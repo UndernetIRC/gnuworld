@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: nickserv.cc,v 1.26 2004/02/13 17:24:41 jeekay Exp $
+ * $Id: nickserv.cc,v 1.27 2004/02/13 18:13:27 jeekay Exp $
  */
 
 #include	<sstream>
@@ -31,7 +31,7 @@
 #include "netData.h"
 #include "nickserv.h"
 
-RCSTAG("$Id: nickserv.cc,v 1.26 2004/02/13 17:24:41 jeekay Exp $");
+RCSTAG("$Id: nickserv.cc,v 1.27 2004/02/13 18:13:27 jeekay Exp $");
 
 namespace gnuworld
 {
@@ -98,6 +98,7 @@ RegisterCommand(new INVITECommand(this, "INVITE", ""));
 RegisterCommand(new MODUSERCommand(this, "MODUSER", "<nick> [ACCESS] <level>"));
 RegisterCommand(new RECOVERCommand(this, "RECOVER", ""));
 RegisterCommand(new REGISTERCommand(this, "REGISTER", ""));
+RegisterCommand(new RELEASECommand(this, "RELEASE", ""));
 RegisterCommand(new SETCommand(this, "SET", "<property> <value>"));
 RegisterCommand(new SHUTDOWNCommand(this, "SHUTDOWN", "<reason>"));
 RegisterCommand(new STATSCommand(this, "STATS", "<stat>"));

@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-# "$Id: Makefile.am,v 1.14 2003/09/14 16:35:54 dan_karrels Exp $"
+# "$Id: Makefile.am,v 1.15 2004/02/13 18:13:27 jeekay Exp $"
 
 lib_LTLIBRARIES = libnickserv.la
 libnickserv_la_LDFLAGS = -module -export-dynamic -L$(PGSQL_LIB) -lpq++
@@ -11,11 +11,12 @@ libnickserv_la_SOURCES = \
   MODUSERCommand.cc      \
   RECOVERCommand.cc      \
   REGISTERCommand.cc     \
+	RELEASECommand.cc      \
   SETCommand.cc          \
   SHUTDOWNCommand.cc     \
-  Stats.cc		 \
+  Stats.cc               \
   STATSCommand.cc        \
-  WHOAMICommand.cc	 \
+  WHOAMICommand.cc       \
   netData.cc             \
   nickserv.cc            \
   sqlManager.cc          \

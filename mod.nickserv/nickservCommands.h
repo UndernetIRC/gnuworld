@@ -16,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: nickservCommands.h,v 1.8 2003/06/19 22:58:31 dan_karrels Exp $
+ * $Id: nickservCommands.h,v 1.9 2004/02/13 18:13:27 jeekay Exp $
  */
 
 #ifndef _NICKSERVCOMMANDS_H
-#define _NICKSERVCOMMANDS_H "$Id: nickservCommands.h,v 1.8 2003/06/19 22:58:31 dan_karrels Exp $"
+#define _NICKSERVCOMMANDS_H "$Id: nickservCommands.h,v 1.9 2004/02/13 18:13:27 jeekay Exp $"
 
 /**
  * All this code is stolen straight from mod.cservice, which possibly had
@@ -87,6 +87,7 @@ class commName##Command : public Command \
 /* Level 0 Commands */
 DECLARE_COMMAND( RECOVER )
 DECLARE_COMMAND( REGISTER )
+DECLARE_COMMAND( RELEASE )
 DECLARE_COMMAND( SET )
 DECLARE_COMMAND( WHOAMI )
 

@@ -14,7 +14,7 @@
 
 @SET_MAKE@
 
-# "$Id: Makefile.in,v 1.81 2004/01/21 19:42:08 dan_karrels Exp $"
+# "$Id: Makefile.in,v 1.82 2004/02/13 18:13:27 jeekay Exp $"
 
 SOURCES = $(libnickserv_la_SOURCES)
 
@@ -57,7 +57,8 @@ am_libnickserv_la_OBJECTS = libnickserv_la-INFOCommand.lo \
 	libnickserv_la-INVITECommand.lo libnickserv_la-Logger.lo \
 	libnickserv_la-MODUSERCommand.lo \
 	libnickserv_la-RECOVERCommand.lo \
-	libnickserv_la-REGISTERCommand.lo libnickserv_la-SETCommand.lo \
+	libnickserv_la-REGISTERCommand.lo \
+	libnickserv_la-RELEASECommand.lo libnickserv_la-SETCommand.lo \
 	libnickserv_la-SHUTDOWNCommand.lo libnickserv_la-Stats.lo \
 	libnickserv_la-STATSCommand.lo libnickserv_la-WHOAMICommand.lo \
 	libnickserv_la-netData.lo libnickserv_la-nickserv.lo \
@@ -72,6 +73,7 @@ am__depfiles_maybe = depfiles
 @AMDEP_TRUE@	./$(DEPDIR)/libnickserv_la-MODUSERCommand.Plo \
 @AMDEP_TRUE@	./$(DEPDIR)/libnickserv_la-RECOVERCommand.Plo \
 @AMDEP_TRUE@	./$(DEPDIR)/libnickserv_la-REGISTERCommand.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/libnickserv_la-RELEASECommand.Plo \
 @AMDEP_TRUE@	./$(DEPDIR)/libnickserv_la-SETCommand.Plo \
 @AMDEP_TRUE@	./$(DEPDIR)/libnickserv_la-SHUTDOWNCommand.Plo \
 @AMDEP_TRUE@	./$(DEPDIR)/libnickserv_la-STATSCommand.Plo \
@@ -234,11 +236,12 @@ libnickserv_la_SOURCES = \
   MODUSERCommand.cc      \
   RECOVERCommand.cc      \
   REGISTERCommand.cc     \
+	RELEASECommand.cc      \
   SETCommand.cc          \
   SHUTDOWNCommand.cc     \
-  Stats.cc		 \
+  Stats.cc               \
   STATSCommand.cc        \
-  WHOAMICommand.cc	 \
+  WHOAMICommand.cc       \
   netData.cc             \
   nickserv.cc            \
   sqlManager.cc          \
@@ -336,6 +339,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libnickserv_la-MODUSERCommand.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libnickserv_la-RECOVERCommand.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libnickserv_la-REGISTERCommand.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libnickserv_la-RELEASECommand.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libnickserv_la-SETCommand.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libnickserv_la-SHUTDOWNCommand.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libnickserv_la-STATSCommand.Plo@am__quote@
@@ -513,6 +517,30 @@ libnickserv_la-REGISTERCommand.lo: REGISTERCommand.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libnickserv_la-REGISTERCommand.Plo' tmpdepfile='$(DEPDIR)/libnickserv_la-REGISTERCommand.TPlo' @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnickserv_la_CXXFLAGS) $(CXXFLAGS) -c -o libnickserv_la-REGISTERCommand.lo `test -f 'REGISTERCommand.cc' || echo '$(srcdir)/'`REGISTERCommand.cc
+
+libnickserv_la-RELEASECommand.o: RELEASECommand.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnickserv_la_CXXFLAGS) $(CXXFLAGS) -MT libnickserv_la-RELEASECommand.o -MD -MP -MF "$(DEPDIR)/libnickserv_la-RELEASECommand.Tpo" -c -o libnickserv_la-RELEASECommand.o `test -f 'RELEASECommand.cc' || echo '$(srcdir)/'`RELEASECommand.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libnickserv_la-RELEASECommand.Tpo" "$(DEPDIR)/libnickserv_la-RELEASECommand.Po"; else rm -f "$(DEPDIR)/libnickserv_la-RELEASECommand.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='RELEASECommand.cc' object='libnickserv_la-RELEASECommand.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libnickserv_la-RELEASECommand.Po' tmpdepfile='$(DEPDIR)/libnickserv_la-RELEASECommand.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnickserv_la_CXXFLAGS) $(CXXFLAGS) -c -o libnickserv_la-RELEASECommand.o `test -f 'RELEASECommand.cc' || echo '$(srcdir)/'`RELEASECommand.cc
+
+libnickserv_la-RELEASECommand.obj: RELEASECommand.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnickserv_la_CXXFLAGS) $(CXXFLAGS) -MT libnickserv_la-RELEASECommand.obj -MD -MP -MF "$(DEPDIR)/libnickserv_la-RELEASECommand.Tpo" -c -o libnickserv_la-RELEASECommand.obj `if test -f 'RELEASECommand.cc'; then $(CYGPATH_W) 'RELEASECommand.cc'; else $(CYGPATH_W) '$(srcdir)/RELEASECommand.cc'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libnickserv_la-RELEASECommand.Tpo" "$(DEPDIR)/libnickserv_la-RELEASECommand.Po"; else rm -f "$(DEPDIR)/libnickserv_la-RELEASECommand.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='RELEASECommand.cc' object='libnickserv_la-RELEASECommand.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libnickserv_la-RELEASECommand.Po' tmpdepfile='$(DEPDIR)/libnickserv_la-RELEASECommand.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnickserv_la_CXXFLAGS) $(CXXFLAGS) -c -o libnickserv_la-RELEASECommand.obj `if test -f 'RELEASECommand.cc'; then $(CYGPATH_W) 'RELEASECommand.cc'; else $(CYGPATH_W) '$(srcdir)/RELEASECommand.cc'; fi`
+
+libnickserv_la-RELEASECommand.lo: RELEASECommand.cc
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnickserv_la_CXXFLAGS) $(CXXFLAGS) -MT libnickserv_la-RELEASECommand.lo -MD -MP -MF "$(DEPDIR)/libnickserv_la-RELEASECommand.Tpo" -c -o libnickserv_la-RELEASECommand.lo `test -f 'RELEASECommand.cc' || echo '$(srcdir)/'`RELEASECommand.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libnickserv_la-RELEASECommand.Tpo" "$(DEPDIR)/libnickserv_la-RELEASECommand.Plo"; else rm -f "$(DEPDIR)/libnickserv_la-RELEASECommand.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='RELEASECommand.cc' object='libnickserv_la-RELEASECommand.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libnickserv_la-RELEASECommand.Plo' tmpdepfile='$(DEPDIR)/libnickserv_la-RELEASECommand.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnickserv_la_CXXFLAGS) $(CXXFLAGS) -c -o libnickserv_la-RELEASECommand.lo `test -f 'RELEASECommand.cc' || echo '$(srcdir)/'`RELEASECommand.cc
 
 libnickserv_la-SETCommand.o: SETCommand.cc
 @am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnickserv_la_CXXFLAGS) $(CXXFLAGS) -MT libnickserv_la-SETCommand.o -MD -MP -MF "$(DEPDIR)/libnickserv_la-SETCommand.Tpo" -c -o libnickserv_la-SETCommand.o `test -f 'SETCommand.cc' || echo '$(srcdir)/'`SETCommand.cc; \
