@@ -1,3 +1,23 @@
 #!/bin/sh
-/bin/mv /usr/local/pgsql/regproc/judge.log /usr/local/pgsql/regproc/logs/judge.log.`/bin/date +%Y%m%d`
-/usr/bin/touch /usr/local/pgsql/regproc/judge.log
+# "$Id: cycle-judge,v 1.2 2002/03/16 00:50:14 gte Exp $"
+# Changes: use gzip when present to compress files, and give users the option to control the behaviour
+# "Alexander Maassen" <outsider@key2peace.org>
+
+# Change the setting below to the location where your judge.log resides without the trailing slash
+SRCPATH=/usr/local/pgsql/regproc/logs
+# Change the setting below if you want the archived logs somewhere else
+DSTPATH=/usr/local/pgsql/regproc/logs
+
+if [ -f $SRCPATH/judge.log ]
+then
+  if [ -f /bin/gzip ]
+  then
+    /bin/gzip $SRCPATH/judge.log > $DSTPATH/judge.log.`/bin/date +%Y%m%d`.gz
+    /bin/rm $SRCPATH/judge.log
+  else
+    /bin/mv $SRCPATH/judge.log $DSTPATH/judge.log.`/bin/date +%Y%m%d`
+  fi
+  /usr/bin/touch $SRCPATH/judge.log
+else
+  echo "No logs found . Aborting.."
+fi
