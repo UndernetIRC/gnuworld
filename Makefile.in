@@ -1,4 +1,4 @@
-# $Id: Makefile.in,v 1.3 2000/07/07 14:20:34 dan_karrels Exp $
+# $Id: Makefile.in,v 1.4 2000/07/10 22:51:52 dan_karrels Exp $
 # all		-- gnuworld
 # clean		-- cleanup objects and executable
 # distclean	-- everything =P
@@ -14,10 +14,6 @@ CXXFLAGS = @CXXFLAGS@
 
 SHLIB_CXX = @SHLIB_CXX@
 SHLIB_LD = @SHLIB_LD@
-
-MOD_CXX = @MOD_CXX@
-MOD_LD = @MOD_LD@
-MOD_DIRS = @MOD_DIRS@
 
 BIN_PATH = @BIN_PATH@
 SRC_PATH = @SRC_PATH@
@@ -40,7 +36,7 @@ MFLAGS ='CXX=$(CXX)'					\
 	'LDFLAGS=$(LDFLAGS)'				\
 	'RM=$(RM)'
 
-all: libgnuworld gnuworld modules
+all: libgnuworld gnuworld
 everything: all
 
 libgnuworld: lib/Makefile
@@ -48,20 +44,6 @@ libgnuworld: lib/Makefile
 
 gnuworld: src/Makefile Makefile libgnuworld
 	@cd src; $(MAKE2) all
-
-modules:
-	@echo "Building modules..."
-	@cd src; $(MAKE2) modules
-	@for i in $(MOD_DIRS); do \
-		whichMod=`echo $$i | cut -d"." -f1`; \
-		whichMod="$$whichMod.so"; \
-		if [ -f $(BIN_PATH)/$$whichMod ]; then \
-			$(RM) $(BIN_PATH)/$$whichMod; \
-		fi; \
-		if [ -f $(SRC_PATH)/$$i/$$whichMod ]; then \
-			$(LN) -s $(SRC_PATH)/$$i/$$whichMod $(BIN_PATH)/$$whichMod ; \
-		fi; \
-	done;
 
 clean:
 	@-if [ -f lib/Makefile ]; then cd lib; $(MAKE2) clean; fi
