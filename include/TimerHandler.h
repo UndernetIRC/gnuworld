@@ -1,11 +1,17 @@
 /* TimerHandler.h */
 
 #ifndef __TIMERHANDLER_H
-#define __TIMERHANDLER_H "$Id: TimerHandler.h,v 1.1 2001/01/28 19:27:35 dan_karrels Exp $"
+#define __TIMERHANDLER_H "$Id: TimerHandler.h,v 1.2 2001/05/17 21:32:57 dan_karrels Exp $"
 
 namespace gnuworld
 {
 
+/**
+ * This is the abstract base class used in the GNUWorld timer system.
+ * All timer handlers must subclass this class, and define the
+ * abstract method OnTimer().  The OnTimer() method will be called
+ * by the timer system when the timer has expired.
+ */
 class TimerHandler
 {
 
@@ -22,7 +28,7 @@ public:
 	virtual ~TimerHandler() {}
 
 	/**
-	 * The type used to represent client timer events.
+	 * The type used to represent timer events.
 	 */
 	typedef unsigned int timerID ;
 
@@ -36,6 +42,10 @@ public:
 
 } ;
 
+/**
+ * This macro is meant to assist in creating new subclasses of
+ * the TimerHandler class.
+ */
 #define SUBCLASS_TIMERHANDLER(className) \
 class className##Timer : public TimerHandler \
 { \

@@ -17,7 +17,7 @@
  */
 
 #ifndef __SERVER_H
-#define __SERVER_H "$Id: server.h,v 1.41 2001/05/17 00:59:33 dan_karrels Exp $"
+#define __SERVER_H "$Id: server.h,v 1.42 2001/05/17 21:32:57 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
@@ -1149,6 +1149,16 @@ protected:
 	 * Time at which we ended the last burst.
 	 */
 	time_t			burstEnd ;
+
+	/**
+	 * The timer interval for the glineUpdateTimer timer.
+	 */
+	time_t			glineUpdateInterval ;
+
+	/**
+	 * The timer interval for the PINGTimer timer.
+	 */
+	time_t			pingUpdateInterval ;
 
 	/**
 	 * This is the version of the xServer, pretty useless.

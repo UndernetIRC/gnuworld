@@ -48,7 +48,7 @@
 #include	"ServerTimerHandlers.h"
 
 const char server_h_rcsId[] = __SERVER_H ;
-const char server_cc_rcsId[] = "$Id: server.cc,v 1.99 2001/05/17 19:19:56 dan_karrels Exp $" ;
+const char server_cc_rcsId[] = "$Id: server.cc,v 1.100 2001/05/17 21:32:57 dan_karrels Exp $" ;
 const char config_h_rcsId[] = __CONFIG_H ;
 const char misc_h_rcsId[] = __MISC_H ;
 const char events_h_rcsId[] = __EVENTS_H ;
@@ -362,6 +362,7 @@ theSock = NULL ;
 Message = SRV_SUCCESS ;
 outputWriteSize = inputReadSize = 0 ;
 lastTimerID = 1 ;
+glineUpdateInterval = pingUpdateInterval = 0 ;
 
 // Initialize the numeric stuff.
 ::memset( charYY, 0, sizeof( charYY ) ) ;
@@ -388,6 +389,11 @@ Password = conf.Require( "password" )->second ;
 Port = atoi( conf.Require( "port" )->second.c_str() ) ;
 intYY = atoi( conf.Require( "numeric" )->second.c_str() ) ;
 intXXX = atoi( conf.Require( "maxclients" )->second.c_str() ) ;
+
+glineUpdateInterval = static_cast< time_t >( atoi(
+	conf.Require( "glineupdateinterval" )->second.c_str() ) ) ;
+pingUpdateInterval = static_cast< time_t >( atoi(
+	conf.Require( "pingupdateinterval" )->second.c_str() ) ) ;
 
 return true ;
 }
@@ -427,11 +433,11 @@ return true ;
 
 void xServer::registerServerTimers()
 {
-RegisterTimer( ::time( 0 ) + 10, // start in 10 seconds
-	new GlineUpdateTimer,
+RegisterTimer( ::time( 0 ) + glineUpdateInterval,
+	new GlineUpdateTimer( this, glineUpdateInterval ),
 	static_cast< void* >( this ) ) ;
-RegisterTimer( ::time( 0 ) + 60,
-	new PINGTimer,
+RegisterTimer( ::time( 0 ) + pingUpdateInterval,
+	new PINGTimer( this, pingUpdateInterval ),
 	static_cast< void* >( this ) ) ;
 }
  
