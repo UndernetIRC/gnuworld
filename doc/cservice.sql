@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------------
--- "$Id: cservice.sql,v 1.77 2003/12/05 14:26:51 nighty Exp $"
+-- "$Id: cservice.sql,v 1.78 2004/02/26 01:08:27 nighty Exp $"
 -- Channel service DB SQL file for PostgreSQL.
 
 -- ChangeLog:
@@ -276,6 +276,8 @@ CREATE TABLE channellog (
 -- 16 -- EV_NONSUPPORT - When an application gets rejected due to NON-SUPPORT from one of the supporters on the web
 -- 17 -- EV_ADMREVIEW - When an admins "Review" an application
 -- 18 -- EV_CLRREVIEW - When a Reviewed application get its "Reviewed" flag cleared by an admin.
+-- 19 -- EV_SUSPEND - When a channel is suspended by an administrator (channel.flags & 0x10 is 'set')
+-- 20 -- EV_UNSUSPEND - When a channel is unsuspended by an administrator (channels.flags & 0x10 is 'unset')
 	message TEXT,
 	last_updated INT4 NOT NULL,
 	deleted INT2 DEFAULT '0'
