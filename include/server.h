@@ -17,7 +17,7 @@
  */
 
 #ifndef __SERVER_H
-#define __SERVER_H "$Id: server.h,v 1.43 2001/05/21 16:35:34 dan_karrels Exp $"
+#define __SERVER_H "$Id: server.h,v 1.44 2001/05/26 00:18:42 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
@@ -441,6 +441,16 @@ public:
 	 */
 	virtual int	Wallops( const string& ) ;
 
+	/**
+	 * Set modes as the server, update internal tables, and notify
+	 * all clients of the mode change(s).
+	 * The first argument is the xClient requesting the mode
+	 * change(s), and cannot be NULL.
+	 */
+	virtual int	Mode( xClient*, Channel*,
+				const string& modes,
+				const string& args ) ;
+
 	/* Event registration stuff */
 
 	/**
@@ -849,6 +859,18 @@ protected:
 	virtual void	removeAllChanModes( Channel* ) ;
 
 	/**
+	 * This support method is called by Mode() to parse the modes
+	 * and arguments.
+	 */
+	virtual int	parseModeRequest( const Channel*, const string&,
+				const string& ) const ;
+
+	/**
+	 * Returns true if the given mask uses the nick!user@host syntax.
+	 */
+	virtual bool	banSyntax( const string& ) const ;
+
+	/**
 	 * Parse a burst line for channel bans.
 	 */
 	virtual void	parseBurstBans( Channel*, const char* ) ;
@@ -957,20 +979,17 @@ protected:
 
 	/* Network message handlers */
 
-	/// ERROR message handler, deprecated.
-	DECLARE_MSG(Error);
-
-	/// RPING message handler, deprecated.
-	DECLARE_MSG(RemPing);
-
-	/// P(RIVMSG) message handler.
-	DECLARE_MSG(P);
-
-	// PRIVMSG message handler, bogus.
-	DECLARE_MSG(PRIVMSG);
-
 	/// B(URST) message handler.
 	DECLARE_MSG(B);
+
+	/// C(REATE) message handler.
+	DECLARE_MSG(C);
+
+	/// CM(CLEARMODE) message handler.
+	DECLARE_MSG(CM);
+
+	/// D(KILL) message handler.
+	DECLARE_MSG(D);
 
 	/// EA (End of burst Acknowledge) message handler.
 	DECLARE_MSG(EA);
@@ -978,20 +997,29 @@ protected:
 	/// EB (End of BURST) message handler.
 	DECLARE_MSG(EB);
 
+	/// ERROR message handler, deprecated.
+	DECLARE_MSG(Error);
+
 	/// G(PING) message handler.
 	DECLARE_MSG(G);
 
 	/// J(OIN) message handler.
 	DECLARE_MSG(J);
 
-	/// C(REATE) message handler.
-	DECLARE_MSG(C);
+	// JU(PE) message handler.
+	DECLARE_MSG(JU);
 
 	/// L(EAVE) message handler.
 	DECLARE_MSG(L);
 
+	/// P(RIVMSG) message handler.
+	DECLARE_MSG(P);
+
 	/// PART message handler, non-tokenized, bogus
 	DECLARE_MSG(PART);
+
+	// PRIVMSG message handler, bogus.
+	DECLARE_MSG(PRIVMSG);
 
 	/// M(ODE) message handler.
 	DECLARE_MSG(M);
@@ -1002,6 +1030,9 @@ protected:
 	/// Q(UIT) message handler.
 	DECLARE_MSG(Q);
 
+	/// RPING message handler, deprecated.
+	DECLARE_MSG(RemPing);
+
 	/// S(ERVER) message handler.
 	DECLARE_MSG(S);
 
@@ -1010,9 +1041,6 @@ protected:
 
 	/// SQ(UIT) message handler.
 	DECLARE_MSG(SQ);
-
-	/// D(KILL) message handler.
-	DECLARE_MSG(D);
 
 	/// WA(LLOPS) message handler.
 	DECLARE_MSG(WA);

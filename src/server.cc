@@ -48,7 +48,7 @@
 #include	"ServerTimerHandlers.h"
 
 const char server_h_rcsId[] = __SERVER_H ;
-const char server_cc_rcsId[] = "$Id: server.cc,v 1.101 2001/05/21 16:35:34 dan_karrels Exp $" ;
+const char server_cc_rcsId[] = "$Id: server.cc,v 1.102 2001/05/26 00:18:42 dan_karrels Exp $" ;
 const char config_h_rcsId[] = __CONFIG_H ;
 const char misc_h_rcsId[] = __MISC_H ;
 const char events_h_rcsId[] = __EVENTS_H ;
@@ -250,6 +250,13 @@ REGISTER_MSG( "PRIVMSG", PRIVMSG );
 
 // Mode
 REGISTER_MSG( "M", M );
+
+// OPMODE
+// Use same handler as MODE
+REGISTER_MSG( "OM", M ) ;
+
+// CLEARMODE
+REGISTER_MSG( "CM", CM ) ;
 
 // Quit
 REGISTER_MSG( "Q", Q );
@@ -3169,6 +3176,327 @@ int retMe = Write( s ) ;
 delete[] s.str() ;
 
 return retMe ;
+}
+
+int xServer::Mode( xClient* theClient,
+	Channel* theChan,
+	const string& modes,
+	const string& args )
+{
+assert( theChan != 0 ) ;
+
+if( NULL == theClient )
+	{
+	return -10 ;
+	}
+
+// Make sure that the modes string is not empty, it's ok for
+// the args string to be empty
+if( modes.empty() )
+	{
+	return -1 ;
+	}
+
+// Return the iClient instance for the requesting xClient
+iClient* theIClient = theClient->getInstance() ;
+
+// Make sure the pointer is not NULL
+assert( theIClient != 0 ) ;
+
+// Attempt to find the ChannelUser for the requesting xClient
+// on the given channel
+ChannelUser* theUser = theChan->findUser( theIClient ) ;
+
+// Is the xClient in the channel?
+if( NULL == theIClient )
+	{
+	// Nope, the xClient is not in the channel...silly xClient
+	return -9 ;
+	}
+
+// Verify that the modes and args are valid for the given channel,
+// this will allow the below loop to work successfully and it
+// will not require to do any validation
+int retMe = parseModeRequest( theChan, modes, args ) ;
+if( retMe < 0 )
+	{
+	// Something was wrong with the modes and/or args mode
+	// change parameters...return the error found from
+	// parseModeRequest()
+	return retMe ;
+	}
+
+// Tokenize the argument list by ' '
+StringTokenizer argTokens( args ) ;
+
+// The argument iterator
+StringTokenizer::const_iterator argPtr = argTokens.begin() ;
+
+// This variable holds the polarity of the current mode
+bool polarity = true ;
+
+// These structures will queue all modes to be sent to the channel
+// and all other xClients
+opVectorType opVector ;
+voiceVectorType voiceVector ;
+banVectorType banVector ;
+
+for( string::const_iterator modePtr = modes.begin() ;
+	modePtr != modes.end() ; ++modePtr )
+	{
+	switch( *modePtr )
+		{
+		case '+':
+			polarity = true ;
+			break ;
+		case '-':
+			polarity = false ;
+			break ;
+		case 't':
+			onChannelModeT( theChan, polarity,
+				theUser ) ;
+			break ;
+		case 'n':
+			onChannelModeN( theChan, polarity,
+				theUser ) ;
+			break ;
+		case 's':
+			onChannelModeS( theChan, polarity,
+				theUser ) ;
+			break ;
+		case 'p':
+			onChannelModeP( theChan, polarity,
+				theUser ) ;
+			break ;
+		case 'i':
+			onChannelModeI( theChan, polarity,
+				theUser ) ;
+			break ;
+		case 'm':
+			onChannelModeM( theChan, polarity,
+				theUser ) ;
+			break ;
+		case 'b':
+			banVector.push_back( banVectorType::value_type(
+				polarity, *argPtr ) ) ;
+			++argPtr ;
+			break ;
+		case 'v':
+			{
+			iClient* theClient = Network->findClient(
+				*argPtr ) ;
+			ChannelUser* theUser = theChan->findUser(
+				theClient ) ;
+
+			voiceVector.push_back( voiceVectorType::value_type(
+				polarity, theUser ) ) ;
+			++argPtr ;
+			}
+			break ;
+		case 'o':
+			{
+			iClient* theClient = Network->findClient(
+				*argPtr ) ;
+			ChannelUser* theUser = theChan->findUser(
+				theClient ) ;
+
+			opVector.push_back( opVectorType::value_type(
+				polarity, theUser ) ) ;
+			++argPtr ;
+			}
+			break ;
+		case 'k':
+			// Channel mode 'k' always has an argument
+			onChannelModeK( theChan, polarity, theUser,
+				*argPtr ) ;
+			++argPtr ;
+			break ;
+		case 'l':
+			// Channel mode 'l' only has an argument if
+			// it's being added, but not removed
+			onChannelModeL( theChan, polarity, theUser,
+				polarity ? atoi( (*argPtr).c_str() )
+				: 0 ) ;
+			if( polarity )
+				{
+				++argPtr ;
+				}
+			break ;
+		} // switch()
+	} // for()
+
+// Write the modes to the network before updating tables and notifying
+// other xClients...this will keep the output buffers synched
+strstream s ;
+s	<< theChan->getName()
+	<< ' '
+	<< modes ;
+
+if( !args.empty() )
+	{
+	s	<< ' '
+		<< args ;
+	}
+
+s	<< ends ;
+
+retMe = Write( s ) ;
+delete[] s.str() ;
+
+// Update internal tables and notify all xClients of mode change(s)
+if( !opVector.empty() )
+	{
+	onChannelModeO( theChan, theUser, opVector ) ;
+	}
+if( !voiceVector.empty() )
+	{
+	onChannelModeV( theChan, theUser, voiceVector ) ;
+	}
+if( !banVector.empty() )
+	{
+	onChannelModeB( theChan, theUser, banVector ) ;
+	}
+
+return retMe ;
+
+}
+
+int xServer::parseModeRequest( const Channel* theChan,
+	const string& modes,
+	const string& args ) const
+{
+
+// Tokenize the argument list by ' '
+StringTokenizer argTokens( args ) ;
+
+// The argument iterator
+StringTokenizer::const_iterator argPtr = argTokens.begin() ;
+
+// This variable holds the polarity of the current mode
+bool polarity = true ;
+
+for( string::const_iterator modePtr = modes.begin() ;
+	modePtr != modes.end() ; ++modePtr )
+	{
+	switch( *modePtr )
+		{
+		case '+':
+			polarity = true ;
+			break ;
+		case '-':
+			polarity = false ;
+			break ;
+		case 'b':
+			{
+			if( argPtr == argTokens.end() )
+				{
+				// Insufficient arguments
+				return -2 ;
+				}
+			if( !banSyntax( *argPtr ) )
+				{
+				// Bad ban syntax
+				return -3 ;
+				}
+			if( !polarity )
+				{
+				// Removing a ban, make sure it
+				// exists
+				if( !theChan->findBan( *argPtr ) )
+					{
+					// Ban mask not found
+					return -4 ;
+					}
+				}
+			// All checks ok, increment argument iterator
+			++argPtr ;
+
+			} // case 'b'
+			break ;
+		case 'o':
+		case 'v':
+			{
+			if( argPtr == argTokens.end() )
+				{
+				// Insufficient arguments
+				return -2 ;
+				}
+			iClient* theClient = Network->findClient(
+				*argPtr ) ;
+			if( NULL == theClient )
+				{
+				// Client not found
+				return -4 ;
+				}
+
+			if( NULL == theChan->findUser( theClient ) )
+				{
+				// ChannelUser not found
+				return -4 ;
+				}
+
+			// All is well
+			++argPtr ;
+
+			} // case 'o'/case 'v'
+			break ;
+		case 'l':
+			// Only has an argument if it's being added
+			if( polarity )
+				{
+				if( argPtr == argTokens.end() )
+					{
+					// Insufficient arguments
+					return -2 ;
+					}
+				++argPtr ;
+				}
+			break ;
+		case 'k':
+			// Mode 'k' always has an argument
+			if( argPtr == argTokens.end() )
+				{
+				// Insufficient arguments
+				return -2 ;
+				}
+			++argPtr ;
+
+			break ;
+		case 't':
+		case 'n':
+		case 'i':
+		case 'm':
+		case 'p':
+		case 's':
+			// No big deal, let the network deal with any
+			// problems
+			break ;
+		default:
+			// Unknown mode
+			return -5 ;
+			break ;
+
+		} // switch()
+	} // for()
+
+// All is well
+return 0 ;
+
+}
+
+// Make sure the banMask is of the form nick!user@host
+bool xServer::banSyntax( const string& theMask ) const
+{
+string::size_type exPos = theMask.find( '!' ) ;
+string::size_type atPos = theMask.find( '@' ) ;
+
+if( (string::npos == exPos) || (string::npos == atPos) ||
+	(exPos > atPos) )
+	{
+	return false ;
+	}
+
+return true ;
 }
 
 } // namespace gnuworld

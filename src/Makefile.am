@@ -16,6 +16,7 @@ gnuworld_SOURCES = Channel.cc \
 	msg_AD.cc \
 	msg_B.cc \
 	msg_C.cc \
+	msg_CM.cc \
 	msg_D.cc \
 	msg_DS.cc \
 	msg_EA.cc \
@@ -25,6 +26,7 @@ gnuworld_SOURCES = Channel.cc \
 	msg_GL.cc \
 	msg_I.cc \
 	msg_J.cc \
+	msg_JU.cc \
 	msg_K.cc \
 	msg_L.cc \
 	msg_M.cc \

@@ -1,7 +1,7 @@
 /* Channel.h */
 
 #ifndef __CHANNEL_H
-#define __CHANNEL_H "$Id: Channel.h,v 1.14 2001/03/24 16:00:55 dan_karrels Exp $"
+#define __CHANNEL_H "$Id: Channel.h,v 1.15 2001/05/26 00:18:42 dan_karrels Exp $"
 
 #include	<string>
 #include	<map>
@@ -65,19 +65,19 @@ public:
 	static const modeType	MODE_S = 0x04 ;
 
 	/// Bit representing channel mode +p
-	static const modeType	MODE_P = 0x10 ;
+	static const modeType	MODE_P = 0x08 ;
 
 	/// Bit representing channel mode +k
-	static const modeType	MODE_K = 0x20 ;
+	static const modeType	MODE_K = 0x10 ;
 
 	/// Bit representing channel mode +l
-	static const modeType	MODE_L = 0x40 ;
+	static const modeType	MODE_L = 0x20 ;
 
 	/// Bit representing channel mode +m
-	static const modeType	MODE_M = 0x80 ;
+	static const modeType	MODE_M = 0x40 ;
 
 	/// Bit representing channel mode +i
-	static const modeType	MODE_I = 0x100 ;
+	static const modeType	MODE_I = 0x80 ;
 
 	/// Type used to store number of clients in channel
 	typedef userListType::size_type size_type ;

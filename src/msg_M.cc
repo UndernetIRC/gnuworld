@@ -18,7 +18,16 @@
 #include	"ELog.h"
 #include	"StringTokenizer.h"
 
-const char msg_M_cc_rcsId[] = "$Id: msg_M.cc,v 1.6 2001/03/24 01:31:42 dan_karrels Exp $" ;
+const char msg_M_cc_rcsId[] = "$Id: msg_M.cc,v 1.7 2001/05/26 00:18:42 dan_karrels Exp $" ;
+const char misc_h_rcsId[] = __MISC_H ;
+const char events_h_rcsId[] = __EVENTS_H ;
+const char server_h_rcsId[] = __SERVER_H ;
+const char iClient_h_rcsId[] = __ICLIENT_H ;
+const char Channel_h_rcsId[] = __CHANNEL_H ;
+const char ChannelUser_h_rcsId[] = __CHANNELUSER_H ;
+const char Network_h_rcsId[] = __NETWORK_H ;
+const char ELog_h_rcsId[] = __ELOG_H ;
+const char StringTokenizer_h_rcsId[] = __STRINGTOKENIZER_H ;
 
 namespace gnuworld
 {
@@ -113,9 +122,10 @@ if( clientSource != 0 )
 
 bool polarity = true ;
 xParameters::size_type argPos = 3 ;
-vector< pair< bool, ChannelUser* > > opVector ;
-vector< pair< bool, ChannelUser* > > voiceVector ;
-vector< pair< bool, string > > banVector ;
+
+opVectorType opVector ;
+voiceVectorType voiceVector ;
+banVectorType banVector ;
 
 for( const char* modePtr = Param[ 2 ] ; *modePtr ; ++modePtr )
 	{
