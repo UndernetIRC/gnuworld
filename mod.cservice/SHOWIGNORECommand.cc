@@ -7,7 +7,7 @@
 #include	"cservice.h" 
 #include	"responses.h"
 
-const char SHOWIGNORECommand_cc_rcsId[] = "$Id: SHOWIGNORECommand.cc,v 1.8 2001/03/05 12:46:50 isomer Exp $" ;
+const char SHOWIGNORECommand_cc_rcsId[] = "$Id: SHOWIGNORECommand.cc,v 1.9 2001/03/05 21:41:30 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -36,7 +36,7 @@ bool SHOWIGNORECommand::Exec( iClient* theClient, const string& Message )
 		ptr != bot->silenceList.end() ; ++ptr )
 		{
 		bot->Notice(theClient, bot->getResponse(theUser,
-			language::rpl_ignorelist, "%s for %i minutes"),
+			language::rpl_ignorelist, "%s for %i minutes").c_str(),
 			ptr->second.c_str(),
 			(((ptr->first - bot->currentTime()) / 60) % 60));
 		count++;

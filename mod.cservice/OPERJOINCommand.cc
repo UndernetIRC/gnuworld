@@ -8,7 +8,7 @@
  *
  * Caveats: None
  *
- * $Id: OPERJOINCommand.cc,v 1.7 2001/03/05 12:46:50 isomer Exp $
+ * $Id: OPERJOINCommand.cc,v 1.8 2001/03/05 21:41:30 gte Exp $
  */
 
 
@@ -21,7 +21,7 @@
 #include	"responses.h"
 #include	"Network.h"
 
-const char OPERJOINCommand_cc_rcsId[] = "$Id: OPERJOINCommand.cc,v 1.7 2001/03/05 12:46:50 isomer Exp $" ;
+const char OPERJOINCommand_cc_rcsId[] = "$Id: OPERJOINCommand.cc,v 1.8 2001/03/05 21:41:30 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -58,7 +58,7 @@ sqlChannel* theChan = bot->getChannelRecord(st[1]);
 if (!theChan)
 	{
 	bot->Notice(theClient, bot->getResponse(theUser, language::chan_not_reg,
-		"The channel %s doesn't appear to be registered"),
+		"The channel %s doesn't appear to be registered").c_str(),
 		st[1].c_str());
 	return false;
 	} 

@@ -17,7 +17,7 @@
  *
  * Caveats: None
  *
- * $Id: OPCommand.cc,v 1.21 2001/03/05 12:46:50 isomer Exp $
+ * $Id: OPCommand.cc,v 1.22 2001/03/05 21:41:30 gte Exp $
  */
 
 #include	<string>
@@ -32,7 +32,7 @@
 
 using std::map ;
 
-const char OPCommand_cc_rcsId[] = "$Id: OPCommand.cc,v 1.21 2001/03/05 12:46:50 isomer Exp $" ;
+const char OPCommand_cc_rcsId[] = "$Id: OPCommand.cc,v 1.22 2001/03/05 21:41:30 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -114,8 +114,8 @@ ChannelUser* tmpBotUser = tmpChan->findUser(bot->getInstance());
 if (!tmpBotUser) return false; 
 if(!tmpBotUser->getMode(ChannelUser::MODE_O))
 		{
-		bot->Notice(theClient, bot->getResponse(thUser,
-			language::im_not_opped, "I'm not opped in %s"),
+		bot->Notice(theClient, bot->getResponse(theUser,
+			language::im_not_opped, "I'm not opped in %s").c_str(),
 			theChan->getName().c_str());
 		return false;
 		} 
