@@ -35,6 +35,11 @@ Note: the script add the user Admin , with all commands enabled .
 then you should
 
 > psql ccontrol < ccontrol.commands.sql
+
+
+If you have problems with an upgrade of GNUworld with ccontrol module on certain features,
+you may want to upgrade your old tables to fit, then do the following :
+
 > psql ccontrol < ccontrol.update.sql
 
 

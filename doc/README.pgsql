@@ -1,3 +1,4 @@
+-- "$Id: README.pgsql,v 1.3 2001/10/14 06:54:40 nighty Exp $"
 --
 -- Building PostgreSQL for GNUworld
 --
