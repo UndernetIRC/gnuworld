@@ -5,7 +5,7 @@ nickname = DS
 username = dronescan
 
 # What hostname should the bot use?
-hostname = undernet.org
+hostname = netgamers.org
 
 # What should the bots real name be?
 userdescription = Drone Scanner
@@ -20,7 +20,9 @@ mode = +idk
 # Note that the entropy tests are always enabled.
 # 1 - Entropy (don't unset)
 # 2 - Join Count (see below)
-enabledTests = 3
+# 4 - Channel Range (see below)
+# 8 - Has Ops
+enabledTests = 15
 
 # Console channel name and initial modes
 consoleChannel = #ds.console
@@ -57,3 +59,13 @@ jcInterval = 60
 # The trigger level for which join counter warns. Note that the total join
 # count must be OVER this level to trigger.
 jcCutoff = 10
+
+
+#################
+# CHANNEL RANGE #
+#################
+
+# If you enabled test 4 in enabledTests, you must give these values:
+
+# The total range of entropy in a channel before it is considered abnormal
+channelRange = 0.2
