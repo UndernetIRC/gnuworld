@@ -10,7 +10,7 @@
 #include	"cservice.h"
 #include	"cservice_config.h"
 
-const char NOTECommand_cc_rcsId[] = "$Id: NOTECommand.cc,v 1.1 2002/04/01 22:08:14 gte Exp $" ;
+const char NOTECommand_cc_rcsId[] = "$Id: NOTECommand.cc,v 1.2 2002/04/01 23:42:49 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -124,6 +124,9 @@ if (string_lower(st[1]) == "send")
 
 	bot->Notice(theClient, "Successfully delivered message to %s!",
 		targetUser->getUserName().c_str());
+
+	noticeAllAuthedClients(targetUser, "%s has just sent you a note. Type /msg %s notes read all to read it."
+		theUser->getUserName().c_str(), bot->getNickName().c_str());
 
 	theUser->setNotesSent(theUser->getNotesSent() + 1);
 	return true;
