@@ -17,13 +17,14 @@
  */
 
 #ifndef __XSERVER_H
-#define __XSERVER_H "$Id: server.h,v 1.5 2000/07/16 17:48:18 dan_karrels Exp $"
+#define __XSERVER_H "$Id: server.h,v 1.6 2000/07/31 21:17:52 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
 #include	<list>
 #include	<strstream>
 #include	<map>
+#include	<hash_map>
 
 #include	<ctime>
 
@@ -33,13 +34,13 @@
 #include	"Socket.h"
 #include	"ClientSocket.h"
 #include	"Buffer.h"
-#include	"VectorTrie.h"
+//#include	"VectorTrie.h"
 #include	"events.h"
 #include	"Gline.h"
 #include	"xparameters.h"
 #include	"misc.h"
 //#include	"moduleLoader.h"
- 
+
 namespace gnuworld
 {
 
@@ -56,9 +57,8 @@ namespace gnuworld
  * class declaration.
  */
 #define REGISTER_MSG( key, handlerFunc ) \
-  if( !commandMap->Insert( key, \
-	&xServer::MSG_##handlerFunc, \
-	strlen( key ) ) ) \
+  if( !commandMap->insert( commandMapType::value_type( key, \
+	&xServer::MSG_##handlerFunc ) ).second ) \
 	{\
 	elog << "Unable to register function: "\
 		<< key << std::endl ;\
@@ -101,8 +101,8 @@ enum MessageType
 using std::string ;
 using std::list ;
 using std::vector ;
-using std::multimap ;
 using std::strstream ;
+using std::hash_map ;
 
 /**
  * This class is the server proper; it is responsible for the connection
@@ -386,6 +386,13 @@ public:
 	virtual void PostChannelEvent( const channelEventType&,
 		const string& chanName,
 		void* = 0, void* = 0, void* = 0, void* = 0 ) ;
+
+	/**
+	 * This variable represents "all channels."  Clients may
+	 * register for events of this channel, and each will receive
+	 * this event for every channel in existence on the network.
+	 */
+	const static string	CHANNEL_ALL ;
 
 	/*
 	 * Server message system
@@ -691,7 +698,8 @@ protected:
 	 * the bound offset of the command handler methods
 	 * are stored in this structure.
 	 */
-	typedef VectorTrie< char*, int (xServer::*)( xParameters& ) >
+	typedef hash_map< string, int (xServer::*)( xParameters& ), eHash, eqstr >
+//	typedef VectorTrie< char*, int (xServer::*)( xParameters& ) >
 		commandMapType ;
 
 	/**
@@ -751,7 +759,8 @@ protected:
 	/**
 	 * Type used to store the channel event map.
 	 */
-	typedef map< string, list< xClient* >*, noCaseCompare >
+	typedef hash_map< string, list< xClient* >*, eHash, eqstr >
+//	typedef map< string, list< xClient* >*, noCaseCompare >
 		channelEventMapType ;
 
 	/**

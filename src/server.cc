@@ -37,7 +37,7 @@
 //#include	"moduleLoader.h"
 
 const char xServer_h_rcsId[] = __XSERVER_H ;
-const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.9 2000/07/31 15:17:25 dan_karrels Exp $" ;
+const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.10 2000/07/31 21:17:52 dan_karrels Exp $" ;
 
 using std::string ;
 using std::vector ;
@@ -48,6 +48,8 @@ using std::strstream ;
 
 namespace gnuworld
 {
+
+const string xServer::CHANNEL_ALL( "*" ) ;
 
 /**
  * Instantiate a new xServer.  There is only one global
@@ -108,7 +110,8 @@ try
 	// the command map's key character set
 	// They include: alpha chars (case insensitive,
 	// so only 26 of these), numeric characters: 10
-	commandMap = new commandMapType( 36, serverCommandTransTable ) ;
+//	commandMap = new commandMapType( 36, serverCommandTransTable ) ;
+	commandMap = new commandMapType ;
 	}
 catch( std::bad_alloc )
 	{
@@ -243,6 +246,8 @@ REGISTER_MSG( "AWAY", NOOP ) ;
 
 // SILENCE
 REGISTER_MSG( "SILENCE", NOOP ) ;
+
+REGISTER_MSG( "441", NOOP ) ;
 
 // DESYNCH
 REGISTER_MSG( "DESYNCH", Desynch ) ;
@@ -570,9 +575,9 @@ if( !isNumeric )
 // elog << "strlen( Command ): " << strlen( Command ) << endl ;
 
 // Lookup the handler for this command
-commandMapType::elementType* pairPtr =
-	commandMap->Search( Command, strlen( Command ) ) ;
-if( pairPtr != NULL )
+commandMapType::iterator pairPtr =
+	commandMap->find( Command ) ;
+if( pairPtr != commandMap->end() )
 	{
 	// Found a command handler for this
 	// command.
@@ -648,7 +653,7 @@ if( pairPtr != NULL )
 
 	// Arguments are set.
 	// Go ahead and call the handler method
-	(this->*(pairPtr->data))( Param ) ;
+	(this->*(pairPtr->second))( Param ) ;
 
 	}
 else
@@ -872,17 +877,17 @@ UnRegisterChannelEvent( chanName, theClient ) ;
 
 // Obtain a pointer to the list of xClient's registered for events
 // on the given channel.
-list< xClient* >* listPtr = channelEventMap.find( chanName )->second ;
-if( NULL == listPtr )
+channelEventMapType::iterator chanPtr = channelEventMap.find( chanName ) ;
+if( chanPtr == channelEventMap.end() )
 	{
 	// Channel event list doesn't exist yet
-	listPtr = new list< xClient* > ;
-	channelEventMap.insert( channelEventMapType::value_type(
-		chanName, listPtr ) ) ;
+	channelEventMap.insert( channelEventMapType::value_type( chanName,
+		new list< xClient* > ) ) ;
+	chanPtr = channelEventMap.find( chanName ) ;
 	}
 
 // Add the xClient as a listener for events in this channel.
-listPtr->push_back( theClient ) ;
+chanPtr->second->push_back( theClient ) ;
 
 // Addition successful
 return true ;
@@ -946,14 +951,15 @@ bool xServer::UnRegisterChannelEvent( const string& chanName,
   assert( theClient != NULL ) ;
 #endif
 
-list< xClient* >* listPtr = channelEventMap.find( chanName )->second ;
-if( NULL == listPtr )
+channelEventMapType::iterator chanPtr = channelEventMap.find( chanName ) ;
+if( chanPtr == channelEventMap.end() )
 	{
 	// Channel has no xClient's registered for channel events
 	// No big deal.
 	return true ;
 	}
 
+list< xClient* >* listPtr = chanPtr->second ;
 for( list< xClient* >::iterator ptr = listPtr->begin(), end = listPtr->end() ;
 	ptr != end ; ++ptr )
 	{
@@ -1023,13 +1029,27 @@ void xServer::PostChannelEvent( const channelEventType& theEvent,
 	void* Data3, void* Data4 )
 {
 
-list< xClient* >* listPtr = channelEventMap.find( chanName )->second ;
-if( NULL == listPtr )
+// First deliver this channel event to any listeners for all channel
+// events.
+channelEventMapType::iterator allChanPtr = channelEventMap.find( CHANNEL_ALL ) ;
+if( allChanPtr != channelEventMap.end() )
+	{
+	for( list< xClient* >::iterator ptr = allChanPtr->second->begin(),
+		endPtr = allChanPtr->second->end() ; ptr != endPtr ; ++ptr )
+		{
+		(*ptr)->OnChannelEvent( theEvent, chanName,
+			Data1, Data2, Data3, Data4 ) ;
+		}
+	}
+
+channelEventMapType::iterator chanPtr = channelEventMap.find( chanName ) ;
+if( chanPtr == channelEventMap.end() )
 	{
 	// No listeners for this channel's events
 	return ;
 	}
 
+list< xClient* >* listPtr = chanPtr->second ;
 for( list< xClient* >::iterator ptr = listPtr->begin(), end = listPtr->end() ;
 	ptr != end ; ++ptr )
 	{
@@ -2114,6 +2134,10 @@ if( '0' == Param[ 1 ][ 0 ] )
 	for( iClient::channelIterator ptr = Target->channels_begin(),
 		endPtr = Target->channels_end() ; ptr != endPtr ; ++ptr )
 		{
+		PostChannelEvent( EVT_PART, (*ptr)->getName(),
+			static_cast< void* >( *ptr ), // Channel*
+			static_cast< void* >( Target ) ) ; // iClient*
+
 		delete (*ptr)->removeUser( Target->getIntYY() ) ;
 		if( (*ptr)->empty() )
 			{
@@ -2148,6 +2172,8 @@ for( StringTokenizer::size_type i = 0 ; i < st.size() ; i++ )
 		return -1 ;
 		}
 
+	channelEventType whichEvent = EVT_JOIN ;
+
 	// On a JOIN command, the channel should already exist.
 	theChan = Network->findChannel( st[ i ] ) ;
 	if( NULL == theChan )
@@ -2180,6 +2206,7 @@ for( StringTokenizer::size_type i = 0 ; i < st.size() ; i++ )
 		// as operator.
 		theUser->setMode( ChannelUser::MODE_O ) ;
 
+		whichEvent = EVT_CREATE ;
 		} // if( NULL == theChan )
 
 	// Otherwise, the channel was found just fine :)
@@ -2202,8 +2229,7 @@ for( StringTokenizer::size_type i = 0 ; i < st.size() ; i++ )
 
 	// Post the event to the clients listening for events on this
 	// channel, if any.
-	// TODO: Update message posting.
-	PostChannelEvent( EVT_JOIN, theChan->getName(),
+	PostChannelEvent( whichEvent, theChan->getName(),
 		static_cast< void* >( theChan ),
 		static_cast< void* >( Target ) ) ;
 
