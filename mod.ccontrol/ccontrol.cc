@@ -38,7 +38,7 @@
 #include	"ip.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.140 2002/04/22 19:10:49 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.141 2002/04/26 16:02:49 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -1870,18 +1870,22 @@ if(!dbConnected)
 	return false;
 	}
 
-char buffer[ 1024 ] = { 0 } ;
+char buffer[ 1024 ] ;
+memset( buffer, 0, 1024 ) ;
+
 va_list list;
 
 va_start( list, Log ) ;
 vsprintf( buffer, Log, list ) ;
 va_end( list ) ;
-iClient* theClient;
+
+iClient* theClient = 0 ;
 if(Oper)
 	{	
 	theClient = Network->findClient(Oper->getNumeric());
 	}
-buffer[512]= '\0';
+
+buffer[ 512 ] = 0 ;
 static const char *Main = "INSERT into comlog (ts,oper,command) VALUES (now()::abstime::int4,'";
 StringTokenizer st(buffer);
 commandIterator tCommand = findCommand((string_upper(st[0])));
@@ -2126,7 +2130,7 @@ newLog->Desc = log;
 if(!LogFile.is_open())
 	{
 	LogFile.open(LogFileName.c_str(),ios::in|ios::out);
-	LogFile.setbuf(NULL,0);
+	//LogFile.setbuf(NULL,0);
 	}
 if(LogFile.bad())
 	{//There was a problem in opening the log file
@@ -3606,7 +3610,7 @@ if((LogList.size() < Amount)
 		{
 		LogFile.close();
 		LogFile.open(LogFileName.c_str(),ios::in|ios::out);
-		LogFile.setbuf(NULL,0);
+		//LogFile.setbuf(NULL,0);
 		if(LogFile.bad())
 			{
 			Notice(theClient,"Error while reading the lastcom report");

@@ -2,12 +2,15 @@
  * msg_M351.cc
  */
 
+#include	<iostream>
+#include	<string>
+
 #include	"server.h"
 #include	"Network.h"
 #include	"ELog.h"
 #include	"xparameters.h"
 
-const char msg_M351_cc_rcsId[] = "$Id: msg_M351.cc,v 1.2 2001/12/28 16:28:47 mrbean_ Exp $" ;
+const char msg_M351_cc_rcsId[] = "$Id: msg_M351.cc,v 1.3 2002/04/26 16:02:50 dan_karrels Exp $" ;
 const char server_h_rcsId[] = __SERVER_H ;
 const char Network_h_rcsId[] = __NETWORK_H ;
 const char ELog_h_rcsId[] = __ELOG_H ;
@@ -17,6 +20,7 @@ namespace gnuworld
 {
 
 using std::endl ;
+using std::string ;
 
 int xServer::MSG_M351( xParameters& Param )
 {
@@ -55,14 +59,14 @@ char numeric2[ 6 ] = { 0 } ;
 strcpy( numeric2, tmpServer->getCharYY()) ;
 Param.setValue( 0, numeric2 ) ;
 string tMessage;
-for(unsigned int i =0 ; i < Param.size();++i)
-{
-tMessage+=Param[i];
-tMessage += " ";
-}
-
+for( xParameters::size_type i = 0 ; i < Param.size() ; ++i )
+	{
+	tMessage+=Param[i];
+	tMessage += " ";
+	}
 
 return theClient->OnServerMessage(tmpServer,tMessage);
+
 }
 
 } // namespace gnuworld
