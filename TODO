@@ -3,3 +3,5 @@
 - handle ban collission stuff, remove conflicting bans
 - when an xClient is removed, make sure to remove all of its customData
   members in all of the iClient's
+- match()
+

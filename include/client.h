@@ -3,7 +3,7 @@
  */
 
 #ifndef __XCLIENT_H
-#define __XCLIENT_H "$Id: client.h,v 1.14 2000/12/23 15:57:02 dan_karrels Exp $"
+#define __XCLIENT_H "$Id: client.h,v 1.15 2000/12/23 23:54:38 dan_karrels Exp $"
 
 #include	<string>
 
@@ -50,6 +50,11 @@ public:
 	 */
 	xClient( const string& ) ;
 
+	/**
+	 * The primary purpose of this method is do call the
+	 * deallocation methods of any xClient's which are storing
+	 * data in the customDataMap.
+	 */
 	virtual ~xClient() ;
 
 	/**
