@@ -1,5 +1,5 @@
 # Default paths (system-wide installs)
-# $Id: Makefile.in,v 1.5 2000/12/11 02:04:28 gte Exp $
+# $Id: Makefile.in,v 1.6 2000/12/13 22:52:50 dan_karrels Exp $
 #
 
 # Standard defines
@@ -14,7 +14,7 @@ CXXFLAGS = @CXXFLAGS@ -I/usr/local/pgsql/include
 
 BIN_PATH = @BIN_PATH@
 LIB_PATH = @BIN_PATH@
-LIBS = -L$(LIB_PATH) -L/usr/local/pgsql/lib -lgnuworld -lpq++ @LIBS@
+LIBS = -L/usr/local/pgsql/lib -lpq++ @LIBS@
 
 RM = @RM@ -f
 CP = @CP@
