@@ -8,4 +8,10 @@ gnuworld
 ccontrol.conf
 cservice.conf
 GNUWorld.conf
+cloner.conf
+nickserv.conf
+stats.conf
+scanner.conf
+clientExample.conf
+gnutest.conf
 EVT_*
