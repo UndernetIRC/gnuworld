@@ -1,7 +1,10 @@
 Newest changes at the top of the file:
-$Id: RELEASE.NOTES,v 1.17 2001/07/29 20:37:57 gte Exp $
+$Id: RELEASE.NOTES,v 1.18 2001/07/30 18:49:34 gte Exp $
 
 CMaster 1.0pl8 - Current
+* Modify BANLIST so you must have level 1+ in the channel now,
+  however you can view channel bans from outside the channel
+  now.
 * DB Maintainence to perform with this release:
   ALTER TABLE levels ADD COLUMN suspend_level INT4 DEFAULT '0';
 

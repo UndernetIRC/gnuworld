@@ -9,7 +9,7 @@
  *
  * Caveats: None.
  *
- * $Id: BANLISTCommand.cc,v 1.15 2001/07/30 18:40:00 gte Exp $
+ * $Id: BANLISTCommand.cc,v 1.16 2001/07/30 18:49:34 gte Exp $
  */
 
 #include        <string>
@@ -20,7 +20,7 @@
 #include        "levels.h"
 #include        "responses.h"
 
-const char BANLISTCommand_cc_rcsId[] = "$Id: BANLISTCommand.cc,v 1.15 2001/07/30 18:40:00 gte Exp $" ;
+const char BANLISTCommand_cc_rcsId[] = "$Id: BANLISTCommand.cc,v 1.16 2001/07/30 18:49:34 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -37,7 +37,11 @@ if( st.size() < 2 )
 	return true;
 	}
 
-sqlUser* theUser = bot->isAuthed(theClient, false);
+sqlUser* theUser = bot->isAuthed(theClient, true);
+if (!theUser)
+	{
+	return false;
+	}
 
 sqlChannel* theChan = bot->getChannelRecord(st[1]);
 if (!theChan)
