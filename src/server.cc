@@ -47,7 +47,7 @@
 #include	"ServerTimerHandlers.h"
 
 const char xServer_h_rcsId[] = __XSERVER_H ;
-const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.69 2001/02/04 19:35:08 dan_karrels Exp $" ;
+const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.70 2001/02/04 19:41:43 dan_karrels Exp $" ;
 
 using std::string ;
 using std::vector ;
@@ -271,7 +271,6 @@ REGISTER_MSG( "AD", AD ) ;
 // Non-tokenized command handlers
 
 // WHOIS
-REGISTER_MSG( "W", NOOP ) ;
 REGISTER_MSG( "WHOIS", NOOP ) ;
 REGISTER_MSG( "MOTD", NOOP ) ;
 REGISTER_MSG( "MO", NOOP ) ; // MOTD
