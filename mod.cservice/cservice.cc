@@ -732,14 +732,14 @@ if(Command == "PING" || Command=="ECHO")
 else if(Command == "GENDER")
 	{
 	xClient::DoCTCP(theClient, CTCP,
-		"Tried to be a man again - there was a slip - now I'm the Easter Bunny");
+		"Tried to be a man again - there was a slip - now I'm an IT");
 	}
 else if(Command == "VERSION")
 	{
 	xClient::DoCTCP(theClient, CTCP,
 		"Undernet P10 Channel Services Version 2 ["
 		__DATE__ " " __TIME__
-		"] Release 1.0pl4");
+		"] Release 1.0pl5");
 	}
 else if(Command == "PROBLEM?")
 	{
