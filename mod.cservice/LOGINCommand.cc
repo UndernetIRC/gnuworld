@@ -12,7 +12,7 @@
 #include	"cservice_config.h"
 #include	"Network.h"
 
-const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.37 2002/02/06 19:08:20 gte Exp $" ;
+const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.38 2002/02/22 14:50:19 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -89,6 +89,13 @@ if(theUser->isAuthed())
 	return false;
 }
 #endif
+
+if (theUser->getFlag(sqlUser::F_GLOBAL_SUSPEND))
+	{
+	bot->Notice(theClient, "AUTHENTICATION FAILED as %s. (Suspended)",
+	st[1].c_str());
+	return false;
+	}
 
 /*
  *  Compare password with MD5 hash stored in user record.
