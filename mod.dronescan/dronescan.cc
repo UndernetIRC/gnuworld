@@ -224,6 +224,9 @@ int dronescan::OnChannelEvent( const channelEventType& theEvent,
 	/* If we are bursting, we don't want to be checking joins. */
 	if(currentState == BURST) return 0;
 
+	/* If this channel is too small, don't test it. */
+	if(theChannel->size() < channelCutoff) return 0;
+
 	/* Iterate over our available tests, checking this channel */
 	checkChannel( theChannel , false );
 	
@@ -711,7 +714,7 @@ CLIENT_STATE dronescan::setClientState( iClient *theClient )
 /** Log a message. */
 void dronescan::log(LOG_TYPE logType, char *format, ...)
 {
-//	if(logType < INFO) return;
+	if(logType < INFO) return;
 	
 	stringstream newMessage;
 	
