@@ -18,7 +18,7 @@
  *
  * Caveats: None.
  *
- * $Id: SETCommand.cc,v 1.47 2002/01/05 22:32:59 gte Exp $
+ * $Id: SETCommand.cc,v 1.48 2002/02/24 01:04:06 gte Exp $
  */
 
 #include	<string>
@@ -29,7 +29,7 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char SETCommand_cc_rcsId[] = "$Id: SETCommand.cc,v 1.47 2002/01/05 22:32:59 gte Exp $" ;
+const char SETCommand_cc_rcsId[] = "$Id: SETCommand.cc,v 1.48 2002/02/24 01:04:06 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -96,11 +96,24 @@ if( st[1][0] != '#' ) // Didn't find a hash?
 	        return true;
 	}
 
+	if (option == "MAXLOGINS")
+		{
+		unsigned int maxlogins = atoi(value.c_str());
+		if (maxlogins > 3 || maxlogins <= 0)
+			{
+				bot->Notice(theClient, "Max Logins cannot be greater than 3 or less than 1");
+				return false;
+			}
+
+		theUser->setMaxLogins(maxlogins);
+		theUser->commit();
+
+		bot->Notice(theClient, "Max Logins now set to %i", maxlogins);
+		return true;
+		}
+
 	if (option == "LANG")
 	{
-//		bot->Notice(theClient, "Coming soon!");
-//		return true;
-
 		cservice::languageTableType::iterator ptr = bot->languageTable.find(value);
 		if (ptr != bot->languageTable.end())
 		{

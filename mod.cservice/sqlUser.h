@@ -1,7 +1,7 @@
 /* sqlUser.h */
 
 #ifndef __SQLUSER_H
-#define __SQLUSER_H "$Id: sqlUser.h,v 1.26 2002/01/08 23:20:43 gte Exp $"
+#define __SQLUSER_H "$Id: sqlUser.h,v 1.27 2002/02/24 01:04:06 gte Exp $"
 
 #include	<string>
 #include	<ctime>
@@ -97,6 +97,9 @@ public:
 			}
 		} ;
 
+	inline const unsigned int& getMaxLogins() const
+		{ return maxlogins ; }
+
 	/*
 	 *  Methods to set data atrributes.
 	 */
@@ -121,6 +124,9 @@ public:
 
 	inline void setEmail( const string& _email )
 		{ email = _email; }
+
+	inline void setMaxLogins( const unsigned int& _maxlogins )
+		{ maxlogins = _maxlogins; }
 
 	/*
 	 * Method to perform a SQL 'UPDATE' and commit changes to this
@@ -158,6 +164,7 @@ protected:
 	time_t		last_used;
 	string		email ;
 	string		last_hostmask ;
+	unsigned int maxlogins;
 
 	PgDatabase*	SQLDb;
 } ;

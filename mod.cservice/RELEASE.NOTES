@@ -1,6 +1,13 @@
 Newest changes at the top of the file:
-$Id: RELEASE.NOTES,v 1.21 2002/01/05 01:00:49 gte Exp $
+$Id: RELEASE.NOTES,v 1.22 2002/02/24 01:04:06 gte Exp $
 
+CMaster 1.1pl6 - 23/02/2002
+* Add MAXLOGINS, to specify how many logins you wish to
+  allow to your account at once.
+* DB Maintainence Required in this release:
+  ALTER TABLE users ADD COLUMN maxlogins INT4 DEFAULT '1';
+  UPDATE users SET maxlogins = 1;
+  
 CMaster 1.1pl5 - 04/12/2001
 * Remove ancient refrences to floodpro.
 * Fix case issue with suspend duration units.

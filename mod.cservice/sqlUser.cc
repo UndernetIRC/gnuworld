@@ -4,7 +4,7 @@
  * Storage class for accessing user information either from the backend
  * or internal storage.
  *
- * $Id: sqlUser.cc,v 1.31 2002/01/08 23:20:43 gte Exp $
+ * $Id: sqlUser.cc,v 1.32 2002/02/24 01:04:06 gte Exp $
  */
 
 #include	<strstream.h>
@@ -47,6 +47,7 @@ sqlUser::sqlUser(PgDatabase* _SQLDb)
    last_used( 0 ),
    email(),
    last_hostmask(),
+   maxlogins(0),
    SQLDb( _SQLDb )
 {
 }
@@ -169,6 +170,7 @@ flags = atoi(SQLDb->GetValue(row, 5));
 last_updated_by = SQLDb->GetValue(row, 6);
 last_updated = atoi(SQLDb->GetValue(row, 7));
 email = SQLDb->GetValue(row, 8);
+maxlogins = atoi(SQLDb->GetValue(row, 9));
 
 /* Fetch the "Last Seen" time from the users_lastseen table. */
 
@@ -189,6 +191,7 @@ queryString	<< queryHeader
 		<< "SET flags = " << flags << ", "
 		<< "password = '" << password << "', "
 		<< "language_id = " << language_id << ", "
+		<< "maxlogins = " << maxlogins << ", "
 		<< "last_updated = now()::abstime::int4 "
 		<< queryCondition << id
 		<< ends;
