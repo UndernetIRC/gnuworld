@@ -1,4 +1,4 @@
--- "$Id: README.cservice,v 1.9 2001/10/16 00:31:46 nighty Exp $"
+-- "$Id: README.cservice,v 1.10 2001/10/18 23:43:59 gte Exp $"
 --
 --
 --
@@ -30,6 +30,7 @@ Make sure you are in the gnuworld/doc directory.
 > psql cservice < cservice.sql
 > psql cservice < languages.sql
 > psql cservice < language_table.sql
+> psql cservice < cservice.help.sql
 > psql cservice < cservice.web.sql
 
 Create a local (for the www) Database called 'cmaster' for webcookies
