@@ -10,7 +10,7 @@
 #include	"Network.h"
 #include	"cservice_config.h"
  
-const char STATUSCommand_cc_rcsId[] = "$Id: STATUSCommand.cc,v 1.27 2001/05/11 16:39:13 gte Exp $" ;
+const char STATUSCommand_cc_rcsId[] = "$Id: STATUSCommand.cc,v 1.28 2001/06/10 17:36:57 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -319,6 +319,7 @@ authQuery	<< "SELECT users.user_name,levels.access FROM "
 		<< "users,levels WHERE users.id = levels.user_id "
 		<< "AND levels.channel_id = "
 		<< theChan->getID()
+		<< " ORDER BY levels.access DESC"
 		<< ends; 
 
 #ifdef LOG_SQL

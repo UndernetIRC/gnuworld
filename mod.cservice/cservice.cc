@@ -2,10 +2,10 @@
 
 #warning --
 #warning --
-#warning If you have not yet ran "update.delete.sql" in doc/ on your database,
-#warning do so now :)
-#warning --
-#warning --
+#warning -- If you have not yet ran "update.delete.sql" in doc/ on your database,
+#warning -- do so now.
+#warning -- 
+#warning --	
 
 #include	<vector>
 #include	<iostream>
@@ -345,6 +345,8 @@ if( PGRES_TUPLES_OK == status )
  
 		} // for()
 	} // if()
+
+	loadPendingChannelList(); 
 
 return xClient::BurstChannels();
 }
@@ -2073,19 +2075,7 @@ if (timer_id == pending_timerID)
 	 * Load the list of pending channels. 
 	 */
 	loadPendingChannelList(); 
-
-	/* 
-	 * For each pending channel, load up its IP traffic
-	 * cache. 
-	 */ 
-	pendingChannelListType::iterator ptr = pendingChannelList.begin(); 
-	while (ptr != pendingChannelList.end())
-		{
-		sqlPendingChannel* pendingChan = ptr->second;
-		pendingChan->loadTrafficCache();
-		++ptr;
-		};
-
+ 
 	/*
 	 * Load a list of channels in NOTIFICATION stage and send them
 	 * a notice. 
@@ -2733,7 +2723,7 @@ switch( whichEvent )
 					ptr->second->trafficList.insert(sqlPendingChannel::trafficListType::value_type(
 						theClient->getIP(), trafRecord));
 	
-					logDebugMessage("Created new IP traffic record for %u (%s) on %s",
+					logDebugMessage("Created a new IP traffic record for IP#%u (%s) on %s",
 						theClient->getIP(), theClient->getNickUserHost().c_str(),
 						theChan->getName().c_str()); 
 					} else
@@ -2744,7 +2734,7 @@ switch( whichEvent )
 
 					trafRecord->join_count++;
 
-					logDebugMessage("New total for %u on %s is %i",
+					logDebugMessage("New total for IP#%u on %s is %i",
 						theClient->getIP(), theChan->getName().c_str(),
 						trafRecord->join_count);
 				}
@@ -2769,7 +2759,8 @@ switch( whichEvent )
 				if (Supptr != ptr->second->supporterList.end())
 					{ 
 						Supptr->second++;
-						logDebugMessage("Supporter %i has just joined %s.", theUser->getID(), theChan->getName().c_str());
+						logDebugMessage("New total for Supporter #%i (%s) on %s is %i.", theUser->getID(), 
+							theUser->getUserName().c_str(), theChan->getName().c_str(), Supptr->second);
 					}
 
 			return xClient::OnChannelEvent( whichEvent, theChan,
@@ -3396,7 +3387,7 @@ if( PGRES_TUPLES_OK == status )
 		}
 	}
 
-	logDebugMessage("Loaded pending channels, there are currently %i channels being notified and recorded.",
+	logDebugMessage("Loaded pending channels, there are currently %i channels traffic monitored.",
 		pendingChannelList.size());
 
 #ifdef LOG_DEBUG
@@ -3405,6 +3396,19 @@ if( PGRES_TUPLES_OK == status )
 			<< " channels being notified and recorded."
 			<< endl;
 #endif
+
+	/* 
+	 * For each pending channel, load up its IP traffic
+	 * cache. 
+	 */ 
+
+	pendingChannelListType::iterator ptr = pendingChannelList.begin(); 
+	while (ptr != pendingChannelList.end())
+		{
+		sqlPendingChannel* pendingChan = ptr->second;
+		pendingChan->loadTrafficCache();
+		++ptr;
+		};
 
 }
  

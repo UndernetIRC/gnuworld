@@ -5,7 +5,7 @@
  */
 
 #ifndef __SQLPENDINGCHANNEL_H
-#define __SQLPENDINGCHANNEL_H "$Id: sqlPendingChannel.h,v 1.4 2001/06/10 01:03:08 gte Exp $"
+#define __SQLPENDINGCHANNEL_H "$Id: sqlPendingChannel.h,v 1.5 2001/06/10 17:36:57 gte Exp $"
 
 #include	<string> 
 #include	"sqlPendingTraffic.h"
@@ -20,6 +20,8 @@ class sqlPendingChannel
 
 public:
 	sqlPendingChannel(PgDatabase*);
+	~sqlPendingChannel();
+
 	bool commit();
 	void loadTrafficCache();
 

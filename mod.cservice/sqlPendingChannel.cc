@@ -4,7 +4,7 @@
  * Class which contains details about channels which are 'pending'
  * registration.
  * 
- * $Id: sqlPendingChannel.cc,v 1.2 2001/06/10 01:03:08 gte Exp $
+ * $Id: sqlPendingChannel.cc,v 1.3 2001/06/10 17:36:57 gte Exp $
  */
  
 #include	<strstream>
@@ -24,7 +24,7 @@
 #include	"sqlPendingTraffic.h"
  
 const char sqlPendingChannel_h_rcsId[] = __SQLPENDINGCHANNEL_H ;
-const char sqlPendingChannel_cc_rcsId[] = "$Id: sqlPendingChannel.cc,v 1.2 2001/06/10 01:03:08 gte Exp $" ;
+const char sqlPendingChannel_cc_rcsId[] = "$Id: sqlPendingChannel.cc,v 1.3 2001/06/10 17:36:57 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -38,6 +38,22 @@ unique_join_count(0),
 SQLDb(_SQLDb)
 { 
 }
+
+/*
+ *  Destructor to clean up any memory this class may have
+ *  allocated.
+ */
+
+sqlPendingChannel::~sqlPendingChannel()
+{
+	for(trafficListType::iterator ptr = trafficList.begin();
+		ptr !=  trafficList.end(); ++ptr)
+		{ 
+			sqlPendingTraffic* toDie = ptr->second;
+			elog << "Autocleanup of Traffic record for #" << toDie->ip_number << endl;
+			delete(toDie);
+		} 
+}	
 
 void sqlPendingChannel::loadTrafficCache()
 {
@@ -132,8 +148,32 @@ if( PGRES_COMMAND_OK != status )
 
 	for(supporterListType::iterator ptr = supporterList.begin();
 		ptr !=  supporterList.end(); ++ptr)
-		{
-			/* NEWREG-TODO */
+		{ 
+		strstream queryString; 
+		queryString << "UPDATE supporters SET "
+					<< "join_count = " 
+					<< ptr->second 
+					<< " WHERE channel_id = "
+					<< channel_id
+					<< " AND user_id = "
+					<< ptr->first
+					<< ends;
+		
+		#ifdef LOG_SQL
+			elog	<< "sqlPendingChannel::commit> "
+					<< queryString.str()
+					<< endl;
+		#endif
+		
+		ExecStatusType status = SQLDb->Exec(queryString.str()) ;
+		delete[] queryString.str() ;
+		
+		if( PGRES_COMMAND_OK != status )
+			{
+				elog << "sqlPendingChannel::commit> Error updating supporter "
+					 << "record for " << ptr->first << endl;
+			}
+
 		}
 
 
@@ -144,7 +184,32 @@ if( PGRES_COMMAND_OK != status )
 	for(trafficListType::iterator ptr = trafficList.begin();
 		ptr !=  trafficList.end(); ++ptr)
 		{
-			/* NEWREG-TODO */			
+		sqlPendingTraffic* theTraf = ptr->second;
+		strstream queryString; 
+		queryString << "UPDATE pending_traffic SET "
+					<< "join_count = " 
+					<< theTraf->join_count
+					<< " WHERE channel_id = "
+					<< channel_id
+					<< " AND ip_number = "
+					<< theTraf->ip_number
+					<< ends;
+		
+		#ifdef LOG_SQL
+			elog	<< "sqlPendingChannel::commit> "
+					<< queryString.str()
+					<< endl;
+		#endif
+		
+		ExecStatusType status = SQLDb->Exec(queryString.str()) ;
+		delete[] queryString.str() ;
+		
+		if( PGRES_COMMAND_OK != status )
+			{
+				elog << "sqlPendingChannel::commit> Error updating pending_traffic "
+					 << "record for " << theTraf->ip_number << endl;
+			}
+ 
 		}
 
 	return true;
