@@ -1,5 +1,5 @@
 # Default paths (system-wide installs)
-# $Id: Makefile.in,v 1.6 2000/08/01 00:02:34 dan_karrels Exp $
+# $Id: Makefile.in,v 1.7 2000/11/02 16:00:22 dan_karrels Exp $
 #
 
 # Standard defines
@@ -23,8 +23,6 @@ MV = @MV@
 LN = @LN@
 
 ############ You shouldn't change anything below this line ###################
-
-VERSION = @VERSION@
 
 SHELL = /bin/sh
 MFLAGS ='CXX=$(CXX)'					\
