@@ -19,7 +19,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
  * USA.
  *
- * $Id: cloner.cc,v 1.13 2002/07/31 20:01:57 reedloden Exp $
+ * $Id: cloner.cc,v 1.14 2002/07/31 21:57:55 reedloden Exp $
  */
 
 #include	<new>
@@ -41,6 +41,17 @@
 #include	"StringTokenizer.h"
 #include	"misc.h"
 #include	"ELog.h"
+
+const char client_h_rcsId[] = __CLIENT_H ;
+const char cloner_h_rcsId[] = __CLONER_H ;
+const char cloner_cc_rcsId[] = "$Id: cloner.cc,v 1.14 2002/07/31 21:57:55 reedloden Exp $" ;
+const char iClient_h_rcsId[] = __ICLIENT_H ;
+const char EConfig_h_rcsId[] = __ECONFIG_H ;
+const char ELog_h_rcsId[] = __ELOG_H ;
+const char ip_h_rcsId[] = __IP_H ;
+const char misc_h_rcsId[] = __MISC_H ;
+const char Network_h_rcsId[] = __NETWORK_H ;
+const char StringTokenizer_h_rcsId[] = __STRINGTOKENIZER_H ;
 
 namespace gnuworld
 {
