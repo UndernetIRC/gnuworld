@@ -11,7 +11,7 @@
 /* ccontrol.cc
  * Authors: Daniel Karrels dan@karrels.com
  *	    Tomer Cohen    MrBean@toughguy.net
- * $Id: ccontrol.cc,v 1.168 2003/03/07 13:01:29 mrbean_ Exp $
+ * $Id: ccontrol.cc,v 1.169 2003/03/08 17:15:01 mrbean_ Exp $
  */
 
 #define MAJORVER "1"
@@ -56,7 +56,7 @@
 #include	"ip.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.168 2003/03/07 13:01:29 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.169 2003/03/08 17:15:01 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -1700,7 +1700,7 @@ if(dbConnected)
 			ccGline * theGline = new (std::nothrow) ccGline(SQLDb);
 			theGline->setHost(string("*@") + tIP);
 			theGline->setAddedBy(tempGline->getAddedBy());
-			theGline->setExpires(tempGline->getExpires());
+			theGline->setExpires((tempGline->getExpires() > 3600 + ::time(0)) ? 3600 + ::time(0) : tempGline->getExpires());
 			theGline->setAddedOn(tempGline->getAddedOn());
 			theGline->setLastUpdated(tempGline->getLastUpdated());
 			theGline->setReason(tempGline->getReason());
@@ -1736,8 +1736,8 @@ else
 	list<const iClient*>::iterator ptr;
 	const iClient* curClient;
 	string Host;
-	Expires = (theGline->getExpires()-::time(0) > 3600*6 
-		    ? 3600*6 : theGline->getExpires());
+	Expires = (theGline->getExpires() > (3600*6 + ::time(0)) 
+		    ? 3600*6 +::time(0): theGline->getExpires());
 	for(ptr = cList.begin(); ptr != cList.end(); ++ptr)
 		{
 		curClient = *ptr;    
