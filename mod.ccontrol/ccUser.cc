@@ -3,7 +3,7 @@
  * 
  * Storage class for accessing user information 
  * 
- * $Id: ccUser.cc,v 1.4 2001/07/20 09:09:31 mrbean_ Exp $
+ * $Id: ccUser.cc,v 1.5 2001/07/20 10:15:40 mrbean_ Exp $
  */
  
 #include	<strstream>
@@ -17,7 +17,7 @@
 #include	"ccUser.h" 
 
 const char ccUser_h_rcsId[] = __CCUSER_H ;
-const char ccUser_cc_rcsId[] = "$Id: ccUser.cc,v 1.4 2001/07/20 09:09:31 mrbean_ Exp $" ;
+const char ccUser_cc_rcsId[] = "$Id: ccUser.cc,v 1.5 2001/07/20 10:15:40 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -29,11 +29,11 @@ using std::ends ;
 
 ccUser::ccUser(PgDatabase* _SQLDb)
  : Id( 0 ),
+   Server( "" ),
    SuspendExpires(0),
    Access( 0 ),
    Flags( 0 ), 
-   SQLDb( _SQLDb ),
-   Server( "" )
+   SQLDb( _SQLDb )
 {
 }
 
@@ -123,7 +123,7 @@ theQuery	<< Main
 		<< SuspendExpires
 		<< " ,suspended_by = '"
 		<< SuspendedBy
-		<< " ,server = '"
+		<< "' ,server = '"
 		<< Server
 		<< "' WHERE lower(user_name) = '" 
 		<< string_lower(UserName) << "'"

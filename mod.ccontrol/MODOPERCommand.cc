@@ -12,7 +12,7 @@
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 
-const char MODOPERCommand_cc_rcsId[] = "$Id: MODOPERCommand.cc,v 1.11 2001/07/20 09:09:31 mrbean_ Exp $";
+const char MODOPERCommand_cc_rcsId[] = "$Id: MODOPERCommand.cc,v 1.12 2001/07/20 10:15:40 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -27,13 +27,13 @@ StringTokenizer st( Message ) ;
 if(st.size() < 3)
 	{
 	Usage(theClient);
-	return true;
+	return false;
 	}
 if( ((st.size() < 4) && (strcasecmp(st[2].c_str(),"getlogs") != 0)) 
 || ((st.size() < 3) && (!strcasecmp(st[2].c_str(),"getlogs"))))
 	{
 	Usage(theClient);
-	return true;
+	return false;
 	}
 //Fetch the oper data base entry
 //ccUser *tmpUser = bot->GetUser(st[1]);
@@ -46,10 +46,25 @@ if(!tmpUser)
 	}
 //Check if the user got a higher or equal flags than the one he's trying to edit	
 AuthInfo* tmpAuth = bot->IsAuth(theClient->getCharYYXXX());
-if(bot->getTrueFlags(tmpAuth->getFlags()) < bot->getTrueFlags(tmpUser->getFlags()))
+unsigned int AdFlag = bot->getTrueFlags(tmpAuth->getFlags()); //Get the admin flag
+unsigned int OpFlag = bot->getTrueFlags(tmpUser->getFlags()); //Get the oper flag
+bool Admin = AdFlag < isSMT;
+
+if((Admin) && (AdFlag <= OpFlag))
+	{
+	bot->Notice(theClient,"You cant modify a user who got higher/equal level than yours");
+	delete tmpUser;
+	return false;
+	}
+else if(AdFlag < OpFlag)
 	{
 	bot->Notice(theClient,"You cant modify a user who got higher level than yours");
 	delete tmpUser;
+	return false;
+	}
+if((Admin) && (strcasecmp(tmpAuth->getServer().c_str(),tmpUser->getServer().c_str())))
+	{
+	bot->Notice(theClient,"You can only modify a user who's associated to the same server as you");
 	return false;
 	}
 else if(!strcasecmp(st[2].c_str(),"newpass")) //Trying to change the password ?
@@ -111,9 +126,39 @@ else if(!strcasecmp(st[2].c_str(),"getlogs")) //Trying to toggle the get of logs
 		tmpUser->removeFlag(getLOGS);
 		bot->Notice(theClient,"getLogs have been turned off for %s",st[1].c_str());
 		}
+	tmpUser->setLast_Updated_By(theClient->getNickUserHost());
 	tmpUser->Update();
 	bot->UpdateAuth(tmpUser);
 	}	
+else if(!strcasecmp(st[2].c_str(),"server")) //Trying to change the user server
+	{
+	if(Admin)
+		{
+		bot->Notice(theClient,"Sorry, only SMT memebers can change the user server");
+		return false;
+		}
+	if(!strcasecmp(tmpUser->getServer().c_str(),st[3].c_str()))
+		{
+		bot->Notice(theClient,"%s already is associated with %s",st[1].c_str(),st[3].c_str());
+		return false;
+		}
+	else
+		{
+		tmpUser->setServer(st[3]);
+		tmpUser->setLast_Updated_By(theClient->getNickUserHost());
+		if(tmpUser->Update())
+			{
+			bot->Notice(theClient,"%s has been associated with %s",st[1].c_str(),st[3].c_str());
+			bot->UpdateAuth(tmpUser);
+			return true;
+			}
+		else
+			{
+			bot->Notice(theClient,"Error while associating %s with %s",st[1].c_str(),st[3].c_str());
+			return false;
+			}
+		}
+	}		
 else
 	{
 	bot->Notice(theClient,"Unknown option %s",st[2].c_str());
