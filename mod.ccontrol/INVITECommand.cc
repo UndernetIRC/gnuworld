@@ -15,7 +15,7 @@
 #include	"Constants.h"
 #include	"Network.h"
 
-const char INVITECommand_cc_rcsId[] = "$Id: INVITECommand.cc,v 1.13 2002/03/01 18:27:36 mrbean_ Exp $";
+const char INVITECommand_cc_rcsId[] = "$Id: INVITECommand.cc,v 1.14 2002/03/01 19:26:39 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -103,11 +103,6 @@ bot->QuoteAsServer( buf ) ;
 // Part
 bot->Part( chanName ) ;
 
-// Wallops
-if( !bot->isOperChan( chanName ) )
-	{
-	bot->MsgChanLog("%s is cordially invited to channel %s\n",theClient->getNickName().c_str(),chanName.c_str());
-	}
 
 return true ;
 }
