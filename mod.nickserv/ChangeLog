@@ -1,3 +1,8 @@
+2002-11-25 1.0.2 Jeekay
+* Added SET CONSOLELEVEL to alter the level at which the console is logging.
+* NickServ will now change the topic of the console channel to show the level.
+* Bumped version to 1.0.2
+
 2002-11-25 1.0.1 Jeekay
 *** This version requires a database change. It deprecates the 'logging' table.
     Please consult Updates for the relevant SQL.

@@ -1,5 +1,5 @@
 #ifndef _NICKSERV_H
-#define _NICKSERV_H "$Id: nickserv.h,v 1.9 2002/11/25 03:56:15 jeekay Exp $"
+#define _NICKSERV_H "$Id: nickserv.h,v 1.10 2002/11/25 04:48:40 jeekay Exp $"
 
 #include "client.h"
 #include "EConfig.h"
@@ -74,28 +74,36 @@ class nickserv : public xClient, public logging::logTarget {
      ** N I C K S E R V   M E T H O D S **
      *************************************/
 
-    /** Register a command */
-    virtual bool RegisterCommand(Command*);
-
-    /** Load all users into the user cache */
-    void precacheUsers();
-    
     /** Insert a nick/sqlUser* pair into the cache */
     void addUserToCache(string, sqlUser*);
-    
-    /** Add an iClient to the processing queue */
-    int addToQueue(iClient*);
-    
-    /** Remove an iClient from the processing queue */
-    int removeFromQueue(iClient*);
-    
-    /** Process the queue */
-    void processQueue();
     
     /** Log a message to the console channel */
     void logAdminMessage(const char*, ... );
     
+    /** Load all users into the user cache */
+    void precacheUsers();
+
+    /** Register a command */
+    virtual bool RegisterCommand(Command*);
     
+    /** Change the console level */
+    void setConsoleLevel(logging::events::eventType&);
+
+
+    /***********************************
+     * Q U E U E   P R O C E S S I N G *
+     ***********************************/
+
+    /** Add an iClient to the processing queue */
+    int addToQueue(iClient*);
+    
+    /** Process the queue */
+    void processQueue();
+    
+    /** Remove an iClient from the processing queue */
+    int removeFromQueue(iClient*);
+    
+
     /*********************************
      ** U S E R   R E S O U R C E S **
      *********************************/

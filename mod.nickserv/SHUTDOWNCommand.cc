@@ -11,7 +11,7 @@
 #include "nickserv.h"
 #include "sqlUser.h"
 
-const char SHUTDOWNCommand_cc_rcsId[] = "$Id: SHUTDOWNCommand.cc,v 1.1 2002/11/25 03:56:15 jeekay Exp $";
+const char SHUTDOWNCommand_cc_rcsId[] = "$Id: SHUTDOWNCommand.cc,v 1.2 2002/11/25 04:49:54 jeekay Exp $";
 
 namespace gnuworld {
 
@@ -34,12 +34,9 @@ if(!theUser || (theUser->getLevel() < level::admin::shutdown)) {
   return true;
 }
 
-stringstream toLog;
-toLog << theClient->getNickName() << " ("
-      << theUser->getName() << ") "
-      << "is asking me to shut down!";
-
-bot->theLogger->log(logging::events::E_ERROR, toLog.str());
+bot->theLogger->log(logging::events::E_ERROR, "%s (%s) is asking me to shutdown: %s",
+                    theClient->getNickName().c_str(), theUser->getName().c_str(),
+                    st.assemble(1).c_str());
 
 stringstream toSQuit;
 toSQuit << server->getCharYY() << " SQ "

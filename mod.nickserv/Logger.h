@@ -1,5 +1,5 @@
 #ifndef _LOGGER_H
-#define _LOGGER_H "$Id: Logger.h,v 1.3 2002/11/25 03:56:15 jeekay Exp $"
+#define _LOGGER_H "$Id: Logger.h,v 1.4 2002/11/25 04:48:40 jeekay Exp $"
 
 #include <string>
 #include <vector>
@@ -31,6 +31,7 @@ class Logger {
      * Allow logging of messages
      */
     void log(const events::eventType&, const string&);
+    void log(const events::eventType&, const char*, ... );
 
     /**
      * Type to contain logTargets

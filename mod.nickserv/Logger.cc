@@ -1,4 +1,4 @@
-#include <new>
+#include <stdarg.h>
 
 #include "Logger.h"
 
@@ -42,6 +42,24 @@ void Logger::log(const events::eventType& theEvent, const string& theMessage)
     (*ptr)->log(theEvent, theMessage);
   }
 }
+
+
+/**
+ * Allow a client to log an event.
+ * This is a convenience wrapper around log(events::eventType&, const string&).
+ */
+void Logger::log(const events::eventType& theEvent, const char* format, ... ) {
+  char buffer[512];
+  
+  va_list _list;
+
+  va_start(_list, format);
+  vsnprintf(buffer, 512, format, _list);
+  va_end(_list);
+
+  log(theEvent, string(buffer));
+}
+
 
 /**
  * Empty constructor

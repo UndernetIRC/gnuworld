@@ -8,7 +8,7 @@
 #include "netData.h"
 #include "nickserv.h"
 
-const char NickServ_cc_rcsId[] = "$Id: nickserv.cc,v 1.12 2002/11/25 03:56:15 jeekay Exp $";
+const char NickServ_cc_rcsId[] = "$Id: nickserv.cc,v 1.13 2002/11/25 04:48:40 jeekay Exp $";
 
 namespace gnuworld
 {
@@ -140,6 +140,13 @@ int nickserv::BurstChannels()
 {
 MyUplink->JoinChannel(this, consoleChannel, nickservConfig->Require("consoleChannelModes")->second);
 
+stringstream setTopic;
+setTopic << getCharYYXXX() << " T "
+         << consoleChannel << " :"
+         << "Current NickServ console level: "
+         << consoleLevel;
+Write(setTopic);
+
 return xClient::BurstChannels() ;
 }
 
@@ -191,7 +198,7 @@ if("DCC" == Command) {
 } else if("PING" == Command) {
   DoCTCP(theClient, CTCP, Message);
 } else if("VERSION" == Command) {
-  DoCTCP(theClient, CTCP, "GNUWorld NickServ v1.0.1");
+  DoCTCP(theClient, CTCP, "GNUWorld NickServ v1.0.2");
 }
 
 return xClient::OnCTCP(theClient, CTCP, Message, Secure);
@@ -430,7 +437,8 @@ if(queuePos != warnQueue.end()) {
 void nickserv::processQueue()
 {
 theStats->incStat("NS.PROCESS");
-theLogger->log(logging::events::E_DEBUG, "Processing queue");
+theLogger->log(logging::events::E_DEBUG, "Processing queue - %u entr%s.",
+               warnQueue.size(), (warnQueue.size() == 1) ? ("y") : ("ies"));
 
 /* A number of things can happen here.
  * Firstly, the warnQueue can be empty. If this is the case, return immediately.
@@ -535,6 +543,24 @@ Message(logChannel, buf);
 return;
 
 }
+
+
+/**
+ * This allows a command to modify the console level
+ */
+void nickserv::setConsoleLevel(logging::events::eventType& newMask) {
+  if(newMask < logging::events::E_MIN || newMask > logging::events::E_MAX) {
+    theLogger->log(logging::events::E_WARNING, "An attempt was made to set the"
+                    " console level to %u.", newMask);
+    return;
+  }
+  
+  consoleLevel = newMask;
+  
+  Write("%s T %s :Current NickServ console level: %u",
+        getCharYYXXX().c_str(), consoleChannel.c_str(), newMask);
+}
+
 
 /**
  * This function compares an iClient and a sqlUser and returns true if they
