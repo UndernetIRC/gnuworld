@@ -1,24 +1,7 @@
 /**
  * ConnectionManager.cc
  * Author: Daniel Karrels (dan@karrels.com)
- * Copyright (C) 2002 Daniel Karrels <dan@karrels.com>
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
- * USA.
- *
- * $Id: ConnectionManager.cc,v 1.2 2002/05/27 17:53:04 dan_karrels Exp $
+ * $Id: ConnectionManager.cc,v 1.3 2002/05/28 20:25:48 dan_karrels Exp $
  */
 
 #include	<unistd.h>
@@ -76,17 +59,17 @@ eraseMap.clear() ;
 
 // First iterate through the list of currently active/pending
 // Connections
-for( handlerMapType::iterator handlerItr = handlerMap.begin() ;
+for( handlerMapIterator handlerItr = handlerMap.begin() ;
 	handlerItr != handlerMap.end() ; ++handlerItr )
 	{
-	for( connectionMapType::iterator connectionItr = 
+	for( connectionMapIterator connectionItr = 
 		handlerItr->second.begin() ;
 		connectionItr != handlerItr->second.end() ;
 		++connectionItr )
 		{
 		// Convenience variable
 		// Obtain a pointer to the Connection object
-		Connection* connectionPtr = connectionItr->second ;
+		Connection* connectionPtr = *connectionItr ;
 
 		// Close this Connection's socket
 		closeSocket( connectionPtr->getSockFD() ) ;
@@ -224,9 +207,7 @@ if( newConnection != 0 )
 
 	// Connection in progress
 	// Add to the handlerMap
-	bool status = handlerMap[ hPtr ].insert(
-		connectionMapType::value_type(
-		newConnection, newConnection ) ).second ;
+	bool status = handlerMap[ hPtr ].insert( newConnection ).second ;
 
 	// It's possible the connection could fail (?)
 	// Either way, the container is nice enough to tell us
@@ -260,7 +241,7 @@ bool ConnectionManager::DisconnectByHost( ConnectionHandler* hPtr,
 assert( hPtr != 0 ) ;
 
 // Iterator variables
-handlerMapType::iterator handlerItr = handlerMap.find( hPtr ) ;
+handlerMapIterator handlerItr = handlerMap.find( hPtr ) ;
 if( handlerItr == handlerMap.end() )
 	{
 	// This ConnectionHandler has no Connections registered
@@ -268,12 +249,12 @@ if( handlerItr == handlerMap.end() )
 	return false ;
 	}
 
-connectionMapType::iterator connectionItr = handlerItr->second.begin() ;
+connectionMapIterator connectionItr = handlerItr->second.begin() ;
 
 for( ; connectionItr != handlerItr->second.end() ; ++connectionItr )
 	{
 	// Store the address of the Connection object in connectionPtr
-	Connection* connectionPtr = connectionItr->second ;
+	Connection* connectionPtr = *connectionItr ;
 
 	// Compare port numbers
 	if( (port == connectionPtr->getPort()) &&
@@ -294,7 +275,7 @@ if( connectionItr == handlerItr->second.end() ) ;
 
 cout	<< "ConnectionManager::DisconnectByHost> Sheduling connection "
 	<< "for removal: "
-	<< *(connectionItr->second)
+	<< *connectionItr
 	<< endl ;
 
 // Schedule this connectionItr to be removed
@@ -312,7 +293,7 @@ bool ConnectionManager::DisconnectByIP( ConnectionHandler* hPtr,
 assert( hPtr != 0 ) ;
 
 // Iterator variables
-handlerMapType::iterator handlerItr = handlerMap.find( hPtr ) ;
+handlerMapIterator handlerItr = handlerMap.find( hPtr ) ;
 if( handlerItr == handlerMap.end() )
 	{
 	// This ConnectionHandler has no Connections registered
@@ -320,12 +301,12 @@ if( handlerItr == handlerMap.end() )
 	return false ;
 	}
 
-connectionMapType::iterator connectionItr = handlerItr->second.begin() ;
+connectionMapIterator connectionItr = handlerItr->second.begin() ;
 
 for( ; connectionItr != handlerItr->second.end() ; ++connectionItr )
 	{
 	// Store the address of the Connection object in connectionPtr
-	Connection* connectionPtr = connectionItr->second ;
+	Connection* connectionPtr = *connectionItr ;
 
 	// Compare port numbers
 	if( (port == connectionPtr->getPort()) &&
@@ -345,7 +326,7 @@ if( connectionItr == handlerItr->second.end() ) ;
 
 cout	<< "ConnectionManager::DisconnectByIP> Sheduling connection "
 	<< "for removal: "
-	<< *(connectionItr->second)
+	<< *connectionItr
 	<< endl ;
 
 // Add to eraseMap to be erased later in Poll()
@@ -363,7 +344,7 @@ assert( hPtr != 0 ) ;
 assert( cPtr != 0 ) ;
 
 // Attempt to locate the handler in the handler map
-handlerMapType::iterator handlerItr = handlerMap.find( hPtr ) ;
+handlerMapIterator handlerItr = handlerMap.find( hPtr ) ;
 if( handlerItr == handlerMap.end() )
 	{
 	// Handler not found
@@ -371,8 +352,7 @@ if( handlerItr == handlerMap.end() )
 	}
 
 // Attempt to locate the Connection in the handler's connectionMap
-connectionMapType::iterator connectionItr =
-	handlerItr->second.find( cPtr ) ;
+connectionMapIterator connectionItr = handlerItr->second.find( cPtr ) ;
 if( connectionItr == handlerItr->second.end() )
 	{
 	// Connection was not found for this handler
@@ -417,10 +397,10 @@ FD_ZERO( &readfds ) ;
 
 // Iterator through the table of Connection's to setup select()
 // FD information
-for( handlerMapType::iterator handlerItr = handlerMap.begin() ;
+for( handlerMapIterator handlerItr = handlerMap.begin() ;
 	handlerItr != handlerMap.end() ; ++handlerItr )
 	{
-	for( connectionMapType::iterator connectionItr =
+	for( connectionMapIterator connectionItr =
 		handlerItr->second.begin(),
 		connectionEndItr = handlerItr->second.end() ;
 		connectionItr != connectionEndItr ;
@@ -428,7 +408,7 @@ for( handlerMapType::iterator handlerItr = handlerMap.begin() ;
 		{
 
 		// Create a couple of convenience variables
-		Connection* connectionPtr = connectionItr->second ;
+		Connection* connectionPtr = *connectionItr ;
 		int tempFD = connectionPtr->getSockFD() ;
 
 		if( connectionPtr->isConnected() )
@@ -503,7 +483,7 @@ if( 0 == fdCnt )
 // This variable is used for checking timeouts
 time_t now = ::time( 0 ) ;
 
-for( handlerMapType::iterator handlerItr = handlerMap.begin() ;
+for( handlerMapIterator handlerItr = handlerMap.begin() ;
 	handlerItr != handlerMap.end() ; ++handlerItr )
 	{
 	// Convenience variable for the long loop ahead
@@ -512,7 +492,7 @@ for( handlerMapType::iterator handlerItr = handlerMap.begin() ;
 	// Use connectionItr.end() explicitly here because if the
 	// map becomes empty during the course of this loop, the
 	// iterator to the original connectionMap.end() will be invalid
-	for( connectionMapType::iterator connectionItr =
+	for( connectionMapIterator connectionItr =
 		handlerItr->second.begin() ;
 		connectionItr != handlerItr->second.end() ;
 		++connectionItr )
@@ -523,7 +503,7 @@ for( handlerMapType::iterator handlerItr = handlerMap.begin() ;
 		bool connectOK = true ;
 
 		// Obtain a pointer to the Connection object being inspected
-		Connection* connectionPtr = connectionItr->second ;
+		Connection* connectionPtr = *connectionItr ;
 
 		// Temporary variable, this is the value of the current
 		// Connection's socket (file) descriptor
@@ -633,7 +613,7 @@ for( handlerMapType::iterator handlerItr = handlerMap.begin() ;
 // we are guaranteed that an iterator to a connection is not entered
 // into the eraseMap more than once.
 //
-for( eraseMapType::iterator eraseItr = eraseMap.begin(),
+for( eraseMapIterator eraseItr = eraseMap.begin(),
 	eraseEndItr = eraseMap.end() ;
 	eraseItr != eraseEndItr ; )
 	{
@@ -645,7 +625,7 @@ for( eraseMapType::iterator eraseItr = eraseMap.begin(),
 	// in the eraseMap, handlerItr is guaranteed to have
 	// at least one Connection which must be removed.
 	//
-	handlerMapType::iterator handlerItr = handlerMap.find(
+	handlerMapIterator handlerItr = handlerMap.find(
 		eraseItr->first ) ;
 
 	// Continue in the loop, erasing elements, until the
@@ -660,7 +640,7 @@ for( eraseMapType::iterator eraseItr = eraseMap.begin(),
 	for( ; (eraseItr != eraseEndItr) &&
 		(eraseItr->first == handlerItr->first) ; ++eraseItr )
 		{
-		Connection* connectionPtr = eraseItr->second->first ;
+		Connection* connectionPtr = *(eraseItr->second) ;
 
 		cout	<< "Poll> Removing connection: "
 			<< *connectionPtr
@@ -682,7 +662,7 @@ for( eraseMapType::iterator eraseItr = eraseMap.begin(),
 eraseMap.clear() ;
 
 // Check if the connectionMap for any particular handler is empty
-for( handlerMapType::iterator handlerItr = handlerMap.begin() ;
+for( handlerMapIterator handlerItr = handlerMap.begin() ;
 	handlerItr != handlerMap.end() ; )
 	{
 	// hash_map's invalidate iterators when an item is erase()'d
@@ -1000,8 +980,7 @@ if( !setSocketOptions( newFD ) )
 
 // Attempt to insert the new Connection into the appropriate
 // connectionMap for its handler
-if( !handlerMap[ hPtr ].insert( connectionMapType::value_type(
-	newConnection, newConnection ) ).second )
+if( !handlerMap[ hPtr ].insert( newConnection ).second )
 	{
 	// Failed to insert into handlerMap
 	// Notify the handler of a failure in connection
@@ -1209,8 +1188,7 @@ if( ::listen( listenFD, 5 ) < 0 )
 
 // Attempt to add this new connection into the handler map for
 // the given handler
-bool status = handlerMap[ hPtr ].insert( connectionMapType::value_type(
-	newConnection, newConnection ) ).second ;
+bool status = handlerMap[ hPtr ].insert( newConnection ).second ;
 if( !status )
 	{
 	// Addition to handlerMap failed :(
@@ -1237,10 +1215,10 @@ return newConnection ;
 }
 
 void ConnectionManager::scheduleErasure( ConnectionHandler* hPtr,
-	connectionMapType::iterator connectionItr )
+	connectionMapIterator connectionItr )
 {
 // Protected member, no error checking performed on arguments
-eraseMapType::iterator eraseItr = eraseMap.find( hPtr ) ;
+eraseMapIterator eraseItr = eraseMap.find( hPtr ) ;
 
 // Walk through the container
 // Continue walking until we find the duplicate (in which case

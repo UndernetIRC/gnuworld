@@ -1,28 +1,11 @@
 /**
  * ConnectionManager.h
  * Author: Daniel Karrels (dan@karrels.com)
- * Copyright (C) 2002 Daniel Karrels <dan@karrels.com>
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
- * USA.
- *
- * $Id: ConnectionManager.h,v 1.2 2002/05/27 17:53:04 dan_karrels Exp $
+ * $Id: ConnectionManager.h,v 1.3 2002/05/28 20:25:48 dan_karrels Exp $
  */
 
 #ifndef __CONNECTIONMANAGER_H
-#define __CONNECTIONMANAGER_H "$Id: ConnectionManager.h,v 1.2 2002/05/27 17:53:04 dan_karrels Exp $"
+#define __CONNECTIONMANAGER_H "$Id: ConnectionManager.h,v 1.3 2002/05/28 20:25:48 dan_karrels Exp $"
 
 #include	<sys/types.h>
 
@@ -31,25 +14,18 @@
 #include	<string>
 #include	<list>
 #include	<map>
+#include	<set>
 
 #include	<ctime>
 
 #include	"Connection.h"
 #include	"ConnectionHandler.h"
 
-#include	"defs.h"
-
-#ifdef GNU_EXTENSIONS
- #include       <ext/hash_map>
-#else
- #include       <hash_map>
-#endif
-
+using std::set ;
 using std::stringstream ;
 using std::multimap ;
 using std::string ;
 using std::map ;
-using HASHMAPNS::hash_map ;
 
 /**
  * The purpose of this class it to manage multiple incoming and
@@ -76,30 +52,18 @@ class ConnectionManager
 {
 
 	/**
-	 * This is a generic little hashing functor.  It will be
-	 * used to hash key's of type Connection*.  Since this
-	 * is essentially an integer, and all pointers to different
-	 * value objects are unique, there is no need for any
-	 * special hashing function -- the pointer is simply
-	 * typecast to an int and returned.
-	 */
-	struct cmHash
-	{
-	inline size_t operator()( const Connection* cPtr ) const
-		{
-		return reinterpret_cast< size_t >( cPtr ) ;
-		}
-	} ;
-
-	/**
 	 * This type is used to store Connection's in a weak sorted
 	 * manner.
 	 * There is a single instance of a connectionMapType for
 	 * each handler which has one or more Connection's registered.
-	 * TODO: Change this to something other than a hash_map.
 	 */
-	typedef hash_map< Connection*, Connection*, cmHash >
-		connectionMapType ;
+	typedef set< Connection* > connectionMapType ;
+
+	/**
+	 * This type is used as convenience to define an iterator
+	 * type for the connectionMap.
+	 */
+	typedef connectionMapType::iterator	connectionMapIterator ;
 
 	/**
 	 * This map stores connectionMapType's, keyed by the handler
@@ -107,6 +71,12 @@ class ConnectionManager
 	 */
 	typedef map< ConnectionHandler*, connectionMapType > 
 		handlerMapType ;
+
+	/**
+	 * This type is used as convenience to define an iterator
+	 * type for the handlerMap.
+	 */
+	typedef handlerMapType::iterator	handlerMapIterator ;
 
 	/**
 	 * The type used to store Connection objects to be erased.
@@ -124,6 +94,12 @@ class ConnectionManager
 	 */
 	typedef multimap< ConnectionHandler*, connectionMapType::iterator >
 		eraseMapType ;
+
+	/**
+	 * This type is used as convenience to define an iterator
+	 * type for the eraseMap.
+	 */
+	typedef eraseMapType::iterator		eraseMapIterator ;
 
 public:
 	/**
