@@ -4,7 +4,7 @@
  */
 
 #ifndef __MISC_H
-#define __MISC_H "$Id: misc.h,v 1.1 2000/06/30 18:46:06 dan_karrels Exp $"
+#define __MISC_H "$Id: misc.h,v 1.2 2000/07/06 19:13:07 dan_karrels Exp $"
 
 #include	<cstring>
 #include	<unistd.h>
@@ -19,17 +19,17 @@ using std::string ;
  */
 struct noCaseCompare
 {
-bool operator()( const string& lhs, const string& rhs ) const
+inline bool operator()( const string& lhs, const string& rhs ) const
 	{
 	return (strcasecmp( lhs.c_str(), rhs.c_str() ) < 0) ;
 	}
 } ;
 
-struct stringHash
+struct eqstr
 {
-inline int hash( const string& hashMe ) const
+inline bool operator()( const char* s1, const char* s2 ) const
 	{
-	return 0 ;
+	return (0 == ::strcasecmp( s1, s2 )) ;
 	}
 } ;
 

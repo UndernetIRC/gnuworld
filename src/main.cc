@@ -1,5 +1,5 @@
 /* main.cc
- * $Id: main.cc,v 1.1 2000/06/30 18:46:07 dan_karrels Exp $
+ * $Id: main.cc,v 1.2 2000/07/06 19:13:07 dan_karrels Exp $
  */
 
 #include	<fstream>
@@ -28,7 +28,7 @@
 using namespace gnuworld ;
 
 const char config_h_rcsId[] = __CONFIG_H ;
-const char main_cc_rcsId[] = "$Id: main.cc,v 1.1 2000/06/30 18:46:07 dan_karrels Exp $" ;
+const char main_cc_rcsId[] = "$Id: main.cc,v 1.2 2000/07/06 19:13:07 dan_karrels Exp $" ;
 
 using std::cerr ;
 using std::clog ;
@@ -135,7 +135,7 @@ if( verbose )
 	socketFile.open( LOG_SOCKET_NAME, std::ios::out ) ;
 	if( !socketFile.is_open() )
 		{
-		elog	<< "*** Unable to open socket log file: "
+		clog	<< "*** Unable to open socket log file: "
 			<< LOG_SOCKET_NAME << endl ;
 		return 0 ;
 		}
@@ -176,18 +176,18 @@ catch( std::bad_alloc )
 
  
 // Connect to the server
-elog << "*** Connecting...\n" ;
+clog << "*** Connecting...\n" ;
 
 if( Server->Connect() < 0 )
 	{
-	elog << "*** Cannot get connected to server!\n" ;
+	clog << "*** Cannot get connected to server!\n" ;
 #ifdef EDEBUG
 	elog.closeFile() ;
 #endif
 	return -1 ;
 	}
 
-elog	<< "*** Connection Established!\n" ;
+clog	<< "*** Connection Established!\n" ;
 
 // The number of messages processed during any one loop
 size_t messages = 0 ;

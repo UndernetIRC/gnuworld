@@ -4,6 +4,7 @@
 
 #include	<iostream>
 #include	<string>
+#include	<hash_map>
 
 #include	<cstring>
 #ifndef NDEBUG
@@ -19,16 +20,17 @@
 #include	"misc.h"
 
 const char xNetwork_h_rcsId[] = __XNETWORK_H ;
-const char xNetwork_cc_rcsId[] = "$Id: Network.cc,v 1.1 2000/06/30 18:46:07 dan_karrels Exp $" ;
+const char xNetwork_cc_rcsId[] = "$Id: Network.cc,v 1.2 2000/07/06 19:13:07 dan_karrels Exp $" ;
 
 using std::string ;
 using std::endl ;
+using std::hash_map ;
+using std::hash ;
 
 namespace gnuworld
 {
 
 xNetwork::xNetwork()
- : nickMap( 72, nickNameTransTable )
 {}
 
 xNetwork::~xNetwork()
@@ -164,7 +166,8 @@ bool xNetwork::addChannel( Channel* theChan )
 //elog << "Adding channel: " << *theChan << endl ;
 
 return channelMap.insert(
-	channelMapType::value_type( theChan->getName(), theChan ) ).second ;
+	channelMapType::value_type( theChan->getName().c_str(),
+	theChan ) ).second ;
 
 }
 
@@ -220,12 +223,12 @@ return findClient( yy, xxx ) ;
 
 iClient* xNetwork::findNick( const string& nick ) const
 {
-nickMapType::elementType* ptr = nickMap.Search( nick, nick.size() ) ;
-if( 0 == ptr )
+nickMapType::const_iterator ptr = nickMap.find( nick.c_str() ) ;
+if( ptr == nickMap.end() )
 	{
 	return 0 ;
 	}
-return ptr->data ;
+return ptr->second ;
 }
 
 xClient* xNetwork::findLocalClient( const unsigned int& YY,
@@ -316,7 +319,7 @@ return NULL ;
 
 Channel* xNetwork::findChannel( const string& name ) const
 {
-return channelMap.find( name )->second ;
+return channelMap.find( name.c_str() )->second ;
 }
 
 iClient* xNetwork::removeClient( const unsigned int& YY,
@@ -393,7 +396,7 @@ return removeClient( yy, xxx ) ;
 
 void xNetwork::removeNick( const string& nick )
 {
-nickMap.Delete( nick, nick.size() ) ;
+nickMap.erase( nick.c_str() ) ;
 }
 
 /**
@@ -478,7 +481,7 @@ return removeServer( theServer->getIntYY() ) ;
 
 Channel* xNetwork::removeChannel( const string& name )
 {
-channelMapType::iterator ptr = channelMap.find( name ) ;
+channelMapType::iterator ptr = channelMap.find( name.c_str() ) ;
 if( ptr == channelMap.end() )
 	{
 	return 0 ;
@@ -514,8 +517,8 @@ addNick( theClient ) ;
 
 void xNetwork::addNick( iClient* theClient )
 {
-nickMap.Insert( theClient->getNickName(), theClient,
-	theClient->getNickName().size() ) ;
+nickMap.insert( nickMapType::value_type(
+	theClient->getNickName().c_str(), theClient ) ) ;
 }
 
 /**

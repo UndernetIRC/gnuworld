@@ -1,15 +1,14 @@
-*** Running in verbose mode...
 Numeric: 51
 Max Clients (bogus): 5
 Uplink Name: 192.168.10.5
 Port: 4400
-Server Name: Uworld.EU.undernet.org
-Server Description: EUWorld Undernet Service
+Server Name: GNUworld.US.undernet.org
+Server Description: GNUWorld Undernet Service
 xServer::charYY> Az
 xServer::charXXX> AAF
 xServer::intYY> 51
 xServer::intXXX> 5
-xServer> Found module: ccontrol.so (Config: euworld3.conf)
-[MOD]: Attempting to load module ccontrol.so
-[MOD]: Error opening module: ld.so.1: GNUWorld: fatal: relocation error: file ./ccontrol.so: symbol __pure_virtual: referenced symbol not found
+ClientSocket::connect> attempt to connect to: 192.168.10.5 (192.168.10.5) using port # 4400
+*** Shutting down...
+ClientSocket::connect> unable to connect to 192.168.10.5, port # 4400
 

@@ -3,11 +3,12 @@
  */
 
 #ifndef __XNETWORK_H
-#define __XNETWORK_H "$Id: Network.h,v 1.1 2000/06/30 18:46:06 dan_karrels Exp $"
+#define __XNETWORK_H "$Id: Network.h,v 1.2 2000/07/06 19:13:07 dan_karrels Exp $"
 
 #include	<vector>
 #include	<string>
 #include	<map>
+#include	<hash_map>
 
 #include	<ctime>
 
@@ -21,25 +22,11 @@
 using std::string ;
 using std::vector ;
 using std::map ;
+using std::hash ;
+using std::hash_map ;
 
 namespace gnuworld
 {
-
-// 72
-static const char nickNameTransTable[] = {
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, // 0-9
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, // 10-19
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, // 20-29
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, // 30-39
- -1, -1, -1, -1, -1,  0, -1, -1,  1,  2, // 40-49
-  3,  4,  5,  6,  7,  8,  9, 10, -1, -1, // 50-59
- -1, -1, -1, -1, -1, 11, 12, 13, 14, 15, // 60-69
- 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, // 70-79
- 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, // 80-89
- 36, 37, 38, 39, 40, 41, 42, 11, 12, 13, // 90-99
- 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, // 100-109
- 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, // 110-119
- 34, 35, 36, 37, 38, 39, -1, -1 } ;      // 120-127
 
 /**
  * This class is responsible for storing the network's iClient's,
@@ -82,12 +69,16 @@ class xNetwork
 	 * instances.
 	 * TODO: This is not too scalable (need templated hashtable).
 	 */
-	typedef map< string, Channel*, noCaseCompare > channelMapType ;
+	typedef hash_map< const char*, Channel*, hash< const char* >, eqstr >
+		channelMapType ;
+//	typedef map< string, Channel*, noCaseCompare > channelMapType ;
 
 	/**
 	 * This is the type used to store the nick name/iClient* pairs.
 	 */
-	typedef VectorTrie< string, iClient* > nickMapType ;
+	typedef hash_map< const char*, iClient*, hash< const char* >, eqstr >
+		nickMapType ;
+//	typedef VectorTrie< string, iClient* > nickMapType ;
 
 public:
 

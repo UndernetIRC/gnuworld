@@ -1,7 +1,7 @@
-dnl $Id: configure.in,v 1.1 2000/06/30 18:46:06 dan_karrels Exp $
+dnl $Id: configure.in,v 1.2 2000/07/06 19:13:07 dan_karrels Exp $
 dnl ----------------------------------------------------------
 
-AC_REVISION($Revision: 1.1 $)
+AC_REVISION($Revision: 1.2 $)
 AC_INIT(src/main.cc)
 AC_CONFIG_HEADER(include/defs.h)
 
@@ -32,6 +32,7 @@ AC_CHECK_PROG(RM,rm,rm)
 AC_CHECK_PROG(LD,ld,ld)
 AC_CHECK_PROG(MV,mv,mv)
 AC_CHECK_PROG(CP,cp,cp)
+AC_CHECK_PROG(GREP,grep,grep)
 
 GNUWORLD_CHECK_OS
 
@@ -405,7 +406,7 @@ dnl This variable is global and will exported to Makefiles
 MOD_DIRS=""
 
 dnl This variable is local for the configure script
-mod_dirs=`/bin/ls src | /bin/grep .mod`
+mod_dirs=`/bin/ls src | ${GREP} .mod`
 dnl echo "mod_dirs: $mod_dirs"
 
 current_dir=`pwd`

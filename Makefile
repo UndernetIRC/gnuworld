@@ -1,5 +1,5 @@
 # Generated automatically from Makefile.in by configure.
-# $Id: Makefile,v 1.3 2000/07/05 19:15:06 dan_karrels Exp $
+# $Id: Makefile,v 1.4 2000/07/06 19:13:07 dan_karrels Exp $
 # all		-- gnuworld
 # clean		-- cleanup objects and executable
 # distclean	-- everything =P
@@ -7,21 +7,21 @@
 # Standard defines
 CXX = g++
 DEFS = -DHAVE_CONFIG_H
-LIBS = -ldl -lnsl 
+LIBS = -ldl -lnsl -lsocket 
 
 # Set this to -g if you want to be able to debug the client, otherwise
 # use -O to have the compiler do some optimization instead.
-CXXFLAGS = -g -Wall -O0 -I/home/dan/gnuworld/include -I/home/dan/gnuworld/lib
+CXXFLAGS = -g -Wall -O0 -I/tmp/gnuworld/include -I/tmp/gnuworld/lib
 
-SHLIB_CXX = g++
-SHLIB_LD = g++ -shared -nostartfiles
+SHLIB_CXX = g++ -fPIC
+SHLIB_LD = /usr/ccs/bin/ld -G -z text
 
-MOD_CXX = g++
+MOD_CXX = g++ -fPIC
 MOD_LD = g++
 MOD_DIRS =  ccontrol.mod cservice.mod
 
-BIN_PATH = /home/dan/gnuworld/bin
-SRC_PATH = /home/dan/gnuworld/src
+BIN_PATH = /tmp/gnuworld/bin
+SRC_PATH = /tmp/gnuworld/src
 
 RM = rm
 CP = cp
