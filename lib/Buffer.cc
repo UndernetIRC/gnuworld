@@ -1,10 +1,5 @@
 /* Buffer.cpp
  * Author: Daniel Karrels dan@karrels.com
- * Synapsis: Very cool class that accepts strings
- *	and stores them until a line (\n delimited, for now, string)
- *	is requested from it.
- *	This was inspired by writing *many* bots
- *	MUCH easier this way :) And string makes it nice too
  * History: Mon Jan 25 23:29:47 EST 1999 -- beginning
  */
 
@@ -13,9 +8,9 @@
 #include	"Buffer.h"
 
 const char Buffer_h_rcsId[] = __BUFFER_H ;
-const char Buffer_cc_rcsId[] = "$Id: Buffer.cc,v 1.2 2000/07/16 17:48:18 dan_karrels Exp $" ;
+const char Buffer_cc_rcsId[] = "$Id: Buffer.cc,v 1.3 2000/11/06 16:08:33 dan_karrels Exp $" ;
 
-using namespace std ;
+using std::string ;
 
 Buffer::Buffer( const string& aString, char delimiter )
 	: buf( aString ), delim( delimiter )

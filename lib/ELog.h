@@ -1,7 +1,7 @@
 /* ELog.h */
 
 #ifndef __ELOG_H
-#define __ELOG_H "$Id: ELog.h,v 1.1 2000/06/30 18:46:06 dan_karrels Exp $"
+#define __ELOG_H "$Id: ELog.h,v 1.1 2000/11/06 16:08:33 dan_karrels Exp $"
 
 #include	<iostream>
 #include	<fstream>

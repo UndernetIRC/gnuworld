@@ -1,4 +1,4 @@
-# $Id: Makefile.in,v 1.5 2000/10/31 00:58:37 dan_karrels Exp $
+# $Id: Makefile.in,v 1.6 2000/11/06 16:08:33 dan_karrels Exp $
 # Default paths (system-wide installs)
 
 # Standard defines
@@ -52,6 +52,8 @@ MFLAGS ='CC=$(CC)'					\
 
 SRCS = Buffer.cc \
 	ClientSocket.cc \
+	EConfig.cc \
+	ELog.cc \
 	FileSocket.cc \
 	misc.cc \
 	Socket.cc \

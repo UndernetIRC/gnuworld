@@ -1,5 +1,5 @@
 #ifndef __MODLOADER_H
-#define __MODLOADER_H "$Id: moduleLoader.h,v 1.1 2000/06/30 18:46:07 dan_karrels Exp $"
+#define __MODLOADER_H "$Id: moduleLoader.h,v 1.2 2000/11/06 16:08:32 dan_karrels Exp $"
 
 #include	<string>
 
@@ -17,11 +17,9 @@ template< class modType >
 class moduleLoader
 { 
 public:
-	/*
+	/**
 	 *  Constructor, takes a module filename as the only
 	 *  parameter.
-	 *
-	 *  Destructor, calls dlclose for the module handle.
 	 */
 	moduleLoader( const string& moduleName )
 	{
@@ -40,6 +38,9 @@ public:
 		<< endl;
 	}
 
+	/**
+	 * Destructor, calls dlclose for the module handle.
+	 */
 	virtual ~moduleLoader()
 	{
 	::dlclose( moduleHandle );
@@ -49,12 +50,12 @@ public:
 	 *  loadObject, extracts an instance of modType
 	 *  derived object from this module, and returns it.
 	 */
-	modType loadObject(const string& configFileName)
+	modType loadObject( const string& configFileName )
 	{
-	modFunc = (GNUWModuleFunc) dlsym(moduleHandle, "_gnuwinit");
+	modFunc = (GNUWModuleFunc) ::dlsym(moduleHandle, "_gnuwinit");
 
 	const char* error = ::dlerror(); 
- 	if(error != NULL)
+ 	if( error != NULL )
 		{
 		elog	<< "[MOD]: Error resolving _gnuwinit: "
 			<< error << endl;
@@ -76,9 +77,20 @@ public:
 
 protected:
 
+  /**
+   * This is the type of the bootstrap function.
+   */
   typedef modType (*GNUWModuleFunc)(const string& args);
-  void* moduleHandle; // Pointer to the loaded module. 
-  GNUWModuleFunc modFunc; // Pointer to the initialisation function.
+
+  /**
+   * Pointer to the loaded module. 
+   */
+  void* moduleHandle;
+
+  /**
+   * Pointer to the initialisation function.
+   */
+  GNUWModuleFunc modFunc;
 
 } ;
 

@@ -8,7 +8,7 @@
 #include	"ELog.h"
 
 const char ELog_h_rcsId[] = __ELOG_H ;
-const char ELog_cc_rcsId[] = "$Id: ELog.cc,v 1.1 2000/06/30 18:46:07 dan_karrels Exp $" ;
+const char ELog_cc_rcsId[] = "$Id: ELog.cc,v 1.1 2000/11/06 16:08:33 dan_karrels Exp $" ;
 
 using std::string ;
 

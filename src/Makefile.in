@@ -1,5 +1,5 @@
 # Default paths (system-wide installs)
-# $Id: Makefile.in,v 1.7 2000/11/02 16:00:22 dan_karrels Exp $
+# $Id: Makefile.in,v 1.8 2000/11/06 16:08:33 dan_karrels Exp $
 #
 
 # Standard defines
@@ -21,6 +21,8 @@ RM = @RM@ -f
 CP = @CP@
 MV = @MV@
 LN = @LN@
+AR = @AR@
+RANLIB = @RANLIB@
 
 ############ You shouldn't change anything below this line ###################
 
@@ -46,8 +48,6 @@ SRCS = ccontrol.cc \
 	client.cc \
 	clientExample.cc \
 	cloner.cc \
-	EConfig.cc \
-	ELog.cc \
 	gnutest.cc \
 	iClient.cc \
 	ip.cc \
@@ -56,15 +56,14 @@ SRCS = ccontrol.cc \
 	Network.cc \
 	server.cc
 OBJS = $(patsubst %.cc, %.o, $(SRCS))
-ABSOBJ = $(patsubst %.cc, $(SRC_PATH)/%.o, $(SRCS))
 
-all: $(OBJS) gnuworld
+#ABSOBJ = $(patsubst %.cc, $(SRC_PATH)/%.o, $(SRCS))
+
+all: gnuworld
 everything: all
 make: all
 
-.SUFFIXES: .o .cc
-
-.cc.o:
+%.o: %.cc
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 gnuworld: $(OBJS)

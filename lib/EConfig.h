@@ -2,7 +2,7 @@
  */
 
 #ifndef __ECONFIG_H
-#define __ECONFIG_H "$Id: EConfig.h,v 1.1 2000/06/30 18:46:06 dan_karrels Exp $"
+#define __ECONFIG_H "$Id: EConfig.h,v 1.1 2000/11/06 16:08:33 dan_karrels Exp $"
 
 #include	<iostream>
 #include	<string>
