@@ -1,11 +1,11 @@
 /**
  * cservice.h
  * Author: Greg Sikorski
- * $Id: cservice.h,v 1.94 2003/04/24 20:19:37 gte Exp $
+ * $Id: cservice.h,v 1.95 2003/06/11 22:37:29 gte Exp $
  */
 
 #ifndef __CSERVICE_H
-#define __CSERVICE_H "$Id: cservice.h,v 1.94 2003/04/24 20:19:37 gte Exp $"
+#define __CSERVICE_H "$Id: cservice.h,v 1.95 2003/06/11 22:37:29 gte Exp $"
 
 #include	<string>
 #include	<vector>
@@ -483,6 +483,13 @@ public:
 
 	void outputChannelAccesses(iClient*, sqlUser*, sqlUser*, unsigned int);
 
+	/*
+ 	 * Global filesystem level admin logging stream.
+	 */
+
+	gnuworld::ELog		cservice::adminLog ;
+
+	string adminlogPath;
 } ;
 
 const string escapeSQLChars(const string& theString);

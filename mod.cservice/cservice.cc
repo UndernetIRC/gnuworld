@@ -2,7 +2,7 @@
  * cservice.cc
  * Author: Greg Sikorski
  * Purpose: Overall control client.
- * $Id: cservice.cc,v 1.232 2003/05/07 20:13:02 gte Exp $
+ * $Id: cservice.cc,v 1.233 2003/06/11 22:37:29 gte Exp $
  */
 
 #include	<new>
@@ -270,6 +270,7 @@ loginDelay = atoi((cserviceConfig->Require( "login_delay" )->second).c_str());
 noteDuration = atoi((cserviceConfig->Require( "note_duration" )->second).c_str());
 noteLimit = atoi((cserviceConfig->Require( "note_limit" )->second).c_str());
 preloadUserDays = atoi((cserviceConfig->Require( "preload_user_days" )->second).c_str());
+adminlogPath = cserviceConfig->Require( "admin_logfile" )->second ;
 
 loadConfigData();
 
@@ -304,6 +305,19 @@ preloadLevelsCache();
 /* Preload any user accounts we want to */
 preloadUserCache();
 
+/*
+ * Init the admin log.
+ */
+
+adminLog.openFile( adminlogPath.c_str() ) ;
+if( !adminLog.isOpen() )
+	{
+	clog	<< "*** Unable to open CMaster admin log file: "
+			<< adminlogPath
+			<< endl ;
+	::exit( 0 ) ;
+	}
+
 }
 
 cservice::~cservice()
@@ -316,6 +330,7 @@ for( commandMapType::iterator ptr = commandMap.begin() ;
 	{
 	delete ptr->second ;
 	}
+
 commandMap.clear() ;
 }
 
@@ -672,6 +687,16 @@ if (!secure && ((Command == "LOGIN") || (Command == "NEWPASS") || (Command == "S
 		Command.c_str(), nickName.c_str(), getUplinkName().c_str());
 	return false;
 	}
+
+/*
+ * If the person issuing this command is an authenticated admin, we need to log
+ * it to the admin log for accountability purposes.
+ */
+		sqlUser* theUser = isAuthed(theClient, false);
+		if (theUser && getAdminAccessLevel(theUser))
+			{
+			adminLog << ::time(NULL) << " " << theClient->getRealNickUserHost() << " " << st.assemble() << endl;
+ 			}
 
 /* Attempt to find a handler for this method. */
 
