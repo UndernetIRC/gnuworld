@@ -1,11 +1,11 @@
--- $Id: language_swedish.sql,v 1.3 2002/11/06 16:41:35 nighty Exp $
+-- $Id: language_swedish.sql,v 1.4 2002/11/06 17:12:03 nighty Exp $
 -- Swedish language definition.
 -- 06/24/2002 - Ponte <tpin@telia.com>.
 -- 11/06/2002 - Comet <Comet@irc-solution.net>
 -- 11/06/2002 - typo/grammar spellchecking by LexTbomb.
 
 -- Run this once.
-INSERT INTO languages VALUES(20,'SE','Svenska',31337);
+INSERT INTO languages VALUES(20,'SV','Svenska',31337);
 
 
 DELETE FROM translations where language_id = 20;
