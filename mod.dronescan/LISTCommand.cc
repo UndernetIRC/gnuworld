@@ -32,11 +32,11 @@ bool LISTCommand::Exec( const iClient *theClient, const string& Message )
 	if("ACTIVE" == Name) {
 		bot->Reply(theClient, "Active drone channels:");
 		
-		for(bot->droneChannelsType::const_iterator itr =
+		for(dronescan::droneChannelsType::const_iterator itr =
 		    bot->droneChannels.begin() ; itr != bot->droneChannels.end()
 		    ; ++itr) {
 			bot->Reply(theClient, "  %s",
-				*itr.c_str()
+				(*itr).c_str()
 				);
 		}
 	}

@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: dronescan.cc,v 1.18 2003/06/19 23:47:43 jeekay Exp $
+ * $Id: dronescan.cc,v 1.19 2003/06/20 00:12:23 jeekay Exp $
  */
 
 #include <cstdarg>	/* va_list */
@@ -34,7 +34,7 @@
 #include "dronescanTests.h"
 #include "Timer.h"
 
-RCSTAG("$Id: dronescan.cc,v 1.18 2003/06/19 23:47:43 jeekay Exp $");
+RCSTAG("$Id: dronescan.cc,v 1.19 2003/06/20 00:12:23 jeekay Exp $");
 
 namespace gnuworld {
 
@@ -285,7 +285,7 @@ int dronescan::OnCTCP( iClient* theClient, const string& CTCP,
 	} else if("PING" == Command) {
 		DoCTCP(theClient, CTCP, Message);
 	} else if("VERSION" == Command) {
-		DoCTCP(theClient, CTCP, "GNUWorld DroneScan v0.0.1");
+		DoCTCP(theClient, CTCP, "GNUWorld DroneScan v0.0.2");
 	}
 
 	return xClient::OnCTCP(theClient, CTCP, Message, Secure);
