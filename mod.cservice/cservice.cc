@@ -2856,29 +2856,11 @@ s	<< getCharYY()
 	<< " " << targetClient->getNickName()
 	<< " " << targetClient->getUserName()
 	<< " " << targetClient->getInsecureHost()
-	<< " * :["
-	<< targetClient->getCharYYXXX() << "]"
+	<< " * :"
 	<< ends; 
 Write( s );
 delete[] s.str();
-
-// Lookup server name
-iServer* targetServer = Network->findServer( targetClient->getIntYY() ) ;
-
-if (targetServer)
-	{
-	strstream s2;
-	s2	<< getCharYY()
-		<< " 312 " 
-		<< sourceClient->getCharYYXXX() 
-		<< " " << targetClient->getNickName()
-		<< " " << targetServer->getName()
-		<< ends;
-	Write( s2 );
-
-	delete[] s2.str();
-	}
-
+ 
 strstream s4;
 s4	<< getCharYY()
 	<< " 317 " 
@@ -3222,6 +3204,9 @@ if (pendingChannelList.size() > 0)
 		sqlPendingChannel* pendingChan = ptr->second;
 		/* Commit the record */
 		pendingChan->commit();
+
+		/* Stop listening on this channels events for now. */
+		MyUplink->UnRegisterChannelEvent(ptr->first, this);
 
 		ptr->second = NULL;
 		delete(pendingChan);
