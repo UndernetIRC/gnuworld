@@ -2,11 +2,11 @@
 /*
  *
  * Undernet GNUworld Interactive Installation Guide (aka UGIIG)
- * $Id: index.php,v 1.4 2002/03/09 04:06:40 nighty Exp $
+ * $Id: index.php,v 1.5 2002/03/11 06:53:06 nighty Exp $
  *
  * Released under the GNU Public License : http://www.gnu.org/licenses/gpl.txt
  * by nighty <nighty@undernet.org>
- * Last modified: 03/09/2002
+ * Last modified: 03/11/2002
  *
  *
  */
@@ -50,7 +50,7 @@ function footer($prev,$next) {
 	//echo "<address>maintained by <b>&lt;</b><a href=\"mailto:" . $coder_email . "\">" . $coder_email . "</a><b>&gt;</b> - Last modified : <b>" . date("M-d-Y H:i:s",   (  filemtime("index.php")+( date("Z",filemtime("index.php"))/3600 )   )   ) . " UTC/GMT</b> - <b>[</b><a href=\"./\">Home</a><b>]</b></address>";
 	echo "<address>maintained by <b>&lt;</b><a href=\"mailto:" . $coder_email . "\">" . $coder_email . "</a><b>&gt;</b> - <b>[</b><a href=\"./\">Home</a><b>]</b>";
 	echo "&nbsp;<br><font size=-2><b>";
-?>$Id: index.php,v 1.4 2002/03/09 04:06:40 nighty Exp $<?
+?>$Id: index.php,v 1.5 2002/03/11 06:53:06 nighty Exp $<?
 	echo "</b></font></address>\n";
 	echo "</body>\n";
 	echo "</html>\n";
@@ -75,7 +75,7 @@ $coder_email = "nighty@undernet.org";
 $coder_name = "nighty";
  
 ?>
-<!-- $Id: index.php,v 1.4 2002/03/09 04:06:40 nighty Exp $ //-->
+<!-- $Id: index.php,v 1.5 2002/03/11 06:53:06 nighty Exp $ //-->
 <html>
 <head>
 <title>Undernet GNUworld Interactive Installation Guide</title>
@@ -1251,12 +1251,12 @@ IMPORTANT NOTICE:</b>
 	&lt;?
 	/*
 
-	&lt;!-- $Id: index.php,v 1.4 2002/03/09 04:06:40 nighty Exp $ //--&gt;
+	&lt;!-- <? echo "\$" . "Id" ?>: config.inc,v 1.9 2002/03/11 06:07:21 nighty Exp <? echo "\$" ?> //--&gt;
 	
 	'config.inc' For GNUworld's mod.cservice's website interface
 	
 	Created: <nighty@undernet.org> - 10/29/2001
-	Last modif: <nighty@undernet.org> - 03/04/2002
+	Last modif: <nighty@undernet.org> - 03/11/2002
 	
 	This file contains two sections,
 	- what you *MUST* edit to ensure your website can work properly.
@@ -1289,6 +1289,7 @@ IMPORTANT NOTICE:</b>
 
 	define(PURGE_EMAIL,"purge@undernet.org"); // the email where channel purge request form is sent.
 	define(XAT_EMAIL,"x@undernet.org"); // the email where manager change form is sent.
+	define(OBJECT_EMAIL,"object@undernet.org"); // the email where replies to password changes are sent.
 
 	define(FROM_NEWUSER,"cmaster@undernet.org"); // the From: email for a NEWUSER registration email
 	define(FROM_NEWUSER_SUBJECT,"Your Undernet Channel Service Account"); // the subject of that mail.
