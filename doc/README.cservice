@@ -1,4 +1,4 @@
--- "$Id: README.cservice,v 1.16 2002/08/30 10:38:15 nighty Exp $"
+-- "$Id: README.cservice,v 1.17 2003/02/07 19:25:57 gte Exp $"
 --
 -- For more detailed information about setting up GNUworld, visit :
 --      http://coder-com.undernet.org/gnuworld-setup/
@@ -23,7 +23,7 @@ Install the pl language
 The following command assumes (in addition to above conditions) that the
 pgsql libraries are located in /usr/local/pgsql/lib:
 
-> createlang plpgsql cservice -L /usr/local/pgsql/lib
+> createlang -L /usr/local/pgsql/lib plpgsql cservice
 
 Load the schema
 ---------------

@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------------
--- "$Id: cservice.sql,v 1.72 2003/01/05 20:52:15 gte Exp $"
+-- "$Id: cservice.sql,v 1.73 2003/02/07 19:25:59 gte Exp $"
 -- Channel service DB SQL file for PostgreSQL.
 
 -- ChangeLog:
@@ -61,8 +61,8 @@ CREATE TABLE languages (
 	code VARCHAR( 16 ) UNIQUE,
 	name VARCHAR( 16 ),
 	last_updated INT4 NOT NULL,
-	deleted INT2 DEFAULT '0' 
---	PRIMARY KEY(id)
+	deleted INT2 DEFAULT '0',
+	PRIMARY KEY(id)
 );
 
 -- Translations for multi-lingual support.
@@ -431,7 +431,7 @@ CREATE INDEX noreg_expire_time_idx ON noreg (expire_time);
 CREATE TABLE notes (
 	message_id SERIAL,
 	user_id INT4 CONSTRAINT users_notes_ref REFERENCES users( id ),
-	from_user_id INT4 CONSTRAINT users_notes_ref REFERENCES users( id ),
+	from_user_id INT4 CONSTRAINT users_notes_ref2 REFERENCES users( id ),
 	message VARCHAR( 300 ),
 	last_updated INT4 NOT NULL,
 
