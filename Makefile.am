@@ -1,1 +1,2 @@
+@SET_MAKE@
 SUBDIRS = lib src @MOD_DIRS@
