@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: stats.cc,v 1.20 2003/07/24 21:14:25 dan_karrels Exp $
+ * $Id: stats.cc,v 1.21 2003/08/06 17:47:48 dan_karrels Exp $
  */
 
 #include	<string>
@@ -39,7 +39,7 @@
 #include	"config.h"
 #include	"misc.h"
 
-RCSTAG( "$Id: stats.cc,v 1.20 2003/07/24 21:14:25 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: stats.cc,v 1.21 2003/08/06 17:47:48 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -345,6 +345,12 @@ if( st[ 0 ] == "reload" )
 if( st[ 0 ] == "stats" )
 	{
 	dumpStats( theClient ) ;
+	return ;
+	}
+
+if( st[ 0 ] == "shutdown" )
+	{
+	MyUplink->Shutdown() ;
 	return ;
 	}
 

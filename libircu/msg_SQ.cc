@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_SQ.cc,v 1.3 2003/06/17 15:13:53 dan_karrels Exp $
+ * $Id: msg_SQ.cc,v 1.4 2003/08/06 17:47:48 dan_karrels Exp $
  */
 
 #include	<iostream>
@@ -34,7 +34,7 @@
 #include	"ServerCommandHandler.h"
 #include	"config.h"
 
-RCSTAG( "$Id: msg_SQ.cc,v 1.3 2003/06/17 15:13:53 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: msg_SQ.cc,v 1.4 2003/08/06 17:47:48 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -93,9 +93,7 @@ if( squitServer->getIntYY() == theServer->getUplinkIntYY() )
 		<< endl ;
 
 	// It's my uplink, we have been squit...those bastards!
-	// Just for fun, let's see if doing nothing here will work
-	// Let the uplink close the connection, and let everything
-	// else fall into place
+	theServer->Shutdown() ;
 	return true ;
 	}
 else

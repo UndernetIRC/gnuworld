@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server.cc,v 1.174 2003/08/05 16:53:46 dan_karrels Exp $
+ * $Id: server.cc,v 1.175 2003/08/06 17:47:48 dan_karrels Exp $
  */
 
 #include	<sys/time.h>
@@ -71,7 +71,7 @@
 #include	"ConnectionHandler.h"
 #include	"Connection.h"
 
-RCSTAG( "$Id: server.cc,v 1.174 2003/08/05 16:53:46 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: server.cc,v 1.175 2003/08/06 17:47:48 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -2754,6 +2754,14 @@ if( SIGINT == whichSig )
 	Shutdown() ;
 	}
 
+if( SIGTERM == whichSig )
+	{
+	elog	<< "xServer::PostSignal> Caught SIGTERM, shutting "
+		<< "down"
+		<< endl ;
+	Shutdown() ;
+	}
+
 // Pass this signal on to each xClient.
 xNetwork::localClientIterator ptr = Network->localClient_begin() ;
 for( ; ptr != Network->localClient_end() ; ++ptr )
@@ -3877,8 +3885,8 @@ while( !theStack.empty() )
 
 void xServer::doShutdown()
 {
-elog	<< "xServer::doShutdown> Removing modules..."
-	<< endl ;
+//elog	<< "xServer::doShutdown> Removing modules..."
+//	<< endl ;
 
 size_t count = 0 ;
 
@@ -3895,8 +3903,8 @@ elog	<< "xServer::doShutdown> Removed "
 	<< " local clients"
 	<< endl ;
 
-elog	<< "xServer::doShutdown> Removing network clients..."
-	<< endl ;
+//elog	<< "xServer::doShutdown> Removing network clients..."
+//	<< endl ;
 
 count = 0 ;
 // Clear the channels
@@ -3911,8 +3919,8 @@ elog	<< "xServer::doShutdown> Removed "
 	<< " network clients"
 	<< endl ;
 
-elog	<< "xServer::doShutdown> Removing channels..."
-	<< endl ;
+//elog	<< "xServer::doShutdown> Removing channels..."
+//	<< endl ;
 
 count = 0 ;
 while( Network->channels_begin() != Network->channels_end() )
@@ -3931,8 +3939,8 @@ elog	<< "xServer::doShutdown> Removed "
 	<< " channels"
 	<< endl ;
 
-elog	<< "xServer::doShutdown> Removing glines..."
-	<< endl ;
+//elog	<< "xServer::doShutdown> Removing glines..."
+//	<< endl ;
 
 count = 0 ;
 // Remove glines
@@ -3947,8 +3955,8 @@ elog	<< "xServer::doShutdown> Removed "
 	<< " glines"
 	<< endl ;
 
-elog	<< "xServer::doShutdown> Removing timers..."
-	<< endl ;
+//elog	<< "xServer::doShutdown> Removing timers..."
+//	<< endl ;
 
 count = 0 ;
 // All of the client timers should be cleared, but let's verify
@@ -3956,8 +3964,8 @@ count = 0 ;
 while( !timerQueue.empty() )
 	{
 	++count ;
-	elog	<< "xServer::doShutdown> Removing a timer"
-		<< endl ;
+//	elog	<< "xServer::doShutdown> Removing a timer"
+//		<< endl ;
 
 	// Delete the timerInfo structure, but not the TimerHandler
 	// or void* data.

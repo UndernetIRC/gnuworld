@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: main.cc,v 1.55 2003/08/04 20:49:24 dan_karrels Exp $
+ * $Id: main.cc,v 1.56 2003/08/06 17:47:48 dan_karrels Exp $
  */
 
 #include	<sys/time.h>
@@ -45,7 +45,7 @@
 #include	"md5hash.h"
 #include	"Signal.h"
 
-RCSTAG( "$Id: main.cc,v 1.55 2003/08/04 20:49:24 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: main.cc,v 1.56 2003/08/06 17:47:48 dan_karrels Exp $" ) ;
 
 // main() must be in the global namespace
 using namespace gnuworld ;
@@ -186,6 +186,8 @@ while( autoConnect )
 
 	releaseDup( argc, dupArgv ) ;
 	dupArgv = 0 ;
+
+	::sleep( 10 ) ;
 	} // while( autoConnect )
 
 return 0 ;
