@@ -1,0 +1,2 @@
+encrypt.sh	Program to generate cmaster password hashes
+00INDEX.TXT	This file.
