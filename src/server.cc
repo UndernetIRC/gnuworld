@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server.cc,v 1.180 2003/08/23 21:00:33 dan_karrels Exp $
+ * $Id: server.cc,v 1.181 2003/08/28 16:06:27 dan_karrels Exp $
  */
 
 #include	<sys/time.h>
@@ -71,7 +71,7 @@
 #include	"ConnectionHandler.h"
 #include	"Connection.h"
 
-RCSTAG( "$Id: server.cc,v 1.180 2003/08/23 21:00:33 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: server.cc,v 1.181 2003/08/28 16:06:27 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -956,16 +956,11 @@ assert( fakeServer != 0 ) ;
 
 if( fakeServer->isJupe() )
 	{
-	// <prefix> JU <target> (+|-)<server> <expiration> 
-	// <lastmod> :<reason>
+	// source_numeric JU +servername * expiration_time :reason
 	// expiration: 604800 (max)
-	// lastmod: last time the jupe was modified, to solve burst 
-	//   problem
-	Write( "%s JU %s +%s 604800 %u :%s",
+	Write( "%s JU +%s * 604800 :%s",
 		getCharYY().c_str(),
-		fakeServer->getCharYY().c_str(),
 		fakeServer->getName().c_str(),
-		::time( 0 ),
 		fakeServer->getDescription().c_str() ) ;
 	}
 else
