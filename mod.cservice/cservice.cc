@@ -267,6 +267,7 @@ pendingChanPeriod = atoi((cserviceConfig->Require( "pending_duration" )->second)
 connectCheckFreq = atoi((cserviceConfig->Require( "connection_check_frequency" )->second).c_str());
 connectRetry = atoi((cserviceConfig->Require( "connection_retry_total" )->second).c_str());
 limitCheckPeriod = atoi((cserviceConfig->Require( "limit_check" )->second).c_str());
+loginDelay = atoi((cserviceConfig->Require( "login_delay" )->second).c_str());
 
 userHits = 0;
 userCacheHits = 0;
