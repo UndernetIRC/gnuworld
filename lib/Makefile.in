@@ -1,4 +1,4 @@
-# $Id: Makefile.in,v 1.8 2000/12/09 22:55:10 dan_karrels Exp $
+# $Id: Makefile.in,v 1.9 2000/12/10 16:52:45 dan_karrels Exp $
 # Default paths (system-wide installs)
 
 # Standard defines
@@ -6,9 +6,6 @@ BIN_PATH = @BIN_PATH@
 
 CXX = @CXX@
 CXXFLAGS = @CXXFLAGS@
-
-SHLIB_CXX = @SHLIB_CXX@
-SHLIB_LD = @SHLIB_LD@
 
 DEFS = @DEFS@
 LIBS = @LIBS@
@@ -34,17 +31,18 @@ SRCS = Buffer.cc \
 	StringTokenizer.cc
 
 OBJS = $(patsubst %.cc, %.o, $(SRCS))
-LIB = $(BIN_PATH)/libgnuworld.so
+LIB = $(BIN_PATH)/libgnuworld.a
 
 all: $(LIB)
 everything: all
 make: all
 
 %.o: %.cc
-	${SHLIB_CXX} ${CXXFLAGS} -c $< -o $@
+	${CXX} ${CXXFLAGS} -c $< -o $@
 
 $(LIB): ${OBJS}
-	${SHLIB_LD} -o $(LIB) $(OBJS) $(LIBS)
+	$(AR) rv $(LIB) $(OBJS) $(LIBS)
+	$(RANLIB) $(LIB)
 
 clean:
 	$(RM) -f $(OBJS) $(LIB)
