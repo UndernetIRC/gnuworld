@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------------
--- "$Id: cservice.sql,v 1.73 2003/02/07 19:25:59 gte Exp $"
+-- "$Id: cservice.sql,v 1.74 2003/03/14 04:41:25 nighty Exp $"
 -- Channel service DB SQL file for PostgreSQL.
 
 -- ChangeLog:
@@ -413,6 +413,8 @@ CREATE TABLE noreg (
 	-- 2 - Abuse.
 	-- 3 - Elective.
 	-- 4 - Fraud Username.
+	-- 5 - Username pattern'd lock (able to lock any new username from matching *mp3* for example)
+	-- 6 - Verification answer lock (stored in 'user_name', planning on db fields renaming for more customisation later)
 	never_reg INT4 NOT NULL DEFAULT '0',
 	-- Never, ever register this channel, or user or pair.
 	for_review INT4 NOT NULL DEFAULT '0',

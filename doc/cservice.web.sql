@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------------
--- "$Id: cservice.web.sql,v 1.28 2003/01/01 04:43:51 gte Exp $"
+-- "$Id: cservice.web.sql,v 1.29 2003/03/14 04:41:25 nighty Exp $"
 -- Channel service DB SQL file for PostgreSQL.
 --
 -- Tables specific to webbased registration process.
@@ -61,10 +61,23 @@ CREATE TABLE locks (
 );
 
 CREATE TABLE counts (
+-- OBSOLETE !!!
 	count_type INT2,
 -- type: 1 : NEW USERS
 	count_count INT4
 );
+
+CREATE TABLE statistics (
+	users_id	INT4 NOT NULL,
+	stats_type	INT4 NOT NULL,
+--	1	Total reviewed applications count
+--	...	more capabilities
+	stats_value_int	INT4 DEFAULT 0 NOT NULL,
+	stats_value_chr	VARCHAR(255) DEFAULT '' NOT NULL,
+	last_updated	INT4 NOT NULL
+);
+
+CREATE INDEX statistics_users_id_idx ON statistics(users_id);
 
 --CREATE TABLE helpmgr_users (
 --	user_id INT4 NOT NULL,
