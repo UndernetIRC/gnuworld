@@ -1,5 +1,5 @@
 #ifndef CONVERT_H
-#define CONVERT_H "$Id: Convert.h,v 1.2 2003/08/02 19:22:38 jeekay Exp $"
+#define CONVERT_H "$Id: Convert.h,v 1.3 2003/08/05 14:56:15 jeekay Exp $"
 
 #include <deque>
 #include <sstream>
@@ -23,7 +23,7 @@ public:
 		_seconds -= seconds;
 		_seconds /= 60;
 		
-		snprintf(temp, 20, "%us", seconds);
+		snprintf(temp, 20, "%lis", seconds);
 		toAssm.push_front(temp);
 		
 		if(_seconds <= 0) {
@@ -34,7 +34,7 @@ public:
 		_seconds -= minutes;
 		_seconds /= 60;
 		
-		snprintf(temp, 20, "%um", minutes);
+		snprintf(temp, 20, "%lim", minutes);
 		toAssm.push_front(temp);
 		
 		if(_seconds <= 0) {
@@ -45,7 +45,7 @@ public:
 		_seconds -= hours;
 		_seconds /= 24;
 		
-		snprintf(temp, 20, "%uh", hours);
+		snprintf(temp, 20, "%lih", hours);
 		toAssm.push_front(temp);
 		
 		if(_seconds <= 0) {
@@ -54,7 +54,7 @@ public:
 		
 		time_t days = _seconds;
 		
-		snprintf(temp, 20, "%ud", days);
+		snprintf(temp, 20, "%lid", days);
 		toAssm.push_front(temp);
 		
 		return Assemble(toAssm);
