@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------------
--- "$Id: cservice.sql,v 1.17 2001/01/21 16:12:56 gte Exp $"
+-- "$Id: cservice.sql,v 1.18 2001/01/22 20:17:18 gte Exp $"
 -- Channel service DB SQL file for PostgreSQL.
 
 -- ChangeLog:
@@ -159,6 +159,7 @@ CREATE INDEX users_username_idx ON users( lower(user_name) );
 CREATE TABLE users_lastseen (
 	user_id INT4 CONSTRAINT lastseen_users_id_ref REFERENCES users ( id ),
 	last_seen INT4,
+	last_updated INT4 NOT NULL,
 	PRIMARY KEY (user_id)
 );
 
