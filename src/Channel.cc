@@ -374,8 +374,8 @@ for( banVectorType::const_iterator newBanPtr = origBans.begin() ;
 const string Channel::getModeString() const
 {
 
-string modeString = "+" ;
-string argString = "" ;
+string modeString( "+" ) ;
+string argString( "" ) ;
 
 if( modes & MODE_T )	modeString += 't' ;
 if( modes & MODE_N )	modeString += 'n' ;
