@@ -23,7 +23,7 @@
 #include	"AuthInfo.h"
 #include        "server.h"
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.37 2001/05/15 20:43:15 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.38 2001/05/16 18:38:35 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -317,6 +317,7 @@ theServer->RegisterEvent( EVT_QUIT, this );
 theServer->RegisterEvent( EVT_NETJOIN, this );
 theServer->RegisterEvent( EVT_BURST_CMPLT, this );
 theServer->RegisterEvent( EVT_GLINE , this );
+theServer->RegisterEvent( EVT_NICK , this );
 
 //theServer->RegisterEvent( EVT_NETBREAK, this );
 
@@ -430,6 +431,7 @@ switch( theEvent )
 	
 	case EVT_NETJOIN:
 		{
+		inBurst = true;
 		/*
 		 * We need to update the servers table about the new
 		 * server , and check if we know it
@@ -474,13 +476,31 @@ switch( theEvent )
 		/*iServer* NewServer = static_cast< iServer* >( Data1);
 		iServer* UplinkServer = static_cast< iServer* >( Data2);*/
 		// still not handled
+		break;
 		}
 	case EVT_BURST_CMPLT:
 		{
 		inBurst = false;
 		refreshGlines();
 		burstGlines();
+		break;
 		}	
+	case EVT_NICK:
+		{
+		if(!inBurst)
+			{
+			iClient* NewUser = static_cast< iClient* >( Data1);
+			ccGline * tempGline = findMatchingGline(NewUser->getUserName() + '@' + NewUser->getInsecureHost());
+			if(tempGline)
+				{
+				addGline(tempGline);
+				MyUplink->setGline(tempGline->get_AddedBy()
+				,tempGline->get_Host(),tempGline->get_Reason()
+				,tempGline->get_Expires() - ::time(0));
+				}
+			}			
+		break;
+		}
 	} // switch()
 
 return 0;
@@ -1254,38 +1274,12 @@ return true;
 
 ccGline* ccontrol::findMatchingGline( const string& Host )
 {
-static const char *Main = "SELECT Id,Host FROM glines";
-
-strstream theQuery;
-theQuery	<< Main
-		<< ends;
-
-elog	<< "ccontrol::findMatchingGline> "
-	<< theQuery.str()
-	<< endl; 
-
-ExecStatusType status = SQLDb->Exec( theQuery.str() ) ;
-delete[] theQuery.str() ;
-
-if( PGRES_TUPLES_OK != status )
+ccGline *theGline;
+for(glineIterator ptr = glineList.begin(); ptr != glineList.end(); ptr++)
 	{
-	elog	<< "ccontrol::findMatchingGline> SQL Failure: "
-		<< SQLDb->ErrorMessage()
-		<< endl ;
-
-	return NULL ;
-	}
-
-for( int i = 0 ; i < SQLDb->Tuples() ; i++ )
-	{
-	if(match(SQLDb->GetValue(i,2),Host) == 0)
-		{
-		ccGline *tempGline = new (nothrow) ccGline(SQLDb);
-		if(tempGline->loadData(atoi(SQLDb->GetValue(i,1))))
-		    return tempGline;
-		else
-		    return NULL;
-		}
+	theGline = *ptr;
+	if((match(theGline->get_Host(),Host) == 0) && theGline->get_Expires() > ::time(0))
+		return theGline;
 	}
 
 return NULL ;
@@ -1624,7 +1618,7 @@ return true;
 
 bool ccontrol::loadGlines()
 {
-static const char *Main = "SELECT Id FROM glines;";
+static const char *Main = "SELECT * FROM glines";
 
 strstream theQuery;
 theQuery	<< Main
@@ -1647,21 +1641,20 @@ if( PGRES_TUPLES_OK != status )
 	return false;
 	}
 
-ccGline *tempGline = new (nothrow) ccGline(SQLDb);
+ccGline *tempGline;
 assert(tempGline != NULL);
 
-int totalFound;
-totalFound = SQLDb->Tuples();
 inRefresh = true;
 
 for( int i = 0 ; i < SQLDb->Tuples() ; i++ )
 	{
-	if(!tempGline->loadData(atoi(SQLDb->GetValue(i,0))))
-		{
-		//there has been a weird error while loading
-		//not handled yet
-		continue;
-		}
+	tempGline =  new (nothrow) ccGline(SQLDb);
+	tempGline->set_Id(SQLDb->GetValue(i,0));
+	tempGline->set_Host(SQLDb->GetValue(i,1));
+	tempGline->set_AddedBy(SQLDb->GetValue(i,2)) ;
+	tempGline->set_AddedOn(static_cast< time_t >( atoi( SQLDb->GetValue(i,3) ) )) ;
+	tempGline->set_Expires(static_cast< time_t >( atoi( SQLDb->GetValue(i,4) ) )) ;
+	tempGline->set_Reason(SQLDb->GetValue(i,5));
 	addGline(tempGline);
 	}
 return true;	

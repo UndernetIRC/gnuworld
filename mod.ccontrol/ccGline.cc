@@ -3,7 +3,7 @@
  * 
  * Gline class
  * 
- * $Id: ccGline.cc,v 1.5 2001/05/15 20:43:15 mrbean_ Exp $
+ * $Id: ccGline.cc,v 1.6 2001/05/16 18:38:35 mrbean_ Exp $
  */
  
 #include	<strstream>
@@ -19,7 +19,7 @@
 #include	"ccGline.h" 
 
 const char ccGline_h_rcsId[] = __CCGLINE_H ;
-const char ccGline_cc_rcsId[] = "$Id: ccGline.cc,v 1.5 2001/05/15 20:43:15 mrbean_ Exp $" ;
+const char ccGline_cc_rcsId[] = "$Id: ccGline.cc,v 1.6 2001/05/16 18:38:35 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -141,7 +141,8 @@ if( PGRES_TUPLES_OK != status )
 	return false ;
 	}
 
-
+if(SQLDb->Tuples() < 6)
+    return false;
 Id = SQLDb->GetValue(0,0);
 Host = SQLDb->GetValue(0,1);
 AddedBy = SQLDb->GetValue(0,2) ;
@@ -161,7 +162,7 @@ theQuery	<< Main
 		<< HostName.c_str()
 		<< "'" << ends;
 
-elog	<< "ccontrol::glineConstructor> "
+elog	<< "ccontrol::loadData> "
 	<< theQuery.str()
 	<< endl; 
 
@@ -170,14 +171,15 @@ delete[] theQuery.str() ;
 
 if( PGRES_TUPLES_OK != status )
 	{
-	elog	<< "ccGline::ccGline> SQL Failure: "
+	elog	<< "ccGline::loadData> SQL Failure: "
 		<< SQLDb->ErrorMessage()
 		<< endl ;
 
 	return false ;
 	}
 
-
+if(SQLDb->Tuples() == 0) //If no gline was found
+	return false;
 Id = SQLDb->GetValue(0,0);
 Host = SQLDb->GetValue(0,1);
 AddedBy = SQLDb->GetValue(0,2) ;
@@ -204,7 +206,11 @@ elog	<< "ccontrol::glineDelete> "
 ExecStatusType status = SQLDb->Exec( theQuery.str() ) ;
 delete[] theQuery.str() ;
 
-if( PGRES_COMMAND_OK != status )
+if( PGRES_COMMAND_OK == status ) 
+	{
+	return true;
+	}
+else
 	{
 	elog	<< "ccGline::ccDelete> SQL Failure: "
 		<< SQLDb->ErrorMessage()
