@@ -18,14 +18,14 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *  
- * $Id: Buffer.cc,v 1.5 2003/06/28 01:21:18 dan_karrels Exp $
+ * $Id: Buffer.cc,v 1.6 2003/07/20 14:13:15 dan_karrels Exp $
  */
 
 #include	<string>
 
 #include	"Buffer.h"
 
-const char rcsId[] = "$Id: Buffer.cc,v 1.5 2003/06/28 01:21:18 dan_karrels Exp $" ;
+const char rcsId[] = "$Id: Buffer.cc,v 1.6 2003/07/20 14:13:15 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -80,7 +80,8 @@ void Buffer::Delete( const size_type& numBytes )
 if( numBytes >= size() )
 	{
 	// Clear the entire Buffer
-	buf.clear() ;
+//	buf.clear() ;
+	buf.erase() ;
 	return ;
 	}
 
