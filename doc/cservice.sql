@@ -1,8 +1,13 @@
 ------------------------------------------------------------------------------------
--- "$Id: cservice.sql,v 1.13 2001/01/03 03:06:24 gte Exp $"
+-- "$Id: cservice.sql,v 1.14 2001/01/05 05:27:33 gte Exp $"
 -- Channel service DB SQL file for PostgreSQL.
 
 -- ChangeLog:
+-- 2001-01-04: Gte
+--             Added 'deleted' flag, to flag records as deleted
+--             (To enable CMaster to see deletions - can be *really* deleted during
+--             routine maintainence/vacuum).
+--             If deleted, value is non zero - null value treated as undeleted.
 -- 2000-12-30: Gte
 --             Added some update notification events for CMaster to listen
 --             on and refresh its internal cache.
@@ -40,7 +45,8 @@
 CREATE TABLE languages (
 	id SERIAL,
 	name VARCHAR( 16 ),
-	last_update INT4 NOT NULL
+	last_updated INT4 NOT NULL,
+	deleted INT2 DEFAULT '0'
 --	PRIMARY KEY(id)
 );
 
@@ -51,7 +57,8 @@ CREATE TABLE translations (
 	language_id INT4 CONSTRAINT translations_language_id_ref REFERENCES languages ( id ),
 	response_id INT4 NOT NULL DEFAULT '0',
 	text TEXT,
-	last_update INT4 NOT NULL,
+	last_updated INT4 NOT NULL,
+	deleted INT2 DEFAULT '0',
 
 	PRIMARY KEY (language_id, response_id)
 );
@@ -91,12 +98,11 @@ CREATE TABLE channels (
 	keywords VARCHAR(128),
 	registered_ts INT4,
 	channel_ts INT4 NOT NULL,
-	channel_mode VARCHAR(26),
-	-- does anyone actually read these schemas?
-	-- Yes :)
+	channel_mode VARCHAR(26), 
 	channel_key VARCHAR(24),
 	channel_limit INT4,
-	last_update INT4 NOT NULL,
+	last_updated INT4 NOT NULL,
+	deleted INT2 DEFAULT '0',
 
 	PRIMARY KEY (id)
 );
@@ -117,7 +123,8 @@ CREATE TABLE bans (
 	duration INT4,				-- In seconds
 	reason VARCHAR (128),
 	channel_id INT4 CONSTRAINT bans_channel_id_ref REFERENCES channels (id),
-	last_update INT4 NOT NULL,
+	last_updated INT4 NOT NULL,
+	deleted INT2 DEFAULT '0',
 
 	PRIMARY KEY (banmask,channel_id)
 );
@@ -137,8 +144,10 @@ CREATE TABLE users (
 	flags INT2 NOT NULL DEFAULT '0',
 -- 0x00 01 -- Suspended globally
 -- 0x00 02 -- Logged in
-	last_update_by VARCHAR (128),		-- nick!user@host
-	last_update INT4 NOT NULL,
+	last_updated_by VARCHAR (128),		-- nick!user@host
+	last_updated INT4 NOT NULL,
+	deleted INT2 DEFAULT '0',
+
 	PRIMARY KEY ( id )
 ) ;
 
@@ -161,6 +170,8 @@ CREATE TABLE levels (
 	last_Modif INT4,
 	last_Modif_By VARCHAR( 128 ),
 	last_Updated INT4 NOT NULL,
+	deleted INT2 DEFAULT '0',
+
 	PRIMARY KEY( channel_id, user_id )
 );
 
@@ -171,14 +182,16 @@ CREATE TABLE channellog (
 	ts INT4,
 	channelID INT4 CONSTRAINT channel_log_ref REFERENCES channels ( id ),
 	message TEXT,
-	last_updated INT4 NOT NULL
+	last_updated INT4 NOT NULL,
+	deleted INT2 DEFAULT '0'
 );
 
 CREATE TABLE userlog (
 	ts INT4,
 	user_id INT4 CONSTRAINT user_log_ref REFERENCES users ( id ),
 	message TEXT,
-	last_updated INT4 NOT NULL
+	last_updated INT4 NOT NULL,
+	deleted INT2 DEFAULT '0'
 );
 
 CREATE TABLE supporters (
@@ -191,6 +204,7 @@ CREATE TABLE supporters (
 	reason TEXT,
 -- Reason for not supporting it if required.
 	last_updated INT4 NOT NULL,
+	deleted INT2 DEFAULT '0',
 	PRIMARY KEY(channel_id,user_id)
 );
 
@@ -202,27 +216,36 @@ CREATE TABLE pending (
 	decision VARCHAR (80),
 	comments TEXT,
 	last_updated INT4 NOT NULL,
+	deleted INT2 DEFAULT '0',
 	PRIMARY KEY(channel_id)
 );
 
-CREATE TABLE baddomain (
+CREATE TABLE domain (
 	id SERIAL,
 	domain varchar(1024) NOT NULL UNIQUE,
+	flags INT2 NOT NULL DEFAULT '1',
+-- Flags are exclusive and can be SELECT'd on.
+-- 0x00 01 - Bad Domain.
+-- 0x00 02 - Good Domain.
+-- 0x00 04 - Pending Domain.
+	last_updated INT4 NOT NULL,
+	deleted INT2 DEFAULT '0',
 	PRIMARY KEY(id)
-);
+); 
 
 -- Update notification rules.
 --
 
 CREATE RULE cm1 AS ON UPDATE TO channels DO NOTIFY channels_u;
-CREATE RULE cm2 AS ON DELETE TO channels DO NOTIFY channels_d;
-CREATE RULE cm3 AS ON UPDATE TO bans DO NOTIFY bans_u;
-CREATE RULE cm4 AS ON DELETE TO bans DO NOTIFY bans_d;
-CREATE RULE cm5 AS ON UPDATE TO users DO NOTIFY users_u;
-CREATE RULE cm6 AS ON DELETE TO users DO NOTIFY users_d;
-CREATE RULE cm7 AS ON UPDATE TO levels DO NOTIFY levels_u;
-CREATE RULE cm8 AS ON DELETE TO levels DO NOTIFY levels_d;
+ 
+CREATE RULE cm2 AS ON UPDATE TO bans DO NOTIFY bans_u;
+ 
+CREATE RULE cm3 AS ON UPDATE TO users DO NOTIFY users_u;
+ 
+CREATE RULE cm4 AS ON UPDATE TO levels DO NOTIFY levels_u;
 
+CREATE RULE cm5 AS ON UPDATE TO translations DO NOTIFY translations_u;
+ 
 -----------------------------------------------------------------------------------------
 
 --Notes:
