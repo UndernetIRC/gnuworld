@@ -15,7 +15,7 @@
 #include	"misc.h"
 #include	"Constants.h"
 
-const char MODUSERCommand_cc_rcsId[] = "$Id: MODUSERCommand.cc,v 1.12 2001/12/28 16:28:47 mrbean_ Exp $";
+const char MODUSERCommand_cc_rcsId[] = "$Id: MODUSERCommand.cc,v 1.13 2001/12/30 00:06:10 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -179,7 +179,7 @@ while(pos < st.size())
 			}
 		if(!bot->UserGotHost(tmpUser,bot->removeSqlChars(st[pos+1])))
 			{
-			bot->Notice(theClient,"%s doesnt havee the host %s in my access list",st[1].c_str(),st[pos+1].c_str());
+			bot->Notice(theClient,"%s doesnt have the host %s in my access list",st[1].c_str(),st[pos+1].c_str());
 			}
 		else if(bot->DelHost(tmpUser,bot->removeSqlChars(st[pos+1])))
 			{

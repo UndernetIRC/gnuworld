@@ -37,7 +37,7 @@
 #include	"ip.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.106 2001/12/28 16:28:47 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.107 2001/12/30 00:06:10 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -227,9 +227,9 @@ RegisterCommand( new LOGINCommand( this, "LOGIN", "<USER> <PASS> "
 	"Authenticate with the bot",commandLevel::flg_LOGIN,false,true,true,operLevel::OPERLEVEL,false ) ) ;
 RegisterCommand( new DEAUTHCommand( this, "DEAUTH", ""
 	"Deauthenticate with the bot",commandLevel::flg_DEAUTH,false,false,true,operLevel::OPERLEVEL,false ) ) ;
-RegisterCommand( new ADDUSERCommand( this, "ADDUSER", "<USER> <OPERTYPE> <PASS> "
+RegisterCommand( new ADDUSERCommand( this, "ADDUSER", "<USER> <OPERTYPE> [SERVER*] <PASS> "
 	"Add a new oper",commandLevel::flg_ADDNOP,false,false,false,operLevel::OPERLEVEL,false ) ) ;
-RegisterCommand( new REMUSERCommand( this, "REMUSER", "<USER> <PASS> "
+RegisterCommand( new REMUSERCommand( this, "REMUSER", "<USER> "
 	"Remove an oper",commandLevel::flg_REMOP,false,false,false,operLevel::OPERLEVEL,false ) ) ;
 RegisterCommand( new ADDCOMMANDCommand( this, "ADDCOMMAND", "<USER> <COMMAND> "
 	"Add a new command to an oper",commandLevel::flg_ADDCMD,false,false,false,operLevel::OPERLEVEL,false ) ) ;
@@ -273,7 +273,7 @@ RegisterCommand( new LISTIGNORESCommand( this, "LISTIGNORES", ""
 	"List the ignore list",commandLevel::flg_LISTIGNORES,false,false,false,operLevel::OPERLEVEL,true ) ) ;
 RegisterCommand( new REMOVEIGNORECommand( this, "REMIGNORE", "(nick/host)"
 	" Removes a host/nick from the  ignore list",commandLevel::flg_REMIGNORE,false,false,false,operLevel::OPERLEVEL,true ) ) ;
-RegisterCommand( new LISTCommand( this, "LIST", "(glines)"
+RegisterCommand( new LISTCommand( this, "LIST", "(glines/servers)"
 	" Get all kinds of lists from the bot",commandLevel::flg_LIST,false,false,false,operLevel::OPERLEVEL,true ) ) ;
 RegisterCommand( new COMMANDSCommand( this, "COMMANDS", "<command> <option> <new value>"
 	" Change commands options",commandLevel::flg_COMMANDS,false,false,false,operLevel::OPERLEVEL,true ) ) ;
@@ -552,7 +552,7 @@ int ccontrol::OnCTCP( iClient* theClient, const string& CTCP
 {
 
 ccUser* theUser = IsAuth(theClient);
-if(!theUser)
+if((!theUser) && !(theClient->isOper()))
 	{ //We need to add the flood points for this user
 	ccFloodData* floodData = (static_cast< ccUserData* >(
 	theClient->getCustomData(this) ))->getFlood() ;
@@ -564,6 +564,30 @@ if(!theUser)
 		return false;
 		}
 	}
+else
+	{
+	StringTokenizer st(CTCP);
+	if(st[0] == "PING")
+		{
+		xClient::DoCTCP(theClient,CTCP,Message);
+		}
+	else if(st[0] == "GENDER")
+		{
+		return xClient::DoCTCP(theClient,CTCP,
+		    "Thats a question i am still trying to find the answer to");
+		}
+	else if(st[0] == "SEX")
+		{
+		xClient::DoCTCP(theClient,CTCP,
+		    "Sorry i am booked till the end of the year");
+		}
+	else if(st[0] == "POLICE")
+		{
+		xClient::DoCTCP(theClient,CTCP,
+		    "Oh crap! where would i hide the drugs now?");
+		}
+	}
+	
 return true;
 }
 
@@ -885,7 +909,7 @@ else
 	serversMap.erase(serversMap.find(tmpServer->getCharYY()));
 	}
 
-
+return xClient::OnConnect();
 }
 
 bool ccontrol::isOperChan( const string& theChan ) const
@@ -2632,8 +2656,18 @@ ccServer* tmpServer;
 for(serversConstIterator ptr = serversMap_begin();ptr != serversMap_end();++ptr)
 	{
 	tmpServer = ptr->second;
-	Notice(theClient,"%s - Name : %s",tmpServer->getLastNumeric().c_str()
-	,tmpServer->getName().c_str());
+	if(tmpServer->getNetServer())
+		{
+		Notice(theClient,"%s (%d) - Name : %s",tmpServer->getLastNumeric().c_str()
+		,base64toint(tmpServer->getLastNumeric().c_str()),
+		tmpServer->getName().c_str());
+		}
+	else
+		{
+		Notice(theClient,"%s (%d) - Name : %s *MISSING*",tmpServer->getLastNumeric().c_str()
+		,base64toint(tmpServer->getLastNumeric().c_str()),
+		tmpServer->getName().c_str());
+		}
 	Notice(theClient,"Version : %s" ,tmpServer->getVersion().c_str());
 	}
 	 

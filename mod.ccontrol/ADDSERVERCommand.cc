@@ -14,7 +14,7 @@
 #include	"Network.h"
 #include	"Constants.h"
 
-const char ADDSERVERCommand_cc_rcsId[] = "$Id: ADDSERVERCommand.cc,v 1.8 2001/12/28 16:28:47 mrbean_ Exp $";
+const char ADDSERVERCommand_cc_rcsId[] = "$Id: ADDSERVERCommand.cc,v 1.9 2001/12/30 00:06:09 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -87,6 +87,8 @@ if(CurServer)
 	NewServer->setLastNumeric(CurServer->getCharYY());
 	NewServer->setLastConnected(CurServer->getConnectTime());
 	NewServer->setUplink((Network->findServer(CurServer->getIntYY()))->getName());
+	NewServer->setNetServer(CurServer);
+	bot->Write("%s V :%s\n",bot->getCharYYXXX(),CurServer->getCharYY());
 	}
 NewServer->setAddedOn(::time(0));
 NewServer->setLastUpdated(::time(0));
@@ -94,7 +96,7 @@ if(NewServer->Insert())
 	bot->Notice(theClient,"Server %s added successfully\n",SName.c_str());
 else
 	bot->Notice(theClient,"Database error while adding server %s\n",SName.c_str());
-delete NewServer;
+bot->addServer(NewServer);
 return true;
 }
 }

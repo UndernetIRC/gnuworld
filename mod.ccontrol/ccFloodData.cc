@@ -3,7 +3,7 @@
  * 
  * flood data class
  * 
- * $Id: ccFloodData.cc,v 1.3 2001/12/13 08:50:00 mrbean_ Exp $
+ * $Id: ccFloodData.cc,v 1.4 2001/12/30 00:06:10 mrbean_ Exp $
  */
  
 #include	<strstream>
@@ -17,7 +17,7 @@
 #include	"Constants.h"
 
 const char ccFloodData_h_rcsId[] = __CCFLOODDATA_H ;
-const char ccFloodData_cc_rcsId[] = "$Id: ccFloodData.cc,v 1.3 2001/12/13 08:50:00 mrbean_ Exp $" ;
+const char ccFloodData_cc_rcsId[] = "$Id: ccFloodData.cc,v 1.4 2001/12/30 00:06:10 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -51,7 +51,7 @@ ccFloodData::~ccFloodData()
 bool ccFloodData::addPoints(unsigned int _Points)
 {
 //Check if the flood points needs to be reset
-if(flood::RESET_TIME <   (::time(0) - lastMessage))
+if((signed)flood::RESET_TIME <   (::time(0) - lastMessage))
         Points = 0;   
 
 //Update the new flood points
