@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------------
--- "$Id: cservice.sql,v 1.1 2002/08/09 01:10:45 reedloden Exp $"
+-- "$Id: cservice.sql,v 1.69 2002/08/30 10:18:44 nighty Exp $"
 -- Channel service DB SQL file for PostgreSQL.
 
 -- ChangeLog:

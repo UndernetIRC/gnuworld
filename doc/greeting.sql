@@ -1,4 +1,4 @@
--- $Id: greeting.sql,v 1.1 2002/08/09 01:10:45 reedloden Exp $
+-- $Id: greeting.sql,v 1.8 2002/08/30 10:18:46 nighty Exp $
 -- spanish + catalan by Algol.
 -- norwegian by MrIron.
 -- french by nighty.

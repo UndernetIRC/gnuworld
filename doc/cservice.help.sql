@@ -3,7 +3,7 @@
 -- Its not particularly in any nice order, but you can use the web interface
 -- to change it all anyway.
 --
--- $Id: cservice.help.sql,v 1.2 2002/08/09 23:40:13 gte Exp $
+-- $Id: cservice.help.sql,v 1.3 2002/08/30 10:18:44 nighty Exp $
 
 DELETE FROM help;
 

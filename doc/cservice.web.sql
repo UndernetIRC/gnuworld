@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------------
--- "$Id: cservice.web.sql,v 1.1 2002/08/09 01:10:45 reedloden Exp $"
+-- "$Id: cservice.web.sql,v 1.27 2002/08/30 10:18:45 nighty Exp $"
 -- Channel service DB SQL file for PostgreSQL.
 --
 -- Tables specific to webbased registration process.
