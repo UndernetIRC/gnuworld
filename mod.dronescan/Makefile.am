@@ -5,6 +5,7 @@ libdronescan_la_CXXFLAGS = -I$(PGSQL_INCLUDE) -I${top_srcdir}/libgnuworld \
 
 libdronescan_la_SOURCES = 	\
 	dronescan.cc		\
+	Convert.cc		\
 	sqlUser.cc		\
 	ACCESSCommand.cc	\
 	ADDUSERCommand.cc	\
