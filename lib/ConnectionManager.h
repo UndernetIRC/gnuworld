@@ -18,34 +18,32 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ConnectionManager.h,v 1.7 2002/06/02 23:14:23 dan_karrels Exp $
+ * $Id: ConnectionManager.h,v 1.8 2002/06/06 02:29:00 dan_karrels Exp $
  */
 
 #ifndef __CONNECTIONMANAGER_H
-#define __CONNECTIONMANAGER_H "$Id: ConnectionManager.h,v 1.7 2002/06/02 23:14:23 dan_karrels Exp $"
+#define __CONNECTIONMANAGER_H "$Id: ConnectionManager.h,v 1.8 2002/06/06 02:29:00 dan_karrels Exp $"
 
 #include	<sys/types.h>
+#include	<pthread.h>
 
 #include	<iostream>
 #include	<sstream>
 #include	<string>
 #include	<list>
-#include	<map>
 #include	<set>
 
 #include	<ctime>
 
 #include	"Connection.h"
-#include	"ConnectionHandler.h"
 
 namespace gnuworld
 {
 
 using std::set ;
 using std::stringstream ;
-using std::multimap ;
 using std::string ;
-using std::map ;
+using std::list ;
 
 /**
  * The purpose of this class it to manage multiple incoming and
@@ -87,19 +85,6 @@ class ConnectionManager
 	typedef connectionMapType::iterator	connectionMapIterator ;
 
 	/**
-	 * This map stores connectionMapType's, keyed by the handler
-	 * which registered the connection(s).
-	 */
-	typedef map< ConnectionHandler*, connectionMapType > 
-		handlerMapType ;
-
-	/**
-	 * This type is used as convenience to define an iterator
-	 * type for the handlerMap.
-	 */
-	typedef handlerMapType::iterator	handlerMapIterator ;
-
-	/**
 	 * The type is used to store Connection objects to be erased.
 	 * This structure stores an iterator to each Connection
 	 * to be removed.  Removal is synchronous to prevent
@@ -113,8 +98,7 @@ class ConnectionManager
 	 * used to prevent multiple entries of the same Connection
 	 * into the eraseMap.
 	 */
-	typedef multimap< ConnectionHandler*, connectionMapType::iterator >
-		eraseMapType ;
+	typedef list< connectionMapIterator > eraseMapType ;
 
 	/**
 	 * This type is used as convenience to define an iterator
@@ -184,11 +168,8 @@ public:
 	 * not work properly.
 	 * The ConnectionHandler must be non-NULL.
 	 */
-	virtual Connection*	Connect(
-				ConnectionHandler*,
-				const string& host,
-				const unsigned short int remotePort,
-				const bool TCP = true ) ;
+	virtual Connection*	Connect( const string& host,
+				const unsigned short int remotePort ) ;
 
 	/**
 	 * Attempt to establish a listening Connection on the
@@ -200,7 +181,6 @@ public:
 	 * The ConnectionHandler must be non-NULL.
 	 */
 	virtual Connection*	Listen(
-				ConnectionHandler*,
 				const unsigned short int localPort ) ;
 
 	/**
@@ -212,7 +192,6 @@ public:
 	 * connections which match the first two search criteria to
 	 * be removed.
 	 * OnDisconnect() is NOT called.
-	 * The ConnectionHandler must be non-NULL.
 	 * The Connection will not be removed if the ConnectionHandler
 	 * does not own the particular Connection.
 	 * This method schedules the given Connection to be disconnected
@@ -220,8 +199,7 @@ public:
 	 * To close a listening Connection, pass an empty hostname, in
 	 * which case the remotePort will be ignored.
 	 */
-	virtual bool	DisconnectByHost( ConnectionHandler*,
-			const string& hostname,
+	virtual bool	DisconnectByHost( const string& hostname,
 			const unsigned short int remotePort,
 			const unsigned short int localPort = 0 ) ;
 
@@ -234,7 +212,6 @@ public:
 	 * connections which match the first two search criteria to
 	 * be removed.
 	 * OnDisconnect() is NOT called.
-	 * The ConnectionHandler must be non-NULL.
 	 * The Connection will not be removed if the ConnectionHandler
 	 * does not own the particular Connection.
 	 * This method schedules the given Connection to be disconnected
@@ -242,8 +219,7 @@ public:
 	 * To close a listening Connection, pass an empty hostname, in
 	 * which case the remotePort will be ignored.
 	 */
-	virtual bool	DisconnectByIP( ConnectionHandler*,
-			const string& IP,
+	virtual bool	DisconnectByIP( const string& IP,
 			const unsigned short int remotePort,
 			const unsigned short int localPort = 0 ) ;
 
@@ -259,15 +235,91 @@ public:
 	 * This method schedules the given Connection to be disconnected
 	 * in the next call to Poll().
 	 */
-	virtual bool	Disconnect( ConnectionHandler*,
-				Connection* ) ;
+	virtual bool	Disconnect( Connection* ) ;
 
 	/**
-	 * This method removes the handler from the internal data
-	 * structures, and all of the handlers Connections as well.
-	 * OnDisconnect() is NOT called for the closed connections.
+	 * This method is called when a host connection succeeds.
+	 * This method is NOOP in the base class, and should NOT
+	 * be called by clients of this class.
 	 */
-	virtual bool	RemoveHandler( ConnectionHandler* ) ;
+	virtual void	OnConnect( Connection* ) ;
+
+	/**
+	 * This method is called when the given connection attempt
+	 * fails.  This could be for either an incoming or outgoing
+	 * attempt -- see the Connection's flags for determining
+	 * which it is.
+	 * The given Connection is no longer valid when this method
+	 * is called.
+	 */
+	virtual void	OnConnectFail( Connection* ) ;
+
+	/**
+	 * This method is called when a string of data is available
+	 * from the remote connection referred to by the Connection.
+	 * The string of data (line) is passed as determined by
+	 * the delimiter passed to the constructor of the associated
+	 * ConnectionManager instance.
+	 */
+	virtual void	OnRead( Connection*, const string& ) ;
+
+	/**
+	 * This is a handler method called when a connection is
+	 * established but is then closed by the remote end.  Note
+	 * that connections terminated with Disconnect() are NOT
+	 * reflected by calling OnDisconnect().
+	 * This method is also called when a listening (incoming)
+	 * socket is no longer valid.  If this occurs, the Connection
+	 * flags will have F_INCOMING set, and that further listening
+	 * on the given port will no longer proceed.
+	 * The given Connection is no longer valid when this method
+	 * is called.
+	 */
+	virtual void	OnDisconnect( Connection* ) ;
+
+	/**
+	 * This method is called if a connection timeout occurs.
+	 * The given Connection is no longer valid when this method
+	 * is called.
+	 */
+	virtual void	OnTimeout( Connection* ) ;
+
+	/**
+	 * Appends data to the given Connection's output buffer,
+	 * to be sent during a call to ConnectionManagerPoll().
+	 * Connection must be non-NULL.
+	 * This object must have a valid (non-NULL) ConnectionManager
+	 * object associated with it.
+	 */
+	virtual void    Write( Connection*, const string& ) ;
+  
+	/**
+	 * Appends data to the given Connection's output buffer,
+	 * to be sent during a call to ConnectionManagerPoll().
+	 * Connection must be non-NULL.
+	 * This object must have a valid (non-NULL) ConnectionManager
+	 * object associated with it.
+	 */
+	virtual void    Write( Connection*, const stringstream& ) ;
+
+protected:
+
+	/// The duration to wait for outgoing connections to be 
+	/// established
+	time_t		timeoutDuration ;
+
+	/// The line delimiter, 0 if none
+	char		delimiter ;
+
+	pthread_cond_t	condWait ;
+	pthread_mutex_t	condMutex ;
+
+	connectionMapType	connectionMap ;
+
+	/// Allow for asynchronous calls to Disconnect()
+	/// This structure contains Connections to be removed from
+	/// the connection tables.
+	eraseMapType	eraseMap ;
 
 	/**
 	 * This method performs the actual read/write calls for all
@@ -288,26 +340,8 @@ public:
 	virtual void	Poll( const long seconds = 0,
 				const long milliseconds = 0 ) ;
 
-protected:
-
-	/// The duratino to wait for outgoing connections to be 
-	/// established
-	time_t		timeoutDuration ;
-
-	/// The line delimiter, 0 if none
-	char		delimiter ;
-
-	/// Stores connectionMap's, one for each handler (key)
-	handlerMapType	handlerMap ;
-
-	/// Allow for asynchronous calls to Disconnect()
-	/// This structure contains Connections to be removed from
-	/// the connection tables.
-	eraseMapType	eraseMap ;
-
-	/// Open a socket: TCP if TCP is true, otherwise UDP
 	/// Return -1 on error
-	int		openSocket( bool TCP = true ) ;
+	int		openSocket() ;
 
 	/// Close a socket
 	void		closeSocket( int ) ;
@@ -323,7 +357,7 @@ protected:
 	 * Return true if the read was successful, false if
 	 * connection is no longer valid.
 	 */
-	bool		handleRead( ConnectionHandler*, Connection* ) ;
+	bool		handleRead( Connection* ) ;
 
 	/**
 	 * Attempt to write()/send() to the given Connection.
@@ -331,7 +365,7 @@ protected:
 	 * Return true if the write was successful, false if
 	 * the connection is no longer valid.
 	 */
-	bool		handleWrite( ConnectionHandler*, Connection* ) ;
+	bool		handleWrite( Connection* ) ;
 
 	/**
 	 * Attempt to complete the connection to the given Connection.
@@ -339,7 +373,7 @@ protected:
 	 * Return true if connect was successful, false if Connection
 	 * is invalid.
 	 */
-	bool		finishConnect( ConnectionHandler*, Connection* ) ;
+	bool		finishConnect( Connection* ) ;
 
 	/**
 	 * Attempt to complete an incoming connection creation.
@@ -350,26 +384,9 @@ protected:
 	 * Return true if connection attempt was successful, false
 	 * otherwise.
 	 */
-	bool		finishAccept( ConnectionHandler*, Connection* ) ;
+	bool		finishAccept( Connection* ) ;
 
-	/**
-	 * Because the eraseMap is a multimap, it is possible to insert
-	 * more than one value for each key.  This is useful for
-	 * removing more than a single connection for any single handler,
-	 * but it also permits the insertion of the same connection
-	 * more than once.  This would create a problem when closing
-	 * connections, because the second (and third, fourth, etc)
-	 * instance of a particular iterator would be invalidated
-	 * once the iterator is removed once -- this would cause
-	 * a process crash.
-	 * This method performs a simple check to see if the connection
-	 * iterator is already present in the eraseMap.  If so, just
-	 * return because the connection is already scheduled to be
-	 * removed, and this will occur in Poll().  Otherwise, add
-	 * the connection to be erased to the eraseMap.
-	 */
-	void		scheduleErasure( ConnectionHandler*,
-				connectionMapType::iterator ) ;
+	void		scheduleErasure( connectionMapIterator ) ;
 
 } ;
 

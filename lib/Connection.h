@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: Connection.h,v 1.7 2002/06/02 23:14:23 dan_karrels Exp $
+ * $Id: Connection.h,v 1.8 2002/06/06 02:29:00 dan_karrels Exp $
  */
 
 #ifndef __CONNECTION_H
-#define __CONNECTION_H "$Id: Connection.h,v 1.7 2002/06/02 23:14:23 dan_karrels Exp $"
+#define __CONNECTION_H "$Id: Connection.h,v 1.8 2002/06/06 02:29:00 dan_karrels Exp $"
 
 #include	<sys/types.h>
 #include	<netinet/in.h>
@@ -105,18 +105,6 @@ public:
 	 */
 	inline unsigned short int	getRemotePort() const
 		{ return remotePort ; }
-
-	/**
-	 * Return true if this connection is TCP, false if UDP.
-	 */
-	inline bool		isTCP() const
-		{ return TCP ; }
-
-	/**
-	 * Return true if this connection is UDP, false if TCP.
-	 */
-	inline bool		isUDP() const
-		{ return !isTCP() ; }
 
 	/**
 	 * This type is used to represent flags of this connection,
@@ -228,12 +216,10 @@ protected:
 
 	/**
 	 * Create a new instance of this class given the remote
-	 * host (may be empty), the IP, remote port number, and TCP/UDP
-	 * flag (true if TCP).
+	 * host (may be empty), the IP, remote port number.
 	 */
 	Connection( const string& host,
 			const unsigned short int remotePort,
-			const bool TCP,
 			const char delimiter ) ;
 
 	/**
@@ -278,10 +264,6 @@ protected:
 				const unsigned short int newRemotePort )
 		{ remotePort = newRemotePort ; }
 
-	/// Set the TCP variable, default value is true
-	inline void	setTCP( bool newVal = true )
-		{ TCP = newVal ; }
-
 	/// Return the socket (file) descriptor for this connection
 	inline int	getSockFD() const
 		{ return sockFD ; }
@@ -320,9 +302,6 @@ protected:
 
 	/// The remote port number of this connection
 	unsigned short int	remotePort ;
-
-	/// True if TCP connection, false if UDP
-	bool			TCP ;
 
 	/// The input buffer for this connection
 	Buffer			inputBuffer ;
