@@ -1,8 +1,10 @@
 ------------------------------------------------------------------------------------
--- "$Id: cservice.sql,v 1.57 2001/12/05 23:42:52 nighty Exp $"
+-- "$Id: cservice.sql,v 1.58 2001/12/29 20:38:00 nighty Exp $"
 -- Channel service DB SQL file for PostgreSQL.
 
 -- ChangeLog:
+-- 2001-12-29: nighty
+--             Added two fields to 'channels' to reflect changes on FLOATING LIMIT in mod.cservice
 -- 2001-12-06: nighty
 --             Added two fields to 'users' table to take care of an abuse hunting module.
 -- 2001-10-14: nighty
@@ -124,6 +126,10 @@ CREATE TABLE channels (
 -- 2: AutoVOICE
 
 	userflags INT2 DEFAULT '0',
+
+	limit_offset INT4 DEFAULT '3',
+	limit_period INT4 DEFAULT '20',
+
 	last_updated INT4 NOT NULL, 
 	deleted INT2 DEFAULT '0',
 
