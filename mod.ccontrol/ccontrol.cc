@@ -20,7 +20,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccontrol.cc,v 1.183 2005/01/12 03:50:29 dan_karrels Exp $
+ * $Id: ccontrol.cc,v 1.184 2005/03/05 03:34:01 dan_karrels Exp $
 */
 
 #define MAJORVER "1"
@@ -65,7 +65,7 @@
 #include	"ip.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: ccontrol.cc,v 1.183 2005/01/12 03:50:29 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: ccontrol.cc,v 1.184 2005/03/05 03:34:01 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -1221,15 +1221,16 @@ switch( theEvent )
 		ccUserData* UserData = static_cast< ccUserData* >(
 		tmpUser->getCustomData(this))  ;
 		tmpUser->removeCustomData(this);
-		
-		ccUser *TempAuth = UserData->getDbUser();
-		if(TempAuth)
-	    		{
-			UserData->setDbUser(NULL);
-			TempAuth->setClient(NULL);
-			}
-		if(UserData)
+
+		if( UserData )
 			{
+			ccUser *TempAuth = UserData->getDbUser();
+			if(TempAuth)
+		    		{
+				UserData->setDbUser(NULL);
+				TempAuth->setClient(NULL);
+				}
+
 			ccFloodData *tempLogin = UserData->getFlood();
 			if(tempLogin)
 				{
