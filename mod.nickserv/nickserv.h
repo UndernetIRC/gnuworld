@@ -1,5 +1,5 @@
 #ifndef _NICKSERV_H
-#define _NICKSERV_H "$Id: nickserv.h,v 1.8 2002/08/27 20:55:53 jeekay Exp $"
+#define _NICKSERV_H "$Id: nickserv.h,v 1.9 2002/11/25 03:56:15 jeekay Exp $"
 
 #include "client.h"
 #include "EConfig.h"
@@ -43,14 +43,17 @@ class nickserv : public xClient, public logging::logTarget {
     /** This is called when we have attached to the xServer */
     virtual void ImplementServer( xServer* ) ;
 
+    /** This is called when we receive a CTCP */
+    virtual int OnCTCP( iClient*, const string&, const string&, bool = false ) ;
+
     /** This is called when a network event happens */
-    virtual int OnEvent( const eventType&, void* , void*, void*, void* );
+    virtual int OnEvent( const eventType&, void* , void*, void*, void* ) ;
 
     /** This method is called when the bot gets a PRIVMSG */
     virtual int OnPrivateMessage( iClient*, const string&, bool secure = false ) ;
     
     /** This method is called when a timer expires */
-    virtual int OnTimer(gnuworld::xServer::timerID, void*);
+    virtual int OnTimer(gnuworld::xServer::timerID, void*) ;
     
   
     /*********************************
@@ -88,6 +91,9 @@ class nickserv : public xClient, public logging::logTarget {
     
     /** Process the queue */
     void processQueue();
+    
+    /** Log a message to the console channel */
+    void logAdminMessage(const char*, ... );
     
     
     /*********************************
@@ -149,6 +155,9 @@ class nickserv : public xClient, public logging::logTarget {
     /** How frequently to commit to the database */
     int commitFreq;
     
+    
+    /** What messages should be sent to the console channel */
+    logging::events::eventType consoleLevel;
 
     /*****************
      ** Q U E U E S **

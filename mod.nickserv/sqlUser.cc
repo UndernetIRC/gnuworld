@@ -3,31 +3,31 @@
  *
  * Stores a database user
  *
- * $Id: sqlUser.cc,v 1.8 2002/09/05 16:02:43 dan_karrels Exp $
+ * $Id: sqlUser.cc,v 1.9 2002/11/25 03:56:15 jeekay Exp $
  */
  
- #include <ctime>
- #include <sstream>
+#include <ctime>
+#include <sstream>
  
- #include "sqlUser.h"
+#include "sqlManager.h"
+#include "sqlUser.h"
 
+namespace gnuworld {
+ 
+namespace ns {
+ 
 using std::stringstream ;
-using std::ends ;
  
- namespace gnuworld {
+const sqlUser::flagType sqlUser::F_SUSPEND  = 0x0001;
+const sqlUser::flagType sqlUser::F_AUTOKILL = 0x0002;
+const sqlUser::flagType sqlUser::F_RECOVER  = 0x0004;
  
- namespace ns {
+unsigned long int sqlUser::maxUserId = 0;
  
- const sqlUser::flagType sqlUser::F_SUSPEND  = 0x0001;
- const sqlUser::flagType sqlUser::F_AUTOKILL = 0x0002;
- const sqlUser::flagType sqlUser::F_RECOVER  = 0x0004;
- 
- unsigned long int sqlUser::maxUserId = 0;
- 
- /**
-  * Default constructor.
-  * This simply creates an empty, zeroed sqlUser
-  */
+/**
+ * Default constructor.
+ * This simply creates an empty, zeroed sqlUser
+ */
 sqlUser::sqlUser(sqlManager* _myManager) :
   id(0),
   name(""),
@@ -55,16 +55,16 @@ sqlUser::~sqlUser()
 void sqlUser::commit()
 {
   /* Use reference to sqlManager to queue a commit request */
-  stringstream commitStatement;
-  commitStatement << "UPDATE users SET"
+  stringstream userCommit;
+  userCommit << "UPDATE users SET"
     << " name = '" << name << "'"
     << ", flags = " << flags
     << ", level = " << level
     << ", lastseen_ts = " << lastseen_ts
     << ", registered_ts = " << registered_ts
-    << " WHERE id = " << id
-    << ends;
-  myManager->queueCommit(commitStatement.str());
+    << ", logmask = " << logmask
+    << " WHERE id = " << id;
+  myManager->queueCommit(userCommit.str());
 }
 
 /**
@@ -86,8 +86,7 @@ void sqlUser::deleteUser()
   /* Construct our delete statement */
   stringstream commitStatement;
   commitStatement << "DELETE FROM users WHERE"
-    << " id = " << id
-    << ends;
+    << " id = " << id;
   myManager->queueCommit(commitStatement.str());
 }
 
@@ -108,8 +107,7 @@ void sqlUser::insertUser()
   commitStatement << "INSERT INTO users (id,name) VALUES ("
     << id
     << ", '" << name << "'"
-    << ")"
-    << ends;
+    << ")";
   myManager->queueCommit(commitStatement.str());
   commit();
 }

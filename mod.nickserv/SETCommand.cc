@@ -6,9 +6,10 @@
 
 #include "StringTokenizer.h"
 
+#include "levels.h"
 #include "nickserv.h"
 
-const char SETCommand_cc_rcsId[] = "$Id: SETCommand.cc,v 1.3 2002/08/25 23:12:28 jeekay Exp $";
+const char SETCommand_cc_rcsId[] = "$Id: SETCommand.cc,v 1.4 2002/11/25 03:56:15 jeekay Exp $";
 
 namespace gnuworld
 {
@@ -44,6 +45,28 @@ if(st.size() != 3) {
 /* Extract our strings from the tokenized message */
 string property = string_upper(st[1]);
 string status = string_upper(st[2]);
+
+/* First check if it is a non-true/false variable */
+if("LOGMASK" == property) {
+  if(!theUser->getLevel() > level::set::logmask) {
+    bot->Notice(theClient, "Sorry, you do not have access to this command.");
+    return true;
+  }
+  
+  logging::events::eventType newMask = atoi(status.c_str());
+  if(newMask < logging::events::E_MIN || newMask > logging::events::E_MAX) {
+    bot->Notice(theClient, "LogMask must be between %u and %u.",
+      logging::events::E_MIN, logging::events::E_MAX);
+    return true;
+  }
+  
+  theUser->setLogMask(newMask);
+  theUser->commit();
+  
+  bot->Notice(theClient, "LogMask set to %u.", newMask);
+  
+  return true;
+}
 
 /* Make some sense out of what we've been given for a status */
 bool bStatus;

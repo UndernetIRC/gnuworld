@@ -1,5 +1,5 @@
 #ifndef _NICKSERVCOMMANDS_H
-#define _NICKSERVCOMMANDS_H "$Id: nickservCommands.h,v 1.5 2002/08/25 22:38:49 jeekay Exp $"
+#define _NICKSERVCOMMANDS_H "$Id: nickservCommands.h,v 1.6 2002/11/25 03:56:15 jeekay Exp $"
 
 /**
  * All this code is stolen straight from mod.cservice, which possibly had
@@ -7,14 +7,11 @@
  * ripper knows how any of this works.
  */
 
-#include "iClient.h"
-#include "server.h"
-
 namespace gnuworld
 {
 
-//class iClient;
-//class xServer;
+class iClient;
+class xServer;
 
 namespace ns
 {
@@ -70,8 +67,12 @@ class commName##Command : public Command \
 DECLARE_COMMAND( RECOVER )
 DECLARE_COMMAND( REGISTER )
 DECLARE_COMMAND( SET )
-DECLARE_COMMAND( STATS )
 DECLARE_COMMAND( WHOAMI )
+
+/* Admin commands */
+DECLARE_COMMAND( INFO )
+DECLARE_COMMAND( SHUTDOWN )
+DECLARE_COMMAND( STATS )
 
 } // namespace ns
 

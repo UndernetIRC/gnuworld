@@ -1,6 +1,7 @@
 #ifndef _SQLMANAGER_H
-#define _SQLMANAGER_H "$Id: sqlManager.h,v 1.6 2002/08/27 20:55:53 jeekay Exp $"
+#define _SQLMANAGER_H "$Id: sqlManager.h,v 1.7 2002/11/25 03:56:15 jeekay Exp $"
 
+#include <string>
 #include <vector>
 
 #include "libpq++.h"
@@ -11,6 +12,9 @@
 namespace gnuworld {
 
 namespace ns {
+
+using std::string ;
+using std::vector ;
 
 class sqlManager {
   public:

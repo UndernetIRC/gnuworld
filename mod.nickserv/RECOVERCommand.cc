@@ -9,7 +9,7 @@
 
 #include "nickserv.h"
 
-const char RECOVERCommand_cc_rcsId[] = "$Id: RECOVERCommand.cc,v 1.2 2002/08/25 23:12:28 jeekay Exp $";
+const char RECOVERCommand_cc_rcsId[] = "$Id: RECOVERCommand.cc,v 1.3 2002/11/25 03:56:15 jeekay Exp $";
 
 namespace gnuworld
 {
@@ -39,7 +39,7 @@ if(theClient == targetClient) {
 }
 
 sqlUser* theUser = bot->isRegistered(authedNick);
-if(theUser && !theUser->getFlag(sqlUser::F_RECOVER)) {
+if(theUser && !theUser->hasFlag(sqlUser::F_RECOVER)) {
   bot->Notice(theClient, "This user has disabled use of the RECOVER command.");
   return true;
 }

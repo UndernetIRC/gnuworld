@@ -1,18 +1,19 @@
 #ifndef _SQLUSER_H
-#define _SQLUSER_H "$Id: sqlUser.h,v 1.8 2002/08/27 20:55:53 jeekay Exp $"
+#define _SQLUSER_H "$Id: sqlUser.h,v 1.9 2002/11/25 03:56:15 jeekay Exp $"
 
 #include <string>
 
 #include "libpq++.h"
 
 #include "logTarget.h"
-#include "sqlManager.h"
 
 namespace gnuworld
 {
 
 namespace ns
 {
+
+using std::string ;
 
 class sqlManager;
 
@@ -43,11 +44,11 @@ class sqlUser
       { return name; }
       
     /** Check whether a user has a given flag set */
-    inline bool getFlag(const flagType& whichFlag) const
-      { return (whichFlag == (flags & whichFlag)); }
+    inline bool hasFlag(const flagType& whichFlag) const
+      { return (flags & whichFlag); }
     
     /** Get all the flags */
-    inline bool getFlags() const
+    inline unsigned short int getFlags() const
       { return flags; }
     
     /** Get the user level */

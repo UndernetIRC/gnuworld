@@ -1,0 +1,14 @@
+2002-11-25 1.0.1 Jeekay
+*** This version requires a database change. It deprecates the 'logging' table.
+    Please consult Updates for the relevant SQL.
+* Modified CService & documentation to reflect that you can now run
+  NickServ and CService on the same GNUWorld core.
+* Added INFO command that will let an admin see the attributes of
+  a registered user.
+* Added SHUTDOWN command to allow admins to shut down NickServ cleanly.
+* Allowed SET to take non-boolean arguments for certain properties so that
+  an admin can now set their logmask.
+* Added consoleLevel to the config file to determine what level of events
+  the console channel should receive.
+* Prefixed [level] to log messages to indicate at what level they were sent.
+* Bumped version to 1.0.1

@@ -1,13 +1,13 @@
 #ifndef _STATS_H
-#define _STATS_H "$Id: Stats.h,v 1.2 2002/09/05 16:02:42 dan_karrels Exp $"
+#define _STATS_H "$Id: Stats.h,v 1.3 2002/11/25 03:56:15 jeekay Exp $"
 
 #include <map>
 #include <string>
 
-using std::string ;
-using std::map ;
-
 namespace gnuworld {
+
+using std::map ;
+using std::string ;
 
 class Stats {
   public:

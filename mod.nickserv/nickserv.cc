@@ -2,12 +2,13 @@
  * nickserv.cc
  */
 
+#include "Network.h"
 #include "StringTokenizer.h"
 
 #include "netData.h"
 #include "nickserv.h"
 
-const char NickServ_cc_rcsId[] = "$Id: nickserv.cc,v 1.11 2002/08/27 20:55:53 jeekay Exp $";
+const char NickServ_cc_rcsId[] = "$Id: nickserv.cc,v 1.12 2002/11/25 03:56:15 jeekay Exp $";
 
 namespace gnuworld
 {
@@ -48,6 +49,9 @@ consoleChannel = nickservConfig->Require("consoleChannel")->second;
 checkFreq = atoi(nickservConfig->Require("checkFreq")->second.c_str());
 startDelay = atoi(nickservConfig->Require("startDelay")->second.c_str());
 
+/* Load debugging variables */
+consoleLevel = atoi(nickservConfig->Require("consoleLevel")->second.c_str());
+
 /* Load the DB variables */
 string dbHost = nickservConfig->Require("dbHost")->second;
 string dbPort = nickservConfig->Require("dbPort")->second;
@@ -66,9 +70,11 @@ theManager = sqlManager::getInstance(dbString, commitCount);
 precacheUsers();
 
 /* Register the commands we want to use */
+RegisterCommand(new INFOCommand(this, "INFO", "<nick>"));
 RegisterCommand(new RECOVERCommand(this, "RECOVER", ""));
 RegisterCommand(new REGISTERCommand(this, "REGISTER", ""));
 RegisterCommand(new SETCommand(this, "SET", "<property> <value>"));
+RegisterCommand(new SHUTDOWNCommand(this, "SHUTDOWN", "<reason>"));
 RegisterCommand(new STATSCommand(this, "STATS", "<stat>"));
 RegisterCommand(new WHOAMICommand(this, "WHOAMI", ""));
 
@@ -94,10 +100,14 @@ delete nickservConfig;
  * cached log event receivers. If it matches, send a notice off to that
  * target.
  */
-void nickserv::log(const eventType& theEvent, const string& theMessage)
+void nickserv::log(const eventType& theEvent, const string& _theMessage)
 {
   iClient* theClient;
   sqlUser* theUser;
+  
+  string theMessage = "[" + logging::logTarget::getIdent(theEvent) + "] ";
+  theMessage += _theMessage;
+  
   for(logUsersType::iterator ptr = logUsers.begin(); ptr != logUsers.end(); ) {
     theClient = *ptr;
     theUser = isAuthed(theClient);
@@ -112,6 +122,10 @@ void nickserv::log(const eventType& theEvent, const string& theMessage)
     }
     
     ptr++;
+  }
+  
+  if(consoleLevel & theEvent) {
+    logAdminMessage("%s", theMessage.c_str());
   }
 }
 
@@ -157,6 +171,30 @@ time_t theTime = time(NULL) + startDelay;
 processQueue_timerID = theServer->RegisterTimer(theTime, this, NULL);
 
 xClient::ImplementServer( theServer );
+}
+
+
+/**
+ * Here we deal with the various CTCP messages that can get thrown at us.
+ */
+int nickserv::OnCTCP( iClient* theClient, const string& CTCP,
+                      const string& Message, bool Secure)
+{
+StringTokenizer st(CTCP);
+
+if(st.empty()) return false;
+
+string Command = string_upper(st[0]);
+
+if("DCC" == Command) {
+  DoCTCP(theClient, CTCP, "REJECT");
+} else if("PING" == Command) {
+  DoCTCP(theClient, CTCP, Message);
+} else if("VERSION" == Command) {
+  DoCTCP(theClient, CTCP, "GNUWorld NickServ v1.0.1");
+}
+
+return xClient::OnCTCP(theClient, CTCP, Message, Secure);
 }
 
 
@@ -313,12 +351,14 @@ PgDatabase* cacheCon = theManager->getConnection();
 
 /* Retrieve the list of registered users */
 stringstream cacheQuery;
-cacheQuery << "SELECT id,name,flags,level,lastseen_ts,registered_ts,"
-  << "coalesce(logmask,'0') FROM users LEFT JOIN logging ON"
-  << " id=user_id";
+cacheQuery << "SELECT id,name,flags,level,lastseen_ts,registered_ts,logmask"
+  << " FROM users";
+
 if(cacheCon->ExecTuplesOk(cacheQuery.str().c_str())) {
   for(int i = 0; i < cacheCon->Tuples(); i++) {
     sqlUser* tmpUser = new sqlUser(theManager);
+    assert(tmpUser != 0);
+    
     tmpUser->setAllMembers(cacheCon, i);
     sqlUserCache.insert(sqlUserHashType::value_type(tmpUser->getName(), tmpUser));
   }
@@ -425,7 +465,7 @@ for(QueueType::iterator queuePos = warnQueue.begin(); queuePos != warnQueue.end(
   }
   
   /* Does the regUser have autokill set? */
-  if(!regUser->getFlag(sqlUser::F_AUTOKILL)) {
+  if(!regUser->hasFlag(sqlUser::F_AUTOKILL)) {
     theData->warned = 0;
     queuePos = warnQueue.erase(queuePos);
     continue;
@@ -469,10 +509,32 @@ for(QueueType::iterator queuePos = killQueue.begin(); queuePos != killQueue.end(
     theClient->getCharYYXXX() + ") " + theClient->getNickName());
 } // iterate over killQueue
 
-// No need to clear killQueue as its a locally scoped variable
+// No need to clear killQueue as it's a locally scoped variable
 
 } // nickserv::processQueue()
 
+
+/**
+ * This function simply writes a given message to the console channel.
+ */
+void nickserv::logAdminMessage(const char* format, ... )
+{
+
+char buf[1024] = {0};
+va_list _list;
+
+va_start(_list, format);
+vsnprintf(buf, 1024, format, _list);
+va_end(_list);
+
+Channel* logChannel = Network->findChannel(consoleChannel);
+if(!logChannel) return;
+
+Message(logChannel, buf);
+
+return;
+
+}
 
 /**
  * This function compares an iClient and a sqlUser and returns true if they
