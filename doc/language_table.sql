@@ -1519,7 +1519,7 @@ COPY "translations" FROM stdin;
 11	111	A(z) %s csatorna URL erteke: %s	31337
 11	112	A csatorna kulcsszavainak hossza nem lehet tobb mint 80 betu!	31337
 11	113	A(z) %s csatorna kulcsszavai: %s	31337
-11	114	A nyelv mostantol Magyar %s.	31337
+11	114	A nyelv mostantol Magyar (%s).	31337
 11	115	HIBA: Ervenytelen nyelv valasztas.	31337
 11	116	Nem kapom a(z) %s csatornat a halozaton!	31337
 11	117	HIBA: Ervenytelen csatorna beallitas.	31337
