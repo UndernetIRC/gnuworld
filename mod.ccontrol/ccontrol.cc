@@ -37,7 +37,7 @@
 #include	"ip.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.90 2001/12/05 21:28:56 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.91 2001/12/05 21:50:11 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -2960,7 +2960,19 @@ for(exceptionIterator ptr = exception_begin();ptr != exception_end();++ptr)
 
 void ccontrol::showStatus(iClient* tmpClient)
 {
-Notice(tmpClient,"Uptime : %s",getUplink()->getStartTime());
+int uptime = getUplink()->getStartTime();
+int days;
+int hours;
+int mins;
+int secs;
+days = uptime/(24*3600);
+uptime %= 24*3600;
+hours = uptime / 3600;
+uptime %= 3600;
+mins = uptime / 60;
+uptime %= 60;
+secs = uptime;
+Notice(tmpClient,"Uptime : %dD %dH %dM %dS",days,hours,mins,secs);
 if(checkClones)
 	Notice(tmpClient,"Currently there are %d hosts in the clones queue",clonesQueue.size());
 if(checkGates)
