@@ -1,6 +1,7 @@
 -- Language Definition Table for CMaster Undernet channel services.
 -- English language definition.
 -- 27/12/00 - Greg Sikorski <gte@atomicrevs.demon.co.uk>.
+-- 01/03/01 - Daniel Simard <svr@undernet.org>.
 
 DELETE FROM languages;
 COPY "languages" FROM stdin;
@@ -30,20 +31,81 @@ COPY "translations" FROM stdin;
 1	15	%s is not opped in %s	31337
 1	16	%s is not voiced in %s	31337
 1	17	AUTHENTICATION FAILED as %s (Invalid Password)	31337
+1	18	I'm not in that channel!	31337
+1	19	Invalid banlevel range. Valid range is 1-%i.	31337
+1	20	Invalid ban duration. Your ban duration can be a maximum of 336 hours.	31337
+1	21	Ban reason cannot exceed 128 chars	31337
+1	22	Specified ban is already in my banlist!	31337
+1	23	The ban %s is already covered by %s	31337
+1	24	Invalid minimum level.	31337
+1	25	Invalid maximum level.	31337
+1	26	USER: %s ACCESS: %s %s	31337
+1	27	CHANNEL: %s -- AUTOMODE: %s	31337
+1	28	LAST MODIFIED: %s (%s ago)	31337
+1	29	** SUSPENDED ** - Expires in %s	31337
+1	30	LAST SEEN: %s ago.	31337
+1	31	There are more than 15 matching entries.	31337
+1	32	Please restrict your query.	31337
+1	33	End of access list	31337
+1	34	No Match!	31337
+1	35	Cannot add a user with equal or higher access than your own. 	31337
+1	36	Invalid access level.	31337
+1	37	%s is already added to %s with access level %i.	31337
+1	38	Added user %s to %s with access level %i	31337
+1	39	Something went wrong: %s	31337
+
+
+1	73	Sorry, I don't know who %s is.	31337
+
+1	89	Invalid channel name.	31337
+
 \.
 
 -- French language definition.
 -- 29/12/00 - Daniel Simard <svr@undernet.org>.
+-- 01/03/01 - Daniel Simard <svr@undernet.org>.
 
 COPY "translations" FROM stdin;
 2	1	Désolé. Vous êtes déjà authentifié avec le nick %s	31337
-2	2	AUTHENTICATION ACCEPTÉ pour %s	31337
-2	3	Désolé. Votre accès est insuffisante pour utiliser cette commande	31337
+2	2	AUTHENTICATION RÉUSSIE pour %s	31337
+2	3	Désolé. Votre accès est insuffisant pour utiliser cette commande	31337
 2	4	Désolé. Le canal %s est vide	31337
-2	5	Je ne vois pas %s nul part	31337
+2	5	Je suis incapable de trouver %s	31337
 2	6	Je ne vois pas %s sur le canal %s	31337
 2	7	Le canal %s ne semble pas être enregistré	31337
-2	8	Vous avez été oppé par %s (%s)	31337
+2	8	Vous avez été op par %s (%s)	31337
+2	9	Vous avez été voice par %s (%s)	31337
+2	10	%s: Vous n'êtes pas dans ce canal	31337
+2	11	%s est déjà op sur %s	31337
+2	12	%s est déjà voice sur %s	31337
+2	13	Vous avez été deop par %s (%s)	31337
+2	14	Vous avez été devoice par %s (%s)	31337
+2	15	%s n'est pas op sur %s	31337
+2	16	%s n'est pas voice sur %s	31337
+2	17	AUTHENTIFICATION REFUSÉE pour %s (Mot-de-passe Invalide)	31337
+2	18	Je ne suis pas dans ce canal!!	31337
+2	19	Niveau de ban invalide. Niveau valide: entre 1-%i.	31337
+2	20	Duration du ban invalide. La duration maximale est de 336 heures.	31337
+2	21	La raison d'un ban ne peut dépasser 128 caractères.	31337
+2	22	Ce ban est déjà dans ma liste!	31337
+2	23	Le ban %s est dejà affecté par %s	31337
+2	24	Niveau minimum invalide.	31337
+2	25	Niveau maximum invalide.	31337
+2	26	USAGER: %s NIVEAU: %s %s	31337
+2	27	CANAL: %s -- AUTOMODE: %s	31337
+2	28	DERNIÈRE MODIFICATION: %s (%s avant)	31337
+2	29	** SUSPENDU ** - Expire dans %s	31337
+2	30	DERNIÈRE FOIS VU: %s avant.	31337
+2	31	Il y a plus de 15 requêtes trouvées.	31337
+2	32	SVP restreindre votre requête	31337
+2	33	Fin de la liste des accès	31337
+2	34	Aucune correspondace trouvée	31337
+2	35	Vous ne pouvez additionner un usager au même niveau que vous ou plus élevé. 	31337
+2	36	Niveau d'accès invalide	31337
+2	37	%s a déjà été ajouté sur %s au niveau %i.	31337
+2	38	Addition de l'usager %s sur %s au niveau %i	31337
+2	39	Quelque chose semble incorrecte: %s	31337
+
 \.
 
 -- Danish language definition.
