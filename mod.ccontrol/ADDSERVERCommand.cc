@@ -14,7 +14,7 @@
 #include	"Network.h"
 #include	"Constants.h"
 
-const char ADDSERVERCommand_cc_rcsId[] = "$Id: ADDSERVERCommand.cc,v 1.10 2001/12/30 19:35:10 mrbean_ Exp $";
+const char ADDSERVERCommand_cc_rcsId[] = "$Id: ADDSERVERCommand.cc,v 1.11 2002/03/01 18:27:36 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -65,10 +65,7 @@ else
 	{
 	SName = st[1];
 	}
-ccUser* tmpClient = bot->IsAuth(theClient);
-if(tmpClient)
-	bot->MsgChanLog("(%s) - %s : ADDSERVER %s\n",tmpClient->getUserName().c_str()
-		,theClient->getNickUserHost().c_str(),SName.c_str());
+bot->MsgChanLog("ADDSERVER %s\n",SName.c_str());
 		
 ccServer* NewServer = new ccServer(bot->SQLDb);
 if(NewServer->loadData(bot->removeSqlChars(SName)))

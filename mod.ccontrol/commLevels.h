@@ -28,7 +28,6 @@ namespace commandLevel
 */
 
 const unsigned long int flg_NOLOGIN = 0x1;
-const unsigned long int flg_ACCESS   = 0x01;
 const unsigned long int flg_HELP     = 0x02 | flg_NOLOGIN;
 const unsigned long int flg_LOGIN    = 0x0; 
 const unsigned long int flg_DEAUTH    = 0x04;
@@ -79,17 +78,21 @@ const unsigned long int flg_STATUS = 0x4000;
 const unsigned long int flg_SHUTDOWN = 0x8000;
 const unsigned long int flg_SCAN = 0x10000 | flg_NOLOGIN;
 const unsigned long int flg_LEARNNET = 0x20000;
+const unsigned long int flg_MAXUSERS = 0x40000;
+const unsigned long int flg_CONFIG = 0x80000;
+const unsigned long int flg_SAY = 0x100000;
+
 /*
  Default commands that are added upon adding a new oper
 */
 
-const unsigned long int OPER = flg_ACCESS | flg_HELP | flg_DEAUTH | flg_NEWPASS 
+const unsigned long int OPER = flg_HELP | flg_DEAUTH | flg_NEWPASS 
 			| flg_MODE | flg_OP | flg_DEOP | flg_MODERATE 
 		        | flg_UNMODERATE | flg_INVITE | flg_GLINE | flg_SGLINE 
 			| flg_REMGLINE | flg_LOPCHN | flg_CHINFO | flg_WHOIS 
 			| flg_TRANS | flg_KICK | flg_CLEARCHAN | flg_LISTHOSTS;
 const unsigned long int SOPER = flg_CHECKNET | flg_LISTIGNORES | flg_LIST 
-			| flg_NOTES | flg_USERINFO | flg_SCAN;
+			| flg_NOTES | flg_USERINFO | flg_SCAN | flg_MAXUSERS;
 const unsigned long int ADMIN = OPER | flg_JUPE | flg_REMOPCHN | flg_ADDOPCHN 
 			| flg_ADDNOP | flg_REMOP |flg_MODOP | flg_ADDCMD 
 			| flg_DELCMD | flg_SUSPEND | flg_UNSUSPEND;
@@ -99,7 +102,8 @@ const unsigned long int SMT = ADMIN | flg_ADDSERVER;
 const unsigned long int SSMT = SADMIN | flg_REMSERVER;
 const unsigned long int CODER = SMT;
 const unsigned long int SCODER =  SSMT | flg_COMMANDS| flg_GCHAN | flg_RGCHAN
-			| flg_EXCEPTIONS | flg_STATUS | flg_SHUTDOWN;
+			| flg_EXCEPTIONS | flg_STATUS | flg_SHUTDOWN 
+			| flg_CONFIG | flg_SAY;
 }
 
 }

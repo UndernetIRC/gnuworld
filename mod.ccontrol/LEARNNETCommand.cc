@@ -17,7 +17,7 @@
 #include	"ccUser.h"
 #include	"misc.h"
 
-const char LEARNNETCommand_cc_rcsId[] = "$Id: LEARNNETCommand.cc,v 1.10 2002/01/01 12:42:14 mrbean_ Exp $";
+const char LEARNNETCommand_cc_rcsId[] = "$Id: LEARNNETCommand.cc,v 1.11 2002/03/01 18:27:36 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -36,10 +36,7 @@ if(!dbConnected)
         return false;
         }
 
-ccUser* tmpUser = bot->IsAuth(theClient);
-if(tmpUser)
-        bot->MsgChanLog("(%s) - %s : LEARNNET \n",tmpUser->getUserName().c_str()
-                        ,theClient->getNickUserHost().c_str());
+bot->MsgChanLog("LEARNNET \n");
 
 ccServer* NewServer;
 

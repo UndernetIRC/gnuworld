@@ -22,7 +22,7 @@
 #include 	"time.h"
 #include	"Constants.h"
 
-const char GCHANCommand_cc_rcsId[] = "$Id: GCHANCommand.cc,v 1.8 2002/01/17 20:04:04 mrbean_ Exp $";
+const char GCHANCommand_cc_rcsId[] = "$Id: GCHANCommand.cc,v 1.9 2002/03/01 18:27:36 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -52,10 +52,7 @@ if( st.size() < 4 )
 
 StringTokenizer::size_type pos = 1 ;
 
-ccUser* tmpUser = bot->IsAuth(theClient);
-if(tmpUser)
-        bot->MsgChanLog("(%s) - %s : GCHAN %s\n",tmpUser->getUserName().c_str()        
-                        ,theClient->getNickUserHost().c_str(),st.assemble(1).c_str());
+bot->MsgChanLog("GCHAN %s\n",st.assemble(1).c_str());
 time_t gLength = bot->getDefaultGlineLength() ;
 
 // (pos) is the index of the next token, the user@host mask.

@@ -13,7 +13,7 @@
 #include	"StringTokenizer.h"
 #include	"ccServer.h"
 
-const char CHECKNETCommand_cc_rcsId[] = "$Id: CHECKNETCommand.cc,v 1.9 2002/01/05 15:34:54 mrbean_ Exp $";
+const char CHECKNETCommand_cc_rcsId[] = "$Id: CHECKNETCommand.cc,v 1.10 2002/03/01 18:27:36 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -29,10 +29,7 @@ bool CHECKNETCommand::Exec( iClient* theClient, const string& Message )
 unsigned int TServers = 0;
 
 bot->Notice(theClient,"Checking network status as for %d\n",::time(NULL));
-ccUser* tmpUser = bot->IsAuth(theClient);
-if(tmpUser)
-	bot->MsgChanLog("(%s) - %s : CHECKNET\n",tmpUser->getUserName().c_str()
-		    ,theClient->getNickUserHost().c_str());
+bot->MsgChanLog("CHECKNET\n");
 ccServer* CurServer;
 string Msg;
 char tNum[512];		    

@@ -1,4 +1,7 @@
--- "$Id: ccontrol.sql,v 1.23 2002/01/01 12:42:12 mrbean_ Exp $"
+-- "$Id: ccontrol.sql,v 1.24 2002/03/01 18:27:32 mrbean_ Exp $"
+
+-- 2002-25-02 : |MrBean|
+-- Added the Misc table
 
 -- 2001-10-14 : nighty
 -- corrected fieldname typo in "suspendReason" -> "suspend_reason"
@@ -116,5 +119,14 @@ CREATE TABLE notes (
 	postedOn INT4 NOT NULL,
 	IsNew BOOLEAN NOT NULL DEFAULT 'n',
 	note VARCHAR (512)
+	);
+	
+CREATE TABLE Misc (
+	VarName VARCHAR(30) NOT NULL,
+	Value1 INT4,
+	Value2 INT4,
+	Value3 INT4,
+	Value4 VARCHAR(40),
+	Value5 VARCHAR(128)
 	);
 	

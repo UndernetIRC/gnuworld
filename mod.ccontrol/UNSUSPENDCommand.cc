@@ -12,7 +12,7 @@
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 
-const char UNSUSPENDCommand_cc_rcsId[] = "$Id: UNSUSPENDCommand.cc,v 1.8 2001/12/23 09:07:57 mrbean_ Exp $";
+const char UNSUSPENDCommand_cc_rcsId[] = "$Id: UNSUSPENDCommand.cc,v 1.9 2002/03/01 18:27:36 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -53,8 +53,8 @@ if(!tmpAuth)
 	{ //we should never get here
 	return false;
 	}
-bot->MsgChanLog("(%s) - %s : UNSUSPEND %s\n",tmpAuth->getUserName().c_str()
-                 ,theClient->getNickUserHost().c_str(),st.assemble(1).c_str());
+bot->MsgChanLog("UNSUSPEND %s\n",st.assemble(1).c_str());
+
 unsigned int AdFlag = tmpAuth->getType(); //Get the admin flag
 unsigned int OpFlag = tmpUser->getType(); //Get the oper flag
 bool Admin = AdFlag < operLevel::SMTLEVEL;

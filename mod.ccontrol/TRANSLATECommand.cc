@@ -13,7 +13,7 @@
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 
-const char TRANSLATECommand_cc_rcsId[] = "$Id: TRANSLATECommand.cc,v 1.7 2002/01/25 17:31:11 mrbean_ Exp $";
+const char TRANSLATECommand_cc_rcsId[] = "$Id: TRANSLATECommand.cc,v 1.8 2002/03/01 18:27:36 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -43,12 +43,7 @@ if( NULL == Target )
 	return true ;
 	}
 ccUser* tmpUser = bot->IsAuth(theClient);
-if(tmpUser)
-        bot->MsgChanLog("(%s) - %s : TRANSLATE %s\n",tmpUser->getUserName().c_str()
-                        ,theClient->getNickUserHost().c_str(),st.assemble(1).c_str());
-else
-        bot->MsgChanLog("(Unknown) - %s : TRANSLATE %s\n"
-                        ,theClient->getNickUserHost().c_str(),st.assemble(1).c_str());
+bot->MsgChanLog("TRANSLATE %s\n",st.assemble(1).c_str());
 
 iServer* theServer = Network->findServer( Target->getIntYY() ) ;
 if( NULL == theServer )

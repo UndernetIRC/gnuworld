@@ -15,7 +15,7 @@
 #include 	"ccUser.h"
 #include	"misc.h"
 
-const char REMCOMMANDCommand_cc_rcsId[] = "$Id: REMCOMMANDCommand.cc,v 1.9 2002/01/17 20:04:05 mrbean_ Exp $";
+const char REMCOMMANDCommand_cc_rcsId[] = "$Id: REMCOMMANDCommand.cc,v 1.10 2002/03/01 18:27:36 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -74,8 +74,7 @@ if(!tempUser)
 	{ //we should never get here
 	return false;
 	}
-bot->MsgChanLog("(%s) - %s : REMCOMMAND %s\n",tempUser->getUserName().c_str()
-                        ,theClient->getNickUserHost().c_str(),st.assemble(1).c_str());
+bot->MsgChanLog("REMCOMMAND %s\n",st.assemble(1).c_str());
 if(!strcasecmp(tempUser->getUserName(),st[1]))
 	{
 	bot->Notice(theClient,"I dont know about you, but i for one dont think removing your own command is such a good idea ... ");

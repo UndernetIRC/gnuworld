@@ -3,7 +3,7 @@
  */
 
 #ifndef __CCONTROL_H
-#define __CCONTROL_H "$Id: ccontrol.h,v 1.61 2002/02/24 21:36:41 mrbean_ Exp $"
+#define __CCONTROL_H "$Id: ccontrol.h,v 1.62 2002/03/01 18:27:36 mrbean_ Exp $"
 
 //Undef this if you want to log to the database
 #define LOGTOHD 
@@ -146,6 +146,8 @@ protected:
 	typedef map<string,int> 	clientsIpMapType;
 	
 	typedef clientsIpMapType::iterator clientsIpIterator;
+	
+	typedef list<string>		allowedVersionsType;
 	
 #ifdef LOGTOHD
 	typedef list<ccLog*>		ccLogList;
@@ -525,6 +527,10 @@ public:
 	
 	bool loadServers();
 	
+	bool loadMaxUsers();
+	
+	bool loadVersions();
+	
 	void wallopsAsServer(const char * , ... );
 
 	int getExceptions( const string & );
@@ -609,6 +615,24 @@ public:
 	void saveServersInfo();
 	
 	void saveChannelsInfo();
+	
+	void checkMaxUsers();
+	
+	const unsigned int getMaxUsers() const
+	{ return maxUsers; }
+	
+	const unsigned long getDateMax() const
+	{ return dateMax; }
+	
+	bool addVersion(const string&);
+	
+	bool remVersion(const string&);
+	
+	bool isValidVersion(const string&);
+	
+	void listVersions(iClient*);
+	
+	bool updateCheckVer(const bool);
 	
 	/**
 	 * This is a constant iterator type used to perform a read-only
@@ -756,6 +780,10 @@ public:
 	serversConstIterator		serversMap_end() const
 		{ return serversMap.end(); }
 
+	allowedVersionsType		VersionsList;
+	
+	typedef list<string>::iterator 	versionsIterator;
+	
 	/**
 	 * Retrieve the default length of time for glines.
 	 */
@@ -883,7 +911,13 @@ protected:
 	unsigned int		connectCount;
 	
 	unsigned int		connectRetry;
+
+	unsigned int		maxUsers;
 	
+	unsigned long int	dateMax;
+	
+	bool			checkVer;
+			
 } ; 
 
 void* initGate( void * );

@@ -15,7 +15,7 @@
 #include	"misc.h"
 #include	"Constants.h"
 
-const char MODUSERCommand_cc_rcsId[] = "$Id: MODUSERCommand.cc,v 1.17 2002/02/24 21:36:40 mrbean_ Exp $";
+const char MODUSERCommand_cc_rcsId[] = "$Id: MODUSERCommand.cc,v 1.18 2002/03/01 18:27:36 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -61,8 +61,8 @@ if(!tmpAuth)
 	{ //we should never get here
 	return false;
 	}
-bot->MsgChanLog("(%s) - %s : MODUSER %s\n",tmpAuth->getUserName().c_str()
-                        ,theClient->getNickUserHost().c_str(),st[1].c_str());
+bot->MsgChanLog("MODUSER %s\n",st[1].c_str());
+
 unsigned int AdFlag = tmpAuth->getType(); //Get the admin flag
 unsigned int OpFlag = tmpUser->getType(); //Get the oper flag
 bool Admin = (AdFlag < operLevel::SMTLEVEL);

@@ -12,7 +12,7 @@
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 
-const char REMGLINECommand_cc_rcsId[] = "$Id: REMGLINECommand.cc,v 1.18 2002/02/24 21:36:40 mrbean_ Exp $";
+const char REMGLINECommand_cc_rcsId[] = "$Id: REMGLINECommand.cc,v 1.19 2002/03/01 18:27:36 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -38,10 +38,8 @@ if( st.size() < 2 )
 	Usage( theClient ) ;
 	return true ;
 	}
-ccUser* tmpUser = bot->IsAuth(theClient);
-if(tmpUser)
-        bot->MsgChanLog("(%s) - %s : REMGLINE %s\n",tmpUser->getUserName().c_str()
-                        ,theClient->getNickUserHost().c_str(),st.assemble(1).c_str());
+bot->MsgChanLog("REMGLINE %s\n",st.assemble(1).c_str());
+
 if(st[1].substr(0,1) == "#")
 	{
 	bot->Notice(theClient,"Please user REMGCHAN to remove a BADCHAN gline");
@@ -55,7 +53,7 @@ if(tmpGline != NULL)
 	bot->remGline(tmpGline);
 	delete tmpGline;
 	}	
-
+server->removeGline(st[1],bot);
 bot->Notice( theClient, "Removal of gline succeeded\n" ) ;
 bot->MsgChanLog( "[REMGLINE]: %s by : %s\n", st[ 1 ].c_str(),theClient->getNickName().c_str() ) ;
 return true ;

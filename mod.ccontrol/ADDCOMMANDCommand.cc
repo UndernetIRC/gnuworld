@@ -15,7 +15,7 @@
 #include        "ccUser.h"
 #include	"misc.h"
 
-const char ADDCOMMANDCommand_cc_rcsId[] = "$Id: ADDCOMMANDCommand.cc,v 1.22 2002/02/12 19:49:21 mrbean_ Exp $";
+const char ADDCOMMANDCommand_cc_rcsId[] = "$Id: ADDCOMMANDCommand.cc,v 1.23 2002/03/01 18:27:36 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -92,8 +92,7 @@ if( NULL == AClient )
 	bot->Notice( theClient, "You must first authenticate" ) ;
 	return true ;
 	}
-bot->MsgChanLog("(%s) - %s : ADDCOMMAND %s\n",AClient->getUserName().c_str()
-	    ,theClient->getNickUserHost().c_str(),st.assemble(1).c_str());
+bot->MsgChanLog("ADDCOMMAND %s\n",st.assemble(1).c_str());
 // Only allow opers who have access to that command to add it to new opers
 if(!AClient->gotAccess(Comm) )
 	{

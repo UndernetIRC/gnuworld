@@ -13,7 +13,7 @@
 #include	"StringTokenizer.h"
 #include	"Constants.h"
 
-const char REMGCHANCommand_cc_rcsId[] = "$Id: REMGCHANCommand.cc,v 1.7 2002/01/17 20:04:05 mrbean_ Exp $";
+const char REMGCHANCommand_cc_rcsId[] = "$Id: REMGCHANCommand.cc,v 1.8 2002/03/01 18:27:36 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -46,10 +46,8 @@ if((st[1].substr(0,1) != "#") || (st[1].size() > channel::MaxName))
 			,channel::MaxName);
 	return false;
 	}
-ccUser* tmpUser = bot->IsAuth(theClient);
-if(tmpUser)
-        bot->MsgChanLog("(%s) - %s : REMGCHAN %s\n",tmpUser->getUserName().c_str()
-                        ,theClient->getNickUserHost().c_str(),st.assemble(1).c_str());
+bot->MsgChanLog("REMGCHAN %s\n",st.assemble(1).c_str());
+
 ccGline *tmpGline = bot->findGline(bot->removeSqlChars(st[1]));
 if(tmpGline != NULL)
 	{

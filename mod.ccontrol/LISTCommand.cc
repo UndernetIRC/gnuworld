@@ -12,7 +12,7 @@
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 
-const char LISTCommand_cc_rcsId[] = "$Id: LISTCommand.cc,v 1.6 2001/12/28 16:28:47 mrbean_ Exp $";
+const char LISTCommand_cc_rcsId[] = "$Id: LISTCommand.cc,v 1.7 2002/03/01 18:27:36 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -31,10 +31,8 @@ if(st.size() < 2)
 	Usage(theClient);
 	return true;
 	}
-ccUser* tmpUser = bot->IsAuth(theClient);
-if(tmpUser)
-        bot->MsgChanLog("(%s) - %s : LIST %s\n",tmpUser->getUserName().c_str()
-                        ,theClient->getNickUserHost().c_str(),st.assemble(1).c_str());
+
+bot->MsgChanLog("LIST %s\n",st.assemble(1).c_str());
 if(!strcasecmp(st[1].c_str(),"glines"))
 	{
 	bot->listGlines(theClient);

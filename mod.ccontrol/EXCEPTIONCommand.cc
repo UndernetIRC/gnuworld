@@ -12,7 +12,7 @@
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 
-const char EXCEPTIONCommand_cc_rcsId[] = "$Id: EXCEPTIONCommand.cc,v 1.9 2001/12/23 09:07:57 mrbean_ Exp $";
+const char EXCEPTIONCommand_cc_rcsId[] = "$Id: EXCEPTIONCommand.cc,v 1.10 2002/03/01 18:27:36 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -37,10 +37,7 @@ if(!dbConnected)
         bot->Notice(theClient,"Sorry, but the db connection is down now, please try again alittle later");
         return false;
         }
-ccUser* tmpUser = bot->IsAuth(theClient);
-if(tmpUser)
-        bot->MsgChanLog("(%s) - %s : EXCEPTIONS %s\n",tmpUser->getUserName().c_str()        
-                        ,theClient->getNickUserHost().c_str(),st.assemble(1).c_str());
+bot->MsgChanLog("EXCEPTIONS %s\n",st.assemble(1).c_str());
 if(!strcasecmp(st[1].c_str(),"list")) //Trying to list all exceptions?
 	{
 	bot->listExceptions(theClient);

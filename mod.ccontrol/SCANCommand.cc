@@ -17,7 +17,7 @@
 #include	"match.h"
 #include	"Network.h"
 
-const char SCANCommand_cc_rcsId[] = "$Id: SCANCommand.cc,v 1.6 2002/01/05 18:25:12 mrbean_ Exp $";
+const char SCANCommand_cc_rcsId[] = "$Id: SCANCommand.cc,v 1.7 2002/03/01 18:27:36 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -39,15 +39,8 @@ if( st.size() < 3 )
 	return true;
 	}
 
-ccUser* tmpUser = bot->IsAuth(theClient);
-//char s[512];
-if(tmpUser)
-        {
-//	sprintf(s,"(%s) - %s : SCAN %s\n",tmpUser->getUserName().c_str()
-  //                      ,theClient->getNickUserHost().c_str(),st.assemble(1).c_str());
-	bot->MsgChanLog("(%s) - %s : SCAN %s\n",tmpUser->getUserName().c_str()
-                        ,theClient->getNickUserHost().c_str(),st.assemble(1).c_str());
-	}
+bot->MsgChanLog("SCAN %s\n",st.assemble(1).c_str());
+
 typedef list<const iClient*> clientsList;
 
 bool showUsers = false;

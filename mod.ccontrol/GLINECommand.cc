@@ -24,7 +24,7 @@
 #include	"ccUser.h"
 #include	"Constants.h"
 
-const char GLINECommand_cc_rcsId[] = "$Id: GLINECommand.cc,v 1.36 2002/01/25 17:31:11 mrbean_ Exp $";
+const char GLINECommand_cc_rcsId[] = "$Id: GLINECommand.cc,v 1.37 2002/03/01 18:27:36 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -65,12 +65,7 @@ time_t gLength = bot->getDefaultGlineLength() ;
 
 ccUser* tmpUser = bot->IsAuth(theClient);
 
-if(tmpUser)
-        bot->MsgChanLog("(%s) - %s : GLINE %s\n",tmpUser->getUserName().c_str()        
-                        ,theClient->getNickUserHost().c_str(),st.assemble(1).c_str());
-else
-        bot->MsgChanLog("(Unknown) - %s : GLINE %s\n"        
-                        ,theClient->getNickUserHost().c_str(),st.assemble(1).c_str());
+bot->MsgChanLog("GLINE %s\n",st.assemble(1).c_str());
 
 bool isChan;
 if(st[pos].substr(0,1) == "#")
@@ -134,7 +129,6 @@ gLength = atoi(Length.c_str()) * Units;
 if(gLength == 0) 
 	{
 	gLength = bot->getDefaultGlineLength() ;
-	bot->Notice(theClient,"No duration was set, setting to %d seconds by default",gLength) ;
 	ResStart = 1;
 	}
 string nickUserHost = bot->removeSqlChars(theClient->getNickUserHost()) ;
@@ -220,7 +214,8 @@ if(!isChan)
 	//bot->setRemoving(userName + "@" +hostName);
 	server->setGline( nickUserHost,
 		userName + "@" +hostName,
-		Reason + "[" + Us + "]",
+		string("[ ") + Us + "] " + Reason,
+		//Reason + "[" + Us + "]",
 		gLength ,bot) ;
 	//bot->unSetRemoving();
 	ccGline *TmpGline = bot->findGline(userName + "@" + hostName);

@@ -17,7 +17,7 @@
 #include	"Network.h"
 #include	"Constants.h"
 
-const char JUPECommand_cc_rcsId[] = "$Id: JUPECommand.cc,v 1.13 2002/02/24 21:36:39 mrbean_ Exp $";
+const char JUPECommand_cc_rcsId[] = "$Id: JUPECommand.cc,v 1.14 2002/03/01 18:27:36 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -43,10 +43,8 @@ if( st[1].length() > server::MaxName)
 	bot->Notice( theClient, "Bogus server name" ) ;
 	return false ;
 	}
-ccUser* tmpUser = bot->IsAuth(theClient);
-if(tmpUser)
-        bot->MsgChanLog("(%s) - %s : JUPE %s\n",tmpUser->getUserName().c_str()
-                        ,theClient->getNickUserHost().c_str(),st.assemble(1).c_str());
+bot->MsgChanLog("JUPE %s\n",st.assemble(1).c_str());
+
 iServer* Server;
 string SName;
 unsigned int contime;

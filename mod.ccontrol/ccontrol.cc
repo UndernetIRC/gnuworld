@@ -38,7 +38,7 @@
 #include	"ip.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.128 2002/02/24 21:36:40 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.129 2002/03/01 18:27:36 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -223,8 +223,6 @@ RegisterCommand( new LISTOPERCHANSCommand( this, "LISTOPERCHANS",
 
 RegisterCommand( new CHANINFOCommand( this, "CHANINFO", "<channel>"
 	"Obtain information about a given channel",commandLevel::flg_CHINFO,false,false,false,operLevel::OPERLEVEL,false ) ) ;
-RegisterCommand( new ACCESSCommand( this, "ACCESS",
-	"Obtain the access list",commandLevel::flg_ACCESS,false,false,true,operLevel::OPERLEVEL,false ) ) ;
 RegisterCommand( new LOGINCommand( this, "LOGIN", "<USER> <PASS> "
 	"Authenticate with the bot",commandLevel::flg_LOGIN,false,true,true,operLevel::OPERLEVEL,false ) ) ;
 RegisterCommand( new DEAUTHCommand( this, "DEAUTH", ""
@@ -289,9 +287,13 @@ RegisterCommand( new STATUSCommand( this, "STATUS", "Shows debug status "
         ,commandLevel::flg_STATUS,false,false,false,operLevel::CODERLEVEL,true ) ) ;
 RegisterCommand( new SHUTDOWNCommand( this, "SHUTDOWN", " <REASON> Shutdown the bot "
         ,commandLevel::flg_SHUTDOWN,false,false,false,operLevel::CODERLEVEL,true ) ) ;
-
 RegisterCommand( new SCANCommand( this, "SCAN", " -h <host> / -n <real name> [-v]"
-		" Scans for all users which much a certain host / real name ",commandLevel::flg_NOLOGIN,false,false,false,operLevel::OPERLEVEL,true ) ) ;
+		" Scans for all users which much a certain host / real name ",commandLevel::flg_SCAN,false,false,false,operLevel::OPERLEVEL,true ) ) ;
+RegisterCommand( new MAXUSERSCommand( this, "MAXUSERS", 
+		"Shows the maximum number of online users ever recorded ",commandLevel::flg_MAXUSERS,false,false,false,operLevel::OPERLEVEL,true ) ) ;
+RegisterCommand( new CONFIGCommand( this, "CONFIG", " "
+		" Manages all kinds of configuration related values ",commandLevel::flg_CONFIG,false,false,false,operLevel::CODERLEVEL,true ) ) ;
+
 
 loadCommands();
 loadGlines();
@@ -303,6 +305,8 @@ if(!loadExceptions())
 	
 loadUsers();
 loadServers();
+loadMaxUsers();
+loadVersions();
 
 connectCount = 0;
 connectRetry = 5;
@@ -776,6 +780,7 @@ switch( theEvent )
 		inBurst = false;
 		refreshGlines();
 		burstGlines();
+		checkMaxUsers();
 		break;
 		}	
 	case EVT_GLINE:
@@ -786,11 +791,6 @@ switch( theEvent )
 			}
 
 		Gline* newG = static_cast< Gline* >(Data1);
-	/*	if((removingGline) //Avoid adding our own glines twice
-		    && (!strcasecmp(rGlineHost,newG->getUserHost())))
-		    {
-		    return 0;
-		    }*/
 
 		ccGline* newGline = findGline(newG->getUserHost());
 		if(!newGline)
@@ -822,11 +822,6 @@ switch( theEvent )
 			}
 			
 		Gline* newG = static_cast< Gline* >(Data1);
-/*		if((removingGline) //Avoid removing our own glines twice
-		    && (!strcasecmp(rGlineHost,newG->getUserHost())))
-		    {
-		    return 0;
-		    }*/
 		ccGline* newGline = findGline(newG->getUserHost());
 		if(newGline)
 			{
@@ -840,7 +835,10 @@ switch( theEvent )
 		{
 		bool glSet = false;
 		iClient* NewUser = static_cast< iClient* >( Data1);
-
+		if(!inBurst)
+			{
+			checkMaxUsers();
+			}
 		//Create our flood data for this user
 		ccFloodData* floodData = new (std::nothrow) ccFloodData(NewUser->getCharYYXXX());
 		assert( floodData != 0 ) ;
@@ -2407,9 +2405,7 @@ for(glineIterator ptr = glineList.begin();ptr != glineList.end();)
 
 		{
 		//remove the gline from the core
-		//setRemoving((*ptr)->getHost());
 		MyUplink->removeGline((*ptr)->getHost(),this);
-		//unSetRemoving();
 		//remove the gline from ccontrol structure
 		//finally remove the gline from the database
 		ccGline* tGline = *ptr;
@@ -2619,6 +2615,100 @@ return true;
 }
 
 	
+bool ccontrol::loadMaxUsers()
+{
+ 
+if(!dbConnected)
+        {   
+        return false;
+        }
+   
+strstream theQuery;
+theQuery        << "Select * from misc where VarName = 'MaxUsers';"
+                << ends;
+
+elog    << "ccotrol::loadMaxUsers> "
+        << theQuery.str()
+        << endl; 
+ 
+ExecStatusType status = SQLDb->Exec( theQuery.str() ) ;
+delete[] theQuery.str() ;
+
+if (PGRES_TUPLES_OK != status)
+        {
+        elog << "Error on loading maxusers : " << SQLDb->ErrorMessage() << endl;
+	return false;
+        }
+elog << "Load max : tuples : " << SQLDb->Tuples() << endl;
+if(SQLDb->Tuples() == 0)
+	{
+	maxUsers = 0;
+	dateMax = 0;
+	strstream insertQ;
+	insertQ << "Insert into misc (VarName,Value1,Value2) Values ('MaxUsers',0,0);"
+		<< ends;
+
+	status = SQLDb->Exec( insertQ.str() ) ;
+	delete[] insertQ.str() ;
+
+	if (PGRES_COMMAND_OK != status)
+    		{
+		return false;
+	        }
+	}
+else
+	{
+	maxUsers = atoi(SQLDb->GetValue(0,1));
+	dateMax = atoi(SQLDb->GetValue(0,2));
+	}
+return true;
+}
+
+bool ccontrol::loadVersions()
+{
+ 
+if(!dbConnected)
+        {   
+        return false;
+        }
+   
+strstream theQuery;
+ 
+ExecStatusType status = SQLDb->Exec( "Select * from misc where VarName = 'Version'") ;
+
+if (PGRES_TUPLES_OK != status)
+        {
+        return false;
+        }
+
+for(int i =0;i<SQLDb->Tuples();++i)
+	{
+	VersionsList.push_back(SQLDb->GetValue(i,1));
+	}
+
+status = SQLDb->Exec( "Select * from misc where VarName = 'CheckVer'") ;
+
+if (PGRES_TUPLES_OK != status)
+        {
+        return false;
+        }
+
+if(SQLDb->Tuples() == 0)
+	{
+	status = SQLDb->Exec( "insert into misc (VarName,Value1) VALUES ('CheckVer',0)") ;
+	checkVer = false;
+	if(PGRES_COMMAND_OK != status)
+		{
+		return false;
+		}
+	}
+else
+	{
+	checkVer = atoi(SQLDb->GetValue(0,1));
+	}
+return true;
+}
+
 void ccontrol::wallopsAsServer(const char *Msg,...)
 {
 if( 0 == MyUplink )
@@ -3616,6 +3706,123 @@ for(;cIterator != Network->channels_end();++cIterator)
 		 << endl;
 	}
 chanFile.close();
+}
+
+void ccontrol::checkMaxUsers()
+{
+if(maxUsers < Network->clientList_size())
+	{
+	maxUsers = Network->clientList_size();
+	dateMax = ::time(0);
+	
+	static const char *UPMain = "update Misc set Value1 = ";
+
+	strstream DelQuery;
+	DelQuery	<< UPMain
+			<< maxUsers
+			<< ", Value2 = " 
+			<< dateMax
+			<< " Where VarName = 'MaxUsers'"
+			<< ends;
+#ifdef LOG_SQL
+	elog	<< "ccontrol::checkMaxUsers> "
+		<< DelQuery.str()
+		<< endl; 
+#endif
+	ExecStatusType status = SQLDb->Exec( DelQuery.str() ) ;
+	delete[] DelQuery.str() ;
+
+	if( PGRES_COMMAND_OK != status )
+		{
+		elog	<< "ccontrol::checkMaxUsers> SQL Failure: "
+			<< SQLDb->ErrorMessage()
+			<< endl ;
+		}
+
+	}
+}
+
+bool ccontrol::addVersion(const string& newVer)
+{
+static const char* verChar = "Insert into misc (VarName,Value5) Values ('Version','";
+strstream VerQuery;
+VerQuery	<< verChar
+		<< newVer
+		<< "')" 
+		<< ends;
+#ifdef LOG_SQL
+elog		<< "ccontrol::addVersion> "
+		<< VerQuery.str()
+		<< endl; 
+#endif
+ExecStatusType status = SQLDb->Exec( VerQuery.str() ) ;
+delete[] VerQuery.str() ;
+if( PGRES_COMMAND_OK != status )
+	{
+	elog	<< "ccontrol::addVersion> SQL Failure: "
+		<< SQLDb->ErrorMessage()
+		<< endl ;
+	}
+
+return true;
+}
+
+bool ccontrol::remVersion(const string& oldVer)
+{
+versionsIterator ptr = VersionsList.begin();
+for(;ptr != VersionsList.end();)
+	{
+	if(!strcasecmp(oldVer,*ptr))
+		{ //Found the version in the list
+		ptr = VersionsList.erase(ptr);
+		}
+	else
+		{
+		++ptr;
+		}
+	}
+
+string delS = "delete from misc where VarName = 'Version' and lower(Value5) = '" + string_lower(oldVer) + "'";
+return (PGRES_COMMAND_OK == SQLDb->Exec(delS.c_str()));
+return true;
+}
+
+bool ccontrol::isValidVersion(const string& checkVer)
+{
+versionsIterator ptr = VersionsList.begin();
+for(;ptr != VersionsList.end();++ptr)
+	{
+	if(!strcasecmp(checkVer,*ptr))
+		{ //Found the version in the list
+		return true;
+		}
+	}
+return false;
+}
+
+void ccontrol::listVersions(iClient* theClient)
+{
+}
+
+bool ccontrol::updateCheckVer(const bool newVal)
+{
+checkVer = newVal;
+strstream ups;
+ups 	<< "Update misc set Value1 = "
+	<< (newVal ? 1 : 0)
+        << " where VarName = 'CheckVer'"
+	<< ends;
+
+ExecStatusType status = SQLDb->Exec( ups.str() ) ;
+delete[] ups.str() ;
+if( PGRES_COMMAND_OK != status )
+	{
+	elog	<< "ccontrol::updateCheckVer> SQL Failure: "
+		<< SQLDb->ErrorMessage()
+		<< endl ;
+	return false;
+	}
+return true;
 }
 
 void *initGate(void* arg)

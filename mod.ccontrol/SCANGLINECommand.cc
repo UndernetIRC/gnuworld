@@ -12,7 +12,7 @@
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 
-const char SCANGLINECommand_cc_rcsId[] = "$Id: SCANGLINECommand.cc,v 1.8 2002/01/25 14:11:31 mrbean_ Exp $";
+const char SCANGLINECommand_cc_rcsId[] = "$Id: SCANGLINECommand.cc,v 1.9 2002/03/01 18:27:36 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -31,10 +31,7 @@ if( st.size() < 2 )
 	return true ;
 	}
 
-ccUser* tmpUser = bot->IsAuth(theClient);
-if(tmpUser)
-        bot->MsgChanLog("(%s) - %s : SCANGLINE %s\n",tmpUser->getUserName().c_str()
-                        ,theClient->getNickUserHost().c_str(),st.assemble(1).c_str());
+bot->MsgChanLog("SCANGLINE %s\n",st.assemble(1).c_str());
 
 bot->listGlines(theClient,st[1]);
 

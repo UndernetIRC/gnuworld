@@ -14,7 +14,7 @@
 #include	"StringTokenizer.h"
 #include	"Network.h"
 
-const char REMOVEIGNORECommand_cc_rcsId[] = "$Id: REMOVEIGNORECommand.cc,v 1.5 2001/12/23 09:34:24 mrbean_ Exp $";
+const char REMOVEIGNORECommand_cc_rcsId[] = "$Id: REMOVEIGNORECommand.cc,v 1.6 2002/03/01 18:27:36 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -34,10 +34,8 @@ if( st.size() < 2 )
 	Usage( theClient ) ;
 	return true ;
 	}
-ccUser* tmpUser = bot->IsAuth(theClient);
-if(tmpUser)
-        bot->MsgChanLog("(%s) - %s : REMIGNORE %s\n",tmpUser->getUserName().c_str()
-                        ,theClient->getNickUserHost().c_str(),st.assemble(1).c_str());
+bot->MsgChanLog("REMIGNORE %s\n",st.assemble(1).c_str());
+
 string::size_type atPos = st[ 1 ].find_first_of( '@' ) ;
 if( string::npos == atPos )
 	{

@@ -13,7 +13,7 @@
 #include	"Network.h"
 #include	"Constants.h"
 
-const char MODECommand_cc_rcsId[] = "$Id: MODECommand.cc,v 1.13 2002/01/25 17:31:11 mrbean_ Exp $";
+const char MODECommand_cc_rcsId[] = "$Id: MODECommand.cc,v 1.14 2002/03/01 18:27:36 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -45,13 +45,7 @@ if( NULL == theChan )
 		st[ 1 ].c_str() ) ;
 	return true ;
 	}
-ccUser* tmpUser = bot->IsAuth(theClient);
-if(tmpUser)
-        bot->MsgChanLog("(%s) - %s : MODE  %s\n",tmpUser->getUserName().c_str()
-                        ,theClient->getNickUserHost().c_str(),st.assemble(1).c_str());
-else
-        bot->MsgChanLog("(Unknown) - %s : MODE  %s\n"
-                        ,theClient->getNickUserHost().c_str(),st.assemble(1).c_str());
+bot->MsgChanLog("MODE  %s\n",st.assemble(1).c_str());
 
 // Define mode to be any mode, such as +abc-def
 // Define argument to to be any argument to a particular mode: -o nickArgument

@@ -15,7 +15,7 @@
 #include	"server.h"
 #include	<string.h>
 
-const char SHUTDOWNCommand_cc_rcsId[] = "$Id: SHUTDOWNCommand.cc,v 1.2 2001/12/23 09:07:57 mrbean_ Exp $";
+const char SHUTDOWNCommand_cc_rcsId[] = "$Id: SHUTDOWNCommand.cc,v 1.3 2002/03/01 18:27:36 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -35,9 +35,8 @@ if(st.size() < 2)
 	return true;
 	}
 ccUser* tmpUser = bot->IsAuth(theClient);
-if(tmpUser)
-        bot->MsgChanLog("(%s) - %s : SHUTDOWN %s\n",tmpUser->getUserName().c_str()
-                        ,theClient->getNickUserHost().c_str(),st.assemble(1).c_str());
+bot->MsgChanLog("SHUTDOWN %s\n",st.assemble(1).c_str());
+
 char sq[512];
 sprintf(sq,"%s SQ %s 0 :(%s)%s\n",
 	server->getCharYY()

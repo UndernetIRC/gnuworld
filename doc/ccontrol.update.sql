@@ -1,5 +1,5 @@
 
--- "$Id: ccontrol.update.sql,v 1.14 2002/01/25 14:11:27 mrbean_ Exp $"
+-- "$Id: ccontrol.update.sql,v 1.15 2002/03/01 18:27:32 mrbean_ Exp $"
 
 -- ccontrol database changes update
 -- this file will add the new features to an old database
@@ -57,9 +57,9 @@
 
 -- 28/12/01 - Add some missing feilds to the servers table
 
-alter TABLE servers add Version VARCHAR(256);
-alter TABLE servers add AddedOn INT4 NOT NULL;
-alter TABLE servers add LastUpdated INT4 NOT NULL;
+-- alter TABLE servers add Version VARCHAR(256);
+-- alter TABLE servers add AddedOn INT4 NOT NULL;
+-- alter TABLE servers add LastUpdated INT4 NOT NULL;
 
 -- 30/12/01 - Add notice column to the opers table 
 
@@ -70,6 +70,18 @@ alter TABLE servers add LastUpdated INT4 NOT NULL;
 
 -- update opers set saccess = (saccess | 65536);
 
--- 25/01/01 - update all opers who had access to LEARNNET to the new flags
+-- 25/01/02 - update all opers who had access to LEARNNET to the new flags
 
-update opers set saccess = (saccess | 131072) where (saccess & 1)=1;
+-- update opers set saccess = (saccess | 131072) where (saccess & 1)=1;
+
+-- 25/02/02 - Add the Misc table
+
+CREATE TABLE Misc (
+	VarName VARCHAR(30) NOT NULL,
+	Value1 INT4,
+	Value2 INT4,
+	Value3 INT4,
+	Value4 VARCHAR(40),
+	Value5 VARCHAR(128)
+	);
+	

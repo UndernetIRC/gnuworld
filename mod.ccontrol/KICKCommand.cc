@@ -13,7 +13,7 @@
 #include	"StringTokenizer.h"
 #include	"Constants.h"
 
-const char KICKCommand_cc_rcsId[] = "$Id: KICKCommand.cc,v 1.8 2001/12/23 09:07:57 mrbean_ Exp $";
+const char KICKCommand_cc_rcsId[] = "$Id: KICKCommand.cc,v 1.9 2002/03/01 18:27:36 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -45,10 +45,7 @@ if(chanName.size() > channel::MaxName)
 	{
 	bot->Notice(theClient,"Channel name can't be more than %d chars",channel::MaxName);
 	}
-ccUser* tmpUser = bot->IsAuth(theClient);
-if(tmpUser)
-        bot->MsgChanLog("(%s) - %s : KICK %s\n",tmpUser->getUserName().c_str()
-                        ,theClient->getNickUserHost().c_str(),st.assemble(1).c_str());
+bot->MsgChanLog("KICK %s\n",st.assemble(1).c_str());
 
 Channel* theChan = Network->findChannel( chanName ) ;
 if( NULL == theChan )

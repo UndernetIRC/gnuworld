@@ -15,7 +15,7 @@
 #include	"Constants.h"
 #include	"Network.h"
 
-const char INVITECommand_cc_rcsId[] = "$Id: INVITECommand.cc,v 1.12 2002/01/17 20:04:05 mrbean_ Exp $";
+const char INVITECommand_cc_rcsId[] = "$Id: INVITECommand.cc,v 1.13 2002/03/01 18:27:36 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -43,12 +43,7 @@ if(st[1].size() > channel::MaxName)
 	return false;
 	}
 ccUser* tmpUser = bot->IsAuth(theClient);
-if(tmpUser)
-        bot->MsgChanLog("(%s) - %s : INVITE %s\n",tmpUser->getUserName().c_str()
-                        ,theClient->getNickUserHost().c_str(),st.assemble(1).c_str());
-else
-        bot->MsgChanLog("(Unknown) - %s : INVITE %s\n"
-                        ,theClient->getNickUserHost().c_str(),st.assemble(1).c_str());
+bot->MsgChanLog("INVITE %s\n",st.assemble(1).c_str());
 
 //If the channel doesnt begin with # add it 
 string chanName = st[ 1 ] ;
