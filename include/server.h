@@ -17,7 +17,7 @@
  */
 
 #ifndef __XSERVER_H
-#define __XSERVER_H "$Id: server.h,v 1.29 2001/02/04 02:37:49 dan_karrels Exp $"
+#define __XSERVER_H "$Id: server.h,v 1.30 2001/02/04 18:02:19 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
@@ -70,6 +70,9 @@ namespace gnuworld
 
 /// Forward declaration of xClient
 class xClient ;
+
+/// Forward declaration of Channel
+class Channel ;
  
 enum MessageType
 	{
@@ -660,7 +663,7 @@ public:
 	 * if the mode is being set/unset by a server.
 	 */
 	virtual void	onChannelModeB( Channel*, ChannelUser*,
-		const banVectorType& ) ;
+		banVectorType& ) ;
 
 	/**
 	 * Check the list of glines for any that are about to

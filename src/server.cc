@@ -47,7 +47,7 @@
 #include	"ServerTimerHandlers.h"
 
 const char xServer_h_rcsId[] = __XSERVER_H ;
-const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.67 2001/02/04 02:37:50 dan_karrels Exp $" ;
+const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.68 2001/02/04 18:02:20 dan_karrels Exp $" ;
 
 using std::string ;
 using std::vector ;
@@ -2653,8 +2653,11 @@ for( list< xClient* >::iterator ptr = listPtr->begin(), end = listPtr->end() ;
 // sourceUser is the source of the mode change; this variable
 // may be NULL if a server is setting the mode
 void xServer::onChannelModeB( Channel* theChan, ChannelUser* sourceUser,
-	const xServer::banVectorType& banVector )
+	xServer::banVectorType& banVector )
 {
+
+// Channel::onModeB() may modify banVector with the extra bans
+// that have been removed due to overlaps
 theChan->onModeB( banVector ) ;
 
 // First deliver this channel event to any listeners for all channel

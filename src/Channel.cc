@@ -12,6 +12,7 @@
 #include	"StringTokenizer.h"
 #include	"ELog.h"
 #include	"match.h"
+#include	"server.h"
 
 using std::string ;
 using std::endl ;
@@ -307,16 +308,67 @@ for( voiceVectorType::const_iterator ptr = voiceVector.begin() ;
 	}
 }
 
-void Channel::onModeB( const vector< pair< bool, string > >&
-	banVector )
+/**
+ * The banVector passed to this method will be updated to
+ * include any bans that have been removed as a result
+ * of overlapping bans being added.
+ * The order of these additions will be as expected:
+ *  an overlapping ban will be put into the banVector,
+ *  followed by all bans that it overrides.
+ */
+void Channel::onModeB( xServer::banVectorType& banVector )
 {
-typedef vector< const pair< bool, string > > banVectorType ;
-for( banVectorType::const_iterator ptr = banVector.begin() ;
-	ptr != banVector.end() ; ++ptr )
+typedef xServer::banVectorType banVectorType ;
+
+banVectorType origBans( banVector ) ;
+banVector.clear() ;
+
+// Walk through the list of bans being removed/added
+for( banVectorType::const_iterator newBanPtr = origBans.begin() ;
+	newBanPtr != banVector.end() ; ++newBanPtr )
 	{
-	if( ptr->first )	setBan( ptr->second ) ;
-	else			removeBan( ptr->second ) ;
-	}
+	banVector.push_back( *newBanPtr ) ;
+
+	// Is the ban being set or removed?
+	if( !newBanPtr->first )
+		{
+		// Removing a ban
+		removeBan( newBanPtr->second ) ;
+		continue ;
+		}
+
+	// Setting a ban
+	// Need to check the list of current bans for overlaps
+	// This is grossly inefficient, Im open to suggestions
+
+	// Next, search for overlaps
+	banIterator currentBanPtr = banList_begin() ;
+	for( ; currentBanPtr != banList_end() ; )
+		{
+		if( !match( newBanPtr->second, *currentBanPtr ) )
+			{
+			// Overlap, remove the old ban
+			currentBanPtr = banList.erase( currentBanPtr ) ;
+
+			// Add the removed ban to the banVector
+			// so that the caller can notify the rest
+			// of the system of the removal
+			banVector.push_back( banVectorType::value_type(
+				false, *currentBanPtr ) ) ;
+			}
+		else
+			{
+			// Update the iterator
+			++currentBanPtr ;
+			}
+
+		// Now set the new ban
+		// Setting this ban will add the ban into
+		// later comparisons, but not this comparison,
+		// which is what we want.
+		setBan( newBanPtr->second ) ;
+		} // inner for()
+	} // outer for()
 }
 
 const string Channel::getModeString() const

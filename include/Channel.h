@@ -436,9 +436,11 @@ protected:
 	/**
 	 * This method is called when one or more channel
 	 * mode (b)'s is/are set or unset.
+	 * This method will add to the vector passed to it any
+	 * bans that have been removed as a result of newly added
+	 * overlapping bans.
 	 */
-	virtual void	onModeB( const vector<
-				pair< bool, string > >& ) ;
+	virtual void	onModeB( vector< pair< bool, string > >& ) ;
 
 	/**
 	 * Set the creation time of this channel.  This is protected
