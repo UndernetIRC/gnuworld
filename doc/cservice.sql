@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------------
--- "$Id: cservice.sql,v 1.27 2001/03/04 16:56:06 gte Exp $"
+-- "$Id: cservice.sql,v 1.28 2001/03/18 22:46:04 gte Exp $"
 -- Channel service DB SQL file for PostgreSQL.
 
 -- ChangeLog:
@@ -191,7 +191,7 @@ CREATE TABLE levels (
 -- 0x00 02 -- Protect  (From CS source, unused)
 -- 0x00 04 -- Temp forced access - Temp used by bot, ignore.
 -- 0x00 08 -- AutoVoice
-	suspend_expires INT4,
+	suspend_expires INT4 DEFAULT '0',
 	suspend_by VARCHAR( 128 ),
 	added INT4,
 	added_By VARCHAR( 128 ),
@@ -202,9 +202,10 @@ CREATE TABLE levels (
 
 	PRIMARY KEY( channel_id, user_id )
 );
-
-
+ 
 CREATE INDEX levels_access_idx ON levels( access ) ;
+CREATE INDEX levels_userid_idx ON levels( user_id ) ;
+CREATE INDEX levels_suspendexpires_idx ON levels( suspend_expires ) ;
 
 CREATE TABLE channellog (
 	ts INT4,
@@ -223,6 +224,7 @@ CREATE TABLE channellog (
 );
 
 CREATE INDEX channellog_channelID_idx ON channellog(channelID);
+CREATE INDEX channellog_event_idx ON channellog(event);
 
 CREATE TABLE userlog (
 	ts INT4,

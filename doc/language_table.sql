@@ -2,8 +2,8 @@
 -- English language definition.
 -- 27/12/00 - Greg Sikorski <gte@atomicrevs.demon.co.uk>.
 -- 01/03/01 - Daniel Simard <svr@undernet.org>.
-
-DELETE FROM languages;
+ 
+DELETE FROM languages; 
 COPY "languages" FROM stdin;
 1	English	31337
 2	French	31337
@@ -13,6 +13,8 @@ COPY "languages" FROM stdin;
 6	Portuguese	31337
 7	Italian	31337
 8	Romanian	31337
+9	Catalan	31337
+10	Spanish	31337
 \.
 
 DELETE FROM translations;
@@ -86,7 +88,7 @@ COPY "translations" FROM stdin;
 1	67	\002*** Ban List for channel %s ***\002	31337
 1	68	%s %s Level: %i	31337
 1	69	ADDED BY: %s (%s)	31337
-1	70	SINCE: %i	31337
+1	70	SINCE: %s	31337
 1	71	EXP: %s	31337
 1	72	\002*** END ***\002	31337
 1	73	I don't know who %s is.	31337
@@ -1074,3 +1076,354 @@ COPY "translations" FROM stdin;
 8	169	Nu sunt operator pe %s	31337
 8	170	%s pentru %i minute	31337
 \.
+
+-- Catalan language definition.
+-- 09/03/2001 - Algol <algol@undernet.org>.
+
+COPY "translations" FROM stdin;
+9	1	Ho sento, ja estàs autentificat/da com a %s	31337
+9	2	AUTENTICACIÓ REEIXIDA com a %s	31337
+9	3	Ho sento, el teu accés és insuficient per efectuar aquesta comanda.	31337
+9	4	Ho sento, el canal %s és buit.	31337
+9	5	No veig cap %s enlloc.	31337
+9	6	No trobo cap %s al canal %s	31337
+9	7	El canal %s no consta com a enregistrat.	31337
+9	8	Has rebut op de %s (%s).	31337
+9	9	Has rebut veu de %s (%s).	31337
+9	10	%s: No ets a aquest canal.	31337
+9	11	%s ja té op a %s	31337
+9	12	%s ja té veu a %s	31337
+9	13	L'op t'ha estat llevat per %s (%s).	31337
+9	14	La veu t'ha estat llevada per %s (%s).	31337
+9	15	%s no té op a %s	31337
+9	16	%s no té veu a %s	31337
+9	17	AUTENTICACIÓ FALLIDA com a %s (Contrasenya no vàlida).	31337
+9	18	No sóc pas a aquest canal!	31337
+9	19	Nivell de bandeig no vàlid. Els nivells vàlids són entre 1-%i.	31337
+9	20	Durada de bandeig no vàlida . La durada màxima del bandeig és de 336 hores.	31337
+9	21	La raó del ban no pot excedir de 128 caràcters.	31337
+9	22	El bandeig especificat ja és a la meva llista!	31337
+9	23	El bandeig %s ja queda cobert per %s	31337
+9	24	Nivell mínim no vàlid.	31337
+9	25	Nivell màxim no vàlid.	31337
+9	26	USUARI/A: %s ACCÉS: %s %s	31337
+9	27	CANAL: %s -- AUTOMODE: %s	31337
+9	28	DARRERA MODIFICACIÓ: %s (fa %s)	31337
+9	29	** SUSPÈS/A ** - Expira d'aquí a %s	31337
+9	30	VIST/A PER DARRERA VEGADA: fa %s.	31337
+9	31	Hi ha més de 15 entrades coincidents.	31337
+9	32	Si et plau, restringeix la teva cerca.	31337
+9	33	Fi de la llista d'accessos.	31337
+9	34	Cap Coincidència!	31337
+9	35	No pots afegir cap usuari/a amb un nivell d'accés igual o superior al teu.	31337
+9	36	Nivell d'accés no vàlid.	31337
+9	37	%s ja té accés a %s amb nivell %i.	31337
+9	38	Afegit l'usuari/a %s a %s amb nivell d'accés %i.	31337
+9	39	Quelcom no ha anat bé: %s	31337
+9	40	%s: Fi de la llista de bandeigs.	31337
+9	41	Els detalls de l'usuari/a no es poden veure pas (Invisible).	31337
+9	42	Informació sobre: %s (%i)	31337
+9	43	Connexió actual autenticada: %s	31337
+9	44	URL: %s	31337
+9	45	Idioma: %i	31337
+9	46	Canals: %s	31337
+9	47	Punts de Flood d'Entrada: %i	31337
+9	48	Flood de Sortida (Bytes): %i	31337
+9	49	%s està enregistrat per:	31337
+9	50	%s - vist/a per darrer cop: fa %s	31337
+9	51	Desc: %s	31337
+9	52	Em vols floodejar, oi? Doncs no t'escoltaré més.	31337
+9	53	Em penso que ja m'has fet enviar-te massa dades, ara t'ignoraré una estona.	31337
+9	54	Comanda incompleta.	31337
+9	55	Per fer %s, has de fer /msg %s@%s	31337
+9	56	Ho sento, t'has d'haver autenticat per utilitzar aquesta comanda.	31337
+9	57	El canal %s ha estat suspès per una/a administrador/a de CService.	31337
+9	58	El teu accés a %s ha estat suspès.	31337
+9	59	L'opció NOOP està activa a %s	31337
+9	60	L'opció STRICTOP està activa a %s	31337
+9	61	Acabes de llevar l'op a més de %i usuari/es.	31337
+9	62	SINTAXI: %s	31337
+9	63	El teu accés al canal %s ha estat incrementat temporalment fins %i.	31337
+9	64	%s està enregistrat.	31337
+9	65	%s no està enregistrat.	31337
+9	66	No crec que a %s li fes gràcia.	31337
+9	67	\002*** Llista de Bandeigs al canal %s ***\002	31337
+9	68	%s %s Nivell: %i	31337
+9	69	AFEGIT PER: %s (%s)	31337
+9	70	DES DE: %i	31337
+9	71	EXP: %s	31337
+9	72	\002*** FI ***\002	31337
+9	73	Ho sento, no sé qui és %s.	31337
+9	74	Ho sento, ja no estàs autenticat/da.	31337
+9	75	no figura amb accés a %s	31337
+9	76	No pots modificar cap usuari/a amb nivell d'accés igual o superior al teu.	31337
+9	77	No pots donar a un/a usuari/a un accés de nivell igual o superior al teu.	31337
+9	78	El nivell d'accés de %s al canal %s s'ha canviat a %i.	31337
+9	79	AUTOMODE canviat a OP per a %s al canal %s	31337
+9	80	AUTOMODE canviat a VOICE pera %s al canal %s	31337
+9	81	AUTOMODE canviat a NONE per a %s al canal %s	31337	
+9	82	La teva contrasenya no pot pas ser el teu nom d'usuari/a ni el teu nick actual - la sintaxi és: NEWPASS <nova contrasenya>	31337
+9	83	Contrasenya canviada correctament.	31337
+9	84	L'opció NOOP està activada a %s	31337
+9	85	L'opció STRICTOP està activada a %s (i %s no s'ha autenticat).	31337
+9	86	L'opció STRICTOP està activada a %s (i %s té un accés insuficient).	31337
+9	87	El canal %s ha estat purgat.	31337
+9	88	%s ja està enregistrat.	31337
+9	89	Nom de canal no vàlid.	31337
+9	90	El canal %s ha estat enregistrat.	31337
+9	91	%s ha estat esborrat de la meva llista de silencis.	31337
+9	92	No he trobat %s a la meva llista de silencis.	31337
+9	93	No pots suprimir cap usuari amb un accés igual o superior al teu.	31337
+9	94	No pots suprimir el teu propi accés a un canal que et pertany.	31337
+9	95	S'ha suprimit l'usuari/a %s a %s	31337
+9	96	La teva opció INVISIBLE és ara activa (ON).	31337
+9	97	La teva opció INVISIBLE és ara inactiva (OFF).	31337
+9	98	%s a %s és %s	31337
+9	99	el valor de %s ha d'ésser 'ON' o 'OFF'.	31337
+9	100	Valor d'USERFLAGS no vàlid. Els valors correctes són 0, 1, 2.	31337
+9	101	USERFLAGS per %s és %i.	31337
+9	102	el valor de MASSDEOPPRO ha d'estar entre 0-7.	31337
+9	103	MASSDEOPPRO per %s s'ha fixat a %d.	31337
+9	104	el valor de FLOODPRO ha d'estar entre 0-7.	31337
+9	105	FLOODPRO per %s s'ha fixat a %d.	31337
+9	106	DESCRIPTION pot tenir fins a 80 caràcters com a màxim!	31337
+9	107	La DESCRIPTION de %s ha estat esborrada.	31337
+9	108	DESCRIPTION de %s és: %s	31337
+9	109	URL pot tenir fins a 75 caràcters com a màxim!	31337
+9	110	La URL de %s ha estat esborrada.	31337
+9	111	La URL de %s és: %s	31337
+9	112	KEYWORDS pot tenir fins a 80 caràcters com a màxim!	31337
+9	113	Les KEYWORDS de %s són: %s	31337
+9	114	L'idioma s'ha fixat a %s.	31337
+9	115	ERROR: Selecció d'idioma no vàlida.	31337
+9	116	No puc trobar el canal %s a la xarxa!	31337
+9	117	ERROR: Configuració de canal no vàlida.	31337
+9	118	Llista d'ignoraments:	31337
+9	119	La llista d'ignoraments és buida.	31337
+9	120	-- Fi de la Llista d'Ignoraments.	31337
+9	121	Estat intern dels Serveis de Canals CMaster:	31337
+9	122	[         Estadístiques de Canals] \002Entrades en Cache:\002 %i    \002DB Peticions:\002 %i    \002Encerts de Cache:\002 %i    \002Eficiència:\002 %.2f%%	31337
+9	123	[       Estadístiques d'Usuari/es] \002Entrades en Cache:\002 %i    \002DB Peticions:\002 %i    \002Encerts de Cache:\002 %i    \002Eficiència:\002 %.2f%%	31337
+9	124	[Estadístiques de Nivells d'Accés] \002Entrades en Cache:\002 %i    \002DB Peticions:\002 %i    \002Encerts de Cache:\002 %i    \002Eficiència:\002 %.2f%%	31337
+9	125	[       Estadístiques de Bandeigs] \002Entrades en Cache:\002 %i    \002DB Peticions:\002 %i    \002Encerts de Cache:\002 %i    \002Eficiència:\002 %.2f%%	31337
+9	126	Darrera recepció de NOTIFY d'Usuari/a: %i	31337
+9	127	Darrera recepció de NOTIFY de Canal: %i	31337
+9	128	Darrera recepció de NOTIFY de Nivell: %i	31337
+9	129	Darrera recepció de NOTIFY de Bandeig: %i	31337
+9	130	Contenidors de dades pròpies assignats: %i	31337
+9	131	\002En funcionament (Uptime):\002 %s	31337
+9	132	El canal %s té %d usuari/es (%i operador/es).	31337
+9	133	Mode(s): %s	31337
+9	134	Opcions actives: %s	31337
+9	135	No pots suspendre cap usuari/a amb nivell d'accés igual o superior al teu.	31337
+9	136	unitats de temps no vàlides.	31337
+9	137	Durada de suspensió no vàlida.	31337
+9	138	La SUSPENSIÓ de %s ha estat cancel·lada.	31337
+9	139	%s ja està suspès/a a %s	31337
+9	140	La SUSPENSIÓ de %s espirarà en %s	31337
+9	141	ERROR: TOPIC no pot superar els 145 caràcters.	31337
+9	142	El teu accés és insuficient per suprimir el bandeig %s de la base de dades de %s	31337
+9	143	Suprimits %i bandeigs coincidents amb %s	31337
+9	144	Suprimit el teu accés temporal de nivell %i al canal %s	31337
+9	145	No consta que tinguis cap accés forçat a %s, potser ha expirat?	31337
+9	146	%s no està suspès/a a %s	31337
+9	147	%s és un/a Operador/a d'IRC.	31337
+9	148	%s NO està autenticat/da.	31337
+9	149	%s està autenticat/da com a %s%s	31337
+9	150	%s és un/a Representant Oficial de CService%s i està autenticat/da com a %s	31337
+9	151	%s és un/a Administrador/a Oficial de CService%s i està autenticat/da com a %s	31337
+9	152	%s és un/a Programador/a Oficial de CService%s i està autenticat/da com a %s	31337
+9	153	Hi ha més de %i entrades coincidents amb [%s]	31337
+9	154	Restringeix la màscara de cerca, si et plau.	31337
+9	155	Cap entrada coincident amb [%s]	31337
+9	156	%s: Els modes del canal han estat esborrats.	31337
+9	158	Opció no vàlida.	31337
+9	159	%s és un Bot de Servei Oficial d'Undernet.	31337
+9	160	%s és un/a Representant Oficial de Coder-Com%s i està autenticat/da com a %s	31337
+9	161	%s és un/a Contrbuïdor/a Oficial de Coder-Com%s i està autenticat/da com a %s	31337
+9	162	%s és un/a Programador/a Oficial de Coder-Com%s i està autenticat/da com a %s	31337
+9	163	%s és un/a Senior Oficial de Coder-Com%s i està autenticat/da com a %s	31337
+9	164	 i un/a Operador/a d'IRC.	31337
+9	165	S'ha afegit el bandeig %s a %s amb nivell %i	31337
+9	166	%s: la llista de bandeigs és buida.		31337
+9	167	Ja sóc a aquest canal!	31337
+9	168	Aquesta comanda és reservada per a Operador/es d'IRC.	31337
+9	169	No tinc pas op a %s	31337
+9	170	%s durant %i minuts.	31337
+\.
+
+-- Spanish language definition.
+-- 09/03/2001 - Algol <algol@undernet.org>.
+
+COPY "translations" FROM stdin;
+10	1	Lo siento, ya estás autentificado/a como %s	31337
+10	2	AUTENTIFICACIÓN COMPLETADA como %s	31337
+10	3	Lo siento, tu acceso es insuficiente para ejecutar esta orden.	31337
+10	4	Lo siento, el canal %s está vacío.	31337
+10	5	No veo a %s en ningún sitio.	31337
+10	6	No encuentro a %s en el canal %s	31337
+10	7	El canal %s no consta como registrado.	31337
+10	8	Has recibido op de %s (%s)	31337
+10	9	Has recibido voz de %s (%s)	31337
+10	10	%s: No estás en ese canal.	31337
+10	11	%s ya tiene op en %s	31337
+10	12	%s ya tiene voz en %s	31337
+10	13	Te ha quitado el op: %s (%s)	31337
+10	14	Te ha quitado la voz: %s (%s)	31337
+10	15	%s no tiene op en %s	31337
+10	16	%s no tiene voz en %s	31337
+10	17	AUTENTIFICACIÓN FALLIDA como %s (Contraseña no válida).	31337
+10	18	No estoy en ese canal!	31337
+10	19	Nivel de ban no válido. El intervalo válido es 1-%i.	31337
+10	20	Duración de ban no válida. La duración de ban máxima es de 336 horas.	31337
+10	21	El motivo del ban no puede superar los 128 caracteres.	31337
+10	22	El ban especificado ya está en mi lista de bans!	31337
+10	23	El ban %s ya está cubierto por %s	31337
+10	24	Nivel mínimo no válido.	31337
+10	25	Nivel máximo no válido.	31337
+10	26	USUARIO/A: %s ACCESO: %s %s	31337
+10	27	CANAL: %s -- AUTOMODO: %s	31337
+10	28	ÚLTIMA MODIFICACIÓN: %s (hace %s)	31337
+10	29	** SUSPENDIDO/A ** - Expira dentro de %s	31337
+10	30	VISTO/A POR ÚLTIMA VEZ: hace %s.	31337
+10	31	Hay más de 15 entradas coincidentes.	31337
+10	32	Restringe tu búsqueda, por favor.	31337
+10	33	Fin de la lista de accesos.	31337
+10	34	No hay coincidencias!	31337
+10	35	No puedes añadir un usuario/a con un nivel igual o superior al tuyo.	31337
+10	36	Nivel de acceso no válido.	31337
+10	37	%s ya está añadido a %s con nivel de acceso %i.	31337
+10	38	Se ha añadido el/la usuario/a %s a %s con nivel de acceso %i	31337
+10	39	Algo ha fallado: %s	31337
+10	40	%s: Fin de la lista de bans.	31337
+10	41	Imposible ver los detalles del/la usuario/a (Invisible).	31337
+10	42	Información sobre: %s (%i)	31337
+10	43	Conexión actual autentificada: %s	31337
+10	44	URL: %s	31337
+10	45	Idioma: %i	31337
+10	46	Canales: %s	31337
+10	47	Puntos de Flood de Entrada: %i	31337
+10	48	Flood de Salida (Bytes): %i	31337
+10	49	%s está registrado por:	31337
+10	50	%s - visto/a por última vez: %s ago	31337
+10	51	Desc: %s	31337
+10	52	Pretendes floodearme? Pues no voy a hacerte más caso.	31337
+10	53	Creo que ya te he enviado datos de sobra, ahora te ignoraré un rato.	31337
+10	54	Orden incompleta	31337
+10	55	Para usar %s, debes /msg %s@%s	31337
+10	56	Lo siento, has de estar autentificado/a para utilizar esta orden.	31337
+10	57	El canal %s ha sido suspendido por un/a administrador/a de CService.	31337
+10	58	Tu acceso en %s ha sido suspendido.	31337
+10	59	La opción NOOP está activa en %s	31337
+10	60	La opción STRICTOP está activa en %s	31337
+10	61	Acabas de quitar el op a más de %i usuarios/as.	31337
+10	62	SINTAXIS: %s	31337
+10	63	Tu acceso en el canal %s se ha incrementado temporalmente a %i.	31337
+10	64	%s está registrado.	31337
+10	65	%s no está registrado.	31337
+10	66	Dudo que a %s le parezca bien.	31337
+10	67	\002*** Lista de bans para el canal %s ***\002	31337
+10	68	%s %s Nivel: %i	31337
+10	69	AÑADIDO POR: %s (%s)	31337
+10	70	DESDE: %i	31337
+10	71	EXP: %s	31337
+10	72	\002*** FIN ***\002	31337
+10	73	Lo siento, no sé quién es %s.	31337
+10	74	Lo siento, ya no estás autentificado/a.	31337
+10	75	no consta con acceso en %s	31337
+10	76	No puedes modificar los usuarios/as con nivel de acceso igual o superior al tuyo.	31337
+10	77	No puedes dar a un/a usuario/a un acceso de nivel igual o superior al tuyo.	31337
+10	78	Se ha cambiado el nivel de acceso de %s en el canal %s a %i.	31337
+10	79	AUTOMODE cambiado a OP para %s en el canal %s	31337
+10	80	AUTOMODE cambiado a VOICE para %s en el canal %s	31337
+10	81	AUTOMODE cambiado a NONE para %s en el canal %s	31337	
+10	82	Tu contraseña no puede ser tu nombre de usuario/a ni tu nick actual - la sintaxis es: NEWPASS <nueva contraseña>	31337
+10	83	Contraseña cambiada con éxito.	31337
+10	84	La opción NOOP está acitavada en %s	31337
+10	85	La opción STRICTOP está activada en %s (y %s no está autentificado/a).	31337
+10	86	La opción STRICTOP está activada en %s (y %s tiene un acceso insuficiente).	31337
+10	87	El canal %s ha sido purgado.	31337
+10	88	%s ya está registrado.	31337
+10	89	Nombre de canal no válido.	31337
+10	90	El canal %s ha sido registrado.	31337
+10	91	%s ha sido eliminado de mi lista de silencios.	31337
+10	92	No he encontrado %s en mi lista de silencios.	31337
+10	93	No puedes suprimir usuarios/as con nivel de acceso igual o superior al tuyo.	31337
+10	94	No puedes suprimir tu propio acceso en un canal que es tuyo.	31337
+10	95	Se ha suprimido el/la usuario/a %s de %s	31337
+10	96	Tu opción INVISIBLE está ahora activa (ON).	31337
+10	97	Your INVISIBLE setting está ahora inactiva (OFF).	31337
+10	98	%s en %s está %s	31337
+10	99	el valor de %s sólo puede ser 'ON' u 'OFF'.	31337
+10	100	Valor de USERFLAGS no válido. Los valores válidos son 0, 1, 2.	31337
+10	101	USERFLAGS en %s es %i.	31337
+10	102	el valor de MASSDEOPPRO tiene que estar entre 0-7.	31337
+10	103	MASSDEOPPRO en %s se ha establecido en %d.	31337
+10	104	el valor de FLOODPRO tiene que estar entre 0-7.	31337
+10	105	FLOODPRO en %s se ha establecido en %d.	31337
+10	106	DESCRIPTION puede contener un máximo de 80 caracteres!	31337
+10	107	La DESCRIPTION de %s ha sido borrada.	31337
+10	108	La DESCRIPTION de %s es: %s	31337
+10	109	URL puede contener un máximo de 75 caracteres!	31337
+10	110	la URL de %s ha sido borrada.	31337
+10	111	La URL de %s es: %s	31337
+10	112	la cadena de KEYWORDS puede contener un máximo de 80 caracteres!	31337
+10	113	KEYWORDS de %s son: %s	31337
+10	114	Se ha seleccionado el idioma %s.	31337
+10	115	ERROR: Selección de idioma no válida.	31337
+10	116	No puedo encontrar el canal %s en la red!	31337
+10	117	ERROR: Configuración de canal incorrecta.	31337
+10	118	Lista de ignores:	31337
+10	119	La lista de ignores está vacía	31337
+10	120	-- Fin de la Lista de Ignores	31337
+10	121	Estado interno de los Servicios de Canales CMaster:	31337
+10	122	[          Estadísticas de Registros de Canales] \002Entradas en Cache:\002 %i    \002DB Peticiones:\002 %i    \002Aciertos en Cache:\002 %i    \002Efficiency:\002 %.2f%%	31337
+10	123	[         Estadísticas de Registros de Usuarios] \002Entradas en Cache:\002 %i    \002DB Peticiones:\002 %i    \002Aciertos en Cache:\002 %i    \002Efficiency:\002 %.2f%%	31337
+10	124	[Estadísticas de Registros de Niveles de Acceso] \002Entradas en Cache:\002 %i    \002DB Peticiones:\002 %i    \002Aciertos en Cache:\002 %i    \002Efficiency:\002 %.2f%%	31337
+10	125	[             Estadísticas de Registros de Bans] \002Entradas en Cache:\002 %i    \002DB Peticiones:\002 %i    \002Aciertos en Cache:\002 %i    \002Efficiency:\002 %.2f%%	31337
+10	126	Última recepción de NOTIFY de Usuario/a: %i	31337
+10	127	Última recepción de NOTIFY de Canal: %i	31337
+10	128	Última recepción de NOTIFY de Nivel: %i	31337
+10	129	Última recepción de NOTIFY de Ban: %i	31337
+10	130	Contenedores de datos propios asignados: %i	31337
+10	131	\002Funcionando (Uptime):\002 %s	31337
+10	132	El canal %s tiene %d usuarios/as (%i operadores/as)	31337
+10	133	Modo(s): %s	31337
+10	134	Opciones: %s	31337
+10	135	No puedes suspender usuarios/as con un nivel de acceso igual o superior al tuyo.	31337
+10	136	unidades de tiempo erróneas.	31337
+10	137	Duración de suspensión no válida.	31337
+10	138	La SUSPENSIÓN de %s ha sido cancelada	31337
+10	139	%s ya está suspendido/a en %s	31337
+10	140	La SUSPENSIÓN de %s expirará dentro de %s.	31337
+10	141	ERROR: TOPIC no puede contener más de 145 caracteres.	31337
+10	142	Tu acceso es insuficiente para suprimir el ban %s de la base de datos de %s	31337
+10	143	Suprimidos %i bans coincidentes con %s	31337
+10	144	Se ha suprimido tu acceso temporal de nivel %i en el canal %s	31337
+10	145	No consta que tengas un acceso forzado en %s, quizás ha expirado?	31337
+10	146	%s no está suspendido/a en %s	31337
+10	147	%s es un/a Operador/a de IRC	31337
+10	148	%s NO está autentificado/a.	31337
+10	149	%s está autentificado/a como %s%s	31337
+10	150	%s es un/a Representante Oficial de CService%s y está autentificado/a como %s	31337
+10	151	%s es un/a Administrador/a Oficial de %s y está autentificado/a como %s	31337
+10	152	%s es un/a Programador/a Oficial de CService%s y está autentificado/a como %s	31337
+10	153	Hay más de %i entradas coincidentes con [%s]	31337
+10	154	Restringe la máscara de búsqueda, por favor.	31337
+10	155	No hay entradas coincidentes con [%s]	31337
+10	156	%s: Los modos del canal han sido borrados.	31337
+10	158	Opción inválida.	31337
+10	159	%s es un Bot de Servicio Oficial de Undernet.	31337
+10	160	%s es un/a Representante Oficial de Coder-Com%s y está autentificado/a como %s	31337
+10	161	%s es un/a Contribuidor Oficial de Coder-Com%s y está autentificado/a como %s	31337
+10	162	%s es un/a Programador/a Oficial de Coder-Com%s y está autentificado/a como %s	31337
+10	163	%s es un/a Senior Oficial de Coder-Com%s y está autentificado/a como %s	31337
+10	164	 y un/a Operador/a de IRC.	31337
+10	165	Se ha añadido el ban %s a %s con nivel %i.	31337
+10	166	%s: la lista de bans está vacía.		31337
+10	167	Ya estoy en ese canal!	31337
+10	168	Esta orden está reservada para Operadores/as de IRC.	31337
+10	169	No tengo op en %s	31337
+10	170	%s durante %i minutos.	31337
+\.
+
