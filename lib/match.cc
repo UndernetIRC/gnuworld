@@ -16,7 +16,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- * $Id: match.cc,v 1.2 2001/01/27 20:16:40 dan_karrels Exp $
+ * $Id: match.cc,v 1.3 2001/03/24 16:00:56 dan_karrels Exp $
  */
 #include	"match.h"
 
@@ -26,6 +26,10 @@ using std::string ;
 
 int match( const string& s1, const string& s2 )
 {
+if( s1.empty() || s2.empty() )
+	{
+	return 1 ;
+	}
 return match( s1.c_str(), s2.c_str() ) ;
 }
 

@@ -38,6 +38,7 @@
 #include	"iClient.h"
 #include	"EConfig.h"
 #include	"Gline.h"
+#include	"match.h"
 
 #include	"ELog.h"
 #include	"Socket.h"
@@ -47,7 +48,10 @@
 #include	"ServerTimerHandlers.h"
 
 const char xServer_h_rcsId[] = __XSERVER_H ;
-const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.90 2001/03/24 01:31:42 dan_karrels Exp $" ;
+const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.91 2001/03/24 16:00:56 dan_karrels Exp $" ;
+
+namespace gnuworld
+{
 
 using std::string ;
 using std::vector ;
@@ -58,11 +62,10 @@ using std::strstream ;
 using std::stack ;
 using std::unary_function ;
 
-namespace gnuworld
-{
-
+// The object containing the network data structures
 xNetwork*	Network = 0 ;
 
+// Some static xServer variables for tracking signals
 int xServer::whichSig = 0 ;
 bool xServer::caughtSignal = false ;
 
@@ -1745,7 +1748,18 @@ return true ;
 // TODO
 vector< const Gline* > xServer::matchGline( const string& userHost ) const
 {
-return vector< const Gline* >() ;
+vector< const Gline* > retMe ;
+
+for( glineListType::const_iterator ptr = glineList.begin() ;
+	ptr != glineList.end() ; ++ptr )
+	{
+	if( !match( (*ptr)->getUserHost(), userHost ) )
+		{
+		retMe.push_back( *ptr ) ;
+		}
+	}
+
+return retMe ;
 }
 
 const Gline* xServer::findGline( const string& userHost ) const

@@ -22,7 +22,7 @@
 #include	"Network.h"
 #include	"iClient.h"
 
-const char msg_B_cc_rcsId[] = "$Id: msg_B.cc,v 1.5 2001/03/03 01:03:28 dan_karrels Exp $" ;
+const char msg_B_cc_rcsId[] = "$Id: msg_B.cc,v 1.6 2001/03/24 16:00:56 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -85,7 +85,7 @@ if( NULL == theChan )
 			<< endl ;
 
 		// Prevent a memory leak by deleting the channel
-		delete theChan ;
+		delete theChan ; theChan = 0 ;
 
 		// Return error
 		return -1 ;
@@ -246,14 +246,25 @@ for( StringTokenizer::const_iterator ptr = st.begin() ; ptr != st.end() ;
 //		<< "(" << theClient->getCharYYXXX() << ") to channel "
 //		<< theChan->getName() << endl ;
 
+	// Add this channel to the user's channel structure.
+	if( !theClient->addChannel( theChan ) )
+		{
+		elog	<< "xServer::parseBurstUsers> Failed to add "
+			<< "channel "
+			<< *theChan
+			<< " to iClient "
+			<< *theClient
+			<< endl ;
+
+		// Non-fatal error
+		continue ;
+		}
+
 	// Create a ChannelUser object to represent this user's presence
 	// in this channel
 	ChannelUser* chanUser =
 		new (nothrow) ChannelUser( theClient ) ;
 	assert( chanUser != 0 ) ;
-
-	// Add this channel to the user's channel structure.
-	theClient->addChannel( theChan ) ;
 
 	// Add this user to the channel's database.
 	if( !theChan->addUser( chanUser ) )
@@ -266,7 +277,10 @@ for( StringTokenizer::const_iterator ptr = st.begin() ; ptr != st.end() ;
 
 		// Prevent a memory leak by deallocating the unused
 		// ChannelUser object
-		delete chanUser ;
+		delete chanUser ; chanUser = 0 ;
+
+		// Remove the channel info from the client
+		theClient->removeChannel( theChan ) ;
 
 		continue ;
 		}

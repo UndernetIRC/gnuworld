@@ -5,6 +5,7 @@
 #include	<iostream>
 #include	<ctime>
 #include	<map>
+#include	<algorithm>
 
 #include	<cassert>
 
@@ -14,7 +15,7 @@
 #include	"ip.h"
 
 const char iClient_h_rcsId[] = __ICLIENT_H ;
-const char iClient_cc_rcsId[] = "$Id: iClient.cc,v 1.12 2001/03/24 01:31:42 dan_karrels Exp $" ;
+const char iClient_cc_rcsId[] = "$Id: iClient.cc,v 1.13 2001/03/24 16:00:56 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -114,16 +115,23 @@ for( string::size_type i = 0 ; i < newModes.size() ; i++ )
 
 bool iClient::removeChannel( Channel* theChan )
 {
+// No need to remove all duplicate channel instances, since
+// addChannel() guarantees that none exist
 for( channelListType::iterator ptr = channelList.begin() ;
-	ptr != channelList.end() ;
-	++ptr )
+	ptr != channelList.end() ; ++ptr )
 	{
 	if( *ptr == theChan )
 		{
 		channelList.erase( ptr ) ;
-		return true ;
+		return true  ;
+		}
+	else
+		{
+		++ptr ;
 		}
 	}
+
+// Channel not found
 return false ;
 }
 
@@ -230,14 +238,23 @@ customDataMap->erase( ptr ) ;
 return ptr->second ;
 }
 
-void iClient::addChannel( Channel* theChan )
+bool iClient::addChannel( Channel* theChan )
 {
 
 // This method is public, make sure the pointer is valid
 assert( theChan != 0 ) ;
 
+if( std::find( channelList.begin(), channelList.end(), theChan )
+	!= channelList.end() )
+	{
+	// Channel already found
+	return false ;
+	}
+
 // Add the channel to the channelList
 channelList.push_front( theChan ) ;
+
+return true ;
 }
 
 } // namespace gnuworld

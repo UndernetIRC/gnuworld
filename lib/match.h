@@ -1,7 +1,7 @@
 /*
  * match.h
  *
- * $Id: match.h,v 1.2 2001/01/27 20:16:40 dan_karrels Exp $
+ * $Id: match.h,v 1.3 2001/03/24 16:00:56 dan_karrels Exp $
  */
 #ifndef INCLUDED_match_h
 #define INCLUDED_match_h
@@ -20,6 +20,7 @@
  * needs to be fixed. --Bleep
  */
 int mmatch(const char *old_mask, const char *new_mask);
+int match( const string&, const string& ) ;
 int match(const char *ma, const char *na);
 int match( const string&, const string& ) ;
 char *collapse(char *pattern);

@@ -20,13 +20,13 @@
 #include	"Channel.h"
 #include	"ChannelUser.h"
 
-const char msg_C_cc_rcsId[] = "$Id: msg_C.cc,v 1.2 2001/03/03 00:17:57 dan_karrels Exp $" ;
-
-using std::string ;
-using std::endl ;
+const char msg_C_cc_rcsId[] = "$Id: msg_C.cc,v 1.3 2001/03/24 16:00:56 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
+
+using std::string ;
+using std::endl ;
 
 /**
  * Someone has just joined an empty channel (create)
@@ -105,11 +105,23 @@ for( StringTokenizer::const_iterator ptr = st.begin() ; ptr != st.end() ;
 
 			// Prevent memory leaks by removing the unused
 			// channel
-			delete theChan ;
+			delete theChan ; theChan = 0 ;
 
 			// continue to next one *shrug*
 			continue ;
 			}
+		}
+
+	// Add this channel to the client's channel structure.
+	if( !theClient->addChannel( theChan ) )
+		{
+		elog	<< "xServer::MSG_C> Unable to add channel "
+			<< *theChan
+			<< " to iClient "
+			<< *theClient
+			<< endl ;
+
+		continue ;
 		}
 
 	// Create a new ChannelUser to represent this iClient's
@@ -135,14 +147,14 @@ for( StringTokenizer::const_iterator ptr = st.begin() ; ptr != st.end() ;
 
 		// Prevent a memory leak by deallocating the unused
 		// ChannelUser structure
-		delete theUser ;
+		delete theUser ; theUser = 0 ;
+
+		// Remove the channel information from the client
+		theClient->removeChannel( theChan ) ;
 
 		// Continue to next channel
 		continue ;
 		}
-
-	// Add this channel to the client's channel structure.
-	theClient->addChannel( theChan ) ;
 
 	// Notify all listening xClients of this event
 	PostChannelEvent( EVT_CREATE, theChan,

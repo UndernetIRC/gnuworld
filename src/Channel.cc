@@ -14,6 +14,9 @@
 #include	"match.h"
 #include	"server.h"
 
+const char Channel_h_rcsId[] = __CHANNEL_H ;
+const char Channel_cc_rcsId[] = "$Id: Channel.cc,v 1.23 2001/03/24 16:00:56 dan_karrels Exp $" ;
+
 namespace gnuworld
 {
 
@@ -75,6 +78,13 @@ ChannelUser* addMe = new (nothrow) ChannelUser( theClient ) ;
 
 // The signature of addUser() here will verify the pointer
 return addUser( addMe ) ;
+}
+
+ChannelUser* Channel::removeUser( ChannelUser* theUser )
+{
+assert( theUser != 0 ) ;
+
+return removeUser( theUser->getClient()->getIntYYXXX() ) ;
 }
 
 ChannelUser* Channel::removeUser( iClient* theClient )
@@ -417,7 +427,7 @@ const string Channel::getModeString() const
 {
 
 string modeString( "+" ) ;
-string argString( "" ) ;
+string argString ;
 
 if( modes & MODE_T )	modeString += 't' ;
 if( modes & MODE_N )	modeString += 'n' ;
@@ -438,7 +448,8 @@ if( modes & MODE_L )
 
 	// Can't put numerical variables into a string
 	strstream s ;
-	s << getLimit() << ends ;
+	s	<< getLimit()
+		<< ends ;
 
 	argString += s.str() ;
 

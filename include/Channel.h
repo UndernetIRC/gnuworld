@@ -1,7 +1,7 @@
 /* Channel.h */
 
 #ifndef __CHANNEL_H
-#define __CHANNEL_H
+#define __CHANNEL_H "$Id: Channel.h,v 1.14 2001/03/24 16:00:55 dan_karrels Exp $"
 
 #include	<string>
 #include	<map>
@@ -15,12 +15,12 @@
 #include	"xparameters.h"
 #include	"ELog.h"
 
+namespace gnuworld
+{
+
 using std::string ;
 using std::map ;
 using std::list ;
-
-namespace gnuworld
-{
 
 /// Forward declaration of class iClient.
 class iClient ;
@@ -338,6 +338,11 @@ public:
 	 * returned to the caller.
 	 */
 	inline ChannelUser* removeUser( iClient* theClient ) ;
+
+	/**
+	 * Remove the given ChannelUser from this Channel.
+	 */
+	inline ChannelUser* removeUser( ChannelUser* theUser ) ;
 
 	/**
 	 * Remove a ChannelUser from this channel's internal

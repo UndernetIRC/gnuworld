@@ -17,7 +17,7 @@
 #include	"ELog.h"
 #include	"StringTokenizer.h"
 
-const char msg_J_cc_rcsId[] = "$Id: msg_J.cc,v 1.8 2001/03/24 01:31:42 dan_karrels Exp $" ;
+const char msg_J_cc_rcsId[] = "$Id: msg_J.cc,v 1.9 2001/03/24 16:00:56 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -154,12 +154,50 @@ for( StringTokenizer::size_type i = 0 ; i < st.size() ; i++ )
 		// ChannelUser object
 		delete theUser ; theUser = 0 ;
 
+		if( EVT_CREATE == whichEvent )
+			{
+			// The channel did not exist before
+			// this message, so go ahead and
+			// remove it
+			Network->removeChannel( theChan->getName() ) ;
+
+			delete theChan ; theChan = 0 ;
+			}
+
 		// Continue to next channel
 		continue ;
 		}
 
 	// Add this channel to this client's channel structure.
-	Target->addChannel( theChan ) ;
+	if( !Target->addChannel( theChan ) )
+		{
+		elog	<< "xServer::MSG_J> Unable to add channel "
+			<< *theChan
+			<< " to iClient "
+			<< *Target
+			<< endl ;
+
+		// Remove the ChannelUser from this channel, and
+		// deallocate the ChannelUser to prevent memory
+		// leaks
+		theChan->removeUser( theUser ) ;
+		delete theUser ; theUser = 0 ;
+
+		// Did we just create the channel?
+		if( EVT_CREATE == whichEvent )
+			{
+			// Yup, remove the channel from the network
+			// data structures
+			Network->removeChannel( theChan->getName() ) ;
+
+			// Prevent memory leaks by deallocating
+			// the channel
+			delete theChan ; theChan = 0 ;
+			}
+
+		// Continue on with the next channel
+		continue ;
+		}
 
 	// Post the event to the clients listening for events on this
 	// channel, if any.

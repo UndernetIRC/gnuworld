@@ -2,7 +2,7 @@
  */
 
 #ifndef __ICLIENT_H
-#define __ICLIENT_H "$Id: iClient.h,v 1.14 2001/03/24 01:31:42 dan_karrels Exp $"
+#define __ICLIENT_H "$Id: iClient.h,v 1.15 2001/03/24 16:00:55 dan_karrels Exp $"
 
 #include	<string>
 #include	<list>
@@ -181,7 +181,7 @@ public:
 	/**
 	 * Add a channel to this user's channel patronage structure.
 	 */
-	inline void addChannel( Channel* newChannel ) ;
+	inline bool addChannel( Channel* newChannel ) ;
 
 	/**
 	 * Remove a channel from this user's channel patronage structure.
