@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: iClient.cc,v 1.26 2002/11/07 21:49:18 dan_karrels Exp $
+ * $Id: iClient.cc,v 1.27 2002/11/11 18:45:35 jeekay Exp $
  */
 
 #include	<new>
@@ -35,7 +35,7 @@
 #include	"ip.h"
 
 const char iClient_h_rcsId[] = __ICLIENT_H ;
-const char iClient_cc_rcsId[] = "$Id: iClient.cc,v 1.26 2002/11/07 21:49:18 dan_karrels Exp $" ;
+const char iClient_cc_rcsId[] = "$Id: iClient.cc,v 1.27 2002/11/11 18:45:35 jeekay Exp $" ;
 const char client_h_rcsId[] = __CLIENT_H ;
 const char Numeric_h_rcsId[] = __NUMERIC_H ;
 const char ip_h_rcsId[] = __IP_H ;
@@ -177,13 +177,13 @@ const string iClient::getCharModes() const
 {
 string retMe( "+" ) ;
 
-if( isModeR() )		retMe += 'o' ;
+if( isModeO() )		retMe += 'o' ;
 if( isModeW() )		retMe += 'w' ;
 if( isModeI() )		retMe += 'i' ;
 if( isModeD() )		retMe += 'd' ;
 if( isModeK() )		retMe += 'k' ;
 if( isModeR() )		retMe += 'r' ;
-if( isModeK() )	retMe += 'x' ;
+if( isModeX() )		retMe += 'x' ;
 if( isModeG() )		retMe += 'g' ;
 
 return retMe ;
