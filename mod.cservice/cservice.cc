@@ -158,8 +158,8 @@ RegisterCommand(new OPCommand(this, "OP", "<#channel> [nick] [nick] ..", 3));
 RegisterCommand(new DEOPCommand(this, "DEOP", "<#channel> [nick] [nick] ..", 3));
 RegisterCommand(new VOICECommand(this, "VOICE", "<#channel> [nick] [nick] ..", 3));
 RegisterCommand(new DEVOICECommand(this, "DEVOICE", "<#channel> [nick] [nick] ..", 3));
-RegisterCommand(new ADDUSERCommand(this, "ADDUSER", "<#channel> <nick> <access>", 8));
-RegisterCommand(new REMUSERCommand(this, "REMUSER", "<#channel> <nick>", 4));
+RegisterCommand(new ADDUSERCommand(this, "ADDUSER", "<#channel> <username> <access>", 8));
+RegisterCommand(new REMUSERCommand(this, "REMUSER", "<#channel> <username>", 4));
 RegisterCommand(new MODINFOCommand(this, "MODINFO", "<#channel> [ACCESS <username> <level>] [AUTOMODE <username> <NONE|OP|VOICE>]", 6));
 RegisterCommand(new SETCommand(this, "SET", "[#channel] <variable> <value> or, SET <invisible> <ON|OFF>", 6));
 RegisterCommand(new INVITECommand(this, "INVITE", "<#channel>", 2));
@@ -725,13 +725,31 @@ else
 
 return true;
 } 
+
+/**
+ * Check to see if this user is 'forced' onto this channel.
+ */
+unsigned short cservice::isForced(sqlChannel* theChan, sqlUser* theUser)
+{
+if (!theChan->forceMap.empty())
+	{ 
+	sqlChannel::forceMapType::iterator ptr = theChan->forceMap.find(theUser->getID()); 
+	if(ptr != theChan->forceMap.end()) 
+		{
+		/* So they do, return their forced level. */
+		return ptr->second.first;
+		}
+	}
+
+return 0;
+}
  
 /**
  *  Confirms a user is logged in by returning a pointer to
  *  the sqlUser record. 
  *  If 'alert' is true, send a notice to the user informing
  *  them that they must be logged in.
- */
+ */ 
 sqlUser* cservice::isAuthed(iClient* theClient, bool alert)
 {
 networkData* tmpData =
@@ -924,7 +942,8 @@ if(ptr != sqlChannelCache.end())
 			<< endl;
 	#endif
 
-	channelCacheHits++;
+	channelCacheHits++; 
+	ptr->second->setLastUsed(currentTime());
 
 	// Return the channel to the caller
 	return ptr->second ;
@@ -950,6 +969,7 @@ if (theChan->loadData(id))
 	#endif
 
 	channelHits++;
+	theChan->setLastUsed(currentTime());
 
 	// Return the channel to the caller
 	return theChan;
@@ -1054,14 +1074,6 @@ if (theLevel->loadData(theUser->getID(), theChan->getID()))
 
 	levelHits++;
 
-	// Flag to let us know this has been loaded from the Db.
-	theLevel->setFlag(sqlLevel::F_ONDB);
-
-	// Remove this incase someone forced an existing record, and
-	// modified it causing it to be committed with the forced flag
-	// still. (Remove when new single field commit scheme in place).
-	theLevel->removeFlag(sqlLevel::F_FORCED);
-
 	return theLevel;
 	}
 
@@ -1106,18 +1118,22 @@ return 0;
 short int cservice::getEffectiveAccessLevel( sqlUser* theUser,
 	sqlChannel* theChan, bool notify )
 {
+	
+/*
+ *  Have a look to see if this user has forced some access.
+ */
+
+unsigned short forcedAccess = isForced(theChan, theUser);
+if (forcedAccess)
+	{
+	return forcedAccess;
+	}
  
 sqlLevel* theLevel = getLevelRecord(theUser, theChan);
 if( !theLevel )
 	{
 	return 0 ;
-	}
-
-if (theLevel->getFlag(sqlLevel::F_FORCED))
-	{
-	/* A forced access, return forced access level. */
-	return theLevel->getForcedAccess();
-	}
+	} 
 
 /* Check to see if the channel has been suspended. */ 
 if (theChan->getFlag(sqlChannel::F_SUSPEND))
@@ -1541,10 +1557,10 @@ void cservice::cacheExpireUsers()
 	{
 		tmpUser = ptr->second;
 		/*
-	 	 *  If this user has been idle 300 seconds, and currently
+	 	 *  If this user has been idle one hour, and currently
 		 *  isn't logged in, boot him out the window.
 		 */
-		if ( ((tmpUser->getLastUsed() + 30) < currentTime()) &&
+		if ( ((tmpUser->getLastUsed() + 3600) < currentTime()) &&
 			!tmpUser->isAuthed() )
 		{ 
 			elog << "cservice::cacheExpireUsers> "
@@ -1570,7 +1586,20 @@ void cservice::cacheExpireUsers()
 		purgeCount, (endTime - startTime)); 
 }
 
-void cservice::cacheExpireChannelData()
+void cservice::cacheExpireBans()
+{
+	logDebugMessage("Beginning Channel cache cleanup:");
+	sqlChannelHashType::iterator ptr = sqlChannelCache.begin();
+	while (ptr != sqlChannelCache.end())
+	{
+//		elog << (ptr)->first << endl;
+		++ptr;
+	} 
+	logDebugMessage("Channel cache cleanup complete.");
+}
+
+
+void cservice::cacheExpireLevels()
 {
 	logDebugMessage("Beginning Channel cache cleanup:");
 	sqlChannelHashType::iterator ptr = sqlChannelCache.begin();
@@ -1904,8 +1933,9 @@ if (timer_id == expire_timerID)
 
 if (timer_id == cache_timerID)
 	{ 
-	cacheExpireUsers(); 
-	cacheExpireChannelData(); 
+	cacheExpireUsers();
+	cacheExpireBans();
+	cacheExpireLevels();
 
 	/* Refresh Timers */
 	time_t theTime = time(NULL) + cacheInterval;
@@ -2770,6 +2800,11 @@ bool cservice::doInternalBanAndKick(sqlChannel* theChan,
 /* Fetch the banVector for this channel */
 vector< sqlBan* >* banList = getBanRecords(theChan);
 
+/*
+ *  Check to see if this banmask already exists in the
+ *  channel. (Ugh, and overlapping too.. hmm).
+ */
+
 /* Create a new Ban record */
 sqlBan* newBan = new (nothrow) sqlBan(SQLDb);
 assert( newBan != 0 ) ;
@@ -2782,11 +2817,16 @@ newBan->setBanMask(banTarget);
 newBan->setSetBy(nickName);
 newBan->setSetTS(currentTime());
 newBan->setLevel(25);
+
 /* Move 360 to config */
 newBan->setExpires( 300 + currentTime());
 newBan->setReason(theReason);
-	
-/* Insert to our internal List. */ 
+
+/*
+ *  Check for duplicates, if none found - 
+ *  add to internal list and commit to the db.
+ */
+ 
 banList->push_back(newBan); 
 
 /* Insert this new record into the database. */

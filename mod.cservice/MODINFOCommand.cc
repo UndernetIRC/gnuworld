@@ -13,7 +13,7 @@
  * Shouldn't really happen, as trying to MODINFO a forced access doesn't
  * make sense - adduser and then MODINFO that :)
  *
- * $Id: MODINFOCommand.cc,v 1.14 2001/03/07 23:22:11 dan_karrels Exp $
+ * $Id: MODINFOCommand.cc,v 1.15 2001/03/13 22:39:33 gte Exp $
  */
 
 #include	<string>
@@ -23,7 +23,7 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char MODINFOCommand_cc_rcsId[] = "$Id: MODINFOCommand.cc,v 1.14 2001/03/07 23:22:11 dan_karrels Exp $" ;
+const char MODINFOCommand_cc_rcsId[] = "$Id: MODINFOCommand.cc,v 1.15 2001/03/13 22:39:33 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -131,10 +131,11 @@ if (command == "ACCESS")
 	
 	if (level <= targetLevel)
 		{
-		/* If the access is forced, they are allowed to
-		 * modify their own record.
+		/* 
+		 * Let forced users modify their own user records in channels to
+		 * any setting.
 		 */
-		if (!tmpLevel->getFlag(sqlLevel::F_FORCED))
+		if (!bot->isForced(theChan, theUser))
 			{ 
 			bot->Notice(theClient, 
 				bot->getResponse(theUser, 
@@ -177,10 +178,9 @@ if (command == "ACCESS")
 	aLevel->setAccess(newAccess);
 	aLevel->setLastModif(bot->currentTime());
 	aLevel->setLastModifBy( string( "(" + theUser->getUserName() + ") " +theClient->getNickUserHost() ) );
+ 
+	aLevel->commit();
 
-	// Only commit changes if this has been loaded from the Db.
-	// (Ie: If its a forced temporary access, this flag won't be set)..
-	if (aLevel->getFlag(sqlLevel::F_ONDB)) aLevel->commit();
 	bot->Notice(theClient, 
 		bot->getResponse(theUser, 
 			language::mod_access_to, 
@@ -216,15 +216,8 @@ if (command == "AUTOMODE")
 		aLevel->removeFlag(sqlLevel::F_AUTOVOICE);
 		aLevel->setFlag(sqlLevel::F_AUTOOP); 
 //		aLevel->setLastModif(bot->currentTime());
-//		aLevel->setLastModifBy(theClient->getNickUserHost());
- 
-		// Only commit changes if this has been loaded from the Db.
-		// (Ie: If its a forced temporary access, this flag
-		// won't be set)..
-		if (aLevel->getFlag(sqlLevel::F_ONDB))
-			{
-			aLevel->commit();
-			}
+//		aLevel->setLastModifBy(theClient->getNickUserHost()); 
+		aLevel->commit(); 
 
 		bot->Notice(theClient, 
 			bot->getResponse(theUser, 
@@ -243,14 +236,7 @@ if (command == "AUTOMODE")
 		aLevel->setFlag(sqlLevel::F_AUTOVOICE); 
 //		aLevel->setLastModif(bot->currentTime());
 //		aLevel->setLastModifBy(theClient->getNickUserHost());
- 
-		// Only commit changes if this has been loaded from the Db.
-		// (Ie: If its a forced temporary access, this flag
-		// won't be set)..
-		if (aLevel->getFlag(sqlLevel::F_ONDB))
-			{
-			aLevel->commit();
-			}
+		aLevel->commit(); 
 
 		bot->Notice(theClient, 
 			bot->getResponse(theUser, 
@@ -268,14 +254,7 @@ if (command == "AUTOMODE")
 		aLevel->removeFlag(sqlLevel::F_AUTOVOICE);
 //		aLevel->setLastModif(bot->currentTime());
 //		aLevel->setLastModifBy(theClient->getNickUserHost());
- 
-		// Only commit changes if this has been loaded from the Db.
-		// (Ie: If its a forced temporary access, this flag won't
-		// be set)..
-		if (aLevel->getFlag(sqlLevel::F_ONDB))
-			{
-			aLevel->commit();
-			}
+		aLevel->commit(); 
 
 		bot->Notice(theClient, 
 			bot->getResponse(theUser, 

@@ -9,7 +9,7 @@
  * Caveats: None
  * 
  *
- * $Id: REMUSERCommand.cc,v 1.10 2001/03/03 01:51:55 gte Exp $
+ * $Id: REMUSERCommand.cc,v 1.11 2001/03/13 22:39:33 gte Exp $
  */
 
 #include	<string>
@@ -21,7 +21,7 @@
 #include	"libpq++.h"
 #include	"responses.h"
 
-const char REMUSERCommand_cc_rcsId[] = "$Id: REMUSERCommand.cc,v 1.10 2001/03/03 01:51:55 gte Exp $" ;
+const char REMUSERCommand_cc_rcsId[] = "$Id: REMUSERCommand.cc,v 1.11 2001/03/13 22:39:33 gte Exp $" ;
  
 namespace gnuworld
 {
@@ -169,16 +169,12 @@ bool REMUSERCommand::Exec( iClient* theClient, const string& Message )
 		bot->dbErrorMessage(theClient); 
  	}
  
-	/* Remove tmpLevel from the cache. (It has to be there, we just got it even if it wasnt..)
-	 * If its a forced record, don't bother.. */
-
-	if (!tmpLevel->getFlag(sqlLevel::F_FORCED))
-	{ 
-		pair<int, int> thePair;
-		thePair = make_pair(tmpLevel->getUserId(), tmpLevel->getChannelId());
-		bot->sqlLevelCache.erase(thePair);
-	}
-
+	/* Remove tmpLevel from the cache. (It has to be there, we just got it even if it wasnt..) */ 
+ 
+	pair<int, int> thePair;
+	thePair = make_pair(tmpLevel->getUserId(), tmpLevel->getChannelId());
+	bot->sqlLevelCache.erase(thePair);
+ 
 	return true ;
 } 
 

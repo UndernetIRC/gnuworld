@@ -10,7 +10,7 @@
 #include	"Network.h"
 #include	"cservice_config.h"
  
-const char STATUSCommand_cc_rcsId[] = "$Id: STATUSCommand.cc,v 1.25 2001/03/08 19:42:37 gte Exp $" ;
+const char STATUSCommand_cc_rcsId[] = "$Id: STATUSCommand.cc,v 1.26 2001/03/13 22:39:33 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -392,7 +392,22 @@ for (int i = 0 ; i < bot->SQLDb->Tuples(); i++)
 	} // for()
  
 bot->Notice(theClient, "Auth: %s", authList.c_str());
- 
+
+/*
+ *  Finally(!) display a quick list of everyone 'forced' on the
+ *  channel. 
+ */
+
+if (admLevel >= 1)
+{
+	for(sqlChannel::forceMapType::const_iterator ptr = theChan->forceMap.begin();
+		ptr != theChan->forceMap.end(); ++ptr)
+		{ 
+			bot->Notice(theClient, "Force: %s (%i)",
+				ptr->second.second.c_str(), ptr->second.first);
+		}
+}
+
 return true ;
 } 
 

@@ -8,7 +8,7 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char FORCECommand_cc_rcsId[] = "$Id: FORCECommand.cc,v 1.10 2001/02/22 19:09:34 gte Exp $" ;
+const char FORCECommand_cc_rcsId[] = "$Id: FORCECommand.cc,v 1.11 2001/03/13 22:39:33 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -67,58 +67,18 @@ bool FORCECommand::Exec( iClient* theClient, const string& Message )
 			st[1].c_str());
 		return false;
 	} 
- 
-	/*
-	 *  Check this user doesn't already have access on this channel.
-	 *  If they do, simply bump their access level to the level they
-	 *  have on *.
+
+ 	/*
+	 * Add an entry to this channel records 'Force List'.
+	 * This list is checked in getEffectiveAccess(), and will return
+	 * the relevant amount of access the admin has forced too.
 	 */
-
-	sqlLevel* newLevel;
-	newLevel = bot->getLevelRecord(theUser, theChan);
-	int level = newLevel ? newLevel->getAccess() : 0;
-
-	if (level != 0) // If they already have some access..
-	{ 
-		/*
-		 * Set this channel access to their admin level.
-		 * getLevelRecord will have cached this entry, we simply don't commit it to
-		 * make it temporary.
-		 */
  
-		newLevel->setForcedAccess(admLevel);
-		newLevel->setFlag(sqlLevel::F_FORCED);
-		bot->logAdminMessage("%s (%s) is getting access on %s", 
-			theClient->getNickName().c_str(), theUser->getUserName().c_str(), theChan->getName().c_str()); 
-		bot->Notice(theClient, 
-			bot->getResponse(theUser,
-				language::temp_inc_access,
-				string("Temporarily increased your access on channel %s to %i")).c_str(), 
-			theChan->getName().c_str(), admLevel); 
-		bot->writeChannelLog(theChan, theClient, sqlChannel::EV_FORCE, "");
-		return true;
-	}
- 
-	/*
-	 *  Manually create a new sqlLevel entry, set the members
-	 *  and add it to the cache.
-	 */
+	theChan->forceMap.insert(sqlChannel::forceMapType::value_type(
+		theUser->getID(),
+		make_pair(admLevel, theUser->getUserName())
+	));
 
-	newLevel = new sqlLevel(bot->SQLDb);
-	newLevel->setChannelId(theChan->getID());
-	newLevel->setUserId(theUser->getID());
-	newLevel->setForcedAccess(admLevel);
-	newLevel->setAccess(501);
-	newLevel->setFlag(sqlLevel::F_FORCED); 
-	newLevel->setSuspendExpire(0);
-
-	/*
-	 *  Add it to the cache.
-	 */
-
-	pair<int, int> thePair; 
-	thePair = make_pair(theUser->getID(), theChan->getID()); 
-	bot->sqlLevelCache.insert(cservice::sqlLevelHashType::value_type(thePair, newLevel));
 	bot->logAdminMessage("%s (%s) is getting access on %s", 
 		theClient->getNickName().c_str(), theUser->getUserName().c_str(), theChan->getName().c_str());
 	bot->Notice(theClient, 
@@ -127,7 +87,8 @@ bool FORCECommand::Exec( iClient* theClient, const string& Message )
 			string("Temporarily increased your access on channel %s to %i")).c_str(), 
 		theChan->getName().c_str(), admLevel);
 	bot->writeChannelLog(theChan, theClient, sqlChannel::EV_FORCE, "");
-	return true ;
+
+	return true; 
 } 
 
 } // namespace gnuworld.

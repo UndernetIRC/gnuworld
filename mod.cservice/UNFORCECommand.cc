@@ -8,7 +8,7 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char UNFORCECommand_cc_rcsId[] = "$Id: UNFORCECommand.cc,v 1.5 2001/02/16 20:20:26 plexus Exp $" ;
+const char UNFORCECommand_cc_rcsId[] = "$Id: UNFORCECommand.cc,v 1.6 2001/03/13 22:39:33 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -60,30 +60,21 @@ bool UNFORCECommand::Exec( iClient* theClient, const string& Message )
 	} 
  
 	/*
-	 *  Look in the user level cache to see if this user is present.
-	 *  If they are, check the isForced() status, and if true
-	 *  drop them from the cache.
+ 	 * Check to see if this userID is forced in this channel.
 	 */
 
-	pair<int, int> thePair; 
-	thePair = make_pair(theUser->getID(), theChan->getID()); 
- 
-	cservice::sqlLevelHashType::iterator ptr = bot->sqlLevelCache.find(thePair);
-	if(ptr != bot->sqlLevelCache.end()) // Found something!
-	{ 
-		if (ptr->second->getFlag(sqlLevel::F_FORCED)) // Forced access, drop it.
-		{
-			bot->sqlLevelCache.erase(thePair);
-			bot->Notice(theClient, 
+	sqlChannel::forceMapType::iterator ptr = theChan->forceMap.find(theUser->getID());
+	/* If we found something, drop it. */
+	if(ptr != theChan->forceMap.end())
+		{ 
+		theChan->forceMap.erase(theUser->getID());
+			bot->Notice(theClient,
 				bot->getResponse(theUser,
 					language::rem_temp_access,
 					string("Removed your temporary access of %i from channel %s")).c_str(), 
-				admLevel, theChan->getName().c_str());
-//			bot->logAdminMessage("%s has removed their forced access on %s", 
-//				theUser->getUserName().c_str(), theChan->getName().c_str());
+				admLevel, theChan->getName().c_str()); 
 			return true;
-		}
-	} 
+		} 
 
 	bot->Notice(theClient, 
 		bot->getResponse(theUser,

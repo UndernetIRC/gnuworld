@@ -1,9 +1,10 @@
 /* sqlChannel.h */
 
 #ifndef __SQLCHANNEL_H
-#define __SQLCHANNEL_H "$Id: sqlChannel.h,v 1.19 2001/03/06 01:09:05 gte Exp $"
+#define __SQLCHANNEL_H "$Id: sqlChannel.h,v 1.20 2001/03/13 22:39:33 gte Exp $"
 
 #include	<string>
+#include	<map>
 #include	<ctime>
 #include	"libpq++.h"
 
@@ -49,7 +50,7 @@ public:
 	static const unsigned short	EV_OPERJOIN = 4 ;
 	static const unsigned short	EV_OPERPART = 5 ;
 	static const unsigned short	EV_FORCE    = 6 ;
-	static const unsigned short	EV_REGISTER = 7 ;
+	static const unsigned short	EV_REGISTER = 7 ; 
 
 	/*
 	 *  Methods to get data atrributes.
@@ -101,8 +102,11 @@ public:
 		{ return inChan; }
 
 	inline const time_t&		getLastTopic() const
-		{ return last_topic ; }
- 
+		{ return last_topic ; } 
+
+	inline const time_t&		getLastUsed() const
+		{ return last_used ; } 
+
 	/**
 	 * Load channel data from the backend using the channel name as
 	 * a key.
@@ -161,7 +165,8 @@ public:
 	inline void setLastTopic( const time_t& _last_topic )
 		{ last_topic = _last_topic; }
 
-	// 'last_updated' is only altered during commit().
+	inline void setLastUsed( const time_t& _last_used )
+		{ last_used = _last_used; } 
  
 	/**
 	 * Method to perform a SQL 'UPDATE' and commit changes to this
@@ -170,6 +175,17 @@ public:
 	bool commit();
 
 	void setAllMembers(int);
+
+public:
+	/* 
+	 * Map with key user-id, contents level and username for
+	 * easy access 
+	 * Stores UID's of admin users with forced accessse
+	 * on this channel 
+	 */
+
+	typedef map< unsigned int, pair < unsigned short, string > > forceMapType ;
+	forceMapType forceMap; 
 
 protected: 
 
@@ -188,8 +204,11 @@ protected:
 	time_t		last_updated ; 
 	time_t		last_topic ;
 	bool		inChan;
-	PgDatabase*	SQLDb;
-} ;
+	time_t		last_used;
+
+	PgDatabase*	SQLDb; 
+ 
+ } ;
 
 } 
 #endif // __SQLCHANNEL_H

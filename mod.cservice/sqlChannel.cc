@@ -9,7 +9,7 @@
  * 30/12/2000: Moved static SQL data to constants.h --Gte
  * Set loadData up to take data from rows other than 0.
  * 
- * $Id: sqlChannel.cc,v 1.24 2001/03/06 02:34:33 dan_karrels Exp $
+ * $Id: sqlChannel.cc,v 1.25 2001/03/13 22:39:33 gte Exp $
  */
  
 #include	<strstream>
@@ -25,7 +25,7 @@
 #include	"cservice_config.h"
  
 const char sqlChannel_h_rcsId[] = __SQLCHANNEL_H ;
-const char sqlChannel_cc_rcsId[] = "$Id: sqlChannel.cc,v 1.24 2001/03/06 02:34:33 dan_karrels Exp $" ;
+const char sqlChannel_cc_rcsId[] = "$Id: sqlChannel.cc,v 1.25 2001/03/13 22:39:33 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -49,6 +49,7 @@ sqlChannel::sqlChannel(PgDatabase* _SQLDb)
    userflags(0),
    last_topic(0),
    inChan(false),
+   last_used(0),
    SQLDb( _SQLDb )
 {
 }

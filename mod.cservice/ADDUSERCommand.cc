@@ -11,7 +11,7 @@
  *
  * Caveats: None
  *
- * $Id: ADDUSERCommand.cc,v 1.16 2001/03/06 02:34:32 dan_karrels Exp $
+ * $Id: ADDUSERCommand.cc,v 1.17 2001/03/13 22:39:33 gte Exp $
  */
  
 #include	<string>
@@ -24,7 +24,7 @@
 #include	"responses.h"
 #include	"cservice_config.h"
 
-const char ADDUSERCommand_cc_rcsId[] = "$Id: ADDUSERCommand.cc,v 1.16 2001/03/06 02:34:32 dan_karrels Exp $" ;
+const char ADDUSERCommand_cc_rcsId[] = "$Id: ADDUSERCommand.cc,v 1.17 2001/03/13 22:39:33 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -122,6 +122,8 @@ if (!targetUser)
  
 /*
  *  Check this user doesn't already have access on this channel.
+ *  (Note: If they're forced, this will only be shown in
+ *  getEffectiveAccess, not by looking at level records).
  */
 
 sqlLevel* newLevel = bot->getLevelRecord(targetUser, theChan);
@@ -129,46 +131,14 @@ int levelTest = newLevel ? newLevel->getAccess() : 0 ;
 
 if (levelTest != 0)
 	{
-	/*
-	 * If the current access is Forced via FORCE, then
-	 * allow the addition anyway..
-	 */
-		
-	if (!newLevel->getFlag(sqlLevel::F_FORCED))
-		{ 
-		bot->Notice(theClient, 
-			bot->getResponse(theUser,
-				language::already_in_list).c_str(),
-			targetUser->getUserName().c_str(),
-			theChan->getName().c_str(),
-			levelTest);
-		return false;
-		}
-
-	sqlLevel testLevel(bot->SQLDb);
-	if (testLevel.loadData(targetUser->getID(), theChan->getID()))
-		{
-		// If a forced person is trying to add themselves and they are already in the DB..
-		bot->Notice(theClient, 
-			bot->getResponse(theUser,
-				language::already_in_list).c_str(),
-			targetUser->getUserName().c_str(),
-			theChan->getName().c_str(),
-			levelTest);
-		return false;
-		}
-
-	if(newLevel->getFlag(sqlLevel::F_FORCED))
-		{
-		/*
-		 *  If the access is forced and is now actually being added, 
-		 *  update the cache.
-		 */
-		 newLevel->setAccess(targetAccess);
-		 // Record is on the DB now.
-		 newLevel->setFlag(sqlLevel::F_ONDB);
-		}
-	}
+	bot->Notice(theClient, 
+		bot->getResponse(theUser,
+			language::already_in_list).c_str(),
+		targetUser->getUserName().c_str(),
+		theChan->getName().c_str(),
+		levelTest);
+	return false;
+	} 
 
 /*
  *  Work out the flags this user should default to.

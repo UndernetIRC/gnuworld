@@ -1,7 +1,7 @@
 /* sqlLevel.h */
 
 #ifndef __SQLLEVEL_H
-#define __SQLLEVEL_H "$Id: sqlLevel.h,v 1.9 2001/02/18 19:46:01 dan_karrels Exp $"
+#define __SQLLEVEL_H "$Id: sqlLevel.h,v 1.10 2001/03/13 22:39:33 gte Exp $"
 
 #include	<string>
 #include	<ctime>
@@ -22,9 +22,9 @@ public:
 	typedef unsigned int	flagType ; 
 	static const flagType	F_AUTOOP =	0x01 ;
 	static const flagType	F_PROTECT =	0x02 ;
-	static const flagType	F_FORCED =	0x04 ;
+	static const flagType	F_FORCED =	0x04 ; // Depricated.
 	static const flagType	F_AUTOVOICE =	0x08 ;
-	static const flagType	F_ONDB =	0x10 ;
+	static const flagType	F_ONDB =	0x10 ; // Depricated.
 
 	/*
 	 *  Methods to get data atrributes.

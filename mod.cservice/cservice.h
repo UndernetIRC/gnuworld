@@ -1,5 +1,5 @@
 #ifndef __CSERVICE_H
-#define __CSERVICE_H "$Id: cservice.h,v 1.57 2001/03/11 02:00:23 gte Exp $"
+#define __CSERVICE_H "$Id: cservice.h,v 1.58 2001/03/13 22:39:33 gte Exp $"
 
 #include	<string>
 #include	<vector>
@@ -131,6 +131,9 @@ public:
 	 * If "bool" is true, send a notice to the client telling them off. */
 	sqlUser* isAuthed(iClient*, bool );
 
+	/* Checks to see if this users is forced on this channel */
+	unsigned short isForced(sqlChannel*, sqlUser*);
+
 	/* Fetch a channel record for a channel. */
 	sqlChannel* getChannelRecord( const string& );
 	sqlChannel* getChannelRecord( int );
@@ -232,6 +235,12 @@ public:
 	// Interval at which we attempt to purge the cache(s).
 	int cacheInterval;
 
+	/* Duration in seconds at which an idle user/chan/level/ban
+	 * record should be purged from the cache. */
+	int idleUserPeriod;
+	int idleChannelPeriod;
+	int idleLevelPeriod;
+
 	// Input flood rate.
 	unsigned int input_flood;
 	unsigned int output_flood;
@@ -315,13 +324,20 @@ public:
 	 */
 
 	void cacheExpireUsers();
+
 	/*
-	 *  Expire Level and Ban records, only if the channel
+	 *  Expire Ban records, only if the channel
 	 *  record is 'idle'.
 	 */
 
-	void cacheExpireChannelData(); 
+	void cacheExpireBans();
 
+	/*
+	 *  Expire idle Level records.
+	 */
+
+	void cacheExpireLevels();
+ 
 	/*
 	 * Process any pending reop requests by the bot.
 	 */
