@@ -1,5 +1,5 @@
 # Default paths (system-wide installs)
-# $Id: Makefile.in,v 1.2 2000/07/09 18:08:11 dan_karrels Exp $
+# $Id: Makefile.in,v 1.3 2000/07/10 22:41:29 dan_karrels Exp $
 #
 
 # Standard defines
@@ -44,7 +44,9 @@ MFLAGS ='CXX=$(CXX)'					\
 
 MAKE2 = $(MAKE) $(MFLAGS)
 
-SRCS = Channel.cc \
+SRCS = ccontrol.cc \
+	CControlCommands.cc \
+	Channel.cc \
 	ChannelUser.cc \
 	client.cc \
 	cloner.cc \
@@ -66,7 +68,7 @@ make: all
 .SUFFIXES: .o .cc
 
 .cc.o:
-	$(MOD_CXX) $(CXXFLAGS) -c $< -o $@
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 gnuworld: $(OBJS)
 	$(CXX) $(CXXFLAGS) -o $(BIN_PATH)/GNUWorld $(OBJS) $(LIBS)

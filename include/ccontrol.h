@@ -3,7 +3,7 @@
  */
 
 #ifndef __CCONTROL_H
-#define __CCONTROL_H "$Id: ccontrol.h,v 1.1 2000/07/05 19:07:34 dan_karrels Exp $"
+#define __CCONTROL_H "$Id: ccontrol.h,v 1.3 2000/07/10 22:41:29 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
