@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------------
--- "$Id: cservice.sql,v 1.20 2001/01/28 18:55:01 gte Exp $"
+-- "$Id: cservice.sql,v 1.21 2001/02/14 19:12:31 gte Exp $"
 -- Channel service DB SQL file for PostgreSQL.
 
 -- ChangeLog:
@@ -196,6 +196,11 @@ CREATE INDEX levels_access_idx ON levels( access ) ;
 CREATE TABLE channellog (
 	ts INT4,
 	channelID INT4 CONSTRAINT channel_log_ref REFERENCES channels ( id ),
+	event INT2 DEFAULT '0',
+	-- Defines the message event type, so we can filter nice reports.
+-- 0x00 01 -- EV_MISC - Uncategorised event.
+-- 0x00 02 -- EV_JOIN - When someone 'JOIN's the bot.
+-- 0x00 04 -- EV_PART - When someone 'PART's the bot. 
 	message TEXT,
 	last_updated INT4 NOT NULL,
 	deleted INT2 DEFAULT '0'
