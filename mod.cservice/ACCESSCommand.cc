@@ -9,7 +9,7 @@
  * Displays all "Level" records for a specified channel.
  * Can optionally narrow down selection using a number of switches. 
  *
- * $Id: ACCESSCommand.cc,v 1.32 2001/02/20 15:37:21 dan_karrels Exp $
+ * $Id: ACCESSCommand.cc,v 1.33 2001/02/20 23:00:08 plexus Exp $
  */
 
 #include	<string>
@@ -22,7 +22,7 @@
 #include	"responses.h"
 #define MAX_RESULTS 15
  
-const char ACCESSCommand_cc_rcsId[] = "$Id: ACCESSCommand.cc,v 1.32 2001/02/20 15:37:21 dan_karrels Exp $" ;
+const char ACCESSCommand_cc_rcsId[] = "$Id: ACCESSCommand.cc,v 1.33 2001/02/20 23:00:08 plexus Exp $" ;
 
 namespace gnuworld
 {
@@ -245,7 +245,6 @@ if( PGRES_TUPLES_OK == status )
 		/* Does the username match the query? */ 
 		if (match(matchString, bot->SQLDb->GetValue(i, 1)) == 0)
 		{
-			results++;			
 			flag = atoi(bot->SQLDb->GetValue(i, 3));
 			duration = atoi(bot->SQLDb->GetValue(i, 4));
 			suspend_expires = atoi(bot->SQLDb->GetValue(i, 5));
@@ -270,6 +269,8 @@ if( PGRES_TUPLES_OK == status )
 					if(!aOp && (flag & sqlLevel::F_AUTOOP)) continue; 
 					}
 				}
+
+			results++;			
 				
 			bot->Notice(theClient,
 				bot->getResponse(theUser,
