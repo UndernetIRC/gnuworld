@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------------
--- "$Id: cservice.web.sql,v 1.32 2003/10/26 11:22:28 nighty Exp $"
+-- "$Id: cservice.web.sql,v 1.33 2004/03/08 01:43:34 nighty Exp $"
 -- Channel service DB SQL file for PostgreSQL.
 --
 -- Tables specific to website
@@ -262,3 +262,13 @@ CREATE TABLE complaints_reference (
 );
 
 CREATE INDEX complaints_ref_ref ON complaints_reference(complaints_ref,referenced_to);
+
+
+CREATE TABLE default_msgs (
+	id	SERIAL,
+	type	int4 NOT NULL,
+	label	varchar(255) NOT NULL,
+	content	text NOT NULL
+);
+
+CREATE INDEX default_msgs_idx ON default_msgs(type);
