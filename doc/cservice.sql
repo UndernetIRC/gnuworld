@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------------
--- "$Id: cservice.sql,v 1.62 2002/03/07 12:09:56 nighty Exp $"
+-- "$Id: cservice.sql,v 1.63 2002/03/07 12:28:33 nighty Exp $"
 -- Channel service DB SQL file for PostgreSQL.
 
 -- ChangeLog:
@@ -259,6 +259,12 @@ CREATE TABLE channellog (
 -- 10 -- EV_REMOVEALL - When REMOVEALL command is used.
 -- 11 -- EV_IDLE - When a channel is idle for > 48 hours.
 -- 12 -- EV_MGRCHANGE - When a channel switched managers either temporarily or permanently
+-- 13 -- EV_ADMREJECT - When an application gets manually rejected by an admin on the web
+-- 14 -- EV_WITHDRAW - When an application gets cancelled by its applicant on the web
+-- 15 -- EV_NEWAPP - When a new application is posted by a user on the web
+-- 16 -- EV_NONSUPPORT - When an application gets rejected due to NON-SUPPORT from one of the supporters on the web
+-- 17 -- EV_ADMREVIEW - When an admins "Review" an application
+-- 18 -- EV_CLRREVIEW - When a Reviewed application get its "Reviewed" flag cleared by an admin.
 	message TEXT,
 	last_updated INT4 NOT NULL,
 	deleted INT2 DEFAULT '0'
