@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: nickserv.cc,v 1.23 2003/12/29 23:59:38 dan_karrels Exp $
+ * $Id: nickserv.cc,v 1.24 2004/01/07 17:03:14 dan_karrels Exp $
  */
 
 #include	<sstream>
@@ -31,7 +31,7 @@
 #include "netData.h"
 #include "nickserv.h"
 
-RCSTAG("$Id: nickserv.cc,v 1.23 2003/12/29 23:59:38 dan_karrels Exp $");
+RCSTAG("$Id: nickserv.cc,v 1.24 2004/01/07 17:03:14 dan_karrels Exp $");
 
 namespace gnuworld
 {
@@ -631,7 +631,7 @@ return false;
 sqlUser* nickserv::isAuthed(iClient* theClient)
 {
 netData* theData = static_cast< netData* >( theClient->getCustomData(this) );
-return theData->authedUser;
+return (theData ? theData->authedUser : 0) ;
 }
 
 
