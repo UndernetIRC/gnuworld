@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server.cc,v 1.194 2004/01/08 18:32:37 dan_karrels Exp $
+ * $Id: server.cc,v 1.195 2004/01/25 14:35:32 dan_karrels Exp $
  */
 
 #include	<sys/time.h>
@@ -71,7 +71,7 @@
 #include	"ConnectionHandler.h"
 #include	"Connection.h"
 
-RCSTAG( "$Id: server.cc,v 1.194 2004/01/08 18:32:37 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: server.cc,v 1.195 2004/01/25 14:35:32 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -592,6 +592,7 @@ elog	<< "xServer::OnConnectFail> Failed to establish connection "
 	<< theConn->getRemotePort()
 	<< endl ;
 
+serverConnection = 0 ;
 keepRunning = false ;
 }
 

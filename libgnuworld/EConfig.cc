@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: EConfig.cc,v 1.7 2004/01/21 19:42:07 dan_karrels Exp $
+ * $Id: EConfig.cc,v 1.8 2004/01/25 14:35:31 dan_karrels Exp $
  */
 
 #include	<unistd.h> // unlink()
@@ -38,7 +38,7 @@
 #include	"ELog.h"
 #include	"misc.h"
 
-const char rcsId[] = "$Id: EConfig.cc,v 1.7 2004/01/21 19:42:07 dan_karrels Exp $" ;
+const char rcsId[] = "$Id: EConfig.cc,v 1.8 2004/01/25 14:35:31 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -117,7 +117,7 @@ if( ptr == valueMap.end() )
 		<< "for key \""
 		<< key << "\""
 		<< endl ;
-	setError() ;
+	::exit( 0 ) ;
 	}
 
 // At least one key/value pair for this key exists; return it

@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: Network.h,v 1.39 2004/01/06 23:22:42 dan_karrels Exp $
+ * $Id: Network.h,v 1.40 2004/01/25 14:35:31 dan_karrels Exp $
  */
 
 #ifndef __NETWORK_H
-#define __NETWORK_H "$Id: Network.h,v 1.39 2004/01/06 23:22:42 dan_karrels Exp $"
+#define __NETWORK_H "$Id: Network.h,v 1.40 2004/01/25 14:35:31 dan_karrels Exp $"
 
 #include	<vector>
 #include	<string>
@@ -794,6 +794,7 @@ public:
 	 */
 	virtual std::list< const iClient* > matchRealHost(
 			const std::string& wildHost ) const ;
+
 	/**
 	 * Match the given user@host string, which may include
 	 * wildcards, to each client on the network.  Return a
