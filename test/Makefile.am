@@ -1,12 +1,13 @@
 ## Process this file with automake to produce Makefile.in
-## $Id: Makefile.am,v 1.8 2003/06/08 20:06:43 dan_karrels Exp $
+## $Id: Makefile.am,v 1.9 2003/06/11 11:29:03 dan_karrels Exp $
 
 noinst_PROGRAMS = test_stringtokenizer \
 	test_econfig \
 	test_gThread \
 	test_signal \
 	test_match \
-	test_bot
+	test_bot \
+	test_kick_transaction
 LDADD = $(glibdir)/libgnuworld.la
 
 test_stringtokenizer_SOURCES = stringtokenizer.cc
@@ -28,4 +29,7 @@ test_match_DEPENDENCIES = $(glibdir)/libgnuworld.la
 
 test_bot_SOURCES = testbot.cc
 test_bot_DEPENDENCIES = $(glibdir)/libgnuworld.la
+
+test_kick_transaction_SOURCES = test_kick_transaction.cc
+test_kick_transaction_DEPENDENCIES = $(glibdir)/libgnuworld.la
 

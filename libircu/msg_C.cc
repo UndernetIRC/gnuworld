@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_C.cc,v 1.1 2002/11/20 22:16:18 dan_karrels Exp $
+ * $Id: msg_C.cc,v 1.2 2003/06/11 11:28:58 dan_karrels Exp $
  */
 
 #include	<new>
@@ -45,7 +45,7 @@ const char xparameters_h_rcsId[] = __XPARAMETERS_H ;
 const char iClient_h_rcsId[] = __ICLIENT_H ;
 const char Channel_h_rcsId[] = __CHANNEL_H ;
 const char ChannelUser_h_rcsId[] = __CHANNELUSER_H ;
-const char msg_C_cc_rcsId[] = "$Id: msg_C.cc,v 1.1 2002/11/20 22:16:18 dan_karrels Exp $" ;
+const char msg_C_cc_rcsId[] = "$Id: msg_C.cc,v 1.2 2003/06/11 11:28:58 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -148,6 +148,8 @@ for( StringTokenizer::const_iterator ptr = st.begin() ; ptr != st.end() ;
 			{
 			// This user<->channel association already
 			// exists.  This not good, but no harm done.
+			// Could be a zombie
+			theChan->findUser( theClient )->removeZombie() ;
 			}
 		else
 			{

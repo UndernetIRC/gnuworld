@@ -149,7 +149,8 @@ noinst_PROGRAMS = test_stringtokenizer \
 	test_gThread \
 	test_signal \
 	test_match \
-	test_bot
+	test_bot \
+	test_kick_transaction
 
 LDADD = $(glibdir)/libgnuworld.la
 
@@ -172,6 +173,9 @@ test_match_DEPENDENCIES = $(glibdir)/libgnuworld.la
 
 test_bot_SOURCES = testbot.cc
 test_bot_DEPENDENCIES = $(glibdir)/libgnuworld.la
+
+test_kick_transaction_SOURCES = test_kick_transaction.cc
+test_kick_transaction_DEPENDENCIES = $(glibdir)/libgnuworld.la
 subdir = test
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
@@ -179,7 +183,7 @@ CONFIG_HEADER = $(top_builddir)/include/defs.h
 CONFIG_CLEAN_FILES =
 noinst_PROGRAMS = test_stringtokenizer$(EXEEXT) test_econfig$(EXEEXT) \
 	test_gThread$(EXEEXT) test_signal$(EXEEXT) test_match$(EXEEXT) \
-	test_bot$(EXEEXT)
+	test_bot$(EXEEXT) test_kick_transaction$(EXEEXT)
 PROGRAMS = $(noinst_PROGRAMS)
 
 am_test_bot_OBJECTS = testbot.$(OBJEXT)
@@ -193,6 +197,10 @@ test_econfig_LDFLAGS =
 am_test_gThread_OBJECTS = gThread.$(OBJEXT)
 test_gThread_OBJECTS = $(am_test_gThread_OBJECTS)
 test_gThread_LDADD = $(LDADD)
+am_test_kick_transaction_OBJECTS = test_kick_transaction.$(OBJEXT)
+test_kick_transaction_OBJECTS = $(am_test_kick_transaction_OBJECTS)
+test_kick_transaction_LDADD = $(LDADD)
+test_kick_transaction_LDFLAGS =
 am_test_match_OBJECTS = match.$(OBJEXT)
 test_match_OBJECTS = $(am_test_match_OBJECTS)
 test_match_LDADD = $(LDADD)
@@ -211,6 +219,7 @@ am__depfiles_maybe = depfiles
 @AMDEP_TRUE@DEP_FILES = ./$(DEPDIR)/econfig.Po ./$(DEPDIR)/gThread.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/match.Po ./$(DEPDIR)/signal.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/stringtokenizer.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/test_kick_transaction.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/testbot.Po
 CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
@@ -221,10 +230,11 @@ CXXLD = $(CXX)
 CXXLINK = $(LIBTOOL) --mode=link $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) \
 	$(AM_LDFLAGS) $(LDFLAGS) -o $@
 DIST_SOURCES = $(test_bot_SOURCES) $(test_econfig_SOURCES) \
-	$(test_gThread_SOURCES) $(test_match_SOURCES) \
-	$(test_signal_SOURCES) $(test_stringtokenizer_SOURCES)
+	$(test_gThread_SOURCES) $(test_kick_transaction_SOURCES) \
+	$(test_match_SOURCES) $(test_signal_SOURCES) \
+	$(test_stringtokenizer_SOURCES)
 DIST_COMMON = Makefile.am Makefile.in
-SOURCES = $(test_bot_SOURCES) $(test_econfig_SOURCES) $(test_gThread_SOURCES) $(test_match_SOURCES) $(test_signal_SOURCES) $(test_stringtokenizer_SOURCES)
+SOURCES = $(test_bot_SOURCES) $(test_econfig_SOURCES) $(test_gThread_SOURCES) $(test_kick_transaction_SOURCES) $(test_match_SOURCES) $(test_signal_SOURCES) $(test_stringtokenizer_SOURCES)
 
 all: all-am
 
@@ -251,6 +261,9 @@ test_econfig$(EXEEXT): $(test_econfig_OBJECTS) $(test_econfig_DEPENDENCIES)
 test_gThread$(EXEEXT): $(test_gThread_OBJECTS) $(test_gThread_DEPENDENCIES) 
 	@rm -f test_gThread$(EXEEXT)
 	$(CXXLINK) $(test_gThread_LDFLAGS) $(test_gThread_OBJECTS) $(test_gThread_LDADD) $(LIBS)
+test_kick_transaction$(EXEEXT): $(test_kick_transaction_OBJECTS) $(test_kick_transaction_DEPENDENCIES) 
+	@rm -f test_kick_transaction$(EXEEXT)
+	$(CXXLINK) $(test_kick_transaction_LDFLAGS) $(test_kick_transaction_OBJECTS) $(test_kick_transaction_LDADD) $(LIBS)
 test_match$(EXEEXT): $(test_match_OBJECTS) $(test_match_DEPENDENCIES) 
 	@rm -f test_match$(EXEEXT)
 	$(CXXLINK) $(test_match_LDFLAGS) $(test_match_OBJECTS) $(test_match_LDADD) $(LIBS)
@@ -272,6 +285,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/match.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/signal.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/stringtokenizer.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_kick_transaction.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/testbot.Po@am__quote@
 
 distclean-depend:
