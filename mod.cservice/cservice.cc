@@ -91,8 +91,12 @@ if (SQLDb->ExecCommandOk("LISTEN channels_u; LISTEN users_u; LISTEN levels_u;"))
 		<< "LISTEN event for Db updates."
 		<< endl;
 
+	// Start the Db checker timer rolling.
+	time_t theTime = time(NULL) + connectCheckFreq;
+	dBconnection_timerID = theServer->RegisterTimer(theTime, this, NULL);
+
 	// Start the Db update/Reop timer rolling.
-	time_t theTime = time(NULL) + updateInterval;
+	theTime = time(NULL) + updateInterval;
 	update_timerID = theServer->RegisterTimer(theTime, this, NULL);
 
 	// Start the ban suspend/expire timer rolling.
@@ -212,16 +216,17 @@ RegisterCommand(new REHASHCommand(this, "REHASH", "[translations]", 5));
 cserviceConfig = new (nothrow) EConfig( args ) ;
 assert( cserviceConfig != 0 ) ;
 
-string sqlHost = cserviceConfig->Require( "sql_host" )->second;
-string sqlDb = cserviceConfig->Require( "sql_db" )->second;
-string sqlPort = cserviceConfig->Require( "sql_port" )->second;
+confSqlHost = cserviceConfig->Require( "sql_host" )->second;
+confSqlDb = cserviceConfig->Require( "sql_db" )->second;
+confSqlPort = cserviceConfig->Require( "sql_port" )->second;
+confSqlUser = cserviceConfig->Require( "sql_user" )->second;
 
-string Query = "host=" + sqlHost + " dbname=" + sqlDb + " port=" + sqlPort;
+string Query = "host=" + confSqlHost + " dbname=" + confSqlDb + " port=" + confSqlPort + " user=" + confSqlUser;
 
 elog	<< "cmaster::cmaster> Attempting to connect to "
-	<< sqlHost
+	<< confSqlHost
 	<< "; Database: "
-	<< sqlDb
+	<< confSqlDb
 	<< endl;
  
 SQLDb = new (nothrow) cmDatabase( Query.c_str() ) ;
@@ -257,7 +262,9 @@ output_flood = atoi((cserviceConfig->Require( "output_flood" )->second).c_str())
 flood_duration = atoi((cserviceConfig->Require( "flood_duration" )->second).c_str());
 topic_duration = atoi((cserviceConfig->Require( "topic_duration" )->second).c_str());
 pendingChanPeriod = atoi((cserviceConfig->Require( "pending_duration" )->second).c_str());
-
+connectCheckFreq = atoi((cserviceConfig->Require( "connection_check_frequency" )->second).c_str());
+connectRetry = atoi((cserviceConfig->Require( "connection_retry_total" )->second).c_str());
+ 
 userHits = 0;
 userCacheHits = 0;
 channelHits = 0;
@@ -268,6 +275,7 @@ banHits = 0;
 banCacheHits = 0; 
 dbErrors = 0;
 joinCount = 0;
+connectRetries = 0;
 
 // Load our translation tables.
 loadTranslationTable(); 
@@ -1825,11 +1833,15 @@ void cservice::processDBUpdates()
 {
 PGnotify* notify = SQLDb->Notifies();
 
-/* 'We get signal..' */ 
+/*
+ *  Check to see if the PGSQL connection is broken..
+ */
+ 
+/* 'We get signal..' */
 if (!notify)
 	{
 	return;
-	}
+	} 
 
 #ifdef LOG_DEBUG
 	elog	<< "cmaster::OnTimer> Recieved a notification event for '"
@@ -2039,15 +2051,23 @@ switch(updateType)
 int cservice::OnTimer(xServer::timerID timer_id, void*)
 {
 
+if (timer_id == dBconnection_timerID)
+	{ 
+	checkDbConnectionStatus();
+	performReops();
+
+	/* Refresh Timers */
+	time_t theTime = time(NULL) + connectCheckFreq;
+	dBconnection_timerID = MyUplink->RegisterTimer(theTime, this, NULL);
+	}
+ 
 if (timer_id ==  update_timerID)
 	{ 
-	performReops();
 	processDBUpdates();
 
-	/* Refresh Timers */			
+	/* Refresh Timer */
 	time_t theTime = time(NULL) + updateInterval;
 	update_timerID = MyUplink->RegisterTimer(theTime, this, NULL); 
-
 	}
 
 if (timer_id == expire_timerID)
@@ -2056,10 +2076,9 @@ if (timer_id == expire_timerID)
 	expireSuspends();
 	expireSilence();
 
-	/* Refresh Timers */
+	/* Refresh Timer */
 	time_t theTime = time(NULL) + expireInterval;
-	expire_timerID = MyUplink->RegisterTimer(theTime, this, NULL);
-
+	expire_timerID = MyUplink->RegisterTimer(theTime, this, NULL); 
 	} 
 
 if (timer_id == cache_timerID)
@@ -2067,17 +2086,17 @@ if (timer_id == cache_timerID)
 	cacheExpireUsers(); 
 	cacheExpireLevels();
 
-	/* Refresh Timers */
+	/* Refresh Timer */
 	time_t theTime = time(NULL) + cacheInterval;
-	cache_timerID = MyUplink->RegisterTimer(theTime, this, NULL);
-
+	cache_timerID = MyUplink->RegisterTimer(theTime, this, NULL); 
 	} 
 
 if (timer_id == pending_timerID)
 	{ 
 	/* 
-	 * Load the list of pending channels. 
+	 * Load the list of pending channels and calculate/save some stats.
 	 */
+
 	loadPendingChannelList(); 
  
 	/*
@@ -2085,24 +2104,42 @@ if (timer_id == pending_timerID)
 	 * a notice. 
 	 */
 
-/*
-	pendingChannelListType::iterator ptr = pendingChannelList.begin();
-	
-	while (ptr != pendingChannelList.end())
+	strstream theQuery;
+	theQuery	<<  "SELECT channels.name,channels.id"
+				<< " FROM pending,channels" 
+				<< " WHERE channels.id = pending.channel_id"
+				<< " AND pending.status = 2;"
+				<< ends;
+
+#ifdef LOG_SQL
+		elog	<< "cmaster::loadPendingChannelList> "
+			<< theQuery.str()
+			<< endl; 
+#endif
+
+	ExecStatusType status = SQLDb->Exec(theQuery.str()) ;
+	delete[] theQuery.str() ;
+
+	if( PGRES_TUPLES_OK == status )
 		{
-		sqlPendingChannel* pendingChan = ptr->second;
-		Channel* tmpChan = Network->findChannel(ptr->first);
-		if (tmpChan)
-			{
-			serverNotice(tmpChan, "This channel is currently being processed for registration.");
-			serverNotice(tmpChan, "If you wish to view the details of the application to or to object, please visit:");
-			serverNotice(tmpChan, "http://www.cservice.undernet.org/pendingchannel.php?id=%i", pendingChan->channel_id);
+		for (int i = 0 ; i < SQLDb->Tuples(); i++)
+			{ 
+			string channelName = SQLDb->GetValue(i,0);
+			unsigned int channel_id = atoi(SQLDb->GetValue(i, 1));
+			Channel* tmpChan = Network->findChannel(channelName);
+ 
+			if (tmpChan)
+				{
+				serverNotice(tmpChan, "This channel is currently being processed for registration.");
+				serverNotice(tmpChan, "If you wish to view the details of the application to or to object, please visit:");
+				serverNotice(tmpChan, "http://www.cservice.undernet.org/pendingchannel.php?id=%i", channel_id);
+				} 
 			}
-		++ptr; 
 		}
 	
-*/
-	/* Refresh Timers */
+
+	/* Refresh Timer */
+
 	time_t theTime = time(NULL) +pendingChanPeriod;
 	pending_timerID = MyUplink->RegisterTimer(theTime, this, NULL);
 	}
@@ -3431,6 +3468,50 @@ if( PGRES_TUPLES_OK == status )
 		++ptr;
 		};
 
+}
+
+void cservice::checkDbConnectionStatus()
+{ 
+	if(SQLDb->Status() == CONNECTION_BAD)
+	{
+		logAdminMessage("\002WARNING:\002 Backend database connection has been lost, attempting to reconnect."); 
+		elog	<< "cmaster::cmaster> Attempting to reconnect to database." << endl; 
+	
+		/* Remove the old database connection object. */ 
+		delete(SQLDb);
+	
+		string Query = "host=" + confSqlHost + " dbname=" + confSqlDb + " port=" + confSqlPort + " user=" + confSqlUser; 
+	
+		SQLDb = new (nothrow) cmDatabase( Query.c_str() ) ;
+	
+		assert( SQLDb != 0 ) ;
+	 
+		if (SQLDb->ConnectionBad())
+		{
+			elog	<< "cmaster::cmaster> Unable to connect to SQL server."
+					<< endl 
+					<< "cmaster::cmaster> PostgreSQL error message: "
+					<< SQLDb->ErrorMessage()
+					<< endl ;
+	
+			connectRetries++;
+			if (connectRetries >= 6) 
+			{
+				logAdminMessage("Unable to contact database after 6 attempts, shutting down.");
+				MyUplink->flushBuffer();
+				::exit(0);
+			} else
+			{
+				logAdminMessage("Connection failed, retrying:");
+			}
+			
+			
+		} else
+		{
+				logAdminMessage("Successfully reconnected to database server. Panic over ;)");
+		}
+	}
+ 
 }
  
 void Command::Usage( iClient* theClient )

@@ -10,7 +10,7 @@
 #include	"Network.h"
 #include	"cservice_config.h"
  
-const char STATUSCommand_cc_rcsId[] = "$Id: STATUSCommand.cc,v 1.28 2001/06/10 17:36:57 gte Exp $" ;
+const char STATUSCommand_cc_rcsId[] = "$Id: STATUSCommand.cc,v 1.29 2001/06/17 20:36:21 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -177,7 +177,7 @@ if ((level < level::status) && (admLevel <= 0) && !theClient->isOper())
 /*
  *  Display some fancy info about the channel. 
  */
-Channel* tmpChan = Network->findChannel(theChan->getName()); 
+Channel* tmpChan = Network->findChannel(theChan->getName());
 
 if (tmpChan)
 	{
@@ -196,6 +196,18 @@ if (tmpChan)
 				language::status_mode,
 				string("Mode is: %s")).c_str(),
 			tmpChan->getModeString().c_str() ) ;
+		}
+ 
+	/*
+	 * Are we on this channel?
+	 */
+
+	if (!theChan->getInChan())
+		{
+			bot->Notice(theClient, "I'm \002not\002 in this channel.");
+		} else
+		{
+			bot->Notice(theClient, "I'm currently in this channel.");
 		}
 
 	if (admLevel >= 1)
@@ -285,6 +297,11 @@ if (tmpChan)
 
 		} // Admin access.
 	} // if( tmpChan )
+	else
+	{
+		bot->Notice(theClient, "I'm \002not\002 in this channel.");
+	}
+
 
 bot->Notice(theClient, "MassDeopPro: %i, FloodPro: %i", 
 	theChan->getMassDeopPro(),

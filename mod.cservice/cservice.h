@@ -1,5 +1,5 @@
 #ifndef __CSERVICE_H
-#define __CSERVICE_H "$Id: cservice.h,v 1.65 2001/05/11 16:39:13 gte Exp $"
+#define __CSERVICE_H "$Id: cservice.h,v 1.66 2001/06/17 20:36:21 gte Exp $"
 
 #include	<string>
 #include	<vector>
@@ -59,7 +59,15 @@ protected:
 
 public:
 
-	cmDatabase* SQLDb; /* PostgreSQL Database */
+	cmDatabase* SQLDb; /* PostgreSQL Database */ 
+	string confSqlHost;
+	string confSqlDb;
+	string confSqlPort;
+	string confSqlUser;
+	short connectRetries;
+	unsigned int connectCheckFreq;
+	unsigned int connectRetry;
+	void checkDbConnectionStatus();
 
 	cservice(const string& args);
 	virtual ~cservice();
@@ -90,7 +98,7 @@ public:
 	virtual int OnWhois( iClient* sourceClient,
 			iClient* targetClient ); 
 
-	// Sends a notice to a channel from the server.
+	/* Sends a notice to a channel from the server. */
 	bool serverNotice( Channel*, const char*, ... );
 	bool serverNotice( Channel*, const string& );
 
@@ -262,16 +270,19 @@ public:
 	time_t lastLevelRefresh;
 	time_t lastBanRefresh;
 
-	/* TimerID we recieve every second (eg: Reop, DB update). */
+	/* TimerID for checking on the database connection. */
+	xServer::timerID dBconnection_timerID;
+
+	/* TimerID we recieve for checking for changes in the Db. */
 	xServer::timerID update_timerID;
 
 	/* TimerID we recieve every XX seconds for expiration of bans/suspend. */
 	xServer::timerID expire_timerID; 
  
-	/* TimerID we recieve every XX hours for expiration of cached entries */
+	/* TimerID we recieve every XX hours for expiration of cached entries. */
 	xServer::timerID cache_timerID; 
 
-	/* TimerID we recieve every XX hours for the notification of pending channels */
+	/* TimerID we recieve every XX hours for the notification of pending channels. */
 	xServer::timerID pending_timerID; 
 
 	// Language definitions table (Loaded from Db).

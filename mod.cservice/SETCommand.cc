@@ -18,7 +18,7 @@
  *
  * Caveats: None.
  *
- * $Id: SETCommand.cc,v 1.38 2001/06/12 22:13:46 gte Exp $
+ * $Id: SETCommand.cc,v 1.39 2001/06/17 20:36:21 gte Exp $
  */
 
 #include	<string>
@@ -29,7 +29,7 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char SETCommand_cc_rcsId[] = "$Id: SETCommand.cc,v 1.38 2001/06/12 22:13:46 gte Exp $" ;
+const char SETCommand_cc_rcsId[] = "$Id: SETCommand.cc,v 1.39 2001/06/17 20:36:21 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -458,71 +458,7 @@ if(option == "NOREG")
 			theChan->getFlag(sqlChannel::F_NOOP) ? "ON" : "OFF");
 	    return true;
 	}
-
-/*	if(option == "ALWAYSOP")
-	{
-	    if(level < level::set::alwaysop)
-	    {
-			bot->Notice(theClient,
-				bot->getResponse(theUser,
-					language::insuf_access,
-					string("You do not have enough access!")));
-		return true;
-	    }
-	    if(value == "ON") theChan->setFlag(sqlChannel::F_ALWAYSOP);
-	    else if(value == "OFF") theChan->removeFlag(sqlChannel::F_ALWAYSOP);
-	    else
-	    {
-		bot->Notice(theClient, 
-			bot->getResponse(theUser,
-				language::set_cmd_syntax_on_off,
-				string("value of %s must be ON or OFF")).c_str(),
-			option.c_str());
-		return true;
-	    }
-	    theChan->commit(); 
-	    bot->Notice(theClient, 
-			bot->getResponse(theUser,
-				language::set_cmd_status,
-				string("%s for %s is %s")).c_str(),
-			option.c_str(),
-			theChan->getName().c_str(),
-			theChan->getFlag(sqlChannel::F_ALWAYSOP) ? "ON" : "OFF");
-	    return true;
-	}
-*/
-	if(option == "OPONLY")
-	{
-	    if(level < level::set::oponly)
-	    {
-		bot->Notice(theClient,
-			bot->getResponse(theUser,
-			language::insuf_access,
-			string("You do not have enough access!")));
-		return true;
-	    }
-	    if(value == "ON") theChan->setFlag(sqlChannel::F_OPONLY);
-	    else if(value == "OFF") theChan->removeFlag(sqlChannel::F_OPONLY);
-	    else
-	    {
-		bot->Notice(theClient, 
-			bot->getResponse(theUser,
-				language::set_cmd_syntax_on_off,
-				string("value of %s must be ON or OFF")).c_str(),
-			option.c_str());
-		return true;
-	    }
-	    theChan->commit(); 
-	    bot->Notice(theClient, 
-			bot->getResponse(theUser,
-				language::set_cmd_status,
-				string("%s for %s is %s")).c_str(),
-			option.c_str(),
-			theChan->getName().c_str(),
-			theChan->getFlag(sqlChannel::F_OPONLY) ? "ON" : "OFF");
-	    return true;
-	}
-
+ 
 	if(option == "STRICTOP")
 	{
 	    if(level < level::set::strictop)
