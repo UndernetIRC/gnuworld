@@ -43,7 +43,7 @@
 #include	"moduleLoader.h"
 
 const char xServer_h_rcsId[] = __XSERVER_H ;
-const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.40 2001/01/06 15:46:31 dan_karrels Exp $" ;
+const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.41 2001/01/07 22:59:32 dan_karrels Exp $" ;
 
 using std::string ;
 using std::vector ;
@@ -56,6 +56,9 @@ using std::unary_function ;
 
 namespace gnuworld
 {
+
+int xServer::whichSig = 0 ;
+bool xServer::caughtSignal = false ;
 
 // Allocate the static std::string in xServer representing
 // all channels.
@@ -76,18 +79,14 @@ theClient->OnSignal( whichSig ) ;
 int     whichSig ;
 } ;
 
-/**
- * Instantiate a new xServer.  There is only one global
- * instance of this class.  The name of the server
- * configuration file is passed as argument.
- */
-xServer::xServer( const string& fileName )
- : eventList( EVT_NOOP )
+void xServer::initializeSystem()
 {
+initializeVariables() ;
 
-if( !readConfigFile( fileName ) )
+if( !readConfigFile( configFileName ) )
 	{
-	elog	<< "Error reading config file: " << fileName << endl ;
+	elog	<< "Error reading config file: "
+		<< configFileName << endl ;
 	::exit( 0 ) ;
 	}
 
@@ -99,23 +98,6 @@ elog << "Port: " << Port << endl ;
 elog << "Server Name: " << ServerName << endl ;
 elog << "Server Description: " << ServerDescription << endl ;
 
-// Initialize more variables
-bursting = false ;
-_connected = false ;
-StartTime = ::time( NULL ) ;
-
-burstStart = burstEnd = 0 ;
-maxLoopCount = MAXLOOPCOUNT_DEFAULT ;
-Uplink = NULL ;
-theSock = NULL ;
-Message = SRV_SUCCESS ;
-outputWriteSize = inputReadSize = 0 ;
-lastTimerID = 1 ;
-
-// Initialize the numeric stuff.
-::memset( charYY, 0, sizeof( charYY ) ) ;
-::memset( charXXX, 0, sizeof( charXXX ) ) ;
-
 inttobase64( charYY, intYY, 2 ) ;
 inttobase64( charXXX, intXXX, 3 ) ;
 
@@ -123,6 +105,61 @@ elog << "xServer::charYY> " << charYY << endl ;
 elog << "xServer::charXXX> " << charXXX << endl ;
 elog << "xServer::intYY> " << intYY << endl ;
 elog << "xServer::intXXX> " << intXXX << endl ;
+
+loadCommandHandlers() ;
+
+if( !loadModules( configFileName ) )
+	{
+	elog	<< "xServer> Failed in loading one or more modules\n" ;
+	::exit( 0 ) ;
+	}
+}
+
+/**
+ * Deallocate this xServer instance.
+ */
+xServer::~xServer()
+{
+// TODO: Delete all clients
+// TODO: Delete all commands in command map
+delete commandMap ;
+
+// Deallocate all of the Glines
+for( glineListType::iterator ptr = glineList.begin() ; ptr != glineList.end() ;
+	++ptr )
+	{
+	delete *ptr ;
+	}
+glineList.clear() ;
+
+// Deallocate all loaded modules/close dlm handles.
+for( moduleListType::iterator ptr = moduleList.begin() ;
+	ptr != moduleList.end() ; ++ptr )
+	{
+	delete *ptr ;
+	}
+moduleList.clear() ;
+
+while( !timerQueue.empty() )
+	{
+	delete timerQueue.top().second ;
+	timerQueue.pop() ;
+	}
+
+#ifdef EDEBUG
+	elog.closeFile()  ;
+#endif
+
+#ifdef LOG_SOCKET
+	socketFile.close() ;
+#endif
+
+delete[] inputCharBuffer ; inputCharBuffer = 0 ;
+
+} // ~xServer()
+
+void xServer::loadCommandHandlers()
+{
 
 // Allocate the command map
 try
@@ -268,46 +305,31 @@ REGISTER_MSG( "441", NOOP ) ;
 
 // DESYNCH
 REGISTER_MSG( "DESYNCH", Desynch ) ;
-
-if( !loadModules( fileName ) )
-	{
-	elog	<< "xServer> Failed in loading one or more modules\n" ;
-	::exit( 0 ) ;
-	}
 }
 
-/**
- * Deallocate this xServer instance.
- */
-xServer::~xServer()
+void xServer::initializeVariables()
 {
-// TODO: Delete all clients
-// TODO: Delete all commands in command map
-delete commandMap ;
+maxLoopCount = MAXLOOPCOUNT_DEFAULT ;
 
-// Deallocate all of the Glines
-for( glineListType::iterator ptr = glineList.begin() ; ptr != glineList.end() ;
-	++ptr )
-	{
-	delete *ptr ;
-	}
-glineList.clear() ;
+// Initialize more variables
+bursting = false ;
+_connected = false ;
+StartTime = ::time( NULL ) ;
 
+inputCharBuffer = 0 ;
+caughtSignal = false ;
+whichSig = 0 ;
+burstStart = burstEnd = 0 ;
+Uplink = NULL ;
+theSock = NULL ;
+Message = SRV_SUCCESS ;
+outputWriteSize = inputReadSize = 0 ;
+lastTimerID = 1 ;
 
-// Deallocate all loaded modules/close dlm handles.
-for( moduleListType::iterator ptr = moduleList.begin() ;
-	ptr != moduleList.end() ; ++ptr )
-	{
-	delete *ptr ;
-	}
-moduleList.clear() ;
-
-while( !timerQueue.empty() )
-	{
-	delete timerQueue.top().second ;
-	timerQueue.pop() ;
-	}
-} // ~xServer()
+// Initialize the numeric stuff.
+::memset( charYY, 0, sizeof( charYY ) ) ;
+::memset( charXXX, 0, sizeof( charXXX ) ) ;
+}
 
 bool xServer::readConfigFile( const string& fileName )
 {
@@ -323,6 +345,11 @@ Password = conf.Require( "password" )->second ;
 Port = atoi( conf.Require( "port" )->second.c_str() ) ;
 intYY = atoi( conf.Require( "numeric" )->second.c_str() ) ;
 intXXX = atoi( conf.Require( "maxclients" )->second.c_str() ) ;
+
+if( conf.Find( "maxloopcount" ) != conf.end() )
+	{
+	maxLoopCount = atoi( conf.Find( "maxloopcount" )->second.c_str() ) ;
+	}
 
 return true ;
 }
@@ -439,6 +466,13 @@ if( static_cast< int >( outputWriteSize ) < 0 )
 	{
 	elog	<< "xServer::Connect> Failed to get output buffer size\n" ;
 	return -1 ;
+	}
+
+inputCharBuffer = new (nothrow) char[ inputReadSize + 1 ] ;
+if( NULL == inputCharBuffer )
+	{
+	elog	<< "xServer::Connect> Memory allocation failure\n" ;
+	::exit( 0 ) ;
 	}
 
 // Notify the curious user of the TCP window sizes.
@@ -1120,75 +1154,73 @@ for( list< xClient* >::iterator ptr = listPtr->begin(), end = listPtr->end() ;
 
 // Attempt a read from the network connection.
 // Returns the number of bytes read or -1 on error.
-int xServer::DoRead()
+void xServer::DoRead()
 {
 
-// Is there a valid connection?
-if( !_connected )
+if( !_connected || (NULL == theSock) )
 	{
-	return -1 ;
+	elog	<< "xServer::DoRead> Not connected, or invalid "
+		<< "socket" << endl ;
+
+	// Make sure the caller knows that there is no
+	// valid connection
+	_connected = false ;
+	return ;
 	}
 
-// See how many bytes are ready to be read without blocking.
-int bytesAvailable = theSock->readable() ;
-if( bytesAvailable < 0 )
-	{
-	// Error on socket
-	elog	<< "xServer::DoRead> Read error: "
-		<< strerror( errno ) << endl ;
-	OnDisConnect() ;
-	return -1 ;
-	}
-else if( 0 == bytesAvailable )
-	{
-	// No data available, no big deal.
-	return 0 ;
-	}
+memset( inputCharBuffer, 0, inputReadSize + 1 ) ;
 
-// Create a string into which to read new data
-char* readBuf = new (nothrow) char[ inputReadSize + 1 ] ;
-if( NULL == readBuf )
-	{
-	elog	<< "xServer::DoRead> Memory allocation failure\n" ;
-	::exit( 0 ) ;
-	}
-
-memset( readBuf, 0, inputReadSize + 1 ) ;
-
-// Attempt to read from the connection
 int bytesRead = theSock->recv(
-	reinterpret_cast< unsigned char* >( readBuf ),
+	reinterpret_cast< unsigned char* >( inputCharBuffer ),
 	inputReadSize ) ;
 
 // Was the read successful?
-if( bytesRead < 0 )
+if( bytesRead <= 0 )
 	{
 	// Read error, the connection is no longer valid
-	OnDisConnect() ;
+	_connected = false ;
 
 	elog	<< "xServer::DoRead> Got a read error: "
 		<< strerror( errno ) << endl ;
-
-	delete[] readBuf ;
-	return bytesRead ;
 	}
-else if( 0 == bytesRead )
+else
 	{
-	delete[] readBuf ;
-	return 0 ;
+	inputBuffer += inputCharBuffer ;
 	}
 
-// The buffer is already null terminated because of the
-// above call to memset()
+}
 
-inputBuffer += readBuf ;
+void xServer::DoWrite()
+{
 
-delete[] readBuf ;
+if( !_connected || (NULL == theSock) )
+	{
+	elog	<< "xServer::DoWrite> Attempt to write, but no "
+		<< "connection!" << endl ;
 
-//elog << "xServer::DoRead> Read " << bytesRead << " bytes\n" ;
+	// Make sure the caller knows that there is no
+	// valid connection
+	_connected = false ;
+	return ;
+	}
 
-// Return the number of bytes read.
-return bytesRead ;
+if( outputBuffer.empty() )
+	{
+	elog	<< "xServer::DoWrite> Output buffer empty"
+		<< endl ;
+	return ;
+	}
+
+int bytesWritten = theSock->send( outputBuffer.toString() ) ;
+
+if( bytesWritten <= 0 )
+	{
+	// Write error
+	_connected = false ;
+	return ;
+	}
+
+outputBuffer.Delete( bytesWritten ) ;
 
 }
 
@@ -1280,7 +1312,7 @@ return ( _connected && theSock &&
  * Make sure buf is sized large enough for any string
  * that may be sent across the network.
  */
-bool xServer::GetString( char* buf, const size_t& size )
+bool xServer::GetString( char* buf )
 {
 
 // Is there a valid connection and data to
@@ -4597,101 +4629,19 @@ switch( whichSig )
 		dumpStats() ;
 		retMe = true ;
 		break ;
+	case SIGHUP:
+		retMe = true ;
+		break ;
 	default:
 		break ;
 	}
 return retMe ;
 }
 
-/*
-void xServer::mainLoop()
+void xServer::run()
 {
-
-timeval tv = { 0, 0 } ;
-fd_set readSet, writeset ;
-time_t now = 0 ;
-int selectRet = -1 ;
-bool setTimer = false ;
-unsigned int cnt = 0 ;
-
-while( keepRunning && isConnected )
-	{
-	setTimer = false ;
-	selectRet = -1 ;
-	cnt = 0 ;
-	now = ::time( 0 ) ;
-
-	FD_ZERO( &readSet ) ;
-	FD_ZERO( &writeSet ) ;
-
-	if( !outputBuffer.empty() )
-		{
-		FD_SET( sockFD, &writeSet ) ;
-		}
-
-	CheckTimers() ;
-
-	if( !timerQueue.empty() )
-		{
-		setTimer = true ;
-		tv.sec = timerQueue.head()->getExpireTime() - now ;
-		}
-	else
-		{
-		setTimer = false ;
-		}
-
-	do
-		{
-		errno = 0 ;
-		selectRet = ::select( sockFD + 1, &readSet, &writeSet,
-			0, setTimer ? &tv : 0 ) ;
-		}
-		while( (EINTR == errno) && (cnt++ < maxLoopCount) ) ;
-
-	if( selectRet < 0 )
-		{
-		// Problem
-		elog	<< "xServer::mainLoop> select() returned error: "
-			<< strerror( errno ) << endl ;
-		continue ;
-		}
-	else if( 0 == selectRet )
-		{
-		// select() timed out..timer has expired
-		CheckTimers() ;
-		continue ;
-		}
-
-	if( FD_ISSET( sockFD, &readSet ) )
-		{
-		DoRead() ;
-		if( !isConnected )
-			{
-			continue ;
-			}
-		}
-
-	if( FD_ISSET( sockFD, &writeSet ) )
-		{
-		DoWrite() ;
-		if( !isConnected )
-			{
-			continue ;
-		}
-
-	while( Server->GetString
-
-	if( caughSignal )
-		{
-
-		}
-
-	} // while( keepRunning && isConnected )
-
-
+mainLoop() ;
 }
-*/
 
 // Handle a channel mode change
 // theChan is the channel on which the mode change occured

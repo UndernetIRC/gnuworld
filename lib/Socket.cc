@@ -35,7 +35,7 @@
 #endif
 
 const char Socket_h_rcsId[] = __SOCKET_H ;
-const char Socket_cc_rcsId[] = "$Id: Socket.cc,v 1.9 2000/12/30 17:47:21 dan_karrels Exp $" ;
+const char Socket_cc_rcsId[] = "$Id: Socket.cc,v 1.10 2001/01/07 22:59:32 dan_karrels Exp $" ;
 
 using gnuworld::elog ;
 using std::endl ;
@@ -203,16 +203,6 @@ if( ::setsockopt( fd, SOL_SOCKET, SO_KEEPALIVE,
 	sizeof( optval ) ) < 0 )
 	{
 	elog	<< "Socket::setSocket> failed to set SO_KEEPALIVE"
-		<< endl ;
-	elog	<< "Error: " << strerror( errno ) << endl ;
-	}
-
-// immediately deliver msg
-if( ::setsockopt( fd, IPPROTO_TCP, TCP_NODELAY,
-	reinterpret_cast< const char* >( &optval ),
-	sizeof( optval ) ) < 0 )
-	{
-	elog	<< "Socket::setSocket> failed to set TCP_NODELAY"
 		<< endl ;
 	elog	<< "Error: " << strerror( errno ) << endl ;
 	}
@@ -482,7 +472,7 @@ if( fd < 0 )
 	return -1 ;
 	}
 
-int cnt = 10;
+short int cnt = 10;
 int nbresult = 0;
 
 do
@@ -490,16 +480,7 @@ do
 	errno = 0 ;
 	nbresult = ::recv( fd, reinterpret_cast< char* >( buf ),
 		nb, 0 ) ;
- 	} while( (--cnt > 0) &&
-		(nbresult < 0) &&
-		(errno == EINTR) &&
-		(readable() >= 0) ) ;
-
-if( cnt == 0 )
-	{
-	elog	<< "Socket::recv> iterations: 10, errno: "
-		<< errno << endl ;
-	}
+ 	} while( (--cnt > 0) && (errno == EINTR) ) ;
 
 return nbresult ;
 }

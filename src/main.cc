@@ -1,30 +1,31 @@
 /* main.cc
- * $Id: main.cc,v 1.14 2001/01/06 15:04:42 dan_karrels Exp $
+ * $Id: main.cc,v 1.15 2001/01/07 22:59:32 dan_karrels Exp $
  */
 
 #include	<fstream>
 #include	<new>
 
+#include	<sys/time.h>
+#include	<sys/types.h>
+#include	<unistd.h>
+#include	<dlfcn.h>
+
 #include	<cstdio>
 #include	<cstdlib>
 #include	<cstring>
 #include	<csignal> 
-#include	<dlfcn.h>
 
 #include	"config.h"
 #include	"ELog.h"
 #include	"Network.h"
 #include	"FileSocket.h" 
+#include	"server.h"
 #include	"moduleLoader.h"
-
-#ifdef LOG_SOCKET
-	std::ofstream socketFile ;
-#endif
 
 using namespace gnuworld ;
 
 const char config_h_rcsId[] = __CONFIG_H ;
-const char main_cc_rcsId[] = "$Id: main.cc,v 1.14 2001/01/06 15:04:42 dan_karrels Exp $" ;
+const char main_cc_rcsId[] = "$Id: main.cc,v 1.15 2001/01/07 22:59:32 dan_karrels Exp $" ;
 
 using std::cerr ;
 using std::clog ;
@@ -33,32 +34,11 @@ using std::string ;
  
 gnuworld::xNetwork*	gnuworld::Network ;
 gnuworld::ELog		gnuworld::elog ;
-gnuworld::xServer*	Server ;
 
-volatile bool keepRunning = true ;
-
-void sigHandler( int whichSig )
+void xServer::sigHandler( int whichSig )
 {
-if( Server != NULL )
-	{
-	// Let the server handle it, for now.
-	if( Server->PostSignal( whichSig ) )
-		{
-		// The server handled it ok.
-		return ;
-		}
-	}
-
-// Either the server is NULL, or it was unable to handle the
-// signal.
-
-switch( whichSig )
-	{
-	default:
-		elog << "*** Shutting down...\n" ;
-		keepRunning = false ;
-		break ;
-	}
+xServer::caughtSignal = true ;
+xServer::whichSig = whichSig ;
 }
 
 void usage( const string& progName )
@@ -77,15 +57,33 @@ clog << endl ;
 
 int main( int argc, char** argv )
 {
+gnuworld::xServer* theServer = new gnuworld::xServer( argc, argv ) ;
+
+// Connect to the server
+clog << "*** Connecting...\n" ;
+
+if( theServer->Connect() < 0 )
+	{
+	clog << "*** Cannot get connected to server!\n" ;
+	::exit( 0 ) ;
+	}
+else
+	{
+	clog	<< "*** Connection Established!\n" ;
+	theServer->run() ;
+	}
+delete theServer ;
+return 0 ;
+}
+
+xServer::xServer( int argc, char** argv )
+ : eventList( EVT_NOOP )
+{
 
 string simFileName ;
-string confFileName( CONFFILE ) ;
+string configFileName( CONFFILE ) ;
 
-#ifdef EDEBUG
-  string elogFileName( DEBUGFILE ) ;
-#endif
-
-bool verbose = false ;
+verbose = false ;
 
 int c = EOF ;
 while( (c = getopt( argc, argv, "cd:f:hs:" )) != EOF )
@@ -101,11 +99,11 @@ while( (c = getopt( argc, argv, "cd:f:hs:" )) != EOF )
 			break ;
 #endif
 		case 'f':
-			confFileName = optarg ;
+			configFileName = optarg ;
 			break ;
 		case 'h':
 			usage( argv[ 0 ] ) ;
-			return 0 ;
+			::exit( 0 ) ;
 		case 's':
 			simFileName = optarg ;
 			clog << "*** Running in simulation mode...\n" ;
@@ -113,36 +111,18 @@ while( (c = getopt( argc, argv, "cd:f:hs:" )) != EOF )
 		case ':':
 			clog << "*** Missing parameter\n" ;
 			usage( argv[ 0 ] ) ;
-			return 0 ;
+			::exit( 0 ) ;
 		case '?':
 			break ;
 		default:
 			clog << "Unknown option " << (char) c << endl ;
 			usage( argv[ 0 ] ) ;
-			return 0 ;
+			::exit( 0 ) ;
 		} // close switch
 	} // close while
 
-if( SIG_ERR == ::signal( SIGINT, sigHandler ) )
-	{
-	clog	<< "*** Unable to establish signal hander for SIGINT\n" ;
-	return 0 ;
-	}
-if( SIG_ERR == ::signal( SIGUSR1, sigHandler ) )
-	{
-	clog	<< "*** Unable to establish signal hander for SIGUSR1\n" ;
-	return 0 ;
-	}
-if( SIG_ERR == ::signal( SIGTERM, sigHandler ) )
-	{
-	clog	<< "*** Unable to establish signal hander for SIGTERM\n" ;
-	return 0 ;
-	}
-if( SIG_ERR == ::signal( SIGHUP, sigHandler ) )
-	{
-	clog	<< "*** Unable to establish signal hander for SIGHUP\n" ;
-	return 0 ;
-	}
+// Sets up the server internals
+initializeSystem() ;
 
 #ifdef EDEBUG
 	elog.openFile( elogFileName.c_str() ) ;
@@ -150,7 +130,7 @@ if( SIG_ERR == ::signal( SIGHUP, sigHandler ) )
 		{
 		clog	<< "*** Unable to open elog file: " << elogFileName
 			<< endl ;
-		return 0 ;
+		::exit( 0 ) ;
 		}
 	clog	<< "*** Running in debug mode...\n" ;
 #endif
@@ -167,153 +147,200 @@ if( verbose )
 		{
 		clog	<< "*** Unable to open socket log file: "
 			<< LOG_SOCKET_NAME << endl ;
-		return 0 ;
+		::exit( 0 ) ;
 		}
 #endif
 
 srand( time( 0 ) ) ;
 
-char		s[ 4096 ] = { 0 } ;
-
 try
 	{
 	Network = new xNetwork ;
 
-	// Instantiate the server object
-	Server = new xServer( confFileName ) ;
-
 	// TODO: Find a way to reduce this coupling
-	Network->setServer( Server ) ;
+	Network->setServer( this ) ;
 
 	// Run in simulation mode?
 	if( !simFileName.empty() )
 		{
-		Server->setSocket( new FileSocket( simFileName ) ) ;
+		setSocket( new FileSocket( simFileName ) ) ;
 		}
 
 	}
 catch( std::bad_alloc )
 	{
 	cerr	<< "*** Memory allocation failure\n" ;
-	return -1 ;
+	::exit( 0 ) ;
 	}
+}
 
-// Instantiate and attach clients to the server
-// TODO: Have all clients loaded from modules
-// --> Easier client manipulation at runtime
-// NOTE: This is a memory leak, *shrug*
-//Server->AttachClient( new ccontrol( "ccontrol.conf" ) ) ;
-//Server->AttachClient( new cloner( "cloner.conf" ) ) ;
-//Server->AttachClient( new stats( "stats.conf" ) ) ;
-//Server->AttachClient( new clientExample( "clientExample.conf" ) ) ;
-//Server->AttachClient( new gnutest( "gnutest.conf" ) ) ;
+void xServer::mainLoop()
+{
 
-// Connect to the server
-clog << "*** Connecting...\n" ;
+timeval tv = { 0, 0 } ;
+fd_set readSet, writeSet ;
+time_t now = 0 ;
+int selectRet = -1 ;
+int sockFD = theSock->getFD() ;
+bool setTimer = false ;
+unsigned int cnt = 0 ; 
+char charBuf[ 1024 ] = { 0 } ;
 
-if( Server->Connect() < 0 )
-	{
-	clog << "*** Cannot get connected to server!\n" ;
-#ifdef EDEBUG
-	elog.closeFile() ;
-#endif
-	return -1 ;
-	}
+while( keepRunning && isConnected() )
+        {
 
-clog	<< "*** Connection Established!\n" ;
+        memset( charBuf, 0, 1024 ) ;
 
-// The number of messages processed during any one loop
-size_t messages = 0 ;
-
-// Main server loop
-while( keepRunning )
-	{
-
-	// Is the server connected?
-	if( !Server->isConnected() )
-		{
-		elog	<< "*** Not connected, aborting\n" ;
-		keepRunning = false ;
-		continue ;
-		}
-
-	// Try to read from the network.
-	if( Server->ReadyForRead() )
-		{
-		// Data available, let's read it
-		if( Server->DoRead() < 0 )
+        // Did we catch a signal?
+        // This needs to be put at the top of this loop.
+        // If select() returns -1 because of a signal, this
+        // loop continues without executing the rest of the loop.
+        if( caughtSignal )
+                {
+		if( !PostSignal( whichSig ) )
 			{
-			elog << "*** Read error!\n" ;
 			keepRunning = false ;
 			continue ;
 			}
-		}
+		caughtSignal = false ;
+		whichSig = 0 ;
+                }
 
-	// Process any new data.
-	while( Server->GetString( s, sizeof( s ) ) )
-		{
-		if( s[ 0 ] != 0 )
-			{
+        setTimer = false ;
+        selectRet = -1 ;
+        cnt = 0 ;
+        now = ::time( 0 ) ;   
+
+        FD_ZERO( &readSet ) ;
+        FD_ZERO( &writeSet ) ;
+
+        // Does the output buffer have any data?
+        if( !outputBuffer.empty() )
+                {
+                // Yes, test for write state on the socket
+                FD_SET( sockFD, &writeSet ) ;
+                }
+
+        // Run any timers before calling select()
+        CheckTimers() ;
+                 
+        // Are there are any timers remaining to run?
+        if( !timerQueue.empty() )
+                {
+                // Yes, set select() timeout to time at which
+                // the nearest timer will expire
+                setTimer = true ;
+                tv.tv_sec = timerQueue.top().second->absTime - now ;
+                }
+        else
+                {
+                // No timers waiting to run
+                setTimer = false ;
+                }
+                
+        // Call select() until the max loop count is reached
+        // or a successful return is obtained
+        do
+                {
+                // Be sure to reset errno before calling select()
+                errno = 0 ;
+                selectRet = ::select( sockFD + 1, &readSet, &writeSet,
+                        0, setTimer ? &tv : 0 ) ;
+                }
+                // We are not expecting any signals, but one
+                // may occur anyway
+                while( (EINTR == errno) && (cnt++ < maxLoopCount) ) ;
+                 
+        // Did we get an error returned?
+        if( selectRet < 0 )
+                {
+                // Caught some form of signal
+                elog    << "xServer::mainLoop> select() returned error: "
+                        << strerror( errno ) << endl ;
+                continue ;
+                }
+        else if( 0 == selectRet )
+                {
+                // select() timed out..timer has expired
+                CheckTimers() ;
+                continue ;
+                }
+                 
+        // Otherwise, select() returned a value greater than 0
+        // At least one socket descriptor has a ready state
+                
+        // Check if there is a read state available
+        if( FD_ISSET( sockFD, &readSet ) )
+                {
+                // Yes, read all available data
+                DoRead() ;
+                
+                // Are we still connected?
+                if( !isConnected() )
+                        {
+                        // Nope, doh!
+                        continue ;
+                        }
+                }
+                
+        // Attempt to process any new data
+        while( GetString( charBuf ) )
+                {
 #ifdef LOG_SOCKET
-			socketFile << s << endl ;
+			socketFile << charBuf << endl ;
 #endif
-			if( verbose )
-				{
-				clog << "[IN]:  " << s << endl ;
-				}
-
-			// handle the new data
-			Server->Process( s ) ;
-
-			// Count the number of messages processed
-			messages++ ;
-			}
-		} // while( Server->GetString() )
-
-	// Are we ready to perform a write operation?
-	if( Server->ReadyForWrite() )
-		{
-		if( !Server->flushBuffer() )
+		if( verbose )
 			{
-			elog << "*** Write error!\n" ;
-			keepRunning = false ;
-			continue ;
+			clog	<< "[IN]:  " << charBuf
+				<< endl ;
 			}
-		}
 
-	if( Server->GetMessage() != SRV_SUCCESS )
-		{
-		elog	<< "*** Received message "
-			<< Server->GetMessage()
-			<< ", shutting down...\n" ;
-		keepRunning = false ;
-		continue ;
-		}
+                Process( charBuf ) ;
+                }
 
-	// Did we process any messages?
-	if( 0 == messages )
-		{
-		// No data handled, pause
-		Server->CheckTimers() ;
-		::usleep( 1000 ) ;
-		}
+        // Can we write to the socket without blocking?
+        if( FD_ISSET( sockFD, &writeSet ) )
+                {
+                // Attempt to write output buffer to socket
+                DoWrite() ;
+                
+                // Are we still connecte?
+                if( !isConnected() )
+                        {
+                        // Nope, doh!
+                        continue ;
+                        }
+                }
+        
+        } // while( keepRunning && isConnected )
+                 
+}
 
-	// Else, data was read and handled, no sleep
-	messages = 0 ;
-
-	} // close while( keepRunning )
-
-//delete Server ;
-//delete Network ;
-
-#ifdef EDEBUG
-	elog.closeFile() ;
-#endif
-
-#ifdef LOG_SOCKET
-	socketFile.close() ;
-#endif
-
-return 0 ;
-
+bool xServer::setupSignals()
+{
+if( SIG_ERR == ::signal( SIGINT,
+	static_cast< void (*)( int ) >( sigHandler ) ) )
+	{
+	clog	<< "*** Unable to establish signal hander for SIGINT\n" ;
+	return false ;
+	}
+if( SIG_ERR == ::signal( SIGUSR1,
+	static_cast< void (*)( int ) >( sigHandler ) ) )
+	{
+	clog	<< "*** Unable to establish signal hander for SIGUSR1\n" ;
+	return false ;
+	}
+if( SIG_ERR == ::signal( SIGTERM,
+	static_cast< void (*)( int ) >( sigHandler ) ) )
+	{
+	clog	<< "*** Unable to establish signal hander for SIGTERM\n" ;
+	return false ;
+	}
+if( SIG_ERR == ::signal( SIGHUP,
+	static_cast< void (*)( int ) >( sigHandler ) ) )
+	{
+	clog	<< "*** Unable to establish signal hander for SIGHUP\n" ;
+	return false ;
+	}
+return true ;
 }

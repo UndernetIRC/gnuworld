@@ -17,7 +17,7 @@
  */
 
 #ifndef __XSERVER_H
-#define __XSERVER_H "$Id: server.h,v 1.20 2001/01/06 19:46:35 dan_karrels Exp $"
+#define __XSERVER_H "$Id: server.h,v 1.21 2001/01/07 22:59:32 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
@@ -67,28 +67,6 @@ namespace gnuworld
 	exit( 0 ) ; \
 	}
 
-/**
- * This is a translation table of allowed characters in
- * network commands.  This table is passed to the VectorTrie
- * that class xServer uses for parsing incoming server
- * commands.
- */
-static const char serverCommandTransTable[] = {
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
- -1, -1, -1, -1, -1, -1, -1, -1, 26, 27,
- 28, 29, 30, 31, 32, 33, 34, 35, -1, -1,
- -1, -1, -1, -1, -1,  0,  1,  2,  3,  4,
-  5,  6,  7,  8,  9, 10, 11, 12, 13, 14,
- 15, 16, 17, 18, 19, 20, 21, 22, 23, 24,
- 25, -1, -1, -1, -1, 26, -1,  0,  1,  2,
-  3,  4,  5,  6,  7,  8,  9, 10, 11, 12,
- 13, 14, 15, 16, 17, 18, 19, 20, 21, 22,
- 23, 24, 25
- } ;
-
 /// Forward declaration of xClient
 class xClient ;
  
@@ -125,18 +103,15 @@ protected:
  
 public:
 
-	/**
-	 * The sole argument to the constructor is the name of
-	 * the configuration file.  The xServer will derive
-	 * all the information it requires from the file.
-	 */
-	xServer( const string& _fileName ) ;
+	xServer( int, char** ) ;
 
 	/**
 	 * Destroy the server and its clients, disconnect
 	 * from network.
 	 */
 	virtual ~xServer() ;
+
+	void		run() ;
 
 	/**
 	 * This type is used for passing information to handler
@@ -191,9 +166,10 @@ public:
 
 	/**
 	 * Perform the physical read of the socket.
-	 * Return the number of bytes read, or -1 on error.
 	 */
-	virtual int DoRead() ;
+	virtual void DoRead() ;
+
+	virtual void DoWrite() ;
 
 	/**
 	 * Append a std::string to the output buffer.
@@ -222,7 +198,7 @@ public:
 	 * Return true is none exist.  (size) is the length of
 	 * the C string buffer (buf).
 	 */
-	virtual inline bool GetString( char* buf, const size_t& size ) ;
+	virtual inline bool GetString( char* buf ) ;
 
 	/**
 	 * Return true if a read attempt from the network
@@ -593,6 +569,8 @@ public:
 	 */
 	virtual unsigned int CheckTimers() ;
 
+	void		mainLoop() ;
+
 protected:
 
 	/**
@@ -760,6 +738,9 @@ protected:
 	 * call before giving up
 	 */
 	unsigned int	maxLoopCount ;
+
+	static bool		caughtSignal ;
+	static int		whichSig ;
 
 	/**
 	 * The structure type to hold information about client timed
@@ -1041,6 +1022,8 @@ protected:
 	 */
 	bool			_connected ;
 
+	volatile bool		keepRunning ;
+
 	/**
 	 * This is the current message error number, or -1 if no
 	 * error exists.
@@ -1130,6 +1113,24 @@ protected:
 	uniqueTimerMapType		uniqueTimerMap ;
 
 	timerID		lastTimerID ;
+
+#ifdef LOG_SOCKET
+	ofstream	socketFile ;
+#endif
+
+#ifdef EDEBUG
+	string		elogFileName ;
+#endif
+
+	string		configFileName ;
+	char*		inputCharBuffer ;
+	bool		verbose ;
+
+	static void		sigHandler( int ) ;
+	void		initializeSystem() ;
+	void		initializeVariables() ;
+	void		loadCommandHandlers() ;
+	bool		setupSignals() ;
 } ;
 
 /// Deprecated method.
