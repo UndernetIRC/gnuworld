@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------------
--- "$Id: cservice.sql,v 1.45 2001/07/08 16:39:47 gte Exp $"
+-- "$Id: cservice.sql,v 1.46 2001/08/05 20:30:58 gte Exp $"
 -- Channel service DB SQL file for PostgreSQL.
 
 -- ChangeLog:
@@ -194,7 +194,8 @@ CREATE TABLE levels (
 -- 0x00 04 -- Temp forced access - Temp used by bot, ignore.
 -- 0x00 08 -- AutoVoice
 	suspend_expires INT4 DEFAULT '0',
-	suspend_by VARCHAR( 128 ),
+	suspend_level INT4 DEFAULT '0',
+	suspend_by VARCHAR( 128 ), 
 	added INT4,
 	added_By VARCHAR( 128 ),
 	last_Modif INT4,
@@ -258,6 +259,8 @@ CREATE TABLE supporters (
 	PRIMARY KEY(channel_id,user_id)
 );
 
+CREATE INDEX supporters_support_idx ON supporters(support);
+
 CREATE TABLE pending (
 	channel_id INT4 CONSTRAINT pending_channel_ref REFERENCES channels (id),
 	manager_id INT4 CONSTRAINT pending_manager_ref REFERENCES users (id),
@@ -270,6 +273,7 @@ CREATE TABLE pending (
 	-- 2 = 'Notification'
 	-- 3 = 'Completed'
 	-- 4 = 'Cancelled by applicant'
+	-- 8 = 'Pending Admin Review'
 	-- 9 = 'Rejected'
 	join_count INT4 DEFAULT '0',
 	unique_join_count INT4 DEFAULT '0',
@@ -283,6 +287,7 @@ CREATE TABLE pending (
 );
 
 CREATE INDEX pending_status_idx ON pending(status);
+CREATE INDEX pending_manager_id_idx ON pending(manager_id);
 
 CREATE TABLE pending_traffic (
 	channel_id INT4 CONSTRAINT pending_traffic_channel_ref REFERENCES channels (id),
