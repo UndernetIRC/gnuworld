@@ -609,7 +609,7 @@ else if(Command == "VERSION")
 	xClient::DoCTCP(theClient, CTCP,
 		"Undernet P10 Channel Services Version 2 ["
 		__DATE__ " " __TIME__
-		"] ($Id: cservice.cc,v 1.107 2001/02/16 20:20:26 plexus Exp $)");
+		"] ($Id: cservice.cc,v 1.108 2001/02/17 18:04:27 gte Exp $)");
 	}
 else if(Command == "PROBLEM?")
 	{
@@ -2051,6 +2051,10 @@ for( string::const_iterator ptr = theString.begin() ;
 	if( *ptr == '\'' )
 		{
 		retMe += "\\\047" ;
+		}
+	else if ( *ptr == '\\' )
+		{
+		retMe += "\\\134" ;
 		}
 	else
 		{
