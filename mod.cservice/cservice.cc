@@ -139,11 +139,15 @@ cservice::cservice(const string& args)
     RegisterCommand(new STATUSCommand(this, "STATUS", "<#channel>", 4));
     RegisterCommand(new SUSPENDCommand(this, "SUSPEND", "<#channel> <nick> [duration]", 5));
     RegisterCommand(new UNSUSPENDCommand(this, "UNSUSPEND", "<#channel> <nick>", 5));
+    RegisterCommand(new BANCommand(this, "BAN", "<#channel> <nick | *!*user@*.host> [duration] [level] [reason]", 5));
+    RegisterCommand(new UNBANCommand(this, "UNBAN", "<#channel> <*!*user@*.host>", 5));
+    RegisterCommand(new LBANLISTCommand(this, "LBANLIST", "<#channel>", 5));
 
     RegisterCommand(new REGISTERCommand(this, "REGISTER", "<#channel>", 0));
     RegisterCommand(new FORCECommand(this, "FORCE", "<#channel>", 0));
     RegisterCommand(new UNFORCECommand(this, "UNFORCE", "<#channel>", 0));
     RegisterCommand(new SERVNOTICECommand(this, "SERVNOTICE", "<#channel> <text>", 0));
+    RegisterCommand(new SAYCommand(this, "SAY", "<#channel> <text>", 0));
 
 	//-- Load in our cservice configuration file. 
 	cserviceConfig = new EConfig( args ) ;
@@ -437,7 +441,7 @@ int cservice::OnCTCP( iClient* theClient, const string& CTCP,
 
 	if(Command == "VERSION")
 	{
-		xClient::DoCTCP(theClient, CTCP.c_str(), "Undernet P10 Channel Services Version 2 [" __DATE__ " " __TIME__ "] ($Id: cservice.cc,v 1.38 2001/01/13 14:49:38 gte Exp $)");
+		xClient::DoCTCP(theClient, CTCP.c_str(), "Undernet P10 Channel Services Version 2 [" __DATE__ " " __TIME__ "] ($Id: cservice.cc,v 1.39 2001/01/13 20:49:46 gte Exp $)");
 		return true;
 	}
  
