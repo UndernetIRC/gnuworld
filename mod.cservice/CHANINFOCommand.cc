@@ -13,7 +13,7 @@
  *
  * Command is aliased "INFO".
  *
- * $Id: CHANINFOCommand.cc,v 1.4 2001/01/02 01:27:56 gte Exp $
+ * $Id: CHANINFOCommand.cc,v 1.5 2001/01/13 22:58:21 gte Exp $
  */
 
 #include	<string>
@@ -24,7 +24,7 @@
 #include	"levels.h"
 #include	"responses.h"
  
-const char CHANINFOCommand_cc_rcsId[] = "$Id: CHANINFOCommand.cc,v 1.4 2001/01/02 01:27:56 gte Exp $" ;
+const char CHANINFOCommand_cc_rcsId[] = "$Id: CHANINFOCommand.cc,v 1.5 2001/01/13 22:58:21 gte Exp $" ;
  
 namespace gnuworld
 {
@@ -43,12 +43,41 @@ bool CHANINFOCommand::Exec( iClient* theClient, const string& Message )
 	    Usage(theClient);
 	    return true;
     }
- 
+
+	/*
+	 *  Are we checking info about a user or a channel?
+	 */
+
+	string::size_type pos = st[1].find_first_of( '#' ) ;
+	if( string::npos == pos ) // Didn't find a hash?
+	{
+		// Look by user then.
+		sqlUser* theUser = bot->getUserRecord(st[1]);
+		if (!theUser) 
+		{
+			bot->Notice(theClient, "The user %s doesn't appear to be registered.", st[1].c_str());
+			return true;
+		}
+
+		bot->Notice(theClient, "Information about: %s", theUser->getUserName().c_str());
+		string loggedOn;
+		iClient* targetClient = theUser->isAuthed();
+	 	loggedOn = targetClient ? targetClient->getNickUserHost() : "Offline";
+
+		bot->Notice(theClient, "Currently logged on via: %s", loggedOn.c_str());
+		bot->Notice(theClient, "URL: %s", theUser->getUrl().c_str());
+		bot->Notice(theClient, "Language: %i", theUser->getLanguageId());
+		bot->Notice(theClient, "Flags: TBA");
+		bot->Notice(theClient, "Last Seen: %s", bot->prettyDuration(theUser->getLastSeen()).c_str());
+		bot->Notice(theClient, "-- End of info.");
+		return true;
+	}
+
 	sqlChannel* theChan = bot->getChannelRecord(st[1]);
         
 	if(!theChan)
 	{
-	        bot->Notice(theClient, "%s is not registered",
+	        bot->Notice(theClient, "The channel %s is not registered",
 	                st[1].c_str());
 	        return true;
 	}
