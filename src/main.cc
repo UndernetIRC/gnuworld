@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: main.cc,v 1.45 2002/07/31 13:53:52 dan_karrels Exp $
+ * $Id: main.cc,v 1.46 2002/08/04 00:40:46 dan_karrels Exp $
  */
 
 #include	<new>
@@ -41,7 +41,7 @@
 #include	"md5hash.h"
 
 const char config_h_rcsId[] = __CONFIG_H ;
-const char main_cc_rcsId[] = "$Id: main.cc,v 1.45 2002/07/31 13:53:52 dan_karrels Exp $" ;
+const char main_cc_rcsId[] = "$Id: main.cc,v 1.46 2002/08/04 00:40:46 dan_karrels Exp $" ;
 const char ELog_h_rcsId[] = __ELOG_H ;
 const char server_h_rcsId[] = __SERVER_H ;
 const char moduleLoader_h_rcsId[] = __MODULELOADER_H ;
@@ -310,7 +310,7 @@ while( keepRunning )
                 }
 
 	// Process all available data
-	Poll( seconds ) ;
+	ConnectionManager::Poll( seconds ) ;
 
 	// Poll() will call all appropriate data handlers
 	// Check the timers
