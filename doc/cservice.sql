@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------------
--- "$Id: cservice.sql,v 1.46 2001/08/05 20:30:58 gte Exp $"
+-- "$Id: cservice.sql,v 1.47 2001/08/06 18:00:09 gte Exp $"
 -- Channel service DB SQL file for PostgreSQL.
 
 -- ChangeLog:
@@ -88,12 +88,13 @@ CREATE TABLE channels (
 -- 0x0000 0020 - Temp Manager
 -- 0x0000 0040 - Cautioned
 -- 0x0000 0080 - Manager on Vacation
+-- 0x0000 0100 - Channel Locked.
 
 -- 0x0001 0000 - AlwaysOp
 -- 0x0002 0000 - StrictOp
 -- 0x0004 0000 - NoOp
 -- 0x0008 0000 - AutoTopic
--- 0x0010 0000 - OpOnly
+-- 0x0010 0000 - OpOnly (Depricated).
 -- 0x0020 0000 - AutoJoin
 		
 	-- Do we want to keep either or both of these?
@@ -160,9 +161,9 @@ CREATE TABLE users (
 	language_id INT4 CONSTRAINT language_channel_id_ref REFERENCES languages (id),
 	public_key TEXT,
 	flags INT2 NOT NULL DEFAULT '0',
--- 0x00 01 -- Suspended globally
--- 0x00 02 -- Logged in
--- 0x00 04 -- Invisible
+-- 0x00 01 -- Suspended globally.
+-- 0x00 02 -- Logged in (Depricated).
+-- 0x00 04 -- Invisible.
 	last_updated_by VARCHAR (128),		-- nick!user@host
 	last_updated INT4 NOT NULL, 
 
