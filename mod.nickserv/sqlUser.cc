@@ -3,13 +3,16 @@
  *
  * Stores a database user
  *
- * $Id: sqlUser.cc,v 1.7 2002/08/27 20:55:53 jeekay Exp $
+ * $Id: sqlUser.cc,v 1.8 2002/09/05 16:02:43 dan_karrels Exp $
  */
  
  #include <ctime>
  #include <sstream>
  
  #include "sqlUser.h"
+
+using std::stringstream ;
+using std::ends ;
  
  namespace gnuworld {
  

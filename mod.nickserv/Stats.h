@@ -1,8 +1,11 @@
 #ifndef _STATS_H
-#define _STATS_H "$Id: Stats.h,v 1.1 2002/08/25 22:38:49 jeekay Exp $"
+#define _STATS_H "$Id: Stats.h,v 1.2 2002/09/05 16:02:42 dan_karrels Exp $"
 
 #include <map>
 #include <string>
+
+using std::string ;
+using std::map ;
 
 namespace gnuworld {
 

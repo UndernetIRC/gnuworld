@@ -1,7 +1,11 @@
+
 #include <new>
+#include <iostream>
 
 #include "ELog.h"
 #include "sqlManager.h"
+
+using std::endl ;
 
 namespace gnuworld {
 

@@ -1,10 +1,13 @@
 #ifndef _LOGGER_H
-#define _LOGGER_H "$Id: Logger.h,v 1.1 2002/08/27 16:10:52 jeekay Exp $"
+#define _LOGGER_H "$Id: Logger.h,v 1.2 2002/09/05 16:02:39 dan_karrels Exp $"
 
 #include <string>
 #include <vector>
 
 #include "logTarget.h"
+
+using std::vector ;
+using std::string ;
 
 namespace gnuworld {
 

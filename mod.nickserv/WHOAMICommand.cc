@@ -1,8 +1,13 @@
 /* WHOAMI - Test command mainly */
 
+#include	<sstream>
+
 #include "nickserv.h"
 
-const char WHOAMICommand_cc_rcsId[] = "$Id: WHOAMICommand.cc,v 1.4 2002/08/27 20:55:53 jeekay Exp $";
+using std::stringstream ;
+using std::ends ;
+
+const char WHOAMICommand_cc_rcsId[] = "$Id: WHOAMICommand.cc,v 1.5 2002/09/05 16:02:42 dan_karrels Exp $";
 
 namespace gnuworld
 {

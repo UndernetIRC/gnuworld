@@ -1,5 +1,5 @@
 #ifndef _LOGTARGET_H
-#define _LOGTARGET_H "$Id: logTarget.h,v 1.2 2002/08/27 20:55:53 jeekay Exp $"
+#define _LOGTARGET_H "$Id: logTarget.h,v 1.3 2002/09/05 16:02:43 dan_karrels Exp $"
 
 /*
  * logTarget.h
@@ -11,6 +11,8 @@
  */
 
 #include <string>
+
+using std::string ;
 
 namespace gnuworld {
 
@@ -34,8 +36,8 @@ class logTarget {
     virtual void log(const events::eventType&, const string&) = 0;
 }; // class logTarget
 
-} // namespace log
+} // namespace logging
 
-} // namespace log
+} // namespace gnuworld
 
 #endif
