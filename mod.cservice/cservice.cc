@@ -144,6 +144,7 @@ else
 theServer->RegisterEvent( EVT_KILL, this );
 theServer->RegisterEvent( EVT_QUIT, this );
 theServer->RegisterEvent( EVT_NICK, this );
+theServer->RegisterEvent( EVT_ACCOUNT, this );
 theServer->RegisterEvent( EVT_BURST_ACK, this );
 
 xClient::ImplementServer( theServer ) ;
@@ -2464,6 +2465,19 @@ int cservice::OnEvent( const eventType& theEvent,
 {
 switch( theEvent )
 	{
+	case EVT_ACCOUNT:
+		{
+		iClient* tmpUser = static_cast< iClient* >( data1 ) ;
+		networkData* tmpData = static_cast< networkData* >(tmpUser->getCustomData(this) ) ;
+		/* Lookup this user account, if its not there.. trouble */
+		sqlUser* theUser = getUserRecord(tmpUser->getAccount());
+		if (theUser)
+			{
+			tmpData->currentUser = theUser;
+			theUser->addAuthedClient(tmpUser);
+			}
+		break;
+		}
 	case EVT_BURST_ACK:
 		{
 //		iServer* theServer = static_cast< iServer* >( data1 );
