@@ -26,6 +26,7 @@ grant all on regteam to gnuworld;
 grant all on webaccessteam to gnuworld;
 grant all on abuseteam to gnuworld;
 grant all on mailq to gnuworld;
+grant all on notes to gnuworld;
 
 -- Sequences.
 grant all on bans_id_seq to gnuworld;
@@ -36,3 +37,4 @@ grant all on languages_id_seq to gnuworld;
 grant all on log_users_id_seq to gnuworld;
 grant all on noreg_id_seq to gnuworld;
 grant all on users_id_seq to gnuworld;
+grant all on notes_message_id_seq to gnuworld;
