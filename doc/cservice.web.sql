@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------------
--- "$Id: cservice.web.sql,v 1.23 2002/02/16 06:14:01 nighty Exp $"
+-- "$Id: cservice.web.sql,v 1.24 2002/02/25 11:05:03 nighty Exp $"
 -- Channel service DB SQL file for PostgreSQL.
 --
 -- Tables specific to webbased registration process.
@@ -66,17 +66,17 @@ CREATE TABLE counts (
 	count_count INT4
 );
 
-CREATE TABLE helpmgr_users (
-	user_id INT4 NOT NULL,
-	language_id INT2,
-	flags INT2 DEFAULT '1'
+--CREATE TABLE helpmgr_users (
+--	user_id INT4 NOT NULL,
+--	language_id INT2,
+--	flags INT2 DEFAULT '1'
 -- CAN_EDIT	: 0x01
 -- CAN_ADD	: 0x02
-);
+--);
 
-CREATE INDEX helpmgr_users_user_id_idx ON helpmgr_users(user_id);
-CREATE INDEX helpmgr_language_id_idx ON helpmgr_users(language_id);
-CREATE INDEX helpmgr_flags_idx ON helpmgr_users(flags);
+--CREATE INDEX helpmgr_users_user_id_idx ON helpmgr_users(user_id);
+--CREATE INDEX helpmgr_language_id_idx ON helpmgr_users(language_id);
+--CREATE INDEX helpmgr_flags_idx ON helpmgr_users(flags);
 
 CREATE TABLE pending_mgrchange (
 	id SERIAL,
@@ -105,12 +105,12 @@ CREATE INDEX pending_mgrchange_expiration_idx ON pending_mgrchange(expiration);
 CREATE INDEX pending_mgrchange_crc_idx ON pending_mgrchange(crc);
 CREATE INDEX pending_mgrchange_confirmed_idx ON pending_mgrchange(confirmed);
 
-CREATE TABLE xatadmins (
-	admin_id INT4 NOT NULL,
-	admin_type INT2 DEFAULT 0
-);
+--CREATE TABLE xatadmins (
+--	admin_id INT4 NOT NULL,
+--	admin_type INT2 DEFAULT 0
+--);
 
-CREATE INDEX xatadmins_admin_id_idx ON xatadmins(admin_id);
+--CREATE INDEX xatadmins_admin_id_idx ON xatadmins(admin_id);
 
 
 CREATE TABLE pendingusers (
@@ -151,10 +151,10 @@ CREATE INDEX lastrequests_ip_idx ON lastrequests(ip);
 
  -- list of admins that have the ability to modify NOREG entries (other admins may only list them) 
 
-CREATE TABLE webaccessteam ( 
-	admin_id int4 REFERENCES users(id) NOT NULL,
-	level INT4 NOT NULL DEFAULT '0'
-);
+--CREATE TABLE webaccessteam ( 
+--	admin_id int4 REFERENCES users(id) NOT NULL,
+--	level INT4 NOT NULL DEFAULT '0'
+--);
  
 -- recorded objections for channels.
 CREATE TABLE objections ( 
