@@ -3,7 +3,7 @@
  */
 
 #ifndef __STRINGTOKENIZER_H
-#define __STRINGTOKENIZER_H "$Id: StringTokenizer.h,v 1.2 2001/03/31 01:26:10 dan_karrels Exp $"
+#define __STRINGTOKENIZER_H "$Id: StringTokenizer.h,v 1.3 2001/08/26 21:13:10 dan_karrels Exp $"
 
 #include	<vector>
 #include	<string>
@@ -62,7 +62,7 @@ public:
 	 * compiled at a later time to throw an exception while
 	 * in a production environment.
 	 */
-	inline const string&	getToken( const size_type& ) const ;
+	const string&		getToken( const size_type& ) const ;
 
 	/**
 	 * This method allows StringTokenizer objects to be used like

@@ -1,7 +1,7 @@
 /* ELog.h */
 
 #ifndef __ELOG_H
-#define __ELOG_H "$Id: ELog.h,v 1.4 2001/07/29 22:44:06 dan_karrels Exp $"
+#define __ELOG_H "$Id: ELog.h,v 1.5 2001/08/26 21:13:10 dan_karrels Exp $"
 
 #include	<strstream>
 #include	<iostream>
@@ -106,17 +106,17 @@ public:
 	inline void setStream( ostream* newStream )
 		{ outStream = newStream ; }
 
-	inline ELog& operator<<( __E_omanip func ) ;
-	inline ELog& operator<<( __E_manip func ) ;
-	inline ELog& operator<<( const char& ) ;
-	inline ELog& operator<<( const string& ) ;
-	inline ELog& operator<<( const int& ) ;
-	inline ELog& operator<<( const unsigned int& ) ;
-	inline ELog& operator<<( const long int& ) ;
-	inline ELog& operator<<( const unsigned long int& ) ;
-	inline ELog& operator<<( const short int& ) ;
-	inline ELog& operator<<( const unsigned short int& ) ;
-	inline ELog& operator<<( strstream& s ) ;
+	ELog& operator<<( __E_omanip func ) ;
+	ELog& operator<<( __E_manip func ) ;
+	ELog& operator<<( const char& ) ;
+	ELog& operator<<( const string& ) ;
+	ELog& operator<<( const int& ) ;
+	ELog& operator<<( const unsigned int& ) ;
+	ELog& operator<<( const long int& ) ;
+	ELog& operator<<( const unsigned long int& ) ;
+	ELog& operator<<( const short int& ) ;
+	ELog& operator<<( const unsigned short int& ) ;
+	ELog& operator<<( strstream& s ) ;
 
 } ;
 
