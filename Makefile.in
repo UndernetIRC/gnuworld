@@ -163,7 +163,7 @@ RECURSIVE_TARGETS = info-recursive dvi-recursive pdf-recursive \
 	check-recursive installcheck-recursive
 DIST_COMMON = README ././include/defs.h.in ./include/defs.h.in AUTHORS \
 	COPYING ChangeLog INSTALL Makefile.am Makefile.in NEWS TODO \
-	aclocal.m4 config.guess config.sub configure configure.in \
+	aclocal.m4 config.guess config.sub configure configure.ac \
 	depcomp install-sh ltconfig ltmain.sh missing mkinstalldirs
 DIST_SUBDIRS = $(SUBDIRS)
 all: all-recursive
@@ -172,7 +172,7 @@ all: all-recursive
 
 am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
  configure.lineno
-$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ Makefile.am  $(top_srcdir)/configure.in $(ACLOCAL_M4)
+$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ Makefile.am  $(top_srcdir)/configure.ac $(ACLOCAL_M4)
 	cd $(top_srcdir) && \
 	  $(AUTOMAKE) --gnu  Makefile
 Makefile: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.in  $(top_builddir)/config.status
@@ -180,10 +180,10 @@ Makefile: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.in  $(top_builddir)/config.s
 
 $(top_builddir)/config.status: $(srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
 	$(SHELL) ./config.status --recheck
-$(srcdir)/configure: @MAINTAINER_MODE_TRUE@ $(srcdir)/configure.in $(ACLOCAL_M4) $(CONFIGURE_DEPENDENCIES)
+$(srcdir)/configure: @MAINTAINER_MODE_TRUE@ $(srcdir)/configure.ac $(ACLOCAL_M4) $(CONFIGURE_DEPENDENCIES)
 	cd $(srcdir) && $(AUTOCONF)
 
-$(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ configure.in 
+$(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ configure.ac 
 	cd $(srcdir) && $(ACLOCAL) $(ACLOCAL_AMFLAGS)
 
 include/defs.h: include/stamp-h1
@@ -196,7 +196,7 @@ include/stamp-h1: $(srcdir)/./include/defs.h.in $(top_builddir)/config.status
 	@rm -f include/stamp-h1
 	cd $(top_builddir) && $(SHELL) ./config.status include/defs.h
 
-$(srcdir)/./include/defs.h.in: @MAINTAINER_MODE_TRUE@ $(top_srcdir)/configure.in $(ACLOCAL_M4) 
+$(srcdir)/./include/defs.h.in: @MAINTAINER_MODE_TRUE@ $(top_srcdir)/configure.ac $(ACLOCAL_M4) 
 	cd $(top_srcdir) && $(AUTOHEADER)
 	touch $(srcdir)/./include/defs.h.in
 

@@ -1,10 +1,10 @@
-dnl $Id: configure.in,v 1.70 2003/05/19 19:59:18 dan_karrels Exp $
+dnl $Id: configure.ac,v 1.1 2003/05/19 20:02:33 dan_karrels Exp $
 dnl ----------------------------------------------------------
 
 echo Configuring GNUWorld...
 echo
 
-AC_REVISION($Revision: 1.70 $)
+AC_REVISION($Revision: 1.1 $)
 AC_INIT
 AC_CONFIG_SRCDIR([src/main.cc])
 AM_INIT_AUTOMAKE(gnuworld,0.0)

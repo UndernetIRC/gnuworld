@@ -14,7 +14,7 @@
 
 @SET_MAKE@
 
-# "$Id: Makefile.in,v 1.156 2003/05/19 19:59:19 dan_karrels Exp $"
+# "$Id: Makefile.in,v 1.157 2003/05/19 20:02:34 dan_karrels Exp $"
 
 srcdir = @srcdir@
 top_srcdir = @top_srcdir@
@@ -324,7 +324,7 @@ all: all-am
 
 .SUFFIXES:
 .SUFFIXES: .cc .lo .o .obj
-$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ Makefile.am  $(top_srcdir)/configure.in $(ACLOCAL_M4)
+$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ Makefile.am  $(top_srcdir)/configure.ac $(ACLOCAL_M4)
 	cd $(top_srcdir) && \
 	  $(AUTOMAKE) --gnu  mod.ccontrol/Makefile
 Makefile: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.in  $(top_builddir)/config.status
