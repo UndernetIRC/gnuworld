@@ -1,4 +1,4 @@
-# $Id: Makefile.in,v 1.4 2000/07/10 22:51:52 dan_karrels Exp $
+# $Id: Makefile.in,v 1.5 2000/11/12 17:27:53 dan_karrels Exp $
 # all		-- gnuworld
 # clean		-- cleanup objects and executable
 # distclean	-- everything =P
@@ -12,11 +12,8 @@ LIBS = @LIBS@
 # use -O to have the compiler do some optimization instead.
 CXXFLAGS = @CXXFLAGS@
 
-SHLIB_CXX = @SHLIB_CXX@
-SHLIB_LD = @SHLIB_LD@
-
 BIN_PATH = @BIN_PATH@
-SRC_PATH = @SRC_PATH@
+LIB_PATH = @LIB_PATH@
 
 RM = @RM@
 CP = @CP@
@@ -24,8 +21,6 @@ MV = @MV@
 LN = @LN@
 
 ############ You shouldn't change anything below this line ###################
-
-VERSION = @VERSION@
 
 SHELL = /bin/sh
 MAKE2 = $(MAKE) $(MFLAGS)

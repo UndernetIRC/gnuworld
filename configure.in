@@ -1,7 +1,7 @@
-dnl $Id: configure.in,v 1.6 2000/11/12 17:20:45 dan_karrels Exp $
+dnl $Id: configure.in,v 1.7 2000/11/12 17:27:53 dan_karrels Exp $
 dnl ----------------------------------------------------------
 
-AC_REVISION($Revision: 1.6 $)
+AC_REVISION($Revision: 1.7 $)
 AC_INIT(src/main.cc)
 AC_CONFIG_HEADER(include/defs.h)
 
@@ -389,41 +389,6 @@ dnl
 dnl set some last minute sanity defaults
 dnl
 
-AC_OUTPUT(Makefile src/Makefile lib/Makefile)
-
-dnl This variable is global and will exported to Makefiles
-dnl MOD_DIRS=""
-
-dnl This variable is local for the configure script
-dnl mod_dirs=`/bin/ls src | ${GREP} .mod`
-dnl echo "mod_dirs: $mod_dirs"
-
-dnl current_dir=`pwd`
-dnl echo "current_dir: $current_dir"
-
-dnl for dir in $mod_dirs
-dnl   do
-dnl	echo "Checking module dir: $dir"
-
-dnl	if test ! -d "src/$dir"
-dnl	then
-dnl		echo "Found a .mod that is not a directory, skipping ($dir)."
-dnl	elif test -f "src/$dir/configure"
-dnl	then
-dnl		echo "Found configure"
-dnl		cd src/$dir
-dnl		./configure
-dnl		cd $current_dir
-dnl	elif test -f "src/$dir/Makefile.in"
-dnl	then
-dnl		echo "Found Makefile.in"
-dnl		output_file="$output_file src/$dir/Makefile"
-dnl		MOD_DIRS="$MOD_DIRS $dir"
-dnl	else
-dnl		echo "./src/$dir: No configure or Makefile present"
-dnl		echo "Skipping..."
-dnl	fi
-dnl  done
 
 AC_SUBST(LDFLAGS)
 AC_SUBST(bindir)
@@ -431,12 +396,12 @@ AC_SUBST(bindir)
 CXXFLAGS="$CXXFLAGS -I`pwd`/include -I`pwd`/lib"
 LIB_PATH="`pwd`/lib"
 BIN_PATH="`pwd`/bin"
-SRC_PATH="`pwd`/src"
 
 AC_SUBST(CXXFLAGS)
 AC_SUBST(LIB_PATH)
 AC_SUBST(BIN_PATH)
-AC_SUBST(SRC_PATH)
+
+AC_OUTPUT(Makefile src/Makefile lib/Makefile)
 
 echo
 echo Configuration has been finished, and everything seems to be allright

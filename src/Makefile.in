@@ -1,5 +1,5 @@
 # Default paths (system-wide installs)
-# $Id: Makefile.in,v 1.8 2000/11/06 16:08:33 dan_karrels Exp $
+# $Id: Makefile.in,v 1.9 2000/11/12 17:28:44 dan_karrels Exp $
 #
 
 # Standard defines
@@ -8,13 +8,12 @@ CXX = @CXX@
 SHLIB_CXX = @SHLIB_CXX@
 SHLIB_LD = @SHLIB_LD@
 
-SRC_PATH = @SRC_PATH@
 DEFS = @DEFS@
 
 CXXFLAGS = @CXXFLAGS@
 
-LIB_PATH = @LIB_PATH@
 BIN_PATH = @BIN_PATH@
+LIB_PATH = @LIB_PATH@
 LIBS = -L$(LIB_PATH) -lgnuworld @LIBS@
 
 RM = @RM@ -f
@@ -56,8 +55,6 @@ SRCS = ccontrol.cc \
 	Network.cc \
 	server.cc
 OBJS = $(patsubst %.cc, %.o, $(SRCS))
-
-#ABSOBJ = $(patsubst %.cc, $(SRC_PATH)/%.o, $(SRCS))
 
 all: gnuworld
 everything: all

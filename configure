@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# From configure.in Revision: 1.5 
+# From configure.in Revision: 1.6 
 
 # Guess values for system-dependent variables and create Makefiles.
 # Generated automatically using autoconf version 2.13 
@@ -3001,6 +3001,18 @@ rm -f conftest*
 
 
 
+
+
+
+
+CXXFLAGS="$CXXFLAGS -I`pwd`/include -I`pwd`/lib"
+LIB_PATH="`pwd`/lib"
+BIN_PATH="`pwd`/bin"
+
+
+
+
+
 trap '' 1 2 15
 cat > confcache <<\EOF
 # This file is a shell script that caches the results of configure
@@ -3153,6 +3165,8 @@ s%@SHLIB_CXX@%$SHLIB_CXX%g
 s%@SHLIB_STRIP@%$SHLIB_STRIP%g
 s%@DEFAULT_MAKE@%$DEFAULT_MAKE%g
 s%@CXXCPP@%$CXXCPP%g
+s%@LIB_PATH@%$LIB_PATH%g
+s%@BIN_PATH@%$BIN_PATH%g
 
 CEOF
 EOF
@@ -3368,29 +3382,8 @@ rm -fr confdefs* $ac_clean_files
 test "$no_create" = yes || ${CONFIG_SHELL-/bin/sh} $CONFIG_STATUS || exit 1
 
 
-
-
-
-
-
-
-
-
-CXXFLAGS="$CXXFLAGS -I`pwd`/include -I`pwd`/lib"
-LIB_PATH="`pwd`/lib"
-BIN_PATH="`pwd`/bin"
-SRC_PATH="`pwd`/src"
-
-
-
-
-
-
 echo
 echo Configuration has been finished, and everything seems to be allright
 echo Now you have the chance to modify include/config.h to set your
 echo preferred options...
 echo
-s%@LIB_PATH@%$LIB_PATH%g
-s%@BIN_PATH@%$BIN_PATH%g
-s%@SRC_PATH@%$SRC_PATH%g
