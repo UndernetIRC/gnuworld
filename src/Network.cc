@@ -23,7 +23,7 @@
 #include	"StringTokenizer.h"
 
 const char xNetwork_h_rcsId[] = __NETWORK_H ;
-const char xNetwork_cc_rcsId[] = "$Id: Network.cc,v 1.30 2001/09/23 02:38:37 gte Exp $" ;
+const char xNetwork_cc_rcsId[] = "$Id: Network.cc,v 1.31 2001/10/17 21:39:11 mrbean_ Exp $" ;
 const char ELog_h_rcsId[] = __ELOG_H ;
 const char iClient_h_rcsId[] = __ICLIENT_H ;
 const char Channel_h_rcsId[] = __CHANNEL_H ;
@@ -665,7 +665,14 @@ for( serverVectorType::size_type i = 0 ; i < servers.size() ; ++i )
 
 		// Remember the numeric to be removed.
 		const unsigned int removeIntYY = servers[ i ]->getIntYY() ;
-
+		// Post a netbreak event
+		string reason("Uplink Splitted");
+		
+		theServer->PostEvent(EVT_NETBREAK,
+			   static_cast<void *>(servers[i]),
+			   static_cast<void *>(findServer(intYY)),
+			   static_cast<void *>(&reason));
+			   
 		// Remove servers[ i ].
 		delete removeServer( servers[ i ]->getIntYY(), true ) ;
 

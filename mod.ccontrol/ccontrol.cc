@@ -29,7 +29,7 @@
 #include	"ccFloodData.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.76 2001/09/30 20:28:45 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.77 2001/10/17 21:39:11 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -367,7 +367,7 @@ theServer->RegisterEvent( EVT_BURST_CMPLT, this );
 theServer->RegisterEvent( EVT_GLINE , this );
 theServer->RegisterEvent( EVT_NICK , this );
 
-//theServer->RegisterEvent( EVT_NETBREAK, this );
+theServer->RegisterEvent( EVT_NETBREAK, this );
 
 xClient::ImplementServer( theServer ) ;
 }
@@ -587,9 +587,17 @@ switch( theEvent )
 		}
 	case EVT_NETBREAK:
 		{
-		/*iServer* NewServer = static_cast< iServer* >( Data1);
-		iServer* UplinkServer = static_cast< iServer* >( Data2);*/
-		// still not handled
+		iServer* NewServer = static_cast< iServer* >( Data1);
+		string Reason = *(static_cast<string *>(Data3));
+		ccServer* CheckServer = new (std::nothrow) ccServer(SQLDb);
+                assert(CheckServer != NULL);
+                if(CheckServer->loadNumericData(NewServer->getCharYY()))
+                        {
+			CheckServer->setSplitReason(Reason);
+			CheckServer->setLastSplitted(::time(NULL));
+			CheckServer->Update();
+			}
+		delete CheckServer;			     
 		break;
 		}
 	case EVT_BURST_CMPLT:
@@ -2000,7 +2008,6 @@ for(exceptionIterator ptr = exception_begin();ptr != exception_end();ptr++)
 	{
 	if(*(*ptr) == Host)
 		{
-		MsgChanLog("Found an Exception for %d connections\n",(*ptr)->getConnections()); 
 		if((*ptr)->getConnections() > Exception)
 			{
 			Exception = (*ptr)->getConnections();

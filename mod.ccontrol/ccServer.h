@@ -1,7 +1,7 @@
 /* ccServer.h */
 
 #ifndef __CCSERVER_H
-#define __CCSERVER_H "$Id: ccServer.h,v 1.3 2001/07/23 10:28:51 mrbean_ Exp $"
+#define __CCSERVER_H "$Id: ccServer.h,v 1.4 2001/10/17 21:39:11 mrbean_ Exp $"
 
 #include	<string>
 
@@ -39,7 +39,9 @@ public:
 	inline const time_t&	getLastSplitted() const
 		{ return LastSplitted; }
 
-	
+	inline const string&	getSplitReason() const
+		{ return SplitReason; }
+
 	//Methods for setting info
 	
 	inline void 		setName( const string& _Name ) 
@@ -57,7 +59,9 @@ public:
 	inline void		setLastSplitted( const time_t& _LastSplitted ) 
 		{ LastSplitted = _LastSplitted; }
 
-    
+        inline void		setSplitReason( const string& _Reason)
+		{ SplitReason = _Reason; }
+
 	//Methods for updating 
 
 	bool Insert();
@@ -76,6 +80,7 @@ protected:
 	string Numeric;
 	time_t LastConnected;
 	time_t LastSplitted;
+	string SplitReason;
 	PgDatabase* SQLDb;
 
 }; // class ccServer

@@ -50,7 +50,7 @@
 #include	"UnloadClientTimerHandler.h"
 
 const char server_h_rcsId[] = __SERVER_H ;
-const char server_cc_rcsId[] = "$Id: server.cc,v 1.117 2001/08/26 22:22:55 dan_karrels Exp $" ;
+const char server_cc_rcsId[] = "$Id: server.cc,v 1.118 2001/10/17 21:39:11 mrbean_ Exp $" ;
 const char config_h_rcsId[] = __CONFIG_H ;
 const char misc_h_rcsId[] = __MISC_H ;
 const char events_h_rcsId[] = __EVENTS_H ;
@@ -952,7 +952,7 @@ charYYXXX += "]]]" ;
 // couldn't link without [ip] being added to their realname
 // field unless they were juped by uworld.  Now anyone can
 // link with that name, oh well.
-Write( "%s S %s %d %d %d P%02d %s 0 :JUPE Reason: %s\n",
+Write( "%s S %s %d %d %d J%02d %s 0 :JUPE Reason: %s\n",
 		getCharYY(),
 		fakeServer->getName().c_str(),
 		2,
@@ -963,8 +963,8 @@ Write( "%s S %s %d %d %d P%02d %s 0 :JUPE Reason: %s\n",
 		description.c_str() ) ;
 
 // Write burst acknowledgements.
-Write( "%s EB", fakeServer->getCharYY() ) ;
-Write( "%s EA", fakeServer->getCharYY() ) ;
+Write( "%s EB\n", fakeServer->getCharYY() ) ;
+Write( "%s EA\n", fakeServer->getCharYY() ) ;
 
 // Add this fake server to the internal list of juped servers.
 jupedServers.push_back( fakeServer->getIntYY() ) ;
@@ -3783,6 +3783,20 @@ if( (string::npos == exPos) || (string::npos == atPos) ||
 	}
 
 return true ;
+}
+
+bool xServer::isJuped(const iServer* theServer)
+{
+for( jupedServerListType::iterator ptr = jupedServers.begin() ;
+	ptr != jupedServers.end() ; ++ptr )
+	{
+	if( *ptr== theServer->getIntYY() )
+		{
+		return true;
+		}
+	}
+
+return false;
 }
 
 } // namespace gnuworld

@@ -3,7 +3,7 @@
  * 
  * Server class
  * 
- * $Id: ccServer.cc,v 1.4 2001/09/26 11:42:19 mrbean_ Exp $
+ * $Id: ccServer.cc,v 1.5 2001/10/17 21:39:11 mrbean_ Exp $
  */
  
 #include	<strstream>
@@ -19,7 +19,7 @@
 #include	"ccServer.h" 
 
 const char ccServer_h_rcsId[] = __CCSERVER_H ;
-const char ccServer_cc_rcsId[] = "$Id: ccServer.cc,v 1.4 2001/09/26 11:42:19 mrbean_ Exp $" ;
+const char ccServer_cc_rcsId[] = "$Id: ccServer.cc,v 1.5 2001/10/17 21:39:11 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -38,6 +38,7 @@ ccServer::ccServer(PgDatabase* _SQLDb)
    Numeric(),
    LastConnected( 0 ),
    LastSplitted( 0 ),
+   SplitReason( "" ),
    SQLDb( _SQLDb )
 {
 }
@@ -47,7 +48,7 @@ ccServer::~ccServer()
 
 bool ccServer::Insert()
 {
-static const char *Main = "INSERT into servers (Name,LastUplink,LastNumeric,LastConnected,SplitedOn) VALUES ('";
+static const char *Main = "INSERT into servers (Name,LastUplink,LastNumeric,LastConnected,SplitedOn,SplitReason) VALUES ('";
 
 strstream theQuery;
 theQuery	<< Main
@@ -55,7 +56,8 @@ theQuery	<< Main
 		<< Uplink << "','"
 		<< Numeric << "',"
 		<< LastConnected << ","
-		<< LastSplitted << ")"
+		<< LastSplitted 
+		<< ",'" << SplitReason << "')"
 		<< ends;
 
 elog	<< "ccontrol::Server::Insert::sqlQuery> "
@@ -94,7 +96,9 @@ theQuery	<< Main
 		<< LastConnected
 		<< ",SplitedOn = "
 		<< LastSplitted
-		<< " WHERE lower(Name) = '" << string_lower(Name)
+		<< ", SplitReason = '"
+		<< SplitReason 
+		<< "' WHERE lower(Name) = '" << string_lower(Name)
 		<<  "'" << ends;
 
 elog	<< "ccontrol::Server::Update> "
@@ -119,7 +123,8 @@ else
 
 bool ccServer::loadData(string ServerName)
 {
-static const char *Main = "SELECT name,lastuplink,lastconnected,splitedon,lastnumeric FROM servers WHERE lower(Name) = '";
+static const char *Main = "SELECT name,lastuplink,lastconnected,splitedon,lastnumeric,splitreason FROM servers WHERE 
+lower(Name) = '";
 
 strstream theQuery;
 theQuery	<< Main
@@ -149,13 +154,14 @@ Uplink = SQLDb->GetValue(0,1);
 LastConnected = static_cast< time_t >( atoi( SQLDb->GetValue(0,2) ) ) ;
 LastSplitted = static_cast< time_t >( atoi( SQLDb->GetValue(0,3) ) ) ;
 Numeric = SQLDb->GetValue(0,4);
-
+SplitReason=SQLDb->GetValue(0,5);
 return true;
 }
 
 bool ccServer::loadNumericData(string ServNumeric)
 {
-static const char *Main = "SELECT name,lastuplink,lastconnected,splitedon,lastnumeric FROM servers WHERE LastNumeric = '";
+static const char *Main = "SELECT name,lastuplink,lastconnected,splitedon,lastnumeric,SplitReason FROM servers WHERE 
+LastNumeric = '";
 
 strstream theQuery;
 theQuery	<< Main
@@ -185,7 +191,7 @@ Uplink = SQLDb->GetValue(0,1);
 LastConnected = static_cast< time_t >( atoi( SQLDb->GetValue(0,2) ) ) ;
 LastSplitted = static_cast< time_t >( atoi( SQLDb->GetValue(0,3) ) ) ;
 Numeric = SQLDb->GetValue(0,4);
-
+SplitReason = SQLDb->GetValue(0,5);
 return true;
 }
 

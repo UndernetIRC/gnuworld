@@ -17,7 +17,7 @@
  */
 
 #ifndef __SERVER_H
-#define __SERVER_H "$Id: server.h,v 1.50 2001/09/23 02:27:19 gte Exp $"
+#define __SERVER_H "$Id: server.h,v 1.51 2001/10/17 21:39:11 mrbean_ Exp $"
 
 #include	<string>
 #include	<vector>
@@ -932,6 +932,12 @@ protected:
 	virtual bool	banSyntax( const string& ) const ;
 
 	/**
+	 * Check if a server is juped
+	 */
+	 
+	 virtual bool isJuped( const iServer* );
+	
+	/**
 	 * Parse a burst line for channel bans.
 	 */
 	virtual void	parseBurstBans( Channel*, const char* ) ;
@@ -972,6 +978,7 @@ protected:
 	 */
 	virtual void	onUserModeChange( xParameters& ) ;
 
+	
 	/**
 	 * This variable is false when no signal has occured, true
 	 * otherwise.  This variable is checked each iteration of

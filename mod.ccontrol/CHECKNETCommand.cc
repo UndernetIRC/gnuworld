@@ -13,7 +13,7 @@
 #include	"StringTokenizer.h"
 #include	"Network.h"
 
-const char CHECKNETCommand_cc_rcsId[] = "$Id: CHECKNETCommand.cc,v 1.1 2001/07/26 20:12:40 mrbean_ Exp $";
+const char CHECKNETCommand_cc_rcsId[] = "$Id: CHECKNETCommand.cc,v 1.2 2001/10/17 21:39:11 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -62,7 +62,11 @@ for (int i = 0 ; i < bot->SQLDb->Tuples(); i++)
 		strcat(Msg,"\002 Is missing, ");
 		strcat(Msg,"Last split time : ");
 		if(atoi(bot->SQLDb->GetValue(i,3)) != 0)
+			{
 			strcat(Msg,bot->SQLDb->GetValue(i,3));
+			strcat(Msg," Split Reason:");
+			strcat(Msg,bot->SQLDb->GetValue(i,5));
+			}
 		else
 			strcat(Msg," unknown ");
 			
