@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------------
--- "$Id: cservice.sql,v 1.71 2003/01/01 04:43:51 gte Exp $"
+-- "$Id: cservice.sql,v 1.72 2003/01/05 20:52:15 gte Exp $"
 -- Channel service DB SQL file for PostgreSQL.
 
 -- ChangeLog:
@@ -191,6 +191,7 @@ CREATE TABLE users (
 -- 0x00 04 -- Invisible.
 -- 0x00 08 -- Fraud username.
 -- 0x00 10 -- "No-Notes" - We don't want to be sent notes.
+-- 0x00 20 -- "No Purge" - Don't remove the username for being idle.
 	last_updated_by VARCHAR (128),		-- nick!user@host
 	last_updated INT4 NOT NULL, 
 	deleted INT2 DEFAULT '0',
