@@ -13,7 +13,7 @@
 #include	"md5hash.h" 
 #include        "ccUser.h"
 
-const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.12 2001/07/24 12:12:34 mrbean_ Exp $";
+const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.13 2001/07/26 20:12:40 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -53,7 +53,9 @@ if (!theUser)
 else
 	{ 
 	//Check if the user need to be operd to login
-	if((!theClient->isOper()) && (flg_LOGIN & flg_NEEDOP) && (theUser->getNeedOp()))
+//	if((!theClient->isOper()) && (flg_LOGIN & flg_NEEDOP) && (theUser->getNeedOp()))
+	if((!theClient->isOper()) && (getNeedOp()) && (theUser->getNeedOp()))
+
 		{
 		bot->Notice(theClient,
 			     "You must be operd up to login");

@@ -1,5 +1,5 @@
 /*
- * REMOVESCOMMANDCommand.cc
+ * REMCOMMANDCommand.cc
  *
  * Removes a command from oper access list
  *
@@ -15,7 +15,7 @@
 #include 	"ccUser.h"
 #include	"misc.h"
 
-const char REMOVECOMMANDCommand_cc_rcsId[] = "$Id: REMOVECOMMANDCommand.cc,v 1.11 2001/07/23 10:28:51 mrbean_ Exp $";
+const char REMCOMMANDCommand_cc_rcsId[] = "$Id: REMCOMMANDCommand.cc,v 1.1 2001/07/26 20:12:40 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -25,7 +25,7 @@ using std::string ;
 namespace uworld
 {
 
-bool REMOVECOMMANDCommand::Exec( iClient* theClient, const string& Message)
+bool REMCOMMANDCommand::Exec( iClient* theClient, const string& Message)
 {
 StringTokenizer st( Message ) ;
 
@@ -53,7 +53,7 @@ if(CommandLevel == -1 )
 	return false;	        
 	}
 //CommandLevel &= ~flg_NOLOG;
-CommandLevel = bot->getTrueAccess(CommandLevel);
+//CommandLevel = bot->getTrueAccess(CommandLevel);
 //Check if the user is trying to remove a command for himself
 AuthInfo* tempUser = bot->IsAuth(theClient->getCharYYXXX());
 

@@ -1,5 +1,5 @@
 /*
- * LEARNNETWORKCommand.cc
+ * LEARNNETCommand.cc
  *
  * Causes the bot to automatically update its server db
  *
@@ -15,7 +15,7 @@
 #include        "stdlib.h"
 #include        "server.h"
 
-const char LEARNNETWORKCommand_cc_rcsId[] = "$Id: LEARNNETWORKCommand.cc,v 1.9 2001/07/23 10:28:51 mrbean_ Exp $";
+const char LEARNNETCommand_cc_rcsId[] = "$Id: LEARNNETCommand.cc,v 1.1 2001/07/26 20:12:40 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -25,7 +25,7 @@ using std::string ;
 namespace uworld
 {
 
-bool LEARNNETWORKCommand::Exec( iClient* theClient, const string& Message )
+bool LEARNNETCommand::Exec( iClient* theClient, const string& Message )
 {
 ccServer* NewServer = new ccServer(bot->SQLDb);
 assert(NewServer != NULL);

@@ -1,5 +1,5 @@
 /*
- * MODOPERCommand.cc
+ * MODUSERCommand.cc
  *
  * Modify an oper database entry
  *
@@ -14,7 +14,7 @@
 #include	"ccUser.h"
 #include	"misc.h"
 
-const char MODOPERCommand_cc_rcsId[] = "$Id: MODOPERCommand.cc,v 1.15 2001/07/25 22:24:59 mrbean_ Exp $";
+const char MODUSERCommand_cc_rcsId[] = "$Id: MODUSERCommand.cc,v 1.1 2001/07/26 20:12:40 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -25,7 +25,7 @@ namespace uworld
 {
 
 
-bool MODOPERCommand::Exec( iClient* theClient, const string& Message)
+bool MODUSERCommand::Exec( iClient* theClient, const string& Message)
 {	 
 StringTokenizer st( Message ) ;
 if(st.size() < 2)

@@ -27,7 +27,7 @@
 #include 	"gline.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.62 2001/07/24 12:12:34 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.63 2001/07/26 20:12:40 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -156,88 +156,89 @@ if( operChans.end() == find( operChans.begin(), operChans.end(), msgChan ) )
 // Be sure to use all capital letters for the command name
 
 RegisterCommand( new HELPCommand( this, "HELP", "[topic]"
-	"\t\tObtain general help or help for a specific command",flg_HELP ) ) ;
+	"\t\tObtain general help or help for a specific command",flg_HELP,false,false,true,operLevel::UHSLEVEL ) ) ;
 RegisterCommand( new INVITECommand( this, "INVITE", "<#channel> "
-	"\t\tRequest an invitation to a channel",flg_INVITE ) ) ;
+	"\t\tRequest an invitation to a channel",flg_INVITE,false,false,false,operLevel::UHSLEVEL ) ) ;
 RegisterCommand( new JUPECommand( this, "JUPE", "<servername> <reason> "
-	"Jupe a server for the given reason.",flg_JUPE ) ) ;
+	"Jupe a server for the given reason.",flg_JUPE,false,false,false,operLevel::UHSLEVEL ) ) ;
 RegisterCommand( new MODECommand( this, "MODE", "<channel> <modes> "
-	"Change modes on the given channel",flg_MODE ) ) ;
+	"Change modes on the given channel",flg_MODE,false,false,false,operLevel::UHSLEVEL ) ) ;
 RegisterCommand( new GLINECommand( this, "GLINE", "<user@host> <duration>[time units (s,d,h)] <reason> "
-	"Gline a given user@host for the given reason",flg_GLINE ) ) ;
+	"Gline a given user@host for the given reason",flg_GLINE,false,false,false,operLevel::UHSLEVEL ) ) ;
 RegisterCommand( new SCANGLINECommand( this, "SCANGLINE", "<mask> "
-	"Search current network glines for glines matching <mask>",flg_SGLINE ) ) ;
+	"Search current network glines for glines matching <mask>",flg_SGLINE,false,false,false,operLevel::UHSLEVEL ) ) ;
 RegisterCommand( new REMGLINECommand( this, "REMGLINE", "<user@host> "
-	"Remove the gline matching <mask>",flg_REMGLINE ) ) ;
+	"Remove the gline matching <mask>",flg_REMGLINE,false,false,false,operLevel::UHSLEVEL ) ) ;
 RegisterCommand( new TRANSLATECommand( this, "TRANSLATE", "<numeric>"
-	"Translate a numeric into user information",flg_TRANS ) ) ;
+	"Translate a numeric into user information",flg_TRANS,false,false,false,operLevel::UHSLEVEL ) ) ;
 RegisterCommand( new WHOISCommand( this, "WHOIS", "<nickname>"
-	"Obtain information on a given nickname",flg_WHOIS ) ) ;
+	"Obtain information on a given nickname",flg_WHOIS,false,false,false,operLevel::UHSLEVEL ) ) ;
 RegisterCommand( new KICKCommand( this, "KICK", "<channel> <nick> <reason>"
-	"Kick a user from a channel",flg_KICK ) ) ;
+	"Kick a user from a channel",flg_KICK,false,false,false,operLevel::UHSLEVEL ) ) ;
 RegisterCommand( new ADDOPERCHANCommand( this, "ADDOPERCHAN", "<channel>"
-	"Add an oper channel",flg_ADDOPCHN ) ) ;
+	"Add an oper channel",flg_ADDOPCHN,false,false,false,operLevel::UHSLEVEL ) ) ;
 RegisterCommand( new REMOPERCHANCommand( this, "REMOPERCHAN", "<channel>"
-	"Remove an oper channel",flg_REMOPCHN ) ) ;
+	"Remove an oper channel",flg_REMOPCHN,false,false,false,operLevel::UHSLEVEL ) ) ;
 RegisterCommand( new LISTOPERCHANSCommand( this, "LISTOPERCHANS",
-	"List current IRCoperator only channels",flg_LOPCHN ) ) ;
+	"List current IRCoperator only channels",flg_LOPCHN,false,false,false,operLevel::UHSLEVEL ) ) ;
 RegisterCommand( new CHANINFOCommand( this, "CHANINFO", "<channel>"
-	"Obtain information about a given channel",flg_CHINFO ) ) ;
+	"Obtain information about a given channel",flg_CHINFO,false,false,false,operLevel::UHSLEVEL ) ) ;
 RegisterCommand( new ACCESSCommand( this, "ACCESS",
-	"Obtain the access list",flg_ACCESS ) ) ;
+	"Obtain the access list",flg_ACCESS,false,false,true,operLevel::UHSLEVEL ) ) ;
 RegisterCommand( new LOGINCommand( this, "LOGIN", "<USER> <PASS> "
-	"Authenticate with the bot",flg_LOGIN ) ) ;
+	"Authenticate with the bot",flg_LOGIN,false,true,true,operLevel::UHSLEVEL ) ) ;
 RegisterCommand( new DEAUTHCommand( this, "DEAUTH", ""
-	"Deauthenticate with the bot",flg_DEAUTH ) ) ;
-RegisterCommand( new ADDNEWOPERCommand( this, "ADDUSER", "<USER> <OPERTYPE> <PASS> "
-	"Add a new oper",flg_ADDNOP ) ) ;
-RegisterCommand( new REMOVEOPERCommand( this, "REMUSER", "<USER> <PASS> "
-	"Remove an oper",flg_REMOP ) ) ;
+	"Deauthenticate with the bot",flg_DEAUTH,false,false,true,operLevel::UHSLEVEL ) ) ;
+RegisterCommand( new ADDUSERCommand( this, "ADDUSER", "<USER> <OPERTYPE> <PASS> "
+	"Add a new oper",flg_ADDNOP,false,false,false,operLevel::UHSLEVEL ) ) ;
+RegisterCommand( new REMUSERCommand( this, "REMUSER", "<USER> <PASS> "
+	"Remove an oper",flg_REMOP,false,false,false,operLevel::UHSLEVEL ) ) ;
 RegisterCommand( new ADDCOMMANDCommand( this, "ADDCOMMAND", "<USER> <COMMAND> "
-	"Add a new command to an oper",flg_ADDCMD ) ) ;
-RegisterCommand( new REMOVECOMMANDCommand( this, "REMCOMMAND", "<USER> <COMMAND> "
-	"Remove a command from oper",flg_DELCMD ) ) ;
+	"Add a new command to an oper",flg_ADDCMD,false,false,false,operLevel::UHSLEVEL ) ) ;
+RegisterCommand( new REMCOMMANDCommand( this, "REMCOMMAND", "<USER> <COMMAND> "
+	"Remove a command from oper",flg_DELCMD,false,false,false,operLevel::UHSLEVEL ) ) ;
 RegisterCommand( new NEWPASSCommand( this, "NEWPASS", "<PASSWORD> "
-	"Change password",flg_NEWPASS ) ) ;
-RegisterCommand( new SUSPENDOPERCommand( this, "SUSPEND", "<OPER> <DURATION> <TIME UNITS>"
-	"Suspend an oper",flg_SUSPEND ) ) ;
-RegisterCommand( new UNSUSPENDOPERCommand( this, "UNSUSPEND", "<OPER> "
-	"UnSuspend an oper",flg_UNSUSPEND ) ) ;
-RegisterCommand( new MODOPERCommand( this, "MODUSER", "<OPER> <OPTION> <NEWVALUE> [OPTION] [NEWVALUE] ... "
-	"Modify an oper",flg_UNSUSPEND ) ) ;
+	"Change password",flg_NEWPASS,false,false,true,operLevel::UHSLEVEL ) ) ;
+RegisterCommand( new SUSPENDCommand( this, "SUSPEND", "<OPER> <DURATION> <TIME UNITS>"
+	"Suspend an oper",flg_SUSPEND,false,false,false,operLevel::UHSLEVEL ) ) ;
+RegisterCommand( new UNSUSPENDCommand( this, "UNSUSPEND", "<OPER> "
+	"UnSuspend an oper",flg_UNSUSPEND,false,false,false,operLevel::UHSLEVEL ) ) ;
+RegisterCommand( new MODUSERCommand( this, "MODUSER", "<OPER> <OPTION> <NEWVALUE> [OPTION] [NEWVALUE] ... "
+	"Modify an oper",flg_UNSUSPEND,false,false,false,operLevel::UHSLEVEL ) ) ;
 RegisterCommand( new MODERATECommand( this, "MODERATE", "<#Channel> "
-	"Moderate A Channel",flg_UNSUSPEND ) ) ;
+	"Moderate A Channel",flg_UNSUSPEND,false,false,false,operLevel::UHSLEVEL ) ) ;
 RegisterCommand( new UNMODERATECommand( this, "UNMODERATE", "<#Channel> "
-	"UNModerate A Channel",flg_UNSUSPEND ) ) ;
+	"UNModerate A Channel",flg_UNSUSPEND,false,false,false,operLevel::UHSLEVEL ) ) ;
 RegisterCommand( new OPCommand( this, "OP", "<#Channel> <nick> [nick] .. "
-	"Op user(s) on a Channel",flg_OP ) ) ;
+	"Op user(s) on a Channel",flg_OP,false,false,false,operLevel::UHSLEVEL ) ) ;
 RegisterCommand( new DEOPCommand( this, "DEOP", "<#Channel> <nick> [nick] .. "
-	"Deop user(s) on a Channel",flg_DEOP ) ) ;
+	"Deop user(s) on a Channel",flg_DEOP,false,false,false,operLevel::UHSLEVEL ) ) ;
 RegisterCommand( new LISTHOSTSCommand( this, "LISTHOSTS", "<oper> "
-	"Shows an oper hosts list",flg_LISTHOSTS ) ) ;
+	"Shows an oper hosts list",flg_LISTHOSTS,false,false,false,operLevel::UHSLEVEL ) ) ;
 RegisterCommand( new CLEARCHANCommand( this, "CLEARCHAN", "<#chan> "
-	"Removes all channel modes",flg_CLEARCHAN ) ) ;
-RegisterCommand( new ADDNEWSERVERCommand( this, "ADDSERVER", "<Server> "
-	"Add a new server to the bot database",flg_ADDSERVER ) ) ;
-RegisterCommand( new LEARNNETWORKCommand( this, "LEARNNET", ""
-	"Update the servers database according to the current situation",flg_LEARNNET ) ) ;
-RegisterCommand( new REMOVESERVERCommand( this, "REMSERVER", "<Server name>"
-	"Removes a server from the bot database",flg_REMSERVER ) ) ;
-RegisterCommand( new CHECKNETWORKCommand( this, "CHECKNET", ""
-	"Checks if all known servers are in place",flg_CHECKNET ) ) ;
+	"Removes all channel modes",flg_CLEARCHAN,false,false,false,operLevel::UHSLEVEL ) ) ;
+RegisterCommand( new ADDSERVERCommand( this, "ADDSERVER", "<Server> "
+	"Add a new server to the bot database",flg_ADDSERVER,false,false,false,operLevel::UHSLEVEL ) ) ;
+RegisterCommand( new LEARNNETCommand( this, "LEARNNET", ""
+	"Update the servers database according to the current situation",flg_LEARNNET,false,false,false,operLevel::UHSLEVEL ) ) ;
+RegisterCommand( new REMSERVERCommand( this, "REMSERVER", "<Server name>"
+	"Removes a server from the bot database",flg_REMSERVER,false,false,false,operLevel::UHSLEVEL ) ) ;
+RegisterCommand( new CHECKNETCommand( this, "CHECKNET", ""
+	"Checks if all known servers are in place",flg_CHECKNET,false,false,false,operLevel::UHSLEVEL ) ) ;
 RegisterCommand( new LASTCOMCommand( this, "LASTCOM", "[number of lines to show]"
-	"Post you the bot logs",flg_LASTCOM ) ) ;
+	"Post you the bot logs",flg_LASTCOM,false,false,true,operLevel::UHSLEVEL ) ) ;
 RegisterCommand( new FORCEGLINECommand( this, "FORCEGLINE", "<user@host> <duration>[time units] <reason> "
-	"Gline a given user@host for the given reason",flg_FGLINE ) ) ;
+	"Gline a given user@host for the given reason",flg_FGLINE,false,false,false,operLevel::UHSLEVEL ) ) ;
 RegisterCommand( new EXCEPTIONCommand( this, "EXCEPTIONS", "(list / add / del) [host mask]"
-	"Add connection exceptions on hosts",flg_EXCEPTIONS ) ) ;
+	"Add connection exceptions on hosts",flg_EXCEPTIONS,false,false,false,operLevel::UHSLEVEL ) ) ;
 RegisterCommand( new LISTIGNORESCommand( this, "LISTIGNORES", ""
-	"List the ignore list",flg_LISTIGNORES ) ) ;
+	"List the ignore list",flg_LISTIGNORES,false,false,false,operLevel::UHSLEVEL ) ) ;
 RegisterCommand( new REMOVEIGNORECommand( this, "REMIGNORE", "(nick/host)"
-	" Removes a host/nick from the  ignore list",flg_REMIGNORE ) ) ;
-
+	" Removes a host/nick from the  ignore list",flg_REMIGNORE,false,false,false,operLevel::UHSLEVEL ) ) ;
 RegisterCommand( new LISTCommand( this, "LIST", "(glines)"
-	" Get all kinds of lists from the bot",flg_LIST ) ) ;
+	" Get all kinds of lists from the bot",flg_LIST,false,false,false,operLevel::UHSLEVEL ) ) ;
+RegisterCommand( new COMMANDSCommand( this, "COMMANDS", "<command> <option> <new value>"
+	" Change commands options",flg_LIST,false,false,false,operLevel::UHSLEVEL ) ) ;
 
 loadGlines();
 loadExceptions();
@@ -258,7 +259,7 @@ commandMap.clear() ;
 // Deallocate each gline entry
 for(glineIterator GLptr = glineList.begin(); GLptr != glineList.end(); ++GLptr)
 	{
-	glineList.erase(GLptr);
+	GLptr = glineList.erase(GLptr);
 	}
 
 }
@@ -270,6 +271,13 @@ assert( newComm != NULL ) ;
 
 // Unregister the command handler first; prevent memory leaks
 UnRegisterCommand( newComm->getName() ) ;
+
+if(!UpdateCommandFromDb(newComm))
+	elog << "Error cant find command "
+	     << newComm->getName() 
+	     << " In database"
+	     << ends;
+
 
 // Insert the new handler
 return commandMap.insert( pairType( newComm->getName(), newComm ) ).second ;
@@ -288,7 +296,7 @@ if( ptr == commandMap.end() )
 	}
 
 // Deallocate the handler
-delete ptr->second ;
+//delete ptr->second ;
 
 // Remove the handler
 commandMap.erase( ptr ) ;
@@ -393,13 +401,13 @@ if( commHandler == command_end() )
 
 int ComAccess = commHandler->second->getFlags();
 
-bool ShouldntLog = ComAccess & flg_NOLOG;
+//bool ShouldntLog = ComAccess & flg_NOLOG;
 
 AuthInfo* theUser = IsAuth(theClient->getCharYYXXX());
 
-bool NeedOp = ((ComAccess & flg_NEEDOP) && !(theClient->isOper()) && (getTrueAccess(ComAccess)) && (theUser->getNeedOp()));
+bool NeedOp = ((commHandler->second->getNeedOp()) && !(theClient->isOper()) && (ComAccess) && (theUser->getNeedOp()));
 
-ComAccess = getTrueAccess(ComAccess);
+//ComAccess = ComAccess);
 
 if(NeedOp)
 	{
@@ -420,10 +428,15 @@ else if(( isSuspended(theUser) ) && ( ComAccess ) )
 		Notice( theClient,
 			"Sorry but you are suspended");
 		}
+else if(commHandler->second->getIsDisabled())
+	{
+	Notice(theClient,
+		"Sorry, but this command is disabled");
+	}
 else 
 	{
 	// Log the command
-	if(!ShouldntLog) //Dont log command which arent suppose to be logged
+	if(!commHandler->second->getNoLog()) //Dont log command which arent suppose to be logged
 		DailyLog(theUser,Message.c_str());
 	// Execute the command handler
 	commHandler->second->Exec( theClient, Message) ;
@@ -2216,10 +2229,10 @@ Notice(theClient,"-= End Of Gline List =-");
 
 }
 			
-/*void ccontrol::listSuspended( iClient * )
+void ccontrol::listSuspended( iClient * )
 {
 
-}*/
+}
 
 	
 void ccontrol::listServers( iClient * )
@@ -2227,7 +2240,7 @@ void ccontrol::listServers( iClient * )
 
 }
 
-unsigned int ccontrol::getTrueAccess( unsigned int Access )
+/*unsigned int ccontrol::getTrueAccess( unsigned int Access )
 {
 return (Access & ~noACCESS);
 }
@@ -2236,6 +2249,154 @@ return (Access & ~noACCESS);
 unsigned int ccontrol::getTrueFlags( unsigned int Flags )
 {
 return (Flags & ~noFLAG);
+}*/
+
+void ccontrol::loadCommands()
+{
+
+static const char *Main = "SELECT * FROM Commands";
+
+strstream theQuery;
+theQuery	<< Main
+		<< ends;
+
+elog	<< "ccontrol::loadCommands> "
+	<< theQuery.str()
+	<< endl; 
+
+ExecStatusType status = SQLDb->Exec( theQuery.str() ) ;
+delete[] theQuery.str() ;
+
+if( PGRES_TUPLES_OK != status )
+	{
+	elog	<< "ccontrol::loadCommands> SQL Failure: "
+		<< SQLDb->ErrorMessage()
+		<< endl ;
+
+	return;
+	}
+
+Command* NewCom;
+
+for( int i = 0 ; i < SQLDb->Tuples() ; i++ )
+	{
+	NewCom = findRealCommand(SQLDb->GetValue(i,0));
+	if(!NewCom)
+		{
+		elog	<< "Can't find handler for command "
+			<< SQLDb->GetValue(i,0)
+			<< ends;	
+		}
+	else
+		{
+		NewCom->setName(SQLDb->GetValue(i,1));
+		if(!strcasecmp(SQLDb->GetValue(i,3),"t"))
+			NewCom->Enable();
+		else
+			NewCom->Disable();
+		NewCom->setNeedOp(!strcasecmp(SQLDb->GetValue(i,4),"t") ? true : false);			
+		NewCom->setNoLog(!strcasecmp(SQLDb->GetValue(i,5),"t") ? true : false);			
+
+		}
+	}
+
+}
+
+	
+bool ccontrol::updateCommand ( Command* Comm)
+{
+static const char *Main = "UPDATE Commands set name = '";
+
+strstream theQuery;
+theQuery	<< Main
+		<< Comm->getName()
+		<< "', isDisabled = "
+		<< (Comm->getIsDisabled() ? "'t'" : "'n'")
+		<< ", NeedOp = "
+		<< (Comm->getNeedOp() ? "'t'" : "'n'")
+		<< ", NoLog = "
+		<< (Comm->getNoLog() ? "'t'" : "'n'")
+		<< ", MinLevel = "
+		<< Comm->getMinLevel() 
+		<< " Where lower(RealName) = '"
+		<< string_lower(Comm->getRealName())
+		<< "'"
+		<< ends;
+
+elog	<< "ccontrol::updateCommands> "
+	<< theQuery.str()
+	<< endl; 
+
+ExecStatusType status = SQLDb->Exec( theQuery.str() ) ;
+delete[] theQuery.str() ;
+
+if( PGRES_COMMAND_OK != status )
+	{
+	elog	<< "ccontrol::updateCommands> SQL Failure: "
+		<< SQLDb->ErrorMessage()
+		<< endl ;
+
+	return false;
+	}
+
+RegisterCommand(Comm);
+return true;
+
+}
+	
+Command* ccontrol::findRealCommand( const string& commName)
+{
+for( commandMapType::iterator ptr = commandMap.begin() ;
+	ptr != commandMap.end() ; ++ptr )
+	if(!strcasecmp(ptr->second->getRealName(),commName))
+		return ptr->second;
+return NULL;
+}
+
+Command* ccontrol::findCommandInMem( const string& commName)
+{
+for( commandMapType::iterator ptr = commandMap.begin() ;
+	ptr != commandMap.end() ; ++ptr )
+	if(!strcasecmp(ptr->second->getName(),commName))
+		return ptr->second;
+return NULL;
+}
+
+		
+bool ccontrol::UpdateCommandFromDb ( Command* Comm )
+{
+static const char *Main = "SELECT * From Commands where lower(RealName) = '";
+
+strstream theQuery;
+theQuery	<< Main
+		<< string_lower(Comm->getRealName())
+		<< "'" << ends;
+
+
+ExecStatusType status = SQLDb->Exec( theQuery.str() ) ;
+delete[] theQuery.str() ;
+
+if( PGRES_TUPLES_OK != status )
+	{
+	elog	<< "ccontrol::LoadCommand> SQL Failure: "
+		<< SQLDb->ErrorMessage()
+		<< endl ;
+
+	return false;
+	}
+if(SQLDb->Tuples() == 0)
+	return false;
+Comm->setName(SQLDb->GetValue(0,1));
+if(!strcasecmp(SQLDb->GetValue(0,3),"t"))
+	Comm->Disable();
+else
+	Comm->Enable();
+Comm->setNeedOp((!strcasecmp(SQLDb->GetValue(0,4),"t")) ? true : false);
+Comm->setNoLog((!strcasecmp(SQLDb->GetValue(0,5),"t")) ? true : false);
+Comm->setMinLevel(atoi(SQLDb->GetValue(0,6)));
+
+return true;
+
 }
 
 }

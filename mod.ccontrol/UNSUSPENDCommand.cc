@@ -1,5 +1,5 @@
 /*
- * UNSUSPENDOPERCommand.cc
+ * UNSUSPENDCommand.cc
  *
  * Unsuspend an oper
  *
@@ -12,7 +12,7 @@
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 
-const char UNSUSPENDOPERCommand_cc_rcsId[] = "$Id: UNSUSPENDOPERCommand.cc,v 1.8 2001/07/23 10:28:51 mrbean_ Exp $";
+const char UNSUSPENDCommand_cc_rcsId[] = "$Id: UNSUSPENDCommand.cc,v 1.1 2001/07/26 20:12:40 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -22,7 +22,7 @@ using std::string ;
 namespace uworld
 {
 
-bool UNSUSPENDOPERCommand::Exec( iClient* theClient, const string& Message)
+bool UNSUSPENDCommand::Exec( iClient* theClient, const string& Message)
 {
 StringTokenizer st( Message ) ;
 	

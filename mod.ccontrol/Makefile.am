@@ -1,22 +1,23 @@
 ## Process this file with automake to produce Makefile.in
-# "$Id: Makefile.am,v 1.21 2001/06/11 21:08:31 mrbean_ Exp $"
+# "$Id: Makefile.am,v 1.22 2001/07/26 20:12:40 mrbean_ Exp $"
 
 lib_LTLIBRARIES = libccontrol.la
 libccontrol_la_SOURCES = ccontrol.cc \
 	CControlCommands.cc \
 	ACCESSCommand.cc \
 	ADDCOMMANDCommand.cc \
-	ADDNEWOPERCommand.cc \
-	ADDNEWSERVERCommand.cc \
 	ADDOPERCHANCommand.cc \
+	ADDSERVERCommand.cc \
+	ADDUSERCommand.cc \
 	ccException.cc \
 	ccLogin.cc \
 	ccGline.cc \
 	ccServer.cc \
 	ccUser.cc \
 	CHANINFOCommand.cc \
-	CHECKNETWORKCommand.cc \
+	CHECKNETCommand.cc \
 	CLEARCHANCommand.cc \
+	COMMANDSCommand.cc \
 	DEAUTHCommand.cc \
 	DEOPCommand.cc \
 	EXCEPTIONCommand.cc \
@@ -27,7 +28,7 @@ libccontrol_la_SOURCES = ccontrol.cc \
 	JUPECommand.cc \
 	KICKCommand.cc \
 	LASTCOMCommand.cc \
-	LEARNNETWORKCommand.cc \
+	LEARNNETCommand.cc \
 	LISTCommand.cc \
 	LISTHOSTSCommand.cc \
 	LISTIGNORESCommand.cc \
@@ -35,20 +36,20 @@ libccontrol_la_SOURCES = ccontrol.cc \
 	LOGINCommand.cc \
 	MODECommand.cc \
 	MODERATECommand.cc \
-	MODOPERCommand.cc \
+	MODUSERCommand.cc \
 	NEWPASSCommand.cc \
 	OPCommand.cc \
 	REMGLINECommand.cc \
 	REMOPERCHANCommand.cc \
-	REMOVECOMMANDCommand.cc \
+	REMCOMMANDCommand.cc \
 	REMOVEIGNORECommand.cc \
-	REMOVEOPERCommand.cc \
-	REMOVESERVERCommand.cc \
+	REMSERVERCommand.cc \
+	REMUSERCommand.cc \
 	SCANGLINECommand.cc \
-	SUSPENDOPERCommand.cc \
+	SUSPENDCommand.cc \
 	TRANSLATECommand.cc \
 	UNMODERATECommand.cc \
-	UNSUSPENDOPERCommand.cc \
+	UNSUSPENDCommand.cc \
 	WHOISCommand.cc
     	
 libccontrol_la_LDFLAGS = -module -export-dynamic -L@PGSQL_LIB@ -lpq++

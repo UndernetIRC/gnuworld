@@ -14,7 +14,7 @@
 #include	"ccontrol.h"
 #include	"CControlCommands.h"
 
-const char ACCESSCommand_cc_rcsId[] = "$Id: ACCESSCommand.cc,v 1.9 2001/07/23 10:28:51 mrbean_ Exp $";
+const char ACCESSCommand_cc_rcsId[] = "$Id: ACCESSCommand.cc,v 1.10 2001/07/26 20:12:39 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -68,10 +68,10 @@ if( PGRES_TUPLES_OK != status )
 	}
 
 // SQL Query succeeded
-string Flags;
+string Flags = "UnSet";
 for (int i = 0 ; i < bot->SQLDb->Tuples(); i++)
 	{
-	if(atoi(bot->SQLDb->GetValue(i,2)) & isOPER)
+/*	if(atoi(bot->SQLDb->GetValue(i,2)) & isOPER)
 		{
 		Flags.assign("OPER");
 		}
@@ -86,7 +86,7 @@ for (int i = 0 ; i < bot->SQLDb->Tuples(); i++)
 	else if(atoi(bot->SQLDb->GetValue(i,2)) & isCODER)
 		{
 		Flags.assign("CODER");
-		}
+		}*/
 	bot->Notice(theClient, "USER: \002%s\002 ACCESS: \002 0x%x\002 FLAGS: \002%s\002 MODIFIED BY: \002%s\002 SERVER: \002%s\002",
 		bot->SQLDb->GetValue(i, 0),
 		atoi(bot->SQLDb->GetValue(i, 1)),

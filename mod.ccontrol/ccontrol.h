@@ -3,7 +3,7 @@
  */
 
 #ifndef __CCONTROL_H
-#define __CCONTROL_H "$Id: ccontrol.h,v 1.39 2001/07/23 10:28:51 mrbean_ Exp $"
+#define __CCONTROL_H "$Id: ccontrol.h,v 1.40 2001/07/26 20:12:40 mrbean_ Exp $"
 
 
 #include	<string>
@@ -513,9 +513,20 @@ public:
 	
 	void listServers( iClient * );
 	
-	unsigned int getTrueAccess( unsigned int Access );
+//	unsigned int getTrueAccess( unsigned int Access );
 	
-	unsigned int getTrueFlags( unsigned int Flags );
+//	unsigned int getTrueFlags( unsigned int Flags );
+	
+	void loadCommands();
+	
+	bool updateCommand ( Command* );
+	
+	Command* findRealCommand( const string& );
+	
+	Command* findCommandInMem( const string& );
+
+	bool UpdateCommandFromDb ( Command* Comm );
+
 
 	/**
 	 * This is a constant iterator type used to perform a read-only

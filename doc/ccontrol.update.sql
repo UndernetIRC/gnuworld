@@ -1,5 +1,5 @@
 
--- "$Id: ccontrol.update.sql,v 1.2 2001/07/23 12:09:08 mrbean_ Exp $"
+-- "$Id: ccontrol.update.sql,v 1.3 2001/07/26 20:12:39 mrbean_ Exp $"
 
 -- ccontrol database changes update
 -- this file will add the new features to an old database
@@ -24,3 +24,14 @@ UPDATE opers set isOPER = 't' where flags = 2;
 UPDATE opers set isADMIN = 't' where flags = 4;
 UPDATE opers set isSMT = 't' where flags = 8;
 UPDATE opers set isCODER = 't' where flags = 32;
+
+-- Create the commands table
+
+CREATE TABLE commands (
+	RealName VARCHAR(128) NOT NULL UNIQUE,
+	Name     VARCHAR(128) NOT NULL UNIQUE,
+	Flags    INT4 NOT NULL,
+	IsDisabled BOOLEAN NOT NULL DEFAULT 'n',
+	NeedOp     BOOLEAN NOT NULL DEFAULT 'n',
+	NoLog      BOOLEAN NOT NULL DEFAULT 'n'
+	);

@@ -1,5 +1,5 @@
 /*
- * ADDNEWOPERCommand.cc
+ * ADDUSERCommand.cc
  *
  * Adds a new oper to the bot database
  * 
@@ -20,7 +20,7 @@
 #include        "ccUser.h"
 #include	"misc.h"
 
-const char ADDNEWOPERCommand_cc_rcsId[] = "$Id: ADDNEWOPERCommand.cc,v 1.14 2001/07/23 10:28:51 mrbean_ Exp $";
+const char ADDUSERCommand_cc_rcsId[] = "$Id: ADDUSERCommand.cc,v 1.1 2001/07/26 20:12:40 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -30,7 +30,7 @@ using std::string ;
 namespace uworld
 {
 
-bool ADDNEWOPERCommand::Exec( iClient* theClient, const string& Message)
+bool ADDUSERCommand::Exec( iClient* theClient, const string& Message)
 {
  
 StringTokenizer st( Message ) ;
@@ -95,7 +95,7 @@ if( NULL == tOper )
 
 //Make sure the new oper wont have a command the old one doesnt have enabled
 NewAccess &= tOper->getAccess(); 
-NewAccess = bot->getTrueAccess(NewAccess);
+//NewAccess = bot->getTrueAccess(NewAccess);
 //Check if the user doesnt try to add an oper with higher flag than he is
 unsigned int OperFlags = tOper->getFlags();
 if(OperFlags < operLevel::ADMINLEVEL)

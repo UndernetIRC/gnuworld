@@ -1,4 +1,4 @@
--- "$Id: ccontrol.sql,v 1.14 2001/07/23 12:32:33 mrbean_ Exp $"
+-- "$Id: ccontrol.sql,v 1.15 2001/07/26 20:12:39 mrbean_ Exp $"
 -- 2001-13-02  : |MrBean|
 -- Added level patch for ccontrol module
 
@@ -87,3 +87,14 @@ CREATE TABLE exceptions (
 	AddedBy VARCHAR(128) NOT NULL,
 	AddedOn INT4 NOT NULL DEFAULT now()::abstime::int4
 	);	
+	
+CREATE TABLE commands (
+	RealName VARCHAR(128) NOT NULL UNIQUE,
+	Name     VARCHAR(128) NOT NULL UNIQUE,
+	Flags    INT4 NOT NULL,
+	IsDisabled BOOLEAN NOT NULL DEFAULT 'n',
+	NeedOp     BOOLEAN NOT NULL DEFAULT 'n',
+	NoLog      BOOLEAN NOT NULL DEFAULT 'n',
+	MinLevel   INT4 NOT NULL DEFAULT '1'
+	);
+	

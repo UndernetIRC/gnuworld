@@ -1,5 +1,5 @@
 /*
- * CHECKNETWORKCommand.cc
+ * CHECKNETCommand.cc
  *
  * Delete a server for the bot database
  *
@@ -13,7 +13,7 @@
 #include	"StringTokenizer.h"
 #include	"Network.h"
 
-const char CHECKNETWORKCommand_cc_rcsId[] = "$Id: CHECKNETWORKCommand.cc,v 1.3 2001/07/23 10:28:51 mrbean_ Exp $";
+const char CHECKNETCommand_cc_rcsId[] = "$Id: CHECKNETCommand.cc,v 1.1 2001/07/26 20:12:40 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -23,7 +23,7 @@ using std::string ;
 namespace uworld
 {
 
-bool CHECKNETWORKCommand::Exec( iClient* theClient, const string& Message )
+bool CHECKNETCommand::Exec( iClient* theClient, const string& Message )
 {
 
 static const char* queryHeader

@@ -16,7 +16,7 @@
 #include	"AuthInfo.h"
 #include	"misc.h"
 
-const char ADDCOMMANDCommand_cc_rcsId[] = "$Id: ADDCOMMANDCommand.cc,v 1.11 2001/07/23 10:28:51 mrbean_ Exp $";
+const char ADDCOMMANDCommand_cc_rcsId[] = "$Id: ADDCOMMANDCommand.cc,v 1.12 2001/07/26 20:12:39 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -63,7 +63,7 @@ if( CommandLevel == -1 )
 	}
 
 //CommandLevel &= ~flg_NOLOG;
-CommandLevel = bot->getTrueAccess(CommandLevel);	
+//CommandLevel = bot->getTrueAccess(CommandLevel);	
 AuthInfo *AClient = bot->IsAuth( theClient );
 if( NULL == AClient )
 	{

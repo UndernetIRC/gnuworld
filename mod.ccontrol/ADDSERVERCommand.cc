@@ -1,5 +1,5 @@
 /*
- * ADDNEWSERVERCommand.cc
+ * ADDSERVERCommand.cc
  *
  * Add a new server for the bot database
  *
@@ -13,7 +13,7 @@
 #include	"StringTokenizer.h"
 #include	"Network.h"
 
-const char ADDNEWSERVERCommand_cc_rcsId[] = "$Id: ADDNEWSERVERCommand.cc,v 1.5 2001/07/23 10:28:51 mrbean_ Exp $";
+const char ADDSERVERCommand_cc_rcsId[] = "$Id: ADDSERVERCommand.cc,v 1.1 2001/07/26 20:12:40 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -23,7 +23,7 @@ using std::string ;
 namespace uworld
 {
 
-bool ADDNEWSERVERCommand::Exec( iClient* theClient, const string& Message )
+bool ADDSERVERCommand::Exec( iClient* theClient, const string& Message )
 {
 
 StringTokenizer st( Message ) ;
