@@ -100,6 +100,9 @@ threadLib = @threadLib@
 
 noinst_LTLIBRARIES = libgnuworld.la
 libgnuworld_la_SOURCES = Buffer.cc \
+	Connection.cc \
+	ConnectionHandler.cc \
+	ConnectionManager.cc \
 	ClientSocket.cc \
 	EConfig.cc \
 	ELog.cc \
@@ -118,7 +121,8 @@ CONFIG_CLEAN_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 
 libgnuworld_la_LIBADD =
-am_libgnuworld_la_OBJECTS = Buffer.lo ClientSocket.lo EConfig.lo ELog.lo \
+am_libgnuworld_la_OBJECTS = Buffer.lo Connection.lo ConnectionHandler.lo \
+	ConnectionManager.lo ClientSocket.lo EConfig.lo ELog.lo \
 	FileSocket.lo Socket.lo StringTokenizer.lo match.lo md5hash.lo \
 	misc.lo
 libgnuworld_la_OBJECTS = $(am_libgnuworld_la_OBJECTS)
@@ -131,6 +135,9 @@ depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
 @AMDEP_TRUE@DEP_FILES = ./$(DEPDIR)/Buffer.Plo \
 @AMDEP_TRUE@	./$(DEPDIR)/ClientSocket.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/Connection.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/ConnectionHandler.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/ConnectionManager.Plo \
 @AMDEP_TRUE@	./$(DEPDIR)/EConfig.Plo ./$(DEPDIR)/ELog.Plo \
 @AMDEP_TRUE@	./$(DEPDIR)/FileSocket.Plo ./$(DEPDIR)/Socket.Plo \
 @AMDEP_TRUE@	./$(DEPDIR)/StringTokenizer.Plo \
@@ -171,6 +178,9 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Buffer.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ClientSocket.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Connection.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ConnectionHandler.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ConnectionManager.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/EConfig.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ELog.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FileSocket.Plo@am__quote@

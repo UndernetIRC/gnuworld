@@ -1,6 +1,23 @@
 /* Buffer.cpp
  * Author: Daniel Karrels dan@karrels.com
  * History: Mon Jan 25 23:29:47 EST 1999 -- beginning
+ * Copyright (C) 2002 Daniel Karrels <dan@karrels.com>    
+ * 
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License  
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of 
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
+ * USA.
+ *  
  */
 
 #include	<string>
@@ -8,7 +25,7 @@
 #include	"Buffer.h"
 
 const char Buffer_h_rcsId[] = __BUFFER_H ;
-const char Buffer_cc_rcsId[] = "$Id: Buffer.cc,v 1.6 2001/08/18 15:03:20 dan_karrels Exp $" ;
+const char Buffer_cc_rcsId[] = "$Id: Buffer.cc,v 1.7 2002/05/27 17:18:12 dan_karrels Exp $" ;
 
 namespace gnuworld
 {

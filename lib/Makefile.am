@@ -1,8 +1,11 @@
 ## Process this file with automake to produce Makefile.in
-## $Id: Makefile.am,v 1.11 2001/08/18 15:03:20 dan_karrels Exp $
+## $Id: Makefile.am,v 1.12 2002/05/27 17:18:12 dan_karrels Exp $
 
 noinst_LTLIBRARIES = libgnuworld.la
 libgnuworld_la_SOURCES = Buffer.cc \
+	Connection.cc \
+	ConnectionHandler.cc \
+	ConnectionManager.cc \
 	ClientSocket.cc \
 	EConfig.cc \
 	ELog.cc \
