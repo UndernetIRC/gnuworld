@@ -15,3 +15,5 @@ scanner.conf
 clientExample.conf
 gnutest.conf
 EVT_*
+*.example.conf
+
