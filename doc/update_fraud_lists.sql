@@ -1,7 +1,8 @@
 --
--- $Id: update_fraud_lists.sql,v 1.1 2003/04/28 04:10:27 nighty Exp $
+-- $Id: update_fraud_lists.sql,v 1.2 2003/04/28 11:27:37 nighty Exp $
 --
 -- For users wishing to add the new TOASTER feature (only if you dont have the FlagLists working already in the User Toaster)
+-- run once:  /usr/local/pgsql/bin/psql cservice < update_fraud_lists.sql
 
 CREATE TABLE fraud_lists (
         id SERIAL,
