@@ -1,0 +1,11 @@
+2003-07-07 0.0.4 Jeekay
+-----------------------
+CREATE TABLE users (
+    user_name character varying(20) NOT NULL,
+    last_seen integer DEFAULT 0 NOT NULL,
+    last_updated integer DEFAULT 0 NOT NULL,
+    last_updated_by character varying(128) NOT NULL,
+    flags integer DEFAULT 0 NOT NULL,
+    "access" integer DEFAULT 0 NOT NULL
+);
+-----------------------
