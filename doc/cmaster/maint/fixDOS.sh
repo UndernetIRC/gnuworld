@@ -2,7 +2,7 @@
 
 ####################################################################################################
 #
-# "$Id: fixDOS.sh,v 1.1 2003/06/19 19:21:12 dan_karrels Exp $"
+# "$Id: fixDOS.sh,v 1.7 2003/07/14 10:35:44 nighty Exp $"
 #
 # fixDOS.sh : a small bash script to convert all .php, .inc etc.. files in your current
 #             directory from DOS (\r\n) to UNIX (\n) CRLF/LF Format.

@@ -1,7 +1,7 @@
 #!/bin/bash
 # You can change the above to the good path to your "bash" binary if needed
 #
-# $Id: WipeUser.sh,v 1.1 2003/06/19 19:21:12 dan_karrels Exp $
+# $Id: WipeUser.sh,v 1.7 2003/07/14 10:35:44 nighty Exp $
 #
 
 # some default script values
@@ -92,7 +92,7 @@ echo "*                                                                     *"
 echo "* Warning: This program stops on any input error.                     *"
 echo "*                                                                     *"
 echo "***********************************************************************"
-echo "\$Id: WipeUser.sh,v 1.1 2003/06/19 19:21:12 dan_karrels Exp $"
+echo "\$Id: WipeUser.sh,v 1.7 2003/07/14 10:35:44 nighty Exp $"
 echo "***********************************************************************"
 echo "* Released under the GNU Public License                               *"
 echo "***********************************************************************"
