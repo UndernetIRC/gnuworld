@@ -8,7 +8,7 @@
  *
  * Caveats: None
  *
- * $Id: OPERJOINCommand.cc,v 1.4 2001/02/15 21:08:14 gte Exp $
+ * $Id: OPERJOINCommand.cc,v 1.5 2001/02/15 23:31:33 gte Exp $
  */
 
 
@@ -21,7 +21,7 @@
 #include	"responses.h"
 #include	"Network.h"
 
-const char OPERJOINCommand_cc_rcsId[] = "$Id: OPERJOINCommand.cc,v 1.4 2001/02/15 21:08:14 gte Exp $" ;
+const char OPERJOINCommand_cc_rcsId[] = "$Id: OPERJOINCommand.cc,v 1.5 2001/02/15 23:31:33 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -85,8 +85,8 @@ bool OPERJOINCommand::Exec( iClient* theClient, const string& Message )
 	bot->getUplink()->RegisterChannelEvent( theChan->getName(), bot);
 	bot->Join(theChan->getName(), theChan->getChannelMode(), theChan->getChannelTS(), false);
 
-	/* Whack this reop on the Q */
-	bot->reopQ.push(cservice::reopQType::value_type(bot->currentTime() + 15, theChan->getName()) );
+	/* Whack this reop on the Q */ 
+	bot->reopQ.insert(cservice::reopQType::value_type(theChan->getName(), bot->currentTime() + 15) );
  
 	if (tmpChan)
 		{

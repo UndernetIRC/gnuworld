@@ -610,7 +610,7 @@ else if(Command == "VERSION")
 	xClient::DoCTCP(theClient, CTCP,
 		"Undernet P10 Channel Services Version 2 ["
 		__DATE__ " " __TIME__
-		"] ($Id: cservice.cc,v 1.103 2001/02/15 21:08:14 gte Exp $)");
+		"] ($Id: cservice.cc,v 1.104 2001/02/15 23:31:33 gte Exp $)");
 	}
 else if(Command == "PROBLEM?")
 	{
@@ -1073,14 +1073,17 @@ MyUplink->RegisterTimer(theTime, this, NULL);
 /*
  *  Any pending reop's?
  */
+
 if (!reopQ.empty())
 {
-	if (reopQ.front().first <= currentTime())
+	reopQType::iterator ptr = reopQ.begin();
+	while ( ptr != reopQ.end() )
+	{
+	if (ptr->second <= currentTime()) 
 		{
-		Channel* tmpChan = Network->findChannel(reopQ.front().second);
+		Channel* tmpChan = Network->findChannel(ptr->first);
 		if (tmpChan) 
 			{ 
-			/* Move to xServer::Op? */
 			strstream s;
 			s	<< MyUplink->getCharYY()
 				<< " M "
@@ -1089,14 +1092,16 @@ if (!reopQ.empty())
 				<< getCharYYXXX()
 				<< ends;
 			
-			Write( s );
-		delete[] s.str();
-			elog << "cservice::OnTimer> REOP " << tmpChan->getName() << endl;
-			}
-		reopQ.pop();
+				Write( s );
+				delete[] s.str();
+				elog << "cservice::OnTimer> REOP " << tmpChan->getName() << endl;
+			} 
+			reopQ.erase(ptr->first); 
 		}
-}	
- 
+		++ptr;
+	}
+}
+
 PGnotify* notify = SQLDb->Notifies();
 
 /*
@@ -1498,7 +1503,7 @@ for( xServer::opVectorType::const_iterator ptr = theTargets.begin() ;
 			logAdminMessage("I've been deopped on %s!",
 				reggedChan->getName().c_str());
 			/* Add this chan to the reop queue, ready to op itself in 15 seconds. */
-			 reopQ.push(reopQType::value_type(currentTime() + 15, reggedChan->getName()) );
+//			 reopQ.push(reopQType::value_type(currentTime() + 15, reggedChan->getName()) );
 			}
 		}
 	} // for()

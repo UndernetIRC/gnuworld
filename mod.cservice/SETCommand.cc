@@ -12,7 +12,7 @@
  *
  * Caveats: SET LANG is still under consideration.
  *
- * $Id: SETCommand.cc,v 1.21 2001/02/12 01:57:39 plexus Exp $
+ * $Id: SETCommand.cc,v 1.22 2001/02/15 23:31:33 gte Exp $
  */
 
 #include	<string>
@@ -24,7 +24,7 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char SETCommand_cc_rcsId[] = "$Id: SETCommand.cc,v 1.21 2001/02/12 01:57:39 plexus Exp $" ;
+const char SETCommand_cc_rcsId[] = "$Id: SETCommand.cc,v 1.22 2001/02/15 23:31:33 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -434,7 +434,8 @@ bool SETCommand::Exec( iClient* theClient, const string& Message )
 			theChan->setInChan(true);
 			bot->getUplink()->RegisterChannelEvent( theChan->getName(), bot ) ;
 			bot->Join(theChan->getName(), theChan->getChannelMode(), 
-				theChan->getChannelTS(), true);
+				theChan->getChannelTS(), false);
+			bot->reopQ.insert(cservice::reopQType::value_type(theChan->getName(), bot->currentTime() + 15) );
 		if (tmpChan)
 			{
 			if(theChan->getFlag(sqlChannel::F_NOOP)) bot->deopAllOnChan(tmpChan);
