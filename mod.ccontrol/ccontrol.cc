@@ -23,7 +23,7 @@
 #include	"AuthInfo.h"
 #include        "server.h"
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.38 2001/05/16 18:38:35 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.39 2001/05/17 19:54:57 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -118,6 +118,10 @@ Sendmail_Path = conf.Require("SendMail")->second;
 
 //SendReport flag that tells ccontrol if the user want the report to be mailed
 SendReport = atoi(conf.Require("mail_report")->second.c_str());
+
+userMaxConnection = atoi(conf.Require("max_connection")->second.c_str());
+
+maxGlineLen = atoi(conf.Require("max_GLen")->second.c_str());
 
 // Set up the oper channels
 EConfig::const_iterator ptr = conf.Find( "operchan" ) ;
@@ -487,11 +491,28 @@ switch( theEvent )
 		}	
 	case EVT_NICK:
 		{
-		if(!inBurst)
+		iClient* NewUser = static_cast< iClient* >( Data1);
+		int CurConnections = Network->countHost(NewUser->getInsecureHost());		
+		if(CurConnections  > userMaxConnection)
 			{
-			iClient* NewUser = static_cast< iClient* >( Data1);
+			ccGline *tmpGline = new ccGline(SQLDb);
+			tmpGline->set_Host("*@" + NewUser->getInsecureHost());
+			tmpGline->set_Expires(::time(0) + maxGlineLen);
+			tmpGline->set_Reason("Automatically banned for exccessive connections");
+			tmpGline->set_AddedOn(::time(0));
+			tmpGline->Insert();
+			wallopsAsServer("Adding gline on %s for %s",tmpGline->get_Host().c_str(),tmpGline->get_Reason().c_str());
+			tmpGline->loadData(tmpGline->get_Host());
+			addGline(tmpGline);
+			MyUplink->setGline( nickName,
+					tmpGline->get_Host(),
+					tmpGline->get_Reason(),
+					tmpGline->get_Expires() - ::time(0) ) ;
+			}
+		else if(!inBurst)
+			{	
 			ccGline * tempGline = findMatchingGline(NewUser->getUserName() + '@' + NewUser->getInsecureHost());
-			if(tempGline)
+			if((tempGline) && (tempGline->get_Expires() > ::time(0)))
 				{
 				addGline(tempGline);
 				MyUplink->setGline(tempGline->get_AddedBy()
@@ -1285,6 +1306,19 @@ for(glineIterator ptr = glineList.begin(); ptr != glineList.end(); ptr++)
 return NULL ;
 }
 
+ccGline* ccontrol::findGline( const string& HostName )
+{
+ccGline *theGline;
+for(glineIterator ptr = glineList.begin(); ptr != glineList.end(); ptr++)
+	{
+	theGline = *ptr;
+	if((!strcasecmp(theGline->get_Host().c_str(),HostName.c_str())) && (theGline->get_Expires() > ::time(0)))
+		return theGline;
+	}
+
+return NULL ;
+}
+
 struct tm ccontrol::convertToTmTime(time_t NOW)
 {
 time_t *tNow;
@@ -1618,7 +1652,7 @@ return true;
 
 bool ccontrol::loadGlines()
 {
-static const char *Main = "SELECT * FROM glines";
+static const char *Main = "SELECT * FROM glines where ExpiresAt > now()::abstime::int4";
 
 strstream theQuery;
 theQuery	<< Main
@@ -1659,4 +1693,22 @@ for( int i = 0 ; i < SQLDb->Tuples() ; i++ )
 	}
 return true;	
 } 
+
+void ccontrol::wallopsAsServer(const char *Msg,...)
+{
+
+char buffer[ 1024 ] = { 0 } ;
+va_list list;
+
+va_start( list , Msg) ;
+vsprintf( buffer, Msg , list ) ;
+va_end( list ) ;
+
+strstream s ;
+s	<< MyUplink->getCharYY() << " WA :"
+        << buffer
+	<< ends ;
+Write( s ) ;
+delete s.str();
+}
 } // namespace gnuworld

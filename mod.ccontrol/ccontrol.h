@@ -3,7 +3,7 @@
  */
 
 #ifndef __CCONTROL_H
-#define __CCONTROL_H "$Id: ccontrol.h,v 1.26 2001/05/15 20:43:15 mrbean_ Exp $"
+#define __CCONTROL_H "$Id: ccontrol.h,v 1.27 2001/05/17 19:54:57 mrbean_ Exp $"
 
 //Define gline response
 #define GLINE_OK 1;
@@ -408,6 +408,8 @@ public:
 
 	ccGline* findMatchingGline( const string& );
 
+	ccGline* findGline( const string& );
+
 	/**
 	 * This method logs the bot commands to the message channel
 	 */
@@ -460,7 +462,9 @@ public:
 	bool burstGlines();
 	
 	bool loadGlines();
-	
+
+	void wallopsAsServer(const char * , ... );
+
 	/**
 	 * This is a constant iterator type used to perform a read-only
 	 * iteration of the operchan structure.
@@ -643,6 +647,10 @@ protected:
 	 */
 
 	 int 			GLInterval;
+
+	 int			userMaxConnection;
+	 
+	 int			maxGlineLen;
 } ; 
  
 } // namespace gnuworld

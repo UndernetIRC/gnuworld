@@ -19,7 +19,7 @@
 #include	"ELog.h"
 #include	"Gline.h"
 
-const char GLINECommand_cc_rcsId[] = "$Id: GLINECommand.cc,v 1.8 2001/05/14 21:26:37 mrbean_ Exp $";
+const char GLINECommand_cc_rcsId[] = "$Id: GLINECommand.cc,v 1.9 2001/05/17 19:54:57 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -100,24 +100,35 @@ server->setGline( nickUserHost,
 	st.assemble( pos + 1 ),
 	gLength ) ;
 
-strstream s ;
-s	<< server->getCharYY() << " WA :"
-        << theClient->getNickName().c_str()
-	<< " is adding gline for: "
-	<< st[ pos ]
-	<< ", expires at " << bot->convertToAscTime((time( 0 ) + gLength))
-	<< " for: " << st.assemble( pos + 1 )
-	<< ends ;
-bot->Write( s ) ;
-delete[] s.str() ;
-ccGline *TmpGline = new ccGline(bot->SQLDb);
+ccGline *TmpGline = bot->findGline(st[pos]);
+bool Up = false;
+
+if(TmpGline)
+	Up =  true;	
+else TmpGline = new ccGline(bot->SQLDb);
 TmpGline->set_Host(st [ pos ]);
 TmpGline->set_Expires(::time(0) + gLength);
 TmpGline->set_AddedBy(nickUserHost);
 TmpGline->set_Reason(st.assemble( pos +1 ));
 TmpGline->set_AddedOn(::time(0));
-TmpGline->Insert();
-bot->addGline(TmpGline);
+if(Up)
+	{	
+	TmpGline->Update();
+	bot->wallopsAsServer("%s is refreshing Gline expiration time on host %s for %d\n",
+	theClient->getNickName().c_str(),st[pos].c_str(),::time(0) + gLength);
+	}
+else
+	{
+	TmpGline->Insert();
+	//We need to update the Id
+	TmpGline->loadData(TmpGline->get_Host());
+	bot->wallopsAsServer("%s is adding gline for %s, expires at %s for: %s\n"
+	,theClient->getNickName().c_str(),
+	st[pos].c_str(),bot->convertToAscTime(time( 0 ) + gLength),
+	st.assemble( pos + 1 ).c_str());
+	}
+if(!Up)
+	bot->addGline(TmpGline);
 return true ;
 }
 }
