@@ -2,7 +2,7 @@
 /*
  *
  * Undernet GNUworld Interactive Installation Guide (aka UGIIG)
- * $Id: index.php,v 1.8 2002/05/20 23:59:36 nighty Exp $
+ * $Id: index.php,v 1.9 2002/10/02 11:17:19 nighty Exp $
  *
  * Released under the GNU Public License : http://www.gnu.org/licenses/gpl.txt
  * by nighty <nighty@undernet.org>
@@ -50,7 +50,7 @@ function footer($prev,$next) {
 	//echo "<address>maintained by <b>&lt;</b><a href=\"mailto:" . $coder_email . "\">" . $coder_email . "</a><b>&gt;</b> - Last modified : <b>" . date("M-d-Y H:i:s",   (  filemtime("index.php")+( date("Z",filemtime("index.php"))/3600 )   )   ) . " UTC/GMT</b> - <b>[</b><a href=\"./\">Home</a><b>]</b></address>";
 	echo "<address>maintained by <b>&lt;</b><a href=\"mailto:" . $coder_email . "\">" . $coder_email . "</a><b>&gt;</b> - <b>[</b><a href=\"./\">Home</a><b>]</b>";
 	echo "&nbsp;<br><font size=-2><b>";
-?>$Id: index.php,v 1.8 2002/05/20 23:59:36 nighty Exp $<?
+?>$Id: index.php,v 1.9 2002/10/02 11:17:19 nighty Exp $<?
 	echo "</b></font></address>\n";
 	echo "</body>\n";
 	echo "</html>\n";
@@ -75,7 +75,7 @@ $coder_email = "nighty@undernet.org";
 $coder_name = "nighty";
 
 ?>
-<!-- $Id: index.php,v 1.8 2002/05/20 23:59:36 nighty Exp $ //-->
+<!-- $Id: index.php,v 1.9 2002/10/02 11:17:19 nighty Exp $ //-->
 <html>
 <head>
 <title>Undernet GNUworld Interactive Installation Guide</title>
@@ -439,8 +439,7 @@ In order to get PostgreSQL you should visit their official website :
 	- <a href="ftp://ftp.postgresql.org/pub/" target=_blank>PostgreSQL Public FTP Site</a>
 
 Direct link to download <b>PostgreSQL 7.2.1</b> (recommended version) :
-	- <a href="ftp://ftp.postgresql.org/pub/v7.2.1/postgresql-7.2.1.tar.gz">FTP</a>
-	- <a href="http://www.postgresql.org/ftpsite/v7.2.1/postgresql-7.2.1.tar.gz">HTTP</a>
+	- <a href="ftp://ftp.postgresql.org/pub/source/v7.2.1/postgresql-7.2.1.tar.gz">FTP</a>
 </pre>
 <?
 	footer("*","A-2");
