@@ -10,7 +10,7 @@
 #include	"responses.h" 
 #include	"networkData.h"
 
-const char NEWPASSCommand_cc_rcsId[] = "$Id: NEWPASSCommand.cc,v 1.7 2001/02/21 00:14:43 dan_karrels Exp $" ;
+const char NEWPASSCommand_cc_rcsId[] = "$Id: NEWPASSCommand.cc,v 1.8 2001/02/21 00:55:42 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -86,7 +86,7 @@ for( size_t i = 0 ; i < MD5_DIGEST_LENGTH ; ++i )
 
 strstream output;
 output << hex;
-//output.fill('0');
+output.fill('0');
 for( size_t ii = 0; ii < MD5_DIGEST_LENGTH; ii++ )
 	{
 	output << setw(2) << data[ii];
