@@ -3,7 +3,7 @@
  * 
  * Exception class
  * 
- * $Id: ccException.cc,v 1.9 2003/02/10 12:22:09 mrbean_ Exp $
+ * $Id: ccException.cc,v 1.10 2003/04/28 09:44:21 mrbean_ Exp $
  */
  
 #include	<sstream>
@@ -20,7 +20,7 @@
 #include	"ccontrol.h"
 
 const char ccException_h_rcsId[] = __CCEXCEPTION_H ;
-const char ccException_cc_rcsId[] = "$Id: ccException.cc,v 1.9 2003/02/10 12:22:09 mrbean_ Exp $" ;
+const char ccException_cc_rcsId[] = "$Id: ccException.cc,v 1.10 2003/04/28 09:44:21 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -42,6 +42,7 @@ ccException::ccException(PgDatabase* _SQLDb)
    Connections(0),
    AddedBy(string()),
    AddedOn(0),
+   Reason(string()),
    SQLDb(_SQLDb)
 {
 ++numAllocated;
@@ -83,7 +84,7 @@ Host = SQLDb->GetValue(0,0);
 Connections = atoi(SQLDb->GetValue(0,1));
 AddedBy = SQLDb->GetValue(0,2);
 AddedOn = atoi(SQLDb->GetValue(0,3));
-
+Reason = SQLDb->GetValue(0,4);
 return true;
 
 }
@@ -104,6 +105,8 @@ theQuery	<< Main
 		<< Connections
 		<< ", AddedOn = "
 		<< AddedOn
+		<< ", Reason = '"
+		<< ccontrol::removeSqlChars(Reason)
 		<< "' WHERE lower(Host) = '" 
 		<< ccontrol::removeSqlChars(string_lower(Host)) << "'"
 		<<  ends;
@@ -130,7 +133,7 @@ else
 
 bool ccException::Insert()
 {
-static const char *quer = "INSERT into exceptions(host,connections,addedby,addedon) VALUES ('";
+static const char *quer = "INSERT into exceptions(host,connections,addedby,addedon,reason) VALUES ('";
 
 if(!dbConnected)
 	{
@@ -143,7 +146,8 @@ query		<< quer
 		<< Connections
 		<< ",'" << ccontrol::removeSqlChars(AddedBy)
 		<< "'," << AddedOn
-		<< ")" << ends;
+		<< ",' " << ccontrol::removeSqlChars(Reason)
+		<< "')" << ends;
 
 elog	<< "ccException::Insert> "
 	<< query.str().c_str()

@@ -1,4 +1,4 @@
--- "$Id: ccontrol.sql,v 1.28 2002/12/28 22:44:54 mrbean_ Exp $"
+-- "$Id: ccontrol.sql,v 1.29 2003/04/28 09:44:16 mrbean_ Exp $"
 
 -- 2002-25-02 : |MrBean|
 -- Added the Misc table
@@ -100,7 +100,8 @@ CREATE TABLE exceptions (
 	Host VARCHAR(128) NOT NULL,
 	Connections INT4 NOT NULL,
 	AddedBy VARCHAR(128) NOT NULL,
-	AddedOn INT4 NOT NULL DEFAULT now()::abstime::int4
+	AddedOn INT4 NOT NULL DEFAULT now()::abstime::int4,
+	Reason VARCHAR(450) 
 	);	
 	
 CREATE TABLE commands (

@@ -12,7 +12,7 @@
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 
-const char LISTCommand_cc_rcsId[] = "$Id: LISTCommand.cc,v 1.9 2002/08/27 19:22:05 mrbean_ Exp $";
+const char LISTCommand_cc_rcsId[] = "$Id: LISTCommand.cc,v 1.10 2003/04/28 09:44:20 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -49,6 +49,10 @@ else if(!strcasecmp(st[1].c_str(),"servers"))
 else if(!strcasecmp(st[1].c_str(),"badchannels"))
 	{
 	bot->listBadChannels(theClient);
+	}
+else if(!strcasecmp(st[1].c_str(),"exceptions"))
+	{
+	bot->listExceptions(theClient);
 	}
 else
 	{

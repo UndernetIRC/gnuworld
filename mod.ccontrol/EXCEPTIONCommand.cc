@@ -11,8 +11,9 @@
 #include	"ccontrol.h"
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
+#include 	"Constants.h"
 
-const char EXCEPTIONCommand_cc_rcsId[] = "$Id: EXCEPTIONCommand.cc,v 1.12 2003/02/10 12:22:08 mrbean_ Exp $";
+const char EXCEPTIONCommand_cc_rcsId[] = "$Id: EXCEPTIONCommand.cc,v 1.13 2003/04/28 09:44:20 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -45,9 +46,9 @@ if(!strcasecmp(st[1].c_str(),"list")) //Trying to list all exceptions?
 	}
 else if(!strcasecmp(st[1].c_str(),"add")) //Trying to add an exception?
 	{
-	if(st.size() < 4) 
+	if(st.size() < 5) 
 		{
-		bot->Notice(theClient,"you must specify the host you want to add and the connection count\n");
+		bot->Notice(theClient,"you must specify the host you want to add the connection count and the reason\n");
 		return false;
 		}
 	if(st[2].size() > 128)
@@ -55,9 +56,15 @@ else if(!strcasecmp(st[1].c_str(),"add")) //Trying to add an exception?
 		bot->Notice(theClient,"Hostname can't be more than 128 chars");
 		return false;
 	}
+	else if(st[4].size() > exceptions::MAX_REASON)
+	{
+		bot->Notice(theClient,"Reason can't be more than %d chars",exceptions::MAX_REASON);
+		return false;
+
+	}
 	else
 		{
-		if(!bot->insertException(theClient,st[2],atoi(st[3].c_str())))
+		if(!bot->insertException(theClient,st[2],atoi(st[3].c_str()),st.assemble(4)))
 			{
 			bot->Notice(theClient,"Error while adding exception\n");
 			}

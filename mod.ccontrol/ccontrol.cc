@@ -11,7 +11,7 @@
 /* ccontrol.cc
  * Authors: Daniel Karrels dan@karrels.com
  *	    Tomer Cohen    MrBean@toughguy.net
- * $Id: ccontrol.cc,v 1.169 2003/03/08 17:15:01 mrbean_ Exp $
+ * $Id: ccontrol.cc,v 1.170 2003/04/28 09:44:21 mrbean_ Exp $
  */
 
 #define MAJORVER "1"
@@ -56,7 +56,7 @@
 #include	"ip.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.169 2003/03/08 17:15:01 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.170 2003/04/28 09:44:21 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -568,7 +568,7 @@ RegisterCommand( new REMOVEIGNORECommand( this, "REMIGNORE", "(nick/host)"
 	false,
 	operLevel::OPERLEVEL,
 	true ) ) ;
-RegisterCommand( new LISTCommand( this, "LIST", "(glines/servers/badchannels)"
+RegisterCommand( new LISTCommand( this, "LIST", "(glines/servers/badchannels/exceptions)"
 	" Get all kinds of lists from the bot",
 	commandLevel::flg_LIST,
 	false,
@@ -1637,7 +1637,7 @@ if(dbConnected)
 					,tIP.c_str(),CurConnections);
 			        iClient* theClient = Network->findClient(this->getCharYYXXX());
 #ifndef LOGTOHD
-				DailyLog(theClient,"%s",Message.c_str());
+				DailyLog(theClient,"%s",Log);
 #else
 				ccLog* newLog = new (std::nothrow) ccLog();
 				newLog->Time = ::time(0);
@@ -3735,10 +3735,11 @@ Notice(theClient,"-= Exceptions list - listing a total of %d exceptions =-"
 	,exceptionList.size());
 	
 for(exceptionIterator ptr = exception_begin();ptr != exception_end();ptr++)
-	Notice(theClient,"Host : %s  Connections : %d AddedBy : %s"
+	Notice(theClient,"Host : %s  Connections : %d AddedBy : %s Reason %s"
 	       ,(*ptr)->getHost().c_str()
 	       ,(*ptr)->getConnections()
-	       ,(*ptr)->getAddedBy().c_str());
+	       ,(*ptr)->getAddedBy().c_str()
+	       ,(*ptr)->getReason().c_str());
 
 Notice(theClient,"-= End of exception list =-");
 
@@ -3756,7 +3757,7 @@ return false;
 }
 
 
-bool ccontrol::insertException( iClient *theClient , const string& Host , int Connections )
+bool ccontrol::insertException( iClient *theClient , const string& Host , int Connections, const string& Reason )
 {
 //Check if there is already an exception on that host
 
@@ -3782,10 +3783,11 @@ tempException->setHost(removeSqlChars(Host));
 tempException->setConnections(Connections);
 tempException->setAddedBy(removeSqlChars(theClient->getRealNickUserHost()));
 tempException->setAddedOn(::time(0));
-
+tempException->setReason(Reason);
 //Update the database, and the internal list
 if(!tempException->Insert())
 	{
+	delete tempException;
 	return false;
 	}
 
@@ -4000,7 +4002,8 @@ return true;
 }
 bool ccontrol::loadExceptions()
 {
-static const char *Main = "SELECT * FROM Exceptions";
+
+const static char Query[] = "Select Host,Connections,AddedBy,AddedOn,Reason from Exceptions";
 
 if(!dbConnected)
 	{
@@ -4008,7 +4011,7 @@ if(!dbConnected)
 	}
 
 stringstream theQuery;
-theQuery	<< Main
+theQuery	<< Query
 		<< ends;
 
 #ifdef LOG_SQL
@@ -4038,6 +4041,7 @@ for( int i = 0 ; i < SQLDb->Tuples() ; i++ )
 	tempException->setConnections(atoi(SQLDb->GetValue(i,1)));
 	tempException->setAddedBy(SQLDb->GetValue(i,2)) ;
 	tempException->setAddedOn(static_cast< time_t >( atoi( SQLDb->GetValue(i,3) ) )) ;
+	tempException->setReason(SQLDb->GetValue(i,4));
 	exceptionList.push_back(tempException);
 	}
 return true;	

@@ -1,5 +1,5 @@
 
--- "$Id: ccontrol.update.sql,v 1.23 2002/12/28 22:44:54 mrbean_ Exp $"
+-- "$Id: ccontrol.update.sql,v 1.24 2003/04/28 09:44:18 mrbean_ Exp $"
 
 -- ccontrol database changes update
 -- this file will add the new features to an old database
@@ -105,5 +105,9 @@
 -- 27/08/02 Add REOP command to opers
 --  update opers set saccess = (saccess | 4194304);
 -- 16/12/02 Added lastupdated to glines
-  alter table glines add LastUpdated INT4 NOT NULL DEFAULT now()::abstime::int4;
+--  alter table glines add LastUpdated INT4 NOT NULL DEFAULT now()::abstime::int4;
+
+-- 28/04/02 Add reason to the exceptions table
+   alter table exceptions add Reason VARCHAR(450);
+   
   

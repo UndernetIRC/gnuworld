@@ -22,6 +22,7 @@
 
 #include	<pthread.h>
 #include	<signal.h>
+#include	<errno.h>
 
 #include	<queue>
 #include	<iostream>
@@ -31,7 +32,7 @@
 #include	"Signal.h"
 
 const char Signal_h_rcsId[] = __SIGNAL_H ;
-const char Signal_cc_rcsId[] = "$Id: Signal.cc,v 1.2 2003/03/11 18:03:19 dan_karrels Exp $" ;
+const char Signal_cc_rcsId[] = "$Id: Signal.cc,v 1.3 2003/04/28 09:44:19 mrbean_ Exp $" ;
 
 namespace gnuworld
 {

@@ -85,6 +85,12 @@ namespace scan
 	static const int MAX_SHOW = 15;
 }
 
+namespace exceptions
+{
+    static const char Query[] = "Select Host,Connections,AddedBy,AddedOn,Reason from Exceptions where lower(Host)='";
+    const unsigned int MAX_REASON = 449;
+}
+
 }
 }
 

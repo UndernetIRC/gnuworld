@@ -1,7 +1,7 @@
 /* ccException.h */
 
 #ifndef __CCEXCEPTION_H
-#define __CCEXCEPTION_H "$Id: ccException.h,v 1.7 2002/06/07 14:38:19 dan_karrels Exp $"
+#define __CCEXCEPTION_H "$Id: ccException.h,v 1.8 2003/04/28 09:44:21 mrbean_ Exp $"
 
 #include	<string>
 
@@ -42,6 +42,9 @@ public:
 	inline time_t			getAddedOn() const
 		{ return AddedOn; }
 
+	inline const string& 		getReason() const
+			{ return Reason; }
+
 	inline void 		setHost( const string& _Host ) 
 		{ Host = _Host; }
 		
@@ -54,6 +57,9 @@ public:
 	inline void		setAddedOn( const time_t _AddedOn )
 		{ AddedOn = _AddedOn; }
 	
+	inline void 		setReason( const string& _Reason ) 
+		{ Reason = _Reason; }
+
 	inline void		setSqldb(PgDatabase* _SQLDb)
 		{ SQLDb = _SQLDb; }
 		
@@ -73,6 +79,7 @@ protected:
 	int 		Connections;
 	string 		AddedBy;
 	time_t		AddedOn;
+	string 		Reason;
 	PgDatabase* SQLDb;
 
 }; 
