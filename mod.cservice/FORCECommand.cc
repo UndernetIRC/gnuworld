@@ -8,7 +8,7 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char FORCECommand_cc_rcsId[] = "$Id: FORCECommand.cc,v 1.2 2001/01/03 03:02:05 gte Exp $" ;
+const char FORCECommand_cc_rcsId[] = "$Id: FORCECommand.cc,v 1.3 2001/01/03 05:33:02 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -64,12 +64,16 @@ bool FORCECommand::Exec( iClient* theClient, const string& Message )
 
 	if (level != 0) // If they already have some access..
 	{ 
-		// Set this channel access to their admin level.
-		// getLevelRecord will have cached this entry, we simply don't commit it to
-		// make it temporary.
+		/*
+		 * Set this channel access to their admin level.
+		 * getLevelRecord will have cached this entry, we simply don't commit it to
+		 * make it temporary.
+		 */
+
 		newLevel->setAccess(admLevel); 
 		newLevel->setFlag(sqlLevel::F_FORCED);
-		bot->Notice(theClient, "Temporarily increased your access on channel %s to %i", theChan->getName().c_str(), admLevel);
+		bot->logAdminMessage("%s is getting access on %s", theUser->getUserName().c_str(), theChan->getName().c_str());
+		bot->Notice(theClient, "Temporarily increased your access on channel %s to %i", theChan->getName().c_str(), admLevel); 
 		return true;
 	}
  
@@ -91,6 +95,7 @@ bool FORCECommand::Exec( iClient* theClient, const string& Message )
 	pair<int, int> thePair; 
 	thePair = make_pair(theUser->getID(), theChan->getID()); 
 	bot->sqlLevelCache.insert(cservice::sqlLevelHashType::value_type(thePair, newLevel));
+	bot->logAdminMessage("%s is getting access on %s", theUser->getUserName().c_str(), theChan->getName().c_str());
 	bot->Notice(theClient, "Gave you temporary access of %i on channel %s", admLevel, theChan->getName().c_str());
 	return true ;
 } 

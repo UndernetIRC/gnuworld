@@ -17,7 +17,7 @@
  *
  * Caveats: None
  *
- * $Id: OPCommand.cc,v 1.11 2001/01/02 07:55:12 gte Exp $
+ * $Id: OPCommand.cc,v 1.12 2001/01/03 05:33:02 gte Exp $
  */
 
 #include	<string>
@@ -32,7 +32,7 @@
 
 using std::map ;
 
-const char OPCommand_cc_rcsId[] = "$Id: OPCommand.cc,v 1.11 2001/01/02 07:55:12 gte Exp $" ;
+const char OPCommand_cc_rcsId[] = "$Id: OPCommand.cc,v 1.12 2001/01/03 05:33:02 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -88,8 +88,8 @@ bool OPCommand::Exec( iClient* theClient, const string& Message )
 		bot->Notice(theClient, bot->getResponse(theUser, language::chan_is_empty).c_str(), 
 			theChan->getName().c_str());
 		return false;
-	}
- 
+	} 
+
 	/*
 	 *  Loop over the remaining 'nick' parameters, opping them all.
 	 */

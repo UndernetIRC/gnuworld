@@ -124,6 +124,7 @@ cservice::cservice(const string& args)
     RegisterCommand(new REGISTERCommand(this, "REGISTER", "<#channel>"));
     RegisterCommand(new FORCECommand(this, "FORCE", "<#channel>"));
     RegisterCommand(new UNFORCECommand(this, "UNFORCE", "<#channel>"));
+    RegisterCommand(new SERVNOTICECommand(this, "SERVNOTICE", "<#channel> <text>"));
 
 	//-- Load in our cservice configuration file. 
 	cserviceConfig = new EConfig( args ) ;
@@ -201,7 +202,7 @@ int cservice::BurstChannels()
 			 *  Check the auto-join flag is set, if so - join. :)
 			 */ 
 
-			MyUplink->JoinChannel( this, data[ 0 ], "+tn" ) ; 
+			MyUplink->JoinChannel( this, data[ 0 ], SQLDb->GetValue( i, 3 ) ) ;
 		}
 	}
 
@@ -273,7 +274,7 @@ int cservice::OnCTCP( iClient* theClient, const string& CTCP,
 
 	if(Command == "VERSION")
 	{
-		xClient::DoCTCP(theClient, CTCP.c_str(), "Undernet Channel Services Version 2 [" __DATE__ " " __TIME__ "] ($Id: cservice.cc,v 1.27 2001/01/02 07:55:12 gte Exp $)");
+		xClient::DoCTCP(theClient, CTCP.c_str(), "Undernet P10 Channel Services Version 2 [" __DATE__ " " __TIME__ "] ($Id: cservice.cc,v 1.28 2001/01/03 05:33:02 gte Exp $)");
 		return true;
 	}
  
@@ -402,6 +403,29 @@ sqlLevel* cservice::getLevelRecord( sqlUser* theUser, sqlChannel* theChan )
 	delete theLevel;
 	return 0;
 }	
+ 
+short cservice::getAdminAccessLevel( sqlUser* theUser )
+{
+	/*
+	 *  Returns the admin access level a particular user has. 
+	 */
+
+	sqlChannel* theChan = getChannelRecord("*");
+	if (!theChan)
+	{
+		elog << "cservice::getAdminAccessLevel> Unable to locate channel '*'! Sorry, I can't continue.." << endl;
+		::exit(0);
+	}
+
+	sqlLevel* theLevel = getLevelRecord(theUser, theChan);
+	if(theLevel)
+	{
+		return theLevel->getAccess();
+	}
+
+	// By default, users have level 0 admin access.
+	return 0;
+}
  
 short cservice::getAccessLevel( sqlUser* theUser, sqlChannel* theChan )
 {
@@ -565,6 +589,56 @@ int cservice::OnTimer(xServer::timerID, void*)
 
 
 	return(0);
+}
+ 
+bool cservice::serverNotice( Channel* theChannel, const char* format, ... )
+{
+	/*
+	 *  Send a notice to a channel from the server.
+	 */
+
+	char buf[ 1024 ] = { 0 } ;
+	va_list _list ;
+	
+	va_start( _list, format ) ;
+	vsprintf( buf, format, _list ) ;
+	va_end( _list ) ;
+	
+	string theMessage = buf;
+ 
+	strstream s;
+	s << MyUplink->getCharYY() << " O " << theChannel->getName() << " "
+	<< ":" << theMessage << ends;
+
+	Write( s );
+	delete[] s.str();
+	
+	return false;
+} 
+
+bool cservice::logAdminMessage(const char* format, ... )
+{
+	/*
+	 *  Log a message to the admin channel and the logfile.
+	 */
+
+	char buf[ 1024 ] = { 0 } ;
+	va_list _list ;
+	
+	va_start( _list, format ) ;
+	vsprintf( buf, format, _list ) ;
+	va_end( _list ) ;
+	
+	// Try and locate the relay channel.
+	Channel* tmpChan = Network->findChannel(relayChan);
+	if (!tmpChan) 
+	{
+		elog << "cservice::logMessage> Unable to locate relay channel on network!" << endl;
+		return false;
+	}
+	string message = "[" + nickName + "] " + string(buf);
+	serverNotice(tmpChan, message.c_str());
+	return true;
 }
  
 const string& cservice::prettyDuration( int duration )

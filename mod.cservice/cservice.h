@@ -1,5 +1,5 @@
 #ifndef __CSERVICE_H
-#define __CSERVICE_H "$Id: cservice.h,v 1.16 2001/01/02 07:55:12 gte Exp $"
+#define __CSERVICE_H "$Id: cservice.h,v 1.17 2001/01/03 05:33:03 gte Exp $"
 
 #include	<string>
 #include	<vector>
@@ -69,6 +69,13 @@ public:
                 const string& Message,
                 bool Secure = false ) ;
 	virtual int OnTimer(xServer::timerID, void*);
+
+	// Sends a notice to a channel from the server.
+	bool serverNotice( Channel*, const char*, ... );
+
+	// Log an administrative alert to the relay channel & log.
+	bool logAdminMessage(const char*, ... );
+
     typedef commandMapType::const_iterator constCommandIterator ; 
     constCommandIterator command_begin() const
                 { return commandMap.begin() ; } 
@@ -79,8 +86,11 @@ public:
     constCommandIterator findCommand( const string& theComm ) const
                 { return commandMap.find( theComm ) ; } 
  
-	// Return what access theUser has in channel theChan.
+	// Returns what access theUser has in channel theChan.
 	short getAccessLevel( sqlUser* theUser, sqlChannel* theChan );
+
+	// Returns what admin access a user has.
+	short getAdminAccessLevel( sqlUser* );
 
 	// Fetch a user record for a user.
 	sqlUser* getUserRecord( const string& );

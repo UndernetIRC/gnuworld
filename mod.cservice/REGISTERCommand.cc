@@ -8,7 +8,7 @@
  *
  * Caveats: None
  *
- * $Id: REGISTERCommand.cc,v 1.1 2001/01/02 07:55:12 gte Exp $
+ * $Id: REGISTERCommand.cc,v 1.2 2001/01/03 05:33:02 gte Exp $
  */
  
 #include	<string>
@@ -20,7 +20,7 @@
 #include	"libpq++.h"
 #include	"Network.h"
 
-const char REGISTERCommand_cc_rcsId[] = "$Id: REGISTERCommand.cc,v 1.1 2001/01/02 07:55:12 gte Exp $" ;
+const char REGISTERCommand_cc_rcsId[] = "$Id: REGISTERCommand.cc,v 1.2 2001/01/03 05:33:02 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -103,6 +103,7 @@ bool REGISTERCommand::Exec( iClient* theClient, const string& Message )
 
 	if ((status = bot->SQLDb->Exec(theQuery.str())) == PGRES_COMMAND_OK)
 	{
+		bot->logAdminMessage("%s has registered %s", theUser->getUserName().c_str(), st[1].c_str());
 		bot->Notice(theClient, "Registered channel %s", st[1].c_str());
 	} else {
 		bot->Notice(theClient, "Something went wrong: %s", bot->SQLDb->ErrorMessage()); // Log to msgchan here.

@@ -1,5 +1,5 @@
 #ifndef __CSERVICECOMMANDS_H
-#define __CSERVICECOMMANDS_H "$Id: cserviceCommands.h,v 1.12 2001/01/02 07:55:12 gte Exp $"
+#define __CSERVICECOMMANDS_H "$Id: cserviceCommands.h,v 1.13 2001/01/03 05:33:03 gte Exp $"
 
 #include	<string>
 #include	"iClient.h"
@@ -94,6 +94,7 @@ DECLARE_COMMAND( KICK )
 DECLARE_COMMAND( REGISTER )
 DECLARE_COMMAND( FORCE )
 DECLARE_COMMAND( UNFORCE )
+DECLARE_COMMAND( SERVNOTICE )
  
 } // namespace gnuworld
 
