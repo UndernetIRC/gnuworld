@@ -3,6 +3,12 @@
  *  Overall control client.
  */
 
+#warning *** If you are upgrading from a previous release, please make note of
+#warning *** the following:
+#warning ***
+#warning *** Read RELEASE.NOTES incase there are any database design changes you
+#warning *** need to make, or certain functions of the bot will not work.
+#warning ***
 #warning *** This release changes the behaviour of Database Updates from backend
 #warning *** notifications to periodic updates.
 #warning *** Ensure you set your update_interval to a sane value (Eg: 360)
@@ -202,6 +208,7 @@ RegisterCommand(new QUOTECommand(this, "QUOTE", "<text>", 5));
 RegisterCommand(new REHASHCommand(this, "REHASH", "[translations | help]]", 5));
 RegisterCommand(new STATSCommand(this, "STATS", "", 8));
 RegisterCommand(new ADDCOMMENTCommand(this, "ADDCOMMENT", "<username> <comment>", 10));
+RegisterCommand(new SHUTDOWNCommand(this, "SHUTDOWN", "[reason]", 10));
 
 cserviceConfig = new (std::nothrow) EConfig( args ) ;
 assert( cserviceConfig != 0 ) ;
