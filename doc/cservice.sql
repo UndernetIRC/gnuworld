@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------------
--- "$Id: cservice.sql,v 1.59 2002/01/05 03:55:58 gte Exp $"
+-- "$Id: cservice.sql,v 1.60 2002/01/05 04:20:59 nighty Exp $"
 -- Channel service DB SQL file for PostgreSQL.
 
 -- ChangeLog:
@@ -183,6 +183,7 @@ CREATE TABLE users (
 -- 0x00 01 -- Suspended globally.
 -- 0x00 02 -- Logged in (Depricated).
 -- 0x00 04 -- Invisible.
+-- 0x00 08 -- Fraud username.
 	last_updated_by VARCHAR (128),		-- nick!user@host
 	last_updated INT4 NOT NULL, 
 	deleted INT2 DEFAULT '0',

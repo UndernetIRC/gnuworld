@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------------
--- "$Id: local_db.sql,v 1.13 2001/11/24 05:18:08 nighty Exp $"
+-- "$Id: local_db.sql,v 1.14 2002/01/05 04:20:59 nighty Exp $"
 -- Channel service DB SQL file for PostgreSQL.
 --
 -- .. if you wonder why some tables have moved and you have them here when
@@ -48,4 +48,15 @@ CREATE  INDEX ips_expiration_key ON ips (expiration);
 CREATE  INDEX ips_set_on_key ON ips (set_on);
 CREATE  INDEX ips_ipnum_key ON ips (ipnum);
 CREATE  INDEX ips_user_name_key ON ips (user_name);
+
+CREATE TABLE newu_ipcheck (
+   ts int4 NOT NULL,
+   ip varchar(15) DEFAULT '0.0.0.0' NOT NULL,
+   expiration int4 NOT NULL,
+   CONSTRAINT newu_ipcheck_pkeys PRIMARY KEY (ip)
+);
+
+CREATE INDEX newu_ipcheck_ts ON newu_ipcheck (ts);
+CREATE INDEX newu_ipcheck_ip ON newu_ipcheck (ip);
+CREATE INDEX newu_ipcheck_expiration ON newu_ipcheck (expiration);
 
