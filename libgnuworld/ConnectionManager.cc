@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ConnectionManager.cc,v 1.9 2003/08/05 01:34:24 dan_karrels Exp $
+ * $Id: ConnectionManager.cc,v 1.10 2003/08/05 02:11:01 dan_karrels Exp $
  */
 
 #include	<unistd.h>
@@ -52,7 +52,7 @@
 #include	"Buffer.h"
 #include	"ELog.h"
 
-const char rcsId[] = "$Id: ConnectionManager.cc,v 1.9 2003/08/05 01:34:24 dan_karrels Exp $" ;
+const char rcsId[] = "$Id: ConnectionManager.cc,v 1.10 2003/08/05 02:11:01 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -68,7 +68,7 @@ ConnectionManager::ConnectionManager( const time_t defaultTimeoutDuration,
 	const char defaultDelimiter )
 :	timeoutDuration( defaultTimeoutDuration ),
 	delimiter( defaultDelimiter ),
-	inputBufferSize( 65536 )
+	inputBufferSize( 131072 )
 {
 inputBuffer = new char[ inputBufferSize ] ;
 }
@@ -1055,10 +1055,10 @@ if( EAGAIN == errno )
 	return true ;
 	}
 
-elog	<< "ConnectionManager::handleRead> Read "
-	<< readResult
-	<< " bytes"
-	<< endl ;
+//elog	<< "ConnectionManager::handleRead> Read "
+//	<< readResult
+//	<< " bytes"
+//	<< endl ;
 
 // Check for error on read()
 if( readResult <= 0 )
@@ -1135,11 +1135,11 @@ if( (ENOBUFS == errno) || (EWOULDBLOCK == errno) || (EAGAIN == errno) )
 	return true ;
 	}
 
-elog	<< "ConnectionManager::handleWrite> Wrote "
-	<< writeResult
-	<< " bytes, remaining in buffer: "
-	<< (cPtr->outputBuffer.size() - writeResult)
-	<< endl ;
+//elog	<< "ConnectionManager::handleWrite> Wrote "
+//	<< writeResult
+//	<< " bytes, remaining in buffer: "
+//	<< (cPtr->outputBuffer.size() - writeResult)
+//	<< endl ;
 
 // Check for write error
 if( writeResult < 0 )
