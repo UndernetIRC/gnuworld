@@ -1,6 +1,6 @@
 /*
  * client.cc
- * $Id: client.cc,v 1.47 2002/11/26 03:09:44 jeekay Exp $
+ * $Id: client.cc,v 1.48 2002/12/02 19:15:37 jeekay Exp $
  */
 
 #include	<new>
@@ -30,7 +30,7 @@
 #include	"events.h"
 
 const char xClient_h_rcsId[] = __CLIENT_H ;
-const char xClient_cc_rcsId[] = "$Id: client.cc,v 1.47 2002/11/26 03:09:44 jeekay Exp $" ;
+const char xClient_cc_rcsId[] = "$Id: client.cc,v 1.48 2002/12/02 19:15:37 jeekay Exp $" ;
 const char config_h_rcsId[] = __CONFIG_H ;
 const char misc_h_rcsId[] = __MISC_H ;
 const char Numeric_h_rcsId[] = __NUMERIC_H ;
@@ -556,7 +556,8 @@ Write( "%s D %s :%s",
 	theClient->getCharYYXXX().c_str(),
 	reason.c_str() ) ;
 
-/*
+// Why was all this commented out? -- gk
+
 // Do NOT cast away constness
 string localReason( reason ) ;
 
@@ -567,7 +568,6 @@ MyUplink->PostEvent( EVT_KILL,
 
 // Remove the user
 delete Network->removeClient( theClient ) ;
-*/
 
 return 0 ;
 }
