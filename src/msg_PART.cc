@@ -15,7 +15,7 @@
 #include	"xparameters.h"
 #include	"StringTokenizer.h"
 
-const char msg_PART_cc_rcsId[] = "$Id: msg_PART.cc,v 1.5 2001/03/24 01:31:42 dan_karrels Exp $" ;
+const char msg_PART_cc_rcsId[] = "$Id: msg_PART.cc,v 1.6 2001/05/08 18:40:40 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -56,7 +56,7 @@ if( NULL == theClient )
 
 // Tokenize the channel string
 // Be sure to take into account the channel parting message
-StringTokenizer _st( Param[ 1 ], ':' ) ;
+StringTokenizer _st( Param[ 1 ] ) ;
 StringTokenizer st( _st[ 0 ], ',' ) ;
 
 // Iterate through all channels that this user is parting
