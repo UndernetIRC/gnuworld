@@ -195,6 +195,7 @@ iClient* newClient = new (std::nothrow) iClient(
 	"realInsecureHost.com", // realInsecureHost
 	"+i", // mode
 	string(), // account
+	0, // account_ts
 	realname,
 	31337 // connect time
 	) ;

@@ -602,7 +602,8 @@ for( vector<string>::iterator itr = jupeQueue.begin();
       "nick.name",
       "nick.name",
       "+ikd",
-      "",
+      string(),
+      0,
       "Juped Nick",
       ::time( 0 )
     );

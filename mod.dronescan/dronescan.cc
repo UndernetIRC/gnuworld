@@ -1154,7 +1154,8 @@ void dronescan::preloadFakeClientCache()
 			newFake->getHostName(),
 			newFake->getHostName(),
 			"+i",
-			"",
+			string(),
+			0,
 			newFake->getRealName(),
 			::time(0)
 			);

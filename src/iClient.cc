@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: iClient.cc,v 1.33 2004/02/13 17:24:42 jeekay Exp $
+ * $Id: iClient.cc,v 1.34 2004/06/14 22:17:58 jeekay Exp $
  */
 
 #include	<new>
@@ -34,7 +34,7 @@
 #include	"ip.h"
 #include	"config.h"
 
-RCSTAG( "$Id: iClient.cc,v 1.33 2004/02/13 17:24:42 jeekay Exp $" ) ;
+RCSTAG( "$Id: iClient.cc,v 1.34 2004/06/14 22:17:58 jeekay Exp $" ) ;
 
 namespace gnuworld
 {
@@ -64,6 +64,7 @@ iClient::iClient( const unsigned int& _uplink,
 	const string& _realInsecureHost,
 	const string& _mode,
 	const string& _account,
+	const time_t _account_ts,
 	const string& _description,
 	const time_t& _connectTime )
 : NetworkTarget( _yyxxx ),
@@ -75,7 +76,8 @@ iClient::iClient( const unsigned int& _uplink,
 	description( _description),
 	connectTime( _connectTime ),
 	mode( 0 ),
-	account( _account )
+	account( _account ),
+	account_ts( _account_ts )
 {
 (void) _uplink ;
 setModes( _mode ) ;

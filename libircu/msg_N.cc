@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_N.cc,v 1.5 2003/08/09 23:15:33 dan_karrels Exp $
+ * $Id: msg_N.cc,v 1.6 2004/06/14 22:17:56 jeekay Exp $
  */
 
 #include	<new>
@@ -36,7 +36,7 @@
 #include	"ServerCommandHandler.h"
 #include	"config.h"
 
-RCSTAG( "$Id: msg_N.cc,v 1.5 2003/08/09 23:15:33 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: msg_N.cc,v 1.6 2004/06/14 22:17:56 jeekay Exp $" ) ;
 
 namespace gnuworld
 {
@@ -97,7 +97,8 @@ const char* modes = "+" ;
 const char* host = params[ 6 ] ;
 const char* yyxxx = params[ 7 ] ;
 const char* description = params [ 8 ] ;
-const char* account = "";
+string account = "";
+time_t account_ts = 0;
 
 // Are modes specified? (With a +r?)
 // If so, token 7 is the authenticated account name,
@@ -156,6 +157,26 @@ else
 	return false ;
 	}
 
+/* If we have an account, does it have a timestamp? */
+if( ! account.empty() ) {
+	string::size_type pos = account.find(':');
+	if( ! ( pos == string::npos ) ) {
+		/* We have a timestamp */
+		if ( pos == ( account.length() - 1 ) ) {
+			/* Bizarre - colon but no following TS */
+			elog	<< "msg_N> Invalid account format: "
+				<< account
+				<< endl;
+		} else {
+			string account_ts_s = account;
+			account_ts_s.erase(0, pos + 1);
+			account.erase(pos);
+			
+			account_ts = atoi(account_ts_s.c_str());
+		}
+	}
+}
+
 iClient* newClient = new (std::nothrow) iClient(
 		nickUplink->getIntYY(),
 		yyxxx,
@@ -166,6 +187,7 @@ iClient* newClient = new (std::nothrow) iClient(
 		params[ 5 ], // realInsecurehost
 		modes,
 		account,
+		account_ts,
 		description,
 		atoi( params[ 3 ] ) // connection time
 		) ;

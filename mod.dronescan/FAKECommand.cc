@@ -75,7 +75,8 @@ void FAKECommand::Exec( const iClient *theClient, const string& Message, const s
 				theFake->getHostName(),
 				theFake->getHostName(),
 				"+i",
-				"",
+				string(),
+				0,
 				theFake->getRealName(),
 				::time(0)
 				);

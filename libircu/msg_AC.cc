@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * "$Id: msg_AC.cc,v 1.5 2004/01/11 11:25:55 dan_karrels Exp $"
+ * "$Id: msg_AC.cc,v 1.6 2004/06/14 22:17:56 jeekay Exp $"
  */
 
 #include	<iostream>
@@ -30,7 +30,7 @@
 #include	"ELog.h"
 #include	"config.h"
 
-RCSTAG( "$Id: msg_AC.cc,v 1.5 2004/01/11 11:25:55 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: msg_AC.cc,v 1.6 2004/06/14 22:17:56 jeekay Exp $" ) ;
 
 namespace gnuworld
 {
@@ -62,8 +62,34 @@ if( !theClient )
 	return false;
 	}
 
+string account( Param[2] );
+time_t account_ts = 0;
+
+/* If we have an account, does it have a timestamp? */
+if( ! account.empty() ) {
+	string::size_type pos = account.find(':');
+	if( ! ( pos == string::npos ) ) {
+		/* We have a timestamp */
+		if ( pos == ( account.length() - 1 ) ) {
+			/* Bizarre - colon but no following TS */
+			elog	<< "msg_N> Invalid account format: "
+				<< account
+				<< std::endl;
+		} else {
+			string account_ts_s = account;
+			account_ts_s.erase(0, pos + 1);
+			account.erase(pos);
+			
+			account_ts = atoi(account_ts_s.c_str());
+		}
+	}
+}
+
+
 // Update user information
-theClient->setAccount( Param[ 2 ] ) ;
+theClient->setAccount( account ) ;
+
+if( account_ts != 0 ) theClient->setAccountTS( account_ts );
 
 // Post event to listening clients
 theServer->PostEvent( EVT_ACCOUNT, static_cast< void* >( theClient ) ) ;

@@ -17,11 +17,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: iClient.h,v 1.42 2004/02/13 17:24:41 jeekay Exp $
+ * $Id: iClient.h,v 1.43 2004/06/14 22:17:56 jeekay Exp $
  */
 
 #ifndef __ICLIENT_H
-#define __ICLIENT_H "$Id: iClient.h,v 1.42 2004/02/13 17:24:41 jeekay Exp $"
+#define __ICLIENT_H "$Id: iClient.h,v 1.43 2004/06/14 22:17:56 jeekay Exp $"
 
 #include	<string>
 #include	<list>
@@ -116,6 +116,7 @@ public:
 		const std::string& _realInsecureHost,
 		const std::string& _mode,
 		const std::string& _account,
+		const time_t _account_ts,
 		const std::string& _description,
 		const time_t& _connectTime ) ;
 
@@ -188,6 +189,14 @@ public:
 	 */
 	inline const std::string& getAccount() const
 		{ return account ; }
+	
+	/**
+	 * Retrieve client's account timestamp.
+	 *
+	 * @return the timestamp of the account if set, else 0.
+	 */
+	inline const time_t getAccountTS() const
+		{ return account_ts; }
 
 	/**
 	 * Return the suffix hostname to be appended to the
@@ -207,6 +216,17 @@ public:
 
 		// We know that the user is mode R already
 		if (isModeX()) setHiddenHost();
+		}
+	
+	/**
+	 * Set the account timestamp for this iClient.
+	 * Only valid if the iClient isModeR()
+	 */
+	inline void setAccountTS( const time_t _account_ts )
+		{
+		if( ! isModeR() ) { return ; }
+		
+		account_ts = _account_ts;
 		}
 
 	/**
@@ -598,10 +618,11 @@ protected:
 	 */
 	modeType	mode ;
 
-	/**
-	 * This client's "Account".
-	 */
+	/** This client's "Account". */
 	std::string	account ;
+	
+	/** The timestamp of this client's account. */
+	time_t		account_ts ;
 
 	/**
 	 * The structure used to store which channels this user is in.
