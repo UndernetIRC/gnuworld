@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server.cc,v 1.143 2002/07/31 13:53:53 dan_karrels Exp $
+ * $Id: server.cc,v 1.144 2002/07/31 20:22:42 reedloden Exp $
  */
 
 #include	<sys/time.h>
@@ -72,7 +72,7 @@
 #include	"Connection.h"
 
 const char server_h_rcsId[] = __SERVER_H ;
-const char server_cc_rcsId[] = "$Id: server.cc,v 1.143 2002/07/31 13:53:53 dan_karrels Exp $" ;
+const char server_cc_rcsId[] = "$Id: server.cc,v 1.144 2002/07/31 20:22:42 reedloden Exp $" ;
 const char config_h_rcsId[] = __CONFIG_H ;
 const char misc_h_rcsId[] = __MISC_H ;
 const char events_h_rcsId[] = __EVENTS_H ;
@@ -543,7 +543,7 @@ elog	<< "*** Connected to "
 WriteDuringBurst( "PASS :%s\n", Password.c_str() ) ;
 
 // Send our server information.
-WriteDuringBurst( "SERVER %s %d %d %d J%02d %s :%s\n",
+WriteDuringBurst( "SERVER %s %d %d %d J%02d %s +s :%s\n",
 	        ServerName.c_str(),
 		1,
 		StartTime,
