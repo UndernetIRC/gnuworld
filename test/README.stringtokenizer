@@ -1,0 +1,4 @@
+Attempts to tokenize a given file.  Has a help menu, so it should be 
+pretty easy to use.  This program is just used to load test the 
+StringTokenizer class.
+

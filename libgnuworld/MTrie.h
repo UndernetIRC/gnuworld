@@ -1,7 +1,7 @@
 /**
  * MTrie.h
  *
- * $Id: MTrie.h,v 1.5 2003/07/24 04:03:18 dan_karrels Exp $
+ * $Id: MTrie.h,v 1.6 2003/07/27 22:26:45 dan_karrels Exp $
  */
 
 #ifndef __MTRIE_H
@@ -10,6 +10,7 @@
 #include	<map>
 #include	<list>
 #include	<string>
+#include	<iostream>
 
 using std::map ;
 using std::list ;
@@ -83,6 +84,8 @@ public:
 	 */
 	virtual size_type		erase( const string& key ) ;
 
+	virtual void			dumpDebug( std::ostream& ) const ;
+
 protected:
 
 	/**
@@ -126,6 +129,10 @@ protected:
 	virtual size_type recursiveErase( MTrie< data_type >*,
 				list< string >& base,
 				const string& key ) ;
+
+	virtual void	recursiveDebug( std::ostream&,
+				size_t levelNum,
+				const MTrie< data_type >* ) const ;
 
 	/// The number of elements stored in this MTrie
 	size_type		numElements ;

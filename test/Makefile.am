@@ -1,7 +1,9 @@
 ## Process this file with automake to produce Makefile.in
-## $Id: Makefile.am,v 1.11 2003/07/20 21:56:30 dan_karrels Exp $
+## $Id: Makefile.am,v 1.12 2003/07/27 22:26:47 dan_karrels Exp $
 
-noinst_PROGRAMS = test_mtrie \
+noinst_PROGRAMS = test_mtrie_perf_summary \
+	test_mtrie_perf \
+	test_mtrie \
 	test_stringtokenizer \
 	test_econfig \
 	test_gThread \
@@ -12,29 +14,19 @@ noinst_PROGRAMS = test_mtrie \
 LDADD = $(glibdir)/libgnuworld.la
 
 test_mtrie_SOURCES = mtrie.cc
-
+test_mtrie_perf_SOURCES = mtrie_perf.cc
+test_mtrie_perf_summary_SOURCES = mtrie_perf_summary.cc
 test_stringtokenizer_SOURCES = stringtokenizer.cc
-test_stringtokenizer_DEPENDENCIES = $(glibdir)/libgnuworld.la
-
 test_econfig_SOURCES = econfig.cc
-test_econfig_DEPENDENCIES = $(glibdir)/libgnuworld.la
+test_match_SOURCES = match.cc
+test_bot_SOURCES = testbot.cc
+test_kick_transaction_SOURCES = test_kick_transaction.cc
 
 test_gThread_SOURCES = gThread.cc
 test_gThread_LDFLAGS = $(glibdir)/libgnuworld.la @threadLib@
-test_gThread_DEPENDENCIES = $(glibdir)/libgnuworld.la
 
 test_signal_SOURCES = signal.cc
 test_signal_LDFLAGS = $(glibdir)/libgnuworld.la @threadLib@
-test_signal_DEPENDENCIES = $(glibdir)/libgnuworld.la
-
-test_match_SOURCES = match.cc
-test_match_DEPENDENCIES = $(glibdir)/libgnuworld.la
-
-test_bot_SOURCES = testbot.cc
-test_bot_DEPENDENCIES = $(glibdir)/libgnuworld.la
-
-test_kick_transaction_SOURCES = test_kick_transaction.cc
-test_kick_transaction_DEPENDENCIES = $(glibdir)/libgnuworld.la
 
 EXTRA_DIST = testbot.h
 

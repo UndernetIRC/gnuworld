@@ -1,0 +1,4 @@
+Interactive testing for the EConfig file parser.  The menu driven system 
+allows you to find/insert/replace(?) key value pairs in a given (-f) 
+config file.
+

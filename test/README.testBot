@@ -1,0 +1,4 @@
+This is a simple test bot that uses the ConnectionManager interface.  It 
+is mainly a demonstration of how easy it is to build network apps with CM 
+:)
+

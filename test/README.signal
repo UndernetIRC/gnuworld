@@ -1,0 +1,13 @@
+This program is designed to hammer the signal handling system looking for 
+flaws with GNUWorld's Signal class.
+
+To do some testing:
+
+1) run test_signal
+2) run kill_mult
+
+kill_test will send a group of known signals to the pid found in 
+signal.pid (the pid file for the signal program from step 1).
+
+kill_mult just runs kill_test a bunch of times.
+
