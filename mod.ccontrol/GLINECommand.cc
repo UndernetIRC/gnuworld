@@ -24,7 +24,7 @@
 #include	"ccUser.h"
 #include	"Constants.h"
 
-const char GLINECommand_cc_rcsId[] = "$Id: GLINECommand.cc,v 1.32 2001/12/23 09:07:57 mrbean_ Exp $";
+const char GLINECommand_cc_rcsId[] = "$Id: GLINECommand.cc,v 1.33 2002/01/10 20:31:23 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -197,11 +197,12 @@ if(!isChan)
 		return false;
 		}
 
+	bot->setRemoving(userName + "@" +hostName);
 	server->setGline( nickUserHost,
 		userName + "@" +hostName,
 		Reason + "[" + Us + "]",
 		gLength ) ;
-	
+	bot->unSetRemoving();
 	ccGline *TmpGline = bot->findGline(userName + "@" + hostName);
 	bool Up = false;
 	
@@ -290,10 +291,12 @@ ptr != theChan->userList_end() ; ++ptr )
 		TmpGline->Insert();
 		TmpGline->loadData(TmpGline->getHost());
 		bot->addGline(TmpGline);
+		bot->setRemoving(TmpGline->getHost());
 		server->setGline( nickUserHost,
 			    TmpGline->getHost(),
 			    TmpGline->getReason() + "[" + Us + "]" ,
 			    gLength ) ;
+		bot->unSetRemoving();
 		glineList.insert(GlineMapType::value_type(TmpGline->getHost(),0));
 		}
 	}

@@ -3,7 +3,7 @@
  */
 
 #ifndef __CCONTROL_H
-#define __CCONTROL_H "$Id: ccontrol.h,v 1.56 2002/01/02 22:22:25 mrbean_ Exp $"
+#define __CCONTROL_H "$Id: ccontrol.h,v 1.57 2002/01/10 20:31:24 mrbean_ Exp $"
 
 
 #include	<string>
@@ -573,6 +573,11 @@ public:
 
 	void	remServer(ccServer*);
 	
+	inline void	setRemoving(const string& host)
+	{ rGlineHost = host; }	
+	
+	inline void unSetRemoving()
+	{ removingGline = false; }
 	/**
 	 * This is a constant iterator type used to perform a read-only
 	 * iteration of the operchan structure.
@@ -834,6 +839,10 @@ protected:
 	unsigned int		connectCount;
 	
 	unsigned int		connectRetry;
+	
+	bool			removingGline;
+	
+	string			rGlineHost;
 } ; 
 
 void* initGate( void * );

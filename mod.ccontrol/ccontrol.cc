@@ -37,7 +37,7 @@
 #include	"ip.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.117 2002/01/08 18:39:35 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.118 2002/01/10 20:31:23 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -299,6 +299,7 @@ loadServers();
 
 connectCount = 0;
 connectRetry = 5;
+removingGline = false;
 
 }
 
@@ -753,7 +754,18 @@ switch( theEvent )
 		}	
 	case EVT_GLINE:
 		{
+		if(!Data1) //TODO: find out how we get this
+			{
+			return 0;
+			}
+
 		Gline* newG = static_cast< Gline* >(Data1);
+		if((removingGline) //Avoid adding our own glines twice
+		    && (!strcasecmp(rGlineHost,newG->getUserHost())))
+		    {
+		    return 0;
+		    }
+
 		ccGline* newGline = findGline(newG->getUserHost());
 		if(!newGline)
 			{
@@ -776,7 +788,17 @@ switch( theEvent )
 		}
 	case EVT_REMGLINE:
 		{
+		if(!Data1)  
+			{
+			return 0;
+			}
+			
 		Gline* newG = static_cast< Gline* >(Data1);
+		if((removingGline) //Avoid removing our own glines twice
+		    && (!strcasecmp(rGlineHost,newG->getUserHost())))
+		    {
+		    return 0;
+		    }
 		ccGline* newGline = findGline(newG->getUserHost());
 		if(newGline)
 			{
@@ -847,10 +869,12 @@ switch( theEvent )
 							tmpGline->loadData(tmpGline->getHost());
 							addGline(tmpGline);
 							}
+						setRemoving(tmpGline->getHost());
 						MyUplink->setGline( nickName,
 								tmpGline->getHost(),
 								tmpGline->getReason(),
-								tmpGline->getExpires() - ::time(0) ) ;*/
+								tmpGline->getExpires() - ::time(0) ) ;
+						unSetRemoving();*/
 						}	
 					else
 						{
@@ -888,9 +912,11 @@ switch( theEvent )
 					{
 					//addGline(tempGline);
 					glSet = true;
+					setRemoving(tempGline->getHost());
 					MyUplink->setGline(tempGline->getAddedBy()
 					,tempGline->getHost(),tempGline->getReason()
 					,tempGline->getExpires() - ::time(0));
+					unSetRemoving();
 					}
 				}			
 			}
@@ -2159,7 +2185,9 @@ for(glineIterator ptr = glineList.begin();ptr != glineList.end();)
 
 		{
 		//remove the gline from the core
+		setRemoving((*ptr)->getHost());
 		MyUplink->removeGline((*ptr)->getHost());
+		unSetRemoving();
 		//remove the gline from ccontrol structure
 		//finally remove the gline from the database
 		ccGline* tGline = *ptr;
@@ -2196,10 +2224,12 @@ for(glineIterator ptr = glineList.begin(); ptr != glineList.end(); ptr++)
 		{
 		Expires = theGline->getExpires() - ::time(0);
 		}
+	setRemoving(theGline->getHost());
 	MyUplink->setGline(theGline->getAddedBy(),
 		theGline->getHost(),
 		theGline->getReason(),
 		Expires);
+	unSetRemoving();
 	}
 
 return true;

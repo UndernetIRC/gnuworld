@@ -18,7 +18,7 @@
 #include	"ELog.h"
 #include	"Constants.h"
 
-const char FORCEGLINECommand_cc_rcsId[] = "$Id: FORCEGLINECommand.cc,v 1.16 2001/12/23 09:07:57 mrbean_ Exp $";
+const char FORCEGLINECommand_cc_rcsId[] = "$Id: FORCEGLINECommand.cc,v 1.17 2002/01/10 20:31:23 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -236,11 +236,12 @@ if(Reason.size() > 255)
 	bot->Notice(theClient,"Gline reason can't be more than 255 chars");
 	return false;
 	}
+bot->setRemoving(st[pos]);
 server->setGline( nickUserHost,
 	st[ pos ],
 	st.assemble( pos + ResStart ) + "[" + Us + "]",
 	gLength ) ;
-
+bot->unSetRemoving();
 ccGline *TmpGline = bot->findGline(st[pos]);
 bool Up = false;
 

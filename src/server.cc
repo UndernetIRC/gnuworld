@@ -50,7 +50,7 @@
 #include	"UnloadClientTimerHandler.h"
 
 const char server_h_rcsId[] = __SERVER_H ;
-const char server_cc_rcsId[] = "$Id: server.cc,v 1.121 2002/01/08 20:16:47 gte Exp $" ;
+const char server_cc_rcsId[] = "$Id: server.cc,v 1.122 2002/01/10 20:31:26 mrbean_ Exp $" ;
 const char config_h_rcsId[] = __CONFIG_H ;
 const char misc_h_rcsId[] = __MISC_H ;
 const char events_h_rcsId[] = __EVENTS_H ;
@@ -2114,7 +2114,7 @@ void xServer::removeMatchingGlines( const string& wildHost )
 for( glineIterator ptr = gline_begin() ; ptr != gline_end() ; )
 	{
 	// TODO: Does this work with two wildHost's?
-	if( !match( wildHost, (*ptr)->getUserHost() ) )
+	if( !strcasecmp( wildHost, (*ptr)->getUserHost() ) )
 		{
 		ptr = glineList.erase( ptr ) ;
 
