@@ -2,7 +2,7 @@
 
 ####################################################################################################
 #
-# "$Id: fixDOS.sh,v 1.1 2002/01/09 01:53:59 nighty Exp $"
+# "$Id: fixDOS.sh,v 1.2 2002/01/09 03:06:04 nighty Exp $"
 #
 # fixDOS.sh : a small bash script to convert all .php, .inc etc.. files in your current
 #             directory from DOS (\r\n) to UNIX (\n) CRLF/LF Format.
@@ -24,7 +24,7 @@ if [ "$1" == "--help" ]; then
 	echo "- [-nobackup] must be used either alone, or as second parameter,"
 	echo "-             it prevents the program from keeping trace of 'old' files."
 	echo "- Default will fix following extensions :"
-	echo "-   PHP, INC, HTML, HTM, C, H, PHP3, TXT."
+	echo "-   PHP, INC, HTML, HTM, C, CC, H, PHP3, TXT."
 	exit 0
 fi
 
@@ -98,6 +98,18 @@ done
 echo "] (ok)"
 echo -n "Fixing .C files ["
 for fichinc in ./*.c; do
+        if `sed -e 's/\r//g' $fichinc > /tmp/$fichinc-TMP.$$ 2>/dev/null`; then
+                mv $fichinc $fichinc.bakFD
+                mv /tmp/$fichinc-TMP.$$ $fichinc
+                echo -n "."
+                FILE="1"
+        else
+                echo -n "no file"
+        fi
+done
+echo "] (ok)"
+echo -n "Fixing .CC files ["
+for fichinc in ./*.cc; do
         if `sed -e 's/\r//g' $fichinc > /tmp/$fichinc-TMP.$$ 2>/dev/null`; then
                 mv $fichinc $fichinc.bakFD
                 mv /tmp/$fichinc-TMP.$$ $fichinc
