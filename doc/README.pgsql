@@ -79,4 +79,5 @@ in order to build postgres you need :
 
 
 
+now go look README.ccontrol and README.cservice ;)
 
