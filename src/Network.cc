@@ -24,7 +24,7 @@
 #include	"ip.h"
 
 const char xNetwork_h_rcsId[] = __NETWORK_H ;
-const char xNetwork_cc_rcsId[] = "$Id: Network.cc,v 1.35 2002/05/15 22:14:10 dan_karrels Exp $" ;
+const char xNetwork_cc_rcsId[] = "$Id: Network.cc,v 1.36 2002/05/19 16:13:37 dan_karrels Exp $" ;
 const char ELog_h_rcsId[] = __ELOG_H ;
 const char iClient_h_rcsId[] = __ICLIENT_H ;
 const char Channel_h_rcsId[] = __CHANNEL_H ;
@@ -373,49 +373,46 @@ iServer* xNetwork::removeServer( const unsigned int& YY,
 	bool postEvent )
 {
 
+// Attempt to find the server being removed
 serverMapType::iterator ptr = serverMap.find( YY ) ;
+
+// Did we find the server?
 if( ptr == serverMap.end() )
 	{
+	// Nope, return NULL
 	return 0 ;
 	}
 
+// Grab a pointer to the iServer for convenience and readability
 iServer* serverPtr = ptr->second ;
+
+// Remove the server from the internal table
 serverMap.erase( ptr ) ;
 
+// Walk through the numericMap looking for clients which are on
+// the server being removed.
 // This algorithm is O(N) :(
 for( numericMapType::iterator ptr = numericMap.begin(),
 	endPtr = numericMap.end() ; ptr != endPtr ; ++ptr )
 	{
+	// Is this client on the server that is being removed?
 	if( YY != ptr->second->getIntYY() )
 		{
+		// Nope, move to next client
 		continue ;
 		}
 
-	// It's possible that this iClient* may point to NULL.
-	iClient* theClient = ptr->second ;
+	// This client is on the server being removed
 
-	// Remove channel->client associations
-	iClient::channelIterator chanPtr = theClient->channels_begin() ;
-	while( chanPtr != theClient->channels_end() )
-		{
-		delete (*chanPtr)->removeUser( theClient ) ;
-
-		// Is the channel now empty?
-		if( (*chanPtr)->empty() )
-			{
-			// The channel is now empty, there is no worry
-			// of finding another user on this server
-			// which is in this channel (it's empty!)
-			// This removal should be safe...
-			delete removeChannel( (*chanPtr)->getName() ) ;
-			}
-
-		// Even if the channel is deallocated and removed
-		// from the channel table, this increment here is still
-		// safe.
-		++chanPtr ;
-		}
-	theClient->clearChannels() ;
+	// Let removeClient() handle:
+	// - Removing the client<->channel interactions
+	// - Removing the channel itself, if empty
+	// - Removing the client from the internal tables
+	//
+	// Note that removal of an element from the numericMap
+	// by removeClient() does NOT invalidate other iterators
+	// into that table; so (ptr) is still valid after this call
+	iClient* theClient = removeClient( ptr->second ) ;
 
 	// Should we post this as an EVT_QUIT event?
 	// It seems that this may add unneeded complexity in handling
@@ -429,10 +426,11 @@ for( numericMapType::iterator ptr = numericMap.begin(),
 			static_cast< void* >( theClient ) ) ;
 		}
 
-	removeNick( theClient->getNickName() ) ;
+	// Be sure to deallocate the iClient's allocated heap space
 	delete theClient ;
 	}
 
+// Return the server being removed
 return serverPtr ;
 }
 
