@@ -23,7 +23,7 @@
 #include	"AuthInfo.h"
 #include        "server.h"
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.40 2001/05/21 16:14:55 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.41 2001/05/21 16:27:32 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -1508,7 +1508,7 @@ User[TPos - GlineHost] = '\0';
 strcpy(Host,TPos+1);
 if((countCinS(Host,'*') > 1) || (!strcasecmp(Host,"*")))
     return HUH_NO_HOST;
-int TotalHost = Network->countMatch(GlineHost);
+int TotalHost = Network->countMatchingUserHost(GlineHost);
 if(TotalHost > 256)
     return HUH_NO_USERS;
 else if(TotalHost > 32)
