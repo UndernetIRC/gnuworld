@@ -3,7 +3,7 @@
  */
 
 #ifndef __CCONTROL_H
-#define __CCONTROL_H "$Id: ccontrol.h,v 1.48 2001/11/20 19:49:46 mrbean_ Exp $"
+#define __CCONTROL_H "$Id: ccontrol.h,v 1.49 2001/12/05 21:03:57 mrbean_ Exp $"
 
 
 #include	<string>
@@ -551,7 +551,7 @@ public:
 	
 	void delClone(const string);
 	
-	void checkClones(const int);
+	void CheckClones(const int);
 	
 	void GatesCheck();
 	
@@ -788,7 +788,7 @@ protected:
 
 	bool			checkGates;	 
 	
-
+	bool			checkClones;
 	
 	time_t			dbConnectionTimer;
 	

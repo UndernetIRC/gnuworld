@@ -21,7 +21,7 @@
 #include	"misc.h"
 #include	"commLevels.h"
 
-const char ADDUSERCommand_cc_rcsId[] = "$Id: ADDUSERCommand.cc,v 1.6 2001/11/20 19:49:45 mrbean_ Exp $";
+const char ADDUSERCommand_cc_rcsId[] = "$Id: ADDUSERCommand.cc,v 1.7 2001/12/05 21:03:57 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -149,7 +149,11 @@ theUser->setLast_Updated_By(theClient->getNickUserHost());
 theUser->setServer(tOper->getServer());
 theUser->setNeedOp(true);
 if(bot->AddOper(theUser) == true)
+	{
 	bot->Notice(theClient, "Oper successfully Added.");
+	theUser->loadData(theUser->getUserName());
+	bot->AddHost(theUser,"*!*@*");
+	}
 else
 	bot->Notice(theClient, "Error while adding new oper.");
 delete theUser;

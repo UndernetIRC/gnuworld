@@ -13,7 +13,7 @@
 #include	"md5hash.h" 
 #include        "ccUser.h"
 
-const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.17 2001/11/20 19:49:45 mrbean_ Exp $";
+const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.18 2001/12/05 21:03:57 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -54,7 +54,10 @@ if (tmpUser)
 ccUser* theUser = bot->GetOper(bot->removeSqlChars(st[1]));
 if (!theUser) 
 	{
-	bot->Notice(theClient, "Sorry, I don't know who %s is.", st[1].c_str());
+	bot->MsgChanLog("[FAILED LOGIN] %s - Bad Username\n",theClient->getNickUserHost().c_str());
+	
+	bot->Notice(theClient, "FALSE LOGIN, DENIED");
+	bot->addLogin(theClient->getCharYYXXX());
 	return false;
 	}
 else
@@ -64,17 +67,21 @@ else
 	if((!theClient->isOper()) && (getNeedOp()) && (theUser->getNeedOp()))
 
 		{
-		bot->Notice(theClient,
-			     "You must be operd up to login");
+		bot->MsgChanLog("[FAILED LOGIN] %s - Not Operd\n",theClient->getNickUserHost().c_str());
+		bot->Notice(theClient, "FALSE LOGIN, DENIED");
+		bot->addLogin(theClient->getCharYYXXX());
+		delete theUser;
 		return false;
 		}
 	//Check if the users mask is in his access list
 		
 	if(!bot->UserGotMask(theUser,theClient->getNickUserHost()))
 		{
-		bot->Notice(theClient,"Sorry but your mask doesnt appear in my access list!");
-		delete theUser;
+		bot->MsgChanLog("[FAILED LOGIN] %s - No HostMask\n",theClient->getNickUserHost().c_str());
+	
+		bot->Notice(theClient, "FALSE LOGIN, DENIED");
 		bot->addLogin(theClient->getCharYYXXX());
+		delete theUser;
 		return false;
 		}
 
@@ -106,9 +113,10 @@ else
 
 	if (md5Part != output.str()) // If the MD5 hash's don't match..
 		{
-		bot->Notice(theClient, "AUTHENTICATION FAILED as %s (Invalid Password).", theUser->getUserName().c_str());
-		delete theUser;
+		bot->MsgChanLog("[FAILED LOGIN] %s - Bad Password\n",theClient->getNickUserHost().c_str());
+		bot->Notice(theClient, "FALSE LOGIN, DENIED");
 		bot->addLogin(theClient->getCharYYXXX());
+		delete theUser;
 		return false;
 		}
 	//Ok the password match , prepare the ccUser data

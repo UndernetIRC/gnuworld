@@ -37,7 +37,7 @@
 #include	"ip.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.88 2001/12/04 20:42:44 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.89 2001/12/05 21:03:57 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -161,6 +161,8 @@ maxGlineLen = atoi(conf.Require("max_GLen")->second.c_str());
 maxThreads = atoi(conf.Require("max_threads")->second.c_str());
 
 checkGates = atoi(conf.Require("check_gates")->second.c_str());
+
+checkClones = atoi(conf.Require("check_clones")->second.c_str());
 
 dbConnectionTimer = atoi(conf.Require("dbinterval")->second.c_str());
 
@@ -662,6 +664,7 @@ switch( theEvent )
 		}	
 	case EVT_NICK:
 		{
+		bool glSet = false;
 		iClient* NewUser = static_cast< iClient* >( Data1);
 
 		//Create our flood data for this user
@@ -687,45 +690,52 @@ switch( theEvent )
 					gatesWaitingQueue.push_front(tempGate);			
 				}			
 			}
-		if((!inBurst) && (dbConnected))
+		if(dbConnected)
 			{
-			int CurConnections = Network->countHost(NewUser->getInsecureHost());		
-			if(CurConnections  > getExceptions("*@" + NewUser->getInsecureHost()))
+			if(checkClones)
 				{
-				ccGline *tmpGline;
-				tmpGline = findGline("*@" + NewUser->getInsecureHost()); 
-				if(!tmpGline)
+				if(!inBurst)
 					{
-					tmpGline = new ccGline(SQLDb);
-					tmpGline->setHost("*@" + NewUser->getInsecureHost());
-					tmpGline->setExpires(::time(0) + maxGlineLen);
-					tmpGline->setReason("Automatically banned for excessive connections");
-					tmpGline->setAddedOn(::time(0));
-					tmpGline->Insert();
-					tmpGline->loadData(tmpGline->getHost());
-					//addGline(tmpGline);
+					int CurConnections = Network->countHost(NewUser->getInsecureHost());		
+					if(CurConnections  > getExceptions("*@" + NewUser->getInsecureHost()))
+						{
+						glSet = true;
+						ccGline *tmpGline;
+						tmpGline = findGline("*@" + NewUser->getInsecureHost()); 
+						if(!tmpGline)
+							{
+							tmpGline = new ccGline(SQLDb);
+							tmpGline->setHost("*@" + NewUser->getInsecureHost());
+							tmpGline->setExpires(::time(0) + maxGlineLen);
+							tmpGline->setReason("Automatically banned for excessive connections");
+							tmpGline->setAddedOn(::time(0));
+							tmpGline->Insert();
+							tmpGline->loadData(tmpGline->getHost());
+						//addGline(tmpGline);
+							}
+						MyUplink->setGline( nickName,
+								tmpGline->getHost(),
+								tmpGline->getReason(),
+								tmpGline->getExpires() - ::time(0) ) ;
+						}	
 					}
-				MyUplink->setGline( nickName,
-						tmpGline->getHost(),
-						tmpGline->getReason(),
-						tmpGline->getExpires() - ::time(0) ) ;
-			
+				else 
+					{
+					addClone(NewUser->getInsecureHost());
+					}
 				}
-			else 
+			if(!glSet) 
 				{	
 				ccGline * tempGline = findMatchingGline(NewUser->getUserName() + '@' + NewUser->getInsecureHost());
 				if((tempGline) && (tempGline->getExpires() > ::time(0)))
 					{
-					addGline(tempGline);
+					//addGline(tempGline);
+					glSet = true;
 					MyUplink->setGline(tempGline->getAddedBy()
 					,tempGline->getHost(),tempGline->getReason()
 					,tempGline->getExpires() - ::time(0));
 					}
 				}			
-			}
-		else if(dbConnected)
-			{
-			addClone(NewUser->getInsecureHost());
 			}
 		break;
 		}
@@ -796,14 +806,14 @@ else if (timer_id == expiredSuspends)
 	expiredSuspends = MyUplink->RegisterTimer(::time(0) + 60,this,NULL);
 	}
 
-else if(timer_id == clonesCheck)
+else if((timer_id == clonesCheck) && (checkClones))
 	{
 	if(!inBurst) 
 		{
 		if(!clonesQueue.empty())
 			{
-			if(dbConnected)
-				checkClones(100);
+			if(dbConnected) 
+				CheckClones(100);
 			clonesCheck = MyUplink->RegisterTimer(::time(0) + 2,this,NULL);
 			}
 		else
@@ -2769,7 +2779,7 @@ for(clonesIterator ptr = clonesQueue.begin(); ptr != clonesQueue.end();)
 	}
 }
 
-void ccontrol::checkClones(const int Amount)
+void ccontrol::CheckClones(const int Amount)
 {
 
 if(!dbConnected)
