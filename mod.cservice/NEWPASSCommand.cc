@@ -9,8 +9,9 @@
 #include	"cservice.h"
 #include	"responses.h"
 #include	"networkData.h"
+#include	"cservice_config.h"
 
-const char NEWPASSCommand_cc_rcsId[] = "$Id: NEWPASSCommand.cc,v 1.11 2001/09/05 03:47:56 gte Exp $" ;
+const char NEWPASSCommand_cc_rcsId[] = "$Id: NEWPASSCommand.cc,v 1.12 2002/03/10 03:23:55 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -19,6 +20,11 @@ const char validChars[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0
 bool NEWPASSCommand::Exec( iClient* theClient, const string& Message )
 {
 bot->incStat("COMMANDS.NEWPASS");
+
+#ifndef USE_NEWPASS
+bot->Notice(theClient, "To change account password, please use the web interface.");
+return true;
+#else
 
 StringTokenizer st( Message ) ;
 if( st.size() < 2 )
@@ -126,6 +132,9 @@ else
 
 delete[] output.str() ;
 return true;
+
+#endif
+
 }
 
 } // namespace gnuworld.

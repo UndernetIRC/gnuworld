@@ -1,7 +1,7 @@
 /* cservice_config.h */
 
 #ifndef __CSERVICE_CONFIG_H
-#define __CSERVICE_CONFIG_H "$Id: cservice_config.h,v 1.4 2002/02/24 01:04:06 gte Exp $"
+#define __CSERVICE_CONFIG_H "$Id: cservice_config.h,v 1.5 2002/03/10 03:23:55 gte Exp $"
 
 /**
  * Define this if you wish for all SQL queries to be sent
@@ -36,5 +36,11 @@
  * The maximum number of search results to return to the user.
  */
 #define MAX_SEARCH_RESULTS 10
+
+/**
+ * Do you want NEWPASS command or not?
+ */
+
+#define USE_NEWPASS
 
 #endif // __CSERVICE_CONFIG_H
