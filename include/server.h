@@ -17,7 +17,7 @@
  */
 
 #ifndef __SERVER_H
-#define __SERVER_H "$Id: server.h,v 1.48 2001/08/18 14:49:49 dan_karrels Exp $"
+#define __SERVER_H "$Id: server.h,v 1.49 2001/08/18 15:03:20 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
@@ -1334,18 +1334,18 @@ protected:
 	 * This is the buffer into which network commands are read
 	 * and from which they are later processed.
 	 */
-	Buffer< char >		inputBuffer ;
+	Buffer			inputBuffer ;
 
 	/**
 	 * This is the output buffer from which data is written to
 	 * the network.
 	 */
-	Buffer< char >		outputBuffer ;
+	Buffer			outputBuffer ;
 
 	/**
 	 * This buffer will hold data to be written during burst time.
 	 */
-	Buffer< char >		burstOutputBuffer ;
+	Buffer			burstOutputBuffer ;
 
 	/**
 	 * This is the size of the TCP input window.

@@ -8,25 +8,21 @@
 #include	"Buffer.h"
 
 const char Buffer_h_rcsId[] = __BUFFER_H ;
-const char Buffer_cc_rcsId[] = "$Id: Buffer.cc,v 1.5 2001/07/29 22:44:06 dan_karrels Exp $" ;
+const char Buffer_cc_rcsId[] = "$Id: Buffer.cc,v 1.6 2001/08/18 15:03:20 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
 
-using std::basic_string ;
+using std::string ;
 
-template< class charType >
-Buffer< charType >::Buffer( const basic_string< charType >& aString,
-	charType delimiter )
+Buffer::Buffer( const string& aString, char delimiter )
 	: buf( aString ), delim( delimiter )
 {}
 
-template< class charType >
-Buffer< charType >::~Buffer()
+Buffer::~Buffer()
 { /* No heap space allocated */ }
 
-template< class charType >
-bool Buffer< charType >::ReadLine( basic_string< charType >& retMe )
+bool Buffer::ReadLine( string& retMe )
 {
 
 /* remove any leading new line characters */
@@ -45,9 +41,9 @@ if( empty() )
 /* find() returns the index of the character, or 
  * npos if it was not found
  */
-basic_string< charType >::size_type pos = buf.find( delim ) ;
+size_type pos = buf.find( delim ) ;
 
-if( basic_string< charType >::npos == pos )
+if( string::npos == pos )
 	{
 	// Unable to find the delimiter
 	return false ;
@@ -64,8 +60,7 @@ return true ;
 
 // Delete numBytes bytes from the beginning
 // of the Buffer
-template< class charType >
-void Buffer< charType >::Delete( const size_type& numBytes )
+void Buffer::Delete( const size_type& numBytes )
 {
 if( numBytes >= size() )
 	{

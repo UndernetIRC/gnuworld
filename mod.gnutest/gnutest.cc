@@ -11,7 +11,7 @@
 
 const char client_h_rcsId[] = __CLIENT_H ;
 const char gnutest_h_rcsId[] = __GNUTEST_H ;
-const char gnutest_cc_rcsId[] = "$Id: gnutest.cc,v 1.5 2001/06/14 22:14:13 dan_karrels Exp $" ;
+const char gnutest_cc_rcsId[] = "$Id: gnutest.cc,v 1.6 2001/08/18 15:03:20 dan_karrels Exp $" ;
 const char iClient_h_rcsId[] = __ICLIENT_H ;
 const char StringTokenizer_h_rcsId[] = __STRINGTOKENIZER_H ;
 const char EConfig_h_rcsId[] = __ECONFIG_H ;
@@ -303,7 +303,7 @@ else if( st[ 0 ] == "reload" )
 	{
 	Notice( theClient, "Reloading client...see you on the flip side" ) ;
 
-	MyUplink->UnloadClient( this ) ;
+	MyUplink->UnloadClient( this, string() ) ;
 	MyUplink->LoadClient( "libgnutest", getConfigFileName() ) ;
 	}
 

@@ -5,7 +5,7 @@
  */
 
 #ifndef __BUFFER_H
-#define __BUFFER_H "$Id: Buffer.h,v 1.3 2001/07/29 22:44:06 dan_karrels Exp $"
+#define __BUFFER_H "$Id: Buffer.h,v 1.4 2001/08/18 15:03:20 dan_karrels Exp $"
 
 #include	<iostream>
 #include	<string>
@@ -13,7 +13,7 @@
 namespace gnuworld
 {
 
-using std::basic_string ;
+using std::string ;
 
 /**
  * This class represents a dynamic buffer capable or parsing out
@@ -23,20 +23,18 @@ using std::basic_string ;
  * because it is unlimited in size and provides a Delete() method
  * to delete an arbitrary number of bytes.
  */
-template< class charType = char >
 class Buffer
 {
 
 public:
 
-	typedef basic_string< charType > stringType ;
+	typedef std::string stringType ;
 
 	/**
 	 * Initialize the Buffer with the given string and
 	 * delimiting character
 	 */
-	Buffer( const basic_string< charType >& =
-		basic_string< charType >(), charType = '\n' ) ;
+	Buffer( const string& = string(), char = '\n' ) ;
 
 	/**
 	 * Destroy this Buffer object.  No internal allocation
@@ -50,13 +48,13 @@ public:
 	 * passed as argument, erasing the line from
 	 * the Buffer once complete.
 	 */
-	virtual bool		ReadLine( basic_string< charType >& ) ;
+	virtual bool		ReadLine( string& ) ;
 
 	/**
 	 * Define the type of the variable used to maintain
 	 * size (number of bytes) of Buffer.
 	 */
-	typedef basic_string< charType >::size_type size_type ;
+	typedef string::size_type size_type ;
 
 	/**
 	 * Return the the number of characters currently in
@@ -105,7 +103,7 @@ public:
 	 * This method is const, and therefore does not alter the
 	 * Buffer.
 	 */
-	inline basic_string< charType >	substr( const size_type& index,
+	inline string	substr( const size_type& index,
 				const size_type& len ) const
 		{ return buf.substr( index, len ) ; }
 
@@ -113,14 +111,14 @@ public:
 	 * Return a const reference to a C++ string
 	 * representation of this Buffer.
 	 */
-	inline const basic_string< charType >&	toString() const
+	inline const string&	toString() const
 		{ return buf ; }
 
 	/**
 	 * Return a const reference to a C++ string representation
 	 * of this Buffer.
 	 */
-	inline const basic_string< charType >&	operator*() const
+	inline const string&	operator*() const
 		{ return buf ; }
 
 	/**
@@ -129,22 +127,21 @@ public:
 	 * data is const, and thus cannot be altered by the
 	 * pointer returned by this method.
 	 */
-	inline const charType*	c_str() const
+	inline const char*	c_str() const
 		{ return buf.c_str() ; }
 
 	/**
 	 * Concatenate the given character array onto the end of
 	 * the Buffer.
 	 */
-	inline Buffer&		operator+=( const charType* addMe )
+	inline Buffer&		operator+=( const char* addMe )
 		{ buf += addMe ; return *this ; }
 
 	/**
 	 * Concatenate the given C++ string to the end of the
 	 * Buffer.
 	 */
-	inline Buffer&		operator+=(
-			const basic_string< charType >& addMe )
+	inline Buffer&		operator+=( const string& addMe )
 		{ buf += addMe ; return *this ; }
 
 	/**
@@ -158,16 +155,15 @@ public:
 	 * Assign to this Buffer the contents of the character
 	 * array passed as argument.
 	 */
-	inline Buffer&		operator=( const charType* replaceWithMe )
+	inline Buffer&		operator=( const char* replaceWithMe )
 		{ buf = replaceWithMe ; return *this ; }
 
 	/**
 	 * Assign to this Buffer the contents of the C++ string
 	 * passed as argument.
 	 */
-	inline Buffer&		operator=(
-			const basic_string< charType >& addMe )
-		{ buf = addMe ; return *this ; }
+	inline Buffer&		operator=( const string& replaceWithMe )
+		{ buf = replaceWithMe ; return *this ; }
 
 	/**
 	 * Assign to this Buffer the contents of the Buffer passed
@@ -182,24 +178,25 @@ public:
 	 */
 	inline friend std::ostream& operator<<( std::ostream& o,
 			const Buffer& b )
-		{ o << b.buf ; return o ; }
+		{
+		o << b.buf ;
+		return o ;
+		}
 
 protected:
 
 	/**
 	 * This is the internal representation of this Buffer.
 	 */
-	basic_string< charType >	buf ;
+	string		buf ;
 
 	/**
 	 * This is the delimiting character.
 	 */
-	charType			delim ;
+	char		delim ;
 
 } ;
 
 } // namespace gnuworld
-
-#include	"Buffer.cc"
 
 #endif /* __BUFFER_H */
