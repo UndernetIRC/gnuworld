@@ -19,6 +19,7 @@
  * Checks whether any member of a channel is in more than maxChans channels.
  */
 
+#include	<string>
 #include	<sstream>
 
 #include "gnuworld_config.h"
@@ -47,13 +48,14 @@ bool MAXCHANSTest::isNormal( const Channel *theChannel )
 } // bool MAXCHANSTest::isNormal( const Channel* )
 
 
-const string MAXCHANSTest::getVariable() const
+const std::string MAXCHANSTest::getVariable() const
 {
 	return "maxChans";
 }
 
 
-bool MAXCHANSTest::setVariable( const string& var, const string& value )
+bool MAXCHANSTest::setVariable( const std::string& var,
+	const std::string& value )
 {
 	if("MAXCHANS" != var) return false;
 
@@ -63,7 +65,7 @@ bool MAXCHANSTest::setVariable( const string& var, const string& value )
 }
 
 
-const string MAXCHANSTest::getStatus() const
+const std::string MAXCHANSTest::getStatus() const
 {
 	std::stringstream status;
 	status << "maxChans: " << maxChans;

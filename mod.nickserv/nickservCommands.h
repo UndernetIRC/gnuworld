@@ -20,6 +20,8 @@
 #ifndef NICKSERVCOMMANDS_H
 #define NICKSERVCOMMANDS_H
 
+#include	<string>
+
 /**
  * All this code is stolen straight from mod.cservice, which possibly had
  * stolen it from somewhere else. I'm increasingly convinced that only
@@ -39,33 +41,35 @@ class nickserv;
 
 class Command {
   public:
-    Command(nickserv* _bot, const string& _commName, const string& _help) :
+    Command(nickserv* _bot,
+	const std::string& _commName,
+	const std::string& _help) :
       bot(_bot), server(0), commName(_commName), help(_help)
       {}
 
     virtual ~Command() {}
 
-    virtual bool Exec(iClient*, const string&) = 0;
+    virtual bool Exec(iClient*, const std::string&) = 0;
 
     void setServer(xServer* _server)
       { server = _server; }
 
-    virtual string getInfo() const
+    virtual std::string getInfo() const
       { return commName + ' ' + help; }
 
     virtual void Usage(iClient*);
 
-    inline const string& getName() const
+    inline const std::string& getName() const
       { return commName; }
 
-    inline const string& getHelp() const
+    inline const std::string& getHelp() const
       { return help; }
 
   protected:
     nickserv* bot;
     xServer*  server;
-    string    commName;
-    string    help;
+    std::string    commName;
+    std::string    help;
 }; // class Command
 
 /* Big nasty #define time! */
@@ -75,11 +79,11 @@ class commName##Command : public Command \
 { \
   public: \
     commName##Command(nickserv* _bot, \
-      const string& _commName, \
-      const string& _help) : \
+      const std::string& _commName, \
+      const std::string& _help) : \
         Command(_bot, _commName, _help) {} \
     virtual ~commName##Command() {} \
-    virtual bool Exec(iClient*, const string&); \
+    virtual bool Exec(iClient*, const std::string&); \
 };
 
 /* Level 0 Commands */

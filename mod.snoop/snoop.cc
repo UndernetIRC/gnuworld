@@ -196,8 +196,6 @@ iClient* newClient = new (std::nothrow) iClient(
 	"+i", // mode
 	string(), // account
 	0, // account_ts
-	string(), // sethost
-	string(), // fakehost
 	realname,
 	31337 // connect time
 	) ;

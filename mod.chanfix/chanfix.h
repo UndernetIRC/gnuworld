@@ -20,7 +20,7 @@
 #ifndef CF_CHANFIX_H
 #define CF_CHANFIX_H
 
-#include <string.h>
+#include <string>
 
 #include "client.h"
 #include "gw_hashmap.h"
@@ -48,9 +48,10 @@ public:
 	 *************************************/
 	virtual void OnAttach();
 	virtual void BurstChannels();
-	virtual void OnCTCP( iClient* , const string& ,
-		const string& , bool );
-	virtual void OnPrivateMessage( iClient* , const string& , bool );
+	virtual void OnCTCP( iClient* , const std::string& ,
+		const std::string& , bool );
+	virtual void OnPrivateMessage( iClient* ,
+		const std::string& , bool );
 	virtual void OnTimer( const TimerHandler::timerID& , void* );
 
 
@@ -58,7 +59,7 @@ public:
 	 * C H A N F I X   M I S C *
 	 ***************************/
 	virtual void log(const logging::loglevel&, const char*, ... );
-	virtual void log(const logging::loglevel&, const string&);
+	virtual void log(const logging::loglevel&, const std::string&);
 	virtual void setConsoleTopic();
 
 
@@ -66,7 +67,8 @@ public:
 	 * C H A N F I X   C O R E *
 	 ***************************/
 	virtual void doCountUpdate();
-	virtual cfChannel* getChannel(const string&, bool create = false);
+	virtual cfChannel* getChannel(const std::string&,
+			bool create = false);
 
 
 protected:
@@ -74,7 +76,7 @@ protected:
 	 * C O N T A I N E R S *
 	 ***********************/
 
-	 typedef HASHMAP< string , cfChannel* > mapChannels;
+	 typedef HASHMAP< std::string , cfChannel* > mapChannels;
 	 mapChannels channels;
 
 
@@ -83,9 +85,9 @@ protected:
 	 *************************/
 
 	/** Name of our console channel. */
-	string confConsoleChannel;
+	std::string confConsoleChannel;
 	/** Modes of our console channel. */
-	string confConsoleModes;
+	std::string confConsoleModes;
 
 	/** Bitmap of what to log. */
 	logging::loglevel confLogLevel;
@@ -113,7 +115,7 @@ protected:
 	 *******************/
 
 	/** Type of the commandMap. */
-	typedef HASHMAP< string , Command* > commandMapType;
+	typedef HASHMAP< std::string , Command* > commandMapType;
 	/** Convenience type when creating a new command pair. */
 	typedef commandMapType::value_type commandPairType;
 	/** Map holding all available bot commands. */

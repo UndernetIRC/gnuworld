@@ -20,6 +20,8 @@
 #ifndef CF_CHANFIX_COMMANDS_H
 #define CF_CHANFIX_COMMANDS_H
 
+#include	<string>
+
 namespace gnuworld {
 
 class iClient;
@@ -30,26 +32,28 @@ class chanfix;
 
 class Command {
 public:
-	Command( chanfix *_bot, const string& _commandName, const string& _help ) :
+	Command( chanfix *_bot,
+		const std::string& _commandName,
+		const std::string& _help ) :
 		bot(_bot), commandName(_commandName), help(_help)
 		{ }
 
 	virtual ~Command() { }
 
-	virtual void Exec(const iClient*, const string&) = 0;
+	virtual void Exec(const iClient*, const std::string&) = 0;
 
-	const string& getName() const
+	const std::string& getName() const
 		{ return commandName; }
 
-	const string& getHelp() const
+	const std::string& getHelp() const
 		{ return help; }
 
 	virtual void Usage(const iClient*);
 
 protected:
 	chanfix	*bot;
-	string	commandName;
-	string	help;
+	std::string	commandName;
+	std::string	help;
 }; // class Command
 
 #define DECLARE_COMMAND(commandName) \
@@ -57,11 +61,11 @@ class commandName##Command : public Command \
 { \
   public: \
     commandName##Command(chanfix* _bot, \
-      const string& _commandName, \
-      const string& _help) : \
+      const std::string& _commandName, \
+      const std::string& _help) : \
         Command(_bot, _commandName, _help) {} \
     virtual ~commandName##Command() {} \
-    virtual void Exec(const iClient*, const string&); \
+    virtual void Exec(const iClient*, const std::string&); \
 };
 
 DECLARE_COMMAND( CHECK )

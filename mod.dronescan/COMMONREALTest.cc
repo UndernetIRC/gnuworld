@@ -19,6 +19,7 @@
  * Checks to see whether the members of a channel have a common realname.
  */
 
+#include	<string>
 #include	<sstream>
 #include	<map>
 
@@ -32,7 +33,7 @@ namespace ds {
 
 bool COMMONREALTest::isNormal( const Channel *theChannel )
 {
-	typedef std::map<string, unsigned short> realnameMapType;
+	typedef std::map<std::string, unsigned short> realnameMapType;
 	realnameMapType realnameMap;
 
 	Channel::const_userIterator chanItr = theChannel->userList_begin();
@@ -52,23 +53,24 @@ bool COMMONREALTest::isNormal( const Channel *theChannel )
 } // bool COMMONREALTest::isNormal(const Channel*)
 
 
-const string COMMONREALTest::getVariable() const
+const std::string COMMONREALTest::getVariable() const
 {
 	return "realCutoff";
 }
 
 
-bool COMMONREALTest::setVariable( const string& var, const string& value)
+bool COMMONREALTest::setVariable( const std::string& var,
+	const std::string& value)
 {
 	if("REALCUTOFF" != var) return false;
 
 	realCutoff = atoi(value.c_str());
 
 	return true;
-} // bool COMMONREALTest::setVariable( const string&, const string& )
+} // bool COMMONREALTest::setVariable( const std::string&,const std::string& )
 
 
-const string COMMONREALTest::getStatus() const
+const std::string COMMONREALTest::getStatus() const
 {
 	std::stringstream status;
 	status << "realCutoff: " << realCutoff;

@@ -16,9 +16,10 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * "$Id: msg_AC.cc,v 1.7 2005/01/12 03:50:28 dan_karrels Exp $"
+ * "$Id: msg_AC.cc,v 1.8 2005/01/12 04:36:44 dan_karrels Exp $"
  */
 
+#include	<string>
 #include	<iostream>
 
 #include	"ServerCommandHandler.h"
@@ -30,7 +31,7 @@
 #include	"ELog.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: msg_AC.cc,v 1.7 2005/01/12 03:50:28 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: msg_AC.cc,v 1.8 2005/01/12 04:36:44 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -62,13 +63,13 @@ if( !theClient )
 	return false;
 	}
 
-string account( Param[2] );
+std::string account( Param[2] );
 time_t account_ts = 0;
 
 /* If we have an account, does it have a timestamp? */
 if( ! account.empty() ) {
-	string::size_type pos = account.find(':');
-	if( ! ( pos == string::npos ) ) {
+	std::string::size_type pos = account.find(':');
+	if( ! ( pos == std::string::npos ) ) {
 		/* We have a timestamp */
 		if ( pos == ( account.length() - 1 ) ) {
 			/* Bizarre - colon but no following TS */
@@ -76,7 +77,7 @@ if( ! account.empty() ) {
 				<< account
 				<< std::endl;
 		} else {
-			string account_ts_s = account;
+			std::string account_ts_s = account;
 			account_ts_s.erase(0, pos + 1);
 			account.erase(pos);
 			

@@ -16,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: testbot.h,v 1.3 2003/06/28 01:21:21 dan_karrels Exp $
+ * $Id: testbot.h,v 1.4 2005/01/12 04:36:48 dan_karrels Exp $
  */
 
 #ifndef __TESTBOT_H
-#define __TESTBOT_H "$Id: testbot.h,v 1.3 2003/06/28 01:21:21 dan_karrels Exp $"
+#define __TESTBOT_H "$Id: testbot.h,v 1.4 2005/01/12 04:36:48 dan_karrels Exp $"
 
 #include	<string>
 #include	<list>
@@ -30,9 +30,6 @@
 #include	"Connection.h"
 
 using namespace gnuworld ;
-
-using std::string ;
-using std::list ;
 
 /**
  * This is a little client bot that connects to an irc server
@@ -48,7 +45,7 @@ public:
 	 * Create a new testBot with the given configuration  file
 	 * name.
 	 */
-	testBot( const string& ) ;
+	testBot( const std::string& ) ;
 
 	/**
 	 * Do the usual destructor stuff.
@@ -75,7 +72,7 @@ public:
 	 * the connection.  No need to buffer this data any
 	 * further, this is a complete '\n' delimited command.
 	 */
-	virtual void	OnRead( Connection*, const string& ) ;
+	virtual void	OnRead( Connection*, const std::string& ) ;
 
 	/**
 	 * This method is called when the connection terminates
@@ -97,7 +94,7 @@ public:
 	/**
 	 * Return the name of the current uplink.
 	 */
-	inline const string&	getUplinkName() const
+	inline const std::string&	getUplinkName() const
 		{ return uplinkName ; }
 
 	/**
@@ -109,25 +106,25 @@ public:
 	/**
 	 * Return the bot's current nickname.
 	 */
-	inline const string&	getNickName() const
+	inline const std::string&	getNickName() const
 		{ return nickName ; }
 
 	/**
 	 * Return the bot's username.
 	 */
-	inline const string&	getUserName() const
+	inline const std::string&	getUserName() const
 		{ return userName ; }
 
 	/**
 	 * Return the bot's real name.
 	 */
-	inline const string&	getRealName() const
+	inline const std::string&	getRealName() const
 		{ return realName ; }
 
 	/**
 	 * Set the name of the uplink.
 	 */
-	inline void	setUplinkName( const string& newVal )
+	inline void	setUplinkName( const std::string& newVal )
 		{ uplinkName = newVal ; }
 
 	/**
@@ -140,19 +137,19 @@ public:
 	/**
 	 * Set the bot's nickname.
 	 */
-	inline void	setNickName( const string& newVal )
+	inline void	setNickName( const std::string& newVal )
 		{ nickName = newVal ; }
 
 	/**
 	 * Set the bot's username.
 	 */
-	inline void	setUserName( const string& newVal )
+	inline void	setUserName( const std::string& newVal )
 		{ userName = newVal ; }
 
 	/**
 	 * Set the bot's real name.
 	 */
-	inline void	setRealName( const string& newVal )
+	inline void	setRealName( const std::string& newVal )
 		{ realName = newVal ; }
 
 protected:
@@ -169,7 +166,7 @@ protected:
 	/// processInput() attempts to parse the line of data
 	/// received in OnRead(), and interpret some basic
 	/// IRC commands.
-	virtual void	processInput( const string& ) ;
+	virtual void	processInput( const std::string& ) ;
 
 	/// The bot will continue running while this variable is
 	/// true.  Setting it to false will cause the bot to
@@ -177,20 +174,20 @@ protected:
 	bool			keepRunning ;
 
 	/// The name of the current uplink server
-	string			uplinkName ;
+	std::string		uplinkName ;
 
 	/// The port on the uplink server to which we are connected
 	/// or connecting.
 	unsigned short int	uplinkPort ;
 
 	/// The bot's current nickname.
-	string			nickName ;
+	std::string		nickName ;
 
 	/// The bot's userrname.
-	string			userName ;
+	std::string		userName ;
 
 	/// The bot's realname.
-	string			realName ;
+	std::string		realName ;
 
 	/// Pointer to the uplink connection
 	Connection*		myConnect ;
@@ -200,7 +197,7 @@ protected:
 	ConnectionManager	cm ;
 
 	/// The list of channels the bot will attempt to join.
-	list< string >		channels ;
+	std::list< std::string >	channels ;
 } ;
 
 #endif // __TESTBOT_H

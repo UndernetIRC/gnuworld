@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server.h,v 1.102 2005/01/09 20:34:43 dan_karrels Exp $
+ * $Id: server.h,v 1.103 2005/01/12 04:36:42 dan_karrels Exp $
  */
 
 #ifndef __SERVER_H
-#define __SERVER_H "$Id: server.h,v 1.102 2005/01/09 20:34:43 dan_karrels Exp $"
+#define __SERVER_H "$Id: server.h,v 1.103 2005/01/12 04:36:42 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
@@ -509,7 +509,7 @@ public:
 	/**
 	 * Sent a notice to a client as the server.
 	 */
-	virtual bool	Notice( iClient*, const string& ) ;
+	virtual bool	Notice( iClient*, const std::string& ) ;
 
 	/**
 	 * Set modes as the server, update internal tables, and notify
@@ -836,7 +836,7 @@ public:
 	 * Shutdown the server.
 	 */
 	virtual void Shutdown( const std::string& reason =
-			string( "Server Shutdown" ) ) ;
+			std::string( "Server Shutdown" ) ) ;
 
 	/**
 	 * Set the reason for the server shutdown, to be displayed in

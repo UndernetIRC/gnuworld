@@ -17,9 +17,10 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_T.cc,v 1.5 2005/01/12 03:50:28 dan_karrels Exp $
+ * $Id: msg_T.cc,v 1.6 2005/01/12 04:36:44 dan_karrels Exp $
  */
 
+#include	<string>
 #include	<iostream>
 
 #include	"server.h"
@@ -30,7 +31,7 @@
 #include	"Channel.h"
 #include	"ServerCommandHandler.h"
 
-RCSTAG( "$Id: msg_T.cc,v 1.5 2005/01/12 03:50:28 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: msg_T.cc,v 1.6 2005/01/12 04:36:44 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -69,7 +70,7 @@ theChan->setTopic( Param[ 2 ] ) ;
 // srcClient may be NULL if a server is setting the topic
 iClient* srcClient = Network->findClient( Param[ 0 ] ) ;
 
-string newTopic( Param[ 2 ] ) ;
+std::string newTopic( Param[ 2 ] ) ;
 
 // No need to pass the new topic, it has already been stored
 // in the theChan

@@ -20,6 +20,8 @@
 #ifndef DRONESCANTESTS_H
 #define DRONESCANTESTS_H
 
+#include	<string>
+
 namespace gnuworld {
 
 namespace ds {
@@ -28,7 +30,9 @@ class dronescan;
 
 class Test {
 public:
-	Test( dronescan *_bot, const string& _testName, const string& _description, const unsigned short _weight ) :
+	Test( dronescan *_bot, const std::string& _testName,
+		const std::string& _description,
+		const unsigned short _weight ) :
 		bot(_bot), testName(_testName), description(_description), weight(_weight)
 		{ } ;
 
@@ -36,26 +40,27 @@ public:
 
 	virtual bool isNormal( const Channel* ) = 0;
 
-	virtual inline bool setVariable( const string&, const string& )
+	virtual inline bool setVariable( const std::string&,
+			const std::string& )
 		{ return false; }
 
-	virtual inline const string& getName() const
+	virtual inline const std::string& getName() const
 		{ return testName; }
-	virtual inline const string& getDescription() const
+	virtual inline const std::string& getDescription() const
 		{ return description; }
 	virtual inline unsigned short getWeight() const
 		{ return weight; }
 
-	virtual const string getVariable() const
-		{ return ""; }
+	virtual const std::string getVariable() const
+		{ return std::string(); }
 
-	virtual inline const string getStatus() const
-		{ return ""; }
+	virtual inline const std::string getStatus() const
+		{ return std::string(); }
 
 protected:
 	dronescan	*bot;
-	string		testName;
-	string		description;
+	std::string	testName;
+	std::string	description;
 	unsigned short	weight;
 }; // class Test
 
@@ -63,7 +68,8 @@ protected:
 #define DECLARE_TEST(testName)		\
 class testName##Test : public Test {	\
 public:					\
-	testName##Test(dronescan *_bot, const string& _testName, const string& _description, const unsigned short _weight) :	\
+	testName##Test(dronescan *_bot, const std::string& _testName, \
+	const std::string& _description, const unsigned short _weight) : \
 		Test(_bot, _testName, _description, _weight) { } ;	\
 	virtual ~testName##Test() { } ;					\
 	virtual bool isNormal( const Channel* ) ;
@@ -71,9 +77,9 @@ public:					\
 #define DECLARE_TEST_FULL(testName) DECLARE_TEST(testName) };
 
 #define DECLARE_TEST_SET(testName) DECLARE_TEST(testName) \
-	virtual bool setVariable( const string&, const string& ); \
-	virtual const string getVariable() const; \
-	virtual const string getStatus() const; \
+	virtual bool setVariable( const std::string&, const std::string& ); \
+	virtual const std::string getVariable() const; \
+	virtual const std::string getStatus() const; \
 protected:
 
 DECLARE_TEST_FULL( ABNORMALS )

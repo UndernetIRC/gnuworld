@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ConnectionManager.h,v 1.7 2004/01/07 18:33:42 dan_karrels Exp $
+ * $Id: ConnectionManager.h,v 1.8 2005/01/12 04:36:43 dan_karrels Exp $
  */
 
 #ifndef __CONNECTIONMANAGER_H
-#define __CONNECTIONMANAGER_H "$Id: ConnectionManager.h,v 1.7 2004/01/07 18:33:42 dan_karrels Exp $"
+#define __CONNECTIONMANAGER_H "$Id: ConnectionManager.h,v 1.8 2005/01/12 04:36:43 dan_karrels Exp $"
 
 #include	<sys/types.h>
 
@@ -39,8 +39,6 @@
 
 namespace gnuworld
 {
-
-using std::string ;
 
 /**
  * The purpose of this class it to manage multiple incoming and
@@ -164,13 +162,13 @@ public:
 	 * and dots format.
 	 * Returns an empty string if no IP address found.
 	 */
-	static string	ipAddrOf( const string& host ) ;
+	static std::string	ipAddrOf( const std::string& host ) ;
 
 	/**
 	 * Return true if the given string is in the proper
 	 * IP format of numbers and dots.
 	 */
-	static bool	isIpAddress( const string& host ) ;
+	static bool	isIpAddress( const std::string& host ) ;
 
 	/**
 	 * Connect() will attempt to establish a new connection to
@@ -189,7 +187,7 @@ public:
 	 */
 	virtual Connection*	Connect(
 				ConnectionHandler*,
-				const string& host,
+				const std::string& host,
 				const unsigned short int remotePort ) ;
 
 	/**
@@ -198,7 +196,7 @@ public:
 	 * may be called during the call to ConnectToFile().
 	 */
 	virtual Connection*	ConnectToFile( ConnectionHandler*,
-					const string& ) ;
+					const std::string& ) ;
 
 	/**
 	 * Attempt to establish a listening Connection on the
@@ -231,7 +229,7 @@ public:
 	 * which case the remotePort will be ignored.
 	 */
 	virtual bool	DisconnectByHost( ConnectionHandler*,
-			const string& hostname,
+			const std::string& hostname,
 			const unsigned short int remotePort,
 			const unsigned short int localPort = 0 ) ;
 
@@ -253,7 +251,7 @@ public:
 	 * which case the remotePort will be ignored.
 	 */
 	virtual bool	DisconnectByIP( ConnectionHandler*,
-			const string& IP,
+			const std::string& IP,
 			const unsigned short int remotePort,
 			const unsigned short int localPort = 0 ) ;
 

@@ -16,9 +16,10 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: testbot.cc,v 1.4 2004/05/18 16:51:05 dan_karrels Exp $
+ * $Id: testbot.cc,v 1.5 2005/01/12 04:36:47 dan_karrels Exp $
  */
 
+#include	<list>
 #include	<string>
 #include	<iostream>
 
@@ -213,7 +214,7 @@ if( st[ 1 ] == "376" )
 
 void testBot::joinChannels()
 {
-for( list< string >::const_iterator chanItr = channels.begin() ;
+for( std::list< string >::const_iterator chanItr = channels.begin() ;
 	chanItr != channels.end() ; ++chanItr )
 	{
 	string writeMe( "JOIN " ) ;

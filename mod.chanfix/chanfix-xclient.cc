@@ -17,6 +17,8 @@
  * USA.
  */
 
+#include <string>
+
 #include "StringTokenizer.h"
 
 #include "chanfix.h"
@@ -46,14 +48,14 @@ void chanfix::BurstChannels()
 }
 
 
-void chanfix::OnCTCP( iClient *theClient, const string& CTCP,
-	const string& Message, bool )
+void chanfix::OnCTCP( iClient *theClient, const std::string& CTCP,
+	const std::string& Message, bool )
 {
 	StringTokenizer st(CTCP);
 
 	if(st.empty()) return;
 
-	string Command = string_upper(st[0]);
+	std::string Command = string_upper(st[0]);
 
 	if("DCC" == Command) {
 		DoCTCP(theClient, CTCP, "REJECT");
@@ -66,7 +68,7 @@ void chanfix::OnCTCP( iClient *theClient, const string& CTCP,
 
 
 void chanfix::OnPrivateMessage( iClient *theClient,
-	const string& Message, bool)
+	const std::string& Message, bool)
 {
 	/* Only speak to opers */
 	if( ! theClient->isOper() ) return;
@@ -75,7 +77,7 @@ void chanfix::OnPrivateMessage( iClient *theClient,
 
 	if( st.empty() ) return;
 
-	string Command = string_upper(st[0]);
+	std::string Command = string_upper(st[0]);
 	commandMapType::iterator commandHandler = commandMap.find(Command);
 
 	if( commandHandler == commandMap.end() ) {

@@ -17,8 +17,10 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_JU.cc,v 1.5 2005/01/12 03:50:28 dan_karrels Exp $
+ * $Id: msg_JU.cc,v 1.6 2005/01/12 04:36:44 dan_karrels Exp $
  */
+
+#include	<string>
 
 #include	"server.h"
 #include 	"Network.h"
@@ -26,7 +28,7 @@
 #include	"ServerCommandHandler.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: msg_JU.cc,v 1.5 2005/01/12 03:50:28 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: msg_JU.cc,v 1.6 2005/01/12 04:36:44 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -53,10 +55,10 @@ if(Param[2][0] == '+')
 	 * A new jupe is interduced, need to create an iServer for it
 	 * and notify all the modules
 	 */
-	string Reason = Param.assemble(5);
-	string SName =  Param[2];
+	std::string Reason = Param.assemble(5);
+	std::string SName =  Param[2];
 	SName = SName.substr(1);
-	string CTime = Param[4];
+	std::string CTime = Param[4];
 	unsigned int intYY = 0;
 	char *temp = new char[2];
 	if (!Network->allocateServerNumeric(intYY))
@@ -92,7 +94,7 @@ if(Param[2][0] == '+')
 	}
 else
 	{ // its a removal..
-	string SName =  Param[2];
+	std::string SName =  Param[2];
 	SName = SName.substr(1);
 	iServer* jupeServer = Network->findServerName(SName);
 	if(!jupeServer)

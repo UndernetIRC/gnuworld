@@ -17,11 +17,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: gnuworld_config.h,v 1.1 2005/01/12 03:50:27 dan_karrels Exp $
+ * $Id: gnuworld_config.h,v 1.2 2005/01/12 04:36:42 dan_karrels Exp $
  */
 
 #ifndef __CONFIG_H
-#define __CONFIG_H "$Id: gnuworld_config.h,v 1.1 2005/01/12 03:50:27 dan_karrels Exp $"
+#define __CONFIG_H "$Id: gnuworld_config.h,v 1.2 2005/01/12 04:36:42 dan_karrels Exp $"
 
 /* GNUWorld main configuration file */
 /* All core settings are set/defined here.
@@ -34,14 +34,6 @@
  * will read its server characteristics.
  */
 #define CONFFILE "GNUWorld.conf"
-
-/**
- * CLIENT_DESC
- * Define this variable if you want gnuworld to track the
- * real name (description) of each network client.  This
- * can use quite a bit more memory on large networks.
- */
-#undef CLIENT_DESC
 
 /**
  * ASUKA

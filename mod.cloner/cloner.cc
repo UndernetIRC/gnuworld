@@ -20,7 +20,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
  * USA.
  *
- * $Id: cloner.cc,v 1.35 2005/01/12 03:50:30 dan_karrels Exp $
+ * $Id: cloner.cc,v 1.36 2005/01/12 04:36:45 dan_karrels Exp $
  */
 
 #include	<new>
@@ -43,7 +43,7 @@
 #include	"misc.h"
 #include	"ELog.h"
 
-RCSTAG("$Id: cloner.cc,v 1.35 2005/01/12 03:50:30 dan_karrels Exp $");
+RCSTAG("$Id: cloner.cc,v 1.36 2005/01/12 04:36:45 dan_karrels Exp $");
 
 namespace gnuworld
 {
@@ -586,8 +586,6 @@ iClient* newClient = new iClient(
 		cloneMode,
 		string(),
 		0,
-		string(),
-		string(),
 		cloneDescription,
 		::time( 0 ) ) ;
 assert( newClient != 0 );

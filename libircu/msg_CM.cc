@@ -17,10 +17,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_CM.cc,v 1.6 2005/01/12 03:50:28 dan_karrels Exp $
+ * $Id: msg_CM.cc,v 1.7 2005/01/12 04:36:44 dan_karrels Exp $
  */
 
 #include	<map>
+#include	<string>
 #include	<iostream>
 
 #include	"server.h"
@@ -33,7 +34,7 @@
 #include	"ServerCommandHandler.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: msg_CM.cc,v 1.6 2005/01/12 03:50:28 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: msg_CM.cc,v 1.7 2005/01/12 04:36:44 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -72,7 +73,7 @@ if( !tmpChan )
 /*
  * First, determine what we are going to clear.
  */
-string Modes = Param[ 2 ] ;
+std::string Modes = Param[ 2 ] ;
 
 // These three variables will be set to true if we are to clear either
 // the ops, voice, or bans, respectively
@@ -82,7 +83,7 @@ bool clearBans = false ;
 
 xServer::modeVectorType modeVector ;
 
-for( string::size_type i = 0 ; i < Modes.size() ; i++ )
+for( std::string::size_type i = 0 ; i < Modes.size() ; i++ )
 	{
 	switch( Modes[ i ] )
 		{
@@ -149,8 +150,8 @@ for( string::size_type i = 0 ; i < Modes.size() ; i++ )
 			break ;
 		case 'k':
 			theServer->OnChannelModeK( tmpChan, false, 0, 
-				string() ) ;
-			tmpChan->setKey( string() );
+				std::string() ) ;
+			tmpChan->setKey( std::string() );
 //			elog	<< tmpChan->getName()
 //				<< "msg_CM> Doing CLEAR_KEY"
 //				<< endl;
@@ -226,7 +227,7 @@ if( clearBans )
 		endPtr = tmpChan->banList_end() ;
 		ptr != endPtr ; ++ptr )
 		{
-		banVector.push_back( pair< bool, string >
+		banVector.push_back( pair< bool, std::string >
 			( false, *ptr ) ) ;
 		}
 

@@ -19,6 +19,7 @@
  * Checks the range of the entropy of a given channel.
  */
 
+#include	<string>
 #include	<sstream>
 
 #include "gnuworld_config.h"
@@ -57,7 +58,8 @@ bool RANGETest::isNormal( const Channel *theChannel )
 }
 
 
-bool RANGETest::setVariable( const string& var, const string& value )
+bool RANGETest::setVariable( const std::string& var,
+	const std::string& value )
 {
 	if("CHANNELRANGE" != var) return false;
 
@@ -67,13 +69,13 @@ bool RANGETest::setVariable( const string& var, const string& value )
 }
 
 
-const string RANGETest::getVariable() const
+const std::string RANGETest::getVariable() const
 {
 	return "channelRange";
 }
 
 
-const string RANGETest::getStatus() const
+const std::string RANGETest::getStatus() const
 {
 	std::stringstream status;
 	status << "channelRange: " << channelRange;

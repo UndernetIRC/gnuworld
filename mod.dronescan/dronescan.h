@@ -21,6 +21,7 @@
 #define DRONESCAN_H
 
 #include <map>
+#include <string>
 
 #include "client.h"
 
@@ -56,7 +57,7 @@ enum LOG_TYPE {
 class dronescan : public xClient {
 public:
 	/** Constructor receives a configuration file name. */
-	dronescan( const string& ) ;
+	dronescan( const std::string& ) ;
 
 	/** Destructor to clean up after ourselves. */
 	inline virtual ~dronescan() ;
@@ -72,7 +73,8 @@ public:
 	virtual void BurstChannels() ;
 
 	/** This is called when we receive a CTCP */
-	virtual void OnCTCP( iClient*, const string&, const string&, bool ) ;
+	virtual void OnCTCP( iClient*, const std::string&,
+			const std::string&, bool ) ;
 
 	/** Receive network events. */
 	virtual void OnEvent( const eventType&, void*, void*, void*, void* ) ;
@@ -82,7 +84,8 @@ public:
 		void*, void*, void*, void* ) ;
 
 	/** Receive private messages. */
-	virtual void OnPrivateMessage( iClient*, const string&, bool ) ;
+	virtual void OnPrivateMessage( iClient*, const std::string&,
+			bool ) ;
 
 	/** When we are being detached by the xServer */
 	virtual void OnDetach() ;
@@ -96,7 +99,8 @@ public:
 
 	typedef unsigned short int testEnabledType;
 
-	typedef std::map< string , sqlUser* , noCaseCompare > userMapType;
+	typedef std::map< std::string , sqlUser* , noCaseCompare > 
+			userMapType;
 	typedef std::map< unsigned int , sqlFakeClient* > fcMapType;
 
 
@@ -105,7 +109,7 @@ public:
 	 *******************************************/
 
 	/** Report a SQL error to the appropriate places. */
-	void doSqlError(const string&, const string&);
+	void doSqlError(const std::string&, const std::string&);
 
 	/** Change the current state. */
 	void changeState(DS_STATE) ;
@@ -131,7 +135,7 @@ public:
 	bool checkChannel( const Channel* , const iClient* = 0 ) ;
 
 	/** Calculate the entropy of a given string. */
-	double calculateEntropy( const string& ) ;
+	double calculateEntropy( const std::string& ) ;
 
 	/** Return the entropy of a given client. */
 	double calculateEntropy( const iClient* ) ;
@@ -153,10 +157,10 @@ public:
 	void Reply(const iClient*, const char*, ...) ;
 
 	/** Return a users access */
-	sqlUser *getSqlUser( const string& ) ;
+	sqlUser *getSqlUser( const std::string& ) ;
 
 	/* Preloaders */
-	bool updateDue(string);
+	bool updateDue(std::string);
 	void preloadFakeClientCache();
 	void preloadUserCache();
 
@@ -169,28 +173,28 @@ public:
 	fcMapType fakeClients;
 
 	/** Typedef of currently seen drone channels */
-	typedef std::map< string , activeChannel* > droneChannelsType;
+	typedef std::map< std::string , activeChannel* > droneChannelsType;
 	droneChannelsType droneChannels;
 
 	/** Join counter config options */
 	unsigned int jcInterval;
 	unsigned int jcCutoff;
-	typedef std::map< string , unsigned int , noCaseCompare >
+	typedef std::map< std::string , unsigned int , noCaseCompare >
 		jcChanMapType;
 	jcChanMapType jcChanMap;
 
 	/* Test control */
 	/** Test map type. */
-	typedef std::map< string, Test* > testMapType;
+	typedef std::map< std::string, Test* > testMapType;
 	typedef testMapType::value_type testPairType;
 	bool RegisterTest(Test*);
-	bool UnRegisterTest(const string&);
+	bool UnRegisterTest(const std::string&);
 
 	/** Tests map */
 	testMapType testMap;
 
 	/** Set a variable in one of the tests. */
-	Test *setTestVariable(const string&, const string&);
+	Test *setTestVariable(const std::string&, const std::string&);
 
 	/* Configuration variables used by tests. */
 
@@ -208,8 +212,8 @@ protected:
 	PgDatabase *SQLDb;
 
 	/** Configuration variables. */
-	string consoleChannel;
-	string consoleChannelModes;
+	std::string consoleChannel;
+	std::string consoleChannelModes;
 
 	/** State variable. */
 	DS_STATE currentState;
@@ -244,14 +248,14 @@ protected:
 	xServer::timerID tidRefreshCaches;
 
 	/** Command map type. */
-	typedef std::map< string , Command* , noCaseCompare >
+	typedef std::map< std::string , Command* , noCaseCompare >
 		commandMapType;
 	typedef commandMapType::value_type commandPairType;
 	commandMapType commandMap;
 	bool RegisterCommand(Command*);
 
 	/** Time of the last cache. */
-	std::map < string , time_t > lastUpdated;
+	std::map < std::string , time_t > lastUpdated;
 
 	/** How often to refresh caches. */
 	unsigned int rcInterval;

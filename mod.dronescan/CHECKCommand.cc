@@ -19,6 +19,8 @@
  * Display information about a given channel or user.
  */
 
+#include <string>
+
 #include "gnuworld_config.h"
 #include "Network.h"
 #include "StringTokenizer.h"
@@ -30,7 +32,8 @@ namespace gnuworld {
 
 namespace ds {
 
-void CHECKCommand::Exec( const iClient *theClient, const string& Message, const sqlUser* )
+void CHECKCommand::Exec( const iClient *theClient,
+	const std::string& Message, const sqlUser* )
 {
 	StringTokenizer st(Message);
 
@@ -130,7 +133,7 @@ void CHECKCommand::Exec( const iClient *theClient, const string& Message, const 
 		}
 
 	return ;
-} // CHECKCommand::Exec(iClient*, const string&)
+} // CHECKCommand::Exec(iClient*, const std::string&)
 
 } // namespace ds
 

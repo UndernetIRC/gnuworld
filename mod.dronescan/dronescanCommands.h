@@ -20,6 +20,8 @@
 #ifndef DRONESCANCOMMANDS_H
 #define DRONESCANCOMMANDS_H
 
+#include	<string>
+
 namespace gnuworld {
 
 namespace ds {
@@ -29,33 +31,35 @@ class sqlUser;
 
 class Command {
 public:
-	Command( dronescan* _bot, const string& _commandName, const string& _help ) :
+	Command( dronescan* _bot, const std::string& _commandName,
+		const std::string& _help ) :
 		bot(_bot), server(0), commandName(_commandName), help(_help)
 		{ }
 
 	virtual ~Command() { }
 
-	virtual void Exec(const iClient*, const string&, const sqlUser*) = 0;
+	virtual void Exec(const iClient*, const std::string&,
+			const sqlUser*) = 0;
 
 	void setServer(xServer *_server)
 		{ server = _server; }
 
-	virtual inline string getInfo() const
+	virtual inline std::string getInfo() const
 		{ return commandName + ' ' + help; }
 
 	virtual void Usage(const iClient*);
 
-	inline const string& getName() const
+	inline const std::string& getName() const
 		{ return commandName; }
 
-	inline const string& getHelp() const
+	inline const std::string& getHelp() const
 		{ return help; }
 
 protected:
 	dronescan	*bot;
 	xServer		*server;
-	string		commandName;
-	string		help;
+	std::string	commandName;
+	std::string	help;
 
 }; // class Command
 
@@ -65,11 +69,11 @@ class commandName##Command : public Command \
 { \
   public: \
     commandName##Command(dronescan* _bot, \
-      const string& _commandName, \
-      const string& _help) : \
+      const std::string& _commandName, \
+      const std::string& _help) : \
         Command(_bot, _commandName, _help) {} \
     virtual ~commandName##Command() {} \
-    virtual void Exec(const iClient*, const string&, const sqlUser*); \
+    virtual void Exec(const iClient*, const std::string&, const sqlUser*); \
 };
 
 /* Admin commands */

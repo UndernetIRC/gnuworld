@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: Channel.h,v 1.30 2003/12/31 23:50:50 dan_karrels Exp $
+ * $Id: Channel.h,v 1.31 2005/01/12 04:36:42 dan_karrels Exp $
  */
 
 #ifndef __CHANNEL_H
-#define __CHANNEL_H "$Id: Channel.h,v 1.30 2003/12/31 23:50:50 dan_karrels Exp $"
+#define __CHANNEL_H "$Id: Channel.h,v 1.31 2005/01/12 04:36:42 dan_karrels Exp $"
 
 #include	<string>
 #include	<map>
@@ -409,7 +409,7 @@ public:
 	 * Sets this channel's topic value to the value passed in.
 	 * This method exists only if TOPIC_TRACK is defined.
 	 */
-	void setTopic(const std::string& _Topic)
+	void setTopic( const std::string& _Topic )
 		{ topic = _Topic; }
 	
 #endif	

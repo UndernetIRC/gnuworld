@@ -17,9 +17,10 @@
  * USA.
  */
 
+#include <string>
 #include <sstream>
 
-#include <stdarg.h>
+#include <cstdarg>
 
 #include "Network.h"
 
@@ -30,8 +31,6 @@ namespace gnuworld {
 namespace chanfix {
 
 using std::endl;
-using std::stringstream;
-
 
 void chanfix::log(const logging::loglevel& level, const char* format, ... )
 {
@@ -42,11 +41,12 @@ void chanfix::log(const logging::loglevel& level, const char* format, ... )
 	vsnprintf(buf, 1024, format, list);
 	va_end(list);
 
-	log(level, string(buf));
+	log(level, std::string(buf));
 }
 
 
-void chanfix::log(const logging::loglevel& level, const string& message)
+void chanfix::log(const logging::loglevel& level,
+	const std::string& message)
 {
 	if( 0 == confLogLevel & level ) { return; }
 
@@ -71,7 +71,7 @@ void chanfix::setConsoleTopic()
 		confPeriod
 		);
 
-	stringstream newTopic;
+	std::stringstream newTopic;
 	newTopic	<< this->getCharYYXXX()
 			<< " T "
 			<< confConsoleChannel

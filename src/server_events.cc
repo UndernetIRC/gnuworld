@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server_events.cc,v 1.1 2005/01/07 00:10:46 dan_karrels Exp $
+ * $Id: server_events.cc,v 1.2 2005/01/12 04:36:47 dan_karrels Exp $
  */
 
 #include	<new>
@@ -39,7 +39,7 @@
 #include	"iClient.h"
 #include	"ELog.h"
 
-RCSTAG( "$Id: server_events.cc,v 1.1 2005/01/07 00:10:46 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: server_events.cc,v 1.2 2005/01/12 04:36:47 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -47,6 +47,7 @@ namespace gnuworld
 using std::list ;
 using std::endl ;
 using std::stack ;
+using std::string ;
 
 /**
  * This method will register the given xClient to receive

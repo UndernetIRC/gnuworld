@@ -17,6 +17,8 @@
  * USA.
  */
 
+#include <string>
+
 #include "StringTokenizer.h"
 
 #include "cfChannel.h"
@@ -28,7 +30,8 @@ namespace gnuworld {
 
 namespace chanfix {
 
-void CHECKCommand::Exec( const iClient *theClient, const string& message )
+void CHECKCommand::Exec( const iClient *theClient,
+	const std::string& message )
 {
 	StringTokenizer st(message);
 
