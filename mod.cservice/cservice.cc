@@ -2754,88 +2754,98 @@ switch( whichEvent )
 		if(ptr != pendingChannelList.end())
 			{
 			/*
-			 *  Yes, this channel is pending registration, update join count
-			 *  and check out this user joining.
+			 * Firstly, is this join a result of a server bursting onto the network?
+			 * If this is the case, its not a manual /join.
 			 */
 
-			ptr->second->join_count++;
-
-			/*
-			 *  Now, has this users IP joined this channel before?
-			 *  If not - we keep a record of it.
-			 */
-
-			sqlPendingChannel::trafficListType::iterator Tptr =
-				ptr->second->trafficList.find(theClient->getIP());
-
-			sqlPendingTraffic* trafRecord;
-
-			/*
-			 * If we have more than 50 unique IP's join, we don't bother
-			 * recording anymore.
-			 */
-
-			if (ptr->second->unique_join_count <= 50)
-				{
-				if(Tptr == ptr->second->trafficList.end())
-					{
-					/* New IP, create and write the record. */
-
-					trafRecord = new sqlPendingTraffic(SQLDb);
-					trafRecord->ip_number = theClient->getIP();
-					trafRecord->join_count = 1;
-					trafRecord->channel_id = ptr->second->channel_id;
-					trafRecord->insertRecord();
-
-					ptr->second->trafficList.insert(sqlPendingChannel::trafficListType::value_type(
-						theClient->getIP(), trafRecord));
-
-					logDebugMessage("Created a new IP traffic record for IP#%u (%s) on %s",
-						theClient->getIP(), theClient->getNickUserHost().c_str(),
-						theChan->getName().c_str());
-					} else
-					{
-					/* Already cached, update and save. */
-					trafRecord = Tptr->second;
-					trafRecord->join_count++;
-					trafRecord->commit();
-					}
-
-					ptr->second->unique_join_count = ptr->second->trafficList.size();
-
-					logDebugMessage("New total for IP#%u on %s is %i",
-						theClient->getIP(), theChan->getName().c_str(),
-						trafRecord->join_count);
-				}
-
-			sqlUser* theUser = isAuthed(theClient, false);
-			if (!theUser)
+			iServer* theServer = Network->findServer( theClient->getIntYY() ) ;
+			if (!theServer->isBursting())
 				{
 				/*
-				 *  If this user isn't authed, he can't possibly be flagged
-				 *  as one of the valid supporters, so we drop out.
+				 *  Yes, this channel is pending registration, update join count
+				 *  and check out this user joining.
 				 */
+
+				ptr->second->join_count++;
+
+				/*
+				 *  Now, has this users IP joined this channel before?
+				 *  If not - we keep a record of it.
+				 */
+
+				sqlPendingChannel::trafficListType::iterator Tptr =
+					ptr->second->trafficList.find(theClient->getIP());
+
+				sqlPendingTraffic* trafRecord;
+
+				/*
+				 * If we have more than 50 unique IP's join, we don't bother
+				 * recording anymore.
+				 */
+
+				if (ptr->second->unique_join_count < 50)
+					{
+					if(Tptr == ptr->second->trafficList.end())
+						{
+						/* New IP, create and write the record. */
+
+						trafRecord = new sqlPendingTraffic(SQLDb);
+						trafRecord->ip_number = theClient->getIP();
+						trafRecord->join_count = 1;
+						trafRecord->channel_id = ptr->second->channel_id;
+						trafRecord->insertRecord();
+
+						ptr->second->trafficList.insert(sqlPendingChannel::trafficListType::value_type(
+							theClient->getIP(), trafRecord));
+
+						logDebugMessage("Created a new IP traffic record for IP#%u (%s) on %s",
+							theClient->getIP(), theClient->getNickUserHost().c_str(),
+							theChan->getName().c_str());
+						} else
+						{
+						/* Already cached, update and save. */
+						trafRecord = Tptr->second;
+						trafRecord->join_count++;
+						trafRecord->commit();
+						}
+
+						ptr->second->unique_join_count = ptr->second->trafficList.size();
+
+						logDebugMessage("New total for IP#%u on %s is %i",
+							theClient->getIP(), theChan->getName().c_str(),
+							trafRecord->join_count);
+					}
+
+				sqlUser* theUser = isAuthed(theClient, false);
+				if (!theUser)
+					{
+					/*
+					 *  If this user isn't authed, he can't possibly be flagged
+					 *  as one of the valid supporters, so we drop out.
+					 */
+
+					return xClient::OnChannelEvent( whichEvent, theChan,
+						data1, data2, data3, data4 );
+					}
+
+					/*
+					 * Now, if this guy is a supporter, we bump his join count up.
+					 */
+
+					sqlPendingChannel::supporterListType::iterator Supptr = ptr->second->supporterList.find(theUser->getID());
+					if (Supptr != ptr->second->supporterList.end())
+						{
+							Supptr->second++;
+							ptr->second->commitSupporter(Supptr->first, Supptr->second);
+							logDebugMessage("New total for Supporter #%i (%s) on %s is %i.", theUser->getID(),
+								theUser->getUserName().c_str(), theChan->getName().c_str(), Supptr->second);
+						}
 
 				return xClient::OnChannelEvent( whichEvent, theChan,
 					data1, data2, data3, data4 );
-				}
 
-				/*
-				 * Now, if this guy is a supporter, we bump his join count up.
-				 */
-
-				sqlPendingChannel::supporterListType::iterator Supptr = ptr->second->supporterList.find(theUser->getID());
-				if (Supptr != ptr->second->supporterList.end())
-					{
-						Supptr->second++;
-						ptr->second->commitSupporter(Supptr->first, Supptr->second);
-						logDebugMessage("New total for Supporter #%i (%s) on %s is %i.", theUser->getID(),
-							theUser->getUserName().c_str(), theChan->getName().c_str(), Supptr->second);
-					}
-
-			return xClient::OnChannelEvent( whichEvent, theChan,
-				data1, data2, data3, data4 );
-			}
+				} /* Is server bursting? */
+			} /* Is channel on pending list */
 
 		sqlChannel* reggedChan = getChannelRecord(theChan->getName());
 		if(!reggedChan)
