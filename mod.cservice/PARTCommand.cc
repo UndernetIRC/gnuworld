@@ -8,7 +8,7 @@
  *
  * Caveats: None
  *
- * $Id: PARTCommand.cc,v 1.10 2001/03/13 22:39:33 gte Exp $
+ * $Id: PARTCommand.cc,v 1.11 2001/03/13 22:41:05 gte Exp $
  */
 
 
@@ -20,7 +20,7 @@
 #include	"responses.h"
 #include	"Network.h"
 
-const char PARTCommand_cc_rcsId[] = "$Id: PARTCommand.cc,v 1.10 2001/03/13 22:39:33 gte Exp $" ;
+const char PARTCommand_cc_rcsId[] = "$Id: PARTCommand.cc,v 1.11 2001/03/13 22:41:05 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -87,11 +87,10 @@ sqlLevel* aLevel = bot->getLevelRecord(theUser, theChan);
  
 theChan->setInChan(false); 
 bot->getUplink()->UnRegisterChannelEvent(theChan->getName(), bot);
- 
-sqlChannel::forceMapType::iterator ptr = theChan->forceMap.find(theUser->getID()); 
-if(ptr != theChan->forceMap.end()) 
-	{
-	/* Forced access. */ 
+
+/* Forced access. */  
+if (!bot->isForced(theChan, theUser)) 
+	{ 
 	bot->Part(theChan->getName(), "At the request of a CService Administrator"); 
 	bot->writeChannelLog(theChan, theClient, sqlChannel::EV_PART, "[CS-ADMIN]");
 	return true;
