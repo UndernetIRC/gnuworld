@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: dronescan.cc,v 1.32 2003/08/12 18:17:11 dan_karrels Exp $
+ * $Id: dronescan.cc,v 1.33 2003/08/13 22:32:16 jeekay Exp $
  */
 
 #include	<string>
@@ -39,7 +39,7 @@
 #include "sqlUser.h"
 #include "Timer.h"
 
-RCSTAG("$Id: dronescan.cc,v 1.32 2003/08/12 18:17:11 dan_karrels Exp $");
+RCSTAG("$Id: dronescan.cc,v 1.33 2003/08/13 22:32:16 jeekay Exp $");
 
 namespace gnuworld {
 
@@ -271,7 +271,7 @@ void dronescan::OnCTCP( iClient* theClient, const string& CTCP,
 	} else if("PING" == Command) {
 		DoCTCP(theClient, CTCP, Message);
 	} else if("VERSION" == Command) {
-		DoCTCP(theClient, CTCP, "GNUWorld DroneScan v0.0.5");
+		DoCTCP(theClient, CTCP, "GNUWorld DroneScan v0.0.6");
 	}
 
 	xClient::OnCTCP(theClient, CTCP, Message, Secure);
@@ -566,9 +566,10 @@ void dronescan::OnTimer( xServer::timerID theTimer , void *)
 		for(jcChanMapType::const_iterator itr = jcChanMap.begin() ;
 		    itr != jcChanMap.end() ; ++itr) {
 			if(itr->second >= jcCutoff)
-				log(WARN, "Join flood over in %s. Total joins: %u",
+				log(WARN, "Join flood over in %s. Total joins: %u. Total size: %d",
 					itr->first.c_str(),
-					itr->second
+					itr->second,
+					Network->findChannel(itr->first)->size()
 					);
 		}
 		
