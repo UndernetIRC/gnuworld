@@ -13,6 +13,8 @@
 #include	<vector>
 #include	<algorithm>
 #include	<strstream>
+#include	<stack>
+
 #include	<cstdlib>
 #include	<cstdio>
 #include	<cstdarg>
@@ -37,7 +39,7 @@
 //#include	"moduleLoader.h"
 
 const char xServer_h_rcsId[] = __XSERVER_H ;
-const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.19 2000/08/04 23:43:19 dan_karrels Exp $" ;
+const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.20 2000/08/05 00:06:27 dan_karrels Exp $" ;
 
 using std::string ;
 using std::vector ;
@@ -45,6 +47,7 @@ using std::list ;
 using std::endl ;
 using std::ends ;
 using std::strstream ;
+using std::stack ;
 
 namespace gnuworld
 {
@@ -316,6 +319,12 @@ for( moduleListType::iterator ptr = moduleList.begin() ; ptr != moduleList.end()
 	}
 moduleList.clear() ;
 */
+
+while( !timerQueue.empty() )
+	{
+	delete timerQueue.top().second ;
+	timerQueue.pop() ;
+	}
 
 }
  
@@ -4137,6 +4146,44 @@ catch( std::bad_alloc )
 timerQueue.push( timerQueueType::value_type( absTime, ti ) ) ;
 
 return ID ;
+}
+
+bool xServer::UnRegisterTimer( xServer::timerID ID )
+{
+
+if( timerQueue.empty() )
+	{
+	return true ;
+	}
+
+stack< timerQueueType::value_type > localStack ;
+while( !timerQueue.empty() && (timerQueue.top().second->ID != ID) )
+	{
+	localStack.push( timerQueue.top() ) ;
+	timerQueue.pop() ;
+	}
+
+bool foundTimer = false ;
+
+// timerQueue is now empty, or its top element has the timer
+// we are interested in.
+if( !timerQueue.empty() )
+	{
+	// Find was successful
+	foundTimer = true ;
+
+	delete timerQueue.top().second ;
+	timerQueue.pop() ;
+	}
+
+// Put the rest of the timers back onto the timerQueue.
+while( !localStack.empty() )
+	{
+	timerQueue.push( localStack.top() ) ;
+	localStack.pop() ;
+	}
+
+return foundTimer ;
 }
 
 unsigned int xServer::CheckTimers()

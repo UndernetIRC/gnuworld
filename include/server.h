@@ -17,7 +17,7 @@
  */
 
 #ifndef __XSERVER_H
-#define __XSERVER_H "$Id: server.h,v 1.8 2000/08/04 23:43:19 dan_karrels Exp $"
+#define __XSERVER_H "$Id: server.h,v 1.9 2000/08/05 00:06:27 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
@@ -387,6 +387,12 @@ public:
 	virtual timerID RegisterTimer( const time_t& absoluteTime,
 		xClient* theClient,
 		void* data = 0 ) ;
+
+	/**
+	 * Remove a timed event from the timer system.
+	 * Return true if successful, false otherwise.
+	 */
+	virtual bool	UnRegisterTimer( timerID ) ;
 
 	/**
 	 * Post a system event to the rest of the system.  Note
