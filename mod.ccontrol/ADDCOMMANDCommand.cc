@@ -15,7 +15,7 @@
 #include        "ccUser.h"
 #include	"AuthInfo.h"
 
-const char ADDCOMMANDCommand_cc_rcsId[] = "$Id: ADDCOMMANDCommand.cc,v 1.6 2001/03/02 02:02:00 dan_karrels Exp $";
+const char ADDCOMMANDCommand_cc_rcsId[] = "$Id: ADDCOMMANDCommand.cc,v 1.7 2001/05/05 19:53:20 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -57,6 +57,7 @@ if( CommandLevel < 0 )
 
 	return false;	        
 	}
+CommandLevel &= ~flg_NOLOG;
 	
 AuthInfo *AClient = bot->IsAuth( theClient );
 if( NULL == AClient )
@@ -66,7 +67,7 @@ if( NULL == AClient )
 	}
 
 // Only allow opers who have access to that command to add it to new opers
-if(!(AClient->Access & CommandLevel))
+if(!(AClient->Access & CommandLevel ))
 	{
 	bot->Notice( theClient,
 		"You must have access to a command inorder to add it");

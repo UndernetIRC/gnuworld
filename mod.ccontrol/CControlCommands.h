@@ -173,6 +173,7 @@ const int isSUSPENDED = 0x01;
 const int isOPER      = 0x02;
 const int isADMIN     = 0x04;
 const int isCODER     = 0x08;
+const int getLOGS      = 0x10;
 
 } // namespace gnuworld
 

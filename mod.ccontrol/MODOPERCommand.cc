@@ -12,7 +12,7 @@
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 
-const char MODOPERCommand_cc_rcsId[] = "$Id: MODOPERCommand.cc,v 1.5 2001/02/26 16:58:05 mrbean_ Exp $";
+const char MODOPERCommand_cc_rcsId[] = "$Id: MODOPERCommand.cc,v 1.6 2001/05/05 19:53:20 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -25,7 +25,8 @@ bool MODOPERCommand::Exec( iClient* theClient, const string& Message)
 {	 
 StringTokenizer st( Message ) ;
 	
-if( st.size() < 4 )
+if( ((st.size() < 4) && (strcasecmp(st[2].c_str(),"getlogs") != 0)) 
+|| ((st.size() < 3) && (!strcasecmp(st[2].c_str(),"getlogs"))))
 	{
 	Usage(theClient);
 	return true;
@@ -39,7 +40,7 @@ if(!tmpUser)
 	}
 //Check if the user got a higher or equal flags than the one he's trying to edit	
 AuthInfo* tmpAuth = bot->IsAuth(theClient->getCharYYXXX());
-if(tmpAuth->Flags < tmpUser->getFlags())
+if((tmpAuth->Flags & ~getLOGS) < (tmpUser->getFlags() & ~getLOGS))
 	{
 	bot->Notice(theClient,"You cant modify a user who got higher level than yours");
 	delete tmpUser;
@@ -62,7 +63,7 @@ else if(!strcasecmp(st[2].c_str(),"addhost")) //Trying to add a new host ?
 	{
 	if(!bot->validUserMask(st[3]))
 		{
-		bot->Notice(theClient,"Mask %s isnt not a valid mask in the form of *!*@*",st[3].c_str());
+		bot->Notice(theClient,"Mask %s is not a valid mask in the form of *!*@*",st[3].c_str());
 		}
 	else if(bot->UserGotHost(tmpUser,st[3]) || bot->UserGotMask(tmpUser,st[3]))
 		{
@@ -92,9 +93,24 @@ else if(!strcasecmp(st[2].c_str(),"delhost")) //Trying to delete an host ?
 		bot->Notice(theClient,"Error while deleting mask %s from %s access list",st[3].c_str(),st[1].c_str());
 		}
 	}	    
+else if(!strcasecmp(st[2].c_str(),"getlogs")) //Trying to toggle the get of logs
+	{
+	if(!tmpUser->gotFlag(getLOGS))
+		{
+		tmpUser->setFlags(getLOGS);
+		bot->Notice(theClient,"getLogs have been turned on for %s",st[1].c_str());
+		}
+	else
+		{
+		tmpUser->removeFlag(getLOGS);
+		bot->Notice(theClient,"getLogs have been turned off for %s",st[1].c_str());
+		}
+	tmpUser->Update();
+	bot->UpdateAuth(tmpUser);
+	}	
 else
 	{
-	bot->Notice(theClient,"Unknown option",st[3].c_str(),st[1].c_str());
+	bot->Notice(theClient,"Unknown option %s",st[2].c_str());
 	}
 	
 delete tmpUser;

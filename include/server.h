@@ -17,7 +17,7 @@
  */
 
 #ifndef __SERVER_H
-#define __SERVER_H "$Id: server.h,v 1.36 2001/03/31 01:26:10 dan_karrels Exp $"
+#define __SERVER_H "$Id: server.h,v 1.37 2001/05/05 19:53:20 mrbean_ Exp $"
 
 #include	<string>
 #include	<vector>
@@ -158,7 +158,7 @@ public:
 	/**
 	 * Attach a fake server to this services server.
 	 */
-	virtual bool AttachServer( iServer*, const string& = "Juped Server" ) ;
+	virtual bool AttachServer( iServer*, const string& = "JUPED Server" ) ;
 
 	/**
 	 * Squit a server from the network and remove it

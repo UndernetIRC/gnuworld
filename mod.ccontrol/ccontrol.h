@@ -3,7 +3,7 @@
  */
 
 #ifndef __CCONTROL_H
-#define __CCONTROL_H "$Id: ccontrol.h,v 1.21 2001/05/02 21:10:18 mrbean_ Exp $"
+#define __CCONTROL_H "$Id: ccontrol.h,v 1.22 2001/05/05 19:53:20 mrbean_ Exp $"
 
 #include	<string>
 #include	<vector>
@@ -124,6 +124,7 @@ public:
 		void* = 0, void* = 0,
 		void* = 0, void* = 0 ) ;
 
+
 	/**
 	 * This method is invoked each time a channel event occurs
 	 * for one of the channels for which this client has registered
@@ -133,6 +134,8 @@ public:
 		Channel*,
 		void* = 0, void* = 0,
 		void* = 0, void* = 0 ) ;
+
+	virtual int OnTimer(xServer::timerID, void*);
 
 	/**
 	 * This method is called once this client has been attached
@@ -291,8 +294,11 @@ public:
 	char *convertToAscTime(time_t);	
 
 	struct tm convertToTmTime(time_t NOW);
-//	bool AuthOper( ccUser* );
-	
+
+	bool CreateReport(time_t , time_t);	
+
+	bool ccontrol::MailReport(const char *, char *);
+
     	/**
 	 * This is a constant iterator type used to perform a read-only
 	 * iteration of the operchan structure.
@@ -392,6 +398,8 @@ public:
 	 */
 	cmDatabase* SQLDb;
 
+	/* TimerID - Posts the daily log to the abuse team  */
+	xServer::timerID postDailyLog;
 
 protected:
 
@@ -427,6 +435,25 @@ protected:
 	 */
 	commandMapType		commandMap ;
 	
+	/**
+	 * The email address that ccontrol will send the email from
+	 */
+	string 			CCEmail;
+	
+	/**
+	 * The email that the lastcom report should be sent to
+	 */
+	string			AbuseMail;	 
+
+	/**
+	 * The full path to sendmail
+	 */
+	string 			Sendmail_Path;
+	
+	/**
+	 * Send report trigger
+	 */
+	int			SendReport;
 } ; 
  
 } // namespace gnuworld

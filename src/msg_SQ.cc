@@ -13,7 +13,7 @@
 #include	"ELog.h"
 #include	"xparameters.h"
 
-const char msg_SQ_cc_rcsId[] = "$Id: msg_SQ.cc,v 1.2 2001/03/24 01:31:42 dan_karrels Exp $" ;
+const char msg_SQ_cc_rcsId[] = "$Id: msg_SQ.cc,v 1.3 2001/05/05 19:53:20 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -82,8 +82,8 @@ else
 	Network->OnSplit( squitServer->getIntYY() ) ;
 
 	// Remove this server from the network tables.
-	Network->removeServer( squitServer->getIntYY(), true ) ;
-
+	//Network->removeServer( squitServer->getIntYY(), true ) ;
+	SquitServer(squitServer->getName(),Param [2]);
 	}
 
 string source( Param[ 0 ] ) ;

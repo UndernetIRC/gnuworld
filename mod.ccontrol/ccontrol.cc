@@ -23,7 +23,7 @@
 #include	"AuthInfo.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.31 2001/05/02 21:39:26 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.32 2001/05/05 19:53:20 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -57,6 +57,9 @@ EConfig conf( configFileName ) ;
 string sqlHost = conf.Find("sql_host" )->second;
 string sqlDb = conf.Find( "sql_db" )->second;
 string sqlPort = conf.Find( "sql_port" )->second;
+
+CCEmail = conf.Require( "ccemail" )->second;
+AbuseMail = conf.Require( "abuse_mail" )->second;
 
 
 string Query = "host=" + sqlHost + " dbname=" + sqlDb + " port=" + sqlPort;
@@ -112,12 +115,16 @@ while( ptr != conf.end() && ptr->first == "operchan" )
 // Read out the client's message channel
 msgChan = conf.Find( "msgchan" )->second ;
 
+Sendmail_Path = conf.Require("SendMail")->second;
+SendReport = atoi(conf.Require("mail_report")->second.c_str());
+
 // Make sure that the msgChan is in the list of operchans
 if( operChans.end() == find( operChans.begin(), operChans.end(), msgChan ) )
 	{
 	// Not found, add it to the list of operChans
 	operChans.push_back( msgChan ) ;
 	}
+
 
 // Be sure to use all capital letters for the command name
 
@@ -274,6 +281,12 @@ for( commandMapType::iterator ptr = commandMap.begin() ;
 	ptr->second->setServer( theServer ) ;
 	}
 
+if(SendReport)
+	{
+	struct tm Now = convertToTmTime(::time(0));
+	time_t theTime = ::time(0) + ((24 - Now.tm_hour)*3600 - (Now.tm_min)*60) ; //Set the daily timer to 24:00
+	postDailyLog = theServer->RegisterTimer(theTime, this, NULL); 
+	}
 theServer->RegisterEvent( EVT_KILL, this );
 theServer->RegisterEvent( EVT_QUIT, this );
 theServer->RegisterEvent( EVT_NETJOIN, this );
@@ -478,6 +491,20 @@ switch( theEvent )
 // Call the base class OnChannelEvent()
 return xClient::OnChannelEvent( theEvent, theChan,
 	Data1, Data2, Data3, Data4 ) ;
+}
+
+int ccontrol::OnTimer(xServer::timerID timer_id, void*)
+{
+
+if (timer_id ==  postDailyLog)
+	{ 
+	CreateReport(::time(0) - 24*3600,::time(0)); //Create the lastcom report 
+	MailReport(AbuseMail.c_str(),"Report.log"); //Email the report to the abuse team
+	/* Refresh Timers */			
+	time_t theTime = time(NULL) + 24*3600; 
+	postDailyLog = MyUplink->RegisterTimer(theTime, this, NULL); 
+	}
+return 1;
 }
 
 bool ccontrol::isOperChan( const string& theChan ) const
@@ -1360,6 +1387,14 @@ vsprintf( buffer, Msg, list ) ;
 va_end( list ) ;
 
 if(Message(Network->findChannel(msgChan),buffer));
+for( authListType::const_iterator ptr = authList.begin() ;
+        ptr != authList.end() ; ++ptr )
+        {
+        if((*ptr)->Flags & getLOGS )
+                { 
+                if(Message(Network->findClient((*ptr)->Numeric),buffer));
+                }
+	}
 return true;
 }
 
@@ -1400,6 +1435,97 @@ else
 	return false;
 	}
 
+return true;
+}
+
+bool ccontrol::CreateReport(time_t From, time_t Til)
+{
+
+static const char* queryHeader = "SELECT * FROM comlog where ts >";
+strstream theQuery;
+theQuery 	<< queryHeader 
+		<< From
+		<< " AND ts < "
+		<< Til
+		<< " ORDER BY ts DESC"
+		<< ends;
+	
+elog	<< "LASTCOM> " 
+	<< theQuery.str() 
+	<< endl;
+	
+ExecStatusType status = SQLDb->Exec( theQuery.str() ) ;
+delete[] theQuery.str() ;
+
+if( PGRES_TUPLES_OK != status )
+	{
+	elog	<< "LASTCOM> SQL Error: "
+		<< SQLDb->ErrorMessage()
+		<< endl ;
+	return false ;
+	}
+
+// SQL Query succeeded
+ofstream LogFile;
+LogFile.open("Report.log",ios::out);
+if(!LogFile)
+	return false;
+LogFile << "ccontrol log for command issued between " << convertToAscTime(From); 
+LogFile << " and up til " << convertToAscTime(Til) << endl;
+
+for (int i = 0 ; i < SQLDb->Tuples(); i++)
+	{
+	LogFile << "[ " << convertToAscTime(atoi(SQLDb->GetValue(i, 0))) << " - " << SQLDb->GetValue(i,1) << " ] " << SQLDb->GetValue(i,2) << endl;
+	}
+
+LogFile << "End of debug log" << '\n';
+LogFile.close();
+return true;
+}
+
+bool ccontrol::MailReport(const char *MailTo, char *ReportFile)
+{
+
+ifstream Report;
+Report.open(Sendmail_Path.c_str(),ios::in);
+
+if(!Report)
+	{
+	MsgChanLog("Error cant find sendmail, check the conf setting and
+try again\n");
+	return false;
+	}
+Report.close();
+
+Report.open(ReportFile,ios::in);
+if(!Report)
+	{
+	MsgChanLog("Error while sending report\n");
+	return false;
+	}
+ofstream TMail;
+TMail.open("Report.mail",ios::out);
+if(!TMail)
+	{
+	MsgChanLog("Error while sending report\n");
+	return false;
+	}
+TMail << "Subject : CControl command log report\n";
+
+char Buffer[1024];
+
+while(!Report.eof())
+	{
+	Report.getline(Buffer,sizeof(Buffer),'\n');	
+	TMail << Buffer << endl;
+	}
+TMail.close();
+Report.close();
+char SendMail[256];
+
+sprintf(SendMail, "%s -f %s %s < Report.mail\n",Sendmail_Path.c_str(),CCEmail.c_str(),
+MailTo);
+system(SendMail);
 return true;
 }
 

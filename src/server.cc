@@ -48,7 +48,7 @@
 #include	"ServerTimerHandlers.h"
 
 const char server_h_rcsId[] = __SERVER_H ;
-const char server_cc_rcsId[] = "$Id: server.cc,v 1.92 2001/03/31 01:26:10 dan_karrels Exp $" ;
+const char server_cc_rcsId[] = "$Id: server.cc,v 1.93 2001/05/05 19:53:20 mrbean_ Exp $" ;
 const char config_h_rcsId[] = __CONFIG_H ;
 const char misc_h_rcsId[] = __MISC_H ;
 const char events_h_rcsId[] = __EVENTS_H ;
@@ -802,6 +802,8 @@ if( !strcasecmp( serverName, this->ServerName ) )
 		<< endl ;
 	return false ;
 	}
+elog	<< "xServer::SquitServer> Searching for server " << serverName
+	<< "\n" ;
 
 // All juped servers are also put into the Network tables...
 // This call to findServerName() will find a juped server.
@@ -815,15 +817,15 @@ if( NULL == theServer )
 	return false ;
 	}
 
-// Remove the server from the list of juped servers, if it is there.
+
 for( jupedServerListType::iterator ptr = jupedServers.begin() ;
 	ptr != jupedServers.end() ; ++ptr )
 	{
-	if( *ptr == theServer->getIntYY() )
+	if( *ptr== theServer->getIntYY() )
 		{
 		// Found the server in the list of jupes
-//		elog	<< "xServer::SquitServer> Found " << serverName
-//			<< " in list of juped servers\n" ;
+		//elog	<< "xServer::SquitServer> Found " << serverName
+		//	<< " in list of juped servers\n" ;
 		jupedServers.erase( ptr ) ;
 		break ;
 		}

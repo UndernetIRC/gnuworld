@@ -18,7 +18,7 @@
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 
-const char ADDNEWOPERCommand_cc_rcsId[] = "$Id: ADDNEWOPERCommand.cc,v 1.7 2001/05/01 19:52:50 mrbean_ Exp $";
+const char ADDNEWOPERCommand_cc_rcsId[] = "$Id: ADDNEWOPERCommand.cc,v 1.8 2001/05/05 19:53:20 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -82,8 +82,9 @@ if( NULL == tOper )
 
 //Make sure the new oper wont have a command the old one doesnt have enabled
 NewAccess &= tOper->Access; 
+NewAccess &= ~flg_NOLOG;
 //Check if the user doesnt try to add an oper with higher flag than he is
-if(tOper->Flags < NewFlags)
+if((tOper->Flags & (OPER | ADMIN | CODER)) < NewFlags)
 	{
 	bot->Notice( theClient,
 		"You can't add an oper with higher access than yours!");

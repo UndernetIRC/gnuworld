@@ -13,7 +13,7 @@
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 
-const char REMOVECOMMANDCommand_cc_rcsId[] = "$Id: REMOVECOMMANDCommand.cc,v 1.5 2001/02/26 16:58:05 mrbean_ Exp $";
+const char REMOVECOMMANDCommand_cc_rcsId[] = "$Id: REMOVECOMMANDCommand.cc,v 1.6 2001/05/05 19:53:20 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -46,7 +46,8 @@ if(CommandLevel < 0 )
 	delete theUser;
 	return false;	        
 	}
-else if(!(theUser->gotAccess(CommandLevel)))
+CommandLevel &= ~flg_NOLOG;
+if(!(theUser->gotAccess(CommandLevel)))
 	{
 	bot->Notice(theClient,"%s doest have access for %s",st[1].c_str(),st[2].c_str());
 	delete theUser;
