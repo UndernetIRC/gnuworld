@@ -8,7 +8,7 @@
  *
  * Caveats: None.
  *
- * $Id: UNSUSPENDCommand.cc,v 1.9 2001/04/02 17:40:05 gte Exp $
+ * $Id: UNSUSPENDCommand.cc,v 1.10 2001/04/07 23:41:40 gte Exp $
  */
 
 #include	<string>
@@ -20,7 +20,7 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char UNSUSPENDCommand_cc_rcsId[] = "$Id: UNSUSPENDCommand.cc,v 1.9 2001/04/02 17:40:05 gte Exp $" ;
+const char UNSUSPENDCommand_cc_rcsId[] = "$Id: UNSUSPENDCommand.cc,v 1.10 2001/04/07 23:41:40 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -112,7 +112,9 @@ if ((aLevel->getAccess()) >= level)
 	{
 	bot->Notice(theClient,
 		"Cannot unsuspend a user with equal or higher access than your own.");
+	return false;
 	}
+
 aLevel->setSuspendExpire(0);
 aLevel->setSuspendBy(string());
 aLevel->setLastModif(bot->currentTime());
