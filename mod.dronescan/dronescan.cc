@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: dronescan.cc,v 1.38 2003/09/15 13:53:45 dan_karrels Exp $
+ * $Id: dronescan.cc,v 1.39 2003/10/12 16:06:44 jeekay Exp $
  */
 
 #include	<string>
@@ -40,7 +40,7 @@
 #include "sqlUser.h"
 #include "Timer.h"
 
-RCSTAG("$Id: dronescan.cc,v 1.38 2003/09/15 13:53:45 dan_karrels Exp $");
+RCSTAG("$Id: dronescan.cc,v 1.39 2003/10/12 16:06:44 jeekay Exp $");
 
 namespace gnuworld {
 
@@ -179,6 +179,7 @@ theTimer = new Timer();
 /* Register commands available to users */
 RegisterCommand(new ACCESSCommand(this, "ACCESS", "() (<user>)"));
 RegisterCommand(new ADDUSERCommand(this, "ADDUSER", "<user> <access>"));
+RegisterCommand(new ANALYSECommand(this, "ANALYSE", "<#channel>"));
 RegisterCommand(new CHECKCommand(this, "CHECK", "(<#channel>) (<user>)"));
 RegisterCommand(new LISTCommand(this, "LIST", "(active)"));
 RegisterCommand(new MODUSERCommand(this, "MODUSER", "(ACCESS <user> <level>"));

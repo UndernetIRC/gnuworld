@@ -16,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: levels.h,v 1.4 2003/08/02 18:17:21 jeekay Exp $
+ * $Id: levels.h,v 1.5 2003/10/12 16:06:44 jeekay Exp $
  */
 
 #ifndef LEVELS_H
-#define LEVELS_H "$Id: levels.h,v 1.4 2003/08/02 18:17:21 jeekay Exp $"
+#define LEVELS_H "$Id: levels.h,v 1.5 2003/10/12 16:06:44 jeekay Exp $"
 
 namespace gnuworld {
 
@@ -45,6 +45,7 @@ namespace level {
 
 	/* Commands at 1000 should really be debug commands only */
 
+	const unsigned short analyse	= 1000;
 	const unsigned short quote	= 1000;
 
 } // namespace level

@@ -8,6 +8,7 @@ libdronescan_la_SOURCES = 	\
 	sqlUser.cc		\
 	ACCESSCommand.cc	\
 	ADDUSERCommand.cc	\
+	ANALYSECommand.cc	\
 	CHECKCommand.cc		\
 	LISTCommand.cc		\
 	MODUSERCommand.cc	\
