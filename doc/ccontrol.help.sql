@@ -1,5 +1,4 @@
-
--- 2001-03-02 |MrBean| "$Id: ccontrol.help.sql,v 1.4 2001/05/14 21:26:37 mrbean_ Exp $"
+-- 2001-03-02 |MrBean| "$Id: ccontrol.help.sql,v 1.5 2001/12/27 09:02:58 mrbean_ Exp $"
 -- Created the file and added all help topics to the database
 
 -- 2201-03-11 |MrBean|
@@ -21,9 +20,10 @@ INSERT INTO help (command,line,help) VALUES ('ACCESS',4,'Usage : /msg $BOT$ acce
 
 INSERT INTO help (command,line,help) VALUES ('ADDCOMMAND',1,'------ ADDCOMMAND COMMAND ------');
 INSERT INTO help (command,line,help) VALUES ('ADDCOMMAND',2,'Gives a permission to oper to use specified command');
-INSERT INTO help (command,line,help) VALUES ('ADDCOMMAND',3,'Usage : /msg $BOT$ addcommand <oper> <command>');
-INSERT INTO help (command,line,help) VALUES ('ADDCOMMAND',4,'<oper> - the oper handle you wand to give permission');
-INSERT INTO help (command,line,help) VALUES ('ADDCOMMAND',5,'<command> - the command you want to add');
+INSERT INTO help (command,line,help) VALUES ('ADDCOMMAND',3,'Usage : /msg $BOT$ addcommand [-fr] <oper> <command>');
+INSERT INTO help (command,line,help) VALUES ('ADDCOMMAND',4,'-fr can only be specified by smt+ and cause the command to be added');
+INSERT INTO help (command,line,help) VALUES ('ADDCOMMAND',5,'<oper> - the oper handle you wand to give permission');
+INSERT INTO help (command,line,help) VALUES ('ADDCOMMAND',6,'<command> - the command you want to add');
 
 -- ADDNEWOPER
 
@@ -148,30 +148,20 @@ INSERT INTO help (command,line,help) VALUES ('MODERATE',3,'Usage : /msg $BOT$ mo
 INSERT INTO help (command,line,help) VALUES ('MODERATE',4,'<#channel> -  the channel to moderate');
 
 
--- MODOPER
+-- MODUSER
 
-INSERT INTO help (command,line,help) VALUES ('MODOPER',1,'------ MODOPER COMMAND ------');
-INSERT INTO help (command,line,help) VALUES ('MODOPER',2,'Modify an existing oper ');
-INSERT INTO help (command,line,help) VALUES ('MODOPER',3,'Usage : /msg $BOT$ modoper <oper> <option> <new value>');
-INSERT INTO help (command,line,help) VALUES ('MODOPER',4,'<oper> - the oper handle to modify');
-INSERT INTO help (command,line,help) VALUES ('MODOPER',5,'<option> - the option to change , can be newpass , addhost , delhost');
-INSERT INTO help (command,line,help) VALUES ('MODOPER',6,'<new value> - the new value to set');
-INSERT INTO help (command,line,help) VALUES ('MODOPER',7,'Note : /msg $BOT$ help <option> for more help on a specific command');
-
--- MODOPER NEWPASS
-
-INSERT INTO help (command,subcommand,line,help) VALUES ('MODOPER','NEWPASS',1,'Changes the password for an oper');
-INSERT INTO help (command,subcommand,line,help) VALUES ('MODOPER','NEWPASS',2,'Usage : /msg $BOT$ modoper <oper> newpass <new password>');
-
--- MODOPER ADDHOST
-
-INSERT INTO help (command,subcommand,line,help) VALUES ('MODOPER','ADDHOST',1,'Add a new host to an oper access list');
-INSERT INTO help (command,subcommand,line,help) VALUES ('MODOPER','ADDHOST',2,'Usage : /msg $BOT$ modoper <oper> addhost <new host>');
-
--- MODOPER DELHOST
-
-INSERT INTO help (command,subcommand,line,help) VALUES ('MODOPER','DELHOST',1,'Delete a new host to an oper access list');
-INSERT INTO help (command,subcommand,line,help) VALUES ('MODOPER','DELHOST',2,'Usage : /msg $BOT$ modoper <oper> delhost <new host>');
+INSERT INTO help (command,line,help) VALUES ('MODUSER',1,'------ MODUSER COMMAND ------');
+INSERT INTO help (command,line,help) VALUES ('MODUSER',2,'Modify an existing user');
+INSERT INTO help (command,line,help) VALUES ('MODUSER',3,'Usage: /msg $BOT$ moduser <handle> <-ah new host] <-dh host> <-s server> <-p password> <-gl on/off> <-op on/off> <-ua> <-uf new flags> <-e email>');
+INSERT INTO help (command,line,help) VALUES ('MODUSER',4,'-ah adds a new host for the user');
+INSERT INTO help (command,line,help) VALUES ('MODUSER',5,'-dh removes a host for a user');
+INSERT INTO help (command,line,help) VALUES ('MODUSER',6,'-s associate a user with the server');
+INSERT INTO help (command,line,help) VALUES ('MODUSER',7,'-p changes the user password');
+INSERT INTO help (command,line,help) VALUES ('MODUSER',8,'-gl toggeles wheather the logs will be messaged to the user');
+INSERT INTO help (command,line,help) VALUES ('MODUSER',9,'-op toggeles if a user must be opered up to user the needop commands');
+INSERT INTO help (command,line,help) VALUES ('MODUSER',10,'-ua resets the user access acording to his flags');
+INSERT INTO help (command,line,help) VALUES ('MODUSER',11,'-uf updates the oper flags to new one (OPER/ADMIN/SMT/CODER)');
+INSERT INTO help (command,line,help) VALUES ('MODUSER',12,'-e updates the user email');
 
 -- NEWPASS
 
@@ -215,11 +205,12 @@ INSERT INTO help (command,line,help) VALUES ('SCANGLINE',3,'Usage : /msg $BOT$ s
 
 INSERT INTO help (command,line,help) VALUES ('SUSPEND',1,'------ SUSPEND COMMAND ------');
 INSERT INTO help (command,line,help) VALUES ('SUSPEND',2,'Suspend an oper for a certain amount of time');
-INSERT INTO help (command,line,help) VALUES ('SUSPEND',3,'Usage : /msg $BOT$ suspend <oper> <duration> <time units>');
+INSERT INTO help (command,line,help) VALUES ('SUSPEND',3,'Usage : /msg $BOT$ suspend <oper> <duration>[s/m/h/d] [-l level] <time units>');
 INSERT INTO help (command,line,help) VALUES ('SUSPEND',4,'<oper> - oper handle to suspend');
 INSERT INTO help (command,line,help) VALUES ('SUSPEND',5,'<duration> - the duration of the suspend');
 INSERT INTO help (command,line,help) VALUES ('SUSPEND',6,'<time units> - the unit in which you specify duriation');
 INSERT INTO help (command,line,help) VALUES ('SUSPEND',7,'time units can be : s - seconds , m - minutes , h - hours , d- days');
+
 
 -- TRANSLATE 
 
@@ -249,5 +240,107 @@ INSERT INTO help (command,line,help) VALUES ('WHOIS',2,'Gives information about 
 INSERT INTO help (command,line,help) VALUES ('WHOIS',3,'Usage : /msg $BOT$ whois <nick>');
 INSERT INTO help (command,line,help) VALUES ('WHOIS',4,'<nick> - the person you want to get info about');
 
+-- LISTHOSTS
 
+INSERT INTO help (command,line,help) VALUES ('LISTHOSTS',1,'------ LISTHOSTS COMMAND ------');
+INSERT INTO help (command,line,help) VALUES ('LISTHOSTS',2,'Syntax: /msg $BOT$ listhosts <handle>');
+INSERT INTO help (command,line,help) VALUES ('LISTHOSTS',3,'Lists all the hosts that an oper is allowed to login from');
+
+-- CHECKNET
+
+INSERT INTO help (command,line,help) VALUES ('CHECKNET',1,'------ CHECKNET COMMAND ------');
+INSERT INTO help (command,line,help) VALUES ('CHECKNET',2,'Syntax: /msg $BOT$ checknet');
+INSERT INTO help (command,line,help) VALUES ('CHECKNET',3,'Lists all the missing servers');
+
+-- LISTIGNORES
+
+INSERT INTO help (command,line,help) VALUES ('LISTIGNORES',1,'------ LISTIGNORES COMMAND ------');
+INSERT INTO help (command,line,help) VALUES ('LISTIGNORES',2,'Syntax: /msg $BOT$ LISTIGNORES');
+INSERT INTO help (command,line,help) VALUES ('LISTIGNORES',3,'Shows the current ignore list of the bot');
+
+-- REMIGNORE
+
+INSERT INTO help (command,line,help) VALUES ('REMIGNORE',1,'------ REMIGNORE COMMAND ------');
+INSERT INTO help (command,line,help) VALUES ('REMIGNORE',1,'Syntax: /msg bot Remignore <host>');
+INSERT INTO help (command,line,help) VALUES ('REMIGNORE',3,'Removes a host from the bot ignore list');
+
+-- COMMANDS
+
+INSERT INTO help (command,line,help) VALUES ('COMMANDS',1,'------ COMMANDS COMMAND ------');
+INSERT INTO help (command,line,help) VALUES ('COMMANDS',2,'Syntax: /msg $BOT$ commands <-ds/-en/-no/-nl/-na/-ml/> <command> <option>');
+INSERT INTO help (command,line,help) VALUES ('COMMANDS',3,'Changes command options');
+INSERT INTO help (command,line,help) VALUES ('COMMANDS',4,'-ds - disable the command');
+INSERT INTO help (command,line,help) VALUES ('COMMANDS',5,'-en - enable the command');
+INSERT INTO help (command,line,help) VALUES ('COMMANDS',6,'-no - toggles the need to be operd up to use the command');
+INSERT INTO help (command,line,help) VALUES ('COMMANDS',7,'-nl - toggles if the command should not be logged in the lastcom report');
+INSERT INTO help (command,line,help) VALUES ('COMMANDS',9,'-na - changes the name of the command');
+INSERT INTO help (command,line,help) VALUES ('COMMANDS',10,'-ml - set the minimum level a oper must have for this command to be added to');
+
+-- GCHAN
+
+INSERT INTO help (command,line,help) VALUES ('GCHAN',1,'------ GCHAN COMMAND ------');
+INSERT INTO help (command,line,help) VALUES ('GCHAN',2,'Syntax: /msg $BOT$ Gchan <#channel> <duration/-per> <reason>');
+INSERT INTO help (command,line,help) VALUES ('GCHAN',3,'Sets a bad channel gline on a channel');
+INSERT INTO help (command,line,help) VALUES ('GCHAN',4,'if a -per is specified as a duration, the gline will be permanent');
+
+-- REMGCHAN
+
+INSERT INTO help (command,line,help) VALUES ('REMCHAN',1,'------ REMGCHAN COMMAND ------');
+INSERT INTO help (command,line,help) VALUES ('REMCHAN',2,'Syntax: /msg $BOT$ remgchan <#channel>');
+INSERT INTO help (command,line,help) VALUES ('REMCHAN',3,'Removes a gchan gline');
+
+-- LIST
+
+INSERT INTO help (command,line,help) VALUES ('LIST',1,'------ LIST COMMAND ------');
+INSERT INTO help (command,line,help) VALUES ('LIST',2,'Syntax: /msg $BOT$ list <list type>');
+INSERT INTO help (command,line,help) VALUES ('LIST',3,'Types can be either Glines or suspended');
+
+-- USERINFO
+
+INSERT INTO help (command,line,help) VALUES ('LIST',1,'------ USERINFO COMMAND ------');
+INSERT INTO help (command,line,help) VALUES ('LIST',2,'Syntax: /msg $BOT$ userinfo <user*/servers*>');
+INSERT INTO help (command,line,help) VALUES ('LIST',3,'Shows information about all the opers that their server/handle match the supplied mask');
+
+-- LEARNNET 
+
+INSERT INTO help (command,line,help) VALUES ('LEARNNET',1,'------ LEARNNET COMMAND ------');
+INSERT INTO help (command,line,help) VALUES ('LEARNNET',2,'Syntax: /msg $BOT$ learnnet [-r]');
+INSERT INTO help (command,line,help) VALUES ('LEARNNET',3,'Add all the unknown server which currently are connected to the network to the database');
+INSERT INTO help (command,line,help) VALUES ('LEARNNET',4,'-r switch can be added only by CODERS, which will cause the bot to delete all the known servers and relearn the network.
+
+-- REMSERVER
+
+INSERT INTO help (command,line,help) VALUES ('REMSERVER',1,'------ REMSERVER COMMAND ------');
+INSERT INTO help (command,line,help) VALUES ('REMSERVER',2,'Syntax: /msg $BOT$ RemServer [server name]');
+INSERT INTO help (command,line,help) VALUES ('REMSERVER',3,'Removes a server from the bot database');
+
+-- LASTCOM
+
+INSERT INTO help (command,line,help) VALUES ('LASTCOM',1,'------ LASTCOM COMMAND ------');
+INSERT INTO help (command,line,help) VALUES ('LASTCOM',2,'Syntax: /msg $BOT$ lastcom [num of commands ] [from days ago - d]');
+INSERT INTO help (command,line,help) VALUES ('LASTCOM',3,'will paste all the last commands which where issued to the bot');
+INSERT INTO help (command,line,help) VALUES ('LASTCOM',4,'the default value is 20 if no num of commands is specified');
+INSERT INTO help (command,line,help) VALUES ('LASTCOM',5,'a user can also specify the number of days ago the commands where issued');
+
+-- FORCEGLINE
+
+INSERT INTO help (command,line,help) VALUES ('FORCEGLINE',1,'------ FORCEGLINE COMMAND ------');
+INSERT INTO help (command,line,help) VALUES ('FORCEGLINE',2,'Syntax: /msg $BOT$ ForceGline [-fu] <host> <duration[s/m/h/d] reason');
+INSERT INTO help (command,line,help) VALUES ('FORCEGLINE',3,'Glines a host for a certain amount of time');
+INSERT INTO help (command,line,help) VALUES ('FORCEGLINE',4,'-fu flag can only be specified by smt+');
+INSERT INTO help (command,line,help) VALUES ('FORCEGLINE',5,'This type of gline is used to gline for more than 14 days and for a gline which affects more than 255 users.');
+
+-- EXCEPTIONS
+
+INSERT INTO help (command,line,help) VALUES ('EXCEPTIONS',1,'------ EXCEPTIONS COMMAND ------');
+INSERT INTO help (command,line,help) VALUES ('EXCEPTIONS',2,'Syntax: /msg $BOT$ Exceptions <add/del/list> [host mask]');
+INSERT INTO help (command,line,help) VALUES ('EXCEPTIONS',3,'Excpetions = AGL in uworld, meaning a user can have more than a certain');
+INSERT INTO help (command,line,help) VALUES ('EXCEPTIONS',4,'amount of connections from a single host than the default one which is specified');
+INSERT INTO help (command,line,help) VALUES ('EXCEPTIONS',5,'in the bot conf file, before he gets automatically glined for clones.');
+
+-- ADDSERVER 
+
+INSERT INTO help (command,line,help) VALUES ('ADDSERVER',1,'------ ADDSERVER COMMAND ------');
+INSERT INTO help (command,line,help) VALUES ('ADDSERVER',2,'Syntax: /msg $BOT$ addserver <server>');
+INSERT INTO help (command,line,help) VALUES ('ADDSERVER',3,'Adds a new server to the bot database');
 
