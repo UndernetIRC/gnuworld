@@ -3,7 +3,7 @@
  */
 
 #ifndef __NETWORK_H
-#define __NETWORK_H "$Id: Network.h,v 1.25 2002/05/15 22:14:10 dan_karrels Exp $"
+#define __NETWORK_H "$Id: Network.h,v 1.26 2002/05/19 22:24:48 dan_karrels Exp $"
 
 #include	<vector>
 #include	<string>
@@ -307,8 +307,8 @@ public:
 	/**
 	 * This method performs a recursive removal of all servers
 	 * which are uplinked by intYY.
-	 * The original server referenced by intYY is neither removed
-	 * nor deleted.
+	 * The server referenced by intYY is deallocated in this
+	 * method.
 	 */
 	virtual void		OnSplit( const unsigned int& intYY ) ;
 
@@ -526,6 +526,14 @@ protected:
 	 * the structure.
 	 */
 	void addNick( iClient* ) ;
+
+	/**
+	 * Perform a simple recursive search for all leaves of
+	 * the server whose numeric is the second arguments, and
+	 * place each of those servers' numerics into the vector.
+	 */
+	void	findLeaves( vector< unsigned int >& yyVector,
+			const unsigned int intYY ) const ;
 
 	/**
 	 * The vector of local clients.

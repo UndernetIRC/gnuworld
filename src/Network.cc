@@ -24,7 +24,7 @@
 #include	"ip.h"
 
 const char xNetwork_h_rcsId[] = __NETWORK_H ;
-const char xNetwork_cc_rcsId[] = "$Id: Network.cc,v 1.37 2002/05/19 18:54:09 dan_karrels Exp $" ;
+const char xNetwork_cc_rcsId[] = "$Id: Network.cc,v 1.38 2002/05/19 22:24:49 dan_karrels Exp $" ;
 const char ELog_h_rcsId[] = __ELOG_H ;
 const char iClient_h_rcsId[] = __ICLIENT_H ;
 const char Channel_h_rcsId[] = __CHANNEL_H ;
@@ -564,69 +564,146 @@ if( !nickMap.insert( nickMapType::value_type(
 
 /**
  * Handle a netsplit.
- * Per requirements, this method does NOT remove or deallocate
- * the server referenced by intYY.
+ * This method removes and deallocated the server corresponding
+ * to the numeric (intYY), and all of its leaf servers (and all
+ * of their leaf servers, etc).
  * Our uplink server has its own numeric as its uplinkIntYY.
+ * This method was once a disturbingly complicated recursive method.
+ * It turned out that the previous implementation was not robust
+ * to modifications made to internal data structure types.
+ * Therefore, it has been greatly simplified here, to where even
+ * someone like me can understand it.
+ * The idea here is to use a simple recursive method to gather the
+ * server numerics which need to be removed, and then perform the
+ * removals in an iterative manner.
+ * (intYY) is the server numeric of the server to be removed.
  */
 void xNetwork::OnSplit( const unsigned int& intYY )
 {
 
-// This is kinda pathetic:
-// hash_map<> invalidates iterators which are deallocated, and
-// may have other undetermined behavior (still searching for
-// accurate documentation).
-// Therefore, if a server is removed, just reset the iterator
-// to the beginning of the structure.  This is done to simplify
-// matters since this is a recursive function.  Performance loss
-// should be negligable since there aren't a signficant number
-// of servers on any network (*crosses fingers*)
-//
-for( serverMapType::iterator ptr = serverMap.begin() ;
-	ptr != serverMap.end() ; )
-	{
-	iServer* serverPtr = ptr->second ;
+// yyVector will be used to hold server numerics of servers
+// to be removed.
+typedef vector< unsigned int > yyVectorType ;
+yyVectorType yyVector ;
 
+// Of course add the top level server to the list of servers
+// to be removed.
+yyVector.push_back( intYY ) ;
+
+// Recursive method to find all leaf servers of intYY, and all
+// of each of those servers' leaf servers.
+// This is much simpler than having the entire OnSplit() method
+// recursive.
+findLeaves( yyVector, intYY ) ;
+
+// yyVector should now have all leaf servers (if any) of intYY,
+// each of which must be removed.
+// First, let's leave them in place, and send events to all
+// handlers of the EVT_NETBREAK event.
+
+// Iterate through the vector of server numerics to be removed
+for( yyVectorType::const_iterator yyIterator = yyVector.begin() ;
+	yyIterator != yyVector.end() ; ++yyIterator )
+	{
+
+	// Obtain a pointer to the server being removed.
+	// Since findLeaves() presumably encountered this iServer*
+	// it sure better not be NULL here.
+	iServer* serverPtr = findServer( *yyIterator ) ;
+	assert( serverPtr != 0 ) ;
+
+	// Obtain serverPtr's uplink here, also for posting to
+	// event handlers
+	iServer* uplinkPtr = findServer( serverPtr->getUplinkIntYY() ) ;
+	assert( uplinkPtr != 0 ) ;
+
+	// (reason) is the reason that the netsplit is occuring
+	// TODO: get the real from from msg_SQ
+	string reason("Uplink Splitted");
+
+	// Post the event to the core xServer class for distribution
+	// to xClient event handlers
+	theServer->PostEvent( EVT_NETBREAK,
+		   static_cast< void * >( serverPtr ),
+		   static_cast< void * >( uplinkPtr ),
+		   static_cast< void * >( &reason ) ) ;
+	}
+
+// All xClients (who care) have been notified of the various servers
+// that are splitting
+// Now iterate through the server numeric vector once more and
+// remove the servers from the network data tables.
+// Note that this will call removeServer() for each server,
+// which will remove that server from the data tables, and also
+// deallocate the server pointer.
+// removeServer() will also remove all iClient's resident on that
+// server (and deallocate them), and also remove any channels
+// which are determined to be empty as a result of the netsplit.
+
+for( yyVectorType::const_iterator yyIterator = yyVector.begin() ;
+	yyIterator != yyVector.end() ; ++yyIterator )
+	{
+	// Obtain a pointer to the server in question for convenience
+	// and readability
+	iServer* removeMe = findServer( *yyIterator ) ;
+	assert( removeMe != 0 ) ;
+
+	// Remove the server, its clients, any empty channels,
+	// and post events for all of the above.
+	delete removeServer( removeMe->getIntYY(), true ) ;
+	}
+}
+
+/**
+ * This is a simple recursive method which traverses the
+ * serverMap looking for all leaves to server whose numeric
+ * is uplinkIntYY.  Any server which is found to be a leaf
+ * to uplinkIntYY is then passed into a recursive call to
+ * findLeaves() for that particular leaf server, etc.
+ * This method does not modify any data tables, it only
+ * walks the serverMap table.
+ */
+void xNetwork::findLeaves( vector< unsigned int >& yyVector,
+	const unsigned int uplinkIntYY ) const
+{
+
+// Begin our walk down the serverMap looking for leaf servers
+// of uplinkIntYY.
+for( serverMapType::const_iterator serverIterator = serverMap.begin() ;
+	serverIterator != serverMap.end() ; ++serverIterator )
+	{
+
+	// Obtain a pointer to this iServer for convenience and
+	// readability
+	const iServer* serverPtr = serverIterator->second ;
+
+	// Check to see if this server is our uplink, don't want
+	// to remove that one :)
 	if( theServer->getUplinkIntYY() == serverPtr->getIntYY() )
 		{
 		// It's our uplink.  Prevent infinite recursion here
 		// by just ignoring this server (base case).
 
-		// Since no server is being removed here, increment
-		// the server iterator to the next server
-		++ptr ;
-//		elog	<< "xServer::OnSplit> Found uplink"
+//		elog	<< "xServer::findLeaves> Found uplink"
 //			<< endl ;
 		}
-	else if( serverPtr->getUplinkIntYY() == intYY )
+	else if( serverPtr->getUplinkIntYY() == uplinkIntYY )
 		{
-		// serverPtr is a leaf to intYY
+		// serverPtr is a leaf to uplinkIntYY
 
-//		elog	<< "xNetwork::OnSplit> Removing "
-//			<< servers[ i ]->getName()
-//			<< endl ;
+		// Add serverPtr to the list of leaves to server
+		// uplinkIntYY
+		yyVector.push_back( serverPtr->getIntYY() ) ;
 
-		// Remember the numeric to be removed.
-		const unsigned int removeIntYY = serverPtr->getIntYY() ;
+		// Call this method recursively to find leaves
+		// of serverPtr.
+		findLeaves( yyVector, serverPtr->getIntYY() ) ;
 
-		// Post a netbreak event
-		string reason("Uplink Splitted");
-		
-		theServer->PostEvent(EVT_NETBREAK,
-			   static_cast<void *>(serverPtr),
-			   static_cast<void *>(findServer(intYY)),
-			   static_cast<void *>(&reason));
-			   
-		// Remove serverPtr
-		delete removeServer( serverPtr->getIntYY(), true ) ;
+		} // else if()
 
-		// Remove serverPtr's leaf servers.
-		OnSplit( removeIntYY ) ;
+	} // for()
 
-		// Handle invalidated iterators the easy way
-		ptr = serverMap.begin() ;
-		}
-	}
-}
+} // findLeaves()
 
 size_t xNetwork::serverList_size() const
 {

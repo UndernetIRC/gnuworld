@@ -14,7 +14,7 @@
 #include	"ELog.h"
 #include	"xparameters.h"
 
-const char msg_SQ_cc_rcsId[] = "$Id: msg_SQ.cc,v 1.6 2002/04/28 16:11:23 dan_karrels Exp $" ;
+const char msg_SQ_cc_rcsId[] = "$Id: msg_SQ.cc,v 1.7 2002/05/19 22:24:49 dan_karrels Exp $" ;
 const char server_h_rcsId[] = __SERVER_H ;
 const char events_h_rcsId[] = __EVENTS_H ;
 const char Network_h_rcsId[] = __NETWORK_H ;
@@ -88,8 +88,6 @@ else
 	// Otherwise, it's just some server.
 	Network->OnSplit( squitServer->getIntYY() ) ;
 
-	// Remove this server from the network tables.
-	Network->removeServer( squitServer->getIntYY(), true ) ;
 	// Remove this server from the juped list (if its there)
 	RemoveJupe(squitServer);
 	}
