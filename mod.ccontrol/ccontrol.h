@@ -3,15 +3,8 @@
  */
 
 #ifndef __CCONTROL_H
-#define __CCONTROL_H "$Id: ccontrol.h,v 1.37 2001/07/20 17:44:17 mrbean_ Exp $"
+#define __CCONTROL_H "$Id: ccontrol.h,v 1.38 2001/07/22 14:44:25 mrbean_ Exp $"
 
-//Define gline response
-#define GLINE_OK 1;
-#define FORCE_NEEDED_HOST 2
-#define FORCE_NEEDED_TIME 3
-#define FORCE_NEEDED_USERS 4
-#define HUH_NO_HOST 5
-#define HUH_NO_USERS 6 
 
 #include	<string>
 #include	<vector>
@@ -36,6 +29,7 @@
 #include 	"ccLogin.h"
 #include 	"ccException.h"
 #include        "server.h"
+//#include 	"gline.h"
 
 namespace gnuworld
 {
@@ -462,7 +456,9 @@ public:
 	 * This method checks the gline paramerters for valid time/host
 	 */
 
-	int CheckGline(const char *, unsigned int);
+//	int CheckGline(const char *, unsigned int);
+	
+	int checkGline(const string ,unsigned int ,int *);
 
 	bool isSuspended(AuthInfo *);
 
@@ -470,8 +466,6 @@ public:
 	
 	bool refreshSuspention();
 	
-	int countCinS( char * , char );
-
 	bool refreshGlines();
 	
 	bool burstGlines();

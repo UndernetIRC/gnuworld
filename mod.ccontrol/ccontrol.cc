@@ -24,9 +24,10 @@
 #include	"ccontrol.h"
 #include	"AuthInfo.h"
 #include        "server.h"
+#include 	"gline.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.59 2001/07/20 17:44:17 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.60 2001/07/22 14:44:25 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -1577,7 +1578,7 @@ return true;
 }
 
 // TODO: This method should be in C++, not C!
-int ccontrol::CheckGline(const char * GlineHost,unsigned int Len)
+/*int ccontrol::CheckGline(const char * GlineHost,unsigned int Len)
 {
 
 char *User;
@@ -1601,6 +1602,58 @@ if(Len > 24*3600*2) //Longer than 2 days ?
 if(strchr(Host,'*') == NULL)
 	return GLINE_OK;
 return FORCE_NEEDED_HOST;
+}*/
+
+int ccontrol::checkGline(const string Host,unsigned int Len,int *Affected)
+{
+
+const unsigned int isWildCard = 0x01;
+const unsigned int isIP = 0x02;
+unsigned int Mask = 0;
+unsigned int Dots = 0;
+unsigned int GlineType = isIP;
+bool ParseEnded = false;
+for(string::size_type pos = 0; pos < Host.size();++pos)
+	{
+	if(Host[pos] =='.')
+		{
+		Dots++;
+		if((GlineType & (isWildCard | isIP)) == isIP)
+			Mask+=8;
+		}
+	else if((Host[pos] =='*') || (Host[pos] == '?'))
+		GlineType |= isWildCard;
+	else if(Host[pos] == '/')
+		{
+		if(!(GlineType & isIP)) //must be an ip to specify 
+			return gline::BAD_HOST;
+		 Mask = atol((Host.substr(++pos)).c_str());
+		 if(!(Mask) || (Mask > 32))
+			return gline::BAD_HOST;
+		 if(Mask < 32)
+			GlineType |= isWildCard;
+		 ParseEnded = true;			
+		 break;
+		 }
+	else if((Host[pos] > '9') || (Host[pos] < '0'))
+		GlineType &= ~isIP;
+	}
+
+
+if((Dots > 3) && (GlineType & isIP)) //IP addy can have more than 3 dots
+	return gline::BAD_HOST;
+
+if((GlineType & (isIP || isWildCard) == isIP) && !(ParseEnded))
+	Mask +=8;
+
+if((GlineType & isIP) && (Mask < 24))
+	return gline::HUH_NO_HOST;
+
+if(!(GlineType & isIP) && (Dots < 2))
+	return gline::HUH_NO_HOST;
+
+return GlineType & isWildCard ? gline::FORCE_NEEDED_HOST : gline::GLINE_OK;
+
 }
 
 bool ccontrol::isSuspended(AuthInfo *theUser)
@@ -1637,9 +1690,6 @@ strstream theQuery;
 theQuery	<< Main
 		<< ends;
 
-elog	<< "ccontrol::RefreshSuspention> "
-	<< theQuery.str()
-	<< endl; 
 
 ExecStatusType status = SQLDb->Exec( theQuery.str() ) ;
 delete[] theQuery.str() ;
@@ -1691,16 +1741,6 @@ if(SQLDb->Tuples() > 0)
 
 	}
 return true;
-}
-// TODO: This method should be in C++ not C!
-int ccontrol::countCinS(char *St,char Sign)
-{
-int count =0;
-char *CurC;
-for(CurC = St;*CurC != '\0';CurC++)
-    if(*CurC == Sign)
-	count++;
-return count;
 }
 
 bool ccontrol::refreshGlines()

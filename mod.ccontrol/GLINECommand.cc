@@ -18,8 +18,9 @@
 #include	"ip.h"
 #include	"ELog.h"
 #include	"Gline.h"
+#include	"gline.h"
 
-const char GLINECommand_cc_rcsId[] = "$Id: GLINECommand.cc,v 1.13 2001/07/20 09:09:31 mrbean_ Exp $";
+const char GLINECommand_cc_rcsId[] = "$Id: GLINECommand.cc,v 1.14 2001/07/22 14:44:25 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -88,24 +89,27 @@ if(gLength == 0)
 	gLength = bot->getDefaultGlineLength() ;
 	bot->Notice(theClient,"No duration was set, setting to %d seconds by default",gLength) ;
 	}
-
-switch(bot->CheckGline(st[ pos ].c_str(),gLength))
+int Users;
+switch(bot->checkGline(hostName,gLength,&Users))
 	{
-	case FORCE_NEEDED_HOST:
+	case gline::FORCE_NEEDED_HOST:
 	    bot->Notice(theClient,"Please use forcegline to gline that host");
 	    return false;
-	case FORCE_NEEDED_TIME:
+	case gline::FORCE_NEEDED_TIME:
 	    bot->Notice(theClient,"Please use forcegline to gline for that amount of time");
 	    return false;
-	case FORCE_NEEDED_USERS:
+	case gline::FORCE_NEEDED_USERS:
 	    bot->Notice(theClient,"You gline bans for than 32 users , please use forcegline");
 	    return false;
-	case HUH_NO_HOST:
+	case gline::HUH_NO_HOST:
 	    bot->Notice(theClient,"I dont think glining that host is such a good idea, do you?");
 	    return false;
-	case HUH_NO_USERS:
+	case gline::HUH_NO_USERS:
 	    bot->Notice(theClient,"Glining more than 256 ppl is a NoNo");
-	return false;
+	    return false;
+	case gline::BAD_HOST:
+	    bot->Notice(theClient,"illegal host");
+	    return false;
 	}	
 // Avoid passing a reference to a temporary variable.
 string nickUserHost = theClient->getNickUserHost() ;
