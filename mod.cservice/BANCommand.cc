@@ -12,22 +12,22 @@
  *
  * Caveats: None.
  *
- * $Id: BANCommand.cc,v 1.6 2001/01/27 20:16:40 dan_karrels Exp $
+ * $Id: BANCommand.cc,v 1.7 2001/01/29 20:48:10 gte Exp $
  */
 
-#include        <string>
+#include	<string>
 #include	<cassert>
  
-#include        "StringTokenizer.h"
-#include        "ELog.h" 
-#include        "cservice.h"
-#include        "Network.h"
-#include        "levels.h"
+#include	"StringTokenizer.h"
+#include	"ELog.h" 
+#include	"cservice.h"
+#include	"Network.h"
+#include	"levels.h"
 #include	"misc.h"
 #include	"responses.h"
 #include	"match.h"
 
-const char BANCommand_cc_rcsId[] = "$Id: BANCommand.cc,v 1.6 2001/01/27 20:16:40 dan_karrels Exp $" ;
+const char BANCommand_cc_rcsId[] = "$Id: BANCommand.cc,v 1.7 2001/01/29 20:48:10 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -101,7 +101,7 @@ switch(oCount)
 		{
 		if(!IsNumeric(st[3]))
 			{
-		    	banReason = st.assemble(3);
+			banReason = st.assemble(3);
 			break;
 			}
 
@@ -153,10 +153,23 @@ if( isNick )
 		return true;
 		}
 
-	/* Ban and kick this user */
-	banTarget = "*!*" + aNick->getUserName() + "@" + aNick->getInsecureHost();
+	/* Ban and kick this user */ 
+	banTarget = Channel::createBan(aNick);
 	}
 
+/*
+ * Check the channel currently exists on the network, if so - we can
+ * start kicking.
+ */
+
+Channel* theChannel = Network->findChannel(theChan->getName()); 
+if (!theChannel) 
+	{
+	bot->Notice(theClient, bot->getResponse(theUser, language::chan_is_empty).c_str(), 
+	theChan->getName().c_str());
+	return false;
+	} 
+ 
 /*
  *  Get a list of all bans on this channel, try and match this ban and
  *  find overlapping bans.
@@ -164,7 +177,7 @@ if( isNick )
 	
 vector< sqlBan* >* banList = bot->getBanRecords(theChan); 
 vector< sqlBan* >::iterator ptr = banList->begin();
-
+ 
 while (ptr != banList->end())
 	{
 	sqlBan* theBan = *ptr;
@@ -176,33 +189,36 @@ while (ptr != banList->end())
 		}  
 
 	/*
-	 * Overlapping ban?
-	 */ 
-	if(match(banTarget, theBan->getBanMask()) == 0)
-		{
-		ptr = banList->erase(ptr);
-		theBan->deleteRecord();
-		delete(theBan);
+	 * Overlapping ban? We just remove the ban from our internal tables, as
+	 * setting this ban to ircu will cause a default removal of overlapping
+	 * bans.
+	 */
+
+	if(match(banTarget, theBan->getBanMask()) == 0) // Matched overlapping ban.
+		{ 
+			if (theBan->getLevel() <= level) // If we have access to remove the overlapper..
+			{ 
+				theChannel->removeBan(theBan->getBanMask()); // Update GNUWorld.
+				ptr = banList->erase(ptr);
+				theBan->deleteRecord();
+				delete(theBan);
+			} else
+			{
+				++ptr;				
+			} 
 		}
-	else
+	else if ( match(theBan->getBanMask(), banTarget) == 0) // More specific ban?
+		{
+			bot->Notice(theClient, "The ban %s is already covered by %s",
+				banTarget.c_str(), theBan->getBanMask().c_str());
+			return true;
+		} 
+			else // Carry on regardless.
 		{
 		++ptr;
 		} 
 	} // while()
  
-/*
- * Check the channel currently exists on the network, if so - we can
- * start kicking some ass. 
- */
-
-Channel* theChannel = Network->findChannel(theChan->getName()); 
-if (!theChannel) 
-	{
-	bot->Notice(theClient, bot->getResponse(theUser, language::chan_is_empty).c_str(), 
-	theChan->getName().c_str());
-	return false;
-	} 
-
 vector< iClient* > clientsToKick ; 
 for(Channel::userIterator chanUsers = theChannel->userList_begin(); chanUsers != theChannel->userList_end(); ++chanUsers)
 	{
@@ -220,7 +236,7 @@ for(Channel::userIterator chanUsers = theChannel->userList_begin(); chanUsers !=
 /* Set the ban :) */
 theChannel->setBan(banTarget);
 
-// TODO: Use xClient::Ban() here
+// TODO: Use xClient::Ban() here 
 strstream s;
 s	<< bot->getCharYYXXX() << " M " << theChannel->getName()
 	<< " +b " << banTarget << ends;
@@ -254,6 +270,9 @@ banList->push_back(newBan);
 
 /* Insert this new record into the database. */
 newBan->insertRecord();
+
+bot->Notice(theClient, "Added ban %s to %s at level %i",
+	newBan->getBanMask().c_str(), theChannel->getName().c_str(), newBan->getLevel());
 
 return true ;
 }

@@ -476,7 +476,7 @@ int cservice::OnCTCP( iClient* theClient, const string& CTCP,
 
 	if(Command == "VERSION")
 	{
-		xClient::DoCTCP(theClient, CTCP.c_str(), "Undernet P10 Channel Services Version 2 [" __DATE__ " " __TIME__ "] ($Id: cservice.cc,v 1.69 2001/01/29 04:07:51 gte Exp $)");
+		xClient::DoCTCP(theClient, CTCP.c_str(), "Undernet P10 Channel Services Version 2 [" __DATE__ " " __TIME__ "] ($Id: cservice.cc,v 1.70 2001/01/29 20:48:10 gte Exp $)");
 		return true;
 	}
 
@@ -1303,10 +1303,10 @@ int cservice::OnChannelEvent( const channelEventType& whichEvent,
 					{ 
 						strstream s;
 						s << getCharYYXXX() << " M " << reggedChan->getName() << " +b "
-						<< theBan->getBanMask() << ends;
-					
+						<< theBan->getBanMask() << ends; 
 						Write( s );
 						delete[] s.str(); 
+						theChan->setBan(theBan->getBanMask());
 						Kick(theChan, theClient, string("(" + theBan->getSetBy() + ") " + theBan->getReason()) );
 						/* 
 						 * Thats it.. we aren't going to op them or anything.
