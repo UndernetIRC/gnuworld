@@ -18,7 +18,7 @@
  *
  * Caveats: None.
  *
- * $Id: SETCommand.cc,v 1.46 2002/01/05 01:00:49 gte Exp $
+ * $Id: SETCommand.cc,v 1.47 2002/01/05 22:32:59 gte Exp $
  */
 
 #include	<string>
@@ -29,7 +29,7 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char SETCommand_cc_rcsId[] = "$Id: SETCommand.cc,v 1.46 2002/01/05 01:00:49 gte Exp $" ;
+const char SETCommand_cc_rcsId[] = "$Id: SETCommand.cc,v 1.47 2002/01/05 22:32:59 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -972,7 +972,7 @@ else
 	return true;
 	}
 
-	if(option == "FLOATMARGIN")
+	if(option == "FLOATPERIOD")
 	{
 	    if(level < level::set::floatlim)
 	    {
@@ -983,24 +983,18 @@ else
 		return true;
 	    }
 
-	unsigned int limit_offset = atoi(value.c_str());
+	unsigned int limit_period = atoi(value.c_str());
 
-	if ((limit_offset <= 1) | (limit_offset > 20))
+	if ((limit_period < 20) | (limit_period > 200))
 		{
-			bot->Notice(theClient, "Invalid floating-limit Margin (2-20 Allowed).");
+			bot->Notice(theClient, "Invalid floating-limit period (20-200 Allowed).");
 			return true;
 		}
 
-	if (limit_offset <= theChan->getLimitGrace())
-		{
-			bot->Notice(theClient, "FLOATMARGIN cannot be less than or equal to FLOATGRACE.");
-			return true;
-		}
-
-	theChan->setLimitOffset(limit_offset);
+	theChan->setLimitPeriod(limit_period);
 	theChan->commit();
 
-	bot->Notice(theClient, "Floating-limit Margin now set to %i", limit_offset);
+	bot->Notice(theClient, "Floating-limit period now set to %i", limit_period);
 	return true;
 	}
 
