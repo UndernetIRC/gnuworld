@@ -1,0 +1,36 @@
+# What nickname should the bot use?
+nickname = DS
+
+# What username should the bot use?
+username = dronescan
+
+# What hostname should the bot use?
+hostname = undernet.org
+
+# What should the bots real name be?
+userdescription = Drone Scanner
+
+# What user modes should the bot use?
+mode = +idk
+
+# Console channel name and initial modes
+consoleChannel = #ds.console
+consoleChannelModes = +ntsim
+
+# Margins
+# Be careful with these. I wouldn't touch chanMargin too much but I suspect
+# nickMargin will need tweaking from network to network. These defaults were
+# taken from a fairly old burst from a small (2k5 user) network so beware!
+
+# The fraction of users who must be `abnormal' in a channel for the channel
+# to be reported.
+channelMargin = 0.75
+
+# The margin around the average entropy within which a nickname is considered
+# `normal'. Outside this margin is `abnormal'. Note this is the margin *either
+# side* of the center, ie 0.25 would give a 50% spread - from 25% to 75%.
+nickMargin = 0.26
+
+# The channel cutoff is the minimum amount of members a channel must have before
+# it can be considered a drone channel.
+channelCutoff = 10
