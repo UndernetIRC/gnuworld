@@ -9,7 +9,7 @@
  * Caveats: None
  * 
  *
- * $Id: REMUSERCommand.cc,v 1.9 2001/02/27 18:57:44 gte Exp $
+ * $Id: REMUSERCommand.cc,v 1.10 2001/03/03 01:51:55 gte Exp $
  */
 
 #include	<string>
@@ -21,7 +21,7 @@
 #include	"libpq++.h"
 #include	"responses.h"
 
-const char REMUSERCommand_cc_rcsId[] = "$Id: REMUSERCommand.cc,v 1.9 2001/02/27 18:57:44 gte Exp $" ;
+const char REMUSERCommand_cc_rcsId[] = "$Id: REMUSERCommand.cc,v 1.10 2001/03/03 01:51:55 gte Exp $" ;
  
 namespace gnuworld
 {
@@ -166,11 +166,7 @@ bool REMUSERCommand::Exec( iClient* theClient, const string& Message )
 				string("Removed user %s from %s")).c_str(), 
 			targetUser->getUserName().c_str(), theChan->getName().c_str());
 	} else {
-		bot->Notice(theClient, 
-			bot->getResponse(theUser,
-				language::its_bad_mmkay,
-				string("Something went wrong: %s")).c_str(), 
-			bot->SQLDb->ErrorMessage()); // Log to msgchan here.
+		bot->dbErrorMessage(theClient); 
  	}
  
 	/* Remove tmpLevel from the cache. (It has to be there, we just got it even if it wasnt..)

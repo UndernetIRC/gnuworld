@@ -16,7 +16,7 @@
  *
  * Caveats: None.
  *
- * $Id: BANCommand.cc,v 1.18 2001/03/02 19:30:41 gte Exp $
+ * $Id: BANCommand.cc,v 1.19 2001/03/03 01:51:55 gte Exp $
  */
 
 #include	<string>
@@ -31,7 +31,7 @@
 #include	"responses.h"
 #include	"match.h"
 
-const char BANCommand_cc_rcsId[] = "$Id: BANCommand.cc,v 1.18 2001/03/02 19:30:41 gte Exp $" ;
+const char BANCommand_cc_rcsId[] = "$Id: BANCommand.cc,v 1.19 2001/03/03 01:51:55 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -286,27 +286,40 @@ for(Channel::userIterator chanUsers = theChannel->userList_begin(); chanUsers !=
 		}
 	} // for()
 
-/* Set the ban :) */
-theChannel->setBan(banTarget);
- 
-/* Kick 'em all out. */
-
 if (banLevel == 42) banReason = "..I'll have a pan-galactic gargleblaster please!";
-
-string finalReason = "(" + theUser->getUserName() + ") " + banReason; 
-if( !clientsToKick.empty() )
+ 
+/*
+ * If this ban level is < 75, we don't kick the user, we simply don't
+ * allow any of the matching hosts to be opped anymore.
+ */ 
+if (banLevel < 75)
 	{
-	// TODO: Use xClient::Ban() here 
-	strstream s;
-	s	<< bot->getCharYYXXX() << " M " << theChannel->getName()
-		<< " +b " << banTarget << ends;
+		bot->DeOp(theChannel, clientsToKick);
+	} else
+	{ 
+	/*
+	 *  Otherwise, > 100 bans result in the user being kicked out
+	 *  and a ban placed on the channel.
+	 */
+	string finalReason = "(" + theUser->getUserName() + ") " + banReason; 
+	if( !clientsToKick.empty() )
+		{
+		// TODO: Use xClient::Ban() here 
+		strstream s;
+		s	<< bot->getCharYYXXX() << " M " << theChannel->getName()
+			<< " +b " << banTarget << ends;
+		
+		bot->Write( s );
+		delete[] s.str();
 	
-	bot->Write( s );
-	delete[] s.str();
-
-	bot->Kick( theChannel, clientsToKick, finalReason ) ;
+		bot->Kick( theChannel, clientsToKick, finalReason ) ;
+	
+		/* Update GNUWorld */
+		theChannel->setBan(banTarget); 
+		} 
 	} 
 
+ 
 /*
  *  Fill out new ban details.
  */

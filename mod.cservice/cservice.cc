@@ -286,6 +286,7 @@ if( PGRES_TUPLES_OK == status )
 
 		newChan->setAllMembers(i);
 		sqlChannelCache.insert(sqlChannelHashType::value_type(newChan->getName(), newChan));
+		sqlChannelIDCache.insert(sqlChannelIDHashType::value_type(newChan->getID(), newChan));
 
 		/*
 		 *  Check the auto-join flag is set, if so - join. :)
@@ -1742,6 +1743,10 @@ if(!reggedChan)
 
 // List of clients to deop.
 vector< iClient* > deopList;
+// Channel bans.
+vector< sqlBan*>* banList;
+banList = getBanRecords(reggedChan);
+ 
 int deopCounter = 0;
 
 for( xServer::opVectorType::const_iterator ptr = theTargets.begin() ;
@@ -1780,6 +1785,11 @@ for( xServer::opVectorType::const_iterator ptr = theTargets.begin() ;
 				deopList.push_back(tmpUser->getClient());
 				}
 			}	
+
+		/*
+		 *  The 'Fun' Part. Scan through channel bans to see if this hostmask
+		 *  is 'banned'.
+		 */
 		} // if()
 	else
 		{
@@ -1792,7 +1802,8 @@ for( xServer::opVectorType::const_iterator ptr = theTargets.begin() ;
 			logAdminMessage("I've been deopped on %s!",
 				reggedChan->getName().c_str());
 			/* Add this chan to the reop queue, ready to op itself in 15 seconds. */
-//			 reopQ.push(reopQType::value_type(currentTime() + 15, reggedChan->getName()) );
+			reopQ.insert(cservice::reopQType::value_type(reggedChan->getName(),
+				currentTime() + 15) ); 
 			}
 		}
 	} // for()
@@ -1825,11 +1836,11 @@ if( !deopList.empty() )
  *  If so, suspend and kick 'em.
  */
 
-if ((theChanUser) && (deopCounter >= reggedChan->getMassDeopPro()))
+if ((theChanUser) && (deopCounter >= reggedChan->getMassDeopPro()) 
+	&& (reggedChan->getMassDeopPro() > 0))
 	{
-	Notice(theChanUser->getClient(),
-		"You just deopped more than %i people", 
-	reggedChan->getMassDeopPro());
+		doInternalBanAndKick(reggedChan, theChanUser->getClient(),
+			"### MASSDEOPPRO TRIGGERED! ###");
 	} 
 }
 
@@ -2113,14 +2124,14 @@ bool cservice::checkBansOnJoin( Channel* netChan, sqlChannel* theChan,
 {
 vector< sqlBan* >* banList = getBanRecords(theChan);
 vector< sqlBan* >::iterator ptr = banList->begin();
-//bool deleted = false;
 
 while (ptr != banList->end())
 	{
 	sqlBan* theBan = *ptr; 
 
 	// TODO: Ban through the server, this method
-	// is not updating the network data tables
+	// is not updating the network data tables.
+	// -- No method available to ban by specified mask in API.
 	/* Matching ban? */ 
 	if( (match(theBan->getBanMask(),
 		theClient->getNickUserHost()) == 0) &&
@@ -2136,6 +2147,8 @@ while (ptr != banList->end())
 		
 		Write( s );
 		delete[] s.str(); 
+
+		netChan->setBan( theBan->getBanMask() ) ;
 
 		/* Don't kick banned +k bots */
 		if ( !theClient->getMode(iClient::MODE_SERVICES) )
@@ -2282,14 +2295,45 @@ theChan->setLastTopic(currentTime());
 }	
 
 /**
- * Bans a user via IRC and the database with 'theReason' and then kicks.
+ * Bans a user via IRC and the database with 'theReason',
+ * and then kicks. theChan cannot be null.
  */
 bool cservice::doInternalBanAndKick(sqlChannel* theChan,
 	iClient* theClient, const string& theReason)
+{ 
+/* Fetch the banVector for this channel */
+vector< sqlBan* >* banList = getBanRecords(theChan);
+
+/* Create a new Ban record */
+sqlBan* newBan = new (nothrow) sqlBan(SQLDb);
+assert( newBan != 0 ) ;
+
+string banTarget = Channel::createBan(theClient);
+
+newBan->setChannelID(theChan->getID());
+newBan->setBanMask(banTarget);
+newBan->setSetBy(nickName);
+newBan->setSetTS(currentTime());
+newBan->setLevel(25);
+/* Move 360 to config */
+newBan->setExpires( 300 + currentTime());
+newBan->setReason(theReason);
+	
+/* Insert to our internal List. */ 
+banList->push_back(newBan); 
+
+/* Insert this new record into the database. */
+newBan->insertRecord();
+
+Channel* netChan = Network->findChannel(theChan->getName());
+if (!netChan) // Oh dear?
 {
-// TODO: Not implemented at all
-//vector< sqlBan* >* banList = getBanRecords(theChan); 
-return false ;
+	return true;
+}
+ 
+Kick( netChan, theClient, theReason ) ;
+
+return true ;
 }
 
 /**

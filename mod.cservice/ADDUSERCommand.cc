@@ -11,7 +11,7 @@
  *
  * Caveats: None
  *
- * $Id: ADDUSERCommand.cc,v 1.14 2001/03/02 19:30:41 gte Exp $
+ * $Id: ADDUSERCommand.cc,v 1.15 2001/03/03 01:51:55 gte Exp $
  */
  
 #include	<string>
@@ -23,7 +23,7 @@
 #include	"libpq++.h"
 #include	"responses.h"
 
-const char ADDUSERCommand_cc_rcsId[] = "$Id: ADDUSERCommand.cc,v 1.14 2001/03/02 19:30:41 gte Exp $" ;
+const char ADDUSERCommand_cc_rcsId[] = "$Id: ADDUSERCommand.cc,v 1.15 2001/03/03 01:51:55 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -221,12 +221,8 @@ if( PGRES_COMMAND_OK == status )
 	}
 else
 	{
-	bot->Notice(theClient, 
-		bot->getResponse(theUser,
-			language::its_bad_mmkay).c_str(),
-		bot->SQLDb->ErrorMessage());
-	// TODO: Log to msgchan here.
- 	}
+		bot->dbErrorMessage(theClient);
+	}
 
 delete[] theQuery.str() ;
 

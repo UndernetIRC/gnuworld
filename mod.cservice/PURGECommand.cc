@@ -8,7 +8,7 @@
  *
  * Caveats: None
  *
- * $Id: PURGECommand.cc,v 1.5 2001/02/16 20:20:26 plexus Exp $
+ * $Id: PURGECommand.cc,v 1.6 2001/03/03 01:51:55 gte Exp $
  */
  
 #include	<string>
@@ -21,7 +21,7 @@
 #include	"Network.h"
 #include	"responses.h"
 
-const char PURGECommand_cc_rcsId[] = "$Id: PURGECommand.cc,v 1.5 2001/02/16 20:20:26 plexus Exp $" ;
+const char PURGECommand_cc_rcsId[] = "$Id: PURGECommand.cc,v 1.6 2001/03/03 01:51:55 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -124,16 +124,13 @@ bool PURGECommand::Exec( iClient* theClient, const string& Message )
 		bot->writeChannelLog(theChan, theClient, sqlChannel::EV_JOIN, "");
 
 		/* Remove from cache.. part channel. */
-		bot->sqlChannelCache.erase(theChan->getName()); 
+		bot->sqlChannelCache.erase(theChan->getName());
+		bot->sqlChannelIDCache.erase(theChan->getID());
 		bot->getUplink()->UnRegisterChannelEvent( theChan->getName(), bot ) ;
 		bot->Part(theChan->getName());
 		delete(theChan); 
 	} else {
-		bot->Notice(theClient, 
-			bot->getResponse(theUser,
-				language::its_bad_mmkay,
-				string("Something went wrong: %s")).c_str(), 
-			bot->SQLDb->ErrorMessage()); // Log to msgchan here?
+	 	bot->dbErrorMessage(theClient);
  	}
 
  	

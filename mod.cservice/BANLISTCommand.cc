@@ -11,7 +11,7 @@
  *
  * Caveats: None.
  *
- * $Id: BANLISTCommand.cc,v 1.5 2001/02/16 20:20:26 plexus Exp $
+ * $Id: BANLISTCommand.cc,v 1.6 2001/03/03 01:51:55 gte Exp $
  */
 
 #include        <string>
@@ -23,7 +23,7 @@
 #include        "levels.h"
 #include        "responses.h"
 
-const char BANLISTCommand_cc_rcsId[] = "$Id: BANLISTCommand.cc,v 1.5 2001/02/16 20:20:26 plexus Exp $" ;
+const char BANLISTCommand_cc_rcsId[] = "$Id: BANLISTCommand.cc,v 1.6 2001/03/03 01:51:55 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -49,18 +49,16 @@ if (!tmpChan)
 	return false;
 	}
 	
-/* Check if the user is in the channel. */
-vector< string > channels;
-bool inChan = 0;
+/* Check if the user is in the channel. */ 
+bool inChan = false;
 
 for(iClient::const_channelIterator ptr = theClient->channels_begin();
 	ptr != theClient->channels_end(); ++ptr)
-	{
-	if(strcasecmp(st[1].c_str(), (*ptr)->getName().c_str()) == 0)
-		{
+	{ 
+	if((*ptr) == tmpChan)
+		{ 
 		inChan = true;
-		}
-	channels.push_back((*ptr)->getName());
+		} 
 	} // for()
 
 /* Do only show the banlist, if the user is in the channel. */
@@ -84,7 +82,7 @@ if( 0 == tmpChan->banList_size() )
 	{
 	bot->Notice(theClient,
 		bot->getResponse(theUser,
-			language::youre_not_in_chan,
+			0,
 			string("%s: ban list is empty.")).c_str(),
 		st[1].c_str());
 	}
