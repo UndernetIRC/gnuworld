@@ -3,7 +3,7 @@
  */
 
 #ifndef __CCONTROL_H
-#define __CCONTROL_H "$Id: ccontrol.h,v 1.76 2002/08/11 00:58:07 reedloden Exp $"
+#define __CCONTROL_H "$Id: ccontrol.h,v 1.77 2002/08/11 01:03:21 reedloden Exp $"
 
 //Undef this if you want to log to the database
 #define LOGTOHD 
@@ -133,8 +133,7 @@ protected:
 	exceptionListType		exceptionList;
 	
 	
-	//typedef map<string,int> 	clientsIpMapType;
-	typedef hash_map<string , int , eHash , eqstr> clientsIpMapType;
+	typedef map<string,int> 	clientsIpMapType;
 	
 	typedef clientsIpMapType::iterator clientsIpIterator;
 	
