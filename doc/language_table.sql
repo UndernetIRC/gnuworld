@@ -1578,178 +1578,179 @@ COPY "translations" FROM stdin;
 \.
 
 -- Turkish language definition.
--- 16/07/2001 - ChatHasan <chathasan@turksystems.org>
+-- 21/08/01 - Mehmet Akçin <cavalry@ircdestek.org>.
+-- 21/08/01 - Ozan Ferah <claymore@ircdestek.org>.
 
 COPY "translations" FROM stdin;
-12	1	Kusura Bakmayin, %s olarak zaten login oldunuz	31337
-12	2	%s olarak ERISIM GERCEKLESTI	31337
-12	3	Kusura Bakmayin, Bu komutu kullanmaniz icin access seviyeniz yeterli degil	31337
-12	4	Kusura Bakmayin, %s kanali boþtur	31337
-12	5	%s hicbir yerde bulunamadý	31337
-12	6	%s þahsý %s kanalýnda bulunamadý	31337
-12	7	%s Kanali kayitli olarak gorunmuyor	31337
-12	8	%s tarafindan Op aldiniz (%s)	31337
-12	9	%s tarafindan voice aldiniz (%s)	31337
-12	10	%s: Siz bu kanalda degilsiniz	31337
-12	11	%s zaten %s kanalinda Op aldý	31337
-12	12	%s zaten %s kanalinda voice aldý	31337
-12	13	%s tarafindan Op'unuz alindi (%s)	31337
-12	14	%s tarafindan Voice'niz alindi (%s)	31337
-12	15	%s þahsý %s kanalinda Op degil	31337
-12	16	%s þahsý %s kanalinda Voice'li degil	31337
-12	17	%s olarak ERISIM BASARISIZ (Hatalý Þifre)	31337
-12	18	Ben o kanalda degilim!	31337
-12	19	Hatalý BanLevel seviyesi. Dogru seviye 1-%i arasinda olmalýdýr.	31337
-12	20	Hatalý Ban zamaný. Ban zamanýnýz maksimum 336 saat olabilir.	31337
-12	21	Ban sebebi 128 karakter gecmemelidir	31337
-12	22	Belirtilen Ban zaten benim BanListemde!	31337
-12	23	%s baný zaten %s baný tarafýndan kapsanmaktadýr.	31337
-12	24	Hatalý minimum seviye.	31337
-12	25	Hatalý maksimum seviye.	31337
-12	26	KULLANICI: %s SEVIYE: %s %s	31337
-12	27	KANAL: %s -- AUTOMODE: %s	31337
-12	28	SON DEGISIM: %s (%s once)	31337
-12	29	** SUSPEND EDILDI ** - %s 'da iptal olacak (Level %i)	31337
-12	30	SON ZIYARET: %s once.	31337
-12	31	15 adet kayýttan daha fazlasi mevcuttur.	31337
-12	32	Lutfen isteginizi sinirlayiniz.	31337
-12	33	Access Listesinin Sonu.	31337
-12	34	Uyan birsey yok!	31337
-12	35	Sizin Access seviyenizden fazla veya sizinkine eþit access veremezsiniz.	31337
-12	36	Hatalý Access Seviyesi.	31337
-12	37	%s zaten %s kanalina %i access seviyesiyle eklenmisti.	31337
-12	38	%s kullanicisi %s kanalina %i access seviyesiyle eklendi.	31337
-12	39	Birsey yanlis yapildi: %s	31337
-12	40	%s: Ban Listesinin Sonu.	31337
-12	41	Kullanici Detaylari Goruntulenemiyor (Gorunmez)	31337
-12	42	Kullanici Hakkinda Bilgi: %s (%i)	31337
-12	43	Þu anda login: %s	31337
-12	44	URL: %s	31337
-12	45	Dil: %i	31337
-12	46	Kanal(lar): %s	31337
-12	47	Giren Flood Sayýsý: %i	31337
-12	48	Çýkan Flood (Bytes): %i	31337
-12	49	%s kanalini kayit eden kisi:	31337
-12	50	%s - Son Ziyaret: %s once	31337
-12	51	Açýklama: %s	31337
-12	52	Bana Flood mu yapicaksin? Artik seni dinlemeyecegim.	31337
-12	53	Dusundum ki sana cok fazla data yolladim, Seni bir sureligine ignore edecegim.	31337
-12	54	Komut Tam Degil.	31337
-12	55	%s kullanmak icin, Bunu kullanin /msg %s@%s	31337
-12	56	Kusura Bakmayin, Bu komutu kullanmak icin Login olmalisiniz.	31337
-12	57	%s kanali bir cservice administrator tarafindan suspend edilmistir.	31337
-12	58	%s kanalindaki access'iniz suspend edilmistir.	31337
-12	59	NOOP %s kanalinda ayarlandi.	31337
-12	60	STRICTOP %s kanalinda ayarlandi.	31337
-12	61	%i kisiden daha fazlasinin Op'unu aldiniz.	31337
-12	62	KULLANIM: %s	31337
-12	63	%s kanalindaki access seviyeniz simdilik %i seviyesine arttirildi.	31337
-12	64	%s kanali kayitlidir.	31337
-12	65	%s kanali kayitli degildir.	31337
-12	66	%s bunu takdir etmeyecektir.	31337
-12	67	\002*** %s kanalinin Ban Listesi ***\002	31337
+12	1	Üzgünüm, %s olarak zaten tanýmlýsýnýz.	31337
+12	2	%s olarak TANIMLAMA BAÞARILI	31337
+12	3	Üzgünüm, o komutu uygulamak için yeterli eriþiminiz yok	31337
+12	4	Üzgünüm, %s kanalý boþ	31337
+12	5	%s hiçbir yerde görünmüyor	31337
+12	6	%s rumuzunu %s kanalýnda göremiyorum	31337
+12	7	%s kanalý kayýtlý olarak gözükmüyor	31337
+12	8	%s size operatörlük yetkisi verdi (%s)	31337
+12	9	%s size konuþma yetkisi verdi (%s)	31337
+12	10	%s: Siz kanalda deðilsiniz	31337
+12	11	%s zaten %s kanalýnda operatör durumunda	31337
+12	12	%s zaten %s kanalýnda konuþma durumunda	31337
+12	13	%s tarafýndan operatörlük yetkiniz alýndý (%s)	31337
+12	14	%s tarafýndan konuþma yetkiniz alýndý (%s)	31337
+12	15	%s için %s kanalýnda operatörlük yetkisi yok	31337
+12	16	%s için %s kanalýnda konuþma yetkisi yok	31337
+12	17	%s kanalýnda TANIMLAMA BAÞARISIZ (Geçersiz Þifre)	31337
+12	18	Ben o kanalda deðilim!	31337
+12	19	Geçersiz yasaklama-seviye dizisi. Geçerli dizi 1-%i olmalý.	31337
+12	20	Geçersiz yasaklama süresi. Sizin yasaklama süreniz en fazla 336 saat olabilir.	31337
+12	21	Yasaklama sebebi 128 karakteri aþmamalýdýr	31337
+12	22	Belirtilen yasaklama zaten benim yasaklýlar listemde!	31337
+12	23	%s yasaklamasý zaten %s ile kapsanmýþ durumda	31337
+12	24	Geçersiz en az seviye.	31337
+12	25	Geçersiz en fazla seviye.	31337
+12	26	KULLANICI: %s ERÝÞÝM: %s %s	31337
+12	27	KANAL: %s -- OTOMOD: %s	31337
+12	28	SON DEÐÝÞÝM: %s (%s önce)	31337
+12	29	** ASKIYA ALINMIÞ ** - %s içinde süresi dolacak (Seviye %i)	31337
+12	30	SON GÖRÜÞ: %s önce.	31337
+12	31	15'den fazla eþleþen giriþ var.	31337
+12	32	Lütfen soruyu sýnýrlandýrýn.	31337
+12	33	Eriþim listesi sonu	31337
+12	34	Eþleþme Yok!	31337
+12	35	Sizikine eþit ya da yüksek seviye ile kullanýcý ekleyemezsiniz.	31337
+12	36	Geçersiz eriþim seviyesi.	31337
+12	37	%s zaten %s kanalýnda %i eriþim seviyesi ile eklenmiþ.	31337
+12	38	%s kullanýcýsý %s kanalýnda %i eriþim seviyesi ile eklendi	31337
+12	39	Birþeyde aksama oldu: %s	31337
+12	40	%s: Yasaklýlar listesi sonu	31337
+12	41	Kullanýcý detaylarý listelenemedi (Görünmez)	31337
+12	42	Hakkýnda bilgiler: %s (%i)	31337
+12	43	Þu anda giriþ yapmýþ olan: %s	31337
+12	44	Site: %s	31337
+12	45	Lisan: %i	31337
+12	46	Kanallar: %s	31337
+12	47	Giren Yüklenme Puaný: %i	31337
+12	48	Çýkan Yüklenme (Bit): %i	31337
+12	49	%s kanalýný kayýt ettirmiþ olan:	31337
+12	50	%s - son görüþ: %s önce	31337
+12	51	Taným: %s	31337
+12	52	Bana yükleme yapmaya devam edecek misin? Bundan sonra seni dinlemeyeceðim	31337
+12	53	Düþünüyorum da sana biraz fazla bilgi yolladým, seni bir süre önemsemeyeceðim.	31337
+12	54	Noksan komut	31337
+12	55	%s komutunu kullanmak için, yapmanýz gereken /msg %s@%s	31337
+12	56	Üzgünüm, bu komutu kullanmak için tanýmlanmalýsýnýz.	31337
+12	57	%s kanalý bir cservice yöneticisi tarafýndan geçici olarak kapatýlmýþ.	31337
+12	58	%s kanalýndaki eriþiminiz askýya alýnmýþ.	31337
+12	59	%s kanalýnda NOOP özelliði aktif hale getirilmiþtir	31337
+12	60	%s kanalýnda STRICTOP özelliði aktif hale getirilmiþtir	31337
+12	61	Biraz önce %i kiþiden fazlasýndan operatörlük yetkisi aldýnýz	31337
+12	62	SÖZDÝZÝMÝ: %s	31337
+12	63	%s kanalýnda eriþiminiz geçici olarak %i olarak yükseltildi	31337
+12	64	%s kayýtlý.	31337
+12	65	%s kayýtsýz.	31337
+12	66	%s kanalýnýn bunu takdir edeceðini sanmýyorum.	31337
+12	67	\002*** %s için Yasaklýlar Listesi ***\002	31337
 12	68	%s %s Seviye: %i	31337
 12	69	EKLEYEN: %s (%s)	31337
-12	70	ACILIS: %s	31337
-12	71	BITIS: %s	31337
+12	70	BAÞLANGIÇ: %s	31337
+12	71	SONA ERÝÞ: %s	31337
 12	72	\002*** SON ***\002	31337
-12	73	%s kullanicisinin kim oldugunu bilmiyorum.	31337
-12	74	Benim ile olan Erisiminiz Kesilmistir.	31337
-12	75	%s kullanicisinin %s kanalinda access'i yoktur.	31337
-12	76	Sizinle ayný veya sizden yuksek access seviyesine sahip kullanicilari modifiye edemezsiniz.	31337
-12	77	Bir Kullaniciya sizinle ayný veya sizden yuksek access seviyesi veremezsiniz.	31337
-12	78	%s kullanicisinin access seviyesi %s kanalinda %i olarak modifiye edilmistir.	31337
-12	79	AUTOMODE degiskenini %s kullanicisi icin %s kanalinda OP olarak ayarlayin.	31337
-12	80	AUTOMODE degiskenini %s kullanicisi icin %s kanalinda VOICE olarak ayarlayin.	31337
-12	81	AUTOMODE degiskenini %s kullanicisi icin %s kanalinda NONE olarak ayarlayin.	31337	
-12	82	Sifreniz Username'iniz veya su andaki nick'iniz ile ayni olamaz  - Kullanim: NEWPASS <yeni sifreniz>	31337
-12	83	Sifreniz basariyla degistirildi.	31337
-12	84	NOOP opsiyonu %s icin ayarlandý.	31337
-12	85	STRICTOP opsiyonu %s icin ayarlandý (ve %s login degil)	31337
-12	86	STRICTOP opsiyonu %s icin ayarlandý (ve %s yetersiz access seviyesine sahip)	31337
-12	87	%s kanali kapatildi yani Purge edildi.	31337
-12	88	%s zaten bende kayitli durumda.	31337
-12	89	Hatalý Kanal Adý.	31337
-12	90	%s kanali Kayit edildi.	31337
-12	91	%s susturulmuslar listemden silindi.	31337
-12	92	%s kullanicisini susturulmuslar listemde bulamadim.	31337
-12	93	Sizin access seviyenize eþit veya sizden yuksek bir kullaniciyi silemezsiniz.	31337
-12	94	Sahibi oldugunuz bir kanaldan kendinizi silemezsiniz.	31337
-12	95	%s kullanicisi %s kanalindan silindi.	31337
-12	96	GORUNMEZLIK ayarýnýz su anda ON (ACIK)	31337
-12	97	GORUNMEZLIK ayarýnýz su anda OFF (KAPALI)	31337
-12	98	%s %s için %s 'dir.	31337
-12	99	%s ayari ON (ACIK) veya OFF (KAPALI) olmalidir.	31337
-12	100	USERFLAGS ayari hatali. Dogru degerler: 0, 1, 2.	31337
-12	101	%s için USERFLAGS %i olarak ayarlandi.	31337
-12	102	MASSDEOPPRO degeri 0-7 olmalidir.	31337
-12	103	%s için MASSDEOPPRO %d olarak ayarlandi.	31337
-12	104	FLOODPRO degeri 0-7 olmalidir.	31337
-12	105	%s için FLOODPRO %d olarak ayarlandi.	31337
-12	106	DESCRIPTION (ACIKLAMA) maksimum 80 karakter olmalidir!	31337
-12	107	%s için DESCRIPTION (ACIKLAMA) temizlendi.	31337
-12	108	%s DESCRIPTION (ACIKLAMA): %s	31337
-12	109	URL maksimum 75 karakter olmalidir!	31337
-12	110	%s için URL temizlendi.	31337
-12	111	%s için URL: %s	31337
-12	112	Keyword'ler maksimum 80 karakteri gecmemelidir!	31337
-12	113	%s için KEYWORD'LER: %s	31337
-12	114	Dil ayarýnýz %s olmustur.	31337
-12	115	HATA: Yanlýs Dil Seçimi.	31337
-12	116	%s kanalini Network'de bulamiyorum!	31337
-12	117	HATA: Yanlýs Kanal Ayarý.	31337
-12	118	Ignore listesi:	31337
-12	119	Ignore listesi boþtur	31337
-12	120	-- Ignore Listesinin Sonu	31337
-12	121	CMaster Kanal Servislerinin iç statusu:	31337
-12	122	[     Kanal Kayýt Istatistigi] \002Saklanmýs Kayýtlar:\002 %i    \002DB Basvurularý:\002 %i    \002Saklý Hits:\002 %i    \002Verimlilik:\002 %.2f%%	31337
-12	123	[        Kullanici Kayýt Istatistigi] \002Saklanmýs Kayýtlar:\002 %i    \002DB Basvurularý:\002 %i    \002Saklý Hits:\002 %i    \002Verimlilik:\002 %.2f%%	31337
-12	124	[Access Seviyesi Kayýt Istatistigi] \002Saklanmýs Kayýtlar:\002 %i    \002DB Basvurularý:\002 %i    \002Saklý Hits:\002 %i    \002Verimlilik:\002 %.2f%%	31337
-12	125	[         Ban Kayýt Istatistigi] \002Saklanmýs Kayýtlar:\002 %i    \002DB Basvurularý:\002 %i    \002Saklý Hits:\002 %i    \002Verimlilik:\002 %.2f%%	31337
-12	126	Son Alinan Kullanici BILDIRISI: %i	31337
-12	127	Son Alinan Kanal BILDIRISI: %i	31337
-12	128	Son Alinan Seviye BILDIRISI: %i	31337
-12	129	Son Alinan Ban BILDIRISI: %i	31337
-12	130	Custom data containers allocated: %i	31337
-12	131	\002Calistigi Zaman(Uptime):\002 %s	31337
-12	132	Kanal %s 'in kullanici sayisi %d (%i operator)	31337
-12	133	Modlar: %s	31337
-12	134	Ayarlý Opsiyonlar: %s	31337
-12	135	Sizin access seviyenize eþit veya sizinkinden fazla olan bir kullanýcýyý suspend edemezsiniz.	31337
-12	136	Hatalý zaman birimi.	31337
-12	137	Hatalý suspend zamaný.	31337
-12	138	%s için SUSPEND Kaldirildi.	31337
-12	139	%s zaten %s kanalinda Suspend edilmistir.	31337
-12	140	%s için SUSPENSION %s 'de kaldirilacak.	31337
-12	141	HATA: Topic 145 karakteri gecmemelidir.	31337
-12	142	%s baninini %s kanalinin database'inden kaldirmaniz icin yeterli access seviyeniz yoktur.	31337
-12	143	%i banlari %s baninin içinde oldugundan silinmistir.	31337
-12	144	Simdilik olan %i access'iniz %s kanalindan silinmistir.	31337
-12	145	%s kanalinda Zorlanmýs Resmi Access Seviyeniz gozukmuyor, zaman asimina ugramis olmasin?	31337
-12	146	%s kullanicisi %s kanalinda suspend edilmemistir.	31337
-12	147	%s bir IRC operator'dur.	31337
-12	148	%s kullanicisi login DEGILDIR.	31337
-12	149	%s kullanicisi %s%s olarak login olmustur.	31337
-12	150	%s Resmi bir CService Representative'dir%s ve %s olarak login olmustur.	31337
-12	151	%s Resmi bir CService Administrator'dur%s ve %s olarak login olmustur.	31337
-12	152	%s Resmi bir CService Developer'dir%s ve %s olarak login olmustur.	31337
-12	153	%i kayýttan daha fazlasý mevcuttur: [%s]	31337
-12	154	Lutfen aradiginiz mask'i sinirlayin.	31337
-12	155	[%s] için uyan bir kayýt yoktur.	31337
-12	156	%s: Kanal modlari temizlendi.	31337
-12	158	Hatalý Opsiyon.	31337
-12	159	%s Resmi bir Undernet Servis Bot'dur.	31337
-12	160	%s Resmi bir Coder-Com Representative'dir%s ve %s ile login olmustur.	31337
-12	161	%s Resmi bir Coder-Com Contributer'dir%s ve %s ile login olmustur.	31337
-12	162	%s Resmi bir Coder-Com Developer'dir%s ve %s ile login olmustur.	31337
-12	163	%s Resmi bir Coder-Com Senior'dur%s ve %s ile login olmustur.	31337
-12	164	 ve bir IRC operator	31337
-12	165	Added ban %s to %s at level %i	31337
-12	166	%s: Ban Listesi boþtur.		31337
+12	73	%s kimdir bilmiyorum.	31337
+12	74	Artýk bende tanýmlý deðilsiniz.	31337
+12	75	%s %s kanalýnda eriþimli gözükmüyor.	31337
+12	76	Sizinkine eþit ya da fazla eriþimli kullanýcýda deðiþiklik yapamazsýnýz.	31337
+12	77	Sizinkine eþit ya da fazla eriþim veremezsiniz.	31337
+12	78	%s için eriþim seviyesi %s kanalýnda %i olarak deðiþtirildi	31337
+12	79	%s kullanýcý adý için %s kanalýnda otomatik operatörlük verildi	31337
+12	80	%s kullanýcý adý için %s kanalýnda otomatik konuþma verildi	31337
+12	81	%s kullanýcý adý için %s kanalýnda otomatik seçeneði kaldýrýldý	31337	
+12	82	Þifre ibareniz kullanýcý adýnýz ya da þuanki rumuzunuz olamaz - sözdizimi: NEWPASS <yeni ibare>	31337
+12	83	Þifre deðiþimi baþarýlý.	31337
+12	84	%s kanalýnda NOOP özelliði aktif hale getirilmiþtir	31337
+12	85	%s kanalýnda STRICTOP özelliði aktif hale getirilmiþtir (ve %s tanýmlanmamýþ)	31337
+12	86	%s kanalýnda STRICTOP özelliði aktif hale getirilmiþtir (ve %s yetersiz eriþimli)	31337
+12	87	%s kanalý kapatýldý	31337
+12	88	%s zaten bende kayýtlý.	31337
+12	89	Geçersiz kanal ismi.	31337
+12	90	Kayýtlý kanal %s	31337
+12	91	%s sessizlik listemden çýkarýldý	31337
+12	92	%s sessizlik listemde bulunamadý	31337
+12	93	Sizinkine eþit ya da fazla eriþimli kullanýcýyý silemezsiniz	31337
+12	94	Kendinizi, sahibi olduðunuz kanaldan silemezsiniz	31337
+12	95	%s kullanýcýsý %s kanalýnda silindi	31337
+12	96	GÖRÜNMEZLÝK ayarýnýz açýldý.	31337
+12	97	GÖRÜNMEZLÝK ayarýnýz kapatýldý.	31337
+12	98	%s %s için %s	31337
+12	99	%s için deðer ON ya da OFF olmalý	31337
+12	100	Geçersiz USERFLAGS ayarý. Doðru deðerler 0, 1, 2.	31337
+12	101	%s için USERFLAGS ayarý %i	31337
+12	102	MASSDEOPPRO için deðer 0-7 olmalý	31337
+12	103	MASSDEOPPRO %s kanalý için %d yapýldý	31337
+12	104	FLOODPRO için deðer 0-7 olmalý	31337
+12	105	FLOODPRO %s kanalý için %d yapýldý	31337
+12	106	KANAL TANIMI en fazla 80 karakter olabilir	31337
+12	107	%s için KANAL TANIMI silindi.	31337
+12	108	%s için KANAL TANIMI: %s	31337
+12	109	Site adý en fazla 75 karakter olabilir!	31337
+12	110	%s için site adý silindi.	31337
+12	111	%s için site adý: %s	31337
+12	112	Anahtar kelimeler için dizgi 80 karakteri aþamaz!	31337
+12	113	%s için ANAHTAR KELÝMELER: %s	31337
+12	114	Lisan %s olarak belirlendi.	31337
+12	115	HATA: Geçersiz lisan seçimi.	31337
+12	116	Aðda %s kanalýnýn yeri saptanamýyor!	31337
+12	117	HATA: Geçersiz kanal ayarý.	31337
+12	118	Önemsenmeyenler listesi:	31337
+12	119	Önemsenmeyenler listesi boþ	31337
+12	120	-- Önemsenmeyenler listesi sonu	31337
+12	121	CMaster Kanal Servisleri dahili statüsü:	31337
+12	122	[     Kanal Kayýt Ýstatistikleri] \002Kaydedilmiþ giriþler:\002 %i    \002VT Ýstekleri:\002 %i    \002Kayýt hitleri:\002 %i    \002Verim:\002 %.2f%%	31337
+12	123	[        Kullanýcý Kayýt Ýstatistikleri] \002Kaydedilmiþ giriþler:\002 %i    \002VT Ýstekleri:\002 %i    \002Kayýt hitleri:\002 %i    \002Verim:\002 %.2f%%	31337
+12	124	[Eriþim Kayýt Ýstatistikleri] \002Kaydedilmiþ giriþler:\002 %i    \002VT Ýstekleri:\002 %i    \002Kayýt hitleri:\002 %i    \002Verim:\002 %.2f%%	31337
+12	125	[         Yasaklama Kayýt Ýstatistikleri] \002Kaydedilmiþ giriþler:\002 %i    \002VT Ýstekleri:\002 %i    \002Kayýt hitleri:\002 %i    \002Verim:\002 %.2f%%	31337
+12	126	Alýnan son Kullanýcý BÝLDÝRÝMÝ: %i	31337
+12	127	Alýnan son Kanal BÝLDÝRÝMÝ: %i	31337
+12	128	Alýnan son Seviye BÝLDÝRÝMÝ: %i	31337
+12	129	Alýnan son Yasaklama BÝLDÝRÝMÝ: %i	31337
+12	130	Belirli bilgi kaplarý tahsis edildi: %i	31337
+12	131	\002Açýk kaldýðý süre:\002 %s	31337
+12	132	%s kanalýnda %d tane kullanýcý var (%i operatör)	31337
+12	133	Mod: %s	31337
+12	134	Bayraklar: %s	31337
+12	135	Sizinkine eþit ya da fazla eriþimi olan kiþiyi askýya alamazsýnýz.	31337
+12	136	sahte zaman üniteleri	31337
+12	137	Geçersiz akýya alma süresi.	31337
+12	138	%s için ASKIYA ALMA iptal edildi	31337
+12	139	%s zaten %s kanalýnda askýya alýnmýþ durumda	31337
+12	140	%s için ASKIYA ALMA %s süre sonra dolacak	31337
+12	141	HATA: Baþlýk 145 karakteri aþamaz	31337
+12	142	%s yasaklamasýný %s kanalýnýn veri tabanýndan kaldýrmak için yetersiz eriþiminiz var	31337
+12	143	%i tane %s ile eþleþen yasaklama silindi	31337
+12	144	%i olan geçici eriþiminiz %s kanalýndan silindi	31337
+12	145	Güçlendirilmiþ eriþimin yok gibi görünüyor, belki süresi dolmuþtur?	31337
+12	146	%s %s kanalýnda askýya alýnmamýþ	31337
+12	147	%s bir IRC operatörü	31337
+12	148	%s tanýmlanmamýþ durumda.	31337
+12	149	%s %s%s olarak tanýmlý	31337
+12	150	%s Resmi bir CService Temsilcisi%s ve %s olarak tanýmlý	31337
+12	151	%s Resmi bir CService Yöneticisi%s ve %s olarak tanýmlý	31337
+12	152	%s Resmi bir CService Geliþtiricisi%s ve %s olarak tanýmlý	31337
+12	153	%i taneden daha fazla eþleþme var [%s]	31337
+12	154	Lütfen arama maskenizi sýnýrlandýrýn	31337
+12	155	[%s] için geçerli eþleþme yok	31337
+12	156	%s: Kanal modlarý temizlendi.	31337
+12	158	Geçersiz seçenek.	31337
+12	159	%s Resmi bir Undernet Servis Robotu.	31337
+12	160	%s Resmi bir Coder-Com Temsilcisi%s ve %s olarak tanýmlý	31337
+12	161	%s Resmi bir Coder-Com Katkýda Bulunucusu%s ve %s olarak tanýmlý	31337
+12	162	%s Resmi bir Coder-Com Geliþtiricisi%s ve %s olarak tanýmlý	31337
+12	163	%s Resmi bir Coder-Com Uzmaný%s ve %s olarak tanýmlý	31337
+12	164	 ve bir IRC operatörü	31337
+12	165	%z yasaklamasý %s kanalýnda %i seviye ile eklendi	31337
+12	166	%s: yasaklýlar listesi boþ.		31337
 12	167	Ben zaten o kanaldayým!	31337
-12	168	Bu komut sadece IRC Operator'ler icin gecerlidir.	31337
-12	169	%s kanalinda Op degilim.	31337
-12	170	%s %i dakika icin.	31337
+12	168	Bu komut IRC operatörlere ait	31337
+12	169	%s kanalýnda operatörlük yetkim yok	31337
+12	170	%s için %i dakika	31337
 \.
 
 -- Erik Torrissen / Mr_|r0n
