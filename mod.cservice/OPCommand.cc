@@ -17,7 +17,7 @@
  *
  * Caveats: None
  *
- * $Id: OPCommand.cc,v 1.19 2001/02/24 21:49:38 gte Exp $
+ * $Id: OPCommand.cc,v 1.20 2001/03/03 19:11:50 gte Exp $
  */
 
 #include	<string>
@@ -32,7 +32,7 @@
 
 using std::map ;
 
-const char OPCommand_cc_rcsId[] = "$Id: OPCommand.cc,v 1.19 2001/02/24 21:49:38 gte Exp $" ;
+const char OPCommand_cc_rcsId[] = "$Id: OPCommand.cc,v 1.20 2001/03/03 19:11:50 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -84,6 +84,7 @@ if (!theChan->getInChan())
 	return false;
 	}
  
+
 /*
  *  Check the user has sufficient access on this channel.
  */
@@ -104,6 +105,18 @@ if (!tmpChan)
 		theChan->getName().c_str());
 	return false;
 	} 
+ 
+/*
+ * Check we're actually opped first..
+ */
+
+ChannelUser* tmpBotUser = tmpChan->findUser(bot->getInstance());
+if (!tmpBotUser) return false; 
+if(!tmpBotUser->getMode(ChannelUser::MODE_O))
+		{
+		bot->Notice(theClient, "I'm not opped in %s", theChan->getName().c_str());
+		return false;
+		} 
 
 /*
  *  If the NOOP flag is set, we aren't allowed to op anyone.

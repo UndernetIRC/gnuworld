@@ -1299,6 +1299,13 @@ if (ptr->second <= currentTime())
 			
 			Write( s );
 			delete[] s.str();
+
+			/*
+			 *  Update the channel state.
+			 */
+
+			tmpChanUser->setMode(ChannelUser::MODE_O);
+
 			elog	<< "cservice::OnTimer> REOP "
 				<< tmpChan->getName()
 				<< endl;

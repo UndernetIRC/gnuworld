@@ -8,7 +8,7 @@
  *
  * Caveats: None
  *
- * $Id: DEOPCommand.cc,v 1.8 2001/02/24 21:49:38 gte Exp $
+ * $Id: DEOPCommand.cc,v 1.9 2001/03/03 19:11:50 gte Exp $
  */
 
 #include	<string>
@@ -23,7 +23,7 @@
 
 using std::map ;
 
-const char DEOPCommand_cc_rcsId[] = "$Id: DEOPCommand.cc,v 1.8 2001/02/24 21:49:38 gte Exp $" ;
+const char DEOPCommand_cc_rcsId[] = "$Id: DEOPCommand.cc,v 1.9 2001/03/03 19:11:50 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -90,7 +90,18 @@ bool DEOPCommand::Exec( iClient* theClient, const string& Message )
 			theChan->getName().c_str());
 		return false;
 	}
- 
+
+	/*
+	 * Check we're actually opped first..
+	 */
+
+	ChannelUser* tmpBotUser = tmpChan->findUser(bot->getInstance());
+	if (!tmpBotUser) return false;
+	if(!tmpBotUser->getMode(ChannelUser::MODE_O))
+			{
+			bot->Notice(theClient, "I'm not opped in %s", theChan->getName().c_str());
+			return false;
+			} 
 
 	if( st.size() < 3 ) // No nicks provided, assume we deop ourself. :)
 	{
