@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: Network.cc,v 1.48 2002/10/09 12:56:56 mrbean_ Exp $
+ * $Id: Network.cc,v 1.49 2002/11/20 17:56:17 mrbean_ Exp $
  */
 
 #include	<new>
@@ -42,7 +42,7 @@
 #include	"ip.h"
 
 const char xNetwork_h_rcsId[] = __NETWORK_H ;
-const char xNetwork_cc_rcsId[] = "$Id: Network.cc,v 1.48 2002/10/09 12:56:56 mrbean_ Exp $" ;
+const char xNetwork_cc_rcsId[] = "$Id: Network.cc,v 1.49 2002/11/20 17:56:17 mrbean_ Exp $" ;
 const char ELog_h_rcsId[] = __ELOG_H ;
 const char iClient_h_rcsId[] = __ICLIENT_H ;
 const char Channel_h_rcsId[] = __CHANNEL_H ;
@@ -852,6 +852,107 @@ size_t xNetwork::countHost( const string& hostName ) const
 {
 return static_cast< size_t >( findHost( hostName ).size() ) ;
 }
+
+
+list< const iClient* > xNetwork::matchRealHost( const string& wildHost ) const
+{
+list< const iClient* > retMe ;
+
+for( numericMapType::const_iterator ptr = numericMap.begin(),
+	endPtr = numericMap.end() ; ptr != endPtr ; ++ptr )
+	{
+	const iClient* clientPtr = ptr->second ;
+	if( !match( wildHost, clientPtr->getRealInsecureHost() ) ||
+		!match( wildHost,
+			xIP( clientPtr->getIP() ).GetNumericIP() ) )
+		{
+		// Found a match
+		retMe.push_back( clientPtr ) ;
+		}
+	}
+
+return retMe ;
+}
+
+list< const iClient* > xNetwork::matchRealUserHost(
+	const string& wildUserHost ) const
+{
+
+// Tokenize the wildUserHost into username and hostname
+StringTokenizer st( wildUserHost, '@' ) ;
+
+// Make sure there are exactly two tokens
+if( st.size() != 2 )
+	{
+	// Invalid format of wildUserHost, return empty list
+	return list< const iClient* >() ;
+	}
+
+// Get a list of matching hosts to that of wildUserHost
+list< const iClient* > matchingHosts = matchRealHost( st[ 1 ] ) ;
+
+// Were any found?
+if( matchingHosts.empty() )
+	{
+	// No matching hosts found, return the empty list
+	return matchingHosts ;
+	}
+
+// Create a list to return to the caller, create matchingHosts.size()
+// empty slots to speed up memory allocation
+list< const iClient* > retMe ;
+
+// Iterate through the list of matching hostnames
+for( list< const iClient* >::const_iterator ptr = matchingHosts.begin() ;
+	ptr != matchingHosts.end() ; ++ptr )
+	{
+	// Does this iClient's username also match that of the
+	// wildUserHost username?
+	if( !match( st[ 0 ], (*ptr)->getUserName() ) )
+		{
+		// Found a matching username
+		retMe.push_back( *ptr ) ;
+		}
+	}
+
+// Return the list of matching username and hostnames
+return retMe ;
+}
+
+size_t xNetwork::countMatchingRealUserHost( const string& wildUserHost ) const
+{
+return static_cast< size_t >( matchRealUserHost( wildUserHost ).size() ) ;
+}
+
+list< const iClient* > xNetwork::findRealHost( const string& hostName ) const
+{
+list< const iClient* > retMe ;
+
+for( numericMapType::const_iterator ptr = numericMap.begin(),
+	endPtr = numericMap.end() ; ptr != endPtr ; ++ptr )
+	{
+	const iClient* clientPtr = ptr->second ;
+
+	if( !strcasecmp( hostName, clientPtr->getRealInsecureHost() ) )
+		{
+		// Found a match
+		retMe.push_back( clientPtr ) ;
+		}
+	}
+
+return retMe ;
+}
+
+size_t xNetwork::countMatchingRealHost( const string& wildHost ) const
+{
+return static_cast< size_t >( matchRealHost( wildHost ).size() ) ;
+}
+
+size_t xNetwork::countRealHost( const string& hostName ) const
+{
+return static_cast< size_t >( findRealHost( hostName ).size() ) ;
+}
+
 
 list< const iClient* > xNetwork::matchRealName( const string& realName ) const
 {

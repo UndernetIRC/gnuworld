@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: Network.h,v 1.33 2002/10/29 19:38:29 dan_karrels Exp $
+ * $Id: Network.h,v 1.34 2002/11/20 17:56:16 mrbean_ Exp $
  */
 
 #ifndef __NETWORK_H
-#define __NETWORK_H "$Id: Network.h,v 1.33 2002/10/29 19:38:29 dan_karrels Exp $"
+#define __NETWORK_H "$Id: Network.h,v 1.34 2002/11/20 17:56:16 mrbean_ Exp $"
 
 #include	<vector>
 #include	<string>
@@ -554,6 +554,48 @@ public:
 	 * only the number of hosts found.
 	 */
 	virtual size_t	countHost( const string& hostName ) const ;
+
+	/**
+	 * Attempt to match the real hostname, which may include wildcard
+	 * characters, with any clients on the network.  Return a
+	 * list of pointers to const iClient's which match.
+	 */
+	virtual list< const iClient* > matchRealHost( const string& wildHost )
+			const ;
+	/**
+	 * Match the given user@host string, which may include
+	 * wildcards, to each client on the network.  Return a
+	 * list of pointers to const iClient's which match.
+	 */
+	virtual list< const iClient* >	matchRealUserHost( const string& )
+			const ;
+
+	/**
+	 * Attempt to find real hostnames which are equivalent to the given
+	 * hostname, found using a case insensitive search.
+	 * Return a list of pointers to const iClient's which are
+	 * found.
+	 */
+	virtual list< const iClient* > findRealHost( const string& hostName )
+			const ;
+
+	/**
+	 * Perform a similar match as to matchRealHost(), except return
+	 * only the number of matches found.
+	 */
+	virtual size_t	countMatchingRealHost( const string& wildHost ) const ;
+
+	/**
+	 * Perform a similar match as to matchRealUserHost(), except return
+	 * only the number of matches found.
+	 */
+	virtual size_t	countMatchingRealUserHost( const string& wildUserHost )
+				const ;
+	/**
+	 * Perform a similar operation as to findRealHost(), except return
+	 * only the number of hosts found.
+	 */
+	virtual size_t	countRealHost( const string& hostName ) const ;
 
 	/**
 	 * Match the given client real name string, which may include

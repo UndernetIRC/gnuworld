@@ -13,7 +13,7 @@
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 
-const char TRANSLATECommand_cc_rcsId[] = "$Id: TRANSLATECommand.cc,v 1.10 2002/05/23 17:43:11 dan_karrels Exp $";
+const char TRANSLATECommand_cc_rcsId[] = "$Id: TRANSLATECommand.cc,v 1.11 2002/11/20 17:56:17 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -51,12 +51,23 @@ if( NULL == theServer )
 	return false ;
 	}
 
-bot->Notice( theClient, "%s is %s!%s@%s on server %s",
-	st[ 1 ].c_str(),
-	Target->getNickName().c_str(),
-	Target->getUserName().c_str(),
-	Target->getInsecureHost().c_str(),
-	theServer->getName().c_str() ) ;
+if((Target->isModeR()) && (Target->isModeX()))
+	{
+	bot->Notice( theClient, "%s is %s (%s) on server %s",
+		st[ 1 ].c_str(),
+		Target->getNickUserHost().c_str(),
+		Target->getRealNickUserHost().c_str(),
+		theServer->getName().c_str() ) ;
+	}
+	
+else
+	{
+	
+	bot->Notice( theClient, "%s is %s on server %s",
+		st[ 1 ].c_str(),
+		Target->getNickUserHost().c_str(),
+		theServer->getName().c_str() ) ;
+	}
 
 return true ;
 

@@ -40,7 +40,7 @@ const unsigned long int flg_UNMODERATE = 0x100 | flg_NOLOGIN;
 const unsigned long int flg_INVITE   = 0x200 | flg_NOLOGIN;
 const unsigned long int flg_JUPE     = 0x400;
 const unsigned long int flg_GLINE    = 0x800 | flg_NOLOGIN;
-const unsigned long int flg_SGLINE   = 0x1000;
+const unsigned long int flg_SCGLINE   = 0x1000;
 const unsigned long int flg_REMGLINE = 0x2000;
 const unsigned long int flg_REMOPCHN = 0x4000;
 const unsigned long int flg_ADDOPCHN = 0x8000;
@@ -83,6 +83,7 @@ const unsigned long int flg_CONFIG = 0x80000;
 const unsigned long int flg_SAY = 0x100000;
 const unsigned long int flg_NOMODE = 0x200000;
 const unsigned long int flg_REOP = 0x400000;
+const unsigned long int flg_SGLINE = 0x800000;
 
 /*
  Default commands that are added upon adding a new oper
@@ -90,7 +91,7 @@ const unsigned long int flg_REOP = 0x400000;
 
 const unsigned long int OPER = flg_HELP | flg_DEAUTH | flg_NEWPASS 
 			| flg_MODE | flg_OP | flg_DEOP | flg_MODERATE 
-		        | flg_UNMODERATE | flg_INVITE | flg_GLINE | flg_SGLINE 
+		        | flg_UNMODERATE | flg_INVITE | flg_GLINE | flg_SCGLINE 
 			| flg_REMGLINE | flg_LOPCHN | flg_CHINFO | flg_WHOIS 
 			| flg_TRANS | flg_KICK | flg_CLEARCHAN | flg_LISTHOSTS;
 const unsigned long int SOPER = flg_CHECKNET | flg_LISTIGNORES | flg_LIST 
@@ -106,7 +107,7 @@ const unsigned long int SSMT = SADMIN | flg_REMSERVER | flg_NOMODE;
 const unsigned long int CODER = SMT;
 const unsigned long int SCODER =  SSMT | flg_COMMANDS| flg_GCHAN | flg_RGCHAN
 			| flg_EXCEPTIONS | flg_STATUS | flg_SHUTDOWN 
-			| flg_CONFIG | flg_SAY;
+			| flg_CONFIG | flg_SAY | flg_SGLINE;
 }
 
 }

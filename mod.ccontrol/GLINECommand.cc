@@ -24,7 +24,7 @@
 #include	"ccUser.h"
 #include	"Constants.h"
 
-const char GLINECommand_cc_rcsId[] = "$Id: GLINECommand.cc,v 1.43 2002/08/27 19:22:05 mrbean_ Exp $";
+const char GLINECommand_cc_rcsId[] = "$Id: GLINECommand.cc,v 1.44 2002/11/20 17:56:17 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -96,7 +96,7 @@ if(!isChan)
 					{
 					userName = "~*";
 					}
-				hostName = tClient->getInsecureHost();
+				hostName = tClient->getRealInsecureHost();
 				}
 			}
 		else
@@ -144,7 +144,7 @@ if(gLength == 0)
 	gLength = bot->getDefaultGlineLength() ;
 	ResStart = 1;
 	}
-string nickUserHost = bot->removeSqlChars(theClient->getNickUserHost()) ;
+string nickUserHost = bot->removeSqlChars(theClient->getRealNickUserHost()) ;
 	
 if(!isChan)
 	{
@@ -222,9 +222,10 @@ if(!isChan)
 	Us[0] = '\0';
 	sprintf(Us,"%d",Users);
 	string Reason = st.assemble( pos + ResStart );
-	if(Reason.size() > 255)
+	if(Reason.size() > gline::MAX_REASON_LENGTH)
 		{
-		bot->Notice(theClient,"Gline reason can't be more than 255 chars");
+		bot->Notice(theClient,"Gline reason can't be more than %d chars",
+			    gline::MAX_REASON_LENGTH);
 		return false;
 		}
 
@@ -297,12 +298,12 @@ for( Channel::const_userIterator ptr = theChan->userList_begin();
 ptr != theChan->userList_end() ; ++ptr )
 	{
 	TmpClient = ptr->second->getClient();
-	GlineMapType::iterator gptr = glineList.find("*~@" + TmpClient->getInsecureHost());
+	GlineMapType::iterator gptr = glineList.find("*~@" + TmpClient->getRealInsecureHost());
 	if(gptr != glineList.end())
 		{
 		continue;
 		}
-	gptr = glineList.find("*" +TmpClient->getUserName() + "@" + TmpClient->getInsecureHost());		
+	gptr = glineList.find("*" +TmpClient->getUserName() + "@" + TmpClient->getRealInsecureHost());		
 	if(gptr != glineList.end())
 		{
 		continue;
@@ -313,9 +314,9 @@ ptr != theChan->userList_end() ; ++ptr )
 		TmpGline = new ccGline(bot->SQLDb);
 		assert(TmpGline != NULL);
 		if(TmpClient->getUserName().substr(0,1) == "~")
-			TmpGline->setHost("~*@" + TmpClient->getInsecureHost());
+			TmpGline->setHost("~*@" + TmpClient->getRealInsecureHost());
 		else
-			TmpGline->setHost("*" + TmpClient->getUserName() + "@" + TmpClient->getInsecureHost());
+			TmpGline->setHost("*" + TmpClient->getUserName() + "@" + TmpClient->getRealInsecureHost());
 		TmpGline->setExpires(::time(0) + gLength);
 		TmpGline->setAddedBy(nickUserHost);
 		unsigned int Affected = Network->countMatchingUserHost(TmpGline->getHost()); 

@@ -54,7 +54,7 @@ namespace gline
         const unsigned int PERM_TIME = 730*3600*24;
         const unsigned int MFU_TIME = 100*3600*24;
 	const unsigned int NOLOGIN_TIME = 3600;	
-
+	const unsigned int MAX_REASON_LENGTH = 255;
         }
 
 namespace flood
@@ -78,6 +78,11 @@ namespace password
 namespace badChannels
 {
 	static const char Query[] = "SELECT Name,Reason,AddedBy from BadChannels";
+}
+
+namespace scan
+{
+	static const int MAX_SHOW = 15;
 }
 
 }

@@ -1,10 +1,10 @@
 /**
  * CommandsDec.h
- * $Id: CommandsDec.h,v 1.10 2002/08/27 19:22:05 mrbean_ Exp $
+ * $Id: CommandsDec.h,v 1.11 2002/11/20 17:56:17 mrbean_ Exp $
  */
 
 #ifndef __COMMANDSDEC_H
-#define __COMMANDSDEC_H "$Id: CommandsDec.h,v 1.10 2002/08/27 19:22:05 mrbean_ Exp $"
+#define __COMMANDSDEC_H "$Id: CommandsDec.h,v 1.11 2002/11/20 17:56:17 mrbean_ Exp $"
 
 namespace gnuworld
 {
@@ -83,6 +83,7 @@ DECLARE_COMMAND( CONFIG )
 DECLARE_COMMAND( SAY )
 DECLARE_COMMAND( NOMODE )
 DECLARE_COMMAND( REOP )
+DECLARE_COMMAND( SGLINE )
 } // namespace uworld
 
 } // namespace gnuworld

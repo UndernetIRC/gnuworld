@@ -1,5 +1,5 @@
 /*
- * FORCECommand.cc
+ * SGLINECommand.cc
  *
  * Glines a specific mask 
  */
@@ -18,7 +18,7 @@
 #include	"ELog.h"
 #include	"Constants.h"
 
-const char FORCEGLINECommand_cc_rcsId[] = "$Id: FORCEGLINECommand.cc,v 1.24 2002/11/20 17:56:17 mrbean_ Exp $";
+const char SGLINECommand_cc_rcsId[] = "$Id: SGLINECommand.cc,v 1.1 2002/11/20 17:56:17 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -26,15 +26,15 @@ namespace gnuworld
 
 using std::string ;
 
-// Input: forcegline *@blah.net reason
-// Input: forcegline 3600 *@blah.net reason
+// Input: sgline *@blah.net reason
+// Input: sgline 3600 *@blah.net reason
 //
 // Output: C GL * +*@lamer.net 3600 :Banned (*@lamer) ...
 //
 namespace uworld
 {
 
-bool FORCEGLINECommand::Exec( iClient* theClient, const string& Message )
+bool SGLINECommand::Exec( iClient* theClient, const string& Message )
 {
 
 StringTokenizer st( Message ) ;
@@ -56,17 +56,8 @@ StringTokenizer::size_type pos = 1 ;
 bool Forced = false;
 
 ccUser* tmpUser = bot->IsAuth(theClient);
-bot->MsgChanLog("FORCEGLINE %s\n",st.assemble(1).c_str());
-if(!strcasecmp(st[pos],"-fu"))
-	{
-	Forced = true;
-	pos++;
-	if( st.size() < 4 )
-		{
-		Usage( theClient ) ;
-		return true ;
-		}
-	}
+bot->MsgChanLog("SGLINE %s\n",st.assemble(1).c_str());
+
 time_t gLength = bot->getDefaultGlineLength() ;
 
 // (pos) is the index of the next token, the user@host mask.
@@ -114,19 +105,13 @@ if(gLength == 0)
 	gLength = bot->getDefaultGlineLength() ;
 	ResStart = 1;
 	}
-//ccUser *tmpAuth = bot->IsAuth(theClient);
 if(!tmpUser)
 	{ // We shouldnt have got here in the first place, but check it anyway
 	return false;
 	}
-if((Forced) && (tmpUser->getType() < operLevel::SMTLEVEL))
-	{
-	bot->Notice(theClient,"Only smt+ can use the -fu option");
-	return false;
-	}
 	
 unsigned int Users;
-int gCheck = bot->checkGline(st[pos],gLength,Users);
+int gCheck = bot->checkSGline(st[pos],gLength,Users);
 
 if(gCheck & gline::NEG_TIME)
 	{
@@ -144,78 +129,13 @@ if(gCheck & gline::BAD_HOST)
 	bot->Notice(theClient,"illegal host");
 	Ok = false;
 	}
-if(gCheck & gline::BAD_TIME)
-	{
-	bot->Notice(theClient,"Glining for more than %d seconds is a NoNo",gline::MFGLINE_TIME);
-	Ok = false;
-	}
-if((gCheck & gline::FU_NEEDED_USERS) && (Ok))
-	{
-	if(!Forced)
-		{
-		Ok = false;
-		if(tmpUser->getFlags() < operLevel::SMTLEVEL)
-			{
-			bot->Notice(theClient,"Sorry but you cant set a gline which affects more than %d users"
-			,gline::MFGLINE_USERS);
-			}
-		else
-			{
-			bot->Notice(theClient,"This gline affects more than %d users, please use the -fu flag"
-			,gline::MFGLINE_USERS);
-			}
-		
-		}
-	}
-if((gCheck & gline::FU_NEEDED_TIME) && (Ok))
-	{
-	if(!Forced)
-		{
-		Ok = false;
-		if(tmpUser->getFlags() < operLevel::SMTLEVEL)
-			{
-			bot->Notice(theClient,"Sorry but you cant set a gline for more than %d seconds"
-			,gline::MFGLINE_TIME);
-			}
-		else
-			{
-			bot->Notice(theClient,"This gline is for more than %d seconds, please use the -fu flag"
-			,gline::MFGLINE_TIME);
-			}
-		}
-	}
-
-/*if((gCheck & gline::FORCE_NEEDED_HOST) && (Ok))
-	{	
-	bot->MsgChanLog("%s is using forcegline to gline a wildcard host (%s@%s)"
-	,theClient->getNickName().c_str()
-	,userName.c_str(),hostName.c_str());
-	}
-
-
-if((gCheck & gline::FORCE_NEEDED_TIME) && (Ok))
-	{
-	bot->MsgChanLog("%s is using forcegline to gline for %d seconds"
-	,theClient->getNickName().c_str(),gLength);
-	}
-
-if(gCheck & gline::FORCE_NEEDED_WILDTIME)
-	{
-	bot->MsgChanLog("%s is using forcegline to gline a wildcard host for more than %d seconds"
-	,theClient->getNickName().c_str()
-	,gline::MGLINE_WILD_TIME);
-	}*/
 if(!Ok)
 	{
 	bot->Notice(theClient,"Please fix all of the above, and try again");
 	return false;
 
 	}
-if(gCheck & gline::GLINE_OK)
-	{
-	bot->Notice(theClient,"Please use the GLINE command to set that gline");
-	return false;
-	}
+
 // Avoid passing a reference to a temporary variable.
 string nickUserHost = bot->removeSqlChars(theClient->getRealNickUserHost()) ;
 string Reason = st.assemble( pos + ResStart );
@@ -228,13 +148,11 @@ if(Reason.size() > gline::MAX_REASON_LENGTH)
 		    gline::MAX_REASON_LENGTH);
 	return false;
 	}
-//bot->setRemoving(st[pos]);
 server->setGline( nickUserHost,
 	st[ pos ],
 	string("[") + Us + "] " + Reason,
 	//st.assemble( pos + ResStart ) + "[" + Us + "]",
 	gLength , bot) ;
-//bot->unSetRemoving();
 ccGline *TmpGline = bot->findGline(st[pos]);
 bool Up = false;
 

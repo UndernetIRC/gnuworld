@@ -3,7 +3,7 @@
  */
 
 #ifndef __CCONTROL_H
-#define __CCONTROL_H "$Id: ccontrol.h,v 1.80 2002/10/09 12:56:55 mrbean_ Exp $"
+#define __CCONTROL_H "$Id: ccontrol.h,v 1.81 2002/11/20 17:56:17 mrbean_ Exp $"
 
 //Undef this if you want to log to the database
 #define LOGTOHD 
@@ -505,6 +505,8 @@ public:
 
 	
 	int checkGline(const string ,unsigned int ,unsigned int &);
+
+	int checkSGline(const string ,unsigned int ,unsigned int &);
 
 	bool isSuspended(ccUser *);
 	

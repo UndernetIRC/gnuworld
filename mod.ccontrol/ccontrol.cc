@@ -11,12 +11,12 @@
 /* ccontrol.cc
  * Authors: Daniel Karrels dan@karrels.com
  *	    Tomer Cohen    MrBean@toughguy.net
- * $Id: ccontrol.cc,v 1.152 2002/10/09 12:56:55 mrbean_ Exp $
+ * $Id: ccontrol.cc,v 1.153 2002/11/20 17:56:17 mrbean_ Exp $
  */
 
 #define MAJORVER "1"
-#define MINORVER "1pl1"
-#define RELDATE "09 October, 2002"
+#define MINORVER "1pl2"
+#define RELDATE "18 November, 2002"
 
 #include        <sys/types.h> 
 #include        <sys/socket.h>
@@ -56,7 +56,7 @@
 #include	"ip.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.152 2002/10/09 12:56:55 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.153 2002/11/20 17:56:17 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -250,7 +250,7 @@ RegisterCommand( new GLINECommand( this, "GLINE",
 	false ) ) ;
 RegisterCommand( new SCANGLINECommand( this, "SCANGLINE", "<mask> "
 	"Search current network glines for glines matching <mask>",
-	commandLevel::flg_SGLINE,
+	commandLevel::flg_SCGLINE,
 	false,
 	false,
 	false,
@@ -527,6 +527,16 @@ RegisterCommand( new FORCEGLINECommand( this, "FORCEGLINE",
 	false,
 	operLevel::OPERLEVEL,
 	true ) ) ;
+RegisterCommand( new SGLINECommand( this, "SGLINE",
+	"<user@host> <duration>[time units] <reason> "
+	"Gline a given user@host for the given reason",
+	commandLevel::flg_SGLINE,
+	false,
+	false,
+	false,
+	operLevel::CODERLEVEL,
+	true ) ) ;
+
 RegisterCommand( new EXCEPTIONCommand( this, "EXCEPTIONS",
 	"(list / add / del) [host mask]"
 	"Add connection exceptions on hosts",
@@ -956,7 +966,7 @@ else
 		ccLog* newLog = new (std::nothrow) ccLog();
 		newLog->Time = ::time(0);
 		newLog->Desc = Message.c_str();
-		newLog->Host = theClient->getNickUserHost().c_str();
+		newLog->Host = theClient->getRealNickUserHost().c_str();
 		if(theUser)
 			newLog->User = theUser->getUserName().c_str();
 		else
@@ -1298,18 +1308,18 @@ switch( theEvent )
 					{
 					int CurConnections = ++clientsIpMap[tIP];
 					if((CurConnections  > getExceptions("*@" + tIP)) 
-					    && (CurConnections > getExceptions("*@"+NewUser->getInsecureHost())))
+					    && (CurConnections > getExceptions("*@"+NewUser->getRealInsecureHost())))
 						{
 						MsgChanLog("Glining %s , total  connections : %d\n"
 						,tIP.c_str(),CurConnections);
 						MsgChanLog(" IP Exception : %d , HOST Exception %d\n"						
-						,getExceptions("*@" + tIP),getExceptions("*@" + NewUser->getInsecureHost()));
+						,getExceptions("*@" + tIP),getExceptions("*@" + NewUser->getRealInsecureHost()));
 
 						glSet = true;
 						ccGline *tmpGline;
 						tmpGline = findGline("*@" + tIP); 
 						if(!tmpGline)
-							tmpGline = findGline("*@" + NewUser->getInsecureHost());
+							tmpGline = findGline("*@" + NewUser->getRealInsecureHost());
 						if(!tmpGline)
 							{
 							tmpGline = new ccGline(SQLDb);
@@ -1356,7 +1366,7 @@ switch( theEvent )
 				}
 			if(!glSet) 
 				{	
-				ccGline * tempGline = findMatchingGline(NewUser->getUserName() + '@' + NewUser->getInsecureHost());
+				ccGline * tempGline = findMatchingGline(NewUser->getUserName() + '@' + NewUser->getRealInsecureHost());
 				if(!tempGline)
 					{
 					string tIP = xIP( NewUser->getIP()).GetNumericIP();
@@ -2398,7 +2408,7 @@ else
 	{
 	theQuery << "Unknown";
 	}
-theQuery	<< " (" << removeSqlChars(theClient->getNickUserHost()) <<")','"
+theQuery	<< " (" << removeSqlChars(theClient->getRealNickUserHost()) <<")','"
 		<< removeSqlChars(buffer) << "')"
 		<< ends;
 
@@ -2496,7 +2506,7 @@ strcpy(buffer,log.c_str());
 stringstream theQuery;
 theQuery	<< Main
 		<< "Unknown"
-		<< " (" << removeSqlChars(theClient->getNickUserHost()) <<")','"
+		<< " (" << removeSqlChars(theClient->getRealNickUserHost()) <<")','"
 		<< removeSqlChars(buffer) << "')"
 		<< ends;
 
@@ -2812,6 +2822,83 @@ if(!retMe)
 return retMe;
 }
 
+int ccontrol::checkSGline(const string Host,unsigned int Len,unsigned int &Affected)
+{
+
+const unsigned int isWildCard = 0x01;
+const unsigned int isIP = 0x02;
+unsigned int Mask = 0;
+unsigned int Dots = 0;
+unsigned int GlineType = isIP;
+bool ParseEnded = false;
+int retMe = 0;
+string::size_type pos = Host.find_first_of('@');
+string Ident = Host.substr(0,pos);
+string Hostname = Host.substr(pos+1);
+if((signed int)Len < 0)
+	retMe |=  gline::NEG_TIME;
+//Check the ident first, if its valid then the gline is ok 
+Affected = Network->countMatchingUserHost(Host); //Calculate the number of affected
+bool hasId = false;
+for(string::size_type pos = 0; pos < Ident.size();++pos)
+	{
+	if((Ident[pos] == '*') || (Ident[pos] == '?'))
+		{
+		continue;
+		}
+	else
+		{ //Its not */? so we have a legal ident
+		hasId = true;
+		break;
+		}
+	}
+if(hasId)
+	return gline::GLINE_OK;
+for(string::size_type pos = 0; pos < Hostname.size();++pos)
+	{
+	if(Hostname[pos] =='.')
+		{
+		Dots++;
+		if((GlineType & (isWildCard | isIP)) == isIP)
+			Mask+=8; //Keep track of the mask
+		}
+	else if((Hostname[pos] =='*') || (Hostname[pos] == '?'))
+		GlineType |= isWildCard;
+	else if(Hostname[pos] == '/')
+		{
+		//For now not handled, return a bad host
+		retMe |=  gline::BAD_HOST;
+		/*if(!(GlineType & isIP)) //must be an ip to specify 
+			return  gline::BAD_HOST;
+		 Mask = atol((Host.substr(++pos)).c_str());
+		 if(!(Mask) || (Mask > 32))
+			return  gline::BAD_HOST;
+		 if(Mask < 32)
+			GlineType |= isWildCard;
+		 ParseEnded = true;			
+		 break;*/
+		 
+		 }
+	else if((Hostname[pos] > '9') || (Hostname[pos] < '0')) 
+		GlineType &= ~isIP;
+	}
+
+
+
+if((Dots > 3) && (GlineType & isIP)) //IP addy cant have more than 3 dots
+	retMe |=  gline::BAD_HOST;
+if((GlineType & (isIP || isWildCard) == isIP) && !(ParseEnded))
+	Mask +=8; //Add the last mask count if needed
+if((GlineType & isIP) && (Mask < 8))
+	retMe |=  gline::HUH_NO_HOST;  //Its too wide
+if(!(GlineType & isIP) && (Dots < 1) && (GlineType & isWildCard))
+	retMe |=  gline::HUH_NO_HOST; //Wildcard gline must have atleast 2 dots
+	
+if(!retMe)
+	retMe =  gline::GLINE_OK;
+return retMe;
+}
+
 bool ccontrol::isSuspended(ccUser *theUser)
 {
 if( (theUser) && (theUser->getIsSuspended()))
@@ -2882,7 +2969,6 @@ for(serversConstIterator ptr = serversMap_begin();
 	curNetServer = curServer->getNetServer();
 	if(curNetServer)
 		{
-		elog << "Getting version of : " << curServer->getName() << endl;
 		Write("%s V :%s\n",getCharYYXXX().c_str(),curNetServer->getCharYY());		
 		}
 		
@@ -3343,7 +3429,7 @@ assert(tempException != NULL);
 
 tempException->setHost(removeSqlChars(Host));
 tempException->setConnections(Connections);
-tempException->setAddedBy(removeSqlChars(theClient->getNickUserHost()));
+tempException->setAddedBy(removeSqlChars(theClient->getRealNickUserHost()));
 tempException->setAddedOn(::time(0));
 
 //Update the database, and the internal list
@@ -3473,7 +3559,7 @@ int ccontrol::removeIgnore( iClient *theClient )
 string Host = string( "*!*" )
 		+ theClient->getUserName() 
 		+ string( "@" )
-		+ theClient->getInsecureHost();
+		+ theClient->getRealInsecureHost();
 int retMe = removeIgnore(Host);
 return retMe;
 }
@@ -3483,12 +3569,12 @@ void ccontrol::ignoreUser( ccFloodData* Flood )
 
 const iClient* theClient = Network->findClient(Flood->getNumeric());
 Notice(theClient,"I dont think I like you anymore , consider yourself ignored");
-MsgChanLog("Added %s to my ignore list\n",theClient->getNickUserHost().c_str());
+MsgChanLog("Added %s to my ignore list\n",theClient->getRealNickUserHost().c_str());
 
 string silenceMask = string( "*!*" )
 	+ theClient->getUserName()
 	+ "@"
-	+ theClient->getInsecureHost();
+	+ theClient->getRealInsecureHost();
 
 stringstream s;
 s	<< getCharYYXXX() 

@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_K.cc,v 1.11 2002/11/07 20:13:56 dan_karrels Exp $
+ * $Id: msg_K.cc,v 1.12 2002/11/20 17:56:17 mrbean_ Exp $
  */
 
 #include	<new>
@@ -37,7 +37,7 @@
 #include	"StringTokenizer.h"
 #include	"ServerCommandHandler.h"
 
-const char msg_K_cc_rcsId[] = "$Id: msg_K.cc,v 1.11 2002/11/07 20:13:56 dan_karrels Exp $" ;
+const char msg_K_cc_rcsId[] = "$Id: msg_K.cc,v 1.12 2002/11/20 17:56:17 mrbean_ Exp $" ;
 const char server_h_rcsId[] = __SERVER_H ;
 const char iClient_h_rcsId[] = __ICLIENT_H ;
 const char Channel_h_rcsId[] = __CHANNEL_H ;
@@ -192,15 +192,39 @@ if( localKick )
 	}
 else
 	{
-	// The kick is unauthoritative, the destination client
-	// is now in the zombie state
-	destChanUser->setZombie() ;
+	// Check if the kick wasnt issued by a server , 
+	// if it does, then its authoritative
+	if((srcClient == 0) && (Network->findServer(Param[0])))
+		{
+		theChan->removeUser( destClient ) ;
 
-//	elog	<< "msg_K> Adding zombie for user "
-//		<< *destChanUser
-//		<< " on channel "
-//		<< theChan->getName()
-//		<< endl ;
+	    	// Deallocate the ChannelUser
+		delete destChanUser ; destChanUser = 0 ;
+
+		// Remove the channel information from the client's internal
+		// channel structure
+		if( !destClient->removeChannel( theChan ) )
+			{
+			elog	<< "msg_K> Unable to remove channel "
+				<< theChan->getName()
+				<< " from the iClient "
+				<< *destClient
+				<< endl ;
+			}
+
+		}
+	else    
+		{
+		// The kick is unauthoritative, the destination client
+		// is now in the zombie state
+		destChanUser->setZombie() ;
+
+	//    	elog	<< "msg_K> Adding zombie for user "
+	//		<< *destChanUser
+	//		<< " on channel "
+	//		<< theChan->getName()
+	//		<< endl ;
+		}
 	}
 
 // Post the channel kick event

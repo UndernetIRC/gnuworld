@@ -18,7 +18,7 @@
 #include        "ccUser.h"
 #include	"ip.h"
 
-const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.25 2002/07/02 11:38:27 mrbean_ Exp $";
+const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.26 2002/11/20 17:56:17 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -63,7 +63,7 @@ theUser = bot->GetOper(st[1]);
 if (!theUser) 
 	{
 	bot->MsgChanLog("[FAILED LOGIN] %s - Bad Username (%s)\n",
-		theClient->getNickUserHost().c_str(),
+		theClient->getRealNickUserHost().c_str(),
 		st[1].c_str());
 	if(theClient->isOper())
 		bot->Notice(theClient, "FALSE LOGIN, DENIED");
@@ -76,16 +76,16 @@ else
 	if((!theClient->isOper()) && (theUser->getNeedOp()))
 
 		{
-		bot->MsgChanLog("[FAILED LOGIN] %s - Not Operd\n",theClient->getNickUserHost().c_str());
+		bot->MsgChanLog("[FAILED LOGIN] %s - Not Operd\n",theClient->getRealNickUserHost().c_str());
 		bot->addLogin(theClient);
 		return false;
 		}
 	//Check if the users mask is in his access list
 		
-	if((!bot->UserGotMask(theUser,theClient->getNickUserHost()))
+	if((!bot->UserGotMask(theUser,theClient->getRealNickUserHost()))
 	    &&(!bot->UserGotMask(theUser,xIP(theClient->getIP()).GetNumericIP())))	
 		{
-		bot->MsgChanLog("[FAILED LOGIN] %s - No HostMask\n",theClient->getNickUserHost().c_str());
+		bot->MsgChanLog("[FAILED LOGIN] %s - No HostMask\n",theClient->getRealNickUserHost().c_str());
 	
 		bot->Notice(theClient, "FALSE LOGIN, DENIED");
 		bot->addLogin(theClient);
@@ -120,7 +120,7 @@ else
 
 	if (md5Part != output.str().c_str()) // If the MD5 hash's don't match..
 		{
-		bot->MsgChanLog("[FAILED LOGIN] %s - Bad Password\n",theClient->getNickUserHost().c_str());
+		bot->MsgChanLog("[FAILED LOGIN] %s - Bad Password\n",theClient->getRealNickUserHost().c_str());
 		bot->Notice(theClient, "FALSE LOGIN, DENIED");
 		bot->addLogin(theClient);
 		return false;
@@ -146,7 +146,7 @@ else
 	else
 	        bot->Notice(theClient, "Error in authentication ",theUser->getUserName().c_str()); 
         bot->MsgChanLog("(%s) - %s : AUTHENTICATED\n",theUser->getUserName().c_str()
-                        ,theClient->getNickUserHost().c_str());
+                        ,theClient->getRealNickUserHost().c_str());
 	} 
 
 return true; 

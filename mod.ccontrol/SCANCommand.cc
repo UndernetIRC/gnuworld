@@ -16,8 +16,9 @@
 #include	"misc.h"
 #include	"match.h"
 #include	"Network.h"
+#include	"Constants.h"
 
-const char SCANCommand_cc_rcsId[] = "$Id: SCANCommand.cc,v 1.7 2002/03/01 18:27:36 mrbean_ Exp $";
+const char SCANCommand_cc_rcsId[] = "$Id: SCANCommand.cc,v 1.8 2002/11/20 17:56:17 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -44,7 +45,8 @@ bot->MsgChanLog("SCAN %s\n",st.assemble(1).c_str());
 typedef list<const iClient*> clientsList;
 
 bool showUsers = false;
-bool hostLook = false;
+bool realHostLook = false;
+bool fakeHostLook  = false;
 bool nameLook = false;
 unsigned int pos = 1;
 string hostName;
@@ -66,15 +68,32 @@ for(pos = 1; pos < st.size() ; )
 			bot->Notice(theClient,"-h must get a host to scan for");
 			return true;
 			}
-		if(nameLook)
+		if((nameLook) || (fakeHostLook))
 			{
-			bot->Notice(theClient,"You can't specify both -h and -n");
+			bot->Notice(theClient,"You can't specify more than one scanning option");
 			return true;
 			}
-		hostLook = true;
+		realHostLook = true;
 		hostName = st[pos+1];
 		pos+=2;
 		}
+	else if(!strcasecmp(st[pos],"-fh"))
+		{
+		if(pos +1 >= st.size())
+			{
+			bot->Notice(theClient,"-fh must get a host to scan for");
+			return true;
+			}
+		if((nameLook) || (realHostLook))
+			{
+			bot->Notice(theClient,"You can't specify more than one scanning option");
+			return true;
+			}
+		fakeHostLook = true;
+		hostName = st[pos+1];
+		pos+=2;
+		}
+
 	else if(!strcasecmp(st[pos],"-n"))
 		{
 		if(pos +1 >= st.size())
@@ -82,9 +101,9 @@ for(pos = 1; pos < st.size() ; )
 			bot->Notice(theClient,"-n must get a real name to scan for");
 			return true;
 			}
-		if(hostLook)
+		if((realHostLook) || (fakeHostLook))
 			{
-			bot->Notice(theClient,"You can't specify both -h and -n");
+			bot->Notice(theClient,"You can't specify more than one scanning option");
 			return true;
 			}
 		nameLook = true;
@@ -93,11 +112,11 @@ for(pos = 1; pos < st.size() ; )
 		}
 	else
 		{
-		bot->Notice(theClient,"SCAN command can only get -h <host> or -n <real name>");
+		bot->Notice(theClient,"SCAN command can only get -h <host> -fh <host> or -n <real name>");
 		return true;
 		}
 	}
-if(hostLook)
+if(fakeHostLook)
 	{
 	if(string::npos == hostName.find_first_of("@"))
 		{
@@ -105,17 +124,24 @@ if(hostLook)
 		}
 	cList = Network->matchUserHost(hostName);
 	}
+else if(realHostLook)
+	{
+	if(string::npos == hostName.find_first_of("@"))
+		{
+		hostName = string("*@" + hostName);
+		}
+	cList = Network->matchRealUserHost(hostName);
+	}
 else if(nameLook)
 	{
 	cList = Network->matchRealName(realName);
 	}
-else
+else 
 	{
-	bot->Notice(theClient,"You didnt specify a search type (-h/-n) please try again");
+	bot->Notice(theClient,"You didnt specify a search type (-h/-fh/-n) please try again");
 	return true;
 	}
-//TODO: make this a constant
-if((cList.size() > 15) && (showUsers))	
+if(((unsigned)cList.size() > scan::MAX_SHOW) && (showUsers))	
 	{
 	bot->Notice(theClient,"There were %d users matching this search, only 15 will be shown"
 		    ,cList.size());

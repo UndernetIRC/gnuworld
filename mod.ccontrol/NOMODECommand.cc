@@ -11,7 +11,7 @@
 #include	"Constants.h"
 #include	"ccBadChannel.h"
 
-const char NOMODECommand_cc_rcsId[] = "$Id: NOMODECommand.cc,v 1.2 2002/08/16 15:20:34 mrbean_ Exp $";
+const char NOMODECommand_cc_rcsId[] = "$Id: NOMODECommand.cc,v 1.3 2002/11/20 17:56:17 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -55,7 +55,7 @@ if(!strcasecmp(st[1],"ADD"))
 	
 	NewChannel = new (std::nothrow) ccBadChannel(bot->removeSqlChars(st[2])
 					,bot->removeSqlChars(st.assemble(3))
-					,theClient->getNickUserHost());
+					,theClient->getRealNickUserHost());
 	assert(NewChannel != NULL);
 	if(!NewChannel->Insert(bot->SQLDb))
 		{

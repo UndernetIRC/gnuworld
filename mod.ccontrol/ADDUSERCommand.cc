@@ -22,7 +22,7 @@
 #include	"commLevels.h"
 #include	"Constants.h"
 
-const char ADDUSERCommand_cc_rcsId[] = "$Id: ADDUSERCommand.cc,v 1.14 2002/03/01 18:27:36 mrbean_ Exp $";
+const char ADDUSERCommand_cc_rcsId[] = "$Id: ADDUSERCommand.cc,v 1.15 2002/11/20 17:56:17 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -172,7 +172,7 @@ else
 theUser->setAccess(NewAccess);
 theUser->setSAccess(NewSAccess);
 theUser->setType(NewFlags);
-theUser->setLast_Updated_By(bot->removeSqlChars(theClient->getNickUserHost()));
+theUser->setLast_Updated_By(bot->removeSqlChars(theClient->getRealNickUserHost()));
 theUser->setNeedOp(true);
 theUser->setNotice(true); //default to notice
 if(bot->AddOper(theUser) == true)

@@ -17,7 +17,7 @@
 #include	"match.h"
 #include	"Network.h"
 
-const char USERINFOCommand_cc_rcsId[] = "$Id: USERINFOCommand.cc,v 1.6 2002/03/01 18:27:36 mrbean_ Exp $";
+const char USERINFOCommand_cc_rcsId[] = "$Id: USERINFOCommand.cc,v 1.7 2002/11/20 17:56:17 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -130,7 +130,7 @@ for(ptr = bot->usersMap_begin();ptr != bot->usersMap_end();++ptr)
 		if(tempUser->getClient())
 			{
 			bot->Notice(theClient,"User Name : %s , Currently logged in from : %s"
-				    ,Name.c_str(),tempUser->getClient()->getNickUserHost().c_str());
+				    ,Name.c_str(),tempUser->getClient()->getRealNickUserHost().c_str());
 			}
 		else
 			bot->Notice(theClient,"User Name : %s",Name.c_str());
