@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ConnectionManager.cc,v 1.16 2002/07/31 03:14:04 dan_karrels Exp $
+ * $Id: ConnectionManager.cc,v 1.17 2002/08/04 00:00:39 dan_karrels Exp $
  */
 
 #include	<unistd.h>
@@ -556,6 +556,8 @@ for( constHandlerMapIterator handlerItr = handlerMap.begin() ;
 		const Connection* connectionPtr = *connectionItr ;
 		int tempFD = connectionPtr->getSockFD() ;
 
+		assert( tempFD >= 0 ) ;
+
 		// The order of the below if/else structure is important
 		// First check for the fully connected sockets.
 		if( connectionPtr->isConnected() )
@@ -617,6 +619,13 @@ do
 //	<< fdCnt
 //	<< endl ;
 
+if( 0 == selectRet )
+	{
+	// No sockets ready to be serviced, timeout occured,
+	// probably a timer
+	return ;
+	}
+
 // Is there an error from select()?
 if( selectRet < 0 )
 	{
@@ -660,6 +669,8 @@ for( constHandlerMapIterator handlerItr = handlerMap.begin() ;
 		// Temporary variable, this is the value of the current
 		// Connection's socket (file) descriptor
 		int tempFD = connectionPtr->getSockFD() ;
+
+		assert( tempFD >= 0 ) ;
 
 		// Order of this if/else is important here.
 		// First check for fully connected sockets
