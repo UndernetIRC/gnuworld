@@ -1,4 +1,4 @@
--- "$Id: README.cservice,v 1.11 2001/10/29 17:00:11 nighty Exp $"
+-- "$Id: README.cservice,v 1.12 2001/10/29 17:03:25 nighty Exp $"
 --
 --
 --
@@ -67,5 +67,6 @@ All Done
 That's it for the sql stuff.  Be sure to edit the configuration file for
 cmaster (../bin/cservice.conf), giving username, nickname, etc, and
 database information.
+For the website, be sure to edit website/php_includes/config.inc to configure your website.
 
 The GNUWorld development team
