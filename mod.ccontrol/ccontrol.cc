@@ -23,7 +23,7 @@
 #include	"AuthInfo.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.30 2001/05/02 21:10:18 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.31 2001/05/02 21:39:26 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -277,7 +277,7 @@ for( commandMapType::iterator ptr = commandMap.begin() ;
 theServer->RegisterEvent( EVT_KILL, this );
 theServer->RegisterEvent( EVT_QUIT, this );
 theServer->RegisterEvent( EVT_NETJOIN, this );
-theServer->RegisterEvent( EVT_NETBREAK, this );
+//theServer->RegisterEvent( EVT_NETBREAK, this );
 
 xClient::ImplementServer( theServer ) ;
 }
