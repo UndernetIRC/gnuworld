@@ -185,7 +185,7 @@ COPY "translations" FROM stdin;
 -- 03/09/01 - nighty <nighty@undernet.org>.
 
 COPY "translations" FROM stdin;
-2	1	Désolé. Vous êtes déjà authentifié avec le nick %s	31337
+2	1	Désolé. Vous êtes déjà authentifié sous le nom d'utilisateur %s	31337
 2	2	AUTHENTIFICATION RÉUSSIE pour %s	31337
 2	3	Désolé. Votre accès est insuffisant pour utiliser cette commande	31337
 2	4	Désolé. Le canal %s est vide	31337
