@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_K.cc,v 1.2 2003/06/17 15:13:53 dan_karrels Exp $
+ * $Id: msg_K.cc,v 1.3 2003/08/23 21:00:32 dan_karrels Exp $
  */
 
 #include	<new>
@@ -38,7 +38,7 @@
 #include	"ServerCommandHandler.h"
 #include	"config.h"
 
-RCSTAG( "$Id: msg_K.cc,v 1.2 2003/06/17 15:13:53 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: msg_K.cc,v 1.3 2003/08/23 21:00:32 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -187,8 +187,8 @@ else
 	{
 	// Check if the kick wasnt issued by a server , 
 	// if it does, then its authoritative
-	if((srcClient == 0) && (Network->findServer(Param[0])))
-		{
+//	if((srcClient == 0) && (Network->findServer(Param[0])))
+//		{
 		theChan->removeUser( destClient ) ;
 
 	    	// Deallocate the ChannelUser
@@ -205,19 +205,19 @@ else
 				<< endl ;
 			}
 
-		}
-	else    
-		{
+//		}
+//	else    
+//		{
 		// The kick is unauthoritative, the destination client
 		// is now in the zombie state
-		destChanUser->setZombie() ;
+//		destChanUser->setZombie() ;
 
 	//    	elog	<< "msg_K> Adding zombie for user "
 	//		<< *destChanUser
 	//		<< " on channel "
 	//		<< theChan->getName()
 	//		<< endl ;
-		}
+//		}
 	}
 
 // Post the channel kick event

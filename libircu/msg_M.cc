@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_M.cc,v 1.6 2003/06/28 16:26:45 dan_karrels Exp $
+ * $Id: msg_M.cc,v 1.7 2003/08/23 21:00:32 dan_karrels Exp $
  */
 
 #include	<new>
@@ -38,7 +38,7 @@
 #include	"ServerCommandHandler.h"
 #include	"config.h"
 
-RCSTAG( "$Id: msg_M.cc,v 1.6 2003/06/28 16:26:45 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: msg_M.cc,v 1.7 2003/08/23 21:00:32 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -135,11 +135,11 @@ if( clientSource != 0 )
 	theUser = theChan->findUser( clientSource ) ;
 	if( NULL == theUser )
 		{
-		elog	<< "msg_M> ("
-			<< theChan->getName()
-			<< ") Unable to find channel user: "
-			<< clientSource->getCharYYXXX()
-			<< endl ;
+//		elog	<< "msg_M> ("
+//			<< theChan->getName()
+//			<< ") Unable to find channel user: "
+//			<< clientSource->getCharYYXXX()
+//			<< endl ;
 		return false ;
 		}
 	}
@@ -240,24 +240,24 @@ for( const char* modePtr = Param[ 2 ] ; *modePtr ; ++modePtr )
 				Param[ argPos++ ] ) ;
 			if( NULL == targetClient )
 				{
-				elog	<< "msg_M> Unable to "
-					<< "find op target client: "
-					<< Param[ argPos - 1 ]
-					<< " in channel "
-					<< *theChan
-					<< endl ;
+//				elog	<< "msg_M> Unable to "
+//					<< "find op target client: "
+//					<< Param[ argPos - 1 ]
+//					<< " in channel "
+//					<< *theChan
+//					<< endl ;
 				break ;
 				}
 			ChannelUser* targetUser = theChan->findUser(
 				targetClient ) ;
 			if( NULL == targetUser )
 				{
-				elog	<< "msg_M> Unable to "
-					<< "find op target user: "
-					<< Param[ argPos - 1 ]
-					<< " in channel "
-					<< *theChan
-					<< endl ;
+//				elog	<< "msg_M> Unable to "
+//					<< "find op target user: "
+//					<< Param[ argPos - 1 ]
+//					<< " in channel "
+//					<< *theChan
+//					<< endl ;
 				break ;
 				}
 			opVector.push_back(
@@ -266,13 +266,13 @@ for( const char* modePtr = Param[ 2 ] ; *modePtr ; ++modePtr )
 
 			// If the op mode is +o, remove the ZOMBIE
 			// state from this user.
-			if( polarity && targetUser->isZombie() )
-				{
-				targetUser->removeZombie() ;
+//			if( polarity && targetUser->isZombie() )
+//				{
+//				targetUser->removeZombie() ;
 //				elog	<< "msg_M> Removing "
 //					<< "zombie"
 //					<< endl ;
-				}
+//				}
 			break ;
 			}
 		case 'v':
@@ -292,24 +292,24 @@ for( const char* modePtr = Param[ 2 ] ; *modePtr ; ++modePtr )
 				Param[ argPos++ ] ) ;
 			if( NULL == targetClient )
 				{
-				elog	<< "msg_M> Unable to "
-					<< "find voice target client: "
-					<< Param[ argPos - 1 ]
-					<< " in channel "
-					<< *theChan
-					<< endl ;
+//				elog	<< "msg_M> Unable to "
+//					<< "find voice target client: "
+//					<< Param[ argPos - 1 ]
+//					<< " in channel "
+//					<< *theChan
+//					<< endl ;
 				break ;
 				}
 			ChannelUser* targetUser = theChan->findUser(
 				targetClient ) ;
 			if( NULL == targetUser )
 				{
-				elog	<< "msg_M> Unable to "
-					<< "find voice target user: "
-					<< Param[ argPos - 1 ]
-					<< " in channel "
-					<< *theChan
-					<< endl ;
+//				elog	<< "msg_M> Unable to "
+//					<< "find voice target user: "
+//					<< Param[ argPos - 1 ]
+//					<< " in channel "
+//					<< *theChan
+//					<< endl ;
 				break ;
 				}
 			voiceVector.push_back(

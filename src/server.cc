@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server.cc,v 1.179 2003/08/21 20:42:38 dan_karrels Exp $
+ * $Id: server.cc,v 1.180 2003/08/23 21:00:33 dan_karrels Exp $
  */
 
 #include	<sys/time.h>
@@ -71,7 +71,7 @@
 #include	"ConnectionHandler.h"
 #include	"Connection.h"
 
-RCSTAG( "$Id: server.cc,v 1.179 2003/08/21 20:42:38 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: server.cc,v 1.180 2003/08/23 21:00:33 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -954,25 +954,42 @@ void xServer::BurstServer( iServer* fakeServer )
 {
 assert( fakeServer != 0 ) ;
 
-// Burst the new server's info./
-// IRCu checks for "JUPE " as being the beginning of the
-// reason as a jupe server.  This was because before servers
-// couldn't link without [ip] being added to their realname
-// field unless they were juped by uworld.  Now anyone can
-// link with that name, oh well.
-Write( "%s S %s %d %d %d J%02d %s 0 :%s\n",
+if( fakeServer->isJupe() )
+	{
+	// <prefix> JU <target> (+|-)<server> <expiration> 
+	// <lastmod> :<reason>
+	// expiration: 604800 (max)
+	// lastmod: last time the jupe was modified, to solve burst 
+	//   problem
+	Write( "%s JU %s +%s 604800 %u :%s",
 		getCharYY().c_str(),
+		fakeServer->getCharYY().c_str(),
 		fakeServer->getName().c_str(),
-		2,
-		0,
-		fakeServer->getConnectTime(),
-		10, // version
-		fakeServer->getCharYYXXX().c_str(),
+		::time( 0 ),
 		fakeServer->getDescription().c_str() ) ;
+	}
+else
+	{
+	// Burst the new server's info./
+	// IRCu checks for "JUPE " as being the beginning of the
+	// reason as a jupe server.  This was because before servers
+	// couldn't link without [ip] being added to their realname
+	// field unless they were juped by uworld.  Now anyone can
+	// link with that name, oh well.
+	Write( "%s S %s %d %d %d J%02d %s 0 :%s\n",
+			getCharYY().c_str(),
+			fakeServer->getName().c_str(),
+			2,
+			0,
+			fakeServer->getConnectTime(),
+			10, // version
+			fakeServer->getCharYYXXX().c_str(),
+			fakeServer->getDescription().c_str() ) ;
 
-// Write burst acknowledgements.
-Write( "%s EB\n", fakeServer->getCharYY().c_str() ) ;
-Write( "%s EA\n", fakeServer->getCharYY().c_str() ) ;
+	// Write burst acknowledgements.
+	Write( "%s EB\n", fakeServer->getCharYY().c_str() ) ;
+	Write( "%s EA\n", fakeServer->getCharYY().c_str() ) ;
+	}
 }
 
 /**

@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ChannelUser.cc,v 1.7 2003/08/09 23:15:36 dan_karrels Exp $
+ * $Id: ChannelUser.cc,v 1.8 2003/08/23 21:00:33 dan_karrels Exp $
  */
 
 #include	<string>
@@ -27,7 +27,7 @@
 #include	"iClient.h"
 #include	"ChannelUser.h"
 
-RCSTAG("$Id: ChannelUser.cc,v 1.7 2003/08/09 23:15:36 dan_karrels Exp $" ) ;
+RCSTAG("$Id: ChannelUser.cc,v 1.8 2003/08/23 21:00:33 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -36,7 +36,7 @@ using std::string ;
 
 const ChannelUser::modeType ChannelUser::MODE_O = 0x01 ;
 const ChannelUser::modeType ChannelUser::MODE_V = 0x02 ;
-const ChannelUser::modeType ChannelUser::ZOMBIE = 0x04 ;
+//const ChannelUser::modeType ChannelUser::ZOMBIE = 0x04 ;
 
 ChannelUser::ChannelUser( iClient* _theClient )
  : theClient( _theClient ),

@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_J.cc,v 1.3 2003/06/17 15:13:53 dan_karrels Exp $
+ * $Id: msg_J.cc,v 1.4 2003/08/23 21:00:32 dan_karrels Exp $
  */
 
 #include	<new>
@@ -37,7 +37,7 @@
 #include	"ServerCommandHandler.h"
 #include	"config.h"
 
-RCSTAG( "$Id: msg_J.cc,v 1.3 2003/06/17 15:13:53 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: msg_J.cc,v 1.4 2003/08/23 21:00:32 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -172,6 +172,7 @@ for( StringTokenizer::size_type i = 0 ; i < st.size() ; i++ )
 		whichEvent = EVT_CREATE ;
 
 		} // if( NULL == theChan )
+/*
 	else if( theChan->findUser( Target ) != 0 )
 		{
 		// The user is already in the channel...check for
@@ -212,6 +213,7 @@ for( StringTokenizer::size_type i = 0 ; i < st.size() ; i++ )
 		// Continue, nothing more to do here
 		continue ;
 		}
+*/
 
 	// Add a new ChannelUser representing this client to this
 	// channel's user structure.

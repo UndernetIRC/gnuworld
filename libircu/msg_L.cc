@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_L.cc,v 1.2 2003/06/17 15:13:53 dan_karrels Exp $
+ * $Id: msg_L.cc,v 1.3 2003/08/23 21:00:32 dan_karrels Exp $
  */
 
 #include	<new>
@@ -35,7 +35,7 @@
 #include	"ServerCommandHandler.h"
 #include	"config.h"
 
-RCSTAG( "$Id: msg_L.cc,v 1.2 2003/06/17 15:13:53 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: msg_L.cc,v 1.3 2003/08/23 21:00:32 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -127,11 +127,16 @@ for( StringTokenizer::size_type i = 0 ; i < st.size() ; ++i )
 	ChannelUser* theChanUser = theChan->removeUser( theClient ) ;
 	if( NULL == theChanUser )
 		{
-		elog	<< "msg_L> Unable to remove "
-			<< *theClient
-			<< " from channel: "
-			<< *theChan
-			<< endl ;
+		// This can happen if the user is a zombie
+		// Since atm GNUWorld ignores zombies, just ignore
+		// this message.
+		continue ;
+
+//		elog	<< "msg_L> Unable to remove "
+//			<< *theClient
+//			<< " from channel: "
+//			<< *theChan
+//			<< endl ;
 		}
 	delete theChanUser ; theChanUser = 0 ;
 

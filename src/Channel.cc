@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: Channel.cc,v 1.41 2003/08/09 23:15:36 dan_karrels Exp $
+ * $Id: Channel.cc,v 1.42 2003/08/23 21:00:33 dan_karrels Exp $
  */
 
 #include	<new>
@@ -37,7 +37,7 @@
 #include	"server.h"
 #include	"ConnectionManager.h"
 
-RCSTAG("$Id: Channel.cc,v 1.41 2003/08/09 23:15:36 dan_karrels Exp $") ;
+RCSTAG("$Id: Channel.cc,v 1.42 2003/08/23 21:00:33 dan_karrels Exp $") ;
 
 namespace gnuworld
 {
@@ -144,11 +144,12 @@ if( ptr != userList.end() )
 
 // Otherwise, the user was NOT found
 // Log the error
-elog	<< "Channel::removeUser> ("
-	<< getName() << ") "
-	<< "Unable to find user: "
-	<< intYYXXX
-	<< std::endl ;
+// Happens when not handling zombies
+//elog	<< "Channel::removeUser> ("
+//	<< getName() << ") "
+//	<< "Unable to find user: "
+//	<< intYYXXX
+//	<< std::endl ;
 
 // Return error state
 return 0 ;

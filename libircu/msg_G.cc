@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_G.cc,v 1.3 2003/06/17 15:13:53 dan_karrels Exp $
+ * $Id: msg_G.cc,v 1.4 2003/08/23 21:00:32 dan_karrels Exp $
  */
 
 #include	<sys/time.h>
@@ -37,7 +37,7 @@
 #include	"StringTokenizer.h"
 #include	"config.h"
 
-RCSTAG( "$Id: msg_G.cc,v 1.3 2003/06/17 15:13:53 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: msg_G.cc,v 1.4 2003/08/23 21:00:32 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -173,7 +173,7 @@ else
 	s += localTSString ;
 	}
 
-return (theServer->Write( s ) > 0) ;
+return theServer->Write( s ) ;
 }
 
 } // namespace gnuworld

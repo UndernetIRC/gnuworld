@@ -19,24 +19,24 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: iServer.h,v 1.12 2003/08/09 23:15:33 dan_karrels Exp $
+ * $Id: iServer.h,v 1.13 2003/08/23 21:00:32 dan_karrels Exp $
  */
 
 #ifndef __ISERVER_H
-#define __ISERVER_H "$Id: iServer.h,v 1.12 2003/08/09 23:15:33 dan_karrels Exp $"
+#define __ISERVER_H "$Id: iServer.h,v 1.13 2003/08/23 21:00:32 dan_karrels Exp $"
 
 #include	<iostream>
 #include	<string>
 
 #include	<ctime>
 
-#include	"Numeric.h"
 #include	"ELog.h"
 #include	"NetworkTarget.h"
 
 namespace gnuworld
 {
 
+class xServer ;
 class xNetwork ;
 
 using std::string ;
@@ -59,6 +59,12 @@ class iServer : public NetworkTarget
 
 public:
 
+	/// Type used to hold flags
+	typedef unsigned int	flagType ;
+
+	/// Set if this iServer is juped, false otherwise
+	static const flagType	FLAG_JUPE ;
+
 	/**
 	 * Construct an iServer given its vital state variables
 	 * as parameters.
@@ -77,8 +83,43 @@ public:
 	/* Accessor methods */
 
 	/**
-	 * Return the integer representation of this iServer's uplink
-	 * server.
+	 * Return the iServer's flags.
+	 */
+	inline const flagType& getFlags() const
+		{ return flags ; }
+
+	/**
+	 * Return true if a particular flag is set, false otherwise.
+	 */
+	inline bool getFlag( const flagType& whichFlag ) const
+		{ return ((flags & whichFlag) == whichFlag) ; }
+
+	/**
+	 * Set a particular flags.
+	 */
+	inline void setFlag( const flagType& whichFlag )
+		{ flags |= whichFlag ; }
+
+	/**
+	 * Remove a particular flag.
+	 */
+	inline void removeFlag( const flagType& whichFlag )
+		{ flags &= ~whichFlag ; }
+
+	/**
+	 * Return true if this server is a jupe.
+	 */
+	inline bool isJupe() const
+		{ return getFlag( FLAG_JUPE ) ; }
+
+	/**
+	 * Set this iServer as a juped server.
+	 */
+	inline void setJupe()
+		{ setFlag( FLAG_JUPE ) ; }
+
+	/**
+	 * Return the server numeric of this server's uplink.
 	 */
 	inline const unsigned int& getUplinkIntYY() const
 		{ return uplinkIntYY ; }
@@ -212,6 +253,11 @@ protected:
 	 * This variable is true when this server is bursting.
 	 */
 	bool		bursting ;
+
+	/**
+	 * This server's flags.
+	 */
+	flagType	flags ;
 
 } ;
 

@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server.h,v 1.91 2003/08/12 18:17:11 dan_karrels Exp $
+ * $Id: server.h,v 1.92 2003/08/23 21:00:32 dan_karrels Exp $
  */
 
 #ifndef __SERVER_H
-#define __SERVER_H "$Id: server.h,v 1.91 2003/08/12 18:17:11 dan_karrels Exp $"
+#define __SERVER_H "$Id: server.h,v 1.92 2003/08/23 21:00:32 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
@@ -186,6 +186,8 @@ public:
 
 	/**
 	 * Attach a fake server to this services server.
+	 * Use this method to jupe a server, just set the iServer's
+	 * JUPE flag.
 	 */
 	virtual bool AttachServer( iServer* ) ;
 

@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_T.cc,v 1.3 2003/06/17 15:13:53 dan_karrels Exp $
+ * $Id: msg_T.cc,v 1.4 2003/08/23 21:00:32 dan_karrels Exp $
  */
 
 #include	<iostream>
@@ -30,7 +30,7 @@
 #include	"Channel.h"
 #include	"ServerCommandHandler.h"
 
-RCSTAG( "$Id: msg_T.cc,v 1.3 2003/06/17 15:13:53 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: msg_T.cc,v 1.4 2003/08/23 21:00:32 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -62,7 +62,7 @@ if( 0 == theChan )
 
 #ifdef TOPIC_TRACK
 
-Chan->setTopic( Param[ 2 ] ) ;
+theChan->setTopic( Param[ 2 ] ) ;
 
 #endif // TOPIC_TRACK
 
