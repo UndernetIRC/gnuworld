@@ -17,7 +17,7 @@
 #include	"ELog.h"
 #include	"StringTokenizer.h"
 
-const char msg_K_cc_rcsId[] = "$Id: msg_K.cc,v 1.6 2001/06/24 02:14:24 dan_karrels Exp $" ;
+const char msg_K_cc_rcsId[] = "$Id: msg_K.cc,v 1.7 2002/04/10 07:10:10 isomer Exp $" ;
 const char server_h_rcsId[] = __SERVER_H ;
 const char iClient_h_rcsId[] = __ICLIENT_H ;
 const char Channel_h_rcsId[] = __CHANNEL_H ;
@@ -125,6 +125,8 @@ if( NULL == destChanUser )
 		<< ", iClient: "
 		<< *destClient
 		<< endl ;
+	// Return error
+	return -1;
 	}
 
 // On a network with more than 2 servers, the chances are greater
