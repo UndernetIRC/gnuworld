@@ -1,4 +1,4 @@
--- "$Id: README.cservice,v 1.10 2001/10/18 23:43:59 gte Exp $"
+-- "$Id: README.cservice,v 1.11 2001/10/29 17:00:11 nighty Exp $"
 --
 --
 --
@@ -44,23 +44,6 @@ This database will also hosts the pending verif q/a reset requests.
 
 > createdb cmaster
 > psql cmaster < local_db.sql
-
-
-If you want to use anti-bruteforce code that checks IP and denies
-access after too many failed attempts, you need to create
-this database :
-
-> createdb ipcheck
-> psql ipcheck < ipcheck.sql
-
-
-Important Note
---------------
-
-The user running postgres locally for the website MUST be the same
-for the db 'ipcheck' and 'cmaster' and you have to modify 'cmaster.inc'
-so the variable '$ipcheck_dbuser' is set to this username (gnuworld for example).
-
 
 
 Add administrator account

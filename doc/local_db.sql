@@ -1,13 +1,7 @@
 ------------------------------------------------------------------------------------
--- "$Id: local_db.sql,v 1.4 2001/10/21 02:41:17 nighty Exp $"
+-- "$Id: local_db.sql,v 1.5 2001/10/29 17:00:11 nighty Exp $"
 -- Channel service DB SQL file for PostgreSQL.
 --
--- Tables specific to webcookies (needs to be LOCAL).
--- If your whole DB is local then this table NEEDS to be in a db named "cmaster"
--- If your local DB is named "cmaster" .. then just 'psql cmaster < webcookies.sql'
--- otherwise,
---                createdb cmaster
---                psql cmaster < webcookies.sql
 --
 -- nighty <nighty@undernet.org>
 
@@ -43,4 +37,34 @@ CREATE TABLE helpmgr_users (
 CREATE INDEX helpmgr_users_user_id_idx ON helpmgr_users(user_id);
 CREATE INDEX helpmgr_language_id_idx ON helpmgr_users(language_id);
 CREATE INDEX helpmgr_flags_idx ON helpmgr_users(flags);
+
+
+--
+-- IP_CHECK lock IPs after 3 attempts (failed) in wheter "login" or "forgotten password" sections.
+-- to reduce the load on the db host.
+--
+
+CREATE TABLE exclusions (
+   excluded varchar(15) DEFAULT '0.0.0.0' NOT NULL,
+   CONSTRAINT exclusions_pkey PRIMARY KEY (excluded)
+);
+
+CREATE  INDEX exclusions_excluded_key ON exclusions (excluded);
+
+
+CREATE TABLE ips (
+   ipnum varchar(15) DEFAULT '0.0.0.0' NOT NULL,
+   user_name varchar(20) NOT NULL,
+   expiration int4 NOT NULL,
+   hit_counts int4,
+   set_on int4 NOT NULL,
+   CONSTRAINT ips_pkey PRIMARY KEY (expiration, ipnum, user_name)
+);
+
+CREATE  INDEX hit_counts_ips_key ON ips (hit_counts);
+CREATE  INDEX ips_expiration_key ON ips (expiration);
+CREATE  INDEX ips_set_on_key ON ips (set_on);
+CREATE  INDEX ips_ipnum_key ON ips (ipnum);
+CREATE  INDEX ips_user_name_key ON ips (user_name);
+
 
