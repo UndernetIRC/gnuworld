@@ -17,11 +17,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ELog.h,v 1.4 2003/11/11 19:21:22 dan_karrels Exp $
+ * $Id: ELog.h,v 1.5 2003/12/17 18:21:36 dan_karrels Exp $
  */
 
 #ifndef __ELOG_H
-#define __ELOG_H "$Id: ELog.h,v 1.4 2003/11/11 19:21:22 dan_karrels Exp $"
+#define __ELOG_H "$Id: ELog.h,v 1.5 2003/12/17 18:21:36 dan_karrels Exp $"
 
 #include	<sstream>
 #include	<iostream>
@@ -125,18 +125,26 @@ public:
 	inline void setStream( ostream* newStream )
 		{ outStream = newStream ; }
 
+	/**
+	 * Output the endl function.
+	 */
 	ELog& operator<<( __E_omanip func ) ;
+
+	/**
+	 * Output the endl function.
+	 */
 	ELog& operator<<( __E_manip func ) ;
-	ELog& operator<<( const char& ) ;
-	ELog& operator<<( const string& ) ;
-	ELog& operator<<( const int& ) ;
-	ELog& operator<<( const unsigned int& ) ;
-	ELog& operator<<( const long int& ) ;
-	ELog& operator<<( const unsigned long int& ) ;
-	ELog& operator<<( const short int& ) ;
-	ELog& operator<<( const unsigned short int& ) ;
-	ELog& operator<<( stringstream& s ) ;
-	ELog& operator<<( const double& ) ;
+
+	/**
+	 * Output any other type supported by std::ostream.
+	 */
+	template< typename T >
+	ELog& operator<<( const T& var )
+		{
+		if( logFile )	outFile << var ;
+		if( outStream )	*outStream << var ;
+		return *this ;
+		}
 
 } ;
 

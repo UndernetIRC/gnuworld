@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server.cc,v 1.185 2003/12/06 22:11:37 dan_karrels Exp $
+ * $Id: server.cc,v 1.186 2003/12/17 18:21:36 dan_karrels Exp $
  */
 
 #include	<sys/time.h>
@@ -71,7 +71,7 @@
 #include	"ConnectionHandler.h"
 #include	"Connection.h"
 
-RCSTAG( "$Id: server.cc,v 1.185 2003/12/06 22:11:37 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: server.cc,v 1.186 2003/12/17 18:21:36 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -1480,6 +1480,8 @@ Write( "%s N %s %d %d %s %s %s %s %s :%s\n",
 	xIP( fakeClient->getIP() ).GetBase64IP(),
 	fakeClient->getCharYYXXX().c_str(),
 	description.c_str() ) ;
+
+PostEvent( EVT_NICK, static_cast< void* >( fakeClient ) ) ;
 }
 
 /**
@@ -1603,24 +1605,7 @@ void xServer::removeClient( xClient* theClient )
 // Remove this xClient's iClient instance
 iClient* iClientPtr = Network->removeClient( theClient->getInstance() ) ;
 
-/*
-// Notify each channel that the iClient has parted.
-for( iClient::channelIterator chanItr = iClientPtr->channels_begin() ;
-	chanItr != iClientPtr->channels_end() ; ++chanItr )
-	{
-	delete (*chanItr)->removeUser( iClientPtr ) ;
-
-	if( (*chanItr)->empty() )
-		{
-		// The client was the last one in the channel
-		delete Network->removeChannel( (*chanItr) ) ;
-		}
-	} // for()
-
-// This is not strictly necessary, but serves to illustrate the
-// internal client<->channel relationships.
-iClientPtr->clearChannels() ;
-*/
+PostEvent( EVT_QUIT, static_cast< void* >( iClientPtr ) ) ;
 
 // Remove any fake clients and fake servers associated with this
 // xClient.
@@ -1635,6 +1620,8 @@ for( list< iClient* >::iterator cItr = fakeClients.begin() ;
 	s	<< fakeClient->getCharYYXXX()
 		<< " Q :Exiting" ;
 	Write( s ) ;
+
+	PostEvent( EVT_QUIT, static_cast< void* >( fakeClient ) ) ;
 
 	// Remove the fake client from all internal tables and
 	// deallocate.  xNetwork::removeClient() will do all but
@@ -2258,6 +2245,16 @@ if( theChan && (0 == joinTime) )
 	postJoinTime = theChan->getCreationTime() ;
 	}
 
+if( (theChan != 0) && (theChan->findUser( theClient->getInstance() )) )
+	{
+	elog    << "xServer::JoinChannel(xClient)> Client attempted "
+		<< "to join channel "
+		<< theChan->getName()
+		<< " more than once"
+		<< endl ;
+	return false ;
+	}
+
 if( (NULL == theChan) && bursting )
 	{
 	// Need to burst the channel
@@ -2400,7 +2397,9 @@ else
 		stringstream s2 ;
 		s2	<< theClient->getCharYYXXX()
 			<< " J "
-			<< chanName ;
+			<< chanName
+			<< " "
+			<< postJoinTime ;
 
 		Write( s2 ) ;
 		}
@@ -2561,6 +2560,10 @@ if( !theChan->addUser( theChanUser ) )
 	// TODO
 	return false ;
 	}
+
+PostChannelEvent( EVT_JOIN, theChan,
+	static_cast< void* >( theIClient ),
+	static_cast< void* >( theChanUser ) ) ;
 
 return true ;
 }
@@ -3821,6 +3824,9 @@ else
 	Write( "%s Q :Exiting",
 		fakeClient->getCharYYXXX().c_str() ) ;
 	}
+
+PostEvent( EVT_QUIT, static_cast< void* >( fakeClient ) ) ;
+
 return true ;
 }
 
@@ -3904,7 +3910,9 @@ if( !theClient->addChannel( theChan ) )
 stringstream s ;
 s	<< theClient->getCharYYXXX()
 	<< " J "
-	<< chanName ;
+	<< chanName
+	<< ' '
+	<< ::time( 0 ) ;
 Write( s ) ;
 
 PostChannelEvent( EVT_JOIN, theChan,

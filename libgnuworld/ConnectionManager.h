@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ConnectionManager.h,v 1.4 2003/08/05 01:34:24 dan_karrels Exp $
+ * $Id: ConnectionManager.h,v 1.5 2003/12/17 18:21:36 dan_karrels Exp $
  */
 
 #ifndef __CONNECTIONMANAGER_H
-#define __CONNECTIONMANAGER_H "$Id: ConnectionManager.h,v 1.4 2003/08/05 01:34:24 dan_karrels Exp $"
+#define __CONNECTIONMANAGER_H "$Id: ConnectionManager.h,v 1.5 2003/12/17 18:21:36 dan_karrels Exp $"
 
 #include	<sys/types.h>
 
@@ -308,37 +308,55 @@ public:
 
 protected:
 
-	/// The duratino to wait for outgoing connections to be 
-	/// established
+	/**
+	 * The duration to wait for outgoing connections to be 
+	 * established.
+	 */
 	time_t		timeoutDuration ;
 
-	/// The line delimiter, 0 if none
+	/**
+	 * The line delimiter, 0 if none
+	 */
 	char		delimiter ;
 
-	/// Stores connectionMap's, one for each handler (key)
+	/**
+	 * Stores connectionMap's, one for each handler (key)
+	 */
 	handlerMapType	handlerMap ;
 
-	/// Allow for asynchronous calls to Disconnect()
-	/// This structure contains Connections to be removed from
-	/// the connection tables.
+	/**
+	 * Allow for asynchronous calls to Disconnect()
+	 * This structure contains Connections to be removed from
+	 * the connection tables.
+	 */
 	eraseMapType	eraseMap ;
 
-	/// The size of the scratch buffer
+	/**
+	 * The size of the scratch buffer
+	 */
 	size_t		inputBufferSize ;
 
-	/// Scratch buffer for reads
+	/**
+	 * Scratch buffer for reads
+	 */
 	char*		inputBuffer ;
 
-	/// Open a socket.
-	/// Return -1 on error
+	/**
+	 * Open a socket.
+	 * Return -1 on error
+	 */
 	virtual int	openSocket() ;
 
-	/// Close a socket
+	/**
+	 * Close a socket
+	 */
 	virtual void	closeSocket( int ) ;
 
-	/// Set the options for a socket
-	/// Return true is all options were set properly, false
-	/// otherwise.
+	/**
+	 * Set the options for a socket
+	 * Return true is all options were set properly, false
+	 * otherwise.
+	 */
 	virtual bool	setSocketOptions( int ) ;
 
 	/**

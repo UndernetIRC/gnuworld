@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: dronescan.cc,v 1.43 2003/11/26 23:30:22 dan_karrels Exp $
+ * $Id: dronescan.cc,v 1.44 2003/12/17 18:21:36 dan_karrels Exp $
  */
 
 #include	<string>
@@ -42,7 +42,7 @@
 #include "sqlUser.h"
 #include "Timer.h"
 
-RCSTAG("$Id: dronescan.cc,v 1.43 2003/11/26 23:30:22 dan_karrels Exp $");
+RCSTAG("$Id: dronescan.cc,v 1.44 2003/12/17 18:21:36 dan_karrels Exp $");
 
 namespace gnuworld {
 
@@ -944,7 +944,8 @@ bool dronescan::isNormal( const iClient* theClient )
 	assert(currentState != BURST);
 	
 	clientData *theData = static_cast< clientData* > (theClient->getCustomData(this));
-	
+	assert( theData != 0 ) ;
+
 	/* We should never see an unknown state for an initialised client */
 	assert(!theData->isUnknown());
 	

@@ -18,38 +18,56 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: Signal.h,v 1.4 2003/07/03 00:25:48 dan_karrels Exp $
+ * $Id: Signal.h,v 1.5 2003/12/17 18:21:36 dan_karrels Exp $
  */
 
 #ifndef __SIGNAL_H
-#define __SIGNAL_H "$Id: Signal.h,v 1.4 2003/07/03 00:25:48 dan_karrels Exp $"
+#define __SIGNAL_H "$Id: Signal.h,v 1.5 2003/12/17 18:21:36 dan_karrels Exp $"
 
 #include	<pthread.h>
 
 namespace gnuworld
 {
 
+/**
+ * A class used to safely handle asynchronous (non-realtime) signals.
+ * It uses a nonblocking pipe (rather than other solutions, see
+ * my thesis) to solve the multiple consumer, single nonblocking
+ * producer p/c problem.
+ */
 class Signal
 {
 
 protected:
 
-	/// This variable is true if there exists an uncoverable error.
+	/**
+	 * This variable is true if there exists an uncoverable error.
+	 */
 	static bool		signalError ;
 
-	/// The FD for the read side of the pipe.
+	/**
+	 * The FD for the read side of the pipe.
+	 */
 	static int		readFD ;
 
-	/// The FD for the write side of the pipe.
+	/**
+	 * The FD for the write side of the pipe.
+	 */
 	static int		writeFD ;
 
-	/// A mutex to guard access to the Singleton.
+	/**
+	 * A mutex to guard access to the Singleton.
+	 */
 	static pthread_mutex_t	singletonMutex ;
 
-	/// The Singleton instance.
+	/**
+	 * The Singleton instance.
+	 */
 	static Signal*		theInstance ;
 
-	/// This mutex guards from multiple threads performing a get()
+	/**
+	 * This mutex guards from multiple threads performing a get()
+	 */
 	static pthread_mutex_t	pipeMutex ;
 
 public:

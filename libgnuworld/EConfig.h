@@ -17,11 +17,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: EConfig.h,v 1.4 2003/06/18 15:04:04 dan_karrels Exp $
+ * $Id: EConfig.h,v 1.5 2003/12/17 18:21:36 dan_karrels Exp $
  */
 
 #ifndef __ECONFIG_H
-#define __ECONFIG_H "$Id: EConfig.h,v 1.4 2003/06/18 15:04:04 dan_karrels Exp $"
+#define __ECONFIG_H "$Id: EConfig.h,v 1.5 2003/12/17 18:21:36 dan_karrels Exp $"
 
 #include	<iostream>
 #include	<fstream>
@@ -66,30 +66,60 @@ class EConfig
 	 */
 	struct lineInfo
 	{
+		/**
+		 * The key for the key/value pair.
+		 */
 		string			key ;
 
-		// An empty value string indicates that this line
-		// is a comment, and key contains the comment
-		// (including preceeding '#' where necessary.
+		/**
+		 * The value for the key/value pair.
+		 * An empty value string indicates that this line
+		 * is a comment, and key contains the comment
+		 * (including preceeding '#' where necessary.
+		 */
 		string			value ;
+
+		/**
+		 * An iterator into the key/value map for this line,
+		 * so that modifications to this key/value pair can
+		 * can be placed in the correct location in the file.
+		 */
 		mapType::iterator	mapItr ;
 
+	/**
+	 * Default constructor relies upon the default constructors
+	 * of the member variables.
+	 */
 	lineInfo()
 	{}
 
-	// This constructor is called when there is a comment
-	// line.  Even though there are no value tokens, be sure
-	// to record whatever comment is present.
+	/**
+	 * This constructor is called when there is a comment
+	 * line.  Even though there are no value tokens, be sure
+	 * to record whatever comment is present.
+	 */
 	lineInfo( const string& key )
 	 : key( key )
 	{}
+
+	/**
+	 * Copy constructor, used in assignment (as in the key/value map).
+	 */
 	lineInfo( const lineInfo& rhs )
 	 : key( rhs.key ), value( rhs.value ), mapItr( rhs.mapItr )
 	{}
+
+	/**
+	 * Constructor receives the key, value, and map iterator.
+	 */
 	lineInfo( const string& key, const string& value,
 		const mapType::iterator& mapItr )
 	 : key( key ), value( value ), mapItr( mapItr )
 	{}
+
+	/**
+	 * Permit assignment.
+	 */
 	lineInfo& operator=( const lineInfo& rhs )
 	{
 		key = rhs.key ;
@@ -246,9 +276,6 @@ public:
 		}
 
 protected:
-
-	/// Default constructor implicitly disabled
-	/// by presence of any other constructor.
 
 	/**
 	 * Disable copying, this method is declared but NOT defined.

@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: Connection.h,v 1.4 2003/12/06 22:11:36 dan_karrels Exp $
+ * $Id: Connection.h,v 1.5 2003/12/17 18:21:36 dan_karrels Exp $
  */
 
 #ifndef __CONNECTION_H
-#define __CONNECTION_H "$Id: Connection.h,v 1.4 2003/12/06 22:11:36 dan_karrels Exp $"
+#define __CONNECTION_H "$Id: Connection.h,v 1.5 2003/12/17 18:21:36 dan_karrels Exp $"
 
 #include	<sys/types.h>
 #include	<netinet/in.h>
@@ -139,6 +139,9 @@ public:
 	 */
 	static const flagType		F_FILE ;
 
+	/**
+	 * Append a string to the Connection's output buffer.
+	 */
 	virtual void		Write( const string& ) ;
 
 	/**
@@ -295,116 +298,174 @@ protected:
 	 */
 	Connection( const char delimiter ) ;
 
-	/// Set an arbitrary flag for this connection
+	/**
+	 * Set an arbitrary flag for this connection
+	 */
 	inline void	setFlag( const flagType& whichFlag )
 		{ flags |= whichFlag ; }
 
-	/// Remove an arbitrary flag for this connection
+	/**
+	 * Remove an arbitrary flag for this connection
+	 */
 	inline void	removeFlag( const flagType& whichFlag )
 		{ flags &= ~whichFlag ; }
 
-	/// Set this Connection to fully connected state, which also
-	/// removes the PENDING state
+	/**
+	 * Set this Connection to fully connected state, which also
+	 * removes the PENDING state
+	 */
 	inline void	setConnected()
 		{ removeFlag( F_PENDING ) ; setFlag( F_CONNECTED ) ; }
 
-	/// Set this Connection to the pending state, and remove
-	/// the CONNECTED state
+	/**
+	 * Set this Connection to the pending state, and remove
+	 * the CONNECTED state
+	 */
 	inline void	setPending()
 		{ removeFlag( F_CONNECTED ) ; setFlag( F_PENDING ) ; }
 
-	/// Mark that this Connection as an incoming connection
+	/**
+	 * Mark that this Connection as an incoming connection
+	 */
 	inline void	setIncoming()
 		{ setFlag( F_INCOMING ) ; }
 
-	/// Mark that this Connection is a listening for connections
+	/**
+	 * Mark that this Connection is a listening for connections
+	 */
 	inline void	setListen()
 		{ setFlag( F_LISTEN ) ; }
 
-	/// Mark that this Connection represents a file
+	/**
+	 * Mark that this Connection represents a file
+	 */
 	inline void	setFile()
 		{ setFlag( F_FILE ) ; }
 
-	/// Set this connection's local port number
+	/**
+	 * Set this connection's local port number
+	 */
 	inline void	setLocalPort(
 				const unsigned short int newLocalPort )
 		{ localPort = newLocalPort ; }
 
-	/// Set this connection's remote port number
+	/**
+	 * Set this connection's remote port number
+	 */
 	inline void	setRemotePort(
 				const unsigned short int newRemotePort )
 		{ remotePort = newRemotePort ; }
 
-	/// Return the socket (file) descriptor for this connection
+	/**
+	 * Return the socket (file) descriptor for this connection
+	 */
 	inline int	getSockFD() const
 		{ return sockFD ; }
 
-	/// Return a pointer to the socket address structure
+	/**
+	 * Return a pointer to the socket address structure
+	 */
 	inline struct sockaddr_in* getAddr()
 		{ return &addr ; }
 
-	/// Set the Connection's IP to the new IP
+	/**
+	 * Set the Connection's IP to the new IP
+	 */
 	inline void	setIP( const string& newIP )
 		{ IP = newIP ; }
 
-	/// Set the Connection's hostname to newHost
+	/**
+	 * Set the Connection's hostname to newHost
+	 */
 	inline void	setHostname( const string& newHost )
 		{ hostname = newHost ; }
 
-	/// Set the Connection's FD to the new FD
+	/**
+	 * Set the Connection's FD to the new FD
+	 */
 	inline void	setSockFD( int newSockFD )
 		{ sockFD = newSockFD ; }
 
-	/// Set the Connection absTimeout to the new absTimeOut
+	/**
+	 * Set the Connection absTimeout to the new absTimeOut
+	 */
 	inline void	setAbsTimeout( const time_t newAbsTimeout )
 		{ absTimeout = newAbsTimeout ; }
 
-	/// Return the time at which this connection attempt will
-	/// be terminated (its absolute timeout value).
+	/**
+	 * Return the time at which this connection attempt will
+	 * be terminated (its absolute timeout value).
+	 */
 	inline time_t	getAbsTimeout() const
 		{ return absTimeout ; }
 
-	/// The remote hostname of this connection
-	/// This variable is empty() if this Connection is a listener
+	/**
+	 * The remote hostname of this connection
+	 * This variable is empty() if this Connection is a listener
+	 */
 	string			hostname ;
 
-	/// The local port number of this connection
+	/**
+	 * The local port number of this connection
+	 */
 	unsigned short int	localPort ;
 
-	/// The remote port number of this connection
+	/**
+	 * The remote port number of this connection
+	 */
 	unsigned short int	remotePort ;
 
-	/// The input buffer for this connection
+	/**
+	 * The input buffer for this connection
+	 */
 	Buffer			inputBuffer ;
 
-	/// The output buffer for this connection
+	/**
+	 * The output buffer for this connection
+	 */
 	Buffer			outputBuffer ;
 
-	/// The remote IP of this connection
-	/// This variable is empty() if this Connection is a listener
+	/**
+	 * The remote IP of this connection
+	 * This variable is empty() if this Connection is a listener
+	 */
 	string			IP ;
 
-	/// The socket (file) descriptor for the socket of this
-	/// connection
+	/**
+	 * The socket (file) descriptor for the socket of this
+	 * connection.
+	 */
 	int			sockFD ;
 
-	/// The flags associated with this connection
+	/**
+	 * The flags associated with this connection
+	 */
 	flagType		flags ;
 
-	/// The socket address structure for this connection
+	/**
+	 * The socket address structure for this connection
+	 */
 	struct sockaddr_in	addr ;
 
-	/// The time at which this connection attempt began
+	/**
+	 * The time at which this connection attempt began
+	 */
 	time_t			absTimeout ;
 
-	/// The time at which this Connection completed connection,
-	/// 0 for listening socket
+	/**
+	 * The time at which this Connection completed connection,
+	 * 0 for listening socket.
+	 */
 	time_t			connectTime ;
 
-	/// The total number of bytes read
+	/**
+	 * The total number of bytes read
+	 */
 	size_t			bytesRead ;
 
-	/// The total number of bytes written
+	/**
+	 * The total number of bytes written
+	 */
 	size_t			bytesWritten ;
 
 } ;

@@ -19,11 +19,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, 
  * USA.
  *
- * $Id: Buffer.h,v 1.5 2003/08/05 01:34:23 dan_karrels Exp $
+ * $Id: Buffer.h,v 1.6 2003/12/17 18:21:36 dan_karrels Exp $
  */
 
 #ifndef __BUFFER_H
-#define __BUFFER_H "$Id: Buffer.h,v 1.5 2003/08/05 01:34:23 dan_karrels Exp $"
+#define __BUFFER_H "$Id: Buffer.h,v 1.6 2003/12/17 18:21:36 dan_karrels Exp $"
 
 #include	<iostream>
 #include	<string>
@@ -46,6 +46,10 @@ class Buffer
 
 public:
 
+	/**
+	 * The type used to represent the string, could be useful
+	 * if this class is ever templated (again).
+	 */
 	typedef std::string stringType ;
 
 	/**
@@ -152,17 +156,11 @@ public:
 
 	/**
 	 * Append a give number of bytes from appendMe to this
-	 * Buffer.
+	 * Buffer.  This is useful for storing binary data in an
+	 * object of this class.
 	 */
 	inline void		append( const char* appendMe, size_t numBytes )
 		{ buf.append( appendMe, numBytes ) ; }
-
-	/**
-	 * Concatenate the given character array onto the end of
-	 * the Buffer.
-	 */
-	inline Buffer&		operator+=( const char* addMe )
-		{ buf += addMe ; return *this ; }
 
 	/**
 	 * Concatenate the given C++ string to the end of the
@@ -177,13 +175,6 @@ public:
 	 */
 	inline Buffer&		operator+=( const Buffer& addMe )
 		{ buf += addMe.buf ; return *this ; }
-
-	/**
-	 * Assign to this Buffer the contents of the character
-	 * array passed as argument.
-	 */
-	inline Buffer&		operator=( const char* replaceWithMe )
-		{ buf = replaceWithMe ; return *this ; }
 
 	/**
 	 * Assign to this Buffer the contents of the C++ string

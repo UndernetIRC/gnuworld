@@ -336,8 +336,10 @@ void snoop::OnFakeChannelMessage( iClient* srcClient,
 	const string& Message )
 {
 // A fake client received a channel message
-// Ignore if it's the admin channel
-if( !strcasecmp( theChan->getName(), adminChanName ) )
+
+// Ignore if it's the admin or relay channel
+if( !strcasecmp( theChan->getName(), adminChanName ) ||
+	!strcasecmp( theChan->getName(), relayChanName ) )
 	{
 	return ;
 	}
@@ -352,12 +354,6 @@ if( 0 == relayChan )
 		<< " unable to find relay chan: "
 		<< relayChanName
 		<< endl ;
-	return ;
-	}
-
-// Don't relay to the relay channel
-if( relayChan == theChan )
-	{
 	return ;
 	}
 

@@ -1,7 +1,7 @@
 /**
  * MTrie.h
  *
- * $Id: MTrie.h,v 1.10 2003/08/19 21:48:39 dan_karrels Exp $
+ * $Id: MTrie.h,v 1.11 2003/12/17 18:21:36 dan_karrels Exp $
  */
 
 #ifndef __MTRIE_H
@@ -44,10 +44,14 @@ public:
 	 */
 	virtual ~MTrie() ;
 
-	/// The type being stored in this structure
+	/**
+	 * The type being stored in this structure
+	 */
 	typedef _valueT		data_type ;
 
-	/// The key/value pair type
+	/**
+	 * The key/value pair type
+	 */
 	typedef pair< string, _valueT >	value_type ;
 
 	/**
@@ -111,15 +115,21 @@ public:
 				const ;
 protected:
 
-	/// Recursive helper method to the public levelDebug()
+	/**
+	 * Recursive helper method to the public levelDebug()
+	 */
 	virtual void	levelDebug( std::ostream&, size_t currentLevel,
 				size_t searchLevel,
 				const MTrie< data_type >* ) const ;
 
-	/// Return the total number of values under the given node
+	/**
+	 * Return the total number of values under the given node
+	 */
 	virtual size_t	value_size( const MTrie< data_type >* ) const ;
 
-	/// Recursive helper method to the public findMinLength()
+	/**
+	 * Recursive helper method to the public findMinLength()
+	 */
 	virtual void	findMinLength( size_t minLength,
 				list< string >& retMe,
 				const MTrie< data_type >* ) const ;
@@ -164,41 +174,66 @@ protected:
 				list< string >& base,
 				const string& key ) ;
 
+	/**
+	 * A recursive method used to output some debugging information.
+	 */
 	virtual void	recursiveDebug( std::ostream&,
 				size_t levelNum,
 				const MTrie< data_type >* ) const ;
 
-	/// The number of elements stored in this MTrie
+	/**
+	 * The number of elements stored in this MTrie
+	 */
 	size_type		numElements ;
 
-	/// The parent node to this node (NULL if root)
+	/**
+	 * The parent node to this node (NULL if root)
+	 */
 	MTrie< data_type >*	parent ;
 
-	/// The string delimiter
+	/**
+	 * The string delimiter.
+	 */
 	char			delimiter ;
 
-	/// The type used to store values
+	/**
+	 * The type used to store values
+	 */
 	typedef list< data_type > valuesListType ;
 
-	/// An iterator for iterating the valuesList
+	/**
+	 * An iterator for iterating the valuesList
+	 */
 	typedef typename valuesListType::iterator values_iterator ;
 
-	/// A const iterator for iterating the valuesList
+	/**
+	 * A const iterator for iterating the valuesList
+	 */
 	typedef typename valuesListType::const_iterator const_values_iterator ;
 
-	/// The structure used to store values
+	/**
+	 * The structure used to store values
+	 */
 	valuesListType		valuesList ;
 
-	/// The type used to store pointers to levels in the trie
+	/**
+	 * The type used to store pointers to levels in the trie
+	 */
 	typedef map< string, MTrie< _valueT >* > nodesMapType ;
 
-	/// An iterator to nodes in the trie
+	/**
+	 * An iterator to nodes in the trie
+	 */
 	typedef typename nodesMapType::iterator nodes_iterator ;
 
-	/// A const iterator to nodes in the trie
+	/**
+	 * A const iterator to nodes in the trie
+	 */
 	typedef typename nodesMapType::const_iterator const_nodes_iterator ;
 
-	/// The structure used to store levels in the trie
+	/**
+	 * The structure used to store levels in the trie
+	 */
 	nodesMapType		nodesMap ;
 
 	/**

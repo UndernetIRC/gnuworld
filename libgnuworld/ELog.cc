@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ELog.cc,v 1.3 2003/11/11 19:21:21 dan_karrels Exp $
+ * $Id: ELog.cc,v 1.4 2003/12/17 18:21:36 dan_karrels Exp $
  */
 
 #include	<iostream>
@@ -29,7 +29,7 @@
 #include	"config.h"
 #include	"ELog.h"
 
-const char rcsId[] = "$Id: ELog.cc,v 1.3 2003/11/11 19:21:21 dan_karrels Exp $" ;
+const char rcsId[] = "$Id: ELog.cc,v 1.4 2003/12/17 18:21:36 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -94,106 +94,6 @@ return *this ;
 }
 
 ELog& ELog::operator<<( __E_manip var )
-{
-if( logFile )
-	{
-	outFile	<< var ;
-	}
-if( outStream ) *outStream << var ;
-return *this ;
-}
-
-ELog& ELog::operator<<( const char& var )
-{
-if( logFile )
-	{
-	outFile	<< var ;
-	}
-if( outStream ) *outStream << var ;
-return *this ;
-}
-
-ELog& ELog::operator<<( const string& var )
-{
-if( logFile )
-	{
-	outFile	<< var ;
-	}
-if( outStream ) *outStream << var ;
-return *this ;
-}
-
-ELog& ELog::operator<<( const int& var )
-{
-if( logFile )
-	{
-	outFile	<< var ;
-	}
-if( outStream ) *outStream << var ;
-return *this ;
-}
-
-ELog& ELog::operator<<( const unsigned int& var )
-{
-if( logFile )
-	{
-	outFile	<< var ;
-	}
-if( outStream ) *outStream << var ;
-return *this ;
-}
-
-ELog& ELog::operator<<( const long int& var )
-{
-if( logFile )
-	{
-	outFile	<< var ;
-	}
-if( outStream ) *outStream << var ;
-return *this ;
-}
-
-ELog& ELog::operator<<( const unsigned long int& var )
-{
-if( logFile )
-	{
-	outFile	<< var ;
-	}
-if( outStream ) *outStream << var ;
-return *this ;
-}
-
-ELog& ELog::operator<<( const short int& var )
-{
-if( logFile )
-	{
-	outFile	<< var ;
-	}
-if( outStream ) *outStream << var ;
-return *this ;
-}
-
-ELog& ELog::operator<<( const unsigned short int& var )
-{
-if( logFile )
-	{
-	outFile	<< var ;
-	}
-if( outStream ) *outStream << var ;
-return *this ;
-}
-
-ELog& ELog::operator<<( stringstream& s )
-{
-if( logFile )
-	{
-	outFile	<< s.str() ;
-	}
-if( outStream ) *outStream << s.str() ;
-return *this ;
-}
-
-ELog& ELog::operator<<( const double& var )
 {
 if( logFile )
 	{
