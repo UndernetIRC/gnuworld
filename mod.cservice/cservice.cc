@@ -82,23 +82,24 @@ cservice::cservice(const string& args)
 	 *  Register command handlers.
 	 */
  
-    RegisterCommand(new SHOWCOMMANDSCommand(this, "SHOWCOMMANDS", "TBA")); 
-    RegisterCommand(new LOGINCommand(this, "LOGIN", "<usernamne | userid> <password>"));
-    RegisterCommand(new SEARCHCommand(this, "SEARCH", "TBA"));
+    RegisterCommand(new SHOWCOMMANDSCommand(this, "SHOWCOMMANDS", ""));
+    RegisterCommand(new LOGINCommand(this, "LOGIN", "<usernamne> <password>")); 
     RegisterCommand(new ACCESSCommand(this, "ACCESS", "[channel] [nick] [-min n] [-max n] [-autoop] [-noautoop] [-modif [mask]]"));
-    RegisterCommand(new CHANINFOCommand(this, "CHANINFO", "TBA"));
-    RegisterCommand(new MOTDCommand(this, "MOTD", "TBA"));
-    RegisterCommand(new ISREGCommand(this, "ISREG", "#channel"));
-    RegisterCommand(new SHOWIGNORECommand(this, "SHOWIGNORE", "TBA"));
+    RegisterCommand(new CHANINFOCommand(this, "CHANINFO", "<#channel>")); 
+    RegisterCommand(new ISREGCommand(this, "ISREG", "<#channel>")); 
     RegisterCommand(new VERIFYCommand(this, "VERIFY", "<nick>"));
-    RegisterCommand(new RANDOMCommand(this, "RANDOM", "TBA"));
+    RegisterCommand(new SEARCHCommand(this, "SEARCH", "<keywords>"));
+    RegisterCommand(new MOTDCommand(this, "MOTD", ""));
+    RegisterCommand(new RANDOMCommand(this, "RANDOM", ""));
+    RegisterCommand(new SHOWIGNORECommand(this, "SHOWIGNORE", ""));
 
-    RegisterCommand(new OPCommand(this, "OP", "#channel [nick][,nick] .."));
-    RegisterCommand(new VOICECommand(this, "VOICE", "#channel [nick][,nick] .."));
-    RegisterCommand(new ADDUSERCommand(this, "ADDUSER", "#channel <nick> <access>"));
-    RegisterCommand(new REMUSERCommand(this, "REMUSER", "#channel <nick>"));
+    RegisterCommand(new OPCommand(this, "OP", "<#channel> [nick][,nick] .."));
+    RegisterCommand(new VOICECommand(this, "VOICE", "<#channel> [nick][,nick] .."));
+    RegisterCommand(new ADDUSERCommand(this, "ADDUSER", "<#channel> <nick> <access>"));
+    RegisterCommand(new REMUSERCommand(this, "REMUSER", "<#channel> <nick>"));
+    RegisterCommand(new MODINFOCommand(this, "MODINFO", "<#channel> [ACCESS <nick> <level>] [AUTOOP <nick> <on|off>]"));
 
-	//-- Load in our cservice configuration file.
+	//-- Load in our cservice configuration file. 
 	cserviceConfig = new EConfig( args ) ;
 	string sqlHost = cserviceConfig->Require( "sql_host" )->second;
 	string sqlDb = cserviceConfig->Require( "sql_db" )->second;
@@ -139,6 +140,9 @@ cservice::cservice(const string& args)
 	userCacheHits = 0;
 	channelHits = 0;
 	channelCacheHits = 0;
+
+	// Load our translation tables.
+	loadTranslationTable();
 }
 
 cservice::~cservice()
@@ -235,7 +239,7 @@ int cservice::OnCTCP( iClient* theClient, const string& CTCP,
 
 	if(Command == "VERSION")
 	{
-		xClient::DoCTCP(theClient, CTCP.c_str(), "Undernet Channel Services Version 2 ($Id: cservice.cc,v 1.16 2000/12/28 01:21:42 gte Exp $)");
+		xClient::DoCTCP(theClient, CTCP.c_str(), "Undernet Channel Services Version 2 [" __DATE__ " " __TIME__ "] ($Id: cservice.cc,v 1.17 2000/12/28 05:03:09 gte Exp $)");
 		return true;
 	}
  
@@ -348,6 +352,65 @@ short cservice::getAccessLevel( sqlUser* theUser, sqlChannel* theChan )
 
 	// By default, users have level 0 access on a channel.
 	return 0;
+}
+
+const string& cservice::getResponse( sqlUser* theUser, int response_id )
+{ 
+	/*
+ 	 * Returns response id "response_id" for this user's prefered
+	 * language. 
+	 */
+
+	static string result;
+
+	int lang_id = theUser->getLanguageId();
+	pair<int, int> thePair;
+	thePair = make_pair(lang_id, response_id);
+
+	translationTableType::iterator ptr =  translationTable.find(thePair);
+	if(ptr != translationTable.end()) // Found something!
+	{ 
+		return ptr->second ;
+	} 
+
+	/* 
+	 * Realistically we should bomb here, however it might be wise to 'fallback'
+	 * to a lower language ID and try again, only bombing if we can't find an
+	 * english variant. (Carrying on here could corrupt numerous varg lists, and
+	 * will most likely segfault anyway).
+	 */
+
+	result = "Unable to retrieve response. If you see this, you are already dead :)";
+	return result;
+}
+
+void cservice::loadTranslationTable()
+{
+	/*
+	 *  Execute an SQL query to retrieve all the translation data.
+	 */
+
+	ExecStatusType status;
+ 
+	if ((status = SQLDb->Exec( "SELECT language_id,response_id,text FROM translations" )) == PGRES_TUPLES_OK)
+	{
+
+		for (int i = 0 ; i < SQLDb->Tuples(); i++)
+		{
+			pair<int, int> thePair;
+
+			/*
+			 *  Add to our translations table.
+			 */
+
+			int lang_id = atoi(SQLDb->GetValue( i, 0 ));
+			int resp_id = atoi(SQLDb->GetValue( i, 1 ));
+			thePair = make_pair(lang_id,resp_id);
+			translationTable.insert( translationTableType::value_type(thePair, SQLDb->GetValue( i, 2 )) );
+		}
+	}
+
+	elog << "sqlTranslations> Loaded " << translationTable.size() << " entries." << endl;
 }
  
 bool cservice::isOnChannel( const string& chanName ) const

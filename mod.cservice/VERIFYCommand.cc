@@ -8,7 +8,7 @@
 #include	"Network.h"
 #include	"levels.h"
  
-const char VERIFYCommand_cc_rcsId[] = "$Id: VERIFYCommand.cc,v 1.4 2000/12/28 01:21:42 gte Exp $" ;
+const char VERIFYCommand_cc_rcsId[] = "$Id: VERIFYCommand.cc,v 1.5 2000/12/28 05:03:09 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -45,9 +45,9 @@ bool VERIFYCommand::Exec( iClient* theClient, const string& Message )
 	{
 		if(target->isOper())
 		{ 
-			bot->Notice(theClient, "%s is an IRC operator", target->getNickName().c_str());
+			bot->Notice(theClient, "%s is an IRC operator", target->getNickUserHost().c_str());
 		} else {
-			bot->Notice(theClient, "%s is NOT an authenticated Cservice representative", target->getNickName().c_str());
+			bot->Notice(theClient, "%s is NOT an authenticated Cservice representative", target->getNickUserHost().c_str());
 		}
 		return false;
 	}
@@ -59,43 +59,43 @@ bool VERIFYCommand::Exec( iClient* theClient, const string& Message )
 
 	if (level < 0)
 	{
-		bot->Notice(theClient, "%s is a well-known TROUBLEMAKER (Authenticated as %s)", target->getNickName().c_str(), theUser->getUserName().c_str());
+		bot->Notice(theClient, "%s is a well-known TROUBLEMAKER (Authenticated as %s)", target->getNickUserHost().c_str(), theUser->getUserName().c_str());
 		return false;
 	}
 
 	if (level == 0) 
 	{ 
-		bot->Notice(theClient, "%s is NOT an authenticated Cservice representative (Authenticated as %s)", target->getNickName().c_str(), theUser->getUserName().c_str());
+		bot->Notice(theClient, "%s is NOT an authenticated Cservice representative (Authenticated as %s)", target->getNickUserHost().c_str(), theUser->getUserName().c_str());
 		return false;
 	}
 
  	if ((level >= level::admin::base) && (level <= level::admin::helper)) 
 	{
-		bot->Notice(theClient, "%s is an Official Cservice Helper%s (Authenticated as %s)", target->getNickName().c_str(), extra.c_str(), theUser->getUserName().c_str());
+		bot->Notice(theClient, "%s is an Official Cservice Helper%s (Authenticated as %s)", target->getNickUserHost().c_str(), extra.c_str(), theUser->getUserName().c_str());
 		return true;
 	}
  
 	if ((level > level::admin::helper) && (level <= level::admin::admin)) 
 	{
-		bot->Notice(theClient, "%s is an Official Cservice Admin%s (Authenticated as %s)", target->getNickName().c_str(), extra.c_str(), theUser->getUserName().c_str());
+		bot->Notice(theClient, "%s is an Official Cservice Admin%s (Authenticated as %s)", target->getNickUserHost().c_str(), extra.c_str(), theUser->getUserName().c_str());
 		return true;
 	}
 
 	if (level == level::admin::hbic) 
 	{
-		bot->Notice(theClient, "%s is the Cservice HBIC%s (Authenticated as %s)", target->getNickName().c_str(), extra.c_str(), theUser->getUserName().c_str());
+		bot->Notice(theClient, "%s is the Cservice HBIC%s (Authenticated as %s)", target->getNickUserHost().c_str(), extra.c_str(), theUser->getUserName().c_str());
 		return true;
 	}
 
 	if ((level > level::admin::hbic) && (level <= level::admin::coder)) 
 	{
-		bot->Notice(theClient, "%s is an Official Cservice Coder%s (Authenticated as %s)", target->getNickName().c_str(), extra.c_str(), theUser->getUserName().c_str());
+		bot->Notice(theClient, "%s is an Official Cservice Coder%s (Authenticated as %s)", target->getNickUserHost().c_str(), extra.c_str(), theUser->getUserName().c_str());
 		return true;
 	}
 
 	if (level == level::admin::daddy) 
 	{
-		bot->Notice(theClient, "%s is my daddy%s (Authenticated as %s)", target->getNickName().c_str(), extra.c_str(), theUser->getUserName().c_str());
+		bot->Notice(theClient, "%s is my daddy%s (Authenticated as %s)", target->getNickUserHost().c_str(), extra.c_str(), theUser->getUserName().c_str());
 		return true;
 	}
  

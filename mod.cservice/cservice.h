@@ -1,9 +1,10 @@
 #ifndef __CSERVICE_H
-#define __CSERVICE_H "$Id: cservice.h,v 1.13 2000/12/28 01:21:42 gte Exp $"
+#define __CSERVICE_H "$Id: cservice.h,v 1.14 2000/12/28 05:03:09 gte Exp $"
 
 #include	<string>
 #include	<vector>
 #include	<hash_map>
+#include	<map>
 #include	<ctime>
 
 #include	"client.h"
@@ -17,6 +18,8 @@
  
 using std::string ;
 using std::vector ;
+using std::hash_map ;
+using std::map ;
 
 class PgDatabase; 
  
@@ -79,6 +82,7 @@ public:
 	// Typedef's for user/channel Hashmaps.
 	typedef hash_map< string, sqlUser*, eHash, eqstr > sqlUserHashType ;
 	typedef hash_map< string, sqlChannel*, eHash, eqstr > sqlChannelHashType ;
+	typedef map < pair <int, int>, sqlLevel* > sqlLevelHashType ;
 
 	// Cache of user records.
 	sqlUserHashType sqlUserCache;
@@ -86,11 +90,24 @@ public:
 	// Cache of channel records.
 	sqlChannelHashType sqlChannelCache;
 
+	// Cache of Level records.
+	sqlLevelHashType sqlLevelCache;
+ 
 	// Some counters for statistical purposes.
 	unsigned int userHits;
 	unsigned int userCacheHits;
 	unsigned int channelHits;
 	unsigned int channelCacheHits; 
+	unsigned int levelHits;
+	unsigned int levelCacheHits; 
+
+	// Language translations table (Loaded from Db).
+	typedef map < pair <int, int>, string > translationTableType ;
+	translationTableType translationTable;
+
+	void loadTranslationTable();
+	// Function to retrieve a translation string.
+	const string& getResponse( sqlUser*, int );
 } ;
  
 } // namespace gnuworld
