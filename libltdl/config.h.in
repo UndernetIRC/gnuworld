@@ -9,6 +9,21 @@
 /* Define if you have the ANSI C header files.  */
 #undef STDC_HEADERS
 
+/* Define if you have the argz_append function.  */
+#undef HAVE_ARGZ_APPEND
+
+/* Define if you have the argz_create_sep function.  */
+#undef HAVE_ARGZ_CREATE_SEP
+
+/* Define if you have the argz_insert function.  */
+#undef HAVE_ARGZ_INSERT
+
+/* Define if you have the argz_next function.  */
+#undef HAVE_ARGZ_NEXT
+
+/* Define if you have the argz_stringify function.  */
+#undef HAVE_ARGZ_STRINGIFY
+
 /* Define if you have the bcopy function.  */
 #undef HAVE_BCOPY
 
@@ -20,6 +35,9 @@
 
 /* Define if you have the memcpy function.  */
 #undef HAVE_MEMCPY
+
+/* Define if you have the memmove function.  */
+#undef HAVE_MEMMOVE
 
 /* Define if you have the rindex function.  */
 #undef HAVE_RINDEX
@@ -33,8 +51,14 @@
 /* Define if you have the strrchr function.  */
 #undef HAVE_STRRCHR
 
+/* Define if you have the <argz.h> header file.  */
+#undef HAVE_ARGZ_H
+
 /* Define if you have the <ctype.h> header file.  */
 #undef HAVE_CTYPE_H
+
+/* Define if you have the <dirent.h> header file.  */
+#undef HAVE_DIRENT_H
 
 /* Define if you have the <dl.h> header file.  */
 #undef HAVE_DL_H
@@ -45,11 +69,17 @@
 /* Define if you have the <dlfcn.h> header file.  */
 #undef HAVE_DLFCN_H
 
+/* Define if you have the <errno.h> header file.  */
+#undef HAVE_ERRNO_H
+
 /* Define if you have the <malloc.h> header file.  */
 #undef HAVE_MALLOC_H
 
 /* Define if you have the <memory.h> header file.  */
 #undef HAVE_MEMORY_H
+
+/* Define if you have the <ndir.h> header file.  */
+#undef HAVE_NDIR_H
 
 /* Define if you have the <stdio.h> header file.  */
 #undef HAVE_STDIO_H
@@ -63,8 +93,17 @@
 /* Define if you have the <strings.h> header file.  */
 #undef HAVE_STRINGS_H
 
+/* Define if you have the <sys/dir.h> header file.  */
+#undef HAVE_SYS_DIR_H
+
 /* Define if you have the <sys/dl.h> header file.  */
 #undef HAVE_SYS_DL_H
+
+/* Define if you have the <sys/ndir.h> header file.  */
+#undef HAVE_SYS_NDIR_H
+
+/* Define if you have the <unistd.h> header file.  */
+#undef HAVE_UNISTD_H
 
 /* Define to the extension used for shared libraries, say, .so.  */
 #undef LTDL_SHLIB_EXT
@@ -104,4 +143,7 @@
 
 /* Define if the OS needs help to load dependent libraries for dlopen().  */
 #undef LTDL_DLOPEN_DEPLIBS
+
+/* Define to a type to use for `error_t' if it is not otherwise available. */
+#undef error_t
 
