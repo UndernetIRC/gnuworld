@@ -38,7 +38,7 @@
 #include	"ip.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.130 2002/03/01 21:02:07 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.131 2002/03/03 11:38:55 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -902,12 +902,10 @@ switch( theEvent )
 							tmpGline->loadData(tmpGline->getHost());
 							addGline(tmpGline);
 							}
-						//setRemoving(tmpGline->getHost());
 						MyUplink->setGline( nickName,
 								tmpGline->getHost(),
 								tmpGline->getReason(),
 								tmpGline->getExpires() - ::time(0) , this) ;
-						//unSetRemoving();
 						}	
 					else
 						{

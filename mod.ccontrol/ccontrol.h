@@ -3,7 +3,7 @@
  */
 
 #ifndef __CCONTROL_H
-#define __CCONTROL_H "$Id: ccontrol.h,v 1.63 2002/03/01 21:02:07 mrbean_ Exp $"
+#define __CCONTROL_H "$Id: ccontrol.h,v 1.64 2002/03/03 11:38:55 mrbean_ Exp $"
 
 //Undef this if you want to log to the database
 #define LOGTOHD 
@@ -11,6 +11,7 @@
 #include	<string>
 #include	<vector>
 #include	<map>
+#include	<hash_map>
 #include        <iomanip>
 
 #include	<cstdio>
@@ -143,7 +144,8 @@ protected:
 	
 	typedef gateQueueType::iterator gateIterator;
 	
-	typedef map<string,int> 	clientsIpMapType;
+	//typedef map<string,int> 	clientsIpMapType;
+	typedef hash_map<string , int , eHash , eqstr> clientsIpMapType;
 	
 	typedef clientsIpMapType::iterator clientsIpIterator;
 	
