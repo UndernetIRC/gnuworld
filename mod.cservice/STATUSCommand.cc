@@ -12,7 +12,7 @@
 #include	"Network.h"
 #include	"cservice_config.h"
 
-const char STATUSCommand_cc_rcsId[] = "$Id: STATUSCommand.cc,v 1.41 2002/05/23 17:43:13 dan_karrels Exp $" ;
+const char STATUSCommand_cc_rcsId[] = "$Id: STATUSCommand.cc,v 1.42 2002/10/19 19:53:59 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -63,51 +63,7 @@ if (st[1] == "*")
 		return false;
 		}
 
-	/*
-	 *  Show some fancy stats.
-	 */
-
-	float userTotal = bot->userCacheHits + bot->userHits;
-	float userEf = (bot->userCacheHits ?
-		((float)bot->userCacheHits / userTotal * 100) : 0);
-
-	bot->Notice(theClient,
-		bot->getResponse(theUser,
-			language::status_tagline,
-			string("CMaster Channel Services internal status:")));
-
-	bot->Notice(theClient,
-		bot->getResponse(theUser,
-			language::status_user_rec,
-			string("[        User Record Stats] \002Cached Entries:\002 %i    \002DB Requests:\002 %i    \002Cache Hits:\002 %i    \002Efficiency:\002 %.2f%%")).c_str(),
-		bot->sqlUserCache.size(),
-		bot->userHits,
-		bot->userCacheHits,
-		userEf);
-
-	bot->Notice(theClient,
-		bot->getResponse(theUser,
-			language::status_data_alloc,
-			string("Custom data containers allocated (# of iClients): %i")).c_str(),
-			bot->customDataAlloc);
-
-	float joinTotal = ((float)bot->joinCount / (float)Network->channelList_size()) * 100;
-	bot->Notice(theClient, "I am in %i channels out of %i on the network. (%.2f%%)",
-		bot->joinCount, Network->channelList_size(), joinTotal);
-
-	unsigned int mins = (bot->currentTime() - bot->getUplink()->getStartTime());
-	cout << "mins: " << mins << endl;
-	float cPerMin = (float)bot->totalCommands / (float)mins;
-
-	bot->Notice(theClient, "I've received %i commands since I started (%.2f commands per second).",
-		bot->totalCommands, cPerMin);
-
-	bot->Notice(theClient,
-		bot->getResponse(theUser,
-			language::status_uptime,
-			string("\002Uptime:\002 %s")).c_str(),
-		bot->prettyDuration(bot->getUplink()->getStartTime()
-			+ bot->dbTimeOffset).c_str());
+	bot->doCoderStats(theClient);
 
 	return true;
 	}

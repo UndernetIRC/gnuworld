@@ -9,7 +9,7 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char FORCECommand_cc_rcsId[] = "$Id: FORCECommand.cc,v 1.13 2002/05/23 17:43:12 dan_karrels Exp $" ;
+const char FORCECommand_cc_rcsId[] = "$Id: FORCECommand.cc,v 1.14 2002/10/19 19:53:59 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -94,4 +94,3 @@ bool FORCECommand::Exec( iClient* theClient, const string& Message )
 }
 
 } // namespace gnuworld.
-

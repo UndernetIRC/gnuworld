@@ -1,11 +1,11 @@
 /**
  * cservice.h
  * Author: Greg Sikorski
- * $Id: cservice.h,v 1.91 2002/10/09 21:04:24 gte Exp $
+ * $Id: cservice.h,v 1.92 2002/10/19 19:54:00 gte Exp $
  */
 
 #ifndef __CSERVICE_H
-#define __CSERVICE_H "$Id: cservice.h,v 1.91 2002/10/09 21:04:24 gte Exp $"
+#define __CSERVICE_H "$Id: cservice.h,v 1.92 2002/10/19 19:54:00 gte Exp $"
 
 #include	<string>
 #include	<vector>
@@ -413,9 +413,12 @@ public:
 	 *  Misc uncategorisable functions.
 	 */
 
+	unsigned int preloadUserDays;
+
 	void preloadBanCache();
 	void preloadChannelCache();
 	void preloadLevelsCache();
+	void preloadUserCache();
 
 	void updateChannels();
 	void updateUsers();
@@ -440,10 +443,12 @@ public:
 
 	unsigned int noteDuration;
 	unsigned int noteLimit;
+
+	void doCoderStats(iClient* theClient);
 } ;
 
 const string escapeSQLChars(const string& theString);
-const string searchSQL(const string& theString); 
+const string searchSQL(const string& theString);
 
 } // namespace gnuworld
 

@@ -2,7 +2,7 @@
  * cservice.cc
  * Author: Greg Sikorski
  * Purpose: Overall control client.
- * $Id: cservice.cc,v 1.221 2002/10/10 18:14:38 gte Exp $
+ * $Id: cservice.cc,v 1.222 2002/10/19 19:53:59 gte Exp $
  */
 
 #include	<new>
@@ -268,6 +268,7 @@ limitCheckPeriod = atoi((cserviceConfig->Require( "limit_check" )->second).c_str
 loginDelay = atoi((cserviceConfig->Require( "login_delay" )->second).c_str());
 noteDuration = atoi((cserviceConfig->Require( "note_duration" )->second).c_str());
 noteLimit = atoi((cserviceConfig->Require( "note_limit" )->second).c_str());
+preloadUserDays = atoi((cserviceConfig->Require( "preload_user_days" )->second).c_str());
 
 userHits = 0;
 userCacheHits = 0;
@@ -296,6 +297,9 @@ preloadBanCache();
 
 /* Preload the Level cache */
 preloadLevelsCache();
+
+/* Preload any user accounts we want to */
+preloadUserCache();
 
 }
 
@@ -2968,6 +2972,8 @@ bool cservice::checkBansOnJoin( Channel* netChan, sqlChannel* theChan,
 
 sqlBan* theBan = isBannedOnChan(theChan, theClient);
 
+// TODO: Don't reapply this ban to the network if it already is set in the channel object.
+//       (ircu banlist could be full).
 // TODO: Ban through the server.
 // TODO: Violation of rule of numbers
 /* If we found a matching ban */
@@ -3702,7 +3708,7 @@ theQuery	<< "SELECT " << sql::ban_fields
 			<< " FROM bans;"
 			<< ends;
 
-elog		<< "*** [CMaster::preloadBanCache]: Precaching Level table: "
+elog		<< "*** [CMaster::preloadBanCache]: Precaching Bans table: "
 			<< endl;
 
 ExecStatusType status = SQLDb->Exec(theQuery.str().c_str()) ;
@@ -3788,6 +3794,48 @@ elog	<< "*** [CMaster::preloadLevelCache]: Done. Loaded "
 		<< goodCount << " level records out of " << SQLDb->Tuples()
 		<< "."
 		<< endl;
+}
+
+/*
+ * Preload all the users within the last 'x' days, to
+ * save doing loads of lookups when we recieve 25,000 +r'd users
+ * during net.merge.
+ */
+
+void cservice::preloadUserCache()
+{
+	stringstream theQuery;
+	theQuery	<< "SELECT " << sql::user_fields
+				<< " FROM users,users_lastseen WHERE "
+				<< " users_lastseen.user_id = users.id AND "
+				<< " users_lastseen.last_seen >= "
+				<< currentTime() - (preloadUserDays * 86400)
+				<< ends;
+
+	elog		<< "*** [CMaster::preloadUserCache]: Loading users accounts logged in within "
+				<< preloadUserDays
+				<< " days : "
+				<< endl;
+	elog << theQuery << endl;
+	ExecStatusType status = SQLDb->Exec(theQuery.str().c_str()) ;
+
+	if( PGRES_TUPLES_OK == status )
+	{
+		for (int i = 0 ; i < SQLDb->Tuples(); i++)
+			{
+				sqlUser* newUser = new (std::nothrow) sqlUser(SQLDb);
+				assert( newUser != 0 ) ;
+
+				newUser->setAllMembers(i);
+				newUser->setLastUsed(currentTime());
+				sqlUserCache.insert(sqlUserHashType::value_type(newUser->getUserName(), newUser));
+			}
+	}
+
+	elog	<< "*** [CMaster::preloadUserCache]: Done. Loaded "
+			<< SQLDb->Tuples()
+			<< " user accounts."
+			<< endl;
 }
 
 void cservice::incStat(const string& name)
@@ -3902,6 +3950,58 @@ if(md5Part != output.str().c_str() ) // If the MD5 hash's don't match..
 	}
 
 return true;
+}
+
+/*
+ * Return some slightly interesting stats as a result of a status *.
+ */
+void cservice::doCoderStats(iClient* theClient)
+{
+	float userTotal = userCacheHits + userHits;
+	float userEf = userCacheHits ? ((float)userCacheHits / userTotal * 100) : 0;
+
+	Notice(theClient, "CMaster Channel Services internal status:");
+
+	Notice(theClient,"[User Record Stats] \002Cached Entries:\002 %i    \002DB Requests:\002 %i    \002Cache Hits:\002 %i    \002Efficiency:\002 %.2f%%",
+		sqlUserCache.size(),
+		userHits,
+		userCacheHits,
+		userEf);
+
+	Notice(theClient, "Total number of clients on network: %i",
+		Network->clientList_size());
+
+	/*
+	 * Count how many users are actually logged in right now.
+	 */
+	unsigned int authCount = 0;
+	sqlUserHashType::iterator ptr = sqlUserCache.begin();
+	sqlUser* tmpUser;
+
+	while (ptr != sqlUserCache.end())
+	{
+		tmpUser = ptr->second;
+		if (tmpUser->isAuthed()) authCount++;
+		++ptr;
+	}
+
+	float authTotal = ((float)authCount / (float)Network->clientList_size()) * 100;
+	Notice(theClient, "Total number of clients authenticated with me: %i (%.2f%%)",
+		authCount, authTotal);
+
+	float joinTotal = ((float)joinCount / (float)Network->channelList_size()) * 100;
+	Notice(theClient, "I am in %i channels out of %i on the network. (%.2f%%)",
+		joinCount, Network->channelList_size(), joinTotal);
+
+	unsigned int secs = (currentTime() - getUplink()->getStartTime());
+
+	float cPerSec = (float)totalCommands / (float)secs;
+
+	Notice(theClient, "I've received %i commands since I started (%.2f commands per second).",
+		totalCommands, cPerSec);
+
+	Notice(theClient,"\002Uptime:\002 %s",
+		prettyDuration(getUplink()->getStartTime() + dbTimeOffset).c_str());
 }
 
 void Command::Usage( iClient* theClient )

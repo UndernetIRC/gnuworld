@@ -1,5 +1,9 @@
 Newest changes at the top of the file:
-$Id: RELEASE.NOTES,v 1.25 2002/10/16 00:13:40 gte Exp $
+$Id: RELEASE.NOTES,v 1.26 2002/10/19 19:53:59 gte Exp $
+
+CMaster 1.1pl9 - 19/10/2002
+* Added preloadUserCache - to fetch a few days worth of user
+  accounts into memory before we hit the big +r'd net.burst :)
 
 CMaster 1.1pl8 - 14/10/2002
 * Add some new commands for CS Admins to scan last hostmasks/usernames,
