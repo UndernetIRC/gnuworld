@@ -306,10 +306,10 @@ COPY "translations" FROM stdin;
 2	119	La liste de silence/ignore est vide	31337
 2	120	-- Fin de la liste de silence/ignore 	31337
 2	121	Statut interne du Service de Canaux CMaster:	31337
-2	122	[          Statistiques du Canal] \002Entrées en cache:\002 %i    \002Requêtes BaseD:\002 %i    \002# de fois Cache touché:\002 %i    \002Efficacité:\002 %.2f%%	31337
-2	123	[     Statistiques Uutilisateurs] \002Entrées en cache:\002 %i    \002Requêtes BaseD:\002 %i    \002# de fois Cache touché:\002 %i    \002Efficacité:\002 %.2f%%	31337
-2	124	[   Statistiques Niveaux d'accès] \002Entrées en cache:\002 %i    \002Requêtes BaseD:\002 %i    \002# de fois Cache touché:\002 %i    \002Efficacité:\002 %.2f%%	31337
-2	125	[          Statistiques des bans] \002Entrées en cache:\002 %i    \002Requêtes BaseD:\002 %i    \002# de fois Cache touché:\002 %i    \002Efficacité:\002 %.2f%%	31337
+2	122	[          Statistiques du Canal] \002Entrées en cache:\002 %i    \002Requêtes Base:\002 %i    \002# de fois Cache touché:\002 %i    \002Efficacité:\002 %.2f%%	31337
+2	123	[     Statistiques Uutilisateurs] \002Entrées en cache:\002 %i    \002Requêtes Base:\002 %i    \002# de fois Cache touché:\002 %i    \002Efficacité:\002 %.2f%%	31337
+2	124	[   Statistiques Niveaux d'accès] \002Entrées en cache:\002 %i    \002Requêtes Base:\002 %i    \002# de fois Cache touché:\002 %i    \002Efficacité:\002 %.2f%%	31337
+2	125	[          Statistiques des bans] \002Entrées en cache:\002 %i    \002Requêtes Base:\002 %i    \002# de fois Cache touché:\002 %i    \002Efficacité:\002 %.2f%%	31337
 2	126	Dernier évènement NOTIFY d'utilisateur: %i	31337
 2	127	Dernier évènement NOTIFY de canal: %i	31337
 2	128	Dernier évènement NOTIFY de niveau: %i	31337
