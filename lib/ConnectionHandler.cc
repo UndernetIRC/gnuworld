@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ConnectionHandler.cc,v 1.4 2002/05/28 20:27:26 dan_karrels Exp $
+ * $Id: ConnectionHandler.cc,v 1.5 2002/05/29 16:10:45 dan_karrels Exp $
  */
 
 #include	<string>
@@ -32,9 +32,8 @@ using std::cout ;
 using std::endl ;
 
 /**
- * These methods are empty.  There is no work to be done in
- * this class.  Simply output a little debugging message if
- * uncommented.
+ * These methods are empty.
+ * Simply output a little debugging message if uncommented.
  */
 
 ConnectionHandler::ConnectionHandler()

@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ConnectionManager.h,v 1.4 2002/05/28 20:27:26 dan_karrels Exp $
+ * $Id: ConnectionManager.h,v 1.5 2002/05/29 16:10:45 dan_karrels Exp $
  */
 
 #ifndef __CONNECTIONMANAGER_H
-#define __CONNECTIONMANAGER_H "$Id: ConnectionManager.h,v 1.4 2002/05/28 20:27:26 dan_karrels Exp $"
+#define __CONNECTIONMANAGER_H "$Id: ConnectionManager.h,v 1.5 2002/05/29 16:10:45 dan_karrels Exp $"
 
 #include	<sys/types.h>
 
@@ -46,10 +46,11 @@ using std::map ;
 
 /**
  * The purpose of this class it to manage multiple incoming and
- * outgoing connections on behalf of ConnectionHandler's.  This
- * class is intended for systems which support multiple client
+ * outgoing connections on behalf of ConnectionHandler's.
+ * This class is intended for systems which support multiple client
  * classes which might require one or more incoming and outgoing
- * connections.  Any client who wishes to create a connection
+ * connections, but may be used to manage a single connection
+ * equally as well.  Any client that wishes to create a connection
  * should subclass ConnectionHandler, and overload the method(s)
  * in which it is interested.
  * This class will support all connections for any number of
@@ -96,7 +97,7 @@ class ConnectionManager
 	typedef handlerMapType::iterator	handlerMapIterator ;
 
 	/**
-	 * The type used to store Connection objects to be erased.
+	 * The type is used to store Connection objects to be erased.
 	 * This structure stores an iterator to each Connection
 	 * to be removed.  Removal is synchronous to prevent
 	 * iterator invalidation of the handlerMap.
@@ -131,9 +132,6 @@ public:
 	 * full line/command has been read from each connection.
 	 * Once this delimiter is encountered, the line/command is
 	 * passed to OnRead().
-	 * Setting the delimiter to 0 ('\0') will cause all data
-	 * read from the connection to be delivered immediately
-	 * via OnRead(). TODO: test this
 	 */
 	ConnectionManager( const time_t defaultTimeout = 10,
 		const char defaultDelimiter = '\n' ) ;
@@ -147,11 +145,11 @@ public:
 	virtual ~ConnectionManager() ;
 
 	/**
-	 * This method will set the timeout for connection attempts
-	 * to the new value given to the method.
+	 * This method will set the timeout duraction for connection 
+	 * attempts to the new value given to the method.
 	 */
-	void		setTimeout( const time_t newTimeout )
-				{ timeout = newTimeout ; }
+	void	setTimeoutDuration( const time_t newTimeoutDuration )
+			{ timeoutDuration = newTimeoutDuration ; }
 
 	/**
 	 * Return a string with (host)'s IP address in numbers
@@ -215,7 +213,7 @@ public:
 	 */
 	virtual bool	DisconnectByHost( ConnectionHandler*,
 				const string& hostname,
-				unsigned short int port ) ;
+				const unsigned short int port ) ;
 
 	/**
 	 * DisConnect() forces the connection associated with
@@ -230,7 +228,7 @@ public:
 	 */
 	virtual bool	DisconnectByIP( ConnectionHandler*,
 				const string& IP,
-				unsigned short int port ) ;
+				const unsigned short int port ) ;
 
 	/**
 	 * Disconnect the given Connection from ConnectionHandler's
@@ -265,7 +263,7 @@ public:
 
 	/**
 	 * This method performs the actual read/write calls for all
-	 * associated sockets.  This method will check for any
+	 * sockets.  This method will check for any
 	 * pending outgoing connections (and call OnConnect() for
 	 * all that succeed), check for read state on all sockets
 	 * which are currently connected (and call OnRead() if conditions
@@ -279,12 +277,14 @@ public:
 	 * If -1 is passed for seconds, then the process will block
 	 * indefinitely waiting for a state change.
 	 */
-	virtual void	Poll( long seconds = 0, long milliseconds = 0 ) ;
+	virtual void	Poll( const long seconds = 0,
+				const long milliseconds = 0 ) ;
 
 protected:
 
-	/// The time to wait for outgoing connections to be established
-	time_t		timeout ;
+	/// The duratino to wait for outgoing connections to be 
+	/// established
+	time_t		timeoutDuration ;
 
 	/// The line delimiter, 0 if none
 	char		delimiter ;
@@ -293,6 +293,8 @@ protected:
 	handlerMapType	handlerMap ;
 
 	/// Allow for asynchronous calls to Disconnect()
+	/// This structure contains Connections to be removed from
+	/// the connection tables.
 	eraseMapType	eraseMap ;
 
 	/// Open a socket: TCP if TCP is true, otherwise UDP

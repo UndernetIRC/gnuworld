@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: Connection.cc,v 1.4 2002/05/28 20:27:26 dan_karrels Exp $
+ * $Id: Connection.cc,v 1.5 2002/05/29 16:10:45 dan_karrels Exp $
  */
 
 #include	<sys/types.h>
@@ -34,6 +34,7 @@
 #include	"Connection.h"
 #include	"Buffer.h"
 
+// Allocate these static variables in class Connection
 const Connection::flagType	Connection::F_PENDING = 0x01 ;
 const Connection::flagType	Connection::F_CONNECTED = 0x02 ;
 const Connection::flagType	Connection::F_INCOMING = 0x04 ;

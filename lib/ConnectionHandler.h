@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ConnectionHandler.h,v 1.4 2002/05/28 20:27:26 dan_karrels Exp $
+ * $Id: ConnectionHandler.h,v 1.5 2002/05/29 16:10:45 dan_karrels Exp $
  */
 
 #ifndef __CONNECTIONHANDLER_H
-#define __CONNECTIONHANDLER_H "$Id: ConnectionHandler.h,v 1.4 2002/05/28 20:27:26 dan_karrels Exp $"
+#define __CONNECTIONHANDLER_H "$Id: ConnectionHandler.h,v 1.5 2002/05/29 16:10:45 dan_karrels Exp $"
 
 #include	<sys/types.h>
 
@@ -44,9 +44,11 @@ class ConnectionManager ;
  * The purpose of this class is to provide a concrete base class
  * for interfacing to a ConnectionManager instance.  This class
  * is designed to receive events on Connections for which the
- * ConnectionHandler is responsible.  This class is intended to
- * be subclassed, and the methods overridden by any class which
- * chooses to use a ConnectionManager instance.
+ * ConnectionHandler is responsible.
+ * Clients should NOT call any of these methods directly.
+ * All state information of ConnectionManager is updated internally.
+ * These methods are information for the Clients of the ConnectionManager
+ * class, and are meant to be one-way.
  */
 class ConnectionHandler
 {
@@ -69,9 +71,6 @@ public:
 
 	/**
 	 * This method is called when a host connection succeeds.
-	 * The method is in this class hierarchy for now, but may
-	 * move to a separate class or registered handler depending
-	 * on how it functions here.
 	 * This method is NOOP in the base class, and should NOT
 	 * be called by clients of this class.
 	 */
@@ -82,17 +81,17 @@ public:
 	 * fails.  This could be for either an incoming or outgoing
 	 * attempt -- see the Connection's flags for determining
 	 * which it is.
-	 * The internal state of the ConnectionManager will update
-	 * itself after calling this method.
+	 * The given Connection is no longer valid when this method
+	 * is called.
 	 */
 	virtual void	OnConnectFail( Connection* ) ;
 
 	/**
 	 * This method is called when a string of data is available
-	 * from the remote connection referred to the Connection.
+	 * from the remote connection referred to by the Connection.
 	 * The string of data (line) is passed as determined by
-	 * the delimiter passed to the constructor of this class.
-	 * Clients of this class should NOT call this method.
+	 * the delimiter passed to the constructor of the associated
+	 * ConnectionManager instance.
 	 */
 	virtual void	OnRead( Connection*, const string& ) ;
 
@@ -105,15 +104,15 @@ public:
 	 * socket is no longer valid.  If this occurs, the Connection
 	 * flags will have F_INCOMING set, and that further listening
 	 * on the given port will no longer proceed.
-	 * The internal state of the ConnectionManager will update
-	 * itself after calling this method.
+	 * The given Connection is no longer valid when this method
+	 * is called.
 	 */
 	virtual void	OnDisconnect( Connection* ) ;
 
 	/**
 	 * This method is called if a connection timeout occurs.
-	 * The internal state of the ConnectionManager will update
-	 * itself after calling this method.
+	 * The given Connection is no longer valid when this method
+	 * is called.
 	 */
 	virtual void	OnTimeout( Connection* ) ;
 

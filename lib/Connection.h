@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: Connection.h,v 1.4 2002/05/28 20:27:26 dan_karrels Exp $
+ * $Id: Connection.h,v 1.5 2002/05/29 16:10:45 dan_karrels Exp $
  */
 
 #ifndef __CONNECTION_H
-#define __CONNECTION_H "$Id: Connection.h,v 1.4 2002/05/28 20:27:26 dan_karrels Exp $"
+#define __CONNECTION_H "$Id: Connection.h,v 1.5 2002/05/29 16:10:45 dan_karrels Exp $"
 
 #include	<sys/types.h>
 #include	<netinet/in.h>
@@ -68,13 +68,18 @@ public:
 
 	/**
 	 * Return the hostname which this connection represents.
-	 * The hostname may be empty.
+	 * The hostname may be empty if it represents a listening
+	 * socket.  Otherwise, the hostname will contain either
+	 * a valid hostname, or a string representation of the
+	 * Connection's IP address.
 	 */
 	inline const string&	getHostname() const
 		{ return hostname ; }
 
 	/**
 	 * Return the IP for this connection.
+	 * The IP may be empty if it represents a listening
+	 * socket.
 	 */
 	inline const string&	getIP() const
 		{ return IP ; }
@@ -117,8 +122,10 @@ public:
 
 	/**
 	 * This flag is true if this Connection represents a
-	 * connection received by ConnectionManager::Listen(),
-	 * and exists throughout the life of the connection.
+	 * connection created by a remote host connecting to the
+	 * localhost.
+	 * The F_INCOMING flag exists throughout the life ot
+	 * the Connection.
 	 */
 	static const flagType		F_INCOMING ;
 
@@ -126,6 +133,7 @@ public:
 	 * This flag is true if this Connection represents a
 	 * socket which is listening for incoming connections.
 	 * This flag exists for the life of this connection.
+	 * A listening Connection is never connected.
 	 */
 	static const flagType		F_LISTEN ;
 
@@ -168,7 +176,7 @@ public:
 
 	/**
 	 * Return true if this connection is listening for new
-	 * incoming connections, as a resulf of calling
+	 * incoming connections, as a result of calling
 	 * ConnectionManager::Listen().
 	 * Note that this flag remains true for the life of the
 	 * connection.
@@ -235,7 +243,7 @@ protected:
 	inline void	setPending()
 		{ removeFlag( F_CONNECTED ) ; setFlag( F_PENDING ) ; }
 
-	/// Mark that this Connection is an incoming connection
+	/// Mark that this Connection as an incoming connection
 	inline void	setIncoming()
 		{ setFlag( F_INCOMING ) ; }
 
@@ -271,15 +279,17 @@ protected:
 	inline void	setSockFD( int newSockFD )
 		{ sockFD = newSockFD ; }
 
-	/// Set the Connection startTime to the new startTime
-	inline void	setStartTime( time_t newStartTime )
-		{ startTime = newStartTime ; }
+	/// Set the Connection absTimeout to the new absTimeOut
+	inline void	setAbsTimeout( const time_t newAbsTimeout )
+		{ absTimeout = newAbsTimeout ; }
 
-	/// Return the time at which this connection attempt began
-	inline time_t	getStartTime() const
-		{ return startTime ; }
+	/// Return the time at which this connection attempt will
+	/// be terminated (its absolute timeout value).
+	inline time_t	getAbsTimeout() const
+		{ return absTimeout ; }
 
-	/// The remote hostname of this connection, possibly empty
+	/// The remote hostname of this connection
+	/// This variable is empty() if this Connection is a listener
 	string			hostname ;
 
 	/// The remote port number of this connection
@@ -295,6 +305,7 @@ protected:
 	Buffer			outputBuffer ;
 
 	/// The remote IP of this connection
+	/// This variable is empty() if this Connection is a listener
 	string			IP ;
 
 	/// The socket (file) descriptor for the socket of this
@@ -308,7 +319,8 @@ protected:
 	struct sockaddr_in	addr ;
 
 	/// The time at which this connection attempt began
-	time_t			startTime ;
+	time_t			absTimeout ;
+
 } ;
 
 #endif // __CONNECTION_H

@@ -1,4 +1,4 @@
-/* Buffer.cpp
+/* Buffer.cc
  * Author: Daniel Karrels dan@karrels.com
  * History: Mon Jan 25 23:29:47 EST 1999 -- beginning
  * Copyright (C) 2002 Daniel Karrels <dan@karrels.com>    
@@ -25,7 +25,7 @@
 #include	"Buffer.h"
 
 const char Buffer_h_rcsId[] = __BUFFER_H ;
-const char Buffer_cc_rcsId[] = "$Id: Buffer.cc,v 1.7 2002/05/27 17:18:12 dan_karrels Exp $" ;
+const char Buffer_cc_rcsId[] = "$Id: Buffer.cc,v 1.8 2002/05/29 16:10:45 dan_karrels Exp $" ;
 
 namespace gnuworld
 {

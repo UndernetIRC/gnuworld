@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ConnectionManager.cc,v 1.4 2002/05/28 20:27:26 dan_karrels Exp $
+ * $Id: ConnectionManager.cc,v 1.5 2002/05/29 16:10:45 dan_karrels Exp $
  */
 
 #include	<unistd.h>
@@ -54,15 +54,14 @@
 using std::cout ;
 using std::endl ;
 using std::string ;
-using std::list ;
 using std::map ;
 using std::nothrow ;
 using std::stringstream ;
 using gnuworld::Buffer ;
 
-ConnectionManager::ConnectionManager( const time_t defaultTimeout,
+ConnectionManager::ConnectionManager( const time_t defaultTimeoutDuration,
 	const char defaultDelimiter )
-:	timeout( defaultTimeout ),
+:	timeoutDuration( defaultTimeoutDuration ),
 	delimiter( defaultDelimiter )
 {}
 
@@ -74,7 +73,7 @@ ConnectionManager::~ConnectionManager()
 // just be clean about it and clear the eraseMap now
 eraseMap.clear() ;
 
-// First iterate through the list of currently active/pending
+// Iterate through the list of currently active/pending
 // Connections
 for( handlerMapIterator handlerItr = handlerMap.begin() ;
 	handlerItr != handlerMap.end() ; ++handlerItr )
@@ -102,12 +101,18 @@ handlerMap.clear() ;
 
 const Connection* ConnectionManager::Connect( ConnectionHandler* hPtr,
 	const string& host,
-	unsigned short int port,
-	bool TCP )
+	const unsigned short int port,
+	const bool TCP )
 {
 
 // Handler must be valid
 assert( hPtr != 0 ) ;
+
+// An empty host is invalid
+if( host.empty() )
+	{
+	return 0 ;
+	}
 
 cout	<< "Connect> "
 	<< host
@@ -121,7 +126,7 @@ Connection* newConnection = new (nothrow)
 assert( newConnection != 0 ) ;
 
 // Set the absolute time for this Connection's timeout to occur
-newConnection->setStartTime( time( 0 ) + timeout ) ;
+newConnection->setAbsTimeout( time( 0 ) + timeoutDuration ) ;
 
 // The new connection will automatically set itself to the pending state
 
@@ -142,20 +147,15 @@ else
 	if( newConnection->getIP().empty() )
 		{
 		// No good
-		delete newConnection ;
+		delete newConnection ; newConnection = 0 ;
 
-		cout	<< "Connect> Unable to find valid IP"
+		cout	<< "ConnectionManager::Connect> Unable "
+			<< "to find valid IP"
 			<< endl ;
 
 		return 0 ;
 		}
 	} // else()
-
-// Setup some basic options
-struct sockaddr_in* addr = newConnection->getAddr() ;
-addr->sin_family = AF_INET ;
-addr->sin_port = htons( static_cast< u_short >( port ) ) ;
-addr->sin_addr.s_addr = inet_addr( newConnection->getIP().c_str() ) ;
 
 // Open a non-blocking socket
 int sockFD = openSocket( TCP ) ;
@@ -168,6 +168,12 @@ if( -1 == sockFD )
 
 	return 0 ;
 	}
+
+// Setup some basic options
+struct sockaddr_in* addr = newConnection->getAddr() ;
+addr->sin_family = AF_INET ;
+addr->sin_port = htons( static_cast< u_short >( port ) ) ;
+addr->sin_addr.s_addr = inet_addr( newConnection->getIP().c_str() ) ;
 
 // Update the new Connection object
 newConnection->setSockFD( sockFD ) ;
@@ -185,7 +191,7 @@ if( ::connect( sockFD, reinterpret_cast< sockaddr* >( addr ),
 		case EISCONN:
 			// EISCONN means the connection is successful
 			// This will still work fine when another
-			// connect() is attempted later
+			// connect() is attempted in Poll()
 			break ;
 
 		// EINPROGRESS means that the socket is nonblocking and
@@ -203,8 +209,8 @@ if( ::connect( sockFD, reinterpret_cast< sockaddr* >( addr ),
 			delete newConnection ;
 			newConnection = 0 ;
 
-			cout	<< "Connect> Error detected in connect()"
-				<< ", errno: "
+			cout	<< "ConnectionManager::Connect> Error "
+				<< "detected in connect(): "
 				<< strerror( errno )
 				<< endl ;
 
@@ -224,12 +230,12 @@ if( newConnection != 0 )
 
 	// Connection in progress
 	// Add to the handlerMap
-	bool status = handlerMap[ hPtr ].insert( newConnection ).second ;
+	bool insertOK = handlerMap[ hPtr ].insert( newConnection ).second ;
 
 	// It's possible the connection could fail (?)
 	// Either way, the container is nice enough to tell us
 	// if it was successful, so let's check.
-	if( !status )
+	if( !insertOK )
 		{
 		// Insertion failed
 		// Close the socket
@@ -241,8 +247,7 @@ if( newConnection != 0 )
 			<< endl ;
 
 		// Deallocate and set to 0 for return to caller
-		delete newConnection ;
-		newConnection = 0 ;
+		delete newConnection ; newConnection = 0 ;
 		}
 	}
 
@@ -253,11 +258,15 @@ return newConnection ;
 
 bool ConnectionManager::DisconnectByHost( ConnectionHandler* hPtr,
 	const string& hostname,
-	unsigned short int port )
+	const unsigned short int port )
 {
+// Public method, check method arguments
 assert( hPtr != 0 ) ;
 
-// Iterator variables
+// An empty hostname is ok here, it indicates that a listening
+// Connection is to be removed from the given port
+
+// Attempt to find the handler in the handlerMap
 handlerMapIterator handlerItr = handlerMap.find( hPtr ) ;
 if( handlerItr == handlerMap.end() )
 	{
@@ -266,14 +275,20 @@ if( handlerItr == handlerMap.end() )
 	return false ;
 	}
 
+// connectionItr will be used to walk the handlers connectionMap
+// After the below for() loop, it will be equivalent to either
+// the Connection this method seeks, or handlerItr->second.end(),
+// in which case the Connection was not found.
 connectionMapIterator connectionItr = handlerItr->second.begin() ;
 
+// Walk the connectionMap
 for( ; connectionItr != handlerItr->second.end() ; ++connectionItr )
 	{
 	// Store the address of the Connection object in connectionPtr
+	// Convenience variable
 	Connection* connectionPtr = *connectionItr ;
 
-	// Compare port numbers
+	// Compare port numbers first, since they are faster
 	if( (port == connectionPtr->getPort()) &&
 		!strcasecmp( connectionPtr->getHostname().c_str(),
 			hostname.c_str() ) )
@@ -304,12 +319,17 @@ return true ;
 
 bool ConnectionManager::DisconnectByIP( ConnectionHandler* hPtr,
 	const string& IP,
-	unsigned short int port )
+	const unsigned short int port )
 {
-
+// Public method, check args
 assert( hPtr != 0 ) ;
 
-// Iterator variables
+// An empty IP is ok here, it indicates that a listening Connection
+// is to be removed from the given port
+
+// Attempt to lookup the given handler
+// handlerItr will be equivalent to handlerMap.end() if the handler
+// is not found.
 handlerMapIterator handlerItr = handlerMap.find( hPtr ) ;
 if( handlerItr == handlerMap.end() )
 	{
@@ -318,14 +338,20 @@ if( handlerItr == handlerMap.end() )
 	return false ;
 	}
 
+// connectionItr will be used to walk the handlers connectionMap
+// After the below for() loop, it will be equivalent to either
+// the Connection this method seeks, or handlerItr->second.end(),
+// in which case the Connection was not found.
 connectionMapIterator connectionItr = handlerItr->second.begin() ;
 
+// Walk the connectionMap for this handler
 for( ; connectionItr != handlerItr->second.end() ; ++connectionItr )
 	{
 	// Store the address of the Connection object in connectionPtr
+	// as a convenience variable
 	Connection* connectionPtr = *connectionItr ;
 
-	// Compare port numbers
+	// Compare port numbers first, since they are faster
 	if( (port == connectionPtr->getPort()) &&
 		(connectionPtr->getIP() == IP) )
 		{
@@ -385,25 +411,27 @@ cout	<< "ConnectionManager::Disconnect> Sheduling connection "
 // to Poll()
 scheduleErasure( hPtr, connectionItr ) ;
 
+// Connection located and scheduled for erasure, return success
 return true ;
 }
 
-void ConnectionManager::Poll( long seconds, long milliseconds )
+void ConnectionManager::Poll( const long seconds,
+	const long milliseconds )
 {
 
 cout	<< "Poll()" << endl ;
 
 // Only execute this method if:
-// - The handlerMap is empty:no connections to check
-// - The eraseMap is empty: no connections to close
+// - The handlerMap is not empty, OR the eraseMap is not empty
+// Either of these cases indicates that some processing must be
+// performed.
 if( handlerMap.empty() && eraseMap.empty() )
 	{
 	return ;
 	}
 
 // highestFD is passed to select() as the largest FD for which to
-// obtain state information, if that bit is present in the below
-// fd_set's
+// obtain state information.
 int highestFD = 0 ;
 
 // These variables are used for select()
@@ -412,7 +440,7 @@ fd_set readfds ;
 FD_ZERO( &writefds ) ;
 FD_ZERO( &readfds ) ;
 
-// Iterator through the table of Connection's to setup select()
+// Iterate through the table of Connection's to setup select()
 // FD information
 for( handlerMapIterator handlerItr = handlerMap.begin() ;
 	handlerItr != handlerMap.end() ; ++handlerItr )
@@ -428,6 +456,8 @@ for( handlerMapIterator handlerItr = handlerMap.begin() ;
 		Connection* connectionPtr = *connectionItr ;
 		int tempFD = connectionPtr->getSockFD() ;
 
+		// The order of the below if/else structure is important
+		// First check for the fully connected sockets.
 		if( connectionPtr->isConnected() )
 			{
 			// This connection already connected
@@ -441,11 +471,17 @@ for( handlerMapIterator handlerItr = handlerMap.begin() ;
 				FD_SET( tempFD, &writefds ) ;
 				}
 			}
+		// Because listening sockets are technically pending
+		// sockets as well, process those first since they
+		// are handled differently than outgoing pending
+		// connections.
 		else if( connectionPtr->isListening() )
 			{
 			// Server socket, it is always pending :)
 			FD_SET( tempFD, &readfds ) ;
 			}
+
+		// Check for a still pending outgoing socket connection.
 		else if( connectionPtr->isPending() )
 			{
 			// Not yet fully connected, check for write
@@ -470,6 +506,10 @@ for( handlerMapIterator handlerItr = handlerMap.begin() ;
 int			fdCnt = -1,
 			loopCnt = 10 ;
 
+// Call select() repeatedly until either of the following:
+// - select() returns a value >= 0
+// - select() returns no error (other than EINTR)
+// - loopCnt becomes negative
 do
 	{
 	// timeval may be modified by select() on some systems,
@@ -485,12 +525,14 @@ do
 		(-1 == seconds) ? NULL : &to ) ;
 	} while( (EINTR == errno) && (--loopCnt >= 0) ) ;
 
+// Is there still an error from select()?
 if( fdCnt < 0 )
 	{
 	// Error in select()
 	return ;
 	}
 
+// Were there any state changes pending?
 if( 0 == fdCnt )
 	{
 	// No pending state changes
@@ -500,15 +542,15 @@ if( 0 == fdCnt )
 // This variable is used for checking timeouts
 time_t now = ::time( 0 ) ;
 
+// Walk the handler list, checking connections for each connectionMap.
 for( handlerMapIterator handlerItr = handlerMap.begin() ;
 	handlerItr != handlerMap.end() ; ++handlerItr )
 	{
 	// Convenience variable for the long loop ahead
 	ConnectionHandler* hPtr = handlerItr->first ;
 
-	// Use connectionItr.end() explicitly here because if the
-	// map becomes empty during the course of this loop, the
-	// iterator to the original connectionMap.end() will be invalid
+	// Iterate through this handler's connectionMap, similar
+	// as the above loops.
 	for( connectionMapIterator connectionItr =
 		handlerItr->second.begin() ;
 		connectionItr != handlerItr->second.end() ;
@@ -526,6 +568,8 @@ for( handlerMapIterator handlerItr = handlerMap.begin() ;
 		// Connection's socket (file) descriptor
 		int tempFD = connectionPtr->getSockFD() ;
 
+		// Order of this if/else is important here.
+		// First check for fully connected sockets
 		if( connectionPtr->isConnected() )
 			{
 			// Check for ability to read
@@ -578,8 +622,7 @@ for( handlerMapIterator handlerItr = handlerMap.begin() ;
 				{
 				// FD is NOT set, and the connection is
 				// still pending; let's check for a timeout
-				if( now >= (connectionPtr->getStartTime()
-					+ timeout) )
+				if( now >= connectionPtr->getAbsTimeout() )
 					{
 					// This connection attempt has
 					// timed out
@@ -654,9 +697,15 @@ for( eraseMapIterator eraseItr = eraseMap.begin(),
 	// - eraseItr->first != handlerItr->first
 	// Be sure to check both, beginning with the case that could
 	// crash the process :)
+	// There is no reason to call the notification methods of
+	// the handlers here, all of that processing is performed
+	// by the above for() loops (either directly, or through calls
+	// to finishAccept(),finishConnect(),handleRead(),handleWrite())
+	//
 	for( ; (eraseItr != eraseEndItr) &&
 		(eraseItr->first == handlerItr->first) ; ++eraseItr )
 		{
+		// Obtain a convenience pointer for readability
 		Connection* connectionPtr = *(eraseItr->second) ;
 
 		cout	<< "Poll> Removing connection: "
@@ -676,31 +725,26 @@ for( eraseMapIterator eraseItr = eraseMap.begin(),
 		} // for( ; eraseItr->first == handlerItr->first ; )
 
 	} // for( eraseItr != eraseEndItr )
+
+// Now that all elements in the eraseMap have been handled, clear
+// the map for future use.
 eraseMap.clear() ;
 
 // Check if the connectionMap for any particular handler is empty
 for( handlerMapIterator handlerItr = handlerMap.begin() ;
-	handlerItr != handlerMap.end() ; )
+	handlerItr != handlerMap.end() ; ++handlerItr )
 	{
-	// hash_map's invalidate iterators when an item is erase()'d
-	// Therefore, if an item is erased in this loop, reset the
-	// handlerItr to begin().  This should result in negligible
-	// performance loss since the number of possible client *should*
-	// be relatively small
+	// From SGI STL website:
+	// Map has the important property that inserting a new element 
+	// into a map does not invalidate iterators that point to 
+	// existing elements.  Erasing an element from a map also does
+	// not invalidate any iterators, except, of course, for iterators 
+	// that actually point to the element that is being erased. 
 	if( handlerItr->second.empty() )
 		{
 		// The connectionMap for this handler is empty
 		// Erase it
 		handlerMap.erase( handlerItr ) ;
-
-		// Reset handlerItr
-		handlerItr = handlerMap.begin() ;
-		}
-	else
-		{
-		// Items remain in this handler's connectionMap
-		// Move to next handler
-		++handlerItr ;
 		}
 	} // for()
 
@@ -732,57 +776,78 @@ if( sockFD < 0 )
 	return -1 ;
 	}
 
+// Attempt to set this socket's options.
 if( !setSocketOptions( sockFD ) )
 	{
+	// setSocketOptions() failed, the socket is now invalid.
 	close( sockFD ) ;
 
 	cout	<< "openSocket> Failed to set SO_LINGER: "
 		<< strerror( errno )
 		<< endl ;
 
+	// Return error to the caller
 	return -1 ;
 	}
+
+// The socket() was opened and configured properly, return the
+// new sockFD to the caller.
 return sockFD ;
 }
 
 // Static method, no const needed
 bool ConnectionManager::isIpAddress( const string& host )
 {
-unsigned short int count = 0 ;
+// decimalPoints counts the number of decimalPoints in the given
+// string referred to by (host).  Note that a valid IP address
+// has exactly 3 decimalPoints.
+unsigned short int decimalPoints = 0 ;
 
-for( string::size_type i = 0 ; (i < host.size()) && (count < 4) ; ++i )
+// Iterate through the host string, looking for valid characters.
+// Break when we reach the end of the string, when decimalPoints == 4,
+// or we encounter an invalid character (non-digit).
+for( string::size_type i = 0 ;
+	(i < host.size()) && (decimalPoints < 4) ; ++i )
 	{
 	// characters in an IP address may only be
 	// digits or decimal points
 	if( '.' == host[ i ] )
 		{
-		count++ ;
+		++decimalPoints ;
 		}
 	else if( !isdigit( host[ i ] ) )
 		{
+		// Found a non-digit, return false, this is not a
+		// valid IP address
 		return false ;
 		}
 	}
 
 // there are exactly three decimal points in an IP address
-return (3 == count) ;
+return (3 == decimalPoints) ;
 }
 
 // Static, so no const necessary
 string ConnectionManager::ipAddrOf( const string& host )
 {
+// Attempt to lookup the hostname
 struct hostent *hostEntry = ::gethostbyname( host.c_str() ) ;
 if( NULL == hostEntry )
 	{
+	// hostname not found, return an empty string
 	return string() ;
 	}
 
+// Attempt to extract the IP address from the hostent struct
 struct in_addr in ;
 char **p = hostEntry->h_addr_list ;
 memcpy( &in.s_addr, *p, sizeof( in.s_addr ) ) ;
+
+// This initial allocation is just for readability
 char ipAddr[] = "000.000.000.000" ;
 sprintf( ipAddr,"%s", inet_ntoa( in ) ) ;
 
+// Return the ipAddr, wrapped in a std::string
 return string( ipAddr ) ;
 }
 
@@ -791,8 +856,9 @@ void ConnectionManager::closeSocket( int fd )
 ::close( fd ) ;
 }
 
+// Caller handles erasing/closing upon a failed call to handleRead().
 bool ConnectionManager::handleRead( ConnectionHandler* hPtr,
-	Connection* c )
+	Connection* cPtr )
 {
 // protected member, no error checking
 
@@ -801,13 +867,14 @@ char buf[ 4096 ] ;
 memset( buf, 0, 4096 ) ;
 
 // Attempt the read from the socket
-int readResult = ::recv( c->getSockFD(), buf, 4096, 0 ) ;
+int readResult = ::recv( cPtr->getSockFD(), buf, 4096, 0 ) ;
 
 // Check for error on read()
 if( readResult < 0 )
 	{
 	// Error on read, socket no longer valid
-	hPtr->OnDisconnect( c ) ;
+	// Notify handler
+	hPtr->OnDisconnect( cPtr ) ;
 
 	// Read error
 	return false ;
@@ -821,21 +888,24 @@ if( readResult < 0 )
 buf[ readResult ] = 0 ;
 
 // Add to Connection input buffer
-c->inputBuffer += buf ;
+cPtr->inputBuffer += buf ;
 
 // Check if a complete command was read
 string line ;
-while( c->inputBuffer.ReadLine( line ) )
+while( cPtr->inputBuffer.ReadLine( line ) )
 	{
 	// Line available
-	hPtr->OnRead( c, line ) ;
+	// Notify handler
+	hPtr->OnRead( cPtr, line ) ;
 	}
 
+// The read was successful, return success
 return true ;
 }
 
+// Caller handles erasing/closing upon a failed call to handleWrite().
 bool ConnectionManager::handleWrite( ConnectionHandler* hPtr,
-	Connection* c )
+	Connection* cPtr )
 {
 // protected member, no error checking
 
@@ -846,40 +916,45 @@ bool ConnectionManager::handleWrite( ConnectionHandler* hPtr,
 // into the buffer. ( This is called a short count).
 // Therefore, just place the entire Connection output buffer into
 // the send(), and the system will send() as much as it can
-int writeResult = ::send( c->getSockFD(),
-	c->outputBuffer.c_str(),
-	c->outputBuffer.size(),
+// The above applies to NONBLOCKING sockets.
+//
+int writeResult = ::send( cPtr->getSockFD(),
+	cPtr->outputBuffer.c_str(),
+	cPtr->outputBuffer.size(),
 	0 ) ;
 
 // Check for write error
 if( writeResult < 0 )
 	{
 	// Error on write, socket no longer valid
-	hPtr->OnDisconnect( c ) ;
+	// Notify the handler.
+	hPtr->OnDisconnect( cPtr ) ;
 
 	// Write error
 	return false ;
 	}
 
 // Successful write, update the Connection's output buffer
-c->outputBuffer.Delete( writeResult ) ;
+cPtr->outputBuffer.Delete( writeResult ) ;
 
+// Write was successful, return succes
 return true ;
 }
 
+// Caller handles erasing/closing upon a failed call to finishConnect().
 bool ConnectionManager::finishConnect( ConnectionHandler* hPtr,
-	Connection* c )
+	Connection* cPtr )
 {
 // Protected member method, no error checking performed on
 // method arguments
 
 //cout	<< "ConnectionManager::finishConnect> "
-//	<< *c
+//	<< *cPtr
 //	<< endl ;
 
 // Attempt to connect()
-int connectResult = ::connect( c->getSockFD(),
-	reinterpret_cast< sockaddr* >( c->getAddr() ),
+int connectResult = ::connect( cPtr->getSockFD(),
+	reinterpret_cast< sockaddr* >( cPtr->getAddr() ),
 	sizeof( struct sockaddr_in ) ) ;
 
 // Was the connect successful?
@@ -894,27 +969,30 @@ if( connectResult < 0 )
 			<< endl ;
 
 		// Unable to establish connection
-		hPtr->OnConnectFail( c ) ;
+		// Notify handler
+		hPtr->OnConnectFail( cPtr ) ;
 
+		// Return failure
 		return false ;
 		} // if( errno != EISCONN )
 	}
 
 // Update the Connection's state
-c->setConnected() ;
+cPtr->setConnected() ;
 
-// Notify listeners
-hPtr->OnConnect( c ) ;
+// Notify handler
+hPtr->OnConnect( cPtr ) ;
 
 // Return success
 return true ;
 }
 
+// Caller handles erasing/closing upon a failed call to finishAccept().
 bool ConnectionManager::finishAccept( ConnectionHandler* hPtr,
-	Connection* c )
+	Connection* cPtr )
 {
 // Protected member, no arguments verified here
-// (c) is the server socket, which is listen()'ing
+// (cPtr) is the server socket, which is listen()'ing
 
 // Allocate and configure a new Connection object
 Connection* newConnection = new (std::nothrow) Connection( delimiter ) ;
@@ -923,18 +1001,18 @@ assert( newConnection != 0 ) ;
 newConnection->setIncoming() ;
 newConnection->setPending() ;
 newConnection->setTCP( true ) ;
-newConnection->setPort( c->getPort() ) ;
+newConnection->setPort( cPtr->getPort() ) ;
 
 // len is the size of a sockaddr structure, for use by accept()
 size_t len = sizeof( struct sockaddr ) ;
 
 // Attempt to receive a pending connection.
-// The socket descriptor passed in is that of te listening socket.
+// The socket descriptor passed in is that of the listening socket.
 // The sockaddr structure is that of the new connection, and will be
 // populated with host information of the connecting client.
 // accept() returns the fd of the new connection, with "mostly"
 // the same options as the server socket, or -1 on error.
-int newFD = ::accept( c->getSockFD(),
+int newFD = ::accept( cPtr->getSockFD(),
 	reinterpret_cast< sockaddr* >( newConnection->getAddr() ),
 	static_cast< socklen_t* >( &len ) ) ;
 
@@ -964,6 +1042,7 @@ if( (newFD < 0) && (EAGAIN != errno) && (EWOULDBLOCK != errno))
 	return false ;
 	}
 
+// Connect OK, update newConnection accordingly
 newConnection->setConnected() ;
 newConnection->setSockFD( newFD ) ;
 
@@ -978,6 +1057,7 @@ if( !setSocketOptions( newFD ) )
 	{
 	// Failed to set socket options
 	// The Connection now has the IP of the failed Connection
+	// Notify handler
 	hPtr->OnConnectFail( newConnection ) ;
 
 	cout	<< "ConnectionManager::finishAccept> Failed to set "
@@ -1001,6 +1081,7 @@ if( !handlerMap[ hPtr ].insert( newConnection ).second )
 	{
 	// Failed to insert into handlerMap
 	// Notify the handler of a failure in connection
+	// TODO: The handler expects errno to be set appropriately.
 	hPtr->OnConnectFail( newConnection ) ;
 
 	cout	<< "ConnectionManager::finishAccept> Failed to add "
@@ -1033,14 +1114,16 @@ return true ;
  */
 bool ConnectionManager::setSocketOptions( int sockFD )
 {
+// Protected member, no error checking on args
 
-// Set to non-blocking
+// Get current flags
 int optval = ::fcntl( sockFD, F_GETFL, 0 ) ;
 if( optval < 0 )
 	{
 	return false ;
 	}
 
+// Set to non-blocking
 optval = ::fcntl( sockFD, F_SETFL, optval | O_NONBLOCK ) ;
 if( optval < 0 )
 	{
@@ -1068,6 +1151,7 @@ if( optval < 0 )
 	return false ;
 	}
 
+// All options set successfully
 return true ;
 }
 
@@ -1205,8 +1289,7 @@ if( ::listen( listenFD, 5 ) < 0 )
 
 // Attempt to add this new connection into the handler map for
 // the given handler
-bool status = handlerMap[ hPtr ].insert( newConnection ).second ;
-if( !status )
+if( !handlerMap[ hPtr ].insert( newConnection ).second )
 	{
 	// Addition to handlerMap failed :(
 	cout	<< "ConnectionManager::Listen> Failed to add new "
@@ -1228,6 +1311,7 @@ if( !status )
 // with connect(), because the Poll() loop will work properly
 // without it.
 
+// Return the new connection to the caller
 return newConnection ;
 }
 
