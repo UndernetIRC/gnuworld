@@ -4,7 +4,7 @@
  */
 
 #ifndef __MISC_H
-#define __MISC_H "$Id: misc.h,v 1.4 2000/08/02 22:48:10 dan_karrels Exp $"
+#define __MISC_H "$Id: misc.h,v 1.5 2000/08/04 23:39:09 dan_karrels Exp $"
 
 #include	<string>
 #include	<hash_map>
@@ -28,6 +28,10 @@ inline bool operator()( const string& lhs, const string& rhs ) const
 	}
 } ;
 
+/**
+ * A case insensitive binary predicate comparator for two
+ * std::string's.
+ */
 struct eqstr
 {
 inline bool operator()( const string& s1, const string& s2 ) const
@@ -36,6 +40,9 @@ inline bool operator()( const string& s1, const string& s2 ) const
 	}
 } ;
 
+/**
+ * A hashing operator for the system hash tables.
+ */
 struct eHash
 {
 inline size_t operator()( const string& s ) const

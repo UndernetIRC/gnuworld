@@ -3,7 +3,7 @@
  */
 
 #ifndef __XCLIENT_H
-#define __XCLIENT_H "$Id: client.h,v 1.6 2000/08/03 15:50:13 dan_karrels Exp $"
+#define __XCLIENT_H "$Id: client.h,v 1.7 2000/08/04 23:39:09 dan_karrels Exp $"
 
 #include	<string>
 
@@ -173,6 +173,14 @@ public:
 	virtual int OnPrivateMessage( iClient* Sender,
 		const string& Message ) ;
 
+	/**
+	 * Handle a timer event.  The first argument is the
+	 * handle for the timer registration, and the second is
+	 * the arguments that were passed when registering the
+	 * timer.
+	 */
+	virtual int	OnTimer( xServer::timerID, void* ) ;
+
 	/* Utility methods */
 
 	/**
@@ -244,6 +252,16 @@ public:
 	virtual bool	Join( Channel* ) ;
 
 	/**
+	 * This method is called when the bot joins a channel.
+	 */
+	virtual void	OnJoin( Channel* ) ;
+
+	/**
+	 * This method is called when the bot joins a channel.
+	 */
+	virtual void	OnJoin( const string& ) ;
+
+	/**
 	 * Part will cause the client to part a channel.
 	 */
 	virtual bool	Part( const string& ) ;
@@ -252,6 +270,16 @@ public:
 	 * Part the given channel.
 	 */
 	virtual bool	Part( Channel* ) ;
+
+	/**
+	 * This method is called when the bot parts a channel.
+	 */
+	virtual void	OnPart( Channel* ) ;
+
+	/**
+	 * This method is called when the bot parts a channel.
+	 */
+	virtual void	OnPart( const string& ) ;
 
 	/**
 	 * Invite a user to a channel.  Join the channel if necessary
@@ -486,6 +514,22 @@ protected:
 	 * from the xServer.
 	 */
 	virtual void ImplementServer( xServer* Server ) ;
+
+	/**
+	 * This method is called to add a channel to the bot's
+	 * internal channel database; typically called from
+	 * OnJoin().  This is used to maintain the integrity
+	 * of isOnChannel() calls.
+	 */
+	virtual bool	addChan( Channel* ) ;
+
+	/**
+	 * This method is called to remove a channel from the
+	 * bot's internal database; typically called from OnPart().
+	 * This is used to maintain the integrity of isOnChannel()
+	 * calls.
+	 */
+	virtual bool	removeChan( Channel* ) ;
 
 	/**
 	 * MyUplink is a pointer to the xServer to which this

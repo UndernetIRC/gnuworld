@@ -17,7 +17,7 @@
  */
 
 #ifndef __XSERVER_H
-#define __XSERVER_H "$Id: server.h,v 1.6 2000/07/31 21:17:52 dan_karrels Exp $"
+#define __XSERVER_H "$Id: server.h,v 1.7 2000/08/04 23:39:09 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
@@ -25,6 +25,7 @@
 #include	<strstream>
 #include	<map>
 #include	<hash_map>
+#include	<queue>
 
 #include	<ctime>
 
@@ -103,6 +104,7 @@ using std::list ;
 using std::vector ;
 using std::strstream ;
 using std::hash_map ;
+using std::priority_queue ;
 
 /**
  * This class is the server proper; it is responsible for the connection
@@ -371,6 +373,22 @@ public:
 		xClient* ) ;
 
 	/**
+	 * The type used to represent client timer events.
+	 */
+	typedef unsigned int timerID ;
+
+	/**
+	 * Register for a timer event.  The first argument is the
+	 * absolute time at which the timed event is to occur.
+	 * The second argument is a pointer to an argument to be
+	 * passed to the timer handler.
+	 * Returns 0 on failure.
+	 */
+	virtual timerID RegisterTimer( const time_t& absoluteTime,
+		xClient* theClient,
+		void* data = 0 ) ;
+
+	/**
 	 * Post a system event to the rest of the system.  Note
 	 * that this method is public, so xClients may post
 	 * events.
@@ -534,6 +552,12 @@ public:
 	 */
 	virtual void dumpStats() ;
 
+	/**
+	 * Execute any waiting client timers.
+	 * Return the number of timers executed.
+	 */
+	virtual unsigned int checkTimers() ;
+
 protected:
 
 	/**
@@ -571,6 +595,37 @@ protected:
 	 * Parse a burst line for channel users.
 	 */
 	virtual void parseBurstUsers( Channel*, const char* ) ;
+
+	/**
+	 * The structure type to hold information about client timed
+	 * events.
+	 */
+	struct timerInfo
+	{
+	timerInfo( const timerID& _ID,
+		const time_t& _absTime,
+		xClient* _theClient,
+		void* _data = 0 )
+	: ID( _ID ),
+	  absTime( _absTime ),
+	  theClient( _theClient ),
+	  data( _data )
+	{}
+
+		timerID		ID ;
+		time_t		absTime ;
+		xClient*	theClient ;
+		void*		data ;
+	} ;
+
+	struct timerGreater
+	{
+	inline bool operator()( const pair< time_t, timerInfo* >& lhs,
+		const pair< time_t, timerInfo* >& rhs ) const
+		{
+		return lhs.first > rhs.first ;
+		}
+	} ;
 
 	/* Network message handlers */
 
@@ -896,6 +951,13 @@ protected:
 //	typedef vector< moduleLoader< xClient* >* >	moduleListType;
 //	moduleListType		moduleList;
 
+	typedef priority_queue< pair< time_t, timerInfo* >,
+		vector< pair< time_t, timerInfo* > >,
+		timerGreater >
+		timerQueueType ;
+	timerQueueType  timerQueue ;
+
+	timerID		lastTimerID ;
 } ;
 
 /// Deprecated method.

@@ -27,7 +27,7 @@
 #include	"events.h"
 
 const char xClient_h_rcsId[] = __XCLIENT_H ;
-const char xClient_cc_rcsId[] = "$Id: client.cc,v 1.10 2000/08/04 18:21:02 dan_karrels Exp $" ;
+const char xClient_cc_rcsId[] = "$Id: client.cc,v 1.11 2000/08/04 23:39:09 dan_karrels Exp $" ;
 
 using std::string ;
 using std::strstream ;
@@ -957,6 +957,63 @@ vsprintf( buf, format, _list ) ;
 va_end( _list ) ;
 
 return Write( string( buf ) ) ;
+}
+
+void xClient::OnJoin( Channel* theChan )
+{
+#ifndef NDEBUG
+  assert( theChan != 0 ) ;
+#endif
+
+addChan( theChan ) ;
+}
+
+void xClient::OnJoin( const string& chanName )
+{
+Channel* theChan = Network->findChannel( chanName ) ;
+if( NULL == theChan )
+	{
+	elog	<< "xClient::OnJoin> Failed to find channel: "
+		<< chanName << endl ;
+	return ;
+	}
+OnJoin( theChan ) ;
+}
+
+void xClient::OnPart( Channel* theChan )
+{
+#ifndef NDEBUG
+  assert( theChan != 0 ) ;
+#endif
+
+removeChan( theChan ) ;
+}
+
+void xClient::OnPart( const string& chanName )
+{
+Channel* theChan = Network->findChannel( chanName ) ;
+if( NULL == theChan )
+	{
+	elog	<< "xClient::OnPart> Failed to find channel: "
+		<< chanName << endl ;
+	return ;
+	}
+OnPart( theChan ) ;
+}
+
+bool xClient::addChan( Channel* )
+{
+return true ;
+}
+
+bool xClient::removeChan( Channel* )
+{
+return true ;
+}
+
+int xClient::OnTimer( xServer::timerID ID, void* data )
+{
+return 0 ;
 }
 
 } // namespace gnuworld

@@ -16,20 +16,22 @@
 #include	"Numeric.h"
 
 const char xIP_h_rcsId[] = __XIP_H ;
-const char xIP_cc_rcsId[] = "$Id: ip.cc,v 1.1 2000/06/30 18:46:07 dan_karrels Exp $" ;
+const char xIP_cc_rcsId[] = "$Id: ip.cc,v 1.2 2000/08/04 23:39:09 dan_karrels Exp $" ;
 
 using std::string ;
 
 namespace gnuworld
 {
 
-xIP::xIP( const long& IP )
+xIP::xIP( const unsigned int& IP )
 {
 this->IP = htonl( IP ) ;
 }
 
-xIP::xIP( const int& a, const int& b,
-	const int& c, const int& d )
+xIP::xIP( const unsigned int& a,
+	const unsigned int& b,
+	const unsigned int& c,
+	const unsigned int& d )
 {
 IP = htonl( (a << 24) | (b << 16) | (c << 8) | d ) ;
 }
@@ -64,7 +66,7 @@ else
 		{
 		unsigned char a, b, c, d;
 		} ip ;
-	::memcpy( &ip, hp->h_addr, sizeof( int ) ) ;
+	::memcpy( &ip, hp->h_addr, sizeof( unsigned int ) ) ;
 	this->IP = htonl( ((ip.a << 24) | (ip.b << 16) | (ip.c << 8) | ip.d) ) ;
 	} // close else
 
@@ -74,7 +76,7 @@ const char* xIP::GetIP() const
 {
 struct hostent* hp = ::gethostbyaddr(
 	reinterpret_cast< const char* >( &IP ),
-	sizeof( int ), AF_INET ) ;
+	sizeof( unsigned int ), AF_INET ) ;
 
 return (hp ? hp->h_name : GetNumericIP()) ;
 }
@@ -91,12 +93,15 @@ sprintf( buf, "%d.%d.%d.%d",
 return buf ;
 }
 
-const long& xIP::GetLongIP() const
+const unsigned int& xIP::GetLongIP() const
 {
 return IP ;
 }
 
-void xIP::GetIP( int& a, int& b, int& c, int& d ) const
+void xIP::GetIP( unsigned int& a,
+	unsigned int& b,
+	unsigned int& c,
+	unsigned int& d ) const
 {
 a = (IP >> 24) & 0xff ;
 b = (IP >> 16) & 0xff ;

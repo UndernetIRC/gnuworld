@@ -1,8 +1,9 @@
 /* xparameters.h
+ * This class originally written by Orlando Bassotto.
  */
 
 #ifndef __xPARAMETERS_H
-#define __xPARAMETERS_H "$Id: xparameters.h,v 1.1 2000/06/30 18:46:06 dan_karrels Exp $"
+#define __xPARAMETERS_H "$Id: xparameters.h,v 1.2 2000/08/04 23:39:09 dan_karrels Exp $"
 
 #include        <vector>
 #include	<cassert>

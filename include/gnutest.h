@@ -1,15 +1,19 @@
 /* gnutest.h */
 
 #ifndef __GNUTEST_H
-#define __GNUTEST_H "$Id: gnutest.h,v 1.1 2000/08/01 00:03:23 dan_karrels Exp $"
+#define __GNUTEST_H "$Id: gnutest.h,v 1.2 2000/08/04 23:39:09 dan_karrels Exp $"
 
 #include	<string>
+#include	<vector>
 
 #include	"client.h"
 #include	"iClient.h"
 
 namespace gnuworld
 {
+
+using std::string ;
+using std::vector ;
 
 class gnutest : public xClient
 {
@@ -30,14 +34,16 @@ public:
 	virtual int BurstChannels() ;
 	virtual int OnPrivateMessage( iClient*, const string& ) ;
 
-	virtual bool isOnChannel( const string& chanName ) const
-		{ return (chanName == operChan) ; }
-	virtual bool isOnChannel( const Channel* theChan ) const
-		{ return (theChan->getName() == operChan) ; }
+	virtual bool isOnChannel( const string& chanName ) const ;
+	virtual bool isOnChannel( const Channel* theChan ) const ;
 
 protected:
 
+	virtual bool	addChan( Channel* ) ;
+	virtual bool	removeChan( Channel* ) ;
+
 	string		operChan ;
+	vector< string >	channels ;
 
 } ;
 

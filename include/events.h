@@ -2,10 +2,11 @@
  * This file defines the basic network and channel events that
  * the GNUWorld server may distribute to its services clients.
  * Hopefully most of these are pretty self explanatory.
+ * This file was originally created by Orlando Bassotto.
  */
 
 #ifndef __EVENTS_H
-#define __EVENTS_H "$Id: events.h,v 1.4 2000/08/02 22:49:43 dan_karrels Exp $"
+#define __EVENTS_H "$Id: events.h,v 1.5 2000/08/04 23:39:09 dan_karrels Exp $"
 
 namespace gnuworld
 {

@@ -6,7 +6,7 @@
  */
 
 #ifndef __XIP_H
-#define __XIP_H "$Id: ip.h,v 1.1 2000/06/30 18:46:06 dan_karrels Exp $"
+#define __XIP_H "$Id: ip.h,v 1.2 2000/08/04 23:39:09 dan_karrels Exp $"
 
 #include	<string>
 
@@ -33,14 +33,16 @@ public:
 	/**
  	 * Construct an xIP instance given an IP in long int format.
 	 */
-	xIP( const long int& IP ) ;
+	xIP( const unsigned int& IP ) ;
 
 	/**
 	 * Construct an xIP instance given the four octets of
 	 * an IP address.
 	 */
-	xIP( const int& a, const int& b,
-		const int& c, const int& d ) ;
+	xIP( const unsigned int& a,
+		const unsigned int& b,
+		const unsigned int& c,
+		const unsigned int& d ) ;
 
 	/**
 	 * Copy constructor.
@@ -63,15 +65,18 @@ public:
 	const char* GetNumericIP() const ;
 
 	/**
-	 * Retrieve the IP as a long int.
+	 * Retrieve the IP as an unsigned int.
 	 */
-	const long int& GetLongIP() const ;
+	const unsigned int& GetLongIP() const ;
 
 	/**
 	 * Place into the four variables passed to this method the
 	 * four octets of the IP.
 	 */
-	void GetIP( int& a, int& b, int& c, int& d ) const ;
+	void GetIP( unsigned int& a,
+		unsigned int& b,
+		unsigned int& c,
+		unsigned int& d ) const ;
 
 	/**
 	 * Return a character array representation of the base 64
@@ -84,7 +89,7 @@ protected:
 	/**
 	 * The IP number itself.
 	 */
-	long int	IP ;
+	unsigned int	IP ;
 
 } ;
 

@@ -37,7 +37,7 @@
 //#include	"moduleLoader.h"
 
 const char xServer_h_rcsId[] = __XSERVER_H ;
-const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.17 2000/08/04 18:21:02 dan_karrels Exp $" ;
+const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.18 2000/08/04 23:39:09 dan_karrels Exp $" ;
 
 using std::string ;
 using std::vector ;
@@ -90,6 +90,7 @@ Uplink = NULL ;
 theSock = NULL ;
 Message = SRV_SUCCESS ;
 outputWriteSize = inputReadSize = 0 ;
+lastTimerID = 1 ;
 
 // Initialize the numeric stuff.
 memset( charYY, 0, sizeof( charYY ) ) ;
@@ -4104,6 +4105,63 @@ clog	<< "Number of channels: " << Network->channelList_size() << endl ;
 clog	<< "Number of servers: " << Network->serverList_size() << endl ;
 clog	<< "Number of clients: " << Network->clientList_size() << endl ;
 clog	<< "Burst duration: " << (burstEnd - burstStart) << " seconds\n" ;
+}
+
+xServer::timerID xServer::RegisterTimer( const time_t& absTime,
+	xClient* theClient,
+	void* data )
+{
+#ifndef NDEBUG
+  assert( theClient != 0 ) ;
+#endif
+
+if( absTime >= ::time( 0 ) )
+	{
+	return 0 ;
+	}
+
+// TODO: Make sure this doesn't overflow
+timerID ID = lastTimerID++ ;
+
+timerInfo* ti = 0 ;
+try
+	{
+	ti = new timerInfo( ID, absTime, theClient, data ) ;
+	}
+catch( std::bad_alloc )
+	{
+	elog	<< "xServer::RegisterTimer> Memory allocation error\n" ;
+	return 0 ;
+	}
+
+timerQueue.push( timerQueueType::value_type( absTime, ti ) ) ;
+
+return ID ;
+}
+
+unsigned int xServer::checkTimers()
+{
+
+if( timerQueue.empty() || bursting )
+	{
+	return 0 ;
+	}
+
+unsigned int numTimers = 0 ;
+time_t now = ::time( 0 ) ;
+
+while( timerQueue.top().second->absTime >= now )
+	{
+	timerInfo* info = timerQueue.top().second ;
+	timerQueue.pop() ;
+
+	info->theClient->OnTimer( info->ID, info->data ) ;
+
+	delete info ;
+	++numTimers ;
+	}
+
+return numTimers ;
 }
 
 } // namespace gnuworld

@@ -260,4 +260,52 @@ else if( st[ 0 ] == "deop" )
 return xClient::OnPrivateMessage( theClient, message ) ;
 }
 
+bool gnutest::isOnChannel( const string& chanName ) const
+{
+if( !::strcasecmp( chanName.c_str(), operChan.c_str() ) )
+	{
+	return true ;
+	}
+
+return std::find( channels.begin(), channels.end(), chanName )
+	!= channels.end() ;
+}
+
+bool gnutest::isOnChannel( const Channel* theChan ) const
+{
+#ifndef NDEBUG
+  assert( theChan != 0 ) ;
+#endif
+
+return isOnChannel( theChan->getName() ) ;
+}
+
+bool gnutest::addChan( Channel* theChan )
+{
+#ifndef NDEBUG
+  assert( theChan != 0 ) ;
+#endif
+
+if( isOnChannel( theChan->getName() ) )
+	{
+	// Already on the channel
+	return false ;
+	}
+
+channels.push_back( theChan->getName() ) ;
+
+return true ;
+}
+
+bool gnutest::removeChan( Channel* theChan )
+{
+#ifndef NDEBUG
+  assert( theChan != 0 ) ;
+#endif
+
+std::remove( channels.begin(), channels.end(), theChan->getName() ) ;
+
+return true ;
+}
+
 } // namespace gnuworld
