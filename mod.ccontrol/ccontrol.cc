@@ -37,7 +37,7 @@
 #include	"ip.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.95 2001/12/07 13:03:55 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.96 2001/12/07 18:00:05 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -702,6 +702,10 @@ switch( theEvent )
 					if((CurConnections  > getExceptions("*@" + tIP)) 
 					    && (CurConnections > getExceptions("*@"+NewUser->getInsecureHost())))
 						{
+						MsgChanLog("Glining %s , connections : %d , IPE : %d , HOSTE %d\n"
+						,tIP.c_str(),CurConnections,
+						getExceptions("*@" + tIP),getExceptions("*@" + NewUser->getInsecureHost()));
+
 						glSet = true;
 						ccGline *tmpGline;
 						tmpGline = findGline("*@" + tIP); 
