@@ -99,9 +99,12 @@ install_sh = @install_sh@
 threadLib = @threadLib@
 
 lib_LTLIBRARIES = libgnuworld_db.la
-libgnuworld_db_la_SOURCES = gnuworldDB.cc
+libgnuworld_db_la_SOURCES = gnuworldDB.cc pgsqlDB.cc
 
-libgnuworld_db_la_LDFLAGS = -version-info 0:0:0 -rpath $(bindir) -static
+libgnuworld_db_la_LDFLAGS = -version-info 0:0:0 -rpath $(bindir) -static\
+	-L@PGSQL_LIB@ -lpq++
+
+INCLUDES = -I@PGSQL_INCLUDE@
 subdir = db
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = $(top_builddir)/include/defs.h
@@ -109,7 +112,7 @@ CONFIG_CLEAN_FILES =
 LTLIBRARIES = $(lib_LTLIBRARIES)
 
 libgnuworld_db_la_LIBADD =
-am_libgnuworld_db_la_OBJECTS = gnuworldDB.lo
+am_libgnuworld_db_la_OBJECTS = gnuworldDB.lo pgsqlDB.lo
 libgnuworld_db_la_OBJECTS = $(am_libgnuworld_db_la_OBJECTS)
 
 DEFS = @DEFS@
@@ -118,7 +121,8 @@ CPPFLAGS = @CPPFLAGS@
 LIBS = @LIBS@
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
-@AMDEP_TRUE@DEP_FILES = ./$(DEPDIR)/gnuworldDB.Plo
+@AMDEP_TRUE@DEP_FILES = ./$(DEPDIR)/gnuworldDB.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/pgsqlDB.Plo
 CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
 LTCXXCOMPILE = $(LIBTOOL) --mode=compile $(CXX) $(DEFS) \
@@ -172,6 +176,7 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gnuworldDB.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pgsqlDB.Plo@am__quote@
 
 distclean-depend:
 	-rm -rf ./$(DEPDIR)

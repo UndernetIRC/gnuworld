@@ -17,43 +17,62 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: gnuworldDB.h,v 1.2 2002/05/29 18:46:11 dan_karrels Exp $
+ * $Id: gnuworldDB.h,v 1.3 2002/05/31 15:07:19 dan_karrels Exp $
  */
 
 #ifndef __GNUWORLDDB_H
-#define __GNUWORLDDB_H "$Id: gnuworldDB.h,v 1.2 2002/05/29 18:46:11 dan_karrels Exp $"
+#define __GNUWORLDDB_H "$Id: gnuworldDB.h,v 1.3 2002/05/31 15:07:19 dan_karrels Exp $"
 
 #include	<string>
+#include	<sstream>
 
 #include	<sys/types.h>
 
 namespace gnuworld
 {
 
+using std::stringstream ;
 using std::string ;
 
 class gnuworldDB
 {
 
+protected:
+	string			dbHost ;
+	unsigned short int	dbPort ;
+	string			dbName ;
+	string			userName ;
+	string			password ;
+
 public:
 
-	static const bool	SUCCESS = true ;
-	static const bool	FAILURE = false ;
+	gnuworldDB( const string& dbHost,
+		const unsigned short int dbPort,
+		const string& dbName,
+		const string& userName,
+		const string& password ) ;
+	virtual ~gnuworldDB() ;
 
-	virtual bool		Connect( const string& host,
-					unsigned short int port,
-					const string& dbName,
-					const string& pass ) = 0 ;
-
+	virtual bool		Exec( const stringstream& ) = 0 ;
 	virtual bool		Exec( const string& ) = 0 ;
 	virtual bool		isConnected() const = 0 ;
 
 	virtual unsigned int	countTuples() const = 0 ;
-	virtual pid_t		getPID() const = 0 ;
 
-	virtual const string&	ErrorMessage() const = 0 ;
-	virtual const string&	GetValue( const unsigned int&,
+	virtual const string	ErrorMessage() const = 0 ;
+	virtual const string	GetValue( const unsigned int&,
 					const unsigned int& ) const = 0 ;
+
+	inline const string&	getDBHost() const
+		{ return dbHost ; }
+	inline const unsigned short int	getDBPort() const
+		{ return dbPort ; }
+	inline const string&	getDBName() const
+		{ return dbName ; }
+	inline const string&	getUserName() const
+		{ return userName ; }
+	inline const string&	getPassword() const
+		{ return password ; }
 
 protected:
 
