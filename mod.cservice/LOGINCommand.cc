@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: LOGINCommand.cc,v 1.50 2003/06/28 01:21:20 dan_karrels Exp $
+ * $Id: LOGINCommand.cc,v 1.51 2005/01/08 23:33:42 dan_karrels Exp $
  */
 
 #include	<string>
@@ -32,7 +32,7 @@
 #include	"cservice_config.h"
 #include	"Network.h"
 
-const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.50 2003/06/28 01:21:20 dan_karrels Exp $" ;
+const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.51 2005/01/08 23:33:42 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -64,11 +64,13 @@ if( st.size() < 3 )
  */
 unsigned int loginTime = bot->getUplink()->getStartTime() + bot->loginDelay;
 if(loginTime >= (unsigned int)bot->currentTime())
-{
-	bot->Notice(theClient, "AUTHENTICATION FAILED as %s. (Unable to login during reconnection, please try again in %i seconds)",
+	{
+	bot->Notice(theClient, "AUTHENTICATION FAILED as %s. (Unable "
+		"to login during reconnection, please try again in "
+		"%i seconds)",
 		st[1].c_str(), (loginTime - bot->currentTime()));
 	return false;
-}
+	}
 
 /*
  * Check theClient isn't already logged in, if so, tell
@@ -90,10 +92,10 @@ if (tmpUser)
  */
 
 if(st[1][0] == '#')
-{
+	{
 	bot->Notice(theClient, "AUTHENTICATION FAILED as %s.", st[1].c_str());
 	return false;
-}
+	}
 
 // TODO: Force a refresh of the user's info from the db
 sqlUser* theUser = bot->getUserRecord(st[1]);
@@ -133,38 +135,46 @@ if (!bot->isPasswordRight(theUser, st.assemble(2)))
  */
 
 if(theUser->networkClientList.size() + 1 > theUser->getMaxLogins())
-{
-	bot->Notice(theClient, "AUTHENTICATION FAILED as %s. (Maximum concurrent logins exceeded).",
+	{
+	bot->Notice(theClient, "AUTHENTICATION FAILED as %s. (Maximum "
+		"concurrent logins exceeded).",
 		theUser->getUserName().c_str());
 
 	string clientList;
 	for( sqlUser::networkClientListType::iterator ptr = theUser->networkClientList.begin() ;
 		ptr != theUser->networkClientList.end() ; )
 		{
-			clientList += (*ptr)->getNickUserHost();
-			++ptr;
-			if (ptr != theUser->networkClientList.end()) clientList += ", ";
-		}
+		clientList += (*ptr)->getNickUserHost();
+		++ptr;
+		if (ptr != theUser->networkClientList.end())
+			{
+			clientList += ", ";
+			}
+		} // for()
 
 	bot->Notice(theClient, "Current Sessions: %s", clientList.c_str());
 	return false;
-}
+	} // for()
 
 /*
  * If this user account is already authed against, send a notice to the other
  * users warning them that someone else has logged in too.
  */
 if(theUser->isAuthed())
-{
+	{
 	bot->noticeAllAuthedClients(theUser,
 	"%s has just authenticated as you (%s). "
 	"If this is not you, your account may have been compromised. "
 	"If you wish to suspend all your access as a precautionary measure, "
-	"type '\002/msg %s@%s suspendme <password>'\002 and contact a CService representative to resolve the problem."
-	" \002** Note: You will NOT be able to use your account after you issue this command **\002",
-		theClient->getNickUserHost().c_str(), theUser->getUserName().c_str(),
-		bot->getNickName().c_str(), bot-> getUplinkName().c_str());
-}
+	"type '\002/msg %s@%s suspendme <password>'\002 and contact a "
+	"CService representative to resolve the problem."
+	" \002** Note: You will NOT be able to use your account after "
+	"you issue this command **\002",
+		theClient->getNickUserHost().c_str(),
+		theUser->getUserName().c_str(),
+		bot->getNickName().c_str(),
+		bot-> getUplinkName().c_str());
+	}
 
 theUser->setLastSeen(bot->currentTime(), theClient->getNickUserHost());
 theUser->setFlag(sqlUser::F_LOGGEDIN);
@@ -190,13 +200,13 @@ bot->Notice(theClient,
 	theUser->getUserName().c_str());
 
 if(!bot->getAdminAccessLevel(theUser))
-{
+	{
 	string greeting = bot->getResponse(theUser, language::greeting);
 	if (!greeting.empty())
-	{
+		{
 		bot->Notice(theClient, greeting.c_str());
+		}
 	}
-}
 
 /*
  * Send out AC token onto the network.
@@ -229,9 +239,9 @@ if (theUser->getFlag(sqlUser::F_GLOBAL_SUSPEND))
 
 stringstream theQuery;
 theQuery	<< "SELECT channel_id,flags,suspend_expires FROM "
-			<< "levels WHERE user_id = "
-			<< theUser->getID()
-			<< ends;
+		<< "levels WHERE user_id = "
+		<< theUser->getID()
+		<< ends;
 
 #ifdef LOG_SQL
 	elog	<< "LOGIN::sqlQuery> "
@@ -254,13 +264,13 @@ autoOpVectorType autoOpVector;
 
 for(int i = 0; i < bot->SQLDb->Tuples(); i++)
 	{
-		autoOpData current;
+	autoOpData current;
 
-		current.channel_id = atoi(bot->SQLDb->GetValue(i, 0));
-		current.flags = atoi(bot->SQLDb->GetValue(i, 1));
-		current.suspend_expires = atoi(bot->SQLDb->GetValue(i, 2));
+	current.channel_id = atoi(bot->SQLDb->GetValue(i, 0));
+	current.flags = atoi(bot->SQLDb->GetValue(i, 1));
+	current.suspend_expires = atoi(bot->SQLDb->GetValue(i, 2));
 
-		autoOpVector.push_back( autoOpVectorType::value_type(current) );
+	autoOpVector.push_back( autoOpVectorType::value_type(current) );
 	}
 
 for (autoOpVectorType::const_iterator resultPtr = autoOpVector.begin();
@@ -347,9 +357,9 @@ for (autoOpVectorType::const_iterator resultPtr = autoOpVector.begin();
 	 */
 
 	if(resultPtr->suspend_expires > bot->currentTime() )
-	{
+		{
 		continue;
-	}
+		}
 
 	/*
  	 *  If its AUTOOP, check for op's and do the deed.
@@ -363,7 +373,7 @@ for (autoOpVectorType::const_iterator resultPtr = autoOpVector.begin();
 			bot->Op(netChan, theClient);
 			}
 		}
-		else
+	else
 		{
 		if(!tmpChanUser->getMode(ChannelUser::MODE_V))
 			{
@@ -409,11 +419,18 @@ if( PGRES_TUPLES_OK != status )
 
 for(int i = 0; i < bot->SQLDb->Tuples(); i++)
 	{
-		string channelName = bot->SQLDb->GetValue(i, 0);
-		bot->Notice(theClient, "You have been named as a supporter in a new channel application"
-			" for %s. You may visit the website to register your support or to make an objection. Alternatively, you can"
-			" type '\002/msg X support %s YES\002' or '\002/msg X support %s NO\002' to confirm or deny your support.",
-			channelName.c_str(), channelName.c_str(), channelName.c_str());
+	string channelName = bot->SQLDb->GetValue(i, 0);
+	bot->Notice(theClient, "You have been named as a supporter in a "
+		"new channel application for %s. You may visit the "
+		"website to register your support or to make an "
+		"objection. Alternatively, you can"
+		" type '\002/msg %s support %s YES\002' or '\002/msg %s "
+		"support %s NO\002' to confirm or deny your support.",
+		channelName.c_str(),
+		bot->getNickName().c_str(),
+		channelName.c_str(),
+		bot->getNickName().c_str(),
+		channelName.c_str());
 	}
 
 /*
@@ -426,9 +443,9 @@ if(!theUser->getFlag(sqlUser::F_NONOTES))
 	{
 	stringstream noteQuery;
 	noteQuery	<< "SELECT message_id FROM notes "
-				<< "WHERE user_id = "
-				<< theUser->getID()
-				<< ends;
+			<< "WHERE user_id = "
+			<< theUser->getID()
+			<< ends;
 
 #ifdef LOG_SQL
 	elog	<< "LOGIN::sqlQuery> "
@@ -439,8 +456,13 @@ if(!theUser->getFlag(sqlUser::F_NONOTES))
 	status = bot->SQLDb->Exec(noteQuery.str().c_str()) ;
 
 	unsigned int count = bot->SQLDb->Tuples();
-	if(count) bot->Notice(theClient, "You have %i note(s). To read them type /msg %s notes read all",
-		count, bot->getNickName().c_str());
+	if(count)
+		{
+		bot->Notice(theClient, "You have %i note(s). To read "
+			"them type /msg %s notes read all",
+			count,
+			bot->getNickName().c_str());
+		}
 	}
 
 #endif

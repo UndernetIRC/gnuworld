@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: Channel.cc,v 1.45 2003/12/31 23:50:51 dan_karrels Exp $
+ * $Id: Channel.cc,v 1.46 2005/01/08 23:33:43 dan_karrels Exp $
  */
 
 #include	<new>
@@ -38,7 +38,7 @@
 #include	"server.h"
 #include	"ConnectionManager.h"
 
-RCSTAG("$Id: Channel.cc,v 1.45 2003/12/31 23:50:51 dan_karrels Exp $") ;
+RCSTAG("$Id: Channel.cc,v 1.46 2005/01/08 23:33:43 dan_karrels Exp $") ;
 
 namespace gnuworld
 {
@@ -69,8 +69,8 @@ Channel::Channel( const string& _name,
 Channel::~Channel()
 {
 // Deallocate all ChannelUser's that are left
-userListType::iterator currentPtr = userList.begin() ;
-userListType::iterator endPtr = userList.end() ;
+userIterator currentPtr = userList_begin() ;
+userIterator endPtr = userList_end() ;
 for( ; currentPtr != endPtr ; ++currentPtr )
 	{
 	delete currentPtr->second ;
@@ -132,7 +132,7 @@ return removeUser( theClient->getIntYYXXX() ) ;
 ChannelUser* Channel::removeUser( const unsigned int& intYYXXX )
 {
 // Attempt to find the user in question
-userListType::iterator ptr = userList.find( intYYXXX ) ;
+userIterator ptr = userList.find( intYYXXX ) ;
 
 // Was the user found?
 if( ptr != userList.end() )
@@ -161,8 +161,8 @@ ChannelUser* Channel::findUser( const iClient* theClient ) const
 {
 assert( theClient != 0 ) ;
 
-userListType::const_iterator ptr = userList.find( theClient->getIntYYXXX() ) ;
-if( ptr == userList.end() )
+const_userIterator ptr = userList.find( theClient->getIntYYXXX() ) ;
+if( ptr == userList_end() )
 	{
 	// User not found
 	return 0 ;
@@ -233,7 +233,7 @@ banList.push_front( newBan ) ;
 
 void Channel::removeBan( const string& banMask )
 {
-for( banListType::iterator ptr = banList.begin(), end = banList.end() ;
+for( banIterator ptr = banList_begin(), end = banList_end() ;
 	ptr != end ; ++ptr )
 	{
 	if( !strcasecmp( *ptr, banMask ) )
@@ -246,8 +246,8 @@ for( banListType::iterator ptr = banList.begin(), end = banList.end() ;
 
 bool Channel::findBan( const string& banMask ) const
 {
-for( banListType::const_iterator ptr = banList.begin(),
-	end = banList.end() ; ptr != end ; ++ptr )
+for( const_banIterator ptr = banList_begin(),
+	end = banList_end() ; ptr != end ; ++ptr )
 	{
 	if( !strcasecmp( *ptr, banMask ) )
 		{
@@ -259,8 +259,8 @@ return false ;
 
 bool Channel::matchBan( const string& banMask ) const
 {
-for( banListType::const_iterator ptr = banList.begin(),
-	end = banList.end() ; ptr != end ; ++ptr )
+for( const_banIterator ptr = banList_begin(),
+	end = banList_end() ; ptr != end ; ++ptr )
 	{
 	if( !match( banMask, *ptr ) )
 		{
@@ -274,8 +274,8 @@ return false ;
 bool Channel::getMatchingBan( const string& banMask,
 	string& matchingBan ) const
 {
-for( banListType::const_iterator ptr = banList.begin(),
-	end = banList.end() ; ptr != end ; ++ptr )
+for( const_banIterator ptr = banList_begin(),
+	end = banList_end() ; ptr != end ; ++ptr )
 	{
 	if( !match( banMask, *ptr ) )
 		{

@@ -17,12 +17,10 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: COMMANDSCommand.cc,v 1.12 2003/08/09 23:15:33 dan_karrels Exp $
+ * $Id: COMMANDSCommand.cc,v 1.13 2005/01/08 23:33:42 dan_karrels Exp $
  */
  
 #include	<string>
-
-#include	<cstdlib>
 
 #include	"ccontrol.h"
 #include	"CControlCommands.h"
@@ -31,7 +29,7 @@
 #include	"misc.h"
 #include	"config.h"
 
-RCSTAG( "$Id: COMMANDSCommand.cc,v 1.12 2003/08/09 23:15:33 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: COMMANDSCommand.cc,v 1.13 2005/01/08 23:33:42 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {

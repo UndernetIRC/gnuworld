@@ -17,19 +17,17 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ADDOPERCHANCommand.cc,v 1.10 2003/08/09 23:15:33 dan_karrels Exp $
+ * $Id: ADDOPERCHANCommand.cc,v 1.11 2005/01/08 23:33:42 dan_karrels Exp $
  */
  
 #include	<string>
-#include	<cstdlib>
-#include        <iomanip>
 
 #include	"ccontrol.h"
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 #include	"Constants.h"
 
-RCSTAG( "$Id: ADDOPERCHANCommand.cc,v 1.10 2003/08/09 23:15:33 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: ADDOPERCHANCommand.cc,v 1.11 2005/01/08 23:33:42 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {

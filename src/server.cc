@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server.cc,v 1.201 2005/01/07 00:10:46 dan_karrels Exp $
+ * $Id: server.cc,v 1.202 2005/01/08 23:33:43 dan_karrels Exp $
  */
 
 #include	<sys/time.h>
@@ -69,7 +69,7 @@
 #include	"ConnectionHandler.h"
 #include	"Connection.h"
 
-RCSTAG( "$Id: server.cc,v 1.201 2005/01/07 00:10:46 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: server.cc,v 1.202 2005/01/08 23:33:43 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -2134,9 +2134,10 @@ for( string::const_iterator modePtr = modes.begin() ;
 
 // Write the modes to the network before updating tables and notifying
 // other xClients...this will keep the output buffers synched
+// BUG: Will this write more than 6 modes at once?
 stringstream s ;
 s	<< getCharYY()
-	<< ' '
+	<< " M "
 	<< theChan->getName()
 	<< ' '
 	<< modes ;

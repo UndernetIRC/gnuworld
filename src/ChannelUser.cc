@@ -17,17 +17,18 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ChannelUser.cc,v 1.8 2003/08/23 21:00:33 dan_karrels Exp $
+ * $Id: ChannelUser.cc,v 1.9 2005/01/08 23:33:43 dan_karrels Exp $
  */
 
 #include	<string>
+#include	<vector>
 
 #include	<cassert>
 
 #include	"iClient.h"
 #include	"ChannelUser.h"
 
-RCSTAG("$Id: ChannelUser.cc,v 1.8 2003/08/23 21:00:33 dan_karrels Exp $" ) ;
+RCSTAG("$Id: ChannelUser.cc,v 1.9 2005/01/08 23:33:43 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -91,6 +92,35 @@ return theClient->getIntYYXXX() ;
 bool ChannelUser::isOper() const
 {
 return theClient->isOper() ;
+}
+
+string ChannelUser::getModeString() const
+{
+std::vector< string > modes ;	
+
+if( isOper() )
+	{
+	modes.push_back( "oper" ) ;
+	}
+if( isModeV() )
+	{
+	modes.push_back( "voice" ) ;
+	}
+if( isModeO() )
+	{
+	modes.push_back( "op" ) ;
+	}
+
+string retMe ;
+for( std::vector< string >::size_type i = 0 ; i < modes.size() ; ++i )
+	{
+	retMe += modes[ i ] ;
+	if( (i + 1) < modes.size() )
+		{
+		retMe += "," ;
+		}
+	}
+return retMe ;
 }
 
 } //  namespace gnuworld

@@ -25,7 +25,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: CLEARMODECommand.cc,v 1.9 2005/01/07 00:10:25 dan_karrels Exp $
+ * $Id: CLEARMODECommand.cc,v 1.10 2005/01/08 23:33:42 dan_karrels Exp $
  */
 
 #include	<string>
@@ -38,7 +38,7 @@
 #include	"responses.h"
 #include	"Network.h"
 
-const char CLEARMODECommand_cc_rcsId[] = "$Id: CLEARMODECommand.cc,v 1.9 2005/01/07 00:10:25 dan_karrels Exp $" ;
+const char CLEARMODECommand_cc_rcsId[] = "$Id: CLEARMODECommand.cc,v 1.10 2005/01/08 23:33:42 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -104,26 +104,7 @@ if(!tmpChan)
 	return false;
 	}
 
-stringstream s;
-s	<< bot->getCharYYXXX()
-	<< " M "
-	<< st[1]
-	<< " -mnstipkl *"
-	<< ends;
-
-tmpChan->removeMode( Channel::MODE_I );
-tmpChan->removeMode( Channel::MODE_K );
-tmpChan->removeMode( Channel::MODE_L );
-tmpChan->removeMode( Channel::MODE_M );
-tmpChan->removeMode( Channel::MODE_N );
-tmpChan->removeMode( Channel::MODE_P );
-tmpChan->removeMode( Channel::MODE_R );
-tmpChan->removeMode( Channel::MODE_S );
-tmpChan->removeMode( Channel::MODE_T );
-tmpChan->setLimit( 0 );
-tmpChan->setKey( "" );
-
-bot->Write( s );
+bot->ClearMode( tmpChan, string( "bmstnipklr" ), true ) ;
 
 bot->Notice(theClient,
     bot->getResponse(theUser,

@@ -17,23 +17,17 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: SHUTDOWNCommand.cc,v 1.7 2003/08/09 23:15:34 dan_karrels Exp $
+ * $Id: SHUTDOWNCommand.cc,v 1.8 2005/01/08 23:33:42 dan_karrels Exp $
  */
 
 #include	<string>
-#include        <iomanip>
-
-#include	<cstdlib>
-#include	<cstring>
 
 #include	"ccontrol.h"
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
-#include	"Network.h"
 #include	"server.h"
-#include	"config.h"
 
-RCSTAG( "$Id: SHUTDOWNCommand.cc,v 1.7 2003/08/09 23:15:34 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: SHUTDOWNCommand.cc,v 1.8 2005/01/08 23:33:42 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -54,14 +48,7 @@ if(st.size() < 2)
 	}
 bot->MsgChanLog("SHUTDOWN %s\n",st.assemble(1).c_str());
 
-char sq[512];
-sprintf(sq,"%s SQ %s 0 :(%s)%s\n",
-	server->getCharYY().c_str()
-//	,Network->findServer(server->getUplinkCharYY())->getName().c_str()
-	,server->getName().c_str()
-	,theClient->getNickName().c_str(),st.assemble(1).c_str());
-bot->Write(bot->getCharYYXXX() + " Q :" +st.assemble(1) + "\n");
-bot->Write(sq);
+server->Shutdown( st.assemble( 1 ) ) ;
 
 return true;
 }

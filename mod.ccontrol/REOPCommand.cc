@@ -17,11 +17,10 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: REOPCommand.cc,v 1.3 2003/08/09 23:15:34 dan_karrels Exp $
+ * $Id: REOPCommand.cc,v 1.4 2005/01/08 23:33:42 dan_karrels Exp $
  */
 
 #include	<string>
-#include        <iomanip>
 
 #include	<cstdlib>
 
@@ -33,7 +32,7 @@
 #include	"ccBadChannel.h"
 #include	"config.h"
 
-RCSTAG( "$Id: REOPCommand.cc,v 1.3 2003/08/09 23:15:34 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: REOPCommand.cc,v 1.4 2005/01/08 23:33:42 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -68,18 +67,19 @@ if( NULL == theChan )
 		st[ 1 ].c_str() ) ;
 	return true ;
 	}
+
 if(bot->isOperChan(theChan))
 	{
 	bot->Notice(theClient,"C'mon , you know you cant reop an oper channel");
 	return false;
 	}
+
 iClient* reopClient = Network->findNick(st[2]);
 if(!reopClient)
 	{
 	bot->Notice(theClient,"I cant find %s anywere",st[2].c_str());
 	return true;
 	}
-	
 
 bot->MsgChanLog("REOP %s\n",st.assemble(1).c_str());
 ccBadChannel* Chan = bot->isBadChannel(st[1]);
@@ -91,31 +91,12 @@ if(Chan)
         return false;
         }
 
-string modes = "-";
-string args = "";
-for( Channel::const_userIterator ptr = theChan->userList_begin();
-	ptr != theChan->userList_end() ; ++ptr )
-	{
-	if( ptr->second->getMode(ChannelUser::MODE_O))
-		{
-		/* Don't deop +k things */
-		if ( !ptr->second->getClient()->getMode(iClient::MODE_SERVICES) ) 
-			{
-			modes+= 'o';
-			args+= ptr->second->getCharYYXXX() + " ";
-			ptr->second->removeMode(ChannelUser::MODE_O);
-			}
-		} // If opped.
-	if(modes.size() > 5) //if we got more than 5 , set the mode and continue
-		{
-		bot->ModeAsServer( theChan, modes + ' ' + args ) ;
-		modes = "-";
-		args = "";
-		}
-	}
-modes+= "+o";
-args += reopClient->getCharYYXXX(); 
-	bot->ModeAsServer(theChan,modes + " " + args);
+// First, clear all ops
+bot->ClearMode( theChan, string( "o" ), true ) ;
+
+// Now, op the proper user
+bot->Op( theChan, reopClient ) ;
+
 return true;	
 }
 

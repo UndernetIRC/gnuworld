@@ -33,7 +33,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: BANCommand.cc,v 1.33 2003/12/04 11:22:10 mrbean_ Exp $
+ * $Id: BANCommand.cc,v 1.34 2005/01/08 23:33:42 dan_karrels Exp $
  */
 
 #include	<new>
@@ -51,7 +51,7 @@
 #include	"responses.h"
 #include	"match.h"
 
-const char BANCommand_cc_rcsId[] = "$Id: BANCommand.cc,v 1.33 2003/12/04 11:22:10 mrbean_ Exp $" ;
+const char BANCommand_cc_rcsId[] = "$Id: BANCommand.cc,v 1.34 2005/01/08 23:33:42 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -388,20 +388,10 @@ else
 	string finalReason = "(" + theUser->getUserName() + ") " + banReason;
 	if( !clientsToKick.empty() )
 		{
-		// TODO: Use xClient::Ban() here
-		stringstream s;
-		s	<< bot->getCharYYXXX() << " M " << theChannel->getName()
-			<< " +b " << banTarget << ends;
-
-		bot->Write( s );
-
+		bot->Ban( theChannel, clientsToKick ) ;
 		bot->Kick( theChannel, clientsToKick, finalReason ) ;
-
-		/* Update GNUWorld */
-		theChannel->setBan(banTarget);
 		}
 	}
-
 
 /*
  *  Fill out new ban details.

@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: OPERJOINCommand.cc,v 1.14 2003/06/28 01:21:20 dan_karrels Exp $
+ * $Id: OPERJOINCommand.cc,v 1.15 2005/01/08 23:33:42 dan_karrels Exp $
  */
 
 #include	<string>
@@ -38,7 +38,7 @@
 #include	"Network.h"
 #include	"cservice_config.h"
 
-const char OPERJOINCommand_cc_rcsId[] = "$Id: OPERJOINCommand.cc,v 1.14 2003/06/28 01:21:20 dan_karrels Exp $" ;
+const char OPERJOINCommand_cc_rcsId[] = "$Id: OPERJOINCommand.cc,v 1.15 2005/01/08 23:33:42 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -99,14 +99,8 @@ if (theChan->getInChan())
 
 // Tell the world.
 
-stringstream s;
-s	<< server->getCharYY()
-	<< " WA :"
-	<< "An IRC Operator is asking me to join channel "
-	<< theChan->getName()
-	<< ends;
-
-bot->Write(s);
+bot->Wallops( "An IRC Operator is asking me to join channel %s",
+	theChan->getName().c_str() ) ;
 
 bot->logAdminMessage("%s is asking me to join channel %s",
 		theClient->getNickUserHost().c_str(),

@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: INVITECommand.cc,v 1.17 2003/08/09 23:15:33 dan_karrels Exp $
+ * $Id: INVITECommand.cc,v 1.18 2005/01/08 23:33:42 dan_karrels Exp $
  */
 
 #include	<string>
@@ -32,7 +32,7 @@
 #include	"Network.h"
 #include	"config.h"
 
-RCSTAG( "$Id: INVITECommand.cc,v 1.17 2003/08/09 23:15:33 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: INVITECommand.cc,v 1.18 2005/01/08 23:33:42 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -45,7 +45,6 @@ namespace uworld
 // invite #channel
 bool INVITECommand::Exec( iClient* theClient, const string& Message )
 {
-
 StringTokenizer st( Message ) ;
 
 if( st.size() == 1 )
@@ -68,60 +67,32 @@ if( chanName[ 0 ] != '#' )
 	{
 	chanName.insert( chanName.begin(), '#' ) ;
 	}
-string invNum;
+
+iClient* inviteClient = 0 ;
 if(st.size() > 2)
 	{
-	iClient* tmpClient = Network->findNick(st[2]);
-	if(tmpClient == NULL)
+	// Invite a different user
+	inviteClient = Network->findNick(st[2]);
+	if( inviteClient == NULL)
 		{
 		bot->Notice(theClient,"I cant find %s anywere",st[2].c_str());
 		return true;
 		}
-	if((!tmpUser) && (tmpClient != theClient))
+
+	if( !tmpUser  && (inviteClient != theClient))
 		{
 		bot->Notice(theClient,"You must login to invite someone else!");
 		return true;
 		}
-
-	invNum = tmpClient->getNickName();
 	}
 else
 	{
-	invNum = theClient->getNickName();
-	}
-char buf[ 512 ] = { 0 } ;
-
-// Invite buffer
-sprintf( buf, "%s I %s :%s\n",
-	bot->getCharYYXXX().c_str(),
-	invNum.c_str(),
-	chanName.c_str() ) ;
-
-if( bot->isOperChan( chanName ) )
-	{
-	// No problem
-
-	// Send the invitation
-	bot->QuoteAsServer( buf ) ;
-	return true ;
+	// Invite the requesting user
+	inviteClient = theClient ;
 	}
 
-// Else, this is a user channel
-// Note that this assumes that the bot
-// is in no channels other than oper
-// channels.
-
-// Join
-bot->Join( chanName, string(), 0, false ) ;
-
-// Invite
-bot->QuoteAsServer( buf ) ;
-
-// Part
-bot->Part( chanName ) ;
-
-
-return true ;
+// xClient::Invite() will Join/Part the channel if necessary.
+return bot->Invite( inviteClient, chanName ) ;
 }
 
 }

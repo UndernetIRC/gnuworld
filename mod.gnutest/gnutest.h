@@ -16,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: gnutest.h,v 1.12 2004/06/04 20:17:24 jeekay Exp $
+ * $Id: gnutest.h,v 1.13 2005/01/08 23:33:43 dan_karrels Exp $
  */
 
 #ifndef __GNUTEST_H
-#define __GNUTEST_H "$Id: gnutest.h,v 1.12 2004/06/04 20:17:24 jeekay Exp $"
+#define __GNUTEST_H "$Id: gnutest.h,v 1.13 2005/01/08 23:33:43 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
@@ -257,6 +257,11 @@ protected:
 	 */
 	virtual void	spawnPart( iClient* requestingClient,
 				const StringTokenizer& st ) ;
+
+	/**
+	 * Report information about a channel.
+	 */
+	virtual void	chanInfo( const Channel* theChan ) ;
 
 	/**
 	 * This is the name of the operator only channel on which this

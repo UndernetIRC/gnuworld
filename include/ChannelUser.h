@@ -17,11 +17,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ChannelUser.h,v 1.14 2003/12/31 23:50:50 dan_karrels Exp $
+ * $Id: ChannelUser.h,v 1.15 2005/01/08 23:33:42 dan_karrels Exp $
  */
 
 #ifndef __CHANNELUSER_H
-#define __CHANNELUSER_H "$Id: ChannelUser.h,v 1.14 2003/12/31 23:50:50 dan_karrels Exp $"
+#define __CHANNELUSER_H "$Id: ChannelUser.h,v 1.15 2005/01/08 23:33:42 dan_karrels Exp $"
 
 #include	<string>
 
@@ -194,6 +194,16 @@ public:
 		{ return theClient ; }
 
 	/**
+	 * Return a human readable string of modes this user has
+	 * in the channel.
+	 * Valid modes are:
+	 *  - "op"
+	 *  - "voice"
+	 *  - "oper"
+	 */
+	std::string	getModeString() const ;
+
+	/**
 	 * Convenience operator method for outputting this
 	 * ChannelUser's information to a C++ standard
 	 * output stream.
@@ -203,7 +213,9 @@ public:
 	out	<< rhs.getNickName() << '!'
 		<< rhs.getUserName() << '@'
 		<< rhs.getHostName() << ' '
-		<< rhs.getCharYYXXX() ;
+		<< rhs.getCharYYXXX()
+		<< " user modes: "
+		<< rhs.getModeString() ;
 	return out ;
 	}
 

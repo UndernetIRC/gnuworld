@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: CLEARCHANCommand.cc,v 1.22 2003/08/09 23:15:33 dan_karrels Exp $
+ * $Id: CLEARCHANCommand.cc,v 1.23 2005/01/08 23:33:42 dan_karrels Exp $
  */
 
 #include	<string>
@@ -31,7 +31,7 @@
 #include	"ccBadChannel.h"
 #include	"config.h"
 
-RCSTAG( "$Id: CLEARCHANCommand.cc,v 1.22 2003/08/09 23:15:33 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: CLEARCHANCommand.cc,v 1.23 2005/01/08 23:33:42 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -90,9 +90,9 @@ if(Chan)
 //Check if the user specified the modes, if not assume he ment all of the modes
 if(st.size() == 2)
 	doModes = "OBKLIM";
-else if(!strcasecmp(string_upper(st[ 2 ]).c_str(),"ALL"))
+else if(!strcasecmp(string_upper(st[ 2 ]),"ALL"))
 	doModes = "OBKLINMSPT";
-else if(!strcasecmp(string_upper(st [ 2]).c_str(),"-D"))
+else if(!strcasecmp(string_upper(st [ 2]),"-D"))
 	Desynch = true;
 else	
 	doModes = string_upper(st [ 2 ]);
@@ -130,7 +130,11 @@ if(Desynch)
 	bot->Part(theChan->getName());
 	return true;
 	}
-	
+
+bot->ClearMode( theChan, doModes, true ) ;
+return true ;
+
+/*	
 for( string::size_type modePos = 0 ; modePos < doModes.size() ; ++modePos )
 	{
 	switch( doModes[ modePos ] )
@@ -169,7 +173,7 @@ for( string::size_type modePos = 0 ; modePos < doModes.size() ; ++modePos )
 				{
 				if( ptr->second->getMode(ChannelUser::MODE_O))
 					{
-					/* Don't deop +k things */
+					// Don't deop +k things
 					if ( !ptr->second->getClient()->getMode(iClient::MODE_SERVICES) ) 
 						{
 						modes+= 'o';
@@ -252,6 +256,7 @@ for( string::size_type modePos = 0 ; modePos < doModes.size() ; ++modePos )
 if(!remModes.empty())
 	bot->ModeAsServer(theChan,"-" + remModes + " " + args);
 return true;	
+*/
 }
 
 }

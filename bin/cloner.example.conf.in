@@ -1,4 +1,4 @@
-# $Id: cloner.example.conf.in,v 1.4 2004/01/01 19:31:12 dan_karrels Exp $
+# $Id: cloner.example.conf.in,v 1.5 2005/01/08 23:33:41 dan_karrels Exp $
 # Configuration file for Cloner (mod.cloner)
 
 # The following fields pertain to the client that connects and
@@ -39,6 +39,12 @@ fakehost=cia.gov
 fakehost=fbi.gov
 fakehost=clone.fbi.gov
 fakehost=i.hacked.cia.gov
+fakehost=osd.gov
+fakehost=af.mil
+fakehost=army.mil
+fakehost=marines.mil
+fakehost=navy.mil
+fakehost=coastguard.mil
 
 # fakeuser's are used for clone usernames
 # There may be as many as you like
@@ -54,6 +60,11 @@ fakeuser=lott
 fakeuser=blair
 fakeuser=bigdick
 fakeuser=rumsfeld
+fakeuser=hw
+fakeuser=tenet
+fakeuser=graham
+fakeuser=clarke
+fakeuser=rice
 
 # Real name field of each clone
 clonedescription = This is a clone, this is only a clone...

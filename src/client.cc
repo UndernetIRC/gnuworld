@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: client.cc,v 1.72 2004/12/22 22:58:32 denspike Exp $
+ * $Id: client.cc,v 1.73 2005/01/08 23:33:43 dan_karrels Exp $
  */
 
 #include	<new>
@@ -41,15 +41,13 @@
 #include	"Network.h"
 #include	"ip.h"
 #include	"NetworkTarget.h"
-
 #include	"client.h"
 #include	"EConfig.h"
 #include	"StringTokenizer.h"
-
 #include	"ELog.h"
 #include	"events.h"
 
-RCSTAG("$Id: client.cc,v 1.72 2004/12/22 22:58:32 denspike Exp $" ) ;
+RCSTAG("$Id: client.cc,v 1.73 2005/01/08 23:33:43 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -83,8 +81,7 @@ xClient::~xClient()
 {}
 
 void xClient::BurstChannels()
-{
-}
+{}
 
 bool xClient::BurstGlines()
 {
@@ -191,7 +188,7 @@ return false ;
 
 bool xClient::Wallops( const string& Message )
 {
-return QuoteAsServer( getCharYYXXX() + " WA :" + Message ) ;
+return Write( getCharYYXXX() + " WA :" + Message ) ;
 }
 
 bool xClient::Wallops( const char* Format, ... )
@@ -238,26 +235,37 @@ if( isConnected() && Format && Format[ 0 ] != 0 )
 return false ;
 }
 
-bool xClient::ModeAsServer( const string& Channel, const string& Mode )
+bool xClient::ModeAsServer( const string& chanName,
+	const string& modes,
+	const string& args )
 {
-// TODO: REMOVE THIS METHOD
-if( isConnected() )
+if( !isConnected() )
 	{
-	return MyUplink->Write( "%s M #%s %s\r\n",
-		MyUplink->getCharYY().c_str(),
-		(Channel[ 0 ] == '#' ? (Channel.c_str() + 1) :
-			Channel.c_str()),
-		Mode.c_str() ) ;
+	return false ;
 	}
-return false ;
+
+Channel* theChan = Network->findChannel( chanName ) ;
+if( 0 == theChan )
+	{
+	return false ;
+	}
+
+return ModeAsServer( theChan, modes, args ) ;
 }
 
-bool xClient::ModeAsServer( const Channel* theChan, const string& Mode )
+bool xClient::ModeAsServer( Channel* theChan,
+	const string& modes,
+	const string& args )
 {
-// TODO: REMOVE THIS METHOD
 assert( theChan != 0 ) ;
 
-return ModeAsServer( theChan->getName(), Mode ) ;
+if( !isConnected() )
+	{
+	return false ;
+	}
+
+return (1 == getUplink()->Mode( this, theChan, modes, args ))
+	? true : false ;
 }
 
 bool xClient::DoCTCP( iClient* Target,

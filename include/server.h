@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server.h,v 1.100 2004/01/07 18:33:42 dan_karrels Exp $
+ * $Id: server.h,v 1.101 2005/01/08 23:33:42 dan_karrels Exp $
  */
 
 #ifndef __SERVER_H
-#define __SERVER_H "$Id: server.h,v 1.100 2004/01/07 18:33:42 dan_karrels Exp $"
+#define __SERVER_H "$Id: server.h,v 1.101 2005/01/08 23:33:42 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
@@ -41,10 +41,8 @@
 #include	"Buffer.h"
 #include	"events.h"
 #include	"Gline.h"
-#include	"xparameters.h"
 #include	"misc.h"
 #include	"moduleLoader.h"
-#include	"ELog.h"
 #include	"TimerHandler.h"
 #include	"ServerCommandHandler.h"
 #include	"ConnectionManager.h"

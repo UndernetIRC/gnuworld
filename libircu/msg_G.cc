@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_G.cc,v 1.4 2003/08/23 21:00:32 dan_karrels Exp $
+ * $Id: msg_G.cc,v 1.5 2005/01/08 23:33:42 dan_karrels Exp $
  */
 
 #include	<sys/time.h>
@@ -37,7 +37,7 @@
 #include	"StringTokenizer.h"
 #include	"config.h"
 
-RCSTAG( "$Id: msg_G.cc,v 1.4 2003/08/23 21:00:32 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: msg_G.cc,v 1.5 2005/01/08 23:33:42 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -149,15 +149,6 @@ else
 //	elog	<< "msg_G> tsDiffDouble: "
 //		<< tsDiffDouble
 //		<< endl ;
-
-/* Why doesn't this work?
-	theStream.str( string() ) ;
-	theStream	<< tsDiffDouble ;
-
-	elog	<< "msg_G> theStream: "
-		<< theStream.str()
-		<< endl ;
-*/
 
 	stringstream stream2 ;
 	stream2		<< tsDiffDouble ;

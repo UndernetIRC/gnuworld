@@ -17,12 +17,10 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: CHANINFOCommand.cc,v 1.14 2003/08/09 23:15:33 dan_karrels Exp $
+ * $Id: CHANINFOCommand.cc,v 1.15 2005/01/08 23:33:42 dan_karrels Exp $
  */
 
 #include	<string>
-#include	<cstdlib>
-#include        <iomanip>
 
 #include	"Network.h"
 #include	"ccontrol.h"
@@ -31,7 +29,7 @@
 #include	"Constants.h"
 #include	"config.h"
 
-RCSTAG( "$Id: CHANINFOCommand.cc,v 1.14 2003/08/09 23:15:33 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: CHANINFOCommand.cc,v 1.15 2005/01/08 23:33:42 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -52,7 +50,8 @@ if( st.size() < 2 )
 
 if(st[1].size() > channel::MaxName)
 	{
-	bot->Notice(theClient,"Channel name can't be more than %d chars",channel::MaxName);
+	bot->Notice(theClient,"Channel name can't be more than %d chars",
+		channel::MaxName);
 	return false;
 	}
 
@@ -73,6 +72,7 @@ bot->Notice( theClient, "Created at time: %d",
 	theChan->getCreationTime() ) ;
 bot->Notice( theClient, "Number of channel users: %d",
 	theChan->size() ) ;
+
 #ifdef TOPIC_TRACK
 bot->Notice(theClient,"Topic: %s",
 	theChan->getTopic().c_str());

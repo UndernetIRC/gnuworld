@@ -20,12 +20,10 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ADDUSERCommand.cc,v 1.18 2003/08/09 23:15:33 dan_karrels Exp $
+ * $Id: ADDUSERCommand.cc,v 1.19 2005/01/08 23:33:42 dan_karrels Exp $
  */
 
 #include	<string>
-
-#include	<cstdlib>
 
 #include	"ccontrol.h"
 #include	"CControlCommands.h"
@@ -36,7 +34,7 @@
 #include	"Constants.h"
 #include	"config.h"
 
-RCSTAG( "$Id: ADDUSERCommand.cc,v 1.18 2003/08/09 23:15:33 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: ADDUSERCommand.cc,v 1.19 2005/01/08 23:33:42 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -48,7 +46,6 @@ namespace uworld
 
 bool ADDUSERCommand::Exec( iClient* theClient, const string& Message)
 {
- 
 StringTokenizer st( Message ) ;
 if( st.size() < 4 )
 	{
@@ -58,20 +55,22 @@ if( st.size() < 4 )
 
 if(!dbConnected)
         {
-        bot->Notice(theClient,"Sorry, but the db connection is down now, please try again alittle later");
+        bot->Notice(theClient,"Sorry, but the db connection is down "
+		"now, please try again alittle later");
         return false;
         }
 
 if(st[1].size() > User::MaxName)
 	{
-	bot->Notice(theClient,"Oper name can't be more than %d chars",User::MaxName);
+	bot->Notice(theClient,"Oper name can't be more than %d "
+		"chars",
+		User::MaxName);
 	return false;
 	}
 
 // Try fetching the user data from the database, note this is
 // the new user handle
 ccUser* theUser = bot->GetOper(st[1]);
-
 if (theUser)  
 	{ 
 	bot->Notice(theClient,"Oper %s already exsits in my db," 
@@ -85,7 +84,6 @@ unsigned long int NewSAccess = 0 ;
 
 unsigned int NewFlags = 0 ;
 
-// TODO: use std::string::operator=(const char*) const
 if(!strcasecmp(st[2],"coder"))
 	{
 	NewAccess = commandLevel::CODER;
@@ -103,7 +101,8 @@ else if(!strcasecmp(st[2],"admin"))
 	{
 	if(st.size() < 5)
 		{
-		bot->Notice(theClient,"When adding new admin, you must specify a server");
+		bot->Notice(theClient,"When adding new admin, you "
+			"must specify a server");
 		return false;
 		}
 	NewAccess = commandLevel::ADMIN;
@@ -130,10 +129,13 @@ if( NULL == tOper )
 		"You must first authenticate" ) ;
 	return true ;
 	}
+
 bot->MsgChanLog("ADDUSER %s %s\n",st[1].c_str(),st[2].c_str());
+
 //Make sure the new oper wont have a command the old one doesnt have enabled
 NewAccess &= tOper->getAccess(); 
 //NewAccess = bot->getTrueAccess(NewAccess);
+
 //Check if the user doesnt try to add an oper with higher flag than he is
 unsigned int OperFlags = tOper->getType();
 if(OperFlags < operLevel::ADMINLEVEL)
@@ -146,13 +148,15 @@ if(OperFlags < operLevel::ADMINLEVEL)
 if((OperFlags < operLevel::SMTLEVEL) && (OperFlags <= NewFlags))
 	{
 	bot->Notice(theClient,
-		"Sorry, but you can't add an oper with higher or equal access to yours");
+		"Sorry, but you can't add an oper with higher or "
+		"equal access to yours");
 	return false;
 	}
 else if(OperFlags < NewFlags)
 	{
 	bot->Notice(theClient,
-		"Sorry, but you can't add an oper with higher access than yours");
+		"Sorry, but you can't add an oper with higher "
+		"access than yours");
 	return false;
 	}
 
@@ -168,15 +172,17 @@ else
 	{
 	if(OperFlags < operLevel::SMTLEVEL)
 		{
-		bot->Notice(theClient,"Sorry, only SMT+ can specify a server name");
+		bot->Notice(theClient,"Sorry, only SMT+ can specify "
+		"a server name");
 		return false;
 		}
-	string Server;
-	Server = bot->expandDbServer(st[3]);
-	if(!strcasecmp(Server,""))
+
+	string Server( bot->expandDbServer(st[3]) ) ;
+	if( Server.empty() )
 		{
-		bot->Notice(theClient,"I cant find a server that matches %s in the database"
-			    ,st[3].c_str());
+		bot->Notice(theClient,"I cant find a server that "
+			"matches %s in the database",
+			st[3].c_str());
 		return false;
 		}
 	theUser->setPassword(bot->CryptPass(st[4]));
@@ -189,6 +195,7 @@ theUser->setType(NewFlags);
 theUser->setLast_Updated_By(theClient->getRealNickUserHost());
 theUser->setNeedOp(true);
 theUser->setNotice(true); //default to notice
+
 if(bot->AddOper(theUser) == true)
 	{
 	bot->Notice(theClient, "Oper successfully Added.");

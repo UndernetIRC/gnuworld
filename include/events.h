@@ -22,11 +22,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: events.h,v 1.17 2003/12/29 23:59:36 dan_karrels Exp $
+ * $Id: events.h,v 1.18 2005/01/08 23:33:42 dan_karrels Exp $
  */
 
 #ifndef __EVENTS_H
-#define __EVENTS_H "$Id: events.h,v 1.17 2003/12/29 23:59:36 dan_karrels Exp $"
+#define __EVENTS_H "$Id: events.h,v 1.18 2005/01/08 23:33:42 dan_karrels Exp $"
 
 #include	<string>
 
@@ -45,6 +45,7 @@ enum
 	EVT_NETJOIN,
 	EVT_BURST_CMPLT,
 	EVT_BURST_ACK,
+	EVT_EA_SENT,
 	EVT_GLINE,
 	EVT_REMGLINE,
 	EVT_JUPE,

@@ -17,12 +17,10 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ADDCOMMANDCommand.cc,v 1.27 2003/08/09 23:15:33 dan_karrels Exp $
+ * $Id: ADDCOMMANDCommand.cc,v 1.28 2005/01/08 23:33:42 dan_karrels Exp $
  */
  
 #include	<string>
-
-#include	<cstdlib>
 
 #include	"ccontrol.h"
 #include	"CControlCommands.h"
@@ -30,7 +28,7 @@
 #include        "ccUser.h"
 #include	"misc.h"
 
-RCSTAG( "$Id: ADDCOMMANDCommand.cc,v 1.27 2003/08/09 23:15:33 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: ADDCOMMANDCommand.cc,v 1.28 2005/01/08 23:33:42 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -56,7 +54,7 @@ if(!dbConnected)
         return false;
         }
 
-unsigned int pos = 1;
+StringTokenizer::size_type pos = 1;
 bool Forced = false;
 if(!strcasecmp(st[pos],"-fr"))
 	{
@@ -68,7 +66,6 @@ if(!strcasecmp(st[pos],"-fr"))
 		}
 	}
 
-
 // Fetch the oper record from the db
 if(st[pos].size() > 64)
 	{
@@ -77,7 +74,6 @@ if(st[pos].size() > 64)
 	}
 
 ccUser* theUser = bot->GetOper(st[pos]);
-	
 if( !theUser )
 	{	
 	bot->Notice( theClient,
@@ -86,6 +82,7 @@ if( !theUser )
 	return false;
 	}
 pos++;	
+
 //int CommandLevel = bot->getCommandLevel(st[pos]);
 if(st[pos].size() > 128)
 	{
@@ -108,6 +105,7 @@ if( NULL == AClient )
 	return true ;
 	}
 bot->MsgChanLog("ADDCOMMAND %s\n",st.assemble(1).c_str());
+
 // Only allow opers who have access to that command to add it to new opers
 if(!AClient->gotAccess(Comm) )
 	{
@@ -115,27 +113,29 @@ if(!AClient->gotAccess(Comm) )
 		"You must have access to a command inorder to add it");
 	return false;
 	}
-	
-bool Admin;
+
+bool Admin = false ;
 if(AClient->getType()  < operLevel::SMTLEVEL)
 	Admin = true;
 else
 	Admin = false;
-	
 
 if((Admin) && (AClient->getType() <= theUser->getType()))
 	{
-	bot->Notice(theClient,"You cant modify user who have a equal/higher access than you");
+	bot->Notice(theClient,"You cant modify user who have a "
+		"equal/higher access than you");
 	return false;
 	}
 else if(!(Admin) && (AClient->getType() < theUser->getType()))
 	{
-	bot->Notice(theClient,"You cant modify user who have a higher access than you");
+	bot->Notice(theClient,"You cant modify user who have a higher "
+		"access than you");
 	return false;
 	}
 if((Admin) && (strcasecmp(AClient->getServer(),theUser->getServer())))
 	{
-	bot->Notice(theClient,"You can only modify a user who is associated with the same server as you");
+	bot->Notice(theClient,"You can only modify a user who is "
+		"associated with the same server as you");
 	return false;
 	}
 if(Forced)
@@ -150,10 +150,13 @@ else if(Comm->getMinLevel() > theUser->getType())
 	{
 	if(AClient->getType() >= operLevel::SMTLEVEL)
 		bot->Notice(theClient,
-			    "The min level required to use this command is higher than the one the oper has, use \002-fr\002 if you stil want to add it");
+			"The min level required to use this command "
+			"is higher than the one the oper has, use "
+			"\002-fr\002 if you stil want to add it");
 	else
 		bot->Notice(theClient,
-			    "The min level required to use this command is higher than the one the oper has");
+			"The min level required to use this command "
+			"is higher than the one the oper has");
 	return false;
 	}
 		
@@ -181,14 +184,10 @@ if(theUser->Update())
 	// If the user is authenticated update his authenticate entry
 	return true;
 	}
-else
-	{
-	bot->Notice( theClient,
-		"Error while adding command for %s",
-		st[pos-1].c_str());
-	return false;
-	}
-	
+
+bot->Notice( theClient, "Error while adding command for %s",
+	st[pos-1].c_str());
+return false;
 }	
 }
 }

@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: client.h,v 1.55 2004/05/19 19:46:33 jeekay Exp $
+ * $Id: client.h,v 1.56 2005/01/08 23:33:42 dan_karrels Exp $
  */
 
 #ifndef __CLIENT_H
-#define __CLIENT_H "$Id: client.h,v 1.55 2004/05/19 19:46:33 jeekay Exp $"
+#define __CLIENT_H "$Id: client.h,v 1.56 2005/01/08 23:33:42 dan_karrels Exp $"
 
 #include	<sstream>
 #include	<string>
@@ -121,13 +121,16 @@ public:
 	/**
 	 * ModeAsServer will change modes in a channel as the server.
 	 */
-	virtual bool ModeAsServer( const std::string& Channel,
-			const std::string& Mode ) ;	
+	virtual bool ModeAsServer( const std::string& chanName,
+			const std::string& modes,
+			const std::string& args ) ;	
 
 	/**
 	 * Change modes as the server for the given channel.
 	 */
-	virtual bool ModeAsServer( const Channel*, const std::string& ) ;
+	virtual bool ModeAsServer( Channel*,
+			const std::string& modes,
+			const std::string& args ) ;
 
 	/**
 	 * Mode is used to set the bot's modes.  If connected to the

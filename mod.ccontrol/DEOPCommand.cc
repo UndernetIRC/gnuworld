@@ -17,11 +17,12 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: DEOPCommand.cc,v 1.11 2003/08/09 23:15:33 dan_karrels Exp $
+ * $Id: DEOPCommand.cc,v 1.12 2005/01/08 23:33:42 dan_karrels Exp $
  */
 
+#include	<set>
 #include	<string>
-#include        <iomanip>
+#include	<vector>
 
 #include	<cstdlib>
 
@@ -33,7 +34,7 @@
 #include	"ccBadChannel.h"
 #include	"config.h"
 
-RCSTAG( "$Id: DEOPCommand.cc,v 1.11 2003/08/09 23:15:33 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: DEOPCommand.cc,v 1.12 2005/01/08 23:33:42 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -74,45 +75,57 @@ if(Chan)
                              ,Chan->getReason().c_str());
         return false;
         }
+
 iClient* Target = 0;
 
-typedef map < iClient*, int > duplicateMapType; 
-duplicateMapType duplicateMap; 
+// Use a set<> here to prevent including a user more than once
+typedef std::set< iClient* > deopSetType ;
+deopSetType deopSet ;
 
 bot->MsgChanLog("DEOP %s\n",st.assemble(1).c_str());
 
-string mode = "-";
-string args = "";
-
-for(unsigned int i=2;i<st.size();i++)
+for( StringTokenizer::size_type i = 2 ; i < st.size() ; ++i )
 	{
 	if(st[i].size() > 64)
-	{
+		{
 		bot->Notice(theClient,"Nick name can't be more than 64 chars");
 		return false;
-	}
-	Target = Network->findNick( st[ i ] ) ;
-	if(Target)
-		{
-		ChannelUser* tmpChanUser = theChan->findUser(Target) ;
+		}
 
-		//Check if the user is in the channel and he's not already opped
-		if(( tmpChanUser ) && ( tmpChanUser->getMode(ChannelUser::MODE_O) ) && !( Target->getMode(iClient::MODE_SERVICES) ))
-			{
-			duplicateMapType::iterator ptr = duplicateMap.find(Target);
-			if(ptr == duplicateMap.end())
-				{ 
-				// Not a duplicate.
-				duplicateMap.insert(duplicateMapType::value_type(Target, 0)); 
-				tmpChanUser->removeMode(ChannelUser::MODE_O);
-				mode+='o';
-				args += Target->getCharYYXXX() + ' ' ;
-				}
-			} //if
-		} //if
+	Target = Network->findNick( st[ i ] ) ;
+	if( 0 == Target )
+		{
+		continue ;
+		}
+
+	// Check if the user is in the channel and he's not already opped
+	ChannelUser* tmpChanUser = theChan->findUser(Target) ;
+	if( !tmpChanUser )
+		{
+		continue ;
+		}
+
+	if( tmpChanUser->getMode( ChannelUser::MODE_O ) )
+		{
+		// User already opped
+		continue ;
+		}
+
+	if( Target->getMode( iClient::MODE_SERVICES ) )
+		{
+		// Don't op services clients, they can op themselves.
+		continue ;
+		}
+
+	deopSet.insert( Target ) ;
 	} // for
-if(!args.empty())
-	bot->ModeAsServer( theChan, mode + ' ' + args ) ;
+
+if( !deopSet.empty() )
+	{
+	std::vector< iClient* >
+		deopVector( deopSet.begin(), deopSet.end() ) ;
+	bot->DeOp( theChan, deopVector ) ;
+	}
 return true;
 }
 

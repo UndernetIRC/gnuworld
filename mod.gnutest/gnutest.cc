@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: gnutest.cc,v 1.21 2004/06/14 22:17:57 jeekay Exp $
+ * $Id: gnutest.cc,v 1.22 2005/01/08 23:33:43 dan_karrels Exp $
  */
 
 #include	<string>
@@ -30,7 +30,7 @@
 #include	"EConfig.h"
 #include	"Network.h"
 
-RCSTAG("$Id: gnutest.cc,v 1.21 2004/06/14 22:17:57 jeekay Exp $");
+RCSTAG("$Id: gnutest.cc,v 1.22 2005/01/08 23:33:43 dan_karrels Exp $");
 
 namespace gnuworld
 {
@@ -216,6 +216,51 @@ else if( st[ 0 ] == "part" )
 	Part( st[ 1 ] ) ;
 	removeChan( st[ 1 ] ) ;
 	}
+else if( st[ 0 ] == "say" )
+	{
+	if( st.size() < 3 )
+		{
+		Notice( theClient, "Usage: say <channel> <text>" ) ;
+		return ;
+		}
+
+	Channel* theChan = Network->findChannel( st[ 1 ] ) ;
+	if( NULL == theChan )
+		{
+		Notice( theClient, "Unable to find channel" ) ;
+		return ;
+		}
+
+	Message( theChan, st.assemble( 2 ) ) ;
+	}
+else if( st[ 0 ] == "clearmode" )
+	{
+	if( st.size() != 3 )
+		{
+		Notice( theClient, "Usage: clearmode <channel> <modes>" ) ;
+		return ;
+		}
+
+	Channel* theChan = Network->findChannel( st[ 1 ] ) ;
+	if( NULL == theChan )
+		{
+		Notice( theClient, "Unable to find channel" ) ;
+		return ;
+		}
+
+	ClearMode( theChan, st[ 2 ], false ) ;
+	}
+else if( st[ 0 ] == "chaninfo" )
+	{
+	Channel* theChan = Network->findChannel( st[ 1 ] ) ;
+	if( NULL == theChan )
+		{
+		Notice( theClient, "Unable to find channel" ) ;
+		return ;
+		}
+
+	chanInfo( theChan ) ;
+	}
 else if( st[ 0 ] == "ban" )
 	{
 	if( st.size() != 3 )
@@ -328,6 +373,39 @@ else if( st[ 0 ] == "op" )
 		}
 
 	Op( theChan, theClient ) ;
+	}
+else if( st[ 0 ] == "servop" )
+	{
+	if( st.size() != 3 )
+		{
+		Notice( theClient, "Usage: op #channel nick" ) ;
+		return ;
+		}
+
+	Channel* theChan = Network->findChannel( st[ 1 ] ) ;
+	if( NULL == theChan )
+		{
+		Notice( theClient, "Unable to find channel" ) ;
+		return ;
+		}
+
+	iClient* theClient = Network->findNick( st[ 2 ] ) ;
+	if( NULL == theClient )
+		{
+		Notice( theClient, "Unable to find nickname" ) ;
+		return ;
+		}
+
+	if( 0 == theChan->findUser( theClient ) )
+		{
+		Notice( theClient, "The user doesn't appear to be on that channel" ) ;
+		return ;
+		}
+
+	getUplink()->Mode( this,
+		theChan,
+		"+o",
+		theClient->getCharYYXXX() ) ;
 	}
 else if( st[ 0 ] == "deop" )
 	{
@@ -890,6 +968,24 @@ getUplink()->PartChannel( fakeClient, st[ 2 ] ) ;
 Notice( srcClient, "%s successfully parted %s",
         st[ 1 ].c_str(),
         st[ 2 ].c_str() ) ;
+}
+
+void gnutest::chanInfo( const Channel* theChan )
+{
+elog	<< *theChan
+	<< endl
+	<< "--- User information ---"
+	<< endl ;
+
+// Iterate through all clients, and return info about each
+// ChannelUser
+for( Channel::const_userIterator cItr = theChan->userList_begin() ;
+	cItr != theChan->userList_end() ; ++cItr )
+	{
+	const ChannelUser* theUser = cItr->second ;
+	elog	<< *theUser
+		<< endl ;
+	}
 }
 
 } // namespace gnuworld

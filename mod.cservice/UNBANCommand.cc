@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: UNBANCommand.cc,v 1.16 2003/12/04 11:22:10 mrbean_ Exp $
+ * $Id: UNBANCommand.cc,v 1.17 2005/01/08 23:33:42 dan_karrels Exp $
  */
 
 #include	<string>
@@ -38,7 +38,7 @@
 #include	"responses.h"
 #include	"match.h"
 
-const char UNBANCommand_cc_rcsId[] = "$Id: UNBANCommand.cc,v 1.16 2003/12/04 11:22:10 mrbean_ Exp $" ;
+const char UNBANCommand_cc_rcsId[] = "$Id: UNBANCommand.cc,v 1.17 2005/01/08 23:33:42 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -242,8 +242,8 @@ while (cPtr != theChannel->banList_end())
 
 	if ( comparison == 0)
 		{
-		// Can't call xClient::UnBan inside the loop it will modify without
-		// a return value.
+		// Can't call xClient::UnBan inside the loop it will
+		// modify without a return value.
 		stringstream s;
 		s	<< bot->getCharYYXXX()
 			<< " M " << theChannel->getName()

@@ -17,13 +17,10 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: UNMODERATECommand.cc,v 1.10 2003/08/09 23:15:34 dan_karrels Exp $
+ * $Id: UNMODERATECommand.cc,v 1.11 2005/01/08 23:33:42 dan_karrels Exp $
  */
 
 #include	<string>
-#include        <iomanip>
-
-#include	<cstdlib>
 
 #include	"ccontrol.h"
 #include	"CControlCommands.h"
@@ -33,7 +30,7 @@
 #include	"ccBadChannel.h"
 #include	"config.h"
 
-RCSTAG( "$Id: UNMODERATECommand.cc,v 1.10 2003/08/09 23:15:34 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: UNMODERATECommand.cc,v 1.11 2005/01/08 23:33:42 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -45,7 +42,6 @@ namespace uworld
 
 bool UNMODERATECommand::Exec( iClient* theClient, const string& Message )
 {
-
 StringTokenizer st( Message ) ;
 if( st.size() < 2 )
 	{
@@ -83,8 +79,7 @@ if(!theChan->getMode(Channel::MODE_M))
 	return false;
 	}
 
-theChan->removeMode(Channel::MODE_M);
-bot->ModeAsServer( theChan, "-m");
+bot->ModeAsServer( theChan, "-m", string() );
 
 return true ;
 

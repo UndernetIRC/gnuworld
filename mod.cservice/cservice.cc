@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: cservice.cc,v 1.242 2004/06/04 20:17:23 jeekay Exp $
+ * $Id: cservice.cc,v 1.243 2005/01/08 23:33:42 dan_karrels Exp $
  */
 
 #include	<new>
@@ -3039,8 +3039,10 @@ while (ptr != theChan->banList.end())
 	{
 	sqlBan* theBan = ptr->second;
 
-	if( match(theBan->getBanMask(),
-		theClient->getNickUserHost()) == 0)
+	if( (match(theBan->getBanMask(),
+		theClient->getNickUserHost()) == 0) ||
+		(0 == match( theBan->getBanMask(),
+			theClient->getRealNickUserHost())) )
 			{
 			return theBan;
 			}

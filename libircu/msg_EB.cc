@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_EB.cc,v 1.7 2004/01/07 18:33:43 dan_karrels Exp $
+ * $Id: msg_EB.cc,v 1.8 2005/01/08 23:33:42 dan_karrels Exp $
  */
 
 #include	<sys/types.h>
@@ -34,7 +34,7 @@
 #include	"ServerCommandHandler.h"
 #include	"config.h"
 
-RCSTAG( "$Id: msg_EB.cc,v 1.7 2004/01/07 18:33:43 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: msg_EB.cc,v 1.8 2005/01/08 23:33:42 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -116,6 +116,9 @@ if( !strcmp( params[ 0 ], theServer->getUplinkCharYY().c_str() ) )
 
 	// Is the burstOutputBuffer empty?
 	theServer->WriteBurstBuffer() ;
+
+	theServer->PostEvent( EVT_EA_SENT,
+		static_cast< void* >( theServer->getUplink() ) ) ;
 	}
 else
 	{

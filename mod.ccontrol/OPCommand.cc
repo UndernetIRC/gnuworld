@@ -17,12 +17,12 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: OPCommand.cc,v 1.11 2003/08/09 23:15:33 dan_karrels Exp $
+ * $Id: OPCommand.cc,v 1.12 2005/01/08 23:33:42 dan_karrels Exp $
  */
 
+#include	<set>
 #include	<string>
-
-#include	<cstdlib>
+#include	<vector>
 
 #include	"ccontrol.h"
 #include	"CControlCommands.h"
@@ -32,7 +32,7 @@
 #include	"ccBadChannel.h"
 #include	"config.h"
 
-RCSTAG( "$Id: OPCommand.cc,v 1.11 2003/08/09 23:15:33 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: OPCommand.cc,v 1.12 2005/01/08 23:33:42 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -44,7 +44,6 @@ namespace uworld
 
 bool OPCommand::Exec( iClient* theClient, const string& Message )
 {
-
 StringTokenizer st( Message ) ;
 if( st.size() < 3 )
 	{
@@ -54,9 +53,11 @@ if( st.size() < 3 )
 
 if(st[1].size() > channel::MaxName)
 	{
-	bot->Notice(theClient,"Channel name can't be more than %d chars",channel::MaxName);
+	bot->Notice(theClient,"Channel name can't be more than %d chars",
+		channel::MaxName);
 	return false;
 	}
+
 Channel* theChan = Network->findChannel( st[ 1 ] ) ;
 if( NULL == theChan )
 	{
@@ -64,50 +65,49 @@ if( NULL == theChan )
 		st[ 1 ].c_str() ) ;
 	return true ;
 	}
+
 ccBadChannel* Chan = bot->isBadChannel(st[1]);
 if(Chan)
 	{
 	bot->Notice(theClient,"Sorry, but you can not change modes in "
-			     "this channel because : %s"
-			     ,Chan->getReason().c_str());
+			     "this channel because : %s",
+			     Chan->getReason().c_str());
 	return false;
 	}
 	
 iClient* Target = 0;
 
-typedef map < iClient*, int > duplicateMapType; 
-duplicateMapType duplicateMap; 
+// Use a std::set<> here to ensure that the same user is not
+// included more than once.
+typedef std::set< iClient* > opSetType ;
+opSetType opSet ;
 
-
-string mode = "+";
-string args = "";
 bot->MsgChanLog("OP %s\n",st.assemble(1).c_str());
 
-for(unsigned int i=2;i<st.size();i++)
+for( StringTokenizer::size_type i = 2 ; i < st.size() ; ++i )
 	{
 	Target = Network->findNick( st[ i ] ) ;
-	if(Target)
+	if( 0 == Target )
 		{
-		ChannelUser* tmpChanUser = theChan->findUser(Target) ;
+		continue ;
+		}
 
-		//Check if the user is in the channel and op him, even if he's opped
-		if( tmpChanUser )
-			{
-			duplicateMapType::iterator ptr = duplicateMap.find(Target);
-			if(ptr == duplicateMap.end())
-				{ 
-				// Not a duplicate.
-				duplicateMap.insert(duplicateMapType::value_type(Target, 0)); 
-				tmpChanUser->setMode(ChannelUser::MODE_O);
-				mode+='o';
-				args += Target->getCharYYXXX() + ' ' ;
-				}
-			} //if
-		} //if
+	ChannelUser* tmpChanUser = theChan->findUser(Target) ;
+	if( 0 == tmpChanUser )
+		{
+		continue ;
+		}
+
+	// Op, even if already opped
+	opSet.insert( Target ) ;
 	} // for
-if(!args.empty())
-	bot->ModeAsServer( theChan, mode + ' ' + args ) ;
-return true;
+
+if( !opSet.empty() )
+	{
+	std::vector< iClient* > opVector( opSet.begin(), opSet.end() ) ;
+	bot->Op( theChan, opVector ) ;
+	}
+return true ;
 }
 
 }

@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: MODECommand.cc,v 1.18 2003/08/09 23:15:33 dan_karrels Exp $
+ * $Id: MODECommand.cc,v 1.19 2005/01/08 23:33:42 dan_karrels Exp $
  */
 
 #include	<string>
@@ -33,7 +33,7 @@
 #include	"ccBadChannel.h"
 #include	"config.h"
 
-RCSTAG( "$Id: MODECommand.cc,v 1.18 2003/08/09 23:15:33 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: MODECommand.cc,v 1.19 2005/01/08 23:33:42 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -47,17 +47,19 @@ namespace uworld
 // mode channel modes
 bool MODECommand::Exec( iClient* theClient, const string& Message )
 {
-
 StringTokenizer st( Message ) ;
 if( st.size() < 3 )
 	{
 	Usage( theClient ) ;
 	return true ;
 	}
+
 if(st[1].size() > channel::MaxName)
 	{
-	bot->Notice(theClient,"Channel can't be more than %d chars",channel::MaxName);
+	bot->Notice(theClient,"Channel can't be more than %d chars",
+		channel::MaxName);
 	}
+
 Channel* theChan = Network->findChannel( st[ 1 ] ) ;
 if( NULL == theChan )
 	{
@@ -75,6 +77,16 @@ if(Chan)
                              ,Chan->getReason().c_str());
         return false;
         }
+
+// This has been changed to use xServer::Mode(), which will from now
+// on perform the bulk of the heavy lifting with setting modes.
+// Note that this will have the negative effect of not telling
+// the requesting client of this command why something did not succeed.
+bot->ModeAsServer( theChan, st.assemble( 2 ), string() ) ;
+return true ;
+
+/*
+
 // Define mode to be any mode, such as +abc-def
 // Define argument to to be any argument to a particular mode: -o nickArgument
 
@@ -363,6 +375,7 @@ while( modePos < st.size() )
 	} // while( modePos < st.size() )
 
 bot->ModeAsServer( theChan, modeString + ' ' + argString ) ;
+*/
 
 // Update internal tables.
 // This is a cheat, but it makes things so much easier :)
