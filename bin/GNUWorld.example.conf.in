@@ -1,19 +1,19 @@
-# $Id: GNUWorld.example.conf.in,v 1.13 2004/05/28 15:18:12 jeekay Exp $
+# $Id: GNUWorld.example.conf.in,v 1.14 2004/05/28 17:17:45 jeekay Exp $
 # GNUWorld Core Configuration File
 #
 
-uplink = 127.0.0.1
+uplink = 192.168.181.111
 port = 4400
-password = gnuworld
-name = gnuworld.dev.netgamers.org
-description = NetGamers Services
+password = 54321
+name = services.undernet.org
+description = UnderNet Services
 numeric = 51
 
 # Set this variable to yes if you want the server to attempt
 # to auto_reconnect when a connection is terminated, set
 # to no otherwise.
 # Be careful using this.
-auto_reconnect = no
+auto_reconnect = yes
 
 # There is currently a bug in ircu which causes the first client
 # of a multiclient server to be lost, but only if maxclients is set
@@ -23,7 +23,7 @@ maxclients = 1023
 
 # This is the variable which defines the host suffix to be concatenated
 # onto the user's account name for host hiding.
-hidden_host_suffix = .users.netgamers.org
+hidden_host_suffix = .users.undernet.org
 
 # command_map is the name of the file which contains the mappings
 # from module filenames (of server command handlers) to the
