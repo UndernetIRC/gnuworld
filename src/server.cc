@@ -37,7 +37,7 @@
 //#include	"moduleLoader.h"
 
 const char xServer_h_rcsId[] = __XSERVER_H ;
-const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.7 2000/07/16 17:48:18 dan_karrels Exp $" ;
+const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.8 2000/07/18 20:45:00 dan_karrels Exp $" ;
 
 using std::string ;
 using std::vector ;
@@ -234,7 +234,7 @@ REGISTER_MSG( "W", NOOP ) ;
 REGISTER_MSG( "WHOIS", NOOP ) ;
 REGISTER_MSG( "MOTD", NOOP ) ;
 REGISTER_MSG( "STATS", NOOP ) ;
-
+REGISTER_MSG( "V", NOOP ) ;
 
 // AWAY
 REGISTER_MSG( "A", NOOP ) ;
@@ -1990,7 +1990,7 @@ if( Param.size() < 3 )
 	return -1 ;
 	}
 
-if( '+' == Param[ 0 ][ 0 ] )
+if( '+' == Param[ 1 ][ 0 ] )
 	{
 	// Don't care about modeless channels
 	return 0 ;
@@ -2356,6 +2356,7 @@ return 0 ;
  * Kill command
  * QAA D BB5 :localhost!_reppir (Im using my super duper clone detecting
  *  skills)
+ * G D r[l :NewYork-R.NY.US.Undernet.Org!NewYork-R.NY.US.Undernet.org ...
  * The source of the kill could be a server or a client.
  */
 int xServer::MSG_D( xParameters& Param )
@@ -2387,10 +2388,15 @@ if( strchr( Param[ 0 ], '.' ) != NULL )
 	// Server, by name
 	serverSource = Network->findServerName( Param[ 0 ] ) ;
 	}
-else
+else if( strlen( Param[ 0 ] ) >= 3 )
 	{
 	// Client, by numeric
 	source = Network->findClient( Param[ 0 ] ) ;
+	}
+else
+	{
+	// Server, by numeric
+	serverSource = Network->findServer( Param[ 0 ] ) ;
 	}
 
 if( (NULL == serverSource) && (NULL == source) )
@@ -3643,6 +3649,8 @@ return 0 ;
 // Mode change
 // OAD M ripper_ :+owg
 //
+// i M #3dx +o eAA
+// J[K M DEMET_33 :+i
 int xServer::MSG_M( xParameters& Param )
 {
 
@@ -3652,15 +3660,33 @@ if( Param.size() < 3 )
 	return -1 ;
 	}
 
-iClient* source = Network->findClient( Param[ 0 ] ) ;
-if( NULL == source )
+// This source stuff really isn't used here, but it's here for
+// debugging and validation.
+iServer* serverSource = 0 ;
+iClient* clientSource = 0 ;
+
+// Note that the order of this if/else if/else is important
+if( NULL != strchr( Param[ 0 ], '.' ) )
 	{
-	if( NULL == strchr( Param[ 0 ], '.' ) )
-		{
-		elog	<< "xServer::MSG_M> Unable to find source client: "
-			<< Param[ 0 ] << endl ;
-		return -1 ;
-		}
+	// Server, by name
+	serverSource = Network->findServerName( Param[ 0 ] ) ;
+	}
+else if( strlen( Param[ 0 ] ) >= 3 )
+	{
+	// Client numeric
+	clientSource = Network->findClient( Param[ 0 ] ) ;
+	}
+else
+	{
+	// 1 or 2 char numeric, server
+	serverSource = Network->findServer( Param[ 0 ] ) ;
+	}
+
+if( (NULL == clientSource) && (NULL == serverSource) )
+	{
+	elog	<< "xServer::MSG_M> Unable to find source: "
+		<< Param[ 0 ] << endl ;
+	// return -1
 	}
 
 if( '#' == Param[ 1 ][ 0 ] )
@@ -3675,7 +3701,7 @@ if( '#' == Param[ 1 ][ 0 ] )
 
 	// This is a bit of a violation of encapsulation.
 	// Not too bad though.
-	theChan->OnModeChange( source, Param ) ;
+	theChan->OnModeChange( clientSource, Param ) ;
 
 	string modes( Param[ 2 ] ) ;
 
@@ -3688,7 +3714,15 @@ if( '#' == Param[ 1 ][ 0 ] )
 // Otherwise, it's a user mode change.
 // Since users aren't allowed to change modes for anyone other than
 // themselves, there is no need to lookup the second user argument
-iClient* theClient = source ;
+// For some reason, when a user changes his/her/its modes, it still
+// specifies the second argument to be nickname instaed of numeric.
+iClient* theClient = Network->findNick( Param[ 1 ] ) ;
+if( NULL == theClient )
+	{
+	elog	<< "xServer::MSG_M> Unable to find target client: "
+		<< Param[ 1 ] << endl ;
+	return -1 ;
+	}
 
 // Local channels are not propogated across the network.
 
