@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------------
--- "$Id: cservice.sql,v 1.33 2001/04/15 23:32:26 gte Exp $"
+-- "$Id: cservice.sql,v 1.34 2001/04/17 02:05:14 gte Exp $"
 -- Channel service DB SQL file for PostgreSQL.
 
 -- ChangeLog:
@@ -44,6 +44,7 @@
 
 CREATE TABLE languages (
 	id SERIAL,
+	code VARCHAR( 16 ) UNIQUE,
 	name VARCHAR( 16 ),
 	last_updated INT4 NOT NULL,
 	deleted INT2 DEFAULT '0'
