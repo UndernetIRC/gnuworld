@@ -1,10 +1,10 @@
-dnl $Id: configure.in,v 1.30 2001/07/29 22:44:06 dan_karrels Exp $
+dnl $Id: configure.in,v 1.31 2001/08/25 15:09:12 dan_karrels Exp $
 dnl ----------------------------------------------------------
 
 echo Configuring GNUWorld...
 echo
 
-AC_REVISION($Revision: 1.30 $)
+AC_REVISION($Revision: 1.31 $)
 AC_INIT(src/main.cc)
 AM_INIT_AUTOMAKE(gnuworld,0.0)
 AM_CONFIG_HEADER(include/defs.h)
@@ -152,7 +152,8 @@ AC_ARG_WITH(pgsql, \
 
 AC_MSG_CHECKING(for libpq++.h)
 if test -f "$PGSQL_PREFIX/include/libpq++.h"; then
-	true
+	PGSQL_INCLUDE="/usr/local/pgsql/include"
+	PGSQL_LIB="/usr/local/pgsql/lib"
 elif test -f "/usr/local/include/libpq++.h"; then
 	PGSQL_INCLUDE=/usr/local/include
 	PGSQL_LIB=/usr/local/lib
