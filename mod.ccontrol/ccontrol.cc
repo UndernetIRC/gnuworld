@@ -11,7 +11,7 @@
 /* ccontrol.cc
  * Authors: Daniel Karrels dan@karrels.com
  *	    Tomer Cohen    MrBean@toughguy.net
- * $Id: ccontrol.cc,v 1.150 2002/08/27 19:22:06 mrbean_ Exp $
+ * $Id: ccontrol.cc,v 1.151 2002/09/24 12:18:54 mrbean_ Exp $
  */
 
 #define MAJORVER "1"
@@ -56,7 +56,7 @@
 #include	"ip.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.150 2002/08/27 19:22:06 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.151 2002/09/24 12:18:54 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -857,8 +857,8 @@ if(theClient == Network->findClient(this->getCharYYXXX()))
 // Make sure there is a command present
 if( st.empty() )
 	{
-	Notice( theClient, "Incomplete command" ) ;
-	return 0 ;
+	//Notice( theClient, "Incomplete command" ) ;
+	return true ;
 	}
 
 const string Command = string_upper( st[ 0 ] ) ;
@@ -872,7 +872,7 @@ if((!theUser) && !(theClient->isOper()))
 		{
 		elog << "Couldnt find custom data for " 
 		     << theClient->getNickName() << endl;
-		return false;
+		return true;
 		}
 		
 	ccFloodData* floodData = (static_cast< ccUserData* >(
@@ -886,7 +886,7 @@ if((!theUser) && !(theClient->isOper()))
 		MsgChanLog("[FLOOD MESSAGE: %s has been ignored",
 			theClient->getNickName().c_str());
 		}
-	//return xClient::OnPrivateMessage( theClient, Message ) ;
+	return xClient::OnPrivateMessage( theClient, Message ) ;
 	}
 
 // Attempt to find a handler for this method.
@@ -1060,9 +1060,13 @@ if((!theUser) && !(theClient->isOper()))
 else
 	{
 	StringTokenizer st(CTCP);
-	if(st[0] == "PING")
+	if(st.empty())
 		{
-		xClient::DoCTCP(theClient,CTCP,Message);
+		return xClient::DoCTCP(theClient,CTCP,"Error Aren\'t we missing something?");
+		}
+	else if(st[0] == "PING")
+		{
+		return xClient::DoCTCP(theClient,CTCP,Message);
 		}
 	else if(st[0] == "GENDER")
 		{
@@ -1071,17 +1075,17 @@ else
 		}
 	else if(st[0] == "SEX")
 		{
-		xClient::DoCTCP(theClient,CTCP,
+		return xClient::DoCTCP(theClient,CTCP,
 		    "Sorry i am booked till the end of the year");
 		}
 	else if(st[0] == "POLICE")
 		{
-		xClient::DoCTCP(theClient,CTCP,
+		return xClient::DoCTCP(theClient,CTCP,
 		    "Oh crap! where would i hide the drugs now?");
 		}
 	else if(st[0] == "VERSION")
 		{
-		xClient::DoCTCP(theClient,CTCP,
+		return xClient::DoCTCP(theClient,CTCP,
 		    " CControl version "
 		    + string(MAJORVER) + "." + string(MINORVER)
 		    + " release date: " + RELDATE);
