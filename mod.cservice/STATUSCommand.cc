@@ -9,7 +9,7 @@
 #include	"responses.h"
 #include	"Network.h"
  
-const char STATUSCommand_cc_rcsId[] = "$Id: STATUSCommand.cc,v 1.21 2001/03/02 03:55:36 isomer Exp $" ;
+const char STATUSCommand_cc_rcsId[] = "$Id: STATUSCommand.cc,v 1.22 2001/03/02 20:35:33 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -170,7 +170,10 @@ bool STATUSCommand::Exec( iClient* theClient, const string& Message )
 					language::status_mode,
 					string("Mode is: %s")).c_str(),
 				tmpChan->getModeString().c_str() ) ;
+		}
 
+		if (admLevel >= 1)
+		{
 			/*
 			 *  Execute a quick query to find the last 3 join/part events that occured
 			 *  on this channel.
