@@ -20,12 +20,12 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccontrol.cc,v 1.180 2004/05/19 19:46:35 jeekay Exp $
+ * $Id: ccontrol.cc,v 1.181 2004/06/04 14:30:52 mrbean_ Exp $
 */
 
 #define MAJORVER "1"
-#define MINORVER "1pl9"
-#define RELDATE "26 Mar, 2004"
+#define MINORVER "1pl10"
+#define RELDATE "4 June, 2004"
 
 #include        <sys/types.h> 
 #include        <sys/socket.h>
@@ -65,7 +65,7 @@
 #include	"ip.h"
 #include	"config.h"
 
-RCSTAG( "$Id: ccontrol.cc,v 1.180 2004/05/19 19:46:35 jeekay Exp $" ) ;
+RCSTAG( "$Id: ccontrol.cc,v 1.181 2004/06/04 14:30:52 mrbean_ Exp $" ) ;
 
 namespace gnuworld
 {
@@ -689,6 +689,15 @@ RegisterCommand( new REOPCommand( this, "REOP", "<#chan> <nick> "
 	operLevel::OPERLEVEL,
 	false ) ) ;
 
+RegisterCommand( new UNJUPECommand( this, "UNJUPE",
+	"<server> removes a jupiter on a server",
+	commandLevel::flg_UNJUPE,
+	false,
+	false,
+	false,
+	operLevel::OPERLEVEL,
+	true ) ) ;
+
 elog << "Loading commands ......... ";
 
 loadCommands();
@@ -1242,15 +1251,19 @@ switch( theEvent )
 	
 	case EVT_NETJOIN:
 		{
-		inBurst = true;
 		/*
 		 * We need to update the servers table about the new
 		 * server , and check if we know it
 		 *
 		 */
 		iServer* NewServer = static_cast< iServer* >( Data1);
+		if(NewServer->isJupe()) //Is the server juped?
+			{
+			break;
+			}
 		iServer* UplinkServer = static_cast< iServer* >( Data2);
 		ccServer* CheckServer = getServer(NewServer->getName());
+		inBurst = true;
 		if(!CheckServer)
 			{    	
 			MsgChanLog("Unknown server connected : %s Uplink : %s\n"

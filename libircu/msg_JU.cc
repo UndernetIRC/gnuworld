@@ -17,26 +17,92 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_JU.cc,v 1.3 2003/06/20 18:58:50 dan_karrels Exp $
+ * $Id: msg_JU.cc,v 1.4 2004/06/04 14:30:50 mrbean_ Exp $
  */
 
 #include	"server.h"
+#include 	"Network.h"
 #include	"xparameters.h"
 #include	"ServerCommandHandler.h"
 #include	"config.h"
 
-RCSTAG( "$Id: msg_JU.cc,v 1.3 2003/06/20 18:58:50 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: msg_JU.cc,v 1.4 2004/06/04 14:30:50 mrbean_ Exp $" ) ;
 
 namespace gnuworld
 {
+
+using std::endl;
 
 CREATE_HANDLER(msg_JU)
 
 /**
  * JUPE message handler.
  */
-bool msg_JU::Execute( const xParameters& )
+bool msg_JU::Execute( const xParameters& Param)
 {
+
+if (Param.size() < 6)
+	{
+	elog 	<< "msg_JU: Invalid number of arguments" 
+		<< endl;
+	return false;
+	}
+if(Param[2][0] == '+') 
+	{
+	/*
+	 * A new jupe is interduced, need to create an iServer for it
+	 * and notify all the modules
+	 */
+	string Reason = Param.assemble(5);
+	string SName =  Param[2];
+	SName = SName.substr(1);
+	string CTime = Param[4];
+	unsigned int intYY = 0;
+	char *temp = new char[2];
+	if (!Network->allocateServerNumeric(intYY))
+		{
+		elog << "msg_JU> Error while allocating server numeric!"
+		     << endl;
+		return false;
+		}
+	const char* temp2 = inttobase64(temp,intYY,2);
+	
+	if (Reason[0] == ':')
+		{
+		Reason = Reason.substr(1);
+		};
+	iServer* jupeServer = new (std::nothrow) iServer(
+	base64toint(Param[0]),
+	temp2,
+	SName,
+	atoi(CTime.c_str()),
+	Reason
+	);
+	assert (jupeServer != 0);
+	jupeServer->setJupe();
+	if (!Network->addServer(jupeServer))
+		{
+		elog << "msg_JU> error while adding new server :(" << endl;
+		return false;
+		}
+	theServer->PostEvent(EVT_NETJOIN, //TODO add EVT_JUPE
+	static_cast< void* >(jupeServer),
+	NULL);
+
+	}
+else
+	{ // its a removal..
+	string SName =  Param[2];
+	SName = SName.substr(1);
+	iServer* jupeServer = Network->findServerName(SName);
+	if(!jupeServer)
+		{
+		elog << "msg_JU> Cant find server for removal" << endl;
+		return false;
+		}
+	if(!Network->removeServer(jupeServer->getIntYY(),true));
+	}	
+
 // TODO
 return false ;
 }

@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: commLevels.h,v 1.18 2004/03/09 11:50:43 mrbean_ Exp $
+ * $Id: commLevels.h,v 1.19 2004/06/04 14:30:52 mrbean_ Exp $
  */
 
 #ifndef __COMMANDLEVELS_H
@@ -57,6 +57,7 @@ const unsigned long int flg_MODERATE = 0x80 | flg_NOLOGIN;
 const unsigned long int flg_UNMODERATE = 0x100 | flg_NOLOGIN;
 const unsigned long int flg_INVITE   = 0x200 | flg_NOLOGIN;
 const unsigned long int flg_JUPE     = 0x400;
+
 const unsigned long int flg_GLINE    = 0x800 | flg_NOLOGIN;
 const unsigned long int flg_SCGLINE   = 0x1000;
 const unsigned long int flg_REMGLINE = 0x2000;
@@ -103,6 +104,7 @@ const unsigned long int flg_NOMODE = 0x200000;
 const unsigned long int flg_REOP = 0x400000;
 const unsigned long int flg_SGLINE = 0x800000;
 const unsigned long int flg_REMSGLINE = 0x1000000;
+const unsigned long int flg_UNJUPE     = 0x2000000;
 /*
  Default commands that are added upon adding a new oper
 */
@@ -111,7 +113,8 @@ const unsigned long int OPER = flg_HELP | flg_DEAUTH | flg_NEWPASS
 			| flg_MODE | flg_OP | flg_DEOP | flg_MODERATE 
 		        | flg_UNMODERATE | flg_INVITE | flg_GLINE | flg_SCGLINE 
 			| flg_REMGLINE | flg_LOPCHN | flg_CHINFO | flg_WHOIS 
-			| flg_TRANS | flg_KICK | flg_CLEARCHAN | flg_LISTHOSTS;
+			| flg_TRANS | flg_KICK | flg_CLEARCHAN | flg_LISTHOSTS
+			| flg_UNJUPE;
 const unsigned long int SOPER = flg_CHECKNET | flg_LISTIGNORES | flg_LIST 
 			| flg_NOTES | flg_USERINFO | flg_SCAN | flg_MAXUSERS
 			| flg_LASTCOM | flg_REOP;

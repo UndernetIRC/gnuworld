@@ -14,7 +14,7 @@
 
 @SET_MAKE@
 
-# "$Id: Makefile.in,v 1.210 2004/05/18 16:51:00 dan_karrels Exp $"
+# "$Id: Makefile.in,v 1.211 2004/06/04 14:30:51 mrbean_ Exp $"
 
 SOURCES = $(libccontrol_la_SOURCES)
 
@@ -100,6 +100,7 @@ am_libccontrol_la_OBJECTS = libccontrol_la-ccontrol.lo \
 	libccontrol_la-STATUSCommand.lo \
 	libccontrol_la-SUSPENDCommand.lo \
 	libccontrol_la-TRANSLATECommand.lo \
+	libccontrol_la-UNJUPECommand.lo \
 	libccontrol_la-UNMODERATECommand.lo \
 	libccontrol_la-UNSUSPENDCommand.lo \
 	libccontrol_la-USERINFOCommand.lo \
@@ -160,6 +161,7 @@ am__depfiles_maybe = depfiles
 @AMDEP_TRUE@	./$(DEPDIR)/libccontrol_la-STATUSCommand.Plo \
 @AMDEP_TRUE@	./$(DEPDIR)/libccontrol_la-SUSPENDCommand.Plo \
 @AMDEP_TRUE@	./$(DEPDIR)/libccontrol_la-TRANSLATECommand.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/libccontrol_la-UNJUPECommand.Plo \
 @AMDEP_TRUE@	./$(DEPDIR)/libccontrol_la-UNMODERATECommand.Plo \
 @AMDEP_TRUE@	./$(DEPDIR)/libccontrol_la-UNSUSPENDCommand.Plo \
 @AMDEP_TRUE@	./$(DEPDIR)/libccontrol_la-USERINFOCommand.Plo \
@@ -378,6 +380,7 @@ libccontrol_la_SOURCES = ccontrol.cc \
 	STATUSCommand.cc \
 	SUSPENDCommand.cc \
 	TRANSLATECommand.cc \
+	UNJUPECommand.cc \
 	UNMODERATECommand.cc \
 	UNSUSPENDCommand.cc \
 	USERINFOCommand.cc \
@@ -522,6 +525,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libccontrol_la-STATUSCommand.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libccontrol_la-SUSPENDCommand.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libccontrol_la-TRANSLATECommand.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libccontrol_la-UNJUPECommand.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libccontrol_la-UNMODERATECommand.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libccontrol_la-UNSUSPENDCommand.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libccontrol_la-USERINFOCommand.Plo@am__quote@
@@ -1974,6 +1978,30 @@ libccontrol_la-TRANSLATECommand.lo: TRANSLATECommand.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libccontrol_la-TRANSLATECommand.Plo' tmpdepfile='$(DEPDIR)/libccontrol_la-TRANSLATECommand.TPlo' @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libccontrol_la_CXXFLAGS) $(CXXFLAGS) -c -o libccontrol_la-TRANSLATECommand.lo `test -f 'TRANSLATECommand.cc' || echo '$(srcdir)/'`TRANSLATECommand.cc
+
+libccontrol_la-UNJUPECommand.o: UNJUPECommand.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libccontrol_la_CXXFLAGS) $(CXXFLAGS) -MT libccontrol_la-UNJUPECommand.o -MD -MP -MF "$(DEPDIR)/libccontrol_la-UNJUPECommand.Tpo" -c -o libccontrol_la-UNJUPECommand.o `test -f 'UNJUPECommand.cc' || echo '$(srcdir)/'`UNJUPECommand.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libccontrol_la-UNJUPECommand.Tpo" "$(DEPDIR)/libccontrol_la-UNJUPECommand.Po"; else rm -f "$(DEPDIR)/libccontrol_la-UNJUPECommand.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='UNJUPECommand.cc' object='libccontrol_la-UNJUPECommand.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libccontrol_la-UNJUPECommand.Po' tmpdepfile='$(DEPDIR)/libccontrol_la-UNJUPECommand.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libccontrol_la_CXXFLAGS) $(CXXFLAGS) -c -o libccontrol_la-UNJUPECommand.o `test -f 'UNJUPECommand.cc' || echo '$(srcdir)/'`UNJUPECommand.cc
+
+libccontrol_la-UNJUPECommand.obj: UNJUPECommand.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libccontrol_la_CXXFLAGS) $(CXXFLAGS) -MT libccontrol_la-UNJUPECommand.obj -MD -MP -MF "$(DEPDIR)/libccontrol_la-UNJUPECommand.Tpo" -c -o libccontrol_la-UNJUPECommand.obj `if test -f 'UNJUPECommand.cc'; then $(CYGPATH_W) 'UNJUPECommand.cc'; else $(CYGPATH_W) '$(srcdir)/UNJUPECommand.cc'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libccontrol_la-UNJUPECommand.Tpo" "$(DEPDIR)/libccontrol_la-UNJUPECommand.Po"; else rm -f "$(DEPDIR)/libccontrol_la-UNJUPECommand.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='UNJUPECommand.cc' object='libccontrol_la-UNJUPECommand.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libccontrol_la-UNJUPECommand.Po' tmpdepfile='$(DEPDIR)/libccontrol_la-UNJUPECommand.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libccontrol_la_CXXFLAGS) $(CXXFLAGS) -c -o libccontrol_la-UNJUPECommand.obj `if test -f 'UNJUPECommand.cc'; then $(CYGPATH_W) 'UNJUPECommand.cc'; else $(CYGPATH_W) '$(srcdir)/UNJUPECommand.cc'; fi`
+
+libccontrol_la-UNJUPECommand.lo: UNJUPECommand.cc
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libccontrol_la_CXXFLAGS) $(CXXFLAGS) -MT libccontrol_la-UNJUPECommand.lo -MD -MP -MF "$(DEPDIR)/libccontrol_la-UNJUPECommand.Tpo" -c -o libccontrol_la-UNJUPECommand.lo `test -f 'UNJUPECommand.cc' || echo '$(srcdir)/'`UNJUPECommand.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libccontrol_la-UNJUPECommand.Tpo" "$(DEPDIR)/libccontrol_la-UNJUPECommand.Plo"; else rm -f "$(DEPDIR)/libccontrol_la-UNJUPECommand.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='UNJUPECommand.cc' object='libccontrol_la-UNJUPECommand.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libccontrol_la-UNJUPECommand.Plo' tmpdepfile='$(DEPDIR)/libccontrol_la-UNJUPECommand.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libccontrol_la_CXXFLAGS) $(CXXFLAGS) -c -o libccontrol_la-UNJUPECommand.lo `test -f 'UNJUPECommand.cc' || echo '$(srcdir)/'`UNJUPECommand.cc
 
 libccontrol_la-UNMODERATECommand.o: UNMODERATECommand.cc
 @am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libccontrol_la_CXXFLAGS) $(CXXFLAGS) -MT libccontrol_la-UNMODERATECommand.o -MD -MP -MF "$(DEPDIR)/libccontrol_la-UNMODERATECommand.Tpo" -c -o libccontrol_la-UNMODERATECommand.o `test -f 'UNMODERATECommand.cc' || echo '$(srcdir)/'`UNMODERATECommand.cc; \

@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server.cc,v 1.198 2004/05/27 15:02:19 jeekay Exp $
+ * $Id: server.cc,v 1.199 2004/06/04 14:30:53 mrbean_ Exp $
  */
 
 #include	<sys/time.h>
@@ -71,7 +71,7 @@
 #include	"ConnectionHandler.h"
 #include	"Connection.h"
 
-RCSTAG( "$Id: server.cc,v 1.198 2004/05/27 15:02:19 jeekay Exp $" ) ;
+RCSTAG( "$Id: server.cc,v 1.199 2004/06/04 14:30:53 mrbean_ Exp $" ) ;
 
 namespace gnuworld
 {
@@ -1001,12 +1001,12 @@ assert( fakeServer != 0 ) ;
 
 if( fakeServer->isJupe() )
 	{
-	// source_numeric JU +servername * expiration_time :reason
+	// source_numeric JU +servername * expiration_time lastmod :reason
 	// expiration: 604800 (max)
-	Write( "%s JU +%s * 604800 :%s",
+	Write( "%s JU * +%s 604800 %d :%s",
 		getCharYY().c_str(),
 		fakeServer->getName().c_str(),
-		fakeServer->getDescription().c_str() ) ;
+		::time(0),fakeServer->getDescription().c_str() ) ;
 	}
 else
 	{
@@ -3880,10 +3880,23 @@ if( 0 == Network->removeServer( fakeServer->getIntYY() ) )
 	return false ;
 	}
 
-Write( "%s SQ %s %d :Unloading server",
-	getCharYY().c_str(),
-	fakeServer->getCharYY().c_str(),
-	fakeServer->getConnectTime() ) ;
+if( fakeServer->isJupe() )
+	{
+	// source_numeric JU -servername * expiration_time lastmod :reason
+	// expiration: 604800 (max)
+	Write( "%s JU * -%s  604800 %d :%s",
+		getCharYY().c_str(),
+		fakeServer->getName().c_str(),
+		::time(0),fakeServer->getDescription().c_str() ) ;
+	}
+
+else
+	{
+	Write( "%s SQ %s %d :Unloading server",
+		getCharYY().c_str(),
+		fakeServer->getCharYY().c_str(),
+		fakeServer->getConnectTime() ) ;
+	}
 
 return true ;
 }
