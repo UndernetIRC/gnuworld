@@ -43,7 +43,7 @@
 #include	"moduleLoader.h"
 
 const char xServer_h_rcsId[] = __XSERVER_H ;
-const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.42 2001/01/07 23:20:34 dan_karrels Exp $" ;
+const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.43 2001/01/07 23:43:18 dan_karrels Exp $" ;
 
 using std::string ;
 using std::vector ;
@@ -56,6 +56,8 @@ using std::unary_function ;
 
 namespace gnuworld
 {
+
+xNetwork*	Network = 0 ;
 
 int xServer::whichSig = 0 ;
 bool xServer::caughtSignal = false ;
@@ -329,6 +331,17 @@ lastTimerID = 1 ;
 // Initialize the numeric stuff.
 ::memset( charYY, 0, sizeof( charYY ) ) ;
 ::memset( charXXX, 0, sizeof( charXXX ) ) ;
+
+Network = new (nothrow) xNetwork ;
+if( NULL == Network )
+	{
+	clog	<< "xServer::initializeVariables> Memory allocation "
+		<< "failure" << endl ;
+	::exit( 0 ) ;
+	}
+
+Network->setServer( this ) ;
+
 }
 
 bool xServer::readConfigFile( const string& fileName )
