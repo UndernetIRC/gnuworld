@@ -6,7 +6,7 @@
 #include	"ELog.h"
 #include	"cservice.h"
 
-const char SUPPORTCommand_cc_rcsId[] = "$Id: SUPPORTCommand.cc,v 1.4 2001/10/07 23:22:17 gte Exp $" ;
+const char SUPPORTCommand_cc_rcsId[] = "$Id: SUPPORTCommand.cc,v 1.5 2002/03/23 18:53:34 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -181,14 +181,13 @@ bot->logDebugMessage("%s has set their support for %s to %c.",
 if (supportChar == 'Y')
 {
 	/*
-	 * Check to see if 10 people have said Yes.
+	 * Check to see if all people have said 'Yes'.
 	 */
 
 	strstream tenQuery;
-	tenQuery 	<< "SELECT count(*) FROM supporters"
+	tenQuery 	<< "SELECT support FROM supporters"
 				<< " WHERE channel_id = "
 				<< channel_id
-				<< " AND support = 'Y'"
 				<< ends;
 
 	elog	<< "SUPPORTCommand::sqlQuery> "
@@ -206,9 +205,24 @@ if (supportChar == 'Y')
 		return false ;
 		}
 
-	int count = atoi(bot->SQLDb->GetValue(0,0));
+	bool allSupporting = true;
 
-	if (count >= 10)
+	/*
+	 * Iterate over the results, if just one of the
+	 * supporter records isn't a Y, then its not
+	 * yet passed.
+	 */
+
+	string support;
+	int supporterCount = bot->SQLDb->Tuples();
+
+	for (int i = 0 ; i < supporterCount; i++)
+		{
+		support = bot->SQLDb->GetValue(i,0);
+		if (support != "Y") allSupporting = false;
+		}
+
+	if (allSupporting)
 	{
 		strstream updatePendingQuery;
 		updatePendingQuery	<< "UPDATE pending SET status = '1',"
@@ -225,8 +239,8 @@ if (supportChar == 'Y')
 
 		bot->SQLDb->Exec( updatePendingQuery.str() ) ;
 		delete[] updatePendingQuery.str() ;
-		bot->logDebugMessage("%s has just made it to traffic check phase.",
-			channelName.c_str());
+		bot->logDebugMessage("%s has just made it to traffic check phase with %i supporters.",
+			channelName.c_str(), supporterCount);
 	}
 
 return true;
