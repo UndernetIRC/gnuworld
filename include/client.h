@@ -3,7 +3,7 @@
  */
 
 #ifndef __XCLIENT_H
-#define __XCLIENT_H "$Id: client.h,v 1.24 2001/02/04 02:37:49 dan_karrels Exp $"
+#define __XCLIENT_H "$Id: client.h,v 1.25 2001/02/04 16:42:47 dan_karrels Exp $"
 
 #include	<string>
 
@@ -148,7 +148,8 @@ public:
 	 * This method is called when a network client performs
 	 * a whois on this xClient.
 	 */
-	virtual int OnWhois( iClient* sourceClient ) ;
+	virtual int OnWhois( iClient* sourceClient,
+			iClient* targetClient ) ;
 
 	/**
 	 * OnEvent is called when a network event occurs.
