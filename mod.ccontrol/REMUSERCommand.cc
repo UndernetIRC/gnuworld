@@ -13,7 +13,7 @@
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 
-const char REMUSERCommand_cc_rcsId[] = "$Id: REMUSERCommand.cc,v 1.1 2001/07/26 20:12:40 mrbean_ Exp $";
+const char REMUSERCommand_cc_rcsId[] = "$Id: REMUSERCommand.cc,v 1.2 2001/09/02 17:13:15 dan_karrels Exp $";
 
 namespace gnuworld
 {
@@ -74,3 +74,4 @@ else
 
 }
 }
+

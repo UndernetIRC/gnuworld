@@ -1,10 +1,10 @@
-dnl $Id: configure.in,v 1.32 2001/08/26 22:22:54 dan_karrels Exp $
+dnl $Id: configure.in,v 1.33 2001/09/02 17:13:14 dan_karrels Exp $
 dnl ----------------------------------------------------------
 
 echo Configuring GNUWorld...
 echo
 
-AC_REVISION($Revision: 1.32 $)
+AC_REVISION($Revision: 1.33 $)
 AC_INIT(src/main.cc)
 AM_INIT_AUTOMAKE(gnuworld,0.0)
 AM_CONFIG_HEADER(include/defs.h)
@@ -93,32 +93,6 @@ if test $found_socklen_t = yes; then
 else
   AC_CHECK_TYPE(socklen_t,int)
 fi
-
-dnl AC_EGREP_CPP(socklen_t,
-dnl [ socklen_t len ;
-dnl ], AC_DEFINE(HAVE_SOCKLEN_T),AC_CHECK_TYPE(socklen_t,int))
-
-
-dnl ----------------------------------------------------------
-dnl
-dnl check for struct linger
-dnl
-
-AC_MSG_CHECKING(for struct linger)
-AC_EGREP_HEADER([struct( |	)*linger], sys/socket.h, AC_MSG_RESULT(yes), AC_DEFINE(NO_STRUCT_LINGER) AC_MSG_RESULT(no, ugh.))
-
-dnl ----------------------------------------------------------
-dnl
-dnl svr3's getpgrp() didnt take arguments.  BSD's did.
-dnl POSIX said that there wasnt any usefulness to giving arguments
-dnl to getpgrp(), so that was forbidden.  So svr4 made a new syscall
-dnl getpgid() to fill in this functionality gap (grrrr).  BSD still
-dnl doesnt have any way to do it, even though they were the ones that
-dnl originally wanted to have it around, but svr3 insisted not so. (grrr)
-dnl
-
-dnl AC_CHECK_FUNC(getpgid, AC_DEFINE(HAVE_GETPGID),)
-dnl AC_CHECK_FUNC(getpgrp, AC_FUNC_GETPGRP,)
 
 useDebug=yes
 AC_ARG_WITH(debug, \
