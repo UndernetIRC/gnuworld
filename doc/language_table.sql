@@ -182,10 +182,11 @@ COPY "translations" FROM stdin;
 -- French language definition.
 -- 29/12/00 - Daniel Simard <svr@undernet.org>.
 -- 01/03/01 - Daniel Simard <svr@undernet.org>.
+-- 03/09/01 - nighty <nighty@undernet.org>.
 
 COPY "translations" FROM stdin;
 2	1	Désolé. Vous êtes déjà authentifié avec le nick %s	31337
-2	2	AUTHENTICATION RÉUSSIE pour %s	31337
+2	2	AUTHENTIFICATION RÉUSSIE pour %s	31337
 2	3	Désolé. Votre accès est insuffisant pour utiliser cette commande	31337
 2	4	Désolé. Le canal %s est vide	31337
 2	5	Je suis incapable de trouver %s	31337
@@ -200,42 +201,42 @@ COPY "translations" FROM stdin;
 2	14	Vous avez été devoice par %s (%s)	31337
 2	15	%s n'est pas op sur %s	31337
 2	16	%s n'est pas voice sur %s	31337
-2	17	AUTHENTIFICATION REFUSÉE pour %s (Mot-de-passe Invalide)	31337
+2	17	AUTHENTIFICATION REFUSÉE pour %s (Mot de passe Invalide)	31337
 2	18	Je ne suis pas dans ce canal!!	31337
-2	19	Niveau de ban invalide. Niveau valide: entre 1-%i.	31337
-2	20	Duration du ban invalide. La duration maximale est de 336 heures.	31337
+2	19	Niveau de ban invalide. Niveau valide: entre 1 et %i.	31337
+2	20	Durée du ban invalide. La durée maximale est de 336 heures.	31337
 2	21	La raison d'un ban ne peut dépasser 128 caractères.	31337
 2	22	Ce ban est déjà dans ma liste!	31337
-2	23	Le ban %s est dejà affecté par %s	31337
+2	23	Le ban %s est dejà couvert par %s	31337
 2	24	Niveau minimum invalide.	31337
 2	25	Niveau maximum invalide.	31337
-2	26	USAGER: %s NIVEAU: %s %s	31337
+2	26	UTILISATEUR: %s NIVEAU: %s %s	31337
 2	27	CANAL: %s -- AUTOMODE: %s	31337
-2	28	DERNIÈRE MODIFICATION: %s (%s avant)	31337
+2	28	DERNIÈRE MODIFICATION: %s (depuis %s)	31337
 2	29	** SUSPENDU ** - Expire dans %s  (Level %i)	31337
-2	30	DERNIÈRE FOIS VU: %s avant.	31337
+2	30	DERNIÈRE FOIS VU: il y a %s.	31337
 2	31	Il y a plus de 15 requêtes trouvées.	31337
 2	32	SVP restreindre votre requête	31337
 2	33	Fin de la liste des accès	31337
-2	34	Aucune correspondace trouvée	31337
-2	35	Vous ne pouvez additionner un usager au même niveau que vous ou plus élevé. 	31337
+2	34	Aucune correspondance trouvée!	31337
+2	35	Vous ne pouvez pas ajouter un utilisateur à un niveau égal ou supérieur au votre. 	31337
 2	36	Niveau d'accès invalide	31337
 2	37	%s a déjà été ajouté sur %s au niveau %i.	31337
-2	38	Addition de l'usager %s sur %s au niveau %i	31337
-2	39	Quelque chose semble incorrecte: %s	31337
-2	40	%s: fin de la liste de ban		31337
-2	41	Impossible de visualiser les détails de l'usager (Invisible).	31337
-2	42	Information à propos de: %s (%i)	31337
-2	43	Présentement connecté via: %s	31337
+2	38	Utilisateur %s ajouté sur %s au niveau %i	31337
+2	39	Quelque chose semble incorrect: %s	31337
+2	40	%s: fin de la liste des bans		31337
+2	41	Impossible de voir les détails de l'utilisateur (Invisible).	31337
+2	42	Informations sur: %s (%i)	31337
+2	43	Connecté en ce moment via: %s	31337
 2	44	URL: %s	31337
 2	45	Langue: %i	31337
 2	46	Canaux: %s	31337
 2	47	Entrée Flood: %i	31337
 2	48	Sortie Flood (Bytes): %i	31337
 2	49	%s a été enregistré par:	31337
-2	50	%s - vu pour la dernière fois: %s avant	31337
+2	50	%s - vu pour la dernière fois: il y a %s	31337
 2	51	Desc: %s	31337
-2	52	Floodez moi voulez-vous? Je ne vais plus vous répondre dorénavant.	31337
+2	52	Vous voulez me Flooder? Je ne vais plus vous répondre dorénavant.	31337
 2	53	Je crois que je vous ai envoyé beaucoup trop d'informations. Je vais vous ignorer un peu.	31337
 2	54	Commande incomplète	31337
 2	55	Pour utiliser %s, Vous devez /msg %s@%s	31337
@@ -246,113 +247,113 @@ COPY "translations" FROM stdin;
 2	60	Le mode STRICTOP est actif sur %s	31337
 2	61	Vous venez de deop plus de %i personnes	31337
 2	62	SYNTAXE: %s	31337
-2	63	Temporairement authentifié sur %s au niveau %i	31337
+2	63	Votre niveau sur %s à été temporairement augmenté au niveau %i	31337
 2	64	%s est enregistré.	31337
 2	65	%s n'est pas enregistré.	31337
 2	66	Je ne crois pas que %s apprécierait ça.	31337
-2	67	\002*** Liste de Ban pour le canal %s ***\002	31337
+2	67	\002*** Liste des Bans pour le canal %s ***\002	31337
 2	68	%s %s Niveau: %i	31337
 2	69	AJOUTÉ PAR: %s (%s)	31337
 2	70	DEPUIS: %s	31337
-2	71	EXP: %s	31337
+2	71	EXPIRATION: %s	31337
 2	72	\002*** FIN ***\002	31337
 2	73	Désolé, Je ne sais pas qui est %s.	31337
-2	74	Désolé, Vous n'êtes plus authentifié.	31337
-2	75	%s Aucune accès correspondant sur %s.	31337
-2	76	Vous ne pouvez pas modifier un usager au même niveau ou supérieur à vous.	31337
-2	77	Vous ne pouvez pas donner un accès à un usager au même niveau ou supérieur à vous.	31337
-2	78	Modification du niveau de %s sur le canal %s à %i	31337
+2	74	Vous avez été déloggué, vous n'êtes plus authentifié.	31337
+2	75	%s n'apparaît pas comme ayant accès sur %s.	31337
+2	76	Vous ne pouvez pas modifier un utilisateur ayant un niveau supérieur ou égal au votre.	31337
+2	77	Vous ne pouvez pas donner un niveau d'accès supérieur ou égal au votre à un utilisateur.	31337
+2	78	Modification du niveau de %s sur le canal %s à %i effectuée.	31337
 2	79	Activation du MODE Automatique (OP) pour %s sur le canal %s	31337
 2	80	Activation du MODE Automatique (VOICE) pour %s sur le canal %s	31337
 2	81	Désactivation des MODES Automatiques pour %s sur le canal %s	31337	
-2	82	Votre mot de passe ne peut être votre nom d'usager ni votre nick - La Syntaxe est: NEWPASS <nouveau mot-de-passe>	31337
+2	82	Votre mot de passe ne peut être ni votre nom d'utilisateur ni votre nick - La Syntaxe est: NEWPASS <nouveau mot de passe>	31337
 2	83	Votre mot de passe a été changé avec succès.	31337
 2	84	Le mode NOOP est actif sur %s	31337
 2	85	Le mode STRICTOP est actif sur %s (et %s n'est pas authentifié)	31337
 2	86	Le mode STRICTOP est actif sur %s (et l'accès de %s est insuffisant)	31337
 2	87	%s a été purgé	31337
-2	88	%s est déjà enregistré avec moi.	31337
+2	88	%s est déjà enregistré.	31337
 2	89	Nom de canal invalide.	31337
 2	90	%s a été enregistré	31337
-2	91	Enlevé %s de ma liste silence/ignore	31337
-2	92	Incapable de trouver %s dans ma liste silence/ignore	31337
-2	93	Vous ne pouvez pas effacer un accès donc le niveau est égal ou plus élevé que le votre.	31337
-2	94	Vous ne pouvez pas effacer votre accès sur un canal que vous possédez.	31337
-2	95	L'accès de l'usager %s a été effacé sur %s	31337
-2	96	Le mode INVISIBLE pour vos options confidentiels est maintenant à ON.	31337
-2	97	Le mode INVISIBLE pour vos options confidentiels est maintenant à OFF.	31337
+2	91	%s à été enlevé de ma liste silence/ignore	31337
+2	92	%s introuvable dans ma liste silence/ignore	31337
+2	93	Vous ne pouvez pas effacer un utilisateur ayant un niveau égal ou supérieur au votre.	31337
+2	94	Vous ne pouvez pas effacer votre accès sur un canal dont vous êtes le propriétaire.	31337
+2	95	L'accès de l'utilisateur %s a été effacé sur %s	31337
+2	96	Le mode INVISIBLE pour vos informations est maintenant à ON.	31337
+2	97	Le mode INVISIBLE pour vos informations est maintenant à OFF.	31337
 2	98	%s pour %s est %s	31337
 2	99	La valeur de %s doit être ON ou OFF	31337
 2	100	Configuration USERFLAGS invalide! Les valeurs correctes sont 0, 1, 2.	31337
 2	101	Le USERFLAGS de %s est %i	31337
-2	102	La valeur de MASSDEOPPRO doit être entre 0-7	31337
+2	102	La valeur de MASSDEOPPRO doit être comprise entre 0 et 7	31337
 2	103	MASSDEOPPRO de %s a été configuré à %d	31337
-2	104	La valeur de FLOODPRO doit être entre 0-7	31337
+2	104	La valeur de FLOODPRO doit être comprise entre 0 et 7	31337
 2	105	FLOODPRO de %s a été configuré à %d	31337
 2	106	La DESCRIPTION ne doit pas dépasser 80 caractères.	31337
-2	107	La DESCRIPTION de %s a été éffacé.	31337
+2	107	La DESCRIPTION de %s a été éffacée.	31337
 2	108	La DESCRIPTION de %s est: %s	31337
 2	109	L'URL ne doit pas dépasser 75 caractères.	31337
-2	110	L'URL de %s a été effacé.	31337
+2	110	L'URL de %s a été effacée.	31337
 2	111	L'URL de %s est: %s	31337
-2	112	Les KEYWORDS (MotsClés) ne doivent pas dépasser 80 caractères.	31337
+2	112	Les KEYWORDS (Mots-Clés) ne doivent pas dépasser 80 caractères.	31337
 2	113	KEYWORDS de %s sont: %s	31337
-2	114	Langue activé: %s.	31337
-2	115	ERREUR: Sélection d'une langue invalide.	31337
+2	114	Langue activée: %s.	31337
+2	115	ERREUR: Langue selectionnée invalide.	31337
 2	116	Le canal %s est introuvable sur le réseau!	31337
 2	117	ERREUR: Configuration de canal invalide.	31337
-2	118	Liste d'Ignoré(s):	31337
-2	119	La liste d'ignore est vide	31337
-2	120	-- Fin de la liste d'ignore 	31337
-2	121	Status interne du Service de Canaux CMaster:	31337
+2	118	Liste de silence/ignore:	31337
+2	119	La liste de silence/ignore est vide	31337
+2	120	-- Fin de la liste de silence/ignore 	31337
+2	121	Statut interne du Service de Canaux CMaster:	31337
 2	122	[          Statistiques du Canal] \002Entrées en cache:\002 %i    \002Requêtes BaseD:\002 %i    \002# de fois Cache touché:\002 %i    \002Efficacité:\002 %.2f%%	31337
-2	123	[           Statistiques Usagers] \002Entrées en cache:\002 %i    \002Requêtes BaseD:\002 %i    \002# de fois Cache touché:\002 %i    \002Efficacité:\002 %.2f%%	31337
-2	124	[   Statistiques niveaux d'accès] \002Entrées en cache:\002 %i    \002Requêtes BaseD:\002 %i    \002# de fois Cache touché:\002 %i    \002Efficacité:\002 %.2f%%	31337
+2	123	[     Statistiques Uutilisateurs] \002Entrées en cache:\002 %i    \002Requêtes BaseD:\002 %i    \002# de fois Cache touché:\002 %i    \002Efficacité:\002 %.2f%%	31337
+2	124	[   Statistiques Niveaux d'accès] \002Entrées en cache:\002 %i    \002Requêtes BaseD:\002 %i    \002# de fois Cache touché:\002 %i    \002Efficacité:\002 %.2f%%	31337
 2	125	[          Statistiques des bans] \002Entrées en cache:\002 %i    \002Requêtes BaseD:\002 %i    \002# de fois Cache touché:\002 %i    \002Efficacité:\002 %.2f%%	31337
-2	126	Dernière réception NOTIFY d'usager: %i	31337
-2	127	Dernière réception NOTIFY de canal: %i	31337
-2	128	Dernière réception NOTIFY de niveau: %i	31337
-2	129	Dernière réception NOTIFY de ban: %i	31337
+2	126	Dernier évènement NOTIFY d'utilisateur: %i	31337
+2	127	Dernier évènement NOTIFY de canal: %i	31337
+2	128	Dernier évènement NOTIFY de niveau: %i	31337
+2	129	Dernier évènement NOTIFY de ban: %i	31337
 2	130	Données assignées: %i	31337
 2	131	\002En fonction depuis (uptime):\002 %s	31337
-2	132	Le canal %s a %d usager(s) (%i opérateurs)	31337
-2	133	Le(s) Mode(s) du canal: %s	31337
-2	134	Flags activés: %s	31337
-2	135	Vous ne pouvez pas suspendre un usager au même niveau que vous ni supérieur.	31337
+2	132	Le canal %s à %d utilisateur(s) (%i opérateur(s))	31337
+2	133	Les Modes du canal sont: %s	31337
+2	134	Flags actifs: %s	31337
+2	135	Vous ne pouvez pas suspendre un utilisateur ayant un niveau égal ou supérieur au votre.	31337
 2	136	Unité de temps invalide.	31337
 2	137	Durée de suspension invalide.	31337
-2	138	La SUSPENSION pour %s a été annulé.	31337
+2	138	La SUSPENSION pour %s a été annulée.	31337
 2	139	%s est déjà suspendu sur %s	31337
 2	140	La SUSPENSION pour %s va expirer dans %s	31337
 2	141	ERREUR: Le topic ne peut dépasser 145 caractères.	31337
-2	142	votre accès est insuffisant pour enlever le ban %s de la base de données de %s	31337
-2	143	Supprimé %i ban(s) qui figuraient %s	31337
-2	144	Supprimé votre accès temporaire de niveau %i du canal %s	31337
-2	145	Vous ne semblez pas d'avoir forcer l'accès à %s, Serait-elle expirée?	31337
+2	142	Votre accès est insuffisant pour enlever le ban %s de la base de données de %s	31337
+2	143	%i ban(s) correpondant à %s ont été supprimés.	31337
+2	144	Votre accès temporaire au niveau %i sur le canal %s à été supprimé.	31337
+2	145	Vous ne semblez pas avoir forcé l'accès à %s, Serait-il expiré?	31337
 2	146	%s n'est pas suspendu sur %s	31337
 2	147	%s est un Opérateur IRC	31337
 2	148	%s n'est pas authentifié.	31337
-2	149	%s est authentifié via le userid %s%s	31337
-2	150	%s est un représentant Officiel de CService%s et authentificé via le userid %s	31337
-2	151	%s est un Administrateur Officiel de CService%s et authentificé via le userid %s	31337
-2	152	%s est un Programmeur Officiel de CService%s et authentificé via le userid %s	31337
-2	153	Il y a plus de %i entrées figurants [%s]	31337
+2	149	%s est authentifié sous le nom d'utilisateur %s%s	31337
+2	150	%s est un représentant Officiel de CService%s et authentifié sour le nom d'utilisateur %s	31337
+2	151	%s est un Administrateur Officiel de CService%s et authentifié sous le nom d'utilisateur %s	31337
+2	152	%s est un Développeur Officiel de CService%s et authentifié sous le nom d'utilisateur %s	31337
+2	153	Il y a plus de %i entrées correspondantes [%s]	31337
 2	154	Veuillez svp restreindre votre requête.	31337
-2	155	Aucune entrée figurante pour votre requête. [%s]	31337
-2	156	%s: Les modes du canal on été effacés.	31337
-2	158	Invalid option.	31337
-2	159	%s is an Official Undernet Service Bot.	31337
-2	160	%s is an Official Coder-Com Representative%s and logged in as %s	31337
-2	161	%s is an Official Coder-Com Contributer%s and logged in as %s	31337
-2	162	%s is an Official Coder-Com Developer%s and logged in as %s	31337
-2	163	%s is an Official Coder-Com Senior%s and logged in as %s	31337
-2	164	 and an IRC operator	31337
-2	165	Added ban %s to %s at level %i	31337
-2	166	%s: ban list is empty.		31337
-2	167	I'm already in that channel!	31337
-2	168	This command is reserved to IRC Operators	31337
-2	169	I'm not opped on %s	31337
-2	170	%s for %i minutes	31337
+2	155	Aucune entrée ne correspond à votre requête. [%s]	31337
+2	156	%s: Les modes du canal on été remis à zéro.	31337
+2	158	Option Invalide.	31337
+2	159	%s est un Bot de Services Officiel d'Undernet.	31337
+2	160	%s est un Représentant Officiel de Coder-Com%s et authentifié sous le nom d'utilisateur %s	31337
+2	161	%s est un Participan Officiel de Coder-Com%s et authentifié sous le nom d'utilisateur %s	31337
+2	162	%s est un Développeur Officie de Coder-Com%s et authentifié sous le nom d'utilisateur %s	31337
+2	163	%s est un Sénior Officiel de Coder-Com%s et authentifié sous le nom d'utilisateur %s	31337
+2	164	 et un Opérateur IRC	31337
+2	165	Ban sur %s ajouté à %s au niveau %i	31337
+2	166	%s: La liste des bans est vide.		31337
+2	167	Je suis déjà dans ce canal!	31337
+2	168	Cette commande est réservée aux Opérateurs IRC	31337
+2	169	Je ne suis pas op sur %s	31337
+2	170	%s pour %i minutes	31337
 \.
 
 -- Danish language definition.
