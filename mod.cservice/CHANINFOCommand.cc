@@ -13,7 +13,7 @@
  *
  * Command is aliased "INFO".
  *
- * $Id: CHANINFOCommand.cc,v 1.7 2001/01/22 00:22:31 gte Exp $
+ * $Id: CHANINFOCommand.cc,v 1.8 2001/01/27 04:22:19 gte Exp $
  */
 
 #include	<string>
@@ -23,8 +23,9 @@
 #include	"cservice.h" 
 #include	"levels.h"
 #include	"responses.h"
+#include	"libpq++.h"
  
-const char CHANINFOCommand_cc_rcsId[] = "$Id: CHANINFOCommand.cc,v 1.7 2001/01/22 00:22:31 gte Exp $" ;
+const char CHANINFOCommand_cc_rcsId[] = "$Id: CHANINFOCommand.cc,v 1.8 2001/01/27 04:22:19 gte Exp $" ;
  
 namespace gnuworld
 {
@@ -72,6 +73,16 @@ bool CHANINFOCommand::Exec( iClient* theClient, const string& Message )
 				return false;
 			}
 		}
+
+		/*
+		 *  Execute an SQL query and find all channels this user has access on.
+		 */
+
+		string accesses = "";
+		ExecStatusType status;
+		strstream theQuery;
+		theQuery << "SELECT access" << endl;
+
 
 		bot->Notice(theClient, "Information about: %s", theUser->getUserName().c_str());
 		string loggedOn;

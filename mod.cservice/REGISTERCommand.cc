@@ -8,7 +8,7 @@
  *
  * Caveats: None
  *
- * $Id: REGISTERCommand.cc,v 1.7 2001/01/24 01:13:52 gte Exp $
+ * $Id: REGISTERCommand.cc,v 1.8 2001/01/27 04:22:19 gte Exp $
  */
  
 #include	<string>
@@ -20,7 +20,7 @@
 #include	"libpq++.h"
 #include	"Network.h"
 
-const char REGISTERCommand_cc_rcsId[] = "$Id: REGISTERCommand.cc,v 1.7 2001/01/24 01:13:52 gte Exp $" ;
+const char REGISTERCommand_cc_rcsId[] = "$Id: REGISTERCommand.cc,v 1.8 2001/01/27 04:22:19 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -90,7 +90,7 @@ bool REGISTERCommand::Exec( iClient* theClient, const string& Message )
 	 */ 
 
 	theQuery << queryHeader << "VALUES (" 
-	<< "'" << st[1] << "',"
+	<< "'" << escapeSQLChars(st[1]) << "',"
 	<< "0" << ","
 	<< ::time(NULL) << ","
 	<< channel_ts << ","

@@ -8,7 +8,7 @@
  *
  * Caveats: None.
  *
- * $Id: LBANLISTCommand.cc,v 1.2 2001/01/24 01:13:51 gte Exp $
+ * $Id: LBANLISTCommand.cc,v 1.3 2001/01/27 04:22:19 gte Exp $
  */
 
 #include	<string>
@@ -19,7 +19,7 @@
 #include	"Network.h"
 #include	"levels.h"
 
-const char LBANLISTCommand_cc_rcsId[] = "$Id: LBANLISTCommand.cc,v 1.2 2001/01/24 01:13:51 gte Exp $" ;
+const char LBANLISTCommand_cc_rcsId[] = "$Id: LBANLISTCommand.cc,v 1.3 2001/01/27 04:22:19 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -58,12 +58,17 @@ bool LBANLISTCommand::Exec( iClient* theClient, const string& Message )
 	for( vector< sqlBan* >::const_iterator ptr = banList->begin() ; ptr != banList->end() ; ++ptr )
 	{
 		sqlBan* theBan = (*ptr);
-		bot->Notice(theClient, "%s %s Level: %i", 
-			theChan->getName().c_str(), theBan->getBanMask().c_str(), theBan->getLevel());
-		bot->Notice(theClient, "ADDED BY: %s (%s)",
-			theBan->getSetBy().c_str(), theBan->getReason().c_str());
-		bot->Notice(theClient, "SINCE: %i", theBan->getSetTS());
-		bot->Notice(theClient, "EXP: %i", theBan->getExpires());
+
+		/* If its expired.. just don't show it - it'll be removed next JOIN. */ 
+		if (theBan->getExpires() >= bot->currentTime())
+		{
+			bot->Notice(theClient, "%s %s Level: %i", 
+				theChan->getName().c_str(), theBan->getBanMask().c_str(), theBan->getLevel());
+			bot->Notice(theClient, "ADDED BY: %s (%s)",
+				theBan->getSetBy().c_str(), theBan->getReason().c_str());
+			bot->Notice(theClient, "SINCE: %i", theBan->getSetTS());
+			bot->Notice(theClient, "EXP: %i", theBan->getExpires());
+		}
 	}
 	bot->Notice(theClient,"\002*** END ***\002");
  

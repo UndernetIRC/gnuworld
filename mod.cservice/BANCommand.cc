@@ -12,7 +12,7 @@
  *
  * Caveats: None.
  *
- * $Id: BANCommand.cc,v 1.4 2001/01/25 00:19:13 gte Exp $
+ * $Id: BANCommand.cc,v 1.5 2001/01/27 04:22:19 gte Exp $
  */
 
 #include        <string>
@@ -26,7 +26,7 @@
 #include		"responses.h"
 #include		"match.h"
 
-const char BANCommand_cc_rcsId[] = "$Id: BANCommand.cc,v 1.4 2001/01/25 00:19:13 gte Exp $" ;
+const char BANCommand_cc_rcsId[] = "$Id: BANCommand.cc,v 1.5 2001/01/27 04:22:19 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -253,7 +253,7 @@ bool BANCommand::Exec( iClient* theClient, const string& Message )
 	newBan->setSetBy(theUser->getUserName());
 	newBan->setSetTS(bot->currentTime());
 	newBan->setLevel(banLevel);
-	newBan->setExpires(banDuration+::time(NULL));
+	newBan->setExpires(banDuration+bot->currentTime());
 	newBan->setReason(banReason); 
 	
 	/* Insert to our internal List. */ 

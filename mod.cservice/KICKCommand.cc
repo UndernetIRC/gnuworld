@@ -11,7 +11,7 @@
 *
 * Suggestion: Support several nicks by seperating them with a comma.
 *             IE: /msg E kick #coder-com nick1,nick2,nick3 get outta here!
-* $Id: KICKCommand.cc,v 1.3 2001/01/17 19:50:54 gte Exp $
+* $Id: KICKCommand.cc,v 1.4 2001/01/27 04:22:19 gte Exp $
 */
 
 #include        <string>
@@ -22,8 +22,9 @@
 #include        "Network.h"
 #include        "levels.h"
 #include        "responses.h"
+#include		"match.h"
 
-const char KICKCommand_cc_rcsId[] = "$Id: KICKCommand.cc,v 1.3 2001/01/17 19:50:54 gte Exp $" ;
+const char KICKCommand_cc_rcsId[] = "$Id: KICKCommand.cc,v 1.4 2001/01/27 04:22:19 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -35,7 +36,7 @@ bool KICKCommand::Exec( iClient* theClient, const string& Message )
 { 
 	StringTokenizer st( Message ) ;
 	
-	if( st.size() < 4 )
+	if( st.size() < 3 )
 	{
 	Usage(theClient);
 	return true;
@@ -47,9 +48,7 @@ bool KICKCommand::Exec( iClient* theClient, const string& Message )
 	 */
 	
 	sqlUser* theUser = bot->isAuthed(theClient, true);
-		if (!theUser) {
-		return false;
-	}
+	if (!theUser) return false;
 	
 	/* 
 	 *  Check the channel is actually registered.
@@ -87,35 +86,75 @@ bool KICKCommand::Exec( iClient* theClient, const string& Message )
 		    theChan->getName().c_str());
 		return false;
 	}
-	
-	
-	iClient* target = Network->findNick(st[2]);
-	
-	if(!target)
+	 
+	/*
+	 *  Wildcard or normal kick?
+	 */
+
+	vector <iClient*> toBoot;
+
+	if((bot->validUserMask(st[2])) && (level >= level::masskick))
 	{
-		bot->Notice(theClient, bot->getResponse(theUser, language::dont_see_them).c_str(),
-		    st[2].c_str());
+		/* Loop over all channel members, and match who to kick. */
+
+		for(Channel::userIterator chanUsers = tmpChan->userList_begin(); chanUsers != tmpChan->userList_end(); ++chanUsers)
+		{
+			ChannelUser* tmpUser = chanUsers->second; 
+ 
+			if(match(st[2].c_str(), tmpUser->getClient()->getNickUserHost().c_str()) == 0)
+			{ 
+				toBoot.push_back(tmpUser->getClient());
+			} 
+		}
+	 
+	} else {
+		/*
+		 *  Do a lookup on nickname, and check they are in the channel.
+		 */
+
+		iClient* target = Network->findNick(st[2]);
+		
+		if(!target)
+		{
+			bot->Notice(theClient, bot->getResponse(theUser, language::dont_see_them).c_str(),
+			    st[2].c_str());
+			return false;
+		}
+	
+		/*
+		 *  Check they are on the channel.
+		 */
+	 
+		ChannelUser* tmpChanUser = tmpChan->findUser(target) ;
+		if (!tmpChanUser)
+		{
+			bot->Notice(theClient, bot->getResponse(theUser, language::cant_find_on_chan).c_str(), 
+				target->getNickName().c_str(), theChan->getName().c_str()); 
+			return false;
+		}
+
+		toBoot.push_back(target);
+	}
+
+	if (toBoot.size() == 0)
+	{
+		bot->Notice(theClient, "No Match!");
 		return false;
 	}
 
-	/*
-	 *  Check they are on the channel.
-	 */
- 
-	ChannelUser* tmpChanUser = tmpChan->findUser(target) ;
-	if (!tmpChanUser)
+	string args;
+	if (st.size() >= 4)
 	{
-		bot->Notice(theClient, bot->getResponse(theUser, language::cant_find_on_chan).c_str(), 
-			target->getNickName().c_str(), theChan->getName().c_str()); 
-		return false;
+		args = st.assemble(3);		
+	} else
+	{
+		args = "No reason supplied";
 	}
  
-	string args = st.assemble(3);
-	
 	string reason = "(" + theClient->getNickName() + ") ";
 	reason += args;
 	
-	bot->Kick(tmpChan, target, reason);
+	bot->Kick(tmpChan, toBoot, reason);
 	return true ;
 } 
 	

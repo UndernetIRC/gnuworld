@@ -8,7 +8,7 @@
  *
  * Caveats: None
  *
- * $Id: PURGECommand.cc,v 1.2 2001/01/25 00:19:13 gte Exp $
+ * $Id: PURGECommand.cc,v 1.3 2001/01/27 04:22:19 gte Exp $
  */
  
 #include	<string>
@@ -20,7 +20,7 @@
 #include	"libpq++.h"
 #include	"Network.h"
 
-const char PURGECommand_cc_rcsId[] = "$Id: PURGECommand.cc,v 1.2 2001/01/25 00:19:13 gte Exp $" ;
+const char PURGECommand_cc_rcsId[] = "$Id: PURGECommand.cc,v 1.3 2001/01/27 04:22:19 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -53,8 +53,9 @@ bool PURGECommand::Exec( iClient* theClient, const string& Message )
 	 */
 
 	sqlChannel* theChan; 
+
 	theChan = bot->getChannelRecord(st[1]);
-	if (!theChan) 
+	if ((!theChan) || (st[1] == "*")) 
 	{
 		bot->Notice(theClient, "%s isn't registered with me", st[1].c_str());
 		return false;

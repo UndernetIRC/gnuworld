@@ -154,7 +154,7 @@ cservice::cservice(const string& args)
     RegisterCommand(new NEWPASSCommand(this, "NEWPASS", "<new passphrase>", 5));
 
     RegisterCommand(new REGISTERCommand(this, "REGISTER", "<#channel>", 0));
-    RegisterCommand(new PURGECommand(this, "PURGE", "<#channel> <reaspon>", 0));
+    RegisterCommand(new PURGECommand(this, "PURGE", "<#channel> <reason>", 0));
     RegisterCommand(new FORCECommand(this, "FORCE", "<#channel>", 0));
     RegisterCommand(new UNFORCECommand(this, "UNFORCE", "<#channel>", 0));
     RegisterCommand(new SERVNOTICECommand(this, "SERVNOTICE", "<#channel> <text>", 0));
@@ -469,7 +469,7 @@ int cservice::OnCTCP( iClient* theClient, const string& CTCP,
 
 	if(Command == "VERSION")
 	{
-		xClient::DoCTCP(theClient, CTCP.c_str(), "Undernet P10 Channel Services Version 2 [" __DATE__ " " __TIME__ "] ($Id: cservice.cc,v 1.62 2001/01/26 20:58:56 gte Exp $)");
+		xClient::DoCTCP(theClient, CTCP.c_str(), "Undernet P10 Channel Services Version 2 [" __DATE__ " " __TIME__ "] ($Id: cservice.cc,v 1.63 2001/01/27 04:22:19 gte Exp $)");
 		return true;
 	}
  
@@ -1250,26 +1250,52 @@ int cservice::OnChannelEvent( const channelEventType& whichEvent,
 
 			vector< sqlBan* >* banList = getBanRecords(reggedChan);
 			vector< sqlBan* >::iterator ptr = banList->begin();
+			bool deleted = false;
+
 			while (ptr != banList->end())
 			{
-				sqlBan* theBan = *ptr;
+				sqlBan* theBan = *ptr; 
 
-				/* Matching ban? */
-
-				if(match(theBan->getBanMask().c_str(), theClient->getNickUserHost().c_str()) == 0)
-				{ 
+				/* Has this ban expired? */ 
+				if (theBan->getExpires() <= currentTime())
+				{
+					/* Delete this ban.. */
 					strstream s;
-					s << getCharYYXXX() << " M " << reggedChan->getName() << " +b "
+					s << getCharYYXXX() << " M " << reggedChan->getName() << " -b "
 					<< theBan->getBanMask() << ends;
 				
 					Write( s );
-					delete[] s.str(); 
-					Kick(theChan, theClient, string("(" + theBan->getSetBy() + ") " + theBan->getReason()) );
-					/* Thats it.. we aren't going to op them or anything. */
-					break;
+					delete[] s.str();
+					banList->erase(ptr); 
+					theBan->deleteRecord();
+					delete(theBan);
+					deleted = true;
+				} else { 
+					/* Matching ban? */ 
+					if(match(theBan->getBanMask().c_str(), theClient->getNickUserHost().c_str()) == 0)
+					{ 
+						strstream s;
+						s << getCharYYXXX() << " M " << reggedChan->getName() << " +b "
+						<< theBan->getBanMask() << ends;
+					
+						Write( s );
+						delete[] s.str(); 
+						Kick(theChan, theClient, string("(" + theBan->getSetBy() + ") " + theBan->getReason()) );
+						/* 
+						 * Thats it.. we aren't going to op them or anything.
+						 * We break out of the select.
+						 */
+						break;
+					} /* Matching Ban */ 
+				} /* Not expired. */
+				if (deleted) 
+				{
+					ptr = banList->begin();
+					deleted = false;
+				} else {
+					++ptr;
 				}
-				++ptr;
-			}
+			} /* Loop over bans */
  
 			/* Is it time to set an autotopic? */
 			if (reggedChan->getFlag(sqlChannel::F_AUTOTOPIC) && (reggedChan->getLastTopic() + topic_duration <= ::time(NULL)))
