@@ -660,7 +660,7 @@ else if(Command == "VERSION")
 	xClient::DoCTCP(theClient, CTCP,
 		"Undernet P10 Channel Services Version 2 ["
 		__DATE__ " " __TIME__
-		"] ($Id: cservice.cc,v 1.111 2001/02/20 00:03:35 plexus Exp $)");
+		"] ($Id: cservice.cc,v 1.112 2001/02/20 20:23:03 gte Exp $)");
 	}
 else if(Command == "PROBLEM?")
 	{
@@ -1642,6 +1642,7 @@ switch( theEvent )
 		if (tmpSqlUser)
 			{
 			tmpSqlUser->networkClient = NULL;
+			tmpSqlUser->removeFlag(sqlUser::F_LOGGEDIN);
 			elog	<< "cservice::OnEvent> Deauthenticated "
 				<< "user "
 				<< tmpSqlUser->getUserName()
@@ -1789,8 +1790,7 @@ if( !deopList.empty() )
  
 /**
  * Handler for registered channel events.
- * Performs a number of functions, autoop, autovoice, bankicks, etc.
- * TODO: This method is entirely too large.
+ * Performs a number of functions, autoop, autovoice, bankicks, etc. 
  */
 int cservice::OnChannelEvent( const channelEventType& whichEvent,
 	Channel* theChan,
