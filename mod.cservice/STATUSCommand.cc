@@ -9,7 +9,7 @@
 #include	"responses.h"
 #include	"Network.h"
  
-const char STATUSCommand_cc_rcsId[] = "$Id: STATUSCommand.cc,v 1.17 2001/02/22 19:09:34 gte Exp $" ;
+const char STATUSCommand_cc_rcsId[] = "$Id: STATUSCommand.cc,v 1.18 2001/02/22 19:13:11 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -142,7 +142,7 @@ bool STATUSCommand::Exec( iClient* theClient, const string& Message )
 
 	int level = bot->getEffectiveAccessLevel(theUser, theChan, true);
 	int admLevel = bot->getAdminAccessLevel(theUser); // Let authenticated admins view status also.
-	if ((level < level::status) && (admLevel <= 0) && !isOper(theClient))
+	if ((level < level::status) && (admLevel <= 0) && !theClient->isOper())
 	{
 		bot->Notice(theClient, bot->getResponse(theUser, language::insuf_access).c_str());
 		return false;
@@ -157,7 +157,7 @@ bool STATUSCommand::Exec( iClient* theClient, const string& Message )
 	if (tmpChan)
 	{
 		// If the person has access >400, or is a 1+ admin (or and Oper).
-		if ((level >= 400) || (admLevel >= 1) || isOper(theClient)) 
+		if ((level >= 400) || (admLevel >= 1) || theClient->isOper()) 
 		{
 			bot->Notice(theClient, 
 				bot->getResponse(theUser,
