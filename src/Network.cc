@@ -23,7 +23,7 @@
 #include	"StringTokenizer.h"
 
 const char xNetwork_h_rcsId[] = __NETWORK_H ;
-const char xNetwork_cc_rcsId[] = "$Id: Network.cc,v 1.31 2001/10/17 21:39:11 mrbean_ Exp $" ;
+const char xNetwork_cc_rcsId[] = "$Id: Network.cc,v 1.32 2001/10/28 10:12:39 mrbean_ Exp $" ;
 const char ELog_h_rcsId[] = __ELOG_H ;
 const char iClient_h_rcsId[] = __ICLIENT_H ;
 const char Channel_h_rcsId[] = __CHANNEL_H ;
@@ -329,6 +329,22 @@ for( serverVectorType::size_type i = 0 ; i < servers.size() ; i++ )
 		continue ;
 		}
 	if( !strcasecmp( servers[ i ]->getName(), name ) )
+		{
+		return servers[ i ] ;
+		}
+	}
+return NULL ;
+}
+
+iServer* xNetwork::findExpandedServerName( const string& name ) const
+{
+for( serverVectorType::size_type i = 0 ; i < servers.size() ; i++ )
+	{
+	if( NULL == servers[ i ] )
+		{
+		continue ;
+		}
+	if( !match(name, servers[ i ]->getName()) )
 		{
 		return servers[ i ] ;
 		}

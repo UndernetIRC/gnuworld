@@ -14,7 +14,7 @@
 #include	"StringTokenizer.h"
 
 
-const char HELPCommand_cc_rcsId[] = "$Id: HELPCommand.cc,v 1.10 2001/07/26 20:12:40 mrbean_ Exp $";
+const char HELPCommand_cc_rcsId[] = "$Id: HELPCommand.cc,v 1.11 2001/10/28 10:12:38 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -43,14 +43,28 @@ int ComLevel;
 if( 1 == st.size() )
 	{
 	// Spit out all commands
+	string Show;
+	int Num = 0;
 	for( ccontrol::constCommandIterator ptr = bot->command_begin() ;
 		ptr != bot->command_end() ; ++ptr )
 		{
 		ComLevel = ptr->second->getFlags();
 		//ComLevel &= ~flg_NOLOG; 
-		if((ComLevel == 0) || (ComLevel & tmpAuth->getAccess()) )
-			bot->Notice( theClient, ptr->second->getName() ) ;
+		if((ComLevel == 0) || (tmpAuth->gotAccess(ptr->second)) )
+			{
+			Show += (ptr->second->getName() + " ");
+			++Num;
+			if(Show.size() > 80)
+				{
+				bot->Notice( theClient, Show) ;
+				Num = 0;
+				Show.assign("");
+				}
+			}
 		}
+	if(!Show.empty())
+		bot->Notice( theClient, Show) ;
+	bot->Notice(theClient,"End of command list");
 	}
 else //Supplied a command, show only the help for that command (if it exists)
 	{

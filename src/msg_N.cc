@@ -14,7 +14,7 @@
 #include	"Network.h"
 #include	"ELog.h"
 
-const char msg_N_cc_rcsId[] = "$Id: msg_N.cc,v 1.3 2001/07/29 22:44:06 dan_karrels Exp $" ;
+const char msg_N_cc_rcsId[] = "$Id: msg_N.cc,v 1.4 2001/10/28 10:12:39 mrbean_ Exp $" ;
 const char iClient_h_rcsId[] = __ICLIENT_H ;
 const char events_h_rcsId[] = __EVENTS_H ;
 const char ip_h_rcsId[] = __IP_H ;
@@ -99,7 +99,6 @@ iClient* newClient = new (std::nothrow) iClient(
 		) ;
 assert( newClient != 0 ) ;
 
-//elog << "Adding client: " << *newClient ;
 if( !Network->addClient( newClient ) )
 	{
 	elog	<< "xServer::MSG_B> Failed to add client: "

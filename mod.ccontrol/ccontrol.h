@@ -3,7 +3,7 @@
  */
 
 #ifndef __CCONTROL_H
-#define __CCONTROL_H "$Id: ccontrol.h,v 1.43 2001/09/26 13:58:28 mrbean_ Exp $"
+#define __CCONTROL_H "$Id: ccontrol.h,v 1.44 2001/10/28 10:12:39 mrbean_ Exp $"
 
 
 #include	<string>
@@ -112,6 +112,12 @@ protected:
 	
 	exceptionListType		exceptionList;
 	
+	typedef list< string >		clonesQueueType;
+	
+	clonesQueueType			clonesQueue;
+	
+	typedef clonesQueueType::iterator clonesIterator;
+				
 public:
 
 	/**
@@ -535,6 +541,14 @@ public:
 
 	bool CleanServers();
 	
+	const string expandDbServer(const string);
+	
+	void addClone(const string);
+	
+	void delClone(const string);
+	
+	void checkClones(const int);
+	
 	/**
 	 * This is a constant iterator type used to perform a read-only
 	 * iteration of the operchan structure.
@@ -675,7 +689,9 @@ public:
 	xServer::timerID expiredIgnores;
 
 	xServer::timerID expiredSuspends;
-	
+
+	xServer::timerID clonesCheck;
+		
 protected:
 
 	/**

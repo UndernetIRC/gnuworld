@@ -3,7 +3,7 @@
  */
 
 #ifndef __NETWORK_H
-#define __NETWORK_H "$Id: Network.h,v 1.20 2001/09/23 02:27:19 gte Exp $"
+#define __NETWORK_H "$Id: Network.h,v 1.21 2001/10/28 10:12:37 mrbean_ Exp $"
 
 #include	<vector>
 #include	<string>
@@ -188,6 +188,12 @@ public:
 	 * Returns NULL if not found.
 	 */
 	virtual iServer*	findServerName( const string& name ) const ;
+
+	/**
+	 * Find a remote server by a wildmask name.
+	 * Returns NULL if not found.
+	 */
+	virtual iServer*	findExpandedServerName( const string& name ) const ;
 
 	/**
 	 * Find a global channel by case insensitive name.
