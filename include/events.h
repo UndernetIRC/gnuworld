@@ -1,11 +1,11 @@
 /* Events.h
  * This file defines the basic network and channel events that
- * the EWorld server may distribute to its services clients.
+ * the GNUWorld server may distribute to its services clients.
  * Hopefully most of these are pretty self explanatory.
  */
 
 #ifndef __EVENTS_H
-#define __EVENTS_H "$Id: events.h,v 1.1 2000/06/30 18:46:06 dan_karrels Exp $"
+#define __EVENTS_H "$Id: events.h,v 1.2 2000/07/08 01:41:05 dan_karrels Exp $"
 
 namespace gnuworld
 {

@@ -1,7 +1,7 @@
 /**
  * server.cc
  * This is the implementation file for the xServer class.
- * This class is the entity which is the EWorld server
+ * This class is the entity which is the GNUWorld server
  * proper.  It manages network I/O, parsing and distributing
  * incoming messages, notifying attached clients of
  * system events, on, and on, and on.
@@ -37,7 +37,7 @@
 #include	"moduleLoader.h"
 
 const char xServer_h_rcsId[] = __XSERVER_H ;
-const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.2 2000/07/07 15:56:01 dan_karrels Exp $" ;
+const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.3 2000/07/08 01:41:05 dan_karrels Exp $" ;
 
 using std::string ;
 using std::vector ;
@@ -2004,31 +2004,6 @@ return 0 ;
 // A nick has requested a version
 int xServer::MSG_Version( xParameters& Param )
 {
-// TODO
-/*
-const char* Sender = Param[ 0 ] ;
-
-iClient* Target = Network->findNick( Sender ) ;
-if( NULL == Target )
-	{
-	elog	<< "xServer::MSG_Version> Unable to find Sender: "
-		<< Sender << endl ;
-	return -1 ;
-	}
-
-// Only send the version reply if the nick is an oper.
-if( Target->isOper() )
-	{
-	Write( "%c 351 %s %s %s :-- %s %s %s",
-			charYY,
-			Sender,
-			EWORLD_VERSION,
-			ServerName.c_str(),
-			EWORLD_NAME,
-			EWORLD_VERSION,
-			EWORLD_COPYRIGHT ) ;
-	}
-*/
 return 0 ;
 }
 

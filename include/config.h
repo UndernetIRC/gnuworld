@@ -1,12 +1,12 @@
 /* config.h
- * $Id: config.h,v 1.1 2000/06/30 18:46:06 dan_karrels Exp $
+ * $Id: config.h,v 1.2 2000/07/08 01:41:05 dan_karrels Exp $
  */
 
 #ifndef __CONFIG_H
-#define __CONFIG_H "$Id: config.h,v 1.1 2000/06/30 18:46:06 dan_karrels Exp $"
+#define __CONFIG_H "$Id: config.h,v 1.2 2000/07/08 01:41:05 dan_karrels Exp $"
 
 /* config.h */
-/* EWorld main configuration file */
+/* GNUWorld main configuration file */
 /* blah blah blah goes here, but who cares,
  * Damnit Jim! Im a programmer not an author!
  */
@@ -28,15 +28,15 @@
 #endif // EDEBUG
 
 /* CONFFILE
- * This is the name of the file that Eworld will read
+ * This is the name of the file that GNUWorld will read
  * it's server characteristics from
  */
-#define CONFFILE "Eworld.conf"
+#define CONFFILE "gnuworld.conf"
 
 /* LOGFILE
- * Name of the file that eworld logs to =P
+ * Name of the file that gnuworld logs to =P
  */
-#define LOGFILE "Eworld.log"
+#define LOGFILE "gnuworld.log"
 
 /* LOG_SOCKET
  * This define allows to log incoming and outgoing data from/to sockets.

@@ -1,10 +1,10 @@
 /* iServer.h
  * iServer objects represent servers across the network, except
- * for the EWorld server itself (see class xServer).
+ * for the GNUWorld server itself (see class xServer).
  */
 
 #ifndef __ISERVER_H
-#define __ISERVER_H "$Id: iServer.h,v 1.1 2000/06/30 18:46:06 dan_karrels Exp $"
+#define __ISERVER_H "$Id: iServer.h,v 1.2 2000/07/08 01:41:05 dan_karrels Exp $"
 
 #include	<iostream>
 #include	<string>
