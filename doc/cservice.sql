@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------------
--- "$Id: cservice.sql,v 1.32 2001/04/15 19:53:42 gte Exp $"
+-- "$Id: cservice.sql,v 1.33 2001/04/15 23:32:26 gte Exp $"
 -- Channel service DB SQL file for PostgreSQL.
 
 -- ChangeLog:
@@ -261,6 +261,7 @@ CREATE TABLE pending (
 	-- 1 = 'Traffic Check & Notification'
 	-- 2 = 'Completed'
 	-- 9 = 'Rejected'
+	join_count INT4 DEFAULT '0',
 	decision_ts INT4,
 	decision VARCHAR (80), 
 	comments TEXT,
