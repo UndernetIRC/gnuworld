@@ -44,7 +44,7 @@
 #include	"moduleLoader.h"
 
 const char xServer_h_rcsId[] = __XSERVER_H ;
-const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.35 2000/12/23 00:56:50 dan_karrels Exp $" ;
+const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.36 2000/12/23 15:57:02 dan_karrels Exp $" ;
 
 using std::string ;
 using std::vector ;
@@ -82,22 +82,15 @@ int     whichSig ;
  * instance of this class.  The name of the server
  * configuration file is passed as argument.
  */
-xServer::xServer( const string& _fileName )
+xServer::xServer( const string& fileName )
  : eventList( EVT_NOOP )
 {
 
-// Read the configuration file and set our
-// data members.
-EConfig conf( _fileName ) ;
-
-// Parse out the required data fields
-UplinkName = conf.Require( "uplink" )->second ;
-ServerName = conf.Require( "name" )->second ;
-ServerDescription = conf.Require( "description" )->second ;
-Password = conf.Require( "password" )->second ;
-Port = atoi( conf.Require( "port" )->second.c_str() ) ;
-intYY = atoi( conf.Require( "numeric" )->second.c_str() ) ;
-intXXX = atoi( conf.Require( "maxclients" )->second.c_str() ) ;
+if( !readConfigFile( fileName ) )
+	{
+	elog	<< "Error reading config file: " << fileName << endl ;
+	::exit( 0 ) ;
+	}
 
 // Output the information to the console.
 elog << "Numeric: " << intYY << endl ;
@@ -113,6 +106,7 @@ _connected = false ;
 StartTime = ::time( NULL ) ;
 
 burstStart = burstEnd = 0 ;
+maxLoopCount = MAXLOOPCOUNT_DEFAULT ;
 Uplink = NULL ;
 theSock = NULL ;
 Message = SRV_SUCCESS ;
@@ -276,34 +270,10 @@ REGISTER_MSG( "441", NOOP ) ;
 // DESYNCH
 REGISTER_MSG( "DESYNCH", Desynch ) ;
 
-/*
- * Load and attach any modules specified in the config.
- */ 
-EConfig::const_iterator ptr = conf.Find( "module" ) ;
-for( ; ptr != conf.end() && ptr->first == "module" ; ++ptr )
+if( !loadModules( fileName ) )
 	{
-	StringTokenizer modInfo(ptr->second) ;
-	elog	<< "xServer> Found module: " << modInfo[0]
-		<< " (Config: " << modInfo[1] << ")" << endl;
-
-	moduleLoader< xClient* >* ml =
-		new (nothrow) moduleLoader< xClient* >( modInfo[ 0 ] ) ;
-	if( NULL == ml )
-		{
-		elog << "xServer> Memory allocation failure loading modules\n" ;
-		break ;
-		}
-
-	moduleList.push_back(ml); // Add moduleLoader to list. 
-	xClient* clientPtr = ml->loadObject(modInfo[1]);
-	if( NULL == clientPtr )
-		{
-		elog	<< "xServer> Failed to instantiate module: "
-			<< modInfo[ 1 ] << endl ;
-		continue ;
-		}
- 
-	AttachClient(clientPtr); 
+	elog	<< "xServer> Failed in loading one or more modules\n" ;
+	::exit( 0 ) ;
 	}
 }
 
@@ -324,22 +294,76 @@ for( glineListType::iterator ptr = glineList.begin() ; ptr != glineList.end() ;
 	}
 glineList.clear() ;
 
-/*
+
 // Deallocate all loaded modules/close dlm handles.
-for( moduleListType::iterator ptr = moduleList.begin() ; ptr != moduleList.end() ;
-	++ptr )
+for( moduleListType::iterator ptr = moduleList.begin() ;
+	ptr != moduleList.end() ; ++ptr )
 	{
 	delete *ptr ;
 	}
 moduleList.clear() ;
-*/
 
 while( !timerQueue.empty() )
 	{
 	delete timerQueue.top().second ;
 	timerQueue.pop() ;
 	}
+} // ~xServer()
 
+bool xServer::readConfigFile( const string& fileName )
+{
+// Read the configuration file and set our
+// data members.
+EConfig conf( fileName ) ;
+
+// Parse out the required data fields
+UplinkName = conf.Require( "uplink" )->second ;
+ServerName = conf.Require( "name" )->second ;
+ServerDescription = conf.Require( "description" )->second ;
+Password = conf.Require( "password" )->second ;
+Port = atoi( conf.Require( "port" )->second.c_str() ) ;
+intYY = atoi( conf.Require( "numeric" )->second.c_str() ) ;
+intXXX = atoi( conf.Require( "maxclients" )->second.c_str() ) ;
+
+return true ;
+}
+
+bool xServer::loadModules( const string& fileName )
+{
+EConfig conf( fileName ) ;
+
+/*
+ * Load and attach any modules specified in the config.
+ */ 
+EConfig::const_iterator ptr = conf.Find( "module" ) ;
+for( ; ptr != conf.end() && ptr->first == "module" ; ++ptr )
+	{
+	StringTokenizer modInfo(ptr->second) ;
+	elog	<< "xServer> Found module: " << modInfo[0]
+		<< " (Config: " << modInfo[1] << ")" << endl;
+
+	moduleLoader< xClient* >* ml =
+		new (nothrow) moduleLoader< xClient* >( modInfo[ 0 ] ) ;
+	if( NULL == ml )
+		{
+		elog	<< "xServer> Memory allocation failure "
+			<< "loading modules\n" ;
+		return false ;
+		}
+
+	moduleList.push_back(ml); // Add moduleLoader to list. 
+	xClient* clientPtr = ml->loadObject(modInfo[1]);
+	if( NULL == clientPtr )
+		{
+		elog	<< "xServer> Failed to instantiate module: "
+			<< modInfo[ 1 ] << endl ;
+		return false ;
+		}
+ 
+	AttachClient(clientPtr); 
+	}
+
+return true ;
 }
  
 /**

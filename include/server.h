@@ -17,7 +17,7 @@
  */
 
 #ifndef __XSERVER_H
-#define __XSERVER_H "$Id: server.h,v 1.17 2000/12/23 00:56:49 dan_karrels Exp $"
+#define __XSERVER_H "$Id: server.h,v 1.18 2000/12/23 15:57:02 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
@@ -625,32 +625,126 @@ protected:
 	virtual void userPartAllChannels( iClient* ) ;
 
 	/**
+	 * Read the config file.  Return true if success, false
+	 * otherwise.
+	 */
+	virtual bool readConfigFile( const string& ) ;
+
+	/**
+	 * Parses a config file and attempts to load all modules
+	 * specified therein.  If any part of the process fails,
+	 * false is returned.  Otherwise, true is returned.
+	 */
+	virtual bool loadModules( const string& ) ;
+
+	/**
 	 * Signal handler for the server itself.
 	 * Returns true if the signal was handled.
 	 */
 	virtual bool	OnSignal( int ) ;
 
+	/**
+	 * This method is called when a user mode change is detected.
+	 */
 	virtual void	onUserModeChange( xParameters& ) ;
 
+	/**
+	 * This method is called when a channel mode 't' change is
+	 * Keep in mind that the source ChannelUser may be NULL
+	 * if the mode is being set/unset by a server.
+	 * detected.
+	 */
 	virtual void	onChannelModeT( Channel*, bool, ChannelUser* ) ;
+
+	/**
+	 * This method is called when a channel mode 'n' change is
+	 * detected.
+	 * Keep in mind that the source ChannelUser may be NULL
+	 * if the mode is being set/unset by a server.
+	 */
 	virtual void	onChannelModeN( Channel*, bool, ChannelUser* ) ;
+
+	/**
+	 * This method is called when a channel mode 's' change is
+	 * detected.
+	 * Keep in mind that the source ChannelUser may be NULL
+	 * if the mode is being set/unset by a server.
+	 */
 	virtual void	onChannelModeS( Channel*, bool, ChannelUser* ) ;
+
+	/**
+	 * This method is called when a channel mode 'p' change is
+	 * detected.
+	 * Keep in mind that the source ChannelUser may be NULL
+	 * if the mode is being set/unset by a server.
+	 */
 	virtual void	onChannelModeP( Channel*, bool, ChannelUser* ) ;
+
+	/**
+	 * This method is called when a channel mode 'm' change is
+	 * detected.
+	 * Keep in mind that the source ChannelUser may be NULL
+	 * if the mode is being set/unset by a server.
+	 */
 	virtual void	onChannelModeM( Channel*, bool, ChannelUser* ) ;
+
+	/**
+	 * This method is called when a channel mode 'i' change is
+	 * detected.
+	 * Keep in mind that the source ChannelUser may be NULL
+	 * if the mode is being set/unset by a server.
+	 */
 	virtual void	onChannelModeI( Channel*, bool, ChannelUser* ) ;
 
+	/**
+	 * This method is called when a channel mode 'l' change is
+	 * detected.
+	 * Keep in mind that the source ChannelUser may be NULL
+	 * if the mode is being set/unset by a server.
+	 */
 	virtual void	onChannelModeL( Channel*, bool,
 				ChannelUser*, unsigned int ) ;
+
+	/**
+	 * This method is called when a channel mode 'k' change is
+	 * detected.
+	 * Keep in mind that the source ChannelUser may be NULL
+	 * if the mode is being set/unset by a server.
+	 */
 	virtual void	onChannelModeK( Channel*, bool,
 				ChannelUser*, const string& ) ;
 
+	/**
+	 * This method is called when one or more mode 'o' changes
+	 * are set/unset on a particular channel.
+	 * Keep in mind that the source ChannelUser may be NULL
+	 * if the mode is being set/unset by a server.
+	 */
 	virtual void	onChannelModeO( Channel*, ChannelUser*,
 		const opVectorType& ) ;
+
+	/**
+	 * This method is called when one or more mode 'v' changes
+	 * are set/unset on a particular channel.
+	 * Keep in mind that the source ChannelUser may be NULL
+	 * if the mode is being set/unset by a server.
+	 */
 	virtual void	onChannelModeV( Channel*, ChannelUser*,
 		const voiceVectorType& ) ;
+
+	/**
+	 * This method is called when one or more mode 'b' changes
+	 * are set/unset on a particular channel.
+	 * Keep in mind that the source ChannelUser may be NULL
+	 * if the mode is being set/unset by a server.
+	 */
 	virtual void	onChannelModeB( Channel*, ChannelUser*,
 		const banVectorType& ) ;
 
+	/**
+	 * This variable represents how many times to attempt a system
+	 * call before giving up
+	 */
 	unsigned int	maxLoopCount ;
 
 	/**
@@ -675,6 +769,10 @@ protected:
 		void*		data ;
 	} ;
 
+	/**
+	 * This structure is used as a comparator functor for
+	 * the timerQueue.
+	 */
 	struct timerGreater
 	{
 	inline bool operator()( const pair< time_t, timerInfo* >& lhs,
@@ -813,7 +911,6 @@ protected:
 	 * are stored in this structure.
 	 */
 	typedef hash_map< string, int (xServer::*)( xParameters& ), eHash, eqstr >
-//	typedef VectorTrie< char*, int (xServer::*)( xParameters& ) >
 		commandMapType ;
 
 	/**
@@ -874,7 +971,6 @@ protected:
 	 * Type used to store the channel event map.
 	 */
 	typedef hash_map< string, list< xClient* >*, eHash, eqstr >
-//	typedef map< string, list< xClient* >*, noCaseCompare >
 		channelEventMapType ;
 
 	/**

@@ -14,7 +14,7 @@
 #include	"ip.h"
 
 const char iClient_h_rcsId[] = __ICLIENT_H ;
-const char iClient_cc_rcsId[] = "$Id: iClient.cc,v 1.6 2000/12/23 15:01:58 dan_karrels Exp $" ;
+const char iClient_cc_rcsId[] = "$Id: iClient.cc,v 1.7 2000/12/23 15:57:02 dan_karrels Exp $" ;
 
 using std::string ;
 using std::map ;
@@ -70,14 +70,20 @@ else
 
 mode = 0 ;
 setModes( _mode ) ;
+customDataMap = 0 ;
 }
 
 iClient::~iClient()
 {
-for( customDataMapType::iterator ptr = customDataMap.begin() ;
-	ptr != customDataMap.end() ; ++ptr )
+if( customDataMap != 0 )
 	{
-	ptr->first->deleteCustomData( this, ptr->second ) ;
+	for( customDataMapType::iterator ptr = customDataMap->begin() ;
+		ptr != customDataMap->end() ; ++ptr )
+		{
+		ptr->first->deleteCustomData( this, ptr->second ) ;
+		}
+	delete customDataMap ;
+	customDataMap = 0 ;
 	}
 }
 
@@ -146,12 +152,33 @@ bool iClient::setCustomData( xClient* theClient, void* data )
   assert( theClient != 0 ) ;
 #endif
 
-if( customDataMap.find( theClient ) != customDataMap.end() )
+// Is the customDataMap empty?
+if( NULL == customDataMap )
 	{
+	// Yes, go ahead and allocate it
+	try
+		{
+		customDataMap = new customDataMapType ;
+		}
+	catch( std::bad_alloc )
+		{
+		// Allocation failed, doh!
+		elog	<< "iClient::setCustomData> Memory allocation "
+			<< "failure\n" ;
+		return false ;
+		}
+	}
+
+// Is this xClient already using its customDataMap slot?
+if( customDataMap->find( theClient ) != customDataMap->end() )
+	{
+	// Yes, return failure
 	return false ;
 	}
 
-return customDataMap.insert( customDataMapType::value_type(
+// Attempt to add this data into the customDataMap.  Return the
+// success/failure of the operation
+return customDataMap->insert( customDataMapType::value_type(
 	theClient, data ) ).second ;
 }
 
@@ -161,11 +188,25 @@ void* iClient::getCustomData( xClient* theClient ) const
   assert( theClient != 0 ) ;
 #endif
 
-customDataMapType::const_iterator ptr = customDataMap.find( theClient ) ;
-if( ptr == customDataMap.end() )
+// Has the customDataMap been allocated?
+if( NULL == customDataMap )
 	{
+	// Nope, return NULL
 	return 0 ;
 	}
+
+// Attempt to find this xClient's data element
+customDataMapType::const_iterator ptr =
+	customDataMap->find( theClient ) ;
+
+// Did we find the element?
+if( ptr == customDataMap->end() )
+	{
+	// Nope, return NULL
+	return 0 ;
+	}
+
+// Found it, go ahead and return this xClient's data element
 return ptr->second ;
 }
 
@@ -175,12 +216,29 @@ void* iClient::removeCustomData( xClient* theClient )
   assert( theClient != 0 ) ;
 #endif
 
-customDataMapType::iterator ptr = customDataMap.find( theClient ) ;
-if( ptr == customDataMap.end() )
+// Has the customDataMap been allocated?
+if( NULL == customDataMap )
 	{
+	// No, return NULL
 	return 0 ;
 	}
-customDataMap.erase( ptr ) ;
+
+// Attempt to find this xClient's data element
+customDataMapType::iterator ptr = customDataMap->find( theClient ) ;
+
+// Did we find it?
+if( ptr == customDataMap->end() )
+	{
+	// Nope, return NULL
+	return 0 ;
+	}
+
+// Yes, we found this xClient's data element.  Remove it from
+// the customDataMap
+customDataMap->erase( ptr ) ;
+
+// The customDataMap may now be empty, but let it remain allocated.
+// Return the data element
 return ptr->second ;
 }
 

@@ -2,7 +2,7 @@
  */
 
 #ifndef __ICLIENT_H
-#define __ICLIENT_H "$Id: iClient.h,v 1.8 2000/12/23 02:05:14 dan_karrels Exp $"
+#define __ICLIENT_H "$Id: iClient.h,v 1.9 2000/12/23 15:57:02 dan_karrels Exp $"
 
 #include	<string>
 #include	<list>
@@ -87,6 +87,8 @@ public:
 
 	/**
 	 * Destruct the iClient.
+	 * This will call xClient::deleteCustomData() for each
+	 * xClient which is storing a data element in this iClient.
 	 */
 	virtual ~iClient() ;
 
@@ -277,8 +279,28 @@ public:
 	inline const string getCharYYXXX() const
 		{ return( string( charYY ) + charXXX ) ; }
 
+	/**
+	 * Add an xClient's personal data representation to this
+	 * iClient.  Only one element per xClient is permitted.
+	 * This method will return false if the internal allocation
+	 * fails, or if the xClient in question is already using
+	 * a data element in this iClient, or if the addition to the
+	 * internal data structure fails.
+	 * Add a NULL value to this iClient is permitted.
+	 */
 	bool		setCustomData( xClient*, void* ) ;
+
+	/**
+	 * Retrieve the custom data element for the given xClient.
+	 * If none is found, NULL is returned.
+	 */
 	void*		getCustomData( xClient* ) const ;
+
+	/**
+	 * Retrieve, remove, and return the custom data element
+	 * for the given xClient.  If none is found, NULL is
+	 * returned.
+	 */
 	void*		removeCustomData( xClient* ) ;
 
 	/**
@@ -388,8 +410,19 @@ protected:
 	 */
 	channelListType	channelList ;
 
+	/**
+	 * This is the type used to represent the custom data map.
+	 */
 	typedef map< xClient*, void* >	customDataMapType ;
-	customDataMapType		customDataMap ;
+
+	/**
+	 * This structure is used to store generic data for
+	 * individual xClient's.  Only one element per xClient is
+	 * permitted to be stored in this structure.  A pointer is
+	 * used here to reduce memory footprint for those iClient's
+	 * whose customDataMap's aren't used.
+	 */
+	customDataMapType		*customDataMap ;
 
 } ;
 

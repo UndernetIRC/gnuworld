@@ -3,7 +3,7 @@
  */
 
 #ifndef __XCLIENT_H
-#define __XCLIENT_H "$Id: client.h,v 1.13 2000/12/23 15:01:57 dan_karrels Exp $"
+#define __XCLIENT_H "$Id: client.h,v 1.14 2000/12/23 15:57:02 dan_karrels Exp $"
 
 #include	<string>
 
@@ -168,33 +168,97 @@ public:
 	virtual void OnChannelModeM( Channel*, bool polarity,
 		ChannelUser* ) ;
 
+	/**
+	 * This method is invoked when a user sets or removes
+	 * channel mode i (invite).  Keep in mind that the
+	 * source ChannelUser may be NULL if a server is
+	 * setting the mode.
+	 */
 	virtual void OnChannelModeI( Channel*, bool polarity,
 		ChannelUser* ) ;
 
+	/**
+	 * This method is invoked when a user sets or removes
+	 * channel mode p (private).  Keep in mind that the
+	 * source ChannelUser may be NULL if a server is
+	 * setting the mode.
+	 */
 	virtual void OnChannelModeP( Channel*, bool polarity,
 		ChannelUser* ) ;
 
+	/**
+	 * This method is invoked when a user sets or removes
+	 * channel mode s (secret).  Keep in mind that the
+	 * source ChannelUser may be NULL if a server is
+	 * setting the mode.
+	 */
 	virtual void OnChannelModeS( Channel*, bool polarity,
 		ChannelUser* ) ;
 
+	/**
+	 * This method is invoked when a user sets or removes
+	 * channel mode n (nomessage).  Keep in mind that the
+	 * source ChannelUser may be NULL if a server is
+	 * setting the mode.
+	 */
 	virtual void OnChannelModeN( Channel*, bool polarity,
 		ChannelUser* ) ;
 
+	/**
+	 * This method is invoked when a user sets or removes
+	 * channel mode t (topic).  Keep in mind that the
+	 * source ChannelUser may be NULL if a server is
+	 * setting the mode.
+	 */
 	virtual void OnChannelModeT( Channel*, bool polarity,
 		ChannelUser* ) ;
 
+	/**
+	 * This method is invoked when a user sets or removes
+	 * channel mode l (limit).  Keep in mind that the
+	 * source ChannelUser may be NULL if a server is
+	 * setting the mode.
+	 * If the mode is being removed, the limit argument
+	 * will be 0.
+	 */
 	virtual void OnChannelModeL( Channel*, bool polarity,
 		ChannelUser*, const unsigned int& ) ;
 
+	/**
+	 * This method is invoked when a user sets or removes
+	 * channel mode k (key).  Keep in mind that the
+	 * source ChannelUser may be NULL if a server is
+	 * setting the mode.
+	 * If the mode is being removed, the key argument will
+	 * be empty.
+	 */
 	virtual void OnChannelModeK( Channel*, bool polarity,
 		ChannelUser*, const string& ) ;
 
+	/**
+	 * This method is invoked when a user sets or removes
+	 * one or more channel mode (o).  Keep in mind that the
+	 * source ChannelUser may be NULL if a server is
+	 * setting the mode.
+	 */
 	virtual void OnChannelModeO( Channel*, ChannelUser*,
 		const xServer::opVectorType& ) ;
 
+	/**
+	 * This method is invoked when a user sets or removes
+	 * one or more channel mode (v).  Keep in mind that the
+	 * source ChannelUser may be NULL if a server is
+	 * setting the mode.
+	 */
 	virtual void OnChannelModeV( Channel*, ChannelUser*,
 		const xServer::voiceVectorType& ) ;
 
+	/**
+	 * This method is invoked when a user sets or removes
+	 * one or more channel mode (b).  Keep in mind that the
+	 * source ChannelUser may be NULL if a server is
+	 * setting the mode.
+	 */
 	virtual void OnChannelModeB( Channel*, ChannelUser*,
 		const xServer::banVectorType& ) ;
 

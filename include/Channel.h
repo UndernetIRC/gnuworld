@@ -304,18 +304,72 @@ public:
 
 protected:
 
+	/**
+	 * This method is called when channel mode 't' is set
+	 * or unset.
+	 */
 	virtual void	onModeT( bool ) ;
+
+	/**
+	 * This method is called when channel mode 'n' is set
+	 * or unset.
+	 */
 	virtual void	onModeN( bool ) ;
+
+	/**
+	 * This method is called when channel mode 's' is set
+	 * or unset.
+	 */
 	virtual void	onModeS( bool ) ;
+
+	/**
+	 * This method is called when channel mode 'p' is set
+	 * or unset.
+	 */
 	virtual void	onModeP( bool ) ;
+
+	/**
+	 * This method is called when channel mode 'm' is set
+	 * or unset.
+	 */
 	virtual void	onModeM( bool ) ;
+
+	/**
+	 * This method is called when channel mode 'i' is set
+	 * or unset.
+	 */
 	virtual void	onModeI( bool ) ;
+
+	/**
+	 * This method is called when channel mode 'l' is set
+	 * or unset.
+	 */
 	virtual void	onModeL( bool, const unsigned int& ) ;
+
+	/**
+	 * This method is called when channel mode 'k' is set
+	 * or unset.
+	 */
 	virtual void	onModeK( bool, const string& ) ;
+
+	/**
+	 * This method is called when one or more channel
+	 * mode (t)'s is/are set or unset.
+	 */
 	virtual void	onModeO( const vector<
 				pair< bool, ChannelUser* > >& ) ;
+
+	/**
+	 * This method is called when one or more channel
+	 * mode (v)'s is/are set or unset.
+	 */
 	virtual void	onModeV( const vector<
 				pair< bool, ChannelUser* > >& ) ;
+
+	/**
+	 * This method is called when one or more channel
+	 * mode (b)'s is/are set or unset.
+	 */
 	virtual void	onModeB( const vector<
 				pair< bool, string > >& ) ;
 

@@ -1,9 +1,9 @@
 /* config.h
- * $Id: config.h,v 1.3 2000/12/15 00:13:44 dan_karrels Exp $
+ * $Id: config.h,v 1.4 2000/12/23 15:57:02 dan_karrels Exp $
  */
 
 #ifndef __CONFIG_H
-#define __CONFIG_H "$Id: config.h,v 1.3 2000/12/15 00:13:44 dan_karrels Exp $"
+#define __CONFIG_H "$Id: config.h,v 1.4 2000/12/23 15:57:02 dan_karrels Exp $"
 
 /* config.h */
 /* GNUWorld main configuration file */
@@ -67,5 +67,12 @@
  * can use quite a bit more memory on large networks.
  */
 #undef CLIENT_DESC
+
+/**
+ * MAXLOOPCOUNT_DEFAULT
+ * This variable represents how many times to attempt a system
+ * call before giving up.
+ */
+#define MAXLOOPCOUNT_DEFAULT 10
 
 #endif /* __CONFIG_H */
