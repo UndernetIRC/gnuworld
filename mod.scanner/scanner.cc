@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: scanner.cc,v 1.2 2002/08/07 20:55:22 dan_karrels Exp $
+ * $Id: scanner.cc,v 1.3 2002/08/07 21:11:11 dan_karrels Exp $
  */
 
 #include	"client.h"
@@ -89,6 +89,10 @@ switch( whichEvent )
 	{
 	case EVT_NICK:
 		handleNewClient( static_cast< iClient* >( arg1 ) ) ;
+		break ;
+	case EVT_BURST_CMPLT:
+	case EVT_BURST_ACK:
+		// Delivered to all clients
 		break ;
 	default:
 		elog	<< "scanner::OnEvent> Received unknown event: "

@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server.cc,v 1.146 2002/08/07 20:28:07 dan_karrels Exp $
+ * $Id: server.cc,v 1.147 2002/08/07 21:11:11 dan_karrels Exp $
  */
 
 #include	<sys/time.h>
@@ -72,7 +72,7 @@
 #include	"Connection.h"
 
 const char server_h_rcsId[] = __SERVER_H ;
-const char server_cc_rcsId[] = "$Id: server.cc,v 1.146 2002/08/07 20:28:07 dan_karrels Exp $" ;
+const char server_cc_rcsId[] = "$Id: server.cc,v 1.147 2002/08/07 21:11:11 dan_karrels Exp $" ;
 const char config_h_rcsId[] = __CONFIG_H ;
 const char misc_h_rcsId[] = __MISC_H ;
 const char events_h_rcsId[] = __EVENTS_H ;
@@ -535,7 +535,7 @@ Version = 10 ;
 // Initialize the connection time variable to current time.
 ConnectionTime = ::time( NULL ) ;
 
-clog	<< "  Connected!"
+clog	<< "*** Connected!"
 	<< endl ;
 
 elog	<< "*** Connected to "

@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: main.cc,v 1.48 2002/08/07 20:28:07 dan_karrels Exp $
+ * $Id: main.cc,v 1.49 2002/08/07 21:11:11 dan_karrels Exp $
  */
 
 #include	<new>
@@ -41,7 +41,7 @@
 #include	"md5hash.h"
 
 const char config_h_rcsId[] = __CONFIG_H ;
-const char main_cc_rcsId[] = "$Id: main.cc,v 1.48 2002/08/07 20:28:07 dan_karrels Exp $" ;
+const char main_cc_rcsId[] = "$Id: main.cc,v 1.49 2002/08/07 21:11:11 dan_karrels Exp $" ;
 const char ELog_h_rcsId[] = __ELOG_H ;
 const char server_h_rcsId[] = __SERVER_H ;
 const char moduleLoader_h_rcsId[] = __MODULELOADER_H ;
@@ -269,7 +269,8 @@ while( keepRunning )
 			// Run in simulation mode
 			clog	<< "to file "
 				<< simFileName
-				<< " ... " ;
+				<< "... "
+				<< endl ;
 
 			serverConnection = ConnectToFile( this, simFileName ) ;
 			if( NULL == serverConnection )
@@ -285,7 +286,8 @@ while( keepRunning )
 			// Run in real mode
 			clog	<< "to "
 				<< UplinkName
-				<< " ... " ;
+				<< "... "
+				<< endl ;
 
 			serverConnection = Connect( this, UplinkName, Port ) ;
 			}
