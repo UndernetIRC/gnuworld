@@ -6,7 +6,7 @@
 #include	"ELog.h" 
 #include	"cservice.h" 
 
-const char SHOWIGNORECommand_cc_rcsId[] = "$Id: SHOWIGNORECommand.cc,v 1.4 2001/02/06 23:07:44 gte Exp $" ;
+const char SHOWIGNORECommand_cc_rcsId[] = "$Id: SHOWIGNORECommand.cc,v 1.5 2001/02/10 01:25:25 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -22,13 +22,24 @@ bool SHOWIGNORECommand::Exec( iClient* theClient, const string& Message )
 		return true;
 	}
 
+	int count = 0;
+
+	if (bot->silenceList.size() != 0) bot->Notice(theClient, "Ignore list:");
+
 	for( cservice::silenceListType::const_iterator ptr = bot->silenceList.begin() ;
 		ptr != bot->silenceList.end() ; ++ptr )
 	{
 		bot->Notice(theClient, "%s", ptr->second.c_str());
+		count++;
 	}
 
-	bot->Notice(theClient, "-- End of Ignore List");
+	if (!count)
+		{ 
+		bot->Notice(theClient, "Ignore list is empty");
+		} else 
+		{
+		bot->Notice(theClient, "-- End of Ignore List");
+		}
 	return true ;
 } 
 
