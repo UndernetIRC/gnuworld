@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: misc.cc,v 1.2 2003/06/17 15:13:53 dan_karrels Exp $
+ * $Id: misc.cc,v 1.3 2003/07/22 21:36:48 dan_karrels Exp $
  */
 
 #include	<string>
@@ -31,7 +31,7 @@
 
 #include	"misc.h"
 
-const char rcsId[] = "$Id: misc.cc,v 1.2 2003/06/17 15:13:53 dan_karrels Exp $" ;
+const char rcsId[] = "$Id: misc.cc,v 1.3 2003/07/22 21:36:48 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -135,24 +135,4 @@ int strcasecmp( const string& s1, const string& s2 )
 return ::strcasecmp( s1.c_str(), s2.c_str() ) ;
 }
 
-size_t countChar( const string& s, const char& findMe )
-{
-return std::count( s.begin(), s.end(), findMe ) ;
-}
-/*
-
-size_t theCount = 0 ;
-
-for( string::const_iterator ptr = s.begin(), endPtr = s.end() ;
-	ptr != endPtr ; ++ptr )
-	{
-	if( *ptr == findMe )
-		{
-		++theCount ;
-		}
-	}
-
-return theCount ;
-}
-*/
 } // namespace gnuworld

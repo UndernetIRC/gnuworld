@@ -1,7 +1,7 @@
 /**
  * MTrie.cc
  *
- * $Id: MTrie.cc,v 1.4 2003/07/22 16:20:24 dan_karrels Exp $
+ * $Id: MTrie.cc,v 1.5 2003/07/22 21:36:48 dan_karrels Exp $
  */
 
 #include	<map>
@@ -199,6 +199,8 @@ const MTrie< data_type >* currentNode = this ;
 StringTokenizer tokens( key, '.' ) ;
 StringTokenizer::const_reverse_iterator tokenItr = tokens.rbegin() ;
 
+bool foundQuestionMark = false ;
+
 // Iterate as far as possible before beginning wild card match()
 // searches.
 for( ; tokenItr != tokens.rend() ; ++tokenItr )
@@ -206,6 +208,13 @@ for( ; tokenItr != tokens.rend() ; ++tokenItr )
 	if( string::npos != (*tokenItr).find( '*' ) )
 		{
 		// Wildcard
+		break ;
+		}
+
+	// Make sure this is after the search for '*'
+	if( string::npos != (*tokenItr).find( '?') )
+		{
+		foundQuestionMark = true ;
 		break ;
 		}
 
@@ -255,6 +264,11 @@ string::size_type starPos = localKey.rfind( '*' ) ;
 // localKey starts out as "n*ws"
 // Setup localKey to "*ws"
 localKey.erase( 0, starPos ) ;
+
+if( foundQuestionMark )
+	{
+	localKey = *tokenItr ;
+	}
 
 clog	<< "MTrie::wildCardFind> starPos: "
 	<< starPos
@@ -346,6 +360,10 @@ void MTrie< _valueT >::recursiveFind( const MTrie< _valueT >* currentNode,
 // '?'
 if( remainingTokens.empty() )
 	{
+	clog	<< "MTrie::recursiveFind(\?)> Top: remainingTokens "
+		<< "empty"
+		<< endl ;
+
 	// We have reached a final node, record all values
 	for( const_values_iterator vItr = 
 		currentNode->valuesList.begin() ;
@@ -381,7 +399,8 @@ while( !remainingTokens.empty() )
 		}
 
 	// No wildcard, continue to next level
-	const_nodes_iterator nItr = currentNode->nodesMap.find( *tokenItr ) ;
+	const_nodes_iterator nItr =
+		currentNode->nodesMap.find( *tokenItr ) ;
 	if( currentNode->nodesMap.end() == nItr )
 		{
 		// This node does not exist
@@ -403,6 +422,9 @@ while( !remainingTokens.empty() )
 
 if( remainingTokens.empty() )
 	{
+	clog	<< "MTrie::recursiveFind(\?)> End node"
+		<< endl ;
+
 	// If remainingTokens is empty it means that the final
 	// token has been reached, and didn't have a '?'.
 	// This is ok, it just means that we have reached the
@@ -418,6 +440,12 @@ if( remainingTokens.empty() )
 
 // Found a '?'
 string localKey( *tokenItr ) ;
+
+remainingTokens.pop_back() ;
+
+clog	<< "MTrie::recursiveFind(?)> Building localKey: "
+	<< localKey
+	<< endl ;
 
 // Everything is set, begin recursion
 // Match localKey against all nodes
