@@ -6,7 +6,7 @@
 #include	"ELog.h"
 #include	"cservice.h"
 
-const char SUPPORTCommand_cc_rcsId[] = "$Id: SUPPORTCommand.cc,v 1.1 2001/08/13 00:27:33 gte Exp $" ;
+const char SUPPORTCommand_cc_rcsId[] = "$Id: SUPPORTCommand.cc,v 1.2 2001/08/13 18:22:07 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -300,7 +300,7 @@ if (supportChar == 'N')
 		noregQuery	<< cmdHeader
 					<< "('', '','"
 					<< escapeSQLChars(channelName) << "',"
-					<< "1, (now()::abstime::int4 + (86400*30)), now()::abstime::int4, '* REGPROC', '-NON SUPPORT-'"
+					<< "1, (now()::abstime::int4 + (86400*3)), now()::abstime::int4, '* REGPROC', '-NON SUPPORT-'"
 					<< ")" << ends;
 
 		elog	<< "SUPPORTCommand::sqlQuery> "
