@@ -8,7 +8,7 @@
  * Can optionally narrow down selection using a number of switches.
  * Can display all channels a user has access on (TODO). 
  *
- * $Id: ACCESSCommand.cc,v 1.17 2001/01/28 23:58:51 gte Exp $
+ * $Id: ACCESSCommand.cc,v 1.18 2001/01/29 00:02:39 gte Exp $
  */
 
 #include	<string>
@@ -18,9 +18,9 @@
 #include	"cservice.h"
 #include	"libpq++.h"
 #include	"match.h"
-#define MAX_RESULTS 2
+#define MAX_RESULTS 15
 
-const char ACCESSCommand_cc_rcsId[] = "$Id: ACCESSCommand.cc,v 1.17 2001/01/28 23:58:51 gte Exp $" ;
+const char ACCESSCommand_cc_rcsId[] = "$Id: ACCESSCommand.cc,v 1.18 2001/01/29 00:02:39 gte Exp $" ;
 
 namespace gnuworld
 {
