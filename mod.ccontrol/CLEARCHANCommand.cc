@@ -14,7 +14,7 @@
 #include	"StringTokenizer.h"
 #include	"Constants.h"
 
-const char CLEARCHANCommand_cc_rcsId[] = "$Id: CLEARCHANCommand.cc,v 1.12 2001/12/30 00:06:10 mrbean_ Exp $";
+const char CLEARCHANCommand_cc_rcsId[] = "$Id: CLEARCHANCommand.cc,v 1.13 2002/01/02 21:04:50 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -99,7 +99,7 @@ for( string::size_type modePos = 0 ; modePos < doModes.size() ; ++modePos )
 			}
 		case 'O':  //Chanops?
 			{
-			string modes = "";
+			string modes = "-";
 			string args = "";
 			for( Channel::const_userIterator ptr = theChan->userList_begin();
 			ptr != theChan->userList_end() ; ++ptr )
