@@ -1,5 +1,5 @@
 #ifndef __CSERVICE_H
-#define __CSERVICE_H "$Id: cservice.h,v 1.22 2001/01/13 14:49:38 gte Exp $"
+#define __CSERVICE_H "$Id: cservice.h,v 1.23 2001/01/13 18:54:18 gte Exp $"
 
 #include	<string>
 #include	<vector>
@@ -15,6 +15,7 @@
 #include	"sqlChannel.h"
 #include	"sqlUser.h"
 #include	"sqlLevel.h"
+#include	"sqlBan.h"
 #include	"libpq-int.h"
  
 using std::string ;
@@ -126,11 +127,25 @@ public:
 	bool isIgnored(iClient*);
 
 	// Typedef's for user/channel Hashmaps.
+	// User hash, Key is Username.
 	typedef hash_map< string, sqlUser*, eHash, eqstr > sqlUserHashType ;
+
+	// Channel hash, Key is channelname.
 	typedef hash_map< string, sqlChannel*, eHash, eqstr > sqlChannelHashType ;
+
+	// Accesslevel cache, key is pair(chanid, userid).
 	typedef map < pair <int, int>, sqlLevel* > sqlLevelHashType ;
 
-//	typedef priority_queue < unsigned int vector< string >, less <unsigned int > > silenceListType;
+	// Ban cache, key is channel id.
+	typedef map < int, vector < sqlBan* > > sqlBanHashType ;
+
+	//typedef priority_queue < unsigned int, vector< string >, less <unsigned int > > silenceListType;
+	// Decided there aren't going to be that many silences anyway + we need iterative/random removal
+	// access for show/remignore.
+
+	typedef vector < string >  silenceListType;
+	silenceListType silenceList;
+
 	// Cache of user records.
 	sqlUserHashType sqlUserCache;
 
