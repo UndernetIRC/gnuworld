@@ -8,7 +8,7 @@
  *
  * Caveats: None.
  *
- * $Id: UNBANCommand.cc,v 1.1 2001/01/13 20:51:33 gte Exp $
+ * $Id: UNBANCommand.cc,v 1.2 2001/01/17 19:50:54 gte Exp $
  */
 
 #include	<string>
@@ -19,7 +19,7 @@
 #include	"Network.h"
 #include	"levels.h"
 
-const char UNBANCommand_cc_rcsId[] = "$Id: UNBANCommand.cc,v 1.1 2001/01/13 20:51:33 gte Exp $" ;
+const char UNBANCommand_cc_rcsId[] = "$Id: UNBANCommand.cc,v 1.2 2001/01/17 19:50:54 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -44,6 +44,13 @@ bool UNBANCommand::Exec( iClient* theClient, const string& Message )
 	{
 	    bot->Notice(theClient, "Sorry, %s isn't registered with me.", st[1].c_str());
 	    return false;
+	} 
+
+ 	/* Check the bot is in the channel. */
+ 
+	if (!theChan->getInChan()) {
+		bot->Notice(theClient, "I'm not in that channel!");
+		return false;
 	} 
 
 	// Is the user authorised?

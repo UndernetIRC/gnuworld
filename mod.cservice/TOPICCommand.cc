@@ -11,7 +11,7 @@
  *
  * Caveats: None
  *
- * $Id: TOPICCommand.cc,v 1.6 2001/01/16 01:31:40 gte Exp $
+ * $Id: TOPICCommand.cc,v 1.7 2001/01/17 19:50:54 gte Exp $
  */
 
 #include	<string>
@@ -23,7 +23,7 @@
 #include	"responses.h"
 #include	"Network.h"
 
-const char TOPICCommand_cc_rcsId[] = "$Id: TOPICCommand.cc,v 1.6 2001/01/16 01:31:40 gte Exp $" ;
+const char TOPICCommand_cc_rcsId[] = "$Id: TOPICCommand.cc,v 1.7 2001/01/17 19:50:54 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -52,7 +52,14 @@ bool TOPICCommand::Exec( iClient* theClient, const string& Message )
 			st[1].c_str());
 		return false;
 	}
-	
+
+	/* Check the bot is in the channel. */
+ 
+	if (!theChan->getInChan()) {
+		bot->Notice(theClient, "I'm not in that channel!");
+		return false;
+	} 
+
 	int level = bot->getEffectiveAccessLevel(theUser, theChan, true);
 	if(level < level::topic)
 	{

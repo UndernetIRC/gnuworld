@@ -1,5 +1,5 @@
 #ifndef __CSERVICE_H
-#define __CSERVICE_H "$Id: cservice.h,v 1.24 2001/01/16 01:31:40 gte Exp $"
+#define __CSERVICE_H "$Id: cservice.h,v 1.25 2001/01/17 19:50:54 gte Exp $"
 
 #include	<string>
 #include	<vector>
@@ -165,7 +165,7 @@ public:
 
 	typedef vector < string >  silenceListType;
 	silenceListType silenceList;
-
+ 
 	// Cache of user records.
 	sqlUserHashType sqlUserCache;
 

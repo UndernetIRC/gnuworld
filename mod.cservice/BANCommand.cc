@@ -8,7 +8,7 @@
  *
  * Caveats: None.
  *
- * $Id: BANCommand.cc,v 1.1 2001/01/13 20:51:33 gte Exp $
+ * $Id: BANCommand.cc,v 1.2 2001/01/17 19:50:54 gte Exp $
  */
 
 #include	<string>
@@ -19,7 +19,7 @@
 #include	"Network.h"
 #include	"levels.h"
 
-const char BANCommand_cc_rcsId[] = "$Id: BANCommand.cc,v 1.1 2001/01/13 20:51:33 gte Exp $" ;
+const char BANCommand_cc_rcsId[] = "$Id: BANCommand.cc,v 1.2 2001/01/17 19:50:54 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -46,6 +46,13 @@ bool BANCommand::Exec( iClient* theClient, const string& Message )
 	    return false;
 	} 
 
+ 	/* Check the bot is in the channel. */
+ 
+	if (!theChan->getInChan()) {
+		bot->Notice(theClient, "I'm not in that channel!");
+		return false;
+	}
+ 
 	// Is the user authorised?
 	 
 	sqlUser* theUser = bot->isAuthed(theClient, true);

@@ -1,7 +1,7 @@
 /* sqlChannel.h */
 
 #ifndef __SQLCHANNEL_H
-#define __SQLCHANNEL_H "$Id: sqlChannel.h,v 1.10 2001/01/05 06:44:05 gte Exp $"
+#define __SQLCHANNEL_H "$Id: sqlChannel.h,v 1.11 2001/01/17 19:50:54 gte Exp $"
 
 #include	<string>
 #include	<ctime>
@@ -69,7 +69,10 @@ public:
 	
 	inline const time_t&		getRegisteredTS() const
 		{ return registered_ts ; }
-	
+
+	inline const time_t&		getChannelTS() const
+		{ return channel_ts ; } 
+
 	inline const string&		getChannelMode() const
 		{ return channel_mode ; }
 	
@@ -81,6 +84,9 @@ public:
 	
 	inline const time_t&		getLastUpdated() const
 		{ return last_updated ; }
+
+	inline const bool& 			getInChan() const
+		{ return inChan; }
 
 	// Load channel data from the backend using the channel name as a key.
 	bool loadData( const string& );
@@ -120,6 +126,9 @@ public:
 	inline void setRegisteredTS( const time_t& _registered_ts )
 		{ registered_ts = _registered_ts; }
 
+	inline void setChannelTS( const time_t& _channel_ts )
+		{ channel_ts = _channel_ts; } 
+
 	inline void setChannelMode( const string& _channel_mode )
 		{ channel_mode = _channel_mode; }
 
@@ -128,6 +137,9 @@ public:
 
 	inline void setChannelLimit( const unsigned int& _channel_limit )
 		{ channel_limit = _channel_limit; }
+
+	inline void setInChan( const bool& _inChan )
+		{ inChan = _inChan; }
 
 	// 'last_updated' is only altered during commit().
  
@@ -155,6 +167,7 @@ protected:
 	string		channel_key ;
 	unsigned int	channel_limit ;
 	time_t		last_updated ; 
+	bool		inChan;
 	PgDatabase*	SQLDb;
 } ;
 

@@ -213,33 +213,35 @@ int cservice::BurstChannels()
 	 */ 
 	strstream theQuery;
 	theQuery << "SELECT " << sql::channel_fields << " FROM channels WHERE lower(name) <> '*' AND registered_ts <> 0" << ends;
-	elog << "cmaster::BurstChannels> " << theQuery.str() << endl;
-	string id;
-	time_t chanTime;
+	elog << "cmaster::BurstChannels> " << theQuery.str() << endl; 
 
 	if ((status = SQLDb->Exec(theQuery.str())) == PGRES_TUPLES_OK)
 	{
 		for (int i = 0 ; i < SQLDb->Tuples (); i++)
 		{ 
+ 
+			/* Add this information to the channel cache. */
+
+			sqlChannel* newChan = new sqlChannel(SQLDb);
+			newChan->setAllMembers(i);
+			sqlChannelCache.insert(sqlChannelHashType::value_type(newChan->getName(), newChan));
+
 			/*
 			 *  Check the auto-join flag is set, if so - join. :)
 			 */ 
 
-			id = SQLDb->GetValue(i, 1);
-			chanTime = atoi(SQLDb->GetValue(i, 9));
-
-			MyUplink->JoinChannel( this, id, SQLDb->GetValue( i,  10), chanTime, true );
-			MyUplink->RegisterChannelEvent( id, this ) ;
+			if (newChan->getFlag(sqlChannel::F_AUTOJOIN))
+			{
+				MyUplink->JoinChannel( this, 
+					newChan->getName(), newChan->getChannelMode(), newChan->getChannelTS(), true ); 
+				MyUplink->RegisterChannelEvent( newChan->getName(), this ) ;
+				newChan->setInChan(true);
+			}
 
 			// Update the interal channel record to reflect the modes fetched for
-			// this channel from the database.
-
-			// Add this information to the channel cache.
-			
-			sqlChannel* theChan = new sqlChannel(SQLDb);
-			theChan->setAllMembers(i);
-			sqlChannelCache.insert(sqlChannelHashType::value_type(id, theChan));
-		}
+			// this channel from the database?  should be doing in 'JoinChannel'.
+		
+	}
 	}
 
 	return xClient::BurstChannels();
@@ -444,7 +446,7 @@ int cservice::OnCTCP( iClient* theClient, const string& CTCP,
 
 	if(Command == "VERSION")
 	{
-		xClient::DoCTCP(theClient, CTCP.c_str(), "Undernet P10 Channel Services Version 2 [" __DATE__ " " __TIME__ "] ($Id: cservice.cc,v 1.46 2001/01/16 23:40:23 gte Exp $)");
+		xClient::DoCTCP(theClient, CTCP.c_str(), "Undernet P10 Channel Services Version 2 [" __DATE__ " " __TIME__ "] ($Id: cservice.cc,v 1.47 2001/01/17 19:50:54 gte Exp $)");
 		return true;
 	}
  

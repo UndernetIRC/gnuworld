@@ -16,7 +16,7 @@
  *
  * Caveats: None
  *
- * $Id: VOICECommand.cc,v 1.10 2001/01/16 01:31:40 gte Exp $
+ * $Id: VOICECommand.cc,v 1.11 2001/01/17 19:50:54 gte Exp $
  */
 
 #include	<string>
@@ -31,7 +31,7 @@
 
 using std::map ;
 
-const char VOICECommand_cc_rcsId[] = "$Id: VOICECommand.cc,v 1.10 2001/01/16 01:31:40 gte Exp $" ;
+const char VOICECommand_cc_rcsId[] = "$Id: VOICECommand.cc,v 1.11 2001/01/17 19:50:54 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -69,6 +69,13 @@ bool VOICECommand::Exec( iClient* theClient, const string& Message )
 			st[1].c_str());
 		return false;
 	} 
+
+ 	/* Check the bot is in the channel. */
+ 
+	if (!theChan->getInChan()) {
+		bot->Notice(theClient, "I'm not in that channel!");
+		return false;
+	}
 
 	/*
 	 *  Check the user has sufficient access on this channel.

@@ -8,7 +8,7 @@
  *
  * Caveats: SET LANG is still under consideration.
  *
- * $Id: SETCommand.cc,v 1.3 2001/01/16 01:31:40 gte Exp $
+ * $Id: SETCommand.cc,v 1.4 2001/01/17 19:50:54 gte Exp $
  */
 
 #include	<string>
@@ -20,7 +20,7 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char SETCommand_cc_rcsId[] = "$Id: SETCommand.cc,v 1.3 2001/01/16 01:31:40 gte Exp $" ;
+const char SETCommand_cc_rcsId[] = "$Id: SETCommand.cc,v 1.4 2001/01/17 19:50:54 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -378,8 +378,19 @@ bool SETCommand::Exec( iClient* theClient, const string& Message )
 		bot->Notice(theClient, "AUTOJOIN: You do not have enough access!");
 		return true;
 	    }
-	    if(value == "ON") theChan->setFlag(sqlChannel::F_AUTOJOIN);
-	    else if(value == "OFF") theChan->removeFlag(sqlChannel::F_AUTOJOIN);
+	    if(value == "ON") 
+	    { 
+	    	theChan->setFlag(sqlChannel::F_AUTOJOIN);
+			theChan->setInChan(true);
+			bot->Join(theChan->getName(), theChan->getChannelMode(), 
+				theChan->getChannelTS(), true); 
+		}
+	    else if(value == "OFF") 
+	    { 
+	    	theChan->removeFlag(sqlChannel::F_AUTOJOIN);
+			theChan->setInChan(false);
+			bot->Part(theChan->getName());
+		}
 	    else
 	    {
 		bot->Notice(theClient, "value of AUTOJOIN must be ON or OFF");
