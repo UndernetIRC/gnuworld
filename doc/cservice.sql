@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------------
--- "$Id: cservice.sql,v 1.6 2000/12/10 19:10:28 gte Exp $"
+-- "$Id: cservice.sql,v 1.7 2000/12/10 19:59:49 gte Exp $"
 -- Channel service DB SQL file for PostgreSQL.
 
 -- ChangeLog:
@@ -162,7 +162,7 @@ CREATE INDEX levels_access_idx ON levels( access ) ;
 
 CREATE TABLE channellog (
 	ts TIMESTAMP,
-	channelID INT4 CONSTRAINT channel_log_ref REFERENCES channels ( channelID ),
+	channelID INT4 CONSTRAINT channel_log_ref REFERENCES channels ( id ),
 	message TEXT,
 	last_updated TIMESTAMP NOT NULL DEFAULT now()
 );
