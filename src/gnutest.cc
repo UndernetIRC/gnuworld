@@ -99,6 +99,7 @@ if( st[ 0 ] == "invite" || st[ 0 ] == "INVITE" )
 	{
 	Invite( theClient, st[ 1 ] ) ;
 	}
+/*
 else if( st[ 0 ] == "moo" )
 	{
 	if( st.size() < 2 )
@@ -109,6 +110,7 @@ else if( st[ 0 ] == "moo" )
 	string raw = st.assemble( 1 ) ;
 	Write( raw ) ;
 	}
+*/
 
 return xClient::OnPrivateMessage( theClient, message ) ;
 }
