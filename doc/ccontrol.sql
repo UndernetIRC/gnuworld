@@ -1,4 +1,4 @@
--- "$Id: ccontrol.sql,v 1.16 2001/07/29 13:33:19 mrbean_ Exp $"
+-- "$Id: ccontrol.sql,v 1.17 2001/08/13 15:10:52 mrbean_ Exp $"
 -- 2001-13-02  : |MrBean|
 -- Added level patch for ccontrol module
 
@@ -98,5 +98,13 @@ CREATE TABLE commands (
 	NoLog      BOOLEAN NOT NULL DEFAULT 'n',
 	MinLevel   INT4 NOT NULL DEFAULT '1',
 	SAccess BOOLEAN NOT NULL DEFAULT 'n'
+	);
+
+CREATE TABLE notes (
+	user_id	INT4 NOT NULL REFERENCES opers (user_id),
+	sentby TEXT NOT NULL,
+	postedOn INT4 NOT NULL,
+	IsNew BOOLEAN NOT NULL DEFAULT 'n',
+	note VARCHAR (512)
 	);
 	

@@ -26,9 +26,9 @@
 #include        "server.h"
 #include 	"gline.h"
 #include	"commLevels.h"
-
+//#include	"CommandsDec.h"
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.65 2001/07/29 22:44:06 dan_karrels Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.66 2001/08/13 15:10:53 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -1407,7 +1407,7 @@ return NULL ;
 ccGline* ccontrol::findGline( const string& HostName )
 {
 ccGline *theGline;
-for(glineIterator ptr = glineList.begin(); ptr != glineList.end();ptr++)
+for(glineIterator ptr = glineList.begin(); ptr != glineList.end();++ptr)
 	{
 	theGline = *ptr;
     	if(theGline->getHost() == HostName)
@@ -1638,7 +1638,7 @@ if(strchr(Host,'*') == NULL)
 return FORCE_NEEDED_HOST;
 }*/
 
-int ccontrol::checkGline(const string Host,unsigned int Len,int *Affected)
+int ccontrol::checkGline(const string Host,unsigned int Len,unsigned int &Affected)
 {
 
 const unsigned int isWildCard = 0x01;
@@ -1647,19 +1647,29 @@ unsigned int Mask = 0;
 unsigned int Dots = 0;
 unsigned int GlineType = isIP;
 bool ParseEnded = false;
-for(string::size_type pos = 0; pos < Host.size();++pos)
+int retMe = 0;
+string::size_type pos = Host.find_first_of('@');
+string Hostname = Host.substr(pos+1);
+if(Len > gline::MFGLINE_TIME)  //Check for maximum time
+	retMe |= gline::BAD_TIME;
+if((signed int) Len < 0)
+	retMe |= gline::NEG_TIME;
+
+for(string::size_type pos = 0; pos < Hostname.size();++pos)
 	{
-	if(Host[pos] =='.')
+	if(Hostname[pos] =='.')
 		{
 		Dots++;
 		if((GlineType & (isWildCard | isIP)) == isIP)
-			Mask+=8;
+			Mask+=8; //Keep track of the mask
 		}
-	else if((Host[pos] =='*') || (Host[pos] == '?'))
+	else if((Hostname[pos] =='*') || (Hostname[pos] == '?'))
 		GlineType |= isWildCard;
-	else if(Host[pos] == '/')
+	else if(Hostname[pos] == '/')
 		{
-		if(!(GlineType & isIP)) //must be an ip to specify 
+		//For now not handled, return a bad host
+		retMe |= gline::BAD_HOST;
+		/*if(!(GlineType & isIP)) //must be an ip to specify 
 			return gline::BAD_HOST;
 		 Mask = atol((Host.substr(++pos)).c_str());
 		 if(!(Mask) || (Mask > 32))
@@ -1667,27 +1677,32 @@ for(string::size_type pos = 0; pos < Host.size();++pos)
 		 if(Mask < 32)
 			GlineType |= isWildCard;
 		 ParseEnded = true;			
-		 break;
+		 break;*/
+		 
 		 }
-	else if((Host[pos] > '9') || (Host[pos] < '0'))
+	else if((Hostname[pos] > '9') || (Hostname[pos] < '0')) 
 		GlineType &= ~isIP;
 	}
 
 
-if((Dots > 3) && (GlineType & isIP)) //IP addy can have more than 3 dots
-	return gline::BAD_HOST;
-
+Affected = Network->countMatchingUserHost(Host); //Calculate the number of affected
+if((Dots > 3) && (GlineType & isIP)) //IP addy cant have more than 3 dots
+	retMe |= gline::BAD_HOST;
 if((GlineType & (isIP || isWildCard) == isIP) && !(ParseEnded))
-	Mask +=8;
-
+	Mask +=8; //Add the last mask count if needed
 if((GlineType & isIP) && (Mask < 24))
-	return gline::HUH_NO_HOST;
-
-if(!(GlineType & isIP) && (Dots < 2))
-	return gline::HUH_NO_HOST;
-
-return GlineType & isWildCard ? gline::FORCE_NEEDED_HOST : gline::GLINE_OK;
-
+	retMe |= gline::HUH_NO_HOST;  //Its too wide
+if(!(GlineType & isIP) && (Dots < 2) && (GlineType & isWildCard))
+	retMe |= gline::HUH_NO_HOST; //Wildcard gline must have atleast 2 dots
+if((Affected > gline::MFGLINE_USERS) && (GlineType & isWildCard))
+	retMe |= gline::FORCE_NEEDED_USERS; //This gline must be set with -fu flag
+if(Len > gline::MGLINE_TIME)
+	retMe |= gline::FORCE_NEEDED_TIME;
+if(GlineType & (isWildCard & (Len > gline::MGLINE_WILD_TIME)))
+	retMe |= gline::FORCE_NEEDED_WILDTIME;
+if(!retMe)
+	retMe = gline::GLINE_OK;
+return retMe;
 }
 
 bool ccontrol::isSuspended(AuthInfo *theUser)
@@ -2209,7 +2224,7 @@ void ccontrol::listGlines( iClient *theClient )
 
 ccGline* tempGline;
 Notice(theClient,"-= Gline List =-");
-for(glineIterator ptr = gline_begin();ptr != gline_end();ptr++)
+for(glineIterator ptr = gline_begin();ptr != gline_end();++ptr)
 	{
 	tempGline =*ptr;
 	if(tempGline ->getExpires() > ::time(0))

@@ -19,7 +19,7 @@
 #include	"Gline.h"
 #include	"gline.h"
 
-const char FORCEGLINECommand_cc_rcsId[] = "$Id: FORCEGLINECommand.cc,v 1.7 2001/07/30 16:58:39 mrbean_ Exp $";
+const char FORCEGLINECommand_cc_rcsId[] = "$Id: FORCEGLINECommand.cc,v 1.8 2001/08/13 15:10:53 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -47,6 +47,18 @@ if( st.size() < 3 )
 
 StringTokenizer::size_type pos = 1 ;
 
+bool Forced = false;
+
+if(!strcasecmp(st[pos],"-fu"))
+	{
+	Forced = true;
+	pos++;
+	if( st.size() < 4 )
+		{
+		Usage( theClient ) ;
+		return true ;
+		}
+	}
 time_t gLength = bot->getDefaultGlineLength() ;
 
 // (pos) is the index of the next token, the user@host mask.
@@ -63,9 +75,10 @@ if( string::npos == atPos )
 string userName = st[ pos ].substr( 0, pos ) ;
 string hostName = st[ pos ].substr( pos + 1 ) ;
 string Length;
-Length.assign(st[2]);
+Length.assign(st[pos+1]);
 unsigned int Units = 1; //Defualt for seconds
 unsigned int ResStart = 1;
+bool Ok = true;
 if(!strcasecmp(Length.substr(Length.length()-1).c_str(),"d"))
 	{
 	Units = 24*3600;
@@ -90,33 +103,96 @@ if(gLength == 0)
 	{
 	gLength = bot->getDefaultGlineLength() ;
 	bot->Notice(theClient,"No duration was set, setting to %d seconds by default",gLength) ;
+	ResStart = 1;
 	}
-int Users;
-switch(bot->checkGline(hostName,gLength,&Users))
+AuthInfo *tmpAuth = bot->IsAuth(theClient->getCharYYXXX());
+if(!tmpAuth)
+	{ // We shouldnt have got here in the first place, but check it anyway
+	return false;
+	}
+if((Forced) && (tmpAuth->getFlags() < operLevel::SMTLEVEL))
 	{
-	case gline::FORCE_NEEDED_HOST:
-	    bot->MsgChanLog("%s is using forcegline to gline %s\n",theClient->getNickName().c_str(),st[pos].c_str());
-	    break;
-	case gline::FORCE_NEEDED_TIME:
-	    bot->MsgChanLog("%s is using forcegline to force a 2+ days gline\n",theClient->getNickName().c_str());
-	    break;
-	case gline::FORCE_NEEDED_USERS:
-	    bot->MsgChanLog("%s is using forcegline to gline more than 32 users\n",theClient->getNickName().c_str());
-	    break;
-	case gline::HUH_NO_HOST:
-	    bot->Notice(theClient,"I dont think glining *@* is such a good idea, do you?");
-	    return false;
-	case gline::HUH_NO_USERS:
-	    bot->Notice(theClient,"Glining more than 256 ppl is a NoNo");
-	    return false;
-	case gline::BAD_HOST:
-	    bot->Notice(theClient,"illegal host");
-	    return false;
+	bot->Notice(theClient,"Only smt+ can use the -fu option");
+	}
+	
+unsigned int Users;
+int gCheck = bot->checkGline(st[pos],gLength,Users);
+
+if(gCheck & gline::NEG_TIME)
+	{
+	bot->Notice(theClient,"Hmmz, dont you think that giving a negative time is kinda stupid?");
+	Ok = false;
 	}	
+
+if(gCheck & gline::HUH_NO_HOST)
+	{
+	bot->Notice(theClient,"I dont think glining that host is such a good idea, do you?");
+	Ok = false;
+	}
+if(gCheck & gline::BAD_HOST)
+	{
+	bot->Notice(theClient,"illegal host");
+	Ok = false;
+	}
+if(gCheck & gline::BAD_TIME)
+	{
+	bot->Notice(theClient,"Glining for more than %d seconds is a NoNo",gline::MFGLINE_TIME);
+	Ok = false;
+	}
+if((gCheck & gline::FORCE_NEEDED_USERS) && (Ok))
+	{
+	if(Forced)
+		{
+		bot->MsgChanLog("%s is using the force flag to gline %d users under the host of (%s@%s)"
+		,theClient->getNickName().c_str()
+		,Users,userName.c_str(),hostName.c_str());
+		}
+	else
+		{
+		Ok = false;
+		if(tmpAuth->getFlags() < operLevel::SMTLEVEL)
+			{
+			bot->Notice(theClient,"Sorry but you cant set a gline which affects more than %d users"
+			,gline::MFGLINE_USERS);
+			}
+		else
+			{
+			bot->Notice(theClient,"This gline affects more than %d users, please use the -fu flag"
+			,gline::MFGLINE_USERS);
+			}
+		
+		}
+	}
+if((gCheck & gline::FORCE_NEEDED_HOST) && (Ok))
+	{	
+	bot->MsgChanLog("%s is using forcegline to gline a forbidden host (%s@%s)"
+	,theClient->getNickName().c_str()
+	,userName.c_str(),hostName.c_str());
+	}
+if((gCheck & gline::FORCE_NEEDED_TIME) && (Ok))
+	{
+	bot->MsgChanLog("%s is using forcegline to gline for %s seconds"
+	,gLength);
+	}
+if(gCheck & gline::FORCE_NEEDED_WILDTIME)
+	{
+	bot->MsgChanLog("%s is using forcegline to gline a wildcard host for more than %d seconds"
+	,theClient->getNickName().c_str()
+	,gline::MGLINE_WILD_TIME);
+	}
+if(!Ok)
+	{
+	bot->Notice(theClient,"Please fix all of the above, and try again");
+	return false;
+	}
+
 
 // Avoid passing a reference to a temporary variable.
 string nickUserHost = theClient->getNickUserHost() ;
 string Reason = st.assemble( pos + ResStart );
+char Us[100];
+Us[0] = '\0';
+sprintf(Us,"%d",Users);
 if(Reason.size() > 255)
 	{
 	bot->Notice(theClient,"Gline reason can't be more than 255 chars");
@@ -124,7 +200,7 @@ if(Reason.size() > 255)
 	}
 server->setGline( nickUserHost,
 	st[ pos ],
-	st.assemble( pos + ResStart ),
+	st.assemble( pos + ResStart ) + "[" + Us + "]",
 	gLength ) ;
 
 ccGline *TmpGline = bot->findGline(st[pos]);

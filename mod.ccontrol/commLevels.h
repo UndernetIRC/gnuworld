@@ -71,17 +71,19 @@ const unsigned long int flg_LISTIGNORES = 0x40;
 const unsigned long int flg_REMIGNORE = 0x80;
 const unsigned long int flg_LIST 	 = 0x100;
 const unsigned long int flg_COMMANDS  = 0x200;
+const unsigned long int flg_NOTES = 0x400;
 
 /*
  Default commands that are added upon adding a new oper
 */
 
 const unsigned long int OPER = flg_ACCESS | flg_HELP | flg_DEAUTH | flg_NEWPASS 
-		   | flg_MODE | flg_OP | flg_DEOP | flg_MODERATE 
-		   | flg_UNMODERATE | flg_INVITE | flg_GLINE | flg_SGLINE 
-		   | flg_REMGLINE | flg_LOPCHN | flg_CHINFO | flg_WHOIS 
-		   | flg_TRANS | flg_KICK | flg_CLEARCHAN | flg_LISTHOSTS;
-const unsigned long int SOPER = flg_CHECKNET | flg_LISTIGNORES | flg_LIST;
+			| flg_MODE | flg_OP | flg_DEOP | flg_MODERATE 
+		        | flg_UNMODERATE | flg_INVITE | flg_GLINE | flg_SGLINE 
+			| flg_REMGLINE | flg_LOPCHN | flg_CHINFO | flg_WHOIS 
+			| flg_TRANS | flg_KICK | flg_CLEARCHAN | flg_LISTHOSTS;
+const unsigned long int SOPER = flg_CHECKNET | flg_LISTIGNORES | flg_LIST 
+			| flg_NOTES;
 const unsigned long int ADMIN = OPER | flg_JUPE | flg_REMOPCHN | flg_ADDOPCHN 
 			| flg_ADDNOP | flg_REMOP |flg_MODOP | flg_ADDCMD 
 			| flg_DELCMD | flg_SUSPEND | flg_UNSUSPEND 

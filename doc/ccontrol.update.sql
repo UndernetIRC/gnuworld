@@ -1,5 +1,5 @@
 
--- "$Id: ccontrol.update.sql,v 1.5 2001/07/29 13:33:19 mrbean_ Exp $"
+-- "$Id: ccontrol.update.sql,v 1.6 2001/08/13 15:10:52 mrbean_ Exp $"
 
 -- ccontrol database changes update
 -- this file will add the new features to an old database
@@ -42,3 +42,11 @@ CREATE TABLE commands (
 -- For those who already have the commands table
 ALTER  TABLE commands add SAccess BOOLEAN NOT NULL DEFAULT 'n';
 
+-- Add the notes table
+CREATE TABLE notes (
+	user_id	INT4 NOT NULL REFERENCES opers (user_id),
+	sentby TEXT NOT NULL,
+	postedOn INT4 NOT NULL,
+	IsNew BOOLEAN NOT NULL DEFAULT 'n',
+	note VARCHAR (512)
+	);

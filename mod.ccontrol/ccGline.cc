@@ -3,7 +3,7 @@
  * 
  * Gline class
  * 
- * $Id: ccGline.cc,v 1.7 2001/07/23 10:28:51 mrbean_ Exp $
+ * $Id: ccGline.cc,v 1.8 2001/08/13 15:10:53 mrbean_ Exp $
  */
  
 #include	<strstream>
@@ -19,7 +19,7 @@
 #include	"ccGline.h" 
 
 const char ccGline_h_rcsId[] = __CCGLINE_H ;
-const char ccGline_cc_rcsId[] = "$Id: ccGline.cc,v 1.7 2001/07/23 10:28:51 mrbean_ Exp $" ;
+const char ccGline_cc_rcsId[] = "$Id: ccGline.cc,v 1.8 2001/08/13 15:10:53 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -47,6 +47,27 @@ ccGline::~ccGline()
 
 bool ccGline::Insert()
 {
+//First we gotta make sure, there is no old gline in the database
+static const char *Del = "DELETE FROM glines WHERE host = '";
+
+strstream delQuery;
+delQuery	<< Del
+		<< Host << "'"
+		<< ends;
+
+
+ExecStatusType status = SQLDb->Exec( delQuery.str() ) ;
+delete[] delQuery.str() ;
+
+if( PGRES_COMMAND_OK != status ) 
+	{
+	elog	<< "ccGline::DeleteOnInsert> SQL Failure: "
+		<< SQLDb->ErrorMessage()
+		<< endl ;
+
+	return false ;
+	}
+//Now insert the new one
 static const char *Main = "INSERT into Glines (Host,AddedBy,AddedOn,ExpiresAt,Reason) VALUES ('";
 
 strstream theQuery;
@@ -62,7 +83,7 @@ elog	<< "Gline::Insert::sqlQuery> "
 	<< theQuery.str()
 	<< endl; 
 
-ExecStatusType status = SQLDb->Exec( theQuery.str() ) ;
+status = SQLDb->Exec( theQuery.str() ) ;
 delete[] theQuery.str() ;
 
 if( PGRES_COMMAND_OK == status ) 

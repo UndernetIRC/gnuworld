@@ -3,7 +3,7 @@
  */
 
 #ifndef __CCONTROL_H
-#define __CCONTROL_H "$Id: ccontrol.h,v 1.40 2001/07/26 20:12:40 mrbean_ Exp $"
+#define __CCONTROL_H "$Id: ccontrol.h,v 1.41 2001/08/13 15:10:53 mrbean_ Exp $"
 
 
 #include	<string>
@@ -30,6 +30,7 @@
 #include 	"ccException.h"
 #include        "server.h"
 //#include 	"gline.h"
+#include	"CommandsDec.h"
 
 namespace gnuworld
 {
@@ -463,7 +464,7 @@ public:
 
 //	int CheckGline(const char *, unsigned int);
 	
-	int checkGline(const string ,unsigned int ,int *);
+	int checkGline(const string ,unsigned int ,unsigned int &);
 
 	bool isSuspended(AuthInfo *);
 
