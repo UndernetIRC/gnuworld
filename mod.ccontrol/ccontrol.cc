@@ -21,9 +21,9 @@
 #include	"libpq++.h"
 #include	"ccontrol.h"
 #include	"AuthInfo.h"
-
+#include        "server.h"
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.32 2001/05/05 19:53:20 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.33 2001/05/07 19:02:15 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -1528,5 +1528,31 @@ MailTo);
 system(SendMail);
 return true;
 }
+
+int ccontrol::CheckGline(const char * GlineHost)
+{
+
+
+if(!strcasecmp(GlineHost,"*@*"))
+	return HUH_NO;
+
+char *User;
+char *Host;
+char *TPos;
+
+if(!strcasecmp(GlineHost,"*@*"))
+	return HUH_NO;
+TPos = strchr(GlineHost,'@');
+User = new char[(TPos - GlineHost) + 1];			
+Host = new char[(GlineHost + strlen(GlineHost)) - TPos +1];
+strncpy(User,GlineHost,TPos - GlineHost);
+strcpy(Host,TPos+1);
+if(!strcasecmp(Host,"*"))
+	return HUH_NO;
+if(strchr(Host,'*') == NULL)
+	return GLINE_OK;
+return FORCE_NEEDED;
+}
+
 
 } // namespace gnuworld

@@ -20,7 +20,7 @@
 #include	"Numeric.h"
 
 const char xNetwork_h_rcsId[] = __NETWORK_H ;
-const char xNetwork_cc_rcsId[] = "$Id: Network.cc,v 1.22 2001/03/31 01:26:10 dan_karrels Exp $" ;
+const char xNetwork_cc_rcsId[] = "$Id: Network.cc,v 1.23 2001/05/07 19:02:15 mrbean_ Exp $" ;
 const char ELog_h_rcsId[] = __ELOG_H ;
 const char iClient_h_rcsId[] = __ICLIENT_H ;
 const char Channel_h_rcsId[] = __CHANNEL_H ;
@@ -527,7 +527,6 @@ clients[ YY ].clear() ;
 
 iServer* retMe = servers[ YY ] ;
 servers[ YY ] = NULL ;
-
 return retMe ;
 }
 
@@ -734,5 +733,6 @@ for( clientVectorType::size_type clientID = 0 ;
 // Return the number of clients found to the caller
 return numClients ;
 }
+
 
 } // namespace gnuworld

@@ -4,6 +4,10 @@
  * Glines a specific mask 
  */
 
+#define HUH_NO 3
+#define FORCE_NEEDED 2
+#define GLINE_OK 1;
+
 #include	<string>
 #include	<cstdlib>
 #include        <iomanip.h>
@@ -18,7 +22,7 @@
 #include	"ELog.h"
 #include	"Gline.h"
 
-const char GLINECommand_cc_rcsId[] = "$Id: GLINECommand.cc,v 1.5 2001/04/24 17:36:40 gte Exp $";
+const char GLINECommand_cc_rcsId[] = "$Id: GLINECommand.cc,v 1.6 2001/05/07 19:02:15 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -71,10 +75,22 @@ if( string::npos == atPos )
 string userName = st[ pos ].substr( 0, pos ) ;
 string hostName = st[ pos ].substr( pos + 1 ) ;
 
-if( hostName.find_first_of( '*' ) != string::npos )
+if(bot->CheckGline(st[ pos ].c_str()) == FORCE_NEEDED)
 	{
-	// Wildcard in hostname, do nothing for now.
+	bot->Notice(theClient,"Please use forcegline to ban that host, for that period of time");
+	return false;
 	}
+else if(bot->CheckGline(st[ pos ].c_str()) == HUH_NO)
+	{
+	bot->Notice(theClient,"Hmmm naaaaaaaa i dont think so ... ");
+	return false;
+	}
+
+/*if( hostName.find_first_of( '*' ) != string::npos )
+	{
+	
+	// Wildcard in hostname, do nothing for now.
+	}*/
 
 // Avoid passing a reference to a temporary variable.
 string nickUserHost = theClient->getNickUserHost() ;
@@ -89,8 +105,8 @@ s	<< server->getCharYY() << " WA :"
         << theClient->getNickName().c_str()
 	<< " is adding gline for: "
 	<< st[ pos ]
-	<< ", expires at " << (time( 0 ) + gLength)
-	<< " reason: " << st.assemble( pos + 1 )
+	<< ", expires at " << bot->convertToAscTime((time( 0 ) + gLength))
+	<< " for: " << st.assemble( pos + 1 )
 	<< ends ;
 bot->Write( s ) ;
 delete[] s.str() ;

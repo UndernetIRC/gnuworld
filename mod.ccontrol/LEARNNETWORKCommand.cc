@@ -15,7 +15,7 @@
 #include	"Network.h"
 #include        "stdlib.h"
 
-const char LEARNNETWORKCommand_cc_rcsId[] = "$Id: LEARNNETWORKCommand.cc,v 1.4 2001/05/02 21:10:18 mrbean_ Exp $";
+const char LEARNNETWORKCommand_cc_rcsId[] = "$Id: LEARNNETWORKCommand.cc,v 1.5 2001/05/07 19:02:15 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -29,7 +29,7 @@ ccServer* NewServer = new ccServer(bot->SQLDb);
 assert(NewServer != NULL);
 unsigned int AddedServers = 0;
 
-bot->MsgChanLog("Learning network status at the request of : %s\n",theClient->getCharYYXXX().c_str());
+bot->MsgChanLog("Learning network status at the request of : %s\n",theClient->getNickName().c_str());
 
 xNetwork::serverIterator ptr = Network->server_begin();
 xNetwork::serverIterator end = Network->server_end();

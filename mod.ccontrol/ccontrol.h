@@ -3,7 +3,12 @@
  */
 
 #ifndef __CCONTROL_H
-#define __CCONTROL_H "$Id: ccontrol.h,v 1.22 2001/05/05 19:53:20 mrbean_ Exp $"
+#define __CCONTROL_H "$Id: ccontrol.h,v 1.23 2001/05/07 19:02:15 mrbean_ Exp $"
+
+#define HUH_NO 3
+#define FORCE_NEEDED 2
+#define GLINE_OK 1;
+
 
 #include	<string>
 #include	<vector>
@@ -25,7 +30,7 @@
 #include	"AuthInfo.h"
 #include        "ccGline.h"
 #include        "ccServer.h"
-
+#include        "server.h"
 namespace gnuworld
 {
  
@@ -293,13 +298,15 @@ public:
 
 	char *convertToAscTime(time_t);	
 
-	struct tm convertToTmTime(time_t NOW);
+	struct tm convertToTmTime(time_t );
 
 	bool CreateReport(time_t , time_t);	
 
-	bool ccontrol::MailReport(const char *, char *);
+	bool MailReport(const char *, char *);
 
-    	/**
+	int CheckGline(const char *);
+
+	/**
 	 * This is a constant iterator type used to perform a read-only
 	 * iteration of the operchan structure.
 	 */

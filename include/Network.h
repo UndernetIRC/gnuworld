@@ -3,7 +3,7 @@
  */
 
 #ifndef __NETWORK_H
-#define __NETWORK_H "$Id: Network.h,v 1.13 2001/03/31 01:26:10 dan_karrels Exp $"
+#define __NETWORK_H "$Id: Network.h,v 1.14 2001/05/07 19:02:14 mrbean_ Exp $"
 
 #include	<vector>
 #include	<string>
@@ -293,6 +293,7 @@ public:
 	 * nor deleted.
 	 */
 	virtual void		OnSplit( const unsigned int& intYY ) ;
+
 
 	/**
 	 * Define a non-const iterator for walking through the

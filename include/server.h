@@ -17,7 +17,7 @@
  */
 
 #ifndef __SERVER_H
-#define __SERVER_H "$Id: server.h,v 1.37 2001/05/05 19:53:20 mrbean_ Exp $"
+#define __SERVER_H "$Id: server.h,v 1.38 2001/05/07 19:02:15 mrbean_ Exp $"
 
 #include	<string>
 #include	<vector>
@@ -708,6 +708,11 @@ public:
 	 * expire.
 	 */
 	virtual void updateGlines() ;
+
+	/**
+	 * Deletes a juped server from the juped server list
+	 */
+	void RemoveJupe(iServer *);
 
 protected:
 
