@@ -18,9 +18,10 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: StringTokenizer.cc,v 1.1 2002/08/07 20:28:06 dan_karrels Exp $
+ * $Id: StringTokenizer.cc,v 1.2 2002/11/29 18:27:58 dan_karrels Exp $
  */
 
+#include	<new>
 #include	<vector>
 #include	<string>
 
@@ -30,7 +31,7 @@
 #include	"StringTokenizer.h"
 
 const char StringTokenizer_h_rcsId[] = __STRINGTOKENIZER_H ;
-const char StringTokenizer_cc_rcsId[] = "$Id: StringTokenizer.cc,v 1.1 2002/08/07 20:28:06 dan_karrels Exp $" ;
+const char StringTokenizer_cc_rcsId[] = "$Id: StringTokenizer.cc,v 1.2 2002/11/29 18:27:58 dan_karrels Exp $" ;
 const char config_h_rcsId[] = __CONFIG_H ;
 
 namespace gnuworld
@@ -92,7 +93,18 @@ if( buf.empty() )
 // addMe is the string which will be added to the vector
 // Initialize it to buf.size() empty characters to speed
 // up addition of characters onto the string
-string addMe ;
+// This method is only called once for the life of this object,
+// so no need for memory of any kind here.
+char*	addMe = new (std::nothrow) char[ buf.size() + 1 ] ;
+assert( addMe != 0 ) ;
+
+addMe[ 0 ] = 0 ;
+
+// (addMePtr) is used to walk down the addMe buffer, adding new
+// characters to the end.
+// (addMePtr) always points to the next location in the addMe ptr
+// in which a character may be placed.
+char*	addMePtr = addMe ;
 
 // currentPtr is the current character pointer
 string::const_iterator currentPtr = buf.begin() ;
@@ -109,17 +121,17 @@ for( ; currentPtr != endPtr ; ++currentPtr )
 	if( delimiter == *currentPtr )
 		{
 		// We have reached a delimiter
+		// Null terminate the token
+		*addMePtr = 0 ;
 
 		// Is this an empty token?
-		if( !addMe.empty() )
+		if( ! (*addMe) )
 			{
 			// Nope, go ahead and add it to the vector
 			array.push_back( addMe ) ;
 
-			// Clear the token string
-			// Silly GNU std::string class doesn't implement
-			// clear() method
-			addMe.erase( addMe.begin(), addMe.end() ) ;
+			addMePtr = addMe ;
+			*addMePtr = 0 ;
 			}
 		}
 
@@ -127,16 +139,23 @@ for( ; currentPtr != endPtr ; ++currentPtr )
 	// character to addMe
 	else
 		{
-		addMe += *currentPtr ;
+		*addMePtr = *currentPtr ;
+		++addMePtr ;
 		}
 	}
 
+// Null terminate, if necessary
+*addMePtr = 0 ;
+
 // currentPtr == endPtr
 // Make sure to check for last token
-if( !addMe.empty() )
+if( addMe[ 0 ] != 0 )
 	{
 	array.push_back( addMe ) ;
 	}
+
+// This point is always reached, excluding a crash
+delete[] addMe ;
 }
 
 /**
@@ -155,6 +174,7 @@ if( !validSubscript( start ) )
 
 // retMe will be returned at the end of the method
 string retMe ;
+retMe.reserve( totalChars() ) ;
 
 // continue while there are more tokens to concatenate
 for( size_type i = start ; i < size() ; i++ )
@@ -172,6 +192,22 @@ for( size_type i = start ; i < size() ; i++ )
 
 // Return the assembled string
 return retMe ;
+}
+
+StringTokenizer::size_type StringTokenizer::totalChars() const
+{
+size_type numChars = 0 ;
+
+for( const_iterator currentPtr = begin() ; currentPtr != end() ;
+	++currentPtr )
+	{
+	numChars += (*currentPtr).size() ;
+	}
+
+// Account for delimiters
+numChars += size() - 1 ;
+
+return numChars ;
 }
 
 } // namespace gnuworld

@@ -14,8 +14,6 @@
 
 @SET_MAKE@
 
-# "$Id: Makefile.in,v 1.19 2002/11/29 18:27:59 dan_karrels Exp $"
-
 srcdir = @srcdir@
 top_srcdir = @top_srcdir@
 VPATH = @srcdir@
@@ -140,57 +138,26 @@ sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 topdir = @topdir@
 
-lib_LTLIBRARIES = libnickserv.la
-libnickserv_la_LDFLAGS = -module -export-dynamic -L@PGSQL_LIB@ -lpq++
+bin_PROGRAMS = stringtokenizer
+stringtokenizer_SOURCES = stringtokenizer.cc
 
-libnickserv_la_SOURCES = \
-  Logger.cc              \
-  netData.cc             \
-  nickserv.cc            \
-  sqlManager.cc          \
-  sqlUser.cc             \
-  Stats.cc               \
-  INFOCommand.cc         \
-  INVITECommand.cc       \
-  MODUSERCommand.cc      \
-  RECOVERCommand.cc      \
-  REGISTERCommand.cc     \
-  SETCommand.cc          \
-  SHUTDOWNCommand.cc     \
-  STATSCommand.cc        \
-  WHOAMICommand.cc
-
-
-INCLUDES = -I@PGSQL_INCLUDE@ $(INCLTDL)
-subdir = mod.nickserv
+stringtokenizer_LDFLAGS = $(glibdir)/libgnuworld.la
+stringtokenizer_DEPENDENCIES = $(glibdir)/libgnuworld.la
+subdir = test
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = $(top_builddir)/include/defs.h
 CONFIG_CLEAN_FILES =
-LTLIBRARIES = $(lib_LTLIBRARIES)
+bin_PROGRAMS = stringtokenizer$(EXEEXT)
+PROGRAMS = $(bin_PROGRAMS)
 
-libnickserv_la_LIBADD =
-am_libnickserv_la_OBJECTS = Logger.lo netData.lo nickserv.lo \
-	sqlManager.lo sqlUser.lo Stats.lo INFOCommand.lo \
-	INVITECommand.lo MODUSERCommand.lo RECOVERCommand.lo \
-	REGISTERCommand.lo SETCommand.lo SHUTDOWNCommand.lo \
-	STATSCommand.lo WHOAMICommand.lo
-libnickserv_la_OBJECTS = $(am_libnickserv_la_OBJECTS)
+am_stringtokenizer_OBJECTS = stringtokenizer.$(OBJEXT)
+stringtokenizer_OBJECTS = $(am_stringtokenizer_OBJECTS)
+stringtokenizer_LDADD = $(LDADD)
 
 DEFAULT_INCLUDES =  -I. -I$(srcdir) -I$(top_builddir)/include
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
-@AMDEP_TRUE@DEP_FILES = ./$(DEPDIR)/INFOCommand.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/INVITECommand.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/Logger.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/MODUSERCommand.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/RECOVERCommand.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/REGISTERCommand.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/SETCommand.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/SHUTDOWNCommand.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/STATSCommand.Plo ./$(DEPDIR)/Stats.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/WHOAMICommand.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/netData.Plo ./$(DEPDIR)/nickserv.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/sqlManager.Plo ./$(DEPDIR)/sqlUser.Plo
+@AMDEP_TRUE@DEP_FILES = ./$(DEPDIR)/stringtokenizer.Po
 CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
 LTCXXCOMPILE = $(LIBTOOL) --mode=compile $(CXX) $(DEFS) \
@@ -199,9 +166,9 @@ LTCXXCOMPILE = $(LIBTOOL) --mode=compile $(CXX) $(DEFS) \
 CXXLD = $(CXX)
 CXXLINK = $(LIBTOOL) --mode=link $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) \
 	$(AM_LDFLAGS) $(LDFLAGS) -o $@
-DIST_SOURCES = $(libnickserv_la_SOURCES)
-DIST_COMMON = README ChangeLog Makefile.am Makefile.in
-SOURCES = $(libnickserv_la_SOURCES)
+DIST_SOURCES = $(stringtokenizer_SOURCES)
+DIST_COMMON = Makefile.am Makefile.in
+SOURCES = $(stringtokenizer_SOURCES)
 
 all: all-am
 
@@ -209,39 +176,41 @@ all: all-am
 .SUFFIXES: .cc .lo .o .obj
 $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ Makefile.am  $(top_srcdir)/configure.in $(ACLOCAL_M4)
 	cd $(top_srcdir) && \
-	  $(AUTOMAKE) --gnu  mod.nickserv/Makefile
+	  $(AUTOMAKE) --gnu  test/Makefile
 Makefile: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.in  $(top_builddir)/config.status
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@ $(am__depfiles_maybe)
-libLTLIBRARIES_INSTALL = $(INSTALL)
-install-libLTLIBRARIES: $(lib_LTLIBRARIES)
+binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
+install-binPROGRAMS: $(bin_PROGRAMS)
 	@$(NORMAL_INSTALL)
-	$(mkinstalldirs) $(DESTDIR)$(libdir)
-	@list='$(lib_LTLIBRARIES)'; for p in $$list; do \
-	  if test -f $$p; then \
-	    f="`echo $$p | sed -e 's|^.*/||'`"; \
-	    echo " $(LIBTOOL) --mode=install $(libLTLIBRARIES_INSTALL) $(INSTALL_STRIP_FLAG) $$p $(DESTDIR)$(libdir)/$$f"; \
-	    $(LIBTOOL) --mode=install $(libLTLIBRARIES_INSTALL) $(INSTALL_STRIP_FLAG) $$p $(DESTDIR)$(libdir)/$$f; \
+	$(mkinstalldirs) $(DESTDIR)$(bindir)
+	@list='$(bin_PROGRAMS)'; for p in $$list; do \
+	  p1=`echo $$p|sed 's/$(EXEEXT)$$//'`; \
+	  if test -f $$p \
+	     || test -f $$p1 \
+	  ; then \
+	    f=`echo "$$p1" | sed 's,^.*/,,;$(transform);s/$$/$(EXEEXT)/'`; \
+	   echo " $(INSTALL_PROGRAM_ENV) $(LIBTOOL) --mode=install $(binPROGRAMS_INSTALL) $$p $(DESTDIR)$(bindir)/$$f"; \
+	   $(INSTALL_PROGRAM_ENV) $(LIBTOOL) --mode=install $(binPROGRAMS_INSTALL) $$p $(DESTDIR)$(bindir)/$$f || exit 1; \
 	  else :; fi; \
 	done
 
-uninstall-libLTLIBRARIES:
+uninstall-binPROGRAMS:
 	@$(NORMAL_UNINSTALL)
-	@list='$(lib_LTLIBRARIES)'; for p in $$list; do \
-	    p="`echo $$p | sed -e 's|^.*/||'`"; \
-	  echo " $(LIBTOOL) --mode=uninstall rm -f $(DESTDIR)$(libdir)/$$p"; \
-	  $(LIBTOOL) --mode=uninstall rm -f $(DESTDIR)$(libdir)/$$p; \
+	@list='$(bin_PROGRAMS)'; for p in $$list; do \
+	  f=`echo "$$p" | sed 's,^.*/,,;s/$(EXEEXT)$$//;$(transform);s/$$/$(EXEEXT)/'`; \
+	  echo " rm -f $(DESTDIR)$(bindir)/$$f"; \
+	  rm -f $(DESTDIR)$(bindir)/$$f; \
 	done
 
-clean-libLTLIBRARIES:
-	-test -z "$(lib_LTLIBRARIES)" || rm -f $(lib_LTLIBRARIES)
-	@list='$(lib_LTLIBRARIES)'; for p in $$list; do \
-	  dir="`echo $$p | sed -e 's|/[^/]*$$||'`"; \
-	  test "$$dir" = "$$p" && dir=.; \
-	  echo "rm -f \"$${dir}/so_locations\""; \
-	  rm -f "$${dir}/so_locations"; \
+clean-binPROGRAMS:
+	@list='$(bin_PROGRAMS)'; for p in $$list; do \
+	  f=`echo $$p|sed 's/$(EXEEXT)$$//'`; \
+	  echo " rm -f $$p $$f"; \
+	  rm -f $$p $$f ; \
 	done
-libnickserv.la: $(libnickserv_la_OBJECTS) $(libnickserv_la_DEPENDENCIES) 
-	$(CXXLINK) -rpath $(libdir) $(libnickserv_la_LDFLAGS) $(libnickserv_la_OBJECTS) $(libnickserv_la_LIBADD) $(LIBS)
+stringtokenizer$(EXEEXT): $(stringtokenizer_OBJECTS) $(stringtokenizer_DEPENDENCIES) 
+	@rm -f stringtokenizer$(EXEEXT)
+	$(CXXLINK) $(stringtokenizer_LDFLAGS) $(stringtokenizer_OBJECTS) $(stringtokenizer_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT) core *.core
@@ -249,21 +218,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/INFOCommand.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/INVITECommand.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Logger.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MODUSERCommand.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/RECOVERCommand.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/REGISTERCommand.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SETCommand.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SHUTDOWNCommand.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/STATSCommand.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Stats.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/WHOAMICommand.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/netData.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nickserv.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sqlManager.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sqlUser.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/stringtokenizer.Po@am__quote@
 
 distclean-depend:
 	-rm -rf ./$(DEPDIR)
@@ -396,10 +351,10 @@ distdir: $(DISTFILES)
 	done
 check-am: all-am
 check: check-am
-all-am: Makefile $(LTLIBRARIES)
+all-am: Makefile $(PROGRAMS)
 
 installdirs:
-	$(mkinstalldirs) $(DESTDIR)$(libdir)
+	$(mkinstalldirs) $(DESTDIR)$(bindir)
 
 install: install-am
 install-exec: install-exec-am
@@ -427,8 +382,7 @@ maintainer-clean-generic:
 	@echo "it deletes files that may require special tools to rebuild."
 clean: clean-am
 
-clean-am: clean-generic clean-libLTLIBRARIES clean-libtool \
-	mostlyclean-am
+clean-am: clean-binPROGRAMS clean-generic clean-libtool mostlyclean-am
 
 distclean: distclean-am
 
@@ -445,7 +399,7 @@ info-am:
 
 install-data-am:
 
-install-exec-am: install-libLTLIBRARIES
+install-exec-am: install-binPROGRAMS
 
 install-info: install-info-am
 
@@ -470,20 +424,19 @@ ps: ps-am
 
 ps-am:
 
-uninstall-am: uninstall-info-am uninstall-libLTLIBRARIES
+uninstall-am: uninstall-binPROGRAMS uninstall-info-am
 
-.PHONY: CTAGS GTAGS all all-am check check-am clean clean-generic \
-	clean-libLTLIBRARIES clean-libtool ctags distclean \
-	distclean-compile distclean-depend distclean-generic \
-	distclean-libtool distclean-tags distdir dvi dvi-am info \
-	info-am install install-am install-data install-data-am \
+.PHONY: CTAGS GTAGS all all-am check check-am clean clean-binPROGRAMS \
+	clean-generic clean-libtool ctags distclean distclean-compile \
+	distclean-depend distclean-generic distclean-libtool \
+	distclean-tags distdir dvi dvi-am info info-am install \
+	install-am install-binPROGRAMS install-data install-data-am \
 	install-exec install-exec-am install-info install-info-am \
-	install-libLTLIBRARIES install-man install-strip installcheck \
-	installcheck-am installdirs maintainer-clean \
-	maintainer-clean-generic mostlyclean mostlyclean-compile \
-	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
-	tags uninstall uninstall-am uninstall-info-am \
-	uninstall-libLTLIBRARIES
+	install-man install-strip installcheck installcheck-am \
+	installdirs maintainer-clean maintainer-clean-generic \
+	mostlyclean mostlyclean-compile mostlyclean-generic \
+	mostlyclean-libtool pdf pdf-am ps ps-am tags uninstall \
+	uninstall-am uninstall-binPROGRAMS uninstall-info-am
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

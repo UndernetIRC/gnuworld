@@ -14,7 +14,7 @@
 
 @SET_MAKE@
 
-# "$Id: Makefile.in,v 1.109 2002/11/24 17:04:35 dan_karrels Exp $"
+# "$Id: Makefile.in,v 1.110 2002/11/29 18:28:00 dan_karrels Exp $"
 
 srcdir = @srcdir@
 top_srcdir = @top_srcdir@
@@ -97,6 +97,7 @@ RANLIB = @RANLIB@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
+TEST_DIR = @TEST_DIR@
 VERSION = @VERSION@
 ac_ct_CC = @ac_ct_CC@
 ac_ct_CXX = @ac_ct_CXX@

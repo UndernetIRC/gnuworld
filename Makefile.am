@@ -1,4 +1,4 @@
-## $Id: Makefile.am,v 1.7 2002/11/20 22:16:16 dan_karrels Exp $
+## $Id: Makefile.am,v 1.8 2002/11/29 18:27:52 dan_karrels Exp $
 
 @SET_MAKE@
-SUBDIRS = libgnuworld libltdl db src @MOD_DIRS@ @NETWORK_DIR@
+SUBDIRS = libgnuworld libltdl db src @MOD_DIRS@ @NETWORK_DIR@ @TEST_DIR@
