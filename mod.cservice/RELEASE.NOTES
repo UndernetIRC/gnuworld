@@ -1,7 +1,11 @@
 Newest changes at the top of the file:
-$Id: RELEASE.NOTES,v 1.14 2001/06/24 15:57:04 gte Exp $
+$Id: RELEASE.NOTES,v 1.15 2001/07/07 22:54:24 gte Exp $
 
-CMaster 1.0pl6 - Current
+CMaster 1.0pl7 - Current
+* Global suspend now logs a few extra details, and unsuspends
+  are now logged/displayed also.
+
+CMaster 1.0pl6 - 27/06/01
 * Disallow globally suspended users op's in registered 
   channels.
 * New channel setting, "Comments", for admins to note a quick
