@@ -16,7 +16,7 @@
 #include	"AuthInfo.h"
 #include	"misc.h"
 
-const char COMMANDSCommand_cc_rcsId[] = "$Id: COMMANDSCommand.cc,v 1.1 2001/07/26 20:12:40 mrbean_ Exp $";
+const char COMMANDSCommand_cc_rcsId[] = "$Id: COMMANDSCommand.cc,v 1.2 2001/07/27 12:10:49 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -182,11 +182,56 @@ else if(!strcasecmp(st[1],"-na"))
 		return true;
 		}
 	}
+else if(!strcasecmp(st[1],"-ml"))
+	{
+	unsigned int MINLEVEL;
+	if(st.size() < 4)
+		{
+		bot->Notice(theClient,"-ml must get a new min level");
+		return false;
+		}
+	if(!strcasecmp(st[3],"CODER"))
+		{
+		MINLEVEL = operLevel::CODERLEVEL;
+		}
+	else if(!strcasecmp(st[3],"SMT"))
+		{
+		MINLEVEL = operLevel::SMTLEVEL;
+		}
+	else if(!strcasecmp(st[3],"ADMIN"))
+		{
+		MINLEVEL = operLevel::ADMINLEVEL;
+		}
+	else if(!strcasecmp(st[3],"OPER"))
+		{
+		MINLEVEL = operLevel::OPERLEVEL;
+		}
+	else if(!strcasecmp(st[3],"UHS"))
+		{
+		MINLEVEL = operLevel::UHSLEVEL;
+		}
+	else
+		{
+		bot->Notice(theClient,"Unknown level, must be CODER,SMT,ADMIN,OPER,UHS");
+		return false;
+		}
+	Comm->setMinLevel(MINLEVEL);
+	if(!bot->updateCommand(Comm))
+		{
+		bot->Notice(theClient,"error while changing command min level");
+		return false;
+		}
+	else
+		{
+		bot->Notice(theClient,"command min level has been changed");
+		return true;
+		}
+	}
 else
 	{
 	bot->Notice(theClient,"Unknown option for commands, must be -en,-ds,-no,-nl");			
 	}
-	
+
 return true;
 }
 }

@@ -29,7 +29,7 @@ public:
 	Command( ccontrol* _bot, const string& _commName,
 		const string& _help, const unsigned long _flags,
 		const bool _disabled, const bool _needOp,
-		const bool _noLog,const int _minLevel)
+		const bool _noLog,const int unsigned _minLevel)
 	 : bot( _bot ),
 	   server( 0 ),
 	   commName( _commName ),
@@ -68,7 +68,7 @@ public:
 	void 	setNoLog ( const bool _noLog )
 		{ noLog = _noLog ; }
 		
-	void	setMinLevel ( const int _minLevel )
+	void	setMinLevel ( const int unsigned _minLevel )
 		{ minLevel = _minLevel ; }
 		
 	inline const string& getName() const
@@ -92,7 +92,7 @@ public:
 	inline const bool getNoLog() const
 		{ return noLog ; }
 
-	inline const int getMinLevel() const
+	inline const unsigned int getMinLevel() const
 		{ return minLevel ; }
 				
 protected:
@@ -105,7 +105,7 @@ protected:
 	bool		isDisabled;
 	bool		needOp;
 	bool		noLog;
-	int		minLevel;
+	unsigned int	minLevel;
 } ;
 
 #define DECLARE_COMMAND(commName) \

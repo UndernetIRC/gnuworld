@@ -16,7 +16,7 @@
 #include	"AuthInfo.h"
 #include	"misc.h"
 
-const char ADDCOMMANDCommand_cc_rcsId[] = "$Id: ADDCOMMANDCommand.cc,v 1.12 2001/07/26 20:12:39 mrbean_ Exp $";
+const char ADDCOMMANDCommand_cc_rcsId[] = "$Id: ADDCOMMANDCommand.cc,v 1.13 2001/07/27 12:10:49 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -36,8 +36,20 @@ if( st.size() < 3 )
 	return true;
 	}
 
+unsigned int pos = 1;
+bool Forced = false;
+if(!strcasecmp(st[pos],"-fr"))
+	{
+	Forced = true;
+	pos++;
+	if(st.size() < 4)
+		{
+		Usage(theClient);
+		}
+	}
+
 // Fetch the oper record from the db
-ccUser* theUser = bot->GetOper(st[1]);
+ccUser* theUser = bot->GetOper(st[pos]);
 	
 if( !theUser )
 	{	
@@ -46,8 +58,8 @@ if( !theUser )
 		st[1].c_str());
 	return false;
 	}
-	
-int CommandLevel = bot->getCommandLevel(st[2]);
+pos++;	
+int CommandLevel = bot->getCommandLevel(st[pos]);
 
 if( CommandLevel == -1 )
 	{
@@ -62,8 +74,6 @@ if( CommandLevel == -1 )
 	return false;	        
 	}
 
-//CommandLevel &= ~flg_NOLOG;
-//CommandLevel = bot->getTrueAccess(CommandLevel);	
 AuthInfo *AClient = bot->IsAuth( theClient );
 if( NULL == AClient )
 	{
@@ -97,7 +107,25 @@ if((Admin) && (strcasecmp(AClient->getServer(),theUser->getServer())))
 	bot->Notice(theClient,"You can only modify a user who is associated with the same server as you");
 	return false;
 	}
-
+if(Forced)
+	{
+	if((AClient->getFlags() < operLevel::SMTLEVEL) && ((bot->findCommandInMem(st[pos]))->getMinLevel() > theUser->getType()))
+		{
+		bot->Notice(theClient,"Only SMT+ can force the add of command");
+		return false;
+		}
+	}
+else if((bot->findCommandInMem(st[pos]))->getMinLevel() > theUser->getType())
+	{
+	if(AClient->getFlags() >= operLevel::SMTLEVEL)
+		bot->Notice(theClient,
+			    "The min level required to use this command is higher than the one the oper has, use \002-fr\002 if you stil want to add it");
+	else
+		bot->Notice(theClient,
+			    "The min level required to use this command is higher than the one the oper has");
+	return false;
+	}
+		
 else if(theUser->gotAccess(CommandLevel))	
 	{
 	bot->Notice( theClient,
@@ -116,7 +144,10 @@ if(theUser->Update())
 	bot->Notice( theClient,
 		"Successfully added the command for %s",
 		st[1].c_str());
-
+	if(Forced)
+		bot->MsgChanLog("%s is using -fr to add %s to %s"
+				,theClient->getNickName().c_str(),st[pos].c_str()
+				,st[pos-1].c_str());
 	// If the user is authenticated update his authenticate entry
 	bot->UpdateAuth(theUser); 
 	delete theUser;
