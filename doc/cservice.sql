@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------------
--- "$Id: cservice.sql,v 1.30 2001/03/29 17:29:21 gte Exp $"
+-- "$Id: cservice.sql,v 1.31 2001/03/29 18:04:59 gte Exp $"
 -- Channel service DB SQL file for PostgreSQL.
 
 -- ChangeLog:
@@ -149,7 +149,7 @@ CREATE TABLE users (
 	id SERIAL,
 	user_name TEXT NOT NULL,
 	password VARCHAR (40) NOT NULL, 
-	email VARCHAR (128),
+	email TEXT,
 	url  VARCHAR(128),
 -- Which question the user provided the answer too from the signup page.
 	question_id INT2,
