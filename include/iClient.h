@@ -17,11 +17,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: iClient.h,v 1.28 2002/05/27 17:18:12 dan_karrels Exp $
+ * $Id: iClient.h,v 1.29 2002/07/31 03:14:04 dan_karrels Exp $
  */
 
 #ifndef __ICLIENT_H
-#define __ICLIENT_H "$Id: iClient.h,v 1.28 2002/05/27 17:18:12 dan_karrels Exp $"
+#define __ICLIENT_H "$Id: iClient.h,v 1.29 2002/07/31 03:14:04 dan_karrels Exp $"
 
 #include	<string>
 #include	<list>
@@ -489,8 +489,7 @@ public:
 			<< ", int YY/XXX/YYXXX: "
 			<< theClient.getIntYY() << '/'
 			<< theClient.getIntXXX() << '/'
-			<< theClient.getIntYYXXX()
-			<< std::endl ;
+			<< theClient.getIntYYXXX() ;
 		return out ;
 		}
 

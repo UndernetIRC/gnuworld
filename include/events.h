@@ -22,11 +22,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: events.h,v 1.12 2002/05/27 17:18:12 dan_karrels Exp $
+ * $Id: events.h,v 1.13 2002/07/31 03:14:04 dan_karrels Exp $
  */
 
 #ifndef __EVENTS_H
-#define __EVENTS_H "$Id: events.h,v 1.12 2002/05/27 17:18:12 dan_karrels Exp $"
+#define __EVENTS_H "$Id: events.h,v 1.13 2002/07/31 03:14:04 dan_karrels Exp $"
 
 namespace gnuworld
 {
@@ -52,6 +52,7 @@ enum
 	EVT_NICK,
 	EVT_CHNICK,
 	EVT_ACCOUNT,
+	EVT_RAW,
 
 	// EVT_NOOP must always be last
 	EVT_NOOP

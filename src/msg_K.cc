@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_K.cc,v 1.9 2002/07/05 01:10:06 dan_karrels Exp $
+ * $Id: msg_K.cc,v 1.10 2002/07/31 03:14:05 dan_karrels Exp $
  */
 
 #include	<new>
@@ -37,7 +37,7 @@
 #include	"StringTokenizer.h"
 #include	"ServerCommandHandler.h"
 
-const char msg_K_cc_rcsId[] = "$Id: msg_K.cc,v 1.9 2002/07/05 01:10:06 dan_karrels Exp $" ;
+const char msg_K_cc_rcsId[] = "$Id: msg_K.cc,v 1.10 2002/07/31 03:14:05 dan_karrels Exp $" ;
 const char server_h_rcsId[] = __SERVER_H ;
 const char iClient_h_rcsId[] = __ICLIENT_H ;
 const char Channel_h_rcsId[] = __CHANNEL_H ;
@@ -193,11 +193,11 @@ else
 	// is now in the zombie state
 	destChanUser->setZombie() ;
 
-	elog	<< "msg_K> Adding zombie for user "
-		<< *destChanUser
-		<< " on channel "
-		<< theChan->getName()
-		<< endl ;
+//	elog	<< "msg_K> Adding zombie for user "
+//		<< *destChanUser
+//		<< " on channel "
+//		<< theChan->getName()
+//		<< endl ;
 	}
 
 // Post the channel kick event

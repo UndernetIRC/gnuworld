@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server.cc,v 1.141 2002/07/20 00:58:29 dan_karrels Exp $
+ * $Id: server.cc,v 1.142 2002/07/31 03:14:05 dan_karrels Exp $
  */
 
 #include	<sys/time.h>
@@ -73,7 +73,7 @@
 #include	"Connection.h"
 
 const char server_h_rcsId[] = __SERVER_H ;
-const char server_cc_rcsId[] = "$Id: server.cc,v 1.141 2002/07/20 00:58:29 dan_karrels Exp $" ;
+const char server_cc_rcsId[] = "$Id: server.cc,v 1.142 2002/07/31 03:14:05 dan_karrels Exp $" ;
 const char config_h_rcsId[] = __CONFIG_H ;
 const char misc_h_rcsId[] = __MISC_H ;
 const char events_h_rcsId[] = __EVENTS_H ;
@@ -623,6 +623,10 @@ if( verbose )
 #endif
 
 Process( inputCharBuffer ) ;
+
+// Post the RAW read event
+PostEvent( EVT_RAW, static_cast< void* >(
+	const_cast< string* >( &line ) ) ) ;
 }
 
 // This function parses and distributes incoming lines

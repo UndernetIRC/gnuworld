@@ -1,7 +1,24 @@
 /**
  * stats.cc
- * Author: Daniel Karrels (dan@karrels.com)
- * $Id: stats.cc,v 1.5 2002/05/23 17:43:14 dan_karrels Exp $
+ * Copyright (C) 2002 Daniel Karrels <dan@karrels.com>
+ *                    Orlando Bassotto
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
+ * USA.
+ *
+ * $Id: stats.cc,v 1.6 2002/07/31 03:14:05 dan_karrels Exp $
  */
 
 #include	<string>
@@ -13,6 +30,8 @@
 #include	"iClient.h"
 #include	"server.h"
 #include	"client.h"
+#include	"EConfig.h"
+#include	"ELog.h"
 
 namespace gnuworld
 {
@@ -38,19 +57,33 @@ extern "C"
 
 stats::stats( const string& fileName )
  : xClient( fileName )
-{}
+{
+EConfig conf( fileName ) ;
+
+data_path = conf.Require( "data_path" )->second ;
+}
 
 stats::~stats()
-{}
+{
+for( mapType::iterator streamItr = fileTable.begin() ;
+	streamItr!= fileTable.end() ; ++streamItr )
+	{
+	(streamItr->second)->close() ;
+	delete streamItr->second ;
+	}
+fileTable.clear() ;
+}
 
 void stats::ImplementServer( xServer* theServer )
 {
 xClient::ImplementServer( theServer ) ;
 
+// Register for all events
 for( eventType i = 0 ; i != EVT_NOOP ; ++i )
 	{
 	theServer->RegisterEvent( i, this ) ;
 	}
+theServer->RegisterChannelEvent( "*", this ) ;
 }
 
 int stats::OnPrivateMessage( iClient* theClient, const string& Message,
@@ -61,60 +94,96 @@ if( !theClient->isOper() )
 	return 0 ;
 	}
 
-for( const_iterator ptr = table.begin(), end = table.end() ; ptr != end ;
-	++ptr )
-	{
-	stringstream s ;
-	s	<< ptr->first << ": " << ptr->second << ends ;
+return 0 ;
+}
 
-	Notice( theClient, s.str() ) ;
-	} // for()
+void stats::WriteLog( const string& writeMe, const string& line )
+{
+mapType::iterator streamItr = fileTable.find( writeMe ) ;
+if( streamItr == fileTable.end() )
+	{
+	// File not yet opened
+	string fileName = data_path + writeMe ;
+
+	ofstream* outFile = new ofstream( fileName.c_str() ) ;
+	if( !(*outFile) )
+		{
+		elog	<< "stats::WriteLog> Unable to open file: "
+			<< fileName
+			<< endl ;
+		return ;
+		}
+
+	streamItr = fileTable.insert(
+		mapType::value_type( writeMe, outFile ) ).first ;
+	}
+
+// Get the current time
+time_t now = ::time(0) ;
+struct tm* nowTM = gmtime( &now ) ;
+
+ofstream* outFile = streamItr->second ;
+
+*outFile	<< nowTM->tm_hour << ":"
+		<< nowTM->tm_min << ":"
+		<< nowTM->tm_sec << " "
+		<< line
+		<< endl ;
+}
+
+int stats::OnChannelEvent( const channelEventType& whichEvent,
+	Channel* theChan,
+	void*, void*, void*, void* )
+{
+
 
 return 0 ;
 }
 
-int stats::OnEvent( const eventType& theEvent,
+int stats::OnEvent( const eventType& whichEvent,
 	void* data1, void* data2, void* data3, void* data4 )
 {
+WriteLog( "Total_Events" ) ;
 
-//elog << "stats::OnEvent()" << endl ;
-
-table[ "Total Events" ]++ ;
-
-switch( theEvent )
+switch( whichEvent )
 	{
 	case EVT_OPER:
-		table[ "EVT_OPER" ]++ ;
+		WriteLog( "EVT_OPER" ) ;
 		break ;
 	case EVT_NETBREAK:
-		table[ "EVT_NETBREAK" ]++ ;
+		WriteLog( "EVT_NETBREAK" ) ;
 		break ;
 	case EVT_NETJOIN:
-		table[ "EVT_NETJOIN" ]++ ;
-		break ;
-	case EVT_BURST_CMPLT:
-		table[ "EVT_BURST_CMPLT" ]++ ;
-		break ;
-	case EVT_BURST_ACK:
-		table[ "EVT_BURST_ACK" ]++ ;
+		WriteLog( "EVT_NETJOIN" ) ;
 		break ;
 	case EVT_GLINE:
-		table[ "EVT_GLINE" ]++ ;
+		WriteLog( "EVT_GLINE" ) ;
 		break ;
 	case EVT_REMGLINE:
-		table[ "EVT_REMGLINE" ]++ ;
+		WriteLog( "EVT_REMGLINE" ) ;
 		break ;
 	case EVT_QUIT:
-		table[ "EVT_QUIT" ]++ ;
+		WriteLog( "EVT_QUIT" ) ;
 		break ;
 	case EVT_KILL:
-		table[ "EVT_KILL" ]++ ;
+		WriteLog( "EVT_KILL" ) ;
 		break ;
 	case EVT_NICK:
-		table[ "EVT_NICK" ]++ ;
+		WriteLog( "EVT_NICK" ) ;
+		break ;
+	case EVT_RAW:
+		{
+		string* theLine = reinterpret_cast< string* >( data1 ) ;
+		WriteLog( "EVT_RAW", *theLine ) ;
+		}
+		break ;
+	case EVT_CHNICK:
+		WriteLog( "EVT_CHNICK" ) ;
 		break ;
 	default:
-		table[ "UNKNOWN" ]++ ;
+		elog	<< "stats::OnEvent> Received unknown event: "
+			<< whichEvent
+			<< endl ;
 		break ;
 	} // switch()
 

@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ConnectionManager.cc,v 1.15 2002/07/23 22:26:36 dan_karrels Exp $
+ * $Id: ConnectionManager.cc,v 1.16 2002/07/31 03:14:04 dan_karrels Exp $
  */
 
 #include	<unistd.h>
@@ -596,15 +596,20 @@ for( constHandlerMapIterator handlerItr = handlerMap.begin() ;
 		} // for( connectionItr )
 	} // for( handlerItr )
 
-// timeval may be modified by select() on some systems,
-// so recreate it each time
-struct timeval to = { seconds, milliseconds } ;
+int loopCount = 0 ;
+int selectRet = 0 ;
+do
+	{
+	// timeval may be modified by select() on some systems,
+	// so recreate it each time
+	struct timeval to = { seconds, milliseconds } ;
 
-// Call select()
-// Block indefinitely if seconds is -1
-errno = 0 ;
-int fdCnt = ::select( 1 + highestFD, &readfds, &writefds, 0,
-		(-1 == seconds) ? NULL : &to ) ;
+	// Call select()
+	// Block indefinitely if seconds is -1
+	errno = 0 ;
+	selectRet = ::select( 1 + highestFD, &readfds, &writefds, 0,
+			(-1 == seconds) ? NULL : &to ) ;
+	} while ((EINTR == errno) && (++loopCount <= 10)) ;
 
 //elog	<< "ConnectionManager::Poll()> seconds: "
 //	<< seconds
@@ -613,7 +618,7 @@ int fdCnt = ::select( 1 + highestFD, &readfds, &writefds, 0,
 //	<< endl ;
 
 // Is there an error from select()?
-if( fdCnt < 0 )
+if( selectRet < 0 )
 	{
 	// Error in select()
 	elog	<< "ConnectionManager::Poll> Error in Poll(): "
@@ -966,8 +971,8 @@ if( EAGAIN == errno )
 	{
 	// Nonblocking type error
 	// Ignore it
-	elog	<< "ConnectionManager::handleRead> EAGAIN"
-		<< endl ;
+//	elog	<< "ConnectionManager::handleRead> EAGAIN"
+//		<< endl ;
 	return true ;
 	}
 

@@ -1,8 +1,30 @@
-/* stats.h */
+/**
+ * stats.h
+ * Copyright (C) 2002 Daniel Karrels <dan@karrels.com>
+ *                    Orlando Bassotto
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
+ * USA.
+ *
+ * $Id: stats.h,v 1.3 2002/07/31 03:14:05 dan_karrels Exp $
+ */
 
 #ifndef __STATS_H
-#define __STATS_H
+#define __STATS_H "$Id: stats.h,v 1.3 2002/07/31 03:14:05 dan_karrels Exp $"
 
+#include	<fstream>
 #include	<string>
 #include	<map>
 
@@ -11,17 +33,18 @@
 #include	"misc.h" // noCaseCompare
 #include	"server.h"
 
-using std::string ;
-using std::map ;
-
 namespace gnuworld
 {
+
+using std::ofstream ;
+using std::string ;
+using std::map ;
 
 class stats : public xClient
 {
 
 protected:
-	typedef map< string, unsigned long, noCaseCompare > mapType ;
+	typedef map< string, ofstream*, noCaseCompare > mapType ;
 
 public:
 	stats( const string& ) ;
@@ -29,22 +52,22 @@ public:
 
 	typedef mapType::const_iterator const_iterator ;
 
-	inline unsigned long& operator[]( const string& name )
-		{ return table[ name ] ; }
-
-	inline const_iterator begin() const
-		{ return table.begin() ; }
-	inline const_iterator end() const
-		{ return table.end() ; }
-
 	virtual void ImplementServer( xServer* ) ;
 	virtual int OnPrivateMessage( iClient*, const string&,
 		bool = false ) ;
 	virtual int OnEvent( const eventType&,
 		void* = 0, void* = 0, void* = 0, void* = 0 ) ;
+        virtual int OnChannelEvent( const channelEventType&,
+                Channel*,  
+                void* Data1 = NULL, void* Data2 = NULL,
+                void* Data3 = NULL, void* Data4 = NULL ) ;
 
 protected:
-	mapType		table ;
+	void		WriteLog( const string& file,
+				const string& line = string() ) ;
+
+	string		data_path ;
+	mapType		fileTable ;
 
 
 } ;
