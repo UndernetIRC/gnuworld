@@ -12,7 +12,7 @@
 #include	"cservice_config.h"
 #include	"Network.h"
 
-const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.20 2001/06/21 23:27:33 gte Exp $" ;
+const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.21 2001/06/21 23:33:55 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -323,9 +323,12 @@ for (autoOpVectorType::const_iterator resultPtr = autoOpVector.begin();
 
 strstream supporterQuery;
 supporterQuery	<< "SELECT channels.name FROM"
-			<< " supporters,channels WHERE supporters.channel_id = channels.id"
+			<< " supporters,channels,pending WHERE"
+			<< " supporters.channel_id = channels.id"
+			<< " AND pending.channel_id = channels.id"
 			<< " AND channels.registered_ts = 0"
 			<< " AND supporters.support = NULL"
+			<< " AND pending.status = 0"
 			<< " AND user_id = "
 			<< theUser->getID()
 			<< ends;
