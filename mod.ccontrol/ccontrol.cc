@@ -23,7 +23,7 @@
 #include	"AuthInfo.h"
 #include        "server.h"
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.45 2001/05/23 21:16:47 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.46 2001/05/29 20:42:09 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -1716,7 +1716,7 @@ if( PGRES_TUPLES_OK != status )
 	elog	<< "ccontrol::getExceptions> SQL Failure: "
 		<< SQLDb->ErrorMessage()
 		<< endl ;
-	return false;
+	return Exception;
 	}
 
 for( int i = 0 ; i < SQLDb->Tuples() ; i++ )
