@@ -1,5 +1,5 @@
 
--- 2001-03-02 |MrBean| "$Id: ccontrol.help.sql,v 1.1 2001/03/03 18:46:59 mrbean_ Exp $"
+-- 2001-03-02 |MrBean| "$Id: ccontrol.help.sql,v 1.2 2001/03/04 20:27:41 mrbean_ Exp $"
 -- Created the file and added all help topics to the database
 
 -- ACCESS 
@@ -192,7 +192,7 @@ INSERT INTO help (command,line,help) VALUES ('TRANSLATE',4,'the numeric you want
 
 INSERT INTO help (command,line,help) VALUES ('UNSUSPEND',1,'------ UNSUSPEND COMMAND ------');
 INSERT INTO help (command,line,help) VALUES ('UNSUSPEND',2,'UNSuspend an oper');
-INSERT INTO help (command,line,help) VALUES ('SUSPEND',3,'Usage : /msg $BOT$ unsuspend <oper> ');
+INSERT INTO help (command,line,help) VALUES ('UNSUSPEND',3,'Usage : /msg $BOT$ unsuspend <oper> ');
 INSERT INTO help (command,line,help) VALUES ('UNSUSPEND',4,'<oper> - oper handle to unsuspend');
 
 -- WHOIS

@@ -3,7 +3,7 @@
  */
 
 #ifndef __CCONTROL_H
-#define __CCONTROL_H "$Id: ccontrol.h,v 1.13 2001/03/02 02:02:00 dan_karrels Exp $"
+#define __CCONTROL_H "$Id: ccontrol.h,v 1.14 2001/03/04 20:27:41 mrbean_ Exp $"
 
 #include	<string>
 #include	<vector>
@@ -252,6 +252,10 @@ public:
 	void UpdateAuth( ccUser* );
 
 	bool GetHelp( iClient* , const string& );
+
+	bool GetHelp( iClient* , const string& , const string&);
+	
+	void DoHelp( iClient* );
 
 	static string replace( const string&,
 				const string&,
