@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ConnectionManager.cc,v 1.11 2003/10/19 20:18:05 jeekay Exp $
+ * $Id: ConnectionManager.cc,v 1.12 2003/12/06 22:11:36 dan_karrels Exp $
  */
 
 #include	<unistd.h>
@@ -52,12 +52,11 @@
 #include	"Buffer.h"
 #include	"ELog.h"
 
-const char rcsId[] = "$Id: ConnectionManager.cc,v 1.11 2003/10/19 20:18:05 jeekay Exp $" ;
+const char rcsId[] = "$Id: ConnectionManager.cc,v 1.12 2003/12/06 22:11:36 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
 
-using std::cout ;
 using std::endl ;
 using std::string ;
 using std::map ;
@@ -122,7 +121,7 @@ if( host.empty() )
 	return 0 ;
 	}
 
-//cout	<< "Connect> "
+//elog	<< "Connect> "
 //	<< host
 //	<< ":"
 //	<< remotePort
@@ -157,7 +156,7 @@ else
 		// No good
 		delete newConnection ; newConnection = 0 ;
 
-		cout	<< "ConnectionManager::Connect> Unable "
+		elog	<< "ConnectionManager::Connect> Unable "
 			<< "to find valid IP"
 			<< endl ;
 
@@ -171,7 +170,7 @@ if( -1 == sockFD )
 	{
 	delete newConnection ;
 
-	cout	<< "Connect> openSocket() failed"
+	elog	<< "Connect> openSocket() failed"
 		<< endl ;
 
 	return 0 ;
@@ -217,7 +216,7 @@ if( ::connect( sockFD, reinterpret_cast< sockaddr* >( addr ),
 			delete newConnection ;
 			newConnection = 0 ;
 
-			cout	<< "ConnectionManager::Connect> Error "
+			elog	<< "ConnectionManager::Connect> Error "
 				<< "detected in connect(): "
 				<< strerror( errno )
 				<< endl ;
@@ -232,7 +231,7 @@ if( ::connect( sockFD, reinterpret_cast< sockaddr* >( addr ),
 
 if( newConnection != 0 )
 	{
-//	cout	<< "Connect> Adding new connection attempt: "
+//	elog	<< "Connect> Adding new connection attempt: "
 //		<< *newConnection
 //		<< endl ;
 
@@ -249,7 +248,7 @@ if( newConnection != 0 )
 		// Close the socket
 		closeSocket( newConnection->getSockFD() ) ;
 
-		cout	<< "ConnectionManager::Connect> Failed to "
+		elog	<< "ConnectionManager::Connect> Failed to "
 			<< "add new connection to handlerMap: "
 			<< *newConnection
 			<< endl ;
@@ -274,7 +273,7 @@ if( newConnection != 0 )
 		&sockAddrLen ) < 0 )
 		{
 		// getsockname() failed
-		cout	<< "finishConnect> getsockname() failed: "
+		elog	<< "finishConnect> getsockname() failed: "
 			<< strerror( errno )
 			<< endl ;
 
@@ -544,7 +543,7 @@ if( connectionItr == handlerItr->second.end() )
 	return false ;
 	}
 
-cout	<< "ConnectionManager::Disconnect> Scheduling connection "
+elog	<< "ConnectionManager::Disconnect> Scheduling connection "
 	<< "for removal: "
 	<< *cPtr
 	<< endl ;
@@ -560,7 +559,7 @@ return true ;
 void ConnectionManager::Poll( const long seconds,
 	const long milliseconds )
 {
-//cout	<< "Poll()" << endl ;
+//elog	<< "Poll()" << endl ;
 
 // Only execute this method if:
 // - The handlerMap is not empty, OR the eraseMap is not empty
@@ -918,7 +917,7 @@ for( handlerMapIterator handlerItr = handlerMap.begin() ;
 		}
 	} // for()
 
-//cout	<< "Poll> End"
+//elog	<< "Poll> End"
 //	<< endl ;
 
 } // Poll()
@@ -1171,7 +1170,7 @@ bool ConnectionManager::finishConnect( ConnectionHandler* hPtr,
 // Protected member method, no error checking performed on
 // method arguments
 
-//cout	<< "ConnectionManager::finishConnect> "
+//elog	<< "ConnectionManager::finishConnect> "
 //	<< *cPtr
 //	<< endl ;
 
@@ -1187,7 +1186,7 @@ if( connectResult < 0 )
 	// first attempt
 	if( errno != EISCONN )
 		{
-//		cout	<< "finishConnect> Failed connect: "
+//		elog	<< "finishConnect> Failed connect: "
 //			<< strerror( errno )
 //			<< endl ;
 
@@ -1297,7 +1296,7 @@ if( !setSocketOptions( newFD ) )
 	// Notify handler
 	hPtr->OnConnectFail( newConnection ) ;
 
-	cout	<< "ConnectionManager::finishAccept> Failed to set "
+	elog	<< "ConnectionManager::finishAccept> Failed to set "
 		<< "socket options for connection: "
 		<< *newConnection
 		<< endl ;
@@ -1321,7 +1320,7 @@ if( !handlerMap[ hPtr ].insert( newConnection ).second )
 	// TODO: The handler expects errno to be set appropriately.
 	hPtr->OnConnectFail( newConnection ) ;
 
-	cout	<< "ConnectionManager::finishAccept> Failed to add "
+	elog	<< "ConnectionManager::finishAccept> Failed to add "
 		<< "new connection to table: "
 		<< *newConnection
 		<< endl ;
@@ -1398,7 +1397,7 @@ Connection* ConnectionManager::Listen( ConnectionHandler* hPtr,
 // Public method, check arguments
 assert( hPtr != 0 ) ;
 
-cout	<< "ConnectionManager::Listen> Port: "
+elog	<< "ConnectionManager::Listen> Port: "
 	<< localPort
 	<< endl ;
 
@@ -1407,7 +1406,7 @@ cout	<< "ConnectionManager::Listen> Port: "
 int listenFD = openSocket() ;
 if( listenFD < 0 )
 	{
-	cout	<< "ConnectionManager::Listen> Failed to open socket"
+	elog	<< "ConnectionManager::Listen> Failed to open socket"
 		<< endl ;
 	return 0 ;
 	}
@@ -1421,7 +1420,7 @@ if( ::setsockopt( listenFD, SOL_SOCKET, SO_REUSEADDR,
 	sizeof( optVal ) ) < 0 )
 	{
 	// Failed to set SO_REUSEADDR
-	cout	<< "ConnectionManager::Listen> Failed to set "
+	elog	<< "ConnectionManager::Listen> Failed to set "
 		<< "SO_REUSEADDR: "
 		<< strerror( errno )
 		<< endl ;
@@ -1456,7 +1455,7 @@ if( ::bind( listenFD,
 	static_cast< socklen_t >( sizeof( struct sockaddr ) ) ) < 0 )
 	{
 	// bind() failed
-	cout	<< "ConnectionManager::Listen> bind() failed: "
+	elog	<< "ConnectionManager::Listen> bind() failed: "
 		<< strerror( errno )
 		<< endl ;
 
@@ -1474,7 +1473,7 @@ if( ::bind( listenFD,
 if( ::listen( listenFD, 5 ) < 0 )
 	{
 	// listen() failed
-	cout	<< "ConnectionManager::Listen> listen() failed: "
+	elog	<< "ConnectionManager::Listen> listen() failed: "
 		<< strerror( errno )
 		<< endl ;
 
@@ -1493,7 +1492,7 @@ if( ::listen( listenFD, 5 ) < 0 )
 if( !handlerMap[ hPtr ].insert( newConnection ).second )
 	{
 	// Addition to handlerMap failed :(
-	cout	<< "ConnectionManager::Listen> Failed to add new "
+	elog	<< "ConnectionManager::Listen> Failed to add new "
 		<< "connection to handlerMap: "
 		<< *newConnection
 		<< endl ;

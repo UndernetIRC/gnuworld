@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: client.cc,v 1.64 2003/12/04 00:44:24 dan_karrels Exp $
+ * $Id: client.cc,v 1.65 2003/12/06 22:11:37 dan_karrels Exp $
  */
 
 #include	<new>
@@ -47,7 +47,7 @@
 #include	"ELog.h"
 #include	"events.h"
 
-RCSTAG("$Id: client.cc,v 1.64 2003/12/04 00:44:24 dan_karrels Exp $" ) ;
+RCSTAG("$Id: client.cc,v 1.65 2003/12/06 22:11:37 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -553,7 +553,16 @@ void xClient::OnCTCP( iClient*, const string&,
 	const string&, bool )
 {}
 
+void xClient::OnFakeCTCP( iClient*, iClient*, const string&,
+	const string&, bool )
+{}
+
 void xClient::OnChannelCTCP( iClient*, Channel*, const string&,
+	const string& )
+{}
+
+void xClient::OnFakeChannelCTCP( iClient*, iClient*,
+	Channel*, const string&,
 	const string& )
 {}
 

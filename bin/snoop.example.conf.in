@@ -1,4 +1,4 @@
-# $Id: snoop.example.conf.in,v 1.1 2003/12/04 00:44:22 dan_karrels Exp $
+# $Id: snoop.example.conf.in,v 1.2 2003/12/06 22:11:36 dan_karrels Exp $
 # conf file for snoop bot
 username = snoopy
 nickname = snoopy_
@@ -17,7 +17,18 @@ mode = +i
 # set to false otherwise (will not affect other users who have access)
 allow_opers = true
 
+# The command character (or string) to which the bot will respond
+# in channels.  This can be any length, but can only be one word.
 cmdchar = snoopy
+
+# The channel in which the bot will accept channel commands
 adminchan = #2010
+
+# The channel to which relay information will be sent
 relaychan = #coder-com
+
+# The default quit message for spawned clients
 defaultquitmessage = Exiting
+
+# The maximum nickname length for your network
+maxnicklen = 9

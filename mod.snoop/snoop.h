@@ -34,6 +34,7 @@ public:
 				const string& ) ;
 
 protected:
+	bool		validNickname( const string& ) const ;
 	void		usage( iClient*, const string& ) ;
 	void		handleSpawnClient( iClient*,
 				Channel*,
@@ -51,6 +52,7 @@ protected:
 	string		adminChanName ;
 	string		relayChanName ;
 	string		defaultQuitMessage ;
+	size_t		maxnicklen ;
 
 } ;
 

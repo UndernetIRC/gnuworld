@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_O.cc,v 1.7 2003/08/09 23:15:33 dan_karrels Exp $
+ * $Id: msg_O.cc,v 1.8 2003/12/06 22:11:36 dan_karrels Exp $
  */
 
 #include	<string>
@@ -33,7 +33,7 @@
 #include	"StringTokenizer.h"
 #include	"config.h"
 
-RCSTAG( "$Id: msg_O.cc,v 1.7 2003/08/09 23:15:33 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: msg_O.cc,v 1.8 2003/12/06 22:11:36 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -47,27 +47,62 @@ void channelNotice( iClient* srcClient,
 	Channel* theChan,
 	const string& message )
 {
-for( xNetwork::localClientIterator lcItr = Network->localClient_begin() ;
-	lcItr != Network->localClient_end() ; ++lcItr )
+for( Channel::userIterator userItr = theChan->userList_begin() ;
+	userItr != theChan->userList_end() ; ++userItr )
 	{
-	// Only deliver the channel ctcp (message) if this client
-	// is on the channel, and is mode -d
-	if( lcItr->second->isOnChannel( theChan ) &&
-		!lcItr->second->getMode( iClient::MODE_DEAF ) )
+	unsigned int intYYXXX = userItr->second->getIntYYXXX() ;
+
+	xClient* servicesClient = Network->findLocalClient( intYYXXX ) ;
+	if( servicesClient != 0
+		&& servicesClient->isOnChannel( theChan )
+		&& !servicesClient->getMode( iClient::MODE_DEAF ) )
 		{
-		lcItr->second->OnChannelNotice(
-			srcClient, theChan, message ) ;
+		// xClient, invoke OnChannelNotice()
+		servicesClient->OnChannelNotice( srcClient,
+			theChan,
+			message ) ;
+		continue ;
 		}
-	}
+
+	// Not an xClient, check if it's a fake client
+	iClient* targetClient = Network->findFakeClient(
+			userItr->second->getClient() ) ;
+	if( 0 == targetClient )
+		{
+		// Nope
+		continue ;
+		}
+
+	// Fake client
+	// Get its owner, use a different variable name here
+	// just for readability.
+	xClient* ownerClient = Network->findFakeClientOwner( 
+		targetClient ) ;
+	if( 0 == ownerClient )
+		{
+		elog	<< "msg_O::channelNotice> Unable to "
+			<< "find owner of client: "
+			<< *targetClient
+			<< ", in channel: "
+			<< *theChan
+			<< endl ;
+		continue ;
+		}
+
+	ownerClient->OnFakeChannelNotice( srcClient,
+		targetClient,
+		theChan,
+		message ) ;
+	} // for()
 }
 
 /**
  * A nick has sent a private message
  * QBg O PAA :help
  * QBg: Source nickname's numeric
- * O: Notice
+ * O: NOTICE
  * PAA: Destination nickname's numeric
- * :help: Message
+ * :help: Notice
  *
  * QAE O PAA :translate xaa
  * QAE O AAPAA :translate xaa
@@ -85,7 +120,7 @@ if( Param.size() < 3 )
 Channel* theChan = 0 ;
 if( '#' == Param[ 1 ][ 0 ] )
 	{
-	// Channel message
+	// Channel notice
 	theChan = Network->findChannel( Param[ 1 ] ) ;
 	if( 0 == theChan )
 		{
@@ -108,14 +143,15 @@ iClient* srcClient = Network->findClient( Param[ 0 ] ) ;
 if( 0 == srcClient )
 	{
 	elog	<< "msg_O> Unable to find source client: "
-		<< Param[ 1 ]
+		<< Param[ 0 ]
 		<< endl ;
 	return false ;
 	}
 
-// abcDE P FGhij :hi, how are you?
+// abcDE O FGhij :hi, how are you?
 bool		secure = false ;
 xClient*	targetClient = 0 ;
+iClient*	fakeTarget = 0 ;
 
 if( (0 == theChan) && (strchr( Param[ 1 ], '@' ) != 0) )
 	{
@@ -126,13 +162,17 @@ if( (0 == theChan) && (strchr( Param[ 1 ], '@' ) != 0) )
 	targetClient = Network->findLocalNick( st[ 0 ] ) ;
 	if( 0 == targetClient )
 		{
-		elog	<< "msg_O> Received message for unknown "
-			<< "client: "
-			<< Param[ 1 ]
-			<< ", nick: "
-			<< st[ 0 ]
-			<< endl ;
-		return true ;
+		fakeTarget = Network->findFakeNick( st[ 0 ] ) ;
+		if( 0 == fakeTarget )
+			{
+			elog	<< "msg_O> Received notice for unknown "
+				<< "client: "
+				<< Param[ 1 ]
+				<< ", nick: "
+				<< st[ 0 ]
+				<< endl ;
+			return true ;
+			}
 		}
 	// Found the target xClient
 	}
@@ -140,28 +180,65 @@ else if( (0 == theChan) &&
 	(Param[ 1 ][ 0 ] == theServer->getCharYY()[ 0 ]) &&
 	(Param[ 1 ][ 1 ] == theServer->getCharYY()[ 1 ]) )
 	{
-	// Normal message to an xClient
+//	elog	<< "msg_O> Notice for local client: "
+//		<< Param[ 1 ]
+//		<< endl ;
+
+	// Normal notice to an xClient
 	targetClient = Network->findLocalClient( Param[ 1 ] ) ;
 	if( 0 == targetClient )
 		{
-		elog	<< "msg_O> Unable to find local client: "
-			<< Param[ 1 ]
-			<< endl ;
-		return true ;
+		// Not an xClient, is it a fake client?
+		fakeTarget = Network->findFakeClient( Param[ 1 ] ) ;
+		if( 0 == fakeTarget )
+			{
+			elog	<< "msg_O> Unable to find local client: "
+				<< Param[ 1 ]
+				<< endl ;
+			return true ;
+			}
 		}
 	}
 else if( 0 == theChan )
 	{
+	// TODO
+	elog	<< "msg_O> Unknown target: "
+		<< Param[ 1 ]
+		<< endl ;
+
 	// May be a message to a juped client on a juped server,
 	// ignore it.
 	return true ;
+	}
+else
+	{
+	// theChan != 0
+	// It's a channel message, this is not a problem for
+	// the case in which there is an xClient in the channel.
+	// However, it becomes a bit more complicated if there are
+	// one or more fake clients (possibly in addition to the
+	// xClient) in the channel.
+	}
+
+xClient* ownerClient = 0 ;
+if( fakeTarget != 0 )
+	{
+	// The target is a fake client, let's find its owner
+	ownerClient = Network->findFakeClientOwner( fakeTarget ) ;
+	if( 0 == ownerClient )
+		{
+		elog	<< "msg_O> Fake client without owner: "
+			<< *fakeTarget
+			<< endl ;
+		return true ;
+		}
 	}
 
 string message( Param[ 2 ] ) ;
 
 if( theChan != 0 )
 	{
-//	elog	<< "msg_O> Channel notice from: "
+//	elog	<< "msg_O> Channel message from: "
 //		<< *srcClient
 //		<< ", message: "
 //		<< message
@@ -169,20 +246,33 @@ if( theChan != 0 )
 //		<< *theChan
 //		<< endl ;
 
-	channelNotice( srcClient, theChan, message ) ;
+	channelNotice( srcClient,
+		theChan,
+		message ) ;
 	}
 else
 	{
-//	elog	<< "msg_O> Private notice from: "
+//	elog	<< "msg_O> Private message from: "
 //		<< *srcClient
 //		<< ", message: "
 //		<< message
 //		<< endl ;
 
-	targetClient->OnPrivateNotice( srcClient,
-		message,
-		secure ) ;
-	}
+	if( fakeTarget != 0 )
+		{
+		ownerClient->OnFakePrivateNotice(
+			srcClient,
+			fakeTarget,
+			message,
+			secure ) ;
+		}
+	else
+		{
+		targetClient->OnPrivateNotice( srcClient,
+			message,
+			secure ) ;
+		} // else()
+	} // else( theChan != 0 )
 
 return true ;
 } // msg_O

@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: client.h,v 1.49 2003/12/04 00:44:22 dan_karrels Exp $
+ * $Id: client.h,v 1.50 2003/12/06 22:11:36 dan_karrels Exp $
  */
 
 #ifndef __CLIENT_H
-#define __CLIENT_H "$Id: client.h,v 1.49 2003/12/04 00:44:22 dan_karrels Exp $"
+#define __CLIENT_H "$Id: client.h,v 1.50 2003/12/06 22:11:36 dan_karrels Exp $"
 
 #include	<sstream>
 #include	<string>
@@ -294,11 +294,32 @@ public:
 		bool Secure = false ) ;
 
 	/**
+	 * OnFakeCTCP is called when a CTCP command is issued to
+	 * one of this xClient's fake clients.
+	 */
+	virtual void OnFakeCTCP( iClient* Sender,
+		iClient* fakeClient,
+		const string& CTCP,
+		const string& Message,
+		bool Secure = false ) ;
+
+	/**
 	 * This method is called when a channel CTCP occurs
 	 * in a channel in which an xClient resides, and the
 	 * xClient is user mode -d.
 	 */
 	virtual void OnChannelCTCP( iClient* Sender,
+		Channel* theChan,
+		const string& CTCPCommand,
+		const string& Message ) ;
+
+	/**
+	 * This method is called when a channel CTCP occurs
+	 * in a channel in which an xClient resides, and the
+	 * xClient is user mode -d.
+	 */
+	virtual void OnFakeChannelCTCP( iClient* Sender,
+		iClient* fakeClient,
 		Channel* theChan,
 		const string& CTCPCommand,
 		const string& Message ) ;

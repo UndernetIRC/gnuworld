@@ -6,6 +6,8 @@
 #include	<sstream>
 #include	<iostream>
 
+#include	<cctype>
+
 #include	"server.h"
 #include	"client.h"
 #include	"snoop.h"
@@ -39,6 +41,7 @@ cmdchar = conf.Require( "cmdchar" )->second ;
 adminChanName = conf.Require( "adminchan" )->second ;
 relayChanName = conf.Require( "relaychan" )->second ;
 defaultQuitMessage = conf.Require( "defaultquitmessage" )->second ;
+maxnicklen = ::atoi( conf.Require( "maxnicklen" )->second.c_str() ) ;
 }
 
 snoop::~snoop()
@@ -46,6 +49,8 @@ snoop::~snoop()
 
 bool snoop::BurstChannels()
 {
+// It's ok if admin and relay chans are the same,
+// xServer::JoinChannel() will not join more than once
 getUplink()->JoinChannel( this, adminChanName ) ;
 getUplink()->JoinChannel( this, relayChanName ) ;
 return xClient::BurstChannels() ;
@@ -148,6 +153,19 @@ if( userTokens.size() != 2 )
 const string nickname( nickTokens[ 0 ] ) ;
 const string username( userTokens[ 0 ] ) ;
 const string hostname( userTokens[ 1 ] ) ;
+
+if( nickname.empty() || username.empty() || hostname.empty() )
+	{
+	Notice( srcClient, "Please specify non-empty nick/user/host names" ) ;
+	return ;
+	}
+
+// Verify that the nickname is valid
+if( !validNickname( nickname ) )
+	{
+	Notice( srcClient, "Invalid nickname" ) ;
+	return ;
+	}
 
 if( Network->findNick( nickname ) != 0 )
 	{
@@ -377,7 +395,7 @@ if( st.size() >= 4 )
 	}
 
 // Find the client
-iClient* fakeClient = Network->findNick( st[ 2 ] ) ;
+iClient* fakeClient = Network->findFakeNick( st[ 2 ] ) ;
 if( 0 == fakeClient )
 	{
 	Notice( srcClient, "Nick \'%s\' does not exist",
@@ -400,7 +418,48 @@ Notice( srcClient, "%s detached",
 // This module allocated the iClient, and it must therefore deallocate
 // it.
 delete fakeClient ; fakeClient = 0 ;
+}
 
+bool snoop::validNickname( const string& nickname ) const
+{
+if( nickname.empty() || nickname.size() > maxnicklen )
+	{
+	return false ;
+	}
+
+/*
+ * From ircu:
+ * Nickname characters are in range 'A'..'}', '_', '-', '0'..'9'
+ *  anything outside the above set will terminate nickname.
+ * In addition, the first character cannot be '-' or a Digit.
+ */
+if( isdigit( nickname[ 0 ] ) )
+	{
+	return false ;
+	}
+
+for( string::const_iterator sItr = nickname.begin() ;
+	sItr != nickname.end() ; ++sItr )
+	{
+	if( *sItr >= 'A' && *sItr <= '}' )
+		{
+		// ok
+		continue ;
+		}
+	if( '_' == *sItr || '-' == *sItr )
+		{
+		// ok
+		continue ;
+		}
+	if( *sItr >= '0' && *sItr <= '9' )
+		{
+		// ok
+		continue ;
+		}
+	// bad char
+	return false ;
+	}
+return true ;
 }
 
 } // namespace gnuworld

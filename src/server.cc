@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server.cc,v 1.184 2003/11/26 23:30:23 dan_karrels Exp $
+ * $Id: server.cc,v 1.185 2003/12/06 22:11:37 dan_karrels Exp $
  */
 
 #include	<sys/time.h>
@@ -71,7 +71,7 @@
 #include	"ConnectionHandler.h"
 #include	"Connection.h"
 
-RCSTAG( "$Id: server.cc,v 1.184 2003/11/26 23:30:23 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: server.cc,v 1.185 2003/12/06 22:11:37 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -3637,9 +3637,9 @@ while( !timerQueue.empty() )
 		{
 		// This timerInfo belongs to the TimerHandler in
 		// question.
-		elog	<< "xServer::removeAllTimers> Found "
-			<< "a timer that was not unregistered"
-			<< endl ;
+//		elog	<< "xServer::removeAllTimers> Found "
+//			<< "a timer that was not unregistered"
+//			<< endl ;
 
 		// Since the TimerHandler has little or no access
 		// to the timer system internals here, it is safe
@@ -3867,6 +3867,13 @@ if( 0 == theChan )
 		<< chanName
 		<< endl ;
 	return false ;
+	}
+
+// If the user is already on the channel, don't rejoin
+if( theChan->findUser( theClient ) )
+	{
+	// User already in channel
+	return true ;
 	}
 
 ChannelUser* theUser = new (std::nothrow) ChannelUser( theClient ) ;

@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_P.cc,v 1.8 2003/11/11 19:21:24 dan_karrels Exp $
+ * $Id: msg_P.cc,v 1.9 2003/12/06 22:11:36 dan_karrels Exp $
  */
 
 #include	<string>
@@ -33,7 +33,7 @@
 #include	"StringTokenizer.h"
 #include	"config.h"
 
-RCSTAG( "$Id: msg_P.cc,v 1.8 2003/11/11 19:21:24 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: msg_P.cc,v 1.9 2003/12/06 22:11:36 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -48,6 +48,57 @@ void channelCTCP( iClient* srcClient,
 	const string& command,
 	const string& message )
 {
+for( Channel::userIterator userItr = theChan->userList_begin() ;
+	userItr != theChan->userList_end() ; ++userItr )
+	{
+	unsigned int intYYXXX = userItr->second->getIntYYXXX() ;
+
+	xClient* servicesClient = Network->findLocalClient( intYYXXX ) ;
+	if( servicesClient != 0
+		&& servicesClient->isOnChannel( theChan )
+		&& !servicesClient->getMode( iClient::MODE_DEAF ) )
+		{
+		// xClient, invoke OnChannelMessage()
+		servicesClient->OnChannelCTCP( srcClient,
+			theChan,
+			command,
+			message ) ;
+		continue ;
+		}
+
+	// Not an xClient, check if it's a fake client
+	iClient* targetClient = Network->findFakeClient(
+			userItr->second->getClient() ) ;
+	if( 0 == targetClient )
+		{
+		// Nope
+		continue ;
+		}
+
+	// Fake client
+	// Get its owner, use a different variable name here
+	// just for readability.
+	xClient* ownerClient = Network->findFakeClientOwner( 
+		targetClient ) ;
+	if( 0 == ownerClient )
+		{
+		elog	<< "msg_P::channelMessage> Unable to "
+			<< "find owner of client: "
+			<< *targetClient
+			<< ", in channel: "
+			<< *theChan
+			<< endl ;
+		continue ;
+		}
+
+	ownerClient->OnFakeChannelCTCP( srcClient,
+		targetClient,
+		theChan,
+		command,
+		message ) ;
+	} // for()
+
+/*
 for( xNetwork::localClientIterator lcItr = Network->localClient_begin() ;
 	lcItr != Network->localClient_end() ; ++lcItr )
 	{
@@ -62,6 +113,7 @@ for( xNetwork::localClientIterator lcItr = Network->localClient_begin() ;
 			message ) ;
 		}
 	}
+*/
 }
 
 void channelMessage( iClient* srcClient,
@@ -209,6 +261,7 @@ else if( (0 == theChan) &&
 	targetClient = Network->findLocalClient( Param[ 1 ] ) ;
 	if( 0 == targetClient )
 		{
+		// Not an xClient, is it a fake client?
 		fakeTarget = Network->findFakeClient( Param[ 1 ] ) ;
 		if( 0 == fakeTarget )
 			{
@@ -243,6 +296,7 @@ else
 xClient* ownerClient = 0 ;
 if( fakeTarget != 0 )
 	{
+	// The target is a fake client, let's find its owner
 	ownerClient = Network->findFakeClientOwner( fakeTarget ) ;
 	if( 0 == ownerClient )
 		{
@@ -268,8 +322,8 @@ string command ;
 
 if( CTCP )
 	{
-	// CTCP, remove the control chars from the command
-	// Tokenizer by the CTCP delimiter, \1
+	// CTCP, remove the control chars from the command.
+	// Tokenize by the CTCP delimiter, \1
 	StringTokenizer st( Param[ 2 ], '\1' ) ;
 
 	// Make sure there is at least one token
@@ -324,10 +378,21 @@ if( CTCP )
 //			<< message
 //			<< endl ;
 
-		targetClient->OnCTCP( srcClient,
-			command,
-			message,
-			secure ) ;
+		if( fakeTarget != 0 )
+			{
+			ownerClient->OnFakeCTCP( srcClient,
+				fakeTarget,
+				command,
+				message,
+				secure ) ;
+			}
+		else
+			{
+			targetClient->OnCTCP( srcClient,
+				command,
+				message,
+				secure ) ;
+			}
 		}
 	}
 else

@@ -16,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: gnutest.h,v 1.8 2003/11/27 02:07:36 dan_karrels Exp $
+ * $Id: gnutest.h,v 1.9 2003/12/06 22:11:37 dan_karrels Exp $
  */
 
 #ifndef __GNUTEST_H
-#define __GNUTEST_H "$Id: gnutest.h,v 1.8 2003/11/27 02:07:36 dan_karrels Exp $"
+#define __GNUTEST_H "$Id: gnutest.h,v 1.9 2003/12/06 22:11:37 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
@@ -55,10 +55,34 @@ public:
 	 */
 	virtual ~gnutest() ;
 
+	/**
+	 * This method is invoked when this module is first loaded.
+	 * This is a good place to setup timers, connect to DB, etc.
+	 * At this point, the server may not yet be connected to the
+	 * network, so please do not issue join/nick requests.
+	 */
 	virtual void OnAttach() ;
+
+	/**
+	 * This method is called when this module is being unloaded from
+	 * the server.  This is a good place to cleanup, including
+	 * deallocating timers, closing connections, closing log files,
+	 * and deallocating private data stored in iClients.
+	 */
 	virtual void OnDetach( const string& =
 			string( "Server Shutdown" ) ) ;
+
+	/**
+	 * This method is called when the server connects to the network.
+	 * Note that if this module is attached while already connected
+	 * to a network, this method is still invoked.
+	 */
 	virtual void OnConnect() ;
+
+	/**
+	 * This method is invoked when the server disconnects from
+	 * its uplink.
+	 */
 	virtual void OnDisconnect() ;
 
 	/**
@@ -112,11 +136,49 @@ public:
 				const string& message ) ;
 
 	/**
+	 * This method is invoked when a fake client belonging to this
+	 * xClient receives a channel notice.
+	 */
+	virtual void	OnFakeChannelNotice( iClient* srcClient,
+				iClient* destClient,
+				Channel* theChan,
+				const string& message ) ;
+
+	/**
 	 * This method is called when a network message arrives for
 	 * one of the fake clients owned by this xClient.
 	 */
 	virtual void	OnFakePrivateMessage( iClient* srcClient,
 				iClient* destClient,
+				const string& message,
+				bool secure = false ) ;
+
+	/**
+	 * This method is called when a network notice arrives for
+	 * one of the fake clients owned by this xClient.
+	 */
+	virtual void	OnFakePrivateNotice( iClient* srcClient,
+				iClient* destClient,
+				const string& message,
+				bool secure = false ) ;
+
+	/**
+	 * Invoked when a fake client of this xClient receives a
+	 * channel CTCP.
+	 */
+	virtual void	OnFakeChannelCTCP( iClient* srcClient,
+				iClient* fakeClient,
+				Channel* theChan,
+				const string& command,
+				const string& message ) ;
+
+	/**
+	 * Invoked when a fake client of this xClient receives a
+	 * channel CTCP.
+	 */
+	virtual void	OnFakeCTCP( iClient* srcClient,
+				iClient* fakeClient,
+				const string& command,
 				const string& message,
 				bool secure = false ) ;
 
@@ -185,6 +247,18 @@ protected:
 	 * Remove a fake server.
 	 */
 	virtual void	removeServer( iClient* requestingClient,
+				const StringTokenizer& st ) ;
+
+	/**
+	 * Request that a spawned (fake) client join a channel.
+	 */
+	virtual void	spawnJoin( iClient* requestingClient,
+				const StringTokenizer& st ) ;
+
+	/**
+	 * Request that a spawned (fake) client part a channel.
+	 */
+	virtual void	spawnPart( iClient* requestingClient,
 				const StringTokenizer& st ) ;
 
 	/**

@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: Connection.h,v 1.3 2003/08/05 01:46:30 dan_karrels Exp $
+ * $Id: Connection.h,v 1.4 2003/12/06 22:11:36 dan_karrels Exp $
  */
 
 #ifndef __CONNECTION_H
-#define __CONNECTION_H "$Id: Connection.h,v 1.3 2003/08/05 01:46:30 dan_karrels Exp $"
+#define __CONNECTION_H "$Id: Connection.h,v 1.4 2003/12/06 22:11:36 dan_karrels Exp $"
 
 #include	<sys/types.h>
 #include	<netinet/in.h>
@@ -34,6 +34,7 @@
 #include	<iostream>
 
 #include	"Buffer.h"
+#include	"ELog.h"
 
 namespace gnuworld
 {
@@ -235,6 +236,30 @@ public:
 	 * Connection object to a given output stream.
 	 */
 	friend ostream& operator<<( ostream& out, const Connection& con )
+		{
+		out	<< "Host: " << con.getHostname()
+			<< ", IP: " << con.getIP()
+			<< ", localPort: " << con.getLocalPort()
+			<< ", remotePort: " << con.getRemotePort()
+			<< ", sockFD: " << con.getSockFD()
+			<< ", state: "
+			<< (con.isConnected() ? "connected" : "pending") ;
+		if( con.isIncoming() )
+			{
+			out	<< ",incoming" ;
+			}
+		if( con.isListening() )
+			{
+			out	<< ",listening" ;
+			} 
+		return out ;
+		}
+
+	/**
+	 * This friend operator allows for the easy output of a
+	 * Connection object to a given ELog output stream.
+	 */
+	friend ELog& operator<<( ELog& out, const Connection& con )
 		{
 		out	<< "Host: " << con.getHostname()
 			<< ", IP: " << con.getIP()

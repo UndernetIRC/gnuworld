@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: gnutest.cc,v 1.15 2003/11/27 18:29:31 dan_karrels Exp $
+ * $Id: gnutest.cc,v 1.16 2003/12/06 22:11:36 dan_karrels Exp $
  */
 
 #include	<string>
@@ -29,7 +29,7 @@
 #include	"EConfig.h"
 #include	"Network.h"
 
-RCSTAG("$Id: gnutest.cc,v 1.15 2003/11/27 18:29:31 dan_karrels Exp $");
+RCSTAG("$Id: gnutest.cc,v 1.16 2003/12/06 22:11:36 dan_karrels Exp $");
 
 namespace gnuworld
 {
@@ -386,6 +386,14 @@ else if( st[ 0 ] == "removeclient" )
 	{
 	removeClient( theClient, st ) ;
 	}
+else if( st[ 0 ] == "spawnjoin" )
+	{
+	spawnJoin( theClient, st ) ;
+	}
+else if( st[ 0 ] == "spawnpart" )
+	{
+	spawnPart( theClient, st ) ;
+	}
 else if( st[ 0 ] == "spawnserver" )
 	{
 	spawnServer( theClient, st ) ;
@@ -396,6 +404,26 @@ else if( st[ 0 ] == "removeserver" )
 	}
 
 xClient::OnPrivateMessage( theClient, message ) ;
+}
+
+void gnutest::OnFakeChannelNotice( iClient* srcClient,
+	iClient* destClient,
+	Channel* theChan,
+	const string& message )
+{
+//elog	<< "gnutest::OnFakeChannelNotice> srcClient: "
+//	<< *srcClient
+//	<< ", destClient: "
+//	<< *destClient
+//	<< ", channel: "
+//	<< theChan->getName()
+//	<< ", message: "
+//	<< message
+//	<< endl ;
+(void) srcClient ;
+(void) destClient ;
+(void) theChan ;
+(void) message ;
 }
 
 void gnutest::OnFakeChannelMessage( iClient* srcClient,
@@ -430,8 +458,28 @@ if( srcClient->getNickName() == "ripper_" )
 		<< " P "
 		<< theChan->getName()
 		<< " :I agree with ripper_..." ;
-//	Write( s.str() ) ;
+	Write( s.str() ) ;
 	}
+}
+
+void gnutest::OnFakePrivateNotice( iClient* srcClient,
+	iClient* destClient,
+	const string& message,
+	bool secure )
+{
+//elog	<< "gnutest::OnFakePrivateNotice> srcClient: "
+//	<< *srcClient
+//	<< ", destClient: "
+//	<< *destClient
+//	<< ", message: "
+//	<< message
+//	<< ", secure: "
+//	<< secure
+//	<< endl ;
+(void) srcClient ;
+(void) destClient ;
+(void) message ;
+(void) secure ;
 }
 
 void gnutest::OnFakePrivateMessage( iClient* /* srcClient */,
@@ -463,7 +511,7 @@ if( st[ 0 ] == "join" )
 else if( st[ 0 ] == "part" )
 	{
 	MyUplink->PartChannel( destClient, st[ 1 ],
-		"gnutest, the other white meat" ) ;
+		"gnuworld, the other white meat" ) ;
 	}
 }
 
@@ -563,7 +611,7 @@ void gnutest::removeClient( iClient* requestingClient,
 {
 if( st.size() != 2 )
 	{
-	Notice( requestingClient, "Usage: spawnclient <nickname>" ) ;
+	Notice( requestingClient, "Usage: removeclient <nickname>" ) ;
 	return ;
 	}
 
@@ -581,10 +629,21 @@ if( 0 == removeMe )
 	return ;
 	}
 
+// Verify that it is a fake client, and owned by this module
+xClient* ownerClient = Network->findFakeClientOwner( removeMe ) ;
+if( ownerClient != this )
+	{
+	Notice( requestingClient, "I don't own that client!" ) ;
+	return ;
+	}
+
 if( MyUplink->DetachClient( removeMe, "Requested shutdown" )  != 0 )
 	{
 	Notice( requestingClient, "Successfully removed fake client: %s",
 		nickName.c_str() ) ;
+
+	// This module allocated the client, so this module will
+	// deallocate it.
 	delete removeMe ; removeMe = 0 ;
 	}
 else
@@ -706,6 +765,128 @@ if( NULL == theChan )
 	}
 
 Message( theChan, "Respect my authoritah!" ) ;
+}
+
+void gnutest::OnFakeChannelCTCP( iClient* srcClient,
+	iClient* fakeClient,
+	Channel* theChan,
+	const string& command,
+	const string& message )
+{
+//elog	<< "gnutest::OnFakeChannelCTCP> srcClient: "
+//	<< *srcClient
+//	<< ", fakeClient: "
+//	<< *fakeClient
+//	<< ", theChan: "
+//	<< theChan->getName()
+//	<< ", command: "
+//	<< command
+//	<< ", message: "
+//	<< message
+//	<< endl ;
+(void) srcClient ;
+(void) theChan ;
+(void) fakeClient ;
+(void) command ;
+(void) message ;
+}
+
+void gnutest::OnFakeCTCP( iClient* srcClient,
+	iClient* fakeClient,
+	const string& command,
+	const string& message,
+	bool )
+{
+//elog	<< "gnutest::OnFakeCTCP> srcClient: "
+//	<< *srcClient
+//	<< ", fakeClient: "
+//	<< *fakeClient
+//	<< ", command: "
+//	<< command
+//	<< ", message: "
+//	<< message
+//	<< endl ;
+(void) srcClient ;
+(void) fakeClient ;
+(void) command ;
+(void) message ;
+}
+
+void gnutest::spawnJoin( iClient* srcClient,
+	const StringTokenizer& st )
+{
+// st[ 0 ] is "spawnjoin"
+// spawnjoin nick #chan
+if( st.size() != 3 )
+	{
+	Notice( srcClient, "SPAWNJOIN: Requires 3 arguments" ) ;
+	return ;
+	}
+
+// Find the client
+iClient* fakeClient = Network->findNick( st[ 1 ] ) ;
+if( 0 == fakeClient )
+	{
+	Notice( srcClient, "Nick \'%s\' does not exist",
+		st[ 1 ].c_str() ) ;
+	return ;
+	}
+
+// Verify that it is a fake client, and owned by this module
+xClient* ownerClient = Network->findFakeClientOwner( fakeClient ) ;
+if( ownerClient != this )
+	{
+	Notice( srcClient, "I don't own that client!" ) ;
+	return ;
+	}
+
+if( !getUplink()->JoinChannel( fakeClient, st[ 2 ] ) )
+	{
+	Notice( srcClient, "Unable to make \'%s\' join channel "
+		"%s",
+		st[ 1 ].c_str(),
+		st[ 2 ].c_str() ) ;
+	}
+else
+	{
+	Notice( srcClient, "%s successfully joined %s",
+		st[ 1 ].c_str(),
+		st[ 2 ].c_str() ) ;
+	}
+}
+
+void gnutest::spawnPart( iClient* srcClient,
+	const StringTokenizer& st )
+{
+// st[ 0 ] is "spawnpart"
+// spawnpart nick #chan
+if( st.size() != 3 )
+	{
+	Notice( srcClient, "SPAWNPART: Requires 3 arguments" ) ;
+	return ;
+	}
+
+// Find the client
+iClient* fakeClient = Network->findNick( st[ 1 ] ) ;
+if( 0 == fakeClient )
+	{
+	Notice( srcClient, "Nick \'%s\' does not exist",
+		st[ 1 ].c_str() ) ;
+	return ;
+	}
+
+// Verify that it is a fake client, and owned by this module
+xClient* ownerClient = Network->findFakeClientOwner( fakeClient ) ;
+if( ownerClient != this )
+	{
+	Notice( srcClient, "I don't own that client!" ) ;
+	return ;
+	}
+
+getUplink()->PartChannel( fakeClient, st[ 2 ] ) ;
+Notice( srcClient, "%s successfully parted %s",
+        st[ 1 ].c_str(),
+        st[ 2 ].c_str() ) ;
 }
 
 } // namespace gnuworld
