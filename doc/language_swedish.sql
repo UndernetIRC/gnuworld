@@ -1,11 +1,11 @@
--- $Id: language_swedish.sql,v 1.1 2002/11/06 16:34:13 nighty Exp $
+-- $Id: language_swedish.sql,v 1.2 2002/11/06 16:38:48 nighty Exp $
 -- Swedish language definition.
 -- 06/24/2002 - Ponte <tpin@telia.com>.
 -- 11/06/2002 - Comet <Comet@irc-solution.net>
 -- 11/06/2002 - typo/grammar spellchecking by LexTbomb.
 
 -- Run this once.
-INSERT INTO languages VALUES(20,'SE','Svensk',31337,0);
+INSERT INTO languages VALUES(20,'SE','Svensk',31337);
 
 
 DELETE FROM translations where language_id = 20;
@@ -27,7 +27,7 @@ COPY "translations" FROM stdin;
 20	15	%s har inte op i %s	31337	0
 20	16	%s har inte voice i %s	31337	0
 20	17	INLOGGNINGEN MISSLYCKADES som %s (Felaktigt lösenord)	31337	0
-20	20	Jag är inte i den kanalen!	31337	0
+20	18	Jag är inte i den kanalen!	31337	0
 20	19	Ogiltig ban nivå. Giltig nivå är 1-%i.	31337	0
 20	20	Ogiltig ban varaktighet. Din ban varaktighet kan max vara 336 timmar.	31337	0
 20	21	Ban anledning kan max vara 128 bokstäver	31337	0
@@ -127,7 +127,7 @@ COPY "translations" FROM stdin;
 20	115	ERROR: Ogiltig språk inställning	31337	0
 20	116	Kan inte hitta kanalen %s på nätverket!	31337	0
 20	117	ERROR: Ogiltig kanal inställning.	31337	0
-20	120	Ignorerings lista:	31337	0
+20	118	Ignorerings lista:	31337	0
 20	119	Ignorerings listan är tom	31337	0
 20	120	-- Slut på Ignorerng listan	31337	0
 20	121	CMaster Kanal Servicens interna status:	31337	0
