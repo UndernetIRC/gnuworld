@@ -560,7 +560,7 @@ else if(Command == "VERSION")
 	xClient::DoCTCP(theClient, CTCP,
 		"Undernet P10 Channel Services Version 2 ["
 		__DATE__ " " __TIME__
-		"] ($Id: cservice.cc,v 1.77 2001/01/31 21:23:16 dan_karrels Exp $)");
+		"] ($Id: cservice.cc,v 1.78 2001/02/01 23:22:51 gte Exp $)");
 	}
 else if(Command == "PROBLEM?")
 	{
@@ -1748,7 +1748,7 @@ return false ;
  */
 const string gnuworld::escapeSQLChars(const string& theString)
 { 
-string retMe ;
+/*string retMe ;
 
 for( string::const_reverse_iterator ptr = theString.rbegin() ;
 	ptr != theString.rend() ; ++ptr )
@@ -1762,7 +1762,33 @@ for( string::const_reverse_iterator ptr = theString.rbegin() ;
 		retMe += *ptr ;
 		}
 	}
-return retMe ;
+return retMe ;*/
+
+        string result;
+        result = theString;
+ 
+        string search = "'";
+        string replace = "\\\047";
+
+        string::size_type idx;
+
+        idx = string::npos;
+
+        while (true)
+        { 
+                if(idx == string::npos)
+                {
+                        idx = result.find(search);
+                } else {
+                        idx = result.find(search, idx+2);
+                }
+
+                if (idx == string::npos) break;
+
+                result.replace(idx, search.size(), replace);
+        }
+
+        return result; 
 }
 
 time_t cservice::currentTime() const
