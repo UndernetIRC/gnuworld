@@ -1,19 +1,20 @@
 -- Merry Christmas!
 
 -- Christmas language definition.
+-- 24/12/01 - R33D33R <reed@redmagnet.com>. (miscellaneous updates)
 -- 24/12/01 - nighty <nighty@undernet.org>. (fixed missing field and type of queries)
--- 19/12/01 - Reed Loden <reed@reedloden.com>.
+-- 19/12/01 - R33D33R <reed@redmagnet.com>.
 -- Special thanks to Vampire-.
 
--- run this once.
+-- Run this once.
 
 INSERT INTO languages VALUES(16,'CH','Christmas',31337);
 
 DELETE FROM translations WHERE language_id = 16;
 
 INSERT INTO translations VALUES (16,1,'We know choosing a present is difficult, but having an identity crisis is a no-no %s',31337,0);
-INSERT INTO translations VALUES (16,2,'Welcome to the Winter Wonderland %s',31337,0);
-INSERT INTO translations VALUES (16,3,'Sorry, you don\'t have the magic to cast that spell :)',31337,0);
+INSERT INTO translations VALUES (16,2,'Welcome to the Winter Wonderland, %s',31337,0);
+INSERT INTO translations VALUES (16,3,'Sorry, you don\'t have the correct number of stars to cast that spell :)',31337,0);
 INSERT INTO translations VALUES (16,4,'Sorry, the tree %s is empty',31337,0);
 INSERT INTO translations VALUES (16,5,'I don\'t see %s anywhere',31337,0);
 INSERT INTO translations VALUES (16,6,'I can\'t find %s on tree %s',31337,0);
@@ -25,19 +26,19 @@ INSERT INTO translations VALUES (16,11,'%s is already opped in %s',31337,0);
 INSERT INTO translations VALUES (16,12,'%s is already voiced in %s',31337,0);
 INSERT INTO translations VALUES (16,13,'You\'re deoped by %s (%s)',31337,0);
 INSERT INTO translations VALUES (16,14,'You\'re devoiced by %s (%s)',31337,0);
-INSERT INTO translations VALUES (16,15,'%s is not scared in %s',31337,0);
-INSERT INTO translations VALUES (16,16,'%s is not frightened in %s',31337,0);
+INSERT INTO translations VALUES (16,15,'%s is not opped in %s',31337,0);
+INSERT INTO translations VALUES (16,16,'%s is not voiced in %s',31337,0);
 INSERT INTO translations VALUES (16,17,'%s is snowed out of the Winter Wonderland (Invalid Ornament)',31337,0);
 INSERT INTO translations VALUES (16,18,'I\'m not in that tree!',31337,0);
 INSERT INTO translations VALUES (16,19,'Invalid curse-level range. Valid range is 1-%i.',31337,0);
 INSERT INTO translations VALUES (16,20,'Invalid curse duration. Your curse duration can be a maximum of 336 hours.',31337,0);
-INSERT INTO translations VALUES (16,21,'curse reason cannot exceed 128 chars',31337,0);
+INSERT INTO translations VALUES (16,21,'Curse reason cannot exceed 128 chars',31337,0);
 INSERT INTO translations VALUES (16,22,'Specified curse is already in my curse-list!',31337,0);
 INSERT INTO translations VALUES (16,23,'The curse %s is already covered by %s',31337,0);
 INSERT INTO translations VALUES (16,24,'Invalid minimum level.',31337,0);
 INSERT INTO translations VALUES (16,25,'Invalid maximum level.',31337,0);
-INSERT INTO translations VALUES (16,26,'elf: %s STARS: %s %s',31337,0);
-INSERT INTO translations VALUES (16,27,'tree: %s -- AUTOMODE: %s',31337,0);
+INSERT INTO translations VALUES (16,26,'ELF: %s STARS: %s %s',31337,0);
+INSERT INTO translations VALUES (16,27,'TREE: %s -- AUTOMODE: %s',31337,0);
 INSERT INTO translations VALUES (16,28,'LAST MODIFIED: %s (%s ago)',31337,0);
 INSERT INTO translations VALUES (16,29,'** CHARMED ** - Expires in %s (Level %i)',31337,0);
 INSERT INTO translations VALUES (16,30,'LAST SEEN: %s ago.',31337,0);
@@ -53,7 +54,7 @@ INSERT INTO translations VALUES (16,39,'Something went wrong: %s',31337,0);
 INSERT INTO translations VALUES (16,40,'%s: End of curse list',31337,0);
 INSERT INTO translations VALUES (16,41,'That elf is under an invisible spell, therefore, you cannot view elf details',31337,0);
 INSERT INTO translations VALUES (16,42,'Information about: %s (%i)',31337,0);
-INSERT INTO translations VALUES (16,43,'Currently logged on via: %s',31337,0);
+INSERT INTO translations VALUES (16,43,'Currently listed in Santa\'s Book as: %s',31337,0);
 INSERT INTO translations VALUES (16,44,'URL: %s',31337,0);
 INSERT INTO translations VALUES (16,45,'Language: %i',31337,0);
 INSERT INTO translations VALUES (16,46,'Trees: %s',31337,0);
@@ -66,12 +67,12 @@ INSERT INTO translations VALUES (16,52,'Flood me will you? I\'m spoiled so I\'m 
 INSERT INTO translations VALUES (16,53,'I think I\'ve sent you a little too much data, I\'m going to ignore you for a while.',31337,0);
 INSERT INTO translations VALUES (16,54,'Incomplete command',31337,0);
 INSERT INTO translations VALUES (16,55,'To use %s, you must /msg %s@%s',31337,0);
-INSERT INTO translations VALUES (16,56,'Sorry, You must give a present to use this command.',31337,0);
-INSERT INTO translations VALUES (16,57,'The tree %s has been suspended by one of Santa\'s North Pole Helpers.',31337,0);
-INSERT INTO translations VALUES (16,58,'Your stars on %s has been suspended.',31337,0);
+INSERT INTO translations VALUES (16,56,'Sorry, you must be in Santa\'s Book to use this command.',31337,0);
+INSERT INTO translations VALUES (16,57,'The tree %s has been charmed by one of Santa\'s North Pole Helpers.',31337,0);
+INSERT INTO translations VALUES (16,58,'Your stars on %s has been charmed.',31337,0);
 INSERT INTO translations VALUES (16,59,'The NOOP flag is set on %s',31337,0);
 INSERT INTO translations VALUES (16,60,'The STRICTOP flag is set on %s',31337,0);
-INSERT INTO translations VALUES (16,61,'You just scared more than %i people',31337,0);
+INSERT INTO translations VALUES (16,61,'You just deoped more than %i people',31337,0);
 INSERT INTO translations VALUES (16,62,'SYNTAX: %s',31337,0);
 INSERT INTO translations VALUES (16,63,'Temporarily increased your stars on tree %s to %i',31337,0);
 INSERT INTO translations VALUES (16,64,'%s is present in Santa\'s sled.',31337,0);
@@ -84,7 +85,7 @@ INSERT INTO translations VALUES (16,70,'SINCE: %s',31337,0);
 INSERT INTO translations VALUES (16,71,'EXP: %s',31337,0);
 INSERT INTO translations VALUES (16,72,'\002*** END ***\002',31337,0);
 INSERT INTO translations VALUES (16,73,'I don\'t know who %s is.',31337,0);
-INSERT INTO translations VALUES (16,74,'Someone has taken your present from you.',31337,0);
+INSERT INTO translations VALUES (16,74,'Someone has erased you from Santa\'s Book.',31337,0);
 INSERT INTO translations VALUES (16,75,'%s doesn\'t appear to have stars in %s.',31337,0);
 INSERT INTO translations VALUES (16,76,'Cannot modify an elf with equal or more stars than you have.',31337,0);
 INSERT INTO translations VALUES (16,77,'Cannot give an elf more or equal stars than you have.',31337,0);
@@ -97,7 +98,7 @@ INSERT INTO translations VALUES (16,83,'Ornament successfully changed.',31337,0)
 INSERT INTO translations VALUES (16,84,'The NOOP flag is set on %s',31337,0);
 INSERT INTO translations VALUES (16,85,'The STRICTOP flag is set on %s (and %s isn\'t authenticated)',31337,0);
 INSERT INTO translations VALUES (16,86,'The STRICTOP flag is set on %s (and %s has insufficient stars)',31337,0);
-INSERT INTO translations VALUES (16,87,'%s is frozen in ice never to be thawed',31337,0);
+INSERT INTO translations VALUES (16,87,'%s is frozen in ice never to be thawed.',31337,0);
 INSERT INTO translations VALUES (16,88,'%s is already registered with me.',31337,0);
 INSERT INTO translations VALUES (16,89,'Invalid tree name.',31337,0);
 INSERT INTO translations VALUES (16,90,'Registered tree %s',31337,0);
@@ -106,15 +107,15 @@ INSERT INTO translations VALUES (16,92,'Couldn\'t find %s in my silence list',31
 INSERT INTO translations VALUES (16,93,'Cannot remove an elf with equal or more stars than you have',31337,0);
 INSERT INTO translations VALUES (16,94,'You can\'t remove yourself from a tree you own',31337,0);
 INSERT INTO translations VALUES (16,95,'Removed elf %s from %s',31337,0);
-INSERT INTO translations VALUES (16,96,'You have casted an INVISIBLE SPELL on yourself.',31337,0);
-INSERT INTO translations VALUES (16,97,'You have revoked the INVISIBLE SPELL on yourself.',31337,0);
+INSERT INTO translations VALUES (16,96,'You casted the INVISIBLE SPELL on yourself.',31337,0);
+INSERT INTO translations VALUES (16,97,'You revoked the INVISIBLE SPELL on yourself.',31337,0);
 INSERT INTO translations VALUES (16,98,'%s for %s is %s',31337,0);
-INSERT INTO translations VALUES (16,99,'value of %s must be ON or OFF',31337,0);
+INSERT INTO translations VALUES (16,99,'Value of %s must be ON or OFF',31337,0);
 INSERT INTO translations VALUES (16,100,'Invalid ELFFLAGS setting. Correct values are 0, 1, 2.',31337,0);
 INSERT INTO translations VALUES (16,101,'ELFFLAGS for %s is %i',31337,0);
-INSERT INTO translations VALUES (16,102,'value of MASSDEOPPRO has to be 0-7',31337,0);
+INSERT INTO translations VALUES (16,102,'Value of MASSDEOPPRO has to be 0-7',31337,0);
 INSERT INTO translations VALUES (16,103,'MASSDEOPPRO for %s is set to %d',31337,0);
-INSERT INTO translations VALUES (16,104,'value of FLOODPRO has to be 0-7',31337,0);
+INSERT INTO translations VALUES (16,104,'Value of FLOODPRO has to be 0-7',31337,0);
 INSERT INTO translations VALUES (16,105,'FLOODPRO for %s is set to %d',31337,0);
 INSERT INTO translations VALUES (16,106,'The DESCRIPTION can be a maximum of 80 chars!',31337,0);
 INSERT INTO translations VALUES (16,107,'DESCRIPTION for %s is cleared.',31337,0);
@@ -142,37 +143,37 @@ INSERT INTO translations VALUES (16,128,'Last received Level NOTIFY: %i',31337,0
 INSERT INTO translations VALUES (16,129,'Last received Curse NOTIFY: %i',31337,0);
 INSERT INTO translations VALUES (16,130,'Custom data containers allocated: %i',31337,0);
 INSERT INTO translations VALUES (16,131,'\002Uptime:\002 %s',31337,0);
-INSERT INTO translations VALUES (16,132,'tree %s has %d elfs (%i operators)',31337,0);
+INSERT INTO translations VALUES (16,132,'Tree %s has %d elfs (%i operators)',31337,0);
 INSERT INTO translations VALUES (16,133,'Mode is: %s',31337,0);
 INSERT INTO translations VALUES (16,134,'Flags set: %s',31337,0);
-INSERT INTO translations VALUES (16,135,'Cannot suspend an elf with equal or more stars than you have.',31337,0);
-INSERT INTO translations VALUES (16,136,'bogus time units',31337,0);
-INSERT INTO translations VALUES (16,137,'Invalid suspend duration.',31337,0);
-INSERT INTO translations VALUES (16,138,'SUSPENSION for %s is cancelled',31337,0);
-INSERT INTO translations VALUES (16,139,'%s is already suspended on %s',31337,0);
-INSERT INTO translations VALUES (16,140,'SUSPENSION for %s will expire in %s',31337,0);
+INSERT INTO translations VALUES (16,135,'Cannot charm an elf with equal or more stars than you have.',31337,0);
+INSERT INTO translations VALUES (16,136,'Bogus Time Units',31337,0);
+INSERT INTO translations VALUES (16,137,'Invalid charm duration.',31337,0);
+INSERT INTO translations VALUES (16,138,'CHARM for %s is cancelled',31337,0);
+INSERT INTO translations VALUES (16,139,'%s is already charmed on %s',31337,0);
+INSERT INTO translations VALUES (16,140,'CHARM for %s will expire in %s',31337,0);
 INSERT INTO translations VALUES (16,141,'ERROR: Topic cannot exceed 145 chars',31337,0);
 INSERT INTO translations VALUES (16,142,'You have insufficient stars to remove the curse %s from %s\'s database',31337,0);
 INSERT INTO translations VALUES (16,143,'Removed %i curses that matched %s',31337,0);
 INSERT INTO translations VALUES (16,144,'Removed your temporary stars of %i from tree %s',31337,0);
 INSERT INTO translations VALUES (16,145,'You don\'t appear to have forced stars in %s, perhaps it expired?',31337,0);
-INSERT INTO translations VALUES (16,146,'%s isn\'t suspended on %s',31337,0);
+INSERT INTO translations VALUES (16,146,'%s isn\'t charmed on %s',31337,0);
 INSERT INTO translations VALUES (16,147,'%s is one of Santa\'s reindeer',31337,0);
 INSERT INTO translations VALUES (16,148,'%s does not believe in Santa Claus.',31337,0);
 INSERT INTO translations VALUES (16,149,'%s is listed in Santa\'s Book as %s%s',31337,0);
-INSERT INTO translations VALUES (16,150,'%s is an Official North Pole Helper%s and logged in as %s',31337,0);
-INSERT INTO translations VALUES (16,151,'%s is a Generous Official North Pole Helper%s and logged in as %s',31337,0);
-INSERT INTO translations VALUES (16,152,'%s is an Angel%s and logged in as %s',31337,0);
+INSERT INTO translations VALUES (16,150,'%s is an Official North Pole Helper%s and is listed in Santa\'s Book as %s',31337,0);
+INSERT INTO translations VALUES (16,151,'%s is a Generous Official North Pole Helper%s and is listed in Santa\'s Book as %s',31337,0);
+INSERT INTO translations VALUES (16,152,'%s is an Angel%s and is listed in Santa\'s Book as %s',31337,0);
 INSERT INTO translations VALUES (16,153,'There are more than %i entries matching [%s]',31337,0);
 INSERT INTO translations VALUES (16,154,'Please restrict your search mask',31337,0);
 INSERT INTO translations VALUES (16,155,'No matching entries for [%s]',31337,0);
 INSERT INTO translations VALUES (16,156,'%s: Cleared tree modes.',31337,0);
 INSERT INTO translations VALUES (16,158,'Invalid option.',31337,0);
 INSERT INTO translations VALUES (16,159,'%s is an Official UnderNet Red-Nosed Reindeer.',31337,0);
-INSERT INTO translations VALUES (16,160,'%s is an Official Coder-Com Representative%s and logged in as %s',31337,0);
-INSERT INTO translations VALUES (16,161,'%s is an Official Coder-Com Contributer%s and logged in as %s',31337,0);
-INSERT INTO translations VALUES (16,162,'%s is an Official Coder-Com Developer%s and logged in as %s',31337,0);
-INSERT INTO translations VALUES (16,163,'%s is an Official Coder-Com Senior%s and logged in as %s',31337,0);
+INSERT INTO translations VALUES (16,160,'%s is an Official Coder-Com Representative%s and is listed in Santa\'s Book as %s',31337,0);
+INSERT INTO translations VALUES (16,161,'%s is an Official Coder-Com Contributer%s and is listed in Santa\'s Book as %s',31337,0);
+INSERT INTO translations VALUES (16,162,'%s is an Official Coder-Com Developer%s and is listed in Santa\'s Book as %s',31337,0);
+INSERT INTO translations VALUES (16,163,'%s is an Official Coder-Com Senior%s and is listed in Santa\'s Book as %s',31337,0);
 INSERT INTO translations VALUES (16,164,' and is one of Santa\'s reindeer',31337,0);
 INSERT INTO translations VALUES (16,165,'Added curse %s to %s at level %i',31337,0);
 INSERT INTO translations VALUES (16,166,'%s: curse list is empty.\'',31337,0);
