@@ -76,7 +76,7 @@ for( commandMapType::iterator ptr = commandMap.begin() ;
 if (SQLDb->ExecCommandOk("LISTEN channels_u; LISTEN bans_u; LISTEN users_u; LISTEN levels_u;"))
 	{
 	elog	<< "cmaster::ImplementServer> Successfully registered "
-		<< "LISTEN event for Db updates." << endl;
+			<< "LISTEN event for Db updates." << endl;
 
 	// Start the Db update timer rolling.
 	time_t theTime = time(NULL) + updateInterval;
@@ -85,8 +85,8 @@ if (SQLDb->ExecCommandOk("LISTEN channels_u; LISTEN bans_u; LISTEN users_u; LIST
 else 
 	{
 	elog	<< "cmaster::ImplementServer> PostgreSQL error while "
-		<< "attempting to register LISTEN event: "
-		<< SQLDb->ErrorMessage() << endl;
+			<< "attempting to register LISTEN event: "
+			<< SQLDb->ErrorMessage() << endl;
 	}
 
 if (SQLDb->Exec("SELECT now()::abstime::int4;") == PGRES_TUPLES_OK) 
@@ -624,8 +624,8 @@ return xClient::OnPrivateMessage( theClient, Message ) ;
  
 int cservice::OnCTCP( iClient* theClient, const string& CTCP,
                     const string& Message, bool Secure)
-{
-/*
+{ 
+/**
  * CTCP hander. Deal with PING, GENDER and VERSION. 
  * Hit users with a '5' flood score for CTCP's.
  * This should be in the config file.
@@ -660,11 +660,15 @@ else if(Command == "VERSION")
 	xClient::DoCTCP(theClient, CTCP,
 		"Undernet P10 Channel Services Version 2 ["
 		__DATE__ " " __TIME__
-		"] ($Id: cservice.cc,v 1.115 2001/02/21 00:14:44 dan_karrels Exp $)");
+		"] Release 1.0");
 	}
 else if(Command == "PROBLEM?")
 	{
 	xClient::DoCTCP(theClient, CTCP.c_str(), "Blame Perry!");
+	} 
+else if(Command == "WHAT_YOU_SAY?")
+	{
+	xClient::DoCTCP(theClient, CTCP.c_str(), "All your base are belong to us.");
 	} 
  
 return true;
@@ -1107,11 +1111,18 @@ bool cservice::isOnChannel( const string& chanName ) const
 return true;
 }
 
-/*
+/**
+ * This member function executes an SQL query to return all
+ * suspended access level records, and unsuspend them. 
+ * TODO
+ */
+//void cservice::expireSuspends
+
+/**
  * Time to see if anyone updated the database while we
  * weren't looking. :)
  */
-int cservice::OnTimer(xServer::timerID, void*)
+int cservice::OnTimer(xServer::timerID timer_id, void*)
 {
 
 // elog	<< "cmaster::OnTimer> Checking for updates.."
@@ -1122,6 +1133,7 @@ MyUplink->RegisterTimer(theTime, this, NULL);
 
 /*
  *  Any pending reop's?
+ *  TODO: Rewrite this bit --Gte
  */
 
 if (!reopQ.empty())
@@ -1256,7 +1268,7 @@ if (status != PGRES_TUPLES_OK)
 		<< SQLDb->ErrorMessage()
 		<< endl;
 
-	// TODO: Log to msgchan here.
+	// TODO: Log to debugchan here.
 	return false;
 	}
 
