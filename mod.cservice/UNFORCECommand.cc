@@ -1,22 +1,23 @@
 /* UNFORCECommand.cc */
 
 #include	<string>
- 
+
 #include	"StringTokenizer.h"
-#include	"ELog.h" 
-#include	"cservice.h" 
+#include	"ELog.h"
+#include	"cservice.h"
 #include	"levels.h"
 #include	"responses.h"
 
-const char UNFORCECommand_cc_rcsId[] = "$Id: UNFORCECommand.cc,v 1.7 2001/03/18 17:25:00 dan_karrels Exp $" ;
+const char UNFORCECommand_cc_rcsId[] = "$Id: UNFORCECommand.cc,v 1.8 2001/09/05 03:47:56 gte Exp $" ;
 
 namespace gnuworld
 {
-
 using std::string ;
- 
+
 bool UNFORCECommand::Exec( iClient* theClient, const string& Message )
-{ 
+{
+bot->incStat("COMMANDS.UNFORCE");
+
 StringTokenizer st( Message ) ;
 if( st.size() < 2 )
 	{
@@ -32,7 +33,7 @@ if( st.size() < 2 )
 sqlUser* theUser = bot->isAuthed(theClient, true);
 if (!theUser)
 	{
-	return false; 
+	return false;
  	}
 
 sqlChannel* admChan = bot->getChannelRecord("*");
@@ -40,29 +41,29 @@ sqlChannel* admChan = bot->getChannelRecord("*");
 int admLevel = bot->getAccessLevel(theUser, admChan);
 if (admLevel < level::force)
 	{
-	bot->Notice(theClient, 
+	bot->Notice(theClient,
 		bot->getResponse(theUser,
 			language::insuf_access,
 			string("Sorry, you have insufficient access to "
 				"perform that command.")));
 	return false;
-	} 
+	}
 
 /*
  *  First, check the channel is registered.
  */
- 
+
 sqlChannel* theChan = bot->getChannelRecord(st[1]);
-if (!theChan) 
+if (!theChan)
 	{
-	bot->Notice(theClient, 
+	bot->Notice(theClient,
 		bot->getResponse(theUser,
 			language::chan_not_reg,
 			string("Sorry, %s isn't registered with me.")).c_str(),
 		st[1].c_str());
 	return false;
-	} 
- 
+	}
+
 /*
  * Check to see if this userID is forced in this channel.
  */
@@ -72,25 +73,25 @@ sqlChannel::forceMapType::iterator ptr
 
 /* If we found something, drop it. */
 if(ptr != theChan->forceMap.end())
-	{ 
+	{
 	theChan->forceMap.erase(theUser->getID());
 		bot->Notice(theClient,
 			bot->getResponse(theUser,
 				language::rem_temp_access,
-				string("Removed your temporary access of %i from channel %s")).c_str(), 
+				string("Removed your temporary access of %i from channel %s")).c_str(),
 			admLevel,
-			theChan->getName().c_str()); 
+			theChan->getName().c_str());
 	return true;
-	} 
+	}
 
-bot->Notice(theClient, 
+bot->Notice(theClient,
 	bot->getResponse(theUser,
 		language::no_forced_access,
 		string("You don't appear to have a forced access in "
-			"%s, perhaps it expired?")).c_str(), 
-	theChan->getName().c_str()); 
+			"%s, perhaps it expired?")).c_str(),
+	theChan->getName().c_str());
 
 return true ;
-} 
+}
 
 } // namespace gnuworld

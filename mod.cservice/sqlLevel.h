@@ -1,7 +1,7 @@
 /* sqlLevel.h */
 
 #ifndef __SQLLEVEL_H
-#define __SQLLEVEL_H "$Id: sqlLevel.h,v 1.13 2001/07/29 20:37:57 gte Exp $"
+#define __SQLLEVEL_H "$Id: sqlLevel.h,v 1.14 2001/09/05 03:47:56 gte Exp $"
 
 #include	<string>
 #include	<ctime>
@@ -122,6 +122,7 @@ public:
 		{ last_used = _last_used; }
 
 	bool commit();
+	bool insertRecord();
 	bool loadData( unsigned int, unsigned int );
 	void setAllMembers(int);
 

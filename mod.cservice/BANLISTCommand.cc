@@ -9,7 +9,7 @@
  *
  * Caveats: None.
  *
- * $Id: BANLISTCommand.cc,v 1.17 2001/07/30 18:56:46 gte Exp $
+ * $Id: BANLISTCommand.cc,v 1.18 2001/09/05 03:47:56 gte Exp $
  */
 
 #include        <string>
@@ -20,16 +20,16 @@
 #include        "levels.h"
 #include        "responses.h"
 
-const char BANLISTCommand_cc_rcsId[] = "$Id: BANLISTCommand.cc,v 1.17 2001/07/30 18:56:46 gte Exp $" ;
+const char BANLISTCommand_cc_rcsId[] = "$Id: BANLISTCommand.cc,v 1.18 2001/09/05 03:47:56 gte Exp $" ;
 
 namespace gnuworld
 {
-
 using std::string ;
 using namespace level;
 
 bool BANLISTCommand::Exec( iClient* theClient, const string& Message )
 {
+bot->incStat("COMMANDS.BANLIST");
 StringTokenizer st( Message ) ;
 if( st.size() < 2 )
 	{

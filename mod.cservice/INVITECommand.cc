@@ -1,5 +1,5 @@
-/* 
- * INVITECommand.cc 
+/*
+ * INVITECommand.cc
  *
  * 29/12/2000 - Greg Sikorski <gte@atomicrevs.demon.co.uk>
  * Initial Version.
@@ -8,28 +8,29 @@
  *
  * Caveats: None
  *
- * $Id: INVITECommand.cc,v 1.5 2001/02/16 20:20:26 plexus Exp $
+ * $Id: INVITECommand.cc,v 1.6 2001/09/05 03:47:56 gte Exp $
  */
 
 
 #include	<string>
- 
+
 #include	"StringTokenizer.h"
-#include	"ELog.h" 
+#include	"ELog.h"
 #include	"cservice.h"
 #include	"levels.h"
 #include	"responses.h"
 #include	"Network.h"
 
-const char INVITECommand_cc_rcsId[] = "$Id: INVITECommand.cc,v 1.5 2001/02/16 20:20:26 plexus Exp $" ;
+const char INVITECommand_cc_rcsId[] = "$Id: INVITECommand.cc,v 1.6 2001/09/05 03:47:56 gte Exp $" ;
 
 namespace gnuworld
 {
 
 using namespace gnuworld;
- 
+
 bool INVITECommand::Exec( iClient* theClient, const string& Message )
-{ 
+{
+	bot->incStat("COMMANDS.INVITE");
 	StringTokenizer st( Message ) ;
 	if( st.size() < 2 )
 	{
@@ -47,7 +48,7 @@ bool INVITECommand::Exec( iClient* theClient, const string& Message )
 		return false;
 	}
 
-	/* 
+	/*
 	 *  Check the channel is actually registered.
 	 */
 
@@ -56,17 +57,17 @@ bool INVITECommand::Exec( iClient* theClient, const string& Message )
 		bot->Notice(theClient, bot->getResponse(theUser, language::chan_not_reg).c_str(),
 			st[1].c_str());
 		return false;
-	} 
+	}
 
  	/* Check the bot is in the channel. */
- 
+
 	if (!theChan->getInChan()) {
-		bot->Notice(theClient, 
+		bot->Notice(theClient,
 			bot->getResponse(theUser,
 				language::i_am_not_on_chan,
 				string("I'm not in that channel!")));
 		return false;
-	} 
+	}
 
 	/*
 	 *  Check the user has sufficient access on this channel.
@@ -77,15 +78,15 @@ bool INVITECommand::Exec( iClient* theClient, const string& Message )
 	{
 		bot->Notice(theClient, bot->getResponse(theUser, language::insuf_access).c_str());
 		return false;
-	} 
- 
+	}
+
 	/*
-	 *  No parameters, Just invite them to the channel. 
+	 *  No parameters, Just invite them to the channel.
 	 */
 
 	bot->Invite(theClient, theChan->getName());
- 
+
 	return true;
-} 
+}
 
 } // namespace gnuworld.

@@ -10,15 +10,16 @@
 #include	"Network.h"
 #include	"cservice_config.h"
 
-const char STATUSCommand_cc_rcsId[] = "$Id: STATUSCommand.cc,v 1.33 2001/08/30 19:30:20 gte Exp $" ;
+const char STATUSCommand_cc_rcsId[] = "$Id: STATUSCommand.cc,v 1.34 2001/09/05 03:47:56 gte Exp $" ;
 
 namespace gnuworld
 {
-
 using std::string ;
 
 bool STATUSCommand::Exec( iClient* theClient, const string& Message )
 {
+bot->incStat("COMMANDS.STATUS");
+
 StringTokenizer st( Message ) ;
 if( st.size() < 2 )
 	{
@@ -351,13 +352,7 @@ if( PGRES_TUPLES_OK != status )
 string authList;
 string nextPerson;
 
-/* Only show the nicknames if we are actually on that channel. */
-
-bool showNicks = false;
-if (tmpChan)
-	{
-	showNicks = (tmpChan->findUser(theClient) || admLevel);
-	}
+bool showNick = false;
 
 for (int i = 0 ; i < bot->SQLDb->Tuples(); i++)
 	{
@@ -378,7 +373,15 @@ for (int i = 0 ; i < bot->SQLDb->Tuples(); i++)
 
 		nextPerson += bot->SQLDb->GetValue(i, 0);
 
-		if (showNicks)
+		/*
+		 * Only show the online nickname if that person is in the target
+		 * channel.
+		 */
+
+		showNick = false;
+		if (tmpChan) showNick = (tmpChan->findUser(tmpClient) || admLevel);
+
+		if (showNick)
 			{
 			nextPerson += "/\002";
 			nextPerson += tmpClient->getNickName();

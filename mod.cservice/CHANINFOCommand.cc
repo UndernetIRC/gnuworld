@@ -13,7 +13,7 @@
  *
  * Command is aliased "INFO".
  *
- * $Id: CHANINFOCommand.cc,v 1.30 2001/08/10 20:11:16 gte Exp $
+ * $Id: CHANINFOCommand.cc,v 1.31 2001/09/05 03:47:56 gte Exp $
  */
 
 #include	<string>
@@ -26,11 +26,10 @@
 #include	"libpq++.h"
 #include	"cservice_config.h"
 
-const char CHANINFOCommand_cc_rcsId[] = "$Id: CHANINFOCommand.cc,v 1.30 2001/08/10 20:11:16 gte Exp $" ;
+const char CHANINFOCommand_cc_rcsId[] = "$Id: CHANINFOCommand.cc,v 1.31 2001/09/05 03:47:56 gte Exp $" ;
 
 namespace gnuworld
 {
-
 using std::string ;
 
 static const char* queryHeader = "SELECT channels.name,users.user_name,levels.access,users_lastseen.last_seen FROM levels,channels,users,users_lastseen ";
@@ -38,6 +37,8 @@ static const char* queryString = "WHERE levels.channel_id=channels.id AND users.
 
 bool CHANINFOCommand::Exec( iClient* theClient, const string& Message )
 {
+bot->incStat("COMMANDS.INFO");
+
 StringTokenizer st( Message ) ;
 if( st.size() < 2 )
 	{

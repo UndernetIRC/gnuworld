@@ -1,5 +1,5 @@
-/* 
- * DEOPCommand.cc 
+/*
+ * DEOPCommand.cc
  *
  * 20/12/2000 - Greg Sikorski <gte@atomicrevs.demon.co.uk>
  * Initial Version.
@@ -8,36 +8,37 @@
  *
  * Caveats: None
  *
- * $Id: DEOPCommand.cc,v 1.10 2001/03/06 02:34:32 dan_karrels Exp $
+ * $Id: DEOPCommand.cc,v 1.11 2001/09/05 03:47:56 gte Exp $
  */
 
 #include	<string>
 #include	<map>
- 
+
 #include	"StringTokenizer.h"
-#include	"ELog.h" 
-#include	"cservice.h" 
+#include	"ELog.h"
+#include	"cservice.h"
 #include	"Network.h"
 #include	"levels.h"
 #include	"responses.h"
 
-const char DEOPCommand_cc_rcsId[] = "$Id: DEOPCommand.cc,v 1.10 2001/03/06 02:34:32 dan_karrels Exp $" ;
+const char DEOPCommand_cc_rcsId[] = "$Id: DEOPCommand.cc,v 1.11 2001/09/05 03:47:56 gte Exp $" ;
 
 namespace gnuworld
 {
-
 using std::map ;
 
 bool DEOPCommand::Exec( iClient* theClient, const string& Message )
-{ 
+{
+bot->incStat("COMMANDS.DEOP");
+
 StringTokenizer st( Message ) ;
- 
+
 if( st.size() < 2 )
 	{
 	Usage(theClient);
 	return true;
 	}
- 
+
 /*
  *  Fetch the sqlUser record attached to this client. If there isn't one,
  *  they aren't logged in - tell them they should be.
@@ -49,7 +50,7 @@ if (!theUser)
 	return false;
 	}
 
-/* 
+/*
  *  Check the channel is actually registered.
  */
 
@@ -60,13 +61,13 @@ if (!theChan)
 		bot->getResponse(theUser, language::chan_not_reg).c_str(),
 		st[1].c_str());
 	return false;
-	} 
+	}
 
 /* Check the bot is in the channel. */
 
 if (!theChan->getInChan())
 	{
-	bot->Notice(theClient, 
+	bot->Notice(theClient,
 		bot->getResponse(theUser,
 			language::i_am_not_on_chan,
 			string("I'm not in that channel!")));
@@ -83,13 +84,13 @@ if (level < level::deop)
 	bot->Notice(theClient,
 		bot->getResponse(theUser, language::insuf_access).c_str());
 	return false;
-	} 
+	}
 
-Channel* tmpChan = Network->findChannel(theChan->getName()); 
-if (!tmpChan) 
+Channel* tmpChan = Network->findChannel(theChan->getName());
+if (!tmpChan)
 	{
 	bot->Notice(theClient,
-		bot->getResponse(theUser, language::chan_is_empty).c_str(), 
+		bot->getResponse(theUser, language::chan_is_empty).c_str(),
 		theChan->getName().c_str());
 	return false;
 	}
@@ -108,7 +109,7 @@ if(!tmpBotUser->getMode(ChannelUser::MODE_O))
 	{
 	bot->Notice(theClient, "I'm not opped in %s", theChan->getName().c_str());
 	return false;
-	} 
+	}
 
 /*
  *  Loop over the remaining 'nick' parameters, opping them all.
@@ -121,8 +122,8 @@ iClient* target = 0 ;
 // Offset of first nick in list.
 StringTokenizer::size_type counter = 2 ;
 
-typedef map < iClient*, int > duplicateMapType; 
-duplicateMapType duplicateMap; 
+typedef map < iClient*, int > duplicateMapType;
+duplicateMapType duplicateMap;
 
 vector< iClient* > deopList ;
 
@@ -131,11 +132,11 @@ if( st.size() < 3 )
 	{
 	deopList.push_back(theClient);
 	source = Message;
-	delim = ' '; 
+	delim = ' ';
 	}
 else
 	{
-	string::size_type pos = st[2].find_first_of( ',' ) ; 
+	string::size_type pos = st[2].find_first_of( ',' ) ;
 
 	// Found a comma?
 	if( string::npos != pos )
@@ -146,12 +147,12 @@ else
 		counter = 0;
 		}
 	else
-		{ 
+		{
 		source = Message;
 		delim = ' ';
-		} 
+		}
 	}
- 
+
 StringTokenizer st2( source, delim );
 
 while( counter < st2.size())
@@ -166,12 +167,12 @@ while( counter < st2.size())
 
 		++counter ;
 		continue ;
-		} 
+		}
 
 	/* Don't deop +k things */
 	if( target->getMode(iClient::MODE_SERVICES) )
 		{
-		bot->Notice(theClient, 
+		bot->Notice(theClient,
 			bot->getResponse(theUser,
 				language::wouldnt_appreciate,
 				string("I don't think %s would appreciate that.")).c_str(),
@@ -187,8 +188,8 @@ while( counter < st2.size())
 	if( !tmpChanUser )
 		{
 		bot->Notice(theClient,
-			bot->getResponse(theUser, language::cant_find_on_chan).c_str(), 
-			target->getNickName().c_str(), theChan->getName().c_str()); 
+			bot->getResponse(theUser, language::cant_find_on_chan).c_str(),
+			target->getNickName().c_str(), theChan->getName().c_str());
 
 		++counter ;
 		continue ;
@@ -203,8 +204,8 @@ while( counter < st2.size())
 
 		++counter ;
 		continue ;
-		} 
- 
+		}
+
 	// Check for duplicates.
 	duplicateMapType::iterator ptr = duplicateMap.find(target);
 
@@ -216,11 +217,11 @@ while( counter < st2.size())
 		}
 
 	deopList.push_back(target);
-	duplicateMap.insert(duplicateMapType::value_type(target, 0)); 
+	duplicateMap.insert(duplicateMapType::value_type(target, 0));
 
 	// Don't send a notice to the person who issued the command.
 	if(target != theClient)
-		{ 
+		{
 		sqlUser* tmpTargetUser = bot->isAuthed(target, false);
 		if (tmpTargetUser)
 			{
@@ -235,17 +236,17 @@ while( counter < st2.size())
 				bot->getResponse(theUser, language::youre_deopped_by).c_str(),
 				theClient->getNickName().c_str(),
 				theUser->getUserName().c_str());
-			} 
+			}
 		} // Don't send to person who issued.
 
 	++counter ;
 	} // while()
 
-// deOp them. 
+// deOp them.
 bot->DeOp(tmpChan, deopList);
 return true ;
 
-} 
+}
 
 } // namespace gnuworld.
 

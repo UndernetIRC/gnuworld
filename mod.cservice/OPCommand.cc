@@ -20,7 +20,7 @@
  *
  * Caveats: None
  *
- * $Id: OPCommand.cc,v 1.27 2001/08/26 22:06:17 gte Exp $
+ * $Id: OPCommand.cc,v 1.28 2001/09/05 03:47:56 gte Exp $
  */
 
 #include	<string>
@@ -35,15 +35,15 @@
 
 using std::map ;
 
-const char OPCommand_cc_rcsId[] = "$Id: OPCommand.cc,v 1.27 2001/08/26 22:06:17 gte Exp $" ;
+const char OPCommand_cc_rcsId[] = "$Id: OPCommand.cc,v 1.28 2001/09/05 03:47:56 gte Exp $" ;
 
 namespace gnuworld
 {
-
 using std::string ;
 
 bool OPCommand::Exec( iClient* theClient, const string& Message )
 {
+bot->incStat("COMMANDS.OP");
 
 StringTokenizer st( Message ) ;
 if( st.size() < 2 )

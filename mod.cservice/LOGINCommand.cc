@@ -12,11 +12,10 @@
 #include	"cservice_config.h"
 #include	"Network.h"
 
-const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.25 2001/08/13 00:26:57 gte Exp $" ;
+const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.26 2001/09/05 03:47:56 gte Exp $" ;
 
 namespace gnuworld
 {
-
 struct autoOpData {
 	unsigned int channel_id;
 	unsigned int flags;
@@ -27,6 +26,7 @@ using namespace gnuworld;
 
 bool LOGINCommand::Exec( iClient* theClient, const string& Message )
 {
+bot->incStat("COMMANDS.LOGIN");
 
 StringTokenizer st( Message ) ;
 if( st.size() < 3 )

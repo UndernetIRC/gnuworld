@@ -7,7 +7,7 @@
  * Suspends an user on the specified channel, if suspend duration 0
  * is defined, the user will be unsuspended.
  *
- * $Id: SUSPENDCommand.cc,v 1.19 2001/07/29 20:37:57 gte Exp $
+ * $Id: SUSPENDCommand.cc,v 1.20 2001/09/05 03:47:56 gte Exp $
  */
 
 #include	<string>
@@ -21,16 +21,17 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char SUSPENDCommand_cc_rcsId[] = "$Id: SUSPENDCommand.cc,v 1.19 2001/07/29 20:37:57 gte Exp $" ;
+const char SUSPENDCommand_cc_rcsId[] = "$Id: SUSPENDCommand.cc,v 1.20 2001/09/05 03:47:56 gte Exp $" ;
 
 namespace gnuworld
 {
-
 using std::string ;
 using namespace level;
 
 bool SUSPENDCommand::Exec( iClient* theClient, const string& Message )
 {
+bot->incStat("COMMANDS.SUSPEND");
+
 StringTokenizer st( Message ) ;
 if( st.size() < 3 )
 	{

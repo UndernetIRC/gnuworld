@@ -8,7 +8,7 @@
  *
  * Caveats: None.
  *
- * $Id: UNSUSPENDCommand.cc,v 1.17 2001/09/03 17:19:45 dan_karrels Exp $
+ * $Id: UNSUSPENDCommand.cc,v 1.18 2001/09/05 03:47:56 gte Exp $
  */
 
 #include	<string>
@@ -20,16 +20,17 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char UNSUSPENDCommand_cc_rcsId[] = "$Id: UNSUSPENDCommand.cc,v 1.17 2001/09/03 17:19:45 dan_karrels Exp $" ;
+const char UNSUSPENDCommand_cc_rcsId[] = "$Id: UNSUSPENDCommand.cc,v 1.18 2001/09/05 03:47:56 gte Exp $" ;
 
 namespace gnuworld
 {
-
 using std::string ;
 using namespace level;
 
 bool UNSUSPENDCommand::Exec( iClient* theClient, const string& Message )
 {
+bot->incStat("COMMANDS.UNSUSPEND");
+
 StringTokenizer st( Message ) ;
 
 if( st.size() < 2 )

@@ -1,5 +1,5 @@
-/* 
- * PARTCommand.cc 
+/*
+ * PARTCommand.cc
  *
  * 10/02/2001 - David Henriksen <david@itwebnet.dk>
  * Initial Version. Written, and finished.
@@ -8,28 +8,30 @@
  *
  * Caveats: None
  *
- * $Id: OPERPARTCommand.cc,v 1.9 2001/05/11 16:39:13 gte Exp $
+ * $Id: OPERPARTCommand.cc,v 1.10 2001/09/05 03:47:56 gte Exp $
  */
 
 
 #include	<string>
- 
+
 #include	"StringTokenizer.h"
-#include	"ELog.h" 
+#include	"ELog.h"
 #include	"cservice.h"
 #include	"levels.h"
 #include	"responses.h"
 #include	"Network.h"
 
-const char OPERPARTCommand_cc_rcsId[] = "$Id: OPERPARTCommand.cc,v 1.9 2001/05/11 16:39:13 gte Exp $" ;
+const char OPERPARTCommand_cc_rcsId[] = "$Id: OPERPARTCommand.cc,v 1.10 2001/09/05 03:47:56 gte Exp $" ;
 
 namespace gnuworld
 {
 
 using std::string ;
- 
+
 bool OPERPARTCommand::Exec( iClient* theClient, const string& Message )
-{ 
+{
+bot->incStat("COMMANDS.OPERPART");
+
 StringTokenizer st( Message ) ;
 if( st.size() < 2 )
 	{
@@ -53,7 +55,7 @@ if(!theClient->isOper())
 	return true;
 	}
 
-/* 
+/*
  *  Check the channel is actually registered.
  */
 
@@ -64,13 +66,13 @@ if (!theChan)
 		bot->getResponse(theUser, language::chan_not_reg).c_str(),
 		st[1].c_str());
 	return false;
-	} 
+	}
 
 /* Check the bot is in the channel. */
 
 if (!theChan->getInChan())
 	{
-	bot->Notice(theClient, 
+	bot->Notice(theClient,
 		bot->getResponse(theUser, language::i_am_not_on_chan,
 			string("I'm not in that channel!")));
 	return false;
@@ -78,8 +80,8 @@ if (!theChan->getInChan())
 
 bot->writeChannelLog(theChan, theClient, sqlChannel::EV_OPERPART, "");
 
-// Tell the world. 
- 
+// Tell the world.
+
 strstream s;
 s       << server->getCharYY()
 	<< " WA :"
@@ -89,7 +91,7 @@ s       << server->getCharYY()
 
 bot->Write(s);
 delete[] s.str();
-	
+
 bot->logAdminMessage("%s is asking me to leave channel %s",
 		theClient->getNickUserHost().c_str(),
 		theChan->getName().c_str());
@@ -97,10 +99,10 @@ bot->logAdminMessage("%s is asking me to leave channel %s",
 theChan->setInChan(false);
 bot->getUplink()->UnRegisterChannelEvent(theChan->getName(), bot);
 bot->joinCount--;
-	
+
 bot->Part(theChan->getName(), "At the request of an IRC Operator");
-	
+
 return true;
-} 
+}
 
 } // namespace gnuworld.

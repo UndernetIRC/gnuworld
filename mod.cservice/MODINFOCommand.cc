@@ -1,5 +1,5 @@
-/* 
- * MODINFOCommand.cc 
+/*
+ * MODINFOCommand.cc
  *
  * 27/12/2000 - Greg Sikorski <gte@atomicrevs.demon.co.uk>
  * Initial Version.
@@ -13,34 +13,35 @@
  * Shouldn't really happen, as trying to MODINFO a forced access doesn't
  * make sense - adduser and then MODINFO that :)
  *
- * $Id: MODINFOCommand.cc,v 1.16 2001/03/19 22:17:46 gte Exp $
+ * $Id: MODINFOCommand.cc,v 1.17 2001/09/05 03:47:56 gte Exp $
  */
 
 #include	<string>
- 
+
 #include	"StringTokenizer.h"
-#include	"cservice.h" 
+#include	"cservice.h"
 #include	"levels.h"
 #include	"responses.h"
 
-const char MODINFOCommand_cc_rcsId[] = "$Id: MODINFOCommand.cc,v 1.16 2001/03/19 22:17:46 gte Exp $" ;
+const char MODINFOCommand_cc_rcsId[] = "$Id: MODINFOCommand.cc,v 1.17 2001/09/05 03:47:56 gte Exp $" ;
 
 namespace gnuworld
 {
-
 using std::string ;
- 
+
 bool MODINFOCommand::Exec( iClient* theClient, const string& Message )
-{ 
+{
+bot->incStat("COMMANDS.MODINFO");
+
 StringTokenizer st( Message ) ;
 if( st.size() < 5 )
 	{
 	Usage(theClient);
 	return true;
 	}
- 
-const string command = string_upper(st[2]); 
-if ((command != "ACCESS") && (command != "AUTOMODE")) 
+
+const string command = string_upper(st[2]);
+if ((command != "ACCESS") && (command != "AUTOMODE"))
 	{
 	Usage(theClient);
 	return true;
@@ -54,7 +55,7 @@ if ((command != "ACCESS") && (command != "AUTOMODE"))
 sqlUser* theUser = bot->isAuthed(theClient, true);
 if (!theUser)
 	{
-	return false; 
+	return false;
 	}
 
 /*
@@ -64,26 +65,26 @@ if (!theUser)
 sqlChannel* theChan = bot->getChannelRecord(st[1]);
 if (!theChan)
 	{
-	bot->Notice(theClient, 
-		bot->getResponse(theUser, 
-			language::chan_not_reg, 
-			string("Sorry, %s isn't registered with me.")).c_str(), 
+	bot->Notice(theClient,
+		bot->getResponse(theUser,
+			language::chan_not_reg,
+			string("Sorry, %s isn't registered with me.")).c_str(),
 		st[1].c_str());
 	return false;
-	} 
+	}
 
 /*
- *  Check the user has sufficient access on this channel. 
- */ 
+ *  Check the user has sufficient access on this channel.
+ */
 int level = bot->getEffectiveAccessLevel(theUser, theChan, true);
 if (level < level::modinfo)
 	{
-	bot->Notice(theClient, 
-		bot->getResponse(theUser, 
-			language::insuf_access, 
+	bot->Notice(theClient,
+		bot->getResponse(theUser,
+			language::insuf_access,
 			string("Sorry, you have insufficient access to perform that command.")));
 	return false;
-	} 
+	}
 
 /*
  *  Check the person we're trying to change actually exists.
@@ -92,13 +93,13 @@ if (level < level::modinfo)
 sqlUser* targetUser = bot->getUserRecord(st[3]);
 if (!targetUser)
 	{
-	bot->Notice(theClient, 
-		bot->getResponse(theUser, 
-			language::not_registered, 
+	bot->Notice(theClient,
+		bot->getResponse(theUser,
+			language::not_registered,
 			string("Sorry, I don't know who %s is.")).c_str(), st[3].c_str());
-	return false; 
+	return false;
 	}
- 
+
 /*
  *  Check this user really does have access on this channel.
  */
@@ -106,53 +107,53 @@ if (!targetUser)
 int targetLevel = bot->getAccessLevel(targetUser, theChan);
 if (targetLevel == 0)
 	{
-	bot->Notice(theClient, 
-		bot->getResponse(theUser, 
-			language::doesnt_have_access, 
-			string("%s doesn't appear to have access in %s.")).c_str(), 
+	bot->Notice(theClient,
+		bot->getResponse(theUser,
+			language::doesnt_have_access,
+			string("%s doesn't appear to have access in %s.")).c_str(),
 		targetUser->getUserName().c_str(),
 		theChan->getName().c_str());
 	return false;
 	}
- 
+
 /*
  *  Figure out what they're doing - ACCESS or AUTOOP.
- */ 
+ */
 
 if (command == "ACCESS")
-	{ 
+	{
 	/*
 	 * Check we aren't trying to change someone with access
 	 * higher (or equal) than ours.
 	 */
-	
+
 	if (level <= targetLevel)
 		{
-		/* 
+		/*
 		 * Let forced users modify their own user records in channels to
 		 * any setting.
 		 */
 		if (!bot->isForced(theChan, theUser))
-			{ 
-			bot->Notice(theClient, 
-				bot->getResponse(theUser, 
-					language::mod_access_higher, 
+			{
+			bot->Notice(theClient,
+				bot->getResponse(theUser,
+					language::mod_access_higher,
 					string("Cannot modify a user with equal or higher access than your own.")));
-			return false; 
+			return false;
 			}
 		}
-	
+
 	/*
 	 * Check we aren't trying to set someone's access higher
 	 * than ours.
-	 */ 
+	 */
 	int newAccess = atoi(st[4].c_str());
 
 	if ((newAccess <= 0) || (newAccess > 999))
 		{
-		bot->Notice(theClient, 
-			bot->getResponse(theUser, 
-				language::inval_access, 
+		bot->Notice(theClient,
+			bot->getResponse(theUser,
+				language::inval_access,
 				string("Invalid access level.")));
 		return false;
 		}
@@ -164,24 +165,24 @@ if (command == "ACCESS")
 
 	if (level <= newAccess)
 		{
-		bot->Notice(theClient, 
-			bot->getResponse(theUser, 
-				language::cant_give_higher, 
+		bot->Notice(theClient,
+			bot->getResponse(theUser,
+				language::cant_give_higher,
 				string("Cannot give a user higher or equal access to your own.")));
 		return false;
-		} 
- 
+		}
+
 	sqlLevel* aLevel = bot->getLevelRecord(targetUser, theChan);
 	aLevel->setAccess(newAccess);
 	aLevel->setLastModif(bot->currentTime());
 	aLevel->setLastModifBy( string( "(" + theUser->getUserName() + ") " +theClient->getNickUserHost() ) );
- 
+
 	aLevel->commit();
 
-	bot->Notice(theClient, 
-		bot->getResponse(theUser, 
-			language::mod_access_to, 
-			string("Modified %s's access level on channel %s to %i")).c_str(), 
+	bot->Notice(theClient,
+		bot->getResponse(theUser,
+			language::mod_access_to,
+			string("Modified %s's access level on channel %s to %i")).c_str(),
 		targetUser->getUserName().c_str(),
 		theChan->getName().c_str(),
 		newAccess);
@@ -193,15 +194,15 @@ if (command == "AUTOMODE")
 	 * Check we aren't trying to change someone with access higher
 	 * than ours (or equal).
 	 */
-	
+
 	if (level < targetLevel)
 		{
-		bot->Notice(theClient, 
-			bot->getResponse(theUser, 
-				language::mod_access_higher, 
+		bot->Notice(theClient,
+			bot->getResponse(theUser,
+				language::mod_access_higher,
 				string("Cannot modify a user with higher access than your own.")));
 		return false;
-		}  
+		}
 
 	/*
 	 *  Check for "ON" or "OFF" and act accordingly.
@@ -211,17 +212,17 @@ if (command == "AUTOMODE")
 		{
 		sqlLevel* aLevel = bot->getLevelRecord(targetUser, theChan);
 		aLevel->removeFlag(sqlLevel::F_AUTOVOICE);
-		aLevel->setFlag(sqlLevel::F_AUTOOP); 
+		aLevel->setFlag(sqlLevel::F_AUTOOP);
 //		aLevel->setLastModif(bot->currentTime());
-//		aLevel->setLastModifBy(theClient->getNickUserHost()); 
-		aLevel->commit(); 
+//		aLevel->setLastModifBy(theClient->getNickUserHost());
+		aLevel->commit();
 
-		bot->Notice(theClient, 
-			bot->getResponse(theUser, 
-				language::automode_op, 
-				string("Set AUTOMODE to OP for %s on channel %s")).c_str(), 
+		bot->Notice(theClient,
+			bot->getResponse(theUser,
+				language::automode_op,
+				string("Set AUTOMODE to OP for %s on channel %s")).c_str(),
 			targetUser->getUserName().c_str(),
-			theChan->getName().c_str()); 
+			theChan->getName().c_str());
 
 		return false;
 		}
@@ -230,19 +231,19 @@ if (command == "AUTOMODE")
 		{
 		sqlLevel* aLevel = bot->getLevelRecord(targetUser, theChan);
 		aLevel->removeFlag(sqlLevel::F_AUTOOP);
-		aLevel->setFlag(sqlLevel::F_AUTOVOICE); 
+		aLevel->setFlag(sqlLevel::F_AUTOVOICE);
 //		aLevel->setLastModif(bot->currentTime());
 //		aLevel->setLastModifBy(theClient->getNickUserHost());
-		aLevel->commit(); 
+		aLevel->commit();
 
-		bot->Notice(theClient, 
-			bot->getResponse(theUser, 
-				language::automode_voice, 
-				string("Set AUTOMODE to VOICE for %s on channel %s")).c_str(), 
+		bot->Notice(theClient,
+			bot->getResponse(theUser,
+				language::automode_voice,
+				string("Set AUTOMODE to VOICE for %s on channel %s")).c_str(),
 			targetUser->getUserName().c_str(),
-			theChan->getName().c_str()); 
+			theChan->getName().c_str());
 		return false;
-		} 
+		}
 
 	if (string_upper(st[4]) == "NONE")
 		{
@@ -251,22 +252,22 @@ if (command == "AUTOMODE")
 		aLevel->removeFlag(sqlLevel::F_AUTOVOICE);
 //		aLevel->setLastModif(bot->currentTime());
 //		aLevel->setLastModifBy(theClient->getNickUserHost());
-		aLevel->commit(); 
+		aLevel->commit();
 
-		bot->Notice(theClient, 
-			bot->getResponse(theUser, 
-				language::automode_none, 
-				string("Set AUTOMODE to NONE for %s on channel %s")).c_str(), 
+		bot->Notice(theClient,
+			bot->getResponse(theUser,
+				language::automode_none,
+				string("Set AUTOMODE to NONE for %s on channel %s")).c_str(),
 			targetUser->getUserName().c_str(),
-			theChan->getName().c_str()); 
+			theChan->getName().c_str());
 		return false;
 		}
 
 	Usage(theClient);
-	return true; 
+	return true;
 	}
 
 return true ;
-} 
+}
 
 } // namespace gnuworld

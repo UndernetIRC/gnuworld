@@ -11,7 +11,7 @@
  *
  * Caveats: None
  *
- * $Id: ADDUSERCommand.cc,v 1.19 2001/08/30 21:43:07 gte Exp $
+ * $Id: ADDUSERCommand.cc,v 1.20 2001/09/05 03:47:56 gte Exp $
  */
 
 #include	<string>
@@ -24,7 +24,7 @@
 #include	"responses.h"
 #include	"cservice_config.h"
 
-const char ADDUSERCommand_cc_rcsId[] = "$Id: ADDUSERCommand.cc,v 1.19 2001/08/30 21:43:07 gte Exp $" ;
+const char ADDUSERCommand_cc_rcsId[] = "$Id: ADDUSERCommand.cc,v 1.20 2001/09/05 03:47:56 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -35,6 +35,8 @@ static const char* queryHeader = "INSERT INTO levels (channel_id, user_id, acces
 
 bool ADDUSERCommand::Exec( iClient* theClient, const string& Message )
 {
+bot->incStat("COMMANDS.ADDUSER");
+
 StringTokenizer st( Message ) ;
 if( st.size() < 4 )
 	{

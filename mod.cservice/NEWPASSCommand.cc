@@ -3,30 +3,30 @@
 #include	<string>
 #include	<iomanip.h>
 
-#include	"md5hash.h" 
+#include	"md5hash.h"
 #include	"StringTokenizer.h"
-#include	"ELog.h" 
-#include	"cservice.h" 
-#include	"responses.h" 
+#include	"ELog.h"
+#include	"cservice.h"
+#include	"responses.h"
 #include	"networkData.h"
 
-const char NEWPASSCommand_cc_rcsId[] = "$Id: NEWPASSCommand.cc,v 1.10 2001/03/14 18:24:55 gte Exp $" ;
+const char NEWPASSCommand_cc_rcsId[] = "$Id: NEWPASSCommand.cc,v 1.11 2001/09/05 03:47:56 gte Exp $" ;
 
 namespace gnuworld
 {
-
 const char validChars[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.$*_";
- 
+
 bool NEWPASSCommand::Exec( iClient* theClient, const string& Message )
 {
- 
+bot->incStat("COMMANDS.NEWPASS");
+
 StringTokenizer st( Message ) ;
 if( st.size() < 2 )
 	{
 	Usage(theClient);
 	return true;
 	}
- 
+
 /*
  *  Fetch the sqlUser record attached to this client. If there isn't one,
  *  they aren't logged in - tell them they should be.
@@ -39,23 +39,23 @@ if (!tmpUser)
 	}
 
 /* Try and stop people using an invalid syntax.. */
-if ( (string_lower(st[1]) == string_lower(tmpUser->getUserName())) 
+if ( (string_lower(st[1]) == string_lower(tmpUser->getUserName()))
 	  || (string_lower(st[1]) == string_lower(theClient->getNickName())) )
 	{
-	bot->Notice(theClient, 
+	bot->Notice(theClient,
 		bot->getResponse(tmpUser,
 			language::pass_cant_be_nick,
 			string("Your passphrase cannot be your username or current nick - syntax is: NEWPASS <new passphrase>")));
 	return false;
 	}
 
-if (st.assemble(1).size() > 50) 
+if (st.assemble(1).size() > 50)
 	{
 	bot->Notice(theClient, "Your passphrase cannot exceed 50 characters.");
 	return false;
 	}
 
-if (st.assemble(1).size() < 6) 
+if (st.assemble(1).size() < 6)
 	{
 	bot->Notice(theClient, "Your passphrase cannot be less than 6 characters.");
 	return false;
@@ -66,16 +66,16 @@ if (st.assemble(1).size() < 6)
 string salt;
 
 // TODO: Why calling srand() here?
-srand(clock() * 1000000); 
+srand(clock() * 1000000);
 
 // TODO: What is the significance of '8' here?
-// Schema states a fixed 8 bytes of random salt are used in generating the 
+// Schema states a fixed 8 bytes of random salt are used in generating the
 // passowrd.
-for ( unsigned short int i = 0 ; i < 8; i++) 
-	{ 
+for ( unsigned short int i = 0 ; i < 8; i++)
+	{
 	int randNo = 1+(int) (64.0*rand()/(RAND_MAX+1.0));
-	salt += validChars[randNo]; 
-	} 
+	salt += validChars[randNo];
+	}
 
 /* Work out a MD5 hash of our salt + password */
 
@@ -88,7 +88,7 @@ string newPass = salt + st.assemble(1);
 // Take the md5 hash of this newPass string
 hash.update( (const unsigned char *)newPass.c_str(), newPass.size() );
 hash.report( digest );
-	
+
 /* Convert to Hex */
 
 int data[ MD5_DIGEST_LENGTH ] = { 0 } ;
@@ -108,11 +108,11 @@ output << ends;
 
 // Prepend the md5 hash to the salt
 string finalPassword = salt + output.str();
-tmpUser->setPassword(finalPassword); 
+tmpUser->setPassword(finalPassword);
 
 if( tmpUser->commit() )
 	{
-	bot->Notice(theClient, 
+	bot->Notice(theClient,
 		bot->getResponse(tmpUser,
 			language::pass_changed,
 			string("Password successfully changed.")));
@@ -125,7 +125,7 @@ else
 	}
 
 delete[] output.str() ;
-return true; 
-} 
+return true;
+}
 
 } // namespace gnuworld.

@@ -1,23 +1,24 @@
 /* REMIGNORECommand.cc */
 
 #include	<string>
- 
+
 #include	"StringTokenizer.h"
-#include	"ELog.h" 
-#include	"cservice.h" 
-#include	"levels.h" 
+#include	"ELog.h"
+#include	"cservice.h"
+#include	"levels.h"
 #include	"responses.h"
 #include	"Network.h"
 
-const char REMIGNORECommand_cc_rcsId[] = "$Id: REMIGNORECommand.cc,v 1.7 2001/03/18 17:25:00 dan_karrels Exp $" ;
+const char REMIGNORECommand_cc_rcsId[] = "$Id: REMIGNORECommand.cc,v 1.8 2001/09/05 03:47:56 gte Exp $" ;
 
 namespace gnuworld
 {
-
 using std::string ;
- 
+
 bool REMIGNORECommand::Exec( iClient* theClient, const string& Message )
-{ 
+{
+bot->incStat("COMMANDS.REMIGNORE");
+
 StringTokenizer st( Message ) ;
 if( st.size() < 2 )
 	{
@@ -33,18 +34,18 @@ if( st.size() < 2 )
 sqlUser* theUser = bot->isAuthed(theClient, true);
 if (!theUser)
 	{
-	return false; 
+	return false;
  	}
 
 int admLevel = bot->getAdminAccessLevel(theUser);
 if (admLevel < level::remignore)
 	{
-	bot->Notice(theClient, 
+	bot->Notice(theClient,
 		bot->getResponse(theUser,
 			language::insuf_access,
 			string("Sorry, you have insufficient access to perform that command.")));
 	return false;
-	} 
+	}
 
 for( cservice::silenceListType::iterator ptr = bot->silenceList.begin() ;
 	ptr != bot->silenceList.end() ; ++ptr )
@@ -55,45 +56,45 @@ for( cservice::silenceListType::iterator ptr = bot->silenceList.begin() ;
 		s	<< bot->getCharYYXXX()
 			<< " SILENCE * -"
 			<< ptr->first.c_str()
-			<< ends; 
+			<< ends;
 		bot->Write( s );
-		delete[] s.str(); 
+		delete[] s.str();
 
-		/* 
+		/*
 		 * Locate this user by numeric.
 		 * If the numeric is still in use, clear the ignored flag.
 		 * If someone else has inherited this numeric, no prob,
-		 * its cleared anyway. 
+		 * its cleared anyway.
 		 */
-	
+
 		iClient* netClient = Network->findClient(ptr->second.second);
 		if (netClient)
 			{
 			bot->setIgnored(netClient, false);
 			}
- 
+
 		bot->silenceList.erase(ptr);
-		bot->Notice(theClient, 
+		bot->Notice(theClient,
 			bot->getResponse(theUser,
 				language::unsilenced,
 				string("Removed %s from my ignore list")).c_str(),
-			st[1].c_str()); 
-		bot->logAdminMessage("%s (%s) has removed ignore: %s", 
+			st[1].c_str());
+		bot->logAdminMessage("%s (%s) has removed ignore: %s",
 			theClient->getNickName().c_str(),
 			theUser->getUserName().c_str(),
-			st[1].c_str()); 
+			st[1].c_str());
 		return true;
 		}
 
 	} // for()
 
-bot->Notice(theClient, 
+bot->Notice(theClient,
 	bot->getResponse(theUser,
 		language::couldnt_find_silence,
 		string("Couldn't find %s in my silence list")).c_str(),
-	st[1].c_str()); 
+	st[1].c_str());
 
 return true ;
-} 
+}
 
 } // namespace gnuworld

@@ -9,19 +9,19 @@
  *
  * Caveats: None.
  *
- * $Id: SEARCHCommand.cc,v 1.5 2001/03/07 15:10:53 dan_karrels Exp $
+ * $Id: SEARCHCommand.cc,v 1.6 2001/09/05 03:47:56 gte Exp $
  */
 
 #include	<string>
- 
+
 #include	"StringTokenizer.h"
-#include	"ELog.h" 
-#include	"cservice.h" 
+#include	"ELog.h"
+#include	"cservice.h"
 #include	"libpq++.h"
 #include	"responses.h"
 #include	"cservice_config.h"
 
-const char SEARCHCommand_cc_rcsId[] = "$Id: SEARCHCommand.cc,v 1.5 2001/03/07 15:10:53 dan_karrels Exp $" ;
+const char SEARCHCommand_cc_rcsId[] = "$Id: SEARCHCommand.cc,v 1.6 2001/09/05 03:47:56 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -34,6 +34,8 @@ static const char* queryFooter =    "ORDER BY channels.name DESC;";
 
 bool SEARCHCommand::Exec( iClient* theClient, const string& Message )
 {
+bot->incStat("COMMANDS.SEARCH");
+
 StringTokenizer st( Message ) ;
 if( st.size() < 2 )
 	{
@@ -64,7 +66,7 @@ theQuery	<< queryHeader
 		<< theQuery.str()
 		<< endl;
 #endif
-	
+
 ExecStatusType status = bot->SQLDb->Exec(theQuery.str());
 delete[] theQuery.str() ;
 delete[] extraCond.str() ;
@@ -86,14 +88,14 @@ for( int i = 0 ; i < bot->SQLDb->Tuples(); i++ )
 
 	if(results >= MAX_SEARCH_RESULTS)
 		{
-		bot->Notice(theClient, 
+		bot->Notice(theClient,
 			bot->getResponse(theUser,
 				language::exc_search,
 				string("There are more than %i entries matching [%s]")).c_str(),
 				MAX_SEARCH_RESULTS,
 				matchString.c_str()
 		);
-		bot->Notice(theClient, 
+		bot->Notice(theClient,
 			bot->getResponse(theUser,
 				language::restrict_search,
 				string("Please restrict your search mask")).c_str()
@@ -104,14 +106,14 @@ for( int i = 0 ; i < bot->SQLDb->Tuples(); i++ )
 
 if( 0 == results )
 	{
-	bot->Notice(theClient, 
+	bot->Notice(theClient,
 		bot->getResponse(theUser,
 			language::no_search_match,
 			string("No matching entries for [%s]")).c_str(),
 			matchString.c_str() );
 	}
- 
+
 return true ;
-} 
+}
 
 } // namespace gnuworld.

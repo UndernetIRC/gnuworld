@@ -196,6 +196,7 @@ RegisterCommand(new SERVNOTICECommand(this, "SERVNOTICE", "<#channel> <text>", 5
 RegisterCommand(new SAYCommand(this, "SAY", "<#channel> <text>", 5));
 RegisterCommand(new QUOTECommand(this, "QUOTE", "<text>", 5));
 RegisterCommand(new REHASHCommand(this, "REHASH", "[translations]", 5));
+RegisterCommand(new STATSCommand(this, "STATS", "", 8));
 
 cserviceConfig = new (std::nothrow) EConfig( args ) ;
 assert( cserviceConfig != 0 ) ;
@@ -731,7 +732,7 @@ else if(Command == "VERSION")
 	xClient::DoCTCP(theClient, CTCP,
 		"Undernet P10 Channel Services II ["
 		__DATE__ " " __TIME__
-		"] Release 1.1");
+		"] Release 1.1pl1");
 	}
 else if(Command == "PROBLEM?")
 	{
@@ -3537,6 +3538,20 @@ elog	<< "*** [CMaster::preloadLevelCache]: Done. Loaded "
 		<< goodCount << " level records out of " << SQLDb->Tuples()
 		<< "."
 		<< endl;
+}
+
+void cservice::incStat(const string& name)
+{
+	statsMapType::iterator ptr = statsMap.find( name );
+
+	if( ptr == statsMap.end() )
+        {
+        statsMap.insert(statsMapType::value_type(name, 1));
+        }
+        else
+        {
+			ptr->second++;
+		}
 }
 
 void Command::Usage( iClient* theClient )

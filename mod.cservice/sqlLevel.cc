@@ -1,16 +1,16 @@
-/* 
+/*
  * sqlLevel.cc
- * 
+ *
  * Storage class for accessing channel user/level information either from the backend
  * or internal storage.
- * 
- * $Id: sqlLevel.cc,v 1.11 2001/07/21 23:06:41 gte Exp $
+ *
+ * $Id: sqlLevel.cc,v 1.12 2001/09/05 03:47:56 gte Exp $
  */
- 
-#include	<strstream>
-#include	<string> 
 
-#include	<cstring> 
+#include	<strstream>
+#include	<string>
+
+#include	<cstring>
 #include	<ctime>
 
 #include	"ELog.h"
@@ -19,16 +19,17 @@
 #include	"sqlUser.h"
 #include	"sqlChannel.h"
 #include	"constants.h"
+#include	"cservice.h"
 #include	"cservice_config.h"
- 
+
 const char sqlLevel_h_rcsId[] = __SQLLEVEL_H ;
-const char sqlLevel_cc_rcsId[] = "$Id: sqlLevel.cc,v 1.11 2001/07/21 23:06:41 gte Exp $" ;
+const char sqlLevel_cc_rcsId[] = "$Id: sqlLevel.cc,v 1.12 2001/09/05 03:47:56 gte Exp $" ;
 
 namespace gnuworld
 {
 
-using std::string ; 
-using std::endl ; 
+using std::string ;
+using std::endl ;
 
 sqlLevel::sqlLevel(PgDatabase* _SQLDb)
  :channel_id(0),
@@ -45,14 +46,14 @@ sqlLevel::sqlLevel(PgDatabase* _SQLDb)
  last_modif_by(),
  last_used(0),
  SQLDb( _SQLDb )
-{ 
+{
 }
- 
+
 bool sqlLevel::loadData(unsigned int userID, unsigned int channelID)
 {
 /*
  * Fetch a matching Level record for this channel and user ID combo.
- */ 
+ */
 
 #ifdef LOG_DEBUG
 	elog	<< "sqlLevel::loadData> Attempting to load level data for "
@@ -65,11 +66,11 @@ bool sqlLevel::loadData(unsigned int userID, unsigned int channelID)
 
 strstream queryString;
 queryString	<< "SELECT "
-		<< sql::level_fields 
+		<< sql::level_fields
 		<< " FROM levels WHERE channel_id = "
-		<< channelID 
+		<< channelID
 		<< " AND user_id = "
-		<< userID 
+		<< userID
 		<< ends;
 
 #ifdef LOG_SQL
@@ -85,21 +86,21 @@ if( PGRES_TUPLES_OK == status )
 	{
 	/*
 	 *  If this combo doesn't exist, we won't get any rows back.
-	 */ 
+	 */
 
 	if(SQLDb->Tuples() < 1)
 		{
 		return (false);
-		} 
+		}
 
 	// Fetch dat from row 0
 	setAllMembers(0);
 
 	return (true);
-	} 
+	}
 
-return (false); 
-} 
+return (false);
+}
 
 
 void sqlLevel::setAllMembers(int row)
@@ -131,9 +132,9 @@ bool sqlLevel::commit()
  */
 
 static const char* queryHeader =    "UPDATE levels ";
- 
+
 strstream queryString;
-queryString	<< queryHeader 
+queryString	<< queryHeader
 		<< "SET flags = " << flags << ", "
 		<< "access = " << access << ", "
 		<< "suspend_expires = " << suspend_expires << ", "
@@ -151,7 +152,7 @@ queryString	<< queryHeader
 #ifdef LOG_SQL
 	elog	<< "sqlLevel::commit> "
 		<< queryString.str()
-		<< endl; 
+		<< endl;
 #endif
 
 ExecStatusType status = SQLDb->Exec(queryString.str()) ;
@@ -165,11 +166,49 @@ if( PGRES_COMMAND_OK != status )
 		<< endl;
 
 	return false;
- 	} 
+ 	}
 
 return true;
-}	
+}
 
+bool sqlLevel::insertRecord()
+{
+static const char* queryHeader = "INSERT INTO levels (channel_id,user_id,access,flags,added,added_by,last_modif,last_modif_by,last_updated) VALUES (";
+
+strstream queryString;
+queryString	<< queryHeader
+			<< channel_id << ", "
+			<< user_id << ", "
+			<< access << ", "
+			<< flags << ", "
+			<< added << ", '"
+			<< escapeSQLChars(added_by) << "', "
+			<< last_modif << ", '"
+			<< escapeSQLChars(last_modif_by) << "', "
+			<< "now()::abstime::int4)"
+			<< ends;
+
+#ifdef LOG_SQL
+	elog	<< "sqlLevel::insertRecord> "
+			<< queryString.str()
+			<< endl;
+#endif
+
+ExecStatusType status = SQLDb->Exec(queryString.str()) ;
+delete[] queryString.str() ;
+
+if( PGRES_COMMAND_OK != status )
+	{
+	// TODO: Log to msgchan here.
+	elog	<< "sqlLevel::commit> Something went wrong: "
+			<< SQLDb->ErrorMessage()
+			<< endl;
+
+	return false ;
+ 	}
+
+return true;
+}
 
 sqlLevel::~sqlLevel()
 {

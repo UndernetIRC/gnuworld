@@ -1,5 +1,5 @@
-/* 
- * OPERJOINCommand.cc 
+/*
+ * OPERJOINCommand.cc
  *
  * 10/02/2001 - David Henriksen <david@itwebnet.dk>
  * Initial Version. Written, and finished.
@@ -8,28 +8,29 @@
  *
  * Caveats: None
  *
- * $Id: OPERJOINCommand.cc,v 1.10 2001/05/11 16:39:13 gte Exp $
+ * $Id: OPERJOINCommand.cc,v 1.11 2001/09/05 03:47:56 gte Exp $
  */
 
 
 #include	<string>
- 
+
 #include	"StringTokenizer.h"
-#include	"ELog.h" 
+#include	"ELog.h"
 #include	"cservice.h"
 #include	"levels.h"
 #include	"responses.h"
 #include	"Network.h"
 
-const char OPERJOINCommand_cc_rcsId[] = "$Id: OPERJOINCommand.cc,v 1.10 2001/05/11 16:39:13 gte Exp $" ;
+const char OPERJOINCommand_cc_rcsId[] = "$Id: OPERJOINCommand.cc,v 1.11 2001/09/05 03:47:56 gte Exp $" ;
 
 namespace gnuworld
 {
-
 using std::string ;
- 
+
 bool OPERJOINCommand::Exec( iClient* theClient, const string& Message )
-{ 
+{
+
+bot->incStat("COMMANDS.OPERJOIN");
 StringTokenizer st( Message ) ;
 if( st.size() < 2 )
 	{
@@ -50,7 +51,7 @@ if(!theClient->isOper())
 	return true;
 	}
 
-/* 
+/*
  *  Check the channel is actually registered.
  */
 
@@ -63,9 +64,9 @@ if (!theChan)
 		"The channel %s doesn't appear to be registered").c_str(),
 		st[1].c_str());
 	return false;
-	} 
+	}
 
-/* Check the bot isn't in the channel. */ 
+/* Check the bot isn't in the channel. */
 if (theChan->getInChan())
 	{
 	bot->Notice(theClient,
@@ -73,7 +74,7 @@ if (theChan->getInChan())
 		"I'm already in that channel!"));
 	return false;
 	}
- 
+
 // Tell the world.
 
 strstream s;
@@ -100,10 +101,10 @@ bot->Join(theChan->getName(),
 	false);
 bot->joinCount++;
 
-/* Whack this reop on the Q */ 
+/* Whack this reop on the Q */
 bot->reopQ.insert(cservice::reopQType::value_type(theChan->getName(),
 	bot->currentTime() + 15) );
- 
+
 if (tmpChan)
 	{
 	if(theChan->getFlag(sqlChannel::F_NOOP))
@@ -115,8 +116,8 @@ if (tmpChan)
 		bot->deopAllUnAuthedOnChan(tmpChan);
 		}
 	}
-	
+
 return true;
-} 
+}
 
 } // namespace gnuworld.

@@ -8,7 +8,7 @@
  *
  * Caveats: None.
  *
- * $Id: UNBANCommand.cc,v 1.11 2001/08/30 19:30:20 gte Exp $
+ * $Id: UNBANCommand.cc,v 1.12 2001/09/05 03:47:56 gte Exp $
  */
 
 #include	<string>
@@ -21,16 +21,17 @@
 #include	"responses.h"
 #include	"match.h"
 
-const char UNBANCommand_cc_rcsId[] = "$Id: UNBANCommand.cc,v 1.11 2001/08/30 19:30:20 gte Exp $" ;
+const char UNBANCommand_cc_rcsId[] = "$Id: UNBANCommand.cc,v 1.12 2001/09/05 03:47:56 gte Exp $" ;
 
 namespace gnuworld
 {
-
 using std::string ;
 using namespace level;
 
 bool UNBANCommand::Exec( iClient* theClient, const string& Message )
 {
+bot->incStat("COMMANDS.UNBAN");
+
 StringTokenizer st( Message ) ;
 
 if( st.size() < 3 )

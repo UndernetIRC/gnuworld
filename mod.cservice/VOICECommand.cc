@@ -20,7 +20,7 @@
  *
  * Caveats: None
  *
- * $Id: VOICECommand.cc,v 1.19 2001/08/30 19:30:20 gte Exp $
+ * $Id: VOICECommand.cc,v 1.20 2001/09/05 03:47:56 gte Exp $
  */
 
 #include	<string>
@@ -37,16 +37,17 @@
 using std::map ;
 using std::vector ;
 
-const char VOICECommand_cc_rcsId[] = "$Id: VOICECommand.cc,v 1.19 2001/08/30 19:30:20 gte Exp $" ;
+const char VOICECommand_cc_rcsId[] = "$Id: VOICECommand.cc,v 1.20 2001/09/05 03:47:56 gte Exp $" ;
 
 namespace gnuworld
 {
-
 using std::map ;
 using std::vector ;
 
 bool VOICECommand::Exec( iClient* theClient, const string& Message )
 {
+bot->incStat("COMMANDS.VOICE");
+
 StringTokenizer st( Message ) ;
 
 if( st.size() < 2 )

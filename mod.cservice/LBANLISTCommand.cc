@@ -8,7 +8,7 @@
  *
  * Caveats: None.
  *
- * $Id: LBANLISTCommand.cc,v 1.9 2001/08/30 19:30:20 gte Exp $
+ * $Id: LBANLISTCommand.cc,v 1.10 2001/09/05 03:47:56 gte Exp $
  */
 
 #include	<string>
@@ -23,16 +23,17 @@
 #include	"cservice_config.h"
 #include	"time.h"
 
-const char LBANLISTCommand_cc_rcsId[] = "$Id: LBANLISTCommand.cc,v 1.9 2001/08/30 19:30:20 gte Exp $" ;
+const char LBANLISTCommand_cc_rcsId[] = "$Id: LBANLISTCommand.cc,v 1.10 2001/09/05 03:47:56 gte Exp $" ;
 
 namespace gnuworld
 {
-
 using std::string ;
 using namespace level;
 
 bool LBANLISTCommand::Exec( iClient* theClient, const string& Message )
 {
+bot->incStat("COMMANDS.LBANLIST");
+
 StringTokenizer st( Message ) ;
 if( st.size() < 3 )
 	{

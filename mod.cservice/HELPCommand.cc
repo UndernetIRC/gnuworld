@@ -8,25 +8,26 @@
  *
  * Caveats: Needs to be written :)
  *
- * $Id: HELPCommand.cc,v 1.1 2001/02/18 14:47:24 plexus Exp $
+ * $Id: HELPCommand.cc,v 1.2 2001/09/05 03:47:56 gte Exp $
  */
 
 #include	<string>
- 
+
 #include	"StringTokenizer.h"
-#include	"ELog.h" 
-#include	"cservice.h" 
+#include	"ELog.h"
+#include	"cservice.h"
 #include 	"responses.h"
 
-const char HELPCommand_cc_rcsId[] = "$Id: HELPCommand.cc,v 1.1 2001/02/18 14:47:24 plexus Exp $" ;
+const char HELPCommand_cc_rcsId[] = "$Id: HELPCommand.cc,v 1.2 2001/09/05 03:47:56 gte Exp $" ;
 
 namespace gnuworld
 {
 
 using namespace gnuworld;
- 
+
 bool HELPCommand::Exec( iClient* theClient, const string& Message )
-{ 
+{
+	bot->incStat("COMMANDS.HELP");
 	StringTokenizer st( Message ) ;
 	if( st.size() > 2 )
 	{
@@ -35,8 +36,8 @@ bool HELPCommand::Exec( iClient* theClient, const string& Message )
 	}
 
 	bot->Notice(theClient, "There is no help available.");
-         
+
 	return true ;
-} 
+}
 
 } // namespace gnuworld.

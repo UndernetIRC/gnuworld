@@ -1,21 +1,22 @@
 /* SHOWIGNORECommand.cc */
 
 #include	<string>
- 
+
 #include	"StringTokenizer.h"
-#include	"ELog.h" 
-#include	"cservice.h" 
+#include	"ELog.h"
+#include	"cservice.h"
 #include	"responses.h"
 
-const char SHOWIGNORECommand_cc_rcsId[] = "$Id: SHOWIGNORECommand.cc,v 1.11 2001/03/14 22:49:14 gte Exp $" ;
+const char SHOWIGNORECommand_cc_rcsId[] = "$Id: SHOWIGNORECommand.cc,v 1.12 2001/09/05 03:47:56 gte Exp $" ;
 
 namespace gnuworld
 {
-
 using std::string ;
- 
+
 bool SHOWIGNORECommand::Exec( iClient* theClient, const string& Message )
-{ 
+{
+bot->incStat("COMMANDS.SHOWIGNORE");
+
 StringTokenizer st( Message ) ;
 if( st.size() < 1 )
 	{
@@ -56,6 +57,6 @@ bot->Notice(theClient,
 	string("-- End of Ignore List")));
 
 return true ;
-} 
+}
 
 } // namespace gnuworld.

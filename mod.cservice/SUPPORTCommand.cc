@@ -6,15 +6,15 @@
 #include	"ELog.h"
 #include	"cservice.h"
 
-const char SUPPORTCommand_cc_rcsId[] = "$Id: SUPPORTCommand.cc,v 1.2 2001/08/13 18:22:07 gte Exp $" ;
+const char SUPPORTCommand_cc_rcsId[] = "$Id: SUPPORTCommand.cc,v 1.3 2001/09/05 03:47:56 gte Exp $" ;
 
 namespace gnuworld
 {
-
 using std::string ;
 
 bool SUPPORTCommand::Exec( iClient* theClient, const string& Message )
 {
+bot->incStat("COMMANDS.SUPPORT");
 
 StringTokenizer st( Message ) ;
 if( st.size() < 3 )

@@ -18,7 +18,7 @@
  *
  * Caveats: None.
  *
- * $Id: BANCommand.cc,v 1.27 2001/08/30 19:30:20 gte Exp $
+ * $Id: BANCommand.cc,v 1.28 2001/09/05 03:47:56 gte Exp $
  */
 
 #include	<new>
@@ -33,16 +33,17 @@
 #include	"responses.h"
 #include	"match.h"
 
-const char BANCommand_cc_rcsId[] = "$Id: BANCommand.cc,v 1.27 2001/08/30 19:30:20 gte Exp $" ;
+const char BANCommand_cc_rcsId[] = "$Id: BANCommand.cc,v 1.28 2001/09/05 03:47:56 gte Exp $" ;
 
 namespace gnuworld
 {
-
 using std::string ;
 using namespace level;
 
 bool BANCommand::Exec( iClient* theClient, const string& Message )
 {
+bot->incStat("COMMANDS.BAN");
+
 StringTokenizer st( Message ) ;
 if( st.size() < 3 )
 	{

@@ -1,7 +1,7 @@
 /* sqlChannel.h */
 
 #ifndef __SQLCHANNEL_H
-#define __SQLCHANNEL_H "$Id: sqlChannel.h,v 1.31 2001/08/30 19:30:20 gte Exp $"
+#define __SQLCHANNEL_H "$Id: sqlChannel.h,v 1.32 2001/09/05 03:47:56 gte Exp $"
 
 #include	<string>
 #include	<map>
@@ -135,7 +135,12 @@ public:
 	 */
 
 	// 'ID' is a primary key and cannot be altered.
-	// We aren't going to let people change channel names here either.
+
+	inline void setID( const unsigned int& _id )
+		{ id = _id; }
+
+	inline void setName( const string& _name )
+		{ name = _name; }
 
 	inline void setFlag( const flagType& whichFlag )
 		{ flags |= whichFlag; }
@@ -187,7 +192,7 @@ public:
 	 * object back to the database.
 	 */
 	bool commit();
-
+	bool insertRecord();
 	void setAllMembers(int);
 
 public:

@@ -12,7 +12,7 @@
  * Displays all "Level" records for a specified channel.
  * Can optionally narrow down selection using a number of switches.
  *
- * $Id: ACCESSCommand.cc,v 1.41 2001/07/29 20:37:57 gte Exp $
+ * $Id: ACCESSCommand.cc,v 1.42 2001/09/05 03:47:56 gte Exp $
  */
 
 #include	<string>
@@ -26,7 +26,7 @@
 #include	"cservice_config.h"
 #include	"Network.h"
 
-const char ACCESSCommand_cc_rcsId[] = "$Id: ACCESSCommand.cc,v 1.41 2001/07/29 20:37:57 gte Exp $" ;
+const char ACCESSCommand_cc_rcsId[] = "$Id: ACCESSCommand.cc,v 1.42 2001/09/05 03:47:56 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -37,6 +37,8 @@ static const char* queryFooter =    "ORDER BY levels.access DESC;";
 
 bool ACCESSCommand::Exec( iClient* theClient, const string& Message )
 {
+bot->incStat("COMMANDS.ACCESS");
+
 /*
  * This command will build up a custom SQL query and execute it on
  * the 'levels' table.

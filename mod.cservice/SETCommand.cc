@@ -9,7 +9,7 @@
  * Minor bug fixes.
  *
  * 20/02/2001 - Gator Robert White <gator@cajun-gator.net>
- * removed AlwaysOp 
+ * removed AlwaysOp
  * Sets channel options on the specified channel.
  * 2001-03-16 - Perry Lorier <isomer@coders.net>
  * Added 'DESC' as an alias for 'DESCRIPTION'
@@ -18,28 +18,29 @@
  *
  * Caveats: None.
  *
- * $Id: SETCommand.cc,v 1.42 2001/07/16 20:25:52 gte Exp $
+ * $Id: SETCommand.cc,v 1.43 2001/09/05 03:47:56 gte Exp $
  */
 
 #include	<string>
- 
+
 #include	"StringTokenizer.h"
 #include	"cservice.h"
 #include	"Network.h"
 #include	"levels.h"
 #include	"responses.h"
 
-const char SETCommand_cc_rcsId[] = "$Id: SETCommand.cc,v 1.42 2001/07/16 20:25:52 gte Exp $" ;
+const char SETCommand_cc_rcsId[] = "$Id: SETCommand.cc,v 1.43 2001/09/05 03:47:56 gte Exp $" ;
 
 namespace gnuworld
 {
-
 using namespace level;
- 
+
 bool SETCommand::Exec( iClient* theClient, const string& Message )
-{ 
+{
+bot->incStat("COMMANDS.SET");
+
 StringTokenizer st( Message ) ;
- 
+
 if( st.size() < 3 )
 	{
 	Usage(theClient);
@@ -51,25 +52,25 @@ if( st.size() < 3 )
 sqlUser* theUser = bot->isAuthed(theClient, true);
 if(!theUser)
 	{
-	return false; 
+	return false;
 	}
 
 /*
  * First, is this a #channel or user set?
  */
- 
+
 if( st[1][0] != '#' ) // Didn't find a hash?
 {
 	// Look by user then.
 	string option = string_upper(st[1]);
-	string value = string_upper(st[2]); 
+	string value = string_upper(st[2]);
 	if (option == "INVISIBLE")
 	{
 		if (value == "ON")
 		{
 			theUser->setFlag(sqlUser::F_INVIS);
 			theUser->commit();
-			bot->Notice(theClient, 
+			bot->Notice(theClient,
 				bot->getResponse(theUser,
 					language::invis_on,
 					string("Your INVISIBLE setting is now ON.")));
@@ -80,14 +81,14 @@ if( st[1][0] != '#' ) // Didn't find a hash?
 		{
 			theUser->removeFlag(sqlUser::F_INVIS);
 			theUser->commit();
-			bot->Notice(theClient, 
+			bot->Notice(theClient,
 				bot->getResponse(theUser,
 					language::invis_off,
 					string("Your INVISIBLE setting is now OFF.")));
 			return true;
 		}
 
-		bot->Notice(theClient, 
+		bot->Notice(theClient,
 			bot->getResponse(theUser,
 				language::set_cmd_syntax_on_off,
 				string("value of %s must be ON or OFF")).c_str(),
@@ -96,55 +97,55 @@ if( st[1][0] != '#' ) // Didn't find a hash?
 	}
 
 	if (option == "LANG")
-	{ 
+	{
 //		bot->Notice(theClient, "Coming soon!");
 //		return true;
 
 		cservice::languageTableType::iterator ptr = bot->languageTable.find(value);
-		if (ptr != bot->languageTable.end()) 
+		if (ptr != bot->languageTable.end())
 		{
 			string lang = ptr->second.second;
 			theUser->setLanguageId(ptr->second.first);
 			theUser->commit();
-			bot->Notice(theClient, 
+			bot->Notice(theClient,
 			    bot->getResponse(theUser,
 			    	    language::lang_set_to,
 				    string("Language is set to %s.")).c_str(), lang.c_str());
-			return true; 
+			return true;
 		}
 
 		bot->Notice(theClient,
         		"ERROR: Invalid language selection.");
 		return true;
-	} 
+	}
 
-	bot->Notice(theClient, 
+	bot->Notice(theClient,
 		bot->getResponse(theUser,
 			language::invalid_option,
 			string("Invalid option.")));
-	return true; 
+	return true;
 }
 
-Channel* tmpChan = Network->findChannel(st[1]); 
+Channel* tmpChan = Network->findChannel(st[1]);
 
 /* Is the channel registered? */
-	
+
 sqlChannel* theChan = bot->getChannelRecord(st[1]);
 if(!theChan)
 	{
-	bot->Notice(theClient, 
+	bot->Notice(theClient,
 		bot->getResponse(theUser,
 			language::chan_not_reg,
 			string("Sorry, %s isn't registered with me.")).c_str(),
 		st[1].c_str());
 	return false;
-	} 
- 
+	}
+
 // Check level.
 
-int level = bot->getEffectiveAccessLevel(theUser, theChan, false); 
+int level = bot->getEffectiveAccessLevel(theUser, theChan, false);
 string option = string_upper(st[2]);
-string value; 
+string value;
 
 if (st.size() < 4)
 	{
@@ -174,15 +175,15 @@ else
 	    else if(value == "OFF") theChan->removeFlag(sqlChannel::F_LOCKED);
 	    else
 	    {
-		bot->Notice(theClient, 
+		bot->Notice(theClient,
 			bot->getResponse(theUser,
 				language::set_cmd_syntax_on_off,
 				string("value of %s must be ON or OFF")).c_str(),
 			option.c_str());
 		return true;
 	    }
-	    theChan->commit(); 
-	    bot->Notice(theClient, 
+	    theChan->commit();
+	    bot->Notice(theClient,
 			bot->getResponse(theUser,
 				language::set_cmd_status,
 				string("%s for %s is %s")).c_str(),
@@ -204,13 +205,13 @@ else
 			{
 			bot->Notice(theClient, "The channel settings for %s have been locked by a cservice"
 				" administrator and cannot be changed.", theChan->getName().c_str());
-			return(true); 
+			return(true);
 			}
 	}
 
 	if(option == "CAUTION")
 	{
-    /* Check for admin access */ 
+    /* Check for admin access */
     if(bot->getAdminAccessLevel(theUser) < level::set::caution)
 	{
 	/* No need to tell users about admin commands. */
@@ -222,7 +223,7 @@ else
     else if(value == "OFF") theChan->removeFlag(sqlChannel::F_CAUTION);
     else
 	{
-	bot->Notice(theClient, 
+	bot->Notice(theClient,
 		bot->getResponse(theUser,
 			language::set_cmd_syntax_on_off,
 			string("value of %s must be ON or OFF")).c_str(),
@@ -230,8 +231,8 @@ else
 	return true;
 	}
 
-	theChan->commit(); 
-	bot->Notice(theClient, 
+	theChan->commit();
+	bot->Notice(theClient,
 		bot->getResponse(theUser,
 			language::set_cmd_status,
 			string("%s for %s is %s")).c_str(),
@@ -257,15 +258,15 @@ else
 	else if(value == "OFF") theChan->removeFlag(sqlChannel::F_NOREG);
 	else
 		{
-		bot->Notice(theClient, 
+		bot->Notice(theClient,
 			bot->getResponse(theUser,
 				language::set_cmd_syntax_on_off,
 				string("value of %s must be ON or OFF")).c_str(),
 			option.c_str());
 		return true;
 		}
-	theChan->commit(); 
-	bot->Notice(theClient, 
+	theChan->commit();
+	bot->Notice(theClient,
 		bot->getResponse(theUser,
 			language::set_cmd_status,
 			string("%s for %s is %s")).c_str(),
@@ -290,15 +291,15 @@ else
 	    else if(value == "OFF") theChan->removeFlag(sqlChannel::F_SPECIAL);
 	    else
 	    {
-		bot->Notice(theClient, 
+		bot->Notice(theClient,
 			bot->getResponse(theUser,
 				language::set_cmd_syntax_on_off,
 				string("value of %s must be ON or OFF")).c_str(),
 			option.c_str());
 		return true;
 	    }
-	    theChan->commit(); 
-	    bot->Notice(theClient, 
+	    theChan->commit();
+	    bot->Notice(theClient,
 			bot->getResponse(theUser,
 				language::set_cmd_status,
 				string("%s for %s is %s")).c_str(),
@@ -309,7 +310,7 @@ else
 	    return true;
 	}
 
- 
+
 	if(option == "NEVERREG")
 	{
 	    // Check for admin access
@@ -325,15 +326,15 @@ else
 	    else if(value == "OFF") theChan->removeFlag(sqlChannel::F_NEVREG);
 	    else
 	    {
-		bot->Notice(theClient, 
+		bot->Notice(theClient,
 			bot->getResponse(theUser,
 				language::set_cmd_syntax_on_off,
 				string("value of %s must be ON or OFF")).c_str(),
 			option.c_str());
 		return true;
 	    }
-	    theChan->commit(); 
-	    bot->Notice(theClient, 
+	    theChan->commit();
+	    bot->Notice(theClient,
 			bot->getResponse(theUser,
 				language::set_cmd_status,
 				string("%s for %s is %s")).c_str(),
@@ -359,15 +360,15 @@ else
 	    else if(value == "OFF") theChan->removeFlag(sqlChannel::F_NOPURGE);
 	    else
 	    {
-		bot->Notice(theClient, 
+		bot->Notice(theClient,
 			bot->getResponse(theUser,
 				language::set_cmd_syntax_on_off,
 				string("value of %s must be ON or OFF")).c_str(),
 			option.c_str());
 		return true;
 	    }
-	    theChan->commit(); 
-	    bot->Notice(theClient, 
+	    theChan->commit();
+	    bot->Notice(theClient,
 			bot->getResponse(theUser,
 				language::set_cmd_status,
 				string("%s for %s is %s")).c_str(),
@@ -392,15 +393,15 @@ else
 	    else if(value == "OFF") theChan->removeFlag(sqlChannel::F_SUSPEND);
 	    else
 	    {
-		bot->Notice(theClient, 
+		bot->Notice(theClient,
 			bot->getResponse(theUser,
 				language::set_cmd_syntax_on_off,
 				string("value of %s must be ON or OFF")).c_str(),
 			option.c_str());
 		return true;
 	    }
-	    theChan->commit(); 
-	    bot->Notice(theClient, 
+	    theChan->commit();
+	    bot->Notice(theClient,
 			bot->getResponse(theUser,
 				language::set_cmd_status,
 				string("%s for %s is %s")).c_str(),
@@ -426,15 +427,15 @@ else
 	    else if(value == "OFF") theChan->removeFlag(sqlChannel::F_TEMP);
 	    else
 	    {
-		bot->Notice(theClient, 
+		bot->Notice(theClient,
 			bot->getResponse(theUser,
 				language::set_cmd_syntax_on_off,
 				string("value of %s must be ON or OFF")).c_str(),
 			option.c_str());
 		return true;
 	    }
-	    theChan->commit(); 
-	    bot->Notice(theClient, 
+	    theChan->commit();
+	    bot->Notice(theClient,
 			bot->getResponse(theUser,
 				language::set_cmd_status,
 				string("%s for %s is %s")).c_str(),
@@ -459,15 +460,15 @@ else
 	    else if(value == "OFF") theChan->removeFlag(sqlChannel::F_VACATION);
 	    else
 	    {
-		bot->Notice(theClient, 
+		bot->Notice(theClient,
 			bot->getResponse(theUser,
 				language::set_cmd_syntax_on_off,
 				string("value of %s must be ON or OFF")).c_str(),
 			option.c_str());
 		return true;
 	    }
-	    theChan->commit(); 
-	    bot->Notice(theClient, 
+	    theChan->commit();
+	    bot->Notice(theClient,
 			bot->getResponse(theUser,
 				language::set_cmd_status,
 				string("%s for %s is %s")).c_str(),
@@ -487,7 +488,7 @@ else
 					string("You do not have enough access!")));
 			return true;
 	    }
-	    if(value == "ON") 
+	    if(value == "ON")
 	    {
 			theChan->setFlag(sqlChannel::F_NOOP);
 			if (tmpChan) bot->deopAllOnChan(tmpChan); // Deop everyone. :)
@@ -495,15 +496,15 @@ else
 	    else if(value == "OFF") theChan->removeFlag(sqlChannel::F_NOOP);
 	    else
 	    {
-		bot->Notice(theClient, 
+		bot->Notice(theClient,
 			bot->getResponse(theUser,
 				language::set_cmd_syntax_on_off,
 				string("value of %s must be ON or OFF")).c_str(),
 			option.c_str());
 		return true;
 	    }
-	    theChan->commit(); 
-	    bot->Notice(theClient, 
+	    theChan->commit();
+	    bot->Notice(theClient,
 			bot->getResponse(theUser,
 				language::set_cmd_status,
 				string("%s for %s is %s")).c_str(),
@@ -512,7 +513,7 @@ else
 			theChan->getFlag(sqlChannel::F_NOOP) ? "ON" : "OFF");
 	    return true;
 	}
- 
+
 	if(option == "STRICTOP")
 	{
 	    if(level < level::set::strictop)
@@ -523,23 +524,23 @@ else
 				string("You do not have enough access!")));
 		return true;
 	    }
-	    if(value == "ON") 
-	    { 
+	    if(value == "ON")
+	    {
 	    	theChan->setFlag(sqlChannel::F_STRICTOP);
 			if (tmpChan) bot->deopAllUnAuthedOnChan(tmpChan);
 		}
 	    else if(value == "OFF") theChan->removeFlag(sqlChannel::F_STRICTOP);
 	    else
 	    {
-		bot->Notice(theClient, 
+		bot->Notice(theClient,
 			bot->getResponse(theUser,
 				language::set_cmd_syntax_on_off,
 				string("value of %s must be ON or OFF")).c_str(),
 			option.c_str());
 		return true;
 	    }
-	    theChan->commit(); 
-	    bot->Notice(theClient, 
+	    theChan->commit();
+	    bot->Notice(theClient,
 			bot->getResponse(theUser,
 				language::set_cmd_status,
 				string("%s for %s is %s")).c_str(),
@@ -559,23 +560,23 @@ else
 				string("You do not have enough access!")));
 		return true;
 	    }
-	    if(value == "ON") 
-	    { 
-	    	theChan->setFlag(sqlChannel::F_AUTOTOPIC); 
+	    if(value == "ON")
+	    {
+	    	theChan->setFlag(sqlChannel::F_AUTOTOPIC);
 			bot->doAutoTopic(theChan);
 		}
 	    else if(value == "OFF") theChan->removeFlag(sqlChannel::F_AUTOTOPIC);
 	    else
 	    {
-		bot->Notice(theClient, 
+		bot->Notice(theClient,
 			bot->getResponse(theUser,
 				language::set_cmd_syntax_on_off,
 				string("value of %s must be ON or OFF")).c_str(),
 			option.c_str());
 		return true;
 	    }
-	    theChan->commit(); 
-	    bot->Notice(theClient, 
+	    theChan->commit();
+	    bot->Notice(theClient,
 			bot->getResponse(theUser,
 				language::set_cmd_status,
 				string("%s for %s is %s")).c_str(),
@@ -596,12 +597,12 @@ else
 
 		return true;
 	    }
-	    if(value == "ON") 
-	    { 
+	    if(value == "ON")
+	    {
 	    	theChan->setFlag(sqlChannel::F_AUTOJOIN);
 			theChan->setInChan(true);
 			bot->getUplink()->RegisterChannelEvent( theChan->getName(), bot ) ;
-			bot->Join(theChan->getName(), theChan->getChannelMode(), 
+			bot->Join(theChan->getName(), theChan->getChannelMode(),
 				theChan->getChannelTS(), false);
 			bot->joinCount++;
 			bot->reopQ.insert(cservice::reopQType::value_type(theChan->getName(), bot->currentTime() + 15) );
@@ -611,8 +612,8 @@ else
 			if(theChan->getFlag(sqlChannel::F_STRICTOP)) bot->deopAllUnAuthedOnChan(tmpChan);
 			}
 		}
-	    else if(value == "OFF") 
-	    { 
+	    else if(value == "OFF")
+	    {
 	    	theChan->removeFlag(sqlChannel::F_AUTOJOIN);
 			theChan->setInChan(false);
 			bot->joinCount--;
@@ -621,7 +622,7 @@ else
 		}
 	    else
 	    {
-	    bot->Notice(theClient, 
+	    bot->Notice(theClient,
 			bot->getResponse(theUser,
 				language::set_cmd_status,
 				string("%s for %s is %s")).c_str(),
@@ -630,8 +631,8 @@ else
 			theChan->getFlag(sqlChannel::F_AUTOJOIN) ? "ON" : "OFF");
 		return true;
 	    }
-	    theChan->commit(); 
-	    bot->Notice(theClient, 
+	    theChan->commit();
+	    bot->Notice(theClient,
 			bot->getResponse(theUser,
 				language::set_cmd_status,
 				string("%s for %s is %s")).c_str(),
@@ -642,7 +643,7 @@ else
 	}
 
 	if(option == "USERFLAGS")
-	{ 
+	{
 	    if(level < level::set::userflag)
 	    {
                 bot->Notice(theClient,
@@ -655,7 +656,7 @@ else
 		int setting = atoi(value.c_str());
 		if ( (setting < 0) || (setting > 2))
 		{
-			bot->Notice(theClient, 
+			bot->Notice(theClient,
 				bot->getResponse(theUser,
 					language::userflags_syntax,
 					string("Invalid USERFLAGS setting. Correct values are 0, 1, 2.")));
@@ -663,8 +664,8 @@ else
 		}
 
 		theChan->setUserFlags(setting);
-		theChan->commit(); 
-	    bot->Notice(theClient, 
+		theChan->commit();
+	    bot->Notice(theClient,
 			bot->getResponse(theUser,
 				language::userflags_status,
 				string("USERFLAGS for %s is %i")).c_str(),
@@ -685,7 +686,7 @@ else
 	    // Temporary MASSDEOPPRO range! 0-7.. is this correct?
 	    if(!IsNumeric(value))
 	    {
-			bot->Notice(theClient, 
+			bot->Notice(theClient,
 				bot->getResponse(theUser,
 					language::massdeoppro_syntax,
 					string("value of MASSDEOPPRO has to be 0-7")));
@@ -694,15 +695,15 @@ else
 	    int numValue = atoi(value.c_str());
 	    if(numValue > 7 || numValue < 0)
 	    {
-			bot->Notice(theClient, 
+			bot->Notice(theClient,
 				bot->getResponse(theUser,
 					language::massdeoppro_syntax,
 					string("value of MASSDEOPPRO has to be 0-7")));
 			return true;
 	    }
 		theChan->setMassDeopPro(numValue);
-	    theChan->commit(); 
-	    bot->Notice(theClient, 
+	    theChan->commit();
+	    bot->Notice(theClient,
 			bot->getResponse(theUser,
 				language::massdeoppro_status,
 				string("MASSDEOPPRO for %s is set to %d")).c_str(),
@@ -723,7 +724,7 @@ else
 	    // Temporary MASSDEOPPRO range! 0-7.. is this correct?
 	    if(!IsNumeric(value))
 	    {
-			bot->Notice(theClient, 
+			bot->Notice(theClient,
 				bot->getResponse(theUser,
 					language::floodpro_syntax,
 					string("value of FLOODPRO has to be 0-7")));
@@ -732,15 +733,15 @@ else
 		    int numValue = atoi(value.c_str());
 		    if(numValue > 7 || numValue < 0)
 	    {
-		bot->Notice(theClient, 
+		bot->Notice(theClient,
 			bot->getResponse(theUser,
 				language::floodpro_syntax,
 				string("value of FLOODPRO has to be 0-7")));
 		return true;
 	    }
 		theChan->setFloodPro(numValue);
-	    theChan->commit(); 
-	    bot->Notice(theClient, 
+	    theChan->commit();
+	    bot->Notice(theClient,
 			bot->getResponse(theUser,
 				language::floodpro_status,
 				string("FLOODPRO for %s is set to %d")).c_str(),
@@ -761,7 +762,7 @@ else
 	    }
 	    if(strlen(desc.c_str()) > 80)
 	    {
-			bot->Notice(theClient, 
+			bot->Notice(theClient,
 				bot->getResponse(theUser,
 					language::desc_max_len,
 					string("The DESCRIPTION can be a maximum of 80 chars!")));
@@ -779,7 +780,7 @@ else
 				theChan->getName().c_str());
 		} else
 		{
-	    	bot->Notice(theClient, 
+	    	bot->Notice(theClient,
 			bot->getResponse(theUser,
 				language::desc_status,
 				string("DESCRIPTION for %s is: %s")).c_str(),
@@ -808,25 +809,25 @@ else
 	    }
 	    if(strlen(url.c_str()) > 75) // Gator - changed to 75
 	    {
-			bot->Notice(theClient, 
+			bot->Notice(theClient,
 				bot->getResponse(theUser,
 					language::url_max_len,
 					string("The URL can be a maximum of 75 chars!")));
 			return true;
 	    }
 		theChan->setURL(url);
-	    theChan->commit(); 
+	    theChan->commit();
 
 		if(url == "")
 		{
-			bot->Notice(theClient, 
+			bot->Notice(theClient,
 				bot->getResponse(theUser,
 					language::url_cleared,
 					string("URL for %s is cleared.")).c_str(),
 				theChan->getName().c_str());
 		} else
 		{
-	    	bot->Notice(theClient, 
+	    	bot->Notice(theClient,
 			bot->getResponse(theUser,
 				language::url_status,
 				string("URL for %s is: %s")).c_str(),
@@ -856,15 +857,15 @@ else
 	    }
 	    if(strlen(value.c_str()) > 80) // is 80 ok as an max keywords length?
 	    {
-		bot->Notice(theClient, 
+		bot->Notice(theClient,
 			bot->getResponse(theUser,
 				language::keywords_max_len,
 				string("The string of keywords cannot exceed 80 chars!")));
 		return true;
 	    }
 	    theChan->setKeywords(keywords);
-	    theChan->commit(); 
-	    bot->Notice(theClient, 
+	    theChan->commit();
+	    bot->Notice(theClient,
 			bot->getResponse(theUser,
 				language::keywords_status,
 				string("KEYWORDS for %s are: %s")).c_str(),
@@ -885,38 +886,38 @@ else
 	    }
 		if (!tmpChan)
 		{
-			bot->Notice(theClient, 
+			bot->Notice(theClient,
 				bot->getResponse(theUser,
 					language::no_such_chan,
 					string("Can't locate channel %s on the network!")).c_str(),
 				st[1].c_str());
 			return false;
 		}
-	    
-	    theChan->setChannelMode(tmpChan->getModeString());
-	    theChan->commit(); 
 
-	    bot->Notice(theClient, 
+	    theChan->setChannelMode(tmpChan->getModeString());
+	    theChan->commit();
+
+	    bot->Notice(theClient,
 			bot->getResponse(theUser,
 				language::set_cmd_status,
 				string("%s for %s is %s")).c_str(),
 			option.c_str(),
 			theChan->getName().c_str(),
 			theChan->getChannelMode().c_str());
-	    return true; 
+	    return true;
 	}
 
 
 	if(option == "COMMENT")
 	{
-	    /* Check for admin access */ 
+	    /* Check for admin access */
 	    if(bot->getAdminAccessLevel(theUser) < level::set::comment)
 			{
 			/* No need to tell users about admin commands. */
 			Usage(theClient);
 			return true;
 			}
-		
+
 		string comment = st.assemble(3);
 
 		if(comment.size() > 200)
@@ -926,7 +927,7 @@ else
 	    }
 
 		theChan->setComment(comment);
-	    theChan->commit(); 
+	    theChan->commit();
 
 		if(comment.empty())
 		{
@@ -937,17 +938,17 @@ else
 	    	bot->Notice(theClient, "COMMENT for %s is: %s",
 				theChan->getName().c_str(), comment.c_str());
 		}
- 
+
 	    return true;
 	}
- 
 
-	bot->Notice(theClient, 
+
+	bot->Notice(theClient,
 		bot->getResponse(theUser,
 			language::mode_invalid,
-			string("ERROR: Invalid channel setting.")));	    
-	return true ; 
-} 
+			string("ERROR: Invalid channel setting.")));
+	return true ;
+}
 
 } // namespace gnuworld.
 
