@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-# "$Id: Makefile.am,v 1.10 2001/03/26 21:55:02 mrbean_ Exp $"
+# "$Id: Makefile.am,v 1.11 2001/04/30 23:44:42 mrbean_ Exp $"
 
 lib_LTLIBRARIES = libccontrol.la
 libccontrol_la_SOURCES = ccontrol.cc \
@@ -7,8 +7,10 @@ libccontrol_la_SOURCES = ccontrol.cc \
 	ACCESSCommand.cc \
 	ADDCOMMANDCommand.cc \
 	ADDNEWOPERCommand.cc \
+	ADDNEWSERVERCommand.cc \
 	ADDOPERCHANCommand.cc \
 	ccGline.cc \
+	ccServer.cc \
 	ccUser.cc \
 	CHANINFOCommand.cc \
 	CLEARCHANCommand.cc \
@@ -19,6 +21,7 @@ libccontrol_la_SOURCES = ccontrol.cc \
 	INVITECommand.cc \
 	JUPECommand.cc \
 	KICKCommand.cc \
+	LEARNNETWORKCommand.cc \
 	LISTHOSTSCommand.cc \
 	LISTOPERCHANSCommand.cc \
 	LOGINCommand.cc \

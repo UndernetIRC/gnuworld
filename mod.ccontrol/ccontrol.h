@@ -3,7 +3,7 @@
  */
 
 #ifndef __CCONTROL_H
-#define __CCONTROL_H "$Id: ccontrol.h,v 1.18 2001/03/29 20:57:42 mrbean_ Exp $"
+#define __CCONTROL_H "$Id: ccontrol.h,v 1.19 2001/04/30 23:44:42 mrbean_ Exp $"
 
 #include	<string>
 #include	<vector>
@@ -24,6 +24,7 @@
 #include        "ccUser.h"
 #include	"AuthInfo.h"
 #include        "ccGline.h"
+#include        "ccServer.h"
 
 namespace gnuworld
 {

@@ -23,7 +23,7 @@
 #include	"AuthInfo.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.25 2001/03/29 21:54:32 dan_karrels Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.26 2001/04/30 23:44:42 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -182,6 +182,10 @@ RegisterCommand( new LISTHOSTSCommand( this, "LISTHOSTS", "<oper> "
 	"Shows an oper hosts list",flg_LISTHOSTS ) ) ;
 RegisterCommand( new CLEARCHANCommand( this, "CLEARCHAN", "<#chan> "
 	"Removes all channel modes",flg_CLEARCHAN ) ) ;
+RegisterCommand( new ADDNEWSERVERCommand( this, "ADDNEWSERVER", "<Server> "
+	"Add a new server to the bot database",flg_ADDSERVER ) ) ;
+RegisterCommand( new LEARNNETWORKCommand( this, "LEARNNET", ""
+	"Update the servers database according to the current situation",flg_ADDSERVER ) ) ;
 
 }
 
@@ -265,6 +269,8 @@ for( commandMapType::iterator ptr = commandMap.begin() ;
 
 theServer->RegisterEvent( EVT_KILL, this );
 theServer->RegisterEvent( EVT_QUIT, this );
+theServer->RegisterEvent( EVT_NETJOIN, this );
+theServer->RegisterEvent( EVT_NETBREAK, this );
 
 xClient::ImplementServer( theServer ) ;
 }
@@ -377,6 +383,46 @@ switch( theEvent )
 		break ;
 		} // case EVT_KILL/case EVT_QUIT
 	
+	case EVT_NETJOIN:
+		{
+		/*
+		 * We need to update the servers table about the new
+		 * server , and check if we know it
+		 *
+		 */
+		iServer* NewServer = static_cast< iServer* >( Data1);
+		iServer* UplinkServer = static_cast< iServer* >( Data2);
+		ccServer* CheckServer = new (nothrow) ccServer(SQLDb);
+		assert(CheckServer != NULL);
+		if(!CheckServer->loadData(NewServer->getName()))
+			{    	
+			string wallopMe = "Unknown server connected : " ;
+			wallopMe+=  NewServer->getName().c_str(); 
+			wallopMe+= " From server : ";
+			wallopMe+= UplinkServer->getName().c_str() ;
+			Wallops( wallopMe ) ;
+			}
+		else
+			{
+			CheckServer->set_LastConnected(::time (0));
+			CheckServer->set_Uplink(UplinkServer->getName());
+			CheckServer->set_LastNumeric(NewServer->getCharYY());
+			CheckServer->Update();
+			}
+		delete CheckServer;
+		break;
+		}
+	case EVT_NETBREAK:
+		{
+		iServer* NewServer = static_cast< iServer* >( Data1);
+		iServer* UplinkServer = static_cast< iServer* >( Data2);
+		string wallopMe = "Net break between : " ;
+		wallopMe+=  NewServer->getName().c_str(); 
+		wallopMe+= " From server : ";
+		wallopMe+= UplinkServer->getName().c_str() ;
+		Wallops( wallopMe ) ;
+		}
+		
 	} // switch()
 
 return 0;

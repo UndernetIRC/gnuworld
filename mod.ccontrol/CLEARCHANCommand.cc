@@ -13,7 +13,7 @@
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 
-const char CLEARCHANCommand_cc_rcsId[] = "$Id: CLEARCHANCommand.cc,v 1.3 2001/03/26 21:59:10 mrbean_ Exp $";
+const char CLEARCHANCommand_cc_rcsId[] = "$Id: CLEARCHANCommand.cc,v 1.4 2001/04/30 23:44:42 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -96,6 +96,12 @@ for( string::size_type modePos = 0 ; modePos < doModes.size() ; ++modePos )
 						ptr->second->removeMode(ChannelUser::MODE_O);
 						}
 					} // If opped.
+				if(modes.size() > 5) //if we got more than 5 , set the mode and continue
+					{
+					bot->ModeAsServer( theChan, modes + ' ' + args ) ;
+					modes = "-";
+					args = "";
+					}
 				}
 			if(!args.empty())
 				bot->ModeAsServer(theChan,modes + " " + args);

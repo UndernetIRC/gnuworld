@@ -103,8 +103,8 @@ DECLARE_COMMAND( OP )
 DECLARE_COMMAND( DEOP )
 DECLARE_COMMAND( LISTHOSTS )
 DECLARE_COMMAND( CLEARCHAN )
-
-
+DECLARE_COMMAND( ADDNEWSERVER )
+DECLARE_COMMAND( LEARNNETWORK )
 /*
  Patch for uworld commands level 
  Added by : |MrBean| (MrBean@toughguy.net)
@@ -148,13 +148,15 @@ const int flg_DEOP = 0x01;
 const int flg_MODERATE = 0x01;
 const int flg_UNMODERATE = 0x01;
 const int flg_LISTHOSTS = 0x80;
+const int flg_ADDSERVER = 2000;
+const int flg_LEARNNET = 2000;
 
 /*
  Default commands that are added upon adding a new oper
 */
 
 const int OPER = flg_MODE | flg_INVITE | flg_GLINE | flg_CHINFO | flg_WHOIS | flg_TRANS | flg_KICK | flg_CLEARCHAN;
-const int ADMIN = OPER | flg_ADDOPCHN | flg_ADDNOP | flg_ADDCMD | flg_SUSPEND | flg_JUPE;
+const int ADMIN = OPER | flg_ADDOPCHN | flg_ADDNOP | flg_ADDCMD | flg_SUSPEND | flg_JUPE | flg_ADDSERVER;
 const int CODER = ADMIN;
 
 //Oper flags 

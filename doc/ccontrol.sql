@@ -1,4 +1,4 @@
--- "$Id: ccontrol.sql,v 1.4 2001/03/26 21:55:01 mrbean_ Exp $"
+-- "$Id: ccontrol.sql,v 1.5 2001/04/30 23:44:42 mrbean_ Exp $"
 -- 2001-13-02  : |MrBean|
 -- Added level patch for ccontrol module
 
@@ -7,6 +7,9 @@
 
 -- 2001-13-03 : |MrBean|
 -- Added Glines table 
+
+-- 2001-30-04 : |MrBean|
+-- Added servers table
 
 CREATE TABLE opers (
 	user_id SERIAL,	
@@ -43,3 +46,12 @@ CREATE TABLE glines (
 	Reason VARCHAR(255)
 	);
 				
+CREATE TABLE servers (
+	Name VARCHAR(100) NOT NULL,
+	LastUplink VARCHAR(100),
+	LastConnected INT4 NOT NULL DEFAULT '0',
+	SplitedOn INT4 NOT NULL DEFAULT '0',
+	LastNumeric VARCHAR(4)
+	);
+	
+	
