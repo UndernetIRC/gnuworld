@@ -3,6 +3,7 @@
  */
 
 #include	<new>
+#include	<list>
 #include	<vector>
 #include	<iostream>
 #include	<strstream>
@@ -80,13 +81,7 @@ if( userNames.empty() )
 	exit( 0 ) ;
 	}
 
-fakeServer = new (nothrow) iServer(
-	0, // uplinkIntYY
-	string(), // charYYXXX
-	conf.Require( "fakeservername" )->second,
-	time( 0 ) ) ;
-
-assert( fakeServer != 0 ) ;
+fakeServerName = conf.Require( "fakeservername" )->second ;
 }
 
 cloner::~cloner()
@@ -94,38 +89,16 @@ cloner::~cloner()
 
 int cloner::OnConnect()
 {
+fakeServer = new (nothrow) iServer(
+	MyUplink->getIntYY(), // uplinkIntYY
+	string(), // charYYXXX
+	fakeServerName,
+	::time( 0 ) ) ;
+assert( fakeServer != 0 ) ;
 
-xClient::OnConnect() ;
+MyUplink->AttachServer( fakeServer ) ;
 
-if( NULL == Network->findServer( fakeServer->getIntYY() ) )
-	{
-	MyUplink->AttachServer( fakeServer ) ;
-	}
-
-for( vector< iClient* >::size_type i = 0 ; i < clones.size() ; ++i )
-	{
-	// TODO: This will break the gnuworld core, but this is just
-	// used for testing, so who cares :)
-	strstream s ;
-	s	<< fakeServer->getCharYY() << " N "
-		<< clones[ i ]->getNickName() << " 0 "
-		<< clones[ i ]->getConnectTime() << " "
-		<< clones[ i ]->getUserName() << " "
-		<< clones[ i ]->getInsecureHost() << " "
-		<< clones[ i ]->getModes() << " "
-		<< xIP( 0, 0, 0, 0 ).GetBase64IP() << " "
-		<< clones[ i ]->getCharYYXXX() << " :"
-		<< cloneDescription << ends ;
-	if( QuoteAsServer( s.str() ) < 0 )
-		{
-		delete[] s.str() ;
-		return -1 ;
-		}
-	delete[] s.str() ;
-	} // close for
-
-return 0 ;
-
+return xClient::OnConnect() ;
 }
 
 int cloner::OnPrivateMessage( iClient* theClient, const string& Message,
@@ -166,6 +139,60 @@ if( command == "LOADCLONES" )
 	Notice( theClient, "Added %d clones", numClones ) ;
 
 	}
+else if( command == "JOINALL" )
+	{
+	if( st.size() < 2 )
+		{
+		Notice( theClient, "Usage: JOINALL <channel>" ) ;
+		return 0 ;
+		}
+
+	string chanName( st[ 1 ] ) ;
+	if( chanName[ 0 ] != '#' )
+		{
+		chanName.insert( chanName.begin(), '#' ) ;
+		}
+
+	for( list< iClient* >::const_iterator ptr = clones.begin(),
+		endPtr = clones.end() ; ptr != endPtr ; ++ptr )
+		{
+		strstream s ;
+		s	<< (*ptr)->getCharYYXXX()
+			<< " J "
+			<< chanName
+			<< ends ;
+
+		MyUplink->Write( s ) ;
+		delete[] s.str() ;
+		}
+	} // JOINALL
+else if( command == "PARTALL" )
+	{
+	if( st.size() < 2 )
+		{
+		Notice( theClient, "Usage: PARTALL <channel>" ) ;
+		return 0 ;
+		}
+
+	string chanName( st[ 1 ] ) ;
+	if( chanName[ 0 ] != '#' )
+		{
+		chanName.insert( chanName.begin(), '#' ) ;
+		}
+
+	for( list< iClient* >::const_iterator ptr = clones.begin(),
+		endPtr = clones.end() ; ptr != endPtr ; ++ptr )
+		{
+		strstream s ;
+		s	<< (*ptr)->getCharYYXXX()
+			<< " L "
+			<< chanName
+			<< ends ;
+
+		MyUplink->Write( s ) ;
+		delete[] s.str() ;
+		}
+	} // PARTALL
 
 return 0 ;
 }
@@ -182,8 +209,7 @@ buf[ 3 ] = 0 ;
 
 yyxxx += buf ;
 
-MyUplink->AttachClient(
-	new iClient(
+iClient* newClient = new iClient(
 		fakeServer->getIntYY(),
 		yyxxx,
 		randomNick( 5 ),
@@ -192,7 +218,11 @@ MyUplink->AttachClient(
 		randomHost(),
 		randomMode(), 
 		"I'm a clone.",
-		::time( 0 ) ) ) ;
+		::time( 0 ) ) ;
+assert( newClient != 0 );
+
+MyUplink->AttachClient( newClient ) ;
+clones.push_back( newClient ) ;
 
 }
 

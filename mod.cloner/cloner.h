@@ -3,10 +3,11 @@
  */
 
 #ifndef __CLONER_H
-#define __CLONER_H "$Id: cloner.h,v 1.1 2001/01/12 22:49:24 dan_karrels Exp $"
+#define __CLONER_H "$Id: cloner.h,v 1.2 2001/06/06 23:10:22 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
+#include	<list>
 
 #include	<ctime>
 
@@ -41,12 +42,13 @@ protected:
 	virtual string		randomMode() ;
 	virtual char		randomChar() ;
 
-	vector< iClient* >	clones ;
+	list< iClient* >	clones ;
 	vector< string >	userNames ;
 	vector< string >	hostNames ;
 	iServer*		fakeServer ;
 
 	string			cloneDescription ;
+	string			fakeServerName ;
 
 } ;
 
