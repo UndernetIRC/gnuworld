@@ -37,7 +37,7 @@
 #include	"ip.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.94 2001/12/07 13:00:20 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.95 2001/12/07 13:03:55 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -555,10 +555,7 @@ switch( theEvent )
 		iClient* tmpUser = (theEvent == EVT_QUIT) ?
 			static_cast< iClient* >( Data1 ) :
 			static_cast< iClient* >( Data2 ) ;
-		MsgChanLog("There are %d clones for address %s\n"
-		,--clientsIpMap[xIP( tmpUser->getIP()).GetNumericIP()]
-		,xIP( tmpUser->getIP()).GetNumericIP());
-
+		--clientsIpMap[xIP( tmpUser->getIP()).GetNumericIP()];
 		ccFloodData* floodData = static_cast< ccFloodData* >(
 		tmpUser->getCustomData(this) ) ;
 		tmpUser->removeCustomData(this);
