@@ -20,9 +20,10 @@
 #include        "ccUser.h"
 #include	"libpq++.h"
 #include	"ccontrol.h"
+#include	"AuthInfo.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.17 2001/02/26 16:58:06 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.18 2001/03/02 02:02:00 dan_karrels Exp $" ;
 
 using std::string ;
 using std::vector ;
@@ -539,6 +540,12 @@ bool ccontrol::removeOperChan( const string& chanName )
 Part( chanName ) ;
 
 return true ;
+}
+
+AuthInfo* ccontrol::IsAuth( const iClient* theClient ) const
+{
+assert( theClient != 0 ) ;
+return IsAuth( theClient->getCharYYXXX() ) ;
 }
 
 AuthInfo* ccontrol::IsAuth( const string& Numeric ) const

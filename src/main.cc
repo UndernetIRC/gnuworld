@@ -1,5 +1,5 @@
 /* main.cc
- * $Id: main.cc,v 1.28 2001/03/01 03:26:41 dan_karrels Exp $
+ * $Id: main.cc,v 1.29 2001/03/02 02:02:01 dan_karrels Exp $
  */
 
 #include	<new>
@@ -24,7 +24,7 @@
 using namespace gnuworld ;
 
 const char config_h_rcsId[] = __CONFIG_H ;
-const char main_cc_rcsId[] = "$Id: main.cc,v 1.28 2001/03/01 03:26:41 dan_karrels Exp $" ;
+const char main_cc_rcsId[] = "$Id: main.cc,v 1.29 2001/03/02 02:02:01 dan_karrels Exp $" ;
 
 using std::cerr ;
 using std::clog ;
@@ -63,7 +63,7 @@ assert( theServer != 0 ) ;
 	// TODO: This will have to be updated when running
 	// in background.
 	{
-	ofstream pidFile( "gnuworld.pid", ios::trunc ) ;
+	ofstream pidFile( "gnuworld.pid", ios::trunc | ios::out ) ;
 	if( !pidFile )
 		{
 		clog	<< "Unable to open pid file: gnuworld.pid"

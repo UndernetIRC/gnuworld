@@ -5,17 +5,17 @@
  *     
  */
  
-
 #include	<string>
+
 #include	<cstdlib>
-#include        <iomanip.h>
 
 #include	"ccontrol.h"
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 #include        "ccUser.h"
+#include	"AuthInfo.h"
 
-const char ADDCOMMANDCommand_cc_rcsId[] = "$Id: ADDCOMMANDCommand.cc,v 1.5 2001/02/26 16:58:05 mrbean_ Exp $";
+const char ADDCOMMANDCommand_cc_rcsId[] = "$Id: ADDCOMMANDCommand.cc,v 1.6 2001/03/02 02:02:00 dan_karrels Exp $";
 
 namespace gnuworld
 {
@@ -32,31 +32,44 @@ if( st.size() < 3 )
 	return true;
 	}
 
-
-//Fetch the oper record from the db
+// Fetch the oper record from the db
 ccUser* theUser = bot->GetOper(st[1]);
 	
-if(!theUser)
+if( !theUser )
 	{	
-	bot->Notice(theClient,"I cant find oper %s",st[1].c_str());
+	bot->Notice( theClient,
+		"I cant find oper %s",
+		st[1].c_str());
 	return false;
 	}
 	
 int CommandLevel = bot->getCommandLevel(st[2]);
-	
-if(CommandLevel < 0 )
+
+if( CommandLevel < 0 )
 	{
-	bot->Notice(theClient,"Command %s does not exists!",st[2].c_str());
+	bot->Notice( theClient,
+		"Command %s does not exist!",
+		st[2].c_str());
+
+	// TODO: Bug?  Even if it's not, this is an obvious design
+	// error.
 	delete theUser;
+
 	return false;	        
 	}
 	
-AuthInfo *AClient = bot->IsAuth(theClient->getCharYYXXX());
-	
-//Only allow opers who have access to that command to add it to new opers
+AuthInfo *AClient = bot->IsAuth( theClient );
+if( NULL == AClient )
+	{
+	bot->Notice( theClient, "You must first authenticate" ) ;
+	return true ;
+	}
+
+// Only allow opers who have access to that command to add it to new opers
 if(!(AClient->Access & CommandLevel))
 	{
-	bot->Notice(theClient,"You must have access to a command inorder to add it");
+	bot->Notice( theClient,
+		"You must have access to a command inorder to add it");
 	delete theUser;
 	return false;
 	}
@@ -64,25 +77,33 @@ if(!(AClient->Access & CommandLevel))
 //else if(theUser->getAccess() & CommandLevel)
 else if(theUser->gotAccess(CommandLevel))	
 	{
-	bot->Notice(theClient,"%s already got access for %s",st[1].c_str(),st[2].c_str());
+	bot->Notice( theClient,
+		"%s already got access for %s",
+		st[1].c_str(),
+		st[2].c_str());
 	delete theUser;
 	return false;	        
-	}	
+	}
 
 //Add the command and update the user db record	
 theUser->addCommand(CommandLevel);
 theUser->setLast_Updated_By(theClient->getNickUserHost());
 if(theUser->Update())
 	{
-	bot->Notice(theClient,"Successfully added the command for %s",st[1].c_str());
-	//If the user is authenticated update his authenticate entry
+	bot->Notice( theClient,
+		"Successfully added the command for %s",
+		st[1].c_str());
+
+	// If the user is authenticated update his authenticate entry
 	bot->UpdateAuth(theUser); 
 	delete theUser;
 	return true;
 	}
 else
 	{
-	bot->Notice(theClient,"Error while adding command for %s",st[1].c_str());
+	bot->Notice( theClient,
+		"Error while adding command for %s",
+		st[1].c_str());
 	delete theUser;
 	return false;
 	}

@@ -151,19 +151,6 @@ const int isOPER      = 0x02;
 const int isADMIN     = 0x04;
 const int isCODER     = 0x08;
 
-
-class AuthInfo{
-public:
-    string Name;
-    unsigned int Id;
-    int unsigned Access;
-    int unsigned Flags;
-    string Numeric;
-    int SuspendExpires;
-    string SuspendedBy;
-};// AuthInfo;
-
-
 } // namespace gnuworld
 
 #endif // __CCONTROLCOMMANDS_H

@@ -3,7 +3,7 @@
  */
 
 #ifndef __CCONTROL_H
-#define __CCONTROL_H "$Id: ccontrol.h,v 1.12 2001/02/26 16:58:06 mrbean_ Exp $"
+#define __CCONTROL_H "$Id: ccontrol.h,v 1.13 2001/03/02 02:02:00 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
@@ -22,6 +22,7 @@
 #include        "match.h"
 #include	"md5hash.h" 
 #include        "ccUser.h"
+#include	"AuthInfo.h"
 
 namespace gnuworld
 {
@@ -211,6 +212,8 @@ public:
 	 * is already in the channel.
 	 */
 	virtual bool removeOperChan( const string& ) ;
+
+	AuthInfo* IsAuth( const iClient* theClient ) const ;
 
         AuthInfo *IsAuth( const string& ) const ;
 	

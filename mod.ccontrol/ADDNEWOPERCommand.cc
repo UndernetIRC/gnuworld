@@ -11,20 +11,19 @@
  */
 
 #include	<string>
+
 #include	<cstdlib>
-#include        <iomanip.h>
 
 #include	"ccontrol.h"
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 
-const char ADDNEWOPERCommand_cc_rcsId[] = "$Id: ADDNEWOPERCommand.cc,v 1.5 2001/02/26 16:58:05 mrbean_ Exp $";
+const char ADDNEWOPERCommand_cc_rcsId[] = "$Id: ADDNEWOPERCommand.cc,v 1.6 2001/03/02 02:02:00 dan_karrels Exp $";
 
 namespace gnuworld
 {
 
 using std::string ;
-
 
 bool ADDNEWOPERCommand::Exec( iClient* theClient, const string& Message)
 {
@@ -36,18 +35,21 @@ if( st.size() < 4 )
 	return true;
 	}
 
-//Try fetching the user data from the database, note this is the new user handle
+// Try fetching the user data from the database, note this is
+// the new user handle
 ccUser* theUser = bot->GetUser(st[1]);
 if (theUser)  
 	{ 
 	bot->Notice(theClient,"Oper %s already exsits in my db," 
-	"please change the oper handle and try again",theUser->getUserName().c_str());
+		"please change the oper handle and try again",
+		theUser->getUserName().c_str());
         delete theUser;
 	return false;
-	}	    
+	}
 
-unsigned int NewAccess;
-unsigned int NewFlags;
+unsigned int NewAccess = 0 ;
+unsigned int NewFlags = 0 ;
+
 if(!strcasecmp(st[2].c_str(),"coder"))
 	{
 	NewAccess = CODER;
@@ -65,17 +67,24 @@ else if(!strcasecmp(st[2].c_str(),"oper"))
 	}
 else
 	{
-	bot->Notice(theClient,"Illegal oper type, Types are : oper , admin , coder");
+	bot->Notice(theClient,
+		"Illegal oper type; types are: oper, admin, coder");
 	return false;
 	}	     	
 
-AuthInfo *tOper = bot->IsAuth(theClient->getCharYYXXX());
-
+AuthInfo *tOper = bot->IsAuth( theClient );
+if( NULL == tOper )
+	{
+	bot->Notice( theClient,
+		"You must first authenticate" ) ;
+	return true ;
+	}
 
 //Check if the user doesnt try to add an oper with higher flag than he is
 if(tOper->Flags < NewFlags)
 	{
-	bot->Notice(theClient,"You can't add an oper with higher access than yours!");
+	bot->Notice( theClient,
+		"You can't add an oper with higher access than yours!");
 	return false;
 	}	     	
 
