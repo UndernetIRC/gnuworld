@@ -37,7 +37,7 @@
 #include	"ip.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.103 2001/12/13 09:10:35 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.104 2001/12/14 16:36:18 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -553,8 +553,8 @@ switch( theEvent )
 		ccUser *TempAuth = UserData->getDbUser();
 		if(TempAuth)
 	    		{
-			MsgChanLog("Removed auth for %s, he quited!\n",TempAuth->getUserName().c_str());
-			deAuthUser(TempAuth);
+			UserData->setDbUser(NULL);
+			TempAuth->setClient(NULL);
 			}
 		ccFloodData *tempLogin = UserData->getFlood();
 		if(tempLogin)

@@ -24,7 +24,7 @@
 #include	"ccUser.h"
 #include	"Constants.h"
 
-const char GLINECommand_cc_rcsId[] = "$Id: GLINECommand.cc,v 1.30 2001/12/13 08:50:00 mrbean_ Exp $";
+const char GLINECommand_cc_rcsId[] = "$Id: GLINECommand.cc,v 1.31 2001/12/14 16:36:18 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -194,7 +194,7 @@ if(!isChan)
 		}
 
 	server->setGline( nickUserHost,
-		"*" + userName + "@" +hostName,
+		userName + "@" +hostName,
 		Reason + "[" + Us + "]",
 		gLength ) ;
 	
