@@ -10,7 +10,7 @@
 #include	"responses.h" 
 #include	"networkData.h"
 
-const char NEWPASSCommand_cc_rcsId[] = "$Id: NEWPASSCommand.cc,v 1.8 2001/02/21 00:55:42 dan_karrels Exp $" ;
+const char NEWPASSCommand_cc_rcsId[] = "$Id: NEWPASSCommand.cc,v 1.9 2001/02/25 23:39:44 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -45,7 +45,13 @@ if ( (string_lower(st[1]) == string_lower(tmpUser->getUserName()))
 	bot->Notice(theClient, 
 		bot->getResponse(tmpUser,
 			language::pass_cant_be_nick,
-			string("Your password cannot be your username or current nick - syntax is: NEWPASS <new passphrase>")));
+			string("Your passphrase cannot be your username or current nick - syntax is: NEWPASS <new passphrase>")));
+	return false;
+	}
+
+if (st.assemble(1).size() > 50) 
+	{
+	bot->Notice(theClient, "Your passphrase cannot exceed 50 characters.");
 	return false;
 	}
 
