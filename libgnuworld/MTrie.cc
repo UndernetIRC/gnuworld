@@ -1,7 +1,7 @@
 /**
  * MTrie.cc
  *
- * $Id: MTrie.cc,v 1.6 2003/07/24 04:03:18 dan_karrels Exp $
+ * $Id: MTrie.cc,v 1.7 2003/07/24 21:14:25 dan_karrels Exp $
  */
 
 #include	<map>
@@ -117,12 +117,17 @@ clog	<< "MTrie::find> Searching for key: "
 	<< key
 	<< endl ;
 
+// base tracks the keys used to iterate to the different levels.
+// It is used when matching for '*', since '*' may cross
+// levels.
 list< string > base ;
 list< value_type > returnMe ;
 
 // key may have wildcards, which is trickier than it may sound.
 // A key may be "w*w.yahoo.com" which matches to both
 // "www.yahoo.com" and "www.wwwww.yahoo.com"
+// The recursive find will handle all cases of '?', '*', and
+// normal non-wildcard keys.
 find( this, returnMe, base, key, key ) ;
 
 return returnMe ;
@@ -136,6 +141,10 @@ void MTrie< _valueT >::find(
 	const string& origKey,
 	const string& key ) const
 {
+// If the key is empty, that means that we have reached the
+// final node.  All values at this node are matches.
+// This happens when the left most token has a '?' in it:
+// "n?ws.abs.net"
 if( key.empty() )
 	{
 	for( const_values_iterator vItr = currentNode->valuesList.begin() ; 
@@ -146,7 +155,6 @@ if( key.empty() )
 	return ;
 	}
 
-// precondition: key contains a '*'
 clog	<< "MTrie::find> Searching for key: "
 	<< key
 	<< endl ;
@@ -156,8 +164,7 @@ StringTokenizer::const_reverse_iterator tokenItr = tokens.rbegin() ;
 
 bool foundQuestionMark = false ;
 
-// Iterate as far as possible before beginning wild card match()
-// searches.
+// Iterate as far as possible
 for( ; tokenItr != tokens.rend() ; ++tokenItr )
 	{
 	if( string::npos != (*tokenItr).find( '*' ) )
@@ -178,8 +185,7 @@ for( ; tokenItr != tokens.rend() ; ++tokenItr )
 	if( currentNode->nodesMap.end() == nItr )
 		{
 		// This node does not exist
-		// Since we are not at the last token,
-		// this key does not exist
+
 		clog	<< "MTrie::find> Unable to find key: "
 			<< key
 			<< endl ;

@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: stats.cc,v 1.19 2003/06/28 16:26:46 dan_karrels Exp $
+ * $Id: stats.cc,v 1.20 2003/07/24 21:14:25 dan_karrels Exp $
  */
 
 #include	<string>
@@ -37,8 +37,9 @@
 #include	"StringTokenizer.h"
 #include	"Network.h"
 #include	"config.h"
+#include	"misc.h"
 
-RCSTAG( "$Id: stats.cc,v 1.19 2003/06/28 16:26:46 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: stats.cc,v 1.20 2003/07/24 21:14:25 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -83,6 +84,21 @@ if( '/' != data_path[ data_path.size() - 1 ] )
 elog	<< "stats> data_path: "
 	<< data_path
 	<< endl ;
+
+allowOpers = false ;
+string stringOperAccess = conf.Require( "allow_opers" )->second ;
+if( !strcasecmp( stringOperAccess, "yes" ) ||
+	!strcasecmp( stringOperAccess, "true" ) )
+	{
+	allowOpers = true ;
+	}
+
+EConfig::const_iterator ptr = conf.Find( "permit_user" ) ;
+while( ptr != conf.end() && ptr->first == "permit_user" )
+	{
+	allowAccess.push_back( ptr->second ) ;
+	++ptr ;
+	}
 
 string ldb = conf.Require( "logDuringBurst" )->second ;
 if( ldb == "true" )
@@ -289,14 +305,23 @@ void stats::OnPrivateMessage( iClient* theClient,
 //	<< theMessage
 //	<< endl ;
 
-if( !theClient->isOper() &&
-	((theClient->getMode( iClient::MODE_REGISTERED )) &&
-	(theClient->getAccount() != "reppir") &&
-	(theClient->getAccount() != "Jeekay")) )
+// Get rid of anyone who is not an oper and does not have access
+bool userHasAccess = hasAccess( theClient->getAccount() ) ;
+if( !userHasAccess && !theClient->isOper() )
 	{
-	elog	<< "stats::OnPrivateMessage> Denying access"
-		<< endl ;
+	// Normal user
 	return ;
+	}
+
+if( !userHasAccess )
+	{
+	// The client must be an oper
+	// Are opers allow to use the service?
+	if( !allowOpers )
+		{
+		// Nope
+		return ;
+		}
 	}
 
 StringTokenizer st( theMessage ) ;
@@ -598,6 +623,19 @@ for( eventType whichEvent = 0 ; whichEvent <= EVT_CREATE ; ++whichEvent )
 Notice( theClient, "Total Events: %d, Total Average Events/Second: %f",
 	totalEvents,
 	(double) totalEvents / (double) countingTime ) ;
+}
+
+bool stats::hasAccess( const string& accountName ) const
+{
+for( list< string >::const_iterator itr = allowAccess.begin() ;
+	itr != allowAccess.end() ; ++itr )
+	{
+	if( !strcasecmp( accountName, *itr ) )
+		{
+		return true ;
+		}
+	}
+return false ;
 }
 
 } // namespace gnuworld

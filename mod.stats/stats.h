@@ -17,14 +17,15 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: stats.h,v 1.11 2003/06/28 16:26:46 dan_karrels Exp $
+ * $Id: stats.h,v 1.12 2003/07/24 21:14:26 dan_karrels Exp $
  */
 
 #ifndef __STATS_H
-#define __STATS_H "$Id: stats.h,v 1.11 2003/06/28 16:26:46 dan_karrels Exp $"
+#define __STATS_H "$Id: stats.h,v 1.12 2003/07/24 21:14:26 dan_karrels Exp $"
 
 #include	<fstream>
 #include	<string>
+#include	<list>
 
 #include	"client.h"
 #include	"iClient.h"
@@ -36,6 +37,7 @@ namespace gnuworld
 
 using std::ofstream ;
 using std::string ;
+using std::list ;
 using std::map ;
 
 class stats : public xClient
@@ -156,8 +158,20 @@ protected:
 	 */
 	virtual void		openLogFiles() ;
 
+	/**
+	 * Return true if the given account name is permitted
+	 * access to this module.
+	 */
+	virtual bool		hasAccess( const string& ) const ;
+
 	/// True if the stats should log during net burst (of gnuworld)
 	bool			logDuringBurst ;
+
+	/// True if opers can use this service, false otherwise
+	bool			allowOpers ;
+
+	/// list of account names who can use this service
+	list< string >		allowAccess ;
 
 	/// The path to the directory in which to store the logs files.
 	/// If the path does not exist, it will NOT be created.

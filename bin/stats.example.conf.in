@@ -1,4 +1,4 @@
-# $Id: stats.example.conf.in,v 1.5 2003/07/10 00:58:23 dan_karrels Exp $
+# $Id: stats.example.conf.in,v 1.6 2003/07/24 21:14:25 dan_karrels Exp $
 # conf file for stats bot
 username = ubercow
 nickname = ubercow
@@ -6,6 +6,16 @@ hostname = undernet.org
 userdescription = UnderNet Statistical Services
 
 mode = +iok
+
+# permit the given user -- by account login name -- to use the
+# module.  You may have as many of these as you like (including none).
+# This is case-insensitive.
+permit_user = reppir
+permit_user = Jeekay
+                                                                           
+# Set this to true if you want to permit opers to use the module,
+# set to false otherwise (will not affect other users who have access)
+allow_opers = true
 
 # Set this value to "true" to enable stats logging during burst (it chews
 # the hard drive/CPU)
