@@ -37,7 +37,7 @@
 #include	"ip.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.96 2001/12/07 18:00:05 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.97 2001/12/07 18:51:49 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -702,9 +702,10 @@ switch( theEvent )
 					if((CurConnections  > getExceptions("*@" + tIP)) 
 					    && (CurConnections > getExceptions("*@"+NewUser->getInsecureHost())))
 						{
-						MsgChanLog("Glining %s , connections : %d , IPE : %d , HOSTE %d\n"
-						,tIP.c_str(),CurConnections,
-						getExceptions("*@" + tIP),getExceptions("*@" + NewUser->getInsecureHost()));
+						MsgChanLog("Glining %s , total  connections : %d\n"
+						,tIP.c_str(),CurConnections);
+						MsgChanLog(" , IP Exception : %d , HOST Exception %d\n"						
+						,getExceptions("*@" + tIP),getExceptions("*@" + NewUser->getInsecureHost()));
 
 						glSet = true;
 						ccGline *tmpGline;
@@ -3060,7 +3061,7 @@ uptime %= 60;
 secs = uptime;
 Notice(tmpClient,"Uptime : %dD %dH %dM %dS",days,hours,mins,secs);
 if(checkClones)
-	Notice(tmpClient,"Currently there are %d hosts in the clones queue",clonesQueue.size());
+	Notice(tmpClient,"Monitoring %d diffrent clones hosts\n",clientsIpMap.size());
 if(checkGates)
 	Notice(tmpClient,"Monitoring %d threads out of %d, and there are %d in the waiting queue",gatesCheckingQueue.size()
 		,maxThreads,gatesWaitingQueue.size());
