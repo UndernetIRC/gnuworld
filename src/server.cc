@@ -47,7 +47,7 @@
 #include	"ServerTimerHandlers.h"
 
 const char xServer_h_rcsId[] = __XSERVER_H ;
-const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.81 2001/03/03 00:17:57 dan_karrels Exp $" ;
+const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.82 2001/03/03 00:37:09 dan_karrels Exp $" ;
 
 using std::string ;
 using std::vector ;
@@ -1899,7 +1899,7 @@ void xServer::OnPartChannel( xClient* theClient, Channel* theChan )
 
 }
 
-void xServer::JoinChannel( xClient* theClient, const string& chanName,
+bool xServer::JoinChannel( xClient* theClient, const string& chanName,
 	const string& chanModes,
 	const time_t& joinTime, bool getOps )
 {
@@ -1923,7 +1923,9 @@ if( (NULL == theChan) && bursting )
 	{
 	// Need to burst the channel
 	strstream s ;
-	s	<< getCharYY() << " B " << chanName << ' '
+	s	<< getCharYY()
+		<< " B "
+		<< chanName << ' '
 		<< postJoinTime << ' '
 		<< chanModes << ' '
 		<< theClient->getCharYYXXX() ;
@@ -1943,7 +1945,21 @@ if( (NULL == theChan) && bursting )
 	assert( theChan != 0 ) ;
 
 	// Add it to the network channel table
-	Network->addChannel( theChan ) ; 
+	if( !Network->addChannel( theChan ) )
+		{
+		elog	<< "xServer::JoinChannel> addChannel() "
+			<< "failed: "
+			<< theChan->getName()
+			<< endl ;
+
+		// Prevent a memory leak
+		delete theChan ; theChan = 0 ;
+
+		// Return failure
+		return false ;
+		}
+
+	// We have just burst a channel
 
 	}
 else if( NULL == theChan )
@@ -1958,8 +1974,11 @@ else if( NULL == theChan )
 		// The client automatically gets op in this case
 	{
 	strstream s ;
-	s	<< theClient->getCharYYXXX() << " C "
-		<< chanName << ' ' << postJoinTime ;
+	s	<< theClient->getCharYYXXX()
+		<< " C "
+		<< chanName
+		<< ' '
+		<< postJoinTime ;
 	Write( s ) ;
 	delete[] s.str() ;
 	}
@@ -1968,8 +1987,10 @@ else if( NULL == theChan )
 		{
 		strstream s ;
 		s	<< theClient->getCharYYXXX()
-			<< " M " << chanName << ' '
-			<< chanModes << ends ;
+			<< " M "
+			<< chanName << ' '
+			<< chanModes
+			<< ends ;
 		Write( s ) ;
 		delete[] s.str() ;
 		}
@@ -1979,7 +2000,19 @@ else if( NULL == theChan )
 	assert( theChan != 0 ) ;
 
 	// Add it to the network channel table
-	Network->addChannel( theChan ) ;
+	if( !Network->addChannel( theChan ) )
+		{
+		elog	<< "xServer::JoinChannel> addChannel() "
+			<< "failed: "
+			<< theChan->getName()
+			<< endl ;
+
+		// Prevent a memory leak
+		delete theChan ; theChan = 0 ;
+
+		// Return failure
+		return false ;
+		}
 
 	}
 else if( bursting )
@@ -2001,7 +2034,9 @@ else if( bursting )
 	// match that supplied in this line. (Because we are authoritive
 	// in this channel, any existing modes will be removed by ircu).
 	strstream s ;
-	s	<< getCharYY() << " B " << chanName << ' '
+	s	<< getCharYY()
+		<< " B "
+		<< chanName << ' '
 		<< postJoinTime << ' '
 		<< chanModes << ' '
 		<< theClient->getCharYYXXX() ;
@@ -2021,8 +2056,11 @@ else
 	// After bursting, and the channel exists
 		{
 		strstream s2 ;
-		s2	<< theClient->getCharYYXXX() << " J "
-			<< chanName << ends ;
+		s2	<< theClient->getCharYYXXX()
+			<< " J "
+			<< chanName
+			<< ends ;
+
 		Write( s2 ) ;
 		delete[] s2.str() ;
 		}
@@ -2031,9 +2069,13 @@ else
 		{
 		// Op the bot
 		strstream s ;
-		s	<< charYY << " M " << chanName
-			<< " +o " << theClient->getCharYYXXX()
+		s	<< charYY
+			<< " M "
+			<< chanName
+			<< " +o "
+			<< theClient->getCharYYXXX()
 			<< ends ;
+
 		Write( s ) ;
 		delete[] s.str() ;
 		}
@@ -2137,6 +2179,8 @@ if( getOps )
 
 // Add the ChannelUser to the channel
 theChan->addUser( theIClient ) ;
+
+return true ;
 
 }
 

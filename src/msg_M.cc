@@ -17,7 +17,7 @@
 #include	"ELog.h"
 #include	"StringTokenizer.h"
 
-const char msg_M_cc_rcsId[] = "$Id: msg_M.cc,v 1.4 2001/03/03 00:17:57 dan_karrels Exp $" ;
+const char msg_M_cc_rcsId[] = "$Id: msg_M.cc,v 1.5 2001/03/03 00:37:09 dan_karrels Exp $" ;
 
 using std::string ;
 using std::vector ;
@@ -103,7 +103,8 @@ if( clientSource != 0 )
 		{
 		elog	<< "xServer::MSG_M> ("
 			<< theChan->getName()
-			<< ") Unable to find channel user"
+			<< ") Unable to find channel user: "
+			<< clientSource->getCharYYXXX()
 			<< endl ;
 		return -1 ;
 		}

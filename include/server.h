@@ -17,7 +17,7 @@
  */
 
 #ifndef __XSERVER_H
-#define __XSERVER_H "$Id: server.h,v 1.34 2001/02/18 19:46:01 dan_karrels Exp $"
+#define __XSERVER_H "$Id: server.h,v 1.35 2001/03/03 00:37:09 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
@@ -312,7 +312,7 @@ public:
 	 * xClient operator in that channel.
 	 * This works at all times, bursting or not.
 	 */
-	virtual void JoinChannel( xClient*, const string& chanName,
+	virtual bool JoinChannel( xClient*, const string& chanName,
 		const string& chanModes = "+tn",
 		const time_t& joinTime = 0,
 		bool getOps = true ) ;
