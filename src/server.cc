@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server.cc,v 1.156 2003/05/26 21:44:32 dan_karrels Exp $
+ * $Id: server.cc,v 1.157 2003/05/27 00:23:23 dan_karrels Exp $
  */
 
 #include	<sys/time.h>
@@ -72,7 +72,7 @@
 #include	"Connection.h"
 
 const char server_h_rcsId[] = __SERVER_H ;
-const char server_cc_rcsId[] = "$Id: server.cc,v 1.156 2003/05/26 21:44:32 dan_karrels Exp $" ;
+const char server_cc_rcsId[] = "$Id: server.cc,v 1.157 2003/05/27 00:23:23 dan_karrels Exp $" ;
 const char config_h_rcsId[] = __CONFIG_H ;
 const char misc_h_rcsId[] = __MISC_H ;
 const char events_h_rcsId[] = __EVENTS_H ;
@@ -1850,7 +1850,7 @@ bool xServer::removeGline( const string& userHost, const xClient* remClient )
 // structure of glines.
 bool foundGline = false ;
 
-// Perform a linear search for the gline
+// Perform a search for the gline
 glineIterator gItr = findGlineIterator( userHost ) ;
 if( gItr != gline_end() )
 	{
@@ -1907,10 +1907,22 @@ bool xServer::setGline(
 	const string& server )
 {
 // Remove any old matches
-removeMatchingGlines( userHost ) ;
+{
+	xServer::glineIterator gItr = findGlineIterator( userHost ) ;
+	if( gItr != gline_end() )
+		{
+		// This gline is already present
+		delete gItr->second ;
+		eraseGline( gItr ) ;
+		}
+}
 
 Gline* newGline =
-	new (std::nothrow) Gline( setBy, userHost, reason, duration , lastmod) ;
+	new (std::nothrow) Gline( setBy,
+		userHost,
+		reason,
+		duration ,
+		lastmod) ;
 assert( newGline != 0 ) ;
 
 // Notify the rest of the network
@@ -2001,14 +2013,13 @@ void xServer::removeMatchingGlines( const string& wildHost )
 for( glineIterator ptr = gline_begin() ; ptr != gline_end() ; ++ptr )
 	{
 	// TODO: Does this work with two wildHost's?
-	if( !strcasecmp( wildHost, ptr->second->getUserHost() ) )
+	if( !match( wildHost, ptr->second->getUserHost() ) )
 		{
-		glineList.erase( ptr ) ;
-
 		PostEvent( EVT_REMGLINE,
 			static_cast< void* >( ptr->second ) ) ;
 
 		delete ptr->second ;
+		glineList.erase( ptr ) ;
 		}
 	}
 }
