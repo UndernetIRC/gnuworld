@@ -13,7 +13,7 @@
  *
  * Command is aliased "INFO".
  *
- * $Id: CHANINFOCommand.cc,v 1.37 2002/01/07 18:47:40 gte Exp $
+ * $Id: CHANINFOCommand.cc,v 1.38 2002/01/08 23:20:43 gte Exp $
  */
 
 #include	<string>
@@ -26,7 +26,7 @@
 #include	"libpq++.h"
 #include	"cservice_config.h"
 
-const char CHANINFOCommand_cc_rcsId[] = "$Id: CHANINFOCommand.cc,v 1.37 2002/01/07 18:47:40 gte Exp $" ;
+const char CHANINFOCommand_cc_rcsId[] = "$Id: CHANINFOCommand.cc,v 1.38 2002/01/08 23:20:43 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -104,15 +104,21 @@ if( string::npos == st[ 1 ].find_first_of( '#' ) )
 		" hyperspace expressway?");
 	}
 
-	iClient* targetClient = theUser->isAuthed();
-	string loggedOn = targetClient ?
-		targetClient->getNickUserHost() : "Offline";
+	/*
+	 * Loop over all people we might be logged in as.
+	 */
 
-	bot->Notice(theClient,
-		bot->getResponse(tmpUser,
-			language::curr_logged_on,
-			string("Currently logged on via: %s")).c_str(),
-		loggedOn.c_str());
+	bot->Notice(theClient, "Currently logged on via:");
+	int aCount = 0;
+
+	for( sqlUser::networkClientListType::iterator ptr = theUser->networkClientList.begin() ;
+		ptr != theUser->networkClientList.end() ; ++ptr )
+		{
+			bot->Notice(theClient, "  " + (*ptr)->getNickUserHost());
+			aCount++;
+		}
+
+	if (!aCount) bot->Notice(theClient, "  OFFLINE");
 
 	if( !theUser->getUrl().empty() )
 		{
@@ -270,29 +276,6 @@ if( string::npos == st[ 1 ].find_first_of( '#' ) )
 				language::channels,
 				string("Channels: %s")).c_str(),
 			channelList.c_str());
-		}
-
-	/*
-	 *  Debug info:
-	 */
-
-	// TODO: Violation of rule of numbers
-	if( ((tmpUser) && (bot->getAdminAccessLevel(tmpUser) == 1000)) )
-		{
-		if (!targetClient)
-			{
-			return true;
-			}
-		bot->Notice(theClient,
-			bot->getResponse(tmpUser,
-				language::inp_flood,
-				string("Input Flood Points: %i")).c_str(),
-			bot->getFloodPoints(targetClient));
-		bot->Notice(theClient,
-			bot->getResponse(tmpUser,
-				language::out_flood,
-				string("Ouput Flood (Bytes): %i")).c_str(),
-			bot->getOutputTotal(targetClient));
 		}
 
 	return true;

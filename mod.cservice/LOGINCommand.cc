@@ -12,7 +12,7 @@
 #include	"cservice_config.h"
 #include	"Network.h"
 
-const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.30 2002/01/08 03:25:00 gte Exp $" ;
+const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.31 2002/01/08 23:20:43 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -129,50 +129,18 @@ if(md5Part != output.str() ) // If the MD5 hash's don't match..
 
 delete[] output.str() ;
 
-/*
- *  Check this user isn't already spoken for..
- *  If someone HAS authenticated as this user, then deauth that other
- *  person.
- */
-
-iClient* authTestUser = theUser->isAuthed();
-if (authTestUser)
-	{
-	bot->Notice(authTestUser,
-		bot->getResponse(tmpUser,
-			language::no_longer_auth,
-			string("NOTICE: %s has now authenticated as %s, you are no longer authenticated.")).c_str(),
-			theClient->getNickUserHost().c_str(),
-			theUser->getUserName().c_str());
-
-	networkData* tmpData =
-		static_cast< networkData* >( authTestUser->getCustomData(bot) ) ;
-	if( NULL == tmpData )
-		{
-		bot->Notice( authTestUser,
-			"Internal error." ) ;
-		elog	<< "LOGINCommand> tmpData is NULL for: "
-			<< *authTestUser
-			<< endl ;
-		return false ;
-		}
-
-	// Remove the pointer from the iClient to the sqlUser.
-	tmpData->currentUser = NULL;
-	}
-
 theUser->setLastSeen(bot->currentTime(), theClient->getNickUserHost());
 theUser->setFlag(sqlUser::F_LOGGEDIN);
-theUser->networkClient = theClient; // Who is authed as this user.
+theUser->addAuthedClient(theClient);
 
 networkData* newData =
 	static_cast< networkData* >( theClient->getCustomData(bot) ) ;
 if( NULL == newData )
 	{
-	bot->Notice( authTestUser,
+	bot->Notice( theClient,
 		"Internal error." ) ;
 	elog	<< "LOGINCommand> newData is NULL for: "
-		<< *authTestUser
+		<< theClient
 		<< endl ;
 	return false ;
 	}
@@ -193,7 +161,7 @@ bot->Notice(theClient,
  * Eg: AXAAA AC APAFD gte
  */
 
-#if 0
+#if 1
 strstream ac;
 ac	<< bot->getCharYY()
 	<< " AC "

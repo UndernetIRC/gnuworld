@@ -10,7 +10,7 @@
 #include	"Network.h"
 #include	"cservice_config.h"
 
-const char STATUSCommand_cc_rcsId[] = "$Id: STATUSCommand.cc,v 1.37 2002/01/05 01:00:49 gte Exp $" ;
+const char STATUSCommand_cc_rcsId[] = "$Id: STATUSCommand.cc,v 1.38 2002/01/08 23:20:43 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -289,30 +289,38 @@ for (int i = 0 ; i < bot->SQLDb->Tuples(); i++)
 
 	if(ptr != bot->sqlUserCache.end())
 		{
-		iClient* tmpClient = ptr->second->isAuthed();
-		if( !tmpClient )
+		sqlUser* currentUser = ptr->second;
+		if( !currentUser->isAuthed() )
 			{
 			continue ;
 			}
 
 		nextPerson += bot->SQLDb->GetValue(i, 0);
+		nextPerson += "/\002";
 
 		/*
 		 * Only show the online nickname if that person is in the target
 		 * channel.
+		 *
+		 * Loop around all people auth'd as this nick and append their nicks
 		 */
-
-		showNick = false;
-		if (tmpChan) showNick = (tmpChan->findUser(tmpClient) || admLevel);
-
-		if (showNick)
+		for( sqlUser::networkClientListType::iterator ptr = currentUser->networkClientList.begin() ;
+			ptr != currentUser->networkClientList.end() ; ++ptr )
 			{
-			nextPerson += "/\002";
-			nextPerson += tmpClient->getNickName();
-			nextPerson += "\002";
+			iClient* tmpClient = (*ptr);
+
+			showNick = false;
+			if (tmpChan) showNick = (tmpChan->findUser(tmpClient) || admLevel);
+
+			if (showNick)
+				{
+				nextPerson += "";
+				nextPerson += tmpClient->getNickName();
+				nextPerson += " ";
+				}
 			}
 
-		nextPerson += " [";
+		nextPerson += "\002[";
 		nextPerson += bot->SQLDb->GetValue(i, 1);
 		nextPerson += "] ";
 

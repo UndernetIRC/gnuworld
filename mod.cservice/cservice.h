@@ -1,5 +1,5 @@
 #ifndef __CSERVICE_H
-#define __CSERVICE_H "$Id: cservice.h,v 1.76 2001/12/27 04:40:57 gte Exp $"
+#define __CSERVICE_H "$Id: cservice.h,v 1.77 2002/01/08 23:20:43 gte Exp $"
 
 #include	<string>
 #include	<vector>
@@ -424,6 +424,8 @@ public:
 
 	void incStat(const string& name);
 	void incStat(const string& name, unsigned int amount);
+
+	void noticeAllAuthedClients(sqlUser* theUser, const char* Message, ... );
 } ;
 
 const string escapeSQLChars(const string& theString);

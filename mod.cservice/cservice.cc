@@ -1081,10 +1081,9 @@ short int cservice::getEffectiveAccessLevel( sqlUser* theUser,
 
 if (theUser->getFlag(sqlUser::F_GLOBAL_SUSPEND))
 	{
-	iClient* theClient = theUser->isAuthed();
-	if (theClient && notify)
+	if (theUser->isAuthed() && notify)
 		{
-		Notice(theClient, "Your account has been suspended.");
+		noticeAllAuthedClients(theUser, "Your account has been suspended.");
 		}
 	return 0;
 	}
@@ -1110,10 +1109,9 @@ if( !theLevel )
 if (theChan->getFlag(sqlChannel::F_SUSPEND))
 	{
 	/* Send them a notice to let them know they've been bad? */
-	iClient* theClient = theUser->isAuthed();
-	if (theClient && notify)
+	if (theUser->isAuthed() && notify)
 		{
-		Notice(theClient, "The channel %s has been suspended by a cservice administrator.",
+		noticeAllAuthedClients(theUser, "The channel %s has been suspended by a cservice administrator.",
 			theChan->getName().c_str());
 		}
 	return 0;
@@ -1127,10 +1125,9 @@ if (theChan->getFlag(sqlChannel::F_SUSPEND))
 if (theLevel->getSuspendExpire() != 0)
 	{
 	// Send them a notice.
-	iClient* theClient = theUser->isAuthed();
-	if (theClient && notify)
+	if (theUser->isAuthed() && notify)
 		{
-		Notice(theClient, "Your access on %s has been suspended.",
+		noticeAllAuthedClients(theUser, "Your access on %s has been suspended.",
 			theChan->getName().c_str());
 		}
 	return 0;
@@ -2490,10 +2487,11 @@ switch( theEvent )
 		sqlUser* tmpSqlUser = isAuthed(tmpUser, false);
 		if (tmpSqlUser)
 			{
-			tmpSqlUser->networkClient = NULL;
+			tmpSqlUser->removeAuthedClient(tmpUser);
 			tmpSqlUser->removeFlag(sqlUser::F_LOGGEDIN);
 			elog	<< "cservice::OnEvent> Deauthenticated "
-				<< "user "
+				<< "client: " << tmpUser << " from "
+				<< "user: "
 				<< tmpSqlUser->getUserName()
 				<< endl;
 			}
@@ -2523,7 +2521,7 @@ switch( theEvent )
 
 		customDataAlloc++;
 
-		// Not authed.
+		// Not authed.. (yet!)
 		newData->currentUser = NULL;
 		tmpUser->setCustomData(this,
 			static_cast< void* >( newData ) );
@@ -2537,7 +2535,11 @@ switch( theEvent )
 			{
 				/* Lookup this user account, if its not there.. trouble */
 				sqlUser* theUser = getUserRecord(tmpUser->getAccount());
-				if (theUser) newData->currentUser = theUser;
+				if (theUser)
+					{
+					newData->currentUser = theUser;
+					theUser->addAuthedClient(tmpUser);
+					}
 			}
 
 		break;
@@ -3786,6 +3788,39 @@ void cservice::incStat(const string& name, unsigned int amount)
 		}
 }
 
+void cservice::noticeAllAuthedClients(sqlUser* theUser, const char* Message, ... )
+{
+/*
+ * Loop over everyone who is authed as this user and give them a message.
+ */
+
+if( Connected && MyUplink && Message && Message[ 0 ] != 0 )
+	{
+	char buffer[ 512 ] = { 0 } ;
+	va_list list;
+
+	va_start(list, Message);
+	vsnprintf(buffer, 512, Message, list);
+	va_end(list);
+
+	/*
+	 * Loop over all people auth'd as this user, and send them a
+	 * message.
+	 */
+
+	for( sqlUser::networkClientListType::iterator ptr = theUser->networkClientList.begin() ;
+		ptr != theUser->networkClientList.end() ; ++ptr )
+		{
+		iClient* Target = (*ptr);
+		setOutputTotal( Target, getOutputTotal(Target) + strlen(buffer) );
+		MyUplink->Write("%s O %s :%s\r\n",
+			getCharYYXXX().c_str(),
+			Target->getCharYYXXX().c_str(),
+			buffer ) ;
+		}
+	}
+
+}
 
 void Command::Usage( iClient* theClient )
 {

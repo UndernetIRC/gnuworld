@@ -1,7 +1,7 @@
 /* sqlUser.h */
 
 #ifndef __SQLUSER_H
-#define __SQLUSER_H "$Id: sqlUser.h,v 1.25 2002/01/07 18:37:22 gte Exp $"
+#define __SQLUSER_H "$Id: sqlUser.h,v 1.26 2002/01/08 23:20:43 gte Exp $"
 
 #include	<string>
 #include	<ctime>
@@ -75,8 +75,27 @@ public:
 	inline const string&		getEmail() const
 		{ return email ; }
 
-	inline iClient* isAuthed()
-		{ return networkClient; }
+	inline bool isAuthed()
+		{ return (networkClientList.size() != 0); }
+
+	inline void addAuthedClient(iClient* theClient)
+		{ networkClientList.push_back(theClient); } ;
+
+	inline void removeAuthedClient(iClient* theClient)
+		{
+		networkClientListType::iterator ptr = networkClientList.begin();
+		while( ptr != networkClientList.end() )
+			{
+				iClient* testClient = *ptr;
+				if (testClient == theClient)
+					{
+					ptr = networkClientList.erase(ptr);
+					} else
+					{
+						++ptr;
+					}
+			}
+		} ;
 
 	/*
 	 *  Methods to set data atrributes.
@@ -116,9 +135,14 @@ public:
 	bool loadData( int );
 	bool loadData( const string& );
 	void setAllMembers( int );
-	iClient*	networkClient;
 	void writeEvent( unsigned short, sqlUser*, const string& );
 	const string getLastEvent( unsigned short, unsigned int&);
+
+	/*
+	 * List of all network users authenticated as this account.
+	 */
+	typedef vector <iClient*>	networkClientListType;
+	networkClientListType networkClientList;
 
 protected:
 

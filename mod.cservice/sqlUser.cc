@@ -4,7 +4,7 @@
  * Storage class for accessing user information either from the backend
  * or internal storage.
  *
- * $Id: sqlUser.cc,v 1.30 2002/01/07 18:37:22 gte Exp $
+ * $Id: sqlUser.cc,v 1.31 2002/01/08 23:20:43 gte Exp $
  */
 
 #include	<strstream.h>
@@ -37,8 +37,7 @@ const unsigned int sqlUser::EV_MISC			= 4;
 const unsigned int sqlUser::EV_COMMENT		= 5;
 
 sqlUser::sqlUser(PgDatabase* _SQLDb)
- : networkClient(0),
-   id( 0 ),
+ : id( 0 ),
    user_name(),
    password(),
    last_seen( 0 ),
