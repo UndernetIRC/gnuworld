@@ -8,12 +8,13 @@
 #include	"Network.h"
 #include	"levels.h"
 
-const char VOICECommand_cc_rcsId[] = "$Id: VOICECommand.cc,v 1.1 2000/12/22 22:22:49 gte Exp $" ;
+const char VOICECommand_cc_rcsId[] = "$Id: VOICECommand.cc,v 1.2 2000/12/23 00:03:58 gte Exp $" ;
 
 namespace gnuworld
 {
 
 using namespace gnuworld;
+using namespace level;
  
 bool VOICECommand::Exec( iClient* theClient, const string& Message )
 { 
@@ -38,7 +39,7 @@ bool VOICECommand::Exec( iClient* theClient, const string& Message )
 		if (theUser->loadData(theClient->getNickName())) { 
 			// Check this user has access.
 			int level = bot->getAccessLevel(theUser, theChan);
-			if (level > 25) {
+			if (level > level::voice) {
 				iClient* target = Network->findNick(st[2]);
 				if( target == NULL )
 				{

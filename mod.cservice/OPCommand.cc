@@ -6,13 +6,15 @@
 #include	"ELog.h" 
 #include	"cservice.h" 
 #include	"Network.h"
+#include	"levels.h"
 
-const char OPCommand_cc_rcsId[] = "$Id: OPCommand.cc,v 1.2 2000/12/22 00:29:32 gte Exp $" ;
+const char OPCommand_cc_rcsId[] = "$Id: OPCommand.cc,v 1.3 2000/12/23 00:03:58 gte Exp $" ;
 
 namespace gnuworld
 {
 
 using namespace gnuworld;
+using namespace level;
  
 bool OPCommand::Exec( iClient* theClient, const string& Message )
 { 
@@ -37,7 +39,7 @@ bool OPCommand::Exec( iClient* theClient, const string& Message )
 		if (theUser->loadData(theClient->getNickName())) { 
 			// Check this user has access.
 			int level = bot->getAccessLevel(theUser, theChan);
-			if (level > 100) {
+			if (level > level::op) {
 				iClient* target = Network->findNick(st[2]);
 				if( target == NULL )
 				{
