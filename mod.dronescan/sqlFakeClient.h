@@ -1,13 +1,17 @@
 #ifndef SQLFAKECLIENT_H
-#define SQLFAKECLIENT_H "$Id: sqlFakeClient.h,v 1.1 2003/10/12 22:21:25 jeekay Exp $"
+#define SQLFAKECLIENT_H "$Id: sqlFakeClient.h,v 1.2 2003/11/26 23:30:22 dan_karrels Exp $"
 
 #include <string>
+
+#include <ctime>
 
 class PgDatabase;
 
 namespace gnuworld {
 
 namespace ds {
+
+using std::string ;
 
 class sqlFakeClient {
 public:
@@ -18,44 +22,44 @@ public:
 	static const flagType F_ACTIVE;
 	
 	/* Accessors */
-	inline unsigned int getId()
+	inline unsigned int getId() const
 		{ return id; }
 	
-	inline string getNickName()
+	inline string getNickName() const
 		{ return nickname; }
 	
-	inline string getUserName()
+	inline string getUserName() const
 		{ return username; }
 	
-	inline string getHostName()
+	inline string getHostName() const
 		{ return hostname; }
 	
-	inline string getRealName()
+	inline string getRealName() const
 		{ return realname; }
 	
-	inline string getCreatedBy()
+	inline string getCreatedBy() const
 		{ return createdBy_s; }
 	
-	inline time_t getCreatedOn()
+	inline time_t getCreatedOn() const
 		{ return createdOn; }
 	
-	inline time_t getLastUpdated()
+	inline time_t getLastUpdated() const
 		{ return lastUpdated; }
 	
-	inline bool getFlag(flagType _flag)
+	inline bool getFlag(flagType _flag) const
 		{ return (flags & _flag); }
 	
 	/* Mutators */
-	inline void setNickName(string _nickname)
+	inline void setNickName(const string& _nickname)
 		{ nickname = _nickname; }
 	
-	inline void setUserName(string _username)
+	inline void setUserName(const string& _username)
 		{ username = _username; }
 	
-	inline void setHostName(string _hostname)
+	inline void setHostName(const string& _hostname)
 		{ hostname = _hostname; }
 	
-	inline void setRealName(string _realname)
+	inline void setRealName(const string& _realname)
 		{ realname = _realname; }
 	
 	inline void setCreatedBy(int _createdby)
@@ -68,9 +72,9 @@ public:
 		{ flags &= !_flag; }
 	
 	/* Convenience functions for flags */
-	string getFlagsString();
+	string getFlagsString() const;
 	
-	inline bool isActive()
+	inline bool isActive() const
 		{ return (flags & F_ACTIVE); }
 	
 	/* Core */
@@ -80,7 +84,7 @@ public:
 	bool remove();
 	
 	/* Misc helper functions */
-	string getNickUserHost();
+	string getNickUserHost() const;
 	
 protected:
 	unsigned int	id;

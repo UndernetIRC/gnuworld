@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: client.h,v 1.47 2003/11/11 19:21:20 dan_karrels Exp $
+ * $Id: client.h,v 1.48 2003/11/26 23:30:21 dan_karrels Exp $
  */
 
 #ifndef __CLIENT_H
-#define __CLIENT_H "$Id: client.h,v 1.47 2003/11/11 19:21:20 dan_karrels Exp $"
+#define __CLIENT_H "$Id: client.h,v 1.48 2003/11/26 23:30:21 dan_karrels Exp $"
 
 #include	<sstream>
 #include	<string>
@@ -81,14 +81,6 @@ public:
 	virtual ~xClient() ;
 
 	/**
-	 * Connect is called by an xServer object when the
-	 * server has connected to the network.  The purpose
-	 * of this method is to burst the client information
-	 * to the network.
-	 */
-	virtual bool Connect( int ForceTime = 0 ) ;
-
-	/**
 	 * This method must call xServer::BurstChannel() with appropriate
 	 * channel modes for any channel it wishes to own.
 	 */
@@ -99,14 +91,6 @@ public:
 	 * all of its glines
 	 */
 	virtual bool BurstGlines() ;
-
-	/**
-	 * Exit is called by xServer::DetachClient().
-	 * Its purpose is to write any finishing data to the
-	 * network and clean up.  Note that the client itself
-	 * can call this method, and then reconnect later.
-	 */
-	virtual bool Exit( const string& Message ) ;
 
 	/**
 	 * Kill will issue a KILL command to the network for
@@ -155,21 +139,30 @@ public:
 	 */
 	virtual bool Mode( const string& Mode ) ;
 
-	// Handler methods
-
 	/**
 	 * OnConnect is called when the server connects to the
 	 * network, during burst time.  The client's NICK
 	 * information has already been sent to the network.
 	 */
-	virtual void OnConnect() ;
+	virtual void	OnConnect() ;
 
 	/**
-	 * OnQuit is called by Exit().
+	 * Invoked when the uplink has been terminated.
+	 */
+	virtual void	OnDisconnect() ;
+
+	/**
+	 * Invoked after the client has been loaded, perform
+	 * initialization stuff here.
+	 */
+	virtual void	OnAttach() ;
+
+	/**
 	 * This method will be invoked when the server is unloading
 	 * the client for whatever reason.
 	 */
-	virtual void OnQuit() ;
+	virtual void	OnDetach( const string& =
+				string( "Server Shutdown") ) ;
 
 	/**
 	 * OnKill() is called when the client has been KILL'd.
@@ -397,7 +390,8 @@ public:
 	virtual void	OnTimer( xServer::timerID, void* ) ;
 
 	/**
-	 * Remove a timer.
+	 * A timer has been destroyed by the server (such as during
+	 * a shutdown).  Perform cleanup for the timer here.
 	 */
 	virtual void	OnTimerDestroy( xServer::timerID, void* ) ;
 
@@ -634,12 +628,6 @@ public:
 	virtual bool WallopsAsServer( const char* Format, ... ) ;
 
 	/**
-	 * Return true if this xClient is attached to a server.
-	 */
-	inline bool isConnected() const
-		{ return Connected ; }
-
-	/**
 	 * Return this xClient's network instance (iClient*).
 	 */
 	inline iClient* getInstance() const
@@ -741,6 +729,16 @@ public:
 	inline const string& getConfigFileName() const
 		{ return configFileName ; }
 
+	/**
+	 * Return true if the server is connected to a network.
+	 */
+	inline bool isConnected() const
+		{ return (MyUplink && MyUplink->isConnected()) ; }
+
+	/**
+	 * Utility method for outputting client information to
+	 * a gnuworld logging stream.
+	 */
 	friend ELog& operator<<( ELog& out,
 		const xClient& theClient )
 		{
@@ -781,15 +779,6 @@ protected:
 	 */
 	inline void resetInstance()
 		{ me = 0 ; }
-
-	/**
-	 * ImplementServer is called by the xServer once
-	 * the client has been attached to the server and
-	 * has been assigned a YY numeric.  This method
-	 * must then acquire the rest of its numeric information
-	 * from the xServer.
-	 */
-	virtual void ImplementServer( xServer* Server ) ;
 
 	/**
 	 * This method is called to add a channel to the bot's

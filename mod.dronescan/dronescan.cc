@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: dronescan.cc,v 1.42 2003/10/19 20:17:11 jeekay Exp $
+ * $Id: dronescan.cc,v 1.43 2003/11/26 23:30:22 dan_karrels Exp $
  */
 
 #include	<string>
@@ -42,7 +42,7 @@
 #include "sqlUser.h"
 #include "Timer.h"
 
-RCSTAG("$Id: dronescan.cc,v 1.42 2003/10/19 20:17:11 jeekay Exp $");
+RCSTAG("$Id: dronescan.cc,v 1.43 2003/11/26 23:30:22 dan_karrels Exp $");
 
 namespace gnuworld {
 
@@ -210,33 +210,32 @@ dronescan::~dronescan()
  * Here we run whatever needs doing as soon as we have attached to
  * the xServer. We are not attached to the network at this point.
  */
-void dronescan::ImplementServer( xServer* theServer )
+void dronescan::OnAttach()
 {
 	/* Register for global network events */
-	theServer->RegisterEvent( EVT_BURST_CMPLT, this );
-	theServer->RegisterEvent( EVT_NETJOIN, this );
-	theServer->RegisterEvent( EVT_NICK, this );
-	theServer->RegisterEvent( EVT_KILL, this );
-	theServer->RegisterEvent( EVT_QUIT, this );
+	MyUplink->RegisterEvent( EVT_BURST_CMPLT, this );
+	MyUplink->RegisterEvent( EVT_NETJOIN, this );
+	MyUplink->RegisterEvent( EVT_NICK, this );
+	MyUplink->RegisterEvent( EVT_KILL, this );
+	MyUplink->RegisterEvent( EVT_QUIT, this );
 	
 	/* Register for all channel events */
-	theServer->RegisterChannelEvent( xServer::CHANNEL_ALL, this );
+	MyUplink->RegisterChannelEvent( xServer::CHANNEL_ALL, this );
 
 	/* Set up clearing active channels */
 	time_t theTime = time(0) + dcInterval;
-	tidClearActiveList = theServer->RegisterTimer(theTime, this, 0);
+	tidClearActiveList = MyUplink->RegisterTimer(theTime, this, 0);
 
 	/* Set up our JC counter */
 	theTime = time(0) + jcInterval;
-	tidClearJoinCounter = theServer->RegisterTimer(theTime, this, 0);
+	tidClearJoinCounter = MyUplink->RegisterTimer(theTime, this, 0);
 	
 	/* Set up cache refresh timer */
 	theTime = time(0) + rcInterval;
-	tidRefreshCaches = theServer->RegisterTimer(theTime, this, 0);
+	tidRefreshCaches = MyUplink->RegisterTimer(theTime, this, 0);
 
-	xClient::ImplementServer( theServer );
-} // dronescan::ImplementServer(xServer*)
-
+	xClient::OnAttach() ;
+} // dronescan::OnAttach()
 
 /**
  * Here we decide what channels our xClient needs to burst in to.
@@ -521,7 +520,7 @@ void dronescan::OnPrivateMessage( iClient* theClient,
 
 
 /** Clean up after ourselves */
-void dronescan::OnQuit()
+void dronescan::OnDetach()
 {
 /* We need to delete() anything we have new()d
  * Currently this is:

@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server.cc,v 1.183 2003/11/11 19:21:37 dan_karrels Exp $
+ * $Id: server.cc,v 1.184 2003/11/26 23:30:23 dan_karrels Exp $
  */
 
 #include	<sys/time.h>
@@ -71,7 +71,7 @@
 #include	"ConnectionHandler.h"
 #include	"Connection.h"
 
-RCSTAG( "$Id: server.cc,v 1.183 2003/11/11 19:21:37 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: server.cc,v 1.184 2003/11/26 23:30:23 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -586,6 +586,11 @@ keepRunning = false ;
 
 // doShutdown() will be called at the bottom of the main for loop,
 // which will perform a proper shutdown.
+for( xNetwork::localClientIterator cItr = Network->localClient_begin() ;
+	cItr != Network->localClient_end() ; ++cItr )
+	{
+	cItr->second->OnDisconnect() ;
+	}
 }
 
 void xServer::OnRead( Connection* theConn, const string& line )
@@ -1293,7 +1298,7 @@ Client->MyUplink = this ;
 
 // Let the client know it has been added to
 // the server and its tables.
-Client->ImplementServer( this ) ;
+Client->OnAttach() ;
 
 // TODO: Remove any existing iClient from the xClient
 
@@ -1488,7 +1493,7 @@ if( NULL == Client )
 	}
 
 // Notify the client that it is being detached.
-Client->Exit( reason ) ;
+Client->OnDetach( reason ) ;
 
 // removeClient() does all of the internal updates
 removeClient( Client ) ;
@@ -2583,7 +2588,7 @@ s	<< theClient->getCharYY() << " N "
 	<< theClient->getDescription() ;
 Write( s ) ;
 
-theClient->Connect( 31337 ) ;
+theClient->OnConnect() ;
 }
 
 void xServer::BurstClients()
@@ -2625,7 +2630,7 @@ xNetwork::localClientIterator ptr = Network->localClient_begin(),
 
 while( ptr != end )
 	{
-	ptr->second->Connect( 0x31337 ) ;
+	ptr->second->OnConnect() ;
 
 	// No need to add to tables, it is
 	// already there

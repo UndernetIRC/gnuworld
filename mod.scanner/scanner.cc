@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: scanner.cc,v 1.6 2003/06/28 16:26:46 dan_karrels Exp $
+ * $Id: scanner.cc,v 1.7 2003/11/26 23:30:22 dan_karrels Exp $
  */
 
 #include	"client.h"
@@ -57,11 +57,11 @@ scanner::~scanner()
 /* No heap space allocated */
 }
 
-void scanner::ImplementServer( xServer* theServer )
+void scanner::OnAttach()
 {
-xClient::ImplementServer( theServer ) ;
+xClient::OnAttach() ;
 
-theServer->RegisterEvent( EVT_NICK, this ) ;
+MyUplink->RegisterEvent( EVT_NICK, this ) ;
 }
 
 void scanner::OnPrivateMessage( iClient* theClient,

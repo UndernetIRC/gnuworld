@@ -16,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: nickserv.h,v 1.13 2003/06/28 16:26:46 dan_karrels Exp $
+ * $Id: nickserv.h,v 1.14 2003/11/26 23:30:22 dan_karrels Exp $
  */
 
 #ifndef _NICKSERV_H
-#define _NICKSERV_H "$Id: nickserv.h,v 1.13 2003/06/28 16:26:46 dan_karrels Exp $"
+#define _NICKSERV_H "$Id: nickserv.h,v 1.14 2003/11/26 23:30:22 dan_karrels Exp $"
 
 #include "client.h"
 #include "EConfig.h"
@@ -61,7 +61,7 @@ class nickserv : public xClient, public logging::logTarget {
     virtual bool BurstChannels() ;
     
     /** This is called when we have attached to the xServer */
-    virtual void ImplementServer( xServer* ) ;
+    virtual void OnAttach() ;
 
     /** This is called when a channel event we are listening for happens */
     virtual void OnChannelEvent( const channelEventType&, Channel*, void*,

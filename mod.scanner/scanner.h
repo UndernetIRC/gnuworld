@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: scanner.h,v 1.4 2003/06/28 16:26:46 dan_karrels Exp $
+ * $Id: scanner.h,v 1.5 2003/11/26 23:30:22 dan_karrels Exp $
  */
 
 #ifndef __SCANNER_H
@@ -69,10 +69,10 @@ public:
 		bool secure = false ) ;
 
 	/**
-	 * Calls the base class ImplementServer() and registers for
-	 * events.
+	 * This method is invoked when the module is fully loaded
+	 * and it is safe to interact with the xServer.
 	 */
-	virtual void	ImplementServer( xServer* theServer ) ;
+	virtual void	OnAttach() ;
 
 	/**
 	 * This method is called by the server when a server connection

@@ -17,11 +17,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: stats.h,v 1.15 2003/08/20 00:22:28 dan_karrels Exp $
+ * $Id: stats.h,v 1.16 2003/11/26 23:30:22 dan_karrels Exp $
  */
 
 #ifndef __STATS_H
-#define __STATS_H "$Id: stats.h,v 1.15 2003/08/20 00:22:28 dan_karrels Exp $"
+#define __STATS_H "$Id: stats.h,v 1.16 2003/11/26 23:30:22 dan_karrels Exp $"
 
 #include	<fstream>
 #include	<string>
@@ -55,10 +55,10 @@ public:
 
 	/**
 	 * This method required to load into the gnuworld core.
-	 * It basically just calls the base class ImplementServer(),
+	 * It basically just calls the base class OnAttach(),
 	 * and registers for events.
 	 */
-	virtual void ImplementServer( xServer* ) ;
+	virtual void OnAttach() ;
 
 	/**
 	 * This method is invoked when someone sends a private

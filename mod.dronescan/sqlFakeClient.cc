@@ -1,4 +1,6 @@
+#include <string>
 #include <sstream>
+#include <iostream>
 
 #include "libpq++.h"
 
@@ -11,6 +13,7 @@ namespace gnuworld {
 
 namespace ds {
 
+using std::string ;
 using std::endl;
 using std::stringstream;
 
@@ -35,7 +38,7 @@ sqlFakeClient::~sqlFakeClient()
 {
 }
 
-string sqlFakeClient::getFlagsString()
+string sqlFakeClient::getFlagsString() const
 {
 /* If this grows, alter the field size in LISTCommand.cc */
 
@@ -95,7 +98,7 @@ return true;
 
 }
 
-string sqlFakeClient::getNickUserHost()
+string sqlFakeClient::getNickUserHost() const
 {
 stringstream theNickUserHost;
 theNickUserHost	<< "("

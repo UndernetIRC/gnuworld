@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: cservice.cc,v 1.237 2003/07/03 17:36:57 dan_karrels Exp $
+ * $Id: cservice.cc,v 1.238 2003/11/26 23:30:22 dan_karrels Exp $
  */
 
 #include	<new>
@@ -94,37 +94,37 @@ commandMap.erase( ptr ) ;
 return true ;
 }
 
-void cservice::ImplementServer( xServer* theServer )
+void cservice::OnAttach()
 {
 for( commandMapType::iterator ptr = commandMap.begin() ;
 	ptr != commandMap.end() ; ++ptr )
 	{
-	ptr->second->setServer( theServer ) ;
+	ptr->second->setServer( MyUplink ) ;
 	}
 
 // Start the Db checker timer rolling.
 time_t theTime = time(NULL) + connectCheckFreq;
-dBconnection_timerID = theServer->RegisterTimer(theTime, this, NULL);
+dBconnection_timerID = MyUplink->RegisterTimer(theTime, this, NULL);
 
 // Start the Db update/Reop timer rolling.
 theTime = time(NULL) + updateInterval;
-update_timerID = theServer->RegisterTimer(theTime, this, NULL);
+update_timerID = MyUplink->RegisterTimer(theTime, this, NULL);
 
 // Start the ban suspend/expire timer rolling.
 theTime = time(NULL) + expireInterval;
-expire_timerID = theServer->RegisterTimer(theTime, this, NULL);
+expire_timerID = MyUplink->RegisterTimer(theTime, this, NULL);
 
 // Start the cache expire timer rolling.
 theTime = time(NULL) + cacheInterval;
-cache_timerID = theServer->RegisterTimer(theTime, this, NULL);
+cache_timerID = MyUplink->RegisterTimer(theTime, this, NULL);
 
 // Start the pending chan timer rolling.
 theTime = time(NULL) + pendingChanPeriod;
-pending_timerID = theServer->RegisterTimer(theTime, this, NULL);
+pending_timerID = MyUplink->RegisterTimer(theTime, this, NULL);
 
 // Start the floating Limit timer rolling.
 theTime = time(NULL) + limitCheckPeriod;
-limit_timerID = theServer->RegisterTimer(theTime, this, NULL);
+limit_timerID = MyUplink->RegisterTimer(theTime, this, NULL);
 
 if (SQLDb->Exec("SELECT now()::abstime::int4;") == PGRES_TUPLES_OK)
 	{
@@ -154,13 +154,13 @@ else
 
 /* Register our interest in recieving some Network events from gnuworld. */
 
-theServer->RegisterEvent( EVT_KILL, this );
-theServer->RegisterEvent( EVT_QUIT, this );
-theServer->RegisterEvent( EVT_NICK, this );
-theServer->RegisterEvent( EVT_ACCOUNT, this );
-theServer->RegisterEvent( EVT_BURST_ACK, this );
+MyUplink->RegisterEvent( EVT_KILL, this );
+MyUplink->RegisterEvent( EVT_QUIT, this );
+MyUplink->RegisterEvent( EVT_NICK, this );
+MyUplink->RegisterEvent( EVT_ACCOUNT, this );
+MyUplink->RegisterEvent( EVT_BURST_ACK, this );
 
-xClient::ImplementServer( theServer ) ;
+xClient::OnAttach() ;
 }
 
 cservice::cservice(const string& args)

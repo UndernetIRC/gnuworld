@@ -16,14 +16,14 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: activeChannel.h,v 1.2 2003/09/12 15:30:41 dan_karrels Exp $
+ * $Id: activeChannel.h,v 1.3 2003/11/26 23:30:22 dan_karrels Exp $
  */
 
 #ifndef ACTIVECHANNEL_H
-#define ACTIVECHANNEL_H "$Id: activeChannel.h,v 1.2 2003/09/12 15:30:41 dan_karrels Exp $"
+#define ACTIVECHANNEL_H "$Id: activeChannel.h,v 1.3 2003/11/26 23:30:22 dan_karrels Exp $"
 
 #include <string>
-#include <time.h>
+#include <ctime>
 
 namespace gnuworld {
 

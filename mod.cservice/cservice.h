@@ -17,11 +17,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: cservice.h,v 1.98 2003/07/03 17:36:57 dan_karrels Exp $
+ * $Id: cservice.h,v 1.99 2003/11/26 23:30:22 dan_karrels Exp $
  */
 
 #ifndef __CSERVICE_H
-#define __CSERVICE_H "$Id: cservice.h,v 1.98 2003/07/03 17:36:57 dan_karrels Exp $"
+#define __CSERVICE_H "$Id: cservice.h,v 1.99 2003/11/26 23:30:22 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
@@ -118,7 +118,7 @@ public:
 	virtual bool BurstChannels();
 	virtual void OnPrivateMessage( iClient*, const string&,
 		bool = false  );
-	virtual void ImplementServer( xServer* ) ;
+	virtual void OnAttach() ;
 	virtual bool isOnChannel( const string& ) const;
 	virtual bool RegisterCommand( Command* ) ;
 	virtual bool UnRegisterCommand( const string& ) ;

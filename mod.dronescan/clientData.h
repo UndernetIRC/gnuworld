@@ -16,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: clientData.h,v 1.3 2003/06/19 22:58:30 dan_karrels Exp $
+ * $Id: clientData.h,v 1.4 2003/11/26 23:30:22 dan_karrels Exp $
  */
 
 #ifndef CLIENTDATA_H
-#define CLIENTDATA_H "$Id: clientData.h,v 1.3 2003/06/19 22:58:30 dan_karrels Exp $"
+#define CLIENTDATA_H "$Id: clientData.h,v 1.4 2003/11/26 23:30:22 dan_karrels Exp $"
 
 namespace gnuworld {
 
@@ -47,7 +47,7 @@ public:
 	 * Accessor for currentState.
 	 * @return	the current state of this client.
 	 */
-	inline CLIENT_STATE getState()
+	inline CLIENT_STATE getState() const
 		{ return currentState; }
 		
 	/**
@@ -58,13 +58,11 @@ public:
 	inline CLIENT_STATE setState(CLIENT_STATE _currentState)
 		{ return currentState = _currentState; }
 	
-	
-	
 	/**
 	 * Accessor for the entropy value.
 	 * @return	the current entropy value
 	 */
-	inline double getEntropy()
+	inline double getEntropy() const
 		{ return entropy; }
 	
 	/**
@@ -80,21 +78,21 @@ public:
 	 * Convenience function to test for state UNKNOWN.
 	 * @return	true if currentState == UNKNOWN else false.
 	 */
-	inline bool isUnknown()
+	inline bool isUnknown() const
 		{ return (currentState == UNKNOWN); }
 
 	/**
 	 * Convenience function to test for state NORMAL.
 	 * @return	true if currentState == NORMAL else false.
 	 */
-	inline bool isNormal()
+	inline bool isNormal() const
 		{ return (currentState == NORMAL); }
 
 	/**
 	 * Convenience function to test for state ABNORMAL.
 	 * @return	true if currentState == ABNORMAL else false.
 	 */
-	inline bool isAbnormal()
+	inline bool isAbnormal() const
 		{ return (currentState == ABNORMAL); }
 
 protected:

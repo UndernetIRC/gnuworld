@@ -20,7 +20,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccontrol.cc,v 1.175 2003/08/09 23:15:34 dan_karrels Exp $
+ * $Id: ccontrol.cc,v 1.176 2003/11/26 23:30:21 dan_karrels Exp $
 */
 
 #define MAJORVER "1"
@@ -65,7 +65,7 @@
 #include	"ip.h"
 #include	"config.h"
 
-RCSTAG( "$Id: ccontrol.cc,v 1.175 2003/08/09 23:15:34 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: ccontrol.cc,v 1.176 2003/11/26 23:30:21 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -866,37 +866,37 @@ return xClient::BurstGlines();
 // In order for each of this bot's Command's to have a valid server
 // pointer, this method must be overloaded and server must be
 // explicitly set for each Command.
-void ccontrol::ImplementServer( xServer* theServer )
+void ccontrol::OnAttach()
 {
 for( commandMapType::iterator ptr = commandMap.begin() ;
 	ptr != commandMap.end() ; ++ptr )
 	{
-	ptr->second->setServer( theServer ) ;
+	ptr->second->setServer( MyUplink ) ;
 	}
 
-expiredTimer = theServer->RegisterTimer(::time(0) + ExpiredInterval,this,NULL);
-dbConnectionCheck = theServer->RegisterTimer(::time(0) + dbConnectionTimer,this,NULL);
-glineQueueCheck = theServer->RegisterTimer(::time(0) + glineBurstInterval, this,NULL);
+expiredTimer = MyUplink->RegisterTimer(::time(0) + ExpiredInterval,this,NULL);
+dbConnectionCheck = MyUplink->RegisterTimer(::time(0) + dbConnectionTimer,this,NULL);
+glineQueueCheck = MyUplink->RegisterTimer(::time(0) + glineBurstInterval, this,NULL);
 
 #ifndef LOGTOHD
 if(SendReport)
 	{
 	struct tm Now = convertToTmTime(::time(0));
 	time_t theTime = ::time(0) + ((24 - Now.tm_hour)*3600 - (Now.tm_min)*60) ; //Set the daily timer to 24:00
-	postDailyLog = theServer->RegisterTimer(theTime, this, NULL); 
+	postDailyLog = MyUplink->RegisterTimer(theTime, this, NULL); 
 	}
 #endif
-theServer->RegisterEvent( EVT_KILL, this );
-theServer->RegisterEvent( EVT_QUIT, this );
-theServer->RegisterEvent( EVT_NETJOIN, this );
-theServer->RegisterEvent( EVT_BURST_CMPLT, this );
-theServer->RegisterEvent( EVT_GLINE , this );
-theServer->RegisterEvent( EVT_REMGLINE , this );
-theServer->RegisterEvent( EVT_NICK , this );
+MyUplink->RegisterEvent( EVT_KILL, this );
+MyUplink->RegisterEvent( EVT_QUIT, this );
+MyUplink->RegisterEvent( EVT_NETJOIN, this );
+MyUplink->RegisterEvent( EVT_BURST_CMPLT, this );
+MyUplink->RegisterEvent( EVT_GLINE , this );
+MyUplink->RegisterEvent( EVT_REMGLINE , this );
+MyUplink->RegisterEvent( EVT_NICK , this );
 
-theServer->RegisterEvent( EVT_NETBREAK, this );
+MyUplink->RegisterEvent( EVT_NETBREAK, this );
 
-xClient::ImplementServer( theServer ) ;
+xClient::OnAttach() ;
 }
 
 void ccontrol::OnPrivateMessage( iClient* theClient,

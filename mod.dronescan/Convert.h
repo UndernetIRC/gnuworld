@@ -1,10 +1,10 @@
 #ifndef CONVERT_H
-#define CONVERT_H "$Id: Convert.h,v 1.4 2003/10/12 16:22:53 jeekay Exp $"
+#define CONVERT_H "$Id: Convert.h,v 1.5 2003/11/26 23:30:22 dan_karrels Exp $"
 
 #include <deque>
 #include <string>
 
-#include <time.h>
+#include <ctime>
 
 namespace gnuworld {
 

@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: nickserv.cc,v 1.21 2003/06/28 16:26:46 dan_karrels Exp $
+ * $Id: nickserv.cc,v 1.22 2003/11/26 23:30:22 dan_karrels Exp $
  */
  
 #include <cstdarg>
@@ -28,7 +28,7 @@
 #include "netData.h"
 #include "nickserv.h"
 
-RCSTAG("$Id: nickserv.cc,v 1.21 2003/06/28 16:26:46 dan_karrels Exp $");
+RCSTAG("$Id: nickserv.cc,v 1.22 2003/11/26 23:30:22 dan_karrels Exp $");
 
 namespace gnuworld
 {
@@ -180,18 +180,18 @@ return xClient::BurstChannels() ;
  * Here we set up the various bits and pieces that we need an xServer
  * reference to be able to do.
  */
-void nickserv::ImplementServer( xServer* theServer )
+void nickserv::OnAttach()
 {
 for(commandMapType::iterator ptr = commandMap.begin(); ptr != commandMap.end(); ++ptr) {
-  ptr->second->setServer(theServer);
+  ptr->second->setServer(MyUplink);
 }
 
 /* Register for all the events we want to see */
-theServer->RegisterEvent(EVT_ACCOUNT, this);
-theServer->RegisterEvent(EVT_CHNICK, this);
-theServer->RegisterEvent(EVT_KILL, this);
-theServer->RegisterEvent(EVT_NICK, this);
-theServer->RegisterEvent(EVT_QUIT, this);
+MyUplink->RegisterEvent(EVT_ACCOUNT, this);
+MyUplink->RegisterEvent(EVT_CHNICK, this);
+MyUplink->RegisterEvent(EVT_KILL, this);
+MyUplink->RegisterEvent(EVT_NICK, this);
+MyUplink->RegisterEvent(EVT_QUIT, this);
 
 /* Register timerID's to process queues */
 
@@ -200,9 +200,9 @@ theServer->RegisterEvent(EVT_QUIT, this);
  * when we first link to the net
  */
 time_t theTime = time(NULL) + startDelay;
-processQueue_timerID = theServer->RegisterTimer(theTime, this, NULL);
+processQueue_timerID = MyUplink->RegisterTimer(theTime, this, NULL);
 
-xClient::ImplementServer( theServer );
+xClient::OnAttach() ;
 }
 
 

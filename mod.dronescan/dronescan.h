@@ -16,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: dronescan.h,v 1.20 2003/10/12 22:21:24 jeekay Exp $
+ * $Id: dronescan.h,v 1.21 2003/11/26 23:30:22 dan_karrels Exp $
  */
 
 #ifndef DRONESCAN_H
-#define DRONESCAN_H "$Id: dronescan.h,v 1.20 2003/10/12 22:21:24 jeekay Exp $"
+#define DRONESCAN_H "$Id: dronescan.h,v 1.21 2003/11/26 23:30:22 dan_karrels Exp $"
 
 #include <map>
 
@@ -68,7 +68,7 @@ public:
 	 ***********************************************************/
 	 
 	/** This method is called when we have attached to the xServer. */
-	virtual void ImplementServer( xServer* ) ;
+	virtual void OnAttach() ;
 	
 	/** This method is called after server connection. */
 	virtual bool BurstChannels() ;
@@ -86,8 +86,8 @@ public:
 	/** Receive private messages. */
 	virtual void OnPrivateMessage( iClient*, const string&, bool ) ;
 	
-	/** When we are quit by the xServer */
-	virtual void OnQuit() ;
+	/** When we are being detached by the xServer */
+	virtual void OnDetach() ;
 	
 	/** Receive our own timed events. */
 	virtual void OnTimer( xServer::timerID , void* ) ;

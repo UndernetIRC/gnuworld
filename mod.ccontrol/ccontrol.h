@@ -16,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccontrol.h,v 1.90 2003/06/28 16:26:45 dan_karrels Exp $
+ * $Id: ccontrol.h,v 1.91 2003/11/26 23:30:21 dan_karrels Exp $
  */
 
 #ifndef __CCONTROL_H
-#define __CCONTROL_H "$Id: ccontrol.h,v 1.90 2003/06/28 16:26:45 dan_karrels Exp $"
+#define __CCONTROL_H "$Id: ccontrol.h,v 1.91 2003/11/26 23:30:21 dan_karrels Exp $"
 
 //Undef this if you want to log to the database
 #define LOGTOHD 
@@ -252,7 +252,7 @@ public:
 	 * command handlers each require a reference to the xServer
 	 * for efficiency.
 	 */
-	virtual void ImplementServer( xServer* ) ;
+	virtual void OnAttach() ;
 
 	/**
 	 * Return true if the given channel name corresponds to a
