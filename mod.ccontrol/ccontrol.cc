@@ -11,7 +11,7 @@
 /* ccontrol.cc
  * Authors: Daniel Karrels dan@karrels.com
  *	    Tomer Cohen    MrBean@toughguy.net
- * $Id: ccontrol.cc,v 1.159 2003/02/16 15:52:20 mrbean_ Exp $
+ * $Id: ccontrol.cc,v 1.160 2003/02/19 15:19:29 mrbean_ Exp $
  */
 
 #define MAJORVER "1"
@@ -56,7 +56,7 @@
 #include	"ip.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.159 2003/02/16 15:52:20 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.160 2003/02/19 15:19:29 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -176,8 +176,6 @@ Sendmail_Path = conf.Require("SendMail")->second;
 
 //SendReport flag that tells ccontrol if the user want the report to be mailed
 SendReport = atoi(conf.Require("mail_report")->second.c_str());
-
-maxGlineLen = atoi(conf.Require("max_GLen")->second.c_str());
 
 maxThreads = atoi(conf.Require("max_threads")->second.c_str());
 
@@ -646,7 +644,9 @@ RegisterCommand( new MAXUSERSCommand( this, "MAXUSERS",
 	true ) ) ;
 
 RegisterCommand( new CONFIGCommand( this, "CONFIG",
-	" Manages all kinds of configuration related values ",
+	" -GTime <duration in secs> / -VClones <amount> -Clones <amount> "
+	" -GBCount <count> / -GBInterval <interval in secs> "
+	"Manages all kinds of configuration related values ",
 	commandLevel::flg_CONFIG,
 	false,
 	false,
@@ -1582,11 +1582,6 @@ if(dbConnected)
 				MsgChanLog("Excessive connections (%d) from host *@%s\n"
 					    ,CurConnections,NewUser->getRealInsecureHost().c_str());
 				
-				/*				
-				MsgChanLog("Glining %s , total  connections : %d\n"
-				,tIP.c_str(),CurConnections);
-				MsgChanLog(" IP Exception : %d , HOST Exception %d\n"						
-				,getExceptions("*@" + tIP),getExceptions("*@" + NewUser->getRealInsecureHost()));
 				glSet = true;
 				ccGline *tmpGline;
 				tmpGline = findGline("*@" + tIP); 
@@ -1597,10 +1592,10 @@ if(dbConnected)
 					tmpGline = new ccGline(SQLDb);
 					tmpGline->setHost("*@" + tIP);
 					tmpGline->setExpires(::time(0) + maxGlineLen);
-					string Reason = "Automatically banned for excessive connections [- ";
-					Reason += CurConnections;
-					Reason += " -]";
-					tmpGline->setReason("Automatically banned for excessive connections ");
+					string Reason = string("[- ");
+					Reason =+ CurConnections;
+					Reason += " -] Automatically banned for excessive connections";
+					tmpGline->setReason(Reason);
 					tmpGline->setAddedOn(::time(0));
 					tmpGline->setAddedBy(nickName);
 					tmpGline->setLastUpdated(::time(0));
@@ -1608,7 +1603,7 @@ if(dbConnected)
 					tmpGline->loadData(tmpGline->getHost());
 					addGline(tmpGline);
 					}
-				addGlineToUplink(tmpGline);*/
+				addGlineToUplink(tmpGline);
 				}	
 			else
 				{
@@ -3545,6 +3540,7 @@ bool gotInterval= false;
 bool gotCount = false;
 bool gotVClones = false;
 bool gotClones = false;
+bool gotGLen = false;
  
 if(!dbConnected)
         {   
@@ -3592,6 +3588,12 @@ for(int i=0; i< SQLDb->Tuples();++i)
 		maxClones = atoi(SQLDb->GetValue(i,1));
 		}
 
+	else if(!strcasecmp(SQLDb->GetValue(i,0),"GTime"))
+		{
+		gotGLen = true;
+		maxGlineLen = atoi(SQLDb->GetValue(i,1));
+		}
+
 	}
 if(!gotCount)
 	{
@@ -3612,6 +3614,11 @@ if(!gotVClones)
 	{
 	maxVClones = 32;
 	updateMisc("VClones",maxVClones);
+	}
+if(!gotGLen)
+	{
+	maxGlineLen = 3600;
+	updateMisc("GTime",maxGlineLen);
 	}
 
 return true;
@@ -4377,6 +4384,10 @@ else if(!strcasecmp(varName,"Clones"))
 else if(!strcasecmp(varName,"VClones"))
 	{
 	maxVClones = Value;
+	}
+else if(!strcasecmp(varName,"GTime"))
+	{
+	maxGlineLen = Value;
 	}
 
 if(!dbConnected)
