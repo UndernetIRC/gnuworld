@@ -1,4 +1,4 @@
-# Makefile.in generated automatically by automake 1.4a from Makefile.am
+# Makefile.in generated automatically by automake 1.4 from Makefile.am
 
 # Copyright (C) 1994, 1995-8, 1999 Free Software Foundation, Inc.
 # This Makefile.in is free software; the Free Software Foundation
@@ -10,7 +10,7 @@
 # even the implied warranty of MERCHANTABILITY or FITNESS FOR A
 # PARTICULAR PURPOSE.
 
-# "$Id: Makefile.in,v 1.57 2001/02/10 02:47:44 isomer Exp $"
+# "$Id: Makefile.in,v 1.58 2001/02/10 17:29:40 gte Exp $"
 
 
 SHELL = @SHELL@
@@ -48,10 +48,9 @@ AUTOMAKE = @AUTOMAKE@
 AUTOHEADER = @AUTOHEADER@
 
 INSTALL = @INSTALL@
-INSTALL_PROGRAM = @INSTALL_PROGRAM@
+INSTALL_PROGRAM = @INSTALL_PROGRAM@ $(AM_INSTALL_PROGRAM_FLAGS)
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
-INSTALL_STRIP_FLAG =
 transform = @program_transform_name@
 
 NORMAL_INSTALL = :
@@ -99,7 +98,7 @@ libcservice_la_LDFLAGS = -module -export-dynamic -L/usr/local/pgsql/lib 	-lpq++
 libcservice_la_SOURCES = cservice.cc 	networkData.cc 	sqlChannel.cc 	sqlUser.cc 	sqlLevel.cc 	sqlBan.cc 	ACCESSCommand.cc 	ADDUSERCommand.cc 	BANCommand.cc 	BANLISTCommand.cc 	CHANINFOCommand.cc 	DEOPCommand.cc 	DEVOICECommand.cc 	FORCECommand.cc 	INVITECommand.cc 	ISREGCommand.cc 	JOINCommand.cc 	KICKCommand.cc 	LBANLISTCommand.cc 	LOGINCommand.cc 	MODINFOCommand.cc 	MOTDCommand.cc 	NEWPASSCommand.cc 	OPCommand.cc 	RANDOMCommand.cc 	REGISTERCommand.cc 	PARTCommand.cc 	PURGECommand.cc 	QUOTECommand.cc 	REMIGNORECommand.cc 	REMUSERCommand.cc 	SAYCommand.cc 	SEARCHCommand.cc 	SERVNOTICECommand.cc 	SETCommand.cc 	SHOWCOMMANDSCommand.cc 	SHOWIGNORECommand.cc 	STATUSCommand.cc 	SUSPENDCommand.cc 	TOPICCommand.cc 	UNBANCommand.cc 	UNFORCECommand.cc 	UNSUSPENDCommand.cc 	VERIFYCommand.cc 	VOICECommand.cc
 
 
-INCLUDES = -I/usr/include/pgsql/
+INCLUDES = -I/usr/local/pgsql/include
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = ../include/defs.h
 CONFIG_CLEAN_FILES = 
@@ -269,7 +268,7 @@ distdir: $(DISTFILES)
 	@for file in $(DISTFILES); do \
 	  d=$(srcdir); \
 	  if test -d $$d/$$file; then \
-	    cp -pr $$d/$$file $(distdir)/$$file; \
+	    cp -pr $$/$$file $(distdir)/$$file; \
 	  else \
 	    test -f $(distdir)/$$file \
 	    || ln $$d/$$file $(distdir)/$$file 2> /dev/null \
@@ -349,7 +348,7 @@ uninstall: uninstall-am
 all-am: Makefile $(LTLIBRARIES)
 all-redirect: all-am
 install-strip:
-	$(MAKE) $(AM_MAKEFLAGS) INSTALL_STRIP_FLAG=-s install
+	$(MAKE) $(AM_MAKEFLAGS) AM_INSTALL_PROGRAM_FLAGS=-s install
 installdirs:
 	$(mkinstalldirs)  $(DESTDIR)$(libdir)
 

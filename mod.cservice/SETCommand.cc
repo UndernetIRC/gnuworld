@@ -5,12 +5,14 @@
  * Initial Version.
  * 01/01/2001 - Greg Sikorski <gte@atomicrevs.demon.co.uk>
  * Modifications.
+ * 10/02/2001 - David Henriksen <david@itwebnet.dk>
+ * Minor bug fixes.
  *
  * Sets channel options on the specified channel.
  *
  * Caveats: SET LANG is still under consideration.
  *
- * $Id: SETCommand.cc,v 1.17 2001/02/05 00:55:17 gte Exp $
+ * $Id: SETCommand.cc,v 1.18 2001/02/10 17:29:40 gte Exp $
  */
 
 #include	<string>
@@ -22,7 +24,7 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char SETCommand_cc_rcsId[] = "$Id: SETCommand.cc,v 1.17 2001/02/05 00:55:17 gte Exp $" ;
+const char SETCommand_cc_rcsId[] = "$Id: SETCommand.cc,v 1.18 2001/02/10 17:29:40 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -71,9 +73,11 @@ bool SETCommand::Exec( iClient* theClient, const string& Message )
 				bot->Notice(theClient, "Your INVISIBLE setting is now OFF.");
 				return true;
 			}
-
+            		bot->Notice(theClient, "value of INVISIBLE must be ON or OFF");
+		        return true;
 		}
-
+		bot->Notice(theClient, "Invalid option.");
+		return true;
 	}
 
     Channel* tmpChan = Network->findChannel(st[1]); 

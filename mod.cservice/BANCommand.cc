@@ -5,14 +5,16 @@
  * Initial Version.
  * 20/01/2001 - David Henriksen <david@itwebnet.dk>
  * BAN Command started.
- * 23/01/2000 - Greg Sikorski <gte@atomicrevs.demon.co.uk>
+ * 23/01/2001 - Greg Sikorski <gte@atomicrevs.demon.co.uk>
  * Cleanups/rewrites - don't allow adding of less specific bans.
+ * 10/02/2001 - David Henriksen <david@itwebnet.dk>
+ * Minor bug fixes.
  *
  * Bans a user on a channel, adds this ban to the internal banlist.
  *
  * Caveats: None.
  *
- * $Id: BANCommand.cc,v 1.13 2001/02/10 03:49:10 isomer Exp $
+ * $Id: BANCommand.cc,v 1.14 2001/02/10 17:29:40 gte Exp $
  */
 
 #include	<string>
@@ -27,7 +29,7 @@
 #include	"responses.h"
 #include	"match.h"
 
-const char BANCommand_cc_rcsId[] = "$Id: BANCommand.cc,v 1.13 2001/02/10 03:49:10 isomer Exp $" ;
+const char BANCommand_cc_rcsId[] = "$Id: BANCommand.cc,v 1.14 2001/02/10 17:29:40 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -62,6 +64,14 @@ if(!theChan)
 	return false;
 	} 
 
+/* Do not allow bans on * channel */
+
+if(st[1][0] != '#')
+	{
+	bot->Notice(theClient, "Invalid channel name.");
+	return false;
+	}
+	
 /* Check the bot is in the channel. */
 	
 if (!theChan->getInChan()) 
@@ -143,12 +153,12 @@ if(level < level::ban)
 	return false;
 	}
 
-if(banLevel < 1 || banLevel > level)
+if(banLevel < 1 || banLevel > level || 500 < level)
 	{
 	bot->Notice(theClient, 
 		bot->getResponse(theUser,language::ban_level_range,
 		string("Invalid banlevel range. Valid range is 1-%i.")).c_str()
-		, level);
+		, (500 < level) ? 500 : level);
 	return true;
 	}
 

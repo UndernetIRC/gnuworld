@@ -3,11 +3,13 @@
  *
  * 24/12/2000 - Greg Sikorski <gte@atomicrevs.demon.co.uk>
  * Initial Version.
+ * 10/02/2001 - David Henriksen <david@itwebnet.dk>
+ * Minor fix, do not show LAST SEEN unless, the last seen is > 1 day.
  *
  * Displays all "Level" records for a specified channel.
  * Can optionally narrow down selection using a number of switches. 
  *
- * $Id: ACCESSCommand.cc,v 1.24 2001/02/05 18:57:36 gte Exp $
+ * $Id: ACCESSCommand.cc,v 1.25 2001/02/10 17:29:40 gte Exp $
  */
 
 #include	<string>
@@ -19,7 +21,7 @@
 #include	"match.h"
 #define MAX_RESULTS 15
  
-const char ACCESSCommand_cc_rcsId[] = "$Id: ACCESSCommand.cc,v 1.24 2001/02/05 18:57:36 gte Exp $" ;
+const char ACCESSCommand_cc_rcsId[] = "$Id: ACCESSCommand.cc,v 1.25 2001/02/10 17:29:40 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -208,8 +210,11 @@ if( PGRES_TUPLES_OK == status )
 				bot->Notice(theClient, "** SUSPENDED ** - Expires in %s",
 					bot->prettyDuration(suspend_expires_f).c_str());
 				}
+			if(duration > (bot->currentTime() + 86400))
+				{
 			bot->Notice(theClient, "LAST SEEN: %s ago.", 
 				bot->prettyDuration(duration).c_str()); 
+				}	 
 		}
 		if ((results >= MAX_RESULTS) && !showAll) break;
 
