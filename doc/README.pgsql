@@ -1,4 +1,4 @@
--- "$Id: README.pgsql,v 1.5 2001/10/14 07:07:06 nighty Exp $"
+-- "$Id: README.pgsql,v 1.6 2001/10/15 21:10:51 nighty Exp $"
 --
 -- Building PostgreSQL for GNUworld
 --
@@ -26,7 +26,6 @@ in order to build postgres you need :
 
 
 		--with-CXX		: needed for several things like GNUworld or PHP to have pgsql support.
-		--with-perl		: needed for plpsql language.
 		--with-tcl --without-tk	: needed to compile pgtclsh (TCL interpreter)
 					  which is needed for the script gnuworld/doc/cmaster/regproc/appjudge
 					  and this script is the one making the applications advance in registration process.
@@ -44,7 +43,7 @@ in order to build postgres you need :
 						- you're done!
 
 	- build pgsql
-		root:# ./configure --with-CXX --with-tcl --without-tk --with-perl
+		root:# ./configure --with-CXX --with-tcl --without-tk
 		root:# gmake
 		root:# gmake install
 

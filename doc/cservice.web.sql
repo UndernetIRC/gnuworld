@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------------
--- "$Id: cservice.web.sql,v 1.14 2001/10/15 13:18:05 nighty Exp $"
+-- "$Id: cservice.web.sql,v 1.15 2001/10/15 21:13:14 nighty Exp $"
 -- Channel service DB SQL file for PostgreSQL.
 --
 -- Tables specific to webbased registration process.
@@ -67,7 +67,7 @@ CREATE TABLE variables (
 	var_name VARCHAR(30),
 	contents text,
 	PRIMARY KEY(var_name)
-)
+);
 
 CREATE TABLE timezones (
 	tz_index SERIAL,
