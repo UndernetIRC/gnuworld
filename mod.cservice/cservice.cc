@@ -212,7 +212,7 @@ int cservice::BurstChannels()
 	 *   is on, gaining ops if AlwaysOp is on, and so forth.
 	 */ 
 	strstream theQuery;
-	theQuery << "SELECT " << sql::channel_fields << " FROM channels WHERE lower(name) <> '*' AND registered_ts <> ''" << ends;
+	theQuery << "SELECT " << sql::channel_fields << " FROM channels WHERE lower(name) <> '*' AND registered_ts <> 0" << ends;
 	elog << "cmaster::BurstChannels> " << theQuery.str() << endl;
 	string id;
 	time_t chanTime;
@@ -444,7 +444,7 @@ int cservice::OnCTCP( iClient* theClient, const string& CTCP,
 
 	if(Command == "VERSION")
 	{
-		xClient::DoCTCP(theClient, CTCP.c_str(), "Undernet P10 Channel Services Version 2 [" __DATE__ " " __TIME__ "] ($Id: cservice.cc,v 1.44 2001/01/16 01:31:40 gte Exp $)");
+		xClient::DoCTCP(theClient, CTCP.c_str(), "Undernet P10 Channel Services Version 2 [" __DATE__ " " __TIME__ "] ($Id: cservice.cc,v 1.45 2001/01/16 20:03:40 gte Exp $)");
 		return true;
 	}
  
@@ -841,9 +841,17 @@ int cservice::OnTimer(xServer::timerID, void*)
 			for (int i = 0 ; i < SQLDb->Tuples(); i++)
 			{ 
 				sqlChannelHashType::iterator ptr = sqlChannelCache.find(SQLDb->GetValue(i, 1)); 
-				if(ptr != sqlChannelCache.end()) // Found something!
+				if(ptr != sqlChannelCache.end()) /* Found something! */
 				{ 
 					(ptr->second)->setAllMembers(i);
+				} else  /* Not in the cache.. must be a new channel. */
+				{
+					/* Create new channel record, insert in cache. */
+					sqlChannel* newChan = new sqlChannel(SQLDb);
+					newChan->setAllMembers(i);
+				 	sqlChannelCache.insert(sqlChannelHashType::value_type(newChan->getName(), newChan));
+					/* Join the newly registered channel. */
+					Join(newChan->getName(), newChan->getChannelMode(), 0, true);
 				}
 			
 			}
