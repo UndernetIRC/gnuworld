@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: cservice.cc,v 1.238 2003/11/26 23:30:22 dan_karrels Exp $
+ * $Id: cservice.cc,v 1.239 2003/12/04 11:22:10 mrbean_ Exp $
  */
 
 #include	<new>
@@ -1377,11 +1377,11 @@ void cservice::expireSuspends()
 {
 elog	<< "cservice::expireSuspends> Checking for expired Suspensions.."
 	<< endl;
-
+time_t expiredTime = currentTime();
 stringstream expireQuery;
 expireQuery	<< "SELECT user_id,channel_id FROM levels "
 		<< "WHERE suspend_expires <= "
-		<< currentTime()
+		<< expiredTime
 		<< " AND suspend_expires <> 0"
 		<< ends;
 
@@ -1458,27 +1458,28 @@ for (expireVectorType::const_iterator resultPtr = expireVector.begin();
 		 *  Execute a query to update the status in the db.
 		 */
 
-		string updateQuery = "UPDATE levels SET suspend_expires = "
-			"0, suspend_by = '' WHERE user_id = "
-			+ resultPtr->first
-			+ " AND channel_id = "
-			+ resultPtr->second;
-
-		#ifdef LOG_SQL
-			elog	<< "expireSuspends::sqlQuery> "
-				<< updateQuery
-				<< endl;
-		#endif
-
-		status = SQLDb->Exec(updateQuery.c_str() ) ;
-		if( status != PGRES_COMMAND_OK)
-			{
-			elog	<< "cservice::expireSuspends> Unable to "
-				<< "update record while unsuspending."
-				<< endl;
-			}
-
 		} // for()
+stringstream updateQuery;
+updateQuery << "UPDATE levels SET suspend_expires = "
+	    << "0, suspend_by = '' WHERE suspend_expires <= "
+	    << expiredTime 
+	    << " and suspend_expires <> 0";
+
+#ifdef LOG_SQL
+	elog	<< "expireSuspends::sqlQuery> "
+		<< updateQuery
+		<< endl;
+#endif
+
+status = SQLDb->Exec(updateQuery.str().c_str() ) ;
+if( status != PGRES_COMMAND_OK)
+	{
+	elog	<< "cservice::expireSuspends> Unable to "
+		<< "update record while unsuspending."
+		<< endl;
+	}
+
+
 }
 
 /**
@@ -1534,11 +1535,11 @@ void cservice::expireBans()
 {
 elog	<< "cservice::expireBans> Checking for expired bans.."
 	<< endl;
-
+time_t expiredTime = currentTime();
 stringstream expireQuery;
 expireQuery	<< "SELECT channel_id,id FROM bans "
 		<< "WHERE expires <= "
-		<< currentTime()
+		<< expiredTime
 		<< ends;
 
 #ifdef LOG_SQL
@@ -1601,40 +1602,64 @@ for (expireVectorType::const_iterator resultPtr = expireVector.begin();
 			<< endl;
 	#endif
 
-	/* Loop over all bans cached in this channel, match ID.. */
-	vector< sqlBan* >::iterator ptr = theChan->banList.begin();
+	/* Attempt to find the ban according to its id */
+	map< int,sqlBan* >::iterator ptr =  
+		theChan->banList.find(resultPtr->second);
 
-	while (ptr != theChan->banList.end())
+	/* Was a ban found ? */
+	if (ptr != theChan->banList.end())
 		{
-		sqlBan* theBan = *ptr;
-		if ( theBan->getID() == resultPtr->second )
+		sqlBan* theBan = ptr->second;
+		theChan->banList.erase(ptr);
+
+		Channel* tmpChan = Network->findChannel(
+			theChan->getName());
+		if (tmpChan)
 			{
-			ptr = theChan->banList.erase(ptr);
-
-			Channel* tmpChan = Network->findChannel(
-				theChan->getName());
-			if (tmpChan)
-				{
-				UnBan(tmpChan, theBan->getBanMask());
-				}
-
-			#ifdef LOG_DEBUG
-				elog	<< "Cleared Ban "
-					<< theBan->getBanMask()
-					<< " from cache"
-					<< endl;
-			#endif
-
-			theBan->deleteRecord();
-			delete(theBan);
+			UnBan(tmpChan, theBan->getBanMask());
 			}
-		else
-			{
-			++ptr;
-			}
-		} /* While looking at bans */
 
+		#ifdef LOG_DEBUG
+			elog	<< "Cleared Ban "
+				<< theBan->getBanMask()
+				<< " from cache"
+				<< endl;
+		#endif
+
+		delete(theBan);
+		}
+	else
+		{
+		sqlBan* theBan = ptr->second;
+		elog << "Unable to find ban "
+		     << theBan->getBanMask()
+		     << " with id " 
+		     << theBan->getID()
+		     << endl;
+		}     
 	} /* Forall results in set */
+
+stringstream deleteQuery;
+deleteQuery	<< "DELETE FROM bans "
+		<< "WHERE expires <= "
+		<< expiredTime
+		<< ends;
+
+#ifdef LOG_SQL
+	elog	<< "sqlQuery> "
+		<< deleteQuery.str().c_str()
+		<< endl;
+#endif
+
+status = SQLDb->Exec(deleteQuery.str().c_str()) ;
+
+if( PGRES_COMMAND_OK != status )
+	{
+	elog	<< "cservice::expireBans> SQL Error: "
+		<< SQLDb->ErrorMessage()
+		<< endl ;
+	return ;
+	}
 
 }
 
@@ -3006,11 +3031,11 @@ xClient::OnChannelEvent( whichEvent, theChan,
  */
 sqlBan* cservice::isBannedOnChan(sqlChannel* theChan, iClient* theClient)
 {
-vector< sqlBan* >::iterator ptr = theChan->banList.begin();
+map < int,sqlBan* >::iterator ptr = theChan->banList.begin();
 
 while (ptr != theChan->banList.end())
 	{
-	sqlBan* theBan = *ptr;
+	sqlBan* theBan = ptr->second;
 
 	if( match(theBan->getBanMask(),
 		theClient->getNickUserHost()) == 0)
@@ -3328,10 +3353,10 @@ newBan->setReason(theReason);
  *  add to internal list and commit to the db.
  */
 
-vector< sqlBan* >::iterator ptr = theChan->banList.begin();
+map< int,sqlBan* >::iterator ptr = theChan->banList.begin();
 while (ptr != theChan->banList.end())
 	{
-	sqlBan* theBan = *ptr;
+	sqlBan* theBan = ptr->second;
 
 	if(string_lower(banTarget) == string_lower(theBan->getBanMask()))
 		{
@@ -3344,7 +3369,7 @@ while (ptr != theChan->banList.end())
 	++ptr;
 	}
 
-theChan->banList.push_back(newBan);
+theChan->banList[newBan->getID()] = newBan;
 
 /* Insert this new record into the database. */
 newBan->insertRecord();
@@ -3798,7 +3823,8 @@ if( PGRES_TUPLES_OK == status )
 
 		sqlBan* newBan = new (std::nothrow) sqlBan(SQLDb);
 		newBan->setAllMembers(i);
-		theChan->banList.push_back(newBan);
+		theChan->banList.insert(map<int,sqlBan*>::value_type(newBan->getID(),newBan));
+//		theChan->banList[newBan->getID()] = newBan;
 
 		} // for()
 	} // if()

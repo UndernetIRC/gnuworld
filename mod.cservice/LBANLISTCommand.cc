@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: LBANLISTCommand.cc,v 1.11 2003/06/28 01:21:20 dan_karrels Exp $
+ * $Id: LBANLISTCommand.cc,v 1.12 2003/12/04 11:22:10 mrbean_ Exp $
  */
 
 #include	<string>
@@ -38,7 +38,7 @@
 #include	"cservice_config.h"
 #include	"time.h"
 
-const char LBANLISTCommand_cc_rcsId[] = "$Id: LBANLISTCommand.cc,v 1.11 2003/06/28 01:21:20 dan_karrels Exp $" ;
+const char LBANLISTCommand_cc_rcsId[] = "$Id: LBANLISTCommand.cc,v 1.12 2003/12/04 11:22:10 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -98,9 +98,9 @@ time_t ban_expires = 0;
 time_t ban_expires_d = 0;
 time_t ban_expires_f = 0;
 
-for( vector< sqlBan* >::const_iterator ptr = theChan->banList.begin() ; ptr != theChan->banList.end() ; ++ptr )
+for( std::map< int,sqlBan* >::const_iterator ptr = theChan->banList.begin() ; ptr != theChan->banList.end() ; ++ptr )
 	{
-	sqlBan* theBan = (*ptr);
+	sqlBan* theBan = ptr->second;
 
 	/* If its expired.. just don't show it - it'll be removed soon ;) */
 	if (theBan->getExpires() >= bot->currentTime())

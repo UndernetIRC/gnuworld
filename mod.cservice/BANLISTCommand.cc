@@ -24,7 +24,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: BANLISTCommand.cc,v 1.19 2003/06/28 01:21:20 dan_karrels Exp $
+ * $Id: BANLISTCommand.cc,v 1.20 2003/12/04 11:22:10 mrbean_ Exp $
  */
 
 #include        <string>
@@ -34,8 +34,9 @@
 #include        "Network.h"
 #include        "levels.h"
 #include        "responses.h"
+#include	"sqlBan.h"
 
-const char BANLISTCommand_cc_rcsId[] = "$Id: BANLISTCommand.cc,v 1.19 2003/06/28 01:21:20 dan_karrels Exp $" ;
+const char BANLISTCommand_cc_rcsId[] = "$Id: BANLISTCommand.cc,v 1.20 2003/12/04 11:22:10 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -87,7 +88,6 @@ if (!level)
 		bot->getResponse(theUser, language::insuf_access).c_str());
 		return false;
 	}
-
 
 for(Channel::const_banIterator ptr = tmpChan->banList_begin();
 	ptr != tmpChan->banList_end(); ++ptr)

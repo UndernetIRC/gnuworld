@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: UNBANCommand.cc,v 1.15 2003/06/28 01:21:20 dan_karrels Exp $
+ * $Id: UNBANCommand.cc,v 1.16 2003/12/04 11:22:10 mrbean_ Exp $
  */
 
 #include	<string>
@@ -38,7 +38,7 @@
 #include	"responses.h"
 #include	"match.h"
 
-const char UNBANCommand_cc_rcsId[] = "$Id: UNBANCommand.cc,v 1.15 2003/06/28 01:21:20 dan_karrels Exp $" ;
+const char UNBANCommand_cc_rcsId[] = "$Id: UNBANCommand.cc,v 1.16 2003/12/04 11:22:10 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -130,7 +130,7 @@ if(level < level::unban)
 	return false;
 	}
 
-vector< sqlBan* >::iterator ptr = theChan->banList.begin();
+std::map< int,sqlBan* >::iterator ptr = theChan->banList.begin();
 string banTarget ;
 
 /*
@@ -167,10 +167,11 @@ else
 
 size_t banCount = 0;
 unsigned short comparison = 0;
+vector <sqlBan*> oldBans;
 
 while (ptr != theChan->banList.end())
 	{
-	sqlBan* theBan = *ptr;
+	sqlBan* theBan = ptr->second;
 	/*
 	 * If we're matching by a users full host, reverse the way we check
 	 * banmask.
@@ -196,24 +197,32 @@ while (ptr != theChan->banList.end())
 					string("You have insufficient access to remove the ban %s from %s's database")).c_str(),
 				theBan->getBanMask().c_str(),
 				theChan->getName().c_str());
-			++ptr;
 			}
 		else
 			{
-			bot->UnBan(theChannel, theBan->getBanMask());
-			ptr = theChan->banList.erase(ptr);
-			theBan->deleteRecord();
-			delete(theBan);
-			banCount++;
+			oldBans.push_back(theBan);
 			}
 		} // if (banMatched)
-	else
-		{
-		++ptr;
-		}
+	++ptr;
 
 	} // while()
-
+/*
+ *  Remove all the matching bans
+ */
+ 
+vector<sqlBan*>::iterator banIterator = oldBans.begin();
+sqlBan* theBan;
+while(banIterator != oldBans.end())
+	{
+	theBan = *banIterator;
+	bot->UnBan(theChannel, theBan->getBanMask());
+	theChan->banList.erase(theChan->banList.find(theBan->getID()));
+	theBan->deleteRecord();
+	delete(theBan);
+	banCount++;
+	banIterator = oldBans.erase(banIterator);
+	}
+	
 /*
  *  Scan through the channel banlist too, and attempt to match any.
  */

@@ -33,7 +33,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: BANCommand.cc,v 1.32 2003/06/28 01:21:20 dan_karrels Exp $
+ * $Id: BANCommand.cc,v 1.33 2003/12/04 11:22:10 mrbean_ Exp $
  */
 
 #include	<new>
@@ -51,7 +51,7 @@
 #include	"responses.h"
 #include	"match.h"
 
-const char BANCommand_cc_rcsId[] = "$Id: BANCommand.cc,v 1.32 2003/06/28 01:21:20 dan_karrels Exp $" ;
+const char BANCommand_cc_rcsId[] = "$Id: BANCommand.cc,v 1.33 2003/12/04 11:22:10 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -59,7 +59,6 @@ using std::string ;
 using std::endl ;
 using std::ends ;
 using std::stringstream ;
-
 using namespace level;
 
 bool BANCommand::Exec( iClient* theClient, const string& Message )
@@ -279,11 +278,12 @@ if( isNick )
  *  find overlapping bans.
  */
 
-vector< sqlBan* >::iterator ptr = theChan->banList.begin();
+std::map < int,sqlBan* >::iterator ptr = theChan->banList.begin();
+vector <sqlBan*> oldBans;
 
 while (ptr != theChan->banList.end())
 	{
-	sqlBan* theBan = *ptr;
+	sqlBan* theBan = ptr->second;
 
 	if(string_lower(banTarget) == string_lower(theBan->getBanMask()))
 		{
@@ -307,13 +307,7 @@ while (ptr != theChan->banList.end())
 		if (theBan->getLevel() <= level)
 			{
 			// Update GNUWorld.
-			theChannel->removeBan(theBan->getBanMask());
-			ptr = theChan->banList.erase(ptr);
-			theBan->deleteRecord();
-			delete(theBan);
-			}
-		else
-			{
+			oldBans.push_back(theBan);
 			++ptr;
 			}
 		}
@@ -332,6 +326,22 @@ while (ptr != theChan->banList.end())
 		++ptr;
 		}
 	} // while()
+/*
+ Go over the bans that needs to be removed
+ and remove them
+ */
+ 
+vector<sqlBan*>::iterator banIterator = oldBans.begin();
+sqlBan* theBan;
+while(banIterator != oldBans.end())
+	{
+	theBan = *banIterator;
+	theChannel->removeBan(theBan->getBanMask());
+	theChan->banList.erase(theChan->banList.find(theBan->getID()));
+	theBan->deleteRecord();
+	delete(theBan);
+	banIterator = oldBans.erase(banIterator);
+	}
 
 vector< iClient* > clientsToKick ;
 for(Channel::userIterator chanUsers = theChannel->userList_begin();
@@ -409,11 +419,13 @@ newBan->setLevel(banLevel);
 newBan->setExpires(banDuration+bot->currentTime());
 newBan->setReason(banReason);
 
-/* Insert to our internal List. */
-theChan->banList.push_back(newBan);
+//theChan->banList[newBan->getID()] = newBan;
 
 /* Insert this new record into the database. */
 newBan->insertRecord();
+
+/* Insert to our internal List. */
+theChan->banList.insert(std::map<int,sqlBan*>::value_type(newBan->getID(),newBan));
 
 bot->Notice(theClient,
 	bot->getResponse(theUser, language::ban_added, "Added ban %s to %s at level %i").c_str(),

@@ -17,11 +17,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: sqlChannel.h,v 1.42 2003/06/28 01:21:20 dan_karrels Exp $
+ * $Id: sqlChannel.h,v 1.43 2003/12/04 11:22:10 mrbean_ Exp $
  */
 
 #ifndef __SQLCHANNEL_H
-#define __SQLCHANNEL_H "$Id: sqlChannel.h,v 1.42 2003/06/28 01:21:20 dan_karrels Exp $"
+#define __SQLCHANNEL_H "$Id: sqlChannel.h,v 1.43 2003/12/04 11:22:10 mrbean_ Exp $"
 
 #include	<string>
 #include	<map>
@@ -266,8 +266,8 @@ public:
 	typedef map< unsigned int, std::pair < unsigned short, string > > forceMapType ;
 	forceMapType forceMap;
 
-	typedef vector < sqlBan* > sqlBanVectorType;
-	sqlBanVectorType banList;
+	typedef map < int,sqlBan*> sqlBanMapType;
+	sqlBanMapType banList;
 
 protected:
 
