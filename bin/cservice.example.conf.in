@@ -1,4 +1,4 @@
-# $Id: cservice.example.conf.in,v 1.4 2003/06/05 01:38:01 dan_karrels Exp $
+# $Id: cservice.example.conf.in,v 1.5 2003/06/11 22:38:20 gte Exp $
 # Channel Services configuration file.
 #
 # sql_host = Hostname/IP of the PostgreSQL server.
@@ -153,3 +153,10 @@ note_limit = 5
 #
 
 preload_user_days = 1
+
+#
+# Specify the filename for the 'Admin Log'.
+# Basically a log of all commands admins type.
+#
+
+admin_logfile = admin.log
