@@ -11,7 +11,7 @@
  *
  * Caveats: None
  *
- * $Id: TOPICCommand.cc,v 1.5 2001/01/03 03:02:05 gte Exp $
+ * $Id: TOPICCommand.cc,v 1.6 2001/01/16 01:31:40 gte Exp $
  */
 
 #include	<string>
@@ -23,7 +23,7 @@
 #include	"responses.h"
 #include	"Network.h"
 
-const char TOPICCommand_cc_rcsId[] = "$Id: TOPICCommand.cc,v 1.5 2001/01/03 03:02:05 gte Exp $" ;
+const char TOPICCommand_cc_rcsId[] = "$Id: TOPICCommand.cc,v 1.6 2001/01/16 01:31:40 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -53,7 +53,7 @@ bool TOPICCommand::Exec( iClient* theClient, const string& Message )
 		return false;
 	}
 	
-	int level = bot->getAccessLevel(theUser, theChan);
+	int level = bot->getEffectiveAccessLevel(theUser, theChan, true);
 	if(level < level::topic)
 	{
 		bot->Notice(theClient, bot->getResponse(theUser, language::insuf_access).c_str(),

@@ -11,7 +11,7 @@
 *
 * Suggestion: Support several nicks by seperating them with a comma.
 *             IE: /msg E kick #coder-com nick1,nick2,nick3 get outta here!
-* $Id: KICKCommand.cc,v 1.1 2000/12/31 05:06:27 gte Exp $
+* $Id: KICKCommand.cc,v 1.2 2001/01/16 01:31:40 gte Exp $
 */
 
 #include        <string>
@@ -23,7 +23,7 @@
 #include        "levels.h"
 #include        "responses.h"
 
-const char KICKCommand_cc_rcsId[] = "$Id: KICKCommand.cc,v 1.1 2000/12/31 05:06:27 gte Exp $" ;
+const char KICKCommand_cc_rcsId[] = "$Id: KICKCommand.cc,v 1.2 2001/01/16 01:31:40 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -66,7 +66,7 @@ bool KICKCommand::Exec( iClient* theClient, const string& Message )
 	 *  Check the user has sufficient access on this channel.
 	 */
 	
-	int level = bot->getAccessLevel(theUser, theChan);
+	int level = bot->getEffectiveAccessLevel(theUser, theChan, true);
 	if (level < level::kick)
 	{
 		bot->Notice(theClient, bot->getResponse(theUser, language::insuf_access).c_str());

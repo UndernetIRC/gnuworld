@@ -12,7 +12,7 @@
  * TODO: /msg x suspend #channel *, suspends all users below your access
  * level.
  *
- * $Id: SUSPENDCommand.cc,v 1.3 2001/01/14 23:12:09 gte Exp $
+ * $Id: SUSPENDCommand.cc,v 1.4 2001/01/16 01:31:40 gte Exp $
  */
 
 #include	<string>
@@ -23,7 +23,7 @@
 #include	"Network.h"
 #include	"levels.h"
 
-const char SUSPENDCommand_cc_rcsId[] = "$Id: SUSPENDCommand.cc,v 1.3 2001/01/14 23:12:09 gte Exp $" ;
+const char SUSPENDCommand_cc_rcsId[] = "$Id: SUSPENDCommand.cc,v 1.4 2001/01/16 01:31:40 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -56,7 +56,7 @@ bool SUSPENDCommand::Exec( iClient* theClient, const string& Message )
 
 	// Check level.
 
-	int level = bot->getAccessLevel(theUser, theChan);
+	int level = bot->getEffectiveAccessLevel(theUser, theChan, true);
 	if(level < level::suspend)
 	{
 	    bot->Notice(theClient, "Sorry, you have insufficient access to perform that command.");
@@ -67,17 +67,24 @@ bool SUSPENDCommand::Exec( iClient* theClient, const string& Message )
 	sqlUser* Target = bot->getUserRecord(st[2]);
 	if(!Target)
 	{
-	    bot->Notice(theClient, "No such user!");
+	    bot->Notice(theClient, "I don't know who %s is",
+	    	st[2].c_str());
 	    return true;
 	}
 
-	sqlLevel* usrLevel = bot->getLevelRecord(Target, theChan);
+	int usrLevel = bot->getAccessLevel(Target, theChan);
 	if(!usrLevel)
 	{
 	    bot->Notice(theClient, "%s doesn't appear to have access in %s.", 
 	    	Target->getUserName().c_str(), theChan->getName().c_str());
 	    return true; 
     }
+
+	if (level <= usrLevel)
+	{
+		bot->Notice(theClient, "Cannot suspend a user with equal or higher access than your own.");
+		return false;
+	}
 
 	int duration = atoi(st[3].c_str());
 	string units;

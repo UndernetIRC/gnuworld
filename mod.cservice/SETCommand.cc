@@ -8,7 +8,7 @@
  *
  * Caveats: SET LANG is still under consideration.
  *
- * $Id: SETCommand.cc,v 1.2 2001/01/08 04:13:04 gte Exp $
+ * $Id: SETCommand.cc,v 1.3 2001/01/16 01:31:40 gte Exp $
  */
 
 #include	<string>
@@ -20,7 +20,7 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char SETCommand_cc_rcsId[] = "$Id: SETCommand.cc,v 1.2 2001/01/08 04:13:04 gte Exp $" ;
+const char SETCommand_cc_rcsId[] = "$Id: SETCommand.cc,v 1.3 2001/01/16 01:31:40 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -40,7 +40,7 @@ bool SETCommand::Exec( iClient* theClient, const string& Message )
 
     Channel* tmpChan = Network->findChannel(st[1]); 
 
-	// Is the channel registered?
+	/* Is the channel registered? */
 	
 	sqlChannel* theChan = bot->getChannelRecord(st[1]);
 	if(!theChan)
@@ -48,7 +48,8 @@ bool SETCommand::Exec( iClient* theClient, const string& Message )
 	    bot->Notice(theClient, "Sorry, %s isn't registered with me.", st[1].c_str());
 	    return false;
 	} 
-	// Is the user authorized?
+
+	/* Is the user authorised? */
 	 
 	sqlUser* theUser = bot->isAuthed(theClient, true);
 	if(!theUser)
@@ -64,12 +65,10 @@ bool SETCommand::Exec( iClient* theClient, const string& Message )
 	
 	if(option == "CAUTION")
 	{
-	    // Check for admin access
-	    sqlChannel* admChan = bot->getChannelRecord("*");
-	    int admLevel = bot->getAccessLevel(theUser, admChan);
-	    if(admLevel < level::set::caution)
+	    /* Check for admin access */ 
+	    if(bot->getAdminAccessLevel(theUser) < level::set::caution)
 	    {
-			// No need to tell users about admin commands.
+			/* No need to tell users about admin commands. */
 			Usage(theClient);
 			return true;
 	    }

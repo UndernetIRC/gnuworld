@@ -8,7 +8,7 @@
  *
  * Caveats: None
  *
- * $Id: ADDUSERCommand.cc,v 1.6 2001/01/14 23:12:09 gte Exp $
+ * $Id: ADDUSERCommand.cc,v 1.7 2001/01/16 01:31:40 gte Exp $
  */
  
 #include	<string>
@@ -19,7 +19,7 @@
 #include	"levels.h"
 #include	"libpq++.h"
 
-const char ADDUSERCommand_cc_rcsId[] = "$Id: ADDUSERCommand.cc,v 1.6 2001/01/14 23:12:09 gte Exp $" ;
+const char ADDUSERCommand_cc_rcsId[] = "$Id: ADDUSERCommand.cc,v 1.7 2001/01/16 01:31:40 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -63,10 +63,10 @@ bool ADDUSERCommand::Exec( iClient* theClient, const string& Message )
 	 *  Check the user has sufficient access on this channel.
 	 */
 
-	int level = bot->getAccessLevel(theUser, theChan);
+	int level = bot->getEffectiveAccessLevel(theUser, theChan, true);
 	if (level < level::adduser)
 	{
-		bot->Notice(theClient, "Sorry, you have insufficient access to perform that command.");
+		bot->Notice(theClient, "You have insufficient access to perform that command.");
 		return false;
 	} 
 

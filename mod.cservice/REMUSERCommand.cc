@@ -9,7 +9,7 @@
  * Caveats: None
  * 
  *
- * $Id: REMUSERCommand.cc,v 1.3 2001/01/15 00:09:57 gte Exp $
+ * $Id: REMUSERCommand.cc,v 1.4 2001/01/16 01:31:40 gte Exp $
  */
 
 #include	<string>
@@ -20,7 +20,7 @@
 #include	"levels.h"
 #include	"libpq++.h"
 
-const char REMUSERCommand_cc_rcsId[] = "$Id: REMUSERCommand.cc,v 1.3 2001/01/15 00:09:57 gte Exp $" ;
+const char REMUSERCommand_cc_rcsId[] = "$Id: REMUSERCommand.cc,v 1.4 2001/01/16 01:31:40 gte Exp $" ;
  
 namespace gnuworld
 {
@@ -63,16 +63,15 @@ bool REMUSERCommand::Exec( iClient* theClient, const string& Message )
 	 *  Check the user has sufficient access on this channel.
 	 */
 
-	int level = bot->getAccessLevel(theUser, theChan);
+	int level = bot->getEffectiveAccessLevel(theUser, theChan, true);
 	if (level < level::remuser)
 	{
-		bot->Notice(theClient, "Sorry, you have insufficient access to perform that command.");
+		bot->Notice(theClient, "You have insufficient access to perform that command.");
 		return false;
 	} 
  
- 
 	/*
-	 *  Check the person we're trying to remve actually exists.
+	 *  Check the person we're trying to remove actually exists.
 	 */
 
 	sqlUser* targetUser = bot->getUserRecord(st[2]);
@@ -123,8 +122,8 @@ bool REMUSERCommand::Exec( iClient* theClient, const string& Message )
 		bot->Notice(theClient, "Something went wrong: %s", bot->SQLDb->ErrorMessage()); // Log to msgchan here.
  	}
  
-	// Remove tmpLevel from the cache. (It has to be there, we just got it even if it wasnt..)
-	// If its a forced record, don't bother..
+	/* Remove tmpLevel from the cache. (It has to be there, we just got it even if it wasnt..)
+	 * If its a forced record, don't bother.. */
 
 	if (!tmpLevel->getFlag(sqlLevel::F_FORCED))
 	{ 

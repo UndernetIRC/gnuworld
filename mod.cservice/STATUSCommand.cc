@@ -9,7 +9,7 @@
 #include	"responses.h"
 #include	"Network.h"
  
-const char STATUSCommand_cc_rcsId[] = "$Id: STATUSCommand.cc,v 1.6 2001/01/08 04:13:04 gte Exp $" ;
+const char STATUSCommand_cc_rcsId[] = "$Id: STATUSCommand.cc,v 1.7 2001/01/16 01:31:40 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -98,7 +98,7 @@ bool STATUSCommand::Exec( iClient* theClient, const string& Message )
 	 *  Check the user has sufficient access on this channel.
 	 */
 
-	int level = bot->getAccessLevel(theUser, theChan);
+	int level = bot->getEffectiveAccessLevel(theUser, theChan, true);
 	int admLevel = bot->getAdminAccessLevel(theUser); // Let authenticated admins view status also.
 	if ((level < level::status) && (admLevel <= 0))
 	{

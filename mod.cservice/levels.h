@@ -1,5 +1,5 @@
 #ifndef __LEVELS_H
-#define __LEVELS_H "$Id: levels.h,v 1.10 2001/01/14 18:21:32 gte Exp $"
+#define __LEVELS_H "$Id: levels.h,v 1.11 2001/01/16 01:31:40 gte Exp $"
 
 /* 
  * levels.h
@@ -9,7 +9,7 @@
  * 
  * Defines access level constants for use in command handlers. 
  *
- * $Id: levels.h,v 1.10 2001/01/14 18:21:32 gte Exp $
+ * $Id: levels.h,v 1.11 2001/01/16 01:31:40 gte Exp $
  */
 
 namespace gnuworld {
@@ -82,7 +82,7 @@ namespace gnuworld {
     const int autojoin = 500;
     
     const int nopurge = 501;
-    const int special = 501;
+    const int special = 750;
     const int noreg = 750;
     const int neverreg = 750;
     const int suspend = 501;

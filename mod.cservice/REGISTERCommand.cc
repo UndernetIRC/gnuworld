@@ -8,7 +8,7 @@
  *
  * Caveats: None
  *
- * $Id: REGISTERCommand.cc,v 1.4 2001/01/14 18:21:31 gte Exp $
+ * $Id: REGISTERCommand.cc,v 1.5 2001/01/16 01:31:40 gte Exp $
  */
  
 #include	<string>
@@ -20,7 +20,7 @@
 #include	"libpq++.h"
 #include	"Network.h"
 
-const char REGISTERCommand_cc_rcsId[] = "$Id: REGISTERCommand.cc,v 1.4 2001/01/14 18:21:31 gte Exp $" ;
+const char REGISTERCommand_cc_rcsId[] = "$Id: REGISTERCommand.cc,v 1.5 2001/01/16 01:31:40 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -57,20 +57,18 @@ bool REGISTERCommand::Exec( iClient* theClient, const string& Message )
 	theChan = bot->getChannelRecord(st[1]);
 	if (theChan) 
 	{
-		bot->Notice(theClient, "Sorry, %s is already registered with me.", st[1].c_str());
+		bot->Notice(theClient, "%s is already registered with me.", st[1].c_str());
 		return false;
 	} 
 
 	/*
 	 *  Check the user has sufficient access for this command..
-	 */
+	 */ 
 
-	theChan = bot->getChannelRecord("*");
-
-	int level = bot->getAccessLevel(theUser, theChan);
+	int level = bot->getAdminAccessLevel(theUser);
 	if (level < level::registercmd)
 	{
-		bot->Notice(theClient, "Sorry, you have insufficient access to perform that command.");
+		bot->Notice(theClient, "You have insufficient access to perform that command.");
 		return false;
 	} 
  
@@ -80,7 +78,7 @@ bool REGISTERCommand::Exec( iClient* theClient, const string& Message )
 		return false;
 	}
  
-	// If the channel exists, grab the creation timestamp and use this as the channel_ts in the Db.
+	/* If the channel exists, grab the creation timestamp and use this as the channel_ts in the Db. */
 	unsigned int channel_ts = 0;
 	Channel* tmpChan = Network->findChannel(st[1]);
 	channel_ts = tmpChan ? tmpChan->getCreationTime() : ::time(NULL);

@@ -1,5 +1,5 @@
 #ifndef __CSERVICE_H
-#define __CSERVICE_H "$Id: cservice.h,v 1.23 2001/01/13 18:54:18 gte Exp $"
+#define __CSERVICE_H "$Id: cservice.h,v 1.24 2001/01/16 01:31:40 gte Exp $"
 
 #include	<string>
 #include	<vector>
@@ -67,7 +67,10 @@ public:
     virtual bool RegisterCommand( Command* ) ;
     virtual bool UnRegisterCommand( const string& ) ; 
 	virtual void OnChannelModeO( Channel*, ChannelUser*,
-		const xServer::opVectorType& ) ;
+		const xServer::opVectorType& ) ; 
+	virtual int OnChannelEvent( const channelEventType& whichEvent,
+		Channel* theChan,
+		void* data1, void* data2, void* data3, void* data4 ); 
 	virtual int OnEvent( const eventType&,
 		void*, void*, void*, void*);
     virtual int OnCTCP( iClient* Sender,
@@ -93,37 +96,54 @@ public:
     constCommandIterator findCommand( const string& theComm ) const
                 { return commandMap.find( theComm ) ; } 
  
-	// Returns what access theUser has in channel theChan.
-	short getAccessLevel( sqlUser* theUser, sqlChannel* theChan );
+	/* Returns the access sqlUser has in channel sqlChan. */
+	short getAccessLevel( sqlUser*, sqlChannel* );
 
-	// Returns what admin access a user has.
+	/* Returns the access sqlUser has in channel sqlChan taking into account
+	 * suspensions, etc.
+	 * If "bool" is true, then send sqlUser a notice about why they don't
+	 * have a particular access. */
+	short getEffectiveAccessLevel( sqlUser*, sqlChannel*, bool );
+
+	/* Returns what admin access a user has. */
 	short getAdminAccessLevel( sqlUser* );
 
-	// Fetch a user record for a user.
+	/* Fetch a user record for a user. */
 	sqlUser* getUserRecord( const string& );
 
-	// Checks if this client is logged in, returns a sqlUser if true.
-	// If bool, send a notice to the client telling them off.
+	/* Checks if this client is logged in, returns a sqlUser if true.
+	 * If "bool" is true, send a notice to the client telling them off. */
 	sqlUser* isAuthed(iClient*, bool );
 
-	// Fetch a channel record for a channel.
+	/* Fetch a channel record for a channel. */
 	sqlChannel* getChannelRecord( const string& );
 
-	// Fetch a access level record for a user/channel combo.
+	/* Fetch a access level record for a user/channel combo. */
 	sqlLevel* getLevelRecord(sqlUser*, sqlChannel*);
 
+	/* Formats a timestamp into a "X Days, XX:XX:XX" from 'Now'. */
 	const string& prettyDuration( int );
 
-	// Increments the flood counter for this iClient.
+	/* Returns the current "Flood Points" this iClient has. */ 
  	unsigned short getFloodPoints(iClient*);
+
+	/* Sets the flood counter for this iClient. */
  	void setFloodPoints(iClient*, unsigned short);
+
+	/* Determins if a client is in "Flooded" state, and if so Notice them. */
 	bool hasFlooded(iClient* theClient);
 
-	// Sets the timestamp for when we last recieved a msg from this client.
+	/* Sets the timestamp for when we first recieved a msg from this client. 
+	 * within the flood period. */
 	void setLastRecieved(iClient*, time_t);
+
+	/* Find out when we first heard from this chap. */
 	time_t getLastRecieved(iClient*);
 
+	/* Ignore someone, or don't. Up to you. */
 	void setIgnored(iClient*, bool);
+
+	/* Is this guy ignored? */
 	bool isIgnored(iClient*);
 
 	// Typedef's for user/channel Hashmaps.

@@ -17,7 +17,7 @@
  *
  * Caveats: None
  *
- * $Id: OPCommand.cc,v 1.12 2001/01/03 05:33:02 gte Exp $
+ * $Id: OPCommand.cc,v 1.13 2001/01/16 01:31:40 gte Exp $
  */
 
 #include	<string>
@@ -32,7 +32,7 @@
 
 using std::map ;
 
-const char OPCommand_cc_rcsId[] = "$Id: OPCommand.cc,v 1.12 2001/01/03 05:33:02 gte Exp $" ;
+const char OPCommand_cc_rcsId[] = "$Id: OPCommand.cc,v 1.13 2001/01/16 01:31:40 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -70,17 +70,17 @@ bool OPCommand::Exec( iClient* theClient, const string& Message )
 			st[1].c_str());
 		return false;
 	} 
-
+ 
 	/*
 	 *  Check the user has sufficient access on this channel.
 	 */
 
-	int level = bot->getAccessLevel(theUser, theChan);
+	int level = bot->getEffectiveAccessLevel(theUser, theChan, true);
 	if (level < level::op)
 	{
 		bot->Notice(theClient, bot->getResponse(theUser, language::insuf_access).c_str());
 		return false;
-	} 
+	}
 
 	Channel* tmpChan = Network->findChannel(theChan->getName()); 
 	if (!tmpChan) 
@@ -91,18 +91,29 @@ bool OPCommand::Exec( iClient* theClient, const string& Message )
 	} 
 
 	/*
+	 *  If the NOOP flag is set, we aren't allowed to op anyone.
+	 */
+
+	if(theChan->getFlag(sqlChannel::F_NOOP))
+	{
+		bot->Notice(theClient, "The NOOP flag is set on %s",
+			theChan->getName().c_str());
+		return false;
+	}
+ 
+	/*
 	 *  Loop over the remaining 'nick' parameters, opping them all.
 	 */
 
 	iClient* target;
-	unsigned short counter = 2; // Offset of first nick in list.
+	unsigned short counter = 2; /* Offset of first nick in string. */
 	unsigned short cont = true;
 	typedef map < iClient*, int > duplicateMapType; 
 	duplicateMapType duplicateMap; 
 	string source;
 	char delim;
 
-	if( st.size() < 3 ) // No nicks provided, assume we op ourself. :)
+	if( st.size() < 3 ) /* No nicks provided, assume we op ourself. :) */
 	{
 		opList.push_back(theClient);
 		source = Message;
@@ -110,9 +121,9 @@ bool OPCommand::Exec( iClient* theClient, const string& Message )
 	} else
 	{
 		string::size_type pos = st[2].find_first_of( ',' ) ; 
-		if( string::npos != pos ) // Found a comma?
+		if( string::npos != pos ) /* Found a comma? */
 		{
-			source = st.assemble(2); // We'll do a comma seperated search then.
+			source = st.assemble(2); /* We'll do a comma seperated search then. */
 			delim = ',';
 			counter = 0;
 		} else { 
@@ -149,6 +160,30 @@ bool OPCommand::Exec( iClient* theClient, const string& Message )
 				target->getNickName().c_str(), theChan->getName().c_str());
 				cont = false;
 		} 
+
+		/*
+		 *  If the channel has the STRICTOP flag set, we are only allowed to op people who
+		 *  are authorised, and have access in this channel.
+		 */
+
+		if(theChan->getFlag(sqlChannel::F_STRICTOP))
+		{
+			sqlUser* authUser = bot->isAuthed(tmpChanUser->getClient(), false);
+
+			/* Not authed, don't allow this op. */
+			if (!authUser)
+			{ 
+				bot->Notice(theClient, "The STRICTOP flag is set on %s (and %s isn't authenticated)",
+					theChan->getName().c_str(), tmpChanUser->getNickName().c_str());
+				cont = false;
+				/* Authed but no access? Tough. :) */
+			} else if (!(bot->getEffectiveAccessLevel(authUser,theChan, false) >= level::op)) 
+				{
+					bot->Notice(theClient, "The STRICTOP flag is set on %s (and %s has insufficient access)",
+						theChan->getName().c_str(), authUser->getUserName().c_str()); 
+					cont = false;
+				} 
+		}
  
 	 	if (cont) 
 	 	{

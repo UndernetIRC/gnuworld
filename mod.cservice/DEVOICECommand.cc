@@ -8,7 +8,7 @@
  *
  * Caveats: None
  *
- * $Id: DEVOICECommand.cc,v 1.3 2001/01/02 07:55:12 gte Exp $
+ * $Id: DEVOICECommand.cc,v 1.4 2001/01/16 01:31:40 gte Exp $
  */
 
 #include	<string>
@@ -23,7 +23,7 @@
 
 using std::map ;
 
-const char DEVOICECommand_cc_rcsId[] = "$Id: DEVOICECommand.cc,v 1.3 2001/01/02 07:55:12 gte Exp $" ;
+const char DEVOICECommand_cc_rcsId[] = "$Id: DEVOICECommand.cc,v 1.4 2001/01/16 01:31:40 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -66,7 +66,7 @@ bool DEVOICECommand::Exec( iClient* theClient, const string& Message )
 	 *  Check the user has sufficient access on this channel.
 	 */
 
-	int level = bot->getAccessLevel(theUser, theChan);
+	int level = bot->getEffectiveAccessLevel(theUser, theChan, true);
 	if (level < level::devoice)
 	{
 		bot->Notice(theClient, bot->getResponse(theUser, language::insuf_access).c_str());
@@ -82,7 +82,7 @@ bool DEVOICECommand::Exec( iClient* theClient, const string& Message )
 	}
  
 
-	if( st.size() < 3 ) // No nicks provided, assume we devoice ourself. :)
+	if( st.size() < 3 ) /* No nicks provided, assume we devoice ourself. :) */
 	{
 		devoiceList.push_back(theClient);
 	}

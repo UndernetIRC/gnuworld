@@ -8,7 +8,7 @@
  *
  * Caveats: None
  *
- * $Id: INVITECommand.cc,v 1.2 2000/12/30 06:34:03 gte Exp $
+ * $Id: INVITECommand.cc,v 1.3 2001/01/16 01:31:40 gte Exp $
  */
 
 
@@ -21,7 +21,7 @@
 #include	"responses.h"
 #include	"Network.h"
 
-const char INVITECommand_cc_rcsId[] = "$Id: INVITECommand.cc,v 1.2 2000/12/30 06:34:03 gte Exp $" ;
+const char INVITECommand_cc_rcsId[] = "$Id: INVITECommand.cc,v 1.3 2001/01/16 01:31:40 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -62,7 +62,7 @@ bool INVITECommand::Exec( iClient* theClient, const string& Message )
 	 *  Check the user has sufficient access on this channel.
 	 */
 
-	int level = bot->getAccessLevel(theUser, theChan);
+	int level = bot->getEffectiveAccessLevel(theUser, theChan, true);
 	if (level < level::invite)
 	{
 		bot->Notice(theClient, bot->getResponse(theUser, language::insuf_access).c_str());

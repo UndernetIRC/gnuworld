@@ -16,7 +16,7 @@
  *
  * Caveats: None
  *
- * $Id: VOICECommand.cc,v 1.9 2001/01/02 07:55:12 gte Exp $
+ * $Id: VOICECommand.cc,v 1.10 2001/01/16 01:31:40 gte Exp $
  */
 
 #include	<string>
@@ -31,7 +31,7 @@
 
 using std::map ;
 
-const char VOICECommand_cc_rcsId[] = "$Id: VOICECommand.cc,v 1.9 2001/01/02 07:55:12 gte Exp $" ;
+const char VOICECommand_cc_rcsId[] = "$Id: VOICECommand.cc,v 1.10 2001/01/16 01:31:40 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -74,7 +74,7 @@ bool VOICECommand::Exec( iClient* theClient, const string& Message )
 	 *  Check the user has sufficient access on this channel.
 	 */
 
-	int level = bot->getAccessLevel(theUser, theChan);
+	int level = bot->getEffectiveAccessLevel(theUser, theChan, true);
 	if (level < level::voice)
 	{
 		bot->Notice(theClient, bot->getResponse(theUser, language::insuf_access).c_str());

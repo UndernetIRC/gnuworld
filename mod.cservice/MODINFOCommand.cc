@@ -13,7 +13,7 @@
  * Shouldn't really happen, as trying to MODINFO a forced access doesn't
  * make sense - adduser and then MODINFO that :)
  *
- * $Id: MODINFOCommand.cc,v 1.5 2001/01/14 23:12:09 gte Exp $
+ * $Id: MODINFOCommand.cc,v 1.6 2001/01/16 01:31:40 gte Exp $
  */
 
 #include	<string>
@@ -23,7 +23,7 @@
 #include	"cservice.h" 
 #include	"levels.h"
 
-const char MODINFOCommand_cc_rcsId[] = "$Id: MODINFOCommand.cc,v 1.5 2001/01/14 23:12:09 gte Exp $" ;
+const char MODINFOCommand_cc_rcsId[] = "$Id: MODINFOCommand.cc,v 1.6 2001/01/16 01:31:40 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -65,11 +65,9 @@ bool MODINFOCommand::Exec( iClient* theClient, const string& Message )
 	if (!theUser) return false; 
  
 	/*
-	 *  Check the user has sufficient access on this channel.
-	 */
-
-	sqlLevel* tmpLevel = bot->getLevelRecord(theUser, theChan);
-	int level = bot->getAccessLevel(theUser, theChan);
+	 *  Check the user has sufficient access on this channel. 
+	 */ 
+	int level = bot->getEffectiveAccessLevel(theUser, theChan, true);
 	if (level < level::modinfo)
 	{
 		bot->Notice(theClient, "Sorry, you have insufficient access to perform that command.");
@@ -90,9 +88,8 @@ bool MODINFOCommand::Exec( iClient* theClient, const string& Message )
 	/*
 	 *  Check this user really does have access on this channel.
 	 */
-
-	sqlLevel* targetLevelRec = bot->getLevelRecord(targetUser, theChan);
-	int targetLevel = targetLevelRec->getAccess();
+ 
+	int targetLevel = bot->getAccessLevel(targetUser, theChan);
 	if (targetLevel == 0)
 	{
 		bot->Notice(theClient, "%s doesn't appear to have access in %s.", targetUser->getUserName().c_str(), theChan->getName().c_str());
@@ -103,19 +100,21 @@ bool MODINFOCommand::Exec( iClient* theClient, const string& Message )
 	 *  Figure out what they're doing - ACCESS or AUTOOP.
 	 */
 
+	/* Pointer to the requesting user's Level record */
+	sqlLevel* tmpLevel = bot->getLevelRecord(theUser, theChan);
 
 	if (command == "ACCESS")
 	{ 
 
 		/*
-		 *  Check we aren't trying to change someone with access higher than ours (or equal).
+		 *  Check we aren't trying to change someone with access higher (or equal) than ours.
 		 */
 	
 		if (level <= targetLevel)
 		{
+			/* If the access is forced, they are allowed to modify their own record. */
 			if (!tmpLevel->getFlag(sqlLevel::F_FORCED))
-			{
-				// If its not forced, they cant modify their own access.
+			{ 
 				bot->Notice(theClient, "Cannot modify a user with equal or higher access than your own.");
 				return false; 
 			}

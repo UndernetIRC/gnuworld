@@ -18,6 +18,7 @@
 #include	"libpq++.h"
 #include	"constants.h"
 #include	"networkData.h"
+#include	"levels.h"
 
 using std::vector ;
 using std::endl ;
@@ -69,12 +70,7 @@ void cservice::ImplementServer( xServer* theServer )
 	        {
 	        ptr->second->setServer( theServer ) ;
 	        }
-	
-	for( eventType i = 0 ; i != EVT_NOOP ; ++i )
-	{
-	  theServer->RegisterEvent( i, this );
-	} 
-
+	 
  	// Attempt to register our interest in recieving NOTIFY events.
 	if (SQLDb->ExecCommandOk("LISTEN channels_u; LISTEN bans_u; LISTEN users_u; LISTEN levels_u;"))
 	{
@@ -369,10 +365,10 @@ int cservice::OnPrivateMessage( iClient* theClient, const string& Message,
 { 
 	/*
 	 *	Private message handler. Pass off the command to the relevant
-	 * handler.
+	 *  handler.
 	 */
 
-	// Don't talk to naughty people.
+	/* Don't talk to naughty people. */
 	if (isIgnored(theClient)) return false; 
 
 	StringTokenizer st( Message ) ;
@@ -389,12 +385,13 @@ int cservice::OnPrivateMessage( iClient* theClient, const string& Message,
 
 	const string Command = string_upper( st[ 0 ] ) ;
 
-	// Attempt to find a handler for this method.
+	/* Attempt to find a handler for this method. */
 
 	commandMapType::iterator commHandler = commandMap.find( Command ) ;
 	if( commHandler == commandMap.end() )
 	{
-		Notice( theClient, "Unknown command" ) ; 
+		/* Don't reply to unknown commands, but add to their flood 
+		 * total :) */
 		if (hasFlooded(theClient)) return false;
 		setFloodPoints(theClient, getFloodPoints(theClient) + 3); 
 	}
@@ -447,7 +444,7 @@ int cservice::OnCTCP( iClient* theClient, const string& CTCP,
 
 	if(Command == "VERSION")
 	{
-		xClient::DoCTCP(theClient, CTCP.c_str(), "Undernet P10 Channel Services Version 2 [" __DATE__ " " __TIME__ "] ($Id: cservice.cc,v 1.43 2001/01/15 00:09:57 gte Exp $)");
+		xClient::DoCTCP(theClient, CTCP.c_str(), "Undernet P10 Channel Services Version 2 [" __DATE__ " " __TIME__ "] ($Id: cservice.cc,v 1.44 2001/01/16 01:31:40 gte Exp $)");
 		return true;
 	}
  
@@ -607,33 +604,36 @@ short cservice::getAdminAccessLevel( sqlUser* theUser )
 	// By default, users have level 0 admin access.
 	return 0;
 }
- 
-short cservice::getAccessLevel( sqlUser* theUser, sqlChannel* theChan )
-{
-	/*
-	 *  Returns the access level a particular user has on a particular
-	 *  channel.
-	 */
 
+/*--getEffectiveAccessLevel---------------------------------------------------
+ *
+ *  Returns the access level a particular user has on a particular
+ *  channel taking into account channel & user level suspensions.
+ *  Also used to return the level of access granted to a forced access.
+ *
+ *  Usage: When determining if we should grant a permission to a user to access
+ *  a particular command/function.
+ *  To determine the effect access level of a target user.
+ *--------------------------------------------------------------------------*/ 
+short cservice::getEffectiveAccessLevel( sqlUser* theUser, sqlChannel* theChan, bool notify )
+{
+ 
 	sqlLevel* theLevel = getLevelRecord(theUser, theChan);
 	if(theLevel)
 	{
 		
 		if (theLevel->getFlag(sqlLevel::F_FORCED))
 		{
-			// A forced access..
+			/* A forced access, return forced access level. */
 			return theLevel->getForcedAccess();
 		}
 
-		/*
-		 *  Check to see if the channel has been suspended.
-		 */
-
+		/* Check to see if the channel has been suspended. */ 
 		if (theChan->getFlag(sqlChannel::F_SUSPEND))
 		{
-			// Send them a notice.
+			/* Send them a notice to let them know they've been bad? */
 			iClient* theClient = theUser->isAuthed();
-			if (theClient)
+			if (theClient && notify)
 				Notice(theClient, "The channel %s has been suspended by a cservice administrator.",
 					theChan->getName().c_str());
 			return 0;
@@ -648,7 +648,7 @@ short cservice::getAccessLevel( sqlUser* theUser, sqlChannel* theChan )
 		{
 			// Send them a notice.
 			iClient* theClient = theUser->isAuthed();
-			if (theClient)
+			if (theClient && notify)
 				Notice(theClient, "Your access on %s has been suspended.",
 					theChan->getName().c_str());
 			return 0;
@@ -660,6 +660,22 @@ short cservice::getAccessLevel( sqlUser* theUser, sqlChannel* theChan )
 	// By default, users have level 0 access on a channel.
 	return 0;
 }
+
+/*--getAccessLevel------------------------------------------------------------
+ *
+ *  Returns the access level a particular user has on a particular
+ *  channel. Plain and simple. If the user has 500 in the channel
+ *  record, this function returns 500. 
+ *--------------------------------------------------------------------------*/ 
+short cservice::getAccessLevel( sqlUser* theUser, sqlChannel* theChan )
+{ 
+	sqlLevel* theLevel = getLevelRecord(theUser, theChan);
+	if(theLevel) return theLevel->getAccess();
+ 
+	/* By default, users have level 0 access on a channel. */
+	return 0;
+}
+
  
 const string& cservice::getResponse( sqlUser* theUser, int response_id )
 { 
@@ -674,19 +690,20 @@ const string& cservice::getResponse( sqlUser* theUser, int response_id )
 	if (theUser) {
 		lang_id = theUser->getLanguageId();
 	} else {
-		lang_id = 1; // Default to english if not authenticated.
+		lang_id = 1; /* Default to english if not authenticated? */
 	}
 	
 	pair<int, int> thePair;
 	thePair = make_pair(lang_id, response_id);
 
 	translationTableType::iterator ptr =  translationTable.find(thePair);
-	if(ptr != translationTable.end()) // Found something!
+	if(ptr != translationTable.end()) /* Found something! */
 	{ 
 		return ptr->second ;
 	} 
 
 	/* 
+	 * Can't find this response Id within a valid language.
 	 * Realistically we should bomb here, however it might be wise to 'fallback'
 	 * to a lower language ID and try again, only bombing if we can't find an
 	 * english variant. (Carrying on here could corrupt numerous varg lists, and
@@ -1034,7 +1051,7 @@ void cservice::OnChannelModeO( Channel* theChan, ChannelUser* theChanUser,
 				{
 					deopList.push_back(tmpUser->getClient());
 					// Authed but doesn't have access... deop.
-				} else if (!getAccessLevel(authUser,reggedChan)) deopList.push_back(tmpUser->getClient());
+				} else if (!(getEffectiveAccessLevel(authUser,reggedChan, false) >= level::op)) deopList.push_back(tmpUser->getClient());
 			}	
 		} 
 	}
@@ -1130,6 +1147,74 @@ if( !deopList.empty() )
 	}
 
 }
+
+/*--OnChannelEvent------------------------------------------------------------
+ *
+ * Handler for registered channel events.
+ * Performs a number of functions, autoop, autovoice, bankicks, etc.
+ *--------------------------------------------------------------------------*/ 
+int cservice::OnChannelEvent( const channelEventType& whichEvent,
+	Channel* theChan,
+	void* data1, void* data2, void* data3, void* data4 )
+{
+ 
+	iClient* theClient = 0 ;
+
+	switch( whichEvent )
+		{
+		case EVT_CREATE: /* God help us if we recieve this for a regg'd channel. */
+		case EVT_JOIN: 
+		{
+			theClient = static_cast< iClient* >( data1 ) ;
+			sqlChannel* reggedChan = getChannelRecord(theChan->getName());
+			if(!reggedChan)
+			{
+				elog << "cservice::OnChannelEvent> WARNING, unable to locate channel record"
+					<< " for registered channel event: " << theChan->getName() << endl;
+				return 0;
+			}
+	
+			/* Deal with auto-op first - check this users access level. */
+			sqlUser* theUser = isAuthed(theClient, false);
+			if (!theUser) break; /* If not authed.. */
+
+			/* Check access in this channel. */
+			sqlLevel* theLevel = getLevelRecord(theUser, reggedChan); 
+			if (!theLevel) break; /* No access.. */
+ 
+			/* Next, see if they have auto op set. */
+			if (theLevel->getFlag(sqlLevel::F_AUTOOP)) 
+			{
+				/* If they are suspended, or somehow have less than 100, don't op them */
+				if (getEffectiveAccessLevel(theUser, reggedChan, false) >= level::op)
+				{
+					Op(theChan, theClient); 
+					break;
+				}
+			}
+
+			/* Or auto voice? */
+			if (theLevel->getFlag(sqlLevel::F_AUTOVOICE)) 
+			{
+				/* If they are suspended, or somehow have less than 75, don't voice them */
+				if (getEffectiveAccessLevel(theUser, reggedChan, false) >= level::voice)
+				{
+					Voice(theChan, theClient);
+					break;
+				}
+			}
+ 
+			/* Finally, check if they are banned or not. */
+			break;
+		}
+
+		default:
+			break;
+		}
+
+return xClient::OnChannelEvent( whichEvent, theChan, data1, data2, data3, data4 );
+}
+
  
 void Command::Usage( iClient* theClient )
 {
