@@ -23,7 +23,7 @@
 #include	"AuthInfo.h"
 #include        "server.h"
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.35 2001/05/14 21:26:37 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.36 2001/05/15 05:56:07 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -294,105 +294,12 @@ if(SendReport)
 theServer->RegisterEvent( EVT_KILL, this );
 theServer->RegisterEvent( EVT_QUIT, this );
 theServer->RegisterEvent( EVT_NETJOIN, this );
-theServer->RegisterEvent( EVT_EB, this );
+theServer->RegisterEvent( EVT_BURST_CMPLT, this );
 //theServer->RegisterEvent( EVT_NETBREAK, this );
 
 xClient::ImplementServer( theServer ) ;
 }
 
-/*int ccontrol::OnPrivateMessage( iClient* theClient, const string& Message,
-	bool )
-{
-
-//elog << "ccontrol::OnPrivateMessage()\n" ;
-
-// Only allow opers or services clients to use this client
-/*if( !theClient->isOper() && !theClient->getMode( iClient::MODE_SERVICES ) )
-	{
-	Notice( theClient, "You must be an IRCoperator to use this service." ) ;
-	return 0 ;
-	}*/
-
-// Tokenize the message
-//StringTokenizer st( Message ) ;
-
-// Make sure there is a command present
-/*if( st.empty() )
-	{
-	Notice( theClient, "Incomplete command" ) ;
-	return 0 ;
-	}*/
-
-// This is no longer necessary, but oh well *shrug*
-//const string Command = string_upper( st[ 0 ] ) ;
-
-// Attempt to find a handler for this method.
-//commandIterator commHandler = findCommand( Command ) ;
-
-// Was a handler found?
-//if( commHandler == command_end() )
-//	{
-	// Nope, notify the client
-//	Notice( theClient, "Unknown command" ) ;
-//	return 0 ; 
-//	}
-
-// Check if the user is logged in , and he got
-// access to that command
-
-/*int ComAccess = commHandler->second->getFlags();
-
-AuthInfo* theUser = IsAuth(theClient->getCharYYXXX());
-
-if((!theUser) && (ComAccess != flg_NOLOG))
-	{
-	Notice( theClient,
-		"You must be logged in to issue that command" ) ;
-	}
-else if( (ComAccess != flg_NOLOG) && !(ComAccess & theUser->Access))
-	{
-	Notice( theClient, "You dont have access to that command" ) ;
-	}
-else if(( isSuspended(theUser) ) && ( ComAccess != 0 ) )
-/*if( (theUser) && (theUser->Flags & isSUSPENDED))
-	{
-	if( (::time( 0 ) - theUser->SuspendExpires < 0)
-		&& (ComAccess != 0))*/
-/*		{
-		Notice( theClient,
-			"Sorry but you are suspended");
-		}
-	else 
-		{*/
-		/*{ //if the suspend expired, unsuspend the user and execute the command
-		if( ::time( 0 ) - theUser->SuspendExpires >= 0) 
-			{	
-//			ccUser* tmpUser = GetUser(theUser->Name);
-			ccUser* tmpUser = GetOper(theUser->Name);
-
-			tmpUser->setSuspendExpires(0);
-			tmpUser->removeFlag(isSUSPENDED);
-			tmpUser->setSuspendedBy("");
-			tmpUser->Update();
-    			delete tmpUser;
-			}*/
-		// Log the command
-/*		if(!(ComAccess & flg_NOLOG)) //Dont log command which arent suppose to be logged
-			DailyLog(theUser,Message.c_str());*/
-		// Execute the command handler
-//		commHandler->second->Exec( theClient, Message) ;
-		//}
-//		}		
-//else
-//	{	
-	// Log the command
-//	if(!(ComAccess & flg_NOLOG)) //Dont log command which arent suppose to be logged
-//		DailyLog(theUser,Message.c_str());
-//	commHandler->second->Exec( theClient, Message) ;
-//	}
-// Call the base class OnPrivateMessage() method
-//return xClient::OnPrivateMessage( theClient, Message ) ;
-//}*/
 int ccontrol::OnPrivateMessage( iClient* theClient, const string& Message,
 	bool )
 {
@@ -545,7 +452,7 @@ switch( theEvent )
 		iServer* UplinkServer = static_cast< iServer* >( Data2);*/
 		// still not handled
 		}
-	case EVT_EB:
+	case EVT_BURST_CMPLT:
 		{
 		inBurst = true;
 		}	
