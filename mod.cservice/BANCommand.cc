@@ -9,12 +9,14 @@
  * Cleanups/rewrites - don't allow adding of less specific bans.
  * 10/02/2001 - David Henriksen <david@itwebnet.dk>
  * Minor bug fixes.
+ * 01/03/01 - Daniel Simard <svr@undernet.org>
+ * Fixed Language module stuff.
  *
  * Bans a user on a channel, adds this ban to the internal banlist.
  *
  * Caveats: None.
  *
- * $Id: BANCommand.cc,v 1.17 2001/02/16 20:20:26 plexus Exp $
+ * $Id: BANCommand.cc,v 1.18 2001/03/02 19:30:41 gte Exp $
  */
 
 #include	<string>
@@ -29,7 +31,7 @@
 #include	"responses.h"
 #include	"match.h"
 
-const char BANCommand_cc_rcsId[] = "$Id: BANCommand.cc,v 1.17 2001/02/16 20:20:26 plexus Exp $" ;
+const char BANCommand_cc_rcsId[] = "$Id: BANCommand.cc,v 1.18 2001/03/02 19:30:41 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -57,8 +59,7 @@ if(st[1][0] != '#')
 	{
 	bot->Notice(theClient, 
 		bot->getResponse(theUser, 
-			language::inval_chan_name, 
-			string("Invalid channel name.")).c_str());
+			language::inval_chan_name).c_str());
 	return false;
 	}
 
@@ -69,9 +70,7 @@ if(!theChan)
 	bot->Notice(theClient, 
 		bot->getResponse(
 			theUser, 
-			language::not_registered, 
-			string("Sorry, %s isn't registered with me.")
-		).c_str(),
+			language::chan_not_reg).c_str(), 
 		st[1].c_str());
 	return false;
 	} 
@@ -84,9 +83,7 @@ if (!theChan->getInChan())
 	bot->Notice(
 		theClient, 
 		bot->getResponse(theUser,
-			language::i_am_not_on_chan,
-			string("I'm not in that channel!")
-		)
+			language::i_am_not_on_chan).c_str()
 		);
 	return false;
 	}
@@ -151,9 +148,7 @@ if(level < level::ban)
 	{
 	bot->Notice(theClient, 
 		bot->getResponse(theUser, 
-			language::insuf_access,
-			string("Sorry, you have insufficient access to perform that command.")
-			)
+			language::insuf_access).c_str()
 		);
 	return false;
 	}
@@ -161,9 +156,8 @@ if(level < level::ban)
 if(banLevel < 1 || banLevel > level || 500 < banLevel)
 	{
 	bot->Notice(theClient, 
-		bot->getResponse(theUser,language::ban_level_range,
-		string("Invalid banlevel range. Valid range is 1-%i.")).c_str()
-		, (500 < level) ? 500 : level);
+		bot->getResponse(theUser,language::ban_level_range).c_str(),
+		(500 < level) ? 500 : level);
 	return true;
 	}
 
@@ -171,8 +165,7 @@ if(banTime < 1 || banTime > 336)
 	{
 	bot->Notice(theClient, 
 		bot->getResponse(theUser,
-		language::ban_duration,
-		string("Invalid ban duration. Your ban duration can be a maximum of 336 hours."))
+		language::ban_duration).c_str()
 	);
 	return true;
 	}
@@ -181,8 +174,7 @@ if(banReason.size() > 128)
 	{
 	bot->Notice(theClient, 
 		bot->getResponse(theUser,
-		language::ban_reason_size,
-		string("Ban reason cannot exceed 128 chars"))
+		language::ban_reason_size).c_str()
 	);
 	return true;
 	}
@@ -199,8 +191,8 @@ if( isNick )
 		{
 		bot->Notice(theClient, 
 			bot->getResponse(theUser,
-			language::cant_find_on_chan, 
-			string("Sorry, I cannot find the specified nick."))
+			language::cant_find_on_chan).c_str(),
+			st[2].c_str(), theChan->getName().c_str()
 		);
 		return true;
 		}
@@ -238,8 +230,7 @@ while (ptr != banList->end())
 		{
 		bot->Notice(theClient, 
 			bot->getResponse(theUser,
-			language::ban_exists,
-			string("Specified ban is already in my banlist!"))
+			language::ban_exists).c_str()
 		);
 		return true; 
 		}  
@@ -267,8 +258,7 @@ while (ptr != banList->end())
 		{
 			bot->Notice(theClient, 
 				bot->getResponse(theUser,
-				language::ban_covered,
-				string("The ban %s is already covered by %s")).c_str(),
+				language::ban_covered).c_str(),
 				banTarget.c_str(), theBan->getBanMask().c_str());
 			return true;
 		} 

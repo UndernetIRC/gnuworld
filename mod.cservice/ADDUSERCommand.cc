@@ -4,11 +4,14 @@
  * 26/12/2000 - Greg Sikorski <gte@atomicrevs.demon.co.uk>
  * Initial Version.
  *
+ * 01/03/01 - Daniel Simard <svr@undernet.org>
+ * Fixed Language module stuff.
+ *
  * Adds a new user to a channel, obeying common sense.
  *
  * Caveats: None
  *
- * $Id: ADDUSERCommand.cc,v 1.13 2001/02/22 19:09:34 gte Exp $
+ * $Id: ADDUSERCommand.cc,v 1.14 2001/03/02 19:30:41 gte Exp $
  */
  
 #include	<string>
@@ -20,7 +23,7 @@
 #include	"libpq++.h"
 #include	"responses.h"
 
-const char ADDUSERCommand_cc_rcsId[] = "$Id: ADDUSERCommand.cc,v 1.13 2001/02/22 19:09:34 gte Exp $" ;
+const char ADDUSERCommand_cc_rcsId[] = "$Id: ADDUSERCommand.cc,v 1.14 2001/03/02 19:30:41 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -58,8 +61,7 @@ if (!theChan)
 	{
 	bot->Notice(theClient, 
 		bot->getResponse(theUser,
-			language::chan_not_reg,
-			string("Sorry, %s isn't registered with me.")).c_str(),
+			language::chan_not_reg).c_str(),
 		st[1].c_str()
 	);
 	return false;
@@ -74,8 +76,7 @@ if (level < level::adduser)
 	{
 	bot->Notice(theClient,
 		bot->getResponse(theUser,
-			language::insuf_access,
-			string("You have insufficient access to perform that command."))
+			language::insuf_access).c_str()
 	);
 	return false;
 	} 
@@ -89,8 +90,7 @@ if (level <= targetAccess)
 	{
 	bot->Notice(theClient,
 		bot->getResponse(theUser,
-			language::access_higher,
-			string("Cannot add a user with equal or higher access than your own."))
+			language::access_higher).c_str()
 	);
 	return false;
 	}
@@ -99,8 +99,7 @@ if ((targetAccess <= 0) || (targetAccess > 999))
 	{
 	bot->Notice(theClient,
 		bot->getResponse(theUser,
-			language::inval_access,
-			string("Invalid access level."))
+			language::inval_access).c_str()
 	);
 	return false;
 	}
@@ -114,8 +113,7 @@ if (!targetUser)
 	{
 	bot->Notice(theClient, 
 		bot->getResponse(theUser,
-			language::not_registered,
-			string("Sorry, I don't know who %s is.")).c_str(),
+			language::not_registered).c_str(),
 		st[2].c_str()
 	);
 	return false; 
@@ -139,8 +137,7 @@ if (levelTest != 0)
 		{ 
 		bot->Notice(theClient, 
 			bot->getResponse(theUser,
-				language::already_in_list,
-				string("%s is already added to %s with access level %i.")).c_str(),
+				language::already_in_list).c_str(),
 			targetUser->getUserName().c_str(),
 			theChan->getName().c_str(),
 			levelTest);
@@ -153,8 +150,7 @@ if (levelTest != 0)
 		// If a forced person is trying to add themselves and they are already in the DB..
 		bot->Notice(theClient, 
 			bot->getResponse(theUser,
-				language::already_in_list,
-				string("%s is already added to %s with access level %i.")).c_str(),
+				language::already_in_list).c_str(),
 			targetUser->getUserName().c_str(),
 			theChan->getName().c_str(),
 			levelTest);
@@ -207,8 +203,7 @@ if( PGRES_COMMAND_OK == status )
 	{
 	bot->Notice(theClient, 
 		bot->getResponse(theUser,
-			language::add_success,
-			string("Added user %s to %s with access level %i")).c_str(),
+			language::add_success).c_str(),
 		targetUser->getUserName().c_str(),
 		theChan->getName().c_str(),
 		targetAccess);
@@ -228,8 +223,7 @@ else
 	{
 	bot->Notice(theClient, 
 		bot->getResponse(theUser,
-			language::its_bad_mmkay,
-			string("Something went wrong: %s")).c_str(),
+			language::its_bad_mmkay).c_str(),
 		bot->SQLDb->ErrorMessage());
 	// TODO: Log to msgchan here.
  	}

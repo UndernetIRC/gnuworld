@@ -1,5 +1,5 @@
 #ifndef __CSERVICE_H
-#define __CSERVICE_H "$Id: cservice.h,v 1.52 2001/03/01 00:43:51 gte Exp $"
+#define __CSERVICE_H "$Id: cservice.h,v 1.53 2001/03/02 19:30:41 gte Exp $"
 
 #include	<string>
 #include	<vector>
@@ -133,6 +133,7 @@ public:
 
 	/* Fetch a channel record for a channel. */
 	sqlChannel* getChannelRecord( const string& );
+	sqlChannel* getChannelRecord( int );
 
 	/* Fetch a access level record for a user/channel combo. */
 	sqlLevel* getLevelRecord(sqlUser*, sqlChannel*);
@@ -169,6 +170,7 @@ public:
 
 	// Channel hash, Key is channelname.
 	typedef hash_map< string, sqlChannel*, eHash, eqstr > sqlChannelHashType ;
+	typedef map< int, sqlChannel* > sqlChannelIDHashType ;
 
 	// Accesslevel cache, key is pair(chanid, userid).
 	typedef map < pair <int, int>, sqlLevel* > sqlLevelHashType ;
@@ -186,8 +188,11 @@ public:
 	// Cache of user records.
 	sqlUserHashType sqlUserCache;
 
-	// Cache of channel records.
+	// Cache of channel records. 
 	sqlChannelHashType sqlChannelCache;
+
+	// Cache of channel records indexed by channel ID.
+	sqlChannelIDHashType sqlChannelIDCache;
 
 	// Cache of Level records.
 	sqlLevelHashType sqlLevelCache;
@@ -204,6 +209,7 @@ public:
 	unsigned int levelCacheHits; 
 	unsigned int banHits;
 	unsigned int banCacheHits; 
+	unsigned int dbErrors;
 
 	/* No of seconds offset our local time is from server time. */
 	int dbTimeOffset;
@@ -281,6 +287,8 @@ public:
 	void expireBans(); 
 	void performReops();
 	void processDBUpdates();
+
+	void dbErrorMessage(iClient*);
 } ;
 
 const string escapeSQLChars(const string& theString);

@@ -73,7 +73,7 @@ for( commandMapType::iterator ptr = commandMap.begin() ;
         }
 	 
 /* Attempt to register our interest in recieving NOTIFY events. */
-if (SQLDb->ExecCommandOk("LISTEN channels_u; LISTEN bans_u; LISTEN users_u; LISTEN levels_u;"))
+if (SQLDb->ExecCommandOk("LISTEN channels_u; LISTEN users_u; LISTEN levels_u;"))
 	{
 	elog	<< "cmaster::ImplementServer> Successfully registered "
 			<< "LISTEN event for Db updates." << endl;
@@ -234,7 +234,12 @@ userHits = 0;
 userCacheHits = 0;
 channelHits = 0;
 channelCacheHits = 0;
- 
+levelHits = 0;
+levelCacheHits = 0;
+banHits = 0;
+banCacheHits = 0; 
+dbErrors = 0;
+
 // Load our translation tables.
 loadTranslationTable(); 
 }
@@ -880,6 +885,54 @@ delete theChan;
 return 0;
 } 
 
+/**
+ *  Loads a channel from the cache by 'id'.
+ */
+sqlChannel* cservice::getChannelRecord(int id)
+{ 
+
+/*
+ *  Check if this record is already in the cache.
+ */
+ 
+sqlChannelIDHashType::iterator ptr = sqlChannelIDCache.find(id);
+if(ptr != sqlChannelIDCache.end())
+	{
+	// Found something!
+	elog	<< "cmaster::getChannelRecord(ID)> Cache hit for "
+		<< id
+		<< endl; 
+
+	// Return the channel to the caller
+	return ptr->second ;
+	} 
+
+/*
+ *  We didn't find anything in the cache, fetch the data from
+ *  the backend and create a new sqlUser object.
+ */
+
+sqlChannel* theChan = new (nothrow) sqlChannel(SQLDb);
+assert( theChan != 0 ) ;
+
+if (theChan->loadData(id))
+	{
+ 	sqlChannelIDCache.insert(sqlChannelIDHashType::value_type(id, theChan));
+
+	elog	<< "cmaster::getChannelRecord(ID)> There are "
+		<< sqlChannelIDCache.size()
+		<< " elements in the ID cache."
+		<< endl; 
+
+	// Return the channel to the caller
+	return theChan;
+	}
+
+delete theChan;
+return 0;
+} 
+
+
 sqlLevel* cservice::getLevelRecord( sqlUser* theUser, sqlChannel* theChan )
 {
 // Check if the record is already in the cache.
@@ -1134,6 +1187,80 @@ void cservice::expireSuspends()
  */ 
 void cservice::expireBans()
 {
+	elog << "cservice::expireBans> Checking for expired bans.." << endl;
+	strstream expireQuery;
+	ExecStatusType status; 
+
+	expireQuery	<< "SELECT channel_id,id FROM bans "
+				<< "WHERE expires <= "
+				<< currentTime() 
+				<< ends;
+
+	elog << "sqlQuery> " << expireQuery.str() << endl;
+ 
+	if ((status = SQLDb->Exec(expireQuery.str())) == PGRES_TUPLES_OK)
+	{ 
+		/*
+		 *  Loops over the results set, and attempt to locate
+		 *  this ban in the cache.
+		 */ 
+
+		elog << "cservice::expireBans> Found " 
+			 << SQLDb->Tuples()
+			 << " expired bans." << endl;
+
+		/*
+		 *  Place our query results into temporary storage, because
+		 *  we might have to execute other queries inside the
+		 *  loop which will invalidate our results set.
+		 */
+		typedef vector < pair < unsigned int, unsigned int > > expireVectorType;
+		expireVectorType expireVector;
+ 
+		for (int i = 0 ; i < SQLDb->Tuples(); i++)
+		{ 
+			expireVector.push_back(expireVectorType::value_type(
+				atoi(SQLDb->GetValue(i, 0)), 
+				atoi(SQLDb->GetValue(i, 1)) )
+				);
+ 		}
+
+		for (expireVectorType::const_iterator resultPtr = expireVector.begin();
+			resultPtr != expireVector.end(); ++resultPtr)
+			{ 
+				sqlChannel* theChan = getChannelRecord( resultPtr->first );
+				if (!theChan) continue; // TODO: Debuglog.
+	
+				elog << "Checking bans for " << theChan->getName() << endl;
+	 
+				/* Then hunt it out in the cache.. */
+				vector<sqlBan*>* chanBans;
+				chanBans = getBanRecords(theChan);
+	
+				/* Loop over all bans cached in this channel, match ID.. */
+				vector< sqlBan* >::iterator ptr = chanBans->begin(); 
+				while (ptr != chanBans->end())
+				{
+					sqlBan* theBan = *ptr;
+					if ( theBan->getID() == resultPtr->second )
+					{
+						ptr = chanBans->erase(ptr);
+						Channel* tmpChan = Network->findChannel(theChan->getName());
+						if (tmpChan) UnBan(tmpChan, theBan->getBanMask()); 
+						elog << "Cleared Ban " << theBan->getBanMask() << " from cache" << endl;
+						theBan->deleteRecord();
+						delete(theBan);
+					} else 
+					{
+						++ptr;
+					}
+				} /* While looking at bans */
+ 
+			} /* Forall results in set */
+
+	} /* If query okay */
+
+	delete[] expireQuery.str(); 
 }
 
 /**
@@ -1301,7 +1428,7 @@ elog	<< "cmaster::OnTimer> Found "
 if (SQLDb->Tuples() <= 0)
 	{ 
 	// We could get no results back if the last_update
-	// field wasn't set.
+	// field wasn't set properly.
 	return;
 	}
 
@@ -1407,7 +1534,7 @@ if (timer_id ==  update_timerID)
 
 if (timer_id == expire_timerID)
 	{ 
-
+	expireBans();
 	/* Refresh Timers */
 	time_t theTime = time(NULL) + expireInterval;
 	expire_timerID = MyUplink->RegisterTimer(theTime, this, NULL);			
@@ -1914,7 +2041,7 @@ switch( whichEvent )
 		/* Is it time to set an autotopic? */
 		if (reggedChan->getFlag(sqlChannel::F_AUTOTOPIC) &&
 			(reggedChan->getLastTopic()
-			+ topic_duration <= ::time(NULL)))
+			+ topic_duration <= currentTime()))
 			{
 			doAutoTopic(reggedChan);
 			}
@@ -1992,69 +2119,39 @@ while (ptr != banList->end())
 	{
 	sqlBan* theBan = *ptr; 
 
-	/* Has this ban expired? */ 
-	if (theBan->getExpires() <= currentTime())
+	// TODO: Ban through the server, this method
+	// is not updating the network data tables
+	/* Matching ban? */ 
+	if( (match(theBan->getBanMask(),
+		theClient->getNickUserHost()) == 0) &&
+		(theBan->getLevel() >= 75) )
 		{
-		/* Delete this ban.. */
 		strstream s;
 		s	<< getCharYYXXX()
 			<< " M "
 			<< theChan->getName()
-			<< " -b "
+			<< " +b "
 			<< theBan->getBanMask()
 			<< ends;
 		
 		Write( s );
-		delete[] s.str();
+		delete[] s.str(); 
 
-		ptr = banList->erase(ptr); 
-		theBan->deleteRecord();
-
-		delete(theBan);
-		deleted = true;
-		}
-	else
-		{
-		// TODO: Ban through the server, this method
-		// is not updating the network data tables
-		/* Matching ban? */ 
-		if( (match(theBan->getBanMask(),
-			theClient->getNickUserHost()) == 0) &&
-			(theBan->getLevel() >= 75) )
+		/* Don't kick banned +k bots */
+		if ( !theClient->getMode(iClient::MODE_SERVICES) )
 			{
-			strstream s;
-			s	<< getCharYYXXX()
-				<< " M "
-				<< theChan->getName()
-				<< " +b "
-				<< theBan->getBanMask()
-				<< ends;
-			
-			Write( s );
-			delete[] s.str(); 
+			Kick(netChan, theClient,
+				string( "("
+				+ theBan->getSetBy()
+				+ ") "
+				+ theBan->getReason()) );
+			}
 
-			/* Don't kick banned +k bots */
-			if ( !theClient->getMode(iClient::MODE_SERVICES) )
-				{
-				Kick(netChan, theClient,
-					string( "("
-					+ theBan->getSetBy()
-					+ ") "
-					+ theBan->getReason()) );
-				}
- 
-			return true;
+		return true;
 			} /* Matching Ban */ 
-		} /* Not expired. */
-	if (deleted) 
-		{
-		deleted = false;
-		}
-	else
-		{
-		++ptr;
-		}
-} /* while() */
+
+	++ptr; 
+	} /* while() */
 	
 	return false;
 }
@@ -2181,7 +2278,7 @@ s	<< getCharYYXXX()
 Write( s );
 delete[] s.str(); 
 
-theChan->setLastTopic(::time(NULL));
+theChan->setLastTopic(currentTime());
 }	
 
 /**
@@ -2320,6 +2417,14 @@ if( Connected && MyUplink && Message && Message[ 0 ] != 0 )
 		buffer ) ; 
 	}
 return -1 ;
+}
+
+void cservice::dbErrorMessage(iClient* theClient)
+{
+	Notice(theClient,
+ 		"An error occured while performing this action, "
+ 		"the database may be unavailable. Please try again later."); 
+	dbErrors++;
 }
  
 void Command::Usage( iClient* theClient )

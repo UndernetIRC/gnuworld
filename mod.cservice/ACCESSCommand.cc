@@ -6,10 +6,13 @@
  * 15/02/2001 - David Henriksen <david@itwebnet.dk>
  * Added -op/-voice/-none support
  *
+ * 01/03/01 - Daniel Simard <svr@undernet.org>
+ * Fixed Language module stuff.
+ * 
  * Displays all "Level" records for a specified channel.
  * Can optionally narrow down selection using a number of switches. 
  *
- * $Id: ACCESSCommand.cc,v 1.35 2001/02/24 21:22:06 gte Exp $
+ * $Id: ACCESSCommand.cc,v 1.36 2001/03/02 19:30:41 gte Exp $
  */
 
 #include	<string>
@@ -22,7 +25,7 @@
 #include	"responses.h"
 #define MAX_RESULTS 15
  
-const char ACCESSCommand_cc_rcsId[] = "$Id: ACCESSCommand.cc,v 1.35 2001/02/24 21:22:06 gte Exp $" ;
+const char ACCESSCommand_cc_rcsId[] = "$Id: ACCESSCommand.cc,v 1.36 2001/03/02 19:30:41 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -51,8 +54,7 @@ if (!theChan)
 	{
 		bot->Notice(theClient, 
 			bot->getResponse(theUser,
-				language::chan_not_reg,
-				string("Sorry, the channel %s isn't registered with me.")).c_str(), 
+				language::chan_not_reg).c_str(),
 			st[1].c_str()
 		);
 		return false;
@@ -66,8 +68,7 @@ if (theChan->getName() == "*")
 	{
 		bot->Notice(theClient, 
 			bot->getResponse(theUser,
-				language::chan_not_reg,
-				string("Sorry, the channel %s isn't registered with me.")).c_str(), 
+				language::chan_not_reg).c_str(),
 			st[1].c_str()
 		);		
 		return false;
@@ -77,8 +78,7 @@ if (theChan->getName() == "*")
 	{
 		bot->Notice(theClient, 
 			bot->getResponse(theUser,
-				language::chan_not_reg,
-				string("Sorry, the channel %s isn't registered with me.")).c_str(), 
+				language::chan_not_reg).c_str(),
 			st[1].c_str()
 		);		
 		return false; 
@@ -161,8 +161,7 @@ for( StringTokenizer::const_iterator ptr = st.begin() ; ptr != st.end() ;
 				{
 				bot->Notice(theClient, 
 					bot->getResponse(theUser,
-						language::inval_min_lvl,
-						string("Invalid minimum level."))
+						language::inval_min_lvl).c_str()
 				);
 				return false;
 				}
@@ -176,8 +175,7 @@ for( StringTokenizer::const_iterator ptr = st.begin() ; ptr != st.end() ;
 				{
 				bot->Notice(theClient, 
 					bot->getResponse(theUser,
-						language::inval_max_lvl,
-						string("Invalid maximum level."))
+						language::inval_max_lvl).c_str()
 				);
 				return false;
 				}
@@ -273,18 +271,14 @@ if( PGRES_TUPLES_OK == status )
 			results++;			
 				
 			bot->Notice(theClient,
-				bot->getResponse(theUser,
-					language::user_access_is,
-					string("USER: %s ACCESS: %s %s")).c_str(),
+				bot->getResponse(theUser, language::user_access_is).c_str(),
 				bot->SQLDb->GetValue(i, 1),
 				bot->SQLDb->GetValue(i, 2),
 				bot->userStatusFlags(bot->SQLDb->GetValue(i, 1)).c_str()
 			);	
 	
 			bot->Notice(theClient, 
-				bot->getResponse(theUser,
-					language::channel_automode_is,
-					string("CHANNEL: %s -- AUTOMODE: %s")).c_str(),
+				bot->getResponse(theUser, language::channel_automode_is).c_str(),
 				bot->SQLDb->GetValue(i, 0), 
 				autoMode.c_str()
 			);
@@ -293,15 +287,13 @@ if( PGRES_TUPLES_OK == status )
 				{
 				bot->Notice(theClient,
 					bot->getResponse(theUser,
-						language::suspend_expires_in,
-						string("** SUSPENDED ** - Expires in %s")).c_str(),
+						language::suspend_expires_in).c_str(),
 					bot->prettyDuration(suspend_expires_f).c_str()
 				);
 				}
 			bot->Notice(theClient,
 				bot->getResponse(theUser,
-						language::last_seen,
-						string("LAST SEEN: %s ago.")).c_str(), 
+						language::last_seen).c_str(),
 				bot->prettyDuration(duration).c_str()
 			);
 
@@ -309,8 +301,7 @@ if( PGRES_TUPLES_OK == status )
 				{
 				bot->Notice(theClient, 
 					bot->getResponse(theUser,
-						language::last_mod,
-						string("LAST MODIFIED: %s (%s ago)")).c_str(), 
+						language::last_mod).c_str(),
 					bot->SQLDb->GetValue(i, 7),
 					bot->prettyDuration(atoi(bot->SQLDb->GetValue(i,6))).c_str()
 				);	
@@ -323,29 +314,21 @@ if( PGRES_TUPLES_OK == status )
 	if ((results >= MAX_RESULTS) && !showAll)
 		{
 			bot->Notice(theClient, 
-				bot->getResponse(theUser,
-						language::more_than_max,
-						string("There are more than 15 matching entries."))
+				bot->getResponse(theUser, language::more_than_max).c_str()
 			);
 			bot->Notice(theClient,
-				bot->getResponse(theUser,
-						language::restrict_query,
-						string("Please restrict your query."))
+				bot->getResponse(theUser, language::restrict_query).c_str()
 			);
 		} else if (results > 0)
 		{
 			bot->Notice(theClient,
-				bot->getResponse(theUser,
-						language::end_access_list,
-						string("End of access list"))
+				bot->getResponse(theUser, language::end_access_list).c_str()
 			);
 		} 
 			else
 		{
 			bot->Notice(theClient,
-				bot->getResponse(theUser,
-						language::no_match,
-						string("No Match!"))
+				bot->getResponse(theUser, language::no_match).c_str()
 			);
 		}
 
