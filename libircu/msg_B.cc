@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_B.cc,v 1.5 2005/01/12 03:50:28 dan_karrels Exp $
+ * $Id: msg_B.cc,v 1.6 2005/01/22 18:13:08 dan_karrels Exp $
  */
 
 #include	<sys/types.h>
@@ -44,7 +44,7 @@
 #include	"ServerCommandHandler.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: msg_B.cc,v 1.5 2005/01/12 03:50:28 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: msg_B.cc,v 1.6 2005/01/22 18:13:08 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -113,15 +113,6 @@ if( Param.size() < 3 )
 	return false ;
 	}
 
-if( 3 == Param.size() )
-	{
-	// Zombie in channel.
-	// If the user is dezombified, the client will be shown
-	// to issue a "J", and the channel will be created anyway.
-	// Only difference is the timestamp difference.
-	return true ;
-	}
-
 // Attempt to find the channel in the network channel table
 Channel* theChan = Network->findChannel( Param[ 1 ] ) ;
 
@@ -166,7 +157,10 @@ else
 
 if( 3 == Param.size() )
 	{
-	// Special case above, zombie in channel, just leave it
+	// Zombie in channel.
+	// If the user is dezombified, the client will be shown
+	// to issue a "J", and the channel will be created anyway.
+	// Only difference is the timestamp difference.
 	return true ;
 	}
 

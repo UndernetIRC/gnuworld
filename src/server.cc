@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server.cc,v 1.205 2005/01/17 23:10:18 dan_karrels Exp $
+ * $Id: server.cc,v 1.206 2005/01/22 18:13:12 dan_karrels Exp $
  */
 
 #include	<sys/time.h>
@@ -70,7 +70,7 @@
 #include	"ConnectionHandler.h"
 #include	"Connection.h"
 
-RCSTAG( "$Id: server.cc,v 1.205 2005/01/17 23:10:18 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: server.cc,v 1.206 2005/01/22 18:13:12 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -1524,7 +1524,7 @@ else if( NULL == theChan )
 	// Channel doesn't exist yet, and we're NOT bursting
 	// 0AT C #lksjhdlksjdlkjs 957214787
 
-//	elog	<< "xServer::BurstChannel> Creating new channel: "
+//	elog	<< "xServer::JoinChannel> Creating new channel: "
 //		<< chanName
 //		<< endl ;
 
@@ -1583,23 +1583,19 @@ else if( bursting )
 	if( postJoinTime < theChan->getCreationTime() )
 		{
 		// We are bursting an older timestamp
-		// Remove all modes
+		// Remove all modes to keep synced.
 		removeAllChanModes( theChan ) ;
 		}
 
 	if( postJoinTime > theChan->getCreationTime() )
 		{
 		// We are bursting into a channel that has an
-		// older timestamp than the one we where supplied with.
+		// older timestamp than the one we were supplied with.
 		// We use the existing timestamp to remain in sync
 		// (And get op'd if needs be).
 		postJoinTime = theChan->getCreationTime();
 		}
 
-	// TODO: If the timestamp we are bursting is less than the
-	// existing one, we need to set the our Network channel state to
-	// match that supplied in this line. (Because we are authoritive
-	// in this channel, any existing modes will be removed by ircu).
 	stringstream s ;
 	s	<< getCharYY()
 		<< " B "
