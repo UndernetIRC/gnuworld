@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-## $Id: Makefile.am,v 1.1 2002/11/20 22:16:18 dan_karrels Exp $
+## $Id: Makefile.am,v 1.2 2002/11/24 17:04:33 dan_karrels Exp $
 
 lib_LTLIBRARIES = lib_msg_AC.la \
 	lib_msg_AD.la \
@@ -34,6 +34,7 @@ lib_LTLIBRARIES = lib_msg_AC.la \
 	lib_msg_V.la \
 	lib_msg_WA.la \
 	lib_msg_W.la
+INCLUDES = $(INCLTDL)
 
 lib_msg_AC_la_LDFLAGS = -module -export-dynamic
 lib_msg_AC_la_SOURCES = msg_AC.cc

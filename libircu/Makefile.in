@@ -171,6 +171,7 @@ lib_LTLIBRARIES = lib_msg_AC.la \
 	lib_msg_WA.la \
 	lib_msg_W.la
 
+INCLUDES = $(INCLTDL)
 
 lib_msg_AC_la_LDFLAGS = -module -export-dynamic
 lib_msg_AC_la_SOURCES = msg_AC.cc
