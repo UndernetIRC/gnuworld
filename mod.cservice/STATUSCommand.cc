@@ -9,7 +9,7 @@
 #include	"responses.h"
 #include	"Network.h"
  
-const char STATUSCommand_cc_rcsId[] = "$Id: STATUSCommand.cc,v 1.9 2001/01/29 01:08:28 gte Exp $" ;
+const char STATUSCommand_cc_rcsId[] = "$Id: STATUSCommand.cc,v 1.10 2001/01/31 19:53:25 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -89,7 +89,7 @@ bool STATUSCommand::Exec( iClient* theClient, const string& Message )
 
 		bot->Notice(theClient, "Custom data containers allocated: %i", bot->customDataAlloc);
 
-		bot->Notice(theClient, "\002Uptime:\002 %s",  bot->prettyDuration(bot->getUplink()->getStartTime()).c_str());
+		bot->Notice(theClient, "\002Uptime:\002 %s",  bot->prettyDuration(bot->getUplink()->getStartTime() + bot->dbTimeOffset).c_str());
 		return true;
 	}
 

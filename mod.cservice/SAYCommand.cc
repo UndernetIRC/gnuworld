@@ -8,7 +8,7 @@
  *
  * Caveats: None.
  *
- * $Id: SAYCommand.cc,v 1.1 2001/01/13 20:49:46 gte Exp $
+ * $Id: SAYCommand.cc,v 1.2 2001/01/31 19:53:25 gte Exp $
  */
 
 #include	<string>
@@ -19,7 +19,7 @@
 #include	"Network.h"
 #include	"levels.h"
 
-const char SAYCommand_cc_rcsId[] = "$Id: SAYCommand.cc,v 1.1 2001/01/13 20:49:46 gte Exp $" ;
+const char SAYCommand_cc_rcsId[] = "$Id: SAYCommand.cc,v 1.2 2001/01/31 19:53:25 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -42,7 +42,7 @@ bool SAYCommand::Exec( iClient* theClient, const string& Message )
 	 *  they aren't logged in - tell them they should be.
 	 */
 
-	sqlUser* theUser = bot->isAuthed(theClient, true);
+	sqlUser* theUser = bot->isAuthed(theClient, false);
 	if (!theUser) return false; 
  
 	int admLevel = bot->getAdminAccessLevel(theUser);

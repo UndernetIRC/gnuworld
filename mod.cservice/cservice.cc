@@ -150,7 +150,7 @@ cservice::cservice(const string& args)
     RegisterCommand(new UNSUSPENDCommand(this, "UNSUSPEND", "<#channel> <nick>", 5));
     RegisterCommand(new BANCommand(this, "BAN", "<#channel> <nick | *!*user@*.host> [duration] [level] [reason]", 5));
     RegisterCommand(new UNBANCommand(this, "UNBAN", "<#channel> <*!*user@*.host>", 5));
-    RegisterCommand(new LBANLISTCommand(this, "LBANLIST", "<#channel>", 5));
+    RegisterCommand(new LBANLISTCommand(this, "LBANLIST", "<#channel> <banmask>", 5));
     RegisterCommand(new NEWPASSCommand(this, "NEWPASS", "<new passphrase>", 8));
     RegisterCommand(new JOINCommand(this, "JOIN", "<#channel>", 8));
     RegisterCommand(new PARTCommand(this, "PART", "<#channel>", 8));
@@ -532,7 +532,7 @@ int cservice::OnCTCP( iClient* theClient, const string& CTCP,
 
 	if(Command == "VERSION")
 	{
-		xClient::DoCTCP(theClient, CTCP.c_str(), "Undernet P10 Channel Services Version 2 [" __DATE__ " " __TIME__ "] ($Id: cservice.cc,v 1.74 2001/01/31 00:27:39 gte Exp $)");
+		xClient::DoCTCP(theClient, CTCP.c_str(), "Undernet P10 Channel Services Version 2 [" __DATE__ " " __TIME__ "] ($Id: cservice.cc,v 1.75 2001/01/31 19:53:25 gte Exp $)");
 		return true;
 	}
 
