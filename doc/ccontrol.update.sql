@@ -1,5 +1,5 @@
 
--- "$Id: ccontrol.update.sql,v 1.3 2001/07/26 20:12:39 mrbean_ Exp $"
+-- "$Id: ccontrol.update.sql,v 1.4 2001/07/26 20:24:21 mrbean_ Exp $"
 
 -- ccontrol database changes update
 -- this file will add the new features to an old database
@@ -33,5 +33,6 @@ CREATE TABLE commands (
 	Flags    INT4 NOT NULL,
 	IsDisabled BOOLEAN NOT NULL DEFAULT 'n',
 	NeedOp     BOOLEAN NOT NULL DEFAULT 'n',
-	NoLog      BOOLEAN NOT NULL DEFAULT 'n'
+	NoLog      BOOLEAN NOT NULL DEFAULT 'n',
+	MinLevel  INT4 NOT NULL DEFAULT '1'
 	);
