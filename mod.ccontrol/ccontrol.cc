@@ -11,7 +11,7 @@
 /* ccontrol.cc
  * Authors: Daniel Karrels dan@karrels.com
  *	    Tomer Cohen    MrBean@toughguy.net
- * $Id: ccontrol.cc,v 1.164 2003/03/06 12:34:13 mrbean_ Exp $
+ * $Id: ccontrol.cc,v 1.165 2003/03/06 15:20:15 mrbean_ Exp $
  */
 
 #define MAJORVER "1"
@@ -56,7 +56,7 @@
 #include	"ip.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.164 2003/03/06 12:34:13 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.165 2003/03/06 15:20:15 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -1707,7 +1707,7 @@ else
 	for(ptr = cList.begin(); ptr != cList.end(); ++ptr)
 		{
 		curClient = *ptr;    
-		Host = string("*@") + curClient->getRealInsecureHost();
+		Host = string("*@") + xIP(curClient->getIP()).GetNumericIP();
 		tmpGline = new (std::nothrow) ccGline(SQLDb);
 		tmpGline->setHost(Host);
 		tmpGline->setAddedBy(theGline->getAddedBy());
