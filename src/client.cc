@@ -26,7 +26,7 @@
 #include	"events.h"
 
 const char xClient_h_rcsId[] = __XCLIENT_H ;
-const char xClient_cc_rcsId[] = "$Id: client.cc,v 1.28 2001/02/03 19:16:33 dan_karrels Exp $" ;
+const char xClient_cc_rcsId[] = "$Id: client.cc,v 1.29 2001/02/04 02:37:50 dan_karrels Exp $" ;
 
 using std::string ;
 using std::strstream ;
@@ -458,6 +458,11 @@ return 0 ;
 int xClient::OnKill()
 {
 Connected = false ;
+return 0 ;
+}
+
+int xClient::OnWhois( iClient* sourceClient )
+{
 return 0 ;
 }
 

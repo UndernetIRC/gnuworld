@@ -40,6 +40,7 @@ gnuworld_SOURCES = Channel.cc \
 	msg_SQ.cc \
 	msg_Server.cc \
 	msg_T.cc \
+	msg_W.cc \
 	msg_WA.cc \
 	server.cc
 INCLUDES = -I../lib

@@ -3,7 +3,7 @@
  */
 
 #ifndef __XCLIENT_H
-#define __XCLIENT_H "$Id: client.h,v 1.23 2001/02/03 19:16:33 dan_karrels Exp $"
+#define __XCLIENT_H "$Id: client.h,v 1.24 2001/02/04 02:37:49 dan_karrels Exp $"
 
 #include	<string>
 
@@ -143,6 +143,12 @@ public:
 	 * OnKill() is called when the client has been KILL'd.
 	 */
 	virtual int OnKill() ;
+
+	/**
+	 * This method is called when a network client performs
+	 * a whois on this xClient.
+	 */
+	virtual int OnWhois( iClient* sourceClient ) ;
 
 	/**
 	 * OnEvent is called when a network event occurs.

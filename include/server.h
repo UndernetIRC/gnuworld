@@ -17,7 +17,7 @@
  */
 
 #ifndef __XSERVER_H
-#define __XSERVER_H "$Id: server.h,v 1.28 2001/02/03 19:16:33 dan_karrels Exp $"
+#define __XSERVER_H "$Id: server.h,v 1.29 2001/02/04 02:37:49 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
@@ -870,6 +870,9 @@ protected:
 
 	/// WA(LLOPS) message handler.
 	DECLARE_MSG(WA);
+
+	/// W(HOIS) message handler.
+	DECLARE_MSG(W);
 
 	// STATS message handler.
 	DECLARE_MSG(R);

@@ -47,7 +47,7 @@
 #include	"ServerTimerHandlers.h"
 
 const char xServer_h_rcsId[] = __XSERVER_H ;
-const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.66 2001/02/03 19:16:33 dan_karrels Exp $" ;
+const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.67 2001/02/04 02:37:50 dan_karrels Exp $" ;
 
 using std::string ;
 using std::vector ;
@@ -242,7 +242,11 @@ REGISTER_MSG( "SQUIT", SQ ) ;
 // Kill
 REGISTER_MSG( "D", D ) ;
 
+// Wallops
 REGISTER_MSG( "WA", WA ) ;
+
+// Whois
+REGISTER_MSG( "W", W ) ;
 
 REGISTER_MSG( "R", R ) ;
 
