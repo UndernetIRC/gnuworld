@@ -17,7 +17,7 @@
 #include	"match.h"
 #include	"Network.h"
 
-const char SCANCommand_cc_rcsId[] = "$Id: SCANCommand.cc,v 1.1 2002/01/02 21:00:03 mrbean_ Exp $";
+const char SCANCommand_cc_rcsId[] = "$Id: SCANCommand.cc,v 1.2 2002/01/02 22:22:25 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -101,6 +101,10 @@ for(pos = 1; pos < st.size() ; )
 	}
 if(hostLook)
 	{
+	if(string::npos == hostName.find_first_of("@"))
+		{
+		hostName = string("*@" + hostName);
+		}
 	cList = Network->matchUserHost(hostName);
 	}
 else if(nameLook)

@@ -3,7 +3,7 @@
  */
 
 #ifndef __CCONTROL_H
-#define __CCONTROL_H "$Id: ccontrol.h,v 1.55 2002/01/01 12:42:14 mrbean_ Exp $"
+#define __CCONTROL_H "$Id: ccontrol.h,v 1.56 2002/01/02 22:22:25 mrbean_ Exp $"
 
 
 #include	<string>
@@ -100,7 +100,7 @@ protected:
 	/**
 	 * The db servers
 	 */
-	typedef map<string, ccServer*> serversMapType;
+	typedef map<string, ccServer*, noCaseCompare> serversMapType;
 
 	/**
 	 * Holds the servers map

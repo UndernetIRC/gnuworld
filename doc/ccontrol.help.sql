@@ -1,4 +1,4 @@
--- 2001-03-02 |MrBean| "$Id: ccontrol.help.sql,v 1.6 2001/12/30 19:35:09 mrbean_ Exp $"
+-- 2001-03-02 |MrBean| "$Id: ccontrol.help.sql,v 1.7 2002/01/02 22:22:21 mrbean_ Exp $"
 -- Created the file and added all help topics to the database
 
 -- 2201-03-11 |MrBean|
@@ -55,7 +55,7 @@ REMCOMMAND		4	<command> - the command to delete
 REMCOMMAND		5	<handle> - the handle of the oper you want to remove the command to
 GLINE		1	****** GLINE COMMAND ******
 GLINE		2	Glines a certain host
-GLINE		3	Syntax: /msg $BOT$ gline [duration (sec)] <user@host> <reason>
+GLINE		3	Syntax: /msg $BOT$ gline <user@host> [duration] <reason>
 GLINE		4	<duration> - the duriation in second to gline the host
 GLINE		5	<user@host> - the host to gline
 GLINE		6	<reason> - the reason for the gline

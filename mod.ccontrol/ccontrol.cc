@@ -37,7 +37,7 @@
 #include	"ip.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.110 2002/01/02 21:00:03 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.111 2002/01/02 22:22:25 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -288,8 +288,8 @@ RegisterCommand( new STATUSCommand( this, "STATUS", "Shows debug status "
 RegisterCommand( new SHUTDOWNCommand( this, "SHUTDOWN", " <REASON> Shutdown the bot "
         ,commandLevel::flg_SHUTDOWN,false,false,false,operLevel::CODERLEVEL,true ) ) ;
 
-RegisterCommand( new SCANCommand( this, "SCAN", " -h <host> / -m <real name> "
-		" Shutdown the bot ",commandLevel::flg_SCAN,false,false,false,operLevel::OPERLEVEL,true ) ) ;
+RegisterCommand( new SCANCommand( this, "SCAN", " -h <host> / -m <real name> [-v]"
+		" Scans for all users which much a certain host / real name ",commandLevel::flg_SCAN,false,false,false,operLevel::OPERLEVEL,true ) ) ;
 
 loadCommands();
 loadGlines();
@@ -787,13 +787,13 @@ switch( theEvent )
 				if(strcasecmp(tIP,"0.0.0.0"))			
 					{
 					int CurConnections = ++clientsIpMap[tIP];
-					if((CurConnections  > getExceptions("*@" + tIP)) 
+					/*if((CurConnections  > getExceptions("*@" + tIP)) 
 					    && (CurConnections > getExceptions("*@"+NewUser->getInsecureHost())))
 						{
 						MsgChanLog("Glining %s , total  connections : %d\n"
 						,tIP.c_str(),CurConnections);
 						MsgChanLog(" IP Exception : %d , HOST Exception %d\n"						
-						,getExceptions("*@" + tIP),getExceptions("*@" + NewUser->getInsecureHost()));
+						,getExceptions("*@" + tIP),getExceptions("*@" + NewUser->getInsecureHost()));*/
 
 						/*glSet = true;
 						ccGline *tmpGline;
@@ -815,27 +815,29 @@ switch( theEvent )
 								tmpGline->getHost(),
 								tmpGline->getReason(),
 								tmpGline->getExpires() - ::time(0) ) ;*/
-						}	
+						/*}	
 					else
-						{
+						{*/
 						string virtualHost = NewUser->getDescription() + "@";
 						int dots = 0;
+						string ipClass = "";
 						for(string::size_type ptr = 0;ptr < tIP.size(),dots < 3;++ptr)
 							{
 							if(tIP[ptr] == '.')
 								{
 								++dots;
 								}
-							virtualHost += tIP[ptr];
+							ipClass += tIP[ptr];
 							}
-						virtualHost += '*';
+						ipClass += '*';
+						virtualHost += ipClass;
 						CurConnections = ++virtualClientsMap[virtualHost];
-						if(CurConnections > userMaxConnection)
+						if(CurConnections > getExceptions("*@"+ipClass))
 							{
 							MsgChanLog("Virtual clones for %s connections %d\n",
 							    virtualHost.c_str(),CurConnections);
 							}
-						}
+						//}
 					}
 				}
 			if(!glSet) 
