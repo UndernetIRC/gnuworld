@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------------
--- "$Id: cservice.sql,v 1.70 2002/10/17 01:32:53 gte Exp $"
+-- "$Id: cservice.sql,v 1.71 2003/01/01 04:43:51 gte Exp $"
 -- Channel service DB SQL file for PostgreSQL.
 
 -- ChangeLog:
@@ -570,6 +570,14 @@ END;
 
 CREATE TRIGGER t_delete_ban AFTER DELETE ON bans FOR EACH ROW EXECUTE PROCEDURE delete_ban();
 
+-- Table used to store run-time configurable settings.
+
+CREATE TABLE variables (
+	var_name VARCHAR(30),
+	contents text,
+	hint text,
+	last_updated INT4,
+	PRIMARY KEY(var_name)
+);
 
 -----------------------------------------------------------------------------------------
-

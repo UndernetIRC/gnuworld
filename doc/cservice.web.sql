@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------------
--- "$Id: cservice.web.sql,v 1.27 2002/08/30 10:18:45 nighty Exp $"
+-- "$Id: cservice.web.sql,v 1.28 2003/01/01 04:43:51 gte Exp $"
 -- Channel service DB SQL file for PostgreSQL.
 --
 -- Tables specific to webbased registration process.
@@ -168,15 +168,6 @@ CREATE TABLE objections (
 -- 'N' : the objection is a regular one and everyone can see it.
 );
 
--- Table used to store run-time configurable settings.
-
-CREATE TABLE variables (
-	var_name VARCHAR(30),
-	contents text,
-	last_updated INT4,
-	PRIMARY KEY(var_name)
-);
-
 CREATE TABLE timezones (
 	tz_index SERIAL,
 	tz_name VARCHAR(128) NOT NULL,
@@ -185,5 +176,4 @@ CREATE TABLE timezones (
 	deleted INT2 DEFAULT '0',
 	last_updated INT4 NOT NULL
 );
-
 
