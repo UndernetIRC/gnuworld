@@ -10,6 +10,7 @@
 #include "StringTokenizer.h"
 
 #include "dronescan.h"
+#include "dronescanCommands.h"
 
 namespace gnuworld {
 
@@ -56,11 +57,20 @@ bool CHECKCommand::Exec( const iClient *theClient, const string& Message )
 			if(userEntropy < minEntropy || minEntropy == 0) minEntropy = userEntropy;
 			if(userEntropy > maxEntropy) maxEntropy = userEntropy;
 			
+			bot->Reply(theClient, "[%s] %0.3lf %s (%s)",
+				bot->isNormal(targetClient) ? "N" : "A",
+				userEntropy,
+				targetClient->getRealNickUserHost().c_str(),
+				targetClient->getDescription().c_str()
+				);
+			
+#if 0
 			bot->Reply(theClient, "  %15s: %0.3lf (%s)",
 				targetClient->getNickName().c_str(),
 				userEntropy,
 				bot->isNormal(targetClient) ? "Normal" : "Abnormal"
 				);
+#endif
 			}
 		
 		assert(totalUsers == theChannel->size());

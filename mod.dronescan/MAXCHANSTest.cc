@@ -7,6 +7,7 @@
  */
 
 #include "dronescan.h"
+#include "dronescanTests.h"
 
 namespace gnuworld {
 
@@ -21,13 +22,23 @@ bool MAXCHANSTest::isNormal( const Channel *theChannel )
 	for( ; chanItr != theChannel->userList_end() ; ++chanItr )
 		{
 		iClient *theClient = chanItr->second->getClient();
-		if(theClient->channels_size() >= bot->maxChans) ++normals;
+		if(theClient->channels_size() >= maxChans) ++normals;
 		if(normals >= 3) return true;
 		}
 	
 	return false;
 	
 } // bool MAXCHANSTest::isNormal( const Channel* )
+
+
+bool MAXCHANSTest::setVariable( const string& var, const string& value )
+{
+	if("MAXCHANS" != var) return false;
+	
+	maxChans = atoi(value.c_str());
+	
+	return true;
+}
 
 } // namespace ds
 

@@ -7,6 +7,7 @@
  */
 
 #include "dronescan.h"
+#include "dronescanTests.h"
 
 namespace gnuworld {
 

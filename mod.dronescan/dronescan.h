@@ -1,20 +1,21 @@
 #ifndef DRONESCAN_H
-#define DRONESCAN_H "$Id: dronescan.h,v 1.8 2003/06/14 19:45:55 jeekay Exp $"
+#define DRONESCAN_H "$Id: dronescan.h,v 1.9 2003/06/15 16:56:15 jeekay Exp $"
 
 #include <map>
 
 #include "client.h"
 
 #include "clientData.h"
-#include "dronescanCommands.h"
-#include "dronescanTests.h"
-#include "Timer.h"
 
 namespace gnuworld {
 
 class EConfig;
+class Timer;
 
 namespace ds {
+
+class Command;
+class Test;
 
 enum DS_STATE {
 	BURST,
@@ -27,13 +28,6 @@ enum LOG_TYPE {
 	WARN,
 	ERROR
 };
-
-/* The bit field values of the enabled tests */
-#define TST_ABNORMALS	0x0001
-#define TST_JOINCOUNT	0x0002
-#define TST_CHANRANGE	0x0004
-#define TST_HASOP	0x0008
-#define TST_MAXCHANS	0x0010
 
 class dronescan : public xClient {
 public:
@@ -52,6 +46,9 @@ public:
 	
 	/** This method is called after server connection. */
 	virtual int BurstChannels() ;
+
+	/** This is called when we receive a CTCP */
+	virtual int OnCTCP( iClient*, const string&, const string&, bool ) ;
 	
 	/** Receive network events. */
 	virtual int OnEvent( const eventType&, void*, void*, void*, void* ) ;
@@ -123,15 +120,25 @@ public:
 	/** Reply to a given iClient. */
 	void Reply(const iClient*, char*, ...) ;
 	
-	/** See if a given test is enabled. */
-	inline bool testEnabled(testEnabledType theTest)
-		{ return ((enabledTests & theTest) != 0); }
-	
 	/** Return a users access */
 	unsigned short getAccess( const iClient* );
 	
 	
-	/** Configuration variables used by tests. */
+	/* Test control */
+	/** Test map type. */
+	typedef map< string, Test* > testMapType;
+	typedef testMapType::value_type testPairType;
+	bool RegisterTest(Test*);
+	bool UnRegisterTest(const string&);
+	
+	/** Set a variable in one of the tests. */
+	Test *setTestVariable(const string&, const string&);
+
+
+	/* Configuration variables used by tests. */
+	
+	/** Global options */
+	unsigned int voteCutoff;
 	
 	/** Abnormals options */
 	double channelMargin;
@@ -139,9 +146,6 @@ public:
 	/** Channel range options */
 	double channelRange;
 	
-	/** Maxchans options */
-	unsigned int maxChans;
-	 
 protected:
 	/** Configuration file. */
 	EConfig *dronescanConfig;
@@ -160,9 +164,6 @@ protected:
 	/** Average nickname entropy. */
 	double averageEntropy;
 	unsigned int totalNicks;
-	
-	/** What tests to enable. */
-	testEnabledType enabledTests;
 	
 	/** Margins. */
 	double nickMargin;
@@ -192,11 +193,9 @@ protected:
 	typedef commandMapType::value_type commandPairType;
 	commandMapType commandMap;
 	bool RegisterCommand(Command*);
-	
-	/** Test map type. */
-	typedef vector< Test* > testVectorType;
-	testVectorType testVector;
-	void RegisterTest(Test*);
+
+	/** Tests vector */
+	testMapType testMap;
 }; // class dronescan
 
 } // namespace ds

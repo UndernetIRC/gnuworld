@@ -1,9 +1,9 @@
 /*
- * HASOPTest.cc
+ * HASALLOPTest.cc
  *
- * Checks to see whether a channel has any ops in it.
+ * Checks to see whether a channel has all ops in it.
  *
- * 2003-05-06	GK@NG	Initial writing
+ * 2003-06-14	GK@NG	Initial writing
  */
 
 #include "dronescan.h"
@@ -13,15 +13,15 @@ namespace gnuworld {
 
 namespace ds {
 
-bool HASOPTest::isNormal( const Channel *theChannel )
+bool HASALLOPTest::isNormal( const Channel *theChannel )
 {
 	Channel::const_userIterator chanItr = theChannel->userList_begin();
 	
 	for( ; chanItr != theChannel->userList_end() ; ++chanItr )
-		if(chanItr->second->isModeO()) return true;
+		if(!chanItr->second->isModeO()) return true;
 	
 	return false;
-}
+} // bool HASALLOPTest::isNormal(const Channel*)
 
 } // namespace ds
 

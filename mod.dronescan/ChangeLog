@@ -1,0 +1,8 @@
+2003-06-14 0.0.1 Jeekay
+* Changed channel finding to scoring instead of voting.
+* Added scoring cutoff.
+* Added HASALLOPS and COMMONREAL tests.
+* Moved configuration items into test objects.
+* Added dynamic reconfiguration via SET.
+* Made getAccess() allow minimal oper access by default.
+* Bumped version to 0.0.1

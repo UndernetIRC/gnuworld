@@ -12,6 +12,9 @@
 
 #include "clientData.h"
 #include "dronescan.h"
+#include "dronescanCommands.h"
+#include "dronescanTests.h"
+#include "Timer.h"
 
 namespace gnuworld {
 
@@ -54,8 +57,8 @@ currentState = BURST;
 averageEntropy = 0;
 totalNicks = 0;
 
-/* What tests do we enable? */
-enabledTests = atoi(dronescanConfig->Require("enabledTests")->second.c_str());
+/* What is the voting cutoff? */
+voteCutoff = atoi(dronescanConfig->Require("voteCutoff")->second.c_str());
 
 /*
  * Set up initial margins.
@@ -68,40 +71,46 @@ channelMargin = atof(dronescanConfig->Require("channelMargin")->second.c_str());
 nickMargin = atof(dronescanConfig->Require("nickMargin")->second.c_str());
 channelCutoff = atoi(dronescanConfig->Require("channelCutoff")->second.c_str());
 
-if(testEnabled(TST_ABNORMALS))
-	{
-	RegisterTest(new ABNORMALSTest(this, "ABNORMALS", "Checks for the percentage of normal clients."));
-	}
+RegisterTest(new ABNORMALSTest(this, "ABNORMALS", "Checks for the percentage of normal clients.", 10));
+RegisterTest(new COMMONREALTest(this, "COMMONREAL", "Checks for common realnames", 10));
 
-if(testEnabled(TST_HASOP))
-	{
-	RegisterTest(new HASOPTest(this, "HASOP", "Checks if a channel has any ops."));
-	}
+RegisterTest(new HASOPTest(this, "HASOP", "Checks if a channel has no ops.", 10));
 
-if(testEnabled(TST_JOINCOUNT))
-	{
-	/* Set up join counter config options. */
-	jcInterval = atoi(dronescanConfig->Require("jcInterval")->second.c_str());
-	jcCutoff = atoi(dronescanConfig->Require("jcCutoff")->second.c_str());
-	}
+RegisterTest(new HASALLOPTest(this, "HASALLOP", "Checks if a channel has all ops.", 10));
 
-if(testEnabled(TST_CHANRANGE))
-	{
-	/* Set up channel range config options */
-	channelRange = atof(dronescanConfig->Require("channelRange")->second.c_str());
+/* Set up join counter config options. */
+jcInterval = atoi(dronescanConfig->Require("jcInterval")->second.c_str());
+jcCutoff = atoi(dronescanConfig->Require("jcCutoff")->second.c_str());
+
+/* Set up channel range config options */
+channelRange = atof(dronescanConfig->Require("channelRange")->second.c_str());
+/* Register the test */
+RegisterTest(new RANGETest(this, "RANGE", "Checks the entropy range.", 10));
+
+/* Register the test */
+RegisterTest(new MAXCHANSTest(this, "MAXCHANS", "Checks the max channel membership of a channel.", 10));
+
+/* Set up variables that our tests will need */
+typedef vector<string> testVarsType;
+testVarsType testVars;
+testVars.push_back("maxChans");
+testVars.push_back("realCutoff");
+
+for( testVarsType::const_iterator itr = testVars.begin() ;
+     itr != testVars.end() ; ++itr) {
+	string theValue = dronescanConfig->Require(*itr)->second;
 	
-	/* Register the test */
-	RegisterTest(new RANGETest(this, "RANGE", "Checks the entropy range."));
+	if(Test *theTest = setTestVariable(string_upper(*itr), theValue)) {
+		elog	<< "dronescan> Test " << theTest->getName()
+			<< " accepted parameter " << *itr
+			<< " @ " << theValue
+			<< endl;
+	} else {
+		elog	<< "dronescan> No test accepted variable: "
+			<< *itr << " @ " << theValue
+			<< endl;
 	}
-
-if(testEnabled(TST_MAXCHANS))
-	{
-	/* Set up the max chans config options */
-	maxChans = atoi(dronescanConfig->Require("maxChans")->second.c_str());
-	
-	/* Register the test */
-	RegisterTest(new MAXCHANSTest(this, "MAXCHANS", "Checks the max channel membership of a channel."));
-	}
+}
 
 /* Set up console logging level. */
 consoleLevel = atoi(dronescanConfig->Require("consoleLevel")->second.c_str());
@@ -113,6 +122,7 @@ customDataCounter = 0;
 theTimer = new Timer();
 
 /* Register commands available to users */
+RegisterCommand(new ACCESSCommand(this, "ACCESS", "() (<user>)"));
 RegisterCommand(new CHECKCommand(this, "CHECK", "(<#channel>) (<user>)"));
 } // dronescan::dronescan(const string&)
 
@@ -148,11 +158,11 @@ for(commandMapType::iterator itr = commandMap.begin() ;
 commandMap.clear();
 
 /* Delete tests */
-for(testVectorType::iterator itr = testVector.begin() ;
-    itr != testVector.end() ; ++itr) {
-	delete *itr;
+for(testMapType::iterator itr = testMap.begin() ;
+    itr != testMap.end() ; ++itr) {
+	delete itr->second;
 }
-testVector.clear();
+testMap.clear();
 
 /* Iterate over clients to delete clientData */
 for(xNetwork::const_clientIterator ptr = Network->clients_begin() ;
@@ -194,12 +204,9 @@ void dronescan::ImplementServer( xServer* theServer )
 	/* Register for all channel events */
 	theServer->RegisterChannelEvent( xServer::CHANNEL_ALL, this );
 
-	/* Set up our JC counter if needed */
-	if(testEnabled(TST_JOINCOUNT))
-		{
-		time_t theTime = time(NULL) + jcInterval;
-		tidClearJoinCounter = theServer->RegisterTimer(theTime, this, 0);
-		}
+	/* Set up our JC counter */
+	time_t theTime = time(NULL) + jcInterval;
+	tidClearJoinCounter = theServer->RegisterTimer(theTime, this, 0);
 
 	xClient::ImplementServer( theServer );
 } // dronescan::ImplementServer(xServer*)
@@ -235,6 +242,26 @@ int dronescan::BurstChannels()
 	return xClient::BurstChannels();
 } // dronescan::BurstChannels()
 
+
+int dronescan::OnCTCP( iClient* theClient, const string& CTCP,
+    const string& Message, bool Secure )
+{
+	StringTokenizer st(CTCP);
+	
+	if(st.empty()) return false;
+	
+	string Command = string_upper(st[0]);
+
+	if("DCC" == Command) {
+		DoCTCP(theClient, CTCP, "REJECT");
+	} else if("PING" == Command) {
+		DoCTCP(theClient, CTCP, Message);
+	} else if("VERSION" == Command) {
+		DoCTCP(theClient, CTCP, "GNUWorld DroneScan v0.0.1");
+	}
+
+	return xClient::OnCTCP(theClient, CTCP, Message, Secure);
+}
 
 /**
  * Here we receive network events that we are registered for.
@@ -299,24 +326,21 @@ int dronescan::OnChannelEvent( const channelEventType& theEvent,
 	checkChannel( theChannel );
 	
 	/* Do join count processing if applicable */
-	if(testEnabled(TST_JOINCOUNT))
+	string channelName = theChannel->getName();
+
+	jcChanMap[channelName]++;
+
+	unsigned int joinCount = jcChanMap[channelName];
+
+	if((joinCount >= jcCutoff) && (joinCount % jcCutoff == 0))
 		{
-		string channelName = theChannel->getName();
-		
-		jcChanMap[channelName]++;
-		
-		unsigned int joinCount = jcChanMap[channelName];
-		
-		if((joinCount >= jcCutoff) && (joinCount % jcCutoff == 0))
-			{
-			log(WARN, "%s has had %u joins within the last %us.",
-				channelName.c_str(),
-				joinCount,
-				jcInterval
-				);
-			}
+		log(WARN, "%s has had %u joins within the last %us.",
+			channelName.c_str(),
+			joinCount,
+			jcInterval
+			);
 		}
-	
+
 	return 0;
 }
 
@@ -327,9 +351,6 @@ int dronescan::OnChannelEvent( const channelEventType& theEvent,
 int dronescan::OnPrivateMessage( iClient* theClient, const string& Message, bool secure )
 {
 	if(!getAccess(theClient)) return 0;
-	
-	elog << "Got access " << getAccess(theClient) << " from " <<
-	theClient->getNickName() << endl;
 	
 	StringTokenizer st(Message);
 	
@@ -350,33 +371,34 @@ int dronescan::OnPrivateMessage( iClient* theClient, const string& Message, bool
 		return 0;
 		}
 	
+#if 0
+/* This is commented out because it doesn't work at the moment */
 	if("RELOAD" == Command)
 		{
 		getUplink()->UnloadClient(this, "Reloading...");
 		getUplink()->LoadClient("libdronescan.la", getConfigFileName());
 		return 0;
 		}
+#endif
 	
 	if("STATS" == Command)
 		{
 		Reply(theClient, "Allocated custom data: %d", customDataCounter);
-		if(1)
-			Reply(theClient, "CM/NM/CC: %0.2lf/%0.2lf/%u",
-				channelMargin,
-				nickMargin,
-				channelCutoff
-				);
-		if(testEnabled(TST_JOINCOUNT))
-			Reply(theClient, "jcI/jcC : %u/%u",
-				jcInterval,
-				jcCutoff
-				);
-		if(testEnabled(TST_CHANRANGE))
-			Reply(theClient, "CR      : %0.3lf",
-				channelRange);
-		if(testEnabled(TST_MAXCHANS))
-			Reply(theClient, "MaxChans: %u",
-				maxChans);
+
+		Reply(theClient, "CM/NM/CC: %0.2lf/%0.2lf/%u",
+			channelMargin,
+			nickMargin,
+			channelCutoff
+			);
+
+		Reply(theClient, "jcI/jcC : %u/%u",
+			jcInterval,
+			jcCutoff
+			);
+
+		Reply(theClient, "CR      : %0.3lf",
+			channelRange);
+
 		return 0;
 		}
 	
@@ -412,6 +434,7 @@ int dronescan::OnPrivateMessage( iClient* theClient, const string& Message, bool
 			unsigned int newCC = atoi(st[2].c_str());
 			channelCutoff = newCC;
 			resetAndCheck();
+			return 1;
 			}
 		if("CM" == Option)
 			{
@@ -419,6 +442,7 @@ int dronescan::OnPrivateMessage( iClient* theClient, const string& Message, bool
 			if(newCM < 0 || newCM > 1) return 0;
 			channelMargin = newCM;
 			resetAndCheck();
+			return 1;
 			}
 		if("NM" == Option)
 			{
@@ -426,6 +450,7 @@ int dronescan::OnPrivateMessage( iClient* theClient, const string& Message, bool
 			if(newNM < 0 || newNM > 1) return 0;
 			nickMargin = newNM;
 			resetAndCheck();
+			return 1;
 			}
 		
 		/* Channel entropy options */
@@ -435,7 +460,26 @@ int dronescan::OnPrivateMessage( iClient* theClient, const string& Message, bool
 			if(newCR < 0) return 0;
 			channelRange = newCR;
 			resetAndCheck();
+			return 1;
 			}
+		
+		/* None of the hardcoded options have hit. Try dynamic. */
+		if(Test *theTest = setTestVariable(Option, st[2])) {
+			log(INFO, "%s set %s to %s in %s",
+				theClient->getNickName().c_str(),
+				Option.c_str(),
+				st[2].c_str(),
+				theTest->getName().c_str()
+				);
+			
+			resetAndCheck();
+			return 1;
+		} else  {
+			Reply(theClient, "No test accepted the variable %s",
+				Option.c_str()
+				);
+			return 0;
+		}
 		}
 	
 	return 0;
@@ -662,38 +706,32 @@ void dronescan::checkChannels()
 /** Check a channel for drones. */
 bool dronescan::checkChannel( const Channel *theChannel , const iClient *theClient )
 {
-	unsigned short int normal = 0;
+	unsigned short int failed = 0;
 
 	/* Iterate over the tests. */
-	for(testVectorType::iterator testItr = testVector.begin() ;
-	    testItr != testVector.end() ; ++testItr )
+	for(testMapType::iterator testItr = testMap.begin() ;
+	    testItr != testMap.end() ; ++testItr )
 		{
-		bool hasPassed = (*testItr)->isNormal(theChannel);
+		bool hasPassed = testItr->second->isNormal(theChannel);
 
 		if(theClient)
 			{
 			Reply(theClient, "%20s: %s",
-				(*testItr)->getName().c_str(),
+				testItr->second->getName().c_str(),
 				hasPassed ? "PASSED" : "FAILED"
 				);
 			}
 
-		if(hasPassed) ++normal;
+		if(!hasPassed) failed += testItr->second->getWeight();
 		}
 
 	/* If we were checking for a client, don't output to console. */
 	if(theClient) return true;
 	
-	/* If the normal count is over half of the total test numbers
-	 * we report that it is normal. Else it is abnormal. */
+	/* If the failure count is over or equal to the vote cutoff
+	 * report this channel as abnormal. */
 	
-	/* Use >= so for an even size() we need over half to fail */
-	if(normal >= (testVector.size() / 2))
-		{
-		/* This channel is voted normal. */
-		return true;
-		}
-	else
+	if(failed >= voteCutoff)
 		{
 		/* This channel is voted abnormal. */
 		stringstream chanStat, chanParams;
@@ -710,9 +748,8 @@ bool dronescan::checkChannel( const Channel *theChannel , const iClient *theClie
 			chanParams << theChannel->getLimit();
 		}
 		
-		log(WARN, "[%u/%u] (%3u) %s +%s %s",
-			(testVector.size() - normal),
-			testVector.size(),
+		log(WARN, "[%u] (%3u) %s +%s %s",
+			failed,
 			theChannel->size(),
 			theChannel->getName().c_str(),
 			chanStat.str().c_str(),
@@ -720,6 +757,11 @@ bool dronescan::checkChannel( const Channel *theChannel , const iClient *theClie
 			);
 
 		return false;
+		}
+	else
+		{
+		/* This channel is voted normal. */
+		return true;
 		}
 }
 
@@ -826,32 +868,22 @@ void dronescan::setConsoleTopic()
 	stringstream setTopic;
 	setTopic	<< getCharYYXXX() << " T "
 			<< consoleChannel << " :"
-			<< "enabledTests: " << enabledTests
 			;
 	
-	if(1)
-		{
-		setTopic	<< "  ||"
-				<< "  channelMargin: " << channelMargin
-				<< "  nickMargin: " << nickMargin
-				<< "  channelCutoff: " << channelCutoff
-				;
-		}
-	
-	if(testEnabled(TST_JOINCOUNT))
-		{
-		setTopic	<< "  ||"
-				<< "  jcInterval: " << jcInterval
-				<< "  jcCutoff: " << jcCutoff
-				;
-		}
-	
-	if(testEnabled(TST_CHANRANGE))
-		{
-		setTopic	<< "  ||"
-				<< "  channelRange: " << channelRange
-				;
-		}
+	setTopic	<< "  ||"
+			<< "  channelMargin: " << channelMargin
+			<< "  nickMargin: " << nickMargin
+			<< "  channelCutoff: " << channelCutoff
+			;
+
+	setTopic	<< "  ||"
+			<< "  jcInterval: " << jcInterval
+			<< "  jcCutoff: " << jcCutoff
+			;
+
+	setTopic	<< "  ||"
+			<< "  channelRange: " << channelRange
+			;
 	
 	Write(setTopic);
 }
@@ -875,11 +907,12 @@ void dronescan::Reply(const iClient *theClient, char *format, ...)
 unsigned short dronescan::getAccess(const iClient *theClient)
 {
 	Channel *theChannel = Network->findChannel(consoleChannel);
+	/* TODO: Complain loudly */
 	if(!theChannel) return 0;
 	
 	ChannelUser *theCU = theChannel->findUser(theClient);
 	if(!theCU) {
-		/* TODO: Complain loudly */
+		if(theClient->isOper()) return 100;
 		return 0;
 	}
 	
@@ -905,11 +938,34 @@ bool dronescan::RegisterCommand( Command *theCommand )
 
 
 /** Register a new test. */
-void dronescan::RegisterTest( Test *theTest )
+bool dronescan::RegisterTest( Test *theTest )
 {
-	testVector.push_back(theTest);
+	return testMap.insert( testPairType(theTest->getName(), theTest) ).second;
 }
 
+/** Unregister a test. */
+bool dronescan::UnRegisterTest( const string& testName )
+{
+	testMapType::iterator ptr = testMap.find( testName );
+	if( ptr == testMap.end() ) return false;
+	
+	delete ptr->second;
+	testMap.erase(ptr);
+	
+	return true;
+}
+
+/** Set a test variable. */
+Test *dronescan::setTestVariable( const string& var, const string& value )
+{
+	for( testMapType::iterator testItr = testMap.begin() ;
+	     testItr != testMap.end() ; ++testItr ) {
+		if(testItr->second->setVariable(var, value))
+			return testItr->second;
+	}
+	
+	return 0;
+}
 
 
 /** Return usage information for a client */

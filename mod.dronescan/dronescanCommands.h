@@ -1,5 +1,5 @@
 #ifndef DRONESCANCOMMANDS_H
-#define DRONESCANCOMMANDS_H "$Id: dronescanCommands.h,v 1.1 2003/05/06 22:17:33 jeekay Exp $"
+#define DRONESCANCOMMANDS_H "$Id: dronescanCommands.h,v 1.2 2003/06/15 16:56:15 jeekay Exp $"
 
 namespace gnuworld {
 
@@ -53,7 +53,7 @@ class commandName##Command : public Command \
 };
 
 /* Admin commands */
-
+DECLARE_COMMAND( ACCESS )
 
 /* Debug commands */
 DECLARE_COMMAND( CHECK )
