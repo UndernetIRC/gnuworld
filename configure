@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# From configure.in Revision: 1.18 
+# From configure.in Revision: 1.19 
 
 
 
@@ -3374,7 +3374,7 @@ echo $ac_n "checking for libpq++.h""... $ac_c" 1>&6
 echo "configure:3375: checking for libpq++.h" >&5
 if test -f "/usr/local/pgsql/include/libpq++.h"; then
 	PGSQL_INCLUDE=/usr/local/pgsql/include
-	PGSQL_LIB=$PGSQL_INCLUDE
+	PGSQL_LIB=/usr/local/pgsql/lib
 elif test -f "/usr/include/pgsql/libpq++.h"; then
 	PGSQL_INCLUDE=/usr/include/pgsql
 	PGSQL_LIB=/usr/lib/pgsql
