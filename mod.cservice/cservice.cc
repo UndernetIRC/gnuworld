@@ -2,7 +2,7 @@
  * cservice.cc
  * Author: Greg Sikorski
  * Purpose: Overall control client.
- * $Id: cservice.cc,v 1.233 2003/06/11 22:37:29 gte Exp $
+ * $Id: cservice.cc,v 1.234 2003/06/11 22:58:01 gte Exp $
  */
 
 #include	<new>
@@ -309,8 +309,8 @@ preloadUserCache();
  * Init the admin log.
  */
 
-adminLog.openFile( adminlogPath.c_str() ) ;
-if( !adminLog.isOpen() )
+adminLog.open( adminlogPath.c_str() ) ;
+if( !adminLog.is_open() )
 	{
 	clog	<< "*** Unable to open CMaster admin log file: "
 			<< adminlogPath

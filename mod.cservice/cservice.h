@@ -1,11 +1,11 @@
 /**
  * cservice.h
  * Author: Greg Sikorski
- * $Id: cservice.h,v 1.95 2003/06/11 22:37:29 gte Exp $
+ * $Id: cservice.h,v 1.96 2003/06/11 22:58:01 gte Exp $
  */
 
 #ifndef __CSERVICE_H
-#define __CSERVICE_H "$Id: cservice.h,v 1.95 2003/06/11 22:37:29 gte Exp $"
+#define __CSERVICE_H "$Id: cservice.h,v 1.96 2003/06/11 22:58:01 gte Exp $"
 
 #include	<string>
 #include	<vector>
@@ -487,7 +487,7 @@ public:
  	 * Global filesystem level admin logging stream.
 	 */
 
-	gnuworld::ELog		cservice::adminLog ;
+	ofstream	adminLog ;
 
 	string adminlogPath;
 } ;
