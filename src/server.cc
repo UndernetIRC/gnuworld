@@ -44,7 +44,7 @@
 #include	"moduleLoader.h"
 
 const char xServer_h_rcsId[] = __XSERVER_H ;
-const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.37 2001/01/01 07:40:06 gte Exp $" ;
+const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.38 2001/01/03 07:22:48 gte Exp $" ;
 
 using std::string ;
 using std::vector ;
@@ -1704,7 +1704,10 @@ if( '+' == Param[ whichToken ][ 0 ] )
 			case 's':
 				theChan->setMode( Channel::MODE_S ) ;
 				break ;
-
+			case 'i':
+				theChan->setMode( Channel::MODE_I ) ;
+				break ;
+ 
 			// With these next two, Im assuming that ircu has properly
 			// formatted the bursts.
 			// This could cause a seg fault or miss a user
