@@ -8,7 +8,7 @@
  *
  * Caveats: None
  *
- * $Id: ADDUSERCommand.cc,v 1.9 2001/01/28 23:16:33 gte Exp $
+ * $Id: ADDUSERCommand.cc,v 1.10 2001/01/30 00:12:16 gte Exp $
  */
  
 #include	<string>
@@ -19,7 +19,7 @@
 #include	"levels.h"
 #include	"libpq++.h"
 
-const char ADDUSERCommand_cc_rcsId[] = "$Id: ADDUSERCommand.cc,v 1.9 2001/01/28 23:16:33 gte Exp $" ;
+const char ADDUSERCommand_cc_rcsId[] = "$Id: ADDUSERCommand.cc,v 1.10 2001/01/30 00:12:16 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -180,6 +180,16 @@ if( PGRES_COMMAND_OK == status )
 		targetUser->getUserName().c_str(),
 		theChan->getName().c_str(),
 		targetAccess);
+
+		/*
+		 *  "If they where added to *, set their invisible flag" (Ace).
+		 */
+
+		if (theChan->getName() == "*")
+		{
+			targetUser->setFlag(sqlUser::F_INVIS);
+			targetUser->commit();
+		}
 	}
 else
 	{

@@ -8,7 +8,7 @@
  * Can optionally narrow down selection using a number of switches.
  * Can display all channels a user has access on (TODO). 
  *
- * $Id: ACCESSCommand.cc,v 1.19 2001/01/29 01:08:28 gte Exp $
+ * $Id: ACCESSCommand.cc,v 1.20 2001/01/30 00:12:16 gte Exp $
  */
 
 #include	<string>
@@ -22,7 +22,7 @@
 
 // Todo: NO limit for * access 600+!
 
-const char ACCESSCommand_cc_rcsId[] = "$Id: ACCESSCommand.cc,v 1.19 2001/01/29 01:08:28 gte Exp $" ;
+const char ACCESSCommand_cc_rcsId[] = "$Id: ACCESSCommand.cc,v 1.20 2001/01/30 00:12:16 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -197,10 +197,15 @@ if( PGRES_TUPLES_OK == status )
 		{
 			bot->Notice(theClient, "There are more than 15 matching entries.");
 			bot->Notice(theClient, "Please restrict your query."); 
-		} else
+		} else if (results > 0)
 		{
 			bot->Notice(theClient, "End of access list");
+		} 
+			else
+		{
+			bot->Notice(theClient, "No Match!");
 		}
+
 	} 
 
 delete[] theQuery.str() ;
