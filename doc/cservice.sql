@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------------
--- "$Id: cservice.sql,v 1.2 2000/11/19 00:51:38 dan_karrels Exp $"
+-- "$Id: cservice.sql,v 1.3 2000/12/10 01:40:52 isomer Exp $"
 -- Channel service DB SQL file for PostgreSQL.
 
 -- ChangeLog:
@@ -144,6 +144,7 @@ CREATE TABLE levels (
 -- 0x00 01 -- Logged in
 -- 0x00 02 -- AutoOp
 -- 0x00 04 -- Protect  (From CS source, unused)
+-- 0x00 08 -- Temp forced access. (removed on logout).
 	suspend_expires TIMESTAMP,
 	suspend_by VARCHAR( 128 ),
 	added TIMESTAMP,
