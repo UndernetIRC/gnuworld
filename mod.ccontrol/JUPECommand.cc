@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: JUPECommand.cc,v 1.19 2004/05/27 12:17:39 jeekay Exp $
+ * $Id: JUPECommand.cc,v 1.20 2004/05/27 15:02:17 jeekay Exp $
  */
 
 #include	<new>
@@ -34,7 +34,7 @@
 #include	"Constants.h"
 #include	"config.h"
 
-RCSTAG( "$Id: JUPECommand.cc,v 1.19 2004/05/27 12:17:39 jeekay Exp $" ) ;
+RCSTAG( "$Id: JUPECommand.cc,v 1.20 2004/05/27 15:02:17 jeekay Exp $" ) ;
 
 namespace gnuworld
 {
@@ -103,12 +103,7 @@ iServer* jupeServer = new (std::nothrow) iServer(
 	time( 0 ),
 	st.assemble( 2 ) ) ;
 assert( jupeServer != 0 ) ;
-
-/* Commented out as ircu doesn't seem to handle JU tokens at the moment
- * .... or our implementation of them is wrong.
- *  --Jeekay 20040527
- */
-//jupeServer->setJupe();
+jupeServer->setJupe();
 
 // Attach the new (fake) server.
 server->AttachServer( jupeServer, bot ) ;
