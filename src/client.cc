@@ -26,7 +26,7 @@
 #include	"events.h"
 
 const char xClient_h_rcsId[] = __XCLIENT_H ;
-const char xClient_cc_rcsId[] = "$Id: client.cc,v 1.5 2000/08/02 22:48:10 dan_karrels Exp $" ;
+const char xClient_cc_rcsId[] = "$Id: client.cc,v 1.6 2000/08/02 22:49:43 dan_karrels Exp $" ;
 
 using std::string ;
 using std::strstream ;
@@ -404,6 +404,7 @@ Write( "%s D %s :%s",
 string localReason( reason ) ;
 
 MyUplink->PostEvent( EVT_KILL,
+	0,
 	static_cast< void* >( theClient ),
 	static_cast< void* >( &localReason ) ) ;
 

@@ -5,7 +5,7 @@
  */
 
 #ifndef __EVENTS_H
-#define __EVENTS_H "$Id: events.h,v 1.3 2000/08/01 02:10:54 dan_karrels Exp $"
+#define __EVENTS_H "$Id: events.h,v 1.4 2000/08/02 22:49:43 dan_karrels Exp $"
 
 namespace gnuworld
 {
@@ -69,7 +69,7 @@ typedef int channelEventType ;
 /**
  * Arguments for the various events:
  * EVT_KILL
- *  1) iClient* or iServer* - source
+ *  1) iClient* or iServer* - source, could be NULL
  *  2) iClient* - target
  *  3) string* - reason
  * EVT_QUIT
