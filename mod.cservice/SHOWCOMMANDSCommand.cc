@@ -8,7 +8,7 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char SHOWCOMMANDSCommand_cc_rcsId[] = "$Id: SHOWCOMMANDSCommand.cc,v 1.6 2001/01/16 01:31:40 gte Exp $" ;
+const char SHOWCOMMANDSCommand_cc_rcsId[] = "$Id: SHOWCOMMANDSCommand.cc,v 1.7 2001/01/20 22:05:43 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -54,15 +54,14 @@ bool SHOWCOMMANDSCommand::Exec( iClient* theClient, const string& Message )
 	if (level >= 900) bot->Notice(theClient, "\002Level  900\002: shutdown");
 	if (level >= 750) bot->Notice(theClient, "\002Level  750\002: purge");
 	if (level >= 600) bot->Notice(theClient, "\002Level  600\002: register remignore*");
-	if (level >= 500) bot->Notice(theClient, "\002Level  500\002: set*");
-	if (level >= 450) bot->Notice(theClient, "\002Level  450\002: join* part*"); 
+	if (level >= 500) bot->Notice(theClient, "\002Level  500\002: set*"); 
 	if (level >= 400) bot->Notice(theClient, "\002Level  400\002: adduser clearmode* modinfo remuser"); 
-	if (level >= 100) bot->Notice(theClient, "\002Level  100\002: deop invite op suspend* unsuspend*"); 
+	if (level >= 100) bot->Notice(theClient, "\002Level  100\002: deop invite op suspend unsuspend");
 	if (level >= 75) bot->Notice(theClient,  "\002Level   75\002: ban* unban*"); 
 	if (level >= 50) bot->Notice(theClient,  "\002Level   50\002: kick topic");
 	if (level >= 25) bot->Notice(theClient,  "\002Level   25\002: voice devoice");
 	if (level >= 1) bot->Notice(theClient,   "\002Level    1\002: status"); 
-	if (level >= 0) bot->Notice(theClient,   "\002Level    0\002: access banlist chaninfo info help* lbanlist* login motd* newpass* showcommands showignore* verify"); 
+	if (level >= 0) bot->Notice(theClient,   "\002Level    0\002: access banlist chaninfo info help* lbanlist* login motd* newpass showcommands showignore* verify"); 
 	bot->Notice(theClient, "Commands marked * are semi-complete :)");
  
 	return true ;
