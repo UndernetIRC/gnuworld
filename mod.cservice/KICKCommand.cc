@@ -11,7 +11,7 @@
 *
 * Suggestion: Support several nicks by seperating them with a comma.
 *             IE: /msg E kick #coder-com nick1,nick2,nick3 get outta here!
-* $Id: KICKCommand.cc,v 1.4 2001/01/27 04:22:19 gte Exp $
+* $Id: KICKCommand.cc,v 1.5 2001/02/03 22:12:00 gte Exp $
 */
 
 #include        <string>
@@ -24,7 +24,7 @@
 #include        "responses.h"
 #include		"match.h"
 
-const char KICKCommand_cc_rcsId[] = "$Id: KICKCommand.cc,v 1.4 2001/01/27 04:22:19 gte Exp $" ;
+const char KICKCommand_cc_rcsId[] = "$Id: KICKCommand.cc,v 1.5 2001/02/03 22:12:00 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -151,7 +151,7 @@ bool KICKCommand::Exec( iClient* theClient, const string& Message )
 		args = "No reason supplied";
 	}
  
-	string reason = "(" + theClient->getNickName() + ") ";
+	string reason = "(" + theUser->getUserName() + ") ";
 	reason += args;
 	
 	bot->Kick(tmpChan, toBoot, reason);

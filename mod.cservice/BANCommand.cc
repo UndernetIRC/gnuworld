@@ -12,7 +12,7 @@
  *
  * Caveats: None.
  *
- * $Id: BANCommand.cc,v 1.9 2001/02/02 20:20:44 gte Exp $
+ * $Id: BANCommand.cc,v 1.10 2001/02/03 22:12:00 gte Exp $
  */
 
 #include	<string>
@@ -27,7 +27,7 @@
 #include	"responses.h"
 #include	"match.h"
 
-const char BANCommand_cc_rcsId[] = "$Id: BANCommand.cc,v 1.9 2001/02/02 20:20:44 gte Exp $" ;
+const char BANCommand_cc_rcsId[] = "$Id: BANCommand.cc,v 1.10 2001/02/03 22:12:00 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -251,6 +251,9 @@ bot->Write( s );
 delete[] s.str();
  
 /* Kick 'em all out. */
+
+if (banLevel == 42) banReason = "..I'll have a pan-galactic gargleblaster please!";
+
 string finalReason = "(" + theUser->getUserName() + ") " + banReason; 
 if( !clientsToKick.empty() )
 	{

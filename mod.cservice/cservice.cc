@@ -564,7 +564,7 @@ else if(Command == "VERSION")
 	xClient::DoCTCP(theClient, CTCP,
 		"Undernet P10 Channel Services Version 2 ["
 		__DATE__ " " __TIME__
-		"] ($Id: cservice.cc,v 1.80 2001/02/03 17:06:35 gte Exp $)");
+		"] ($Id: cservice.cc,v 1.81 2001/02/03 22:12:00 gte Exp $)");
 	}
 else if(Command == "PROBLEM?")
 	{
@@ -1564,79 +1564,15 @@ switch( whichEvent )
 			return 0;
 			}
 
-		/*
+		/* 
 		 * First thing we do - check if this person is banned.
+		 * If so, they're booted out.
 		 */ 
-
-		vector< sqlBan* >* banList = getBanRecords(reggedChan);
-		vector< sqlBan* >::iterator ptr = banList->begin();
-		bool deleted = false;
-
-		while (ptr != banList->end())
+		if (checkBansOnJoin(reggedChan, theClient))
 			{
-			sqlBan* theBan = *ptr; 
-
-			/* Has this ban expired? */ 
-			if (theBan->getExpires() <= currentTime())
-				{
-				/* Delete this ban.. */
-				strstream s;
-				s	<< getCharYYXXX()
-					<< " M "
-					<< reggedChan->getName()
-					<< " -b "
-					<< theBan->getBanMask()
-					<< ends;
-				
-				Write( s );
-				delete[] s.str();
-
-				ptr = banList->erase(ptr); 
-				theBan->deleteRecord();
-
-				delete(theBan);
-				deleted = true;
-				}
-			else
-				{
-				/* Matching ban? */ 
-				if(match(theBan->getBanMask(),
-					theClient->getNickUserHost()) == 0)
-					{ 
-					strstream s;
-					s	<< getCharYYXXX()
-						<< " M "
-						<< reggedChan->getName()
-						<< " +b "
-						<< theBan->getBanMask()
-						<< ends;
-					
-					Write( s );
-					delete[] s.str(); 
-
-					Kick(theChan, theClient,
-						string( "("
-						+ theBan->getSetBy()
-						+ ") "
-						+ theBan->getReason()) );
-					/* 
-					 * Thats it.. we aren't going to
-					 * op them or anything.
-					 * We break out of the select.
-					 */
-					break;
-					} /* Matching Ban */ 
-				} /* Not expired. */
-			if (deleted) 
-				{
-				deleted = false;
-				}
-			else
-				{
-				++ptr;
-				}
-			} /* while() */
-
+			break;
+			}
+ 
 		/* Is it time to set an autotopic? */
 		if (reggedChan->getFlag(sqlChannel::F_AUTOTOPIC) &&
 			(reggedChan->getLastTopic()
@@ -1698,6 +1634,84 @@ switch( whichEvent )
 
 return xClient::OnChannelEvent( whichEvent, theChan,
 	data1, data2, data3, data4 );
+}
+
+/*--checkBansOnJoin-----------------------------------------------------------
+ *
+ * This function compares a client with any active bans set in the DB.
+ * If matched, the ban is applied and the user is kicked.
+ * Returns true if matched, false if not.
+ * N.B: Called from OnChannelEvent, theClient is guarantee'd to be in the
+ * channel.
+ *--------------------------------------------------------------------------*/ 
+bool cservice::checkBansOnJoin( sqlChannel* theChan, iClient* theClient )
+{
+vector< sqlBan* >* banList = getBanRecords(theChan);
+vector< sqlBan* >::iterator ptr = banList->begin();
+bool deleted = false;
+
+while (ptr != banList->end())
+	{
+	sqlBan* theBan = *ptr; 
+
+	/* Has this ban expired? */ 
+	if (theBan->getExpires() <= currentTime())
+		{
+		/* Delete this ban.. */
+		strstream s;
+		s	<< getCharYYXXX()
+			<< " M "
+			<< theChan->getName()
+			<< " -b "
+			<< theBan->getBanMask()
+			<< ends;
+		
+		Write( s );
+		delete[] s.str();
+
+		ptr = banList->erase(ptr); 
+		theBan->deleteRecord();
+
+		delete(theBan);
+		deleted = true;
+		}
+	else
+		{
+		/* Matching ban? */ 
+		if( (match(theBan->getBanMask(),
+			theClient->getNickUserHost()) == 0) && (theBan->getLevel() >= 75) )
+			{ 
+			strstream s;
+			s	<< getCharYYXXX()
+				<< " M "
+				<< thedChan->getName()
+				<< " +b "
+				<< theBan->getBanMask()
+				<< ends;
+			
+			Write( s );
+			delete[] s.str(); 
+
+			Kick(theChan, theClient,
+				string( "("
+				+ theBan->getSetBy()
+				+ ") "
+				+ theBan->getReason()) );
+ 
+			return true;
+			} /* Matching Ban */ 
+		} /* Not expired. */
+	if (deleted) 
+		{
+		deleted = false;
+		}
+	else
+		{
+		++ptr;
+		}
+} /* while() */
+	
+	return false;
 }
 
 /*--doAutoTopic---------------------------------------------------------------
