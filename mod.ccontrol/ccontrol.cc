@@ -37,7 +37,7 @@
 #include	"ip.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.115 2002/01/05 15:34:54 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.116 2002/01/05 18:25:12 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -509,7 +509,7 @@ else
 	{
 	// Log the command
 	if(!commHandler->second->getNoLog()) //Dont log command which arent suppose to be logged
-		DailyLog(theUser,Message.c_str());
+		DailyLog(theUser,"%s",Message.c_str());
 	// Execute the command handler
 	commHandler->second->Exec( theClient, Message) ;
 	}		
@@ -555,7 +555,7 @@ int ccontrol::Notice( const iClient* Target, const string& Message )
 ccUser* tmpUser = IsAuth(Target);
 if((tmpUser) && !(tmpUser->getNotice()))
 	{
-	return xClient::Message(Target,Message);
+	return xClient::Message(Target,"%s",Message.c_str());
 	}
 return xClient::Notice(Target,Message);
 }
@@ -573,9 +573,9 @@ va_end(list);
 ccUser* tmpUser = IsAuth(Target);
 if((tmpUser) && !(tmpUser->getNotice()))
 	{
-	return xClient::Message(Target,string(buffer));
+	return xClient::Message(Target,"%s",buffer);
 	}
-return xClient::Notice(Target,(buffer));
+return xClient::Notice(Target,"%s",buffer);
                         
 }        
 
@@ -1749,7 +1749,7 @@ va_start( list, Msg ) ;
 vsprintf( buffer, Msg, list ) ;
 va_end( list ) ;
 
-xClient::Notice((Network->findChannel(msgChan))->getName(),buffer);
+xClient::Notice((Network->findChannel(msgChan))->getName(),"%s",buffer);
 usersIterator uIterator;
 ccUser* tempUser;
 for( uIterator = usersMap.begin();uIterator != usersMap.end();++uIterator)
@@ -1757,7 +1757,7 @@ for( uIterator = usersMap.begin();uIterator != usersMap.end();++uIterator)
         tempUser = uIterator->second;
 	if((tempUser) && (tempUser->getLogs() ) && (tempUser->getClient()))
                 { 
-                Notice(tempUser->getClient(),buffer);
+                Notice(tempUser->getClient(),"%s",buffer);
                 }
 	}
 return true;
