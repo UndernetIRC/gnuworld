@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------------
--- "$Id: cservice.sql,v 1.4 2000/12/10 17:57:42 gte Exp $"
+-- "$Id: cservice.sql,v 1.5 2000/12/10 18:41:48 isomer Exp $"
 -- Channel service DB SQL file for PostgreSQL.
 
 -- ChangeLog:
@@ -34,8 +34,8 @@
 CREATE TABLE languages (
 	id SERIAL,
 	name VARCHAR( 16 ),
-	last_update TIMESTAMP NOT NULL DEFAULT now(),
-	PRIMARY KEY(id)
+	last_update TIMESTAMP NOT NULL DEFAULT now()
+--	PRIMARY KEY(id)
 );
 
 -- Translations for multi-lingual support.
