@@ -8,7 +8,7 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char FORCECommand_cc_rcsId[] = "$Id: FORCECommand.cc,v 1.8 2001/02/16 20:20:26 plexus Exp $" ;
+const char FORCECommand_cc_rcsId[] = "$Id: FORCECommand.cc,v 1.9 2001/02/17 17:47:49 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -54,7 +54,7 @@ bool FORCECommand::Exec( iClient* theClient, const string& Message )
 		bot->Notice(theClient,
 			bot->getResponse(theUser,
 				language::chan_not_reg,
-				string("Sorry, %s isn't registered with me.")).c_str(), 
+				string("Sorry, %s isn't registered with me.")).c_str(),
 			st[1].c_str());
 		return false;
 	} 
@@ -83,7 +83,7 @@ bool FORCECommand::Exec( iClient* theClient, const string& Message )
 			theClient->getNickName().c_str(), theUser->getUserName().c_str(), theChan->getName().c_str()); 
 		bot->Notice(theClient, 
 			bot->getResponse(theUser,
-				language::chan_not_reg,
+				language::temp_inc_access,
 				string("Temporarily increased your access on channel %s to %i")).c_str(), 
 			theChan->getName().c_str(), admLevel); 
 		bot->writeChannelLog(theChan, theClient, sqlChannel::EV_FORCE, "");
