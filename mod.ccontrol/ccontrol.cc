@@ -37,7 +37,7 @@
 #include	"ip.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.125 2002/02/01 14:04:48 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.126 2002/02/01 14:17:18 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -2117,7 +2117,10 @@ else
 
 newLog->Desc = log;
 if(!LogFile.is_open())
+	{
 	LogFile.open(LogFileName.c_str(),ios::in|ios::out);
+	LogFile.setbuf(NULL,0);
+	}
 if(LogFile.bad())
 	{//There was a problem in opening the log file
 	MsgChanLog("Error while logging to the logs file %s!\n",LogFileName.c_str());
@@ -2130,6 +2133,7 @@ if(!newLog->Save(LogFile))
 	MsgChanLog("Error while logging to the log file!\n");
 	}
 addLog(newLog);
+LogFile.close();
 
 if(NumOfLogs > 0)
 	NumOfLogs++;
@@ -3414,7 +3418,8 @@ if(LogFile.bad())
 	elog << "Error while initilizing the logs file!\n";
 	return ;
 	}
-LogFile.setbuf(NULL,0);
+//LogFile.setbuf(NULL,0);
+LogFile.close();
 }
 
 void ccontrol::addLog(ccLog* newLog)
@@ -3479,7 +3484,6 @@ if((LogList.size() < Amount)
 	    not a big deal *g*
 	*/
 	ccLog* tmpLog;
-	bool cont = true;
 	LogFile.seekg(0,ios::beg);
 	NumOfLogs = 0;
 	while(!LogFile.eof())
@@ -3500,8 +3504,8 @@ if((LogList.size() < Amount)
 			}
 		}
 	LogFile.close();
-	LogFile.open(LogFileName.c_str(),ios::in|ios::out);
-	LogFile.setbuf(NULL,0);
+//	LogFile.open(LogFileName.c_str(),ios::in|ios::out);
+//	LogFile.setbuf(NULL,0);
 	delete tmpLog;
 	}
 //At this point, we should have the log list full of the last LogsToSave
