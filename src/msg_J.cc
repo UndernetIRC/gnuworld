@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_J.cc,v 1.14 2002/07/05 01:10:06 dan_karrels Exp $
+ * $Id: msg_J.cc,v 1.15 2002/07/10 14:42:33 dan_karrels Exp $
  */
 
 #include	<new>
@@ -44,7 +44,7 @@ const char ELog_h_rcsId[] = __ELOG_H ;
 const char Channel_h_rcsId[] = __CHANNEL_H ;
 const char iClient_h_rcsId[] = __ICLIENT_H ;
 const char ChannelUser_h_rcsId[] = __CHANNELUSER_H ;
-const char msg_J_cc_rcsId[] = "$Id: msg_J.cc,v 1.14 2002/07/05 01:10:06 dan_karrels Exp $" ;
+const char msg_J_cc_rcsId[] = "$Id: msg_J.cc,v 1.15 2002/07/10 14:42:33 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -291,8 +291,7 @@ for( StringTokenizer::size_type i = 0 ; i < st.size() ; i++ )
 
 	} // for()
 
-return 0 ;
-
+return true ;
 }
 
 void msg_J::userPartAllChannels( iClient* theClient )
