@@ -33,7 +33,7 @@
 #endif
 
 const char Socket_h_rcsId[] = __SOCKET_H ;
-const char Socket_cc_rcsId[] = "$Id: Socket.cc,v 1.3 2000/11/05 23:09:39 dan_karrels Exp $" ;
+const char Socket_cc_rcsId[] = "$Id: Socket.cc,v 1.4 2000/11/05 23:16:52 dan_karrels Exp $" ;
 
 using namespace std ;
 using gnuworld::elog ;
@@ -653,8 +653,7 @@ return nbresult ;
 // static
 string Socket::hostname()
 {
-char info[ MAXNAMLEN + 1 ] ;
-memset( info,0,sizeof( info ) ) ;
+char info[ MAXNAMLEN + 1 ] = { 0 } ;
 ::gethostname( info, sizeof( info ) ) ;
 
 return string( info ) ;
