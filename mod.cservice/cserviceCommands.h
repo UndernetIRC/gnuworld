@@ -1,5 +1,5 @@
 #ifndef __CSERVICECOMMANDS_H
-#define __CSERVICECOMMANDS_H "$Id: cserviceCommands.h,v 1.23 2001/02/10 23:34:02 gte Exp $"
+#define __CSERVICECOMMANDS_H "$Id: cserviceCommands.h,v 1.24 2001/02/16 00:18:17 plexus Exp $"
 
 #include	<string>
 #include	"iClient.h"
@@ -102,6 +102,7 @@ DECLARE_COMMAND( LBANLIST )
 DECLARE_COMMAND( NEWPASS )
 DECLARE_COMMAND( JOIN )
 DECLARE_COMMAND( PART )
+DECLARE_COMMAND( CLEARMODE )
 
 // IRCop commands.
 

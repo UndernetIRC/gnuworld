@@ -3,13 +3,13 @@
  *
  * 24/12/2000 - Greg Sikorski <gte@atomicrevs.demon.co.uk>
  * Initial Version.
- * 10/02/2001 - David Henriksen <david@itwebnet.dk>
- * Minor fix, do not show LAST SEEN unless, the last seen is > 1 day.
+ * 15/02/2001 - David Henriksen <david@itwebnet.dk>
+ * Added -op/-voice/-none support
  *
  * Displays all "Level" records for a specified channel.
  * Can optionally narrow down selection using a number of switches. 
  *
- * $Id: ACCESSCommand.cc,v 1.26 2001/02/10 18:38:05 gte Exp $
+ * $Id: ACCESSCommand.cc,v 1.27 2001/02/16 00:18:16 plexus Exp $
  */
 
 #include	<string>
@@ -21,7 +21,7 @@
 #include	"match.h"
 #define MAX_RESULTS 15
  
-const char ACCESSCommand_cc_rcsId[] = "$Id: ACCESSCommand.cc,v 1.26 2001/02/10 18:38:05 gte Exp $" ;
+const char ACCESSCommand_cc_rcsId[] = "$Id: ACCESSCommand.cc,v 1.27 2001/02/16 00:18:16 plexus Exp $" ;
 
 namespace gnuworld
 {
@@ -72,13 +72,16 @@ if (theChan->getName() == "*")
  *  Figure out the switches and append to the SQL statement accordingly.
  */ 
 
-/* 0 = None, 1 = min, 2 = max, 3 = modif. */
+/* 0 = None, 1 = min, 2 = max, 3 = modif, 4 = op, 5 = voice, 6 = none. */
 unsigned short currentType = 0;
 
 unsigned int minAmount = 0;
 unsigned int maxAmount = 0;
 bool modif = false;
 bool showAll = false;
+bool aOp = false;
+bool aVoice = false;
+bool aNone = false;
 
 string modifMask;
 
@@ -101,6 +104,27 @@ for( StringTokenizer::const_iterator ptr = st.begin() ; ptr != st.end() ;
 		{
 		currentType = 3;
 		modif = true;
+		continue;
+		}
+		
+	if (string_lower(*ptr) == "-op")
+		{
+		currentType = 4;
+		aOp = true;
+		continue;
+		}
+	
+	if (string_lower(*ptr) == "-voice")
+		{
+		currentType = 5;
+		aVoice = true;
+		continue;
+		}
+	
+	if (string_lower(*ptr) == "-none")
+		{
+		currentType = 6;
+		aNone = true;
 		continue;
 		}
 
@@ -140,6 +164,18 @@ for( StringTokenizer::const_iterator ptr = st.begin() ; ptr != st.end() ;
 			{ 
 			// [22:13] <DrCkTaiL> backburner 
 			break;
+			}
+		case 4: /* Automode Op */
+			{
+			break;
+			}
+		case 5: /* Automode Voice */
+			{
+			break;
+			}
+		case 6: /* Automode None */
+			{
+			break;
 			} 
 		} 
 	}
@@ -173,7 +209,11 @@ if( PGRES_TUPLES_OK == status )
 	int suspend_expires_d = 0;
 	int suspend_expires_f = 0;
 	int results = 0;
-
+	string matchString;
+	
+	if(st[2][0] == '-') matchString = "*";
+	else matchString = st[2];
+	
 	for (int i = 0 ; i < bot->SQLDb->Tuples(); i++)
 		{
 
@@ -190,6 +230,20 @@ if( PGRES_TUPLES_OK == status )
 	 
 			if (flag & sqlLevel::F_AUTOOP) autoMode = "OP";
 			if (flag & sqlLevel::F_AUTOVOICE) autoMode = "VOICE"; 
+			
+			if(aNone == true)
+				{
+				if (!(flag & sqlLevel::F_AUTOVOICE) &&
+				    !(flag & sqlLevel::F_AUTOOP)) continue;
+				}
+			if(aVoice == true)
+				{
+				if (!(flag & sqlLevel::F_AUTOVOICE)) continue;
+				}
+			if(aOp == true)
+				{
+				if (!(flag & sqlLevel::F_AUTOOP)) continue;
+				}
 	
 			bot->Notice(theClient, "USER: %s ACCESS: %s", bot->SQLDb->GetValue(i, 1),
 				bot->SQLDb->GetValue(i, 2));
