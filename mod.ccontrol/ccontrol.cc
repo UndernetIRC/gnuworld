@@ -20,12 +20,12 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccontrol.cc,v 1.178 2004/03/25 20:55:40 mrbean_ Exp $
+ * $Id: ccontrol.cc,v 1.179 2004/03/26 14:24:37 mrbean_ Exp $
 */
 
 #define MAJORVER "1"
-#define MINORVER "1pl8"
-#define RELDATE "9 Mar, 2004"
+#define MINORVER "1pl9"
+#define RELDATE "26 Mar, 2004"
 
 #include        <sys/types.h> 
 #include        <sys/socket.h>
@@ -65,7 +65,7 @@
 #include	"ip.h"
 #include	"config.h"
 
-RCSTAG( "$Id: ccontrol.cc,v 1.178 2004/03/25 20:55:40 mrbean_ Exp $" ) ;
+RCSTAG( "$Id: ccontrol.cc,v 1.179 2004/03/26 14:24:37 mrbean_ Exp $" ) ;
 
 namespace gnuworld
 {
@@ -1728,48 +1728,18 @@ if(dbConnected)
 void ccontrol::addGlineToUplink(ccGline* theGline)
 {
 int Expires;
-if(theGline->getHost().substr(0,2) != "$R")
+if((theGline->getHost().substr(0,1) == "#")
+   && (theGline->getExpires() == 0))
+        {
+        Expires = gline::PERM_TIME;
+        }
+else
 	{
-	if((theGline->getHost().substr(0,1) == "#")
-	   && (theGline->getExpires() == 0))
-	        {
-	        Expires = gline::PERM_TIME;
-	        }
-	else
-		{
-		Expires = theGline->getExpires() - time(0);
-		}
-	MyUplink->setGline(theGline->getAddedBy()
-	    ,theGline->getHost(),theGline->getReason()
-	    ,Expires,theGline->getLastUpdated(),this);
+	Expires = theGline->getExpires() - time(0);
 	}
-else 
-	{ // Its a realname gline, match all the users and gline their hosts
-	ccGline* tmpGline;
-	string RealName = theGline->getHost().substr(2,theGline->getHost().size()-2);
-	MyUplink->setGline(theGline->getAddedBy(),theGline->getHost(),
-	theGline->getReason(),theGline->getExpires() - ::time(0),theGline->getLastUpdated(),this);
-	list<const iClient*> cList = Network->matchRealName(RealName);
-	list<const iClient*>::iterator ptr;
-	const iClient* curClient;
-	string Host;
-	Expires = (theGline->getExpires() > (3600*6 + ::time(0)) 
-		    ? 3600*6 : theGline->getExpires() - ::time(0));
-	/*for(ptr = cList.begin(); ptr != cList.end(); ++ptr)
-		{
-		curClient = *ptr;    
-		Host = string("*@") + xIP(curClient->getIP()).GetNumericIP();
-		tmpGline = new (std::nothrow) ccGline(SQLDb);
-		tmpGline->setHost(Host);
-		tmpGline->setAddedBy(theGline->getAddedBy());
-		tmpGline->setExpires(Expires);
-		tmpGline->setAddedOn(theGline->getAddedOn());
-		tmpGline->setLastUpdated(theGline->getLastUpdated());
-		tmpGline->setReason(theGline->getReason());
-		queueGline(tmpGline,false);				    
-		}*/
-			
-	}
+MyUplink->setGline(theGline->getAddedBy()
+    ,theGline->getHost(),theGline->getReason()
+    ,Expires,theGline->getLastUpdated(),this);
 }
 
 ccUser* ccontrol::IsAuth( const iClient* theClient ) 

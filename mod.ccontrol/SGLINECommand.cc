@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: SGLINECommand.cc,v 1.9 2004/03/09 11:50:43 mrbean_ Exp $
+ * $Id: SGLINECommand.cc,v 1.10 2004/03/26 14:24:37 mrbean_ Exp $
  */
 
 #include	<string>
@@ -36,7 +36,7 @@
 #include	"Constants.h"
 #include	"config.h"
 
-RCSTAG( "$Id: SGLINECommand.cc,v 1.9 2004/03/09 11:50:43 mrbean_ Exp $" ) ;
+RCSTAG( "$Id: SGLINECommand.cc,v 1.10 2004/03/26 14:24:37 mrbean_ Exp $" ) ;
 
 namespace gnuworld
 {
@@ -201,6 +201,14 @@ if(!RealName)
 	sprintf(Us,"%d",Users);
 	Reason = string("[") + Us + string("] ") + Reason;
 	} //RealName Gline
+else
+	{
+	Users = Network->matchRealName(RealHost.substr(2,RealHost.size()-2)).size();
+	char Us[100];
+	Us[0] = '\0';
+	sprintf(Us,"%d",Users);
+	Reason = string("[") + Us + string ("] ") + Reason;
+	}
 if(Reason.size() > gline::MAX_REASON_LENGTH)
 	{
 	bot->Notice(theClient,"Gline reason can't be more than %d chars",
