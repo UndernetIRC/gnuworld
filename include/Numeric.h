@@ -5,7 +5,7 @@
  */
 
 #ifndef __NUMERIC_H
-#define __NUMERIC_H "$Id: Numeric.h,v 1.1 2000/06/30 18:46:06 dan_karrels Exp $"
+#define __NUMERIC_H "$Id: Numeric.h,v 1.2 2001/03/31 01:26:10 dan_karrels Exp $"
 
 /*
  * Numeric nicks are new as of version ircu2.10.00beta1.
@@ -28,6 +28,7 @@
  */
 
 /* These must be the same on ALL servers ! Do not change ! */
+#include	<cassert>
 
 namespace gnuworld
 {
@@ -109,12 +110,16 @@ return i ;
  */
 inline unsigned int base64toint( const char* s, size_t count )
 {
-  unsigned int i = convert2n[ static_cast< unsigned char >( *s++ ) ] ;
-  while (*s && --count > 0) {
-    i <<= NUMNICKLOG;
-    i += convert2n[ static_cast< unsigned char >( *s++ ) ] ;
-  }
-  return i;
+assert( s != 0 ) ;
+
+unsigned int i = convert2n[ static_cast< unsigned char >( *s++ ) ] ;
+while (*s && --count > 0)
+	{
+	i <<= NUMNICKLOG;
+	i += convert2n[ static_cast< unsigned char >( *s++ ) ] ;
+	}
+
+return i;
 }
 
 /**
@@ -126,12 +131,16 @@ inline unsigned int base64toint( const char* s, size_t count )
  */
 inline const char* inttobase64( char* buf, unsigned int v, size_t count )
 {
-  buf[count] = '\0';  
-  while (count > 0) {
-    buf[ --count ] = convert2y[(v & NUMNICKMASK)];
-    v >>= NUMNICKLOG;
-  }
-  return buf;
+assert( buf != 0 ) ;
+
+buf[count] = '\0';  
+while (count > 0)
+	{
+	buf[ --count ] = convert2y[(v & NUMNICKMASK)];
+	v >>= NUMNICKLOG;
+	}
+
+return buf;
 }
 
 } // namespace gnuworld

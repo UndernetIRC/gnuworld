@@ -1,6 +1,9 @@
-#ifndef __MODLOADER_H
-#define __MODLOADER_H "$Id: moduleLoader.h,v 1.6 2001/03/29 21:54:32 dan_karrels Exp $"
+/* moduleLoader.h */
 
+#ifndef __MODULELOADER_H
+#define __MODULELOADER_H "$Id: moduleLoader.h,v 1.7 2001/03/31 01:26:10 dan_karrels Exp $"
+
+#include	<iostream>
 #include	<string>
 
 #include	<dlfcn.h>
@@ -8,10 +11,11 @@
 
 #include	"ELog.h"
 
-using std::string ;
-
 namespace gnuworld
 {
+
+using std::string ;
+using std::endl ;
 
 template< class modType >
 class moduleLoader
@@ -42,7 +46,10 @@ public:
 			<< endl;
 		::exit( 0 ) ;
 		}
-	elog	<< "[MOD]: Module " << moduleName << " successfully loaded."
+
+	elog	<< "[MOD]: Module "
+		<< moduleName
+		<< " successfully loaded."
 		<< endl;
 	}
 
@@ -104,4 +111,4 @@ protected:
 
 } /* gnuworld */
  
-#endif /* __MODLOADER_H */
+#endif /* __MODULELOADER_H */

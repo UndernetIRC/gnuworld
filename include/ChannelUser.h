@@ -1,16 +1,16 @@
 /* ChannelUser.h */
 
 #ifndef __CHANNELUSER_H
-#define __CHANNELUSER_H
+#define __CHANNELUSER_H "$Id: ChannelUser.h,v 1.4 2001/03/31 01:26:10 dan_karrels Exp $"
 
 #include	<string>
 
 #include	"ELog.h"
 
-using std::string ;
-
 namespace gnuworld
 {
+
+using std::string ;
 
 /// Forward declaration of class iClient.
 class iClient ;
@@ -146,11 +146,11 @@ public:
 	 */
 	friend ELog& operator<<( ELog& out, const ChannelUser& rhs )
 	{
-		out	<< rhs.getNickName() << '!'
-			<< rhs.getUserName() << '@'
-			<< rhs.getHostName() << ' '
-			<< rhs.getCharYYXXX() ;
-		return out ;
+	out	<< rhs.getNickName() << '!'
+		<< rhs.getUserName() << '@'
+		<< rhs.getHostName() << ' '
+		<< rhs.getCharYYXXX() ;
+	return out ;
 	}
 
 protected:

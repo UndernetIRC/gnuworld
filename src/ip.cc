@@ -15,8 +15,9 @@
 #include	"ip.h"
 #include	"Numeric.h"
 
-const char xIP_h_rcsId[] = __XIP_H ;
-const char xIP_cc_rcsId[] = "$Id: ip.cc,v 1.3 2001/03/01 01:58:17 dan_karrels Exp $" ;
+const char xIP_h_rcsId[] = __IP_H ;
+const char xIP_cc_rcsId[] = "$Id: ip.cc,v 1.4 2001/03/31 01:26:10 dan_karrels Exp $" ;
+const char Numeric_h_rcsId[] = __NUMERIC_H ;
 
 namespace gnuworld
 {

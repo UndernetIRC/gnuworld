@@ -2,11 +2,14 @@
  */
 
 #ifndef __CLIENTSOCKET_H
-#define __CLIENTSOCKET_H "$Id: ClientSocket.h,v 1.2 2000/12/15 00:13:44 dan_karrels Exp $"
+#define __CLIENTSOCKET_H "$Id: ClientSocket.h,v 1.3 2001/03/31 01:26:10 dan_karrels Exp $"
 
 #include	"Socket.h" // inherit send, recv, status methods
 #include	"cstring"
 #include	"limits.h"
+
+namespace gnuworld
+{
 
 /**
  * This class provides basic functionality for a client type socket.
@@ -63,5 +66,7 @@ protected:
 	string		_ipAddr ;
 
 } ;
+
+} // namespace gnuworld
 
 #endif // __CLIENTSOCKET_H

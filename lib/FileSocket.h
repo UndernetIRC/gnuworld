@@ -2,11 +2,14 @@
  */
 
 #ifndef __FILESOCKET_H
-#define __FILESOCKET_H "$Id: FileSocket.h,v 1.3 2001/02/02 18:10:29 dan_karrels Exp $"
+#define __FILESOCKET_H "$Id: FileSocket.h,v 1.4 2001/03/31 01:26:10 dan_karrels Exp $"
 
 #include	<string>
 
 #include	"ClientSocket.h"
+
+namespace gnuworld
+{
 
 using std::string ;
 
@@ -98,5 +101,7 @@ protected:
 	FileSocket operator=( const FileSocket& ) ;
 
 } ;
+
+} // namespace gnuworld
 
 #endif // __FILESOCKET_H

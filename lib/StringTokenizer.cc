@@ -4,8 +4,6 @@
 
 #include	<vector>
 #include	<string>
-#include	<stdexcept>
-#include	<iostream>
 
 #include	<cassert>
 
@@ -13,7 +11,11 @@
 #include	"StringTokenizer.h"
 
 const char StringTokenizer_h_rcsId[] = __STRINGTOKENIZER_H ;
-const char StringTokenizer_cc_rcsId[] = "$Id: StringTokenizer.cc,v 1.3 2000/12/08 00:31:00 dan_karrels Exp $" ;
+const char StringTokenizer_cc_rcsId[] = "$Id: StringTokenizer.cc,v 1.4 2001/03/31 01:26:10 dan_karrels Exp $" ;
+const char config_h_rcsId[] = __CONFIG_H ;
+
+namespace gnuworld
+{
 
 using std::string ;
 using std::vector ;
@@ -26,7 +28,8 @@ using std::vector ;
  *   we will tokenize the string
  */
 StringTokenizer::StringTokenizer( const string& buf, char _delimiter )
-	: original( buf ), delimiter( _delimiter )
+  : original( buf ),
+    delimiter( _delimiter )
 {
 Tokenize( original ) ;
 }
@@ -43,10 +46,8 @@ StringTokenizer::~StringTokenizer()
  */
 const string& StringTokenizer::getToken( const size_type& sub ) const
 {
-#ifdef DEBUG
-	// Dump core
-	assert( validSubscript( sub ) ) ;
-#endif
+// Dump core
+assert( validSubscript( sub ) ) ;
 return array[ sub ] ;
 }
 
@@ -152,5 +153,6 @@ for( size_type i = start ; i < size() ; i++ )
 
 // Return the assembled string
 return retMe ;
-
 }
+
+} // namespace gnuworld

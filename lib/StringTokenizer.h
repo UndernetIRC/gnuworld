@@ -3,11 +3,14 @@
  */
 
 #ifndef __STRINGTOKENIZER_H
-#define __STRINGTOKENIZER_H "$Id: StringTokenizer.h,v 1.1 2000/06/30 18:46:06 dan_karrels Exp $"
+#define __STRINGTOKENIZER_H "$Id: StringTokenizer.h,v 1.2 2001/03/31 01:26:10 dan_karrels Exp $"
 
 #include	<vector>
 #include	<string>
 #include	<iostream>
+
+namespace gnuworld
+{
 
 using std::string ;
 using std::vector ;
@@ -23,6 +26,13 @@ using std::vector ;
 class StringTokenizer
 {
 
+private:
+	/**
+	 * This is the type that will be used to store
+	 * the tokens in the StringTokenizer object.
+	 */
+	typedef vector< string > vectorType ;
+
 public:
 
 	/**
@@ -30,19 +40,13 @@ public:
 	 * tokenized, and the delimiter by which
 	 * tokens will be generated.
 	 */
-	StringTokenizer( const string& = string( "" ), char = ' ' ) ;
+	StringTokenizer( const string& = string(), char = ' ' ) ;
 
 	/**
 	 * The destructor is a NOOP because no streams have been
 	 * opened, and no memory dynamically explicitly allocated.
 	 */
 	virtual ~StringTokenizer() ;
-
-	/**
-	 * This is the type that will be used to store
-	 * the tokens in the StringTokenizer object.
-	 */
-	typedef vector< string > vectorType ;
 
 	/**
 	 * This is the type of the variable used for
@@ -116,7 +120,7 @@ public:
 	 * The immutable iterator type to use for walking through
 	 * this object's tokens.
 	 */
-	typedef vector< string >::const_iterator const_iterator ;
+	typedef vectorType::const_iterator const_iterator ;
 
 	/**
 	 * Retrieve an immutable iterator to the beginning of this
@@ -135,9 +139,10 @@ public:
 	/**
 	 * Convenience method for debugging purposes.
 	 */
-	friend std::ostream& operator<<( std::ostream& out, const StringTokenizer& rhs )
+	friend std::ostream& operator<<( std::ostream& out,
+		const StringTokenizer& rhs )
 		{
-		for( register size_type i = 0, end = rhs.size() ; i < end ; ++i )
+		for( size_type i = 0, end = rhs.size() ; i < end ; ++i )
 			{
 			out << rhs.array[ i ] ;
 			if( i < (rhs.size() - 1) )
@@ -178,5 +183,7 @@ protected:
 	vectorType		array ;
 
 } ;
+
+} // namespace gnuworld
 
 #endif /* __STRINGTOKENIZER_H */

@@ -6,11 +6,13 @@
 
 #include	<ctime>
 
+const char ServerTimerHandlers_h_rcsId[] = __SERVERTIMERHANDLERS_H ;
+const char ServerTimerHandlers_cc_rcsId[] = "$Id: ServerTimerHandlers.cc,v 1.3 2001/03/31 01:26:10 dan_karrels Exp $" ;
+const char server_h_rcsId[] = __SERVER_H ;
+const char ELog_h_rcsId[] = __ELOG_H ;
+
 namespace gnuworld
 {
-
-const char ServerTimerHandlers_h_rcsId[] = __SERVERTIMERHANDLERS_H ;
-const char ServerTimerHandlers_cc_rcsId[] = "$Id: ServerTimerHandlers.cc,v 1.2 2001/02/05 18:58:12 dan_karrels Exp $" ;
 
 int GlineUpdateTimer::OnTimer( timerID, void* data )
 {

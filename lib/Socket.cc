@@ -35,9 +35,12 @@
 #endif
 
 const char Socket_h_rcsId[] = __SOCKET_H ;
-const char Socket_cc_rcsId[] = "$Id: Socket.cc,v 1.15 2001/01/31 22:03:22 dan_karrels Exp $" ;
+const char Socket_cc_rcsId[] = "$Id: Socket.cc,v 1.16 2001/03/31 01:26:10 dan_karrels Exp $" ;
+const char ELog_h_rcsId[] = __ELOG_H ;
 
-using gnuworld::elog ;
+namespace gnuworld
+{
+
 using std::endl ;
 using std::strstream ;
 using std::ends ;
@@ -504,3 +507,5 @@ char info[ MAXNAMLEN + 1 ] = { 0 } ;
 
 return string( info ) ;
 }
+
+} // namespace gnuworld

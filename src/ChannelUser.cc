@@ -7,6 +7,10 @@
 #include	"iClient.h"
 #include	"ChannelUser.h"
 
+const char ChannelUser_h_rcsId[] = __CHANNELUSER_H ;
+const char ChannelUser_cc_rcsId[] = "$Id: ChannelUser.cc,v 1.4 2001/03/31 01:26:10 dan_karrels Exp $" ;
+const char iClient_h_rcsId[] = __ICLIENT_H ;
+
 namespace gnuworld
 {
 

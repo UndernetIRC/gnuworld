@@ -2,6 +2,7 @@
  * Author: Daniel Karrels dan@karrels.com
  */
 
+#include	<new>
 #include	<iostream>
 #include	<string>
 #include	<hash_map>
@@ -18,8 +19,14 @@
 #include	"misc.h"
 #include	"Numeric.h"
 
-const char xNetwork_h_rcsId[] = __XNETWORK_H ;
-const char xNetwork_cc_rcsId[] = "$Id: Network.cc,v 1.21 2001/03/24 01:31:42 dan_karrels Exp $" ;
+const char xNetwork_h_rcsId[] = __NETWORK_H ;
+const char xNetwork_cc_rcsId[] = "$Id: Network.cc,v 1.22 2001/03/31 01:26:10 dan_karrels Exp $" ;
+const char ELog_h_rcsId[] = __ELOG_H ;
+const char iClient_h_rcsId[] = __ICLIENT_H ;
+const char Channel_h_rcsId[] = __CHANNEL_H ;
+const char client_h_rcsId[] = __CLIENT_H ;
+const char misc_h_rcsId[] = __MISC_H ;
+const char Numeric_h_rcsId[] = __NUMERIC_H ;
 
 namespace gnuworld
 {

@@ -15,7 +15,10 @@
 #include	"misc.h"
 
 const char EConfig_h_rcsId[] = __ECONFIG_H ;
-const char EConfig_cc_rcsId[] = "$Id: EConfig.cc,v 1.6 2001/03/29 21:54:32 dan_karrels Exp $" ;
+const char EConfig_cc_rcsId[] = "$Id: EConfig.cc,v 1.7 2001/03/31 01:26:10 dan_karrels Exp $" ;
+const char StringTokenizer_h_rcsId[] = __STRINGTOKENIZER_H ;
+const char ELog_h_rcsId[] = __ELOG_H ;
+const char misc_h_rcsId[] = __MISC_H ;
 
 namespace gnuworld
 {

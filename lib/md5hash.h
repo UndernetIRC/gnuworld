@@ -1,6 +1,6 @@
 /**********************************************************************
  * $Workfile: MD5.H $
- * $Revision: 1.1 $
+ * $Revision: 1.2 $
  *  $Modtime: 1/08/97 6:35p $
  *
  * PURPOSE:
@@ -59,13 +59,14 @@
  * So there! 
  **********************************************************************/
 #ifndef MD5_H
-#define MD5_H
+#define MD5_H "$Id: md5hash.h,v 1.2 2001/03/31 01:26:10 dan_karrels Exp $"
 
-#include <iostream.h>
+#include <iostream>
  
 #define MD5_DIGEST_LENGTH 16
 
-namespace gnuworld {
+namespace gnuworld
+{
 
 class md5Digest;     // Forward declaration.
 
@@ -105,5 +106,6 @@ private:
    friend void     md5::encode( md5Digest &digest );
 };
 
-} // namespace.
+} // namespace gnuworld
+
 #endif // MD5_H

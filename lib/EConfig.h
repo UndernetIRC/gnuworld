@@ -2,7 +2,7 @@
  */
 
 #ifndef __ECONFIG_H
-#define __ECONFIG_H "$Id: EConfig.h,v 1.2 2000/11/12 17:20:45 dan_karrels Exp $"
+#define __ECONFIG_H "$Id: EConfig.h,v 1.3 2001/03/31 01:26:10 dan_karrels Exp $"
 
 #include	<iostream>
 #include	<string>
@@ -12,12 +12,12 @@
 #include	"ELog.h"
 #include	"misc.h" // noCaseCompare
 
+namespace gnuworld 
+{
+
 using std::string ;
 using std::fstream ;
 using std::multimap ;
-
-namespace gnuworld 
-{
 
 /**
  * A simple configuration file parser.

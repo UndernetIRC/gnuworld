@@ -47,8 +47,24 @@
 #include	"moduleLoader.h"
 #include	"ServerTimerHandlers.h"
 
-const char xServer_h_rcsId[] = __XSERVER_H ;
-const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.91 2001/03/24 16:00:56 dan_karrels Exp $" ;
+const char server_h_rcsId[] = __SERVER_H ;
+const char server_cc_rcsId[] = "$Id: server.cc,v 1.92 2001/03/31 01:26:10 dan_karrels Exp $" ;
+const char config_h_rcsId[] = __CONFIG_H ;
+const char misc_h_rcsId[] = __MISC_H ;
+const char events_h_rcsId[] = __EVENTS_H ;
+const char ip_h_rcsId[] = __IP_H ;
+const char Network_h_rcsId[] = __NETWORK_H ;
+const char iServer_h_rcsId[] = __ISERVER_H ;
+const char iClient_h_rcsId[] = __ICLIENT_H ;
+const char EConfig_h_rcsId[] = __ECONFIG_H ;
+const char Gline_h_rcsId[] = __GLINE_H ;
+const char match_h_rcsId[] = __MATCH_H ;
+const char ELog_h_rcsId[] = __ELOG_H ;
+const char Socket_h_rcsId[] = __SOCKET_H ;
+const char StringTokenizer_h_rcsId[] = __STRINGTOKENIZER_H ;
+const char xParameters_h_rcsId[] = __XPARAMETERS_H ;
+const char moduleLoader_h_rcsId[] = __MODULELOADER_H ;
+const char ServerTimerHandler_h_rcsId[] = __SERVERTIMERHANDLERS_H ;
 
 namespace gnuworld
 {

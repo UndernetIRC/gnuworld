@@ -1,10 +1,10 @@
 /*
  * match.h
  *
- * $Id: match.h,v 1.3 2001/03/24 16:00:56 dan_karrels Exp $
+ * $Id: match.h,v 1.4 2001/03/31 01:26:10 dan_karrels Exp $
  */
-#ifndef INCLUDED_match_h
-#define INCLUDED_match_h
+#ifndef __MATCH_H
+#define __MATCH_H "$Id: match.h,v 1.4 2001/03/31 01:26:10 dan_karrels Exp $"
 
 #include	<string>
 
@@ -30,4 +30,4 @@ int matchexec(const char *string, const char *cmask, int minlen);
 int matchdecomp(char *mask, const char *cmask);
 int mmexec(const char *wcm, int wminlen, const char *rcm, int rminlen);
 
-#endif /* INCLUDED_match_h */
+#endif // __MATCH_H

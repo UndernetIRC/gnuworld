@@ -2,7 +2,7 @@
  */
 
 #ifndef __ICLIENT_H
-#define __ICLIENT_H "$Id: iClient.h,v 1.15 2001/03/24 16:00:55 dan_karrels Exp $"
+#define __ICLIENT_H "$Id: iClient.h,v 1.16 2001/03/31 01:26:10 dan_karrels Exp $"
 
 #include	<string>
 #include	<list>
@@ -429,4 +429,4 @@ protected:
 
 } // namespace gnuworld
 
-#endif // _ICLIENT_H
+#endif // __ICLIENT_H

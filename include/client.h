@@ -2,8 +2,8 @@
  * This file originally created by Orlando Bassotto.
  */
 
-#ifndef __XCLIENT_H
-#define __XCLIENT_H "$Id: client.h,v 1.27 2001/02/12 13:59:26 plexus Exp $"
+#ifndef __CLIENT_H
+#define __CLIENT_H "$Id: client.h,v 1.28 2001/03/31 01:26:10 dan_karrels Exp $"
 
 #include	<string>
 
@@ -13,11 +13,11 @@
 #include	"events.h"
 #include	"TimerHandler.h"
 
-using std::string ;
-
 namespace gnuworld
 {
  
+using std::string ;
+
 /**
  * This is the public concrete base class that represents
  * a client that may connect to this server.  To build a new
@@ -775,4 +775,4 @@ protected:
 
 } // namespace gnuworld
 
-#endif // __CLIENT__
+#endif // __CLIENT_H

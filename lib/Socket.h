@@ -2,7 +2,7 @@
  */
 
 #ifndef __SOCKET_H
-#define __SOCKET_H "$Id: Socket.h,v 1.5 2001/01/31 22:03:22 dan_karrels Exp $"
+#define __SOCKET_H "$Id: Socket.h,v 1.6 2001/03/31 01:26:10 dan_karrels Exp $"
 
 #include	<new>
 #include	<iostream>
@@ -22,6 +22,8 @@
 #include	<cerrno>
 #include	<cstdlib>
 
+namespace gnuworld
+{
 
 /**
  * This class provides basic functionality for communications
@@ -194,5 +196,7 @@ protected:
 
 
 } ;
+
+} // namespace gnuworld
 
 #endif // __SOCKET_H

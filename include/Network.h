@@ -2,8 +2,8 @@
  * Author: Daniel Karrels dan@karrels.com
  */
 
-#ifndef __XNETWORK_H
-#define __XNETWORK_H "$Id: Network.h,v 1.12 2001/03/01 01:58:17 dan_karrels Exp $"
+#ifndef __NETWORK_H
+#define __NETWORK_H "$Id: Network.h,v 1.13 2001/03/31 01:26:10 dan_karrels Exp $"
 
 #include	<vector>
 #include	<string>
@@ -42,6 +42,7 @@ class xServer ;
 class xNetwork
 {
 
+private:
 	/**
 	 * This is the vector type that will hold
 	 * pointers to iServer's.
@@ -483,4 +484,4 @@ extern xNetwork* Network ;
 
 } // namespace gnuworld
 
-#endif // __XNETWORK_H
+#endif // __NETWORK_H

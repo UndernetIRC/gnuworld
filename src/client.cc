@@ -27,8 +27,8 @@
 #include	"ELog.h"
 #include	"events.h"
 
-const char xClient_h_rcsId[] = __XCLIENT_H ;
-const char xClient_cc_rcsId[] = "$Id: client.cc,v 1.35 2001/03/29 21:54:32 dan_karrels Exp $" ;
+const char xClient_h_rcsId[] = __CLIENT_H ;
+const char xClient_cc_rcsId[] = "$Id: client.cc,v 1.36 2001/03/31 01:26:10 dan_karrels Exp $" ;
 
 namespace gnuworld
 {

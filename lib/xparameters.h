@@ -2,11 +2,14 @@
  * This class originally written by Orlando Bassotto.
  */
 
-#ifndef __xPARAMETERS_H
-#define __xPARAMETERS_H "$Id: xparameters.h,v 1.3 2001/01/31 22:03:22 dan_karrels Exp $"
+#ifndef __XPARAMETERS_H
+#define __XPARAMETERS_H "$Id: xparameters.h,v 1.4 2001/03/31 01:26:10 dan_karrels Exp $"
 
 #include        <vector>
 #include	<cassert>
+
+namespace gnuworld
+{
 
 /**
  * This class is similar to StringTokenizer, except that it accepts
@@ -122,4 +125,6 @@ protected:
 
 } ;
 
-#endif // __xPARAMETERS_H
+} // namespace gnuworld
+
+#endif // __XPARAMETERS_H

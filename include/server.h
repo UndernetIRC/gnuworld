@@ -16,8 +16,8 @@
  * VectorTrie (see web page).
  */
 
-#ifndef __XSERVER_H
-#define __XSERVER_H "$Id: server.h,v 1.35 2001/03/03 00:37:09 dan_karrels Exp $"
+#ifndef __SERVER_H
+#define __SERVER_H "$Id: server.h,v 1.36 2001/03/31 01:26:10 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
@@ -46,6 +46,14 @@
 
 namespace gnuworld
 {
+
+using std::string ;
+using std::list ;
+using std::vector ;
+using std::strstream ;
+using std::hash_map ;
+using std::priority_queue ;
+using std::map ;
 
 /**
  * This macro constructs a method prototype for a command
@@ -81,14 +89,6 @@ enum MessageType
 	SRV_QUIT, // server shutdown
 	SRV_DISCONNECT // server disconnected
 	} ;
-
-using std::string ;
-using std::list ;
-using std::vector ;
-using std::strstream ;
-using std::hash_map ;
-using std::priority_queue ;
-using std::map ;
 
 /**
  * This class is the server proper; it is responsible for the connection
@@ -1265,4 +1265,4 @@ protected:
 
 } // namespace gnuworld
 
-#endif // __XSERVER_H
+#endif // __SERVER_H

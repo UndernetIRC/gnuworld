@@ -17,10 +17,13 @@
 #include	"ELog.h"
 
 const char FileSocket_h_rcsId[] = __FILESOCKET_H ;
-const char FileSocket_cc_rcsId[] = "$Id: FileSocket.cc,v 1.4 2001/02/02 18:10:29 dan_karrels Exp $" ;
+const char FileSocket_cc_rcsId[] = "$Id: FileSocket.cc,v 1.5 2001/03/31 01:26:10 dan_karrels Exp $" ;
+const char ELog_h_rcsId[] = __ELOG_H ;
+
+namespace gnuworld
+{
 
 using std::string ;
-using gnuworld::elog ;
 
 FileSocket::FileSocket( const string& fileName )
 {
@@ -83,3 +86,5 @@ buf[ readReturn ] = 0 ;
 
 return readReturn ;
 }
+
+} // namespace gnuworld
