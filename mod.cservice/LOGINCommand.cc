@@ -12,7 +12,7 @@
 #include	"cservice_config.h"
 #include	"Network.h"
 
-const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.33 2002/01/26 23:08:42 gte Exp $" ;
+const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.34 2002/01/28 17:32:40 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -167,7 +167,7 @@ if (!greeting.empty())
  * Eg: AXAAA AC APAFD gte
  */
 
-#if 0
+#if 1
 strstream ac;
 ac	<< bot->getCharYY()
 	<< " AC "
