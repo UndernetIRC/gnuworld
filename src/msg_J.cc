@@ -4,6 +4,7 @@
 
 #include	<new>
 #include	<string>
+#include	<iostream>
 
 #include	<cassert>
 
@@ -16,13 +17,13 @@
 #include	"ELog.h"
 #include	"StringTokenizer.h"
 
-const char msg_J_cc_rcsId[] = "$Id: msg_J.cc,v 1.7 2001/03/03 15:07:34 dan_karrels Exp $" ;
-
-using std::string ;
-using std::endl ;
+const char msg_J_cc_rcsId[] = "$Id: msg_J.cc,v 1.8 2001/03/24 01:31:42 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
+
+using std::string ;
+using std::endl ;
 
 /**
  * Someone has just joined a non-empty channel.
@@ -87,8 +88,6 @@ for( StringTokenizer::size_type i = 0 ; i < st.size() ; i++ )
 		continue ;
 		}
 
-	Channel* theChan = 0 ;
-
 	// Attempt to allocate a ChannelUser structure for this
 	// user<->channel association
 	ChannelUser* theUser =
@@ -99,7 +98,7 @@ for( StringTokenizer::size_type i = 0 ; i < st.size() ; i++ )
 	channelEventType whichEvent = EVT_JOIN ;
 
 	// On a JOIN command, the channel should already exist.
-	theChan = Network->findChannel( st[ i ] ) ;
+	Channel* theChan = Network->findChannel( st[ i ] ) ;
 
 	// Does the channel already exist?
 	if( NULL == theChan )
@@ -121,8 +120,8 @@ for( StringTokenizer::size_type i = 0 ; i < st.size() ; i++ )
 
 			// Prevent memory leaks by deallocating the
 			// Channel and ChannelUser objects
-			delete theChan ;
-			delete theUser ;
+			delete theChan ; theChan = 0 ;
+			delete theUser ; theUser = 0 ;
 
 			// Continue to next channel
 			continue ;
@@ -153,7 +152,7 @@ for( StringTokenizer::size_type i = 0 ; i < st.size() ; i++ )
 
 		// Prevent memory leaks by deallocating the unused
 		// ChannelUser object
-		delete theUser ;
+		delete theUser ; theUser = 0 ;
 
 		// Continue to next channel
 		continue ;
@@ -184,14 +183,29 @@ for( iClient::channelIterator ptr = theClient->channels_begin(),
 	endPtr = theClient->channels_end() ; ptr != endPtr ; ++ptr )
 	{
 
-	// Post this event to all listeners
-	PostChannelEvent( EVT_PART, *ptr,
-		static_cast< void* >( theClient ) ) ; // iClient*
-
 	// Remove this ChannelUser from the Channel's internal
 	// structure.
 	// Deallocate the ChannelUser
-	delete (*ptr)->removeUser( theClient ) ;
+	ChannelUser* theChanUser =  (*ptr)->removeUser( theClient ) ;
+	if( NULL == theChanUser )
+		{
+		elog	<< "xServer::userPartAllChannels> Unable to "
+			<< "remove iClient "
+			<< *theClient
+			<< " from channel "
+			<< *(*ptr)
+			<< endl ;
+		}
+	delete theChanUser ; theChanUser = 0 ;
+
+	// BUG: This iClient has inconsistent state because
+	// no channels have been removed from its internal
+	// structure until the end of this method.
+
+	// Post this event to all listeners
+	PostChannelEvent( EVT_PART,
+		*ptr,
+		static_cast< void* >( theClient ) ) ; // iClient*
 
 	// Is the channel empty of all network and services
 	// clients?
@@ -205,6 +219,7 @@ for( iClient::channelIterator ptr = theClient->channels_begin(),
 		}
 	}
 
+// Just to be sure
 theClient->clearChannels() ;
 
 } // userPartAllChannels()

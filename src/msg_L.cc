@@ -14,13 +14,13 @@
 #include	"StringTokenizer.h"
 #include	"events.h"
 
-const char msg_L_cc_rcsId[] = "$Id: msg_L.cc,v 1.3 2001/03/03 00:17:57 dan_karrels Exp $" ;
-
-using std::string ;
-using std::endl ;
+const char msg_L_cc_rcsId[] = "$Id: msg_L.cc,v 1.4 2001/03/24 01:31:42 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
+
+using std::string ;
+using std::endl ;
 
 /**
  * Someone has just left a channel.
@@ -92,10 +92,26 @@ for( StringTokenizer::size_type i = 0 ; i < st.size() ; ++i )
 
 	// Remove and deallocate the ChannelUser instance from this
 	// channel's ChannelUser structure.
-	delete theChan->removeUser( theClient ) ;
+	ChannelUser* theChanUser = theChan->removeUser( theClient ) ;
+	if( NULL == theChanUser )
+		{
+		elog	<< "xServer::MSG_L> Unable to remove "
+			<< *theClient
+			<< " from channel: "
+			<< *theChan
+			<< endl ;
+		}
+	delete theChanUser ; theChanUser = 0 ;
 
 	// Remove this channel from this client's channel structure.
-	theClient->removeChannel( theChan ) ;
+	if( !theClient->removeChannel( theChan ) )
+		{
+		elog	<< "xServer::MSG_L> Unable to remove iClient "
+			<< *theClient
+			<< " from channel "
+			<< *theChan
+			<< endl ;
+		}
 
 	// Post the event to the clients listening for events on this
 	// channel, if any.

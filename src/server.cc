@@ -47,7 +47,7 @@
 #include	"ServerTimerHandlers.h"
 
 const char xServer_h_rcsId[] = __XSERVER_H ;
-const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.89 2001/03/20 13:32:44 isomer Exp $" ;
+const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.90 2001/03/24 01:31:42 dan_karrels Exp $" ;
 
 using std::string ;
 using std::vector ;
@@ -848,9 +848,7 @@ return true ;
  */
 bool xServer::AttachServer( iServer* fakeServer, const string& description )
 {
-#ifndef NDEBUG
-  assert( fakeServer != NULL ) ;
-#endif
+assert( fakeServer != NULL ) ;
 
 // Make sure a server of the same name is not already connected.
 iServer* tmp = Network->findServerName( fakeServer->getName() ) ;
@@ -951,9 +949,7 @@ return( 0 ) ;
  */
 bool xServer::RegisterEvent( const eventType& theEvent, xClient* theClient )
 {
-#ifndef NDEBUG
-  assert( theClient != NULL ) ;
-#endif
+assert( theClient != NULL ) ;
 
 // Make sure that the given event is valid
 // (in the interval of possible events).
@@ -981,9 +977,7 @@ return true ;
 bool xServer::RegisterChannelEvent( const string& chanName,
 	xClient* theClient )
 {
-#ifndef NDEBUG
-  assert( theClient != NULL ) ;
-#endif
+assert( theClient != NULL ) ;
 
 // Prevent duplicates of the same channel/client pair
 UnRegisterChannelEvent( chanName, theClient ) ;
@@ -1016,9 +1010,7 @@ return true ;
  */
 bool xServer::UnRegisterEvent( const eventType& theEvent, xClient* theClient )
 {
-#ifndef NDEBUG
-  assert( theClient != NULL ) ;
-#endif
+assert( theClient != NULL ) ;
 
 // Make sure this is a valid event.
 if( !validEvent( theEvent ) )
@@ -1060,9 +1052,7 @@ return false ;
 bool xServer::UnRegisterChannelEvent( const string& chanName,
 	xClient* theClient )
 {
-#ifndef NDEBUG
-  assert( theClient != NULL ) ;
-#endif
+assert( theClient != NULL ) ;
 
 channelEventMapType::iterator chanPtr = channelEventMap.find( chanName ) ;
 if( chanPtr == channelEventMap.end() )
@@ -1383,15 +1373,14 @@ bool xServer::AttachClient( xClient* Client )
 {
 
 // Make sure the pointer is valid.
-#ifndef NDEBUG
-  assert( NULL != Client ) ;
-#endif
+assert( NULL != Client ) ;
 
 // addClient() will allocate a new YYXXX and
 // update Client.
 if( !Network->addClient( Client ) )
 	{
-	elog	<< "xServer::AttachClient> Network->addClient failed\n" ;
+	elog	<< "xServer::AttachClient> Network->addClient failed"
+		<< endl ;
 	return false ;
 	}
 
@@ -1431,9 +1420,7 @@ return true ;
  */
 bool xServer::AttachClient( iClient* fakeClient )
 {
-#ifndef NDEBUG
-  assert( fakeClient != NULL ) ;
-#endif
+assert( fakeClient != NULL ) ;
 
 // Need to send info to the network about the new client.
 iServer* fakeServer = Network->findServer( fakeClient->getIntYY() ) ;
@@ -1462,9 +1449,7 @@ return Network->addClient( fakeClient ) ;
  */
 bool xServer::DetachClient( xClient* Client )
 {
-#ifndef NDEBUG
-  assert( NULL != Client ) ;
-#endif
+assert( NULL != Client ) ;
 
 // Notify the client that it is being detached.
 Client->Exit( "Client has been detached by server" ) ;
@@ -2300,9 +2285,7 @@ xServer::timerID xServer::RegisterTimer( const time_t& absTime,
 	TimerHandler* theHandler,
 	void* data )
 {
-#ifndef NDEBUG
-  assert( theHandler != 0 ) ;
-#endif
+assert( theHandler != 0 ) ;
 
 // Don't register a timer that has already expired.
 if( absTime <= ::time( 0 ) )

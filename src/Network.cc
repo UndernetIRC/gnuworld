@@ -19,7 +19,7 @@
 #include	"Numeric.h"
 
 const char xNetwork_h_rcsId[] = __XNETWORK_H ;
-const char xNetwork_cc_rcsId[] = "$Id: Network.cc,v 1.20 2001/03/03 15:07:34 dan_karrels Exp $" ;
+const char xNetwork_cc_rcsId[] = "$Id: Network.cc,v 1.21 2001/03/24 01:31:42 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -383,7 +383,17 @@ while( chanPtr != retMe->channels_end() )
 //		<< (*chanPtr)->getName()
 //		<< endl ;
 
-	delete (*chanPtr)->removeUser( retMe ) ;
+	ChannelUser* theChanUser = (*chanPtr)->removeUser( retMe ) ;
+	if( NULL == theChanUser )
+		{
+		elog	<< "xNetwork::removeClient> Unable to find "
+			<< "ChannelUser in channel "
+			<< (*chanPtr)->getName()
+			<< ", for iClient: "
+			<< *retMe
+			<< endl ;
+		}
+	delete theChanUser ;
 
 	if( (*chanPtr)->empty() )
 		{
@@ -398,7 +408,6 @@ while( chanPtr != retMe->channels_end() )
 retMe->clearChannels() ;
 
 return retMe ;
-
 }
 
 iClient* xNetwork::removeClient( const string& yyxxx )
@@ -423,9 +432,7 @@ return removeClient( yy, xxx ) ;
 
 iClient* xNetwork::removeClient( iClient* theClient )
 {
-#ifndef NDEBUG
-  assert( theClient != 0 ) ;
-#endif
+assert( theClient != 0 ) ;
 
 return removeClient( theClient->getIntYY(), theClient->getIntXXX() ) ;
 }
@@ -493,6 +500,7 @@ for( clientVectorType::size_type i = 0 ; i < clients[ YY ].size() ; i++ )
 		// safe.
 		++chanPtr ;
 		}
+	theClient->clearChannels() ;
 
 	// Should we post this as an EVT_QUIT event?
 	if( postEvent )

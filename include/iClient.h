@@ -2,7 +2,7 @@
  */
 
 #ifndef __ICLIENT_H
-#define __ICLIENT_H "$Id: iClient.h,v 1.13 2001/03/03 15:07:34 dan_karrels Exp $"
+#define __ICLIENT_H "$Id: iClient.h,v 1.14 2001/03/24 01:31:42 dan_karrels Exp $"
 
 #include	<string>
 #include	<list>
@@ -186,7 +186,7 @@ public:
 	/**
 	 * Remove a channel from this user's channel patronage structure.
 	 */
-	inline void removeChannel( Channel* theChannel ) ;
+	inline bool removeChannel( Channel* theChannel ) ;
 
 	/**
 	 * Clear this client's list of channels.  No heap space needs

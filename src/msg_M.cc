@@ -5,6 +5,7 @@
 #include	<new>
 #include	<string>
 #include	<vector>
+#include	<iostream>
 
 #include	"misc.h"
 #include	"events.h"
@@ -17,15 +18,15 @@
 #include	"ELog.h"
 #include	"StringTokenizer.h"
 
-const char msg_M_cc_rcsId[] = "$Id: msg_M.cc,v 1.5 2001/03/03 00:37:09 dan_karrels Exp $" ;
+const char msg_M_cc_rcsId[] = "$Id: msg_M.cc,v 1.6 2001/03/24 01:31:42 dan_karrels Exp $" ;
+
+namespace gnuworld
+{
 
 using std::string ;
 using std::vector ;
 using std::endl ;
 using std::ends ;
-
-namespace gnuworld
-{
 
 // Mode change
 // OAD M ripper_ :+owg
@@ -150,16 +151,21 @@ for( const char* modePtr = Param[ 2 ] ; *modePtr ; ++modePtr )
 			onChannelModeI( theChan,
 				polarity, theUser ) ;
 			break ;
+
+		// Channel mode l only has an argument if
+		// it is being added, but not removed
 		case 'l':
 			onChannelModeL( theChan,
 				polarity, theUser,
 				polarity ? atoi( Param[ argPos++ ] )
 					: 0 ) ;
 			break ;
+
+		// Channel mode k always has an argument
 		case 'k':
 			onChannelModeK( theChan,
 				polarity, theUser,
-				polarity ? Param[ argPos++ ] : "" ) ;
+				Param[ argPos++ ] ) ;
 			break ;
 		case 'o':
 			{
@@ -169,7 +175,8 @@ for( const char* modePtr = Param[ 2 ] ; *modePtr ; ++modePtr )
 				{
 				elog	<< "xServer::MSG_M> Unable to "
 					<< "find op target client: "
-					<< Param[ argPos - 1 ] << endl ;
+					<< Param[ argPos - 1 ]
+					<< endl ;
 				break ;
 				}
 			ChannelUser* targetUser = theChan->findUser(

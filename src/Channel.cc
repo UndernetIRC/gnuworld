@@ -451,9 +451,7 @@ return (modeString + ' ' + argString) ;
 
 string Channel::createBan( const iClient* theClient )
 {
-#ifndef NDEBUG
-  assert( theClient != 0 ) ;
-#endif
+assert( theClient != 0 ) ;
 
 string theBan = "*!*" ;
 

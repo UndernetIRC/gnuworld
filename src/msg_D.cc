@@ -16,13 +16,13 @@
 #include	"ELog.h"
 #include	"StringTokenizer.h"
 
-const char msg_D_rcsId[] = "$Id: msg_D.cc,v 1.2 2001/03/03 00:17:57 dan_karrels Exp $" ;
-
-using std::string ;
-using std::endl ;
+const char msg_D_rcsId[] = "$Id: msg_D.cc,v 1.3 2001/03/24 01:31:42 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
+
+using std::string ;
+using std::endl ;
 
 /**
  * Kill command
@@ -33,6 +33,13 @@ namespace gnuworld
  */
 int xServer::MSG_D( xParameters& Param )
 {
+
+if( Param.size() < 3 )
+	{
+	elog	<< "xServer::MSG_D> Invalid number of parameters"
+		<< endl ;
+	return -1 ;
+	}
 
 // See if the client being killed is one of my own.
 xClient* myClient = Network->findLocalClient( Param[ 1 ] ) ;

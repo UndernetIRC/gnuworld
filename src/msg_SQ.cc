@@ -13,13 +13,13 @@
 #include	"ELog.h"
 #include	"xparameters.h"
 
-const char msg_SQ_cc_rcsId[] = "$Id: msg_SQ.cc,v 1.1 2001/02/02 18:10:30 dan_karrels Exp $" ;
-
-using std::string ;
-using std::endl ;
+const char msg_SQ_cc_rcsId[] = "$Id: msg_SQ.cc,v 1.2 2001/03/24 01:31:42 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
+
+using std::string ;
+using std::endl ;
 
 /**
  * SQUIT message handler.
@@ -36,10 +36,13 @@ namespace gnuworld
  */
 int xServer::MSG_SQ( xParameters& Param )
 {
-// Few things to do:
-// - Clean user and server tables (remote only)
-// - Clear input/output buffers
-// - Delete socket connection, reinstantiate, reconnect
+
+if( Param.size() < 2 )
+	{
+	elog	<< "xServer::MSG_SQ> Invalid number of parameters"
+		<< endl ;
+	return -1 ;
+	}
 
 iServer* squitServer = 0 ;
 if( strchr( Param[ 1 ], '.' ) != NULL )
@@ -56,13 +59,15 @@ else
 if( NULL == squitServer )
 	{
 	elog	<< "xServer::MSG_SQ> Unable to find server: "
-		<< Param[ 1 ] << endl ;
+		<< Param[ 1 ]
+		<< endl ;
 	return -1 ;
 	}
 
 if( squitServer->getIntYY() == Uplink->getIntYY() )
 	{
-	elog	<< "xServer::MSG_SQ> Ive been delinked!!\n" ;
+	elog	<< "xServer::MSG_SQ> Ive been delinked!!"
+		<< endl ;
 
 	// It's my uplink, we have been squit...those bastards!
 	OnDisConnect() ;

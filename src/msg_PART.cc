@@ -15,7 +15,7 @@
 #include	"xparameters.h"
 #include	"StringTokenizer.h"
 
-const char msg_PART_cc_rcsId[] = "$Id: msg_PART.cc,v 1.4 2001/03/03 00:17:57 dan_karrels Exp $" ;
+const char msg_PART_cc_rcsId[] = "$Id: msg_PART.cc,v 1.5 2001/03/24 01:31:42 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -77,7 +77,7 @@ for( StringTokenizer::size_type i = 0 ; i < st.size() ; ++i )
 	if( NULL == theChan )
 		{
 		// Channel not found, log the error
-		elog	<< "xServer::MSG_L> Unable to find channel: "
+		elog	<< "xServer::MSG_PART> Unable to find channel: "
 			<< st[ i ]
 			<< endl ;
 

@@ -17,7 +17,7 @@
 #include	"ELog.h"
 #include	"StringTokenizer.h"
 
-const char msg_K_cc_rcsId[] = "$Id: msg_K.cc,v 1.3 2001/03/03 00:17:57 dan_karrels Exp $" ;
+const char msg_K_cc_rcsId[] = "$Id: msg_K.cc,v 1.4 2001/03/24 01:31:42 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -46,7 +46,7 @@ if( Param.size() < 3 )
 	}
 
 // Is this a modeless channel?
-// TODO: Can there even be kicks on modeless channels?
+// Can there even be kicks on modeless channels?
 if( '+' == Param[ 1 ][ 0 ] )
 	{
 	// Don't care about modeless channels
@@ -86,8 +86,26 @@ if( NULL == theChan )
 	}
 
 // Remove client<->channel associations
-delete theChan->removeUser( theClient ) ;
-theClient->removeChannel( theChan ) ;
+ChannelUser* theChanUser = theChan->removeUser( theClient ) ;
+if( NULL == theChanUser )
+	{
+	elog	<< "xServer::msg_K> Unable to remove ChannelUser "
+		<< "for channel "
+		<< theChan->getName()
+		<< ", iClient: "
+		<< *theClient
+		<< endl ;
+	}
+delete theChanUser ;
+
+if( !theClient->removeChannel( theChan ) )
+	{
+	elog	<< "xServer::msg_K> Unable to remove channel "
+		<< theChan->getName()
+		<< " from the iClient "
+		<< *theClient
+		<< endl ;
+	}
 
 // All we really have to do here is post the message.
 // TODO: Send the source of the kick

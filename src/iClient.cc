@@ -14,13 +14,13 @@
 #include	"ip.h"
 
 const char iClient_h_rcsId[] = __ICLIENT_H ;
-const char iClient_cc_rcsId[] = "$Id: iClient.cc,v 1.11 2001/03/03 15:07:34 dan_karrels Exp $" ;
-
-using std::string ;
-using std::map ;
+const char iClient_cc_rcsId[] = "$Id: iClient.cc,v 1.12 2001/03/24 01:31:42 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
+
+using std::string ;
+using std::map ;
 
 iClient::iClient( const unsigned int& _uplink,
 	const string& _yxx,
@@ -112,7 +112,7 @@ for( string::size_type i = 0 ; i < newModes.size() ; i++ )
 	} // for
 } // setModes()
 
-void iClient::removeChannel( Channel* theChan )
+bool iClient::removeChannel( Channel* theChan )
 {
 for( channelListType::iterator ptr = channelList.begin() ;
 	ptr != channelList.end() ;
@@ -121,9 +121,10 @@ for( channelListType::iterator ptr = channelList.begin() ;
 	if( *ptr == theChan )
 		{
 		channelList.erase( ptr ) ;
-		break ;
+		return true ;
 		}
 	}
+return false ;
 }
 
 const string iClient::getCharModes() const
@@ -141,9 +142,7 @@ return retMe ;
 
 bool iClient::setCustomData( xClient* theClient, void* data )
 {
-#ifndef NDEBUG
-  assert( theClient != 0 ) ;
-#endif
+assert( theClient != 0 ) ;
 
 // Is the customDataMap empty?
 if( NULL == customDataMap )
@@ -177,9 +176,7 @@ return customDataMap->insert( customDataMapType::value_type(
 
 void* iClient::getCustomData( xClient* theClient ) const
 {
-#ifndef NDEBUG
-  assert( theClient != 0 ) ;
-#endif
+assert( theClient != 0 ) ;
 
 // Has the customDataMap been allocated?
 if( NULL == customDataMap )
@@ -205,9 +202,7 @@ return ptr->second ;
 
 void* iClient::removeCustomData( xClient* theClient )
 {
-#ifndef NDEBUG
-  assert( theClient != 0 ) ;
-#endif
+assert( theClient != 0 ) ;
 
 // Has the customDataMap been allocated?
 if( NULL == customDataMap )

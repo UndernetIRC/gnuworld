@@ -2,15 +2,13 @@
  * msg_Q.cc
  */
 
-#include	<iostream>
-
 #include	"server.h"
 #include	"events.h"
 #include	"iClient.h"
 #include	"Network.h"
 #include	"ELog.h"
 
-const char msg_Q_cc_rcsId[] = "$Id: msg_Q.cc,v 1.2 2001/03/03 00:17:57 dan_karrels Exp $" ;
+const char msg_Q_cc_rcsId[] = "$Id: msg_Q.cc,v 1.3 2001/03/24 01:31:42 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -23,6 +21,13 @@ using std::endl ;
  */
 int xServer::MSG_Q( xParameters& Param )
 {
+
+if( Param.size() < 1 )
+	{
+	elog	<< "xServer::MSG_Q> Invalid number of parameters"
+		<< endl ;
+	return -1 ;
+	}
 
 // xNetwork::removeClient will remove user<->channel associations
 iClient* theClient = Network->removeClient( Param[ 0 ] ) ;

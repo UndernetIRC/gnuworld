@@ -4,7 +4,7 @@
  */
 
 #ifndef __MISC_H
-#define __MISC_H "$Id: misc.h,v 1.10 2001/03/03 15:07:34 dan_karrels Exp $"
+#define __MISC_H "$Id: misc.h,v 1.11 2001/03/24 01:31:42 dan_karrels Exp $"
 
 #include	<string>
 #include	<hash_map>
@@ -58,6 +58,11 @@ struct eHash
 {
 inline size_t operator()( const string& s ) const
 	{
+	if( s.empty() )
+		{
+		return 0 ;
+		}
+
 	register size_t __h = 0 ;
 	for ( register const char* ptr = s.c_str() ; *ptr ; ++ptr )
 		{
