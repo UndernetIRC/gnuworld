@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------------
--- "$Id: cservice.sql,v 1.31 2001/03/29 18:04:59 gte Exp $"
+-- "$Id: cservice.sql,v 1.32 2001/04/15 19:53:42 gte Exp $"
 -- Channel service DB SQL file for PostgreSQL.
 
 -- ChangeLog:
@@ -243,6 +243,9 @@ CREATE TABLE supporters (
 -- N - Doesn't support this channel
 	reason TEXT,
 -- Reason for not supporting it if required.
+	join_count INT4 DEFAULT '0',
+-- Number of times this 'supporter' has joined the channel.
+-- Field updated by CMaster to reflect channel 'traffic'.
 	last_updated INT4 NOT NULL,
 	deleted INT2 DEFAULT '0',
 	PRIMARY KEY(channel_id,user_id)
@@ -252,8 +255,14 @@ CREATE TABLE pending (
 	channel_id INT4 CONSTRAINT pending_channel_ref REFERENCES channels (id),
 	manager_id INT4 CONSTRAINT pending_manager_ref REFERENCES users (id),
 	created_ts INT4 NOT NULL,
+	status INT4 DEFAULT '0',
+	-- Status of 'pending' channel:
+	-- 0 = 'Pending Supporters Confirmation'
+	-- 1 = 'Traffic Check & Notification'
+	-- 2 = 'Completed'
+	-- 9 = 'Rejected'
 	decision_ts INT4,
-	decision VARCHAR (80),
+	decision VARCHAR (80), 
 	comments TEXT,
 	last_updated INT4 NOT NULL,
 	deleted INT2 DEFAULT '0',
