@@ -11,7 +11,7 @@
 /* ccontrol.cc
  * Authors: Daniel Karrels dan@karrels.com
  *	    Tomer Cohen    MrBean@toughguy.net
- * $Id: ccontrol.cc,v 1.165 2003/03/06 15:20:15 mrbean_ Exp $
+ * $Id: ccontrol.cc,v 1.166 2003/03/06 15:37:50 mrbean_ Exp $
  */
 
 #define MAJORVER "1"
@@ -56,7 +56,7 @@
 #include	"ip.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.165 2003/03/06 15:20:15 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.166 2003/03/06 15:37:50 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -1664,7 +1664,7 @@ if(dbConnected)
 			glSet = true;
 			string tIP = xIP( NewUser->getIP()).GetNumericIP();
 			ccGline * theGline = new (std::nothrow) ccGline(SQLDb);
-			theGline->setHost(string("*@*") + tIP);
+			theGline->setHost(string("*@") + tIP);
 			theGline->setAddedBy(tempGline->getAddedBy());
 			theGline->setExpires(tempGline->getExpires());
 			theGline->setAddedOn(tempGline->getAddedOn());
@@ -3225,7 +3225,7 @@ bool ccontrol::processGlineQueue()
 {
 
 
-if (glineQueue.empty())
+if (inBurst || glineQueue.empty())
         {
         return true;
         }
