@@ -15,7 +15,7 @@
 #include	"Network.h"
 #include        "stdlib.h"
 
-const char LEARNNETWORKCommand_cc_rcsId[] = "$Id: LEARNNETWORKCommand.cc,v 1.1 2001/04/30 23:44:42 mrbean_ Exp $";
+const char LEARNNETWORKCommand_cc_rcsId[] = "$Id: LEARNNETWORKCommand.cc,v 1.2 2001/05/01 18:44:39 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -47,7 +47,7 @@ for( ; ptr != end ; ptr++ )
 	else
 		{
 		if(!NewServer->loadData(CurServer->getName().c_str()))
-			{
+			{ //If the server isnt in the database , update it
 			NewServer->set_Name(CurServer->getName());
 			NewServer->set_Uplink(Network->findServer(CurServer->getUplinkIntYY())->getName());
 			NewServer->set_LastNumeric(CurServer->getCharYY());
@@ -70,10 +70,9 @@ for( ; ptr != end ; ptr++ )
 		}
 	}
 delete NewServer;
-wallopMe = "Finished learning the network ";
-//wallopMe+= strtol(AddedServers);
-//wallopMe+= " servers";
-bot->Wallops( wallopMe ) ;
+char tWall[256];
+sprintf(tWall,"Finished learning the network, Learned a total of %d servers\n",AddedServers);
+bot->Wallops( tWall ) ;
 return true;
 }
 }

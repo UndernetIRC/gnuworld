@@ -23,7 +23,7 @@
 #include	"AuthInfo.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.26 2001/04/30 23:44:42 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.27 2001/05/01 18:44:39 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -186,6 +186,10 @@ RegisterCommand( new ADDNEWSERVERCommand( this, "ADDNEWSERVER", "<Server> "
 	"Add a new server to the bot database",flg_ADDSERVER ) ) ;
 RegisterCommand( new LEARNNETWORKCommand( this, "LEARNNET", ""
 	"Update the servers database according to the current situation",flg_ADDSERVER ) ) ;
+RegisterCommand( new REMOVESERVERCommand( this, "REMSERVER", "<Server name>"
+	"Removes a server from the bot database",flg_REMSERVER ) ) ;
+RegisterCommand( new CHECKNETWORKCommand( this, "CHECKNET", ""
+	"Checks if all known servers are in place",flg_CHECKNET ) ) ;
 
 }
 
@@ -394,6 +398,21 @@ switch( theEvent )
 		iServer* UplinkServer = static_cast< iServer* >( Data2);
 		ccServer* CheckServer = new (nothrow) ccServer(SQLDb);
 		assert(CheckServer != NULL);
+		if(CheckServer->loadNumericData(NewServer->getCharYY()))
+			{
+			if(strcasecmp(NewServer->getName(),CheckServer->get_Name()))
+				{
+				strstream s ;
+				s	<< getCharYY() << " WA :"
+    					<< "\002Database numeric collision warnning!\002 - "
+					<< NewServer->getName()
+					<< " != "
+					<< CheckServer->get_Name()
+					<< ends ;
+				Write( s ) ;
+				delete[] s.str();
+				}
+			}				
 		if(!CheckServer->loadData(NewServer->getName()))
 			{    	
 			string wallopMe = "Unknown server connected : " ;

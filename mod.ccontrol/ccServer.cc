@@ -3,7 +3,7 @@
  * 
  * Server class
  * 
- * $Id: ccServer.cc,v 1.1 2001/04/30 23:44:42 mrbean_ Exp $
+ * $Id: ccServer.cc,v 1.2 2001/05/01 18:44:39 mrbean_ Exp $
  */
  
 #include	<strstream>
@@ -19,7 +19,7 @@
 #include	"ccServer.h" 
 
 const char ccServer_h_rcsId[] = __CCSERVER_H ;
-const char ccServer_cc_rcsId[] = "$Id: ccServer.cc,v 1.1 2001/04/30 23:44:42 mrbean_ Exp $" ;
+const char ccServer_cc_rcsId[] = "$Id: ccServer.cc,v 1.2 2001/05/01 18:44:39 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -116,7 +116,7 @@ else
 
 bool ccServer::loadData(string ServerName)
 {
-static const char *Main = "SELECT * FROM servers WHERE lower(Name) = '";
+static const char *Main = "SELECT name,lastuplink,lastconnected,splitedon,lastnumeric FROM servers WHERE lower(Name) = '";
 
 strstream theQuery;
 theQuery	<< Main
@@ -147,6 +147,68 @@ LastConnected = static_cast< time_t >( atoi( SQLDb->GetValue(0,2) ) ) ;
 LastSplitted = static_cast< time_t >( atoi( SQLDb->GetValue(0,3) ) ) ;
 Numeric = SQLDb->GetValue(0,4);
 
+return true;
+}
+
+bool ccServer::loadNumericData(string ServNumeric)
+{
+static const char *Main = "SELECT name,lastuplink,lastconnected,splitedon,lastnumeric FROM servers WHERE lower(LastNumeric) = '";
+
+strstream theQuery;
+theQuery	<< Main
+		<< string_lower(ServNumeric)
+		<< "'" << ends;
+
+elog	<< "ccontrol::Server::LoadNumericData> "
+	<< theQuery.str()
+	<< endl; 
+
+ExecStatusType status = SQLDb->Exec( theQuery.str() ) ;
+delete[] theQuery.str() ;
+
+if( PGRES_TUPLES_OK != status )
+	{
+	elog	<< "ccontrol::Server> SQL Failure: "
+		<< SQLDb->ErrorMessage()
+		<< endl ;
+
+	return false ;
+	}
+
+if(SQLDb->Tuples() == 0 )
+    return false;
+Name = SQLDb->GetValue(0,0);
+Uplink = SQLDb->GetValue(0,1);
+LastConnected = static_cast< time_t >( atoi( SQLDb->GetValue(0,2) ) ) ;
+LastSplitted = static_cast< time_t >( atoi( SQLDb->GetValue(0,3) ) ) ;
+Numeric = SQLDb->GetValue(0,4);
+
+return true;
+}
+
+bool ccServer::Delete()
+{
+static const char *Main = "DELETE FROM servers WHERE lower(Name) = '";
+
+strstream theQuery;
+theQuery	<< Main
+		<< string_lower(Name)
+		<< "'" << ends;
+
+elog	<< "ccontrol::Server::Delete> "
+	<< theQuery.str()
+	<< endl; 
+
+ExecStatusType status = SQLDb->Exec( theQuery.str() ) ;
+delete[] theQuery.str() ;
+
+if( PGRES_COMMAND_OK != status ) 
+	{
+	elog	<< "ccontrol::Server::Delete> SQL Failure: "
+		<< SQLDb->ErrorMessage()
+		<< endl ;
+	return false;
+	}
 return true;
 }
 

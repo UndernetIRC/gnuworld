@@ -105,6 +105,10 @@ DECLARE_COMMAND( LISTHOSTS )
 DECLARE_COMMAND( CLEARCHAN )
 DECLARE_COMMAND( ADDNEWSERVER )
 DECLARE_COMMAND( LEARNNETWORK )
+DECLARE_COMMAND( REMOVESERVER )
+DECLARE_COMMAND( CHECKNETWORK )
+
+
 /*
  Patch for uworld commands level 
  Added by : |MrBean| (MrBean@toughguy.net)
@@ -148,9 +152,10 @@ const int flg_DEOP = 0x01;
 const int flg_MODERATE = 0x01;
 const int flg_UNMODERATE = 0x01;
 const int flg_LISTHOSTS = 0x80;
-const int flg_ADDSERVER = 2000;
-const int flg_LEARNNET = 2000;
-
+const int flg_ADDSERVER = 0x2000;
+const int flg_LEARNNET = 0x2000;
+const int flg_REMSERVER = 0x2000;
+const int flg_CHECKNET = 0x2000;
 /*
  Default commands that are added upon adding a new oper
 */

@@ -13,7 +13,7 @@
 #include	"StringTokenizer.h"
 #include	"Network.h"
 
-const char ADDNEWSERVERCommand_cc_rcsId[] = "$Id: ADDNEWSERVERCommand.cc,v 1.1 2001/04/30 23:44:42 mrbean_ Exp $";
+const char ADDNEWSERVERCommand_cc_rcsId[] = "$Id: ADDNEWSERVERCommand.cc,v 1.2 2001/05/01 18:44:39 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -40,7 +40,7 @@ if(NewServer->loadData(st [ 1 ]))
 	}
 NewServer->set_Name(st[1]);
 //We need to check if the server is currently connected , 
-//if so update the all the data
+//if so update all the data
 iServer* CurServer = Network->findServerName(st[1]);
 if(CurServer)
 	{
