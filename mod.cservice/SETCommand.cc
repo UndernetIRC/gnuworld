@@ -14,19 +14,18 @@
  *
  * Caveats: None.
  *
- * $Id: SETCommand.cc,v 1.29 2001/03/05 12:46:50 isomer Exp $
+ * $Id: SETCommand.cc,v 1.30 2001/03/07 23:22:11 dan_karrels Exp $
  */
 
 #include	<string>
  
 #include	"StringTokenizer.h"
-#include	"ELog.h" 
 #include	"cservice.h"
 #include	"Network.h"
 #include	"levels.h"
 #include	"responses.h"
 
-const char SETCommand_cc_rcsId[] = "$Id: SETCommand.cc,v 1.29 2001/03/05 12:46:50 isomer Exp $" ;
+const char SETCommand_cc_rcsId[] = "$Id: SETCommand.cc,v 1.30 2001/03/07 23:22:11 dan_karrels Exp $" ;
 
 namespace gnuworld
 {

@@ -8,20 +8,19 @@
  *
  * Caveats: None
  *
- * $Id: PARTCommand.cc,v 1.8 2001/02/21 00:14:43 dan_karrels Exp $
+ * $Id: PARTCommand.cc,v 1.9 2001/03/07 23:22:11 dan_karrels Exp $
  */
 
 
 #include	<string>
  
 #include	"StringTokenizer.h"
-#include	"ELog.h" 
 #include	"cservice.h" 
 #include	"levels.h"
 #include	"responses.h"
 #include	"Network.h"
 
-const char PARTCommand_cc_rcsId[] = "$Id: PARTCommand.cc,v 1.8 2001/02/21 00:14:43 dan_karrels Exp $" ;
+const char PARTCommand_cc_rcsId[] = "$Id: PARTCommand.cc,v 1.9 2001/03/07 23:22:11 dan_karrels Exp $" ;
 
 namespace gnuworld
 {

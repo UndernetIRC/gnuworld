@@ -8,7 +8,7 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char SHOWCOMMANDSCommand_cc_rcsId[] = "$Id: SHOWCOMMANDSCommand.cc,v 1.17 2001/03/06 02:34:32 dan_karrels Exp $" ;
+const char SHOWCOMMANDSCommand_cc_rcsId[] = "$Id: SHOWCOMMANDSCommand.cc,v 1.18 2001/03/07 23:22:11 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -34,6 +34,7 @@ static const char* lvl_0_cmds = "\002Level    0\002: access banlist chaninfo inf
 static const char* lvl_oper_cmds = "\002Level Oper\002: operjoin* operpart*";
 
 static const char* cmdFooter = "Commands marked * are not yet fully functional :)";
+
 bool SHOWCOMMANDSCommand::Exec( iClient* theClient, const string& Message )
 { 
 
@@ -84,21 +85,25 @@ if (!theChan)
  */
 
 int level = bot->getEffectiveAccessLevel(theUser, theChan, true);
-int admin = bot->getEffectiveAccessLevel(theUser, bot->getChannelRecord("*"), true); 
+int admin = bot->getEffectiveAccessLevel(theUser,
+	bot->getChannelRecord("*"), true); 
 
 if (level >= 1000) bot->Notice(theClient, lvl_1000_cmds);
 if (level >= 900) bot->Notice(theClient, lvl_900_cmds);
 if (level >= 800) bot->Notice(theClient, lvl_800_cmds);
 if (level >= 750) bot->Notice(theClient, lvl_750_cmds);
 if (level >= 600) bot->Notice(theClient, lvl_600_cmds);
-if (level >= 450) bot->Notice(theClient, lvl_450_cmds, (level>=500) ? "+" : ""); 
+if (level >= 450) bot->Notice(theClient, lvl_450_cmds,
+	(level>=500) ? "+" : ""); 
 if (level >= 400) bot->Notice(theClient, lvl_400_cmds); 
 if (level >= 100) bot->Notice(theClient, lvl_100_cmds);
 if (level >= 75) bot->Notice(theClient,  lvl_75_cmds); 
-if (level >= 50) bot->Notice(theClient,  lvl_50_cmds, (level>=200) ? "+" : "");
+if (level >= 50) bot->Notice(theClient,  lvl_50_cmds,
+		(level>=200) ? "+" : "");
 if (level == 42) bot->Notice(theClient,  lvl_42_cmds);
 if (level >= 25) bot->Notice(theClient,  lvl_25_cmds);
-if (level >= 1) bot->Notice(theClient,   lvl_1_cmds, (level>=200||admin>0||theClient->isOper()) ? "+" : ""); 
+if (level >= 1) bot->Notice(theClient,   lvl_1_cmds,
+		(level>=200||admin>0||theClient->isOper()) ? "+" : ""); 
 
 if (admin >= level::force) 
 	{
@@ -115,4 +120,4 @@ if (theClient->isOper())
 return true ;
 } 
 
-} // namespace gnuworld.
+} // namespace gnuworld

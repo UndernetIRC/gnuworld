@@ -10,7 +10,7 @@
 # even the implied warranty of MERCHANTABILITY or FITNESS FOR A
 # PARTICULAR PURPOSE.
 
-# "$Id: Makefile.in,v 1.70 2001/02/23 16:16:58 dan_karrels Exp $"
+# "$Id: Makefile.in,v 1.71 2001/03/07 23:22:11 dan_karrels Exp $"
 
 
 SHELL = @SHELL@
@@ -81,7 +81,7 @@ LN_S = @LN_S@
 MAKEINFO = @MAKEINFO@
 MOD_DIRS = @MOD_DIRS@
 MV = @MV@
-OBJDUMP = @OBJDUMP@
+NM = @NM@
 PACKAGE = @PACKAGE@
 PGSQL_INCLUDE = @PGSQL_INCLUDE@
 PGSQL_LIB = @PGSQL_LIB@
@@ -89,6 +89,7 @@ RANLIB = @RANLIB@
 RM = @RM@
 SRC_PATH = @SRC_PATH@
 UNAME = @UNAME@
+USE_SYMBOL_UNDERSCORE = @USE_SYMBOL_UNDERSCORE@
 VERSION = @VERSION@
 bindir = @bindir@
 glibdir = @glibdir@
