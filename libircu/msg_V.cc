@@ -1,5 +1,5 @@
 /**
- * msg_SQ.cc
+ * msg_V.cc
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -16,17 +16,17 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_V.cc,v 1.4 2003/08/09 23:15:33 dan_karrels Exp $
+ * $Id: msg_V.cc,v 1.5 2004/02/17 16:03:31 jeekay Exp $
  */
 
-#include <sstream>
+#include	<sstream>
 
 #include	"server.h"
 #include	"ServerCommandHandler.h"
 #include	"xparameters.h"
 #include	"config.h"
 
-RCSTAG( "$Id: msg_V.cc,v 1.4 2003/08/09 23:15:33 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: msg_V.cc,v 1.5 2004/02/17 16:03:31 jeekay Exp $" ) ;
 
 namespace gnuworld
 {
