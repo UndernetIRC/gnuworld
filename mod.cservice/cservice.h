@@ -1,5 +1,5 @@
 #ifndef __CSERVICE_H
-#define __CSERVICE_H "$Id: cservice.h,v 1.18 2001/01/08 04:13:04 gte Exp $"
+#define __CSERVICE_H "$Id: cservice.h,v 1.19 2001/01/10 01:46:10 gte Exp $"
 
 #include	<string>
 #include	<vector>
@@ -111,7 +111,18 @@ public:
 	sqlLevel* getLevelRecord(sqlUser*, sqlChannel*);
 
 	const string& prettyDuration( int );
- 
+
+	// Increments the flood counter for this iClient.
+ 	unsigned short getFloodPoints(iClient*);
+ 	void setFloodPoints(iClient*, unsigned short);
+
+	// Sets the timestamp for when we last recieved a msg from this client.
+	void setLastRecieved(iClient*, time_t);
+	time_t getLastRecieved(iClient*);
+
+	void setIgnored(iClient*, bool);
+	bool isIgnored(iClient*);
+
 	// Typedef's for user/channel Hashmaps.
 	typedef hash_map< string, sqlUser*, eHash, eqstr > sqlUserHashType ;
 	typedef hash_map< string, sqlChannel*, eHash, eqstr > sqlChannelHashType ;
@@ -148,6 +159,7 @@ public:
 	// Input flood rate.
 	int input_flood;
 	int output_flood;
+	int flood_duration;
 
 	// Timestamp's of when we last checked the database for updates.
 	time_t lastChannelRefresh;

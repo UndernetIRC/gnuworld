@@ -1,5 +1,5 @@
 #ifndef __CSERVICECOMMANDS_H
-#define __CSERVICECOMMANDS_H "$Id: cserviceCommands.h,v 1.14 2001/01/03 08:05:09 gte Exp $"
+#define __CSERVICECOMMANDS_H "$Id: cserviceCommands.h,v 1.15 2001/01/10 01:46:10 gte Exp $"
 
 #include	<string>
 #include	"iClient.h"
@@ -17,11 +17,12 @@ class Command
 
 public:
         Command( cservice* _bot, const string& _commName,
-                const string& _help )
+                const string& _help, unsigned short _flood_points )
          : bot( _bot ),
            server( 0 ),
            commName( _commName ),
-           help( _help )
+           help( _help ),
+		   flood_points( _flood_points )
         {}
         virtual ~Command() {}
 
@@ -39,12 +40,15 @@ public:
                 { return commName ; }
         inline const string& getHelp() const
                 { return help ; }
+		inline const unsigned short& getFloodPoints() const
+				{ return flood_points; }
 
 protected:
-        cservice*         bot ;
+        cservice*       bot ;
         xServer*        server ;
         string          commName ;
         string          help ;
+		unsigned short  flood_points ;
 
 } ;
  
@@ -54,8 +58,9 @@ class commName##Command : public Command \
 public: \
         commName##Command( cservice* _bot, \
                 const string& _commName, \
-                const string& _help ) \
-        : Command( _bot, _commName, _help ) \
+                const string& _help, \
+                unsigned short _flood_points) \
+        : Command( _bot, _commName, _help, _flood_points ) \
         {} \
         virtual bool Exec( iClient*, const string& ) ; \
         virtual ~commName##Command() {} \

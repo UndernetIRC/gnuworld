@@ -25,9 +25,9 @@ namespace gnuworld
 using namespace gnuworld ;
  
 networkData::networkData()
- : lastMessage( 0 ),
+ : messageTime( 0 ),
    outputCount( 0 ),
-   inputCount( 0 ),
+   flood_points( 0 ),
    currentUser( 0 ),
    ignored( false) 
 {

@@ -1,7 +1,7 @@
 /* networkData.h */
 
 #ifndef __NETWORKDATA_H
-#define __NETWORKDATA_H "$Id: networkData.h,v 1.1 2001/01/08 04:13:04 gte Exp $"
+#define __NETWORKDATA_H "$Id: networkData.h,v 1.2 2001/01/10 01:46:10 gte Exp $"
 
 #include	<string>
 #include	<ctime>
@@ -22,13 +22,13 @@ public:
 	virtual ~networkData() ; 
 
  	// Timestamp of when last message was recieved from this user.
-	unsigned int lastMessage;
+	time_t messageTime;
 
 	// Count of all bytes outputted to this client.
 	unsigned int outputCount;
 
-	// Number of messages recieved since lastMessage.
-	unsigned int inputCount;
+	// Total flood points accumulated by input from this client.
+	unsigned int flood_points;
 
 	// Pointer to the sqlUser record of this user (if it exists).
 	// Ie: If they're authed.

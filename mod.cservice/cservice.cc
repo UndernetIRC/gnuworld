@@ -111,37 +111,37 @@ cservice::cservice(const string& args)
 	 *  Register command handlers.
 	 */
  
-    RegisterCommand(new SHOWCOMMANDSCommand(this, "SHOWCOMMANDS", "<#channel>"));
-    RegisterCommand(new LOGINCommand(this, "LOGIN", "<username> <password>")); 
-    RegisterCommand(new ACCESSCommand(this, "ACCESS", "[channel] [nick] [-min n] [-max n] [-autoop] [-noautoop] [-modif [mask]]"));
-    RegisterCommand(new CHANINFOCommand(this, "CHANINFO", "<#channel>")); 
-    RegisterCommand(new ISREGCommand(this, "ISREG", "<#channel>")); 
-    RegisterCommand(new VERIFYCommand(this, "VERIFY", "<nick>"));
-    RegisterCommand(new SEARCHCommand(this, "SEARCH", "<keywords>"));
-    RegisterCommand(new MOTDCommand(this, "MOTD", ""));
-    RegisterCommand(new RANDOMCommand(this, "RANDOM", ""));
-    RegisterCommand(new SHOWIGNORECommand(this, "SHOWIGNORE", ""));
+    RegisterCommand(new SHOWCOMMANDSCommand(this, "SHOWCOMMANDS", "<#channel>", 3));
+    RegisterCommand(new LOGINCommand(this, "LOGIN", "<username> <password>", 10)); 
+    RegisterCommand(new ACCESSCommand(this, "ACCESS", "[channel] [nick] [-min n] [-max n] [-autoop] [-noautoop] [-modif [mask]]", 5));
+    RegisterCommand(new CHANINFOCommand(this, "CHANINFO", "<#channel>", 3)); 
+    RegisterCommand(new ISREGCommand(this, "ISREG", "<#channel>", 4)); 
+    RegisterCommand(new VERIFYCommand(this, "VERIFY", "<nick>", 3));
+    RegisterCommand(new SEARCHCommand(this, "SEARCH", "<keywords>", 5));
+    RegisterCommand(new MOTDCommand(this, "MOTD", "", 4));
+    RegisterCommand(new RANDOMCommand(this, "RANDOM", "", 4));
+    RegisterCommand(new SHOWIGNORECommand(this, "SHOWIGNORE", "", 3));
 
-    RegisterCommand(new OPCommand(this, "OP", "<#channel> [nick] [nick] .."));
-    RegisterCommand(new DEOPCommand(this, "DEOP", "<#channel> [nick] [nick] .."));
-    RegisterCommand(new VOICECommand(this, "VOICE", "<#channel> [nick] [nick] .."));
-    RegisterCommand(new DEVOICECommand(this, "DEVOICE", "<#channel> [nick] [nick] .."));
-    RegisterCommand(new ADDUSERCommand(this, "ADDUSER", "<#channel> <nick> <access>"));
-    RegisterCommand(new REMUSERCommand(this, "REMUSER", "<#channel> <nick>"));
-    RegisterCommand(new MODINFOCommand(this, "MODINFO", "<#channel> [ACCESS <nick> <level>] [AUTOOP <nick> <on|off>]"));
-    RegisterCommand(new SETCommand(this, "SET", "[#channel] <variable> <value>"));
-    RegisterCommand(new INVITECommand(this, "INVITE", "<#channel>"));
-    RegisterCommand(new TOPICCommand(this, "TOPIC", "<#channel> <topic>"));
-    RegisterCommand(new CHANINFOCommand(this, "CHANINFO", "<#channel>"));
-    RegisterCommand(new CHANINFOCommand(this, "INFO", "<#channel>"));
-    RegisterCommand(new BANLISTCommand(this, "BANLIST", "<#channel>"));
-    RegisterCommand(new KICKCommand(this, "KICK", "<#channel> <nick> <reason>"));
-    RegisterCommand(new STATUSCommand(this, "STATUS", "<#channel>"));
+    RegisterCommand(new OPCommand(this, "OP", "<#channel> [nick] [nick] ..", 3));
+    RegisterCommand(new DEOPCommand(this, "DEOP", "<#channel> [nick] [nick] ..", 3));
+    RegisterCommand(new VOICECommand(this, "VOICE", "<#channel> [nick] [nick] ..", 3));
+    RegisterCommand(new DEVOICECommand(this, "DEVOICE", "<#channel> [nick] [nick] ..", 3));
+    RegisterCommand(new ADDUSERCommand(this, "ADDUSER", "<#channel> <nick> <access>", 8));
+    RegisterCommand(new REMUSERCommand(this, "REMUSER", "<#channel> <nick>", 4));
+    RegisterCommand(new MODINFOCommand(this, "MODINFO", "<#channel> [ACCESS <nick> <level>] [AUTOOP <nick> <on|off>]", 6));
+    RegisterCommand(new SETCommand(this, "SET", "[#channel] <variable> <value>", 6));
+    RegisterCommand(new INVITECommand(this, "INVITE", "<#channel>", 2));
+    RegisterCommand(new TOPICCommand(this, "TOPIC", "<#channel> <topic>", 4));
+    RegisterCommand(new CHANINFOCommand(this, "CHANINFO", "<#channel>", 3));
+    RegisterCommand(new CHANINFOCommand(this, "INFO", "<#channel>", 3));
+    RegisterCommand(new BANLISTCommand(this, "BANLIST", "<#channel>", 3));
+    RegisterCommand(new KICKCommand(this, "KICK", "<#channel> <nick> <reason>", 4));
+    RegisterCommand(new STATUSCommand(this, "STATUS", "<#channel>", 4));
 
-    RegisterCommand(new REGISTERCommand(this, "REGISTER", "<#channel>"));
-    RegisterCommand(new FORCECommand(this, "FORCE", "<#channel>"));
-    RegisterCommand(new UNFORCECommand(this, "UNFORCE", "<#channel>"));
-    RegisterCommand(new SERVNOTICECommand(this, "SERVNOTICE", "<#channel> <text>"));
+    RegisterCommand(new REGISTERCommand(this, "REGISTER", "<#channel>", 0));
+    RegisterCommand(new FORCECommand(this, "FORCE", "<#channel>", 0));
+    RegisterCommand(new UNFORCECommand(this, "UNFORCE", "<#channel>", 0));
+    RegisterCommand(new SERVNOTICECommand(this, "SERVNOTICE", "<#channel> <text>", 0));
 
 	//-- Load in our cservice configuration file. 
 	cserviceConfig = new EConfig( args ) ;
@@ -179,6 +179,7 @@ cservice::cservice(const string& args)
 	updateInterval = atoi((cserviceConfig->Require( "update_interval" )->second).c_str());
 	input_flood = atoi((cserviceConfig->Require( "input_flood" )->second).c_str()); 
 	output_flood = atoi((cserviceConfig->Require( "output_flood" )->second).c_str());
+	flood_duration = atoi((cserviceConfig->Require( "flood_duration" )->second).c_str());
 
 	//-- Move this to the configuration file?  This should be fairly static..
 
@@ -207,18 +208,28 @@ int cservice::BurstChannels()
 	 *   Various other things must be done, such as setting the topic if AutoTopic
 	 *   is on, gaining ops if AlwaysOp is on, and so forth.
 	 */ 
-
-	if ((status = SQLDb->Exec( "SELECT name,flags,channel_ts,channel_mode,channel_key,channel_limit FROM channels WHERE name <> '*' AND registered_ts <> ''" )) == PGRES_TUPLES_OK)
+	strstream theQuery;
+	theQuery << "SELECT " << sql::channel_fields << " FROM channels WHERE name <> '*' AND registered_ts <> ''" << ends;
+	elog << "cmaster::BurstChannels> " << theQuery.str() << endl;
+	string id;
+	if ((status = SQLDb->Exec(theQuery.str())) == PGRES_TUPLES_OK)
 	{
 		for (int i = 0 ; i < SQLDb->Tuples (); i++)
-		{
-			StringTokenizer data( SQLDb->GetValue( i, 0 ) ) ;
+		{ 
 			/*
 			 *  Check the auto-join flag is set, if so - join. :)
 			 */ 
 
-			MyUplink->JoinChannel( this, data[ 0 ], SQLDb->GetValue( i, 3 ) );
-			MyUplink->RegisterChannelEvent( data [0], this ) ;
+			id = SQLDb->GetValue(i, 1);
+
+			MyUplink->JoinChannel( this, id, SQLDb->GetValue( i, 9 ) );
+			MyUplink->RegisterChannelEvent( id, this ) ;
+
+			// Add this information to the channel cache.
+			
+			sqlChannel* theChan = new sqlChannel(SQLDb);
+			theChan->setAllMembers(i);
+			sqlChannelCache.insert(sqlChannelHashType::value_type(id, theChan));
 		}
 	}
 
@@ -230,12 +241,78 @@ int cservice::OnConnect()
 	return 0;
 }
 
+unsigned short cservice::getFloodPoints(iClient* theClient)
+{
+	/*
+	 * This function gets an iClient's flood points. 
+	 */
+
+	networkData* tmpData = (networkData*)theClient->getCustomData(this);
+	assert(tmpData != NULL);
+ 
+	return tmpData->flood_points;
+}	
+
+void cservice::setIgnored(iClient* theClient, bool polarity)
+{
+	networkData* tmpData = (networkData*)theClient->getCustomData(this);
+	assert(tmpData != NULL);
+	
+	tmpData->ignored = polarity;
+}
+
+bool cservice::isIgnored(iClient* theClient)
+{
+	networkData* tmpData = (networkData*)theClient->getCustomData(this);
+	assert(tmpData != NULL);
+	
+	return tmpData->ignored;
+}	
+
+void cservice::setFloodPoints(iClient* theClient, unsigned short amount)
+{ 
+	networkData* tmpData = (networkData*)theClient->getCustomData(this);
+	assert(tmpData != NULL);
+
+	tmpData->flood_points = amount; 
+}	
+ 
+void cservice::setLastRecieved(iClient* theClient, time_t last_recieved)
+{
+	/*
+	 * This function sets a timestamp for when we last recieved
+	 * a message from this iClient.
+	 */
+
+	networkData* tmpData = (networkData*)theClient->getCustomData(this);
+	assert(tmpData != NULL);
+
+	tmpData->messageTime = last_recieved;
+}	
+
+time_t cservice::getLastRecieved(iClient* theClient)
+{
+	/*
+	 * This function gets a timestamp from this iClient
+	 * for flood control.
+	 */
+
+	networkData* tmpData = (networkData*)theClient->getCustomData(this);
+	assert(tmpData != NULL);
+
+	return tmpData->messageTime;
+}	
+
+
 int cservice::OnPrivateMessage( iClient* theClient, const string& Message )
 { 
- /*
-  *	Private message handler. Pass off the command to the relevant
-  * handler.
-  */
+	/*
+	 *	Private message handler. Pass off the command to the relevant
+	 * handler.
+	 */
+
+	// Don't talk to naughty people.
+	if (isIgnored(theClient)) return false; 
 
 	StringTokenizer st( Message ) ;
 	if( st.empty() )
@@ -246,7 +323,7 @@ int cservice::OnPrivateMessage( iClient* theClient, const string& Message )
 
 	/*
 	 * Do flood checking - admins at 750 or above are excempt.
-	 * N.B: Only check that once someone has flooded ;)
+	 * N.B: Only check that *after* someone has flooded ;)
 	 */
 
 	const string Command = string_upper( st[ 0 ] ) ;
@@ -255,16 +332,51 @@ int cservice::OnPrivateMessage( iClient* theClient, const string& Message )
 	commandMapType::iterator commHandler = commandMap.find( Command ) ;
 	if( commHandler == commandMap.end() )
 	{
-		Notice( theClient, "Unknown command" ) ;
+		Notice( theClient, "Unknown command" ) ; 
 	}
 	else
 	{
+		/*
+		 *  Check users flood limit, if exceeded..
+		 */
+		if( (getLastRecieved(theClient) + flood_duration) <= ::time(NULL) )
+		{
+			/*
+			 *  Reset a few things, they're out of the flood period now.
+			 *  Or, this is the first message from them.
+			 */
+			setFloodPoints(theClient, 0);
+			setLastRecieved(theClient, ::time(NULL));
+		} else {
+			/*
+			 *  Inside the flood period, check their points..
+			 */
+			if(getFloodPoints(theClient) > input_flood)
+			{
+				// Bad boy!
+				setIgnored(theClient, true);
+				setFloodPoints(theClient, 0);
+				setLastRecieved(theClient, ::time(NULL)); 
+				Notice(theClient, "Flood me will you? I'm not going to listen to you anymore."); 
+
+				// Send a silence numeric target, and mask to ignore messages from this user.
+				strstream s;
+				s << getCharYYXXX() << " SILENCE " << theClient->getCharYYXXX() << " *!*" 
+				  << theClient->getUserName() << "@" << theClient->getInsecureHost() << ends; 
+				Write( s );
+				delete[] s.str();
+
+				logAdminMessage("MSG-FLOOD from %s", theClient->getNickUserHost().c_str());
+				return false;
+			}
+		}
+
+		setFloodPoints(theClient, getFloodPoints(theClient) + commHandler->second->getFloodPoints() ); 
 		commHandler->second->Exec( theClient, Message ) ;
 	}
 
 return xClient::OnPrivateMessage( theClient, Message ) ;
 }
-
  
 int cservice::OnCTCP( iClient* theClient, const string& CTCP,
                     const string& Message, bool Secure)
@@ -295,7 +407,7 @@ int cservice::OnCTCP( iClient* theClient, const string& CTCP,
 
 	if(Command == "VERSION")
 	{
-		xClient::DoCTCP(theClient, CTCP.c_str(), "Undernet P10 Channel Services Version 2 [" __DATE__ " " __TIME__ "] ($Id: cservice.cc,v 1.32 2001/01/08 04:13:04 gte Exp $)");
+		xClient::DoCTCP(theClient, CTCP.c_str(), "Undernet P10 Channel Services Version 2 [" __DATE__ " " __TIME__ "] ($Id: cservice.cc,v 1.33 2001/01/10 01:46:10 gte Exp $)");
 		return true;
 	}
  
@@ -311,9 +423,7 @@ sqlUser* cservice::isAuthed(iClient* theClient, bool alert)
 	 *  them that they must be logged in.
 	 */
 
-	networkData* tmpData = (networkData*)theClient->getCustomData(this);
-
-	if (!tmpData) return 0; // No custom data, can't be logged in.
+	networkData* tmpData = (networkData*)theClient->getCustomData(this); 
 
 	sqlUser* theUser = tmpData->currentUser;
 
@@ -549,7 +659,7 @@ void cservice::loadTranslationTable()
 	}
 
 	elog << "cmaster::loadTranslationTable> Loaded " << translationTable.size() << " entries." << endl;
-}
+} 
  
 bool cservice::isOnChannel( const string& chanName ) const
 {
