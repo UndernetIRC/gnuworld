@@ -32,8 +32,8 @@ DELETE FROM supporters where user_id = to_die.user_id;
 \qecho [*] Removing Objection records..
 DELETE FROM objections where user_id = to_die.user_id;
 -- Clean up mailq records.
-\qecho [*] Removing mailq records..
-DELETE FROM mailq where user_id = to_die.user_id;
+--\qecho [*] Removing mailq records..
+--DELETE FROM mailq where user_id = to_die.user_id;
 --
 -- Clean up last_seens.
 \qecho [*] Removing last_seens..
