@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------------
--- "$Id: cservice.web.sql,v 1.21 2001/12/16 06:49:55 nighty Exp $"
+-- "$Id: cservice.web.sql,v 1.22 2002/01/13 13:59:23 nighty Exp $"
 -- Channel service DB SQL file for PostgreSQL.
 --
 -- Tables specific to webbased registration process.
@@ -141,6 +141,7 @@ CREATE TABLE objections (
 CREATE TABLE variables (
 	var_name VARCHAR(30),
 	contents text,
+	last_updated INT4,
 	PRIMARY KEY(var_name)
 );
 
