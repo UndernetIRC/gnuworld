@@ -22,6 +22,7 @@
 #include "Channel.h"
 #include "ChannelUser.h"
 #include "Network.h"
+#include "Timer.h"
 
 #include "cfChannel.h"
 #include "cfChannelUser.h"
@@ -54,12 +55,17 @@ void chanfix::doCountUpdate()
 	/* Iterator over all available channels */
 	log(logging::DEBUG, "Starting count cycle");
 
-	time_t starttime = ::time(0);
+	Timer myTimer;
+
+	unsigned int channels = 0;
+	unsigned int ops = 0;
 
 	for( xNetwork::const_channelIterator itr = Network->channels_begin() ;
 	     itr != Network->channels_end() ;
 	     ++itr ) {
 		Channel *tmpChannel = itr->second;
+
+		++channels;
 
 		cfChannel *cfChan = 0;
 
@@ -74,6 +80,8 @@ void chanfix::doCountUpdate()
 
 			if( ! cfChan ) { cfChan = getChannel(tmpChannel->getName(), true); }
 
+			++ops;
+
 			cfChannelUser *user = cfChan->getUser(chanUser->getClient()->getAccount());
 
 			if( user->getPoints() >= confMaxPoints ) { continue ; }
@@ -86,9 +94,11 @@ void chanfix::doCountUpdate()
 		}
 	}
 
-	time_t duration = ::time(0) - starttime;
-
-	log(logging::DEBUG, "Duration: %ld", duration);
+	log(logging::DEBUG, "Duration: %ums. Found %u channels and %u ops.",
+		myTimer.stopTimeMS(),
+		channels,
+		ops
+		);
 }
 
 } // namespace chanfix
