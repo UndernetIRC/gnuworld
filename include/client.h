@@ -3,9 +3,8 @@
  */
 
 #ifndef __XCLIENT_H
-#define __XCLIENT_H "$Id: client.h,v 1.2 2000/08/01 00:02:34 dan_karrels Exp $"
+#define __XCLIENT_H "$Id: client.h,v 1.3 2000/08/01 16:44:09 dan_karrels Exp $"
 
-#include	<queue>
 #include	<string>
 
 #include	"server.h"
@@ -259,9 +258,6 @@ public:
 	 */
 	virtual int Wallops( const char* Format, ... ) ;
 
-	/// Depracated.
-	virtual void ProcessMessageQueue() ;
-
 	/**
 	 * Return true if this xClient is attached to a server.
 	 */
@@ -483,8 +479,6 @@ protected:
 	 */
 	char		charXXX[ 4 ] ;
 
-//	std::queue< MessageNode* > *MessageQueue ;
-	
 } ;
 
 } // namespace gnuworld

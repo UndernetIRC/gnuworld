@@ -1,5 +1,5 @@
 /* main.cc
- * $Id: main.cc,v 1.6 2000/08/01 00:02:34 dan_karrels Exp $
+ * $Id: main.cc,v 1.7 2000/08/01 16:44:09 dan_karrels Exp $
  */
 
 #include	<fstream>
@@ -29,7 +29,7 @@
 using namespace gnuworld ;
 
 const char config_h_rcsId[] = __CONFIG_H ;
-const char main_cc_rcsId[] = "$Id: main.cc,v 1.6 2000/08/01 00:02:34 dan_karrels Exp $" ;
+const char main_cc_rcsId[] = "$Id: main.cc,v 1.7 2000/08/01 16:44:09 dan_karrels Exp $" ;
 
 using std::cerr ;
 using std::clog ;
@@ -129,6 +129,11 @@ if( SIG_ERR == ::signal( SIGINT, sigHandler ) )
 if( SIG_ERR == ::signal( SIGUSR1, sigHandler ) )
 	{
 	clog	<< "*** Unable to establish signal hander for SIGUSR1\n" ;
+	return 0 ;
+	}
+if( SIG_ERR == ::signal( SIGTERM, sigHandler ) )
+	{
+	clog	<< "*** Unable to establish signal hander for SIGTERM\n" ;
 	return 0 ;
 	}
 

@@ -3,7 +3,7 @@
  */
 
 #ifndef __XNETWORK_H
-#define __XNETWORK_H "$Id: Network.h,v 1.5 2000/08/01 00:02:34 dan_karrels Exp $"
+#define __XNETWORK_H "$Id: Network.h,v 1.6 2000/08/01 16:44:09 dan_karrels Exp $"
 
 #include	<vector>
 #include	<string>
@@ -124,10 +124,7 @@ public:
 	virtual bool		addChannel( Channel* ) ;
 
 	/*
-	 * All nickname based searches are case sensitive,
-	 * be careful how you place items into this structure.
-	 * Note that this is not true, at present, for server
-	 * name based searches.
+	 * All nickname based searches are case insensitive.
 	 */
 
 	/**
@@ -163,7 +160,7 @@ public:
 	virtual xClient*	findLocalClient( const string& yyxxx ) const ;
 
 	/**
-	 * Find a local (services) client by its case-sensitive nickname.
+	 * Find a local (services) client by its case-insensitive nickname.
 	 * Returns NULL if not found.
 	 */
 	virtual xClient*	findLocalNick( const string& nickName ) const ;
@@ -187,8 +184,7 @@ public:
 	virtual iServer*	findServerName( const string& name ) const ;
 
 	/**
-	 * Find a global channel by case sensitive name.
-	 * TODO: Change to case insensitive.
+	 * Find a global channel by case insensitive name.
 	 * Returns NULL if not found.
 	 */
 	virtual Channel*	findChannel( const string& name ) const ;
@@ -257,10 +253,15 @@ public:
 
 	/**
 	 * Remove a channel from the network table, keyed by its
-	 * case sensitive name.
+	 * case insensitive name.
 	 * Returns NULL if not found.
 	 */
 	virtual Channel*	removeChannel( const string& name ) ;
+
+	/**
+	 * Remove a channel from the network table.
+	 */
+	virtual Channel*	removeChannel( const Channel* theChan ) ;
 
 	/* Utility methods */
 

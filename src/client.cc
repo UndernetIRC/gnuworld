@@ -2,7 +2,6 @@
  */
 
 #include	<string>
-#include	<queue>
 #include	<strstream>
 
 #include	<cstdio>
@@ -27,7 +26,7 @@
 #include	"events.h"
 
 const char xClient_h_rcsId[] = __XCLIENT_H ;
-const char xClient_cc_rcsId[] = "$Id: client.cc,v 1.3 2000/08/01 00:11:21 dan_karrels Exp $" ;
+const char xClient_cc_rcsId[] = "$Id: client.cc,v 1.4 2000/08/01 16:44:09 dan_karrels Exp $" ;
 
 using std::string ;
 using std::strstream ;
@@ -67,16 +66,7 @@ memset( charXXX, 0, sizeof( charXXX ) ) ;
 }
 
 xClient::~xClient()
-{
-/*
-while( !MessageQueue->empty() )
-	{
-	delete MessageQueue->front() ;
-	MessageQueue->pop() ;
-	}
-delete MessageQueue ;
-*/
-}
+{}
 
 // This method is called after being added
 // to the network tables.
@@ -233,6 +223,10 @@ return -1 ;
 
 int xClient::ModeAsServer( const Channel* theChan, const string& Mode )
 {
+#ifndef NDEBUG
+  assert( theChan != 0 ) ;
+#endif
+
 return ModeAsServer( theChan->getName(), Mode ) ;
 }
 
@@ -400,18 +394,29 @@ int xClient::Kill( iClient*, const string& )
 return 0 ;
 }
 
-void xClient::ProcessMessageQueue()
-{}
-
 bool xClient::Op( Channel* theChan, iClient* theClient )
 {
 #ifndef NDEBUG
-  assert( theChan != NULL && theClient != NULL ) ;
+  assert( (theChan != NULL) && (theClient != NULL) ) ;
 #endif
 
 if( !Connected )
 	{
 	return false ;
+	}
+
+ChannelUser* theUser = theChan->findUser( theClient ) ;
+if( NULL == theUser )
+	{
+	elog	<< "xClient::Op> Unable to find ChannelUser: "
+		<< *theClient << endl ;
+	return false ;
+	}
+
+if( theUser->getMode( ChannelUser::MODE_O ) )
+	{
+	// User is already opped
+	return true ;
 	}
 
 bool onChannel = isOnChannel( theChan ) ;
@@ -430,6 +435,10 @@ if( !onChannel )
 	Part( theChan ) ;
 	}
 
+theUser->setMode( ChannelUser::MODE_O ) ;
+
+// TODO: Post message
+
 return true ;
 }
 
@@ -444,19 +453,58 @@ if( !Connected )
 	return false ;
 	}
 
+// Do 6 at a time, as per unet protocol
+string modes = "+" ;
+string args ;
+
 return true ;
 }
 
 bool xClient::DeOp( Channel* theChan, iClient* theClient )
 {
 #ifndef NDEBUG
-  assert( theChan != NULL && theClient != NULL ) ;
+  assert( (theChan != NULL) && (theClient != NULL) ) ;
 #endif
 
 if( !Connected )
 	{
 	return false ;
 	}
+
+ChannelUser* theUser = theChan->findUser( theClient ) ;
+if( NULL == theUser )
+	{
+	elog	<< "xClient::Op> Unable to find ChannelUser: "
+		<< *theClient << endl ;
+	return false ;
+	}
+
+if( !theUser->getMode( ChannelUser::MODE_O ) )
+	{
+	// User is not opped
+	return true ;
+	}
+
+bool onChannel = isOnChannel( theChan ) ;
+if( !onChannel )
+	{
+	Join( theChan ) ;
+	}
+
+Write( "%s M %s -o %s",
+	getCharYYXXX().c_str(),
+	theChan->getName().c_str(),
+	theClient->getCharYYXXX().c_str() ) ;
+
+if( !onChannel )
+	{
+	Part( theChan ) ;
+	}
+
+// Update the user's channel state
+theUser->removeMode( ChannelUser::MODE_O ) ;
+
+// TODO: Post message
 
 return true ;
 }

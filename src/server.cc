@@ -37,7 +37,7 @@
 //#include	"moduleLoader.h"
 
 const char xServer_h_rcsId[] = __XSERVER_H ;
-const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.13 2000/08/01 02:10:54 dan_karrels Exp $" ;
+const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.14 2000/08/01 16:44:09 dan_karrels Exp $" ;
 
 using std::string ;
 using std::vector ;
@@ -236,10 +236,11 @@ REGISTER_MSG( "KILL", Kill ) ;
 REGISTER_MSG( "W", NOOP ) ;
 REGISTER_MSG( "WHOIS", NOOP ) ;
 REGISTER_MSG( "MOTD", NOOP ) ;
-REGISTER_MSG( "MO", NOOP ) ;
+REGISTER_MSG( "MO", NOOP ) ; // MOTD
 REGISTER_MSG( "STATS", NOOP ) ;
-REGISTER_MSG( "V", NOOP ) ;
+REGISTER_MSG( "V", NOOP ) ; // Version
 REGISTER_MSG( "I", NOOP ) ; // Invite
+REGISTER_MSG( "TR", NOOP ) ; // Trace
 
 // AWAY
 REGISTER_MSG( "A", NOOP ) ;
@@ -1831,7 +1832,6 @@ if( NULL == theClient )
 		<< "): Unable to find client: "
 		<< Param[ 0 ] << endl ;
 	return -1 ;
-
 	}
 
 StringTokenizer st( Param[ 1 ], ',' ) ;
@@ -1898,7 +1898,6 @@ if( NULL == theClient )
 		<< Param[ 1 ] << ") Unable to find client: "
 		<< Param[ 0 ] << endl ;
 	return -1 ;
-
 	}
 
 StringTokenizer st( Param[ 1 ], ',' ) ;
@@ -2355,7 +2354,6 @@ for( StringTokenizer::size_type i = 0 ; i < st.size() ; i++ )
 
 	// Post the event to the clients listening for events on this
 	// channel, if any.
-	// TODO: Update message posting.
 	PostChannelEvent( EVT_JOIN, theChan->getName(),
 		static_cast< void* >( theChan ),
 		static_cast< void* >( Target ) ) ;
@@ -3028,13 +3026,19 @@ OnPartChannel( theClient, theChan ) ;
 void xServer::OnPartChannel( iClient* theClient, Channel* theChan )
 {
 #ifndef NDEBUG
-  assert( theClient != NULL && theChan != NULL ) ;
+  assert( (theClient != NULL) && (theChan != NULL) ) ;
 #endif
 
 theClient->removeChannel( theChan ) ;
 delete theChan->removeUser( theClient ) ;
 
 // TODO: Post message
+
+if( theChan->empty() && !Network->servicesOnChannel( theChan ) )
+	{
+	// Empty channel
+	delete Network->removeChannel( theChan ) ;
+	}
 
 }
 
@@ -3062,6 +3066,7 @@ void xServer::OnPartChannel( xClient* theClient, Channel* theChan )
 #endif
 
 // TODO: post message
+// TODO: Check for empty channel
 // Let the other xClient's know that one of their own
 // has parted a channel.
 
@@ -3085,22 +3090,17 @@ if( NULL == theChan )
 	{
 		strstream s ;
 		s	<< theClient->getCharYYXXX() << " C "
-			<< chanName << ' ' << time( 0 ) << ends ;
+			<< chanName << ' ' << time( 0 ) ;
+
+		if( !chanModes.empty() )
+			{
+			s	<< ' ' << chanModes ;
+			}
+		s	<< ends ;
+
 		Write( s ) ;
 		delete[] s.str() ;
 	}
-
-	if( !chanModes.empty() )
-		{
-		strstream s ;
-
-		// Set the requested channel modes.
-		s	<< theClient->getCharYYXXX() << " M "
-			<< chanName << ' '
-			<< chanModes << ends ;
-		Write( s ) ;
-		delete[] s.str() ;
-		}
 
 	// Instantiate the new channel
 	theChan = new Channel( chanName, time( 0 ) ) ;

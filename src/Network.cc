@@ -20,7 +20,7 @@
 #include	"misc.h"
 
 const char xNetwork_h_rcsId[] = __XNETWORK_H ;
-const char xNetwork_cc_rcsId[] = "$Id: Network.cc,v 1.8 2000/08/01 00:02:34 dan_karrels Exp $" ;
+const char xNetwork_cc_rcsId[] = "$Id: Network.cc,v 1.9 2000/08/01 16:44:09 dan_karrels Exp $" ;
 
 using std::string ;
 using std::endl ;
@@ -506,6 +506,15 @@ if( ptr == channelMap.end() )
 	}
 channelMap.erase( ptr ) ;
 return ptr->second ;
+}
+
+Channel* xNetwork::removeChannel( const Channel* theChan )
+{
+#ifndef NDEBUG
+  assert( theChan != 0 ) ;
+#endif
+
+return removeChannel( theChan->getName() ) ;
 }
 
 bool xNetwork::servicesOnChannel( const string& chanName ) const
