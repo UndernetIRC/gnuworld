@@ -40,10 +40,10 @@
 #include	"MessageNode.h"
 #include	"Socket.h"
 #include	"StringTokenizer.h"
-//#include	"moduleLoader.h"
+#include	"moduleLoader.h"
 
 const char xServer_h_rcsId[] = __XSERVER_H ;
-const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.30 2000/12/09 15:38:30 dan_karrels Exp $" ;
+const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.31 2000/12/09 22:01:11 dan_karrels Exp $" ;
 
 using std::string ;
 using std::vector ;
@@ -281,7 +281,6 @@ REGISTER_MSG( "DESYNCH", Desynch ) ;
 /*
  * Load and attach any modules specified in the config.
  */ 
-/*
 EConfig::const_iterator ptr = conf.Find( "module" ) ;
 for( ; ptr != conf.end() && ptr->first == "module" ; ++ptr )
 	{
@@ -308,7 +307,6 @@ for( ; ptr != conf.end() && ptr->first == "module" ; ++ptr )
  
 	AttachClient(clientPtr); 
 	}
-*/
 }
 
 /**

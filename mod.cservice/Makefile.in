@@ -1,5 +1,5 @@
 # Default paths (system-wide installs)
-# $Id: Makefile.in,v 1.12 2000/12/09 22:01:11 dan_karrels Exp $
+# $Id: Makefile.in,v 1.1 2000/12/09 22:01:11 dan_karrels Exp $
 #
 
 # Standard defines
@@ -14,9 +14,9 @@ CXXFLAGS = @CXXFLAGS@
 
 BIN_PATH = @BIN_PATH@
 LIB_PATH = @LIB_PATH@
-LIBS = -L$(BIN_PATH) -lgnuworld @LIBS@
+LIBS = -L$(LIB_PATH) -lgnuworld @LIBS@
 
-RM = @RM@
+RM = @RM@ -f
 CP = @CP@
 MV = @MV@
 LN = @LN@
@@ -27,32 +27,24 @@ RANLIB = @RANLIB@
 
 SHELL = /bin/sh
 
-SRCS = Channel.cc \
-	ChannelUser.cc \
-	client.cc \
-	clientExample.cc \
-	cloner.cc \
-	gnutest.cc \
-	iClient.cc \
-	ip.cc \
-	iServer.cc \
-	main.cc \
-	Network.cc \
-	server.cc
+SRCS = cservice.cc \
+	sqlChannel.cc \
+	sqlUser.cc
 OBJS = $(patsubst %.cc, %.o, $(SRCS))
+LIB = libcservice.so
 
-all: gnuworld
+all: $(OBJS) $(LIB)
 everything: all
 make: all
 
 %.o: %.cc
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-gnuworld: $(OBJS)
+$(LIB): $(OBJS)
 	$(CXX) $(CXXFLAGS) -o $(BIN_PATH)/GNUWorld $(OBJS) $(LIBS)
 
 clean:
-	$(RM) -f $(OBJS) $(BIN_PATH)/GNUWorld
+	$(RM) -f *.o $(BIN_PATH)/GNUWorld
 
 distclean: clean
 

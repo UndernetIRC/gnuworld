@@ -1,5 +1,5 @@
 #ifndef __CSERVICE_H
-#define __CSERVICE_H "$Id: cservice.h,v 1.3 2000/07/10 22:41:29 dan_karrels Exp $"
+#define __CSERVICE_H "$Id: cservice.h,v 1.1 2000/12/09 22:01:11 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>

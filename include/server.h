@@ -17,7 +17,7 @@
  */
 
 #ifndef __XSERVER_H
-#define __XSERVER_H "$Id: server.h,v 1.12 2000/11/05 23:09:39 dan_karrels Exp $"
+#define __XSERVER_H "$Id: server.h,v 1.13 2000/12/09 22:01:11 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
@@ -41,7 +41,7 @@
 #include	"Gline.h"
 #include	"xparameters.h"
 #include	"misc.h"
-//#include	"moduleLoader.h"
+#include	"moduleLoader.h"
 
 namespace gnuworld
 {
@@ -983,8 +983,8 @@ protected:
 	/**
 	 * List used to store runtime modules.
 	 */
-//	typedef vector< moduleLoader< xClient* >* >	moduleListType;
-//	moduleListType		moduleList;
+	typedef vector< moduleLoader< xClient* >* >	moduleListType;
+	moduleListType		moduleList;
 
 	typedef priority_queue< pair< time_t, timerInfo* >,
 		vector< pair< time_t, timerInfo* > >,

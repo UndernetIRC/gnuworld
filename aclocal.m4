@@ -1,7 +1,7 @@
 dnl aclocal.m4
 dnl   macros autoconf uses when building configure from configure.in
 dnl
-dnl $Id: aclocal.m4,v 1.1 2000/06/30 18:46:06 dan_karrels Exp $
+dnl $Id: aclocal.m4,v 1.2 2000/12/09 22:01:11 dan_karrels Exp $
 dnl
 
 dnl This entire function (minus a few minor modifications) was taken
@@ -196,11 +196,11 @@ case "$cv_var_system" in
     fi
     ;;
 esac
-AC_SUBST(MOD_LD)dnl
-AC_SUBST(MOD_CXX)dnl
-AC_SUBST(MOD_STRIP)dnl
-AC_SUBST(SHLIB_LD)dnl
-AC_SUBST(SHLIB_CXX)dnl
-AC_SUBST(SHLIB_STRIP)dnl
-AC_SUBST(DEFAULT_MAKE)dnl
-])dnl
+AC_SUBST(MOD_LD)
+AC_SUBST(MOD_CXX)
+AC_SUBST(MOD_STRIP)
+AC_SUBST(SHLIB_LD)
+AC_SUBST(SHLIB_CXX)
+AC_SUBST(SHLIB_STRIP)
+AC_SUBST(DEFAULT_MAKE)
+])

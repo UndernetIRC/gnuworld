@@ -1,54 +1,31 @@
-# $Id: Makefile.in,v 1.6 2000/11/06 16:08:33 dan_karrels Exp $
+# $Id: Makefile.in,v 1.7 2000/12/09 22:01:11 dan_karrels Exp $
 # Default paths (system-wide installs)
 
 # Standard defines
+BIN_PATH = @BIN_PATH@
+
 CXX = @CXX@
+CXXFLAGS = @CXXFLAGS@
+
+SHLIB_CXX = @SHLIB_CXX@
+SHLIB_LD = @SHLIB_LD@
+
 DEFS = @DEFS@
 LIBS = @LIBS@
-RANLIB = @RANLIB@
+
 SHLIB_CXX = @MOD_CXX@
 SHLIB_LD = @SHLIB_LD@
+
 AR = @AR@
 RANLIB = @RANLIB@
 
-# Set this to -g if you want to be able to debug the client, otherwise
-# use -O to have the compiler do some optimization instead.
-CXXFLAGS = @CXXFLAGS@
-
-# set this to whatever flag your compiler takes to turn on ansi mode.
-# gcc is ansi by default, but you can specify -ansi anyhow.  Digital's
-# 'cc' requires this, as may other non-gcc compilers.
-# Typically, its "-ansi" or "-std1" or some such thing.
-ANSIFLAGS =
-
-# Set this to -s if you want the binary to be striped.
-LDFLAGS = @LDFLAGS@
-
 ############ You shouldn't change anything below this line ###################
 
-RM = rm -f
-CP = cp
-MV = mv
-INSTALL = ./bsdinstall -c -m 755
-INSTALL_DATA = ../bsdinstall -c -m 644
-
-VERSION = @VERSION@
+RM = @RM@
+CP = @CP@
+MV = @MV@
 
 SHELL = /bin/sh
-MAKE2 = $(MAKE) $(MFLAGS)
-MFLAGS ='CC=$(CC)'					\
-	'CXX=$(CXX)'					\
-	'ANSIFLAGS=$(ANSIFLAGS)'			\
-	'CFLAGS=$(CFLAGS)'				\
-	'CXXFLAGS=$(CXXFLAGS)'				\
-	'DEFS=$(DEFS)'					\
-	'LDFLAGS=$(LDFLAGS)'				\
-	'LIBS=$(LIBS)'					\
-	'RM=$(RM)'					\
-	'MV=$(MV)'					\
-	'CP=$(CP)'					\
-	'AR=$(AR)'					\
-	'RANLIB=$(RANLIB)'
 
 SRCS = Buffer.cc \
 	ClientSocket.cc \
@@ -64,23 +41,20 @@ SRCS = Buffer.cc \
 #	EThread.cc
 #	EWriteThread.cc
 OBJS = $(patsubst %.cc, %.o, $(SRCS))
+LIB = $(BIN_PATH)/libgnuworld.so
 
-all: lib
+all: $(LIB)
 everything: all
 make: all
 
-.SUFFIXES: .o .cc .c
+%.o: %.cc
+	${SHLIB_CXX} ${CXXFLAGS} -c $< -o $@
 
-.cc.o:
-	${CXX} ${CXXFLAGS} -c $< -o $@
-
-lib: ${OBJS}
-	$(AR) rv libgnuworld.a $(OBJS)
-	$(RANLIB) libgnuworld.a
-#	${CXX} libgnuworld.so $(OBJS) $(LIBS)
+$(LIB): ${OBJS}
+	${SHLIB_LD} -o $(LIB) $(OBJS) $(LIBS)
 
 clean:
-	$(RM) -f *.o libgnuworld.a
+	$(RM) -f $(OBJS) $(LIB)
 
 distclean: clean
 

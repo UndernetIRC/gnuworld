@@ -1,4 +1,4 @@
-# $Id: Makefile.in,v 1.5 2000/11/12 17:27:53 dan_karrels Exp $
+# $Id: Makefile.in,v 1.6 2000/12/09 22:01:11 dan_karrels Exp $
 # all		-- gnuworld
 # clean		-- cleanup objects and executable
 # distclean	-- everything =P
@@ -6,14 +6,10 @@
 # Standard defines
 CXX = @CXX@
 DEFS = @DEFS@
-LIBS = @LIBS@
-
-# Set this to -g if you want to be able to debug the client, otherwise
-# use -O to have the compiler do some optimization instead.
-CXXFLAGS = @CXXFLAGS@
 
 BIN_PATH = @BIN_PATH@
 LIB_PATH = @LIB_PATH@
+MOD_DIRS = @MOD_DIRS@
 
 RM = @RM@
 CP = @CP@
@@ -23,32 +19,38 @@ LN = @LN@
 ############ You shouldn't change anything below this line ###################
 
 SHELL = /bin/sh
-MAKE2 = $(MAKE) $(MFLAGS)
-MFLAGS ='CXX=$(CXX)'					\
-	'ANSIFLAGS=$(ANSIFLAGS)'			\
-	'CXXFLAGS=$(CXXFLAGS)'				\
-	'DEFS=$(DEFS)'					\
-	'LDFLAGS=$(LDFLAGS)'				\
-	'RM=$(RM)'
 
-all: libgnuworld gnuworld
+all: libgnuworld gnuworld modules
 everything: all
 
 libgnuworld: lib/Makefile
-	@cd lib; $(MAKE2) all
+	@cd lib; make all
 
-gnuworld: src/Makefile Makefile libgnuworld
-	@cd src; $(MAKE2) all
+gnuworld: src/Makefile Makefile libgnuworld modules
+	@cd src; make all
+
+modules:
+	@for i in $(MOD_DIRS); do \
+		echo "Building module: $$i"; \
+		cd $$i; make all; cd ..; \
+	done;
 
 clean:
-	@-if [ -f lib/Makefile ]; then cd lib; $(MAKE2) clean; fi
-	@-if [ -f src/Makefile ]; then cd src; $(MAKE2) clean; fi
+	@-if [ -f lib/Makefile ]; then cd lib; make clean; fi
+	@-if [ -f src/Makefile ]; then cd src; make clean; fi
+	@for i in $(MOD_DIRS); do \
+		cd $$i; make clean; cd ..; \
+	done;
 
 distclean cleandir realclean:
 	$(RM) config.status config.cache
 	$(RM) config.log include/defs.h
-	@cd lib; $(MAKE2) distclean
-	@cd src; $(MAKE2) distclean
+	@cd lib; make distclean
+	@cd src; make distclean
+	@for i in $(MOD_DIRS); do \
+		cd $$i; make distclean; cd ..; \
+		$(RM) $$i/Makefile; \
+	done;
 	$(RM) src/Makefile lib/Makefile
 	$(RM) Makefile
 
@@ -58,6 +60,9 @@ depend:
 	@echo
 	@cd lib; make depend
 	@cd src; make depend
+	@for i in $(MOD_DIRS); do \
+		cd $$i; make depend; cd ..; \
+	done;
 	@echo
 	@echo "Finished building dependencies"
 	@echo
