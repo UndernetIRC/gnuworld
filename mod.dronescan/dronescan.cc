@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: dronescan.cc,v 1.30 2003/08/09 23:15:35 dan_karrels Exp $
+ * $Id: dronescan.cc,v 1.31 2003/08/10 12:26:39 jeekay Exp $
  */
 
 #include	<string>
@@ -39,7 +39,7 @@
 #include "sqlUser.h"
 #include "Timer.h"
 
-RCSTAG("$Id: dronescan.cc,v 1.30 2003/08/09 23:15:35 dan_karrels Exp $");
+RCSTAG("$Id: dronescan.cc,v 1.31 2003/08/10 12:26:39 jeekay Exp $");
 
 namespace gnuworld {
 
@@ -824,7 +824,7 @@ bool dronescan::checkChannel( const Channel *theChannel , const iClient *theClie
 			chanParams << theChannel->getLimit();
 		}
 		
-		log(WARN, "[%u] (%3u) %s +%s %s",
+		log(WARN, "[%u] (%4u) %s +%s %s",
 			failed,
 			theChannel->size(),
 			theChannel->getName().c_str(),
