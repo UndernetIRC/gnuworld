@@ -1,4 +1,4 @@
--- $Id: language_greek.sql,v 1.1 2002/10/31 13:49:25 nighty Exp $
+-- $Id: language_greek.sql,v 1.2 2002/10/31 13:58:31 nighty Exp $
 -- Greek	 language definition.
 -- 04/05/02 - Marios Solomou <hawk@undernet.org>.
 -- 04/05/02 - deop <d30pma@cytanet.com.cy>.
@@ -9,8 +9,7 @@ DELETE FROM translations where language_id=19;
 COPY "translations" FROM stdin; 
 19	1	Signwmi, Eiste eidi anagnorismenos san %s	31337	0
 19	2	ANAGNWRISH EPITIXIMENH san %s	31337	0
-19	3	Signwmi, Den exete arketa access gia na xrisimopoieisete auti tin
-entoli	31337	0
+19	3	Signwmi, Den exete arketa access gia na xrisimopoieisete auti tin entoli	31337	0
 19	4	Signwmi, to kanali %s einai adeio	31337	0
 19	5	Den vlepw ton/tin %s pouthena	31337	0
 19	6	Den mporw na vrw ton/tin %s sto kanali %s	31337	0
@@ -27,8 +26,7 @@ entoli	31337	0
 19	17	ANAGNWRISI ANEPITIXHS san %s (Lathos Kwdikos)	31337	0
 19	18	Den eimai s`ekeino to kanali!	31337	0
 19	19	Avasimo banlevel range. Vasiko range einai apo 1-%i.	31337	0
-19	20	Avasimi diarkeia gia ban. H diarkeia tou ban den mporei na einai pano
-apo to anwtato orio twn 336 hours.	31337	0
+19	20	Avasimi diarkeia gia ban. H diarkeia tou ban den mporei na einai pano apo to anwtato orio twn 336 hours.	31337	0
 19	21	O logos tou Ban den mporei na Xeperasei tous 128 charaktires	31337	0
 19	22	To Sikgekrimeno ban einai eidi stin lista twn bans mou!	31337	0
 19	23	To ban %s einai eidi kalimeno apo ton/tin %s	31337	0
@@ -43,8 +41,7 @@ apo to anwtato orio twn 336 hours.	31337	0
 19	32	Parakalw perioriste to erotima sas.	31337	0
 19	33	Telos tis listas twn access	31337	0
 19	34	Den eiparxei Teriasma!	31337	0
-19	35	Den mporeis na kaneis add ena xristi me isa i psilotera access apo ta
-dika sou.	31337	0
+19	35	Den mporeis na kaneis add ena xristi me isa i psilotera access apo ta dika sou.	31337	0
 19	36	Avasimo orio access.	31337	0
 19	37	O/H %s einai eidi added sto %s me orio access %i.	31337	0
 19	38	Egine added o xristis %s sto %s me orio access %i	31337	0
@@ -62,12 +59,10 @@ dika sou.	31337	0
 19	50	%s - teleutaia sinantisi : %s prin	31337	0
 19	51	Desc: %s	31337	0
 19	52	Me kaneis Flood oste? Den prokeitai na eipakouw se sena pia	31337	0
-19	53	Nomizo oti sou esteila ligo polla dedomena, Tha se kano ignore gia
-ligo.	31337	0
+19	53	Nomizo oti sou esteila ligo polla dedomena, Tha se kano ignore gia ligo.	31337	0
 19	54	Asimplirwti entoli	31337	0
 19	55	Gia na xrisimopoieiseis %s, prepei na kaneis /msg %s@%s	31337	0
-19	56	Signwmi, Prepei na eisai logged ston X gia na xrisimopoieiseis autin
-tin entoli.	31337	0
+19	56	Signwmi, Prepei na eisai logged ston X gia na xrisimopoieiseis autin tin entoli.	31337	0
 19	57	To kanali %s exei ginei suspend apo ena cservice administrator.	31337	0
 19	58	Ta access sou sto %s exoun ginei suspend.	31337	0
 19	59	H  simaia NOOP exei tethei sto %s	31337	0
@@ -87,33 +82,26 @@ tin entoli.	31337	0
 19	73	Den xero O/H %s pios einai.	31337	0
 19	74	Den eisai exousiodoteimenos me emena pia.	31337	0
 19	75	O/H %s den fenetai na exei access sto %s.	31337	0
-19	76	Den mporeis na kaneis modinfo se ena xristi me isa i psilotera access
-apo ta dika sou.	31337	0
-19	77	Den mporeis na doseis se ena xristi psilotera i isa access me ta dika
-sou.	31337	0
+19	76	Den mporeis na kaneis modinfo se ena xristi me isa i psilotera access apo ta dika sou.	31337	0
+19	77	Den mporeis na doseis se ena xristi psilotera i isa access me ta dika sou.	31337	0
 19	78	Exei ginei modinfo to orio twn access tou xristi %s's sto kanali %s se
 %i	31337	0
 19	79	Exei tethei AUTOMODE gia OP gia ton/tin %s sto kanali %s	31337	0
 19	80	Exei tethei AUTOMODE gia VOICE gia ton/tin %s sto kanali %s	31337	0
 19	81	Exei tethei AUTOMODE se NONE gia ton/tin %s sto kanali %s	31337	0 
-19	82	H frasi tou pass den mporei na einai to username i to en xrisi
-nickname - H sintaxi einai: NEWPASS <nea frasi-pass>	31337	0
+19	82	H frasi tou pass den mporei na einai to username i to en xrisi nickname - H sintaxi einai: NEWPASS <nea frasi-pass>	31337	0
 19	83	O kwdikos exei epitiximena allaxei.	31337	0
 19	84	H simaia NOOP exei tethei sto %s	31337	0
-19	85	H simaia STRICTOP exei tethei sto %s (kai O/H %s den einai
-anagnwrismenos/anagnwrismeni)	31337	0
-19	86	H simaia STRICTOP exei tethei sto %s (kai O/H %s den exei arketa
-access)	31337	0
+19	85	H simaia STRICTOP exei tethei sto %s (kai O/H %s den einai anagnwrismenos/anagnwrismeni)	31337	0
+19	86	H simaia STRICTOP exei tethei sto %s (kai O/H %s den exei arketa access)	31337	0
 19	87	To kanali %s exei ginei purge	31337	0
 19	88	To %s einai idi register me emena.	31337	0
 19	89	Avasimo onoma kanaliou.	31337	0
 19	90	To kanali %s exei ginei register	31337	0
 19	91	Aferethike O/H %s apo tin lista siopis mou	31337	0
 19	92	Den mporo na vro ton/tin %s stin lista siopis mou	31337	0
-19	93	Den mporeis na afereseis ena xristi me psilotera i isa access apo auta
-pou exeis	31337	0
-19	94	Den mporeis na afereseis ton eauto sou apo ena kanali tou opiou eisai
-katoxos	31337	0
+19	93	Den mporeis na afereseis ena xristi me psilotera i isa access apo auta pou exeis	31337	0
+19	94	Den mporeis na afereseis ton eauto sou apo ena kanali tou opiou eisai katoxos	31337	0
 19	95	Aferethike o xristis %s apo to %s	31337	0
 19	96	H rithmisi INVISIBLE einai twra ON.	31337	0
 19	97	H rithmisi INVISIBLE einai twra OFF.	31337	0
@@ -141,14 +129,10 @@ katoxos	31337	0
 19	119	H lista gia Ignore einai adeia	31337	0
 19	120	-- Telos tis Listas twn Ignore --	31337	0
 19	121	CMaster Channel Services internal status:	31337	0
-19	122	[     Channel Record Stats] \002Cached Entries:\002 %i    \002DB
-Requests:\002 %i    \002Cache Hits:\002 %i    \002Efficiency:\002 %.2f%%	31337	0
-19	123	[        User Record Stats] \002Cached Entries:\002 %i    \002DB
-Requests:\002 %i    \002Cache Hits:\002 %i    \002Efficiency:\002 %.2f%%	31337	0
-19	124	[Access Level Record Stats] \002Cached Entries:\002 %i    \002DB
-Requests:\002 %i    \002Cache Hits:\002 %i    \002Efficiency:\002 %.2f%%	31337	0
-19	125	[         Ban Record Stats] \002Cached Entries:\002 %i    \002DB
-Requests:\002 %i    \002Cache Hits:\002 %i    \002Efficiency:\002 %.2f%%	31337	0
+19	122	[     Channel Record Stats] \002Cached Entries:\002 %i    \002DB Requests:\002 %i    \002Cache Hits:\002 %i    \002Efficiency:\002 %.2f%%	31337	0
+19	123	[        User Record Stats] \002Cached Entries:\002 %i    \002DB Requests:\002 %i    \002Cache Hits:\002 %i    \002Efficiency:\002 %.2f%%	31337	0
+19	124	[Access Level Record Stats] \002Cached Entries:\002 %i    \002DB Requests:\002 %i    \002Cache Hits:\002 %i    \002Efficiency:\002 %.2f%%	31337	0
+19	125	[         Ban Record Stats] \002Cached Entries:\002 %i    \002DB Requests:\002 %i    \002Cache Hits:\002 %i    \002Efficiency:\002 %.2f%%	31337	0
 19	126	Last received User NOTIFY: %i	31337	0
 19	127	Last received Channel NOTIFY: %i	31337	0
 19	128	Last received Level NOTIFY: %i	31337	0
@@ -158,16 +142,14 @@ Requests:\002 %i    \002Cache Hits:\002 %i    \002Efficiency:\002 %.2f%%	31337	0
 19	132	To kanali %s exei %d xristes (%i operators)	31337	0
 19	133	To Mode einai: %s	31337	0
 19	134	Simaies pou exoun tethei: %s	31337	0
-19	135	Den mporeis na kaneis suspend ena xristi me isa i psilotera access
-apo ta dika sou.	31337	0
+19	135	Den mporeis na kaneis suspend ena xristi me isa i psilotera access apo ta dika sou.	31337	0
 19	136	Aniparktes monades xronou	31337	0
 19	137	Avasimi diarkeia gia suspend.	31337	0
 19	138	SUSPENSION gia ton/tin %s exei akirwthei	31337	0
 19	139	O/H %s einai eidi suspended sto %s	31337	0
 19	140	SUSPENSION gia ton/tin %s tha lixei se %s	31337	0
 19	141	BLABH: To topic den mporei na ipervei tous 145 xaraktires	31337	0
-19	142	Den exeis  arketa access gia na afereseis to ban %s apo tin vasi
-dedomenwn tou %s's	31337	0
+19	142	Den exeis  arketa access gia na afereseis to ban %s apo tin vasi dedomenwn tou %s's	31337	0
 19	143	Aferethikan %i bans pou teriazan sto %s	31337	0
 19	144	Aferethikan ta prosorina sou access %i apo to %s	31337	0
 19	145	Den fenetai na exeis forced access sto %s, Mipos eleixan?	31337	0
