@@ -1,10 +1,10 @@
-dnl $Id: configure.in,v 1.34 2001/11/03 01:13:05 mrbean_ Exp $
+dnl $Id: configure.in,v 1.35 2001/11/03 12:15:20 mrbean_ Exp $
 dnl ----------------------------------------------------------
 
 echo Configuring GNUWorld...
 echo
 
-AC_REVISION($Revision: 1.34 $)
+AC_REVISION($Revision: 1.35 $)
 AC_INIT(src/main.cc)
 AM_INIT_AUTOMAKE(gnuworld,0.0)
 AM_CONFIG_HEADER(include/defs.h)
@@ -47,8 +47,8 @@ if test $pthread_found = no; then
 AC_CHECK_LIB(c_r, pthread_create)
 fi
 
-CFLAGS="-Wall -pipe -pthread"
-CXXFLAGS="-Wall -pipe -pthread"
+CFLAGS="-Wall -pipe"
+CXXFLAGS="-Wall -pipe"
 CXX="g++"
 LIBS=""
 
