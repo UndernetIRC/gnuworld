@@ -43,7 +43,7 @@
 #include	"moduleLoader.h"
 
 const char xServer_h_rcsId[] = __XSERVER_H ;
-const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.49 2001/01/13 21:06:29 dan_karrels Exp $" ;
+const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.50 2001/01/13 22:06:53 gte Exp $" ;
 
 using std::string ;
 using std::vector ;
@@ -3075,6 +3075,27 @@ Channel* theChan = Network->findChannel( chanName ) ;
 if( (NULL == theChan) && bursting )
 	{
 	// Need to burst the channel
+	strstream s ;
+	s	<< getCharYY() << " B " << chanName << ' '
+		<< postJoinTime << ' '
+		<< chanModes << ' '
+		<< theClient->getCharYYXXX() ;
+
+	if( getOps )
+		{
+		s	<< ":o" ;
+		}
+
+		s	<< ends ;
+
+	Write( s ) ;
+	delete[] s.str() ;
+
+	// Instantiate the new channel
+	theChan = new Channel( chanName, time( 0 ) ) ;
+
+	// Add it to the network channel table
+	Network->addChannel( theChan ) ; 
 
 	}
 else if( NULL == theChan )
