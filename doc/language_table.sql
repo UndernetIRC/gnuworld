@@ -1930,3 +1930,171 @@ COPY "translations" FROM stdin;
 13	169	Jeg er ikke operatør på %s	31337
 13	170	%s for %i minutter	31337
 \.
+
+-- Arabic Language Definition.
+-- 02/09/01
+-- B_O_S_S - boss@boss.org
+
+COPY "translations" FROM stdin; 
+14	1	Assif. anta mo3arafone sabi9ane %s	31337
+14	2	ta3arof naji7li  %s	31337
+14	3	Assif.	31337
+14	4	Assif. Al9anatou %s farigha	31337
+14	5	lam yatamakan li woujoud  %s	31337
+14	6	Lam ajid %s fi 9anate %s	31337
+14	7	al9anatou %s laysate mousajala	31337
+14	8	la9ade asbahta op min tarafe %s (%s)	31337
+14	9	la9ade asbahta voice min tarafe %s (%s)	31337
+14	10	%s: anta lasta dakhila hadihi al9anate	31337
+14	11	%s lahou sabi9ane op fi  %s	31337
+14	12	%s lahou sabi9ane voice fi %s	31337
+14	13	la9ade okhida laka al op min tarafe %s (%s)	31337
+14	14	la9ade okhida laka voice min tarafe %s (%s)	31337
+14	15	%s laissa op fi %s	31337
+14	16	%s laissa voice fi %s	31337
+14	17	TA3AROUFE GHAYR NAJI7 %s (KALIMATO ASIRE KHATI2A)	31337
+14	18	Ana lastou dakhila hadidi al9anate!!	31337
+14	19	Moustawa ban GHAYROU sahihe. Moustawa sahihe: bayna 1-%i.	31337
+14	20	Moudatou ban ghayrou sahiha. Almoudatou alkouswa Hia 336 heures.	31337
+14	21	Sababou al ban layomkino an yata3adda 128 7arfe .	31337
+14	22	Hada al ban Youjadou sabi9ane fe la2i7a!	31337
+14	23	Al ban %s youjado sabi9ane %s	31337
+14	24	Almousstawa al adna ghayrou sahi7e.	31337
+14	25	Almousstawa al a9ssa ghayrou sahi7e.	31337
+14	26	MOUSSTA3MILE%: %s MOUSSTAWA: %s %s	31337
+14	27	AL9ANATE: %s -- AMRE: %s	31337
+14	28	AKHIRE TAGHYIRE: %s (%s kabla)	31337
+14	29	** MOUTAWA9IFE ** - Yantahi fi %s (moustawa %i)	31337
+14	30	AKHIRE MARA CHOUHIDA : %s 9able.	31337
+14	31	Youjado aktare min 15 talabe .	31337
+14	32	Min Fadlik 7addid talabake	31337
+14	33	Nihayato lai7ati al mousstawayate	31337
+14	34	lam youjade ayou chayeine youwafi9o talabakome 	31337
+14	35	La youmkino zeyadata chakhs lahou moustawake awe aktare. 	31337
+14	36	Mousstawa atadakhole ghayro sahi7e	31337
+14	37	%s oudifa moussaba9ane %s fi mousstawa %i.	31337
+14	38	ziyadatou moussta3mile %s ala %s fi mousstawa %i	31337
+14	39	Youjado ghalate: %s	31337
+14	40	%s: nihayatou lai7ati al ban		31337
+14	41	la youmkinou idharou tafassile al moussta3mile.	31337
+14	42	Ma3loumate 3ala: %s (%i)	31337
+14	43	alane moutassile 3abra: %s	31337
+14	44	URL: %s	31337
+14	45	Lougha: %i	31337
+14	46	9ANAWATE: %s	31337
+14	47	Madkhale Flood: %i	31337
+14	48	Makhraje Flood (Bytes): %i	31337
+14	49	%s moussajaloune min tarafe:	31337
+14	50	%s - chouhida lile mara akhira : %s 9able	31337
+14	51	wassf: %s	31337
+14	52	Touridouna flood ? lane arouda alaykoume ba3da hada.	31337
+14	53	Adono anani arsaltou lakoume ma3loumatine katira. saatajahaloukome ba3da al wa9te.	31337
+14	54	Amroune na9ise	31337
+14	55	li issti3mali %s, alaykoume bi /msg %s@%s	31337
+14	56	Assif. 3Alayka an takouna mo3arafe li sti3mali hada al amre.	31337
+14	57	9anatou %s oughli9ate min tarafe moudire cservice.	31337
+14	58	Tadakhouloukoume fi %s tawa9afa.	31337
+14	59	Tari9ate NOOP mousta3mala biha fi %s	31337
+14	60	Tari9ate STRICTOP mousta3mala fi %s	31337
+14	61	La9ad fa3alta deop li aktare min %i chakhsse	31337
+14	62	SYNTAXE: %s	31337
+14	63	mou3arafe moua9atane fi %s bi mousstawa %i	31337
+14	64	%s mousajala.	31337
+14	65	%s ghayre moussajala.	31337
+14	66	La adono ana %s you7iba hada.	31337
+14	67	\002*** lai7ato al Ban li 9anate %s ***\002	31337
+14	68	%s %s mousstawa: %i	31337
+14	69	OUDIFA MIN Tarafe: %s (%s)	31337
+14	70	MOUNDO: %s	31337
+14	71	YANTAHI: %s	31337
+14	72	\002*** NIHAYA ***\002	31337
+14	73	Assif, La a3rifou man houa %s.	31337
+14	74	Assif, Lasta mou3arafe.	31337
+14	75	%s La youjado ayo tadakhoule mouwafi9e fi %s.	31337
+14	76	La youmkinouka taghyire ayi moussata3mile lahou moustawakoume awe aktare. 	31337
+14	77	La youmkino ane tane9asa tadakhoule lahou moustawake awe aktare .	31337
+14	78	Taghyire mousstawa %s fi al9anate %s ila %i	31337
+14	79	Tachghilou tari9ate (OP) atela9ai li %s fi 9anate %s	31337
+14	80	Tachghilou tarikate (VOICE) atela9ai li %s fi 9anate %s	31337
+14	81	Izalatou tari9ate atela9ai li %s fil 9anate %s	31337
+14	82	ra9mouka asiri la younassibou isma lmousta3mile wa nick - al Syntaxe hiya: NEWPASS <nouveau mot-de-passe>	31337
+14	83	ra9mouka asiri ghouyira bi naja7e.	31337
+14	84	Tari9atou NOOP Mousta3mala fi %s	31337
+14	85	Tari9atou STRICTOP mousta3mala fi %s (wa %s Layssa mou3arafe)	31337
+14	86	Tari9atou STRICTOP mousta3mala fi %s (wa tadakhoulo %s ghayrou kafi)	31337
+14	87	%s na9iye	31337
+14	88	%s mousajale sabi9ane houna.	31337
+14	89	Ismou al 9anate ghayrou sa7i7e.	31337
+14	90	%s Soujilate	31337
+14	91	Izalatou %s min lai7ate a soukoute/tajahoule	31337
+14	92	Ghayrou 9adire 3ala ijadi %s fi lai7ati soukoute/tajahoule	31337
+14	93	La youmkino izalate tadakhoule lahou moustawake awe aktare.	31337
+14	94	La youmkino izalate tadakhoulaka fi 9anate tasta3miloha.	31337
+14	95	Tadakhoulou al moussta3mile %s ounzila ila %s	31337
+14	96	Tari9atou INVISIBLE li khiyaratikoume al khassa al ane ON.	31337
+14	97	Tari9atou INVISIBLE li khiyaratikoume al khassa al ane off.	31337
+14	98	%s li %s hia %s	31337
+14	99	Kimatou %s yajibou ane takouna ON aw OFF	31337
+14	100	Tahakoume USERFLAGS ghayrou sa7i7e! Al 9iyamou a sa7i7a hia 0,1,2.	31337
+14	101	Al USERFLAGS li %s houa %i	31337
+14	102	9imatou  MASSDEOPPRO yajibou ana takouna bayne 0-7	31337
+14	103	MASSDEOPPRO li %s ta7akama fihi ila %d	31337
+14	104	9imatou  FLOODPRO yajibou ane takouna bayne 0-7	31337
+14	105	FLOODPRO %s ta7akama fihi ila %d	31337
+14	106	Al wasfou la yajibou ane yata3ada 80 7arfane.	31337
+14	107	Wasaf %s ouzila.	31337
+14	108	Wasf %s houa: %s	31337
+14	109	Al URL la yajibou ana yata3ada 75 7arfane.	31337
+14	110	Al URL li %s ouzila.	31337
+14	111	Al URL li %s houa: %s	31337
+14	112	Al KEYWORDS (Alkalimatou almiftahe) la yajibou ane tata3ada 80 7arfane.	31337
+14	113	KEYWORDS li %s houme: %s	31337
+14	114	loughato mousta3emala: %s.	31337
+14	115	kHATA2: ikhtiyarou loughatine ghayre sa7iha.	31337
+14	116	Al 9anate %s ghayrou mawjouda 3ala chabakati arabte!	31337
+14	117	KHATA2: Ta7akoumou al 9anate ghayrou sa7i7e.	31337
+14	118	Lai7atou al motajahaline:	31337
+14	119	Lai7atou almoutajahaline farigha	31337
+14	120	-- Nihayatou lai7ati al moutajahaline 	31337
+14	121	Status interne du Service de Canaux CMaster:	31337
+14	130	almoutayatou moutafa9a: %i	31337
+14	131	\002file khidma moundou (uptime):\002 %s	31337
+14	132	Al 9anate %s li %d moussta3mile (%i Amiloune)	31337
+14	133	Touroukou al 9anate: %s	31337
+14	134	al flags almoussta3male : %s	31337
+14	135	La youmkino tawa9ofe mousta3mile lahou moustawake awe aktare.	31337
+14	136	Wa7adate alwa9te ghayre sa7i7a.	31337
+14	137	Moudatou al i9afe ghayre sa7i7a.	31337
+14	138	i9afe %s oulghiya.	31337
+14	139	%s mouwa9afe sabi9ane 3ala %s	31337
+14	140	al tawa9ofe li %s sa ya3male fi %s	31337
+14	141	KHATA2: al topic la yajibou ane yata3ada 145 7arfane.	31337
+14	142	tadakhoulouke ghayre kafi li izalati al ban %s min la2i7ate al mou3tayate li %s	31337
+14	143	7adfou %i ban(s) alati ta7tawi 3alayhe %s	31337
+14	144	Izalatou tadakhoulouke al moua9ate fi al mousstawa %i fi 9anate %s	31337
+14	145	La tadhare 9ade da3amata tadakhoulake ila %s, hale satantahi?	31337
+14	146	%s lame youwa9afe 3ala %s	31337
+14	147	%s huwa Opérateur IRC	31337
+14	148	%s ghayre mou3arafe.	31337
+14	149	%s mou3arafe 3abra userid %s%s	31337
+14	150	%s moumatile rassmi li CService%s wa mou3arafe 3abra userid %s	31337
+14	151	%s huwa moudire rassmi li CService%s wa mou3arafe 3abra userid %s	31337
+14	152	%s huwa moubarmije rassmi li CService%s wa mou3arafe 3abra userid %s	31337
+14	153	LA youjadou ayo %i doukhoule 7adire  [%s]	31337
+14	154	Min fadlike 7adide talabake.	31337
+14	155	La youjado doukhoule 7adire li talabouke. [%s]	31337
+14	156	%s: Touroukou al 9anate 9ade ouzila.	31337
+14	158	khiyare ghayrou sa7ihe.	31337
+14	159	%s Undernet Service Bot Rassmi .	31337
+14	160	%s is an Official Coder-Com Representative%s wa mou3arafe bi %s	31337
+14	161	%s is an Official Coder-Com Contributer%s wa mou3arafe bi %s	31337
+14	162	%s is an Official Coder-Com Developer%s wa mou3arafe bi %s	31337
+14	163	%s is an Official Coder-Com Senior%s wa mou3arafe bi %s	31337
+14	164	 wa IRC operator	31337
+14	165	Tamate idafato ban %s li %s fi darajati %i	31337
+14	166	%s: Lai7ato l ban farigha .		31337
+14	167	Ana sabi9ane fi hadihi al 9anate!	31337
+14	168	hada al amre moukhassasse li IRC Operators	31337
+14	169	Ana lastou op fi %s	31337
+14	170	%s ila %i da9i9a	31337
+\.

@@ -16,4 +16,5 @@ COPY "languages" FROM stdin;
 11	HU	Hungary	31337
 12	TR	Turkish	31337
 13	NO	Norsk	31337
+14	AR	Arabic	31337
 \.
