@@ -162,6 +162,7 @@ cservice::cservice(const string& args)
     RegisterCommand(new UNFORCECommand(this, "UNFORCE", "<#channel>", 8));
     RegisterCommand(new SERVNOTICECommand(this, "SERVNOTICE", "<#channel> <text>", 5));
     RegisterCommand(new SAYCommand(this, "SAY", "<#channel> <text>", 5));
+    RegisterCommand(new QUOTECommand(this, "QUOTE", "<text>", 5));
 
 	//-- Load in our cservice configuration file. 
 	cserviceConfig = new EConfig( args ) ;
@@ -472,7 +473,7 @@ int cservice::OnCTCP( iClient* theClient, const string& CTCP,
 
 	if(Command == "VERSION")
 	{
-		xClient::DoCTCP(theClient, CTCP.c_str(), "Undernet P10 Channel Services Version 2 [" __DATE__ " " __TIME__ "] ($Id: cservice.cc,v 1.67 2001/01/29 02:16:27 gte Exp $)");
+		xClient::DoCTCP(theClient, CTCP.c_str(), "Undernet P10 Channel Services Version 2 [" __DATE__ " " __TIME__ "] ($Id: cservice.cc,v 1.68 2001/01/29 02:21:58 gte Exp $)");
 		return true;
 	}
  
