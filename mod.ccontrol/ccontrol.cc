@@ -37,7 +37,7 @@
 #include	"ip.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.89 2001/12/05 21:03:57 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.90 2001/12/05 21:28:56 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -189,94 +189,94 @@ if( operChans.end() == find( operChans.begin(), operChans.end(), msgChan ) )
 // Be sure to use all capital letters for the command name
 
 RegisterCommand( new HELPCommand( this, "HELP", "[topic]"
-	"\t\tObtain general help or help for a specific command",commandLevel::flg_HELP,false,false,true,operLevel::UHSLEVEL,false ) ) ;
+	"\t\tObtain general help or help for a specific command",commandLevel::flg_HELP,false,false,true,operLevel::OPERLEVEL,false ) ) ;
 RegisterCommand( new INVITECommand( this, "INVITE", "<#channel> "
-	"\t\tRequest an invitation to a channel",commandLevel::flg_INVITE,false,false,false,operLevel::UHSLEVEL,false ) ) ;
+	"\t\tRequest an invitation to a channel",commandLevel::flg_INVITE,false,false,false,operLevel::OPERLEVEL,false ) ) ;
 RegisterCommand( new JUPECommand( this, "JUPE", "<servername> <reason> "
-	"Jupe a server for the given reason.",commandLevel::flg_JUPE,false,false,false,operLevel::UHSLEVEL,false ) ) ;
+	"Jupe a server for the given reason.",commandLevel::flg_JUPE,false,false,false,operLevel::OPERLEVEL,false ) ) ;
 RegisterCommand( new MODECommand( this, "MODE", "<channel> <modes> "
-	"Change modes on the given channel",commandLevel::flg_MODE,false,false,false,operLevel::UHSLEVEL,false ) ) ;
+	"Change modes on the given channel",commandLevel::flg_MODE,false,false,false,operLevel::OPERLEVEL,false ) ) ;
 RegisterCommand( new GLINECommand( this, "GLINE", "<user@host> <duration>[time units (s,d,h)] <reason> "
-	"Gline a given user@host for the given reason",commandLevel::flg_GLINE,false,false,false,operLevel::UHSLEVEL,false ) ) ;
+	"Gline a given user@host for the given reason",commandLevel::flg_GLINE,false,false,false,operLevel::OPERLEVEL,false ) ) ;
 RegisterCommand( new SCANGLINECommand( this, "SCANGLINE", "<mask> "
-	"Search current network glines for glines matching <mask>",commandLevel::flg_SGLINE,false,false,false,operLevel::UHSLEVEL,false ) ) ;
+	"Search current network glines for glines matching <mask>",commandLevel::flg_SGLINE,false,false,false,operLevel::OPERLEVEL,false ) ) ;
 RegisterCommand( new REMGLINECommand( this, "REMGLINE", "<user@host> "
-	"Remove the gline matching <mask>",commandLevel::flg_REMGLINE,false,false,false,operLevel::UHSLEVEL,false ) ) ;
+	"Remove the gline matching <mask>",commandLevel::flg_REMGLINE,false,false,false,operLevel::OPERLEVEL,false ) ) ;
 RegisterCommand( new TRANSLATECommand( this, "TRANSLATE", "<numeric>"
-	"Translate a numeric into user information",commandLevel::flg_TRANS,false,false,false,operLevel::UHSLEVEL,false ) ) ;
+	"Translate a numeric into user information",commandLevel::flg_TRANS,false,false,false,operLevel::OPERLEVEL,false ) ) ;
 RegisterCommand( new WHOISCommand( this, "WHOIS", "<nickname>"
-	"Obtain information on a given nickname",commandLevel::flg_WHOIS,false,false,false,operLevel::UHSLEVEL,false ) ) ;
+	"Obtain information on a given nickname",commandLevel::flg_WHOIS,false,false,false,operLevel::OPERLEVEL,false ) ) ;
 RegisterCommand( new KICKCommand( this, "KICK", "<channel> <nick> <reason>"
-	"Kick a user from a channel",commandLevel::flg_KICK,false,false,false,operLevel::UHSLEVEL,false ) ) ;
+	"Kick a user from a channel",commandLevel::flg_KICK,false,false,false,operLevel::OPERLEVEL,false ) ) ;
 //The following commands deals with operchans, if you want operchans just uncomment them
 /*
 
 RegisterCommand( new ADDOPERCHANCommand( this, "ADDOPERCHAN", "<channel>"
-	"Add an oper channel",commandLevel::flg_ADDOPCHN,false,false,false,operLevel::UHSLEVEL,false ) ) ;
+	"Add an oper channel",commandLevel::flg_ADDOPCHN,false,false,false,operLevel::OPERLEVEL,false ) ) ;
 RegisterCommand( new REMOPERCHANCommand( this, "REMOPERCHAN", "<channel>"
-	"Remove an oper channel",commandLevel::flg_REMOPCHN,false,false,false,operLevel::UHSLEVEL,false ) ) ;
+	"Remove an oper channel",commandLevel::flg_REMOPCHN,false,false,false,operLevel::OPERLEVEL,false ) ) ;
 RegisterCommand( new LISTOPERCHANSCommand( this, "LISTOPERCHANS",
-	"List current IRCoperator only channels",commandLevel::flg_LOPCHN,false,false,false,operLevel::UHSLEVEL,false ) ) ;
+	"List current IRCoperator only channels",commandLevel::flg_LOPCHN,false,false,false,operLevel::OPERLEVEL,false ) ) ;
 */	
 
 RegisterCommand( new CHANINFOCommand( this, "CHANINFO", "<channel>"
-	"Obtain information about a given channel",commandLevel::flg_CHINFO,false,false,false,operLevel::UHSLEVEL,false ) ) ;
+	"Obtain information about a given channel",commandLevel::flg_CHINFO,false,false,false,operLevel::OPERLEVEL,false ) ) ;
 RegisterCommand( new ACCESSCommand( this, "ACCESS",
-	"Obtain the access list",commandLevel::flg_ACCESS,false,false,true,operLevel::UHSLEVEL,false ) ) ;
+	"Obtain the access list",commandLevel::flg_ACCESS,false,false,true,operLevel::OPERLEVEL,false ) ) ;
 RegisterCommand( new LOGINCommand( this, "LOGIN", "<USER> <PASS> "
-	"Authenticate with the bot",commandLevel::flg_LOGIN,false,true,true,operLevel::UHSLEVEL,false ) ) ;
+	"Authenticate with the bot",commandLevel::flg_LOGIN,false,true,true,operLevel::OPERLEVEL,false ) ) ;
 RegisterCommand( new DEAUTHCommand( this, "DEAUTH", ""
-	"Deauthenticate with the bot",commandLevel::flg_DEAUTH,false,false,true,operLevel::UHSLEVEL,false ) ) ;
+	"Deauthenticate with the bot",commandLevel::flg_DEAUTH,false,false,true,operLevel::OPERLEVEL,false ) ) ;
 RegisterCommand( new ADDUSERCommand( this, "ADDUSER", "<USER> <OPERTYPE> <PASS> "
-	"Add a new oper",commandLevel::flg_ADDNOP,false,false,false,operLevel::UHSLEVEL,false ) ) ;
+	"Add a new oper",commandLevel::flg_ADDNOP,false,false,false,operLevel::OPERLEVEL,false ) ) ;
 RegisterCommand( new REMUSERCommand( this, "REMUSER", "<USER> <PASS> "
-	"Remove an oper",commandLevel::flg_REMOP,false,false,false,operLevel::UHSLEVEL,false ) ) ;
+	"Remove an oper",commandLevel::flg_REMOP,false,false,false,operLevel::OPERLEVEL,false ) ) ;
 RegisterCommand( new ADDCOMMANDCommand( this, "ADDCOMMAND", "<USER> <COMMAND> "
-	"Add a new command to an oper",commandLevel::flg_ADDCMD,false,false,false,operLevel::UHSLEVEL,false ) ) ;
+	"Add a new command to an oper",commandLevel::flg_ADDCMD,false,false,false,operLevel::OPERLEVEL,false ) ) ;
 RegisterCommand( new REMCOMMANDCommand( this, "REMCOMMAND", "<USER> <COMMAND> "
-	"Remove a command from oper",commandLevel::flg_DELCMD,false,false,false,operLevel::UHSLEVEL,false ) ) ;
+	"Remove a command from oper",commandLevel::flg_DELCMD,false,false,false,operLevel::OPERLEVEL,false ) ) ;
 RegisterCommand( new NEWPASSCommand( this, "NEWPASS", "<PASSWORD> "
-	"Change password",commandLevel::flg_NEWPASS,false,false,true,operLevel::UHSLEVEL,false ) ) ;
+	"Change password",commandLevel::flg_NEWPASS,false,false,true,operLevel::OPERLEVEL,false ) ) ;
 RegisterCommand( new SUSPENDCommand( this, "SUSPEND", "<OPER> <DURATION> [-l level] <REASON>"
-	"Suspend an oper",commandLevel::flg_SUSPEND,false,false,false,operLevel::UHSLEVEL,false ) ) ;
+	"Suspend an oper",commandLevel::flg_SUSPEND,false,false,false,operLevel::OPERLEVEL,false ) ) ;
 RegisterCommand( new UNSUSPENDCommand( this, "UNSUSPEND", "<OPER> "
-	"UnSuspend an oper",commandLevel::flg_UNSUSPEND,false,false,false,operLevel::UHSLEVEL,false ) ) ;
+	"UnSuspend an oper",commandLevel::flg_UNSUSPEND,false,false,false,operLevel::OPERLEVEL,false ) ) ;
 RegisterCommand( new MODUSERCommand( this, "MODUSER", "<OPER> <OPTION> <NEWVALUE> [OPTION] [NEWVALUE] ... "
-	"Modify an oper",commandLevel::flg_MODOP,false,false,false,operLevel::UHSLEVEL,false ) ) ;
+	"Modify an oper",commandLevel::flg_MODOP,false,false,false,operLevel::OPERLEVEL,false ) ) ;
 RegisterCommand( new MODERATECommand( this, "MODERATE", "<#Channel> "
-	"Moderate A Channel",commandLevel::flg_MODERATE,false,false,false,operLevel::UHSLEVEL,false ) ) ;
+	"Moderate A Channel",commandLevel::flg_MODERATE,false,false,false,operLevel::OPERLEVEL,false ) ) ;
 RegisterCommand( new UNMODERATECommand( this, "UNMODERATE", "<#Channel> "
-	"UNModerate A Channel",commandLevel::flg_UNMODERATE,false,false,false,operLevel::UHSLEVEL,false ) ) ;
+	"UNModerate A Channel",commandLevel::flg_UNMODERATE,false,false,false,operLevel::OPERLEVEL,false ) ) ;
 RegisterCommand( new OPCommand( this, "OP", "<#Channel> <nick> [nick] .. "
-	"Op user(s) on a Channel",commandLevel::flg_OP,false,false,false,operLevel::UHSLEVEL,false ) ) ;
+	"Op user(s) on a Channel",commandLevel::flg_OP,false,false,false,operLevel::OPERLEVEL,false ) ) ;
 RegisterCommand( new DEOPCommand( this, "DEOP", "<#Channel> <nick> [nick] .. "
-	"Deop user(s) on a Channel",commandLevel::flg_DEOP,false,false,false,operLevel::UHSLEVEL,false ) ) ;
+	"Deop user(s) on a Channel",commandLevel::flg_DEOP,false,false,false,operLevel::OPERLEVEL,false ) ) ;
 RegisterCommand( new LISTHOSTSCommand( this, "LISTHOSTS", "<oper> "
-	"Shows an oper hosts list",commandLevel::flg_LISTHOSTS,false,false,false,operLevel::UHSLEVEL,false ) ) ;
+	"Shows an oper hosts list",commandLevel::flg_LISTHOSTS,false,false,false,operLevel::OPERLEVEL,false ) ) ;
 RegisterCommand( new CLEARCHANCommand( this, "CLEARCHAN", "<#chan> "
-	"Removes all channel modes",commandLevel::flg_CLEARCHAN,false,false,false,operLevel::UHSLEVEL,false ) ) ;
+	"Removes all channel modes",commandLevel::flg_CLEARCHAN,false,false,false,operLevel::OPERLEVEL,false ) ) ;
 RegisterCommand( new ADDSERVERCommand( this, "ADDSERVER", "<Server> "
-	"Add a new server to the bot database",commandLevel::flg_ADDSERVER,false,false,false,operLevel::UHSLEVEL,false ) ) ;
+	"Add a new server to the bot database",commandLevel::flg_ADDSERVER,false,false,false,operLevel::OPERLEVEL,false ) ) ;
 RegisterCommand( new LEARNNETCommand( this, "LEARNNET", ""
-	"Update the servers database according to the current situation",commandLevel::flg_LEARNNET,false,false,false,operLevel::UHSLEVEL,true ) ) ;
+	"Update the servers database according to the current situation",commandLevel::flg_LEARNNET,false,false,false,operLevel::OPERLEVEL,true ) ) ;
 RegisterCommand( new REMSERVERCommand( this, "REMSERVER", "<Server name>"
-	"Removes a server from the bot database",commandLevel::flg_REMSERVER,false,false,false,operLevel::UHSLEVEL,true ) ) ;
+	"Removes a server from the bot database",commandLevel::flg_REMSERVER,false,false,false,operLevel::OPERLEVEL,true ) ) ;
 RegisterCommand( new CHECKNETCommand( this, "CHECKNET", ""
-	"Checks if all known servers are in place",commandLevel::flg_CHECKNET,false,false,false,operLevel::UHSLEVEL,true ) ) ;
+	"Checks if all known servers are in place",commandLevel::flg_CHECKNET,false,false,false,operLevel::OPERLEVEL,true ) ) ;
 RegisterCommand( new LASTCOMCommand( this, "LASTCOM", "[number of lines to show]"
-	"Post you the bot logs",commandLevel::flg_LASTCOM,false,false,true,operLevel::UHSLEVEL, true) ) ;
+	"Post you the bot logs",commandLevel::flg_LASTCOM,false,false,true,operLevel::OPERLEVEL, true) ) ;
 RegisterCommand( new FORCEGLINECommand( this, "FORCEGLINE", "<user@host> <duration>[time units] <reason> "
-	"Gline a given user@host for the given reason",commandLevel::flg_FGLINE,false,false,false,operLevel::UHSLEVEL,true ) ) ;
+	"Gline a given user@host for the given reason",commandLevel::flg_FGLINE,false,false,false,operLevel::OPERLEVEL,true ) ) ;
 RegisterCommand( new EXCEPTIONCommand( this, "EXCEPTIONS", "(list / add / del) [host mask]"
-	"Add connection exceptions on hosts",commandLevel::flg_EXCEPTIONS,false,false,false,operLevel::UHSLEVEL,true ) ) ;
+	"Add connection exceptions on hosts",commandLevel::flg_EXCEPTIONS,false,false,false,operLevel::OPERLEVEL,true ) ) ;
 RegisterCommand( new LISTIGNORESCommand( this, "LISTIGNORES", ""
-	"List the ignore list",commandLevel::flg_LISTIGNORES,false,false,false,operLevel::UHSLEVEL,true ) ) ;
+	"List the ignore list",commandLevel::flg_LISTIGNORES,false,false,false,operLevel::OPERLEVEL,true ) ) ;
 RegisterCommand( new REMOVEIGNORECommand( this, "REMIGNORE", "(nick/host)"
-	" Removes a host/nick from the  ignore list",commandLevel::flg_REMIGNORE,false,false,false,operLevel::UHSLEVEL,true ) ) ;
+	" Removes a host/nick from the  ignore list",commandLevel::flg_REMIGNORE,false,false,false,operLevel::OPERLEVEL,true ) ) ;
 RegisterCommand( new LISTCommand( this, "LIST", "(glines)"
-	" Get all kinds of lists from the bot",commandLevel::flg_LIST,false,false,false,operLevel::UHSLEVEL,true ) ) ;
+	" Get all kinds of lists from the bot",commandLevel::flg_LIST,false,false,false,operLevel::OPERLEVEL,true ) ) ;
 RegisterCommand( new COMMANDSCommand( this, "COMMANDS", "<command> <option> <new value>"
-	" Change commands options",commandLevel::flg_COMMANDS,false,false,false,operLevel::UHSLEVEL,true ) ) ;
+	" Change commands options",commandLevel::flg_COMMANDS,false,false,false,operLevel::OPERLEVEL,true ) ) ;
 RegisterCommand( new GCHANCommand( this, "GCHAN", "#channel <length/-per> <reason>"
 	" Set a BADCHAN gline",commandLevel::flg_GCHAN,false,false,false,operLevel::CODERLEVEL,true ) ) ;
 RegisterCommand( new REMGCHANCommand( this, "REMGCHAN", "#channel "
@@ -2960,8 +2960,11 @@ for(exceptionIterator ptr = exception_begin();ptr != exception_end();++ptr)
 
 void ccontrol::showStatus(iClient* tmpClient)
 {
-Notice(tmpClient,"Currently there are %d hosts in the clones queue",clonesQueue.size());
-Notice(tmpClient,"Monitoring %d threads out of %d, and there are %d in the waiting queue",gatesCheckingQueue.size()
+Notice(tmpClient,"Uptime : %s",getUplink()->getStartTime());
+if(checkClones)
+	Notice(tmpClient,"Currently there are %d hosts in the clones queue",clonesQueue.size());
+if(checkGates)
+	Notice(tmpClient,"Monitoring %d threads out of %d, and there are %d in the waiting queue",gatesCheckingQueue.size()
 		,maxThreads,gatesWaitingQueue.size());
 Notice(tmpClient,"Allocated Structures:");
 Notice(tmpClient,"ccGate:  %d",ccGate::numAllocated);
