@@ -1,23 +1,12 @@
 -- Language Definition Table for CMaster Undernet channel services.
+ 
+-- Zap everything! 
+DELETE FROM translations;
+
 -- English language definition.
 -- 27/12/00 - Greg Sikorski <gte@atomicrevs.demon.co.uk>.
 -- 01/03/01 - Daniel Simard <svr@undernet.org>.
- 
-DELETE FROM languages; 
-COPY "languages" FROM stdin;
-1	English	31337
-2	French	31337
-3	Danish	31337
-4	Dutch	31337
-5	German	31337
-6	Portuguese	31337
-7	Italian	31337
-8	Romanian	31337
-9	Catalan	31337
-10	Spanish	31337
-\.
 
-DELETE FROM translations;
 COPY "translations" FROM stdin;
 1	1	Sorry, You are already authenticated as %s	31337
 1	2	AUTHENTICATION SUCCESSFUL as %s	31337
@@ -565,8 +554,7 @@ COPY "translations" FROM stdin;
 5	10	%s: Du bist nicht im Channel	31337
 5	11	%s wurde bereits von %s geopt	31337
 \.
-
-
+ 
 -- Portuguese language definition.
 -- 02/03/01 - Ed Cattuci <maniac@undernet.org>
 
