@@ -12,7 +12,7 @@
  * TODO: /msg x suspend #channel *, suspends all users below your access
  * level.
  *
- * $Id: SUSPENDCommand.cc,v 1.14 2001/05/20 00:00:50 gte Exp $
+ * $Id: SUSPENDCommand.cc,v 1.15 2001/05/22 18:21:22 gte Exp $
  */
 
 #include	<string>
@@ -26,7 +26,7 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char SUSPENDCommand_cc_rcsId[] = "$Id: SUSPENDCommand.cc,v 1.14 2001/05/20 00:00:50 gte Exp $" ;
+const char SUSPENDCommand_cc_rcsId[] = "$Id: SUSPENDCommand.cc,v 1.15 2001/05/22 18:21:22 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -78,6 +78,21 @@ if (st[1][0] != '#')
 		return true;
 		}
 
+	/*
+	 *  Check the target's admin access, if its >= ours, don't
+	 *  allow it. :) 
+	 */
+
+	int targetLevel = bot->getAdminAccessLevel(targetUser);
+	if (targetLevel >= level)
+	{
+	bot->Notice(theClient, 
+		bot->getResponse(theUser,
+			language::suspend_access_higher,
+			string("Cannot suspend a user with equal or higher access than your own.")));
+	return false; 
+	}
+ 
 	// Suspend them.
 	targetUser->setFlag(sqlUser::F_GLOBAL_SUSPEND);
 	targetUser->commit();
