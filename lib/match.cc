@@ -16,7 +16,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- * $Id: match.cc,v 1.3 2001/03/24 16:00:56 dan_karrels Exp $
+ * $Id: match.cc,v 1.4 2001/05/17 00:59:33 dan_karrels Exp $
  */
 #include	"match.h"
 
@@ -145,7 +145,7 @@ break_while:
 
 char *collapse(char *mask)
 {
-  int star = 0;
+  bool star = false ;
   char *m = mask;
   char *b;
 
@@ -159,13 +159,13 @@ char *collapse(char *mask)
         do
         {
           if (*m == '*')
-            star = 1;
+            star = true;
           else
           {
             if (star && (*m != '?'))
             {
               *b++ = '*';
-              star = 0;
+              star = false;
             };
             *b++ = *m;
             if ((*m == '\\') && ((m[1] == '*') || (m[1] == '?')))
@@ -274,7 +274,7 @@ int matchcomp(char *cmask, int *minlen, int *charset, const char *mask)
   char *ls = 0;
   char *x1, *x2;
   int l1, l2, lmin, loop, sign;
-  int star = 0;
+  bool star = false;
   int cnt = 0;
   char ch;
   int chset = ~0;
@@ -285,7 +285,7 @@ int matchcomp(char *cmask, int *minlen, int *charset, const char *mask)
       switch (ch)
       {
         case '*':
-          star = 1;
+          star = true;
           break;
         case '?':
           cnt++;
@@ -302,7 +302,7 @@ int matchcomp(char *cmask, int *minlen, int *charset, const char *mask)
             fs = fs ? fs : b;
             *b++ = 'Z';
             chset2 &= ~NTL_LOWER;
-            star = 0;
+            star = false;
           };
           cnt++;
           *b = ToLower(ch);

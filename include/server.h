@@ -17,7 +17,7 @@
  */
 
 #ifndef __SERVER_H
-#define __SERVER_H "$Id: server.h,v 1.40 2001/05/17 00:34:11 dan_karrels Exp $"
+#define __SERVER_H "$Id: server.h,v 1.41 2001/05/17 00:59:33 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
@@ -788,12 +788,14 @@ protected:
 	xServer() {}
 
 	/**
-	 * Disable copy constructor, this method is declared but NOT defined.
+	 * Disable copy constructor, this method is declared but
+	 * NOT defined.
 	 */
 	xServer( const xServer& ) ;
 
 	/**
-	 * Disable assignment, this method is declared but NOT defined.
+	 * Disable assignment, this method is declared but NOT
+	 * defined.
 	 */
 	xServer operator=( const xServer& ) ;
 
@@ -804,14 +806,31 @@ protected:
 	virtual bool	RemoveJupe( const iServer* );
 
 	/**
+	 * Remove glines which match the given userHost, post event.
+	 */
+	virtual void	removeMatchingGlines( const string& ) ;
+
+	/**
+	 * Return an iterator to the beginning of the gline structure.
+	 */
+	inline glineIterator	gline_begin()
+		{ return glineList.begin() ; }
+
+	/**
+	 * Return an iterator to the end of the gline structure.
+	 */
+	inline glineIterator	gline_end()
+		{ return glineList.end() ; }
+
+	/**
 	 * Burst out information about all xClients on this server.
 	 */
-	virtual void BurstClients() ;
+	virtual void 	BurstClients() ;
 
 	/**
 	 * Output channel information for each client on this server.
 	 */
-	virtual void BurstChannels() ;
+	virtual void	BurstChannels() ;
 
 	/**
 	 * Remove all modes from a channel, used when bursting an
@@ -822,32 +841,32 @@ protected:
 	/**
 	 * Parse a burst line for channel bans.
 	 */
-	virtual void parseBurstBans( Channel*, const char* ) ;
+	virtual void	parseBurstBans( Channel*, const char* ) ;
 
 	/**
 	 * Parse a burst line for channel users.
 	 */
-	virtual void parseBurstUsers( Channel*, const char* ) ;
+	virtual void	parseBurstUsers( Channel*, const char* ) ;
 
 	/**
 	 * Convenience method that will part a given network
 	 * client from all channels, and notify each listening
 	 * xClient of the parts.
 	 */
-	virtual void userPartAllChannels( iClient* ) ;
+	virtual void	userPartAllChannels( iClient* ) ;
 
 	/**
 	 * Read the config file.  Return true if success, false
 	 * otherwise.
 	 */
-	virtual bool readConfigFile( const string& ) ;
+	virtual bool	readConfigFile( const string& ) ;
 
 	/**
 	 * Parses a config file and attempts to load all modules
 	 * specified therein.  If any part of the process fails,
 	 * false is returned.  Otherwise, true is returned.
 	 */
-	virtual bool loadModules( const string& ) ;
+	virtual bool	loadModules( const string& ) ;
 
 	/**
 	 * Signal handler for the server itself.
@@ -865,14 +884,14 @@ protected:
 	 * otherwise.  This variable is checked each iteration of
 	 * the main server loop.
 	 */
-	static bool		caughtSignal ;
+	static bool	caughtSignal ;
 
 	/**
 	 * This variable holds the signal identifier for the most
 	 * recently issued software signal, or 0 if no signal
 	 * is currently pending.
 	 */
-	static int		whichSig ;
+	static int	whichSig ;
 
 	/**
 	 * The structure type to hold information about client timed

@@ -48,7 +48,7 @@
 #include	"ServerTimerHandlers.h"
 
 const char server_h_rcsId[] = __SERVER_H ;
-const char server_cc_rcsId[] = "$Id: server.cc,v 1.97 2001/05/17 00:34:11 dan_karrels Exp $" ;
+const char server_cc_rcsId[] = "$Id: server.cc,v 1.98 2001/05/17 00:59:33 dan_karrels Exp $" ;
 const char config_h_rcsId[] = __CONFIG_H ;
 const char misc_h_rcsId[] = __MISC_H ;
 const char events_h_rcsId[] = __EVENTS_H ;
@@ -169,7 +169,7 @@ xServer::~xServer()
 delete commandMap ;
 
 // Deallocate all of the Glines
-for( glineListType::iterator ptr = glineList.begin() ; ptr != glineList.end() ;
+for( glineIterator ptr = gline_begin() ; ptr != gline_end() ;
 	++ptr )
 	{
 	delete *ptr ;
@@ -1699,8 +1699,8 @@ return strlen( buffer ) ;
 
 bool xServer::removeGline( const string& userHost )
 {
-glineListType::iterator ptr = glineList.begin() ;
-for( ; ptr != glineList.end() ; ++ptr )
+glineIterator ptr = gline_begin() ;
+for( ; ptr != gline_end() ; ++ptr )
 	{
 	if( *(*ptr) == userHost )
 		{
@@ -1709,7 +1709,7 @@ for( ; ptr != glineList.end() ; ++ptr )
 	++ptr ;
 	}
 
-if( ptr == glineList.end() )
+if( ptr == gline_end() )
 	{
 	return false ;
 	}
@@ -1741,7 +1741,8 @@ bool xServer::setGline(
 	const time_t& duration )
 {
 
-// TODO: Remove any old matches, or just update the expiration time
+// Remove any old matches
+removeMatchingGlines( userHost ) ;
 
 Gline* newGline =
 	new (nothrow) Gline( setBy, userHost, reason, duration ) ;
@@ -1749,7 +1750,7 @@ assert( newGline != 0 ) ;
 
 // Notify the rest of the network
 strstream s ;
-s	<< charYY << " GL * +"
+s	<< getCharYY() << " GL * +"
 	<< userHost << ' '
 	<< duration << " :"
 	<< reason << ends ;
@@ -1767,8 +1768,8 @@ vector< const Gline* > xServer::matchGline( const string& userHost ) const
 {
 vector< const Gline* > retMe ;
 
-for( glineListType::const_iterator ptr = glineList.begin() ;
-	ptr != glineList.end() ; ++ptr )
+for( const_glineIterator ptr = gline_begin() ;
+	ptr != gline_end() ; ++ptr )
 	{
 	if( !match( (*ptr)->getUserHost(), userHost ) )
 		{
@@ -1781,8 +1782,8 @@ return retMe ;
 
 const Gline* xServer::findGline( const string& userHost ) const
 {
-for( glineListType::const_iterator ptr = glineList.begin() ;
-	ptr != glineList.end() ; ++ptr )
+for( const_glineIterator ptr = gline_begin() ;
+	ptr != gline_end() ; ++ptr )
 	{
 	if( !strcasecmp( (*ptr)->getUserHost(), userHost ) )
 		{
@@ -1797,8 +1798,8 @@ void xServer::sendGlinesToNetwork()
 {
 time_t now = ::time( 0 ) ;
 
-for( glineListType::const_iterator ptr = glineList.begin() ;
-	ptr != glineList.end() ; ++ptr )
+for( const_glineIterator ptr = gline_begin() ;
+	ptr != gline_end() ; ++ptr )
 	{
 	strstream s ;
 	s	<< getCharYY() << " GL * +"
@@ -1808,6 +1809,25 @@ for( glineListType::const_iterator ptr = glineList.begin() ;
 
 	Write( s ) ;
 	delete[] s.str() ;
+	}
+}
+
+void xServer::removeMatchingGlines( const string& wildHost )
+{
+for( glineIterator ptr = gline_begin() ; ptr != gline_end() ; )
+	{
+	// TODO: Does this work with two wildHost's?
+	if( !match( wildHost, (*ptr)->getUserHost() ) )
+		{
+		ptr = glineList.erase( ptr ) ;
+
+		PostEvent( EVT_REMGLINE,
+			static_cast< void* >( *ptr ) ) ;
+		}
+	else
+		{
+		++ptr ;
+		}
 	}
 }
 
@@ -3074,8 +3094,8 @@ void xServer::updateGlines()
 {
 time_t now = ::time( 0 ) ;
 
-glineListType::iterator ptr = glineList.begin(),
-	end = glineList.end() ;  
+glineIterator	ptr = gline_begin(),
+		end = gline_end() ;  
 for( ; ptr != end ; )
 	{
 	if( (*ptr)->getExpiration() <= now )
