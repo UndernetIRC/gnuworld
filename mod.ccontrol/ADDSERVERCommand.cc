@@ -14,7 +14,7 @@
 #include	"Network.h"
 #include	"Constants.h"
 
-const char ADDSERVERCommand_cc_rcsId[] = "$Id: ADDSERVERCommand.cc,v 1.11 2002/03/01 18:27:36 mrbean_ Exp $";
+const char ADDSERVERCommand_cc_rcsId[] = "$Id: ADDSERVERCommand.cc,v 1.12 2003/02/10 12:22:07 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -68,14 +68,14 @@ else
 bot->MsgChanLog("ADDSERVER %s\n",SName.c_str());
 		
 ccServer* NewServer = new ccServer(bot->SQLDb);
-if(NewServer->loadData(bot->removeSqlChars(SName)))
+if(NewServer->loadData(SName))
 	{
 	bot->Notice(theClient, "Server %s is already in my database!",
 		SName.c_str());
 	delete NewServer;
 	return false;
 	}
-NewServer->setName(bot->removeSqlChars(SName));
+NewServer->setName(SName);
 //We need to check if the server is currently connected , 
 //if so update all the data
 iServer* CurServer = Network->findServerName(SName);

@@ -3,7 +3,7 @@
  */
 
 #ifndef __CCONTROL_H
-#define __CCONTROL_H "$Id: ccontrol.h,v 1.82 2002/12/28 22:44:56 mrbean_ Exp $"
+#define __CCONTROL_H "$Id: ccontrol.h,v 1.83 2003/02/10 12:22:11 mrbean_ Exp $"
 
 //Undef this if you want to log to the database
 #define LOGTOHD 
@@ -588,7 +588,7 @@ public:
 	
 	const string expandDbServer(const string&);
 	
-	const string removeSqlChars(const string&);
+	static const string removeSqlChars(const string&);
 	
 	void checkDbConnection();
 	

@@ -1,7 +1,7 @@
 /* ccGline.h */
 
 #ifndef __CCGLINE_H
-#define __CCGLINE_H "$Id: ccGline.h,v 1.11 2002/12/28 22:44:56 mrbean_ Exp $"
+#define __CCGLINE_H "$Id: ccGline.h,v 1.12 2003/02/10 12:22:10 mrbean_ Exp $"
 
 #include	<string>
 #include	<list>
@@ -78,12 +78,6 @@ public:
 	inline void 		setSqldb(PgDatabase* _SQLDb)
 		{ SQLDb = _SQLDb; } 
 		
-	inline burstIterator 	getBurstBegin()
-	{ return burstServers.begin(); }
-	
-	inline burstIterator	getBurstEnd()
-	{ return burstServers.end(); }
-
 	//Methods for updating 
 
 	bool Insert();
@@ -96,10 +90,6 @@ public:
 	
 	bool Delete();
 	
-	void addBurst(string*);
-
-	void clearBurst();
-
 	static unsigned int numAllocated;
 	
 protected:

@@ -24,7 +24,7 @@
 #include	"ccUser.h"
 #include	"Constants.h"
 
-const char GLINECommand_cc_rcsId[] = "$Id: GLINECommand.cc,v 1.45 2002/12/28 22:44:55 mrbean_ Exp $";
+const char GLINECommand_cc_rcsId[] = "$Id: GLINECommand.cc,v 1.46 2003/02/10 12:22:08 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -150,7 +150,7 @@ if(gLength == 0)
 	gLength = bot->getDefaultGlineLength() ;
 	ResStart = 1;
 	}
-string nickUserHost = bot->removeSqlChars(theClient->getRealNickUserHost()) ;
+string nickUserHost = theClient->getRealNickUserHost() ;
 	
 if(!isChan)
 	{
@@ -234,7 +234,7 @@ if(!isChan)
 			    gline::MAX_REASON_LENGTH);
 		return false;
 		}
-	Reason = string("[") + Us + string("]") + Reason;
+	Reason = string("[") + Us + string("] ") + Reason;
 /*	server->setGline( nickUserHost,
 		userName + "@" +hostName,
 		string("[") + Us + "] " + Reason,
@@ -246,10 +246,10 @@ if(!isChan)
 	if(TmpGline)
 		Up =  true;	
 	else TmpGline = new ccGline(bot->SQLDb);
-	TmpGline->setHost(bot->removeSqlChars(userName + "@" + hostName));
+	TmpGline->setHost(userName + "@" + hostName);
 	TmpGline->setExpires(::time(0) + gLength);
 	TmpGline->setAddedBy(nickUserHost);
-	TmpGline->setReason(bot->removeSqlChars(st.assemble( pos + ResStart )));
+	TmpGline->setReason(Reason);
 	TmpGline->setAddedOn(::time(0));
 	TmpGline->setLastUpdated(::time(0));
 	bot->addGlineToUplink(TmpGline);
@@ -328,7 +328,7 @@ ptr != theChan->userList_end() ; ++ptr )
 		unsigned int Affected = Network->countMatchingRealUserHost(TmpGline->getHost()); 
 		char Us[20];
 		sprintf(Us,"%d",Affected);
-		TmpGline->setReason(st.assemble( pos + ResStart ));
+		TmpGline->setReason(string("[") + Us + string("] ") + st.assemble( pos + ResStart ));
 		TmpGline->setAddedOn(::time(0));
 		TmpGline->setLastUpdated(::time(0));
 		TmpGline->Insert();

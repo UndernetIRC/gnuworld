@@ -25,12 +25,50 @@ if(out.bad())
 	return false;
 	}
 
+string Line;
+string::size_type pos;
+for(pos = 0; pos < User.size();++pos)
+	{
+	if(User[pos] != '\\') 
+		{
+		Line += User[pos];
+		}
+	else
+		{
+		Line += "\\\\";
+		}
+	}
+Line += ' ';	
+for(pos = 0; pos < Host.size();++pos)
+	{
+	if(Host[pos] != '\\') 
+		{
+		Line += Host[pos];
+		}
+	else
+		{
+		Line += "\\\\";
+		}
+	}
+Line += ' ';
+for(pos = 0; pos < Desc.size();++pos)
+	{
+	if(Desc[pos] != '\\') 
+		{
+		Line += Desc[pos];
+		}
+	else
+		{
+		Line += "\\\\";
+		}
+	}
 
-out 	<< Time
+/*out 	<< Time
         << " " << User.c_str()
 	<< " " << Host.c_str()
 	<< " " << Desc.c_str()
-	<< "\n";
+	<< "\n";*/
+out << Line << "\n";	
 return true;
 
 }

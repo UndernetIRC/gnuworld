@@ -22,7 +22,7 @@
 #include	"commLevels.h"
 #include	"Constants.h"
 
-const char ADDUSERCommand_cc_rcsId[] = "$Id: ADDUSERCommand.cc,v 1.15 2002/11/20 17:56:17 mrbean_ Exp $";
+const char ADDUSERCommand_cc_rcsId[] = "$Id: ADDUSERCommand.cc,v 1.16 2003/02/10 12:22:07 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -56,7 +56,7 @@ if(st[1].size() > User::MaxName)
 
 // Try fetching the user data from the database, note this is
 // the new user handle
-ccUser* theUser = bot->GetOper(bot->removeSqlChars(st[1]));
+ccUser* theUser = bot->GetOper(st[1]);
 
 if (theUser)  
 	{ 
@@ -172,7 +172,7 @@ else
 theUser->setAccess(NewAccess);
 theUser->setSAccess(NewSAccess);
 theUser->setType(NewFlags);
-theUser->setLast_Updated_By(bot->removeSqlChars(theClient->getRealNickUserHost()));
+theUser->setLast_Updated_By(theClient->getRealNickUserHost());
 theUser->setNeedOp(true);
 theUser->setNotice(true); //default to notice
 if(bot->AddOper(theUser) == true)

@@ -18,7 +18,7 @@
 #include	"ELog.h"
 #include	"Constants.h"
 
-const char FORCEGLINECommand_cc_rcsId[] = "$Id: FORCEGLINECommand.cc,v 1.25 2002/12/28 22:44:55 mrbean_ Exp $";
+const char FORCEGLINECommand_cc_rcsId[] = "$Id: FORCEGLINECommand.cc,v 1.26 2003/02/10 12:22:08 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -222,11 +222,11 @@ if(gCheck & gline::GLINE_OK)
 	return false;
 	}
 // Avoid passing a reference to a temporary variable.
-string nickUserHost = bot->removeSqlChars(theClient->getRealNickUserHost()) ;
-string Reason = st.assemble( pos + ResStart );
+string nickUserHost = theClient->getRealNickUserHost() ;
 char Us[100];
 Us[0] = '\0';
 sprintf(Us,"%d",Users);
+string Reason = string("[") + Us + "] " + st.assemble( pos + ResStart );
 if(Reason.size() > gline::MAX_REASON_LENGTH)
 	{
 	bot->Notice(theClient,"Gline reason can't be more than %d chars",
@@ -245,10 +245,10 @@ bool Up = false;
 if(TmpGline)
 	Up =  true;	
 else TmpGline = new ccGline(bot->SQLDb);
-TmpGline->setHost(bot->removeSqlChars(st [ pos ]));
+TmpGline->setHost(st [ pos ]);
 TmpGline->setExpires(::time(0) + gLength);
 TmpGline->setAddedBy(nickUserHost);
-TmpGline->setReason(bot->removeSqlChars(st.assemble( pos + ResStart )));
+TmpGline->setReason(Reason);
 TmpGline->setAddedOn(::time(0));
 TmpGline->setLastUpdated(::time(0));
 bot->addGlineToUplink(TmpGline);

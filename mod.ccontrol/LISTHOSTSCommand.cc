@@ -12,7 +12,7 @@
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 
-const char LISTHOSTSCommand_cc_rcsId[] = "$Id: LISTHOSTSCommand.cc,v 1.9 2002/03/01 18:27:36 mrbean_ Exp $";
+const char LISTHOSTSCommand_cc_rcsId[] = "$Id: LISTHOSTSCommand.cc,v 1.10 2003/02/10 12:22:09 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -41,7 +41,7 @@ if( st.size() < 2 )
 ccUser* tmpUser = bot->IsAuth(theClient);
 bot->MsgChanLog("LISTHOSTS %s\n",st.assemble(1).c_str());
 
-tmpUser = bot->GetOper(bot->removeSqlChars(st[1]));
+tmpUser = bot->GetOper(st[1]);
 
 if(!tmpUser)
 	{

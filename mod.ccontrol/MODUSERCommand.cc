@@ -15,7 +15,7 @@
 #include	"misc.h"
 #include	"Constants.h"
 
-const char MODUSERCommand_cc_rcsId[] = "$Id: MODUSERCommand.cc,v 1.21 2002/11/20 17:56:17 mrbean_ Exp $";
+const char MODUSERCommand_cc_rcsId[] = "$Id: MODUSERCommand.cc,v 1.22 2003/02/10 12:22:09 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -48,7 +48,7 @@ if(st[1].size() > 64)
 	return false;
 	}
 
-ccUser* tmpUser = bot->GetOper(bot->removeSqlChars(st[1]));
+ccUser* tmpUser = bot->GetOper(st[1]);
 
 if(!tmpUser)
 	{
@@ -108,7 +108,7 @@ while(pos < st.size())
 			case password::PASS_OK:
 				{
 				tmpUser->setPassword(bot->CryptPass(st[pos+1]));
-				tmpUser->setLast_Updated_By(bot->removeSqlChars(theClient->getRealNickUserHost()));
+				tmpUser->setLast_Updated_By(theClient->getRealNickUserHost());
 				if(tmpUser->Update())
 					{
 					bot->Notice(theClient,"Password for %s Changed to %s",st[1].c_str(),st[pos+1].c_str());
@@ -148,7 +148,7 @@ while(pos < st.size())
 			{
 			bot->Notice(theClient,"%s already got the host %s",st[1].c_str(),st[pos+1].c_str());
 			}
-		else if(bot->AddHost(tmpUser,bot->removeSqlChars(st[pos+1])))
+		else if(bot->AddHost(tmpUser,st[pos+1]))
 			{
 			bot->Notice(theClient,"Mask %s added for %s",st[pos+1].c_str(),st[1].c_str());
 			}

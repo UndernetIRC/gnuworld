@@ -3,7 +3,7 @@
  * 
  * Server class
  * 
- * $Id: ccServer.cc,v 1.9 2002/05/23 17:43:11 dan_karrels Exp $
+ * $Id: ccServer.cc,v 1.10 2003/02/10 12:22:10 mrbean_ Exp $
  */
  
 #include	<sstream>
@@ -21,7 +21,7 @@
 #include	"Constants.h"
 
 const char ccServer_h_rcsId[] = __CCSERVER_H ;
-const char ccServer_cc_rcsId[] = "$Id: ccServer.cc,v 1.9 2002/05/23 17:43:11 dan_karrels Exp $" ;
+const char ccServer_cc_rcsId[] = "$Id: ccServer.cc,v 1.10 2003/02/10 12:22:10 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -67,13 +67,13 @@ if(!dbConnected)
 	}
 stringstream theQuery;
 theQuery	<< Main
-		<< Name <<"','"
-		<< Uplink << "','"
-		<< Numeric << "',"
+		<< ccontrol::removeSqlChars(Name) <<"','"
+		<< ccontrol::removeSqlChars(Uplink) << "','"
+		<< ccontrol::removeSqlChars(Numeric) << "',"
 		<< LastConnected << ","
 		<< LastSplitted 
-		<< ",'" << SplitReason 
-		<< "','" << Version
+		<< ",'" << ccontrol::removeSqlChars(SplitReason)
+		<< "','" << ccontrol::removeSqlChars(Version)
 		<< "'," << AddedOn
 		<< "," << LastUpdated
 		<< ")" << ends;
@@ -109,19 +109,19 @@ if(!dbConnected)
 
 stringstream theQuery;
 theQuery	<< Main
-		<< Name
+		<< ccontrol::removeSqlChars(Name)
 		<< "', LastUplink = '"
-		<< Uplink
+		<< ccontrol::removeSqlChars(Uplink)
 		<< "', LastNumeric = '"
-		<< Numeric
+		<< ccontrol::removeSqlChars(Numeric)
 		<< "', LastConnected = "
 		<< LastConnected
 		<< ",SplitedOn = "
 		<< LastSplitted
 		<< ", SplitReason = '"
-		<< SplitReason 
+		<< ccontrol::removeSqlChars(SplitReason) 
 		<< "', Version = ' "
-		<< Version
+		<< ccontrol::removeSqlChars(Version)
 		<< "', AddedOn = " 
 		<< AddedOn
 		<< ", LastUpdated = " 
@@ -161,7 +161,7 @@ if(!dbConnected)
 stringstream theQuery;
 theQuery	<< server::Query
 		<< "Where lower(Name) = '"
-		<< string_lower(ServerName)
+		<< ccontrol::removeSqlChars(string_lower(ServerName))
 		<< "'" << ends;
 
 elog	<< "ccontrol::Server::LoadData> "
@@ -196,7 +196,7 @@ if(!dbConnected)
 stringstream theQuery;
 theQuery	<< server::Query
 		<< "Where LastNumeric = '"
-		<< ServNumeric
+		<< ccontrol::removeSqlChars(ServNumeric)
 		<< "'" << ends;
 
 elog	<< "ccontrol::Server::LoadNumericData> "
@@ -246,7 +246,7 @@ if(!dbConnected)
 
 stringstream theQuery;
 theQuery	<< Main
-		<< string_lower(Name)
+		<< ccontrol::removeSqlChars(string_lower(Name))
 		<< "'" << ends;
 
 elog	<< "ccontrol::Server::Delete> "

@@ -22,7 +22,7 @@
 #include 	"time.h"
 #include	"Constants.h"
 
-const char GCHANCommand_cc_rcsId[] = "$Id: GCHANCommand.cc,v 1.12 2002/12/28 22:44:55 mrbean_ Exp $";
+const char GCHANCommand_cc_rcsId[] = "$Id: GCHANCommand.cc,v 1.13 2003/02/10 12:22:08 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -122,7 +122,7 @@ else if(st.size() < 4)
 	}
 
 // Avoid passing a reference to a temporary variable.
-string nickUserHost = bot->removeSqlChars(theClient->getRealNickUserHost()) ;
+string nickUserHost = theClient->getRealNickUserHost() ;
 string Reason = st.assemble( pos + ResStart );
 if(Reason.size() > 255)
 	{
@@ -134,18 +134,18 @@ if(Reason.size() > 255)
 	st[ pos ],
 	Reason ,
 	gLength , bot) ;*/
-ccGline *TmpGline = bot->findGline(bot->removeSqlChars(st[pos]));
+ccGline *TmpGline = bot->findGline(st[pos]);
 bool Up = false;
 if(TmpGline)
 	Up =  true;	
 else TmpGline = new ccGline(bot->SQLDb);
-TmpGline->setHost(bot->removeSqlChars(st [ pos ]));
+TmpGline->setHost(st [ pos ]);
 if(!isPerm)
 	TmpGline->setExpires(::time(0) + gLength);
 else
 	TmpGline->setExpires(0);
 TmpGline->setAddedBy(nickUserHost);
-TmpGline->setReason(bot->removeSqlChars(st.assemble( pos + ResStart )));
+TmpGline->setReason(st.assemble( pos + ResStart ));
 TmpGline->setAddedOn(::time(0));
 TmpGline->setLastUpdated(::time(0));
 bot->addGlineToUplink(TmpGline);

@@ -11,7 +11,7 @@
 /* ccontrol.cc
  * Authors: Daniel Karrels dan@karrels.com
  *	    Tomer Cohen    MrBean@toughguy.net
- * $Id: ccontrol.cc,v 1.154 2002/12/28 22:44:56 mrbean_ Exp $
+ * $Id: ccontrol.cc,v 1.155 2003/02/10 12:22:10 mrbean_ Exp $
  */
 
 #define MAJORVER "1"
@@ -56,7 +56,7 @@
 #include	"ip.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.154 2002/12/28 22:44:56 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.155 2003/02/10 12:22:10 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -1622,12 +1622,12 @@ if(dbConnected)
 				{
 				addGlineToUplink(tempGline);
 				}
-			else
+			/*else
 				{
 				string* tServer = new (std::nothrow) string(NewUser->getCharYY());
 				assert(tServer != NULL);
 				tempGline->addBurst(tServer);
-				}
+				}*/
 			}
 		}			
 	}
@@ -1712,14 +1712,14 @@ if(!dbConnected)
 	}
 stringstream theQuery;
 theQuery	<< Main
-		<< Oper->getUserName() <<"','"
-		<< Oper->getPassword() << "',"
+		<< removeSqlChars(Oper->getUserName()) <<"','"
+		<< removeSqlChars(Oper->getPassword()) << "',"
 		<< Oper->getAccess() << ","
 		<< Oper->getSAccess() << ",'"
-		<< Oper->getLast_Updated_by()
+		<< removeSqlChars(Oper->getLast_Updated_by())
 		<< "',now()::abstime::int4,"
 		<< Oper->getFlags() << ",'"
-		<< Oper->getServer() 
+		<< removeSqlChars(Oper->getServer()) 
 		<< "' ," 
 		<< (Oper->getIsSuspended() ? "'t'" : "'n'") 
 		<< "," << Oper->getSuspendExpires()
@@ -2033,7 +2033,7 @@ static const char *Main = "INSERT into hosts (user_id,host) VALUES (";
 stringstream theQuery;
 theQuery	<< Main
 		<< user->getID() <<",'"
-		<< host << "')"
+		<< removeSqlChars(host) << "')"
 		<< ends;
 
 #ifdef LOG_SQL
@@ -2071,7 +2071,7 @@ stringstream theQuery;
 theQuery	<< Main
 		<< user->getID()
 		<< " And host = '"
-		<< host << "'"
+		<< removeSqlChars(host) << "'"
 		<< ends;
 
 #ifdef LOG_SQL
@@ -3152,6 +3152,24 @@ for(glineIterator ptr = glineList.begin();ptr != glineList.end();)
 		ptr++;
 	}
 
+for(glineIterator ptr = rnGlineList.begin();ptr != rnGlineList.end();) 
+	{
+	if(((*ptr)->getExpires() <= ::time(0)) 
+	    && (((*ptr)->getHost().substr(0,1) != "#") || 
+	    ((*ptr)->getExpires() != 0)))
+
+		{
+		//remove the gline from the database
+		ccGline* tGline = *ptr;
+		tGline->Delete();
+		ptr = rnGlineList.erase(ptr);
+		delete tGline;
+		++totalFound;
+		}
+	else
+		ptr++;
+	}
+
 inRefresh = false;
 
 //if(totalFound > 0)
@@ -3946,7 +3964,7 @@ if(!dbConnected)
 
 stringstream theQuery;
 theQuery	<< Main
-		<< Comm->getName()
+		<< removeSqlChars(Comm->getName())
 		<< "', isDisabled = "
 		<< (Comm->getIsDisabled() ? "'t'" : "'n'")
 		<< ", NeedOp = "
@@ -3956,7 +3974,7 @@ theQuery	<< Main
 		<< ", MinLevel = "
 		<< Comm->getMinLevel() 
 		<< " Where lower(RealName) = '"
-		<< string_lower(Comm->getRealName())
+		<< string_lower(removeSqlChars(Comm->getRealName()))
 		<< "'"
 		<< ends;
 
@@ -4011,7 +4029,7 @@ if(!dbConnected)
 
 stringstream theQuery;
 theQuery	<< Main
-		<< string_lower(Comm->getRealName())
+		<< string_lower(removeSqlChars(Comm->getRealName()))
 		<< "'" << ends;
 
 
@@ -4118,7 +4136,7 @@ if(SQLDb->Status() == CONNECTION_BAD) //Check if the connection had died
 			}
 		else
 			{
-			MsgChanLog("Attempt was failed\n");
+			MsgChanLog("Attempt failed\n");
 			}
 		}
 	else
@@ -4528,7 +4546,8 @@ for(;ptr != VersionsList.end();)
 		}
 	}
 
-string delS = "delete from misc where VarName = 'Version' and lower(Value5) = '" + string_lower(oldVer) + "'";
+string delS = "delete from misc where VarName = 'Version' and lower(Value5) = '" 
+		+ string_lower(removeSqlChars(oldVer)) + "'";
 return (PGRES_COMMAND_OK == SQLDb->Exec(delS.c_str()));
 return true;
 }

@@ -3,7 +3,7 @@
  * 
  * Gline class
  * 
- * $Id: ccGline.cc,v 1.14 2002/12/28 22:44:55 mrbean_ Exp $
+ * $Id: ccGline.cc,v 1.15 2003/02/10 12:22:10 mrbean_ Exp $
  */
  
 #include	<sstream>
@@ -20,7 +20,7 @@
 #include	"ccontrol.h"
 
 const char ccGline_h_rcsId[] = __CCGLINE_H ;
-const char ccGline_cc_rcsId[] = "$Id: ccGline.cc,v 1.14 2002/12/28 22:44:55 mrbean_ Exp $" ;
+const char ccGline_cc_rcsId[] = "$Id: ccGline.cc,v 1.15 2003/02/10 12:22:10 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -49,7 +49,6 @@ ccGline::ccGline(PgDatabase* _SQLDb)
 
 ccGline::~ccGline()
 {
-clearBurst(); //Clear the bursting list
 --numAllocated;
 }
 
@@ -64,7 +63,7 @@ if(!dbConnected)
 	}
 stringstream delQuery;
 delQuery	<< Del
-		<< string_lower(Host) << "'"
+		<< ccontrol::removeSqlChars(string_lower(Host)) << "'"
 		<< ends;
 
 
@@ -83,12 +82,12 @@ static const char *Main = "INSERT into Glines (Host,AddedBy,AddedOn,ExpiresAt,La
 
 stringstream theQuery;
 theQuery	<< Main
-		<< Host << "','"
-		<< AddedBy << "',"
+		<< ccontrol::removeSqlChars(Host) << "','"
+		<< ccontrol::removeSqlChars(AddedBy) << "',"
 		<< AddedOn << ","
 		<< Expires << ","
 		<< LastUpdated << ",'"
-		<< Reason << "')"
+		<< ccontrol::removeSqlChars(Reason) << "')"
 		<< ends;
 
 elog	<< "Gline::Insert::sqlQuery> "
@@ -124,9 +123,9 @@ stringstream theQuery;
 theQuery	<< Main
 		<< Id
 		<< "', Host = '"
-		<< Host
+		<< ccontrol::removeSqlChars(Host)
 		<< "', AddedBy = '"
-		<< AddedBy
+		<< ccontrol::removeSqlChars(AddedBy)
 		<< "', AddedOn = "
 		<< AddedOn
 		<< ",ExpiresAt = "
@@ -134,7 +133,7 @@ theQuery	<< Main
 		<< ",LastUpdated = "
 		<< LastUpdated
 		<<  ",Reason = '"
-		<< Reason << "'"
+		<< ccontrol::removeSqlChars(Reason) << "'"
 		<< " WHERE Id = " << Id
 		<<  ends;
 
@@ -210,7 +209,7 @@ if(!dbConnected)
 
 stringstream theQuery;
 theQuery	<< Main
-		<< HostName.c_str()
+		<< ccontrol::removeSqlChars(HostName.c_str())
 		<< "'" << ends;
 
 elog	<< "ccontrol::loadData> "
@@ -276,29 +275,6 @@ else
 return true;
 }
 
-void ccGline::addBurst(string *Server)
-{
-burstIterator ptr = burstServers.begin();
-for(;ptr != burstServers.end();++ptr)
-	{
-	if(!strcmp((**ptr).c_str(),Server->c_str()))
-		break;
-	}
-if(ptr == burstServers.end())
-	{
-	burstServers.push_back(Server);
-	}
-}
-
-void ccGline::clearBurst()
-{
-burstIterator ptr = burstServers.begin();
-for(;ptr != burstServers.end();)
-	{
-	delete *ptr;
-	ptr = burstServers.erase(ptr);
-	}
-}
 
 }
 } //Namespace Gnuworld

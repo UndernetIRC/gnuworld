@@ -3,7 +3,7 @@
  * 
  * Storage class for accessing user information 
  * 
- * $Id: ccUser.cc,v 1.15 2002/05/23 17:43:11 dan_karrels Exp $
+ * $Id: ccUser.cc,v 1.16 2003/02/10 12:22:10 mrbean_ Exp $
  */
  
 #include	<sstream>
@@ -19,7 +19,7 @@
 #include	"ccontrol.h"
 
 const char ccUser_h_rcsId[] = __CCUSER_H ;
-const char ccUser_cc_rcsId[] = "$Id: ccUser.cc,v 1.15 2002/05/23 17:43:11 dan_karrels Exp $" ;
+const char ccUser_cc_rcsId[] = "$Id: ccUser.cc,v 1.16 2003/02/10 12:22:10 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -79,7 +79,7 @@ if(!dbConnected)
 
 stringstream theQuery;
 theQuery	<< Main
-		<< string_lower(Name)
+		<< ccontrol::removeSqlChars(string_lower(Name))
 		<< "'"
 		<< ends;
 
@@ -170,13 +170,13 @@ if(!dbConnected)
 
 stringstream theQuery;
 theQuery	<< Main
-		<< Password
+		<< ccontrol::removeSqlChars(Password)
 		<< "', Access = "
 		<< Access
 		<< ", SAccess = "
 		<< SAccess
 		<< ", last_updated_by = '"
-		<<last_updated_by
+		<< ccontrol::removeSqlChars(last_updated_by)
 		<< "',last_updated = now()::abstime::int4,flags = "
 		<< Flags
 		<<  ",suspend_expires = "
@@ -206,11 +206,11 @@ theQuery	<< Main
 		<< ",NeedOp = "
 		<< (NeedOp ? "'t'" : "'n'")
 		<< ", Email = '"
-		<< Email
+		<<  ccontrol::removeSqlChars(Email)
 		<< "',Notice = "
 		<< (Notice ? "'t'" : "'n'")
 		<< " WHERE lower(user_name) = '" 
-		<< string_lower(UserName) << "'"
+		<< ccontrol::removeSqlChars( string_lower(UserName)) << "'"
 		<<  ends;
 
 elog	<< "ccontrol::UpdateOper> "

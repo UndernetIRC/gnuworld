@@ -3,7 +3,7 @@
  * 
  * Exception class
  * 
- * $Id: ccException.cc,v 1.8 2002/07/02 11:38:28 mrbean_ Exp $
+ * $Id: ccException.cc,v 1.9 2003/02/10 12:22:09 mrbean_ Exp $
  */
  
 #include	<sstream>
@@ -20,7 +20,7 @@
 #include	"ccontrol.h"
 
 const char ccException_h_rcsId[] = __CCEXCEPTION_H ;
-const char ccException_cc_rcsId[] = "$Id: ccException.cc,v 1.8 2002/07/02 11:38:28 mrbean_ Exp $" ;
+const char ccException_cc_rcsId[] = "$Id: ccException.cc,v 1.9 2003/02/10 12:22:09 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -64,7 +64,7 @@ if((!dbConnected) || !(SQLDb))
 
 stringstream theQuery;
 theQuery	<< Main
-		<< string_lower(HostName)
+		<< ccontrol::removeSqlChars(string_lower(HostName))
 		<< "'"
 		<< ends;
 
@@ -99,13 +99,13 @@ if(!dbConnected)
 
 stringstream theQuery;
 theQuery	<< Main
-		<< AddedBy
+		<< ccontrol::removeSqlChars(AddedBy)
 		<< "', Connections = "
 		<< Connections
 		<< ", AddedOn = "
 		<< AddedOn
 		<< "' WHERE lower(Host) = '" 
-		<< string_lower(Host) << "'"
+		<< ccontrol::removeSqlChars(string_lower(Host)) << "'"
 		<<  ends;
 
 elog	<< "ccException::Update> "
@@ -139,20 +139,20 @@ if(!dbConnected)
 
 stringstream query;
 query		<< quer
-		<< Host << "',"
+		<< ccontrol::removeSqlChars(Host) << "',"
 		<< Connections
-		<< ",'" << AddedBy
+		<< ",'" << ccontrol::removeSqlChars(AddedBy)
 		<< "'," << AddedOn
 		<< ")" << ends;
 
-elog	<< "ccException::insertException> "
+elog	<< "ccException::Insert> "
 	<< query.str().c_str()
 	<< endl; 
 
 ExecStatusType status = SQLDb->Exec( query.str().c_str() ) ;
 if(PGRES_COMMAND_OK != status)
 	{
-	elog	<< "ccontrol::Gline::Update> SQL Failure: "
+	elog	<< "ccException::Insert> SQL Failure: "
 		<< SQLDb->ErrorMessage()
 		<< endl ;
 	}
@@ -172,7 +172,7 @@ if(!dbConnected)
 
 stringstream query;
 query		<< quer
-		<< Host << "'"
+		<< ccontrol::removeSqlChars(Host) << "'"
 		<< ends;
 
 elog 		<< "ccException::delException> "

@@ -18,7 +18,7 @@
 #include	"ELog.h"
 #include	"Constants.h"
 
-const char SGLINECommand_cc_rcsId[] = "$Id: SGLINECommand.cc,v 1.3 2002/12/29 19:08:56 mrbean_ Exp $";
+const char SGLINECommand_cc_rcsId[] = "$Id: SGLINECommand.cc,v 1.4 2003/02/10 12:22:09 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -177,7 +177,7 @@ if(!RealName)
 	char Us[100];
 	Us[0] = '\0';
 	sprintf(Us,"%d",Users);
-	Reason = string("[") + Us + string("]") + Reason;
+	Reason = string("[") + Us + string("] ") + Reason;
 	} //RealName Gline
 if(Reason.size() > gline::MAX_REASON_LENGTH)
 	{
@@ -202,7 +202,7 @@ else
 	TmpGline->setHost(RealHost);
 TmpGline->setExpires(::time(0) + gLength);
 TmpGline->setAddedBy(nickUserHost);
-TmpGline->setReason(bot->removeSqlChars(st.assemble( pos + ResStart )));
+TmpGline->setReason(Reason);
 TmpGline->setAddedOn(::time(0));
 TmpGline->setLastUpdated(::time(0));
 bot->addGlineToUplink(TmpGline);

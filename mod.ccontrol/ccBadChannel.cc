@@ -10,7 +10,7 @@
 #include	"ccontrol.h"
 #include 	"ccBadChannel.h"
 
-const char ccBadChannel_cc_rcsId[] = "$Id: ccBadChannel.cc,v 1.1 2002/05/25 15:03:58 mrbean_ Exp $";
+const char ccBadChannel_cc_rcsId[] = "$Id: ccBadChannel.cc,v 1.2 2003/02/10 12:22:09 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -37,11 +37,11 @@ if(!dbConnected)
 
 stringstream theQuery;
 theQuery        << "update BadChannels set Reason = '"
-		<< Reason
+		<< ccontrol::removeSqlChars(Reason)
 		<< "', AddedBy = '"
-		<< AddedBy 
+		<< ccontrol::removeSqlChars(AddedBy)
 		<< "' where lower(Name) = '"
-		<< string_lower(Name) << "'"
+		<< ccontrol::removeSqlChars(string_lower(Name)) << "'"
                 << ends;
          
 elog    << "ccBadChannel::Update> "
@@ -70,7 +70,7 @@ if(!dbConnected)
 
 stringstream theQuery;
 theQuery        << "delete from  BadChannels where lower(Name) = '"
-		<< string_lower(Name) << "'"
+		<< ccontrol::removeSqlChars(string_lower(Name)) << "'"
                 << ends;
          
 elog    << "ccBadChannel::Delete> "
@@ -100,10 +100,10 @@ if(!dbConnected)
 
 stringstream theQuery;
 theQuery        << "Insert into BadChannels (Name,Reason,AddedBy) VALUES ('"
-		<< Name << "','"
-		<< Reason
+		<< ccontrol::removeSqlChars(Name) << "','"
+		<< ccontrol::removeSqlChars(Reason)
 		<< "','"
-		<< AddedBy 
+		<< ccontrol::removeSqlChars(AddedBy) 
 		<< "')"
                 << ends;
          
