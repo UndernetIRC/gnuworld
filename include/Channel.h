@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: Channel.h,v 1.26 2002/11/07 21:49:17 dan_karrels Exp $
+ * $Id: Channel.h,v 1.27 2003/06/14 19:35:26 jeekay Exp $
  */
 
 #ifndef __CHANNEL_H
-#define __CHANNEL_H "$Id: Channel.h,v 1.26 2002/11/07 21:49:17 dan_karrels Exp $"
+#define __CHANNEL_H "$Id: Channel.h,v 1.27 2003/06/14 19:35:26 jeekay Exp $"
 
 #include	<string>
 #include	<map>
@@ -397,7 +397,7 @@ public:
 	 * Return the ChannelUser associated with the given iClient,
 	 * NULL if not found.
 	 */
-	ChannelUser* findUser( iClient* theClient ) const ;
+	ChannelUser* findUser( const iClient* theClient ) const ;
 
 #ifdef TOPIC_TRACK	
 	

@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: Channel.cc,v 1.38 2003/06/07 00:26:23 dan_karrels Exp $
+ * $Id: Channel.cc,v 1.39 2003/06/14 19:35:26 jeekay Exp $
  */
 
 #include	<new>
@@ -38,7 +38,7 @@
 #include	"ConnectionManager.h"
 
 const char Channel_h_rcsId[] = __CHANNEL_H ;
-const char Channel_cc_rcsId[] = "$Id: Channel.cc,v 1.38 2003/06/07 00:26:23 dan_karrels Exp $" ;
+const char Channel_cc_rcsId[] = "$Id: Channel.cc,v 1.39 2003/06/14 19:35:26 jeekay Exp $" ;
 const char iClient_h_rcsId[] = __ICLIENT_H ;
 const char ChannelUser_h_rcsId[] = __CHANNELUSER_H ;
 const char Network_h_rcsId[] = __NETWORK_H ;
@@ -164,7 +164,7 @@ elog	<< "Channel::removeUser> ("
 return 0 ;
 }
 
-ChannelUser* Channel::findUser( iClient* theClient ) const
+ChannelUser* Channel::findUser( const iClient* theClient ) const
 {
 assert( theClient != 0 ) ;
 
@@ -481,6 +481,7 @@ if( modes & MODE_S )	modeString += 's' ;
 if( modes & MODE_P )	modeString += 'p' ;
 if( modes & MODE_M )	modeString += 'm' ;
 if( modes & MODE_I )	modeString += 'i' ;
+if( modes & MODE_R )	modeString += 'r' ;
 
 if( modes & MODE_K )
 	{
