@@ -1,10 +1,10 @@
-dnl $Id: configure.ac,v 1.5 2003/06/06 12:38:01 dan_karrels Exp $
+dnl $Id: configure.ac,v 1.6 2003/06/08 20:06:39 dan_karrels Exp $
 dnl ----------------------------------------------------------
 
 echo Configuring GNUWorld...
 echo
 
-AC_REVISION($Revision: 1.5 $)
+AC_REVISION($Revision: 1.6 $)
 AC_INIT
 AC_CONFIG_SRCDIR([src/main.cc])
 AM_INIT_AUTOMAKE(gnuworld,0.0)
@@ -172,6 +172,14 @@ AC_ARG_WITH(prof,
 	[CXXFLAGS="$CXXFLAGS -pg"]
 )
 
+check_pgsql=yes
+AC_ARG_WITH(pgsql,
+	AC_HELP_STRING([--without-pgsql],
+			[Do not check for pgsql.  This will cause \
+several modules to be uncompilable]),
+	[check_pgsql=$withval]
+)
+
 PGSQL_LIB=/usr/local/pgsql/lib
 AC_ARG_WITH(pgsql-lib,
 	AC_HELP_STRING([--with-pgsql-lib=PGSQLLIBDIR],
@@ -190,41 +198,45 @@ AC_ARG_WITH(pgsql-include,
 )
 dnl echo PGSQL_INCLUDE: $PGSQL_INCLUDE
 
-AC_MSG_CHECKING(for libpq++.h)
-if [test -f "$PGSQL_INCLUDE/libpq++.h"]; then
-	/bin/true
-elif [test -f "/usr/local/include/libpq++.h"]; then
-	PGSQL_INCLUDE=/usr/local/include
-elif [test -f "/usr/include/postgresql/libpq++.h"]; then
-	PGSQL_INCLUDE=/usr/include/postgresql
-elif [test -f "/usr/include/pgsql/libpq++.h"]; then
-	PGSQL_INCLUDE=/usr/include/pgsql
-elif [test -f "/usr/include/libpq++.h"]; then
-	PGSQL_INCLUDE=/usr/include
-else
-        AC_MSG_ERROR( Unable to find libpq++.h )
+if [test $check_pgsql = "yes" ]; then
+	AC_MSG_CHECKING(for libpq++.h)
+	if [test -f "$PGSQL_INCLUDE/libpq++.h"]; then
+		/bin/true
+	elif [test -f "/usr/local/include/libpq++.h"]; then
+		PGSQL_INCLUDE=/usr/local/include
+	elif [test -f "/usr/include/postgresql/libpq++.h"]; then
+		PGSQL_INCLUDE=/usr/include/postgresql
+	elif [test -f "/usr/include/pgsql/libpq++.h"]; then
+		PGSQL_INCLUDE=/usr/include/pgsql
+	elif [test -f "/usr/include/libpq++.h"]; then
+		PGSQL_INCLUDE=/usr/include
+	else
+	        AC_MSG_ERROR( Unable to find libpq++.h )
+	fi
+	AC_MSG_RESULT(yes)
 fi
-AC_MSG_RESULT(yes)
 
-AC_MSG_CHECKING(for libpq++.so)
-if [test -f "$PGSQL_LIB/libpq++.so"]; then
-	/bin/true
-elif [test -f "/usr/local/lib/libpq++.so"]; then
-	PGSQL_LIB=/usr/local/lib
-elif [test -f "/usr/lib/libpq++.so"]; then
-	PGSQL_LIB=/usr/lib
-elif [test -f "/usr/lib/postgresql/libpq++.so"]; then
-	PGSQL_LIB=/usr/lib/postgresql
-elif [test -f "/usr/lib/pgsql/libpq++.so"]; then
-	PGSQL_LIB=/usr/lib/pgsql
-elif [test -f "/usr/local/pgsql/lib/libpq++.so"]; then
-	PGSQL_LIB=/usr/local/pgsql/lib
-elif [test -f "/usr/local/postgresql/lib/libpq++.so"]; then
-	PGSQL_LIB=/usr/local/postgresql/lib
-else
-        AC_MSG_ERROR( Unable to find libpq++.so)
+if [test $check_pgsql = "yes" ]; then
+	AC_MSG_CHECKING(for libpq++.so)
+	if [test -f "$PGSQL_LIB/libpq++.so"]; then
+		/bin/true
+	elif [test -f "/usr/local/lib/libpq++.so"]; then
+		PGSQL_LIB=/usr/local/lib
+	elif [test -f "/usr/lib/libpq++.so"]; then
+		PGSQL_LIB=/usr/lib
+	elif [test -f "/usr/lib/postgresql/libpq++.so"]; then
+		PGSQL_LIB=/usr/lib/postgresql
+	elif [test -f "/usr/lib/pgsql/libpq++.so"]; then
+		PGSQL_LIB=/usr/lib/pgsql
+	elif [test -f "/usr/local/pgsql/lib/libpq++.so"]; then
+		PGSQL_LIB=/usr/local/pgsql/lib
+	elif [test -f "/usr/local/postgresql/lib/libpq++.so"]; then
+		PGSQL_LIB=/usr/local/postgresql/lib
+	else
+	        AC_MSG_ERROR( Unable to find libpq++.so)
+	fi
+	AC_MSG_RESULT(yes)
 fi
-AC_MSG_RESULT(yes)
 
 dnl echo "PGSQL_INCLUDE: $PGSQL_INCLUDE"
 dnl echo "PGSQL_LIB: $PGSQL_LIB"
@@ -322,7 +334,8 @@ bin/gnutest.example.conf \
 bin/GNUWorld.example.conf \
 bin/nickserv.example.conf \
 bin/scanner.example.conf \
-bin/stats.example.conf])
+bin/stats.example.conf \
+bin/dronescan.example.conf])
 
 AC_OUTPUT
 

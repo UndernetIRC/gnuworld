@@ -144,60 +144,66 @@ target_alias = @target_alias@
 threadLib = @threadLib@
 topdir = @topdir@
 
-noinst_PROGRAMS = stringtokenizer econfig gThread signal match testbot
+noinst_PROGRAMS = test_stringtokenizer \
+	test_econfig \
+	test_gThread \
+	test_signal \
+	test_match \
+	test_bot
+
 LDADD = $(glibdir)/libgnuworld.la
 
-stringtokenizer_SOURCES = stringtokenizer.cc
-stringtokenizer_DEPENDENCIES = $(glibdir)/libgnuworld.la
+test_stringtokenizer_SOURCES = stringtokenizer.cc
+test_stringtokenizer_DEPENDENCIES = $(glibdir)/libgnuworld.la
 
-econfig_SOURCES = econfig.cc
-econfig_DEPENDENCIES = $(glibdir)/libgnuworld.la
+test_econfig_SOURCES = econfig.cc
+test_econfig_DEPENDENCIES = $(glibdir)/libgnuworld.la
 
-gThread_SOURCES = gThread.cc
-gThread_LDFLAGS = $(glibdir)/libgnuworld.la @threadLib@
-gThread_DEPENDENCIES = $(glibdir)/libgnuworld.la
+test_gThread_SOURCES = gThread.cc
+test_gThread_LDFLAGS = $(glibdir)/libgnuworld.la @threadLib@
+test_gThread_DEPENDENCIES = $(glibdir)/libgnuworld.la
 
-signal_SOURCES = signal.cc
-signal_LDFLAGS = $(glibdir)/libgnuworld.la @threadLib@
-signal_DEPENDENCIES = $(glibdir)/libgnuworld.la
+test_signal_SOURCES = signal.cc
+test_signal_LDFLAGS = $(glibdir)/libgnuworld.la @threadLib@
+test_signal_DEPENDENCIES = $(glibdir)/libgnuworld.la
 
-match_SOURCES = match.cc
-match_DEPENDENCIES = $(glibdir)/libgnuworld.la
+test_match_SOURCES = match.cc
+test_match_DEPENDENCIES = $(glibdir)/libgnuworld.la
 
-testbot_SOURCES = testbot.cc
-testbot_DEPENDENCIES = $(glibdir)/libgnuworld.la
+test_bot_SOURCES = testbot.cc
+test_bot_DEPENDENCIES = $(glibdir)/libgnuworld.la
 subdir = test
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = $(top_builddir)/include/defs.h
 CONFIG_CLEAN_FILES =
-noinst_PROGRAMS = stringtokenizer$(EXEEXT) econfig$(EXEEXT) \
-	gThread$(EXEEXT) signal$(EXEEXT) match$(EXEEXT) \
-	testbot$(EXEEXT)
+noinst_PROGRAMS = test_stringtokenizer$(EXEEXT) test_econfig$(EXEEXT) \
+	test_gThread$(EXEEXT) test_signal$(EXEEXT) test_match$(EXEEXT) \
+	test_bot$(EXEEXT)
 PROGRAMS = $(noinst_PROGRAMS)
 
-am_econfig_OBJECTS = econfig.$(OBJEXT)
-econfig_OBJECTS = $(am_econfig_OBJECTS)
-econfig_LDADD = $(LDADD)
-econfig_LDFLAGS =
-am_gThread_OBJECTS = gThread.$(OBJEXT)
-gThread_OBJECTS = $(am_gThread_OBJECTS)
-gThread_LDADD = $(LDADD)
-am_match_OBJECTS = match.$(OBJEXT)
-match_OBJECTS = $(am_match_OBJECTS)
-match_LDADD = $(LDADD)
-match_LDFLAGS =
-am_signal_OBJECTS = signal.$(OBJEXT)
-signal_OBJECTS = $(am_signal_OBJECTS)
-signal_LDADD = $(LDADD)
-am_stringtokenizer_OBJECTS = stringtokenizer.$(OBJEXT)
-stringtokenizer_OBJECTS = $(am_stringtokenizer_OBJECTS)
-stringtokenizer_LDADD = $(LDADD)
-stringtokenizer_LDFLAGS =
-am_testbot_OBJECTS = testbot.$(OBJEXT)
-testbot_OBJECTS = $(am_testbot_OBJECTS)
-testbot_LDADD = $(LDADD)
-testbot_LDFLAGS =
+am_test_bot_OBJECTS = testbot.$(OBJEXT)
+test_bot_OBJECTS = $(am_test_bot_OBJECTS)
+test_bot_LDADD = $(LDADD)
+test_bot_LDFLAGS =
+am_test_econfig_OBJECTS = econfig.$(OBJEXT)
+test_econfig_OBJECTS = $(am_test_econfig_OBJECTS)
+test_econfig_LDADD = $(LDADD)
+test_econfig_LDFLAGS =
+am_test_gThread_OBJECTS = gThread.$(OBJEXT)
+test_gThread_OBJECTS = $(am_test_gThread_OBJECTS)
+test_gThread_LDADD = $(LDADD)
+am_test_match_OBJECTS = match.$(OBJEXT)
+test_match_OBJECTS = $(am_test_match_OBJECTS)
+test_match_LDADD = $(LDADD)
+test_match_LDFLAGS =
+am_test_signal_OBJECTS = signal.$(OBJEXT)
+test_signal_OBJECTS = $(am_test_signal_OBJECTS)
+test_signal_LDADD = $(LDADD)
+am_test_stringtokenizer_OBJECTS = stringtokenizer.$(OBJEXT)
+test_stringtokenizer_OBJECTS = $(am_test_stringtokenizer_OBJECTS)
+test_stringtokenizer_LDADD = $(LDADD)
+test_stringtokenizer_LDFLAGS =
 
 DEFAULT_INCLUDES =  -I. -I$(srcdir) -I$(top_builddir)/include
 depcomp = $(SHELL) $(top_srcdir)/depcomp
@@ -214,10 +220,11 @@ LTCXXCOMPILE = $(LIBTOOL) --mode=compile $(CXX) $(DEFS) \
 CXXLD = $(CXX)
 CXXLINK = $(LIBTOOL) --mode=link $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) \
 	$(AM_LDFLAGS) $(LDFLAGS) -o $@
-DIST_SOURCES = $(econfig_SOURCES) $(gThread_SOURCES) $(match_SOURCES) \
-	$(signal_SOURCES) $(stringtokenizer_SOURCES) $(testbot_SOURCES)
+DIST_SOURCES = $(test_bot_SOURCES) $(test_econfig_SOURCES) \
+	$(test_gThread_SOURCES) $(test_match_SOURCES) \
+	$(test_signal_SOURCES) $(test_stringtokenizer_SOURCES)
 DIST_COMMON = Makefile.am Makefile.in
-SOURCES = $(econfig_SOURCES) $(gThread_SOURCES) $(match_SOURCES) $(signal_SOURCES) $(stringtokenizer_SOURCES) $(testbot_SOURCES)
+SOURCES = $(test_bot_SOURCES) $(test_econfig_SOURCES) $(test_gThread_SOURCES) $(test_match_SOURCES) $(test_signal_SOURCES) $(test_stringtokenizer_SOURCES)
 
 all: all-am
 
@@ -235,24 +242,24 @@ clean-noinstPROGRAMS:
 	  echo " rm -f $$p $$f"; \
 	  rm -f $$p $$f ; \
 	done
-econfig$(EXEEXT): $(econfig_OBJECTS) $(econfig_DEPENDENCIES) 
-	@rm -f econfig$(EXEEXT)
-	$(CXXLINK) $(econfig_LDFLAGS) $(econfig_OBJECTS) $(econfig_LDADD) $(LIBS)
-gThread$(EXEEXT): $(gThread_OBJECTS) $(gThread_DEPENDENCIES) 
-	@rm -f gThread$(EXEEXT)
-	$(CXXLINK) $(gThread_LDFLAGS) $(gThread_OBJECTS) $(gThread_LDADD) $(LIBS)
-match$(EXEEXT): $(match_OBJECTS) $(match_DEPENDENCIES) 
-	@rm -f match$(EXEEXT)
-	$(CXXLINK) $(match_LDFLAGS) $(match_OBJECTS) $(match_LDADD) $(LIBS)
-signal$(EXEEXT): $(signal_OBJECTS) $(signal_DEPENDENCIES) 
-	@rm -f signal$(EXEEXT)
-	$(CXXLINK) $(signal_LDFLAGS) $(signal_OBJECTS) $(signal_LDADD) $(LIBS)
-stringtokenizer$(EXEEXT): $(stringtokenizer_OBJECTS) $(stringtokenizer_DEPENDENCIES) 
-	@rm -f stringtokenizer$(EXEEXT)
-	$(CXXLINK) $(stringtokenizer_LDFLAGS) $(stringtokenizer_OBJECTS) $(stringtokenizer_LDADD) $(LIBS)
-testbot$(EXEEXT): $(testbot_OBJECTS) $(testbot_DEPENDENCIES) 
-	@rm -f testbot$(EXEEXT)
-	$(CXXLINK) $(testbot_LDFLAGS) $(testbot_OBJECTS) $(testbot_LDADD) $(LIBS)
+test_bot$(EXEEXT): $(test_bot_OBJECTS) $(test_bot_DEPENDENCIES) 
+	@rm -f test_bot$(EXEEXT)
+	$(CXXLINK) $(test_bot_LDFLAGS) $(test_bot_OBJECTS) $(test_bot_LDADD) $(LIBS)
+test_econfig$(EXEEXT): $(test_econfig_OBJECTS) $(test_econfig_DEPENDENCIES) 
+	@rm -f test_econfig$(EXEEXT)
+	$(CXXLINK) $(test_econfig_LDFLAGS) $(test_econfig_OBJECTS) $(test_econfig_LDADD) $(LIBS)
+test_gThread$(EXEEXT): $(test_gThread_OBJECTS) $(test_gThread_DEPENDENCIES) 
+	@rm -f test_gThread$(EXEEXT)
+	$(CXXLINK) $(test_gThread_LDFLAGS) $(test_gThread_OBJECTS) $(test_gThread_LDADD) $(LIBS)
+test_match$(EXEEXT): $(test_match_OBJECTS) $(test_match_DEPENDENCIES) 
+	@rm -f test_match$(EXEEXT)
+	$(CXXLINK) $(test_match_LDFLAGS) $(test_match_OBJECTS) $(test_match_LDADD) $(LIBS)
+test_signal$(EXEEXT): $(test_signal_OBJECTS) $(test_signal_DEPENDENCIES) 
+	@rm -f test_signal$(EXEEXT)
+	$(CXXLINK) $(test_signal_LDFLAGS) $(test_signal_OBJECTS) $(test_signal_LDADD) $(LIBS)
+test_stringtokenizer$(EXEEXT): $(test_stringtokenizer_OBJECTS) $(test_stringtokenizer_DEPENDENCIES) 
+	@rm -f test_stringtokenizer$(EXEEXT)
+	$(CXXLINK) $(test_stringtokenizer_LDFLAGS) $(test_stringtokenizer_OBJECTS) $(test_stringtokenizer_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT) core *.core

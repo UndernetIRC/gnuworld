@@ -18,19 +18,17 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: stats.h,v 1.8 2003/06/07 14:38:59 dan_karrels Exp $
+ * $Id: stats.h,v 1.9 2003/06/08 20:06:43 dan_karrels Exp $
  */
 
 #ifndef __STATS_H
-#define __STATS_H "$Id: stats.h,v 1.8 2003/06/07 14:38:59 dan_karrels Exp $"
+#define __STATS_H "$Id: stats.h,v 1.9 2003/06/08 20:06:43 dan_karrels Exp $"
 
 #include	<fstream>
 #include	<string>
-#include	<map>
 
 #include	"client.h"
 #include	"iClient.h"
-#include	"misc.h" // noCaseCompare
 #include	"server.h"
 #include	"events.h"
 
@@ -44,37 +42,108 @@ using std::map ;
 class stats : public xClient
 {
 public:
+	/**
+	 * Create a new stats object, given its configuration filename.
+	 */
 	stats( const string& ) ;
+
+	/**
+	 * Destroy a stats object.
+	 */
 	virtual ~stats() ;
 
+	/**
+	 * This method required to load into the gnuworld core.
+	 * It basically just calls the base class ImplementServer(),
+	 * and registers for events.
+	 */
 	virtual void ImplementServer( xServer* ) ;
+
+	/**
+	 * This method is invoked when someone sends a private
+	 * message to the stats bot.
+	 */
 	virtual int OnPrivateMessage( iClient*, const string&,
 		bool = false ) ;
+
+	/**
+	 * This method is invoked when someone sends a private
+	 * message CTCP to the stats bot.
+	 */
 	virtual int OnCTCP( iClient*, const string&,
 		const string&, bool = false ) ;
+
+	/**
+	 * This method is invoked when someone sends a channel
+	 * message to the stats bot.
+	 */
 	virtual int OnChannelMessage( iClient*, Channel*,
 		const string& ) ;
+
+	/**
+	 * This method is invoked when someone sends a channel
+	 * CTCP to the stats bot.
+	 */
 	virtual int OnChannelCTCP( iClient*, Channel*,
 		const string&, const string& ) ;
+
+	/**
+	 * This method is invoked when someone sends a private
+	 * notice to the stats bot.
+	 */
 	virtual int OnPrivateNotice( iClient*, const string&, bool ) ;
+
+	/**
+	 * This method is invoked when someone sends a channel
+	 * notice to the stats bot.
+	 */
 	virtual int OnChannelNotice( iClient*, Channel*, const string& ) ;
+
+	/**
+	 * This method is called when a general network event
+	 * occurs.
+	 */
 	virtual int OnEvent( const eventType&,
 		void* = 0, void* = 0, void* = 0, void* = 0 ) ;
+
+	/**
+	 * This method is invoked when a channel event (except for
+	 * kick) occurs.
+	 */
         virtual int OnChannelEvent( const channelEventType&,
                 Channel*,  
                 void* Data1 = NULL, void* Data2 = NULL,
                 void* Data3 = NULL, void* Data4 = NULL ) ;
+
+	/**
+	 * This method is invoked when a channel kick occurs.
+	 */
 	virtual void OnNetworkKick( Channel*, iClient*,
 		iClient*, const string&, bool ) ;
 
+	/**
+	 * This method is called when a registered timer
+	 * expires.
+	 */
 	virtual int	OnTimer( xServer::timerID, void* ) ;
 
+	/**
+	 * Return the part message stats will use when it parts
+	 * a channel.
+	 */
 	inline const string&	getPartMessage() const
 		{ return partMessage ; }
 
+	/**
+	 * Set the part message stats will use when it parts
+	 * a channel.
+	 */
 	inline void		setPartMessage( const string& newVal )
 		{ partMessage = newVal ; }
 
+	/**
+	 * Send the current running stats to the given iClient.
+	 */
 	virtual void		dumpStats( iClient* ) ;
 
 protected:
@@ -88,9 +157,17 @@ protected:
 	 */
 	virtual void		openLogFiles() ;
 
+	/// True if the stats should log during net burst (of gnuworld)
 	bool			logDuringBurst ;
+
+	/// The path to the directory in which to store the logs files.
+	/// If the path does not exist, it will NOT be created.
 	string			data_path ;
+
+	/// The message to use when parting a channel.
 	string			partMessage ;
+
+	/// The absolute time at which stats collection began.
 	time_t			startTime ;
 
 	/// This variable holds the totals for each event,

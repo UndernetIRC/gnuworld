@@ -152,7 +152,8 @@ CONFIG_CLEAN_FILES = bin/ccontrol.example.conf \
 	bin/clientExample.example.conf bin/cloner.example.conf \
 	bin/cservice.example.conf bin/gnutest.example.conf \
 	bin/GNUWorld.example.conf bin/nickserv.example.conf \
-	bin/scanner.example.conf bin/stats.example.conf
+	bin/scanner.example.conf bin/stats.example.conf \
+	bin/dronescan.example.conf
 DIST_SOURCES =
 
 RECURSIVE_TARGETS = info-recursive dvi-recursive pdf-recursive \
@@ -218,6 +219,8 @@ bin/nickserv.example.conf: $(top_builddir)/config.status $(top_srcdir)/bin/nicks
 bin/scanner.example.conf: $(top_builddir)/config.status $(top_srcdir)/bin/scanner.example.conf.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 bin/stats.example.conf: $(top_builddir)/config.status $(top_srcdir)/bin/stats.example.conf.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+bin/dronescan.example.conf: $(top_builddir)/config.status $(top_srcdir)/bin/dronescan.example.conf.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 
 mostlyclean-libtool:

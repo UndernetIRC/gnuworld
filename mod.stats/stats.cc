@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: stats.cc,v 1.14 2003/06/07 14:38:59 dan_karrels Exp $
+ * $Id: stats.cc,v 1.15 2003/06/08 20:06:43 dan_karrels Exp $
  */
 
 #include	<string>
@@ -397,15 +397,15 @@ int stats::OnChannelEvent( const channelEventType& whichEvent,
 	void* arg3,
 	void* arg4 )
 {
-if( 0 == startTime )
-	{
-	startTime = ::time( 0 ) ;
-	}
-
 if( !logDuringBurst && MyUplink->isBursting() )
 	{
 	// Don't log
 	return 0 ;
+	}
+
+if( 0 == startTime )
+	{
+	startTime = ::time( 0 ) ;
 	}
 
 assert( whichEvent <= EVT_CREATE ) ;
@@ -439,15 +439,15 @@ int stats::OnEvent( const eventType& whichEvent,
 	void* arg3,
 	void* arg4 )
 {
-if( 0 == startTime )
-	{
-	startTime = ::time( 0 ) ;
-	}
-
 if( !logDuringBurst && MyUplink->isBursting() )
 	{
 	// Don't log
 	return 0 ;
+	}
+
+if( 0 == startTime )
+	{
+	startTime = ::time( 0 ) ;
 	}
 
 assert( whichEvent <= EVT_CREATE ) ;

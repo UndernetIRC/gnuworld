@@ -17,11 +17,12 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: stringtokenizer.cc,v 1.4 2003/03/10 18:34:17 dan_karrels Exp $
+ * $Id: stringtokenizer.cc,v 1.5 2003/06/08 20:06:43 dan_karrels Exp $
  */
 
 #include	<iostream>
 #include	<fstream>
+#include	<string>
 
 #include	<ctime>
 #include	<cstdlib>
@@ -35,7 +36,7 @@ using namespace gnuworld ;
 
 ELog gnuworld::elog ;
 
-void	usage( const char* ) ;
+void	usage( const string& ) ;
 bool	getData( ifstream& inputFile, vector< string >& ) ;
 
 size_t	maxLines = 10000 ;
@@ -154,7 +155,7 @@ cout	<< endl ;
 return 0 ;
 }
 
-void usage( const char* progName )
+void usage( const string& progName )
 {
 cout	<< "Usage: "
 	<< progName
