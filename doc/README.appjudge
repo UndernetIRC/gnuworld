@@ -1,9 +1,9 @@
--- "$Id: README.appjudge,v 1.1 2001/10/16 01:20:52 nighty Exp $"
+-- "$Id: README.appjudge,v 1.2 2001/10/16 01:22:49 nighty Exp $"
 --
 -- 2001-10-16: nighty <nighty@undernet.org>
 --
 
-     - copy regproc/ and its subdirs to /usr/local/pgsql
+     - copy cmaster/regproc/ and its subdirs to /usr/local/pgsql
 
      - make it owned by your gnuworld user (the one running the postgres) :
           chown -R gnuworld /usr/local/pgsql/regproc
