@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: SHUTDOWNCommand.cc,v 1.4 2003/08/09 23:15:35 dan_karrels Exp $
+ * $Id: SHUTDOWNCommand.cc,v 1.5 2003/11/24 14:43:50 dan_karrels Exp $
  */
 
 #include	<string>
@@ -31,7 +31,7 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char SHUTDOWNCommand_cc_rcsId[] = "$Id: SHUTDOWNCommand.cc,v 1.4 2003/08/09 23:15:35 dan_karrels Exp $" ;
+const char SHUTDOWNCommand_cc_rcsId[] = "$Id: SHUTDOWNCommand.cc,v 1.5 2003/11/24 14:43:50 dan_karrels Exp $" ;
 namespace gnuworld
 {
 using std::string ;
@@ -70,7 +70,8 @@ if (admLevel < level::shutdown)
 	}
 
 bot->logAdminMessage("%s issued the shutdown command! So long, and thanks for all the fish!", theClient->getNickName().c_str());
-bot->Exit( st.assemble(1).c_str());
+//bot->Exit( st.assemble(1).c_str());
+server->Shutdown() ;
 
 char buf[ 512 ] = { 0 } ;
 
