@@ -3,7 +3,7 @@
  * 
  * Exception class
  * 
- * $Id: ccException.cc,v 1.2 2001/07/23 10:28:51 mrbean_ Exp $
+ * $Id: ccException.cc,v 1.3 2001/08/16 20:18:38 mrbean_ Exp $
  */
  
 #include	<strstream>
@@ -15,11 +15,12 @@
 
 #include	"ELog.h"
 #include	"misc.h"
+#include	"match.h"
 
 #include	"ccException.h" 
 
 const char ccException_h_rcsId[] = __CCEXCEPTION_H ;
-const char ccException_cc_rcsId[] = "$Id: ccException.cc,v 1.2 2001/07/23 10:28:51 mrbean_ Exp $" ;
+const char ccException_cc_rcsId[] = "$Id: ccException.cc,v 1.3 2001/08/16 20:18:38 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -43,6 +44,7 @@ ccException::ccException(PgDatabase* _SQLDb)
 
 ccException::~ccException()
 {}
+
 
 int ccException::loadData(const string& HostName)
 {
@@ -163,5 +165,6 @@ if( PGRES_COMMAND_OK != status )
 	}
 return true;
 }
+
 }
 }

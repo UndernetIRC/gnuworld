@@ -3,7 +3,7 @@
  */
 
 #ifndef __CCONTROL_H
-#define __CCONTROL_H "$Id: ccontrol.h,v 1.41 2001/08/13 15:10:53 mrbean_ Exp $"
+#define __CCONTROL_H "$Id: ccontrol.h,v 1.42 2001/08/16 20:18:38 mrbean_ Exp $"
 
 
 #include	<string>
@@ -29,7 +29,6 @@
 #include 	"ccLogin.h"
 #include 	"ccException.h"
 #include        "server.h"
-//#include 	"gline.h"
 #include	"CommandsDec.h"
 
 namespace gnuworld
@@ -138,6 +137,11 @@ public:
 	 */
 	virtual int OnPrivateMessage( iClient*, const string&,
 			bool secure = false ) ;
+
+	virtual int OnCTCP( iClient* ,
+                const string& ,
+                const string&,
+		bool Secure = false ) ;
 
 	/**
 	 * This method is invoked each time a network event occurs.
@@ -501,7 +505,7 @@ public:
 	int removeIgnore( iClient * );
 
 	void ignoreUser( ccLogin * );
-	
+
 	bool listIgnores( iClient * );
 	
 	bool refreshIgnores();

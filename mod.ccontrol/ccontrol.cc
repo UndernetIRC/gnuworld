@@ -26,9 +26,10 @@
 #include        "server.h"
 #include 	"gline.h"
 #include	"commLevels.h"
-//#include	"CommandsDec.h"
+#include	"ccFloodData.h"
+
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.68 2001/08/16 09:01:55 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.69 2001/08/16 20:18:38 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -368,14 +369,6 @@ int ccontrol::OnPrivateMessage( iClient* theClient, const string& Message,
 	bool )
 {
 
-//elog << "ccontrol::OnPrivateMessage()\n" ;
-
-// Only allow opers or services clients to use this client
-/*if( !theClient->isOper() && !theClient->getMode( iClient::MODE_SERVICES ) )
-	{
-	Notice( theClient, "You must be an IRCoperator to use this service." ) ;
-	return 0 ;
-	}*/
 
 // Tokenize the message
 StringTokenizer st( Message ) ;
@@ -390,14 +383,38 @@ if( st.empty() )
 // This is no longer necessary, but oh well *shrug*
 const string Command = string_upper( st[ 0 ] ) ;
 
+AuthInfo* theUser = IsAuth(theClient->getCharYYXXX());
+
+if(!theUser)
+	{ //We need to add the flood points for this user
+	ccFloodData* floodData = static_cast< ccFloodData* >(
+	theClient->getCustomData(this) ) ;
+	if(floodData->addPoints(flood::MESSAGE_POINTS))
+		{ //yes we need to ignore this user
+		ccLogin *tempLogin = findLogin(theClient->getCharYYXXX());
+		if(!tempLogin)
+			{
+			tempLogin = new (std::nothrow) ccLogin(theClient->getCharYYXXX());
+			assert(tempLogin != NULL);
+			}
+		ignoreUser(tempLogin);
+	
+		MsgChanLog("[FLOOD MESSAGE]: %s has been ignored"
+			,theClient->getNickName().c_str());
+		return false;
+		}
+	}
+
+
 // Attempt to find a handler for this method.
 commandIterator commHandler = findCommand( Command ) ;
 
 // Was a handler found?
 if( commHandler == command_end() )
 	{
-	// Nope, notify the client
-	Notice( theClient, "Unknown command" ) ;
+	// Nope, notify the client if he's authenticated
+	if(theUser)
+		Notice( theClient, "Unknown command" ) ;
 	return 0 ; 
 	}
 
@@ -408,11 +425,7 @@ int ComAccess = commHandler->second->getFlags();
 
 //bool ShouldntLog = ComAccess & commandLevel::flg_NOLOG;
 
-AuthInfo* theUser = IsAuth(theClient->getCharYYXXX());
-
 bool NeedOp = ((commHandler->second->getNeedOp()) && !(theClient->isOper()) && (ComAccess) && (theUser->getNeedOp()));
-
-//ComAccess = ComAccess);
 
 if(NeedOp)
 	{
@@ -449,6 +462,32 @@ else
 return xClient::OnPrivateMessage( theClient, Message ) ;
 }
 
+int ccontrol::OnCTCP( iClient* theClient, const string& CTCP
+		, const string& Message ,bool Secure = false ) 
+{
+
+AuthInfo* theUser = IsAuth(theClient->getCharYYXXX());
+if(!theUser)
+	{ //We need to add the flood points for this user
+	ccFloodData* floodData = static_cast< ccFloodData* >(
+	theClient->getCustomData(this) ) ;
+	if(floodData->addPoints(flood::CTCP_POINTS))
+		{ //yes we need to ignore this user
+		ccLogin *tempLogin = findLogin(theClient->getCharYYXXX());
+		if(!tempLogin)
+			{
+			tempLogin = new (std::nothrow) ccLogin(theClient->getCharYYXXX());
+			assert(tempLogin != NULL);
+			}
+		ignoreUser(tempLogin);
+		MsgChanLog("[FLOOD MESSAGE]: %s has been ignored"
+			,theClient->getNickName().c_str());
+		return false;
+		}
+	}
+return true;
+}
+
 int ccontrol::OnEvent( const eventType& theEvent,
 	void* Data1, void* Data2, void* Data3, void* Data4 )
 {
@@ -458,14 +497,20 @@ switch( theEvent )
 	case EVT_KILL:
 		{
 		/*
-		 *  We need to deauth this user if they're authed.
-		 *  Also, clean up their custom data memory.
+		 *  The user disconnected,
+		 *  remove his authentication,
+		 *  and flood data, and login data
 		 */
 	
 		iClient* tmpUser = (theEvent == EVT_QUIT) ?
 			static_cast< iClient* >( Data1 ) :
 			static_cast< iClient* >( Data2 ) ;
 
+		ccFloodData* floodData = static_cast< ccFloodData* >(
+		tmpUser->getCustomData(this) ) ;
+		tmpUser->removeCustomData(this);
+		delete(floodData);
+		
 		AuthInfo *TempAuth = IsAuth(tmpUser);
 		if(TempAuth)
 	    		deAuthUser(tmpUser->getCharYYXXX());
@@ -546,6 +591,13 @@ switch( theEvent )
 	case EVT_NICK:
 		{
 		iClient* NewUser = static_cast< iClient* >( Data1);
+
+		//Create our flood data for this user
+		ccFloodData* floodData = new (std::nothrow) ccFloodData();
+		assert( floodData != 0 ) ;
+		NewUser->setCustomData(this,
+			static_cast< void* >( floodData ) );
+
 		int CurConnections = Network->countHost(NewUser->getInsecureHost());		
 		if(CurConnections  > getExceptions("*@" + NewUser->getInsecureHost()))
 			{
@@ -563,8 +615,6 @@ switch( theEvent )
 				tmpGline->loadData(tmpGline->getHost());
 				addGline(tmpGline);
 				}
-			else
-				wallopsAsServer("Refreshing gline time on %s for %s",tmpGline->getHost().c_str(),tmpGline->getReason().c_str());
 			MyUplink->setGline( nickName,
 					tmpGline->getHost(),
 					tmpGline->getReason(),
@@ -2132,10 +2182,8 @@ return retMe;
 
 void ccontrol::ignoreUser( ccLogin *User )
 {
-iClient *theClient = Network->findClient(User->getNumeric());
 
-// TODO: Might wanna reconsider this assert()
-assert(theClient != NULL);
+iClient *theClient = Network->findClient(User->getNumeric());
 
 Notice(theClient,"Hmmmz i dont think i like you anymore , consider yourself ignored");
 MsgChanLog("Added %s to my ignore list\n",theClient->getNickUserHost().c_str());
@@ -2156,7 +2204,7 @@ s	<< getCharYYXXX()
 Write( s );
 delete[] s.str();
 
-User->setIgnoreExpires(::time(0)+60);
+User->setIgnoreExpires(::time(0)+ flood::IGNORE_TIME);
 User->setIgnoredHost(silenceMask);
 
 ignoreList.push_back(User);
