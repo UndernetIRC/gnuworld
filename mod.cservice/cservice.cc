@@ -738,7 +738,7 @@ else if(Command == "VERSION")
 	xClient::DoCTCP(theClient, CTCP,
 		"Undernet P10 Channel Services II ["
 		__DATE__ " " __TIME__
-		"] Release 1.1pl2");
+		"] Release 1.1pl3");
 	}
 else if(Command == "PROBLEM?")
 	{
