@@ -5,13 +5,9 @@ DROP TABLE to_die;
 --
 \qecho [*] Fetching list of idle user accounts:
 SELECT user_id,last_seen INTO TABLE to_die FROM users_lastseen WHERE (last_seen <= now()::abstime::int4 - (86400 * 90));
---
--- Remove any who are channel managers, they can be delt with seperately and are not auto-purged.
-\qecho [*] Discounting those who are channel managers:
-DELETE FROM to_die WHERE (levels.user_id = to_die.user_id) AND (levels.access = 500);
 -- Remove any who currently have a pending app (Shouldn't happen <g>)
-\qecho [*] Discounting those who have pending apps:
-DELETE FROM to_die WHERE (pending.manager_id = to_die.user_id);
+\qecho [*] Moving those with old channel applications to user "AutoPurged".
+UPDATE pending set manager_id = 279907 where pending.manager_id = to_die.user_id;
 -- Output who are are going to kill, log stdout.
 \qecho [*] Listing Final Accounts to be removed:
 SELECT users.user_name,to_die.last_seen from users,to_die where users.id = to_die.user_id;
@@ -34,6 +30,10 @@ DELETE FROM objections where user_id = to_die.user_id;
 -- Clean up mailq records.
 --\qecho [*] Removing mailq records..
 --DELETE FROM mailq where user_id = to_die.user_id;
+--
+-- Clean up webaccessteam records..
+\qecho [*] Removing webaccessteam records..
+DELETE FROM webaccessteam where admin_id = to_die.user_id;
 --
 -- Clean up last_seens.
 \qecho [*] Removing last_seens..

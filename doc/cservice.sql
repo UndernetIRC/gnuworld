@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------------
--- "$Id: cservice.sql,v 1.65 2002/03/24 05:34:11 nighty Exp $"
+-- "$Id: cservice.sql,v 1.66 2002/03/31 19:38:05 gte Exp $"
 -- Channel service DB SQL file for PostgreSQL.
 
 -- ChangeLog:
@@ -243,7 +243,12 @@ CREATE TABLE levels (
  
 CREATE INDEX levels_access_idx ON levels( access ) ;
 CREATE INDEX levels_userid_idx ON levels( user_id ) ;
-CREATE INDEX levels_suspendexpires_idx ON levels( suspend_expires ) ;
+
+-- Note: The below index is a new postgres 7.2 feature which vastly speeds up the
+-- checking of expired suspension levels. If you still use <7.2, stick to the index
+-- commented out below.
+-- CREATE INDEX levels_suspendexpires_idx ON levels( suspend_expires ) ;
+CREATE INDEX levels_suspendexpires_idx ON levels( suspend_expires ) WHERE suspend_expires <> 0;
 
 CREATE TABLE channellog (
 	ts INT4,
