@@ -10,7 +10,7 @@
 #include	"cservice.h"
 #include	"cservice_config.h"
 
-const char NOTECommand_cc_rcsId[] = "$Id: NOTECommand.cc,v 1.4 2002/04/01 23:44:31 gte Exp $" ;
+const char NOTECommand_cc_rcsId[] = "$Id: NOTECommand.cc,v 1.5 2002/04/03 19:51:51 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -25,18 +25,22 @@ bool NOTECommand::Exec( iClient* theClient, const string& Message )
 
 bot->incStat("COMMANDS.NOTE");
 
+/* Is the user authorised? */
+sqlUser* theUser = bot->isAuthed(theClient, false);
+if(!theUser)
+	{
+	return false;
+	}
+
+/* Only let admins play for now */
+int level = bot->getAdminAccessLevel(theUser);
+if(!level) return false;
+
 StringTokenizer st( Message ) ;
 if( st.size() < 3 )
 	{
 	Usage(theClient);
 	return true;
-	}
-
-/* Is the user authorised? */
-sqlUser* theUser = bot->isAuthed(theClient, true);
-if(!theUser)
-	{
-	return false;
 	}
 
 /*
@@ -223,8 +227,40 @@ if (string_lower(st[1]) == "erase")
 		}
 
 	/*
-	 * TODO: Delete by message-id.
+	 * TOFINISH: Delete by message-id.
 	 */
+
+	unsigned int messageId = atoi(st[2].c_str());
+	if(!messageId)
+		{
+		bot->Notice(theClient, "Invalid message-id.");
+		return false;
+		}
+
+		strstream queryString;
+		queryString	<< "DELETE FROM notes where user_id = "
+					<< theUser->getID()
+					<< " AND message_id = "
+					<< messageId
+					<< ends;
+
+		#ifdef LOG_SQL
+			elog	<< "NOTECommand::Delete Notes> "
+					<< queryString.str()
+					<< endl;
+		#endif
+
+		ExecStatusType status = bot->SQLDb->Exec(queryString.str()) ;
+		delete[] queryString.str() ;
+
+		if( PGRES_COMMAND_OK != status )
+			{
+			bot->Notice(theClient, "An error occured while deleting note-id %i.", messageId);
+			return false;
+			}
+
+		bot->Notice(theClient, "Successfully erased note with message-id %i.", messageId);
+		return true;
 
 	return true;
 }
