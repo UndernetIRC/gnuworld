@@ -2,7 +2,7 @@
  * cservice.cc
  * Author: Greg Sikorski
  * Purpose: Overall control client.
- * $Id: cservice.cc,v 1.220 2002/10/09 21:04:24 gte Exp $
+ * $Id: cservice.cc,v 1.221 2002/10/10 18:14:38 gte Exp $
  */
 
 #include	<new>
@@ -2355,7 +2355,7 @@ for( xServer::opVectorType::const_iterator ptr = theTargets.begin() ;
 		// Has the target user's account been suspended?
 		if (authUser && authUser->getFlag(sqlUser::F_GLOBAL_SUSPEND))
 		{
-			Notice(theChanUser->getClient(), "The user %s (%s) has been suspended by a CService Administrator.",
+			if (theChanUser) Notice(theChanUser->getClient(), "The user %s (%s) has been suspended by a CService Administrator.",
 				authUser->getUserName().c_str(), tmpUser->getClient()->getNickName().c_str());
 			deopList.push_back(tmpUser->getClient());
 			sourceHasBeenBad = true;
