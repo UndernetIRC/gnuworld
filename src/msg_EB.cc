@@ -14,7 +14,7 @@
 #include	"ELog.h"
 #include	"xparameters.h"
 
-const char msg_EB_cc_rcsId[] = "$Id: msg_EB.cc,v 1.4 2001/08/08 20:05:57 gte Exp $" ;
+const char msg_EB_cc_rcsId[] = "$Id: msg_EB.cc,v 1.5 2001/08/25 18:07:15 dan_karrels Exp $" ;
 const char server_h_rcsId[] = __SERVER_H ;
 const char iServer_h_rcsId[] = __ISERVER_H ;
 const char events_h_rcsId[] = __EVENTS_H ;
@@ -38,7 +38,11 @@ if( !strcmp( params[ 0 ], Uplink->getCharYY() ) )
 	// It's my uplink
 	burstEnd = ::time( 0 ) ;
 
-	Uplink->bursting = false;
+	// Our uplink is done bursting
+	// This is done here instead of down below the if/else
+	// structure because some of the methods called here
+	// may depend or use the Uplink's isBursting() method
+	Uplink->stopBursting() ;
 
 	// Signal that all Write()'s should write to the
 	// normal output buffer
@@ -55,6 +59,13 @@ if( !strcmp( params[ 0 ], Uplink->getCharYY() ) )
 
 	// For some silly reason, EB must come before EA
 	// *shrug*
+
+	// Called PostEvent() here to notify all attached clients
+	// that we are no longer bursting.  This will ensure
+	// that all end of burst items are written to the
+	// burstOutputBuffer before the burst if officially
+	// completed (as seen by the network)
+	PostEvent( EVT_BURST_CMPLT, static_cast< void* >( Uplink ) ) ;
 
 	// Send our EB
 	Write( "%s EB\n", charYY ) ;
@@ -80,7 +91,8 @@ if( !strcmp( params[ 0 ], Uplink->getCharYY() ) )
 
 	elog	<< "*** Completed net burst"
 		<< endl ;
-	} else
+	}
+else
 	{
 	/* Its another server that has just completed its net.burst. */
 
@@ -93,7 +105,7 @@ if( !strcmp( params[ 0 ], Uplink->getCharYY() ) )
 		return -1 ;
 	}
 
-	theServer->bursting = false;
+	theServer->stopBursting() ;
 
 	PostEvent( EVT_BURST_CMPLT, static_cast< void* >( theServer ) ) ;
 	}

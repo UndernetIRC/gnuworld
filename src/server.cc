@@ -50,7 +50,7 @@
 #include	"pair.h"
 
 const char server_h_rcsId[] = __SERVER_H ;
-const char server_cc_rcsId[] = "$Id: server.cc,v 1.115 2001/08/18 14:49:49 dan_karrels Exp $" ;
+const char server_cc_rcsId[] = "$Id: server.cc,v 1.116 2001/08/25 18:07:15 dan_karrels Exp $" ;
 const char config_h_rcsId[] = __CONFIG_H ;
 const char misc_h_rcsId[] = __MISC_H ;
 const char events_h_rcsId[] = __EVENTS_H ;
@@ -1207,6 +1207,7 @@ for( list< xClient* >::iterator ptr = listPtr->begin(), end = listPtr->end() ;
 	}
 }
 
+// srcClient may be NULL, when the source is a server
 void xServer::PostChannelKick( Channel* theChan,
 	iClient* srcClient,
 	iClient* destClient,
@@ -1215,7 +1216,9 @@ void xServer::PostChannelKick( Channel* theChan,
 {
 // Public method, verify arguments
 assert( theChan != 0 ) ;
-assert( srcClient != 0 ) ;
+// Source can be a server
+//assert( srcClient != 0 ) ;
+
 assert( destClient != 0 ) ;
 
 // First deliver this channel event to any listeners for all channel

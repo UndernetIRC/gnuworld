@@ -18,7 +18,7 @@
 #include	"ELog.h"
 #include	"StringTokenizer.h"
 
-const char msg_M_cc_rcsId[] = "$Id: msg_M.cc,v 1.10 2001/06/24 13:49:14 dan_karrels Exp $" ;
+const char msg_M_cc_rcsId[] = "$Id: msg_M.cc,v 1.11 2001/08/25 18:07:15 dan_karrels Exp $" ;
 const char misc_h_rcsId[] = __MISC_H ;
 const char events_h_rcsId[] = __EVENTS_H ;
 const char server_h_rcsId[] = __SERVER_H ;
@@ -165,6 +165,15 @@ for( const char* modePtr = Param[ 2 ] ; *modePtr ; ++modePtr )
 		// Channel mode l only has an argument if
 		// it is being added, but not removed
 		case 'l':
+			if( polarity && (argPos >= Param.size()) )
+				{
+				elog	<< "xServer::msg_M> Invalid "
+					<< "format for message: missing "
+					<< "argument to mode +l"
+					<< endl ;
+				continue ;
+				}
+
 			onChannelModeL( theChan,
 				polarity, theUser,
 				polarity ? atoi( Param[ argPos++ ] )
@@ -173,12 +182,30 @@ for( const char* modePtr = Param[ 2 ] ; *modePtr ; ++modePtr )
 
 		// Channel mode k always has an argument
 		case 'k':
+			if( argPos >= Param.size() )
+				{
+				elog	<< "xServer::msg_M> Invalid "
+					<< "format for message: missing "
+					<< "argument for mode 'k'"
+					<< endl ;
+				continue ;
+				}
+
 			onChannelModeK( theChan,
 				polarity, theUser,
 				Param[ argPos++ ] ) ;
 			break ;
 		case 'o':
 			{
+			if( argPos >= Param.size() )
+				{
+				elog	<< "xServer::msg_M> Invalid "
+					<< "format for message: missing "
+					<< "argument for mode 'o'"
+					<< endl ;
+				continue ;
+				}
+
 			iClient* targetClient = Network->findClient(
 				Param[ argPos++ ] ) ;
 			if( NULL == targetClient )
@@ -216,6 +243,15 @@ for( const char* modePtr = Param[ 2 ] ; *modePtr ; ++modePtr )
 			}
 		case 'v':
 			{
+			if( argPos >= Param.size() )
+				{
+				elog	<< "xServer::msg_M> Invalid "
+					<< "format for message: missing "
+					<< "argument for mode 'v'"
+					<< endl ;
+				continue ;
+				}
+
 			iClient* targetClient = Network->findClient(
 				Param[ argPos++ ] ) ;
 			if( NULL == targetClient )
@@ -243,6 +279,15 @@ for( const char* modePtr = Param[ 2 ] ; *modePtr ; ++modePtr )
 			}
 		case 'b':
 			{
+			if( argPos >= Param.size() )
+				{
+				elog	<< "xServer::msg_M> Invalid "
+					<< "format for message: missing "
+					<< "argument for mode 'b'"
+					<< endl ;
+				continue ;
+				}
+
 			const char* targetBan = Param[ argPos++ ] ;
 			banVector.push_back(
 				pair< bool, string >(

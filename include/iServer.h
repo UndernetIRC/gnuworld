@@ -4,7 +4,7 @@
  */
 
 #ifndef __ISERVER_H
-#define __ISERVER_H "$Id: iServer.h,v 1.7 2001/08/08 20:01:36 gte Exp $"
+#define __ISERVER_H "$Id: iServer.h,v 1.8 2001/08/25 18:07:14 dan_karrels Exp $"
 
 #include	<iostream>
 #include	<string>
@@ -139,6 +139,20 @@ protected:
 	 */
 	virtual void	setUplinkIntYY( const unsigned int& newYY )
 		{ uplinkIntYY = newYY ; }
+
+	/**
+	 * This method is used by xServer to signify that this
+	 * iServer is now in the bursting state.
+	 */
+	virtual void	startBursting()
+		{ bursting = true ; }
+
+	/**
+	 * This method is called by xServer to signify that this
+	 * iServer has completed bursting.
+	 */
+	virtual void	stopBursting()
+		{ bursting = false ; }
 
 	/**
 	 * Integer numeric of this server's uplink.
