@@ -11,7 +11,7 @@
 #include	"cservice_config.h"
 #include	"Network.h"
 
-const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.39 2002/02/24 01:04:06 gte Exp $" ;
+const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.40 2002/03/10 02:54:10 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -142,10 +142,13 @@ bot->Notice(theClient,
 	bot->getResponse(theUser, language::auth_success).c_str(),
 	theUser->getUserName().c_str());
 
-string greeting = bot->getResponse(0, language::greeting);
-if (!greeting.empty())
+if(!bot->getAdminAccessLevel(theUser))
 {
-	bot->Notice(theClient, greeting.c_str());
+	string greeting = bot->getResponse(theUser, language::greeting);
+	if (!greeting.empty())
+	{
+		bot->Notice(theClient, greeting.c_str());
+	}
 }
 
 /*
