@@ -13,7 +13,7 @@
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 
-const char CLEARCHANCommand_cc_rcsId[] = "$Id: CLEARCHANCommand.cc,v 1.2 2001/03/11 23:02:30 mrbean_ Exp $";
+const char CLEARCHANCommand_cc_rcsId[] = "$Id: CLEARCHANCommand.cc,v 1.3 2001/03/26 21:59:10 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -39,13 +39,13 @@ if( NULL == theChan )
 	}
 
 string doModes; //This holds the modes the user asked to be removed
-string remModes; //Holds the modes that we are removing
-string args; //Holds the arguments for the remModes
+string remModes = ""; //Holds the modes that we are removing
+string args = ""; //Holds the arguments for the remModes
 
 //Check if the user specified the modes, if not assume he ment all of the modes
 if(st.size() == 2)
 	doModes = "OBKLI";
-else if(string_upper(st[ 2 ]) == "ALL")
+else if(!strcasecmp(string_upper(st[ 2 ]).c_str(),"ALL"))
 	doModes = "OBKLINMSPT";
 else	
 	doModes = string_upper(st [ 2 ]);
@@ -100,6 +100,7 @@ for( string::size_type modePos = 0 ; modePos < doModes.size() ; ++modePos )
 			if(!args.empty())
 				bot->ModeAsServer(theChan,modes + " " + args);
 			}
+			break;
 		case 'K':  //Key?
 			if(theChan->getMode(Channel::MODE_K))
 				{
@@ -108,12 +109,14 @@ for( string::size_type modePos = 0 ; modePos < doModes.size() ; ++modePos )
 				args+= theChan->getKey() + " ";
 				theChan->setKey("");
 				}
+			break;
 		case 'I':  //Invite?
 			if(theChan->getMode(Channel::MODE_I))
 				{
 				theChan->removeMode(Channel::MODE_I);
 				remModes+= "i";
 				}
+			break;
 		case 'L': //Limit?
 			if(theChan->getMode(Channel::MODE_L))
 				{
@@ -121,37 +124,42 @@ for( string::size_type modePos = 0 ; modePos < doModes.size() ; ++modePos )
 				remModes+= "l";
 				//args+= theChan->getLimit() + " ";
 				}
+			break;
 		case 'P':  //Private?
 			if(theChan->getMode(Channel::MODE_P))
 				{
 				theChan->removeMode(Channel::MODE_P);
 				remModes+= "p";
 				}
+			break;
 		case 'S':  //Secret?
 			if(theChan->getMode(Channel::MODE_S))
 				{
 				theChan->removeMode(Channel::MODE_S);
 				remModes+= "s";
 				}
+			break;
 		case 'M':  //Moderated?
 			if(theChan->getMode(Channel::MODE_M))
 				{
 				theChan->removeMode(Channel::MODE_M);
 				remModes+= "m";
 				}
+			break;
 		case 'N':  //No External Messages?
 			if(theChan->getMode(Channel::MODE_N))
 				{
 				theChan->removeMode(Channel::MODE_N);
 				remModes+= "n";
 				}
+			break;
 		case 'T':  //Topic?
 			if(theChan->getMode(Channel::MODE_T))
 				{
 				theChan->removeMode(Channel::MODE_T);
 				remModes+= "t";
 				}
-	
+			break;
 		default:;
 	}	}			
 if(!remModes.empty())
