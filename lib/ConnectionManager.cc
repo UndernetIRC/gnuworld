@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ConnectionManager.cc,v 1.12 2002/07/16 15:30:49 dan_karrels Exp $
+ * $Id: ConnectionManager.cc,v 1.13 2002/07/16 15:57:13 dan_karrels Exp $
  */
 
 #include	<unistd.h>
@@ -970,7 +970,6 @@ memset( buf, 0, 4096 ) ;
 errno = 0 ;
 int readResult = ::recv( cPtr->getSockFD(), buf, 4096, 0 ) ;
 
-/*
 if( EAGAIN == errno )
 	{
 	// Nonblocking type error
@@ -979,7 +978,6 @@ if( EAGAIN == errno )
 		<< endl ;
 	return true ;
 	}
-*/
 
 //elog	<< "ConnectionManager::handleRead> Read "
 //	<< readResult
@@ -987,7 +985,7 @@ if( EAGAIN == errno )
 //	<< endl ;
 
 // Check for error on read()
-if( readResult < 0 )
+if( readResult <= 0 )
 	{
 	// Error on read, socket no longer valid
 	// Notify handler

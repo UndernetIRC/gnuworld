@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server.h,v 1.70 2002/07/16 15:30:47 dan_karrels Exp $
+ * $Id: server.h,v 1.71 2002/07/16 15:57:10 dan_karrels Exp $
  */
 
 #ifndef __SERVER_H
-#define __SERVER_H "$Id: server.h,v 1.70 2002/07/16 15:30:47 dan_karrels Exp $"
+#define __SERVER_H "$Id: server.h,v 1.71 2002/07/16 15:57:10 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
@@ -198,6 +198,14 @@ public:
 	 */
 	inline glineIterator	gline_end()
 		{ return glineList.end() ; }
+
+	/// Deprecated.
+	inline size_t		getTotalReceived() const
+		{ return 0 ; }
+
+	/// Deprecated.
+	inline size_t		getTotalSent() const
+		{ return 0 ; }
 
 	virtual void OnDisconnect( Connection* ) ;
 
