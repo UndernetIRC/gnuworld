@@ -1,5 +1,5 @@
 --
--- $Id: autokill.sql,v 1.11 2002/08/30 10:18:43 nighty Exp $
+-- $Id: autokill.sql,v 1.12 2002/09/15 01:40:32 nighty Exp $
 --
 
 --
@@ -8,7 +8,7 @@ DROP TABLE to_die;
 -- Select all user_id's idle > 60 days into a temp table.
 --
 \qecho [*] Fetching list of idle user accounts:
-SELECT user_id,last_seen INTO TABLE to_die FROM users_lastseen WHERE (last_seen <= now()::abstime::int4 - (86400 * 60));
+SELECT users_lastseen.user_id,users_lastseen.last_seen,users.user_name INTO TABLE to_die FROM users_lastseen,users WHERE (users_lastseen.last_seen <= now()::abstime::int4 - (86400 * 60)) AND users.id=users_lastseen.user_id;
 -- Remove any who currently have a pending app (Shouldn't happen <g>)
 \qecho [*] Moving those with old channel applications to user "AutoPurged".
 UPDATE pending set manager_id = (select id from users where lower(user_name) = 'autopurged') where pending.manager_id = to_die.user_id;
@@ -23,6 +23,10 @@ DELETE FROM userlog WHERE user_id = to_die.user_id;
 -- Clean up level records.
 \qecho [*] Removing access levels..
 DELETE FROM levels where user_id = to_die.user_id;
+--
+-- Clean up FRAUD USERNAMES.
+\qecho [*] Removing FRAUD USERNAME records..
+DELETE FROM noreg WHERE type=4 AND user_name= to_die.user_name;
 --
 -- Clean up supporter records.
 \qecho [*] Removing supporter records..
