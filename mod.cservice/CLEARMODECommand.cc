@@ -10,7 +10,7 @@
  *
  * Todo: Support ircu2.10.11's CLEARMODE feature.
  *
- * $Id: CLEARMODECommand.cc,v 1.1 2001/02/16 00:18:16 plexus Exp $
+ * $Id: CLEARMODECommand.cc,v 1.2 2001/02/16 00:27:56 plexus Exp $
  */
 
 #include	<string>
@@ -22,7 +22,7 @@
 #include	"responses.h"
 #include	"Network.h"
 
-const char CLEARMODECommand_cc_rcsId[] = "$Id: CLEARMODECommand.cc,v 1.1 2001/02/16 00:18:16 plexus Exp $" ;
+const char CLEARMODECommand_cc_rcsId[] = "$Id: CLEARMODECommand.cc,v 1.2 2001/02/16 00:27:56 plexus Exp $" ;
 
 namespace gnuworld
 {
@@ -32,7 +32,7 @@ using namespace gnuworld;
 bool CLEARMODECommand::Exec( iClient* theClient, const string& Message )
 { 
 	StringTokenizer st( Message ) ;
-	if( st.size() < 3 )
+	if( st.size() < 2 )
 	{
 		Usage(theClient);
 		return true;
