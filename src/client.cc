@@ -26,7 +26,7 @@
 #include	"events.h"
 
 const char xClient_h_rcsId[] = __XCLIENT_H ;
-const char xClient_cc_rcsId[] = "$Id: client.cc,v 1.23 2001/01/13 21:06:29 dan_karrels Exp $" ;
+const char xClient_cc_rcsId[] = "$Id: client.cc,v 1.24 2001/01/27 04:26:42 gte Exp $" ;
 
 using std::string ;
 using std::strstream ;
@@ -580,7 +580,7 @@ for( vector< iClient* >::const_iterator ptr = clientVector.begin(),
 		}
 	}
 
-string modeString = "+" ;
+string modeString ;
 string args ;
 
 for( xServer::opVectorType::const_iterator ptr = opVector.begin(),
@@ -589,13 +589,13 @@ for( xServer::opVectorType::const_iterator ptr = opVector.begin(),
 	modeString += 'o' ;
 	args += ptr->second->getCharYYXXX() + ' ' ;
 
-	if( ((MAX_CHAN_MODES + 1) == modeString.size()) ||
+	if( (MAX_CHAN_MODES == modeString.size()) ||
 		((ptr + 1) == end) )
 		{
 		strstream s ;
 		s	<< getCharYYXXX() << " M "
 			<< theChan->getName() << ' '
-			<< modeString << ' ' << args
+			<< "+" << modeString << ' ' << args
 			<< ends ;
 
 		Write( s ) ;
@@ -658,7 +658,7 @@ for( vector< iClient* >::const_iterator ptr = clientVector.begin(),
 		}
 	}
 
-string modeString = "+" ;
+string modeString ;
 string args ;
 
 for( xServer::voiceVectorType::const_iterator ptr = voiceVector.begin(),
@@ -667,13 +667,13 @@ for( xServer::voiceVectorType::const_iterator ptr = voiceVector.begin(),
 	modeString += 'v' ;
 	args += ptr->second->getCharYYXXX() + ' ' ;
 
-	if( ((MAX_CHAN_MODES + 1) == modeString.size()) ||
+	if( (MAX_CHAN_MODES == modeString.size()) ||
 		((ptr + 1) == end) )
 		{
 		strstream s ;
 		s	<< getCharYYXXX() << " M "
 			<< theChan->getName() << ' '
-			<< modeString << ' ' << args
+			<< "+" << modeString << ' ' << args
 			<< ends ;
 
 		Write( s ) ;
@@ -835,7 +835,7 @@ for( vector< iClient* >::const_iterator ptr = clientVector.begin(),
 		}
 	}
 
-string modeString = "-" ;
+string modeString ;
 string args ;
 
 for( xServer::opVectorType::const_iterator ptr = opVector.begin(),
@@ -844,13 +844,13 @@ for( xServer::opVectorType::const_iterator ptr = opVector.begin(),
 	modeString += 'o' ;
 	args += ptr->second->getCharYYXXX() + ' ' ;
 
-	if( ((MAX_CHAN_MODES + 1) == modeString.size()) ||
+	if( (MAX_CHAN_MODES == modeString.size()) ||
 		((ptr + 1) == end) )
 		{
 		strstream s ;
 		s	<< getCharYYXXX() << " M "
 			<< theChan->getName() << ' '
-			<< modeString << ' ' << args
+			<< "-" << modeString << ' ' << args
 			<< ends ;
 
 		Write( s ) ;
@@ -963,7 +963,7 @@ for( vector< iClient* >::const_iterator ptr = clientVector.begin(),
 		}
 	}
 
-string modeString = "-" ;
+string modeString ;
 string args ;
 
 for( xServer::voiceVectorType::const_iterator ptr = voiceVector.begin(),
@@ -972,13 +972,13 @@ for( xServer::voiceVectorType::const_iterator ptr = voiceVector.begin(),
 	modeString += 'v' ;
 	args += ptr->second->getCharYYXXX() + ' ' ;
 
-	if( ((MAX_CHAN_MODES + 1) == modeString.size()) ||
+	if( (MAX_CHAN_MODES == modeString.size()) ||
 		((ptr + 1) == end) )
 		{
 		strstream s ;
 		s	<< getCharYYXXX() << " M "
 			<< theChan->getName() << ' '
-			<< modeString << ' ' << args
+			<< "-" << modeString << ' ' << args
 			<< ends ;
 
 		Write( s ) ;
