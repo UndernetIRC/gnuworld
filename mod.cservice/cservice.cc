@@ -455,7 +455,7 @@ int cservice::OnCTCP( iClient* theClient, const string& CTCP,
 
 	if(Command == "VERSION")
 	{
-		xClient::DoCTCP(theClient, CTCP.c_str(), "Undernet P10 Channel Services Version 2 [" __DATE__ " " __TIME__ "] ($Id: cservice.cc,v 1.54 2001/01/20 16:40:02 gte Exp $)");
+		xClient::DoCTCP(theClient, CTCP.c_str(), "Undernet P10 Channel Services Version 2 [" __DATE__ " " __TIME__ "] ($Id: cservice.cc,v 1.55 2001/01/20 16:41:22 gte Exp $)");
 		return true;
 	}
  
@@ -1250,7 +1250,7 @@ return xClient::OnChannelEvent( whichEvent, theChan, data1, data2, data3, data4 
 void cservice::doAutoTopic(sqlChannel* theChan)
 {
 	strstream s;
-	string extra = (theChan->getURL().size() != 0) ? (" (" + theChan->getURL() + ")") : "";
+	string extra = (theChan->getURL().size() != 0) ? (" ( " + theChan->getURL() + " )") : "";
 
 	s << getCharYYXXX() << " T " << theChan->getName() << " :" 
 		<< theChan->getDescription() << extra << ends; 
