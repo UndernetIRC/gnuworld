@@ -8,7 +8,7 @@
  *
  * Caveats: None
  *
- * $Id: JOINCommand.cc,v 1.2 2001/02/10 21:49:09 gte Exp $
+ * $Id: JOINCommand.cc,v 1.3 2001/02/10 22:06:36 gte Exp $
  */
 
 
@@ -21,7 +21,7 @@
 #include	"responses.h"
 #include	"Network.h"
 
-const char JOINCommand_cc_rcsId[] = "$Id: JOINCommand.cc,v 1.2 2001/02/10 21:49:09 gte Exp $" ;
+const char JOINCommand_cc_rcsId[] = "$Id: JOINCommand.cc,v 1.3 2001/02/10 22:06:36 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -74,8 +74,11 @@ bool JOINCommand::Exec( iClient* theClient, const string& Message )
 	bot->getUplink()->RegisterChannelEvent( theChan->getName(), bot);
 	bot->Join(theChan->getName(), theChan->getChannelMode(), theChan->getChannelTS(), true);
 
-	if (tmpChan && theChan->getFlag(sqlChannel::F_STRICTOP)) bot->deopAllUnAuthedOnChan(tmpChan);
-	if (tmpChan && theChan->getFlag(sqlChannel::F_NOOP) ) bot->deopAllOnChan(tmpChan);
+	if (tmpChan)
+		{
+		if(theChan->getFlag(sqlChannel::F_NOOP)) bot->deopAllOnChan(tmpChan);
+		if(theChan->getFlag(sqlChannel::F_STRICTOP)) bot->deopAllUnAuthedOnChan(tmpChan);
+		}
 
 	return true;
 } 

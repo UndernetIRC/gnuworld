@@ -12,7 +12,7 @@
  *
  * Caveats: SET LANG is still under consideration.
  *
- * $Id: SETCommand.cc,v 1.19 2001/02/10 21:49:09 gte Exp $
+ * $Id: SETCommand.cc,v 1.20 2001/02/10 22:06:36 gte Exp $
  */
 
 #include	<string>
@@ -24,7 +24,7 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char SETCommand_cc_rcsId[] = "$Id: SETCommand.cc,v 1.19 2001/02/10 21:49:09 gte Exp $" ;
+const char SETCommand_cc_rcsId[] = "$Id: SETCommand.cc,v 1.20 2001/02/10 22:06:36 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -435,8 +435,11 @@ bool SETCommand::Exec( iClient* theClient, const string& Message )
 			bot->getUplink()->RegisterChannelEvent( theChan->getName(), bot ) ;
 			bot->Join(theChan->getName(), theChan->getChannelMode(), 
 				theChan->getChannelTS(), true);
-			if ( tmpChan && theChan->getFlag(sqlChannel::F_STRICTOP) ) bot->deopAllUnAuthedOnChan(tmpChan);
-			if ( tmpChan && theChan->getFlag(sqlChannel::F_NOOP) ) bot->deopAllOnChan(tmpChan);
+		if (tmpChan)
+			{
+			if(theChan->getFlag(sqlChannel::F_NOOP)) bot->deopAllOnChan(tmpChan);
+			if(theChan->getFlag(sqlChannel::F_STRICTOP)) bot->deopAllUnAuthedOnChan(tmpChan);
+			}
 		}
 	    else if(value == "OFF") 
 	    { 
