@@ -23,7 +23,7 @@
 #include	"AuthInfo.h"
 #include        "server.h"
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.47 2001/05/29 22:25:47 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.48 2001/05/30 14:51:50 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -1306,6 +1306,7 @@ return true;
 ccGline* ccontrol::findMatchingGline( const string& Host )
 {
 ccGline *theGline;
+glineIterator tptr;
 for(glineIterator ptr = glineList.begin(); ptr != glineList.end(); ptr++)
 	{
 	theGline = *ptr;
@@ -1314,9 +1315,12 @@ for(glineIterator ptr = glineList.begin(); ptr != glineList.end(); ptr++)
 			return theGline;
 		else
 			{
+			tptr = ptr++;
 			theGline->Delete();
-			glineList.erase(ptr);
+			glineList.erase(tptr);
 			MyUplink->removeGline(theGline->get_Host());
+			wallopsAsServer("Removing gline for host %s\n",theGline->get_Host().c_str());
+			delete theGline;
 			}
 	}
 
