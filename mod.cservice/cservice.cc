@@ -3323,12 +3323,8 @@ if( Connected && MyUplink )
 			}
 		else
 			{
-			*(b++)=*m;
-			if (b>=buffer+509) {
-			  while (b>=buffer+509 && !(*m || *m=='\n' || *m=='\r'))
-				m++;
-			  }
-			  m--;
+			if (b<buffer+509)
+			  *(b++)=*m;
 			}
 			
 		}
