@@ -1,13 +1,12 @@
 /**
  * MTrie.cc
  *
- * $Id: MTrie.cc,v 1.1 2003/07/20 21:56:28 dan_karrels Exp $
+ * $Id: MTrie.cc,v 1.2 2003/07/20 23:00:34 dan_karrels Exp $
  */
 
 #include	<map>
 #include	<list>
 #include	<string>
-#include	<vector>
 #include	<iostream>
 
 #include	<cassert>
@@ -22,7 +21,6 @@ using std::map ;
 using std::clog ;
 using std::list ;
 using std::string ;
-using std::vector ;
 using gnuworld::StringTokenizer ;
 
 template< typename _valueT >
@@ -175,7 +173,7 @@ clog	<< "MTrie::wildCardFind> Searching for key: "
 
 // First, establish the base
 list< string > base ;
-vector< string > remainingTokens ;
+list< string > remainingTokens ;
 list< value_type > returnMe ;
 
 const MTrie< data_type >* currentNode = this ;
@@ -208,8 +206,12 @@ for( ; tokenItr != tokens.rend() ; ++tokenItr )
 	currentNode = nItr->second ;
 
 	// Add to base
-	base.push_back( *tokenItr ) ;
+	base.push_front( *tokenItr ) ;
 	} // for( tokenItr )
+
+clog	<< "MTrie::wildCardFind> *tokenItr: "
+	<< *tokenItr
+	<< endl ;
 
 // Because of the precondition, the only way to exit the above 
 // loop is by finding a wildcard, tokenItr must be valid 
@@ -225,12 +227,20 @@ string localKey( *tokenItr ) ;
 
 // searchPrefix will be everything before (and including) the
 // rightmost '*'
-// searchPrefix is only used if a '*' is found
+// searchPrefix is only used if a '*' is found, and empty otherwise
 // In the case of "abc*fgh", localKey will be "*fgh" and
 // searchPrefix will be "abc*"
-string searchPrefix( localKey ) ;
+string searchPrefix ;
 
+// starPos is the index of the '*'
 string::size_type starPos = localKey.rfind( '*' ) ;
+
+// tokenItr needs to be moved to the next element in both cases below
+++tokenItr ;
+
+// If the '?' occured on the last token, then currentNode->values
+// contains all possible matches
+//bool wildOnLastToken = (tokenItr == tokens.rend()) ;
 
 if( starPos != string::npos )
 	{
@@ -242,11 +252,13 @@ if( starPos != string::npos )
 	clog	<< "MTrie::wildCardFind> Found *"
 		<< endl ;
 
-	// Setup localKey
+	// localKey starts out as "n*ws"
+	// Setup localKey to "*ws"
 	localKey.erase( 0, starPos ) ;
 
-	// Setup searchPrefix
-	searchPrefix = "*" ;
+	// Setup searchPrefix to "n*"
+	searchPrefix = (*tokenItr).substr( 0, starPos ) + "*" ;
+
 	for( ; tokenItr != tokens.rend() ; ++tokenItr )
 		{
 		searchPrefix = *tokenItr + searchPrefix ;
@@ -262,82 +274,86 @@ else
 	clog	<< "MTrie::wildCardFind> Found ?"
 		<< endl ;
 
-	localKey = *tokenItr ;
-
 	for( ; tokenItr != tokens.rend() ; ++tokenItr )
 		{
-		remainingTokens.push_back( *tokenItr ) ;
+		remainingTokens.push_front( *tokenItr ) ;
 		}
 
-	clog	<< "MTrie::wildCardFind> localKey: "
-		<< localKey
-		<< ", remainingTokens: " ;
+/*
+	// With the '?', it is possible to have matches here
+	if( wildOnLastToken )
+		{
+		for( const_values_iterator vItr = 
+			currentNode->valuesList.begin() ;
+			vItr != currentNode->valuesList.end() ;
+			++vItr )
+			{
+			clog	<< "MTrie::wildCardFind> vItr: "
+				<< *vItr
+				<< endl ;
+			value_type addMe( getBase( base ),
+				*vItr ) ;
+			returnMe.push_back( addMe ) ;
+			}
+		}
+*/
 	}
 
-clog	<< "MTrie::wildCardFind> localKey: "
+clog	<< "MTrie::wildCardFind> starPos: "
+	<< starPos
+	<< ", localKey: "
 	<< localKey
 	<< ", searchPrefix: "
 	<< searchPrefix
 	<< ", remainingTokens: " ;
 
-for( vector< string >::const_iterator rtItr = remainingTokens.begin() ;
+bool doneALoop = false ;
+for( list< string >::const_iterator rtItr = remainingTokens.begin() ;
 	rtItr != remainingTokens.end() ; ++rtItr )
 	{
-	clog	<< *rtItr ;
-	if( (rtItr + 1) != remainingTokens.end() )
+	if( doneALoop )
 		{
 		clog	<< "." ;
 		}
+	clog	<< *rtItr ;
+	doneALoop = true ;
+	}
+
+clog	<< ", base: " ;
+
+doneALoop = false ;
+for( list< string >::const_iterator rtItr = base.begin() ;
+	rtItr != base.end() ; ++rtItr )
+	{
+	if( doneALoop )
+		{
+		clog	<< "." ;
+		}
+	clog	<< *rtItr ;
+	doneALoop = true ;
 	}
 clog	<< endl ;
 
+
+
 return returnMe ;
 }
-
-
-
-
-
-
-
-
-
-
-
-
 
 template< typename _valueT >
-list< string > MTrie< _valueT >::wildCardTokenize( const string& key ) const
+string MTrie< _valueT >::getBase( const list< string >& base ) const
 {
-list< string > returnMe ;
-list< string > currentBase ;
+string retMe ;
+bool doneALoop = false ;
 
-StringTokenizer st( key, '.' ) ;
-
-// Add the obvious tokenization to search matrix
-returnMe.push_back( key ) ;
-
-bool foundWildCard = false ;
-for( StringTokenizer::const_reverse_iterator tokItr = st.begin() ;
-	tokItr != st.end() ; ++tokItr )
+for( list< string >::const_iterator rtItr = base.begin() ;
+	rtItr != base.end() ; ++rtItr )
 	{
-	if( string::npos == (*tokItr).find( '*' ) )
+	if( doneALoop )
 		{
-		// No wildcard in this token
-		currentBase.push_front( *tokItr ) ;
-		continue ;
+		retMe += "." ;
 		}
-
-	foundWildCard = true ;
-
-	string currentToken( *tokItr ) ;
-	for( string::reverse_iterator sItr = currentToken.rbegin() ;
-		sItr != currentToken.rend() ; ++sItr )
-		{
-		
-
-		}
-	} // for( itr )
-return returnMe ;
+	retMe += *rtItr ;
+	doneALoop = true ;
+	}
+return retMe ;
 }
-

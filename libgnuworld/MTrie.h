@@ -1,7 +1,7 @@
 /**
  * MTrie.h
  *
- * $Id: MTrie.h,v 1.1 2003/07/20 21:56:28 dan_karrels Exp $
+ * $Id: MTrie.h,v 1.2 2003/07/20 23:00:34 dan_karrels Exp $
  */
 
 #ifndef __MTRIE_H
@@ -67,7 +67,7 @@ public:
 protected:
 
 	list< value_type >	wildCardFind( const string& key ) const ;
-	list< string >		wildCardTokenize( const string& key ) const ;
+	string			getBase( const list< string >& ) const ;
 
 	/// The number of elements stored in this MTrie
 	size_type		numElements ;

@@ -1,7 +1,7 @@
 /**
  * mtrie.cc
  *
- * $Id: mtrie.cc,v 1.1 2003/07/20 21:56:30 dan_karrels Exp $
+ * $Id: mtrie.cc,v 1.2 2003/07/20 23:00:34 dan_karrels Exp $
  */
 
 #include	<string>
@@ -149,9 +149,9 @@ cout	<< endl
 
 void handleSearch( const string& line )
 {
-cout	<< "handleSearch> line: "
-	<< line
-	<< endl ;
+//cout	<< "handleSearch> line: "
+//	<< line
+//	<< endl ;
 
 StringTokenizer st( line ) ;
 if( st.size() != 2 )
