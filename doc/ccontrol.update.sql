@@ -1,5 +1,5 @@
 
--- "$Id: ccontrol.update.sql,v 1.9 2001/10/17 21:39:11 mrbean_ Exp $"
+-- "$Id: ccontrol.update.sql,v 1.10 2001/12/28 16:28:45 mrbean_ Exp $"
 
 -- ccontrol database changes update
 -- this file will add the new features to an old database
@@ -51,6 +51,12 @@
 --	note VARCHAR (512)
 --	);
 
-ALTER TABLE opers add suspend_level INT4 NOT NULL DEFAULT '0';
-ALTER TABLE opers rename suspendreason to suspend_Reason;
-ALTER TABLE servers add SplitReason VARCHAR(512);
+-- ALTER TABLE opers add suspend_level INT4 NOT NULL DEFAULT '0';
+-- ALTER TABLE opers rename suspendreason to suspend_Reason;
+-- ALTER TABLE servers add SplitReason VARCHAR(512);
+
+-- 28/12/01 - Add some missing feilds to the servers table
+
+alter TABLE servers add Version VARCHAR(256);
+alter TABLE servers add AddedOn INT4 NOT NULL;
+alter TABLE servers add LastUpdated INT4 NOT NULL;

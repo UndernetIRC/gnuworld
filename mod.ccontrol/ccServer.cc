@@ -3,7 +3,7 @@
  * 
  * Server class
  * 
- * $Id: ccServer.cc,v 1.7 2001/11/21 20:54:40 mrbean_ Exp $
+ * $Id: ccServer.cc,v 1.8 2001/12/28 16:28:47 mrbean_ Exp $
  */
  
 #include	<strstream>
@@ -18,9 +18,10 @@
 #include	"misc.h"
 #include	"ccServer.h" 
 #include	"ccontrol.h"
+#include	"Constants.h"
 
 const char ccServer_h_rcsId[] = __CCSERVER_H ;
-const char ccServer_cc_rcsId[] = "$Id: ccServer.cc,v 1.7 2001/11/21 20:54:40 mrbean_ Exp $" ;
+const char ccServer_cc_rcsId[] = "$Id: ccServer.cc,v 1.8 2001/12/28 16:28:47 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -42,6 +43,10 @@ ccServer::ccServer(PgDatabase* _SQLDb)
    LastConnected( 0 ),
    LastSplitted( 0 ),
    SplitReason( "" ),
+   Version( "Unknown" ),
+   AddedOn( ::time(0) ),
+   LastUpdated( 0 ),
+   NetServer(NULL),
    SQLDb( _SQLDb )
 {
 ++numAllocated;
@@ -54,7 +59,7 @@ ccServer::~ccServer()
 
 bool ccServer::Insert()
 {
-static const char *Main = "INSERT into servers (Name,LastUplink,LastNumeric,LastConnected,SplitedOn,SplitReason) VALUES ('";
+static const char *Main = "INSERT into servers (Name,LastUplink,LastNumeric,LastConnected,SplitedOn,SplitReason,Version,AddedOn,LastUpdated) VALUES ('";
 
 if(!dbConnected)
 	{
@@ -67,8 +72,11 @@ theQuery	<< Main
 		<< Numeric << "',"
 		<< LastConnected << ","
 		<< LastSplitted 
-		<< ",'" << SplitReason << "')"
-		<< ends;
+		<< ",'" << SplitReason 
+		<< "','" << Version
+		<< "'," << AddedOn
+		<< "," << LastUpdated
+		<< ")" << ends;
 
 elog	<< "ccontrol::Server::Insert::sqlQuery> "
 	<< theQuery.str()
@@ -113,7 +121,13 @@ theQuery	<< Main
 		<< LastSplitted
 		<< ", SplitReason = '"
 		<< SplitReason 
-		<< "' WHERE lower(Name) = '" << string_lower(Name)
+		<< "', Version = ' "
+		<< Version
+		<< "', AddedOn = " 
+		<< AddedOn
+		<< ", LastUpdated = " 
+		<< LastUpdated
+		<< " WHERE lower(Name) = '" << string_lower(Name)
 		<<  "'" << ends;
 
 elog	<< "ccontrol::Server::Update> "
@@ -138,8 +152,8 @@ else
 
 bool ccServer::loadData(string ServerName)
 {
-static const char *Main = "SELECT name,lastuplink,lastconnected,splitedon,lastnumeric,splitreason FROM servers WHERE 
-lower(Name) = '";
+//static const char *Main = "SELECT name,lastuplink,lastconnected,splitedon,lastnumeric,splitreason FROM servers WHERE 
+//lower(Name) = '";
 
 if(!dbConnected)
 	{
@@ -147,7 +161,8 @@ if(!dbConnected)
 	}
 
 strstream theQuery;
-theQuery	<< Main
+theQuery	<< server::Query
+		<< "Where lower(Name) = '"
 		<< string_lower(ServerName)
 		<< "'" << ends;
 
@@ -167,21 +182,14 @@ if( PGRES_TUPLES_OK != status )
 	return false ;
 	}
 
-if(SQLDb->Tuples() == 0 )
-    return false;
-Name = SQLDb->GetValue(0,0);
-Uplink = SQLDb->GetValue(0,1);
-LastConnected = static_cast< time_t >( atoi( SQLDb->GetValue(0,2) ) ) ;
-LastSplitted = static_cast< time_t >( atoi( SQLDb->GetValue(0,3) ) ) ;
-Numeric = SQLDb->GetValue(0,4);
-SplitReason=SQLDb->GetValue(0,5);
-return true;
+return loadDataFromDB();
+
 }
 
 bool ccServer::loadNumericData(string ServNumeric)
 {
-static const char *Main = "SELECT name,lastuplink,lastconnected,splitedon,lastnumeric,SplitReason FROM servers WHERE 
-LastNumeric = '";
+/*static const char *Main = "SELECT name,lastuplink,lastconnected,splitedon,lastnumeric,SplitReason FROM servers WHERE 
+LastNumeric = '";*/
 
 if(!dbConnected)
 	{
@@ -189,7 +197,8 @@ if(!dbConnected)
 	}
 
 strstream theQuery;
-theQuery	<< Main
+theQuery	<< server::Query
+		<< "Where LastNumeric = '"
 		<< ServNumeric
 		<< "'" << ends;
 
@@ -208,16 +217,26 @@ if( PGRES_TUPLES_OK != status )
 
 	return false ;
 	}
+return loadDataFromDB();
+
+}
+
+bool ccServer::loadDataFromDB(int place)
+{
 
 if(SQLDb->Tuples() == 0 )
     return false;
-Name = SQLDb->GetValue(0,0);
+Name = SQLDb->GetValue(place,0);
 Uplink = SQLDb->GetValue(0,1);
-LastConnected = static_cast< time_t >( atoi( SQLDb->GetValue(0,2) ) ) ;
-LastSplitted = static_cast< time_t >( atoi( SQLDb->GetValue(0,3) ) ) ;
-Numeric = SQLDb->GetValue(0,4);
-SplitReason = SQLDb->GetValue(0,5);
+LastConnected = static_cast< time_t >( atoi( SQLDb->GetValue(place,2) ) ) ;
+LastSplitted = static_cast< time_t >( atoi( SQLDb->GetValue(place,3) ) ) ;
+Numeric = SQLDb->GetValue(place,4);
+SplitReason = SQLDb->GetValue(place,5);
+Version = SQLDb->GetValue(place,6);
+AddedOn = static_cast< time_t >( atoi( SQLDb->GetValue(place,7) ) ) ;
+LastUpdated = static_cast< time_t >( atoi( SQLDb->GetValue(place,8) ) ) ;
 return true;
+
 }
 
 bool ccServer::Delete()
@@ -250,5 +269,7 @@ if( PGRES_COMMAND_OK != status )
 	}
 return true;
 }
+
 }
+
 } //Namespace Gnuworld

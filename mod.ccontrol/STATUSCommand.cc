@@ -12,7 +12,7 @@
 #include	"CControlCommands.h"
 //#include	"StringTokenizer.h"
 
-const char STATUSCommand_cc_rcsId[] = "$Id: STATUSCommand.cc,v 1.2 2001/12/23 09:07:57 mrbean_ Exp $";
+const char STATUSCommand_cc_rcsId[] = "$Id: STATUSCommand.cc,v 1.3 2001/12/28 16:28:47 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -27,7 +27,7 @@ bool STATUSCommand::Exec( iClient* theClient, const string& Message)
 
 ccUser* tmpUser = bot->IsAuth(theClient);
 if(tmpUser)
-        bot->MsgChanLog("(%s) - %s : STAUTS\n",tmpUser->getUserName().c_str()
+        bot->MsgChanLog("(%s) - %s : STATUS\n",tmpUser->getUserName().c_str()
                         ,theClient->getNickUserHost().c_str());
 bot->showStatus(theClient);
 return true ;

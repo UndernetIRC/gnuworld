@@ -15,7 +15,7 @@
 #include	"misc.h"
 #include	"Constants.h"
 
-const char MODUSERCommand_cc_rcsId[] = "$Id: MODUSERCommand.cc,v 1.11 2001/12/23 09:07:57 mrbean_ Exp $";
+const char MODUSERCommand_cc_rcsId[] = "$Id: MODUSERCommand.cc,v 1.12 2001/12/28 16:28:47 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -200,6 +200,11 @@ while(pos < st.size())
 			}
 		if(!strcasecmp(st[pos+1],"on"))
 			{
+			if(OpFlag < operLevel::ADMINLEVEL)
+				{
+				bot->Notice(theClient,"-gl can only be set for ADMINS+");
+				return false;
+				}
 			tmpUser->setLogs(true);
 			bot->Notice(theClient,"getLogs have been turned on for %s",st[1].c_str());
 			}

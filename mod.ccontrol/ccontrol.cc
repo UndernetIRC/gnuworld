@@ -37,7 +37,7 @@
 #include	"ip.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.105 2001/12/23 09:07:57 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.106 2001/12/28 16:28:47 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -287,9 +287,12 @@ RegisterCommand( new STATUSCommand( this, "STATUS", "Shows debug status "
         ,commandLevel::flg_STATUS,false,false,false,operLevel::CODERLEVEL,true ) ) ;
 RegisterCommand( new SHUTDOWNCommand( this, "SHUTDOWN", " <REASON> Shutdown the bot "
         ,commandLevel::flg_SHUTDOWN,false,false,false,operLevel::CODERLEVEL,true ) ) ;
+
+loadCommands();
 loadGlines();
 loadExceptions();
 loadUsers();
+loadServers();
 
 connectCount = 0;
 connectRetry = 5;
@@ -422,6 +425,7 @@ int ccontrol::OnPrivateMessage( iClient* theClient, const string& Message,
 // Tokenize the message
 StringTokenizer st( Message ) ;
 
+
 // Make sure there is a command present
 if( st.empty() )
 	{
@@ -436,7 +440,7 @@ const string Command = string_upper( st[ 0 ] ) ;
 	MsgChanLog("351 ! %s\n",st.assemble(0).c_str());
 	return xClient::OnPrivateMessage( theClient, Message ) ;
 	}*/
-ccUser* theUser = IsAuth(theClient->getCharYYXXX());
+ccUser* theUser = IsAuth(theClient);
 
 if(!theUser)
 	{ //We need to add the flood points for this user
@@ -460,7 +464,7 @@ commandIterator commHandler = findCommand( Command ) ;
 if( commHandler == command_end() )
 	{
 	// Nope, notify the client if he's authenticated
-	if(theUser)
+	//if(theUser)
 		Notice( theClient, "Unknown command" ) ;
 	return 0 ; 
 	}
@@ -507,6 +511,40 @@ else
 	commHandler->second->Exec( theClient, Message) ;
 	}		
 return xClient::OnPrivateMessage( theClient, Message ) ;
+}
+
+int ccontrol::OnServerMessage( iServer* Server, const string& Message,
+	bool )
+{
+//elog << "On server message : " << Message << endl;
+StringTokenizer st( Message ) ;
+
+if(st.size() < 2)
+    {
+    return xClient::OnServerMessage(Server,Message);
+    }
+
+//This is kinda lame, TODO : add a server message parser
+if(!strcasecmp(st[1],"351"))
+	{
+	if(st.size() < 5)
+		{
+		elog << "Invalid number of parameters on 351! :" << Message << endl;
+	        return xClient::OnServerMessage(Server,Message);
+		}
+		
+	ccServer* tmpServer = serversMap[Server->getCharYY()];
+	
+	if(tmpServer)
+		{
+		tmpServer->setVersion(st[2] + " - " + st[4]);
+		}
+	else
+		{
+		serversMap.erase(serversMap.find(Server->getCharYY()));
+		}
+	}
+return xClient::OnServerMessage(Server,Message);
 }
 
 int ccontrol::OnCTCP( iClient* theClient, const string& CTCP
@@ -590,6 +628,7 @@ switch( theEvent )
 			{
 			iServer* NewServer = static_cast< iServer* >( Data1);
 			iServer* UplinkServer = static_cast< iServer* >( Data2);
+			elog << "recv notification for " << NewServer->getCharYY() <<endl;
 			ccServer* CheckServer = new (std::nothrow) ccServer(SQLDb);
 			assert(CheckServer != NULL);
 			if(CheckServer->loadNumericData(NewServer->getCharYY()))
@@ -619,7 +658,19 @@ switch( theEvent )
 				CheckServer->setLastNumeric(NewServer->getCharYY());
 				CheckServer->Update();
 				}
+		
 			delete CheckServer;
+			CheckServer = serversMap[NewServer->getCharYY()];
+			if(CheckServer)
+				{
+				elog << "Updating " << CheckServer->getName().c_str() <<endl;
+				CheckServer->setNetServer(NewServer);
+				}
+			else
+				{
+				elog << NewServer->getCharYY() << "isnt on map!" << endl;
+				serversMap.erase(serversMap.find(NewServer->getCharYY()));
+				}
 			}
 		break;
 		}
@@ -629,6 +680,7 @@ switch( theEvent )
 			{
 			iServer* NewServer = static_cast< iServer* >( Data1);
 			string Reason = *(static_cast<string *>(Data3));
+			
 			if(!getUplink()->isJuped(NewServer))
 				{
 				ccServer* CheckServer = new (std::nothrow) ccServer(SQLDb);
@@ -640,6 +692,11 @@ switch( theEvent )
 					CheckServer->Update();
 					}
 				delete CheckServer;			     
+				CheckServer = serversMap[NewServer->getCharYY()];
+				if(CheckServer)
+					CheckServer->setNetServer(NULL);
+				else
+					serversMap.erase(serversMap.find(NewServer->getCharYY()));
 				}
 			}
 		break;
@@ -649,7 +706,7 @@ switch( theEvent )
 		inBurst = false;
 		refreshGlines();
 		burstGlines();
-		//Write("%s V :EB\n",getCharYYXXX().c_str());
+		updateVersions();
 		break;
 		}	
 	case EVT_NICK:
@@ -695,7 +752,7 @@ switch( theEvent )
 						{
 						MsgChanLog("Glining %s , total  connections : %d\n"
 						,tIP.c_str(),CurConnections);
-						MsgChanLog(" , IP Exception : %d , HOST Exception %d\n"						
+						MsgChanLog(" IP Exception : %d , HOST Exception %d\n"						
 						,getExceptions("*@" + tIP),getExceptions("*@" + NewUser->getInsecureHost()));
 
 						/*glSet = true;
@@ -708,7 +765,7 @@ switch( theEvent )
 							tmpGline = new ccGline(SQLDb);
 							tmpGline->setHost("*@" + tIP);
 							tmpGline->setExpires(::time(0) + maxGlineLen);
-							tmpGline->setReason("Automatically banned for excessive connections");
+							tmpGline->setReason("Automatically banned for excessive connections ");
 							tmpGline->setAddedOn(::time(0));
 							tmpGline->Insert();
 							tmpGline->loadData(tmpGline->getHost());
@@ -813,6 +870,22 @@ else if(timer_id == dbConnectionCheck)
 	}
 	
 return true;
+}
+
+int ccontrol::OnConnect()
+{
+iServer* tmpServer = Network->findServer(getUplink()->getUplinkCharYY());
+ccServer* tServer = serversMap[tmpServer->getCharYY()];
+if(tServer)
+	{
+	tServer->setNetServer(tmpServer);
+	}
+else
+	{
+	serversMap.erase(serversMap.find(tmpServer->getCharYY()));
+	}
+
+
 }
 
 bool ccontrol::isOperChan( const string& theChan ) const
@@ -2147,6 +2220,41 @@ for(int i =0;i<SQLDb->Tuples();++i)
 return true;
 }
 
+bool ccontrol::loadServers()
+{
+ 
+if(!dbConnected)
+        {   
+        return false;
+        }
+   
+strstream theQuery;
+theQuery        << server::Query
+                << ends;
+
+elog    << "ccotrol::loadServers> "
+        << theQuery.str()
+        << endl; 
+ 
+ExecStatusType status = SQLDb->Exec( theQuery.str() ) ;
+delete[] theQuery.str() ;
+
+if (PGRES_TUPLES_OK != status)
+        {
+        return false;
+        }
+ccServer* tempServer;
+for(int i =0;i<SQLDb->Tuples();++i)
+	{
+	tempServer = new (std::nothrow) ccServer(SQLDb);
+	assert(tempServer != NULL);
+	tempServer->loadDataFromDB(i);
+	serversMap[tempServer->getLastNumeric()] = tempServer;
+	}
+return true;
+}
+
+	
 void ccontrol::wallopsAsServer(const char *Msg,...)
 {
 if( 0 == MyUplink )
@@ -2518,9 +2626,17 @@ void ccontrol::listSuspended( iClient * )
 }
 
 	
-void ccontrol::listServers( iClient * )
+void ccontrol::listServers( iClient * theClient)
 {
-
+ccServer* tmpServer;
+for(serversConstIterator ptr = serversMap_begin();ptr != serversMap_end();++ptr)
+	{
+	tmpServer = ptr->second;
+	Notice(theClient,"%s - Name : %s",tmpServer->getLastNumeric().c_str()
+	,tmpServer->getName().c_str());
+	Notice(theClient,"Version : %s" ,tmpServer->getVersion().c_str());
+	}
+	 
 }
 
 
@@ -2568,7 +2684,7 @@ for( int i = 0 ; i < SQLDb->Tuples() ; i++ )
 	else
 		{
 		NewCom->setName(SQLDb->GetValue(i,1));
-		if(!strcasecmp(SQLDb->GetValue(i,3),"t"))
+		if(!strcasecmp(SQLDb->GetValue(i,3),"f"))
 			NewCom->Enable();
 		else
 			NewCom->Disable();
@@ -2896,6 +3012,11 @@ for(usersIterator ptr = usersMap.begin();ptr != usersMap.end();++ptr)
 	ptr->second->setSqldb(_SQLDb);
 	}
 
+for(serversIterator ptr = serversMap.begin();ptr != serversMap.end();++ptr)
+	{
+	ptr->second->setSqldb(_SQLDb);
+	}
+
 }
 
 void ccontrol::showStatus(iClient* tmpClient)
@@ -2940,6 +3061,34 @@ if(!strcasecmp(NewPass,tmpUser->getUserName()))
 return password::PASS_OK;
 }
 
+void ccontrol::updateVersions()
+{
+for(serversIterator ptr = serversMap.begin();ptr != serversMap.end();++ptr)
+	{
+	MsgChanLog("Server : %s num : %s\n",ptr->second->getName().c_str(),ptr->second->getLastNumeric().c_str()); 
+	if(ptr->second->getNetServer())
+		Write("%s V :%s\n",getCharYYXXX().c_str(),ptr->second->getLastNumeric().c_str());
+	}
+
+}
+
+ccServer* ccontrol::getServer(const string& Numeric)
+{
+ccServer* tempServer = serversMap[Numeric];
+if(tempServer)
+	return tempServer;
+serversMap.erase(serversMap.find(Numeric));
+return NULL;
+
+}
+
+void ccontrol::addServer(ccServer* tempServer)
+{
+if(!serversMap[tempServer->getLastNumeric()])
+	{
+	serversMap[tempServer->getLastNumeric()] = tempServer;
+	}
+}
 
 void *initGate(void* arg)
 {

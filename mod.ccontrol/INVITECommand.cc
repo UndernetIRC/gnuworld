@@ -14,7 +14,7 @@
 #include	"StringTokenizer.h"
 #include	"Constants.h"
 
-const char INVITECommand_cc_rcsId[] = "$Id: INVITECommand.cc,v 1.10 2001/12/23 09:07:57 mrbean_ Exp $";
+const char INVITECommand_cc_rcsId[] = "$Id: INVITECommand.cc,v 1.11 2001/12/28 16:28:47 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -75,7 +75,7 @@ if( bot->isOperChan( chanName ) )
 // channels.
 
 // Join
-bot->Join( chanName, string(), 0, true ) ;
+bot->Join( chanName, string(), 0, false ) ;
 
 // Invite
 bot->QuoteAsServer( buf ) ;

@@ -18,7 +18,9 @@ namespace server
 {
 
 	const unsigned int MaxName = 63;
-        static const char Query[] = "SELECT name,lastuplink,lastconnected,splitedon,lastnumeric,splitreason FROM servers";
+        static const char Query[] = "SELECT name,lastuplink,lastconnected,"
+	"splitedon,lastnumeric,splitreason,version,addedon,lastupdated"
+	" FROM servers ";
 
 }
 

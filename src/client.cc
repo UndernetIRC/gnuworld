@@ -28,7 +28,7 @@
 #include	"events.h"
 
 const char xClient_h_rcsId[] = __CLIENT_H ;
-const char xClient_cc_rcsId[] = "$Id: client.cc,v 1.41 2001/07/21 15:06:24 isomer Exp $" ;
+const char xClient_cc_rcsId[] = "$Id: client.cc,v 1.42 2001/12/28 16:28:47 mrbean_ Exp $" ;
 const char config_h_rcsId[] = __CONFIG_H ;
 const char misc_h_rcsId[] = __MISC_H ;
 const char Numeric_h_rcsId[] = __NUMERIC_H ;
@@ -502,6 +502,11 @@ void xClient::OnChannelModeB( Channel*, ChannelUser*,
 }
 
 int xClient::OnPrivateMessage( iClient*, const string&, bool )
+{
+return 0;
+}
+
+int xClient::OnServerMessage( iServer*, const string&, bool )
 {
 return 0;
 }

@@ -3,7 +3,7 @@
  */
 
 #ifndef __CLIENT_H
-#define __CLIENT_H "$Id: client.h,v 1.31 2001/06/23 16:27:52 dan_karrels Exp $"
+#define __CLIENT_H "$Id: client.h,v 1.32 2001/12/28 16:28:47 mrbean_ Exp $"
 
 #include	<string>
 
@@ -321,6 +321,13 @@ public:
 	 * is issued to the client.
 	 */
 	virtual int OnPrivateMessage( iClient* Sender,
+		const string& Message, bool secure = false ) ;
+
+	/**
+	 * OnServerMessage is called when a server message
+	 * a client
+	 */
+	virtual int OnServerMessage( iServer* Sender,
 		const string& Message, bool secure = false ) ;
 
 	/**

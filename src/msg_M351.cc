@@ -7,7 +7,7 @@
 #include	"ELog.h"
 #include	"xparameters.h"
 
-const char msg_M351_cc_rcsId[] = "$Id: msg_M351.cc,v 1.1 2001/12/23 09:07:57 mrbean_ Exp $" ;
+const char msg_M351_cc_rcsId[] = "$Id: msg_M351.cc,v 1.2 2001/12/28 16:28:47 mrbean_ Exp $" ;
 const char server_h_rcsId[] = __SERVER_H ;
 const char Network_h_rcsId[] = __NETWORK_H ;
 const char ELog_h_rcsId[] = __ELOG_H ;
@@ -28,11 +28,6 @@ if( Param.empty() )
 	return -1 ;
 	}
 
-for(unsigned int i =0 ; i < Param.size();++i)
-{
-elog << "Param[" << i << "]:" << Param[i] <<endl;
-}
-
 // Dont try this at home kids
 char numeric[ 6 ] = { 0 } ;
 
@@ -46,7 +41,7 @@ if( NULL == theClient )
 	}
 
 strcpy( numeric, theClient->getCharYYXXX().c_str() ) ;
-Param.setValue( 1, numeric ) ;
+Param.setValue( 1, "351" ) ;
 iServer* tmpServer = Network->findServerName(Param[0]);
 if( NULL == tmpServer )
 	{
@@ -59,12 +54,15 @@ char numeric2[ 6 ] = { 0 } ;
 
 strcpy( numeric2, tmpServer->getCharYY()) ;
 Param.setValue( 0, numeric2 ) ;
-
+string tMessage;
 for(unsigned int i =0 ; i < Param.size();++i)
 {
-elog << "Param[" << i << "]:" << Param[i] <<endl;
+tMessage+=Param[i];
+tMessage += " ";
 }
-return MSG_P( Param ) ;
+
+
+return theClient->OnServerMessage(tmpServer,tMessage);
 }
 
 } // namespace gnuworld

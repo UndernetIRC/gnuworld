@@ -3,7 +3,7 @@
  */
 
 #ifndef __CCONTROL_H
-#define __CCONTROL_H "$Id: ccontrol.h,v 1.52 2001/12/13 08:50:00 mrbean_ Exp $"
+#define __CCONTROL_H "$Id: ccontrol.h,v 1.53 2001/12/28 16:28:47 mrbean_ Exp $"
 
 
 #include	<string>
@@ -95,6 +95,20 @@ protected:
 
 	typedef usersMapType::iterator     usersIterator;
 	
+
+	/**
+	 * The db servers
+	 */
+	typedef map<string, ccServer*> serversMapType;
+
+	/**
+	 * Holds the servers map
+	 */
+	serversMapType			serversMap ;
+
+	typedef serversMapType::iterator     serversIterator;
+	
+	
 	typedef list< ccGline* >        glineListType ;
 
 	/**
@@ -149,6 +163,9 @@ public:
 	virtual int OnPrivateMessage( iClient*, const string&,
 			bool secure = false ) ;
 
+	virtual int OnServerMessage( iServer*, const string&,
+			bool secure = false ) ;
+
 	virtual int OnCTCP( iClient* ,
                 const string& ,
                 const string&,
@@ -173,7 +190,9 @@ public:
 		void* = 0, void* = 0 ) ;
 
 	virtual int OnTimer(xServer::timerID, void*);
-
+	
+	virtual int OnConnect();
+	
 	/**
 	 * This method is called once this client has been attached
 	 * to an xServer.  This method is overloaded because the
@@ -479,6 +498,8 @@ public:
 
 	bool loadUsers();
 	
+	bool loadServers();
+	
 	void wallopsAsServer(const char * , ... );
 
 	int getExceptions( const string & );
@@ -540,7 +561,13 @@ public:
 	void showStatus(iClient*);
 	
 	unsigned int checkPassword(string,ccUser*);
-		
+	
+	void updateVersions();
+	
+	ccServer* getServer(const string& );
+	
+	void	addServer(ccServer*);
+	
 	/**
 	 * This is a constant iterator type used to perform a read-only
 	 * iteration of the operchan structure.
@@ -669,6 +696,14 @@ public:
 
 	usersConstIterator		usersMap_end() const
 		{ return usersMap.end(); }
+
+	typedef  serversMapType::const_iterator	serversConstIterator;
+	
+	serversConstIterator		serversMap_begin() const
+		{ return serversMap.begin(); }
+
+	serversConstIterator		serversMap_end() const
+		{ return serversMap.end(); }
 
 	/**
 	 * Retrieve the default length of time for glines.

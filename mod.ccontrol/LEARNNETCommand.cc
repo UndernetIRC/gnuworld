@@ -15,8 +15,9 @@
 #include        "stdlib.h"
 #include        "server.h"
 #include	"ccUser.h"
+#include	"misc.h"
 
-const char LEARNNETCommand_cc_rcsId[] = "$Id: LEARNNETCommand.cc,v 1.8 2001/12/23 09:07:57 mrbean_ Exp $";
+const char LEARNNETCommand_cc_rcsId[] = "$Id: LEARNNETCommand.cc,v 1.9 2001/12/28 16:28:47 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -37,11 +38,11 @@ if(!dbConnected)
 
 ccUser* tmpUser = bot->IsAuth(theClient);
 if(tmpUser)
-        bot->MsgChanLog("(%s) - %s : LEARNNET %s\n",tmpUser->getUserName().c_str()
+        bot->MsgChanLog("(%s) - %s : LEARNNET \n",tmpUser->getUserName().c_str()
                         ,theClient->getNickUserHost().c_str());
 
-ccServer* NewServer = new ccServer(bot->SQLDb);
-assert(NewServer != NULL);
+ccServer* NewServer;
+
 unsigned int AddedServers = 0;
 
 StringTokenizer st(Message);
@@ -59,15 +60,21 @@ for( ; ptr != end ; ptr++ )
 		{
 		continue ;
 		}
-	else if(!server->isJuped(CurServer))
+	else if((!server->isJuped(CurServer)) && (strcmp(CurServer->getName().c_str(),bot->getUplinkName().c_str())))
 		{
-		if(!NewServer->loadData(CurServer->getName().c_str()))
+		if(!bot->getServer(CurServer->getCharYY()))
 			{ //If the server isnt in the database , update it
+			NewServer = new (std::nothrow) ccServer(bot->SQLDb);
 			NewServer->setName(CurServer->getName());
-			//NewServer->setUplink(Network->findServer(CurServer->getUplinkIntYY())->getName());
+			NewServer->setUplink(Network->findServer(CurServer->getUplinkIntYY())->getName());
 			NewServer->setLastNumeric(CurServer->getCharYY());
 			NewServer->setLastConnected(CurServer->getConnectTime());
 			NewServer->setLastSplitted(0);
+			NewServer->setAddedOn(::time(0));
+			NewServer->setLastUpdated(::time(0));
+			NewServer->setNetServer(CurServer);
+			bot->addServer(NewServer);
+			bot->Write("%s V :%s\n",bot->getCharYYXXX().c_str(),CurServer->getCharYY());
 			if(NewServer->Insert())
 				{
 				AddedServers++;
@@ -79,7 +86,6 @@ for( ; ptr != end ; ptr++ )
 			}
 		}
 	}
-delete NewServer;
 bot->MsgChanLog("Finished learning the network, Learned a total of %d servers\n",AddedServers);
 bot->Notice(theClient,"Finished learning the network, Learned a total of %d servers\n",AddedServers);
 return true;

@@ -1,4 +1,4 @@
--- "$Id: ccontrol.sql,v 1.20 2001/10/17 21:39:11 mrbean_ Exp $"
+-- "$Id: ccontrol.sql,v 1.21 2001/12/28 16:28:45 mrbean_ Exp $"
 
 -- 2001-10-14 : nighty
 -- corrected fieldname typo in "suspendReason" -> "suspend_reason"
@@ -70,7 +70,10 @@ CREATE TABLE servers (
 	LastConnected INT4 NOT NULL DEFAULT '0',
 	SplitedOn INT4 NOT NULL DEFAULT '0',
 	LastNumeric VARCHAR(4),
-	SplitReason VARCHAR(512)
+	SplitReason VARCHAR(512),
+	Version VARCHAR(256),
+	AddedOn INT4 NOT NULL,
+	LastUpdated INT4 NOT NULL
 	);
 
 CREATE TABLE comlog (

@@ -1,13 +1,14 @@
 /* ccServer.h */
 
 #ifndef __CCSERVER_H
-#define __CCSERVER_H "$Id: ccServer.h,v 1.5 2001/11/21 20:54:40 mrbean_ Exp $"
+#define __CCSERVER_H "$Id: ccServer.h,v 1.6 2001/12/28 16:28:47 mrbean_ Exp $"
 
 #include	<string>
 
 #include	<ctime>
 
 #include	"libpq++.h"
+#include	"iServer.h"
 
 namespace gnuworld
 { 
@@ -41,7 +42,19 @@ public:
 
 	inline const string&	getSplitReason() const
 		{ return SplitReason; }
-
+	
+	inline const string&   	getVersion() const
+		{ return Version; }
+		
+	inline const time_t&	getAddedOn() const
+		{ return AddedOn; }
+	    
+	inline const time_t&	getLastUpdated() const
+		{ return LastUpdated; }
+	
+	inline const iServer* getNetServer() const
+		{ return NetServer; }
+		
 	//Methods for setting info
 	
 	inline void 		setName( const string& _Name ) 
@@ -62,6 +75,21 @@ public:
         inline void		setSplitReason( const string& _Reason)
 		{ SplitReason = _Reason; }
 
+	inline void		setVersion( const string& _Version )
+		{ Version = _Version; }
+		
+	inline void		setAddedOn( const time_t& _AddedOn ) 
+		{ AddedOn = _AddedOn; }
+
+	inline void		setLastUpdated( const time_t& _LastUpdated ) 
+		{ LastUpdated = _LastUpdated; }
+
+	inline void		setNetServer(iServer* NewServer)
+		{ NetServer = NewServer; }
+		
+	inline void 		setSqldb(PgDatabase* _SQLDb)
+		{ SQLDb = _SQLDb; }
+		
 	//Methods for updating 
 
 	bool Insert();
@@ -72,6 +100,8 @@ public:
 
 	bool loadNumericData( string );
 
+	bool loadDataFromDB(int place = 0 );
+	
 	bool Delete();
 
 	static unsigned int numAllocated;
@@ -83,6 +113,10 @@ protected:
 	time_t LastConnected;
 	time_t LastSplitted;
 	string SplitReason;
+	string Version;
+	time_t AddedOn;
+	time_t LastUpdated;
+	iServer* NetServer;
 	PgDatabase* SQLDb;
 
 }; // class ccServer
