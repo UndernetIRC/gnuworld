@@ -3,7 +3,7 @@
  * 
  * Exception class
  * 
- * $Id: ccException.cc,v 1.7 2002/06/07 14:38:19 dan_karrels Exp $
+ * $Id: ccException.cc,v 1.8 2002/07/02 11:38:28 mrbean_ Exp $
  */
  
 #include	<sstream>
@@ -20,7 +20,7 @@
 #include	"ccontrol.h"
 
 const char ccException_h_rcsId[] = __CCEXCEPTION_H ;
-const char ccException_cc_rcsId[] = "$Id: ccException.cc,v 1.7 2002/06/07 14:38:19 dan_karrels Exp $" ;
+const char ccException_cc_rcsId[] = "$Id: ccException.cc,v 1.8 2002/07/02 11:38:28 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -82,7 +82,7 @@ if( (PGRES_TUPLES_OK != status) && (SQLDb->Tuples() > 0) )
 Host = SQLDb->GetValue(0,0);
 Connections = atoi(SQLDb->GetValue(0,1));
 AddedBy = SQLDb->GetValue(0,2);
-AddedOn = atoi(SQLDb->GetValue(0,0));
+AddedOn = atoi(SQLDb->GetValue(0,3));
 
 return true;
 

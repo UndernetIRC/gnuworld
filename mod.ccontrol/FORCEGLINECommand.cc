@@ -18,7 +18,7 @@
 #include	"ELog.h"
 #include	"Constants.h"
 
-const char FORCEGLINECommand_cc_rcsId[] = "$Id: FORCEGLINECommand.cc,v 1.22 2002/06/07 17:58:23 mrbean_ Exp $";
+const char FORCEGLINECommand_cc_rcsId[] = "$Id: FORCEGLINECommand.cc,v 1.23 2002/07/02 11:38:27 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -213,7 +213,7 @@ if(!Ok)
 	}
 if(gCheck & gline::GLINE_OK)
 	{
-	bot->Notice(theClient,"Please use gline and not forcegline to set that gline");
+	bot->Notice(theClient,"Please use the GLINE command to set that gline");
 	return false;
 	}
 // Avoid passing a reference to a temporary variable.

@@ -15,7 +15,7 @@
 #include	"Constants.h"
 #include	"ccBadChannel.h"
 
-const char CLEARCHANCommand_cc_rcsId[] = "$Id: CLEARCHANCommand.cc,v 1.19 2002/06/07 17:58:23 mrbean_ Exp $";
+const char CLEARCHANCommand_cc_rcsId[] = "$Id: CLEARCHANCommand.cc,v 1.20 2002/07/02 11:38:27 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -85,7 +85,6 @@ if(Desynch)
 	{
 	vector<iClient*> KickVec;
 	bot->Join(theChan->getName(),"+i",0,true);
-	//bot->Mode(theChan,Channel::MODE_I);
 	for( Channel::const_userIterator ptr = theChan->userList_begin();
 		ptr != theChan->userList_end() ; ++ptr )
 			{

@@ -1,7 +1,7 @@
 /* ccUser.h */
 
 #ifndef __CCUSER_H
-#define __CCUSER_H "$Id: ccUser.h,v 1.15 2001/12/30 19:35:10 mrbean_ Exp $"
+#define __CCUSER_H "$Id: ccUser.h,v 1.16 2002/07/02 11:38:28 mrbean_ Exp $"
 
 #include	<string>
 
@@ -30,6 +30,18 @@ namespace operLevel
 	const unsigned int CODERLEVEL = 0x05;
 	}
 	
+/*
+CLASS
+    ccUser
+    
+    Holds all the vital information about a user
+
+*/
+
+
+
+
+
 class ccUser
 {
 

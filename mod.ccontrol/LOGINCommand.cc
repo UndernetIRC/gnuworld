@@ -18,7 +18,7 @@
 #include        "ccUser.h"
 #include	"ip.h"
 
-const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.24 2002/05/23 17:43:11 dan_karrels Exp $";
+const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.25 2002/07/02 11:38:27 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -62,7 +62,9 @@ if (theUser)
 theUser = bot->GetOper(st[1]);
 if (!theUser) 
 	{
-	bot->MsgChanLog("[FAILED LOGIN] %s - Bad Username\n",theClient->getNickUserHost().c_str());
+	bot->MsgChanLog("[FAILED LOGIN] %s - Bad Username (%s)\n",
+		theClient->getNickUserHost().c_str(),
+		st[1].c_str());
 	if(theClient->isOper())
 		bot->Notice(theClient, "FALSE LOGIN, DENIED");
 	bot->addLogin(theClient);

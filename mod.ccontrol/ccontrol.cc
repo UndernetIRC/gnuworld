@@ -11,7 +11,7 @@
 /* ccontrol.cc
  * Authors: Daniel Karrels dan@karrels.com
  *	    Tomer Cohen    MrBean@toughguy.net
- * $Id: ccontrol.cc,v 1.145 2002/06/07 17:58:24 mrbean_ Exp $
+ * $Id: ccontrol.cc,v 1.146 2002/07/02 11:38:28 mrbean_ Exp $
  */
 
 #define MAJORVER "1"
@@ -56,7 +56,7 @@
 #include	"ip.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.145 2002/06/07 17:58:24 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.146 2002/07/02 11:38:28 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -500,6 +500,16 @@ RegisterCommand( new LASTCOMCommand( this, "LASTCOM",
 	false,
 	operLevel::OPERLEVEL,
 	true) ) ;
+RegisterCommand( new LASTCOMCommand( this, "LASTCOMM",
+	"[number of lines to show]"
+	"Post you the bot logs",
+	commandLevel::flg_LASTCOM,
+	false,
+	false,
+	false,
+	operLevel::OPERLEVEL,
+	true) ) ;
+
 RegisterCommand( new FORCEGLINECommand( this, "FORCEGLINE",
 	"<user@host> <duration>[time units] <reason> "
 	"Gline a given user@host for the given reason",
@@ -833,18 +843,24 @@ ccUser* theUser = IsAuth(theClient);
 if((!theUser) && !(theClient->isOper()))
 	{
 	// We need to add the flood points for this user
+	if(!theClient->getCustomData(this))
+		{
+		elog << "Couldnt find custom data for " 
+		     << theClient->getNickName() << endl;
+		return false;
+		}
+		
 	ccFloodData* floodData = (static_cast< ccUserData* >(
 	theClient->getCustomData(this) ))->getFlood() ;
-
+	
 	if(floodData->addPoints(flood::MESSAGE_POINTS))
 		{
 		// yes we need to ignore this user
 		ignoreUser(floodData);
-	
-		MsgChanLog("[FLOOD MESSAGE]: %s has been ignored",
+		
+		MsgChanLog("[FLOOD MESSAGE: %s has been ignored",
 			theClient->getNickName().c_str());
 		}
-	
 	//return xClient::OnPrivateMessage( theClient, Message ) ;
 	}
 
@@ -856,6 +872,7 @@ if( commHandler == command_end() )
 	{
 	// Nope, notify the client if he's authenticated
 	//if(theUser)
+	if(!theClient->getMode(iClient::MODE_SERVICES))	
 		Notice( theClient, "Unknown command" ) ;
 	return 0 ; 
 	}
@@ -872,29 +889,33 @@ if((!theUser) && (ComAccess) && !(theClient->isOper()))
 if((!theUser) && !(ComAccess & commandLevel::flg_NOLOGIN) && (ComAccess))
 	{//The user isnt authenticated, 
 	 //and he must be to run this command
-	if(theClient->isOper())
+	if((theClient->isOper()) && !(theClient->getMode(iClient::MODE_SERVICES)))
 		Notice(theClient,"Sorry, but you must be authenticated to run this command");
 	 return xClient::OnPrivateMessage( theClient, Message ) ;
 	}	 	 
 
 if((theUser) && (!theClient->isOper()) && (theUser->getNeedOp()))
 	{
-	Notice(theClient,
-		"You must be operd up to use this command");
+	if(!theClient->getMode(iClient::MODE_SERVICES))
+		Notice(theClient,
+			"You must be operd up to use this command");
 	}
 else if( (ComAccess) && (theUser) && !(theUser->gotAccess(commHandler->second)))
 	{
-	Notice( theClient, "You dont have access to that command" ) ;
+	if(!theClient->getMode(iClient::MODE_SERVICES))
+		Notice( theClient, "You dont have access to that command" ) ;
 	}
 else if(( (theUser) && isSuspended(theUser) ) && ( ComAccess ) )
 		{
-		Notice( theClient,
-			"Sorry but you are suspended");
+		if(theClient->getMode(iClient::MODE_SERVICES))
+			Notice( theClient,
+				"Sorry but you are suspended");
 		}
 else if(commHandler->second->getIsDisabled())
 	{
-	Notice(theClient,
-		"Sorry, but this command is disabled");
+	if(!theClient->getMode(iClient::MODE_SERVICES))
+		Notice(theClient,
+			"Sorry, but this command is disabled");
 	}
 else 
 	{
@@ -994,6 +1015,13 @@ int ccontrol::OnCTCP( iClient* theClient, const string& CTCP,
 ccUser* theUser = IsAuth(theClient);
 if((!theUser) && !(theClient->isOper()))
 	{ //We need to add the flood points for this user
+	if(!theClient->getCustomData(this))
+		{
+		elog << "Couldnt find custom data for " 
+		     << theClient->getNickName() << endl;
+		return false;
+		}
+
 	ccFloodData* floodData = (static_cast< ccUserData* >(
 	theClient->getCustomData(this) ))->getFlood() ;
 	if(floodData->addPoints(flood::CTCP_POINTS))
@@ -1089,21 +1117,24 @@ switch( theEvent )
 			UserData->setDbUser(NULL);
 			TempAuth->setClient(NULL);
 			}
-		ccFloodData *tempLogin = UserData->getFlood();
-		if(tempLogin)
+		if(UserData)
 			{
-			removeLogin(tempLogin);
-			if(tempLogin->getIgnoredHost() != "")
+			ccFloodData *tempLogin = UserData->getFlood();
+			if(tempLogin)
 				{
-				tempLogin->setNumeric("0");
-				tempLogin->resetLogins();
+				removeLogin(tempLogin);
+				if(tempLogin->getIgnoredHost() != "")
+					{
+					tempLogin->setNumeric("0");
+					tempLogin->resetLogins();
+					}
+	    			else
+					{
+					delete tempLogin;
+					}		
 				}
-			else
-				{
-				delete tempLogin;
-				}		
+			delete UserData;
 			}
-		delete UserData;
 		break ;
 		} // case EVT_KILL/case EVT_QUIT
 	
@@ -1694,6 +1725,13 @@ return -1 ;
 
 bool ccontrol::AuthUser( ccUser* TempUser,iClient* tUser)
 {
+if(!tUser->getCustomData(this))
+	{
+	elog << "Couldnt find custom data for " 
+	     << tUser->getNickName() << endl;
+	return false;
+	}
+
 ccUserData* UserData= static_cast<ccUserData*>(tUser->getCustomData(this));
 UserData->setDbUser(TempUser);
 TempUser->setClient(tUser);
@@ -1707,6 +1745,13 @@ bool ccontrol::deAuthUser( ccUser* tUser)
 const iClient* tClient = tUser->getClient();
 if(tClient)
 	{
+	if(!tClient->getCustomData(this))
+		{
+		elog << "Couldnt find custom data for " 
+		     << tClient->getNickName() << endl;
+		return false;
+		}
+
 	(static_cast<ccUserData*>(tClient->getCustomData(this)))->setDbUser(NULL);
 	tUser->setClient(NULL);
 	}
@@ -3295,6 +3340,13 @@ for(ignoreIterator ptr = ignore_begin() ; ptr != ignore_end() ;)
 
 void ccontrol::addLogin( iClient* tClient)
 {
+if(!tClient->getCustomData(this))
+	{
+	elog << "Couldnt find custom data for " 
+	     << tClient->getNickName() << endl;
+	return;
+	}
+
 ccFloodData *LogInfo = static_cast<ccUserData*>( tClient->getCustomData(this))->getFlood();
 
 LogInfo->add_Login();
