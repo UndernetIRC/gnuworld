@@ -9,11 +9,12 @@ CXXFLAGS = @CXXFLAGS@
 
 OBJS = cservice.o
 RM = @RM@
+INC = -I/usr/local/pgsql/include
 
 all: $(OBJS) cservice.o finish
 
 .cc.o:
-	$(MOD_CXX) $(CXXFLAGS) -I/usr/local/pgsql/include -c -o $@ $<
+	$(MOD_CXX) $(CXXFLAGS) $(INC) -c -o $@ $<
 
 # LIBS is passed in by make
 finish:
@@ -27,6 +28,6 @@ distclean: clean
 	$(RM) -f config.status config.cache
 
 depend:
-	$(CXX) $(CXXFLAGS) -MM cservice.cc >> Makefile
+	$(CXX) $(CXXFLAGS) $(INC) -MM cservice.cc >> Makefile
 
 # DO NOT DELETE THIS LINE
