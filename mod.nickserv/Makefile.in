@@ -14,7 +14,7 @@
 
 @SET_MAKE@
 
-# "$Id: Makefile.in,v 1.3 2002/08/15 20:46:44 jeekay Exp $"
+# "$Id: Makefile.in,v 1.4 2002/08/16 21:37:32 jeekay Exp $"
 SHELL = @SHELL@
 
 srcdir = @srcdir@
@@ -103,10 +103,10 @@ libnickserv_la_SOURCES = \
   netData.cc \
   nickserv.cc \
   sqlManager.cc \
-  sqlUser.cc
+  sqlUser.cc \
+  WHOAMICommand.cc
 
 
-#  WHOAMICommand.cc
 INCLUDES = -I@PGSQL_INCLUDE@ $(INCLTDL)
 subdir = mod.nickserv
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
@@ -116,7 +116,7 @@ LTLIBRARIES = $(lib_LTLIBRARIES)
 
 libnickserv_la_LIBADD =
 am_libnickserv_la_OBJECTS = netData.lo nickserv.lo sqlManager.lo \
-	sqlUser.lo
+	sqlUser.lo WHOAMICommand.lo
 libnickserv_la_OBJECTS = $(am_libnickserv_la_OBJECTS)
 
 DEFS = @DEFS@
@@ -126,7 +126,8 @@ LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
-@AMDEP_TRUE@DEP_FILES = ./$(DEPDIR)/netData.Plo ./$(DEPDIR)/nickserv.Plo \
+@AMDEP_TRUE@DEP_FILES = ./$(DEPDIR)/WHOAMICommand.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/netData.Plo ./$(DEPDIR)/nickserv.Plo \
 @AMDEP_TRUE@	./$(DEPDIR)/sqlManager.Plo ./$(DEPDIR)/sqlUser.Plo
 CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
@@ -180,6 +181,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/WHOAMICommand.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/netData.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nickserv.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sqlManager.Plo@am__quote@

@@ -72,6 +72,22 @@ delete tempCon;
 }
 
 
+/**
+ * This method allows a caller to add a statement to the commit queue.
+ * The statement will be executed against the database when the next commit
+ * interval occurs.
+ */
+void sqlManager::queueCommit(const string& theStatement)
+{
+  commitQueue.push_back(theStatement);
+  
+  /* Debug */
+  cout << "Commit Queue Contents:" << endl;
+  for(constCommitQueueItr itr = commitQueue.begin(); itr != commitQueue.end(); ++itr) {
+    cout << *itr << endl;
+  }
+}
+
 
 /*****************************************************
  ** C O N S T R U C T O R   &   D E S T R U C T O R **

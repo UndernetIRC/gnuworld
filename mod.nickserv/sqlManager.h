@@ -1,6 +1,8 @@
 #ifndef _SQLMANAGER_H
 #define _SQLMANAGER_H "$Id"
 
+#include <vector>
+
 #include "libpq++.h"
 
 namespace gnuworld {
@@ -20,6 +22,9 @@ class sqlManager {
   
     /** Allow checking in of database connections */
     void removeConnection(PgDatabase*); 
+    
+    /** Add a statement to the commit queue */
+    void queueCommit(const string&);
   
   protected:
     /**
@@ -40,6 +45,15 @@ class sqlManager {
     
     /** Our PgDatabase instance */
     PgDatabase* SQLDb;
+    
+    /** The type used for the commit queue */
+    typedef vector< string > commitQueueType;
+    
+    /** Allow iteration over the commit queue */
+    typedef commitQueueType::const_iterator constCommitQueueItr;
+    
+    /** Our commit queue */
+    commitQueueType commitQueue;
     
     /** The current instance of sqlManager */
     static sqlManager* theManager;

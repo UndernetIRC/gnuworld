@@ -2,14 +2,12 @@
  * nickserv.cc
  */
 
-#include "libpq++.h"
-
 #include "StringTokenizer.h"
 
 #include "netData.h"
 #include "nickserv.h"
 
-const char NickServ_cc_rcsId[] = "$Id: nickserv.cc,v 1.3 2002/08/15 20:46:45 jeekay Exp $";
+const char NickServ_cc_rcsId[] = "$Id: nickserv.cc,v 1.4 2002/08/16 21:37:32 jeekay Exp $";
 
 namespace gnuworld
 {
@@ -63,6 +61,9 @@ theManager = sqlManager::getInstance(dbString);
 
 /* Precache the users */
 precacheUsers();
+
+/* Register the commands we want to use */
+RegisterCommand(new WHOAMICommand(this, "WHOAMI", ""));
 }
 
 nickserv::~nickserv()
@@ -91,8 +92,9 @@ return xClient::BurstChannels() ;
  */
 void nickserv::ImplementServer( xServer* theServer )
 {
-/* Register the commands we want to use */
-//RegisterCommand(new WHOAMICommand(this, "WHOAMI", ""));
+for(commandMapType::iterator ptr = commandMap.begin(); ptr != commandMap.end(); ++ptr) {
+  ptr->second->setServer(theServer);
+}
 
 /* Register for all the events we want to see */
 theServer->RegisterEvent(EVT_ACCOUNT, this);
@@ -152,10 +154,13 @@ switch( event ) {
   case EVT_NICK: {
     netData* theData = new netData();
     theClient->setCustomData(this, theData);
-    if(theClient->isModeR() && (string_lower(theClient->getNickName()) == string_lower(theClient->getAccount()))) {
-      return 1;
-      break;
+    
+    /* If this user has umode +r */
+    if(theClient->isModeR()) {
+      /* Find the sqlUser for their +r and assign it to this iClient */
+      theData->authedUser = isRegistered(theClient->getAccount());
     }
+
     addToQueue(theClient);
     
     return 1;
@@ -163,22 +168,16 @@ switch( event ) {
   } // case EVT_NICK
   
   case EVT_CHNICK: {
-    if(string_lower(theClient->getNickName()) == string_lower(theClient->getAccount())) {
-      removeFromQueue(theClient);
-    } else {
-      addToQueue(theClient);
-    }
-    
+    addToQueue(theClient);
+
     return 1;
     break;
   } // case EVT_CHNICK
   
   case EVT_ACCOUNT: {
-    elog << "Got account. iClient nick: " << theClient->getNickName() << ", AC: "
-      << theClient->getAccount() << endl;
-    if(string_lower(theClient->getNickName()) == string_lower(theClient->getAccount())) {
-      removeFromQueue(theClient);
-    }
+    netData* theData = static_cast< netData* > (theClient->getCustomData(this));
+    
+    theData->authedUser = isRegistered(theClient->getAccount());
     
     return 1;
     break;
@@ -244,7 +243,7 @@ return 0;
  */
 bool nickserv::RegisterCommand( Command* theCommand )
 {
-//return commandMap.insert( commandPairType(theCommand->getName(), theCommand)).second;
+return commandMap.insert( commandPairType(theCommand->getName(), theCommand)).second;
 }
 
 
@@ -260,10 +259,10 @@ elog << "*** [NickServ:precacheUsers] Precaching users." << endl;
 PgDatabase* cacheCon = theManager->getConnection();
 
 /* Retrieve the list of registered users */
-string cacheQuery = "SELECT id,name,flags,level FROM users";
+string cacheQuery = "SELECT id,name,flags,level,lastseen FROM users";
 if(cacheCon->ExecTuplesOk(cacheQuery.c_str())) {
   for(int i = 0; i < cacheCon->Tuples(); i++) {
-    sqlUser* tmpUser = new sqlUser();
+    sqlUser* tmpUser = new sqlUser(theManager);
     tmpUser->setAllMembers(cacheCon, i);
     sqlUserCache.insert(sqlUserHashType::value_type(tmpUser->getName(), tmpUser));
   }
@@ -352,13 +351,31 @@ for(QueueType::iterator queuePos = warnQueue.begin(); queuePos != warnQueue.end(
   iClient* theClient = *queuePos;
   netData* theData = static_cast< netData* >( theClient->getCustomData(this) );
   
-  /* First things first - is this nick set to autokill? */
-  sqlUserHashType::const_iterator cachedUser = sqlUserCache.find(theClient->getNickName());
-  if(cachedUser == sqlUserCache.end() || !(cachedUser->second)->getFlag(sqlUser::F_AUTOKILL)) {
+  /* Is this nick registered? */
+  sqlUser* regUser = isRegistered(theClient->getNickName());
+  if(!regUser) {
     theData->warned = 0;
     queuePos = warnQueue.erase(queuePos);
     continue;
   }
+  
+  /* Does the regUser have autokill set? */
+  if(!regUser->getFlag(sqlUser::F_AUTOKILL)) {
+    theData->warned = 0;
+    queuePos = warnQueue.erase(queuePos);
+    continue;
+  }
+  
+  /* User is registered and record has autokill set.
+   * See if this iClient and the sqlUser match */
+  if(isAccountMatch(theClient, regUser)) {
+    theData->warned = 0;
+    queuePos = warnQueue.erase(queuePos);
+    continue;
+  }
+  
+  /* We now know that the user is NOT logged in as the user, and the user
+   * has AUTOKILL set. Warn them. */
   
   if(theData->warned) {
     killQueue.push_back(theClient);
@@ -385,6 +402,49 @@ for(QueueType::iterator queuePos = killQueue.begin(); queuePos != killQueue.end(
 
 } // nickserv::processQueue()
 
+
+/**
+ * This function compares an iClient and a sqlUser and returns true if they
+ * match, ie iClient->getNickName() == sqlUser->getName()
+ */
+bool isAccountMatch(iClient* theClient, sqlUser* theUser)
+{
+string lowerNickName = string_lower(theClient->getNickName());
+string lowerName = string_lower(theUser->getName());
+  
+if(lowerNickName == lowerName) return true;
+  
+return false;
+}
+
+
+/**
+ * This function simply returns iClient->netData->authedUser.
+ * It is purely a convenience method.
+ */
+sqlUser* nickserv::isAuthed(iClient* theClient)
+{
+netData* theData = static_cast< netData* >( theClient->getCustomData(this) );
+return theData->authedUser;
+}
+
+
+/**
+ * This function simply checks if a given nick is registered, and if so then returns
+ * the associated sqlUser* from the cache.
+ */
+sqlUser* nickserv::isRegistered(string theNick)
+{
+sqlUserHashType::iterator cachedUser = sqlUserCache.find(theNick);
+if(cachedUser == sqlUserCache.end()) return 0;
+return cachedUser->second;
+}
+
+
+void Command::Usage(iClient* theClient)
+{
+bot->Notice(theClient, string("SYNTAX: ")  + getInfo());
+}
 
 } // namespace ns
 

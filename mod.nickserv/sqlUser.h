@@ -1,9 +1,11 @@
 #ifndef _SQLUSER_H
-#define _SQLUSER_H "$Id: sqlUser.h,v 1.3 2002/08/10 19:53:57 jeekay Exp $"
+#define _SQLUSER_H "$Id: sqlUser.h,v 1.4 2002/08/16 21:37:32 jeekay Exp $"
 
 #include <string>
 
 #include "libpq++.h"
+
+#include "sqlManager.h"
 
 namespace gnuworld
 {
@@ -22,7 +24,7 @@ class sqlUser
     static const flagType F_AUTOKILL;
 
     /** Default constructor makes an empty user */
-    sqlUser();
+    sqlUser(sqlManager*);
     
     /** Default destructor deletes user */
     ~sqlUser();
@@ -42,6 +44,14 @@ class sqlUser
     inline bool getFlag(const flagType& whichFlag) const
       { return (whichFlag == (flags & whichFlag)); }
     
+    /** Get the user level */
+    inline unsigned int getLevel() const
+       { return level; }
+    
+    /** Get the user lastseen */
+    inline unsigned int getLastSeen() const
+      { return lastseen; }
+    
     
     /* MUTATOR METHODS */
     
@@ -57,6 +67,13 @@ class sqlUser
     inline void setFlag(const flagType& whichFlag)
       { flags |= whichFlag; }
     
+    /** Set the user level */
+    inline void setLevel(const unsigned int _level)
+      { level = _level; }
+    
+    /** Set the lastseen */
+    inline void setLastSeen(const unsigned int _lastseen)
+      { lastseen = _lastseen; }
     
     /* MISCELLANEOUS METHODS */
     
@@ -71,6 +88,7 @@ class sqlUser
     string name;
     flagType flags;
     unsigned int level;
+    unsigned int lastseen;
     
     sqlManager* myManager;
 }; // class sqlUser

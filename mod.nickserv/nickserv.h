@@ -1,5 +1,5 @@
 #ifndef _NICKSERV_H
-#define _NICKSERV_H "$Id: nickserv.h,v 1.3 2002/08/15 20:46:45 jeekay Exp $"
+#define _NICKSERV_H "$Id: nickserv.h,v 1.4 2002/08/16 21:37:32 jeekay Exp $"
 
 #include "client.h"
 #include "EConfig.h"
@@ -72,6 +72,20 @@ class nickserv : public xClient {
     
     /** Process the queue */
     void processQueue();
+    
+    
+    /*********************************
+     ** U S E R   R E S O U R C E S **
+     *********************************/
+    
+    /** Check if a given iClient matches a given sqlUser */
+    bool isAccountMatch(iClient*, sqlUser*);
+    
+    /** Returns a sqlUser if the user is registered */
+    sqlUser* isAuthed(iClient*); 
+    
+    /** Returns a sqlUser for a given user name */
+    sqlUser* isRegistered(string);
 
     
     /*****************************************
