@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ConnectionManager.cc,v 1.14 2004/01/16 00:57:36 dan_karrels Exp $
+ * $Id: ConnectionManager.cc,v 1.15 2004/02/05 23:28:46 dan_karrels Exp $
  */
 
 #include	<unistd.h>
@@ -52,7 +52,7 @@
 #include	"Buffer.h"
 #include	"ELog.h"
 
-const char rcsId[] = "$Id: ConnectionManager.cc,v 1.14 2004/01/16 00:57:36 dan_karrels Exp $" ;
+const char rcsId[] = "$Id: ConnectionManager.cc,v 1.15 2004/02/05 23:28:46 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -668,12 +668,8 @@ do
 //	<< selectRet
 //	<< endl ;
 
-if( 0 == selectRet )
-	{
-	// No sockets ready to be serviced, timeout occured,
-	// probably a timer
-	return ;
-	}
+// Continue even if select() returned 0, there may be connections
+// waiting to be erased
 
 // Is there an error from select()?
 if( selectRet < 0 )
