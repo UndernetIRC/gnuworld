@@ -2,7 +2,7 @@
  */
 
 #ifndef __ECONFIG_H
-#define __ECONFIG_H "$Id: EConfig.h,v 1.1 2000/11/06 16:08:33 dan_karrels Exp $"
+#define __ECONFIG_H "$Id: EConfig.h,v 1.2 2000/11/12 17:20:45 dan_karrels Exp $"
 
 #include	<iostream>
 #include	<string>
@@ -87,15 +87,9 @@ public:
 	/**
 	 * Find the first key/value pair for the given key.
 	 * Note that each key may have more than one value,
-	 * so a const iterator is returned here.  Note also
-	 * that is method is NOT const.  If the key being
-	 * searched for is not found, then it is inserted
-	 * into the map with a value of "".  This is to prevent
-	 * run time crashes.  To check if a value was found,
-	 * check if the returned iterator->value is not
-	 * empty().
+	 * so a const iterator is returned here.
 	 */
-	virtual const_iterator Find( const string& findMe ) ;
+	virtual const_iterator Find( const string& findMe ) const ;
 
 	/**
 	 * Call this method to retrieve a const_iterator to the first

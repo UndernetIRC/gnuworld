@@ -14,7 +14,7 @@
 #include	"misc.h"
 
 const char EConfig_h_rcsId[] = __ECONFIG_H ;
-const char EConfig_cc_rcsId[] = "$Id: EConfig.cc,v 1.1 2000/11/06 16:08:33 dan_karrels Exp $" ;
+const char EConfig_cc_rcsId[] = "$Id: EConfig.cc,v 1.2 2000/11/12 17:20:45 dan_karrels Exp $" ;
 
 using std::string ;
 using std::fstream ;
@@ -53,7 +53,7 @@ configFile.close() ;
 valueMap.clear() ;
 }
 
-EConfig::const_iterator EConfig::Find( const string& findMe )
+EConfig::const_iterator EConfig::Find( const string& findMe ) const
 {
 return valueMap.find( findMe ) ;
 }
