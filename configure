@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# From configure.in Revision: 1.7 
+# From configure.in Revision: 1.8 
 
 
 # Guess values for system-dependent variables and create Makefiles.
@@ -1461,7 +1461,7 @@ EOF
   *BSD)
     echo "$ac_t""FreeBSD/NetBSD/OpenBSD - choose your poison" 1>&6
     SHLIB_CXX="${CXX} -fpic"
-    SHLIB_LD="ld -Bshareable -x"
+    SHLIB_LD="ld -Bshareable -x -r"
     cat >> confdefs.h <<\EOF
 #define MODULES_OK 1
 EOF
