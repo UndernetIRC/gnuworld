@@ -4,7 +4,7 @@
  * Storage class for accessing user information either from the backend
  * or internal storage.
  * 
- * $Id: sqlChannel.cc,v 1.7 2000/12/30 00:32:37 gte Exp $
+ * $Id: sqlChannel.cc,v 1.8 2000/12/30 23:28:34 gte Exp $
  */
  
 #include	<strstream>
@@ -18,7 +18,7 @@ using std::string ;
 using std::endl ; 
  
 const char sqlChannel_h_rcsId[] = __SQLCHANNEL_H ;
-const char sqlChannel_cc_rcsId[] = "$Id: sqlChannel.cc,v 1.7 2000/12/30 00:32:37 gte Exp $" ;
+const char sqlChannel_cc_rcsId[] = "$Id: sqlChannel.cc,v 1.8 2000/12/30 23:28:34 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -45,7 +45,7 @@ bool sqlChannel::loadData(const string& channelName)
 	ExecStatusType status;
 	elog << "sqlChannel> Attempting to load data for channel-name: " << channelName << endl;
 
-    string queryString = "SELECT id,name,flags,mass_deop_pro,flood_pro,url,description,keywords,registered_ts,channel_ts,channel_mode,channel_key,channel_limit FROM channels WHERE lower(name) = '" + string_lower(channelName) + "'";
+    string queryString = "SELECT id,name,flags,mass_deop_pro,flood_pro,url,description,keywords,registered_ts,channel_ts,channel_mode,channel_key,channel_limit FROM channels WHERE registered_ts <> '' AND lower(name) = '" + string_lower(channelName) + "'";
 	elog << "sqlQuery> " << queryString << endl;
 
 	if ((status = SQLDb->Exec(queryString.c_str())) == PGRES_TUPLES_OK)
@@ -74,7 +74,7 @@ bool sqlChannel::loadData(int channelID)
 	elog << "sqlChannel> Attempting to load data for channel-id: " << channelID << endl;
 	
 	strstream queryString;
-	queryString << "SELECT id,name,flags,mass_deop_pro,flood_pro,url,description,keywords,registered_ts,channel_ts,channel_mode,channel_key,channel_limit FROM channels WHERE id = " << channelID; 
+	queryString << "SELECT id,name,flags,mass_deop_pro,flood_pro,url,description,keywords,registered_ts,channel_ts,channel_mode,channel_key,channel_limit FROM channels WHERE registered_ts <> '' AND id = " << channelID; 
 
 	elog << "sqlQuery> " << queryString.str() << endl;
 
