@@ -1,5 +1,6 @@
 /* ccontrol.cc
- * Author: Daniel Karrels dan@karrels.com
+ * Authors: Daniel Karrels dan@karrels.com
+	    Tomer Cohen    MrBean@toughguy.net
  */
 
 #include	<string>
@@ -23,7 +24,7 @@
 #include	"AuthInfo.h"
 #include        "server.h"
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.50 2001/05/30 21:35:11 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.51 2001/05/31 18:17:59 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -221,6 +222,10 @@ RegisterCommand( new FORCEGLINECommand( this, "FORCEGLINE", "[duration (sec)] <u
 	"Gline a given user@host for the given reason",flg_FGLINE ) ) ;
 RegisterCommand( new EXCEPTIONCommand( this, "EXCEPTIONS", "(list / add / del) [host mask]"
 	"Add connection exceptions on hosts",flg_EXCEPTIONS ) ) ;
+RegisterCommand( new LISTIGNORESCommand( this, "LISTIGNORES", ""
+	"List the ignore list",flg_LISTIGNORES ) ) ;
+RegisterCommand( new REMOVEIGNORECommand( this, "REMIGNORE", "(nick/host)"
+	" Removes a host/nick from the  ignore list",flg_REMIGNORE ) ) ;
 
 loadGlines();
 
@@ -1904,9 +1909,47 @@ LogInfo->add_Login();
 if(LogInfo->get_Logins() > 5)
     ignoreUser(LogInfo);
 }	
-void ccontrol::removeIgnore( const string &Numeric )
+
+int ccontrol::removeIgnore( const string &Host )
 {
+
+ccLogin *tempLogin;
+loginIterator tptr;
+int retMe = IGNORE_NOT_FOUND;
+for(loginIterator ptr = login_begin();ptr!=login_end();)
+	{
+	tempLogin = *ptr;
+	if(tempLogin->get_IgnoredHost() == Host)
+		{
+		strstream s;
+		s	<< getCharYYXXX() 
+			<< " SILENCE " 
+			<< tempLogin->get_Numeric() 
+			<< " -" 
+			<< tempLogin->get_IgnoredHost()
+			<< ends; 
+		Write( s );
+		delete[] s.str();
+		tempLogin->resetIgnore();
+		tempLogin->resetLogins();
+		tptr = ptr++;
+		ignoreList.erase(tptr);
+		retMe = IGNORE_REMOVED;
+		}
+	else
+		ptr++;
+	}
+return retMe;
 }	
+
+int ccontrol::removeIgnore( iClient *theClient )
+{
+string Host = "*!*" + theClient->getUserName() 
+		    + "@"+ theClient->getInsecureHost();
+int retMe = removeIgnore(Host);
+return retMe;
+}	
+
 void ccontrol::ignoreUser( ccLogin *User )
 {
 iClient *theClient = Network->findClient(User->get_Numeric());
@@ -1933,7 +1976,20 @@ ignoreList.push_back(User);
 
 bool ccontrol::listIgnores( iClient *theClient )
 {
+Notice(theClient,"-= Listing Ignore List =-");			
+ccLogin *tempLogin;
+for(loginIterator ptr = login_begin();ptr!=login_end();ptr++)
+	{
+	tempLogin = *ptr;
+	if(tempLogin->get_IgnoreExpires() > ::time(0))
+		{
+		Notice(theClient,"Host : %s Expires At %s[%d]",
+		tempLogin->get_IgnoredHost().c_str(),convertToAscTime(tempLogin->get_IgnoreExpires()),tempLogin->get_IgnoreExpires());
+		}
+	}
+Notice(theClient,"-= End Of Ignore List =-");			
 }
+
 bool ccontrol::refreshIgnores()
 {
 loginIterator tptr;
@@ -1942,7 +1998,7 @@ MsgChanLog("[Refreshing Ignores] - Started\n");
 for(loginIterator ptr = login_begin();ptr!=login_end();)
 	{
 	tempLogin = *ptr;
-	if(tempLogin->get_IgnoreExpires() <= ::time(0))
+	if((tempLogin) &&(tempLogin->get_IgnoreExpires() <= ::time(0)))
 		{
 		tempLogin->set_IgnoreExpires(0);
 		strstream s;

@@ -1,7 +1,10 @@
 /* ccFlood.h */
 
 #ifndef __CCLOGIN_H
-#define __CCLOGIN_H "$Id: ccLogin.h,v 1.2 2001/05/30 21:16:44 mrbean_ Exp $"
+#define __CCLOGIN_H "$Id: ccLogin.h,v 1.3 2001/05/31 18:17:59 mrbean_ Exp $"
+
+#define IGNORE_NOT_FOUND -1
+#define IGNORE_REMOVED -2
 
 #include	<string>
 
@@ -42,7 +45,7 @@ public:
 		{ Logins++; }
 
 	inline 	void		resetIgnore()
-		{ IgnoreExpires = 0; }
+		{ IgnoreExpires = 0; IgnoredHost="" ; }
 	
 	inline void		resetLogins() 
 		{ Logins = 0; }

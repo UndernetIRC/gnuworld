@@ -3,7 +3,7 @@
  */
 
 #ifndef __CCONTROL_H
-#define __CCONTROL_H "$Id: ccontrol.h,v 1.31 2001/05/30 21:16:45 mrbean_ Exp $"
+#define __CCONTROL_H "$Id: ccontrol.h,v 1.32 2001/05/31 18:17:59 mrbean_ Exp $"
 
 //Define gline response
 #define GLINE_OK 1;
@@ -486,8 +486,10 @@ public:
 	
 	void addLogin( const string & );
 	
-	void removeIgnore( const string & );
+	int removeIgnore( const string & );
 	
+	int removeIgnore( iClient * );
+
 	void ignoreUser( ccLogin * );
 	
 	bool listIgnores( iClient * );

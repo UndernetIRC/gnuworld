@@ -10,7 +10,7 @@
 # even the implied warranty of MERCHANTABILITY or FITNESS FOR A
 # PARTICULAR PURPOSE.
 
-# "$Id: Makefile.in,v 1.49 2001/05/30 15:11:45 mrbean_ Exp $"
+# "$Id: Makefile.in,v 1.50 2001/05/31 18:17:59 mrbean_ Exp $"
 
 
 SHELL = @SHELL@
@@ -94,7 +94,7 @@ bindir = @bindir@
 glibdir = @glibdir@
 
 lib_LTLIBRARIES = libccontrol.la
-libccontrol_la_SOURCES = ccontrol.cc 	CControlCommands.cc 	ACCESSCommand.cc 	ADDCOMMANDCommand.cc 	ADDNEWOPERCommand.cc 	ADDNEWSERVERCommand.cc 	ADDOPERCHANCommand.cc 	ccLogin.cc 	ccGline.cc 	ccServer.cc 	ccUser.cc 	CHANINFOCommand.cc 	CHECKNETWORKCommand.cc 	CLEARCHANCommand.cc 	DEAUTHCommand.cc 	DEOPCommand.cc 	EXCEPTIONCommand.cc 	FORCEGLINECommand.cc 	GLINECommand.cc 	HELPCommand.cc 	INVITECommand.cc 	JUPECommand.cc 	KICKCommand.cc 	LASTCOMCommand.cc 	LEARNNETWORKCommand.cc 	LISTHOSTSCommand.cc 	LISTOPERCHANSCommand.cc 	LOGINCommand.cc 	MODECommand.cc 	MODERATECommand.cc 	MODOPERCommand.cc 	NEWPASSCommand.cc 	OPCommand.cc 	REMGLINECommand.cc 	REMOPERCHANCommand.cc 	REMOVECOMMANDCommand.cc 	REMOVEOPERCommand.cc 	REMOVESERVERCommand.cc 	SCANGLINECommand.cc 	SUSPENDOPERCommand.cc 	TRANSLATECommand.cc 	UNMODERATECommand.cc 	UNSUSPENDOPERCommand.cc 	WHOISCommand.cc
+libccontrol_la_SOURCES = ccontrol.cc 	CControlCommands.cc 	ACCESSCommand.cc 	ADDCOMMANDCommand.cc 	ADDNEWOPERCommand.cc 	ADDNEWSERVERCommand.cc 	ADDOPERCHANCommand.cc 	ccLogin.cc 	ccGline.cc 	ccServer.cc 	ccUser.cc 	CHANINFOCommand.cc 	CHECKNETWORKCommand.cc 	CLEARCHANCommand.cc 	DEAUTHCommand.cc 	DEOPCommand.cc 	EXCEPTIONCommand.cc 	FORCEGLINECommand.cc 	GLINECommand.cc 	HELPCommand.cc 	INVITECommand.cc 	JUPECommand.cc 	KICKCommand.cc 	LASTCOMCommand.cc 	LEARNNETWORKCommand.cc 	LISTHOSTSCommand.cc 	LISTIGNORESCommand.cc 	LISTOPERCHANSCommand.cc 	LOGINCommand.cc 	MODECommand.cc 	MODERATECommand.cc 	MODOPERCommand.cc 	NEWPASSCommand.cc 	OPCommand.cc 	REMGLINECommand.cc 	REMOPERCHANCommand.cc 	REMOVECOMMANDCommand.cc 	REMOVEIGNORECommand.cc 	REMOVEOPERCommand.cc 	REMOVESERVERCommand.cc 	SCANGLINECommand.cc 	SUSPENDOPERCommand.cc 	TRANSLATECommand.cc 	UNMODERATECommand.cc 	UNSUSPENDOPERCommand.cc 	WHOISCommand.cc
 
 
 libccontrol_la_LDFLAGS = -module -export-dynamic -L@PGSQL_LIB@ -lpq++
@@ -116,12 +116,13 @@ ccServer.lo ccUser.lo CHANINFOCommand.lo CHECKNETWORKCommand.lo \
 CLEARCHANCommand.lo DEAUTHCommand.lo DEOPCommand.lo EXCEPTIONCommand.lo \
 FORCEGLINECommand.lo GLINECommand.lo HELPCommand.lo INVITECommand.lo \
 JUPECommand.lo KICKCommand.lo LASTCOMCommand.lo LEARNNETWORKCommand.lo \
-LISTHOSTSCommand.lo LISTOPERCHANSCommand.lo LOGINCommand.lo \
-MODECommand.lo MODERATECommand.lo MODOPERCommand.lo NEWPASSCommand.lo \
-OPCommand.lo REMGLINECommand.lo REMOPERCHANCommand.lo \
-REMOVECOMMANDCommand.lo REMOVEOPERCommand.lo REMOVESERVERCommand.lo \
-SCANGLINECommand.lo SUSPENDOPERCommand.lo TRANSLATECommand.lo \
-UNMODERATECommand.lo UNSUSPENDOPERCommand.lo WHOISCommand.lo
+LISTHOSTSCommand.lo LISTIGNORESCommand.lo LISTOPERCHANSCommand.lo \
+LOGINCommand.lo MODECommand.lo MODERATECommand.lo MODOPERCommand.lo \
+NEWPASSCommand.lo OPCommand.lo REMGLINECommand.lo REMOPERCHANCommand.lo \
+REMOVECOMMANDCommand.lo REMOVEIGNORECommand.lo REMOVEOPERCommand.lo \
+REMOVESERVERCommand.lo SCANGLINECommand.lo SUSPENDOPERCommand.lo \
+TRANSLATECommand.lo UNMODERATECommand.lo UNSUSPENDOPERCommand.lo \
+WHOISCommand.lo
 CXXCOMPILE = $(CXX) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
 LTCXXCOMPILE = $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
 CXXLD = $(CXX)
@@ -141,16 +142,16 @@ DEP_FILES =  .deps/ACCESSCommand.P .deps/ADDCOMMANDCommand.P \
 .deps/EXCEPTIONCommand.P .deps/FORCEGLINECommand.P .deps/GLINECommand.P \
 .deps/HELPCommand.P .deps/INVITECommand.P .deps/JUPECommand.P \
 .deps/KICKCommand.P .deps/LASTCOMCommand.P .deps/LEARNNETWORKCommand.P \
-.deps/LISTHOSTSCommand.P .deps/LISTOPERCHANSCommand.P \
-.deps/LOGINCommand.P .deps/MODECommand.P .deps/MODERATECommand.P \
-.deps/MODOPERCommand.P .deps/NEWPASSCommand.P .deps/OPCommand.P \
-.deps/REMGLINECommand.P .deps/REMOPERCHANCommand.P \
-.deps/REMOVECOMMANDCommand.P .deps/REMOVEOPERCommand.P \
-.deps/REMOVESERVERCommand.P .deps/SCANGLINECommand.P \
-.deps/SUSPENDOPERCommand.P .deps/TRANSLATECommand.P \
-.deps/UNMODERATECommand.P .deps/UNSUSPENDOPERCommand.P \
-.deps/WHOISCommand.P .deps/ccGline.P .deps/ccLogin.P .deps/ccServer.P \
-.deps/ccUser.P .deps/ccontrol.P
+.deps/LISTHOSTSCommand.P .deps/LISTIGNORESCommand.P \
+.deps/LISTOPERCHANSCommand.P .deps/LOGINCommand.P .deps/MODECommand.P \
+.deps/MODERATECommand.P .deps/MODOPERCommand.P .deps/NEWPASSCommand.P \
+.deps/OPCommand.P .deps/REMGLINECommand.P .deps/REMOPERCHANCommand.P \
+.deps/REMOVECOMMANDCommand.P .deps/REMOVEIGNORECommand.P \
+.deps/REMOVEOPERCommand.P .deps/REMOVESERVERCommand.P \
+.deps/SCANGLINECommand.P .deps/SUSPENDOPERCommand.P \
+.deps/TRANSLATECommand.P .deps/UNMODERATECommand.P \
+.deps/UNSUSPENDOPERCommand.P .deps/WHOISCommand.P .deps/ccGline.P \
+.deps/ccLogin.P .deps/ccServer.P .deps/ccUser.P .deps/ccontrol.P
 SOURCES = $(libccontrol_la_SOURCES)
 OBJECTS = $(libccontrol_la_OBJECTS)
 

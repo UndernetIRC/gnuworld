@@ -110,6 +110,9 @@ DECLARE_COMMAND( CHECKNETWORK )
 DECLARE_COMMAND( LASTCOM )
 DECLARE_COMMAND( FORCEGLINE )
 DECLARE_COMMAND( EXCEPTION )
+DECLARE_COMMAND( LISTIGNORES )
+DECLARE_COMMAND( REMOVEIGNORE )
+
 /*
  Patch for uworld commands level 
  Added by : |MrBean| (MrBean@toughguy.net)
@@ -162,7 +165,8 @@ const int flg_CHECKNET = 0x4000;
 const int flg_LASTCOM = 0x4000 | flg_NOLOG;
 const int flg_FGLINE = 0x8000;
 const int flg_EXCEPTIONS = 0x10000;
-
+const int flg_LISTIGNORES = 0x20000;
+const int flg_REMIGNORE = 0x40000;
 /*
  Default commands that are added upon adding a new oper
 */
