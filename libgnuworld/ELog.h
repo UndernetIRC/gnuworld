@@ -17,11 +17,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ELog.h,v 1.1 2002/08/07 20:28:06 dan_karrels Exp $
+ * $Id: ELog.h,v 1.2 2003/06/03 01:01:52 dan_karrels Exp $
  */
 
 #ifndef __ELOG_H
-#define __ELOG_H "$Id: ELog.h,v 1.1 2002/08/07 20:28:06 dan_karrels Exp $"
+#define __ELOG_H "$Id: ELog.h,v 1.2 2003/06/03 01:01:52 dan_karrels Exp $"
 
 #include	<sstream>
 #include	<iostream>
@@ -102,12 +102,12 @@ public:
 	 * Keep in mind that even if this method return false,
 	 * any existing output file will be closed.
 	 */
-	inline bool openFile( const string& fileName ) ;
+	bool openFile( const string& fileName ) ;
 
 	/**
 	 * Close the output log file, if it is open.
 	 */
-	inline void closeFile() ;
+	void closeFile() ;
 
 	/**
 	 * Return true if an output log file is open, false otherwise.

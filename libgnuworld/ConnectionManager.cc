@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ConnectionManager.cc,v 1.3 2002/08/29 19:42:21 mrbean_ Exp $
+ * $Id: ConnectionManager.cc,v 1.4 2003/06/03 01:01:52 dan_karrels Exp $
  */
 
 #include	<unistd.h>
@@ -1093,7 +1093,7 @@ if( (ENOBUFS == errno) || (EWOULDBLOCK == errno) || (EAGAIN == errno) )
 	return true ;
 	}
 
-//elog	<< "ConnectionManager::handleWrite> Read "
+//elog	<< "ConnectionManager::handleWrite> Wrote "
 //	<< writeResult
 //	<< " bytes"
 //	<< endl ;
@@ -1108,6 +1108,10 @@ if( writeResult < 0 )
 	// Write error
 	return false ;
 	}
+
+//elog	<< "ConnectionManager::handleWrite> Wrote: "
+//	<< cPtr->outputBuffer.substr( 0, writeResult )
+//	<< endl ;
 
 // Successful write, update the Connection's output buffer
 cPtr->outputBuffer.Delete( writeResult ) ;

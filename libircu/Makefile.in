@@ -182,106 +182,40 @@ lib_LTLIBRARIES = lib_msg_AC.la \
 
 INCLUDES = $(INCLTDL)
 
-lib_msg_AC_la_LDFLAGS = -module -export-dynamic
+AM_LDFLAGS = -module -export-dynamic
 lib_msg_AC_la_SOURCES = msg_AC.cc
-
-lib_msg_AD_la_LDFLAGS = -module -export-dynamic
 lib_msg_AD_la_SOURCES = msg_AD.cc
-
-lib_msg_B_la_LDFLAGS = -module -export-dynamic
 lib_msg_B_la_SOURCES = msg_B.cc
-
-lib_msg_C_la_LDFLAGS = -module -export-dynamic
 lib_msg_C_la_SOURCES = msg_C.cc
-
-lib_msg_CM_la_LDFLAGS = -module -export-dynamic
 lib_msg_CM_la_SOURCES = msg_CM.cc
-
-lib_msg_D_la_LDFLAGS = -module -export-dynamic
 lib_msg_D_la_SOURCES = msg_D.cc
-
-lib_msg_DS_la_LDFLAGS = -module -export-dynamic
 lib_msg_DS_la_SOURCES = msg_DS.cc
-
-lib_msg_EA_la_LDFLAGS = -module -export-dynamic
 lib_msg_EA_la_SOURCES = msg_EA.cc
-
-lib_msg_EB_la_LDFLAGS = -module -export-dynamic
 lib_msg_EB_la_SOURCES = msg_EB.cc
-
-lib_msg_G_la_LDFLAGS = -module -export-dynamic
 lib_msg_G_la_SOURCES = msg_G.cc
-
-lib_msg_GL_la_LDFLAGS = -module -export-dynamic
 lib_msg_GL_la_SOURCES = msg_GL.cc
-
-lib_msg_I_la_LDFLAGS = -module -export-dynamic
 lib_msg_I_la_SOURCES = msg_I.cc
-
-lib_msg_J_la_LDFLAGS = -module -export-dynamic
 lib_msg_J_la_SOURCES = msg_J.cc
-
-lib_msg_JU_la_LDFLAGS = -module -export-dynamic
 lib_msg_JU_la_SOURCES = msg_JU.cc
-
-lib_msg_K_la_LDFLAGS = -module -export-dynamic
 lib_msg_K_la_SOURCES = msg_K.cc
-
-lib_msg_L_la_LDFLAGS = -module -export-dynamic
 lib_msg_L_la_SOURCES = msg_L.cc
-
-lib_msg_M351_la_LDFLAGS = -module -export-dynamic
 lib_msg_M351_la_SOURCES = msg_M351.cc
-
-lib_msg_M_la_LDFLAGS = -module -export-dynamic
 lib_msg_M_la_SOURCES = msg_M.cc
-
-lib_msg_N_la_LDFLAGS = -module -export-dynamic
 lib_msg_N_la_SOURCES = msg_N.cc
-
-lib_msg_NOOP_la_LDFLAGS = -module -export-dynamic
 lib_msg_NOOP_la_SOURCES = msg_NOOP.cc
-
-lib_msg_PART_la_LDFLAGS = -module -export-dynamic
 lib_msg_PART_la_SOURCES = msg_PART.cc
-
-lib_msg_PA_la_LDFLAGS = -module -export-dynamic
 lib_msg_PA_la_SOURCES = msg_PA.cc
-
-lib_msg_O_la_LDFLAGS = -module -export-dynamic
 lib_msg_O_la_SOURCES = msg_O.cc
-
-lib_msg_P_la_LDFLAGS = -module -export-dynamic
 lib_msg_P_la_SOURCES = msg_P.cc
-
-lib_msg_Q_la_LDFLAGS = -module -export-dynamic
 lib_msg_Q_la_SOURCES = msg_Q.cc
-
-lib_msg_R_la_LDFLAGS = -module -export-dynamic
 lib_msg_R_la_SOURCES = msg_R.cc
-
-lib_msg_S_la_LDFLAGS = -module -export-dynamic
 lib_msg_S_la_SOURCES = msg_S.cc
-
-lib_msg_Server_la_LDFLAGS = -module -export-dynamic
 lib_msg_Server_la_SOURCES = msg_Server.cc
-
-lib_msg_SQ_la_LDFLAGS = -module -export-dynamic
 lib_msg_SQ_la_SOURCES = msg_SQ.cc
-
-lib_msg_T_la_LDFLAGS = -module -export-dynamic
 lib_msg_T_la_SOURCES = msg_T.cc
-
-lib_msg_V_la_LDFLAGS = -module -export-dynamic
 lib_msg_V_la_SOURCES = msg_V.cc
-
-lib_msg_WA_la_LDFLAGS = -module -export-dynamic
 lib_msg_WA_la_SOURCES = msg_WA.cc
-
-lib_msg_W_la_LDFLAGS = -module -export-dynamic
 lib_msg_W_la_SOURCES = msg_W.cc
-
-lib_msg_Y_la_LDFLAGS = -module -export-dynamic
 lib_msg_Y_la_SOURCES = msg_Y.cc
 subdir = libircu
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -290,105 +224,139 @@ CONFIG_HEADER = $(top_builddir)/include/defs.h
 CONFIG_CLEAN_FILES =
 LTLIBRARIES = $(lib_LTLIBRARIES)
 
+lib_msg_AC_la_LDFLAGS =
 lib_msg_AC_la_LIBADD =
 am_lib_msg_AC_la_OBJECTS = msg_AC.lo
 lib_msg_AC_la_OBJECTS = $(am_lib_msg_AC_la_OBJECTS)
+lib_msg_AD_la_LDFLAGS =
 lib_msg_AD_la_LIBADD =
 am_lib_msg_AD_la_OBJECTS = msg_AD.lo
 lib_msg_AD_la_OBJECTS = $(am_lib_msg_AD_la_OBJECTS)
+lib_msg_B_la_LDFLAGS =
 lib_msg_B_la_LIBADD =
 am_lib_msg_B_la_OBJECTS = msg_B.lo
 lib_msg_B_la_OBJECTS = $(am_lib_msg_B_la_OBJECTS)
+lib_msg_C_la_LDFLAGS =
 lib_msg_C_la_LIBADD =
 am_lib_msg_C_la_OBJECTS = msg_C.lo
 lib_msg_C_la_OBJECTS = $(am_lib_msg_C_la_OBJECTS)
+lib_msg_CM_la_LDFLAGS =
 lib_msg_CM_la_LIBADD =
 am_lib_msg_CM_la_OBJECTS = msg_CM.lo
 lib_msg_CM_la_OBJECTS = $(am_lib_msg_CM_la_OBJECTS)
+lib_msg_D_la_LDFLAGS =
 lib_msg_D_la_LIBADD =
 am_lib_msg_D_la_OBJECTS = msg_D.lo
 lib_msg_D_la_OBJECTS = $(am_lib_msg_D_la_OBJECTS)
+lib_msg_DS_la_LDFLAGS =
 lib_msg_DS_la_LIBADD =
 am_lib_msg_DS_la_OBJECTS = msg_DS.lo
 lib_msg_DS_la_OBJECTS = $(am_lib_msg_DS_la_OBJECTS)
+lib_msg_EA_la_LDFLAGS =
 lib_msg_EA_la_LIBADD =
 am_lib_msg_EA_la_OBJECTS = msg_EA.lo
 lib_msg_EA_la_OBJECTS = $(am_lib_msg_EA_la_OBJECTS)
+lib_msg_EB_la_LDFLAGS =
 lib_msg_EB_la_LIBADD =
 am_lib_msg_EB_la_OBJECTS = msg_EB.lo
 lib_msg_EB_la_OBJECTS = $(am_lib_msg_EB_la_OBJECTS)
+lib_msg_G_la_LDFLAGS =
 lib_msg_G_la_LIBADD =
 am_lib_msg_G_la_OBJECTS = msg_G.lo
 lib_msg_G_la_OBJECTS = $(am_lib_msg_G_la_OBJECTS)
+lib_msg_GL_la_LDFLAGS =
 lib_msg_GL_la_LIBADD =
 am_lib_msg_GL_la_OBJECTS = msg_GL.lo
 lib_msg_GL_la_OBJECTS = $(am_lib_msg_GL_la_OBJECTS)
+lib_msg_I_la_LDFLAGS =
 lib_msg_I_la_LIBADD =
 am_lib_msg_I_la_OBJECTS = msg_I.lo
 lib_msg_I_la_OBJECTS = $(am_lib_msg_I_la_OBJECTS)
+lib_msg_J_la_LDFLAGS =
 lib_msg_J_la_LIBADD =
 am_lib_msg_J_la_OBJECTS = msg_J.lo
 lib_msg_J_la_OBJECTS = $(am_lib_msg_J_la_OBJECTS)
+lib_msg_JU_la_LDFLAGS =
 lib_msg_JU_la_LIBADD =
 am_lib_msg_JU_la_OBJECTS = msg_JU.lo
 lib_msg_JU_la_OBJECTS = $(am_lib_msg_JU_la_OBJECTS)
+lib_msg_K_la_LDFLAGS =
 lib_msg_K_la_LIBADD =
 am_lib_msg_K_la_OBJECTS = msg_K.lo
 lib_msg_K_la_OBJECTS = $(am_lib_msg_K_la_OBJECTS)
+lib_msg_L_la_LDFLAGS =
 lib_msg_L_la_LIBADD =
 am_lib_msg_L_la_OBJECTS = msg_L.lo
 lib_msg_L_la_OBJECTS = $(am_lib_msg_L_la_OBJECTS)
+lib_msg_M_la_LDFLAGS =
 lib_msg_M_la_LIBADD =
 am_lib_msg_M_la_OBJECTS = msg_M.lo
 lib_msg_M_la_OBJECTS = $(am_lib_msg_M_la_OBJECTS)
+lib_msg_M351_la_LDFLAGS =
 lib_msg_M351_la_LIBADD =
 am_lib_msg_M351_la_OBJECTS = msg_M351.lo
 lib_msg_M351_la_OBJECTS = $(am_lib_msg_M351_la_OBJECTS)
+lib_msg_N_la_LDFLAGS =
 lib_msg_N_la_LIBADD =
 am_lib_msg_N_la_OBJECTS = msg_N.lo
 lib_msg_N_la_OBJECTS = $(am_lib_msg_N_la_OBJECTS)
+lib_msg_NOOP_la_LDFLAGS =
 lib_msg_NOOP_la_LIBADD =
 am_lib_msg_NOOP_la_OBJECTS = msg_NOOP.lo
 lib_msg_NOOP_la_OBJECTS = $(am_lib_msg_NOOP_la_OBJECTS)
+lib_msg_O_la_LDFLAGS =
 lib_msg_O_la_LIBADD =
 am_lib_msg_O_la_OBJECTS = msg_O.lo
 lib_msg_O_la_OBJECTS = $(am_lib_msg_O_la_OBJECTS)
+lib_msg_P_la_LDFLAGS =
 lib_msg_P_la_LIBADD =
 am_lib_msg_P_la_OBJECTS = msg_P.lo
 lib_msg_P_la_OBJECTS = $(am_lib_msg_P_la_OBJECTS)
+lib_msg_PA_la_LDFLAGS =
 lib_msg_PA_la_LIBADD =
 am_lib_msg_PA_la_OBJECTS = msg_PA.lo
 lib_msg_PA_la_OBJECTS = $(am_lib_msg_PA_la_OBJECTS)
+lib_msg_PART_la_LDFLAGS =
 lib_msg_PART_la_LIBADD =
 am_lib_msg_PART_la_OBJECTS = msg_PART.lo
 lib_msg_PART_la_OBJECTS = $(am_lib_msg_PART_la_OBJECTS)
+lib_msg_Q_la_LDFLAGS =
 lib_msg_Q_la_LIBADD =
 am_lib_msg_Q_la_OBJECTS = msg_Q.lo
 lib_msg_Q_la_OBJECTS = $(am_lib_msg_Q_la_OBJECTS)
+lib_msg_R_la_LDFLAGS =
 lib_msg_R_la_LIBADD =
 am_lib_msg_R_la_OBJECTS = msg_R.lo
 lib_msg_R_la_OBJECTS = $(am_lib_msg_R_la_OBJECTS)
+lib_msg_S_la_LDFLAGS =
 lib_msg_S_la_LIBADD =
 am_lib_msg_S_la_OBJECTS = msg_S.lo
 lib_msg_S_la_OBJECTS = $(am_lib_msg_S_la_OBJECTS)
+lib_msg_SQ_la_LDFLAGS =
 lib_msg_SQ_la_LIBADD =
 am_lib_msg_SQ_la_OBJECTS = msg_SQ.lo
 lib_msg_SQ_la_OBJECTS = $(am_lib_msg_SQ_la_OBJECTS)
+lib_msg_Server_la_LDFLAGS =
 lib_msg_Server_la_LIBADD =
 am_lib_msg_Server_la_OBJECTS = msg_Server.lo
 lib_msg_Server_la_OBJECTS = $(am_lib_msg_Server_la_OBJECTS)
+lib_msg_T_la_LDFLAGS =
 lib_msg_T_la_LIBADD =
 am_lib_msg_T_la_OBJECTS = msg_T.lo
 lib_msg_T_la_OBJECTS = $(am_lib_msg_T_la_OBJECTS)
+lib_msg_V_la_LDFLAGS =
 lib_msg_V_la_LIBADD =
 am_lib_msg_V_la_OBJECTS = msg_V.lo
 lib_msg_V_la_OBJECTS = $(am_lib_msg_V_la_OBJECTS)
+lib_msg_W_la_LDFLAGS =
 lib_msg_W_la_LIBADD =
 am_lib_msg_W_la_OBJECTS = msg_W.lo
 lib_msg_W_la_OBJECTS = $(am_lib_msg_W_la_OBJECTS)
+lib_msg_WA_la_LDFLAGS =
 lib_msg_WA_la_LIBADD =
 am_lib_msg_WA_la_OBJECTS = msg_WA.lo
 lib_msg_WA_la_OBJECTS = $(am_lib_msg_WA_la_OBJECTS)
+lib_msg_Y_la_LDFLAGS =
 lib_msg_Y_la_LIBADD =
 am_lib_msg_Y_la_OBJECTS = msg_Y.lo
 lib_msg_Y_la_OBJECTS = $(am_lib_msg_Y_la_OBJECTS)

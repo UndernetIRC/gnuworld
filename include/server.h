@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server.h,v 1.80 2003/05/26 21:44:29 dan_karrels Exp $
+ * $Id: server.h,v 1.81 2003/06/03 01:01:52 dan_karrels Exp $
  */
 
 #ifndef __SERVER_H
-#define __SERVER_H "$Id: server.h,v 1.80 2003/05/26 21:44:29 dan_karrels Exp $"
+#define __SERVER_H "$Id: server.h,v 1.81 2003/06/03 01:01:52 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
@@ -112,7 +112,8 @@ public:
 	virtual ~xServer() ;
 
 	/**
-	 * The actual run method.
+	 * The actual run method.  This method is invoked by main(),
+	 * and contains the xServer's main loop.
 	 */
 	void		run() ;
 
@@ -207,12 +208,29 @@ public:
 	inline size_t		getTotalSent() const
 		{ return 0 ; }
 
+	/**
+	 * This method is called when a Connection is disconnected.
+	 * Inherited from ConnectionHandler.
+	 */
 	virtual void OnDisconnect( Connection* ) ;
 
+	/**
+	 * This method is called when a Connection attempt succeeds.
+	 * Inherited from ConnectionHandler.
+	 */
 	virtual void OnConnect( Connection* ) ;
 
+	/**
+	 * This method is called when a Connection attempt fails.
+	 * Inherited from ConnectionHandler.
+	 */
 	virtual void OnConnectFail( Connection* ) ;
 
+	/**
+	 * This method is called when a line of data is read from
+	 * Connection.
+	 * Inherited from ConnectionHandler.
+	 */
 	virtual void OnRead( Connection*, const string& ) ;
 
 	/**
@@ -1029,11 +1047,12 @@ protected:
 	static int	whichSig ;
 
 	/**
-	 * The structure type to hold information about client timed
+	 * The structure type holds information about client timed
 	 * events.
 	 */
 	struct timerInfo
 	{
+	/// Instantiate a new timerInfo structure.
 	timerInfo( const timerID& _ID,
 		const time_t& _absTime,
 		TimerHandler* _theHandler,
@@ -1086,6 +1105,9 @@ protected:
 	inline bool validEvent( const eventType& theEvent ) const
 		{ return (theEvent >= 0 && theEvent < EVT_NOOP) ; }
 
+	/**
+	 * The server's uplink to the network.
+	 */
 	Connection		*serverConnection ;
 
 	/**
@@ -1422,7 +1444,12 @@ protected:
 
 #ifdef EDEBUG
 	/// Some debugging information, just a curiosity
+	/// burstLines is the total number of lines that have been
+	/// processed since the beginning of the last burst.
 	size_t		burstLines ;
+
+	/// burstBytes is the total number of bytes that have been
+	/// processed since the beginning of the last burst.
 	size_t		burstBytes ;
 #endif
 

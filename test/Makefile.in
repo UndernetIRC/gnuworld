@@ -145,14 +145,13 @@ target_alias = @target_alias@
 threadLib = @threadLib@
 topdir = @topdir@
 
-noinst_PROGRAMS = stringtokenizer econfig gThread signal match
+noinst_PROGRAMS = stringtokenizer econfig gThread signal match testbot
+LDADD = $(glibdir)/libgnuworld.la
 
 stringtokenizer_SOURCES = stringtokenizer.cc
-stringtokenizer_LDFLAGS = $(glibdir)/libgnuworld.la
 stringtokenizer_DEPENDENCIES = $(glibdir)/libgnuworld.la
 
 econfig_SOURCES = econfig.cc
-econfig_LDFLAGS = $(glibdir)/libgnuworld.la
 econfig_DEPENDENCIES = $(glibdir)/libgnuworld.la
 
 gThread_SOURCES = gThread.cc
@@ -164,39 +163,50 @@ signal_LDFLAGS = $(glibdir)/libgnuworld.la @threadLib@
 signal_DEPENDENCIES = $(glibdir)/libgnuworld.la
 
 match_SOURCES = match.cc
-match_LDFLAGS = $(glibdir)/libgnuworld.la
 match_DEPENDENCIES = $(glibdir)/libgnuworld.la
+
+testbot_SOURCES = testbot.cc
+testbot_DEPENDENCIES = $(glibdir)/libgnuworld.la
 subdir = test
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = $(top_builddir)/include/defs.h
 CONFIG_CLEAN_FILES =
 noinst_PROGRAMS = stringtokenizer$(EXEEXT) econfig$(EXEEXT) \
-	gThread$(EXEEXT) signal$(EXEEXT) match$(EXEEXT)
+	gThread$(EXEEXT) signal$(EXEEXT) match$(EXEEXT) \
+	testbot$(EXEEXT)
 PROGRAMS = $(noinst_PROGRAMS)
 
 am_econfig_OBJECTS = econfig.$(OBJEXT)
 econfig_OBJECTS = $(am_econfig_OBJECTS)
 econfig_LDADD = $(LDADD)
+econfig_LDFLAGS =
 am_gThread_OBJECTS = gThread.$(OBJEXT)
 gThread_OBJECTS = $(am_gThread_OBJECTS)
 gThread_LDADD = $(LDADD)
 am_match_OBJECTS = match.$(OBJEXT)
 match_OBJECTS = $(am_match_OBJECTS)
 match_LDADD = $(LDADD)
+match_LDFLAGS =
 am_signal_OBJECTS = signal.$(OBJEXT)
 signal_OBJECTS = $(am_signal_OBJECTS)
 signal_LDADD = $(LDADD)
 am_stringtokenizer_OBJECTS = stringtokenizer.$(OBJEXT)
 stringtokenizer_OBJECTS = $(am_stringtokenizer_OBJECTS)
 stringtokenizer_LDADD = $(LDADD)
+stringtokenizer_LDFLAGS =
+am_testbot_OBJECTS = testbot.$(OBJEXT)
+testbot_OBJECTS = $(am_testbot_OBJECTS)
+testbot_LDADD = $(LDADD)
+testbot_LDFLAGS =
 
 DEFAULT_INCLUDES =  -I. -I$(srcdir) -I$(top_builddir)/include
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
 @AMDEP_TRUE@DEP_FILES = ./$(DEPDIR)/econfig.Po ./$(DEPDIR)/gThread.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/match.Po ./$(DEPDIR)/signal.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/stringtokenizer.Po
+@AMDEP_TRUE@	./$(DEPDIR)/stringtokenizer.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/testbot.Po
 CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
 LTCXXCOMPILE = $(LIBTOOL) --mode=compile $(CXX) $(DEFS) \
@@ -206,9 +216,9 @@ CXXLD = $(CXX)
 CXXLINK = $(LIBTOOL) --mode=link $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) \
 	$(AM_LDFLAGS) $(LDFLAGS) -o $@
 DIST_SOURCES = $(econfig_SOURCES) $(gThread_SOURCES) $(match_SOURCES) \
-	$(signal_SOURCES) $(stringtokenizer_SOURCES)
+	$(signal_SOURCES) $(stringtokenizer_SOURCES) $(testbot_SOURCES)
 DIST_COMMON = Makefile.am Makefile.in
-SOURCES = $(econfig_SOURCES) $(gThread_SOURCES) $(match_SOURCES) $(signal_SOURCES) $(stringtokenizer_SOURCES)
+SOURCES = $(econfig_SOURCES) $(gThread_SOURCES) $(match_SOURCES) $(signal_SOURCES) $(stringtokenizer_SOURCES) $(testbot_SOURCES)
 
 all: all-am
 
@@ -241,6 +251,9 @@ signal$(EXEEXT): $(signal_OBJECTS) $(signal_DEPENDENCIES)
 stringtokenizer$(EXEEXT): $(stringtokenizer_OBJECTS) $(stringtokenizer_DEPENDENCIES) 
 	@rm -f stringtokenizer$(EXEEXT)
 	$(CXXLINK) $(stringtokenizer_LDFLAGS) $(stringtokenizer_OBJECTS) $(stringtokenizer_LDADD) $(LIBS)
+testbot$(EXEEXT): $(testbot_OBJECTS) $(testbot_DEPENDENCIES) 
+	@rm -f testbot$(EXEEXT)
+	$(CXXLINK) $(testbot_LDFLAGS) $(testbot_OBJECTS) $(testbot_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT) core *.core
@@ -253,6 +266,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/match.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/signal.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/stringtokenizer.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/testbot.Po@am__quote@
 
 distclean-depend:
 	-rm -rf ./$(DEPDIR)

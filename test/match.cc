@@ -24,10 +24,7 @@ int main( int argc, const char** argv )
 string s1 ;
 string s2 ;
 
-if( argc != 3 )
-	{
-	getInput( s1, s2 ) ;
-	}
+getInput( s1, s2 ) ;
 
 cout	<< "Matching "
 	<< s1

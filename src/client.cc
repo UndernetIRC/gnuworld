@@ -1,6 +1,6 @@
 /*
  * client.cc
- * $Id: client.cc,v 1.50 2003/05/26 21:44:32 dan_karrels Exp $
+ * $Id: client.cc,v 1.51 2003/06/03 01:01:56 dan_karrels Exp $
  */
 
 #include	<new>
@@ -30,7 +30,7 @@
 #include	"events.h"
 
 const char xClient_h_rcsId[] = __CLIENT_H ;
-const char xClient_cc_rcsId[] = "$Id: client.cc,v 1.50 2003/05/26 21:44:32 dan_karrels Exp $" ;
+const char xClient_cc_rcsId[] = "$Id: client.cc,v 1.51 2003/06/03 01:01:56 dan_karrels Exp $" ;
 const char config_h_rcsId[] = __CONFIG_H ;
 const char misc_h_rcsId[] = __MISC_H ;
 const char Numeric_h_rcsId[] = __NUMERIC_H ;
@@ -561,13 +561,13 @@ int xClient::Kill( iClient* theClient, const string& reason )
 {
 assert( theClient != 0 ) ;
 
-// TODO
 Write( "%s D %s :%s",
 	MyUplink->getCharYY(),
 	theClient->getCharYYXXX().c_str(),
 	reason.c_str() ) ;
 
 // Why was all this commented out? -- gk
+// beats me -- dan
 
 // Do NOT cast away constness
 string localReason( reason ) ;
