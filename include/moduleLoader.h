@@ -1,5 +1,5 @@
 #ifndef __MODLOADER_H
-#define __MODLOADER_H "$Id: moduleLoader.h,v 1.2 2000/11/06 16:08:32 dan_karrels Exp $"
+#define __MODLOADER_H "$Id: moduleLoader.h,v 1.3 2000/12/10 00:10:16 dan_karrels Exp $"
 
 #include	<string>
 
@@ -26,7 +26,11 @@ public:
 	elog << "[MOD]: Attempting to load module " << moduleName << endl;
 
 	string fileName = "./" + moduleName;
-	moduleHandle = ::dlopen( fileName.c_str(), RTLD_NOW );
+	#ifdef RTLD_NOW
+	  moduleHandle = ::dlopen( fileName.c_str(), RTLD_NOW );
+	#else
+	  moduleHandle = ::dlopen( fileName.c_str(), DL_LAZY ) ;
+	#endif
 
 	if( 0 == moduleHandle )
 		{
