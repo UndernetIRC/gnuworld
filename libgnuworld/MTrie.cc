@@ -1,7 +1,7 @@
 /**
  * MTrie.cc
  *
- * $Id: MTrie.cc,v 1.2 2003/07/20 23:00:34 dan_karrels Exp $
+ * $Id: MTrie.cc,v 1.3 2003/07/21 16:05:21 dan_karrels Exp $
  */
 
 #include	<map>
@@ -334,11 +334,40 @@ for( list< string >::const_iterator rtItr = base.begin() ;
 	}
 clog	<< endl ;
 
-
+// Everything is set, begin recursion
+// Match localKey against all nodes
+for( const_nodes_iterator nItr = currentNode->nodesMap.begin() ;
+	nItr != currentNode->nodesMap.end() ; ++nItr )
+	{
+	if( !match( localKey, nItr->first ) )
+		{
+/*		recursiveFind( nItr->second, // MTrie*
+			base,
+			returnMe,
+			searchPrefix,
+			remainingTokens ) ;
+*/		}
+	}
 
 return returnMe ;
 }
 
+/*
+template< typename _valueT >
+void MTrie< _valueT >::recursiveFind( MTrie< _valueT >* currentNode,
+	list< string >& base,
+	list< value_type >& returnMe,
+	string& searchPrefix,
+	list< string >& remainingTokens ) const
+{
+if( searchPrefix.empty() )
+	{
+	// Looking for matches in remainingTokens
+	
+
+
+}
+*/
 template< typename _valueT >
 string MTrie< _valueT >::getBase( const list< string >& base ) const
 {

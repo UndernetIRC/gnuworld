@@ -1,7 +1,7 @@
 /**
  * MTrie.h
  *
- * $Id: MTrie.h,v 1.2 2003/07/20 23:00:34 dan_karrels Exp $
+ * $Id: MTrie.h,v 1.3 2003/07/21 16:05:21 dan_karrels Exp $
  */
 
 #ifndef __MTRIE_H
@@ -69,6 +69,13 @@ protected:
 	list< value_type >	wildCardFind( const string& key ) const ;
 	string			getBase( const list< string >& ) const ;
 
+/*
+	void		recursiveFind( MTrie< value_type >*,
+				list< string >& base,
+				list< value_type >& returnMe,
+				string& searchPrefix,
+				list< string >& remainingTokens ) const ;
+*/
 	/// The number of elements stored in this MTrie
 	size_type		numElements ;
 
