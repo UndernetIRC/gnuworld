@@ -1,7 +1,7 @@
 /* sqlUser.h */
 
 #ifndef __SQLUSER_H
-#define __SQLUSER_H "$Id: sqlUser.h,v 1.13 2001/02/21 00:14:44 dan_karrels Exp $"
+#define __SQLUSER_H "$Id: sqlUser.h,v 1.14 2001/03/11 02:00:23 gte Exp $"
 
 #include	<string>
 #include	<ctime>
@@ -24,7 +24,7 @@ public:
 
 	typedef unsigned short int	flagType ;
 	static const flagType F_GLOBAL_SUSPEND =	0x01 ;
-	static const flagType F_LOGGEDIN =		0x02 ;
+	static const flagType F_LOGGEDIN =		0x02 ; // Depricated.
 	static const flagType F_INVIS =			0x04 ;
 
 	/*
@@ -42,18 +42,12 @@ public:
 
 	inline const time_t&		getLastSeen() const
 		{ return last_seen ; }
-
-	inline const string&		getEmail() const
-		{ return email ; }
-
+ 
 	inline const string&		getUrl() const
 		{ return url ; }
 
 	inline const unsigned int&	getLanguageId() const
-		{ return language_id ; }
-
-	inline const string&		getPublicKey() const
-		{ return public_key ; }
+		{ return language_id ; } 
 
 	inline bool		getFlag( const flagType& whichFlag ) const
 		{ return (whichFlag == (flags & whichFlag)) ; }
@@ -67,6 +61,12 @@ public:
 	inline const time_t&		getLastUpdated() const
 		{ return last_updated ; }
 
+	inline const time_t&		getLastUsed() const
+		{ return last_used ; } 
+
+	inline iClient* isAuthed()
+		{ return networkClient; }
+ 
 	/*
 	 *  Methods to set data atrributes.
 	 */
@@ -85,9 +85,9 @@ public:
 
 	inline void setLanguageId( const unsigned int& _language_id )
 		{ language_id = _language_id; }
-
-	inline iClient* isAuthed()
-		{ return networkClient; }
+ 
+	inline void setLastUsed( const time_t& _last_used )
+		{ last_used = _last_used; } 
 
 	/*
 	 * Method to perform a SQL 'UPDATE' and commit changes to this
@@ -107,14 +107,13 @@ protected:
 	unsigned int	id ;
 	string		user_name ;
 	string		password ;
-	time_t		last_seen ;
-	string		email ;
+	time_t		last_seen ; 
 	string		url ;
 	unsigned int	language_id ;
-	string		public_key ;
 	flagType	flags ;
 	string		last_updated_by ;
 	time_t		last_updated ;
+	time_t		last_used;
  
 	PgDatabase*	SQLDb;
 } ;

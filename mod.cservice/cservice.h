@@ -1,5 +1,5 @@
 #ifndef __CSERVICE_H
-#define __CSERVICE_H "$Id: cservice.h,v 1.56 2001/03/06 23:44:00 gte Exp $"
+#define __CSERVICE_H "$Id: cservice.h,v 1.57 2001/03/11 02:00:23 gte Exp $"
 
 #include	<string>
 #include	<vector>
@@ -229,6 +229,9 @@ public:
 	// Interval at which we check for expired bans/suspends.
 	int expireInterval;
 
+	// Interval at which we attempt to purge the cache(s).
+	int cacheInterval;
+
 	// Input flood rate.
 	unsigned int input_flood;
 	unsigned int output_flood;
@@ -246,7 +249,10 @@ public:
 
 	/* TimerID we recieve every XX seconds for expiration of bans/suspend. */
 	xServer::timerID expire_timerID; 
-
+ 
+	/* TimerID we recieve every XX hours for expiration of cached entries */
+	xServer::timerID cache_timerID; 
+ 
 	// Language translations table (Loaded from Db).
 	typedef map < pair <int, int>, string > translationTableType ;
 	translationTableType translationTable;
@@ -286,14 +292,55 @@ public:
 	typedef map < string, time_t > reopQType;
 	reopQType reopQ;
 
-	/* Two support members to check the db for expired bans */
+	/*
+	 *  Timer Functions.
+	 *  These support functions are called at periodic
+	 *  intervals to perform maintainence, etc. 
+	 */
+
+	/*
+	 * Expire suspends, ignores and bans respectively.
+	 */
 	void expireSuspends();
 	void expireSilence();
 	void expireBans(); 
+
+	/*
+	 *  Cache expiration functions.
+	 *  To expire idle user/level/ban records from the
+	 *  cache. 
+	 *  N.B: We'll never expire out channel records because
+	 *  this information may be used to cancel 'unused'
+	 *  channels.
+	 */
+
+	void cacheExpireUsers();
+	/*
+	 *  Expire Level and Ban records, only if the channel
+	 *  record is 'idle'.
+	 */
+
+	void cacheExpireChannelData(); 
+
+	/*
+	 * Process any pending reop requests by the bot.
+	 */
 	void performReops();
+
+	/*
+	 * Process any Postgres notification requests,
+	 * reloading cached records if neccessary.
+	 */
 	void processDBUpdates();
 
-	void dbErrorMessage(iClient*);
+	/*
+	 *  Send a generic Error Message, may log/etc at a later date.
+	 */
+	void dbErrorMessage(iClient*); 
+
+	/*
+	 *  Misc uncategorisable functions.
+	 */
 } ;
 
 const string escapeSQLChars(const string& theString);

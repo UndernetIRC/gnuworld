@@ -88,6 +88,9 @@ if (SQLDb->ExecCommandOk("LISTEN channels_u; LISTEN users_u; LISTEN levels_u;"))
 	theTime = time(NULL) + expireInterval;
 	expire_timerID = theServer->RegisterTimer(theTime, this, NULL);
 
+	// Start the cache expire timer rolling.
+	theTime = time(NULL) + cacheInterval;
+	cache_timerID = theServer->RegisterTimer(theTime, this, NULL); 
 	}
 else 
 	{
@@ -230,6 +233,7 @@ relayChan = cserviceConfig->Require( "relay_channel" )->second ;
 debugChan = cserviceConfig->Require( "debug_channel" )->second ; 
 updateInterval = atoi((cserviceConfig->Require( "update_interval" )->second).c_str());
 expireInterval = atoi((cserviceConfig->Require( "expire_interval" )->second).c_str());
+cacheInterval = atoi((cserviceConfig->Require( "cache_interval" )->second).c_str());
 input_flood = atoi((cserviceConfig->Require( "input_flood" )->second).c_str()); 
 output_flood = atoi((cserviceConfig->Require( "output_flood" )->second).c_str());
 flood_duration = atoi((cserviceConfig->Require( "flood_duration" )->second).c_str());
@@ -752,6 +756,7 @@ if(ptr != sqlUserCache.end())
 			<< endl;
 	#endif
 
+	ptr->second->setLastUsed(currentTime());
 	userCacheHits++;
 	return ptr->second ;
 	}
@@ -778,6 +783,7 @@ if (theUser->loadData(id))
 	userHits++;
 
 	// Return the new user to the caller
+	theUser->setLastUsed(currentTime());
 	return theUser;
 	}
 else
@@ -1482,6 +1488,68 @@ for (expireVectorType::const_iterator resultPtr = expireVector.begin();
 		} /* While looking at bans */
 
 	} /* Forall results in set */
+
+}
+
+/**
+ * This function iterates over the usercache, and removes
+ * accounts not accessed in a certain timeframe. 
+ * N.B: do *NOT* expire those with a networkClient set.
+ * (Ie: those currently logged in).
+ */
+void cservice::cacheExpireUsers()
+{ 
+	logDebugMessage("Beginning User cache cleanup:");
+	sqlUserHashType::iterator ptr = sqlUserCache.begin();
+	sqlUser* tmpUser;
+	clock_t startTime = ::clock();
+	clock_t endTime = 0;
+	int purgeCount = 0;
+	string removeKey;
+
+	while (ptr != sqlUserCache.end())
+	{
+		tmpUser = ptr->second;
+		/*
+	 	 *  If this user has been idle 300 seconds, and currently
+		 *  isn't logged in, boot him out the window.
+		 */
+		if ( ((tmpUser->getLastUsed() + 30) < currentTime()) &&
+			!tmpUser->isAuthed() )
+		{ 
+			elog << "cservice::cacheExpireUsers> "
+			<< tmpUser->getUserName() 
+			<< "; last used: " 
+			<< tmpUser->getLastUsed() 
+			<< endl;
+			purgeCount++;
+			removeKey = ptr->first;
+			/* Advance the iterator past the soon to be
+			 * removed element. */
+			++ptr; 
+			sqlUserCache.erase(removeKey);
+
+		}  
+			else
+		{ 
+			++ptr;
+		}
+	}
+	endTime = ::clock();
+	logDebugMessage("User cache cleanup complete; Removed %i user records in %ims.",
+		purgeCount, (endTime - startTime)); 
+}
+
+void cservice::cacheExpireChannelData()
+{
+	logDebugMessage("Beginning Channel cache cleanup:");
+	sqlChannelHashType::iterator ptr = sqlChannelCache.begin();
+	while (ptr != sqlChannelCache.end())
+	{
+//		elog << (ptr)->first << endl;
+		++ptr;
+	} 
+	logDebugMessage("Channel cache cleanup complete.");
 }
 
 /**
@@ -1803,7 +1871,18 @@ if (timer_id == expire_timerID)
 	expire_timerID = MyUplink->RegisterTimer(theTime, this, NULL);
 
 	} 
- 
+
+if (timer_id == cache_timerID)
+	{ 
+	cacheExpireUsers(); 
+	cacheExpireChannelData(); 
+
+	/* Refresh Timers */
+	time_t theTime = time(NULL) + cacheInterval;
+	cache_timerID = MyUplink->RegisterTimer(theTime, this, NULL);
+
+	} 
+
 return 0 ;
 }
  
@@ -2616,8 +2695,7 @@ delete[] s3.str();
 
 return 0;
 }
-
-
+ 
 /*--doAutoTopic---------------------------------------------------------------
  *
  * This support function sets the autotopic in a particular channel. 

@@ -4,7 +4,7 @@
  * Storage class for accessing user information either from the backend
  * or internal storage.
  * 
- * $Id: sqlUser.cc,v 1.14 2001/03/06 02:34:33 dan_karrels Exp $
+ * $Id: sqlUser.cc,v 1.15 2001/03/11 02:00:23 gte Exp $
  */
  
 #include	<strstream>
@@ -29,12 +29,11 @@ sqlUser::sqlUser(PgDatabase* _SQLDb)
    id( 0 ),
    user_name(),
    password(),
-   last_seen( 0 ),
-   email(),
+   last_seen( 0 ), 
    url(),
-   language_id( 0 ),
-   public_key(),
+   language_id( 0 ), 
    flags( 0 ), 
+   last_used( 0 ),
    SQLDb( _SQLDb )
 {
 }
@@ -153,14 +152,12 @@ void sqlUser::setAllMembers(int row)
 id = atoi(SQLDb->GetValue(row, 0));
 user_name = SQLDb->GetValue(row, 1);
 password = SQLDb->GetValue(row, 2); 
-email = SQLDb->GetValue(row, 3);
-url = SQLDb->GetValue(row, 4);
-language_id = atoi(SQLDb->GetValue(row, 5));
-public_key = SQLDb->GetValue(row, 6); 
-flags = atoi(SQLDb->GetValue(row, 7));
-last_updated_by = SQLDb->GetValue(row, 8); 
-last_updated = atoi(SQLDb->GetValue(row, 9));
-last_seen = atoi(SQLDb->GetValue(row, 10));
+url = SQLDb->GetValue(row, 3);
+language_id = atoi(SQLDb->GetValue(row, 4)); 
+flags = atoi(SQLDb->GetValue(row, 5));
+last_updated_by = SQLDb->GetValue(row, 6); 
+last_updated = atoi(SQLDb->GetValue(row, 7));
+last_seen = atoi(SQLDb->GetValue(row, 8));
 
 /* Fetch the "Last Seen" time from the users_lastseen table. */
 
