@@ -2,7 +2,7 @@
  */
 
 #ifndef __ICLIENT_H
-#define __ICLIENT_H "$Id: iClient.h,v 1.3 2000/07/31 15:17:25 dan_karrels Exp $"
+#define __ICLIENT_H "$Id: iClient.h,v 1.4 2000/08/05 00:12:58 dan_karrels Exp $"
 
 #include	<string>
 #include	<list>
@@ -121,7 +121,7 @@ public:
 	 * TODO: Make sure that a word is 32 bits, adjusting where
 	 * necessary for > 32bit architectures.
 	 */
-	inline const long int& getIP() const
+	inline const unsigned int& getIP() const
 		{ return IP ; }
 
 	/**
@@ -315,7 +315,7 @@ protected:
 	 * This client's 32 bit IP, stored in
 	 *  network (bigendian) byte order.
 	 */
-	long int	IP ;
+	unsigned int	IP ;
 
 	/**
 	 * This client's hostname as it appears to network users.
