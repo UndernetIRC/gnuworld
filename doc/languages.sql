@@ -17,4 +17,5 @@ COPY "languages" FROM stdin;
 12	TR	Turkish	31337
 13	NO	Norsk	31337
 14	AR	Arabic	31337
+15	HA	Haloween	31337
 \.
