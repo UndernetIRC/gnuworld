@@ -14,7 +14,7 @@
 
 @SET_MAKE@
 
-# "$Id: Makefile.in,v 1.129 2002/08/07 20:55:22 dan_karrels Exp $"
+# "$Id: Makefile.in,v 1.130 2002/08/08 18:32:33 dan_karrels Exp $"
 SHELL = @SHELL@
 
 srcdir = @srcdir@
@@ -95,6 +95,7 @@ am__include = @am__include@
 am__quote = @am__quote@
 glibdir = @glibdir@
 install_sh = @install_sh@
+threadLib = @threadLib@
 
 lib_LTLIBRARIES = libccontrol.la
 libccontrol_la_SOURCES = ccontrol.cc \
@@ -158,7 +159,9 @@ libccontrol_la_SOURCES = ccontrol.cc \
 	WHOISCommand.cc
 
 
-libccontrol_la_LDFLAGS = -module -export-dynamic -L@PGSQL_LIB@ -lpq++ 
+libccontrol_la_LDFLAGS = -module -export-dynamic -L@PGSQL_LIB@ -lpq++ \
+	$(threadLib)
+
 INCLUDES = -I@PGSQL_INCLUDE@ $(INCLTDL)
 CFLAGS = @CFLAGS@ -D_THREAD_SAFE
 subdir = mod.ccontrol

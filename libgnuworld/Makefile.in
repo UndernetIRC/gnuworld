@@ -93,6 +93,7 @@ am__include = @am__include@
 am__quote = @am__quote@
 glibdir = @glibdir@
 install_sh = @install_sh@
+threadLib = @threadLib@
 
 noinst_LTLIBRARIES = libgnuworld.la
 libgnuworld_la_SOURCES = Buffer.cc \

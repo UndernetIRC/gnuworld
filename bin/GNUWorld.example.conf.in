@@ -22,7 +22,7 @@ command_map = server_command_map
 # libdir is the full path to the directory containing
 # the command handlers, typically bin (since the command handlers
 # at present do not get installed)
-libdir = /home/gnuworld/gnuworld/bin
+libdir = @libdir@
 
 # To use a certain module, uncomment it below.
 #module = libcservice.la cservice.conf

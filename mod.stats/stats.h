@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: stats.h,v 1.3 2002/07/31 03:14:05 dan_karrels Exp $
+ * $Id: stats.h,v 1.4 2002/08/08 18:32:34 dan_karrels Exp $
  */
 
 #ifndef __STATS_H
-#define __STATS_H "$Id: stats.h,v 1.3 2002/07/31 03:14:05 dan_karrels Exp $"
+#define __STATS_H "$Id: stats.h,v 1.4 2002/08/08 18:32:34 dan_karrels Exp $"
 
 #include	<fstream>
 #include	<string>
@@ -44,13 +44,14 @@ class stats : public xClient
 {
 
 protected:
-	typedef map< string, ofstream*, noCaseCompare > mapType ;
+	typedef map< string, ofstream*, noCaseCompare > fileTableType ;
 
 public:
 	stats( const string& ) ;
 	virtual ~stats() ;
 
-	typedef mapType::const_iterator const_iterator ;
+	typedef fileTableType::iterator fileIterator ;
+	typedef fileTableType::const_iterator constFileIterator ;
 
 	virtual void ImplementServer( xServer* ) ;
 	virtual int OnPrivateMessage( iClient*, const string&,
@@ -63,12 +64,13 @@ public:
                 void* Data3 = NULL, void* Data4 = NULL ) ;
 
 protected:
-	void		WriteLog( const string& file,
-				const string& line = string() ) ;
+	void			WriteLog( const string& file,
+					const string& line = string() ) ;
 
-	string		data_path ;
-	mapType		fileTable ;
+	string			data_path ;
+	fileTableType		fileTable ;
 
+	bool			logDuringBurst ;
 
 } ;
 

@@ -1,10 +1,10 @@
-dnl $Id: configure.in,v 1.58 2002/08/07 20:28:04 dan_karrels Exp $
+dnl $Id: configure.in,v 1.59 2002/08/08 18:32:32 dan_karrels Exp $
 dnl ----------------------------------------------------------
 
 echo Configuring GNUWorld...
 echo
 
-AC_REVISION($Revision: 1.58 $)
+AC_REVISION($Revision: 1.59 $)
 AC_INIT
 AC_CONFIG_SRCDIR([src/main.cc])
 AM_INIT_AUTOMAKE(gnuworld,0.0)
@@ -32,6 +32,8 @@ CFLAGS="$CFLAGS -Wall -pipe"
 CXXFLAGS="$CXXFLAGS -Wall -pipe"
 
 prefix="`pwd`"
+libdir="`pwd`/lib"
+bindir="`pwd`/bin"
 glibdir="`pwd`/libgnuworld"
 
 AC_PROG_CC
@@ -62,9 +64,10 @@ fi
 
 if [test "$threadLib" = no]; then
 	AC_MSG_RESULT([Unable to locate pthread_create in any library])
-else
-	LIBS="$LIBS $threadLib"
 fi
+dnl else
+dnl 	LIBS="$LIBS $threadLib"
+dnl fi
 
 dnl ----------------------------------------------------------
 dnl ----------------------------------------------------------
@@ -77,10 +80,9 @@ dnl ----------------------------------------------------------
 AC_CHECK_LIB(socket,socket)
 AC_CHECK_LIB(nsl,gethostbyname)
 dnl AC_CHECK_LIB(pthread,pthread_create)
-dnl AC_CHECK_LIB(posix4,sem_init)
-AC_SEARCH_LIBS(pthread_create,lthread pthread c c_r)
-AC_SEARCH_LIBS(pthread_kill,lthread pthread c c_r)
-AC_CHECK_FUNCS(pthread_create)
+dnl AC_SEARCH_LIBS(pthread_create,lthread pthread c c_r)
+dnl AC_SEARCH_LIBS(pthread_kill,lthread pthread c c_r)
+dnl AC_CHECK_FUNCS(pthread_create)
 
 dnl ----------------------------------------------------------
 dnl
@@ -258,6 +260,7 @@ AC_SUBST(LIBTOOL_DEPS)
 AC_SUBST(PGSQL_INCLUDE)
 AC_SUBST(PGSQL_LIB)
 AC_SUBST(bindir)
+AC_SUBST(threadLib)
 
 AC_CONFIG_FILES([Makefile \
 db/Makefile \
@@ -269,7 +272,15 @@ mod.cloner/Makefile \
 mod.cservice/Makefile \
 mod.gnutest/Makefile \
 mod.scanner/Makefile \
-mod.stats/Makefile])
+mod.stats/Makefile \
+bin/ccontrol.example.conf \
+bin/clientExample.example.conf \
+bin/cloner.example.conf \
+bin/cservice.example.conf \
+bin/gnutest.example.conf \
+bin/GNUWorld.example.conf \
+bin/scanner.example.conf \
+bin/stats.example.conf])
 
 AC_OUTPUT
 

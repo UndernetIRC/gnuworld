@@ -93,12 +93,17 @@ am__include = @am__include@
 am__quote = @am__quote@
 glibdir = @glibdir@
 install_sh = @install_sh@
+threadLib = @threadLib@
 SUBDIRS = libgnuworld libltdl db src @MOD_DIRS@
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = $(top_builddir)/include/defs.h
-CONFIG_CLEAN_FILES =
+CONFIG_CLEAN_FILES = bin/ccontrol.example.conf \
+	bin/clientExample.example.conf bin/cloner.example.conf \
+	bin/cservice.example.conf bin/gnutest.example.conf \
+	bin/GNUWorld.example.conf bin/scanner.example.conf \
+	bin/stats.example.conf
 DIST_SOURCES =
 
 RECURSIVE_TARGETS = info-recursive dvi-recursive install-info-recursive \
@@ -146,6 +151,22 @@ $(srcdir)/./include/defs.h.in:  $(top_srcdir)/configure.in $(ACLOCAL_M4)
 
 distclean-hdr:
 	-rm -f include/defs.h include/stamp-h1
+bin/ccontrol.example.conf: $(top_builddir)/config.status $(top_srcdir)/bin/ccontrol.example.conf.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+bin/clientExample.example.conf: $(top_builddir)/config.status $(top_srcdir)/bin/clientExample.example.conf.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+bin/cloner.example.conf: $(top_builddir)/config.status $(top_srcdir)/bin/cloner.example.conf.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+bin/cservice.example.conf: $(top_builddir)/config.status $(top_srcdir)/bin/cservice.example.conf.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+bin/gnutest.example.conf: $(top_builddir)/config.status $(top_srcdir)/bin/gnutest.example.conf.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+bin/GNUWorld.example.conf: $(top_builddir)/config.status $(top_srcdir)/bin/GNUWorld.example.conf.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+bin/scanner.example.conf: $(top_builddir)/config.status $(top_srcdir)/bin/scanner.example.conf.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+bin/stats.example.conf: $(top_builddir)/config.status $(top_srcdir)/bin/stats.example.conf.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
 
 mostlyclean-libtool:
 	-rm -f *.lo
@@ -268,7 +289,7 @@ distcleancheck_listfiles = find . -type f -print
 distdir: $(DISTFILES)
 	$(am__remove_distdir)
 	mkdir $(distdir)
-	$(mkinstalldirs) $(distdir)/././include $(distdir)/./include
+	$(mkinstalldirs) $(distdir)/././include $(distdir)/./include $(distdir)/bin
 	@list='$(DISTFILES)'; for file in $$list; do \
 	  if test -f $$file || test -d $$file; then d=.; else d=$(srcdir); fi; \
 	  dir=`echo "$$file" | sed -e 's,/[^/]*$$,,'`; \

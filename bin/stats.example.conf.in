@@ -6,5 +6,9 @@ userdescription = UnderNet Statistical Services
 
 mode = +iodk
 
+# Set this value to "true" to enable stats logging during burst (it chews
+# the hard drive/CPU)
+logDuringBurst = false
+
 # Path to where you want output files to be placed
-data_path = /home/gnuworld/gnuworld/bin
+data_path = @bindir@

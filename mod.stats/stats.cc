@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: stats.cc,v 1.6 2002/07/31 03:14:05 dan_karrels Exp $
+ * $Id: stats.cc,v 1.7 2002/08/08 18:32:34 dan_karrels Exp $
  */
 
 #include	<string>
@@ -36,6 +36,7 @@
 namespace gnuworld
 {
 
+using std::cerr ;
 using std::string ;
 using std::stringstream ;
 using std::ends ;
@@ -61,15 +62,42 @@ stats::stats( const string& fileName )
 EConfig conf( fileName ) ;
 
 data_path = conf.Require( "data_path" )->second ;
+if( data_path.empty() )
+	{
+	cerr	<< "stats> Invalid data_path"
+		<< endl ;
+	::exit( -1 ) ;
+	}
+
+// Make sure that the last char is a '/'
+if( '/' != data_path[ data_path.size() - 1 ] )
+	{
+	data_path += "/" ;
+	}
+
+string ldb = conf.Require( "logDuringBurst" )->second ;
+if( ldb == "true" )
+	{
+	logDuringBurst = true ;
+	}
+else
+	{
+	logDuringBurst = false ;
+	}
+
+elog	<< "stats> data_path: "
+	<< data_path
+	<< endl ;
 }
 
 stats::~stats()
 {
-for( mapType::iterator streamItr = fileTable.begin() ;
-	streamItr!= fileTable.end() ; ++streamItr )
+for( fileIterator fileItr = fileTable.begin() ;
+	fileItr!= fileTable.end() ; ++fileItr )
 	{
-	(streamItr->second)->close() ;
-	delete streamItr->second ;
+	(fileItr->second)->flush() ;
+	(fileItr->second)->close() ;
+	delete fileItr->second ;
 	}
 fileTable.clear() ;
 }
@@ -79,10 +107,20 @@ void stats::ImplementServer( xServer* theServer )
 xClient::ImplementServer( theServer ) ;
 
 // Register for all events
-for( eventType i = 0 ; i != EVT_NOOP ; ++i )
+for( eventType whichEvent = 0 ; whichEvent != EVT_NOOP ; ++whichEvent )
 	{
-	theServer->RegisterEvent( i, this ) ;
-	}
+	switch( whichEvent )
+		{
+		case EVT_RAW:
+		case EVT_BURST_CMPLT:
+		case EVT_BURST_ACK:
+			break ;
+		default:
+			theServer->RegisterEvent( whichEvent, this ) ;
+			break ;
+		} // switch()
+	} // for()
+
 theServer->RegisterChannelEvent( "*", this ) ;
 }
 
@@ -97,32 +135,47 @@ if( !theClient->isOper() )
 return 0 ;
 }
 
-void stats::WriteLog( const string& writeMe, const string& line )
+void stats::WriteLog( const string& fileName, const string& line )
 {
-mapType::iterator streamItr = fileTable.find( writeMe ) ;
-if( streamItr == fileTable.end() )
+//elog	<< "stats::WriteLog> fileName: "
+//	<< fileName
+//	<< ", line: "
+//	<< line
+//	<< endl ;
+
+// Should we log during a net burst
+if( !logDuringBurst && theServer->isBursting() )
+	{
+	// Don't log
+	return ;
+	}
+
+fileIterator fileItr = fileTable.find( fileName ) ;
+if( fileItr == fileTable.end() )
 	{
 	// File not yet opened
-	string fileName = data_path + writeMe ;
-
-	ofstream* outFile = new ofstream( fileName.c_str() ) ;
+	ofstream* outFile = new ofstream( (data_path + fileName).c_str() ) ;
 	if( !(*outFile) )
 		{
 		elog	<< "stats::WriteLog> Unable to open file: "
-			<< fileName
+			<< (data_path + fileName)
 			<< endl ;
 		return ;
 		}
 
-	streamItr = fileTable.insert(
-		mapType::value_type( writeMe, outFile ) ).first ;
+	elog	<< "stats::writeLog> Opened log file: "
+		<< (data_path + fileName)
+		<< endl ;
+
+	fileItr = fileTable.insert(
+		fileTableType::value_type( fileName, outFile ) ).first ;
 	}
 
 // Get the current time
 time_t now = ::time(0) ;
 struct tm* nowTM = gmtime( &now ) ;
 
-ofstream* outFile = streamItr->second ;
+ofstream* outFile = fileItr->second ;
 
 *outFile	<< nowTM->tm_hour << ":"
 		<< nowTM->tm_min << ":"
@@ -133,16 +186,44 @@ ofstream* outFile = streamItr->second ;
 
 int stats::OnChannelEvent( const channelEventType& whichEvent,
 	Channel* theChan,
-	void*, void*, void*, void* )
+	void* arg1,
+	void* arg2,
+	void* arg3,
+	void* arg4 )
 {
+switch( whichEvent )
+	{
+	case EVT_JOIN:
+		WriteLog( "EVT_JOIN" ) ;
+		break ;
+	case EVT_PART:
+		WriteLog( "EVT_PART" ) ;
+		break ;
+	case EVT_TOPIC:
+		WriteLog( "EVT_TOPIC" ) ;
+		break ;
+	case EVT_KICK:
+		WriteLog( "EVT_KICK" ) ;
+		break ;
+	case EVT_CREATE:
+		WriteLog( "EVT_CREATE" ) ;
+		break ;
+	}
 
-
-return 0 ;
+return xClient::OnChannelEvent( whichEvent, theChan, arg1, arg2, arg3, arg4 ) ;
 }
 
 int stats::OnEvent( const eventType& whichEvent,
-	void* data1, void* data2, void* data3, void* data4 )
+	void* arg1,
+	void* arg2,
+	void* arg3,
+	void* arg4 )
 {
+// NEVER uncomment this line on a large network heh
+//elog	<< "stats::OnEvent> Event number: "
+//	<< whichEvent
+//	<< endl ;
+
 WriteLog( "Total_Events" ) ;
 
 switch( whichEvent )
@@ -171,12 +252,6 @@ switch( whichEvent )
 	case EVT_NICK:
 		WriteLog( "EVT_NICK" ) ;
 		break ;
-	case EVT_RAW:
-		{
-		string* theLine = reinterpret_cast< string* >( data1 ) ;
-		WriteLog( "EVT_RAW", *theLine ) ;
-		}
-		break ;
 	case EVT_CHNICK:
 		WriteLog( "EVT_CHNICK" ) ;
 		break ;
@@ -187,7 +262,7 @@ switch( whichEvent )
 		break ;
 	} // switch()
 
-return 0 ;
+return xClient::OnEvent( whichEvent, arg1, arg2, arg3, arg4 ) ;
 }
 
 } // namespace gnuworld

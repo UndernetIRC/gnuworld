@@ -1,9 +1,9 @@
 ## Process this file with automake to produce Makefile.in
-# "$Id: Makefile.am,v 1.43 2002/04/01 22:02:22 gte Exp $"
+# "$Id: Makefile.am,v 1.44 2002/08/08 18:32:33 dan_karrels Exp $"
 
 lib_LTLIBRARIES = libcservice.la
 libcservice_la_LDFLAGS = -module -export-dynamic -L@PGSQL_LIB@ \
-	-lpq++
+	-lpq++ $(threadLib)
 
 libcservice_la_SOURCES = cservice.cc \
 	networkData.cc \

@@ -7422,6 +7422,8 @@ CFLAGS="$CFLAGS -Wall -pipe"
 CXXFLAGS="$CXXFLAGS -Wall -pipe"
 
 prefix="`pwd`"
+libdir="`pwd`/lib"
+bindir="`pwd`/bin"
 glibdir="`pwd`/libgnuworld"
 
 ac_ext=c
@@ -8893,8 +8895,6 @@ fi
 if test "$threadLib" = no; then
 	echo "$as_me:$LINENO: result: Unable to locate pthread_create in any library" >&5
 echo "${ECHO_T}Unable to locate pthread_create in any library" >&6
-else
-	LIBS="$LIBS $threadLib"
 fi
 
 
@@ -9027,298 +9027,6 @@ _ACEOF
   LIBS="-lnsl $LIBS"
 
 fi
-
-echo "$as_me:$LINENO: checking for library containing pthread_create" >&5
-echo $ECHO_N "checking for library containing pthread_create... $ECHO_C" >&6
-if test "${ac_cv_search_pthread_create+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  ac_func_search_save_LIBS=$LIBS
-ac_cv_search_pthread_create=no
-cat >conftest.$ac_ext <<_ACEOF
-#line $LINENO "configure"
-#include "confdefs.h"
-
-/* Override any gcc2 internal prototype to avoid an error.  */
-#ifdef __cplusplus
-extern "C"
-#endif
-/* We use char because int might match the return type of a gcc2
-   builtin and then its argument prototype would still apply.  */
-char pthread_create ();
-#ifdef F77_DUMMY_MAIN
-#  ifdef __cplusplus
-     extern "C"
-#  endif
-   int F77_DUMMY_MAIN() { return 1; }
-#endif
-int
-main ()
-{
-pthread_create ();
-  ;
-  return 0;
-}
-_ACEOF
-rm -f conftest.$ac_objext conftest$ac_exeext
-if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
-  (eval $ac_link) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } &&
-         { ac_try='test -s conftest$ac_exeext'
-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
-  (eval $ac_try) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; }; then
-  ac_cv_search_pthread_create="none required"
-else
-  echo "$as_me: failed program was:" >&5
-cat conftest.$ac_ext >&5
-fi
-rm -f conftest.$ac_objext conftest$ac_exeext conftest.$ac_ext
-if test "$ac_cv_search_pthread_create" = no; then
-  for ac_lib in lthread pthread c c_r; do
-    LIBS="-l$ac_lib  $ac_func_search_save_LIBS"
-    cat >conftest.$ac_ext <<_ACEOF
-#line $LINENO "configure"
-#include "confdefs.h"
-
-/* Override any gcc2 internal prototype to avoid an error.  */
-#ifdef __cplusplus
-extern "C"
-#endif
-/* We use char because int might match the return type of a gcc2
-   builtin and then its argument prototype would still apply.  */
-char pthread_create ();
-#ifdef F77_DUMMY_MAIN
-#  ifdef __cplusplus
-     extern "C"
-#  endif
-   int F77_DUMMY_MAIN() { return 1; }
-#endif
-int
-main ()
-{
-pthread_create ();
-  ;
-  return 0;
-}
-_ACEOF
-rm -f conftest.$ac_objext conftest$ac_exeext
-if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
-  (eval $ac_link) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } &&
-         { ac_try='test -s conftest$ac_exeext'
-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
-  (eval $ac_try) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; }; then
-  ac_cv_search_pthread_create="-l$ac_lib"
-break
-else
-  echo "$as_me: failed program was:" >&5
-cat conftest.$ac_ext >&5
-fi
-rm -f conftest.$ac_objext conftest$ac_exeext conftest.$ac_ext
-  done
-fi
-LIBS=$ac_func_search_save_LIBS
-fi
-echo "$as_me:$LINENO: result: $ac_cv_search_pthread_create" >&5
-echo "${ECHO_T}$ac_cv_search_pthread_create" >&6
-if test "$ac_cv_search_pthread_create" != no; then
-  test "$ac_cv_search_pthread_create" = "none required" || LIBS="$ac_cv_search_pthread_create $LIBS"
-
-fi
-
-echo "$as_me:$LINENO: checking for library containing pthread_kill" >&5
-echo $ECHO_N "checking for library containing pthread_kill... $ECHO_C" >&6
-if test "${ac_cv_search_pthread_kill+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  ac_func_search_save_LIBS=$LIBS
-ac_cv_search_pthread_kill=no
-cat >conftest.$ac_ext <<_ACEOF
-#line $LINENO "configure"
-#include "confdefs.h"
-
-/* Override any gcc2 internal prototype to avoid an error.  */
-#ifdef __cplusplus
-extern "C"
-#endif
-/* We use char because int might match the return type of a gcc2
-   builtin and then its argument prototype would still apply.  */
-char pthread_kill ();
-#ifdef F77_DUMMY_MAIN
-#  ifdef __cplusplus
-     extern "C"
-#  endif
-   int F77_DUMMY_MAIN() { return 1; }
-#endif
-int
-main ()
-{
-pthread_kill ();
-  ;
-  return 0;
-}
-_ACEOF
-rm -f conftest.$ac_objext conftest$ac_exeext
-if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
-  (eval $ac_link) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } &&
-         { ac_try='test -s conftest$ac_exeext'
-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
-  (eval $ac_try) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; }; then
-  ac_cv_search_pthread_kill="none required"
-else
-  echo "$as_me: failed program was:" >&5
-cat conftest.$ac_ext >&5
-fi
-rm -f conftest.$ac_objext conftest$ac_exeext conftest.$ac_ext
-if test "$ac_cv_search_pthread_kill" = no; then
-  for ac_lib in lthread pthread c c_r; do
-    LIBS="-l$ac_lib  $ac_func_search_save_LIBS"
-    cat >conftest.$ac_ext <<_ACEOF
-#line $LINENO "configure"
-#include "confdefs.h"
-
-/* Override any gcc2 internal prototype to avoid an error.  */
-#ifdef __cplusplus
-extern "C"
-#endif
-/* We use char because int might match the return type of a gcc2
-   builtin and then its argument prototype would still apply.  */
-char pthread_kill ();
-#ifdef F77_DUMMY_MAIN
-#  ifdef __cplusplus
-     extern "C"
-#  endif
-   int F77_DUMMY_MAIN() { return 1; }
-#endif
-int
-main ()
-{
-pthread_kill ();
-  ;
-  return 0;
-}
-_ACEOF
-rm -f conftest.$ac_objext conftest$ac_exeext
-if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
-  (eval $ac_link) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } &&
-         { ac_try='test -s conftest$ac_exeext'
-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
-  (eval $ac_try) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; }; then
-  ac_cv_search_pthread_kill="-l$ac_lib"
-break
-else
-  echo "$as_me: failed program was:" >&5
-cat conftest.$ac_ext >&5
-fi
-rm -f conftest.$ac_objext conftest$ac_exeext conftest.$ac_ext
-  done
-fi
-LIBS=$ac_func_search_save_LIBS
-fi
-echo "$as_me:$LINENO: result: $ac_cv_search_pthread_kill" >&5
-echo "${ECHO_T}$ac_cv_search_pthread_kill" >&6
-if test "$ac_cv_search_pthread_kill" != no; then
-  test "$ac_cv_search_pthread_kill" = "none required" || LIBS="$ac_cv_search_pthread_kill $LIBS"
-
-fi
-
-
-for ac_func in pthread_create
-do
-as_ac_var=`echo "ac_cv_func_$ac_func" | $as_tr_sh`
-echo "$as_me:$LINENO: checking for $ac_func" >&5
-echo $ECHO_N "checking for $ac_func... $ECHO_C" >&6
-if eval "test \"\${$as_ac_var+set}\" = set"; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  cat >conftest.$ac_ext <<_ACEOF
-#line $LINENO "configure"
-#include "confdefs.h"
-/* System header to define __stub macros and hopefully few prototypes,
-    which can conflict with char $ac_func (); below.  */
-#include <assert.h>
-/* Override any gcc2 internal prototype to avoid an error.  */
-#ifdef __cplusplus
-extern "C"
-#endif
-/* We use char because int might match the return type of a gcc2
-   builtin and then its argument prototype would still apply.  */
-char $ac_func ();
-char (*f) ();
-
-#ifdef F77_DUMMY_MAIN
-#  ifdef __cplusplus
-     extern "C"
-#  endif
-   int F77_DUMMY_MAIN() { return 1; }
-#endif
-int
-main ()
-{
-/* The GNU C library defines this for functions which it implements
-    to always fail with ENOSYS.  Some functions are actually named
-    something starting with __ and the normal name is an alias.  */
-#if defined (__stub_$ac_func) || defined (__stub___$ac_func)
-choke me
-#else
-f = $ac_func;
-#endif
-
-  ;
-  return 0;
-}
-_ACEOF
-rm -f conftest.$ac_objext conftest$ac_exeext
-if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
-  (eval $ac_link) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } &&
-         { ac_try='test -s conftest$ac_exeext'
-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
-  (eval $ac_try) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; }; then
-  eval "$as_ac_var=yes"
-else
-  echo "$as_me: failed program was:" >&5
-cat conftest.$ac_ext >&5
-eval "$as_ac_var=no"
-fi
-rm -f conftest.$ac_objext conftest$ac_exeext conftest.$ac_ext
-fi
-echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_var'}'`" >&5
-echo "${ECHO_T}`eval echo '${'$as_ac_var'}'`" >&6
-if test `eval echo '${'$as_ac_var'}'` = yes; then
-  cat >>confdefs.h <<_ACEOF
-#define `echo "HAVE_$ac_func" | $as_tr_cpp` 1
-_ACEOF
-
-fi
-done
 
 
 
@@ -10595,7 +10303,8 @@ fi
 
 
 
-ac_config_files="$ac_config_files Makefile db/Makefile libgnuworld/Makefile src/Makefile mod.ccontrol/Makefile mod.clientExample/Makefile mod.cloner/Makefile mod.cservice/Makefile mod.gnutest/Makefile mod.scanner/Makefile mod.stats/Makefile"
+
+ac_config_files="$ac_config_files Makefile db/Makefile libgnuworld/Makefile src/Makefile mod.ccontrol/Makefile mod.clientExample/Makefile mod.cloner/Makefile mod.cservice/Makefile mod.gnutest/Makefile mod.scanner/Makefile mod.stats/Makefile bin/ccontrol.example.conf bin/clientExample.example.conf bin/cloner.example.conf bin/cservice.example.conf bin/gnutest.example.conf bin/GNUWorld.example.conf bin/scanner.example.conf bin/stats.example.conf"
 
 
 cat >confcache <<\_ACEOF
@@ -11097,6 +10806,14 @@ do
   "mod.gnutest/Makefile" ) CONFIG_FILES="$CONFIG_FILES mod.gnutest/Makefile" ;;
   "mod.scanner/Makefile" ) CONFIG_FILES="$CONFIG_FILES mod.scanner/Makefile" ;;
   "mod.stats/Makefile" ) CONFIG_FILES="$CONFIG_FILES mod.stats/Makefile" ;;
+  "bin/ccontrol.example.conf" ) CONFIG_FILES="$CONFIG_FILES bin/ccontrol.example.conf" ;;
+  "bin/clientExample.example.conf" ) CONFIG_FILES="$CONFIG_FILES bin/clientExample.example.conf" ;;
+  "bin/cloner.example.conf" ) CONFIG_FILES="$CONFIG_FILES bin/cloner.example.conf" ;;
+  "bin/cservice.example.conf" ) CONFIG_FILES="$CONFIG_FILES bin/cservice.example.conf" ;;
+  "bin/gnutest.example.conf" ) CONFIG_FILES="$CONFIG_FILES bin/gnutest.example.conf" ;;
+  "bin/GNUWorld.example.conf" ) CONFIG_FILES="$CONFIG_FILES bin/GNUWorld.example.conf" ;;
+  "bin/scanner.example.conf" ) CONFIG_FILES="$CONFIG_FILES bin/scanner.example.conf" ;;
+  "bin/stats.example.conf" ) CONFIG_FILES="$CONFIG_FILES bin/stats.example.conf" ;;
   "depfiles" ) CONFIG_COMMANDS="$CONFIG_COMMANDS depfiles" ;;
   "include/defs.h" ) CONFIG_HEADERS="$CONFIG_HEADERS include/defs.h" ;;
   *) { { echo "$as_me:$LINENO: error: invalid argument: $ac_config_target" >&5
@@ -11239,6 +10956,7 @@ s,@glibdir@,$glibdir,;t t
 s,@LIBTOOL_DEPS@,$LIBTOOL_DEPS,;t t
 s,@PGSQL_INCLUDE@,$PGSQL_INCLUDE,;t t
 s,@PGSQL_LIB@,$PGSQL_LIB,;t t
+s,@threadLib@,$threadLib,;t t
 CEOF
 
 _ACEOF

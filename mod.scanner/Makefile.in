@@ -14,7 +14,7 @@
 
 @SET_MAKE@
 
-# "$Id: Makefile.in,v 1.2 2002/08/07 20:55:22 dan_karrels Exp $"
+# "$Id: Makefile.in,v 1.3 2002/08/08 18:32:34 dan_karrels Exp $"
 SHELL = @SHELL@
 
 srcdir = @srcdir@
@@ -95,10 +95,11 @@ am__include = @am__include@
 am__quote = @am__quote@
 glibdir = @glibdir@
 install_sh = @install_sh@
+threadLib = @threadLib@
 
 lib_LTLIBRARIES = libscanner.la
 libscanner_la_SOURCES = scanner.cc
-libscanner_la_LDFLAGS = -module -export-dynamic
+libscanner_la_LDFLAGS = -module -export-dynamic $(threadLib)
 
 INCLUDES = $(INCLTDL)
 subdir = mod.scanner

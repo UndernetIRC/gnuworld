@@ -93,6 +93,7 @@ am__include = @am__include@
 am__quote = @am__quote@
 glibdir = @glibdir@
 install_sh = @install_sh@
+threadLib = @threadLib@
 
 lib_LTLIBRARIES = libgnuworld_db.la
 libgnuworld_db_la_SOURCES = gnuworldDB.cc pgsqlDB.cc

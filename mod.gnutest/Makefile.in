@@ -14,7 +14,7 @@
 
 @SET_MAKE@
 
-# "$Id: Makefile.in,v 1.99 2002/08/07 20:55:22 dan_karrels Exp $"
+# "$Id: Makefile.in,v 1.100 2002/08/08 18:32:33 dan_karrels Exp $"
 SHELL = @SHELL@
 
 srcdir = @srcdir@
@@ -95,6 +95,7 @@ am__include = @am__include@
 am__quote = @am__quote@
 glibdir = @glibdir@
 install_sh = @install_sh@
+threadLib = @threadLib@
 
 lib_LTLIBRARIES = libgnutest.la
 libgnutest_la_SOURCES = gnutest.cc
