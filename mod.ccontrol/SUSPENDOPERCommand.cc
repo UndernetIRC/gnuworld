@@ -12,7 +12,7 @@
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 
-const char SUSPENDOPERCommand_cc_rcsId[] = "$Id: SUSPENDOPERCommand.cc,v 1.5 2001/02/26 16:58:06 mrbean_ Exp $";
+const char SUSPENDOPERCommand_cc_rcsId[] = "$Id: SUSPENDOPERCommand.cc,v 1.6 2001/05/14 21:26:37 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -30,7 +30,9 @@ if( st.size() < 4 )
 	return true;
 	}
 //Fetch the oper record from the database	
-ccUser *tmpUser = bot->GetUser(st[1]);
+//ccUser *tmpUser = bot->GetUser(st[1]);
+ccUser* tmpUser = bot->GetOper(st[1]);
+
 if(!tmpUser)
 	{
 	bot->Notice(theClient,"%s isnt on my access list",st[1].c_str());

@@ -1,7 +1,7 @@
 /* ccGline.h */
 
 #ifndef __CCGLINE_H
-#define __CCGLINE_H "$Id: ccGline.h,v 1.3 2001/03/29 21:54:32 dan_karrels Exp $"
+#define __CCGLINE_H "$Id: ccGline.h,v 1.4 2001/05/14 21:26:37 mrbean_ Exp $"
 
 #include	<string>
 
@@ -68,6 +68,8 @@ public:
 	
 	bool loadData( int );
 
+	bool loadData( string & );
+	
 protected:
 	string Id;
 	string Host;

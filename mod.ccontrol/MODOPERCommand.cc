@@ -12,7 +12,7 @@
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 
-const char MODOPERCommand_cc_rcsId[] = "$Id: MODOPERCommand.cc,v 1.7 2001/05/05 20:29:09 mrbean_ Exp $";
+const char MODOPERCommand_cc_rcsId[] = "$Id: MODOPERCommand.cc,v 1.8 2001/05/14 21:26:37 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -32,7 +32,9 @@ if( ((st.size() < 4) && (strcasecmp(st[2].c_str(),"getlogs") != 0))
 	return true;
 	}
 //Fetch the oper data base entry
-ccUser *tmpUser = bot->GetUser(st[1]);
+//ccUser *tmpUser = bot->GetUser(st[1]);
+ccUser* tmpUser = bot->GetOper(st[1]);
+
 if(!tmpUser)
 	{
         bot->Notice(theClient,"%s isnt on my access list",st[1].c_str());

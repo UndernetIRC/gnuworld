@@ -18,7 +18,7 @@
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 
-const char ADDNEWOPERCommand_cc_rcsId[] = "$Id: ADDNEWOPERCommand.cc,v 1.8 2001/05/05 19:53:20 mrbean_ Exp $";
+const char ADDNEWOPERCommand_cc_rcsId[] = "$Id: ADDNEWOPERCommand.cc,v 1.9 2001/05/14 21:26:37 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -37,7 +37,9 @@ if( st.size() < 4 )
 
 // Try fetching the user data from the database, note this is
 // the new user handle
-ccUser* theUser = bot->GetUser(st[1]);
+//ccUser* theUser = bot->GetUser(st[1]);
+ccUser* theUser = bot->GetOper(st[1]);
+
 if (theUser)  
 	{ 
 	bot->Notice(theClient,"Oper %s already exsits in my db," 

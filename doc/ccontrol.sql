@@ -1,4 +1,4 @@
--- "$Id: ccontrol.sql,v 1.6 2001/05/02 21:10:18 mrbean_ Exp $"
+-- "$Id: ccontrol.sql,v 1.7 2001/05/14 21:26:37 mrbean_ Exp $"
 -- 2001-13-02  : |MrBean|
 -- Added level patch for ccontrol module
 
@@ -10,6 +10,7 @@
 
 -- 2001-30-04 : |MrBean|
 -- Added servers table
+
 
 CREATE TABLE opers (
 	user_id SERIAL,	
@@ -60,4 +61,12 @@ CREATE TABLE comlog (
 	command VARCHAR(512)
 	);
 		
-	
+CREATE TABLE opernews (
+	MessageId SERIAL,
+	MessageFlags INT4 NOT NULL DEFAULT '0',
+	PostTime INT4 NOT NULL,
+	PostedBy VARCHAR(128) NOT NULL,
+	Message VARCHAR(512) NOT NULL,
+	ExpiresOn INT4
+	);
+		

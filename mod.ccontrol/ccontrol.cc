@@ -23,7 +23,7 @@
 #include	"AuthInfo.h"
 #include        "server.h"
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.34 2001/05/08 16:01:12 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.35 2001/05/14 21:26:37 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -32,6 +32,7 @@ using std::string ;
 using std::vector ;
 using std::cout ;
 using std::endl ; 
+using std::count ;
 
 /*
  *  Exported function used by moduleLoader to gain an
@@ -60,7 +61,7 @@ string sqlPort = conf.Find( "sql_port" )->second;
 
 CCEmail = conf.Require( "ccemail" )->second;
 AbuseMail = conf.Require( "abuse_mail" )->second;
-
+inBurst = true;
 
 string Query = "host=" + sqlHost + " dbname=" + sqlDb + " port=" + sqlPort;
 
@@ -162,9 +163,9 @@ RegisterCommand( new LOGINCommand( this, "LOGIN", "<USER> <PASS> "
 	"Authenticate with the bot",flg_LOGIN ) ) ;
 RegisterCommand( new DEAUTHCommand( this, "DEAUTH", ""
 	"Deauthenticate with the bot",flg_LOGIN ) ) ;
-RegisterCommand( new ADDNEWOPERCommand( this, "ADDNEWOPER", "<USER> <OPERTYPE> <PASS> "
+RegisterCommand( new ADDNEWOPERCommand( this, "ADDOPER", "<USER> <OPERTYPE> <PASS> "
 	"Add a new oper",flg_ADDNOP ) ) ;
-RegisterCommand( new REMOVEOPERCommand( this, "REMOVEOPER", "<USER> <PASS> "
+RegisterCommand( new REMOVEOPERCommand( this, "REMOPER", "<USER> <PASS> "
 	"Remove an oper",flg_REMOP ) ) ;
 RegisterCommand( new ADDCOMMANDCommand( this, "ADDCOMMAND", "<USER> <COMMAND> "
 	"Add a new command to an oper",flg_ADDCMD ) ) ;
@@ -190,7 +191,7 @@ RegisterCommand( new LISTHOSTSCommand( this, "LISTHOSTS", "<oper> "
 	"Shows an oper hosts list",flg_LISTHOSTS ) ) ;
 RegisterCommand( new CLEARCHANCommand( this, "CLEARCHAN", "<#chan> "
 	"Removes all channel modes",flg_CLEARCHAN ) ) ;
-RegisterCommand( new ADDNEWSERVERCommand( this, "ADDNEWSERVER", "<Server> "
+RegisterCommand( new ADDNEWSERVERCommand( this, "ADDSERVER", "<Server> "
 	"Add a new server to the bot database",flg_ADDSERVER ) ) ;
 RegisterCommand( new LEARNNETWORKCommand( this, "LEARNNET", ""
 	"Update the servers database according to the current situation",flg_ADDSERVER ) ) ;
@@ -289,14 +290,109 @@ if(SendReport)
 	time_t theTime = ::time(0) + ((24 - Now.tm_hour)*3600 - (Now.tm_min)*60) ; //Set the daily timer to 24:00
 	postDailyLog = theServer->RegisterTimer(theTime, this, NULL); 
 	}
+
 theServer->RegisterEvent( EVT_KILL, this );
 theServer->RegisterEvent( EVT_QUIT, this );
 theServer->RegisterEvent( EVT_NETJOIN, this );
+theServer->RegisterEvent( EVT_EB, this );
 //theServer->RegisterEvent( EVT_NETBREAK, this );
 
 xClient::ImplementServer( theServer ) ;
 }
 
+/*int ccontrol::OnPrivateMessage( iClient* theClient, const string& Message,
+	bool )
+{
+
+//elog << "ccontrol::OnPrivateMessage()\n" ;
+
+// Only allow opers or services clients to use this client
+/*if( !theClient->isOper() && !theClient->getMode( iClient::MODE_SERVICES ) )
+	{
+	Notice( theClient, "You must be an IRCoperator to use this service." ) ;
+	return 0 ;
+	}*/
+
+// Tokenize the message
+//StringTokenizer st( Message ) ;
+
+// Make sure there is a command present
+/*if( st.empty() )
+	{
+	Notice( theClient, "Incomplete command" ) ;
+	return 0 ;
+	}*/
+
+// This is no longer necessary, but oh well *shrug*
+//const string Command = string_upper( st[ 0 ] ) ;
+
+// Attempt to find a handler for this method.
+//commandIterator commHandler = findCommand( Command ) ;
+
+// Was a handler found?
+//if( commHandler == command_end() )
+//	{
+	// Nope, notify the client
+//	Notice( theClient, "Unknown command" ) ;
+//	return 0 ; 
+//	}
+
+// Check if the user is logged in , and he got
+// access to that command
+
+/*int ComAccess = commHandler->second->getFlags();
+
+AuthInfo* theUser = IsAuth(theClient->getCharYYXXX());
+
+if((!theUser) && (ComAccess != flg_NOLOG))
+	{
+	Notice( theClient,
+		"You must be logged in to issue that command" ) ;
+	}
+else if( (ComAccess != flg_NOLOG) && !(ComAccess & theUser->Access))
+	{
+	Notice( theClient, "You dont have access to that command" ) ;
+	}
+else if(( isSuspended(theUser) ) && ( ComAccess != 0 ) )
+/*if( (theUser) && (theUser->Flags & isSUSPENDED))
+	{
+	if( (::time( 0 ) - theUser->SuspendExpires < 0)
+		&& (ComAccess != 0))*/
+/*		{
+		Notice( theClient,
+			"Sorry but you are suspended");
+		}
+	else 
+		{*/
+		/*{ //if the suspend expired, unsuspend the user and execute the command
+		if( ::time( 0 ) - theUser->SuspendExpires >= 0) 
+			{	
+//			ccUser* tmpUser = GetUser(theUser->Name);
+			ccUser* tmpUser = GetOper(theUser->Name);
+
+			tmpUser->setSuspendExpires(0);
+			tmpUser->removeFlag(isSUSPENDED);
+			tmpUser->setSuspendedBy("");
+			tmpUser->Update();
+    			delete tmpUser;
+			}*/
+		// Log the command
+/*		if(!(ComAccess & flg_NOLOG)) //Dont log command which arent suppose to be logged
+			DailyLog(theUser,Message.c_str());*/
+		// Execute the command handler
+//		commHandler->second->Exec( theClient, Message) ;
+		//}
+//		}		
+//else
+//	{	
+	// Log the command
+//	if(!(ComAccess & flg_NOLOG)) //Dont log command which arent suppose to be logged
+//		DailyLog(theUser,Message.c_str());
+//	commHandler->second->Exec( theClient, Message) ;
+//	}
+// Call the base class OnPrivateMessage() method
+//return xClient::OnPrivateMessage( theClient, Message ) ;
+//}*/
 int ccontrol::OnPrivateMessage( iClient* theClient, const string& Message,
 	bool )
 {
@@ -339,51 +435,41 @@ if( commHandler == command_end() )
 
 int ComAccess = commHandler->second->getFlags();
 
+bool ShouldntLog = ComAccess & flg_NOLOG;
+
+ComAccess &= ~flg_NOLOG;
+
 AuthInfo* theUser = IsAuth(theClient->getCharYYXXX());
 
-if((!theUser) && (ComAccess != flg_NOLOG))
+if((!theUser) && (ComAccess))
 	{
 	Notice( theClient,
 		"You must be logged in to issue that command" ) ;
 	}
-else if( (ComAccess != flg_NOLOG) && !(ComAccess & theUser->Access))
+else if( (ComAccess) && !(ComAccess & theUser->Access))
 	{
 	Notice( theClient, "You dont have access to that command" ) ;
 	}
-else if( (theUser) && (theUser->Flags & isSUSPENDED))
-	{
-	if( (::time( 0 ) - theUser->SuspendExpires < 0)
-		&& (ComAccess != 0))
+else if(( isSuspended(theUser) ) && ( ComAccess ) )
 		{
 		Notice( theClient,
 			"Sorry but you are suspended");
 		}
 	else 
-		{ //if the suspend expired, unsuspend the user and execute the command
-		if( ::time( 0 ) - theUser->SuspendExpires >= 0) 
-			{	
-			ccUser* tmpUser = GetUser(theUser->Name);
-
-			tmpUser->setSuspendExpires(0);
-			tmpUser->removeFlag(isSUSPENDED);
-			tmpUser->setSuspendedBy("");
-			tmpUser->Update();
-    			delete tmpUser;
-			}
+		{
 		// Log the command
-		if(!(ComAccess & flg_NOLOG)) //Dont log command which arent suppose to be logged
+		if(!ShouldntLog) //Dont log command which arent suppose to be logged
 			DailyLog(theUser,Message.c_str());
 		// Execute the command handler
 		commHandler->second->Exec( theClient, Message) ;
-		}
-	}		
-else
-	{	
+		}		
+//else
+//	{	
 	// Log the command
-	if(!(ComAccess & flg_NOLOG)) //Dont log command which arent suppose to be logged
-		DailyLog(theUser,Message.c_str());
-	commHandler->second->Exec( theClient, Message) ;
-	}
+//	if(!(ComAccess & flg_NOLOG)) //Dont log command which arent suppose to be logged
+//		DailyLog(theUser,Message.c_str());
+//	commHandler->second->Exec( theClient, Message) ;
+//	}
 // Call the base class OnPrivateMessage() method
 return xClient::OnPrivateMessage( theClient, Message ) ;
 }
@@ -459,7 +545,10 @@ switch( theEvent )
 		iServer* UplinkServer = static_cast< iServer* >( Data2);*/
 		// still not handled
 		}
-		
+	case EVT_EB:
+		{
+		inBurst = true;
+		}	
 	} // switch()
 
 return 0;
@@ -700,72 +789,6 @@ if(TempAuth)
 	}
 }
 
-ccUser* ccontrol::GetUser( const string& Name )
-{
-static const char Main[] = "SELECT user_id,user_name,password,access,flags,suspend_expires,suspended_by FROM opers WHERE lower(user_name) = '";
-
-strstream theQuery;
-theQuery	<< Main
-		<< string_lower(Name)
-		<< "'"
-		<< ends;
-
-elog	<< "ACCESS::sqlQuery> "
-	<< theQuery.str()
-	<< endl; 
-
-ExecStatusType status = SQLDb->Exec( theQuery.str() ) ;
-delete[] theQuery.str() ;
-
-if( (PGRES_TUPLES_OK == status) && (SQLDb->Tuples() > 0) )
-	{
-        return GetParm();
-	}
-
-return NULL;
-}
-
-ccUser* ccontrol::GetUser( const int Id)
-{
-static const char Main[] = "SELECT user_id,user_name,password,access,flags,suspend_expires,suspended_by FROM opers WHERE user_id = ";
-
-strstream theQuery;
-
-theQuery	<< Main
-		<< Id
-		<< ';'
-		<< ends;
-
-elog	<< "ACCESS::sqlQuery> "
-	<< theQuery.str()
-	<< endl; 
-
-ExecStatusType status = SQLDb->Exec( theQuery.str() ) ;
-delete[] theQuery.str() ;
-
-if( (PGRES_TUPLES_OK == status) && (SQLDb->Tuples() > 0) )
-	{
-	return GetParm();
-	}
-
-return NULL;
-}
-
-ccUser* ccontrol::GetParm()
-{
-ccUser* TempUser = new (nothrow) ccUser(SQLDb);
-assert (TempUser != NULL);
-
-TempUser->setID(atoi(SQLDb->GetValue(0, 0)));
-TempUser->setUserName(SQLDb->GetValue(0, 1));
-TempUser->setPassword(SQLDb->GetValue(0, 2));
-TempUser->setAccess(atoi(SQLDb->GetValue(0, 3)));
-TempUser->setFlag(atoi(SQLDb->GetValue(0, 4)));
-TempUser->setSuspendExpires(atoi(SQLDb->GetValue(0,5)));
-TempUser->setSuspendedBy(SQLDb->GetValue(0,6));
-
-return TempUser;
-}
 
 bool ccontrol::AddOper (ccUser* Oper)
 {
@@ -804,7 +827,7 @@ bool ccontrol::DeleteOper (const string& Name)
 //    strstream Condition;
 //    Condition << "WHERE user_id = " << Id << ';';
 ExecStatusType status;
-ccUser* tUser = GetUser(Name.c_str());
+ccUser* tUser = GetOper(Name.c_str());
 //Delete the user hosts
 if(tUser)
     {
@@ -1297,7 +1320,21 @@ assert( tmpUser != 0 ) ;
 
 if( !tmpUser->loadData(Name) )
 	{
-	delete tmpUser ; tmpUser = 0 ;
+	delete tmpUser ; 
+	tmpUser = 0 ;
+	}
+return tmpUser ;
+}
+
+ccUser* ccontrol::GetOper( unsigned int ID)
+{
+ccUser* tmpUser = new (nothrow) ccUser(SQLDb);
+assert( tmpUser != 0 ) ;
+
+if( !tmpUser->loadData(ID) )
+	{
+	delete tmpUser ; 
+	tmpUser = 0 ;
 	}
 return tmpUser ;
 }
@@ -1409,12 +1446,14 @@ va_list list;
 va_start( list, Log ) ;
 vsprintf( buffer, Log, list ) ;
 va_end( list ) ;
+iClient *theClient = Network->findClient(Oper->Numeric);
 
 static const char *Main = "INSERT into comlog (ts,oper,command) VALUES (now()::abstime::int4,'";
 
 strstream theQuery;
 theQuery	<< Main
-		<< Oper->Name <<"','"
+		<< Oper->Name 
+		<< " (" << theClient->getNickUserHost() <<")','"
 		<< buffer << "')"
 		<< ends;
 
@@ -1534,19 +1573,21 @@ return true;
 int ccontrol::CheckGline(const char * GlineHost,unsigned int Len)
 {
 
-
-
 char *User;
 char *Host;
 char *TPos;
-
 TPos = strchr(GlineHost,'@');
 User = new char[(TPos - GlineHost) + 1];			
 Host = new char[(GlineHost + strlen(GlineHost)) - TPos +1];
 strncpy(User,GlineHost,TPos - GlineHost);
+User[TPos - GlineHost] = '\0';
 strcpy(Host,TPos+1);
-if(!strcasecmp(Host,"*"))
-	return HUH_NO_HOST;
+if((countCinS(Host,'*') > 1) || (!strcasecmp(Host,"*")))
+    return HUH_NO_HOST;
+if(Network->countHost(GlineHost) > 256)
+    return HUH_NO_USERS;
+else if(Network->countHost(GlineHost) > 32)
+    return FORCE_NEEDED_USERS;
 if(Len > 24*3600*2) //Longer than 2 days ? 
 	return FORCE_NEEDED_TIME;
 if(strchr(Host,'*') == NULL)
@@ -1554,4 +1595,36 @@ if(strchr(Host,'*') == NULL)
 return FORCE_NEEDED_HOST;
 }
 
+bool ccontrol::isSuspended(AuthInfo *theUser)
+{
+if( (theUser) && (theUser->Flags & isSUSPENDED))
+	{
+	if(::time( 0 ) - theUser->SuspendExpires < 0)
+		{
+		return true;
+		}
+	else 
+		{ //if the suspend expired, unsuspend the user and execute the command
+		MsgChanLog("unsuspending %s\n",theUser->Name.c_str());
+		ccUser* tmpUser = GetOper(theUser->Name);
+		tmpUser->setSuspendExpires(0);
+		tmpUser->removeFlag(isSUSPENDED);
+		tmpUser->setSuspendedBy("");
+		tmpUser->Update();
+		delete tmpUser;
+		}
+	}
+return false;
+}
+
+int ccontrol::countCinS(char *St,char Sign)
+{
+int count =0;
+char *CurC;
+for(CurC = St;*CurC != '\0';CurC++)
+    if(*CurC == Sign)
+	count++;
+return count;
+}
+ 
 } // namespace gnuworld

@@ -12,7 +12,7 @@
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 
-const char LISTHOSTSCommand_cc_rcsId[] = "$Id: LISTHOSTSCommand.cc,v 1.1 2001/03/10 18:33:23 mrbean_ Exp $";
+const char LISTHOSTSCommand_cc_rcsId[] = "$Id: LISTHOSTSCommand.cc,v 1.2 2001/05/14 21:26:37 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -31,7 +31,9 @@ if( st.size() < 2 )
 	return true;
 	}
 //Fetch the oper data base entry
-ccUser *tmpUser = bot->GetUser(st[1]);
+//ccUser *tmpUser = bot->GetUser(st[1]);
+ccUser* tmpUser = bot->GetOper(st[1]);
+
 if(!tmpUser)
 	{
         bot->Notice(theClient,"%s isnt on my access list",st[1].c_str());

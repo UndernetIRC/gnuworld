@@ -1,5 +1,5 @@
 
--- 2001-03-02 |MrBean| "$Id: ccontrol.help.sql,v 1.3 2001/03/11 21:40:10 mrbean_ Exp $"
+-- 2001-03-02 |MrBean| "$Id: ccontrol.help.sql,v 1.4 2001/05/14 21:26:37 mrbean_ Exp $"
 -- Created the file and added all help topics to the database
 
 -- 2201-03-11 |MrBean|
@@ -27,12 +27,12 @@ INSERT INTO help (command,line,help) VALUES ('ADDCOMMAND',5,'<command> - the com
 
 -- ADDNEWOPER
 
-INSERT INTO help (command,line,help) VALUES ('ADDNEWOPER',1,'------ ADDNEWOPER COMMAND ------');
-INSERT INTO help (command,line,help) VALUES ('ADDNEWOPER',2,'Adds new oper to the bot access list');
-INSERT INTO help (command,line,help) VALUES ('ADDNEWOPER',3,'Usage : /msg $BOT$ addnewoper <handle> <oper level> <password>');
-INSERT INTO help (command,line,help) VALUES ('ADDNEWOPER',4,'<handle> - The handle the bot will recognize the oper under');
-INSERT INTO help (command,line,help) VALUES ('ADDNEWOPER',5,'<oper level> - Sets the initial oper commands , options are : oper , admin , coder');
-INSERT INTO help (command,line,help) VALUES ('ADDNEWOPER',6,'<password> - the password of the new oper');
+INSERT INTO help (command,line,help) VALUES ('ADDOPER',1,'------ ADDNEWOPER COMMAND ------');
+INSERT INTO help (command,line,help) VALUES ('ADDOPER',2,'Adds new oper to the bot access list');
+INSERT INTO help (command,line,help) VALUES ('ADDOPER',3,'Usage : /msg $BOT$ addnewoper <handle> <oper level> <password>');
+INSERT INTO help (command,line,help) VALUES ('ADDOPER',4,'<handle> - The handle the bot will recognize the oper under');
+INSERT INTO help (command,line,help) VALUES ('ADDOPER',5,'<oper level> - Sets the initial oper commands , options are : oper , admin , coder');
+INSERT INTO help (command,line,help) VALUES ('ADDOPER',6,'<password> - the password of the new oper');
 
 -- ADDOPERCHAN
 
@@ -200,10 +200,10 @@ INSERT INTO help (command,line,help) VALUES ('REMOPERCHAN',4,'<#channel> - the c
 
 -- REMOVEOPER
 
-INSERT INTO help (command,line,help) VALUES ('REMOVEOPER',1,'------ REMOVEOPER COMMAND ------');
-INSERT INTO help (command,line,help) VALUES ('REMOVEOPER',2,'Removes an oper from the bot access list');
-INSERT INTO help (command,line,help) VALUES ('REMOVEOPER',3,'Usage : /msg $BOT$ removeoper <handle>');
-INSERT INTO help (command,line,help) VALUES ('REMOVEOPER',4,'<handle> - handle of the oper you want to remove');
+INSERT INTO help (command,line,help) VALUES ('REMOPER',1,'------ REMOVEOPER COMMAND ------');
+INSERT INTO help (command,line,help) VALUES ('REMOPER',2,'Removes an oper from the bot access list');
+INSERT INTO help (command,line,help) VALUES ('REMOPER',3,'Usage : /msg $BOT$ removeoper <handle>');
+INSERT INTO help (command,line,help) VALUES ('REMOPER',4,'<handle> - handle of the oper you want to remove');
 
 -- SCANGLINE
 

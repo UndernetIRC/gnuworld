@@ -19,7 +19,7 @@
 #include	"ELog.h"
 #include	"Gline.h"
 
-const char GLINECommand_cc_rcsId[] = "$Id: GLINECommand.cc,v 1.7 2001/05/08 16:01:12 mrbean_ Exp $";
+const char GLINECommand_cc_rcsId[] = "$Id: GLINECommand.cc,v 1.8 2001/05/14 21:26:37 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -85,7 +85,7 @@ switch(bot->CheckGline(st[ pos ].c_str(),gLength))
 	    bot->Notice(theClient,"You gline bans for than 32 users , please use forcegline");
 	    return false;
 	case HUH_NO_HOST:
-	    bot->Notice(theClient,"I dont think glining *@* is such a good idea, do you?");
+	    bot->Notice(theClient,"I dont think glining that host is such a good idea, do you?");
 	    return false;
 	case HUH_NO_USERS:
 	    bot->Notice(theClient,"Glining more than 256 ppl is a NoNo");
@@ -110,7 +110,14 @@ s	<< server->getCharYY() << " WA :"
 	<< ends ;
 bot->Write( s ) ;
 delete[] s.str() ;
-
+ccGline *TmpGline = new ccGline(bot->SQLDb);
+TmpGline->set_Host(st [ pos ]);
+TmpGline->set_Expires(::time(0) + gLength);
+TmpGline->set_AddedBy(nickUserHost);
+TmpGline->set_Reason(st.assemble( pos +1 ));
+TmpGline->set_AddedOn(::time(0));
+TmpGline->Insert();
+bot->addGline(TmpGline);
 return true ;
 }
 }

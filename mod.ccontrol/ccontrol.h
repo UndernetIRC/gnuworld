@@ -3,8 +3,9 @@
  */
 
 #ifndef __CCONTROL_H
-#define __CCONTROL_H "$Id: ccontrol.h,v 1.24 2001/05/08 16:01:12 mrbean_ Exp $"
+#define __CCONTROL_H "$Id: ccontrol.h,v 1.25 2001/05/14 21:26:38 mrbean_ Exp $"
 
+//Define gline response
 #define GLINE_OK 1;
 #define FORCE_NEEDED_HOST 2
 #define FORCE_NEEDED_TIME 3
@@ -234,79 +235,225 @@ public:
 	 */
 	virtual bool removeOperChan( const string& ) ;
 
+	/**
+	 * This method will check if a client is authenticated 
+	 * based on the iClient structure
+	 */
+	 
 	AuthInfo* IsAuth( const iClient* theClient ) const ;
+
+	/**
+	 * This method will check if a client is authenticated 
+	 * based on a nick
+	 */
 
         AuthInfo *IsAuth( const string& ) const ;
 
+	/**
+	 * This method will check if a client is authenticated 
+	 * based on the ccUser structure
+	 */
+
 	AuthInfo *IsAuth( const ccUser* ) const ;
 	
+	/**
+	 * This method will check if a client is authenticated 
+	 * based on the full numeric
+	 */
+
 	AuthInfo *IsAuth( const unsigned int ) const ;
        
-        ccUser *GetUser( const string& );
-	
-	ccUser *GetUser( const int );
-	
-	ccUser *GetParm();
         
+	/**
+	 * This method will add a new oper to the database
+	 */
+
 	bool AddOper( ccUser* );
 	
+	/**
+	 * This method will delete an oper from the database
+	 * based on the a handle
+	 */
+
 	bool DeleteOper( const string& );
 	
-//	bool UpdateOper( ccUser* );
+	/**
+	 * This method will mark the client as authenticated
+	 */
 	
 	bool AuthUser( ccUser* );
 	
+	/**
+	 * This method will deauthenticate a client with the bot
+	 */
+
+	bool deAuthUser( const string& );
+
+	/**
+	 * This method will return the access flag needed for a command
+	 */
+
 	int getCommandLevel( const string& );
 	
-	bool deAuthUser( const string& );
+
+	/**
+	 * This method will check if a user got a corrisponding
+	 * host mask in the databse
+	 */
 
 	bool UserGotMask( ccUser* , const string& );
 
+	/**
+	 * This method will check if a user got a corrisponding
+	 * host in the databse
+	 */
+
+
 	bool UserGotHost( ccUser* , const string& );
+
+	/**
+	 * This method will crypt a string based on the md5 hash
+	 */
 
 	static string CryptPass( const string& );
 
+	/**
+	 * This method will check if a mask is valid
+	 */
+
 	virtual bool validUserMask(const string& userMask) const ;
+
+	/**
+	 * This method will add a host to a client
+	 */
 
         bool AddHost( ccUser* , const string& host );
 
+	/**
+	 * This method will delete a host from  aclient
+	 */
+
         bool DelHost( ccUser* , const string& host );
 	
+	/**
+	 * This method lists all the hosts a client got
+	 */
+
 	bool listHosts( ccUser* , iClient* );
 	
+	/**
+	 * This method will update a client authenticate info
+	 * based on the ccUser structure (called after update)
+	 */
+
+
 	void UpdateAuth( ccUser* );
+
+	/**
+	 * This method will get a help entry for a command from the database
+	 */
 
 	bool GetHelp( iClient* , const string& );
 
+	/**
+	 * This method will get a help entry for a command and its subcommand
+	 * from the database
+	 */
+
 	bool GetHelp( iClient* , const string& , const string&);
 	
+	/**
+	 * This method will post help for a client
+	 */
+
 	void DoHelp( iClient* );
+
+	/**
+	 * This method will replace a word in a string with another one
+	 */
 
 	static string replace( const string&,
 				const string&,
 				const string& ) ;
 	
+	/**
+	 * This method will attempt to load an oper info from the database
+	 * based on the handle
+	 */
+	 
 	ccUser *GetOper( const string );
 
+	/**
+	 * This method will attempt to load an oper info from the database
+	 * based on the user id
+	 */
+
+	ccUser *GetOper( unsigned int );
+
+	/**
+	 * This method add a gline to the database
+	 */
+	 
 	bool addGline( ccGline* );
+
+	/**
+	 * This method deletes a gline from the database
+	 */
 	
 	bool remGline( ccGline* );
 
+	/**
+	 * This method tries to load a gline from the database
+	 */
+
 	ccGline* findMatchingGline( const string& );
+
+	/**
+	 * This method logs the bot commands to the message channel
+	 */
 
 	bool MsgChanLog( const char * , ... );
 
+	/**
+	 * This method logs the commands to the database 
+	 * for lastcom report
+	 */
+
 	bool DailyLog( AuthInfo * , const char *, ... );
+
+	/**
+	 * This method convers a unix time to ascii time
+	 */
 
 	char *convertToAscTime(time_t);	
 
+	/**
+	 * This method converts a unix time to tm structure
+	 */
+
 	struct tm convertToTmTime(time_t );
+
+	/**
+	 * This method creates a lastcom report between two dates
+	 */
 
 	bool CreateReport(time_t , time_t);	
 
+	/**
+	 * This method emails the lastcom report
+	 */
+
 	bool MailReport(const char *, char *);
 
+	/**
+	 * This method checks the gline paramerters for valid time/host
+	 */
+
 	int CheckGline(const char *, unsigned int);
+
+	bool isSuspended(AuthInfo *);
+	
+	int countCinS( char * , char );
 
 	/**
 	 * This is a constant iterator type used to perform a read-only
@@ -463,6 +610,12 @@ protected:
 	 * Send report trigger
 	 */
 	int			SendReport;
+	
+	/**
+	 * Burst flag
+	 */
+	 bool inBurst;
+
 } ; 
  
 } // namespace gnuworld

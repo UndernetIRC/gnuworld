@@ -3,7 +3,7 @@
  * 
  * Gline class
  * 
- * $Id: ccGline.cc,v 1.3 2001/03/29 21:54:32 dan_karrels Exp $
+ * $Id: ccGline.cc,v 1.4 2001/05/14 21:26:37 mrbean_ Exp $
  */
  
 #include	<strstream>
@@ -19,7 +19,7 @@
 #include	"ccGline.h" 
 
 const char ccGline_h_rcsId[] = __CCGLINE_H ;
-const char ccGline_cc_rcsId[] = "$Id: ccGline.cc,v 1.3 2001/03/29 21:54:32 dan_karrels Exp $" ;
+const char ccGline_cc_rcsId[] = "$Id: ccGline.cc,v 1.4 2001/05/14 21:26:37 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -44,11 +44,10 @@ ccGline::~ccGline()
 
 bool ccGline::Insert()
 {
-static const char *Main = "INSERT into Glines (Id,Host,AddedBy,AddedOn,Expires,Reason) VALUES ('";
+static const char *Main = "INSERT into Glines (Host,AddedBy,AddedOn,ExpiresAt,Reason) VALUES ('";
 
 strstream theQuery;
 theQuery	<< Main
-		<< Id <<"','"
 		<< Host << "','"
 		<< AddedBy << "',"
 		<< AddedOn << ","
@@ -90,7 +89,7 @@ theQuery	<< Main
 		<< AddedBy
 		<< "', AddedOn = "
 		<< AddedOn
-		<< ",Expires = "
+		<< ",ExpiresAt = "
 		<< Expires
 		<<  ",Reason = '"
 		<< Reason << "'"
@@ -124,6 +123,41 @@ static const char *Main = "SELECT * FROM glines WHERE Id = ";
 strstream theQuery;
 theQuery	<< Main
 		<< GlineId
+		<< ends;
+
+elog	<< "ccontrol::glineConstructor> "
+	<< theQuery.str()
+	<< endl; 
+
+ExecStatusType status = SQLDb->Exec( theQuery.str() ) ;
+delete[] theQuery.str() ;
+
+if( PGRES_TUPLES_OK != status )
+	{
+	elog	<< "ccGline::ccGline> SQL Failure: "
+		<< SQLDb->ErrorMessage()
+		<< endl ;
+
+	return false ;
+	}
+
+
+Id = SQLDb->GetValue(0,0);
+Host = SQLDb->GetValue(0,1);
+AddedBy = SQLDb->GetValue(0,2) ;
+AddedOn = static_cast< time_t >( atoi( SQLDb->GetValue(0,3) ) ) ;
+Expires = static_cast< time_t >( atoi( SQLDb->GetValue(0,4) ) ) ;
+Reason = SQLDb->GetValue(0,5);
+
+return true;
+}
+bool ccGline::loadData( string & Host)
+{
+static const char *Main = "SELECT * FROM glines WHERE Host = ";
+
+strstream theQuery;
+theQuery	<< Main
+		<< Host.c_str()
 		<< ends;
 
 elog	<< "ccontrol::glineConstructor> "
