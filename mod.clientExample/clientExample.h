@@ -2,7 +2,7 @@
  */
 
 #ifndef __CLIENTEXAMPLE_H
-#define __CLIENTEXAMPLE_H "$Id: clientExample.h,v 1.1 2000/07/31 16:33:50 dan_karrels Exp $"
+#define __CLIENTEXAMPLE_H "$Id: clientExample.h,v 1.1 2001/01/06 15:31:53 dan_karrels Exp $"
 
 #include	<string>
 

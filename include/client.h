@@ -3,7 +3,7 @@
  */
 
 #ifndef __XCLIENT_H
-#define __XCLIENT_H "$Id: client.h,v 1.16 2001/01/01 07:45:22 gte Exp $"
+#define __XCLIENT_H "$Id: client.h,v 1.17 2001/01/06 15:31:52 dan_karrels Exp $"
 
 #include	<string>
 
@@ -78,8 +78,6 @@ public:
 	 * can call this method, and then reconnect later.
 	 */
 	virtual int Exit( const string& Message ) ;
-
-	virtual void	deleteCustomData( iClient*, void* ) ;
 
 	/**
 	 * Kill will issue a KILL command to the network for
