@@ -1,7 +1,7 @@
 /* ccUser.h */
 
 #ifndef __CCUSER_H
-#define __CCUSER_H "$Id: ccUser.h,v 1.3 2001/02/24 19:41:28 dan_karrels Exp $"
+#define __CCUSER_H "$Id: ccUser.h,v 1.4 2001/02/24 21:41:40 mrbean_ Exp $"
 
 #include	<string>
 
@@ -41,7 +41,7 @@ public:
 	inline const string&		getNumeric() const
 		{ return Numeric ; }
         
-	inline const unsigned int&	getSuspendExpires() const
+	inline const time_t&	getSuspendExpires() const
 		{ return SuspendExpires ; }
 
 	inline const string&		getSuspendedBy() const

@@ -22,7 +22,7 @@
 #include	"ccontrol.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.14 2001/02/24 18:31:27 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.15 2001/02/24 21:41:40 mrbean_ Exp $" ;
 
 using std::string ;
 using std::vector ;
@@ -283,6 +283,7 @@ if( st.empty() )
 // This is no longer necessary, but oh well *shrug*
 const string Command = string_upper( st[ 0 ] ) ;
 
+
 // Attempt to find a handler for this method.
 commandMapType::iterator commHandler = commandMap.find( Command ) ;
 
@@ -298,16 +299,19 @@ if( commHandler == commandMap.end() )
 // access to that command
 
 int ComAccess = commHandler->second->getFlags();
+
 AuthInfo* theUser = IsAuth(theClient->getCharYYXXX());
 
 if((!theUser) && (ComAccess != 0))
 	{
 	Notice( theClient,
 		"You must be logged in to issue that command" ) ;
+	return false;
 	}
 else if( (ComAccess != 0) && !(ComAccess & theUser->Access))
 	{
 	Notice( theClient, "You dont have access to that command" ) ;
+	return false;
 	}
 else if( (theUser) && (theUser->Flags & isSUSPENDED))
 	{
@@ -316,10 +320,11 @@ else if( (theUser) && (theUser->Flags & isSUSPENDED))
 		{
 		Notice( theClient,
 			"Sorry but you are suspended");
+		return false;
 		}
 	else 
-		{
-		if( ::time( 0 ) - theUser->SuspendExpires >= 0)
+		{ //if the suspend expired, unsuspend the user and execute the command
+		if( ::time( 0 ) - theUser->SuspendExpires >= 0) 
 			{	
 			User* tmpUser = GetUser(theUser->Name);
 
@@ -332,9 +337,9 @@ else if( (theUser) && (theUser->Flags & isSUSPENDED))
 			}
 		}
 	// Execute the command handler
-	commHandler->second->Exec( theClient, Message) ;
-	}		
 
+	}		
+	commHandler->second->Exec( theClient, Message) ;
 // Call the base class OnPrivateMessage() method
 return xClient::OnPrivateMessage( theClient, Message ) ;
 }
@@ -548,7 +553,7 @@ for( authListType::const_iterator ptr = authList.begin() ;
 		return *ptr ;
 		}
 	}
-return 0 ;
+return NULL ;
 }
    
 AuthInfo* ccontrol::IsAuth( const int UserId ) const
@@ -561,7 +566,7 @@ for( authListType::const_iterator ptr = authList.begin() ;
 		return *ptr ;
 		}
 	}
-return 0 ;
+return NULL ;
 }
 
 void ccontrol::UpdateAuth(int Id)
