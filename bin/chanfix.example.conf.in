@@ -6,3 +6,17 @@ hostname = undernet.org
 userdescription = GNUWorld ChanFix
 
 mode = +idk
+
+# Console channel
+consoleChannel = #chanfix
+# Console channel modes
+consoleModes = +ins
+
+# Delay between linking and starting to count in seconds
+startDelay = 10
+
+# Number of points to allocate to an authed op per period
+pointsAuth = 10
+
+# Duration of a single period in seconds
+period = 10
