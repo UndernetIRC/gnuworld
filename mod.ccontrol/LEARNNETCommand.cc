@@ -17,7 +17,7 @@
 #include	"ccUser.h"
 #include	"AuthInfo.h"
 
-const char LEARNNETCommand_cc_rcsId[] = "$Id: LEARNNETCommand.cc,v 1.5 2001/12/09 14:36:35 mrbean_ Exp $";
+const char LEARNNETCommand_cc_rcsId[] = "$Id: LEARNNETCommand.cc,v 1.6 2001/12/13 08:50:00 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -42,28 +42,6 @@ unsigned int AddedServers = 0;
 
 StringTokenizer st(Message);
 
-if((st.size() > 1) && (!strcasecmp(st[1],"-r")))
-	{
-	AuthInfo *tmpAuth = bot->IsAuth(theClient->getCharYYXXX());
-	if(!tmpAuth)
-		{ //donno how we got to here .. but what the hell 
-		delete NewServer;
-		return false;
-		}
-	if(tmpAuth->getFlags() < operLevel::CODERLEVEL)
-		{
-		bot->Notice(theClient,"Only coders can specify the -r flag");
-		delete NewServer;
-		return false;
-		}
-	if(bot->CleanServers())
-		{
-		bot->MsgChanLog("Cleaned the server database at the request of %s\n"
-		,theClient->getNickName().c_str());
-		bot->Notice(theClient,"Successfully cleaned the database");
-		}		
-	}
-			
 bot->MsgChanLog("Learning network status at the request of : %s\n",theClient->getNickName().c_str());
 
 xNetwork::serverIterator ptr = Network->server_begin();

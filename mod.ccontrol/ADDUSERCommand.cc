@@ -22,7 +22,7 @@
 #include	"commLevels.h"
 #include	"Constants.h"
 
-const char ADDUSERCommand_cc_rcsId[] = "$Id: ADDUSERCommand.cc,v 1.8 2001/12/09 14:36:35 mrbean_ Exp $";
+const char ADDUSERCommand_cc_rcsId[] = "$Id: ADDUSERCommand.cc,v 1.9 2001/12/13 08:50:00 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -63,7 +63,6 @@ if (theUser)
 	bot->Notice(theClient,"Oper %s already exsits in my db," 
 		"please change the oper handle and try again",
 		theUser->getUserName().c_str());
-        delete theUser;
 	return false;
 	}
 
@@ -110,7 +109,7 @@ else
 	return false;
 	}	     	
 
-AuthInfo *tOper = bot->IsAuth( theClient );
+ccUser *tOper = bot->IsAuth( theClient );
 if( NULL == tOper )
 	{
 	bot->Notice( theClient,
@@ -122,7 +121,7 @@ if( NULL == tOper )
 NewAccess &= tOper->getAccess(); 
 //NewAccess = bot->getTrueAccess(NewAccess);
 //Check if the user doesnt try to add an oper with higher flag than he is
-unsigned int OperFlags = tOper->getFlags();
+unsigned int OperFlags = tOper->getType();
 if(OperFlags < operLevel::ADMINLEVEL)
 	{
 	bot->Notice(theClient,
@@ -156,7 +155,6 @@ else
 	if(OperFlags < operLevel::SMTLEVEL)
 		{
 		bot->Notice(theClient,"Sorry, only SMT+ can specify a server name");
-		delete theUser;
 		return false;
 		}
 	string Server;
@@ -165,7 +163,6 @@ else
 		{
 		bot->Notice(theClient,"I cant find a server that matches %s in the database"
 			    ,st[3].c_str());
-		delete theUser;
 		return false;
 		}
 	theUser->setPassword(bot->CryptPass(st[4]));
@@ -184,7 +181,6 @@ if(bot->AddOper(theUser) == true)
 	}
 else
 	bot->Notice(theClient, "Error while adding new oper.");
-delete theUser;
 return true; 
 }
 }

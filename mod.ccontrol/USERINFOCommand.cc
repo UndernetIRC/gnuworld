@@ -15,10 +15,9 @@
 #include	"StringTokenizer.h"
 #include	"misc.h"
 #include	"match.h"
-#include	"AuthInfo.h"
 #include	"Network.h"
 
-const char USERINFOCommand_cc_rcsId[] = "$Id: USERINFOCommand.cc,v 1.3 2001/11/20 19:49:45 mrbean_ Exp $";
+const char USERINFOCommand_cc_rcsId[] = "$Id: USERINFOCommand.cc,v 1.4 2001/12/13 08:50:00 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -33,11 +32,6 @@ bool USERINFOCommand::Exec( iClient* theClient, const string& Message )
 
 StringTokenizer st( Message ) ;
 	
-if(!dbConnected)
-        {
-        bot->Notice(theClient,"Sorry, but the db connection is down now, please try again alittle later");
-        return false;
-        }
 
 if( st.size() < 2 )
 	{
@@ -45,26 +39,7 @@ if( st.size() < 2 )
 	return true;
 	}
 
-static const char Main[] = "SELECT user_name,password,server,isSuspended "
-		",Suspend_Expires,Suspended_By,Suspend_Reason,isUHS,isOPER"
-		",isADMIN,isSMT,isCODER,getLogs,NeedOp,Email,user_id,suspend_level from opers";
-
-strstream theQuery;
-theQuery	<< Main
-		<< ends;
-
-
-elog << theQuery.str() << endl;
-ExecStatusType status = bot->SQLDb->Exec( theQuery.str() ) ;
-delete[] theQuery.str() ;
-
-if(PGRES_TUPLES_OK != status) 
-	{
-	elog	<< "USERINFO> SQL Error: "
-		<< bot->SQLDb->ErrorMessage()
-		<< endl ;
-	return false;
-	}
+ccUser* tempUser;
 string Name;
 string Level;
 string Email;
@@ -75,25 +50,26 @@ char NeedOp[4];
 string SuspendedBy;
 string SuspendReason;
 time_t SuspendExpires;
-AuthInfo* tmpAuth;
 unsigned int Id;
 unsigned int SuspendLevel;
 string SLevel;
-for(int i = 0;i< bot->SQLDb->Tuples();++i)
+ccontrol::usersConstIterator ptr;
+for(ptr = bot->usersMap_begin();ptr != bot->usersMap_end();++ptr)
 	{
-	if(!(match(st[1],bot->SQLDb->GetValue(i,0))) || 
-	!(match(st[1],bot->SQLDb->GetValue(i,2))))
+	tempUser = ptr->second;
+	if(!(match(st[1],tempUser->getUserName())) || 
+	!(match(st[1],tempUser->getServer())))
 		{
-		Name.assign(bot->SQLDb->GetValue(i,0));
-		Server.assign(bot->SQLDb->GetValue(i,2));
-		Email.assign(bot->SQLDb->GetValue(i,14));
-		SuspendExpires = atoi(bot->SQLDb->GetValue(i,4));
-		if((!strcasecmp(bot->SQLDb->GetValue(i,3),"t")) && (SuspendExpires > ::time(0)))
+		Name.assign(tempUser->getUserName());
+		Server.assign(tempUser->getServer());
+		Email.assign(tempUser->getEmail());
+		SuspendExpires = tempUser->getSuspendExpires();
+		if((tempUser->getIsSuspended()) && (SuspendExpires > ::time(0)))
 			{
 			Suspended = true;
-			SuspendedBy.assign(bot->SQLDb->GetValue(i,5));
-			SuspendReason.assign(bot->SQLDb->GetValue(i,6));
-			SuspendLevel=atoi(bot->SQLDb->GetValue(i,16));
+			SuspendedBy.assign(tempUser->getSuspendedBy());
+			SuspendReason.assign(tempUser->getSuspendReason());
+			SuspendLevel=tempUser->getSuspendLevel();
 			if(SuspendLevel == operLevel::OPERLEVEL)
 				{
 				SLevel.assign("OPER");
@@ -116,22 +92,22 @@ for(int i = 0;i< bot->SQLDb->Tuples();++i)
 			Suspended = false;
 			}
 		
-		if(!strcasecmp(bot->SQLDb->GetValue(i,8),"t"))
+		if(tempUser->isOper())
 			{
 			Level.assign("OPER");
 			}
-		else if(!strcasecmp(bot->SQLDb->GetValue(i,9),"t"))
+		else if(tempUser->isAdmin())
 			{
 			Level.assign("ADMIN");
 			}
-		else if(!strcasecmp(bot->SQLDb->GetValue(i,10),"t"))
+		else if(tempUser->isSmt())
 			{
 			Level.assign("SMT");
 			}
 		else 
 			Level.assign("CODER");
 					
-		if(!strcasecmp(bot->SQLDb->GetValue(i,12),"t"))
+		if(tempUser->getLogs())
 			{
 			sprintf(GetLogs,"YES");
 			}
@@ -140,7 +116,7 @@ for(int i = 0;i< bot->SQLDb->Tuples();++i)
 			sprintf(GetLogs,"NO");
 			}
 
-		if(!strcasecmp(bot->SQLDb->GetValue(i,13),"t"))
+		if(tempUser->getNeedOp())
 			{
 			sprintf(NeedOp,"YES");
 			}
@@ -148,12 +124,11 @@ for(int i = 0;i< bot->SQLDb->Tuples();++i)
 			{
 			sprintf(NeedOp,"NO");
 			}
-		Id=atoi(bot->SQLDb->GetValue(i,15));
-		tmpAuth = bot->IsAuth(Id);
-		if(tmpAuth)
+		Id=tempUser->getID();
+		if(tempUser->getClient())
 			{
 			bot->Notice(theClient,"User Name : %s , Currently logged in from : %s"
-				    ,Name.c_str(),(Network->findClient(tmpAuth->getNumeric())->getNickUserHost()).c_str());
+				    ,Name.c_str(),tempUser->getClient()->getNickUserHost().c_str());
 			}
 		else
 			bot->Notice(theClient,"User Name : %s",Name.c_str());

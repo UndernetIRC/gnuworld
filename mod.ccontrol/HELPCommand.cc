@@ -14,7 +14,7 @@
 #include	"StringTokenizer.h"
 
 
-const char HELPCommand_cc_rcsId[] = "$Id: HELPCommand.cc,v 1.12 2001/11/20 19:49:45 mrbean_ Exp $";
+const char HELPCommand_cc_rcsId[] = "$Id: HELPCommand.cc,v 1.13 2001/12/13 08:50:00 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -36,7 +36,7 @@ if(!dbConnected)
         return false;
         }
 
-AuthInfo *tmpAuth = bot->IsAuth(theClient->getCharYYXXX());
+ccUser *tmpAuth = bot->IsAuth(theClient);
 if(!tmpAuth)
 	return false;
 string banner = "--- Help Menu for " ;

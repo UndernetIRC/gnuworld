@@ -3,7 +3,7 @@
  */
 
 #ifndef __CCONTROL_H
-#define __CCONTROL_H "$Id: ccontrol.h,v 1.51 2001/12/09 14:36:35 mrbean_ Exp $"
+#define __CCONTROL_H "$Id: ccontrol.h,v 1.52 2001/12/13 08:50:00 mrbean_ Exp $"
 
 
 #include	<string>
@@ -23,15 +23,15 @@
 #include        "match.h"
 #include	"md5hash.h" 
 #include        "ccUser.h"
-#include	"AuthInfo.h"
 #include        "ccGline.h"
 #include        "ccServer.h"
-#include 	"ccLogin.h"
+#include 	"ccFloodData.h"
 #include 	"ccException.h"
 #include        "server.h"
 #include	"CommandsDec.h"
 #include	"ccGate.h"
 #include	<pthread.h>
+
 namespace gnuworld
 {
  
@@ -84,16 +84,17 @@ protected:
 	typedef commandMapType::value_type pairType ;
 
 	/**
-	 * The type used to store the authenticated users.
+	 * The db clients map
 	 */
-	typedef list< AuthInfo* >	authListType ;
+	typedef map<string ,ccUser* ,noCaseCompare> usersMapType;
 
 	/**
 	 * Holds the authenticated user list
 	 */
-	authListType			authList ;
+	usersMapType			usersMap ;
 
-
+	typedef usersMapType::iterator     usersIterator;
+	
 	typedef list< ccGline* >        glineListType ;
 
 	/**
@@ -102,23 +103,14 @@ protected:
 
 	glineListType			glineList ;
 
-	typedef list< ccLogin* >	loginListType;
+	typedef list< ccFloodData* >	ignoreListType;
 	
-	
-	loginListType			loginList ;
-	
-	loginListType			ignoreList;
+	ignoreListType			ignoreList;
 	
 	typedef list< ccException* >    exceptionListType;
 	
 	exceptionListType		exceptionList;
 	
-	typedef list< string* >		clonesQueueType;
-	
-	clonesQueueType			clonesQueue;
-	
-	typedef clonesQueueType::iterator clonesIterator;
-				
 	typedef list< ccGate* >		gateQueueType;
 	
 	gateQueueType			gatesWaitingQueue;
@@ -277,29 +269,15 @@ public:
 	 * based on the iClient structure
 	 */
 	 
-	AuthInfo* IsAuth( const iClient* theClient ) const ;
+	ccUser* IsAuth( const iClient* theClient ) ;
 
 	/**
 	 * This method will check if a client is authenticated 
 	 * based on a nick
 	 */
 
-        AuthInfo *IsAuth( const string& ) const ;
+        ccUser *IsAuth( const string& );
 
-	/**
-	 * This method will check if a client is authenticated 
-	 * based on the ccUser structure
-	 */
-
-	AuthInfo *IsAuth( const ccUser* ) const ;
-	
-	/**
-	 * This method will check if a client is authenticated 
-	 * based on the full numeric
-	 */
-
-	AuthInfo *IsAuth( const unsigned int ) const ;
-       
         
 	/**
 	 * This method will add a new oper to the database
@@ -318,13 +296,13 @@ public:
 	 * This method will mark the client as authenticated
 	 */
 	
-	bool AuthUser( ccUser* );
+	bool AuthUser( ccUser* ,iClient* );
 	
 	/**
 	 * This method will deauthenticate a client with the bot
 	 */
 
-	bool deAuthUser( const string& );
+	bool deAuthUser( ccUser* );
 
 	/**
 	 * This method will return the access flag needed for a command
@@ -448,14 +426,14 @@ public:
 	 * This method logs the bot commands to the message channel
 	 */
 
-	bool MsgChanLog( const char * , ... );
+	bool MsgChanLog( const char * , ... ) ;
 
 	/**
 	 * This method logs the commands to the database 
 	 * for lastcom report
 	 */
 
-	bool DailyLog( AuthInfo * , const char *, ... );
+	bool DailyLog( ccUser * , const char *, ... );
 
 	/**
 	 * This method convers a unix time to ascii time
@@ -489,8 +467,6 @@ public:
 	
 	int checkGline(const string ,unsigned int ,unsigned int &);
 
-	bool isSuspended(AuthInfo *);
-
 	bool isSuspended(ccUser *);
 	
 	bool refreshSuspention();
@@ -501,6 +477,8 @@ public:
 	
 	bool loadGlines();
 
+	bool loadUsers();
+	
 	void wallopsAsServer(const char * , ... );
 
 	int getExceptions( const string & );
@@ -513,17 +491,17 @@ public:
 
 	bool delException( iClient * , const string & );
 	
-	ccLogin *findLogin( const string & );
+	ccFloodData *findLogin( const string & );
 
-	void removeLogin( ccLogin * );
+	void removeLogin( ccFloodData * );
 
-	void addLogin( const string & );
+	void addLogin( iClient* );
 	
 	int removeIgnore( const string & );
 	
 	int removeIgnore( iClient * );
 
-	void ignoreUser( ccLogin * );
+	void ignoreUser( ccFloodData * );
 
 	bool listIgnores( iClient * );
 	
@@ -561,7 +539,8 @@ public:
 	
 	void showStatus(iClient*);
 	
-	
+	unsigned int checkPassword(string,ccUser*);
+		
 	/**
 	 * This is a constant iterator type used to perform a read-only
 	 * iteration of the operchan structure.
@@ -659,18 +638,12 @@ public:
 	glineIterator gline_end()
 		{ return glineList.end() ; }
 		
-	typedef loginListType::iterator loginIterator;
+	typedef ignoreListType::iterator ignoreIterator;
 	
-	loginIterator login_begin()
-		{ return loginList.begin() ; }
-
-	loginIterator login_end()
-		{ return loginList.end() ; }
-
-	loginIterator ignore_begin()
+	ignoreIterator ignore_begin()
 		{ return ignoreList.begin() ; }
 
-	loginIterator ignore_end()
+	ignoreIterator ignore_end()
 		{ return ignoreList.end() ; }
 	
 	typedef exceptionListType::iterator exceptionIterator;
@@ -689,6 +662,14 @@ public:
 	clientsIpIterator clientsIp_end()
 		{ return clientsIpMap.end(); }
 
+	typedef  usersMapType::const_iterator	usersConstIterator;
+	
+	usersConstIterator		usersMap_begin() const
+		{ return usersMap.begin(); }
+
+	usersConstIterator		usersMap_end() const
+		{ return usersMap.end(); }
+
 	/**
 	 * Retrieve the default length of time for glines.
 	 */
@@ -703,13 +684,8 @@ public:
 	/* TimerID - Posts the daily log to the abuse team  */
 	xServer::timerID postDailyLog;
 
-	/* TimerID = Expired glines interval timer */
-	xServer::timerID expiredGlines;
-
-	/* TimerID = Expired ignores interval timer */
-	xServer::timerID expiredIgnores;
-
-	xServer::timerID expiredSuspends;
+	/* TimerID = Expired glines/ignores/suspends/... interval timer */
+	xServer::timerID expiredTimer;
 
 	xServer::timerID gatesStatusCheck;
 	
@@ -782,7 +758,7 @@ protected:
 	 * Refresh gline interval
 	 */
 
-	int 			GLInterval;
+	int 			ExpiredInterval;
 
 	int			userMaxConnection;
 	 

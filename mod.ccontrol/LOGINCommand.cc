@@ -12,8 +12,9 @@
 #include	"StringTokenizer.h"
 #include	"md5hash.h" 
 #include        "ccUser.h"
+#include	"ip.h"
 
-const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.18 2001/12/05 21:03:57 mrbean_ Exp $";
+const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.19 2001/12/13 08:50:00 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -39,8 +40,8 @@ if( st.size() < 3 )
 	return true;
 	}
 //Try fetching the user authenticate entry
-AuthInfo* tmpUser = bot->IsAuth(theClient->getCharYYXXX());
-if (tmpUser) 
+ccUser* theUser = bot->IsAuth(theClient);
+if (theUser) 
 	{
 	//Dont let him authenticate under a new name (for now)
 	bot->Notice(theClient, "You  are already authenticated! ");
@@ -51,13 +52,13 @@ if (tmpUser)
 	 *  Find the user record, confirm authorisation and attach the record to this client. 
 	 */
  
-ccUser* theUser = bot->GetOper(bot->removeSqlChars(st[1]));
+theUser = bot->GetOper(st[1]);
 if (!theUser) 
 	{
 	bot->MsgChanLog("[FAILED LOGIN] %s - Bad Username\n",theClient->getNickUserHost().c_str());
 	
 	bot->Notice(theClient, "FALSE LOGIN, DENIED");
-	bot->addLogin(theClient->getCharYYXXX());
+	bot->addLogin(theClient);
 	return false;
 	}
 else
@@ -69,19 +70,18 @@ else
 		{
 		bot->MsgChanLog("[FAILED LOGIN] %s - Not Operd\n",theClient->getNickUserHost().c_str());
 		bot->Notice(theClient, "FALSE LOGIN, DENIED");
-		bot->addLogin(theClient->getCharYYXXX());
-		delete theUser;
+		bot->addLogin(theClient);
 		return false;
 		}
 	//Check if the users mask is in his access list
 		
-	if(!bot->UserGotMask(theUser,theClient->getNickUserHost()))
+	if((!bot->UserGotMask(theUser,theClient->getNickUserHost()))
+	    &&(!bot->UserGotMask(theUser,xIP(theClient->getIP()).GetNumericIP())))	
 		{
 		bot->MsgChanLog("[FAILED LOGIN] %s - No HostMask\n",theClient->getNickUserHost().c_str());
 	
 		bot->Notice(theClient, "FALSE LOGIN, DENIED");
-		bot->addLogin(theClient->getCharYYXXX());
-		delete theUser;
+		bot->addLogin(theClient);
 		return false;
 		}
 
@@ -115,32 +115,29 @@ else
 		{
 		bot->MsgChanLog("[FAILED LOGIN] %s - Bad Password\n",theClient->getNickUserHost().c_str());
 		bot->Notice(theClient, "FALSE LOGIN, DENIED");
-		bot->addLogin(theClient->getCharYYXXX());
-		delete theUser;
+		bot->addLogin(theClient);
 		return false;
 		}
 	//Ok the password match , prepare the ccUser data
-	AuthInfo *TempAuth = bot->IsAuth(theUser->getID());
-	if(TempAuth) //there is already a user authenticated under that nick
+	if(theUser->getClient()) //there is already a user authenticated under that nick
 		{
-		iClient *tClient = Network->findClient(TempAuth->getNumeric());
+		const iClient *tClient = theUser->getClient();
 		bot->Notice(tClient,"You have just been deauthenticated");
 		bot->MsgChanLog("Login conflict for user %s from %s and %s\n"
 				,st[1].c_str(),theClient->getNickName().c_str()
 				,tClient->getNickName().c_str());
-		bot->deAuthUser(tClient->getCharYYXXX());
+		bot->deAuthUser(theUser);
 		}
 	theUser->setUserName(st[1]);
 	theUser->setNumeric(theClient->getCharYYXXX());
 	//Try creating an authentication entry for the user
-	if(bot->AuthUser(theUser))
+	if(bot->AuthUser(theUser,theClient))
 		if(!(bot->isSuspended(theUser)))
 			bot->Notice(theClient, "Authentication successful! ",theUser->getUserName().c_str()); 
 		else 
 			bot->Notice(theClient, "Authentication successful,However you are suspended ",theUser->getUserName().c_str()); 
 	else
 	        bot->Notice(theClient, "Error in authentication ",theUser->getUserName().c_str()); 
-	delete theUser;
 	} 
 
 return true; 

@@ -24,7 +24,7 @@
 #include	"ccUser.h"
 #include	"Constants.h"
 
-const char GLINECommand_cc_rcsId[] = "$Id: GLINECommand.cc,v 1.29 2001/12/09 20:43:08 mrbean_ Exp $";
+const char GLINECommand_cc_rcsId[] = "$Id: GLINECommand.cc,v 1.30 2001/12/13 08:50:00 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -225,10 +225,10 @@ if(!isChan)
 	} //end of regular gline
 
 //Its a channel gline
-AuthInfo *tmpAuth = bot->IsAuth(theClient->getCharYYXXX());
+ccUser *tmpAuth = bot->IsAuth(theClient);
 if(!tmpAuth)
 	return false;
-if(tmpAuth->getFlags() < operLevel::SMTLEVEL)
+if(tmpAuth->getType() < operLevel::SMTLEVEL)
 	{
 	bot->Notice(theClient,"Only smt+ can use the gline #channel command");
 	return false;

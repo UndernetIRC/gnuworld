@@ -18,7 +18,7 @@
 #include	"ELog.h"
 #include	"Constants.h"
 
-const char FORCEGLINECommand_cc_rcsId[] = "$Id: FORCEGLINECommand.cc,v 1.14 2001/12/08 17:17:29 mrbean_ Exp $";
+const char FORCEGLINECommand_cc_rcsId[] = "$Id: FORCEGLINECommand.cc,v 1.15 2001/12/13 08:50:00 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -113,12 +113,12 @@ if(gLength == 0)
 	bot->Notice(theClient,"No duration was set, setting to %d seconds by default",gLength) ;
 	ResStart = 1;
 	}
-AuthInfo *tmpAuth = bot->IsAuth(theClient->getCharYYXXX());
+ccUser *tmpAuth = bot->IsAuth(theClient);
 if(!tmpAuth)
 	{ // We shouldnt have got here in the first place, but check it anyway
 	return false;
 	}
-if((Forced) && (tmpAuth->getFlags() < operLevel::SMTLEVEL))
+if((Forced) && (tmpAuth->getType() < operLevel::SMTLEVEL))
 	{
 	bot->Notice(theClient,"Only smt+ can use the -fu option");
 	return false;

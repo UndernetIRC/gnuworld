@@ -1,7 +1,7 @@
 /* ccUser.h */
 
 #ifndef __CCUSER_H
-#define __CCUSER_H "$Id: ccUser.h,v 1.13 2001/11/21 20:54:40 mrbean_ Exp $"
+#define __CCUSER_H "$Id: ccUser.h,v 1.14 2001/12/13 08:50:00 mrbean_ Exp $"
 
 #include	<string>
 
@@ -11,6 +11,7 @@
 
 #include	"CControlCommands.h" 
 
+#include	"iClient.h"
 //#include	"ccontrol.h"
 namespace gnuworld
 { 
@@ -110,6 +111,9 @@ public:
 	inline const bool		getNeedOp() const
 		    { return NeedOp;  }
 
+	inline const iClient*		getClient() const
+		    { return Client;  }
+
 	/*
 	 * Methods to set data attributes
 	 */
@@ -172,6 +176,11 @@ public:
 	inline void			setNeedOp( const bool _needOp )
 		    { NeedOp = _needOp; }
 	
+	inline void			setClient(iClient* _Client)
+		    { Client = _Client; }
+		    
+	inline void			setSqldb(PgDatabase* _SQLDb)
+		    { SQLDb = _SQLDb; }
 	/*
 	 * Methods to load a user and update the 
 	 * the database
@@ -181,7 +190,7 @@ public:
 	
 	bool loadData( const unsigned int Id );
 
-	bool Update();
+    	bool Update();
 
 	void GetParm();
 	
@@ -234,6 +243,7 @@ protected:
 	bool IsCoder;
 	bool GetLogs;
 	bool NeedOp;
+	iClient* Client;
 	PgDatabase* SQLDb;
 
 } ; // class ccUser

@@ -28,16 +28,16 @@
 #include        "ccUser.h"
 #include	"libpq++.h"
 #include	"ccontrol.h"
-#include	"AuthInfo.h"
 #include        "server.h"
 #include 	"Constants.h"
 #include	"commLevels.h"
 #include	"ccFloodData.h"
+#include	"ccUserData.h"
 #include	"ccGate.h"
 #include	"ip.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.101 2001/12/09 20:43:08 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.102 2001/12/13 08:50:00 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -146,7 +146,7 @@ CCEmail = conf.Require( "ccemail" )->second;
 AbuseMail = conf.Require( "abuse_mail" )->second;
 
 //GLInterval is the inteval in which ccontrol will check for expired glines
-GLInterval = atoi( conf.Require( "gline_interval" )->second.c_str() );
+ExpiredInterval = atoi( conf.Require( "Expired_interval" )->second.c_str() );
 
 //Sendmail  is the full path of the sendmail program
 Sendmail_Path = conf.Require("SendMail")->second;
@@ -289,6 +289,7 @@ RegisterCommand( new SHUTDOWNCommand( this, "SHUTDOWN", " <REASON> Shutdown the 
         ,commandLevel::flg_SHUTDOWN,false,false,false,operLevel::CODERLEVEL,true ) ) ;
 loadGlines();
 loadExceptions();
+loadUsers();
 
 connectCount = 0;
 connectRetry = 5;
@@ -386,9 +387,7 @@ for( commandMapType::iterator ptr = commandMap.begin() ;
 	ptr->second->setServer( theServer ) ;
 	}
 
-expiredGlines = theServer->RegisterTimer(::time(0) + GLInterval,this,NULL);
-expiredIgnores = theServer->RegisterTimer(::time(0) + 60,this,NULL);
-expiredSuspends = theServer->RegisterTimer(::time(0) + 60,this,NULL);
+expiredTimer = theServer->RegisterTimer(::time(0) + ExpiredInterval,this,NULL);
 dbConnectionCheck = theServer->RegisterTimer(::time(0) + dbConnectionTimer,this,NULL);
 
 if(SendReport)
@@ -433,21 +432,15 @@ if( st.empty() )
 // This is no longer necessary, but oh well *shrug*
 const string Command = string_upper( st[ 0 ] ) ;
 
-AuthInfo* theUser = IsAuth(theClient->getCharYYXXX());
+ccUser* theUser = IsAuth(theClient->getCharYYXXX());
 
 if(!theUser)
 	{ //We need to add the flood points for this user
-	ccFloodData* floodData = static_cast< ccFloodData* >(
-	theClient->getCustomData(this) ) ;
+	ccFloodData* floodData = (static_cast< ccUserData* >(
+	theClient->getCustomData(this) ))->getFlood() ;
 	if(floodData->addPoints(flood::MESSAGE_POINTS))
 		{ //yes we need to ignore this user
-		ccLogin *tempLogin = findLogin(theClient->getCharYYXXX());
-		if(!tempLogin)
-			{
-			tempLogin = new (std::nothrow) ccLogin(theClient->getCharYYXXX());
-			assert(tempLogin != NULL);
-			}
-		ignoreUser(tempLogin);
+		ignoreUser(floodData);
 	
 		MsgChanLog("[FLOOD MESSAGE]: %s has been ignored"
 			,theClient->getNickName().c_str());
@@ -516,20 +509,14 @@ int ccontrol::OnCTCP( iClient* theClient, const string& CTCP
 		, const string& Message ,bool Secure = false ) 
 {
 
-AuthInfo* theUser = IsAuth(theClient->getCharYYXXX());
+ccUser* theUser = IsAuth(theClient);
 if(!theUser)
 	{ //We need to add the flood points for this user
-	ccFloodData* floodData = static_cast< ccFloodData* >(
-	theClient->getCustomData(this) ) ;
+	ccFloodData* floodData = (static_cast< ccUserData* >(
+	theClient->getCustomData(this) ))->getFlood() ;
 	if(floodData->addPoints(flood::CTCP_POINTS))
 		{ //yes we need to ignore this user
-		ccLogin *tempLogin = findLogin(theClient->getCharYYXXX());
-		if(!tempLogin)
-			{
-			tempLogin = new (std::nothrow) ccLogin(theClient->getCharYYXXX());
-			assert(tempLogin != NULL);
-			}
-		ignoreUser(tempLogin);
+		ignoreUser(floodData);
 		MsgChanLog("[FLOOD MESSAGE]: %s has been ignored"
 			,theClient->getNickName().c_str());
 		return false;
@@ -559,19 +546,17 @@ switch( theEvent )
 			{
 			clientsIpMap.erase(clientsIpMap.find(xIP( tmpUser->getIP()).GetNumericIP()));
 			}
-		ccFloodData* floodData = static_cast< ccFloodData* >(
-		tmpUser->getCustomData(this) ) ;
+		ccUserData* UserData = static_cast< ccUserData* >(
+		tmpUser->getCustomData(this))  ;
 		tmpUser->removeCustomData(this);
-		delete(floodData);
 		
-		AuthInfo *TempAuth = IsAuth(tmpUser);
+		ccUser *TempAuth = UserData->getDbUser();
 		if(TempAuth)
 	    		{
-			elog << "Deauth " << TempAuth->getName().c_str()
-			     << "because he quited / killed!\n";
-			deAuthUser(tmpUser->getCharYYXXX());
+			MsgChanLog("Removed auth for %s, he quited!\n",TempAuth->getUserName().c_str());
+			deAuthUser(TempAuth);
 			}
-		ccLogin *tempLogin = findLogin(tmpUser->getCharYYXXX());
+		ccFloodData *tempLogin = UserData->getFlood();
 		if(tempLogin)
 			{
 			removeLogin(tempLogin);
@@ -668,10 +653,11 @@ switch( theEvent )
 		iClient* NewUser = static_cast< iClient* >( Data1);
 
 		//Create our flood data for this user
-		ccFloodData* floodData = new (std::nothrow) ccFloodData();
+		ccFloodData* floodData = new (std::nothrow) ccFloodData(NewUser->getCharYYXXX());
 		assert( floodData != 0 ) ;
+		ccUserData* UserData = new (std::nothrow) ccUserData(floodData);
 		NewUser->setCustomData(this,
-			static_cast< void* >( floodData ) );
+			static_cast< void* >( UserData ) );
 				
 		if(checkGates)
 			{
@@ -799,23 +785,14 @@ if (timer_id ==  postDailyLog)
 	time_t theTime = time(NULL) + 24*3600; 
 	postDailyLog = MyUplink->RegisterTimer(theTime, this, NULL); 
 	}
-else if (timer_id == expiredGlines)
+else if (timer_id == expiredTimer)
 	{
 	refreshGlines();
-	expiredGlines = MyUplink->RegisterTimer(::time(0) + GLInterval,
+	refreshIgnores();
+	refreshSuspention();
+	expiredTimer = MyUplink->RegisterTimer(::time(0) + ExpiredInterval,
 		this,NULL);
 	}
-else if (timer_id == expiredIgnores)
-	{
-	refreshIgnores();
-	expiredIgnores = MyUplink->RegisterTimer(::time(0) + 60,this,NULL);
-	}
-else if (timer_id == expiredSuspends)
-	{
-	refreshSuspention();
-	expiredSuspends = MyUplink->RegisterTimer(::time(0) + 60,this,NULL);
-	}
-
 else if(timer_id == gatesStatusCheck)
 	{
 	if(checkGates)
@@ -970,63 +947,14 @@ Part( chanName ) ;
 return true ;
 }
 
-AuthInfo* ccontrol::IsAuth( const iClient* theClient ) const
+ccUser* ccontrol::IsAuth( const iClient* theClient ) 
 {
-assert( theClient != 0 ) ;
-return IsAuth( theClient->getCharYYXXX() ) ;
+return (static_cast<ccUserData*>(theClient->getCustomData(this)))->getDbUser() ;
 }
 
-AuthInfo* ccontrol::IsAuth( const string& Numeric ) const
+ccUser* ccontrol::IsAuth( const string& Numeric ) 
 {
-for( authListType::const_iterator ptr = authList.begin() ;
-	ptr != authList.end() ; ++ptr )
-	{
-	if( !strcasecmp( (*ptr)->getNumeric(), Numeric ) )
-		{
-		return *ptr ;
-		}
-	}
-return NULL ;
-}
-
-AuthInfo* ccontrol::IsAuth( const ccUser* theUser ) const
-{
-assert( theUser != 0 ) ;
-return IsAuth( theUser->getID() ) ;
-}
-   
-AuthInfo* ccontrol::IsAuth( const unsigned int UserId ) const
-{
-for( authListType::const_iterator ptr = authList.begin() ;
-	ptr != authList.end() ; ++ptr )
-	{
-	if( (*ptr)->getId() == UserId )
-		{
-		return *ptr ;
-		}
-	}
-return NULL ;
-}
-
-void ccontrol::UpdateAuth(ccUser* TempUser)
-{
-AuthInfo* TempAuth = IsAuth(TempUser);
-
-if(TempAuth)
-	{
-	//ccUser* TempUser = GetUser(Id);
-	TempAuth->setId(TempUser->getID());
-        TempAuth->setName(TempUser->getUserName());
-        TempAuth->setAccess(TempUser->getAccess());
-        TempAuth->setSAccess(TempUser->getSAccess());
-        TempAuth->setFlags(TempUser->getType());
-	TempAuth->setIsSuspended(TempUser->getIsSuspended());
-        TempAuth->setSuspendExpires(TempUser->getSuspendExpires());
-        TempAuth->setSuspendedBy(TempUser->getSuspendedBy());
-	TempAuth->setServer(TempUser->getServer());
-	TempAuth->setNeedOp(TempUser->getNeedOp());
-	TempAuth->setGetLogs(TempUser->getLogs());
-	}
+return IsAuth(Network->findClient(Numeric));
 }
 
 
@@ -1064,15 +992,14 @@ theQuery	<< Main
 		<< ")"
 		<< ends;
 
-elog	<< "ACCESS::sqlQuery> "
-	<< theQuery.str()
-	<< endl; 
-
 ExecStatusType status = SQLDb->Exec( theQuery.str() ) ;
 delete[] theQuery.str() ;
 
 if( PGRES_COMMAND_OK == status ) 
 	{
+	if(!Oper->loadData(Oper->getUserName()))
+		return false;
+	usersMap[Oper->getUserName()] = Oper;
 	return true;
 	}
 
@@ -1091,7 +1018,7 @@ if(!dbConnected)
 	}
 
 ExecStatusType status;
-ccUser* tUser = GetOper(removeSqlChars(Name.c_str()));
+ccUser* tUser = usersMap[Name];
 //Delete the user hosts
 if(tUser)
     {
@@ -1113,7 +1040,7 @@ if( PGRES_COMMAND_OK != status )
 		<< endl ;
 	return false;
 	}
-	delete tUser;
+	usersMap.erase(usersMap.find(Name));
     }    
 
 static const char *Main = "DELETE FROM opers WHERE lower(user_name) = '";
@@ -1158,42 +1085,26 @@ if( commHandler != command_end() )
 return -1 ;
 }	
 
-bool ccontrol::AuthUser( ccUser* TempUser)
+bool ccontrol::AuthUser( ccUser* TempUser,iClient* tUser)
 {
-AuthInfo *TempAuth = new (std::nothrow) AuthInfo;
-assert( TempAuth != 0 ) ;
+ccUserData* UserData= static_cast<ccUserData*>(tUser->getCustomData(this));
+UserData->setDbUser(TempUser);
+TempUser->setClient(tUser);
 
-TempAuth->setId(TempUser->getID());
-TempAuth->setName(TempUser->getUserName());
-TempAuth->setAccess(TempUser->getAccess());
-TempAuth->setSAccess(TempUser->getSAccess());
-TempAuth->setFlags(TempUser->getType());
-TempAuth->setNumeric(TempUser->getNumeric());
-TempAuth->setIsSuspended(TempUser->getIsSuspended());
-TempAuth->setSuspendExpires(TempUser->getSuspendExpires());
-TempAuth->setSuspendedBy(TempUser->getSuspendedBy());
-TempAuth->setSuspendLevel(TempUser->getSuspendLevel());
-TempAuth->setSuspendReason(TempUser->getSuspendReason());
-TempAuth->setServer(TempUser->getServer());
-TempAuth->setNeedOp(TempUser->getNeedOp());
-TempAuth->setGetLogs(TempUser->getLogs());
-authList.push_back( TempAuth ) ;
+MsgChanLog("Authenticated %s\n",TempUser->getNumeric().c_str());
 return true;
 }    
 
-bool ccontrol::deAuthUser( const string& Numeric)
+bool ccontrol::deAuthUser( ccUser* tUser)
 {
-AuthInfo *TempAuth = IsAuth(Numeric);
-if(TempAuth)
-	{
-	elog 	<< "Removed authentication for " 
-		<< TempAuth->getName().c_str() << "\n";
-	authList.erase( std::find( authList.begin(),
-		authList.end(),
-		TempAuth ) ) ;
 
-	delete TempAuth ; 
+const iClient* tClient = tUser->getClient();
+if(tClient)
+	{
+	(static_cast<ccUserData*>(tClient->getCustomData(this)))->setDbUser(NULL);
+	tUser->setClient(NULL);
 	}
+		
 return true;
 }
 
@@ -1582,35 +1493,27 @@ return retMe ;
 
 ccUser* ccontrol::GetOper( const string Name)
 {
-
-if(!dbConnected)
+ccUser* tempUser = usersMap[Name];
+if(!tempUser)
 	{
-	return NULL;
+	usersMap.erase(usersMap.find(Name));
 	}
-
-
-ccUser* tmpUser = new (std::nothrow) ccUser(SQLDb);
-assert( tmpUser != 0 ) ;
-
-if( !tmpUser->loadData(removeSqlChars(Name)) )
-	{
-	delete tmpUser ; 
-	tmpUser = 0 ;
-	}
-return tmpUser ;
+return tempUser;
 }
 
 ccUser* ccontrol::GetOper( unsigned int ID)
 {
-ccUser* tmpUser = new (std::nothrow) ccUser(SQLDb);
-assert( tmpUser != 0 ) ;
-
-if( !tmpUser->loadData(ID) )
+usersIterator tIterator = usersMap.begin();
+while(tIterator != usersMap.end())
 	{
-	delete tmpUser ; 
-	tmpUser = 0 ;
+	ccUser* tUser = tIterator->second;;
+	if(tUser->getID() == ID)
+		{
+		return tIterator->second;
+		}
+	++tIterator;
 	}
-return tmpUser ;
+return NULL;
 }
 
 bool ccontrol::addGline( ccGline* TempGline)
@@ -1688,7 +1591,7 @@ ATime[strlen(ATime)-1] = '\0';
 return ATime;
 }
 
-bool ccontrol::MsgChanLog(const char *Msg, ... )
+bool ccontrol::MsgChanLog(const char *Msg, ... ) 
 {
 if(!Network->findChannel(msgChan))
 	{
@@ -1703,19 +1606,20 @@ vsprintf( buffer, Msg, list ) ;
 va_end( list ) ;
 
 Notice((Network->findChannel(msgChan))->getName(),buffer);
-
-for( authListType::const_iterator ptr = authList.begin() ;
-        ptr != authList.end() ; ++ptr )
+usersIterator uIterator;
+ccUser* tempUser;
+for( uIterator = usersMap.begin();uIterator != usersMap.end();++uIterator)
         {
-        if((*ptr)->getLogs() )
+        tempUser = uIterator->second;
+	if((tempUser) && (tempUser->getLogs() ) && (tempUser->getClient()))
                 { 
-                Message(Network->findClient((*ptr)->getNumeric()),buffer);
+                Message(tempUser->getClient(),buffer);
                 }
 	}
 return true;
 }
 
-bool ccontrol::DailyLog(AuthInfo* Oper, const char *Log, ... )
+bool ccontrol::DailyLog(ccUser* Oper, const char *Log, ... )
 {
 
 if(!dbConnected)
@@ -1786,7 +1690,7 @@ strcpy(buffer,log.c_str());
 					
 strstream theQuery;
 theQuery	<< Main
-		<< Oper->getName() 
+		<< Oper->getUserName() 
 		<< " (" << theClient->getNickUserHost() <<")','"
 		<< removeSqlChars(buffer) << "')"
 		<< ends;
@@ -1997,19 +1901,6 @@ if(!retMe)
 return retMe;
 }
 
-bool ccontrol::isSuspended(AuthInfo *theUser)
-{
-if( (theUser) && (theUser->getIsSuspended()))
-	{
-	//Check if the suspend hadnt already expired
-	if(::time( 0 ) - theUser->getSuspendExpires() < 0)
-		{
-		return true;
-		}
-	}
-return false;
-}
-
 bool ccontrol::isSuspended(ccUser *theUser)
 {
 if( (theUser) && (theUser->getIsSuspended()))
@@ -2025,69 +1916,47 @@ return false;
 
 bool ccontrol::refreshSuspention()
 {
-static const char *Main = "SELECT user_id FROM opers WHERE isSuspended = 't' AND suspend_expires < now()::abstime::int4";
 
-if(!dbConnected)
+int totalCount = 0;
+usersIterator curUser = usersMap.begin();
+ccUser* tempUser;
+for(;curUser != usersMap.end();++curUser)
 	{
-	return false;
+	tempUser = curUser->second;
+	if((tempUser->getIsSuspended()) && (tempUser->getSuspendExpires() < ::time(0)))
+		{
+		tempUser->setSuspendExpires(0);
+		tempUser->setSuspendedBy("");
+		tempUser->setIsSuspended(false);
+		tempUser->setSuspendLevel(0);
+		tempUser->setSuspendReason("");
+		++totalCount;
+		}
 	}
 
-strstream theQuery;
-theQuery	<< Main
+static const char *DelMain = "update opers set isSuspended = 'n',Suspend_Expires = 0, Suspended_by = '',suspend_level = 0,suspend_reason='' where IsSuspended = 'y' And suspend_expires < now()::abstime::int4";
+
+strstream DelQuery;
+DelQuery	<< DelMain
 		<< ends;
 
+elog	<< "ccontrol::RefreshSuspention> "
+	<< DelQuery.str()
+	<< endl; 
 
-ExecStatusType status = SQLDb->Exec( theQuery.str() ) ;
-delete[] theQuery.str() ;
+ExecStatusType status = SQLDb->Exec( DelQuery.str() ) ;
+delete[] DelQuery.str() ;
 
-if( PGRES_TUPLES_OK != status )
+if( PGRES_COMMAND_OK != status )
 	{
 	elog	<< "ccontrol::refreshSuspention> SQL Failure: "
 		<< SQLDb->ErrorMessage()
 		<< endl ;
-
-	return false ;
-	}
-
-if(SQLDb->Tuples() > 0)
-	{
-	AuthInfo *tmpAuth;
-	for( int i = 0 ; i < SQLDb->Tuples() ; i++ )
-		{
-		tmpAuth = IsAuth(atoi(SQLDb->GetValue(i,0)));
-		if(tmpAuth)
-			{ //The user is authenticated now, update his authentication
-			tmpAuth->setSuspendExpires(0);
-			tmpAuth->setSuspendedBy("");
-			tmpAuth->setIsSuspended(false);
-			tmpAuth->setSuspendLevel(0);
-			tmpAuth->setSuspendReason("");
-			}
-		}
-	static const char *DelMain = "update opers set isSuspended = 'n',Suspend_Expires = 0, Suspended_by = '',suspend_level = 0,suspend_reason='' where IsSuspended = 'y' And suspend_expires < now()::abstime::int4";
-
-	strstream DelQuery;
-	DelQuery	<< DelMain
-			<< ends;
-
-	elog	<< "ccontrol::RefreshSuspention> "
-		<< DelQuery.str()
-		<< endl; 
-
-	status = SQLDb->Exec( DelQuery.str() ) ;
-	delete[] DelQuery.str() ;
-
-	if( PGRES_COMMAND_OK != status )
-		{
-		elog	<< "ccontrol::refreshSuspention> SQL Failure: "
-			<< SQLDb->ErrorMessage()
-			<< endl ;
-
 		return false ;
-		}
-			
-
 	}
+if(totalCount > 0)
+	MsgChanLog("[Refresh Suspend] - %d expired\n",totalCount);		
+
 return true;
 }
 
@@ -2104,7 +1973,6 @@ inRefresh = true;
 
 for(glineIterator ptr = glineList.begin();ptr != glineList.end();) 
 	{
-//	if((*ptr)->getExpires() <= ::time(0))
 	if(((*ptr)->getExpires() <= ::time(0)) 
 	    && (((*ptr)->getHost().substr(0,1) != "#") || 
 	    ((*ptr)->getExpires() != 0)))
@@ -2118,7 +1986,7 @@ for(glineIterator ptr = glineList.begin();ptr != glineList.end();)
 		tGline->Delete();
 		ptr = glineList.erase(ptr);
 		delete tGline;
-		totalFound++;
+		++totalFound;
 		}
 	else
 		ptr++;
@@ -2126,25 +1994,11 @@ for(glineIterator ptr = glineList.begin();ptr != glineList.end();)
 
 inRefresh = false;
 
+if(totalFound > 0)
+	MsgChanLog("[Refresh Glines] - %d expired\n",totalFound);
 return true;
 
 }
-
-/*bool ccontrol::burstGlines()
-{
-
-ccGline *theGline = 0 ;
-for(glineIterator ptr = glineList.begin(); ptr != glineList.end(); ptr++)
-	{
-	theGline = *ptr;
-	MyUplink->setGline(theGline->getAddedBy(),
-		theGline->getHost(),
-		theGline->getReason(),
-		theGline->getExpires() - ::time(0));
-	}
-
-return true;
-}*/
 
 bool ccontrol::burstGlines()
 {
@@ -2221,6 +2075,73 @@ for( int i = 0 ; i < SQLDb->Tuples() ; i++ )
 	}
 return true;	
 } 
+
+bool ccontrol::loadUsers()
+{
+ 
+if(!dbConnected)
+        {   
+        return false;
+        }
+   
+strstream theQuery;
+theQuery        << User::Query
+                << ends;
+
+elog    << "ccotrol::loadUsers> "
+        << theQuery.str()
+        << endl; 
+ 
+ExecStatusType status = SQLDb->Exec( theQuery.str() ) ;
+delete[] theQuery.str() ;
+
+if (PGRES_TUPLES_OK != status)
+        {
+        return false;
+        }
+ccUser* tempUser;
+for(int i =0;i<SQLDb->Tuples();++i)
+	{
+	tempUser = new (std::nothrow) ccUser(SQLDb);
+	tempUser->setID(atoi(SQLDb->GetValue(i, 0)));
+        tempUser->setUserName(SQLDb->GetValue(i, 1));
+        tempUser->setPassword(SQLDb->GetValue(i, 2));
+	tempUser->setAccess(atol(SQLDb->GetValue(i, 3)));
+	tempUser->setSAccess(atol(SQLDb->GetValue(i, 4)));
+	tempUser->setFlags(atoi(SQLDb->GetValue(i, 5)));
+	tempUser->setSuspendExpires(atoi(SQLDb->GetValue(i,6)));
+	tempUser->setSuspendedBy(SQLDb->GetValue(i,7));
+	tempUser->setServer(SQLDb->GetValue(i,8));
+	tempUser->setIsSuspended(!strcasecmp(SQLDb->GetValue(i,9),"t"));
+	if(!strcasecmp(SQLDb->GetValue(i,10),"t"))
+		{
+		tempUser->setType(operLevel::UHSLEVEL);
+		}
+	else if(!strcasecmp(SQLDb->GetValue(i,11),"t"))
+		{
+		tempUser->setType(operLevel::OPERLEVEL);
+		}
+	else if(!strcasecmp(SQLDb->GetValue(i,12),"t"))
+		{
+		tempUser->setType(operLevel::ADMINLEVEL);
+		}
+	else if(!strcasecmp(SQLDb->GetValue(i,13),"t"))
+		{
+		tempUser->setType(operLevel::SMTLEVEL);
+		}
+	else if(!strcasecmp(SQLDb->GetValue(i,14),"t"))
+		{
+		tempUser->setType(operLevel::CODERLEVEL);
+		}
+	tempUser->setLogs(!strcasecmp(SQLDb->GetValue(i,15),"t"));
+	tempUser->setNeedOp(!strcasecmp(SQLDb->GetValue(i,16),"t"));
+	tempUser->setEmail(SQLDb->GetValue(i,17));
+	tempUser->setSuspendLevel(atoi(SQLDb->GetValue(i,18)));
+	tempUser->setSuspendReason(SQLDb->GetValue(i,19));
+	usersMap[tempUser->getUserName()]=tempUser;
+	}
+return true;
+}
 
 void ccontrol::wallopsAsServer(const char *Msg,...)
 {
@@ -2356,9 +2277,9 @@ for(exceptionIterator ptr = exception_begin();ptr != exception_end();)
 return true;
 }	
 
-ccLogin *ccontrol::findLogin( const string & Numeric )
+ccFloodData *ccontrol::findLogin( const string & Numeric )
 {
-for(loginIterator ptr = login_begin() ; ptr != login_end() ; ++ptr)
+for(ignoreIterator ptr = ignore_begin() ; ptr != ignore_end() ; ++ptr)
 	{
 	if((*ptr)->getNumeric() == Numeric)
 		{
@@ -2368,29 +2289,22 @@ for(loginIterator ptr = login_begin() ; ptr != login_end() ; ++ptr)
 return NULL;
 }
 
-void ccontrol::removeLogin( ccLogin *tempLogin )
+void ccontrol::removeLogin( ccFloodData *tempLogin )
 {
-for(loginIterator ptr = login_begin() ; ptr != login_end() ;)
+for(ignoreIterator ptr = ignore_begin() ; ptr != ignore_end() ;)
 	{
 	if((*ptr) == tempLogin)
 		{
-		ptr = loginList.erase(ptr);
+		ptr = ignoreList.erase(ptr);
 		}
 	else
 		ptr++;
 	}
 }
 
-void ccontrol::addLogin( const string & Numeric)
+void ccontrol::addLogin( iClient* tClient)
 {
-ccLogin *LogInfo = findLogin(Numeric);
-if(LogInfo == NULL)
-	{
-	LogInfo = new (std::nothrow) ccLogin(Numeric);
-	assert(LogInfo != NULL);
-
-	loginList.push_back(LogInfo);
-	}
+ccFloodData *LogInfo = static_cast<ccUserData*>( tClient->getCustomData(this))->getFlood();
 
 LogInfo->add_Login();
 if(LogInfo->getLogins() > 5)
@@ -2402,10 +2316,10 @@ if(LogInfo->getLogins() > 5)
 int ccontrol::removeIgnore( const string &Host )
 {
 
-ccLogin *tempLogin = 0;
+ccFloodData *tempLogin = 0;
 int retMe = IGNORE_NOT_FOUND;
 
-for(loginIterator ptr = ignore_begin();ptr!=ignore_end();)
+for(ignoreIterator ptr = ignore_begin();ptr!=ignore_end();)
 	{
 	tempLogin = *ptr;
 	if(tempLogin->getIgnoredHost() == Host)
@@ -2424,7 +2338,7 @@ for(loginIterator ptr = ignore_begin();ptr!=ignore_end();)
 		ptr = ignoreList.erase(ptr);
 		if(tempLogin->getNumeric() == "0")
 			{
-		delete tempLogin;
+			delete tempLogin;
 			}
 		retMe = IGNORE_REMOVED;
 		}
@@ -2444,12 +2358,11 @@ int retMe = removeIgnore(Host);
 return retMe;
 }
 
-void ccontrol::ignoreUser( ccLogin *User )
+void ccontrol::ignoreUser( ccFloodData* Flood )
 {
 
-iClient *theClient = Network->findClient(User->getNumeric());
-
-Notice(theClient,"Hmmmz i dont think i like you anymore , consider yourself ignored");
+const iClient* theClient = Network->findClient(Flood->getNumeric());
+Notice(theClient,"I dont think I like you anymore , consider yourself ignored");
 MsgChanLog("Added %s to my ignore list\n",theClient->getNickUserHost().c_str());
 
 string silenceMask = string( "*!*" )
@@ -2467,18 +2380,17 @@ s	<< getCharYYXXX()
 
 Write( s );
 delete[] s.str();
+Flood->setIgnoreExpires(::time(0)+ flood::IGNORE_TIME);
+Flood->setIgnoredHost(silenceMask);
 
-User->setIgnoreExpires(::time(0)+ flood::IGNORE_TIME);
-User->setIgnoredHost(silenceMask);
-
-ignoreList.push_back(User);
+ignoreList.push_back(Flood);
 }
 
 bool ccontrol::listIgnores( iClient *theClient )
 {
 Notice(theClient,"-= Listing Ignore List =-");			
-ccLogin *tempLogin;
-for(loginIterator ptr = ignore_begin();ptr!=ignore_end();ptr++)
+ccFloodData *tempLogin;
+for(ignoreIterator ptr = ignore_begin();ptr!=ignore_end();ptr++)
 	{
 	tempLogin = *ptr;
 	if(tempLogin->getIgnoreExpires() > ::time(0))
@@ -2495,8 +2407,9 @@ return true ;
 
 bool ccontrol::refreshIgnores()
 {
-ccLogin *tempLogin;
-for(loginIterator ptr = ignore_begin();ptr!=ignore_end();)
+ccFloodData *tempLogin;
+unsigned int TotalFound =0;
+for(ignoreIterator ptr = ignore_begin();ptr!=ignore_end();)
 	{
 	tempLogin = *ptr;
 	if((tempLogin) &&(tempLogin->getIgnoreExpires() <= ::time(0)))
@@ -2515,13 +2428,16 @@ for(loginIterator ptr = ignore_begin();ptr!=ignore_end();)
 		tempLogin->setIgnoredHost("");
 		if(tempLogin->getNumeric() == "0")
 			{
-		delete tempLogin;
+			delete tempLogin;
 			}
 		ptr = ignoreList.erase(ptr);
+		++TotalFound;
 		}
 	else
 		ptr++;
 	}
+if(TotalFound > 0)
+	MsgChanLog("[Refresh Ignores] - %d expired\n",TotalFound);
 
 return true;
 
@@ -2970,6 +2886,12 @@ for(exceptionIterator ptr = exception_begin();ptr != exception_end();++ptr)
 	{
 	(*ptr)->setSqldb(_SQLDb);
 	}
+
+for(usersIterator ptr = usersMap.begin();ptr != usersMap.end();++ptr)
+	{
+	ptr->second->setSqldb(_SQLDb);
+	}
+
 }
 
 void ccontrol::showStatus(iClient* tmpClient)
@@ -2998,8 +2920,22 @@ Notice(tmpClient,"ccServer: %d",ccServer::numAllocated);
 Notice(tmpClient,"ccGline: %d",ccGline::numAllocated);
 Notice(tmpClient,"ccException: %d",ccException::numAllocated);
 Notice(tmpClient,"ccUser: %d",ccUser::numAllocated);
- 
+Notice(tmpClient,"Total of %d users in the map",usersMap.size()); 
 }
+
+unsigned int ccontrol::checkPassword(string NewPass , ccUser* tmpUser)
+{
+if(NewPass.size() < password::MIN_SIZE)
+	{
+	return password::TOO_SHORT;
+	}
+if(!strcasecmp(NewPass,tmpUser->getUserName()))
+	{
+	return password::LIKE_UNAME;
+	}
+return password::PASS_OK;
+}
+
 
 void *initGate(void* arg)
 {

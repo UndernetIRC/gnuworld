@@ -15,7 +15,7 @@
 #include 	"ccUser.h"
 #include	"misc.h"
 
-const char REMCOMMANDCommand_cc_rcsId[] = "$Id: REMCOMMANDCommand.cc,v 1.6 2001/11/20 19:49:45 mrbean_ Exp $";
+const char REMCOMMANDCommand_cc_rcsId[] = "$Id: REMCOMMANDCommand.cc,v 1.7 2001/12/13 08:50:00 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -59,43 +59,38 @@ if(!theUser)
 if(st[2].size() > 128)
 	{
 	bot->Notice(theClient,"Command name can't be more than 128 chars");
-	delete theUser;
 	return false;
 	}
 Command* Comm = bot->findCommandInMem(st[2]);
 if(!Comm)
 	{
 	bot->Notice(theClient,"Command %s does not exists!",st[2].c_str());
-	delete theUser;
 	return false;	        
 	}
-AuthInfo* tempUser = bot->IsAuth(theClient->getCharYYXXX());
 
-if(!strcasecmp(tempUser->getName(),st[1]))
+ccUser* tempUser = bot->IsAuth(theClient);
+
+if(!strcasecmp(tempUser->getUserName(),st[1]))
 	{
 	bot->Notice(theClient,"I dont know about you, but i for one dont think removing your own command is such a good idea ... ");
-	delete theUser;
 	return false;
 	}
 
-bool Admin = (tempUser->getFlags()  < operLevel::SMTLEVEL);
+bool Admin = (tempUser->getType()  < operLevel::SMTLEVEL);
 
-if((Admin) && (tempUser->getFlags() <= theUser->getType()))
+if((Admin) && (tempUser->getType() <= theUser->getType()))
 	{
 	bot->Notice(theClient,"You cant modify user who have a equal/higher access than you");
-	delete theUser;
 	return false;
 	}
-else if(!(Admin) && (tempUser->getFlags() < theUser->getType()))
+else if(!(Admin) && (tempUser->getType() < theUser->getType()))
 	{
 	bot->Notice(theClient,"You cant modify user who have a higher access than you");
-	delete theUser;
 	return false;
 	}
 if((Admin) && (strcasecmp(tempUser->getServer(),theUser->getServer())))
 	{
 	bot->Notice(theClient,"You can only modify a user who is associated with the same server as you");
-	delete theUser;
 	return false;
 	}
 	
@@ -103,7 +98,6 @@ if((Admin) && (strcasecmp(tempUser->getServer(),theUser->getServer())))
 if(!(theUser->gotAccess(Comm)))
 	{
 	bot->Notice(theClient,"%s doest have access for %s",st[1].c_str(),st[2].c_str());
-	delete theUser;
 	return false;	        
 	}	
 //Remove the command 	
@@ -112,14 +106,11 @@ theUser->setLast_Updated_By(theClient->getNickUserHost());
 if(theUser->Update())
 	{
 	bot->Notice(theClient,"Successfully removed the command from %s",st[1].c_str());
-	bot->UpdateAuth(theUser);
-	delete theUser;
 	return true;
 	}
 else
 	{
 	bot->Notice(theClient,"Error while removing command from %s",st[1].c_str());
-	delete theUser;
 	return false;
 	}
 	

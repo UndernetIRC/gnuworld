@@ -1,7 +1,9 @@
 /* 
  * ccFloodData.cc
  * 
- * $Id: ccFloodData.cc,v 1.2 2001/11/21 20:54:40 mrbean_ Exp $
+ * flood data class
+ * 
+ * $Id: ccFloodData.cc,v 1.3 2001/12/13 08:50:00 mrbean_ Exp $
  */
  
 #include	<strstream>
@@ -11,13 +13,11 @@
 #include	<cstring> 
 #include	<cstdlib>
 
-#include	"ELog.h"
-#include	"misc.h"
-
 #include	"ccFloodData.h" 
+#include	"Constants.h"
 
 const char ccFloodData_h_rcsId[] = __CCFLOODDATA_H ;
-const char ccFLOODDATA_cc_rcsId[] = "$Id: ccFloodData.cc,v 1.2 2001/11/21 20:54:40 mrbean_ Exp $" ;
+const char ccFloodData_cc_rcsId[] = "$Id: ccFloodData.cc,v 1.3 2001/12/13 08:50:00 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -31,9 +31,14 @@ namespace uworld
 {
 
 unsigned int ccFloodData::numAllocated = 0;
-ccFloodData::ccFloodData()
- : Points(0),
+
+ccFloodData::ccFloodData(const string &_Numeric)
+ : Numeric(_Numeric),
+   Logins(0),
+   IgnoreExpires( 0 ),
+   Points(0),
    lastMessage(0)
+
 {
 ++numAllocated;
 }
@@ -46,8 +51,8 @@ ccFloodData::~ccFloodData()
 bool ccFloodData::addPoints(unsigned int _Points)
 {
 //Check if the flood points needs to be reset
-if(flood::RESET_TIME < (::time(0) - lastMessage))
-	Points = 0;
+if(flood::RESET_TIME <   (::time(0) - lastMessage))
+        Points = 0;   
 
 //Update the new flood points
 Points += _Points;
@@ -57,9 +62,6 @@ lastMessage = ::time(0);
 
 return (Points > flood::FLOOD_POINTS);
 }
-
-} // uworld
-} // gnuworld
-
-      
-
+ 
+}
+} //Namespace Gnuworld

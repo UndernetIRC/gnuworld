@@ -13,10 +13,9 @@
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 #include        "ccUser.h"
-#include	"AuthInfo.h"
 #include	"misc.h"
 
-const char ADDCOMMANDCommand_cc_rcsId[] = "$Id: ADDCOMMANDCommand.cc,v 1.18 2001/11/20 19:49:45 mrbean_ Exp $";
+const char ADDCOMMANDCommand_cc_rcsId[] = "$Id: ADDCOMMANDCommand.cc,v 1.19 2001/12/13 08:50:00 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -61,7 +60,7 @@ if(st[pos].size() > 64)
 	return false;
 	}
 
-ccUser* theUser = bot->GetOper(bot->removeSqlChars(st[pos]));
+ccUser* theUser = bot->GetOper(st[pos]);
 	
 if( !theUser )
 	{	
@@ -83,17 +82,13 @@ if( !Comm )
 	bot->Notice( theClient,
 		"Command %s does not exist!",
 		st[pos].c_str());
-
-	delete theUser;
-
 	return false;	        
 	}
 
-AuthInfo *AClient = bot->IsAuth( theClient );
+ccUser *AClient = bot->IsAuth( theClient );
 if( NULL == AClient )
 	{
 	bot->Notice( theClient, "You must first authenticate" ) ;
-	delete theUser;
 	return true ;
 	}
 
@@ -102,28 +97,24 @@ if(!AClient->gotAccess(Comm) )
 	{
 	bot->Notice( theClient,
 		"You must have access to a command inorder to add it");
-	delete theUser;
 	return false;
 	}
 	
 bool Admin = (AClient->getFlags()  < operLevel::SMTLEVEL);
 
-if((Admin) && (AClient->getFlags() <= theUser->getType()))
+if((Admin) && (AClient->getType() <= theUser->getType()))
 	{
 	bot->Notice(theClient,"You cant modify user who have a equal/higher access than you");
-	delete theUser;
 	return false;
 	}
 else if(!(Admin) && (AClient->getFlags() < theUser->getType()))
 	{
 	bot->Notice(theClient,"You cant modify user who have a higher access than you");
-	delete theUser;
 	return false;
 	}
 if((Admin) && (strcasecmp(AClient->getServer(),theUser->getServer())))
 	{
 	bot->Notice(theClient,"You can only modify a user who is associated with the same server as you");
-	delete theUser;
 	return false;
 	}
 if(Forced)
@@ -131,7 +122,6 @@ if(Forced)
 	if((AClient->getFlags() < operLevel::SMTLEVEL) && ((bot->findCommandInMem(st[pos]))->getMinLevel() > theUser->getType()))
 		{
 		bot->Notice(theClient,"Only SMT+ can force the add of command");
-		delete theUser;
 		return false;
 		}
 	}
@@ -143,7 +133,6 @@ else if(Comm->getMinLevel() > theUser->getType())
 	else
 		bot->Notice(theClient,
 			    "The min level required to use this command is higher than the one the oper has");
-	delete theUser;
 	return false;
 	}
 		
@@ -153,7 +142,6 @@ else if(theUser->gotAccess(Comm))
 		"%s already got access for %s",
 		st[1].c_str(),
 		st[2].c_str());
-	delete theUser;
 	return false;	        
 	}
 
@@ -170,8 +158,6 @@ if(theUser->Update())
 				,theClient->getNickName().c_str(),st[pos].c_str()
 				,st[pos-1].c_str());
 	// If the user is authenticated update his authenticate entry
-	bot->UpdateAuth(theUser); 
-	delete theUser;
 	return true;
 	}
 else
@@ -179,7 +165,6 @@ else
 	bot->Notice( theClient,
 		"Error while adding command for %s",
 		st[pos-1].c_str());
-	delete theUser;
 	return false;
 	}
 	

@@ -15,7 +15,7 @@
 #include	"misc.h"
 #include	"Constants.h"
 
-const char MODUSERCommand_cc_rcsId[] = "$Id: MODUSERCommand.cc,v 1.9 2001/12/09 20:43:08 mrbean_ Exp $";
+const char MODUSERCommand_cc_rcsId[] = "$Id: MODUSERCommand.cc,v 1.10 2001/12/13 08:50:00 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -56,27 +56,25 @@ if(!tmpUser)
         return false;
 	}
 //Check if the user got a higher or equal flags than the one he's trying to edit	
-AuthInfo* tmpAuth = bot->IsAuth(theClient->getCharYYXXX());
-unsigned int AdFlag = tmpAuth->getFlags(); //Get the admin flag
+ccUser* tmpAuth = bot->IsAuth(theClient);
+unsigned int AdFlag = tmpAuth->getType(); //Get the admin flag
 unsigned int OpFlag = tmpUser->getType(); //Get the oper flag
-bool Admin = AdFlag < operLevel::SMTLEVEL;
+bool Admin = (AdFlag < operLevel::SMTLEVEL);
+bool Same = (tmpUser->getID() == tmpAuth->getID());
 
-if((Admin) && (AdFlag <= OpFlag))
+if((Admin) && (AdFlag <= OpFlag) && (!Same))
 	{
 	bot->Notice(theClient,"You cant modify a user who got higher/equal level than yours");
-	delete tmpUser;
 	return false;
 	}
 else if(AdFlag < OpFlag)
 	{
 	bot->Notice(theClient,"You cant modify a user who got higher level than yours");
-	delete tmpUser;
 	return false;
 	}
 if((Admin) && (strcasecmp(tmpAuth->getServer().c_str(),tmpUser->getServer().c_str())))
 	{
 	bot->Notice(theClient,"You can only modify a user who's associated to the same server as you");
-	delete tmpUser;
 	return false;
 	}
 unsigned int pos = 2;
@@ -84,35 +82,63 @@ while(pos < st.size())
 	{
 	if(!strcasecmp(st[pos],"-p")) //Trying to change the password ?
 		{
+/*		if((Admin) && !(Same) && (AdFlag = OpFlag))
+			{
+			bot->Notice(theClient,"You cant change a password, for someone with the same level");
+			pos+=2;
+			continue;
+			}			*/
 		if((pos + 1) >= st.size())
 			{
 			bot->Notice(theClient,"-p option must get new password");
 			return false;
 			}
-		tmpUser->setPassword(bot->CryptPass(st[pos+1]));
-		tmpUser->setLast_Updated_By(theClient->getNickUserHost());
-		if(tmpUser->Update())
+		unsigned int passStat = bot->checkPassword(st[pos+1],tmpUser);
+		switch(passStat)
 			{
-			bot->Notice(theClient,"Password for %s Changed to %s",st[1].c_str(),st[pos+1].c_str());
+			case password::TOO_SHORT:
+				bot->Notice(theClient,"Password must be atleast %d"
+					    ,password::MIN_SIZE);
+				pos+=2;
+				break;
+			case password::LIKE_UNAME:
+				bot->Notice(theClient,"Password can't be the same as the username");
+				pos+=2;
+				break;
+			case password::PASS_OK:
+				{
+				tmpUser->setPassword(bot->CryptPass(st[pos+1]));
+				tmpUser->setLast_Updated_By(theClient->getNickUserHost());
+				if(tmpUser->Update())
+					{
+					bot->Notice(theClient,"Password for %s Changed to %s",st[1].c_str(),st[pos+1].c_str());
+					}
+				else
+					{
+					bot->Notice(theClient,"Error while changing password for %s",st[1].c_str());
+					}
+					pos+=2;
+				}
 			}
-		else
-			{
-			bot->Notice(theClient,"Error while changing password for %s",st[1].c_str());
-			}
-		pos+=2;
-		}
+		}			
 	else if(!strcasecmp(st[pos],"-ah")) //Trying to add a new host ?
 		{
+//		if((Admin) && (AdFlag = OpFlag))
+		if(Same)
+			{
+			bot->Notice(theClient,"You cant change a password, for someone with the same level");
+			pos+=2;
+			continue;
+			}			
+
 		if((pos + 1) >= st.size())
 			{
 			bot->Notice(theClient,"-ah option must get new hostmask");
-			delete tmpUser;
 			return false;
 			}
 		if(st[pos + 1].size() > 128)
 			{
 			bot->Notice(theClient,"Hostname can't be more than 128 chars");
-			delete tmpUser;
 			return false;
 			}
 		if(!bot->validUserMask(st[pos+1]))
@@ -138,13 +164,11 @@ while(pos < st.size())
 		if((pos + 1) >= st.size())
 			{
 			bot->Notice(theClient,"-dh option must get a host mask");
-			delete tmpUser;
 			return false;
 			}
 		if(st[pos + 1].size() > 128)
 			{
 			bot->Notice(theClient,"Hostname can't be more than 128 chars");
-			delete tmpUser;
 			return false;
 			}
 		if(!bot->UserGotHost(tmpUser,bot->removeSqlChars(st[pos+1])))
@@ -166,7 +190,6 @@ while(pos < st.size())
 		if((pos + 1) >= st.size())
 			{
 			bot->Notice(theClient,"-gl option must get on/off");
-			delete tmpUser;
 			return false;
 			}
 		if(!strcasecmp(st[pos+1],"on"))
@@ -182,12 +205,10 @@ while(pos < st.size())
 		else
 			{
 			bot->Notice(theClient,"unknown option %s for -gl must be on/off",st[pos+1].c_str());
-			delete tmpUser;
 			return false;
 			}
 		tmpUser->setLast_Updated_By(theClient->getNickUserHost());
 		tmpUser->Update();
-		bot->UpdateAuth(tmpUser);
 		pos += 2;
 		}	
 	else if(!strcasecmp(st[pos],"-s")) //Trying to change the user server
@@ -195,19 +216,16 @@ while(pos < st.size())
 		if((pos + 1) >= st.size())
 			{
 			bot->Notice(theClient,"-s option must get a server");
-			delete tmpUser;
 			return false;
 			}
 		if(Admin)
 			{
 			bot->Notice(theClient,"Sorry, only SMT memebers can change the user server");
-			delete tmpUser;
 			return false;
 			}
 		if(st[pos + 1].size() > server::MaxName)
 			{
 			bot->Notice(theClient,"Server name can't be more than 128 chars");
-			delete tmpUser;
 			return false;
 			}
 		string SName = bot->expandDbServer(st[pos+1]);
@@ -215,7 +233,6 @@ while(pos < st.size())
 			{
 			bot->Notice(theClient,"I cant see a server in the db that matches %s"
 				    ,st[pos+1].c_str());
-			delete tmpUser;
 			return false;
 			}
 		if(!strcasecmp(tmpUser->getServer(),SName))
@@ -230,12 +247,10 @@ while(pos < st.size())
 			if(tmpUser->Update())
 				{
 				bot->Notice(theClient,"%s has been associated with %s",st[1].c_str(),SName.c_str());
-				bot->UpdateAuth(tmpUser);
 				}
 			else
 				{
 				bot->Notice(theClient,"Error while associating %s with %s",st[1].c_str(),SName.c_str());
-				delete tmpUser;
 				return false;
 				}
 			pos += 2;
@@ -243,10 +258,15 @@ while(pos < st.size())
 		}		
 	else if(!strcasecmp(st[pos],"-op")) //Trying to toggle the get of logs
 		{
+		if(Admin)
+			{
+			bot->Notice(theClient,"Sorry, the needop is a must");
+			pos+=2;
+			continue;
+			}
 		if((pos + 1) >= st.size())
 			{
 			bot->Notice(theClient,"-op option must get on/off");
-			delete tmpUser;
 			return false;
 			}
 		if(!strcasecmp(st[pos+1],"on"))
@@ -265,7 +285,6 @@ while(pos < st.size())
 			}
 		tmpUser->setLast_Updated_By(theClient->getNickUserHost());
 		tmpUser->Update();
-		bot->UpdateAuth(tmpUser);
 		pos += 2;
 		}	
 	else if(!strcasecmp(st[pos],"-ua")) //Trying to update the access?
@@ -281,7 +300,6 @@ while(pos < st.size())
 			if(tmpUser->Update())
 				{
 				bot->Notice(theClient,"Successfully updated %s access",st[1].c_str());
-				bot->UpdateAuth(tmpUser);
 				}
 			else
 				{
@@ -295,7 +313,6 @@ while(pos < st.size())
 		if((pos + 1) >= st.size())
 			{
 			bot->Notice(theClient,"-uf option must get anew flags");
-			delete tmpUser;
 			return false;
 			}
 		unsigned int NewF;
@@ -333,7 +350,6 @@ while(pos < st.size())
 				if(tmpUser->Update())
 					{
 					bot->Notice(theClient,"Successfully updated %s flags",st[1].c_str());
-					bot->UpdateAuth(tmpUser);
 					}
 				else
 					{
@@ -349,7 +365,6 @@ while(pos < st.size())
 		if((pos + 1) >= st.size())
 			{
 			bot->Notice(theClient,"-e option must get an email addy");
-			delete tmpUser;
 			return false;
 			}
 		tmpUser->setEmail(bot->removeSqlChars(st[pos+1]));
@@ -369,7 +384,6 @@ while(pos < st.size())
 		pos++;
 		}
 	}
-delete tmpUser;
 return true;
 }		    				
 

@@ -13,7 +13,7 @@
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 
-const char REMUSERCommand_cc_rcsId[] = "$Id: REMUSERCommand.cc,v 1.5 2001/11/20 19:49:45 mrbean_ Exp $";
+const char REMUSERCommand_cc_rcsId[] = "$Id: REMUSERCommand.cc,v 1.6 2001/12/13 08:50:00 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -46,12 +46,11 @@ if (!theUser)
 	"check your handle and try again",st[1].c_str());
 	return false;
 	}	    
-AuthInfo* tempAuth = bot->IsAuth(theClient->getCharYYXXX());
+ccUser* tempAuth = bot->IsAuth(theClient);
 	
-if(tempAuth->getFlags() < theUser->getType())
+if(tempAuth->getType() < theUser->getType())
 	{
 	bot->Notice(theClient,"You cant remove an oper who got higer access than yours");
-	delete theUser;
 	return false;
 	}
 if(bot->DeleteOper(string_lower(st[1])))     
@@ -59,15 +58,14 @@ if(bot->DeleteOper(string_lower(st[1])))
 	bot->Notice(theClient,"Successfully Deleted Oper %s ",st[1].c_str());
 	
 	//Check if the user is authenticate 
-	AuthInfo *TDeauth = bot->IsAuth(theUser->getID());
-	if(TDeauth)
+	if(theUser->getClient())
 		{
 		//Get hte user iClient entry from the network , and notify him that he was deleted
-		iClient *TClient = Network->findClient(TDeauth->getNumeric()); 
+		const iClient *TClient = theUser->getClient(); 
 		if(TClient)
 			bot->Notice(TClient,"You have been removed from my access list");
 		//Remove the user authenticate entry
-		bot->deAuthUser(TDeauth->getNumeric());
+		bot->deAuthUser(theUser);
 		}	
 	delete theUser;
 	return true;	
@@ -75,7 +73,6 @@ if(bot->DeleteOper(string_lower(st[1])))
 else
 	{    
 	bot->Notice(theClient,"Error While Deleting Oper %s ",st[1].c_str());
-	delete theUser;
 	return false;	
 	}
 }

@@ -3,7 +3,7 @@
  * 
  * Storage class for accessing user information 
  * 
- * $Id: ccUser.cc,v 1.12 2001/11/21 20:54:40 mrbean_ Exp $
+ * $Id: ccUser.cc,v 1.13 2001/12/13 08:50:00 mrbean_ Exp $
  */
  
 #include	<strstream>
@@ -19,7 +19,7 @@
 #include	"ccontrol.h"
 
 const char ccUser_h_rcsId[] = __CCUSER_H ;
-const char ccUser_cc_rcsId[] = "$Id: ccUser.cc,v 1.12 2001/11/21 20:54:40 mrbean_ Exp $" ;
+const char ccUser_cc_rcsId[] = "$Id: ccUser.cc,v 1.13 2001/12/13 08:50:00 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -51,6 +51,7 @@ ccUser::ccUser(PgDatabase* _SQLDb)
    IsCoder(0),
    GetLogs(0),
    NeedOp(0),
+   Client(NULL),
    SQLDb( _SQLDb )
 {
 ++numAllocated;
@@ -63,7 +64,11 @@ ccUser::~ccUser()
 
 bool ccUser::loadData(const string& Name)
 {
-
+if(!dbConnected)
+	{
+	return false;
+	}
+	
 static const char Main[] = "SELECT user_id,user_name,password,access,saccess,flags,suspend_expires,suspended_by,server,isSuspended,IsUhs,IsOper,IsAdmin,IsSmt,IsCoder,GetLogs,NeedOp,Email,Suspend_Level,Suspend_Reason FROM opers WHERE lower(user_name) = '";
 
 if(!dbConnected)
@@ -95,6 +100,12 @@ return false;
 
 bool ccUser::loadData( const unsigned int Id)
 {
+
+if(!dbConnected)
+	{
+	return false;
+	}
+	
 static const char Main[] = "SELECT user_id,user_name,password,access,saccess,flags,suspend_expires,suspended_by,server,isSuspended,IsUhs,IsOper,IsAdmin,IsSmt,IsCoder,GetLogs,NeedOp,Email,Suspend_Level,Suspend_Reason FROM opers WHERE user_id = ";
 strstream theQuery;
 

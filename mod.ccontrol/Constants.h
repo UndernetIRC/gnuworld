@@ -52,8 +52,26 @@ namespace gline
         const unsigned int MFU_TIME = 100*3600*24;
 
         }
+
+namespace flood
+{
+	const unsigned int MESSAGE_POINTS = 4;
+	const unsigned int CTCP_POINTS = 5;
+	const unsigned int RESET_TIME = 5;
+	const unsigned int FLOOD_POINTS = 20;
+	const int IGNORE_TIME = 15*60;
 }
 
+namespace password
+{
+	const unsigned int MIN_SIZE = 5;
+	const unsigned int TOO_SHORT = 1;
+	const unsigned int LIKE_UNAME = 2;
+	const unsigned int PASS_OK = 3;
+	
+}
+
+}
 }
 
 #endif

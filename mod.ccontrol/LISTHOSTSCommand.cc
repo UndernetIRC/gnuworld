@@ -12,7 +12,7 @@
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 
-const char LISTHOSTSCommand_cc_rcsId[] = "$Id: LISTHOSTSCommand.cc,v 1.6 2001/11/20 19:49:45 mrbean_ Exp $";
+const char LISTHOSTSCommand_cc_rcsId[] = "$Id: LISTHOSTSCommand.cc,v 1.7 2001/12/13 08:50:00 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -57,7 +57,6 @@ else
 	bot->Notice(theClient,"Error while accessing %s hostlist",st[1].c_str());
 	}
 
-delete tmpUser;
 return true;
 }
 

@@ -13,7 +13,7 @@
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 
-const char DEAUTHCommand_cc_rcsId[] = "$Id: DEAUTHCommand.cc,v 1.5 2001/07/23 10:28:51 mrbean_ Exp $";
+const char DEAUTHCommand_cc_rcsId[] = "$Id: DEAUTHCommand.cc,v 1.6 2001/12/13 08:50:00 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -26,13 +26,13 @@ namespace uworld
 bool DEAUTHCommand::Exec( iClient* theClient, const string& Message)
 {
 //Fetch the user authenticate entry
-AuthInfo* tmpUser = bot->IsAuth(theClient->getCharYYXXX());
+ccUser* tmpUser = bot->IsAuth(theClient->getCharYYXXX());
 if (!tmpUser) 
 	{
 	bot->Notice(theClient,"Your are not authenticated");
 	return false;
 	}
-if(bot->deAuthUser(theClient->getCharYYXXX()))
+if(bot->deAuthUser(tmpUser))
 	{
 	bot->Notice(theClient,"DeAuthentication successfull");
 	return true;
