@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: LISTCommand.cc,v 1.6 2003/08/02 18:17:21 jeekay Exp $
+ * $Id: LISTCommand.cc,v 1.7 2003/08/10 15:16:01 jeekay Exp $
  *
  * Display information about things.
  *
@@ -62,12 +62,12 @@ bool LISTCommand::Exec( const iClient *theClient, const string& Message , const 
 			Channel *theChannel = Network->findChannel(*itr);
 			
 			if(theChannel) {
-				bot->Reply(theClient, "  [%3u] %s",
+				bot->Reply(theClient, "  [%4u] %s",
 					theChannel->size(),
 					theChannel->getName().c_str()
 					);
 			} else {
-				bot->Reply(theClient, "  [N/A] %s",
+				bot->Reply(theClient, "  [   0] %s",
 					(*itr).c_str()
 					);
 			}
