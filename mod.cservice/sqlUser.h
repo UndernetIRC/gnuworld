@@ -1,7 +1,7 @@
 /* sqlUser.h */
 
 #ifndef __SQLUSER_H
-#define __SQLUSER_H "$Id: sqlUser.h,v 1.24 2001/10/07 23:47:58 gte Exp $"
+#define __SQLUSER_H "$Id: sqlUser.h,v 1.25 2002/01/07 18:37:22 gte Exp $"
 
 #include	<string>
 #include	<ctime>
@@ -26,6 +26,7 @@ public:
 	static const flagType F_GLOBAL_SUSPEND;
 	static const flagType F_LOGGEDIN; // Deprecated.
 	static const flagType F_INVIS;
+	static const flagType F_FRAUD;
 
 	/*
 	 *   User 'Event' Flags, used in the userlog table.

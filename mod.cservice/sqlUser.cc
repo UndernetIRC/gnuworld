@@ -4,7 +4,7 @@
  * Storage class for accessing user information either from the backend
  * or internal storage.
  *
- * $Id: sqlUser.cc,v 1.29 2001/10/07 23:47:58 gte Exp $
+ * $Id: sqlUser.cc,v 1.30 2002/01/07 18:37:22 gte Exp $
  */
 
 #include	<strstream.h>
@@ -28,6 +28,7 @@ using std::endl ;
 const sqlUser::flagType sqlUser::F_GLOBAL_SUSPEND =	0x01 ;
 const sqlUser::flagType sqlUser::F_LOGGEDIN =		0x02 ;
 const sqlUser::flagType sqlUser::F_INVIS =			0x04 ;
+const sqlUser::flagType sqlUser::F_FRAUD =			0x08 ;
 
 const unsigned int sqlUser::EV_SUSPEND		= 1;
 const unsigned int sqlUser::EV_UNSUSPEND	= 2;
