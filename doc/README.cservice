@@ -1,0 +1,46 @@
+Follow these steps to setup the database for the cservice module.  This
+file assumes that postgresql is running and configured, and that you have
+access to add and modify databases within it.
+
+Create the database
+-------------------
+> createdb cservice
+
+Note that this assumes that the ccontrol database does not already exist.
+
+Install the pl language
+-----------------------
+The following command assumes (in addition to above conditions) that the
+pgsql libraries are located in /usr/local/pgsql/lib:
+
+> createlang plpgsql cservice -L /usr/local/pgsql/lib
+
+Load the schema
+---------------
+Make sure you are in the gnuworld/doc directory.
+
+> psql cservice < cservice.sql
+> psql cservice < language_table.sql
+> psql cservice < cservice.web.sql
+
+Add administrator account
+-------------------------
+This command will add an account called 'Admin' with level 1000 access on
+channel '*'...use this power wisely, The Dark Side is very powerful.
+
+> psql cservice < cservice.addme.sql
+
+Using this account you will be able to login as Admin online with your
+cservice bot.
+
+Username: Admin
+Password: temPass (be sure to change this)
+
+All Done
+--------
+That's it for the sql stuff.  Be sure to edit the configuration file for
+cmaster (../bin/cservice.conf), giving username, nickname, etc, and
+database information.
+
+The GNUWorld development team
+
