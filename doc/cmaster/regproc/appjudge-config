@@ -1,5 +1,5 @@
 # Database name (duh)
-set SQL_DB "cmaster"
+set SQL_DB "cservice"
 
 # Number of seconds in a day, I suggest you do not change this ;)
 set DAY				86400
