@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------------
--- "$Id: cservice.sql,v 1.7 2000/12/10 19:59:49 gte Exp $"
+-- "$Id: cservice.sql,v 1.8 2000/12/12 01:45:19 gte Exp $"
 -- Channel service DB SQL file for PostgreSQL.
 
 -- ChangeLog:
@@ -34,7 +34,7 @@
 CREATE TABLE languages (
 	id SERIAL,
 	name VARCHAR( 16 ),
-	last_update TIMESTAMP NOT NULL DEFAULT now()
+	last_update INT4 NOT NULL
 --	PRIMARY KEY(id)
 );
 
@@ -45,7 +45,7 @@ CREATE TABLE translations (
 	language_id INT4 CONSTRAINT translations_language_id_ref REFERENCES languages (languageID),
 	response_id INT4 NOT NULL DEFAULT '0',
 	text TEXT,
-	last_update TIMESTAMP NOT NULL DEFAULT now(),
+	last_update INT4 NOT NULL,
 
 	PRIMARY KEY (language_id, response_id)
 );
@@ -83,14 +83,14 @@ CREATE TABLE channels (
 	url VARCHAR (128),
 	description VARCHAR (128),
 	keywords VARCHAR(128),
-	registered_ts TIMESTAMP,
-	channel_ts TIMESTAMP NOT NULL DEFAULT now(),
+	registered_ts INT4,
+	channel_ts INT4 NOT NULL,
 	channel_mode VARCHAR(26),
 	-- does anyone actually read these schemas?
 	-- Yes :)
 	channel_key VARCHAR(24),
 	channel_limit INT4,
-	last_update TIMESTAMP NOT NULL DEFAULT now(),
+	last_update INT4 NOT NULL,
 
 	PRIMARY KEY (id)
 );
@@ -106,12 +106,12 @@ CREATE TABLE bans (
 	id SERIAL,
 	banmask VARCHAR (128) NOT NULL,
 	set_by VARCHAR (128),			-- nick!user@host
-	set_ts TIMESTAMP,
+	set_ts INT4,
 	level INT2,
 	duration INT4,				-- In seconds
 	reason VARCHAR (128),
 	channel_id INT4 CONSTRAINT bans_channel_id_ref REFERENCES channels (id),
-	last_update TIMESTAMP NOT NULL DEFAULT now(),
+	last_update INT4 NOT NULL,
 
 	PRIMARY KEY (banmask,channel_id)
 );
@@ -123,7 +123,7 @@ CREATE TABLE users (
 	id SERIAL,
 	user_name VARCHAR (32) NOT NULL,
 	password VARCHAR (32) NOT NULL,
-	last_seen TIMESTAMP,
+	last_seen INT4,
 	email VARCHAR (128),
         url  VARCHAR(128),
 	language_id INT4 CONSTRAINT language_channel_id_ref REFERENCES languages (id),
@@ -131,7 +131,7 @@ CREATE TABLE users (
 	flags INT2 NOT NULL DEFAULT '0',
 -- 0x00 01 -- Suspended globally
 	last_update_by VARCHAR (128),		-- nick!user@host
-	last_update TIMESTAMP NOT NULL DEFAULT now(),
+	last_update INT4 NOT NULL,
 	PRIMARY KEY ( id )
 ) ;
 
@@ -148,30 +148,30 @@ CREATE TABLE levels (
 -- 0x00 02 -- AutoOp
 -- 0x00 04 -- Protect  (From CS source, unused)
 -- 0x00 08 -- Temp forced access. (removed on logout).
-	suspend_expires TIMESTAMP,
+	suspend_expires INT4,
 	suspend_by VARCHAR( 128 ),
-	added TIMESTAMP,
+	added INT4,
 	added_By VARCHAR( 128 ),
-	last_Modif TIMESTAMP,
+	last_Modif INT4,
 	last_Modif_By VARCHAR( 128 ),
-	last_Updated TIMESTAMP,
+	last_Updated INT4 NOT NULL,
 	PRIMARY KEY( channel_id, user_id )
 );
 
 CREATE INDEX levels_access_idx ON levels( access ) ;
 
 CREATE TABLE channellog (
-	ts TIMESTAMP,
+	ts INT4,
 	channelID INT4 CONSTRAINT channel_log_ref REFERENCES channels ( id ),
 	message TEXT,
-	last_updated TIMESTAMP NOT NULL DEFAULT now()
+	last_updated INT4 NOT NULL
 );
 
 CREATE TABLE userlog (
-	ts TIMESTAMP,
+	ts INT4,
 	userID INT4 CONSTRAINT user_log_ref REFERENCES users ( userID ),
 	message TEXT,
-	last_updated TIMESTAMP NOT NULL DEFAULT now()
+	last_updated INT4 NOT NULL
 );
 
 CREATE TABLE supporters (
@@ -183,18 +183,18 @@ CREATE TABLE supporters (
 -- N - Doesn't support this channel
 	reason TEXT,
 -- Reason for not supporting it if required.
-	last_updated TIMESTAMP NOT NULL DEFAULT now(),
+	last_updated INT4 NOT NULL,
 	PRIMARY KEY(channel_id,user_id)
 );
 
 CREATE TABLE pending (
 	channel_id INT4 CONSTRAINT pending_channel_ref REFERENCES channels (id),
 	manager_id INT4 CONSTRAINT pending_manager_ref REFERENCES users (id),
-	created_ts TIMESTAMP NOT NULL DEFAULT now(),
-	decision_ts TIMESTAMP,
+	created_ts INT4 NOT NULL,
+	decision_ts INT4,
 	decision VARCHAR (80),
 	comments TEXT,
-	last_updated TIMESTAMP NOT NULL DEFAULT now(),
+	last_updated INT4 NOT NULL,
 	PRIMARY KEY(channel_id)
 );
 

@@ -7,12 +7,11 @@
 #include	"misc.h"
 #include	"sqlChannel.h" 
 
-using std::string ;
-
+using std::string ; 
 using std::endl ; 
  
 const char sqlChannel_h_rcsId[] = __SQLCHANNEL_H ;
-const char sqlChannel_cc_rcsId[] = "$Id: sqlChannel.cc,v 1.4 2000/12/11 21:36:09 gte Exp $" ;
+const char sqlChannel_cc_rcsId[] = "$Id: sqlChannel.cc,v 1.5 2000/12/12 01:45:20 gte Exp $" ;
 
 namespace gnuworld
 {
