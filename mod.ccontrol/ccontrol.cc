@@ -11,7 +11,7 @@
 /* ccontrol.cc
  * Authors: Daniel Karrels dan@karrels.com
  *	    Tomer Cohen    MrBean@toughguy.net
- * $Id: ccontrol.cc,v 1.147 2002/07/03 17:44:23 mrbean_ Exp $
+ * $Id: ccontrol.cc,v 1.148 2002/07/04 08:03:18 mrbean_ Exp $
  */
 
 #define MAJORVER "1"
@@ -56,7 +56,7 @@
 #include	"ip.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.147 2002/07/03 17:44:23 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.148 2002/07/04 08:03:18 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -3172,7 +3172,7 @@ ccBadChannel* tempBad;
 for(int i =0;i<SQLDb->Tuples();++i)
         {
         tempBad = new (std::nothrow) ccBadChannel(SQLDb,i);
-        assert(tempServer != NULL);
+        assert(tempBad != NULL);
         badChannelsMap[tempBad->getName()] = tempBad;
         }
 return true;
