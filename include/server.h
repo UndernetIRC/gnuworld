@@ -17,7 +17,7 @@
  */
 
 #ifndef __XSERVER_H
-#define __XSERVER_H "$Id: server.h,v 1.11 2000/11/02 19:24:29 dan_karrels Exp $"
+#define __XSERVER_H "$Id: server.h,v 1.12 2000/11/05 23:09:39 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
@@ -612,6 +612,13 @@ protected:
 	 * Parse a burst line for channel users.
 	 */
 	virtual void parseBurstUsers( Channel*, const char* ) ;
+
+	/**
+	 * Convenience method that will part a given network
+	 * client from all channels, and notify each listening
+	 * xClient of the parts.
+	 */
+	virtual void userPartAllChannels( iClient* ) ;
 
 	/**
 	 * Signal handler for the server itself.

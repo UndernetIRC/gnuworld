@@ -2,7 +2,7 @@
  */
 
 #ifndef __SOCKET_H
-#define __SOCKET_H "$Id: Socket.h,v 1.1 2000/06/30 18:46:06 dan_karrels Exp $"
+#define __SOCKET_H "$Id: Socket.h,v 1.2 2000/11/05 23:09:40 dan_karrels Exp $"
 
 #include	<new>
 #include	<iostream>
@@ -11,32 +11,14 @@
 #include	<string>
 #include	<vector>
 
-#include	"sys/types.h"
-#include	"netinet/tcp.h" // TCP_
+#include	<sys/types.h>
+#include	<arpa/inet.h> // sockaddr
+#include	<netdb.h>
 
-#include	"cstdio"
-#include	"cstring"
-#include	"cerrno"
-#include	"cstdlib"
-#include	"unistd.h"
-#include	"netdb.h"
-#include	"limits.h"
-
-#include	"strings.h"
-#include	"fcntl.h"
-#include	"sys/uio.h"
-#include	"sys/types.h"
-#include	"sys/time.h"
-#include	"sys/stat.h"
-#include	"sys/socket.h"
-#include	"arpa/inet.h"
-#include	"netinet/in.h" // IP_
-
-/**
- * A default port number for testing Socket and its
- * children classes.
- */
-const int __DefaultTestServerPortNo_ = 57575 ;
+#include	<cstdio>
+#include	<cstring>
+#include	<cerrno>
+#include	<cstdlib>
 
 /**
  * This structure is responsible for representing the state
@@ -193,7 +175,12 @@ public:
 	 * character array pointer to by (b).
 	 * The number of bytes read is returned, or -1 on error.
 	 */
-	virtual int recv( unsigned char* b, int nb ) ;
+	virtual int recv( unsigned char* b, size_t nb ) ;
+
+	/**
+	 * Attempt to read numBytes bytes from the connection.
+	 */
+	virtual int recv( string&, size_t numBytes ) ;
 
 	/**
 	 * Send as much of the C NULL terminated string (s)

@@ -15,6 +15,9 @@
 #include	<strstream>
 #include	<stack>
 
+#include	<sys/time.h>
+#include	<unistd.h>
+
 #include	<cstdlib>
 #include	<cstdio>
 #include	<cstdarg>
@@ -40,7 +43,7 @@
 //#include	"moduleLoader.h"
 
 const char xServer_h_rcsId[] = __XSERVER_H ;
-const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.26 2000/11/02 19:24:29 dan_karrels Exp $" ;
+const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.27 2000/11/05 23:09:40 dan_karrels Exp $" ;
 
 using std::string ;
 using std::vector ;
@@ -54,8 +57,12 @@ using std::unary_function ;
 namespace gnuworld
 {
 
+// Allocate the static std::string in xServer representing
+// all channels.
 const string xServer::CHANNEL_ALL( "*" ) ;
 
+// This is a unary function class that will handle notifying
+// each xClient of a received signal
 struct handleSignal : public xNetwork::fe_xClientBase
 {
 handleSignal( int _whichSig ) : whichSig( _whichSig ) {}
@@ -82,6 +89,7 @@ xServer::xServer( const string& _fileName )
 // data members.
 EConfig conf( _fileName ) ;
 
+// Parse out the required data fields
 UplinkName = conf.Require( "uplink" )->second ;
 ServerName = conf.Require( "name" )->second ;
 ServerDescription = conf.Require( "description" )->second ;
@@ -111,8 +119,8 @@ outputWriteSize = inputReadSize = 0 ;
 lastTimerID = 1 ;
 
 // Initialize the numeric stuff.
-memset( charYY, 0, sizeof( charYY ) ) ;
-memset( charXXX, 0, sizeof( charXXX ) ) ;
+::memset( charYY, 0, sizeof( charYY ) ) ;
+::memset( charXXX, 0, sizeof( charXXX ) ) ;
 
 inttobase64( charYY, intYY, 2 ) ;
 inttobase64( charXXX, intXXX, 3 ) ;
@@ -125,11 +133,6 @@ elog << "xServer::intXXX> " << intXXX << endl ;
 // Allocate the command map
 try
 	{
-	// 36 is the number of valid characters in
-	// the command map's key character set
-	// They include: alpha chars (case insensitive,
-	// so only 26 of these), numeric characters: 10
-//	commandMap = new commandMapType( 36, serverCommandTransTable ) ;
 	commandMap = new commandMapType ;
 	}
 catch( std::bad_alloc )
@@ -468,6 +471,10 @@ return 0 ;
 
 }
 
+/**
+ * Handle a disconnect from our uplink.  This method is
+ * responsible for deallocating variables mostly.
+ */
 void xServer::OnDisConnect()
 {
 if( theSock )
@@ -479,6 +486,7 @@ if( theSock )
 _connected = false ;
 inputReadSize = outputWriteSize = 0 ;
 
+// Clear socket buffers
 inputBuffer.clear() ;
 outputBuffer.clear() ;
 
@@ -1070,6 +1078,7 @@ if( allChanPtr != channelEventMap.end() )
 		}
 	}
 
+// Find listeners for this specific channel
 channelEventMapType::iterator chanPtr = channelEventMap.find( chanName ) ;
 if( chanPtr == channelEventMap.end() )
 	{
@@ -1077,6 +1086,8 @@ if( chanPtr == channelEventMap.end() )
 	return ;
 	}
 
+// Iterate through the listeners for this channel's events
+// and notify each listener of the event
 list< xClient* >* listPtr = chanPtr->second ;
 for( list< xClient* >::iterator ptr = listPtr->begin(), end = listPtr->end() ;
 	ptr != end ; ++ptr )
@@ -1113,55 +1124,27 @@ else if( 0 == bytesAvailable )
 	return 0 ;
 	}
 
-// Allocate a small C buffer to receive the
-// data from the socket.
-//
-char* inBuf = 0 ;
-try
-	{
-	// inputReadSize is the size of the TCP receive window, and
-	// is determined at runtime in Connect().
-	inBuf = new char[ inputReadSize + 1 ] ;
-	}
-catch( std::bad_alloc )
-	{
-	// Unable to allocate memory.
-	elog	<< "xServer::DoRead> Memory allocation failure\n" ;
-	return -1 ;
-	}
+// Create a string into which to read new data
+string readBuf( inputReadSize + 1, 0 ) ;
 
-// Typecast here to make sure we get the correct recv method.
-int bytesRead = theSock->recv(
-	reinterpret_cast< unsigned char* >( inBuf ), inputReadSize + 1 ) ;
+// Attempt to read from the connection
+int bytesRead = theSock->recv( readBuf, inputReadSize ) ;
 
-// Was the recv successful?
+// Was the read successful?
 if( bytesRead < 0 )
 	{
-	// Nope, read error.  The connection is no
-	// longer valid.
-
+	// Read error, the connection is no longer valid
 	OnDisConnect() ;
-
-	// Don't forget to deallocate the temp buffer.
-	delete[] inBuf ;
 
 	elog	<< "xServer::DoRead> Got a read error: "
 		<< strerror( errno ) << endl ;
 
-	// Return error, errno is already set.
-	return -1 ;
+	return bytesRead ;
 	}
 
-// Null terminate the buffer we just read
-inBuf[ bytesRead ] = 0 ;
+inputBuffer += readBuf ;
 
-// Append this buffer to the input buffer.
-inputBuffer += inBuf ;
-
-// Don't forget to deallocate the buffer.
-delete[] inBuf ;
-
-//elog << "xServer::DoRead> Read " << bytesRead << " bytes\n" ;
+elog << "xServer::DoRead> Read " << bytesRead << " bytes\n" ;
 
 // Return the number of bytes read.
 return bytesRead ;
@@ -1589,37 +1572,60 @@ return 0 ;
 //
 int xServer::MSG_B( xParameters& Param )
 {
+
+// Make sure there are at least four arguments supplied:
+// servernumeric #channel time_stamp arguments
 if( Param.size() < 4 )
 	{
 	elog	<< "xServer::MSG_B> Invalid number of arguments\n" ;
 	return -1 ;
 	}
 
+// Attempt to find the channel in the network channel table
 Channel* theChan = Network->findChannel( Param[ 1 ] ) ;
+
+// Was the channel found?
 if( NULL == theChan )
 	{
+	// The channel does not yet exist, go ahead and create it.
 	try
 		{
+		// Provide the channel name and timestamp to the
+		// Channel constructor
 		theChan = new Channel( Param[ 1 ], atoi( Param[ 2 ] ) ) ;
 		}
 	catch( std::bad_alloc )
 		{
+		// Memory allocation failure, uh oh
 		elog	<< "xServer::MSG_B> Memory allocation failure\n" ;
 		return -1 ;
 		}
+
+	// Add the new Channel to the network channel table
 	if( !Network->addChannel( theChan ) )
 		{
+		// The addition of this channel failed, *shrug*
 		elog	<< "xServer::MSG_B> Failed to add channel: "
 			<< Param[ 1 ] << endl ;
+
+		// Prevent a memory leak by deleting the channel
 		delete theChan ;
+
+		// Return error
 		return -1 ;
 		}
 	} // if( NULL == theChan )
 else
 	{
-	time_t newCreationTime = static_cast< time_t >( ::atoi( Param[ 2 ] ) ) ;
+	// The channel was already found.
+	// Make sure the timestamp is accurate, this is an oddity imho.
+	time_t newCreationTime =
+		static_cast< time_t >( ::atoi( Param[ 2 ] ) ) ;
+
+	// Do the old TS and the new TS match?
 	if( newCreationTime != theChan->getCreationTime() )
 		{
+		// Nope, update the timestamp
 		theChan->setCreationTime( newCreationTime ) ;
 		// TODO: Clear channel modes etc?
 		}
@@ -1688,6 +1694,7 @@ if( whichToken >= Param.size() )
 	return 0 ;
 	}
 
+// Parse the remaining tokens
 for( ; whichToken < Param.size() ; ++whichToken )
 	{
 	// Bans will always be the last thing burst, so no users
@@ -1712,6 +1719,8 @@ return 0 ;
 // PIs,OfK,OAu,PZl:o,eAA
 void xServer::parseBurstUsers( Channel* theChan, const char* theUsers )
 {
+// This is a protected method, so the method arguments are
+// guaranteed to be valid
 
 //clog	<< "xServer::parseBurstUsers> Channel: " << theChan->getName()
 //	<< ", users: " << theUsers << endl ;
@@ -1726,13 +1735,20 @@ for( StringTokenizer::const_iterator ptr = st.begin() ; ptr != st.end() ;
 	// abc or abc:modes
 	string::size_type pos = (*ptr).find_first_of( ':' ) ;
 
+	// Find the client in the client table
 	iClient* theClient = Network->findClient( (*ptr).substr( 0, pos ) ) ;
+
+	// Was the search successful?
 	if( NULL == theClient )
 		{
+		// Nope, no such user
+		// Log the error
 		elog	<< "xServer::parseBurstUsers> ("
 			<< theChan->getName() << ")"
 			<< ": Unable to find client: "
 			<< (*ptr).substr( 0, pos ) << endl ;
+
+		// Skip this user
 		continue ;
 		}
 
@@ -1740,17 +1756,22 @@ for( StringTokenizer::const_iterator ptr = st.begin() ; ptr != st.end() ;
 //		<< "(" << theClient->getCharYYXXX() << ") to channel "
 //		<< theChan->getName() << endl ;
 
+	// Create a ChannelUser object to represent this user's presence
+	// in this channel
 	ChannelUser* chanUser = 0 ;
 	try
 		{
+		// Allocate using the iClient object as constructor
+		// argument
 		chanUser = new ChannelUser( theClient ) ;
 		}
 	catch( std::bad_alloc )
 		{
-		elog	<< "xServer::parseBurstUsers> Memory allocation failure\n" ;
+		// Memory allocation failure
+		elog	<< "xServer::parseBurstUsers> Memory allocation "
+			<< "failure\n" ;
 
-		// Fatal error
-		exit( 0 ) ;
+		continue ;
 		}
 
 	// Add this channel to the user's channel structure.
@@ -1759,13 +1780,19 @@ for( StringTokenizer::const_iterator ptr = st.begin() ; ptr != st.end() ;
 	// Add this user to the channel's database.
 	if( !theChan->addUser( chanUser ) )
 		{
+		// The addition failed
 		elog	<< "xServer::parseBurstUsers> Unable to add user "
 			<< theClient->getNickName() << " to channel "
 			<< theChan->getName() << endl ;
+
+		// Prevent a memory leak by deallocating the unused
+		// ChannelUser object
 		delete chanUser ;
+
 		continue ;
 		}
 
+	// Is there a ':' in this client's info?
 	if( string::npos == pos )
 		{
 		// no ':' in this string, just add the user
@@ -1794,10 +1821,16 @@ for( StringTokenizer::const_iterator ptr = st.begin() ; ptr != st.end() ;
 
 void xServer::parseBurstBans( Channel* theChan, const char* theBans )
 {
+// This is a protected method, so the method arguments are
+// guaranteed to be valid
+
 //clog	<< "xServer::parseBurstBans> Found bans for channel "
 //	<< theChan->getName() << ": " << theBans << endl ;
 
+// Tokenize the ban string
 StringTokenizer st( theBans ) ;
+
+// Move through each token and add the ban
 for( StringTokenizer::size_type i = 0 ; i < st.size() ; ++i )
 	{
 	theChan->setBan( st[ i ] ) ;
@@ -1838,32 +1871,39 @@ return 0;
 int xServer::MSG_L( xParameters& Param )
 {
 
+// Verify that there are at least 2 arguments:
+// client_numeric #channel
 if( Param.size() < 2 )
 	{
 	elog	<< "xServer::MSG_L> Invalid number of arguments\n" ;
 	return -1 ;
 	}
 
-if( '+' == Param[ 1 ][ 0 ] )
-	{
-	// Don't care about modeless channels
-	return 0 ;
-	}
-
 // Find the client in question
-// TODO: This could conceivably find a matching client *sigh*
 iClient* theClient = Network->findClient( Param[ 0 ] ) ;
+
+// Was the client found?
 if( NULL == theClient )
 	{
+	// Nope, no matching client found
+
+	// Log the error
 	elog	<< "xServer::MSG_L> (" << Param[ 1 ]
 		<< "): Unable to find client: "
 		<< Param[ 0 ] << endl ;
+
+	// Return error
 	return -1 ;
 	}
 
+// Tokenize the channel string
 StringTokenizer st( Param[ 1 ], ',' ) ;
+
+// Iterate through all channels that this user is parting
 for( StringTokenizer::size_type i = 0 ; i < st.size() ; ++i )
 	{
+
+	// Is this a modeless channel?
 	if( '+' == st[ i ][ 0 ] )
 		{
 		// Ignore modeless channels
@@ -1872,12 +1912,19 @@ for( StringTokenizer::size_type i = 0 ; i < st.size() ; ++i )
 
 	// Get the channel that was just parted.
 	Channel* theChan = Network->findChannel( st[ i ] ) ;
+
+	// Was the channel found?
 	if( NULL == theChan )
 		{
+		// Channel not found, log the error
 		elog	<< "xServer::MSG_L> Unable to find channel: "
 			<< st[ i ] << endl ;
-		return -1 ;
+
+		// Continue on to the next channel
+		continue ;
 		}
+
+	// Remove client<->channel associations
 
 	// Remove and deallocate the ChannelUser instance from this
 	// channel's ChannelUser structure.
@@ -1895,10 +1942,14 @@ for( StringTokenizer::size_type i = 0 ; i < st.size() ; ++i )
 		static_cast< void* >( theChan ),
 		static_cast< void* >( theClient ) ) ;
 
+	// Is the channel now empty, and no services clients are
+	// on the channel?
 	if( theChan->empty() && !Network->servicesOnChannel( theChan ) )
 		{
 		// No users in the channel, remove it.
 		delete Network->removeChannel( theChan->getName() ) ;
+
+		// TODO: Post event
 		}
 	} // for
 
@@ -1965,6 +2016,8 @@ for( StringTokenizer::size_type i = 0 ; i < st.size() ; ++i )
 		{
 		// No users in the channel, remove it.
 		delete Network->removeChannel( theChan->getName() ) ;
+
+		// TODO: Post event
 		}
 	} // for
 
@@ -1979,37 +2032,55 @@ return 0 ;
 int xServer::MSG_K( xParameters& Param )
 {
 
+// Verify that there are at least three arguments provided
+// client_source_numeric #channel client_target_numeric
 if( Param.size() < 3 )
 	{
+	// Invalid number of arguments
 	elog	<< "xServer::MSG_K> Invalid number of arguments\n" ;
+
+	// Return error
 	return -1 ;
 	}
 
+// Is this a modeless channel?
+// TODO: Can there even be kicks on modeless channels?
 if( '+' == Param[ 1 ][ 0 ] )
 	{
 	// Don't care about modeless channels
 	return 0 ;
 	}
 
-// Find the client in question.
+// Find the target client
 iClient* theClient = Network->findClient( Param[ 2 ] ) ;
+
+// Did we find the target client?
 if( NULL == theClient )
 	{
+	// Nope, log the error
 	elog	<< "xServer::MSG_K> ("
 		<< Param[ 1 ] << ") Unable to find client: "
 		<< Param[ 2 ] << endl ;
+
+	// Return error
 	return -1 ;
 	}
 
 // Find the channel in question.
 Channel* theChan = Network->findChannel( Param[ 1 ] ) ;
+
+// Did we find the channel?
 if( NULL == theChan )
 	{
+	// Nope, log the error
 	elog	<< "xServer::MSG_K> Unable to find channel: "
 		<< Param[ 1 ] << endl ;
+
+	// Return error
 	return -1 ;
 	}
 
+// Remove client<->channel associations
 delete theChan->removeUser( theClient ) ;
 theClient->removeChannel( theChan ) ;
 
@@ -2019,10 +2090,13 @@ PostChannelEvent( EVT_KICK, theChan->getName(),
 	static_cast< void* >( theChan ),
 	static_cast< void* >( theClient ) ) ;
 
-// Any users left in the channel?
+// Any users or services clients left in the channel?
 if( theChan->empty() && !Network->servicesOnChannel( theChan ) )
 	{
+	// Nope, remove the channel
 	delete Network->removeChannel( theChan->getName() ) ;
+
+	// TODO: Post event
 	}
 
 return 0 ;
@@ -2037,60 +2111,88 @@ return 0 ;
 int xServer::MSG_C( xParameters& Param )
 {
 
+// Verify that there exist sufficient arguments to successfully
+// handle this command
+// client_numeric #channel[,#channel2,...] timestamp
 if( Param.size() < 3 )
 	{
+	// Insufficient arguments provided
 	elog	<< "xServer::MSG_C> Invalid number of parameters\n" ;
-	return -1 ;
-	}
 
-if( '+' == Param[ 1 ][ 0 ] )
-	{
-	// Don't care about modeless channels
-	return 0 ;
+	// Return error
+	return -1 ;
 	}
 
 // Find the client in question.
 iClient* theClient = Network->findClient( Param[ 0 ] ) ;
+
+// Did we find the client?
 if( NULL == theClient )
 	{
+	// Nope, log the error
 	elog	<< "xServer::MSG_C> ("
 		<< Param[ 1 ] << ") Unable to find client: "
 		<< Param[ 0 ] << endl ;
+
+	// Return error
 	return -1 ;
 	}
 
 // Grab the creation time.
-time_t creationTime = static_cast< time_t >( atoi( Param[ Param.size() - 1 ] ) ) ;
+time_t creationTime =
+	static_cast< time_t >( atoi( Param[ Param.size() - 1 ] ) ) ;
 
 // Tokenize based on ','.  Multiple channels may be put into the
 // same C command.
 StringTokenizer st( Param[ 1 ], ',' ) ;
+
 for( StringTokenizer::const_iterator ptr = st.begin() ; ptr != st.end() ;
 	++ptr )
 	{
 
+	// Is this a modeless channel?
+	if( '+' == (*ptr)[ 0 ] )
+		{
+		// Modeless channel, ignore it
+		continue ;
+		}
+
 	// Find the channel in question.
 	Channel* theChan = Network->findChannel( *ptr ) ;
+
+	// Did we find the channel?
 	if( NULL == theChan )
 		{
-		// Channel doesn't exist, allocate it
+		// Channel doesn't exist..this transmutes to a create
 		try
 			{
+			// Pass the channel name and join time to
+			// the Channel constructor
 			theChan = new Channel( *ptr, creationTime ) ;
 			}
 		catch( std::bad_alloc )
 			{
-			elog	<< "xServer::MSG_C> Memory allocation failure\n" ;
+			// Memory allocation failure
+			elog	<< "xServer::MSG_C> Memory allocation "
+				"failure\n" ;
+
+			// Return error
 			return -1 ;
 			}
 
-		// Add it to the network table
+		// Add this channel to the network channel table
 		if( !Network->addChannel( theChan ) )
 			{
+			// Addition failed, log the error
 			elog	<< "xServer::MSG_C> Failed to add channel: "
 				<< *theChan << endl ;
+
+			// Prevent memory leaks by removing the unused
+			// channel
 			delete theChan ;
-			return -1 ;
+
+			// continue to next one *shrug*
+			continue ;
 			}
 		}
 
@@ -2104,34 +2206,77 @@ for( StringTokenizer::const_iterator ptr = st.begin() ; ptr != st.end() ;
 		}
 	catch( std::bad_alloc )
 		{
+		// Memory allocation failure
+		// Log the error
 		elog	<< "xServer::MSG_C> Memory allocation failure\n" ;
-		exit( 0 ) ;
+
+		// Move to the next channel
+		continue ;
 		}
 
 	// The user who creates a channel is automatically +o
 	theUser->setMode( ChannelUser::MODE_O ) ;
 
 	// Build associations
+
+	// Add the ChannelUser to the Channel's information
 	if( !theChan->addUser( theUser ) )
 		{
+		// Addition failed, log the error
 		elog	<< "xServer::MSG_C> Unable to add user "
 			<< theUser->getNickName() << " to channel "
 			<< theChan->getName() << endl ;
 
+		// Prevent a memory leak by deallocating the unused
+		// ChannelUser structure
 		delete theUser ;
-		return -1 ;
+
+		// Continue to next channel
+		continue ;
 		}
 
 	// Add this channel to the client's channel structure.
 	theClient->addChannel( theChan ) ;
 
+	// Notify all listening xClients of this event
 	PostChannelEvent( EVT_CREATE, theChan->getName(),
 		static_cast< void* >( theChan ),
 		static_cast< void* >( theClient ) ) ;
 
+	// TODO: Post event that the user joins the channel,
+	// and gets ops
+
 	} // for()
 
 return 0 ;
+
+}
+
+void xServer::userPartAllChannels( iClient* theClient )
+{
+// Artifact, user is parting all channels
+for( iClient::channelIterator ptr = theClient->channels_begin(),
+	endPtr = theClient->channels_end() ; ptr != endPtr ; ++ptr )
+	{
+	PostChannelEvent( EVT_PART, (*ptr)->getName(),
+		static_cast< void* >( *ptr ), // Channel*
+		static_cast< void* >( theClient ) ) ; // iClient*
+		delete (*ptr)->removeUser( theClient->getIntYY() ) ;
+
+	// Is the channel empty of all network and services
+	// clients?
+	if( (*ptr)->empty() && !Network->servicesOnChannel( *ptr ) )
+		{
+		// TODO: Post event
+
+		// Yup, remove the channel from the network channel
+		// table
+		delete Network->removeChannel( (*ptr)->getName() ) ;
+		}
+	}
+
+// Notify the iClient that it has parted all channels
+theClient->clearChannels() ;
 
 }
 
@@ -2144,93 +2289,122 @@ return 0 ;
 int xServer::MSG_J( xParameters& Param )
 {
 
+// Verify that sufficient arguments have been provided
+// client_numeric #channel[,#channel2,...]
 if( Param.size() < 2 )
 	{
+	// Insufficient arguments provided, log the error
 	elog	<< "xServer::MSG_J> Invalid number of arguments\n" ;
+
+	// Return error
 	return -1 ;
 	}
 
 // Find the client in question.
 iClient* Target = Network->findClient( Param[ 0 ] ) ;
+
+// Did we find the client?
 if( NULL == Target )
 	{
+	// Nope, log the error
 	elog	<< "xServer::MSG_J> ("
 		<< Param[ 1 ] << ") Unable to find user: "
 		<< Param[ 0 ] << endl ;
+
+	// Return error
 	return -1 ;
-	}
-
-if( '0' == Param[ 1 ][ 0 ] )
-	{
-	// Artifact, user is parting all channels
-	for( iClient::channelIterator ptr = Target->channels_begin(),
-		endPtr = Target->channels_end() ; ptr != endPtr ; ++ptr )
-		{
-		PostChannelEvent( EVT_PART, (*ptr)->getName(),
-			static_cast< void* >( *ptr ), // Channel*
-			static_cast< void* >( Target ) ) ; // iClient*
-
-		delete (*ptr)->removeUser( Target->getIntYY() ) ;
-		if( (*ptr)->empty() && !Network->servicesOnChannel( *ptr ) )
-			{
-			delete Network->removeChannel( (*ptr)->getName() ) ;
-			}
-		}
-	Target->clearChannels() ;
-	return 0 ;
 	}
 
 // Tokenize by ',', as the client may join more than one
 // channel at once.
 StringTokenizer st( Param[ 1 ], ',' ) ;
+
 for( StringTokenizer::size_type i = 0 ; i < st.size() ; i++ )
 	{
 
+	// Is it a modeless channel?
 	if( '+' == st[ i ][ 0 ] )
 		{
 		// Don't care about modeless channels
 		continue ;
 		}
 
+	// Is the user parting all channels?
+	if( '0' == st[ i ][ 0 ] )
+		{
+		// Yup, call userPartAllChannels which will update
+		// the user's information and notify listening
+		// services clients of the parts
+		userPartAllChannels( Target ) ;
+
+		// continue to next channel
+		continue ;
+		}
+
 	Channel* theChan = 0 ;
 	ChannelUser* theUser = 0 ;
+
+	// Attempt to allocate a ChannelUser structure for this
+	// user<->channel association
 	try
 		{
+		// Pass the iClient* of this client to the
+		// ChannelUser constructor
 		theUser = new ChannelUser( Target ) ;
 		}
 	catch( std::bad_alloc )
 		{
+		// Memory allocation failure, log the error
 		elog	<< "xServer::MSG_J> Memory allocation failure\n" ;
-		return -1 ;
+
+		// Continue to next channel
+		continue ;
 		}
 
+	// This variable represents which event actually occurs
 	channelEventType whichEvent = EVT_JOIN ;
 
 	// On a JOIN command, the channel should already exist.
 	theChan = Network->findChannel( st[ i ] ) ;
+
+	// Does the channel already exist?
 	if( NULL == theChan )
 		{
-		// This transmutes to a CREATE
+		// Nope, this transmutes to a CREATE
 		try
 			{
+			// Create a new Channel to represent this
+			// network channel
 			theChan = new Channel( st[ i ], ::time( 0 ) ) ;
 			}
 		catch( std::bad_alloc )
 			{
+			// Memory allocation failure, log the error
 			elog	<< "xServer::MSG_J> Memory allocation "
 				<< "failure\n" ;
-			delete theChan ;
+
+			// Prevent memory leaks by deallocating the
+			// ChannelUser information for this user
 			delete theUser ;
-			return -1 ;
+
+			// Continue to next channel
+			continue ;
 			}
 
 		// Add the channel to the network tables
 		if( !Network->addChannel( theChan ) )
 			{
+			// Addition to network tables failed
+			// Log the error
 			elog	<< "xServer::MSG_J> Unable to add channel: "
 				<< theChan->getName() << endl ;
+
+			// Prevent memory leaks by deallocating the
+			// Channel and ChannelUser objects
 			delete theChan ;
 			delete theUser ;
+
+			// Continue to next channel
 			continue ;
 			}
 
@@ -2238,7 +2412,9 @@ for( StringTokenizer::size_type i = 0 ; i < st.size() ; i++ )
 		// as operator.
 		theUser->setMode( ChannelUser::MODE_O ) ;
 
+		// Update the event type
 		whichEvent = EVT_CREATE ;
+
 		} // if( NULL == theChan )
 
 	// Otherwise, the channel was found just fine :)
@@ -2247,13 +2423,18 @@ for( StringTokenizer::size_type i = 0 ; i < st.size() ; i++ )
 	// channel's user structure.
 	if( !theChan->addUser( theUser ) )
 		{
+		// Addition of this ChannelUser to the Channel failed
+		// Log the error
 //		elog	<< "xServer::MSG_J> Unable to add user "
 //			<< theUser->getNickName() << " to channel: "
 //			<< theChan->getName() << endl ;
 
-		// Addition of ChannelUser failed.
+		// Prevent memory leaks by deallocating the unused
+		// ChannelUser object
 		delete theUser ;
-		return -1 ;
+
+		// Continue to next channel
+		continue ;
 		}
 
 	// Add this channel to this client's channel structure.
@@ -2264,6 +2445,9 @@ for( StringTokenizer::size_type i = 0 ; i < st.size() ; i++ )
 	PostChannelEvent( whichEvent, theChan->getName(),
 		static_cast< void* >( theChan ),
 		static_cast< void* >( Target ) ) ;
+
+	// TODO: Update event posting so that CREATE is also
+	// passed the client who created the channel
 
 	} // for()
 
@@ -3983,9 +4167,10 @@ return 0 ;
 static const char* militime( const char* sec, const char* msec )
 {
 struct timeval tv;
-static char buf[128];
+static char buf[128] = {0} ;
 
-gettimeofday( &tv, NULL ) ;
+::memset( buf, 0, sizeof( buf ) ) ;
+::gettimeofday( &tv, NULL ) ;
 
 if( sec && msec )
 	{

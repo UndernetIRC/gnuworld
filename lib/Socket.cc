@@ -9,7 +9,10 @@
 #include	<sys/types.h>
 #include	<sys/socket.h>
 #include	<sys/ioctl.h>
+#include	<sys/time.h>
+#include	<netinet/tcp.h>
 #include	<dirent.h>
+
 #include	<cmath>
 #include	<cstring>
 
@@ -30,7 +33,7 @@
 #endif
 
 const char Socket_h_rcsId[] = __SOCKET_H ;
-const char Socket_cc_rcsId[] = "$Id: Socket.cc,v 1.2 2000/07/16 17:48:18 dan_karrels Exp $" ;
+const char Socket_cc_rcsId[] = "$Id: Socket.cc,v 1.3 2000/11/05 23:09:39 dan_karrels Exp $" ;
 
 using namespace std ;
 using gnuworld::elog ;
@@ -111,9 +114,9 @@ int Socket::available() const
 string Socket::ipAddrOf( const string& host )
 {
 struct hostent *hostEntry = ::gethostbyname( host.c_str() ) ;
-if( hostEntry == NULL)
+if( NULL == hostEntry )
 	{
-	elog	<< "Socket::ipAddrOf> unable to find host name in service! "
+	elog	<< "Socket::ipAddrOf> Unable to find host name: "
 		<< host << endl ;
 	return host ;
 	}
@@ -180,19 +183,23 @@ if( _sockinfo.addr == 0 && _portNo > 0 )
 		elog << "Socket::setSocket> Memory allocation failure\n" ;
 		return -1 ;
 		}
-	memset( static_cast< void* >( _sockinfo.addr ), 0, sizeof( sockaddr_in ) ) ;
+
+	memset( static_cast< void* >( _sockinfo.addr ), 0,
+		sizeof( sockaddr_in ) ) ;
 	_sockinfo.addr->sin_family = AF_INET ;
-	_sockinfo.addr->sin_port = htons( static_cast< u_short >( _portNo ) ) ;
+	_sockinfo.addr->sin_port =
+		htons( static_cast< u_short >( _portNo ) ) ;
 	}
 
 if( _sockinfo.addr != 0 && _portNo > 0 )
 	{
 	struct linger setLinger;
-	setLinger.l_onoff = 0; // don't linger!      1; // linger on unread date!
+	setLinger.l_onoff = 0; // don't linger!     
 	setLinger.l_linger = 0;
     
 	if( ::setsockopt( _sockinfo.fd, SOL_SOCKET, SO_LINGER,
-		reinterpret_cast< const char* >( &setLinger ), sizeof( setLinger ) ) < 0 )
+		reinterpret_cast< const char* >( &setLinger ),
+		sizeof( setLinger ) ) < 0 )
 		{
 		elog << "Socket::setSocket> failed to set SO_LINGER" << endl ;
 		elog << "Error: " << strerror( errno ) << endl ;
@@ -203,7 +210,8 @@ int optval = 1 ;
 
 // detect closed connection
 if( ::setsockopt( _sockinfo.fd, SOL_SOCKET, SO_KEEPALIVE,
-		reinterpret_cast< const char* >( &optval ), sizeof( optval ) ) < 0 )
+	reinterpret_cast< const char* >( &optval ),
+	sizeof( optval ) ) < 0 )
 	{
 	elog << "Socket::setSocket> failed to set SO_KEEPALIVE" << endl ;
 	elog << "Error: " << strerror( errno ) << endl ;
@@ -211,7 +219,8 @@ if( ::setsockopt( _sockinfo.fd, SOL_SOCKET, SO_KEEPALIVE,
 
 // immediately deliver msg
 if( ::setsockopt( _sockinfo.fd, IPPROTO_TCP, TCP_NODELAY,
-		     reinterpret_cast< const char* >( &optval ), sizeof( optval ) ) < 0 )
+	reinterpret_cast< const char* >( &optval ),
+	sizeof( optval ) ) < 0 )
 	{
 	elog << "Socket::setSocket> failed to set TCP_NODELAY" << endl ;
 	elog << "Error: " << strerror( errno ) << endl ;
@@ -243,7 +252,7 @@ if( ::setsockopt( _sockinfo.fd, SOL_SOCKET, SO_RCVBUF,
 	}
 
 // explicitly set to blocking
-optval = fcntl( _sockinfo.fd, F_GETFL, 0 ) ;
+optval = ::fcntl( _sockinfo.fd, F_GETFL, 0 ) ;
 if( optval < 0 )
 	{
 	elog << "Socket::setSocket> failed to get sock flags" << endl ;
@@ -280,7 +289,7 @@ for( string::size_type i = 0 ; (i < h.size()) && (count < 4) ; ++i )
 	}
 
 // there are exactly three decimal points in an IP address
-return (count == 3) ;
+return (3 == count) ;
 }
 
 // static
@@ -331,7 +340,7 @@ if( fdcnt < 0 )
 	return fdcnt ;
 	}
 
-if( fdcnt == 0 )
+if( 0 == fdcnt )
 	{
 	// No descriptors ready, no big deal.
 	return fdcnt ;
@@ -447,7 +456,7 @@ do
 	// since timeval may be modified by call
 	struct timeval to = *usetimeout;
 	errno = 0 ;
-	fdcnt = select( 1+_sockinfo.fd, &readfds, 0, 0, &to ) ;
+	fdcnt = ::select( 1+_sockinfo.fd, &readfds, 0, 0, &to ) ;
 	} while( errno == EINTR && --cnt >= 0 ) ;
 
 if( fdcnt < 0 )
@@ -527,8 +536,9 @@ do
 	{
 	struct timeval to = poll;
 	errno = 0;
-	fdcnt = ::select( 1 + _sockinfo.fd, &readfds, &writefds, &excptfds, &to ) ;
-	} while( errno == EINTR && --cnt >= 0 ) ;
+	fdcnt = ::select( 1 + _sockinfo.fd, &readfds, &writefds,
+		&excptfds, &to ) ;
+	} while( (errno == EINTR) && (--cnt >= 0) ) ;
 
 if( fdcnt < 0 )
 	{
@@ -547,7 +557,6 @@ return FD_ISSET(_sockinfo.fd, &readfds) +
 	4 * (FD_ISSET(_sockinfo.fd, &excptfds)) ;
 }
 
-///////////////////////////////// all send signatures ////////////////////////////////////
 int Socket::send( const unsigned char* buf, int nb )
 {
 if( _sockinfo.fd < 0 )
@@ -570,7 +579,7 @@ do
 	errno = 0 ;
 	result = ::send( _sockinfo.fd,
 		reinterpret_cast< const char* >( buf ), nb, 0 ) ;
-	} while( --cnt >= 0 && (EINTR == errno) ) ;
+	} while( (--cnt >= 0) && (EINTR == errno) ) ;
 
 return result ;
 
@@ -578,7 +587,7 @@ return result ;
 
 int Socket::send( const char* s )
 {
-return send( reinterpret_cast< const unsigned char* >( s ), ::strlen( s ) ) ;
+return send( reinterpret_cast< const unsigned char* >( s ), strlen( s ) ) ;
 }
 
 // support call by reference
@@ -596,12 +605,20 @@ do
 	{
 	errno = 0 ;
 	result = ::send( _sockinfo.fd, val.c_str(), val.size(), 0 ) ;
-	} while( --cnt >= 0 && (EINTR == errno) ) ;
+	} while( (--cnt >= 0) && (EINTR == errno) ) ;
 
 return result ;
 }
 
-int Socket::recv( unsigned char* buf, int nb )
+int Socket::recv( string& readBuf, size_t numBytes )
+{
+unsigned char* buf = reinterpret_cast< unsigned char* >(
+	const_cast< char* >( readBuf.data() ) ) ;
+
+return recv( buf, numBytes ) ;
+}
+
+int Socket::recv( unsigned char* buf, size_t nb )
 {
 if( _sockinfo.fd < 0 )
 	{
