@@ -95,6 +95,7 @@ cservice::cservice(const string& args)
 
     RegisterCommand(new OPCommand(this, "OP", "#channel [nick][,nick] .."));
     RegisterCommand(new VOICECommand(this, "VOICE", "#channel [nick][,nick] .."));
+    RegisterCommand(new ADDUSERCommand(this, "ADDUSER", "#channel <nick> <access>"));
 
 	//-- Load in our cservice configuration file.
 	cserviceConfig = new EConfig( args ) ;
@@ -315,7 +316,7 @@ const string& cservice::prettyDuration( int duration )
 	result = "TBA";
 	return result;
 }	
-	
+ 
 void Command::Usage( iClient* theClient )
 {
 	bot->Notice( theClient, string( "Usage:" ) + ' ' + getInfo() ) ;

@@ -1,5 +1,5 @@
 #ifndef __CSERVICE_H
-#define __CSERVICE_H "$Id: cservice.h,v 1.10 2000/12/27 01:11:08 gte Exp $"
+#define __CSERVICE_H "$Id: cservice.h,v 1.11 2000/12/27 03:15:42 gte Exp $"
 
 #include	<string>
 #include	<vector>
@@ -71,7 +71,7 @@ public:
 	sqlChannel* getChannelRecord( const string& );
 
 	const string& prettyDuration( int );
-
+ 
 	// Typedef's for user/channel Hashmaps.
 	typedef hash_map< string, sqlUser*, eHash, eqstr > sqlUserHashType ;
 	typedef hash_map< string, sqlChannel*, eHash, eqstr > sqlChannelHashType ;
@@ -86,3 +86,4 @@ public:
 } // namespace gnuworld
 
 #endif // __CSERVICE_H
+
