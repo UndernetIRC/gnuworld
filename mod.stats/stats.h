@@ -17,11 +17,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: stats.h,v 1.13 2003/08/09 23:15:36 dan_karrels Exp $
+ * $Id: stats.h,v 1.14 2003/08/11 17:45:05 dan_karrels Exp $
  */
 
 #ifndef __STATS_H
-#define __STATS_H "$Id: stats.h,v 1.13 2003/08/09 23:15:36 dan_karrels Exp $"
+#define __STATS_H "$Id: stats.h,v 1.14 2003/08/11 17:45:05 dan_karrels Exp $"
 
 #include	<fstream>
 #include	<string>
@@ -58,7 +58,7 @@ public:
 	 * It basically just calls the base class ImplementServer(),
 	 * and registers for events.
 	 */
-///	virtual void ImplementServer( xServer* ) ;
+	virtual void ImplementServer( xServer* ) ;
 
 	/**
 	 * This method is invoked when someone sends a private
