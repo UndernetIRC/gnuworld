@@ -14,13 +14,18 @@
 #include	"Network.h"
 #include	"ELog.h"
 
-const char msg_N_cc_rcsId[] = "$Id: msg_N.cc,v 1.1 2001/02/02 18:10:30 dan_karrels Exp $" ;
-
-using std::string ;
-using std::endl ;
+const char msg_N_cc_rcsId[] = "$Id: msg_N.cc,v 1.2 2001/05/21 16:35:34 dan_karrels Exp $" ;
+const char iClient_h_rcsId[] = __ICLIENT_H ;
+const char events_h_rcsId[] = __EVENTS_H ;
+const char ip_h_rcsId[] = __IP_H ;
+const char Network_h_rcsId[] = __NETWORK_H ;
+const char ELog_h_rcsId[] = __ELOG_H ;
 
 namespace gnuworld
 {
+
+using std::string ;
+using std::endl ;
 
 /**
  * A new user has joined the network, or a user has changed

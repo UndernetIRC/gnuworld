@@ -48,7 +48,7 @@
 #include	"ServerTimerHandlers.h"
 
 const char server_h_rcsId[] = __SERVER_H ;
-const char server_cc_rcsId[] = "$Id: server.cc,v 1.100 2001/05/17 21:32:57 dan_karrels Exp $" ;
+const char server_cc_rcsId[] = "$Id: server.cc,v 1.101 2001/05/21 16:35:34 dan_karrels Exp $" ;
 const char config_h_rcsId[] = __CONFIG_H ;
 const char misc_h_rcsId[] = __MISC_H ;
 const char events_h_rcsId[] = __EVENTS_H ;
@@ -3151,4 +3151,24 @@ for( jupedServerListType::iterator ptr = jupedServers.begin() ;
 	}
 return false ;
 }
+
+int xServer::Wallops( const string& msg )
+{
+if( msg.empty() )
+	{
+	return -1 ;
+	}
+
+strstream s ;
+s	<< getCharYY()
+	<< " WA :"
+	<< msg
+	<< ends ;
+
+int retMe = Write( s ) ;
+delete[] s.str() ;
+
+return retMe ;
+}
+
 } // namespace gnuworld

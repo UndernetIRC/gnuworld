@@ -3,7 +3,7 @@
  */
 
 #ifndef __CLIENT_H
-#define __CLIENT_H "$Id: client.h,v 1.28 2001/03/31 01:26:10 dan_karrels Exp $"
+#define __CLIENT_H "$Id: client.h,v 1.29 2001/05/21 16:35:34 dan_karrels Exp $"
 
 #include	<string>
 
@@ -514,6 +514,16 @@ public:
 	 * Have this bot send a global wallops message.
 	 */
 	virtual int Wallops( const char* Format, ... ) ;
+
+	/**
+	 * Have the server send a wallops.
+	 */
+	virtual int WallopsAsServer( const string& ) ;
+
+	/**
+	 * Have the server send a wallops.
+	 */
+	virtual int WallopsAsServer( const char* Format, ... ) ;
 
 	/**
 	 * Return true if this xClient is attached to a server.

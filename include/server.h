@@ -17,7 +17,7 @@
  */
 
 #ifndef __SERVER_H
-#define __SERVER_H "$Id: server.h,v 1.42 2001/05/17 21:32:57 dan_karrels Exp $"
+#define __SERVER_H "$Id: server.h,v 1.43 2001/05/21 16:35:34 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
@@ -340,7 +340,8 @@ public:
 	/**
 	 * Find one or more glines matching a given userHost string.
 	 */
-	virtual vector< const Gline* > matchGline( const string& userHost ) const ;
+	virtual vector< const Gline* > matchGline( const string& userHost )
+		const ;
 
 	/**
 	 * Send all glines to the network.
@@ -391,19 +392,22 @@ public:
 	 * Notify the network that one of the services clients has
 	 * parted a channel.
 	 */
-	virtual void PartChannel( xClient* theClient, const string& chanName, const string& reason = "" ) ;
+	virtual void PartChannel( xClient* theClient, const string& chanName,
+			const string& reason = string() ) ;
 
 	/**
 	 * Notify the network that one of the services clients has
 	 * parted a channel.
 	 */
-	virtual void PartChannel( xClient* theClient, Channel* theChan, const string& reason = "" ) ;
+	virtual void PartChannel( xClient* theClient, Channel* theChan,
+			const string& reason = string() ) ;
 
 	/**
  	 * Handle the parting of a services client from a channel.  This
 	 * method updates internal tables.
  	 */
-	virtual void OnPartChannel( xClient* theClient, const string& chanName ) ;
+	virtual void OnPartChannel( xClient* theClient,
+			const string& chanName ) ;
 
 	/**
  	 * Handle the parting of a services client from a channel.  This
@@ -415,7 +419,8 @@ public:
 	 * Handle the parting of a network client from a channel.  This method
 	 * updates internal tables.
 	 */
-	virtual void OnPartChannel( iClient* theClient, const string& chanName ) ;
+	virtual void OnPartChannel( iClient* theClient,
+			const string& chanName ) ;
 
 	/**
 	 * Handle the parting of a network client from a channel.  This method
@@ -430,6 +435,11 @@ public:
 	 * a juped/fake server.
 	 */
 	virtual void BurstClient( xClient*, bool localClient = true ) ;
+
+	/**
+	 * Send a wallops to the network as the server.
+	 */
+	virtual int	Wallops( const string& ) ;
 
 	/* Event registration stuff */
 

@@ -28,7 +28,7 @@
 #include	"events.h"
 
 const char xClient_h_rcsId[] = __CLIENT_H ;
-const char xClient_cc_rcsId[] = "$Id: client.cc,v 1.36 2001/03/31 01:26:10 dan_karrels Exp $" ;
+const char xClient_cc_rcsId[] = "$Id: client.cc,v 1.37 2001/05/21 16:35:34 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -227,6 +227,31 @@ if( Connected && MyUplink && Format && Format[ 0 ] != 0 )
 	return MyUplink->Write( "%s WA :%s",
 		getCharYYXXX().c_str(),
 		buffer ) ;
+	}
+return -1 ;
+}
+
+int xClient::WallopsAsServer( const string& buf )
+{
+if( !Connected || !MyUplink )
+	{
+	return -1 ;
+	}
+return MyUplink->Wallops( buf ) ;
+}
+
+int xClient::WallopsAsServer( const char* Format, ... )
+{
+if( Connected && MyUplink && Format && Format[ 0 ] != 0 )
+	{
+	char buffer[ 512 ] = { 0 } ;
+	va_list list;
+
+	va_start( list, Format ) ;
+	vsprintf( buffer, Format, list ) ;
+	va_end( list ) ;
+
+	return MyUplink->Wallops( buffer ) ;
 	}
 return -1 ;
 }

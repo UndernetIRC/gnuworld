@@ -16,7 +16,7 @@
 #include	"Numeric.h"
 
 const char xIP_h_rcsId[] = __IP_H ;
-const char xIP_cc_rcsId[] = "$Id: ip.cc,v 1.4 2001/03/31 01:26:10 dan_karrels Exp $" ;
+const char xIP_cc_rcsId[] = "$Id: ip.cc,v 1.5 2001/05/21 16:35:34 dan_karrels Exp $" ;
 const char Numeric_h_rcsId[] = __NUMERIC_H ;
 
 namespace gnuworld
@@ -26,7 +26,7 @@ using std::string ;
 
 xIP::xIP( const unsigned int& IP )
 {
-this->IP = htonl( IP ) ;
+this->IP = ntohl( IP ) ;
 }
 
 xIP::xIP( const unsigned int& a,
@@ -34,7 +34,7 @@ xIP::xIP( const unsigned int& a,
 	const unsigned int& c,
 	const unsigned int& d )
 {
-IP = htonl( (a << 24) | (b << 16) | (c << 8) | d ) ;
+IP = ntohl( (a << 24) | (b << 16) | (c << 8) | d ) ;
 }
 
 xIP::xIP( const xIP& rhs )
@@ -45,7 +45,6 @@ xIP::xIP( const string& IP, bool Base64 )
 {
 if( Base64 )
 	{
-	// TOOD: ntohl()?
 	// 30 24 18 12 6
 	this->IP = (convert2n[ IP[ 0 ] ] << 30) +
 		  (convert2n[ IP[ 1 ] ] << 24) +
@@ -53,13 +52,15 @@ if( Base64 )
 		  (convert2n[ IP[ 3 ] ] << 12) +
 		  (convert2n[ IP[ 4 ] ] << 6) +
 		  (convert2n[ IP[ 5 ] ] ) ;
+
+	this->IP = ntohl( this->IP ) ;
 	return ;
 	}
 
 struct hostent* hp = ::gethostbyname( IP.c_str() ) ;
 if( NULL == hp )
 	{
-	this->IP = htonl( inet_addr( IP.c_str() ) ) ;
+	this->IP = ntohl( inet_addr( IP.c_str() ) ) ;
 	}
 else
 	{
@@ -68,8 +69,13 @@ else
 		unsigned char a, b, c, d;
 		} ip ;
 	::memcpy( &ip, hp->h_addr, sizeof( unsigned int ) ) ;
-	this->IP = htonl( ((ip.a << 24) | (ip.b << 16) | (ip.c << 8) | ip.d) ) ;
-	} // close else
+
+	this->IP = ntohl( 
+		((ip.a << 24) |
+		(ip.b << 16) |
+		(ip.c << 8) |
+		ip.d) ) ;
+	}
 
 }
 
