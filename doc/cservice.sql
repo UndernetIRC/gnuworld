@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------------
--- "$Id: cservice.sql,v 1.74 2003/03/14 04:41:25 nighty Exp $"
+-- "$Id: cservice.sql,v 1.75 2003/05/08 11:57:01 nighty Exp $"
 -- Channel service DB SQL file for PostgreSQL.
 
 -- ChangeLog:
@@ -192,6 +192,7 @@ CREATE TABLE users (
 -- 0x00 08 -- Fraud username.
 -- 0x00 10 -- "No-Notes" - We don't want to be sent notes.
 -- 0x00 20 -- "No Purge" - Don't remove the username for being idle.
+-- 0x00 40 -- "No Admin" - Any * authentication is disabled (verify/commands) (its the DISABLEAUTH ON/OFF setting online)
 	last_updated_by VARCHAR (128),		-- nick!user@host
 	last_updated INT4 NOT NULL, 
 	deleted INT2 DEFAULT '0',
