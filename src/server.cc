@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server.cc,v 1.152 2002/11/20 22:09:34 dan_karrels Exp $
+ * $Id: server.cc,v 1.153 2002/11/21 21:13:14 dan_karrels Exp $
  */
 
 #include	<sys/time.h>
@@ -72,7 +72,7 @@
 #include	"Connection.h"
 
 const char server_h_rcsId[] = __SERVER_H ;
-const char server_cc_rcsId[] = "$Id: server.cc,v 1.152 2002/11/20 22:09:34 dan_karrels Exp $" ;
+const char server_cc_rcsId[] = "$Id: server.cc,v 1.153 2002/11/21 21:13:14 dan_karrels Exp $" ;
 const char config_h_rcsId[] = __CONFIG_H ;
 const char misc_h_rcsId[] = __MISC_H ;
 const char events_h_rcsId[] = __EVENTS_H ;
@@ -3705,6 +3705,36 @@ if( !isConnected() )
 
 serverConnection->Write( burstHoldBuffer.data() ) ;
 burstHoldBuffer.clear() ;
+}
+
+void xServer::UserLogin( iClient* destClient, const string& account,
+	xClient* sourceClient )
+{
+assert( destClient != 0 ) ;
+
+if( account.empty() )
+	{
+	elog	<< "xServer::UserLogin> Empty account name/domain for user: "
+		<< *destClient
+		<< endl ;
+	return ;
+	}
+
+destClient->setAccount( account ) ;
+
+stringstream	outStream ;
+outStream	<< getCharYY()
+		<< " AC "
+		<< destClient->getCharYYXXX()
+		<< " "
+		<< account
+		<< ends ;
+Write( outStream ) ;
+
+PostEvent( EVT_ACCOUNT,
+	static_cast< void* >( destClient ), 0, 0, 0,
+	sourceClient ) ;
+
 }
 
 } // namespace gnuworld

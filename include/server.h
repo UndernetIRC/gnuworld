@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server.h,v 1.76 2002/10/31 18:52:51 dan_karrels Exp $
+ * $Id: server.h,v 1.77 2002/11/21 21:13:13 dan_karrels Exp $
  */
 
 #ifndef __SERVER_H
-#define __SERVER_H "$Id: server.h,v 1.76 2002/10/31 18:52:51 dan_karrels Exp $"
+#define __SERVER_H "$Id: server.h,v 1.77 2002/11/21 21:13:13 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
@@ -525,6 +525,18 @@ public:
 	 * Return true if successful, false otherwise.
 	 */
 	virtual bool	UnRegisterTimer( const timerID&, void*& data ) ;
+
+	/**
+	 * This method is called by the xClient's to notify the network
+	 * that an iClient has logged into that particular service.
+	 * The iClient's internal state will be updated to reflect this
+	 * login, and the message will be sent to the network.
+	 * The third argument (the source xClient) is the xClient issuing
+	 * the login event.  If this argument is NULL, then all xClients
+	 * will receive the EVT_ACCOUNT event.  If the argument is non-NULL,
+	 * then all but the sourceClient will receive the event.
+	 */
+	virtual void	UserLogin( iClient*, const string&, xClient* = 0 ) ;
 
 	/**
 	 * Post a system event to the rest of the system.  Note
