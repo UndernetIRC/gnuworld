@@ -22,10 +22,13 @@ namespace gnuworld
 
 using std::string ;
 
+namespace uworld
+{
+
 void Command::Usage( iClient* theClient )
 {
 bot->Notice( theClient, string( "Usage: " ) + ' ' + getInfo() ) ;
 }
 
-
+}
 } // namespace gnuworld

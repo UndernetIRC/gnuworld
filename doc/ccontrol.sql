@@ -1,4 +1,4 @@
--- "$Id: ccontrol.sql,v 1.11 2001/07/22 14:44:25 mrbean_ Exp $"
+-- "$Id: ccontrol.sql,v 1.12 2001/07/23 10:28:50 mrbean_ Exp $"
 -- 2001-13-02  : |MrBean|
 -- Added level patch for ccontrol module
 
@@ -24,9 +24,17 @@ CREATE TABLE opers (
 	suspend_expires INT4,
 	suspended_by VARCHAR(128),
 	suspendReason VARCHAR(256),
-	PRIMARY KEY( user_id )
+	isUHS BOOLEAN NOT NULL DEFAULT 0,
+	isOPER BOOLEAN NOT NULL DEFAULT 0,
+	isADMIN BOOLEAN NOT NULL DEFAULT 0,
+	isSMT BOOLEAN NOT NULL DEFAULT 0,
+	isCODER BOOLEAN NOT NULL DEFAULT 0,
+	getLOGS BOOLEAN NOT NULL DEFAULT 0,
+	needOP BOOLEAN NOT NULL DEFAULT 0,
+	email VARCHAR(128),
 	last_updated_by VARCHAR (128),		-- nick!user@host
 	last_updated INT4 NOT NULL,
+	PRIMARY KEY( user_id )
 );
 
 CREATE TABLE hosts (

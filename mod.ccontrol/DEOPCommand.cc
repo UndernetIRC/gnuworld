@@ -13,13 +13,15 @@
 #include	"StringTokenizer.h"
 #include	"Network.h"
 
-const char DEOPCommand_cc_rcsId[] = "$Id: DEOPCommand.cc,v 1.1 2001/03/10 18:33:23 mrbean_ Exp $";
+const char DEOPCommand_cc_rcsId[] = "$Id: DEOPCommand.cc,v 1.2 2001/07/23 10:28:51 mrbean_ Exp $";
 
 namespace gnuworld
 {
 
 using std::string ;
 
+namespace uworld
+{
 
 bool DEOPCommand::Exec( iClient* theClient, const string& Message )
 {
@@ -73,6 +75,8 @@ for(unsigned int i=2;i<st.size();i++)
 if(!args.empty())
 	bot->ModeAsServer( theChan, mode + ' ' + args ) ;
 return true;
+}
+
 }
 }			
 	

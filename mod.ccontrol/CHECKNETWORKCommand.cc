@@ -13,13 +13,15 @@
 #include	"StringTokenizer.h"
 #include	"Network.h"
 
-const char CHECKNETWORKCommand_cc_rcsId[] = "$Id: CHECKNETWORKCommand.cc,v 1.2 2001/05/08 16:01:12 mrbean_ Exp $";
+const char CHECKNETWORKCommand_cc_rcsId[] = "$Id: CHECKNETWORKCommand.cc,v 1.3 2001/07/23 10:28:51 mrbean_ Exp $";
 
 namespace gnuworld
 {
 
 using std::string ;
 
+namespace uworld
+{
 
 bool CHECKNETWORKCommand::Exec( iClient* theClient, const string& Message )
 {
@@ -78,5 +80,7 @@ return true;
 
 bot->Notice(theClient,"Finished checking the network status\n");
 bot->Notice(theClient,"Found a total of %d missing servers\n,TServers");
+}
+
 }
 }

@@ -1,7 +1,7 @@
 /* ccFlood.h */
 
 #ifndef __CCLOGIN_H
-#define __CCLOGIN_H "$Id: ccLogin.h,v 1.5 2001/07/20 09:09:31 mrbean_ Exp $"
+#define __CCLOGIN_H "$Id: ccLogin.h,v 1.6 2001/07/23 10:28:51 mrbean_ Exp $"
 
 #define IGNORE_NOT_FOUND -1
 #define IGNORE_REMOVED -2
@@ -16,6 +16,9 @@ namespace gnuworld
 { 
 
 using std::string ;
+
+namespace uworld
+{
 
 class ccLogin
 {
@@ -67,7 +70,7 @@ protected:
 	time_t IgnoreExpires;
 	string IgnoredHost;
 }; // class ccGline
-
+}
 } // namespace gnuworld
 
 #endif // __CCGLINE_H

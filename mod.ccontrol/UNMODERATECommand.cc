@@ -15,12 +15,15 @@
 #include	"StringTokenizer.h"
 #include	"Network.h"
 
-const char UNMODERATECommand_cc_rcsId[] = "$Id: UNMODERATECommand.cc,v 1.2 2001/03/29 21:54:32 dan_karrels Exp $";
+const char UNMODERATECommand_cc_rcsId[] = "$Id: UNMODERATECommand.cc,v 1.3 2001/07/23 10:28:51 mrbean_ Exp $";
 
 namespace gnuworld
 {
 
 using std::string ;
+
+namespace uworld
+{
 
 bool UNMODERATECommand::Exec( iClient* theClient, const string& Message )
 {
@@ -52,5 +55,6 @@ bot->ModeAsServer( theChan, "-m");
 
 return true ;
 
+}
 }
 }

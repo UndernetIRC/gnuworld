@@ -14,12 +14,15 @@
 #include	"StringTokenizer.h"
 #include	"Network.h"
 
-const char OPCommand_cc_rcsId[] = "$Id: OPCommand.cc,v 1.2 2001/07/17 16:58:27 dan_karrels Exp $";
+const char OPCommand_cc_rcsId[] = "$Id: OPCommand.cc,v 1.3 2001/07/23 10:28:51 mrbean_ Exp $";
 
 namespace gnuworld
 {
 
 using std::string ;
+
+namespace uworld
+{
 
 bool OPCommand::Exec( iClient* theClient, const string& Message )
 {
@@ -74,5 +77,6 @@ if(!args.empty())
 return true;
 }
 
+}
 } // namespace gnuworld
 

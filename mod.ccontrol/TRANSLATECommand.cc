@@ -13,13 +13,15 @@
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 
-const char TRANSLATECommand_cc_rcsId[] = "$Id: TRANSLATECommand.cc,v 1.4 2001/02/26 16:58:06 mrbean_ Exp $";
+const char TRANSLATECommand_cc_rcsId[] = "$Id: TRANSLATECommand.cc,v 1.5 2001/07/23 10:28:51 mrbean_ Exp $";
 
 namespace gnuworld
 {
 
 using std::string ;
 
+namespace uworld
+{
 
 // translate yyxxx
 bool TRANSLATECommand::Exec( iClient* theClient, const string& Message )
@@ -57,5 +59,6 @@ bot->Notice( theClient, "%s is %s!%s@%s on server %s",
 
 return true ;
 
+}
 }
 }

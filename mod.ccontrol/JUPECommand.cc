@@ -14,12 +14,15 @@
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 
-const char JUPECommand_cc_rcsId[] = "$Id: JUPECommand.cc,v 1.8 2001/07/17 07:24:13 mrbean_ Exp $";
+const char JUPECommand_cc_rcsId[] = "$Id: JUPECommand.cc,v 1.9 2001/07/23 10:28:51 mrbean_ Exp $";
 
 namespace gnuworld
 {
 
 using std::string ;
+
+namespace uworld
+{
 
 bool JUPECommand::Exec( iClient* theClient, const string& Message )
 {
@@ -58,4 +61,5 @@ return true ;
 
 }
 
+}
 } // namespace gnuworld

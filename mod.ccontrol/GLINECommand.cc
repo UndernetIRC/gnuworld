@@ -20,7 +20,7 @@
 #include	"Gline.h"
 #include	"gline.h"
 
-const char GLINECommand_cc_rcsId[] = "$Id: GLINECommand.cc,v 1.14 2001/07/22 14:44:25 mrbean_ Exp $";
+const char GLINECommand_cc_rcsId[] = "$Id: GLINECommand.cc,v 1.15 2001/07/23 10:28:51 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -33,6 +33,10 @@ using std::string ;
 //
 // Output: C GL * +*@lamer.net 3600 :Banned (*@lamer) ...
 //
+
+namespace uworld
+{
+
 bool GLINECommand::Exec( iClient* theClient, const string& Message )
 {
 
@@ -143,5 +147,7 @@ else
 if(!Up)
 	bot->addGline(TmpGline);
 return true ;
+}
+
 }
 }

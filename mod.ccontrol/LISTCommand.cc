@@ -12,12 +12,15 @@
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 
-const char LISTCommand_cc_rcsId[] = "$Id: LISTCommand.cc,v 1.3 2001/07/18 06:42:35 mrbean_ Exp $";
+const char LISTCommand_cc_rcsId[] = "$Id: LISTCommand.cc,v 1.4 2001/07/23 10:28:51 mrbean_ Exp $";
 
 namespace gnuworld
 {
 
 using std::string ;
+
+namespace uworld
+{
 
 bool LISTCommand::Exec( iClient* theClient, const string& Message)
 {	 
@@ -44,5 +47,6 @@ else
 return true ;
 }
 
+}
 }
 

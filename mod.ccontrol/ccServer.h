@@ -1,7 +1,7 @@
 /* ccServer.h */
 
 #ifndef __CCSERVER_H
-#define __CCSERVER_H "$Id: ccServer.h,v 1.2 2001/07/20 09:09:31 mrbean_ Exp $"
+#define __CCSERVER_H "$Id: ccServer.h,v 1.3 2001/07/23 10:28:51 mrbean_ Exp $"
 
 #include	<string>
 
@@ -13,6 +13,9 @@ namespace gnuworld
 { 
 
 using std::string ;
+
+namespace uworld
+{
 
 class ccServer
 {
@@ -76,7 +79,7 @@ protected:
 	PgDatabase* SQLDb;
 
 }; // class ccServer
-
+}
 } // namespace gnuworld
 
 #endif // __CCSERVER_H

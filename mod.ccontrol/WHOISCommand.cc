@@ -14,12 +14,15 @@
 #include	"StringTokenizer.h"
 #include	"ip.h"
 
-const char WHOISCommand_cc_rcsId[] = "$Id: WHOISCommand.cc,v 1.5 2001/07/17 07:24:13 mrbean_ Exp $";
+const char WHOISCommand_cc_rcsId[] = "$Id: WHOISCommand.cc,v 1.6 2001/07/23 10:28:51 mrbean_ Exp $";
 
 namespace gnuworld
 {
 
 using std::string ;
+
+namespace uworld
+{
 
 // whois nickname
 bool WHOISCommand::Exec( iClient* theClient, const string& Message )
@@ -98,5 +101,7 @@ bot->Notice( theClient, "On channels: %s",
 	chanNames.c_str() ) ;
 
 return true ;
+}
+
 }
 }

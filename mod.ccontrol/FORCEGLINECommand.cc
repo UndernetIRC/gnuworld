@@ -19,7 +19,7 @@
 #include	"Gline.h"
 #include	"gline.h"
 
-const char FORCEGLINECommand_cc_rcsId[] = "$Id: FORCEGLINECommand.cc,v 1.5 2001/07/22 14:44:25 mrbean_ Exp $";
+const char FORCEGLINECommand_cc_rcsId[] = "$Id: FORCEGLINECommand.cc,v 1.6 2001/07/23 10:28:51 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -32,6 +32,9 @@ using std::string ;
 //
 // Output: C GL * +*@lamer.net 3600 :Banned (*@lamer) ...
 //
+namespace uworld
+{
+
 bool FORCEGLINECommand::Exec( iClient* theClient, const string& Message )
 {
 
@@ -143,5 +146,7 @@ else
 if(!Up)
 	bot->addGline(TmpGline);
 return true ;
+}
+
 }
 }

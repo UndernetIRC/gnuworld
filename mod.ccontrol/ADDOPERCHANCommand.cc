@@ -13,9 +13,12 @@
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 
-const char ADDOPERCHANCommand_cc_rcsId[] = "$Id: ADDOPERCHANCommand.cc,v 1.5 2001/07/17 07:24:13 mrbean_ Exp $";
+const char ADDOPERCHANCommand_cc_rcsId[] = "$Id: ADDOPERCHANCommand.cc,v 1.6 2001/07/23 10:28:51 mrbean_ Exp $";
 
 namespace gnuworld
+{
+
+namespace uworld
 {
 
 using std::string ;
@@ -53,6 +56,7 @@ else
 		chanName.c_str() ) ;
 	}
 return true ;
+}
 }
 }
 

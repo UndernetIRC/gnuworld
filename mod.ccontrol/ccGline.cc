@@ -3,7 +3,7 @@
  * 
  * Gline class
  * 
- * $Id: ccGline.cc,v 1.6 2001/05/16 18:38:35 mrbean_ Exp $
+ * $Id: ccGline.cc,v 1.7 2001/07/23 10:28:51 mrbean_ Exp $
  */
  
 #include	<strstream>
@@ -19,7 +19,7 @@
 #include	"ccGline.h" 
 
 const char ccGline_h_rcsId[] = __CCGLINE_H ;
-const char ccGline_cc_rcsId[] = "$Id: ccGline.cc,v 1.6 2001/05/16 18:38:35 mrbean_ Exp $" ;
+const char ccGline_cc_rcsId[] = "$Id: ccGline.cc,v 1.7 2001/07/23 10:28:51 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -28,6 +28,9 @@ using std::string ;
 using std::endl ; 
 using std::strstream ;
 using std::ends ;
+
+namespace uworld
+{
 
 ccGline::ccGline(PgDatabase* _SQLDb)
  : Id(),
@@ -220,5 +223,5 @@ else
 	}
 return true;
 }
-
+}
 } //Namespace Gnuworld

@@ -11,14 +11,17 @@
 #include	"ccontrol.h"
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
+#include	"ccUser.h"
 
-const char MODOPERCommand_cc_rcsId[] = "$Id: MODOPERCommand.cc,v 1.12 2001/07/20 10:15:40 mrbean_ Exp $";
+const char MODOPERCommand_cc_rcsId[] = "$Id: MODOPERCommand.cc,v 1.13 2001/07/23 10:28:51 mrbean_ Exp $";
 
 namespace gnuworld
 {
 
 using std::string ;
 
+namespace uworld
+{
 
 
 bool MODOPERCommand::Exec( iClient* theClient, const string& Message)
@@ -46,9 +49,9 @@ if(!tmpUser)
 	}
 //Check if the user got a higher or equal flags than the one he's trying to edit	
 AuthInfo* tmpAuth = bot->IsAuth(theClient->getCharYYXXX());
-unsigned int AdFlag = bot->getTrueFlags(tmpAuth->getFlags()); //Get the admin flag
-unsigned int OpFlag = bot->getTrueFlags(tmpUser->getFlags()); //Get the oper flag
-bool Admin = AdFlag < isSMT;
+unsigned int AdFlag = tmpAuth->getFlags(); //Get the admin flag
+unsigned int OpFlag = tmpUser->getType(); //Get the oper flag
+bool Admin = AdFlag < operLevel::SMTLEVEL;
 
 if((Admin) && (AdFlag <= OpFlag))
 	{
@@ -116,14 +119,14 @@ else if(!strcasecmp(st[2].c_str(),"delhost")) //Trying to delete an host ?
 	}	    
 else if(!strcasecmp(st[2].c_str(),"getlogs")) //Trying to toggle the get of logs
 	{
-	if(!tmpUser->gotFlag(getLOGS))
+	if(!tmpUser->getLogs())
 		{
-		tmpUser->setFlag(getLOGS);
+		tmpUser->setLogs(true);
 		bot->Notice(theClient,"getLogs have been turned on for %s",st[1].c_str());
 		}
 	else
 		{
-		tmpUser->removeFlag(getLOGS);
+		tmpUser->setLogs(false);
 		bot->Notice(theClient,"getLogs have been turned off for %s",st[1].c_str());
 		}
 	tmpUser->setLast_Updated_By(theClient->getNickUserHost());
@@ -167,4 +170,6 @@ else
 delete tmpUser;
 return true;
 }		    				
+
+}
 }

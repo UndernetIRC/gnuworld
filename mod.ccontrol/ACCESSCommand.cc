@@ -14,7 +14,7 @@
 #include	"ccontrol.h"
 #include	"CControlCommands.h"
 
-const char ACCESSCommand_cc_rcsId[] = "$Id: ACCESSCommand.cc,v 1.8 2001/07/20 17:44:17 mrbean_ Exp $";
+const char ACCESSCommand_cc_rcsId[] = "$Id: ACCESSCommand.cc,v 1.9 2001/07/23 10:28:51 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -23,6 +23,9 @@ using std::string ;
 using std::endl ;
 using std::strstream ;
 using std::ends ;
+
+namespace uworld
+{
 
 static const char* queryHeader
 	= "SELECT user_name,access,flags,last_updated_by,server FROM opers ";
@@ -101,6 +104,8 @@ else
 	}
 
 return true ;
+}
+
 }
 
 } // namespace gnuworld

@@ -12,12 +12,15 @@
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 
-const char LISTHOSTSCommand_cc_rcsId[] = "$Id: LISTHOSTSCommand.cc,v 1.3 2001/07/17 16:58:27 dan_karrels Exp $";
+const char LISTHOSTSCommand_cc_rcsId[] = "$Id: LISTHOSTSCommand.cc,v 1.4 2001/07/23 10:28:51 mrbean_ Exp $";
 
 namespace gnuworld
 {
 
 using std::string ;
+
+namespace uworld
+{
 
 bool LISTHOSTSCommand::Exec( iClient* theClient, const string& Message)
 {	 
@@ -51,5 +54,6 @@ delete tmpUser;
 return true;
 }
 
+}
 } // namespace gnuworld
 

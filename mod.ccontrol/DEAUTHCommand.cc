@@ -13,12 +13,15 @@
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 
-const char DEAUTHCommand_cc_rcsId[] = "$Id: DEAUTHCommand.cc,v 1.4 2001/02/26 16:58:05 mrbean_ Exp $";
+const char DEAUTHCommand_cc_rcsId[] = "$Id: DEAUTHCommand.cc,v 1.5 2001/07/23 10:28:51 mrbean_ Exp $";
 
 namespace gnuworld
 {
 
 using std::string ;
+
+namespace uworld
+{
 
 bool DEAUTHCommand::Exec( iClient* theClient, const string& Message)
 {
@@ -40,4 +43,6 @@ else
 	return false;
 	}
 }	
+
+}
 }

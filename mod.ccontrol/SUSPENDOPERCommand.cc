@@ -12,12 +12,15 @@
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 
-const char SUSPENDOPERCommand_cc_rcsId[] = "$Id: SUSPENDOPERCommand.cc,v 1.9 2001/07/22 14:44:25 mrbean_ Exp $";
+const char SUSPENDOPERCommand_cc_rcsId[] = "$Id: SUSPENDOPERCommand.cc,v 1.10 2001/07/23 10:28:51 mrbean_ Exp $";
 
 namespace gnuworld
 {
 
 using std::string ;
+
+namespace uworld
+{
 
 bool SUSPENDOPERCommand::Exec( iClient* theClient, const string& Message)
 {
@@ -78,5 +81,6 @@ else
 
 }
 
+}
 } // namespace gnuworld
 

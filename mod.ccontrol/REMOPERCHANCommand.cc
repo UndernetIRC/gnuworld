@@ -13,7 +13,7 @@
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 
-const char REMOPERCHANCommand_cc_rcsId[] = "$Id: REMOPERCHANCommand.cc,v 1.4 2001/02/26 16:58:05 mrbean_ Exp $";
+const char REMOPERCHANCommand_cc_rcsId[] = "$Id: REMOPERCHANCommand.cc,v 1.5 2001/07/23 10:28:51 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -21,6 +21,9 @@ namespace gnuworld
 using std::string ;
 
 // remoperchan #channel
+
+namespace uworld
+{
 
 bool REMOPERCHANCommand::Exec( iClient* theClient, const string& Message )
 {
@@ -49,5 +52,7 @@ else
 		chanName.c_str() ) ;
 	}
 return true ;
+}
+
 }
 }

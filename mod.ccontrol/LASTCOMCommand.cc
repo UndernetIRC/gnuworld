@@ -13,12 +13,15 @@
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 
-const char LASTCOMCommand_cc_rcsId[] = "$Id: LASTCOMCommand.cc,v 1.2 2001/07/17 07:24:13 mrbean_ Exp $";
+const char LASTCOMCommand_cc_rcsId[] = "$Id: LASTCOMCommand.cc,v 1.3 2001/07/23 10:28:51 mrbean_ Exp $";
 
 namespace gnuworld
 {
 
 using std::string ;
+
+namespace uworld
+{
 
 bool LASTCOMCommand::Exec( iClient* theClient, const string& Message )
 {
@@ -89,6 +92,8 @@ for (int i = (bot->SQLDb->Tuples() - 1) ; i >= 0; i--)
 
 bot->Notice(theClient,"End of debug log");
 return true;
+}
+
 }
 }
 

@@ -12,12 +12,15 @@
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 
-const char EXCEPTIONCommand_cc_rcsId[] = "$Id: EXCEPTIONCommand.cc,v 1.3 2001/07/17 16:58:27 dan_karrels Exp $";
+const char EXCEPTIONCommand_cc_rcsId[] = "$Id: EXCEPTIONCommand.cc,v 1.4 2001/07/23 10:28:51 mrbean_ Exp $";
 
 namespace gnuworld
 {
 
 using std::string ;
+
+namespace uworld
+{
 
 bool EXCEPTIONCommand::Exec( iClient* theClient, const string& Message )
 {	 
@@ -78,5 +81,6 @@ else if(!strcasecmp(st[1].c_str(),"del")) //Trying to add an exception?
 return true;
 }
 
+}
 } // namespace gnuworld
 

@@ -13,12 +13,15 @@
 #include	"StringTokenizer.h"
 #include	"Network.h"
 
-const char MODERATECommand_cc_rcsId[] = "$Id: MODERATECommand.cc,v 1.3 2001/07/17 16:58:27 dan_karrels Exp $";
+const char MODERATECommand_cc_rcsId[] = "$Id: MODERATECommand.cc,v 1.4 2001/07/23 10:28:51 mrbean_ Exp $";
 
 namespace gnuworld
 {
 
 using std::string ;
+
+namespace uworld
+{
 
 bool MODERATECommand::Exec( iClient* theClient, const string& Message )
 {
@@ -49,4 +52,5 @@ bot->ModeAsServer( theChan, "+m");
 return true;
 }
 
+}
 } // namespace gnuworld

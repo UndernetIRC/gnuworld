@@ -14,7 +14,7 @@
 #include	"StringTokenizer.h"
 
 
-const char HELPCommand_cc_rcsId[] = "$Id: HELPCommand.cc,v 1.8 2001/07/20 09:09:31 mrbean_ Exp $";
+const char HELPCommand_cc_rcsId[] = "$Id: HELPCommand.cc,v 1.9 2001/07/23 10:28:51 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -23,6 +23,9 @@ using std::string ;
 
 
 // help [command]
+namespace uworld
+{
+
 bool HELPCommand::Exec( iClient* theClient, const string& Message )
 {
 StringTokenizer st( Message ) ;
@@ -67,5 +70,7 @@ else //Supplied a command, show only the help for that command (if it exists)
 	}
 
 return true ;
+}
+
 }
 }

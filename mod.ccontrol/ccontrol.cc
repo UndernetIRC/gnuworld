@@ -27,7 +27,7 @@
 #include 	"gline.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.60 2001/07/22 14:44:25 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.61 2001/07/23 10:28:51 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -37,6 +37,12 @@ using std::vector ;
 using std::cout ;
 using std::endl ; 
 using std::count ;
+
+namespace uworld
+{
+
+using gnuworld::xServer;
+
 
 /*
  *  Exported function used by moduleLoader to gain an
@@ -816,18 +822,20 @@ if(TempAuth)
 	TempAuth->setId(TempUser->getID());
         TempAuth->setName(TempUser->getUserName());
         TempAuth->setAccess(TempUser->getAccess());
-        TempAuth->setFlags(TempUser->getFlags());
+        TempAuth->setFlags(TempUser->getType());
 	TempAuth->setIsSuspended(TempUser->getIsSuspended());
         TempAuth->setSuspendExpires(TempUser->getSuspendExpires());
         TempAuth->setSuspendedBy(TempUser->getSuspendedBy());
 	TempAuth->setServer(TempUser->getServer());
+	TempAuth->setNeedOp(TempUser->getNeedOp());
+	TempAuth->setGetLogs(TempUser->getLogs());
 	}
 }
 
 
 bool ccontrol::AddOper (ccUser* Oper)
 {
-static const char *Main = "INSERT into opers (user_name,password,access,last_updated_by,last_updated,flags,server,isSuspended) VALUES ('";
+static const char *Main = "INSERT into opers (user_name,password,access,last_updated_by,last_updated,flags,server,isSuspended,isUhs,isOper,isAdmin,isSmt,isCoder,GetLogs,NeedOp) VALUES ('";
 
 strstream theQuery;
 theQuery	<< Main
@@ -838,8 +846,16 @@ theQuery	<< Main
 		<< "',now()::abstime::int4,"
 		<< Oper->getFlags() << ",'"
 		<< Oper->getServer() 
-		<< "' ,'" 
-		<<  (Oper->getIsSuspended() ? 't' : 'n') << "')"
+		<< "' ," 
+		<< (Oper->getIsSuspended() ? "'t'" : "'n'") 
+		<< "," << (Oper->isUhs() ? "'t'" : "'n'")
+		<< "," << (Oper->isOper() ? "'t'" : "'n'")
+		<< "," << (Oper->isAdmin() ? "'t'" : "'n'")
+		<< "," << (Oper->isSmt() ? "'t'" : "'n'")
+		<< "," << (Oper->isCoder() ? "'t'" : "'n'")
+		<< "," << (Oper->getLogs() ? "'t'" : "'n'")
+		<< "," << (Oper->getNeedOp() ? "'t'" : "'n'")
+		<< ")"
 		<< ends;
 
 elog	<< "ACCESS::sqlQuery> "
@@ -940,12 +956,14 @@ assert( TempAuth != 0 ) ;
 TempAuth->setId(TempUser->getID());
 TempAuth->setName(TempUser->getUserName());
 TempAuth->setAccess(TempUser->getAccess());
-TempAuth->setFlags(TempUser->getFlags());
+TempAuth->setFlags(TempUser->getType());
 TempAuth->setNumeric(TempUser->getNumeric());
 TempAuth->setIsSuspended(TempUser->getIsSuspended());
 TempAuth->setSuspendExpires(TempUser->getSuspendExpires());
 TempAuth->setSuspendedBy(TempUser->getSuspendedBy());
 TempAuth->setServer(TempUser->getServer());
+TempAuth->setNeedOp(TempUser->getNeedOp());
+TempAuth->setGetLogs(TempUser->getLogs());
 authList.push_back( TempAuth ) ;
 return true;
 }    
@@ -1418,7 +1436,7 @@ Message(Network->findChannel(msgChan),buffer);
 for( authListType::const_iterator ptr = authList.begin() ;
         ptr != authList.end() ; ++ptr )
         {
-        if((*ptr)->getFlags() & getLOGS )
+        if((*ptr)->getLogs() )
                 { 
                 Message(Network->findClient((*ptr)->getNumeric()),buffer);
                 }
@@ -2213,5 +2231,6 @@ unsigned int ccontrol::getTrueFlags( unsigned int Flags )
 return (Flags & ~noFLAG);
 }
 
+}
 
 } // namespace gnuworld

@@ -13,12 +13,15 @@
 #include	"md5hash.h" 
 #include        "ccUser.h"
 
-const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.10 2001/07/20 17:44:17 mrbean_ Exp $";
+const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.11 2001/07/23 10:28:51 mrbean_ Exp $";
 
 namespace gnuworld
 {
 
 using std::string ;
+
+namespace uworld
+{
 
 bool LOGINCommand::Exec( iClient* theClient, const string& Message)
 {
@@ -109,5 +112,6 @@ else
 return true; 
 } 
 
+}
 } // namespace gnuworld
 

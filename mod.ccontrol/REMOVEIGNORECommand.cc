@@ -15,7 +15,7 @@
 #include	"Network.h"
 #include        "ccLogin.h"
 
-const char REMOVEIGNORECommand_cc_rcsId[] = "$Id: REMOVEIGNORECommand.cc,v 1.2 2001/07/17 16:58:27 dan_karrels Exp $";
+const char REMOVEIGNORECommand_cc_rcsId[] = "$Id: REMOVEIGNORECommand.cc,v 1.3 2001/07/23 10:28:51 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -23,6 +23,9 @@ namespace gnuworld
 using std::string ;
 
 // remoperchan #channel
+
+namespace uworld
+{
 
 bool REMOVEIGNORECommand::Exec( iClient* theClient, const string& Message )
 {
@@ -63,5 +66,6 @@ else
 return true;
 }
 
+}
 } // namespace gnuworld
 

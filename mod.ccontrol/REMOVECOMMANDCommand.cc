@@ -12,13 +12,18 @@
 #include	"ccontrol.h"
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
+#include 	"ccUser.h"
+#include	"misc.h"
 
-const char REMOVECOMMANDCommand_cc_rcsId[] = "$Id: REMOVECOMMANDCommand.cc,v 1.10 2001/07/20 09:09:31 mrbean_ Exp $";
+const char REMOVECOMMANDCommand_cc_rcsId[] = "$Id: REMOVECOMMANDCommand.cc,v 1.11 2001/07/23 10:28:51 mrbean_ Exp $";
 
 namespace gnuworld
 {
 
 using std::string ;
+
+namespace uworld
+{
 
 bool REMOVECOMMANDCommand::Exec( iClient* theClient, const string& Message)
 {
@@ -52,13 +57,32 @@ CommandLevel = bot->getTrueAccess(CommandLevel);
 //Check if the user is trying to remove a command for himself
 AuthInfo* tempUser = bot->IsAuth(theClient->getCharYYXXX());
 
-if(tempUser->getName() == st[1])
+if(!strcasecmp(tempUser->getName(),st[1]))
 	{
 	bot->Notice(theClient,"I dont know about you, but i for one dont think removing your own command is such a good idea ... ");
 	delete theUser;
 	return false;
 	}
+
+bool Admin = (tempUser->getFlags()  < operLevel::SMTLEVEL);
+
+if((Admin) && (tempUser->getFlags() <= theUser->getType()))
+	{
+	bot->Notice(theClient,"You cant modify user who have a equal/higher access than you");
+	return false;
+	}
+else if(!(Admin) && (tempUser->getFlags() < theUser->getType()))
+	{
+	bot->Notice(theClient,"You cant modify user who have a higher access than you");
+	return false;
+	}
+if((Admin) && (strcasecmp(tempUser->getServer(),theUser->getServer())))
+	{
+	bot->Notice(theClient,"You can only modify a user who is associated with the same server as you");
+	return false;
+	}
 	
+
 if(!(theUser->gotAccess(CommandLevel)))
 	{
 	bot->Notice(theClient,"%s doest have access for %s",st[1].c_str(),st[2].c_str());
@@ -83,4 +107,6 @@ else
 	}
 	
 }	
+
+}
 }

@@ -3,7 +3,7 @@
  * 
  * Login class
  * 
- * $Id: ccLogin.cc,v 1.1 2001/05/29 22:25:47 mrbean_ Exp $
+ * $Id: ccLogin.cc,v 1.2 2001/07/23 10:28:51 mrbean_ Exp $
  */
  
 #include	<strstream>
@@ -16,7 +16,7 @@
 #include	"ccLogin.h" 
 
 const char ccLogin_h_rcsId[] = __CCLOGIN_H ;
-const char ccLogin_cc_rcsId[] = "$Id: ccLogin.cc,v 1.1 2001/05/29 22:25:47 mrbean_ Exp $" ;
+const char ccLogin_cc_rcsId[] = "$Id: ccLogin.cc,v 1.2 2001/07/23 10:28:51 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -25,6 +25,9 @@ using std::string ;
 using std::endl ; 
 using std::strstream ;
 using std::ends ;
+
+namespace uworld
+{
 
 ccLogin::ccLogin(const string &_Numeric)
  : Numeric(_Numeric),
@@ -36,4 +39,5 @@ ccLogin::ccLogin(const string &_Numeric)
 ccLogin::~ccLogin()
 {}
 
+}
 } //Namespace Gnuworld

@@ -1,7 +1,7 @@
 /* AuthInfo.h */
 
 #ifndef __AUTHINFO_H
-#define __AUTHINFO_H "$Id: AuthInfo.h,v 1.4 2001/07/20 17:44:17 mrbean_ Exp $"
+#define __AUTHINFO_H "$Id: AuthInfo.h,v 1.5 2001/07/23 10:28:51 mrbean_ Exp $"
 
 #include	<string>
 
@@ -11,6 +11,9 @@ namespace gnuworld
 {
 
 using std::string ;
+
+namespace uworld
+{
 
 class AuthInfo
 {
@@ -44,6 +47,12 @@ public:
 	inline const string&		getServer() const
 		{ return Server; }
 		
+	inline const bool		getNeedOp() const
+		{ return NeedOp; }
+
+	inline const bool		getLogs() const
+		{ return GetLogs; }
+		
 	inline void 			setName( const string _Name )
 		{ Name = _Name; } 			
 
@@ -72,20 +81,30 @@ public:
 	inline void 			setServer( const string& _Server )
 		{ Server = _Server; }
 
+	inline void			setNeedOp( const bool _NeedOp )
+		{ NeedOp = _NeedOp; }
+	
+	inline void			setGetLogs( const bool _GetLogs )
+		{ GetLogs = _GetLogs; }
+				
+		
 protected:
 
 	string		Name;
 	string		Numeric;
 	bool		IsSuspended;
 	string		SuspendedBy;
+	time_t		SuspendExpires;
 	string 		Server;
 	unsigned int	Id;
 	unsigned int	Access;
 	unsigned int	Flags;
-
-	time_t		SuspendExpires;
+	bool		NeedOp;
+	bool		GetLogs;
 
 } ;
+
+}
 
 } // namespace gnuworld
 

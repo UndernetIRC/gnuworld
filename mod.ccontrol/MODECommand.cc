@@ -12,13 +12,15 @@
 #include	"StringTokenizer.h"
 #include	"Network.h"
 
-const char MODECommand_cc_rcsId[] = "$Id: MODECommand.cc,v 1.8 2001/06/23 16:27:52 dan_karrels Exp $";
+const char MODECommand_cc_rcsId[] = "$Id: MODECommand.cc,v 1.9 2001/07/23 10:28:51 mrbean_ Exp $";
 
 namespace gnuworld
 {
 
 using std::string ;
 
+namespace uworld
+{
 
 // LDd P AIAAA :mode #krushnet -o DawgSleep
 // mode channel modes
@@ -330,5 +332,7 @@ bot->ModeAsServer( theChan, modeString + ' ' + argString ) ;
 //) ;
 
 return true ;
+}
+
 }
 }

@@ -1,7 +1,7 @@
 /* ccGline.h */
 
 #ifndef __CCGLINE_H
-#define __CCGLINE_H "$Id: ccGline.h,v 1.6 2001/07/20 09:09:31 mrbean_ Exp $"
+#define __CCGLINE_H "$Id: ccGline.h,v 1.7 2001/07/23 10:28:51 mrbean_ Exp $"
 
 #include	<string>
 
@@ -13,6 +13,9 @@ namespace gnuworld
 { 
 
 using std::string ;
+
+namespace uworld
+{
 
 class ccGline
 {
@@ -82,7 +85,7 @@ protected:
 	PgDatabase* SQLDb;
 
 }; // class ccGline
-
+}
 } // namespace gnuworld
 
 #endif // __CCGLINE_H

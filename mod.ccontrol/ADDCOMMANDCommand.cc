@@ -14,13 +14,17 @@
 #include	"StringTokenizer.h"
 #include        "ccUser.h"
 #include	"AuthInfo.h"
+#include	"misc.h"
 
-const char ADDCOMMANDCommand_cc_rcsId[] = "$Id: ADDCOMMANDCommand.cc,v 1.10 2001/07/20 09:09:31 mrbean_ Exp $";
+const char ADDCOMMANDCommand_cc_rcsId[] = "$Id: ADDCOMMANDCommand.cc,v 1.11 2001/07/23 10:28:51 mrbean_ Exp $";
 
 namespace gnuworld
 {
 
 using std::string ;
+
+namespace uworld
+{
 
 bool ADDCOMMANDCommand::Exec( iClient* theClient, const string& Message)
 {
@@ -76,7 +80,24 @@ if(!(AClient->getAccess() & CommandLevel ))
 	return false;
 	}
 	
-//else if(theUser->getAccess() & CommandLevel)
+bool Admin = (AClient->getFlags()  < operLevel::SMTLEVEL);
+
+if((Admin) && (AClient->getFlags() <= theUser->getType()))
+	{
+	bot->Notice(theClient,"You cant modify user who have a equal/higher access than you");
+	return false;
+	}
+else if(!(Admin) && (AClient->getFlags() < theUser->getType()))
+	{
+	bot->Notice(theClient,"You cant modify user who have a higher access than you");
+	return false;
+	}
+if((Admin) && (strcasecmp(AClient->getServer(),theUser->getServer())))
+	{
+	bot->Notice(theClient,"You can only modify a user who is associated with the same server as you");
+	return false;
+	}
+
 else if(theUser->gotAccess(CommandLevel))	
 	{
 	bot->Notice( theClient,
@@ -111,4 +132,5 @@ else
 	}
 	
 }	
+}
 }

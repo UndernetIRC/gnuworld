@@ -17,13 +17,18 @@
 #include	"ccontrol.h"
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
+#include        "ccUser.h"
+#include	"misc.h"
 
-const char ADDNEWOPERCommand_cc_rcsId[] = "$Id: ADDNEWOPERCommand.cc,v 1.13 2001/07/20 09:09:31 mrbean_ Exp $";
+const char ADDNEWOPERCommand_cc_rcsId[] = "$Id: ADDNEWOPERCommand.cc,v 1.14 2001/07/23 10:28:51 mrbean_ Exp $";
 
 namespace gnuworld
 {
 
 using std::string ;
+
+namespace uworld
+{
 
 bool ADDNEWOPERCommand::Exec( iClient* theClient, const string& Message)
 {
@@ -52,26 +57,26 @@ unsigned int NewAccess = 0 ;
 unsigned int NewFlags = 0 ;
 
 // TODO: use std::string::operator=(const char*) const
-if(!strcasecmp(st[2].c_str(),"coder"))
+if(!strcasecmp(st[2],"coder"))
 	{
 	NewAccess = CODER;
-	NewFlags = isCODER;
+	NewFlags = operLevel::CODERLEVEL;
 	}
-else if(!strcasecmp(st[2].c_str(),"smt"))
+else if(!strcasecmp(st[2],"smt"))
 	{
 	NewAccess = SMT;
-	NewFlags = isSMT;
+	NewFlags = operLevel::SMTLEVEL;
 	}
 
-else if(!strcasecmp(st[2].c_str(),"admin"))
+else if(!strcasecmp(st[2],"admin"))
 	{
 	NewAccess = ADMIN;
-        NewFlags = isADMIN;
+        NewFlags = operLevel::ADMINLEVEL;
 	}
-else if(!strcasecmp(st[2].c_str(),"oper"))
+else if(!strcasecmp(st[2],"oper"))
 	{
         NewAccess = OPER;
-        NewFlags = isOPER;
+        NewFlags = operLevel::OPERLEVEL;
 	}
 else
 	{
@@ -92,15 +97,15 @@ if( NULL == tOper )
 NewAccess &= tOper->getAccess(); 
 NewAccess = bot->getTrueAccess(NewAccess);
 //Check if the user doesnt try to add an oper with higher flag than he is
-unsigned int OperFlags = bot->getTrueFlags(tOper->getFlags());
-if(OperFlags & isOPER)
+unsigned int OperFlags = tOper->getFlags();
+if(OperFlags < operLevel::ADMINLEVEL)
 	{
 	bot->Notice(theClient,
 		"Sorry, but only admins+ can add new opers");
 	return false;
 	}
 
-if((OperFlags & isADMIN) && (OperFlags <= NewFlags))
+if((OperFlags < operLevel::SMTLEVEL) && (OperFlags <= NewFlags))
 	{
 	bot->Notice(theClient,
 		"Sorry, but you can't add an oper with higher or equal access to yours");
@@ -119,7 +124,7 @@ theUser = new ccUser(bot->SQLDb);
 theUser->setUserName(st[1]);
 theUser->setPassword(bot->CryptPass(st[3]));
 theUser->setAccess(NewAccess);
-theUser->setFlags(NewFlags);
+theUser->setType(NewFlags);
 theUser->setLast_Updated_By(theClient->getNickUserHost());
 theUser->setServer(tOper->getServer());
 if(bot->AddOper(theUser) == true)
@@ -128,5 +133,6 @@ else
 	bot->Notice(theClient, "Error while adding new oper.");
 delete theUser;
 return true; 
+}
 }
 }

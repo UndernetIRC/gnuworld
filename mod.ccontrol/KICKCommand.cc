@@ -12,12 +12,15 @@
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 
-const char KICKCommand_cc_rcsId[] = "$Id: KICKCommand.cc,v 1.5 2001/03/10 18:33:23 mrbean_ Exp $";
+const char KICKCommand_cc_rcsId[] = "$Id: KICKCommand.cc,v 1.6 2001/07/23 10:28:51 mrbean_ Exp $";
 
 namespace gnuworld
 {
 
 using std::string ;
+
+namespace uworld
+{
 
 // kick #channel nick reason
 bool KICKCommand::Exec( iClient* theClient, const string& Message )
@@ -86,5 +89,7 @@ bot->Kick( theChan, Target, st.assemble( 3 ) ) ;
 bot->Part( chanName ) ;
 
 return true ;
+}
+
 }
 }

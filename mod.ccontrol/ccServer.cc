@@ -3,7 +3,7 @@
  * 
  * Server class
  * 
- * $Id: ccServer.cc,v 1.2 2001/05/01 18:44:39 mrbean_ Exp $
+ * $Id: ccServer.cc,v 1.3 2001/07/23 10:28:51 mrbean_ Exp $
  */
  
 #include	<strstream>
@@ -19,7 +19,7 @@
 #include	"ccServer.h" 
 
 const char ccServer_h_rcsId[] = __CCSERVER_H ;
-const char ccServer_cc_rcsId[] = "$Id: ccServer.cc,v 1.2 2001/05/01 18:44:39 mrbean_ Exp $" ;
+const char ccServer_cc_rcsId[] = "$Id: ccServer.cc,v 1.3 2001/07/23 10:28:51 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -28,6 +28,9 @@ using std::string ;
 using std::endl ; 
 using std::strstream ;
 using std::ends ;
+
+namespace uworld
+{
 
 ccServer::ccServer(PgDatabase* _SQLDb)
  : Name(),
@@ -211,5 +214,5 @@ if( PGRES_COMMAND_OK != status )
 	}
 return true;
 }
-
+}
 } //Namespace Gnuworld

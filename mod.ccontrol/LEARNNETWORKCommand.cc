@@ -15,12 +15,15 @@
 #include        "stdlib.h"
 #include        "server.h"
 
-const char LEARNNETWORKCommand_cc_rcsId[] = "$Id: LEARNNETWORKCommand.cc,v 1.8 2001/07/20 09:09:31 mrbean_ Exp $";
+const char LEARNNETWORKCommand_cc_rcsId[] = "$Id: LEARNNETWORKCommand.cc,v 1.9 2001/07/23 10:28:51 mrbean_ Exp $";
 
 namespace gnuworld
 {
 
 using std::string ;
+
+namespace uworld
+{
 
 bool LEARNNETWORKCommand::Exec( iClient* theClient, const string& Message )
 {
@@ -66,5 +69,6 @@ bot->MsgChanLog("Finished learning the network, Learned a total of %d servers\n"
 return true;
 }
 
+}
 } // namespace gnuworld
 

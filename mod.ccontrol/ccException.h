@@ -1,7 +1,7 @@
 /* ccException.h */
 
 #ifndef __CCEXCEPTION_H
-#define __CCEXCEPTION_H "$Id: ccException.h,v 1.2 2001/07/20 09:09:31 mrbean_ Exp $"
+#define __CCEXCEPTION_H "$Id: ccException.h,v 1.3 2001/07/23 10:28:51 mrbean_ Exp $"
 
 #include	<string>
 
@@ -13,6 +13,9 @@ namespace gnuworld
 { 
 
 using std::string ;
+
+namespace uworld
+{
 
 class ccException
 {
@@ -65,5 +68,6 @@ protected:
 	PgDatabase* SQLDb;
 
 }; 
+}
 }
 #endif // __CCEXCEPTION_H

@@ -13,13 +13,15 @@
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 
-const char CLEARCHANCommand_cc_rcsId[] = "$Id: CLEARCHANCommand.cc,v 1.7 2001/07/20 09:09:31 mrbean_ Exp $";
+const char CLEARCHANCommand_cc_rcsId[] = "$Id: CLEARCHANCommand.cc,v 1.8 2001/07/23 10:28:51 mrbean_ Exp $";
 
 namespace gnuworld
 {
 
 using std::string ;
 
+namespace uworld
+{
 
 bool CLEARCHANCommand::Exec( iClient* theClient, const string& Message )
 {
@@ -176,5 +178,7 @@ for( string::size_type modePos = 0 ; modePos < doModes.size() ; ++modePos )
 if(!remModes.empty())
 	bot->ModeAsServer(theChan,"-" + remModes + " " + args);
 return true;	
+}
+
 }
 }

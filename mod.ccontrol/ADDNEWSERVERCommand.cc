@@ -13,12 +13,15 @@
 #include	"StringTokenizer.h"
 #include	"Network.h"
 
-const char ADDNEWSERVERCommand_cc_rcsId[] = "$Id: ADDNEWSERVERCommand.cc,v 1.4 2001/07/20 09:09:31 mrbean_ Exp $";
+const char ADDNEWSERVERCommand_cc_rcsId[] = "$Id: ADDNEWSERVERCommand.cc,v 1.5 2001/07/23 10:28:51 mrbean_ Exp $";
 
 namespace gnuworld
 {
 
 using std::string ;
+
+namespace uworld
+{
 
 bool ADDNEWSERVERCommand::Exec( iClient* theClient, const string& Message )
 {
@@ -55,5 +58,5 @@ else
 
 return true;
 }
-
+}
 } // namespace gnuworld

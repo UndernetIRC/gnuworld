@@ -14,6 +14,11 @@ using std::string ;
 namespace gnuworld
 {
 
+namespace uworld
+{
+
+using gnuworld::xServer;
+
 class ccontrol ;
 class xServer ;
 
@@ -191,6 +196,7 @@ const int noACCESS = flg_NOLOG;
 
 const int noFLAG = isSUSPENDED | getLOGS;
 
+}
 
 } // namespace gnuworld
 

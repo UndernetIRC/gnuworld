@@ -3,7 +3,7 @@
  */
 
 #ifndef __CCONTROL_H
-#define __CCONTROL_H "$Id: ccontrol.h,v 1.38 2001/07/22 14:44:25 mrbean_ Exp $"
+#define __CCONTROL_H "$Id: ccontrol.h,v 1.39 2001/07/23 10:28:51 mrbean_ Exp $"
 
 
 #include	<string>
@@ -36,6 +36,11 @@ namespace gnuworld
  
 using std::string ;
 using std::vector ;
+
+namespace uworld
+{
+
+using gnuworld::xServer;
 
 /*
  *  Sublcass the postgres API to create our own accessor
@@ -727,6 +732,8 @@ protected:
 	 int			maxGlineLen;
 } ; 
  
+} //namespace uworld
+
 } // namespace gnuworld
  
 #endif // __CCONTROL_H
