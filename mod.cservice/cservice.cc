@@ -82,7 +82,7 @@ cservice::cservice(const string& args)
 	 *  Register command handlers.
 	 */
  
-    RegisterCommand(new SHOWCOMMANDSCommand(this, "SHOWCOMMANDS", ""));
+    RegisterCommand(new SHOWCOMMANDSCommand(this, "SHOWCOMMANDS", "<#channel>"));
     RegisterCommand(new LOGINCommand(this, "LOGIN", "<username> <password>")); 
     RegisterCommand(new ACCESSCommand(this, "ACCESS", "[channel] [nick] [-min n] [-max n] [-autoop] [-noautoop] [-modif [mask]]"));
     RegisterCommand(new CHANINFOCommand(this, "CHANINFO", "<#channel>")); 
@@ -242,7 +242,7 @@ int cservice::OnCTCP( iClient* theClient, const string& CTCP,
 
 	if(Command == "VERSION")
 	{
-		xClient::DoCTCP(theClient, CTCP.c_str(), "Undernet Channel Services Version 2 [" __DATE__ " " __TIME__ "] ($Id: cservice.cc,v 1.19 2000/12/30 00:36:38 gte Exp $)");
+		xClient::DoCTCP(theClient, CTCP.c_str(), "Undernet Channel Services Version 2 [" __DATE__ " " __TIME__ "] ($Id: cservice.cc,v 1.20 2000/12/30 04:15:43 gte Exp $)");
 		return true;
 	}
  
@@ -432,7 +432,7 @@ const string& cservice::prettyDuration( int duration )
  
 void Command::Usage( iClient* theClient )
 {
-	bot->Notice( theClient, string( "Usage:" ) + ' ' + getInfo() ) ;
+	bot->Notice( theClient, string( "SYNTAX: " ) + getInfo() ) ;
 }
  
 } // namespace gnuworld

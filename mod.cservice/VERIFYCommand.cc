@@ -7,8 +7,9 @@
 #include	"cservice.h" 
 #include	"Network.h"
 #include	"levels.h"
+
  
-const char VERIFYCommand_cc_rcsId[] = "$Id: VERIFYCommand.cc,v 1.6 2000/12/30 00:36:38 gte Exp $" ;
+const char VERIFYCommand_cc_rcsId[] = "$Id: VERIFYCommand.cc,v 1.7 2000/12/30 04:15:43 gte Exp $" ;
 
 namespace gnuworld
 {
