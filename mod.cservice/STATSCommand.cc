@@ -6,7 +6,7 @@
 #include	"ELog.h"
 #include	"cservice.h"
 
-const char STATSCommand_cc_rcsId[] = "$Id: STATSCommand.cc,v 1.3 2001/09/12 21:02:47 gte Exp $" ;
+const char STATSCommand_cc_rcsId[] = "$Id: STATSCommand.cc,v 1.4 2001/12/15 00:44:27 gte Exp $" ;
 
 namespace gnuworld
 {
