@@ -20,15 +20,8 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccontrol.cc,v 1.173 2003/06/28 01:21:19 dan_karrels Exp $
+ * $Id: ccontrol.cc,v 1.174 2003/06/28 16:26:45 dan_karrels Exp $
 */
-
-
-/* ccontrol.cc
- * Authors: Daniel Karrels dan@karrels.com
- *	    Tomer Cohen    MrBean@toughguy.net
- * $Id: ccontrol.cc,v 1.173 2003/06/28 01:21:19 dan_karrels Exp $
- */
 
 #define MAJORVER "1"
 #define MINORVER "1pl7"
@@ -72,7 +65,7 @@
 #include	"ip.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.173 2003/06/28 01:21:19 dan_karrels Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.174 2003/06/28 16:26:45 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -198,7 +191,6 @@ maxThreads = atoi(conf.Require("max_threads")->second.c_str());
 checkClones = atoi(conf.Require("check_clones")->second.c_str());
 
 dbConnectionTimer = atoi(conf.Require("dbinterval")->second.c_str());
-
 
 // Set up the oper channels
 EConfig::const_iterator ptr = conf.Find( "operchan" ) ;
@@ -745,7 +737,6 @@ else
 	elog << "Failed!!!" << endl;
 	}
 
-
 loadMaxUsers();
 loadVersions();
 loadBadChannels();
@@ -765,7 +756,6 @@ curUsers = 0;
 #endif
 
 }
-
 
 ccontrol::~ccontrol()
 {
@@ -835,9 +825,8 @@ commandMap.erase( ptr ) ;
 return true ;
 }
 
-int ccontrol::BurstChannels()
+bool ccontrol::BurstChannels()
 {
-
 // msgChan is an operChan as well, no need to burst it separately
 for( vector< string >::size_type i = 0 ; i < operChans.size() ; i++ )
 	{
@@ -850,10 +839,9 @@ for( vector< string >::size_type i = 0 ; i < operChans.size() ; i++ )
 
 // Don't forget to call the base class BurstChannels() method
 return xClient::BurstChannels() ;
-
 }
 
-int ccontrol::BurstGlines()
+bool ccontrol::BurstGlines()
 {
 ccGline *theGline = 0 ;
 for(glineListType::iterator ptr = glineList.begin()
@@ -911,10 +899,9 @@ theServer->RegisterEvent( EVT_NETBREAK, this );
 xClient::ImplementServer( theServer ) ;
 }
 
-int ccontrol::OnPrivateMessage( iClient* theClient, const string& Message,
-	bool )
+void ccontrol::OnPrivateMessage( iClient* theClient,
+	const string& Message, bool )
 {
-
 // Tokenize the message
 StringTokenizer st( Message ) ;
 
@@ -924,14 +911,14 @@ if(theClient == Network->findClient(this->getCharYYXXX()))
 	 Got message from one self, this should never happen
 	 but in case it does, dont want to create an endless loop
 	 */
-	   
-	return xClient::OnPrivateMessage( theClient, Message ) ;
+	xClient::OnPrivateMessage( theClient, Message ) ;
+	return ;
 	}
 // Make sure there is a command present
 if( st.empty() )
 	{
 	//Notice( theClient, "Incomplete command" ) ;
-	return true ;
+	return ;
 	}
 
 const string Command = string_upper( st[ 0 ] ) ;
@@ -945,7 +932,7 @@ if((!theUser) && !(theClient->isOper()))
 		{
 		elog << "Couldnt find custom data for " 
 		     << theClient->getNickName() << endl;
-		return true;
+		return ;
 		}
 		
 	ccFloodData* floodData = (static_cast< ccUserData* >(
@@ -959,7 +946,8 @@ if((!theUser) && !(theClient->isOper()))
 		MsgChanLog("[FLOOD MESSAGE: %s has been ignored",
 			theClient->getNickName().c_str());
 		}
-	return xClient::OnPrivateMessage( theClient, Message ) ;
+	xClient::OnPrivateMessage( theClient, Message ) ;
+	return ;
 	}
 
 // Attempt to find a handler for this method.
@@ -972,7 +960,7 @@ if( commHandler == command_end() )
 	//if(theUser)
 	if(!theClient->getMode(iClient::MODE_SERVICES))	
 		Notice( theClient, "Unknown command" ) ;
-	return 0 ; 
+	return ; 
 	}
 
 // Check if the user is logged in , and he got
@@ -982,14 +970,18 @@ int ComAccess = commHandler->second->getFlags();
 
 if((!theUser) && (ComAccess) && !(theClient->isOper()))
 	{
-	return xClient::OnPrivateMessage( theClient, Message ) ;	
+	xClient::OnPrivateMessage( theClient, Message ) ;	
+	return ;
 	}
+
 if((!theUser) && !(ComAccess & commandLevel::flg_NOLOGIN) && (ComAccess))
 	{//The user isnt authenticated, 
 	 //and he must be to run this command
 	if((theClient->isOper()) && !(theClient->getMode(iClient::MODE_SERVICES)))
 		Notice(theClient,"Sorry, but you must be authenticated to run this command");
-	 return xClient::OnPrivateMessage( theClient, Message ) ;
+
+	xClient::OnPrivateMessage( theClient, Message ) ;
+	return ;
 	}	 	 
 
 if((theUser) && (!theClient->isOper()) && (theUser->getNeedOp()))
@@ -1041,17 +1033,18 @@ else
 	// Execute the command handler
 	commHandler->second->Exec( theClient, Message) ;
 	}		
-return xClient::OnPrivateMessage( theClient, Message ) ;
+xClient::OnPrivateMessage( theClient, Message ) ;
 }
 
-int ccontrol::OnServerMessage( iServer* Server, const string& Message,
+void ccontrol::OnServerMessage( iServer* Server, const string& Message,
 	bool )
 {
 StringTokenizer st( Message ) ;
 
 if(st.size() < 2)
     {
-    return xClient::OnServerMessage(Server,Message);
+    xClient::OnServerMessage(Server,Message);
+    return ;
     }
 
 //This is kinda lame 
@@ -1060,8 +1053,13 @@ if(!strcasecmp(st[1],"351"))
 	{
 	if(st.size() < 5)
 		{
-		elog << "Invalid number of parameters on 351! :" << Message << endl;
-	        return xClient::OnServerMessage(Server,Message);
+		elog	<< "ccontrol::OnServerMessage> Invalid number "
+			<< "on parameters on 351! :"
+			<< Message
+			<< endl;
+
+	        xClient::OnServerMessage(Server,Message);
+		return ;
 		}
 	ccServer* tmpServer = serversMap[Server->getName()];
 	
@@ -1074,10 +1072,10 @@ if(!strcasecmp(st[1],"351"))
 		serversMap.erase(serversMap.find(Server->getName()));
 		}
 	}
-return xClient::OnServerMessage(Server,Message);
+xClient::OnServerMessage(Server,Message);
 }
 
-int ccontrol::Notice( const iClient* Target, const string& Message )
+bool ccontrol::Notice( const iClient* Target, const string& Message )
 {
 ccUser* tmpUser = IsAuth(Target);
 if((tmpUser) && !(tmpUser->getNotice()))
@@ -1087,9 +1085,8 @@ if((tmpUser) && !(tmpUser->getNotice()))
 return xClient::Notice(Target,Message);
 }
          
-int ccontrol::Notice( const iClient* Target, const char* Message, ... )
+bool ccontrol::Notice( const iClient* Target, const char* Message, ... )
 {
-
 char buffer[ 1024 ] = { 0 } ;
 va_list list;
 
@@ -1106,7 +1103,7 @@ return xClient::Notice(Target,"%s",buffer);
                         
 }        
 
-int ccontrol::OnCTCP( iClient* theClient, const string& CTCP,
+void ccontrol::OnCTCP( iClient* theClient, const string& CTCP,
 	const string& Message, bool ) 
 {
 ccUser* theUser = IsAuth(theClient);
@@ -1114,9 +1111,9 @@ if((!theUser) && !(theClient->isOper()))
 	{ //We need to add the flood points for this user
 	if(!theClient->getCustomData(this))
 		{
-		elog << "Couldnt find custom data for " 
-		     << theClient->getNickName() << endl;
-		return false;
+		elog << "ccontrol::OnCTCP> Couldnt find custom data for " 
+		     << *theClient << endl;
+		return ;
 		}
 
 	ccFloodData* floodData = (static_cast< ccUserData* >(
@@ -1126,7 +1123,7 @@ if((!theUser) && !(theClient->isOper()))
 		ignoreUser(floodData);
 		MsgChanLog("[FLOOD MESSAGE]: %s has been ignored"
 			,theClient->getNickName().c_str());
-		return false;
+		return ;
 		}
 	}
 else
@@ -1134,40 +1131,44 @@ else
 	StringTokenizer st(CTCP);
 	if(st.empty())
 		{
-		return xClient::DoCTCP(theClient,CTCP,"Error Aren\'t we missing something?");
+		xClient::DoCTCP(theClient,CTCP,"Error Aren\'t we missing something?");
+		return ;
 		}
 	else if(st[0] == "PING")
 		{
-		return xClient::DoCTCP(theClient,CTCP,Message);
+		xClient::DoCTCP(theClient,CTCP,Message);
+		return ;
 		}
 	else if(st[0] == "GENDER")
 		{
-		return xClient::DoCTCP(theClient,CTCP,
+		xClient::DoCTCP(theClient,CTCP,
 		    "Thats a question i am still trying to find the answer to");
+		return ;
 		}
 	else if(st[0] == "SEX")
 		{
-		return xClient::DoCTCP(theClient,CTCP,
+		xClient::DoCTCP(theClient,CTCP,
 		    "Sorry i am booked till the end of the year");
+		return ;
 		}
 	else if(st[0] == "POLICE")
 		{
-		return xClient::DoCTCP(theClient,CTCP,
+		xClient::DoCTCP(theClient,CTCP,
 		    "Oh crap! where would i hide the drugs now?");
+		return ;
 		}
 	else if(st[0] == "VERSION")
 		{
-		return xClient::DoCTCP(theClient,CTCP,
+		xClient::DoCTCP(theClient,CTCP,
 		    " CControl version "
 		    + string(MAJORVER) + "." + string(MINORVER)
 		    + " release date: " + RELDATE);
+		return ;
 		}
 	}
-	
-return true;
 }
 
-int ccontrol::OnEvent( const eventType& theEvent,
+void ccontrol::OnEvent( const eventType& theEvent,
 	void* Data1, void* Data2, void* Data3, void* Data4 )
 {
 switch( theEvent )
@@ -1331,12 +1332,12 @@ switch( theEvent )
 		{
 		if(!Data1) //TODO: find out how we get this
 			{
-			return 0;
+			return ;
 			}
 
 		if(!saveGlines)
 			{
-			return 0;
+			return ;
 			}
 		Gline* newG = static_cast< Gline* >(Data1);
 
@@ -1355,7 +1356,7 @@ switch( theEvent )
 			{
 			if(newGline->getLastUpdated() >= newG->getLastmod())
 				{ 
-				return 0;
+				return ;
 				}
 				 
 			}
@@ -1381,7 +1382,7 @@ switch( theEvent )
 		{
 		if(!Data1)  
 			{
-			return 0;
+			return ;
 			}
 			
 		Gline* newG = static_cast< Gline* >(Data1);
@@ -1402,15 +1403,13 @@ switch( theEvent )
 		}
 	} // switch()
 
-return 0;
-
-return xClient::OnEvent( theEvent, Data1, Data2, Data3, Data4 ) ;
+xClient::OnEvent( theEvent, Data1, Data2, Data3, Data4 ) ;
 }
 
-int ccontrol::OnChannelEvent( const channelEventType& theEvent,	Channel* theChan,
+void ccontrol::OnChannelEvent( const channelEventType& theEvent,	
+	Channel* theChan,
 	void* Data1, void* Data2, void* Data3, void* Data4 )
 {
-
 switch( theEvent )
 	{
 	case EVT_JOIN:
@@ -1430,13 +1429,12 @@ switch( theEvent )
 	}
 
 // Call the base class OnChannelEvent()
-return xClient::OnChannelEvent( theEvent, theChan,
+xClient::OnChannelEvent( theEvent, theChan,
 	Data1, Data2, Data3, Data4 ) ;
 }
 
-int ccontrol::OnTimer(xServer::timerID timer_id, void*)
+void ccontrol::OnTimer(xServer::timerID timer_id, void*)
 {
-
 if (timer_id ==  postDailyLog)
 	{ 
 	// Create the lastcom report 
@@ -1467,10 +1465,9 @@ else if(timer_id == glineQueueCheck)
 	processGlineQueue();
 	glineQueueCheck = MyUplink->RegisterTimer(::time(0) + glineBurstInterval,this,NULL);	
 	}
-return true;
 }
 
-int ccontrol::OnConnect()
+void ccontrol::OnConnect()
 {
 iServer* tmpServer = Network->findServer(getUplink()->getUplinkCharYY());
 ccServer* tServer = getServer(tmpServer->getName());
@@ -1480,7 +1477,7 @@ if(tServer)
 	Write("%s V :%s\n",getCharYYXXX().c_str(),tmpServer->getCharYY());
 	}
 
-return xClient::OnConnect();
+xClient::OnConnect();
 }
 
 bool ccontrol::isOperChan( const string& theChan ) const
@@ -1846,7 +1843,6 @@ return false;
 
 bool ccontrol::DeleteOper (const string& Name)
 {
-
 if(!dbConnected)
 	{
 	return false;
@@ -1907,7 +1903,6 @@ else
 	return false;
 	}
 }
-
 
 int ccontrol::getCommandLevel( const string& Command)
 {
@@ -4622,17 +4617,14 @@ LogList.push_front(newLog);
  the hardisk if it has to , thous saving time
 
 */
-
 void ccontrol::showLogs(iClient* theClient, unsigned int Amount)
 {
-
 if(Amount > LogsToSave)
 	{
 	Notice(theClient,"Sorry, but you can't view more than the last %d commands"
 		,LogsToSave);
 	Amount = LogsToSave;
 	}
-	
 
 if((LogList.size() < Amount) 
 	&& ((NumOfLogs > LogList.size()) || (NumOfLogs == 0)))
@@ -4664,7 +4656,7 @@ if((LogList.size() < Amount)
 	    this is done only once if at all per restart, so its
 	    not a big deal *g*
 	*/
-	ccLog* tmpLog;
+	ccLog* tmpLog = 0 ;
 	LogFile.seekg(0,ios::beg);
 	NumOfLogs = 0;
 	while(!LogFile.eof())
@@ -4675,6 +4667,7 @@ if((LogList.size() < Amount)
 			if(!LogFile.eof())
 				{
 				Notice(theClient,"Error while reading the lastcom report");
+				delete tmpLog ;
 				return;
 				}
 			}
@@ -4719,7 +4712,7 @@ while(Left > 0)
 
 #endif
 
-int ccontrol::OnSignal(int sig)
+void ccontrol::OnSignal(int sig)
 { 
 if(sig == SIGUSR1)
 	saveServersInfo();
@@ -4727,7 +4720,7 @@ else
 if(sig == SIGUSR2)
 	saveChannelsInfo();
 
-return xClient::OnSignal(sig);
+xClient::OnSignal(sig);
 }
 
 void ccontrol::saveServersInfo()

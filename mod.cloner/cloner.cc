@@ -20,7 +20,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
  * USA.
  *
- * $Id: cloner.cc,v 1.25 2003/01/07 15:57:48 jeekay Exp $
+ * $Id: cloner.cc,v 1.26 2003/06/28 16:26:45 dan_karrels Exp $
  */
 
 #include	<new>
@@ -45,7 +45,7 @@
 
 const char client_h_rcsId[] = __CLIENT_H ;
 const char cloner_h_rcsId[] = __CLONER_H ;
-const char cloner_cc_rcsId[] = "$Id: cloner.cc,v 1.25 2003/01/07 15:57:48 jeekay Exp $" ;
+const char cloner_cc_rcsId[] = "$Id: cloner.cc,v 1.26 2003/06/28 16:26:45 dan_karrels Exp $" ;
 const char iClient_h_rcsId[] = __ICLIENT_H ;
 const char EConfig_h_rcsId[] = __ECONFIG_H ;
 const char ELog_h_rcsId[] = __ELOG_H ;
@@ -146,7 +146,7 @@ if( maxNickLength <= minNickLength )
 cloner::~cloner()
 {}
 
-int cloner::OnConnect()
+void cloner::OnConnect()
 {
 fakeServer = new (std::nothrow) iServer(
 	MyUplink->getIntYY(), // uplinkIntYY
@@ -157,23 +157,23 @@ assert( fakeServer != 0 ) ;
 
 MyUplink->AttachServer( fakeServer, fakeServerDescription ) ;
 
-return xClient::OnConnect() ;
+xClient::OnConnect() ;
 }
 
-int cloner::OnPrivateMessage( iClient* theClient, const string& Message,
-	bool)
+void cloner::OnPrivateMessage( iClient* theClient, const string& Message,
+	bool )
 {
 //elog << "cloner::OnPrivateMessage> " << Message << endl ;
 
 if( !theClient->isOper() )
 	{
-	return 0 ;
+	return ;
 	}
 
 StringTokenizer st( Message ) ;
 if( st.empty() )
 	{
-	return 0 ;
+	return ;
 	}
 
 string command( string_upper( st[ 0 ] ) ) ;
@@ -189,7 +189,7 @@ if( command == "SHOWCOMMANDS" )
 	if( st.size() < 1 )
 		{
 		Notice( theClient, "Usage: %s", command.c_str() ) ;
-		return 0 ;
+		return ;
 		}
 	if( st.size() >= 1 )
 		{
@@ -206,7 +206,7 @@ else if( command == "HELP" )
 		{
 		Notice( theClient, "Usage: %s <topic>",
 			command.c_str() ) ;
-		return 0 ;
+		return ;
 		}
 
 	if( topic == "SHOWCOMMANDS" )
@@ -267,7 +267,7 @@ else if( command == "LOADCLONES" )
 		{
 		Notice( theClient, "Usage: %s <# of clones>",
 			command.c_str() ) ;
-		return 0 ;
+		return ;
 		}
 
 	int numClones = atoi( st[ 1 ].c_str() ) ;
@@ -275,7 +275,7 @@ else if( command == "LOADCLONES" )
 		{
 		Notice( theClient,
 			"LOADCLONES: Invalid number of clones" ) ;
-		return 0 ;
+		return ;
 		}
 
 	if( 0 == makeCloneCount )
@@ -296,7 +296,7 @@ else if( command == "JOINALL" )
 		{
 		Notice( theClient, "Usage: %s <#channel>",
 			command.c_str() ) ;
-		return 0 ;
+		return ;
 		}
 
 	string chanName( st[ 1 ] ) ;
@@ -323,7 +323,7 @@ else if( command == "PARTALL" )
 		{
 		Notice( theClient, "Usage: %s <#channel> [reason]",
 			command.c_str() ) ;
-		return 0 ;
+		return ;
 		}
 
 	if( st.size() == 2 )
@@ -377,7 +377,7 @@ else if( command == "KILLALL" || command == "QUITALL" )
                 {
                 Notice( theClient, "Usage: %s [reason]",
 			command.c_str() ) ;
-                return 0 ;
+                return ;
                 }
 
 	if( st.size() == 1 )
@@ -417,7 +417,7 @@ else if( command == "SAYALL" || command == "MSGALL" )
 		{
 		Notice( theClient, "Usage: %s <#channel/nickname> "
 			"<message>", command.c_str() ) ;
-		return 0 ;
+		return ;
 		}
 
 	string chanOrNickName( st[ 1 ] ) ;
@@ -430,7 +430,7 @@ else if( command == "SAYALL" || command == "MSGALL" )
                         {
                         Notice( theClient, "Unable to find nick: %s"
 	                         , st[ 1 ].c_str() ) ;
-	                return 0 ;
+	                return ;
 	                }
 		chanOrNickName = Target->getCharYYXXX();
 	        }
@@ -456,7 +456,7 @@ else if( command == "ACTALL" || command == "DOALL" ||
 		{
 		Notice( theClient, "Usage: %s <#channel/nickname> "
 			"<action>", command.c_str() ) ;
-		return 0 ;
+		return ;
 		}
 
 	string chanOrNickName( st[ 1 ] ) ;
@@ -469,7 +469,7 @@ else if( command == "ACTALL" || command == "DOALL" ||
                         {
                         Notice( theClient, "Unable to find nick: %s"
                                 , st[ 1 ].c_str() ) ;
-                        return 0 ;
+                        return ;
                         }
 		chanOrNickName = Target->getCharYYXXX();
 	        }
@@ -495,7 +495,7 @@ else if( command == "NOTICEALL" )
 		{
 		Notice( theClient, "Usage: %s <#channel/nickname> "
 			"<notice>", command.c_str() ) ;
-		return 0 ;
+		return ;
 		}
 
 	string chanOrNickName( st[ 1 ] ) ;
@@ -508,7 +508,7 @@ else if( command == "NOTICEALL" )
 		        {
 		        Notice( theClient, "Unable to find nick: %s"
 				, st[ 1 ].c_str() ) ;
-		        return 0 ;
+		        return ;
 		        }
 		chanOrNickName = Target->getCharYYXXX();
 		}
@@ -527,10 +527,9 @@ else if( command == "NOTICEALL" )
 		MyUplink->Write( s ) ;
 		}
 	} // NOTICEALL
-return 0 ;
 }
 
-int cloner::OnTimer( xServer::timerID, void* )
+void cloner::OnTimer( xServer::timerID, void* )
 {
 //elog	<< "cloner::OnTimer> makeCloneCount: "
 //	<< makeCloneCount
@@ -538,7 +537,7 @@ int cloner::OnTimer( xServer::timerID, void* )
 
 if( 0 == makeCloneCount )
 	{
-	return -1 ;
+	return ;
 	}
 
 size_t cloneCount = makeCloneCount ;
@@ -563,8 +562,6 @@ if( makeCloneCount > 0 )
 	{
 	MyUplink->RegisterTimer( ::time( 0 ) + 1, this, 0 ) ;
 	}
-
-return 0 ;
 }
 
 void cloner::addClone()

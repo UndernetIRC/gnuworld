@@ -16,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: dronescan.h,v 1.12 2003/06/20 00:33:28 jeekay Exp $
+ * $Id: dronescan.h,v 1.13 2003/06/28 16:26:46 dan_karrels Exp $
  */
 
 #ifndef DRONESCAN_H
-#define DRONESCAN_H "$Id: dronescan.h,v 1.12 2003/06/20 00:33:28 jeekay Exp $"
+#define DRONESCAN_H "$Id: dronescan.h,v 1.13 2003/06/28 16:26:46 dan_karrels Exp $"
 
 #include <map>
 
@@ -66,24 +66,23 @@ public:
 	virtual void ImplementServer( xServer* ) ;
 	
 	/** This method is called after server connection. */
-	virtual int BurstChannels() ;
+	virtual bool BurstChannels() ;
 
 	/** This is called when we receive a CTCP */
-	virtual int OnCTCP( iClient*, const string&, const string&, bool ) ;
+	virtual void OnCTCP( iClient*, const string&, const string&, bool ) ;
 	
 	/** Receive network events. */
-	virtual int OnEvent( const eventType&, void*, void*, void*, void* ) ;
+	virtual void OnEvent( const eventType&, void*, void*, void*, void* ) ;
 	
 	/** Receive channel events. */
-	virtual int OnChannelEvent( const channelEventType&, Channel*,
+	virtual void OnChannelEvent( const channelEventType&, Channel*,
 		void*, void*, void*, void* ) ;
 	
 	/** Receive private messages. */
-	virtual int OnPrivateMessage( iClient*, const string&, bool ) ;
+	virtual void OnPrivateMessage( iClient*, const string&, bool ) ;
 	
 	/** Receive our own timed events. */
-	virtual int OnTimer( xServer::timerID , void* ) ;
-	
+	virtual void OnTimer( xServer::timerID , void* ) ;
 	
 	/*****************************************
 	 ** D R O N E S C A N   T Y P E D E F S **
@@ -164,7 +163,6 @@ public:
 	/** Set a variable in one of the tests. */
 	Test *setTestVariable(const string&, const string&);
 
-
 	/* Configuration variables used by tests. */
 	
 	/** Global options */
@@ -198,7 +196,6 @@ protected:
 	/** Margins. */
 	double nickMargin;
 	unsigned int channelCutoff;
-	
 	
 	/** How often to show drone channels on join test */
 	unsigned int dcInterval;

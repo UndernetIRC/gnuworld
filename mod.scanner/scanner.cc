@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: scanner.cc,v 1.5 2003/06/28 01:21:21 dan_karrels Exp $
+ * $Id: scanner.cc,v 1.6 2003/06/28 16:26:46 dan_karrels Exp $
  */
 
 #include	"client.h"
@@ -40,7 +40,6 @@ extern "C"
   { 
     return new scanner( args );
   }
-
 } 
  
 /**
@@ -65,21 +64,21 @@ xClient::ImplementServer( theServer ) ;
 theServer->RegisterEvent( EVT_NICK, this ) ;
 }
 
-int scanner::OnPrivateMessage( iClient* theClient,
+void scanner::OnPrivateMessage( iClient* theClient,
 	const string&, bool )
 {
 Notice( theClient, "Howdy :)" ) ;
-return 0 ;
 }
 
 // Burst any channels.
-int scanner::BurstChannels()
+bool scanner::BurstChannels()
 {
 Join( "#some_oper_channel" ) ;
-return 0 ;
+
+return xClient::BurstChannels() ;
 }
 
-int scanner::OnEvent( const eventType& whichEvent,
+void scanner::OnEvent( const eventType& whichEvent,
 	void* arg1,
 	void* arg2,
 	void* arg3,
@@ -100,7 +99,7 @@ switch( whichEvent )
 			<< endl ;
 		break ;
 	}
-return xClient::OnEvent( whichEvent, arg1, arg2, arg3, arg4 ) ;
+xClient::OnEvent( whichEvent, arg1, arg2, arg3, arg4 ) ;
 }
 
 /**
@@ -127,7 +126,6 @@ void scanner::RejectClient( Connection* /* cPtr */,
 // kill clients for fun? :)
 
 // place ip/host into rejected queue for db thread to update db
-
 }
 
 } // namespace gnuworld

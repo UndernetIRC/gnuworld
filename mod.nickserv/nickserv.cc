@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: nickserv.cc,v 1.20 2003/06/28 01:21:21 dan_karrels Exp $
+ * $Id: nickserv.cc,v 1.21 2003/06/28 16:26:46 dan_karrels Exp $
  */
  
 #include <cstdarg>
@@ -28,7 +28,7 @@
 #include "netData.h"
 #include "nickserv.h"
 
-RCSTAG("$Id: nickserv.cc,v 1.20 2003/06/28 01:21:21 dan_karrels Exp $");
+RCSTAG("$Id: nickserv.cc,v 1.21 2003/06/28 16:26:46 dan_karrels Exp $");
 
 namespace gnuworld
 {
@@ -158,7 +158,7 @@ void nickserv::log(const eventType& theEvent, const string& _theMessage)
  * The only channel of any interest to us is our console channel, which is
  * loaded from the configuration file.
  */
-int nickserv::BurstChannels()
+bool nickserv::BurstChannels()
 {
 MyUplink->JoinChannel(this, consoleChannel, nickservConfig->Require("consoleChannelModes")->second);
 
@@ -209,10 +209,10 @@ xClient::ImplementServer( theServer );
 /**
  * Here we deal with any channel events we want to listen to.
  */
-int nickserv::OnChannelEvent(const channelEventType& theEvent, Channel* theChannel,
-                              void* data1, void*, void*, void*)
+void nickserv::OnChannelEvent(const channelEventType& theEvent,
+	Channel* theChannel,
+	void* data1, void*, void*, void*)
 {
-
 iClient* theClient = 0;
 
 switch (theEvent) {
@@ -220,7 +220,7 @@ switch (theEvent) {
     if(theChannel->getName() != consoleChannel) {
       theLogger->log(logging::events::E_WARNING, "Received a JOIN for channel: %s.",
                      theChannel->getName().c_str());
-      return true;
+      return ;
     }
     
     theClient = static_cast< iClient* > ( data1 );
@@ -232,20 +232,17 @@ switch (theEvent) {
   } // case EVT_JOIN
 } // switch (theEvent)
 
-return true;
-
 }
-
 
 /**
  * Here we deal with the various CTCP messages that can get thrown at us.
  */
-int nickserv::OnCTCP( iClient* theClient, const string& CTCP,
+void nickserv::OnCTCP( iClient* theClient, const string& CTCP,
                       const string& Message, bool Secure)
 {
 StringTokenizer st(CTCP);
 
-if(st.empty()) return false;
+if(st.empty()) return ;
 
 string Command = string_upper(st[0]);
 
@@ -257,7 +254,7 @@ if("DCC" == Command) {
   DoCTCP(theClient, CTCP, "GNUWorld NickServ v1.0.4");
 }
 
-return xClient::OnCTCP(theClient, CTCP, Message, Secure);
+xClient::OnCTCP(theClient, CTCP, Message, Secure);
 }
 
 
@@ -277,7 +274,7 @@ return xClient::OnCTCP(theClient, CTCP, Message, Secure);
  *  EVT_QUIT    : Delete the netData instance
  *                Remove the iClient from the process queue
  */
-int nickserv::OnEvent( const eventType& event,
+void nickserv::OnEvent( const eventType& event,
 	void* Data1, void* Data2, void* Data3, void* Data4)
 {
 /* The target user of the event */
@@ -293,7 +290,7 @@ switch( event ) {
     logUsersType::iterator ptr = find(logUsers.begin(), logUsers.end(), theClient);
     if(ptr != logUsers.end()) { logUsers.erase(ptr); }
     
-    return 1;
+    return ;
     break;
   } // case EVT_KILL/QUIT
   
@@ -313,14 +310,14 @@ switch( event ) {
 
     addToQueue(theClient);
     
-    return 1;
+    return ;
     break;
   } // case EVT_NICK
   
   case EVT_CHNICK: {
     addToQueue(theClient);
 
-    return 1;
+    return ;
     break;
   } // case EVT_CHNICK
   
@@ -333,63 +330,55 @@ switch( event ) {
       theData->authedUser->commitLastSeen();
     }
     
-    return 1;
+    return ;
     break;
   } // case EVT_ACCOUNT
 } // switch( event )
 
-return xClient::OnEvent( event, Data1, Data2, Data3, Data4 ) ;
+xClient::OnEvent( event, Data1, Data2, Data3, Data4 ) ;
 }
-
 
 /**
  * Here we deal with incoming communications from network clients.
  */
-int nickserv::OnPrivateMessage( iClient* theClient,
+void nickserv::OnPrivateMessage( iClient* theClient,
 	const string& Message, bool )
 {
 if(!theClient->isModeR()) {
   Notice(theClient, "You must be logged in before attempting to use any commands.");
-  return 1;
+  return ;
 }
 
 StringTokenizer st(Message);
 if(st.empty()) {
   Notice(theClient, "Incomplete command");
-  return 1;
+  return ;
 }
 
 string Command = string_upper(st[0]);
 commandMapType::iterator commHandler = commandMap.find(Command);
 
 if(commHandler == commandMap.end()) {
-  return 1;
+  return ;
 }
 
 commHandler->second->Exec(theClient, Message);
-
-return 1 ;
 }
-
 
 /**
  * When a timer expires, this function is called. It allows for periodic
  * processing of data.
  */
-int nickserv::OnTimer(xServer::timerID theTimer, void* )
+void nickserv::OnTimer(xServer::timerID theTimer, void* )
 {
 if(theTimer == processQueue_timerID) {
   processQueue();
   
   time_t theTime = time(NULL) + checkFreq;
   processQueue_timerID = MyUplink->RegisterTimer(theTime, this, NULL);
-  return 1;
-} // if(theTimer == processQueue_timerID)
+  } // if(theTimer == processQueue_timerID)
 
-return 0;
 } // nickserv::OnTimer(xServer::timerID, void*)
-
-
 
 /**
  * This is where we register a command so that users can interact
@@ -399,7 +388,6 @@ bool nickserv::RegisterCommand( Command* theCommand )
 {
 return commandMap.insert( commandPairType(theCommand->getName(), theCommand)).second;
 }
-
 
 /**
  * This function empties the current user cache and reloads all information from

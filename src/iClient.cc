@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: iClient.cc,v 1.29 2003/06/17 15:13:54 dan_karrels Exp $
+ * $Id: iClient.cc,v 1.30 2003/06/28 16:26:46 dan_karrels Exp $
  */
 
 #include	<new>
@@ -35,7 +35,7 @@
 #include	"ip.h"
 #include	"config.h"
 
-RCSTAG( "$Id: iClient.cc,v 1.29 2003/06/17 15:13:54 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: iClient.cc,v 1.30 2003/06/28 16:26:46 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -140,6 +140,12 @@ for( string::size_type i = 0 ; i < newModes.size() ; i++ )
 			if (isModeR() && isModeX()) setHiddenHost();
 			break ;
 		case '+':
+			break ;
+		case 'n':
+		case 'h':
+			// Unsupported but used on networks that
+			// GNUWorld runs on.
+			// TODO?
 			break ;
 		default:
 			// Unknown mode

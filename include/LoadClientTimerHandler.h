@@ -17,11 +17,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: LoadClientTimerHandler.h,v 1.3 2002/05/27 17:18:12 dan_karrels Exp $
+ * $Id: LoadClientTimerHandler.h,v 1.4 2003/06/28 16:26:45 dan_karrels Exp $
  */
 
 #ifndef __LOADCLIENTTIMERHANDLER_H
-#define __LOADCLIENTTIMERHANDLER_H "$Id: LoadClientTimerHandler.h,v 1.3 2002/05/27 17:18:12 dan_karrels Exp $"
+#define __LOADCLIENTTIMERHANDLER_H "$Id: LoadClientTimerHandler.h,v 1.4 2003/06/28 16:26:45 dan_karrels Exp $"
 
 #include	<string>
 
@@ -77,7 +77,7 @@ public:
 	 * The method that is called by the server when this handler's
 	 * time to perform has arrived.
 	 */
-	virtual	int	OnTimer( timerID, void* ) ;
+	virtual	void	OnTimer( timerID, void* ) ;
 
 } ;
 

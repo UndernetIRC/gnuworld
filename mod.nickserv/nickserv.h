@@ -16,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: nickserv.h,v 1.12 2003/06/19 22:58:31 dan_karrels Exp $
+ * $Id: nickserv.h,v 1.13 2003/06/28 16:26:46 dan_karrels Exp $
  */
 
 #ifndef _NICKSERV_H
-#define _NICKSERV_H "$Id: nickserv.h,v 1.12 2003/06/19 22:58:31 dan_karrels Exp $"
+#define _NICKSERV_H "$Id: nickserv.h,v 1.13 2003/06/28 16:26:46 dan_karrels Exp $"
 
 #include "client.h"
 #include "EConfig.h"
@@ -47,7 +47,6 @@ class nickserv : public xClient, public logging::logTarget {
     /** Receive a message for logging */
     virtual void log(const logging::events::eventType&, const string&);
 
-    
     /*******************************************************
      ** O V E R R I D E N   X C L I E N T   M E T H O D S **
      *******************************************************/
@@ -59,28 +58,27 @@ class nickserv : public xClient, public logging::logTarget {
     virtual ~nickserv() ;
     
     /** This method is called after server connection */
-    virtual int BurstChannels() ;
+    virtual bool BurstChannels() ;
     
     /** This is called when we have attached to the xServer */
     virtual void ImplementServer( xServer* ) ;
 
     /** This is called when a channel event we are listening for happens */
-    virtual int OnChannelEvent( const channelEventType&, Channel*, void*,
+    virtual void OnChannelEvent( const channelEventType&, Channel*, void*,
                                  void*, void*, void* ) ;
 
     /** This is called when we receive a CTCP */
-    virtual int OnCTCP( iClient*, const string&, const string&, bool ) ;
+    virtual void OnCTCP( iClient*, const string&, const string&, bool ) ;
 
     /** This is called when a network event happens */
-    virtual int OnEvent( const eventType&, void* , void*, void*, void* ) ;
+    virtual void OnEvent( const eventType&, void* , void*, void*, void* ) ;
 
     /** This method is called when the bot gets a PRIVMSG */
-    virtual int OnPrivateMessage( iClient*, const string&, bool secure ) ;
+    virtual void OnPrivateMessage( iClient*, const string&, bool secure ) ;
     
     /** This method is called when a timer expires */
-    virtual int OnTimer(gnuworld::xServer::timerID, void*) ;
+    virtual void OnTimer(gnuworld::xServer::timerID, void*) ;
     
-  
     /*********************************
      ** N I C K S E R V   T Y P E S **
      *********************************/
@@ -93,8 +91,7 @@ class nickserv : public xClient, public logging::logTarget {
     typedef map< string, sqlUser*, noCaseCompare > sqlUserHashType;
 
     typedef vector< iClient* > logUsersType;
-    
-  
+      
     /*************************************
      ** N I C K S E R V   M E T H O D S **
      *************************************/

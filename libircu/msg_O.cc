@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_O.cc,v 1.5 2003/06/17 15:13:53 dan_karrels Exp $
+ * $Id: msg_O.cc,v 1.6 2003/06/28 16:26:45 dan_karrels Exp $
  */
 
 #include	<string>
@@ -33,7 +33,7 @@
 #include	"StringTokenizer.h"
 #include	"config.h"
 
-RCSTAG( "$Id: msg_O.cc,v 1.5 2003/06/17 15:13:53 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: msg_O.cc,v 1.6 2003/06/28 16:26:45 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -169,7 +169,6 @@ if( theChan != 0 )
 //		<< endl ;
 
 	channelNotice( srcClient, theChan, message ) ;
-	return true ;
 	}
 else
 	{
@@ -179,14 +178,12 @@ else
 //		<< message
 //		<< endl ;
 
-	return targetClient->OnPrivateNotice( srcClient,
+	targetClient->OnPrivateNotice( srcClient,
 		message,
 		secure ) ;
 	}
 
-// This should not happen
 return true ;
-
 } // msg_O
 
 } // namespace gnuworld

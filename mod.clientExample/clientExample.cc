@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: clientExample.cc,v 1.4 2003/06/28 01:21:19 dan_karrels Exp $
+ * $Id: clientExample.cc,v 1.5 2003/06/28 16:26:45 dan_karrels Exp $
  */
 
 #include	"client.h"
@@ -56,18 +56,17 @@ clientExample::~clientExample()
 /* No heap space allocated */
 }
 
-int clientExample::OnPrivateMessage( iClient* theClient,
+void clientExample::OnPrivateMessage( iClient* theClient,
 	const string&, bool )
 {
 Notice( theClient, "Howdy :)" ) ;
-return 0 ;
 }
 
 // Burst any channels.
-int clientExample::BurstChannels()
+bool clientExample::BurstChannels()
 {
 Join( "#some_oper_channel" ) ;
-return 0 ;
+return xClient::BurstChannels() ;
 }
 
 } // namespace gnuworld

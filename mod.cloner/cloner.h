@@ -20,11 +20,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
  * USA.
  *
- * $Id: cloner.h,v 1.6 2002/08/01 18:59:32 reedloden Exp $
+ * $Id: cloner.h,v 1.7 2003/06/28 16:26:45 dan_karrels Exp $
  */
 
 #ifndef __CLONER_H
-#define __CLONER_H "$Id: cloner.h,v 1.6 2002/08/01 18:59:32 reedloden Exp $"
+#define __CLONER_H "$Id: cloner.h,v 1.7 2003/06/28 16:26:45 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
@@ -49,9 +49,9 @@ public:
 	cloner( const string& configFileName ) ;
 	virtual ~cloner() ;
 
-	virtual int OnConnect() ;
-	virtual int OnTimer( xServer::timerID, void* ) ;
-	virtual int OnPrivateMessage( iClient*, const string&,
+	virtual void OnConnect() ;
+	virtual void OnTimer( xServer::timerID, void* ) ;
+	virtual void OnPrivateMessage( iClient*, const string&,
 			bool secure = false ) ;
 	virtual void addClone() ;
 

@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: UnloadClientTimerHandler.cc,v 1.6 2003/06/17 15:13:54 dan_karrels Exp $
+ * $Id: UnloadClientTimerHandler.cc,v 1.7 2003/06/28 16:26:46 dan_karrels Exp $
  */
 
 #include	<iostream>
@@ -27,12 +27,12 @@
 #include	"ELog.h"
 #include	"config.h"
 
-RCSTAG( "$Id: UnloadClientTimerHandler.cc,v 1.6 2003/06/17 15:13:54 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: UnloadClientTimerHandler.cc,v 1.7 2003/06/28 16:26:46 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
 
-int UnloadClientTimerHandler::OnTimer( timerID, void* )
+void UnloadClientTimerHandler::OnTimer( timerID, void* )
 {
 //elog	<< "UnloadClientTimerHandler::OnTimer("
 //	<< moduleName
@@ -42,7 +42,6 @@ int UnloadClientTimerHandler::OnTimer( timerID, void* )
 theServer->DetachClient( moduleName, reason ) ;
 
 delete this ;
-return 0 ;
 }
 
 } // namespace gnuworld

@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_M.cc,v 1.5 2003/06/18 12:18:46 dan_karrels Exp $
+ * $Id: msg_M.cc,v 1.6 2003/06/28 16:26:45 dan_karrels Exp $
  */
 
 #include	<new>
@@ -38,7 +38,7 @@
 #include	"ServerCommandHandler.h"
 #include	"config.h"
 
-RCSTAG( "$Id: msg_M.cc,v 1.5 2003/06/18 12:18:46 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: msg_M.cc,v 1.6 2003/06/28 16:26:45 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -440,6 +440,15 @@ for( const char* modePtr = Param[ 2 ] ; *modePtr ; ++modePtr )
 //					<< endl ;
 				theClient->removeModeO() ;
 				}
+			break ;
+		case 'n':
+		case 'I':
+		case 'h':
+		case 'X':
+		case 'R':
+			// Unsupported but used on networks that
+			// GNUWorld runs on.
+			// TODO?
 			break ;
 		default:
 			elog	<< "msg_M::onUserModeChange> "

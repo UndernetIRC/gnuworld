@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_N.cc,v 1.3 2003/06/17 15:13:53 dan_karrels Exp $
+ * $Id: msg_N.cc,v 1.4 2003/06/28 16:26:45 dan_karrels Exp $
  */
 
 #include	<new>
@@ -36,7 +36,7 @@
 #include	"ServerCommandHandler.h"
 #include	"config.h"
 
-RCSTAG( "$Id: msg_N.cc,v 1.3 2003/06/17 15:13:53 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: msg_N.cc,v 1.4 2003/06/28 16:26:45 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -103,22 +103,58 @@ const char* account = "";
 // Are modes specified? (With a +r?)
 // If so, token 7 is the authenticated account name,
 // the rest shuffle up.
-// TODO: Make this more futureproof.
-if( params.size() > 10 )
+if( 11 == params.size() )
 	{
+	// User logged in with AC account
+	// server nick '1' someothernumber username hostname
+	// modes account base64host numeric <description>
 	modes = params[ 6 ] ;
 	account = params[ 7 ];
 	host = params[ 8 ] ;
 	yyxxx = params[ 9 ] ;
 	description = params[ 10 ];
 	}
-else if( params.size() > 9 )
+else if( 10 == params.size() )
 	{
+	// User not logged in
+	// server nick '1' someothernumber username hostname
+	// modes base64host numeric <description>
+
 	// Just plain modes here without any parameters
 	modes = params[ 6 ] ;
 	host = params[ 7 ] ;
 	yyxxx = params[ 8 ] ;
 	description = params[ 9 ];
+	}
+else if( 12 == params.size() )
+	{
+	// asuka sethost, user logged in
+	// server nick '1' someothernumber username hostname
+	// modes account sethost base64host numeric <description>
+	modes = params[ 6 ] ;
+	account = params[ 7 ] ;
+	host = params[ 9 ] ;
+	yyxxx = params[ 10 ] ;
+	description = params[ 11 ] ;
+
+//	elog	<< "msg_N> 12 params: "
+//		<< params
+//		<< endl ;
+	}
+else if( 9 == params.size() )
+	{
+	// server nick '1' someothernumber username hostname
+	// base64host numeric <description>
+	host = params[ 6 ] ;
+	yyxxx = params[ 7 ] ;
+	description = params[ 8 ] ;
+	}
+else
+	{
+	elog	<< "msg_N> Unknown token formation: "
+		<< params
+		<< endl ;
+	return false ;
 	}
 
 iClient* newClient = new (std::nothrow) iClient(
@@ -148,7 +184,10 @@ if( !Network->addClient( newClient ) )
 	return false ;
 	}
 
-// TODO: Should this be posted?
+//elog	<< "msg_N> Added user: "
+//	<< *newClient
+//	<< endl ;
+
 theServer->PostEvent( EVT_NICK, static_cast< void* >( newClient ) ) ;
 
 return true ;

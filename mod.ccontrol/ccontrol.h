@@ -16,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccontrol.h,v 1.89 2003/06/28 01:21:19 dan_karrels Exp $
+ * $Id: ccontrol.h,v 1.90 2003/06/28 16:26:45 dan_karrels Exp $
  */
 
 #ifndef __CCONTROL_H
-#define __CCONTROL_H "$Id: ccontrol.h,v 1.89 2003/06/28 01:21:19 dan_karrels Exp $"
+#define __CCONTROL_H "$Id: ccontrol.h,v 1.90 2003/06/28 16:26:45 dan_karrels Exp $"
 
 //Undef this if you want to log to the database
 #define LOGTOHD 
@@ -118,10 +118,11 @@ protected:
 	 */
 	usersMapType			usersMap ;
 
-	
+	/**
+	 * A mutable iterator to the usersMap.
+	 */
 	typedef usersMapType::iterator     usersIterator;
 	
-
 	/**
 	 * The db servers
 	 */
@@ -132,14 +133,19 @@ protected:
 	 */
 	serversMapType			serversMap ;
 
+	/**
+	 * A mutable iterator to the serversMap.
+	 */
 	typedef serversMapType::iterator     serversIterator;
-	
+
+	/**
+	 * Type used to hold the gline list.
+	 */
 	typedef map< string, ccGline* >        glineListType ;
 	
 	/**
 	 * Holds the glines
 	 */
-
 	glineListType			glineList ;
 
 	glineListType			rnGlineList;
@@ -192,29 +198,29 @@ public:
 	 * This method is called by the xServer when it wants information
 	 * about the channels this client will be on.
 	 */
-	virtual int BurstChannels() ;
+	virtual bool BurstChannels() ;
 
 	/**
 	 * This method is called by the xServer when it wants information
 	 * about the glines this client has in its database;
 	 */
-	virtual int BurstGlines() ;
+	virtual bool BurstGlines() ;
 	
 	/**
 	 * This method is invoked each time the client is sent a
 	 * PRIVMSG.
 	 */
-	virtual int OnPrivateMessage( iClient*, const string&,
+	virtual void OnPrivateMessage( iClient*, const string&,
 			bool secure = false ) ;
 
-	virtual int OnServerMessage( iServer*, const string&,
+	virtual void OnServerMessage( iServer*, const string&,
 			bool secure = false ) ;
 
-	int Notice( const iClient* Target, const string& Message );
+	bool Notice( const iClient* Target, const string& Message );
          
-	int Notice( const iClient* Target, const char* Message, ... );
+	bool Notice( const iClient* Target, const char* Message, ... );
 
-	virtual int OnCTCP( iClient* ,
+	virtual void OnCTCP( iClient* ,
                 const string& ,
                 const string&,
 		bool Secure = false ) ;
@@ -222,24 +228,23 @@ public:
 	/**
 	 * This method is invoked each time a network event occurs.
 	 */
-	virtual int OnEvent( const eventType&,
+	virtual void OnEvent( const eventType&,
 		void* = 0, void* = 0,
 		void* = 0, void* = 0 ) ;
-
 
 	/**
 	 * This method is invoked each time a channel event occurs
 	 * for one of the channels for which this client has registered
 	 * to receive channel events.
 	 */
-	virtual int OnChannelEvent( const channelEventType&,
+	virtual void OnChannelEvent( const channelEventType&,
 		Channel*,
 		void* = 0, void* = 0,
 		void* = 0, void* = 0 ) ;
 
-	virtual int OnTimer(xServer::timerID, void*);
+	virtual void OnTimer(xServer::timerID, void*);
 	
-	virtual int OnConnect();
+	virtual void OnConnect();
 	
 	/**
 	 * This method is called once this client has been attached
@@ -339,125 +344,102 @@ public:
 	 * This method will check if a client is authenticated 
 	 * based on the iClient structure
 	 */
-	 
 	ccUser* IsAuth( const iClient* theClient ) ;
 
 	/**
 	 * This method will check if a client is authenticated 
 	 * based on a nick
 	 */
-
         ccUser *IsAuth( const string& );
 
-        
-	/**
+       	/**
 	 * This method will add a new oper to the database
 	 */
-
 	bool AddOper( ccUser* );
 	
 	/**
 	 * This method will delete an oper from the database
 	 * based on the a handle
 	 */
-
 	bool DeleteOper( const string& );
 	
 	/**
 	 * This method will mark the client as authenticated
 	 */
-	
 	bool AuthUser( ccUser* ,iClient* );
 	
 	/**
 	 * This method will deauthenticate a client with the bot
 	 */
-
 	bool deAuthUser( ccUser* );
 
 	/**
 	 * This method will return the access flag needed for a command
 	 */
-
 	int getCommandLevel( const string& );
-	
 
 	/**
 	 * This method will check if a user got a corrisponding
 	 * host mask in the databse
 	 */
-
 	bool UserGotMask( ccUser* , const string& );
 
 	/**
 	 * This method will check if a user got a corrisponding
 	 * host in the databse
 	 */
-
-
 	bool UserGotHost( ccUser* , const string& );
 
 	/**
 	 * This method will crypt a string based on the md5 hash
 	 */
-
 	static string CryptPass( const string& );
 
 	/**
 	 * This method will check if a mask is valid
 	 */
-
 	virtual bool validUserMask(const string& userMask) const ;
 
 	/**
 	 * This method will add a host to a client
 	 */
-
         bool AddHost( ccUser* , const string& host );
 
 	/**
 	 * This method will delete a host from  aclient
 	 */
-
         bool DelHost( ccUser* , const string& host );
 	
 	/**
 	 * This method lists all the hosts a client got
 	 */
-
 	bool listHosts( ccUser* , iClient* );
 	
 	/**
 	 * This method will update a client authenticate info
 	 * based on the ccUser structure (called after update)
 	 */
-
-
 	void UpdateAuth( ccUser* );
 
 	/**
 	 * This method will get a help entry for a command from the database
 	 */
-
 	bool GetHelp( iClient* , const string& );
 
 	/**
 	 * This method will get a help entry for a command and its subcommand
 	 * from the database
 	 */
-
 	bool GetHelp( iClient* , const string& , const string&);
 	
 	/**
 	 * This method will post help for a client
 	 */
-
 	void DoHelp( iClient* );
 
 	/**
 	 * This method will replace a word in a string with another one
 	 */
-
 	static string replace( const string&,
 				const string&,
 				const string& ) ;
@@ -466,26 +448,22 @@ public:
 	 * This method will attempt to load an oper info from the database
 	 * based on the handle
 	 */
-	 
 	ccUser *GetOper( const string );
 
 	/**
 	 * This method will attempt to load an oper info from the database
 	 * based on the user id
 	 */
-
 	ccUser *GetOper( unsigned int );
 
 	/**
 	 * This method add a gline to the database
 	 */
-	 
 	bool addGline( ccGline* );
 
 	/**
 	 * This method deletes a gline from the database
 	 */
-	
 	bool remGline( ccGline* );
 
 	ccGline* findMatchingGline( const iClient* );
@@ -495,10 +473,10 @@ public:
 	ccGline* findGline( const string& );
 
 	ccGline* findRealGline( const string& );
+
 	/**
 	 * This method logs the bot commands to the message channel
 	 */
-
 	bool MsgChanLog( const char * , ... ) ;
 
 	/**
@@ -516,32 +494,26 @@ public:
 	/**
 	 * This method convers a unix time to ascii time
 	 */
-
 	char *convertToAscTime(time_t);	
 
 	/**
 	 * This method converts a unix time to tm structure
 	 */
-
 	struct tm convertToTmTime(time_t );
 
 	/**
 	 * This method creates a lastcom report between two dates
 	 */
-
 	bool CreateReport(time_t , time_t);	
 
 	/**
 	 * This method emails the lastcom report
 	 */
-
 	bool MailReport(const char *, char *);
 
 	/**
 	 * This method checks the gline paramerters for valid time/host
 	 */
-
-	
 	int checkGline(const string ,unsigned int ,unsigned int &);
 
 	int checkSGline(const string ,unsigned int ,unsigned int &);
@@ -616,8 +588,6 @@ public:
 
 	bool UpdateCommandFromDb ( Command* Comm );
 
-
-	
 	const string expandDbServer(const string&);
 	
 	static const string removeSqlChars(const string&);
@@ -653,13 +623,11 @@ public:
 	void    showLogs(iClient* , unsigned int = 20);
 
 #endif
-	
-		
+
 	/**
 	    Signals Commands
 	 */
-	 
-	int OnSignal(int sig); 
+	void OnSignal(int sig); 
 	
 	void saveServersInfo();
 	
@@ -796,7 +764,6 @@ public:
 	commandIterator findCommand( const string& theComm )
 		{ return commandMap.find( theComm ) ; }
 
-	
 	typedef glineListType::iterator  glineIterator;
 	
 	glineIterator gline_begin()
@@ -852,7 +819,6 @@ public:
 	usersConstIterator		usersMap_end() const
 		{ return usersMap.end(); }
 
-
 	typedef  serversMapType::const_iterator	serversConstIterator;
 	
 	serversConstIterator		serversMap_begin() const
@@ -876,7 +842,6 @@ public:
 	 */
 	inline const time_t& getDefaultGlineLength() const
 		{ return gLength ; }
-
 	
 	/**
 	 * PostgreSQL Database
@@ -892,7 +857,6 @@ public:
 	xServer::timerID dbConnectionCheck;
 	
 	xServer::timerID glineQueueCheck;
-	
 	
 protected:
 

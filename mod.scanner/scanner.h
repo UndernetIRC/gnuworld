@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: scanner.h,v 1.3 2002/08/08 21:44:00 dan_karrels Exp $
+ * $Id: scanner.h,v 1.4 2003/06/28 16:26:46 dan_karrels Exp $
  */
 
 #ifndef __SCANNER_H
@@ -65,7 +65,7 @@ public:
 	 * and the second argument is the actual message (minus
 	 * all of the server command stuff).
 	 */
-	virtual int OnPrivateMessage( iClient*, const string&,
+	virtual void OnPrivateMessage( iClient*, const string&,
 		bool secure = false ) ;
 
 	/**
@@ -79,13 +79,13 @@ public:
 	 * is established.  The purpose of this method is to inform
 	 * the xServer of the channels this client wishes to burst.
 	 */
-	virtual int BurstChannels() ;
+	virtual bool BurstChannels() ;
 
 	/**
 	 * The event handler method, all network events will cause this
 	 * method to be invoked.
 	 */
-	virtual int	OnEvent( const eventType&,
+	virtual void	OnEvent( const eventType&,
 				void* = 0,
 				void* = 0,
 				void* = 0,

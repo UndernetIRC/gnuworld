@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: client.cc,v 1.56 2003/06/20 18:58:51 dan_karrels Exp $
+ * $Id: client.cc,v 1.57 2003/06/28 16:26:46 dan_karrels Exp $
  */
 
 #include	<new>
@@ -47,7 +47,7 @@
 #include	"ELog.h"
 #include	"events.h"
 
-RCSTAG("$Id: client.cc,v 1.56 2003/06/20 18:58:51 dan_karrels Exp $" ) ;
+RCSTAG("$Id: client.cc,v 1.57 2003/06/28 16:26:46 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -86,7 +86,6 @@ hostName = conf.Require( "hostname" )->second ;
 userDescription = conf.Require( "userdescription" )->second ;
 
 Mode( conf.Require( "mode" )->second ) ;
-
 }
 
 xClient::~xClient()
@@ -111,34 +110,33 @@ intYY = MyUplink->getIntYY() ;
 
 inttobase64( charYY, intYY, 2 ) ;
 inttobase64( charXXX, intXXX, 3 ) ;
-
 }
 
-int xClient::BurstChannels()
+bool xClient::BurstChannels()
 {
-return 0 ;
+return true ;
 }
 
-int xClient::BurstGlines()
+bool xClient::BurstGlines()
 {
-return 0;
+return true ;
 }
 
-int xClient::Connect( int )
+bool xClient::Connect( int )
 {
 if( !Connected && MyUplink && MyUplink->isConnected() )
 	{
 	Connected = true ;
-	return OnConnect() ;
+	OnConnect() ;
 	}
-return -1 ;
+return true ;
 }
 
-int xClient::Exit( const string& Message )
+bool xClient::Exit( const string& Message )
 {
 if( !Connected )
 	{
-	return -1 ;
+	return false ;
 	}
 
 stringstream s ;
@@ -149,7 +147,9 @@ s	<< getCharYYXXX()
 MyUplink->Write( s ) ;
 
 Connected = false ;
-return OnQuit() ;
+OnQuit() ;
+
+return true ;
 }
 
 string xClient::getModes() const
@@ -165,9 +165,8 @@ if( mode & iClient::MODE_INVISIBLE )	Mode += 'i' ;
 return Mode ;
 }
 
-int xClient::Mode( const string& Value )
+bool xClient::Mode( const string& Value )
 {
-
 //elog	<< "xClient::Mode> Value: "
 //	<< Value
 //	<< endl ;
@@ -215,24 +214,24 @@ if( (MyUplink != NULL) && MyUplink->isConnected() && !Value.empty() )
 	return MyUplink->Write( s ) ;
 	}
 
-return( 1 ) ;
+return false ;
 }
 
-int xClient::QuoteAsServer( const string& Message )
+bool xClient::QuoteAsServer( const string& Message )
 {
 if( MyUplink )
 	{
 	return MyUplink->Write( Message ) ;
 	}
-return -1 ;
+return false ;
 }
 
-int xClient::Wallops( const string& Message )
+bool xClient::Wallops( const string& Message )
 {
 return QuoteAsServer( getCharYYXXX() + " WA :" + Message ) ;
 }
 
-int xClient::Wallops( const char* Format, ... )
+bool xClient::Wallops( const char* Format, ... )
 {
 if( Connected && MyUplink && Format && Format[ 0 ] != 0 )
 	{
@@ -248,19 +247,19 @@ if( Connected && MyUplink && Format && Format[ 0 ] != 0 )
 		getCharYYXXX().c_str(),
 		buffer ) ;
 	}
-return -1 ;
+return false ;
 }
 
-int xClient::WallopsAsServer( const string& buf )
+bool xClient::WallopsAsServer( const string& buf )
 {
 if( !Connected || !MyUplink )
 	{
-	return -1 ;
+	return false ;
 	}
 return MyUplink->Wallops( buf ) ;
 }
 
-int xClient::WallopsAsServer( const char* Format, ... )
+bool xClient::WallopsAsServer( const char* Format, ... )
 {
 if( Connected && MyUplink && Format && Format[ 0 ] != 0 )
 	{
@@ -273,11 +272,12 @@ if( Connected && MyUplink && Format && Format[ 0 ] != 0 )
 
 	return MyUplink->Wallops( buffer ) ;
 	}
-return -1 ;
+return false ;
 }
 
-int xClient::ModeAsServer( const string& Channel, const string& Mode )
+bool xClient::ModeAsServer( const string& Channel, const string& Mode )
 {
+// TODO: REMOVE THIS METHOD
 if( Connected && MyUplink )
 	{
 	return MyUplink->Write( "%s M #%s %s\r\n",
@@ -286,23 +286,24 @@ if( Connected && MyUplink )
 			Channel.c_str()),
 		Mode.c_str() ) ;
 	}
-return -1 ;
+return false ;
 }
 
-int xClient::ModeAsServer( const Channel* theChan, const string& Mode )
+bool xClient::ModeAsServer( const Channel* theChan, const string& Mode )
 {
+// TODO: REMOVE THIS METHOD
 assert( theChan != 0 ) ;
 
 return ModeAsServer( theChan->getName(), Mode ) ;
 }
 
-int xClient::DoCTCP( iClient* Target,
+bool xClient::DoCTCP( iClient* Target,
 	const string& CTCP,
 	const string& Message )
 {
 if( !Connected && !MyUplink )
 	{
-	return -1 ;
+	return false ;
 	}
 
 return MyUplink->Write( "%s O %s :\001%s %s\001\r\n",
@@ -312,7 +313,7 @@ return MyUplink->Write( "%s O %s :\001%s %s\001\r\n",
 	Message.c_str() ) ;
 }
 
-int xClient::Message( const iClient* Target, const string& Message )
+bool xClient::Message( const iClient* Target, const string& Message )
 {
 if( Connected && MyUplink )
 	{
@@ -321,10 +322,10 @@ if( Connected && MyUplink )
 		Target->getCharYYXXX().c_str(),
 		Message.c_str() ) ;
 	}
-return 0 ;
+return false ;
 }
 
-int xClient::Message( const iClient* Target, const char* Message, ... )
+bool xClient::Message( const iClient* Target, const char* Message, ... )
 {
 if( Connected && MyUplink && Message && Message[ 0 ] !=0 )
 	{
@@ -341,10 +342,10 @@ if( Connected && MyUplink && Message && Message[ 0 ] !=0 )
 		Target->getCharYYXXX().c_str(),
 		buffer ) ;
 	}
-return 0 ;
+return false ;
 }
 
-int xClient::Message( const string& Channel, const char* Message, ... )
+bool xClient::Message( const string& Channel, const char* Message, ... )
 {
 if( Connected && MyUplink && Message && Message[ 0 ] != 0 )
 	{
@@ -361,10 +362,10 @@ if( Connected && MyUplink && Message && Message[ 0 ] != 0 )
 			Channel.c_str(),
 		buffer ) ;
 	}
-return 0 ;
+return false ;
 }
 
-int xClient::Message( const Channel* theChan, const string& Message )
+bool xClient::Message( const Channel* theChan, const string& Message )
 {
 assert( theChan != 0 ) ;
 
@@ -375,10 +376,10 @@ if( Connected && MyUplink )
 		theChan->getName().c_str(),
 		Message.c_str() ) ;
 	}
-return 0 ;
+return false ;
 }
 
-int xClient::Notice( const iClient* Target, const string& Message )
+bool xClient::Notice( const iClient* Target, const string& Message )
 {
 if( Connected && MyUplink )
 	{
@@ -387,10 +388,10 @@ if( Connected && MyUplink )
 		Target->getCharYYXXX().c_str(),
 		Message.c_str() ) ;
 	}
-return 0 ;
+return false ;
 }
 
-int xClient::Notice( const iClient* Target, const char* Message, ... )
+bool xClient::Notice( const iClient* Target, const char* Message, ... )
 {
 if( Connected && MyUplink && Message && Message[ 0 ] != 0 )
 	{
@@ -408,10 +409,10 @@ if( Connected && MyUplink && Message && Message[ 0 ] != 0 )
 		Target->getCharYYXXX().c_str(),
 		buffer ) ;
 	}
-return 0 ;
+return false ;
 }
 
-int xClient::Notice( const string& Channel, const char* Message, ... )
+bool xClient::Notice( const string& Channel, const char* Message, ... )
 {
 if( Connected && MyUplink && Message && Message[ 0 ] != 0 )
 	{
@@ -429,30 +430,48 @@ if( Connected && MyUplink && Message && Message[ 0 ] != 0 )
 			Channel.c_str(),
 		buffer ) ;
 	}
-return 0 ;
+return false ;
 }
 
-int xClient::OnCTCP( iClient*, const string&,
+bool xClient::Notice( const Channel* theChan, const char* Message, ... )
+{
+assert( theChan != 0 ) ;
+
+if( Connected && MyUplink && Message && Message[ 0 ] != 0 )
+	{
+	char buffer[ 1024 ] ;
+	memset( buffer, 0, 1024 ) ;
+	va_list list;
+
+	va_start(list, Message);
+	vsnprintf(buffer, 1024, Message, list);
+	va_end(list);
+
+	return MyUplink->Write("%s O #%s :%s\r\n",
+		getCharYYXXX().c_str(),
+		theChan->getName().c_str(),
+		buffer ) ;
+	}
+return false ;
+}
+
+void xClient::OnCTCP( iClient*, const string&,
 	const string&, bool )
 {
-return 0;
 }
 
-int xClient::OnChannelCTCP( iClient*, Channel*, const string&,
+void xClient::OnChannelCTCP( iClient*, Channel*, const string&,
 	const string& )
 {
-return 0 ;
 }
 
-int xClient::OnEvent( const eventType&, void*, void*, void*, void* )
+void xClient::OnEvent( const eventType&, void*, void*, void*, void* )
 {
-return 0;
 }
 
-int xClient::OnChannelEvent( const channelEventType&, Channel*,
+void xClient::OnChannelEvent( const channelEventType&, Channel*,
 	void*, void*, void*, void* )
 {
-return 0 ;
 }
 
 void xClient::OnNetworkKick( Channel*,
@@ -523,62 +542,57 @@ void xClient::OnChannelModeB( Channel*, ChannelUser*,
 {
 }
 
-int xClient::OnPrivateMessage( iClient*, const string&, bool )
+void xClient::OnPrivateMessage( iClient*, const string&, bool )
 {
-return 0;
 }
 
-int xClient::OnChannelMessage( iClient*, Channel*, const string& )
+void xClient::OnChannelMessage( iClient*, Channel*, const string& )
 {
-return 0 ;
 }
 
-int xClient::OnPrivateNotice( iClient*, const string&, bool )
+void xClient::OnPrivateNotice( iClient*, const string&, bool )
 {
-return 0;
 }
 
-int xClient::OnChannelNotice( iClient*, Channel*, const string& )
+void xClient::OnChannelNotice( iClient*, Channel*, const string& )
 {
-return 0;
 }
 
-int xClient::OnServerMessage( iServer*, const string&, bool )
+void xClient::OnServerMessage( iServer*, const string&, bool )
 {
-return 0;
 }
 
-int xClient::OnConnect()
+void xClient::OnConnect()
 {
 Connected = true ;
-return 0 ;
 }
 
-int xClient::OnQuit()
+void xClient::OnQuit()
 {
 Connected = false ;
-return 0 ;
 }
 
-int xClient::OnKill()
+void xClient::OnKill()
 {
 Connected = false ;
-return 0 ;
 }
 
-int xClient::OnWhois( iClient*, iClient* )
+void xClient::OnWhois( iClient*, iClient* )
 {
-return 0 ;
 }
 
-int xClient::OnInvite( iClient*, Channel* )
+void xClient::OnInvite( iClient*, Channel* )
 {
-return 0 ;
 }
 
-int xClient::Kill( iClient* theClient, const string& reason )
+bool xClient::Kill( iClient* theClient, const string& reason )
 {
 assert( theClient != 0 ) ;
+
+if( theClient->isModeK() )
+	{
+	return false ;
+	}
 
 Write( "%s D %s :%s",
 	MyUplink->getCharYY(),
@@ -599,7 +613,7 @@ MyUplink->PostEvent( EVT_KILL,
 // Remove the user
 delete Network->removeClient( theClient ) ;
 
-return 0 ;
+return true ;
 }
 
 bool xClient::Op( Channel* theChan, iClient* theClient )
@@ -889,7 +903,6 @@ if( !OnChannel )
 	}
  
 return true ;
-
 }
 
 bool xClient::Voice( Channel* theChan, iClient* theClient )
@@ -970,6 +983,11 @@ assert( theChan != NULL ) ;
 assert( theClient != NULL ) ;
 
 if( !Connected )
+	{
+	return false ;
+	}
+
+if( theClient->isModeK() )
 	{
 	return false ;
 	}
@@ -1091,6 +1109,11 @@ for( vector< iClient* >::const_iterator ptr = clientVector.begin(),
 		elog	<< "xClient::DeOp(vector)> Found NULL "
 			<< "iClient!"
 			<< endl ;
+		continue ;
+		}
+
+	if( (*ptr)->isModeK() )
+		{
 		continue ;
 		}
 
@@ -1338,6 +1361,11 @@ if( !Connected )
 	return false ;
 	}
 
+if( theClient->isModeK() )
+	{
+	return false ;
+	}
+
 if( 0 == theChan->findUser( theClient ) )
 	{
 	// User is not on that channel
@@ -1511,6 +1539,11 @@ for( vector< iClient* >::const_iterator ptr = clientVector.begin(),
 		continue ;
 		}
 
+	if( (*ptr)->isModeK() )
+		{
+		continue ;
+		}
+
 	ChannelUser* theUser = theChan->findUser( *ptr ) ;
 	if( NULL == theUser )
 		{
@@ -1568,6 +1601,11 @@ assert( theChan != 0 ) ;
 assert( theClient != 0 ) ;
 
 if( !Connected )
+	{
+	return false ;
+	}
+
+if( theClient->isModeK() )
 	{
 	return false ;
 	}
@@ -1642,6 +1680,11 @@ if( !Connected )
 	return false ;
 	}
 
+if( theClient->isModeK() )
+	{
+	return false ;
+	}
+
 if( NULL == theChan->findUser( theClient ) )
 	{
 	elog	<< "xClient::Kick> Can't find "
@@ -1689,7 +1732,6 @@ s	<< getCharYYXXX() << " K "
 
 Write( s ) ;
 
-// TODO: OnPartChannel()
 if( !OnChannel )
 	{
 	Part( theChan ) ;
@@ -1747,6 +1789,17 @@ else
 for( vector< iClient* >::const_iterator ptr = theClients.begin() ;
 	ptr != theClients.end() ; ++ptr )
 	{
+	if( 0 == *ptr )
+		{
+		elog	<< "xClient::Kick(vector)> NULL target client"
+			<< endl ;
+		continue ;
+		}
+
+	if( (*ptr)->isModeK() )
+		{
+		continue ;
+		}
 
 	if( NULL == theChan->findUser( *ptr ) )
 		{
@@ -1763,7 +1816,6 @@ for( vector< iClient* >::const_iterator ptr = theClients.begin() ;
 	Write( s ) ;
 	}
 
-// TODO: OnPartChannel()
 if( !OnChannel )
 	{
 	Part( theChan ) ;
@@ -1799,7 +1851,6 @@ return Join( theChan->getName(), string(), joinTime, getOps ) ;
 
 bool xClient::Part( const string& chanName, const string& reason )
 {
-
 if( !Connected )
 	{
 	return false ;
@@ -1867,8 +1918,10 @@ ChannelUser* meUser = theChan->findUser( me ) ;
 return (meUser) ? true : false ;
 }
 
-int xClient::Write( const char* format, ... )
+bool xClient::Write( const char* format, ... )
 {
+assert( format != 0 ) ;
+
 char buf[ 4096 ] ;
 memset( buf, 0, 4096 ) ;
 va_list _list ;
@@ -1930,14 +1983,12 @@ bool xClient::removeChan( Channel* )
 return true ;
 }
 
-int xClient::OnTimer( xServer::timerID, void* )
+void xClient::OnTimer( xServer::timerID, void* )
 {
-return 0 ;
 }
 
-int xClient::OnSignal( int )
+void xClient::OnSignal( int )
 {
-return 0 ;
 }
 
 } // namespace gnuworld

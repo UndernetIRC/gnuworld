@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: gnutest.cc,v 1.8 2003/06/28 01:21:21 dan_karrels Exp $
+ * $Id: gnutest.cc,v 1.9 2003/06/28 16:26:46 dan_karrels Exp $
  */
 
 #include	<string>
@@ -30,7 +30,7 @@
 
 const char client_h_rcsId[] = __CLIENT_H ;
 const char gnutest_h_rcsId[] = __GNUTEST_H ;
-const char gnutest_cc_rcsId[] = "$Id: gnutest.cc,v 1.8 2003/06/28 01:21:21 dan_karrels Exp $" ;
+const char gnutest_cc_rcsId[] = "$Id: gnutest.cc,v 1.9 2003/06/28 16:26:46 dan_karrels Exp $" ;
 const char iClient_h_rcsId[] = __ICLIENT_H ;
 const char StringTokenizer_h_rcsId[] = __STRINGTOKENIZER_H ;
 const char EConfig_h_rcsId[] = __ECONFIG_H ;
@@ -65,14 +65,14 @@ operChan = conf.Require( "operchan" )->second ;
 gnutest::~gnutest()
 {}
 
-int gnutest::BurstChannels()
+bool gnutest::BurstChannels()
 {
 Join( operChan ) ;
 MyUplink->RegisterChannelEvent( operChan, this ) ;
 return xClient::BurstChannels() ;
 }
 
-int gnutest::OnChannelEvent( const channelEventType& whichEvent,
+void gnutest::OnChannelEvent( const channelEventType& whichEvent,
 	Channel* theChan,
 	void* data1, void* data2, void* data3, void* data4 )
 {
@@ -81,7 +81,7 @@ if( theChan->getName() != operChan )
 	{
 	elog	<< "gnutest::OnChannelEvent> Got bad channel: "
 		<< theChan->getName() << endl ;
-	return 0 ;
+	return ;
 	}
 
 iClient* theClient = 0 ;
@@ -104,33 +104,30 @@ switch( whichEvent )
 		break ;
 	}
 
-return xClient::OnChannelEvent( whichEvent, theChan,
+xClient::OnChannelEvent( whichEvent, theChan,
 	data1, data2, data3, data4 ) ;
 }
 
-int gnutest::OnEvent( const eventType& whichEvent,
+void gnutest::OnEvent( const eventType& whichEvent,
 	void* data1, void* data2, void* data3, void* data4 )
 {
-
-
-return xClient::OnEvent( whichEvent, data1, data2, data3, data4 ) ;
+xClient::OnEvent( whichEvent, data1, data2, data3, data4 ) ;
 }
 
-int gnutest::OnPrivateMessage( iClient* theClient,
+void gnutest::OnPrivateMessage( iClient* theClient,
 	const string& message,
 	bool )
 {
-
 if( !theClient->isOper() )
 	{
-	return 0 ;
+	return ;
 	}
 
 StringTokenizer st( message ) ;
 if( st.empty() || (st.size() < 2 ) )
 	{
 	Notice( theClient, "Are you speaking to me?" ) ;
-	return 0 ;
+	return ;
 	}
 
 if( st[ 0 ] == "invite" )
@@ -157,27 +154,27 @@ else if( st[ 0 ] == "ban" )
 	if( st.size() != 3 )
 		{
 		Notice( theClient, "Usage: ban #channel nickname" ) ;
-		return 0 ;
+		return ;
 		}
 
 	Channel* theChan = Network->findChannel( st[ 1 ] ) ;
 	if( NULL == theChan )
 		{
 		Notice( theClient, "Unable to find channel" ) ;
-		return 0 ;
+		return ;
 		}
 
 	iClient* theClient = Network->findNick( st[ 2 ] ) ;
 	if( NULL == theClient )
 		{
 		Notice( theClient, "Unable to find nickname" ) ;
-		return 0 ;
+		return ;
 		}
 
 	if( 0 == theChan->findUser( theClient ) )
 		{
 		Notice( theClient, "The user doesn't appear to be on that channel" ) ;
-		return 0 ;
+		return ;
 		}
 
 	Ban( theChan, theClient ) ;
@@ -187,20 +184,20 @@ else if( st[ 0 ] == "unban" )
 	if( st.size() != 3 )
 		{
 		Notice( theClient, "Usage: unban #channel banmask" ) ;
-		return 0 ;
+		return ;
 		}
 
 	Channel* theChan = Network->findChannel( st[ 1 ] ) ;
 	if( NULL == theChan )
 		{
 		Notice( theClient, "Unable to find channel" ) ;
-		return 0 ;
+		return ;
 		}
 
 	if( !theChan->findBan( st[ 2 ] ) )
 		{
 		Notice( theClient, "Unable to find ban" ) ;
-		return 0 ;
+		return ;
 		}
 
 	UnBan( theChan, st[ 2 ] ) ;
@@ -210,27 +207,27 @@ else if( st[ 0 ] == "bankick" )
 	if( st.size() < 4 )
 		{
 		Notice( theClient, "Usage: bankick #channel nick reason" ) ;
-		return 0 ;
+		return ;
 		}
 
 	Channel* theChan = Network->findChannel( st[ 1 ] ) ;
 	if( NULL == theChan )
 		{
 		Notice( theClient, "Unable to find channel" ) ;
-		return 0 ;
+		return ;
 		}
 
 	iClient* theClient = Network->findNick( st[ 2 ] ) ;
 	if( NULL == theClient )
 		{
 		Notice( theClient, "Unable to find nickname" ) ;
-		return 0 ;
+		return ;
 		}
 
 	if( 0 == theChan->findUser( theClient ) )
 		{
 		Notice( theClient, "The user doesn't appear to be on that channel" ) ;
-		return 0 ;
+		return ;
 		}
 
 	BanKick( theChan, theClient, st.assemble( 3 ) ) ;
@@ -240,27 +237,27 @@ else if( st[ 0 ] == "op" )
 	if( st.size() != 3 )
 		{
 		Notice( theClient, "Usage: op #channel nick" ) ;
-		return 0 ;
+		return ;
 		}
 
 	Channel* theChan = Network->findChannel( st[ 1 ] ) ;
 	if( NULL == theChan )
 		{
 		Notice( theClient, "Unable to find channel" ) ;
-		return 0 ;
+		return ;
 		}
 
 	iClient* theClient = Network->findNick( st[ 2 ] ) ;
 	if( NULL == theClient )
 		{
 		Notice( theClient, "Unable to find nickname" ) ;
-		return 0 ;
+		return ;
 		}
 
 	if( 0 == theChan->findUser( theClient ) )
 		{
 		Notice( theClient, "The user doesn't appear to be on that channel" ) ;
-		return 0 ;
+		return ;
 		}
 
 	Op( theChan, theClient ) ;
@@ -270,27 +267,27 @@ else if( st[ 0 ] == "deop" )
 	if( st.size() != 3 )
 		{
 		Notice( theClient, "Usage: deop #channel nick" ) ;
-		return 0 ;
+		return ;
 		}
 
 	Channel* theChan = Network->findChannel( st[ 1 ] ) ;
 	if( NULL == theChan )
 		{
 		Notice( theClient, "Unable to find channel" ) ;
-		return 0 ;
+		return ;
 		}
 
 	iClient* theClient = Network->findNick( st[ 2 ] ) ;
 	if( NULL == theClient )
 		{
 		Notice( theClient, "Unable to find nickname" ) ;
-		return 0 ;
+		return ;
 		}
 
 	if( 0 == theChan->findUser( theClient ) )
 		{
 		Notice( theClient, "The user doesn't appear to be on that channel" ) ;
-		return 0 ;
+		return ;
 		}
 
 	DeOp( theChan, theClient ) ;
@@ -301,7 +298,7 @@ else if( st[ 0 ] == "schedule" )
 	if( NULL == theChan )
 		{
 		Notice( theClient, "Unable to find channel" ) ;
-		return 0 ;
+		return ;
 		}
 
 	xServer::timerID id = MyUplink->RegisterTimer( ::time( 0 ) + 60,
@@ -324,7 +321,7 @@ else if( st[ 0 ] == "reload" )
 	MyUplink->LoadClient( "libgnutest", getConfigFileName() ) ;
 	}
 
-return xClient::OnPrivateMessage( theClient, message ) ;
+xClient::OnPrivateMessage( theClient, message ) ;
 }
 
 bool gnutest::isOnChannel( const string& chanName ) const
@@ -371,19 +368,17 @@ std::remove( channels.begin(), channels.end(), chanName ) ;
 return true ;
 }
 
-int gnutest::OnTimer( xServer::timerID, void* )
+void gnutest::OnTimer( xServer::timerID, void* )
 {
 Channel* theChan = Network->findChannel( timerChan ) ;
 if( NULL == theChan )
 	{
 	elog	<< "gnutest::OnTimer> Unable to find channel: "
 		<< timerChan << endl ;
-	return 0 ;
+	return ;
 	}
 
 Message( theChan, "Respect my authoritah!" ) ;
-
-return 0 ;
 }
 
 } // namespace gnuworld

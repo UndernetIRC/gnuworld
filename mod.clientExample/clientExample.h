@@ -16,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: clientExample.h,v 1.3 2003/06/28 01:21:19 dan_karrels Exp $
+ * $Id: clientExample.h,v 1.4 2003/06/28 16:26:45 dan_karrels Exp $
  */
 
 #ifndef __CLIENTEXAMPLE_H
-#define __CLIENTEXAMPLE_H "$Id: clientExample.h,v 1.3 2003/06/28 01:21:19 dan_karrels Exp $"
+#define __CLIENTEXAMPLE_H "$Id: clientExample.h,v 1.4 2003/06/28 16:26:45 dan_karrels Exp $"
 
 #include	<string>
 
@@ -56,7 +56,7 @@ public:
 	 * and the second argument is the actual message (minus
 	 * all of the server command stuff).
 	 */
-	virtual int OnPrivateMessage( iClient*, const string&,
+	virtual void OnPrivateMessage( iClient*, const string&,
 		bool secure = false ) ;
 
 	/**
@@ -64,7 +64,7 @@ public:
 	 * is established.  The purpose of this method is to inform
 	 * the xServer of the channels this client wishes to burst.
 	 */
-	virtual int BurstChannels() ;
+	virtual bool BurstChannels() ;
 
 protected:
 

@@ -16,8 +16,10 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: dronescan.cc,v 1.23 2003/06/28 01:21:20 dan_karrels Exp $
+ * $Id: dronescan.cc,v 1.24 2003/06/28 16:26:45 dan_karrels Exp $
  */
+
+#include	<string>
 
 #include <cstdarg>	/* va_list */
 #include <cstdio>	/* *printf() */
@@ -34,11 +36,13 @@
 #include "dronescanTests.h"
 #include "Timer.h"
 
-RCSTAG("$Id: dronescan.cc,v 1.23 2003/06/28 01:21:20 dan_karrels Exp $");
+RCSTAG("$Id: dronescan.cc,v 1.24 2003/06/28 16:26:45 dan_karrels Exp $");
 
 namespace gnuworld {
 
 namespace ds {
+
+using std::string ;
 
 /*
  * Exported function to be used by moduleLoader to gain an
@@ -245,7 +249,7 @@ void dronescan::ImplementServer( xServer* theServer )
  * The only channel of any interest to us is our console channel, which is
  * loaded from the configuration file.
  */
-int dronescan::BurstChannels()
+bool dronescan::BurstChannels()
 {
 	MyUplink->JoinChannel(this, consoleChannel,
 		dronescanConfig->Require("consoleChannelModes")->second);
@@ -270,13 +274,12 @@ int dronescan::BurstChannels()
 	return xClient::BurstChannels();
 } // dronescan::BurstChannels()
 
-
-int dronescan::OnCTCP( iClient* theClient, const string& CTCP,
+void dronescan::OnCTCP( iClient* theClient, const string& CTCP,
     const string& Message, bool Secure )
 {
 	StringTokenizer st(CTCP);
 	
-	if(st.empty()) return false;
+	if(st.empty()) return ;
 	
 	string Command = string_upper(st[0]);
 
@@ -288,13 +291,13 @@ int dronescan::OnCTCP( iClient* theClient, const string& CTCP,
 		DoCTCP(theClient, CTCP, "GNUWorld DroneScan v0.0.3");
 	}
 
-	return xClient::OnCTCP(theClient, CTCP, Message, Secure);
+	xClient::OnCTCP(theClient, CTCP, Message, Secure);
 }
 
 /**
  * Here we receive network events that we are registered for.
  */
-int dronescan::OnEvent( const eventType& theEvent,
+void dronescan::OnEvent( const eventType& theEvent,
 	void *Data1, void *Data2, void *Data3, void *Data4)
 {
 	switch( theEvent )
@@ -333,22 +336,21 @@ int dronescan::OnEvent( const eventType& theEvent,
 			}
 		} // switch( theEvent )
 
-	return xClient::OnEvent( theEvent, Data1, Data2, Data3, Data4);
+	xClient::OnEvent( theEvent, Data1, Data2, Data3, Data4);
 }
 
-
 /** Receive channel events. */
-int dronescan::OnChannelEvent( const channelEventType& theEvent,
+void dronescan::OnChannelEvent( const channelEventType& theEvent,
 	Channel *theChannel, void *Data1, void *Data2, void *Data3, void *Data4 )
 {
 	/* If this is not a join, we don't care. */
-	if(theEvent != EVT_JOIN) return 0;
+	if(theEvent != EVT_JOIN) return ;
 	
 	/* If we are bursting, we don't want to be checking joins. */
-	if(currentState == BURST) return 0;
+	if(currentState == BURST) return ;
 
 	/* If this channel is too small, don't test it. */
-	if(theChannel->size() < channelCutoff) return 0;
+	if(theChannel->size() < channelCutoff) return ;
 
 	/* Iterate over our available tests, checking this channel */
 	if(find(droneChannels.begin(), droneChannels.end(), theChannel->getName()) == droneChannels.end()) {
@@ -370,21 +372,21 @@ int dronescan::OnChannelEvent( const channelEventType& theEvent,
 			);
 		}
 
-return xClient::OnChannelEvent( theEvent, theChannel,
+xClient::OnChannelEvent( theEvent, theChannel,
 	Data1, Data2, Data3, Data4 ) ;
 }
 
 /**
  * Here we receive private messages from iClients.
  */
-int dronescan::OnPrivateMessage( iClient* theClient,
+void dronescan::OnPrivateMessage( iClient* theClient,
 	const string& Message, bool )
 {
-	if(!getAccess(theClient)) return 0;
+	if(!getAccess(theClient)) return ;
 	
 	StringTokenizer st(Message);
-	
-	if(st.size() < 1) return 0;
+
+	if(st.size() < 1) return ;
 	
 	string Command = string_upper(st[0]);
 	commandMapType::iterator commandHandler = commandMap.find(Command);
@@ -392,13 +394,13 @@ int dronescan::OnPrivateMessage( iClient* theClient,
 	if(commandHandler != commandMap.end())
 		{
 		commandHandler->second->Exec(theClient, Message);
-		return 1;
+		return ;
 		}
 		
 	if("INVITE" == Command)
 		{
 		Invite(theClient, consoleChannel);
-		return 0;
+		return ;
 		}
 	
 #if 0
@@ -407,7 +409,7 @@ int dronescan::OnPrivateMessage( iClient* theClient,
 		{
 		getUplink()->UnloadClient(this, "Reloading...");
 		getUplink()->LoadClient("libdronescan.la", getConfigFileName());
-		return 0;
+		return ;
 		}
 #endif
 
@@ -429,30 +431,30 @@ int dronescan::OnPrivateMessage( iClient* theClient,
 		Reply(theClient, "CR      : %0.3lf",
 			channelRange);
 
-		return 0;
+		return ;
 		}
 	
 	if("RESET" == Command)
 		{
 		resetAndCheck();
-		return 0;
+		return ;
 		}
 	
-	if(st.size() < 2) return 0;
+	if(st.size() < 2) return ;
 	
 	if("INFO" == Command)
 		{
 		string nick = st[1];
 		iClient *targetClient = Network->findNick(nick);
-		if(!targetClient) return 0;
+		if(!targetClient) return ;
 		Reply(theClient, "Status of %s: %s",
 			targetClient->getNickName().c_str(),
 			(isNormal(targetClient) ? "Normal" : "Abnormal" )
 			);
-		return 0;
+		return ;
 		}
 	
-	if(st.size() < 3) return 0;
+	if(st.size() < 3) return ;
 	
 	if("SET" == Command)
 		{
@@ -464,33 +466,33 @@ int dronescan::OnPrivateMessage( iClient* theClient,
 			unsigned int newCC = atoi(st[2].c_str());
 			channelCutoff = newCC;
 			resetAndCheck();
-			return 1;
+			return ;
 			}
 		if("CM" == Option)
 			{
 			double newCM = atof(st[2].c_str());
-			if(newCM < 0 || newCM > 1) return 0;
+			if(newCM < 0 || newCM > 1) return ;
 			channelMargin = newCM;
 			resetAndCheck();
-			return 1;
+			return ;
 			}
 		if("NM" == Option)
 			{
 			double newNM = atof(st[2].c_str());
-			if(newNM < 0 || newNM > 1) return 0;
+			if(newNM < 0 || newNM > 1) return ;
 			nickMargin = newNM;
 			resetAndCheck();
-			return 1;
+			return ;
 			}
 		
 		/* Channel entropy options */
 		if("CR" == Option)
 			{
 			double newCR = atof(st[2].c_str());
-			if(newCR < 0) return 0;
+			if(newCR < 0) return ;
 			channelRange = newCR;
 			resetAndCheck();
-			return 1;
+			return ;
 			}
 		
 		/* None of the hardcoded options have hit. Try dynamic. */
@@ -503,20 +505,18 @@ int dronescan::OnPrivateMessage( iClient* theClient,
 				);
 			
 			resetAndCheck();
-			return 1;
+			return ;
 		} else  {
 			Reply(theClient, "No test accepted the variable %s",
 				Option.c_str()
 				);
-			return 0;
+			return ;
 		}
 		}
-	
-	return 0;
 }
 
 /** Receive our own timed events. */
-int dronescan::OnTimer( xServer::timerID theTimer , void *)
+void dronescan::OnTimer( xServer::timerID theTimer , void *)
 {
 	time_t theTime;
 
@@ -550,8 +550,6 @@ int dronescan::OnTimer( xServer::timerID theTimer , void *)
 		theTime = time(0) + jcInterval;
 		tidClearJoinCounter = MyUplink->RegisterTimer(theTime, this, 0);
 		}
-	
-	return 0;
 }
 
 /*******************************************

@@ -17,11 +17,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: stats.h,v 1.10 2003/06/17 15:13:53 dan_karrels Exp $
+ * $Id: stats.h,v 1.11 2003/06/28 16:26:46 dan_karrels Exp $
  */
 
 #ifndef __STATS_H
-#define __STATS_H "$Id: stats.h,v 1.10 2003/06/17 15:13:53 dan_karrels Exp $"
+#define __STATS_H "$Id: stats.h,v 1.11 2003/06/28 16:26:46 dan_karrels Exp $"
 
 #include	<fstream>
 #include	<string>
@@ -62,54 +62,54 @@ public:
 	 * This method is invoked when someone sends a private
 	 * message to the stats bot.
 	 */
-	virtual int OnPrivateMessage( iClient*, const string&,
+	virtual void OnPrivateMessage( iClient*, const string&,
 		bool = false ) ;
 
 	/**
 	 * This method is invoked when someone sends a private
 	 * message CTCP to the stats bot.
 	 */
-	virtual int OnCTCP( iClient*, const string&,
+	virtual void OnCTCP( iClient*, const string&,
 		const string&, bool = false ) ;
 
 	/**
 	 * This method is invoked when someone sends a channel
 	 * message to the stats bot.
 	 */
-	virtual int OnChannelMessage( iClient*, Channel*,
+	virtual void OnChannelMessage( iClient*, Channel*,
 		const string& ) ;
 
 	/**
 	 * This method is invoked when someone sends a channel
 	 * CTCP to the stats bot.
 	 */
-	virtual int OnChannelCTCP( iClient*, Channel*,
+	virtual void OnChannelCTCP( iClient*, Channel*,
 		const string&, const string& ) ;
 
 	/**
 	 * This method is invoked when someone sends a private
 	 * notice to the stats bot.
 	 */
-	virtual int OnPrivateNotice( iClient*, const string&, bool ) ;
+	virtual void OnPrivateNotice( iClient*, const string&, bool ) ;
 
 	/**
 	 * This method is invoked when someone sends a channel
 	 * notice to the stats bot.
 	 */
-	virtual int OnChannelNotice( iClient*, Channel*, const string& ) ;
+	virtual void OnChannelNotice( iClient*, Channel*, const string& ) ;
 
 	/**
 	 * This method is called when a general network event
 	 * occurs.
 	 */
-	virtual int OnEvent( const eventType&,
+	virtual void OnEvent( const eventType&,
 		void* = 0, void* = 0, void* = 0, void* = 0 ) ;
 
 	/**
 	 * This method is invoked when a channel event (except for
 	 * kick) occurs.
 	 */
-        virtual int OnChannelEvent( const channelEventType&,
+        virtual void OnChannelEvent( const channelEventType&,
                 Channel*,  
                 void* Data1 = NULL, void* Data2 = NULL,
                 void* Data3 = NULL, void* Data4 = NULL ) ;
@@ -124,7 +124,7 @@ public:
 	 * This method is called when a registered timer
 	 * expires.
 	 */
-	virtual int	OnTimer( xServer::timerID, void* ) ;
+	virtual void	OnTimer( xServer::timerID, void* ) ;
 
 	/**
 	 * Return the part message stats will use when it parts

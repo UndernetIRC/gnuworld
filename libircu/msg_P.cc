@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_P.cc,v 1.5 2003/06/17 15:13:53 dan_karrels Exp $
+ * $Id: msg_P.cc,v 1.6 2003/06/28 16:26:45 dan_karrels Exp $
  */
 
 #include	<string>
@@ -33,7 +33,7 @@
 #include	"StringTokenizer.h"
 #include	"config.h"
 
-RCSTAG( "$Id: msg_P.cc,v 1.5 2003/06/17 15:13:53 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: msg_P.cc,v 1.6 2003/06/28 16:26:45 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -128,7 +128,7 @@ iClient* srcClient = Network->findClient( Param[ 0 ] ) ;
 if( 0 == srcClient )
 	{
 	elog	<< "msg_P> Unable to find source client: "
-		<< Param[ 1 ]
+		<< Param[ 0 ]
 		<< endl ;
 	return false ;
 	}
@@ -237,7 +237,6 @@ if( CTCP )
 //			<< endl ;
 
 		channelCTCP( srcClient, theChan, command, message ) ;
-		return true ;
 		}
 	else
 		{
@@ -249,7 +248,7 @@ if( CTCP )
 //			<< message
 //			<< endl ;
 
-		return targetClient->OnCTCP( srcClient,
+		targetClient->OnCTCP( srcClient,
 			command,
 			message,
 			secure ) ;
@@ -268,7 +267,6 @@ else
 //			<< endl ;
 
 		channelMessage( srcClient, theChan, message ) ;
-		return true ;
 		}
 	else
 		{
@@ -278,15 +276,13 @@ else
 //			<< message
 //			<< endl ;
 
-		return targetClient->OnPrivateMessage( srcClient,
+		targetClient->OnPrivateMessage( srcClient,
 			message,
 			secure ) ;
 		}
 	}
 
-// This should not happen
 return true ;
-
 } // msg_P
 
 } // namespace gnuworld

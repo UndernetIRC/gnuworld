@@ -16,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: gnutest.h,v 1.4 2003/06/28 01:21:21 dan_karrels Exp $
+ * $Id: gnutest.h,v 1.5 2003/06/28 16:26:46 dan_karrels Exp $
  */
 
 #ifndef __GNUTEST_H
-#define __GNUTEST_H "$Id: gnutest.h,v 1.4 2003/06/28 01:21:21 dan_karrels Exp $"
+#define __GNUTEST_H "$Id: gnutest.h,v 1.5 2003/06/28 16:26:46 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
@@ -59,7 +59,7 @@ public:
 	 * of the channels for which this client has requested to
 	 * be notified of events.
 	 */
-	virtual int	OnChannelEvent( const channelEventType&,
+	virtual void	OnChannelEvent( const channelEventType&,
 		Channel*,
 		void* data1 = 0, void* data2 = 0,
 		void* data3 = 0, void* data4 = 0 ) ;
@@ -68,7 +68,7 @@ public:
 	 * This method is called when a network event occurs, and
 	 * the client has registered for that event.
 	 */
-	virtual int	OnEvent( const eventType& theEvent,
+	virtual void	OnEvent( const eventType& theEvent,
 		void* data1 = 0, void* data2 = 0,
 		void* data3 = 0, void* data4 = 0 ) ;
 
@@ -76,19 +76,19 @@ public:
 	 * This method is called for the client to burst all channels
 	 * once the server connects to the network.
 	 */
-	virtual int	BurstChannels() ;
+	virtual bool	BurstChannels() ;
 
 	/**
 	 * This method is called when a network client messages
 	 * this client.
 	 */
-	virtual int	OnPrivateMessage( iClient*, const string&,
+	virtual void	OnPrivateMessage( iClient*, const string&,
 				bool secure = false ) ;
 
 	/**
 	 * This method is called when a timer expires.
 	 */
-	virtual int	OnTimer( xServer::timerID, void* ) ;
+	virtual void	OnTimer( xServer::timerID, void* ) ;
 
 	/**
 	 * This method returns true if the client is on the given

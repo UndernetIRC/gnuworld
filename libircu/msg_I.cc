@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_I.cc,v 1.2 2003/06/17 15:13:53 dan_karrels Exp $
+ * $Id: msg_I.cc,v 1.3 2003/06/28 16:26:45 dan_karrels Exp $
  */
 
 #include	<iostream>
@@ -32,7 +32,7 @@
 #include	"ServerCommandHandler.h"
 #include	"config.h"
 
-RCSTAG( "$Id: msg_I.cc,v 1.2 2003/06/17 15:13:53 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: msg_I.cc,v 1.3 2003/06/28 16:26:45 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -78,7 +78,8 @@ if( NULL == theChan )
 	return false ;
 	}
 
-return destClient->OnInvite( srcClient, theChan ) ;
+destClient->OnInvite( srcClient, theChan ) ;
+return true ;
 }
 
 } // namespace gnuworld

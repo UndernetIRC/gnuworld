@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: LoadClientTimerHandler.cc,v 1.7 2003/06/17 15:13:54 dan_karrels Exp $
+ * $Id: LoadClientTimerHandler.cc,v 1.8 2003/06/28 16:26:46 dan_karrels Exp $
  */
 
 #include	<iostream>
@@ -27,12 +27,12 @@
 #include	"ELog.h"
 #include	"config.h"
 
-RCSTAG( "$Id: LoadClientTimerHandler.cc,v 1.7 2003/06/17 15:13:54 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: LoadClientTimerHandler.cc,v 1.8 2003/06/28 16:26:46 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
 
-int LoadClientTimerHandler::OnTimer( timerID, void* )
+void LoadClientTimerHandler::OnTimer( timerID, void* )
 {
 //elog	<< "LoadClientTimerHandler::OnTimer("
 //	<< moduleName
@@ -48,11 +48,10 @@ if( !theServer->AttachClient( moduleName, configFileName, true ) )
 	elog	<< "LoadClientTimer> Failed to load client module: "
 		<< moduleName
 		<< endl ;
-	return -1 ;
+	return ;
 	}
 
 delete this ;
-return 0 ;
 }
 
 } // namespace gnuworld

@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: client.h,v 1.41 2003/06/17 15:13:52 dan_karrels Exp $
+ * $Id: client.h,v 1.42 2003/06/28 16:26:45 dan_karrels Exp $
  */
 
 #ifndef __CLIENT_H
-#define __CLIENT_H "$Id: client.h,v 1.41 2003/06/17 15:13:52 dan_karrels Exp $"
+#define __CLIENT_H "$Id: client.h,v 1.42 2003/06/28 16:26:45 dan_karrels Exp $"
 
 #include	<sstream>
 #include	<string>
@@ -87,19 +87,19 @@ public:
 	 * of this method is to burst the client information
 	 * to the network.
 	 */
-	virtual int Connect( int ForceTime = 0 ) ;
+	virtual bool Connect( int ForceTime = 0 ) ;
 
 	/**
 	 * This method must call xServer::BurstChannel() with appropriate
 	 * channel modes for any channel it wishes to own.
 	 */
-	virtual int BurstChannels() ;
+	virtual bool BurstChannels() ;
 
 	/**
 	 * BurstGlines is called before eob, for the client to burst
 	 * all of its glines
 	 */
-	virtual int BurstGlines() ;
+	virtual bool BurstGlines() ;
 
 	/**
 	 * Exit is called by xServer::DetachClient().
@@ -107,53 +107,54 @@ public:
 	 * network and clean up.  Note that the client itself
 	 * can call this method, and then reconnect later.
 	 */
-	virtual int Exit( const string& Message ) ;
+	virtual bool Exit( const string& Message ) ;
 
 	/**
 	 * Kill will issue a KILL command to the network for
 	 * the given iClient (network generic client).
 	 */
-	virtual int Kill( iClient*, const string& ) ;
+	virtual bool Kill( iClient*, const string& ) ;
 
 	/**
 	 * QuoteAsServer will send data to the network as the
 	 * server itself.  Try to avoid using this method.
 	 */
-	virtual int QuoteAsServer( const string& Command );
+	virtual bool QuoteAsServer( const string& Command );
 
 	/**
 	 * Write a string of data to the network.
 	 */
-	virtual int Write( const string& s )
+	virtual bool Write( const string& s )
 		{ return QuoteAsServer( s ) ; }
 
 	/**
 	 * Write a string of data to the network.
 	 */
-	virtual int Write( const stringstream& s )
+	virtual bool Write( const stringstream& s )
 		{ return QuoteAsServer( s.str() ) ; }
 
 	/**
 	 * Write a variable length argument list to the network.
 	 */
-	virtual int Write( const char*, ... ) ;
+	virtual bool Write( const char*, ... ) ;
 
 	/**
 	 * ModeAsServer will change modes in a channel as the server.
 	 */
-	virtual int ModeAsServer( const string& Channel, const string& Mode ) ;	
+	virtual bool ModeAsServer( const string& Channel,
+			const string& Mode ) ;	
 
 	/**
 	 * Change modes as the server for the given channel.
 	 */
-	virtual int ModeAsServer( const Channel*, const string& ) ;
+	virtual bool ModeAsServer( const Channel*, const string& ) ;
 
 	/**
 	 * Mode is used to set the bot's modes.  If connected to the
 	 * network already, these new modes will be written to the
 	 * network.
 	 */
-	virtual int Mode( const string& Mode ) ;
+	virtual bool Mode( const string& Mode ) ;
 
 	// Handler methods
 
@@ -162,30 +163,30 @@ public:
 	 * network, during burst time.  The client's NICK
 	 * information has already been sent to the network.
 	 */
-	virtual int OnConnect() ;
+	virtual void OnConnect() ;
 
 	/**
 	 * OnQuit is called by Exit().
 	 */
-	virtual int OnQuit() ;
+	virtual void OnQuit() ;
 
 	/**
 	 * OnKill() is called when the client has been KILL'd.
 	 */
-	virtual int OnKill() ;
+	virtual void OnKill() ;
 
 	/**
 	 * This method is called when a network client performs
 	 * a whois on this xClient.
 	 */
-	virtual int OnWhois( iClient* sourceClient,
+	virtual void OnWhois( iClient* sourceClient,
 			iClient* targetClient ) ;
 
 	/**
 	 * This method is called when a network client invites
 	 * a services client to a channel.
 	 */
-	virtual int OnInvite( iClient* sourceClient,
+	virtual void OnInvite( iClient* sourceClient,
 			Channel* theChan );
 
 	/**
@@ -193,7 +194,7 @@ public:
 	 * To receive a particular event, the client must
 	 * first register for that event with the xServer.
 	 */
-	virtual int OnEvent( const eventType& theEvent,
+	virtual void OnEvent( const eventType& theEvent,
 		void* Data1 = NULL, void* Data2 = NULL,
 		void* Data3 = NULL, void* Data4 = NULL ) ;
 
@@ -201,7 +202,7 @@ public:
 	 * OnChannelEvent is called when a requested channel
 	 * event occurs.
 	 */
-	virtual int OnChannelEvent( const channelEventType&,
+	virtual void OnChannelEvent( const channelEventType&,
 		Channel*,
 		void* Data1 = NULL, void* Data2 = NULL,
 		void* Data3 = NULL, void* Data4 = NULL ) ;
@@ -341,13 +342,13 @@ public:
 	 * sure to end the method with a call to the base
 	 * class OnSignal (or the closest base class).
 	 */
-	virtual int OnSignal( int ) ;
+	virtual void OnSignal( int ) ;
 
 	/**
 	 * OnCTCP is called when a CTCP command is issued to
 	 * the client.
 	 */
-	virtual int OnCTCP( iClient* Sender,
+	virtual void OnCTCP( iClient* Sender,
 		const string& CTCP,
 		const string& Message,
 		bool Secure = false ) ;
@@ -357,7 +358,7 @@ public:
 	 * in a channel in which an xClient resides, and the
 	 * xClient is user mode -d.
 	 */
-	virtual int OnChannelCTCP( iClient* Sender,
+	virtual void OnChannelCTCP( iClient* Sender,
 		Channel* theChan,
 		const string& CTCPCommand,
 		const string& Message ) ;
@@ -366,7 +367,7 @@ public:
 	 * OnPrivateMessage is called when a PRIVMSG command
 	 * is issued to the client.
 	 */
-	virtual int OnPrivateMessage( iClient* Sender,
+	virtual void OnPrivateMessage( iClient* Sender,
 		const string& Message,
 		bool secure = false ) ;
 
@@ -375,7 +376,7 @@ public:
 	 * in a channel in which an xClient resides, and the
 	 * xClient is user mode -d.
 	 */
-	virtual int OnChannelMessage( iClient* Sender,
+	virtual void OnChannelMessage( iClient* Sender,
 		Channel* theChan,
 		const string& Message ) ;
 
@@ -383,21 +384,21 @@ public:
 	 * OnPrivateNotice is called when a NOTICE command
 	 * is issued to the client.
 	 */
-	virtual int OnPrivateNotice( iClient* Sender,
+	virtual void OnPrivateNotice( iClient* Sender,
 		const string& Message, bool secure = false ) ;
 
 	/**
 	 * OnChannelNotice is called when a module receives
 	 * channel notice, and is mode -d.
 	 */
-	virtual int OnChannelNotice( iClient* Sender,
+	virtual void OnChannelNotice( iClient* Sender,
 		Channel* theChan, const string& Message ) ;
 
 	/**
 	 * OnServerMessage is called when a server message
 	 * a client
 	 */
-	virtual int OnServerMessage( iServer* Sender,
+	virtual void OnServerMessage( iServer* Sender,
 		const string& Message, bool secure = false ) ;
 
 	/**
@@ -408,7 +409,7 @@ public:
 	 * This method overloads the pure virtual TimerHandler
 	 * base class method declaration.
 	 */
-	virtual int	OnTimer( xServer::timerID, void* ) ;
+	virtual void	OnTimer( xServer::timerID, void* ) ;
 
 	/* Utility methods */
 
@@ -418,7 +419,8 @@ public:
 	virtual bool	Op( Channel*, iClient* ) ;
 
 	/**
-	 * Op one or more users on a channel, join/part the channel if necessary.
+	 * Op one or more users on a channel, join/part the channel
+	 * if necessary.
 	 */
 	virtual bool	Op( Channel*, const vector< iClient* >& ) ;
 
@@ -428,7 +430,8 @@ public:
 	virtual bool	Voice( Channel*, iClient* ) ;
 
 	/**
-	 * Voice one or more users on a channel, join/part the channel if necessary.
+	 * Voice one or more users on a channel, join/part the channel
+	 * if necessary.
 	 */
 	virtual bool	Voice( Channel*, const vector< iClient* >& ) ;
  
@@ -448,7 +451,8 @@ public:
 	virtual bool	DeVoice( Channel*, iClient* ) ;
 
 	/**
-	 * Devoice one or more users on a channel, join/part the channel if necessary.
+	 * Devoice one or more users on a channel, join/part the channel
+	 * if necessary.
 	 */
 	virtual bool	DeVoice( Channel*, const vector< iClient* >& ) ; 
 
@@ -554,72 +558,78 @@ public:
 	/**
 	 * DoCTCP will issue a CTCP (reply) to the given iClient.
 	 */
-	virtual int DoCTCP( iClient* Target,
+	virtual bool DoCTCP( iClient* Target,
 		const string& CTCP,
 		const string& Message ) ;
 
 	/**
 	 * Message will PRIVMSG a string of data to the given iClient.
 	 */
-	virtual int Message( const iClient* Target,
+	virtual bool Message( const iClient* Target,
 		const char* Message, ... ) ;
 
 	/**
 	 * Message will PRIVMSG a string of data to the given iClient.
 	 */
-	virtual int Message( const iClient* Target,
+	virtual bool Message( const iClient* Target,
 		const string& Message ) ;
 
 	/**
 	 * This format of Message will write a string of data
 	 * to a channel.
 	 */
-	virtual int Message( const string& Channel,
+	virtual bool Message( const string& Channel,
 		const char* Message, ... ) ;
 
 	/**
 	 * This format of Message will write a string of data
 	 * to a channel.
 	 */
-	virtual int Message( const Channel* theChan,
+	virtual bool Message( const Channel* theChan,
 		const string& Message ) ;
 
 	/**
 	 * Notice will send a NOTICE command to the given iClient.
 	 */
-	virtual int Notice( const iClient* Target,
+	virtual bool Notice( const iClient* Target,
 		const char* Message, ... ) ;
 
 	/**
 	 * Notice will send a NOTICE command to the given iClient.
 	 */
-	virtual int Notice( const iClient* Target, const string& ) ;
+	virtual bool Notice( const iClient* Target, const string& ) ;
 
 	/**
 	 * This Notice() signature will send a channel NOTICE.
 	 */
-	virtual int Notice( const string& Channel,
+	virtual bool Notice( const string& Channel,
+		const char* Message, ... ) ;
+
+	/**
+	 * This Notice() signature will send a channel NOTICE.
+	 */
+	virtual bool Notice( const Channel* theChan,
 		const char* Message, ... ) ;
 
 	/**
 	 * Have this bot send a global wallops message.
 	 */
-	virtual int Wallops( const string& ) ;
+	virtual bool Wallops( const string& ) ;
 
 	/**
 	 * Have this bot send a global wallops message.
 	 */
-	virtual int Wallops( const char* Format, ... ) ;
+	virtual bool Wallops( const char* Format, ... ) ;
 
 	/**
 	 * Have the server send a wallops.
 	 */
-	virtual int WallopsAsServer( const string& ) ;
+	virtual bool WallopsAsServer( const string& ) ;
 
 	/**
 	 * Have the server send a wallops.
 	 */
-	virtual int WallopsAsServer( const char* Format, ... ) ;
+	virtual bool WallopsAsServer( const char* Format, ... ) ;
 
 	/**
 	 * Return true if this xClient is attached to a server.

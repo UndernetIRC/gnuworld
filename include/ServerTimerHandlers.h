@@ -17,11 +17,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ServerTimerHandlers.h,v 1.4 2002/05/27 17:18:12 dan_karrels Exp $
+ * $Id: ServerTimerHandlers.h,v 1.5 2003/06/28 16:26:45 dan_karrels Exp $
  */
 
 #ifndef __SERVERTIMERHANDLERS_H
-#define __SERVERTIMERHANDLERS_H "$Id: ServerTimerHandlers.h,v 1.4 2002/05/27 17:18:12 dan_karrels Exp $"
+#define __SERVERTIMERHANDLERS_H "$Id: ServerTimerHandlers.h,v 1.5 2003/06/28 16:26:45 dan_karrels Exp $"
 
 #include	"TimerHandler.h"
 
@@ -68,7 +68,7 @@ public:
 	 * into persistent memory, otherwise a segmentation fault
 	 * may occur when running OnTimer().
 	 */
-	virtual int OnTimer( timerID, void* ) = 0 ;
+	virtual void OnTimer( timerID, void* ) = 0 ;
 
 protected:
 
@@ -96,7 +96,7 @@ public: \
 	: ServerTimerHandler( theServer, updateInterval ) \
 	{} \
 	virtual ~className##Timer() {} \
-	virtual int OnTimer( timerID, void* ) ; \
+	virtual void OnTimer( timerID, void* ) ; \
 } ;
 
 SUBCLASS_SERVERTIMERHANDLER( GlineUpdate )

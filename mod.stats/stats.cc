@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: stats.cc,v 1.18 2003/06/17 15:13:53 dan_karrels Exp $
+ * $Id: stats.cc,v 1.19 2003/06/28 16:26:46 dan_karrels Exp $
  */
 
 #include	<string>
@@ -38,7 +38,7 @@
 #include	"Network.h"
 #include	"config.h"
 
-RCSTAG( "$Id: stats.cc,v 1.18 2003/06/17 15:13:53 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: stats.cc,v 1.19 2003/06/28 16:26:46 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -185,7 +185,7 @@ theServer->RegisterChannelEvent( "*", this ) ;
 theServer->RegisterTimer( ::time( 0 ) + 60, this ) ;
 }
 
-int stats::OnTimer( xServer::timerID, void* )
+void stats::OnTimer( xServer::timerID, void* )
 {
 //elog	<< "stats::OnTimer"
 //	<< endl ;
@@ -199,11 +199,9 @@ writeLog() ;
 
 // Reset the minutely event counters
 memset( eventMinuteTotal, 0, sizeof( eventMinuteTotal ) ) ;
-
-return 0 ;
 }
 
-int stats::OnPrivateNotice( iClient* theClient,
+void stats::OnPrivateNotice( iClient* theClient,
 	const string& theMessage,
 	bool secure )
 {
@@ -212,12 +210,12 @@ int stats::OnPrivateNotice( iClient* theClient,
 //	<< ", theMessage: "
 //	<< theMessage
 //	<< endl ;
-return xClient::OnPrivateNotice( theClient,
+xClient::OnPrivateNotice( theClient,
 	theMessage,
 	secure ) ;
 }
 
-int stats::OnChannelNotice( iClient* theClient,
+void stats::OnChannelNotice( iClient* theClient,
 	Channel* theChan,
 	const string& theMessage )
 {
@@ -228,10 +226,10 @@ int stats::OnChannelNotice( iClient* theClient,
 //	<< ", theMessage: "
 //	<< theMessage
 //	<< endl ;
-return xClient::OnChannelNotice( theClient, theChan, theMessage ) ;
+xClient::OnChannelNotice( theClient, theChan, theMessage ) ;
 }
 
-int stats::OnCTCP( iClient* theClient,
+void stats::OnCTCP( iClient* theClient,
 	const string& CTCPCommand,
 	const string& theMessage,
 	bool secure )
@@ -243,11 +241,11 @@ int stats::OnCTCP( iClient* theClient,
 //	<< ", theMessage: "
 //	<< theMessage
 //	<< endl ;
-return xClient::OnCTCP( theClient, CTCPCommand,
+xClient::OnCTCP( theClient, CTCPCommand,
 	theMessage, secure ) ;
 }
 
-int stats::OnChannelMessage( iClient* theClient,
+void stats::OnChannelMessage( iClient* theClient,
 	Channel* theChan,
 	const string& theMessage )
 {
@@ -258,12 +256,12 @@ int stats::OnChannelMessage( iClient* theClient,
 //	<< ", theMessage: "
 //	<< theMessage
 //	<< endl ;
-return xClient::OnChannelMessage( theClient,
+xClient::OnChannelMessage( theClient,
 	theChan,
 	theMessage ) ;
 }
 
-int stats::OnChannelCTCP( iClient* theClient,
+void stats::OnChannelCTCP( iClient* theClient,
 	Channel* theChan,
 	const string& CTCPCommand,
 	const string& theMessage )
@@ -277,11 +275,11 @@ int stats::OnChannelCTCP( iClient* theClient,
 //	<< ", theMessage: "
 //	<< theMessage
 //	<< endl ;
-return xClient::OnChannelCTCP( theClient, theChan,
+xClient::OnChannelCTCP( theClient, theChan,
 	CTCPCommand, theMessage ) ;
 }
 
-int stats::OnPrivateMessage( iClient* theClient,
+void stats::OnPrivateMessage( iClient* theClient,
 	const string& theMessage,
 	bool )
 {
@@ -298,13 +296,13 @@ if( !theClient->isOper() &&
 	{
 	elog	<< "stats::OnPrivateMessage> Denying access"
 		<< endl ;
-	return 0 ;
+	return ;
 	}
 
 StringTokenizer st( theMessage ) ;
 if( st.empty() )
 	{
-	return 0 ;
+	return ;
 	}
 
 if( st[ 0 ] == "reload" )
@@ -316,20 +314,20 @@ if( st[ 0 ] == "reload" )
 		"Keep smiling, I'm reloading..." ) ;
 	getUplink()->LoadClient( "libstats.la",
 		getConfigFileName() ) ;
-	return 0 ;
+	return ;
 	}
 
 if( st[ 0 ] == "stats" )
 	{
 	dumpStats( theClient ) ;
-	return 0 ;
+	return ;
 	}
 
 if( st.size() < 2 )
 	{
 	// No commands from this point forward can be done without
 	// one argument
-	return 0 ;
+	return ;
 	}
 
 if( st[ 0 ] == "join" )
@@ -338,7 +336,7 @@ if( st[ 0 ] == "join" )
 //		<< st[ 1 ]
 //		<< endl ;
 	Join( st[ 1 ] ) ;
-	return 0 ;
+	return ;
 	}
 
 if( st[ 0 ] == "part" )
@@ -347,12 +345,12 @@ if( st[ 0 ] == "part" )
 //		<< st[ 1 ]
 //		<< endl ;
 	Part( st[ 1 ], partMessage ) ;
-	return 0 ;
+	return ;
 	}
 
 if( st.size() < 3 )
 	{
-	return 0 ;
+	return ;
 	}
 
 if( st[ 0 ] == "say" )
@@ -361,7 +359,7 @@ if( st[ 0 ] == "say" )
 		{
 		Notice( theClient, "Im not on channel %s",
 			st[ 1 ].c_str() ) ;
-		return 0 ;
+		return ;
 		}
 
 	Channel* theChan = Network->findChannel( st[ 1 ] ) ;
@@ -370,14 +368,12 @@ if( st[ 0 ] == "say" )
 		Notice( theClient, "I have no information about channel "
 			"%s",
 			st[ 1 ].c_str() ) ;
-		return 0 ;
+		return ;
 		}
 
 	Message( theChan, st.assemble( 2 ) ) ;
-	return 0 ;
+	return ;
 	}
-
-return 0 ;
 }
 
 void stats::writeLog()
@@ -410,7 +406,7 @@ for( eventType whichEvent = 0 ; whichEvent <= EVT_CREATE ; ++whichEvent )
 	}
 }
 
-int stats::OnChannelEvent( const channelEventType& whichEvent,
+void stats::OnChannelEvent( const channelEventType& whichEvent,
 	Channel* theChan,
 	void* arg1,
 	void* arg2,
@@ -420,7 +416,7 @@ int stats::OnChannelEvent( const channelEventType& whichEvent,
 if( !logDuringBurst && MyUplink->isBursting() )
 	{
 	// Don't log
-	return 0 ;
+	return ;
 	}
 
 if( 0 == startTime )
@@ -433,7 +429,7 @@ assert( whichEvent <= EVT_CREATE ) ;
 eventMinuteTotal[ whichEvent ]++ ;
 eventTotal[ whichEvent ]++ ;
 
-return xClient::OnChannelEvent( whichEvent, theChan,
+xClient::OnChannelEvent( whichEvent, theChan,
 	arg1, arg2, arg3, arg4 ) ;
 }
 
@@ -446,14 +442,14 @@ void stats::OnNetworkKick( Channel* theChan,
 eventMinuteTotal[ EVT_KICK ]++ ;
 eventTotal[ EVT_KICK ]++ ;
 
-return xClient::OnNetworkKick( theChan,
+xClient::OnNetworkKick( theChan,
 	srcClient,
 	destClient,
 	kickMessage,
 	authoritative ) ;
 }
 
-int stats::OnEvent( const eventType& whichEvent,
+void stats::OnEvent( const eventType& whichEvent,
 	void* arg1,
 	void* arg2,
 	void* arg3,
@@ -462,7 +458,7 @@ int stats::OnEvent( const eventType& whichEvent,
 if( !logDuringBurst && MyUplink->isBursting() )
 	{
 	// Don't log
-	return 0 ;
+	return ;
 	}
 
 if( 0 == startTime )
@@ -480,7 +476,7 @@ eventTotal[ whichEvent ]++ ;
 //	<< whichEvent
 //	<< endl ;
 
-return xClient::OnEvent( whichEvent, arg1, arg2, arg3, arg4 ) ;
+xClient::OnEvent( whichEvent, arg1, arg2, arg3, arg4 ) ;
 }
 
 void stats::dumpStats( iClient* theClient )

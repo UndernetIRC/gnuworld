@@ -17,11 +17,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: TimerHandler.h,v 1.3 2002/05/27 17:18:12 dan_karrels Exp $
+ * $Id: TimerHandler.h,v 1.4 2003/06/28 16:26:45 dan_karrels Exp $
  */
 
 #ifndef __TIMERHANDLER_H
-#define __TIMERHANDLER_H "$Id: TimerHandler.h,v 1.3 2002/05/27 17:18:12 dan_karrels Exp $"
+#define __TIMERHANDLER_H "$Id: TimerHandler.h,v 1.4 2003/06/28 16:26:45 dan_karrels Exp $"
 
 namespace gnuworld
 {
@@ -58,7 +58,7 @@ public:
 	 * is the argument that was passed when registering the
 	 * timer.
 	 */
-	virtual int OnTimer( timerID, void* ) = 0 ;
+	virtual void OnTimer( timerID, void* ) = 0 ;
 
 } ;
 
@@ -72,7 +72,7 @@ class className##Timer : public TimerHandler \
 public: \
 className##Timer() {} \
 virtual ~className##Timer() {} \
-virtual int OnTimer( timerID, void* ) ; \
+virtual void OnTimer( timerID, void* ) ; \
 } ;
 
 } // namespace gnuworld
