@@ -20,11 +20,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
  * USA.
  *
- * $Id: cloner.h,v 1.7 2003/06/28 16:26:45 dan_karrels Exp $
+ * $Id: cloner.h,v 1.8 2003/07/21 23:36:34 dan_karrels Exp $
  */
 
 #ifndef __CLONER_H
-#define __CLONER_H "$Id: cloner.h,v 1.7 2003/06/28 16:26:45 dan_karrels Exp $"
+#define __CLONER_H "$Id: cloner.h,v 1.8 2003/07/21 23:36:34 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
@@ -38,6 +38,7 @@
 
 using std::string ;
 using std::vector ;
+using std::list ;
 
 namespace gnuworld
 {
@@ -57,16 +58,21 @@ public:
 
 protected:
 
+	virtual bool		hasAccess( const string& ) const ;
+
 	virtual string		randomNick( int minLength = 5,
 					int maxLength = 9 ) ;
 	virtual string		randomUser() ;
 	virtual string		randomHost() ;
 	virtual char		randomChar() ;
 
+	list< string >		allowAccess ;
 	list< iClient* >	clones ;
 	vector< string >	userNames ;
 	vector< string >	hostNames ;
 	iServer*		fakeServer ;
+
+	bool			allowOpers ;
 
 	size_t			makeCloneCount ;
 	size_t			cloneBurstCount ;

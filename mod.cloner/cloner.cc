@@ -20,7 +20,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
  * USA.
  *
- * $Id: cloner.cc,v 1.26 2003/06/28 16:26:45 dan_karrels Exp $
+ * $Id: cloner.cc,v 1.27 2003/07/21 23:36:34 dan_karrels Exp $
  */
 
 #include	<new>
@@ -43,16 +43,7 @@
 #include	"misc.h"
 #include	"ELog.h"
 
-const char client_h_rcsId[] = __CLIENT_H ;
-const char cloner_h_rcsId[] = __CLONER_H ;
-const char cloner_cc_rcsId[] = "$Id: cloner.cc,v 1.26 2003/06/28 16:26:45 dan_karrels Exp $" ;
-const char iClient_h_rcsId[] = __ICLIENT_H ;
-const char EConfig_h_rcsId[] = __ECONFIG_H ;
-const char ELog_h_rcsId[] = __ELOG_H ;
-const char ip_h_rcsId[] = __IP_H ;
-const char misc_h_rcsId[] = __MISC_H ;
-const char Network_h_rcsId[] = __NETWORK_H ;
-const char StringTokenizer_h_rcsId[] = __STRINGTOKENIZER_H ;
+RCSTAG("$Id: cloner.cc,v 1.27 2003/07/21 23:36:34 dan_karrels Exp $");
 
 namespace gnuworld
 {
@@ -80,13 +71,26 @@ extern "C"
 cloner::cloner( const string& configFileName )
  : xClient( configFileName )
 {
-
 EConfig conf( configFileName ) ;
 
 cloneDescription = conf.Require( "clonedescription" )->second ;
 cloneMode = conf.Require( "clonemode" )->second ;
 fakeServerName = conf.Require( "fakeservername" )->second ;
 fakeServerDescription = conf.Require( "fakeserverdescription" )->second ;
+
+allowOpers = false ;
+string stringOperAccess = conf.Require( "allow_opers" )->second ;
+if( !strcasecmp( stringOperAccess, "yes" ) ||
+	!strcasecmp( stringOperAccess, "true" ) )
+	{
+	allowOpers = true ;
+	}
+
+EConfig::const_iterator ptr = conf.Find( "permit_user" ) ;
+while( ptr != conf.end() && ptr->first == "permit_user" )
+	{
+	allowAccess.push_back( ptr->second ) ;
+	}
 
 cloneBurstCount = atoi( conf.Require( "cloneburstcount" )->second.c_str() ) ;
 if( cloneBurstCount < 1 )
@@ -96,7 +100,7 @@ if( cloneBurstCount < 1 )
 	::exit( 0 ) ;
 	}
 
-EConfig::const_iterator ptr = conf.Find( "fakehost" ) ;
+ptr = conf.Find( "fakehost" ) ;
 while( ptr != conf.end() && ptr->first == "fakehost" )
 	{
 	hostNames.push_back( ptr->second ) ;
@@ -165,9 +169,23 @@ void cloner::OnPrivateMessage( iClient* theClient, const string& Message,
 {
 //elog << "cloner::OnPrivateMessage> " << Message << endl ;
 
-if( !theClient->isOper() )
+// Get rid of anyone who is not an oper and does not have access
+bool userHasAccess = hasAccess( theClient->getAccount() ) ;
+if( !userHasAccess && !theClient->isOper() )
 	{
+	// Normal user
 	return ;
+	}
+
+if( !userHasAccess )
+	{
+	// The client must be an oper
+	// Are opers allow to use the service?
+	if( !allowOpers )
+		{
+		// Nope
+		return ;
+		}
 	}
 
 StringTokenizer st( Message ) ;
@@ -630,6 +648,19 @@ return c ;
          
 //return( (65 + (rand() % 122) ) ;
 //return (char) (1 + (int) (9.0 * rand() / (RAND_MAX + 1.0) ) ) ;
+}
+
+bool cloner::hasAccess( const string& accountName ) const
+{
+for( list< string >::const_iterator itr = allowAccess.begin() ;
+	itr != allowAccess.end() ; ++itr )
+	{
+	if( !strcasecmp( accountName, *itr ) )
+		{
+		return true ;
+		}
+	}
+return false ;
 }
 
 } // namespace gnuworld
