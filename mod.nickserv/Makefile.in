@@ -14,7 +14,7 @@
 
 @SET_MAKE@
 
-# "$Id: Makefile.in,v 1.95 2005/03/18 16:20:14 mrbean_ Exp $"
+# "$Id: Makefile.in,v 1.96 2005/04/03 22:11:47 dan_karrels Exp $"
 
 SOURCES = $(libnickserv_la_SOURCES)
 

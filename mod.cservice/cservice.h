@@ -17,11 +17,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: cservice.h,v 1.102 2004/06/04 20:17:23 jeekay Exp $
+ * $Id: cservice.h,v 1.103 2005/04/03 22:11:45 dan_karrels Exp $
  */
 
 #ifndef __CSERVICE_H
-#define __CSERVICE_H "$Id: cservice.h,v 1.102 2004/06/04 20:17:23 jeekay Exp $"
+#define __CSERVICE_H "$Id: cservice.h,v 1.103 2005/04/03 22:11:45 dan_karrels Exp $"
 
 #include	<iostream>
 #include	<string>
@@ -34,6 +34,7 @@
 #include	"iClient.h"
 #include	"iServer.h"
 #include	"EConfig.h"
+#include	"cservice_config.h"
 #include	"cserviceCommands.h"
 #include	"sqlChannel.h"
 #include	"sqlUser.h"
@@ -507,6 +508,14 @@ public:
 	std::ofstream	adminLog ;
 
 	string adminlogPath;
+
+	static string CryptPass( const string& pass ) ;
+
+#ifdef ALLOW_HELLO
+	typedef std::map< int, time_t > helloIPListType ;
+	helloIPListType	helloIPList ;
+	unsigned int helloBlockPeriod ;
+#endif // ALLOW_HELLO
 } ;
 
 const string escapeSQLChars(const string& theString);

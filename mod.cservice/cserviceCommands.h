@@ -16,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: cserviceCommands.h,v 1.36 2003/06/28 01:21:20 dan_karrels Exp $
+ * $Id: cserviceCommands.h,v 1.37 2005/04/03 22:11:45 dan_karrels Exp $
  */
 
 #ifndef __CSERVICECOMMANDS_H
-#define __CSERVICECOMMANDS_H "$Id: cserviceCommands.h,v 1.36 2003/06/28 01:21:20 dan_karrels Exp $"
+#define __CSERVICECOMMANDS_H "$Id: cserviceCommands.h,v 1.37 2005/04/03 22:11:45 dan_karrels Exp $"
 
 #include	<string>
 
@@ -152,6 +152,7 @@ DECLARE_COMMAND( REHASH )
 DECLARE_COMMAND( STATS )
 DECLARE_COMMAND( ADDCOMMENT )
 DECLARE_COMMAND( SHUTDOWN )
+DECLARE_COMMAND( HELLO )
 
 } // namespace gnuworld
 

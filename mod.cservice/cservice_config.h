@@ -16,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: cservice_config.h,v 1.9 2003/06/28 01:21:20 dan_karrels Exp $
+ * $Id: cservice_config.h,v 1.10 2005/04/03 22:11:45 dan_karrels Exp $
  */
 
 #ifndef __CSERVICE_CONFIG_H
-#define __CSERVICE_CONFIG_H "$Id: cservice_config.h,v 1.9 2003/06/28 01:21:20 dan_karrels Exp $"
+#define __CSERVICE_CONFIG_H "$Id: cservice_config.h,v 1.10 2005/04/03 22:11:45 dan_karrels Exp $"
 
 /**
  * Define this if you wish for all SQL queries to be sent
@@ -79,5 +79,10 @@
  */
 
 #define USE_SETMAXLOGINS
+
+/**
+ * Define this if you want to enable the HELLO command.
+ */
+#undef ALLOW_HELLO
 
 #endif // __CSERVICE_CONFIG_H

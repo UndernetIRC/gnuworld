@@ -19,7 +19,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: sqlUser.cc,v 1.39 2003/06/28 01:21:20 dan_karrels Exp $
+ * $Id: sqlUser.cc,v 1.40 2005/04/03 22:11:45 dan_karrels Exp $
  */
 
 #include	<sstream>
@@ -473,5 +473,49 @@ sqlUser::~sqlUser()
 // No heap space allocated
 }
 
+bool sqlUser::Insert()
+{
+/*
+ * Build an SQL statement to insert the transient data in 
+ * this storage class back into the database.
+ */
+static const char* queryHeader =  "INSERT INTO users "
+	"(user_name,password,language_id,flags,last_updated_by,last_"
+	"updated,email) VALUES ('";
+
+stringstream queryString;
+queryString	<< queryHeader
+		<< escapeSQLChars(user_name)
+		<< "'," << "'"
+		<< password << "',"
+		<< 1 << ","
+		<< 0 << ",'"
+		<< escapeSQLChars(last_updated_by)
+		<< "',"
+		<< "now()::abstime::int4,'"
+		<< escapeSQLChars(email)
+		<< "')"
+		<< ends;
+
+#ifdef LOG_SQL
+        elog    << "sqlUser::insert> "
+                << queryString.str()
+                << endl;
+#endif
+
+ExecStatusType status = SQLDb->Exec(queryString.str().c_str()) ;
+
+if( PGRES_COMMAND_OK != status )
+        {
+        // TODO: Log to msgchan here.
+        elog    << "sqlUser::insert> Something went wrong: "
+                << SQLDb->ErrorMessage()
+                << endl;
+
+        return false;
+        }
+
+return true;
+}
 
 } // namespace gnuworld.

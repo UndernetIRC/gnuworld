@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: cservice.cc,v 1.245 2005/03/25 03:07:29 dan_karrels Exp $
+ * $Id: cservice.cc,v 1.246 2005/04/03 22:11:44 dan_karrels Exp $
  */
 
 #include	<new>
@@ -231,6 +231,11 @@ RegisterCommand(new STATSCommand(this, "STATS", "", 8));
 RegisterCommand(new ADDCOMMENTCommand(this, "ADDCOMMENT", "<username> <comment>", 10));
 RegisterCommand(new SHUTDOWNCommand(this, "SHUTDOWN", "[reason]", 10));
 
+#ifdef ALLOW_HELLO
+  RegisterCommand( new HELLOCommand( this,
+	"HELLO", "<username> <email> <email>", 10 ) ) ;
+#endif // ALLOW_HELLO
+
 cserviceConfig = new (std::nothrow) EConfig( args ) ;
 assert( cserviceConfig != 0 ) ;
 
@@ -290,6 +295,11 @@ noteDuration = atoi((cserviceConfig->Require( "note_duration" )->second).c_str()
 noteLimit = atoi((cserviceConfig->Require( "note_limit" )->second).c_str());
 preloadUserDays = atoi((cserviceConfig->Require( "preload_user_days" )->second).c_str());
 adminlogPath = cserviceConfig->Require( "admin_logfile" )->second ;
+
+#ifdef ALLOW_HELLO
+  helloBlockPeriod = atoi( cserviceConfig->Require( 
+    "hello_block_period" )->second.c_str() ) ;
+#endif // ALLOW_HELLO
 
 loadConfigData();
 
@@ -4274,6 +4284,50 @@ void cservice::outputChannelAccesses(iClient* theClient, sqlUser* theUser, sqlUs
 void Command::Usage( iClient* theClient )
 {
 bot->Notice( theClient, string( "SYNTAX: " ) + getInfo() ) ;
+}
+
+string cservice::CryptPass( const string& pass )
+{
+StringTokenizer st( pass ) ;
+
+const char validChars[] = 
+	"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.$*_";
+
+string salt ;
+for( unsigned short int i = 0 ; i < 8 ; ++i )
+	{
+	int randNo = 1 + (int) (64.0 * rand() / (RAND_MAX + 1.0) );
+	salt += validChars[ randNo ] ;
+	}
+
+/* Work out a MD5 hash of our salt + password */
+md5		hash; // MD5 hash algorithm object.
+md5Digest	digest; // MD5Digest algorithm object.
+
+stringstream output;
+string newPass;
+newPass = salt + st.assemble(0);
+
+hash.update( (const unsigned char *)newPass.c_str(),
+	newPass.size() );
+hash.report( digest );
+
+/* Convert to Hex */
+int data[ MD5_DIGEST_LENGTH ] = { 0 } ;
+for( size_t ii = 0; ii < MD5_DIGEST_LENGTH; ii++ )
+        {
+        data[ii] = digest[ii];
+        }
+
+output << std::hex;
+output.fill('0');
+for( size_t ii = 0; ii < MD5_DIGEST_LENGTH; ii++ )
+        {
+        output << std::setw(2) << data[ii];
+        }
+output << ends;
+
+return string( salt + output.str()  );
 }
 
 } // namespace gnuworld

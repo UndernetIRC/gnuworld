@@ -1,4 +1,4 @@
-# $Id: cservice.example.conf.in,v 1.5 2003/06/11 22:38:20 gte Exp $
+# $Id: cservice.example.conf.in,v 1.6 2005/04/03 22:11:12 dan_karrels Exp $
 # Channel Services configuration file.
 #
 # sql_host = Hostname/IP of the PostgreSQL server.
@@ -151,12 +151,18 @@ note_limit = 5
 # 'x' number of days to avoid a large number of queries when processing
 # +r accounts during the initial net.burst.
 #
-
 preload_user_days = 1
 
 #
 # Specify the filename for the 'Admin Log'.
 # Basically a log of all commands admins type.
 #
-
 admin_logfile = admin.log
+
+#
+# This option is used only if ALLOW_HELLO is defined in
+# cservice_config.h, thus enabling the HELLO command in cservice.
+# This is the time to block users attempting to flood the bot with
+# hello commands, in seconds.
+#
+hello_block_period = 3600

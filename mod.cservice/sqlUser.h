@@ -16,22 +16,22 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: sqlUser.h,v 1.34 2003/06/28 01:21:20 dan_karrels Exp $
+ * $Id: sqlUser.h,v 1.35 2005/04/03 22:11:45 dan_karrels Exp $
  */
 
 #ifndef __SQLUSER_H
-#define __SQLUSER_H "$Id: sqlUser.h,v 1.34 2003/06/28 01:21:20 dan_karrels Exp $"
+#define __SQLUSER_H "$Id: sqlUser.h,v 1.35 2005/04/03 22:11:45 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
+
 #include	<ctime>
+
+#include	"cservice_config.h"
 #include	"libpq++.h"
 
 namespace gnuworld
 {
-
-using std::string ;
-using std::vector ;
 
 class iClient;
 
@@ -69,13 +69,13 @@ public:
 	inline const unsigned int&	getID() const
 		{ return id ; }
 
-	inline const string&		getUserName() const
+	inline const std::string&	getUserName() const
 		{ return user_name ; }
 
-	inline const string&		getPassword() const
+	inline const std::string&	getPassword() const
 		{ return password ; }
 
-	inline const string&		getUrl() const
+	inline const std::string&	getUrl() const
 		{ return url ; }
 
 	inline const unsigned int&	getLanguageId() const
@@ -87,7 +87,7 @@ public:
 	inline const flagType&		getFlags() const
 		{ return flags ; }
 
-	inline const string&		getLastUpdatedBy() const
+	inline const std::string&	getLastUpdatedBy() const
 		{ return last_updated_by ; }
 
 	inline const time_t&		getLastUpdated() const
@@ -99,7 +99,7 @@ public:
 	inline const time_t&		getInstantiatedTS() const
 		{ return instantiated_ts ; }
 
-	inline const string&		getEmail() const
+	inline const std::string&	getEmail() const
 		{ return email ; }
 
 	inline bool isAuthed()
@@ -143,11 +143,14 @@ public:
 	inline void removeFlag( const flagType& whichFlag )
 		{ flags &= ~whichFlag; }
 
-	inline void setPassword( const string& _password )
+	inline void setPassword( const std::string& _password )
 		{ password = _password; }
 
-	inline void setLastSeen( const time_t& _last_seen, const string& _last_hostmask )
-		{ last_seen = _last_seen; last_hostmask = _last_hostmask ; commitLastSeen(); }
+	inline void setLastSeen( const time_t& _last_seen,
+			const std::string& _last_hostmask )
+		{ last_seen = _last_seen;
+		  last_hostmask = _last_hostmask ;
+		  commitLastSeen(); }
 
 	inline void setLastSeen( const time_t& _last_seen )
 		{ last_seen = _last_seen; commitLastSeenWithoutMask(); }
@@ -161,7 +164,7 @@ public:
 	inline void setInstantiatedTS( const time_t& _instantiated_ts)
 		{ instantiated_ts = _instantiated_ts; }
 
-	inline void setEmail( const string& _email )
+	inline void setEmail( const std::string& _email )
 		{ email = _email; }
 
 	inline void setMaxLogins( const unsigned int& _maxlogins )
@@ -173,6 +176,12 @@ public:
 	inline void setNotesSent( const unsigned int& _notes_sent )
 		{ notes_sent = _notes_sent; }
 
+	inline void setUserName( const std::string& _user_name )
+		{ user_name = _user_name ; }
+
+	inline void setLastUpdatedBy( const std::string& _last_updated_by )
+		{ last_updated_by = _last_updated_by ; }
+
 	/*
 	 * Method to perform a SQL 'UPDATE' and commit changes to this
 	 * object back to the database.
@@ -182,35 +191,36 @@ public:
 	bool commitLastSeen();
 	bool commitLastSeenWithoutMask();
 	time_t	getLastSeen();
-	const string getLastHostMask();
+	const std::string getLastHostMask();
+	bool Insert() ;
 
 	bool loadData( int );
-	bool loadData( const string& );
+	bool loadData( const std::string& );
 	void setAllMembers( int );
-	void writeEvent( unsigned short, sqlUser*, const string& );
-	const string getLastEvent( unsigned short, unsigned int&);
+	void writeEvent( unsigned short, sqlUser*, const std::string& );
+	const std::string getLastEvent( unsigned short, unsigned int&);
 
 	/*
 	 * List of all network users authenticated as this account.
 	 */
-	typedef vector <iClient*>	networkClientListType;
+	typedef std::vector <iClient*>	networkClientListType;
 	networkClientListType networkClientList;
 
 protected:
 
 	unsigned int	id ;
-	string		user_name ;
-	string		password ;
+	std::string	user_name ;
+	std::string	password ;
 	time_t		last_seen ;
-	string		url ;
+	std::string	url ;
 	unsigned int	language_id ;
 	flagType	flags ;
-	string		last_updated_by ;
+	std::string	last_updated_by ;
 	time_t		last_updated ;
 	time_t		last_used;
 	time_t		instantiated_ts;
-	string		email ;
-	string		last_hostmask ;
+	std::string	email ;
+	std::string	last_hostmask ;
 	unsigned int maxlogins;
 	time_t		last_note;
 	unsigned int	notes_sent;

@@ -14,7 +14,7 @@
 
 @SET_MAKE@
 
-# "$Id: Makefile.in,v 1.237 2005/03/18 16:20:03 mrbean_ Exp $"
+# "$Id: Makefile.in,v 1.238 2005/04/03 22:11:42 dan_karrels Exp $"
 
 SOURCES = $(libcservice_la_SOURCES)
 
@@ -72,8 +72,9 @@ am_libcservice_la_OBJECTS = libcservice_la-cservice.lo \
 	libcservice_la-CLEARMODECommand.lo \
 	libcservice_la-DEOPCommand.lo libcservice_la-DEVOICECommand.lo \
 	libcservice_la-FORCECommand.lo libcservice_la-HELPCommand.lo \
-	libcservice_la-INVITECommand.lo libcservice_la-ISREGCommand.lo \
-	libcservice_la-JOINCommand.lo libcservice_la-KICKCommand.lo \
+	libcservice_la-HELLOCommand.lo libcservice_la-INVITECommand.lo \
+	libcservice_la-ISREGCommand.lo libcservice_la-JOINCommand.lo \
+	libcservice_la-KICKCommand.lo \
 	libcservice_la-LBANLISTCommand.lo \
 	libcservice_la-LOGINCommand.lo \
 	libcservice_la-MODINFOCommand.lo libcservice_la-MOTDCommand.lo \
@@ -281,6 +282,7 @@ libcservice_la_SOURCES = cservice.cc \
 	DEVOICECommand.cc \
 	FORCECommand.cc \
 	HELPCommand.cc \
+	HELLOCommand.cc \
 	INVITECommand.cc \
 	ISREGCommand.cc \
 	JOINCommand.cc \
@@ -419,6 +421,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcservice_la-DEOPCommand.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcservice_la-DEVOICECommand.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcservice_la-FORCECommand.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcservice_la-HELLOCommand.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcservice_la-HELPCommand.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcservice_la-INVITECommand.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcservice_la-ISREGCommand.Plo@am__quote@
@@ -624,6 +627,13 @@ libcservice_la-HELPCommand.lo: HELPCommand.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='HELPCommand.cc' object='libcservice_la-HELPCommand.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcservice_la_CXXFLAGS) $(CXXFLAGS) -c -o libcservice_la-HELPCommand.lo `test -f 'HELPCommand.cc' || echo '$(srcdir)/'`HELPCommand.cc
+
+libcservice_la-HELLOCommand.lo: HELLOCommand.cc
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcservice_la_CXXFLAGS) $(CXXFLAGS) -MT libcservice_la-HELLOCommand.lo -MD -MP -MF "$(DEPDIR)/libcservice_la-HELLOCommand.Tpo" -c -o libcservice_la-HELLOCommand.lo `test -f 'HELLOCommand.cc' || echo '$(srcdir)/'`HELLOCommand.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libcservice_la-HELLOCommand.Tpo" "$(DEPDIR)/libcservice_la-HELLOCommand.Plo"; else rm -f "$(DEPDIR)/libcservice_la-HELLOCommand.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='HELLOCommand.cc' object='libcservice_la-HELLOCommand.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcservice_la_CXXFLAGS) $(CXXFLAGS) -c -o libcservice_la-HELLOCommand.lo `test -f 'HELLOCommand.cc' || echo '$(srcdir)/'`HELLOCommand.cc
 
 libcservice_la-INVITECommand.lo: INVITECommand.cc
 @am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcservice_la_CXXFLAGS) $(CXXFLAGS) -MT libcservice_la-INVITECommand.lo -MD -MP -MF "$(DEPDIR)/libcservice_la-INVITECommand.Tpo" -c -o libcservice_la-INVITECommand.lo `test -f 'INVITECommand.cc' || echo '$(srcdir)/'`INVITECommand.cc; \
