@@ -787,8 +787,14 @@ sqlUser* cservice::getUserRecord(const string& id)
  */
 if (id[0]=='=') 
 	{
-	iClient *client = Network->findClient(id.c_str()+1);
-	return isAuthed(client,false);
+	const char* theNick = id.c_str();
+	// Skip the '=' 
+	++theNick; 
+
+	iClient *client = Network->findNick(theNick);
+	if (client) return isAuthed(client,false);
+
+	return 0;
 	}
 /*
  *  Check if this record is already in the cache.
@@ -2198,21 +2204,24 @@ for( xServer::opVectorType::const_iterator ptr = theTargets.begin() ;
 			sqlBan* theBan = isBannedOnChan(reggedChan, tmpUser->getClient()); 
 			if( theBan && (theBan->getLevel() <= 75) ) 
 				{
-					deopList.push_back(tmpUser->getClient());
-
-					/* Tell the person bein op'd that they can't */
-					Notice(tmpUser->getClient(), 
-						"You are not allowed to be opped on %s",
-						reggedChan->getName().c_str());
-
-					/* Tell the person doing the op'ing this is bad */
-					if (theChanUser) 
+					if ( !tmpUser->getClient()->getMode(iClient::MODE_SERVICES) )
 						{
-						Notice(theChanUser->getClient(),
-							"%s isn't allowed to be opped on %s",
-							tmpUser->getClient()->getNickName().c_str(), 
+						deopList.push_back(tmpUser->getClient());
+
+						/* Tell the person bein op'd that they can't */
+						Notice(tmpUser->getClient(), 
+							"You are not allowed to be opped on %s",
 							reggedChan->getName().c_str());
-						} 
+	
+						/* Tell the person doing the op'ing this is bad */
+						if (theChanUser) 
+							{
+							Notice(theChanUser->getClient(),
+								"%s isn't allowed to be opped on %s",
+								tmpUser->getClient()->getNickName().c_str(), 
+								reggedChan->getName().c_str());
+							} 
+						}
 				}
 
 			} // if()
@@ -2662,7 +2671,16 @@ if( theBan && (theBan->getLevel() >= 75) )
 
 		return true;
 	} /* Matching Ban > 75 */ 
- 
+
+/*
+ * If they're banned < 75, return true, but don't
+ * do anything.
+ */
+if( theBan && (theBan->getLevel() < 75) )
+	{
+	return true;
+	}
+
 return false;
 }
 
