@@ -13,7 +13,7 @@
  *
  * Command is aliased "INFO".
  *
- * $Id: CHANINFOCommand.cc,v 1.5 2001/01/13 22:58:21 gte Exp $
+ * $Id: CHANINFOCommand.cc,v 1.6 2001/01/20 22:01:01 gte Exp $
  */
 
 #include	<string>
@@ -24,7 +24,7 @@
 #include	"levels.h"
 #include	"responses.h"
  
-const char CHANINFOCommand_cc_rcsId[] = "$Id: CHANINFOCommand.cc,v 1.5 2001/01/13 22:58:21 gte Exp $" ;
+const char CHANINFOCommand_cc_rcsId[] = "$Id: CHANINFOCommand.cc,v 1.6 2001/01/20 22:01:01 gte Exp $" ;
  
 namespace gnuworld
 {
@@ -44,6 +44,10 @@ bool CHANINFOCommand::Exec( iClient* theClient, const string& Message )
 	    return true;
     }
 
+	sqlUser* tmpUser = bot->isAuthed(theClient, true);
+	if (!tmpUser) return false;
+
+
 	/*
 	 *  Are we checking info about a user or a channel?
 	 */
@@ -57,6 +61,16 @@ bool CHANINFOCommand::Exec( iClient* theClient, const string& Message )
 		{
 			bot->Notice(theClient, "The user %s doesn't appear to be registered.", st[1].c_str());
 			return true;
+		}
+ 
+		if (theUser->getFlag(sqlUser::F_INVIS)) /* Keep details private. */
+		{
+			/* If they don't have * access or are opered, deny. */
+			if( !(bot->getAdminAccessLevel(tmpUser)) && !(theClient->isOper()))
+			{
+				bot->Notice(theClient, "Unable to view user details (Invisible)");
+				return false;
+			}
 		}
 
 		bot->Notice(theClient, "Information about: %s", theUser->getUserName().c_str());

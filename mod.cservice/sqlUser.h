@@ -1,7 +1,7 @@
 /* sqlUser.h */
 
 #ifndef __SQLUSER_H
-#define __SQLUSER_H "$Id: sqlUser.h,v 1.9 2001/01/08 04:13:04 gte Exp $"
+#define __SQLUSER_H "$Id: sqlUser.h,v 1.10 2001/01/20 22:01:01 gte Exp $"
 
 #include	<string>
 #include	<ctime>
@@ -25,6 +25,7 @@ public:
 	typedef unsigned short int	flagType ;
 	static const flagType F_GLOBAL_SUSPEND =	0x01 ;
 	static const flagType F_LOGGEDIN =	0x02 ;
+	static const flagType F_INVIS =	0x04 ;
 
 	/*
 	 *  Methods to get data atrributes.

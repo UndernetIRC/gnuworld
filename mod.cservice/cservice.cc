@@ -125,7 +125,7 @@ cservice::cservice(const string& args)
     RegisterCommand(new ADDUSERCommand(this, "ADDUSER", "<#channel> <nick> <access>", 8));
     RegisterCommand(new REMUSERCommand(this, "REMUSER", "<#channel> <nick>", 4));
     RegisterCommand(new MODINFOCommand(this, "MODINFO", "<#channel> [ACCESS <nick> <level>] [AUTOOP <nick> <on|off>]", 6));
-    RegisterCommand(new SETCommand(this, "SET", "[#channel] <variable> <value>", 6));
+    RegisterCommand(new SETCommand(this, "SET", "[#channel] <variable> <value> or, SET <invisible> <ON|OFF>", 6));
     RegisterCommand(new INVITECommand(this, "INVITE", "<#channel>", 2));
     RegisterCommand(new TOPICCommand(this, "TOPIC", "<#channel> <topic>", 4));
     RegisterCommand(new CHANINFOCommand(this, "CHANINFO", "<#channel>", 3));
@@ -455,7 +455,7 @@ int cservice::OnCTCP( iClient* theClient, const string& CTCP,
 
 	if(Command == "VERSION")
 	{
-		xClient::DoCTCP(theClient, CTCP.c_str(), "Undernet P10 Channel Services Version 2 [" __DATE__ " " __TIME__ "] ($Id: cservice.cc,v 1.55 2001/01/20 16:41:22 gte Exp $)");
+		xClient::DoCTCP(theClient, CTCP.c_str(), "Undernet P10 Channel Services Version 2 [" __DATE__ " " __TIME__ "] ($Id: cservice.cc,v 1.56 2001/01/20 22:01:01 gte Exp $)");
 		return true;
 	}
  

@@ -3,12 +3,14 @@
  *
  * 28/12/2000 - David Henriksen <david@itwebnet.dk>
  * Initial Version.
+ * 01/01/2001 - Greg Sikorski <gte@atomicrevs.demon.co.uk>
+ * Modifications.
  *
  * Sets channel options on the specified channel.
  *
  * Caveats: SET LANG is still under consideration.
  *
- * $Id: SETCommand.cc,v 1.9 2001/01/20 16:40:02 gte Exp $
+ * $Id: SETCommand.cc,v 1.10 2001/01/20 22:01:01 gte Exp $
  */
 
 #include	<string>
@@ -20,7 +22,7 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char SETCommand_cc_rcsId[] = "$Id: SETCommand.cc,v 1.9 2001/01/20 16:40:02 gte Exp $" ;
+const char SETCommand_cc_rcsId[] = "$Id: SETCommand.cc,v 1.10 2001/01/20 22:01:01 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -32,10 +34,46 @@ bool SETCommand::Exec( iClient* theClient, const string& Message )
 { 
 	StringTokenizer st( Message ) ;
  
-	if( st.size() < 4 )
+	if( st.size() < 3 )
 	{
 	    Usage(theClient);
 	    return true;
+	}
+
+	/* Is the user authorised? */
+	 
+	sqlUser* theUser = bot->isAuthed(theClient, true);
+	if(!theUser) return false; 
+
+	/*
+	 * First, is this a #channel or user set?
+	 */
+ 
+	if( st[1][0] != '#' ) // Didn't find a hash?
+	{
+		// Look by user then.
+		string option = string_upper(st[1]);
+		string value = string_upper(st[2]); 
+		if (option == "INVISIBLE")
+		{
+			if (value == "ON")
+			{
+				theUser->setFlag(sqlUser::F_INVIS);
+				theUser->commit();
+				bot->Notice(theClient, "Your INVISIBLE setting is now ON.");
+				return true;
+			}
+
+			if (value == "OFF")
+			{
+				theUser->removeFlag(sqlUser::F_INVIS);
+				theUser->commit();
+				bot->Notice(theClient, "Your INVISIBLE setting is now OFF.");
+				return true;
+			}
+
+		}
+
 	}
 
     Channel* tmpChan = Network->findChannel(st[1]); 
@@ -48,19 +86,20 @@ bool SETCommand::Exec( iClient* theClient, const string& Message )
 	    bot->Notice(theClient, "Sorry, %s isn't registered with me.", st[1].c_str());
 	    return false;
 	} 
-
-	/* Is the user authorised? */
-	 
-	sqlUser* theUser = bot->isAuthed(theClient, true);
-	if(!theUser)
-	{
-	    return false;
-	}
+ 
 	// Check level.
 
 	int level = bot->getEffectiveAccessLevel(theUser, theChan, false); 
 	string option = string_upper(st[2]);
-	string value = string_upper(st[3]);
+	string value; 
+
+	if (st.size() < 4)
+	{
+		value = "";
+	} else {
+	 	value = string_upper(st[3]);
+	}
+
 	
 	if(option == "CAUTION")
 	{
@@ -495,7 +534,7 @@ bool SETCommand::Exec( iClient* theClient, const string& Message )
 	    }
 	    if(strlen(desc.c_str()) > 80)
 	    {
-			bot->Notice(theClient, "The DESCRIPTION can max be 80 chars long!");
+			bot->Notice(theClient, "The DESCRIPTION can be a maximum of 80 chars!");
 			return true;
 	    }
 		theChan->setDescription(desc);
@@ -521,7 +560,7 @@ bool SETCommand::Exec( iClient* theClient, const string& Message )
 	    }
 	    if(strlen(value.c_str()) > 80) // is 80 ok as an max url length?
 	    {
-			bot->Notice(theClient, "The URL can max be 80 chars long!");
+			bot->Notice(theClient, "The URL can be a maximum of 80 chars!");
 			return true;
 	    }
 		theChan->setURL(url);

@@ -17,7 +17,7 @@
  *
  * Caveats: None
  *
- * $Id: OPCommand.cc,v 1.14 2001/01/17 19:50:54 gte Exp $
+ * $Id: OPCommand.cc,v 1.15 2001/01/20 22:01:01 gte Exp $
  */
 
 #include	<string>
@@ -32,7 +32,7 @@
 
 using std::map ;
 
-const char OPCommand_cc_rcsId[] = "$Id: OPCommand.cc,v 1.14 2001/01/17 19:50:54 gte Exp $" ;
+const char OPCommand_cc_rcsId[] = "$Id: OPCommand.cc,v 1.15 2001/01/20 22:01:01 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -173,7 +173,7 @@ bool OPCommand::Exec( iClient* theClient, const string& Message )
 		 *  are authorised, and have access in this channel.
 		 */
 
-		if(theChan->getFlag(sqlChannel::F_STRICTOP))
+		if(cont && theChan->getFlag(sqlChannel::F_STRICTOP))
 		{
 			sqlUser* authUser = bot->isAuthed(tmpChanUser->getClient(), false);
 

@@ -9,7 +9,7 @@
 #include	"levels.h"
 
  
-const char VERIFYCommand_cc_rcsId[] = "$Id: VERIFYCommand.cc,v 1.8 2001/01/14 18:21:32 gte Exp $" ;
+const char VERIFYCommand_cc_rcsId[] = "$Id: VERIFYCommand.cc,v 1.9 2001/01/20 22:01:01 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -48,7 +48,7 @@ bool VERIFYCommand::Exec( iClient* theClient, const string& Message )
 		{ 
 			bot->Notice(theClient, "%s is an IRC operator", target->getNickUserHost().c_str());
 		} else {
-			bot->Notice(theClient, "%s is NOT Authenticated.", target->getNickUserHost().c_str());
+			bot->Notice(theClient, "%s is NOT logged in.", target->getNickUserHost().c_str());
 		}
 		return false;
 	}
@@ -59,28 +59,28 @@ bool VERIFYCommand::Exec( iClient* theClient, const string& Message )
  
 	if (level == 0) 
 	{ 
-		bot->Notice(theClient, "%s is Authenticated as %s%s", 
+		bot->Notice(theClient, "%s is logged in as %s%s", 
 			target->getNickUserHost().c_str(), extra.c_str(), theUser->getUserName().c_str());
 		return false;
 	}
 
  	if ((level >= level::admin::base) && (level <= level::admin::helper)) 
 	{
-		bot->Notice(theClient, "%s is an Official CService Representative%s and authenticated as %s", 
+		bot->Notice(theClient, "%s is an Official CService Representative%s and logged in as %s", 
 			target->getNickUserHost().c_str(), extra.c_str(), theUser->getUserName().c_str());
 		return true;
 	}
  
 	if ((level > level::admin::helper) && (level <= level::admin::admin)) 
 	{
-		bot->Notice(theClient, "%s is an Official CService Administrative Representative%s and authenticated as %s", 
+		bot->Notice(theClient, "%s is an Official CService Administrator%s and logged in as %s", 
 			target->getNickUserHost().c_str(), extra.c_str(), theUser->getUserName().c_str());
 		return true;
 	}
  
 	if (level == level::admin::coder) 
 	{
-		bot->Notice(theClient, "%s is an Official Cservice Developer%s and authenticated as %s",
+		bot->Notice(theClient, "%s is an Official Cservice Developer%s and logged in as %s",
 			target->getNickUserHost().c_str(), extra.c_str(), theUser->getUserName().c_str());
 		return true;
 	}
