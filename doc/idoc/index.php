@@ -2,7 +2,7 @@
 /*
  *
  * Undernet GNUworld Interactive Installation Guide (aka UGIIG)
- * $Id: index.php,v 1.9 2002/10/02 11:17:19 nighty Exp $
+ * $Id: index.php,v 1.10 2002/10/02 11:27:52 nighty Exp $
  *
  * Released under the GNU Public License : http://www.gnu.org/licenses/gpl.txt
  * by nighty <nighty@undernet.org>
@@ -50,7 +50,7 @@ function footer($prev,$next) {
 	//echo "<address>maintained by <b>&lt;</b><a href=\"mailto:" . $coder_email . "\">" . $coder_email . "</a><b>&gt;</b> - Last modified : <b>" . date("M-d-Y H:i:s",   (  filemtime("index.php")+( date("Z",filemtime("index.php"))/3600 )   )   ) . " UTC/GMT</b> - <b>[</b><a href=\"./\">Home</a><b>]</b></address>";
 	echo "<address>maintained by <b>&lt;</b><a href=\"mailto:" . $coder_email . "\">" . $coder_email . "</a><b>&gt;</b> - <b>[</b><a href=\"./\">Home</a><b>]</b>";
 	echo "&nbsp;<br><font size=-2><b>";
-?>$Id: index.php,v 1.9 2002/10/02 11:17:19 nighty Exp $<?
+?>$Id: index.php,v 1.10 2002/10/02 11:27:52 nighty Exp $<?
 	echo "</b></font></address>\n";
 	echo "</body>\n";
 	echo "</html>\n";
@@ -75,7 +75,7 @@ $coder_email = "nighty@undernet.org";
 $coder_name = "nighty";
 
 ?>
-<!-- $Id: index.php,v 1.9 2002/10/02 11:17:19 nighty Exp $ //-->
+<!-- $Id: index.php,v 1.10 2002/10/02 11:27:52 nighty Exp $ //-->
 <html>
 <head>
 <title>Undernet GNUworld Interactive Installation Guide</title>
@@ -1609,10 +1609,10 @@ if ($subset=="C-1") {
 <h2>Getting Apache</h2>
 <pre>
 
-To get the latest Apache server, go to <a href="ftp://ftp.ovh.net/mirrors/ftp.apache.org/dist/httpd/" target=_blank>ftp://ftp.ovh.net/mirrors/ftp.apache.org/dist/httpd/</a>,
+To get the latest Apache server, go to <a href="http://mir2.ovh.net/ftp.apache.org/dist/httpd/" target=_blank>http://mir2.ovh.net/ftp.apache.org/dist/httpd/</a>,
 and take the latest <b>1.3.x</b>.
 
-Recommended version <a href="ftp://ftp.ovh.net/mirrors/ftp.apache.org/dist/httpd/apache_1.3.23.tar.gz">apache_1.3.23.tar.gz</a>.
+Recommended version <a href="http://mir2.ovh.net/ftp.apache.org/dist/httpd/apache_1.3.26.tar.gz">apache_1.3.26.tar.gz</a>.
 
 Put that, as <b>root</b> in your <b>/root</b> home directory.
 
@@ -1627,8 +1627,8 @@ if ($subset=="C-2") {
 
 To get the latest version of PHP, go to <a href="http://www.php.net/downloads.php" target=_blank>http://www.php.net/downloads.php</a>.
 
-Recommended version <a href="http://www.php.net/do_download.php?download_file=php-4.1.2.tar.gz">php-4.1.2.tar.gz</a>.
-CERT Security Advisory, you should upgrade to <b>php-4.1.2</b> for security reasons :
+Recommended version <a href="http://www.php.net/do_download.php?download_file=php-4.2.3.tar.gz">php-4.2.3.tar.gz</a>.
+CERT Security Advisory, you should upgrade to <b>php-4.2.3</b> for security reasons :
 	<a href="http://www.cert.org/advisories/CA-2002-05.html" target=_blank>http://www.cert.org/advisories/CA-2002-05.html</a>
 
 
@@ -1644,32 +1644,32 @@ if ($subset=="C-3") {
 <pre>
 
 <i>Side note: of course it's always best to be up to date with php and apache version
-if you have apache_1.3.24 or php-4.1.3 .. don't hesitate, take it ;)</i>
+if you have apache_1.3.27 or php-4.2.4 .. don't hesitate, take it ;)</i>
 
 I will be a bit short on it because :
 	- It should'nt need to be long ;)
 	- Apache and PHP documentations are way more complete than that one.
 
 
-	<?=$os?>:/root# <b>tar -xzf apache_1.3.23.tar.gz</b>
-	<?=$os?>:/root# <b>tar -xzf php-4.1.2.tar.gz</b>
-	<?=$os?>:/root# <b>cd apache_1.3.23/</b>
-	<?=$os?>:/root/apache_1.3.23# <b>./configure --prefix=/usr/local/apache</b>
-	<?=$os?>:/root/apache_1.3.23# <b>cd ../php-4.1.2/</b>
-	<?=$os?>:/root/php-4.1.2# <b>./configure --with-pgsql=/usr/local/pgsql --enable-track-vars --with-apache=../apache_1.3.23</b>
-	<?=$os?>:/root/php-4.1.2# <b>make</b>
-	<?=$os?>:/root/php-4.1.2# <b>make install</b>
-	<?=$os?>:/root/php-4.1.2# <b>cd ../apache_1.3.23/</b>
-	<?=$os?>:/root/apache_1.3.23# <b>./configure --prefix=/usr/local/apache --activate-module=src/modules/php4/libphp4.a</b>
-	<?=$os?>:/root/apache_1.3.23# <b>make</b>
-	<?=$os?>:/root/apache_1.3.23# <b>make install</b>
-	<?=$os?>:/root/apache_1.3.23# <b>cd ../php-4.1.2/</b>
-	<?=$os?>:/root/php-4.1.2# <b>cp php.ini-dist /usr/local/lib/php.ini</b>
+	<?=$os?>:/root# <b>tar -xzf apache_1.3.26.tar.gz</b>
+	<?=$os?>:/root# <b>tar -xzf php-4.2.3.tar.gz</b>
+	<?=$os?>:/root# <b>cd apache_1.3.26/</b>
+	<?=$os?>:/root/apache_1.3.26# <b>./configure --prefix=/usr/local/apache</b>
+	<?=$os?>:/root/apache_1.3.26# <b>cd ../php-4.2.3/</b>
+	<?=$os?>:/root/php-4.2.3# <b>./configure --with-pgsql=/usr/local/pgsql --enable-track-vars --with-apache=../apache_1.3.26</b>
+	<?=$os?>:/root/php-4.2.3# <b>make</b>
+	<?=$os?>:/root/php-4.2.3# <b>make install</b>
+	<?=$os?>:/root/php-4.2.3# <b>cd ../apache_1.3.26/</b>
+	<?=$os?>:/root/apache_1.3.26# <b>./configure --prefix=/usr/local/apache --activate-module=src/modules/php4/libphp4.a</b>
+	<?=$os?>:/root/apache_1.3.26# <b>make</b>
+	<?=$os?>:/root/apache_1.3.26# <b>make install</b>
+	<?=$os?>:/root/apache_1.3.26# <b>cd ../php-4.2.3/</b>
+	<?=$os?>:/root/php-4.2.3# <b>cp php.ini-dist /usr/local/lib/php.ini</b>
 
 You can possibly edit the file <b>/usr/local/lib/php.ini</b> if you want to tweak anything,
 actually this should not be needed here.
 
-	<?=$os?>:/root/php-4.1.2# <b>cd /usr/local/apache/htdocs/</b>
+	<?=$os?>:/root/php-4.2.3# <b>cd /usr/local/apache/htdocs/</b>
 	<?=$os?>:/usr/local/apache/htdocs# <b>chmod 711 ~gnuworld</b>
 	<?=$os?>:/usr/local/apache/htdocs# <b>chmod 711 ~gnuworld/website</b>
 	<?=$os?>:/usr/local/apache/htdocs# <b>chmod 755 ~gnuworld/website/php_includes</b>
