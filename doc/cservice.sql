@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------------
--- "$Id: cservice.sql,v 1.66 2002/03/31 19:38:05 gte Exp $"
+-- "$Id: cservice.sql,v 1.67 2002/04/01 22:02:58 gte Exp $"
 -- Channel service DB SQL file for PostgreSQL.
 
 -- ChangeLog:
@@ -180,7 +180,7 @@ CREATE TABLE users (
 	url  VARCHAR(128),
 -- Which question the user provided the answer too from the signup page.
 	question_id INT2,
--- The answer to the question.
+-- The answer to the question. 42?
 	verificationdata VARCHAR(30), 
 	language_id INT4 CONSTRAINT language_channel_id_ref REFERENCES languages (id),
 	public_key TEXT,
@@ -190,6 +190,7 @@ CREATE TABLE users (
 -- 0x00 02 -- Logged in (Depricated).
 -- 0x00 04 -- Invisible.
 -- 0x00 08 -- Fraud username.
+-- 0x00 10 -- "No-Notes" - We don't want to be sent notes.
 	last_updated_by VARCHAR (128),		-- nick!user@host
 	last_updated INT4 NOT NULL, 
 	deleted INT2 DEFAULT '0',
@@ -425,6 +426,17 @@ CREATE INDEX noreg_user_name_idx ON noreg (lower(user_name));
 CREATE INDEX noreg_email_idx ON noreg (lower(email));
 CREATE INDEX noreg_channel_name_idx ON noreg (lower(channel_name));
 CREATE INDEX noreg_expire_time_idx ON noreg (expire_time);
+
+CREATE TABLE notes (
+	message_id SERIAL,
+	user_id INT4 CONSTRAINT users_notes_ref REFERENCES users( id ),
+	from_user_id INT4 CONSTRAINT users_notes_ref REFERENCES users( id ),
+	message VARCHAR( 300 ),
+	last_updated INT4 NOT NULL,
+
+	PRIMARY KEY(message_id, user_id)
+);
+
 
 --CREATE TABLE mailq (	
 --	user_id INT4 CONSTRAINT mailq_users_ref REFERENCES users(id),
