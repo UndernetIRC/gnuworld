@@ -1,7 +1,7 @@
 /**
  * mtrie.cc
  *
- * $Id: mtrie.cc,v 1.4 2003/07/29 04:43:51 dan_karrels Exp $
+ * $Id: mtrie.cc,v 1.5 2003/08/02 01:40:16 dan_karrels Exp $
  */
 
 #include	<string>
@@ -18,8 +18,10 @@ using namespace gnuworld ;
 ELog gnuworld::elog ;
 
 void		printHelp() ;
-void		handleSearch( const string& line ) ;
-void		handleErase( const string& line ) ;
+void		handleSearch( const StringTokenizer& ) ;
+void		handleErase( const StringTokenizer& ) ;
+void		handleLevelDebug( const StringTokenizer& ) ;
+void		handleMinLength( const StringTokenizer& ) ;
 
 MTrie< string > hostTrie ;
 
@@ -127,13 +129,21 @@ do
 		}
 	else if( st[ 0 ] == "search" )
 		{
-		handleSearch( line ) ;
+		handleSearch( st ) ;
 		}
 	else if( st[ 0 ] == "erase" )
 		{
-		handleErase( line ) ;
+		handleErase( st ) ;
 		}
-	else if( st[ 0 ] == "exit" )
+	else if( st[ 0 ] == "leveldebug" )
+		{
+		handleLevelDebug( st ) ;
+		}
+	else if( st[ 0 ] == "minlength" )
+		{
+		handleMinLength( st ) ;
+		}
+	else if( st[ 0 ] == "exit" || st[ 0 ] == "quit" )
 		{
 		}
 	else
@@ -144,7 +154,7 @@ do
 		}
 
 	cout	<< endl ;
-	} while( (line != "exit") ) ;
+	} while( (line != "exit") && (line != "quit") ) ;
 
 return 0 ;
 }
@@ -155,19 +165,28 @@ cout	<< endl
 	<< "--- Help menu ---"
 	<< endl
 	<< endl
-	<< "help:\t\tThis menu"
+	<< "help\t\t\tThis menu"
 	<< endl
-	<< "search <mask>:\tSearch for a given mask"
+	<< "exit/quit\t\tTerminate program"
+	<< endl
+	<< "search <mask>\t\tSearch for a given mask"
+	<< endl
+	<< "erase <mask>\t\tErase all values matching the given mask"
+	<< endl
+	<< "leveldebug <level num>\tReport information about a given "
+	<< "level"
+	<< endl
+	<< "minlength <min length>\tFind keys with at least <min "
+	<< "length> tokens"
 	<< endl ;
 }
 
-void handleSearch( const string& line )
+void handleSearch( const StringTokenizer& st )
 {
 //cout	<< "handleSearch> line: "
 //	<< line
 //	<< endl ;
 
-StringTokenizer st( line ) ;
 if( st.size() != 2 )
 	{
 	cout	<< "Error: Search requires exactly 1 argument"
@@ -193,9 +212,8 @@ cout	<< "Search found "
 	<< endl ;
 }
 
-void handleErase( const string& line )
+void handleErase( const StringTokenizer& st )
 {
-StringTokenizer st( line ) ;
 if( st.size() != 2 )
 	{
 	cout	<< "Error: Erase requires exactly 1 argument"
@@ -208,4 +226,53 @@ clog	<< "Erased "
 	<< eraseCount
 	<< " element(s)"
 	<< endl ;
+}
+
+void handleLevelDebug( const StringTokenizer& st )
+{
+if( st.size() != 2 )
+	{
+	cout	<< "Error: leveldebug requires exactly 1 argument"
+		<< endl ;
+	return ;
+	}
+
+size_t searchLevel = static_cast< size_t >( atoi( st[ 1 ].c_str() ) ) ;
+
+hostTrie.levelDebug( clog, searchLevel ) ;
+}
+
+void handleMinLength( const StringTokenizer& st )
+{
+if( st.size() != 2 )
+	{
+	cout	<< "Error: maxlength requires exactly 1 argument"
+		<< endl ;
+	return ;
+	}
+
+size_t minLength = static_cast< size_t >( atoi( st[ 1 ].c_str() ) ) ;
+
+list< string > maxLengthStrings = hostTrie.findMinLength( minLength ) ;
+if( !maxLengthStrings.empty() )
+	{
+	clog	<< "Found "
+		<< maxLengthStrings.size()
+		<< " hostnames with at least "
+		<< minLength
+		<< " tokens."
+		<< endl
+		<< endl ;
+	}
+
+for( list< string >::const_iterator itr = maxLengthStrings.begin() ;
+	itr != maxLengthStrings.end() ; ++itr )
+	{
+	StringTokenizer tokens( *itr, '.' ) ;
+	clog	<< "Length: "
+		<< tokens.size()
+		<< ", key: "
+		<< *itr
+		<< endl ;
+	}
 }

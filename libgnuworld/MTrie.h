@@ -1,7 +1,7 @@
 /**
  * MTrie.h
  *
- * $Id: MTrie.h,v 1.7 2003/07/29 04:43:50 dan_karrels Exp $
+ * $Id: MTrie.h,v 1.8 2003/08/02 01:40:16 dan_karrels Exp $
  */
 
 #ifndef __MTRIE_H
@@ -87,23 +87,52 @@ public:
 	 */
 	virtual size_type		erase( const string& key ) ;
 
+	/**
+	 * Produce output about for each node in the trie in the
+	 * following format:
+	 * <level number> <nodesmap size> <valueslist size>
+	 * This method is used for statistical analysis.
+	 */
 	virtual void			dumpDebug( std::ostream& ) const ;
 
+	/**
+	 * Send the key of each node at the given level to the
+	 * output stream.  Also send the total number of values
+	 * under each subtree at those nodes.
+	 */
+	virtual void	levelDebug( std::ostream&, size_t searchLevel )
+				const ;
+
+	/**
+	 * Return all keys that have at least as many tokens as
+	 * minLength.
+	 */
+	virtual list< string >	findMinLength( size_t minLength )
+				const ;
 protected:
+
+	/// Recursive helper method to the public levelDebug()
+	virtual void	levelDebug( std::ostream&, size_t currentLevel,
+				size_t searchLevel,
+				const MTrie< data_type >* ) const ;
+
+	/// Return the total number of values under the given node
+	virtual size_t	value_size( const MTrie< data_type >* ) const ;
+
+	/// Recursive helper method to the public findMinLength()
+	virtual void	findMinLength( size_t minLength,
+				list< string >& retMe,
+				const MTrie< data_type >* ) const ;
 
 	/**
 	 * Recursive find method that handles all the hard work
 	 * matching across multiple levels.
 	 */
 	virtual void	find( const MTrie< data_type >*,
-//				list< value_type >&,
-//				list< string >&,
 				const string& origKey,
 				const StringTokenizer&,
 				StringTokenizer::const_reverse_iterator )
 				const ;
-
-//				const string& key ) const ;
 
 	/**
 	 * Recursive erase method that handles all the hard work
@@ -125,8 +154,6 @@ protected:
 	 * strings.
 	 */
 	virtual void	recursiveFind( const MTrie< data_type >*,
-//				list< string >& base,
-//				list< value_type >& returnMe,
 				const string& key ) const ;
 
 	/**
@@ -174,7 +201,19 @@ protected:
 	/// The structure used to store levels in the trie
 	nodesMapType		nodesMap ;
 
+	/**
+	 * This variable is used in find() and erase() to reduce the 
+	 * number of arguments passed to the internal recursive methods.
+	 * It stores the current key associated with the node
+	 * being examined.
+	 */
 	mutable list< string >	base ;
+
+	/**
+	 * This variable is used in find() and erase() to reduce the 
+	 * number of arguments passed to the internal recursive methods.
+	 * It stores the values to be returned from the methods.
+	 */
 	mutable list< value_type >	returnMe ;
 } ;
 

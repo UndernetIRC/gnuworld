@@ -1,7 +1,7 @@
 /**
  * MTrie.cc
  *
- * $Id: MTrie.cc,v 1.10 2003/08/01 01:06:33 dan_karrels Exp $
+ * $Id: MTrie.cc,v 1.11 2003/08/02 01:40:16 dan_karrels Exp $
  */
 
 #include	<map>
@@ -654,3 +654,93 @@ out	<< levelNum << ' '
 	<< endl ;
 }
 
+template< typename _valueT >
+void MTrie< _valueT >::levelDebug( ostream& out, size_t searchLevel )
+	const
+{
+out	<< "Searching for level "
+	<< searchLevel
+	<< endl ;
+levelDebug( out, 0, searchLevel, this ) ;
+}
+
+template< typename _valueT >
+void MTrie< _valueT >::levelDebug( ostream& out, size_t currentLevel,
+	size_t searchLevel, const MTrie< _valueT >* currentNode ) const
+{
+if( (currentLevel + 1) == searchLevel )
+	{
+	// Next level is the winner
+	for( const_nodes_iterator nItr = currentNode->nodesMap.begin() ;
+		nItr != currentNode->nodesMap.end() ; ++nItr )
+		{
+		out	<< "Key: "
+			<< nItr->first
+			<< ", number of values: "
+			<< value_size( nItr->second )
+			<< endl ;
+		}
+	}
+else
+	{
+	for( const_nodes_iterator nItr = currentNode->nodesMap.begin() ;
+		nItr != currentNode->nodesMap.end() ; ++nItr )
+		{
+		levelDebug( out, currentLevel + 1, searchLevel,
+			currentNode ) ;
+		}
+	}
+}
+
+template< typename _valueT >
+size_t MTrie< _valueT >::value_size( const MTrie< _valueT >* currentNode )
+	const
+{
+size_t returnMe = currentNode->valuesList.size() ;
+for( const_nodes_iterator nItr = currentNode->nodesMap.begin() ;
+	nItr != currentNode->nodesMap.end() ; ++nItr )
+	{
+	returnMe += value_size( nItr->second ) ;
+	}
+return returnMe ;
+}
+
+template< typename _valueT >
+list< string >
+MTrie< _valueT >::findMinLength( size_t minLength ) const
+{
+base.clear() ;
+list< string > retMe ;
+
+findMinLength( minLength, retMe, this ) ;
+
+return retMe ;
+}
+
+template< typename _valueT >
+void
+MTrie< _valueT >::findMinLength( size_t minLength,
+	list< string >& retMe,
+	const MTrie< _valueT >* currentNode ) const
+{
+if( (base.size() >= minLength) && !currentNode->valuesList.empty() )
+	{
+	// We are at or past the min length, and this node
+	// has at least one value to add
+	// Only one entry into returnMe is necessary
+	retMe.push_back( getBase( base ) ) ;
+	}
+else
+	{
+	// Continue to all subnodes
+	for( const_nodes_iterator nItr = currentNode->nodesMap.begin() ;
+		nItr != currentNode->nodesMap.end() ; ++nItr )
+		{
+		base.push_front( nItr->first ) ;
+		findMinLength( minLength,
+			retMe,
+			nItr->second ) ;
+		base.pop_front() ;
+		}
+	}
+}

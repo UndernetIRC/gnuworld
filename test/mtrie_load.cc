@@ -1,7 +1,7 @@
 /**
  * mtrie_load.cc
  *
- * $Id: mtrie_load.cc,v 1.1 2003/07/29 04:43:51 dan_karrels Exp $
+ * $Id: mtrie_load.cc,v 1.2 2003/08/02 01:40:16 dan_karrels Exp $
  */
 
 #include	<map>
@@ -29,13 +29,20 @@ using namespace gnuworld ;
 
 ELog gnuworld::elog ;
 
+MTrie< string >* hostTrie = 0 ;
+
+typedef multimap< string, string, noCaseCompare > hostMapType ;
+hostMapType* hostMap = 0 ;
+
+list< pair< string, string > > mm_find( const string& ) ;
+
 void usage( const string& progName )
 {
 cout	<< "Usage: "
 	<< progName
 	<< " -f <socket log file> [options]"
 	<< endl ;
-clog	<< endl
+cout	<< endl
 	<< "Options: "
 	<< endl
 	<< "-q\tRun quietly"
@@ -65,11 +72,6 @@ string socketFileName ;
 string matchFileName ;
 vector< string > matchStrings ;
 
-MTrie< string >* hostTrie = 0 ;
-
-typedef multimap< string, string, noCaseCompare > hostMapType ;
-hostMapType* hostMap = 0 ;
-
 int c = 0 ;
 while( (c = getopt( argc, argv, "qn:f:m:t" )) != EOF )
 	{
@@ -92,7 +94,7 @@ while( (c = getopt( argc, argv, "qn:f:m:t" )) != EOF )
 			useTrie = true ;
 			break ;
 		default:
-			clog	<< "Unknown option: "
+			cout	<< "Unknown option: "
 				<< c
 				<< endl ;
 			return -1 ;
@@ -101,7 +103,7 @@ while( (c = getopt( argc, argv, "qn:f:m:t" )) != EOF )
 
 if( socketFileName.empty() )
 	{
-	clog	<< "Error: You must specify a socket file"
+	cout	<< "Error: You must specify a socket file"
 		<< endl ;
 	usage( argv[ 0 ] ) ;
 	return 0 ;
@@ -109,7 +111,7 @@ if( socketFileName.empty() )
 
 if( matchFileName.empty() )
 	{
-	clog	<< "Error: You must specify a match strings file"
+	cout	<< "Error: You must specify a match strings file"
 		<< endl ;
 	usage( argv[ 0 ] ) ;
 	return 0 ;
@@ -143,7 +145,7 @@ else
 	hostMap = new hostMapType ;
 	}
 
-clog	<< endl
+cout	<< endl
 	<< "Socket file: "
 	<< socketFileName << endl
 	<< "Match file: "
@@ -157,7 +159,7 @@ clog	<< endl
 	<< (useTrie ? "matching trie" : "multimap")
 	<< endl ;
 
-clog	<< endl
+cout	<< endl
 	<< "Reading match file..." ;
 
 size_t numFound = 0 ;
@@ -174,12 +176,12 @@ while( getline( matchFile, line ) )
 	}
 matchFile.close() ;
 
-clog	<< "Read "
+cout	<< "Read "
 	<< numFound
 	<< " match strings"
 	<< endl ;
 
-clog	<< "Reading socket file..." ;
+cout	<< "Reading socket file..." ;
 
 numFound = 0 ;
 while( getline( socketFile, line ) )
@@ -227,7 +229,7 @@ while( getline( socketFile, line ) )
 	} // while( getline() )
 socketFile.close() ;
 
-clog	<< numFound
+cout	<< numFound
 	<< " hosts"
 	<< endl ;
 
@@ -235,7 +237,7 @@ clock_t startTime = 0 ;
 clock_t stopTime = 0 ;
 clock_t totalTime = 0 ;
 
-clog.flush() ;
+cout.flush() ;
 for( vector< string >::const_iterator vItr = matchStrings.begin() ;
 	vItr != matchStrings.end() ; ++vItr )
 	{
@@ -243,11 +245,11 @@ for( vector< string >::const_iterator vItr = matchStrings.begin() ;
 
 	if( verbose )
 		{
-		clog	<< endl
+		cout	<< endl
 			<< "Match string: "
 			<< findMe
 			<< endl ;
-		clog.flush() ;
+		cout.flush() ;
 		}
 
 	if( useTrie )
@@ -264,24 +266,7 @@ for( vector< string >::const_iterator vItr = matchStrings.begin() ;
 		startTime = clock() ;
 		for( size_t i = 0 ; i < numIterations ; ++i )
 			{
-			// Must perform a linear search for
-			// this structure if either '?' or '*'
-			// is present.
-			if( findMe.find( '?' ) != string::npos ||
-				findMe.find( '*' ) != string::npos )
-				{
-				for( hostMapType::const_iterator hmItr =
-					hostMap->begin() ;
-					hmItr != hostMap->end() ;
-					++hmItr )
-					{
-					match( findMe, hmItr->first ) ;
-					}
-				}
-			else
-				{
-				hostMap->find( findMe ) ;
-				}
+			mm_find( findMe ) ;
 			} // for( i )
 		stopTime = clock() ;
 		}
@@ -289,17 +274,17 @@ for( vector< string >::const_iterator vItr = matchStrings.begin() ;
 
 	if( verbose )
 		{
-		clog	<< "Time: "
+		cout	<< "Time: "
 			<< (stopTime - startTime)
 			<< " clocks, "
 			<< ((stopTime - startTime) / CLOCKS_PER_SEC)
 			<< " seconds"
 			<< endl ;
-		clog.flush() ;
+		cout.flush() ;
 		}
 	} // for( vItr )
 
-clog	<< endl
+cout	<< endl
 	<< "Performed "
 	<< numIterations
 	<< " iterations"
@@ -317,4 +302,40 @@ delete hostTrie ; hostTrie = 0 ;
 delete hostMap ; hostMap = 0 ;
 
 return 0 ;
+}
+
+list< pair< string, string > > mm_find( const string& findMe )
+{
+list< pair< string, string > > returnMe ;
+
+// Must perform a linear search for
+// this structure if either '?' or '*'
+// is present.
+if( findMe.find( '?' ) != string::npos ||
+	findMe.find( '*' ) != string::npos )
+	{
+	for( hostMapType::const_iterator hmItr =
+		hostMap->begin() ;
+		hmItr != hostMap->end() ;
+		++hmItr )
+		{
+		if( !match( findMe, hmItr->first ) )
+			{
+			returnMe.push_back( make_pair(
+				hmItr->first, hmItr->second ) ) ;
+			}
+		} // for( hmItr )
+	} // if( '?' || '*' )
+else
+	{
+	hostMapType::const_iterator hmItr = hostMap->find( findMe ) ;
+	for( ; (hmItr != hostMap->end()) && (hmItr->first == findMe) ;
+		++hmItr )
+		{
+		returnMe.push_back( make_pair(
+				hmItr->first, hmItr->second ) ) ;
+		}
+	} // else()
+
+return returnMe ;
 }
