@@ -125,8 +125,6 @@ int dronescan::BurstChannels()
 	MyUplink->JoinChannel(this, consoleChannel,
 		dronescanConfig->Require("consoleChannelModes")->second);
 
-	MyUplink->RegisterChannelEvent(consoleChannel, this);
-
 	/* We need to assign a clientData to all xClients on this xServer */
 	xNetwork::const_localClientIterator itr = Network->localClient_begin();
 	for( ; itr != Network->localClient_end(); ++itr )
@@ -158,7 +156,6 @@ int dronescan::OnEvent( const eventType& theEvent,
 		{
 		case EVT_BURST_CMPLT :
 			{
-			elog << "Got BURST_CMPLT" << endl;
 			log(DEBUG, "Caught EOB. Resetting frequencies.");
 			changeState(RUN);
 			break;
@@ -276,9 +273,26 @@ int dronescan::OnPrivateMessage( iClient* theClient, const string& message, bool
 	
 	string command = string_upper(st[0]);
 	
+	if("INVITE" == command)
+		{
+		Invite(theClient, consoleChannel);
+		return 0;
+		}
+	
 	if("STATS" == command)
 		{
 		Reply(theClient, "Allocated custom data: %d", customDataCounter);
+		if(1)
+			Reply(theClient, "CM/NM/CC: %0.2lf/%0.2lf/%d",
+				channelMargin,
+				nickMargin,
+				channelCutoff
+				);
+		if(testEnabled(TST_JOINCOUNT))
+			Reply(theClient, "jcI/jcC : %d/%d",
+				jcInterval,
+				jcCutoff
+				);
 		return 0;
 		}
 	
@@ -317,13 +331,14 @@ int dronescan::OnPrivateMessage( iClient* theClient, const string& message, bool
 		if("CM" == option)
 			{
 			double newCM = atof(st[2].c_str());
+			if(newCM < 0 || newCM > 1) return 0;
 			channelMargin = newCM;
 			resetAndCheck();
 			}
 		if("NM" == option)
 			{
 			double newNM = atof(st[2].c_str());
-//			if(newNM <= 0 || newNM >= 1) return 0;
+			if(newNM < 0 || newNM > 1) return 0;
 			nickMargin = newNM;
 			resetAndCheck();
 			}
@@ -554,7 +569,7 @@ double dronescan::calculateEntropy( const string& theString )
 
 
 /** Decide whether a channel is `abnormal'. */
-unsigned int dronescan::isAbnormal( const Channel* theChannel)
+unsigned int dronescan::isAbnormal( const Channel* theChannel )
 {
 	if(theChannel->size() < channelCutoff) return 0;
 	
@@ -580,7 +595,7 @@ unsigned int dronescan::isAbnormal( const Channel* theChannel)
 
 
 /** Check whether an iClient's nick is `normal'. */
-bool dronescan::isNormal( const iClient* theClient)
+bool dronescan::isNormal( const iClient* theClient )
 {
 	/* We should never see this called during BURST */
 	assert(currentState != BURST);
@@ -646,7 +661,7 @@ CLIENT_STATE dronescan::setClientState( iClient *theClient )
 /** Log a message. */
 void dronescan::log(LOG_TYPE logType, char *format, ...)
 {
-//	if(logType < INFO) return;
+	if(logType < INFO) return;
 	
 	stringstream newMessage;
 	
