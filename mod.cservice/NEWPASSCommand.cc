@@ -10,7 +10,7 @@
 #include	"responses.h" 
 #include	"networkData.h"
 
-const char NEWPASSCommand_cc_rcsId[] = "$Id: NEWPASSCommand.cc,v 1.1 2001/01/19 02:29:31 gte Exp $" ;
+const char NEWPASSCommand_cc_rcsId[] = "$Id: NEWPASSCommand.cc,v 1.2 2001/01/19 02:46:24 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -23,7 +23,7 @@ bool NEWPASSCommand::Exec( iClient* theClient, const string& Message )
 	const char validChars[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.$*_";
  
 	StringTokenizer st( Message ) ;
-	if( st.size() < 3 )
+	if( st.size() < 2 )
 	{
 		Usage(theClient);
 		return true;
@@ -39,16 +39,6 @@ bool NEWPASSCommand::Exec( iClient* theClient, const string& Message )
 		return false;
 	}
  
-	/*
-	 *  First, check the two supplied passwords match.
-	 */
-
-	if (st[1] != st[2])
-	{
-		bot->Notice(theClient, "Those passwords don't match. However, this proves you are honest and didn't copy and paste.");
-		return false;
-	}
-
 	/* Work out some salt. */
 	string salt;
 	int i;
