@@ -379,15 +379,20 @@ else
 		
 		// Send a silence numeric target, and mask to ignore
 		// messages from this user.
+		string silenceMask = "*!*" + theClient->getUserName() + "@" + theClient->getInsecureHost();
+
 		strstream s;
-		s	<< getCharYYXXX() << " SILENCE "
-			<< theClient->getCharYYXXX() << " *!*" 
-			<< theClient->getUserName() << "@"
-			<< theClient->getInsecureHost()
-			<< ends; 
+	 	s << getCharYYXXX() 
+	 	<< " SILENCE " 
+	 	<< theClient->getCharYYXXX() 
+	 	<< " " 
+	 	<< silenceMask << ends; 
 		Write( s );
 		delete[] s.str();
-		
+
+		time_t expireTime = currentTime() + 3600
+		silenceList.push_back(make_pair(expireTime, silenceMask));
+	 
 		logAdminMessage("MSG-FLOOD from %s",
 			theClient->getNickUserHost().c_str());
 		return true;
@@ -564,7 +569,7 @@ else if(Command == "VERSION")
 	xClient::DoCTCP(theClient, CTCP,
 		"Undernet P10 Channel Services Version 2 ["
 		__DATE__ " " __TIME__
-		"] ($Id: cservice.cc,v 1.85 2001/02/05 00:44:09 gte Exp $)");
+		"] ($Id: cservice.cc,v 1.86 2001/02/06 18:55:42 gte Exp $)");
 	}
 else if(Command == "PROBLEM?")
 	{
@@ -1761,6 +1766,36 @@ while (ptr != banList->end())
 	
 	return false;
 }
+
+int cservice::OnWhois( iClient* sourceClient,
+			iClient* targetClient )
+{
+	/*
+	 *  Return info about 'targetClient' to 'sourceClient'
+	 */
+//:uworld.eu.undernet.org 311 Gte- Gte- Gte atomicrevs.demon.co.uk * :I am the one that was.
+	strstream s;
+	s << getCharYY() << " 311 " 
+	<< sourceClient->getCharYYXXX() 
+	<< " " << targetClient->getNickName()
+	<< " " << targetClient->getUserName()
+	<< " " << targetClient->getInsecureHost() << " * :" << ends; 
+	Write( s );
+	delete[] s.str();
+
+	strstream s1;
+	s1 << getCharYY() << " 318 " 
+	<< sourceClient->getCharYYXXX() 
+	<< " " << targetClient->getNickName()
+	<< " :End of /WHOIS list." << ends;
+
+	Write( s1 );
+	delete[] s1.str();
+
+
+	return 0;
+}
+
 
 /*--doAutoTopic---------------------------------------------------------------
  *

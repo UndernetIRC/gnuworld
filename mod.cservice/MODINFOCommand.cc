@@ -13,7 +13,7 @@
  * Shouldn't really happen, as trying to MODINFO a forced access doesn't
  * make sense - adduser and then MODINFO that :)
  *
- * $Id: MODINFOCommand.cc,v 1.10 2001/01/30 03:02:46 gte Exp $
+ * $Id: MODINFOCommand.cc,v 1.11 2001/02/06 18:55:42 gte Exp $
  */
 
 #include	<string>
@@ -23,7 +23,7 @@
 #include	"cservice.h" 
 #include	"levels.h"
 
-const char MODINFOCommand_cc_rcsId[] = "$Id: MODINFOCommand.cc,v 1.10 2001/01/30 03:02:46 gte Exp $" ;
+const char MODINFOCommand_cc_rcsId[] = "$Id: MODINFOCommand.cc,v 1.11 2001/02/06 18:55:42 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -177,8 +177,8 @@ bool MODINFOCommand::Exec( iClient* theClient, const string& Message )
 			sqlLevel* aLevel = bot->getLevelRecord(targetUser, theChan);
 			aLevel->removeFlag(sqlLevel::F_AUTOVOICE);
 			aLevel->setFlag(sqlLevel::F_AUTOOP); 
-			aLevel->setLastModif(bot->currentTime());
-			aLevel->setLastModifBy(theClient->getNickUserHost());
+//			aLevel->setLastModif(bot->currentTime());
+//			aLevel->setLastModifBy(theClient->getNickUserHost());
  
 			// Only commit changes if this has been loaded from the Db.
 			// (Ie: If its a forced temporary access, this flag won't be set)..
@@ -194,8 +194,8 @@ bool MODINFOCommand::Exec( iClient* theClient, const string& Message )
 			sqlLevel* aLevel = bot->getLevelRecord(targetUser, theChan);
 			aLevel->removeFlag(sqlLevel::F_AUTOOP);
 			aLevel->setFlag(sqlLevel::F_AUTOVOICE); 
-			aLevel->setLastModif(bot->currentTime());
-			aLevel->setLastModifBy(theClient->getNickUserHost());
+//			aLevel->setLastModif(bot->currentTime());
+//			aLevel->setLastModifBy(theClient->getNickUserHost());
  
 			// Only commit changes if this has been loaded from the Db.
 			// (Ie: If its a forced temporary access, this flag won't be set)..
@@ -211,8 +211,8 @@ bool MODINFOCommand::Exec( iClient* theClient, const string& Message )
 			sqlLevel* aLevel = bot->getLevelRecord(targetUser, theChan);			
 			aLevel->removeFlag(sqlLevel::F_AUTOOP);
 			aLevel->removeFlag(sqlLevel::F_AUTOVOICE);
-			aLevel->setLastModif(bot->currentTime());
-			aLevel->setLastModifBy(theClient->getNickUserHost());
+//			aLevel->setLastModif(bot->currentTime());
+//			aLevel->setLastModifBy(theClient->getNickUserHost());
  
 			// Only commit changes if this has been loaded from the Db.
 			// (Ie: If its a forced temporary access, this flag won't be set)..

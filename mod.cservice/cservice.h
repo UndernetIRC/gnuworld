@@ -1,5 +1,5 @@
 #ifndef __CSERVICE_H
-#define __CSERVICE_H "$Id: cservice.h,v 1.40 2001/02/04 04:09:20 gte Exp $"
+#define __CSERVICE_H "$Id: cservice.h,v 1.41 2001/02/06 18:55:42 gte Exp $"
 
 #include	<string>
 #include	<vector>
@@ -81,6 +81,8 @@ public:
 	virtual int Notice( const iClient* Target,
 		const char* Message, ... ) ; 
 	virtual int Notice( const iClient* Target, const string& ) ;
+	virtual int OnWhois( iClient* sourceClient,
+			iClient* targetClient ); 
 
 	// Sends a notice to a channel from the server.
 	bool serverNotice( Channel*, const char*, ... );

@@ -8,7 +8,7 @@
  *
  * Caveats: None.
  *
- * $Id: LBANLISTCommand.cc,v 1.4 2001/01/31 19:53:25 gte Exp $
+ * $Id: LBANLISTCommand.cc,v 1.5 2001/02/06 18:55:42 gte Exp $
  */
 
 #include	<string>
@@ -22,7 +22,7 @@
  
 #define MAX_RESULTS 15
 
-const char LBANLISTCommand_cc_rcsId[] = "$Id: LBANLISTCommand.cc,v 1.4 2001/01/31 19:53:25 gte Exp $" ;
+const char LBANLISTCommand_cc_rcsId[] = "$Id: LBANLISTCommand.cc,v 1.5 2001/02/06 18:55:42 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -48,10 +48,6 @@ bool LBANLISTCommand::Exec( iClient* theClient, const string& Message )
 	    bot->Notice(theClient, "Sorry, %s isn't registered with me.", st[1].c_str());
 	    return false;
 	} 
-	// Is the user authorised?
-	 
-	sqlUser* theUser = bot->isAuthed(theClient, true);
-	if(!theUser) return false;
  
 	bool showAll = false; /* Show all results? */
 	for( StringTokenizer::const_iterator ptr = st.begin() ; ptr != st.end() ;
