@@ -1,4 +1,4 @@
--- 2001-03-02 |MrBean| "$Id: ccontrol.help.sql,v 1.7 2002/01/02 22:22:21 mrbean_ Exp $"
+-- 2001-03-02 |MrBean| "$Id: ccontrol.help.sql,v 1.8 2002/03/01 23:35:24 gte Exp $"
 -- Created the file and added all help topics to the database
 
 -- 2201-03-11 |MrBean|
@@ -96,7 +96,7 @@ MODERATE		3	Syntax: /msg $BOT$ moderate <#channel>
 MODERATE		4	<#channel> -  the channel to moderate
 MODUSER		1	****** MODUSER COMMAND ******
 MODUSER		2	Modify an existing user
-MODUSER		3	Syntax: /msg $BOT$ moduser <handle> <-ah new host] <-dh host> <-s server> <-p password> <-gl on/off> <-op on/off> <-ua> <-uf new flags> <-e email> <-mt m/n>
+MODUSER		3	Syntax: /msg $BOT$ moduser <handle> <-ah new host] <-dh host> <-s server> <-p password> <-gl on/off> <-op on/off> <-ua> <-uf new flags> <-e email> <-mt m/n>
 MODUSER		4	-ah adds a new host for the user
 MODUSER		5	-dh removes a host for a user
 MODUSER		6	-s associate a user with the server;
