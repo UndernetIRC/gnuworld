@@ -13,6 +13,8 @@ COPY "translations" FROM stdin;
 1	7	The channel %s doesn't appear to be registered	31337
 1	8	You're opped by %s	31337
 1	9	You're voiced by %s	31337
+1	10	%s: You are not in that channel	31337
+1	11	%s is already opped on %s	31337
 \.
 
 
