@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: REMCOMMANDCommand.cc,v 1.12 2003/06/28 01:21:19 dan_karrels Exp $
+ * $Id: REMCOMMANDCommand.cc,v 1.13 2003/08/09 23:15:33 dan_karrels Exp $
  */
 
 #include	<string>
@@ -30,8 +30,9 @@
 #include	"StringTokenizer.h"
 #include 	"ccUser.h"
 #include	"misc.h"
+#include	"config.h"
 
-const char REMCOMMANDCommand_cc_rcsId[] = "$Id: REMCOMMANDCommand.cc,v 1.12 2003/06/28 01:21:19 dan_karrels Exp $";
+RCSTAG( "$Id: REMCOMMANDCommand.cc,v 1.13 2003/08/09 23:15:33 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {

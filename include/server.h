@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server.h,v 1.89 2003/08/04 20:49:24 dan_karrels Exp $
+ * $Id: server.h,v 1.90 2003/08/09 23:15:33 dan_karrels Exp $
  */
 
 #ifndef __SERVER_H
-#define __SERVER_H "$Id: server.h,v 1.89 2003/08/04 20:49:24 dan_karrels Exp $"
+#define __SERVER_H "$Id: server.h,v 1.90 2003/08/09 23:15:33 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
@@ -35,7 +35,7 @@
 #include	<ctime>
 #include	<cassert>
 
-#include	"Numeric.h"
+#include	"NetworkTarget.h"
 #include	"iServer.h"
 #include	"iClient.h"
 #include	"Buffer.h"
@@ -71,16 +71,12 @@ class Channel ;
  * This class is the server proper; it is responsible for the connection
  * to the IRC network, and for maintaining the services clients.
  */
-class xServer : public ConnectionManager, ConnectionHandler
+class xServer : public ConnectionManager,
+	public ConnectionHandler,
+	public NetworkTarget
 {
 
 protected:
-
-	/**
-	 * The type used to store server numerics for juped
-	 * servers.
-	 */
-	typedef vector< unsigned int > jupedServerListType ;
 
 	/**
 	 * The type of the structure to hold Gline's internally.
@@ -124,33 +120,6 @@ public:
 	 * methods for channel ban changes.
 	 */
 	typedef vector< pair< bool, string > > banVectorType ;
-
-	/**
-	 * The iterator type used to iterate through the structure
-	 * of juped servers.
-	 */
-	typedef jupedServerListType::iterator jupedServerIterator ;
-
-	/**
-	 * The const iterator type used to iterate through the
-	 * structure of juped servers.
-	 */
-	typedef jupedServerListType::const_iterator
-		const_jupedServerIterator ;
-
-	/**
-	 * Return a const iterator to the beginning of the juped
-	 * servers structure.
-	 */
-	inline const_jupedServerIterator jupedServers_begin() const
-		{ return jupedServers.begin() ; }
-
-	/**
-	 * Return a const iterator to the end of the juped
-	 * servers structure.
-	 */
-	inline const_jupedServerIterator jupedServers_end() const
-		{ return jupedServers.end() ; }
 
 	/**
 	 * The iterator type used to iterate through the
@@ -218,8 +187,12 @@ public:
 	/**
 	 * Attach a fake server to this services server.
 	 */
-	virtual bool AttachServer( iServer*,
-		const string& = "JUPED Server" ) ;
+	virtual bool AttachServer( iServer* ) ;
+
+	/**
+	 * Detach a fake server from the services server.
+	 */
+	virtual bool DetachServer( iServer* ) ;
 
 	/**
 	 * Squit a server from the network and remove it
@@ -335,11 +308,25 @@ public:
 	/* Client stuff */
 
 	/**
-	 * Attach a fake client to a fake (juped) server.
+	 * Attach a fake client to a this or a fake (juped) server.
 	 * The server must exist and must already be attached
-	 * to this server.
+	 * to this server.  Otherwise, if attaching to the current
+	 * server, it already exists :)
+	 * All integrity of the iClient will be verified: non-empty
+	 * nick/user/hostname, etc.  Also, if the nickname
+	 * is already in use on the network, then false will be
+	 * returned.
+	 * The client's intXXX/charXXX will be set by this method.
+	 * The xClient* is the owner to whom messages will be sent.
 	 */
-	virtual bool AttachClient( iClient* Client ) ;
+	virtual bool AttachClient( iClient* Client, xClient* = 0 ) ;
+
+	/**
+	 * Quit a hosted client from the network with the given
+	 * quit message.
+	 */
+	virtual bool DetachClient( iClient*,
+			const string& = string( "Exiting, moo" ) ) ;
 
 	/**
 	 * Attempt to load a client given its client module name.
@@ -452,7 +439,8 @@ public:
 	 * Handle the parting of a network client from a channel.  This method
 	 * updates internal tables.
 	 */
-	virtual void OnPartChannel( iClient* theClient, Channel* theChan ) ;
+	virtual void OnPartChannel( iClient* theClient,
+			Channel* theChan ) ;
 
 	/**
 	 * Output the information about an xClient to the network.
@@ -460,7 +448,17 @@ public:
 	 * reside on this xServer, false when it is to reside on
 	 * a juped/fake server.
 	 */
-	virtual void	BurstClient( xClient*, bool localClient = true ) ;
+	virtual void	BurstClient( xClient* ) ;
+
+	/**
+	 * Burst a (fake) client to the network.
+	 */
+	virtual void	BurstClient( iClient* ) ;
+
+	/**
+	 * Burst a (fake) server to the network.
+	 */
+	virtual void	BurstServer( iServer* ) ;
 
 	/**
 	 * Send a wallops to the network as the server.
@@ -646,38 +644,10 @@ public:
 	/* Numeric utility methods */
 
 	/**
-	 * Return an unsigned int representation of this server's
-	 * numeric server numeric.
-	 */
-	inline const unsigned int& getIntYY() const
-		{ return intYY ; }
-
-	/**
-	 * Return an unsigned int representation of this server's
-	 * maximum number of possible clients.
- 	 */
-	inline const unsigned int& getIntXXX() const
-		{ return intXXX ; }
-
-	/**
-	 * Return a character array representation of this server's
-	 * server numeric, base64.
-	 */
-	inline const char* getCharYY() const
-		{ return charYY ; }
-
-	/**
-	 * Return a character array representation of this server's
-	 * maximum number of possible clients, base 64.
-	 */
-	inline const char* getCharXXX() const
-		{ return charXXX ; }
-
-	/**
 	 * Return an unsigned int representation of this server's uplink's
 	 * server numeric.
 	 */
-	inline const unsigned int& getUplinkIntYY() const
+	inline const unsigned int getUplinkIntYY() const
 		{ return Uplink->getIntYY() ; }
 
 	/**
@@ -686,13 +656,6 @@ public:
 	 */
 	inline const string getUplinkCharYY() const
 		{ return Uplink->getCharYY() ; }
-
-	/**
-	 * Return a std::string representation of this server's full
-	 * numeric, base64.
-	 */
-	inline const string getCharYYXXX() const
-		{ return( string( charYY ) + charXXX ) ; }
 
 	/* General server utility methods */
 
@@ -731,6 +694,12 @@ public:
 	 */
 	inline iServer*		getUplink() const
 		{ return Uplink ; }
+
+	/**
+	 * Return a pointer to this server's iServer representation.
+	 */
+	inline iServer*		getMe() const
+		{ return me ; }
 
 	/**
 	 * Set this server's uplink.
@@ -901,11 +870,6 @@ public:
 	virtual void updateGlines() ;
 
 	/**
-	 * Check if a server is juped
-	 */
-	virtual bool isJuped( const iServer* ) const ;
-
-	/**
 	 * Burst out information about all xClients on this server.
 	 */
 	virtual void 	BurstClients() ;
@@ -919,12 +883,6 @@ public:
 	 * Output glines information for each client on this server.
 	 */
 	virtual void	BurstGlines() ;
-
-	/**
-	 * Deletes a juped server from the juped server list.
-	 * This does not alter the server itself.
-	 */
-	virtual bool	RemoveJupe( const iServer* );
 
 	/**
 	 * Return the length of time needed for the last burst.
@@ -1118,13 +1076,6 @@ protected:
 	string			UplinkName ;
 
 	/**
-	 * This vector holds the server numerics of any servers
-	 * that we are juping.  The actual iServer instances
-	 * are maintained by the xNetwork instance, Network.
-	 */
-	jupedServerListType	jupedServers ;
-
-	/**
 	 * The type used to store the system event map.
 	 */
 	typedef vector< list< xClient* > > eventListType ;
@@ -1214,33 +1165,15 @@ protected:
 	unsigned short int	Port ;
 
 	/**
-	 * This is the unsigned integer representation of our server numeric.
-	 */
-	unsigned int		intYY ;
-
-	/**
-	 * This is the unsigned integer representation of the max number
-	 * of clients we can accept.
-	 */
-	unsigned int		intXXX ;
-
-	/**
- 	 * This is the base 64 character array representation of this
-	 * server's numeric.
-	 */
-	char			charYY[ 3 ] ;
-
-	/**
-	 * This is the base 64 character array representation of this
-	 * server's maximum number of allowable clients.
-	 */
-	char			charXXX[ 4 ] ;
-
-	/**
 	 * This is a pointer into the network table to our uplink
 	 * server.  It is kept here for convenience.
 	 */
 	iServer* 		Uplink ;
+
+	/**
+	 * A pointer to the iServer* representation of this server.
+	 */
+	iServer*		me ;
 
 	/**
 	 * This buffer will hold data to be written during burst time.

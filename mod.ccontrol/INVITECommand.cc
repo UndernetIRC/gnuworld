@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: INVITECommand.cc,v 1.16 2003/06/28 01:21:19 dan_karrels Exp $
+ * $Id: INVITECommand.cc,v 1.17 2003/08/09 23:15:33 dan_karrels Exp $
  */
 
 #include	<string>
@@ -30,8 +30,9 @@
 #include	"StringTokenizer.h"
 #include	"Constants.h"
 #include	"Network.h"
+#include	"config.h"
 
-const char INVITECommand_cc_rcsId[] = "$Id: INVITECommand.cc,v 1.16 2003/06/28 01:21:19 dan_karrels Exp $";
+RCSTAG( "$Id: INVITECommand.cc,v 1.17 2003/08/09 23:15:33 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {

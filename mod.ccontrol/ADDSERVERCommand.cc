@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ADDSERVERCommand.cc,v 1.13 2003/06/28 01:21:19 dan_karrels Exp $
+ * $Id: ADDSERVERCommand.cc,v 1.14 2003/08/09 23:15:33 dan_karrels Exp $
  */
 
 #include	<string>
@@ -29,7 +29,7 @@
 #include	"Network.h"
 #include	"Constants.h"
 
-const char ADDSERVERCommand_cc_rcsId[] = "$Id: ADDSERVERCommand.cc,v 1.13 2003/06/28 01:21:19 dan_karrels Exp $";
+RCSTAG( "$Id: ADDSERVERCommand.cc,v 1.14 2003/08/09 23:15:33 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -100,7 +100,8 @@ if(CurServer)
 	NewServer->setLastConnected(CurServer->getConnectTime());
 	NewServer->setUplink((Network->findServer(CurServer->getIntYY()))->getName());
 	NewServer->setNetServer(CurServer);
-	bot->Write("%s V :%s\n",bot->getCharYYXXX().c_str(),CurServer->getCharYY());
+	bot->Write("%s V :%s\n",bot->getCharYYXXX().c_str(),
+		CurServer->getCharYY().c_str());
 	}
 NewServer->setAddedOn(::time(0));
 NewServer->setLastUpdated(::time(0));

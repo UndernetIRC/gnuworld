@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: CONFIGCommand.cc,v 1.6 2003/06/28 01:21:19 dan_karrels Exp $
+ * $Id: CONFIGCommand.cc,v 1.7 2003/08/09 23:15:33 dan_karrels Exp $
  */
 
 #include	<string>
@@ -24,8 +24,9 @@
 #include	"StringTokenizer.h"
 #include	"ccontrol.h"
 #include	"CControlCommands.h"
+#include	"config.h"
 
-const char CONFIGCommand_cc_rcsId[] = "$Id: CONFIGCommand.cc,v 1.6 2003/06/28 01:21:19 dan_karrels Exp $";
+RCSTAG( "$Id: CONFIGCommand.cc,v 1.7 2003/08/09 23:15:33 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {

@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: NOMODECommand.cc,v 1.4 2003/06/28 01:21:19 dan_karrels Exp $
+ * $Id: NOMODECommand.cc,v 1.5 2003/08/09 23:15:33 dan_karrels Exp $
  */
 
 #include	<string>
@@ -27,8 +27,9 @@
 #include	"StringTokenizer.h"
 #include	"Constants.h"
 #include	"ccBadChannel.h"
+#include	"config.h"
 
-const char NOMODECommand_cc_rcsId[] = "$Id: NOMODECommand.cc,v 1.4 2003/06/28 01:21:19 dan_karrels Exp $";
+RCSTAG( "$Id: NOMODECommand.cc,v 1.5 2003/08/09 23:15:33 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {

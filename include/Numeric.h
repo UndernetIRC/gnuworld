@@ -19,11 +19,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: Numeric.h,v 1.5 2002/05/27 17:18:12 dan_karrels Exp $
+ * $Id: Numeric.h,v 1.6 2003/08/09 23:15:33 dan_karrels Exp $
  */
 
 #ifndef __NUMERIC_H
-#define __NUMERIC_H "$Id: Numeric.h,v 1.5 2002/05/27 17:18:12 dan_karrels Exp $"
+#define __NUMERIC_H "$Id: Numeric.h,v 1.6 2003/08/09 23:15:33 dan_karrels Exp $"
 
 /*
  * Numeric nicks are new as of version ircu2.10.00beta1.
@@ -159,6 +159,19 @@ while (count > 0)
 	}
 
 return buf;
+}
+
+inline void splitbase64int( unsigned int intYYXXX,
+	unsigned int& intYY,
+	unsigned int& intXXX )
+{
+// Decompose to charYYXXX
+char charYYXXX[ 6 ] ;
+inttobase64( charYYXXX, intYYXXX, 5 ) ;
+
+// Now split the charYYXXX into two ints
+intYY = base64toint( charYYXXX, 2 ) ;
+intXXX = base64toint( &charYYXXX[ 2 ], 3 ) ;
 }
 
 inline const unsigned int combinebase64int( const unsigned int& intYY,

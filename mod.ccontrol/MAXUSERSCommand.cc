@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: MAXUSERSCommand.cc,v 1.3 2003/06/28 01:21:19 dan_karrels Exp $
+ * $Id: MAXUSERSCommand.cc,v 1.4 2003/08/09 23:15:33 dan_karrels Exp $
  */
 
 #include	<string>
@@ -25,8 +25,9 @@
 #include	"StringTokenizer.h"
 #include	"ccontrol.h"
 #include	"CControlCommands.h"
+#include	"config.h"
 
-const char MAXUSERSCommand_cc_rcsId[] = "$Id: MAXUSERSCommand.cc,v 1.3 2003/06/28 01:21:19 dan_karrels Exp $";
+RCSTAG( "$Id: MAXUSERSCommand.cc,v 1.4 2003/08/09 23:15:33 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {

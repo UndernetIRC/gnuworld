@@ -18,14 +18,15 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: Network.h,v 1.34 2002/11/20 17:56:16 mrbean_ Exp $
+ * $Id: Network.h,v 1.35 2003/08/09 23:15:33 dan_karrels Exp $
  */
 
 #ifndef __NETWORK_H
-#define __NETWORK_H "$Id: Network.h,v 1.34 2002/11/20 17:56:16 mrbean_ Exp $"
+#define __NETWORK_H "$Id: Network.h,v 1.35 2003/08/09 23:15:33 dan_karrels Exp $"
 
 #include	<vector>
 #include	<string>
+#include	<set>
 #include	<map>
 #include	<list>
 #include	<algorithm>
@@ -41,6 +42,7 @@
 namespace gnuworld
 {
 
+using std::set ;
 using std::string ;
 using std::vector ;
 using std::map ;
@@ -56,17 +58,69 @@ class xServer ;
  * first, but are actually very simple.
  * This is a big container class, mutated primarily by the
  * xServer instance.
+ *
+ * The following semantics about the addition and removal of
+ * fake clients and servers is followed:
+ *
+ * addFake{client,server}
+ * - Adds fake element of the {client,server}
+ * - Adds normal element of the {client,server}
+ *
+ * add{Client,Server}
+ * - Adds normal element of the {client,server}
+ *
+ * removeFake{client,server}
+ * - Removes fake element of {client,server}
+ * 
+ * remove{Client,Server}
+ * - Removes normal element of {client,server}
+ * - Removes fake element of {client,server}
+ *
+ * None of the remove* methods deallocate the {client,server}.
+ * This also means that OnSplit() will properly clean up even
+ * fake servers and clients.
  */
 class xNetwork
 {
+	/// Allow xServer to access this class's private
+	/// members/methods.
+	friend class xServer ;
 
 private:
+
+	/**
+	 * Type used to store all reserved intYY and intYYXXX's
+	 * for the local server and juped iClient/xClient/iServer's.
+	 * Keyed top level by the server's intYY, then each
+	 * set is keyed by intXXX for that particular server.
+	 */
+	typedef map< unsigned int, set< unsigned int > >
+		reservedNumericMapType ;
+
+	/**
+	 * This is an iterator type definition for the
+	 * reservedNumericMapType.
+	 */
+	typedef reservedNumericMapType::iterator 
+		reservedNumeric_iterator ;
+
+	/**
+	 * This type maps fake iClient's to their owning
+	 * xClient's, keyed by the iClient's intYYXXX numeric.
+	 */
+	typedef map< unsigned int, std::pair< iClient*, xClient* > >
+		fakeClientMapType ;
+
+	/**
+	 * This type stores fake (juped) servers.
+	 */
+	typedef map< unsigned int, iServer* >	fakeServerMapType ;
 
 	/**
 	 * This is the type of vector for storing
 	 * local (services) clients.
 	 */
-	typedef vector< xClient* > xClientVectorType ;
+	typedef map< unsigned int, xClient* > xClientMapType ;
 
 	/**
 	 * This is the type used to store the network Channel
@@ -121,6 +175,15 @@ public:
 	virtual bool		addClient( iClient* ) ;
 
 	/**
+	 * Add a fake client to this (or a juped) server.  The
+	 * xClient is the "owner" of the iClient.
+	 * This method will fill in the iClient's intXXX/charXXX,
+	 * but the intYY/charYY must be valid.
+	 */
+	virtual bool		addFakeClient( iClient* theClient,
+					xClient* ownerClient ) ;
+
+	/**
 	 * Add a services client to the network table.
 	 * This is stored in the table of local clients.
 	 * Returns false if the addition fails.
@@ -132,6 +195,13 @@ public:
 	 * Returns false if the addition fails.
 	 */
 	virtual bool		addServer( iServer* ) ;
+
+	/**
+	 * Add a new fake (juped) server to the structure
+	 * of fake servers.
+	 * Returns true on success, false on failure.
+	 */
+	virtual bool		addFakeServer( iServer* ) ;
 
 	/**
 	 * Add a new channel to the network table.
@@ -166,8 +236,10 @@ public:
 	 * Find a local (services) client by its numeric.
 	 * Returns NULL if not found.
 	 */
+/*
 	virtual xClient*	findLocalClient( const unsigned int& YY,
 					const unsigned int& XXX ) const ;
+*/
 
 	/**
 	 * Find a local (services) client by its character numeric.
@@ -182,10 +254,32 @@ public:
 	virtual xClient*	findLocalNick( const string& nickName ) const ;
 
 	/**
+	 * Lookup a fake (juped) iClient.
+	 */
+	virtual iClient*	findFakeClient( iClient* ) const ;
+
+	/**
+	 * Lookup a fake (juped) iClient by nickname.
+	 */
+	virtual iClient*	findFakeNick( const string& nickName ) const ;
+
+	/**
 	 * Find a remote server by its integer numeric.
 	 * Returns NULL if not found.
 	 */
 	virtual iServer*	findServer( const unsigned int& YY ) const ;
+
+	/**
+	 * Find a fake server, return that server if it is fake (juped),
+	 * or NULL otherwise.
+	 */
+	virtual iServer*	findFakeServer( const iServer* ) const ;
+
+	/**
+	 * Find a fake server described by the given intYY numeric.
+	 * Return 0 on failure.
+	 */
+	virtual iServer*	findFakeServer( unsigned int intYY ) const ;
 
 	/**
 	 * Find a remote server by its character numeric.
@@ -198,6 +292,11 @@ public:
 	 * Returns NULL if not found.
 	 */
 	virtual iServer*	findServerName( const string& name ) const ;
+
+	/**
+	 * Find a fake server by (case insensitive) name.
+	 */
+	virtual iServer*	findFakeServerName( const string& ) const ;
 
 	/**
 	 * Find a remote server by a wildmask name.
@@ -247,6 +346,25 @@ public:
 	 * Remove a local client from the network data tables.
 	 */
 	virtual xClient*	removeLocalClient( xClient* ) ;
+
+	/**
+	 * Remove a fake client from the network data structures
+	 * and deallocate its reserved numeric.
+	 */
+	virtual iClient*	removeFakeClient( iClient* ) ;
+
+	/**
+	 * Remove a fake server from the network data structures
+	 * and deallocate its reserved numeric.
+	 */
+	virtual iServer*	removeFakeServer( iServer* ) ;
+
+	/**
+	 * Remove a fake iServer from the network data structures
+	 * by (case-insensitive) name, and remove its reserved
+	 * numeric.
+	 */
+	virtual iServer*	removeFakeServerName( const string& ) ;
 
 	/**
 	 * Remove a nick name from the internal nick name table.
@@ -384,41 +502,41 @@ public:
 	 * Return a non-const iterator to the beginning of the
 	 * remote servers table.
 	 */
-	inline serverIterator server_begin()
+	inline serverIterator servers_begin()
 		{ return serverMap.begin() ; }
 
 	/**
 	 * Return a non-const iterator to the end of the
 	 * remote servers table.
 	 */
-	inline serverIterator server_end()
+	inline serverIterator servers_end()
 		{ return serverMap.end() ; }
 
 	/**
 	 * Return a const iterator to the beginning of the
 	 * remote servers table.
 	 */
-	inline const_serverIterator server_begin() const
+	inline const_serverIterator servers_begin() const
 		{ return serverMap.begin() ; }
 
 	/**
 	 * Return a const iterator to the end of the remote
 	 * servers table.
 	 */
-	inline const_serverIterator server_end() const
+	inline const_serverIterator servers_end() const
 		{ return serverMap.end() ; }
 
 	/**
 	 * Define a non-const iterator for walking through the
 	 * structure of local clients (xClients).
 	 */
-	typedef xClientVectorType::iterator localClientIterator ;
+	typedef xClientMapType::iterator localClientIterator ;
 
 	/**
 	 * Define a const iterator for walking through the
 	 * structure of local clients (xClients).
 	 */
-	typedef xClientVectorType::const_iterator const_localClientIterator ;
+	typedef xClientMapType::const_iterator const_localClientIterator ;
 
 	/**
 	 * Return a non-const iterator to the beginning of the
@@ -449,22 +567,117 @@ public:
 		{ return localClients.end() ; }
 
 	/**
-	 * Define a non-const iterator for walking through the 
+	 * Define a const iterator for walking through the 
 	 * channels structure
 	 */
-	typedef channelMapType::const_iterator	constChannelIterator;
+	typedef channelMapType::const_iterator	const_channelIterator;
 	
 	/**
 	 * Returns an iterator to the begining of the channels structure
 	 */
-	inline constChannelIterator		channels_begin() const
+	inline const_channelIterator		channels_begin() const
 		{ return channelMap.begin(); }
 	
 	/**
 	 * Returns an iterator to the end of the channels structure
 	 */
-	inline constChannelIterator		channels_end() const
+	inline const_channelIterator		channels_end() const
 		{ return channelMap.end(); }
+
+	/**
+	 * Define a mutating iterator for walking through the 
+	 * channels structure
+	 */
+	typedef channelMapType::iterator	channelIterator;
+	
+	/**
+	 * Returns an iterator to the begining of the channels structure
+	 */
+	inline channelIterator			channels_begin()
+		{ return channelMap.begin(); }
+	
+	/**
+	 * Returns an iterator to the end of the channels structure
+	 */
+	inline channelIterator			channels_end()
+		{ return channelMap.end(); }
+
+	/**
+	 * const_iterator to a fake client.
+	 */
+	typedef fakeClientMapType::const_iterator const_fakeClientIterator ;
+
+	/**
+	 * Return a const iterator the beginning of the fake
+	 * client structure.
+	 */
+	inline const_fakeClientIterator	fakeClient_begin() const
+		{ return fakeClientMap.begin() ; }
+
+	/**
+	 * Return a const iterator the end of the fake
+	 * client structure.
+	 */
+	inline const_fakeClientIterator	fakeClient_end() const
+		{ return fakeClientMap.end() ; }
+
+	/**
+	 * Mutable iterator to a fake client.
+	 */
+	typedef fakeClientMapType::iterator	fakeClientIterator ;
+
+	/**
+	 * Return a mutable iterator the beginning of the fake
+	 * client structure.
+	 */
+	inline fakeClientIterator	fakeClient_begin()
+		{ return fakeClientMap.begin() ; }
+
+	/**
+	 * Return a mutable iterator the end of the fake
+	 * client structure.
+	 */
+	inline fakeClientIterator	fakeClient_end()
+		{ return fakeClientMap.end() ; }
+
+	/**
+	 * const_iterator to the fakeServerMap.
+	 */
+	typedef fakeServerMapType::const_iterator
+		const_fakeServerIterator ;
+
+	/**
+	 * Return a const_iterator to the beginning of the fake
+	 * server structure.
+	 */
+	inline const_fakeServerIterator	fakeServers_begin() const
+		{ return fakeServerMap.begin() ; }
+
+	/**
+	 * Return a const_iterator to the end of the fake
+	 * server structure.
+	 */
+	inline const_fakeServerIterator fakeServers_end() const
+		{ return fakeServerMap.end() ; }
+
+	/**
+	 * iterator to the fakeServerMap.
+	 */
+	typedef fakeServerMapType::iterator fakeServerIterator ;
+
+	/**
+	 * Return a mutable iterator to the beginning of the fake
+	 * server structure.
+	 */
+	inline fakeServerIterator	fakeServers_begin()
+		{ return fakeServerMap.begin() ; }
+
+	/**
+ 	 * Return a mutable iterator to the end of the fake
+	 * server structure.
+	 */
+	inline fakeServerIterator fakeServers_end()
+		{ return fakeServerMap.end() ; }
 
 	/**
 	 * Return the number of channels currently stored in the
@@ -499,19 +712,11 @@ public:
 		} ;
 
 	/**
-	 * Execute a unary function for each xClient.  Keep in mind
-	 * that the arguments passed to the operator() of this
-	 * functor may be NULL.
-	 */
-	virtual void	foreach_xClient( fe_xClientBase  ) ;
-
-	/**
 	 * This method is used to set the xServer used for
 	 * backwards communication.  This is bad, and I would like
 	 * very much to get rid of it.
 	 */
-	virtual void	setServer( xServer* _theServer )
-		{ theServer = _theServer ; }
+	virtual void	setServer( xServer* _theServer ) ;
 
 	/**
 	 * Attempt to match the hostname, which may include wildcard
@@ -620,23 +825,48 @@ protected:
 	xNetwork operator=( const xNetwork& ) ;
 
 	/**
+	 * Find a new client (iClient or xClient) numeric.
+	 * The new numeric is assigned to newIntYYXXX.
+	 * On success, true is returned, false otherwise.
+	 */
+	virtual bool	allocateClientNumeric( unsigned int intYY,
+				unsigned int& newIntXXX ) ;
+
+	/**
+	 * Free a reserved client (iClient or xClient) numeric.
+	 */
+	virtual bool	freeClientNumeric( unsigned int intYYXXX ) ;
+
+	/**
+	 * Find a new server (iServer) numeric.
+	 * The new numeric is assigned to intYY.
+	 * On success, true is returned, false otherwise.
+	 */
+	virtual bool	allocateServerNumeric( unsigned int& intYY ) ;
+
+	/**
+	 * Free a reserved server (iServer) numeric.
+	 */
+	virtual bool	freeServerNumeric( unsigned int intYYXXX ) ;
+
+	/**
 	 * This method is used internally when a client is added to
 	 * the structure.
 	 */
-	void addNick( iClient* ) ;
+	virtual void addNick( iClient* ) ;
 
 	/**
 	 * Perform a simple recursive search for all leaves of
 	 * the server whose numeric is the second arguments, and
 	 * place each of those servers' numerics into the vector.
 	 */
-	void	findLeaves( vector< unsigned int >& yyVector,
+	virtual void	findLeaves( vector< unsigned int >& yyVector,
 			const unsigned int intYY ) const ;
 
 	/**
 	 * The vector of local clients.
 	 */
-	xClientVectorType		localClients ;
+	xClientMapType			localClients ;
 
 	/**
 	 * The structure used to store the network channel
@@ -666,6 +896,23 @@ protected:
 	 * This variable is used backwards calls to the main server.
 	 */
 	xServer				*theServer ;
+
+	/**
+	 * This structure maps fake iClient's to their owning
+	 * xClient's.
+	 */
+	fakeClientMapType		fakeClientMap ;
+
+	/**
+	 * This structure stores fake (juped) servers.
+	 */
+	fakeServerMapType		fakeServerMap ;
+
+	/**
+	 * Structure used to store all reserved intYY and intYYXXX's
+	 * for the local server and juped iClient/xClient/iServer's.
+	 */
+	reservedNumericMapType		reservedNumericMap ;	
 } ;
 
 /**

@@ -16,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: gnutest.h,v 1.5 2003/06/28 16:26:46 dan_karrels Exp $
+ * $Id: gnutest.h,v 1.6 2003/08/09 23:15:35 dan_karrels Exp $
  */
 
 #ifndef __GNUTEST_H
-#define __GNUTEST_H "$Id: gnutest.h,v 1.5 2003/06/28 16:26:46 dan_karrels Exp $"
+#define __GNUTEST_H "$Id: gnutest.h,v 1.6 2003/08/09 23:15:35 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
@@ -28,6 +28,7 @@
 #include	"client.h"
 #include	"iClient.h"
 #include	"Channel.h"
+#include	"StringTokenizer.h"
 
 namespace gnuworld
 {
@@ -127,6 +128,30 @@ protected:
 	 * structure of channels which the client is on.
 	 */
 	virtual bool	removeChan( const string& ) ;
+
+	/**
+	 * Spawn a fake client.
+	 */
+	virtual void	spawnClient( iClient* requestingClient,
+				const StringTokenizer& st ) ;
+
+	/**
+	 * Spawn a fake server.
+	 */
+	virtual void	spawnServer( iClient* requestingClient,
+				const StringTokenizer& st ) ;
+
+	/**
+	 * Remove a fake client.
+	 */
+	virtual void	removeClient( iClient* requestingClient,
+				const StringTokenizer& st ) ;
+
+	/**
+	 * Remove a fake server.
+	 */
+	virtual void	removeServer( iClient* requestingClient,
+				const StringTokenizer& st ) ;
 
 	/**
 	 * This is the name of the operator only channel on which this

@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: LASTCOMCommand.cc,v 1.14 2003/06/28 01:21:19 dan_karrels Exp $
+ * $Id: LASTCOMCommand.cc,v 1.15 2003/08/09 23:15:33 dan_karrels Exp $
  */
 
 #include	<sstream>
@@ -33,8 +33,9 @@
 #include	"iClient.h"
 #include	"StringTokenizer.h"
 #include	"ELog.h"
+#include	"config.h"
 
-const char LASTCOMCommand_cc_rcsId[] = "$Id: LASTCOMCommand.cc,v 1.14 2003/06/28 01:21:19 dan_karrels Exp $";
+RCSTAG( "$Id: LASTCOMCommand.cc,v 1.15 2003/08/09 23:15:33 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -49,8 +50,6 @@ namespace uworld
 
 bool LASTCOMCommand::Exec( iClient* theClient, const string& Message )
 {
-
-
 StringTokenizer st( Message ) ;
 bot->MsgChanLog("LASTCOM\n");
 #ifndef LOGTOHD

@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_P.cc,v 1.6 2003/06/28 16:26:45 dan_karrels Exp $
+ * $Id: msg_P.cc,v 1.7 2003/08/09 23:15:33 dan_karrels Exp $
  */
 
 #include	<string>
@@ -33,7 +33,7 @@
 #include	"StringTokenizer.h"
 #include	"config.h"
 
-RCSTAG( "$Id: msg_P.cc,v 1.6 2003/06/28 16:26:45 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: msg_P.cc,v 1.7 2003/08/09 23:15:33 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -53,10 +53,10 @@ for( xNetwork::localClientIterator lcItr = Network->localClient_begin() ;
 	{
 	// Only deliver the channel ctcp (message) if this client
 	// is on the channel, and is mode -d
-	if( (*lcItr)->isOnChannel( theChan ) &&
-		!(*lcItr)->getMode( iClient::MODE_DEAF ) )
+	if( lcItr->second->isOnChannel( theChan ) &&
+		!lcItr->second->getMode( iClient::MODE_DEAF ) )
 		{
-		(*lcItr)->OnChannelCTCP( srcClient,
+		lcItr->second->OnChannelCTCP( srcClient,
 			theChan,
 			command,
 			message ) ;
@@ -73,10 +73,11 @@ for( xNetwork::localClientIterator lcItr = Network->localClient_begin() ;
 	{
 	// Only deliver the channel ctcp (message) if this client
 	// is on the channel, and is mode -d
-	if( (*lcItr)->isOnChannel( theChan ) &&
-		!(*lcItr)->getMode( iClient::MODE_DEAF ) )
+	if( lcItr->second->isOnChannel( theChan ) &&
+		!lcItr->second->getMode( iClient::MODE_DEAF ) )
 		{
-		(*lcItr)->OnChannelMessage( srcClient, theChan, message ) ;
+		lcItr->second->OnChannelMessage(
+			srcClient, theChan, message ) ;
 		}
 	}
 }
@@ -160,6 +161,10 @@ else if( (0 == theChan) &&
 	(Param[ 1 ][ 0 ] == theServer->getCharYY()[ 0 ]) &&
 	(Param[ 1 ][ 1 ] == theServer->getCharYY()[ 1 ]) )
 	{
+//	elog	<< "msg_P> Message for local client: "
+//		<< Param[ 1 ]
+//		<< endl ;
+
 	// Normal message to an xClient
 	targetClient = Network->findLocalClient( Param[ 1 ] ) ;
 	if( 0 == targetClient )
@@ -172,6 +177,10 @@ else if( (0 == theChan) &&
 	}
 else if( 0 == theChan )
 	{
+	elog	<< "msg_P> Unknown target: "
+		<< Param[ 1 ]
+		<< endl ;
+
 	// May be a message to a juped client on a juped server,
 	// ignore it.
 	return true ;

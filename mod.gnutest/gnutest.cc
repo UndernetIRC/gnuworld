@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: gnutest.cc,v 1.9 2003/06/28 16:26:46 dan_karrels Exp $
+ * $Id: gnutest.cc,v 1.10 2003/08/09 23:15:35 dan_karrels Exp $
  */
 
 #include	<string>
@@ -28,13 +28,7 @@
 #include	"EConfig.h"
 #include	"Network.h"
 
-const char client_h_rcsId[] = __CLIENT_H ;
-const char gnutest_h_rcsId[] = __GNUTEST_H ;
-const char gnutest_cc_rcsId[] = "$Id: gnutest.cc,v 1.9 2003/06/28 16:26:46 dan_karrels Exp $" ;
-const char iClient_h_rcsId[] = __ICLIENT_H ;
-const char StringTokenizer_h_rcsId[] = __STRINGTOKENIZER_H ;
-const char EConfig_h_rcsId[] = __ECONFIG_H ;
-const char Network_h_rcsId[] = __NETWORK_H ;
+RCSTAG("$Id: gnutest.cc,v 1.10 2003/08/09 23:15:35 dan_karrels Exp $");
 
 namespace gnuworld
 {
@@ -120,11 +114,21 @@ void gnutest::OnPrivateMessage( iClient* theClient,
 {
 if( !theClient->isOper() )
 	{
+//	elog	<< "gnutest::OnPrivateMessage> Denying access "
+//		<< "to non-oper: "
+//		<< *theClient
+//		<< endl ;
 	return ;
 	}
 
+//elog	<< "gnutest::OnPrivateMessage> Message: "
+//	<< message
+//	<< ", from client: "
+//	<< *theClient
+//	<< endl ;
+
 StringTokenizer st( message ) ;
-if( st.empty() || (st.size() < 2 ) )
+if( st.size() < 2 )
 	{
 	Notice( theClient, "Are you speaking to me?" ) ;
 	return ;
@@ -320,8 +324,208 @@ else if( st[ 0 ] == "reload" )
 	MyUplink->UnloadClient( this, string() ) ;
 	MyUplink->LoadClient( "libgnutest", getConfigFileName() ) ;
 	}
+else if( st[ 0 ] == "spawnclient" )
+	{
+	spawnClient( theClient, st ) ;
+	}
+else if( st[ 0 ] == "removeclient" )
+	{
+	removeClient( theClient, st ) ;
+	}
+else if( st[ 0 ] == "spawnserver" )
+	{
+	spawnServer( theClient, st ) ;
+	}
+else if( st[ 0 ] == "removeserver" )
+	{
+	removeServer( theClient, st ) ;
+	}
 
 xClient::OnPrivateMessage( theClient, message ) ;
+}
+
+void gnutest::spawnServer( iClient* requestingClient,
+	const StringTokenizer& st )
+{
+if( st.size() < 3 )
+	{
+	Notice( requestingClient,
+		"Usage: spawnserver <name> <description>" ) ;
+	return ;
+	}
+
+string name( st[ 1 ] ) ;
+if( string::npos == name.find( '.' ) )
+	{
+	Notice( requestingClient, "Server name must have at least "
+		"one \'.\'" ) ;
+	return ;
+	}
+
+string description( st.assemble( 2 ) ) ;
+
+string yyxxx( "00]]]" ) ;
+iServer* newServer = new (std::nothrow) iServer(
+	getIntYY(),
+	yyxxx,
+	name,
+	::time( 0 ),
+	description ) ;
+assert( newServer != 0 ) ;
+
+if( !MyUplink->AttachServer( newServer ) )
+	{
+	elog	<< "gnutest::spawnServer> Failed to add new iServer: "
+		<< *newServer
+		<< endl ;
+
+	Notice( requestingClient, "Failed to add new server" ) ;
+	}
+else
+	{
+	elog	<< "gnutest::spawnServer> Added new iServer: "
+		<< *newServer
+		<< endl ;
+
+	Notice( requestingClient, "Added new server with description: %s",
+		description.c_str() ) ;
+	}
+}
+
+void gnutest::removeServer( iClient* requestingClient,
+	const StringTokenizer& st )
+{
+if( st.size() < 2 )
+	{
+	Notice( requestingClient, "Usage: removeServer <name>" ) ;
+	}
+
+string name( st[ 1 ] ) ;
+
+iServer* theServer = Network->findServerName( name ) ;
+if( 0 == theServer )
+	{
+	elog	<< "gnutest::removeServer> Failed to find server name: "
+		<< name
+		<< endl ;
+
+	Notice( requestingClient, "Failed to find server: %s",
+		name.c_str() ) ;
+	return ;
+	}
+
+if( !MyUplink->DetachServer( theServer ) )
+	{
+	elog	<< "gnutest::removeServer> Failed to DetachServer(): "
+		<< *theServer
+		<< endl ;
+
+	Notice( requestingClient, "Failed to remove server: %s",
+		name.c_str() ) ;
+	}
+else
+	{
+	elog	<< "gnutest::removeServer> Successfully removed server: "
+		<< *theServer
+		<< endl ;
+
+	Notice( requestingClient, "Successfully removed server: %s",
+		name.c_str() ) ;
+	delete theServer ; theServer = 0 ;
+	}
+}
+
+void gnutest::removeClient( iClient* requestingClient,
+	const StringTokenizer& st )
+{
+if( st.size() != 2 )
+	{
+	Notice( requestingClient, "Usage: spawnclient <nickname>" ) ;
+	return ;
+	}
+
+string nickName( st[ 1 ] ) ;
+
+elog	<< "gnutest::removeClient> Removing: "
+	<< nickName
+	<< endl ;
+
+iClient* removeMe = Network->findFakeNick( nickName ) ;
+if( 0 == removeMe )
+	{
+	Notice( requestingClient, "Unable to find fake client: %s",
+		nickName.c_str() ) ;
+	return ;
+	}
+
+if( MyUplink->DetachClient( removeMe, "Requested shutdown" )  != 0 )
+	{
+	Notice( requestingClient, "Successfully removed fake client: %s",
+		nickName.c_str() ) ;
+	delete removeMe ; removeMe = 0 ;
+	}
+else
+	{
+	Notice( requestingClient, "Failed to remove fake client: %s",
+		nickName.c_str() ) ;
+	}
+}
+
+void gnutest::spawnClient( iClient* requestingClient,
+	const StringTokenizer& st )
+{
+if( st.size() != 2 )
+	{
+	Notice( requestingClient, "Usage: spawnclient <nickname>" ) ;
+	return ;
+	}
+
+string nickName( st[ 1 ] ) ;
+
+elog	<< "gnutest::spawnClient> Spawning "
+	<< nickName
+	<< endl ;
+
+char newCharYY[ 6 ] ;
+newCharYY[ 2 ] = 0 ;
+inttobase64( newCharYY, MyUplink->getIntYY(), 2 ) ;
+
+//elog	<< "gnutest::spawnClient> newCharYY: "
+//	<< newCharYY
+//	<< endl ;
+
+iClient* newClient = new (std::nothrow) iClient(
+	MyUplink->getIntYY(), // intYY
+	newCharYY, // charYYXXX
+	nickName,
+	"username",
+	"AAAAAA", // host base 64
+	"insecurehost.com", // insecureHost
+	"realInsecureHost.com", // realInsecureHost
+	"+i", // mode
+	string(), // account
+	"test spawn client, moo", // description
+	31337 // connect time
+	) ;
+assert( newClient != 0 ) ;
+
+if( !MyUplink->AttachClient( newClient, this ) )
+	{
+	elog	<< "gnutest::spawnClient> Failed to add new client: "
+		<< *newClient
+		<< endl ;
+
+	Notice( requestingClient, "Failed to create new fake client" ) ;
+	delete newClient ; newClient = 0 ;
+	}
+else
+	{
+	Notice( requestingClient, "Created new client %s",
+		nickName.c_str() ) ;
+	elog	<< "gnutest::spawnClient> Added client: "
+		<< *newClient
+		<< endl ;
+	}
 }
 
 bool gnutest::isOnChannel( const string& chanName ) const

@@ -17,11 +17,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ChannelUser.h,v 1.9 2002/05/27 17:18:12 dan_karrels Exp $
+ * $Id: ChannelUser.h,v 1.10 2003/08/09 23:15:33 dan_karrels Exp $
  */
 
 #ifndef __CHANNELUSER_H
-#define __CHANNELUSER_H "$Id: ChannelUser.h,v 1.9 2002/05/27 17:18:12 dan_karrels Exp $"
+#define __CHANNELUSER_H "$Id: ChannelUser.h,v 1.10 2003/08/09 23:15:33 dan_karrels Exp $"
 
 #include	<string>
 
@@ -191,13 +191,13 @@ public:
 	 * Retrieve this channel user's integer representation
 	 * of its server numeric.
 	 */
-	const unsigned int& getIntYY() const ;
+	const unsigned int getIntYY() const ;
 
 	/**
 	 * Retrieve this channel user's integer representation
 	 * of its client numeric.
 	 */
-	const unsigned int& getIntXXX() const ;
+	const unsigned int getIntXXX() const ;
 
 	/**
 	 * Retrieve this channel user's integer representation

@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_N.cc,v 1.4 2003/06/28 16:26:45 dan_karrels Exp $
+ * $Id: msg_N.cc,v 1.5 2003/08/09 23:15:33 dan_karrels Exp $
  */
 
 #include	<new>
@@ -36,7 +36,7 @@
 #include	"ServerCommandHandler.h"
 #include	"config.h"
 
-RCSTAG( "$Id: msg_N.cc,v 1.4 2003/06/28 16:26:45 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: msg_N.cc,v 1.5 2003/08/09 23:15:33 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -69,7 +69,6 @@ CREATE_HANDLER(msg_N)
  */
 bool msg_N::Execute( const xParameters& params )
 {
-
 // AUAAB N Gte- 949527071
 if( params.size() < 5 )
 	{

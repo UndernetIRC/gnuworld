@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: LEARNNETCommand.cc,v 1.13 2003/06/28 01:21:19 dan_karrels Exp $
+ * $Id: LEARNNETCommand.cc,v 1.14 2003/08/09 23:15:33 dan_karrels Exp $
  */
 
 #include	<new>
@@ -34,16 +34,9 @@
 #include        "server.h"
 #include	"ccUser.h"
 #include	"misc.h"
+#include	"config.h"
 
-const char ccontrol_h_rcsId[] = __CCONTROL_H ;
-const char CControlCommands_h_rcsId[] = __CCONTROLCOMMANDS_H ;
-const char StringTokenzier_h_rcsId[] = __STRINGTOKENIZER_H ;
-const char iServer_h_rcsId[] = __ISERVER_H ;
-const char Network_h_rcsId[] = __NETWORK_H ;
-const char server_h_rcsId[] = __SERVER_H ;
-const char ccUser_h_rcsId[] = __CCUSER_H ;
-const char misc_h_rcsId[] = __MISC_H ;
-const char LEARNNETCommand_cc_rcsId[] = "$Id: LEARNNETCommand.cc,v 1.13 2003/06/28 01:21:19 dan_karrels Exp $";
+RCSTAG( "$Id: LEARNNETCommand.cc,v 1.14 2003/08/09 23:15:33 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -71,8 +64,8 @@ StringTokenizer st(Message);
 bot->MsgChanLog("Learning network status at the request of : %s\n",
 	theClient->getNickName().c_str());
 
-xNetwork::serverIterator ptr = Network->server_begin();
-xNetwork::serverIterator end = Network->server_end();
+xNetwork::serverIterator ptr = Network->servers_begin();
+xNetwork::serverIterator end = Network->servers_end();
 
 for( ; ptr != end ; ptr++ )
 	{
@@ -82,7 +75,8 @@ for( ; ptr != end ; ptr++ )
 		continue ;
 		}
 
-	if((!server->isJuped(CurServer)) && 
+	// NOTE: Changed from isJuped()
+	if((0 == Network->findFakeServer(CurServer)) && 
 		(strcmp(CurServer->getName().c_str(),
 			bot->getUplinkName().c_str())))
 		{
@@ -107,7 +101,7 @@ for( ; ptr != end ; ptr++ )
 			bot->addServer(NewServer);
 			bot->Write("%s V :%s\n",
 				bot->getCharYYXXX().c_str(),
-				CurServer->getCharYY());
+				CurServer->getCharYY().c_str());
 
 			if(NewServer->Insert())
 				{

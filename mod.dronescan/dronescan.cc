@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: dronescan.cc,v 1.29 2003/08/05 16:13:23 jeekay Exp $
+ * $Id: dronescan.cc,v 1.30 2003/08/09 23:15:35 dan_karrels Exp $
  */
 
 #include	<string>
@@ -39,7 +39,7 @@
 #include "sqlUser.h"
 #include "Timer.h"
 
-RCSTAG("$Id: dronescan.cc,v 1.29 2003/08/05 16:13:23 jeekay Exp $");
+RCSTAG("$Id: dronescan.cc,v 1.30 2003/08/09 23:15:35 dan_karrels Exp $");
 
 namespace gnuworld {
 
@@ -241,7 +241,7 @@ bool dronescan::BurstChannels()
 	xNetwork::const_localClientIterator itr = Network->localClient_begin();
 	for( ; itr != Network->localClient_end(); ++itr )
 		{
-		xClient *theXClient = *itr;
+		xClient *theXClient = itr->second;
 		iClient *theClient = theXClient->getInstance();
 		
 		clientData *newData = new clientData();
@@ -756,7 +756,7 @@ void dronescan::checkChannels()
 
 	theTimer->Start();
 
-	xNetwork::constChannelIterator ptr = Network->channels_begin();
+	xNetwork::const_channelIterator ptr = Network->channels_begin();
 			
 	for( ; ptr != Network->channels_end() ; ++ptr )
 		{

@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: LOGINCommand.cc,v 1.27 2003/06/28 01:21:19 dan_karrels Exp $
+ * $Id: LOGINCommand.cc,v 1.28 2003/08/09 23:15:33 dan_karrels Exp $
  */
 
 #include	<string>
@@ -33,8 +33,9 @@
 #include	"md5hash.h" 
 #include        "ccUser.h"
 #include	"ip.h"
+#include	"config.h"
 
-const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.27 2003/06/28 01:21:19 dan_karrels Exp $";
+RCSTAG( "$Id: LOGINCommand.cc,v 1.28 2003/08/09 23:15:33 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {

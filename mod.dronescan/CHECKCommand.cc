@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: CHECKCommand.cc,v 1.4 2003/07/26 16:47:18 jeekay Exp $
+ * $Id: CHECKCommand.cc,v 1.5 2003/08/09 23:15:35 dan_karrels Exp $
  *
  * Display information about a given channel or user.
  */
@@ -28,7 +28,7 @@
 #include "dronescan.h"
 #include "dronescanCommands.h"
 
-RCSTAG("$Id: CHECKCommand.cc,v 1.4 2003/07/26 16:47:18 jeekay Exp $");
+RCSTAG("$Id: CHECKCommand.cc,v 1.5 2003/08/09 23:15:35 dan_karrels Exp $");
 
 namespace gnuworld {
 
@@ -77,7 +77,7 @@ bool CHECKCommand::Exec( const iClient *theClient, const string& Message, const 
 			
 			bot->Reply(theClient, "[%s] (%s) %0.3lf %s (%s)",
 				bot->isNormal(targetClient) ? "N" : "A",
-				targetClient->getCharYY(),
+				targetClient->getCharYY().c_str(),
 				userEntropy,
 				targetClient->getRealNickUserHost().c_str(),
 				targetClient->getDescription().c_str()

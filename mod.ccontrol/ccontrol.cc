@@ -20,7 +20,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccontrol.cc,v 1.174 2003/06/28 16:26:45 dan_karrels Exp $
+ * $Id: ccontrol.cc,v 1.175 2003/08/09 23:15:34 dan_karrels Exp $
 */
 
 #define MAJORVER "1"
@@ -63,9 +63,9 @@
 #include	"ccFloodData.h"
 #include	"ccUserData.h"
 #include	"ip.h"
+#include	"config.h"
 
-const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.174 2003/06/28 16:26:45 dan_karrels Exp $" ;
+RCSTAG( "$Id: ccontrol.cc,v 1.175 2003/08/09 23:15:34 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -1273,8 +1273,10 @@ switch( theEvent )
 		{
 		iServer* NewServer = static_cast< iServer* >( Data1);
 		string Reason = *(static_cast<string *>(Data3));
-		
-		if(!getUplink()->isJuped(NewServer))
+
+		if( 0 == Network->findFakeServer( NewServer ) )
+// NOTE: Changed --dan
+//		if(!getUplink()->isJuped(NewServer))
 			{
 			ccServer* CheckServer = getServer(NewServer->getName());
     	                if(CheckServer)
@@ -1474,7 +1476,8 @@ ccServer* tServer = getServer(tmpServer->getName());
 if(tServer)
 	{
 	tServer->setNetServer(tmpServer);
-	Write("%s V :%s\n",getCharYYXXX().c_str(),tmpServer->getCharYY());
+	Write("%s V :%s\n",getCharYYXXX().c_str(),
+		tmpServer->getCharYY().c_str());
 	}
 
 xClient::OnConnect();
@@ -3187,7 +3190,8 @@ for(serversConstIterator ptr = serversMap_begin();
 	curNetServer = curServer->getNetServer();
 	if(curNetServer)
 		{
-		Write("%s V :%s\n",getCharYYXXX().c_str(),curNetServer->getCharYY());		
+		Write("%s V :%s\n",getCharYYXXX().c_str(),
+			curNetServer->getCharYY().c_str());		
 		}
 		
 	}
@@ -4728,12 +4732,13 @@ void ccontrol::saveServersInfo()
 ofstream servFile("ServerList.txt",ios::out);
 if(!servFile)
 	{
-	elog << "Error while opening server list file!\n";
+	elog << "Error while opening server list file!" << endl;
 	return;
 	}
-gnuworld::xNetwork::const_serverIterator sIterator = Network->server_begin();
+gnuworld::xNetwork::const_serverIterator sIterator =
+	Network->servers_begin();
 iServer* curServer;
-for(;sIterator != Network->server_end();++sIterator)
+for(;sIterator != Network->servers_end();++sIterator)
 	{
 	curServer = sIterator->second;
 	if(!curServer)
@@ -4754,7 +4759,8 @@ if(!chanFile)
 	elog << "Error while opening server list file!\n";
 	return;
 	}
-gnuworld::xNetwork::constChannelIterator cIterator = Network->channels_begin();
+gnuworld::xNetwork::const_channelIterator cIterator =
+	Network->channels_begin();
 Channel* curChannel;
 for(;cIterator != Network->channels_end();++cIterator)
 	{

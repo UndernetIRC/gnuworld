@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: stats.cc,v 1.21 2003/08/06 17:47:48 dan_karrels Exp $
+ * $Id: stats.cc,v 1.22 2003/08/09 23:15:36 dan_karrels Exp $
  */
 
 #include	<string>
@@ -39,7 +39,7 @@
 #include	"config.h"
 #include	"misc.h"
 
-RCSTAG( "$Id: stats.cc,v 1.21 2003/08/06 17:47:48 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: stats.cc,v 1.22 2003/08/09 23:15:36 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -177,6 +177,7 @@ for( eventType whichEvent = 0 ; whichEvent <= EVT_CREATE ; ++whichEvent )
 	} // for( whichEvent )
 }
 
+/*
 void stats::ImplementServer( xServer* theServer )
 {
 xClient::ImplementServer( theServer ) ;
@@ -200,6 +201,7 @@ theServer->RegisterChannelEvent( "*", this ) ;
 // This event will be used to flush data to the log files
 theServer->RegisterTimer( ::time( 0 ) + 60, this ) ;
 }
+*/
 
 void stats::OnTimer( xServer::timerID, void* )
 {
@@ -521,7 +523,7 @@ Notice( theClient, "Total Network Users: %d, Total Network Channels: %d",
 	Network->channelList_size() ) ;
 
 Channel* largestChan = 0 ;
-for( xNetwork::constChannelIterator chanItr = Network->channels_begin() ;
+for( xNetwork::const_channelIterator chanItr = Network->channels_begin() ;
 	chanItr != Network->channels_end() ; ++chanItr )
 	{
 	if( 0 == largestChan )

@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_SQ.cc,v 1.4 2003/08/06 17:47:48 dan_karrels Exp $
+ * $Id: msg_SQ.cc,v 1.5 2003/08/09 23:15:33 dan_karrels Exp $
  */
 
 #include	<iostream>
@@ -34,7 +34,7 @@
 #include	"ServerCommandHandler.h"
 #include	"config.h"
 
-RCSTAG( "$Id: msg_SQ.cc,v 1.4 2003/08/06 17:47:48 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: msg_SQ.cc,v 1.5 2003/08/09 23:15:33 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -114,9 +114,6 @@ else
 	// xNetwork::OnSplit() will deallocate all servers
 	// which are split
 	Network->OnSplit( squitServer->getIntYY() ) ;
-
-	// Remove this server from the juped list (if its there)
-	theServer->RemoveJupe(squitServer);
 	}
 
 return true ;

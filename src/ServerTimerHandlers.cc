@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ServerTimerHandlers.cc,v 1.8 2003/06/28 16:26:46 dan_karrels Exp $
+ * $Id: ServerTimerHandlers.cc,v 1.9 2003/08/09 23:15:36 dan_karrels Exp $
  */
 
 #include	<string>
@@ -29,7 +29,7 @@
 #include	"ELog.h"
 #include	"config.h"
 
-RCSTAG( "$Id: ServerTimerHandlers.cc,v 1.8 2003/06/28 16:26:46 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: ServerTimerHandlers.cc,v 1.9 2003/08/09 23:15:36 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -48,8 +48,7 @@ theServer->RegisterTimer( ::time( 0 ) + updateInterval, this, 0 ) ;
 void PINGTimer::OnTimer( timerID, void* )
 {
 string writeMe( theServer->getCharYY() ) ;
-writeMe += " G " ;
-writeMe += ":I am the King, bow before me!\n" ;
+writeMe += " G :I am the King, bow before me!\n" ;
 
 theServer->RegisterTimer( ::time( 0 ) + updateInterval, this, 0 ) ;
 

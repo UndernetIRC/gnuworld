@@ -20,7 +20,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
  * USA.
  *
- * $Id: cloner.cc,v 1.28 2003/07/24 17:14:57 dan_karrels Exp $
+ * $Id: cloner.cc,v 1.29 2003/08/09 23:15:35 dan_karrels Exp $
  */
 
 #include	<new>
@@ -43,7 +43,7 @@
 #include	"misc.h"
 #include	"ELog.h"
 
-RCSTAG("$Id: cloner.cc,v 1.28 2003/07/24 17:14:57 dan_karrels Exp $");
+RCSTAG("$Id: cloner.cc,v 1.29 2003/08/09 23:15:35 dan_karrels Exp $");
 
 namespace gnuworld
 {
@@ -155,12 +155,13 @@ void cloner::OnConnect()
 {
 fakeServer = new (std::nothrow) iServer(
 	MyUplink->getIntYY(), // uplinkIntYY
-	string(), // charYYXXX
+	string( "00]]]" ),
 	fakeServerName,
-	::time( 0 ) ) ;
+	::time( 0 ),
+	fakeServerDescription ) ;
 assert( fakeServer != 0 ) ;
 
-MyUplink->AttachServer( fakeServer, fakeServerDescription ) ;
+MyUplink->AttachServer( fakeServer ) ;
 
 xClient::OnConnect() ;
 }
@@ -404,12 +405,13 @@ else if( command == "KILLALL" || command == "QUITALL" )
 		for( list< iClient* >::const_iterator ptr = clones.begin(),
 			endPtr = clones.end() ; ptr != endPtr ; ++ptr )
 			{
-			stringstream s ;
-			s	<< (*ptr)->getCharYYXXX()
-				<< " Q"
-				<< ends ;
+			MyUplink->DetachClient( *ptr ) ;
+//			stringstream s ;
+//			s	<< (*ptr)->getCharYYXXX()
+//				<< " Q :Quitting"
+//				<< ends ;
 
-			MyUplink->Write( s ) ;
+//			MyUplink->Write( s ) ;
 			}
 		}
 
@@ -585,14 +587,16 @@ if( makeCloneCount > 0 )
 
 void cloner::addClone()
 {
-char buf[ 4 ] = { 0 } ;
+//char buf[ 4 ] = { 0 } ;
 
-string yyxxx( fakeServer->getCharYY() ) ;
+// The XXX doesn't matter here, the core will choose an
+// appropriate value.
+string yyxxx( fakeServer->getCharYY() + "]]]" ) ;
 
-inttobase64( buf, Network->countClients( fakeServer ) + 1, 3 ) ;
-buf[ 3 ] = 0 ;
+//inttobase64( buf, Network->countClients( fakeServer ) + 1, 3 ) ;
+//buf[ 3 ] = 0 ;
 
-yyxxx += buf ;
+//yyxxx += buf ;
 
 iClient* newClient = new iClient(
 		fakeServer->getIntYY(),
@@ -608,9 +612,10 @@ iClient* newClient = new iClient(
 		::time( 0 ) ) ;
 assert( newClient != 0 );
 
-MyUplink->AttachClient( newClient ) ;
-clones.push_back( newClient ) ;
-
+if( MyUplink->AttachClient( newClient ) )
+	{
+	clones.push_back( newClient ) ;
+	}
 }
 
 string cloner::randomUser()

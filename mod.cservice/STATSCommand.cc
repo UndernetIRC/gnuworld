@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: STATSCommand.cc,v 1.6 2003/06/28 01:21:20 dan_karrels Exp $
+ * $Id: STATSCommand.cc,v 1.7 2003/08/09 23:15:35 dan_karrels Exp $
  */
 
 #include	<string>
@@ -26,7 +26,7 @@
 #include	"cservice.h"
 #include	"Network.h"
 
-const char STATSCommand_cc_rcsId[] = "$Id: STATSCommand.cc,v 1.6 2003/06/28 01:21:20 dan_karrels Exp $" ;
+const char STATSCommand_cc_rcsId[] = "$Id: STATSCommand.cc,v 1.7 2003/08/09 23:15:35 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -102,7 +102,8 @@ if( st.size() >= 2 )
 		 if(theServer)
 		 	{
 			 bot->Notice(theClient, "Server: %s", theServer->getName().c_str());
-			 bot->Notice(theClient, " - Numeric: %s", theServer->getCharYY());
+			 bot->Notice(theClient, " - Numeric: %s",
+				theServer->getCharYY().c_str());
 			 bot->Notice(theClient, " - Connect Time: %i", theServer->getConnectTime());
 			 bot->Notice(theClient, " - Still Bursting? %s", theServer->isBursting() ? "Yes" : "No");
 		 	}

@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_W.cc,v 1.2 2003/06/17 15:13:53 dan_karrels Exp $
+ * $Id: msg_W.cc,v 1.3 2003/08/09 23:15:33 dan_karrels Exp $
  */
 
 #include	<iostream>
@@ -31,7 +31,7 @@
 #include	"ServerCommandHandler.h"
 #include	"config.h"
 
-RCSTAG( "$Id: msg_W.cc,v 1.2 2003/06/17 15:13:53 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: msg_W.cc,v 1.3 2003/08/09 23:15:33 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -72,7 +72,7 @@ if( NULL == targetClient )
 xNetwork::localClientIterator ptr = Network->localClient_begin() ;
 for( ; ptr != Network->localClient_end() ; ++ptr )
 	{
-	(*ptr)->OnWhois( sourceClient, targetClient ) ;
+	ptr->second->OnWhois( sourceClient, targetClient ) ;
 	}
 
 return true ;

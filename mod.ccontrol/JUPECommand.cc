@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: JUPECommand.cc,v 1.15 2003/06/28 01:21:19 dan_karrels Exp $
+ * $Id: JUPECommand.cc,v 1.16 2003/08/09 23:15:33 dan_karrels Exp $
  */
 
 #include	<new>
@@ -32,8 +32,9 @@
 #include	"StringTokenizer.h"
 #include	"Network.h"
 #include	"Constants.h"
+#include	"config.h"
 
-const char JUPECommand_cc_rcsId[] = "$Id: JUPECommand.cc,v 1.15 2003/06/28 01:21:19 dan_karrels Exp $";
+RCSTAG( "$Id: JUPECommand.cc,v 1.16 2003/08/09 23:15:33 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -94,16 +95,17 @@ if(!strcasecmp(SName,Network->findServer(bot->getUplink()->getUplinkCharYY())->g
 	}
 bot->MsgChanLog("%s is asking me to jupe %s because : %s\n",theClient->getNickName().c_str(),SName.c_str(),st.assemble(2).c_str());
 
-
+string yyxxx( "00]]]" ) ;
 iServer* jupeServer = new (std::nothrow) iServer(
-	0, // uplinkIntYY
-	"", // charYYXXX
+	bot->getUplinkIntYY(), // uplinkIntYY
+	yyxxx,
 	SName,
-	time( 0 ) ) ;
+	time( 0 ),
+	st.assemble( 2 ) ) ;
 assert( jupeServer != 0 ) ;
 
 // Attach the new (fake) server.
-server->AttachServer( jupeServer, st.assemble( 2 ) ) ;
+server->AttachServer( jupeServer ) ;
 
 return true ;
 

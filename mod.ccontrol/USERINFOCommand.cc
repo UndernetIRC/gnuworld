@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: USERINFOCommand.cc,v 1.8 2003/06/28 01:21:19 dan_karrels Exp $
+ * $Id: USERINFOCommand.cc,v 1.9 2003/08/09 23:15:34 dan_karrels Exp $
  */
 
 #include	<string>
@@ -31,8 +31,9 @@
 #include	"misc.h"
 #include	"match.h"
 #include	"Network.h"
+#include	"config.h"
 
-const char USERINFOCommand_cc_rcsId[] = "$Id: USERINFOCommand.cc,v 1.8 2003/06/28 01:21:19 dan_karrels Exp $";
+RCSTAG( "$Id: USERINFOCommand.cc,v 1.9 2003/08/09 23:15:34 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {

@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_O.cc,v 1.6 2003/06/28 16:26:45 dan_karrels Exp $
+ * $Id: msg_O.cc,v 1.7 2003/08/09 23:15:33 dan_karrels Exp $
  */
 
 #include	<string>
@@ -33,7 +33,7 @@
 #include	"StringTokenizer.h"
 #include	"config.h"
 
-RCSTAG( "$Id: msg_O.cc,v 1.6 2003/06/28 16:26:45 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: msg_O.cc,v 1.7 2003/08/09 23:15:33 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -52,10 +52,11 @@ for( xNetwork::localClientIterator lcItr = Network->localClient_begin() ;
 	{
 	// Only deliver the channel ctcp (message) if this client
 	// is on the channel, and is mode -d
-	if( (*lcItr)->isOnChannel( theChan ) &&
-		!(*lcItr)->getMode( iClient::MODE_DEAF ) )
+	if( lcItr->second->isOnChannel( theChan ) &&
+		!lcItr->second->getMode( iClient::MODE_DEAF ) )
 		{
-		(*lcItr)->OnChannelNotice( srcClient, theChan, message ) ;
+		lcItr->second->OnChannelNotice(
+			srcClient, theChan, message ) ;
 		}
 	}
 }

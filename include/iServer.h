@@ -19,11 +19,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: iServer.h,v 1.11 2002/07/05 01:10:05 dan_karrels Exp $
+ * $Id: iServer.h,v 1.12 2003/08/09 23:15:33 dan_karrels Exp $
  */
 
 #ifndef __ISERVER_H
-#define __ISERVER_H "$Id: iServer.h,v 1.11 2002/07/05 01:10:05 dan_karrels Exp $"
+#define __ISERVER_H "$Id: iServer.h,v 1.12 2003/08/09 23:15:33 dan_karrels Exp $"
 
 #include	<iostream>
 #include	<string>
@@ -32,23 +32,30 @@
 
 #include	"Numeric.h"
 #include	"ELog.h"
+#include	"NetworkTarget.h"
 
 namespace gnuworld
 {
+
+class xNetwork ;
 
 using std::string ;
 
 /**
  * This class represents a network server.
  */
-class iServer
+class iServer : public NetworkTarget
 {
-
 	/**
 	 * Allow xServer to directly manipulate the
 	 * internal state of this iServer.
 	 */
 	friend class xServer ;
+
+	/**
+	 * xNetwork needs access to setIntYY().
+	 */
+	friend class xNetwork ;
 
 public:
 
@@ -57,9 +64,10 @@ public:
 	 * as parameters.
 	 */
 	iServer( const unsigned int& _uplink,
-		const string& _yxx,
+		const string& _yyxxx,
 		const string& _name,
-		const time_t& _connectTime ) ;
+		const time_t& _connectTime,
+		const string& description = string() ) ;
 
 	/**
 	 * Destruct this iServer instance.
@@ -74,27 +82,6 @@ public:
 	 */
 	inline const unsigned int& getUplinkIntYY() const
 		{ return uplinkIntYY ; }
-
-	/**
-	 * Return the integer representation of this iServer's network
-	 * numeric.
-	 */
-	inline const unsigned int& getIntYY() const
-		{ return intYY ; }
-
-	/**
-	 * Return the integer representation of this iServer's network
-	 * max client numeric.
-	 */
-	inline const unsigned int& getIntXXX() const
-		{ return intXXX ; }
-
-	/**
-	 * Return the character array representation of this iServer's
-	 * network numeric.
-	 */
-	inline const char* getCharYY() const
-		{ return charYY ; }
 
 	/**
 	 * Return the name of this server.
@@ -113,6 +100,12 @@ public:
 	 */
 	inline const time_t& getStartTime() const
 		{ return startTime ; }
+
+	/**
+	 * Return the description of this server.
+	 */
+	inline const string& getDescription() const
+		{ return description ; }
 
 	/**
 	 * Return true if no BURST state exists, false otherwise.
@@ -134,6 +127,10 @@ public:
 	virtual void	stopBursting()
 		{ bursting = false ; }
 
+	/**
+	 * Permit setting an arbitrary value to the bursting
+	 * variable.
+	 */
 	virtual void	setBursting( bool newVal )
 		{ bursting = newVal ; }
 
@@ -153,10 +150,11 @@ public:
 	friend ELog& operator<<( ELog& out,
 		const iServer& serv )
 		{
-		out     << "Name: " << serv.name << ' '
-			<< "intYY: " << serv.intYY << ' '
-			<< "uplinkIntYY: " << serv.uplinkIntYY << ' '
-			<< "charYY: " << serv.charYY ;
+		out     << "Name: " << serv.getName() << ' '
+			<< "intYY: " << serv.getIntYY() << ' '
+			<< "uplinkIntYY: "
+			<< serv.getUplinkIntYY() << ' '
+			<< "charYY: " << serv.getCharYY() ;
 		return out ;
 		}
 
@@ -167,14 +165,23 @@ public:
 	friend std::ostream& operator<<( std::ostream& out,
 		const iServer& serv )
 		{
-		out     << "Name: " << serv.name << ' '
-			<< "intYY: " << serv.intYY << ' '
-			<< "uplinkIntYY: " << serv.uplinkIntYY << ' '
-			<< "charYY: " << serv.charYY ;
+		out     << "Name: " << serv.getName() << ' '
+			<< "intYY: " << serv.getIntYY() << ' '
+			<< "uplinkIntYY: "
+			<< serv.getUplinkIntYY() << ' '
+			<< "charYY: " << serv.getCharYY() ;
 		return out ;
 		}
 
 protected:
+
+	/**
+	 * Allow friends to modify the iServer's description.  This
+	 * is used in the case of adding this server as a juped
+	 * server.
+	 */
+	inline void	setDescription( const string& newDescription )
+		{ description = newDescription ; }
 
 	/**
 	 * Integer numeric of this server's uplink.
@@ -197,19 +204,9 @@ protected:
 	time_t		startTime ;
 
 	/**
-	 * This server's integer numeric.
+	 * The server's description field.
 	 */
-	unsigned int	intYY ;
-
-	/**
-	 * This server's integer max number of clients.
-	 */
-	unsigned int	intXXX ;
-
-	/**
-	 * This server's character array numeric.
-	 */
-	char		charYY[ 3 ] ;
+	string		description ;
 
 	/**
 	 * This variable is true when this server is bursting.

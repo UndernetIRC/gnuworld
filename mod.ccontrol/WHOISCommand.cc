@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: WHOISCommand.cc,v 1.19 2003/06/28 01:21:19 dan_karrels Exp $
+ * $Id: WHOISCommand.cc,v 1.20 2003/08/09 23:15:34 dan_karrels Exp $
  */
 
 #include	<string>
@@ -30,8 +30,9 @@
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 #include	"ip.h"
+#include	"config.h"
 
-const char WHOISCommand_cc_rcsId[] = "$Id: WHOISCommand.cc,v 1.19 2003/06/28 01:21:19 dan_karrels Exp $";
+RCSTAG( "$Id: WHOISCommand.cc,v 1.20 2003/08/09 23:15:34 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -88,8 +89,8 @@ else
 
 bot->Notice( theClient, "Numeric: %s, UserModes: %s, Server Numeric: %s (%s)",
 	Target->getCharYYXXX().c_str(),
-	Target->getCharModes().c_str(),
-	targetServer->getCharYY(),
+	Target->getStringModes().c_str(),
+	targetServer->getCharYY().c_str(),
 	targetServer->getName().c_str()
 	) ;
 

@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server.cc,v 1.175 2003/08/06 17:47:48 dan_karrels Exp $
+ * $Id: server.cc,v 1.176 2003/08/09 23:15:36 dan_karrels Exp $
  */
 
 #include	<sys/time.h>
@@ -71,7 +71,7 @@
 #include	"ConnectionHandler.h"
 #include	"Connection.h"
 
-RCSTAG( "$Id: server.cc,v 1.175 2003/08/06 17:47:48 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: server.cc,v 1.176 2003/08/09 23:15:36 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -108,22 +108,29 @@ if( !readConfigFile( configFileName ) )
 	}
 
 // Output the information to the console.
-elog << "Numeric: " << intYY << endl ;
-elog << "Max Clients (bogus): " << intXXX << endl ;
-elog << "Uplink Name: " << UplinkName << endl ;
-elog << "Port: " << Port << endl ;
-elog << "Server Name: " << ServerName << endl ;
-elog << "Server Description: " << ServerDescription << endl ;
+elog	<< endl ;
+elog	<< "Numeric: " << getIntYY()
+	<< " ("
+	<< getCharYY()
+	<< ")"
+	<< endl ;
+elog	<< "Max Clients: " << getIntXXX()
+	<< " ("
+	<< getCharXXX()
+	<< ")"
+	<< endl ;
+elog	<< "Uplink Name: " << UplinkName << endl ;
+elog	<< "Uplink Port: " << Port << endl ;
+elog	<< "Server Name: " << ServerName << endl ;
+elog	<< "Server Description: " << ServerDescription << endl ;
+elog	<< endl ;
 
-inttobase64( charYY, intYY, 2 ) ;
-inttobase64( charXXX, intXXX, 3 ) ;
+//elog	<< "xServer::charYY> " << getCharYY() << endl ;
+//elog	<< "xServer::charXXX> " << getCharXXX() << endl ;
+//elog	<< "xServer::intYY> " << getIntYY() << endl ;
+//elog	<< "xServer::intXXX> " << getIntXXX() << endl ;
 
-elog << "xServer::charYY> " << charYY << endl ;
-elog << "xServer::charXXX> " << charXXX << endl ;
-elog << "xServer::intYY> " << intYY << endl ;
-elog << "xServer::intXXX> " << intXXX << endl ;
-
-iServer* me = new (std::nothrow) iServer(
+me = new (std::nothrow) iServer(
 	0,
 	getCharYYXXX(),
 	ServerName,
@@ -137,6 +144,8 @@ if( !Network->addServer( me ) )
 		<< endl ;
 	::exit( -1 ) ;
 	}
+
+Network->setServer( this ) ;
 
 if( !loadCommandHandlers() )
 	{
@@ -185,17 +194,12 @@ StartTime = ::time( NULL ) ;
 serverConnection = 0 ;
 burstStart = burstEnd = 0 ;
 Uplink = NULL ;
+me = NULL ;
 lastTimerID = 1 ;
 glineUpdateInterval = pingUpdateInterval = 0 ;
 
-// Initialize the numeric stuff.
-::memset( charYY, 0, sizeof( charYY ) ) ;
-::memset( charXXX, 0, sizeof( charXXX ) ) ;
-
 Network = new (std::nothrow) xNetwork ;
 assert( Network != 0 ) ;
-
-Network->setServer( this ) ;
 }
 
 bool xServer::readConfigFile( const string& fileName )
@@ -210,8 +214,8 @@ ServerName = conf.Require( "name" )->second ;
 ServerDescription = conf.Require( "description" )->second ;
 Password = conf.Require( "password" )->second ;
 Port = atoi( conf.Require( "port" )->second.c_str() ) ;
-intYY = atoi( conf.Require( "numeric" )->second.c_str() ) ;
-intXXX = atoi( conf.Require( "maxclients" )->second.c_str() ) ;
+setIntYY( atoi( conf.Require( "numeric" )->second.c_str() ) ) ;
+setIntXXX( atoi( conf.Require( "maxclients" )->second.c_str() ) ) ;
 commandMapFileName = conf.Require( "command_map" )->second ;
 
 // autoConnect initialized to false
@@ -500,6 +504,10 @@ void xServer::Shutdown()
 keepRunning = false ;
 autoConnect = false ;
 
+Write( "%s SQ %s :Server shutdown",
+	getCharYY().c_str(),
+	getCharYY().c_str() ) ;
+
 // Can't call removeClients() here because it is likely one of the
 // clients that has invoked this call, that would be bad.
 // Instead, the code that will halt the system is located in the
@@ -585,6 +593,18 @@ if( theConn != serverConnection )
 	{
 	elog	<< "xServer::OnRead> Unknown connection"
 		<< endl ;
+	return ;
+	}
+
+if( !keepRunning )
+	{
+	// Part of the shutdown process includes flushing any
+	// data in the output buffer, and closing connections.
+	// This requires calling Poll(), which will also
+	// recv() and perform any distribution of messages to
+	// handlers, including OnRead().
+	// Therefore, only handle data if the server is still
+	// in a running state.
 	return ;
 	}
 
@@ -837,9 +857,9 @@ else
  * Squit another server as a server.
  * 0 SQ server.name.com timestamp :reason
  */
-bool xServer::SquitServer( const string& serverName, const string& reason )
+bool xServer::SquitServer( const string& serverName,
+	const string& reason )
 {
-
 // Is it our server?
 if( !strcasecmp( serverName, this->ServerName ) )
 	{
@@ -853,8 +873,6 @@ if( !strcasecmp( serverName, this->ServerName ) )
 //	<< serverName
 //	<< endl ;
 
-// All juped servers are also put into the Network tables...
-// This call to findServerName() will find a juped server.
 iServer* theServer = Network->removeServerName( serverName ) ;
 if( NULL == theServer )
 	{
@@ -865,25 +883,9 @@ if( NULL == theServer )
 	return false ;
 	}
 
-
-for( jupedServerListType::iterator ptr = jupedServers.begin() ;
-	ptr != jupedServers.end() ; ++ptr )
-	{
-	if( *ptr== theServer->getIntYY() )
-		{
-		// Found the server in the list of jupes
-		//elog	<< "xServer::SquitServer> Found " << serverName
-		//	<< " in list of juped servers\n" ;
-		jupedServers.erase( ptr ) ;
-		break ;
-		}
-	}
-
-// Don't really care if we found a server in the jupe list or not.
-
 // Prepare the output buffer that will squit the server.
 stringstream s ;
-s	<< charYY
+s	<< getCharYY()
 	<< " SQ "
 	<< serverName
 	<< ' '
@@ -894,10 +896,8 @@ s	<< charYY
 // Notify the rest of the network of the SQUIT.
 Write( s ) ;
 
-// The server that is being squit has already been removed from
-// both the network server table and the juped servers table.
 // Deallocate the memory it occupies.
-delete theServer ;
+delete theServer ; theServer = 0 ;
 
 // TODO: Log event
 // TODO: Post message
@@ -910,70 +910,49 @@ return true ;
  * Attach a server.  This could be either a jupe, or some fictitious
  * server from which to host virtual clients.
  */
-bool xServer::AttachServer( iServer* fakeServer, const string& description )
+bool xServer::AttachServer( iServer* fakeServer )
 {
 assert( fakeServer != NULL ) ;
 
 // Make sure a server of the same name is not already connected.
-iServer* tmp = Network->findServerName( fakeServer->getName() ) ;
-
-if( tmp != NULL )
+iServer* existingServer =
+	Network->findServerName( fakeServer->getName() ) ;
+if( existingServer != NULL )
 	{
 	// The server is already on the network.
 	// Steal it's numeric :)
-	fakeServer->uplinkIntYY = tmp->getIntYY() ;
+	fakeServer->setIntYY( existingServer->getIntYY() ) ;
 
 	// Squit the old server and remove it from the internal tables.
 	// This will also remove the server if it is already juped.
-	SquitServer( fakeServer->getName(), "Being juped" ) ;
+	SquitServer( existingServer->getName(),
+		fakeServer->getDescription() ) ;
 
 	// SquitServer() will also deallocate the server.
 	// Make sure not to attempt to use the bogus tmp pointer.
-	tmp = 0 ;
+	existingServer = 0 ;
 	}
-else if( !jupedServers.empty() )
+
+if( !Network->addFakeServer( fakeServer ) )
 	{
-	// Try to create a numeric by looking at the currently juped
-	// servers.
-
-	// Assume that the iServer's basic info such as name
-	// and IP are set as they are desired by the caller.
-
-	// Build a new numeric.
-	// Find the last juped server.
-	tmp = Network->findServer( jupedServers[ jupedServers.size() - 1 ] ) ;
-	if( NULL == tmp )
-		{
-		elog	<< "xServer::AttachServer> Unable to find juped server: "
-			<< jupedServers[ jupedServers.size() - 1 ] << endl ;
-		return false ;
-		}
-
-	// Create a new numeric from the last juped server's numeric.
-	fakeServer->intYY = tmp->getIntYY() + 1 ;
-	}
-else
-	{
-	// TODO: Try to make more sure that this numeric is available after
-	// all bursting is complete -> reserve numeric?
-	// Take a guess at a decent numeric.
-	fakeServer->intYY = intYY + 100 ;
+	elog	<< "xNetwork::AttachServer> Failed to attach fake "
+		<< "server: "
+		<< *fakeServer
+		<< endl ;
+	return false ;
 	}
 
-// Setup the rest of the fake server's numeric stuff.
-inttobase64( fakeServer->charYY, fakeServer->intYY, 2 ) ;
+// Set the intXXX/charXXX to the max possible
+fakeServer->setIntXXX( 64 * 64 * 64 ) ;
 
-// Null terminate the server's new character numeric.
-fakeServer->charYY[ 2 ] = 0 ;
+BurstServer( fakeServer ) ;
 
-//elog << "AttachServer> Built server: " << *fakeServer << endl ;
+return true ;
+}
 
-// Setup YYXXX numeric for new server...bogus
-string charYYXXX( fakeServer->getCharYY() ) ;
-
-// Guess at the xxx part of the numeric, the max number of clients
-// for this server.
-charYYXXX += "]]]" ;
+void xServer::BurstServer( iServer* fakeServer )
+{
+assert( fakeServer != 0 ) ;
 
 // Burst the new server's info./
 // IRCu checks for "JUPE " as being the beginning of the
@@ -981,32 +960,19 @@ charYYXXX += "]]]" ;
 // couldn't link without [ip] being added to their realname
 // field unless they were juped by uworld.  Now anyone can
 // link with that name, oh well.
-Write( "%s S %s %d %d %d J%02d %s 0 :JUPE Reason: %s\n",
-		getCharYY(),
+Write( "%s S %s %d %d %d J%02d %s 0 :%s\n",
+		getCharYY().c_str(),
 		fakeServer->getName().c_str(),
 		2,
 		0,
-		fakeServer->getConnectTime()-24*3600*365,
+		fakeServer->getConnectTime(),
 		10, // version
-		charYYXXX.c_str(),
-		description.c_str() ) ;
+		fakeServer->getCharYYXXX().c_str(),
+		fakeServer->getDescription().c_str() ) ;
 
 // Write burst acknowledgements.
-Write( "%s EB\n", fakeServer->getCharYY() ) ;
-Write( "%s EA\n", fakeServer->getCharYY() ) ;
-
-// Add this fake server to the internal list of juped servers.
-jupedServers.push_back( fakeServer->getIntYY() ) ;
-
-// Add to network tables...It doesn't know whether it is fake
-// or not, and why should it care?
-Network->addServer( fakeServer ) ;
-
-//elog	<< "xServer::AttachServer> Added server: "
-//	<< fakeServer->getName() << endl ;
-
-// Success.
-return( 0 ) ;
+Write( "%s EB\n", fakeServer->getCharYY().c_str() ) ;
+Write( "%s EA\n", fakeServer->getCharYY().c_str() ) ;
 }
 
 /**
@@ -1014,7 +980,8 @@ return( 0 ) ;
  * all events of the given type.
  * Available events are listed in include/events.h
  */
-bool xServer::RegisterEvent( const eventType& theEvent, xClient* theClient )
+bool xServer::RegisterEvent( const eventType& theEvent,
+	xClient* theClient )
 {
 assert( theClient != NULL ) ;
 
@@ -1297,7 +1264,10 @@ bool xServer::AttachClient( xClient* Client, bool doBurst )
 // Make sure the pointer is valid.
 assert( NULL != Client ) ;
 
-// addClient() will allocate a new YYXXX and
+// The xClient will be attached to this server.
+Client->setIntYY( getIntYY() ) ;
+
+// addClient() will allocate a new XXX and
 // update Client.
 if( !Network->addClient( Client ) )
 	{
@@ -1305,6 +1275,8 @@ if( !Network->addClient( Client ) )
 		<< endl ;
 	return false ;
 	}
+
+Client->MyUplink = this ;
 
 // Let the client know it has been added to
 // the server and its tables.
@@ -1421,31 +1393,68 @@ return true ;
  *
  * AQ N ripper_ 1 952038834 ~dan 127.0.0.1 +owg B]AAAB AQAAA :Dan Karrels
  */
-bool xServer::AttachClient( iClient* fakeClient )
+bool xServer::AttachClient( iClient* fakeClient,
+	xClient* ownerClient )
 {
 assert( fakeClient != NULL ) ;
 
-// Need to send info to the network about the new client.
-iServer* fakeServer = Network->findServer( fakeClient->getIntYY() ) ;
-if( NULL == fakeServer )
+// Verify that the iClient is in good order
+if( fakeClient->getNickName().empty() ||
+	fakeClient->getUserName().empty() ||
+	fakeClient->getInsecureHost().empty() ||
+	fakeClient->getDescription().empty() )
 	{
-	elog	<< "xServer::AttachClient> Unable to find fake server: "
-		<< fakeClient->getIntYY()
+	elog	<< "xServer::AttachClient(iClient)> Missing data "
+		<< "in iClient: "
+		<< *fakeClient
 		<< endl ;
-	return -1 ;
+	return false ;
 	}
 
-Write( "%s N %s 2 %d %s %s +d %s %s :%s\n",
-	fakeServer->getCharYY(),
+// Let the xNetwork class handle filling in the information about the
+// iClient.
+if( !Network->addFakeClient( fakeClient, ownerClient ) )
+	{
+	elog	<< "xServer::AttachClient(iClient)> addFakeClient() "
+		<< "failed"
+		<< endl ;
+	return false ;
+	}
+
+// Burst the client
+BurstClient( fakeClient ) ;
+
+return true ;
+}
+
+void xServer::BurstClient( iClient* fakeClient )
+{
+iServer* fakeServer = me ;
+int hopCount = 1 ;
+if( fakeClient->getIntYY() != getIntYY() )
+	{
+	hopCount = 2 ;
+	fakeServer = Network->findFakeServer( fakeClient->getIntYY() ) ;
+	assert( fakeServer != 0 ) ;
+	}
+
+string description( "Clone" ) ;
+if( !fakeClient->getDescription().empty() )
+	{
+	description = fakeClient->getDescription() ;
+	}
+
+Write( "%s N %s %d %d %s %s %s %s %s :%s\n",
+	fakeServer->getCharYY().c_str(),
 	fakeClient->getNickName().c_str(),
+	hopCount,
 	fakeClient->getConnectTime(),
 	fakeClient->getUserName().c_str(),
 	fakeClient->getInsecureHost().c_str(),
+	fakeClient->getStringModes().c_str(),
 	xIP( fakeClient->getIP() ).GetBase64IP(),
 	fakeClient->getCharYYXXX().c_str(),
-	"Clone" ) ;
-
-return Network->addClient( fakeClient ) ;
+	description.c_str() ) ;
 }
 
 /**
@@ -1540,9 +1549,9 @@ RegisterTimer( ::time( 0 ), handler, 0 ) ;
 
 void xServer::UnloadClient( xClient* theClient, const string& reason )
 {
-elog	<< "xServer::UnloadClient(xClient*)> "
-	<< theClient->getNickName()
-	<< endl ;
+//elog	<< "xServer::UnloadClient(xClient*)> "
+//	<< theClient->getNickName()
+//	<< endl ;
 
 for( clientModuleListType::const_iterator ptr = clientModuleList.begin() ;
 	ptr != clientModuleList.end() ; ++ptr )
@@ -1569,6 +1578,7 @@ void xServer::removeClient( xClient* theClient )
 // Remove this xClient's iClient instance
 iClient* iClientPtr = Network->removeClient( theClient->getInstance() ) ;
 
+/*
 // Notify each channel that the iClient has parted.
 for( iClient::channelIterator chanItr = iClientPtr->channels_begin() ;
 	chanItr != iClientPtr->channels_end() ; ++chanItr )
@@ -1585,6 +1595,7 @@ for( iClient::channelIterator chanItr = iClientPtr->channels_begin() ;
 // This is not strictly necessary, but serves to illustrate the
 // internal client<->channel relationships.
 iClientPtr->clearChannels() ;
+*/
 
 // By this point, the xClient should have removed all of its
 // custom data from each iClient in the network.
@@ -1907,7 +1918,7 @@ if( gItr != gline_end() )
 // Even if we didn't find the gline here, it may be present
 // to someone on the network *shrug*
 stringstream s ;
-s	<< charYY
+s	<< getCharYY()
 	<< " GL * -"
 	<< userHost ;
 
@@ -2358,7 +2369,7 @@ else
 		{
 		// Op the bot
 		stringstream s ;
-		s	<< charYY
+		s	<< getCharYY()
 			<< " M "
 			<< chanName
 			<< " +o "
@@ -2509,16 +2520,24 @@ return true ;
 }
 
 // K N Isomer 2 957217279 ~perry p136-tnt1.ham.ihug.co.nz DLbaCI KAC :*Unknown*
-void xServer::BurstClient( xClient* theClient, bool localClient )
+void xServer::BurstClient( xClient* theClient )
 {
+int hopCount = 1 ;
+if( (theClient->getCharYY()[ 0 ] != getCharYY()[ 0 ]) ||
+	(theClient->getCharYY()[ 1 ] != getCharYY()[ 1 ]) )
+	{
+	// The xClient is not on this server
+	hopCount = 2 ;
+	}
+
 stringstream s ;
-s	<< getCharYY() << " N "
+s	<< theClient->getCharYY() << " N "
 	<< theClient->getNickName() << ' '
-	<< (localClient ? '1' : '2') << " 31337 "
+	<< hopCount << " 31337 "
 	<< theClient->getUserName() << ' '
 	<< theClient->getHostName() << ' '
 	<< theClient->getModes() << ' '
-	<< "AAAAAA" << ' '
+	<< "AAAAAA "
 	<< theClient->getCharYYXXX() << " :"
 	<< theClient->getDescription() ;
 Write( s ) ;
@@ -2531,7 +2550,7 @@ void xServer::BurstClients()
 xNetwork::localClientIterator ptr = Network->localClient_begin() ;
 while( ptr != Network->localClient_end() )
 	{
-	BurstClient( *ptr ) ;
+	BurstClient( ptr->second ) ;
 	++ptr ;
 	}
 }
@@ -2541,7 +2560,7 @@ void xServer::BurstChannels()
 xNetwork::localClientIterator ptr = Network->localClient_begin() ;
 while( ptr != Network->localClient_end() )
 	{
-	(*ptr)->BurstChannels() ;
+	ptr->second->BurstChannels() ;
 	++ptr ;
 	}
 }
@@ -2551,7 +2570,7 @@ void xServer::BurstGlines()
 xNetwork::localClientIterator ptr = Network->localClient_begin() ;
 while( ptr != Network->localClient_end() )
 	{
-	(*ptr)->BurstGlines() ;
+	ptr->second->BurstGlines() ;
 	++ptr ;
 	}
 }
@@ -2565,13 +2584,7 @@ xNetwork::localClientIterator ptr = Network->localClient_begin(),
 
 while( ptr != end )
 	{
-	// This should never happen at burst time,
-	// but just to be safe...
-	if( NULL == *ptr )
-		{
-		continue ;
-		}
-	(*ptr)->Connect( 0x31337 ) ;
+	ptr->second->Connect( 0x31337 ) ;
 
 	// No need to add to tables, it is
 	// already there
@@ -2746,31 +2759,15 @@ bool xServer::PostSignal( int whichSig )
 // First, notify the server signal handler
 bool handledSignal = OnSignal( whichSig ) ;
 
-if( SIGINT == whichSig )
-	{
-	elog	<< "xServer::PostSignal> Caught SIGINT, shutting "
-		<< "down"
-		<< endl ;
-	Shutdown() ;
-	}
-
-if( SIGTERM == whichSig )
-	{
-	elog	<< "xServer::PostSignal> Caught SIGTERM, shutting "
-		<< "down"
-		<< endl ;
-	Shutdown() ;
-	}
-
 // Pass this signal on to each xClient.
 xNetwork::localClientIterator ptr = Network->localClient_begin() ;
 for( ; ptr != Network->localClient_end() ; ++ptr )
 	{
-	if( NULL == *ptr )
-		{
-		continue ;
-		}
-	(*ptr)->OnSignal( whichSig ) ;
+//	if( NULL == *ptr )
+//		{
+//		continue ;
+//		}
+	ptr->second->OnSignal( whichSig ) ;
 	}
 
 return handledSignal ;
@@ -2790,6 +2787,11 @@ switch( whichSig )
 		break ;
 	case SIGUSR2:
 		retMe = true;
+		break ;
+	case SIGINT:
+	case SIGTERM:
+		Shutdown() ;
+		retMe = true ;
 		break ;
 	default:
 		break ;
@@ -3412,26 +3414,6 @@ for( ; ptr != end ; ++ptr )
 	} // for()
 } // updateGlines()
 
-bool xServer::RemoveJupe( const iServer* theServer )
-{
-for( jupedServerListType::iterator ptr = jupedServers.begin() ;
-	ptr != jupedServers.end() ; ++ptr )
-	{
-	if( *ptr== theServer->getIntYY() )
-		{
-		// Found the server in the list of jupes
-		//elog	<< "xServer::RemoveJupe> Found "
-		//	<< serverName
-		//	<< " in list of juped servers\n" ;
-
-		jupedServers.erase( ptr ) ;
-
-		return true ;
-		}
-	}
-return false ;
-}
-
 int xServer::Wallops( const string& msg )
 {
 if( msg.empty() )
@@ -3764,19 +3746,6 @@ if( (string::npos == exPos) || (string::npos == atPos) ||
 return true ;
 }
 
-bool xServer::isJuped( const iServer* theServer ) const
-{
-for( jupedServerListType::const_iterator ptr = jupedServers.begin() ;
-	ptr != jupedServers.end() ; ++ptr )
-	{
-	if( *ptr == theServer->getIntYY() )
-		{
-		return true;
-		}
-	}
-return false;
-}
-
 void xServer::WriteBurstBuffer()
 {
 if( !isConnected() )
@@ -3896,8 +3865,9 @@ for( xNetwork::localClientIterator clientItr = Network->localClient_begin() ;
 	++clientItr )
 	{
 	++count ;
-	DetachClient( *clientItr, "Server shutdown" ) ;
+	DetachClient( clientItr->second, "Server shutdown" ) ;
 	}
+
 elog	<< "xServer::doShutdown> Removed "
 	<< count
 	<< " local clients"
@@ -3937,6 +3907,20 @@ while( Network->channels_begin() != Network->channels_end() )
 elog	<< "xServer::doShutdown> Removed "
 	<< count
 	<< " channels"
+	<< endl ;
+
+// Remove servers
+count = 0 ;
+while( Network->servers_begin() != Network->servers_end() )
+	{
+	++count ;
+	iServer* tmpServer = Network->servers_begin()->second ;
+	delete Network->removeServer( tmpServer->getIntYY() ) ;
+	}
+
+elog	<< "xServer::doShutdown> Removing "
+	<< count
+	<< " servers..."
 	<< endl ;
 
 //elog	<< "xServer::doShutdown> Removing glines..."
@@ -3992,6 +3976,49 @@ ConnectionManager::Poll() ;
 
 // Deallocate the serverConnection
 // The Connection is deallocated in ConnectionManager::Poll()
+}
+
+bool xServer::DetachClient( iClient* fakeClient,
+	const string& quitMessage )
+{
+assert( fakeClient != 0 ) ;
+
+// xNetwork::removeFakeClient() will remove the client from
+// the network data structurs, and free its numeric
+if( 0 == Network->removeClient( fakeClient ) )
+	{
+	elog	<< "xNetwork::DetachClient(iClient)> Failed to remove "
+		<< "fakeClient from network data structures: "
+		<< *fakeClient
+		<< endl ;
+	return false ;
+	}
+
+Write( "%s Q :%s",
+	fakeClient->getCharYYXXX().c_str(),
+	quitMessage.c_str() ) ;
+
+return true ;
+}
+
+bool xServer::DetachServer( iServer* fakeServer )
+{
+assert( fakeServer != 0 ) ;
+
+if( 0 == Network->removeServer( fakeServer->getIntYY() ) )
+	{
+	elog	<< "xServer::DetachServer> Failed to remove server: "
+		<< *fakeServer
+		<< endl ;
+	return false ;
+	}
+
+Write( "%s SQ %s %d :Unloading server",
+	getCharYY().c_str(),
+	fakeServer->getCharYY().c_str(),
+	fakeServer->getConnectTime() ) ;
+
+return true ;
 }
 
 } // namespace gnuworld

@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: CControlCommands.cc,v 1.14 2003/06/28 01:21:19 dan_karrels Exp $
+ * $Id: CControlCommands.cc,v 1.15 2003/08/09 23:15:33 dan_karrels Exp $
  */
 
 #include	<string>
@@ -26,6 +26,9 @@
 #include	"ccontrol.h"
 #include	"CControlCommands.h"
 #include	"iClient.h"
+#include	"config.h"
+
+RCSTAG( "$Id: CControlCommands.cc,v 1.15 2003/08/09 23:15:33 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {

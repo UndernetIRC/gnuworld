@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: HELPCommand.cc,v 1.19 2003/06/28 01:21:19 dan_karrels Exp $
+ * $Id: HELPCommand.cc,v 1.20 2003/08/09 23:15:33 dan_karrels Exp $
  */
 
 #include	<string>
@@ -29,8 +29,9 @@
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 #include	"commLevels.h"
+#include	"config.h"
 
-const char HELPCommand_cc_rcsId[] = "$Id: HELPCommand.cc,v 1.19 2003/06/28 01:21:19 dan_karrels Exp $";
+RCSTAG( "$Id: HELPCommand.cc,v 1.20 2003/08/09 23:15:33 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {

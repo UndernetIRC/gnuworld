@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_EB.cc,v 1.2 2003/06/17 15:13:53 dan_karrels Exp $
+ * $Id: msg_EB.cc,v 1.3 2003/08/09 23:15:33 dan_karrels Exp $
  */
 
 #include	<sys/types.h>
@@ -34,7 +34,7 @@
 #include	"ServerCommandHandler.h"
 #include	"config.h"
 
-RCSTAG( "$Id: msg_EB.cc,v 1.2 2003/06/17 15:13:53 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: msg_EB.cc,v 1.3 2003/08/09 23:15:33 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -94,10 +94,10 @@ if( !strcmp( params[ 0 ], theServer->getUplinkCharYY().c_str() ) )
 		<< endl ;
 
 	// Send our EB
-	theServer->Write( "%s EB\n", theServer->getCharYY() ) ;
+	theServer->Write( "%s EB\n", theServer->getCharYY().c_str() ) ;
 
 	// Acknowledge their end of burst
-	theServer->Write( "%s EA\n", theServer->getCharYY() ) ;
+	theServer->Write( "%s EA\n", theServer->getCharYY().c_str() ) ;
 
 	// Is the burstOutputBuffer empty?
 	theServer->WriteBurstBuffer() ;

@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_V.cc,v 1.3 2003/06/17 15:13:53 dan_karrels Exp $
+ * $Id: msg_V.cc,v 1.4 2003/08/09 23:15:33 dan_karrels Exp $
  */
 
 #include <sstream>
@@ -26,7 +26,7 @@
 #include	"xparameters.h"
 #include	"config.h"
 
-RCSTAG( "$Id: msg_V.cc,v 1.3 2003/06/17 15:13:53 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: msg_V.cc,v 1.4 2003/08/09 23:15:33 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -49,7 +49,6 @@ CREATE_HANDLER(msg_V)
 
 bool msg_V::Execute( const xParameters& Param )
 {
-
 /* We should have exactly two parameters - source and destination */
 if( Param.size() != 2)
 	{
@@ -59,7 +58,7 @@ if( Param.size() != 2)
 	}
 
 /* The destination numeric should always match us exactly */
-if(strncmp(Param[1], theServer->getCharYY(), 2) != 0)
+if(strncmp(Param[1], theServer->getCharYY().c_str(), 2) != 0)
 	{
 	elog	<< "msg_V> Target server is not me!"
 		<< endl;

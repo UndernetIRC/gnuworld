@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: client.cc,v 1.59 2003/08/03 18:57:44 dan_karrels Exp $
+ * $Id: client.cc,v 1.60 2003/08/09 23:15:36 dan_karrels Exp $
  */
 
 #include	<new>
@@ -34,11 +34,11 @@
 
 #include	"config.h"
 #include	"misc.h"
-#include	"Numeric.h"
 #include	"iClient.h"
 #include	"iServer.h"
 #include	"Network.h"
 #include	"ip.h"
+#include	"NetworkTarget.h"
 
 #include	"client.h"
 #include	"EConfig.h"
@@ -47,7 +47,7 @@
 #include	"ELog.h"
 #include	"events.h"
 
-RCSTAG("$Id: client.cc,v 1.59 2003/08/03 18:57:44 dan_karrels Exp $" ) ;
+RCSTAG("$Id: client.cc,v 1.60 2003/08/09 23:15:36 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -61,11 +61,6 @@ xClient::xClient()
 me = 0 ;
 MyUplink = NULL ;
 Connected = false ;
-
-intYY = intXXX = 0 ;
-
-memset( charYY, 0, sizeof( charYY ) ) ;
-memset( charXXX, 0, sizeof( charXXX ) ) ;
 }
 
 xClient::xClient( const string& fileName )
@@ -73,11 +68,6 @@ xClient::xClient( const string& fileName )
 {
 MyUplink = 0 ;
 Connected = false ;
-
-intYY = intXXX = 0 ;
-
-memset( charYY, 0, sizeof( charYY ) ) ;
-memset( charXXX, 0, sizeof( charXXX ) ) ;
 
 EConfig conf( fileName ) ;
 nickName = conf.Require( "nickname" )->second ;
@@ -94,23 +84,8 @@ xClient::~xClient()
 // This method is called after being added
 // to the network tables.
 // It has been assigned int XX.
-void xClient::ImplementServer( xServer* Server )
-{
-if( NULL == Server )
-	{
-	Connected = false ;
-	elog	<< "ImplementServer> NULL Uplink"
-		<< endl ;
-	return ;
-	}
-
-MyUplink = Server ;
-
-intYY = MyUplink->getIntYY() ;
-
-inttobase64( charYY, intYY, 2 ) ;
-inttobase64( charXXX, intXXX, 3 ) ;
-}
+void xClient::ImplementServer( xServer* )
+{}
 
 bool xClient::BurstChannels()
 {
@@ -281,7 +256,7 @@ bool xClient::ModeAsServer( const string& Channel, const string& Mode )
 if( Connected && MyUplink )
 	{
 	return MyUplink->Write( "%s M #%s %s\r\n",
-		MyUplink->getCharYY(),
+		MyUplink->getCharYY().c_str(),
 		(Channel[ 0 ] == '#' ? (Channel.c_str() + 1) :
 			Channel.c_str()),
 		Mode.c_str() ) ;
@@ -612,7 +587,7 @@ if( theClient->isModeK() )
 	}
 
 Write( "%s D %s :%s",
-	MyUplink->getCharYY(),
+	MyUplink->getCharYY().c_str(),
 	theClient->getCharYYXXX().c_str(),
 	reason.c_str() ) ;
 

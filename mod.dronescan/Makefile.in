@@ -245,7 +245,7 @@ CXXLD = $(CXX)
 CXXLINK = $(LIBTOOL) --mode=link $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) \
 	$(AM_LDFLAGS) $(LDFLAGS) -o $@
 DIST_SOURCES = $(libdronescan_la_SOURCES)
-DIST_COMMON = ChangeLog Makefile.am Makefile.in TODO
+DIST_COMMON = ChangeLog Makefile.am Makefile.in
 SOURCES = $(libdronescan_la_SOURCES)
 
 all: all-am

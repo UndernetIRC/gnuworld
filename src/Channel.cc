@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: Channel.cc,v 1.40 2003/06/17 15:13:54 dan_karrels Exp $
+ * $Id: Channel.cc,v 1.41 2003/08/09 23:15:36 dan_karrels Exp $
  */
 
 #include	<new>
@@ -37,7 +37,7 @@
 #include	"server.h"
 #include	"ConnectionManager.h"
 
-RCSTAG("$Id: Channel.cc,v 1.40 2003/06/17 15:13:54 dan_karrels Exp $") ;
+RCSTAG("$Id: Channel.cc,v 1.41 2003/08/09 23:15:36 dan_karrels Exp $") ;
 
 namespace gnuworld
 {
@@ -129,7 +129,6 @@ return removeUser( theClient->getIntYYXXX() ) ;
 
 ChannelUser* Channel::removeUser( const unsigned int& intYYXXX )
 {
-
 // Attempt to find the user in question
 userListType::iterator ptr = userList.find( intYYXXX ) ;
 
@@ -462,7 +461,6 @@ for( banVectorType::const_iterator newBanPtr = origBans.begin() ;
 
 const string Channel::getModeString() const
 {
-
 string modeString( "+" ) ;
 string argString ;
 

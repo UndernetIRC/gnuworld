@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_D.cc,v 1.2 2003/06/17 15:13:53 dan_karrels Exp $
+ * $Id: msg_D.cc,v 1.3 2003/08/09 23:15:33 dan_karrels Exp $
  */
 
 #include	<new>
@@ -36,7 +36,7 @@
 #include	"ServerCommandHandler.h"
 #include	"config.h"
 
-RCSTAG( "$Id: msg_D.cc,v 1.2 2003/06/17 15:13:53 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: msg_D.cc,v 1.3 2003/08/09 23:15:33 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -62,21 +62,32 @@ if( Param.size() < 3 )
 	return false ;
 	}
 
-// See if the client being killed is one of my own.
-xClient* myClient = Network->findLocalClient( Param[ 1 ] ) ;
-
-// Is the user being killed on this server?
-if( NULL != myClient )
+if( (Param[ 1 ][ 0 ] == theServer->getCharYY()[ 0 ]) &&
+	(Param[ 1 ][ 1 ] == theServer->getCharYY()[ 1 ]) )
 	{
-	// doh, yes it is :(
-	myClient->OnKill() ;
+	// See if the client being killed is one of my own.
+	xClient* myClient = Network->findLocalClient( Param[ 1 ] ) ;
 
-	// Don't detach the client until it requests so.
-	// TODO: Work on this system.
+	// Is the user being killed on this server?
+	if( NULL != myClient )
+		{
+		// doh, yes it is :(
+		myClient->OnKill() ;
 
-	// Note that the client is still attached to the
-	// server.
-	return true ;
+		// Don't detach the client until it requests so.
+		// TODO: Work on this system.
+
+		// Note that the client is still attached to the
+		// server.
+		return true ;
+		}
+	else
+		{
+		// It's a client on my server, but not an xClient.
+		// This is ok, the normal client kill handling code
+		// (for iClient) will handle removing fake clients.
+		// Allow it continue instead of returning.
+		}
 	}
 
 // Otherwise, it's a non-local client.

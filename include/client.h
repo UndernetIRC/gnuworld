@@ -18,17 +18,17 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: client.h,v 1.44 2003/08/03 18:57:44 dan_karrels Exp $
+ * $Id: client.h,v 1.45 2003/08/09 23:15:33 dan_karrels Exp $
  */
 
 #ifndef __CLIENT_H
-#define __CLIENT_H "$Id: client.h,v 1.44 2003/08/03 18:57:44 dan_karrels Exp $"
+#define __CLIENT_H "$Id: client.h,v 1.45 2003/08/09 23:15:33 dan_karrels Exp $"
 
 #include	<sstream>
 #include	<string>
 
+#include	"NetworkTarget.h"
 #include	"server.h"
-#include	"Numeric.h"
 #include	"iClient.h"
 #include	"events.h"
 #include	"TimerHandler.h"
@@ -48,9 +48,8 @@ using std::string ;
  * This has proven to be extremely easy: I built a functioning
  * services client in 11 minutes, though it didn't do much :)
  */
-class xClient : public TimerHandler
+class xClient : public TimerHandler, public NetworkTarget
 {
-
 	/// Let xServer access our protected members.
 	friend class xServer ;
 
@@ -679,64 +678,30 @@ public:
 		{ return userDescription ; }
 
 	/**
-	 * Retrieve the unsigned integer representation of this
-	 * bot's server.
-	 */
-	inline const unsigned int& getIntYY() const
-		{ return intYY ; }
-
-	/**
-	 * Retrieve the unsigned integer representation of this
-	 * bot's client numeric.
-	 */
-	inline const unsigned int& getIntXXX() const
-		{ return intXXX ; }
-
-	/**
-	 * Retrieve a pointer to this bot's character representation
-	 * of its server's numeric.
-	 */
-	inline const char* getCharYY() const
-		{ return charYY ; }
-
-	/**
-	 * Retrieve a pointer to this bot's character representation
-	 * of its client numeric.
-	 */
-	inline const char* getCharXXX() const
-		{ return charXXX ; }
-
-	/**
-	 * Retrieve this bot's std::string network numeric.
-	 */
-	inline const string getCharYYXXX() const
-		{ return( string( charYY ) + charXXX ) ; }
-
-	/**
 	 * Retrieve this bot's uplink's numeric, integer format.
 	 */
-	inline const unsigned int& getUplinkIntYY() const
+	unsigned int getUplinkIntYY() const
 		{ return MyUplink->getIntYY() ; }
 
 	/**
 	 * Retrieve this bot's uplink's highest client count
 	 * numeric, integer format.
 	 */
-	inline const unsigned int& getUplinkIntXXX() const
+	inline unsigned int getUplinkIntXXX() const
 		{ return MyUplink->getIntXXX() ; }
 
 	/**
 	 * Retrieve this bot's uplink's numeric, character
 	 * array format.
 	 */
-	inline const char* getUplinkCharYY() const
+	inline const string getUplinkCharYY() const
 		{ return MyUplink->getCharYY() ; }
 
 	/**
 	 * Retrieve this bot's uplink's client count numeric,
 	 * character array format.
 	 */
-	inline const char* getUplinkCharXXX() const
+	inline const string getUplinkCharXXX() const
 		{ return MyUplink->getCharXXX() ; }
 
 	/**
@@ -793,7 +758,8 @@ public:
 			<< " Numeric: " << theClient.getCharYYXXX()
 			<< ", int YY/XXX/YYXXX: "
 			<< theClient.getIntYY() << '/'
-			<< theClient.getIntXXX() ;
+			<< theClient.getIntXXX() << '/'
+			<< theClient.getIntYYXXX() ;
 		return out ;
 		}
 
@@ -817,16 +783,6 @@ protected:
 	 */
 	xClient operator=( const xClient& ) ;
 	
-	/**
-	 * setIntXXX is called by the network table
-	 * structure when the client is added to the table.
-	 * This is because the (Network) structure is
-	 * responsible for allocating and deallocating
-	 * numerics.
-	 */
-	inline void setIntXXX( const unsigned int& newXX )
-		{ intXXX = newXX ; }
-
 	/**
  	 * This method is called by the xServer, and its purpose is
 	 * to reset its iClient instance.
@@ -909,27 +865,6 @@ protected:
 	 * This is the user mode of this client.
 	 */
 	modeType	mode ;
-
-	/**
-	 * Integer representation of this bot's uplink's numeric.
-	 */
-	unsigned int	intYY ;
-
-	/**
-	 * Integer representation of this bot's client numeric.
-	 */
-	unsigned int	intXXX ;
-
-	/**
-	 * Character array representation of this client's uplink's
-	 * numeric.
-	 */
-	char		charYY[ 3 ] ;
-
-	/**
-	 * Character array representation of this client's numeric.
-	 */
-	char		charXXX[ 4 ] ;
 
 	/**
 	 * The name of the config file from which this client read

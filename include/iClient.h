@@ -17,11 +17,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: iClient.h,v 1.38 2003/06/20 18:58:50 dan_karrels Exp $
+ * $Id: iClient.h,v 1.39 2003/08/09 23:15:33 dan_karrels Exp $
  */
 
 #ifndef __ICLIENT_H
-#define __ICLIENT_H "$Id: iClient.h,v 1.38 2003/06/20 18:58:50 dan_karrels Exp $"
+#define __ICLIENT_H "$Id: iClient.h,v 1.39 2003/08/09 23:15:33 dan_karrels Exp $"
 
 #include	<string>
 #include	<list>
@@ -30,8 +30,8 @@
 
 #include	<ctime>
 
-#include	"Numeric.h"
 #include	"Channel.h"
+#include	"NetworkTarget.h"
 
 namespace gnuworld
 {
@@ -48,7 +48,7 @@ class xClient ;
  * Note that iClient is NOT used for services clients, see
  * class xClient for that.
  */
-class iClient
+class iClient : public NetworkTarget
 {
 
 protected:
@@ -476,43 +476,7 @@ public:
 	 * Return a string representation of this iClient's user
 	 * modes.
 	 */
-	const string getCharModes() const ;
-
-	/**
-	 * Return this client's uplink server's integer numeric.
-	 */
-	inline const unsigned int& getIntYY() const
-		{ return intYY ; }
-
-	/**
-	 * Return this client's integer per-server numeric.
-	 */
-	inline const unsigned int& getIntXXX() const
-		{ return intXXX ; }
-
-	/**
-	 * Return this clients integer network numeric.
-	 */
-	inline const unsigned int& getIntYYXXX() const
-		{ return intYYXXX ; }
-
-	/**
-	 * Return this client's uplink server's character numeric.
-	 */
-	inline const char* getCharYY() const
-		{ return charYY ; }
-
-	/**
-	 * Return this client's character per-server numeric.
-	 */
-	inline const char* getCharXXX() const
-		{ return charXXX ; }
-
-	/**
-	 * Return this client's full character numeric.
-	 */
-	inline const string getCharYYXXX() const
-		{ return( string( charYY ) + charXXX ) ; }
+	const string getStringModes() const ;
 
 	/**
 	 * Add an xClient's personal data representation to this
@@ -582,12 +546,6 @@ protected:
 	// efficient instantiation.  Do not alter order.
 
 	/**
-	 * This is the integer representation of this
-	 * client's uplink server.
-	 */
-	unsigned int	intYY ;
-
-	/**
 	 * This client's nick name.
 	 */
 	string		nickName ;
@@ -633,26 +591,6 @@ protected:
 	 * This client's "Account".
 	 */
 	string		account ;
-
-	/**
-	 * This client's integer per-server numeric.
-	 */
-	unsigned int	intXXX ;
-
-	/**
-	 * This client's uplink server's character numeric.
-	 */
-	char		charYY[ 3 ] ;
-
-	/**
-	 * This client's per-server character numeric.
-	 */
-	char		charXXX[ 4 ] ;
-
-	/**
-	 * This client's integer network numeric.
-	 */
-	unsigned int	intYYXXX ;
 
 	/**
 	 * The structure used to store which channels this user is in.

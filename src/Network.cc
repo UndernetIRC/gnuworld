@@ -18,13 +18,15 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: Network.cc,v 1.59 2003/06/17 15:13:54 dan_karrels Exp $
+ * $Id: Network.cc,v 1.60 2003/08/09 23:15:36 dan_karrels Exp $
  */
 
 #include	<new>
-#include	<iostream>
-#include	<string>
+#include	<set>
+#include	<map>
 #include	<list>
+#include	<string>
+#include	<iostream>
 #include	<algorithm>
 
 #include	<cassert>
@@ -42,12 +44,14 @@
 #include	"ip.h"
 #include	"config.h"
 
-RCSTAG( "$Id: Network.cc,v 1.59 2003/06/17 15:13:54 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: Network.cc,v 1.60 2003/08/09 23:15:36 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
 
+using std::set ;
 using std::map ;
+using std::make_pair ;
 using std::string ;
 using std::endl ;
 using std::list ;
@@ -57,9 +61,7 @@ xNetwork::xNetwork()
 {}
 
 xNetwork::~xNetwork()
-{
-// TODO: Establish protocol here about who deletes all clients/server/etc
-}
+{}
 
 bool xNetwork::addClient( iClient* newClient )
 {
@@ -102,29 +104,36 @@ if( findLocalNick( newClient->getNickName() ) != 0 )
 	return false ;
 	}
 
-// First, find a new numeric for this client
-xClientVectorType::size_type pos = 0 ;
-for( ; pos < localClients.size() ; pos++ )
-	{
-	if( NULL == localClients[ pos ] )
-		{
-		break ;
-		}
-	}
+// Find a new numeric for this client
+// The client's intYY/charYY should already be set.
+unsigned int intXXX = 0 ;
 
-// Were there any spots available?
-if( pos >= localClients.size() )
+if( !allocateClientNumeric( newClient->getIntYY(), intXXX ) )
 	{
-	// Nope, make a new one
-	localClients.push_back( NULL ) ;
+	elog	<< "xNetwork::addClient(xClient)> Unable to "
+		<< "allocate local client numeric for: "
+		<< *newClient
+		<< endl ;
+	return false ;
 	}
-
-// pos is now the index of the next empty
-// slot in the localClients vector
-localClients[ pos ] = newClient ;
 
 // Give the new client a numeric
-newClient->setIntXXX( pos ) ;
+newClient->setIntXXX( intXXX ) ;
+
+if( !localClients.insert(
+	make_pair( newClient->getIntYYXXX(), newClient ) ).second )
+	{
+	elog	<< "xNetwork::addClient(xClient)> Unable to insert "
+		<< "new client into localClients: "
+		<< *newClient
+		<< endl ;
+	newClient->setIntXXX( 0 ) ;
+	return false ;
+	}
+
+elog	<< "xNetwork::addClient(xClient)> Added client: "
+	<< *newClient
+	<< endl ;
 
 return true ;
 }
@@ -197,65 +206,38 @@ iClient* xNetwork::findNick( const string& nick ) const
 //	<< nick
 //	<< endl ;
 
-nickMapType::const_iterator ptr = nickMap.find( nick ) ;
-if( ptr == nickMap.end() )
+const_clientIterator ptr = nickMap.find( nick ) ;
+if( ptr == clients_end() )
 	{
 	return 0 ;
 	}
 return ptr->second ;
 }
 
-xClient* xNetwork::findLocalClient( const unsigned int& YY,
-	const unsigned int& XXX ) const
-{
-// Nothing fancy for now, just linear iteration
-for( xClientVectorType::size_type i = 0 ; i < localClients.size() ; i++ )
-	{
-	if( NULL == localClients[ i ] )
-		{
-		continue ;
-		}
-	if( YY == localClients[ i ]->getIntYY() &&
-		XXX == localClients[ i ]->getIntXXX() )
-		{
-		return localClients[ i ] ;
-		}
-	}
-return 0 ;
-}
-
 xClient* xNetwork::findLocalClient( const string& yyxxx ) const
 {
-unsigned int	yy = 0,
-		xxx = 0 ;
+unsigned int intYYXXX = base64toint( yyxxx.c_str(), 5 ) ;
 
-if( yyxxx.size() == 5 )
+const_localClientIterator cItr = localClients.find( intYYXXX ) ;
+if( cItr == localClient_end() )
 	{
-	// n2k
-	yy = base64toint( yyxxx.c_str(), 2 ) ;
-	xxx = base64toint( yyxxx.c_str() + 2, 3 ) ;
+	elog	<< "xNetwork::findLocalClient> Unable to find "
+		<< "client numeric: "
+		<< yyxxx
+		<< endl ;
+	return 0 ;
 	}
-else
-	{
-	// yxx
-	yy = base64toint( yyxxx.c_str(), 1 ) ;
-	xxx = base64toint( yyxxx.c_str() + 1, 2 ) ;
-	}
-
-return findLocalClient( yy, xxx ) ;
+return cItr->second ;
 }
 
 xClient* xNetwork::findLocalNick( const string& nickName ) const
 {
-for( xClientVectorType::size_type i = 0 ; i < localClients.size() ; i++ )
+for( const_localClientIterator cItr = localClient_begin() ;
+	cItr != localClient_end() ; ++cItr )
 	{
-	if( NULL == localClients[ i ] )
+	if( !strcasecmp( cItr->second->getNickName(), nickName ) )
 		{
-		continue ;
-		}
-	if( !strcasecmp( nickName, localClients[ i ]->getNickName() ) )
-		{
-		return localClients[ i ] ;
+		return cItr->second ;
 		}
 	}
 return 0 ;
@@ -266,10 +248,10 @@ iServer* xNetwork::findServer( const string& YY ) const
 return findServer( base64toint( YY.c_str(), YY.size() ) ) ;
 }
 
-iServer* xNetwork::findServer( const unsigned int& YY ) const
+iServer* xNetwork::findServer( const unsigned int& intYY ) const
 {
-serverMapType::const_iterator ptr = serverMap.find( YY ) ;
-if( ptr == serverMap.end() )
+const_serverIterator ptr = serverMap.find( intYY ) ;
+if( ptr == servers_end() )
 	{
 	return 0 ;
 	}
@@ -278,8 +260,8 @@ return ptr->second ;
 
 iServer* xNetwork::findServerName( const string& name ) const
 {
-for( serverMapType::const_iterator ptr = serverMap.begin(),
-	endPtr = serverMap.end() ; ptr != endPtr ; ++ptr )
+for( const_serverIterator ptr = servers_begin() ;
+	ptr != servers_end() ; ++ptr )
 	{
 	if( !strcasecmp( ptr->second->getName(), name ) )
 		{
@@ -291,8 +273,8 @@ return 0 ;
 
 iServer* xNetwork::findExpandedServerName( const string& name ) const
 {
-for( serverMapType::const_iterator ptr = serverMap.begin(),
-	endPtr = serverMap.end() ; ptr != endPtr ; ++ptr )
+for( const_serverIterator ptr = servers_begin() ;
+	ptr != servers_end() ; ++ptr )
 	{
 	if( !match( ptr->second->getName(), name ) )
 		{
@@ -304,8 +286,8 @@ return 0 ;
 
 Channel* xNetwork::findChannel( const string& name ) const
 {
-channelMapType::const_iterator ptr = channelMap.find( name ) ;
-if( ptr == channelMap.end() )
+const_channelIterator ptr = channelMap.find( name ) ;
+if( ptr == channels_end() )
 	{
 //	elog	<< "xNetwork::findChannel> Failed to find: "
 //		<< name << endl ;
@@ -345,6 +327,11 @@ numericMap.erase( ptr ) ;
 
 iClient* retMe = ptr->second ;
 removeNick( retMe->getNickName() ) ;
+
+if( findFakeClient( retMe ) != 0 )
+	{
+	removeFakeClient( retMe ) ;
+	}
 
 // Remove all associations between client->channel
 iClient::channelIterator chanPtr = retMe->channels_begin() ;
@@ -394,15 +381,29 @@ xClient* xNetwork::removeLocalClient( xClient* theClient )
 {
 assert( theClient != 0 ) ;
 
-for( xClientVectorType::size_type i = 0 ; i < localClients.size() ; ++i )
+localClientIterator cItr =
+	localClients.find( theClient->getIntYYXXX() ) ;
+if( cItr == localClient_end() )
 	{
-	if( localClients[ i ] == theClient )
-		{
-		localClients[ i ] = 0 ;
-		return theClient ;
-		}
+	// client not found
+	elog	<< "xNetwork::removeLocalClient> Unable to "
+		<< "find local client: "
+		<< *theClient
+		<< endl ;
+	return 0 ;
 	}
-return 0 ;
+localClients.erase( cItr ) ;
+
+if( !freeClientNumeric( theClient->getIntYYXXX() ) )
+	{
+	elog	<< "xNetwork::removeLocalClient> Failed to free "
+		<< "client numeric for client: "
+		<< *theClient
+		<< endl ;
+	return 0 ;
+	}
+
+return theClient ;
 }
 
 void xNetwork::removeNick( const string& nick )
@@ -421,12 +422,11 @@ nickMap.erase( nick ) ;
 iServer* xNetwork::removeServer( const unsigned int& YY,
 	bool postEvent )
 {
-
 // Attempt to find the server being removed
-serverMapType::iterator serverIterator = serverMap.find( YY ) ;
+serverIterator sItr = serverMap.find( YY ) ;
 
 // Did we find the server?
-if( serverIterator == serverMap.end() )
+if( sItr == servers_end() )
 	{
 	// Nope, log an error
 	elog	<< "xNetwork::removeServer> Failed to find server "
@@ -439,10 +439,15 @@ if( serverIterator == serverMap.end() )
 	}
 
 // Grab a pointer to the iServer for convenience and readability
-iServer* serverPtr = serverIterator->second ;
+iServer* serverPtr = sItr->second ;
 
 // Remove the server from the internal table
-serverMap.erase( serverIterator ) ;
+serverMap.erase( sItr ) ;
+
+if( findFakeServer( serverPtr->getIntYY() ) )
+	{
+	removeFakeServer( serverPtr ) ;
+	}
 
 // Verbose debugging information
 //elog	<< "xNetwork::removeServer> Removing server: "
@@ -485,6 +490,7 @@ for( numericMapType::iterator clientIterator = numericMap.begin() ;
 	// This method calls numericMap.erase(), and so after the
 	// call to removeClient(), the clientIterator is no longer
 	// valid.
+	// removeClient() also calls removeFakeClient()
 	iClient* theClient = removeClient( clientIterator->second ) ;
 
 	// Point the clientIterator to the nextIterator
@@ -527,8 +533,8 @@ return removeServer( serverPtr->getIntYY() ) ;
 
 Channel* xNetwork::removeChannel( const string& name )
 {
-channelMapType::iterator ptr = channelMap.find( name ) ;
-if( ptr == channelMap.end() )
+channelIterator ptr = channelMap.find( name ) ;
+if( ptr == channels_end() )
 	{
 	elog	<< "xNetwork::removeChannel> Failed to find channel: "
 		<< name
@@ -695,16 +701,14 @@ for( yyVectorType::const_iterator yyIterator = yyVector.begin() ;
 void xNetwork::findLeaves( vector< unsigned int >& yyVector,
 	const unsigned int uplinkIntYY ) const
 {
-
 // Begin our walk down the serverMap looking for leaf servers
 // of uplinkIntYY.
-for( serverMapType::const_iterator serverIterator = serverMap.begin() ;
-	serverIterator != serverMap.end() ; ++serverIterator )
+for( const_serverIterator sItr = servers_begin() ;
+	sItr != servers_end() ; ++sItr )
 	{
-
 	// Obtain a pointer to this iServer for convenience and
 	// readability
-	const iServer* serverPtr = serverIterator->second ;
+	const iServer* serverPtr = sItr->second ;
 
 	// Check to see if this server is our uplink, don't want
 	// to remove that one :)
@@ -742,11 +746,6 @@ return static_cast< size_t >( serverMap.size() ) ;
 size_t xNetwork::clientList_size() const
 {
 return static_cast< size_t >( numericMap.size() ) ;
-}
-
-void xNetwork::foreach_xClient( xNetwork::fe_xClientBase f )
-{
-std::for_each( localClients.begin(), localClients.end(), f ) ;
 }
 
 size_t xNetwork::countClients( const iServer* serverPtr ) const
@@ -793,7 +792,6 @@ return retMe ;
 list< const iClient* > xNetwork::matchUserHost(
 	const string& wildUserHost ) const
 {
-
 // Tokenize the wildUserHost into username and hostname
 StringTokenizer st( wildUserHost, '@' ) ;
 
@@ -869,8 +867,8 @@ size_t xNetwork::countHost( const string& hostName ) const
 return static_cast< size_t >( findHost( hostName ).size() ) ;
 }
 
-
-list< const iClient* > xNetwork::matchRealHost( const string& wildHost ) const
+list< const iClient* > xNetwork::matchRealHost( const string& wildHost )
+	const
 {
 list< const iClient* > retMe ;
 
@@ -893,7 +891,6 @@ return retMe ;
 list< const iClient* > xNetwork::matchRealUserHost(
 	const string& wildUserHost ) const
 {
-
 // Tokenize the wildUserHost into username and hostname
 StringTokenizer st( wildUserHost, '@' ) ;
 
@@ -969,8 +966,8 @@ size_t xNetwork::countRealHost( const string& hostName ) const
 return static_cast< size_t >( findRealHost( hostName ).size() ) ;
 }
 
-
-list< const iClient* > xNetwork::matchRealName( const string& realName ) const
+list< const iClient* > xNetwork::matchRealName( const string& realName )
+	const
 {
 list< const iClient* > retMe ;
 
@@ -984,8 +981,524 @@ for( numericMapType::const_iterator ptr = numericMap.begin(),
 		retMe.push_back( clientPtr ) ;
 		}
 	}
-
 return retMe;
+}
+
+bool xNetwork::allocateClientNumeric( unsigned int intYY,
+	unsigned int& newIntXXX )
+{
+newIntXXX = 0 ;
+
+// First verify that the given intYY corresponds to a
+// fake server (including the xServer).
+reservedNumeric_iterator rsItr = reservedNumericMap.find( intYY ) ;
+if( rsItr == reservedNumericMap.end() )
+	{
+	// Can't find the fake server to which this client
+	// is to be attached.
+	elog	<< "xNetwork::allocateClientNumeric> Unable to "
+		<< "find intYY: "
+		<< intYY
+		<< endl ;
+	return false ;
+	}
+
+// Look for an unassigned numeric.
+// If the for loop traverses all possible values of
+// unsigned int, it will eventually hit 0 again, and
+// the loop will terminate.
+for( newIntXXX = 1 ; newIntXXX != 0 ; ++newIntXXX )
+	{
+//	elog	<< "xNetwork::allocateClientNumeric> Checking: "
+//		<< newIntXXX
+//		<< endl ;
+
+	if( rsItr->second.find( newIntXXX ) == rsItr->second.end() )
+		{
+		// Unused numeric
+		// By definition this insert() must succeed, since
+		// the only reason for it to fail is if the
+		// numeric already existed.
+		rsItr->second.insert( newIntXXX ) ;
+
+		break ;
+		}
+	}
+
+// Check if all values were examined
+if( 0 == newIntXXX )
+	{
+	elog	<< "xNetwork::allocateClientNumeric> Looped unsigned "
+		<< "int"
+		<< endl ;
+	return false ;
+	}
+
+//elog	<< "xNetwork::allocateClientNumeric> Allocated numeric: "
+//	<< "intYY: "
+//	<< intYY
+//	<< ", intXXX: "
+//	<< newIntXXX
+//	<< endl ;
+
+// newIntXXX holds the unused numeric
+return true ;
+}
+
+void xNetwork::setServer( xServer* _theServer )
+{
+assert( _theServer != 0 ) ;
+
+// When this method is invoked, the xServer's iServer instance
+// has already been added to normal server list
+theServer = _theServer ;
+
+// Reserve the server's numeric
+if( !reservedNumericMap.insert( make_pair( theServer->getIntYY(), 
+	set< unsigned int>() ) ).second )
+	{
+	elog	<< "xNetwork::setServer> Failed to add core server "
+		<< "numeric to reservedNumericMap"
+		<< endl ;
+	}
+}
+
+bool xNetwork::addFakeClient( iClient* fakeClient,
+	xClient* ownerClient )
+{
+// precondition: fakeClient has an assigned intYY already, but
+// not an intXXX
+assert( fakeClient != 0 ) ;
+// ownerClient can be NULL
+
+// This is a protected method, the presence of the necessary
+// variables in the iClient have been met.
+// Verify the integrity of a few key elements.
+
+// Make sure the fake server to which this iClient is being
+// associated at least has its server intYY numeric reserved
+if( reservedNumericMap.find( fakeClient->getIntYY() ) ==
+	reservedNumericMap.end() )
+	{
+	elog	<< "xNetwork::addFakeClient> Unable to find "
+		<< "fakeServer intYY "
+		<< fakeClient->getIntYY()
+		<< " for fake client: "
+		<< *fakeClient
+		<< endl ;
+	return false ;
+	}
+
+// Make sure the nickname does not collide
+if( findFakeNick( fakeClient->getNickName() ) != 0 )
+	{
+	elog	<< "xNetwork::addFakeClient> Found matching nickname: "
+		<< fakeClient->getNickName()
+		<< endl ;
+	return false ;
+	}
+
+// fakeServer now points to a valid fake server
+// Get an intXXX
+unsigned int intXXX = 0 ;
+if( !allocateClientNumeric( fakeClient->getIntYY(), intXXX ) )
+	{
+	elog	<< "xNetwork::addFakeClient> Unable to "
+		<< "allocate client numeric for: "
+		<< *fakeClient
+		<< endl ;
+	return false ;
+	}
+
+// pos
+// Give the new client a numeric
+// This call will set both intXXX and charXXX
+fakeClient->setIntXXX( intXXX ) ;
+
+// Add this client to the fake client table
+if( !fakeClientMap.insert(
+	make_pair( fakeClient->getIntYYXXX(),
+		make_pair( fakeClient, ownerClient ) ) ).second )
+	{
+	elog	<< "xNetwork::addFakeClient> Failed to insert into "
+		<< "fakeClientMap: "
+		<< *fakeClient
+		<< ", with controlling xClient: " ;
+
+	if( 0 == ownerClient )
+		{
+		elog	<< "NULL" ;
+		}
+	else
+		{
+		elog	<< *ownerClient ;
+		}
+	elog	<< endl ;
+	return false ;
+	}
+
+if( !numericMap.insert( make_pair( fakeClient->getIntYYXXX(),
+	fakeClient ) ).second )
+	{
+	elog	<< "xNetwork::addFakeClient> Failed to add client "
+		<< "to the numericMap: "
+		<< *fakeClient
+		<< endl ;
+
+	fakeClientMap.erase( fakeClient->getIntYYXXX() ) ;
+	freeClientNumeric( fakeClient->getIntYYXXX() ) ;
+
+	return false ;
+	}
+addNick( fakeClient ) ;
+
+return true ;
+}
+
+iServer* xNetwork::findFakeServer( const iServer* theServer ) const
+{
+assert( theServer != 0 ) ;
+return findFakeServer( theServer->getIntYY() ) ;
+}
+
+iServer* xNetwork::findFakeServer( unsigned int intYY ) const
+{
+const_fakeServerIterator sItr = fakeServerMap.find( intYY ) ;
+if( sItr == fakeServers_end() )
+	{
+	return 0 ;
+	}
+return sItr->second ;
+}
+
+iClient* xNetwork::removeFakeClient( iClient* fakeClient )
+{
+assert( fakeClient != 0 ) ;
+
+fakeClientIterator cItr = fakeClientMap.find( 
+	fakeClient->getIntYYXXX() ) ;
+if( cItr == fakeClient_end() )
+	{
+	elog	<< "xNetwork::removeFakeClient> Unable to find fake "
+		<< "client: "
+		<< *fakeClient
+		<< endl ;
+	}
+else
+	{
+	fakeClientMap.erase( cItr ) ;
+	}
+
+if( !freeClientNumeric( fakeClient->getIntYYXXX() ) )
+	{
+	elog	<< "xNetwork::removeFakeClient> Failed to free "
+		<< "client numeric: "
+		<< fakeClient->getIntYYXXX()
+		<< endl ;
+	}
+
+// All successful
+return fakeClient ;
+}
+
+iClient* xNetwork::findFakeNick( const string& nickName ) const
+{
+for( const_fakeClientIterator cItr = fakeClient_begin() ;
+	cItr != fakeClient_end() ; ++cItr )
+	{
+	std::pair< iClient*, xClient* > clientPair = cItr->second ;
+	if( !strcasecmp( clientPair.first->getNickName(),
+		nickName ) )
+		{
+		return clientPair.first ;
+		}
+	}
+return 0 ;
+}
+
+bool xNetwork::addFakeServer( iServer* fakeServer )
+{
+assert( fakeServer != 0 ) ;
+
+// Verify that the server name does not exist
+if( findServerName( fakeServer->getName() ) != 0 )
+	{
+	elog	<< "xNetwork::addFakeServer> Server name already "
+		<< "exists in normal list of iServers: "
+		<< *fakeServer
+		<< endl ;
+	return false ;
+	}
+
+elog	<< "xNetwork::addFakeServer> No matching name found for: "
+	<< *fakeServer
+	<< endl ;
+
+// Allocate a new numeric
+unsigned int intYY = 0 ;
+if( !allocateServerNumeric( intYY ) )
+	{
+	elog	<< "xNetwork::addFakeServer> Failed to "
+		<< "allocate fake numeric"
+		<< endl ;
+	return false ;
+	}
+
+// Set the intYY/charYY of the fakeServer
+fakeServer->setIntYY( intYY ) ;
+
+// Add the fakeServer into the fakeServerMap
+if( !fakeServerMap.insert( make_pair( fakeServer->getIntYY(),
+	fakeServer ) ).second )
+	{
+	elog	<< "xNetwork::addFakeServer> Failed to insert "
+		<< "new server into fakeServerMap: "
+		<< *fakeServer
+		<< endl ;
+
+	// A numeric had been allocated for this server,
+	// free that numeric.
+	freeServerNumeric( fakeServer->getIntYY() ) ;
+
+	return false ;
+	}
+
+if( !serverMap.insert( make_pair( fakeServer->getIntYY(),
+	fakeServer ) ).second )
+	{
+	elog	<< "xNetwork::addFakeServer> Failed to add new server "
+		<< "to serverMap: "
+		<< *fakeServer
+		<< endl ;
+
+	freeServerNumeric( fakeServer->getIntYY() ) ;
+	fakeServerMap.erase( fakeServer->getIntYY() ) ;
+
+	return false ;
+	}
+
+elog	<< "xNetwork::addFakeServer> Successfully added fake "
+	<< "server: "
+	<< *fakeServer
+	<< endl ;
+
+return true ;
+}
+
+iServer* xNetwork::findFakeServerName( const string& name ) const
+{
+for( const_fakeServerIterator sItr = fakeServers_begin() ;
+	sItr != fakeServers_end() ; ++sItr )
+	{
+	if( !strcasecmp( name, sItr->second->getName() ) )
+		{
+		// Found it
+		elog	<< "xNetwork::findServerName> Found name: "
+			<< name
+			<< ", matching server: "
+			<< *(sItr->second)
+			<< endl ;
+		return sItr->second ;
+		}
+	} // for()
+
+elog	<< "xNetwork::findFakeServerName> Unable to find server name: "
+	<< name
+	<< endl ;
+
+return 0 ;
+}
+
+bool xNetwork::freeClientNumeric( unsigned int intYYXXX )
+{
+unsigned int intYY = 0 ;
+unsigned int intXXX = 0 ;
+
+splitbase64int( intYYXXX, intYY, intXXX ) ;
+
+reservedNumeric_iterator rsItr =
+	reservedNumericMap.find( intYY ) ;
+if( rsItr == reservedNumericMap.end() )
+	{
+	elog	<< "xNetwork::freeClientNumeric> Unable to find "
+		<< "server intYY for intYY/intXXX/intYYXXX: "
+		<< intYY << '/'
+		<< intXXX << '/'
+		<< intYYXXX
+		<< endl ;
+	return false ;
+	}
+
+set< unsigned int >::iterator numItr = rsItr->second.find( intXXX ) ;
+if( numItr == rsItr->second.end() )
+	{
+	elog	<< "xNetwork::freeClientNumeric> Unable to find "
+		<< "client intXXX for intYY/intXXX/intYYXXX: "
+		<< intYY << '/'
+		<< intXXX << '/'
+		<< intYYXXX
+		<< endl ;
+	return false ;
+	}
+
+//elog	<< "xNetwork::freeClientNumeric> Removing "
+//	<< "intYY/intXXX/intYYXXX: "
+//	<< intYY << '/'
+//	<< intXXX << '/'
+//	<< intYYXXX
+//	<< endl ;
+
+rsItr->second.erase( numItr ) ;
+return true ;
+}
+
+bool xNetwork::allocateServerNumeric( unsigned int& intYY )
+{
+// Arbitrarily choose 200 as base numeric
+
+// Look for an unassigned numeric.
+// If the for loop traverses all possible values of
+// unsigned int, it will eventually hit 0 again, and
+// the loop will terminate.
+for( intYY = 2000 ; intYY != 0 ; ++intYY )
+	{
+//	elog	<< "xNetwork::allocateServerNumeric> Checking: "
+//		<< intYY
+//		<< endl ;
+
+	if( serverMap.find( intYY ) != serverMap.end() )
+		{
+		continue ;
+		}
+	if( reservedNumericMap.find( intYY ) != reservedNumericMap.end() )
+		{
+		continue ;
+		}
+
+	// Found an unused numeric
+//	elog	<< "xNetwork::allocateServerNumeric> Found "
+//		<< "unused numeric: "
+//		<< intYY
+//		<< endl ;
+
+	if( !reservedNumericMap.insert( make_pair( intYY,
+		set< unsigned int >() ) ).second )
+		{
+		elog	<< "xNetwork::allocateServerNumeric> Failed "
+			<< "to reserve intYY: "
+			<< intYY
+			<< endl ;
+		return false ;
+		}
+	return true ;
+	} // for()
+
+elog	<< "xNetwork::allocateServerNumeric> Looped unsigned "
+	<< "int"
+	<< endl ;
+return false ;
+}
+
+bool xNetwork::freeServerNumeric( unsigned int intYY )
+{
+reservedNumeric_iterator sItr = reservedNumericMap.find( intYY ) ;
+if( sItr == reservedNumericMap.end()  )
+	{
+	elog	<< "xNetwork::freeServerNumeric> Unable to find "
+		<< "numeric: "
+		<< intYY
+		<< endl ;
+	return false ;
+	}
+
+if( !sItr->second.empty() )
+	{
+	elog	<< "xNetwork::freeServerNumeric> Releasing numeric "
+		<< intYY
+		<< " which has "
+		<< sItr->second.empty()
+		<< " client numerics reserved"
+		<< endl ;
+	}
+
+reservedNumericMap.erase( sItr ) ;
+return true ;
+}
+
+iServer* xNetwork::removeFakeServer( iServer* fakeServer )
+{
+assert( fakeServer != 0 ) ;
+
+fakeServerIterator sItr = fakeServerMap.find( fakeServer->getIntYY() ) ;
+if( sItr == fakeServers_end() )
+	{
+	elog	<< "xNetwork::removeFakeServer> Unable to find fake "
+		<< "server: "
+		<< *fakeServer
+		<< endl ;
+	}
+else
+	{
+	fakeServerMap.erase( sItr ) ;
+	}
+
+if( !freeServerNumeric( fakeServer->getIntYY() ) )
+	{
+	elog	<< "xNetwork::removeFakeServer> Failed to free "
+		<< "server numeric: "
+		<< fakeServer->getIntYY()
+		<< endl ;
+	}
+
+// All successful
+return fakeServer ;
+}
+
+iServer* xNetwork::removeFakeServerName( const string& name )
+{
+if( name.empty() )
+	{
+	elog	<< "xNetwork::removeFakeServerName> Empty name"
+		<< endl ;
+	return 0 ;
+	}
+
+fakeServerIterator sItr = fakeServers_begin() ;
+for( ; sItr != fakeServers_end() ; ++sItr )
+	{
+	if( !strcasecmp( sItr->second->getName(), name ) )
+		{
+		// Found it
+		elog	<< "xNetwork::removeFakeServerName> Found "
+			<< "matching server name for name: "
+			<< name
+			<< ", server: "
+			<< *(sItr->second)
+			<< endl ;
+
+		return removeFakeServer( sItr->second ) ;
+		}
+	} // for()
+
+elog	<< "xNetwork::removeFakeServerName> Unable to find "
+	<< "matching server name for name: "
+	<< name
+	<< endl ;
+
+return 0 ;
+}
+
+iClient* xNetwork::findFakeClient( iClient* theClient ) const
+{
+assert( theClient != 0 ) ;
+
+const_fakeClientIterator cItr = fakeClientMap.find( 
+	theClient->getIntYYXXX() ) ;
+if( cItr == fakeClientMap.end() )
+	{
+	return 0 ;
+	}
+return cItr->second.first ;
 }
 
 } // namespace gnuworld

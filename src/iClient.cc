@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: iClient.cc,v 1.30 2003/06/28 16:26:46 dan_karrels Exp $
+ * $Id: iClient.cc,v 1.31 2003/08/09 23:15:36 dan_karrels Exp $
  */
 
 #include	<new>
@@ -31,11 +31,10 @@
 
 #include	"iClient.h"
 #include	"client.h"
-#include	"Numeric.h"
 #include	"ip.h"
 #include	"config.h"
 
-RCSTAG( "$Id: iClient.cc,v 1.30 2003/06/28 16:26:46 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: iClient.cc,v 1.31 2003/08/09 23:15:36 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -56,7 +55,7 @@ const iClient::modeType iClient::MODE_SERVNOTICES = 0x100 ;
 string iClient::hiddenHostSuffix( "we.all.worship.mrbean.org" ) ;
 
 iClient::iClient( const unsigned int& _uplink,
-	const string& _yxx,
+	const string& _yyxxx,
 	const string& _nickName,
 	const string& _userName,
 	const string& _hostBase64,
@@ -66,7 +65,7 @@ iClient::iClient( const unsigned int& _uplink,
 	const string& _account,
 	const string& _description,
 	const time_t& _connectTime )
-: intYY( _uplink ),
+: NetworkTarget( _yyxxx ),
 	nickName( _nickName ),
 	userName( _userName ),
 	IP( xIP( _hostBase64, true ).GetLongIP() ),
@@ -77,19 +76,7 @@ iClient::iClient( const unsigned int& _uplink,
 	mode( 0 ),
 	account( _account )
 {
-// n2k, yyxxx
-intXXX = base64toint( _yxx.c_str() + 2, 3 ) ;
-intYYXXX = base64toint( _yxx.c_str(), 5 ) ;
-
-charYY[ 0 ] = _yxx[ 0 ] ;
-charYY[ 1 ] = _yxx[ 1 ] ;
-charYY[ 2 ] = 0 ;
-
-charXXX[ 0 ] = _yxx[ 2 ] ;
-charXXX[ 1 ] = _yxx[ 3 ] ;
-charXXX[ 2 ] = _yxx[ 4 ] ;
-charXXX[ 3 ] = 0 ;
-
+(void) _uplink ;
 setModes( _mode ) ;
 customDataMap = 0 ;
 }
@@ -177,7 +164,7 @@ for( channelIterator ptr = channelList.begin() ;
 return false ;
 }
 
-const string iClient::getCharModes() const
+const string iClient::getStringModes() const
 {
 string retMe( "+" ) ;
 
@@ -276,7 +263,6 @@ return ptr->second ;
 
 bool iClient::addChannel( Channel* theChan )
 {
-
 // This method is public, make sure the pointer is valid
 assert( theChan != 0 ) ;
 

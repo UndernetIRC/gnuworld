@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: REOPCommand.cc,v 1.2 2003/06/28 01:21:19 dan_karrels Exp $
+ * $Id: REOPCommand.cc,v 1.3 2003/08/09 23:15:34 dan_karrels Exp $
  */
 
 #include	<string>
@@ -31,8 +31,9 @@
 #include	"StringTokenizer.h"
 #include	"Constants.h"
 #include	"ccBadChannel.h"
+#include	"config.h"
 
-const char REOPCommand_cc_rcsId[] = "$Id: REOPCommand.cc,v 1.2 2003/06/28 01:21:19 dan_karrels Exp $";
+RCSTAG( "$Id: REOPCommand.cc,v 1.3 2003/08/09 23:15:34 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {

@@ -20,7 +20,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ADDUSERCommand.cc,v 1.17 2003/06/28 01:21:19 dan_karrels Exp $
+ * $Id: ADDUSERCommand.cc,v 1.18 2003/08/09 23:15:33 dan_karrels Exp $
  */
 
 #include	<string>
@@ -34,8 +34,9 @@
 #include	"misc.h"
 #include	"commLevels.h"
 #include	"Constants.h"
+#include	"config.h"
 
-const char ADDUSERCommand_cc_rcsId[] = "$Id: ADDUSERCommand.cc,v 1.17 2003/06/28 01:21:19 dan_karrels Exp $";
+RCSTAG( "$Id: ADDUSERCommand.cc,v 1.18 2003/08/09 23:15:33 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
