@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------------
--- "$Id: cservice.web.sql,v 1.31 2003/10/20 02:26:50 nighty Exp $"
+-- "$Id: cservice.web.sql,v 1.32 2003/10/26 11:22:28 nighty Exp $"
 -- Channel service DB SQL file for PostgreSQL.
 --
 -- Tables specific to website
@@ -220,6 +220,7 @@ CREATE TABLE complaints (
 	created_crc varchar (128) NOT NULL,
 	crc_expiration int4 NOT NULL,
 	ticket_number varchar(32) NOT NULL,
+	current_owner int4 NOT NULL,
 	PRIMARY KEY (id)
 );
 
