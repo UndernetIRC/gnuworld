@@ -17,7 +17,7 @@
  */
 
 #ifndef __XSERVER_H
-#define __XSERVER_H "$Id: server.h,v 1.22 2001/01/08 00:01:07 dan_karrels Exp $"
+#define __XSERVER_H "$Id: server.h,v 1.23 2001/01/12 23:42:05 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
@@ -218,9 +218,6 @@ public:
 	 * Process is responsible for parsing lines of data.
 	 */
 	virtual void Process( char* String ) ;
-
-	/// Deprecated.
-	virtual void ProcessMessageQueue() ;
 
 	/**
 	 * Add a network gline and update glines table.
@@ -790,9 +787,6 @@ protected:
 	/// RPING message handler, deprecated.
 	DECLARE_MSG(RemPing);
 
-	/// VERSION message handler, deprecated.
-	DECLARE_MSG(Version);
-
 	/// P(RIVMSG) message handler.
 	DECLARE_MSG(P);
 
@@ -805,14 +799,8 @@ protected:
 	/// EB (End of BURST) message handler.
 	DECLARE_MSG(EB);
 
-	/// EndOfBurst message handler, deprecated.
-	DECLARE_MSG(EndOfBurst);
-
 	/// G(PING) message handler.
 	DECLARE_MSG(G);
-
-	/// PING message handler, deprecated.
-	DECLARE_MSG(Ping);
 
 	/// J(OIN) message handler.
 	DECLARE_MSG(J);
@@ -829,14 +817,8 @@ protected:
 	/// N(ICK) message handler.
 	DECLARE_MSG(N);
 
-	/// NICK message handler, deprecated.
-	DECLARE_MSG(Nick);
-
 	/// Q(UIT) message handler.
 	DECLARE_MSG(Q);
-
-	/// QUIT message handler, deprecated.
-	DECLARE_MSG(Quit);
 
 	/// S(ERVER) message handler.
 	DECLARE_MSG(S);
@@ -881,18 +863,6 @@ protected:
 
 	// Non-tokenized command handlers
 	// Replication of code *sigh*
-
-	/// PART
-	DECLARE_MSG(Part);
-
-	/// JOIN
-	DECLARE_MSG(Join);
-
-	/// DESYNCH
-	DECLARE_MSG(Desynch);
-
-	// KILL
-	DECLARE_MSG(Kill);
 
 	/**
 	 * Bounds checker for events.
@@ -1132,26 +1102,6 @@ protected:
 	void		loadCommandHandlers() ;
 	bool		setupSignals() ;
 } ;
-
-/// Deprecated method.
-void AddServer( const unsigned int& Uplink,
-	const string& YXX, 
-	const string& ServerName,
-	const time_t& ConnectionTime,
-	const time_t& StartTime,  
-	const int& Version ) ;
-
-/// Deprecated method.
-void AddUser( const unsigned int& Uplink,
-	const string& YXX,
-	const string& Nick,
-	const string& UserID,
-	const string& HostBase64,
-	const string& InsecureHost,
-	const string& description,
-	const string& Mode,
-	const time_t& ConnectionTime,
-	bool IncrementClients = true ) ;
 
 } // namespace gnuworld
 

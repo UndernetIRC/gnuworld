@@ -43,7 +43,7 @@
 #include	"moduleLoader.h"
 
 const char xServer_h_rcsId[] = __XSERVER_H ;
-const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.47 2001/01/12 22:49:24 dan_karrels Exp $" ;
+const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.48 2001/01/12 23:42:06 dan_karrels Exp $" ;
 
 using std::string ;
 using std::vector ;
@@ -187,7 +187,6 @@ catch( std::bad_alloc )
 
 REGISTER_MSG( "ERROR", Error );
 REGISTER_MSG( "RPING", RemPing );
-REGISTER_MSG( "VERSION", Version );
 
 // Server
 REGISTER_MSG( "S", S );
@@ -195,19 +194,15 @@ REGISTER_MSG( "SERVER", Server );
 
 // Nick
 REGISTER_MSG( "N", N );
-REGISTER_MSG( "NICK", N );
 
 // End of Burst
-REGISTER_MSG( "END_OF_BURST", EndOfBurst );
 REGISTER_MSG( "EB", EB );
 
 // End of Burst Acknowledge
 REGISTER_MSG( "EA", EA );
-REGISTER_MSG( "EOB_ACK", EA );
 
 // Ping
 REGISTER_MSG( "G", G );
-REGISTER_MSG( "PING", Ping );
 
 // Privmsg
 // Also register NOTICE to
@@ -216,32 +211,26 @@ REGISTER_MSG( "PING", Ping );
 //
 REGISTER_MSG( "O", P );
 REGISTER_MSG( "P", P );
-REGISTER_MSG( "NOTICE", P );
-REGISTER_MSG( "PRIVMSG", P );
 
 // Mode
 REGISTER_MSG( "M", M );
 
 // Quit
 REGISTER_MSG( "Q", Q );
-REGISTER_MSG( "QUIT", Quit );
 
 // BURST
 REGISTER_MSG( "B", B );
-REGISTER_MSG( "BURST", B );
 
 // Join
 REGISTER_MSG( "J", J ) ;
 
 // Create
 REGISTER_MSG( "C", C ) ;
-REGISTER_MSG( "CREATE", C ) ;
 
 // Leave
 REGISTER_MSG( "L", L ) ;
 
 // Squit
-REGISTER_MSG( "SQUIT", SQ ) ;
 REGISTER_MSG( "SQ", SQ ) ;
 
 // Kill
@@ -256,33 +245,20 @@ REGISTER_MSG( "PASS", PASS ) ;
 
 // GLINE
 REGISTER_MSG( "GL", GL ) ;
-REGISTER_MSG( "GLINE", GL ) ;
 
 // TOPIC
 REGISTER_MSG( "T", T ) ;
-REGISTER_MSG( "TOPIC", T ) ;
 
 // KICK
 REGISTER_MSG( "K", K ) ;
-REGISTER_MSG( "KICK", K ) ;
 
 // No idea
 REGISTER_MSG( "DS", DS ) ;
 
 // Admin
 REGISTER_MSG( "AD", AD ) ;
-REGISTER_MSG( "ADMIN", AD ) ;
 
 // Non-tokenized command handlers
-
-// Part
-REGISTER_MSG( "PART", Part ) ;
-
-// Join
-REGISTER_MSG( "JOIN", Join ) ;
-
-// Kill
-REGISTER_MSG( "KILL", Kill ) ;
 
 // WHOIS
 REGISTER_MSG( "W", NOOP ) ;
@@ -298,15 +274,9 @@ REGISTER_MSG( "368", NOOP ) ; // End of channel ban list
 
 // AWAY
 REGISTER_MSG( "A", NOOP ) ;
-REGISTER_MSG( "AWAY", NOOP ) ;
-
-// SILENCE
-REGISTER_MSG( "SILENCE", NOOP ) ;
 
 REGISTER_MSG( "441", NOOP ) ;
 
-// DESYNCH
-REGISTER_MSG( "DESYNCH", Desynch ) ;
 }
 
 void xServer::initializeVariables()
@@ -1464,10 +1434,11 @@ if( !_connected )
 	return false ;
 	}
 
-#ifdef OUTPUT_TO_CONSOLE
+if( verbose )
+	{
 	// Output the debugging information
 	// to the console.
-	cout << "[OUT]: " << buf  ;
+	clog << "[OUT]: " << buf  ;
 
 	// Should we output a trailing newline
 	// character?
@@ -1475,7 +1446,7 @@ if( !_connected )
 		{
 		cout << endl ;
 		}
-#endif
+	}
 
 // Newline terminate the string if it's
 // not already done and append it to
@@ -2121,73 +2092,6 @@ for( StringTokenizer::size_type i = 0 ; i < st.size() ; ++i )
 return 0 ;
 }
 
-/**
- * Non-tokenized command handler.
- */
-int xServer::MSG_Part( xParameters& Param )
-{
-
-if( Param.size() < 2 )
-	{
-	elog	<< "xServer::MSG_Part> Invalid number of arguments\n" ;
-	return -1 ;
-	}
-
-if( '+' == Param[ 1 ][ 0 ] )
-	{
-	// Don't care about modeless channels
-	return 0 ;
-	}
-
-// Find the client in question
-iClient* theClient = Network->findNick( Param[ 0 ] ) ;
-if( NULL == theClient )
-	{
-	elog	<< "xServer::MSG_Part> ("
-		<< Param[ 1 ] << ") Unable to find client: "
-		<< Param[ 0 ] << endl ;
-	return -1 ;
-	}
-
-StringTokenizer st( Param[ 1 ], ',' ) ;
-for( StringTokenizer::size_type i = 0 ; i < st.size() ; ++i )
-	{
-	// Get the channel that was just parted.
-	Channel* theChan = Network->findChannel( st[ i ] ) ;
-	if( NULL == theChan )
-		{
-		elog	<< "xServer::MSG_Part> Unable to find channel: "
-			<< st[ i ] << endl ;
-		return -1 ;
-		}
-
-	// Remove and deallocate the ChannelUser instance from this
-	// channel's ChannelUser structure.
-	delete theChan->removeUser( theClient ) ;
-
-	// Remove this channel from this client's channel structure.
-	theClient->removeChannel( theChan ) ;
-
-	// Post the event to the clients listening for events on this
-	// channel, if any.
-	// TODO: Update message posting
-	// TODO: Check if channel is empty, remove if so
-
-	PostChannelEvent( EVT_PART, theChan,
-		static_cast< void* >( theClient ) ) ;
-
-	if( theChan->empty() && !Network->servicesOnChannel( theChan ) )
-		{
-		// No users in the channel, remove it.
-		delete Network->removeChannel( theChan->getName() ) ;
-
-		// TODO: Post event
-		}
-	} // for
-
-return 0 ;
-}
-
 // AIAAA K #coder-com 0C] :This is now an IRCoperator only channel
 // Note that when a user is kicked from a channel, the user is not
 // actually parted.  A separate MSG_L message will be issued after
@@ -2616,139 +2520,6 @@ return 0 ;
 
 }
 
-// Non-tokenized command handler
-//
-// nickname JOIN #channel timestamp
-int xServer::MSG_Join( xParameters& Param )
-{
-
-if( Param.size() < 2 )
-	{
-	elog	<< "xServer::MSG_Join> Invalid number of arguments\n" ;
-	return -1 ;
-	}
-
-// Find the client in question.
-iClient* Target = Network->findNick( Param[ 0 ] ) ;
-if( NULL == Target )
-	{
-	elog	<< "xServer::MSG_Join> ("
-		<< Param[ 1 ] << ") Unable to find user: "
-		<< Param[ 0 ] << endl ;
-	return -1 ;
-	}
-
-if( '0' == Param[ 1 ][ 0 ] )
-	{
-	// Artifact, user is parting all channels
-	for( iClient::channelIterator ptr = Target->channels_begin(),
-		endPtr = Target->channels_end() ; ptr != endPtr ; ++ptr )
-		{
-		delete (*ptr)->removeUser( Target->getIntYY() ) ;
-		if( (*ptr)->empty() && !Network->servicesOnChannel( *ptr ) )
-			{
-			delete Network->removeChannel( (*ptr)->getName() ) ;
-			}
-		}
-	Target->clearChannels() ;
-	return 0 ;
-	}
-
-// Tokenize by ',', as the client may join more than one
-// channel at once.
-StringTokenizer st( Param[ 1 ], ',' ) ;
-for( StringTokenizer::size_type i = 0 ; i < st.size() ; i++ )
-	{
-
-	if( '+' == st[ i ][ 0 ] )
-		{
-		// Don't care about modeless channels
-		continue ;
-		}
-
-	Channel* theChan = 0 ;
-	ChannelUser* theUser = 0 ;
-	try
-		{
-		theUser = new ChannelUser( Target ) ;
-		}
-	catch( std::bad_alloc )
-		{
-		elog	<< "xServer::MSG_Join> Memory allocation failure\n" ;
-		return -1 ;
-		}
-
-	// On a JOIN command, the channel should already exist.
-	theChan = Network->findChannel( st[ i ] ) ;
-	if( NULL == theChan )
-		{
-		// This transmutes to a CREATE
-		try
-			{
-			theChan = new Channel( st[ i ], ::time( 0 ) ) ;
-			}
-		catch( std::bad_alloc )
-			{
-			elog	<< "xServer::MSG_Join> Memory allocation "
-				<< "failure\n" ;
-			delete theChan ;
-			delete theUser ;
-			return -1 ;
-			}
-
-		// Add the channel to the network tables
-		if( !Network->addChannel( theChan ) )
-			{
-			elog	<< "xServer::MSG_Join> Unable to add channel: "
-				<< theChan->getName() << endl ;
-			delete theChan ;
-			delete theUser ;
-			continue ;
-			}
-
-		// Since this is equivalent to a CREATE, set the user
-		// as operator.
-		theUser->setMode( ChannelUser::MODE_O ) ;
-
-		} // if( NULL == theChan )
-
-	// Otherwise, the channel was found just fine :)
-
-	// Add a new ChannelUser representing this client to this
-	// channel's user structure.
-	if( !theChan->addUser( theUser ) )
-		{
-//		elog	<< "xServer::MSG_Join> User "
-//			<< theUser->getNickName() << " already on channel "
-//			<< theChan->getName() << endl ;
-
-		// Addition of ChannelUser failed.
-		delete theUser ;
-		return -1 ;
-		}
-
-	// Add this channel to this client's channel structure.
-	Target->addChannel( theChan ) ;
-
-	// Post the event to the clients listening for events on this
-	// channel, if any.
-	PostChannelEvent( EVT_JOIN, theChan,
-		static_cast< void* >( Target ) ) ;
-
-	} // for()
-
-return 0 ;
-
-}
-
-// A nick has requested a version
-int xServer::MSG_Version( xParameters& Param )
-{
-return 0 ;
-}
-
-// WHOIS
-//
 int xServer::MSG_NOOP( xParameters& Param )
 {
 return 0 ;
@@ -2806,94 +2577,6 @@ if( (NULL == serverSource) && (NULL == source) )
 	elog	<< "xServer::MSG_D> Unable to find source: "
 		<< Param[ 0 ] << endl ;
 	return -1 ;
-	}
-
-// Find and remove the client that was just killed.
-// xNetwork::removeClient will remove user<->channel associations
-iClient* target = Network->removeClient( Param[ 1 ] ) ;
-
-// Make sure we have valid pointers to both source
-// and target.
-if( NULL == target )
-	{
-	elog	<< "xServer::MSG_D> Unable to find target client: "
-		<< Param[ 1 ] << endl ;
-	return -1 ;
-	}
-
-// Notify all listeners of the EVT_KILL event.
-string reason( Param[ 2 ] ) ;
-
-if( source != NULL )
-	{
-	PostEvent( EVT_KILL,
-		static_cast< void* >( source ),
-		static_cast< void* >( target ),
-		static_cast< void* >( &reason ) ) ;
-	}
-else
-	{
-	PostEvent( EVT_KILL,
-		static_cast< void* >( serverSource ),
-		static_cast< void* >( target ),
-		static_cast< void* >( &reason ) ) ;
-	}
-
-// Deallocate the memory associated with this iClient.
-delete target ;
-
-return 0 ;
-
-}
-
-// :pokebonk KILL LG[
-// :NewYork-R.NY.US.Undernet.org!SantaClara.CA.US.Undernet.Org!dallas.tx.us.undernet.org
-// !iago.nac.net!pokebonk (not here you don't)
-//
-// z KILL R[t :Baltimore-R.MD.US.Undernet.Org (NewYork-R.NY.US.Undernet.org <-
-// austin.tx.us.undernet.org (Nick collision))
-//
-int xServer::MSG_Kill( xParameters& Param )
-{
-
-// See if the client being killed is one of my own.
-xClient* myClient = Network->findLocalClient( Param[ 1 ] ) ;
-
-// Is the user being killed on this server?
-if( NULL != myClient )
-	{
-	// doh, yes it is :(
-	myClient->OnKill() ;
-
-	// Don't detach the client until it requests so.
-	// TODO: Work on this system.
-
-	// Note that the client is still attached to the
-	// server.
-	return 0 ;
-	}
-
-// Otherwise, it's a non-local client.
-iClient* source = 0 ;
-iServer* serverSource = 0 ;
-
-if( strchr( Param[ 0 ], '.' ) != NULL )
-	{
-	// Server, by name
-	serverSource = Network->findServerName( Param[ 0 ] ) ;
-	}
-else
-	{
-	// Nickname
-	source = Network->findNick( Param[ 0 ] ) ;
-	}
-
-if( (NULL == source) && (NULL == serverSource) )
-	{
-	elog	<< "xServer::MSG_Kill> Unable to find source: "
-		<< Param[ 0 ] << endl ;
-//	The source isn't all that important
-//	return -1 ;
 	}
 
 // Find and remove the client that was just killed.
@@ -3147,68 +2830,7 @@ if( Param[ 1 ][ 0 ] == '1' )
 //	Burst() ;
 
 	}
-else
-	{
-	// A server joining the network.
-	// This is deprecated with the introduction
-	// of tokenized commands.
 
-//	elog << "MSG_SERVER: Depracated section\n" ;
-//	clog	<< "xServer::MSG_Server> Param[ 3 ]: " << Param[ 3 ] << endl ;
-
-	const char* ServerName = Param[ 1 ] ;
-	time_t StartTime = atoi( Param[ 3 ] ) ;
-	time_t ConnectionTime = atoi( Param[ 4 ] ) ;
-	const char* Version = Param[ 5 ];
-	const char* YXX = Param[ 6 ] ;
-
-	iServer* uplink = Network->findServer( Param[ 0 ] ) ;
-	if( NULL == uplink )
-		{
-		elog	<< "xServer::MSG_Server> Unable to find server: "
-			<< Param[ 0 ] << endl ;
-		return -1 ;
-		}
-
-	unsigned int intYY = convert2n[ YXX[ 0 ] ] ;
-	if( strlen( YXX ) == 5 )
-		{
-		// n2k
-		intYY = base64toint( YXX, 2 ) ;
-		}
-
-	if( *Version == 'J' || *Version == 'P' )
-		{
-		iServer* newServer = 0 ;
-		try
-			{
-			newServer = new iServer(
-				uplink->getIntYY(),
-				YXX,
-				ServerName,
-				ConnectionTime,
-				StartTime,
-				atoi( Version ) ) ;
-			}
-		catch( std::bad_alloc )
-			{
-			elog	<< "MSG_Server> Memory allocation failure\n" ;
-			return -1 ;
-			}
-
-		Network->addServer( newServer ) ;
-		}
-
-	if( !bursting && *Version == 'J' )
-		{
-		iServer* Server = Network->findServer( ServerName ) ;
-		iServer* Uplink = Network->findServer( Param[ 0 ] ) ;
-		if( Server && Uplink )
-			{
-			PostEvent( EVT_NETJOIN, Uplink, Server ) ;
-			}
-		}
-	}
 // Not posting message here because this method is only called once
 // using tokenized commands - when the xServer connects
 return 0 ;
@@ -3236,29 +2858,6 @@ PostEvent( EVT_QUIT, static_cast< void* >( theClient ) ) ;
 delete theClient ;
 
 return 0 ;
-}
-
-/**
- * A quit message has been received
- * :_reppir QUIT :You are an imperfect being, created by an imperfect
- *  being.
- */
-int xServer::MSG_Quit( xParameters& Param )
-{
-iClient* Who = Network->findNick( Param[ 0 ] ) ;
-if( NULL == Who )
-	{
-	// BAD
-	elog	<< "xServer::MSG_Quit> Unable to find nick: "
-		<< Param[ 0 ] << endl ;
-	return -1 ;
-	}
-
-PostEvent( EVT_QUIT, static_cast< void* >( Who ) ) ;
-
-delete Network->removeClient( Who->getIntYY(), Who->getIntXXX() ) ;
-
-return( 0 ) ;
 }
 
 /**
@@ -3611,126 +3210,6 @@ while( ptr != end )
 
 }
 
-void xServer::ProcessMessageQueue() 
-{
-// TODO: Who's to say that the clients are in
-// continugous memory in the list?  Again, move
-// to dynamic structure
-/*
-for( int i = 0 ; i < Clients ; i++ )
-	{
-	if( NULL == ClientList[ i ] )
-		{
-		continue ;
-		}
-	ClientList[ i ]->ProcessMessageQueue() ;
-	} // close for loop
-*/
-}
-
-// Received an end of burst message
-// B END_OF_BURST
-// Depracated method
-int xServer::MSG_EndOfBurst( xParameters& Param )
-{
-if( NULL == theSock )
-	{
-	return -1 ;
-	}
-
-if( !strcmp( Param[ 0 ], Uplink->getCharYY() ) )
-	{
-	// It's my uplink
-	burstEnd = ::time( 0 ) ;
-	Write( "%s END_OF_BURST\n", charYY ) ;
-	Write( "%s EOB_ACK\n", charYY ) ;
-	}
-if( !bursting )
-	{
-	iServer* theServer = Network->findServer( Param[ 0 ] ) ;
-	if( NULL == theServer )
-		{
-		elog	<< "xServer::MSG_EndOfBurst> Unable to find server: "
-			<< Param[ 0 ] << endl ;
-		return -1 ;
-		}
-
-	PostEvent( EVT_BURST_CMPLT, static_cast< void* >( theServer ) ) ;
-	}
-return 0 ;
-}
-
-/**
- * A new user joined the network, or a user changed its nickname.
- * C NICK ripper_ 2 946934327 ~dan dolphinus.astro.ufl.edu +w CA47iY CAB
- *  :*Unknown*
- * CAB NICK _reppir 946934954
- *
- * If this method is called, then the uplink at least isn't using
- * tokenized commands.
- */
-int xServer::MSG_Nick( xParameters& Param )
-{
-
-// Is this just a nickname change?
-if( Param.size() < 8 )
-	{
-	Network->rehashNick( Param[ 0 ], Param[ 1 ] ) ;
-	return 0 ;
-	}
-
-iServer* Server = Network->findServer( Param[ 0 ] ) ;
-if( NULL == Server )
-	{
-	elog	<< "xServer::MSG_Nick> Unable to find server, "
-		<< "Y: " << Param[ 0 ] << ", Numeric: "
-		<< base64toint( Param[ 0 ] ) <<  endl ;
-	return -1 ;
-	}
-
-const char	*Nick = 0,
-		*YXX = 0,
-		*CTime = 0,
-		*UserID = 0,
-		*Mode = 0,
-		*Host = 0,
-		*description = 0;
-
-if( '+' == Param[ 6 ][ 0 ] )
-	{
-	// Mode set
-	Mode = Param[ 6 ] ;
-	Host = Param[ 7 ] ;
-	YXX = Param[ 8 ] ;
-	description = Param[ 9 ] ;
-	}
-else
-	{
-	Host = Param[ 6 ] ;
-	YXX = Param[ 7 ] ;
-	description = Param[ 8 ] ;
-	Mode = "";
-	}
-
-const char* InsecureHostMask = Param[ 5 ] ;
-Nick = Param[ 1 ] ;
-CTime = Param[ 3 ] ;
-UserID = Param[ 4 ] ;
-
-AddUser( Server->getIntYY(),
-	YXX,
-	Nick,
-	UserID,
-	Host,
-	InsecureHostMask,
-	description,
-	Mode,
-	atoi( CTime ) ) ;
-
-return 0 ;
-
-}
-
 /**
  * A new user has joined the network, or a user has changed
  * its nickname.
@@ -4059,13 +3538,6 @@ int xServer::MSG_DS( xParameters& )
 return 0 ;
 }
 
-// :Baltimore-R.MD.US.Undernet.Org DESYNCH :HACK: SanDiego.CA.US.Undernet.org MODE #f21
-// +o EmMaNuElL <000000000>
-int xServer::MSG_Desynch( xParameters& )
-{
-return 0 ;
-}
-
 // Mode change
 // OAD M ripper_ :+owg
 //
@@ -4383,115 +3855,6 @@ if( Param[ 1 ][ 0 ] == charYY[ 0 ]
 		Param[ 5 ] ) ;
 	}
 return 0 ;
-}
-
-// Ping message received
-// TODO: Only allow opers to receive PONGs
-int xServer::MSG_Ping( xParameters& Param )
-{
-if( Param.size() < 1 )
-	{
-	elog	<< "xServer::MSG_Ping> Invalid number of arguments\n" ;
-	return -1 ;
-	}
-
-Write( ":%s PONG :%s\n",
-	ServerName.c_str(),
-	Param[ 0 ] ) ;
-return 0 ;
-}
-
-// Depracated.
-void AddUser( const unsigned int& Uplink,
-	const string& YXX,
-	const string& Nick,
-	const string& UserID,
-	const string& HostBase64,
-	const string& InsecureHost,
-	const string& Mode,
-	const string& description,
-	const time_t& ConnectionTime,
-	bool IncrementClients = true )
-{
-// See if the client already exists
-iClient* Target = Network->findClient( YXX ) ;
-
-if( Target != NULL )
-	{
-	// Yup, shoot first, ask questions later
-	elog	<< "AddUser> Numeric collision for " << Target->getIntYY()
-		<< ":" << Target->getIntXXX() << ":" << Target->getNickName()
-		<< endl ;
-
-	// Force remove
-	// Don't forget to delete the allocated memory
-	delete Network->removeClient( Target->getIntYY(), Target->getIntXXX() ) ;
-	}
-
-try
-	{
-	Target = new iClient( Uplink,
-		YXX,
-		Nick,
-		UserID,
-		HostBase64,
-		InsecureHost,
-		Mode,
-		description,
-		ConnectionTime ) ;
-	}
-catch( std::bad_alloc )
-	{
-	// TODO
-	elog	<< "AddUser> Memory allocation failure\n" ;
-	return ;
-	}
-
-//elog << "Adding client: " << *Target ;
-if( !Network->addClient( Target ) )
-	{
-	delete Target ;
-	}
-
-}
-
-// Depracated method.
-void AddServer( const unsigned int& Uplink,
-	const string& YXX,
-	const string& ServerName,
-	const time_t& ConnectionTime,
-	const time_t& StartTime,
-	const int& Version )
-{
-
-iServer* newServer = NULL ;
-try
-	{
-	newServer = new iServer(
-		Uplink,
-		YXX,
-		ServerName,
-		ConnectionTime,
-		StartTime,
-		Version ) ;
-	}
-catch( std::bad_alloc )
-	{
-	elog	<< "AddServer: Memory allocation failure\n" ;
-	return ;
-	}
-
-
-// Update this server's info in the network table
-if( !Network->addServer( newServer ) )
-	{
-	delete newServer ;
-	elog	<< "AddServer> Unable to add to network table: "
-		<< *newServer << endl ;
-	}
-
-//elog << "Added server: " << *newServer ;
-
 }
 
 void xServer::dumpStats()

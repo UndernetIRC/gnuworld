@@ -1,9 +1,9 @@
 /* config.h
- * $Id: config.h,v 1.5 2001/01/12 22:49:24 dan_karrels Exp $
+ * $Id: config.h,v 1.6 2001/01/12 23:42:05 dan_karrels Exp $
  */
 
 #ifndef __CONFIG_H
-#define __CONFIG_H "$Id: config.h,v 1.5 2001/01/12 22:49:24 dan_karrels Exp $"
+#define __CONFIG_H "$Id: config.h,v 1.6 2001/01/12 23:42:05 dan_karrels Exp $"
 
 /* config.h */
 /* GNUWorld main configuration file */
@@ -28,13 +28,6 @@
 #define DEBUGFILE "debug.log"
 
 #endif // EDEBUG
-
-/**
- * OUTPUT_TO_CONSOLE
- * If this is defined, all output to the network will be sent
- * to the console.
- */
-#undef OUTPUT_TO_CONSOLE
 
 /**
  * CONFFILE

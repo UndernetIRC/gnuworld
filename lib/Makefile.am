@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-lib_LTLIBRARIES = libgnuworld.la
+noinst_LTLIBRARIES = libgnuworld.la
 libgnuworld_la_SOURCES = ClientSocket.cc \
 	EConfig.cc \
 	ELog.cc \

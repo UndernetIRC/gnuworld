@@ -1,5 +1,5 @@
 /* main.cc
- * $Id: main.cc,v 1.23 2001/01/12 23:01:14 dan_karrels Exp $
+ * $Id: main.cc,v 1.24 2001/01/12 23:42:06 dan_karrels Exp $
  */
 
 #include	<fstream>
@@ -24,7 +24,7 @@
 using namespace gnuworld ;
 
 const char config_h_rcsId[] = __CONFIG_H ;
-const char main_cc_rcsId[] = "$Id: main.cc,v 1.23 2001/01/12 23:01:14 dan_karrels Exp $" ;
+const char main_cc_rcsId[] = "$Id: main.cc,v 1.24 2001/01/12 23:42:06 dan_karrels Exp $" ;
 
 using std::cerr ;
 using std::clog ;
@@ -249,18 +249,25 @@ while( keepRunning && _connected )
 			(EINTR == errno) &&
 			(cnt++ < maxLoopCount) ) ;
                  
-        // Did we get an error returned?
-        if( selectRet < 0 )
-                {
+	// Did a timer expire?  Note that the above loop is
+	// non-deterministic.  All timers are checked before
+	// calling select(), however a timer may expire
+	// before we get to call select().  If this is the
+	// case, the timeval structure will contain an invalid
+	// time, and errno will be set to EINVAL.
+
+	// Check if a timer expired
+	if( (0 == selectRet) || (EINVAL == selectRet) )
+		{
+                // select() timed out..timer has expired
+                CheckTimers() ;
+                continue ;
+		}
+	else if( selectRet < 0 )
+		{
                 // Caught some form of signal
                 elog    << "xServer::mainLoop> select() returned error: "
                         << strerror( errno ) << endl ;
-                continue ;
-                }
-        else if( 0 == selectRet )
-                {
-                // select() timed out..timer has expired
-                CheckTimers() ;
                 continue ;
                 }
                  
@@ -285,7 +292,7 @@ while( keepRunning && _connected )
         while( GetString( charBuf ) )
                 {
 #ifdef LOG_SOCKET
-			socketFile << charBuf << endl ;
+		socketFile << charBuf << endl ;
 #endif
 		if( verbose )
 			{
