@@ -36,7 +36,7 @@ COPY "translations" FROM stdin;
 1	26	USER: %s ACCESS: %s %s	31337
 1	27	CHANNEL: %s -- AUTOMODE: %s	31337
 1	28	LAST MODIFIED: %s (%s ago)	31337
-1	29	** SUSPENDED ** - Expires in %s	31337
+1	29	** SUSPENDED ** - Expires in %s (Level %i)	31337
 1	30	LAST SEEN: %s ago.	31337
 1	31	There are more than 15 matching entries.	31337
 1	32	Please restrict your query.	31337
@@ -212,7 +212,7 @@ COPY "translations" FROM stdin;
 2	26	USAGER: %s NIVEAU: %s %s	31337
 2	27	CANAL: %s -- AUTOMODE: %s	31337
 2	28	DERNIÈRE MODIFICATION: %s (%s avant)	31337
-2	29	** SUSPENDU ** - Expire dans %s	31337
+2	29	** SUSPENDU ** - Expire dans %s  (Level %i)	31337
 2	30	DERNIÈRE FOIS VU: %s avant.	31337
 2	31	Il y a plus de 15 requêtes trouvées.	31337
 2	32	SVP restreindre votre requête	31337
@@ -387,7 +387,7 @@ COPY "translations" FROM stdin;
 3	26	BRUGER: %s ADGANG: %s %s	31337
 3	27	KANAL: %s - AUTOMODE: %s	31337
 3	28	SIDST ÆNDRET: %s (%s siden)	31337
-3	29	** SUSPENDERET ** - Udløber om %s	31337
+3	29	** SUSPENDERET ** - Udløber om %s (Level %i)	31337
 3	30	SIDST SET: %s siden.	31337
 3	31	Der er mere end 15 matchende indtastninger.	31337
 3	32	Forkort venligst din forspørgelse.	31337
@@ -562,7 +562,7 @@ COPY "translations" FROM stdin;
 6	26	USER: %s ACCESS: %s %s	31337
 6	27	CHANNEL: %s -- AUTOMODE: %s	31337
 6	28	LAST MODIFIED: %s (%s ago)	31337
-6	29	** SUSPENDED ** - Expires in %s	31337
+6	29	** SUSPENDED ** - Expires in %s  (Level %i)	31337
 6	30	LAST SEEN: %s ago.	31337
 6	31	There are more than 15 matching entries.	31337
 6	32	Please restrict your query.	31337
@@ -909,7 +909,7 @@ COPY "translations" FROM stdin;
 8	26	USER: %s ACCES: %s %s	31337
 8	27	CANAL: %s -- AUTOMODE: %s	31337
 8	28	MODIFICAT: %s (in urma cu %s)	31337
-8	29	** SUSPENDAT ** - Expira in %s	31337
+8	29	** SUSPENDAT ** - Expira in %s (Level %i)	31337
 8	30	VAZUT: in urma cu %s	31337
 8	31	Sunt mai mult de 15 rezultate.	31337
 8	32	Restrictioneaza-ti cererea.	31337
@@ -1084,7 +1084,7 @@ COPY "translations" FROM stdin;
 9	26	USUARI/A: %s ACCÉS: %s %s	31337
 9	27	CANAL: %s -- AUTOMODE: %s	31337
 9	28	DARRERA MODIFICACIÓ: %s (fa %s)	31337
-9	29	** SUSPÈS/A ** - Expira d'aquí a %s	31337
+9	29	** SUSPÈS/A ** - Expira d'aquí a %s (Level %i)	31337
 9	30	VIST/A PER DARRERA VEGADA: fa %s.	31337
 9	31	Hi ha més de 15 entrades coincidents.	31337
 9	32	Si et plau, restringeix la teva cerca.	31337
@@ -1259,7 +1259,7 @@ COPY "translations" FROM stdin;
 10	26	USUARIO/A: %s ACCESO: %s %s	31337
 10	27	CANAL: %s -- AUTOMODO: %s	31337
 10	28	ÚLTIMA MODIFICACIÓN: %s (hace %s)	31337
-10	29	** SUSPENDIDO/A ** - Expira dentro de %s	31337
+10	29	** SUSPENDIDO/A ** - Expira dentro de %s (Level %i)	31337
 10	30	VISTO/A POR ÚLTIMA VEZ: hace %s.	31337
 10	31	Hay más de 15 entradas coincidentes.	31337
 10	32	Restringe tu búsqueda, por favor.	31337
@@ -1609,7 +1609,7 @@ COPY "translations" FROM stdin;
 12	26	KULLANICI: %s SEVIYE: %s %s	31337
 12	27	KANAL: %s -- AUTOMODE: %s	31337
 12	28	SON DEGISIM: %s (%s once)	31337
-12	29	** SUSPEND EDILDI ** - %s 'da iptal olacak	31337
+12	29	** SUSPEND EDILDI ** - %s 'da iptal olacak (Level %i)	31337
 12	30	SON ZIYARET: %s once.	31337
 12	31	15 adet kayýttan daha fazlasi mevcuttur.	31337
 12	32	Lutfen isteginizi sinirlayiniz.	31337
@@ -1781,7 +1781,7 @@ COPY "translations" FROM stdin;
 13	26	Bruker: %s Adgang: %s %s	31337
 13	27	Kanal: %s -- AUTOMODE: %s	31337
 13	28	Sist Endret: %s (%s ago)	31337
-13	29	** SUSPENDERT ** - Utløper om %s	31337
+13	29	** SUSPENDERT ** - Utløper om %s (Level %i)	31337
 13	30	SIST SETT: %s ago.	31337
 13	31	Det er mer enn 15 matchende inntastninger.	31337
 13	32	Vær så snill og begrens din forespørsel.	31337
