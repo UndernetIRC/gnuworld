@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: match.cc,v 1.3 2003/06/28 01:21:21 dan_karrels Exp $
+ * $Id: match.cc,v 1.4 2004/05/18 16:51:05 dan_karrels Exp $
  */
 
 #include	<iostream>
@@ -27,8 +27,6 @@
 
 using namespace std ;
 using namespace gnuworld ;
-
-ELog elog ;
 
 void getInput( string& s1, string& s2 )
 {

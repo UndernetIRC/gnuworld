@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: moduleLoader.h,v 1.20 2004/01/16 01:28:24 dan_karrels Exp $
+ * $Id: moduleLoader.h,v 1.21 2004/05/18 16:50:57 dan_karrels Exp $
  */
 
 #ifndef __MODULELOADER_H
-#define __MODULELOADER_H "$Id: moduleLoader.h,v 1.20 2004/01/16 01:28:24 dan_karrels Exp $"
+#define __MODULELOADER_H "$Id: moduleLoader.h,v 1.21 2004/05/18 16:50:57 dan_karrels Exp $"
 
 #include	<iostream>
 #include	<string>
@@ -220,7 +220,7 @@ public:
 	 * Return the last error seen by the module system.
 	 */
 	inline const std::string&	getLastError() const
-		{ return ld_dlerror() ; }
+		{ return ::lt_dlerror() ; }
 
 	/**
 	 * Return by value the object being loaded from the module.

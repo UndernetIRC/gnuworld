@@ -44,7 +44,7 @@ EXIT_FAILURE=1
 PROGRAM=ltmain.sh
 PACKAGE=libtool
 VERSION=1.5.6
-TIMESTAMP=" (1.1220.2.95 2004/04/11 05:50:42) Debian$Rev: 203 $"
+TIMESTAMP=" (1.1220.2.94 2004/04/10 16:27:27)"
 
 
 # Check that we have a working $echo.
@@ -1838,10 +1838,7 @@ EOF
 	case $pass in
 	dlopen) libs="$dlfiles" ;;
 	dlpreopen) libs="$dlprefiles" ;;
-	link)
-	  libs="$deplibs %DEPLIBS%"
-	  test "X$link_all_deplibs" != Xno && libs="$libs $dependency_libs"
-	  ;;
+	link) libs="$deplibs %DEPLIBS% $dependency_libs" ;;
 	esac
       fi
       if test "$pass" = dlopen; then

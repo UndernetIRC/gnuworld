@@ -1,7 +1,23 @@
 /**
  * MTrie.cc
+ * Copyright (C) 2002 Daniel Karrels <dan@karrels.com>
  *
- * $Id: MTrie.cc,v 1.13 2003/08/19 21:48:39 dan_karrels Exp $
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
+ * USA.
+ *
+ * $Id: MTrie.cc,v 1.14 2004/05/18 16:50:57 dan_karrels Exp $
  */
 
 #include	<map>
@@ -19,6 +35,7 @@
 
 using std::map ;
 using std::clog ;
+using std::endl ;
 using std::list ;
 using std::string ;
 using std::ostream ;
@@ -289,7 +306,7 @@ for( const_nodes_iterator nItr = currentNode->nodesMap.begin(),
 
 	if( foundQuestionMark )
 		{
-		if( !match( localKey, nItr->first ) )
+		if( !gnuworld::match( localKey, nItr->first ) )
 			{
 //			clog	<< "true" << endl ;
 			base.push_front( nItr->first ) ;
@@ -313,7 +330,7 @@ for( const_nodes_iterator nItr = currentNode->nodesMap.begin(),
 		{
 		/* NO-OP, fall through, all nodes match */
 		}
-	else if( match( localKey, nItr->first ) )
+	else if( gnuworld::match( localKey, nItr->first ) )
 		{
 		// Not a match, do not recursiveFind() on this node
 		continue ;
@@ -353,7 +370,7 @@ if( !currentNode->valuesList.empty() )
 	// We need the stringBase either way
 	string stringBase = getBase() ;
 
-	if( blindRecursion || !match( origKey, stringBase ) )
+	if( blindRecursion || !gnuworld::match( origKey, stringBase ) )
 		{
 		//	clog	<< "MTrie::recursiveFind> match"
 		//		<< endl ;
@@ -549,7 +566,7 @@ for( nodes_iterator nItr = currentNode->nodesMap.begin() ;
 //		<< nItr->first
 //		<< " ): " ;
 
-	if( match( localKey, nItr->first ) )
+	if( gnuworld::match( localKey, nItr->first ) )
 		{
 //		clog	<< "false" << endl ;
 		continue ;
@@ -623,7 +640,7 @@ size_type eraseCount = 0 ;
 
 // '*'
 string stringBase = getBase() ;
-if( !match( key, stringBase ) )
+if( !gnuworld::match( key, stringBase ) )
 	{
 	// This node matches
 	eraseCount = currentNode->valuesList.size() ;

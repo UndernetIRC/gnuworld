@@ -1,4 +1,4 @@
-/* config-h.in.  Generated from configure.in by autoheader.  */
+/* config-h.in.  Generated from configure.ac by autoheader.  */
 /* Some of these are defined here, not in configure.in, because
    they're AC_DEFINEd in two different places, which causes two
    defines to appear.  Some C compilers might now appreciate it...  */

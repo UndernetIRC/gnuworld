@@ -29,8 +29,6 @@
 using namespace std ;
 using namespace gnuworld ;
 
-ELog gnuworld::elog ;
-
 class localHandler : public ConnectionHandler
 {
 public:

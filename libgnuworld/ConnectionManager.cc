@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ConnectionManager.cc,v 1.15 2004/02/05 23:28:46 dan_karrels Exp $
+ * $Id: ConnectionManager.cc,v 1.16 2004/05/18 16:50:57 dan_karrels Exp $
  */
 
 #include	<unistd.h>
@@ -52,7 +52,7 @@
 #include	"Buffer.h"
 #include	"ELog.h"
 
-const char rcsId[] = "$Id: ConnectionManager.cc,v 1.15 2004/02/05 23:28:46 dan_karrels Exp $" ;
+const char rcsId[] = "$Id: ConnectionManager.cc,v 1.16 2004/05/18 16:50:57 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -1018,10 +1018,6 @@ bool ConnectionManager::handleRead( ConnectionHandler* hPtr,
 	Connection* cPtr )
 {
 // protected member, no error checking
-
-// Create and set a temporary buffer to 0
-//char buf[ 4096 ] ;
-//memset( buf, 0, 4096 ) ;
 
 // Attempt the read from the socket
 errno = 0 ;

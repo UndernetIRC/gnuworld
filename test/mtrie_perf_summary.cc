@@ -1,7 +1,7 @@
 /**
  * mtrie_perf_summary.cc
  *
- * $Id: mtrie_perf_summary.cc,v 1.3 2003/07/30 13:29:25 dan_karrels Exp $
+ * $Id: mtrie_perf_summary.cc,v 1.4 2004/05/18 16:51:05 dan_karrels Exp $
  */
 
 #include	<string>
@@ -17,8 +17,6 @@
 
 using namespace std ;
 using namespace gnuworld ;
-
-ELog gnuworld::elog ;
 
 void usage( const string& progName )
 {

@@ -1,7 +1,7 @@
 /**
  * mtrie_load.cc
  *
- * $Id: mtrie_load.cc,v 1.3 2003/08/19 21:48:39 dan_karrels Exp $
+ * $Id: mtrie_load.cc,v 1.4 2004/05/18 16:51:05 dan_karrels Exp $
  */
 
 #include	<map>
@@ -19,15 +19,12 @@
 #endif
 
 #include	"misc.h"
-#include	"ELog.h"
 #include	"MTrie.h"
 #include	"match.h"
 #include	"StringTokenizer.h"
 
 using namespace std ;
 using namespace gnuworld ;
-
-ELog gnuworld::elog ;
 
 MTrie< string >* hostTrie = 0 ;
 

@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: signal.cc,v 1.4 2003/07/17 13:09:03 dan_karrels Exp $
+ * $Id: signal.cc,v 1.5 2004/05/18 16:51:05 dan_karrels Exp $
  */
 
 #include	<sys/types.h>
@@ -38,8 +38,6 @@
 
 using namespace std ;
 using namespace gnuworld ;
-
-ELog gnuworld::elog ;
 
 struct sigInfo
 {

@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ELog.cc,v 1.5 2003/12/29 23:59:36 dan_karrels Exp $
+ * $Id: ELog.cc,v 1.6 2004/05/18 16:50:57 dan_karrels Exp $
  */
 
 #include	<iostream>
@@ -29,7 +29,7 @@
 #include	"config.h"
 #include	"ELog.h"
 
-const char rcsId[] = "$Id: ELog.cc,v 1.5 2003/12/29 23:59:36 dan_karrels Exp $" ;
+const char rcsId[] = "$Id: ELog.cc,v 1.6 2004/05/18 16:50:57 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -37,6 +37,9 @@ namespace gnuworld
 using std::stringstream ;
 using std::string ;
 using std::endl ;
+
+// Instantiate the global instance
+ELog	elog ;
 
 ELog::ELog()
  : outStream( 0 ),

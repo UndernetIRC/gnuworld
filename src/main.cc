@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: main.cc,v 1.61 2004/01/09 17:01:04 dan_karrels Exp $
+ * $Id: main.cc,v 1.62 2004/05/18 16:51:05 dan_karrels Exp $
  */
 
 #include	<sys/time.h>
@@ -47,7 +47,7 @@
 #include	"md5hash.h"
 #include	"Signal.h"
 
-RCSTAG( "$Id: main.cc,v 1.61 2004/01/09 17:01:04 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: main.cc,v 1.62 2004/05/18 16:51:05 dan_karrels Exp $" ) ;
 
 // main() must be in the global namespace
 using namespace gnuworld ;
@@ -59,9 +59,6 @@ using std::string ;
 
 // Output the GNU greeting
 void		gnu() ;
-
-// Instantiate the logging stream
-gnuworld::ELog		gnuworld::elog ;
 
 /// Output the command line arguments for gnuworld
 void usage( const string& progName )

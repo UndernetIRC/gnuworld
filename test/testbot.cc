@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: testbot.cc,v 1.3 2003/06/28 01:21:21 dan_karrels Exp $
+ * $Id: testbot.cc,v 1.4 2004/05/18 16:51:05 dan_karrels Exp $
  */
 
 #include	<string>
@@ -36,8 +36,6 @@ using namespace gnuworld ;
 using std::string ;
 using std::cout ;
 using std::endl ;
-
-gnuworld::ELog gnuworld::elog ;
 
 void usage( const string& progName )
 {

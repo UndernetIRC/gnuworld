@@ -1,7 +1,7 @@
 /**
  * mtrie.cc
  *
- * $Id: mtrie.cc,v 1.5 2003/08/02 01:40:16 dan_karrels Exp $
+ * $Id: mtrie.cc,v 1.6 2004/05/18 16:51:05 dan_karrels Exp $
  */
 
 #include	<string>
@@ -14,8 +14,6 @@
 
 using namespace std ;
 using namespace gnuworld ;
-
-ELog gnuworld::elog ;
 
 void		printHelp() ;
 void		handleSearch( const StringTokenizer& ) ;

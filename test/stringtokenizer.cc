@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: stringtokenizer.cc,v 1.6 2003/06/11 17:46:34 dan_karrels Exp $
+ * $Id: stringtokenizer.cc,v 1.7 2004/05/18 16:51:05 dan_karrels Exp $
  */
 
 #include	<iostream>
@@ -38,8 +38,6 @@
 
 using namespace std ;
 using namespace gnuworld ;
-
-ELog gnuworld::elog ;
 
 void	usage( const string& ) ;
 bool	getData( ifstream& inputFile, vector< string >& ) ;

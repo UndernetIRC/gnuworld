@@ -1,6 +1,6 @@
 /**********************************************************************
  * $Workfile: MD5.H $
- * $Revision: 1.2 $
+ * $Revision: 1.3 $
  *  $Modtime: 1/08/97 6:35p $
  *
  * PURPOSE:
@@ -59,7 +59,7 @@
  * So there! 
  **********************************************************************/
 #ifndef MD5_H
-#define MD5_H "$Id: md5hash.h,v 1.2 2003/12/29 23:59:36 dan_karrels Exp $"
+#define MD5_H "$Id: md5hash.h,v 1.3 2004/05/18 16:50:57 dan_karrels Exp $"
 
 #include <iostream>
  
@@ -89,6 +89,7 @@ protected:
 };
 
 class md5Digest {
+   friend class md5 ;
 public:
    md5Digest(  void );              // Automatically calls md5Digest::clear().
    ~md5Digest( void );              // Automatically calls md5Digest::clear().
@@ -105,7 +106,7 @@ private:
 				md5Digest& digest );
    friend std::ostream& operator<<( std::ostream& stream,
 				const md5Digest& digest );
-   friend void     md5::encode( md5Digest &digest );
+//   friend void     md5::encode( md5Digest &digest );
 };
 
 } // namespace gnuworld

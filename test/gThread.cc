@@ -31,8 +31,6 @@
 using namespace std ;
 using namespace gnuworld ;
 
-ELog gnuworld::elog ;
-
 class subThread1 : public gThread
 {
 public:

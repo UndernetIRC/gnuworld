@@ -1,7 +1,7 @@
 /**
  * mtrie_perf.cc
  *
- * $Id: mtrie_perf.cc,v 1.2 2003/07/30 13:29:25 dan_karrels Exp $
+ * $Id: mtrie_perf.cc,v 1.3 2004/05/18 16:51:05 dan_karrels Exp $
  */
 
 #include	<string>
@@ -14,8 +14,6 @@
 
 using namespace std ;
 using namespace gnuworld ;
-
-ELog gnuworld::elog ;
 
 MTrie< string > hostTrie ;
 
