@@ -48,7 +48,7 @@
 #include	"ServerTimerHandlers.h"
 
 const char server_h_rcsId[] = __SERVER_H ;
-const char server_cc_rcsId[] = "$Id: server.cc,v 1.98 2001/05/17 00:59:33 dan_karrels Exp $" ;
+const char server_cc_rcsId[] = "$Id: server.cc,v 1.99 2001/05/17 19:19:56 dan_karrels Exp $" ;
 const char config_h_rcsId[] = __CONFIG_H ;
 const char misc_h_rcsId[] = __MISC_H ;
 const char events_h_rcsId[] = __EVENTS_H ;
@@ -1699,36 +1699,48 @@ return strlen( buffer ) ;
 
 bool xServer::removeGline( const string& userHost )
 {
+
+// Perform a linear search for the gline
 glineIterator ptr = gline_begin() ;
 for( ; ptr != gline_end() ; ++ptr )
 	{
+	// Is this the gline in question?
 	if( *(*ptr) == userHost )
 		{
+		// Yup
 		break ;
 		}
-	++ptr ;
 	}
 
+// Did we find the gline?
 if( ptr == gline_end() )
 	{
+	// Nope, return false
 	return false ;
 	}
 
-// Found it
+// Found it, notify the network that we are removing it
 strstream s ;
 s	<< charYY
 	<< " GL * -"
 	<< userHost
 	<< ends ;
 
+// Write the data to the network output buffer(s)
 Write( s ) ;
 delete[] s.str() ;
 
+// Remove the gline from the internal gline structure
 glineList.erase( ptr ) ;
+
+// Let all clients know that the gline has been removed
 PostEvent( EVT_REMGLINE,
 	static_cast< void* >( *ptr ) ) ;
 
+// Deallocate the gline
 delete *ptr ;
+
+// Return success
 return true ;
 }
 
