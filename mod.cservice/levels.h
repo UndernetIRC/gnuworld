@@ -1,15 +1,15 @@
 #ifndef __LEVELS_H
-#define __LEVELS_H "$Id: levels.h,v 1.23 2001/07/16 19:31:18 gte Exp $"
+#define __LEVELS_H "$Id: levels.h,v 1.24 2001/09/20 22:51:04 gte Exp $"
 
-/* 
+/*
  * levels.h
  *
  * 20/12/2000 - Perry Lorier <perry@coders.net>
  * Initial Version.
- * 
- * Defines access level constants for use in command handlers. 
  *
- * $Id: levels.h,v 1.23 2001/07/16 19:31:18 gte Exp $
+ * Defines access level constants for use in command handlers.
+ *
+ * $Id: levels.h,v 1.24 2001/09/20 22:51:04 gte Exp $
  */
 
 namespace gnuworld {
@@ -23,28 +23,28 @@ namespace gnuworld {
   const int lbanlist = 0;
   const int map = 0;
   const int motd = 0;
-  
+
   const int status = 1;
   const int force = 1; // And by definition, unforce.
-  
+
   const int voice = 25;
   const int devoice = 25;
-  
+
   const int kick = 50;
   const int topic = 50;
-  
+
   const int ban = 75;
   const int unban = 75;
-  
+
   const int deop = 100;
   const int op = 100;
   const int invite = 100;
   const int suspend = 100;
   const int unsuspend = 100;
-  
+
   const int masskick = 200;
   const int status2 = 200; // Users can see the channel modes too
-  
+
   const int adduser = 400;
   const int clearmode = 400;
   const int modinfo = 400;
@@ -54,24 +54,24 @@ namespace gnuworld {
   const int part = 500;
   const int setcmd = 450;
 
-  const int logs = 501; // Level that logs are visible at 
-  
-  const int registercmd = 600;
+  const int logs = 501; // Level that logs are visible at
+
+  const int registercmd = 750;
   const int globalsuspend = 750;
   const int rehash = 900;
 
-  const int purge = 750; 
+  const int purge = 750;
   const int removeall = 750;
 
   const int remignore = 600;
 
   const int servnotice = 800;
-  const int say = 800; 
+  const int say = 800;
 
   // Debug Commands
   const int shutdown = 900;
   const int quote = 1000;
- 
+
   namespace set {
     const int alwaysop = 450;
     const int userflag = 450;
@@ -79,7 +79,7 @@ namespace gnuworld {
     const int url = 450;
     const int massdeoppro = 500;
     const int keywords = 450;
-    
+
     const int desc = 450;
     const int mode = 450;
     const int noop = 500;
@@ -88,9 +88,9 @@ namespace gnuworld {
     const int lang = 500;
     const int floodpro = 500;
     const int autojoin = 500;
-    
+
     const int nopurge = 501;
-	const int comment = 600;
+	const int comment = 750;
 	const int locked = 600;
     const int special = 750;
     const int noreg = 750;
@@ -106,7 +106,7 @@ namespace gnuworld {
     const int suspendop = 450; // Immune from op'ing a suspended user.
     const int floodpro = 501;
   }
- 
+
   namespace admin {
 	const int base = 1;
   	const int helper = 500;
