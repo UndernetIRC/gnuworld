@@ -3133,7 +3133,7 @@ void cservice::doFloatingLimit(sqlChannel* reggedChan, Channel* theChan)
 	 * either.
 	 */
 
-	if (reggedChan->getLimitMax() && (theChan->getLimit() >= reggedChan->getLimitMax())) return;
+	if (reggedChan->getLimitMax() && (newLimit >= reggedChan->getLimitMax())) return;
 
 	/*
  	 * Check we're actually opped.
