@@ -252,12 +252,13 @@ else
 
 // The program will exit if these variables are not defined in the
 // configuration file.
-relayChan = cserviceConfig->Require( "relay_channel" )->second ; 
-debugChan = cserviceConfig->Require( "debug_channel" )->second ; 
+relayChan = cserviceConfig->Require( "relay_channel" )->second ;
+debugChan = cserviceConfig->Require( "debug_channel" )->second ;
+pendingPageURL = cserviceConfig->Require( "pending_page_url" )->second ;
 updateInterval = atoi((cserviceConfig->Require( "update_interval" )->second).c_str());
 expireInterval = atoi((cserviceConfig->Require( "expire_interval" )->second).c_str());
 cacheInterval = atoi((cserviceConfig->Require( "cache_interval" )->second).c_str());
-input_flood = atoi((cserviceConfig->Require( "input_flood" )->second).c_str()); 
+input_flood = atoi((cserviceConfig->Require( "input_flood" )->second).c_str());
 output_flood = atoi((cserviceConfig->Require( "output_flood" )->second).c_str());
 flood_duration = atoi((cserviceConfig->Require( "flood_duration" )->second).c_str());
 topic_duration = atoi((cserviceConfig->Require( "topic_duration" )->second).c_str());
@@ -2105,7 +2106,7 @@ if (timer_id == pending_timerID)
 	 */
 
 	strstream theQuery;
-	theQuery	<<  "SELECT channels.name,channels.id"
+	theQuery	<<  "SELECT channels.name,channels.id,channels.created_ts"
 				<< " FROM pending,channels" 
 				<< " WHERE channels.id = pending.channel_id"
 				<< " AND pending.status = 2;"
@@ -2126,13 +2127,14 @@ if (timer_id == pending_timerID)
 			{ 
 			string channelName = SQLDb->GetValue(i,0);
 			unsigned int channel_id = atoi(SQLDb->GetValue(i, 1));
+			unsigned int created_ts = atoi(SQLDb->GetValue(i, 2));
 			Channel* tmpChan = Network->findChannel(channelName);
  
 			if (tmpChan)
 				{
 				serverNotice(tmpChan, "This channel is currently being processed for registration.");
-				serverNotice(tmpChan, "If you wish to view the details of the application to or to object, please visit:");
-				serverNotice(tmpChan, "http://www.cservice.undernet.org/pendingchannel.php?id=%i", channel_id);
+				serverNotice(tmpChan, "If you wish to view the details of the application or to object, please visit:");
+				serverNotice(tmpChan, "%s?id=%i-%i", pendingPageURL.c_str(), created_ts, channel_id);
 				} 
 			}
 		}

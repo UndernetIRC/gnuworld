@@ -1,5 +1,5 @@
 #ifndef __CSERVICE_H
-#define __CSERVICE_H "$Id: cservice.h,v 1.66 2001/06/17 20:36:21 gte Exp $"
+#define __CSERVICE_H "$Id: cservice.h,v 1.67 2001/06/18 02:20:58 gte Exp $"
 
 #include	<string>
 #include	<vector>
@@ -68,6 +68,7 @@ public:
 	unsigned int connectCheckFreq;
 	unsigned int connectRetry;
 	void checkDbConnectionStatus();
+	string pendingPageURL;
 
 	cservice(const string& args);
 	virtual ~cservice();
