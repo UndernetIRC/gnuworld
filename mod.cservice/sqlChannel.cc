@@ -9,7 +9,7 @@
  * 30/12/2000: Moved static SQL data to constants.h --Gte
  * Set loadData up to take data from rows other than 0.
  *
- * $Id: sqlChannel.cc,v 1.30 2001/09/09 23:29:13 gte Exp $
+ * $Id: sqlChannel.cc,v 1.31 2001/09/12 21:02:47 gte Exp $
  */
 
 #include	<strstream>
@@ -25,7 +25,7 @@
 #include	"cservice_config.h"
 
 const char sqlChannel_h_rcsId[] = __SQLCHANNEL_H ;
-const char sqlChannel_cc_rcsId[] = "$Id: sqlChannel.cc,v 1.30 2001/09/09 23:29:13 gte Exp $" ;
+const char sqlChannel_cc_rcsId[] = "$Id: sqlChannel.cc,v 1.31 2001/09/12 21:02:47 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -52,19 +52,19 @@ const sqlChannel::flagType sqlChannel::F_AUTOTOPIC = 0x00080000 ;
 const sqlChannel::flagType sqlChannel::F_OPONLY    = 0x00100000 ; // Deprecated
 const sqlChannel::flagType sqlChannel::F_AUTOJOIN  = 0x00200000 ;
 
-const unsigned int sqlChannel::EV_MISC     = 1 ;
-const unsigned int sqlChannel::EV_JOIN     = 2 ;
-const unsigned int sqlChannel::EV_PART     = 3 ;
-const unsigned int sqlChannel::EV_OPERJOIN = 4 ;
-const unsigned int sqlChannel::EV_OPERPART = 5 ;
-const unsigned int sqlChannel::EV_FORCE    = 6 ;
-const unsigned int sqlChannel::EV_REGISTER = 7 ;
-const unsigned int sqlChannel::EV_PURGE    = 8 ;
+const int sqlChannel::EV_MISC     = 1 ;
+const int sqlChannel::EV_JOIN     = 2 ;
+const int sqlChannel::EV_PART     = 3 ;
+const int sqlChannel::EV_OPERJOIN = 4 ;
+const int sqlChannel::EV_OPERPART = 5 ;
+const int sqlChannel::EV_FORCE    = 6 ;
+const int sqlChannel::EV_REGISTER = 7 ;
+const int sqlChannel::EV_PURGE    = 8 ;
 
 /* Manually added Comment */
-const unsigned int sqlChannel::EV_COMMENT 	= 9  ;
-const unsigned int sqlChannel::EV_REMOVEALL	= 10 ;
-const unsigned int sqlChannel::EV_IDLE		= 11 ;
+const int sqlChannel::EV_COMMENT 	= 9  ;
+const int sqlChannel::EV_REMOVEALL	= 10 ;
+const int sqlChannel::EV_IDLE		= 11 ;
 
 sqlChannel::sqlChannel(PgDatabase* _SQLDb)
  : id(0),

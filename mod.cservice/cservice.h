@@ -1,5 +1,5 @@
 #ifndef __CSERVICE_H
-#define __CSERVICE_H "$Id: cservice.h,v 1.70 2001/09/05 03:47:56 gte Exp $"
+#define __CSERVICE_H "$Id: cservice.h,v 1.71 2001/09/12 21:02:47 gte Exp $"
 
 #include	<string>
 #include	<vector>
@@ -133,6 +133,9 @@ public:
 
 	/* Returns what admin access a user has. */
 	short getAdminAccessLevel( sqlUser* );
+
+	/* Returns what access a user has in the coder channel */
+	short getCoderAccessLevel( sqlUser* );
 
 	/* Fetch a user record for a user. */
 	sqlUser* getUserRecord( const string& );

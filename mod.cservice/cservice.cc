@@ -1014,6 +1014,36 @@ return 0;
 }
 
 /**
+ *  Returns the coder access level a particular user has.
+ */
+short int cservice::getCoderAccessLevel( sqlUser* theUser )
+{
+if (theUser->getFlag(sqlUser::F_GLOBAL_SUSPEND))
+	{
+	return 0;
+	}
+
+sqlChannel* theChan = getChannelRecord("#coder-com"); // Move to config,
+if (!theChan)
+	{
+	elog	<< "cservice::getAdminAccessLevel> Unable to "
+		<< "locate channel '#coder-com'! Sorry, I can't continue.."
+		<< endl;
+	::exit(0);
+	}
+
+sqlLevel* theLevel = getLevelRecord(theUser, theChan);
+if(theLevel)
+	{
+	return theLevel->getAccess();
+	}
+
+// By default, users have level 0 admin access.
+return 0;
+}
+
+
+/**
  * Returns the access level a particular user has on a particular
  * channel taking into account channel & user level suspensions.
  * Also used to return the level of access granted to a forced access.

@@ -6,7 +6,7 @@
 #include	"ELog.h"
 #include	"cservice.h"
 
-const char STATSCommand_cc_rcsId[] = "$Id: STATSCommand.cc,v 1.2 2001/09/05 03:47:56 gte Exp $" ;
+const char STATSCommand_cc_rcsId[] = "$Id: STATSCommand.cc,v 1.3 2001/09/12 21:02:47 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -23,7 +23,8 @@ if (!theUser)
 	}
 
 int admLevel = bot->getAdminAccessLevel(theUser);
-if (!admLevel) return false;
+int coderLevel = bot->getCoderAccessLevel(theUser);
+if (!admLevel && !coderLevel) return false;
 
 bot->Notice(theClient, "CMaster Command/SQL Query Statistics:");
 for( cservice::statsMapType::iterator ptr = bot->statsMap.begin() ;

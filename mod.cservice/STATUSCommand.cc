@@ -10,7 +10,7 @@
 #include	"Network.h"
 #include	"cservice_config.h"
 
-const char STATUSCommand_cc_rcsId[] = "$Id: STATUSCommand.cc,v 1.34 2001/09/05 03:47:56 gte Exp $" ;
+const char STATUSCommand_cc_rcsId[] = "$Id: STATUSCommand.cc,v 1.35 2001/09/12 21:02:47 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -48,8 +48,8 @@ if (st[1] == "*")
 	 *  Special case, display admin stats.
 	 */
 
-	// Don't show if they don't have any admin access.
-	if (!bot->getAdminAccessLevel(theUser))
+	/* Don't show if they don't have any admin or coder-com access. */
+	if (!bot->getAdminAccessLevel(theUser) && !bot->getCoderAccessLevel(theUser))
 		{
 		bot->Notice(theClient,
 			bot->getResponse(theUser, language::chan_not_reg).c_str(),
@@ -203,92 +203,6 @@ if (tmpChan)
 			bot->Notice(theClient, "I'm currently in this channel.");
 		}
 
-	if (admLevel >= 1)
-		{
-		/*
-		 *  Execute a quick query to find the last 3 join/part events that occured
-		 *  on this channel.
-		 */
-
-		strstream theQuery;
-		theQuery	<< "SELECT * FROM channellog WHERE (event = "
-				<< sqlChannel::EV_JOIN << " OR event = "
-				<< sqlChannel::EV_PART << " OR event = "
-				<< sqlChannel::EV_OPERJOIN << " OR event = "
-				<< sqlChannel::EV_OPERPART << ")"
-				<< " AND channelID = "
-				<< theChan->getID()
-				<< " ORDER BY ts DESC LIMIT 3"
-				<< ends;
-
-#ifdef LOG_SQL
-		elog	<< "sqlQuery> "
-			<< theQuery.str()
-			<< endl;
-#endif
-
-		ExecStatusType status = bot->SQLDb->Exec( theQuery.str() ) ;
-		delete[] theQuery.str();
-
-		if( PGRES_TUPLES_OK != status )
-			{
-			elog	<< "STATUS: SQL Error: "
-				<< bot->SQLDb->ErrorMessage()
-				<< endl ;
-			return false ;
-			}
-
-		if (bot->SQLDb->Tuples() > 0)
-			{
-			bot->Notice(theClient,
-				"Last 3 channel events:");
-			}
-		for (int i = 0 ; i < bot->SQLDb->Tuples(); i++)
-			{
-			string type ;
-			switch( atoi(bot->SQLDb->GetValue(i, 2)) )
-				{
-				case sqlChannel::EV_MISC:
-					{
-					type = "MISC";
-					break;
-					}
-				case sqlChannel::EV_JOIN:
-					{
-					type = "JOIN";
-					break;
-					}
-				case sqlChannel::EV_OPERJOIN:
-					{
-					type = "OPERJOIN";
-					break;
-					}
-				case sqlChannel::EV_OPERPART:
-					{
-					type = "OPERPART";
-					break;
-					}
-				case sqlChannel::EV_PART:
-					{
-					type = "PART";
-					break;
-					}
-				case sqlChannel::EV_FORCE:
-					{
-					type = "FORCE";
-					break;
-					}
-				} // switch()
-
-		bot->Notice(theClient, "%s ago: %s %s",
-			bot->prettyDuration(
-				atoi(bot->SQLDb->GetValue(i, 0)) ).c_str(),
-			type.c_str(),
-			bot->SQLDb->GetValue(i, 3));
-
-			} // for()
-
-		} // Admin access.
 	} // if( tmpChan )
 	else
 	{

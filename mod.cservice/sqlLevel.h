@@ -1,7 +1,7 @@
 /* sqlLevel.h */
 
 #ifndef __SQLLEVEL_H
-#define __SQLLEVEL_H "$Id: sqlLevel.h,v 1.15 2001/09/09 21:54:22 gte Exp $"
+#define __SQLLEVEL_H "$Id: sqlLevel.h,v 1.16 2001/09/12 21:02:47 gte Exp $"
 
 #include	<string>
 #include	<ctime>
@@ -51,7 +51,7 @@ public:
 	inline const time_t&		getSuspendExpire() const
 		{ return suspend_expires ; }
 
-	inline const unsigned int&	getSuspendLevel() const
+	inline const int&	getSuspendLevel() const
 		{ return suspend_level ; }
 
 	inline const string&		getSuspendBy() const
@@ -134,7 +134,7 @@ protected:
 	unsigned short	forced_access ;
 	flagType		flags ;
 	time_t			suspend_expires ;
-	unsigned int	suspend_level ;
+	int				suspend_level ;
 	string			suspend_by ;
 	time_t			added ;
 	string			added_by ;
