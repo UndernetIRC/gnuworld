@@ -79,9 +79,13 @@ if( !myConnect )
 
 login() ;
 
+// This is the main loop of the program
+// Pretty complicated eh?
 while( keepRunning )
 	{
-	cm.Poll( 100 ) ; // poll on 100ms intervals
+	// Poll() will release control to this method at least
+	// every 100milliseconds.
+	cm.Poll( 100 ) ;
 	}
 
 cout	<< "Run> Out of main loop, shutting down"
@@ -111,6 +115,10 @@ cout	<< "Connected"
 
 void testBot::OnRead( Connection*, const string& line )
 {
+// New data from the uplink arrives here
+// It is a complete \n delimited command
+
+// Trim any trailing \r or \n
 size_t len = line.size() - 1 ;
 while( ('\r' == line[ len ]) ||
 	('\n' == line[ len ]) )
@@ -118,16 +126,21 @@ while( ('\r' == line[ len ]) ||
 	--len ;
 	}
 
+// Prepare the data to be processed
 string	processMe = line.substr( 0, len + 1 ) ;
+
+// Output what was read
 cout	<< "[IN]: "
 	<< processMe
 	<< endl ;
 
+// Handle the command
 processInput( processMe ) ;
 }
 
 void testBot::login()
 {
+// This is called when a new connection is established
 // NICK <nick>
 // USER ident host server :realname
 string writeMe( "NICK " ) ;
@@ -172,13 +185,12 @@ if( st.size() < 2 )
 
 if( st[ 1 ] == "376" )
 	{
+	// Fully connected, MOTD and other stuff has completed
+	// sending.
 	joinChannels() ;
 
-	string writeMe( "JOIN #c++\r\n" ) ;
-	myConnect->Write( writeMe ) ;
 	return ;
 	}
-
 }
 
 void testBot::joinChannels()

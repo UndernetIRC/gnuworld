@@ -17,11 +17,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: config.h,v 1.17 2003/06/03 01:01:52 dan_karrels Exp $
+ * $Id: config.h,v 1.18 2003/06/03 20:43:29 dan_karrels Exp $
  */
 
 #ifndef __CONFIG_H
-#define __CONFIG_H "$Id: config.h,v 1.17 2003/06/03 01:01:52 dan_karrels Exp $"
+#define __CONFIG_H "$Id: config.h,v 1.18 2003/06/03 20:43:29 dan_karrels Exp $"
 
 /* config.h */
 /* GNUWorld main configuration file */
@@ -34,7 +34,7 @@
  * massive quantities of CPU when debugging, recommended
  * only for debugging/testing purposes.
  */
-#undef EDEBUG
+#define EDEBUG
 
 #ifdef EDEBUG
 
