@@ -15,7 +15,7 @@
 #include	"ip.h"
 
 const char iClient_h_rcsId[] = __ICLIENT_H ;
-const char iClient_cc_rcsId[] = "$Id: iClient.cc,v 1.13 2001/03/24 16:00:56 dan_karrels Exp $" ;
+const char iClient_cc_rcsId[] = "$Id: iClient.cc,v 1.14 2001/03/28 23:18:48 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -124,10 +124,6 @@ for( channelListType::iterator ptr = channelList.begin() ;
 		{
 		channelList.erase( ptr ) ;
 		return true  ;
-		}
-	else
-		{
-		++ptr ;
 		}
 	}
 
