@@ -1797,7 +1797,7 @@ COPY "translations" FROM stdin;
 13	35	Kan ikke legge til bruker med lik eller høyere aksess enn din egen.	31337
 13	36	Ikke gyldig aksess level.	31337
 13	37	%s er allerede lagt til i %s med aksess level %i.	31337
-13	38	Lagt til bruker %s til %s med aksess level %i	31337
+13	38	Lagt til bruker %s i %s med aksess level %i	31337
 13	39	Noe gikk galt: %s	31337
 13	40	%s: Slutt på banlisten	31337
 13	41	Ikke mulig å se brukers detaljer (Usynlig)	31337
