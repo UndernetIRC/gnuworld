@@ -2,7 +2,7 @@
 /*
  *
  * Undernet GNUworld Interactive Installation Guide (aka UGIIG)
- * $Id: index.php,v 1.17 2004/02/24 22:39:37 nighty Exp $
+ * $Id: index.php,v 1.18 2004/02/25 01:02:24 nighty Exp $
  *
  * Released under the GNU Public License : http://www.gnu.org/licenses/gpl.txt
  * by nighty <nighty@undernet.org>
@@ -50,7 +50,7 @@ function footer($prev,$next) {
 	//echo "<address>maintained by <b>&lt;</b><a href=\"mailto:" . $coder_email . "\">" . $coder_email . "</a><b>&gt;</b> - Last modified : <b>" . date("M-d-Y H:i:s",   (  filemtime("index.php")+( date("Z",filemtime("index.php"))/3600 )   )   ) . " UTC/GMT</b> - <b>[</b><a href=\"./\">Home</a><b>]</b></address>";
 	echo "<address>maintained by <b>&lt;</b><a href=\"mailto:" . $coder_email . "\">" . $coder_email . "</a><b>&gt;</b> - <b>[</b><a href=\"./\">Home</a><b>]</b>";
 	echo "&nbsp;<br><font size=-2><b>";
-?>$Id: index.php,v 1.17 2004/02/24 22:39:37 nighty Exp $<?
+?>$Id: index.php,v 1.18 2004/02/25 01:02:24 nighty Exp $<?
 	echo "</b></font></address>\n";
 	echo "</body>\n";
 	echo "</html>\n";
@@ -117,7 +117,7 @@ define(ZLIB_FILE_NAME,"zlib-1.1.4.tar.gz");
 
 
 ?>
-<!-- $Id: index.php,v 1.17 2004/02/24 22:39:37 nighty Exp $ //-->
+<!-- $Id: index.php,v 1.18 2004/02/25 01:02:24 nighty Exp $ //-->
 <html>
 <head>
 <title>Undernet GNUworld Interactive Installation Guide</title>
@@ -636,21 +636,20 @@ If you don't have <b>automake 1.6</b>, you can get it <a href="ftp://ftp.grolier
 If that's ok, you can go on and build PostgreSQL for real, then install it...
 
 	<?=$os?>:/root/postgresql-<?=PG_SQL_RECOM_VERSION?># <b>gmake</b>
-<?
-/*
+
+
 If compilation fails due to an error like ...<font color=#aaaaaa>
 	commands/SUBSYS.o(.text+0x4902): In function `DoCopy':
 	: undefined reference to `errno'
 	collect2: ld returned 1 exit status
 	gmake[2]: *** [postgres] Error 1
 	gmake[2]: Leaving directory `/root/postgresql-<?=PG_SQL_RECOM_VERSION?>/src/backend'</font>
-... then get the <b>patch</b> and apply it as follows before trying to compile again...
+... then open file '/root/postgresql-<?=PG_SQL_RECOM_VERSION?>/src/backend/commands/copy.c'
+and add <b>#include &lt;errno.h&gt;</b> to the includes already present.
+You will then be able to do <b>gmake</b> again so it will end without error.
 
-		<?=$os?>:/root/postgresql-<?=PG_SQL_RECOM_VERSION?># <b>wget ...</b>
-		<?=$os?>:/root/postgresql-<?=PG_SQL_RECOM_VERSION?># <b>wget ...</b> ... to be continued..
-		<?=$os?>:/root/postgresql-<?=PG_SQL_RECOM_VERSION?># <b>wget ...</b>
-*/
-	?>	<?=$os?>:/root/postgresql-<?=PG_SQL_RECOM_VERSION?># <b>gmake install</b>
+
+	<?=$os?>:/root/postgresql-<?=PG_SQL_RECOM_VERSION?># <b>gmake install</b>
 
 <? if ($os=="freebsd") { ?>
 If you are using <b>bash</b> as your shell programm, add the following line :
