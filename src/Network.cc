@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: Network.cc,v 1.57 2003/06/11 14:08:23 dan_karrels Exp $
+ * $Id: Network.cc,v 1.58 2003/06/14 17:34:29 jeekay Exp $
  */
 
 #include	<new>
@@ -42,7 +42,7 @@
 #include	"ip.h"
 
 const char xNetwork_h_rcsId[] = __NETWORK_H ;
-const char xNetwork_cc_rcsId[] = "$Id: Network.cc,v 1.57 2003/06/11 14:08:23 dan_karrels Exp $" ;
+const char xNetwork_cc_rcsId[] = "$Id: Network.cc,v 1.58 2003/06/14 17:34:29 jeekay Exp $" ;
 const char ELog_h_rcsId[] = __ELOG_H ;
 const char iClient_h_rcsId[] = __ICLIENT_H ;
 const char Channel_h_rcsId[] = __CHANNEL_H ;
@@ -76,7 +76,8 @@ assert( NULL != newClient ) ;
 if( !numericMap.insert( numericMapType::value_type(
 	newClient->getIntYYXXX(), newClient ) ).second )
 	{
-	elog	<< "xNetwork::addClient> Insert into numericMap failed"
+	elog	<< "xNetwork::addClient> Insert into numericMap failed for numeric "
+		<< newClient->getIntYYXXX()
 		<< endl ;
 	return false ;
 	}
