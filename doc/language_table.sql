@@ -1,5 +1,6 @@
 -- Language Definition Table for CMaster Undernet channel services.
 -- 24/12/01 - nighty <nighty@undernet.org>. (fixed missing field)
+
  
 -- Zap everything! 
 DELETE FROM translations;
