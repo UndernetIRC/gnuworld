@@ -23,3 +23,9 @@ checkFreq = 10
 # Note this does NOT include checkFreq so make sure to set
 # a value somewhat higher than 0
 startDelay = 10
+
+# How frequently to commit to the database
+# _freq is max time to wait, _count is max entries to wait
+commitFreq = 5
+commitCount = 1
+
