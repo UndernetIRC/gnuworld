@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------------
--- "$Id: cservice.web.sql,v 1.2 2001/01/05 05:27:33 gte Exp $"
+-- "$Id: cservice.web.sql,v 1.3 2001/02/22 23:17:52 gte Exp $"
 -- Channel service DB SQL file for PostgreSQL.
 --
 -- Tables specific to webbased registration process.
@@ -15,5 +15,7 @@ CREATE TABLE webcookies (
 CREATE TABLE pendingusers (
 	user_name VARCHAR(63),
 	cookie VARCHAR(32),
-	expire INT4
+	expire INT4,
+	question_id INT2,
+	verificationdata VARCHAR(30)
 );
