@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: Network.cc,v 1.56 2003/06/11 13:52:25 dan_karrels Exp $
+ * $Id: Network.cc,v 1.57 2003/06/11 14:08:23 dan_karrels Exp $
  */
 
 #include	<new>
@@ -42,7 +42,7 @@
 #include	"ip.h"
 
 const char xNetwork_h_rcsId[] = __NETWORK_H ;
-const char xNetwork_cc_rcsId[] = "$Id: Network.cc,v 1.56 2003/06/11 13:52:25 dan_karrels Exp $" ;
+const char xNetwork_cc_rcsId[] = "$Id: Network.cc,v 1.57 2003/06/11 14:08:23 dan_karrels Exp $" ;
 const char ELog_h_rcsId[] = __ELOG_H ;
 const char iClient_h_rcsId[] = __ICLIENT_H ;
 const char Channel_h_rcsId[] = __CHANNEL_H ;
@@ -200,9 +200,9 @@ return ptr->second ;
 
 iClient* xNetwork::findNick( const string& nick ) const
 {
-elog	<< "xNetwork::findNick> "
-	<< nick
-	<< endl ;
+//elog	<< "xNetwork::findNick> "
+//	<< nick
+//	<< endl ;
 
 nickMapType::const_iterator ptr = nickMap.find( nick ) ;
 if( ptr == nickMap.end() )
