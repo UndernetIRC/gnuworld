@@ -1,8 +1,8 @@
--- $Id: greeting.sql,v 1.8 2002/08/30 10:18:46 nighty Exp $
+-- $Id: greeting.sql,v 1.9 2002/12/23 16:31:50 nighty Exp $
 -- spanish + catalan by Algol.
 -- norwegian by MrIron.
 -- french by nighty.
--- romanian by TheBeast.
+-- romanian by Tyranus.
 -- Dutch by Spike.
 
 DELETE FROM translations where response_id = 9998;
