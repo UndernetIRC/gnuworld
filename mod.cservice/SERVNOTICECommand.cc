@@ -8,7 +8,7 @@
  *
  * Caveats: None
  *
- * $Id: SERVNOTICECommand.cc,v 1.3 2001/09/05 03:47:56 gte Exp $
+ * $Id: SERVNOTICECommand.cc,v 1.4 2003/01/06 18:19:17 gte Exp $
  */
 
 #include	<string>
@@ -21,7 +21,7 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char SERVNOTICECommand_cc_rcsId[] = "$Id: SERVNOTICECommand.cc,v 1.3 2001/09/05 03:47:56 gte Exp $" ;
+const char SERVNOTICECommand_cc_rcsId[] = "$Id: SERVNOTICECommand.cc,v 1.4 2003/01/06 18:19:17 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -71,7 +71,7 @@ if (!tmpChan)
 	}
 
 string theMessage = st.assemble(2);
-bot->serverNotice(tmpChan, theMessage.c_str());
+bot->serverNotice(tmpChan, "%s", theMessage.c_str());
 
 return true ;
 }

@@ -8,7 +8,7 @@
  *
  * Caveats: None.
  *
- * $Id: SAYCommand.cc,v 1.6 2001/09/05 03:47:56 gte Exp $
+ * $Id: SAYCommand.cc,v 1.7 2003/01/06 18:19:13 gte Exp $
  */
 
 #include	<string>
@@ -16,9 +16,10 @@
 #include	"StringTokenizer.h"
 #include	"cservice.h"
 #include	"levels.h"
+#include	"Network.h"
 #include	"responses.h"
 
-const char SAYCommand_cc_rcsId[] = "$Id: SAYCommand.cc,v 1.6 2001/09/05 03:47:56 gte Exp $" ;
+const char SAYCommand_cc_rcsId[] = "$Id: SAYCommand.cc,v 1.7 2003/01/06 18:19:13 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -75,7 +76,9 @@ if (!theChan)
 	return false;
 	}
 
-bot->Message(st[1], st.assemble(2).c_str());
+Channel* tmpChan = Network->findChannel(theChan->getName());
+if(tmpChan) bot->Message(tmpChan, st.assemble(2));
+
 return true;
 }
 
