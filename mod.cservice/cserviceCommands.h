@@ -1,5 +1,5 @@
 #ifndef __CSERVICECOMMANDS_H
-#define __CSERVICECOMMANDS_H "$Id: cserviceCommands.h,v 1.17 2001/01/13 20:49:46 gte Exp $"
+#define __CSERVICECOMMANDS_H "$Id: cserviceCommands.h,v 1.18 2001/01/19 02:29:31 gte Exp $"
 
 #include	<string>
 #include	"iClient.h"
@@ -99,6 +99,7 @@ DECLARE_COMMAND( UNSUSPEND )
 DECLARE_COMMAND( BAN )
 DECLARE_COMMAND( UNBAN )
 DECLARE_COMMAND( LBANLIST )
+DECLARE_COMMAND( NEWPASS )
 
 
 // Admin level commands.
