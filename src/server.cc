@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server.cc,v 1.196 2004/02/13 16:55:45 jeekay Exp $
+ * $Id: server.cc,v 1.197 2004/05/27 12:17:39 jeekay Exp $
  */
 
 #include	<sys/time.h>
@@ -71,7 +71,7 @@
 #include	"ConnectionHandler.h"
 #include	"Connection.h"
 
-RCSTAG( "$Id: server.cc,v 1.196 2004/02/13 16:55:45 jeekay Exp $" ) ;
+RCSTAG( "$Id: server.cc,v 1.197 2004/05/27 12:17:39 jeekay Exp $" ) ;
 
 namespace gnuworld
 {
@@ -990,7 +990,7 @@ fakeServer->setIntXXX( 64 * 64 * 64 - 1 ) ;
 
 BurstServer( fakeServer ) ;
 
-PostEvent( EVT_NETJOIN, static_cast< void* >( fakeServer ) ) ;
+PostEvent( EVT_NETJOIN, static_cast< void* >( fakeServer ), static_cast< void* >( getMe() ) ) ;
 
 return true ;
 }
@@ -1007,6 +1007,10 @@ if( fakeServer->isJupe() )
 		getCharYY().c_str(),
 		fakeServer->getName().c_str(),
 		fakeServer->getDescription().c_str() ) ;
+	
+	elog	<< "xNetwork::BurstServer> Adding jupe of "
+		<< *fakeServer
+		<< endl;
 	}
 else
 	{
