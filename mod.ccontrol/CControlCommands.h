@@ -8,6 +8,7 @@
 
 #include	"iClient.h"
 //#include	"ccontrol.h"
+#include        "ccUser.h"
 
 using std::string ;
 
@@ -167,7 +168,7 @@ public:
     string Numeric;
     int SuspendExpires;
     string SuspendedBy;
-    AuthInfo *Next,*Prev;
+//    AuthInfo *Next,*Prev;
 };// AuthInfo;
 
 //typedef struct UserInfo {

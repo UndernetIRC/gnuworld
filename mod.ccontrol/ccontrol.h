@@ -3,7 +3,7 @@
  */
 
 #ifndef __CCONTROL_H
-#define __CCONTROL_H "$Id: ccontrol.h,v 1.8 2001/02/22 20:27:32 dan_karrels Exp $"
+#define __CCONTROL_H "$Id: ccontrol.h,v 1.9 2001/02/24 18:31:27 mrbean_ Exp $"
 
 #include	<string>
 #include	<vector>
@@ -21,6 +21,7 @@
 #include	"libpq-int.h"
 #include        "match.h"
 #include	"md5hash.h" 
+#include        "ccUser.h"
 
 namespace gnuworld
 {
@@ -254,8 +255,12 @@ public:
 	static string replace( const string&,
 				const string&,
 				const string& ) ;
+	
+	ccUser *GetOper( const string );
 
-	/**
+	bool AuthOper( ccUser* );
+	
+    	/**
 	 * This is a constant iterator type used to perform a read-only
 	 * iteration of the operchan structure.
 	 */

@@ -1,12 +1,12 @@
 #include	<string>
 #include	<cstdlib>
-#include        <iomanip.h>
+#include        <iomanip>
 #include	"ccontrol.h"
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 #include	"md5hash.h" 
-
-const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.3 2001/02/23 20:19:43 mrbean_ Exp $";
+#include        "ccUser.h"
+const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.4 2001/02/24 18:31:27 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -26,8 +26,7 @@ if( st.size() < 3 )
 AuthInfo* tmpUser = bot->IsAuth(theClient->getCharYYXXX());
 if (tmpUser) 
 	{
-	bot->Notice(theClient, "You  are already authenticated! ", 
-	tmpUser->Name.c_str());
+	bot->Notice(theClient, "You  are already authenticated! ");
 	return false;
 	}
 
@@ -35,24 +34,24 @@ if (tmpUser)
 	 *  Find the user record, confirm authorisation and attach the record to this client. 
 	 */
  
-User* theUser = bot->GetUser(st[1]);
+ccUser* theUser = bot->GetOper(st[1]);
 if (theUser) 
 	{ 
 		/*
 		 *  Compare password with MD5 hash stored in user record.
 		 */
 
-	if(!bot->UserGotMask(theUser,theClient->getNickUserHost()))
+/*	if(!bot->UserGotMask(theUser,theClient->getNickUserHost()))
 		{
 		bot->Notice(theClient,"Sorry but your mask doesnt appear in my access list!");
 		return false;
-		}
+		}*/
 
 	md5	hash; // MD5 hash algorithm object.
 	md5Digest digest; // MD5Digest algorithm object.
 	strstream output;
-	string salt = theUser->Password.substr(0, 8);
-	string md5Part = theUser->Password.substr(8);
+	string salt = theUser->getPassword().substr(0, 8);
+	string md5Part = theUser->getPassword().substr(8);
 	string guess = salt + st.assemble(2);
 
 	// Build a MD5 hash based on our salt + the guessed password.
@@ -74,21 +73,21 @@ if (theUser)
 		}
 	output << ends;
 
-	if (output.str() != md5Part) // If the MD5 hash's don't match..
+	if (md5Part != output.str()) // If the MD5 hash's don't match..
 		{
-		bot->Notice(theClient, "AUTHENTICATION FAILED as %s (Invalid Password).", theUser->UserName.c_str());
+		bot->Notice(theClient, "AUTHENTICATION FAILED as %s (Invalid Password).", theUser->getUserName().c_str());
 		return false;
 		}
 
-	theUser->UserName = st[1];
-	theUser->Numeric = theClient->getCharYYXXX();
-	if(bot->AuthUser(theUser))
-	if(!(theUser->Flags & isSUSPENDED))
-		bot->Notice(theClient, "Authentication successful! ",theUser->UserName.c_str()); 
+	theUser->setUserName(st[1]);
+	theUser->setNumeric(theClient->getCharYYXXX());
+	if(bot->AuthOper(theUser))
+	if(!(theUser->getFlags() & isSUSPENDED))
+		bot->Notice(theClient, "Authentication successful! ",theUser->getUserName().c_str()); 
 	else 
-		bot->Notice(theClient, "Authentication successful,However you are suspended ",theUser->UserName.c_str()); 
+		bot->Notice(theClient, "Authentication successful,However you are suspended ",theUser->getUserName().c_str()); 
 	else
-	        bot->Notice(theClient, "Error in authentication ",theUser->UserName.c_str()); 
+	        bot->Notice(theClient, "Error in authentication ",theUser->getUserName().c_str()); 
 	delete (theUser);
 	} 
 else

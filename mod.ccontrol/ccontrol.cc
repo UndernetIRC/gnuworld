@@ -17,11 +17,12 @@
 #include	"misc.h"
 #include	"Network.h"
 #include	"ELog.h"
+#include        "ccUser.h"
 #include	"libpq++.h"
 #include	"ccontrol.h"
- 
+
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.13 2001/02/22 20:27:32 dan_karrels Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.14 2001/02/24 18:31:27 mrbean_ Exp $" ;
 
 using std::string ;
 using std::vector ;
@@ -573,7 +574,7 @@ void ccontrol::UpdateAuth(int Id)
         TempAuth->Name = TempUser->UserName;
         TempAuth->Access = TempUser->Access;
         TempAuth->Flags = TempUser->Flags;
-        TempAuth->Next = NULL;
+        //TempAuth->Next = NULL;
         TempAuth->SuspendExpires = TempUser->SuspendExpires;
         TempAuth->SuspendedBy = TempUser->SuspendedBy;
     }
@@ -776,10 +777,27 @@ TempAuth->Id = TempUser->Id;
 TempAuth->Name = TempUser->UserName;
 TempAuth->Access = TempUser->Access;
 TempAuth->Flags = TempUser->Flags;
-TempAuth->Next = NULL;
+//TempAuth->Next = NULL;
 TempAuth->Numeric = TempUser->Numeric;
 TempAuth->SuspendExpires = TempUser->SuspendExpires;
 TempAuth->SuspendedBy = TempUser->SuspendedBy;
+
+authList.push_back( TempAuth ) ;
+return true;
+}    
+
+bool ccontrol::AuthOper( ccUser* TempUser)
+{
+AuthInfo *TempAuth = new (nothrow) AuthInfo;
+assert( TempAuth != 0 ) ;
+
+TempAuth->Id = TempUser->getID();
+TempAuth->Name = TempUser->getUserName();
+TempAuth->Access = TempUser->getAccess();
+TempAuth->Flags = TempUser->getFlags();
+TempAuth->Numeric = TempUser->getNumeric();
+TempAuth->SuspendExpires = 0;//TempUser->getSuspendExpires();
+TempAuth->SuspendedBy = TempUser->getSuspendedBy();
 
 authList.push_back( TempAuth ) ;
 return true;
@@ -1077,5 +1095,20 @@ retMe += srcString.substr( beginPos + from.size() ) ;
 return retMe ;
 
 }
+
+ccUser* ccontrol::GetOper( const string Name)
+{
+ccUser* tmpUser = new (nothrow) ccUser(SQLDb);
+if(!tmpUser)
+	return NULL;
+if(tmpUser->loadData(Name))
+	return tmpUser;
+else
+	{
+	delete tmpUser;
+	return NULL;
+	}
+}
+		    
 
 } // namespace gnuworld
