@@ -1,5 +1,5 @@
 
-"$Id: TODO,v 1.1 2001/05/26 16:43:18 mrbean_ Exp $"
+"$Id: TODO,v 1.2 2001/05/28 21:10:38 dan_karrels Exp $"
 
 [ ] - Add flood check for lame users
 
@@ -13,5 +13,12 @@
 
 [ ] - Cleanup ... dont need to say how much its needed in here
 
-
+- Truncate output of any commands which will flood an oper 
+(access,lastcomm)
+- chaninfo output should also include human readable time
+- op command should op the requesting oper if no nicks are provided
+- same with deop
+- scangline doesn't work
+- "help translate" needs extra space between syntax and description (or is 
+it just my terminal?)
 
