@@ -14,16 +14,10 @@
 #include	"xparameters.h"
 #include	"StringTokenizer.h"
 
-const char msg_PART_cc_rcsId[] = "$Id: msg_PART.cc,v 1.1 2001/02/02 18:10:30 dan_karrels Exp $" ;
+const char msg_PART_cc_rcsId[] = "$Id: msg_PART.cc,v 1.2 2001/02/03 17:47:23 dan_karrels Exp $" ;
 
 using std::string ;
-using std::vector ;
-using std::list ;
 using std::endl ;
-using std::ends ;
-using std::strstream ;
-using std::stack ;
-using std::unary_function ;
 
 namespace gnuworld
 {
