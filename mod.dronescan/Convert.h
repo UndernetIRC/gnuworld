@@ -1,9 +1,12 @@
 #ifndef CONVERT_H
-#define CONVERT_H "$Id: Convert.h,v 1.1 2003/07/26 16:47:18 jeekay Exp $"
+#define CONVERT_H "$Id: Convert.h,v 1.2 2003/08/02 19:22:38 jeekay Exp $"
 
 #include <deque>
 #include <sstream>
 #include <string>
+
+#include <stdio.h>
+#include <time.h>
 
 namespace gnuworld {
 
