@@ -7,7 +7,7 @@
 #include "netData.h"
 #include "nickserv.h"
 
-const char NickServ_cc_rcsId[] = "$Id: nickserv.cc,v 1.4 2002/08/16 21:37:32 jeekay Exp $";
+const char NickServ_cc_rcsId[] = "$Id: nickserv.cc,v 1.5 2002/08/23 21:28:01 jeekay Exp $";
 
 namespace gnuworld
 {
@@ -135,8 +135,6 @@ xClient::ImplementServer( theServer );
 int nickserv::OnEvent( const eventType& event, void* Data1, void* Data2, void* Data3, void* Data4)
 {
 
-elog << "Got an Event!" << endl;
-
 /* The target user of the event */
 iClient* theClient = static_cast< iClient* >( Data1 );
 
@@ -159,6 +157,7 @@ switch( event ) {
     if(theClient->isModeR()) {
       /* Find the sqlUser for their +r and assign it to this iClient */
       theData->authedUser = isRegistered(theClient->getAccount());
+      if(theData->authedUser) { theData->authedUser->commitLastSeen(); }
     }
 
     addToQueue(theClient);
@@ -178,6 +177,7 @@ switch( event ) {
     netData* theData = static_cast< netData* > (theClient->getCustomData(this));
     
     theData->authedUser = isRegistered(theClient->getAccount());
+    if(theData->authedUser) { theData->authedUser->commitLastSeen(); }
     
     return 1;
     break;
@@ -259,7 +259,7 @@ elog << "*** [NickServ:precacheUsers] Precaching users." << endl;
 PgDatabase* cacheCon = theManager->getConnection();
 
 /* Retrieve the list of registered users */
-string cacheQuery = "SELECT id,name,flags,level,lastseen FROM users";
+string cacheQuery = "SELECT id,name,flags,level,lastseen_ts,registered_ts FROM users";
 if(cacheCon->ExecTuplesOk(cacheQuery.c_str())) {
   for(int i = 0; i < cacheCon->Tuples(); i++) {
     sqlUser* tmpUser = new sqlUser(theManager);
@@ -407,9 +407,9 @@ for(QueueType::iterator queuePos = killQueue.begin(); queuePos != killQueue.end(
  * This function compares an iClient and a sqlUser and returns true if they
  * match, ie iClient->getNickName() == sqlUser->getName()
  */
-bool isAccountMatch(iClient* theClient, sqlUser* theUser)
+bool nickserv::isAccountMatch(iClient* theClient, sqlUser* theUser)
 {
-string lowerNickName = string_lower(theClient->getNickName());
+string lowerNickName = string_lower(theClient->getAccount());
 string lowerName = string_lower(theUser->getName());
   
 if(lowerNickName == lowerName) return true;
