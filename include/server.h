@@ -17,7 +17,7 @@
  */
 
 #ifndef __SERVER_H
-#define __SERVER_H "$Id: server.h,v 1.53 2001/12/23 09:07:55 mrbean_ Exp $"
+#define __SERVER_H "$Id: server.h,v 1.54 2002/01/12 21:42:49 gte Exp $"
 
 #include	<string>
 #include	<vector>
@@ -856,9 +856,9 @@ public:
 	/**
 	 * Check if a server is juped
 	 */
-	 
+
 	 virtual bool isJuped( const iServer* );
-	
+
 
 protected:
 
@@ -979,7 +979,7 @@ protected:
 	 */
 	virtual void	onUserModeChange( xParameters& ) ;
 
-	
+
 	/**
 	 * This variable is false when no signal has occured, true
 	 * otherwise.  This variable is checked each iteration of
@@ -1144,11 +1144,14 @@ protected:
 	/// W(HOIS) message handler.
 	DECLARE_MSG(W);
 
+	/// Account message handler.
+	DECLARE_MSG(AC);
+
 	/// NOOP message.
 	/// Use this handler for any messages that we don't need to handle.
 	/// Included for completeness.
 	DECLARE_MSG(NOOP);
-	
+
 	/// 351 message
 	/// when our client recieve back a version reply from a server
 	DECLARE_MSG(M351);

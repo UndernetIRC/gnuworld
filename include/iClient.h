@@ -2,7 +2,7 @@
  */
 
 #ifndef __ICLIENT_H
-#define __ICLIENT_H "$Id: iClient.h,v 1.22 2002/01/08 20:49:51 gte Exp $"
+#define __ICLIENT_H "$Id: iClient.h,v 1.23 2002/01/12 21:42:49 gte Exp $"
 
 #include	<string>
 #include	<list>
@@ -131,10 +131,13 @@ public:
 		{ return description ; }
 
 	/**
-	 * Retrieve client's 'account' field.
+	 * Set/Retrieve client's 'account' field.
 	 */
 	inline const string& getAccount() const
 		{ return account ; }
+
+	inline void setAccount( const string& _account )
+		{ account = _account ; setMode(MODE_REGISTERED); }
 
 	/**
 	 * Retrieve the iClient's connection time.

@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-## $Id: Makefile.am,v 1.15 2001/12/23 09:07:57 mrbean_ Exp $
+## $Id: Makefile.am,v 1.16 2002/01/12 21:42:17 gte Exp $
 
 bin_PROGRAMS = gnuworld
 
@@ -19,6 +19,7 @@ gnuworld_SOURCES = Channel.cc \
 	iServer.cc \
 	ip.cc \
 	main.cc \
+	msg_AC.cc \
 	msg_AD.cc \
 	msg_B.cc \
 	msg_C.cc \

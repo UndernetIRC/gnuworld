@@ -50,7 +50,7 @@
 #include	"UnloadClientTimerHandler.h"
 
 const char server_h_rcsId[] = __SERVER_H ;
-const char server_cc_rcsId[] = "$Id: server.cc,v 1.122 2002/01/10 20:31:26 mrbean_ Exp $" ;
+const char server_cc_rcsId[] = "$Id: server.cc,v 1.123 2002/01/12 21:42:17 gte Exp $" ;
 const char config_h_rcsId[] = __CONFIG_H ;
 const char misc_h_rcsId[] = __MISC_H ;
 const char events_h_rcsId[] = __EVENTS_H ;
@@ -321,6 +321,9 @@ REGISTER_MSG( "DS", DS ) ;
 
 // Admin
 REGISTER_MSG( "AD", AD ) ;
+
+// Account
+REGISTER_MSG( "AC", AC ) ;
 
 // Non-tokenized command handlers
 

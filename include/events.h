@@ -6,7 +6,7 @@
  */
 
 #ifndef __EVENTS_H
-#define __EVENTS_H "$Id: events.h,v 1.10 2001/01/28 19:27:35 dan_karrels Exp $"
+#define __EVENTS_H "$Id: events.h,v 1.11 2002/01/12 21:42:49 gte Exp $"
 
 namespace gnuworld
 {
@@ -31,6 +31,7 @@ enum
 	EVT_KILL,
 	EVT_NICK,
 	EVT_CHNICK,
+	EVT_ACCOUNT,
 
 	// EVT_NOOP must always be last
 	EVT_NOOP
@@ -88,6 +89,8 @@ typedef int channelEventType ;
  *  1) Gline*
  * EVT_REMGLINE
  *  1) Gline*
+ * EVT_ACCOUNT
+ *  1) iClient*
  *
  * Channel Events
  * --------------
