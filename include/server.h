@@ -17,7 +17,7 @@
  */
 
 #ifndef __SERVER_H
-#define __SERVER_H "$Id: server.h,v 1.46 2001/06/23 16:27:52 dan_karrels Exp $"
+#define __SERVER_H "$Id: server.h,v 1.47 2001/06/25 20:32:04 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
@@ -1036,6 +1036,9 @@ protected:
 
 	/* Network message handlers */
 
+	/// AD(MIN)
+	DECLARE_MSG(AD);
+
 	/// B(URST) message handler.
 	DECLARE_MSG(B);
 
@@ -1047,6 +1050,9 @@ protected:
 
 	/// D(KILL) message handler.
 	DECLARE_MSG(D);
+
+	/// DE(SYNCH) ?
+	DECLARE_MSG(DS);
 
 	/// EA (End of burst Acknowledge) message handler.
 	DECLARE_MSG(EA);
@@ -1060,8 +1066,17 @@ protected:
 	/// G(PING) message handler.
 	DECLARE_MSG(G);
 
+	/// GL(INE) message handler
+	DECLARE_MSG(GL);
+
+	/// I(NVITE)
+	DECLARE_MSG(I);
+
 	/// J(OIN) message handler.
 	DECLARE_MSG(J);
+
+	/// K(ICK) message handler.
+	DECLARE_MSG(K);
 
 	// JU(PE) message handler.
 	DECLARE_MSG(JU);
@@ -1087,6 +1102,12 @@ protected:
 	/// Q(UIT) message handler.
 	DECLARE_MSG(Q);
 
+	/// PASS message handler.
+	DECLARE_MSG(PASS);
+
+	// STATS message handler.
+	DECLARE_MSG(R);
+
 	/// RPING message handler, deprecated.
 	DECLARE_MSG(RemPing);
 
@@ -1099,35 +1120,17 @@ protected:
 	/// SQ(UIT) message handler.
 	DECLARE_MSG(SQ);
 
+	/// T(OPIC) message handler.
+	DECLARE_MSG(T);
+
+	/// U(SILENCE)
+//	DECLARE_MSG(U);
+
 	/// WA(LLOPS) message handler.
 	DECLARE_MSG(WA);
 
 	/// W(HOIS) message handler.
 	DECLARE_MSG(W);
-
-	// STATS message handler.
-	DECLARE_MSG(R);
-
-	/// PASS message handler.
-	DECLARE_MSG(PASS);
-
-	/// GL(INE) message handler
-	DECLARE_MSG(GL);
-
-	/// T(OPIC) message handler.
-	DECLARE_MSG(T);
-
-	/// K(ICK) message handler.
-	DECLARE_MSG(K);
-
-	/// DE(SYNCH) ?
-	DECLARE_MSG(DS);
-
-	/// AD(MIN)
-	DECLARE_MSG(AD);
-
-	/// I(NVITE)
-	DECLARE_MSG(I);
 
 	/// NOOP message.
 	/// Use this handler for any messages that we don't need to handle.
