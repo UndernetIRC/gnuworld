@@ -442,7 +442,7 @@ COPY "translations" FROM stdin;
 3	80	Satte Automatisk MODE til VOICE for %s på kanal %s	31337
 3	81	Automatisk MODE for %s på kanal %s er nu slået fra	31337
 3	82	Dit kodeord kan ikke være dit brugernavn eller nuværende nick - syntaks er: NEWPASS <nyt kodeord>	31337
-3	83	Kodeordet er ændret med succes. 31337
+3	83	Kodeordet er ændret med succes.	31337
 3	84	NOOP flaget er sat på %s	31337
 3	85	STRICTOP flaget er sat på %s (og %s er ikke autoriseret)	31337
 3	86	STRICTOP flaget er sat på %s (og %s har ikke tilstrækkelig adgang)	31337
@@ -517,9 +517,9 @@ COPY "translations" FROM stdin;
 3	155	Ingen matchende indtastninger for [%s]	31337
 3	156	%s: Kanal modes fjernet.	31337
 3	158	Ugyldig indstilling.	31337
-3	159	%s er en Officiel Undernet Service ot.	31337
+3	159	%s er en Officiel Undernet Service bot.	31337
 3	160	%s er en Officiel Coder-Com Repræsentativ%s og logget ind som %s	31337
-3	161	%s er en Officiel Coder-Com Medhjælper%s og logget ind som %s	31337
+3	161	%s er en Officiel Coder-Com Medarbejder%s og logget ind som %s	31337
 3	162	%s er en Officiel Coder-Com Udvikler%s og logget ind som %s	31337
 3	163	%s er en Officiel Coder-Com Senior%s og logget ind som %s	31337
 3	164	 og en IRC operatør	31337
