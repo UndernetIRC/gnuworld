@@ -1,5 +1,5 @@
 /* main.cc
- * $Id: main.cc,v 1.22 2001/01/12 22:16:21 dan_karrels Exp $
+ * $Id: main.cc,v 1.23 2001/01/12 23:01:14 dan_karrels Exp $
  */
 
 #include	<fstream>
@@ -24,7 +24,7 @@
 using namespace gnuworld ;
 
 const char config_h_rcsId[] = __CONFIG_H ;
-const char main_cc_rcsId[] = "$Id: main.cc,v 1.22 2001/01/12 22:16:21 dan_karrels Exp $" ;
+const char main_cc_rcsId[] = "$Id: main.cc,v 1.23 2001/01/12 23:01:14 dan_karrels Exp $" ;
 
 using std::cerr ;
 using std::clog ;
@@ -176,7 +176,7 @@ bool setTimer = false ;
 unsigned int cnt = 0 ; 
 char charBuf[ 1024 ] = { 0 } ;
 
-while( keepRunning && isConnected() )
+while( keepRunning && _connected )
         {
 
         memset( charBuf, 0, 1024 ) ;
@@ -245,7 +245,9 @@ while( keepRunning && isConnected() )
                 }
                 // We are not expecting any signals, but one
                 // may occur anyway
-                while( (EINTR == errno) && (cnt++ < maxLoopCount) ) ;
+                while( (selectRet < 0) &&
+			(EINTR == errno) &&
+			(cnt++ < maxLoopCount) ) ;
                  
         // Did we get an error returned?
         if( selectRet < 0 )
@@ -272,7 +274,7 @@ while( keepRunning && isConnected() )
                 DoRead() ;
                 
                 // Are we still connected?
-                if( !isConnected() )
+                if( !_connected )
                         {
                         // Nope, doh!
                         continue ;
@@ -301,14 +303,14 @@ while( keepRunning && isConnected() )
                 DoWrite() ;
                 
                 // Are we still connecte?
-                if( !isConnected() )
+                if( !_connected )
                         {
                         // Nope, doh!
                         continue ;
                         }
                 }
         
-        } // while( keepRunning && isConnected )
+        } // while( keepRunning && _connected )
                  
 }
 
