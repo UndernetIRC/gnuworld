@@ -19,11 +19,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, 
  * USA.
  *
- * $Id: Buffer.h,v 1.4 2003/07/21 15:07:26 dan_karrels Exp $
+ * $Id: Buffer.h,v 1.5 2003/08/05 01:34:23 dan_karrels Exp $
  */
 
 #ifndef __BUFFER_H
-#define __BUFFER_H "$Id: Buffer.h,v 1.4 2003/07/21 15:07:26 dan_karrels Exp $"
+#define __BUFFER_H "$Id: Buffer.h,v 1.5 2003/08/05 01:34:23 dan_karrels Exp $"
 
 #include	<iostream>
 #include	<string>
@@ -149,6 +149,13 @@ public:
 	 */
 	inline const char*	data() const
 		{ return buf.data() ; }
+
+	/**
+	 * Append a give number of bytes from appendMe to this
+	 * Buffer.
+	 */
+	inline void		append( const char* appendMe, size_t numBytes )
+		{ buf.append( appendMe, numBytes ) ; }
 
 	/**
 	 * Concatenate the given character array onto the end of

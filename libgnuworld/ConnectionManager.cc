@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ConnectionManager.cc,v 1.8 2003/08/04 20:49:24 dan_karrels Exp $
+ * $Id: ConnectionManager.cc,v 1.9 2003/08/05 01:34:24 dan_karrels Exp $
  */
 
 #include	<unistd.h>
@@ -52,7 +52,7 @@
 #include	"Buffer.h"
 #include	"ELog.h"
 
-const char rcsId[] = "$Id: ConnectionManager.cc,v 1.8 2003/08/04 20:49:24 dan_karrels Exp $" ;
+const char rcsId[] = "$Id: ConnectionManager.cc,v 1.9 2003/08/05 01:34:24 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -67,11 +67,16 @@ using std::stringstream ;
 ConnectionManager::ConnectionManager( const time_t defaultTimeoutDuration,
 	const char defaultDelimiter )
 :	timeoutDuration( defaultTimeoutDuration ),
-	delimiter( defaultDelimiter )
-{}
+	delimiter( defaultDelimiter ),
+	inputBufferSize( 65536 )
+{
+inputBuffer = new char[ inputBufferSize ] ;
+}
 
 ConnectionManager::~ConnectionManager()
 {
+delete[] inputBuffer ; inputBuffer = 0 ;
+
 // There is no reason to iterate through the eraseMap because
 // that structure simply holds iterators to the connectionMap.
 // Since the below loop invalidates all of those iterators, let's
@@ -108,7 +113,6 @@ Connection* ConnectionManager::Connect( ConnectionHandler* hPtr,
 	const string& host,
 	const unsigned short int remotePort )
 {
-
 // Handler must be valid
 assert( hPtr != 0 ) ;
 
@@ -257,7 +261,7 @@ if( newConnection != 0 )
 
 if( newConnection != 0 )
 	{
-// Obtain the local machine's port number for this Connection
+	// Obtain the local machine's port number for this Connection
 	struct sockaddr_in sockAddr ;
 	memset( &sockAddr, 0, sizeof( struct sockaddr_in ) ) ;
 
@@ -274,8 +278,11 @@ if( newConnection != 0 )
 			<< strerror( errno )
 			<< endl ;
 
+		closeSocket( newConnection->getSockFD() ) ;
+		delete newConnection ; newConnection = 0 ;
+
 		// Return failure
-		return false ;
+		return 0 ;
 		}
 
 	// Update remote port number for this Connection
@@ -578,8 +585,9 @@ FD_ZERO( &readfds ) ;
 
 // Iterate through the table of Connection's to setup select()
 // FD information
-for( constHandlerMapIterator handlerItr = handlerMap.begin() ;
-	handlerItr != handlerMap.end() ; ++handlerItr )
+for( constHandlerMapIterator handlerItr = handlerMap.begin(),
+	handlerEndItr = handlerMap.end() ;
+	handlerItr != handlerEndItr ; ++handlerItr )
 	{
 	for( constConnectionMapIterator connectionItr =
 		handlerItr->second.begin(),
@@ -587,7 +595,6 @@ for( constHandlerMapIterator handlerItr = handlerMap.begin() ;
 		connectionItr != connectionEndItr ;
 		++connectionItr )
 		{
-
 		// Create a couple of convenience variables
 		const Connection* connectionPtr = *connectionItr ;
 		int tempFD = connectionPtr->getSockFD() ;
@@ -642,6 +649,9 @@ int selectRet = 0 ;
 unsigned short int loopCount = 0 ;
 do
 	{
+//	elog	<< "ConnectionManager::Poll> select()"
+//		<< endl ;
+
 	// timeval may be modified by select() on some systems,
 	// so recreate it each time
 	struct timeval to = { seconds, milliseconds } ;
@@ -684,8 +694,9 @@ if( selectRet < 0 )
 time_t now = ::time( 0 ) ;
 
 // Walk the handler list, checking connections for each connectionMap.
-for( constHandlerMapIterator handlerItr = handlerMap.begin() ;
-	handlerItr != handlerMap.end() ; ++handlerItr )
+for( constHandlerMapIterator handlerItr = handlerMap.begin(),
+	handlerEndItr = handlerMap.end() ;
+	handlerItr != handlerEndItr ; ++handlerItr )
 	{
 	// Convenience variable for the long loop ahead
 	ConnectionHandler* hPtr = handlerItr->first ;
@@ -914,7 +925,6 @@ for( handlerMapIterator handlerItr = handlerMap.begin() ;
 
 int ConnectionManager::openSocket()
 {
-
 // Let's get right to it, open the socket
 int sockFD = ::socket( AF_INET, SOCK_STREAM, 0 ) ;
 
@@ -922,7 +932,7 @@ int sockFD = ::socket( AF_INET, SOCK_STREAM, 0 ) ;
 if( sockFD < 0 )
 	{
 	// Nope
-	cout	<< "openSocket> socket() failed: "
+	elog	<< "openSocket> socket() failed: "
 		<< strerror( errno )
 		<< endl ;
 	return -1 ;
@@ -934,7 +944,7 @@ if( !setSocketOptions( sockFD ) )
 	// setSocketOptions() failed, the socket is now invalid.
 	close( sockFD ) ;
 
-	cout	<< "openSocket> Failed to set SO_LINGER: "
+	elog	<< "openSocket> Failed to set SO_LINGER: "
 		<< strerror( errno )
 		<< endl ;
 
@@ -1015,8 +1025,8 @@ bool ConnectionManager::handleRead( ConnectionHandler* hPtr,
 // protected member, no error checking
 
 // Create and set a temporary buffer to 0
-char buf[ 4096 ] ;
-memset( buf, 0, 4096 ) ;
+//char buf[ 4096 ] ;
+//memset( buf, 0, 4096 ) ;
 
 // Attempt the read from the socket
 errno = 0 ;
@@ -1026,12 +1036,14 @@ int readResult = -1 ;
 if( cPtr->isFile() )
 	{
 	// Connected to file
-	readResult = ::read( cPtr->getSockFD(), buf, 4095 ) ;
+	readResult = ::read( cPtr->getSockFD(), inputBuffer,
+		inputBufferSize ) ;
 	}
 else
 	{
 	// Network connection
-	readResult = ::recv( cPtr->getSockFD(), buf, 4095, 0 ) ;
+	readResult = ::recv( cPtr->getSockFD(), inputBuffer,
+		inputBufferSize, 0 ) ;
 	}
 
 if( EAGAIN == errno )
@@ -1043,10 +1055,10 @@ if( EAGAIN == errno )
 	return true ;
 	}
 
-//elog	<< "ConnectionManager::handleRead> Read "
-//	<< readResult
-//	<< " bytes"
-//	<< endl ;
+elog	<< "ConnectionManager::handleRead> Read "
+	<< readResult
+	<< " bytes"
+	<< endl ;
 
 // Check for error on read()
 if( readResult <= 0 )
@@ -1065,13 +1077,9 @@ if( readResult <= 0 )
 
 // Read was successful
 
-// Null terminate the buffer
-// This shouldn't be necessary since the buffer was cleared
-// above, but who knows what the system is doing :)
-buf[ readResult ] = 0 ;
-
 // Add to Connection input buffer
-cPtr->inputBuffer += buf ;
+cPtr->inputBuffer.append( inputBuffer, readResult ) ;
+cPtr->bytesRead += readResult ;
 
 // Check if a complete command was read
 string line ;
@@ -1127,10 +1135,11 @@ if( (ENOBUFS == errno) || (EWOULDBLOCK == errno) || (EAGAIN == errno) )
 	return true ;
 	}
 
-//elog	<< "ConnectionManager::handleWrite> Wrote "
-//	<< writeResult
-//	<< " bytes"
-//	<< endl ;
+elog	<< "ConnectionManager::handleWrite> Wrote "
+	<< writeResult
+	<< " bytes, remaining in buffer: "
+	<< (cPtr->outputBuffer.size() - writeResult)
+	<< endl ;
 
 // Check for write error
 if( writeResult < 0 )
@@ -1149,6 +1158,7 @@ if( writeResult < 0 )
 
 // Successful write, update the Connection's output buffer
 cPtr->outputBuffer.Delete( writeResult ) ;
+cPtr->bytesWritten += writeResult ;
 
 // Write was successful, return succes
 return true ;
@@ -1192,6 +1202,7 @@ if( connectResult < 0 )
 
 // Update the Connection's state
 cPtr->setConnected() ;
+cPtr->connectTime = ::time( 0 ) ;
 
 // Notify handler
 hPtr->OnConnect( cPtr ) ;
@@ -1256,6 +1267,7 @@ if( (newFD < 0) && (EAGAIN != errno) && (EWOULDBLOCK != errno))
 // Connect OK, update newConnection accordingly
 newConnection->setConnected() ;
 newConnection->setSockFD( newFD ) ;
+newConnection->connectTime = ::time( 0 ) ;
 
 // Store the remote machine's IP address into the Connection's memory
 const char* IP = inet_ntoa( newConnection->getAddr()->sin_addr ) ;
@@ -1536,11 +1548,17 @@ for( ; (eraseItr != eraseMap.end()) && (eraseItr->first == hPtr) ;
 eraseMap.insert( eraseMapType::value_type( hPtr, connectionItr ) ) ;
 }
 
+/**
+ * This method is used for debugging in general, but can certainly
+ * be used to read a file.
+ */
 Connection* ConnectionManager::ConnectToFile( ConnectionHandler* hPtr,
 	const string& fileName )
 {
+// public method, verify parameter
 assert( hPtr != 0 ) ;
 
+// Make sure the filename is valid (or at least, not blatantly invalid)
 if( fileName.empty() )
 	{
 	return 0 ;
@@ -1550,9 +1568,11 @@ if( fileName.empty() )
 //	<< fileName
 //	<< endl ;
 
+// Open the file
 int fd = ::open( fileName.c_str(), O_CREAT ) ;
 if( fd < 0 )
 	{
+	// Failed to open the file
 	elog	<< "ConnectToFile> Unable to open file "
 		<< fileName
 		<< ": "
@@ -1561,44 +1581,61 @@ if( fd < 0 )
 	return 0 ;
 	}
 
+// Create a new Connection object to represent this open file
 Connection* newConnect = new (std::nothrow)
 	Connection( fileName, fd, delimiter ) ;
 assert( newConnect != 0 ) ;
 
+// Set the Connection's state
 newConnect->setConnected() ;
 newConnect->setSockFD( fd ) ;
+
+// Tag the new Connection as a file
 newConnect->setFile() ;
 
+// Insert the new Connection into the Connection map
 bool insertOK = handlerMap[ hPtr ].insert( newConnect ).second ;
 if( !insertOK )
 	{
 	elog	<< "ConnectToFile> Failed to insert new Connection"
 		<< endl ;
 
-	// Don't worry about posting an event, this is simulation only
-	::close( fd ) ;
+	// Posting OnConnectFail() doesn't make sense here because
+	// we haven't notified the handler of the Connection in
+	// the first place
+	closeSocket( fd ) ;
 
+	// Clean up memory
 	delete newConnect ; newConnect = 0 ;
 	}
 
+// Should we notify the handler of the new conncetion?
 if( newConnect != 0 )
 	{
+	// Yes, all is valid
 	hPtr->OnConnect( newConnect ) ;
 	}
 
+// Return the new connection to the caller
 return newConnect ;
 }
 
+// Retrieve the number of connections that a given handler
+// present has outstanding
 size_t ConnectionManager::numConnections( ConnectionHandler* hPtr ) const
 {
+// public method, check parameter
 assert( hPtr != 0 ) ;
 
+// Lookup the handler
 constHandlerMapIterator hItr = handlerMap.find( hPtr ) ;
 if( hItr == handlerMap.end() )
 	{
+	// Handler not found
 	return 0 ;
 	}
 
+// Return the number of active/pending connections the handler posesses
 return hItr->second.size() ;
 }
 

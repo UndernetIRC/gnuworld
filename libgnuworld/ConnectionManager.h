@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ConnectionManager.h,v 1.3 2003/07/03 00:25:48 dan_karrels Exp $
+ * $Id: ConnectionManager.h,v 1.4 2003/08/05 01:34:24 dan_karrels Exp $
  */
 
 #ifndef __CONNECTIONMANAGER_H
-#define __CONNECTIONMANAGER_H "$Id: ConnectionManager.h,v 1.3 2003/07/03 00:25:48 dan_karrels Exp $"
+#define __CONNECTIONMANAGER_H "$Id: ConnectionManager.h,v 1.4 2003/08/05 01:34:24 dan_karrels Exp $"
 
 #include	<sys/types.h>
 
@@ -282,6 +282,8 @@ public:
 	/**
 	 * Return the number of outstanding connections for the given
 	 * ConnectionHandler.
+	 * If anyone figures out why gcc won't let me declare
+	 * the ConnectionHandler* as const here please let me know.
 	 */
 	virtual size_t	numConnections( ConnectionHandler* ) const ;
 
@@ -320,6 +322,12 @@ protected:
 	/// This structure contains Connections to be removed from
 	/// the connection tables.
 	eraseMapType	eraseMap ;
+
+	/// The size of the scratch buffer
+	size_t		inputBufferSize ;
+
+	/// Scratch buffer for reads
+	char*		inputBuffer ;
 
 	/// Open a socket.
 	/// Return -1 on error

@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: Connection.h,v 1.1 2002/08/07 20:28:06 dan_karrels Exp $
+ * $Id: Connection.h,v 1.2 2003/08/05 01:34:24 dan_karrels Exp $
  */
 
 #ifndef __CONNECTION_H
-#define __CONNECTION_H "$Id: Connection.h,v 1.1 2002/08/07 20:28:06 dan_karrels Exp $"
+#define __CONNECTION_H "$Id: Connection.h,v 1.2 2003/08/05 01:34:24 dan_karrels Exp $"
 
 #include	<sys/types.h>
 #include	<netinet/in.h>
@@ -195,6 +195,28 @@ public:
 		{ return (flags & F_FILE) ; }
 
 	/**
+	 * Return the total number of bytes read from this
+	 * Connection.
+	 */
+	inline size_t	getBytesRead() const
+		{ return bytesRead ; }
+
+	/**
+	 * Return the total number of bytes successfully written
+	 * to this Connection (does not count amount currently
+	 * in the output buffer).
+	 */
+	inline size_t	getBytesWritten() const
+		{ return bytesWritten ; }
+
+	/**
+	 * Return the time at which this Connection object established
+	 * connection.  This value is 0 for listening sockets.
+	 */
+	inline time_t	getConnectTime() const
+		{ return connectTime ; }
+
+	/**
 	 * This friend operator allows for the easy output of a
 	 * Connection object to a given output stream.
 	 */
@@ -335,6 +357,16 @@ protected:
 
 	/// The time at which this connection attempt began
 	time_t			absTimeout ;
+
+	/// The time at which this Connection completed connection,
+	/// 0 for listening socket
+	time_t			connectTime ;
+
+	/// The total number of bytes read
+	size_t			bytesRead ;
+
+	/// The total number of bytes written
+	size_t			bytesWritten ;
 
 } ;
 
