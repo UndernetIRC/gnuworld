@@ -10,7 +10,7 @@
 #include "netData.h"
 #include "nickserv.h"
 
-const char NickServ_cc_rcsId[] = "$Id: nickserv.cc,v 1.15 2002/12/01 22:25:55 jeekay Exp $";
+const char NickServ_cc_rcsId[] = "$Id: nickserv.cc,v 1.16 2002/12/02 19:17:54 jeekay Exp $";
 
 namespace gnuworld
 {
@@ -149,8 +149,9 @@ MyUplink->RegisterChannelEvent(consoleChannel, this);
 stringstream setTopic;
 setTopic << getCharYYXXX() << " T "
          << consoleChannel << " :"
-         << "Current NickServ console level: "
-         << consoleLevel;
+         << "Current NickServ console level: ["
+         << logging::logTarget::getIdent(consoleLevel)
+         << "] (" << consoleLevel << ")";
 Write(setTopic);
 
 return xClient::BurstChannels() ;
