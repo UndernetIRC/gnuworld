@@ -10,7 +10,7 @@
 # even the implied warranty of MERCHANTABILITY or FITNESS FOR A
 # PARTICULAR PURPOSE.
 
-# "$Id: Makefile.in,v 1.14 2000/12/19 21:56:17 dan_karrels Exp $"
+# "$Id: Makefile.in,v 1.15 2000/12/20 01:10:52 dan_karrels Exp $"
 
 
 SHELL = @SHELL@
@@ -92,7 +92,7 @@ bindir = @bindir@
 glibdir = @glibdir@
 
 lib_LTLIBRARIES = libcservice.la
-libcservice_la_LDFLAGS = -module -export-dynamic -L/usr/local/pgsql/lib 	-lpq++ $(glibdir)/libgnuworld.la
+libcservice_la_LDFLAGS = -module -export-dynamic -L/usr/local/pgsql/lib 	-lpq++
 
 
 libcservice_la_SOURCES = cservice.cc 	sqlChannel.cc 	sqlUser.cc 	ACCESSCommand.cc 	CHANINFOCommand.cc 	ISREGCommand.cc 	LOGINCommand.cc 	MOTDCommand.cc 	RANDOMCommand.cc 	SEARCHCommand.cc 	SHOWCOMMANDSCommand.cc 	SHOWIGNORECommand.cc 	VERIFYCommand.cc
@@ -121,7 +121,7 @@ DIST_COMMON =  Makefile.am Makefile.in
 
 DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
-TAR = tar
+TAR = gtar
 GZIP_ENV = --best
 DEP_FILES =  .deps/ACCESSCommand.P .deps/CHANINFOCommand.P \
 .deps/ISREGCommand.P .deps/LOGINCommand.P .deps/MOTDCommand.P \
@@ -248,7 +248,7 @@ distdir: $(DISTFILES)
 	@for file in $(DISTFILES); do \
 	  d=$(srcdir); \
 	  if test -d $$d/$$file; then \
-	    cp -pr $$/$$file $(distdir)/$$file; \
+	    cp -pr $$d/$$file $(distdir)/$$file; \
 	  else \
 	    test -f $(distdir)/$$file \
 	    || ln $$d/$$file $(distdir)/$$file 2> /dev/null \
