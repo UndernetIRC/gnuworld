@@ -9,8 +9,18 @@
 #include	"EConfig.h"
 #include	"Network.h"
 
+const char client_h_rcsId[] = __CLIENT_H ;
+const char gnutest_h_rcsId[] = __GNUTEST_H ;
+const char gnutest_cc_rcsId[] = "$Id: gnutest.cc,v 1.5 2001/06/14 22:14:13 dan_karrels Exp $" ;
+const char iClient_h_rcsId[] = __ICLIENT_H ;
+const char StringTokenizer_h_rcsId[] = __STRINGTOKENIZER_H ;
+const char EConfig_h_rcsId[] = __ECONFIG_H ;
+const char Network_h_rcsId[] = __NETWORK_H ;
+
 namespace gnuworld
 {
+
+using std::string ;
 
 /*
  *  Exported function used by moduleLoader to gain an
@@ -25,8 +35,6 @@ extern "C"
   }
 
 } 
- 
-using std::string ;
 
 gnutest::gnutest( const string& fileName )
  : xClient( fileName )
@@ -66,7 +74,8 @@ switch( whichEvent )
 	case EVT_CREATE:
 //		elog	<< "gnutest::OnChannelEvent> EVT_CREATE\n" ;
 	case EVT_JOIN:
-//		elog	<< "gnutest::OnChannelEvent> Got EVT_JOIN\n" ;
+//		elog	<< "gnutest::OnChannelEvent> Got EVT_JOIN:
+//			<< endl ;
 		theClient = static_cast< iClient* >( data1 ) ;
 
 		if( theClient->isOper() )
@@ -90,7 +99,8 @@ int gnutest::OnEvent( const eventType& whichEvent,
 return xClient::OnEvent( whichEvent, data1, data2, data3, data4 ) ;
 }
 
-int gnutest::OnPrivateMessage( iClient* theClient, const string& message,
+int gnutest::OnPrivateMessage( iClient* theClient,
+	const string& message,
 	bool )
 {
 
@@ -118,10 +128,12 @@ else if( st[ 0 ] == "moo" )
 else if( st[ 0 ] == "join" )
 	{
 	Join( st[ 1 ] ) ;
+	addChan( st[ 1 ] ) ;
 	}
 else if( st[ 0 ] == "part" )
 	{
 	Part( st[ 1 ] ) ;
+	removeChan( st[ 1 ] ) ;
 	}
 else if( st[ 0 ] == "ban" )
 	{
@@ -287,6 +299,13 @@ else if( st[ 0 ] == "schedule" )
 		timerChan = theChan->getName() ;
 		}
 	}
+else if( st[ 0 ] == "reload" )
+	{
+	Notice( theClient, "Reloading client...see you on the flip side" ) ;
+
+	MyUplink->UnloadClient( this ) ;
+	MyUplink->LoadClient( "libgnutest", getConfigFileName() ) ;
+	}
 
 return xClient::OnPrivateMessage( theClient, message ) ;
 }
@@ -304,38 +323,34 @@ return std::find( channels.begin(), channels.end(), chanName )
 
 bool gnutest::isOnChannel( const Channel* theChan ) const
 {
-#ifndef NDEBUG
-  assert( theChan != 0 ) ;
-#endif
+assert( theChan != 0 ) ;
 
 return isOnChannel( theChan->getName() ) ;
 }
 
 bool gnutest::addChan( Channel* theChan )
 {
-#ifndef NDEBUG
-  assert( theChan != 0 ) ;
-#endif
+assert( theChan != 0 ) ;
 
-if( isOnChannel( theChan->getName() ) )
-	{
-	// Already on the channel
-	return false ;
-	}
+return addChan( theChan->getName() ) ;
+}
 
-channels.push_back( theChan->getName() ) ;
-
+bool gnutest::addChan( const string& chanName )
+{
+channels.push_back( chanName ) ;
 return true ;
 }
 
 bool gnutest::removeChan( Channel* theChan )
 {
-#ifndef NDEBUG
-  assert( theChan != 0 ) ;
-#endif
+assert( theChan != 0 ) ;
 
-std::remove( channels.begin(), channels.end(), theChan->getName() ) ;
+return removeChan( theChan->getName() ) ;
+}
 
+bool gnutest::removeChan( const string& chanName )
+{
+std::remove( channels.begin(), channels.end(), chanName ) ;
 return true ;
 }
 

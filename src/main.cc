@@ -1,5 +1,5 @@
 /* main.cc
- * $Id: main.cc,v 1.29 2001/03/02 02:02:01 dan_karrels Exp $
+ * $Id: main.cc,v 1.30 2001/06/14 22:14:13 dan_karrels Exp $
  */
 
 #include	<new>
@@ -21,10 +21,15 @@
 #include	"server.h"
 #include	"moduleLoader.h"
 
-using namespace gnuworld ;
-
 const char config_h_rcsId[] = __CONFIG_H ;
-const char main_cc_rcsId[] = "$Id: main.cc,v 1.29 2001/03/02 02:02:01 dan_karrels Exp $" ;
+const char main_cc_rcsId[] = "$Id: main.cc,v 1.30 2001/06/14 22:14:13 dan_karrels Exp $" ;
+const char ELog_h_rcsId[] = __ELOG_H ;
+const char FileSocket_h_rcsId[] = __FILESOCKET_H ;
+const char server_h_rcsId[] = __SERVER_H ;
+const char moduleLoader_h_rcsId[] = __MODULELOADER_H ;
+
+// main() must be in the global namespace
+using namespace gnuworld ;
 
 using std::cerr ;
 using std::clog ;
@@ -292,7 +297,8 @@ while( keepRunning && _connected )
 		{
                 // Caught some form of signal
                 elog    << "xServer::mainLoop> select() returned error: "
-                        << strerror( errno ) << endl ;
+                        << strerror( errno )
+			<< endl ;
                 continue ;
                 }
                  

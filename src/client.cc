@@ -28,7 +28,17 @@
 #include	"events.h"
 
 const char xClient_h_rcsId[] = __CLIENT_H ;
-const char xClient_cc_rcsId[] = "$Id: client.cc,v 1.37 2001/05/21 16:35:34 dan_karrels Exp $" ;
+const char xClient_cc_rcsId[] = "$Id: client.cc,v 1.38 2001/06/14 22:14:13 dan_karrels Exp $" ;
+const char config_h_rcsId[] = __CONFIG_H ;
+const char misc_h_rcsId[] = __MISC_H ;
+const char Numeric_h_rcsId[] = __NUMERIC_H ;
+const char iClient_h_rcsId[] = __ICLIENT_H ;
+const char iServer_h_rcsId[] = __ISERVER_H ;
+const char Network_h_rcsId[] = __NETWORK_H ;
+const char EConfig_h_rcsId[] = __ECONFIG_H ;
+const char StringTokenizer_h_rcsId[] = __STRINGTOKENIZER_H ;
+const char ELog_h_rcsId[] = __ELOG_H ;
+const char events_h_rcsId[] = __EVENTS_H ;
 
 namespace gnuworld
 {
@@ -51,6 +61,7 @@ memset( charXXX, 0, sizeof( charXXX ) ) ;
 }
 
 xClient::xClient( const string& fileName )
+ : configFileName( fileName )
 {
 MyUplink = 0 ;
 Connected = false ;
@@ -117,14 +128,15 @@ if( !Connected )
 	return -1 ;
 	}
 
-char buf[ 256 ] = { 0 } ;
+strstream s ;
+s	<< getCharYYXXX()
+	<< " Q :"
+	<< Message
+	<< ends ;
 
-sprintf( buf, ":%s Q :%s\r\n",
-	nickName.c_str(), Message.c_str() ) ;
-if( QuoteAsServer( buf ) < 0 )
-	{
-	return -1 ;
-	}
+MyUplink->Write( s ) ;
+delete[] s.str() ;
+
 Connected = false ;
 return OnQuit() ;
 }

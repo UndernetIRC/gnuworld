@@ -1,6 +1,7 @@
 /* iClient.cc
  */
 
+#include	<new>
 #include	<string>
 #include	<iostream>
 #include	<ctime>
@@ -15,7 +16,10 @@
 #include	"ip.h"
 
 const char iClient_h_rcsId[] = __ICLIENT_H ;
-const char iClient_cc_rcsId[] = "$Id: iClient.cc,v 1.14 2001/03/28 23:18:48 dan_karrels Exp $" ;
+const char iClient_cc_rcsId[] = "$Id: iClient.cc,v 1.15 2001/06/14 22:14:13 dan_karrels Exp $" ;
+const char client_h_rcsId[] = __CLIENT_H ;
+const char Numeric_h_rcsId[] = __NUMERIC_H ;
+const char ip_h_rcsId[] = __IP_H ;
 
 namespace gnuworld
 {
@@ -117,7 +121,7 @@ bool iClient::removeChannel( Channel* theChan )
 {
 // No need to remove all duplicate channel instances, since
 // addChannel() guarantees that none exist
-for( channelListType::iterator ptr = channelList.begin() ;
+for( channelIterator ptr = channelList.begin() ;
 	ptr != channelList.end() ; ++ptr )
 	{
 	if( *ptr == theChan )
@@ -133,7 +137,7 @@ return false ;
 
 const string iClient::getCharModes() const
 {
-string retMe = "+" ;
+string retMe( "+" ) ;
 
 if( mode & MODE_OPER )		retMe += 'o' ;
 if( mode & MODE_WALLOPS )	retMe += 'w' ;
@@ -152,17 +156,8 @@ assert( theClient != 0 ) ;
 if( NULL == customDataMap )
 	{
 	// Yes, go ahead and allocate it
-	try
-		{
-		customDataMap = new customDataMapType ;
-		}
-	catch( std::bad_alloc )
-		{
-		// Allocation failed, doh!
-		elog	<< "iClient::setCustomData> Memory allocation "
-			<< "failure\n" ;
-		return false ;
-		}
+	customDataMap = new (nothrow) customDataMapType ;
+	assert( customDataMap != 0 ) ;
 	}
 
 // Is this xClient already using its customDataMap slot?

@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-## $Id: Makefile.am,v 1.12 2001/06/02 23:44:42 dan_karrels Exp $
+## $Id: Makefile.am,v 1.13 2001/06/14 22:14:13 dan_karrels Exp $
 
 bin_PROGRAMS = gnuworld
 
@@ -10,8 +10,10 @@ gnuworld_LDADD = $(LIBLTDL) "-dlopen" self "-dlopen" \
 gnuworld_DEPENDENCIES = $(LIBLTDL) $(glibdir)/libgnuworld.la
 gnuworld_SOURCES = Channel.cc \
 	ChannelUser.cc \
+	LoadClientTimerHandler.cc \
 	Network.cc \
 	ServerTimerHandlers.cc \
+	UnloadClientTimerHandler.cc \
 	client.cc \
 	iClient.cc \
 	iServer.cc \

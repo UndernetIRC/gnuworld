@@ -23,7 +23,7 @@
 #include	"StringTokenizer.h"
 
 const char xNetwork_h_rcsId[] = __NETWORK_H ;
-const char xNetwork_cc_rcsId[] = "$Id: Network.cc,v 1.27 2001/05/21 16:11:24 dan_karrels Exp $" ;
+const char xNetwork_cc_rcsId[] = "$Id: Network.cc,v 1.28 2001/06/14 22:14:13 dan_karrels Exp $" ;
 const char ELog_h_rcsId[] = __ELOG_H ;
 const char iClient_h_rcsId[] = __ICLIENT_H ;
 const char Channel_h_rcsId[] = __CHANNEL_H ;
@@ -90,7 +90,7 @@ while( XXX >= clients[ YY ].size() )
 if( clients[ YY ][ XXX ] != NULL )
 	{
 	// Numeric collission
-	elog	<< "xNetwork::addClient: Numeric collision: " 
+	elog	<< "xNetwork::addClient> Numeric collision: " 
 		<< newClient->getCharYYXXX()
 		<< endl ;
 
@@ -99,14 +99,13 @@ if( clients[ YY ][ XXX ] != NULL )
 	}
 
 clients[ YY ][ XXX ] = newClient ;
-
 addNick( newClient ) ;
 
 return true ;
 }
 
 // xClients are local to this server, they
-// must be handled a little differently
+// must be handled a little differently.
 // This method needs to assign numerics
 // to the client -- the client doesn't
 // already have a numeric.
@@ -135,10 +134,10 @@ if( pos >= localClients.size() )
 // slot in the localClients vector
 localClients[ pos ] = newClient ;
 
+// Give the new client a numeric
 newClient->setIntXXX( pos ) ;
 
 return true ;
-
 }
 
 bool xNetwork::addServer( iServer* newServer )
@@ -214,7 +213,6 @@ if( static_cast< networkVectorType::size_type >( XXX ) >= clients[ YY ].size() )
 
 // This could still return NULL
 return clients[ YY ][ XXX ] ;
-
 }
 
 iClient* xNetwork::findClient( const string& yyxxx ) const
@@ -450,6 +448,21 @@ iClient* xNetwork::removeClient( iClient* theClient )
 assert( theClient != 0 ) ;
 
 return removeClient( theClient->getIntYY(), theClient->getIntXXX() ) ;
+}
+
+xClient* xNetwork::removeLocalClient( xClient* theClient )
+{
+assert( theClient != 0 ) ;
+
+for( xClientVectorType::size_type i = 0 ; i < localClients.size() ; ++i )
+	{
+	if( localClients[ i ] == theClient )
+		{
+		localClients[ i ] = 0 ;
+		return theClient ;
+		}
+	}
+return 0 ;
 }
 
 void xNetwork::removeNick( const string& nick )

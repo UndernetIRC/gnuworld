@@ -10,7 +10,7 @@
 # even the implied warranty of MERCHANTABILITY or FITNESS FOR A
 # PARTICULAR PURPOSE.
 
-# "$Id: Makefile.in,v 1.80 2001/06/10 17:36:57 gte Exp $"
+# "$Id: Makefile.in,v 1.81 2001/06/14 22:14:13 dan_karrels Exp $"
 
 
 SHELL = @SHELL@
@@ -136,7 +136,7 @@ DIST_COMMON =  README Makefile.am Makefile.in configure
 
 DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
-TAR = gtar
+TAR = tar
 GZIP_ENV = --best
 DEP_FILES =  .deps/ACCESSCommand.P .deps/ADDUSERCommand.P \
 .deps/BANCommand.P .deps/BANLISTCommand.P .deps/CHANINFOCommand.P \
@@ -276,7 +276,7 @@ distdir: $(DISTFILES)
 	@for file in $(DISTFILES); do \
 	  d=$(srcdir); \
 	  if test -d $$d/$$file; then \
-	    cp -pr $$d/$$file $(distdir)/$$file; \
+	    cp -pr $$/$$file $(distdir)/$$file; \
 	  else \
 	    test -f $(distdir)/$$file \
 	    || ln $$d/$$file $(distdir)/$$file 2> /dev/null \

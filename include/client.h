@@ -3,7 +3,7 @@
  */
 
 #ifndef __CLIENT_H
-#define __CLIENT_H "$Id: client.h,v 1.29 2001/05/21 16:35:34 dan_karrels Exp $"
+#define __CLIENT_H "$Id: client.h,v 1.30 2001/06/14 22:14:12 dan_karrels Exp $"
 
 #include	<string>
 
@@ -54,6 +54,9 @@ public:
 	 * The primary purpose of this method is do call the
 	 * deallocation methods of any xClient's which are storing
 	 * data in the customDataMap.
+	 * Client responsibilities:
+	 *  Removing all timers registered with the xServer
+	 *  Removing all custom data members held in the iClient's
 	 */
 	virtual ~xClient() ;
 
@@ -654,6 +657,13 @@ public:
 	inline xServer* getUplink() const
 		{ return MyUplink ; }
 
+	/**
+	 * Return the name of the configuration file from which this
+	 * client derived its configuration information.
+	 */
+	inline const string& getConfigFileName() const
+		{ return configFileName ; }
+
 protected:
 
 	/**
@@ -683,6 +693,13 @@ protected:
 	 */
 	inline void setIntXXX( const unsigned int& newXX )
 		{ intXXX = newXX ; }
+
+	/**
+ 	 * This method is called by the xServer, and its purpose is
+	 * to reset its iClient instance.
+	 */
+	inline void resetInstance()
+		{ me = 0 ; }
 
 	/**
 	 * ImplementServer is called by the xServer once
@@ -781,6 +798,11 @@ protected:
 	 */
 	char		charXXX[ 4 ] ;
 
+	/**
+	 * The name of the config file from which this client read
+	 * its configuration information.
+	 */
+	string		configFileName ;
 } ;
 
 } // namespace gnuworld

@@ -10,7 +10,7 @@
 # even the implied warranty of MERCHANTABILITY or FITNESS FOR A
 # PARTICULAR PURPOSE.
 
-# "$Id: Makefile.in,v 1.54 2001/06/11 21:08:31 mrbean_ Exp $"
+# "$Id: Makefile.in,v 1.55 2001/06/14 22:14:13 dan_karrels Exp $"
 
 
 SHELL = @SHELL@
@@ -135,7 +135,7 @@ DIST_COMMON =  README Makefile.am Makefile.in TODO
 
 DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
-TAR = gtar
+TAR = tar
 GZIP_ENV = --best
 DEP_FILES =  .deps/ACCESSCommand.P .deps/ADDCOMMANDCommand.P \
 .deps/ADDNEWOPERCommand.P .deps/ADDNEWSERVERCommand.P \

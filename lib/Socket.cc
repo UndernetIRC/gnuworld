@@ -35,7 +35,7 @@
 #endif
 
 const char Socket_h_rcsId[] = __SOCKET_H ;
-const char Socket_cc_rcsId[] = "$Id: Socket.cc,v 1.16 2001/03/31 01:26:10 dan_karrels Exp $" ;
+const char Socket_cc_rcsId[] = "$Id: Socket.cc,v 1.17 2001/06/14 22:14:13 dan_karrels Exp $" ;
 const char ELog_h_rcsId[] = __ELOG_H ;
 
 namespace gnuworld
@@ -410,9 +410,7 @@ return FD_ISSET( fd, &readfds ) +
 
 int Socket::send( const unsigned char* buf, size_t nb )
 {
-#ifndef NDEBUG
-  assert( buf != 0 ) ;
-#endif
+assert( buf != 0 ) ;
 
 if( fd < 0 )
 	{
@@ -469,9 +467,7 @@ return recv( buf, numBytes ) ;
 
 int Socket::recv( unsigned char* buf, size_t nb )
 {
-#ifndef NDEBUG
-  assert( buf != 0 ) ;
-#endif 
+assert( buf != 0 ) ;
 
 if( fd < 0 )
 	{

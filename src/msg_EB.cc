@@ -5,6 +5,8 @@
 #include	<sys/types.h>
 #include	<sys/time.h>
 
+#include	<iostream>
+
 #include	"server.h"
 #include	"iServer.h"
 #include	"events.h"
@@ -12,12 +14,18 @@
 #include	"ELog.h"
 #include	"xparameters.h"
 
-const char msg_EB_cc_rcsId[] = "$Id: msg_EB.cc,v 1.2 2001/02/05 18:58:12 dan_karrels Exp $" ;
-
-using std::endl ;
+const char msg_EB_cc_rcsId[] = "$Id: msg_EB.cc,v 1.3 2001/06/14 22:14:13 dan_karrels Exp $" ;
+const char server_h_rcsId[] = __SERVER_H ;
+const char iServer_h_rcsId[] = __ISERVER_H ;
+const char events_h_rcsId[] = __EVENTS_H ;
+const char Network_h_rcsId[] = __NETWORK_H ;
+const char ELog_h_rcsId[] = __ELOG_H ;
+const char xParameters_h_rcsId[] = __XPARAMETERS_H ;
 
 namespace gnuworld
 {
+
+using std::endl ;
 
 // Q EB
 // Q: Remote server numeric

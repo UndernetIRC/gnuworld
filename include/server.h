@@ -17,7 +17,7 @@
  */
 
 #ifndef __SERVER_H
-#define __SERVER_H "$Id: server.h,v 1.44 2001/05/26 00:18:42 dan_karrels Exp $"
+#define __SERVER_H "$Id: server.h,v 1.45 2001/06/14 22:14:12 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
@@ -351,13 +351,6 @@ public:
 	/* Client stuff */
 
 	/**
-	 * Attach a client to the server.  This will add the client
-	 * to the internal table, and call the client's ImplementServer()
-	 * method.
-	 */
-	virtual bool AttachClient( xClient* Client ) ;
-
-	/**
 	 * Attach a fake client to a fake (juped) server.
 	 * The server must exist and must already be attached
 	 * to this server.
@@ -365,16 +358,58 @@ public:
 	virtual bool AttachClient( iClient* Client ) ;
 
 	/**
-	 * Detach a client from the server.  This will call the
-	 * client's Exit() method and remove the client from the
-	 * internal tables.
+	 * Attempt to load a client given its client module name.
 	 */
-	virtual bool DetachClient( const string& Nick ) ;
+	virtual void	LoadClient( const string& moduleName,
+				const string& configFileName ) ;
+
+	/**
+	 * Attempt to unload a client given its module name.
+	 */
+	virtual void	UnloadClient( const string& moduleName ) ;
+
+	/**
+	 * Attempt to unload a client given its pointer.
+	 */
+	virtual void	UnloadClient( xClient* ) ;
+
+	/**
+	 * Attach a client to the server.  This will add the client
+	 * to the internal table, and call the client's ImplementServer()
+	 * method.
+	 * Clients must *not* call this method, use LoadClient()
+	 * instead.
+	 */
+	virtual bool AttachClient( xClient* Client,
+			bool doBurst = false ) ;
+
+	/**
+	 * Attach a client to the server.  This will add the client
+	 * to the internal table, and call the client's ImplementServer()
+	 * method.
+	 * Locate the client by its module name.
+	 * Clients must *not* call this method, use LoadClient()
+	 * instead.
+	 */
+	virtual bool AttachClient( const string& moduleName,
+			const string& configFileName,
+			bool doBurst = false ) ;
 
 	/**
 	 * Detach a client from the server.  This will call the
 	 * client's Exit() method and remove the client from the
 	 * internal tables.
+	 * Clients must *not* call this method, use UnloadClient()
+	 * instead.
+	 */
+	virtual bool DetachClient( const string& moduleName ) ;
+
+	/**
+	 * Detach a client from the server.  This will call the
+	 * client's Exit() method and remove the client from the
+	 * internal tables.
+	 * Clients must *not* call this method, use UnloadClient()
+	 * instead.
 	 */
 	virtual bool DetachClient( xClient* Client ) ;
 
@@ -434,7 +469,7 @@ public:
 	 * reside on this xServer, false when it is to reside on
 	 * a juped/fake server.
 	 */
-	virtual void BurstClient( xClient*, bool localClient = true ) ;
+	virtual void	BurstClient( xClient*, bool localClient = true ) ;
 
 	/**
 	 * Send a wallops to the network as the server.
@@ -829,6 +864,13 @@ protected:
 	 * Remove glines which match the given userHost, post event.
 	 */
 	virtual void	removeMatchingGlines( const string& ) ;
+
+	/**
+	 * This method is responsible for updating the systems internal
+	 * data structures, and deallocating the given xClient when it
+	 * is being removed from the server.
+	 */
+	virtual void	removeClient( xClient* ) ;
 
 	/**
 	 * Return an iterator to the beginning of the gline structure.

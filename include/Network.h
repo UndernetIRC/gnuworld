@@ -3,7 +3,7 @@
  */
 
 #ifndef __NETWORK_H
-#define __NETWORK_H "$Id: Network.h,v 1.17 2001/05/21 16:11:23 dan_karrels Exp $"
+#define __NETWORK_H "$Id: Network.h,v 1.18 2001/06/14 22:14:12 dan_karrels Exp $"
 
 #include	<vector>
 #include	<string>
@@ -217,6 +217,11 @@ public:
 	 * This will NOT deallocate the iClient instance.
 	 */
 	virtual iClient*	removeClient( iClient* ) ;
+
+	/**
+	 * Remove a local client from the network data tables.
+	 */
+	virtual xClient*	removeLocalClient( xClient* ) ;
 
 	/**
 	 * Remove a nick name from the internal nick name table.

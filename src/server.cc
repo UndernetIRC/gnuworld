@@ -46,9 +46,11 @@
 #include	"xparameters.h"
 #include	"moduleLoader.h"
 #include	"ServerTimerHandlers.h"
+#include	"LoadClientTimerHandler.h"
+#include	"UnloadClientTimerHandler.h"
 
 const char server_h_rcsId[] = __SERVER_H ;
-const char server_cc_rcsId[] = "$Id: server.cc,v 1.105 2001/06/11 21:09:17 dan_karrels Exp $" ;
+const char server_cc_rcsId[] = "$Id: server.cc,v 1.106 2001/06/14 22:14:13 dan_karrels Exp $" ;
 const char config_h_rcsId[] = __CONFIG_H ;
 const char misc_h_rcsId[] = __MISC_H ;
 const char events_h_rcsId[] = __EVENTS_H ;
@@ -65,6 +67,8 @@ const char StringTokenizer_h_rcsId[] = __STRINGTOKENIZER_H ;
 const char xParameters_h_rcsId[] = __XPARAMETERS_H ;
 const char moduleLoader_h_rcsId[] = __MODULELOADER_H ;
 const char ServerTimerHandler_h_rcsId[] = __SERVERTIMERHANDLERS_H ;
+const char LoadClientTimerHandler_h_rcsId[] = __LOADCLIENTTIMERHANDLER_H ;
+const char UnloadClientTimerHandler_h_rcsId[] = __UNLOADCLIENTTIMERHANDLER_H ;
 
 namespace gnuworld
 {
@@ -150,7 +154,8 @@ loadCommandHandlers() ;
 
 if( !loadModules( configFileName ) )
 	{
-	elog	<< "xServer> Failed in loading one or more modules\n" ;
+	elog	<< "xServer> Failed in loading one or more modules"
+		<< endl ;
 	::exit( 0 ) ;
 	}
 
@@ -407,6 +412,7 @@ return true ;
 
 bool xServer::loadModules( const string& fileName )
 {
+// Load the config file
 EConfig conf( fileName ) ;
 
 /*
@@ -416,23 +422,35 @@ EConfig::const_iterator ptr = conf.Find( "module" ) ;
 for( ; ptr != conf.end() && ptr->first == "module" ; ++ptr )
 	{
 	StringTokenizer modInfo(ptr->second) ;
-	elog	<< "xServer> Found module: " << modInfo[0]
-		<< " (Config: " << modInfo[1] << ")" << endl;
 
-	moduleLoader< xClient* >* ml =
-		new (nothrow) moduleLoader< xClient* >( modInfo[ 0 ] ) ;
-	assert( ml != 0 ) ;
-
-	moduleList.push_back(ml); // Add moduleLoader to list. 
-	xClient* clientPtr = ml->loadObject(modInfo[1]);
-	if( NULL == clientPtr )
+	if( 2 != modInfo.size() )
 		{
-		elog	<< "xServer> Failed to instantiate module: "
-			<< modInfo[ 1 ] << endl ;
+		elog	<< "xServer::loadModules> modules require two "
+			<< "arguments, modulename followed by config "
+			<< "file name"
+			<< endl ;
+
 		return false ;
 		}
- 
-	AttachClient(clientPtr); 
+
+	elog	<< "xServer> Found module: "
+		<< modInfo[0]
+		<< " (Config: "
+		<< modInfo[1]
+		<< ")"
+		<< endl;
+
+	// The AttachClient method will load the client from the
+	// file.
+	if( !AttachClient( modInfo[ 0 ], modInfo[ 1 ] ) )
+		{
+		// No need for error output here because AttachClient()
+		// will do that for us
+		elog	<< "xServer::loadModules> Failed to attach client"
+			<< endl ;
+
+		return false ;
+		}
 	}
 
 return true ;
@@ -503,7 +521,8 @@ ConnectionTime = ::time( NULL ) ;
 inputReadSize = theSock->recvBufSize() ;
 if( static_cast< int >( inputReadSize ) < 0 )
 	{
-	elog	<< "xServer::Connect> Failed to get receive buffer size\n" ;
+	elog	<< "xServer::Connect> Failed to get receive buffer size"
+		<< endl ;
 	return -1 ;
 	}
 
@@ -513,7 +532,8 @@ if( static_cast< int >( inputReadSize ) < 0 )
 outputWriteSize = theSock->sendBufSize() ;
 if( static_cast< int >( outputWriteSize ) < 0 )
 	{
-	elog	<< "xServer::Connect> Failed to get output buffer size\n" ;
+	elog	<< "xServer::Connect> Failed to get output buffer size"
+		<< endl ;
 	return -1 ;
 	}
 
@@ -537,37 +557,7 @@ WriteDuringBurst( "SERVER %s %d %d %d J%02d %s :%s\n",
 		getCharYYXXX().c_str(),
 		ServerDescription.c_str() ) ;
 
-/*
-// Wait for the writable state on the socket.
-// Have to check by the socket itself here
-// because ReadyForWrite() checks the output
-// buffer first.
-while( true )
-	{
-	int writable = theSock->writable() ;
-	if( writable < 0 )
-		{
-		elog	<< "Socket failed after connect :(\n" ;
-
-		OnDisConnect() ;
-		return -1 ;
-		}
-	else if( 0 == writable )
-		{
-		::usleep( 10000 ) ;
-		}
-	else
-		{
-		break ;
-		}
-	}
-
-// Flush the login/server information to the uplink.
-flushBuffer() ;
-*/
-
 return 0 ;
-
 }
 
 /**
@@ -591,6 +581,7 @@ outputBuffer.clear() ;
 
 Message = SRV_DISCONNECT ;
 
+// TODO: Unload clients
 }
 
 // This function parses and distributes incoming lines
@@ -1402,8 +1393,10 @@ return true ;
 
 /**
  * Attach an xClient to the server.
+ * If this method fails, the xClient pointer passed to it is
+ * returned to its state when the method was called.
  */
-bool xServer::AttachClient( xClient* Client )
+bool xServer::AttachClient( xClient* Client, bool doBurst )
 {
 
 // Make sure the pointer is valid.
@@ -1422,6 +1415,9 @@ if( !Network->addClient( Client ) )
 // the server and its tables.
 Client->ImplementServer( this ) ;
 
+// TODO: Remove any existing iClient from the xClient
+
+// Create a new iClient representation for this xClient
 iClient* theIClient = new (nothrow) iClient(
 	getIntYY(),
 	Client->getCharYYXXX(),
@@ -1434,16 +1430,90 @@ iClient* theIClient = new (nothrow) iClient(
 	::time( 0 ) ) ;
 assert( theIClient != 0 ) ;
 
+// Notify the xClient of its iClient instance
 Client->setInstance( theIClient ) ;
 
+// Add the iClient to the network tables
 if( !Network->addClient( theIClient ) )
 	{
+	// Failed to add the iClient to the network tables
 	elog	<< "xServer::AttachClient> Unable to add theIClient "
 		<< "to the Network table"
 		<< endl ;
+
+	// We have already reserved a numeric for this client,
+	// go ahead and remove it
+	Network->removeLocalClient( Client ) ;
+
+	// Do some cleanup
+	delete theIClient ; theIClient = 0 ;
+	Client->resetInstance() ;
+
+	// Failed to complete the procedure
 	return false ;
 	}
 
+if( doBurst )
+	{
+	BurstClient( Client ) ;
+	Client->BurstChannels() ;
+	}
+
+// Success
+return true ;
+}
+
+bool xServer::AttachClient( const string& moduleName,
+	const string& configFileName,
+	bool doBurst )
+{
+
+// Create a moduleLoader instance, based on the given moduleName
+moduleLoader< xClient* >* ml =
+	new (nothrow) moduleLoader< xClient* >( moduleName ) ;
+assert( ml != 0 ) ;
+
+// Attempt to instantiate an xClient instance from the module
+xClient* clientPtr = ml->loadObject( configFileName );
+
+// Check if the object was loaded successfully
+if( NULL == clientPtr )
+	{
+	// Failed to load the object
+	elog	<< "xServer::AttachClient> Failed to instantiate module: "
+		<< moduleName
+		<< endl ;
+
+	// Deallocate the module, this will also close the module file
+	delete ml ; ml = 0 ;
+
+	// Return failure
+	return false ;
+	}
+
+// Attempt to attach the client to the server
+if( !AttachClient( clientPtr, doBurst ) )
+	{
+	// Failed to attach the client
+	elog	<< "xServer::AttachClient> Failed to attach new xClient: "
+		<< moduleName
+		<< endl ;
+
+	// Deallocate the client and its encapsulating module
+	delete clientPtr ; clientPtr = 0 ;
+	delete ml ; ml = 0 ;
+
+	// Return failure
+	return false ;
+	}
+
+// The client module is successfully loaded from the file, and
+// has been successfully attached to the server
+
+// Add moduleLoader to the moduleList
+moduleList.push_back( ml );
+
+// success
 return true ;
 }
 
@@ -1461,7 +1531,8 @@ iServer* fakeServer = Network->findServer( fakeClient->getIntYY() ) ;
 if( NULL == fakeServer )
 	{
 	elog	<< "xServer::AttachClient> Unable to find fake server: "
-		<< fakeClient->getIntYY() << endl ;
+		<< fakeClient->getIntYY()
+		<< endl ;
 	return -1 ;
 	}
 
@@ -1483,26 +1554,150 @@ return Network->addClient( fakeClient ) ;
  */
 bool xServer::DetachClient( xClient* Client )
 {
-assert( NULL != Client ) ;
+if( NULL == Client )
+	{
+	return false ;
+	}
 
 // Notify the client that it is being detached.
 Client->Exit( "Client has been detached by server" ) ;
 
-// TODO: Unregister client from event tables
-
-// Remove the client from the internal tables and
-// deallocate its space.
-delete Network->findLocalClient( Client->getIntYY(), Client->getIntXXX() ) ;
+// removeClient() does all of the internal updates
+removeClient( Client ) ;
 
 return true ;
 }
 
 /**
- * Detach an xClient by nickname.
+ * Detach an xClient by moduleName
  */
-bool xServer::DetachClient( const string& Nick )
+bool xServer::DetachClient( const string& moduleName )
 {
-return DetachClient( Network->findLocalNick( Nick ) ) ;
+for( moduleListType::const_iterator ptr = moduleList.begin() ;
+	ptr != moduleList.end() ; ++ptr )
+	{
+	if( !strcasecmp( (*ptr)->getModuleName(), moduleName ) )
+		{
+		// Found one
+		return DetachClient( (*ptr)->getObject() ) ;
+		}
+	}
+return false ;
+}
+
+void xServer::LoadClient( const string& moduleName,
+	const string& configFileName )
+{
+elog	<< "xServer::LoadClient("
+	<< moduleName
+	<< ", "
+	<< configFileName
+	<< ")"
+	<< endl ;
+
+// First, unload the client.
+// This will queue the request.
+//UnloadClient( moduleName ) ;
+
+// Next, queue the load request
+LoadClientTimerHandler* handler = new (nothrow)
+	LoadClientTimerHandler( this, moduleName, configFileName ) ;
+assert( handler != 0 ) ;
+
+RegisterTimer( ::time( 0 ), handler, 0 ) ;
+}
+
+void xServer::UnloadClient( const string& moduleName )
+{
+elog	<< "xServer::UnloadClient(const string&)> "
+	<< moduleName
+	<< endl ;
+
+UnloadClientTimerHandler* handler = new (nothrow)
+	UnloadClientTimerHandler( this, moduleName ) ;
+assert( handler != 0 ) ;
+
+RegisterTimer( ::time( 0 ), handler, 0 ) ;
+}
+
+void xServer::UnloadClient( xClient* theClient )
+{
+elog	<< "xServer::UnloadClient(xClient*)> "
+	<< theClient->getNickName()
+	<< endl ;
+
+for( moduleListType::const_iterator ptr = moduleList.begin() ;
+	ptr != moduleList.end() ; ++ptr )
+	{
+	if( (*ptr)->getObject() == theClient )
+		{
+		// Found one
+		UnloadClient( (*ptr)->getModuleName() ) ;
+		return ;
+		}
+	}
+
+elog	<< "xServer::UnloadClient(xClient*)> Unable to find client: "
+	<< theClient->getNickName()
+	<< endl ;
+}
+
+// This method is responsible for updating all internal
+// tables and deallocating the given xClient
+void xServer::removeClient( xClient* theClient )
+{
+// Precondition: theClient != 0
+
+// Remove this xClient's iClient instance
+delete Network->removeClient( theClient->getInstance() ) ;
+theClient->resetInstance() ;
+
+// Walk the channelEventMap, and remove the xClient from all
+// channel's in which it is registered.
+// This is an O(n) operation
+for( channelEventMapType::iterator chPtr = channelEventMap.begin(),
+	chEndPtr = channelEventMap.end() ;
+	chPtr != chEndPtr ;
+	++chPtr )
+	{
+	(*chPtr).second->remove( theClient ) ;
+	}
+
+// Remove this xClient from all other events
+for( eventListType::iterator evPtr = eventList.begin(),
+	evEndPtr = eventList.end() ;
+	evPtr != evEndPtr ;
+	++evPtr )
+	{
+	(*evPtr).remove( theClient ) ;
+	}
+
+// Remove the client from the network data structures.
+// Be sure to do this before closing the client's module,
+// because closing the module will invalidate the client
+// pointer.
+Network->removeLocalClient( theClient ) ;
+
+// Find this client in the module list
+for( moduleListType::iterator modPtr = moduleList.begin() ;
+	modPtr != moduleList.end() ; ++modPtr )
+	{
+	if( (*modPtr)->getObject() == theClient )
+		{
+		// We need to deallocate the client object
+		// here before we close the module.
+		delete theClient ; theClient = 0 ;
+
+		// Deallocating the module will close
+		// the module as well.
+		delete *modPtr ;
+
+		// Remove this module from the list of modules
+		moduleList.erase( modPtr ) ;
+
+		break ;
+		}
+	}
 }
 
 /**
@@ -1978,9 +2173,11 @@ assert( theClient != 0 ) ;
 assert( theChan != 0 ) ;
 }
 
-bool xServer::JoinChannel( xClient* theClient, const string& chanName,
+bool xServer::JoinChannel( xClient* theClient,
+	const string& chanName,
 	const string& chanModes,
-	const time_t& joinTime, bool getOps )
+	const time_t& joinTime,
+	bool getOps )
 {
 
 // Determine the timestamp to use for the join
@@ -2093,6 +2290,10 @@ else if( NULL == theChan )
 		// Return failure
 		return false ;
 		}
+
+	// When we create a channel, the client automatically gets
+	// ops
+	getOps = true ;
 
 	}
 else if( bursting )
@@ -2318,7 +2519,7 @@ return true ;
 void xServer::BurstClient( xClient* theClient, bool localClient )
 {
 strstream s ;
-s	<< charYY << " N "
+s	<< getCharYY() << " N "
 	<< theClient->getNickName() << ' '
 	<< (localClient ? '1' : '2') << " 31337 "
 	<< theClient->getUserName() << ' '
@@ -2329,6 +2530,7 @@ s	<< charYY << " N "
 	<< theClient->getDescription() << ends ;
 Write( s ) ;
 delete[] s.str() ;
+
 theClient->Connect( 31337 ) ;
 }
 
@@ -2393,11 +2595,9 @@ xServer::timerID xServer::RegisterTimer( const time_t& absTime,
 {
 assert( theHandler != 0 ) ;
 
-// Don't register a timer that has already expired.
-if( absTime <= ::time( 0 ) )
-	{
-	return 0 ;
-	}
+// Allow registration of timers which are requesting to be executed
+// at times which are <= now.
+// This will just allow the timer to run on the next iteration
 
 // Retrieve a unique timerID
 timerID ID = getUniqueTimerID() ;
