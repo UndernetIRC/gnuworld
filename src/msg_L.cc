@@ -14,7 +14,7 @@
 #include	"StringTokenizer.h"
 #include	"events.h"
 
-const char msg_L_cc_rcsId[] = "$Id: msg_L.cc,v 1.4 2001/03/24 01:31:42 dan_karrels Exp $" ;
+const char msg_L_cc_rcsId[] = "$Id: msg_L.cc,v 1.5 2001/05/08 18:39:56 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -59,8 +59,18 @@ if( NULL == theClient )
 
 // Tokenize the channel string
 // Be sure to take into account the channel parting message
-StringTokenizer _st( Param[ 1 ], ':' ) ;
-StringTokenizer st( _st[ 0 ], ',' ) ;
+// This first line will first tokenize the string containing the
+// names of the channel(s) being parted and the part message (if any)
+// by ' ' (space).  The first token of this StringTokenizer (the channel
+// name(s)) will then be tokenized by ':' to separate out the channel
+// name(s) from the part message (if any).
+
+// This first partString StringTokenizer will tokenize out the string
+// into two tokens (by space): chan1[,chan2,...] :part message
+StringTokenizer partString( Param[ 1 ] ) ;
+
+// This tokenizer will separate out the invidividual channel names
+StringTokenizer st( partString[ 0 ], ',' ) ;
 
 // Iterate through all channels that this user is parting
 for( StringTokenizer::size_type i = 0 ; i < st.size() ; ++i )
