@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: dronescan.cc,v 1.26 2003/08/02 18:17:21 jeekay Exp $
+ * $Id: dronescan.cc,v 1.27 2003/08/02 19:36:49 jeekay Exp $
  */
 
 #include	<string>
@@ -39,7 +39,7 @@
 #include "sqlUser.h"
 #include "Timer.h"
 
-RCSTAG("$Id: dronescan.cc,v 1.26 2003/08/02 18:17:21 jeekay Exp $");
+RCSTAG("$Id: dronescan.cc,v 1.27 2003/08/02 19:36:49 jeekay Exp $");
 
 namespace gnuworld {
 
@@ -141,7 +141,22 @@ for( testVarsType::const_iterator itr = testVars.begin() ;
 }
 
 /* Set up database */
-SQLDb = new PgDatabase("host=127.0.0.1 dbname=dronescan");
+string sqlHost(dronescanConfig->Require("sqlHost")->second);
+string sqlPort(dronescanConfig->Require("sqlPort")->second);
+string sqlDB(dronescanConfig->Require("sqlDB")->second);
+string sqlUser(dronescanConfig->Require("sqlUser")->second);
+string sqlPass(dronescanConfig->Require("sqlPass")->second);
+
+stringstream connectString;
+connectString	<< "host=" << sqlHost << " "
+		<< "port=" << sqlPort << " "
+		<< "dbname=" << sqlDB << " "
+		<< "user=" << sqlUser << " "
+		<< "password=" << sqlPass
+		;
+elog << "dronescan::dronescan> Connecting to SQL Server." << endl;
+
+SQLDb = new PgDatabase(connectString.str().c_str());
 if(SQLDb->ConnectionBad()) {
 	elog	<< "dronescan> Failed to connect to SQL server: "
 		<< SQLDb->ErrorMessage()
