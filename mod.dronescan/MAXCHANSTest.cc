@@ -16,8 +16,6 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: MAXCHANSTest.cc,v 1.7 2003/12/29 23:59:37 dan_karrels Exp $
- *
  * Checks whether any member of a channel is in more than maxChans channels.
  */
 
@@ -26,8 +24,6 @@
 #include "config.h"
 #include "dronescan.h"
 #include "dronescanTests.h"
-
-RCSTAG("$Id: MAXCHANSTest.cc,v 1.7 2003/12/29 23:59:37 dan_karrels Exp $");
 
 namespace gnuworld {
 
@@ -38,16 +34,16 @@ bool MAXCHANSTest::isNormal( const Channel *theChannel )
 	unsigned int normals = 0;
 
 	Channel::const_userIterator chanItr = theChannel->userList_begin();
-	
+
 	for( ; chanItr != theChannel->userList_end() ; ++chanItr )
 		{
 		iClient *theClient = chanItr->second->getClient();
 		if(theClient->channels_size() >= maxChans) ++normals;
 		if(normals >= 3) return true;
 		}
-	
+
 	return false;
-	
+
 } // bool MAXCHANSTest::isNormal( const Channel* )
 
 
@@ -60,9 +56,9 @@ const string MAXCHANSTest::getVariable() const
 bool MAXCHANSTest::setVariable( const string& var, const string& value )
 {
 	if("MAXCHANS" != var) return false;
-	
+
 	maxChans = atoi(value.c_str());
-	
+
 	return true;
 }
 

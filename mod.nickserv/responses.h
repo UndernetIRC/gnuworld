@@ -16,14 +16,12 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: responses.h,v 1.2 2003/06/19 22:58:31 dan_karrels Exp $
- *
  * This file statically defines the various messages used globally
  * in the module.
  */
 
 #ifndef RESPONSES_H
-#define RESPONSES_H "$Id: responses.h,v 1.2 2003/06/19 22:58:31 dan_karrels Exp $"
+#define RESPONSES_H
 
 namespace gnuworld {
 
@@ -32,7 +30,7 @@ namespace ns {
 namespace responses {
 
   const string noAccess("Sorry, you do not have access to this command.");
-  
+
   const string noSuchUser("Sorry, that user name does not exist.");
 
 } // namespace responses

@@ -15,16 +15,12 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
- *
- * $Id: ABNORMALSTest.cc,v 1.4 2003/06/19 22:58:30 dan_karrels Exp $
  */
 
 #include "config.h"
 
 #include "dronescan.h"
 #include "dronescanTests.h"
-
-RCSTAG("$Id: ABNORMALSTest.cc,v 1.4 2003/06/19 22:58:30 dan_karrels Exp $") ;
 
 namespace gnuworld {
 
@@ -34,16 +30,16 @@ bool ABNORMALSTest::isNormal( const Channel *theChannel )
 {
 	Channel::const_userIterator chanItr =
 		theChannel->userList_begin();
-	
+
 	unsigned int abnormals = 0;
-	
+
 	for( ; chanItr != theChannel->userList_end() ; ++chanItr )
 		{
 		iClient *theClient = chanItr->second->getClient();
-		
+
 		if(!bot->isNormal(theClient)) ++abnormals;
 		}
-	
+
 	if((double)abnormals / (double)theChannel->size() > bot->channelMargin)
 		return false;
 	else

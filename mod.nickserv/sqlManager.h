@@ -15,12 +15,10 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
- *
- * $Id: sqlManager.h,v 1.8 2003/06/19 22:58:31 dan_karrels Exp $
  */
 
-#ifndef _SQLMANAGER_H
-#define _SQLMANAGER_H "$Id: sqlManager.h,v 1.8 2003/06/19 22:58:31 dan_karrels Exp $"
+#ifndef SQLMANAGER_H
+#define SQLMANAGER_H
 
 #include <string>
 #include <vector>
@@ -44,19 +42,19 @@ class sqlManager {
      * Only way to get a reference to the manager is through this method
      */
     static sqlManager* getInstance(const string&, int);
-    
+
     /** Allow checking out of database connections */
     PgDatabase* getConnection();
-  
+
     /** Allow checking in of database connections */
-    void removeConnection(PgDatabase*); 
-    
+    void removeConnection(PgDatabase*);
+
     /** Flush the current commit queue to the database */
     void flush();
-    
+
     /** Add a statement to the commit queue */
     void queueCommit(const string&);
-  
+
   protected:
     /**
      * Disable the default constructor so that instances can only be gotten
@@ -64,37 +62,37 @@ class sqlManager {
      * @see #getInstance
      */
     sqlManager(const string&, int);
-    
+
     /**
      * Disable the default destructor so that other objects cannot destruct
      * the instance they have a reference to.
      */
     ~sqlManager();
-    
+
     /** The string storing our DB connection path */
     string dbString;
-    
+
     /** Our PgDatabase instance */
     PgDatabase* SQLDb;
-    
+
     /** The type used for the commit queue */
     typedef vector< string > commitQueueType;
-    
+
     /** Allow iteration over the commit queue */
     typedef commitQueueType::iterator CommitQueueItr;
-    
+
     /** Our commit queue */
     commitQueueType commitQueue;
-    
+
     /** Max commit queue size before autocommit */
     unsigned long int commitQueueMax;
-    
+
     /** The current instance of sqlManager */
     static sqlManager* theManager;
-    
+
     /** A Stats instance for stats collecting */
     Stats* theStats;
-    
+
     /** A Logger instance for logging */
     logging::Logger* theLogger;
 }; // class sqlManager

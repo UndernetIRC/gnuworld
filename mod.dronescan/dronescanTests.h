@@ -15,12 +15,10 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
- *
- * $Id: dronescanTests.h,v 1.6 2003/08/02 18:17:21 jeekay Exp $
  */
 
 #ifndef DRONESCANTESTS_H
-#define DRONESCANTESTS_H "$Id: dronescanTests.h,v 1.6 2003/08/02 18:17:21 jeekay Exp $"
+#define DRONESCANTESTS_H
 
 namespace gnuworld {
 
@@ -33,27 +31,27 @@ public:
 	Test( dronescan *_bot, const string& _testName, const string& _description, const unsigned short _weight ) :
 		bot(_bot), testName(_testName), description(_description), weight(_weight)
 		{ } ;
-	
+
 	virtual ~Test() { } ;
-	
+
 	virtual bool isNormal( const Channel* ) = 0;
-	
+
 	virtual inline bool setVariable( const string&, const string& )
 		{ return false; }
-	
+
 	virtual inline const string& getName() const
 		{ return testName; }
 	virtual inline const string& getDescription() const
 		{ return description; }
 	virtual inline unsigned short getWeight() const
 		{ return weight; }
-	
+
 	virtual const string getVariable() const
 		{ return ""; }
-	
+
 	virtual inline const string getStatus() const
 		{ return ""; }
-	
+
 protected:
 	dronescan	*bot;
 	string		testName;
@@ -83,7 +81,7 @@ DECLARE_TEST_FULL( ABNORMALS )
 DECLARE_TEST_SET( COMMONREAL )
 	unsigned short realCutoff;
 };
-	
+
 DECLARE_TEST_FULL( HASALLOP )
 
 DECLARE_TEST_FULL( HASOP )

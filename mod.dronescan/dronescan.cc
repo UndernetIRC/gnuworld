@@ -15,8 +15,6 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
- *
- * $Id: dronescan.cc,v 1.49 2004/06/04 20:17:23 jeekay Exp $
  */
 
 #include	<string>
@@ -44,8 +42,6 @@
 #include "sqlFakeClient.h"
 #include "sqlUser.h"
 #include "Timer.h"
-
-RCSTAG("$Id: dronescan.cc,v 1.49 2004/06/04 20:17:23 jeekay Exp $");
 
 namespace gnuworld {
 
@@ -131,9 +127,9 @@ for( testMapType::const_iterator itr = testMap.begin() ;
 for( testVarsType::const_iterator itr = testVars.begin() ;
      itr != testVars.end() ; ++itr) {
 	if(*itr == "") continue;
-	
+
 	string theValue = dronescanConfig->Require(*itr)->second;
-	
+
 	if(Test *theTest = setTestVariable(string_upper(*itr), theValue)) {
 		elog	<< "dronescan> Test " << theTest->getName()
 			<< " accepted parameter " << *itr
@@ -234,7 +230,7 @@ void dronescan::OnAttach()
 	MyUplink->RegisterEvent( EVT_NICK, this );
 	MyUplink->RegisterEvent( EVT_KILL, this );
 	MyUplink->RegisterEvent( EVT_QUIT, this );
-	
+
 	/* Register for all channel events */
 	MyUplink->RegisterChannelEvent( xServer::CHANNEL_ALL, this );
 
@@ -245,7 +241,7 @@ void dronescan::OnAttach()
 	/* Set up our JC counter */
 	theTime = time(0) + jcInterval;
 	tidClearJoinCounter = MyUplink->RegisterTimer(theTime, this, 0);
-	
+
 	/* Set up cache refresh timer */
 	theTime = time(0) + rcInterval;
 	tidRefreshCaches = MyUplink->RegisterTimer(theTime, this, 0);
@@ -269,10 +265,10 @@ void dronescan::BurstChannels()
 		{
 		xClient *theXClient = itr->second;
 		iClient *theClient = theXClient->getInstance();
-		
+
 		clientData *newData = new clientData();
 		newData->setState(NORMAL);
-		
+
 		theClient->setCustomData(this, newData);
 		customDataCounter++;
 		}
@@ -287,9 +283,9 @@ void dronescan::OnCTCP( iClient* theClient, const string& CTCP,
     const string& Message, bool Secure )
 {
 	StringTokenizer st(CTCP);
-	
+
 	if(st.empty()) return ;
-	
+
 	string Command = string_upper(st[0]);
 
 	if("DCC" == Command) {
@@ -327,7 +323,7 @@ void dronescan::OnEvent( const eventType& theEvent,
 			handleNewClient( static_cast< iClient* >( Data1 ) );
 			break;
 			} // EVT_NICK
-		
+
 		case EVT_KILL : /* Intentional drop through */
 		case EVT_QUIT :
 			{
@@ -335,10 +331,10 @@ void dronescan::OnEvent( const eventType& theEvent,
 				( theEvent == EVT_KILL ?
 					Data2 :
 					Data1 );
-			
+
 			clientData *theData = static_cast< clientData* >
 				( theClient->removeCustomData(this) );
-			
+
 			delete(theData);
 			--customDataCounter;
 			break;
@@ -354,7 +350,7 @@ void dronescan::OnChannelEvent( const channelEventType& theEvent,
 {
 	/* If this is not a join, we don't care. */
 	if(theEvent != EVT_JOIN) return ;
-	
+
 	/* If we are bursting, we don't want to be checking joins. */
 	if(currentState == BURST) return ;
 
@@ -369,7 +365,7 @@ void dronescan::OnChannelEvent( const channelEventType& theEvent,
 		// droneChannels structure by checkChannel()
 		checkChannel( theChannel );
 	}
-	
+
 	/* Reset lastjoin on the active channel */
 	droneChannelsType::iterator droneChanItr =
 		droneChannels.find( theChannel->getName() ) ;
@@ -380,7 +376,7 @@ void dronescan::OnChannelEvent( const channelEventType& theEvent,
 		{
 		droneChanItr->second->setLastJoin( ::time( 0 ) ) ;
 		}
-	
+
 	/* Do join count processing if applicable */
 	const string& channelName = theChannel->getName();
 
@@ -406,11 +402,11 @@ void dronescan::OnPrivateMessage( iClient* theClient,
 	const string& Message, bool )
 {
 	sqlUser *theUser = getSqlUser(theClient->getAccount());
-	
+
 	/* If the client is opered, we might have a fake account */
 	if( !theUser && theClient->isOper() && fakeOperUser ) {
 		theUser = fakeOperUser;
-		
+
 		fakeOperUser->setUserName(theClient->getNickName());
 		fakeOperUser->setCreated(::time(0));
 		fakeOperUser->setLastSeen(::time(0));
@@ -431,22 +427,22 @@ void dronescan::OnPrivateMessage( iClient* theClient,
 	StringTokenizer st(Message);
 
 	if(st.size() < 1) return ;
-	
+
 	string Command = string_upper(st[0]);
 	commandMapType::iterator commandHandler = commandMap.find(Command);
-	
+
 	if(commandHandler != commandMap.end())
 		{
 		commandHandler->second->Exec(theClient, Message, theUser);
 		return ;
 		}
-	
+
 	if("INVITE" == Command)
 		{
 		Invite(theClient, consoleChannel);
 		return ;
 		}
-	
+
 /* This is commented out because it doesn't work at the moment */
 	if("RELOAD" == Command)
 		{
@@ -471,15 +467,15 @@ void dronescan::OnPrivateMessage( iClient* theClient,
 			);
 		return ;
 		}
-	
+
 	if("RESET" == Command)
 		{
 		resetAndCheck();
 		return ;
 		}
-	
+
 	if(st.size() < 2) return ;
-	
+
 	if("INFO" == Command)
 		{
 		string nick = st[1];
@@ -491,13 +487,13 @@ void dronescan::OnPrivateMessage( iClient* theClient,
 			);
 		return ;
 		}
-	
+
 	if(st.size() < 3) return ;
-	
+
 	if("SET" == Command)
 		{
 		string Option = string_upper(st[1]);
-		
+
 		/* Global entropy options */
 		if("CC" == Option)
 			{
@@ -522,7 +518,7 @@ void dronescan::OnPrivateMessage( iClient* theClient,
 			resetAndCheck();
 			return ;
 			}
-		
+
 		/* None of the hardcoded options have hit. Try dynamic. */
 		if(Test *theTest = setTestVariable(Option, st[2])) {
 			log(INFO, "%s set %s to %s in %s",
@@ -531,7 +527,7 @@ void dronescan::OnPrivateMessage( iClient* theClient,
 				st[2].c_str(),
 				theTest->getName().c_str()
 				);
-			
+
 			resetAndCheck();
 			return ;
 		} else  {
@@ -609,22 +605,22 @@ void dronescan::OnTimer( const xServer::timerID& theTimer , void *)
 		{
 		droneChannelsType::iterator dcitr, next_dcitr;
 		time_t joinSince = ::time(0) - dcInterval;
-		
+
 		for( dcitr = droneChannels.begin() ;
 		     dcitr != droneChannels.end() ; dcitr = next_dcitr ) {
 		 	next_dcitr = dcitr;
 			++next_dcitr;
-			
+
 			if( dcitr->second->getLastJoin() <= joinSince ) {
 				log(DBG, "Removing %s.",
 					dcitr->first.c_str()
 					);
-				
+
 				delete dcitr->second;
 				droneChannels.erase(dcitr);
 			}
 		}
-		
+
 		theTime = time(0) + dcInterval;
 		tidClearActiveList = MyUplink->RegisterTimer(theTime, this, 0);
 		}
@@ -651,21 +647,21 @@ void dronescan::OnTimer( const xServer::timerID& theTimer , void *)
 					theChan->size()
 					);
 		}
-		
+
 		log(DBG, "Clearing %u records from the join counter.",
 			jcChanMap.size()
 			);
 		jcChanMap.clear();
-		
+
 		theTime = time(0) + jcInterval;
 		tidClearJoinCounter = MyUplink->RegisterTimer(theTime, this, 0);
 		}
-	
+
 	if(theTimer == tidRefreshCaches) {
 		log(DBG, "Refreshing caches");
-		
+
 		preloadUserCache();
-		
+
 		theTime = time(0) + rcInterval;
 		tidRefreshCaches = MyUplink->RegisterTimer(theTime, this, 0);
 	}
@@ -674,7 +670,7 @@ void dronescan::OnTimer( const xServer::timerID& theTimer , void *)
 /*******************************************
  ** D R O N E S C A N   F U N C T I O N S **
  *******************************************/
- 
+
 /** Report a SQL error as necessary. */
 void dronescan::doSqlError(const string& theQuery, const string& theError)
 {
@@ -686,16 +682,16 @@ void dronescan::doSqlError(const string& theQuery, const string& theError)
 		<< theError
 		<< std::endl;
 }
- 
+
 /** This function allows us to change our current state. */
 void dronescan::changeState(DS_STATE newState)
 {
 	if(currentState == newState) return;
-	
+
 	/* Instantiate our own timer so we don't interfere with anyone elses */
 	Timer stateTimer;
 	stateTimer.Start();
-	
+
 	/* First, do what we need to exit our current state */
 	switch( currentState )
 		{
@@ -715,7 +711,7 @@ void dronescan::changeState(DS_STATE newState)
 		}
 
 	currentState = newState;
-	
+
 	switch( currentState )
 		{
 		case BURST :
@@ -725,7 +721,7 @@ void dronescan::changeState(DS_STATE newState)
 				<< std::endl;
 			break;
 			}
-		case RUN   : 
+		case RUN   :
 			{
 			elog	<< "*** DroneScan: Entering state RUN"
 				<< std::endl;
@@ -733,10 +729,10 @@ void dronescan::changeState(DS_STATE newState)
 			break;
 			}
 		}
-	
+
 	log(INFO, "Changed state in: %u ms", stateTimer.stopTimeMS());
 }
- 
+
 
 /** Here we handle new clients as they connect to the network. */
 void dronescan::handleNewClient( iClient* theClient )
@@ -765,9 +761,9 @@ void dronescan::calculateEntropy()
 	charMap.clear();
 	averageEntropy = 0;
 	totalNicks = 0;
-	
+
 	theTimer->Start();
-	
+
 	elog << "dronescan::calculateEntropy> Calculating frequencies."
 		<< std::endl;
 	/* First, learn the entropy from all nicks */
@@ -781,24 +777,24 @@ void dronescan::calculateEntropy()
 			}
 		++totalNicks;
 		}
-	
+
 	log(DBG, "Calculated frequencies in: %u ms", theTimer->stopTimeMS());
-	
+
 	theTimer->Start();
-	
+
 	elog << "dronescan::calculateEntropy> Normalising frequencies."
 		<< std::endl;
 	for( charMapType::iterator itr = charMap.begin() ;
 	     itr != charMap.end(); ++itr)
 		itr->second /= totalNicks;
-	
+
 	log(DBG, "Normalised frequencies in: %u ms", theTimer->stopTimeMS());
-	
+
 	elog << "dronescan::calculateEntropy> Calculating average entropy."
 		<< std::endl;
 
 	double totalEntropy = 0;
-	
+
 	theTimer->Start();
 
 	for( xNetwork::const_clientIterator ptr = Network->clients_begin() ;
@@ -807,13 +803,13 @@ void dronescan::calculateEntropy()
 		if( ptr->second->isModeK() ) continue;
 		totalEntropy += calculateEntropy(ptr->second->getNickName());
 		}
-	
+
 	log(DBG, "Total entropy  : %lf", totalEntropy);
 	log(DBG, "Total nicks    : %u", totalNicks);
-			
+
 	averageEntropy = totalEntropy / totalNicks;
 	log(DBG, "Average entropy: %lf ", averageEntropy);
-	
+
 	log(DBG, "Found entropy in: %u ms", theTimer->stopTimeMS());
 }
 
@@ -823,8 +819,8 @@ double dronescan::calculateEntropy( const iClient *theClient )
 {
 	clientData *theData = static_cast< clientData* > ( theClient->getCustomData(this) );
 	if( 0 == theData ) return 0.0 ;
-	
-	return theData->getEntropy();	
+
+	return theData->getEntropy();
 }
 
 
@@ -833,16 +829,16 @@ void dronescan::setNickStates()
 {
 	elog << "dronescan::setNickStates> Finding states of all nicks."
 		<< std::endl;
-	
+
 	theTimer->Start();
-	
+
 	/* Now we must assign a state to each nick we see */
 	for( xNetwork::const_clientIterator ptr = Network->clients_begin()
 	     ; ptr != Network->clients_end() ; ++ptr)
 		{
 		setClientState( ptr->second );
 		}
-	
+
 	log(DBG, "Set all nick states in: %u ms",
 		theTimer->stopTimeMS()
 		);
@@ -861,19 +857,19 @@ void dronescan::checkChannels()
 	theTimer->Start();
 
 	xNetwork::const_channelIterator ptr = Network->channels_begin();
-			
+
 	for( ; ptr != Network->channels_end() ; ++ptr )
 		{
 		++noChannels;
-		
+
 		if(ptr->second->size() < channelCutoff) continue;
-		
+
 		if(!checkChannel( ptr->second )) {
 			++failure;
 			noDrones += ptr->second->size();
 		}
 		}
-	
+
 	log(INFO, "Finished checking %u channels. %u/%u total possible channels/clients. Duration: %u ms",
 		noChannels,
 		failure,
@@ -907,17 +903,17 @@ bool dronescan::checkChannel( const Channel *theChannel , const iClient *theClie
 
 	/* If we were checking for a client, don't output to console. */
 	if(theClient) return true;
-	
+
 	/* If the failure count is over or equal to the vote cutoff
 	 * report this channel as abnormal. */
-	
+
 	if(failed >= voteCutoff)
 		{
 		/* This channel is voted abnormal. */
 		std::stringstream chanStat, chanParams;
 		if(theChannel->getMode(Channel::MODE_I)) chanStat << "i";
 		if(theChannel->getMode(Channel::MODE_R)) chanStat << "r";
-		
+
 		if(theChannel->getMode(Channel::MODE_K)) {
 			chanStat << "k";
 			chanParams << theChannel->getKey();
@@ -927,7 +923,7 @@ bool dronescan::checkChannel( const Channel *theChannel , const iClient *theClie
 			if(theChannel->getMode(Channel::MODE_K)) chanParams << " ";
 			chanParams << theChannel->getLimit();
 		}
-		
+
 		log(WARN, "[%u] (%4u) %s +%s %s",
 			failed,
 			theChannel->size(),
@@ -935,7 +931,7 @@ bool dronescan::checkChannel( const Channel *theChannel , const iClient *theClie
 			chanStat.str().c_str(),
 			chanParams.str().c_str()
 			);
-		
+
 		/* Add this channel to the actives list */
 		activeChannel *newActive = new activeChannel(theChannel->getName(), ::time(0));
 		droneChannels[theChannel->getName()] = newActive;
@@ -957,10 +953,10 @@ double dronescan::calculateEntropy( const string& theString )
 
 	double entropy = 0;
 	const char* ptr = theString.c_str();
-	
+
 	for( ; *ptr ; ++ptr )
 		entropy += charMap[*ptr];
-	
+
 	return entropy / theString.length();
 }
 
@@ -970,13 +966,13 @@ bool dronescan::isNormal( const iClient* theClient )
 {
 	/* We should never see this called during BURST */
 	assert(currentState != BURST);
-	
+
 	clientData *theData = static_cast< clientData* > (theClient->getCustomData(this));
 	assert( theData != 0 ) ;
 
 	/* We should never see an unknown state for an initialised client */
 	assert(!theData->isUnknown());
-	
+
 	return theData->isNormal();
 }
 
@@ -985,14 +981,14 @@ bool dronescan::isNormal( const iClient* theClient )
 CLIENT_STATE dronescan::setClientState( iClient *theClient )
 {
 	clientData* theData = static_cast< clientData* > (theClient->getCustomData(this));
-	assert(theData != 0);	
-	
+	assert(theData != 0);
+
 	double userEntropy = calculateEntropy(theClient->getNickName());
 	theData->setEntropy(userEntropy);
-	
+
 	/* Make sure our services don't skew anything */
 	if(theClient->isModeK()) return theData->setState(NORMAL);
-	
+
 	/*
 	 * First, check if the first 8 chars of the realname are the same as the
 	 * first 8 chars of the nickname.
@@ -1003,14 +999,14 @@ CLIENT_STATE dronescan::setClientState( iClient *theClient )
 		{
 		return theData->setState(ABNORMAL);
 		}
-	
+
 	/*
 	 * Second, check whether the nickname itself is abnormal.
 	 */
 	if( userEntropy > averageEntropy * (1 + nickMargin) ||
 	    userEntropy < averageEntropy * (1 - nickMargin) )
 		return theData->setState(ABNORMAL);
-	
+
 	/*
 	 * It has passed the checks. It is therefore normal.
 	 */
@@ -1022,9 +1018,9 @@ CLIENT_STATE dronescan::setClientState( iClient *theClient )
 void dronescan::log(LOG_TYPE logType, const char *format, ...)
 {
 	if(logType < consoleLevel) return;
-	
+
 	std::stringstream newMessage;
-	
+
 	switch(logType) {
 		case DBG	: newMessage << "[D] ";	break;
 		case INFO	: newMessage << "[I] ";	break;
@@ -1035,13 +1031,13 @@ void dronescan::log(LOG_TYPE logType, const char *format, ...)
 
 	char buffer[512] = {0};
 	va_list _list;
-	
+
 	va_start(_list, format);
 	vsnprintf(buffer, 512, format, _list);
 	va_end(_list);
-	
+
 	newMessage << buffer;
-	
+
 	Message(consoleChannel, newMessage.str().c_str());
 }
 
@@ -1053,7 +1049,7 @@ void dronescan::setConsoleTopic()
 	setTopic	<< getCharYYXXX() << " T "
 			<< consoleChannel << " :"
 			;
-	
+
 	setTopic	<< "  ||"
 			<< "  channelMargin: " << channelMargin
 			<< "  nickMargin: " << nickMargin
@@ -1074,11 +1070,11 @@ void dronescan::Reply(const iClient *theClient, const char *format, ...)
 {
 	char buffer[512] = {0};
 	va_list _list;
-	
+
 	va_start(_list, format);
 	vsnprintf(buffer, 512, format, _list);
 	va_end(_list);
-	
+
 	Message(theClient, buffer);
 }
 
@@ -1086,11 +1082,11 @@ void dronescan::Reply(const iClient *theClient, const char *format, ...)
 sqlUser *dronescan::getSqlUser(const string& theNick)
 {
 	userMapType::const_iterator itr = userMap.find(theNick);
-	
+
 	if(itr != userMap.end()) {
 		return itr->second;
 	}
-	
+
 	return 0;
 }
 
@@ -1100,18 +1096,18 @@ bool dronescan::updateDue(string _table)
 {
 	std::stringstream check;
 	check	<< "SELECT max(last_updated) FROM " << _table;
-	
+
 	ExecStatusType status = SQLDb->Exec(check.str().c_str());
-	
+
 	if( PGRES_TUPLES_OK != status ) {
 		doSqlError(check.str(), SQLDb->ErrorMessage());
 		return false;
 	}
-	
+
 	time_t maxUpdated = atoi(SQLDb->GetValue(0, 0));
-	
+
 	if( maxUpdated > lastUpdated[_table] ) return true;
-	
+
 	return false;
 }
 
@@ -1121,34 +1117,34 @@ void dronescan::preloadFakeClientCache()
 {
 	/* Are we due to update? */
 	if(!updateDue("FAKECLIENTS")) return;
-	
+
 	std::stringstream theQuery;
 	theQuery	<< sql::fakeclients ;
-	
+
 	if(!SQLDb->ExecTuplesOk(theQuery.str().c_str())) {
 		doSqlError(theQuery.str(), SQLDb->ErrorMessage());
 		return;
 	}
-	
+
 	for(fcMapType::iterator itr = fakeClients.begin() ;
 	    itr != fakeClients.end(); ++itr) {
 		delete itr->second;
 	}
-	
+
 	fakeClients.clear();
 
-/*	
+/*
 	string yyxxx( MyUplink->getCharYY() + "]]]" );
 */
-	
+
 	for(int i = 0; i < SQLDb->Tuples(); ++i) {
 		sqlFakeClient *newFake = new sqlFakeClient(SQLDb);
 		assert(newFake != 0);
-		
+
 		newFake->setAllMembers(i);
 		fakeClients.insert(fcMapType::value_type(newFake->getId(), newFake));
 
-/*		
+/*
 		iClient *fakeClient = new iClient(
 			MyUplink->getIntYY(),
 			yyxxx,
@@ -1162,13 +1158,13 @@ void dronescan::preloadFakeClientCache()
 			newFake->getRealName(),
 			::time(0)
 			);
-		
+
 		assert( fakeClient != 0 );
-		
+
 		MyUplink->AttachClient( fakeClient );
 */
 	}
-	
+
 	elog	<< "dronescan::preloadFakeClientCache> Loaded "
 		<< fakeClients.size()
 		<< " fake clients."
@@ -1187,9 +1183,9 @@ void dronescan::preloadUserCache()
 	theQuery	<< "SELECT user_name,last_seen,last_updated_by,last_updated,flags,access,created "
 			<< "FROM users"
 			;
-	
+
 	ExecStatusType status = SQLDb->Exec(theQuery.str().c_str());
-	
+
 	if(PGRES_TUPLES_OK == status) {
 		/* First we need to clear the current cache. */
 		for(userMapType::iterator itr = userMap.begin() ;
@@ -1197,11 +1193,11 @@ void dronescan::preloadUserCache()
 			delete itr->second;
 		}
 		userMap.clear();
-		
+
 		for(int i = 0; i < SQLDb->Tuples(); ++i) {
 			sqlUser *newUser = new sqlUser(SQLDb);
 			assert(newUser != 0);
-			
+
 			newUser->setAllMembers(i);
 			userMap.insert(userMapType::value_type(newUser->getUserName(), newUser));
 		}
@@ -1209,7 +1205,7 @@ void dronescan::preloadUserCache()
 		elog	<< "dronescan::preloadUserCache> "
 			<< SQLDb->ErrorMessage();
 	}
-	
+
 	elog	<< "dronescan::preloadUserCache> Loaded "
 		<< userMap.size()
 		<< " users."
@@ -1235,10 +1231,10 @@ bool dronescan::UnRegisterTest( const string& testName )
 {
 	testMapType::iterator ptr = testMap.find( testName );
 	if( ptr == testMap.end() ) return false;
-	
+
 	delete ptr->second;
 	testMap.erase(ptr);
-	
+
 	return true;
 }
 
@@ -1250,7 +1246,7 @@ Test *dronescan::setTestVariable( const string& var, const string& value )
 		if(testItr->second->setVariable(var, value))
 			return testItr->second;
 	}
-	
+
 	return 0;
 }
 

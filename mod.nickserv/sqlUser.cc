@@ -16,11 +16,9 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: sqlUser.cc,v 1.10 2003/06/19 22:58:31 dan_karrels Exp $
- *
  * Stores a database user
  */
- 
+
 #include <ctime>
 #include <sstream>
 
@@ -28,20 +26,18 @@
 #include "sqlManager.h"
 #include "sqlUser.h"
 
-RCSTAG("$Id: sqlUser.cc,v 1.10 2003/06/19 22:58:31 dan_karrels Exp $");
-
 namespace gnuworld {
- 
+
 namespace ns {
- 
+
 using std::stringstream ;
- 
+
 const sqlUser::flagType sqlUser::F_SUSPEND  = 0x0001;
 const sqlUser::flagType sqlUser::F_AUTOKILL = 0x0002;
 const sqlUser::flagType sqlUser::F_RECOVER  = 0x0004;
- 
+
 unsigned long int sqlUser::maxUserId = 0;
- 
+
 /**
  * Default constructor.
  * This simply creates an empty, zeroed sqlUser
@@ -119,7 +115,7 @@ void sqlUser::insertUser()
 {
   /* Grab the next available user id */
   id = ++maxUserId;
-  
+
   /* Construct our insert statement */
   stringstream commitStatement;
   commitStatement << "INSERT INTO users (id,name) VALUES ("
@@ -149,5 +145,5 @@ if(id > maxUserId) maxUserId = id;
 }
 
 } // namespace ns
- 
+
 } // namespace gnuworld

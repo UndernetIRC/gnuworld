@@ -20,9 +20,9 @@ namespace ds {
 void QUOTECommand::Exec( const iClient *theClient, const string& Message, const sqlUser* theUser )
 {
 	if(theUser->getAccess() < level::quote) return ;
-	
+
 	StringTokenizer st(Message);
-	
+
 	if(st.size() < 2) {
 		Usage(theClient);
 		return ;
@@ -33,7 +33,7 @@ void QUOTECommand::Exec( const iClient *theClient, const string& Message, const 
 		theClient->getAccount().c_str(),
 		st.assemble(1).c_str()
 		);
-	
+
 	bot->Write(st.assemble(1));
 
 	return ;

@@ -16,18 +16,14 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: STATSCommand.cc,v 1.5 2003/06/28 01:21:21 dan_karrels Exp $
- *
  * Give the user various statistics
  */
 
 #include "config.h"
-#include "levels.h" 
+#include "levels.h"
 #include "nickserv.h"
 #include "responses.h"
 #include "Stats.h"
-
-RCSTAG("$Id: STATSCommand.cc,v 1.5 2003/06/28 01:21:21 dan_karrels Exp $");
 
 namespace gnuworld
 {

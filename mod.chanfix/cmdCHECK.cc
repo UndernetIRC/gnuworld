@@ -16,33 +16,33 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  */
- 
+
 #include "StringTokenizer.h"
- 
+
 #include "cfChannel.h"
 #include "cfChannelUser.h"
 #include "chanfix.h"
 #include "chanfix-commands.h"
- 
+
 namespace gnuworld {
- 
+
 namespace chanfix {
 
 void CHECKCommand::Exec( const iClient *theClient, const string& message )
 {
 	StringTokenizer st(message);
-	
+
 	/* Usage:
 	 *  CHECK #channel
 	 */
-	
+
 	if( st.size() != 2 ) {
 		Usage(theClient);
 		return;
 	}
-	
+
 	cfChannel *theChannel = bot->getChannel(st[1], false);
-	
+
 	if( ! theChannel ) {
 		bot->Notice(theClient, "Unable to find channel %s",
 			st[1].c_str()
@@ -53,14 +53,14 @@ void CHECKCommand::Exec( const iClient *theClient, const string& message )
 			st[1].c_str()
 			);
 	}
-	
-	
+
+
 	for(cfChannel::mapUsersConstIterator itr = theChannel->getUsersBegin() ;
 		itr != theChannel->getUsersEnd() ;
 		++itr
 	) {
 		cfChannelUser *theCU = itr->second;
-		
+
 		bot->Notice(theClient, "  %s: %u",
 			theCU->getName().c_str(),
 			theCU->getPoints()
@@ -71,4 +71,4 @@ void CHECKCommand::Exec( const iClient *theClient, const string& message )
 } // namespace chanfix
 
 } // namespace gnuworld
- 
+

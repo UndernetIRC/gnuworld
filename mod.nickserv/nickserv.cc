@@ -15,13 +15,11 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
- *
- * $Id: nickserv.cc,v 1.29 2004/06/04 20:17:24 jeekay Exp $
  */
 
 #include	<sstream>
 #include	<iostream>
- 
+
 #include <cstdarg>
 
 #include "config.h"
@@ -30,8 +28,6 @@
 
 #include "netData.h"
 #include "nickserv.h"
-
-RCSTAG("$Id: nickserv.cc,v 1.29 2004/06/04 20:17:24 jeekay Exp $");
 
 namespace gnuworld
 {
@@ -46,12 +42,12 @@ namespace ns
 extern "C"
 {
   xClient* _gnuwinit(const string& args)
-  { 
+  {
     return new nickserv( args );
   }
 
-} 
- 
+}
+
 /**
  * This constructor calls the base class constructor.  The xClient
  * constructor will open the configuration file given and retrieve
@@ -130,10 +126,10 @@ void nickserv::log(const eventType& theEvent, const string& _theMessage)
 {
   iClient* theClient;
   sqlUser* theUser;
-  
+
   string theMessage = "[" + logging::logTarget::getIdent(theEvent) + "] ";
   theMessage += _theMessage;
-  
+
   for(logUsersType::iterator ptr = logUsers.begin(); ptr != logUsers.end(); ) {
     theClient = *ptr;
     theUser = isAuthed(theClient);
@@ -142,14 +138,14 @@ void nickserv::log(const eventType& theEvent, const string& _theMessage)
       elog << "*** [nickserv::log] User in queue but not logged in: "
         << theClient->getNickName() << std::endl;
     }
-    
+
     if(theUser->getLogMask() & theEvent) {
       Notice(theClient, theMessage);
     }
-    
+
     ptr++;
   }
-  
+
   if(consoleLevel & theEvent) {
     logAdminMessage("%s", theMessage.c_str());
   }
@@ -226,12 +222,12 @@ switch (theEvent) {
                      theChannel->getName().c_str());
       return ;
     }
-    
+
     theClient = static_cast< iClient* > ( data1 );
-    
+
     sqlUser* theUser = isAuthed(theClient);
     if(theUser && theUser->getLevel() > 0) Op(theChannel, theClient);
-    
+
     break;
   } // case EVT_JOIN
 } // switch (theEvent)
@@ -290,18 +286,18 @@ switch( event ) {
     netData* theData = static_cast< netData* >( theClient->removeCustomData(this) );
     delete theData;
     removeFromQueue(theClient);
-    
+
     logUsersType::iterator ptr = find(logUsers.begin(), logUsers.end(), theClient);
     if(ptr != logUsers.end()) { logUsers.erase(ptr); }
-    
+
     return ;
     break;
   } // case EVT_KILL/QUIT
-  
+
   case EVT_NICK: {
     netData* theData = new netData();
     theClient->setCustomData(this, theData);
-    
+
     /* If this user has umode +r */
     if(theClient->isModeR()) {
       /* Find the sqlUser for their +r and assign it to this iClient */
@@ -313,27 +309,27 @@ switch( event ) {
     }
 
     addToQueue(theClient);
-    
+
     return ;
     break;
   } // case EVT_NICK
-  
+
   case EVT_CHNICK: {
     addToQueue(theClient);
 
     return ;
     break;
   } // case EVT_CHNICK
-  
+
   case EVT_ACCOUNT: {
     netData* theData = static_cast< netData* > (theClient->getCustomData(this));
-    
+
     theData->authedUser = isRegistered(theClient->getAccount());
     if(theData->authedUser) {
       if(theData->authedUser->getLogMask()) { logUsers.push_back(theClient); }
       theData->authedUser->commitLastSeen();
     }
-    
+
     return ;
     break;
   } // case EVT_ACCOUNT
@@ -377,7 +373,7 @@ void nickserv::OnTimer(const xServer::timerID& theTimer, void* )
 {
 if(theTimer == processQueue_timerID) {
   processQueue();
-  
+
   time_t theTime = time(NULL) + checkFreq;
   processQueue_timerID = MyUplink->RegisterTimer(theTime, this, NULL);
   } // if(theTimer == processQueue_timerID)
@@ -413,7 +409,7 @@ if(cacheCon->ExecTuplesOk(cacheQuery.str().c_str())) {
   for(int i = 0; i < cacheCon->Tuples(); i++) {
     sqlUser* tmpUser = new sqlUser(theManager);
     assert(tmpUser != 0);
-    
+
     tmpUser->setAllMembers(cacheCon, i);
     sqlUserCache.insert(sqlUserHashType::value_type(tmpUser->getName(), tmpUser));
   }
@@ -467,7 +463,7 @@ if(queuePos != warnQueue.end()) {
  */
 int nickserv::removeFromQueue(iClient* theClient)
 {
-QueueType::iterator queuePos = 
+QueueType::iterator queuePos =
   find(warnQueue.begin(), warnQueue.end(), theClient);
 if(queuePos != warnQueue.end()) {
   warnQueue.erase(queuePos);
@@ -513,7 +509,7 @@ vector<string> jupeQueue;
 for(QueueType::iterator queuePos = warnQueue.begin(); queuePos != warnQueue.end(); ) {
   iClient* theClient = *queuePos;
   netData* theData = static_cast< netData* >( theClient->getCustomData(this) );
-	
+
   /* Is this a juped nick? */
   /* TODO: There should be an iClient call for this */
   if(theClient->isFake()) {
@@ -521,7 +517,7 @@ for(QueueType::iterator queuePos = warnQueue.begin(); queuePos != warnQueue.end(
     queuePos = warnQueue.erase(queuePos);
     continue;
   }
-  
+
   /* Is this nick registered? */
   sqlUser* regUser = isRegistered(theClient->getNickName());
   if(!regUser) {
@@ -529,14 +525,14 @@ for(QueueType::iterator queuePos = warnQueue.begin(); queuePos != warnQueue.end(
     queuePos = warnQueue.erase(queuePos);
     continue;
   }
-  
+
   /* Does the regUser have autokill set? */
   if(!regUser->hasFlag(sqlUser::F_AUTOKILL)) {
     theData->warned = 0;
     queuePos = warnQueue.erase(queuePos);
     continue;
   }
-  
+
   /* User is registered and record has autokill set.
    * See if this iClient and the sqlUser match */
   if(isAccountMatch(theClient, regUser)) {
@@ -544,10 +540,10 @@ for(QueueType::iterator queuePos = warnQueue.begin(); queuePos != warnQueue.end(
     queuePos = warnQueue.erase(queuePos);
     continue;
   }
-  
+
   /* We now know that the user is NOT logged in as the user, and the user
    * has AUTOKILL set. Warn them. */
-  
+
   if(theData->warned) {
     killQueue.push_back(theClient);
     queuePos = warnQueue.erase(queuePos);
@@ -556,7 +552,7 @@ for(QueueType::iterator queuePos = warnQueue.begin(); queuePos != warnQueue.end(
     Notice(theClient, "You are using a registered nickname. Please login or you will be disconnected.");
     theData->warned++;
     theStats->incStat("NS.WARN");
-    theLogger->log(logging::events::E_INFO, "Warned: (" + 
+    theLogger->log(logging::events::E_INFO, "Warned: (" +
       theClient->getCharYYXXX() + ") " + theClient->getNickName());
     queuePos++;
     continue;
@@ -574,7 +570,7 @@ for(QueueType::iterator queuePos = killQueue.begin(); queuePos != killQueue.end(
   netData* theData = static_cast<netData*>(theClient->removeCustomData(this));
   delete(theData);
   theStats->incStat("NS.KILL");
-  theLogger->log(logging::events::E_INFO, "Killed: (" + 
+  theLogger->log(logging::events::E_INFO, "Killed: (" +
     theClient->getCharYYXXX() + ") " + theClient->getNickName());
   Kill(theClient, "[NickServ] AutoKill");
 } // iterate over killQueue
@@ -612,11 +608,11 @@ for( vector<string>::iterator itr = jupeQueue.begin();
     );
 
     assert( fakeClient != 0 );
- 
+
     if( ! MyUplink->AttachClient( fakeClient, this ) ) {
       theLogger->log(logging::events::E_INFO, "Unable to jupe: " + theNick);
     }
-	
+
 }
 
 } // nickserv::processQueue()
@@ -654,9 +650,9 @@ void nickserv::setConsoleLevel(logging::events::eventType& newMask) {
                     " console level to %u.", newMask);
     return;
   }
-  
+
   consoleLevel = newMask;
-  
+
   Write("%s T %s :Current NickServ console level: %u",
         getCharYYXXX().c_str(), consoleChannel.c_str(), newMask);
 }
@@ -670,9 +666,9 @@ bool nickserv::isAccountMatch(iClient* theClient, sqlUser* theUser)
 {
 string lowerNickName = string_lower(theClient->getAccount());
 string lowerName = string_lower(theUser->getName());
-  
+
 if(lowerNickName == lowerName) return true;
-  
+
 return false;
 }
 

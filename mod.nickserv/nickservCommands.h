@@ -15,12 +15,10 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
- *
- * $Id: nickservCommands.h,v 1.9 2004/02/13 18:13:27 jeekay Exp $
  */
 
-#ifndef _NICKSERVCOMMANDS_H
-#define _NICKSERVCOMMANDS_H "$Id: nickservCommands.h,v 1.9 2004/02/13 18:13:27 jeekay Exp $"
+#ifndef NICKSERVCOMMANDS_H
+#define NICKSERVCOMMANDS_H
 
 /**
  * All this code is stolen straight from mod.cservice, which possibly had
@@ -44,25 +42,25 @@ class Command {
     Command(nickserv* _bot, const string& _commName, const string& _help) :
       bot(_bot), server(0), commName(_commName), help(_help)
       {}
-    
+
     virtual ~Command() {}
-    
+
     virtual bool Exec(iClient*, const string&) = 0;
-    
+
     void setServer(xServer* _server)
       { server = _server; }
-    
+
     virtual string getInfo() const
       { return commName + ' ' + help; }
-    
+
     virtual void Usage(iClient*);
-    
+
     inline const string& getName() const
       { return commName; }
-    
+
     inline const string& getHelp() const
       { return help; }
-    
+
   protected:
     nickserv* bot;
     xServer*  server;

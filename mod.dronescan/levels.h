@@ -15,12 +15,10 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
- *
- * $Id: levels.h,v 1.6 2003/10/12 22:21:25 jeekay Exp $
  */
 
 #ifndef LEVELS_H
-#define LEVELS_H "$Id: levels.h,v 1.6 2003/10/12 22:21:25 jeekay Exp $"
+#define LEVELS_H
 
 namespace gnuworld {
 
@@ -39,7 +37,7 @@ namespace level {
 	const unsigned short status	= 300;
 
 	/* Higher admin commands */
-	
+
 	const unsigned short adduser	= 750;
 	const unsigned short moduser	= 750;
 	const unsigned short remuser	= 750;

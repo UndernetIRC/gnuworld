@@ -15,12 +15,10 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
- *
- * $Id: activeChannel.h,v 1.3 2003/11/26 23:30:22 dan_karrels Exp $
  */
 
 #ifndef ACTIVECHANNEL_H
-#define ACTIVECHANNEL_H "$Id: activeChannel.h,v 1.3 2003/11/26 23:30:22 dan_karrels Exp $"
+#define ACTIVECHANNEL_H
 
 #include <string>
 #include <ctime>
@@ -41,27 +39,27 @@ public:
 		name(_name),
 		lastjoin(_lastjoin)
 		{ }
-	
+
 	/** Empty destructor as we allocate no memory. */
 	inline ~activeChannel() { } ;
-	
+
 	/************************
 	 ** A C C E S S O  R S **
 	 ************************/
-	
+
 	inline const std::string& getName() const
 		{ return name; }
-	
+
 	inline const time_t& getLastJoin() const
 		{ return lastjoin; }
-	
+
 	/*********************
 	 ** M U T A T O R S **
 	 *********************/
-	
+
 	inline void setLastJoin( const time_t& _lastjoin )
 		{ lastjoin = _lastjoin; }
-	
+
 protected:
 	std::string	name;
 	time_t		lastjoin;

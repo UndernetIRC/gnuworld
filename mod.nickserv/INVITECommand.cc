@@ -16,19 +16,15 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: INVITECommand.cc,v 1.3 2003/06/28 01:21:21 dan_karrels Exp $
- *
  * Invite the user to the console channel.
  */
 
 #include "config.h"
 #include "Network.h"
 
-#include "levels.h" 
+#include "levels.h"
 #include "nickserv.h"
 #include "responses.h"
-
-RCSTAG("$Id: INVITECommand.cc,v 1.3 2003/06/28 01:21:21 dan_karrels Exp $");
 
 namespace gnuworld
 {

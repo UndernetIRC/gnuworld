@@ -33,17 +33,17 @@ public:
 	Command( chanfix *_bot, const string& _commandName, const string& _help ) :
 		bot(_bot), commandName(_commandName), help(_help)
 		{ }
-	
+
 	virtual ~Command() { }
-	
+
 	virtual void Exec(const iClient*, const string&) = 0;
-	
+
 	const string& getName() const
 		{ return commandName; }
-	
+
 	const string& getHelp() const
 		{ return help; }
-	
+
 	virtual void Usage(const iClient*);
 
 protected:

@@ -15,12 +15,10 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
- *
- * $Id: dronescan.h,v 1.25 2004/06/04 20:17:24 jeekay Exp $
  */
 
 #ifndef DRONESCAN_H
-#define DRONESCAN_H "$Id: dronescan.h,v 1.25 2004/06/04 20:17:24 jeekay Exp $"
+#define DRONESCAN_H
 
 #include <map>
 
@@ -59,128 +57,128 @@ class dronescan : public xClient {
 public:
 	/** Constructor receives a configuration file name. */
 	dronescan( const string& ) ;
-	
+
 	/** Destructor to clean up after ourselves. */
 	inline virtual ~dronescan() ;
-	
+
 	/***********************************************************
 	 ** O V E R R I D E N   X C L I E N T   F U N C T I O N S **
 	 ***********************************************************/
-	 
+
 	/** This method is called when we have attached to the xServer. */
 	virtual void OnAttach() ;
-	
+
 	/** This method is called after server connection. */
 	virtual void BurstChannels() ;
 
 	/** This is called when we receive a CTCP */
 	virtual void OnCTCP( iClient*, const string&, const string&, bool ) ;
-	
+
 	/** Receive network events. */
 	virtual void OnEvent( const eventType&, void*, void*, void*, void* ) ;
-	
+
 	/** Receive channel events. */
 	virtual void OnChannelEvent( const channelEventType&, Channel*,
 		void*, void*, void*, void* ) ;
-	
+
 	/** Receive private messages. */
 	virtual void OnPrivateMessage( iClient*, const string&, bool ) ;
-	
+
 	/** When we are being detached by the xServer */
 	virtual void OnDetach() ;
-	
+
 	/** Receive our own timed events. */
 	virtual void OnTimer( const xServer::timerID& , void* ) ;
-	
+
 	/*****************************************
 	 ** D R O N E S C A N   T Y P E D E F S **
 	 *****************************************/
-	
+
 	typedef unsigned short int testEnabledType;
-	
+
 	typedef std::map< string , sqlUser* , noCaseCompare > userMapType;
 	typedef std::map< unsigned int , sqlFakeClient* > fcMapType;
-	
-	
+
+
 	/*******************************************
 	 ** D R O N E S C A N   F U N C T I O N S **
 	 *******************************************/
-	
+
 	/** Report a SQL error to the appropriate places. */
 	void doSqlError(const string&, const string&);
-	
+
 	/** Change the current state. */
 	void changeState(DS_STATE) ;
-	
+
 	/** This function handles new clients as they connect. */
 	void handleNewClient( iClient* ) ;
-	
+
 	/** Calculate global entropy and store it. */
 	void calculateEntropy() ;
-	
+
 	/** Set states on global nicks. */
 	void setNickStates() ;
-	
+
 	/** Convenience function to reset states and check channels. */
 	inline void resetAndCheck()
 		{ setConsoleTopic(); setNickStates(); checkChannels(); }
-	
+
 	/**
 	 * Check global channels for drones. This is a convenience wrapper
 	 * for isAbnormal( Channel* ).
 	 */
 	void checkChannels() ;
 	bool checkChannel( const Channel* , const iClient* = 0 ) ;
-	
+
 	/** Calculate the entropy of a given string. */
 	double calculateEntropy( const string& ) ;
-	
+
 	/** Return the entropy of a given client. */
 	double calculateEntropy( const iClient* ) ;
-	
+
 	/** Check if a channel is normal. */
 	/** Check if an iClient's nick is normal. */
 	bool isNormal( const iClient* ) ;
-	
+
 	/** Set a clientData's state depending on the iClient. */
 	CLIENT_STATE setClientState( iClient* );
-	
+
 	/** Log a message. */
 	void log(LOG_TYPE, const char*, ...) ;
-	
+
 	/** Set the topic of the console channel. */
 	void setConsoleTopic() ;
-	
+
 	/** Reply to a given iClient. */
 	void Reply(const iClient*, const char*, ...) ;
-	
+
 	/** Return a users access */
 	sqlUser *getSqlUser( const string& ) ;
-	
+
 	/* Preloaders */
 	bool updateDue(string);
 	void preloadFakeClientCache();
 	void preloadUserCache();
-	
+
 	/* Allow commands access to the database pointer */
 	inline PgDatabase *getSqlDb()
 		{ return SQLDb; }
-	
+
 	/** Internal variables */
 	userMapType userMap;
 	fcMapType fakeClients;
-	
+
 	/** Typedef of currently seen drone channels */
 	typedef std::map< string , activeChannel* > droneChannelsType;
 	droneChannelsType droneChannels;
-	
+
 	/** Join counter config options */
 	unsigned int jcInterval;
 	unsigned int jcCutoff;
-	typedef std::map< string , unsigned int , noCaseCompare > 
+	typedef std::map< string , unsigned int , noCaseCompare >
 		jcChanMapType;
 	jcChanMapType jcChanMap;
-	
+
 	/* Test control */
 	/** Test map type. */
 	typedef std::map< string, Test* > testMapType;
@@ -190,74 +188,74 @@ public:
 
 	/** Tests map */
 	testMapType testMap;
-	
+
 	/** Set a variable in one of the tests. */
 	Test *setTestVariable(const string&, const string&);
 
 	/* Configuration variables used by tests. */
-	
+
 	/** Global options */
 	unsigned int voteCutoff;
-	
+
 	/** Abnormals options */
 	double channelMargin;
-	
+
 protected:
 	/** Configuration file. */
 	EConfig *dronescanConfig;
-	
+
 	/** Our database instance */
 	PgDatabase *SQLDb;
-	
+
 	/** Configuration variables. */
 	string consoleChannel;
 	string consoleChannelModes;
-	
+
 	/** State variable. */
 	DS_STATE currentState;
-	
+
 	/** Character occurance frequencies. */
 	typedef std::map< char , double > charMapType;
 	charMapType charMap;
-	
+
 	/** Average nickname entropy. */
 	double averageEntropy;
 	unsigned int totalNicks;
-	
+
 	/** Margins. */
 	double nickMargin;
 	unsigned int channelCutoff;
-	
+
 	/** How often to show drone channels on join test */
 	unsigned int dcInterval;
 	xServer::timerID tidClearActiveList;
-	
+
 	/** What level to log to the console. */
 	int consoleLevel;
-	
+
 	/** Stats. */
 	int customDataCounter;
-	
+
 	/** Internally used timer. */
 	Timer *theTimer;
-	
+
 	/** Timers for GNUWorld triggered events. */
 	xServer::timerID tidClearJoinCounter;
 	xServer::timerID tidRefreshCaches;
-	
+
 	/** Command map type. */
-	typedef std::map< string , Command* , noCaseCompare > 
+	typedef std::map< string , Command* , noCaseCompare >
 		commandMapType;
 	typedef commandMapType::value_type commandPairType;
 	commandMapType commandMap;
 	bool RegisterCommand(Command*);
-	
+
 	/** Time of the last cache. */
 	std::map < string , time_t > lastUpdated;
-	
+
 	/** How often to refresh caches. */
 	unsigned int rcInterval;
-	
+
 	/** Fake sqlUser record for opered clients without accounts. */
 	sqlUser *fakeOperUser;
 }; // class dronescan

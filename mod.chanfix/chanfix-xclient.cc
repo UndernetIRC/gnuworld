@@ -15,8 +15,6 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
- *
- * $Id: chanfix-xclient.cc,v 1.4 2004/06/03 22:18:00 jeekay Exp $
  */
 
 #include "StringTokenizer.h"
@@ -52,11 +50,11 @@ void chanfix::OnCTCP( iClient *theClient, const string& CTCP,
 	const string& Message, bool )
 {
 	StringTokenizer st(CTCP);
-	
+
 	if(st.empty()) return;
-	
+
 	string Command = string_upper(st[0]);
-	
+
 	if("DCC" == Command) {
 		DoCTCP(theClient, CTCP, "REJECT");
 	} else if("PING" == Command) {
@@ -72,19 +70,19 @@ void chanfix::OnPrivateMessage( iClient *theClient,
 {
 	/* Only speak to opers */
 	if( ! theClient->isOper() ) return;
-	
+
 	StringTokenizer st(Message);
-	
+
 	if( st.empty() ) return;
-	
+
 	string Command = string_upper(st[0]);
 	commandMapType::iterator commandHandler = commandMap.find(Command);
-	
+
 	if( commandHandler == commandMap.end() ) {
 		Notice(theClient, "Invalid command: %s", Command.c_str());
 		return;
 	}
-	
+
 	commandHandler->second->Exec(theClient, Message);
 }
 

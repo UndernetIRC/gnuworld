@@ -15,12 +15,10 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
- *
- * $Id: Timer.h,v 1.2 2003/06/19 22:58:30 dan_karrels Exp $
  */
 
 #ifndef TIMER_H
-#define TIMER_H "$Id: Timer.h,v 1.2 2003/06/19 22:58:30 dan_karrels Exp $"
+#define TIMER_H
 
 #include <sys/time.h>
 

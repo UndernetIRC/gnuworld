@@ -15,16 +15,12 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
- *
- * $Id: Stats.cc,v 1.2 2003/06/19 22:58:31 dan_karrels Exp $
  */
 
 #include <new>
 
 #include "config.h"
 #include "Stats.h"
-
-RCSTAG("$Id: Stats.cc,v 1.2 2003/06/19 22:58:31 dan_karrels Exp $");
 
 namespace gnuworld {
 
@@ -42,7 +38,7 @@ Stats* Stats::theStats = 0;
 Stats* Stats::getInstance()
 {
   if(!theStats) theStats = new Stats();
-  
+
   return theStats;
 }
 
@@ -76,7 +72,7 @@ Stats::~Stats()
 void Stats::incStat(const string& theStat, unsigned int amount)
 {
   statsMapType::iterator ptr = statsMap.find(theStat);
-  
+
   if(ptr == statsMap.end()) {
     statsMap.insert(statsMapType::value_type(theStat, amount));
   } else {
@@ -91,7 +87,7 @@ void Stats::incStat(const string& theStat, unsigned int amount)
 unsigned int Stats::getStat(const string& theStat)
 {
   statsMapType::const_iterator ptr = statsMap.find(theStat);
-  
+
   if(ptr == statsMap.end()) {
     return 0;
    } else {

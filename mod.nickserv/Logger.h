@@ -15,12 +15,10 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
- *
- * $Id: Logger.h,v 1.5 2003/06/19 22:58:31 dan_karrels Exp $
  */
 
-#ifndef _LOGGER_H
-#define _LOGGER_H "$Id: Logger.h,v 1.5 2003/06/19 22:58:31 dan_karrels Exp $"
+#ifndef LOGGER_H
+#define LOGGER_H
 
 #include <string>
 #include <vector>

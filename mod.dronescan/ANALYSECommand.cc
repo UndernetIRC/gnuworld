@@ -16,8 +16,6 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ANALYSECommand.cc,v 1.2 2003/10/19 20:17:11 jeekay Exp $
- *
  * Display information about a given channel.
  */
 
@@ -33,8 +31,6 @@
 #include "levels.h"
 #include "sqlUser.h"
 
-RCSTAG("$Id: ANALYSECommand.cc,v 1.2 2003/10/19 20:17:11 jeekay Exp $");
-
 namespace gnuworld {
 
 namespace ds {
@@ -44,24 +40,24 @@ void ANALYSECommand::Exec( const iClient *theClient, const string& Message, cons
 	if(theUser->getAccess() < level::analyse) return ;
 
 	StringTokenizer st(Message);
-	
+
 	/* ANALYSE <#channel>
 	 */
 	if(st.size() != 2) {
 		Usage(theClient);
 		return ;
 	}
-	
+
 	Channel *theChannel = Network->findChannel(st[1]);
-	
+
 	if(!theChannel) {
 		bot->Reply(theClient, "Unable to find channel: %s",
 			theChannel->getName().c_str()
 			);
 		return ;
 	}
-	
-	
+
+
 
 	return ;
 } // ANALYSECommand::Exec(iClient*, const string&)

@@ -15,8 +15,6 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
- *
- * $Id: Logger.cc,v 1.4 2003/06/19 22:58:31 dan_karrels Exp $
  */
 
 #include <cstdarg>
@@ -24,8 +22,6 @@
 
 #include "config.h"
 #include "Logger.h"
-
-RCSTAG("$Id: Logger.cc,v 1.4 2003/06/19 22:58:31 dan_karrels Exp $");
 
 namespace gnuworld {
 
@@ -75,7 +71,7 @@ void Logger::log(const events::eventType& theEvent, const string& theMessage)
  */
 void Logger::log(const events::eventType& theEvent, const char* format, ... ) {
   char buffer[512];
-  
+
   va_list _list;
 
   va_start(_list, format);

@@ -15,12 +15,10 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
- *
- * $Id: logTarget.h,v 1.5 2003/06/19 22:58:31 dan_karrels Exp $
  */
 
-#ifndef _LOGTARGET_H
-#define _LOGTARGET_H "$Id: logTarget.h,v 1.5 2003/06/19 22:58:31 dan_karrels Exp $"
+#ifndef LOGTARGET_H
+#define LOGTARGET_H
 
 /*
  * logTarget.h

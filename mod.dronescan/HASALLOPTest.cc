@@ -16,16 +16,12 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: HASALLOPTest.cc,v 1.2 2003/06/19 22:58:30 dan_karrels Exp $
- *
  * Checks to see whether a channel has all ops in it.
  */
 
 #include "config.h"
 #include "dronescan.h"
 #include "dronescanTests.h"
-
-RCSTAG("$Id: HASALLOPTest.cc,v 1.2 2003/06/19 22:58:30 dan_karrels Exp $");
 
 namespace gnuworld {
 
@@ -34,10 +30,10 @@ namespace ds {
 bool HASALLOPTest::isNormal( const Channel *theChannel )
 {
 	Channel::const_userIterator chanItr = theChannel->userList_begin();
-	
+
 	for( ; chanItr != theChannel->userList_end() ; ++chanItr )
 		if(!chanItr->second->isModeO()) return true;
-	
+
 	return false;
 } // bool HASALLOPTest::isNormal(const Channel*)
 

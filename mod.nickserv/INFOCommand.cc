@@ -16,8 +16,6 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: INFOCommand.cc,v 1.3 2003/06/19 22:58:31 dan_karrels Exp $
- *
  * Allows an administrator to see what attributes a registered user has.
  */
 
@@ -27,8 +25,6 @@
 #include "levels.h"
 #include "nickserv.h"
 #include "responses.h"
-
-RCSTAG("$Id: INFOCommand.cc,v 1.3 2003/06/19 22:58:31 dan_karrels Exp $");
 
 namespace gnuworld {
 

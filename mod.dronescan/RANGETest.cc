@@ -16,8 +16,6 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: RANGETest.cc,v 1.6 2003/12/29 23:59:37 dan_karrels Exp $
- *
  * Checks the range of the entropy of a given channel.
  */
 
@@ -27,8 +25,6 @@
 #include "dronescan.h"
 #include "dronescanTests.h"
 
-RCSTAG("$Id: RANGETest.cc,v 1.6 2003/12/29 23:59:37 dan_karrels Exp $");
-
 namespace gnuworld {
 
 namespace ds {
@@ -37,23 +33,23 @@ bool RANGETest::isNormal( const Channel *theChannel )
 {
 	double maxEntropy, minEntropy;
 	maxEntropy = minEntropy = 0;
-	
+
 	bool hasOp = false;
-	
+
 	Channel::const_userIterator chanItr = theChannel->userList_begin();
-	
+
 	for( ; chanItr != theChannel->userList_end() ; ++chanItr )
 		{
 		iClient *targetClient = chanItr->second->getClient();
-		
+
 		double userEntropy = bot->calculateEntropy(targetClient);
-		
+
 		if(userEntropy < minEntropy || minEntropy == 0) minEntropy = userEntropy;
 		if(userEntropy > maxEntropy) maxEntropy = userEntropy;
-		
+
 		if(chanItr->second->isModeO()) hasOp = true;
 		}
-	
+
 	if((maxEntropy - minEntropy) > channelRange)
 		return true;
 	else
@@ -64,9 +60,9 @@ bool RANGETest::isNormal( const Channel *theChannel )
 bool RANGETest::setVariable( const string& var, const string& value )
 {
 	if("CHANNELRANGE" != var) return false;
-	
+
 	channelRange = atoi(value.c_str());
-	
+
 	return true;
 }
 

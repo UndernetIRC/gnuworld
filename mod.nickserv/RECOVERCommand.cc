@@ -18,16 +18,12 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
- *
- * $Id: RECOVERCommand.cc,v 1.5 2003/06/28 01:21:21 dan_karrels Exp $
  */
 
 #include "config.h"
 #include "Network.h"
 
 #include "nickserv.h"
-
-RCSTAG("$Id: RECOVERCommand.cc,v 1.5 2003/06/28 01:21:21 dan_karrels Exp $");
 
 namespace gnuworld
 {

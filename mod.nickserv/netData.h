@@ -15,12 +15,10 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
- *
- * $Id: netData.h,v 1.3 2003/06/19 22:58:31 dan_karrels Exp $
  */
 
-#ifndef _NETDATA_H
-#define _NETDATA_H "$Id: netData.h,v 1.3 2003/06/19 22:58:31 dan_karrels Exp $"
+#ifndef NETDATA_H
+#define NETDATA_H
 
 #include "sqlUser.h"
 
@@ -35,16 +33,16 @@ namespace ns
 class netData
 {
   public:
-  
+
     /** Empty Constructor */
    netData();
-  
+
     /** Empty Destructor */
     ~netData();
-    
+
     /** Pointer to sqlUser if authed */
     sqlUser* authedUser;
-    
+
     /** Has this user been warned? */
     bool warned;
 

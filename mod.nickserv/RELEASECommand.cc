@@ -16,8 +16,6 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: RELEASECommand.cc,v 1.1 2004/02/13 18:13:27 jeekay Exp $
- *
  * This command allows a user to release their nick if it has been juped.
  */
 
@@ -26,8 +24,6 @@
 #include "Network.h"
 
 #include "nickserv.h"
-
-RCSTAG("$Id: RELEASECommand.cc,v 1.1 2004/02/13 18:13:27 jeekay Exp $");
 
 namespace gnuworld
 {

@@ -16,8 +16,6 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: LISTCommand.cc,v 1.11 2004/06/04 22:17:25 jeekay Exp $
- *
  * Display information about things.
  *
  * 2003-06-20	GK@NG	Initial writing
@@ -41,28 +39,28 @@ void LISTCommand::Exec( const iClient *theClient, const string& Message , const 
 	/* Usage: LIST <name> */
 
 	StringTokenizer st(Message);
-	
+
 	if(st.size() < 2) {
 		Usage(theClient);
 		return ;
 	}
-	
+
 	string Name = string_upper(st[1]);
-	
+
 	if("ACTIVE" == Name) {
 		if(bot->droneChannels.empty()) {
 			bot->Reply(theClient, "There are currently no active drone channels.");
 			return ;
 		}
-	
+
 		bot->Reply(theClient, "Active drone channels:");
-		
+
 		for(dronescan::droneChannelsType::const_iterator itr =
 		    bot->droneChannels.begin() ; itr != bot->droneChannels.end()
 		    ; ++itr) {
 			/* Does this channel still exist? */
 			Channel *theChannel = Network->findChannel(itr->first);
-			
+
 			if(theChannel) {
 				bot->Reply(theClient, "  [%4u] (%u) %s",
 					theChannel->size(),
@@ -77,21 +75,21 @@ void LISTCommand::Exec( const iClient *theClient, const string& Message , const 
 			}
 		}
 	}
-	
+
 	if("FAKECLIENTS" == Name) {
 		if(bot->fakeClients.empty()) {
 			bot->Reply(theClient, "There are currently no fake clients.");
 			return ;
 		}
-		
+
 		bot->Reply(theClient, "Fake clients:");
-		
+
 		for(dronescan::fcMapType::const_iterator itr =
 		    bot->fakeClients.begin() ; itr != bot->fakeClients.end() ;
 		    ++itr ) {
 			/* List the fake clients back to the user */
 			sqlFakeClient *theFake = itr->second;
-			
+
 			bot->Reply(theClient, "  (%02u %1s) %s",
 				theFake->getId(),
 				theFake->getFlagsString().c_str(),
@@ -99,15 +97,15 @@ void LISTCommand::Exec( const iClient *theClient, const string& Message , const 
 				);
 		}
 	}
-	
+
 	if("JOINFLOOD" == Name) {
 		if(bot->jcChanMap.empty()) {
 			bot->Reply(theClient, "There are currently no channels being join flooded.");
 			return ;
 		}
-	
+
 		bot->Reply(theClient, "Currently joinflooded channels:");
-		
+
 		for(dronescan::jcChanMapType::const_iterator itr =
 		    bot->jcChanMap.begin() ; itr != bot->jcChanMap.end()
 		    ; ++itr) {
@@ -118,7 +116,7 @@ void LISTCommand::Exec( const iClient *theClient, const string& Message , const 
 					);
 		}
 	}
-	
+
 	if("USERS" == Name) {
 		bot->Reply(theClient, "Users:");
 		for(dronescan::userMapType::const_iterator itr = bot->userMap.begin() ;
@@ -129,7 +127,7 @@ void LISTCommand::Exec( const iClient *theClient, const string& Message , const 
 				);
 		}
 	}
-	
+
 	return ;
 } // LISTCommand::Exec(iClient*, const string&)
 

@@ -15,12 +15,10 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
- *
- * $Id: dronescanCommands.h,v 1.10 2003/11/26 23:30:22 dan_karrels Exp $
  */
 
 #ifndef DRONESCANCOMMANDS_H
-#define DRONESCANCOMMANDS_H "$Id: dronescanCommands.h,v 1.10 2003/11/26 23:30:22 dan_karrels Exp $"
+#define DRONESCANCOMMANDS_H
 
 namespace gnuworld {
 
@@ -36,23 +34,23 @@ public:
 		{ }
 
 	virtual ~Command() { }
-	
+
 	virtual void Exec(const iClient*, const string&, const sqlUser*) = 0;
-	
+
 	void setServer(xServer *_server)
 		{ server = _server; }
-	
+
 	virtual inline string getInfo() const
 		{ return commandName + ' ' + help; }
-	
+
 	virtual void Usage(const iClient*);
-	
+
 	inline const string& getName() const
 		{ return commandName; }
-	
+
 	inline const string& getHelp() const
 		{ return help; }
-	
+
 protected:
 	dronescan	*bot;
 	xServer		*server;

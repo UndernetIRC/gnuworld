@@ -15,8 +15,6 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
- *
- * $Id: sqlManager.cc,v 1.10 2003/06/19 22:58:31 dan_karrels Exp $
  */
 
 #include <new>
@@ -27,8 +25,6 @@
 #include "config.h"
 #include "ELog.h"
 #include "sqlManager.h"
-
-RCSTAG("$Id: sqlManager.cc,v 1.10 2003/06/19 22:58:31 dan_karrels Exp $");
 
 using std::endl ;
 
@@ -112,7 +108,7 @@ void sqlManager::flush()
   for(CommitQueueItr ptr = commitQueue.begin(); ptr != commitQueue.end(); ++ptr) {
     string statement = *ptr;
     theStats->incStat("SM.EXEC");
-    
+
 #ifdef LOG_SQL
     elog << "*** [sqlManager:flush] Executing: " << statement << endl;
 #endif
@@ -125,13 +121,13 @@ void sqlManager::flush()
       elog << "*** [sqlManager:flush] Executing: " << statement << endl;
 #endif
       elog << "*** [sqlManager:flush] Error: " << error << endl;
-      
+
       theLogger->log(logging::events::E_ERROR, "Executing: " + statement);
       theLogger->log(logging::events::E_ERROR, "Error    : " + error);
       // TODO: Log error
     }
   }
-  
+
   commitQueue.clear();
 }
 
@@ -144,7 +140,7 @@ void sqlManager::flush()
 void sqlManager::queueCommit(const string& theStatement)
 {
   commitQueue.push_back(theStatement);
-  
+
   if(commitQueue.size() >= commitQueueMax) {
     flush();
   }

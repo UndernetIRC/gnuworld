@@ -107,12 +107,12 @@ protected:
 
 	/** Counting timer. */
 	xServer::timerID timerCount;
-	
-	
+
+
 	/*******************
 	 * C O M M A N D S *
 	 *******************/
-	
+
 	/** Type of the commandMap. */
 	typedef std::map< string , Command* , noCaseCompare > commandMapType;
 	/** Convenience type when creating a new command pair. */

@@ -15,12 +15,10 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
- *
- * $Id: clientData.h,v 1.4 2003/11/26 23:30:22 dan_karrels Exp $
  */
 
 #ifndef CLIENTDATA_H
-#define CLIENTDATA_H "$Id: clientData.h,v 1.4 2003/11/26 23:30:22 dan_karrels Exp $"
+#define CLIENTDATA_H
 
 namespace gnuworld {
 
@@ -42,14 +40,14 @@ public:
 	/** Constructor sets initial state to UNKNOWN. */
 	inline clientData()
 		{ currentState = UNKNOWN; entropy = 0; }
-	
+
 	/**
 	 * Accessor for currentState.
 	 * @return	the current state of this client.
 	 */
 	inline CLIENT_STATE getState() const
 		{ return currentState; }
-		
+
 	/**
 	 * Mutator for currentState.
 	 * @param _currentState	the new state to be set.
@@ -57,14 +55,14 @@ public:
 	 */
 	inline CLIENT_STATE setState(CLIENT_STATE _currentState)
 		{ return currentState = _currentState; }
-	
+
 	/**
 	 * Accessor for the entropy value.
 	 * @return	the current entropy value
 	 */
 	inline double getEntropy() const
 		{ return entropy; }
-	
+
 	/**
 	 * Mutator for the entropy value.
 	 * @param _entropy	the new entropy value to be set.
@@ -72,8 +70,8 @@ public:
 	 */
 	inline double setEntropy(double _entropy)
 		{ return entropy = _entropy; }
-	
-	
+
+
 	/**
 	 * Convenience function to test for state UNKNOWN.
 	 * @return	true if currentState == UNKNOWN else false.
@@ -98,7 +96,7 @@ public:
 protected:
 	/** The current state. */
 	CLIENT_STATE	currentState;
-	
+
 	/** The current entropy value. */
 	double		entropy;
 }; // class clientData

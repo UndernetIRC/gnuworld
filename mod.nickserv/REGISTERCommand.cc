@@ -16,8 +16,6 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: REGISTERCommand.cc,v 1.6 2003/06/28 01:21:21 dan_karrels Exp $
- *
  * This command allows a user to register their AC nick
  */
 
@@ -26,8 +24,6 @@
 #include "config.h"
 #include "netData.h"
 #include "nickserv.h"
-
-RCSTAG("$Id: REGISTERCommand.cc,v 1.6 2003/06/28 01:21:21 dan_karrels Exp $");
 
 namespace gnuworld
 {

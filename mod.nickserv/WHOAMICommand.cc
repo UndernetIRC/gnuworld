@@ -15,16 +15,12 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
- *
- * $Id: WHOAMICommand.cc,v 1.7 2003/06/28 01:21:21 dan_karrels Exp $
  */
 
 #include	<sstream>
 
 #include	"config.h"
 #include	"nickserv.h"
-
-RCSTAG("$Id: WHOAMICommand.cc,v 1.7 2003/06/28 01:21:21 dan_karrels Exp $");
 
 using std::stringstream ;
 using std::ends ;

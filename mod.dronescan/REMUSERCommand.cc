@@ -17,8 +17,6 @@
  * USA.
  *
  * 2003-08-02	Jeekay	Initial writing
- *
- * $Id: REMUSERCommand.cc,v 1.2 2003/10/19 20:17:11 jeekay Exp $
  */
 
 #include "StringTokenizer.h"
@@ -27,8 +25,6 @@
 #include "dronescan.h"
 #include "dronescanCommands.h"
 #include "sqlUser.h"
-
-RCSTAG("$Id: REMUSERCommand.cc,v 1.2 2003/10/19 20:17:11 jeekay Exp $");
 
 namespace gnuworld {
 
@@ -39,11 +35,11 @@ void REMUSERCommand::Exec( const iClient *theClient, const string& Message, cons
 	if(theUser->getAccess() < level::remuser) return ;
 
 	StringTokenizer st(Message);
-	
+
 	/* Usage:
 	 *  REMUSER <username>
 	 */
-	
+
 	if(st.size() != 2) {
 		Usage(theClient);
 		return ;
@@ -53,7 +49,7 @@ void REMUSERCommand::Exec( const iClient *theClient, const string& Message, cons
 	 *  i) The target user must exist
 	 * ii) The removee's access must be < the removers access
 	 */
-	
+
 	/* Does the user exist? */
 	sqlUser *targetUser = bot->getSqlUser(st[1]);
 	if(!targetUser) {
@@ -62,18 +58,18 @@ void REMUSERCommand::Exec( const iClient *theClient, const string& Message, cons
 			);
 		return ;
 	}
-	
+
 	/* Is the removees access lower than the removers? */
 	if(targetUser->getAccess() >= theUser->getAccess()) {
 		bot->Reply(theClient, "You cannot remove someone with higher or equal access.");
 		return ;
 	}
-	
+
 	/* Conditions satisfied.
 	 *  i) Remove user from the database
 	 * ii) Flush cache
 	 */
-	
+
 	/* Remove the user from the database */
 	if(targetUser->remove()) {
 		bot->Reply(theClient, "User %s successfully removed.",
@@ -81,12 +77,12 @@ void REMUSERCommand::Exec( const iClient *theClient, const string& Message, cons
 	} else {
 		bot->Reply(theClient, "There was a problem removing the user.");
 	}
-	
+
 	/* Flush the cache */
 	bot->preloadUserCache();
-	
+
 	return ;
-	
+
 } // REMUSERCommand::Exec(iClient*, const string&, const sqlUser*)
 
 } // namespace ds

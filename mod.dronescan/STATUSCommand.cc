@@ -17,8 +17,6 @@
  * USA.
  *
  * 2003-07-07	GK@NG	Initial writing
- *
- * $Id: STATUSCommand.cc,v 1.3 2003/10/19 20:17:11 jeekay Exp $
  */
 
 #include "Convert.h"
@@ -30,8 +28,6 @@
 #include "dronescanTests.h"
 #include "sqlUser.h"
 
-RCSTAG("$Id: STATUSCommand.cc,v 1.3 2003/10/19 20:17:11 jeekay Exp $");
-
 namespace gnuworld {
 
 namespace ds {
@@ -41,22 +37,22 @@ void STATUSCommand::Exec( const iClient *theClient, const string& Message, const
 	if(theUser->getAccess() < level::status) return ;
 
 	StringTokenizer st(Message);
-	
+
 	/* Usage:
 	 *  STATUS
 	 */
-	
+
 	if(st.size() != 1) {
 		Usage(theClient);
 		return ;
 	}
-	
+
 	time_t uptime = ::time(0) - bot->getUplink()->getStartTime();
 	bot->Reply(theClient, "Uptime: %u (%s)",
 		uptime,
 		Convert::ConvertSecondsToString(uptime).c_str()
 		);
-	
+
 	bot->Reply(theClient, "Tests:");
 	dronescan::testMapType::const_iterator itr = bot->testMap.begin();
 	for( ; itr != bot->testMap.end() ; ++itr) {
@@ -65,10 +61,10 @@ void STATUSCommand::Exec( const iClient *theClient, const string& Message, const
 			itr->second->getStatus().c_str()
 			);
 	}
-	
+
 	return ;
-	
-	
+
+
 } // STATUSCommand::Exec(iClient*, const string&)
 
 } // namespace ds

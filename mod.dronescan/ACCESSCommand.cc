@@ -19,8 +19,6 @@
  * Return the access level of the current or specified user.
  *
  * 2003-06-15	GK@NG	Initial writing
- *
- * $Id: ACCESSCommand.cc,v 1.4 2003/10/19 20:17:11 jeekay Exp $
  */
 
 #include <time.h>
@@ -33,8 +31,6 @@
 #include "dronescanCommands.h"
 #include "sqlUser.h"
 
-RCSTAG("$Id: ACCESSCommand.cc,v 1.4 2003/10/19 20:17:11 jeekay Exp $");
-
 namespace gnuworld {
 
 namespace ds {
@@ -44,14 +40,14 @@ void ACCESSCommand::Exec( const iClient *theClient, const string& Message, const
 	if(theUser->getAccess() < level::access) return ;
 
 	StringTokenizer st(Message);
-	
+
 	/* Usage:
 	 *  ACCESS
 	 *  ACCESS <username>
 	 */
-	
+
 	const sqlUser *targetUser = theUser;
-	
+
 	if(st.size() == 2) {
 		targetUser = bot->getSqlUser(st[1]);
 		if(!targetUser) {
@@ -61,12 +57,12 @@ void ACCESSCommand::Exec( const iClient *theClient, const string& Message, const
 			return ;
 		}
 	}
-	
+
 	time_t lastseen = targetUser->getLastSeen();
 	char lastseen_r[21];
 	struct tm *lastseen_b = gmtime(&lastseen);
 	strftime(lastseen_r, 20, "%F %H:%M:%S", lastseen_b);
-	
+
 	/* Give the client information about the targetUser */
 	bot->Reply(theClient, "Username : %-10s Access: %4u",
 		targetUser->getUserName().c_str(),
@@ -75,15 +71,15 @@ void ACCESSCommand::Exec( const iClient *theClient, const string& Message, const
 	bot->Reply(theClient, "Last Seen: %s",
 		lastseen_r
 		);
-	
+
 	lastseen = targetUser->getLastUpdated();
 	lastseen_b = gmtime(&lastseen);
 	strftime(lastseen_r, 20, "%F %H:%M:%S", lastseen_b);
 	bot->Reply(theClient, "Last Updated: %s (by %s)",
 		lastseen_r,
 		targetUser->getLastUpdatedBy().c_str()
-		);		
-	
+		);
+
 	return ;
 } // ACCESSCommand::Exec(iClient*, const string&)
 

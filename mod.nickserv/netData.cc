@@ -16,16 +16,12 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: netData.cc,v 1.2 2003/06/19 22:58:31 dan_karrels Exp $
- *
  * This class stores information about a given iClient.
  * It is used as a quick reference to logged in users and for checking warnings
  */
 
 #include "config.h"
 #include "netData.h"
-
-RCSTAG("$Id: netData.cc,v 1.2 2003/06/19 22:58:31 dan_karrels Exp $");
 
 namespace gnuworld
 {

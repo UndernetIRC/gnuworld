@@ -16,8 +16,6 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: SHUTDOWNCommand.cc,v 1.4 2003/12/29 23:59:38 dan_karrels Exp $
- *
  * Allows an administrator to shut down NickServ cleanly.
  */
 
@@ -30,8 +28,6 @@
 #include "logTarget.h"
 #include "nickserv.h"
 #include "sqlUser.h"
-
-RCSTAG("$Id: SHUTDOWNCommand.cc,v 1.4 2003/12/29 23:59:38 dan_karrels Exp $");
 
 namespace gnuworld {
 

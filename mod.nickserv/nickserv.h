@@ -15,12 +15,10 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
- *
- * $Id: nickserv.h,v 1.16 2004/06/04 20:17:24 jeekay Exp $
  */
 
-#ifndef _NICKSERV_H
-#define _NICKSERV_H "$Id: nickserv.h,v 1.16 2004/06/04 20:17:24 jeekay Exp $"
+#ifndef NICKSERV_H
+#define NICKSERV_H
 
 #include "client.h"
 #include "EConfig.h"
@@ -50,16 +48,16 @@ class nickserv : public xClient, public logging::logTarget {
     /*******************************************************
      ** O V E R R I D E N   X C L I E N T   M E T H O D S **
      *******************************************************/
-    
+
     /** Constructor receives a configuration file name */
     nickserv( const string& ) ;
-    
+
     /** Destructor to remove anything interesting we've done */
     virtual ~nickserv() ;
-    
+
     /** This method is called after server connection */
     virtual void BurstChannels() ;
-    
+
     /** This is called when we have attached to the xServer */
     virtual void OnAttach() ;
 
@@ -75,43 +73,43 @@ class nickserv : public xClient, public logging::logTarget {
 
     /** This method is called when the bot gets a PRIVMSG */
     virtual void OnPrivateMessage( iClient*, const string&, bool secure ) ;
-    
+
     /** This method is called when a timer expires */
     virtual void OnTimer(const gnuworld::xServer::timerID&, void*) ;
-    
+
     /*********************************
      ** N I C K S E R V   T Y P E S **
      *********************************/
-    
+
     typedef map< string, Command*, noCaseCompare > commandMapType;
     typedef commandMapType::value_type commandPairType;
 
     typedef vector< iClient* > QueueType;
-    
+
     typedef map< string, sqlUser*, noCaseCompare > sqlUserHashType;
 
     typedef vector< iClient* > logUsersType;
-      
+
     /*************************************
      ** N I C K S E R V   M E T H O D S **
      *************************************/
 
     /** Insert a nick/sqlUser* pair into the cache */
     void addUserToCache(string, sqlUser*);
-    
+
     /* Accessor for consoleChannel */
     inline const string getConsoleChannel() const
       { return consoleChannel; }
-    
+
     /** Log a message to the console channel */
     void logAdminMessage(const char*, ... );
-    
+
     /** Load all users into the user cache */
     void precacheUsers();
 
     /** Register a command */
     virtual bool RegisterCommand(Command*);
-    
+
     /** Change the console level */
     void setConsoleLevel(logging::events::eventType&);
 
@@ -122,28 +120,28 @@ class nickserv : public xClient, public logging::logTarget {
 
     /** Add an iClient to the processing queue */
     int addToQueue(iClient*);
-    
+
     /** Process the queue */
     void processQueue();
-    
+
     /** Remove an iClient from the processing queue */
     int removeFromQueue(iClient*);
-    
+
 
     /*********************************
      ** U S E R   R E S O U R C E S **
      *********************************/
-    
+
     /** Check if a given iClient matches a given sqlUser */
     bool isAccountMatch(iClient*, sqlUser*);
-    
+
     /** Returns a sqlUser if the user is registered */
-    sqlUser* isAuthed(iClient*); 
-    
+    sqlUser* isAuthed(iClient*);
+
     /** Returns a sqlUser for a given user name */
     sqlUser* isRegistered(string);
 
-    
+
     /*******************************
      ** M I S C E L L A N E O U S **
      *******************************/
@@ -153,27 +151,27 @@ class nickserv : public xClient, public logging::logTarget {
 
     /** Holds a reference to our Logger instance */
     logging::Logger* theLogger;
-   
-    
+
+
     /*****************************************
      ** N I C K S E R V   V A R I A B L E S **
      *****************************************/
 
     /** Our sqlManager instance for DB communication */
     sqlManager* theManager;
-    
+
   protected:
     /*********************************************
      ** I N T E R N A L   M A I N T E N A N C E **
      *********************************************/
-    
+
     commandMapType commandMap;
 
 
     /*************************************
      ** C O N F I G   V A R I A B L E S **
      *************************************/
-    
+
     /** The frequency with which we process the queue */
     int checkFreq;
 
@@ -182,35 +180,35 @@ class nickserv : public xClient, public logging::logTarget {
 
     /** Store the config file pointer */
     EConfig* nickservConfig;
-    
+
     /** How long to wait after linking before processing */
     int startDelay;
-    
+
     /** How frequently to commit to the database */
     int commitFreq;
-    
-    
+
+
     /** What messages should be sent to the console channel */
     logging::events::eventType consoleLevel;
 
     /*****************
      ** Q U E U E S **
      *****************/
-    
+
     /** List of iClient's that currently need verifying */
     QueueType warnQueue;
-    
+
     /** The cached list of registered users */
     sqlUserHashType sqlUserCache;
 
     /** The list of log users */
     logUsersType logUsers;
-    
-    
+
+
     /***********************
      ** T I M E R   I D S **
      ***********************/
-     
+
     /** TimerID for processing the queue */
     gnuworld::xServer::timerID processQueue_timerID;
 

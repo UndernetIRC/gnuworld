@@ -16,8 +16,6 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: SETCommand.cc,v 1.6 2003/06/19 22:58:31 dan_karrels Exp $
- *
  * Allow a user to set various flags on themselves
  */
 
@@ -26,8 +24,6 @@
 
 #include "levels.h"
 #include "nickserv.h"
-
-RCSTAG("$Id: SETCommand.cc,v 1.6 2003/06/19 22:58:31 dan_karrels Exp $");
 
 namespace gnuworld
 {
@@ -70,37 +66,37 @@ if("CONSOLELEVEL" == property) {
     bot->Notice(theClient, "Sorry, you do not have access to this command.");
     return true;
   }
-  
+
   logging::events::eventType newMask = atoi(status.c_str());
   if(newMask < logging::events::E_MIN || newMask > logging::events::E_MAX) {
     bot->Notice(theClient, "LogMask must be between %u and %u.",
       logging::events::E_MIN, logging::events::E_MAX);
     return true;
   }
-  
+
   bot->setConsoleLevel(newMask);
   bot->Notice(theClient, "Set console level to %u.", newMask);
   bot->Notice(theClient, "REMINDER: This is only effective until the next restart.");
-  
+
   return true;
 } else if("LOGMASK" == property) {
   if(theUser->getLevel() < level::set::logmask) {
     bot->Notice(theClient, "Sorry, you do not have access to this command.");
     return true;
   }
-  
+
   logging::events::eventType newMask = atoi(status.c_str());
   if(newMask < logging::events::E_MIN || newMask > logging::events::E_MAX) {
     bot->Notice(theClient, "LogMask must be between %u and %u.",
       logging::events::E_MIN, logging::events::E_MAX);
     return true;
   }
-  
+
   theUser->setLogMask(newMask);
   theUser->commit();
-  
+
   bot->Notice(theClient, "LogMask set to %u.", newMask);
-  
+
   return true;
 }
 
