@@ -16,11 +16,14 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- * $Id: match.cc,v 1.4 2001/05/17 00:59:33 dan_karrels Exp $
+ * $Id: match.cc,v 1.5 2001/07/17 13:42:51 dan_karrels Exp $
  */
 #include	"match.h"
 
 #include	<string>
+
+namespace gnuworld
+{
 
 using std::string ;
 
@@ -704,3 +707,5 @@ int mmexec(const char *wcm, int wminlen, const char *rcm, int rminlen)
   }
   return 1;                     /* Auch... something left out ? Fail */
 }
+
+} // namespace gnuworld

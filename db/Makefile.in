@@ -59,36 +59,32 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 host_alias = @host_alias@
 host_triplet = @host@
-AR = @AR@
 AS = @AS@
 BIN_PATH = @BIN_PATH@
 CC = @CC@
-CP = @CP@
 CPP = @CPP@
 CXX = @CXX@
 CXXFLAGS = @CXXFLAGS@
 DLLTOOL = @DLLTOOL@
-GREP = @GREP@
+ECHO = @ECHO@
+EXEEXT = @EXEEXT@
 INCLTDL = @INCLTDL@
-LD = @LD@
 LDFLAGS = @LDFLAGS@
 LIBLTDL = @LIBLTDL@
 LIBTOOL = @LIBTOOL@
 LIBTOOL_DEPS = @LIBTOOL_DEPS@
 LIB_PATH = @LIB_PATH@
-LN = @LN@
 LN_S = @LN_S@
 MAKEINFO = @MAKEINFO@
 MOD_DIRS = @MOD_DIRS@
-MV = @MV@
 OBJDUMP = @OBJDUMP@
+OBJEXT = @OBJEXT@
 PACKAGE = @PACKAGE@
 PGSQL_INCLUDE = @PGSQL_INCLUDE@
 PGSQL_LIB = @PGSQL_LIB@
 RANLIB = @RANLIB@
-RM = @RM@
 SRC_PATH = @SRC_PATH@
-UNAME = @UNAME@
+STRIP = @STRIP@
 VERSION = @VERSION@
 bindir = @bindir@
 glibdir = @glibdir@
@@ -125,7 +121,7 @@ OBJECTS = $(libgnuworld_db_la_OBJECTS)
 
 all: all-redirect
 .SUFFIXES:
-.SUFFIXES: .S .c .cc .lo .o .s
+.SUFFIXES: .S .c .cc .lo .o .obj .s
 $(srcdir)/Makefile.in: Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4) 
 	cd $(top_srcdir) && $(AUTOMAKE) --gnu db/Makefile
 
@@ -159,6 +155,11 @@ uninstall-libLTLIBRARIES:
 	  $(LIBTOOL)  --mode=uninstall rm -f $(DESTDIR)$(libdir)/$$p; \
 	done
 
+# FIXME: We should only use cygpath when building on Windows,
+# and only if it is available.
+.c.obj:
+	$(COMPILE) -c `cygpath -w $<`
+
 .s.o:
 	$(COMPILE) -c $<
 
@@ -167,6 +168,7 @@ uninstall-libLTLIBRARIES:
 
 mostlyclean-compile:
 	-rm -f *.o core *.core
+	-rm -f *.$(OBJEXT)
 
 clean-compile:
 
@@ -195,6 +197,8 @@ libgnuworld_db.la: $(libgnuworld_db_la_OBJECTS) $(libgnuworld_db_la_DEPENDENCIES
 	$(CXXLINK) -rpath $(libdir) $(libgnuworld_db_la_LDFLAGS) $(libgnuworld_db_la_OBJECTS) $(libgnuworld_db_la_LIBADD) $(LIBS)
 .cc.o:
 	$(CXXCOMPILE) -c $<
+.cc.obj:
+	$(CXXCOMPILE) -c `cygpath -w $<`
 .cc.lo:
 	$(LTCXXCOMPILE) -c $<
 

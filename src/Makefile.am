@@ -1,12 +1,12 @@
 ## Process this file with automake to produce Makefile.in
-## $Id: Makefile.am,v 1.13 2001/06/14 22:14:13 dan_karrels Exp $
+## $Id: Makefile.am,v 1.14 2001/07/17 13:42:51 dan_karrels Exp $
 
 bin_PROGRAMS = gnuworld
 
-gnuworld_LDFLAGS = -rpath $(bindir) -dlopen $(glibdir)/libgnuworld.la \
-	-R$(bindir) -export-dynamic -module
-gnuworld_LDADD = $(LIBLTDL) "-dlopen" self "-dlopen" \
-	$(glibdir)/libgnuworld.la
+gnuworld_LDFLAGS = -rpath $(bindir) $(glibdir)/libgnuworld.la \
+	-R$(bindir) -export-dynamic -module $(LIBLTDL)
+##gnuworld_LDADD = $(LIBLTDL) "-dlopen" self "-dlopen" \
+##	$(glibdir)/libgnuworld.la
 gnuworld_DEPENDENCIES = $(LIBLTDL) $(glibdir)/libgnuworld.la
 gnuworld_SOURCES = Channel.cc \
 	ChannelUser.cc \

@@ -1,5 +1,6 @@
 /* Channel.cc */
 
+#include	<new>
 #include	<string>
 #include	<iostream>
 #include	<strstream>
@@ -15,7 +16,7 @@
 #include	"server.h"
 
 const char Channel_h_rcsId[] = __CHANNEL_H ;
-const char Channel_cc_rcsId[] = "$Id: Channel.cc,v 1.25 2001/06/23 16:27:52 dan_karrels Exp $" ;
+const char Channel_cc_rcsId[] = "$Id: Channel.cc,v 1.26 2001/07/17 13:42:51 dan_karrels Exp $" ;
 const char iClient_h_rcsId[] = __ICLIENT_H ;
 const char ChannelUser_h_rcsId[] = __CHANNELUSER_H ;
 const char Network_h_rcsId[] = __NETWORK_H ;

@@ -59,45 +59,39 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 host_alias = @host_alias@
 host_triplet = @host@
-AR = @AR@
 AS = @AS@
 BIN_PATH = @BIN_PATH@
 CC = @CC@
-CP = @CP@
 CPP = @CPP@
 CXX = @CXX@
 CXXFLAGS = @CXXFLAGS@
 DLLTOOL = @DLLTOOL@
-GREP = @GREP@
+ECHO = @ECHO@
+EXEEXT = @EXEEXT@
 INCLTDL = @INCLTDL@
-LD = @LD@
 LDFLAGS = @LDFLAGS@
 LIBLTDL = @LIBLTDL@
 LIBTOOL = @LIBTOOL@
 LIBTOOL_DEPS = @LIBTOOL_DEPS@
 LIB_PATH = @LIB_PATH@
-LN = @LN@
 LN_S = @LN_S@
 MAKEINFO = @MAKEINFO@
 MOD_DIRS = @MOD_DIRS@
-MV = @MV@
 OBJDUMP = @OBJDUMP@
+OBJEXT = @OBJEXT@
 PACKAGE = @PACKAGE@
 PGSQL_INCLUDE = @PGSQL_INCLUDE@
 PGSQL_LIB = @PGSQL_LIB@
 RANLIB = @RANLIB@
-RM = @RM@
 SRC_PATH = @SRC_PATH@
-UNAME = @UNAME@
+STRIP = @STRIP@
 VERSION = @VERSION@
 bindir = @bindir@
 glibdir = @glibdir@
 
 bin_PROGRAMS = gnuworld
 
-gnuworld_LDFLAGS = -rpath $(bindir) -dlopen $(glibdir)/libgnuworld.la 	-R$(bindir) -export-dynamic -module
-
-gnuworld_LDADD = $(LIBLTDL) "-dlopen" self "-dlopen" 	$(glibdir)/libgnuworld.la
+gnuworld_LDFLAGS = -rpath $(bindir) $(glibdir)/libgnuworld.la 	-R$(bindir) -export-dynamic -module $(LIBLTDL)
 
 gnuworld_DEPENDENCIES = $(LIBLTDL) $(glibdir)/libgnuworld.la
 gnuworld_SOURCES = Channel.cc 	ChannelUser.cc 	LoadClientTimerHandler.cc 	Network.cc 	ServerTimerHandlers.cc 	UnloadClientTimerHandler.cc 	client.cc 	iClient.cc 	iServer.cc 	ip.cc 	main.cc 	msg_AD.cc 	msg_B.cc 	msg_C.cc 	msg_CM.cc 	msg_D.cc 	msg_DS.cc 	msg_EA.cc 	msg_EB.cc 	msg_Error.cc 	msg_G.cc 	msg_GL.cc 	msg_I.cc 	msg_J.cc 	msg_JU.cc 	msg_K.cc 	msg_L.cc 	msg_M.cc 	msg_N.cc 	msg_NOOP.cc 	msg_P.cc 	msg_PART.cc 	msg_PASS.cc 	msg_PRIVMSG.cc 	msg_Q.cc 	msg_R.cc 	msg_RemPing.cc 	msg_S.cc 	msg_SQ.cc 	msg_Server.cc 	msg_T.cc 	msg_W.cc 	msg_WA.cc 	server.cc
@@ -106,19 +100,28 @@ INCLUDES = $(INCLTDL)
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = ../include/defs.h
 CONFIG_CLEAN_FILES = 
+bin_PROGRAMS =  gnuworld$(EXEEXT)
 PROGRAMS =  $(bin_PROGRAMS)
 
 
 DEFS = @DEFS@ -I. -I$(srcdir) -I../include
 CPPFLAGS = @CPPFLAGS@
 LIBS = @LIBS@
-gnuworld_OBJECTS =  Channel.o ChannelUser.o LoadClientTimerHandler.o \
-Network.o ServerTimerHandlers.o UnloadClientTimerHandler.o client.o \
-iClient.o iServer.o ip.o main.o msg_AD.o msg_B.o msg_C.o msg_CM.o \
-msg_D.o msg_DS.o msg_EA.o msg_EB.o msg_Error.o msg_G.o msg_GL.o msg_I.o \
-msg_J.o msg_JU.o msg_K.o msg_L.o msg_M.o msg_N.o msg_NOOP.o msg_P.o \
-msg_PART.o msg_PASS.o msg_PRIVMSG.o msg_Q.o msg_R.o msg_RemPing.o \
-msg_S.o msg_SQ.o msg_Server.o msg_T.o msg_W.o msg_WA.o server.o
+gnuworld_OBJECTS =  Channel.$(OBJEXT) ChannelUser.$(OBJEXT) \
+LoadClientTimerHandler.$(OBJEXT) Network.$(OBJEXT) \
+ServerTimerHandlers.$(OBJEXT) UnloadClientTimerHandler.$(OBJEXT) \
+client.$(OBJEXT) iClient.$(OBJEXT) iServer.$(OBJEXT) ip.$(OBJEXT) \
+main.$(OBJEXT) msg_AD.$(OBJEXT) msg_B.$(OBJEXT) msg_C.$(OBJEXT) \
+msg_CM.$(OBJEXT) msg_D.$(OBJEXT) msg_DS.$(OBJEXT) msg_EA.$(OBJEXT) \
+msg_EB.$(OBJEXT) msg_Error.$(OBJEXT) msg_G.$(OBJEXT) msg_GL.$(OBJEXT) \
+msg_I.$(OBJEXT) msg_J.$(OBJEXT) msg_JU.$(OBJEXT) msg_K.$(OBJEXT) \
+msg_L.$(OBJEXT) msg_M.$(OBJEXT) msg_N.$(OBJEXT) msg_NOOP.$(OBJEXT) \
+msg_P.$(OBJEXT) msg_PART.$(OBJEXT) msg_PASS.$(OBJEXT) \
+msg_PRIVMSG.$(OBJEXT) msg_Q.$(OBJEXT) msg_R.$(OBJEXT) \
+msg_RemPing.$(OBJEXT) msg_S.$(OBJEXT) msg_SQ.$(OBJEXT) \
+msg_Server.$(OBJEXT) msg_T.$(OBJEXT) msg_W.$(OBJEXT) msg_WA.$(OBJEXT) \
+server.$(OBJEXT)
+gnuworld_LDADD = $(LDADD)
 CXXCOMPILE = $(CXX) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
 LTCXXCOMPILE = $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
 CXXLD = $(CXX)
@@ -147,7 +150,7 @@ OBJECTS = $(gnuworld_OBJECTS)
 
 all: all-redirect
 .SUFFIXES:
-.SUFFIXES: .S .c .cc .lo .o .s
+.SUFFIXES: .S .c .cc .lo .o .obj .s
 $(srcdir)/Makefile.in: Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4) 
 	cd $(top_srcdir) && $(AUTOMAKE) --gnu src/Makefile
 
@@ -181,6 +184,11 @@ uninstall-binPROGRAMS:
 	  rm -f $(DESTDIR)$(bindir)/`echo $$p|sed 's/$(EXEEXT)$$//'|sed '$(transform)'|sed 's/$$/$(EXEEXT)/'`; \
 	done
 
+# FIXME: We should only use cygpath when building on Windows,
+# and only if it is available.
+.c.obj:
+	$(COMPILE) -c `cygpath -w $<`
+
 .s.o:
 	$(COMPILE) -c $<
 
@@ -189,6 +197,7 @@ uninstall-binPROGRAMS:
 
 mostlyclean-compile:
 	-rm -f *.o core *.core
+	-rm -f *.$(OBJEXT)
 
 clean-compile:
 
@@ -213,11 +222,13 @@ distclean-libtool:
 
 maintainer-clean-libtool:
 
-gnuworld: $(gnuworld_OBJECTS) $(gnuworld_DEPENDENCIES)
-	@rm -f gnuworld
+gnuworld$(EXEEXT): $(gnuworld_OBJECTS) $(gnuworld_DEPENDENCIES)
+	@rm -f gnuworld$(EXEEXT)
 	$(CXXLINK) $(gnuworld_LDFLAGS) $(gnuworld_OBJECTS) $(gnuworld_LDADD) $(LIBS)
 .cc.o:
 	$(CXXCOMPILE) -c $<
+.cc.obj:
+	$(CXXCOMPILE) -c `cygpath -w $<`
 .cc.lo:
 	$(LTCXXCOMPILE) -c $<
 

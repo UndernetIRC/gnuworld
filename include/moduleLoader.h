@@ -1,13 +1,13 @@
 /* moduleLoader.h */
 
 #ifndef __MODULELOADER_H
-#define __MODULELOADER_H "$Id: moduleLoader.h,v 1.9 2001/06/14 22:14:12 dan_karrels Exp $"
+#define __MODULELOADER_H "$Id: moduleLoader.h,v 1.10 2001/07/17 13:42:51 dan_karrels Exp $"
 
 #include	<iostream>
 #include	<string>
 
-#include	<ltdl.h>
 #include	<cstdlib> // exit()
+#include	<ltdl.h>
 
 #include	"ELog.h"
 
@@ -26,17 +26,17 @@ protected:
 	/**
 	 * This is the type of the bootstrap function.
 	 */
-	typedef modType (*GNUWModuleFunc)(const string& args);
+	typedef modType (*GNUWModuleFunc)(const string& args) ;
 
 	/**
   	 * Pointer to the loaded module. 
 	 */
-	lt_dlhandle		moduleHandle;
+	lt_dlhandle		moduleHandle ;
 
 	/**
 	 * Pointer to the initialisation function.	
 	 */
-	GNUWModuleFunc		modFunc;
+	GNUWModuleFunc		modFunc ;
 
 	/**
 	 * Pointer to the object being retrieved from the
@@ -59,7 +59,14 @@ public:
 	{
 	// Must call lt_dlinit() to initialize libltdl.
 	// This method may be called more than once
-	lt_dlinit() ;
+	if( lt_dlinit() != 0 )
+		{
+		elog	<< "moduleLoader> Failed to initialize "
+			<< "module loading system: "
+			<< lt_dlerror()
+			<< endl ;
+		::exit( 0 ) ;
+		}
 
 	string fileName( string( "./" ) + moduleName ) ;
 	if( string::npos == fileName.find( ".la" ) )
@@ -74,7 +81,7 @@ public:
 
 	// lt_dlopenext() will do all that lt_dlopen() does,
 	// but also check for .la, .so, .sl, etc extensions
-	moduleHandle = lt_dlopenext( fileName.c_str() ) ;
+	moduleHandle = lt_dlopen( fileName.c_str() ) ;
 
 	if( 0 == moduleHandle )
 		{
@@ -107,13 +114,13 @@ public:
 	moduleHandle = 0 ;
 	}
 
-	/* 
+	/**
 	 * Extracts an instance of modType
 	 * erived object from this module, and returns it.
 	 */
 	modType loadObject( const string& configFileName )
 	{
-	lt_ptr_t symPtr = lt_dlsym( moduleHandle, "_gnuwinit" ) ;
+	lt_ptr symPtr = lt_dlsym( moduleHandle, "_gnuwinit" ) ;
 	if( 0 == symPtr )
 		{
 		elog	<< "moduleLoader::loadObject> Error: "

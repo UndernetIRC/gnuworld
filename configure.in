@@ -1,10 +1,10 @@
-dnl $Id: configure.in,v 1.25 2001/06/19 23:25:40 dan_karrels Exp $
+dnl $Id: configure.in,v 1.26 2001/07/17 13:42:50 dan_karrels Exp $
 dnl ----------------------------------------------------------
 
 echo Configuring GNUWorld...
 echo
 
-AC_REVISION($Revision: 1.25 $)
+AC_REVISION($Revision: 1.26 $)
 AC_INIT(src/main.cc)
 AM_INIT_AUTOMAKE(gnuworld,0.0)
 AM_CONFIG_HEADER(include/defs.h)
@@ -48,15 +48,6 @@ AC_ISC_POSIX
 
 AC_PROG_MAKE_SET(gmake)
 AC_SUBST(LIBTOOL_DEPS)
-
-AC_CHECK_PROG(UNAME,uname,uname)
-AC_CHECK_PROG(LN,ln,ln)
-AC_CHECK_PROG(RM,rm,rm)
-AC_CHECK_PROG(LD,ld,ld)
-AC_CHECK_PROG(MV,mv,mv)
-AC_CHECK_PROG(CP,cp,cp)
-AC_CHECK_PROG(GREP,grep,grep)
-AC_CHECK_PROG(AR,ar,ar)
 
 AC_MSG_CHECKING(if C++ compiler supports bool)
 AC_TRY_COMPILE(

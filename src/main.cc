@@ -1,5 +1,5 @@
 /* main.cc
- * $Id: main.cc,v 1.30 2001/06/14 22:14:13 dan_karrels Exp $
+ * $Id: main.cc,v 1.31 2001/07/17 13:42:51 dan_karrels Exp $
  */
 
 #include	<new>
@@ -8,7 +8,6 @@
 #include	<sys/time.h>
 #include	<sys/types.h>
 #include	<unistd.h>
-#include	<dlfcn.h>
 
 #include	<cstdio>
 #include	<cstdlib>
@@ -22,7 +21,7 @@
 #include	"moduleLoader.h"
 
 const char config_h_rcsId[] = __CONFIG_H ;
-const char main_cc_rcsId[] = "$Id: main.cc,v 1.30 2001/06/14 22:14:13 dan_karrels Exp $" ;
+const char main_cc_rcsId[] = "$Id: main.cc,v 1.31 2001/07/17 13:42:51 dan_karrels Exp $" ;
 const char ELog_h_rcsId[] = __ELOG_H ;
 const char FileSocket_h_rcsId[] = __FILESOCKET_H ;
 const char server_h_rcsId[] = __SERVER_H ;
@@ -60,6 +59,7 @@ clog << endl ;
 
 int main( int argc, char** argv )
 {
+
 gnuworld::xServer* theServer =
 	new (nothrow) gnuworld::xServer( argc, argv ) ;
 assert( theServer != 0 ) ;
