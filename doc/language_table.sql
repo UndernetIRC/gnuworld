@@ -2281,3 +2281,178 @@ COPY "translations" FROM stdin;
 15	169	%s אין לי אופ ב	31337	0
 15	170	%s דקות ל %i	31337	0
 \.
+
+-- Macedonian language definition.
+-- 01/04/03 - Marjan Lazarevski <acid@iunc.net>.
+
+COPY "translations" FROM stdin;
+16	1	Izvini, No veke si logiran kako %s	31337	0
+16	2	USPESHNO LOGIRAN kako %s	31337	0
+16	3	Izvini, nemash dovolno pristap za taa komanda	31337	0
+16	4	Izvini, kanalot %s e prazen	31337	0
+16	5	Ne go zabelezuvam %s nikade	31337	0
+16	6	Nemozam da go lociram %s na kanal %s	31337	0
+16	7	Kanalot %s ne e registriran	31337	0
+16	8	Dobi op od %s (%s) na %s	31337	0
+16	9	Dobi glas od %s (%s) na %s	31337	0
+16	10	%s: ne si na toj kanal	31337	0
+16	11	%s veke ima op na %s	31337	0
+16	12	%s veke ima glas na %s	31337	0
+16	13	Odzemen ti e opot od %s (%s) na %s	31337	0
+16	14	Odzemen ti e glasot od %s (%s) na %s	31337	0
+16	15	%s nema op na %s	31337	0
+16	16	%s nema glas na %s	31337	0
+16	17	NEUSPESHNO LOGIRANJE kako %s (Pogreshna Lozinka)	31337	0
+16	18	Ne sum na toj kanal!	31337	0
+16	19	Pogreshen ban dostrel. Dozvoleniot dostrel e 1-%i.	31337	0
+16	20	Pogreshno vremetraenje na banot. Vashiot ban moze da bide najmnogu 336 chasa.	31337	0
+16	21	Ban porakata nemoze da bide poveke od 128 bukvi	31337	0
+16	22	Odbraniot ban e veke na mojata lista!	31337	0
+16	23	Banot %s e veke pokrien so %s	31337	0
+16	24	Pogreshno minimalno nivo.	31337	0
+16	25	Pogreshno maksimalno nivo.	31337	0
+16	26	KORISNIK: %s PRISTAP: %s %s	31337	0
+16	27	KANAL: %s -- AVTOMOD: %s	31337	0
+16	28	POSLEDNO MODIFICIRAN: %s (%s pred)	31337	0
+16	29	** SUSPENDIRAN ** - Istekuva za %s (Nivo %i)	31337	0
+16	30	POSLEDNO VIDEN: %s pred.	31337	0
+16	31	Ima poveke od 15 isti.	31337	0
+16	32	Ve molam namalete go izborot.	31337	0
+16	33	Kraj na pristap listata	31337	0
+16	34	Nema Takov!	31337	0
+16	35	Nemozesh da dodadesh korisnik so ednakov ili pogolem pristap od tvojot.	31337	0
+16	36	Pogreshno pristap nivo.	31337	0
+16	37	%s e veke dodaden na %s so pristap nivo %i.	31337	0
+16	38	Dodaden korisnikot %s na %s so pristap nivo %i	31337	0
+16	39	Neshto trgna naopaku: %s	31337	0
+16	40	%s: Kraj na ban listata	31337	0
+16	41	Detalite nemozat da se vidat (Nevidliv)	31337	0
+16	42	Informacija za: %s (%i)	31337	0
+16	43	Momentalno logiran preku: %s	31337	0
+16	44	WEB Strana: %s	31337	0
+16	45	Jazik: %i	31337	0
+16	46	Kanali: %s	31337	0
+16	47	Vlezni povtoruvacki poeni: %i	31337	0
+16	48	Izlezno povtoruvanje (Bajti): %i	31337	0
+16	49	%s e registriran od:	31337	0
+16	50	%s - posledno viden: %s pred	31337	0
+16	51	Opis: %s	31337	0
+16	52	Ke me poplavuvash od zborovi a? E ne te slusham veke!	31337	0
+16	53	Mislam deka ti prativ malku poveke podatoci, odsega momentalno si ignoriran.	31337	0
+16	54	Nekompletna komanda	31337	0
+16	55	Za upotreba na %s, morash da pishesh /msg %s@%s	31337	0
+16	56	Izvini, Mora da si logiran za da ja upotrebish taa komanda.	31337	0
+16	57	Kanalot %s e suspendiran od cservice administrator.	31337	0
+16	58	Vashiot pristap na %s e suspendiran.	31337	0
+16	59	BEZOP flagot e postaven na %s	31337	0
+16	60	STRICTOP flagot e postaven na %s	31337	0
+16	61	Shtotuku odzede op na poveke od %i luge	31337	0
+16	62	UPOTREBA: %s	31337	0
+16	63	Momentalno go zgolemiv tvojot pristap na kanal %s na %i	31337	0
+16	64	%s e registriran.	31337	0
+16	65	%s ne e registriran.	31337	0
+16	66	Mislam deka %s ne bi go sakal toa.	31337	0
+16	67	\002*** Ban Lista za kanal %s ***\002	31337	0
+16	68	%s %s Nivo: %i	31337	0
+16	69	DODADEN OD: %s (%s)	31337	0
+16	70	NA: %s	31337	0
+16	71	ISTEKUVA: %s	31337	0
+16	72	\002*** KRAJ ***\002	31337	0
+16	73	Neznam koj %s e.	31337	0
+16	74	Vekje ne se logiran na mene.	31337	0
+16	75	%s nema pristap na %s.	31337	0
+16	76	Nemozesh da modificirash korisnik so ednakov ili pogolem pristap od tvojot.	31337	0
+16	77	Nemozesh da dadesh pogolem ili ednakov pristap na tvojot.	31337	0
+16	78	Modificirano e pristap nivoto na %s na kanal %s na %i	31337	0
+16	79	Postaven AVTOMOD za OP na %s na kanal %s	31337	0
+16	80	Postaven AVTOMOD za GLAS na %s na kanal %s	31337	0
+16	81	Nema AVTOMODE za %s na kanal %s	31337	0
+16	82	Vashata lozinka nemoze da bide vasheto korisnicko ime ili nadimakot - upotreba: NEWPASS <nova lozinka>	31337	0
+16	83	Lozinkata uspeshno smeneta.	31337	0
+16	84	BEZOP flagot e postaven na %s	31337	0
+16	85	BEZOP flagot e postaven na %s (a %s ne e logiran)	31337	0
+16	86	BEZOP flagot e postaven na %s (a %s nema dovolen pristap)	31337	0
+16	87	Izbrishan kanal %s	31337	0
+16	88	%s e veke registriran so mene.	31337	0
+16	89	Imeto na kanalot e invalidno.	31337	0
+16	90	Kanalot %s e sega registriran	31337	0
+16	91	Trgant %s od mojata molk lista	31337	0
+16	92	Nemozam da go najdam %s vo mojata molk lista	31337	0
+16	93	Nemozesh da odzemesh pristap na korisnik so ednakov ili pogolem pristap od tvojot	31337	0
+16	94	Nemozesh da si go odzemesh pristapot od sopstvieniot kanal	31337	0
+16	95	Odzemen pristap na korisnikot %s od %s	31337	0
+16	96	Vashiot NEVIDLIV flag e sega VKLICEN.	31337	0
+16	97	Vashiot NEVIDLIV flag e sega ISKLUCEN.	31337	0
+16	98	%s za %s e %s	31337	0
+16	99	podesuvanjeto na %s mora da bide VKLUCENO(ON) ili ISKLUCENO (OFF)	31337	0
+16	100	Pogreshni KORISNICKI PODESUVANJA. Tocnite podesuvanja se 0, 1, 2.	31337	0
+16	101	KORISNICKITE PODESUVANJA za %s se %i	31337	0
+16	102	podesuvanjeto za MASSDEOPPRO mora da bide 0-7	31337	0
+16	103	MASSDEOPPRO za %s e postaven na %d	31337	0
+16	104	podesuvanjeto za FLOODPRO mora da bide 0-7	31337	0
+16	105	FLOODPRO za %s e postaven na %d	31337	0
+16	106	OPISOT moze da bide maksimum 80 bukvi !	31337	0
+16	107	OPISOT za %s e iscisten.	31337	0
+16	108	OPISOT za %s e: %s	31337	0
+16	109	WEB Stranata moze da bide maksimum 75 bukvi!	31337	0
+16	110	WEB Stranata na %s e iscistena.	31337	0
+16	111	WEB Stranata na %s e: %s	31337	0
+16	112	Podesuvanjeto na klucnite zborovi nemoze da bide poveke od 80 bukvi!	31337	0
+16	113	KLUCNITE ZBOROVI za %s se: %s	31337	0
+16	114	Jazikot e sega postaven na %s.	31337	0
+16	115	GRESHKA: Pogreshna selekcija na jazikot.	31337	0
+16	116	Nemozam da go lociram kanalot %s na mrezata!	31337	0
+16	117	GRESHKA: Pogreshno podesuvanje za kanalot.	31337	0
+16	118	Ignore lista:	31337	0
+16	119	Ignore listata e prazna	31337	0
+16	120	-- Kraj na Ignore Listata	31337	0
+16	121	CMaster status na servisot na kanali:	31337	0
+16	122	[     Rekordna Statistika Na Kanalot] \002Cached Entries:\002 %i    \002DB Requests:\002 %i    \002Cache Hits:\002 %i    \002Efficiency:\002 %.2f%%	31337	0
+16	123	[        Rekordna Statistika Na Korisnici] \002Cached Entries:\002 %i    \002DB Requests:\002 %i    \002Cache Hits:\002 %i    \002Efficiency:\002 %.2f%%	31337	0
+16	124	[Rekordna Statistika Na Pristap] \002Cached Entries:\002 %i    \002DB Requests:\002 %i    \002Cache Hits:\002 %i    \002Efficiency:\002 %.2f%%	31337	0
+16	125	[         Rekordna Statistika Na Ban] \002Cached Entries:\002 %i    \002DB Requests:\002 %i    \002Cache Hits:\002 %i    \002Efficiency:\002 %.2f%%	31337	0
+16	126	Posledno Primeno Korsnicko Izvestuvanje: %i	31337	0
+16	127	Posledno Primeno Izvestuvanje Za Kanalot: %i	31337	0
+16	128	Posledno Primeno Izvestuvanje Za Nivo: %i	31337	0
+16	129	Posledno Primeno Izvestuvanje Za Ban: %i	31337	0
+16	130	Custom data containers allocated: %i	31337	0
+16	131	\002Uptime:\002 %s	31337	0
+16	132	Kanalot %s ima %d korisnici (%i operatori)	31337	0
+16	133	Modot e: %s	31337	0
+16	134	Postaveni flagovi: %s	31337	0
+16	135	Nemozesh da suspendirash korisnik so ednakov ili pogolem pristap od tvojot.	31337	0
+16	136	pogreshno vreme	31337	0
+16	137	Pogreshno vremetraenje na suspenzija.	31337	0
+16	138	SUSPENZIJATA na %s ponishtena	31337	0
+16	139	%s e veke suspendiran na %s	31337	0
+16	140	SUSPENZIJATA na %s ke istece za %s	31337	0
+16	141	GRESHKA: Naslovot nemoze da bide pogolem od 145 bukvi	31337	0
+16	142	Nemash dovolno pristap za da go trgnesh banot %s od bazata na %s	31337	0
+16	143	Trgnati %i banovi shto go pokrivaat %s	31337	0
+16	144	Odzemen e vashiot privremen pristap od %i na kanal %s	31337	0
+16	145	Izgleda deka nemash prinuden pristap na %s, mozebi istekol?	31337	0
+16	146	%s ne e suspendiran na %s	31337	0
+16	147	%s e IRC operator	31337	0
+16	148	%s NE e logiran.	31337	0
+16	149	%s e logiran kako %s%s	31337	0
+16	150	%s e Oficijalen CService Pretstavnik%s i logiran kako %s	31337	0
+16	151	%s e Oficijalen CService Administrator%s i logiran kako %s	31337	0
+16	152	%s e Oficijalen CService Developer%s i logiran kako %s	31337	0
+16	153	Ima povekje od %i vlezovi koi se sovpagaat. [%s]	31337	0
+16	154	Ve molam odredete na baranata maska	31337	0
+16	155	Nema takvi koi se sovpagaat [%s]	31337	0
+16	156	%s: Modovite na kanalot se iscisteni.	31337	0
+16	158	Pogreshna opcija.	31337	0
+16	159	%s e Oficijalen Undernet Servisen Bot.	31337	0
+16	160	%s e Oficijalen Coder-Com Pretstavnik%s i logiran kako %s	31337	0
+16	161	%s e Oficijalen Coder-Com Pridonesnik%s i logiran kako %s	31337	0
+16	162	%s e Oficijalen Coder-Com Developer%s i logiran kako %s	31337	0
+16	163	%s e Oficijalen Coder-Com Senior%s i logiran kako %s	31337	0
+16	164	 i IRC operator	31337	0
+16	165	Dodaden ban %s na %s so nivo %i	31337	0
+16	166	%s: ban listata e prazna.	31337	0
+16	167	Veke sum vo toj kanal!	31337	0
+16	168	Taa komanda e rezervirana za IRC Operatori	31337	0
+16	169	Nemam op na %s	31337	0
+16	170	%s za %i minuti	31337	0
+\.
