@@ -1,8 +1,10 @@
 ------------------------------------------------------------------------------------
--- "$Id: cservice.sql,v 1.50 2001/08/31 19:39:46 gte Exp $"
+-- "$Id: cservice.sql,v 1.51 2001/10/14 05:44:27 nighty Exp $"
 -- Channel service DB SQL file for PostgreSQL.
 
 -- ChangeLog:
+-- 2001-10-14: nighty
+--             Corrected bogus table entries and added missing fields / tables.
 -- 2001-04-30: Gte
 --             Redesigned deletion system, new table called deletion_transactions
 --             to store deletion details for CMaster's to clear cached values.
@@ -48,7 +50,8 @@ CREATE TABLE languages (
 	id SERIAL,
 	code VARCHAR( 16 ) UNIQUE,
 	name VARCHAR( 16 ),
-	last_updated INT4 NOT NULL 
+	last_updated INT4 NOT NULL,
+	deleted INT2 DEFAULT '0' 
 --	PRIMARY KEY(id)
 );
 
@@ -59,6 +62,7 @@ CREATE TABLE translations (
 	response_id INT4 NOT NULL DEFAULT '0',
 	text TEXT,
 	last_updated INT4 NOT NULL, 
+	deleted INT2 DEFAULT '0',
 
 	PRIMARY KEY (language_id, response_id)
 );
@@ -118,6 +122,7 @@ CREATE TABLE channels (
 
 	userflags INT2 DEFAULT '0',
 	last_updated INT4 NOT NULL, 
+	deleted INT2 DEFAULT '0',
 
 	PRIMARY KEY (id)
 );
@@ -139,6 +144,7 @@ CREATE TABLE bans (
 	expires INT4,					-- Expiration timestamp.
 	reason VARCHAR (128), 
 	last_updated INT4 NOT NULL, 
+	deleted INT2 DEFAULT '0',
 
 	PRIMARY KEY (banmask,channel_id)
 );
@@ -168,6 +174,8 @@ CREATE TABLE users (
 -- 0x00 04 -- Invisible.
 	last_updated_by VARCHAR (128),		-- nick!user@host
 	last_updated INT4 NOT NULL, 
+	deleted INT2 DEFAULT '0',
+	signup_cookie VARCHAR(255) DEFAULT '',
 
 	PRIMARY KEY ( id )
 ) ;
@@ -204,6 +212,7 @@ CREATE TABLE levels (
 	last_Modif INT4,
 	last_Modif_By VARCHAR( 128 ),
 	last_Updated INT4 NOT NULL, 
+	deleted INT2 DEFAULT '0',
 
 	PRIMARY KEY( channel_id, user_id )
 );
@@ -229,7 +238,8 @@ CREATE TABLE channellog (
 -- 10 -- EV_REMOVEALL - When REMOVEALL command is used.
 -- 11 -- EV_IDLE - When a channel is idle for > 48 hours.
 	message TEXT,
-	last_updated INT4 NOT NULL 
+	last_updated INT4 NOT NULL,
+	deleted INT2 DEFAULT '0'
 );
 
 CREATE INDEX channellog_channelID_idx ON channellog(channelID);
@@ -241,6 +251,9 @@ CREATE TABLE userlog (
 	event INT4 DEFAULT '0',
 -- 1 -- EV_SUSPEND - Notification/Reason for suspension.
 -- 2 -- EV_UNSUSPEND - Notification of an unsuspend.
+-- 3 -- EV_MODIF - Modification of user record by an admin.
+-- 4 -- EV_MISC - Uncategorised event.
+-- 5 -- EV_COMMENT - Admin comment on username.
 	message TEXT,
 	last_updated INT4 NOT NULL 
 );
@@ -261,6 +274,8 @@ CREATE TABLE supporters (
 -- Number of times this 'supporter' has joined the channel.
 -- Field updated by CMaster to reflect channel 'traffic'.
 	last_updated INT4 NOT NULL, 
+	deleted INT2 DEFAULT '0',
+
 	PRIMARY KEY(channel_id,user_id)
 );
 
@@ -315,6 +330,8 @@ CREATE TABLE domain (
 -- 0x00 02 - Good Domain.
 -- 0x00 04 - Pending Domain.
 	last_updated INT4 NOT NULL, 
+	deleted INT2 DEFAULT '0',
+
 	PRIMARY KEY(id)
 ); 
 

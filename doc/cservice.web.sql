@@ -1,19 +1,20 @@
 ------------------------------------------------------------------------------------
--- "$Id: cservice.web.sql,v 1.12 2001/10/14 05:04:46 nighty Exp $"
+-- "$Id: cservice.web.sql,v 1.13 2001/10/14 05:44:27 nighty Exp $"
 -- Channel service DB SQL file for PostgreSQL.
 --
 -- Tables specific to webbased registration process.
 --
 -- Perry Lorier <perry@coders.net>
--- nighty <nighty@undernet.org>
+-- nighty <nighty@undernet.org> - Correcte tables and added missing fields
 
 CREATE TABLE pendingusers (
-	user_name VARCHAR(63),
+	user_name VARCHAR(12),
 	cookie VARCHAR(32),
 	email VARCHAR(255),
 	expire INT4,
 	question_id INT2,
-	verificationdata VARCHAR(30)
+	verificationdata VARCHAR(30),
+	language INT4 NOT NULL
 );
 
 CREATE INDEX pendingusers_cookie_idx ON pendingusers(cookie);
@@ -24,21 +25,13 @@ CREATE INDEX pendingusers_cookie_idx ON pendingusers(cookie);
 -- times a minute.
 
 CREATE TABLE lastrequests (
-	ip VARCHAR(15),
+	ip VARCHAR(15) DEFAULT '0.0.0.0',
 	last_request_ts INT4
 );
 
 CREATE INDEX lastrequests_ip_idx ON lastrequests(ip);
 
  -- list of admins that have the ability to modify NOREG entries (other admins may only list them) 
-
-CREATE TABLE regteam ( 
-	admin_id int4 REFERENCES users(id) NOT NULL
-);
-
-CREATE TABLE abuseteam ( 
-	admin_id int4 REFERENCES users(id) NOT NULL
-);
 
 CREATE TABLE webaccessteam ( 
 	admin_id int4 REFERENCES users(id) NOT NULL,
@@ -63,4 +56,14 @@ CREATE TABLE variables (
 	contents text,
 	PRIMARY KEY(var_name)
 )
+
+CREATE TABLE timezones (
+	tz_index SERIAL,
+	tz_name VARCHAR(128) NOT NULL,
+	tz_countrycode VARCHAR(5) NOT NULL,
+	tz_acronym VARCHAR(10) NOT NULL,
+	deleted INT2 DEFAULT '0',
+	last_updated INT4 NOT NULL
+);
+
 
