@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: cservice.cc,v 1.243 2005/01/08 23:33:42 dan_karrels Exp $
+ * $Id: cservice.cc,v 1.244 2005/03/16 20:29:55 dan_karrels Exp $
  */
 
 #include	<new>
@@ -3033,11 +3033,19 @@ xClient::OnChannelEvent( whichEvent, theChan,
  */
 sqlBan* cservice::isBannedOnChan(sqlChannel* theChan, iClient* theClient)
 {
-map < int,sqlBan* >::iterator ptr = theChan->banList.begin();
+map < int,sqlBan* >::const_iterator ptr = theChan->banList.begin();
 
-while (ptr != theChan->banList.end())
+for( ; ptr != theChan->banList.end() ; ++ptr )
 	{
+	// NOTE: This is a band-aid, it does not correct the actual
+	// problem..
 	sqlBan* theBan = ptr->second;
+	if( 0 == theBan )
+		{
+		elog	<< "cservice::isBannedOnChan> Invalid ban!"
+			<< endl ;
+		continue ;
+		}
 
 	if( (match(theBan->getBanMask(),
 		theClient->getNickUserHost()) == 0) ||
@@ -3046,7 +3054,6 @@ while (ptr != theChan->banList.end())
 			{
 			return theBan;
 			}
-	++ptr;
 	} /* while() */
 
 return NULL;
