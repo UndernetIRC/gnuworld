@@ -1,7 +1,7 @@
 #!/usr/local/pgsql/bin/pgtclsh
-# $Id: appjudge,v 1.10 2003/07/19 01:12:53 nighty Exp $
+# $Id: appjudge,v 1.11 2003/08/23 16:02:25 nighty Exp $
 # Author: sengaia@undernet.org, 20010619
-# Last modif: nighty@undernet.org, 20030717 (added a feature to rejects apps with anyone suspended on it at review time)
+# Last modif: nighty@undernet.org, 20030823 (fixed the feature, added more traps, packed a couple of procs, added ability of running the judge remotely)
 # This script automates a good part of the channel-registration process, you need
 # to set up sensible settings in appjudge-config for it to do you any good though.
 
@@ -83,11 +83,51 @@ proc check_comments {hDB channel_id} {
 	return $check_res
 }
 
+proc check_fraudulous {hDB chan_id} {
+	set supporter_ids ""
+	pg_select $hDB "SELECT channel_id,user_id FROM supporters WHERE (channel_id = $chan_id)" sup_res {
+		lappend supporter_ids [lindex [array get sup_res "user_id"] 1]
+	}
+	# check for fraudulous users
+	set isfraud 0
+        foreach sup_id $supporter_ids  {
+		pg_select $hDB "SELECT id,user_name,flags FROM users where id=$sup_id" user_res {
+                	set user_flags [lindex [array get user_res "flags"] 1]
+                	if {[expr $user_flags & 8]} { incr isfraud }
+		}
+	}
+	pg_select $hDB "SELECT id,user_name,flags FROM users where id=$mgr_id" user_res {
+        	set user_flags [lindex [array get user_res "flags"] 1]
+        	if {[expr $user_flags & 8]} { incr isfraud }
+	}
+	return $isfraud
+}
+
+proc check_suspended {hDB chan_id} {
+	set supporter_ids ""
+	pg_select $hDB "SELECT channel_id,user_id FROM supporters WHERE (channel_id = $chan_id)" sup_res {
+		lappend supporter_ids [lindex [array get sup_res "user_id"] 1]
+	}
+	# check for suspended applicant/supporter
+	set issusp 0
+        foreach sup_id $supporter_ids  {
+		pg_select $hDB "SELECT id,user_name,flags FROM users where id=$sup_id" user_res {
+                	set user_flags [lindex [array get user_res "flags"] 1]
+                	if {[expr $user_flags & 1]} { incr issusp }
+		}
+	}
+	pg_select $hDB "SELECT id,user_name,flags FROM users where id=$mgr_id" user_res {
+        	set user_flags [lindex [array get user_res "flags"] 1]
+        	if {[expr $user_flags & 1]} { incr issusp }
+	}
+	return $issusp
+}
+
 # Open the DB
 if {$SQL_PASS == ""} {
-	set hSQL [pg_connect -conninfo "dbname=$SQL_DB user=$SQL_USER"]
+	set hSQL [pg_connect -conninfo "host=$SQL_HOST dbname=$SQL_DB user=$SQL_USER"]
 } else {
-	set hSQL [pg_connect -conninfo "dbname=$SQL_DB password=$SQL_PASS user=$SQL_USER"]
+	set hSQL [pg_connect -conninfo "host=$SQL_HOST dbname=$SQL_DB password=$SQL_PASS user=$SQL_USER"]
 }
 puts [format "%s: The court is now in session." [clock_stamp]]
 
@@ -148,45 +188,18 @@ pg_select $hSQL "SELECT channel_id,status,manager_id,reviewed FROM pending WHERE
 	set mgr_id [lindex [array get t_notified "manager_id"] 1]
 	set reviewed [lindex [array get t_notified "reviewed"] 1]
 	# Figure out what to do
-	if {![check_comments $hSQL $chan_id]} { # 0 objection found !
-
+	if {![check_comments $hSQL $chan_id]} { # NO objection found !, good.
 		# Has a human being seen this application?
 		if {$reviewed == "Y"} {
-			set supporter_ids ""
-			pg_select $hSQL "SELECT channel_id,user_id FROM supporters WHERE (channel_id = $chan_id)" sup_res {
-                		lappend supporter_ids [lindex [array get sup_res "user_id"] 1]
-        		}
-			# check for fraudulous users
-			set isfraud 0
-		        foreach sup_id $supporter_ids  {
-                		pg_select $hSQL "SELECT id,user_name,flags FROM users where id=$sup_id" user_res {
-	                        	set user_flags [lindex [array get user_res "flags"] 1]
-	                        	if {[expr $user_flags & 8]} { incr isfraud }
-                		}
-        		}
-               		pg_select $hSQL "SELECT id,user_name,flags FROM users where id=$mgr_id" user_res {
-                        	set user_flags [lindex [array get user_res "flags"] 1]
-                        	if {[expr $user_flags & 8]} { incr isfraud }
-               		}
-			if {$isfraud > 0} { # move it to 'Ready for review' is anyone if fraudulous
-				puts [format "%s: Moving channel %s to status %d (%d fraudulent applicant/supporters found)" [clock_stamp] [get_channel $hSQL $chan_id] $AS_PENDREVIEW $isfraud]
-				pg_exec $hSQL "UPDATE pending SET status=$AS_PENDREVIEW,last_updated=now()::abstime::int4 WHERE channel_id=$chan_id"
+			set issusp check_suspended $hSQL $chan_id
+			if ($issusp > 0) { # reject the channel if any suspended found !
+				puts [format "%s: Moving channel %s to status %d (%d suspended applicant/supporters found)" [clock_stamp] [get_channel $hSQL $chan_id] $AS_REJECTED $issusp]
+				reject_app $hSQL $chan_id "The applicant and/or one or more of the supporters are suspended."
 			} else {
-				# check for suspended applicant/supporter
-				set issusp 0
-			        foreach sup_id $supporter_ids  {
-	                		pg_select $hSQL "SELECT id,user_name,flags FROM users where id=$sup_id" user_res {
-		                        	set user_flags [lindex [array get user_res "flags"] 1]
-		                        	if {[expr $user_flags & 1]} { incr issusp }
-	                		}
-	        		}
-	               		pg_select $hSQL "SELECT id,user_name,flags FROM users where id=$mgr_id" user_res {
-	                        	set user_flags [lindex [array get user_res "flags"] 1]
-	                        	if {[expr $user_flags & 1]} { incr issusp }
-	               		}
-				if ($issusp > 0) { # reject the channel if any suspended found !
-					puts [format "%s: Moving channel %s to status %d (%d suspended applicant/supporters found)" [clock_stamp] [get_channel $hSQL $chan_id] $AS_REJECTED $issusp]
-					reject_app $hSQL $chan_id "The applicant and/or one or more of the supporters are suspended."
+				set isfraud check_fraudulous $hSQL $chan_id
+				if {$isfraud > 0} { # move it to 'Ready for review' if anyone is fraudulous
+					puts [format "%s: Moving channel %s to status %d (%d fraudulent applicant/supporters found)" [clock_stamp] [get_channel $hSQL $chan_id] $AS_PENDREVIEW $isfraud]
+					pg_exec $hSQL "UPDATE pending SET status=$AS_PENDREVIEW,last_updated=now()::abstime::int4 WHERE channel_id=$chan_id"
 				} else {
 					# Register the channel
 			        	log_channel $hSQL $chan_id "ACCEPTED" "All checks passed." 7
@@ -198,12 +211,29 @@ pg_select $hSQL "SELECT channel_id,status,manager_id,reviewed FROM pending WHERE
 				}
 			}
 		} else {
-			# No, label it for review
-		        puts [format "%s: Moving channel %s to status %d (it was never reviewed)" [clock_stamp] [get_channel $hSQL $chan_id] $AS_PENDREVIEW]
-                        pg_exec $hSQL "UPDATE pending SET status=$AS_PENDREVIEW,last_updated=now()::abstime::int4 WHERE channel_id=$chan_id"
+			# No, label it for review if no one is suspended on it
+			set issusp check_suspended $hSQL $chan_id
+			if ($issusp > 0) { # reject the channel if any suspended found !
+				puts [format "%s: Moving channel %s to status %d (%d suspended applicant/supporters found)" [clock_stamp] [get_channel $hSQL $chan_id] $AS_REJECTED $issusp]
+				reject_app $hSQL $chan_id "The applicant and/or one or more of the supporters are suspended."
+			} else {
+				puts [format "%s: Moving channel %s to status %d (it was never reviewed)" [clock_stamp] [get_channel $hSQL $chan_id] $AS_PENDREVIEW]
+        	                pg_exec $hSQL "UPDATE pending SET status=$AS_PENDREVIEW,last_updated=now()::abstime::int4 WHERE channel_id=$chan_id"
+			}
+		}
+	} else { # Objections found, label it for review if no one is suspended on it ;)
+		set issusp check_suspended $hSQL $chan_id
+		if ($issusp > 0) { # reject the channel if any suspended found !
+			puts [format "%s: Moving channel %s to status %d (%d suspended applicant/supporters found)" [clock_stamp] [get_channel $hSQL $chan_id] $AS_REJECTED $issusp]
+			reject_app $hSQL $chan_id "The applicant and/or one or more of the supporters are suspended."
+		} else {
+			puts [format "%s: Moving channel %s to status %d (it was never reviewed)" [clock_stamp] [get_channel $hSQL $chan_id] $AS_PENDREVIEW]
+        	        pg_exec $hSQL "UPDATE pending SET status=$AS_PENDREVIEW,last_updated=now()::abstime::int4 WHERE channel_id=$chan_id"
 		}
 	}
 }
+
+
 
 # Now that wasn't so hard...
 pg_disconnect $hSQL

@@ -1,11 +1,12 @@
 #
-# $Id: appjudge-config,v 1.6 2003/07/14 10:35:44 nighty Exp $
+# $Id: appjudge-config,v 1.7 2003/08/23 16:02:25 nighty Exp $
 # original code by Sengaia
 #
 # Database name (duh)
 set SQL_DB "cservice"
 set SQL_USER "gnuworld"
 set SQL_PASS ""
+set SQL_HOST "127.0.0.1"
 
 # Number of seconds in a day, I suggest you do not change this ;)
 set DAY				86400
