@@ -8,7 +8,7 @@
  *
  * Caveats: None
  *
- * $Id: PURGECommand.cc,v 1.13 2001/09/05 03:47:56 gte Exp $
+ * $Id: PURGECommand.cc,v 1.14 2001/12/08 19:15:41 gte Exp $
  */
 
 #include	<string>
@@ -22,7 +22,7 @@
 #include	"responses.h"
 #include	"cservice_config.h"
 
-const char PURGECommand_cc_rcsId[] = "$Id: PURGECommand.cc,v 1.13 2001/09/05 03:47:56 gte Exp $" ;
+const char PURGECommand_cc_rcsId[] = "$Id: PURGECommand.cc,v 1.14 2001/12/08 19:15:41 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -78,6 +78,17 @@ if (level < level::purge)
 	}
 
 /*
+ * Don't purge the channel if NOPURGE is set.
+ */
+
+if(theChan->getFlag(sqlChannel::F_NOPURGE))
+{
+	bot->Notice(theClient, "%s has NOPURGE set, so I'm not purging it.",
+		theChan->getName().c_str());
+	return false;
+}
+
+/*
  * Fetch some information about the owner of this channel, so we can
  * 'freeze' it for future investigation in the log.
  */
@@ -121,17 +132,32 @@ if( status != PGRES_TUPLES_OK )
 	}
 
 /*
- *  Set this channel records registered_ts to 0 (ie: not registered).
- *  The register command, and suitable PHP can re-register this channel.
+ * Reset everything back to nice default values.
+ */
+
+theChan->clearFlags();
+theChan->setMassDeopPro(3);
+theChan->setFloodPro(7);
+theChan->setURL("");
+theChan->setDescription("");
+theChan->setComment("");
+theChan->setKeywords("");
+theChan->setRegisteredTS(0);
+theChan->setChannelMode("+tn");
+theChan->commit();
+
+/*
+ * Permanently delete all associated Level records for this channel.
  */
 
 strstream theQuery ;
-theQuery	<< "UPDATE channels set registered_ts = 0 WHERE id = "
-		<< theChan->getID()
-		<< ends;
+
+theQuery	<< "DELETE FROM levels WHERE channel_id = "
+			<< theChan->getID()
+			<< ends;
 
 #ifdef LOG_SQL
-	elog	<< "sqlQuery> "
+elog	<< "sqlQuery> "
 		<< theQuery.str()
 		<< endl;
 #endif
@@ -146,6 +172,34 @@ if( status != PGRES_COMMAND_OK )
 		<< endl ;
 	return false ;
 	}
+
+/*
+ * Bin 'em all.
+ */
+
+cservice::sqlLevelHashType::const_iterator ptr = bot->sqlLevelCache.begin();
+cservice::sqlLevelHashType::key_type thePair;
+
+while(ptr != bot->sqlLevelCache.end())
+{
+	sqlLevel* tmpLevel = ptr->second;
+	unsigned int channel_id = ptr->first.second;
+
+	if (channel_id == theChan->getID())
+	{
+		thePair = ptr->first;
+		elog << "Purging Level Record for: " << thePair.second << " (UID: " << thePair.first << ")" << endl;
+
+		++ptr;
+		bot->sqlLevelCache.erase(thePair);
+
+		delete(tmpLevel);
+	} else
+	{
+		++ptr;
+	}
+
+}
 
 string reason = st.assemble(2);
 

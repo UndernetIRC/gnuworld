@@ -1,7 +1,15 @@
 Newest changes at the top of the file:
-$Id: RELEASE.NOTES,v 1.18 2001/07/30 18:49:34 gte Exp $
+$Id: RELEASE.NOTES,v 1.19 2001/12/08 19:15:41 gte Exp $
 
-CMaster 1.0pl8 - Current
+CMaster 1.1pl3 - 07/12/2001
+* Make PURGE obey the NOPURGE flag.
+* Make PURGE automatically remove associated level records 
+  from the memory cache and the Db, and also remove flags,
+  description, comments, etc.
+
+[..TODO..]
+
+CMaster 1.0pl8 - 25/07/2001
 * Modify BANLIST so you must have level 1+ in the channel now,
   however you can view channel bans from outside the channel
   now.

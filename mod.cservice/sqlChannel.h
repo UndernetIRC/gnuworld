@@ -1,7 +1,7 @@
 /* sqlChannel.h */
 
 #ifndef __SQLCHANNEL_H
-#define __SQLCHANNEL_H "$Id: sqlChannel.h,v 1.35 2001/09/12 21:02:47 gte Exp $"
+#define __SQLCHANNEL_H "$Id: sqlChannel.h,v 1.36 2001/12/08 19:15:41 gte Exp $"
 
 #include	<string>
 #include	<map>
@@ -147,6 +147,9 @@ public:
 
 	inline void removeFlag( const flagType& whichFlag )
 		{ flags &= ~whichFlag; }
+
+	inline void clearFlags()
+		{ flags = 0; }
 
 	inline void setMassDeopPro( const unsigned short int& _mass_deop_pro )
 		{ mass_deop_pro = _mass_deop_pro; }
