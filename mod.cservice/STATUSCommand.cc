@@ -1,24 +1,24 @@
 /* STATUSCommand.cc */
 
 #include	<string>
- 
+
 #include	"StringTokenizer.h"
-#include	"ELog.h" 
-#include	"cservice.h" 
+#include	"ELog.h"
+#include	"cservice.h"
 #include	"levels.h"
 #include	"responses.h"
 #include	"Network.h"
 #include	"cservice_config.h"
- 
-const char STATUSCommand_cc_rcsId[] = "$Id: STATUSCommand.cc,v 1.31 2001/07/16 19:31:18 gte Exp $" ;
+
+const char STATUSCommand_cc_rcsId[] = "$Id: STATUSCommand.cc,v 1.32 2001/08/19 16:21:02 gte Exp $" ;
 
 namespace gnuworld
 {
 
 using std::string ;
- 
+
 bool STATUSCommand::Exec( iClient* theClient, const string& Message )
-{ 
+{
 StringTokenizer st( Message ) ;
 if( st.size() < 2 )
 	{
@@ -37,11 +37,11 @@ if (!theUser)
 	return false;
 	}
 
-/* 
+/*
  *  Check the channel is actually registered.
  */
 
-if (st[1] == "*") 
+if (st[1] == "*")
 	{
 	/*
 	 *  Special case, display admin stats.
@@ -53,7 +53,7 @@ if (st[1] == "*")
 		bot->Notice(theClient,
 			bot->getResponse(theUser, language::chan_not_reg).c_str(),
 			st[1].c_str());
-		return false; 
+		return false;
 		}
 
 	/*
@@ -76,33 +76,33 @@ if (st[1] == "*")
 	float banEf = (bot->banCacheHits ?
 		((float)bot->banCacheHits / banTotal * 100) : 0);
 
-	bot->Notice(theClient, 
+	bot->Notice(theClient,
 		bot->getResponse(theUser,
 			language::status_tagline,
-			string("CMaster Channel Services internal status:"))); 
+			string("CMaster Channel Services internal status:")));
 
-	bot->Notice(theClient, 
+	bot->Notice(theClient,
 		bot->getResponse(theUser,
 			language::status_chan_rec,
-			string("[     Channel Record Stats] \002Cached Entries:\002 %i    \002DB Requests:\002 %i    \002Cache Hits:\002 %i    \002Efficiency:\002 %.2f%%")).c_str(), 
+			string("[     Channel Record Stats] \002Cached Entries:\002 %i    \002DB Requests:\002 %i    \002Cache Hits:\002 %i    \002Efficiency:\002 %.2f%%")).c_str(),
 		bot->sqlChannelCache.size(),
 		bot->channelHits,
 		bot->channelCacheHits,
 		chanEf);
 
-	bot->Notice(theClient, 
+	bot->Notice(theClient,
 		bot->getResponse(theUser,
 			language::status_user_rec,
-			string("[        User Record Stats] \002Cached Entries:\002 %i    \002DB Requests:\002 %i    \002Cache Hits:\002 %i    \002Efficiency:\002 %.2f%%")).c_str(), 
+			string("[        User Record Stats] \002Cached Entries:\002 %i    \002DB Requests:\002 %i    \002Cache Hits:\002 %i    \002Efficiency:\002 %.2f%%")).c_str(),
 		bot->sqlUserCache.size(),
 		bot->userHits,
 		bot->userCacheHits,
 		userEf);
 
-	bot->Notice(theClient, 
+	bot->Notice(theClient,
 		bot->getResponse(theUser,
 			language::status_access_rec,
-			string("[Access Level Record Stats] \002Cached Entries:\002 %i    \002DB Requests:\002 %i    \002Cache Hits:\002 %i    \002Efficiency:\002 %.2f%%")).c_str(), 
+			string("[Access Level Record Stats] \002Cached Entries:\002 %i    \002DB Requests:\002 %i    \002Cache Hits:\002 %i    \002Efficiency:\002 %.2f%%")).c_str(),
 		bot->sqlLevelCache.size(),
 		bot->levelHits,
 		bot->levelCacheHits,
@@ -111,7 +111,7 @@ if (st[1] == "*")
 	bot->Notice(theClient,
 		bot->getResponse(theUser,
 			language::status_ban_rec,
-			string("[         Ban Record Stats] \002Cached Entries:\002 %i    \002DB Requests:\002 %i    \002Cache Hits:\002 %i    \002Efficiency:\002 %.2f%%")).c_str(), 
+			string("[         Ban Record Stats] \002Cached Entries:\002 %i    \002DB Requests:\002 %i    \002Cache Hits:\002 %i    \002Efficiency:\002 %.2f%%")).c_str(),
 		bot->sqlBanCache.size(),
 		bot->banHits,
 		bot->banCacheHits,
@@ -129,20 +129,20 @@ if (st[1] == "*")
 	bot->Notice(theClient, "Last recieved Ban NOTIFY: %s",
 			bot->prettyDuration(bot->lastBanRefresh).c_str());
 
-	bot->Notice(theClient, 
+	bot->Notice(theClient,
 		bot->getResponse(theUser,
 			language::status_data_alloc,
 			string("Custom data containers allocated: %i")).c_str(),
 			bot->customDataAlloc);
 
 	float joinTotal = ((float)bot->joinCount / (float)Network->channelList_size()) * 100;
-	bot->Notice(theClient, "I am in %i channels out of %i on the network. (%.2f%%)", 
+	bot->Notice(theClient, "I am in %i channels out of %i on the network. (%.2f%%)",
 		bot->joinCount, Network->channelList_size(), joinTotal);
 
-	bot->Notice(theClient, 
+	bot->Notice(theClient,
 		bot->getResponse(theUser,
 			language::status_uptime,
-			string("\002Uptime:\002 %s")).c_str(),  
+			string("\002Uptime:\002 %s")).c_str(),
 		bot->prettyDuration(bot->getUplink()->getStartTime()
 			+ bot->dbTimeOffset).c_str());
 
@@ -156,7 +156,7 @@ if (!theChan)
 		bot->getResponse(theUser, language::chan_not_reg).c_str(),
 		st[1].c_str());
 	return false;
-	} 
+	}
 
 /*
  *  Check the user has sufficient access on this channel.
@@ -172,32 +172,32 @@ if ((level < level::status) && (admLevel <= 0) && !theClient->isOper())
 	bot->Notice(theClient,
 		bot->getResponse(theUser, language::insuf_access).c_str());
 	return false;
-	} 
+	}
 
 /*
- *  Display some fancy info about the channel. 
+ *  Display some fancy info about the channel.
  */
 Channel* tmpChan = Network->findChannel(theChan->getName());
 
 if (tmpChan)
 	{
 	// If the person has access >200, or is a 1+ admin (or and Oper).
-	bot->Notice(theClient, 
+	bot->Notice(theClient,
 		bot->getResponse(theUser,
 			language::status_chan_info,
 			string("Channel %s has %d users (%i operators)")).c_str(),
 		tmpChan->getName().c_str(),
 		tmpChan->size(),
 		bot->countChanOps(tmpChan) ) ;
-	if ((level >= 200) || (admLevel >= 1) || theClient->isOper()) 
+	if ((level >= 200) || (admLevel >= 1) || theClient->isOper())
 		{
-		bot->Notice(theClient, 
+		bot->Notice(theClient,
 			bot->getResponse(theUser,
 				language::status_mode,
 				string("Mode is: %s")).c_str(),
 			tmpChan->getModeString().c_str() ) ;
 		}
- 
+
 	/*
 	 * Are we on this channel?
 	 */
@@ -223,8 +223,8 @@ if (tmpChan)
 				<< sqlChannel::EV_PART << " OR event = "
 				<< sqlChannel::EV_OPERJOIN << " OR event = "
 				<< sqlChannel::EV_OPERPART << ")"
-				<< " AND channelID = " 
-				<< theChan->getID() 
+				<< " AND channelID = "
+				<< theChan->getID()
 				<< " ORDER BY ts DESC LIMIT 3"
 				<< ends;
 
@@ -234,7 +234,7 @@ if (tmpChan)
 			<< endl;
 #endif
 
-		ExecStatusType status = bot->SQLDb->Exec( theQuery.str() ) ; 
+		ExecStatusType status = bot->SQLDb->Exec( theQuery.str() ) ;
 		delete[] theQuery.str();
 
 		if( PGRES_TUPLES_OK != status )
@@ -274,7 +274,7 @@ if (tmpChan)
 					{
 					type = "OPERPART";
 					break;
-					} 
+					}
 				case sqlChannel::EV_PART:
 					{
 					type = "PART";
@@ -283,13 +283,13 @@ if (tmpChan)
 				case sqlChannel::EV_FORCE:
 					{
 					type = "FORCE";
-					break; 
+					break;
 					}
 				} // switch()
 
 		bot->Notice(theClient, "%s ago: %s %s",
 			bot->prettyDuration(
-				atoi(bot->SQLDb->GetValue(i, 0)) ).c_str(), 
+				atoi(bot->SQLDb->GetValue(i, 0)) ).c_str(),
 			type.c_str(),
 			bot->SQLDb->GetValue(i, 3));
 
@@ -303,10 +303,10 @@ if (tmpChan)
 	}
 
 
-bot->Notice(theClient, "MassDeopPro: %i, FloodPro: %i", 
+bot->Notice(theClient, "MassDeopPro: %i, FloodPro: %i",
 	theChan->getMassDeopPro(),
 	theChan->getFloodPro());
- 
+
 string flagsSet;
 if (theChan->getFlag(sqlChannel::F_NOPURGE)) flagsSet += "NOPURGE ";
 if (theChan->getFlag(sqlChannel::F_SPECIAL)) flagsSet += "SPECIAL ";
@@ -319,13 +319,13 @@ if (theChan->getFlag(sqlChannel::F_VACATION)) flagsSet += "VACATION ";
 if (theChan->getFlag(sqlChannel::F_ALWAYSOP)) flagsSet += "ALWAYSOP ";
 if (theChan->getFlag(sqlChannel::F_STRICTOP)) flagsSet += "STRICTOP ";
 if (theChan->getFlag(sqlChannel::F_NOOP)) flagsSet += "NOOP ";
-if (theChan->getFlag(sqlChannel::F_AUTOTOPIC)) flagsSet += "AUTOTOPIC "; 
+if (theChan->getFlag(sqlChannel::F_AUTOTOPIC)) flagsSet += "AUTOTOPIC ";
 if (theChan->getFlag(sqlChannel::F_AUTOJOIN)) flagsSet += "AUTOJOIN ";
 if (theChan->getFlag(sqlChannel::F_LOCKED)) flagsSet += "LOCKED ";
 
-bot->Notice(theClient, 
+bot->Notice(theClient,
 	bot->getResponse(theUser, language::status_flags,
-		string("Flags set: %s")).c_str(),flagsSet.c_str()); 
+		string("Flags set: %s")).c_str(),flagsSet.c_str());
 
 /*
  *  Get a list of authenticated users on this channel.
@@ -337,7 +337,7 @@ authQuery	<< "SELECT users.user_name,levels.access FROM "
 		<< "AND levels.channel_id = "
 		<< theChan->getID()
 		<< " ORDER BY levels.access DESC"
-		<< ends; 
+		<< ends;
 
 #ifdef LOG_SQL
 	elog	<< "sqlQuery> "
@@ -345,11 +345,11 @@ authQuery	<< "SELECT users.user_name,levels.access FROM "
 		<< endl;
 #endif
 
-ExecStatusType status = bot->SQLDb->Exec( authQuery.str() ) ; 
-delete[] authQuery.str(); 
+ExecStatusType status = bot->SQLDb->Exec( authQuery.str() ) ;
+delete[] authQuery.str();
 
-if( PGRES_TUPLES_OK != status ) 
-	{ 
+if( PGRES_TUPLES_OK != status )
+	{
 	elog	<< "STATUS> SQL Error: "
 		<< bot->SQLDb->ErrorMessage()
 		<< endl ;
@@ -358,6 +358,14 @@ if( PGRES_TUPLES_OK != status )
 
 string authList;
 string nextPerson;
+
+/* Only show the nicknames if we are actually on that channel. */
+
+bool showNicks = false;
+if (tmpChan)
+	{
+	showNicks = (tmpChan->findUser(theClient) || admLevel);
+	}
 
 for (int i = 0 ; i < bot->SQLDb->Tuples(); i++)
 	{
@@ -372,16 +380,22 @@ for (int i = 0 ; i < bot->SQLDb->Tuples(); i++)
 		{
 		iClient* tmpClient = ptr->second->isAuthed();
 		if( !tmpClient )
-			{ 
+			{
 			continue ;
 			}
 
 		nextPerson += bot->SQLDb->GetValue(i, 0);
-		nextPerson += "/";
-		nextPerson += tmpClient->getNickName();
-		nextPerson += " (";
+
+		if (showNicks)
+			{
+			nextPerson += "/\002";
+			nextPerson += tmpClient->getNickName();
+			nextPerson += "\002";
+			}
+
+		nextPerson += " [";
 		nextPerson += bot->SQLDb->GetValue(i, 1);
-		nextPerson += ") ";
+		nextPerson += "] ";
 
 		/*
 		 *  Will this string overflow our Notice buffer?
@@ -390,38 +404,38 @@ for (int i = 0 ; i < bot->SQLDb->Tuples(); i++)
 		if(nextPerson.size() + authList.size() > 400)
 			{
 			bot->Notice(theClient, "Auth: %s", authList.c_str());
-			authList.erase( authList.begin(), authList.end() ); 
-			} 
+			authList.erase( authList.begin(), authList.end() );
+			}
 
 		/*
 		 * Add it on to our list.
 		 */
 
-		authList += nextPerson; 
-		nextPerson.erase( nextPerson.begin(), nextPerson.end() );	
+		authList += nextPerson;
+		nextPerson.erase( nextPerson.begin(), nextPerson.end() );
 		}
 
 
 	} // for()
- 
+
 bot->Notice(theClient, "Auth: %s", authList.c_str());
 
 /*
  *  Finally(!) display a quick list of everyone 'forced' on the
- *  channel. 
+ *  channel.
  */
 
 if (admLevel >= 1)
 {
 	for(sqlChannel::forceMapType::const_iterator ptr = theChan->forceMap.begin();
 		ptr != theChan->forceMap.end(); ++ptr)
-		{ 
+		{
 			bot->Notice(theClient, "Force: %s (%i)",
 				ptr->second.second.c_str(), ptr->second.first);
 		}
 }
 
 return true ;
-} 
+}
 
 } // namespace gnuworld.
