@@ -41,6 +41,13 @@ relay_channel = #coder-com
 debug_channel = #coder-com
 
 #
+# Coder channel.
+#
+# Channel used to extract levels to display coder access status.
+
+coder_channel = #coder-com
+
+#
 # Frequency in seconds to check the database for updates.
 #
 
