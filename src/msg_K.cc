@@ -17,11 +17,12 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_K.cc,v 1.8 2002/05/27 17:18:13 dan_karrels Exp $
+ * $Id: msg_K.cc,v 1.9 2002/07/05 01:10:06 dan_karrels Exp $
  */
 
 #include	<new>
 #include	<string>
+#include	<iostream>
 
 #include	<cassert>
 
@@ -34,8 +35,9 @@
 
 #include	"ELog.h"
 #include	"StringTokenizer.h"
+#include	"ServerCommandHandler.h"
 
-const char msg_K_cc_rcsId[] = "$Id: msg_K.cc,v 1.8 2002/05/27 17:18:13 dan_karrels Exp $" ;
+const char msg_K_cc_rcsId[] = "$Id: msg_K.cc,v 1.9 2002/07/05 01:10:06 dan_karrels Exp $" ;
 const char server_h_rcsId[] = __SERVER_H ;
 const char iClient_h_rcsId[] = __ICLIENT_H ;
 const char Channel_h_rcsId[] = __CHANNEL_H ;
@@ -50,6 +52,8 @@ namespace gnuworld
 
 using std::string ;
 using std::endl ;
+
+CREATE_HANDLER(msg_K)
 
 // AIAAA K #coder-com 0C] :This is now an IRCoperator only channel
 // Note that when a user is kicked from a channel, the user is not
@@ -74,19 +78,18 @@ using std::endl ;
 // or bounce them back to the sender, thus invalidating
 // the command sent.
 //
-int xServer::MSG_K( xParameters& Param )
+bool msg_K::Execute( const xParameters& Param )
 {
-
 // Verify that there are at least three arguments provided
 // client_source_numeric #channel client_target_numeric
 if( Param.size() < 3 )
 	{
 	// Invalid number of arguments
-	elog	<< "xServer::MSG_K> Invalid number of arguments"
+	elog	<< "msg_K> Invalid number of arguments"
 		<< endl ;
 
 	// Return error
-	return -1 ;
+	return false ;
 	}
 
 // Is this a modeless channel?
@@ -94,7 +97,7 @@ if( Param.size() < 3 )
 if( '+' == Param[ 1 ][ 0 ] )
 	{
 	// Don't care about modeless channels
-	return 0 ;
+	return true ;
 	}
 
 // Find the source client
@@ -109,14 +112,14 @@ iClient* destClient = Network->findClient( Param[ 2 ] ) ;
 if( NULL == destClient )
 	{
 	// Nope, log the error
-	elog	<< "xServer::MSG_K> ("
+	elog	<< "msg_K> ("
 		<< Param[ 1 ]
 		<< ") Unable to find client: "
 		<< Param[ 2 ]
 		<< endl ;
 
 	// Return error
-	return -1 ;
+	return false ;
 	}
 
 // Find the channel in question.
@@ -126,25 +129,26 @@ Channel* theChan = Network->findChannel( Param[ 1 ] ) ;
 if( NULL == theChan )
 	{
 	// Nope, log the error
-	elog	<< "xServer::MSG_K> Unable to find channel: "
+	elog	<< "msg_K> Unable to find channel: "
 		<< Param[ 1 ]
 		<< endl ;
 
 	// Return error
-	return -1 ;
+	return false ;
 	}
 
 ChannelUser* destChanUser = theChan->findUser( destClient ) ;
 if( NULL == destChanUser )
 	{
-	elog	<< "xServer::msg_K> Unable to find ChannelUser "
+	elog	<< "msg_K> Unable to find ChannelUser "
 		<< "for channel "
 		<< theChan->getName()
 		<< ", iClient: "
 		<< *destClient
 		<< endl ;
+
 	// Return error
-	return -1;
+	return false ;
 	}
 
 // On a network with more than 2 servers, the chances are greater
@@ -170,13 +174,13 @@ if( localKick )
 	theChan->removeUser( destClient ) ;
 
 	// Deallocate the ChannelUser
-	delete destChanUser ;
+	delete destChanUser ; destChanUser = 0 ;
 
 	// Remove the channel information from the client's internal
 	// channel structure
 	if( !destClient->removeChannel( theChan ) )
 		{
-		elog	<< "xServer::msg_K> Unable to remove channel "
+		elog	<< "msg_K> Unable to remove channel "
 			<< theChan->getName()
 			<< " from the iClient "
 			<< *destClient
@@ -189,7 +193,7 @@ else
 	// is now in the zombie state
 	destChanUser->setZombie() ;
 
-	elog	<< "xServer::msg_K> Adding zombie for user "
+	elog	<< "msg_K> Adding zombie for user "
 		<< *destChanUser
 		<< " on channel "
 		<< theChan->getName()
@@ -197,7 +201,7 @@ else
 	}
 
 // Post the channel kick event
-PostChannelKick( theChan,
+theServer->PostChannelKick( theChan,
 	srcClient,
 	destClient,
 	(Param.size() >= 4) ? Param[ 3 ] : string(),
@@ -212,8 +216,7 @@ if( theChan->empty() )
 	// TODO: Post event
 	}
 
-return 0 ;
-
+return true ;
 }
 
 } // namespace gnuworld

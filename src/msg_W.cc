@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_W.cc,v 1.5 2002/05/27 17:18:13 dan_karrels Exp $
+ * $Id: msg_W.cc,v 1.6 2002/07/05 01:10:06 dan_karrels Exp $
  */
 
 #include	<iostream>
@@ -28,8 +28,9 @@
 #include	"Network.h"
 #include	"iClient.h"
 #include	"client.h"
+#include	"ServerCommandHandler.h"
 
-const char msg_W_cc_rcsId[] = "$Id: msg_W.cc,v 1.5 2002/05/27 17:18:13 dan_karrels Exp $" ;
+const char msg_W_cc_rcsId[] = "$Id: msg_W.cc,v 1.6 2002/07/05 01:10:06 dan_karrels Exp $" ;
 const char server_h_rcsId[] = __SERVER_H ;
 const char xParameters_h_rcsId[] = __XPARAMETERS_H ;
 const char ELog_h_rcsId[] = __ELOG_H ;
@@ -42,32 +43,34 @@ namespace gnuworld
 
 using std::endl ;
 
+CREATE_HANDLER(msg_W)
+
 // ABAG7 W Az :Gte-
-int xServer::MSG_W( xParameters& Param )
+bool msg_W::Execute( const xParameters& Param )
 {
 if( Param.size() != 3 )
 	{
-	elog	<< "xServer::MSG_W> Invalid number of parameters"
+	elog	<< "msg_W> Invalid number of parameters"
 		<< endl ;
-	return -1 ;
+	return false ;
 	}
 
 iClient* sourceClient = Network->findClient( Param[ 0 ] ) ;
 if( NULL == sourceClient )
 	{
-	elog	<< "xServer::MSG_W> Unable to find source client: "
+	elog	<< "msg_W> Unable to find source client: "
 		<< Param[ 0 ]
 		<< endl ;
-	return -1 ;
+	return false ;
 	}
 
 iClient* targetClient = Network->findNick( Param[ 2 ] ) ;
 if( NULL == targetClient )
 	{
-	elog	<< "xServer::MSG_W> Unable to find target client: "
+	elog	<< "msg_W> Unable to find target client: "
 		<< Param[ 2 ]
 		<< endl ;
-	return -1 ;
+	return false ;
 	}
 
 // WHOIS must be delivered to all xclients
@@ -77,7 +80,7 @@ for( ; ptr != Network->localClient_end() ; ++ptr )
 	(*ptr)->OnWhois( sourceClient, targetClient ) ;
 	}
 
-return 0 ;
+return true ;
 }
 
 } // namespace gnuworld

@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_M.cc,v 1.14 2002/05/27 17:18:13 dan_karrels Exp $
+ * $Id: msg_M.cc,v 1.15 2002/07/05 01:10:06 dan_karrels Exp $
  */
 
 #include	<new>
@@ -35,8 +35,9 @@
 #include	"Network.h"
 #include	"ELog.h"
 #include	"StringTokenizer.h"
+#include	"ServerCommandHandler.h"
 
-const char msg_M_cc_rcsId[] = "$Id: msg_M.cc,v 1.14 2002/05/27 17:18:13 dan_karrels Exp $" ;
+const char msg_M_cc_rcsId[] = "$Id: msg_M.cc,v 1.15 2002/07/05 01:10:06 dan_karrels Exp $" ;
 const char misc_h_rcsId[] = __MISC_H ;
 const char events_h_rcsId[] = __EVENTS_H ;
 const char server_h_rcsId[] = __SERVER_H ;
@@ -55,19 +56,36 @@ using std::vector ;
 using std::endl ;
 using std::ends ;
 
+class msg_M : public ServerCommandHandler
+{
+public:
+	msg_M( xServer* theServer )
+	 : ServerCommandHandler( theServer )
+	{}
+	virtual ~msg_M()
+	{}
+
+	virtual bool Execute( const xParameters& ) ;
+
+protected:
+	bool	onUserModeChange( const xParameters& ) ;
+
+} ;
+
+CREATE_LOADER(msg_M)
+
 // Mode change
 // OAD M ripper_ :+owg
 //
 // i M #3dx +o eAA
 // J[K M DEMET_33 :+i
-int xServer::MSG_M( xParameters& Param )
+bool msg_M::Execute( const xParameters& Param )
 {
-
 if( Param.size() < 3 )
 	{
-	elog	<< "xServer::MSG_M> Invalid number of arguments"
+	elog	<< "msg_M> Invalid number of arguments"
 		<< endl ;
-	return -1 ;
+	return false ;
 	}
 
 // This source stuff really isn't used here, but it's here for
@@ -94,9 +112,10 @@ else
 
 if( (NULL == clientSource) && (NULL == serverSource) )
 	{
-	elog	<< "xServer::MSG_M> Unable to find source: "
+	elog	<< "msg_M> Unable to find source: "
 		<< Param[ 0 ]
 		<< endl ;
+	// TODO: Why is this commented out?
 	// return -1
 	}
 
@@ -104,20 +123,17 @@ if( (NULL == clientSource) && (NULL == serverSource) )
 if( '#' != Param[ 1 ][ 0 ] )
 	{
 	// Yup, process the user's mode change(s)
-	onUserModeChange( Param ) ;
-
-	// Return
-	return 0 ;
+	return onUserModeChange( Param ) ;
 	}
 
 // Find the channel in question
 Channel* theChan = Network->findChannel( Param[ 1 ] ) ;
 if( NULL == theChan )
 	{
-	elog	<< "xServer::MSG_M> Unable to find channel: "
+	elog	<< "msg_M> Unable to find channel: "
 		<< Param[ 1 ]
 		<< endl ;
-	return -1 ;
+	return false ;
 	}
 
 // Find the ChannelUser of the source client
@@ -129,21 +145,21 @@ if( clientSource != 0 )
 	theUser = theChan->findUser( clientSource ) ;
 	if( NULL == theUser )
 		{
-		elog	<< "xServer::MSG_M> ("
+		elog	<< "msg_M> ("
 			<< theChan->getName()
 			<< ") Unable to find channel user: "
 			<< clientSource->getCharYYXXX()
 			<< endl ;
-		return -1 ;
+		return false ;
 		}
 	}
 
 bool polarity = true ;
 xParameters::size_type argPos = 3 ;
 
-opVectorType opVector ;
-voiceVectorType voiceVector ;
-banVectorType banVector ;
+xServer::opVectorType opVector ;
+xServer::voiceVectorType voiceVector ;
+xServer::banVectorType banVector ;
 
 for( const char* modePtr = Param[ 2 ] ; *modePtr ; ++modePtr )
 	{
@@ -156,27 +172,27 @@ for( const char* modePtr = Param[ 2 ] ; *modePtr ; ++modePtr )
 			polarity = false ;
 			break ;
 		case 't':
-			OnChannelModeT( theChan,
+			theServer->OnChannelModeT( theChan,
 				polarity, theUser ) ;
 			break ;
 		case 'n':
-			OnChannelModeN( theChan,
+			theServer->OnChannelModeN( theChan,
 				polarity, theUser ) ;
 			break ;
 		case 's':
-			OnChannelModeS( theChan,
+			theServer->OnChannelModeS( theChan,
 				polarity, theUser ) ;
 			break ;
 		case 'p':
-			OnChannelModeP( theChan,
+			theServer->OnChannelModeP( theChan,
 				polarity, theUser ) ;
 			break ;
 		case 'm':
-			OnChannelModeM( theChan,
+			theServer->OnChannelModeM( theChan,
 				polarity, theUser ) ;
 			break ;
 		case 'i':
-			OnChannelModeI( theChan,
+			theServer->OnChannelModeI( theChan,
 				polarity, theUser ) ;
 			break ;
 
@@ -185,14 +201,14 @@ for( const char* modePtr = Param[ 2 ] ; *modePtr ; ++modePtr )
 		case 'l':
 			if( polarity && (argPos >= Param.size()) )
 				{
-				elog	<< "xServer::msg_M> Invalid "
+				elog	<< "msg_M> Invalid "
 					<< "format for message: missing "
 					<< "argument to mode +l"
 					<< endl ;
 				continue ;
 				}
 
-			OnChannelModeL( theChan,
+			theServer->OnChannelModeL( theChan,
 				polarity, theUser,
 				polarity ? atoi( Param[ argPos++ ] )
 					: 0 ) ;
@@ -202,14 +218,14 @@ for( const char* modePtr = Param[ 2 ] ; *modePtr ; ++modePtr )
 		case 'k':
 			if( argPos >= Param.size() )
 				{
-				elog	<< "xServer::msg_M> Invalid "
+				elog	<< "msg_M> Invalid "
 					<< "format for message: missing "
 					<< "argument for mode 'k'"
 					<< endl ;
 				continue ;
 				}
 
-			OnChannelModeK( theChan,
+			theServer->OnChannelModeK( theChan,
 				polarity, theUser,
 				Param[ argPos++ ] ) ;
 			break ;
@@ -217,7 +233,7 @@ for( const char* modePtr = Param[ 2 ] ; *modePtr ; ++modePtr )
 			{
 			if( argPos >= Param.size() )
 				{
-				elog	<< "xServer::msg_M> Invalid "
+				elog	<< "msg_M> Invalid "
 					<< "format for message: missing "
 					<< "argument for mode 'o'"
 					<< endl ;
@@ -228,7 +244,7 @@ for( const char* modePtr = Param[ 2 ] ; *modePtr ; ++modePtr )
 				Param[ argPos++ ] ) ;
 			if( NULL == targetClient )
 				{
-				elog	<< "xServer::MSG_M> Unable to "
+				elog	<< "msg_M> Unable to "
 					<< "find op target client: "
 					<< Param[ argPos - 1 ]
 					<< endl ;
@@ -238,7 +254,7 @@ for( const char* modePtr = Param[ 2 ] ; *modePtr ; ++modePtr )
 				targetClient ) ;
 			if( NULL == targetUser )
 				{
-				elog	<< "xServer::MSG_M> Unable to "
+				elog	<< "msg_M> Unable to "
 					<< "find op target user: "
 					<< Param[ argPos - 1 ]
 					<< endl ;
@@ -253,7 +269,7 @@ for( const char* modePtr = Param[ 2 ] ; *modePtr ; ++modePtr )
 			if( polarity && targetUser->isZombie() )
 				{
 				targetUser->removeZombie() ;
-				elog	<< "xServer::msg_M> Removing "
+				elog	<< "msg_M> Removing "
 					<< "zombie"
 					<< endl ;
 				}
@@ -263,7 +279,7 @@ for( const char* modePtr = Param[ 2 ] ; *modePtr ; ++modePtr )
 			{
 			if( argPos >= Param.size() )
 				{
-				elog	<< "xServer::msg_M> Invalid "
+				elog	<< "msg_M> Invalid "
 					<< "format for message: missing "
 					<< "argument for mode 'v'"
 					<< endl ;
@@ -274,7 +290,7 @@ for( const char* modePtr = Param[ 2 ] ; *modePtr ; ++modePtr )
 				Param[ argPos++ ] ) ;
 			if( NULL == targetClient )
 				{
-				elog	<< "xServer::MSG_M> Unable to "
+				elog	<< "msg_M> Unable to "
 					<< "find voice target client: "
 					<< Param[ argPos - 1 ]
 					<< endl ;
@@ -284,7 +300,7 @@ for( const char* modePtr = Param[ 2 ] ; *modePtr ; ++modePtr )
 				targetClient ) ;
 			if( NULL == targetUser )
 				{
-				elog	<< "xServer::MSG_M> Unable to "
+				elog	<< "msg_M> Unable to "
 					<< "find voice target user: "
 					<< Param[ argPos - 1 ]
 					<< endl ;
@@ -299,7 +315,7 @@ for( const char* modePtr = Param[ 2 ] ; *modePtr ; ++modePtr )
 			{
 			if( argPos >= Param.size() )
 				{
-				elog	<< "xServer::msg_M> Invalid "
+				elog	<< "msg_M> Invalid "
 					<< "format for message: missing "
 					<< "argument for mode 'b'"
 					<< endl ;
@@ -318,21 +334,21 @@ for( const char* modePtr = Param[ 2 ] ; *modePtr ; ++modePtr )
 
 if( !opVector.empty() )
 	{
-	OnChannelModeO( theChan, theUser, opVector ) ;
+	theServer->OnChannelModeO( theChan, theUser, opVector ) ;
 	}
 if( !voiceVector.empty() )
 	{
-	OnChannelModeV( theChan, theUser, voiceVector ) ;
+	theServer->OnChannelModeV( theChan, theUser, voiceVector ) ;
 	}
 if( !banVector.empty() )
 	{
-	OnChannelModeB( theChan, theUser, banVector ) ;
+	theServer->OnChannelModeB( theChan, theUser, banVector ) ;
 	}
 
-return 0 ;
+return true ;
 }
 
-void xServer::onUserModeChange( xParameters& Param )
+bool msg_M::onUserModeChange( const xParameters& Param )
 {
 
 // Since users aren't allowed to change modes for anyone other than
@@ -342,10 +358,11 @@ void xServer::onUserModeChange( xParameters& Param )
 iClient* theClient = Network->findNick( Param[ 1 ] ) ;
 if( NULL == theClient )
 	{
-	elog	<< "xServer::MSG_M> Unable to find target client: "
+	elog	<< "msg_M::OnUserModeChange> Unable to find target "
+		<< "client: "
 		<< Param[ 1 ]
 		<< endl ;
-	return ;
+	return false ;
 	}
 
 // Local channels are not propogated across the network.
@@ -388,12 +405,12 @@ for( const char* modePtr = Param[ 2 ] ; *modePtr ; ++modePtr )
 			if( plus )
 				{
 				theClient->setModeO() ;
-				PostEvent( EVT_OPER,
+				theServer->PostEvent( EVT_OPER,
 					static_cast< void* >( theClient ) ) ;
 				}
 			else
 				{
-//				elog	<< "xServer::onUserModeChange> "
+//				elog	<< "msg_M::onUserModeChange> "
 //					<< "Caught -o for user: "
 //					<< *theClient
 //					<< endl ;
@@ -404,7 +421,7 @@ for( const char* modePtr = Param[ 2 ] ; *modePtr ; ++modePtr )
 			break ;
 		} // close switch
 	} // close for
-
+return true ;
 }
 
 } // namespace gnuworld

@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_SQ.cc,v 1.9 2002/05/27 17:18:13 dan_karrels Exp $
+ * $Id: msg_SQ.cc,v 1.10 2002/07/05 01:10:06 dan_karrels Exp $
  */
 
 #include	<iostream>
@@ -31,8 +31,9 @@
 #include	"iServer.h"
 #include	"ELog.h"
 #include	"xparameters.h"
+#include	"ServerCommandHandler.h"
 
-const char msg_SQ_cc_rcsId[] = "$Id: msg_SQ.cc,v 1.9 2002/05/27 17:18:13 dan_karrels Exp $" ;
+const char msg_SQ_cc_rcsId[] = "$Id: msg_SQ.cc,v 1.10 2002/07/05 01:10:06 dan_karrels Exp $" ;
 const char server_h_rcsId[] = __SERVER_H ;
 const char events_h_rcsId[] = __EVENTS_H ;
 const char Network_h_rcsId[] = __NETWORK_H ;
@@ -45,6 +46,8 @@ namespace gnuworld
 
 using std::string ;
 using std::endl ;
+
+CREATE_HANDLER(msg_SQ)
 
 /**
  * SQUIT message handler.
@@ -59,14 +62,14 @@ using std::endl ;
  * 0 SQ Asheville-R.NC.US.KrushNet.Org 0 :Ping timeout
  * Az SQ Seattle-R.WA.US.KrushNet.Org 0 :Ping timeout
  */
-int xServer::MSG_SQ( xParameters& Param )
+bool msg_SQ::Execute( const xParameters& Param )
 {
 
 if( Param.size() < 2 )
 	{
-	elog	<< "xServer::MSG_SQ> Invalid number of parameters"
+	elog	<< "msg_SQ> Invalid number of parameters"
 		<< endl ;
-	return -1 ;
+	return false ;
 	}
 
 iServer* squitServer = 0 ;
@@ -83,30 +86,30 @@ else
 
 if( NULL == squitServer )
 	{
-	elog	<< "xServer::MSG_SQ> Unable to find server: "
+	elog	<< "msg_SQ> Unable to find server: "
 		<< Param[ 1 ]
 		<< endl ;
-	return -1 ;
+	return false ;
 	}
 
-if( squitServer->getIntYY() == Uplink->getIntYY() )
+if( squitServer->getIntYY() == theServer->getUplinkIntYY() )
 	{
-	elog	<< "xServer::MSG_SQ> Ive been delinked!!"
+	elog	<< "msg_SQ> Ive been delinked!!"
 		<< endl ;
 
 	// It's my uplink, we have been squit...those bastards!
-	OnDisConnect() ;
+	theServer->OnDisConnect() ;
 	}
 else
 	{
 
-//	elog	<< "xServer::MSG_SQ> " << squitServer->getName()
-//		<< " has been squit\n" ;
+//	elog	<< "msg_SQ> " << squitServer->getName()
+//		<< " has been squit" << endl ;
 
 	string source( Param[ 0 ] ) ;
 	string reason( Param[ 3 ] ) ;
 
-	PostEvent( EVT_NETBREAK,
+	theServer->PostEvent( EVT_NETBREAK,
 		static_cast< void* >( squitServer ),
 		static_cast< void* >( &source ),
 		static_cast< void* >( &reason ) ) ;
@@ -117,10 +120,10 @@ else
 	Network->OnSplit( squitServer->getIntYY() ) ;
 
 	// Remove this server from the juped list (if its there)
-	RemoveJupe(squitServer);
+	theServer->RemoveJupe(squitServer);
 	}
 
-return 0 ;
+return true ;
 }
 
 } // namespace gnuworld

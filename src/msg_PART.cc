@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_PART.cc,v 1.8 2002/05/27 17:18:13 dan_karrels Exp $
+ * $Id: msg_PART.cc,v 1.9 2002/07/05 01:10:06 dan_karrels Exp $
  */
 
 #include	<string>
@@ -32,8 +32,9 @@
 #include	"ELog.h"
 #include	"xparameters.h"
 #include	"StringTokenizer.h"
+#include	"ServerCommandHandler.h"
 
-const char msg_PART_cc_rcsId[] = "$Id: msg_PART.cc,v 1.8 2002/05/27 17:18:13 dan_karrels Exp $" ;
+const char msg_PART_cc_rcsId[] = "$Id: msg_PART.cc,v 1.9 2002/07/05 01:10:06 dan_karrels Exp $" ;
 const char server_h_rcsId[] = __SERVER_H ;
 const char events_h_rcsId[] = __EVENTS_H ;
 const char iClient_h_rcsId[] = __ICLIENT_H ;
@@ -50,16 +51,18 @@ namespace gnuworld
 using std::string ;
 using std::endl ;
 
+CREATE_HANDLER(msg_PART)
+
 // nick PART #channel,#channel2 <part msg>
-int xServer::MSG_PART( xParameters& Param )
+bool msg_PART::Execute( const xParameters& Param )
 {
 // Verify that there are at least 2 arguments:
 // client_numeric #channel
 if( Param.size() < 2 )
 	{
-	elog	<< "xServer::MSG_PART> Invalid number of arguments"
+	elog	<< "msg_PART> Invalid number of arguments"
 		<< endl ;
-	return -1 ;
+	return false ;
 	}
 
 // Find the client in question
@@ -71,14 +74,14 @@ if( NULL == theClient )
 	// Nope, no matching client found
 
 	// Log the error
-	elog	<< "xServer::MSG_PART> ("
+	elog	<< "msg_PART> ("
 		<< Param[ 1 ]
 		<< "): Unable to find client: "
 		<< Param[ 0 ]
 		<< endl ;
 
 	// Return error
-	return -1 ;
+	return false ;
 	}
 
 // Tokenize the channel string
@@ -104,7 +107,7 @@ for( StringTokenizer::size_type i = 0 ; i < st.size() ; ++i )
 	if( NULL == theChan )
 		{
 		// Channel not found, log the error
-		elog	<< "xServer::MSG_PART> Unable to find channel: "
+		elog	<< "msg_PART> Unable to find channel: "
 			<< st[ i ]
 			<< endl ;
 
@@ -123,7 +126,7 @@ for( StringTokenizer::size_type i = 0 ; i < st.size() ; ++i )
 
 	// Post the event to the clients listening for events on this
 	// channel, if any.
-	PostChannelEvent( EVT_PART, theChan,
+	theServer->PostChannelEvent( EVT_PART, theChan,
 		static_cast< void* >( theClient ) ) ;
 
 	// Is the channel now empty, and no services clients are
@@ -137,7 +140,7 @@ for( StringTokenizer::size_type i = 0 ; i < st.size() ; ++i )
 		}
 	} // for
 
-return 0 ;
+return true ;
 }
 
 } // namespace gnuworld

@@ -17,22 +17,25 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_NOOP.cc,v 1.3 2002/05/27 17:18:13 dan_karrels Exp $
+ * $Id: msg_NOOP.cc,v 1.4 2002/07/05 01:10:06 dan_karrels Exp $
  */
 
 #include	"server.h"
 #include	"xparameters.h"
+#include	"ServerCommandHandler.h"
 
 const char server_h_rcsId[] = __SERVER_H ;
 const char xparameters_h_rcsId[] = __XPARAMETERS_H ;
-const char msg_NOOP_cc_rcsId[] = "$Id: msg_NOOP.cc,v 1.3 2002/05/27 17:18:13 dan_karrels Exp $" ;
+const char msg_NOOP_cc_rcsId[] = "$Id: msg_NOOP.cc,v 1.4 2002/07/05 01:10:06 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
 
-int xServer::MSG_NOOP( xParameters& Param )
+CREATE_HANDLER(msg_NOOP)
+
+bool msg_NOOP::Execute( const xParameters& Param )
 {
-return 0 ;
+return true ;
 }
 
 } // namespace gnuworld

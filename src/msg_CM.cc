@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_CM.cc,v 1.5 2002/05/27 17:18:13 dan_karrels Exp $
+ * $Id: msg_CM.cc,v 1.6 2002/07/05 01:10:05 dan_karrels Exp $
  */
 
 #include	<iostream>
@@ -29,13 +29,16 @@
 #include	"iClient.h"
 #include	"xparameters.h"
 #include	"ELog.h"
+#include	"ServerCommandHandler.h"
 
-const char msg_CM_cc_rcsId[] = "$Id: msg_CM.cc,v 1.5 2002/05/27 17:18:13 dan_karrels Exp $" ;
+const char msg_CM_cc_rcsId[] = "$Id: msg_CM.cc,v 1.6 2002/07/05 01:10:05 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
 
 using std::endl ;
+
+CREATE_HANDLER(msg_CM)
 
 /**
  * CLEARMODE message handler.
@@ -43,14 +46,13 @@ using std::endl ;
  * The above message would remove all ops, bans, and voice modes
  *  from channel #channel.
  */
-int xServer::MSG_CM( xParameters& Param )
+bool msg_CM::Execute( const xParameters& Param )
 {
-
 if( Param.size() < 3 )
 	{
-	elog	<< "MSG_CM> Invalid number of parameters"
+	elog	<< "msg_CM> Invalid number of parameters"
 		<< endl ;
-	return -1 ;
+	return false ;
 	}
 
 Channel* tmpChan = Network->findChannel( Param[ 1 ] ) ;
@@ -60,7 +62,7 @@ if( !tmpChan )
 	elog	<< "msg_CM> Unable to locate channel: "
 		<< Param[ 1 ]
 		<< endl ;
-	return -1 ;
+	return false ;
 	}
 
 /*
@@ -94,42 +96,43 @@ for( string::size_type i = 0 ; i < Modes.size() ; i++ )
 			break ;
 		case 's':
 		case 'S':
-			OnChannelModeS( tmpChan, false, 0 ) ;
+			theServer->OnChannelModeS( tmpChan, false, 0 ) ;
 			elog	<< tmpChan->getName()
 				<< "msg_CM> Doing CLEAR_SECRET"
 				<< endl;
 			break ;
 		case 'm':
 		case 'M':
-			OnChannelModeM( tmpChan, false, 0 ) ;
+			theServer->OnChannelModeM( tmpChan, false, 0 ) ;
 			elog	<< tmpChan->getName()
 				<< "msg_CM> Doing CLEAR_MODERATED"
 				<< endl;
 			break ;
 		case 't':
 		case 'T':
-			OnChannelModeT( tmpChan, false, 0 ) ;
+			theServer->OnChannelModeT( tmpChan, false, 0 ) ;
 			elog	<< tmpChan->getName()
 				<< "msg_CM> Doing CLEAR_TOPICLIMIT"
 				<< endl;
 			break ;
 		case 'i':
 		case 'I':
-			OnChannelModeI( tmpChan, false, 0 ) ;
+			theServer->OnChannelModeI( tmpChan, false, 0 ) ;
 			elog	<< tmpChan->getName()
 				<< "msg_CM> Doing CLEAR_INVITEONLY"
 				<< endl;
 			break ;
 		case 'n':
 		case 'N':
-			OnChannelModeN( tmpChan, false, 0 ) ;
+			theServer->OnChannelModeN( tmpChan, false, 0 ) ;
 			elog	<< tmpChan->getName()
 				<< "msg_CM> Doing CLEAR_NOPRIVMSGS"
 				<< endl;
 			break ;
 		case 'k':
 		case 'K':
-			OnChannelModeK( tmpChan, false, 0, string() ) ;
+			theServer->OnChannelModeK( tmpChan, false, 0, 
+				string() ) ;
 			tmpChan->setKey( string() );
 			elog	<< tmpChan->getName()
 				<< "msg_CM> Doing CLEAR_KEY"
@@ -145,7 +148,7 @@ for( string::size_type i = 0 ; i < Modes.size() ; i++ )
 			break ;
 		case 'l':
 		case 'L':
-			OnChannelModeL( tmpChan, false, 0, 0 ) ;
+			theServer->OnChannelModeL( tmpChan, false, 0, 0 ) ;
 			elog	<< tmpChan->getName()
 				<< "msg_CM> Doing CLEAR_LIMIT"
 				<< endl;
@@ -187,11 +190,11 @@ if( clearOps || clearVoice )
 
 	if( !voiceVector.empty() )
 		{
-		OnChannelModeV( tmpChan, 0, voiceVector ) ;
+		theServer->OnChannelModeV( tmpChan, 0, voiceVector ) ;
 		}
 	if( !opVector.empty() )
 		{
-		OnChannelModeO( tmpChan, 0, opVector ) ;
+		theServer->OnChannelModeO( tmpChan, 0, opVector ) ;
 		}
 	} // if( clearOps || clearVoice )
 
@@ -207,10 +210,10 @@ if( clearBans )
 			( false, *ptr ) ) ;
 		}
 
-	OnChannelModeB( tmpChan, 0, banVector ) ;
+	theServer->OnChannelModeB( tmpChan, 0, banVector ) ;
 	} // if( clearBans )
 
-return 0 ;
+return true ;
 }
 
 } // namespace gnuworld

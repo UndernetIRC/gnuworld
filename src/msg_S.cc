@@ -17,11 +17,12 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_S.cc,v 1.6 2002/05/27 17:18:13 dan_karrels Exp $
+ * $Id: msg_S.cc,v 1.7 2002/07/05 01:10:06 dan_karrels Exp $
  */
 
 #include	<new>
 #include	<string>
+#include	<iostream>
 
 #include	<cassert>
 
@@ -31,8 +32,9 @@
 #include	"iServer.h"
 #include	"ELog.h"
 #include	"xparameters.h"
+#include	"ServerCommandHandler.h"
 
-const char msg_S_cc_rcsId[] = "$Id: msg_S.cc,v 1.6 2002/05/27 17:18:13 dan_karrels Exp $" ;
+const char msg_S_cc_rcsId[] = "$Id: msg_S.cc,v 1.7 2002/07/05 01:10:06 dan_karrels Exp $" ;
 const char server_h_rcsId[] = __SERVER_H ;
 const char events_h_rcsId[] = __EVENTS_H ;
 const char Network_h_rcsId[] = __NETWORK_H ;
@@ -45,6 +47,8 @@ namespace gnuworld
 
 using std::string ;
 using std::endl ;
+
+CREATE_HANDLER(msg_S)
 
 /**
  * New server joined the network.
@@ -67,15 +71,15 @@ using std::endl ;
  * As always, the second token, the command, is not
  * included in the xParameters passed here.
  */
-int xServer::MSG_S( xParameters& params )
+bool msg_S::Execute( const xParameters& params )
 {
 
 // We need at least 9 tokens
 if( params.size() < 9 )
 	{
-	elog	<< "xServer::MSG_S> Not enough parameters"
+	elog	<< "msg_S> Not enough parameters"
 		<< endl ;
-	return -1 ;
+	return false ;
 	}
 
 int uplinkIntYY = base64toint( params[ 0 ] ) ;
@@ -83,9 +87,9 @@ iServer* uplinkServer = Network->findServer( uplinkIntYY ) ;
 
 if( NULL == uplinkServer )
 	{
-	elog	<< "xServer::MSG_S> Unable to find uplink server"
+	elog	<< "msg_S> Unable to find uplink server"
 		<< endl ;
-	return -1 ;
+	return false ;
 	}
 
 const string serverName( params[ 1 ] ) ;
@@ -94,22 +98,12 @@ const string serverName( params[ 1 ] ) ;
 time_t connectTime = static_cast< time_t >( atoi( params[ 4 ] ) ) ;
 // Don't care about version
 
-int serverIntYY = 0 ;
-if( 5 == strlen( params[ 6 ] ) )
-	{
-	// n2k
-	serverIntYY = base64toint( params[ 6 ], 2 ) ;
-	}
-else
-	{
-	// yxx
-	serverIntYY = base64toint( params[ 6 ], 1 ) ;
-	}
+int serverIntYY = base64toint( params[ 6 ], 2 ) ;
 
 // Does the new server's numeric already exist?
 if( NULL != Network->findServer( serverIntYY ) )
 	{
-	elog	<< "xServer::MSG_S> Server numeric collision, numeric: "
+	elog	<< "msg_S> Server numeric collision, numeric: "
 		<< params[ 6 ]
 		<< ", old name: "
 		<< Network->findServer( serverIntYY )->getName()
@@ -129,20 +123,19 @@ assert( newServer != 0 ) ;
 
 // If we've finished our sync to the network, then this S
 // must be another server merging later on.
-if (!bursting)
-	newServer->bursting = true;
+if( !theServer->isBursting() )
+	{
+	newServer->setBursting( true ) ;
+	}
 
 Network->addServer( newServer ) ;
-//elog << "Added server: " << *newServer ;
+//elog << "Added server: " << *newServer << endl ;
 
-// TODO: Post message
-PostEvent( EVT_NETJOIN,
+theServer->PostEvent( EVT_NETJOIN,
 	static_cast< void* >( newServer ),
 	static_cast< void* >( uplinkServer ) ) ;
 
-return 0 ;
-
+return true ;
 }
-
 
 } // namespace gnuworld

@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_L.cc,v 1.7 2002/05/27 17:18:13 dan_karrels Exp $
+ * $Id: msg_L.cc,v 1.8 2002/07/05 01:10:06 dan_karrels Exp $
  */
 
 #include	<new>
@@ -32,6 +32,7 @@
 #include	"StringTokenizer.h"
 #include	"events.h"
 #include	"xparameters.h"
+#include	"ServerCommandHandler.h"
 
 const char server_h_rcsId[] = __SERVER_H ;
 const char xparameters_h_rcsId[] = __XPARAMETERS_H ;
@@ -42,7 +43,7 @@ const char Channel_h_rcsId[] = __CHANNEL_H ;
 const char ChannelUser_h_rcsId[] = __CHANNELUSER_H ;
 const char iClient_h_rcsId[] = __ICLIENT_H ;
 const char StringTokenizer_h_rcsId[] = __STRINGTOKENIZER_H ;
-const char msg_L_cc_rcsId[] = "$Id: msg_L.cc,v 1.7 2002/05/27 17:18:13 dan_karrels Exp $" ;
+const char msg_L_cc_rcsId[] = "$Id: msg_L.cc,v 1.8 2002/07/05 01:10:06 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -50,20 +51,21 @@ namespace gnuworld
 using std::string ;
 using std::endl ;
 
+CREATE_HANDLER(msg_L)
+
 /**
  * Someone has just left a channel.
  * AABBB L #channel
  */
-int xServer::MSG_L( xParameters& Param )
+bool msg_L::Execute( const xParameters& Param )
 {
-
 // Verify that there are at least 2 arguments:
 // client_numeric #channel
 if( Param.size() < 2 )
 	{
-	elog	<< "xServer::MSG_L> Invalid number of arguments"
+	elog	<< "msg_L> Invalid number of arguments"
 		<< endl ;
-	return -1 ;
+	return false ;
 	}
 
 // Find the client in question
@@ -75,14 +77,14 @@ if( NULL == theClient )
 	// Nope, no matching client found
 
 	// Log the error
-	elog	<< "xServer::MSG_L> ("
+	elog	<< "msg_L> ("
 		<< Param[ 1 ]
 		<< "): Unable to find client: "
 		<< Param[ 0 ]
 		<< endl ;
 
 	// Return error
-	return -1 ;
+	return false ;
 	}
 
 // Tokenize the channel string
@@ -118,7 +120,7 @@ for( StringTokenizer::size_type i = 0 ; i < st.size() ; ++i )
 	if( NULL == theChan )
 		{
 		// Channel not found, log the error
-		elog	<< "xServer::MSG_L> Unable to find channel: "
+		elog	<< "msg_L> Unable to find channel: "
 			<< st[ i ]
 			<< endl ;
 
@@ -133,7 +135,7 @@ for( StringTokenizer::size_type i = 0 ; i < st.size() ; ++i )
 	ChannelUser* theChanUser = theChan->removeUser( theClient ) ;
 	if( NULL == theChanUser )
 		{
-		elog	<< "xServer::MSG_L> Unable to remove "
+		elog	<< "msg_L> Unable to remove "
 			<< *theClient
 			<< " from channel: "
 			<< *theChan
@@ -144,7 +146,7 @@ for( StringTokenizer::size_type i = 0 ; i < st.size() ; ++i )
 	// Remove this channel from this client's channel structure.
 	if( !theClient->removeChannel( theChan ) )
 		{
-		elog	<< "xServer::MSG_L> Unable to remove iClient "
+		elog	<< "msg_L> Unable to remove iClient "
 			<< *theClient
 			<< " from channel "
 			<< *theChan
@@ -154,7 +156,7 @@ for( StringTokenizer::size_type i = 0 ; i < st.size() ; ++i )
 	// Post the event to the clients listening for events on this
 	// channel, if any.
 	// TODO: Update message posting
-	PostChannelEvent( EVT_PART, theChan,
+	theServer->PostChannelEvent( EVT_PART, theChan,
 		static_cast< void* >( theClient ) ) ;
 
 	// Is the channel now empty, and no services clients are
@@ -168,7 +170,7 @@ for( StringTokenizer::size_type i = 0 ; i < st.size() ; ++i )
 		}
 	} // for
 
-return 0 ;
+return true ;
 }
 
 } // namespace gnuworld

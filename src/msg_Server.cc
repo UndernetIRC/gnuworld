@@ -17,10 +17,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_Server.cc,v 1.7 2002/05/27 17:18:13 dan_karrels Exp $
+ * $Id: msg_Server.cc,v 1.8 2002/07/05 01:10:06 dan_karrels Exp $
  */
 
 #include	<new>
+#include	<iostream>
 
 #include	<cstring>
 #include	<cassert>
@@ -31,8 +32,9 @@
 #include	"iServer.h"
 #include	"ELog.h"
 #include	"xparameters.h"
+#include	"ServerCommandHandler.h"
 
-const char msg_Server_cc_rcsId[] = "$Id: msg_Server.cc,v 1.7 2002/05/27 17:18:13 dan_karrels Exp $" ;
+const char msg_Server_cc_rcsId[] = "$Id: msg_Server.cc,v 1.8 2002/07/05 01:10:06 dan_karrels Exp $" ;
 const char server_h_rcsId[] = __SERVER_H ;
 const char events_h_rcsId[] = __EVENTS_H ;
 const char Network_h_rcsId[] = __NETWORK_H ;
@@ -44,6 +46,8 @@ namespace gnuworld
 {
 
 using std::endl ;
+
+CREATE_HANDLER(msg_Server)
 
 /**
  * New server message
@@ -62,24 +66,27 @@ using std::endl ;
  *
  * Remember that the "SERVER" parameter is removed.
  */
-int xServer::MSG_Server( xParameters& Param )
+bool msg_Server::Execute( const xParameters& Param )
 {
 
-burstEnd = 0 ;
-burstStart = ::time( 0 ) ;
+theServer->setBurstEnd( 0 ) ;
+theServer->setBurstStart( ::time( 0 ) ) ;
 
 // Check the hopcount
 // 1: It's our uplink
 if( Param[ 1 ][ 0 ] == '1' )
 	{
 
-//	clog	<< "xServer::MSG_Server> Got Uplink: " << Param[ 0 ] << endl ;
+//	elog	<< "msg_Server> Got Uplink: "
+//		<< Param[ 0 ]
+//		<< endl ;
 
 	// It's our uplink
 	if( Param.size() < 6 )
 		{
-		elog	<< "xServer::MSG_Server> Invalid number of parameters\n" ;
-		return -1 ;
+		elog	<< "msg_Server> Invalid number of parameters"
+			<< endl ;
+		return false ;
 		}
 
 	// Here's the deal:
@@ -99,20 +106,22 @@ if( Param[ 1 ][ 0 ] == '1' )
 		}
 
 	// Our uplink has its own numeric as its uplinkIntYY.
-	Uplink = new (std::nothrow) iServer( 
+	iServer* tmpUplink = new (std::nothrow) iServer( 
 		uplinkYY,
 		Param[ 5 ], // yyxxx
 		Param[ 0 ], // name
 		atoi( Param[ 3 ] ) ) ; // connect time
-	assert( Uplink != 0 ) ;
+	assert( tmpUplink != 0 ) ;
+
+	theServer->setUplink( tmpUplink ) ;
 
 	// Find this server (me)
-	iServer* me = Network->findServer( intYY ) ;
+	iServer* me = Network->findServer( theServer->getIntYY() ) ;
 	if( NULL == me )
 		{
-		elog	<< "xServer::MSG_SERVER> Unable to find myself "
+		elog	<< "msg_Server> Unable to find myself "
 			<< " ("
-			<< intYY
+			<< theServer->getIntYY()
 			<< ")"
 			<< endl ;
 		::exit( 0 ) ;
@@ -125,15 +134,17 @@ if( Param[ 1 ][ 0 ] == '1' )
 	// We now have a pointer to our own uplink
 	// Add it to the tables
 	// We maintain a local pointer just for speed reasons
-	Network->addServer( Uplink ) ;
+	Network->addServer( theServer->getUplink() ) ;
 
-//	elog << "Added server: " << *Uplink ;
+//	elog	<< "Added server: "
+//		<< *(theServer->getUplink())
+//		<< endl ;
 
 	}
 
 // Not posting message here because this method is only called once
 // using tokenized commands - when the xServer connects
-return 0 ;
+return true ;
 }
 
 

@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_EB.cc,v 1.6 2002/05/27 17:18:13 dan_karrels Exp $
+ * $Id: msg_EB.cc,v 1.7 2002/07/05 01:10:05 dan_karrels Exp $
  */
 
 #include	<sys/types.h>
@@ -31,8 +31,9 @@
 #include	"Network.h"
 #include	"ELog.h"
 #include	"xparameters.h"
+#include	"ServerCommandHandler.h"
 
-const char msg_EB_cc_rcsId[] = "$Id: msg_EB.cc,v 1.6 2002/05/27 17:18:13 dan_karrels Exp $" ;
+const char msg_EB_cc_rcsId[] = "$Id: msg_EB.cc,v 1.7 2002/07/05 01:10:05 dan_karrels Exp $" ;
 const char server_h_rcsId[] = __SERVER_H ;
 const char iServer_h_rcsId[] = __ISERVER_H ;
 const char events_h_rcsId[] = __EVENTS_H ;
@@ -45,35 +46,36 @@ namespace gnuworld
 
 using std::endl ;
 
+CREATE_HANDLER(msg_EB)
+
 // Q EB
 // Q: Remote server numeric
 // EB: End Of Burst
-int xServer::MSG_EB( xParameters& params )
+bool msg_EB::Execute( const xParameters& params )
 {
-
-if( !strcmp( params[ 0 ], Uplink->getCharYY() ) )
+if( !strcmp( params[ 0 ], theServer->getUplinkCharYY().c_str() ) )
 	{
 	// It's my uplink
-	burstEnd = ::time( 0 ) ;
+	theServer->setBurstEnd( ::time( 0 ) ) ;
 
 	// Our uplink is done bursting
 	// This is done here instead of down below the if/else
 	// structure because some of the methods called here
 	// may depend or use the Uplink's isBursting() method
-	Uplink->stopBursting() ;
+	theServer->getUplink()->stopBursting() ;
 
 	// Signal that all Write()'s should write to the
 	// normal output buffer
-	useBurstBuffer = false ;
+	theServer->setUseBurstBuffer( false ) ;
 
 	// Burst our clients
-	BurstClients() ;
+	theServer->BurstClients() ;
 
 	// Burst our channels
-	BurstChannels() ;
+	theServer->BurstChannels() ;
 
 	// We are no longer bursting
-	bursting = false ;
+	theServer->setBursting( false ) ;
 
 	// For some silly reason, EB must come before EA
 	// *shrug*
@@ -83,28 +85,27 @@ if( !strcmp( params[ 0 ], Uplink->getCharYY() ) )
 	// that all end of burst items are written to the
 	// burstOutputBuffer before the burst if officially
 	// completed (as seen by the network)
-	PostEvent( EVT_BURST_CMPLT, static_cast< void* >( Uplink ) ) ;
+	theServer->PostEvent( EVT_BURST_CMPLT,
+		static_cast< void* >( theServer->getUplink() ) ) ;
 
 	// Send our EB
-	Write( "%s EB\n", charYY ) ;
+	theServer->Write( "%s EB\n", theServer->getCharYY() ) ;
 
 	// Acknowledge their end of burst
-	Write( "%s EA\n", charYY ) ;
+	theServer->Write( "%s EA\n", theServer->getCharYY() ) ;
 
 	// Is the burstOutputBuffer empty?
-	if( !burstOutputBuffer.empty() )
+	if( !theServer->isBurstOutputBufferEmpty() )
 		{
 		// It has data, concatenate this data
 		// onto the normal outputBuffer
-		outputBuffer += burstOutputBuffer ;
-		burstOutputBuffer.clear() ;
+		theServer->transferBurstToOutputBuffer() ;
 
-		elog	<< "xServer::MSG_EB> Adding "
-			<< burstOutputBuffer.size()
+		elog	<< "msg_EB> Adding "
+			<< theServer->burstOutputBufferSize()
 			<< " bytes from burstOutputBuffer to "
 			<< "outputBuffer"
 			<< endl ;
-
 		}
 
 	elog	<< "*** Completed net burst"
@@ -113,22 +114,22 @@ if( !strcmp( params[ 0 ], Uplink->getCharYY() ) )
 else
 	{
 	/* Its another server that has just completed its net.burst. */
-
-	iServer* theServer = Network->findServer( params[ 0 ] ) ;
-	if( NULL == theServer )
+	iServer* targetServer = Network->findServer( params[ 0 ] ) ;
+	if( NULL == targetServer )
 		{
-		elog	<< "xServer::MSG_EB> Unable to find server: "
+		elog	<< "msg_EB> Unable to find server: "
 			<< params[ 0 ]
 			<< endl ;
 		return -1 ;
 	}
 
-	theServer->stopBursting() ;
+	targetServer->stopBursting() ;
 
-	PostEvent( EVT_BURST_CMPLT, static_cast< void* >( theServer ) ) ;
+	theServer->PostEvent( EVT_BURST_CMPLT,
+		static_cast< void* >( targetServer ) ) ;
 	}
 
-return 0 ;
+return true ;
 }
 
 } // namespace gnuworld

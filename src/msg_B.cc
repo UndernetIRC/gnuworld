@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_B.cc,v 1.12 2002/05/27 17:18:13 dan_karrels Exp $
+ * $Id: msg_B.cc,v 1.13 2002/07/05 01:10:05 dan_karrels Exp $
  */
 
 #include	<sys/types.h>
@@ -40,6 +40,7 @@
 #include	"ChannelUser.h"
 #include	"Network.h"
 #include	"iClient.h"
+#include	"ServerCommandHandler.h"
 
 const char server_h_rcsId[] = __SERVER_H ;
 const char xparameters_h_rcsId[] = __XPARAMETERS_H ;
@@ -49,7 +50,7 @@ const char Channel_h_rcsId[] = __CHANNEL_H ;
 const char ChannelUser_h_rcsId[] = __CHANNELUSER_H ;
 const char Network_h_rcsId[] = __NETWORK_H ;
 const char iClient_h_rcsId[] = __ICLIENT_H ;
-const char msg_B_cc_rcsId[] = "$Id: msg_B.cc,v 1.12 2002/05/27 17:18:13 dan_karrels Exp $" ;
+const char msg_B_cc_rcsId[] = "$Id: msg_B.cc,v 1.13 2002/07/05 01:10:05 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -58,6 +59,25 @@ using std::pair ;
 using std::string ;
 using std::vector ;
 using std::endl ;
+
+class msg_B : public ServerCommandHandler
+{
+public:
+	msg_B( xServer* theServer )
+	 : ServerCommandHandler( theServer )
+	{}
+	virtual ~msg_B()
+	{}
+
+	virtual bool	Execute( const xParameters& ) ;
+
+protected:
+	void	parseBurstUsers( Channel*, const string& ) ;
+	void	parseBurstBans( Channel*, const string& ) ;
+	
+} ;
+
+CREATE_LOADER(msg_B)
 
 // MSG_B
 // This is the BURST command.
@@ -81,16 +101,16 @@ using std::endl ;
 //
 // Q B #hgsd 933357379 +tn PIs,OfK,OAu,PZl:o,eAA
 //
-int xServer::MSG_B( xParameters& Param )
+bool msg_B::Execute( const xParameters& Param )
 {
 
 // Make sure there are at least four arguments supplied:
 // servernumeric #channel time_stamp arguments
 if( Param.size() < 4 )
 	{
-	elog	<< "xServer::MSG_B> Invalid number of arguments"
+	elog	<< "msg_B> Invalid number of arguments"
 		<< endl ;
-	return -1 ;
+	return false ;
 	}
 
 // Attempt to find the channel in the network channel table
@@ -108,7 +128,7 @@ if( NULL == theChan )
 	if( !Network->addChannel( theChan ) )
 		{
 		// The addition of this channel failed, *shrug*
-		elog	<< "xServer::MSG_B> Failed to add channel: "
+		elog	<< "msg_B> Failed to add channel: "
 			<< Param[ 1 ]
 			<< endl ;
 
@@ -116,7 +136,7 @@ if( NULL == theChan )
 		delete theChan ; theChan = 0 ;
 
 		// Return error
-		return -1 ;
+		return false ;
 		}
 	} // if( NULL == theChan )
 else
@@ -152,30 +172,38 @@ if( '+' == Param[ whichToken ][ 0 ] )
 		switch( *currentPtr )
 			{
 			case 't':
-				OnChannelModeT( theChan, true, 0 ) ;
+				theServer->OnChannelModeT( theChan, true, 
+					0 ) ;
 				break ;
 			case 'n':
-				OnChannelModeN( theChan, true, 0 ) ;
+				theServer->OnChannelModeN( theChan, true, 
+					0 ) ;
 				break ;
 			case 'm':
-				OnChannelModeM( theChan, true, 0 ) ;
+				theServer->OnChannelModeM( theChan, true, 
+					0 ) ;
 				break ;
 			case 'p':
-				OnChannelModeP( theChan, true, 0 ) ;
+				theServer->OnChannelModeP( theChan, true, 
+					0 ) ;
 				break ;
 			case 's':
-				OnChannelModeS( theChan, true, 0 ) ;
+				theServer->OnChannelModeS( theChan, true, 
+					0 ) ;
 				break ;
 			case 'i':
-				OnChannelModeI( theChan, true, 0 ) ;
+				theServer->OnChannelModeI( theChan, true, 
+					0 ) ;
 				break ;
  			case 'l':
-				OnChannelModeL( theChan, true, 0,
+				theServer->OnChannelModeL( theChan, true, 
+					0,
 					::atoi( Param[ whichToken + 1 ] ) ) ;
 				whichToken++ ;
 				break ;
 			case 'k':
-				OnChannelModeK( theChan, true, 0,
+				theServer->OnChannelModeK( theChan, true, 
+					0,
 					Param[ whichToken + 1 ] ) ;
 				whichToken++ ;
 				break ;
@@ -196,7 +224,7 @@ if( '+' == Param[ whichToken ][ 0 ] )
 // Have we reached the end of this burst command?
 if( whichToken >= Param.size() )
 	{
-	return 0 ;
+	return true ;
 	}
 
 // Parse the remaining tokens
@@ -227,12 +255,12 @@ return 0 ;
 // mode state.
 // Mode states will always be in the order ov, v, o if present
 // at all.
-void xServer::parseBurstUsers( Channel* theChan, const char* theUsers )
+void msg_B::parseBurstUsers( Channel* theChan, const string& theUsers )
 {
 // This is a protected method, so the method arguments are
 // guaranteed to be valid
 
-//clog	<< "xServer::parseBurstUsers> Channel: " << theChan->getName()
+//clog	<< "msg_B::parseBurstUsers> Channel: " << theChan->getName()
 //	<< ", users: " << theUsers << endl ;
 
 // Parse out users and their modes
@@ -242,8 +270,11 @@ StringTokenizer st( theUsers, ',' ) ;
 // 1 = op, 2 = voice, 3 = opvoice.
 unsigned short int mode_state = 0;
 
-vector< pair< bool, ChannelUser* > > opVector ;
-vector< pair< bool, ChannelUser* > > voiceVector ;
+typedef xServer::opVectorType opVectorType ;
+typedef xServer::voiceVectorType voiceVectorType ;
+
+opVectorType opVector ;
+voiceVectorType voiceVector ;
 
 for( StringTokenizer::const_iterator ptr = st.begin() ; ptr != st.end() ;
 	++ptr )
@@ -260,7 +291,7 @@ for( StringTokenizer::const_iterator ptr = st.begin() ; ptr != st.end() ;
 		{
 		// Nope, no such user
 		// Log the error
-		elog	<< "xServer::parseBurstUsers> ("
+		elog	<< "msg_B::parseBurstUsers> ("
 			<< theChan->getName() << ")"
 			<< ": Unable to find client: "
 			<< (*ptr).substr( 0, pos )
@@ -270,14 +301,15 @@ for( StringTokenizer::const_iterator ptr = st.begin() ; ptr != st.end() ;
 		continue ;
 		}
 
-//	elog	<< "xServer::parseBurstUsers> Adding user " << theClient->getNickName()
+//	elog	<< "msg_B::parseBurstUsers> Adding user "
+//		<< theClient->getNickName()
 //		<< "(" << theClient->getCharYYXXX() << ") to channel "
 //		<< theChan->getName() << endl ;
 
 	// Add this channel to the user's channel structure.
 	if( !theClient->addChannel( theChan ) )
 		{
-		elog	<< "xServer::parseBurstUsers> Failed to add "
+		elog	<< "msg_B::parseBurstUsers> Failed to add "
 			<< "channel "
 			<< *theChan
 			<< " to iClient "
@@ -298,8 +330,9 @@ for( StringTokenizer::const_iterator ptr = st.begin() ; ptr != st.end() ;
 	if( !theChan->addUser( chanUser ) )
 		{
 		// The addition failed
-		elog	<< "xServer::parseBurstUsers> Unable to add user "
-			<< theClient->getNickName() << " to channel "
+		elog	<< "msg_B::parseBurstUsers> Unable to add user "
+			<< theClient->getNickName()
+			<< " to channel "
 			<< theChan->getName()
 			<< endl ;
 
@@ -315,7 +348,7 @@ for( StringTokenizer::const_iterator ptr = st.begin() ; ptr != st.end() ;
 
 	// Notify the services clients that a user has
 	// joined the channel
-	PostChannelEvent( EVT_JOIN, theChan,
+	theServer->PostChannelEvent( EVT_JOIN, theChan,
 		static_cast< void* >( theClient ),
 		static_cast< void* >( chanUser ) ) ;
 
@@ -377,7 +410,7 @@ for( StringTokenizer::const_iterator ptr = st.begin() ; ptr != st.end() ;
 				mode_state = (mode_state == 1) ? 3 : 2;
 				break ;
 			default:
-				elog	<< "xServer::parseBurstUsers> "
+				elog	<< "msg_B::parseBurstUsers> "
 					<< "Unknown mode: "
 					<< (*ptr)[ pos ] << endl ;
 				break ;
@@ -390,21 +423,21 @@ for( StringTokenizer::const_iterator ptr = st.begin() ; ptr != st.end() ;
 // all listening clients
 if( !opVector.empty() )
 	{
-	OnChannelModeO( theChan, 0, opVector ) ;
+	theServer->OnChannelModeO( theChan, 0, opVector ) ;
 	}
 if( !voiceVector.empty() )
 	{
-	OnChannelModeV( theChan, 0, voiceVector ) ;
+	theServer->OnChannelModeV( theChan, 0, voiceVector ) ;
 	}
 
 }
 
-void xServer::parseBurstBans( Channel* theChan, const char* theBans )
+void msg_B::parseBurstBans( Channel* theChan, const string& theBans )
 {
 // This is a protected method, so the method arguments are
 // guaranteed to be valid
 
-//elog	<< "xServer::parseBurstBans> Found bans for channel "
+//elog	<< "msg_B::parseBurstBans> Found bans for channel "
 //	<< theChan->getName()
 //	<< ": "
 //	<< theBans
@@ -413,6 +446,7 @@ void xServer::parseBurstBans( Channel* theChan, const char* theBans )
 // Tokenize the ban string
 StringTokenizer st( theBans ) ;
 
+typedef xServer::banVectorType banVectorType ;
 banVectorType banVector( st.size() ) ;
 
 // Move through each token and add the ban
@@ -424,7 +458,7 @@ for( StringTokenizer::size_type i = 0 ; i < st.size() ; ++i )
 
 if( !banVector.empty() )
 	{
-	OnChannelModeB( theChan, 0, banVector ) ;
+	theServer->OnChannelModeB( theChan, 0, banVector ) ;
 	}
 }
 

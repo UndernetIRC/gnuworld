@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_J.cc,v 1.13 2002/05/27 17:18:13 dan_karrels Exp $
+ * $Id: msg_J.cc,v 1.14 2002/07/05 01:10:06 dan_karrels Exp $
  */
 
 #include	<new>
@@ -34,6 +34,7 @@
 #include	"Network.h"
 #include	"ELog.h"
 #include	"StringTokenizer.h"
+#include	"ServerCommandHandler.h"
 
 const char server_h_rcsId[] = __SERVER_H ;
 const char xparameters_h_rcsId[] = __XPARAMETERS_H ;
@@ -43,7 +44,7 @@ const char ELog_h_rcsId[] = __ELOG_H ;
 const char Channel_h_rcsId[] = __CHANNEL_H ;
 const char iClient_h_rcsId[] = __ICLIENT_H ;
 const char ChannelUser_h_rcsId[] = __CHANNELUSER_H ;
-const char msg_J_cc_rcsId[] = "$Id: msg_J.cc,v 1.13 2002/05/27 17:18:13 dan_karrels Exp $" ;
+const char msg_J_cc_rcsId[] = "$Id: msg_J.cc,v 1.14 2002/07/05 01:10:06 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -51,25 +52,41 @@ namespace gnuworld
 using std::string ;
 using std::endl ;
 
+class msg_J : public ServerCommandHandler
+{
+public:
+	msg_J( xServer* theServer )
+	 : ServerCommandHandler( theServer )
+	{}
+	virtual ~msg_J()
+	{}
+
+	virtual bool Execute( const xParameters& ) ;
+
+protected:
+	void		userPartAllChannels( iClient* ) ;
+} ;
+
+CREATE_LOADER(msg_J)
+
 /**
  * Someone has just joined a non-empty channel.
  *
  * 0AT J #coder-com
  * OAT J #coder-com,#blah
  */
-int xServer::MSG_J( xParameters& Param )
+bool msg_J::Execute( const xParameters& Param )
 {
-
 // Verify that sufficient arguments have been provided
 // client_numeric #channel[,#channel2,...]
 if( Param.size() < 2 )
 	{
 	// Insufficient arguments provided, log the error
-	elog	<< "xServer::MSG_J> Invalid number of arguments"
+	elog	<< "msg_J> Invalid number of arguments"
 		<< endl ;
 
 	// Return error
-	return -1 ;
+	return false ;
 	}
 
 // Find the client in question.
@@ -79,13 +96,14 @@ iClient* Target = Network->findClient( Param[ 0 ] ) ;
 if( NULL == Target )
 	{
 	// Nope, log the error
-	elog	<< "xServer::MSG_J> ("
-		<< Param[ 1 ] << ") Unable to find user: "
+	elog	<< "msg_J> ("
+		<< Param[ 1 ]
+		<< ") Unable to find user: "
 		<< Param[ 0 ]
 		<< endl ;
 
 	// Return error
-	return -1 ;
+	return false ;
 	}
 
 // Tokenize by ',', as the client may join more than one
@@ -94,7 +112,6 @@ StringTokenizer st( Param[ 1 ], ',' ) ;
 
 for( StringTokenizer::size_type i = 0 ; i < st.size() ; i++ )
 	{
-
 	// Is it a modeless channel?
 	if( '+' == st[ i ][ 0 ] )
 		{
@@ -141,7 +158,7 @@ for( StringTokenizer::size_type i = 0 ; i < st.size() ; i++ )
 			{
 			// Addition to network tables failed
 			// Log the error
-			elog	<< "xServer::MSG_J> Unable to add channel: "
+			elog	<< "msg_J> Unable to add channel: "
 				<< theChan->getName()
 				<< endl ;
 
@@ -175,7 +192,7 @@ for( StringTokenizer::size_type i = 0 ; i < st.size() ; i++ )
 			oldUser->removeMode( ChannelUser::ZOMBIE ) ;
 
 			// TODO: Should this post an event?
-			elog	<< "xServer::msg_J> Removed zombie: "
+			elog	<< "msg_J> Removed zombie: "
 				<< *oldUser
 				<< " on channel "
 				<< theChan->getName()
@@ -184,7 +201,7 @@ for( StringTokenizer::size_type i = 0 ; i < st.size() ; i++ )
 		else
 			{
 			// User was found in channel, no reason apparent
-			elog	<< "xServer::MSG_J> Unexpectadly found "
+			elog	<< "msg_J> Unexpectadly found "
 				<< "user "
 				<< *Target
 				<< " in channel "
@@ -207,7 +224,7 @@ for( StringTokenizer::size_type i = 0 ; i < st.size() ; i++ )
 		{
 		// Addition of this ChannelUser to the Channel failed
 		// Log the error
-		elog	<< "xServer::MSG_J> Unable to add user "
+		elog	<< "msg_J> Unable to add user "
 			<< theUser->getNickName()
 			<< " to channel: "
 			<< theChan->getName()
@@ -235,7 +252,7 @@ for( StringTokenizer::size_type i = 0 ; i < st.size() ; i++ )
 	// Add this channel to this client's channel structure.
 	if( !Target->addChannel( theChan ) )
 		{
-		elog	<< "xServer::MSG_J> Unable to add channel "
+		elog	<< "msg_J> Unable to add channel "
 			<< *theChan
 			<< " to iClient "
 			<< *Target
@@ -265,7 +282,7 @@ for( StringTokenizer::size_type i = 0 ; i < st.size() ; i++ )
 
 	// Post the event to the clients listening for events on this
 	// channel, if any.
-	PostChannelEvent( whichEvent, theChan,
+	theServer->PostChannelEvent( whichEvent, theChan,
 		static_cast< void* >( Target ),
 		static_cast< void* >( theUser ) ) ;
 
@@ -278,7 +295,7 @@ return 0 ;
 
 }
 
-void xServer::userPartAllChannels( iClient* theClient )
+void msg_J::userPartAllChannels( iClient* theClient )
 {
 // Artifact, user is parting all channels
 for( iClient::channelIterator ptr = theClient->channels_begin(),
@@ -291,7 +308,7 @@ for( iClient::channelIterator ptr = theClient->channels_begin(),
 	ChannelUser* theChanUser =  (*ptr)->removeUser( theClient ) ;
 	if( NULL == theChanUser )
 		{
-		elog	<< "xServer::userPartAllChannels> Unable to "
+		elog	<< "msg_J::userPartAllChannels> Unable to "
 			<< "remove iClient "
 			<< *theClient
 			<< " from channel "
@@ -305,7 +322,7 @@ for( iClient::channelIterator ptr = theClient->channels_begin(),
 	// structure until the end of this method.
 
 	// Post this event to all listeners
-	PostChannelEvent( EVT_PART,
+	theServer->PostChannelEvent( EVT_PART,
 		*ptr,
 		static_cast< void* >( theClient ) ) ; // iClient*
 

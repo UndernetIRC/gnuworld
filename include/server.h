@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server.h,v 1.66 2002/06/07 14:38:19 dan_karrels Exp $
+ * $Id: server.h,v 1.67 2002/07/05 01:10:05 dan_karrels Exp $
  */
 
 /* Command Map Description
@@ -35,7 +35,7 @@
  */
 
 #ifndef __SERVER_H
-#define __SERVER_H "$Id: server.h,v 1.66 2002/06/07 14:38:19 dan_karrels Exp $"
+#define __SERVER_H "$Id: server.h,v 1.67 2002/07/05 01:10:05 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
@@ -60,6 +60,7 @@
 #include	"moduleLoader.h"
 #include	"ELog.h"
 #include	"TimerHandler.h"
+#include	"ServerCommandHandler.h"
 #include	"defs.h"
 
 /*
@@ -81,27 +82,6 @@ using std::vector ;
 using std::stringstream ;
 using std::priority_queue ;
 using std::map ;
-
-/**
- * This macro constructs a method prototype for a command
- * handler with the given name MSG_handlerFunc.
- */
-#define DECLARE_MSG( handlerFunc ) \
- virtual int MSG_##handlerFunc( xParameters& ) ;
-
-/**
- * This method registers a command handler with the xServer's
- * command table.  It must first be prototyped in the xServer
- * class declaration.
- */
-#define REGISTER_MSG( key, handlerFunc ) \
-  if( !commandMap->insert( commandMapType::value_type( key, \
-	&xServer::MSG_##handlerFunc ) ).second ) \
-	{\
-	elog << "Unable to register function: "\
-		<< key << std::endl ;\
-	exit( 0 ) ; \
-	}
 
 /// Forward declaration of xClient
 class xClient ;
@@ -227,6 +207,18 @@ public:
 	 * structure.
 	 */
 	inline const_glineIterator gline_end() const
+		{ return glineList.end() ; }
+
+	/**
+	 * Return an iterator to the beginning of the gline structure.
+	 */
+	inline glineIterator	gline_begin()
+		{ return glineList.begin() ; }
+
+	/**
+	 * Return an iterator to the end of the gline structure.
+	 */
+	inline glineIterator	gline_end()
 		{ return glineList.end() ; }
 
 	/**
@@ -363,6 +355,12 @@ public:
 	 */
 	virtual bool removeGline( const string& userHost,
 		const  xClient* remClient = NULL) ;
+
+	virtual void eraseGline( glineIterator removeMe )
+		{ glineList.erase( removeMe ) ; }
+
+	virtual void addGline( Gline* newGline )
+		{ glineList.push_back( newGline ) ; }
 
 	/**
 	 * Find a gline by lexical searching, case insensitive.
@@ -668,6 +666,12 @@ public:
 	virtual bool IsEndOfBurst() const
 		{ return !bursting ; }
 
+	inline bool isBursting() const
+		{ return bursting ; }
+
+	inline void setBursting( bool newVal = true )
+		{ bursting = newVal ; }
+
 	/**
 	 * Return true if the server has a valid connection to
 	 * its uplink, false otherwise.
@@ -704,6 +708,35 @@ public:
 	 */
 	inline const char* getCharXXX() const
 		{ return charXXX ; }
+
+	inline iServer*		getUplink() const
+		{ return Uplink ; }
+
+	inline void		setUplink( iServer* newUplink )
+		{ Uplink = newUplink ; }
+
+	inline void setUseBurstBuffer( bool newVal )
+		{ useBurstBuffer = newVal ; }
+
+	inline void setBurstEnd( const time_t newVal )
+		{ burstEnd = newVal ; }
+
+	inline void setBurstStart( const time_t newVal )
+		{ burstStart = newVal ; }
+
+	inline bool isBurstOutputBufferEmpty() const
+		{ return burstOutputBuffer.empty() ; }
+
+	inline string::size_type burstOutputBufferSize() const
+		{ return burstOutputBuffer.size() ; }
+
+	inline void clearBurstOutputBuffer()
+		{ burstOutputBuffer.clear() ; }
+
+	inline void transferBurstToOutputBuffer()
+		{ outputBuffer += burstOutputBuffer ; 
+		  burstOutputBuffer.clear() ;
+		}
 
 	/**
 	 * Return an unsigned int representation of this server's uplink's
@@ -903,6 +936,22 @@ public:
 	 */
 	virtual bool isJuped( const iServer* ) const ;
 
+	/**
+	 * Burst out information about all xClients on this server.
+	 */
+	virtual void 	BurstClients() ;
+
+	/**
+	 * Output channel information for each client on this server.
+	 */
+	virtual void	BurstChannels() ;
+
+	/**
+	 * Deletes a juped server from the juped server list.
+	 * This does not alter the server itself.
+	 */
+	virtual bool	RemoveJupe( const iServer* );
+
 protected:
 
 	/**
@@ -924,12 +973,6 @@ protected:
 	xServer operator=( const xServer& ) ;
 
 	/**
-	 * Deletes a juped server from the juped server list.
-	 * This does not alter the server itself.
-	 */
-	virtual bool	RemoveJupe( const iServer* );
-
-	/**
 	 * Remove glines which match the given userHost, post event.
 	 */
 	virtual void	removeMatchingGlines( const string& ) ;
@@ -940,28 +983,6 @@ protected:
 	 * is being removed from the server.
 	 */
 	virtual void	removeClient( xClient* ) ;
-
-	/**
-	 * Return an iterator to the beginning of the gline structure.
-	 */
-	inline glineIterator	gline_begin()
-		{ return glineList.begin() ; }
-
-	/**
-	 * Return an iterator to the end of the gline structure.
-	 */
-	inline glineIterator	gline_end()
-		{ return glineList.end() ; }
-
-	/**
-	 * Burst out information about all xClients on this server.
-	 */
-	virtual void 	BurstClients() ;
-
-	/**
-	 * Output channel information for each client on this server.
-	 */
-	virtual void	BurstChannels() ;
 
 	/**
 	 * Remove all modes from a channel, used when bursting an
@@ -982,23 +1003,6 @@ protected:
 	virtual bool	banSyntax( const string& ) const ;
 
 	/**
-	 * Parse a burst line for channel bans.
-	 */
-	virtual void	parseBurstBans( Channel*, const char* ) ;
-
-	/**
-	 * Parse a burst line for channel users.
-	 */
-	virtual void	parseBurstUsers( Channel*, const char* ) ;
-
-	/**
-	 * Convenience method that will part a given network
-	 * client from all channels, and notify each listening
-	 * xClient of the parts.
-	 */
-	virtual void	userPartAllChannels( iClient* ) ;
-
-	/**
 	 * Read the config file.  Return true if success, false
 	 * otherwise.
 	 */
@@ -1009,19 +1013,13 @@ protected:
 	 * specified therein.  If any part of the process fails,
 	 * false is returned.  Otherwise, true is returned.
 	 */
-	virtual bool	loadModules( const string& ) ;
+	virtual bool	loadClients( const string& ) ;
 
 	/**
 	 * Signal handler for the server itself.
 	 * Returns true if the signal was handled.
 	 */
 	virtual bool	OnSignal( int ) ;
-
-	/**
-	 * This method is called when a user mode change is detected.
-	 */
-	virtual void	onUserModeChange( xParameters& ) ;
-
 
 	/**
 	 * This variable is false when no signal has occured, true
@@ -1089,137 +1087,11 @@ protected:
 	 */
 	virtual timerID		getUniqueTimerID() ;
 
-	/* Network message handlers */
-
-	/// AD(MIN)
-	DECLARE_MSG(AD);
-
-	/// B(URST) message handler.
-	DECLARE_MSG(B);
-
-	/// C(REATE) message handler.
-	DECLARE_MSG(C);
-
-	/// CM(CLEARMODE) message handler.
-	DECLARE_MSG(CM);
-
-	/// D(KILL) message handler.
-	DECLARE_MSG(D);
-
-	/// DE(SYNCH) ?
-	DECLARE_MSG(DS);
-
-	/// EA (End of burst Acknowledge) message handler.
-	DECLARE_MSG(EA);
-
-	/// EB (End of BURST) message handler.
-	DECLARE_MSG(EB);
-
-	/// ERROR message handler, deprecated.
-	DECLARE_MSG(Error);
-
-	/// G(PING) message handler.
-	DECLARE_MSG(G);
-
-	/// GL(INE) message handler
-	DECLARE_MSG(GL);
-
-	/// I(NVITE)
-	DECLARE_MSG(I);
-
-	/// J(OIN) message handler.
-	DECLARE_MSG(J);
-
-	/// K(ICK) message handler.
-	DECLARE_MSG(K);
-
-	// JU(PE) message handler.
-	DECLARE_MSG(JU);
-
-	/// L(EAVE) message handler.
-	DECLARE_MSG(L);
-
-	/// P(RIVMSG) message handler.
-	DECLARE_MSG(P);
-
-	/// PART message handler, non-tokenized, bogus
-	DECLARE_MSG(PART);
-
-	// PRIVMSG message handler, bogus.
-	DECLARE_MSG(PRIVMSG);
-
-	/// M(ODE) message handler.
-	DECLARE_MSG(M);
-
-	/// N(ICK) message handler.
-	DECLARE_MSG(N);
-
-	/// Q(UIT) message handler.
-	DECLARE_MSG(Q);
-
-	/// PASS message handler.
-	DECLARE_MSG(PASS);
-
-	// STATS message handler.
-	DECLARE_MSG(R);
-
-	/// RPING message handler, deprecated.
-	DECLARE_MSG(RemPing);
-
-	/// S(ERVER) message handler.
-	DECLARE_MSG(S);
-
-	/// SERVER message handler, deprecated.
-	DECLARE_MSG(Server);
-
-	/// SQ(UIT) message handler.
-	DECLARE_MSG(SQ);
-
-	/// T(OPIC) message handler.
-	DECLARE_MSG(T);
-
-	/// U(SILENCE)
-//	DECLARE_MSG(U);
-
-	/// WA(LLOPS) message handler.
-	DECLARE_MSG(WA);
-
-	/// W(HOIS) message handler.
-	DECLARE_MSG(W);
-
-	/// Account message handler.
-	DECLARE_MSG(AC);
-
-	/// NOOP message.
-	/// Use this handler for any messages that we don't need to handle.
-	/// Included for completeness.
-	DECLARE_MSG(NOOP);
-
-	/// 351 message
-	/// when our client recieve back a version reply from a server
-	DECLARE_MSG(M351);
-
-	// Non-tokenized command handlers
-	// Replication of code *sigh*
-
 	/**
 	 * Bounds checker for events.
 	 */
 	inline bool validEvent( const eventType& theEvent ) const
 		{ return (theEvent >= 0 && theEvent < EVT_NOOP) ; }
-
-	/**
-	 * This is the command map type.  Pointers to
-	 * the bound offset of the command handler methods
-	 * are stored in this structure.
-	 */
-	typedef map< string, int (xServer::*)( xParameters& ) >
-		commandMapType ;
-
-	/**
-	 * A pointer to the server command handler.
-	 */
-	commandMapType		*commandMap ;
 
 	/**
 	 * This points to the input/output stream to be used for
@@ -1414,6 +1286,10 @@ protected:
 	 */
 	size_t			outputWriteSize ;
 
+	string			commandMapFileName ;
+
+	string			commandHandlerPrefix ;
+
 	/**
 	 * Burst() is called when the network connection is
 	 * established.  Its purpose is to call each xClient's
@@ -1428,12 +1304,26 @@ protected:
 	/**
 	 * Type used to store runtime client modules.
 	 */
-	typedef vector< moduleLoader< xClient* >* >	moduleListType;
+	typedef vector< moduleLoader< xClient* >* >	clientModuleListType;
 
 	/**
 	 * Structure used to store runtime client modules.
 	 */
-	moduleListType		moduleList;
+	clientModuleListType		clientModuleList;
+
+	typedef moduleLoader< ServerCommandHandler*, xServer* >
+			commandModuleType ;
+
+	typedef vector< commandModuleType* > commandModuleListType ;
+
+	commandModuleListType		commandModuleList ;
+
+	typedef map< string, ServerCommandHandler*, noCaseCompare >
+			commandMapType ;
+
+	commandMapType			commandMap ;
+
+	commandModuleType*	lookupCommandModule( const string& ) const ;
 
 	/**
 	 * The type used to store timed events.
@@ -1514,7 +1404,15 @@ protected:
 	/**
 	 * This method loads all command handlers.
 	 */
-	void		loadCommandHandlers() ;
+	bool		loadCommandHandlers() ;
+
+	/**
+	 * Load an individual command handler from a file (fileName),
+	 * and associate that handler with the network message
+	 * (commandKey).
+	 */
+	bool		loadCommandHandler( const string& fileName,
+				const string& commandKey ) ;
 
 	/**
 	 * This method maps all relevant signals to sigHandler().

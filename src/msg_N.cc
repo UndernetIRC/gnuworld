@@ -17,11 +17,12 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_N.cc,v 1.8 2002/05/27 17:18:13 dan_karrels Exp $
+ * $Id: msg_N.cc,v 1.9 2002/07/05 01:10:06 dan_karrels Exp $
  */
 
 #include	<new>
 #include	<string>
+#include	<iostream>
 
 #include	<cassert>
 
@@ -32,8 +33,9 @@
 #include	"Network.h"
 #include	"ELog.h"
 #include	"xparameters.h"
+#include	"ServerCommandHandler.h"
 
-const char msg_N_cc_rcsId[] = "$Id: msg_N.cc,v 1.8 2002/05/27 17:18:13 dan_karrels Exp $" ;
+const char msg_N_cc_rcsId[] = "$Id: msg_N.cc,v 1.9 2002/07/05 01:10:06 dan_karrels Exp $" ;
 const char iClient_h_rcsId[] = __ICLIENT_H ;
 const char events_h_rcsId[] = __EVENTS_H ;
 const char ip_h_rcsId[] = __IP_H ;
@@ -47,6 +49,8 @@ namespace gnuworld
 
 using std::string ;
 using std::endl ;
+
+CREATE_HANDLER(msg_N)
 
 /**
  * A new user has joined the network, or a user has changed
@@ -69,7 +73,7 @@ using std::endl ;
  * AU N Gte2 3 949526996 Gte 212.49.240.147 DUMfCT AUAAB :I am the one
  *  that was.
  */
-int xServer::MSG_N( xParameters& params )
+bool msg_N::Execute( const xParameters& params )
 {
 
 // AUAAB N Gte- 949527071
@@ -77,16 +81,17 @@ if( params.size() < 5 )
 	{
 	// User changing nick
 	Network->rehashNick( params[ 0 ], params[ 1 ] ) ;
-	return 0 ;
+	return true ;
 	}
 
 // Else, it's the network giving us a new client.
 iServer* nickUplink = Network->findServer( params[ 0 ] ) ;
 if( NULL == nickUplink )
 	{
-	elog	<< "xServer::MSG_N> Unable to find server: "
-		<< params[ 0 ] << endl ;
-	return -1 ;
+	elog	<< "msg_N> Unable to find server: "
+		<< params[ 0 ]
+		<< endl ;
+	return false ;
 	}
 
 // Default arguments, assuming
@@ -109,16 +114,13 @@ if( params.size() > 10 )
 	yyxxx = params[ 9 ] ;
 	description = params[ 10 ];
 	}
-	else
+else if( params.size() > 9 )
 	{
-	if( params.size() > 9 )
-		{
-		// Just plain modes here without any parameters
-		modes = params[ 6 ] ;
-		host = params[ 7 ] ;
-		yyxxx = params[ 8 ] ;
-		description = params[ 9 ];
-		}
+	// Just plain modes here without any parameters
+	modes = params[ 6 ] ;
+	host = params[ 7 ] ;
+	yyxxx = params[ 8 ] ;
+	description = params[ 9 ];
 	}
 
 iClient* newClient = new (std::nothrow) iClient(
@@ -138,20 +140,20 @@ assert( newClient != 0 ) ;
 
 if( !Network->addClient( newClient ) )
 	{
-	elog	<< "xServer::MSG_B> Failed to add client: "
+	elog	<< "msg_N> Failed to add client: "
 		<< *newClient
 		<< ", user already exists? "
 		<< (Network->findClient( newClient->getCharYYXXX() ) ?
 		   "yes" : "no")
 		<< endl ;
 	delete newClient ;
-	return -1 ;
+	return false ;
 	}
 
 // TODO: Should this be posted?
-PostEvent( EVT_NICK, static_cast< void* >( newClient ) ) ;
+theServer->PostEvent( EVT_NICK, static_cast< void* >( newClient ) ) ;
 
-return 0 ;
+return true ;
 }
 
 } // namespace gnuworld

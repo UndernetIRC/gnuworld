@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server.cc,v 1.135 2002/06/07 14:38:19 dan_karrels Exp $
+ * $Id: server.cc,v 1.136 2002/07/05 01:10:06 dan_karrels Exp $
  */
 
 #include	<sys/time.h>
@@ -35,6 +35,7 @@
 #include	<vector>
 #include	<algorithm>
 #include	<sstream>
+#include	<fstream>
 #include	<stack>
 #include	<iostream>
 #include	<utility>
@@ -71,7 +72,7 @@
 #include	"Connection.h"
 
 const char server_h_rcsId[] = __SERVER_H ;
-const char server_cc_rcsId[] = "$Id: server.cc,v 1.135 2002/06/07 14:38:19 dan_karrels Exp $" ;
+const char server_cc_rcsId[] = "$Id: server.cc,v 1.136 2002/07/05 01:10:06 dan_karrels Exp $" ;
 const char config_h_rcsId[] = __CONFIG_H ;
 const char misc_h_rcsId[] = __MISC_H ;
 const char events_h_rcsId[] = __EVENTS_H ;
@@ -141,9 +142,10 @@ initializeVariables() ;
 
 if( !readConfigFile( configFileName ) )
 	{
-	clog	<< "Error reading config file: "
-		<< configFileName << endl ;
-	::exit( 0 ) ;
+	elog	<< "Error reading config file: "
+		<< configFileName
+		<< endl ;
+	::exit( -1 ) ;
 	}
 
 // Output the information to the console.
@@ -174,20 +176,25 @@ if( !Network->addServer( me ) )
 	elog	<< "xServer::initializeSystem> Failed to add "
 		<< "(me) to the system tables"
 		<< endl ;
-	::exit( 0 ) ;
+	::exit( -1 ) ;
 	}
 
-loadCommandHandlers() ;
+if( !loadCommandHandlers() )
+	{
+	elog	<< "xServer::initializeSystem> Failed to load "
+		<< "command handlers"
+		<< endl ;
+	::exit( -1 ) ;
+	}
 
-if( !loadModules( configFileName ) )
+if( !loadClients( configFileName ) )
 	{
 	elog	<< "xServer> Failed in loading one or more modules"
 		<< endl ;
-	::exit( 0 ) ;
+	::exit( -1 ) ;
 	}
 
 registerServerTimers() ;
-
 }
 
 /**
@@ -198,7 +205,7 @@ xServer::~xServer()
 // TODO: Delete all clients
 // TODO: Delete all commands in command map
 // TODO: Deallocate all timers
-delete commandMap ;
+//delete commandMap ;
 
 // Deallocate all of the Glines
 for( glineIterator ptr = gline_begin() ; ptr != gline_end() ;
@@ -209,12 +216,12 @@ for( glineIterator ptr = gline_begin() ; ptr != gline_end() ;
 glineList.clear() ;
 
 // Deallocate all loaded modules/close dlm handles.
-for( moduleListType::iterator ptr = moduleList.begin() ;
-	ptr != moduleList.end() ; ++ptr )
+for( clientModuleListType::iterator ptr = clientModuleList.begin() ;
+	ptr != clientModuleList.end() ; ++ptr )
 	{
 	delete *ptr ;
 	}
-moduleList.clear() ;
+clientModuleList.clear() ;
 
 while( !timerQueue.empty() )
 	{
@@ -234,6 +241,7 @@ delete[] inputCharBuffer ; inputCharBuffer = 0 ;
 
 } // ~xServer()
 
+/*
 void xServer::loadCommandHandlers()
 {
 
@@ -252,7 +260,6 @@ assert( commandMap != 0 ) ;
 // class handler method to be called for handling
 // that particular command, prepended with MSG_
 
-REGISTER_MSG( "ERROR", Error );
 REGISTER_MSG( "RPING", RemPing );
 
 // Server
@@ -294,9 +301,6 @@ REGISTER_MSG( "CM", CM ) ;
 
 // Quit
 REGISTER_MSG( "Q", Q );
-
-// BURST
-REGISTER_MSG( "B", B );
 
 // Join
 REGISTER_MSG( "J", J ) ;
@@ -343,12 +347,6 @@ REGISTER_MSG( "K", K ) ;
 // No idea
 REGISTER_MSG( "DS", DS ) ;
 
-// Admin
-REGISTER_MSG( "AD", AD ) ;
-
-// Account
-REGISTER_MSG( "AC", AC ) ;
-
 // Non-tokenized command handlers
 
 // NOOP handlers.
@@ -391,6 +389,7 @@ REGISTER_MSG( "U", NOOP ) ;
 REGISTER_MSG( "WU", NOOP ) ;
 
 }
+*/
 
 void xServer::initializeVariables()
 {
@@ -437,6 +436,13 @@ Password = conf.Require( "password" )->second ;
 Port = atoi( conf.Require( "port" )->second.c_str() ) ;
 intYY = atoi( conf.Require( "numeric" )->second.c_str() ) ;
 intXXX = atoi( conf.Require( "maxclients" )->second.c_str() ) ;
+commandMapFileName = conf.Require( "command_map" )->second ;
+
+commandHandlerPrefix = conf.Require( "command_handler_path" )->second ;
+if( commandHandlerPrefix[ commandHandlerPrefix.size() - 1 ] != '/' )
+	{
+	commandHandlerPrefix += '/' ;
+	}
 
 glineUpdateInterval = static_cast< time_t >( atoi(
 	conf.Require( "glineupdateinterval" )->second.c_str() ) ) ;
@@ -446,7 +452,157 @@ pingUpdateInterval = static_cast< time_t >( atoi(
 return true ;
 }
 
-bool xServer::loadModules( const string& fileName )
+bool xServer::loadCommandHandlers()
+{
+std::ifstream commandMapFile( commandMapFileName.c_str() ) ;
+if( !commandMapFile )
+	{
+	elog	<< "xServer::loadCommandHandlers> Unable to open "
+		<< "command map file: "
+		<< commandMapFileName
+		<< endl ;
+	return false ;
+	}
+
+string line ;
+size_t lineNumber = 0 ;
+bool returnVal = true ;
+
+while( std::getline( commandMapFile, line ) )
+	{
+	++lineNumber ;
+
+	if( line.empty() || '#' == line[ 0 ] )
+		{
+		continue ;
+		}
+
+	StringTokenizer st( line ) ;
+	if( st.size() != 2 )
+		{
+		elog	<< "xServer::loadCommandHandlers> "
+			<< commandMapFileName
+			<< ":"
+			<< lineNumber
+			<< "> Invalid syntax, 2 tokens expected, "
+			<< st.size()
+			<< " tokens found"
+			<< endl ;
+		returnVal = false ;
+		break ;
+		}
+
+	// st[ 0 ] is the filename of the module
+	// st[ 1 ] is the command key to which the handler will
+	//  be registered
+
+	// Let's make sure that the filename is correct
+	string fileName( st[ 0 ] ) ;
+
+	// We need the entire path to the command handler in the
+	// fileName.
+	if( string::npos == fileName.find( commandHandlerPrefix ) )
+		{
+		// Need to put the command handler path prefix in
+		// the filename
+		// commandHandlerPrefix has a trailing '/'
+		fileName = commandHandlerPrefix + fileName ;
+		}
+
+	// All module names end with ".la" for libtool libraries
+	if( string::npos == fileName.find( ".la" ) )
+		{
+		// Need to append ".la" to fileName
+		fileName += ".la" ;
+		}
+
+	if( !loadCommandHandler( fileName, st[ 1 ] ) )
+		{
+		elog	<< "xSerer::loadCommandHandlers> Failed to load "
+			<< "handler for "
+			<< st[ 1 ]
+			<< endl ;
+		returnVal = false ;
+		break ;
+		}
+
+	elog	<< "xServer::loadCommandHandlers> Loaded handler for "
+		<< st[ 1 ]
+		<< endl ;
+
+	} // while()
+
+commandMapFile.close() ;
+return returnVal ;
+}
+
+bool xServer::loadCommandHandler( const string& fileName,
+	const string& commandKey )
+{
+// Let's first check to see if the module is already open
+// It is possible that a single module handler may be
+// registered to handle multiple commands (NOOP for example)
+commandModuleType* ml = lookupCommandModule( fileName ) ;
+if( NULL == ml )
+	{
+	ml = new (std::nothrow) commandModuleType( fileName ) ;
+	assert( ml != 0 ) ;
+	}
+
+ServerCommandHandler* sch = ml->loadObject( this ) ;
+if( NULL == sch )
+	{
+	elog	<< "xServer::loadCommandHandler> Error loading "
+		<< "module file "
+		<< fileName
+		<< endl ;
+
+	delete( ml ) ; ml = 0 ;
+
+	return false ;
+	}
+
+// Successfully loaded a module
+// Put it in the list of modules
+commandModuleList.push_back( ml ) ;
+
+// Add the command handler to the handler map
+if( !commandMap.insert( commandMapType::value_type(
+	commandKey, sch ) ).second )
+	{
+	elog	<< "xServer::loadCommandHandler> Unable to add "
+		<< "handler for message "
+		<< commandKey
+		<< " to commandMap"
+		<< endl ;
+
+	delete ml ; ml = 0 ;
+	delete sch ; sch = 0 ;
+
+	return false ;
+	}
+
+return true ;
+}
+
+xServer::commandModuleType* xServer::lookupCommandModule(
+	const string& moduleName ) const
+{
+for( commandModuleListType::const_iterator ptr =
+	commandModuleList.begin() ;
+	ptr != commandModuleList.end() ;
+	++ptr )
+	{
+	if( !strcasecmp( (*ptr)->getModuleName(), moduleName ) )
+		{
+		// Found the module
+		return *ptr ;
+		}
+	}
+return 0 ;
+}
+
+bool xServer::loadClients( const string& fileName )
 {
 // Load the config file
 EConfig conf( fileName ) ;
@@ -461,7 +617,7 @@ for( ; ptr != conf.end() && ptr->first == "module" ; ++ptr )
 
 	if( 2 != modInfo.size() )
 		{
-		elog	<< "xServer::loadModules> modules require two "
+		elog	<< "xServer::loadClients> modules require two "
 			<< "arguments, modulename followed by config "
 			<< "file name"
 			<< endl ;
@@ -482,7 +638,7 @@ for( ; ptr != conf.end() && ptr->first == "module" ; ++ptr )
 		{
 		// No need for error output here because AttachClient()
 		// will do that for us
-		elog	<< "xServer::loadModules> Failed to attach client"
+		elog	<< "xServer::loadClients> Failed to attach client"
 			<< endl ;
 
 		return false ;
@@ -739,9 +895,8 @@ if( !isNumeric )
 // elog << "strlen( Command ): " << strlen( Command ) << endl ;
 
 // Lookup the handler for this command
-commandMapType::iterator pairPtr =
-	commandMap->find( Command ) ;
-if( pairPtr != commandMap->end() )
+commandMapType::iterator pairPtr = commandMap.find( Command ) ;
+if( pairPtr != commandMap.end() )
 	{
 	// Found a command handler for this
 	// command.
@@ -817,7 +972,13 @@ if( pairPtr != commandMap->end() )
 
 	// Arguments are set.
 	// Go ahead and call the handler method
-	(this->*(pairPtr->second))( Param ) ;
+//	(this->*(pairPtr->second))( Param ) ;
+	if( !pairPtr->second->Execute( Param ) )
+		{
+		elog	<< "xServer::Process> Handler failed for message: "
+			<< Param
+			<< endl ;
+		}
 
 	}
 else
@@ -1608,8 +1769,8 @@ if( !AttachClient( clientPtr, doBurst ) )
 // The client module is successfully loaded from the file, and
 // has been successfully attached to the server
 
-// Add moduleLoader to the moduleList
-moduleList.push_back( ml );
+// Add moduleLoader to the clientModuleList
+clientModuleList.push_back( ml );
 
 // success
 return true ;
@@ -1672,8 +1833,8 @@ return true ;
 bool xServer::DetachClient( const string& moduleName,
 	const string& reason )
 {
-for( moduleListType::const_iterator ptr = moduleList.begin() ;
-	ptr != moduleList.end() ; ++ptr )
+for( clientModuleListType::const_iterator ptr = clientModuleList.begin() ;
+	ptr != clientModuleList.end() ; ++ptr )
 	{
 	if( !strcasecmp( (*ptr)->getModuleName(), moduleName ) )
 		{
@@ -1726,8 +1887,8 @@ elog	<< "xServer::UnloadClient(xClient*)> "
 	<< theClient->getNickName()
 	<< endl ;
 
-for( moduleListType::const_iterator ptr = moduleList.begin() ;
-	ptr != moduleList.end() ; ++ptr )
+for( clientModuleListType::const_iterator ptr = clientModuleList.begin() ;
+	ptr != clientModuleList.end() ; ++ptr )
 	{
 	if( (*ptr)->getObject() == theClient )
 		{
@@ -1779,8 +1940,8 @@ for( eventListType::iterator evPtr = eventList.begin(),
 Network->removeLocalClient( theClient ) ;
 
 // Find this client in the module list
-for( moduleListType::iterator modPtr = moduleList.begin() ;
-	modPtr != moduleList.end() ; ++modPtr )
+for( clientModuleListType::iterator modPtr = clientModuleList.begin() ;
+	modPtr != clientModuleList.end() ; ++modPtr )
 	{
 	if( (*modPtr)->getObject() == theClient )
 		{
@@ -1793,7 +1954,7 @@ for( moduleListType::iterator modPtr = moduleList.begin() ;
 		delete *modPtr ;
 
 		// Remove this module from the list of modules
-		moduleList.erase( modPtr ) ;
+		clientModuleList.erase( modPtr ) ;
 
 		break ;
 		}

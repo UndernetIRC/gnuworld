@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_T.cc,v 1.5 2002/05/27 17:18:13 dan_karrels Exp $
+ * $Id: msg_T.cc,v 1.6 2002/07/05 01:10:06 dan_karrels Exp $
  */
 
 #include	<iostream>
@@ -28,8 +28,9 @@
 #include	"ELog.h"
 #include	"config.h"
 #include	"Channel.h"
+#include	"ServerCommandHandler.h"
 
-const char msg_T_cc_rcsId[] = "$Id: msg_T.cc,v 1.5 2002/05/27 17:18:13 dan_karrels Exp $" ;
+const char msg_T_cc_rcsId[] = "$Id: msg_T.cc,v 1.6 2002/07/05 01:10:06 dan_karrels Exp $" ;
 const char xParameters_h_rcsId[] = __XPARAMETERS_H ;
 const char server_h_rcsId[] = __SERVER_H ;
 const char ELog_h_rcsId[] = __ELOG_H ;
@@ -42,33 +43,37 @@ namespace gnuworld
 
 using std::endl ;
 
+CREATE_HANDLER(msg_T)
+
 // Channel topics currently are not tracked.
 // kAI T #omniplex :-=[ Washington.DC.US.Krushnet.Org / Luxembourg.
 // LU.EU.KrushNet.Org
 // Admin Channel ]=-
-int xServer::MSG_T( xParameters& Param )
+bool msg_T::Execute( const xParameters& Param )
 {
 if( Param.size() < 4 )
 	{
-	elog	<< "MSG_T> Invalid number of arguments"
+	elog	<< "msg_T> Invalid number of arguments"
 		<< endl ;
-	return -1 ;
+	return false ;
 	}
 
 #ifdef TOPIC_TRACK
-  Channel* Chan = Network->findChannel( Param[ 1 ] ) ;
-  if(!Chan)
+
+Channel* Chan = Network->findChannel( Param[ 1 ] ) ;
+if(!Chan)
 	{
-	elog	<< "MSG_T> Unable to locate channel: "
+	elog	<< "msg_T> Unable to locate channel: "
 		<< Param[ 1 ]
 		<< endl;
 	return 0;
 	}
 
-  Chan->setTopic( Param[ 2 ] ) ;
+Chan->setTopic( Param[ 2 ] ) ;
+
 #endif // TOPIC_TRACK
 
-return 0 ;
+return true ;
 }
 
 } // namespace gnuworld

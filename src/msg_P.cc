@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_P.cc,v 1.5 2002/05/27 17:18:13 dan_karrels Exp $
+ * $Id: msg_P.cc,v 1.6 2002/07/05 01:10:06 dan_karrels Exp $
  */
 
 #include	<string>
@@ -29,8 +29,9 @@
 #include	"client.h"
 #include	"ELog.h"
 #include	"xparameters.h"
+#include	"ServerCommandHandler.h"
 
-const char msg_P_cc_rcsId[] = "$Id: msg_P.cc,v 1.5 2002/05/27 17:18:13 dan_karrels Exp $" ;
+const char msg_P_cc_rcsId[] = "$Id: msg_P.cc,v 1.6 2002/07/05 01:10:06 dan_karrels Exp $" ;
 const char server_h_rcsId[] = __SERVER_H ;
 const char Network_h_rcsId[] = __NETWORK_H ;
 const char iClient_h_rcsId[] = __ICLIENT_H ;
@@ -44,6 +45,8 @@ namespace gnuworld
 using std::string ;
 using std::endl ;
 
+CREATE_HANDLER(msg_P)
+
 /**
  * A nick has sent a private message
  * QBg P PAA :help
@@ -55,14 +58,13 @@ using std::endl ;
  * QAE P PAA :translate xaa
  * QAE P AAPAA :translate xaa
  */
-int xServer::MSG_P( xParameters& Param )
+bool msg_P::Execute( const xParameters& Param )
 {
-
 if( Param.size() < 3 )
 	{
-	elog	<< "xServer::MSG_P> Invalid number of arguments"
+	elog	<< "msg_P> Invalid number of arguments"
 		<< endl ;
-	return -1 ;
+	return false ;
 	}
 
 char* Sender	= Param[ 0 ] ;
@@ -72,7 +74,7 @@ char* Receiver	= Param[ 1 ] ;
 if( ('#' == *Receiver) || ('+' == *Receiver))
 	{
 	// It's a channel message, just ignore it
-	return 0 ;
+	return true ;
 	}
 
 char		*Server		= NULL,
@@ -96,15 +98,18 @@ if( NULL != Pos )
 	Client = Network->findLocalNick( Receiver ) ;
 	secure = true ;
 	}
-else if( Receiver[ 0 ] == charYY[ 0 ]
-	&& Receiver[ 1 ] == charYY[ 1 ] )
+else if( Receiver[ 0 ] == theServer->getCharYY()[ 0 ]
+	&& Receiver[ 1 ] == theServer->getCharYY()[ 1 ] )
 	{
 	// It's mine
 	Client = Network->findLocalClient( Receiver ) ;
 	}
 else
 	{
-	return -1 ;
+	elog	<< "msg_P> Received a message for unknown client: "
+		<< Param
+		<< endl ;
+	return false ;
 	}
 
 char* Message = Param[ 2 ] ;
@@ -140,19 +145,19 @@ if( Message[ 0 ] == 1 && Message[ strlen( Message ) - 1 ] == 1 )
 
 if( NULL == Client )
 	{
-	elog	<< "xServer::MSG_P> Local client not found: "
+	elog	<< "msg_P> Local client not found: "
 		<< Receiver
 		<< endl ;
-	return -1 ;
+	return false ;
 	}
 
 iClient* Target = Network->findClient( Sender ) ;
 if( NULL == Target )
 	{
-	elog	<< "xServer::MSG_P> Unable to find Sender: "
+	elog	<< "msg_P> Unable to find Sender: "
 		<< Sender
 		<< endl ;
-	return -1 ;
+	return false ;
 	}
 
 if( CTCP )

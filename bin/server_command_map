@@ -1,0 +1,39 @@
+# The mapping from module to message name for server command handlers
+# format: module_name command_key
+# example: msg_AC AC
+# example: msg_P P
+# example: msg_NOOP Z
+lib_msg_AC AC
+lib_msg_AD AD
+lib_msg_B B
+lib_msg_C C
+lib_msg_CM CM
+lib_msg_D D
+lib_msg_DS DS
+lib_msg_EA EA
+lib_msg_EB EB
+lib_msg_Error Error
+lib_msg_G G
+lib_msg_GL GL
+lib_msg_I I
+lib_msg_J J
+lib_msg_JU JU
+lib_msg_K K
+lib_msg_L L
+lib_msg_M351 M351
+lib_msg_M M
+lib_msg_N N
+lib_msg_NOOP NOOP
+lib_msg_PART PART
+lib_msg_PASS PASS
+lib_msg_P P
+lib_msg_Q Q
+lib_msg_R R
+lib_msg_S S
+lib_msg_Server Server
+lib_msg_SQ SQ
+lib_msg_T T
+lib_msg_WA WA
+lib_msg_W W
+
+

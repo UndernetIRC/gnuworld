@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_C.cc,v 1.10 2002/05/27 17:18:13 dan_karrels Exp $
+ * $Id: msg_C.cc,v 1.11 2002/07/05 01:10:05 dan_karrels Exp $
  */
 
 #include	<new>
@@ -38,6 +38,7 @@
 #include	"iClient.h"
 #include	"Channel.h"
 #include	"ChannelUser.h"
+#include	"ServerCommandHandler.h"
 
 const char ELog_h_rcsId[] = __ELOG_H ;
 const char Socket_h_rcsId[] = __SOCKET_H ;
@@ -46,7 +47,7 @@ const char xparameters_h_rcsId[] = __XPARAMETERS_H ;
 const char iClient_h_rcsId[] = __ICLIENT_H ;
 const char Channel_h_rcsId[] = __CHANNEL_H ;
 const char ChannelUser_h_rcsId[] = __CHANNELUSER_H ;
-const char msg_C_cc_rcsId[] = "$Id: msg_C.cc,v 1.10 2002/05/27 17:18:13 dan_karrels Exp $" ;
+const char msg_C_cc_rcsId[] = "$Id: msg_C.cc,v 1.11 2002/07/05 01:10:05 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -55,12 +56,14 @@ using std::pair ;
 using std::string ;
 using std::endl ;
 
+CREATE_HANDLER(msg_C)
+
 /**
  * Someone has just joined an empty channel (create)
  * UAA C #xfactor 957134023
  * zBP C #OaXaCa,#UruApan,#skatos 957207634
  */
-int xServer::MSG_C( xParameters& Param )
+bool msg_C::Execute( const xParameters& Param )
 {
 
 // Verify that there exist sufficient arguments to successfully
@@ -69,11 +72,11 @@ int xServer::MSG_C( xParameters& Param )
 if( Param.size() < 3 )
 	{
 	// Insufficient arguments provided
-	elog	<< "xServer::MSG_C> Invalid number of parameters"
+	elog	<< "msg_C> Invalid number of parameters"
 		<< endl ;
 
 	// Return error
-	return -1 ;
+	return false ;
 	}
 
 // Find the client in question.
@@ -83,14 +86,14 @@ iClient* theClient = Network->findClient( Param[ 0 ] ) ;
 if( NULL == theClient )
 	{
 	// Nope, log the error
-	elog	<< "xServer::MSG_C> ("
+	elog	<< "msg_C> ("
 		<< Param[ 1 ]
 		<< ") Unable to find client: "
 		<< Param[ 0 ]
 		<< endl ;
 
 	// Return error
-	return -1 ;
+	return false ;
 	}
 
 // Grab the creation time.
@@ -127,7 +130,7 @@ for( StringTokenizer::const_iterator ptr = st.begin() ; ptr != st.end() ;
 		if( !Network->addChannel( theChan ) )
 			{
 			// Addition failed, log the error
-			elog	<< "xServer::MSG_C> Failed to add channel: "
+			elog	<< "msg_C> Failed to add channel: "
 				<< *theChan
 				<< endl ;
 
@@ -143,7 +146,7 @@ for( StringTokenizer::const_iterator ptr = st.begin() ; ptr != st.end() ;
 	// Add this channel to the client's channel structure.
 	if( !theClient->addChannel( theChan ) )
 		{
-		elog	<< "xServer::MSG_C> Unable to add channel "
+		elog	<< "msg_C> Unable to add channel "
 			<< *theChan
 			<< " to iClient "
 			<< *theClient
@@ -167,7 +170,7 @@ for( StringTokenizer::const_iterator ptr = st.begin() ; ptr != st.end() ;
 	if( !theChan->addUser( theUser ) )
 		{
 		// Addition failed, log the error
-		elog	<< "xServer::MSG_C> Unable to add user "
+		elog	<< "msg_C> Unable to add user "
 			<< theUser->getNickName()
 			<< " to channel "
 			<< theChan->getName()
@@ -185,12 +188,12 @@ for( StringTokenizer::const_iterator ptr = st.begin() ; ptr != st.end() ;
 		}
 
 	// Notify all listening xClients of this event
-	PostChannelEvent( EVT_CREATE, theChan,
+	theServer->PostChannelEvent( EVT_CREATE, theChan,
 		static_cast< void* >( theClient ) ) ;
 
 	} // for()
 
-return 0 ;
+return true ;
 }
 
 } // namespace gnuworld

@@ -17,10 +17,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_EA.cc,v 1.4 2002/05/27 17:18:13 dan_karrels Exp $
+ * $Id: msg_EA.cc,v 1.5 2002/07/05 01:10:05 dan_karrels Exp $
  */
 
-#include	<stack>
+#include	<string>
+#include	<iostream>
 
 #include	<cstring>
 
@@ -29,48 +30,52 @@
 #include	"events.h"
 #include	"ELog.h"
 #include	"iServer.h"
+#include	"ServerCommandHandler.h"
 
 const char server_h_rcsId[] = __SERVER_H ;
 const char Network_h_rcsId[] = __NETWORK_H ;
 const char events_h_rcsId[] = __EVENTS_H ;
 const char ELog_h_rcsId[] = __ELOG_H ;
 const char iServer_h_rcsId[] = __ISERVER_H ;
-const char msg_EA_cc_rcsId[] = "$Id: msg_EA.cc,v 1.4 2002/05/27 17:18:13 dan_karrels Exp $" ;
-
-using std::string ;
-using std::endl ;
-using std::stack ;
+const char msg_EA_cc_rcsId[] = "$Id: msg_EA.cc,v 1.5 2002/07/05 01:10:05 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
+
+using std::string ;
+using std::endl ;
+
+CREATE_HANDLER(msg_EA)
 
 // Q EA
 // Q: Remote server numeric
 // EA: End Of Burst Acknowledge
 // Our uplink server has acknowledged our EB
-int xServer::MSG_EA( xParameters& Param )
+bool msg_EA::Execute( const xParameters& Param )
 {
-if( !strcmp( Param[ 0 ], Uplink->getCharYY() ) )
+if( !strcmp( Param[ 0 ], theServer->getUplinkCharYY().c_str() ) )
 	{
 	// My uplink! :)
 	// Reset EOB just to be sure
-	bursting = false ; // ACKNOWLEDGE! :)
+	theServer->setBursting( false ) ; // ACKNOWLEDGE! :)
 	}
 
-if( !bursting )
+if( !theServer->isBursting() )
 	{
-	iServer* theServer = Network->findServer( Param[ 0 ] ) ;
-	if( NULL == theServer )
+	iServer* burstServer = Network->findServer( Param[ 0 ] ) ;
+	if( NULL == burstServer )
 		{
-		elog	<< "xServer::MSG_EA> Unable to find server: "
-			<< Param[ 0 ] << endl ;
-		return -1 ;
+		elog	<< "msg_EA> Unable to find server: "
+			<< Param[ 0 ]
+			<< endl ;
+		return false ;
 		}
 
-	PostEvent( EVT_BURST_ACK, static_cast< void* >( theServer ) );
+	theServer->PostEvent( EVT_BURST_ACK,
+		static_cast< void* >( burstServer ) );
 	}
-return( 0 ) ;
 
+return true ;
 }
 
 } // namespace gnuworld

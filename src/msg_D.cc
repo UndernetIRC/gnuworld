@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_D.cc,v 1.5 2002/05/27 17:18:13 dan_karrels Exp $
+ * $Id: msg_D.cc,v 1.6 2002/07/05 01:10:05 dan_karrels Exp $
  */
 
 #include	<new>
@@ -33,6 +33,7 @@
 
 #include	"ELog.h"
 #include	"StringTokenizer.h"
+#include	"ServerCommandHandler.h"
 
 const char server_h_rcsId[] = __SERVER_H ;
 const char iClient_h_rcsId[] = __ICLIENT_H ;
@@ -41,13 +42,15 @@ const char events_h_rcsId[] = __EVENTS_H ;
 const char Network_h_rcsId[] = __NETWORK_H ;
 const char ELog_h_rcsId[] = __ELOG_H ;
 const char StringTokenizer_h_rcsId[] = __STRINGTOKENIZER_H ;
-const char msg_D_rcsId[] = "$Id: msg_D.cc,v 1.5 2002/05/27 17:18:13 dan_karrels Exp $" ;
+const char msg_D_rcsId[] = "$Id: msg_D.cc,v 1.6 2002/07/05 01:10:05 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
 
 using std::string ;
 using std::endl ;
+
+CREATE_HANDLER(msg_D)
 
 /**
  * Kill command
@@ -56,14 +59,13 @@ using std::endl ;
  * G D r[l :NewYork-R.NY.US.Undernet.Org!NewYork-R.NY.US.Undernet.org ...
  * The source of the kill could be a server or a client.
  */
-int xServer::MSG_D( xParameters& Param )
+bool msg_D::Execute( const xParameters& Param )
 {
-
 if( Param.size() < 3 )
 	{
-	elog	<< "xServer::MSG_D> Invalid number of parameters"
+	elog	<< "msg_D> Invalid number of parameters"
 		<< endl ;
-	return -1 ;
+	return false ;
 	}
 
 // See if the client being killed is one of my own.
@@ -80,7 +82,7 @@ if( NULL != myClient )
 
 	// Note that the client is still attached to the
 	// server.
-	return 0 ;
+	return true ;
 	}
 
 // Otherwise, it's a non-local client.
@@ -105,10 +107,10 @@ else
 
 if( (NULL == serverSource) && (NULL == source) )
 	{
-	elog	<< "xServer::MSG_D> Unable to find source: "
+	elog	<< "msg_D> Unable to find source: "
 		<< Param[ 0 ]
 		<< endl ;
-	return -1 ;
+	return false ;
 	}
 
 // Find and remove the client that was just killed.
@@ -119,10 +121,10 @@ iClient* target = Network->removeClient( Param[ 1 ] ) ;
 // and target.
 if( NULL == target )
 	{
-	elog	<< "xServer::MSG_D> Unable to find target client: "
+	elog	<< "msg_D> Unable to find target client: "
 		<< Param[ 1 ]
 		<< endl ;
-	return -1 ;
+	return false ;
 	}
 
 // Notify all listeners of the EVT_KILL event.
@@ -130,14 +132,14 @@ string reason( Param[ 2 ] ) ;
 
 if( source != NULL )
 	{
-	PostEvent( EVT_KILL,
+	theServer->PostEvent( EVT_KILL,
 		static_cast< void* >( source ),
 		static_cast< void* >( target ),
 		static_cast< void* >( &reason ) ) ;
 	}
 else
 	{
-	PostEvent( EVT_KILL,
+	theServer->PostEvent( EVT_KILL,
 		static_cast< void* >( serverSource ),
 		static_cast< void* >( target ),
 		static_cast< void* >( &reason ) ) ;
@@ -146,7 +148,7 @@ else
 // Deallocate the memory associated with this iClient.
 delete target ;
 
-return 0 ;
+return true ;
 }
 
 } // namespace gnuworld

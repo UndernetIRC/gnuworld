@@ -19,11 +19,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: iServer.h,v 1.10 2002/05/27 17:18:12 dan_karrels Exp $
+ * $Id: iServer.h,v 1.11 2002/07/05 01:10:05 dan_karrels Exp $
  */
 
 #ifndef __ISERVER_H
-#define __ISERVER_H "$Id: iServer.h,v 1.10 2002/05/27 17:18:12 dan_karrels Exp $"
+#define __ISERVER_H "$Id: iServer.h,v 1.11 2002/07/05 01:10:05 dan_karrels Exp $"
 
 #include	<iostream>
 #include	<string>
@@ -121,6 +121,32 @@ public:
 		{ return bursting ; }
 
 	/**
+	 * This method is used by xServer to signify that this
+	 * iServer is now in the bursting state.
+	 */
+	virtual void	startBursting()
+		{ bursting = true ; }
+
+	/**
+	 * This method is called by xServer to signify that this
+	 * iServer has completed bursting.
+	 */
+	virtual void	stopBursting()
+		{ bursting = false ; }
+
+	virtual void	setBursting( bool newVal )
+		{ bursting = newVal ; }
+
+	/**
+	 * This method is called by class xServer once the uplink
+	 * of the xServer is known.  This method is only called
+	 * for the single instance of the iServer for the core
+	 * xServer.
+	 */
+	virtual void	setUplinkIntYY( const unsigned int& newYY )
+		{ uplinkIntYY = newYY ; }
+
+	/**
 	 * Nice debugging method for outputting the iServer's
 	 * information to an ELog stream.
 	 */
@@ -149,29 +175,6 @@ public:
 		}
 
 protected:
-
-	/**
-	 * This method is called by class xServer once the uplink
-	 * of the xServer is known.  This method is only called
-	 * for the single instance of the iServer for the core
-	 * xServer.
-	 */
-	virtual void	setUplinkIntYY( const unsigned int& newYY )
-		{ uplinkIntYY = newYY ; }
-
-	/**
-	 * This method is used by xServer to signify that this
-	 * iServer is now in the bursting state.
-	 */
-	virtual void	startBursting()
-		{ bursting = true ; }
-
-	/**
-	 * This method is called by xServer to signify that this
-	 * iServer has completed bursting.
-	 */
-	virtual void	stopBursting()
-		{ bursting = false ; }
 
 	/**
 	 * Integer numeric of this server's uplink.

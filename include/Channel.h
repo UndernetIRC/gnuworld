@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: Channel.h,v 1.23 2002/05/27 17:18:12 dan_karrels Exp $
+ * $Id: Channel.h,v 1.24 2002/07/05 01:10:05 dan_karrels Exp $
  */
 
 #ifndef __CHANNEL_H
-#define __CHANNEL_H "$Id: Channel.h,v 1.23 2002/05/27 17:18:12 dan_karrels Exp $"
+#define __CHANNEL_H "$Id: Channel.h,v 1.24 2002/07/05 01:10:05 dan_karrels Exp $"
 
 #include	<string>
 #include	<map>
@@ -270,6 +270,13 @@ public:
 		{ return creationTime ; }
 
 	/**
+	 * Set the creation time of this channel.  This is protected
+	 * so that only class xServer may access it externally.
+	 */
+	inline virtual void	setCreationTime( const time_t& newCT )
+		{ creationTime = newCT ; }
+
+	/**
 	 * Retrieve this channel's key.  Note that the
 	 * existence of a key does not mean that channel
 	 * mode +k is set.
@@ -494,13 +501,6 @@ protected:
 	 * overlapping bans.
 	 */
 	virtual void	onModeB( vector< pair< bool, string > >& ) ;
-
-	/**
-	 * Set the creation time of this channel.  This is protected
-	 * so that only class xServer may access it externally.
-	 */
-	inline virtual void	setCreationTime( const time_t& newCT )
-		{ creationTime = newCT ; }
 
 	/**
 	 * The name of this channel.

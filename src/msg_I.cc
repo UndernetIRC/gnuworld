@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_I.cc,v 1.3 2002/05/27 17:18:13 dan_karrels Exp $
+ * $Id: msg_I.cc,v 1.4 2002/07/05 01:10:06 dan_karrels Exp $
  */
 
 #include	<iostream>
@@ -29,6 +29,7 @@
 #include	"ELog.h"
 #include	"client.h"
 #include	"Network.h"
+#include	"ServerCommandHandler.h"
 
 const char server_h_rcsId[] = __SERVER_H ;
 const char xparameters_h_rcsId[] = __XPARAMETERS_H ;
@@ -37,48 +38,50 @@ const char Channel_h_rcsId[] = __CHANNEL_H ;
 const char iClient_h_rcsId[] = __ICLIENT_H ;
 const char client_h_rcsId[] = __CLIENT_H ;
 const char ELog_h_rcsId[] = __ELOG_H ;
-const char msg_I_cc_rcsId[] = "$Id: msg_I.cc,v 1.3 2002/05/27 17:18:13 dan_karrels Exp $" ;
+const char msg_I_cc_rcsId[] = "$Id: msg_I.cc,v 1.4 2002/07/05 01:10:06 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
 
 using std::endl ;
 
+CREATE_HANDLER(msg_I)
+
 // ABAHo I X :#lksdlkj
-int xServer::MSG_I( xParameters& Param )
+bool msg_I::Execute( const xParameters& Param )
 {
 if( Param.size() != 3 )
 	{
-	elog	<< "xServer::MSG_I> Invalid number of arguments"
+	elog	<< "msg_I> Invalid number of arguments"
 		<< endl ;
-	return -1 ;
+	return false ;
 	}
 
 iClient* srcClient = Network->findClient( Param[ 0 ] ) ;
 if( NULL == srcClient )
 	{
-	elog	<< "xServer::MSG_I> Unable to find source client: "
+	elog	<< "msg_I> Unable to find source client: "
 		<< Param[ 0 ]
 		<< endl ;
-	return -1 ;
+	return false ;
 	}
 
 xClient* destClient = Network->findLocalNick( Param[ 1 ] ) ;
 if( NULL == destClient )
 	{
-	elog	<< "xServer::MSG_I> Unable to find destination client: "
+	elog	<< "msg_I> Unable to find destination client: "
 		<< Param[ 1 ]
 		<< endl ;
-	return -1 ;
+	return false ;
 	}
 
 Channel* theChan = Network->findChannel( Param[ 2 ] ) ;
 if( NULL == theChan )
 	{
-	elog	<< "xServer::MSG_I> Unable to find channel: "
+	elog	<< "msg_I> Unable to find channel: "
 		<< Param[ 2 ]
 		<< endl ;
-	return -1 ;
+	return false ;
 	}
 
 return destClient->OnInvite( srcClient, theChan ) ;
