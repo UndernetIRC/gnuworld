@@ -14,9 +14,13 @@ COPY "translations" FROM stdin;
 1	8	You're opped by %s	31337
 1	9	You're voiced by %s	31337
 1	10	%s: You are not in that channel	31337
-1	11	%s is already opped on %s	31337
+1	11	%s is already opped in %s	31337
+1	12	%s is already voiced in %s	31337
+1	13	You're deopped by %s	31337
+1	14	You're devoiced by %s	31337
+1	15	%s is not opped in %s	31337
+1	16	%s is not voiced in %s	31337
 \.
-
 
 -- French language definition.
 -- 29/12/00 - Daniel Simard <svr@undernet.org>.
@@ -31,7 +35,6 @@ COPY "translations" FROM stdin;
 2	7	Le canal %s ne semble pas être enregistré	31337
 2	8	Vous avez été oppé par %s	31337
 \.
-
 
 -- Danish language definition.
 -- 28/12/2000 - David Henriksen <david@itwebnet.dk>.
@@ -60,4 +63,7 @@ COPY "translations" FROM stdin;
 4	6	Ik kan %s niet vinden op het kanaal %s	31337
 4	7	Het kanaal %s ziet er niet geregistreerd uit	31337
 4	8	Je bent geopt door %s	31337
+4	9	Je bent gevoiced door %s	31337
+4	10	%s: Je bent niet in dat kanaal	31337
+4	11	%s is reeds geopt op %s	31337
 \.
