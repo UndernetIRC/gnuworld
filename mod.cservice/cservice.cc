@@ -513,6 +513,19 @@ if( st.empty() )
  */
 const string Command = string_upper( st[ 0 ] ) ;
 
+/*
+ *  Just quickly, abort if someone tries to LOGIN or NEWPASS
+ *  unsecurely.
+ */
+
+ if (!secure && ((Command == "LOGIN") || (Command == "NEWPASS")) )
+ {
+ 	Notice(theClient, "To use %s, you must /msg %s@%s",
+		Command.c_str(), nickName.c_str(), getUplinkName().c_str());
+	return false;
+ }
+ 
+
 /* Attempt to find a handler for this method. */
 
 commandMapType::iterator commHandler = commandMap.find( Command ) ;
@@ -585,7 +598,7 @@ else if(Command == "VERSION")
 	xClient::DoCTCP(theClient, CTCP,
 		"Undernet P10 Channel Services Version 2 ["
 		__DATE__ " " __TIME__
-		"] ($Id: cservice.cc,v 1.91 2001/02/09 23:57:00 gte Exp $)");
+		"] ($Id: cservice.cc,v 1.92 2001/02/10 00:19:37 gte Exp $)");
 	}
 else if(Command == "PROBLEM?")
 	{
