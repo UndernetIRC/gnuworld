@@ -39,7 +39,7 @@
 //#include	"moduleLoader.h"
 
 const char xServer_h_rcsId[] = __XSERVER_H ;
-const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.21 2000/08/05 17:23:34 dan_karrels Exp $" ;
+const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.22 2000/08/05 17:43:23 dan_karrels Exp $" ;
 
 using std::string ;
 using std::vector ;
@@ -4197,7 +4197,7 @@ if( timerQueue.empty() || bursting )
 unsigned int numTimers = 0 ;
 time_t now = ::time( 0 ) ;
 
-while( timerQueue.top().second->absTime >= now )
+while( !timerQueue.empty() && (timerQueue.top().second->absTime >= now) )
 	{
 	timerInfo* info = timerQueue.top().second ;
 	timerQueue.pop() ;
