@@ -1,9 +1,12 @@
--- "$Id: ccontrol.sql,v 1.3 2001/02/23 20:19:43 mrbean_ Exp $"
+-- "$Id: ccontrol.sql,v 1.4 2001/03/26 21:55:01 mrbean_ Exp $"
 -- 2001-13-02  : |MrBean|
 -- Added level patch for ccontrol module
 
 -- 2001-22-02 : |MrBean|
 -- Added help table for a new help system being developed
+
+-- 2001-13-03 : |MrBean|
+-- Added Glines table 
 
 CREATE TABLE opers (
 	user_id SERIAL,	
@@ -30,4 +33,13 @@ CREATE TABLE help (
 	line INT4 NOT NULL DEFAULT '1',
 	help VARCHAR(255)
 );
-			
+
+CREATE TABLE glines (
+	Id SERIAL,
+	Host VARCHAR(128) UNIQUE NOT NULL,
+	AddedBy VARCHAR(128) NOT NULL,
+	AddedOn INT4 NOT NULL,
+	ExpiresAt INT4 NOT NULL,
+	Reason VARCHAR(255)
+	);
+				

@@ -3,7 +3,7 @@
  */
 
 #ifndef __CCONTROL_H
-#define __CCONTROL_H "$Id: ccontrol.h,v 1.16 2001/03/26 00:08:31 dan_karrels Exp $"
+#define __CCONTROL_H "$Id: ccontrol.h,v 1.17 2001/03/26 21:55:02 mrbean_ Exp $"
 
 #include	<string>
 #include	<vector>
@@ -23,6 +23,7 @@
 #include	"md5hash.h" 
 #include        "ccUser.h"
 #include	"AuthInfo.h"
+#include        "ccGline.h"
 
 namespace gnuworld
 {
@@ -79,6 +80,15 @@ protected:
 	 * Holds the authenticated user list
 	 */
 	authListType			authList ;
+
+
+	typedef list< ccGline* >        glineListType ;
+
+	/**
+	 * Holds the glines
+	 */
+
+	glineListType			glineList ;
 
 public:
 
@@ -266,6 +276,10 @@ public:
 				const string& ) ;
 	
 	ccUser *GetOper( const string );
+
+	bool addGline( ccGline* );
+	
+	bool remGline( ccGline* );
 
 //	bool AuthOper( ccUser* );
 	

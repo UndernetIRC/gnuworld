@@ -23,7 +23,7 @@
 #include	"AuthInfo.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.22 2001/03/26 00:08:31 dan_karrels Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.23 2001/03/26 21:55:02 mrbean_ Exp $" ;
 
 using std::string ;
 using std::vector ;
@@ -1177,6 +1177,23 @@ if( !tmpUser->loadData(Name) )
 	delete tmpUser ; tmpUser = 0 ;
 	}
 return tmpUser ;
+}
+
+bool ccontrol::addGline( ccGline* TempGline)
+{
+
+glineList.push_back( TempGline ) ;
+return true;
+}    
+
+
+bool ccontrol::remGline( ccGline* TempGline)
+{
+glineList.erase( std::find( glineList.begin(),
+glineList.end(),
+TempGline ) ) ;
+delete TempGline ; 
+return true;
 }
 
 } // namespace gnuworld
