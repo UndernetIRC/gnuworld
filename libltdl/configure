@@ -1130,7 +1130,7 @@ for ac_kw in inline __inline__ __inline; do
 #include "confdefs.h"
 
 int main() {
-} $ac_kw foo() {
+} int $ac_kw foo() {
 ; return 0; }
 EOF
 if { (eval echo configure:1137: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
