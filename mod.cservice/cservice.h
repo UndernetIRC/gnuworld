@@ -1,5 +1,5 @@
 #ifndef __CSERVICE_H
-#define __CSERVICE_H "$Id: cservice.h,v 1.6 2000/12/21 22:20:57 gte Exp $"
+#define __CSERVICE_H "$Id: cservice.h,v 1.7 2000/12/22 00:29:32 gte Exp $"
 
 #include	<string>
 #include	<vector>
@@ -13,6 +13,7 @@
 #include	"cserviceCommands.h" 
 #include	"sqlChannel.h"
 #include	"sqlUser.h"
+#include	"sqlLevel.h"
  
 using std::string ;
 using std::vector ;
@@ -56,7 +57,7 @@ public:
                 { return commandMap.find( theComm ) ; } 
  
 	// Return what access theUser has in channel theChan.
-	int getAccessLevel( sqlUser* theUser, sqlChannel* theChan );
+	unsigned short getAccessLevel( sqlUser* theUser, sqlChannel* theChan );
 } ;
  
 } // namespace gnuworld

@@ -197,9 +197,19 @@ int cservice::OnPrivateMessage( iClient* theClient, const string& Message )
 return xClient::OnPrivateMessage( theClient, Message ) ;
 }
 
-int cservice::getAccessLevel( sqlUser* theUser, sqlChannel* theChan )
+unsigned short cservice::getAccessLevel( sqlUser* theUser, sqlChannel* theChan )
 {
-	return 500;
+	/*
+	 *  Returns the access level a particular user has on a particular
+	 *  channel.
+	 */
+
+	sqlLevel* theLevel = new sqlLevel(SQLDb);
+	if(theLevel->loadData(theUser->getID(), theChan->getID()))
+	{
+		return theLevel->getAccess();
+	}
+	return 0;
 }
  
 void Command::Usage( iClient* theClient )

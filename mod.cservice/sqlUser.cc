@@ -4,7 +4,7 @@
  * Storage class for accessing user information either from the backend
  * or internal storage.
  * 
- * $Id: sqlUser.cc,v 1.2 2000/12/21 22:20:57 gte Exp $
+ * $Id: sqlUser.cc,v 1.3 2000/12/22 00:29:32 gte Exp $
  */
  
 #include	<strstream>
@@ -48,7 +48,7 @@ bool sqlUser::loadData(int userID)
 	elog << "sqlUser> Attempting to load data for user-id: " << userID << endl;
 	
 	strstream queryString;
-	queryString << "SELECT id,user_name,password,last_seen,email,url,language_id,public_key,flags,last_update_by,last_update FROM users WHERE id = " << userID; 
+	queryString << "SELECT id,user_name,password,last_seen,email,url,language_id,public_key,flags,last_update_by,last_update FROM users WHERE id = " << userID << ends;
 
 	elog << "sqlQuery> " << queryString.str() << endl;
 
@@ -62,9 +62,11 @@ bool sqlUser::loadData(int userID)
 			return (false);
 		} 
 		setAllMembers(); 
+		delete[] queryString.str() ;
 		return (true);
 	} 
 
+	delete[] queryString.str() ;
 	return (false); 
 } 
 
@@ -79,7 +81,7 @@ bool sqlUser::loadData(const string& userName)
 	elog << "sqlUser> Attempting to load data for user-name: " << userName << endl;
 	
 	strstream queryString;
-	queryString << "SELECT id,user_name,password,last_seen,email,url,language_id,public_key,flags,last_update_by,last_update FROM users WHERE lower(user_name) = '" + string_lower(userName) + "'";
+	queryString << "SELECT id,user_name,password,last_seen,email,url,language_id,public_key,flags,last_update_by,last_update FROM users WHERE lower(user_name) = '" + string_lower(userName) + "'" << ends;
 
 	elog << "sqlQuery> " << queryString.str() << endl;
 
@@ -93,9 +95,11 @@ bool sqlUser::loadData(const string& userName)
 			return (false);
 		} 
 		setAllMembers(); 
+		delete[] queryString.str() ;
 		return (true);
 	} 
 
+	delete[] queryString.str() ;
 	return (false); 
 } 
 

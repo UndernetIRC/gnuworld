@@ -1,12 +1,13 @@
-/* OPCommand.cc */
+/* OPCommand.cc */ 
 
 #include	<string>
  
 #include	"StringTokenizer.h"
 #include	"ELog.h" 
 #include	"cservice.h" 
+#include	"Network.h"
 
-const char OPCommand_cc_rcsId[] = "$Id: OPCommand.cc,v 1.1 2000/12/21 22:28:16 gte Exp $" ;
+const char OPCommand_cc_rcsId[] = "$Id: OPCommand.cc,v 1.2 2000/12/22 00:29:32 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -36,7 +37,24 @@ bool OPCommand::Exec( iClient* theClient, const string& Message )
 		if (theUser->loadData(theClient->getNickName())) { 
 			// Check this user has access.
 			int level = bot->getAccessLevel(theUser, theChan);
-			bot->Notice(theClient, "%s and %s (Level %i).", theUser->getUserName().c_str(), theUser->getEmail().c_str(), level);
+			if (level > 100) {
+				iClient* target = Network->findNick(st[2]);
+				if( target == NULL )
+				{
+					bot->Notice( theClient, "I don't see %s anywhere.", st[2].c_str());
+					return true;
+				}
+
+				// TODO: Update gnuworld internal state - or write a gnuw op function. :)
+				strstream tmp ;
+				tmp << bot->getCharYYXXX() << " M " << theChan->getName() << " +o "
+					<< target->getCharYYXXX() << ends ;
+	
+				bot->Write( tmp ) ;
+				delete[] tmp.str() ;
+	
+				bot->Notice(theClient, "Username: %s, Email: %s (Level %i).", theUser->getUserName().c_str(), theUser->getEmail().c_str(), level);
+			}
 		} else {
 			bot->Notice(theClient, "I would.. but.. one teensy problem.  You're not in %s's database.", st[1].c_str());
 		} 

@@ -1,7 +1,7 @@
 /* sqlUser.h */
 
 #ifndef __SQLUSER_H
-#define __SQLUSER_H "$Id: sqlUser.h,v 1.2 2000/12/21 22:20:57 gte Exp $"
+#define __SQLUSER_H "$Id: sqlUser.h,v 1.3 2000/12/22 00:29:32 gte Exp $"
 
 #include	<string>
 #include	<ctime>
@@ -23,7 +23,7 @@ public:
 	typedef unsigned short int	flagType ;
 	static const flagType F_GLOBAL_SUSPEND =	0x01 ;
 
-	const unsigned int&	getId() const
+	const unsigned int&	getID() const
 		{ return id ; }
 	const string&		getUserName() const
 		{ return user_name ; }
