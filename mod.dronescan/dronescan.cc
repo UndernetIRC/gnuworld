@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: dronescan.cc,v 1.21 2003/06/20 00:58:47 jeekay Exp $
+ * $Id: dronescan.cc,v 1.22 2003/06/20 01:09:48 jeekay Exp $
  */
 
 #include <cstdarg>	/* va_list */
@@ -34,7 +34,7 @@
 #include "dronescanTests.h"
 #include "Timer.h"
 
-RCSTAG("$Id: dronescan.cc,v 1.21 2003/06/20 00:58:47 jeekay Exp $");
+RCSTAG("$Id: dronescan.cc,v 1.22 2003/06/20 01:09:48 jeekay Exp $");
 
 namespace gnuworld {
 
@@ -354,7 +354,6 @@ int dronescan::OnChannelEvent( const channelEventType& theEvent,
 	if(find(droneChannels.begin(), droneChannels.end(), theChannel->getName()) == droneChannels.end()) {
 		/* This channel is not currently listed as active */
 		checkChannel( theChannel );
-		droneChannels.push_back(theChannel->getName());
 	}
 	
 	
@@ -809,6 +808,9 @@ bool dronescan::checkChannel( const Channel *theChannel , const iClient *theClie
 			chanStat.str().c_str(),
 			chanParams.str().c_str()
 			);
+		
+		/* Add this channel to the actives list */
+		droneChannels.push_back(theChannel->getName());
 
 		return false;
 		}

@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: LISTCommand.cc,v 1.3 2003/06/20 00:33:27 jeekay Exp $
+ * $Id: LISTCommand.cc,v 1.4 2003/06/20 01:09:48 jeekay Exp $
  *
  * Display information about things.
  *
@@ -74,10 +74,11 @@ bool LISTCommand::Exec( const iClient *theClient, const string& Message )
 		for(dronescan::jcChanMapType::const_iterator itr =
 		    bot->jcChanMap.begin() ; itr != bot->jcChanMap.end()
 		    ; ++itr) {
-			bot->Reply(theClient, "  %s (%u)",
-				itr->first.c_str(),
-				itr->second
-				);
+		    	if(itr->second >= bot->jcCutoff)
+				bot->Reply(theClient, "  %s (%u)",
+					itr->first.c_str(),
+					itr->second
+					);
 		}
 	}
 	
