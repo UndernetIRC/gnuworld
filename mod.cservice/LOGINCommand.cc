@@ -12,7 +12,7 @@
 #include	"cservice_config.h"
 #include	"Network.h"
 
-const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.34 2002/01/28 17:32:40 gte Exp $" ;
+const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.35 2002/02/02 21:56:59 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -176,6 +176,7 @@ ac	<< bot->getCharYY()
 	<< ends;
 bot->Write( ac );
 delete[] ac.str();
+theClient->setAccount(theUser->getUserName());
 #endif
 
 /*
