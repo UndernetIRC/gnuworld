@@ -242,7 +242,7 @@ COPY "translations" FROM stdin;
 2	55	Pour utiliser %s, Vous devez /msg %s@%s	31337
 2	56	Désolé. Vous devez être authentifié pour utiliser cette commande.	31337
 2	57	Le canal %s a été suspendu par un administrateur de cservice.	31337
-2	58	Votre access sur %s a été suspendu.	31337
+2	58	Votre accès sur %s a été suspendu.	31337
 2	59	Le mode NOOP est actif sur %s	31337
 2	60	Le mode STRICTOP est actif sur %s	31337
 2	61	Vous venez de deop plus de %i personnes	31337
