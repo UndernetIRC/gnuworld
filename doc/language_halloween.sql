@@ -1,4 +1,4 @@
--- $Id: language_halloween.sql,v 1.3 2002/11/01 04:26:50 nighty Exp $
+-- $Id: language_halloween.sql,v 1.4 2002/11/01 04:35:17 nighty Exp $
 -- Muhauahuuahha.
 -- Halloween language definition.
 -- 30/10/01 - Gte (Greg Sikorski) <gte@atomicrevs.demon.co.uk>.
@@ -134,7 +134,8 @@ COPY "translations" FROM stdin;
 15	122	[Casket Record Stats] \002Cached Entries:\002 %i    \002DB Requests:\002 %i    \002Cache Hits:\002 %i    \002Efficiency:\002 %.2f%%	31337	0
 15	123	[Pumpkin Record Stats] \002Cached Entries:\002 %i    \002DB Requests:\002 %i    \002Cache Hits:\002 %i    \002Efficiency:\002 %.2f%%	31337	0
 15	124	[Generation Level Record Stats] \002Cached Entries:\002 %i    \002DB Requests:\002 %i    \002Cache Hits:\002 %i    \002Efficiency:\002 %.2f%%	31337	0
-15	125	[Pitchfork Record Stats] \002Cached Entries:\002 %i    \002DB Requests:\002 %i    \002Cache Hits:\002 %i    \002Efficiency:\002 %.2f%%	31337	0 15	126	Last received Pumpkin NOTIFY: %i	31337	0
+15	125	[Pitchfork Record Stats] \002Cached Entries:\002 %i    \002DB Requests:\002 %i    \002Cache Hits:\002 %i    \002Efficiency:\002 %.2f%%	31337	0
+15	126	Last received Pumpkin NOTIFY: %i	31337	0
 15	127	Last received Casket NOTIFY: %i	31337	0
 15	128	Last received Level NOTIFY: %i	31337	0
 15	129	Last received Pitchfork NOTIFY: %i	31337	0
@@ -173,7 +174,7 @@ COPY "translations" FROM stdin;
 15	163	%s is an Official Coder-Com Senior%s and is disguised as %s	 31337	0
 15	164	 and is a vampire scr1ptk1dd13 slayer	31337	0
 15	165	Added pitchfork %s to %s at level %i	31337	0
-15	166	%s: pitchfork list is empty.		31337	0
+15	166	%s: pitchfork list is empty.	31337	0
 15	167	I'm already in that casket!	31337	0
 15	168	This command is reserved to vampire scr1ptk1dd13 slayers	31337	0
 15	169	I'm not opped on %s	31337	0
