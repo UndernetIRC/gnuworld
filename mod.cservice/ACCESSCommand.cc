@@ -27,7 +27,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ACCESSCommand.cc,v 1.45 2003/06/28 01:21:20 dan_karrels Exp $
+ * $Id: ACCESSCommand.cc,v 1.46 2003/07/03 17:36:57 dan_karrels Exp $
  */
 
 #include	<string>
@@ -43,7 +43,7 @@
 #include	"cservice_config.h"
 #include	"Network.h"
 
-const char ACCESSCommand_cc_rcsId[] = "$Id: ACCESSCommand.cc,v 1.45 2003/06/28 01:21:20 dan_karrels Exp $" ;
+const char ACCESSCommand_cc_rcsId[] = "$Id: ACCESSCommand.cc,v 1.46 2003/07/03 17:36:57 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -185,7 +185,7 @@ for( StringTokenizer::const_iterator ptr = st.begin() ; ptr != st.end() ;
 		case 1: /* Min */
 			{
 			minAmount = atoi( (*ptr).c_str() );
-			if ((minAmount > 1000) || (minAmount < 0))
+			if ((minAmount > 1000) /*|| (minAmount < 0)*/)
 				{
 				bot->Notice(theClient,
 					bot->getResponse(theUser,
@@ -199,7 +199,7 @@ for( StringTokenizer::const_iterator ptr = st.begin() ; ptr != st.end() ;
 		case 2: /* Max */
 			{
 			maxAmount = atoi( (*ptr).c_str() );
-			if ((maxAmount > 1000) || (maxAmount < 0))
+			if ((maxAmount > 1000) /*|| (maxAmount < 0)*/)
 				{
 				bot->Notice(theClient,
 					bot->getResponse(theUser,

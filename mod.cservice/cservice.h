@@ -17,11 +17,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: cservice.h,v 1.97 2003/06/28 01:21:20 dan_karrels Exp $
+ * $Id: cservice.h,v 1.98 2003/07/03 17:36:57 dan_karrels Exp $
  */
 
 #ifndef __CSERVICE_H
-#define __CSERVICE_H "$Id: cservice.h,v 1.97 2003/06/28 01:21:20 dan_karrels Exp $"
+#define __CSERVICE_H "$Id: cservice.h,v 1.98 2003/07/03 17:36:57 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
@@ -114,9 +114,9 @@ public:
 	cservice(const string& args);
 	virtual ~cservice();
 
-	virtual int OnConnect();
-	virtual int BurstChannels();
-	virtual int OnPrivateMessage( iClient*, const string&,
+	virtual void OnConnect();
+	virtual bool BurstChannels();
+	virtual void OnPrivateMessage( iClient*, const string&,
 		bool = false  );
 	virtual void ImplementServer( xServer* ) ;
 	virtual bool isOnChannel( const string& ) const;
@@ -124,20 +124,20 @@ public:
 	virtual bool UnRegisterCommand( const string& ) ;
 	virtual void OnChannelModeO( Channel*, ChannelUser*,
 		const xServer::opVectorType& ) ;
-	virtual int OnChannelEvent( const channelEventType& whichEvent,
+	virtual void OnChannelEvent( const channelEventType& whichEvent,
 		Channel* theChan,
 		void* data1, void* data2, void* data3, void* data4 );
-	virtual int OnEvent( const eventType&,
+	virtual void OnEvent( const eventType&,
 		void*, void*, void*, void*);
-	virtual int OnCTCP( iClient* Sender,
+	virtual void OnCTCP( iClient* Sender,
                 const string& CTCP,
                 const string& Message,
                 bool Secure = false ) ;
-	virtual int OnTimer(xServer::timerID, void*);
-	virtual int Notice( const iClient* Target,
+	virtual void OnTimer(xServer::timerID, void*);
+	virtual bool Notice( const iClient* Target,
 		const char* Message, ... ) ;
-	virtual int Notice( const iClient* Target, const string& ) ;
-	virtual int OnWhois( iClient* sourceClient,
+	virtual bool Notice( const iClient* Target, const string& ) ;
+	virtual void OnWhois( iClient* sourceClient,
 			iClient* targetClient );
 
 	/* Sends a notice to a channel from the server. */

@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: cservice.cc,v 1.236 2003/06/28 01:21:20 dan_karrels Exp $
+ * $Id: cservice.cc,v 1.237 2003/07/03 17:36:57 dan_karrels Exp $
  */
 
 #include	<new>
@@ -351,7 +351,7 @@ for( commandMapType::iterator ptr = commandMap.begin() ;
 commandMap.clear() ;
 }
 
-int cservice::BurstChannels()
+bool cservice::BurstChannels()
 {
 	/*
 	 *   Need to join every channel with AUTOJOIN set. (But not * ;))
@@ -385,9 +385,10 @@ int cservice::BurstChannels()
 	return xClient::BurstChannels();
 }
 
-int cservice::OnConnect()
+void cservice::OnConnect()
 {
-	return 0;
+// TODO: I changed this from return 0
+xClient::OnConnect() ;
 }
 
 unsigned short cservice::getFloodPoints(iClient* theClient)
@@ -670,7 +671,8 @@ else
 return false;
 }
 
-int cservice::OnPrivateMessage( iClient* theClient, const string& Message,
+void cservice::OnPrivateMessage( iClient* theClient,
+	const string& Message,
 	bool secure )
 {
 /*
@@ -678,13 +680,13 @@ int cservice::OnPrivateMessage( iClient* theClient, const string& Message,
  * handler.
  */
 
-if (isIgnored(theClient)) return 0;
+if (isIgnored(theClient)) return ;
 
 StringTokenizer st( Message ) ;
 if( st.empty() )
 	{
 	Notice( theClient, "Incomplete command");
-	return 0 ;
+	return ;
 	}
 
 /*
@@ -702,7 +704,7 @@ if (!secure && ((Command == "LOGIN") || (Command == "NEWPASS") || (Command == "S
 	{
 	Notice(theClient, "To use %s, you must /msg %s@%s",
 		Command.c_str(), nickName.c_str(), getUplinkName().c_str());
-	return false;
+	return ;
 	}
 
 /*
@@ -725,12 +727,12 @@ if( commHandler == commandMap.end() )
 	 */
 	if (hasFlooded(theClient, "PRIVMSG"))
 		{
-		return false;
+		return ;
 		}
 
 	if (hasOutputFlooded(theClient))
 		{
-		return false;
+		return ;
 		}
 
 	// Why use 3 here?  Should be in config file
@@ -745,12 +747,12 @@ else
 
 	if (hasFlooded(theClient, Message))
 		{
-		return false;
+		return ;
 		}
 
 	if (hasOutputFlooded(theClient))
 		{
-		return false;
+		return ;
 		}
 
 	setFloodPoints(theClient, getFloodPoints(theClient)
@@ -760,11 +762,11 @@ else
 	commHandler->second->Exec( theClient, Message ) ;
 	}
 
-return xClient::OnPrivateMessage( theClient, Message ) ;
+xClient::OnPrivateMessage( theClient, Message ) ;
 }
 
-int cservice::OnCTCP( iClient* theClient, const string& CTCP,
-                    const string& Message, bool Secure)
+void cservice::OnCTCP( iClient* theClient, const string& CTCP,
+                    const string& Message, bool )
 {
 /**
  * CTCP hander. Deal with PING, GENDER and VERSION.
@@ -774,11 +776,11 @@ int cservice::OnCTCP( iClient* theClient, const string& CTCP,
 
 incStat("CORE.CTCP");
 
-if (isIgnored(theClient)) return 0;
+if (isIgnored(theClient)) return ;
 
 if (hasFlooded(theClient, "CTCP"))
 	{
-	return false;
+	return ;
 	}
 
 setFloodPoints(theClient, getFloodPoints(theClient) + 5 );
@@ -786,7 +788,7 @@ setFloodPoints(theClient, getFloodPoints(theClient) + 5 );
 StringTokenizer st( CTCP ) ;
 if( st.empty() )
 	{
-	return 0;
+	return ;
 	}
 
 const string Command = string_upper(st[0]);
@@ -841,8 +843,6 @@ else
 	{
 	xClient::DoCTCP(theClient, "ERRMSG", CTCP.c_str());
 	}
-
-return true;
 }
 
 /**
@@ -1363,7 +1363,7 @@ if( PGRES_TUPLES_OK == status )
 
 }
 
-bool cservice::isOnChannel( const string& chanName ) const
+bool cservice::isOnChannel( const string& /* chanName */ ) const
 {
 return true;
 }
@@ -2086,9 +2086,8 @@ void cservice::updateBans()
  * control to the relevant member for the timer
  * triggered.
  */
-int cservice::OnTimer(xServer::timerID timer_id, void*)
+void cservice::OnTimer(xServer::timerID timer_id, void*)
 {
-
 if (timer_id == limit_timerID)
 	{
 	updateLimits();
@@ -2190,15 +2189,11 @@ if (timer_id == pending_timerID)
 	logDebugMessage("Loaded Pending Channels notification list, I have just notified %i channels that they are under registration.",
 		noticeCount);
 
-
 	/* Refresh Timer */
 
 	time_t theTime = time(NULL) +pendingChanPeriod;
 	pending_timerID = MyUplink->RegisterTimer(theTime, this, NULL);
 	}
-
-
-return 0 ;
 }
 
 /**
@@ -2207,7 +2202,6 @@ return 0 ;
  */
 bool cservice::serverNotice( Channel* theChannel, const char* format, ... )
 {
-
 char buf[ 1024 ] = { 0 } ;
 va_list _list ;
 
@@ -2234,7 +2228,6 @@ return false;
  */
 bool cservice::serverNotice( Channel* theChannel, const string& Message)
 {
-
 stringstream s;
 s	<< MyUplink->getCharYY()
 	<< " O "
@@ -2543,7 +2536,7 @@ if ((theChanUser) && (deopCounter >= reggedChan->getMassDeopPro())
 	}
 }
 
-int cservice::OnEvent( const eventType& theEvent,
+void cservice::OnEvent( const eventType& theEvent,
 	void* data1, void* data2, void* data3, void* data4 )
 {
 switch( theEvent )
@@ -2642,8 +2635,8 @@ switch( theEvent )
 		break;
 		} // case EVT_NICK
 	} // switch()
-
-return 0;
+xClient::OnEvent( theEvent,
+	data1, data2, data3, data4 ) ;
 }
 
 /**
@@ -2792,11 +2785,10 @@ if( !deopList.empty() )
  * Handler for registered channel events.
  * Performs a number of functions, autoop, autovoice, bankicks, etc.
  */
-int cservice::OnChannelEvent( const channelEventType& whichEvent,
+void cservice::OnChannelEvent( const channelEventType& whichEvent,
 	Channel* theChan,
 	void* data1, void* data2, void* data3, void* data4 )
 {
-
 iClient* theClient = 0 ;
 
 switch( whichEvent )
@@ -2888,8 +2880,9 @@ switch( whichEvent )
 					 *  as one of the valid supporters, so we drop out.
 					 */
 
-					return xClient::OnChannelEvent( whichEvent, theChan,
+					xClient::OnChannelEvent( whichEvent, theChan,
 						data1, data2, data3, data4 );
+					return ;
 					}
 
 					/*
@@ -2907,8 +2900,9 @@ switch( whichEvent )
 #endif
 						}
 
-				return xClient::OnChannelEvent( whichEvent, theChan,
+				xClient::OnChannelEvent( whichEvent, theChan,
 					data1, data2, data3, data4 );
+				return ;
 
 				} /* Is server bursting? */
 			} /* Is channel on pending list */
@@ -2921,7 +2915,7 @@ switch( whichEvent )
 				<< " for registered channel event: "
 				<< theChan->getName()
 				<< endl;
-			return 0;
+			return ;
 			}
 
 		/*
@@ -3000,7 +2994,7 @@ switch( whichEvent )
 		break;
 	} // switch()
 
-return xClient::OnChannelEvent( whichEvent, theChan,
+xClient::OnChannelEvent( whichEvent, theChan,
 	data1, data2, data3, data4 );
 }
 
@@ -3086,12 +3080,13 @@ if( theBan && (theBan->getLevel() < 75) )
 return false;
 }
 
-int cservice::OnWhois( iClient* sourceClient,
+void cservice::OnWhois( iClient* sourceClient,
 			iClient* targetClient )
 {
 	/*
 	 *  Return info about 'targetClient' to 'sourceClient'
 	 */
+// TODO: Only use one stringstream here
 
 stringstream s;
 s	<< getCharYY()
@@ -3161,8 +3156,6 @@ s3	<< getCharYY()
 	<< " :End of /WHOIS list."
 	<< ends;
 Write( s3 );
-
-return 0;
 }
 
 void cservice::updateLimits()
@@ -3485,10 +3478,9 @@ time_t cservice::currentTime() const
 return dbTimeOffset + ::time(NULL);
 }
 
-int cservice::Notice( const iClient* Target, const string& Message )
+bool cservice::Notice( const iClient* Target, const string& Message )
 {
-size_t count = 0 ;
-
+bool returnMe = false ;
 if( Connected && MyUplink )
 	{
 	setOutputTotal( Target, getOutputTotal(Target) + Message.size() );
@@ -3503,7 +3495,7 @@ if( Connected && MyUplink )
 		if (*m == '\n' || *m == '\r')
 			{
 			*b='\0';
-			count+=MyUplink->Write( "%s O %s :%s\r\n",
+			MyUplink->Write( "%s O %s :%s\r\n",
 				getCharYYXXX().c_str(),
 				Target->getCharYYXXX().c_str(),
 				buffer ) ;
@@ -3517,16 +3509,16 @@ if( Connected && MyUplink )
 
 		}
         *b='\0';
-	count+=MyUplink->Write( "%s O %s :%s\r\n",
+	returnMe = MyUplink->Write( "%s O %s :%s\r\n",
 		getCharYYXXX().c_str(),
 		Target->getCharYYXXX().c_str(),
 		buffer ) ;
 	}
-
-return count ;
+return returnMe ;
 }
 
-int cservice::Notice( const iClient* Target, const char* Message, ... )
+bool cservice::Notice( const iClient* Target, const char* Message, 
+	... )
 {
 if( Connected && MyUplink && Message && Message[ 0 ] != 0 )
 	{
@@ -3543,7 +3535,7 @@ if( Connected && MyUplink && Message && Message[ 0 ] != 0 )
 		Target->getCharYYXXX().c_str(),
 		buffer ) ;
 	}
-return -1 ;
+return false ;
 }
 
 void cservice::dbErrorMessage(iClient* theClient)

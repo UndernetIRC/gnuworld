@@ -33,7 +33,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: SETCommand.cc,v 1.55 2003/06/28 01:21:20 dan_karrels Exp $
+ * $Id: SETCommand.cc,v 1.56 2003/07/03 17:36:57 dan_karrels Exp $
  */
 
 #include	<string>
@@ -45,7 +45,7 @@
 #include	"responses.h"
 #include	"cservice_config.h"
 
-const char SETCommand_cc_rcsId[] = "$Id: SETCommand.cc,v 1.55 2003/06/28 01:21:20 dan_karrels Exp $" ;
+const char SETCommand_cc_rcsId[] = "$Id: SETCommand.cc,v 1.56 2003/07/03 17:36:57 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -1102,7 +1102,8 @@ else
 
 	unsigned int limit_grace = atoi(value.c_str());
 
-	if ((limit_grace < 0) | (limit_grace > 19))
+	// TODO: Was this meant to be | or || ?
+	if (/* (limit_grace < 0) |*/ (limit_grace > 19))
 		{
 			bot->Notice(theClient, "Invalid floating-grace setting (0-19 Allowed).");
 			return true;
@@ -1134,7 +1135,7 @@ else
 
 	unsigned int limit_max = atoi(value.c_str());
 
-	if ((limit_max < 0) | (limit_max > 65536))
+	if (/*(limit_max < 0) |*/ (limit_max > 65536))
 		{
 			bot->Notice(theClient, "Invalid floating-limit max (0-65536 Allowed).");
 			return true;

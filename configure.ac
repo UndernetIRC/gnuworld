@@ -1,10 +1,10 @@
-dnl $Id: configure.ac,v 1.11 2003/06/30 14:49:58 dan_karrels Exp $
+dnl $Id: configure.ac,v 1.12 2003/07/03 17:36:55 dan_karrels Exp $
 dnl ----------------------------------------------------------
 
 echo Configuring GNUWorld...
 echo
 
-AC_REVISION($Revision: 1.11 $)
+AC_REVISION($Revision: 1.12 $)
 AC_INIT
 AC_CONFIG_SRCDIR([src/main.cc])
 AM_INIT_AUTOMAKE(gnuworld,2.2)
@@ -291,7 +291,7 @@ dnl	Prepare for conditionals
 	    mod.ccontrol)	build_modccontrol=true;;
 	    mod.clientExample)	build_modclientExample=true;;
 	    mod.cloner)		build_modcloner=true;;
-	    mod.ccservice)	build_modcservice=true;;
+	    mod.cservice)	build_modcservice=true;;
 	    mod.dronescan)	build_moddronescan=true;;
 	    mod.gnutest)	build_modgnutest=true;;
 	    mod.nickserv)	build_modnickserv=true;;
@@ -323,7 +323,7 @@ dnl	echo "mod_list: $mod_list"
 		    mod.ccontrol)	build_modccontrol=true;;
 		    mod.clientExample)	build_modclientExample=true;;
 		    mod.cloner)		build_modcloner=true;;
-		    mod.ccservice)	build_modcservice=true;;
+		    mod.cservice)	build_modcservice=true;;
 		    mod.dronescan)	build_moddronescan=true;;
 		    mod.gnutest)	build_modgnutest=true;;
 		    mod.nickserv)	build_modnickserv=true;;
