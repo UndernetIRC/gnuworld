@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: Network.h,v 1.37 2003/12/29 23:59:36 dan_karrels Exp $
+ * $Id: Network.h,v 1.38 2004/01/05 00:13:18 dan_karrels Exp $
  */
 
 #ifndef __NETWORK_H
-#define __NETWORK_H "$Id: Network.h,v 1.37 2003/12/29 23:59:36 dan_karrels Exp $"
+#define __NETWORK_H "$Id: Network.h,v 1.38 2004/01/05 00:13:18 dan_karrels Exp $"
 
 #include	<vector>
 #include	<string>
@@ -214,6 +214,13 @@ public:
 	 */
 	virtual iClient*	findClient( const unsigned int& YY,
 					const unsigned int& XXX ) const ;
+
+	/**
+	 * Find a remote client given the client's integer numeric.
+	 * Returns NULL if not found.
+	 */
+	virtual iClient*	findClient( const unsigned int& intYYXX )
+					const ;
 
 	/**
 	 * Find a fake client given the client's integer numeric.

@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server.h,v 1.98 2004/01/01 19:31:12 dan_karrels Exp $
+ * $Id: server.h,v 1.99 2004/01/05 00:13:18 dan_karrels Exp $
  */
 
 #ifndef __SERVER_H
-#define __SERVER_H "$Id: server.h,v 1.98 2004/01/01 19:31:12 dan_karrels Exp $"
+#define __SERVER_H "$Id: server.h,v 1.99 2004/01/05 00:13:18 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
@@ -497,6 +497,11 @@ public:
 	 * Send a wallops to the network as the server.
 	 */
 	virtual int	Wallops( const std::string& ) ;
+
+	/**
+	 * Sent a notice to a client as the server.
+	 */
+	virtual bool	Notice( iClient*, const string& ) ;
 
 	/**
 	 * Set modes as the server, update internal tables, and notify

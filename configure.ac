@@ -1,10 +1,10 @@
-dnl $Id: configure.ac,v 1.24 2004/01/03 23:16:23 dan_karrels Exp $
+dnl $Id: configure.ac,v 1.25 2004/01/05 00:13:18 dan_karrels Exp $
 dnl ----------------------------------------------------------
 
 echo Configuring GNUWorld...
 echo
 
-AC_REVISION($Revision: 1.24 $)
+AC_REVISION($Revision: 1.25 $)
 AC_INIT
 AC_CONFIG_SRCDIR([src/main.cc])
 AM_INIT_AUTOMAKE(gnuworld,2.4)
@@ -97,7 +97,7 @@ dnl ----------------------------------------------------------
 
 AC_CHECK_LIB(socket,socket)
 AC_CHECK_LIB(nsl,gethostbyname)
-AC_CHECK_LIB(pcre,pcre_compile)
+dnl AC_CHECK_LIB(pcre,pcre_compile)
 dnl AC_CHECK_LIB(z,inflate)
 dnl AC_CHECK_LIB(pthread,pthread_create)
 dnl AC_SEARCH_LIBS(pthread_create,lthread pthread c c_r)

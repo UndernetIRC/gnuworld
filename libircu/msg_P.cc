@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_P.cc,v 1.12 2004/01/01 19:31:13 dan_karrels Exp $
+ * $Id: msg_P.cc,v 1.13 2004/01/05 00:13:18 dan_karrels Exp $
  */
 
 #include	<string>
@@ -33,7 +33,7 @@
 #include	"StringTokenizer.h"
 #include	"config.h"
 
-RCSTAG( "$Id: msg_P.cc,v 1.12 2004/01/01 19:31:13 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: msg_P.cc,v 1.13 2004/01/05 00:13:18 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -221,9 +221,9 @@ if( (0 == theChan) && (strchr( Param[ 1 ], '@' ) != 0) )
 		fakeTarget = Network->findFakeNick( st[ 0 ] ) ;
 		if( 0 == fakeTarget )
 			{
-			elog	<< "msg_P> Looking for control nick: "
-				<< st[ 0 ]
-				<< endl ;
+//			elog	<< "msg_P> Looking for control nick: "
+//				<< st[ 0 ]
+//				<< endl ;
 			bool controlNick =
 				theServer->findControlNick( st[ 0 ] ) ;
 			if( controlNick )

@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: moduleLoader.h,v 1.17 2003/12/29 23:59:36 dan_karrels Exp $
+ * $Id: moduleLoader.h,v 1.18 2004/01/05 00:13:18 dan_karrels Exp $
  */
 
 #ifndef __MODULELOADER_H
-#define __MODULELOADER_H "$Id: moduleLoader.h,v 1.17 2003/12/29 23:59:36 dan_karrels Exp $"
+#define __MODULELOADER_H "$Id: moduleLoader.h,v 1.18 2004/01/05 00:13:18 dan_karrels Exp $"
 
 #include	<iostream>
 #include	<string>
@@ -72,6 +72,12 @@ protected:
 	 */
 	std::string		moduleName ;
 
+	/**
+	 * This variable is true if there was an error in loading
+	 * or resolving a symbol, false otherwise.
+	 */
+	bool			hasError ;
+
 public:
 	/**
 	 * Constructor, takes a module filename as the only
@@ -91,7 +97,8 @@ public:
 			<< "module loading system: "
 			<< lt_dlerror()
 			<< std::endl ;
-		::exit( 0 ) ;
+		hasError = true ;
+		return ;
 		}
 
 	std::string fileName( moduleName ) ;
@@ -125,7 +132,8 @@ public:
 			<< "): "
 			<< lt_dlerror()
 			<< std::endl;
-		::exit( 0 ) ;
+		hasError = true ;
+		return ;
 		}
 
 //	elog	<< "moduleLoader> Module "
@@ -161,6 +169,12 @@ public:
 	modType loadObject( argType arg,
 		const std::string& symbolSuffix = std::string() )
 	{
+	if( getError() )
+		{
+		// Error already present
+		return 0 ;
+		}
+
 	const std::string symbolName =
 		std::string( "_gnuwinit" ) + symbolSuffix ;
 	modFunc = (GNUWModuleFunc) lt_dlsym( moduleHandle,
@@ -170,16 +184,18 @@ public:
 		elog	<< "moduleLoader::loadObject> Error: "
 			<< lt_dlerror()
 			<< std::endl ;
-		exit( 0 ) ;
+		hasError = true ;
+		return 0 ;
 		}
 
 	modPtr = modFunc( arg );
 
-	// 0 is the global initializer
+	// Types usable by this class must support comparison against 0
 	if( 0 == modPtr )
 		{
 		elog	<< "moduleLoader> Unable to instantiate modType."
 			<< std::endl;
+		hasError = true ;
 		}
 
 	return modPtr ;
@@ -203,6 +219,12 @@ public:
 	 */
 	inline modType		getObject() const
 		{ return modPtr ; }
+
+	/**
+	 * Return true if an error occured, false otherwise.
+	 */
+	inline bool		getError() const
+		{ return hasError ; }
 
 } ;
 

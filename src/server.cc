@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server.cc,v 1.189 2004/01/01 19:31:13 dan_karrels Exp $
+ * $Id: server.cc,v 1.190 2004/01/05 00:13:19 dan_karrels Exp $
  */
 
 #include	<sys/time.h>
@@ -71,7 +71,7 @@
 #include	"ConnectionHandler.h"
 #include	"Connection.h"
 
-RCSTAG( "$Id: server.cc,v 1.189 2004/01/01 19:31:13 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: server.cc,v 1.190 2004/01/05 00:13:19 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -1538,6 +1538,10 @@ bool xServer::DetachClient( const string& moduleName,
 for( clientModuleListType::const_iterator ptr = clientModuleList.begin() ;
 	ptr != clientModuleList.end() ; ++ptr )
 	{
+//	elog	<< "xServer::DetachClient> moduleName: "
+//		<< (*ptr)->getModuleName()
+//		<< endl ;
+
 	if( !strcasecmp( (*ptr)->getModuleName(), moduleName ) )
 		{
 		// Found one
@@ -4145,11 +4149,72 @@ if( !hasControlAccess( srcClient->getAccount() ) ||
 	// Silently return
 	return ;
 	}
+
+StringTokenizer msgTokens( message ) ;
+if( msgTokens.size() < 2 )
+	{
+	Notice( srcClient, "Unable to comply" ) ;
+	return ;
+	}
+
+// This is hideously ugly, if there proves to be any significant
+// need for many commands supproted by the server then I will
+// use something with a better OO design (ok, so it will probably
+// get done just out of embarassment)
+const string command = string_lower( msgTokens[ 0 ] ) ;
+
+// For unloadclient, the full path to the library must be specified,
+// for example: /home/gnuworld/gnuworld/lib/libstats.la
+if( msgTokens[ 0 ] == "unloadclient" )
+	{
+	string reason ;
+	if( msgTokens.size() >= 3 )
+		{
+		reason = msgTokens.assemble( 2 ) ;
+		}
+	UnloadClient( msgTokens[ 1 ], reason ) ;
+	Notice( srcClient, string( "Attempting to unload client: " )
+		+ msgTokens[ 1 ] ) ;
+	return ;
+	}
+
+if( msgTokens.size() < 3 )
+	{
+	Notice( srcClient, "Unable to comply" ) ;
+	return ;
+	}
+
+if( msgTokens[ 0 ] == "loadclient" )
+	{
+	LoadClient( msgTokens[ 1 ], msgTokens[ 2 ] ) ;
+	Notice( srcClient, string( "Attempting to load client module: " )
+		+ msgTokens[ 1 ] + ", with config file: "
+		+ msgTokens[ 2 ] ) ;
+	return ;
+	}
 }
 
 bool xServer::hasControlAccess( const std::string& userName ) const
 {
 return (allowControlSet.find( userName ) != allowControlSet.end()) ;
+}
+
+bool xServer::Notice( iClient* theClient, const string& message )
+{
+assert( theClient != 0 ) ;
+
+if( message.empty() || !isConnected() )
+	{
+	return false ;
+	}
+
+stringstream s ;
+s	<< getCharYY()
+	<< " O "
+	<< theClient->getCharYYXXX()
+	<< " :"
+	<< message ;
+return Write( s.str() ) ;
 }
 
 } // namespace gnuworld

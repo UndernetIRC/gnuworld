@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: Network.cc,v 1.63 2003/12/29 23:59:38 dan_karrels Exp $
+ * $Id: Network.cc,v 1.64 2004/01/05 00:13:19 dan_karrels Exp $
  */
 
 #include	<new>
@@ -45,7 +45,7 @@
 #include	"ip.h"
 #include	"config.h"
 
-RCSTAG( "$Id: Network.cc,v 1.63 2003/12/29 23:59:38 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: Network.cc,v 1.64 2004/01/05 00:13:19 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -175,6 +175,16 @@ assert( theChan != NULL ) ;
 return channelMap.insert(
 	channelMapType::value_type( theChan->getName(),
 		theChan ) ).second ;
+}
+
+iClient* xNetwork::findClient( const unsigned int& intYYXXX ) const
+{
+numericMapType::const_iterator ptr = numericMap.find( intYYXXX ) ;
+if( ptr == numericMap.end() )
+	{
+	return 0 ;
+	}
+return ptr->second ;
 }
 
 iClient* xNetwork::findClient( const unsigned int& intYY,
@@ -716,14 +726,13 @@ for( yyVectorType::const_iterator yyIterator = yyVector.begin() ;
 	// squit, let the msg_SQ handle that.
 	if( intYY != tmpServer->getIntYY() )
 		{
-		string Reason = "Uplink Squit";
+		string Reason( "Uplink Squit" ) ;
 	
 		theServer->PostEvent(EVT_NETBREAK,
 			  static_cast<void *>(tmpServer),
 			  static_cast<void*>(findServer(intYY)),
 			  static_cast<void*>(&Reason));
 		}
-	
 	delete tmpServer;		  
 	}
 }
