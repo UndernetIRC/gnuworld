@@ -4,7 +4,7 @@
  * Storage class for accessing channel user/level information either from the backend
  * or internal storage.
  * 
- * $Id: sqlLevel.cc,v 1.10 2001/03/18 00:19:16 gte Exp $
+ * $Id: sqlLevel.cc,v 1.11 2001/07/21 23:06:41 gte Exp $
  */
  
 #include	<strstream>
@@ -22,7 +22,7 @@
 #include	"cservice_config.h"
  
 const char sqlLevel_h_rcsId[] = __SQLLEVEL_H ;
-const char sqlLevel_cc_rcsId[] = "$Id: sqlLevel.cc,v 1.10 2001/03/18 00:19:16 gte Exp $" ;
+const char sqlLevel_cc_rcsId[] = "$Id: sqlLevel.cc,v 1.11 2001/07/21 23:06:41 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -37,6 +37,7 @@ sqlLevel::sqlLevel(PgDatabase* _SQLDb)
  forced_access(0),
  flags(0),
  suspend_expires(0),
+ suspend_level(0),
  suspend_by(),
  added(0),
  added_by(),
@@ -113,12 +114,13 @@ user_id = atoi(SQLDb->GetValue(row, 1));
 access = atoi(SQLDb->GetValue(row, 2));
 flags = atoi(SQLDb->GetValue(row, 3));
 suspend_expires = atoi(SQLDb->GetValue(row, 4));
-suspend_by = SQLDb->GetValue(row, 5);
-added = atoi(SQLDb->GetValue(row, 6));
-added_by = SQLDb->GetValue(row, 7);
-last_modif = atoi(SQLDb->GetValue(row, 8));
-last_modif_by = SQLDb->GetValue(row, 9);
-last_updated = atoi(SQLDb->GetValue(row, 10)); 
+suspend_level = atoi(SQLDb->GetValue(row, 5));
+suspend_by = SQLDb->GetValue(row, 6);
+added = atoi(SQLDb->GetValue(row, 7));
+added_by = SQLDb->GetValue(row, 8);
+last_modif = atoi(SQLDb->GetValue(row, 9));
+last_modif_by = SQLDb->GetValue(row, 10);
+last_updated = atoi(SQLDb->GetValue(row, 11));
 }
 
 bool sqlLevel::commit()
@@ -135,6 +137,7 @@ queryString	<< queryHeader
 		<< "SET flags = " << flags << ", "
 		<< "access = " << access << ", "
 		<< "suspend_expires = " << suspend_expires << ", "
+		<< "suspend_level = " << suspend_level << ", "
 		<< "suspend_by = '" << suspend_by << "', "
 		<< "added = " << added << ", "
 		<< "added_by = '" << added_by << "', "

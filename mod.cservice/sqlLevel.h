@@ -1,7 +1,7 @@
 /* sqlLevel.h */
 
 #ifndef __SQLLEVEL_H
-#define __SQLLEVEL_H "$Id: sqlLevel.h,v 1.11 2001/03/18 00:19:16 gte Exp $"
+#define __SQLLEVEL_H "$Id: sqlLevel.h,v 1.12 2001/07/21 23:06:41 gte Exp $"
 
 #include	<string>
 #include	<ctime>
@@ -127,6 +127,7 @@ protected:
 	unsigned short	forced_access ;
 	flagType		flags ;
 	time_t			suspend_expires ;
+	unsigned int	suspend_level ;
 	string			suspend_by ; 
 	time_t			added ;
 	string			added_by ;

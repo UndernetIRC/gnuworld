@@ -1,11 +1,15 @@
 Newest changes at the top of the file:
-$Id: RELEASE.NOTES,v 1.15 2001/07/07 22:54:24 gte Exp $
+$Id: RELEASE.NOTES,v 1.16 2001/07/21 23:06:41 gte Exp $
 
-CMaster 1.0pl7 - Current
+CMaster 1.0pl7a - Current
+* Add a new channel flag "LOCKED" to prevent normal
+  users from using SET to modify channel settings.
+
+CMaster 1.0pl7 - 15/07/2001
 * Global suspend now logs a few extra details, and unsuspends
   are now logged/displayed also.
 
-CMaster 1.0pl6 - 27/06/01
+CMaster 1.0pl6 - 27/06/2001
 * Disallow globally suspended users op's in registered 
   channels.
 * New channel setting, "Comments", for admins to note a quick

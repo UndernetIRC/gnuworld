@@ -9,7 +9,7 @@
  * Caveats: None
  * 
  *
- * $Id: REMUSERCommand.cc,v 1.11 2001/03/13 22:39:33 gte Exp $
+ * $Id: REMUSERCommand.cc,v 1.12 2001/07/21 23:06:41 gte Exp $
  */
 
 #include	<string>
@@ -21,7 +21,7 @@
 #include	"libpq++.h"
 #include	"responses.h"
 
-const char REMUSERCommand_cc_rcsId[] = "$Id: REMUSERCommand.cc,v 1.11 2001/03/13 22:39:33 gte Exp $" ;
+const char REMUSERCommand_cc_rcsId[] = "$Id: REMUSERCommand.cc,v 1.12 2001/07/21 23:06:41 gte Exp $" ;
  
 namespace gnuworld
 {
@@ -174,6 +174,7 @@ bool REMUSERCommand::Exec( iClient* theClient, const string& Message )
 	pair<int, int> thePair;
 	thePair = make_pair(tmpLevel->getUserId(), tmpLevel->getChannelId());
 	bot->sqlLevelCache.erase(thePair);
+	delete(tmpLevel);
  
 	return true ;
 } 
