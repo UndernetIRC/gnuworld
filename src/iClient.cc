@@ -16,7 +16,7 @@
 #include	"ip.h"
 
 const char iClient_h_rcsId[] = __ICLIENT_H ;
-const char iClient_cc_rcsId[] = "$Id: iClient.cc,v 1.18 2002/01/01 12:42:14 mrbean_ Exp $" ;
+const char iClient_cc_rcsId[] = "$Id: iClient.cc,v 1.19 2002/01/08 20:16:47 gte Exp $" ;
 const char client_h_rcsId[] = __CLIENT_H ;
 const char Numeric_h_rcsId[] = __NUMERIC_H ;
 const char ip_h_rcsId[] = __IP_H ;
@@ -32,6 +32,7 @@ const iClient::modeType iClient::MODE_WALLOPS = 0x02 ;
 const iClient::modeType iClient::MODE_INVISIBLE = 0x04 ;
 const iClient::modeType iClient::MODE_DEAF = 0x08 ;
 const iClient::modeType iClient::MODE_SERVICES = 0x10 ;
+const iClient::modeType iClient::MODE_REGISTERED = 0x20 ;
 
 iClient::iClient( const unsigned int& _uplink,
 	const string& _yxx,
@@ -40,6 +41,7 @@ iClient::iClient( const unsigned int& _uplink,
 	const string& _hostBase64,
 	const string& _insecureHost,
 	const string& _mode,
+	const string& _account,
 	const string& _description,
 	const time_t& _connectTime )
 : intYY( _uplink ),
@@ -49,7 +51,8 @@ iClient::iClient( const unsigned int& _uplink,
 	insecureHost( _insecureHost ),
 	description( _description),
 	connectTime( _connectTime ),
-	mode( 0 )
+	mode( 0 ),
+	account( _account )
 {
 if( 5 == _yxx.size() )
 	{
@@ -113,6 +116,10 @@ for( string::size_type i = 0 ; i < newModes.size() ; i++ )
 		case 'd':
 		case 'D':
 			mode |= MODE_DEAF ;
+			break ;
+		case 'r':
+		case 'R':
+			mode |= MODE_REGISTERED ;
 			break ;
 		default:
 			// Unknown mode

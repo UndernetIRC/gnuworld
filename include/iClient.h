@@ -2,7 +2,7 @@
  */
 
 #ifndef __ICLIENT_H
-#define __ICLIENT_H "$Id: iClient.h,v 1.20 2002/01/01 12:42:14 mrbean_ Exp $"
+#define __ICLIENT_H "$Id: iClient.h,v 1.21 2002/01/08 20:16:26 gte Exp $"
 
 #include	<string>
 #include	<list>
@@ -63,6 +63,9 @@ public:
 	/// MODE_SERVICES is true if the iClient is a service agent.
 	const static modeType	MODE_SERVICES ;
 
+	/// MODE_REGISTERED is true if the iClient has an account set.
+	const static modeType	MODE_REGISTERED ;
+
 	/// Iterator for channels this user is on.
 	typedef channelListType::iterator channelIterator ;
 
@@ -83,7 +86,8 @@ public:
 		const string& _hostBase64,
 		const string& _insecureHost,
 		const string& _mode,
-		const string& _description,    
+		const string& _account,
+		const string& _description,
 		const time_t& _connectTime ) ;
 
 	/**
@@ -126,6 +130,11 @@ public:
 	inline const string& getDescription() const
 		{ return description ; }
 
+	/**
+	 * Retrieve client's 'account' field.
+	 */
+	inline const string& getAccount() const
+		{ return account ; }
 
 	/**
 	 * Retrieve the iClient's connection time.
@@ -430,6 +439,12 @@ protected:
 	 * This client's current user modes.
 	 */
 	modeType	mode ;
+
+	/**
+	 * This client's "Account".
+	 */
+
+	string		account;
 
 	/**
 	 * This client's integer per-server numeric.

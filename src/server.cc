@@ -50,7 +50,7 @@
 #include	"UnloadClientTimerHandler.h"
 
 const char server_h_rcsId[] = __SERVER_H ;
-const char server_cc_rcsId[] = "$Id: server.cc,v 1.120 2001/12/23 09:07:57 mrbean_ Exp $" ;
+const char server_cc_rcsId[] = "$Id: server.cc,v 1.121 2002/01/08 20:16:47 gte Exp $" ;
 const char config_h_rcsId[] = __CONFIG_H ;
 const char misc_h_rcsId[] = __MISC_H ;
 const char events_h_rcsId[] = __EVENTS_H ;
@@ -107,7 +107,7 @@ virtual void operator() ( xClient* theClient )
 if( NULL == theClient ) return ;
 theClient->OnSignal( whichSig ) ;
 }
- 
+
 int     whichSig ;
 } ;
 
@@ -125,7 +125,7 @@ if( !readConfigFile( configFileName ) )
 // Output the information to the console.
 elog << "Numeric: " << intYY << endl ;
 elog << "Max Clients (bogus): " << intXXX << endl ;
-elog << "Uplink Name: " << UplinkName << endl ;  
+elog << "Uplink Name: " << UplinkName << endl ;
 elog << "Port: " << Port << endl ;
 elog << "Server Name: " << ServerName << endl ;
 elog << "Server Description: " << ServerDescription << endl ;
@@ -427,7 +427,7 @@ EConfig conf( fileName ) ;
 
 /*
  * Load and attach any modules specified in the config.
- */ 
+ */
 EConfig::const_iterator ptr = conf.Find( "module" ) ;
 for( ; ptr != conf.end() && ptr->first == "module" ; ++ptr )
 	{
@@ -475,7 +475,7 @@ RegisterTimer( ::time( 0 ) + pingUpdateInterval,
 	new PINGTimer( this, pingUpdateInterval ),
 	static_cast< void* >( this ) ) ;
 }
- 
+
 /**
  * Initiate a server shutdown.
  */
@@ -664,7 +664,7 @@ if( s[ 0 ] != ':' )
 	// whether it be server or client
 	Sender = YXX ;
 
-	} 
+	}
 
 // :ripper.ufl.edu 442 EuWorld3 #nowhere :You're not on that channel
 else
@@ -948,7 +948,7 @@ string charYYXXX( fakeServer->getCharYY() ) ;
 charYYXXX += "]]]" ;
 
 // Burst the new server's info./
-// IRCu checks for "JUPE " as being the beginning of the 
+// IRCu checks for "JUPE " as being the beginning of the
 // reason as a jupe server.  This was because before servers
 // couldn't link without [ip] being added to their realname
 // field unless they were juped by uworld.  Now anyone can
@@ -957,7 +957,7 @@ Write( "%s S %s %d %d %d J%02d %s 0 :JUPE Reason: %s\n",
 		getCharYY(),
 		fakeServer->getName().c_str(),
 		2,
-		0, 
+		0,
 		fakeServer->getConnectTime()-24*3600*365,
 		10, // version
 		charYYXXX.c_str(),
@@ -1496,6 +1496,7 @@ iClient* theIClient = new (std::nothrow) iClient(
 	"AAAAAA",
 	Client->getHostName(),
 	Client->getModes(),
+	"",
 	Client->getDescription(),
 	::time( 0 ) ) ;
 assert( theIClient != 0 ) ;
@@ -2326,7 +2327,7 @@ else if( NULL == theChan )
 		<< " C "
 		<< chanName
 		<< ' '
-		<< postJoinTime 
+		<< postJoinTime
 		<< ends ;
 	Write( s ) ;
 	delete[] s.str() ;
@@ -3405,7 +3406,7 @@ void xServer::updateGlines()
 time_t now = ::time( 0 ) ;
 
 glineIterator	ptr = gline_begin(),
-		end = gline_end() ;  
+		end = gline_end() ;
 for( ; ptr != end ; )
 	{
 	if( (*ptr)->getExpiration() <= now )

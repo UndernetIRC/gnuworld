@@ -14,7 +14,7 @@
 #include	"Network.h"
 #include	"ELog.h"
 
-const char msg_N_cc_rcsId[] = "$Id: msg_N.cc,v 1.4 2001/10/28 10:12:39 mrbean_ Exp $" ;
+const char msg_N_cc_rcsId[] = "$Id: msg_N.cc,v 1.5 2002/01/08 20:16:47 gte Exp $" ;
 const char iClient_h_rcsId[] = __ICLIENT_H ;
 const char events_h_rcsId[] = __EVENTS_H ;
 const char ip_h_rcsId[] = __IP_H ;
@@ -74,16 +74,30 @@ const char* modes = "+" ;
 const char* host = params[ 6 ] ;
 const char* yyxxx = params[ 7 ] ;
 const char* description = params [ 8 ] ;
+const char* account = "";
 
-// Are modes specified?
-if( params.size() > 9 )
+// Are modes specified? (With a +r?)
+// If so, token 7 is the authenticated account name,
+// the rest shuffle up.
+// TODO: Make this more futureproof.
+if( params.size() > 10 )
 	{
-	// Yup, all trailing fields
-	// are offset by one.
 	modes = params[ 6 ] ;
-	host = params[ 7 ] ;
-	yyxxx = params[ 8 ] ;
-	description = params[ 9 ];
+	account = params[ 7 ];
+	host = params[ 8 ] ;
+	yyxxx = params[ 9 ] ;
+	description = params[ 10 ];
+	}
+	else
+	{
+	if( params.size() > 9 )
+		{
+		// Just plain modes here without any parameters
+		modes = params[ 6 ] ;
+		host = params[ 7 ] ;
+		yyxxx = params[ 8 ] ;
+		description = params[ 9 ];
+		}
 	}
 
 iClient* newClient = new (std::nothrow) iClient(
@@ -94,6 +108,7 @@ iClient* newClient = new (std::nothrow) iClient(
 		host, // base 64 host
 		params[ 5 ], // insecurehost
 		modes,
+		account,
 		description,
 		atoi( params[ 3 ] ) // connection time
 		) ;
@@ -109,7 +124,7 @@ if( !Network->addClient( newClient ) )
 	return -1 ;
 	}
 
-// TODO: Should this be posted? 
+// TODO: Should this be posted?
 PostEvent( EVT_NICK, static_cast< void* >( newClient ) ) ;
 
 return 0 ;
