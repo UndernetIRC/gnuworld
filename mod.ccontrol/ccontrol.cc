@@ -37,7 +37,7 @@
 #include	"ip.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.116 2002/01/05 18:25:12 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.117 2002/01/08 18:39:35 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -413,6 +413,7 @@ theServer->RegisterEvent( EVT_QUIT, this );
 theServer->RegisterEvent( EVT_NETJOIN, this );
 theServer->RegisterEvent( EVT_BURST_CMPLT, this );
 theServer->RegisterEvent( EVT_GLINE , this );
+theServer->RegisterEvent( EVT_REMGLINE , this );
 theServer->RegisterEvent( EVT_NICK , this );
 
 theServer->RegisterEvent( EVT_NETBREAK, this );
@@ -750,6 +751,41 @@ switch( theEvent )
 		burstGlines();
 		break;
 		}	
+	case EVT_GLINE:
+		{
+		Gline* newG = static_cast< Gline* >(Data1);
+		ccGline* newGline = findGline(newG->getUserHost());
+		if(!newGline)
+			{
+			newGline = new (std::nothrow) ccGline(SQLDb);
+			assert (newGline != NULL);
+			}
+		iServer* serverAdded = Network->findServer(newG->getSetBy());
+		if(serverAdded)
+			newGline->setAddedBy(serverAdded->getName());
+		else
+			newGline->setAddedBy("Unknown");
+		newGline->setAddedOn(::time(0));
+		//newGline->setLastUpdated(::time(0));
+		newGline->setHost(newG->getUserHost());
+		newGline->setReason(newG->getReason());
+		newGline->setExpires(newG->getExpiration());
+		newGline->Insert();
+		addGline(newGline);
+		break;
+		}
+	case EVT_REMGLINE:
+		{
+		Gline* newG = static_cast< Gline* >(Data1);
+		ccGline* newGline = findGline(newG->getUserHost());
+		if(newGline)
+			{
+			remGline(newGline);
+			newGline->Delete();
+			delete newGline;
+			}
+		break;
+		}
 	case EVT_NICK:
 		{
 		bool glSet = false;
