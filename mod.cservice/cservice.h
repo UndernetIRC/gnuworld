@@ -1,5 +1,5 @@
 #ifndef __CSERVICE_H
-#define __CSERVICE_H "$Id: cservice.h,v 1.41 2001/02/06 18:55:42 gte Exp $"
+#define __CSERVICE_H "$Id: cservice.h,v 1.42 2001/02/09 23:57:00 gte Exp $"
 
 #include	<string>
 #include	<vector>
@@ -242,6 +242,10 @@ public:
 	/* Matches DB bans, and kicks supplied user if neccessary */
 	bool checkBansOnJoin( Channel*, sqlChannel* , iClient* );
 	time_t currentTime() const ;
+
+	/* Queue to hold pending reops */
+	typedef queue < string, list<string> > reopQType;
+	reopQType reopQ;
 
 } ;
 

@@ -585,7 +585,7 @@ else if(Command == "VERSION")
 	xClient::DoCTCP(theClient, CTCP,
 		"Undernet P10 Channel Services Version 2 ["
 		__DATE__ " " __TIME__
-		"] ($Id: cservice.cc,v 1.90 2001/02/08 23:36:46 dan_karrels Exp $)");
+		"] ($Id: cservice.cc,v 1.91 2001/02/09 23:57:00 gte Exp $)");
 	}
 else if(Command == "PROBLEM?")
 	{
@@ -1428,6 +1428,15 @@ for( xServer::opVectorType::const_iterator ptr = theTargets.begin() ;
 		{
 		/* Somebody is being deopped? */
 		deopCounter++;
+
+		/* What if someone deop'd us?! */
+		if (tmpUser->getClient() == me)
+			{ 
+			logAdminMessage("I've been deopped on %s!",
+				reggedChan->getName().c_str());
+			/* Add this chan to the reop queue, ready to op itself in 30 seconds. */
+			 reopQ.push( reggedChan->getName() );
+			}
 		}
 	} // for()
 
@@ -1456,6 +1465,7 @@ if( !deopList.empty() )
 
 /*
  *  Have more than 'maxdeoppro' been deopped?
+ *  If so, suspend and kick 'em.
  */
 
 if ((theChanUser) && (deopCounter >= reggedChan->getMassDeopPro()))
@@ -1548,8 +1558,12 @@ for( Channel::const_userIterator ptr = theChan->userList_begin();
 	{
 	if( ptr->second->getMode(ChannelUser::MODE_O))
 		{
-		deopList.push_back( ptr->second->getClient() );
-		}
+			
+		/* Don't deop +k things */
+		if ( !ptr->second->getClient()->getMode(iClient::MODE_SERVICES) ) 
+			deopList.push_back( ptr->second->getClient() );
+
+		} // If opped.
 	}
 
 if( !deopList.empty() )
@@ -1583,13 +1597,16 @@ for( Channel::const_userIterator ptr = theChan->userList_begin();
  
 			if (!authUser)
 			{
-				/* Not authed, deop this guy. */
-				deopList.push_back( ptr->second->getClient() );
+				/* Not authed, deop this guy + Don't deop +k things */
+				if ( !ptr->second->getClient()->getMode(iClient::MODE_SERVICES) ) 
+					deopList.push_back( ptr->second->getClient() ); 
 
 			/* Authed but no access? Tough. :) */
 			} else if ((reggedChan) && !(getEffectiveAccessLevel(authUser, reggedChan, false) >= level::op))
 			{
-				deopList.push_back( ptr->second->getClient() );
+				/* Don't deop +k things */
+				if ( !ptr->second->getClient()->getMode(iClient::MODE_SERVICES) ) 
+					deopList.push_back( ptr->second->getClient() );
 			} 
 
 		} // if opped.
@@ -1675,7 +1692,7 @@ switch( whichEvent )
 		if (theLevel->getFlag(sqlLevel::F_AUTOOP)) 
 			{
 			/* If they are suspended, or somehow have less than 100, don't op them */
-			if (getEffectiveAccessLevel(theUser, reggedChan, false) >= level::op)
+			if (getEffectiveAccessLevel(theUser, reggedChan, false))
 				{
 				Op(theChan, theClient); 
 				break;
@@ -1686,7 +1703,7 @@ switch( whichEvent )
 		if (theLevel->getFlag(sqlLevel::F_AUTOVOICE)) 
 			{
 			/* If they are suspended, or somehow have less than 75, don't voice them */
-			if (getEffectiveAccessLevel(theUser, reggedChan, false) >= level::voice)
+			if (getEffectiveAccessLevel(theUser, reggedChan, false))
 				{
 				Voice(theChan, theClient);
 				break;
