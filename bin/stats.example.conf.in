@@ -1,7 +1,7 @@
-# $Id: stats.example.conf.in,v 1.3 2003/06/06 20:03:30 dan_karrels Exp $
+# $Id: stats.example.conf.in,v 1.4 2003/06/08 20:26:17 dan_karrels Exp $
 # conf file for stats bot
-username = Stats
-nickname = Stats
+username = ubercow
+nickname = ubercow
 hostname = undernet.org
 userdescription = UnderNet Statistical Services
 
