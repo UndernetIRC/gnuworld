@@ -11,7 +11,7 @@
  *
  * Caveats: None
  *
- * $Id: TOPICCommand.cc,v 1.4 2001/01/02 01:27:56 gte Exp $
+ * $Id: TOPICCommand.cc,v 1.5 2001/01/03 03:02:05 gte Exp $
  */
 
 #include	<string>
@@ -23,7 +23,7 @@
 #include	"responses.h"
 #include	"Network.h"
 
-const char TOPICCommand_cc_rcsId[] = "$Id: TOPICCommand.cc,v 1.4 2001/01/02 01:27:56 gte Exp $" ;
+const char TOPICCommand_cc_rcsId[] = "$Id: TOPICCommand.cc,v 1.5 2001/01/03 03:02:05 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -83,7 +83,7 @@ bool TOPICCommand::Exec( iClient* theClient, const string& Message )
         
 	strstream s;
 	s << bot->getCharYYXXX() << " T "
-	<< st[1] << " :" << " (" << theUser->getUserName() << ") " << topic << ends;
+	<< st[1] << " :" << "(" << theUser->getUserName() << ") " << topic << ends;
         
 	bot->Write( s );
 

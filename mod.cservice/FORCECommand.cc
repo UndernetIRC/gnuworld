@@ -8,7 +8,7 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char FORCECommand_cc_rcsId[] = "$Id: FORCECommand.cc,v 1.1 2001/01/02 07:55:12 gte Exp $" ;
+const char FORCECommand_cc_rcsId[] = "$Id: FORCECommand.cc,v 1.2 2001/01/03 03:02:05 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -68,7 +68,7 @@ bool FORCECommand::Exec( iClient* theClient, const string& Message )
 		// getLevelRecord will have cached this entry, we simply don't commit it to
 		// make it temporary.
 		newLevel->setAccess(admLevel); 
-		newLevel->setForced(true);
+		newLevel->setFlag(sqlLevel::F_FORCED);
 		bot->Notice(theClient, "Temporarily increased your access on channel %s to %i", theChan->getName().c_str(), admLevel);
 		return true;
 	}
@@ -82,7 +82,7 @@ bool FORCECommand::Exec( iClient* theClient, const string& Message )
 	newLevel->setChannelId(theChan->getID());
 	newLevel->setUserId(theUser->getID());
 	newLevel->setAccess(admLevel); 
-	newLevel->setForced(true);
+	newLevel->setFlag(sqlLevel::F_FORCED);
 
 	/*
 	 *  Add it to the cache.

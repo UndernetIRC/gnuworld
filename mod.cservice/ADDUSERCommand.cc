@@ -8,7 +8,7 @@
  *
  * Caveats: None
  *
- * $Id: ADDUSERCommand.cc,v 1.3 2001/01/02 07:55:12 gte Exp $
+ * $Id: ADDUSERCommand.cc,v 1.4 2001/01/03 03:02:04 gte Exp $
  */
  
 #include	<string>
@@ -19,7 +19,7 @@
 #include	"levels.h"
 #include	"libpq++.h"
 
-const char ADDUSERCommand_cc_rcsId[] = "$Id: ADDUSERCommand.cc,v 1.3 2001/01/02 07:55:12 gte Exp $" ;
+const char ADDUSERCommand_cc_rcsId[] = "$Id: ADDUSERCommand.cc,v 1.4 2001/01/03 03:02:04 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -111,7 +111,7 @@ bool ADDUSERCommand::Exec( iClient* theClient, const string& Message )
 		 *  If the current access is Forced via FORCE, then allow the addition anyway..
 		 */
 		
-		if (!newLevel->getForced()) 
+		if (!newLevel->getFlag(sqlLevel::F_FORCED))
 		{ 
 			bot->Notice(theClient, "%s is already added to %s with access level %i.", targetUser->getUserName().c_str(), theChan->getName().c_str(), levelTest);
 			return false;

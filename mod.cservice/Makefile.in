@@ -10,7 +10,7 @@
 # even the implied warranty of MERCHANTABILITY or FITNESS FOR A
 # PARTICULAR PURPOSE.
 
-# "$Id: Makefile.in,v 1.26 2001/01/02 07:55:12 gte Exp $"
+# "$Id: Makefile.in,v 1.27 2001/01/03 03:02:05 gte Exp $"
 
 
 SHELL = /bin/sh
@@ -94,13 +94,14 @@ libcservice_la_LDFLAGS = -module -export-dynamic -L/usr/local/pgsql/lib \
 	-lpq++
 
 libcservice_la_SOURCES = cservice.cc \
+	md5hash.cc \
+	LOGINCommand.cc \
 	sqlChannel.cc \
 	sqlUser.cc \
 	sqlLevel.cc \
 	ACCESSCommand.cc \
 	CHANINFOCommand.cc \
 	ISREGCommand.cc \
-	LOGINCommand.cc \
 	MOTDCommand.cc \
 	RANDOMCommand.cc \
 	SEARCHCommand.cc \
@@ -133,14 +134,14 @@ DEFS = @DEFS@ -I. -I$(srcdir) -I../include
 CPPFLAGS = @CPPFLAGS@
 LIBS = @LIBS@
 libcservice_la_LIBADD = 
-libcservice_la_OBJECTS =  cservice.lo sqlChannel.lo sqlUser.lo \
-sqlLevel.lo ACCESSCommand.lo CHANINFOCommand.lo ISREGCommand.lo \
-LOGINCommand.lo MOTDCommand.lo RANDOMCommand.lo SEARCHCommand.lo \
-SHOWCOMMANDSCommand.lo SHOWIGNORECommand.lo VERIFYCommand.lo \
-OPCommand.lo DEOPCommand.lo VOICECommand.lo DEVOICECommand.lo \
-ADDUSERCommand.lo REMUSERCommand.lo MODINFOCommand.lo SETCommand.lo \
-TOPICCommand.lo INVITECommand.lo BANLISTCommand.lo KICKCommand.lo \
-REGISTERCommand.lo FORCECommand.lo UNFORCECommand.lo
+libcservice_la_OBJECTS =  cservice.lo md5hash.lo LOGINCommand.lo \
+sqlChannel.lo sqlUser.lo sqlLevel.lo ACCESSCommand.lo \
+CHANINFOCommand.lo ISREGCommand.lo MOTDCommand.lo RANDOMCommand.lo \
+SEARCHCommand.lo SHOWCOMMANDSCommand.lo SHOWIGNORECommand.lo \
+VERIFYCommand.lo OPCommand.lo DEOPCommand.lo VOICECommand.lo \
+DEVOICECommand.lo ADDUSERCommand.lo REMUSERCommand.lo MODINFOCommand.lo \
+SETCommand.lo TOPICCommand.lo INVITECommand.lo BANLISTCommand.lo \
+KICKCommand.lo REGISTERCommand.lo FORCECommand.lo UNFORCECommand.lo
 CXXCOMPILE = $(CXX) $(DEFS) $(INCLUDES) $(CPPFLAGS) $(CXXFLAGS)
 LTCXXCOMPILE = $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(INCLUDES) $(CPPFLAGS) $(CXXFLAGS)
 CXXLINK = $(LIBTOOL) --mode=link $(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@
@@ -160,7 +161,7 @@ DEP_FILES =  .deps/ACCESSCommand.P .deps/ADDUSERCommand.P \
 .deps/SEARCHCommand.P .deps/SETCommand.P .deps/SHOWCOMMANDSCommand.P \
 .deps/SHOWIGNORECommand.P .deps/TOPICCommand.P .deps/UNFORCECommand.P \
 .deps/VERIFYCommand.P .deps/VOICECommand.P .deps/cservice.P \
-.deps/sqlChannel.P .deps/sqlLevel.P .deps/sqlUser.P
+.deps/md5hash.P .deps/sqlChannel.P .deps/sqlLevel.P .deps/sqlUser.P
 CXXMKDEP = $(CXX) -M $(DEFS) $(INCLUDES) $(CPPFLAGS) $(CXXFLAGS)
 SOURCES = $(libcservice_la_SOURCES)
 OBJECTS = $(libcservice_la_OBJECTS)

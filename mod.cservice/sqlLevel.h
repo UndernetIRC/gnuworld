@@ -1,7 +1,7 @@
 /* sqlLevel.h */
 
 #ifndef __SQLLEVEL_H
-#define __SQLLEVEL_H "$Id: sqlLevel.h,v 1.4 2001/01/02 07:55:12 gte Exp $"
+#define __SQLLEVEL_H "$Id: sqlLevel.h,v 1.5 2001/01/03 03:02:05 gte Exp $"
 
 #include	<string>
 #include	<ctime>
@@ -20,8 +20,9 @@ public:
 	virtual ~sqlLevel() ;
 
 	typedef unsigned int	flagType ; 
-	static const flagType	F_LOGGEDIN =	0x01 ;
-	static const flagType	F_AUTOOP =	0x02 ;
+	static const flagType	F_AUTOOP =	0x01 ;
+	static const flagType	F_PROTECT =	0x02 ;
+	static const flagType	F_FORCED =	0x04 ;
 
 	/*
 	 *  Methods to get data atrributes.
@@ -62,10 +63,7 @@ public:
 
 	inline const time_t&		getLastUpdate() const
 		{ return last_update ; }
-	
-	inline bool					getForced() const
-		{ return forced ; }
- 
+	 
 	bool loadData( unsigned int, unsigned int ); 
     void setAllMembers(int);
 
@@ -105,9 +103,6 @@ public:
 
 	inline void setLastModifBy( const string& _last_modif_by )
 		{ last_modif_by = _last_modif_by; } 
-
-	inline void setForced( const bool& _forced )
-		{ forced = _forced; }
  
 protected:
  
@@ -122,11 +117,7 @@ protected:
 	time_t			last_modif ;
 	string			last_modif_by ;
 	time_t			last_update ;
-
-	// True if this access has been temporarily
-	// forced.
-	bool		forced;
-
+ 
 	PgDatabase*		SQLDb;
 } ;
 
