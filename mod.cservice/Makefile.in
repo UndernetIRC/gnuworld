@@ -1,5 +1,5 @@
 # Default paths (system-wide installs)
-# $Id: Makefile.in,v 1.3 2000/12/10 04:15:56 gte Exp $
+# $Id: Makefile.in,v 1.4 2000/12/11 00:46:31 gte Exp $
 #
 
 # Standard defines
@@ -29,7 +29,8 @@ SHELL = /bin/sh
 
 SRCS = cservice.cc \
 	sqlChannel.cc \
-	sqlUser.cc
+	sqlUser.cc \
+	ACCESSCommand.cc
 OBJS = $(patsubst %.cc, %.o, $(SRCS))
 LIB = libcservice.so
 

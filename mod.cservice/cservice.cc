@@ -5,10 +5,11 @@
 
 #include	<ctime>
 #include	<cstdlib>
-
+ 
 #include	"client.h" 
 #include  	"cservice.h"
 #include	"EConfig.h"
+#include	"events.h"
 #include	"ip.h"
 #include	"Network.h"
 #include	"StringTokenizer.h"
@@ -41,8 +42,51 @@ extern "C"
 
 //-- Connect to the PG SQL database and load the configuration file.
  
+bool cservice::RegisterCommand( Command* newComm )
+{ 
+
+UnRegisterCommand( newComm->getName() ) ;
+return commandMap.insert( pairType( newComm->getName(), newComm ) ).second ;
+}
+
+bool cservice::UnRegisterCommand( const string& commName )
+{
+commandMapType::iterator ptr = commandMap.find( commName ) ;
+if( ptr == commandMap.end() )
+        {
+        return false ;
+        }
+delete ptr->second ;
+commandMap.erase( ptr ) ;
+return true ;
+}
+
+void cservice::ImplementServer( xServer* theServer )
+{
+
+for( commandMapType::iterator ptr = commandMap.begin() ; ptr != commandMap.end() ;
+        ++ptr )
+        {
+        ptr->second->setServer( theServer ) ;
+        }
+
+for( eventType i = 0 ; i != EVT_NOOP ; ++i )
+{
+  theServer->RegisterEvent( i, this );
+} 
+
+xClient::ImplementServer( theServer ) ;
+}
+
 cservice::cservice(const string& args)
 { 
+
+    /*
+	 *  Register command handlers.
+	 */
+ 
+    RegisterCommand(new ACCESSCommand(this, "ACCESS", "[access_option] #channel [access_option] [(userid|nick|hostmask)] [access_option]"));
+
 	//-- Load in our cservice configuration file.
 	cserviceConfig = new EConfig( args ) ;
 	string sqlHost = cserviceConfig->Require( "sql_host" )->second;
@@ -88,7 +132,7 @@ cservice::~cservice()
 
 int cservice::BurstChannels()
 {
-	ExecStatusType status; 
+	ExecStatusType status;
  
 	//-- We need to join every channel in the database that has been ADDCHAN'd by the
 	//   manager.  Various other things must be done, such as setting the topic if AutoTopic
@@ -113,29 +157,37 @@ int cservice::OnConnect()
 
 int cservice::OnPrivateMessage( iClient* theClient, const string& Message )
 { 
-	StringTokenizer	st( Message ) ;
-	ExecStatusType	status ;
+ /*
+  *	Private message handler. Pass off the command to the relevant
+  * handler.
+  */
 
-	if( st.empty () )
+	StringTokenizer st( Message ) ;
+	if( st.empty() )
 	{
+		Notice( theClient, "Incomplete command" ) ;
 		return 0 ;
 	}
 
-	string	command( string_upper( st[ 0 ] ) ) ;
+	const string Command = string_upper( st[ 0 ] ) ;
 
-	// if( command == "COMMAND" ) 
-	// {
-	//	...perform command actions...
-	// }
-
-	if( command == "DUMP" )
+	// Attempt to find a handler for this method.
+	commandMapType::iterator commHandler = commandMap.find( Command ) ;
+	if( commHandler == commandMap.end() )
 	{
-		string	dumpMe	= st.assemble( 1 ) ;
-		QuoteAsServer( dumpMe ) ;
+		Notice( theClient, "Unknown command" ) ;
+	}
+	else
+	{
+		commHandler->second->Exec( theClient, Message ) ;
 	}
 
-
-	return 0 ;
+return xClient::OnPrivateMessage( theClient, Message ) ;
 }
-
+ 
+void Command::Usage( iClient* theClient )
+{
+bot->Notice( theClient, string( "Usage:" ) + ' ' + getInfo() ) ;
+}
+ 
 } // namespace gnuworld

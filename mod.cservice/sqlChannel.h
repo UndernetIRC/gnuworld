@@ -1,11 +1,12 @@
 /* sqlChannel.h */
 
 #ifndef __SQLCHANNEL_H
-#define __SQLCHANNEL_H "$Id: sqlChannel.h,v 1.1 2000/12/09 22:01:11 dan_karrels Exp $"
+#define __SQLCHANNEL_H "$Id: sqlChannel.h,v 1.2 2000/12/11 00:46:31 gte Exp $"
 
 #include	<string>
 
 #include	<ctime>
+#include	"libpq++.h"
 
 using std::string ;
 
@@ -13,7 +14,7 @@ class sqlChannel
 {
 
 public:
-	sqlChannel() ;
+	sqlChannel(PgDatabase* SQLDb, const string& channelName) ;
 	virtual ~sqlChannel() ;
 
 	typedef unsigned int	flagType ;
