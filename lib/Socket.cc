@@ -16,6 +16,7 @@
 
 #include	<cmath>
 #include	<cstring>
+#include	<cassert>
 
 #include	"Socket.h"
 #include	"defs.h"
@@ -34,7 +35,7 @@
 #endif
 
 const char Socket_h_rcsId[] = __SOCKET_H ;
-const char Socket_cc_rcsId[] = "$Id: Socket.cc,v 1.8 2000/12/30 17:40:21 dan_karrels Exp $" ;
+const char Socket_cc_rcsId[] = "$Id: Socket.cc,v 1.9 2000/12/30 17:47:21 dan_karrels Exp $" ;
 
 using gnuworld::elog ;
 using std::endl ;
