@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: dronescan.cc,v 1.36 2003/09/04 18:58:15 jeekay Exp $
+ * $Id: dronescan.cc,v 1.37 2003/09/12 15:30:41 dan_karrels Exp $
  */
 
 #include	<string>
@@ -40,7 +40,7 @@
 #include "sqlUser.h"
 #include "Timer.h"
 
-RCSTAG("$Id: dronescan.cc,v 1.36 2003/09/04 18:58:15 jeekay Exp $");
+RCSTAG("$Id: dronescan.cc,v 1.37 2003/09/12 15:30:41 dan_karrels Exp $");
 
 namespace gnuworld {
 
@@ -343,10 +343,32 @@ void dronescan::OnChannelEvent( const channelEventType& theEvent,
 	}
 	
 	/* Reset lastjoin on the active channel */
-	droneChannels[theChannel->getName()]->setLastJoin(::time(0));
+	droneChannelsType::iterator droneChanItr =
+		droneChannels.find( theChannel->getName() ) ;
+	if( droneChanItr == droneChannels.end() )
+		{
+		elog	<< "dronescan::OnChannelEvent> Unable to "
+			<< "find active channel for channel: "
+			<< *theChannel
+			<< endl ;
+
+		activeChannel* newAC = new (std::nothrow)
+			activeChannel( theChannel->getName(),
+				::time( 0 ) ) ;
+		assert( newAC != 0 ) ;
+
+		// By definition, this channel is not present in
+		// droneChannels, so the insert() must succeed
+		droneChannels.insert( make_pair( 
+			theChannel->getName(), newAC ) ) ;
+		}
+	else
+		{
+		droneChanItr->second->setLastJoin( ::time( 0 ) ) ;
+		}
 	
 	/* Do join count processing if applicable */
-	string channelName = theChannel->getName();
+	const string& channelName = theChannel->getName();
 
 	jcChanMap[channelName]++;
 

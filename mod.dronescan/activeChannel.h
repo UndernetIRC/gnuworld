@@ -16,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: activeChannel.h,v 1.1 2003/09/04 18:58:15 jeekay Exp $
+ * $Id: activeChannel.h,v 1.2 2003/09/12 15:30:41 dan_karrels Exp $
  */
 
 #ifndef ACTIVECHANNEL_H
-#define ACTIVECHANNEL_H "$Id: activeChannel.h,v 1.1 2003/09/04 18:58:15 jeekay Exp $"
+#define ACTIVECHANNEL_H "$Id: activeChannel.h,v 1.2 2003/09/12 15:30:41 dan_karrels Exp $"
 
 #include <string>
 #include <time.h>
@@ -49,12 +49,11 @@ public:
 	 ** A C C E S S O  R S **
 	 ************************/
 	
-	inline const std::string& getName()
+	inline const std::string& getName() const
 		{ return name; }
 	
-	inline const time_t& getLastJoin()
+	inline const time_t& getLastJoin() const
 		{ return lastjoin; }
-	
 	
 	/*********************
 	 ** M U T A T O R S **
@@ -66,6 +65,7 @@ public:
 protected:
 	std::string	name;
 	time_t		lastjoin;
+
 }; // class activeChannel
 
 } // namespace ds
