@@ -1,12 +1,31 @@
-/* netData.cc
+/**
+ * netData.cc
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
+ * USA.
+ *
+ * $Id: netData.cc,v 1.2 2003/06/19 22:58:31 dan_karrels Exp $
+ *
  * This class stores information about a given iClient.
  * It is used as a quick reference to logged in users and for checking warnings
  */
 
+#include "config.h"
 #include "netData.h"
 
-const char netData_h_rcsId[] = _NETDATA_H;
-const char netData_cc_rcsId[] = "$Id: netData.cc,v 1.1 2002/08/10 15:41:02 jeekay Exp $";
+RCSTAG("$Id: netData.cc,v 1.2 2003/06/19 22:58:31 dan_karrels Exp $");
 
 namespace gnuworld
 {

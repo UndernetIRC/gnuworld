@@ -1,16 +1,34 @@
-/*
+/**
  * CHECKCommand.cc
  *
- * Display information about a given channel or user.
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
  *
- * 2003-05-05	GK@NG	Initial writing
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
+ * USA.
+ *
+ * $Id: CHECKCommand.cc,v 1.3 2003/06/19 22:58:30 dan_karrels Exp $
+ *
+ * Display information about a given channel or user.
  */
 
+#include "config.h"
 #include "Network.h"
 #include "StringTokenizer.h"
 
 #include "dronescan.h"
 #include "dronescanCommands.h"
+
+RCSTAG("$Id: CHECKCommand.cc,v 1.3 2003/06/19 22:58:30 dan_karrels Exp $");
 
 namespace gnuworld {
 
