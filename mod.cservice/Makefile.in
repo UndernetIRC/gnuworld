@@ -1,5 +1,5 @@
 # Default paths (system-wide installs)
-# $Id: Makefile.in,v 1.1 2000/12/09 22:01:11 dan_karrels Exp $
+# $Id: Makefile.in,v 1.2 2000/12/09 22:52:42 dan_karrels Exp $
 #
 
 # Standard defines
@@ -41,7 +41,7 @@ make: all
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 $(LIB): $(OBJS)
-	$(CXX) $(CXXFLAGS) -o $(BIN_PATH)/GNUWorld $(OBJS) $(LIBS)
+	$(SHLIB_LD) -o $(BIN_PATH)/GNUWorld $(OBJS) $(LIBS)
 
 clean:
 	$(RM) -f *.o $(BIN_PATH)/GNUWorld

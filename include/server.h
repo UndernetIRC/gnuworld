@@ -17,7 +17,7 @@
  */
 
 #ifndef __XSERVER_H
-#define __XSERVER_H "$Id: server.h,v 1.13 2000/12/09 22:01:11 dan_karrels Exp $"
+#define __XSERVER_H "$Id: server.h,v 1.14 2000/12/09 22:52:42 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
@@ -36,12 +36,12 @@
 #include	"Socket.h"
 #include	"ClientSocket.h"
 #include	"Buffer.h"
-//#include	"VectorTrie.h"
 #include	"events.h"
 #include	"Gline.h"
 #include	"xparameters.h"
 #include	"misc.h"
 #include	"moduleLoader.h"
+#include	"ELog.h"
 
 namespace gnuworld
 {

@@ -1,4 +1,4 @@
-# $Id: Makefile.in,v 1.6 2000/12/09 22:01:11 dan_karrels Exp $
+# $Id: Makefile.in,v 1.7 2000/12/09 22:52:42 dan_karrels Exp $
 # all		-- gnuworld
 # clean		-- cleanup objects and executable
 # distclean	-- everything =P
@@ -24,31 +24,31 @@ all: libgnuworld gnuworld modules
 everything: all
 
 libgnuworld: lib/Makefile
-	@cd lib; make all
+	@cd lib; $(MAKE) all
 
 gnuworld: src/Makefile Makefile libgnuworld modules
-	@cd src; make all
+	@cd src; $(MAKE) all
 
 modules:
 	@for i in $(MOD_DIRS); do \
 		echo "Building module: $$i"; \
-		cd $$i; make all; cd ..; \
+		cd $$i; $(MAKE) all; cd ..; \
 	done;
 
 clean:
-	@-if [ -f lib/Makefile ]; then cd lib; make clean; fi
-	@-if [ -f src/Makefile ]; then cd src; make clean; fi
+	@-if [ -f lib/Makefile ]; then cd lib; $(MAKE) clean; fi
+	@-if [ -f src/Makefile ]; then cd src; $(MAKE) clean; fi
 	@for i in $(MOD_DIRS); do \
-		cd $$i; make clean; cd ..; \
+		cd $$i; $(MAKE) clean; cd ..; \
 	done;
 
 distclean cleandir realclean:
 	$(RM) config.status config.cache
 	$(RM) config.log include/defs.h
-	@cd lib; make distclean
-	@cd src; make distclean
+	@cd lib; $(MAKE) distclean
+	@cd src; $(MAKE) distclean
 	@for i in $(MOD_DIRS); do \
-		cd $$i; make distclean; cd ..; \
+		cd $$i; $(MAKE) distclean; cd ..; \
 		$(RM) $$i/Makefile; \
 	done;
 	$(RM) src/Makefile lib/Makefile
@@ -58,10 +58,10 @@ depend:
 	@echo
 	@echo "Building dependencies, this may take a moment..."
 	@echo
-	@cd lib; make depend
-	@cd src; make depend
+	@cd lib; $(MAKE) depend
+	@cd src; $(MAKE) depend
 	@for i in $(MOD_DIRS); do \
-		cd $$i; make depend; cd ..; \
+		cd $$i; $(MAKE) depend; cd ..; \
 	done;
 	@echo
 	@echo "Finished building dependencies"
