@@ -21324,7 +21324,7 @@ fi
 
 
 
-                                                                                                                                                                                                                                      ac_config_files="$ac_config_files Makefile db/Makefile libgnuworld/Makefile libircu/Makefile src/Makefile test/Makefile mod.ccontrol/Makefile mod.clientExample/Makefile mod.cloner/Makefile mod.cservice/Makefile mod.gnutest/Makefile mod.nickserv/Makefile mod.scanner/Makefile mod.stats/Makefile bin/ccontrol.example.conf bin/clientExample.example.conf bin/cloner.example.conf bin/cservice.example.conf bin/gnutest.example.conf bin/GNUWorld.example.conf bin/nickserv.example.conf bin/scanner.example.conf bin/stats.example.conf"
+                                                                                                                                                                                                                                                ac_config_files="$ac_config_files Makefile db/Makefile libgnuworld/Makefile libircu/Makefile src/Makefile test/Makefile mod.ccontrol/Makefile mod.clientExample/Makefile mod.cloner/Makefile mod.cservice/Makefile mod.dronescan/Makefile mod.gnutest/Makefile mod.nickserv/Makefile mod.scanner/Makefile mod.stats/Makefile bin/ccontrol.example.conf bin/clientExample.example.conf bin/cloner.example.conf bin/cservice.example.conf bin/gnutest.example.conf bin/GNUWorld.example.conf bin/nickserv.example.conf bin/scanner.example.conf bin/stats.example.conf"
 
 
 cat >confcache <<\_ACEOF
@@ -21913,6 +21913,7 @@ do
   "mod.clientExample/Makefile" ) CONFIG_FILES="$CONFIG_FILES mod.clientExample/Makefile" ;;
   "mod.cloner/Makefile" ) CONFIG_FILES="$CONFIG_FILES mod.cloner/Makefile" ;;
   "mod.cservice/Makefile" ) CONFIG_FILES="$CONFIG_FILES mod.cservice/Makefile" ;;
+  "mod.dronescan/Makefile" ) CONFIG_FILES="$CONFIG_FILES mod.dronescan/Makefile" ;;
   "mod.gnutest/Makefile" ) CONFIG_FILES="$CONFIG_FILES mod.gnutest/Makefile" ;;
   "mod.nickserv/Makefile" ) CONFIG_FILES="$CONFIG_FILES mod.nickserv/Makefile" ;;
   "mod.scanner/Makefile" ) CONFIG_FILES="$CONFIG_FILES mod.scanner/Makefile" ;;
