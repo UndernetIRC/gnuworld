@@ -43,7 +43,7 @@
 #include	"moduleLoader.h"
 
 const char xServer_h_rcsId[] = __XSERVER_H ;
-const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.32 2000/12/13 23:22:23 dan_karrels Exp $" ;
+const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.33 2000/12/15 00:33:12 dan_karrels Exp $" ;
 
 using std::string ;
 using std::vector ;
@@ -1917,7 +1917,9 @@ if( NULL == theClient )
 	}
 
 // Tokenize the channel string
-StringTokenizer st( Param[ 1 ], ',' ) ;
+// Be sure to take into account the channel parting message
+StringTokenizer _st( Param[ 1 ], ':' ) ;
+StringTokenizer st( _st[ 0 ], ',' ) ;
 
 // Iterate through all channels that this user is parting
 for( StringTokenizer::size_type i = 0 ; i < st.size() ; ++i )
