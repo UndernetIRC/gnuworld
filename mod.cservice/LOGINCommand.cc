@@ -12,7 +12,7 @@
 #include	"cservice_config.h"
 #include	"Network.h"
 
-const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.18 2001/05/20 00:00:49 gte Exp $" ;
+const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.19 2001/06/21 23:23:56 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -316,6 +316,46 @@ for (autoOpVectorType::const_iterator resultPtr = autoOpVector.begin();
 
 	} 
 
+/*
+ *  And last but by no means least, see if we have been nominated as 
+ *  a supporter for a channel.
+ */
+
+strstream supporterQuery;
+supporterQuery	<< "SELECT channels.name FROM"
+			<< " supporters,channels WHERE supporters.channel_id = channels.id"
+			<< " AND channels.registered_ts = 0"
+			<< " AND supporters.support = NULL"
+			<< " AND user_id = "
+			<< theUser->getID()
+			<< ends;
+
+#ifdef LOG_SQL
+	elog	<< "LOGIN::sqlQuery> "
+		<< supporterQuery.str()
+		<< endl;
+#endif
+
+status = bot->SQLDb->Exec(supporterQuery.str()) ;
+delete[] supporterQuery.str() ;
+
+if( PGRES_TUPLES_OK != status )
+	{
+	elog	<< "LOGIN> SQL Error: "
+		<< bot->SQLDb->ErrorMessage()
+		<< endl ;
+	return false ; 
+	}
+ 
+ 
+for(int i = 0; i < bot->SQLDb->Tuples(); i++)
+	{ 
+		string channelName = bot->SQLDb->GetValue(i, 1);
+		bot->Notice(theClient, "You have been named as a supporter in a new channel application"
+			" for %s. Please visit the webpage to confirm your support, or register an objection with the application.",
+			channelName.c_str());
+	}
+ 
 return true; 
 } 
 
