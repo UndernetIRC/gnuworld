@@ -225,10 +225,10 @@ while( !done )
 	string writeMe( inputBuffer, readBytes ) ;
 	lh.burstPtr->Write( writeMe ) ;
 
-	cout	<< "main> Writing "
-		<< readBytes
-		<< " bytes"
-		<< endl ;
+//	cout	<< "main> Writing "
+//		<< readBytes
+//		<< " bytes"
+//		<< endl ;
 
 	} // while( !done )
 
