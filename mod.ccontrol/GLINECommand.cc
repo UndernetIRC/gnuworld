@@ -24,7 +24,7 @@
 #include	"ccUser.h"
 #include	"Constants.h"
 
-const char GLINECommand_cc_rcsId[] = "$Id: GLINECommand.cc,v 1.34 2002/01/17 20:04:04 mrbean_ Exp $";
+const char GLINECommand_cc_rcsId[] = "$Id: GLINECommand.cc,v 1.35 2002/01/25 17:15:41 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -151,6 +151,7 @@ if(!isChan)
 			bot->Notice(theClient,"You must login to issue this gline!");
 			return true;
 			}
+		Users = Network->countMatchingUserHost(string(userName + "@" + hostname));
 		}
 	else
 		{
