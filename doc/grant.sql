@@ -21,3 +21,5 @@ grant all on lastrequests to gnuworld;
 grant all on pendingusers to gnuworld;
 grant all on transition to gnuworld;
 grant all on pending_traffic to gnuworld;
+grant all on noreg to gnuworld;
+grant all on regteam to gnuworld;
