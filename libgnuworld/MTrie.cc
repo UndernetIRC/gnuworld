@@ -1,7 +1,7 @@
 /**
  * MTrie.cc
  *
- * $Id: MTrie.cc,v 1.5 2003/07/22 21:36:48 dan_karrels Exp $
+ * $Id: MTrie.cc,v 1.6 2003/07/24 04:03:18 dan_karrels Exp $
  */
 
 #include	<map>
@@ -17,7 +17,6 @@
 
 // TODO: Max number of levels? It could reduce memory by a large amount
 // TODO: allow comparison functor (case insensitive)
-// TODO: allow specifying delimiter ('.')
 
 using std::map ;
 using std::clog ;
@@ -26,8 +25,10 @@ using std::string ;
 using gnuworld::StringTokenizer ;
 
 template< typename _valueT >
-MTrie< _valueT >::MTrie()
- : numElements( 0 )
+MTrie< _valueT >::MTrie( const char delimiter )
+ : numElements( 0 ),
+   parent( 0 ),
+   delimiter( delimiter )
 {}
 
 template< typename _valueT >
@@ -63,7 +64,7 @@ if( key.find( '?' ) != string::npos )
 
 // Tokenize the key
 // The key is of the form "www.yahoo.com" or "ns1.switch.abc.net"
-StringTokenizer st( key, '.' ) ;
+StringTokenizer st( key, delimiter ) ;
 
 MTrie< _valueT >* currentNode = this ;
 
@@ -83,12 +84,18 @@ for( StringTokenizer::const_reverse_iterator tokenItr = st.rbegin() ;
 		assert( newNode != 0 ) ;
 
 		currentNode->nodesMap[ *tokenItr ] = newNode ;
+		newNode->parent = currentNode ;
 
 //		clog	<< "MTrie::insert> Added node for key: "
 //			<< *tokenItr
 //			<< endl ;
+
+		currentNode = newNode ;
 		}
-	currentNode = currentNode->nodesMap[ *tokenItr ] ;
+	else
+		{
+		currentNode = currentNode->nodesMap[ *tokenItr ] ;
+		}
 	}
 
 // currentNode now points to the level at which to add this item
@@ -110,93 +117,41 @@ clog	<< "MTrie::find> Searching for key: "
 	<< key
 	<< endl ;
 
+list< string > base ;
 list< value_type > returnMe ;
 
 // key may have wildcards, which is trickier than it may sound.
 // A key may be "w*w.yahoo.com" which matches to both
 // "www.yahoo.com" and "www.wwwww.yahoo.com"
-if( key.find( '*' ) != string::npos )
-	{
-	wildCardFind( returnMe, key ) ;
-	return returnMe ;
-	}
+find( this, returnMe, base, key, key ) ;
 
-// Tokenize the key
-// The key is of the form "www.yahoo.com" or "ns1.switch.abc.net"
-StringTokenizer st( key, '.' ) ;
-
-if( key.find( '?' ) != string::npos )
-	{
-	list< string > base ;
-	list< string > remainingTokens ;
-	for( StringTokenizer::const_iterator sItr = st.begin() ;
-		sItr != st.end() ; ++sItr )
-		{
-		remainingTokens.push_back( *sItr ) ;
-		}
-	recursiveFind( this,
-		base,
-		returnMe,
-		remainingTokens ) ;
-	return returnMe ;
-	}
-
-// Normal key, no wildcards
-const MTrie< _valueT >* currentNode = this ;
-
-for( StringTokenizer::const_reverse_iterator tokenItr = st.rbegin() ;
-	tokenItr != st.rend() ; ++tokenItr )
-	{
-	const_nodes_iterator nItr = currentNode->nodesMap.find( *tokenItr ) ;
-	if( currentNode->nodesMap.end() == nItr )
-		{
-		// This node does not exist
-		// Since we are not at the last token,
-		// this key does not exist
-		clog	<< "MTrie::find> Unable to find key: "
-			<< key
-			<< endl ;
-
-		return returnMe ;
-		}
-	currentNode = nItr->second ;
-	}
-
-// currentNode now points to the node that corresponds to the last
-// token in key.
-// Iterate the node's value list for all matches
-for( const_values_iterator vItr = currentNode->valuesList.begin() ;
-	vItr != currentNode->valuesList.end() ; ++vItr )
-	{
-	if( 0 == match( key, *vItr ) )
-		{
-		clog	<< "MTrie::find> Found a match for key: "
-			<< key
-			<< ", match: "
-			<< *vItr
-			<< endl ;
-		returnMe.push_back( value_type( key, *vItr ) ) ;
-		}
-	}
 return returnMe ;
 }
 
 template< typename _valueT >
-void MTrie< _valueT >::wildCardFind(
+void MTrie< _valueT >::find(
+	const MTrie< _valueT >* currentNode,
 	list< typename MTrie< _valueT >::value_type >& returnMe,
+	list< string >& base,
+	const string& origKey,
 	const string& key ) const
 {
+if( key.empty() )
+	{
+	for( const_values_iterator vItr = currentNode->valuesList.begin() ; 
+		vItr != currentNode->valuesList.end() ; ++vItr )
+		{
+		returnMe.push_back( value_type( getBase( base ), *vItr ) ) ;
+		}
+	return ;
+	}
+
 // precondition: key contains a '*'
-clog	<< "MTrie::wildCardFind> Searching for key: "
+clog	<< "MTrie::find> Searching for key: "
 	<< key
 	<< endl ;
 
-// First, establish the base
-list< string > base ;
-
-const MTrie< data_type >* currentNode = this ;
-
-StringTokenizer tokens( key, '.' ) ;
+StringTokenizer tokens( key, delimiter ) ;
 StringTokenizer::const_reverse_iterator tokenItr = tokens.rbegin() ;
 
 bool foundQuestionMark = false ;
@@ -225,7 +180,7 @@ for( ; tokenItr != tokens.rend() ; ++tokenItr )
 		// This node does not exist
 		// Since we are not at the last token,
 		// this key does not exist
-		clog	<< "MTrie::wildCardFind> Unable to find key: "
+		clog	<< "MTrie::find> Unable to find key: "
 			<< key
 			<< endl ;
 
@@ -237,7 +192,18 @@ for( ; tokenItr != tokens.rend() ; ++tokenItr )
 	base.push_front( *tokenItr ) ;
 	} // for( tokenItr )
 
-clog	<< "MTrie::wildCardFind> *tokenItr: "
+if( tokenItr == tokens.rend() )
+	{
+	// We are at a matching node
+	for( const_values_iterator vItr = currentNode->valuesList.begin() ; 
+		vItr != currentNode->valuesList.end() ; ++vItr )
+		{
+		returnMe.push_back( value_type( getBase( base ), *vItr ) ) ;
+		}
+	return ;
+	}
+
+clog	<< "MTrie::find> *tokenItr: "
 	<< *tokenItr
 	<< endl ;
 
@@ -261,16 +227,14 @@ string::size_type starPos = localKey.rfind( '*' ) ;
 // setup the rest of the string to be everything left of
 //  and including the star
 
-// localKey starts out as "n*ws"
-// Setup localKey to "*ws"
-localKey.erase( 0, starPos ) ;
-
-if( foundQuestionMark )
+if( !foundQuestionMark )
 	{
-	localKey = *tokenItr ;
+	// localKey starts out as "n*ws"
+	// Setup localKey to "*ws"
+	localKey.erase( 0, starPos ) ;
 	}
 
-clog	<< "MTrie::wildCardFind> starPos: "
+clog	<< "MTrie::find> starPos: "
 	<< starPos
 	<< ", localKey: "
 	<< localKey
@@ -283,27 +247,57 @@ clog	<< "MTrie::wildCardFind> starPos: "
 for( const_nodes_iterator nItr = currentNode->nodesMap.begin() ;
 	nItr != currentNode->nodesMap.end() ; ++nItr )
 	{
-	clog	<< "MTrie::wildCardFind> match( "
+	clog	<< "MTrie::find> match( "
 		<< localKey
 		<< ", "
 		<< nItr->first
 		<< " ): " ;
 
-	if( !match( localKey, nItr->first ) )
+	if( match( localKey, nItr->first ) )
 		{
-		clog	<< "true" << endl ;
-		base.push_front( nItr->first ) ;
-		recursiveFind( nItr->second, // MTrie*
-			base,
+		clog	<< "false" << endl ;
+		continue ;
+		}
+
+	clog	<< "true" << endl ;
+
+	base.push_front( nItr->first ) ;
+	if( foundQuestionMark )
+		{
+		// Question mark only, no '*' in the
+		// token
+		// Reassemble the key
+		string newKey ;
+		for( ++tokenItr; tokenItr != tokens.rend() ; 
+			++tokenItr )
+			{
+			if( !newKey.empty() )
+				{
+				newKey.insert( newKey.begin(),
+					delimiter ) ;
+				}
+			newKey.insert( 0, *tokenItr ) ;
+			}
+
+		clog	<< "MTrie::find> (?) newKey: "
+			<< newKey
+			<< endl ;
+
+		find( nItr->second,
 			returnMe,
-			key ) ;
-		base.pop_front() ;
+			base,
+			origKey,
+			newKey ) ;
 		}
 	else
 		{
-		clog	<< "false" << endl ;
-		}
-	}
+		recursiveFind( nItr->second, // MTrie*
+			base,
+			returnMe,
+			origKey ) ;
+		} // if( questionMarkFound )
+	base.pop_front() ;
+	} // for( nItr )
 }
 
 template< typename _valueT >
@@ -313,16 +307,19 @@ void MTrie< _valueT >::recursiveFind(
 	list< typename MTrie< _valueT >::value_type >& returnMe,
 	const string& key ) const
 {
-clog	<< "MTrie::recursiveFind(*)> base: "
-	<< getBase( base )
-	<< ", key: "
+clog	<< "MTrie::recursiveFind> key: "
 	<< key
+	<< ", base: "
+	<< getBase( base )
 	<< endl ;
 
 // '*'
 string stringBase = getBase( base ) ;
 if( !match( key, stringBase ) )
 	{
+//	clog	<< "MTrie::recursiveFind> match"
+//		<< endl ;
+
 	// This node matches
 	for( const_values_iterator vItr = 
 		currentNode->valuesList.begin() ;
@@ -352,130 +349,6 @@ for( const_nodes_iterator nItr = currentNode->nodesMap.begin() ;
 }
 
 template< typename _valueT >
-void MTrie< _valueT >::recursiveFind( const MTrie< _valueT >* currentNode,
-	list< string >& base,
-	list< typename MTrie< _valueT >::value_type >& returnMe,
-	list< string >& remainingTokens ) const
-{
-// '?'
-if( remainingTokens.empty() )
-	{
-	clog	<< "MTrie::recursiveFind(\?)> Top: remainingTokens "
-		<< "empty"
-		<< endl ;
-
-	// We have reached a final node, record all values
-	for( const_values_iterator vItr = 
-		currentNode->valuesList.begin() ;
-		vItr != currentNode->valuesList.end() ;
-		++vItr )
-		{
-		clog	<< "MTrie::recursiveFind(\?)> vItr: "
-			<< *vItr
-			<< endl ;
-		value_type addMe( getBase( base ), *vItr ) ;
-		returnMe.push_back( addMe ) ;
-		} // for( vItr )
-
-	// base case
-	return ;
-	} // if( base.empty() )
-
-//list< string >::const_reverse_iterator tokenItr =
-//	remainingTokens.rbegin() ;
-list< string >::const_reverse_iterator tokenItr ;
-
-// Iterate as far as possible before beginning question mark match()
-// searches.
-while( !remainingTokens.empty() )
-	{
-//for( ; tokenItr != remainingTokens.rend() ; ++tokenItr )
-//	{
-	tokenItr = remainingTokens.rbegin() ;
-	if( string::npos != (*tokenItr).find( '?' ) )
-		{
-		// Question mark found
-		break ;
-		}
-
-	// No wildcard, continue to next level
-	const_nodes_iterator nItr =
-		currentNode->nodesMap.find( *tokenItr ) ;
-	if( currentNode->nodesMap.end() == nItr )
-		{
-		// This node does not exist
-		// Since we are not at the last token,
-		// this key does not exist
-		clog	<< "MTrie::recursiveFind(\?)> Unable to find key: "
-			<< *tokenItr
-			<< endl ;
-
-		return ;
-		}
-	currentNode = nItr->second ;
-
-	// Add to base
-	base.push_front( *tokenItr ) ;
-
-	remainingTokens.pop_back() ;
-	} // for( tokenItr )
-
-if( remainingTokens.empty() )
-	{
-	clog	<< "MTrie::recursiveFind(\?)> End node"
-		<< endl ;
-
-	// If remainingTokens is empty it means that the final
-	// token has been reached, and didn't have a '?'.
-	// This is ok, it just means that we have reached the
-	// end node.  Instead of building a for loop here, just
-	// reinvoke this method with an empty remainingTokens
-	// list, it will do the right thing (base case).
-	recursiveFind( currentNode,
-		base,
-		returnMe,
-		remainingTokens ) ;
-	return ;
-	}
-
-// Found a '?'
-string localKey( *tokenItr ) ;
-
-remainingTokens.pop_back() ;
-
-clog	<< "MTrie::recursiveFind(?)> Building localKey: "
-	<< localKey
-	<< endl ;
-
-// Everything is set, begin recursion
-// Match localKey against all nodes
-for( const_nodes_iterator nItr = currentNode->nodesMap.begin() ;
-	nItr != currentNode->nodesMap.end() ; ++nItr )
-	{
-	clog	<< "MTrie::recursiveFind(\?)> match( "
-		<< localKey
-		<< ", "
-		<< nItr->first
-		<< " ): " ;
-
-	if( !match( localKey, nItr->first ) )
-		{
-		clog	<< "true" << endl ;
-		base.push_front( nItr->first ) ;
-		recursiveFind( nItr->second, // MTrie*
-			base,
-			returnMe,
-			remainingTokens ) ;
-		base.pop_front() ;
-		}
-	else
-		{
-		clog	<< "false" << endl ;
-		}
-	}
-}
-
-template< typename _valueT >
 string MTrie< _valueT >::getBase( const list< string >& base ) const
 {
 string retMe ;
@@ -486,10 +359,256 @@ for( list< string >::const_iterator rtItr = base.begin() ;
 	{
 	if( doneALoop )
 		{
-		retMe += "." ;
+		retMe += delimiter ;
 		}
 	retMe += *rtItr ;
 	doneALoop = true ;
 	}
 return retMe ;
 }
+
+template< typename _valueT >
+typename MTrie< _valueT >::size_type
+MTrie< _valueT >::erase( const string& key )
+{
+clog	<< "MTrie::erase> Erasing key: "
+	<< key
+	<< endl ;
+
+// key may have wildcards, which is trickier than it may sound.
+// A key may be "w*w.yahoo.com" which matches to both
+// "www.yahoo.com" and "www.wwwww.yahoo.com"
+
+list< string > base ;
+return erase( this, base, key, key ) ;
+}
+
+template< typename _valueT >
+typename MTrie< _valueT >::size_type
+MTrie< _valueT >::erase(
+	MTrie< _valueT >* currentNode,
+	list< string >& base,
+	const string& origKey,
+	const string& key )
+{
+size_type eraseCount = 0 ;
+if( key.empty() )
+	{
+	// Everything on this level is a match
+	eraseCount = currentNode->valuesList.size() ;
+	currentNode->valuesList.clear() ;
+
+	return eraseCount ;
+	}
+
+// precondition: key contains a '*'
+clog	<< "MTrie::erase> Erasing key: "
+	<< key
+	<< endl ;
+
+StringTokenizer tokens( key, delimiter ) ;
+StringTokenizer::const_reverse_iterator tokenItr = tokens.rbegin() ;
+
+bool foundQuestionMark = false ;
+
+// Iterate as far as possible before beginning wild card match()
+// searches.
+for( ; tokenItr != tokens.rend() ; ++tokenItr )
+	{
+	if( string::npos != (*tokenItr).find( '*' ) )
+		{
+		// Wildcard
+		break ;
+		}
+
+	// Make sure this is after the search for '*'
+	if( string::npos != (*tokenItr).find( '?') )
+		{
+		foundQuestionMark = true ;
+		break ;
+		}
+
+	// No wildcard, continue to next level
+	nodes_iterator nItr = currentNode->nodesMap.find( *tokenItr ) ;
+	if( currentNode->nodesMap.end() == nItr )
+		{
+		// This node does not exist
+		// Since we are not at the last token,
+		// this key does not exist
+		clog	<< "MTrie::erase> Unable to find key: "
+			<< key
+			<< endl ;
+
+		return 0 ;
+		}
+	currentNode = nItr->second ;
+
+	// Add to base
+	base.push_front( *tokenItr ) ;
+	} // for( tokenItr )
+
+if( tokenItr == tokens.rend() )
+	{
+	// Everything on this level is a match
+	eraseCount = currentNode->valuesList.size() ;
+	currentNode->valuesList.clear() ;
+
+	return eraseCount ;
+	}
+
+clog	<< "MTrie::erase> *tokenItr: "
+	<< *tokenItr
+	<< endl ;
+
+// Because of the precondition, the only way to exit the above 
+// loop is by finding a wildcard, tokenItr must be valid 
+// tokenItr now points to a token of the form "w*w" or "*w*w*" 
+// We can prevent some unnecessary searching by creating a 
+// search token with as many real characters as possible. 
+// In the above cases, it would be "w" and "*", respectively. 
+// That is, if we are searching for "w*w", there is no reason 
+// to recursively check the currentNode's nodesMap element whose 
+// key is "moo". 
+// Construct the most known token.
+string localKey( *tokenItr ) ;
+
+// starPos is the index of the '*'
+string::size_type starPos = localKey.rfind( '*' ) ;
+
+// Here we must:
+// setup localKey to be the star and everything to its right
+// setup the rest of the string to be everything left of
+//  and including the star
+
+if( !foundQuestionMark )
+	{
+	// localKey starts out as "n*ws"
+	// Setup localKey to "*ws"
+	localKey.erase( 0, starPos ) ;
+	}
+
+clog	<< "MTrie::erase> starPos: "
+	<< starPos
+	<< ", localKey: "
+	<< localKey
+	<< ", base: "
+	<< getBase( base )
+	<< endl ;
+
+// Everything is set, begin recursion
+// Match localKey against all nodes
+for( nodes_iterator nItr = currentNode->nodesMap.begin() ;
+	nItr != currentNode->nodesMap.end() ; ++nItr )
+	{
+	clog	<< "MTrie::erase> match( "
+		<< localKey
+		<< ", "
+		<< nItr->first
+		<< " ): " ;
+
+	if( match( localKey, nItr->first ) )
+		{
+		clog	<< "false" << endl ;
+		continue ;
+		}
+
+	clog	<< "true" << endl ;
+
+	base.push_front( nItr->first ) ;
+	if( foundQuestionMark )
+		{
+		// Question mark only, no '*' in the
+		// token
+		// Reassemble the key
+		string newKey ;
+		for( ++tokenItr; tokenItr != tokens.rend() ; 
+			++tokenItr )
+			{
+			if( !newKey.empty() )
+				{
+				newKey.insert( newKey.begin(),
+					delimiter ) ;
+				}
+			newKey.insert( 0, *tokenItr ) ;
+			}
+
+		clog	<< "MTrie::erase> (?) newKey: "
+			<< newKey
+			<< endl ;
+
+		eraseCount += erase( nItr->second,
+			base,
+			origKey,
+			newKey ) ;
+		}
+	else
+		{
+		eraseCount += recursiveErase( nItr->second, // MTrie*
+			base,
+			origKey ) ;
+		} // if( questionMarkFound )
+	base.pop_front() ;
+
+	if( currentNode->valuesList.empty() &&
+		currentNode->nodesMap.empty() )
+		{
+		clog	<< "MTrie::erase> Erasing empty node"
+			<< endl ;
+
+		// This does NOT invalidate the iterator
+		delete nItr->second ;
+		currentNode->nodesMap.erase( nItr ) ;
+		}
+	} // for( nItr )
+return eraseCount ;
+}
+
+template< typename _valueT >
+typename MTrie< _valueT >::size_type
+MTrie< _valueT >::recursiveErase(
+	MTrie< _valueT >* currentNode,
+	list< string >& base,
+	const string& key )
+{
+clog	<< "MTrie::recursiveErase(*)> base: "
+	<< getBase( base )
+	<< ", key: "
+	<< key
+	<< endl ;
+
+size_type eraseCount = 0 ;
+
+// '*'
+string stringBase = getBase( base ) ;
+if( !match( key, stringBase ) )
+	{
+	// This node matches
+	eraseCount = currentNode->valuesList.size() ;
+	currentNode->valuesList.clear() ;
+	} // if( !match() )
+
+for( nodes_iterator nItr = currentNode->nodesMap.begin() ;
+	nItr != currentNode->nodesMap.end() ; ++nItr )
+	{
+	// match() is not important here, since we are doing
+	// a blind '*' search, check every node from here down
+	base.push_front( nItr->first ) ;
+	eraseCount += recursiveErase( nItr->second, // MTrie*
+		base,
+		key ) ;
+	base.pop_front() ;
+
+	if( currentNode->valuesList.empty() &&
+		currentNode->nodesMap.empty() )
+		{
+		clog	<< "MTrie::recursiveErase> Erasing empty node"
+			<< endl ;
+
+		// This does NOT invalidate the iterator
+		delete nItr->second ;
+		currentNode->nodesMap.erase( nItr ) ;
+		}
+	} // for( nItr )
+return eraseCount ;
+}
+

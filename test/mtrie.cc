@@ -1,7 +1,7 @@
 /**
  * mtrie.cc
  *
- * $Id: mtrie.cc,v 1.2 2003/07/20 23:00:34 dan_karrels Exp $
+ * $Id: mtrie.cc,v 1.3 2003/07/24 04:03:19 dan_karrels Exp $
  */
 
 #include	<string>
@@ -19,6 +19,9 @@ ELog gnuworld::elog ;
 
 void		printHelp() ;
 void		handleSearch( const string& line ) ;
+void		handleErase( const string& line ) ;
+
+MTrie< string > hostTrie ;
 
 void usage( const string& progName )
 {
@@ -27,8 +30,6 @@ cout	<< "Usage: "
 	<< " <socket log file>"
 	<< endl ;
 }
-
-MTrie< string > hostTrie ;
 
 int main( int argc, char** argv )
 {
@@ -119,6 +120,10 @@ do
 		{
 		handleSearch( line ) ;
 		}
+	else if( st[ 0 ] == "erase" )
+		{
+		handleErase( line ) ;
+		}
 	else if( st[ 0 ] == "exit" )
 		{
 		}
@@ -178,4 +183,21 @@ for( valuesListType::const_iterator vItr = values.begin() ;
 		<< vItr->second
 		<< endl ;
 	}
+}
+
+void handleErase( const string& line )
+{
+StringTokenizer st( line ) ;
+if( st.size() != 2 )
+	{
+	cout	<< "Error: Erase requires exactly 1 argument"
+		<< endl ;
+	return ;
+	}
+
+MTrie< string >::size_type eraseCount = hostTrie.erase( st[ 1 ] ) ;
+clog	<< "Erased "
+	<< eraseCount
+	<< " element(s)"
+	<< endl ;
 }
