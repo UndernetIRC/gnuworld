@@ -20,7 +20,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
  * USA.
  *
- * $Id: cloner.cc,v 1.16 2002/08/01 18:59:32 reedloden Exp $
+ * $Id: cloner.cc,v 1.17 2002/08/01 21:11:59 reedloden Exp $
  */
 
 #include	<new>
@@ -45,7 +45,7 @@
 
 const char client_h_rcsId[] = __CLIENT_H ;
 const char cloner_h_rcsId[] = __CLONER_H ;
-const char cloner_cc_rcsId[] = "$Id: cloner.cc,v 1.16 2002/08/01 18:59:32 reedloden Exp $" ;
+const char cloner_cc_rcsId[] = "$Id: cloner.cc,v 1.17 2002/08/01 21:11:59 reedloden Exp $" ;
 const char iClient_h_rcsId[] = __ICLIENT_H ;
 const char EConfig_h_rcsId[] = __ECONFIG_H ;
 const char ELog_h_rcsId[] = __ELOG_H ;
@@ -291,8 +291,7 @@ else if( command == "PARTALL" )
 			chanName.insert( chanName.begin(), '#' ) ;
 			}
 
-		// This needs to be changed to >= 2 and not just 2. -reed
-		string partReason( st[ 2 ] ) ;
+		string partReason( st.assemble(2).c_str() ) ;
 
 		for( list< iClient* >::const_iterator ptr = clones.begin(),
 			endPtr = clones.end() ; ptr != endPtr ; ++ptr )
@@ -335,8 +334,7 @@ else if( command == "KILLALL" || command == "QUITALL" )
 	if( st.size() >= 2 )
 		{
 
-		// This needs to be changed to >= 1 and not just 1. -reed
-		string quitMsg( st[ 1 ] ) ;
+		string quitMsg( st.assemble(1).c_str() ) ;
 
 		for( list< iClient* >::const_iterator ptr = clones.begin(),
 			endPtr = clones.end() ; ptr != endPtr ; ++ptr )
@@ -352,6 +350,58 @@ else if( command == "KILLALL" || command == "QUITALL" )
 		}
 
 	} // KILLALL/QUITALL
+else if( command == "SAYALL" )
+	{
+	if( st.size() < 3 )
+		{
+		Notice( theClient, "Usage: SAYALL <#channel> <message>" ) ;
+		return 0 ;
+		}
+
+	string chanName( st[ 1 ] ) ;
+	if( chanName[ 0 ] != '#' )
+		{
+		chanName.insert( chanName.begin(), '#' ) ;
+		}
+		string privMsg( st.assemble(2).c_str() ) ;
+
+	for( list< iClient* >::const_iterator ptr = clones.begin(),
+		endPtr = clones.end() ; ptr != endPtr ; ++ptr )
+		{
+		stringstream s ;
+		s	<< (*ptr)->getCharYYXXX()
+			<< " P "
+			<< chanName
+			<< " :"
+		<< privMsg
+		<< ends ;
+		MyUplink->Write( s ) ;
+		}
+	} // SAYALL
+else if( command == "MSGALL" )
+	{
+	if( st.size() < 3 )
+		{
+		Notice( theClient, "Usage: MSGALL <nickname> <message>" ) ;
+		return 0 ;
+		}
+
+	string nickName( st[ 1 ] ) ;
+	string privMsg( st.assemble(2).c_str() ) ;
+
+	for( list< iClient* >::const_iterator ptr = clones.begin(),
+		endPtr = clones.end() ; ptr != endPtr ; ++ptr )
+		{
+		stringstream s ;
+		s	<< (*ptr)->getCharYYXXX()
+			<< " P "
+			<< nickName
+			<< " :"
+			<< privMsg
+			<< ends ;
+			MyUplink->Write( s ) ;
+		}
+	} // MSGALL
 return 0 ;
 }
 
