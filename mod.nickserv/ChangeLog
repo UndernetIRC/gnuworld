@@ -1,3 +1,7 @@
+2004-02-13 1.0.5 Jeekay
+* Added juping of nicks that have just been autokilled
+* Bumped version to 1.0.5
+
 2002-12-10 1.0.4 Jeekay
 * Fixed stupid bug that would cause a crash if a non-authed user entered the
   console channel.

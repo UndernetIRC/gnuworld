@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: nickserv.cc,v 1.24 2004/01/07 17:03:14 dan_karrels Exp $
+ * $Id: nickserv.cc,v 1.25 2004/02/13 17:04:23 jeekay Exp $
  */
 
 #include	<sstream>
@@ -31,7 +31,7 @@
 #include "netData.h"
 #include "nickserv.h"
 
-RCSTAG("$Id: nickserv.cc,v 1.24 2004/01/07 17:03:14 dan_karrels Exp $");
+RCSTAG("$Id: nickserv.cc,v 1.25 2004/02/13 17:04:23 jeekay Exp $");
 
 namespace gnuworld
 {
@@ -254,7 +254,7 @@ if("DCC" == Command) {
 } else if("PING" == Command) {
   DoCTCP(theClient, CTCP, Message);
 } else if("VERSION" == Command) {
-  DoCTCP(theClient, CTCP, "GNUWorld NickServ v1.0.4");
+  DoCTCP(theClient, CTCP, "GNUWorld NickServ v1.0.5");
 }
 
 xClient::OnCTCP(theClient, CTCP, Message, Secure);
@@ -495,6 +495,8 @@ if(warnQueue.size() == 0) { return; }
 
 QueueType killQueue;
 
+vector<string> jupeQueue;
+
 /* Now we start to process the queue. The rules are as follows for a given nick:
  *  Is the cached user record set to autokill?
  *    No  - remove entry from warnQueue, continue processing next element
@@ -510,6 +512,14 @@ QueueType killQueue;
 for(QueueType::iterator queuePos = warnQueue.begin(); queuePos != warnQueue.end(); ) {
   iClient* theClient = *queuePos;
   netData* theData = static_cast< netData* >( theClient->getCustomData(this) );
+	
+  /* Is this a juped nick? */
+  /* TODO: There should be an iClient call for this */
+  if(MyUplink->getIntYY() == theClient->getIntYY()) {
+    /* This is a juped nick. Let's not try to kill it eh. */
+    queuePos = warnQueue.erase(queuePos);
+    continue;
+  }
   
   /* Is this nick registered? */
   sqlUser* regUser = isRegistered(theClient->getNickName());
@@ -556,6 +566,10 @@ if(killQueue.empty()) { return; }
 
 for(QueueType::iterator queuePos = killQueue.begin(); queuePos != killQueue.end(); queuePos++) {
   iClient* theClient = *queuePos;
+
+  /* Add the nickname to the juping queue */
+  jupeQueue.push_back(theClient->getNickName());
+
   netData* theData = static_cast<netData*>(theClient->removeCustomData(this));
   delete(theData);
   theStats->incStat("NS.KILL");
@@ -564,7 +578,45 @@ for(QueueType::iterator queuePos = killQueue.begin(); queuePos != killQueue.end(
   Kill(theClient, "[NickServ] AutoKill");
 } // iterate over killQueue
 
-// No need to clear killQueue as it's a locally scoped variable
+/* Iterate over jupeQueue and do appropriate things */
+string fakenumeric(MyUplink->getCharYY() + "]]]");
+
+for( vector<string>::iterator itr = jupeQueue.begin();
+     itr != jupeQueue.end() ;
+     ++itr ) {
+
+    string theNick = *itr;
+
+    theLogger->log( logging::events::E_DEBUG, "Juping " +
+                    theNick
+                  );
+
+
+    /* Set up a fake iClient to represent the new jupe.
+     * TODO: The connect time should probably be less so that we win any
+     * collision races resulting from a lagging network.
+     */
+    iClient *fakeClient = new iClient(
+      MyUplink->getIntYY(),
+      fakenumeric,
+      theNick,
+      "juped",
+      "AAAAAA",
+      "nick.name",
+      "nick.name",
+      "+ikd",
+      "",
+      "Juped Nick",
+      ::time( 0 )
+    );
+
+    assert( fakeClient != 0 );
+ 
+    if( ! MyUplink->AttachClient( fakeClient, this ) ) {
+      theLogger->log(logging::events::E_INFO, "Unable to jupe: " + theNick);
+    }
+	
+}
 
 } // nickserv::processQueue()
 
