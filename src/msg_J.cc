@@ -16,7 +16,7 @@
 #include	"ELog.h"
 #include	"StringTokenizer.h"
 
-const char msg_J_cc_rcsId[] = "$Id: msg_J.cc,v 1.3 2001/03/02 23:33:09 dan_karrels Exp $" ;
+const char msg_J_cc_rcsId[] = "$Id: msg_J.cc,v 1.4 2001/03/02 23:38:03 dan_karrels Exp $" ;
 
 using std::string ;
 using std::endl ;
@@ -178,9 +178,17 @@ void xServer::userPartAllChannels( iClient* theClient )
 for( iClient::channelIterator ptr = theClient->channels_begin(),
 	endPtr = theClient->channels_end() ; ptr != endPtr ; ++ptr )
 	{
+
+	// Post this event to all listeners
 	PostChannelEvent( EVT_PART, *ptr,
 		static_cast< void* >( theClient ) ) ; // iClient*
 
+	// Remove this channel from the iClient's internal structure
+	theClient->removeChannel( *ptr ) ;
+
+	// Remove this ChannelUser from the Channel's internal
+	// structure.
+	// Deallocate the ChannelUser
 	delete (*ptr)->removeUser( theClient ) ;
 
 	// Is the channel empty of all network and services
@@ -194,10 +202,6 @@ for( iClient::channelIterator ptr = theClient->channels_begin(),
 		delete Network->removeChannel( (*ptr)->getName() ) ;
 		}
 	}
-
-// Notify the iClient that it has parted all channels
-theClient->clearChannels() ;
-
-}
+} // userPartAllChannels()
 
 } // namespace gnuworld
