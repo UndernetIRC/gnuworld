@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: Connection.cc,v 1.10 2002/07/16 15:30:49 dan_karrels Exp $
+ * $Id: Connection.cc,v 1.11 2002/07/23 22:26:35 dan_karrels Exp $
  */
 
 #include	<sys/types.h>
@@ -48,12 +48,10 @@ using std::string ;
 // Simply initialize the object
 Connection::Connection( const string& _hostname,
 	const unsigned short int _remotePort,
-	const bool _TCP,
 	const char _delimiter )
 : hostname( _hostname ),
 	localPort( 0 ),
 	remotePort( _remotePort ),
-	TCP( _TCP ),
 	inputBuffer( string(), _delimiter ),
 	outputBuffer( string(), _delimiter ),
 	IP( string() ),
@@ -66,7 +64,6 @@ memset( &addr, 0, sizeof( struct sockaddr_in ) ) ;
 Connection::Connection( const char _delimiter )
 : localPort( 0 ),
 	remotePort( 0 ),
-	TCP( true ),
 	inputBuffer( string(), _delimiter ),
 	outputBuffer( string(), _delimiter ),
 	sockFD( -1 ),

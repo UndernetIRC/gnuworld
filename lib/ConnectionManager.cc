@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ConnectionManager.cc,v 1.14 2002/07/20 00:58:29 dan_karrels Exp $
+ * $Id: ConnectionManager.cc,v 1.15 2002/07/23 22:26:36 dan_karrels Exp $
  */
 
 #include	<unistd.h>
@@ -52,7 +52,6 @@
 #include	"Buffer.h"
 #include	"ELog.h"
 
-using std::clog ;
 using std::cout ;
 using std::endl ;
 using std::string ;
@@ -105,8 +104,7 @@ handlerMap.clear() ;
 
 Connection* ConnectionManager::Connect( ConnectionHandler* hPtr,
 	const string& host,
-	const unsigned short int remotePort,
-	const bool TCP )
+	const unsigned short int remotePort )
 {
 
 // Handler must be valid
@@ -126,7 +124,7 @@ cout	<< "Connect> "
 
 // Allocate a new Connection object
 Connection* newConnection = new (nothrow)
-	Connection( host, remotePort, TCP, delimiter ) ;
+	Connection( host, remotePort, delimiter ) ;
 assert( newConnection != 0 ) ;
 
 // Set the absolute time for this Connection's timeout to occur
@@ -162,7 +160,7 @@ else
 	} // else()
 
 // Open a non-blocking socket
-int sockFD = openSocket( TCP ) ;
+int sockFD = openSocket() ;
 if( -1 == sockFD )
 	{
 	delete newConnection ;
@@ -527,7 +525,7 @@ void ConnectionManager::Poll( const long seconds,
 // performed.
 if( handlerMap.empty() && eraseMap.empty() )
 	{
-//	clog	<< "ConnectionManager::Poll> handlerMap.empty()"
+//	elog	<< "ConnectionManager::Poll> handlerMap.empty()"
 //		<< endl ;
 	return ;
 	}
@@ -544,10 +542,10 @@ FD_ZERO( &readfds ) ;
 
 // Iterate through the table of Connection's to setup select()
 // FD information
-for( handlerMapIterator handlerItr = handlerMap.begin() ;
+for( constHandlerMapIterator handlerItr = handlerMap.begin() ;
 	handlerItr != handlerMap.end() ; ++handlerItr )
 	{
-	for( connectionMapIterator connectionItr =
+	for( constConnectionMapIterator connectionItr =
 		handlerItr->second.begin(),
 		connectionEndItr = handlerItr->second.end() ;
 		connectionItr != connectionEndItr ;
@@ -555,7 +553,7 @@ for( handlerMapIterator handlerItr = handlerMap.begin() ;
 		{
 
 		// Create a couple of convenience variables
-		Connection* connectionPtr = *connectionItr ;
+		const Connection* connectionPtr = *connectionItr ;
 		int tempFD = connectionPtr->getSockFD() ;
 
 		// The order of the below if/else structure is important
@@ -618,7 +616,7 @@ int fdCnt = ::select( 1 + highestFD, &readfds, &writefds, 0,
 if( fdCnt < 0 )
 	{
 	// Error in select()
-	clog	<< "ConnectionManager::Poll> Error in Poll(): "
+	elog	<< "ConnectionManager::Poll> Error in Poll(): "
 		<< strerror( errno )
 		<< endl ;
 	return ;
@@ -632,7 +630,7 @@ if( fdCnt < 0 )
 time_t now = ::time( 0 ) ;
 
 // Walk the handler list, checking connections for each connectionMap.
-for( handlerMapIterator handlerItr = handlerMap.begin() ;
+for( constHandlerMapIterator handlerItr = handlerMap.begin() ;
 	handlerItr != handlerMap.end() ; ++handlerItr )
 	{
 	// Convenience variable for the long loop ahead
@@ -641,8 +639,9 @@ for( handlerMapIterator handlerItr = handlerMap.begin() ;
 	// Iterate through this handler's connectionMap, similar
 	// as the above loops.
 	for( connectionMapIterator connectionItr =
-		handlerItr->second.begin() ;
-		connectionItr != handlerItr->second.end() ;
+		handlerItr->second.begin(),
+		connectionEndItr = handlerItr->second.end() ;
+		connectionItr != connectionEndItr ;
 		++connectionItr )
 		{
 
@@ -691,7 +690,7 @@ for( handlerMapIterator handlerItr = handlerMap.begin() ;
 		// Next let's check if this is a listening (server) socket
 		else if( connectionPtr->isListening() )
 			{
-//			cout	<< "Poll> Checking listener: "
+//			elog	<< "Poll> Checking listener: "
 //				<< *connectionPtr
 //				<< endl ;
 
@@ -707,7 +706,7 @@ for( handlerMapIterator handlerItr = handlerMap.begin() ;
 		// Check for pending outgoing connection
 		else if( connectionPtr->isPending() )
 			{
-//			cout	<< "Poll> Checking pending: "
+//			elog	<< "Poll> Checking pending: "
 //				<< *connectionPtr
 //				<< endl ;
 
@@ -808,7 +807,7 @@ for( eraseMapIterator eraseItr = eraseMap.begin(),
 		// Obtain a convenience pointer for readability
 		Connection* connectionPtr = *(eraseItr->second) ;
 
-//		cout	<< "Poll> Removing connection: "
+//		elog	<< "Poll> Removing connection: "
 //			<< *connectionPtr
 //			<< endl ;
 
@@ -853,18 +852,11 @@ for( handlerMapIterator handlerItr = handlerMap.begin() ;
 
 } // Poll()
 
-int ConnectionManager::openSocket( bool TCP )
+int ConnectionManager::openSocket()
 {
 
 // Let's get right to it, open the socket
-int sockFD = ::socket( AF_INET,
-	(TCP) ? SOCK_STREAM : SOCK_DGRAM, 0 ) ;
-
-if( !TCP )
-	{
-	cout	<< "openSocket> Opening UDP"
-		<< endl ;
-	}
+int sockFD = ::socket( AF_INET, SOCK_STREAM, 0 ) ;
 
 // Was the socket creation successful?
 if( sockFD < 0 )
@@ -1131,7 +1123,6 @@ assert( newConnection != 0 ) ;
 
 newConnection->setIncoming() ;
 newConnection->setPending() ;
-newConnection->setTCP( true ) ;
 
 // len is the size of a sockaddr structure, for use by accept()
 size_t len = sizeof( struct sockaddr ) ;
@@ -1382,7 +1373,6 @@ assert( newConnection != 0 ) ;
 newConnection->setSockFD( listenFD ) ;
 newConnection->setListen() ;
 newConnection->setPending() ;
-newConnection->setTCP() ;
 newConnection->setLocalPort( localPort ) ;
 // Leave hostname/IP empty for the new Connection.  This will
 // distinguish the connection more easily for use in

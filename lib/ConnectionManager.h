@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ConnectionManager.h,v 1.10 2002/07/16 15:30:49 dan_karrels Exp $
+ * $Id: ConnectionManager.h,v 1.11 2002/07/23 22:26:36 dan_karrels Exp $
  */
 
 #ifndef __CONNECTIONMANAGER_H
-#define __CONNECTIONMANAGER_H "$Id: ConnectionManager.h,v 1.10 2002/07/16 15:30:49 dan_karrels Exp $"
+#define __CONNECTIONMANAGER_H "$Id: ConnectionManager.h,v 1.11 2002/07/23 22:26:36 dan_karrels Exp $"
 
 #include	<sys/types.h>
 
@@ -86,6 +86,8 @@ class ConnectionManager
 	 */
 	typedef connectionMapType::iterator	connectionMapIterator ;
 
+	typedef connectionMapType::const_iterator constConnectionMapIterator ;
+
 	/**
 	 * This map stores connectionMapType's, keyed by the handler
 	 * which registered the connection(s).
@@ -98,6 +100,8 @@ class ConnectionManager
 	 * type for the handlerMap.
 	 */
 	typedef handlerMapType::iterator	handlerMapIterator ;
+
+	typedef handlerMapType::const_iterator	constHandlerMapIterator ;
 
 	/**
 	 * The type is used to store Connection objects to be erased.
@@ -171,9 +175,7 @@ public:
 	 * Connect() will attempt to establish a new connection to
 	 * the given host, on the given port.  The (host) field may
 	 * be the canonical host name, or the IP in the form of
-	 * numbres and dots. If TCP is true (or
-	 * not given to the method, thus default), then a TCP
-	 * connection will be made, UDP otherwise.
+	 * numbres and dots.
 	 * This method creates a non-blocking socket with which to
 	 * connect to the remote host, thus a return value of non-NULL
 	 * does not necessarily mean that the connection is valid,
@@ -187,8 +189,7 @@ public:
 	virtual Connection*	Connect(
 				ConnectionHandler*,
 				const string& host,
-				const unsigned short int remotePort,
-				const bool TCP = true ) ;
+				const unsigned short int remotePort ) ;
 
 	/**
 	 * Attempt to establish a listening Connection on the
@@ -314,9 +315,9 @@ protected:
 	/// the connection tables.
 	eraseMapType	eraseMap ;
 
-	/// Open a socket: TCP if TCP is true, otherwise UDP
+	/// Open a socket.
 	/// Return -1 on error
-	int		openSocket( bool TCP = true ) ;
+	int		openSocket() ;
 
 	/// Close a socket
 	void		closeSocket( int ) ;
