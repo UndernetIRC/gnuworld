@@ -23,3 +23,5 @@ grant all on transition to gnuworld;
 grant all on pending_traffic to gnuworld;
 grant all on noreg to gnuworld;
 grant all on regteam to gnuworld;
+grant all on webaccessteam to gnuworld;
+grant all on abuseteam to gnuworld;

@@ -13,4 +13,5 @@ COPY "languages" FROM stdin;
 8	RO	Romanian	31337
 9	CA	Catalan	31337
 10	ES	Spanish	31337
+11	HU	Hungary	31337
 \.

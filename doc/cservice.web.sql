@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------------
--- "$Id: cservice.web.sql,v 1.8 2001/06/16 21:56:27 gte Exp $"
+-- "$Id: cservice.web.sql,v 1.9 2001/07/13 19:15:47 gte Exp $"
 -- Channel service DB SQL file for PostgreSQL.
 --
 -- Tables specific to webbased registration process.
@@ -42,6 +42,15 @@ CREATE TABLE regteam (
 	admin_id int4 REFERENCES users(id) NOT NULL
 );
 
+CREATE TABLE abuseteam ( 
+	admin_id int4 REFERENCES users(id) NOT NULL
+);
+
+CREATE TABLE webaccessteam ( 
+	admin_id int4 REFERENCES users(id) NOT NULL,
+	level INT4 NOT NULL DEFAULT '0'
+);
+ 
 -- recorded objections for channels.
 CREATE TABLE objections ( 
 	channel_id int4 REFERENCES channels(id) NOT NULL, 
