@@ -5,7 +5,7 @@
 #include	"server.h"
 #include	"xparameters.h"
 
-const char msg_PASS_cc_rcsId[] = "$Id: msg_PASS.cc,v 1.1 2001/02/02 18:10:30 dan_karrels Exp $" ;
+const char msg_PASS_cc_rcsId[] = "$Id: msg_PASS.cc,v 1.2 2001/02/05 18:58:12 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -13,6 +13,7 @@ namespace gnuworld
 int xServer::MSG_PASS( xParameters& )
 {
 bursting = true ;
+useBurstBuffer = true ;
 return 0 ;
 }
 

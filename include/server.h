@@ -17,7 +17,7 @@
  */
 
 #ifndef __XSERVER_H
-#define __XSERVER_H "$Id: server.h,v 1.30 2001/02/04 18:02:19 dan_karrels Exp $"
+#define __XSERVER_H "$Id: server.h,v 1.31 2001/02/05 18:58:12 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
@@ -173,23 +173,54 @@ public:
 	 */
 	virtual void DoRead() ;
 
+	/**
+	 * Perform the physical write to the socket.
+	 */
 	virtual void DoWrite() ;
 
 	/**
 	 * Append a std::string to the output buffer.
+	 * The second argument determines if data should be written
+	 * during burst time.
 	 */
 	virtual bool Write( const string& ) ;
 
 	/**
+	 * Similar to the above signature of Write() except that data
+	 * will be written to the normal output buffer even during
+	 * burst time.
+	 */
+	virtual bool WriteDuringBurst( const string& ) ;
+
+	/**
 	 * Append a C variable argument list/character array to the output
 	 * buffer.
+	 * Since this method uses a variable argument list, this
+	 * method cannot support a final default argument -- this method
+	 * defaults to NOT writing during burst.
 	 */
 	virtual bool Write( const char*, ... ) ;
 
 	/**
+	 * This method is similar to the above Write(), except
+	 * that the data will be written to the normal output
+	 * buffer even during burst time.
+	 */
+	virtual bool WriteDuringBurst( const char*, ... ) ;
+
+	/**
 	 * Append a std::strstream to the output buffer.
+	 * The second argument determines if data should be written
+	 * during burst time.
 	 */
 	virtual bool Write( strstream& ) ;
+
+	/**
+	 * This method is similar to the above Write(), except
+	 * that the data will be written to the normal output
+	 * buffer even during burst time.
+	 */
+	virtual bool WriteDuringBurst( strstream& ) ;
 
 	/**
 	 * Write any bufferred data to the network.
@@ -503,6 +534,13 @@ public:
 	 */
 	inline const unsigned int& getUplinkIntYY() const
 		{ return Uplink->getIntYY() ; }
+
+	/**
+	 * Return a string representation of this server's uplink's
+	 * server numeric.
+	 */
+	inline const string getUplinkCharYY() const
+		{ return Uplink->getCharYY() ; }
 
 	/**
 	 * Return a std::string representation of this server's full
@@ -1030,10 +1068,21 @@ protected:
 	bool			bursting ;
 
 	/**
+	 * This variable will be true when the default behavior
+	 * of Write() is to write to the burstOutputBuffer.
+	 */
+	bool			useBurstBuffer ;
+
+	/**
 	 * This variable is true when the socket connection is valid.
 	 */
 	bool			_connected ;
 
+	/**
+	 * This variable remains true while the server should continue
+	 * running.  It may be set false by user input, or caught
+	 * signals.
+	 */
 	volatile bool		keepRunning ;
 
 	/**
@@ -1087,6 +1136,11 @@ protected:
 	 * the network.
 	 */
 	Buffer< char >		outputBuffer ;
+
+	/**
+	 * This buffer will hold data to be written during burst time.
+	 */
+	Buffer< char >		burstOutputBuffer ;
 
 	/**
 	 * This is the size of the TCP input window.

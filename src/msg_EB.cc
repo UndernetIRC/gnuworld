@@ -12,7 +12,7 @@
 #include	"ELog.h"
 #include	"xparameters.h"
 
-const char msg_EB_cc_rcsId[] = "$Id: msg_EB.cc,v 1.1 2001/02/02 18:10:30 dan_karrels Exp $" ;
+const char msg_EB_cc_rcsId[] = "$Id: msg_EB.cc,v 1.2 2001/02/05 18:58:12 dan_karrels Exp $" ;
 
 using std::endl ;
 
@@ -29,6 +29,10 @@ if( !strcmp( params[ 0 ], Uplink->getCharYY() ) )
 	{
 	// It's my uplink
 	burstEnd = ::time( 0 ) ;
+
+	// Signal that all Write()'s should write to the
+	// normal output buffer
+	useBurstBuffer = false ;
 
 	// Burst our clients
 	BurstClients() ;
@@ -47,6 +51,22 @@ if( !strcmp( params[ 0 ], Uplink->getCharYY() ) )
 
 	// Acknowledge their end of burst
 	Write( "%s EA\n", charYY ) ;
+
+	// Is the burstOutputBuffer empty?
+	if( !burstOutputBuffer.empty() )
+		{
+		// It has data, concatenate this data
+		// onto the normal outputBuffer
+		outputBuffer += burstOutputBuffer ;
+		burstOutputBuffer.clear() ;
+
+		elog	<< "xServer::MSG_EB> Adding "
+			<< burstOutputBuffer.size()
+			<< " bytes from burstOutputBuffer to "
+			<< "outputBuffer"
+			<< endl ;
+
+		}
 
 	elog	<< "*** Completed net burst"
 		<< endl ;

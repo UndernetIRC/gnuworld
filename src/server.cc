@@ -47,7 +47,7 @@
 #include	"ServerTimerHandlers.h"
 
 const char xServer_h_rcsId[] = __XSERVER_H ;
-const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.71 2001/02/04 20:01:08 dan_karrels Exp $" ;
+const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.72 2001/02/05 18:58:12 dan_karrels Exp $" ;
 
 using std::string ;
 using std::vector ;
@@ -270,20 +270,42 @@ REGISTER_MSG( "AD", AD ) ;
 
 // Non-tokenized command handlers
 
+// NOOP handlers.
+// These messages aren't currently used.
+
 // WHOIS
 REGISTER_MSG( "WHOIS", NOOP ) ;
+
+// PING Reply
+REGISTER_MSG( "Z", NOOP ) ;
+
+// MOTD
 REGISTER_MSG( "MOTD", NOOP ) ;
-REGISTER_MSG( "MO", NOOP ) ; // MOTD
+REGISTER_MSG( "MO", NOOP ) ;
+
+// STATS
 REGISTER_MSG( "STATS", NOOP ) ;
-REGISTER_MSG( "V", NOOP ) ; // Version
-REGISTER_MSG( "I", NOOP ) ; // Invite
-REGISTER_MSG( "TR", NOOP ) ; // Trace
+
+// Version
+REGISTER_MSG( "V", NOOP ) ;
+
+// Invite
+// TODO
+REGISTER_MSG( "I", NOOP ) ;
+
+// Trace
+REGISTER_MSG( "TR", NOOP ) ;
+
+// SETTIME
 REGISTER_MSG( "SETTIME", NOOP ) ;
-REGISTER_MSG( "368", NOOP ) ; // End of channel ban list
+
+// End of channel ban list
+REGISTER_MSG( "368", NOOP ) ;
 
 // AWAY
 REGISTER_MSG( "A", NOOP ) ;
 
+// *shrug*
 REGISTER_MSG( "441", NOOP ) ;
 
 }
@@ -294,6 +316,7 @@ void xServer::initializeVariables()
 // Initialize more variables
 keepRunning = true ;
 bursting = false ;
+useBurstBuffer = false ;
 _connected = false ;
 StartTime = ::time( NULL ) ;
 
@@ -374,6 +397,9 @@ void xServer::registerServerTimers()
 RegisterTimer( ::time( 0 ) + 10, // start in 10 seconds
 	new GlineUpdateTimer,
 	static_cast< void* >( this ) ) ;
+RegisterTimer( ::time( 0 ) + 60,
+	new PINGTimer,
+	static_cast< void* >( this ) ) ;
 }
  
 /**
@@ -453,10 +479,10 @@ assert( inputCharBuffer != 0 ) ;
 //elog << "outputWriteSize: " << outputWriteSize << endl ;
 
 // Login to the uplink.
-Write( "PASS :%s\n", Password.c_str() ) ;
+WriteDuringBurst( "PASS :%s\n", Password.c_str() ) ;
 
 // Send our server information.
-Write( "SERVER %s %d %d %d J%02d %s :%s\n",
+WriteDuringBurst( "SERVER %s %d %d %d J%02d %s :%s\n",
 	        ServerName.c_str(),
 		1,
 		StartTime,
@@ -465,7 +491,7 @@ Write( "SERVER %s %d %d %d J%02d %s :%s\n",
 		getCharYYXXX().c_str(),
 		ServerDescription.c_str() ) ;
 
-
+/*
 // Wait for the writable state on the socket.
 // Have to check by the socket itself here
 // because ReadyForWrite() checks the output
@@ -492,6 +518,7 @@ while( true )
 
 // Flush the login/server information to the uplink.
 flushBuffer() ;
+*/
 
 return 0 ;
 
@@ -1468,6 +1495,61 @@ if( verbose )
 //
 if( buf[ buf.size() - 1 ] != '\n' )
 	{
+	if( useBurstBuffer || bursting )
+		{
+		burstOutputBuffer += buf + '\n' ;
+		}
+	else
+		{
+		outputBuffer += buf + '\n' ;
+		}
+	}
+else
+	{
+	if( useBurstBuffer || bursting )
+		{
+		burstOutputBuffer += buf + '\n' ;
+		}
+	else
+		{
+		outputBuffer += buf ;
+		}
+	}
+
+// Return success.
+return buf.size() ;
+
+}
+
+bool xServer::WriteDuringBurst( const string& buf )
+{
+
+// Is there a valid connection?
+if( !_connected )
+	{
+	return 0 ;
+	}
+
+if( verbose )
+	{
+	// Output the debugging information
+	// to the console.
+	clog << "[OUT]: " << buf  ;
+
+	// Should we output a trailing newline
+	// character?
+	if( buf[ buf.size() - 1 ] != '\n' )
+		{
+		cout << endl ;
+		}
+	}
+
+// Newline terminate the string if it's
+// not already done and append it to
+// the output buffer.
+//
+if( buf[ buf.size() - 1 ] != '\n' )
+	{
 	outputBuffer += buf + '\n' ;
 	}
 else
@@ -1488,6 +1570,11 @@ bool xServer::Write( strstream& s )
 return Write( string( s.str() ) ) ;
 }
 
+bool xServer::WriteDuringBurst( strstream& s )
+{
+return WriteDuringBurst( string( s.str() ) ) ;
+}
+
 /**
  * This method appends the variable sized argument
  * list buffer to the output buffer.
@@ -1496,6 +1583,51 @@ return Write( string( s.str() ) ) ;
  * I despise this function. --dan
  */
 bool xServer::Write( const char* format, ... )
+{
+
+// Is there a valid connection?
+if( !_connected )
+	{
+	// Nope, return false.
+	return false ;
+	}
+
+// Go through the motions of putting the
+// string into a buffer.
+char buffer[ 4096 ] = { 0 } ;
+va_list _list ;
+
+va_start( _list, format ) ;
+vsprintf( buffer, format, _list ) ;
+va_end( _list ) ;
+
+#ifdef EDEBUG
+	// Output the string to the console.
+	cout << "[OUT]: " << buffer  ;
+
+	// Do we need to newline terminate it?
+	if( buffer[ strlen( buffer ) - 1 ] != '\n' )
+		{
+		cout << endl ;
+		}
+#endif
+
+if( useBurstBuffer || bursting )
+	{
+	burstOutputBuffer += buffer ;
+	}
+else
+	{
+	// Append the line to the output buffer.
+	outputBuffer += buffer ;
+	}
+
+// Return success.
+return true ;
+
+}
+
+bool xServer::WriteDuringBurst( const char* format, ... )
 {
 
 // Is there a valid connection?
