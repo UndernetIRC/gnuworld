@@ -3,9 +3,10 @@
  *
  * Stores a database user
  *
- * $Id: sqlUser.cc,v 1.4 2002/08/23 21:25:25 jeekay Exp $
+ * $Id: sqlUser.cc,v 1.5 2002/08/25 00:10:48 jeekay Exp $
  */
  
+ #include <ctime>
  #include <sstream>
  
  #include "sqlUser.h"
@@ -16,6 +17,8 @@
  
  const sqlUser::flagType sqlUser::F_SUSPEND  = 0x0001;
  const sqlUser::flagType sqlUser::F_AUTOKILL = 0x0002;
+ 
+ unsigned long int sqlUser::maxUserId = 0;
  
  /**
   * Default constructor.
@@ -50,10 +53,10 @@ void sqlUser::commit()
   stringstream commitStatement;
   commitStatement << "UPDATE users SET"
     << " name = '" << name << "'"
-    << " flags = " << flags
-    << " level = " << level
-    << " lastseen_ts = " << lastseen_ts
-    << " registered_ts = " << registered_ts
+    << ", flags = " << flags
+    << ", level = " << level
+    << ", lastseen_ts = " << lastseen_ts
+    << ", registered_ts = " << registered_ts
     << " WHERE id = " << id
     << ends;
   myManager->queueCommit(commitStatement.str());
@@ -64,12 +67,46 @@ void sqlUser::commit()
  */
 void sqlUser::commitLastSeen()
 {
+  lastseen_ts = time(NULL);
+  commit();
+}
+
+/**
+ * This function simply deletes this users entry from the DB.
+ * It is possible to call insertUser() on a sqlUser that has
+ * just been deleteUser()'d
+ */
+void sqlUser::deleteUser()
+{
+  /* Construct our delete statement */
   stringstream commitStatement;
-  commitStatement << "UPDATE users SET"
-    << " lastseen_ts = now()::abstime::int4"
-    << " WHERE id = " << id
+  commitStatement << "DELETE FROM users WHERE"
+    << " id = " << id
     << ends;
   myManager->queueCommit(commitStatement.str());
+}
+
+/**
+ * This function inserts a brand new user into the DB.
+ * It is a slight fudge, in that it first creates a blank record then
+ * calls commit() to update the data fields for that record. This is done
+ * so that any new fields added will automatically be dealt with in commit()
+ * instead of in 50 different functions.
+ */
+void sqlUser::insertUser()
+{
+  /* Grab the next available user id */
+  id = ++maxUserId;
+  
+  /* Construct our insert statement */
+  stringstream commitStatement;
+  commitStatement << "INSERT INTO users (id,name) VALUES ("
+    << id
+    << ", '" << name << "'"
+    << ")"
+    << ends;
+  myManager->queueCommit(commitStatement.str());
+  commit();
 }
 
 /**
@@ -85,6 +122,8 @@ flags = atoi(theDB->GetValue(row, 2));
 level = atoi(theDB->GetValue(row, 3));
 lastseen_ts = atoi(theDB->GetValue(row, 4));
 registered_ts = atoi(theDB->GetValue(row, 5));
+
+if(id > maxUserId) maxUserId = id;
 }
 
 } // namespace ns

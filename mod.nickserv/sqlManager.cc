@@ -20,12 +20,12 @@ sqlManager* sqlManager::theManager = 0;
  * initialise must be called prior to attempted to obtain an instance.
  * This method is static.
  */
-sqlManager* sqlManager::getInstance(const string& _dbString)
+sqlManager* sqlManager::getInstance(const string& _dbString, int _commitQueueMax)
 {
 if(theManager) return theManager;
 
 /* There is currently no sqlManager instance */
-return new sqlManager(_dbString);
+return new sqlManager(_dbString, _commitQueueMax);
 } // static sqlManager* sqlManager::getInstance(const string&)
 
 
@@ -73,6 +73,28 @@ delete tempCon;
 
 
 /**
+ * This method simply processes all statements in the queue, executing
+ * them against the database.
+ * TODO: Should this be inside a transaction?
+ */
+void sqlManager::flush()
+{
+  cout << "Entering sqlManager::flush()" << endl;
+  for(CommitQueueItr ptr = commitQueue.begin(); ptr != commitQueue.end(); ++ptr) {
+    string statement = *ptr;
+    cout << "Executing: " << statement << endl;
+    
+    if(!SQLDb->ExecCommandOk(statement.c_str())) {
+      string error = string(SQLDb->ErrorMessage());
+      cout << "Error: " << error << endl;
+    }
+  }
+  
+  commitQueue.clear();
+}
+
+
+/**
  * This method allows a caller to add a statement to the commit queue.
  * The statement will be executed against the database when the next commit
  * interval occurs.
@@ -81,10 +103,8 @@ void sqlManager::queueCommit(const string& theStatement)
 {
   commitQueue.push_back(theStatement);
   
-  /* Debug */
-  cout << "Commit Queue Contents:" << endl;
-  for(constCommitQueueItr itr = commitQueue.begin(); itr != commitQueue.end(); ++itr) {
-    cout << *itr << endl;
+  if(commitQueue.size() >= commitQueueMax) {
+    flush();
   }
 }
 
@@ -98,11 +118,12 @@ void sqlManager::queueCommit(const string& theStatement)
  * and any of the queues that will be used
  * It is only ever called from initialise()
  */
-sqlManager::sqlManager(const string& _dbString)
+sqlManager::sqlManager(const string& _dbString, int _commitQueueMax)
 {
 /* Construct our DB object and initialise queues */
 dbString = _dbString;
 SQLDb = getConnection();
+commitQueueMax = _commitQueueMax;
 } // sqlManager::sqlManager
 
 

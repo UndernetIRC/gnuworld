@@ -15,13 +15,16 @@ class sqlManager {
      * Implement sqlManager as a singleton
      * Only way to get a reference to the manager is through this method
      */
-    static sqlManager* getInstance(const string&);
+    static sqlManager* getInstance(const string&, int);
     
     /** Allow checking out of database connections */
     PgDatabase* getConnection();
   
     /** Allow checking in of database connections */
     void removeConnection(PgDatabase*); 
+    
+    /** Flush the current commit queue to the database */
+    void flush();
     
     /** Add a statement to the commit queue */
     void queueCommit(const string&);
@@ -32,7 +35,7 @@ class sqlManager {
      * through getInstance()
      * @see #getInstance
      */
-    sqlManager(const string&);
+    sqlManager(const string&, int);
     
     /**
      * Disable the default destructor so that other objects cannot destruct
@@ -50,10 +53,13 @@ class sqlManager {
     typedef vector< string > commitQueueType;
     
     /** Allow iteration over the commit queue */
-    typedef commitQueueType::const_iterator constCommitQueueItr;
+    typedef commitQueueType::iterator CommitQueueItr;
     
     /** Our commit queue */
     commitQueueType commitQueue;
+    
+    /** Max commit queue size before autocommit */
+    unsigned long int commitQueueMax;
     
     /** The current instance of sqlManager */
     static sqlManager* theManager;

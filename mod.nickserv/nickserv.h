@@ -1,5 +1,5 @@
 #ifndef _NICKSERV_H
-#define _NICKSERV_H "$Id: nickserv.h,v 1.4 2002/08/16 21:37:32 jeekay Exp $"
+#define _NICKSERV_H "$Id: nickserv.h,v 1.5 2002/08/25 00:10:48 jeekay Exp $"
 
 #include "client.h"
 #include "EConfig.h"
@@ -94,7 +94,7 @@ class nickserv : public xClient {
 
     /** Our sqlManager instance for DB communication */
     sqlManager* theManager;
-
+    
   protected:
     /*********************************************
      ** I N T E R N A L   M A I N T E N A N C E **
@@ -118,6 +118,8 @@ class nickserv : public xClient {
     /** How long to wait after linking before processing */
     int startDelay;
     
+    /** How frequently to commit to the database */
+    int commitFreq;
     
     /*****************
      ** Q U E U E S **
@@ -134,13 +136,13 @@ class nickserv : public xClient {
      ** T I M E R   I D S **
      ***********************/
      
-     /** TimerID for processing the queue */
-     gnuworld::xServer::timerID processQueue_timerID;
+    /** TimerID for processing the queue */
+    gnuworld::xServer::timerID processQueue_timerID;
      
-     
-     /*************************
-      ** S T A T I S T I C S **
-      *************************/
+    
+    /*************************
+     ** S T A T I S T I C S **
+     *************************/
 }; // class nickserv
 
 } // namespace ns

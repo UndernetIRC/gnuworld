@@ -1,5 +1,5 @@
 #ifndef _SQLUSER_H
-#define _SQLUSER_H "$Id: sqlUser.h,v 1.5 2002/08/23 21:25:25 jeekay Exp $"
+#define _SQLUSER_H "$Id: sqlUser.h,v 1.6 2002/08/25 00:10:48 jeekay Exp $"
 
 #include <string>
 
@@ -91,9 +91,18 @@ class sqlUser
     /** Update this users lastseen */
     void commitLastSeen();
     
+    /** Delete this user from the database */
+    void deleteUser();
+    
+    /** Insert a brand new sqlUser into the database */
+    void insertUser();
+    
     /** Load data for this user from a given DB handle */
     void setAllMembers(PgDatabase*, int);
 
+    /** Static member for keeping track of max user id */
+    static unsigned long int maxUserId;
+    
   protected:
     unsigned int id;
     string name;

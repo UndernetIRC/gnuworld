@@ -7,7 +7,7 @@
 #include "netData.h"
 #include "nickserv.h"
 
-const char NickServ_cc_rcsId[] = "$Id: nickserv.cc,v 1.5 2002/08/23 21:28:01 jeekay Exp $";
+const char NickServ_cc_rcsId[] = "$Id: nickserv.cc,v 1.6 2002/08/25 00:10:48 jeekay Exp $";
 
 namespace gnuworld
 {
@@ -48,21 +48,26 @@ consoleChannel = nickservConfig->Require("consoleChannel")->second;
 checkFreq = atoi(nickservConfig->Require("checkFreq")->second.c_str());
 startDelay = atoi(nickservConfig->Require("startDelay")->second.c_str());
 
+/* Load the DB variables */
 string dbHost = nickservConfig->Require("dbHost")->second;
 string dbPort = nickservConfig->Require("dbPort")->second;
 string dbDb = nickservConfig->Require("dbDb")->second;
 string dbUser = nickservConfig->Require("dbUser")->second;
 string dbPass = nickservConfig->Require("dbPass")->second;
+commitFreq = atoi(nickservConfig->Require("commitFreq")->second.c_str());
+int commitCount = atoi(nickservConfig->Require("commitCount")->second.c_str());
 
 string dbString = "host=" + dbHost + " port=" + dbPort + " dbname=" + dbDb
   + " user="+dbUser + " password=" + dbPass;
 
-theManager = sqlManager::getInstance(dbString);
+theManager = sqlManager::getInstance(dbString, commitCount);
 
 /* Precache the users */
 precacheUsers();
 
 /* Register the commands we want to use */
+RegisterCommand(new REGISTERCommand(this, "REGISTER", ""));
+RegisterCommand(new SETCommand(this, "SET", "<property> <value>"));
 RegisterCommand(new WHOAMICommand(this, "WHOAMI", ""));
 }
 
