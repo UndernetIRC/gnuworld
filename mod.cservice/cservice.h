@@ -1,5 +1,5 @@
 #ifndef __CSERVICE_H
-#define __CSERVICE_H "$Id: cservice.h,v 1.36 2001/01/31 21:10:37 dan_karrels Exp $"
+#define __CSERVICE_H "$Id: cservice.h,v 1.37 2001/01/31 21:23:16 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
@@ -123,10 +123,6 @@ public:
 
 	/* Fetch a access level record for a user/channel combo. */
 	sqlLevel* getLevelRecord(sqlUser*, sqlChannel*);
-
-	virtual void setIgnored(iClient* theClient, bool polarity) ;
-
-	virtual bool isIgnored( iClient* ) ;
 
 	/* Formats a timestamp into a "X Days, XX:XX:XX" from 'Now'. */
 	const string prettyDuration( int ) const ;

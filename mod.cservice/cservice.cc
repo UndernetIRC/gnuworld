@@ -312,24 +312,6 @@ assert(tmpData != NULL);
 tmpData->flood_points = amount; 
 }	
 
-void cservice::setIgnored(iClient* theClient, bool polarity)
-{
-networkData* tmpData =
-	static_cast< networkData* >( theClient->getCustomData(this) ) ;
-assert(tmpData != NULL);
-	
-tmpData->ignored = polarity;
-}
-
-bool cservice::isIgnored(iClient* theClient)
-{
-networkData* tmpData =
-	static_cast< networkData* >( theClient->getCustomData(this) ) ;
-assert(tmpData != NULL);
-	
-return tmpData->ignored;
-}	
-
 /**
  * This method sets a timestamp for when we last recieved
  * a message from this iClient.
@@ -385,7 +367,6 @@ else
 		if (theUser && getAdminAccessLevel(theUser)) return false;
 
 		// Bad boy!
-		setIgnored(theClient, true);
 		setFloodPoints(theClient, 0);
 		setLastRecieved(theClient, ::time(NULL)); 
 		Notice(theClient,
@@ -494,12 +475,6 @@ int cservice::OnPrivateMessage( iClient* theClient, const string& Message,
  * handler.
  */
 
-/* Don't talk to naughty people. */
-if (isIgnored(theClient))
-	{
-	return false; 
-	}
-
 StringTokenizer st( Message ) ;
 if( st.empty() )
 	{
@@ -585,7 +560,7 @@ else if(Command == "VERSION")
 	xClient::DoCTCP(theClient, CTCP,
 		"Undernet P10 Channel Services Version 2 ["
 		__DATE__ " " __TIME__
-		"] ($Id: cservice.cc,v 1.76 2001/01/31 21:10:37 dan_karrels Exp $)");
+		"] ($Id: cservice.cc,v 1.77 2001/01/31 21:23:16 dan_karrels Exp $)");
 	}
 else if(Command == "PROBLEM?")
 	{
