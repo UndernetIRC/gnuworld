@@ -8,7 +8,7 @@
  *
  * Caveats: None
  *
- * $Id: PURGECommand.cc,v 1.4 2001/02/15 21:08:14 gte Exp $
+ * $Id: PURGECommand.cc,v 1.5 2001/02/16 20:20:26 plexus Exp $
  */
  
 #include	<string>
@@ -19,8 +19,9 @@
 #include	"levels.h"
 #include	"libpq++.h"
 #include	"Network.h"
+#include	"responses.h"
 
-const char PURGECommand_cc_rcsId[] = "$Id: PURGECommand.cc,v 1.4 2001/02/15 21:08:14 gte Exp $" ;
+const char PURGECommand_cc_rcsId[] = "$Id: PURGECommand.cc,v 1.5 2001/02/16 20:20:26 plexus Exp $" ;
 
 namespace gnuworld
 {
@@ -57,7 +58,11 @@ bool PURGECommand::Exec( iClient* theClient, const string& Message )
 	theChan = bot->getChannelRecord(st[1]);
 	if ((!theChan) || (st[1] == "*")) 
 	{
-		bot->Notice(theClient, "%s isn't registered with me", st[1].c_str());
+		bot->Notice(theClient, 
+			bot->getResponse(theUser,
+				language::chan_not_reg,
+				string("%s isn't registered with me")).c_str(), 
+			st[1].c_str());
 		return false;
 	} 
 
@@ -68,7 +73,10 @@ bool PURGECommand::Exec( iClient* theClient, const string& Message )
 	int level = bot->getAdminAccessLevel(theUser);
 	if (level < level::purge)
 	{
-		bot->Notice(theClient, "You have insufficient access to perform that command");
+		bot->Notice(theClient, 
+			bot->getResponse(theUser,
+				language::insuf_access,
+				string("You have insufficient access to perform that command")));
 		return false;
 	} 
  
@@ -107,7 +115,11 @@ bool PURGECommand::Exec( iClient* theClient, const string& Message )
 			theClient->getNickName().c_str(), theUser->getUserName().c_str(), 
 			theChan->getName().c_str(), reason.c_str()); 
 
-		bot->Notice(theClient, "Purged channel %s", st[1].c_str());
+		bot->Notice(theClient, 
+			bot->getResponse(theUser,
+				language::purged_chan,
+				string("Purged channel %s")).c_str(), 
+			st[1].c_str());
 
 		bot->writeChannelLog(theChan, theClient, sqlChannel::EV_JOIN, "");
 
@@ -117,7 +129,11 @@ bool PURGECommand::Exec( iClient* theClient, const string& Message )
 		bot->Part(theChan->getName());
 		delete(theChan); 
 	} else {
-		bot->Notice(theClient, "Something went wrong: %s", bot->SQLDb->ErrorMessage()); // Log to msgchan here?
+		bot->Notice(theClient, 
+			bot->getResponse(theUser,
+				language::its_bad_mmkay,
+				string("Something went wrong: %s")).c_str(), 
+			bot->SQLDb->ErrorMessage()); // Log to msgchan here?
  	}
 
  	

@@ -5,8 +5,9 @@
 #include	"StringTokenizer.h"
 #include	"ELog.h" 
 #include	"cservice.h" 
+#include	"responses.h"
 
-const char SHOWIGNORECommand_cc_rcsId[] = "$Id: SHOWIGNORECommand.cc,v 1.6 2001/02/10 23:41:49 gte Exp $" ;
+const char SHOWIGNORECommand_cc_rcsId[] = "$Id: SHOWIGNORECommand.cc,v 1.7 2001/02/16 20:20:26 plexus Exp $" ;
 
 namespace gnuworld
 {
@@ -24,7 +25,12 @@ bool SHOWIGNORECommand::Exec( iClient* theClient, const string& Message )
 
 	int count = 0;
 
-	if (bot->silenceList.size() != 0) bot->Notice(theClient, "Ignore list:");
+	sqlUser* theUser = bot->isAuthed(theClient, false);
+	
+	if (bot->silenceList.size() != 0) bot->Notice(theClient, 
+							bot->getResponse(theUser,
+								language::ignore_list_start,
+								string("Ignore list:")));
 
 	for( cservice::silenceListType::const_iterator ptr = bot->silenceList.begin() ;
 		ptr != bot->silenceList.end() ; ++ptr )
@@ -36,10 +42,14 @@ bool SHOWIGNORECommand::Exec( iClient* theClient, const string& Message )
 
 	if (!count)
 		{ 
-		bot->Notice(theClient, "Ignore list is empty");
+		bot->Notice(theClient, bot->getResponse(theUser,
+						language::ignore_list_empty,
+						string("Ignore list is empty")));
 		} else 
 		{
-		bot->Notice(theClient, "-- End of Ignore List");
+		bot->Notice(theClient, bot->getResponse(theUser,
+						language::ignore_list_end,
+						string("-- End of Ignore List")));
 		}
 	return true ;
 } 

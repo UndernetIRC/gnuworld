@@ -8,7 +8,7 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char FORCECommand_cc_rcsId[] = "$Id: FORCECommand.cc,v 1.7 2001/02/14 21:23:12 gte Exp $" ;
+const char FORCECommand_cc_rcsId[] = "$Id: FORCECommand.cc,v 1.8 2001/02/16 20:20:26 plexus Exp $" ;
 
 namespace gnuworld
 {
@@ -37,7 +37,10 @@ bool FORCECommand::Exec( iClient* theClient, const string& Message )
 	int admLevel = bot->getAccessLevel(theUser, admChan);
 	if (admLevel < level::force)
 	{
-		bot->Notice(theClient, "Sorry, you have insufficient access to perform that command.");
+		bot->Notice(theClient,
+			bot->getResponse(theUser,
+				language::insuf_access,
+				string("Sorry, you have insufficient access to perform that command.")));
 		return false;
 	} 
 
@@ -48,7 +51,11 @@ bool FORCECommand::Exec( iClient* theClient, const string& Message )
 	sqlChannel* theChan = bot->getChannelRecord(st[1]);
 	if (!theChan) 
 	{
-		bot->Notice(theClient, "Sorry, %s isn't registered with me.", st[1].c_str());
+		bot->Notice(theClient,
+			bot->getResponse(theUser,
+				language::chan_not_reg,
+				string("Sorry, %s isn't registered with me.")).c_str(), 
+			st[1].c_str());
 		return false;
 	} 
  
@@ -74,7 +81,11 @@ bool FORCECommand::Exec( iClient* theClient, const string& Message )
 		newLevel->setFlag(sqlLevel::F_FORCED);
 		bot->logAdminMessage("%s (%s) is getting access on %s", 
 			theClient->getNickName().c_str(), theUser->getUserName().c_str(), theChan->getName().c_str()); 
-		bot->Notice(theClient, "Temporarily increased your access on channel %s to %i", theChan->getName().c_str(), admLevel); 
+		bot->Notice(theClient, 
+			bot->getResponse(theUser,
+				language::chan_not_reg,
+				string("Temporarily increased your access on channel %s to %i")).c_str(), 
+			theChan->getName().c_str(), admLevel); 
 		bot->writeChannelLog(theChan, theClient, sqlChannel::EV_FORCE, "");
 		return true;
 	}
@@ -101,7 +112,11 @@ bool FORCECommand::Exec( iClient* theClient, const string& Message )
 	bot->sqlLevelCache.insert(cservice::sqlLevelHashType::value_type(thePair, newLevel));
 	bot->logAdminMessage("%s (%s) is getting access on %s", 
 		theClient->getNickName().c_str(), theUser->getUserName().c_str(), theChan->getName().c_str());
-	bot->Notice(theClient, "Gave you temporary access of %i on channel %s", admLevel, theChan->getName().c_str());
+	bot->Notice(theClient, 
+		bot->getResponse(theUser,
+			language::temp_inc_access,
+			string("Temporarily increased your access on channel %s to %i")).c_str(), 
+		theChan->getName().c_str(), admLevel);
 	bot->writeChannelLog(theChan, theClient, sqlChannel::EV_FORCE, "");
 	return true ;
 } 

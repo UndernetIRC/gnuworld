@@ -8,7 +8,7 @@
  *
  * Caveats: None.
  *
- * $Id: UNBANCommand.cc,v 1.7 2001/02/04 23:37:32 gte Exp $
+ * $Id: UNBANCommand.cc,v 1.8 2001/02/16 20:20:26 plexus Exp $
  */
 
 #include	<string>
@@ -21,7 +21,7 @@
 #include	"responses.h"
 #include	"match.h"
 
-const char UNBANCommand_cc_rcsId[] = "$Id: UNBANCommand.cc,v 1.7 2001/02/04 23:37:32 gte Exp $" ;
+const char UNBANCommand_cc_rcsId[] = "$Id: UNBANCommand.cc,v 1.8 2001/02/16 20:20:26 plexus Exp $" ;
 
 namespace gnuworld
 {
@@ -39,33 +39,45 @@ bool UNBANCommand::Exec( iClient* theClient, const string& Message )
 	    return true;
 	}
  
+	// Is the user authorised?
+	 
+	sqlUser* theUser = bot->isAuthed(theClient, true);
+	if(!theUser) return false;
+
 	/* Is the channel registered? */
 	
 	sqlChannel* theChan = bot->getChannelRecord(st[1]);
 	if(!theChan)
 	{
-	    bot->Notice(theClient, "Sorry, %s isn't registered with me.", st[1].c_str());
+	    bot->Notice(theClient, 
+		bot->getResponse(theUser,
+			language::chan_not_reg,
+			string("Sorry, %s isn't registered with me.")).c_str(), 
+		st[1].c_str());
 	    return false;
 	} 
+
 
  	/* Check the bot is in the channel. */
  
 	if (!theChan->getInChan()) {
-		bot->Notice(theClient, "I'm not in that channel!");
+		bot->Notice(theClient, 
+			bot->getResponse(theUser,
+				language::i_am_not_on_chan,
+				string("I'm not in that channel!")));
 		return false;
 	} 
 
-	// Is the user authorised?
-	 
-	sqlUser* theUser = bot->isAuthed(theClient, true);
-	if(!theUser) return false;
 
 	// Check level.
 
 	int level = bot->getEffectiveAccessLevel(theUser, theChan, true);
 	if(level < level::unban)
 	{
-	    bot->Notice(theClient, "Sorry, you have insufficient access to perform that command.");
+	    bot->Notice(theClient, 
+		bot->getResponse(theUser,
+			language::insuf_access,
+			string("Sorry, you have insufficient access to perform that command.")));
 	    return false;
 	}
 
@@ -94,7 +106,10 @@ bool UNBANCommand::Exec( iClient* theClient, const string& Message )
 		iClient* aNick = Network->findNick(st[2]);
 		if(!aNick)
 		{
-			bot->Notice(theClient, "Sorry, I cannot find the specified nick.");
+			bot->Notice(theClient, 
+				bot->getResponse(theUser,
+					language::cant_find_on_chan,
+					string("Sorry, I cannot find the specified nick.")));
 			return true;
 		}
 
@@ -132,7 +147,10 @@ bool UNBANCommand::Exec( iClient* theClient, const string& Message )
 			/* Matches! remove this ban - if we can. */ 
 			if (theBan->getLevel() > level)
 			{
-				bot->Notice(theClient, "You have insufficient access to remove the ban %s from %s's database",
+				bot->Notice(theClient, 
+					bot->getResponse(theUser,
+						language::cant_rem_ban,
+						string("You have insufficient access to remove the ban %s from %s's database")).c_str(),
 					theBan->getBanMask().c_str(), theChan->getName().c_str());
 				++ptr;
 			}
@@ -190,7 +208,10 @@ bool UNBANCommand::Exec( iClient* theClient, const string& Message )
 
 	} // while()
 
-	bot->Notice(theClient, "Removed %i bans that matched %s",
+	bot->Notice(theClient, 
+		bot->getResponse(theUser,
+			language::bans_removed,
+			string("Removed %i bans that matched %s")).c_str(),
 		banCount, banTarget.c_str());
 
 	return true;

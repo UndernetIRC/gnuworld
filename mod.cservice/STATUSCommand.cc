@@ -9,7 +9,7 @@
 #include	"responses.h"
 #include	"Network.h"
  
-const char STATUSCommand_cc_rcsId[] = "$Id: STATUSCommand.cc,v 1.14 2001/02/15 21:08:14 gte Exp $" ;
+const char STATUSCommand_cc_rcsId[] = "$Id: STATUSCommand.cc,v 1.15 2001/02/16 20:20:26 plexus Exp $" ;
 
 namespace gnuworld
 {
@@ -68,28 +68,64 @@ bool STATUSCommand::Exec( iClient* theClient, const string& Message )
 		float banTotal = bot->banCacheHits + bot->banHits;
 		float banEf = (bot->banCacheHits ? ((float)bot->banCacheHits / banTotal * 100) : 0);
 
-		bot->Notice(theClient, "CMaster Channel Services internal status:"); 
+		bot->Notice(theClient, 
+			bot->getResponse(theUser,
+				language::status_tagline,
+				string("CMaster Channel Services internal status:"))); 
 
-		bot->Notice(theClient, "[     Channel Record Stats] \002Cached Entries:\002 %i    \002DB Requests:\002 %i    \002Cache Hits:\002 %i    \002Efficiency:\002 %.2f%%", 
+		bot->Notice(theClient, 
+			bot->getResponse(theUser,
+				language::status_chan_rec,
+				string("[     Channel Record Stats] \002Cached Entries:\002 %i    \002DB Requests:\002 %i    \002Cache Hits:\002 %i    \002Efficiency:\002 %.2f%%")).c_str(), 
 			bot->sqlChannelCache.size(), bot->channelHits, bot->channelCacheHits, chanEf);
 
-		bot->Notice(theClient, "[        User Record Stats] \002Cached Entries:\002 %i    \002DB Requests:\002 %i    \002Cache Hits:\002 %i    \002Efficiency:\002 %.2f%%", 
+		bot->Notice(theClient, 
+			bot->getResponse(theUser,
+				language::status_user_rec,
+				string("[        User Record Stats] \002Cached Entries:\002 %i    \002DB Requests:\002 %i    \002Cache Hits:\002 %i    \002Efficiency:\002 %.2f%%")).c_str(), 
 			bot->sqlUserCache.size(), bot->userHits, bot->userCacheHits, userEf);
 
-		bot->Notice(theClient, "[Access Level Record Stats] \002Cached Entries:\002 %i    \002DB Requests:\002 %i    \002Cache Hits:\002 %i    \002Efficiency:\002 %.2f%%", 
+		bot->Notice(theClient, 
+			bot->getResponse(theUser,
+				language::status_access_rec,
+				string("[Access Level Record Stats] \002Cached Entries:\002 %i    \002DB Requests:\002 %i    \002Cache Hits:\002 %i    \002Efficiency:\002 %.2f%%")).c_str(), 
 			bot->sqlLevelCache.size(), bot->levelHits, bot->levelCacheHits, levelEf);
 
-		bot->Notice(theClient, "[         Ban Record Stats] \002Cached Entries:\002 %i    \002DB Requests:\002 %i    \002Cache Hits:\002 %i    \002Efficiency:\002 %.2f%%", 
+		bot->Notice(theClient,
+			bot->getResponse(theUser,
+				language::status_ban_rec,
+				string("[         Ban Record Stats] \002Cached Entries:\002 %i    \002DB Requests:\002 %i    \002Cache Hits:\002 %i    \002Efficiency:\002 %.2f%%")).c_str(), 
 			bot->sqlBanCache.size(), bot->banHits, bot->banCacheHits, banEf);
 			
-		bot->Notice(theClient, "Last recieved Channel NOTIFY: %i", bot->lastChannelRefresh);
-		bot->Notice(theClient, "Last recieved User NOTIFY: %i", bot->lastUserRefresh);
-		bot->Notice(theClient, "Last recieved Level NOTIFY: %i", bot->lastLevelRefresh);
-		bot->Notice(theClient, "Last recieved Ban NOTIFY: %i", bot->lastBanRefresh);
+		bot->Notice(theClient, 
+			bot->getResponse(theUser,
+				language::status_last_user_not,
+				string("Last recieved Channel NOTIFY: %i")).c_str(), bot->lastChannelRefresh);
+		bot->Notice(theClient, 
+			bot->getResponse(theUser,
+				language::status_last_chan_not,
+				string("Last recieved User NOTIFY: %i")).c_str(), bot->lastUserRefresh);
+		bot->Notice(theClient, 
+			bot->getResponse(theUser,
+				language::status_last_lvl_not,
+				string("Last recieved Level NOTIFY: %i")).c_str(), bot->lastLevelRefresh);
+		bot->Notice(theClient, 
+			bot->getResponse(theUser,
+				language::status_last_ban_not,
+				string("Last recieved Ban NOTIFY: %i")).c_str(), bot->lastBanRefresh);
 
-		bot->Notice(theClient, "Custom data containers allocated: %i", bot->customDataAlloc);
+		bot->Notice(theClient, 
+			bot->getResponse(theUser,
+				language::status_data_alloc,
+				string("Custom data containers allocated: %i")).c_str(), bot->customDataAlloc);
 
-		bot->Notice(theClient, "\002Uptime:\002 %s",  bot->prettyDuration(bot->getUplink()->getStartTime() + bot->dbTimeOffset).c_str());
+		bot->Notice(theClient, 
+			bot->getResponse(theUser,
+				language::status_uptime,
+				string("\002Uptime:\002 %s")).c_str(),  
+			bot->prettyDuration(bot->getUplink()->getStartTime() + bot->dbTimeOffset).c_str());
+
+
 		return true;
 	}
 
@@ -122,10 +158,16 @@ bool STATUSCommand::Exec( iClient* theClient, const string& Message )
 	{
 		if ((level >= 400) || (admLevel >= 1)) // If the person has access >400, or is a 600+ admin.
 		{
-			bot->Notice(theClient, "Channel %s has %d users (TBA operators)",
+			bot->Notice(theClient, 
+				bot->getResponse(theUser,
+					language::status_chan_info,
+					string("Channel %s has %d users (TBA operators)")).c_str(),
 				tmpChan->getName().c_str(), tmpChan->size() ) ;
 	 
-			bot->Notice(theClient, "Mode is: %s",
+			bot->Notice(theClient, 
+				bot->getResponse(theUser,
+					language::status_mode,
+					string("Mode is: %s")).c_str(),
 				tmpChan->getModeString().c_str() ) ;
 
 			/*
@@ -218,7 +260,11 @@ bool STATUSCommand::Exec( iClient* theClient, const string& Message )
 	if (theChan->getFlag(sqlChannel::F_OPONLY)) flagsSet += "OPONLY ";
 	if (theChan->getFlag(sqlChannel::F_AUTOJOIN)) flagsSet += "AUTOJOIN ";
 
-	bot->Notice(theClient, "Flags set: %s",flagsSet.c_str()); 
+	bot->Notice(theClient, 
+		bot->getResponse(theUser,
+			language::status_flags,
+			string("Flags set: %s")).c_str(),flagsSet.c_str()); 
+
 	bot->Notice(theClient, "Auth: TBA");
 	return true ;
 } 

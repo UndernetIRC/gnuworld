@@ -7,9 +7,10 @@
 #include	"cservice.h" 
 #include	"Network.h"
 #include	"levels.h"
+#include	"responses.h"
 
  
-const char VERIFYCommand_cc_rcsId[] = "$Id: VERIFYCommand.cc,v 1.12 2001/02/12 05:42:55 isomer Exp $" ;
+const char VERIFYCommand_cc_rcsId[] = "$Id: VERIFYCommand.cc,v 1.13 2001/02/16 20:20:26 plexus Exp $" ;
 
 namespace gnuworld
 {
@@ -28,24 +29,31 @@ bool VERIFYCommand::Exec( iClient* theClient, const string& Message )
  	string extra;
 	extra = "";
 
+	sqlUser* tmpUser = bot->isAuthed(theClient, false);
 	iClient* target = Network->findNick(st[1]); 
 	if(!target) {
-		bot->Notice(theClient, "Sorry, I don't see %s anywhere.", st[1].c_str());
+		bot->Notice(theClient, 
+			bot->getResponse(tmpUser,
+				language::dont_see_them,
+				string("Sorry, I don't see %s anywhere.")).c_str(), st[1].c_str());
 		return false;
 	}
         
         if (target->getMode(iClient::MODE_SERVICES)) {
-   		bot->Notice(theClient, 
-			"%s is an Official Undernet Service Bot.",
-                	target->getNickName().c_str());
+		bot->Notice(theClient, 
+			bot->getResponse(tmpUser,
+				language::is_service_bot,
+				string("%s is an Official Undernet Service Bot.")).c_str(), 
+			target->getNickName().c_str());
                 return false;
 	}
 
-	sqlUser* theUser = bot->isAuthed(target, false);
 
 	/* 
 	 *  Firstly, deal with unauthenticated users.
 	 */
+
+	sqlUser* theUser = bot->isAuthed(target, false);
 
 	if (target->isOper()) extra = " and an IRC operator";
 
@@ -53,9 +61,17 @@ bool VERIFYCommand::Exec( iClient* theClient, const string& Message )
 	{
 		if(target->isOper())
 		{ 
-			bot->Notice(theClient, "%s is an IRC operator", target->getNickUserHost().c_str());
+			bot->Notice(theClient, 
+				bot->getResponse(tmpUser,
+					language::is_an_ircop,
+					string("%s is an IRC operator")).c_str(), 
+				target->getNickUserHost().c_str());
 		} else {
-			bot->Notice(theClient, "%s is NOT logged in.", target->getNickUserHost().c_str());
+			bot->Notice(theClient, 
+				bot->getResponse(tmpUser,
+				language::is_not_logged_in,
+				string("%s is NOT logged in.")).c_str(), 
+			target->getNickUserHost().c_str());
 		}
 		return false;
 	}
@@ -66,28 +82,40 @@ bool VERIFYCommand::Exec( iClient* theClient, const string& Message )
  
 	if (level == 0) 
 	{ 
-		bot->Notice(theClient, "%s is logged in as %s%s", 
+		bot->Notice(theClient, 
+			bot->getResponse(tmpUser,
+				language::logged_in_as,
+				string("%s is logged in as %s%s")).c_str(), 
 			target->getNickUserHost().c_str(), theUser->getUserName().c_str(), extra.c_str());
 		return false;
 	}
 
  	if ((level >= level::admin::base) && (level <= level::admin::helper)) 
 	{
-		bot->Notice(theClient, "%s is an Official CService Representative%s and logged in as %s", 
+		bot->Notice(theClient, 
+			bot->getResponse(tmpUser,
+				language::is_cservice_rep,
+				string("%s is an Official CService Representative%s and logged in as %s")).c_str(), 
 			target->getNickUserHost().c_str(), extra.c_str(), theUser->getUserName().c_str());
 		return true;
 	}
  
 	if ((level > level::admin::helper) && (level <= level::admin::admin)) 
 	{
-		bot->Notice(theClient, "%s is an Official CService Administrator%s and logged in as %s", 
+		bot->Notice(theClient, 
+			bot->getResponse(tmpUser,
+				language::is_cservice_admin,
+				string("%s is an Official CService Administrator%s and logged in as %s")).c_str(), 
 			target->getNickUserHost().c_str(), extra.c_str(), theUser->getUserName().c_str());
 		return true;
 	}
  
 	if (level == level::admin::coder) 
 	{
-		bot->Notice(theClient, "%s is an Official CService Developer%s and logged in as %s",
+		bot->Notice(theClient, 
+			bot->getResponse(tmpUser,
+				language::is_cservice_dev,
+				string("%s is an Official CService Developer%s and logged in as %s")).c_str(),
 			target->getNickUserHost().c_str(), extra.c_str(), theUser->getUserName().c_str());
 		return true;
 	}

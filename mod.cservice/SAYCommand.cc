@@ -8,7 +8,7 @@
  *
  * Caveats: None.
  *
- * $Id: SAYCommand.cc,v 1.2 2001/01/31 19:53:25 gte Exp $
+ * $Id: SAYCommand.cc,v 1.3 2001/02/16 20:20:26 plexus Exp $
  */
 
 #include	<string>
@@ -18,8 +18,9 @@
 #include	"cservice.h"
 #include	"Network.h"
 #include	"levels.h"
+#include	"responses.h"
 
-const char SAYCommand_cc_rcsId[] = "$Id: SAYCommand.cc,v 1.2 2001/01/31 19:53:25 gte Exp $" ;
+const char SAYCommand_cc_rcsId[] = "$Id: SAYCommand.cc,v 1.3 2001/02/16 20:20:26 plexus Exp $" ;
 
 namespace gnuworld
 {
@@ -48,7 +49,10 @@ bool SAYCommand::Exec( iClient* theClient, const string& Message )
 	int admLevel = bot->getAdminAccessLevel(theUser);
 	if (admLevel < level::say)
 	{
-		bot->Notice(theClient, "Sorry, you have insufficient access to perform that command.");
+		bot->Notice(theClient,
+			bot->getResponse(theUser,
+				language::insuf_access,
+				string("Sorry, you have insufficient access to perform that command.")));
 		return false;
 	} 
 
@@ -59,7 +63,11 @@ bool SAYCommand::Exec( iClient* theClient, const string& Message )
 	sqlChannel* theChan = bot->getChannelRecord(st[1]);
 	if (!theChan) 
 	{
-		bot->Notice(theClient, "Sorry, %s isn't registered with me.", st[1].c_str());
+		bot->Notice(theClient, 
+			bot->getResponse(theUser,
+				language::chan_not_reg,
+				string("Sorry, %s isn't registered with me.")).c_str(), 
+			st[1].c_str());
 		return false;
 	} 
  

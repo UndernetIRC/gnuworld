@@ -11,7 +11,7 @@
  *
  * Caveats: None
  *
- * $Id: TOPICCommand.cc,v 1.8 2001/01/30 01:01:49 gte Exp $
+ * $Id: TOPICCommand.cc,v 1.9 2001/02/16 20:20:26 plexus Exp $
  */
 
 #include	<string>
@@ -23,7 +23,7 @@
 #include	"responses.h"
 #include	"Network.h"
 
-const char TOPICCommand_cc_rcsId[] = "$Id: TOPICCommand.cc,v 1.8 2001/01/30 01:01:49 gte Exp $" ;
+const char TOPICCommand_cc_rcsId[] = "$Id: TOPICCommand.cc,v 1.9 2001/02/16 20:20:26 plexus Exp $" ;
 
 namespace gnuworld
 {
@@ -56,7 +56,10 @@ bool TOPICCommand::Exec( iClient* theClient, const string& Message )
 	/* Check the bot is in the channel. */
  
 	if (!theChan->getInChan()) {
-		bot->Notice(theClient, "I'm not in that channel!");
+		bot->Notice(theClient, 
+			bot->getResponse(theUser,
+				language::i_am_not_on_chan,
+				string("I'm not in that channel!")));
 		return false;
 	} 
 
@@ -84,7 +87,10 @@ bool TOPICCommand::Exec( iClient* theClient, const string& Message )
 	
 	if(strlen(topic.c_str()) > 145) // Default ircu TOPICLEN - maxusername?
 	{
-	    bot->Notice(theClient, "ERROR: Topic cannot exceed 145 chars");
+	    bot->Notice(theClient, 
+		bot->getResponse(theUser,
+			language::topic_max_len,
+			string("ERROR: Topic cannot exceed 145 chars")));
 	    return false;
         }
         

@@ -14,7 +14,7 @@
  *
  * Caveats: None.
  *
- * $Id: BANCommand.cc,v 1.16 2001/02/12 00:57:26 plexus Exp $
+ * $Id: BANCommand.cc,v 1.17 2001/02/16 20:20:26 plexus Exp $
  */
 
 #include	<string>
@@ -29,7 +29,7 @@
 #include	"responses.h"
 #include	"match.h"
 
-const char BANCommand_cc_rcsId[] = "$Id: BANCommand.cc,v 1.16 2001/02/12 00:57:26 plexus Exp $" ;
+const char BANCommand_cc_rcsId[] = "$Id: BANCommand.cc,v 1.17 2001/02/16 20:20:26 plexus Exp $" ;
 
 namespace gnuworld
 {
@@ -46,17 +46,21 @@ if( st.size() < 3 )
 	return true;
 	}
 
-/* Do not allow bans on * channel */
-
-if(st[1][0] != '#')
-	{
-	bot->Notice(theClient, "Invalid channel name.");
-	return false;
-	}
  
 /* Is the user authorised? */
 sqlUser* theUser = bot->isAuthed(theClient, true);
 if(!theUser) return false;
+
+/* Do not allow bans on * channel */
+
+if(st[1][0] != '#')
+	{
+	bot->Notice(theClient, 
+		bot->getResponse(theUser, 
+			language::inval_chan_name, 
+			string("Invalid channel name.")).c_str());
+	return false;
+	}
 
 /* Is the channel registered? */
 sqlChannel* theChan = bot->getChannelRecord(st[1]);
@@ -175,7 +179,11 @@ if(banTime < 1 || banTime > 336)
 
 if(banReason.size() > 128)
 	{
-	bot->Notice(theClient, "Ban reason cannot exceed 128 chars");
+	bot->Notice(theClient, 
+		bot->getResponse(theUser,
+		language::ban_reason_size,
+		string("Ban reason cannot exceed 128 chars"))
+	);
 	return true;
 	}
  
@@ -189,7 +197,11 @@ if( isNick )
 	iClient* aNick = Network->findNick(banTarget);
 	if(!aNick)
 		{
-		bot->Notice(theClient, "Sorry, I cannot find the specified nick.");
+		bot->Notice(theClient, 
+			bot->getResponse(theUser,
+			language::cant_find_on_chan, 
+			string("Sorry, I cannot find the specified nick."))
+		);
 		return true;
 		}
 
@@ -224,7 +236,11 @@ while (ptr != banList->end())
 		
 	if(string_lower(banTarget) == string_lower(theBan->getBanMask()))
 		{
-		bot->Notice(theClient, "Specified ban is already in my banlist!");
+		bot->Notice(theClient, 
+			bot->getResponse(theUser,
+			language::ban_exists,
+			string("Specified ban is already in my banlist!"))
+		);
 		return true; 
 		}  
 
@@ -249,7 +265,10 @@ while (ptr != banList->end())
 		}
 	else if ( match(theBan->getBanMask(), banTarget) == 0) // More specific ban?
 		{
-			bot->Notice(theClient, "The ban %s is already covered by %s",
+			bot->Notice(theClient, 
+				bot->getResponse(theUser,
+				language::ban_covered,
+				string("The ban %s is already covered by %s")).c_str(),
 				banTarget.c_str(), theBan->getBanMask().c_str());
 			return true;
 		} 

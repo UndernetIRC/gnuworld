@@ -13,7 +13,7 @@
  *
  * Command is aliased "INFO".
  *
- * $Id: CHANINFOCommand.cc,v 1.14 2001/02/06 23:07:44 gte Exp $
+ * $Id: CHANINFOCommand.cc,v 1.15 2001/02/16 20:20:26 plexus Exp $
  */
 
 #include	<string>
@@ -25,7 +25,7 @@
 #include	"responses.h"
 #include	"libpq++.h"
  
-const char CHANINFOCommand_cc_rcsId[] = "$Id: CHANINFOCommand.cc,v 1.14 2001/02/06 23:07:44 gte Exp $" ;
+const char CHANINFOCommand_cc_rcsId[] = "$Id: CHANINFOCommand.cc,v 1.15 2001/02/16 20:20:26 plexus Exp $" ;
  
 namespace gnuworld
 {
@@ -52,16 +52,19 @@ if( st.size() < 2 )
 if( string::npos == st[ 1 ].find_first_of( '#' ) )
 {
 	// Nope, look by user then.
+	sqlUser* tmpUser = bot->isAuthed(theClient, false);
 	sqlUser* theUser = bot->getUserRecord(st[1]);
 	if (!theUser) 
 		{
-		bot->Notice(theClient, "The user %s doesn't appear to be registered.",
+		bot->Notice(theClient, 
+			bot->getResponse(tmpUser,
+				language::not_registered,
+				string("The user %s doesn't appear to be registered.")).c_str(),
 			st[1].c_str());
 		return true;
 		}
  
 	/* Keep details private. */
-	sqlUser* tmpUser = bot->isAuthed(theClient, false);
 
 	if (theUser->getFlag(sqlUser::F_INVIS))
 		{
@@ -69,28 +72,47 @@ if( string::npos == st[ 1 ].find_first_of( '#' ) )
 		/* If they don't have * access or are opered, deny. */ 
 		if( !((tmpUser) && bot->getAdminAccessLevel(tmpUser)) && !(theClient->isOper()))
 			{
-			bot->Notice(theClient, "Unable to view user details (Invisible)");
+			bot->Notice(theClient, 
+				bot->getResponse(tmpUser,
+					language::no_peeking,
+					string("Unable to view user details (Invisible)")));
 			return false;
 			}
 		}
 
-	bot->Notice(theClient, "Information about: %s (%i)",
+		bot->Notice(theClient, 
+			bot->getResponse(tmpUser,
+				language::info_about,
+				string("Information about: %s (%i)")).c_str(),
 		theUser->getUserName().c_str(), theUser->getID());
 
 	iClient* targetClient = theUser->isAuthed();
 	string loggedOn = targetClient ?
 	targetClient->getNickUserHost() : "Offline";
 
-	bot->Notice(theClient, "Currently logged on via: %s",
+	bot->Notice(theClient, 
+		bot->getResponse(tmpUser,
+			language::curr_logged_on,
+			string("Currently logged on via: %s")).c_str(),
 		loggedOn.c_str());
+
 	if(theUser->getUrl() != "")
 	{
-		bot->Notice(theClient, "URL: %s",
+		bot->Notice(theClient,
+			bot->getResponse(tmpUser,
+				language::url,
+				string("URL: %s")).c_str(),
 			theUser->getUrl().c_str());
 	}
-	bot->Notice(theClient, "Language: %i",
+	bot->Notice(theClient, 
+		bot->getResponse(tmpUser,
+			language::lang,
+			string("Language: %i")).c_str(),
 		theUser->getLanguageId()); 
-	bot->Notice(theClient, "Last Seen: %s",
+	bot->Notice(theClient, 
+		bot->getResponse(tmpUser,
+			language::last_seen,
+			string("Last Seen: %s")).c_str(),
 		bot->prettyDuration(theUser->getLastSeen()).c_str()); 
 
 	/*
@@ -121,7 +143,11 @@ if( string::npos == st[ 1 ].find_first_of( '#' ) )
 					// 4 for 2 spaces, 2 brackets + comma.
 					if ((channelList.size() + chanName.size() + chanAccess.size() +5) >= 500)
 					{
-						bot->Notice(theClient, "Channels: %s", channelList.c_str());
+						bot->Notice(theClient, 
+							bot->getResponse(tmpUser,
+								language::channels,
+								string("Channels: %s")).c_str(), 
+							channelList.c_str());
 						channelList = "";
 					}
 						
@@ -133,8 +159,11 @@ if( string::npos == st[ 1 ].find_first_of( '#' ) )
 				} // for()
 			}
 	 
-		bot->Notice(theClient, "Channels: %s", channelList.c_str());
-	 
+		bot->Notice(theClient, 
+			bot->getResponse(tmpUser,
+				language::channels,
+				string("Channels: %s")).c_str(), 
+			channelList.c_str());	 
 		delete[] channelsQuery.str() ; 
 	}
 
@@ -145,17 +174,30 @@ if( string::npos == st[ 1 ].find_first_of( '#' ) )
 	if( ((tmpUser) && (bot->getAdminAccessLevel(tmpUser) == 1000)) )
 	{
 		if (!targetClient) return true;
-		bot->Notice(theClient, "Input Flood Points: %i", bot->getFloodPoints(targetClient));
-		bot->Notice(theClient, "Ouput Flood (Bytes): %i", bot->getOutputTotal(targetClient));
+		bot->Notice(theClient, 
+			bot->getResponse(tmpUser,
+				language::inp_flood,
+				string("Input Flood Points: %i")).c_str(), 
+			bot->getFloodPoints(targetClient));
+		bot->Notice(theClient, 
+			bot->getResponse(tmpUser,
+				language::out_flood,
+				string("Ouput Flood (Bytes): %i")).c_str(), 
+			bot->getOutputTotal(targetClient));
 	}
 
 	return true;
 } 
 
+
+sqlUser* theUser = bot->isAuthed(theClient, false);
 sqlChannel* theChan = bot->getChannelRecord(st[1]);
 if( !theChan ) 
 	{
-	bot->Notice(theClient, "The channel %s is not registered",
+	bot->Notice(theClient, 
+		bot->getResponse(theUser,
+			language::chan_not_reg,
+			string("The channel %s is not registered")).c_str(),
 		st[1].c_str());
 	return true;
 	}
@@ -173,7 +215,10 @@ theQuery	<< queryHeader << queryString
 
 elog << "CHANINFO::sqlQuery> " << theQuery.str() << endl;
         
-bot->Notice(theClient, "%s is registered by:",
+bot->Notice(theClient, 
+	bot->getResponse(theUser,
+		language::reg_by,
+		string("%s is registered by:")).c_str(),
 	st[1].c_str());
 
 ExecStatusType status = bot->SQLDb->Exec(theQuery.str()) ;
@@ -181,7 +226,10 @@ if( PGRES_TUPLES_OK == status )
 	{
 	for(int i = 0; i < bot->SQLDb->Tuples(); i++)
 		{
-		bot->Notice(theClient, "%s - last seen: %s ago",
+		bot->Notice(theClient, 
+			bot->getResponse(theUser,
+				language::last_seen_info,
+				string("%s - last seen: %s ago")).c_str(),
 			bot->SQLDb->GetValue(i, 1),
 			bot->prettyDuration(atoi(bot->SQLDb->GetValue(i, 3))).c_str());
 		} // for()
@@ -189,13 +237,19 @@ if( PGRES_TUPLES_OK == status )
 
 if( !theChan->getDescription().empty() )
 	{
-	bot->Notice(theClient, "Desc: %s",
+	bot->Notice(theClient, 
+		bot->getResponse(theUser,
+			language::desc,
+			string("Desc: %s")).c_str(),
 		theChan->getDescription().c_str());
 	}
 
 if( !theChan->getURL().empty() )
 	{
-	bot->Notice(theClient, "URL: %s",
+	bot->Notice(theClient, 
+		bot->getResponse(theUser,
+			language::url,
+			string("URL: %s")).c_str(),
 		theChan->getURL().c_str());
 	}
 

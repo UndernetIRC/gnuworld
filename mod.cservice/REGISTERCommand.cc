@@ -8,7 +8,7 @@
  *
  * Caveats: None
  *
- * $Id: REGISTERCommand.cc,v 1.8 2001/01/27 04:22:19 gte Exp $
+ * $Id: REGISTERCommand.cc,v 1.9 2001/02/16 20:20:26 plexus Exp $
  */
  
 #include	<string>
@@ -19,8 +19,9 @@
 #include	"levels.h"
 #include	"libpq++.h"
 #include	"Network.h"
+#include	"responses.h"
 
-const char REGISTERCommand_cc_rcsId[] = "$Id: REGISTERCommand.cc,v 1.8 2001/01/27 04:22:19 gte Exp $" ;
+const char REGISTERCommand_cc_rcsId[] = "$Id: REGISTERCommand.cc,v 1.9 2001/02/16 20:20:26 plexus Exp $" ;
 
 namespace gnuworld
 {
@@ -57,7 +58,11 @@ bool REGISTERCommand::Exec( iClient* theClient, const string& Message )
 	theChan = bot->getChannelRecord(st[1]);
 	if (theChan) 
 	{
-		bot->Notice(theClient, "%s is already registered with me.", st[1].c_str());
+		bot->Notice(theClient, 
+			bot->getResponse(theUser,
+				language::chan_already_reg,
+				string("%s is already registered with me.")).c_str(), 
+			st[1].c_str());
 		return false;
 	} 
 
@@ -68,7 +73,10 @@ bool REGISTERCommand::Exec( iClient* theClient, const string& Message )
 	int level = bot->getAdminAccessLevel(theUser);
 	if (level < level::registercmd)
 	{
-		bot->Notice(theClient, "You have insufficient access to perform that command.");
+		bot->Notice(theClient, 
+			bot->getResponse(theUser,
+				language::insuf_access,
+				string("You have insufficient access to perform that command.")));
 		return false;
 	} 
 
@@ -76,7 +84,10 @@ bool REGISTERCommand::Exec( iClient* theClient, const string& Message )
  
 	if ( (st[1][0] != '#') || (string::npos != pos))
 	{
-		bot->Notice(theClient, "Invalid channel name.");
+		bot->Notice(theClient, 
+			bot->getResponse(theUser,
+				language::inval_chan_name,
+				string("Invalid channel name.")));
 		return false;
 	}
  
@@ -104,9 +115,17 @@ bool REGISTERCommand::Exec( iClient* theClient, const string& Message )
 	if ((status = bot->SQLDb->Exec(theQuery.str())) == PGRES_COMMAND_OK)
 	{
 		bot->logAdminMessage("%s has registered %s", theUser->getUserName().c_str(), st[1].c_str());
-		bot->Notice(theClient, "Registered channel %s", st[1].c_str());
+		bot->Notice(theClient, 
+			bot->getResponse(theUser,
+				language::regged_chan,
+				string("Registered channel %s")).c_str(), 
+			st[1].c_str());
 	} else {
-		bot->Notice(theClient, "Something went wrong: %s", bot->SQLDb->ErrorMessage()); // Log to msgchan here?
+		bot->Notice(theClient, 
+			bot->getResponse(theUser,
+				language::its_bad_mmkay,
+				string("Something went wrong: %s")).c_str(), 
+			bot->SQLDb->ErrorMessage()); // Log to msgchan here?
  	}
  
 	return true ;

@@ -11,7 +11,7 @@
  *
  * Caveats: None.
  *
- * $Id: BANLISTCommand.cc,v 1.4 2001/02/12 00:02:09 plexus Exp $
+ * $Id: BANLISTCommand.cc,v 1.5 2001/02/16 20:20:26 plexus Exp $
  */
 
 #include        <string>
@@ -23,7 +23,7 @@
 #include        "levels.h"
 #include        "responses.h"
 
-const char BANLISTCommand_cc_rcsId[] = "$Id: BANLISTCommand.cc,v 1.4 2001/02/12 00:02:09 plexus Exp $" ;
+const char BANLISTCommand_cc_rcsId[] = "$Id: BANLISTCommand.cc,v 1.5 2001/02/16 20:20:26 plexus Exp $" ;
 
 namespace gnuworld
 {
@@ -40,10 +40,12 @@ if( st.size() < 2 )
 	return true;
 	}
 	
+sqlUser* theUser = bot->isAuthed(theClient, false);	
 Channel* tmpChan = Network->findChannel(st[1]); 
 if (!tmpChan) 
 	{
-	bot->Notice(theClient, "Sorry, the channel %s is empty",st[1].c_str());
+	bot->Notice(theClient, bot->getResponse(theUser, language::chan_is_empty).c_str(), 
+		st[1].c_str());
 	return false;
 	}
 	
@@ -64,8 +66,11 @@ for(iClient::const_channelIterator ptr = theClient->channels_begin();
 /* Do only show the banlist, if the user is in the channel. */
 if( !inChan )
 	{
-	bot->Notice(theClient, "%s: You are not in that channel.",
-		st[1].c_str());
+	bot->Notice(theClient, 
+	bot->getResponse(theUser,
+		language::youre_not_in_chan,
+		string("%s: You are not in that channel.")).c_str(),
+	st[1].c_str());
 	return true;
 	}
 
@@ -77,11 +82,17 @@ for(Channel::const_banIterator ptr = tmpChan->banList_begin();
 
 if( 0 == tmpChan->banList_size() )
 	{
-	bot->Notice(theClient, "%s: ban list is empty.",
+	bot->Notice(theClient,
+		bot->getResponse(theUser,
+			language::youre_not_in_chan,
+			string("%s: ban list is empty.")).c_str(),
 		st[1].c_str());
 	}
 else	{
-	bot->Notice(theClient, "%s: End of ban list",
+	bot->Notice(theClient, 
+		bot->getResponse(theUser,
+			language::end_ban_list,
+			string("%s: End of ban list")).c_str(),
 		st[1].c_str());
 	}
 

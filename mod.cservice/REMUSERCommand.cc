@@ -9,7 +9,7 @@
  * Caveats: None
  * 
  *
- * $Id: REMUSERCommand.cc,v 1.7 2001/01/30 01:16:15 gte Exp $
+ * $Id: REMUSERCommand.cc,v 1.8 2001/02/16 20:20:26 plexus Exp $
  */
 
 #include	<string>
@@ -19,8 +19,9 @@
 #include	"cservice.h" 
 #include	"levels.h"
 #include	"libpq++.h"
+#include	"responses.h"
 
-const char REMUSERCommand_cc_rcsId[] = "$Id: REMUSERCommand.cc,v 1.7 2001/01/30 01:16:15 gte Exp $" ;
+const char REMUSERCommand_cc_rcsId[] = "$Id: REMUSERCommand.cc,v 1.8 2001/02/16 20:20:26 plexus Exp $" ;
  
 namespace gnuworld
 {
@@ -41,16 +42,6 @@ bool REMUSERCommand::Exec( iClient* theClient, const string& Message )
 	strstream theQuery; 
 	ExecStatusType status;
  
- 	/*
-	 *  First, check the channel is registered.
-	 */
- 
-	sqlChannel* theChan = bot->getChannelRecord(st[1]);
-	if (!theChan) {
-		bot->Notice(theClient, "Sorry, %s isn't registered with me.", st[1].c_str());
-		return false;
-	} 
-
 	/*
 	 *  Fetch the sqlUser record attached to this client. If there isn't one,
 	 *  they aren't logged in - tell them they should be.
@@ -58,6 +49,21 @@ bool REMUSERCommand::Exec( iClient* theClient, const string& Message )
 
 	sqlUser* theUser = bot->isAuthed(theClient, true);
 	if (!theUser) return false; 
+
+ 	/*
+	 *  First, check the channel is registered.
+	 */
+ 
+	sqlChannel* theChan = bot->getChannelRecord(st[1]);
+	if (!theChan) {
+		bot->Notice(theClient, 
+			bot->getResponse(theUser,
+				language::chan_not_reg,
+				string("Sorry, %s isn't registered with me.")).c_str(), 
+			st[1].c_str());
+		return false;
+	} 
+
  
 	/*
 	 *  Check the user has sufficient access on this channel.
@@ -67,7 +73,10 @@ bool REMUSERCommand::Exec( iClient* theClient, const string& Message )
 	int level = bot->getEffectiveAccessLevel(theUser, theChan, true);
 	if ((level < level::remuser) && ((targetUser) && targetUser != theUser))
 	{
-		bot->Notice(theClient, "You have insufficient access to perform that command.");
+		bot->Notice(theClient, 
+			bot->getResponse(theUser,
+				language::insuf_access,
+				string("You have insufficient access to perform that command.")));
 		return false;
 	} 
  
@@ -77,7 +86,11 @@ bool REMUSERCommand::Exec( iClient* theClient, const string& Message )
  
 	if (!targetUser)
 	{
-		bot->Notice(theClient, "Sorry, I don't know who %s is.", st[2].c_str());
+		bot->Notice(theClient, 
+			bot->getResponse(theUser,
+				language::not_registered,
+				string("Sorry, I don't know who %s is.")).c_str(), 
+			st[2].c_str());
 		return false; 
 	}
  
@@ -89,7 +102,11 @@ bool REMUSERCommand::Exec( iClient* theClient, const string& Message )
 
 	if (!tmpLevel)
 	{
-		bot->Notice(theClient, "%s doesn't appear to have access in %s.", targetUser->getUserName().c_str(), theChan->getName().c_str());
+		bot->Notice(theClient, 
+			bot->getResponse(theUser,
+				language::doesnt_have_access,
+				string("%s doesn't appear to have access in %s.")).c_str(), 
+			targetUser->getUserName().c_str(), theChan->getName().c_str());
 		return false;
 	}
 
@@ -102,13 +119,19 @@ bool REMUSERCommand::Exec( iClient* theClient, const string& Message )
 
 	if ((level <= targetLevel) && (targetUser != theUser))
 	{
-		bot->Notice(theClient, "Cannot remove a user with equal or higher access than your own");
+		bot->Notice(theClient, 
+			bot->getResponse(theUser,
+				language::cant_rem_higher,
+				string("Cannot remove a user with equal or higher access than your own")));
 		return false;
 	} 
 
 	if ((targetLevel == 500) && (targetUser == theUser))
 	{
-		bot->Notice(theClient, "You can't remove yourself from a channel you own");
+		bot->Notice(theClient, 
+			bot->getResponse(theUser,
+				language::cant_rem_owner_self,
+				string("You can't remove yourself from a channel you own")));
 		return false;
 	} 
 
@@ -125,9 +148,17 @@ bool REMUSERCommand::Exec( iClient* theClient, const string& Message )
 
 	if ((status = bot->SQLDb->Exec(theQuery.str())) == PGRES_COMMAND_OK)
 	{
-		bot->Notice(theClient, "Removed user %s from %s", targetUser->getUserName().c_str(), theChan->getName().c_str());
+		bot->Notice(theClient, 
+			bot->getResponse(theUser,
+				language::removed_user,
+				string("Removed user %s from %s")).c_str(), 
+			targetUser->getUserName().c_str(), theChan->getName().c_str());
 	} else {
-		bot->Notice(theClient, "Something went wrong: %s", bot->SQLDb->ErrorMessage()); // Log to msgchan here.
+		bot->Notice(theClient, 
+			bot->getResponse(theUser,
+				language::its_bad_mmkay,
+				string("Something went wrong: %s")).c_str(), 
+			bot->SQLDb->ErrorMessage()); // Log to msgchan here.
  	}
  
 	/* Remove tmpLevel from the cache. (It has to be there, we just got it even if it wasnt..)

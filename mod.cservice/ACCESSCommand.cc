@@ -9,7 +9,7 @@
  * Displays all "Level" records for a specified channel.
  * Can optionally narrow down selection using a number of switches. 
  *
- * $Id: ACCESSCommand.cc,v 1.27 2001/02/16 00:18:16 plexus Exp $
+ * $Id: ACCESSCommand.cc,v 1.28 2001/02/16 20:20:26 plexus Exp $
  */
 
 #include	<string>
@@ -19,9 +19,10 @@
 #include	"cservice.h"
 #include	"libpq++.h"
 #include	"match.h"
+#include	"responses.h"
 #define MAX_RESULTS 15
  
-const char ACCESSCommand_cc_rcsId[] = "$Id: ACCESSCommand.cc,v 1.27 2001/02/16 00:18:16 plexus Exp $" ;
+const char ACCESSCommand_cc_rcsId[] = "$Id: ACCESSCommand.cc,v 1.28 2001/02/16 20:20:26 plexus Exp $" ;
 
 namespace gnuworld
 {
@@ -44,10 +45,16 @@ if( st.size() < 3 )
 	return true;
 	}
  
+sqlUser* theUser = bot->isAuthed(theClient, false);
 sqlChannel* theChan = bot->getChannelRecord(st[1]);
 if (!theChan) 
 	{
-		bot->Notice(theClient, "Sorry, the channel %s isn't registered with me.", st[1].c_str());
+		bot->Notice(theClient, 
+			bot->getResponse(theUser,
+				language::chan_not_reg,
+				string("Sorry, the channel %s isn't registered with me.")).c_str(), 
+			st[1].c_str()
+		);
 		return false;
 	} 
 
@@ -57,13 +64,23 @@ if (theChan->getName() == "*")
 	sqlUser* theUser = bot->isAuthed(theClient, false);
 	if (!theUser) 
 	{
-		bot->Notice(theClient, "Sorry, the channel %s isn't registered with me.", st[1].c_str());
+		bot->Notice(theClient, 
+			bot->getResponse(theUser,
+				language::chan_not_reg,
+				string("Sorry, the channel %s isn't registered with me.")).c_str(), 
+			st[1].c_str()
+		);		
 		return false;
 	}
 
 	if (theUser && !bot->getAdminAccessLevel(theUser))
 	{
-		bot->Notice(theClient, "Sorry, the channel %s isn't registered with me.", st[1].c_str());
+		bot->Notice(theClient, 
+			bot->getResponse(theUser,
+				language::chan_not_reg,
+				string("Sorry, the channel %s isn't registered with me.")).c_str(), 
+			st[1].c_str()
+		);		
 		return false; 
 	}
 }
@@ -142,18 +159,26 @@ for( StringTokenizer::const_iterator ptr = st.begin() ; ptr != st.end() ;
 			minAmount = atoi( (*ptr).c_str() );
 			if ((minAmount > 1000) || (minAmount < 0))
 				{
-				bot->Notice(theClient, "Invalid minimum level.");
+				bot->Notice(theClient, 
+					bot->getResponse(theUser,
+						language::inval_min_lvl,
+						string("Invalid minimum level."))
+				);
 				return false;
 				}
 			currentType = 0;
 			break;
 			}
 		case 2: /* Max */ 
-			{ 
+			{
 			maxAmount = atoi( (*ptr).c_str() );
 			if ((maxAmount > 1000) || (maxAmount < 0))
 				{
-				bot->Notice(theClient, "Invalid maximum level.");
+				bot->Notice(theClient, 
+					bot->getResponse(theUser,
+						language::inval_max_lvl,
+						string("Invalid maximum level."))
+				);
 				return false;
 				}
 
@@ -209,10 +234,9 @@ if( PGRES_TUPLES_OK == status )
 	int suspend_expires_d = 0;
 	int suspend_expires_f = 0;
 	int results = 0;
-	string matchString;
+	string matchString = st[2];
 	
-	if(st[2][0] == '-') matchString = "*";
-	else matchString = st[2];
+	if(matchString[0] == '-') matchString = "*";
 	
 	for (int i = 0 ; i < bot->SQLDb->Tuples(); i++)
 		{
@@ -244,28 +268,48 @@ if( PGRES_TUPLES_OK == status )
 				{
 				if (!(flag & sqlLevel::F_AUTOOP)) continue;
 				}
+
+			bot->Notice(theClient,
+				bot->getResponse(theUser,
+					language::user_access_is,
+					string("USER: %s ACCESS: %s")).c_str(),
+				bot->SQLDb->GetValue(i, 1), bot->SQLDb->GetValue(i, 2)
+			);	
 	
-			bot->Notice(theClient, "USER: %s ACCESS: %s", bot->SQLDb->GetValue(i, 1),
-				bot->SQLDb->GetValue(i, 2));
-	
-			bot->Notice(theClient, "CHANNEL: %s -- AUTOMODE: %s",
+			bot->Notice(theClient, 
+				bot->getResponse(theUser,
+					language::channel_automode_is,
+					string("CHANNEL: %s -- AUTOMODE: %s")).c_str(),
 				bot->SQLDb->GetValue(i, 0), 
-				autoMode.c_str());
+				autoMode.c_str()
+			);
 	
 			if(modif)
 				{
-				bot->Notice(theClient, "LAST MODIFIED: %s (%s ago)", 
+				bot->Notice(theClient, 
+					bot->getResponse(theUser,
+						language::last_mod,
+						string("LAST MODIFIED: %s (%s ago)")).c_str(), 
 					bot->SQLDb->GetValue(i, 7),
-					bot->prettyDuration(atoi(bot->SQLDb->GetValue(i,6))).c_str() );
+					bot->prettyDuration(atoi(bot->SQLDb->GetValue(i,6))).c_str()
+				);	
 				}
 	
 			if(suspend_expires != 0)
 				{
-				bot->Notice(theClient, "** SUSPENDED ** - Expires in %s",
-					bot->prettyDuration(suspend_expires_f).c_str());
+				bot->Notice(theClient,
+					bot->getResponse(theUser,
+						language::suspend_expires_in,
+						string("** SUSPENDED ** - Expires in %s")).c_str(),
+					bot->prettyDuration(suspend_expires_f).c_str()
+				);
 				}
-			bot->Notice(theClient, "LAST SEEN: %s ago.", 
-				bot->prettyDuration(duration).c_str());
+			bot->Notice(theClient,
+				bot->getResponse(theUser,
+						language::last_seen,
+						string("LAST SEEN: %s ago.")).c_str(), 
+				bot->prettyDuration(duration).c_str()
+			);
 		}
 		if ((results >= MAX_RESULTS) && !showAll) break;
 
@@ -273,15 +317,31 @@ if( PGRES_TUPLES_OK == status )
 	 
 	if ((results >= MAX_RESULTS) && !showAll)
 		{
-			bot->Notice(theClient, "There are more than 15 matching entries.");
-			bot->Notice(theClient, "Please restrict your query."); 
+			bot->Notice(theClient, 
+				bot->getResponse(theUser,
+						language::more_than_max,
+						string("There are more than 15 matching entries."))
+			);
+			bot->Notice(theClient,
+				bot->getResponse(theUser,
+						language::restrict_query,
+						string("Please restrict your query."))
+			);
 		} else if (results > 0)
 		{
-			bot->Notice(theClient, "End of access list");
+			bot->Notice(theClient,
+				bot->getResponse(theUser,
+						language::end_access_list,
+						string("End of access list"))
+			);
 		} 
 			else
 		{
-			bot->Notice(theClient, "No Match!");
+			bot->Notice(theClient,
+				bot->getResponse(theUser,
+						language::no_match,
+						string("No Match!"))
+			);
 		}
 
 	} 

@@ -11,7 +11,7 @@
 *
 * Suggestion: Support several nicks by seperating them with a comma.
 *             IE: /msg E kick #coder-com nick1,nick2,nick3 get outta here!
-* $Id: KICKCommand.cc,v 1.6 2001/02/05 00:44:08 gte Exp $
+* $Id: KICKCommand.cc,v 1.7 2001/02/16 20:20:26 plexus Exp $
 */
 
 #include        <string>
@@ -24,7 +24,7 @@
 #include        "responses.h"
 #include		"match.h"
 
-const char KICKCommand_cc_rcsId[] = "$Id: KICKCommand.cc,v 1.6 2001/02/05 00:44:08 gte Exp $" ;
+const char KICKCommand_cc_rcsId[] = "$Id: KICKCommand.cc,v 1.7 2001/02/16 20:20:26 plexus Exp $" ;
 
 namespace gnuworld
 {
@@ -64,7 +64,10 @@ bool KICKCommand::Exec( iClient* theClient, const string& Message )
  	/* Check the bot is in the channel. */
  
 	if (!theChan->getInChan()) {
-		bot->Notice(theClient, "I'm not in that channel!");
+		bot->Notice(theClient,
+			bot->getResponse(theUser,
+				language::i_am_not_on_chan,
+				string("I'm not in that channel!")));
 		return false;
 	} 
 
@@ -140,7 +143,10 @@ bool KICKCommand::Exec( iClient* theClient, const string& Message )
 		/* Don't kick +k things */
 		if ( target->getMode(iClient::MODE_SERVICES) ) 
 		{
-			bot->Notice(theClient, "I don't think %s would appreciate that?",
+			bot->Notice(theClient, 
+				bot->getResponse(theUser,
+					language::wouldnt_appreciate,
+					string("I don't think %s would appreciate that.")).c_str(),
 				target->getNickName().c_str());
 			return false;
 		}
@@ -150,7 +156,10 @@ bool KICKCommand::Exec( iClient* theClient, const string& Message )
 
 	if (toBoot.size() == 0)
 	{
-		bot->Notice(theClient, "No Match!");
+		bot->Notice(theClient, 
+			bot->getResponse(theUser,
+				language::no_match,
+				string("No Match!")));
 		return false;
 	}
 

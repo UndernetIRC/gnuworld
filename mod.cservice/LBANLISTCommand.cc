@@ -8,7 +8,7 @@
  *
  * Caveats: None.
  *
- * $Id: LBANLISTCommand.cc,v 1.5 2001/02/06 18:55:42 gte Exp $
+ * $Id: LBANLISTCommand.cc,v 1.6 2001/02/16 20:20:26 plexus Exp $
  */
 
 #include	<string>
@@ -19,10 +19,11 @@
 #include	"Network.h"
 #include	"levels.h"
 #include	"match.h"
+#include	"responses.h"
  
 #define MAX_RESULTS 15
 
-const char LBANLISTCommand_cc_rcsId[] = "$Id: LBANLISTCommand.cc,v 1.5 2001/02/06 18:55:42 gte Exp $" ;
+const char LBANLISTCommand_cc_rcsId[] = "$Id: LBANLISTCommand.cc,v 1.6 2001/02/16 20:20:26 plexus Exp $" ;
 
 namespace gnuworld
 {
@@ -42,10 +43,15 @@ bool LBANLISTCommand::Exec( iClient* theClient, const string& Message )
  
 	// Is the channel registered?
 	
+	sqlUser* theUser = bot->isAuthed(theClient, false);
 	sqlChannel* theChan = bot->getChannelRecord(st[1]);
 	if(!theChan)
 	{
-	    bot->Notice(theClient, "Sorry, %s isn't registered with me.", st[1].c_str());
+	    bot->Notice(theClient, 
+		bot->getResponse(theUser,
+			language::chan_not_reg,
+			string("Sorry, %s isn't registered with me.")).c_str(), 
+		st[1].c_str());
 	    return false;
 	} 
  
@@ -63,7 +69,10 @@ bool LBANLISTCommand::Exec( iClient* theClient, const string& Message )
 
 	vector < sqlBan* >* banList = bot->getBanRecords(theChan); 
 
-	bot->Notice(theClient,"\002*** Ban List for channel %s ***\002",
+	bot->Notice(theClient,
+		bot->getResponse(theUser,
+			language::lbanlist_for,
+			string("\002*** Ban List for channel %s ***\002")).c_str(),
 		theChan->getName().c_str());
 
 	int results = 0;
@@ -85,12 +94,26 @@ bool LBANLISTCommand::Exec( iClient* theClient, const string& Message )
 				ban_expires_d = ban_expires - bot->currentTime();
 				ban_expires_f = bot->currentTime() - ban_expires_d;
 
-				bot->Notice(theClient, "%s %s Level: %i", 
+				bot->Notice(theClient, 
+					bot->getResponse(theUser,
+						language::lban_entry,
+						string("%s %s Level: %i")).c_str(), 
 					theChan->getName().c_str(), theBan->getBanMask().c_str(), theBan->getLevel());
-				bot->Notice(theClient, "ADDED BY: %s (%s)",
+				bot->Notice(theClient, 
+					bot->getResponse(theUser,
+						language::lban_added_by,
+						string("ADDED BY: %s (%s)")).c_str(),
 					theBan->getSetBy().c_str(), theBan->getReason().c_str());
-				bot->Notice(theClient, "SINCE: %i", theBan->getSetTS());
-				bot->Notice(theClient, "EXP: %s", bot->prettyDuration(ban_expires_f).c_str());
+				bot->Notice(theClient, 
+					bot->getResponse(theUser,
+						language::lban_since,
+						string("SINCE: %i")).c_str(), 
+					theBan->getSetTS());
+				bot->Notice(theClient, 
+					bot->getResponse(theUser,
+						language::lban_exp,
+						string("EXP: %s")).c_str(), 
+					bot->prettyDuration(ban_expires_f).c_str());	
 			}
 		}
 		if ((results >= MAX_RESULTS) && !showAll) break;
@@ -98,15 +121,27 @@ bool LBANLISTCommand::Exec( iClient* theClient, const string& Message )
 
 	if ((results >= MAX_RESULTS) && !showAll)
 	{
-		bot->Notice(theClient, "There are more than 15 matching entries.");
-		bot->Notice(theClient, "Please restrict your query."); 
+		bot->Notice(theClient, 
+			bot->getResponse(theUser,
+				language::more_than_max,
+				string("There are more than 15 matching entries.")));
+		bot->Notice(theClient, 
+			bot->getResponse(theUser,
+				language::restrict_query,
+				string("Please restrict your query."))); 
 	} else if (results > 0)
 	{
-		bot->Notice(theClient,"\002*** END ***\002");
+		bot->Notice(theClient,
+			bot->getResponse(theUser,
+				language::lban_end,
+				string("\002*** END ***\002")));
 	} 
 		else
 	{
-		bot->Notice(theClient, "No Match!");
+		bot->Notice(theClient, 
+			bot->getResponse(theUser,
+				language::no_match,
+				string("No match!")));
 	}
 
 

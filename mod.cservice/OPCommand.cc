@@ -17,7 +17,7 @@
  *
  * Caveats: None
  *
- * $Id: OPCommand.cc,v 1.15 2001/01/20 22:01:01 gte Exp $
+ * $Id: OPCommand.cc,v 1.16 2001/02/16 20:20:26 plexus Exp $
  */
 
 #include	<string>
@@ -32,7 +32,7 @@
 
 using std::map ;
 
-const char OPCommand_cc_rcsId[] = "$Id: OPCommand.cc,v 1.15 2001/01/20 22:01:01 gte Exp $" ;
+const char OPCommand_cc_rcsId[] = "$Id: OPCommand.cc,v 1.16 2001/02/16 20:20:26 plexus Exp $" ;
 
 namespace gnuworld
 {
@@ -74,7 +74,10 @@ bool OPCommand::Exec( iClient* theClient, const string& Message )
  	/* Check the bot is in the channel. */
  
 	if (!theChan->getInChan()) {
-		bot->Notice(theClient, "I'm not in that channel!");
+		bot->Notice(theClient, 
+			bot->getResponse(theUser,
+				language::i_am_not_on_chan,
+				string("I'm not in that channel!")));
 		return false;
 	}
  
@@ -103,7 +106,10 @@ bool OPCommand::Exec( iClient* theClient, const string& Message )
 
 	if(theChan->getFlag(sqlChannel::F_NOOP))
 	{
-		bot->Notice(theClient, "The NOOP flag is set on %s",
+		bot->Notice(theClient, 
+			bot->getResponse(theUser,
+				language::noop_set,
+				string("The NOOP flag is set on %s")).c_str(),
 			theChan->getName().c_str());
 		return false;
 	}
@@ -180,13 +186,19 @@ bool OPCommand::Exec( iClient* theClient, const string& Message )
 			/* Not authed, don't allow this op. */
 			if (!authUser)
 			{ 
-				bot->Notice(theClient, "The STRICTOP flag is set on %s (and %s isn't authenticated)",
+				bot->Notice(theClient, 
+					bot->getResponse(theUser,
+						language::strictop_not_authed,
+						string("The STRICTOP flag is set on %s (and %s isn't authenticated)")).c_str(),
 					theChan->getName().c_str(), tmpChanUser->getNickName().c_str());
 				cont = false;
 				/* Authed but no access? Tough. :) */
 			} else if (!(bot->getEffectiveAccessLevel(authUser,theChan, false) >= level::op)) 
 				{
-					bot->Notice(theClient, "The STRICTOP flag is set on %s (and %s has insufficient access)",
+					bot->Notice(theClient, 
+						bot->getResponse(theUser,
+							language::strictop_insuf_access,
+							string("The STRICTOP flag is set on %s (and %s has insufficient access)")).c_str(),
 						theChan->getName().c_str(), authUser->getUserName().c_str()); 
 					cont = false;
 				} 

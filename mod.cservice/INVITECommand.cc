@@ -8,7 +8,7 @@
  *
  * Caveats: None
  *
- * $Id: INVITECommand.cc,v 1.4 2001/01/17 19:50:54 gte Exp $
+ * $Id: INVITECommand.cc,v 1.5 2001/02/16 20:20:26 plexus Exp $
  */
 
 
@@ -21,7 +21,7 @@
 #include	"responses.h"
 #include	"Network.h"
 
-const char INVITECommand_cc_rcsId[] = "$Id: INVITECommand.cc,v 1.4 2001/01/17 19:50:54 gte Exp $" ;
+const char INVITECommand_cc_rcsId[] = "$Id: INVITECommand.cc,v 1.5 2001/02/16 20:20:26 plexus Exp $" ;
 
 namespace gnuworld
 {
@@ -61,7 +61,10 @@ bool INVITECommand::Exec( iClient* theClient, const string& Message )
  	/* Check the bot is in the channel. */
  
 	if (!theChan->getInChan()) {
-		bot->Notice(theClient, "I'm not in that channel!");
+		bot->Notice(theClient, 
+			bot->getResponse(theUser,
+				language::i_am_not_on_chan,
+				string("I'm not in that channel!")));
 		return false;
 	} 
 

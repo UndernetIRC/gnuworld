@@ -8,7 +8,7 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char SHOWCOMMANDSCommand_cc_rcsId[] = "$Id: SHOWCOMMANDSCommand.cc,v 1.11 2001/02/10 23:41:49 gte Exp $" ;
+const char SHOWCOMMANDSCommand_cc_rcsId[] = "$Id: SHOWCOMMANDSCommand.cc,v 1.12 2001/02/16 20:20:26 plexus Exp $" ;
 
 namespace gnuworld
 {
@@ -20,7 +20,7 @@ bool SHOWCOMMANDSCommand::Exec( iClient* theClient, const string& Message )
 	StringTokenizer st( Message ) ;
 	if( st.size() < 2 )
 	{
-		Usage(theClient);
+		Usage( theClient );
 		return true;
 	}
 
@@ -31,7 +31,7 @@ bool SHOWCOMMANDSCommand::Exec( iClient* theClient, const string& Message )
 
 	sqlUser* theUser = bot->isAuthed(theClient, true);
 	if (!theUser) {
-		return false;
+		return true;	
 	}
 
 	/* 
@@ -65,9 +65,9 @@ bool SHOWCOMMANDSCommand::Exec( iClient* theClient, const string& Message )
 	if (level == 42) bot->Notice(theClient,  "\002Level   42\002: PANIC");
 	if (level >= 25) bot->Notice(theClient,  "\002Level   25\002: voice devoice");
 	if (level >= 1) bot->Notice(theClient,   "\002Level    1\002: status%s",(level>=400||admin>0||theClient->isOper()) ? "+" : ""); 
-	if (level >= 0) bot->Notice(theClient,   "\002Level    0\002: access banlist chaninfo info help* lbanlist login motd* newpass showcommands showignore verify"); 
 	if (admin >= level::force) 
 			bot->Notice(theClient,   "\002Level    *\002: force unforce");
+	bot->Notice(theClient,   "\002Level    0\002: access banlist chaninfo info help* lbanlist login motd* newpass showcommands showignore verify"); 
 	if (theClient->isOper()) 
 		           bot->Notice(theClient,"\002Level Oper\002: operjoin* operpart*");
 	bot->Notice(theClient, "Commands marked * are not yet fully functional :)");

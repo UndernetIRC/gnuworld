@@ -10,7 +10,7 @@
 #include	"responses.h" 
 #include	"networkData.h"
 
-const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.10 2001/01/24 01:13:51 gte Exp $" ;
+const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.11 2001/02/16 20:20:26 plexus Exp $" ;
 
 namespace gnuworld
 {
@@ -76,7 +76,11 @@ bool LOGINCommand::Exec( iClient* theClient, const string& Message )
 
 		if (output.str() != md5Part) // If the MD5 hash's don't match..
 		{
-			bot->Notice(theClient, "AUTHENTICATION FAILED as %s (Invalid Password).", theUser->getUserName().c_str());
+			bot->Notice(theClient, 
+				bot->getResponse(theUser,
+					language::auth_failed,
+					string("AUTHENTICATION FAILED as %s (Invalid Password).")).c_str(), 
+				theUser->getUserName().c_str());
 			return false;
 		}
 
@@ -89,9 +93,11 @@ bool LOGINCommand::Exec( iClient* theClient, const string& Message )
 		iClient* authTestUser = theUser->isAuthed();
 		if (authTestUser)
 		{
-			bot->Notice(authTestUser, "NOTICE: %s has now authenticated as %s, you are no longer authenticated.",
-				theClient->getNickUserHost().c_str(), theUser->getUserName().c_str());
-
+			bot->Notice(authTestUser, 
+				bot->getResponse(tmpUser,
+					language::no_longer_auth,
+					string("NOTICE: %s has now authenticated as %s, you are no longer authenticated.")).c_str(),
+					theClient->getNickUserHost().c_str(), theUser->getUserName().c_str());
 			networkData* tmpData = (networkData*)authTestUser->getCustomData(bot);
 			tmpData->currentUser = NULL; // Remove the pointer from the iClient to the sqlUser.
 		}
@@ -108,7 +114,11 @@ bool LOGINCommand::Exec( iClient* theClient, const string& Message )
 
 	} else
 	{
-		bot->Notice(theClient, "Sorry, I don't know who %s is.", st[1].c_str());
+		bot->Notice(theClient, 
+			bot->getResponse(tmpUser,
+				language::not_registered,
+				string("Sorry, I don't know who %s is.")).c_str(), 
+			st[1].c_str());
 		return false;
 	}
 

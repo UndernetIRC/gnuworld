@@ -8,7 +8,7 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char UNFORCECommand_cc_rcsId[] = "$Id: UNFORCECommand.cc,v 1.4 2001/01/16 01:31:40 gte Exp $" ;
+const char UNFORCECommand_cc_rcsId[] = "$Id: UNFORCECommand.cc,v 1.5 2001/02/16 20:20:26 plexus Exp $" ;
 
 namespace gnuworld
 {
@@ -37,7 +37,10 @@ bool UNFORCECommand::Exec( iClient* theClient, const string& Message )
 	int admLevel = bot->getAccessLevel(theUser, admChan);
 	if (admLevel < level::force)
 	{
-		bot->Notice(theClient, "Sorry, you have insufficient access to perform that command.");
+		bot->Notice(theClient, 
+			bot->getResponse(theUser,
+				language::insuf_access,
+				string("Sorry, you have insufficient access to perform that command.")));
 		return false;
 	} 
 
@@ -48,7 +51,11 @@ bool UNFORCECommand::Exec( iClient* theClient, const string& Message )
 	sqlChannel* theChan = bot->getChannelRecord(st[1]);
 	if (!theChan) 
 	{
-		bot->Notice(theClient, "Sorry, %s isn't registered with me.", st[1].c_str());
+		bot->Notice(theClient, 
+			bot->getResponse(theUser,
+				language::chan_not_reg,
+				string("Sorry, %s isn't registered with me.")).c_str(),
+			st[1].c_str());
 		return false;
 	} 
  
@@ -67,14 +74,22 @@ bool UNFORCECommand::Exec( iClient* theClient, const string& Message )
 		if (ptr->second->getFlag(sqlLevel::F_FORCED)) // Forced access, drop it.
 		{
 			bot->sqlLevelCache.erase(thePair);
-			bot->Notice(theClient, "Removed your temporary access of %i from channel %s", admLevel, theChan->getName().c_str());
+			bot->Notice(theClient, 
+				bot->getResponse(theUser,
+					language::rem_temp_access,
+					string("Removed your temporary access of %i from channel %s")).c_str(), 
+				admLevel, theChan->getName().c_str());
 //			bot->logAdminMessage("%s has removed their forced access on %s", 
 //				theUser->getUserName().c_str(), theChan->getName().c_str());
 			return true;
 		}
 	} 
 
-	bot->Notice(theClient, "You don't appear to have a forced access in %s, perhaps it expired?", theChan->getName().c_str()); 
+	bot->Notice(theClient, 
+		bot->getResponse(theUser,
+			language::no_forced_access,
+			string("You don't appear to have a forced access in %s, perhaps it expired?")).c_str(), 
+		theChan->getName().c_str()); 
 	return true ;
 } 
 

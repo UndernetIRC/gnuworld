@@ -8,7 +8,7 @@
  *
  * Caveats: None
  *
- * $Id: DEOPCommand.cc,v 1.6 2001/02/05 00:44:08 gte Exp $
+ * $Id: DEOPCommand.cc,v 1.7 2001/02/16 20:20:26 plexus Exp $
  */
 
 #include	<string>
@@ -23,7 +23,7 @@
 
 using std::map ;
 
-const char DEOPCommand_cc_rcsId[] = "$Id: DEOPCommand.cc,v 1.6 2001/02/05 00:44:08 gte Exp $" ;
+const char DEOPCommand_cc_rcsId[] = "$Id: DEOPCommand.cc,v 1.7 2001/02/16 20:20:26 plexus Exp $" ;
 
 namespace gnuworld
 {
@@ -65,7 +65,10 @@ bool DEOPCommand::Exec( iClient* theClient, const string& Message )
  	/* Check the bot is in the channel. */
  
 	if (!theChan->getInChan()) {
-		bot->Notice(theClient, "I'm not in that channel!");
+		bot->Notice(theClient, 
+			bot->getResponse(theUser,
+				language::i_am_not_on_chan,
+				string("I'm not in that channel!")));
 		return false;
 	}
 
@@ -141,7 +144,10 @@ bool DEOPCommand::Exec( iClient* theClient, const string& Message )
 		/* Don't deop +k things */
 		if ((cont) && (target->getMode(iClient::MODE_SERVICES)) )
 		{
-			bot->Notice(theClient, "I don't think %s would appreciate that?",
+			bot->Notice(theClient, 
+				bot->getResponse(theUser,
+					language::wouldnt_appreciate,
+					string("I don't think %s would appreciate that.")).c_str(),
 				target->getNickName().c_str());
 			cont = false;
 		}

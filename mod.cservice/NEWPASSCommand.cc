@@ -10,7 +10,7 @@
 #include	"responses.h" 
 #include	"networkData.h"
 
-const char NEWPASSCommand_cc_rcsId[] = "$Id: NEWPASSCommand.cc,v 1.3 2001/01/19 23:01:56 gte Exp $" ;
+const char NEWPASSCommand_cc_rcsId[] = "$Id: NEWPASSCommand.cc,v 1.4 2001/02/16 20:20:26 plexus Exp $" ;
 
 namespace gnuworld
 {
@@ -43,7 +43,10 @@ bool NEWPASSCommand::Exec( iClient* theClient, const string& Message )
 	if ( (string_lower(st[1]) == string_lower(tmpUser->getUserName())) 
 		  || (string_lower(st[1]) == string_lower(theClient->getNickName())) )
 	{
-		bot->Notice(theClient, "Your password cannot be your username or current nick - syntax is: NEWPASS <new passphrase>");
+		bot->Notice(theClient, 
+			bot->getResponse(tmpUser,
+				language::pass_cant_be_nick,
+				string("Your password cannot be your username or current nick - syntax is: NEWPASS <new passphrase>")));
 		return false;
 	}
 
@@ -89,7 +92,10 @@ bool NEWPASSCommand::Exec( iClient* theClient, const string& Message )
  	string finalPassword = salt + output.str();
  	tmpUser->setPassword(finalPassword); 
 	tmpUser->commit();
-	bot->Notice(theClient, "Password successfully changed.");
+	bot->Notice(theClient, 
+		bot->getResponse(tmpUser,
+			language::pass_changed,
+			string("Password successfully changed.")));
 
 	return true; 
 } 

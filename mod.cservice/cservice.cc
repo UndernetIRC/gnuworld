@@ -381,9 +381,7 @@ else
 		// Bad boy!
 		setFloodPoints(theClient, 0);
 		setLastRecieved(theClient, ::time(NULL)); 
-		Notice(theClient,
-			"Flood me will you? I'm not going to listen "
-			"to you anymore."); 
+		Notice(theClient, "Flood me will you? I'm not going to listen to you anymore.");
 		
 		// Send a silence numeric target, and mask to ignore
 		// messages from this user.
@@ -466,7 +464,7 @@ bool cservice::hasOutputFlooded(iClient* theClient)
 			setOutputTotal(theClient, 0);
 			setLastRecieved(theClient, ::time(NULL)); 
 			Notice(theClient, "I think I've sent you a little too much data, I'm going to ignore you for a while."); 
-		
+
 			// Send a silence numeric target, and mask to ignore messages from this user.
 			string silenceMask = "*!*"
 				+ theClient->getUserName()
@@ -506,7 +504,7 @@ int cservice::OnPrivateMessage( iClient* theClient, const string& Message,
 StringTokenizer st( Message ) ;
 if( st.empty() )
 	{
-	Notice( theClient, "Incomplete command" ) ;
+	Notice( theClient, "Incomplete command");
 	return 0 ;
 	}
 
@@ -523,7 +521,7 @@ const string Command = string_upper( st[ 0 ] ) ;
 
  if (!secure && ((Command == "LOGIN") || (Command == "NEWPASS")) )
  {
- 	Notice(theClient, "To use %s, you must /msg %s@%s",
+	Notice(theClient, "To use %s, you must /msg %s@%s",
 		Command.c_str(), nickName.c_str(), getUplinkName().c_str());
 	return false;
  }
@@ -611,7 +609,7 @@ else if(Command == "VERSION")
 	xClient::DoCTCP(theClient, CTCP,
 		"Undernet P10 Channel Services Version 2 ["
 		__DATE__ " " __TIME__
-		"] ($Id: cservice.cc,v 1.106 2001/02/16 00:18:17 plexus Exp $)");
+		"] ($Id: cservice.cc,v 1.107 2001/02/16 20:20:26 plexus Exp $)");
 	}
 else if(Command == "PROBLEM?")
 	{
@@ -645,8 +643,7 @@ if( theUser )
 
 if( alert )
 	{
-	Notice(theClient, "Sorry, You must be logged in to use "
-		"this command.");
+	Notice(theClient, "Sorry, You must be logged in to use this command.");
 	}
 return 0;
 }
@@ -927,8 +924,7 @@ if (theChan->getFlag(sqlChannel::F_SUSPEND))
 	iClient* theClient = theUser->isAuthed();
 	if (theClient && notify)
 		{
-		Notice(theClient, "The channel %s has been suspended "
-			"by a cservice administrator.",
+		Notice(theClient, "The channel %s has been suspended by a cservice administrator.",
 			theChan->getName().c_str());
 		}
 	return 0;
@@ -1523,15 +1519,13 @@ if( !deopList.empty() )
 	{
 	if ((theChanUser) && (reggedChan->getFlag(sqlChannel::F_NOOP)) ) 
 		{
-		Notice( theChanUser->getClient(),
-			"The NOOP flag is set on %s",
+		Notice( theChanUser->getClient(), "The NOOP flag is set on %s",
 			reggedChan->getName().c_str());
 		}
 
 	if ((theChanUser) && (reggedChan->getFlag(sqlChannel::F_STRICTOP)) ) 
 		{
-		Notice( theChanUser->getClient(),
-			"The STRICTOP flag is set on %s",
+		Notice( theChanUser->getClient(), "The STRICTOP flag is set on %s",
 			reggedChan->getName().c_str());
 		}
 
@@ -1545,8 +1539,7 @@ if( !deopList.empty() )
 
 if ((theChanUser) && (deopCounter >= reggedChan->getMassDeopPro()))
 	{
-	Notice( theChanUser->getClient(),
-		"You just deopped more than %i people", 
+		Notice(theChanUser->getClient(), "You just deopped more than %i people", 
 		reggedChan->getMassDeopPro());
 	} 
 }

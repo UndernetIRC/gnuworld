@@ -8,7 +8,7 @@
  *
  * Caveats: None
  *
- * $Id: ADDUSERCommand.cc,v 1.11 2001/02/05 18:57:36 gte Exp $
+ * $Id: ADDUSERCommand.cc,v 1.12 2001/02/16 20:20:26 plexus Exp $
  */
  
 #include	<string>
@@ -18,8 +18,9 @@
 #include	"cservice.h" 
 #include	"levels.h"
 #include	"libpq++.h"
+#include	"responses.h"
 
-const char ADDUSERCommand_cc_rcsId[] = "$Id: ADDUSERCommand.cc,v 1.11 2001/02/05 18:57:36 gte Exp $" ;
+const char ADDUSERCommand_cc_rcsId[] = "$Id: ADDUSERCommand.cc,v 1.12 2001/02/16 20:20:26 plexus Exp $" ;
 
 namespace gnuworld
 {
@@ -55,8 +56,12 @@ if (!theUser)
 sqlChannel* theChan = bot->getChannelRecord(st[1]);
 if (!theChan)
 	{
-	bot->Notice(theClient, "Sorry, %s isn't registered with me.",
-		st[1].c_str());
+	bot->Notice(theClient, 
+		bot->getResponse(theUser,
+			language::chan_not_reg,
+			string("Sorry, %s isn't registered with me.")).c_str(),
+		st[1].c_str()
+	);
 	return false;
 	} 
  
@@ -67,7 +72,11 @@ if (!theChan)
 int level = bot->getEffectiveAccessLevel(theUser, theChan, true);
 if (level < level::adduser)
 	{
-	bot->Notice(theClient, "You have insufficient access to perform that command.");
+	bot->Notice(theClient,
+		bot->getResponse(theUser,
+			language::insuf_access,
+			string("You have insufficient access to perform that command."))
+	);
 	return false;
 	} 
 
@@ -78,13 +87,21 @@ int targetAccess = atoi(st[3].c_str());
 
 if (level <= targetAccess)
 	{
-	bot->Notice(theClient, "Cannot add a user with equal or higher access than your own.");
+	bot->Notice(theClient,
+		bot->getResponse(theUser,
+			language::access_higher,
+			string("Cannot add a user with equal or higher access than your own."))
+	);
 	return false;
 	}
 
 if ((targetAccess <= 0) || (targetAccess > 999))
 	{
-	bot->Notice(theClient, "Invalid access level.");
+	bot->Notice(theClient,
+		bot->getResponse(theUser,
+			language::inval_access,
+			string("Invalid access level."))
+	);
 	return false;
 	}
 
@@ -95,8 +112,12 @@ if ((targetAccess <= 0) || (targetAccess > 999))
 sqlUser* targetUser = bot->getUserRecord(st[2]);
 if (!targetUser)
 	{
-	bot->Notice(theClient, "Sorry, I don't know who %s is.",
-		st[2].c_str());
+	bot->Notice(theClient, 
+		bot->getResponse(theUser,
+			language::not_registered,
+			string("Sorry, I don't know who %s is.")).c_str(),
+		st[2].c_str()
+	);
 	return false; 
 	}
  
@@ -116,7 +137,10 @@ if (levelTest != 0)
 		
 	if (!newLevel->getFlag(sqlLevel::F_FORCED))
 		{ 
-		bot->Notice(theClient, "%s is already added to %s with access level %i.",
+		bot->Notice(theClient, 
+			bot->getResponse(theUser,
+				language::already_in_list,
+				string("%s is already added to %s with access level %i.")).c_str(),
 			targetUser->getUserName().c_str(),
 			theChan->getName().c_str(),
 			levelTest);
@@ -127,7 +151,10 @@ if (levelTest != 0)
 	if (testLevel.loadData(targetUser->getID(), theChan->getID()))
 		{
 		// If a forced person is trying to add themselves and they are already in the DB..
-		bot->Notice(theClient, "%s is already added to %s with access level %i.",
+		bot->Notice(theClient, 
+			bot->getResponse(theUser,
+				language::already_in_list,
+				string("%s is already added to %s with access level %i.")).c_str(),
 			targetUser->getUserName().c_str(),
 			theChan->getName().c_str(),
 			levelTest);
@@ -176,10 +203,14 @@ elog << "ADDUSER::sqlQuery> " << theQuery.str() << endl;
 ExecStatusType status = bot->SQLDb->Exec(theQuery.str()) ;
 if( PGRES_COMMAND_OK == status )
 	{
-	bot->Notice(theClient, "Added user %s to %s with access level %i",
+	bot->Notice(theClient, 
+		bot->getResponse(theUser,
+			language::add_success,
+			string("Added user %s to %s with access level %i")).c_str(),
 		targetUser->getUserName().c_str(),
 		theChan->getName().c_str(),
 		targetAccess);
+
 
 		/*
 		 *  "If they where added to *, set their invisible flag" (Ace).
@@ -193,7 +224,10 @@ if( PGRES_COMMAND_OK == status )
 	}
 else
 	{
-	bot->Notice(theClient, "Something went wrong: %s",
+	bot->Notice(theClient, 
+		bot->getResponse(theUser,
+			language::its_bad_mmkay,
+			string("Something went wrong: %s")).c_str(),
 		bot->SQLDb->ErrorMessage());
 	// TODO: Log to msgchan here.
  	}

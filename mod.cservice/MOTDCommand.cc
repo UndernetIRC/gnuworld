@@ -7,7 +7,7 @@
 #include	"cservice.h" 
 #include 	"responses.h"
 
-const char MOTDCommand_cc_rcsId[] = "$Id: MOTDCommand.cc,v 1.2 2001/02/12 05:42:55 isomer Exp $" ;
+const char MOTDCommand_cc_rcsId[] = "$Id: MOTDCommand.cc,v 1.3 2001/02/16 20:20:26 plexus Exp $" ;
 
 namespace gnuworld
 {
@@ -23,13 +23,7 @@ bool MOTDCommand::Exec( iClient* theClient, const string& Message )
 		return true;
 	}
 
-	bot->Notice(theClient, 
-		bot->getResponse(
-			bot->isAuthed(theClient, false),
-			language::motd,
-			"There is no motd (or spoon for that matter)"
-		)
-	);
+	bot->Notice(theClient, "There is no motd (or spoon for that matter)");
          
 	return true ;
 } 

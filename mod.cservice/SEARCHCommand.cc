@@ -9,7 +9,7 @@
  *
  * Caveats: None.
  *
- * $Id: SEARCHCommand.cc,v 1.3 2001/02/12 14:07:52 plexus Exp $
+ * $Id: SEARCHCommand.cc,v 1.4 2001/02/16 20:20:26 plexus Exp $
  */
 
 #include	<string>
@@ -18,9 +18,10 @@
 #include	"ELog.h" 
 #include	"cservice.h" 
 #include	"libpq++.h"
+#include	"responses.h"
 #define MAX_RESULTS 10
 
-const char SEARCHCommand_cc_rcsId[] = "$Id: SEARCHCommand.cc,v 1.3 2001/02/12 14:07:52 plexus Exp $" ;
+const char SEARCHCommand_cc_rcsId[] = "$Id: SEARCHCommand.cc,v 1.4 2001/02/16 20:20:26 plexus Exp $" ;
 
 namespace gnuworld
 {
@@ -40,6 +41,8 @@ bool SEARCHCommand::Exec( iClient* theClient, const string& Message )
 		Usage(theClient);
 		return true;
 	}
+
+	sqlUser* theUser = bot->isAuthed(theClient, false);
 
 	string matchString = st.assemble(1);
 	unsigned int results = 0;
@@ -65,15 +68,28 @@ bool SEARCHCommand::Exec( iClient* theClient, const string& Message )
 			
 			if(results >= MAX_RESULTS)
 				{
-				bot->Notice(theClient, "There are more than 10 entries matching [%s]",
-					matchString.c_str());
-				bot->Notice(theClient, "Please restrict your search mask");
+				bot->Notice(theClient, 
+					bot->getResponse(theUser,
+						language::exc_search,
+						string("There are more than %i entries matching [%s]")).c_str(),
+						MAX_RESULTS, matchString.c_str()
+				);
+				bot->Notice(theClient, 
+					bot->getResponse(theUser,
+						language::restrict_search,
+						string("Please restrict your search mask")).c_str()
+				);
 				break;
 				}
 			}
 		if(results < 1)
 			{
-			bot->Notice(theClient, "No matching entries for [%s]", matchString.c_str());
+			bot->Notice(theClient, 
+				bot->getResponse(theUser,
+					language::no_search_match,
+					string("No matching entries for [%s]")).c_str(),
+					matchString.c_str()
+			);
 			}
 		}
 		

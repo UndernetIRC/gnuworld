@@ -13,7 +13,7 @@
  * Shouldn't really happen, as trying to MODINFO a forced access doesn't
  * make sense - adduser and then MODINFO that :)
  *
- * $Id: MODINFOCommand.cc,v 1.11 2001/02/06 18:55:42 gte Exp $
+ * $Id: MODINFOCommand.cc,v 1.12 2001/02/16 20:20:26 plexus Exp $
  */
 
 #include	<string>
@@ -22,8 +22,9 @@
 #include	"ELog.h" 
 #include	"cservice.h" 
 #include	"levels.h"
+#include	"responses.h"
 
-const char MODINFOCommand_cc_rcsId[] = "$Id: MODINFOCommand.cc,v 1.11 2001/02/06 18:55:42 gte Exp $" ;
+const char MODINFOCommand_cc_rcsId[] = "$Id: MODINFOCommand.cc,v 1.12 2001/02/16 20:20:26 plexus Exp $" ;
 
 namespace gnuworld
 {
@@ -47,22 +48,27 @@ bool MODINFOCommand::Exec( iClient* theClient, const string& Message )
 	}
 
 	/*
-	 *  First, check the channel is registered.
-	 */
- 
-	sqlChannel* theChan = bot->getChannelRecord(st[1]);
-	if (!theChan) {
-		bot->Notice(theClient, "Sorry, %s isn't registered with me.", st[1].c_str());
-		return false;
-	} 
-
-	/*
 	 *  Fetch the sqlUser record attached to this client. If there isn't one,
 	 *  they aren't logged in - tell them they should be.
 	 */
 
 	sqlUser* theUser = bot->isAuthed(theClient, true);
 	if (!theUser) return false; 
+
+	/*
+	 *  First, check the channel is registered.
+	 */
+ 
+	sqlChannel* theChan = bot->getChannelRecord(st[1]);
+	if (!theChan) {
+		bot->Notice(theClient, 
+			bot->getResponse(theUser, 
+				language::chan_not_reg, 
+				string("Sorry, %s isn't registered with me.")).c_str(), 
+			st[1].c_str());
+		return false;
+	} 
+
  
 	/*
 	 *  Check the user has sufficient access on this channel. 
@@ -70,7 +76,10 @@ bool MODINFOCommand::Exec( iClient* theClient, const string& Message )
 	int level = bot->getEffectiveAccessLevel(theUser, theChan, true);
 	if (level < level::modinfo)
 	{
-		bot->Notice(theClient, "Sorry, you have insufficient access to perform that command.");
+		bot->Notice(theClient, 
+			bot->getResponse(theUser, 
+				language::insuf_access, 
+				string("Sorry, you have insufficient access to perform that command.")));
 		return false;
 	} 
 
@@ -81,7 +90,10 @@ bool MODINFOCommand::Exec( iClient* theClient, const string& Message )
 	sqlUser* targetUser = bot->getUserRecord(st[3]);
 	if (!targetUser)
 	{
-		bot->Notice(theClient, "Sorry, I don't know who %s is.", st[3].c_str());
+		bot->Notice(theClient, 
+			bot->getResponse(theUser, 
+				language::not_registered, 
+				string("Sorry, I don't know who %s is.")).c_str(), st[3].c_str());
 		return false; 
 	}
  
@@ -92,7 +104,11 @@ bool MODINFOCommand::Exec( iClient* theClient, const string& Message )
 	int targetLevel = bot->getAccessLevel(targetUser, theChan);
 	if (targetLevel == 0)
 	{
-		bot->Notice(theClient, "%s doesn't appear to have access in %s.", targetUser->getUserName().c_str(), theChan->getName().c_str());
+		bot->Notice(theClient, 
+			bot->getResponse(theUser, 
+				language::doesnt_have_access, 
+				string("%s doesn't appear to have access in %s.")).c_str(), 
+			targetUser->getUserName().c_str(), theChan->getName().c_str());
 		return false;
 	}
  
@@ -115,7 +131,10 @@ bool MODINFOCommand::Exec( iClient* theClient, const string& Message )
 			/* If the access is forced, they are allowed to modify their own record. */
 			if (!tmpLevel->getFlag(sqlLevel::F_FORCED))
 			{ 
-				bot->Notice(theClient, "Cannot modify a user with equal or higher access than your own.");
+				bot->Notice(theClient, 
+					bot->getResponse(theUser, 
+						language::mod_access_higher, 
+						string("Cannot modify a user with equal or higher access than your own.")));
 				return false; 
 			}
 		}
@@ -127,7 +146,10 @@ bool MODINFOCommand::Exec( iClient* theClient, const string& Message )
 		int newAccess = atoi(st[4].c_str());
 		if ((newAccess <= 0) || (newAccess > 999))
 		{
-			bot->Notice(theClient, "Invalid access level.");
+			bot->Notice(theClient, 
+				bot->getResponse(theUser, 
+					language::inval_access, 
+					string("Invalid access level.")));
 			return false;
 		}
 
@@ -137,7 +159,10 @@ bool MODINFOCommand::Exec( iClient* theClient, const string& Message )
 
 		if (level <= newAccess)
 		{
-			bot->Notice(theClient, "Cannot give a user higher or equal access to your own.");
+			bot->Notice(theClient, 
+				bot->getResponse(theUser, 
+					language::cant_give_higher, 
+					string("Cannot give a user higher or equal access to your own.")));
 			return false;
 		} 
  
@@ -149,9 +174,11 @@ bool MODINFOCommand::Exec( iClient* theClient, const string& Message )
 		// Only commit changes if this has been loaded from the Db.
 		// (Ie: If its a forced temporary access, this flag won't be set)..
 		if (aLevel->getFlag(sqlLevel::F_ONDB)) aLevel->commit();
-		bot->Notice(theClient, "Modified %s's access level on channel %s to %i", 
-			targetUser->getUserName().c_str(), theChan->getName().c_str(),
-			newAccess);
+		bot->Notice(theClient, 
+			bot->getResponse(theUser, 
+				language::mod_access_to, 
+				string("Modified %s's access level on channel %s to %i")).c_str(), 
+			targetUser->getUserName().c_str(), theChan->getName().c_str(), newAccess);
 	}
  
 
@@ -164,7 +191,10 @@ bool MODINFOCommand::Exec( iClient* theClient, const string& Message )
 	
 		if (level < targetLevel)
 		{
-			bot->Notice(theClient, "Cannot modify a user with higher access than your own.");
+			bot->Notice(theClient, 
+				bot->getResponse(theUser, 
+					language::mod_access_higher, 
+					string("Cannot modify a user with higher access than your own.")));
 			return false;
 		}  
 
@@ -184,8 +214,12 @@ bool MODINFOCommand::Exec( iClient* theClient, const string& Message )
 			// (Ie: If its a forced temporary access, this flag won't be set)..
 			if (aLevel->getFlag(sqlLevel::F_ONDB)) aLevel->commit();
 
-			bot->Notice(theClient, "Set AUTOMODE to OP for %s on channel %s", 
+			bot->Notice(theClient, 
+				bot->getResponse(theUser, 
+					language::automode_op, 
+					string("Set AUTOMODE to OP for %s on channel %s")).c_str(), 
 				targetUser->getUserName().c_str(), theChan->getName().c_str()); 
+
 			return false;
 		}
 
@@ -201,7 +235,10 @@ bool MODINFOCommand::Exec( iClient* theClient, const string& Message )
 			// (Ie: If its a forced temporary access, this flag won't be set)..
 			if (aLevel->getFlag(sqlLevel::F_ONDB)) aLevel->commit();
 
-			bot->Notice(theClient, "Set AUTOMODE to VOICE for %s on channel %s", 
+			bot->Notice(theClient, 
+				bot->getResponse(theUser, 
+					language::automode_voice, 
+					string("Set AUTOMODE to VOICE for %s on channel %s")).c_str(), 
 				targetUser->getUserName().c_str(), theChan->getName().c_str()); 
 			return false;
 		} 
@@ -218,7 +255,10 @@ bool MODINFOCommand::Exec( iClient* theClient, const string& Message )
 			// (Ie: If its a forced temporary access, this flag won't be set)..
 			if (aLevel->getFlag(sqlLevel::F_ONDB)) aLevel->commit();
 
-			bot->Notice(theClient, "Set AUTOMODE to NONE for %s on channel %s", 
+			bot->Notice(theClient, 
+				bot->getResponse(theUser, 
+					language::automode_none, 
+					string("Set AUTOMODE to NONE for %s on channel %s")).c_str(), 
 				targetUser->getUserName().c_str(), theChan->getName().c_str()); 
 			return false;
 		}
