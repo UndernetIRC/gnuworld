@@ -23,7 +23,7 @@
 #include 	"time.h"
 #include	"ccUser.h"
 
-const char GLINECommand_cc_rcsId[] = "$Id: GLINECommand.cc,v 1.24 2001/09/26 11:42:19 mrbean_ Exp $";
+const char GLINECommand_cc_rcsId[] = "$Id: GLINECommand.cc,v 1.25 2001/11/08 23:13:29 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -182,10 +182,10 @@ if(!isChan)
 	if(TmpGline)
 		Up =  true;	
 	else TmpGline = new ccGline(bot->SQLDb);
-	TmpGline->setHost(st [ pos ]);
+	TmpGline->setHost(bot->removeSqlChars(st [ pos ]));
 	TmpGline->setExpires(::time(0) + gLength);
 	TmpGline->setAddedBy(nickUserHost);
-	TmpGline->setReason(st.assemble( pos + ResStart ));
+	TmpGline->setReason(bot->removeSqlChars(st.assemble( pos + ResStart )));
 	TmpGline->setAddedOn(::time(0));
 	if(Up)
 		{	
@@ -251,7 +251,7 @@ ptr != theChan->userList_end() ; ++ptr )
 		TmpGline = new ccGline(bot->SQLDb);
 		assert(TmpGline != NULL);
 		if(TmpClient->getUserName().substr(0,1) == "~")
-			TmpGline->setHost("*@" + TmpClient->getInsecureHost());
+			TmpGline->setHost("~*@" + TmpClient->getInsecureHost());
 		else
 			TmpGline->setHost("*" + TmpClient->getUserName() + "@" + TmpClient->getInsecureHost());
 		TmpGline->setExpires(::time(0) + gLength);

@@ -21,7 +21,7 @@
 #include	"gline.h"
 #include 	"time.h"
 
-const char GCHANCommand_cc_rcsId[] = "$Id: GCHANCommand.cc,v 1.2 2001/09/26 11:42:19 mrbean_ Exp $";
+const char GCHANCommand_cc_rcsId[] = "$Id: GCHANCommand.cc,v 1.3 2001/11/08 23:13:29 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -126,18 +126,18 @@ server->setGline( nickUserHost,
 	Reason ,
 	gLength ) ;
 
-ccGline *TmpGline = bot->findGline(st[pos]);
+ccGline *TmpGline = bot->findGline(bot->removeSqlChars(st[pos]));
 bool Up = false;
 if(TmpGline)
 	Up =  true;	
 else TmpGline = new ccGline(bot->SQLDb);
-TmpGline->setHost(st [ pos ]);
+TmpGline->setHost(bot->removeSqlChars(st [ pos ]));
 if(!isPerm)
 	TmpGline->setExpires(::time(0) + gLength);
 else
 	TmpGline->setExpires(0);
 TmpGline->setAddedBy(nickUserHost);
-TmpGline->setReason(st.assemble( pos + ResStart ));
+TmpGline->setReason(bot->removeSqlChars(st.assemble( pos + ResStart )));
 TmpGline->setAddedOn(::time(0));
 if(Up)
 	{	

@@ -15,6 +15,7 @@
 #include        <sys/socket.h>
 #include        <netinet/in.h>
 #include        <netdb.h>
+#include	<fcntl.h>
 
 #include	"client.h"
 #include	"iClient.h"
@@ -36,7 +37,7 @@
 #include	"ip.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.81 2001/11/03 01:20:53 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.82 2001/11/08 23:13:29 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -656,10 +657,16 @@ switch( theEvent )
 			if(strcasecmp(tIP,"0.0.0.0"))			
 				{
 				ccGate* tempGate = new (nothrow) ccGate(tIP,1080);
-				gatesWaitingQueue.push_back(tempGate);			
+				if(inBurst)
+					gatesWaitingQueue.push_back(tempGate);			
+				else
+					gatesWaitingQueue.push_front(tempGate);			
 				tempGate = new (nothrow) ccGate(tIP,23);
 				assert(tempGate != NULL);
-				gatesWaitingQueue.push_back(tempGate);
+				if(inBurst)
+					gatesWaitingQueue.push_back(tempGate);			
+				else
+					gatesWaitingQueue.push_front(tempGate);			
 				}			
 			}
 		if(!inBurst)
@@ -1048,7 +1055,7 @@ bool ccontrol::DeleteOper (const string& Name)
 //    strstream Condition;
 //    Condition << "WHERE user_id = " << Id << ';';
 ExecStatusType status;
-ccUser* tUser = GetOper(Name.c_str());
+ccUser* tUser = GetOper(removeSqlChars(Name.c_str()));
 //Delete the user hosts
 if(tUser)
     {
@@ -1077,7 +1084,7 @@ static const char *Main = "DELETE FROM opers WHERE lower(user_name) = '";
 
 strstream theQuery;
 theQuery	<< Main
-		<< Name
+		<< removeSqlChars(Name)
 		<< "'"
 		<< ends;
 
@@ -1395,7 +1402,7 @@ static const char *Main = "SELECT line,help FROM help WHERE lower(command) = '";
 
 strstream theQuery;
 theQuery	<< Main
-		<< string_lower(command)
+		<< string_lower(removeSqlChars(command))
 		<< "' and lower(subcommand) = "
 		<< "NULL"
 		<< " ORDER BY line"
@@ -1437,9 +1444,9 @@ static const char *Main = "SELECT line,help FROM help WHERE lower(command) = '";
 
 strstream theQuery;
 theQuery	<< Main
-		<< string_lower(command)
+		<< string_lower(removeSqlChars(command))
 		<< "' and lower(subcommand) = '"
-		<< string_lower(subcommand)
+		<< string_lower(removeSqlChars(subcommand))
 		<< "' ORDER BY line"
 		<< ends;
 
@@ -1507,7 +1514,7 @@ ccUser* ccontrol::GetOper( const string Name)
 ccUser* tmpUser = new (std::nothrow) ccUser(SQLDb);
 assert( tmpUser != 0 ) ;
 
-if( !tmpUser->loadData(Name) )
+if( !tmpUser->loadData(removeSqlChars(Name)) )
 	{
 	delete tmpUser ; 
 	tmpUser = 0 ;
@@ -1578,7 +1585,7 @@ ccGline *theGline;
 for(glineIterator ptr = glineList.begin(); ptr != glineList.end();++ptr)
 	{
 	theGline = *ptr;
-    	if(theGline->getHost() == HostName)
+    	if((theGline->getHost() == HostName) || !(match(theGline->getHost(),HostName)))
 		if(theGline->getExpires() > ::time(0))
 			return theGline;
 	}
@@ -1645,7 +1652,7 @@ strstream theQuery;
 theQuery	<< Main
 		<< Oper->getName() 
 		<< " (" << theClient->getNickUserHost() <<")','"
-		<< buffer << "')"
+		<< removeSqlChars(buffer) << "')"
 		<< ends;
 
 elog	<< "ccontrol::DailyLog> "
@@ -2036,8 +2043,6 @@ if( PGRES_TUPLES_OK != status )
 	return false;
 	}
 
-// BUG: This should crash, if only this variable was initialized
-// as it should be!
 ccGline *tempGline = NULL;
 
 inRefresh = true;
@@ -2081,7 +2086,7 @@ int Exception = userMaxConnection;
 
 for(exceptionIterator ptr = exception_begin();ptr != exception_end();ptr++)
 	{
-	if(*(*ptr) == Host)
+	if((*(*ptr) == Host) || !(match((*ptr)->getHost(),Host)))
 		{
 		if((*ptr)->getConnections() > Exception)
 			{
@@ -2137,7 +2142,7 @@ if(isException(Host))
 ccException* tempException = new (std::nothrow) ccException(SQLDb);
 assert(tempException != NULL);
 
-tempException->setHost(Host);
+tempException->setHost(removeSqlChars(Host));
 tempException->setConnections(Connections);
 tempException->setAddedBy(theClient->getNickUserHost());
 tempException->setAddedOn(::time(0));
@@ -2156,7 +2161,7 @@ return true;
 bool ccontrol::delException( iClient *theClient , const string &Host )
 {
 
-if(!isException(Host))
+if(!isException(removeSqlChars(Host)))
 	{
 	Notice(theClient,"Cant find exception for host %s",Host.c_str());
 	return true;
@@ -2166,7 +2171,7 @@ ccException *tempException = NULL;
 for(exceptionIterator ptr = exception_begin();ptr != exception_end();)
 	{
 	tempException = *ptr;
-	if(*tempException == Host)
+	if(*tempException == removeSqlChars(Host))
 		{
 		bool status = tempException->Delete();
 		ptr = exceptionList.erase(ptr);
@@ -2423,16 +2428,6 @@ void ccontrol::listServers( iClient * )
 
 }
 
-/*unsigned int ccontrol::getTrueAccess( unsigned int Access )
-{
-return (Access & ~noACCESS);
-}
-
-	
-unsigned int ccontrol::getTrueFlags( unsigned int Flags )
-{
-return (Flags & ~noFLAG);
-}*/
 
 void ccontrol::loadCommands()
 {
@@ -2665,6 +2660,36 @@ for(clonesIterator ptr = clonesQueue.begin();((ptr != clonesQueue.end()) && (Num
 	
 }
 
+const string ccontrol::removeSqlChars(const string& Msg)
+{
+string NewString;
+
+for(string::const_iterator ptr = Msg.begin(); ptr != Msg.end() ; ++ptr)
+	{
+	if(*ptr == ';')
+		{
+		NewString += ' ';
+		}
+	else if(*ptr == '\'')
+		{
+		NewString += "\\\047";
+		}
+	else if(*ptr == '\\')
+		{
+		NewString += "\\\134";
+		}
+	else
+		{
+		NewString += *ptr;
+		}
+	}
+return NewString;
+
+}
+
+		
+
+
 
 void ccontrol::GatesCheck()
 {
@@ -2689,14 +2714,16 @@ for(ptr = gatesCheckingQueue.begin();ptr!=gatesCheckingQueue.end();)
 	}
 
 int LeftThreads = maxThreads - gatesCheckingQueue.size();
-
+//MsgChanLog("Left threads is %d",LeftThreads);
 ptr = gatesWaitingQueue.begin();
 int er;
 pthread_t tId; 
-for(;(!(gatesWaitingQueue.empty()) && (LeftThreads));--LeftThreads)
+for(;(!(gatesWaitingQueue.empty()) && (LeftThreads > 0));--LeftThreads)
 	{
 	tmpGate = gatesWaitingQueue.front();
-	gatesWaitingQueue.pop_front();
+	//gatesWaitingQueue.pop_front();
+	gatesWaitingQueue.erase(gatesWaitingQueue.begin());
+	//MsgChanLog("After %d\n",gatesWaitingQueue.size());
 	gatesCheckingQueue.push_back(tmpGate);
 	if((er = pthread_create(&tId,NULL,initGate,(void *)tmpGate)) < 0)
 		{
@@ -2717,8 +2744,11 @@ void *initGate(void* arg)
 
 ccGate * tmpGate = (ccGate*) arg;
 
-int sockFd;
-fd_set ReadSet;
+
+int sockFd,conRet;
+fd_set ReadSet,WriteSet;
+bool error = false;
+int tError = 0;
 char Buf[512] = {0};
 struct sockHead{
     char Version; //Socks version number
@@ -2727,6 +2757,14 @@ struct sockHead{
     char destIp[4]; //Destination ip 
     char userid[5]; //Userid
     };
+struct tval{
+    long int secs;
+    long int milsecs;
+};
+timeval Timeout;
+Timeout.tv_sec = 3;
+Timeout.tv_usec = 0;
+
 sockHead sockHeader;
 sockHeader.Version = 4;
 sockHeader.Command = 1;
@@ -2743,8 +2781,32 @@ MyAddr.sin_family = AF_INET;
 MyAddr.sin_port = htons(Port);
 MyAddr.sin_addr.s_addr = inet_addr(Host.c_str());
 sockFd = socket(AF_INET,SOCK_STREAM,0);
-if(::connect(sockFd,(struct sockaddr*) &MyAddr,sizeof(MyAddr))>= 0)
+int sockFlags = fcntl(sockFd,F_GETFL,0);
+fcntl(sockFd,F_SETFL,sockFlags | O_NONBLOCK);
+if((conRet = ::connect(sockFd,(struct sockaddr*) &MyAddr,sizeof(MyAddr)))< 0)
+        if(errno != EINPROGRESS)
+                error = true;
+        else if(conRet != 0)  
+                {
+		FD_ZERO(&ReadSet);
+                FD_SET(sockFd,&ReadSet);
+                WriteSet = ReadSet;
+		if((conRet = select(sockFd+1,&ReadSet,&WriteSet,NULL,&Timeout)) == 0)
+			{
+			error = true;
+			}
+		else if(FD_ISSET(sockFd,&ReadSet) || FD_ISSET(sockFd,&WriteSet))
+			{
+			socklen_t len = sizeof(tError);
+			if(getsockopt(sockFd,SOL_SOCKET,SO_ERROR,&tError,&len) < 0)
+				error = true;
+			}
+		else
+			error = true;
+		}
+if((!error) && !(tError))
 	{
+	fcntl(sockFd,F_SETFL,sockFlags);
 	tmpGate->setStatus(ccGate::statConnected);
 	int Res = 0;
 	if(tmpGate->getPort() == 1080)
@@ -2760,7 +2822,8 @@ if(::connect(sockFd,(struct sockaddr*) &MyAddr,sizeof(MyAddr))>= 0)
 		{
 		FD_ZERO(&ReadSet);
 		FD_SET(sockFd,&ReadSet);
-		Res = ::select(sockFd+1,&ReadSet,NULL,NULL,NULL);
+		
+		Res = ::select(sockFd+1,&ReadSet,NULL,NULL,&Timeout);
 		if(Res >= 0)
 			{
 			if(FD_ISSET(sockFd,&ReadSet))
@@ -2784,8 +2847,9 @@ if(::connect(sockFd,(struct sockaddr*) &MyAddr,sizeof(MyAddr))>= 0)
 			}
 		}
 	}
+close(sockFd);		
 tmpGate->setStatus(ccGate::statDone);
-
+pthread_exit(NULL);
 return NULL;
 }
 

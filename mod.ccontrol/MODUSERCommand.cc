@@ -14,7 +14,7 @@
 #include	"ccUser.h"
 #include	"misc.h"
 
-const char MODUSERCommand_cc_rcsId[] = "$Id: MODUSERCommand.cc,v 1.4 2001/09/26 11:42:19 mrbean_ Exp $";
+const char MODUSERCommand_cc_rcsId[] = "$Id: MODUSERCommand.cc,v 1.5 2001/11/08 23:13:29 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -40,7 +40,7 @@ if(st[1].size() > 64)
 	return false;
 	}
 
-ccUser* tmpUser = bot->GetOper(st[1]);
+ccUser* tmpUser = bot->GetOper(bot->removeSqlChars(st[1]));
 
 if(!tmpUser)
 	{
@@ -112,7 +112,7 @@ while(pos < st.size())
 			{
 			bot->Notice(theClient,"%s already got the host %s",st[1].c_str(),st[pos+1].c_str());
 			}
-		else if(bot->AddHost(tmpUser,st[pos+1]))
+		else if(bot->AddHost(tmpUser,bot->removeSqlChars(st[pos+1])))
 			{
 			bot->Notice(theClient,"Mask %s added for %s",st[pos+1].c_str(),st[1].c_str());
 			}
@@ -134,11 +134,11 @@ while(pos < st.size())
 			bot->Notice(theClient,"Hostname can't be more than 128 chars");
 			return false;
 			}
-		if(!bot->UserGotHost(tmpUser,st[pos+1]))
+		if(!bot->UserGotHost(tmpUser,bot->removeSqlChars(st[pos+1])))
 			{
 			bot->Notice(theClient,"%s doesnt havee the host %s in my access list",st[1].c_str(),st[pos+1].c_str());
 			}
-		else if(bot->DelHost(tmpUser,st[pos+1]))
+		else if(bot->DelHost(tmpUser,bot->removeSqlChars(st[pos+1])))
 			{
 			bot->Notice(theClient,"Mask %s was deleted from %s access list",st[pos+1].c_str(),st[1].c_str());
 			}
@@ -199,7 +199,7 @@ while(pos < st.size())
 			}
 		else
 			{
-			tmpUser->setServer(st[pos+1]);
+			tmpUser->setServer(bot->removeSqlChars(st[pos+1]));
 			tmpUser->setLast_Updated_By(theClient->getNickUserHost());
 			if(tmpUser->Update())
 				{
@@ -317,14 +317,14 @@ while(pos < st.size())
 		pos+=2;
 		}
 		
-	else if(!strcasecmp(st[pos],"-e")) //Trying to toggle the get of logs
+	else if(!strcasecmp(st[pos],"-e")) //Trying to change email
 		{
 		if((pos + 1) >= st.size())
 			{
 			bot->Notice(theClient,"-e option must get an email addy");
 			return false;
 			}
-		tmpUser->setEmail(st[pos+1]);
+		tmpUser->setEmail(bot->removeSqlChars(st[pos+1]));
 		if(tmpUser->Update())
 			{
 			bot->Notice(theClient,"Successfully updated %s email address",st[1].c_str());

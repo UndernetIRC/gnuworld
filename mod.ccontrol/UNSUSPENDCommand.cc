@@ -12,7 +12,7 @@
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 
-const char UNSUSPENDCommand_cc_rcsId[] = "$Id: UNSUSPENDCommand.cc,v 1.3 2001/09/30 20:26:44 mrbean_ Exp $";
+const char UNSUSPENDCommand_cc_rcsId[] = "$Id: UNSUSPENDCommand.cc,v 1.4 2001/11/08 23:13:29 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -34,7 +34,7 @@ if( st.size() < 2 )
 
 //Fetch the user record from the database	
 //ccUser *tmpUser = bot->GetUser(st[1]);
-ccUser* tmpUser = bot->GetOper(st[1]);
+ccUser* tmpUser = bot->GetOper(bot->removeSqlChars(st[1]));
 
 if(!tmpUser)
 	{

@@ -1,10 +1,10 @@
-dnl $Id: configure.in,v 1.35 2001/11/03 12:15:20 mrbean_ Exp $
+dnl $Id: configure.in,v 1.36 2001/11/08 23:13:27 mrbean_ Exp $
 dnl ----------------------------------------------------------
 
 echo Configuring GNUWorld...
 echo
 
-AC_REVISION($Revision: 1.35 $)
+AC_REVISION($Revision: 1.36 $)
 AC_INIT(src/main.cc)
 AM_INIT_AUTOMAKE(gnuworld,0.0)
 AM_CONFIG_HEADER(include/defs.h)
@@ -32,26 +32,33 @@ AM_PROG_LIBTOOL
 dnl Configure libltdl
 AC_CONFIG_SUBDIRS(libltdl)
 
-pthread_found=no
-AC_CHECK_LIB(lthread, pthread_create, pthread_found=yes)
+AC_SUBST(threadLib)
+threadLib=no
 
-if test $pthread_found = no; then
-AC_CHECK_LIB(pthread, pthread_create, pthread_found=yes)
+AC_CHECK_LIB(lthread, pthread_create, threadLib=-lpthread)
+
+if [test "$threadLib" = no]; then
+AC_CHECK_LIB(pthread, pthread_create, threadLib=-pthread)
 fi
 
-if test $pthread_found = no; then
-AC_CHECK_LIB(c, pthread_create, pthread_found=yes)
+if [test "$threadLib" = no]; then
+AC_CHECK_LIB(c, pthread_create, threadLib=-pthread)
 fi
 
-if test $pthread_found = no; then
-AC_CHECK_LIB(c_r, pthread_create)
+if [test "$threadLib" = no]; then
+AC_CHECK_LIB(c_r, pthread_create, threadLib=-pthread)
+fi
+
+if [test "$threadLib" = no]; then
+AC_MSG_RESULT([Unable to locate pthread_create in any library])
+else
+AC_MSG_RESULT([Found pthread_create in $threadLib adding to libs])
+LIBS=$threadLib
 fi
 
 CFLAGS="-Wall -pipe"
 CXXFLAGS="-Wall -pipe"
 CXX="g++"
-LIBS=""
-
 libdir="`pwd`/bin"
 bindir="`pwd`/bin"
 glibdir="`pwd`/lib"

@@ -84,6 +84,7 @@ SRC_PATH = @SRC_PATH@
 VERSION = @VERSION@
 bindir = @bindir@
 glibdir = @glibdir@
+threadLib = @threadLib@
 
 bin_PROGRAMS = gnuworld
 

@@ -19,7 +19,7 @@
 #include	"Gline.h"
 #include	"gline.h"
 
-const char FORCEGLINECommand_cc_rcsId[] = "$Id: FORCEGLINECommand.cc,v 1.11 2001/09/26 11:42:19 mrbean_ Exp $";
+const char FORCEGLINECommand_cc_rcsId[] = "$Id: FORCEGLINECommand.cc,v 1.12 2001/11/08 23:13:29 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -237,10 +237,10 @@ bool Up = false;
 if(TmpGline)
 	Up =  true;	
 else TmpGline = new ccGline(bot->SQLDb);
-TmpGline->setHost(st [ pos ]);
+TmpGline->setHost(bot->removeSqlChars(st [ pos ]));
 TmpGline->setExpires(::time(0) + gLength);
 TmpGline->setAddedBy(nickUserHost);
-TmpGline->setReason(st.assemble( pos + ResStart ));
+TmpGline->setReason(bot->removeSqlChars(st.assemble( pos + ResStart )));
 TmpGline->setAddedOn(::time(0));
 
 if(Up)

@@ -84,6 +84,7 @@ SRC_PATH = @SRC_PATH@
 VERSION = @VERSION@
 bindir = @bindir@
 glibdir = @glibdir@
+threadLib = @threadLib@
 
 noinst_LTLIBRARIES = libgnuworld.la
 libgnuworld_la_SOURCES = Buffer.cc 	ClientSocket.cc 	EConfig.cc 	ELog.cc 	FileSocket.cc 	Socket.cc 	StringTokenizer.cc 	match.cc 	md5hash.cc 	misc.cc

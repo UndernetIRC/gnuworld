@@ -13,7 +13,7 @@
 #include	"StringTokenizer.h"
 #include	"ccUser.h"
 
-const char SUSPENDCommand_cc_rcsId[] = "$Id: SUSPENDCommand.cc,v 1.3 2001/09/30 20:26:44 mrbean_ Exp $";
+const char SUSPENDCommand_cc_rcsId[] = "$Id: SUSPENDCommand.cc,v 1.4 2001/11/08 23:13:29 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -33,7 +33,7 @@ if( st.size() < 4 )
 	return true;
 	}
 //Fetch the oper record from the database	
-ccUser* tmpUser = bot->GetOper(st[1]);
+ccUser* tmpUser = bot->GetOper(bot->removeSqlChars(st[1]));
 
 if(!tmpUser)
 	{
@@ -141,7 +141,7 @@ tmpUser->setSuspendExpires(Len + time( 0 ));
 tmpUser->setSuspendedBy(theClient->getNickUserHost());	    
 tmpUser->setIsSuspended(true);
 tmpUser->setSuspendLevel(Level);
-tmpUser->setSuspendReason(st.assemble(ResPos));	
+tmpUser->setSuspendReason(bot->removeSqlChars(st.assemble(ResPos)));	
 if(tmpUser->Update())
 	{
 	bot->Notice(theClient,"%s has been suspended",st[1].c_str());

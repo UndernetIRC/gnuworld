@@ -84,6 +84,7 @@ SRC_PATH = @SRC_PATH@
 VERSION = @VERSION@
 bindir = @bindir@
 glibdir = @glibdir@
+threadLib = @threadLib@
 SUBDIRS = lib libltdl db src @MOD_DIRS@
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs

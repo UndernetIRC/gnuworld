@@ -21,7 +21,7 @@
 #include	"misc.h"
 #include	"commLevels.h"
 
-const char ADDUSERCommand_cc_rcsId[] = "$Id: ADDUSERCommand.cc,v 1.4 2001/09/30 20:26:44 mrbean_ Exp $";
+const char ADDUSERCommand_cc_rcsId[] = "$Id: ADDUSERCommand.cc,v 1.5 2001/11/08 23:13:29 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -49,7 +49,7 @@ if(st[1].size() > 64)
 
 // Try fetching the user data from the database, note this is
 // the new user handle
-ccUser* theUser = bot->GetOper(st[1]);
+ccUser* theUser = bot->GetOper(bot->removeSqlChars(st[1]));
 
 if (theUser)  
 	{ 

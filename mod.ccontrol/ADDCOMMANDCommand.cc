@@ -16,7 +16,7 @@
 #include	"AuthInfo.h"
 #include	"misc.h"
 
-const char ADDCOMMANDCommand_cc_rcsId[] = "$Id: ADDCOMMANDCommand.cc,v 1.15 2001/07/30 16:58:39 mrbean_ Exp $";
+const char ADDCOMMANDCommand_cc_rcsId[] = "$Id: ADDCOMMANDCommand.cc,v 1.16 2001/11/08 23:13:29 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -55,7 +55,7 @@ if(st[pos].size() > 64)
 	return false;
 	}
 
-ccUser* theUser = bot->GetOper(st[pos]);
+ccUser* theUser = bot->GetOper(bot->removeSqlChars(st[pos]));
 	
 if( !theUser )
 	{	

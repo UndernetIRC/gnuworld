@@ -12,7 +12,7 @@
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 
-const char LISTHOSTSCommand_cc_rcsId[] = "$Id: LISTHOSTSCommand.cc,v 1.4 2001/07/23 10:28:51 mrbean_ Exp $";
+const char LISTHOSTSCommand_cc_rcsId[] = "$Id: LISTHOSTSCommand.cc,v 1.5 2001/11/08 23:13:29 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -33,7 +33,7 @@ if( st.size() < 2 )
 	}
 //Fetch the oper data base entry
 //ccUser *tmpUser = bot->GetUser(st[1]);
-ccUser* tmpUser = bot->GetOper(st[1]);
+ccUser* tmpUser = bot->GetOper(bot->removeSqlChars(st[1]));
 
 if(!tmpUser)
 	{

@@ -13,7 +13,7 @@
 #include	"StringTokenizer.h"
 #include	"Network.h"
 
-const char REMSERVERCommand_cc_rcsId[] = "$Id: REMSERVERCommand.cc,v 1.1 2001/07/26 20:12:40 mrbean_ Exp $";
+const char REMSERVERCommand_cc_rcsId[] = "$Id: REMSERVERCommand.cc,v 1.2 2001/11/08 23:13:29 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -36,7 +36,7 @@ if( st.size() < 2 )
 ccServer* NewServer = new ccServer(bot->SQLDb);
 assert(NewServer != NULL);
 
-if(!NewServer->loadData(st [ 1 ])) //Check if the server is already in the database
+if(!NewServer->loadData(bot->removeSqlChars(st [ 1 ]))) //Check if the server is already in the database
 	{
 	bot->Notice(theClient, "Server %s is not  in my database!\n",st [ 1 ].c_str());
 	delete NewServer;

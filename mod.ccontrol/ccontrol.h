@@ -3,7 +3,7 @@
  */
 
 #ifndef __CCONTROL_H
-#define __CCONTROL_H "$Id: ccontrol.h,v 1.45 2001/11/03 01:13:06 mrbean_ Exp $"
+#define __CCONTROL_H "$Id: ccontrol.h,v 1.46 2001/11/08 23:13:29 mrbean_ Exp $"
 
 
 #include	<string>
@@ -555,6 +555,8 @@ public:
 	void checkClones(const int);
 	
 	void GatesCheck();
+	
+	const string removeSqlChars(const string&);
 	
 //	void *initGate(void *);
 	

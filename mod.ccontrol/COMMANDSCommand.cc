@@ -16,7 +16,7 @@
 #include	"AuthInfo.h"
 #include	"misc.h"
 
-const char COMMANDSCommand_cc_rcsId[] = "$Id: COMMANDSCommand.cc,v 1.3 2001/07/30 16:58:39 mrbean_ Exp $";
+const char COMMANDSCommand_cc_rcsId[] = "$Id: COMMANDSCommand.cc,v 1.4 2001/11/08 23:13:29 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -180,7 +180,7 @@ else if(!strcasecmp(st[1],"-na"))
 		bot->Notice(theClient,"the command is already called like that");
 		return false;
 		}
-	Comm->setName(string_upper(st[3]));
+	Comm->setName(string_upper(bot->removeSqlChars(st[3])));
 	if(!bot->updateCommand(Comm))
 		{
 		bot->Notice(theClient,"error while changing command name");

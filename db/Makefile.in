@@ -84,6 +84,7 @@ SRC_PATH = @SRC_PATH@
 VERSION = @VERSION@
 bindir = @bindir@
 glibdir = @glibdir@
+threadLib = @threadLib@
 
 lib_LTLIBRARIES = libgnuworld_db.la
 libgnuworld_db_la_SOURCES = gnuworldDB.cc

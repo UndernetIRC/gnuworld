@@ -13,7 +13,7 @@
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 
-const char REMUSERCommand_cc_rcsId[] = "$Id: REMUSERCommand.cc,v 1.2 2001/09/02 17:13:15 dan_karrels Exp $";
+const char REMUSERCommand_cc_rcsId[] = "$Id: REMUSERCommand.cc,v 1.3 2001/11/08 23:13:29 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -32,7 +32,7 @@ if( st.size() < 2 )
 	return true;
 	}
 //Fetch the user record from the database
-ccUser* theUser = bot->GetOper(st[1]);
+ccUser* theUser = bot->GetOper(bot->removeSqlChars(st[1]));
 if (!theUser) 
 	{ 
 	bot->Notice(theClient,"Oper %s does not exists db," 

@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-# "$Id: Makefile.am,v 1.29 2001/11/03 12:15:21 mrbean_ Exp $"
+# "$Id: Makefile.am,v 1.30 2001/11/08 23:13:29 mrbean_ Exp $"
 
 lib_LTLIBRARIES = libccontrol.la
 libccontrol_la_SOURCES = ccontrol.cc \
@@ -61,5 +61,5 @@ libccontrol_la_SOURCES = ccontrol.cc \
 
 libccontrol_la_LDFLAGS = -module -export-dynamic -L@PGSQL_LIB@ -lpq++ 
 INCLUDES = -I@PGSQL_INCLUDE@ $(INCLTDL)
-CFLAGS = @CFLAGS@ -pthread
-CXXFLAGS = @CXXFLAGS@ -pthread
+CFLAGS = @CFLAGS@ -D_THREAD_SAFE
+CXXFLAGS = @CXXFLAGS@ -D_THREAD_SAFE

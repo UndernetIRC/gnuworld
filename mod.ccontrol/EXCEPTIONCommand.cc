@@ -12,7 +12,7 @@
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 
-const char EXCEPTIONCommand_cc_rcsId[] = "$Id: EXCEPTIONCommand.cc,v 1.6 2001/09/26 11:42:19 mrbean_ Exp $";
+const char EXCEPTIONCommand_cc_rcsId[] = "$Id: EXCEPTIONCommand.cc,v 1.7 2001/11/08 23:13:29 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -76,7 +76,7 @@ else if(!strcasecmp(st[1].c_str(),"del")) //Trying to add an exception?
 		}
 	else
 		{
-		if(!bot->delException(theClient,st[2]))
+		if(!bot->delException(theClient,bot->removeSqlChars(st[2])))
 			{
 			bot->Notice(theClient,"Error while deleting exception for host %s",st[2].c_str());
 			}

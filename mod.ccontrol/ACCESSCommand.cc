@@ -14,7 +14,7 @@
 #include	"ccontrol.h"
 #include	"CControlCommands.h"
 
-const char ACCESSCommand_cc_rcsId[] = "$Id: ACCESSCommand.cc,v 1.11 2001/07/30 16:58:39 mrbean_ Exp $";
+const char ACCESSCommand_cc_rcsId[] = "$Id: ACCESSCommand.cc,v 1.12 2001/11/08 23:13:29 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -45,7 +45,7 @@ if(st.size() > 1)
 		bot->Notice(theClient,"Oper name can't be more than 64 chars");
 		return false;
 		}
-	Uname = "Where lower(user_name) = '" +  string_lower(st[1]) + "'\n";
+	Uname = "Where lower(user_name) = '" +  string_lower(bot->removeSqlChars(st[1])) + "'\n";
 	}
 else
 	{

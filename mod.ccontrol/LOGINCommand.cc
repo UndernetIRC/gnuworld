@@ -13,7 +13,7 @@
 #include	"md5hash.h" 
 #include        "ccUser.h"
 
-const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.15 2001/09/26 11:42:19 mrbean_ Exp $";
+const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.16 2001/11/08 23:13:29 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -44,7 +44,7 @@ if (tmpUser)
 	 *  Find the user record, confirm authorisation and attach the record to this client. 
 	 */
  
-ccUser* theUser = bot->GetOper(st[1]);
+ccUser* theUser = bot->GetOper(bot->removeSqlChars(st[1]));
 if (!theUser) 
 	{
 	bot->Notice(theClient, "Sorry, I don't know who %s is.", st[1].c_str());

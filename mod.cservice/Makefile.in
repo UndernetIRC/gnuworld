@@ -10,7 +10,7 @@
 # even the implied warranty of MERCHANTABILITY or FITNESS FOR A
 # PARTICULAR PURPOSE.
 
-# "$Id: Makefile.in,v 1.100 2001/11/03 01:13:06 mrbean_ Exp $"
+# "$Id: Makefile.in,v 1.101 2001/11/08 23:13:29 mrbean_ Exp $"
 
 
 SHELL = @SHELL@
@@ -86,6 +86,7 @@ SRC_PATH = @SRC_PATH@
 VERSION = @VERSION@
 bindir = @bindir@
 glibdir = @glibdir@
+threadLib = @threadLib@
 
 lib_LTLIBRARIES = libcservice.la
 libcservice_la_LDFLAGS = -module -export-dynamic -L@PGSQL_LIB@ 	-lpq++
