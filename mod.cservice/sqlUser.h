@@ -1,7 +1,7 @@
 /* sqlUser.h */
 
 #ifndef __SQLUSER_H
-#define __SQLUSER_H "$Id: sqlUser.h,v 1.23 2001/10/07 23:22:17 gte Exp $"
+#define __SQLUSER_H "$Id: sqlUser.h,v 1.24 2001/10/07 23:47:58 gte Exp $"
 
 #include	<string>
 #include	<ctime>
@@ -33,6 +33,8 @@ public:
 
 	static const unsigned int	EV_SUSPEND;
 	static const unsigned int	EV_UNSUSPEND;
+	static const unsigned int	EV_ADMINMOD;
+	static const unsigned int	EV_MISC;
 	static const unsigned int	EV_COMMENT;
 
 	/*
