@@ -27,7 +27,7 @@
 #include	"events.h"
 
 const char xClient_h_rcsId[] = __XCLIENT_H ;
-const char xClient_cc_rcsId[] = "$Id: client.cc,v 1.17 2000/12/23 15:01:58 dan_karrels Exp $" ;
+const char xClient_cc_rcsId[] = "$Id: client.cc,v 1.18 2000/12/24 16:33:35 gte Exp $" ;
 
 using std::string ;
 using std::strstream ;
@@ -541,12 +541,41 @@ bool xClient::Op( Channel* theChan, const vector< iClient* >& theClients )
 #ifndef NDEBUG
   assert( theChan != NULL ) ;
 #endif
+	unsigned short counter = 0;
 
 if( !Connected )
 	{
 	return false ;
 	}
-
+ 
+string opList;    // Stack of numerics we're opping.
+string paramList; // To build up our "+ooo"'s.
+ 
+for( vector< iClient* >::const_iterator ptr = theClients.begin(); ptr != theClients.end() ; ++ptr )
+	{ 
+		ChannelUser* theUser = theChan->findUser( *ptr );
+		if(theUser) // If on Channel.
+		{
+			opList += " " + (*ptr)->getCharYYXXX();
+			paramList += "o";
+			theUser->setMode( ChannelUser::MODE_O ) ;
+			counter++;
+			
+			if ((counter == 6) || (counter == theClients.size()))
+			{
+				strstream s ;
+				s	<< getCharYYXXX() << " M "
+					<< theChan->getName() << " +" << paramList
+					<< opList << ends ;
+				Write( s ) ;
+				delete[] s.str() ;
+				opList = "";
+				paramList = "";
+				counter = 0;
+			} 
+		} 
+	}
+ 
 return true ;
 }
 
