@@ -1790,7 +1790,7 @@ if (!notify)
 		<< "'"
 		<< endl;
 #endif
-
+ 
 // Check we aren't getting our own updates.
 if (notify->be_pid == SQLDb->getPID())
 	{
@@ -1805,6 +1805,9 @@ if (notify->be_pid == SQLDb->getPID())
 	free(notify); 
 	return;
 	}
+
+logDebugMessage("Recieved a notification event for '%s' from backend PID %i.",
+	notify->relname, notify->be_pid);
 
 assert( notify->relname != 0 ) ;
 string relname( notify->relname ) ;
@@ -1884,6 +1887,9 @@ if (status != PGRES_TUPLES_OK)
 		<< " updated records."
 		<< endl;
 #endif
+
+logDebugMessage("Found %i updated records.",
+	SQLDb->Tuples());
 
 /*
  *  Now, update the cache with information in this results set.
