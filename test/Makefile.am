@@ -1,7 +1,8 @@
 ## Process this file with automake to produce Makefile.in
-## $Id: Makefile.am,v 1.10 2003/06/28 01:47:11 dan_karrels Exp $
+## $Id: Makefile.am,v 1.11 2003/07/20 21:56:30 dan_karrels Exp $
 
-noinst_PROGRAMS = test_stringtokenizer \
+noinst_PROGRAMS = test_mtrie \
+	test_stringtokenizer \
 	test_econfig \
 	test_gThread \
 	test_signal \
@@ -9,6 +10,8 @@ noinst_PROGRAMS = test_stringtokenizer \
 	test_bot \
 	test_kick_transaction
 LDADD = $(glibdir)/libgnuworld.la
+
+test_mtrie_SOURCES = mtrie.cc
 
 test_stringtokenizer_SOURCES = stringtokenizer.cc
 test_stringtokenizer_DEPENDENCIES = $(glibdir)/libgnuworld.la

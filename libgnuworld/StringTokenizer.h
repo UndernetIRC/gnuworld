@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: StringTokenizer.h,v 1.3 2002/11/29 19:30:02 dan_karrels Exp $
+ * $Id: StringTokenizer.h,v 1.4 2003/07/20 21:56:28 dan_karrels Exp $
  */
 
 #ifndef __STRINGTOKENIZER_H
-#define __STRINGTOKENIZER_H "$Id: StringTokenizer.h,v 1.3 2002/11/29 19:30:02 dan_karrels Exp $"
+#define __STRINGTOKENIZER_H "$Id: StringTokenizer.h,v 1.4 2003/07/20 21:56:28 dan_karrels Exp $"
 
 #include	<vector>
 #include	<string>
@@ -141,6 +141,12 @@ public:
 	typedef vectorType::const_iterator const_iterator ;
 
 	/**
+	 * The immutable reverse iterator type to use for walking through
+	 * this object's tokens, in reverse.
+	 */
+	typedef vectorType::const_reverse_iterator const_reverse_iterator ;
+
+	/**
 	 * Retrieve an immutable iterator to the beginning of this
 	 * object's token structure.
 	 */
@@ -153,6 +159,20 @@ public:
 	 */
 	inline const_iterator	end() const
 		{ return array.end() ; }
+
+	/**
+	 * Retrieve an immutable reverse iterator to the
+	 * reverse beginning of this object's token structure.
+	 */
+	inline const_reverse_iterator	rbegin() const
+		{ return array.rbegin() ; }
+
+	/**
+	 * Retrieve an immutable reverse iterator to the reverse
+	 * end of this object's token structure.
+	 */
+	inline const_reverse_iterator	rend() const
+		{ return array.rend() ; }
 
 	/**
 	 * Return the total number of characters for all tokens,
