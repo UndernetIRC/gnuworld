@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------------
--- "$Id: cservice.sql,v 1.18 2001/01/22 20:17:18 gte Exp $"
+-- "$Id: cservice.sql,v 1.19 2001/01/28 18:52:07 gte Exp $"
 -- Channel service DB SQL file for PostgreSQL.
 
 -- ChangeLog:
@@ -99,8 +99,13 @@ CREATE TABLE channels (
 	registered_ts INT4,
 	channel_ts INT4 NOT NULL,
 	channel_mode VARCHAR(26), 
-	channel_key VARCHAR(24),
-	channel_limit INT4,
+
+-- USERFLAGS: Defaults new access records to:
+-- 0: No Default
+-- 1: AutoOP
+-- 2: AutoVOICE
+
+	userflags INT2 DEFAULT '0',
 	last_updated INT4 NOT NULL,
 	deleted INT2 DEFAULT '0',
 
