@@ -1,7 +1,7 @@
 /**
  * MTrie.cc
  *
- * $Id: MTrie.cc,v 1.9 2003/07/29 04:43:50 dan_karrels Exp $
+ * $Id: MTrie.cc,v 1.10 2003/08/01 01:06:33 dan_karrels Exp $
  */
 
 #include	<map>
@@ -330,25 +330,30 @@ void MTrie< _valueT >::recursiveFind(
 //	<< endl ;
 
 // '*'
-string stringBase = getBase( base ) ;
-if( !match( key, stringBase ) )
+// No need to create a new string and perform a match
+// if this node has no values
+if( !currentNode->valuesList.empty() )
 	{
-//	clog	<< "MTrie::recursiveFind> match"
-//		<< endl ;
-
-	// This node matches
-	for( const_values_iterator vItr = 
-		currentNode->valuesList.begin() ;
-		vItr != currentNode->valuesList.end() ;
-		++vItr )
+	string stringBase = getBase( base ) ;
+	if( !match( key, stringBase ) )
 		{
-//		clog	<< "MTrie::recursiveFind> vItr: "
-//			<< *vItr
-//			<< endl ;
-		value_type addMe( getBase( base ), *vItr ) ;
-		returnMe.push_back( addMe ) ;
-		} // for( vItr )
-	} // if( !match() )
+	//	clog	<< "MTrie::recursiveFind> match"
+	//		<< endl ;
+
+		// This node matches
+		for( const_values_iterator vItr = 
+			currentNode->valuesList.begin() ;
+			vItr != currentNode->valuesList.end() ;
+			++vItr )
+			{
+	//		clog	<< "MTrie::recursiveFind> vItr: "
+	//			<< *vItr
+	//			<< endl ;
+			value_type addMe( getBase( base ), *vItr ) ;
+			returnMe.push_back( addMe ) ;
+			} // for( vItr )
+		} // if( !match() )
+	} // if( !empty() )
 
 for( const_nodes_iterator nItr = currentNode->nodesMap.begin() ;
 	nItr != currentNode->nodesMap.end() ; ++nItr )
