@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ServerTimerHandlers.cc,v 1.9 2003/08/09 23:15:36 dan_karrels Exp $
+ * $Id: ServerTimerHandlers.cc,v 1.10 2004/05/19 19:46:36 jeekay Exp $
  */
 
 #include	<string>
@@ -29,14 +29,14 @@
 #include	"ELog.h"
 #include	"config.h"
 
-RCSTAG( "$Id: ServerTimerHandlers.cc,v 1.9 2003/08/09 23:15:36 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: ServerTimerHandlers.cc,v 1.10 2004/05/19 19:46:36 jeekay Exp $" ) ;
 
 namespace gnuworld
 {
 
 using std::string ;
 
-void GlineUpdateTimer::OnTimer( timerID, void* )
+void GlineUpdateTimer::OnTimer( const timerID& , void* )
 {
 // Remove any expired glines
 theServer->updateGlines() ;
@@ -45,7 +45,7 @@ theServer->updateGlines() ;
 theServer->RegisterTimer( ::time( 0 ) + updateInterval, this, 0 ) ;
 }
 
-void PINGTimer::OnTimer( timerID, void* )
+void PINGTimer::OnTimer( const timerID& , void* )
 {
 string writeMe( theServer->getCharYY() ) ;
 writeMe += " G :I am the King, bow before me!\n" ;

@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: client.cc,v 1.70 2004/02/04 14:47:26 denspike Exp $
+ * $Id: client.cc,v 1.71 2004/05/19 19:46:36 jeekay Exp $
  */
 
 #include	<new>
@@ -49,7 +49,7 @@
 #include	"ELog.h"
 #include	"events.h"
 
-RCSTAG("$Id: client.cc,v 1.70 2004/02/04 14:47:26 denspike Exp $" ) ;
+RCSTAG("$Id: client.cc,v 1.71 2004/05/19 19:46:36 jeekay Exp $" ) ;
 
 namespace gnuworld
 {
@@ -82,9 +82,8 @@ Mode( conf.Require( "mode" )->second ) ;
 xClient::~xClient()
 {}
 
-bool xClient::BurstChannels()
+void xClient::BurstChannels()
 {
-return true ;
 }
 
 bool xClient::BurstGlines()
@@ -2111,7 +2110,7 @@ bool xClient::removeChan( Channel* )
 return true ;
 }
 
-void xClient::OnTimer( xServer::timerID, void* )
+void xClient::OnTimer( const xServer::timerID& , void* )
 {}
 
 void xClient::OnTimerDestroy( xServer::timerID, void* )

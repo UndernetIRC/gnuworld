@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: cservice.cc,v 1.240 2003/12/29 23:59:37 dan_karrels Exp $
+ * $Id: cservice.cc,v 1.241 2004/05/19 19:46:35 jeekay Exp $
  */
 
 #include	<new>
@@ -353,7 +353,7 @@ for( commandMapType::iterator ptr = commandMap.begin() ;
 commandMap.clear() ;
 }
 
-bool cservice::BurstChannels()
+void cservice::BurstChannels()
 {
 	/*
 	 *   Need to join every channel with AUTOJOIN set. (But not * ;))
@@ -2113,7 +2113,7 @@ void cservice::updateBans()
  * control to the relevant member for the timer
  * triggered.
  */
-void cservice::OnTimer(xServer::timerID timer_id, void*)
+void cservice::OnTimer(const xServer::timerID timer_id, void*)
 {
 if (timer_id == limit_timerID)
 	{

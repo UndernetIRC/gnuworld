@@ -17,11 +17,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: cservice.h,v 1.100 2003/12/29 23:59:37 dan_karrels Exp $
+ * $Id: cservice.h,v 1.101 2004/05/19 19:46:35 jeekay Exp $
  */
 
 #ifndef __CSERVICE_H
-#define __CSERVICE_H "$Id: cservice.h,v 1.100 2003/12/29 23:59:37 dan_karrels Exp $"
+#define __CSERVICE_H "$Id: cservice.h,v 1.101 2004/05/19 19:46:35 jeekay Exp $"
 
 #include	<iostream>
 #include	<string>
@@ -116,7 +116,7 @@ public:
 	virtual ~cservice();
 
 	virtual void OnConnect();
-	virtual bool BurstChannels();
+	virtual void BurstChannels();
 	virtual void OnPrivateMessage( iClient*, const string&,
 		bool = false  );
 	virtual void OnAttach() ;
@@ -134,7 +134,7 @@ public:
                 const string& CTCP,
                 const string& Message,
                 bool Secure = false ) ;
-	virtual void OnTimer(xServer::timerID, void*);
+	virtual void OnTimer(const xServer::timerID, void*);
 	virtual bool Notice( const iClient* Target,
 		const char* Message, ... ) ;
 	virtual bool Notice( const iClient* Target, const string& ) ;

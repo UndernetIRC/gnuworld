@@ -17,11 +17,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: TimerHandler.h,v 1.5 2003/07/03 00:25:48 dan_karrels Exp $
+ * $Id: TimerHandler.h,v 1.6 2004/05/19 19:46:33 jeekay Exp $
  */
 
 #ifndef __TIMERHANDLER_H
-#define __TIMERHANDLER_H "$Id: TimerHandler.h,v 1.5 2003/07/03 00:25:48 dan_karrels Exp $"
+#define __TIMERHANDLER_H "$Id: TimerHandler.h,v 1.6 2004/05/19 19:46:33 jeekay Exp $"
 
 namespace gnuworld
 {
@@ -58,7 +58,7 @@ public:
 	 * is the argument that was passed when registering the
 	 * timer.
 	 */
-	virtual void OnTimer( timerID, void* ) = 0 ;
+	virtual void OnTimer( const timerID& , void* ) = 0 ;
 
 	/**
 	 * This method is invoked when the server removes a

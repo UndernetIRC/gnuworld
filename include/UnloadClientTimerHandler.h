@@ -17,11 +17,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: UnloadClientTimerHandler.h,v 1.6 2003/12/29 23:59:36 dan_karrels Exp $
+ * $Id: UnloadClientTimerHandler.h,v 1.7 2004/05/19 19:46:33 jeekay Exp $
  */
 
 #ifndef __UNLOADCLIENTTIMERHANDLER_H
-#define __UNLOADCLIENTTIMERHANDLER_H "$Id: UnloadClientTimerHandler.h,v 1.6 2003/12/29 23:59:36 dan_karrels Exp $"
+#define __UNLOADCLIENTTIMERHANDLER_H "$Id: UnloadClientTimerHandler.h,v 1.7 2004/05/19 19:46:33 jeekay Exp $"
 
 #include	<string>
 
@@ -73,7 +73,7 @@ public:
 	/**
 	 * The method that is called when it's time to unload the client.
 	 */
-	virtual	void	OnTimer( timerID, void* ) ;
+	virtual	void	OnTimer( const timerID& , void* ) ;
 
 } ;
 

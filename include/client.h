@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: client.h,v 1.54 2004/02/04 14:47:25 denspike Exp $
+ * $Id: client.h,v 1.55 2004/05/19 19:46:33 jeekay Exp $
  */
 
 #ifndef __CLIENT_H
-#define __CLIENT_H "$Id: client.h,v 1.54 2004/02/04 14:47:25 denspike Exp $"
+#define __CLIENT_H "$Id: client.h,v 1.55 2004/05/19 19:46:33 jeekay Exp $"
 
 #include	<sstream>
 #include	<string>
@@ -81,7 +81,7 @@ public:
 	 * This method must call xServer::BurstChannel() with appropriate
 	 * channel modes for any channel it wishes to own.
 	 */
-	virtual bool BurstChannels() ;
+	virtual void BurstChannels() ;
 
 	/**
 	 * BurstGlines is called before eob, for the client to burst
@@ -427,7 +427,7 @@ public:
 	 * This method overloads the pure virtual TimerHandler
 	 * base class method declaration.
 	 */
-	virtual void	OnTimer( xServer::timerID, void* ) ;
+	virtual void	OnTimer( const xServer::timerID& , void* ) ;
 
 	/**
 	 * A timer has been destroyed by the server (such as during

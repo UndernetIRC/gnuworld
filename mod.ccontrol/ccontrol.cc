@@ -20,7 +20,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccontrol.cc,v 1.179 2004/03/26 14:24:37 mrbean_ Exp $
+ * $Id: ccontrol.cc,v 1.180 2004/05/19 19:46:35 jeekay Exp $
 */
 
 #define MAJORVER "1"
@@ -65,7 +65,7 @@
 #include	"ip.h"
 #include	"config.h"
 
-RCSTAG( "$Id: ccontrol.cc,v 1.179 2004/03/26 14:24:37 mrbean_ Exp $" ) ;
+RCSTAG( "$Id: ccontrol.cc,v 1.180 2004/05/19 19:46:35 jeekay Exp $" ) ;
 
 namespace gnuworld
 {
@@ -825,7 +825,7 @@ commandMap.erase( ptr ) ;
 return true ;
 }
 
-bool ccontrol::BurstChannels()
+void ccontrol::BurstChannels()
 {
 // msgChan is an operChan as well, no need to burst it separately
 for( vector< string >::size_type i = 0 ; i < operChans.size() ; i++ )
@@ -1435,7 +1435,7 @@ xClient::OnChannelEvent( theEvent, theChan,
 	Data1, Data2, Data3, Data4 ) ;
 }
 
-void ccontrol::OnTimer(xServer::timerID timer_id, void*)
+void ccontrol::OnTimer(const xServer::timerID timer_id, void*)
 {
 if (timer_id ==  postDailyLog)
 	{ 
