@@ -12018,7 +12018,7 @@ fi
 
 
 echo
-echo Configuration has been finished, and everything seems to be allright
+echo Configuration has been finished, and everything seems to be all right.
 echo Now you have the chance to modify include/config.h to set your
 echo preferred options...
 echo

@@ -1,10 +1,10 @@
-dnl $Id: configure.in,v 1.56 2002/07/05 01:10:03 dan_karrels Exp $
+dnl $Id: configure.in,v 1.57 2002/07/31 22:09:00 reedloden Exp $
 dnl ----------------------------------------------------------
 
 echo Configuring GNUWorld...
 echo
 
-AC_REVISION($Revision: 1.56 $)
+AC_REVISION($Revision: 1.57 $)
 AC_INIT
 AC_CONFIG_SRCDIR([src/main.cc])
 AM_INIT_AUTOMAKE(gnuworld,0.0)
@@ -302,7 +302,7 @@ mod.stats/Makefile])
 AC_OUTPUT
 
 echo
-echo Configuration has been finished, and everything seems to be allright
+echo Configuration has been finished, and everything seems to be all right.
 echo Now you have the chance to modify include/config.h to set your
 echo preferred options...
 echo
