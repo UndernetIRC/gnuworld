@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: client.h,v 1.46 2003/11/02 18:43:34 dan_karrels Exp $
+ * $Id: client.h,v 1.47 2003/11/11 19:21:20 dan_karrels Exp $
  */
 
 #ifndef __CLIENT_H
-#define __CLIENT_H "$Id: client.h,v 1.46 2003/11/02 18:43:34 dan_karrels Exp $"
+#define __CLIENT_H "$Id: client.h,v 1.47 2003/11/11 19:21:20 dan_karrels Exp $"
 
 #include	<sstream>
 #include	<string>
@@ -319,6 +319,15 @@ public:
 		bool secure = false ) ;
 
 	/**
+	 * Invoked when a private message arives for a fake client
+	 * owned by this xClient.
+	 */
+	virtual void OnFakePrivateMessage( iClient* Sender,
+		iClient* Target,
+		const string& Message,
+		bool secure = false ) ;
+
+	/**
 	 * This method is called when a channel message occurs
 	 * in a channel in which an xClient resides, and the
 	 * xClient is user mode -d.
@@ -328,22 +337,51 @@ public:
 		const string& Message ) ;
 
 	/**
+	 * Invoked when a fake client in a channel receives
+	 * a channel message.
+	 */
+	virtual void OnFakeChannelMessage( iClient* Sender,
+		iClient* Target,
+		Channel* theChan,
+		const string& Message ) ;
+
+	/**
 	 * OnPrivateNotice is called when a NOTICE command
 	 * is issued to the client.
 	 */
 	virtual void OnPrivateNotice( iClient* Sender,
-		const string& Message, bool secure = false ) ;
+		const string& Message,
+		bool secure = false ) ;
+
+	/**
+	 * Invoked when a private notice arives for a fake client
+	 * owned by this xClient.
+	 */
+	virtual void OnFakePrivateNotice( iClient* Sender,
+		iClient* Target,
+		const string& Message,
+		bool secure = false ) ;
 
 	/**
 	 * OnChannelNotice is called when a module receives
 	 * channel notice, and is mode -d.
 	 */
 	virtual void OnChannelNotice( iClient* Sender,
-		Channel* theChan, const string& Message ) ;
+		Channel* theChan,
+		const string& Message ) ;
 
 	/**
-	 * OnServerMessage is called when a server message
-	 * a client
+	 * Invoked when a fake client in a channel receives
+	 * a channel notice.
+	 */
+	virtual void OnFakeChannelNotice( iClient* Sender,
+		iClient* Target,
+		Channel* theChan,
+		const string& Message ) ;
+
+	/**
+	 * OnServerMessage is called when a server messages
+	 * a client.
 	 */
 	virtual void OnServerMessage( iServer* Sender,
 		const string& Message, bool secure = false ) ;
@@ -358,6 +396,9 @@ public:
 	 */
 	virtual void	OnTimer( xServer::timerID, void* ) ;
 
+	/**
+	 * Remove a timer.
+	 */
 	virtual void	OnTimerDestroy( xServer::timerID, void* ) ;
 
 	/* Utility methods */
@@ -566,6 +607,11 @@ public:
 	 */
 	virtual bool Notice( const Channel* theChan,
 		const char* Message, ... ) ;
+
+	/**
+	 * This Notice() signature will send a channel NOTICE.
+	 */
+	virtual bool Notice( const Channel*, const string& ) ;
 
 	/**
 	 * Have this bot send a global wallops message.

@@ -17,11 +17,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ChannelUser.h,v 1.11 2003/08/23 21:00:32 dan_karrels Exp $
+ * $Id: ChannelUser.h,v 1.12 2003/11/11 19:21:20 dan_karrels Exp $
  */
 
 #ifndef __CHANNELUSER_H
-#define __CHANNELUSER_H "$Id: ChannelUser.h,v 1.11 2003/08/23 21:00:32 dan_karrels Exp $"
+#define __CHANNELUSER_H "$Id: ChannelUser.h,v 1.12 2003/11/11 19:21:20 dan_karrels Exp $"
 
 #include	<string>
 
@@ -43,7 +43,6 @@ class ChannelUser
 {
 
 public:
-
 	/**
 	 * The type to be used for this ChannelUser's channel
 	 * modes.

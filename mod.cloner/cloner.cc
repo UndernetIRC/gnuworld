@@ -20,7 +20,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
  * USA.
  *
- * $Id: cloner.cc,v 1.30 2003/08/21 20:42:37 dan_karrels Exp $
+ * $Id: cloner.cc,v 1.31 2003/11/11 19:21:29 dan_karrels Exp $
  */
 
 #include	<new>
@@ -43,7 +43,7 @@
 #include	"misc.h"
 #include	"ELog.h"
 
-RCSTAG("$Id: cloner.cc,v 1.30 2003/08/21 20:42:37 dan_karrels Exp $");
+RCSTAG("$Id: cloner.cc,v 1.31 2003/11/11 19:21:29 dan_karrels Exp $");
 
 namespace gnuworld
 {
@@ -160,7 +160,7 @@ fakeServer = new (std::nothrow) iServer(
 	fakeServerDescription ) ;
 assert( fakeServer != 0 ) ;
 
-MyUplink->AttachServer( fakeServer ) ;
+MyUplink->AttachServer( fakeServer, this ) ;
 
 xClient::OnConnect() ;
 }
@@ -589,7 +589,7 @@ iClient* newClient = new iClient(
 		::time( 0 ) ) ;
 assert( newClient != 0 );
 
-if( MyUplink->AttachClient( newClient ) )
+if( MyUplink->AttachClient( newClient, this ) )
 	{
 	clones.push_back( newClient ) ;
 	}

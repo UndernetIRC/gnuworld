@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: stats.cc,v 1.25 2003/08/21 20:42:38 dan_karrels Exp $
+ * $Id: stats.cc,v 1.26 2003/11/11 19:21:35 dan_karrels Exp $
  */
 
 #include	<string>
@@ -39,7 +39,7 @@
 #include	"config.h"
 #include	"misc.h"
 
-RCSTAG( "$Id: stats.cc,v 1.25 2003/08/21 20:42:38 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: stats.cc,v 1.26 2003/11/11 19:21:35 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -621,13 +621,11 @@ if( channelsPerUserFile )
 Notice( theClient, "Maximum channels joined by a user: %u",
 	maxChannels ) ;
 
-#ifdef EDEBUG
-	Notice( theClient, "Length of last burst: %d seconds, "
-		"Number of bytes processed since beginning of last "
-		"burst: %d",
-		MyUplink->getLastBurstDuration(),
-		MyUplink->getBurstBytes() ) ;
-#endif
+Notice( theClient, "Length of last burst: %d seconds, "
+	"Number of bytes processed since beginning of last "
+	"burst: %d",
+	MyUplink->getLastBurstDuration(),
+	MyUplink->getBurstBytes() ) ;
 
 	{
 	stringstream ss ;

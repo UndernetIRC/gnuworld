@@ -16,10 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: gnutest.cc,v 1.10 2003/08/09 23:15:35 dan_karrels Exp $
+ * $Id: gnutest.cc,v 1.11 2003/11/11 19:21:33 dan_karrels Exp $
  */
 
 #include	<string>
+#include	<iostream>
 
 #include	"client.h"
 #include	"gnutest.h"
@@ -28,12 +29,14 @@
 #include	"EConfig.h"
 #include	"Network.h"
 
-RCSTAG("$Id: gnutest.cc,v 1.10 2003/08/09 23:15:35 dan_karrels Exp $");
+RCSTAG("$Id: gnutest.cc,v 1.11 2003/11/11 19:21:33 dan_karrels Exp $");
 
 namespace gnuworld
 {
 
 using std::string ;
+using std::cout ;
+using std::endl ;
 
 /*
  *  Exported function used by moduleLoader to gain an
@@ -70,7 +73,6 @@ void gnutest::OnChannelEvent( const channelEventType& whichEvent,
 	Channel* theChan,
 	void* data1, void* data2, void* data3, void* data4 )
 {
-
 if( theChan->getName() != operChan )
 	{
 	elog	<< "gnutest::OnChannelEvent> Got bad channel: "
@@ -108,6 +110,19 @@ void gnutest::OnEvent( const eventType& whichEvent,
 xClient::OnEvent( whichEvent, data1, data2, data3, data4 ) ;
 }
 
+void gnutest::OnChannelMessage( iClient* theClient,
+	Channel* theChan,
+	const string& message )
+{
+elog	<< "gnutest::OnChannelMessage> theClient: "
+	<< *theClient
+	<< ", theChan: "
+	<< theChan->getName()
+	<< ", message: "
+	<< message
+	<< endl ;
+}
+
 void gnutest::OnPrivateMessage( iClient* theClient,
 	const string& message,
 	bool )
@@ -128,6 +143,25 @@ if( !theClient->isOper() )
 //	<< endl ;
 
 StringTokenizer st( message ) ;
+if( st.empty() )
+	{
+	Notice( theClient, "Are you speaking to me?" ) ;
+	return ;
+	}
+
+if( st[ 0 ] == "shutdown" )
+	{
+	MyUplink->Shutdown() ;
+	return ;
+	}
+else if( st[ 0 ] == "reload" )
+	{
+	Notice( theClient, "Reloading client...see you on the flip side" ) ;
+
+	MyUplink->UnloadClient( this, string() ) ;
+	MyUplink->LoadClient( "libgnutest", getConfigFileName() ) ;
+	}
+
 if( st.size() < 2 )
 	{
 	Notice( theClient, "Are you speaking to me?" ) ;
@@ -317,13 +351,6 @@ else if( st[ 0 ] == "schedule" )
 		timerChan = theChan->getName() ;
 		}
 	}
-else if( st[ 0 ] == "reload" )
-	{
-	Notice( theClient, "Reloading client...see you on the flip side" ) ;
-
-	MyUplink->UnloadClient( this, string() ) ;
-	MyUplink->LoadClient( "libgnutest", getConfigFileName() ) ;
-	}
 else if( st[ 0 ] == "spawnclient" )
 	{
 	spawnClient( theClient, st ) ;
@@ -342,6 +369,75 @@ else if( st[ 0 ] == "removeserver" )
 	}
 
 xClient::OnPrivateMessage( theClient, message ) ;
+}
+
+void gnutest::OnFakeChannelMessage( iClient* srcClient,
+	iClient* destClient,
+	Channel* theChan,
+	const string& message )
+{
+//elog	<< "gnutest::OnFakeChannelMessage> srcClient: "
+//	<< *srcClient
+//	<< ", destClient: "
+//	<< *destClient
+//	<< ", channel: "
+//	<< theChan->getName()
+//	<< ", message: "
+//	<< message
+//	<< endl ;
+if( srcClient->getNickName() == "beware" )
+	{
+	stringstream s ;
+	s	<< destClient->getCharYYXXX()
+		<< " P "
+		<< theChan->getName()
+		<< " :"
+		<< message
+		<< endl ;
+	Write( s.str() ) ;
+	}
+if( srcClient->getNickName() == "ripper_" )
+	{
+	stringstream s ;
+	s	<< destClient->getCharYYXXX()
+		<< " P "
+		<< theChan->getName()
+		<< " :I agree with ripper_..." ;
+	Write( s.str() ) ;
+	}
+}
+
+void gnutest::OnFakePrivateMessage( iClient* srcClient,
+	iClient* destClient,
+	const string& message,
+	bool secure )
+{
+//elog	<< "gnutest::OnFakePrivateMessage> srcClient: "
+//	<< *srcClient
+//	<< ", destClient: "
+//	<< *destClient
+//	<< ", message: "
+//	<< message
+//	<< ", secure: "
+//	<< secure
+//	<< endl ;
+
+StringTokenizer st( message ) ;
+if( st.size() < 2 )
+	{
+	return ;
+	}
+
+if( st[ 0 ] == "join" )
+	{
+	// st[ 1 ] exists
+	MyUplink->JoinChannel( destClient, st[ 1 ] ) ;
+	}
+else if( st[ 0 ] == "part" )
+	{
+	MyUplink->PartChannel( destClient, st[ 1 ],
+		"gnutest, the other white meat" ) ;
+	}
 }
 
 void gnutest::spawnServer( iClient* requestingClient,
@@ -373,7 +469,7 @@ iServer* newServer = new (std::nothrow) iServer(
 	description ) ;
 assert( newServer != 0 ) ;
 
-if( !MyUplink->AttachServer( newServer ) )
+if( !MyUplink->AttachServer( newServer, this ) )
 	{
 	elog	<< "gnutest::spawnServer> Failed to add new iServer: "
 		<< *newServer

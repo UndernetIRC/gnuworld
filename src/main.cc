@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: main.cc,v 1.56 2003/08/06 17:47:48 dan_karrels Exp $
+ * $Id: main.cc,v 1.57 2003/11/11 19:21:36 dan_karrels Exp $
  */
 
 #include	<sys/time.h>
@@ -45,7 +45,7 @@
 #include	"md5hash.h"
 #include	"Signal.h"
 
-RCSTAG( "$Id: main.cc,v 1.56 2003/08/06 17:47:48 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: main.cc,v 1.57 2003/11/11 19:21:36 dan_karrels Exp $" ) ;
 
 // main() must be in the global namespace
 using namespace gnuworld ;
@@ -64,25 +64,35 @@ gnuworld::ELog		gnuworld::elog ;
 /// Output the command line arguments for gnuworld
 void usage( const string& progName )
 {
-clog << "Usage: " << progName << " [options]\n" ;
-clog << "\nOptions:\n" ;
-clog << "  -c, --verbose\t\tVerbose output\n" ;
-#ifdef EDEBUG
-  clog << "  -d <debug filename>, --debug=<debug file name>" << endl ;
-  clog << "\t\t\tSpecify the debug output file\n" ;
-#endif
-clog << "  -f <conf filename>, --config=<config filename>" << endl ;
-clog << "\t\t\tSpecify the config file name\n" ;
-clog << "  -h, --help\t\tPrint this help menu\n" ;
-clog << "  -s <socket file>, --socket=<socket file name>" << endl ;
-clog << "\t\t\tRun in simulation mode\n" ;
-clog << endl ;
+clog	<< "Usage: " << progName << " [options]"
+	<< endl ;
+clog	<< endl
+	<< "Options:"
+	<< endl ;
+clog	<< "  -c\t\t\tVerbose output"
+	<< endl ;
+clog	<< "  -d <debug filename>\tSpecify the debug output file"
+	<< endl ;
+clog	<< "  -D\t\t\tDisable debug logging"
+	<< endl ;
+clog	<< "  -f <conf filename>\tSpecify the config file name"
+	<< endl ;
+clog	<< "  -h\t\t\tPrint this help menu" 
+	<< endl ;
+clog	<< "  -l <log file>\t\tCapture raw socket data to log file"
+	<< endl ; 
+clog	<< "  -L\t\t\tDisable logging of socket data to file"
+	<< endl ;
+clog	<< "  -s <socket file>\tRun in simulation mode"
+	<< endl ;
+clog	<< endl ;
 }
 
 /// Output the GNUWorld/GNU welcome message
 void gnu()
 {
-clog	<< "GNUWorld version 2.2" << endl ;
+clog	<< endl ;
+clog	<< "GNUWorld version 2.3" << endl ;
 clog	<< "Copyright (C) 2002 Free Software Foundation, Inc." << endl ;
 clog	<< "GNUWorld comes with NO WARRANTY," << endl ;
 clog	<< "to the extent permitted by law." << endl ;
@@ -195,47 +205,32 @@ return 0 ;
 
 xServer::xServer( int argc, char** argv )
  : eventList( EVT_NOOP ),
-#ifdef EDEBUG
-   elogFileName( DEBUGFILE ),
-#endif
+   elogFileName( "debug.log" ),
    configFileName( CONFFILE )
 {
+logSocket = true ;
 verbose = false ;
+bool doDebug = true ;
+string socketFileName( "socket.log" ) ;
 
 optind = 0 ;
 int c = EOF ;
-while( (c = getopt( argc, argv, "cd:f:hs:")) != EOF )
-//while( true )
+while( (c = getopt( argc, argv, "cd:Df:l:Lhs:")) != EOF )
 	{
-/*
-	int option_index = 0 ;
-	struct option cmdLineArgs[] = {
-		{ "verbose", no_argument, NULL, 0 },
-		{ "debug", no_argument, NULL, 1 },
-		{ "config", required_argument, NULL, 2 },
-		{ "help", no_argument, NULL, 3 },
-		{ "socket", required_argument, NULL, 4 },
-		{ 0, 0, 0, 0 }
-	} ;
-	c = getopt_long_only( argc, argv, "cd:f:hs:",
-		cmdLineArgs, &option_index ) ;
-	if( -1 == c )
-		{
-		break ;
-		}
-*/
 	switch( c )
 		{
 		case 0:
 		case 'c':
 			verbose = true ;
 			break ;
-#ifdef EDEBUG
 		case 1:
 		case 'd':
+			doDebug = true ;
 			elogFileName = optarg ;
 			break ;
-#endif
+		case 'D':
+			doDebug = false ;
+			break ;
 		case 2:
 		case 'f':
 			configFileName = optarg ;
@@ -244,6 +239,13 @@ while( (c = getopt( argc, argv, "cd:f:hs:")) != EOF )
 		case 'h':
 			usage( argv[ 0 ] ) ;
 			::exit( 0 ) ;
+		case 'l':
+			logSocket = true ;
+			socketFileName = optarg ;
+			break ;
+		case 'L':
+			logSocket = false ;
+			break ;
 		case 4:
 		case 's':
 			simFileName = optarg ;
@@ -263,8 +265,9 @@ while( (c = getopt( argc, argv, "cd:f:hs:")) != EOF )
 		} // close switch
 	} // close while
 
-#ifdef EDEBUG
-	elog.openFile( elogFileName.c_str() ) ;
+if( doDebug )
+	{
+	elog.openFile( elogFileName ) ;
 	if( !elog.isOpen() )
 		{
 		clog	<< "*** Unable to open elog file: "
@@ -274,7 +277,7 @@ while( (c = getopt( argc, argv, "cd:f:hs:")) != EOF )
 		}
 	clog	<< "*** Running in debug mode..."
 		<< endl ;
-#endif
+	}
 
 if( verbose )
 	{
@@ -283,19 +286,24 @@ if( verbose )
 		<< endl ;
 	}
 
-// Sets up the server internals
-initializeSystem() ;
-
-#ifdef LOG_SOCKET
-	socketFile.open( LOG_SOCKET_NAME, std::ios::out ) ;
+if( logSocket )
+	{
+	socketFile.open( socketFileName.c_str(), std::ios::out ) ;
 	if( !socketFile.is_open() )
 		{
 		clog	<< "*** Unable to open socket log file: "
-			<< LOG_SOCKET_NAME
+			<< socketFileName
 			<< endl ;
 		::exit( -1 ) ;
 		}
-#endif
+	clog	<< "*** Logging raw data to "
+		<< socketFileName
+		<< "..."
+		<< endl ;
+	}
+
+// Sets up the server internals
+initializeSystem() ;
 }
 
 void xServer::mainLoop()

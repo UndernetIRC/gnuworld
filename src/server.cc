@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server.cc,v 1.182 2003/11/02 18:43:34 dan_karrels Exp $
+ * $Id: server.cc,v 1.183 2003/11/11 19:21:37 dan_karrels Exp $
  */
 
 #include	<sys/time.h>
@@ -71,7 +71,7 @@
 #include	"ConnectionHandler.h"
 #include	"Connection.h"
 
-RCSTAG( "$Id: server.cc,v 1.182 2003/11/02 18:43:34 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: server.cc,v 1.183 2003/11/11 19:21:37 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -100,6 +100,10 @@ void xServer::initializeSystem()
 {
 initializeVariables() ;
 
+clog	<< "*** Parsing configuration file "
+	<< configFileName
+	<< "..."
+	<< endl ;
 if( !readConfigFile( configFileName ) )
 	{
 	elog	<< "Error reading config file: "
@@ -171,15 +175,11 @@ registerServerTimers() ;
 xServer::~xServer()
 {
 // All deallocations are performed in doShutdown()
-
-#ifdef EDEBUG
-	elog.closeFile()  ;
-#endif
-
-#ifdef LOG_SOCKET
+elog.closeFile()  ;
+if( logSocket )
+	{
 	socketFile.close() ;
-#endif
-
+	}
 } // ~xServer()
 
 void xServer::initializeVariables()
@@ -455,12 +455,12 @@ for( ; ptr != conf.end() && ptr->first == "module" ; ++ptr )
 		return false ;
 		}
 
-	elog	<< "xServer::loadClients> Found module: "
-		<< modInfo[0]
-		<< " (Config: "
-		<< modInfo[1]
-		<< ")"
-		<< endl;
+//	elog	<< "xServer::loadClients> Found module: "
+//		<< modInfo[0]
+//		<< " (Config: "
+//		<< modInfo[1]
+//		<< ")"
+//		<< endl;
 
 	string fileName = modInfo[ 0 ] ;
 	if( '/' != fileName[ 0 ] )
@@ -609,10 +609,8 @@ if( !keepRunning )
 	return ;
 	}
 
-#ifdef EDEBUG
-  burstLines++ ;
-  burstBytes += line.size() ;
-#endif
+burstLines++ ;
+burstBytes += line.size() ;
 
 size_t len = line.size() - 1 ;
 while( ('\n' == line[ len ]) || ('\r' == line[ len ]) )
@@ -629,9 +627,10 @@ if( verbose )
 		<< line ;
 	}
 
-#ifdef LOG_SOCKET
+if( logSocket )
+	{
 	socketFile	<< line ;
-#endif
+	}
 
 Process( inputCharBuffer ) ;
 
@@ -911,8 +910,9 @@ return true ;
  * Attach a server.  This could be either a jupe, or some fictitious
  * server from which to host virtual clients.
  */
-bool xServer::AttachServer( iServer* fakeServer )
+bool xServer::AttachServer( iServer* fakeServer, xClient* owningClient )
 {
+assert( owningClient != 0 ) ;
 assert( fakeServer != NULL ) ;
 
 // Make sure a server of the same name is not already connected.
@@ -934,7 +934,7 @@ if( existingServer != NULL )
 	existingServer = 0 ;
 	}
 
-if( !Network->addFakeServer( fakeServer ) )
+if( !Network->addFakeServer( fakeServer, owningClient ) )
 	{
 	elog	<< "xNetwork::AttachServer> Failed to attach fake "
 		<< "server: "
@@ -1344,8 +1344,10 @@ if( doBurst )
 	Client->BurstGlines() ;
 	}
 
-elog	<< "Successfully loaded client module: "
+elog	<< "Loaded client, nickname: "
 	<< theIClient->getNickName()
+	<< ", with config file: "
+	<< Client->getConfigFileName()
 	<< endl ;
 
 // Success
@@ -1414,6 +1416,7 @@ bool xServer::AttachClient( iClient* fakeClient,
 	xClient* ownerClient )
 {
 assert( fakeClient != NULL ) ;
+assert( ownerClient != 0 ) ;
 
 // Verify that the iClient is in good order
 if( fakeClient->getNickName().empty() ||
@@ -1613,6 +1616,26 @@ for( iClient::channelIterator chanItr = iClientPtr->channels_begin() ;
 // internal client<->channel relationships.
 iClientPtr->clearChannels() ;
 */
+
+// Remove any fake clients and fake servers associated with this
+// xClient.
+list< iClient* > fakeClients = Network->findFakeClients( theClient ) ;
+for( list< iClient* >::iterator cItr = fakeClients.begin() ;
+	cItr != fakeClients.end() ; ++cItr )
+	{
+	iClient* fakeClient = *cItr ;
+
+	// Issue the quite message for this client
+	stringstream s ;
+	s	<< fakeClient->getCharYYXXX()
+		<< " Q :Exiting" ;
+	Write( s ) ;
+
+	// Remove the fake client from all internal tables and
+	// deallocate.  xNetwork::removeClient() will do all but
+	// the deallocation.
+	delete Network->removeClient( fakeClient ) ;
+	} // for( cItr )
 
 // By this point, the xClient should have removed all of its
 // custom data from each iClient in the network.
@@ -1832,19 +1855,17 @@ va_start( _list, format ) ;
 vsnprintf( buffer, 4096, format, _list ) ;
 va_end( _list ) ;
 
-#ifdef EDEBUG
 if( verbose )
 	{
 	// Output the string to the console.
 	cout << "[OUT]: " << buffer  ;
-	}
 
 	// Do we need to newline terminate it?
 	if( buffer[ strlen( buffer ) - 1 ] != '\n' )
 		{
 		cout << endl ;
 		}
-#endif
+	}
 
 if( buffer[ strlen( buffer ) - 1 ] != '\n' )
 	{
@@ -1893,19 +1914,17 @@ va_start( _list, format ) ;
 vsnprintf( buffer, 4096, format, _list ) ;
 va_end( _list ) ;
 
-#ifdef EDEBUG
 if( verbose )
 	{
 	// Output the string to the console.
 	cout << "[OUT]: " << buffer  ;
-	}
 
 	// Do we need to newline terminate it?
 	if( buffer[ strlen( buffer ) - 1 ] != '\n' )
 		{
 		cout << endl ;
 		}
-#endif
+	}
 
 // Append the line to the output buffer.
 serverConnection->Write( buffer ) ;
@@ -2272,7 +2291,6 @@ if( (NULL == theChan) && bursting )
 		}
 
 	// We have just burst a channel
-
 	}
 else if( NULL == theChan )
 	{
@@ -2327,7 +2345,6 @@ else if( NULL == theChan )
 	// When we create a channel, the client automatically gets
 	// ops
 	getOps = true ;
-
 	}
 else if( bursting )
 	{
@@ -2626,14 +2643,12 @@ clog	<< "Number of clients: " << Network->clientList_size() << endl ;
 clog	<< "Number of glines: " << glineList.size() << endl ;
 clog	<< "Last burst duration: " << (burstEnd - burstStart)
 	<< " seconds" << endl ;
-#ifdef EDEBUG
 clog	<< "Read " << burstBytes
 	<< " bytes and processed " << burstLines
 	<< " commands over the last "
 	<< (::time( 0 ) - burstStart)
 	<< " seconds."
 	<< endl ;
-#endif
 }
 
 xServer::timerID xServer::RegisterTimer( const time_t& absTime,
@@ -3583,7 +3598,6 @@ void xServer::setBursting( bool newVal )
 {
 bursting = newVal ;
 
-#ifdef EDEBUG
 if( newVal )
 	{
 	// Starting bursting
@@ -3601,7 +3615,6 @@ else
 		<< " commands"
 		<< endl ;
 	}
-#endif
 }
 
 void xServer::removeAllTimers( TimerHandler* theHandler )
@@ -3824,6 +3837,116 @@ Write( "%s SQ %s %d :Unloading server",
 	fakeServer->getConnectTime() ) ;
 
 return true ;
+}
+
+bool xServer::JoinChannel( iClient* theClient, const string& chanName )
+{
+assert( theClient != 0 ) ;
+
+if( 0 == Network->findFakeClient( theClient ) )
+	{
+	// Not a fake client
+	elog	<< "xServer::JoinChannel (fake)> Attempt to force a "
+		<< "non-fake client to join a channel: "
+		<< *theClient
+		<< endl ;
+
+	return false ;
+	}
+
+Channel* theChan = Network->findChannel( chanName ) ;
+if( 0 == theChan )
+	{
+	elog	<< "xServer::JoinChannel (fake)> Attempting to join "
+		<< "non-existing channel: "
+		<< chanName
+		<< endl ;
+	return false ;
+	}
+
+ChannelUser* theUser = new (std::nothrow) ChannelUser( theClient ) ;
+assert( theUser != 0 ) ;
+
+if( !theChan->addUser( theUser ) )
+	{
+	elog	<< "xServer::JoinChannel (fake)> Failed to add user "
+		<< "to channel: "
+		<< *theChan
+		<< endl ;
+	delete theUser ; theUser = 0 ;
+	return false ;
+	}
+
+if( !theClient->addChannel( theChan ) )
+	{
+	elog	<< "xServer::JoinChannel (fake)> Failed to add channel "
+		<< "to client: "
+		<< *theClient
+		<< endl ;
+
+	theChan->removeUser( theUser ) ;
+	delete theUser ; theUser = 0 ;
+	return false ;
+	}
+
+stringstream s ;
+s	<< theClient->getCharYYXXX()
+	<< " J "
+	<< chanName ;
+Write( s ) ;
+
+PostChannelEvent( EVT_JOIN, theChan,
+	static_cast< void* >( theClient ),
+	static_cast< void* >( theUser ) ) ;
+
+return true ;
+}
+
+void xServer::PartChannel( iClient* theClient, const string& chanName,
+	const string& reason )
+{
+assert( theClient != 0 ) ;
+
+if( 0 == Network->findFakeClient( theClient ) )
+	{
+	// Not a fake client
+	elog	<< "xServer::PartChannel (fake)> Attempt to force a "
+		<< "non-fake client to part a channel: "
+		<< *theClient
+		<< endl ;
+
+	return ;
+	}
+
+Channel* theChan = Network->findChannel( chanName ) ;
+if( 0 == theChan )
+	{
+	elog	<< "xServer::ParChannel (fake)> Attempting to part "
+		<< "non-existing channel: "
+		<< chanName
+		<< endl ;
+	return ;
+	}
+
+// Perform both operations below regardless of the return values,
+// just to ensure that all parts are in synch
+delete theChan->removeUser( theClient ) ;
+theClient->removeChannel( theChan ) ;
+
+stringstream s ;
+s	<< theClient->getCharYYXXX()
+	<< " L "
+	<< chanName ;
+
+if( !reason.empty() )
+	{
+	s	<< " :"
+		<< reason ;
+	}
+Write( s ) ;
+
+PostChannelEvent( EVT_PART, theChan,
+	static_cast< void* >( theClient ) ) ;
 }
 
 } // namespace gnuworld

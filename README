@@ -2,6 +2,15 @@
 Welcome to GNUWorld
 ------------------
 
+****
+The best and most comprehensive information for installing gnuworld, 
+postgresql, and the cservice and ccontrol (uworld) modules can be found at 
+http://www.gnuworld.org/gnuworld-setup.
+
+The setup procedures listed here are generic, and do not provide any 
+information for building databases for these two modules.
+****
+
 GNUWorld is an IRC services server.  This server hosts several
 virtual client modules that perform IRC network and channel 
 functions.

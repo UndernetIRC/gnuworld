@@ -17,11 +17,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ELog.h,v 1.3 2003/06/17 15:13:53 dan_karrels Exp $
+ * $Id: ELog.h,v 1.4 2003/11/11 19:21:22 dan_karrels Exp $
  */
 
 #ifndef __ELOG_H
-#define __ELOG_H "$Id: ELog.h,v 1.3 2003/06/17 15:13:53 dan_karrels Exp $"
+#define __ELOG_H "$Id: ELog.h,v 1.4 2003/11/11 19:21:22 dan_karrels Exp $"
 
 #include	<sstream>
 #include	<iostream>
@@ -60,12 +60,15 @@ protected:
 	 */
 	ostream		*outStream ;
 
-#ifdef EDEBUG
 	/**
 	 * The file output stream to which to log all messages.
 	 */
 	ofstream	outFile ;
-#endif
+
+	/**
+	 * True if logging to an output file.
+	 */
+	bool		logFile ;
 
 public:
 
@@ -76,7 +79,6 @@ public:
 	 */
 	ELog() ;
 
-#ifdef EDEBUG
 	/**
 	 * Instantiate an instance of this class, specifying the
 	 * name of the file to which to log messages.  This log file
@@ -84,7 +86,6 @@ public:
 	 * exists, it will be truncated.
 	 */
 	ELog( const string& ) ;
-#endif
 
 	/**
 	 * Destroy an instance of this class.  This method will
@@ -92,7 +93,6 @@ public:
 	 */
 	virtual ~ELog() ;
 
-#ifdef EDEBUG
 	/**
 	 * Open an output file for logging messages.  If an output
 	 * file is currently open, it will be flushed and closed.
@@ -114,8 +114,7 @@ public:
 	 * For some reason, std::fstream::is_open() is not const.
 	 */
 	inline bool isOpen()
-		{ return outFile.is_open() ; }
-#endif
+		{ return (logFile && outFile.is_open()) ; }
 
 	/**
 	 * Use this method to specify which stream to which

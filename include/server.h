@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server.h,v 1.93 2003/11/02 18:43:34 dan_karrels Exp $
+ * $Id: server.h,v 1.94 2003/11/11 19:21:21 dan_karrels Exp $
  */
 
 #ifndef __SERVER_H
-#define __SERVER_H "$Id: server.h,v 1.93 2003/11/02 18:43:34 dan_karrels Exp $"
+#define __SERVER_H "$Id: server.h,v 1.94 2003/11/11 19:21:21 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
@@ -196,7 +196,7 @@ public:
 	 * Use this method to jupe a server, just set the iServer's
 	 * JUPE flag.
 	 */
-	virtual bool AttachServer( iServer* ) ;
+	virtual bool AttachServer( iServer*, xClient* ) ;
 
 	/**
 	 * Detach a fake server from the services server.
@@ -328,7 +328,7 @@ public:
 	 * The client's intXXX/charXXX will be set by this method.
 	 * The xClient* is the owner to whom messages will be sent.
 	 */
-	virtual bool AttachClient( iClient* Client, xClient* = 0 ) ;
+	virtual bool AttachClient( iClient* Client, xClient* ) ;
 
 	/**
 	 * Quit a hosted client from the network with the given
@@ -411,10 +411,22 @@ public:
 		bool getOps = true ) ;
 
 	/**
+	 * Have a fake (only) client join a channel.
+	 * This will NOT create the channel if it does not already exist.
+	 */
+	virtual bool JoinChannel( iClient*, const string& chanName ) ;
+
+	/**
 	 * Notify the network that one of the services clients has
 	 * parted a channel.
 	 */
 	virtual void PartChannel( xClient* theClient, const string& chanName,
+			const string& reason = string() ) ;
+
+	/**
+	 * Notify the network that a fake client has parted a channel.
+	 */
+	virtual void PartChannel( iClient* theClient, const string& chanName,
 			const string& reason = string() ) ;
 
 	/**
@@ -851,7 +863,6 @@ public:
 	virtual time_t	getLastBurstDuration() const
 		{ return (burstEnd - burstStart) ; }
 
-#ifdef EDEBUG
 	/**
 	 * Return the number of bytes since the beginning of the
 	 * last burst.
@@ -865,7 +876,6 @@ public:
 	 */
 	virtual size_t	getBurstLines() const
 		{ return burstLines ; }
-#endif // EDEBUG
 
 protected:
 
@@ -1242,21 +1252,17 @@ protected:
 	 */
 	timerID		lastTimerID ;
 
-#ifdef LOG_SOCKET
 	/**
 	 * The output file to which to write raw data read from
 	 * the network.
 	 */
 	ofstream	socketFile ;
-#endif
 
-#ifdef EDEBUG
 	/**
 	 * The name of the file for which elog to write all
 	 * debugging information.
 	 */
 	string		elogFileName ;
-#endif
 
 	/**
 	 * The name of the server config file.
@@ -1278,6 +1284,11 @@ protected:
 	 * handling a single network message a time (max 512 bytes).
 	 */
 	char		inputCharBuffer[ 1024 ] ;
+
+	/**
+	 * True if logging of raw input data to file is enabled.
+	 */
+	bool		logSocket ;
 
 	/**
 	 * True if all elog data should be output to clog.
@@ -1313,7 +1324,6 @@ protected:
 				const string& symbolName,
 				const string& commandKey ) ;
 
-#ifdef EDEBUG
 	/// Some debugging information, just a curiosity
 	/// burstLines is the total number of lines that have been
 	/// processed since the beginning of the last burst.
@@ -1322,7 +1332,6 @@ protected:
 	/// burstBytes is the total number of bytes that have been
 	/// processed since the beginning of the last burst.
 	size_t		burstBytes ;
-#endif
 
 } ;
 

@@ -82,7 +82,7 @@ void FAKECommand::Exec( const iClient *theClient, const string& Message, const s
 		
 			assert( fakeClient != 0 );
 		
-			bot->getUplink()->AttachClient( fakeClient );
+			bot->getUplink()->AttachClient( fakeClient, bot );
 			
 			theFake->setFlag(sqlFakeClient::F_ACTIVE);
 /*			

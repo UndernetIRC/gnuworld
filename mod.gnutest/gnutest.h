@@ -16,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: gnutest.h,v 1.6 2003/08/09 23:15:35 dan_karrels Exp $
+ * $Id: gnutest.h,v 1.7 2003/11/11 19:21:34 dan_karrels Exp $
  */
 
 #ifndef __GNUTEST_H
-#define __GNUTEST_H "$Id: gnutest.h,v 1.6 2003/08/09 23:15:35 dan_karrels Exp $"
+#define __GNUTEST_H "$Id: gnutest.h,v 1.7 2003/11/11 19:21:34 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
@@ -84,6 +84,34 @@ public:
 	 * this client.
 	 */
 	virtual void	OnPrivateMessage( iClient*, const string&,
+				bool secure = false ) ;
+
+	/**
+	 * This method is called when a channel message occurs
+	 * in a channel in which an xClient resides, and the
+	 * xClient is user mode -d.
+	 */
+	virtual void OnChannelMessage( iClient* Sender,
+		Channel* theChan,
+		const string& Message ) ;
+
+
+	/**
+	 * This method is invoked when a fake client belonging to this
+	 * xClient receives a channel message.
+	 */
+	virtual void	OnFakeChannelMessage( iClient* srcClient,
+				iClient* destClient,
+				Channel* theChan,
+				const string& message ) ;
+
+	/**
+	 * This method is called when a network message arrives for
+	 * one of the fake clients owned by this xClient.
+	 */
+	virtual void	OnFakePrivateMessage( iClient* srcClient,
+				iClient* destClient,
+				const string& message,
 				bool secure = false ) ;
 
 	/**

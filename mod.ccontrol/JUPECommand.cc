@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: JUPECommand.cc,v 1.16 2003/08/09 23:15:33 dan_karrels Exp $
+ * $Id: JUPECommand.cc,v 1.17 2003/11/11 19:21:28 dan_karrels Exp $
  */
 
 #include	<new>
@@ -34,7 +34,7 @@
 #include	"Constants.h"
 #include	"config.h"
 
-RCSTAG( "$Id: JUPECommand.cc,v 1.16 2003/08/09 23:15:33 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: JUPECommand.cc,v 1.17 2003/11/11 19:21:28 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -105,7 +105,7 @@ iServer* jupeServer = new (std::nothrow) iServer(
 assert( jupeServer != 0 ) ;
 
 // Attach the new (fake) server.
-server->AttachServer( jupeServer ) ;
+server->AttachServer( jupeServer, bot ) ;
 
 return true ;
 

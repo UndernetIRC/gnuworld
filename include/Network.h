@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: Network.h,v 1.35 2003/08/09 23:15:33 dan_karrels Exp $
+ * $Id: Network.h,v 1.36 2003/11/11 19:21:20 dan_karrels Exp $
  */
 
 #ifndef __NETWORK_H
-#define __NETWORK_H "$Id: Network.h,v 1.35 2003/08/09 23:15:33 dan_karrels Exp $"
+#define __NETWORK_H "$Id: Network.h,v 1.36 2003/11/11 19:21:20 dan_karrels Exp $"
 
 #include	<vector>
 #include	<string>
@@ -114,7 +114,8 @@ private:
 	/**
 	 * This type stores fake (juped) servers.
 	 */
-	typedef map< unsigned int, iServer* >	fakeServerMapType ;
+	typedef map< unsigned int, std::pair< iServer*, xClient* > >
+		fakeServerMapType ;
 
 	/**
 	 * This is the type of vector for storing
@@ -201,7 +202,7 @@ public:
 	 * of fake servers.
 	 * Returns true on success, false on failure.
 	 */
-	virtual bool		addFakeServer( iServer* ) ;
+	virtual bool		addFakeServer( iServer*, xClient* ) ;
 
 	/**
 	 * Add a new channel to the network table.
@@ -221,10 +222,40 @@ public:
 					const unsigned int& XXX ) const ;
 
 	/**
+	 * Find a fake client given the client's integer numeric.
+	 * Returns NULL if not found.
+	 */
+	virtual iClient*	findFakeClient( const unsigned int& YY,
+					const unsigned int& XXX ) const ;
+
+	/**
 	 * Find a remote client given the client's character numeric.
 	 * Returns NULL if not found.
 	 */
 	virtual iClient*	findClient( const string& yyxxx ) const ;
+
+	/**
+	 * Find a fake client by numeric.
+	 * Returns NULL if not found.
+	 */
+	virtual iClient*	findFakeClient( const string& yyxxx )
+					const ;
+
+	/**
+	 * Lookup a fake (juped) iClient.
+	 */
+	virtual iClient*	findFakeClient( iClient* ) const ;
+
+	/**
+	 * Lookup the xClient owner of a particular iClient.
+	 */
+	virtual xClient*	findFakeClientOwner( iClient* ) const ;
+
+	/**
+	 * Lookup all fake iClients belonging to an xClient.
+	 * If the xClient is NULL, return all fake clients.
+	 */
+	virtual list< iClient* > findFakeClients( xClient* ) const ;
 
 	/**
 	 * Retrieve a pointer to an iClient given its nick name.
@@ -233,30 +264,23 @@ public:
 	virtual iClient*	findNick( const string& nickName ) const ;
 
 	/**
-	 * Find a local (services) client by its numeric.
-	 * Returns NULL if not found.
-	 */
-/*
-	virtual xClient*	findLocalClient( const unsigned int& YY,
-					const unsigned int& XXX ) const ;
-*/
-
-	/**
 	 * Find a local (services) client by its character numeric.
 	 * Returns NULL if not found.
 	 */
 	virtual xClient*	findLocalClient( const string& yyxxx ) const ;
 
 	/**
+	 * Find a local (services) client by its integer numeric.
+	 * Returns NULL if not found.
+	 */
+	virtual xClient*	findLocalClient( const unsigned int& intYYXXX )
+					const ;
+
+	/**
 	 * Find a local (services) client by its case-insensitive nickname.
 	 * Returns NULL if not found.
 	 */
 	virtual xClient*	findLocalNick( const string& nickName ) const ;
-
-	/**
-	 * Lookup a fake (juped) iClient.
-	 */
-	virtual iClient*	findFakeClient( iClient* ) const ;
 
 	/**
 	 * Lookup a fake (juped) iClient by nickname.

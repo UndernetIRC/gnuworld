@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: Network.cc,v 1.61 2003/08/21 20:42:38 dan_karrels Exp $
+ * $Id: Network.cc,v 1.62 2003/11/11 19:21:36 dan_karrels Exp $
  */
 
 #include	<new>
@@ -44,7 +44,7 @@
 #include	"ip.h"
 #include	"config.h"
 
-RCSTAG( "$Id: Network.cc,v 1.61 2003/08/21 20:42:38 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: Network.cc,v 1.62 2003/11/11 19:21:36 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -189,6 +189,19 @@ if( ptr == numericMap.end() )
 return ptr->second ;
 }
 
+iClient* xNetwork::findFakeClient( const unsigned int& intYY,
+	const unsigned int& intXXX ) const
+{
+unsigned int intYYXXX = combinebase64int( intYY, intXXX ) ;
+
+fakeClientMapType::const_iterator ptr = fakeClientMap.find( intYYXXX ) ;
+if( ptr == fakeClientMap.end() )
+	{
+	return 0 ;
+	}
+return ptr->second.first ;
+}
+
 iClient* xNetwork::findClient( const string& yyxxx ) const
 {
 unsigned int intYYXXX = base64toint( yyxxx.c_str(), yyxxx.size() ) ;
@@ -198,6 +211,17 @@ if( ptr == numericMap.end() )
 	return 0 ;
 	}
 return ptr->second ;
+}
+
+iClient* xNetwork::findFakeClient( const string& yyxxx ) const
+{
+unsigned int intYYXXX = base64toint( yyxxx.c_str(), yyxxx.size() ) ;
+fakeClientMapType::const_iterator ptr = fakeClientMap.find( intYYXXX ) ;
+if( ptr == fakeClientMap.end() )
+	{
+	return 0 ;
+	}
+return ptr->second.first ;
 }
 
 iClient* xNetwork::findNick( const string& nick ) const
@@ -221,10 +245,24 @@ unsigned int intYYXXX = base64toint( yyxxx.c_str(), 5 ) ;
 const_localClientIterator cItr = localClients.find( intYYXXX ) ;
 if( cItr == localClient_end() )
 	{
-	elog	<< "xNetwork::findLocalClient> Unable to find "
-		<< "client numeric: "
-		<< yyxxx
-		<< endl ;
+//	elog	<< "xNetwork::findLocalClient> Unable to find "
+//		<< "client numeric: "
+//		<< yyxxx
+//		<< endl ;
+	return 0 ;
+	}
+return cItr->second ;
+}
+
+xClient* xNetwork::findLocalClient( const unsigned int& intYYXXX ) const
+{
+const_localClientIterator cItr = localClients.find( intYYXXX ) ;
+if( cItr == localClient_end() )
+	{
+//	elog	<< "xNetwork::findLocalClient> Unable to find "
+//		<< "client numeric: "
+//		<< intYYXXX
+//		<< endl ;
 	return 0 ;
 	}
 return cItr->second ;
@@ -1168,7 +1206,7 @@ if( sItr == fakeServers_end() )
 	{
 	return 0 ;
 	}
-return sItr->second ;
+return sItr->second.first ;
 }
 
 iClient* xNetwork::removeFakeClient( iClient* fakeClient )
@@ -1220,9 +1258,11 @@ for( const_fakeClientIterator cItr = fakeClient_begin() ;
 return 0 ;
 }
 
-bool xNetwork::addFakeServer( iServer* fakeServer )
+bool xNetwork::addFakeServer( iServer* fakeServer,
+	xClient* owningClient )
 {
 assert( fakeServer != 0 ) ;
+assert( owningClient != 0 ) ;
 
 // Verify that the server name does not exist
 if( findServerName( fakeServer->getName() ) != 0 )
@@ -1253,7 +1293,7 @@ fakeServer->setIntYY( intYY ) ;
 
 // Add the fakeServer into the fakeServerMap
 if( !fakeServerMap.insert( make_pair( fakeServer->getIntYY(),
-	fakeServer ) ).second )
+	make_pair( fakeServer, owningClient ) ) ).second )
 	{
 	elog	<< "xNetwork::addFakeServer> Failed to insert "
 		<< "new server into fakeServerMap: "
@@ -1294,15 +1334,15 @@ iServer* xNetwork::findFakeServerName( const string& name ) const
 for( const_fakeServerIterator sItr = fakeServers_begin() ;
 	sItr != fakeServers_end() ; ++sItr )
 	{
-	if( !strcasecmp( name, sItr->second->getName() ) )
+	if( !strcasecmp( name, sItr->second.first->getName() ) )
 		{
 		// Found it
 		elog	<< "xNetwork::findServerName> Found name: "
 			<< name
 			<< ", matching server: "
-			<< *(sItr->second)
+			<< *(sItr->second.first)
 			<< endl ;
-		return sItr->second ;
+		return sItr->second.first ;
 		}
 	} // for()
 
@@ -1470,17 +1510,17 @@ if( name.empty() )
 fakeServerIterator sItr = fakeServers_begin() ;
 for( ; sItr != fakeServers_end() ; ++sItr )
 	{
-	if( !strcasecmp( sItr->second->getName(), name ) )
+	if( !strcasecmp( sItr->second.first->getName(), name ) )
 		{
 		// Found it
 		elog	<< "xNetwork::removeFakeServerName> Found "
 			<< "matching server name for name: "
 			<< name
 			<< ", server: "
-			<< *(sItr->second)
+			<< *(sItr->second.first)
 			<< endl ;
 
-		return removeFakeServer( sItr->second ) ;
+		return removeFakeServer( sItr->second.first ) ;
 		}
 	} // for()
 
@@ -1503,6 +1543,36 @@ if( cItr == fakeClientMap.end() )
 	return 0 ;
 	}
 return cItr->second.first ;
+}
+
+xClient* xNetwork::findFakeClientOwner( iClient* theClient ) const
+{
+assert( theClient != 0 ) ;
+
+const_fakeClientIterator cItr = fakeClientMap.find( 
+	theClient->getIntYYXXX() ) ;
+if( cItr == fakeClientMap.end() )
+	{
+	return 0 ;
+	}
+return cItr->second.second ;
+}
+
+list< iClient* > xNetwork::findFakeClients( xClient* owningClient ) const
+{
+list< iClient* > retMe ;
+
+// This hurts my brain a bit...
+for( fakeClientMapType::const_iterator cItr = fakeClientMap.begin() ;
+	cItr != fakeClientMap.end() ; ++cItr )
+	{
+	if( 0 == owningClient
+		|| owningClient == cItr->second.second )
+		{
+		retMe.push_back( cItr->second.first ) ;
+		}
+	} // for
+return retMe ;
 }
 
 } // namespace gnuworld

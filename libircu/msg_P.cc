@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_P.cc,v 1.7 2003/08/09 23:15:33 dan_karrels Exp $
+ * $Id: msg_P.cc,v 1.8 2003/11/11 19:21:24 dan_karrels Exp $
  */
 
 #include	<string>
@@ -33,7 +33,7 @@
 #include	"StringTokenizer.h"
 #include	"config.h"
 
-RCSTAG( "$Id: msg_P.cc,v 1.7 2003/08/09 23:15:33 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: msg_P.cc,v 1.8 2003/11/11 19:21:24 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -68,18 +68,53 @@ void channelMessage( iClient* srcClient,
 	Channel* theChan,
 	const string& message )
 {
-for( xNetwork::localClientIterator lcItr = Network->localClient_begin() ;
-	lcItr != Network->localClient_end() ; ++lcItr )
+for( Channel::userIterator userItr = theChan->userList_begin() ;
+	userItr != theChan->userList_end() ; ++userItr )
 	{
-	// Only deliver the channel ctcp (message) if this client
-	// is on the channel, and is mode -d
-	if( lcItr->second->isOnChannel( theChan ) &&
-		!lcItr->second->getMode( iClient::MODE_DEAF ) )
+	unsigned int intYYXXX = userItr->second->getIntYYXXX() ;
+
+	xClient* servicesClient = Network->findLocalClient( intYYXXX ) ;
+	if( servicesClient != 0
+		&& servicesClient->isOnChannel( theChan )
+		&& !servicesClient->getMode( iClient::MODE_DEAF ) )
 		{
-		lcItr->second->OnChannelMessage(
-			srcClient, theChan, message ) ;
+		// xClient, invoke OnChannelMessage()
+		servicesClient->OnChannelMessage( srcClient,
+			theChan,
+			message ) ;
+		continue ;
 		}
-	}
+
+	// Not an xClient, check if it's a fake client
+	iClient* targetClient = Network->findFakeClient(
+			userItr->second->getClient() ) ;
+	if( 0 == targetClient )
+		{
+		// Nope
+		continue ;
+		}
+
+	// Fake client
+	// Get its owner, use a different variable name here
+	// just for readability.
+	xClient* ownerClient = Network->findFakeClientOwner( 
+		targetClient ) ;
+	if( 0 == ownerClient )
+		{
+		elog	<< "msg_P::channelMessage> Unable to "
+			<< "find owner of client: "
+			<< *targetClient
+			<< ", in channel: "
+			<< *theChan
+			<< endl ;
+		continue ;
+		}
+
+	ownerClient->OnFakeChannelMessage( srcClient,
+		targetClient,
+		theChan,
+		message ) ;
+	} // for()
 }
 
 /**
@@ -137,6 +172,7 @@ if( 0 == srcClient )
 // abcDE P FGhij :hi, how are you?
 bool		secure = false ;
 xClient*	targetClient = 0 ;
+iClient*	fakeTarget = 0 ;
 
 if( (0 == theChan) && (strchr( Param[ 1 ], '@' ) != 0) )
 	{
@@ -147,13 +183,17 @@ if( (0 == theChan) && (strchr( Param[ 1 ], '@' ) != 0) )
 	targetClient = Network->findLocalNick( st[ 0 ] ) ;
 	if( 0 == targetClient )
 		{
-		elog	<< "msg_P> Received message for unknown "
-			<< "client: "
-			<< Param[ 1 ]
-			<< ", nick: "
-			<< st[ 0 ]
-			<< endl ;
-		return true ;
+		fakeTarget = Network->findFakeNick( st[ 0 ] ) ;
+		if( 0 == fakeTarget )
+			{
+			elog	<< "msg_P> Received message for unknown "
+				<< "client: "
+				<< Param[ 1 ]
+				<< ", nick: "
+				<< st[ 0 ]
+				<< endl ;
+			return true ;
+			}
 		}
 	// Found the target xClient
 	}
@@ -169,14 +209,19 @@ else if( (0 == theChan) &&
 	targetClient = Network->findLocalClient( Param[ 1 ] ) ;
 	if( 0 == targetClient )
 		{
-		elog	<< "msg_P> Unable to find local client: "
-			<< Param[ 1 ]
-			<< endl ;
-		return true ;
+		fakeTarget = Network->findFakeClient( Param[ 1 ] ) ;
+		if( 0 == fakeTarget )
+			{
+			elog	<< "msg_P> Unable to find local client: "
+				<< Param[ 1 ]
+				<< endl ;
+			return true ;
+			}
 		}
 	}
 else if( 0 == theChan )
 	{
+	// TODO
 	elog	<< "msg_P> Unknown target: "
 		<< Param[ 1 ]
 		<< endl ;
@@ -184,6 +229,28 @@ else if( 0 == theChan )
 	// May be a message to a juped client on a juped server,
 	// ignore it.
 	return true ;
+	}
+else
+	{
+	// theChan != 0
+	// It's a channel message, this is not a problem for
+	// the case in which there is an xClient in the channel.
+	// However, it becomes a bit more complicated if there are
+	// one or more fake clients (possibly in addition to the
+	// xClient) in the channel.
+	}
+
+xClient* ownerClient = 0 ;
+if( fakeTarget != 0 )
+	{
+	ownerClient = Network->findFakeClientOwner( fakeTarget ) ;
+	if( 0 == ownerClient )
+		{
+		elog	<< "msg_P> Fake client without owner: "
+			<< *fakeTarget
+			<< endl ;
+		return true ;
+		}
 	}
 
 bool CTCP = (Param[ 2 ][ 0 ] == 1) ? true : false ;
@@ -275,7 +342,9 @@ else
 //			<< *theChan
 //			<< endl ;
 
-		channelMessage( srcClient, theChan, message ) ;
+		channelMessage( srcClient,
+			theChan,
+			message ) ;
 		}
 	else
 		{
@@ -285,11 +354,22 @@ else
 //			<< message
 //			<< endl ;
 
-		targetClient->OnPrivateMessage( srcClient,
-			message,
-			secure ) ;
-		}
-	}
+		if( fakeTarget != 0 )
+			{
+			ownerClient->OnFakePrivateMessage(
+				srcClient,
+				fakeTarget,
+				message,
+				secure ) ;
+			}
+		else
+			{
+			targetClient->OnPrivateMessage( srcClient,
+				message,
+				secure ) ;
+			} // else()
+		} // else( theChan != 0 )
+	} // else( CTCP )
 
 return true ;
 } // msg_P

@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ELog.cc,v 1.2 2003/06/17 15:13:53 dan_karrels Exp $
+ * $Id: ELog.cc,v 1.3 2003/11/11 19:21:21 dan_karrels Exp $
  */
 
 #include	<iostream>
@@ -29,7 +29,7 @@
 #include	"config.h"
 #include	"ELog.h"
 
-const char rcsId[] = "$Id: ELog.cc,v 1.2 2003/06/17 15:13:53 dan_karrels Exp $" ;
+const char rcsId[] = "$Id: ELog.cc,v 1.3 2003/11/11 19:21:21 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -39,32 +39,38 @@ using std::string ;
 using std::endl ;
 
 ELog::ELog()
- : outStream( 0 )
+ : outStream( 0 ),
+   logFile( false )
 {}
 
-#ifdef EDEBUG
 ELog::ELog( const string& fileName )
- : outStream( 0 )
+ : outStream( 0 ),
+   logFile( false )
 {
 openFile( fileName ) ;
 }
-#endif
 
 ELog::~ELog()
 {
-#ifdef EDEBUG
-  closeFile() ;
-#endif
+if( logFile )
+	{
+ 	closeFile() ;
+	}
 }
 
-#ifdef EDEBUG
 bool ELog::openFile( const string& fileName )
 {
 if( isOpen() )
 	{
 	closeFile() ;
 	}
-outFile.open( fileName.c_str() ) ;
+logFile = true ;
+outFile.open( fileName.c_str(), ios::out | ios::trunc ) ;
+
+if( !isOpen() )
+	{
+	logFile = false ;
+	}
 return isOpen() ;
 }
 
@@ -76,112 +82,123 @@ if( isOpen() )
 	outFile.close() ;
 	}
 }
-#endif // EDEBUG
 
 ELog& ELog::operator<<( __E_omanip var )
 {
-#ifdef EDEBUG
-  outFile << var ;
-#endif
+if( logFile )
+	{
+	outFile	<< var ;
+	}
 if( outStream ) *outStream << var ;
 return *this ;
 }
 
 ELog& ELog::operator<<( __E_manip var )
 {
-#ifdef EDEBUG
-  outFile << var ;
-#endif
+if( logFile )
+	{
+	outFile	<< var ;
+	}
 if( outStream ) *outStream << var ;
 return *this ;
 }
 
 ELog& ELog::operator<<( const char& var )
 {
-#ifdef EDEBUG
-  outFile << var ;
-#endif
+if( logFile )
+	{
+	outFile	<< var ;
+	}
 if( outStream ) *outStream << var ;
 return *this ;
 }
 
 ELog& ELog::operator<<( const string& var )
 {
-#ifdef EDEBUG
-  outFile << var ;
-#endif
+if( logFile )
+	{
+	outFile	<< var ;
+	}
 if( outStream ) *outStream << var ;
 return *this ;
 }
 
 ELog& ELog::operator<<( const int& var )
 {
-#ifdef EDEBUG
-  outFile << var ;
-#endif
+if( logFile )
+	{
+	outFile	<< var ;
+	}
 if( outStream ) *outStream << var ;
 return *this ;
 }
 
 ELog& ELog::operator<<( const unsigned int& var )
 {
-#ifdef EDEBUG
-  outFile << var ;
-#endif
+if( logFile )
+	{
+	outFile	<< var ;
+	}
 if( outStream ) *outStream << var ;
 return *this ;
 }
 
 ELog& ELog::operator<<( const long int& var )
 {
-#ifdef EDEBUG
-  outFile << var ;
-#endif
+if( logFile )
+	{
+	outFile	<< var ;
+	}
 if( outStream ) *outStream << var ;
 return *this ;
 }
 
 ELog& ELog::operator<<( const unsigned long int& var )
 {
-#ifdef EDEBUG
-  outFile << var ;
-#endif
+if( logFile )
+	{
+	outFile	<< var ;
+	}
 if( outStream ) *outStream << var ;
 return *this ;
 }
 
 ELog& ELog::operator<<( const short int& var )
 {
-#ifdef EDEBUG
-  outFile << var ;
-#endif
+if( logFile )
+	{
+	outFile	<< var ;
+	}
 if( outStream ) *outStream << var ;
 return *this ;
 }
 
 ELog& ELog::operator<<( const unsigned short int& var )
 {
-#ifdef EDEBUG
-  outFile << var ;
-#endif
+if( logFile )
+	{
+	outFile	<< var ;
+	}
 if( outStream ) *outStream << var ;
 return *this ;
 }
 
 ELog& ELog::operator<<( stringstream& s )
 {
-#ifdef EDEBUG
-  outFile << s.str() ;
-#endif
+if( logFile )
+	{
+	outFile	<< s.str() ;
+	}
 if( outStream ) *outStream << s.str() ;
 return *this ;
 }
 
 ELog& ELog::operator<<( const double& var )
 {
-#ifdef EDEBUG
-  outFile << var ;
-#endif
+if( logFile )
+	{
+	outFile	<< var ;
+	}
 if( outStream ) *outStream << var ;
 return *this ;
 }

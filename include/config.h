@@ -17,35 +17,16 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: config.h,v 1.21 2003/06/19 23:38:32 dan_karrels Exp $
+ * $Id: config.h,v 1.22 2003/11/11 19:21:21 dan_karrels Exp $
  */
 
 #ifndef __CONFIG_H
-#define __CONFIG_H "$Id: config.h,v 1.21 2003/06/19 23:38:32 dan_karrels Exp $"
+#define __CONFIG_H "$Id: config.h,v 1.22 2003/11/11 19:21:21 dan_karrels Exp $"
 
-/* config.h */
 /* GNUWorld main configuration file */
 /* All core settings are set/defined here.
  */
 #include	"defs.h"
-
-/**
- * EDEBUG
- * This define is pretty obvious...Will probably consume
- * massive quantities of CPU when debugging, recommended
- * only for debugging/testing purposes.
- */
-#define EDEBUG
-
-#ifdef EDEBUG
-
-/**
- * DEBUGFILE
- * The file to which the debugger will write.
- */
-#define DEBUGFILE "debug.log"
-
-#endif // EDEBUG
 
 /**
  * CONFFILE
@@ -55,43 +36,12 @@
 #define CONFFILE "GNUWorld.conf"
 
 /**
- * LOGFILE
- * Name of the file to which gnuworld logs :)
- */
-#define LOGFILE "gnuworld.log"
-
-/**
- * LOG_SOCKET
- * Define this variable to enable logging of incoming raw data.
- * This is very useful for offline debugging.
- */
-#define LOG_SOCKET
-
-#ifdef LOG_SOCKET
-
-/**
- * LOG_SOCKET_NAME
- * The name of the default file to which to write raw data
- * from the network.
- */
-#define LOG_SOCKET_NAME "socket.log"
-
-#endif /* LOG_SOCKET */
-
-/**
  * CLIENT_DESC
  * Define this variable if you want gnuworld to track the
  * real name (description) of each network client.  This
  * can use quite a bit more memory on large networks.
  */
 #undef CLIENT_DESC
-
-/**
- * MAXLOOPCOUNT_DEFAULT
- * This variable represents how many times to attempt a system
- * call before giving up.
- */
-#define MAXLOOPCOUNT_DEFAULT 10
 
 /**
  * MAX_CHAN_MODES

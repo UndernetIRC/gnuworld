@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: client.cc,v 1.61 2003/11/02 18:43:34 dan_karrels Exp $
+ * $Id: client.cc,v 1.62 2003/11/11 19:21:36 dan_karrels Exp $
  */
 
 #include	<new>
@@ -47,7 +47,7 @@
 #include	"ELog.h"
 #include	"events.h"
 
-RCSTAG("$Id: client.cc,v 1.61 2003/11/02 18:43:34 dan_karrels Exp $" ) ;
+RCSTAG("$Id: client.cc,v 1.62 2003/11/11 19:21:36 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -425,6 +425,22 @@ if( Connected && MyUplink && Message && Message[ 0 ] != 0 )
 return false ;
 }
 
+bool xClient::Notice( const Channel* theChan, const string& Message )
+{
+assert( theChan != 0 ) ;
+if( Message.empty() )
+	{
+	return false ;
+	}
+
+return MyUplink->Write( "%s O #%s :%s\r\n",
+	getCharYYXXX().c_str(),
+	('#' == theChan->getName()[ 0 ])
+		? (theChan->getName().c_str() + 1)
+		: theChan->getName().c_str(),
+	Message.c_str() ) ;
+}
+
 bool xClient::Notice( const Channel* theChan, const char* Message, ... )
 {
 assert( theChan != 0 ) ;
@@ -507,6 +523,16 @@ void xClient::OnPrivateMessage( iClient*, const string&, bool )
 {
 }
 
+void xClient::OnFakePrivateMessage( iClient*, iClient*,
+	const string&, bool )
+{
+}
+
+void xClient::OnFakeChannelMessage( iClient*, iClient*,
+	Channel*, const string& )
+{
+}
+
 void xClient::OnChannelMessage( iClient*, Channel*, const string& )
 {
 }
@@ -515,7 +541,17 @@ void xClient::OnPrivateNotice( iClient*, const string&, bool )
 {
 }
 
+void xClient::OnFakePrivateNotice( iClient*, iClient*,
+	const string&, bool )
+{
+}
+
 void xClient::OnChannelNotice( iClient*, Channel*, const string& )
+{
+}
+
+void xClient::OnFakeChannelNotice( iClient*, iClient*,
+	Channel*, const string& )
 {
 }
 
