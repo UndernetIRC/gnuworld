@@ -20,6 +20,7 @@ COPY "translations" FROM stdin;
 1	14	You're devoiced by %s	31337
 1	15	%s is not opped in %s	31337
 1	16	%s is not voiced in %s	31337
+1	17	AUTHENTICATION FAILED as %s (Invalid Password)	31337
 \.
 
 -- French language definition.

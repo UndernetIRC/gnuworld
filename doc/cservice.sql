@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------------
--- "$Id: cservice.sql,v 1.12 2001/01/02 02:32:45 gte Exp $"
+-- "$Id: cservice.sql,v 1.13 2001/01/03 03:06:24 gte Exp $"
 -- Channel service DB SQL file for PostgreSQL.
 
 -- ChangeLog:
@@ -136,6 +136,7 @@ CREATE TABLE users (
 	public_key TEXT,
 	flags INT2 NOT NULL DEFAULT '0',
 -- 0x00 01 -- Suspended globally
+-- 0x00 02 -- Logged in
 	last_update_by VARCHAR (128),		-- nick!user@host
 	last_update INT4 NOT NULL,
 	PRIMARY KEY ( id )
@@ -150,10 +151,9 @@ CREATE TABLE levels (
 	user_id INT4 CONSTRAINT levels_users_id_ref REFERENCES users ( id ),
 	access INT4 NOT NULL DEFAULT '0',
 	flags INT2 NOT NULL DEFAULT '0',
--- 0x00 01 -- Logged in
--- 0x00 02 -- AutoOp
--- 0x00 04 -- Protect  (From CS source, unused)
--- 0x00 08 -- Temp forced access. (removed on logout).
+-- 0x00 01 -- AutoOp
+-- 0x00 02 -- Protect  (From CS source, unused)
+-- 0x00 04 -- Temp forced access. (removed on logout).
 	suspend_expires INT4,
 	suspend_by VARCHAR( 128 ),
 	added INT4,
