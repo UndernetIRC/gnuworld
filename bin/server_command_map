@@ -24,6 +24,7 @@ lib_msg_M351 351
 lib_msg_M M
 lib_msg_N N
 lib_msg_NOOP NOOP
+lib_msg_M OM
 lib_msg_PART PART
 lib_msg_PASS PASS
 lib_msg_P P
