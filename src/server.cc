@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server.cc,v 1.186 2003/12/17 18:21:36 dan_karrels Exp $
+ * $Id: server.cc,v 1.187 2003/12/18 18:42:21 dan_karrels Exp $
  */
 
 #include	<sys/time.h>
@@ -71,7 +71,7 @@
 #include	"ConnectionHandler.h"
 #include	"Connection.h"
 
-RCSTAG( "$Id: server.cc,v 1.186 2003/12/17 18:21:36 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: server.cc,v 1.187 2003/12/18 18:42:21 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -500,14 +500,15 @@ RegisterTimer( ::time( 0 ) + pingUpdateInterval,
 /**
  * Initiate a server shutdown.
  */
-void xServer::Shutdown()
+void xServer::Shutdown( const string& reason )
 {
 keepRunning = false ;
 autoConnect = false ;
 
-Write( "%s SQ %s :Server shutdown",
+Write( "%s SQ %s :%s",
 	getCharYY().c_str(),
-	getCharYY().c_str() ) ;
+	getCharYY().c_str(),
+	reason.c_str() ) ;
 
 // Can't call removeClients() here because it is likely one of the
 // clients that has invoked this call, that would be bad.

@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server.h,v 1.94 2003/11/11 19:21:21 dan_karrels Exp $
+ * $Id: server.h,v 1.95 2003/12/18 18:42:20 dan_karrels Exp $
  */
 
 #ifndef __SERVER_H
-#define __SERVER_H "$Id: server.h,v 1.94 2003/11/11 19:21:21 dan_karrels Exp $"
+#define __SERVER_H "$Id: server.h,v 1.95 2003/12/18 18:42:20 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
@@ -764,7 +764,7 @@ public:
 	/**
 	 * Shutdown the server.
 	 */
-	virtual void Shutdown() ;
+	virtual void Shutdown( const string& reason = "Server Shutdown" ) ;
 
 	/**
 	 * Output server statistics to the console (clog).
