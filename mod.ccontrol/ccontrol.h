@@ -3,7 +3,7 @@
  */
 
 #ifndef __CCONTROL_H
-#define __CCONTROL_H "$Id: ccontrol.h,v 1.73 2002/05/23 20:32:06 dan_karrels Exp $"
+#define __CCONTROL_H "$Id: ccontrol.h,v 1.74 2002/05/25 15:03:58 mrbean_ Exp $"
 
 //Undef this if you want to log to the database
 #define LOGTOHD 
@@ -33,6 +33,7 @@
 #include 	"ccException.h"
 #include        "server.h"
 #include	"CommandsDec.h"
+#include 	"ccBadChannel.h"
 #include	"ccGate.h"
 #include	"defs.h"
 
@@ -161,6 +162,10 @@ protected:
 	typedef ccLogList::iterator 	ccLogIterator;
 #endif
 
+	typedef map<string , ccBadChannel* , noCaseCompare> badChannelsMapType;
+	
+	typedef badChannelsMapType::iterator badChannelsIterator;
+	
 public:
 
 	/**
@@ -536,6 +541,8 @@ public:
 	
 	bool loadVersions();
 	
+	bool loadBadChannels();
+	
 	void wallopsAsServer(const char * , ... );
 
 	int getExceptions( const string & );
@@ -629,6 +636,9 @@ public:
 	const unsigned long getDateMax() const
 	{ return dateMax; }
 	
+	const unsigned long getCurUsers() const
+	{ return curUsers; }
+	
 	bool addVersion(const string&);
 	
 	bool remVersion(const string&);
@@ -638,6 +648,12 @@ public:
 	void listVersions(iClient*);
 	
 	bool updateCheckVer(const bool);
+	
+	ccBadChannel* isBadChannel(const string&);
+	
+	void addBadChannel(ccBadChannel*);
+	
+	void remBadChannel(ccBadChannel*);
 	
 	/**
 	 * This is a constant iterator type used to perform a read-only
@@ -789,12 +805,19 @@ public:
 	
 	typedef list<string>::iterator 	versionsIterator;
 	
+	badChannelsIterator badChannels_begin()
+		{ return badChannelsMap.begin(); }
+		
+	badChannelsIterator badChannels_end()
+		{ return badChannelsMap.end(); }
+
 	/**
 	 * Retrieve the default length of time for glines.
 	 */
 	inline const time_t& getDefaultGlineLength() const
 		{ return gLength ; }
 
+	
 	/**
 	 * PostgreSQL Database
 	 */
@@ -856,6 +879,8 @@ protected:
 	fstream			LogFile;
 #endif
 
+	badChannelsMapType	badChannelsMap;
+	
 	/**
 	 * The email address that ccontrol will send the email from
 	 */

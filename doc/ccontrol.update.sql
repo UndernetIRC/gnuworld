@@ -1,5 +1,5 @@
 
--- "$Id: ccontrol.update.sql,v 1.17 2002/03/20 22:23:48 mrbean_ Exp $"
+-- "$Id: ccontrol.update.sql,v 1.18 2002/05/25 15:03:57 mrbean_ Exp $"
 
 -- ccontrol database changes update
 -- this file will add the new features to an old database
@@ -89,5 +89,12 @@
 --update opers set saccess = (saccess | 262144);
 
 -- 20/03/02 Add LASTCOM command for opers
-update opers set saccess = (saccess | 8);
+-- update opers set saccess = (saccess | 8);
 
+-- 16/05/02 Add the BadChannels table
+
+CREATE TABLE BadChannels (
+        Name VARCHAR(400) NOT NULL,
+        Reason VARCHAR(512) NOT NULL,
+        AddedBy VARCHAR(200) NOT NULL
+        );

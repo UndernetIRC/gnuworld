@@ -12,8 +12,9 @@
 #include	"StringTokenizer.h"
 #include	"Network.h"
 #include	"Constants.h"
+#include	"ccBadChannel.h"
 
-const char MODECommand_cc_rcsId[] = "$Id: MODECommand.cc,v 1.15 2002/05/23 17:43:11 dan_karrels Exp $";
+const char MODECommand_cc_rcsId[] = "$Id: MODECommand.cc,v 1.16 2002/05/25 15:03:57 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -47,6 +48,14 @@ if( NULL == theChan )
 	}
 bot->MsgChanLog("MODE  %s\n",st.assemble(1).c_str());
 
+ccBadChannel* Chan = bot->isBadChannel(st[1]);
+if(Chan)
+        {
+        bot->Notice(theClient,"Sorry, but you can not change modes in "
+                             "this channel because : %s"
+                             ,Chan->getReason().c_str());
+        return false;
+        }
 // Define mode to be any mode, such as +abc-def
 // Define argument to to be any argument to a particular mode: -o nickArgument
 

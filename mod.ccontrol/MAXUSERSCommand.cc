@@ -10,7 +10,7 @@
 #include	"ccontrol.h"
 #include	"CControlCommands.h"
 
-const char MAXUSERSCommand_cc_rcsId[] = "$Id: MAXUSERSCommand.cc,v 1.1 2002/03/01 18:27:36 mrbean_ Exp $";
+const char MAXUSERSCommand_cc_rcsId[] = "$Id: MAXUSERSCommand.cc,v 1.2 2002/05/25 15:03:57 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -21,6 +21,7 @@ namespace uworld
 bool MAXUSERSCommand::Exec( iClient* theClient, const string& Message)
 {
 
+bot->Notice(theClient,"Current number of users is : %d",bot->getCurUsers());
 bot->Notice(theClient,"Maximum number of users ever recorded is : %d",bot->getMaxUsers());
 bot->Notice(theClient,"Recorded on %s",bot->convertToAscTime(bot->getDateMax()));
 return true;

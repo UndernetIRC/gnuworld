@@ -1,7 +1,7 @@
 /* ccontrol.cc
  * Authors: Daniel Karrels dan@karrels.com
  *	    Tomer Cohen    MrBean@toughguy.net
- * $Id: ccontrol.cc,v 1.143 2002/05/23 17:43:11 dan_karrels Exp $
+ * $Id: ccontrol.cc,v 1.144 2002/05/25 15:03:58 mrbean_ Exp $
  */
 
 #include        <sys/types.h> 
@@ -43,7 +43,7 @@
 #include	"ip.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.143 2002/05/23 17:43:11 dan_karrels Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.144 2002/05/25 15:03:58 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -593,6 +593,7 @@ RegisterCommand( new MAXUSERSCommand( this, "MAXUSERS",
 	false,
 	operLevel::OPERLEVEL,
 	true ) ) ;
+
 RegisterCommand( new CONFIGCommand( this, "CONFIG",
 	" Manages all kinds of configuration related values ",
 	commandLevel::flg_CONFIG,
@@ -600,6 +601,15 @@ RegisterCommand( new CONFIGCommand( this, "CONFIG",
 	false,
 	false,
 	operLevel::CODERLEVEL,
+	true ) ) ;
+
+RegisterCommand( new NOMODECommand( this, "NOMODE", 
+	"<ADD/DEL> <#channel> <reason>  Manage the nomode list  ",
+	commandLevel::flg_NOMODE,
+	false,
+	false,
+	false,
+	operLevel::SMTLEVEL,
 	true ) ) ;
 
 loadCommands();
@@ -616,6 +626,7 @@ loadUsers();
 loadServers();
 loadMaxUsers();
 loadVersions();
+loadBadChannels();
 
 connectCount = 0;
 connectRetry = 5;
@@ -2923,7 +2934,6 @@ for(int i =0;i<SQLDb->Tuples();++i)
 return true;
 }
 
-	
 bool ccontrol::loadMaxUsers()
 {
  
@@ -2972,7 +2982,7 @@ return true;
 
 bool ccontrol::loadVersions()
 {
- 
+
 if(!dbConnected)
         {   
         return false;
@@ -3010,6 +3020,40 @@ else
 	{
 	checkVer = atoi(SQLDb->GetValue(0,1));
 	}
+return true;
+}
+
+bool ccontrol::loadBadChannels()
+{
+        
+if(!dbConnected) 
+        {       
+        return false;
+        }
+
+stringstream theQuery;
+theQuery        << server::Query
+                << ends;
+         
+elog    << "ccotrol::loadServers> "
+        << theQuery.str()
+        << endl;
+
+ExecStatusType status = SQLDb->Exec( theQuery.str().c_str() ) ;
+//delete[] theQuery.str() ;
+
+if (PGRES_TUPLES_OK != status)
+        {
+        return false;
+        }
+ccServer* tempServer;
+for(int i =0;i<SQLDb->Tuples();++i)
+        {
+        tempServer = new (std::nothrow) ccServer(SQLDb);
+        assert(tempServer != NULL);
+        tempServer->loadDataFromDB(i);
+        serversMap[tempServer->getName()] = tempServer;
+        }
 return true;
 }
 
@@ -3775,7 +3819,7 @@ if(totalRecv > 1024*1024)
 else
 	{
 	Notice(tmpClient,"Received a total of %ld bytes (average of %ld Bytes/Sec)",
-		getUplink()->getTotalReceived(),totalRecv);	
+		getUplink()->getTotalReceived(),long (totalRecv));	
 	}
 	
 if(totalSent > 1024*1024)
@@ -3786,7 +3830,7 @@ if(totalSent > 1024*1024)
 else
 	{
 	Notice(tmpClient,"Sent a total of %ld bytes (average of %ld Bytes/Sec)",
-		getUplink()->getTotalSent(),totalSent);	
+		getUplink()->getTotalSent(),long(totalSent));	
 	}
 
 //Notice(tmpClient,"Received a total of %ld bytes",getUplink()->getTotalReceived());
@@ -4147,6 +4191,29 @@ if( PGRES_COMMAND_OK != status )
 	return false;
 	}
 return true;
+}
+
+ccBadChannel* ccontrol::isBadChannel(const string& Channel)
+{
+badChannelsIterator ptr = badChannelsMap.find(Channel);
+if(ptr == badChannels_end())
+	{
+	return NULL;
+	}
+
+return ptr->second;
+
+}
+
+void ccontrol::addBadChannel(ccBadChannel* Channel)
+{
+badChannelsMap[Channel->getName()] = Channel;
+
+}
+
+void ccontrol::remBadChannel(ccBadChannel* Channel)
+{
+badChannelsMap.erase(badChannelsMap.find(Channel->getName()));
 }
 
 void *initGate(void* arg)

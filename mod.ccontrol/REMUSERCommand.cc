@@ -13,7 +13,7 @@
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 
-const char REMUSERCommand_cc_rcsId[] = "$Id: REMUSERCommand.cc,v 1.9 2002/05/23 17:43:11 dan_karrels Exp $";
+const char REMUSERCommand_cc_rcsId[] = "$Id: REMUSERCommand.cc,v 1.10 2002/05/25 15:03:58 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -52,9 +52,16 @@ if(!tempAuth)
 	{ //we should never get here
 	return false;
 	}
-if(tempAuth->getType() < theUser->getType())
+if((tempAuth->getType() <= theUser->getType()) 
+    && (tempAuth->getType() < operLevel::CODERLEVEL))
 	{
-	bot->Notice(theClient,"You cant remove an oper who got higer access than yours");
+	bot->Notice(theClient,"You cant remove an oper who got higher or equal access");
+	return false;
+	}
+if(((tempAuth->getType() < operLevel::SMTLEVEL)) &&
+    (strcasecmp(tempAuth->getServer(),theUser->getServer())))
+	{
+	bot->Notice(theClient,"You cant remove opers from other servers");
 	return false;
 	}
 bot->MsgChanLog("REMUSER %s\n",st.assemble(1).c_str());

@@ -1,4 +1,4 @@
--- "$Id: ccontrol.sql,v 1.24 2002/03/01 18:27:32 mrbean_ Exp $"
+-- "$Id: ccontrol.sql,v 1.25 2002/05/25 15:03:57 mrbean_ Exp $"
 
 -- 2002-25-02 : |MrBean|
 -- Added the Misc table
@@ -129,4 +129,10 @@ CREATE TABLE Misc (
 	Value4 VARCHAR(40),
 	Value5 VARCHAR(128)
 	);
-	
+
+CREATE TABLE BadChannels (
+	Name VARCHAR(400) NOT NULL,
+	Reason VARCHAR(512) NOT NULL,
+	AddedBy VARCHAR(200) NOT NULL
+	);
+		

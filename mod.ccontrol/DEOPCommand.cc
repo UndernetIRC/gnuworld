@@ -13,8 +13,9 @@
 #include	"StringTokenizer.h"
 #include	"Network.h"
 #include	"Constants.h"
+#include	"ccBadChannel.h"
 
-const char DEOPCommand_cc_rcsId[] = "$Id: DEOPCommand.cc,v 1.8 2002/05/23 17:43:10 dan_karrels Exp $";
+const char DEOPCommand_cc_rcsId[] = "$Id: DEOPCommand.cc,v 1.9 2002/05/25 15:03:57 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -47,6 +48,14 @@ if( NULL == theChan )
 	return true ;
 	}
 
+ccBadChannel* Chan = bot->isBadChannel(st[1]);
+if(Chan)
+        {
+        bot->Notice(theClient,"Sorry, but you can not change modes in "
+                             "this channel because : %s"
+                             ,Chan->getReason().c_str());
+        return false;
+        }
 iClient* Target = 0;
 
 typedef map < iClient*, int > duplicateMapType; 

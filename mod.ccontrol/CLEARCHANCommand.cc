@@ -13,8 +13,9 @@
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 #include	"Constants.h"
+#include	"ccBadChannel.h"
 
-const char CLEARCHANCommand_cc_rcsId[] = "$Id: CLEARCHANCommand.cc,v 1.17 2002/05/23 17:43:10 dan_karrels Exp $";
+const char CLEARCHANCommand_cc_rcsId[] = "$Id: CLEARCHANCommand.cc,v 1.18 2002/05/25 15:03:57 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -57,6 +58,15 @@ string remModes = ""; //Holds the modes that we are removing
 string args = ""; //Holds the arguments for the remModes
 
 bot->MsgChanLog("CLEARCHAN %s\n",st.assemble(1).c_str());
+ccBadChannel* Chan = bot->isBadChannel(st[1]);
+if(Chan)
+        {
+        bot->Notice(theClient,"Sorry, but you can not change modes in "
+                             "this channel because : %s"
+                             ,Chan->getReason().c_str());
+        return false;
+        }
+
 //Check if the user specified the modes, if not assume he ment all of the modes
 if(st.size() == 2)
 	doModes = "OBKLIM";

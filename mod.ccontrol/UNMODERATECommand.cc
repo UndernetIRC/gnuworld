@@ -15,8 +15,9 @@
 #include	"StringTokenizer.h"
 #include	"Network.h"
 #include	"Constants.h"
+#include	"ccBadChannel.h"
 
-const char UNMODERATECommand_cc_rcsId[] = "$Id: UNMODERATECommand.cc,v 1.7 2002/03/01 18:27:36 mrbean_ Exp $";
+const char UNMODERATECommand_cc_rcsId[] = "$Id: UNMODERATECommand.cc,v 1.8 2002/05/25 15:03:58 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -41,6 +42,15 @@ if(st[1].size() > channel::MaxName)
 	}
 
 bot->MsgChanLog("UNMODERATE %s\n",st.assemble(1).c_str());
+
+ccBadChannel* Chan = bot->isBadChannel(st[1]);
+if(Chan)
+        {
+        bot->Notice(theClient,"Sorry, but you can not change modes in "
+                             "this channel because : %s"
+                             ,Chan->getReason().c_str());
+        return false;
+        }
 
 Channel* theChan = Network->findChannel( st[ 1 ] ) ;
 if( NULL == theChan )
