@@ -16,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: dronescan.h,v 1.15 2003/08/02 18:17:21 jeekay Exp $
+ * $Id: dronescan.h,v 1.16 2003/08/05 16:13:23 jeekay Exp $
  */
 
 #ifndef DRONESCAN_H
-#define DRONESCAN_H "$Id: dronescan.h,v 1.15 2003/08/02 18:17:21 jeekay Exp $"
+#define DRONESCAN_H "$Id: dronescan.h,v 1.16 2003/08/05 16:13:23 jeekay Exp $"
 
 #include <map>
 
@@ -83,6 +83,9 @@ public:
 	
 	/** Receive private messages. */
 	virtual void OnPrivateMessage( iClient*, const string&, bool ) ;
+	
+	/** When we are quit by the xServer */
+	virtual void OnQuit() ;
 	
 	/** Receive our own timed events. */
 	virtual void OnTimer( xServer::timerID , void* ) ;

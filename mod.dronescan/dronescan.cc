@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: dronescan.cc,v 1.28 2003/08/04 20:49:24 dan_karrels Exp $
+ * $Id: dronescan.cc,v 1.29 2003/08/05 16:13:23 jeekay Exp $
  */
 
 #include	<string>
@@ -39,7 +39,7 @@
 #include "sqlUser.h"
 #include "Timer.h"
 
-RCSTAG("$Id: dronescan.cc,v 1.28 2003/08/04 20:49:24 dan_karrels Exp $");
+RCSTAG("$Id: dronescan.cc,v 1.29 2003/08/05 16:13:23 jeekay Exp $");
 
 namespace gnuworld {
 
@@ -192,55 +192,6 @@ RegisterCommand(new STATUSCommand(this, "STATUS", ""));
  *************************/
 dronescan::~dronescan()
 {
-/* We need to delete() anything we have new()d
- * Currently this is:
- *  dronescanConfig
- *  Tests
- *  Commands
- *  clientData for every client on the net
- *  theTimer
- *
- * It is important this is kept up to date so that reload() does not leak.
- * We also need to unregister any timers we have so GNUworld doesn't segfault :)
- */
-
-/* Delete our config */
-delete dronescanConfig;
-
-/* Delete our timer */
-delete theTimer;
-
-/* Delete commands */
-for(commandMapType::iterator itr = commandMap.begin() ;
-    itr != commandMap.end() ; ++itr) {
-	delete itr->second;
-}
-commandMap.clear();
-
-/* Delete tests */
-for(testMapType::iterator itr = testMap.begin() ;
-    itr != testMap.end() ; ++itr) {
-	delete itr->second;
-}
-testMap.clear();
-
-/* Iterate over clients to delete clientData */
-for(xNetwork::const_clientIterator ptr = Network->clients_begin() ;
-    ptr != Network->clients_end() ; ++ptr) {
-	iClient *theClient = ptr->second;
-	clientData *theData = static_cast< clientData* > (theClient->removeCustomData(this));
-	delete theData;
-}
-
-/* Unregister the join counting timer */
-if(!MyUplink->UnRegisterTimer(tidClearJoinCounter, 0)) {
-	elog	<< "dronescan::~dronescan> "
-		<< "Could not unregister timer. Expect problems shortly."
-		<< endl;
-}
-
-/* Done! */
-
 }
 
 
@@ -536,6 +487,63 @@ void dronescan::OnPrivateMessage( iClient* theClient,
 		}
 		}
 }
+
+
+/** Clean up after ourselves */
+void dronescan::OnQuit()
+{
+/* We need to delete() anything we have new()d
+ * Currently this is:
+ *  dronescanConfig
+ *  Tests
+ *  Commands
+ *  clientData for every client on the net
+ *  theTimer
+ *
+ * It is important this is kept up to date so that reload() does not leak.
+ * We also need to unregister any timers we have so GNUworld doesn't segfault :)
+ */
+
+/* Delete our config */
+delete dronescanConfig;
+
+/* Delete our timer */
+delete theTimer;
+
+/* Delete commands */
+for(commandMapType::iterator itr = commandMap.begin() ;
+    itr != commandMap.end() ; ++itr) {
+	delete itr->second;
+}
+commandMap.clear();
+
+/* Delete tests */
+for(testMapType::iterator itr = testMap.begin() ;
+    itr != testMap.end() ; ++itr) {
+	delete itr->second;
+}
+testMap.clear();
+
+/* Iterate over clients to delete clientData */
+for(xNetwork::const_clientIterator ptr = Network->clients_begin() ;
+    ptr != Network->clients_end() ; ++ptr) {
+	iClient *theClient = ptr->second;
+	clientData *theData = static_cast< clientData* > (theClient->removeCustomData(this));
+	delete theData;
+}
+
+/* Unregister the join counting timer */
+if(!MyUplink->UnRegisterTimer(tidClearJoinCounter, 0) ||
+   !MyUplink->UnRegisterTimer(tidClearActiveList, 0)) {
+	elog	<< "dronescan::~dronescan> "
+		<< "Could not unregister timer. Expect problems shortly."
+		<< endl;
+}
+
+/* Done! */
+
+}
+
 
 /** Receive our own timed events. */
 void dronescan::OnTimer( xServer::timerID theTimer , void *)
