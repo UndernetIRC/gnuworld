@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * "$Id: moduleLoader.h,v 1.13 2002/07/05 01:10:05 dan_karrels Exp $"
+ * "$Id: moduleLoader.h,v 1.14 2003/01/28 22:06:32 jeekay Exp $"
  */
 
 #ifndef __MODULELOADER_H
-#define __MODULELOADER_H "$Id: moduleLoader.h,v 1.13 2002/07/05 01:10:05 dan_karrels Exp $"
+#define __MODULELOADER_H "$Id: moduleLoader.h,v 1.14 2003/01/28 22:06:32 jeekay Exp $"
 
 #include	<iostream>
 #include	<string>
@@ -167,16 +167,14 @@ public:
 		return modPtr ;
 		}
 
-	lt_ptr symPtr = lt_dlsym( moduleHandle, "_gnuwinit" ) ;
-	if( 0 == symPtr )
+	modFunc = (GNUWModuleFunc)lt_dlsym( moduleHandle, "_gnuwinit" ) ;
+	if( 0 == modFunc )
 		{
 		elog	<< "moduleLoader::loadObject> Error: "
 			<< lt_dlerror()
 			<< endl ;
 		exit( 0 ) ;
 		}
-
-	modFunc = (GNUWModuleFunc) symPtr ;
 
 	modPtr = modFunc( arg );
 
