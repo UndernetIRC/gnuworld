@@ -1,6 +1,8 @@
 #include <sstream>
 #include <string>
 
+#include	<cstdio>
+
 #include "Convert.h"
 
 namespace gnuworld {
