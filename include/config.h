@@ -1,9 +1,9 @@
 /* config.h
- * $Id: config.h,v 1.9 2001/05/18 15:27:09 dan_karrels Exp $
+ * $Id: config.h,v 1.10 2002/02/02 18:18:18 gte Exp $
  */
 
 #ifndef __CONFIG_H
-#define __CONFIG_H "$Id: config.h,v 1.9 2001/05/18 15:27:09 dan_karrels Exp $"
+#define __CONFIG_H "$Id: config.h,v 1.10 2002/02/02 18:18:18 gte Exp $"
 
 /* config.h */
 /* GNUWorld main configuration file */
@@ -80,5 +80,12 @@
  * The maximum number of channel modes per command.
  */
 #define MAX_CHAN_MODES 10
+
+/**
+ * HIDDEN_HOST
+ * The suffix to be appended to the authenticated username
+ * to form the hidden host-mask when a user sets +x.
+ */
+#define HIDDEN_HOST ".users.undernet.org"
 
 #endif /* __CONFIG_H */

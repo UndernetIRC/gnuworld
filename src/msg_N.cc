@@ -14,7 +14,7 @@
 #include	"Network.h"
 #include	"ELog.h"
 
-const char msg_N_cc_rcsId[] = "$Id: msg_N.cc,v 1.5 2002/01/08 20:16:47 gte Exp $" ;
+const char msg_N_cc_rcsId[] = "$Id: msg_N.cc,v 1.6 2002/02/02 18:19:56 gte Exp $" ;
 const char iClient_h_rcsId[] = __ICLIENT_H ;
 const char events_h_rcsId[] = __EVENTS_H ;
 const char ip_h_rcsId[] = __IP_H ;
@@ -107,6 +107,7 @@ iClient* newClient = new (std::nothrow) iClient(
 		params[ 4 ], // username
 		host, // base 64 host
 		params[ 5 ], // insecurehost
+		params[ 5 ], // realInsecurehost
 		modes,
 		account,
 		description,

@@ -18,7 +18,7 @@
 #include	"ELog.h"
 #include	"StringTokenizer.h"
 
-const char msg_M_cc_rcsId[] = "$Id: msg_M.cc,v 1.11 2001/08/25 18:07:15 dan_karrels Exp $" ;
+const char msg_M_cc_rcsId[] = "$Id: msg_M.cc,v 1.12 2002/02/02 18:19:56 gte Exp $" ;
 const char misc_h_rcsId[] = __MISC_H ;
 const char events_h_rcsId[] = __EVENTS_H ;
 const char server_h_rcsId[] = __SERVER_H ;
@@ -360,6 +360,10 @@ for( const char* modePtr = Param[ 2 ] ; *modePtr ; ++modePtr )
 		case 'w':
 			if( plus )	theClient->setModeW() ;
 			else		theClient->removeModeW() ;
+			break ;
+		case 'x':
+			if( plus )	theClient->setModeX() ;
+			else		theClient->removeModeX() ;
 			break ;
 		case 'o':
 		case 'O':

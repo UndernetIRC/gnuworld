@@ -16,7 +16,7 @@
 #include	"ip.h"
 
 const char iClient_h_rcsId[] = __ICLIENT_H ;
-const char iClient_cc_rcsId[] = "$Id: iClient.cc,v 1.19 2002/01/08 20:16:47 gte Exp $" ;
+const char iClient_cc_rcsId[] = "$Id: iClient.cc,v 1.20 2002/02/02 18:19:56 gte Exp $" ;
 const char client_h_rcsId[] = __CLIENT_H ;
 const char Numeric_h_rcsId[] = __NUMERIC_H ;
 const char ip_h_rcsId[] = __IP_H ;
@@ -27,12 +27,13 @@ namespace gnuworld
 using std::string ;
 using std::map ;
 
-const iClient::modeType iClient::MODE_OPER = 0x01 ;
-const iClient::modeType iClient::MODE_WALLOPS = 0x02 ;
-const iClient::modeType iClient::MODE_INVISIBLE = 0x04 ;
-const iClient::modeType iClient::MODE_DEAF = 0x08 ;
-const iClient::modeType iClient::MODE_SERVICES = 0x10 ;
-const iClient::modeType iClient::MODE_REGISTERED = 0x20 ;
+const iClient::modeType iClient::MODE_OPER        = 0x01 ;
+const iClient::modeType iClient::MODE_WALLOPS     = 0x02 ;
+const iClient::modeType iClient::MODE_INVISIBLE   = 0x04 ;
+const iClient::modeType iClient::MODE_DEAF        = 0x08 ;
+const iClient::modeType iClient::MODE_SERVICES    = 0x10 ;
+const iClient::modeType iClient::MODE_REGISTERED  = 0x20 ;
+const iClient::modeType iClient::MODE_HIDDEN_HOST = 0x40 ;
 
 iClient::iClient( const unsigned int& _uplink,
 	const string& _yxx,
@@ -40,6 +41,7 @@ iClient::iClient( const unsigned int& _uplink,
 	const string& _userName,
 	const string& _hostBase64,
 	const string& _insecureHost,
+	const string& _realInsecureHost,
 	const string& _mode,
 	const string& _account,
 	const string& _description,
@@ -49,6 +51,7 @@ iClient::iClient( const unsigned int& _uplink,
 	userName( _userName ),
 	IP( xIP( _hostBase64, true ).GetLongIP() ),
 	insecureHost( _insecureHost ),
+	realInsecureHost( _realInsecureHost ),
 	description( _description),
 	connectTime( _connectTime ),
 	mode( 0 ),
@@ -121,6 +124,11 @@ for( string::size_type i = 0 ; i < newModes.size() ; i++ )
 		case 'R':
 			mode |= MODE_REGISTERED ;
 			break ;
+		case 'x':
+		case 'X':
+			mode |= MODE_HIDDEN_HOST ;
+			insecureHost = account + string(HIDDEN_HOST);
+			break ;
 		default:
 			// Unknown mode
 			break ;
@@ -155,6 +163,8 @@ if( mode & MODE_WALLOPS )	retMe += 'w' ;
 if( mode & MODE_INVISIBLE )	retMe += 'i' ;
 if( mode & MODE_DEAF )		retMe += 'd' ;
 if( mode & MODE_SERVICES )	retMe += 'k' ;
+if( mode & MODE_REGISTERED )	retMe += 'r' ;
+if( mode & MODE_HIDDEN_HOST )	retMe += 'x' ;
 
 return retMe ;
 }

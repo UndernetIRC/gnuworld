@@ -2,7 +2,7 @@
  */
 
 #ifndef __ICLIENT_H
-#define __ICLIENT_H "$Id: iClient.h,v 1.23 2002/01/12 21:42:49 gte Exp $"
+#define __ICLIENT_H "$Id: iClient.h,v 1.24 2002/02/02 18:18:18 gte Exp $"
 
 #include	<string>
 #include	<list>
@@ -66,6 +66,9 @@ public:
 	/// MODE_REGISTERED is true if the iClient has an account set.
 	const static modeType	MODE_REGISTERED ;
 
+	/// MODE_HIDDEN_HOST is true if the iClient has HIDDEN_HOST (+x) set.
+	const static modeType	MODE_HIDDEN_HOST ;
+
 	/// Iterator for channels this user is on.
 	typedef channelListType::iterator channelIterator ;
 
@@ -85,6 +88,7 @@ public:
 		const string& _userName,
 		const string& _hostBase64,
 		const string& _insecureHost,
+		const string& _realInsecureHost,
 		const string& _mode,
 		const string& _account,
 		const string& _description,
@@ -116,6 +120,12 @@ public:
 	 */
 	inline const string& getInsecureHost() const
 		{ return insecureHost ;}
+
+	/**
+	 * Retrieve the iClient's 'real' host name.
+	 */
+	inline const string& getRealInsecureHost() const
+		{ return realInsecureHost ;}
 
 	/**
 	 * Retrieve a string of the form: nick!user@host for this user.
@@ -243,6 +253,9 @@ public:
 	inline bool isModeR() const
 		{ return getMode( MODE_REGISTERED ) ; }
 
+	inline bool isModeX() const
+		{ return getMode( MODE_HIDDEN_HOST ) ; }
+
 	/**
 	 * Return true if this iClient is an oper, false otherwise.
 	 */
@@ -276,6 +289,9 @@ public:
 	inline void setModeO()
 		{ setMode( MODE_OPER ) ; }
 
+	inline void setModeX()
+		{ setMode( MODE_HIDDEN_HOST ) ; insecureHost = account + string(HIDDEN_HOST); }
+
 	/**
 	 * Remove a user mode for this iClient.
 	 */
@@ -296,6 +312,9 @@ public:
 
 	inline void removeModeO()
 		{ removeMode( MODE_OPER ) ; }
+
+	inline void removeModeX()
+		{ removeMode( MODE_HIDDEN_HOST ) ; }
 
 	/**
 	 * Return a string representation of this iClient's user
@@ -426,9 +445,15 @@ protected:
 
 	/**
 	 * This client's hostname as it appears to network users.
+	 * (Possibly a hidden-hostname is the user is +x)
 	 */
 	string		insecureHost ;
 
+	/**
+	 * This client's actual network hostname, unhidden and
+	 * exposed.
+	 */
+	string		realInsecureHost ;
 
 	/**
 	 * This client's 'real-name' field data.

@@ -50,7 +50,7 @@
 #include	"UnloadClientTimerHandler.h"
 
 const char server_h_rcsId[] = __SERVER_H ;
-const char server_cc_rcsId[] = "$Id: server.cc,v 1.124 2002/01/17 20:04:05 mrbean_ Exp $" ;
+const char server_cc_rcsId[] = "$Id: server.cc,v 1.125 2002/02/02 18:19:53 gte Exp $" ;
 const char config_h_rcsId[] = __CONFIG_H ;
 const char misc_h_rcsId[] = __MISC_H ;
 const char events_h_rcsId[] = __EVENTS_H ;
@@ -1500,6 +1500,7 @@ iClient* theIClient = new (std::nothrow) iClient(
 	Client->getNickName(),
 	Client->getUserName(),
 	"AAAAAA",
+	Client->getHostName(),
 	Client->getHostName(),
 	Client->getModes(),
 	"",
