@@ -23,7 +23,7 @@
 #include	"AuthInfo.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.28 2001/05/01 19:52:50 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.29 2001/05/01 22:26:49 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -419,6 +419,8 @@ switch( theEvent )
 			wallopMe+=  NewServer->getName().c_str(); 
 			wallopMe+= " From server : ";
 			wallopMe+= UplinkServer->getName().c_str() ;
+			wallopMe+='\n';
+			MsgChanLog(wallopMe.c_str());
 			Wallops( wallopMe ) ;
 			}
 		else
@@ -439,7 +441,8 @@ switch( theEvent )
 		wallopMe+=  NewServer->getName().c_str(); 
 		wallopMe+= " From server : ";
 		wallopMe+= UplinkServer->getName().c_str() ;
-		Wallops( wallopMe ) ;
+		wallopMe+='\n';
+		MsgChanLog(wallopMe.c_str());
 		}
 		
 	} // switch()
@@ -1325,5 +1328,14 @@ for( int i = 0 ; i < SQLDb->Tuples() ; i++ )
 
 return NULL ;
 }
+
+bool ccontrol::MsgChanLog(const char *Msg)
+{
+if(!Network->findChannel(msgChan))
+	return false;
+if(Message(Network->findChannel(msgChan),Msg));
+return true;
+}
+
 
 } // namespace gnuworld

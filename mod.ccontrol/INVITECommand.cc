@@ -13,7 +13,7 @@
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 
-const char INVITECommand_cc_rcsId[] = "$Id: INVITECommand.cc,v 1.4 2001/02/26 16:58:05 mrbean_ Exp $";
+const char INVITECommand_cc_rcsId[] = "$Id: INVITECommand.cc,v 1.5 2001/05/01 22:26:49 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -77,7 +77,8 @@ if( !bot->isOperChan( chanName ) )
 	string wallopMe = theClient->getCharYYXXX() ;
 	wallopMe += " is cordially invited to channel "
 		+ chanName ;
-	bot->Wallops( wallopMe ) ;
+	wallopMe+='\n';
+	bot->MsgChanLog(wallopMe.c_str());
 	}
 
 return true ;

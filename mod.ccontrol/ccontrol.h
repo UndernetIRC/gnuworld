@@ -3,7 +3,7 @@
  */
 
 #ifndef __CCONTROL_H
-#define __CCONTROL_H "$Id: ccontrol.h,v 1.19 2001/04/30 23:44:42 mrbean_ Exp $"
+#define __CCONTROL_H "$Id: ccontrol.h,v 1.20 2001/05/01 22:26:49 mrbean_ Exp $"
 
 #include	<string>
 #include	<vector>
@@ -283,6 +283,8 @@ public:
 	bool remGline( ccGline* );
 
 	ccGline* findMatchingGline( const string& );
+
+	bool MsgChanLog( const char * );
 
 //	bool AuthOper( ccUser* );
 	
