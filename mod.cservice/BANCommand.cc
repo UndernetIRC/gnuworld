@@ -16,7 +16,7 @@
  *
  * Caveats: None.
  *
- * $Id: BANCommand.cc,v 1.22 2001/03/06 02:34:32 dan_karrels Exp $
+ * $Id: BANCommand.cc,v 1.23 2001/03/16 09:20:58 isomer Exp $
  */
 
 #include	<string>
@@ -30,7 +30,7 @@
 #include	"responses.h"
 #include	"match.h"
 
-const char BANCommand_cc_rcsId[] = "$Id: BANCommand.cc,v 1.22 2001/03/06 02:34:32 dan_karrels Exp $" ;
+const char BANCommand_cc_rcsId[] = "$Id: BANCommand.cc,v 1.23 2001/03/16 09:20:58 isomer Exp $" ;
 
 namespace gnuworld
 {
@@ -119,7 +119,8 @@ switch(oCount)
 			banReason = st.assemble(4);
 			banTime = atoi(st[3].c_str());
 			}
-	
+		banTime = atoi(st[3].c_str());
+		banLevel = atoi(st[3].c_str());
 		break;
 		}
 	case 3:
