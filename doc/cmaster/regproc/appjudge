@@ -1,5 +1,5 @@
 #!/usr/local/pgsql/bin/pgtclsh
-# $Id: appjudge,v 1.2 2002/04/13 23:27:58 nighty Exp $
+# $Id: appjudge,v 1.3 2002/08/30 10:15:15 nighty Exp $
 # Author: sengaia@undernet.org, 20010619
 # Last fix: nighty@undernet.org, 20020414
 # This script automates a good part of the channel-registration process, you need 
@@ -55,8 +55,12 @@ set hSQL [pg_connect $SQL_DB]
 puts [format "%s: The court is now in session." [clock_stamp]]
 
 # Step 0.5: Reject applications that are still in status 0 after x days.
+
+puts [format "%s: DEBUG : Step 0.5 (0)." [clock_stamp]]
+
 set sup_timeout [expr $DAY * $SUPPORT_DAYS]
 pg_select $hSQL "SELECT channel_id,status,check_start_ts FROM pending WHERE (status = $AS_PENDING_SUPPORT) AND (now()::abstime::int4 > (created_ts + $sup_timeout))" sup_expired {
+puts [format "%s: DEBUG : Step 0.5 (1)." [clock_stamp]]
 	set chan_id [lindex [array get sup_expired "channel_id"] 1]
         reject_app $hSQL $chan_id "One or more of the supporters did not confirm their support."
 }
@@ -64,7 +68,12 @@ pg_select $hSQL "SELECT channel_id,status,check_start_ts FROM pending WHERE (sta
 
 # Step 1: reject applications that failed to pass the activity test within the required timeframe
 set app_timeout [expr $DAY * $MAX_DAYS]
+
+puts [format "%s: DEBUG : Step 1 (0)." [clock_stamp]]
 pg_select $hSQL "SELECT channel_id,status,check_start_ts,unique_join_count FROM pending WHERE (status = $AS_TRAFFIC_CHECK) AND (now()::abstime::int4 > (check_start_ts + $app_timeout))" t_expired {
+
+puts [format "%s: DEBUG : Step 1 (1)." [clock_stamp]]
+
 	set chan_id [lindex [array get t_expired "channel_id"] 1]
 	set joins [lindex [array get t_expired "unique_join_count"] 1]
 
@@ -90,7 +99,12 @@ pg_select $hSQL "SELECT channel_id,status,check_start_ts,unique_join_count FROM 
 }
 
 # Step 2: pass along applications that have passed the activity test
+
+puts [format "%s: DEBUG : Step 2 (0)." [clock_stamp]]
+
 pg_select $hSQL "SELECT channel_id,status FROM pending WHERE (status=$AS_TRAFFIC_CHECK) AND (unique_join_count >= $UNIQUE_JOINS)" t_check {
+
+	puts [format "%s: DEBUG : Step 2 (1)." [clock_stamp]]
 	# check if supporters joined often enough
 	set chan_id [lindex [array get t_check "channel_id"] 1]
 	pg_select $hSQL "SELECT COUNT(*) AS supcount FROM supporters WHERE (channel_id = $chan_id) AND (join_count > 0)" sup_res {
@@ -104,12 +118,14 @@ pg_select $hSQL "SELECT channel_id,status FROM pending WHERE (status=$AS_TRAFFIC
 }
 
 # Step 3: check for end of notify period
+puts [format "%s: DEBUG : Step 3 (0)." [clock_stamp]]
 set notify_delay [expr $DAY * $NOTIFY_DAYS]
 
 pg_select $hSQL "SELECT channel_id,status,manager_id,reviewed FROM pending WHERE (status = $AS_NOTIFICATION) AND ((check_start_ts + $notify_delay) < now()::abstime::int4)" t_notified {
 	set chan_id [lindex [array get t_notified "channel_id"] 1]
 	set mgr_id [lindex [array get t_notified "manager_id"] 1]
 	set reviewed [lindex [array get t_notified "reviewed"] 1]
+	puts [format "%s: DEBUG : Step 3 (1)." [clock_stamp]]
 	# Figure out what to do
 	if {![check_comments $hSQL $chan_id]} {
 
