@@ -26,7 +26,7 @@
 #include	"events.h"
 
 const char xClient_h_rcsId[] = __XCLIENT_H ;
-const char xClient_cc_rcsId[] = "$Id: client.cc,v 1.26 2001/01/28 19:27:35 dan_karrels Exp $" ;
+const char xClient_cc_rcsId[] = "$Id: client.cc,v 1.27 2001/01/31 22:34:52 dan_karrels Exp $" ;
 
 using std::string ;
 using std::strstream ;
@@ -255,7 +255,7 @@ if( Connected && MyUplink )
 		Target->getCharYYXXX().c_str(),
 		Message.c_str() ) ;
 	}
-return -1 ;
+return 0 ;
 }
 
 int xClient::Message( const iClient* Target, const char* Message, ... )
@@ -274,7 +274,7 @@ if( Connected && MyUplink && Message && Message[ 0 ] !=0 )
 		Target->getCharYYXXX().c_str(),
 		buffer ) ;
 	}
-	return -1;
+return 0 ;
 }
 
 int xClient::Message( const string& Channel, const char* Message, ... )
@@ -294,7 +294,7 @@ if( Connected && MyUplink && Message && Message[ 0 ] != 0 )
 			Channel.c_str(),
 		buffer ) ;
 	}
-return -1 ;
+return 0 ;
 }
 
 int xClient::Message( const Channel* theChan, const string& Message )
@@ -310,7 +310,7 @@ if( Connected && MyUplink )
 		theChan->getName().c_str(),
 		Message.c_str() ) ;
 	}
-return -1 ;
+return 0 ;
 }
 
 int xClient::Notice( const iClient* Target, const string& Message )
@@ -322,7 +322,7 @@ if( Connected && MyUplink )
 		Target->getCharYYXXX().c_str(),
 		Message.c_str() ) ;
 	}
-return -1 ;
+return 0 ;
 }
 
 int xClient::Notice( const iClient* Target, const char* Message, ... )
@@ -342,7 +342,7 @@ if( Connected && MyUplink && Message && Message[ 0 ] != 0 )
 		Target->getCharYYXXX().c_str(),
 		buffer ) ;
 	}
-return -1 ;
+return 0 ;
 }
 
 int xClient::Notice( const string& Channel, const char* Message, ... )
@@ -362,7 +362,7 @@ if( Connected && MyUplink && Message && Message[ 0 ] != 0 )
 			Channel.c_str(),
 		buffer ) ;
 	}
-return -1 ;
+return 0 ;
 }
 
 int xClient::OnCTCP( iClient*, const string&,

@@ -44,7 +44,7 @@
 #include	"ServerTimerHandlers.h"
 
 const char xServer_h_rcsId[] = __XSERVER_H ;
-const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.62 2001/01/31 22:03:22 dan_karrels Exp $" ;
+const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.63 2001/01/31 22:34:52 dan_karrels Exp $" ;
 
 using std::string ;
 using std::vector ;
@@ -1423,7 +1423,7 @@ bool xServer::Write( const string& buf )
 // Is there a valid connection?
 if( !_connected )
 	{
-	return false ;
+	return 0 ;
 	}
 
 if( verbose )
@@ -1454,7 +1454,7 @@ else
 	}
 
 // Return success.
-return true ;
+return buf.size() ;
 
 }
 

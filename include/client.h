@@ -3,7 +3,7 @@
  */
 
 #ifndef __XCLIENT_H
-#define __XCLIENT_H "$Id: client.h,v 1.21 2001/01/28 19:27:35 dan_karrels Exp $"
+#define __XCLIENT_H "$Id: client.h,v 1.22 2001/01/31 22:34:52 dan_karrels Exp $"
 
 #include	<string>
 
@@ -457,19 +457,22 @@ public:
 	/**
 	 * Message will PRIVMSG a string of data to the given iClient.
 	 */
-	virtual int Message( const iClient* Target, const string& Message ) ;
+	virtual int Message( const iClient* Target,
+		const string& Message ) ;
 
 	/**
 	 * This format of Message will write a string of data
 	 * to a channel.
 	 */
-	virtual int Message( const string& Channel, const char* Message, ... ) ;
+	virtual int Message( const string& Channel,
+		const char* Message, ... ) ;
 
 	/**
 	 * This format of Message will write a string of data
 	 * to a channel.
 	 */
-	virtual int Message( const Channel* theChan, const string& Message ) ;
+	virtual int Message( const Channel* theChan,
+		const string& Message ) ;
 
 	/**
 	 * Notice will send a NOTICE command to the given iClient.
@@ -485,7 +488,8 @@ public:
 	/**
 	 * This Notice() signature will send a channel NOTICE.
 	 */
-	virtual int Notice( const string& Channel, const char* Message, ... ) ;
+	virtual int Notice( const string& Channel,
+		const char* Message, ... ) ;
 
 	/**
 	 * Have this bot send a global wallops message.
