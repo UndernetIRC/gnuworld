@@ -20,3 +20,4 @@ grant all on webcookies to gnuworld;
 grant all on lastrequests to gnuworld;
 grant all on pendingusers to gnuworld;
 grant all on transition to gnuworld;
+grant all on pending_traffic to gnuworld;

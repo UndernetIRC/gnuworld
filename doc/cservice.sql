@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------------
--- "$Id: cservice.sql,v 1.40 2001/06/02 21:47:30 gte Exp $"
+-- "$Id: cservice.sql,v 1.41 2001/06/10 00:48:45 gte Exp $"
 -- Channel service DB SQL file for PostgreSQL.
 
 -- ChangeLog:
@@ -253,15 +253,25 @@ CREATE TABLE pending (
 	status INT4 DEFAULT '0',
 	-- Status of 'pending' channel:
 	-- 0 = 'Pending Supporters Confirmation'
-	-- 1 = 'Traffic Check & Notification'
-	-- 2 = 'Completed'
+	-- 1 = 'Traffic Check'
+	-- 2 = 'Notification'
+	-- 3 = 'Completed'
+	-- 4 = 'Cancelled by applicant'
 	-- 9 = 'Rejected'
 	join_count INT4 DEFAULT '0',
+	unique_join_count INT4 DEFAULT '0',
 	decision_ts INT4,
 	decision VARCHAR (80), 
+	managername VARCHAR (80),
 	comments TEXT,
 	last_updated INT4 NOT NULL, 
 	PRIMARY KEY(channel_id)
+);
+
+CREATE TABLE pending_traffic (
+	channel_id INT4 CONSTRAINT pending_traffic_channel_ref REFERENCES channels (id),
+	ip_number INT4,
+	join_count INT4
 );
 
 CREATE TABLE domain (

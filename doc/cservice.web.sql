@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------------
--- "$Id: cservice.web.sql,v 1.6 2001/03/18 22:46:04 gte Exp $"
+-- "$Id: cservice.web.sql,v 1.7 2001/06/10 00:48:45 gte Exp $"
 -- Channel service DB SQL file for PostgreSQL.
 --
 -- Tables specific to webbased registration process.
@@ -35,3 +35,20 @@ CREATE TABLE lastrequests (
 );
 
 CREATE INDEX lastrequests_ip_idx ON lastrequests(ip);
+
+ -- list of admins that have the ability to modify NOREG entries (other admins may only list them) 
+
+CREATE TABLE regteam ( 
+	admin_id int4 REFERENCES users(id) NOT NULL
+);
+
+-- recorded objections for channels.
+CREATE TABLE objections ( 
+	 channel_id int4 REFERENCES channels(id) NOT NULL, 
+	user_id int4 REFERENCES users(id) NOT NULL, 
+	comment text NOT NULL, 
+	created_ts int4 NOT NULL,
+	admin_only varchar(1) DEFAULT 'N'
+-- 'Y' : the objection is an admin comment on only * users sees it.
+-- 'N' : the objection is a regular one and everyone can see it.
+);
