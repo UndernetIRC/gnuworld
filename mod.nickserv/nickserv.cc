@@ -1,6 +1,8 @@
 /*
  * nickserv.cc
  */
+ 
+#include <stdarg.h>
 
 #include "Network.h"
 #include "StringTokenizer.h"
@@ -8,7 +10,7 @@
 #include "netData.h"
 #include "nickserv.h"
 
-const char NickServ_cc_rcsId[] = "$Id: nickserv.cc,v 1.13 2002/11/25 04:48:40 jeekay Exp $";
+const char NickServ_cc_rcsId[] = "$Id: nickserv.cc,v 1.14 2002/11/26 03:33:24 jeekay Exp $";
 
 namespace gnuworld
 {
@@ -71,6 +73,8 @@ precacheUsers();
 
 /* Register the commands we want to use */
 RegisterCommand(new INFOCommand(this, "INFO", "<nick>"));
+RegisterCommand(new INVITECommand(this, "INVITE", ""));
+RegisterCommand(new MODUSERCommand(this, "MODUSER", "<nick> [ACCESS] <level>"));
 RegisterCommand(new RECOVERCommand(this, "RECOVER", ""));
 RegisterCommand(new REGISTERCommand(this, "REGISTER", ""));
 RegisterCommand(new SETCommand(this, "SET", "<property> <value>"));
@@ -140,6 +144,8 @@ int nickserv::BurstChannels()
 {
 MyUplink->JoinChannel(this, consoleChannel, nickservConfig->Require("consoleChannelModes")->second);
 
+MyUplink->RegisterChannelEvent(consoleChannel, this);
+
 stringstream setTopic;
 setTopic << getCharYYXXX() << " T "
          << consoleChannel << " :"
@@ -182,6 +188,37 @@ xClient::ImplementServer( theServer );
 
 
 /**
+ * Here we deal with any channel events we want to listen to.
+ */
+int nickserv::OnChannelEvent(const channelEventType& theEvent, Channel* theChannel,
+                              void* data1, void*, void*, void*)
+{
+
+iClient* theClient = 0;
+
+switch (theEvent) {
+  case EVT_JOIN: {
+    if(theChannel->getName() != consoleChannel) {
+      theLogger->log(logging::events::E_WARNING, "Received a JOIN for channel: %s.",
+                     theChannel->getName().c_str());
+      return true;
+    }
+    
+    theClient = static_cast< iClient* > ( data1 );
+    
+    sqlUser* theUser = isAuthed(theClient);
+    if(theUser->getLevel() > 0) Op(theChannel, theClient);
+    
+    break;
+  } // case EVT_JOIN
+} // switch (theEvent)
+
+return true;
+
+}
+
+
+/**
  * Here we deal with the various CTCP messages that can get thrown at us.
  */
 int nickserv::OnCTCP( iClient* theClient, const string& CTCP,
@@ -198,7 +235,7 @@ if("DCC" == Command) {
 } else if("PING" == Command) {
   DoCTCP(theClient, CTCP, Message);
 } else if("VERSION" == Command) {
-  DoCTCP(theClient, CTCP, "GNUWorld NickServ v1.0.2");
+  DoCTCP(theClient, CTCP, "GNUWorld NickServ v1.0.3");
 }
 
 return xClient::OnCTCP(theClient, CTCP, Message, Secure);

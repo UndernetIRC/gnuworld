@@ -1,5 +1,5 @@
 #ifndef _NICKSERV_H
-#define _NICKSERV_H "$Id: nickserv.h,v 1.10 2002/11/25 04:48:40 jeekay Exp $"
+#define _NICKSERV_H "$Id: nickserv.h,v 1.11 2002/11/26 03:33:24 jeekay Exp $"
 
 #include "client.h"
 #include "EConfig.h"
@@ -43,14 +43,18 @@ class nickserv : public xClient, public logging::logTarget {
     /** This is called when we have attached to the xServer */
     virtual void ImplementServer( xServer* ) ;
 
+    /** This is called when a channel event we are listening for happens */
+    virtual int OnChannelEvent( const channelEventType&, Channel*, void*,
+                                 void*, void*, void* ) ;
+
     /** This is called when we receive a CTCP */
-    virtual int OnCTCP( iClient*, const string&, const string&, bool = false ) ;
+    virtual int OnCTCP( iClient*, const string&, const string&, bool ) ;
 
     /** This is called when a network event happens */
     virtual int OnEvent( const eventType&, void* , void*, void*, void* ) ;
 
     /** This method is called when the bot gets a PRIVMSG */
-    virtual int OnPrivateMessage( iClient*, const string&, bool secure = false ) ;
+    virtual int OnPrivateMessage( iClient*, const string&, bool secure ) ;
     
     /** This method is called when a timer expires */
     virtual int OnTimer(gnuworld::xServer::timerID, void*) ;
@@ -76,6 +80,10 @@ class nickserv : public xClient, public logging::logTarget {
 
     /** Insert a nick/sqlUser* pair into the cache */
     void addUserToCache(string, sqlUser*);
+    
+    /* Accessor for consoleChannel */
+    inline const string getConsoleChannel() const
+      { return consoleChannel; }
     
     /** Log a message to the console channel */
     void logAdminMessage(const char*, ... );

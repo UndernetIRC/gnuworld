@@ -6,9 +6,10 @@
 
 #include "levels.h" 
 #include "nickserv.h"
+#include "responses.h"
 #include "Stats.h"
 
-const char STATSCommand_cc_rcsId[] = "$Id: STATSCommand.cc,v 1.2 2002/08/25 23:12:28 jeekay Exp $";
+const char STATSCommand_cc_rcsId[] = "$Id: STATSCommand.cc,v 1.3 2002/11/26 03:33:24 jeekay Exp $";
 
 namespace gnuworld
 {
@@ -26,7 +27,7 @@ bot->theStats->incStat("NS.CMD.STATS");
 sqlUser* theUser = bot->isAuthed(theClient);
 
 if(!theUser || (theUser->getLevel() < level::admin::stats)) {
-  bot->Notice(theClient, "Sorry, you do not have access to this command.");
+  bot->Notice(theClient, responses::noAccess);
   return true;
 }
 

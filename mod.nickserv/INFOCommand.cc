@@ -8,8 +8,9 @@
 
 #include "levels.h"
 #include "nickserv.h"
+#include "responses.h"
 
-const char INFOCommand_cc_rcsId[] = "$Id: INFOCommand.cc,v 1.1 2002/11/25 03:56:15 jeekay Exp $";
+const char INFOCommand_cc_rcsId[] = "$Id: INFOCommand.cc,v 1.2 2002/11/26 03:33:24 jeekay Exp $";
 
 namespace gnuworld {
 
@@ -22,7 +23,7 @@ bot->theStats->incStat("NS.CMD.INFO");
 sqlUser* theUser = bot->isAuthed(theClient);
 
 if(!theUser || (theUser->getLevel() < level::admin::info)) {
-  bot->Notice(theClient, "Sorry, you do not have access to this command.");
+  bot->Notice(theClient, responses::noAccess);
   return true;
 }
 
@@ -37,7 +38,7 @@ if(st.size() != 2) {
 sqlUser* targetUser = bot->isRegistered(st[1]);
 
 if(!targetUser) {
-  bot->Notice(theClient, "Unable to find nick.");
+  bot->Notice(theClient, responses::noSuchUser);
   return true;
 }
 

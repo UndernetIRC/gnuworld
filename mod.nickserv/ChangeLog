@@ -1,3 +1,8 @@
+2002-11-26 1.0.3 Jeekay
+* Added MODUSER to allow admins to change the access levels of other users
+* Added INVITE to allow admins to invite themselves into the console channel
+* Bumped version to 1.0.3
+
 2002-11-25 1.0.2 Jeekay
 * Added SET CONSOLELEVEL to alter the level at which the console is logging.
 * NickServ will now change the topic of the console channel to show the level.

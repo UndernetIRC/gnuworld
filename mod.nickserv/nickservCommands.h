@@ -1,5 +1,5 @@
 #ifndef _NICKSERVCOMMANDS_H
-#define _NICKSERVCOMMANDS_H "$Id: nickservCommands.h,v 1.6 2002/11/25 03:56:15 jeekay Exp $"
+#define _NICKSERVCOMMANDS_H "$Id: nickservCommands.h,v 1.7 2002/11/26 03:33:24 jeekay Exp $"
 
 /**
  * All this code is stolen straight from mod.cservice, which possibly had
@@ -71,6 +71,8 @@ DECLARE_COMMAND( WHOAMI )
 
 /* Admin commands */
 DECLARE_COMMAND( INFO )
+DECLARE_COMMAND( INVITE )
+DECLARE_COMMAND( MODUSER )
 DECLARE_COMMAND( SHUTDOWN )
 DECLARE_COMMAND( STATS )
 
