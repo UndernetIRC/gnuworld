@@ -35,7 +35,7 @@
 #endif
 
 const char Socket_h_rcsId[] = __SOCKET_H ;
-const char Socket_cc_rcsId[] = "$Id: Socket.cc,v 1.17 2001/06/14 22:14:13 dan_karrels Exp $" ;
+const char Socket_cc_rcsId[] = "$Id: Socket.cc,v 1.18 2002/04/06 21:39:29 mrbean_ Exp $" ;
 const char ELog_h_rcsId[] = __ELOG_H ;
 
 namespace gnuworld
@@ -50,11 +50,16 @@ Socket::Socket()
 memset( &addr, 0, sizeof( struct sockaddr_in ) ) ;
 fd = -1 ;
 portNum = 0 ;
+totalReceived = 0;
+totalSent = 0;
 }
+
 
 Socket::Socket( const Socket& rhs )
  : fd( rhs.fd ),
-   portNum( rhs.portNum )
+   portNum( rhs.portNum ),
+   totalReceived(rhs.totalReceived),
+   totalSent(rhs.totalReceived)
 {
 memcpy( &addr, &rhs.addr, sizeof( struct sockaddr_in ) ) ;
 }
@@ -426,7 +431,10 @@ do
 	result = ::send( fd,
 		reinterpret_cast< const char* >( buf ), nb, 0 ) ;
 	} while( (--cnt >= 0) && (EINTR == errno) ) ;
-
+if(result > 0)
+	{
+	totalSent += result;
+	}
 return result ;
 }
 
@@ -453,6 +461,10 @@ do
 	} while( (result < 0) &&
 		(--cnt >= 0) &&
 		(EINTR == errno) ) ;
+if(result > 0)
+	{
+	totalSent += result;
+	}
 
 return result ;
 }
@@ -490,6 +502,7 @@ do
 if( nbresult > 0 )
 	{
 	buf[ nbresult ] = 0 ;
+	totalReceived += nbresult;
 	}
 
 return nbresult ;

@@ -2,7 +2,7 @@
  */
 
 #ifndef __SOCKET_H
-#define __SOCKET_H "$Id: Socket.h,v 1.7 2001/07/29 22:44:06 dan_karrels Exp $"
+#define __SOCKET_H "$Id: Socket.h,v 1.8 2002/04/06 21:39:29 mrbean_ Exp $"
 
 #include	<new>
 #include	<iostream>
@@ -53,6 +53,18 @@ protected:
 	 */
 	unsigned short int	portNum ;
 
+	/**
+	 * This holds the total number of bytes revceived on the socket
+	 */
+	 
+	unsigned long int	totalReceived;
+	
+	/**
+	 * This holds the total number of bytes sent on the socket
+	 */
+
+	unsigned long int	totalSent;
+	
 public:
 
 	/**
@@ -186,7 +198,21 @@ public:
 	 * -1 on error.
 	 */
 	virtual int writable() const ;
- 
+	
+	/**
+	 * Returns the total number of bytes that was received on this socket
+	 */
+	 
+	const unsigned long getTotalReceived() const
+	{ return totalReceived; } 
+
+	/**
+	 * Returns the total number of bytes that was sent on this socket
+	 */
+
+	const unsigned long getTotalSent() const
+	{ return totalSent; } 
+
 protected:
 
 	/**

@@ -17,7 +17,7 @@
  */
 
 #ifndef __SERVER_H
-#define __SERVER_H "$Id: server.h,v 1.56 2002/03/14 20:35:19 mrbean_ Exp $"
+#define __SERVER_H "$Id: server.h,v 1.57 2002/04/06 21:39:28 mrbean_ Exp $"
 
 #include	<string>
 #include	<vector>
@@ -729,6 +729,20 @@ public:
 	inline const time_t& getConnectionTime() const
 		{ return ConnectionTime ; }
 
+	/**
+	 * Returns the total number of bytes recieved from the uplink
+	 */
+	
+	inline const unsigned long getTotalReceived() const
+	{ return theSock->getTotalReceived(); }
+
+	/**
+	 * Returns the total number of bytes sent to the uplink
+	 */
+	
+	inline const unsigned long getTotalSent() const
+	{ return theSock->getTotalSent(); }
+	
 	/**
 	 * This is a simple mutator of the server's socket pointer.
 	 * This is used ONLY for implementing the simulation mode.
