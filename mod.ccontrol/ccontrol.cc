@@ -27,7 +27,7 @@
 #include 	"gline.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.61 2001/07/23 10:28:51 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.62 2001/07/24 12:12:34 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -188,7 +188,7 @@ RegisterCommand( new ACCESSCommand( this, "ACCESS",
 RegisterCommand( new LOGINCommand( this, "LOGIN", "<USER> <PASS> "
 	"Authenticate with the bot",flg_LOGIN ) ) ;
 RegisterCommand( new DEAUTHCommand( this, "DEAUTH", ""
-	"Deauthenticate with the bot",flg_LOGIN ) ) ;
+	"Deauthenticate with the bot",flg_DEAUTH ) ) ;
 RegisterCommand( new ADDNEWOPERCommand( this, "ADDUSER", "<USER> <OPERTYPE> <PASS> "
 	"Add a new oper",flg_ADDNOP ) ) ;
 RegisterCommand( new REMOVEOPERCommand( this, "REMUSER", "<USER> <PASS> "
@@ -203,7 +203,7 @@ RegisterCommand( new SUSPENDOPERCommand( this, "SUSPEND", "<OPER> <DURATION> <TI
 	"Suspend an oper",flg_SUSPEND ) ) ;
 RegisterCommand( new UNSUSPENDOPERCommand( this, "UNSUSPEND", "<OPER> "
 	"UnSuspend an oper",flg_UNSUSPEND ) ) ;
-RegisterCommand( new MODOPERCommand( this, "MODOPER", "<OPER> <OPTION> <NEWVALUE>"
+RegisterCommand( new MODOPERCommand( this, "MODUSER", "<OPER> <OPTION> <NEWVALUE> [OPTION] [NEWVALUE] ... "
 	"Modify an oper",flg_UNSUSPEND ) ) ;
 RegisterCommand( new MODERATECommand( this, "MODERATE", "<#Channel> "
 	"Moderate A Channel",flg_UNSUSPEND ) ) ;
@@ -395,11 +395,18 @@ int ComAccess = commHandler->second->getFlags();
 
 bool ShouldntLog = ComAccess & flg_NOLOG;
 
-ComAccess = getTrueAccess(ComAccess);
-
 AuthInfo* theUser = IsAuth(theClient->getCharYYXXX());
 
-if((!theUser) && (ComAccess))
+bool NeedOp = ((ComAccess & flg_NEEDOP) && !(theClient->isOper()) && (getTrueAccess(ComAccess)) && (theUser->getNeedOp()));
+
+ComAccess = getTrueAccess(ComAccess);
+
+if(NeedOp)
+	{
+	Notice(theClient,
+		"You must be operd up to use this command");
+	}
+else if((!theUser) && (ComAccess))
 	{
 	Notice( theClient,
 		"You must be logged in to issue that command" ) ;
@@ -413,14 +420,14 @@ else if(( isSuspended(theUser) ) && ( ComAccess ) )
 		Notice( theClient,
 			"Sorry but you are suspended");
 		}
-	else 
-		{
-		// Log the command
-		if(!ShouldntLog) //Dont log command which arent suppose to be logged
-			DailyLog(theUser,Message.c_str());
-		// Execute the command handler
-		commHandler->second->Exec( theClient, Message) ;
-		}		
+else 
+	{
+	// Log the command
+	if(!ShouldntLog) //Dont log command which arent suppose to be logged
+		DailyLog(theUser,Message.c_str());
+	// Execute the command handler
+	commHandler->second->Exec( theClient, Message) ;
+	}		
 //else
 //	{	
 	// Log the command

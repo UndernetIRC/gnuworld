@@ -132,9 +132,13 @@ DECLARE_COMMAND( LIST )
 */
 
 const int flg_NOLOG = 0x80000000; //causes the bot not to log this command
+const int flg_NEEDOP = 0x40000000; //needs to be operd to use the command
+
 const int flg_ACCESS   = 0x01 | flg_NOLOG; 
 const int flg_HELP     = 0x01 | flg_NOLOG;
-const int flg_LOGIN    = 0x00 | flg_NOLOG;
+const int flg_LOGIN    = 0x0 | flg_NOLOG | flg_NEEDOP;
+const int flg_DEAUTH    = 0x01 | flg_NOLOG;
+
 const int flg_NEWPASS  = 0x01 | flg_NOLOG;
 const int flg_MODE     = 0x02;
 const int flg_OP = 0x02;
@@ -192,7 +196,7 @@ const int isSMT     = 0x08;
 const int isCODER     = 0x20;
 const int getLOGS      = 0x10;
 
-const int noACCESS = flg_NOLOG;
+const int noACCESS = flg_NOLOG | flg_NEEDOP;
 
 const int noFLAG = isSUSPENDED | getLOGS;
 

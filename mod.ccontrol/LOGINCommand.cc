@@ -13,7 +13,7 @@
 #include	"md5hash.h" 
 #include        "ccUser.h"
 
-const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.11 2001/07/23 10:28:51 mrbean_ Exp $";
+const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.12 2001/07/24 12:12:34 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -52,7 +52,15 @@ if (!theUser)
 	}
 else
 	{ 
+	//Check if the user need to be operd to login
+	if((!theClient->isOper()) && (flg_LOGIN & flg_NEEDOP) && (theUser->getNeedOp()))
+		{
+		bot->Notice(theClient,
+			     "You must be operd up to login");
+		return false;
+		}
 	//Check if the users mask is in his access list
+		
 	if(!bot->UserGotMask(theUser,theClient->getNickUserHost()))
 		{
 		bot->Notice(theClient,"Sorry but your mask doesnt appear in my access list!");
