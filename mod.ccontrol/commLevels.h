@@ -77,6 +77,7 @@ const unsigned long int flg_RGCHAN = 0x1000;
 const unsigned long int flg_USERINFO = 0x2000;
 const unsigned long int flg_STATUS = 0x4000;
 const unsigned long int flg_SHUTDOWN = 0x8000;
+const unsigned long int flg_SCAN = 0x10000;
 
 /*
  Default commands that are added upon adding a new oper
@@ -88,7 +89,7 @@ const unsigned long int OPER = flg_ACCESS | flg_HELP | flg_DEAUTH | flg_NEWPASS
 			| flg_REMGLINE | flg_LOPCHN | flg_CHINFO | flg_WHOIS 
 			| flg_TRANS | flg_KICK | flg_CLEARCHAN | flg_LISTHOSTS;
 const unsigned long int SOPER = flg_CHECKNET | flg_LISTIGNORES | flg_LIST 
-			| flg_NOTES | flg_USERINFO;
+			| flg_NOTES | flg_USERINFO | flg_SCAN;
 const unsigned long int ADMIN = OPER | flg_JUPE | flg_REMOPCHN | flg_ADDOPCHN 
 			| flg_ADDNOP | flg_REMOP |flg_MODOP | flg_ADDCMD 
 			| flg_DELCMD | flg_SUSPEND | flg_UNSUSPEND;

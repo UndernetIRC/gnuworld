@@ -37,7 +37,7 @@
 #include	"ip.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.109 2002/01/01 12:42:14 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.110 2002/01/02 21:00:03 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -287,6 +287,9 @@ RegisterCommand( new STATUSCommand( this, "STATUS", "Shows debug status "
         ,commandLevel::flg_STATUS,false,false,false,operLevel::CODERLEVEL,true ) ) ;
 RegisterCommand( new SHUTDOWNCommand( this, "SHUTDOWN", " <REASON> Shutdown the bot "
         ,commandLevel::flg_SHUTDOWN,false,false,false,operLevel::CODERLEVEL,true ) ) ;
+
+RegisterCommand( new SCANCommand( this, "SCAN", " -h <host> / -m <real name> "
+		" Shutdown the bot ",commandLevel::flg_SCAN,false,false,false,operLevel::OPERLEVEL,true ) ) ;
 
 loadCommands();
 loadGlines();

@@ -3,7 +3,7 @@
  */
 
 #ifndef __NETWORK_H
-#define __NETWORK_H "$Id: Network.h,v 1.21 2001/10/28 10:12:37 mrbean_ Exp $"
+#define __NETWORK_H "$Id: Network.h,v 1.22 2002/01/02 20:59:59 mrbean_ Exp $"
 
 #include	<vector>
 #include	<string>
@@ -476,6 +476,14 @@ public:
 	 * only the number of hosts found.
 	 */
 	virtual size_t	countHost( const string& hostName ) const ;
+
+	/**
+	 * Match the given client real name string, which may include
+	 * wildcards, to each client on the network.  Return a
+	 * list of pointers to const iClient's which match.
+	 */
+	virtual list< const iClient* >	matchRealName( const string& )
+			const ;
 
 protected:
 

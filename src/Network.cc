@@ -21,9 +21,10 @@
 #include	"Numeric.h"
 #include	"match.h"
 #include	"StringTokenizer.h"
+#include	"ip.h"
 
 const char xNetwork_h_rcsId[] = __NETWORK_H ;
-const char xNetwork_cc_rcsId[] = "$Id: Network.cc,v 1.32 2001/10/28 10:12:39 mrbean_ Exp $" ;
+const char xNetwork_cc_rcsId[] = "$Id: Network.cc,v 1.33 2002/01/02 21:00:03 mrbean_ Exp $" ;
 const char ELog_h_rcsId[] = __ELOG_H ;
 const char iClient_h_rcsId[] = __ICLIENT_H ;
 const char Channel_h_rcsId[] = __CHANNEL_H ;
@@ -796,10 +797,11 @@ for( networkVectorType::const_iterator sPtr = clients.begin() ;
 			continue ;
 			}
 
-		if( !match( wildHost, (*cPtr)->getInsecureHost() ) )
+		if( (!match( wildHost, (*cPtr)->getInsecureHost() ) )
+		    || (!match(wildHost, xIP((*cPtr)->getIP()).GetNumericIP())))
 			{
 			// Found a match
-			retMe.push_back( *cPtr ) ;
+			     retMe.push_back( *cPtr ) ;
 			}
 		}
 	}
@@ -896,4 +898,32 @@ size_t xNetwork::countHost( const string& hostName ) const
 return static_cast< size_t >( findHost( hostName ).size() ) ;
 }
 
+list< const iClient* > xNetwork::matchRealName( const string& realName ) const
+{
+list< const iClient* > retMe ;
+
+for( networkVectorType::const_iterator sPtr = clients.begin() ;
+	sPtr != clients.end() ; ++sPtr )
+	{
+
+	for( clientVectorType::const_iterator cPtr = (*sPtr).begin() ;
+		cPtr != (*sPtr).end() ; ++cPtr )
+		{
+		if( NULL == *cPtr )
+			{
+			// No client present at this numeric,
+			// no big deal
+			continue ;
+			}
+
+		if (!match( realName, (*cPtr)->getDescription() ) )
+			{
+			retMe.push_back(*cPtr);
+			}
+		}
+	}
+
+return retMe;
+
+}
 } // namespace gnuworld

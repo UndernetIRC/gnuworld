@@ -13,7 +13,7 @@
 #include	"Network.h"
 #include	"Constants.h"
 
-const char NEWPASSCommand_cc_rcsId[] = "$Id: NEWPASSCommand.cc,v 1.16 2001/12/23 09:07:57 mrbean_ Exp $";
+const char NEWPASSCommand_cc_rcsId[] = "$Id: NEWPASSCommand.cc,v 1.17 2002/01/02 21:00:03 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -75,7 +75,7 @@ switch(passRet)
 			}
 		}
 	}
-	
+return true;	
 }	
 
 }
