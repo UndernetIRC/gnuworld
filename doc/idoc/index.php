@@ -2,7 +2,7 @@
 /*
  *
  * Undernet GNUworld Interactive Installation Guide (aka UGIIG)
- * $Id: index.php,v 1.18 2004/02/25 01:02:24 nighty Exp $
+ * $Id: index.php,v 1.19 2004/06/01 08:30:25 nighty Exp $
  *
  * Released under the GNU Public License : http://www.gnu.org/licenses/gpl.txt
  * by nighty <nighty@undernet.org>
@@ -50,7 +50,7 @@ function footer($prev,$next) {
 	//echo "<address>maintained by <b>&lt;</b><a href=\"mailto:" . $coder_email . "\">" . $coder_email . "</a><b>&gt;</b> - Last modified : <b>" . date("M-d-Y H:i:s",   (  filemtime("index.php")+( date("Z",filemtime("index.php"))/3600 )   )   ) . " UTC/GMT</b> - <b>[</b><a href=\"./\">Home</a><b>]</b></address>";
 	echo "<address>maintained by <b>&lt;</b><a href=\"mailto:" . $coder_email . "\">" . $coder_email . "</a><b>&gt;</b> - <b>[</b><a href=\"./\">Home</a><b>]</b>";
 	echo "&nbsp;<br><font size=-2><b>";
-?>$Id: index.php,v 1.18 2004/02/25 01:02:24 nighty Exp $<?
+?>$Id: index.php,v 1.19 2004/06/01 08:30:25 nighty Exp $<?
 	echo "</b></font></address>\n";
 	echo "</body>\n";
 	echo "</html>\n";
@@ -117,7 +117,7 @@ define(ZLIB_FILE_NAME,"zlib-1.1.4.tar.gz");
 
 
 ?>
-<!-- $Id: index.php,v 1.18 2004/02/25 01:02:24 nighty Exp $ //-->
+<!-- $Id: index.php,v 1.19 2004/06/01 08:30:25 nighty Exp $ //-->
 <html>
 <head>
 <title>Undernet GNUworld Interactive Installation Guide</title>
@@ -882,13 +882,13 @@ if (ereg("cservice",$modules)) {
 	<?=$os?>:/root# <b>su - gnuworld</b>
 <? } ?>
 	<?=$os?>:/home/gnuworld$ <b>touch .cvspass</b>
-	<?=$os?>:/home/gnuworld$ <b>cvs -d:pserver:anonymous@cvs.gnuworld.sourceforge.net:/cvsroot/gnuworld login</b>
+	<?=$os?>:/home/gnuworld$ <b>cvs -d:pserver:anonymous@cvs.sourceforge.net:/cvsroot/gnuworld login</b>
 
 Just hit the <b>[</b>ENTER<b>]</b> key as the password.
 
-	<?=$os?>:/home/gnuworld$ <b>cvs -z3 -d :pserver:anonymous@cvs.gnuworld.sourceforge.net:/cvsroot/gnuworld co gnuworld</b>
+	<?=$os?>:/home/gnuworld$ <b>cvs -z3 -d :pserver:anonymous@cvs.sourceforge.net:/cvsroot/gnuworld co gnuworld</b>
 <? if (ereg("cservice",$modules)) { ?>
-	<?=$os?>:/home/gnuworld$ <b>cvs -z3 -d :pserver:anonymous@cvs.gnuworld.sourceforge.net:/cvsroot/gnuworld co website</b>
+	<?=$os?>:/home/gnuworld$ <b>cvs -z3 -d :pserver:anonymous@cvs.sourceforge.net:/cvsroot/gnuworld co website</b>
 
 You should now have two directories in <b>/home/gnuworld</b> called <b>gnuworld/</b> and <b>website/</b>;
 they contain the CVS latest distributions of both c++ program and website.
@@ -2016,10 +2016,10 @@ We recommend you read <a href="./?s=1">our current documentation</a> about it us
 
 <a name=faq4><b>Were can i get the Website module for GNUWorld X ?</b>
 You can obtain it from CVS:
-	<i>cvs -d:pserver:anonymous@cvs.gnuworld.sourceforge.net:/cvsroot/gnuworld</i>
+	<i>cvs -d:pserver:anonymous@cvs.sourceforge.net:/cvsroot/gnuworld</i>
 login (There is no password, just press enter)
 and tand then type:
-	<i>cvs -z3 -d:pserver:anonymous@cvs.gnuworld.sourceforge.net:/cvsroot/gnt:/cvsroot/gnuworld checkout website</i>
+	<i>cvs -z3 -d:pserver:anonymous@cvs.sourceforge.net:/cvsroot/gnuworld checkout website</i>
 
 <hr width=100% noshade size=1><br>
 
