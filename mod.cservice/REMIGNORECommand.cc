@@ -8,7 +8,7 @@
 #include	"levels.h" 
 #include	"responses.h"
 
-const char REMIGNORECommand_cc_rcsId[] = "$Id: REMIGNORECommand.cc,v 1.3 2001/02/16 20:20:26 plexus Exp $" ;
+const char REMIGNORECommand_cc_rcsId[] = "$Id: REMIGNORECommand.cc,v 1.4 2001/02/24 20:48:57 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -58,6 +58,8 @@ bool REMIGNORECommand::Exec( iClient* theClient, const string& Message )
 					language::unsilenced,
 					string("Removed %s from my silence list")).c_str(),
 				st[1].c_str()); 
+			bot->logAdminMessage("%s (%s) has removed ignore: %s", 
+				theClient->getNickName().c_str(), theUser->getUserName().c_str(), st[1].c_str()); 
 			return true;
 		}
 
