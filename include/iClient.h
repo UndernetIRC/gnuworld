@@ -2,7 +2,7 @@
  */
 
 #ifndef __ICLIENT_H
-#define __ICLIENT_H "$Id: iClient.h,v 1.5 2000/08/06 22:45:21 gte Exp $"
+#define __ICLIENT_H "$Id: iClient.h,v 1.6 2000/08/11 13:47:43 dan_karrels Exp $"
 
 #include	<string>
 #include	<list>
@@ -64,6 +64,8 @@ public:
 
 	/// Constant iterator for channels this user is on.
 	typedef channelListType::const_iterator const_channelIterator ;
+
+	typedef channelListType::size_type channels_sizeType ;
 
 	/**
 	 * Construct a new iClient given a large list of
@@ -159,6 +161,12 @@ public:
 	 */
 	inline channelIterator channels_end()
 		{ return channelList.end() ; }
+
+	/**
+	 * Return the number of channels which this user is on.
+	 */
+	inline channels_sizeType channels_size() const
+		{ return channelList.size() ; }
 
 	/* Mutator methods */
 
