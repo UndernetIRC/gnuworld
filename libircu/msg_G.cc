@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_G.cc,v 1.1 2002/11/20 22:16:18 dan_karrels Exp $
+ * $Id: msg_G.cc,v 1.2 2003/06/07 00:26:23 dan_karrels Exp $
  */
 
 #include	<sys/time.h>
@@ -47,7 +47,6 @@ namespace gnuworld
 using std::string ;
 using std::endl ;
 using std::stringstream ;
-using std::ends ;
 
 CREATE_HANDLER(msg_G)
 
@@ -128,8 +127,7 @@ else
 	stringstream	theStream ;
 	theStream	<< now.tv_sec
 			<< "."
-			<< now.tv_usec
-			<< ends ;
+			<< now.tv_usec ;
 
 	// Obtain localTS as double val
 	double localTSDouble = 0.0 ;
@@ -139,8 +137,7 @@ else
 	theStream.str( string() ) ;
 	theStream	<< now.tv_sec
 			<< "."
-			<< now.tv_usec
-			<< ends ;
+			<< now.tv_usec ;
 
 	string localTSString ;
 	theStream	>> localTSString ;

@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server.cc,v 1.162 2003/06/06 13:14:16 dan_karrels Exp $
+ * $Id: server.cc,v 1.163 2003/06/07 00:26:24 dan_karrels Exp $
  */
 
 #include	<sys/time.h>
@@ -72,7 +72,7 @@
 #include	"Connection.h"
 
 const char server_h_rcsId[] = __SERVER_H ;
-const char server_cc_rcsId[] = "$Id: server.cc,v 1.162 2003/06/06 13:14:16 dan_karrels Exp $" ;
+const char server_cc_rcsId[] = "$Id: server.cc,v 1.163 2003/06/07 00:26:24 dan_karrels Exp $" ;
 const char config_h_rcsId[] = __CONFIG_H ;
 const char misc_h_rcsId[] = __MISC_H ;
 const char events_h_rcsId[] = __EVENTS_H ;
@@ -101,7 +101,6 @@ using std::string ;
 using std::vector ;
 using std::list ;
 using std::endl ;
-using std::ends ;
 using std::stringstream ;
 using std::stack ;
 using std::unary_function ;
@@ -944,8 +943,7 @@ s	<< charYY
 	<< ' '
 	<< theServer->getStartTime()
 	<< " :"
-	<< reason
-	<< ends ;
+	<< reason ;
 
 // Notify the rest of the network of the SQUIT.
 Write( s ) ;
@@ -1913,8 +1911,7 @@ if( gItr != gline_end() )
 stringstream s ;
 s	<< charYY
 	<< " GL * -"
-	<< userHost
-	<< ends ;
+	<< userHost ;
 
 // Write the data to the network output buffer(s)
 Write( s ) ;
@@ -1982,7 +1979,7 @@ s	<< getCharYY() << " GL "
 	<< userHost << ' '
 	<< duration << ' '
 	<< lastmod << " :"
-	<< reason << ends ;
+	<< reason ;
 Write( s ) ;
 
 glineList.insert( glineListType::value_type(
@@ -2052,7 +2049,7 @@ for( const_glineIterator ptr = gline_begin() ;
 		<< ptr->second->getUserHost() << ' '
 		<< (ptr->second->getExpiration() - now) << ' '
 		<< ptr->second->getLastmod() << " :"
-		<< ptr->second->getReason() << ends ;
+		<< ptr->second->getReason() ;
 
 	Write( s ) ;
 	}
@@ -2110,8 +2107,7 @@ s	<< theClient->getCharYYXXX()
 	<< " L "
 	<< theChan->getName()
 	<< " :"
-	<< reason
-	<< ends ;
+	<< reason ;
 
 Write( s ) ;
 
@@ -2228,8 +2224,6 @@ if( (NULL == theChan) && bursting )
 		s	<< ":o" ;
 		}
 
-		s	<< ends ;
-
 	Write( s ) ;
 
 	// Instantiate the new channel
@@ -2271,8 +2265,7 @@ else if( NULL == theChan )
 		<< " C "
 		<< chanName
 		<< ' '
-		<< postJoinTime
-		<< ends ;
+		<< postJoinTime ;
 	Write( s ) ;
 	}
 
@@ -2282,8 +2275,7 @@ else if( NULL == theChan )
 		s	<< theClient->getCharYYXXX()
 			<< " M "
 			<< chanName << ' '
-			<< chanModes
-			<< ends ;
+			<< chanModes ;
 		Write( s ) ;
 		}
 
@@ -2351,7 +2343,6 @@ else if( bursting )
 		s	<< ":o" ;
 		}
 
-	s	<< ends ;
 	Write( s ) ;
 	}
 else
@@ -2361,8 +2352,7 @@ else
 		stringstream s2 ;
 		s2	<< theClient->getCharYYXXX()
 			<< " J "
-			<< chanName
-			<< ends ;
+			<< chanName ;
 
 		Write( s2 ) ;
 		}
@@ -2375,8 +2365,7 @@ else
 			<< " M "
 			<< chanName
 			<< " +o "
-			<< theClient->getCharYYXXX()
-			<< ends ;
+			<< theClient->getCharYYXXX() ;
 
 		Write( s ) ;
 		}
@@ -2386,8 +2375,7 @@ else
 		// Set the channel modes
 		stringstream s ;
 		s	<< theClient->getCharYYXXX() << " M "
-			<< chanName << ' '
-			<< chanModes << ends ;
+			<< chanName << ' ' ;
 
 		Write( s ) ;
 		}
@@ -2536,7 +2524,7 @@ s	<< getCharYY() << " N "
 	<< theClient->getModes() << ' '
 	<< "AAAAAA" << ' '
 	<< theClient->getCharYYXXX() << " :"
-	<< theClient->getDescription() << ends ;
+	<< theClient->getDescription() ;
 Write( s ) ;
 
 theClient->Connect( 31337 ) ;
@@ -3446,8 +3434,7 @@ if( msg.empty() )
 stringstream s ;
 s	<< getCharYY()
 	<< " WA :"
-	<< msg
-	<< ends ;
+	<< msg ;
 
 return Write( s ) ;
 }
@@ -3613,8 +3600,6 @@ if( !args.empty() )
 	s	<< ' '
 		<< args ;
 	}
-
-s	<< ends ;
 
 retMe = Write( s ) ;
 
@@ -3815,8 +3800,7 @@ outStream	<< getCharYY()
 		<< " AC "
 		<< destClient->getCharYYXXX()
 		<< " "
-		<< account
-		<< ends ;
+		<< account ;
 Write( outStream ) ;
 
 PostEvent( EVT_ACCOUNT,

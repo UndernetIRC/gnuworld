@@ -21,7 +21,7 @@
  */
 
 #ifndef __CLIENT_H
-#define __CLIENT_H "$Id: client.h,v 1.39 2003/06/06 20:03:31 dan_karrels Exp $"
+#define __CLIENT_H "$Id: client.h,v 1.40 2003/06/07 00:26:23 dan_karrels Exp $"
 
 #include	<sstream>
 #include	<string>
@@ -379,11 +379,18 @@ public:
 		const string& Message ) ;
 
 	/**
-	 * OnNotice is called when a NOTICE command
+	 * OnPrivateNotice is called when a NOTICE command
 	 * is issued to the client.
 	 */
-	virtual int OnNotice( iClient* Sender,
+	virtual int OnPrivateNotice( iClient* Sender,
 		const string& Message, bool secure = false ) ;
+
+	/**
+	 * OnChannelNotice is called when a module receives
+	 * channel notice, and is mode -d.
+	 */
+	virtual int OnChannelNotice( iClient* Sender,
+		Channel* theChan, const string& Message ) ;
 
 	/**
 	 * OnServerMessage is called when a server message
@@ -733,6 +740,12 @@ public:
 	 * Accessor method for the bot's user modes.
 	 */
 	virtual string getModes() const ;
+
+	/**
+	 * Return true if an arbitrary mode is set, false otherwise.
+	 */
+	inline bool	getMode( const modeType& whichMode ) const
+		{ return ((mode & whichMode) == whichMode) ; }
 
 	/**
 	 * Obtain a pointer to the single xServer instance, which

@@ -1,6 +1,6 @@
 /**
  * msg_O.cc
- * Copyright (C) 2003 Daniel Karrels <dan@karrels.com>
+ * Copyright (C) 2002 Daniel Karrels <dan@karrels.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_O.cc,v 1.2 2003/06/03 01:01:52 dan_karrels Exp $
+ * $Id: msg_O.cc,v 1.3 2003/06/07 00:26:23 dan_karrels Exp $
  */
 
 #include	<string>
@@ -30,14 +30,16 @@
 #include	"ELog.h"
 #include	"xparameters.h"
 #include	"ServerCommandHandler.h"
+#include	"StringTokenizer.h"
 
-const char msg_P_cc_rcsId[] = "$Id: msg_O.cc,v 1.2 2003/06/03 01:01:52 dan_karrels Exp $" ;
+const char msg_P_cc_rcsId[] = "$Id: msg_O.cc,v 1.3 2003/06/07 00:26:23 dan_karrels Exp $" ;
 const char server_h_rcsId[] = __SERVER_H ;
 const char Network_h_rcsId[] = __NETWORK_H ;
 const char iClient_h_rcsId[] = __ICLIENT_H ;
 const char client_h_rcsId[] = __CLIENT_H ;
 const char ELog_h_rcsId[] = __ELOG_H ;
 const char xParameters_h_rcsId[] = __XPARAMETERS_H ;
+const char StringTokenizer_h_rcsId[] = __STRINGTOKENIZER_H ;
 
 namespace gnuworld
 {
@@ -47,16 +49,34 @@ using std::endl ;
 
 CREATE_HANDLER(msg_O)
 
+void channelNotice( iClient* srcClient,
+	Channel* theChan,
+	const string& message )
+{
+for( xNetwork::localClientIterator lcItr = Network->localClient_begin() ;
+	lcItr != Network->localClient_end() ; ++lcItr )
+	{
+	// Only deliver the channel ctcp (message) if this client
+	// is on the channel, and is mode -d
+	if( (*lcItr)->isOnChannel( theChan ) &&
+		!(*lcItr)->getMode( iClient::MODE_DEAF ) )
+		{
+		(*lcItr)->OnChannelNotice( srcClient, theChan, message ) ;
+		}
+	}
+}
+
 /**
  * A nick has sent a private message
  * QBg O PAA :help
  * QBg: Source nickname's numeric
- * O: NOTICE
+ * O: Notice
  * PAA: Destination nickname's numeric
  * :help: Message
  *
  * QAE O PAA :translate xaa
  * QAE O AAPAA :translate xaa
+ * abcDE O #chanName :testing 12 3
  */
 bool msg_O::Execute( const xParameters& Param )
 {
@@ -67,71 +87,112 @@ if( Param.size() < 3 )
 	return false ;
 	}
 
-char* Sender	= Param[ 0 ] ;
-char* Receiver	= Param[ 1 ] ;
-
-// Is the PRIVMSG being sent to a channel?
-if( '#' == *Receiver )
+Channel* theChan = 0 ;
+if( '#' == Param[ 1 ][ 0 ] )
 	{
-	// It's a channel message, just ignore it
+	// Channel message
+	theChan = Network->findChannel( Param[ 1 ] ) ;
+	if( 0 == theChan )
+		{
+		elog	<< "msg_O> Unable to locate channel: "
+			<< Param[ 1 ]
+			<< endl ;
+		return  false ;
+		}
+	}
+
+if( '+' == Param[ 1 ][ 0 ] )
+	{
+	// Chances of receiving a local channel are slim to
+	// none anyway
+	// *shrug*
 	return true ;
 	}
 
-char		*Server		= NULL,
-		*Pos		= NULL ;
-
-bool		secure		= false ;
-
-xClient		*Client		= NULL ;
-
-// Search for user@host in the receiver string
-Pos = strchr( Receiver, '@' ) ;
-
-// Was there a '@' in the Receiver string?
-if( NULL != Pos )
+iClient* srcClient = Network->findClient( Param[ 0 ] ) ;
+if( 0 == srcClient )
 	{
-	// Yup, nickname specified
-	Server = Receiver + (Pos - Receiver) + 1 ;
-	Receiver[ Pos - Receiver ] = 0 ;
-	Client = Network->findLocalNick( Receiver ) ;
-	secure = true ;
+	elog	<< "msg_O> Unable to find source client: "
+		<< Param[ 1 ]
+		<< endl ;
+	return false ;
 	}
-else if( Receiver[ 0 ] == theServer->getCharYY()[ 0 ]
-	&& Receiver[ 1 ] == theServer->getCharYY()[ 1 ] )
+
+// abcDE P FGhij :hi, how are you?
+bool		secure = false ;
+xClient*	targetClient = 0 ;
+
+if( (0 == theChan) && (strchr( Param[ 1 ], '@' ) != 0) )
 	{
-	// It's mine
-	Client = Network->findLocalClient( Receiver ) ;
+	// nick@host.name specified, secure message
+	secure = true ;
+
+	StringTokenizer st( Param[ 1 ], '@' ) ;
+	targetClient = Network->findLocalNick( st[ 0 ] ) ;
+	if( 0 == targetClient )
+		{
+		elog	<< "msg_O> Received message for unknown "
+			<< "client: "
+			<< Param[ 1 ]
+			<< ", nick: "
+			<< st[ 0 ]
+			<< endl ;
+		return true ;
+		}
+	// Found the target xClient
+	}
+else if( (0 == theChan) &&
+	(Param[ 1 ][ 0 ] == theServer->getCharYY()[ 0 ]) &&
+	(Param[ 1 ][ 1 ] == theServer->getCharYY()[ 1 ]) )
+	{
+	// Normal message to an xClient
+	targetClient = Network->findLocalClient( Param[ 1 ] ) ;
+	if( 0 == targetClient )
+		{
+		elog	<< "msg_O> Unable to find local client: "
+			<< Param[ 1 ]
+			<< endl ;
+		return true ;
+		}
+	}
+else if( 0 == theChan )
+	{
+	// May be a message to a juped client on a juped server,
+	// ignore it.
+	return true ;
+	}
+
+string message( Param[ 2 ] ) ;
+
+if( theChan != 0 )
+	{
+//	elog	<< "msg_O> Channel notice from: "
+//		<< *srcClient
+//		<< ", message: "
+//		<< message
+//		<< ", on channel: "
+//		<< *theChan
+//		<< endl ;
+
+	channelNotice( srcClient, theChan, message ) ;
+	return true ;
 	}
 else
 	{
-	elog	<< "msg_O> Received a message for unknown client: "
-		<< Param
+	elog	<< "msg_O> Private notice from: "
+		<< *srcClient
+		<< ", message: "
+		<< message
 		<< endl ;
-	return false ;
+
+	return targetClient->OnPrivateNotice( srcClient,
+		message,
+		secure ) ;
 	}
 
-char* Message = Param[ 2 ] ;
+// This should not happen
+return true ;
 
-// :Sender PRIVMSG YXX :Message
-
-if( NULL == Client )
-	{
-	elog	<< "msg_O> Local client not found: "
-		<< Receiver
-		<< endl ;
-	return false ;
-	}
-
-iClient* Target = Network->findClient( Sender ) ;
-if( NULL == Target )
-	{
-	elog	<< "msg_O> Unable to find Sender: "
-		<< Sender
-		<< endl ;
-	return false ;
-	}
-
-return Client->OnNotice( Target, Message, secure ) ;
-}
+} // msg_O
 
 } // namespace gnuworld

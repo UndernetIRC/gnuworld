@@ -17,13 +17,14 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: stats.cc,v 1.12 2003/06/06 20:03:31 dan_karrels Exp $
+ * $Id: stats.cc,v 1.13 2003/06/07 00:26:23 dan_karrels Exp $
  */
 
 #include	<string>
 #include	<map>
 #include	<sstream>
 #include	<iostream>
+#include	<iomanip>
 
 #include	<ctime>
 
@@ -183,38 +184,98 @@ MyUplink->RegisterTimer( ::time( 0 ) + 60, this ) ;
 writeLog() ;
 
 // Reset the minutely event counters
-
-
 memset( eventMinuteTotal, 0, sizeof( eventMinuteTotal ) ) ;
 
 return 0 ;
+}
+
+int stats::OnPrivateNotice( iClient* theClient,
+	const string& theMessage,
+	bool secure )
+{
+//elog	<< "stats::OnPrivateNotice> theClient: "
+//	<< *theClient
+//	<< ", theMessage: "
+//	<< theMessage
+//	<< endl ;
+return xClient::OnPrivateNotice( theClient,
+	theMessage,
+	secure ) ;
+}
+
+int stats::OnChannelNotice( iClient* theClient,
+	Channel* theChan,
+	const string& theMessage )
+{
+//elog	<< "stats::OnChannelNotice> theClient: "
+//	<< *theClient
+//	<< ", theChan: "
+//	<< *theChan
+//	<< ", theMessage: "
+//	<< theMessage
+//	<< endl ;
+return xClient::OnChannelNotice( theClient, theChan, theMessage ) ;
+}
+
+int stats::OnCTCP( iClient* theClient,
+	const string& CTCPCommand,
+	const string& theMessage,
+	bool secure )
+{
+//elog	<< "stats::OnCTCP> theClient: "
+//	<< *theClient
+//	<< ", CTCPCommand: "
+//	<< CTCPCommand
+//	<< ", theMessage: "
+//	<< theMessage
+//	<< endl ;
+return xClient::OnCTCP( theClient, CTCPCommand,
+	theMessage, secure ) ;
 }
 
 int stats::OnChannelMessage( iClient* theClient,
 	Channel* theChan,
 	const string& theMessage )
 {
-elog	<< "stats::OnChannelMessage> theClient: "
-	<< *theClient
-	<< ", theChan: "
-	<< *theChan
-	<< ", theMessage: "
-	<< theMessage
-	<< endl ;
+//elog	<< "stats::OnChannelMessage> theClient: "
+//	<< *theClient
+//	<< ", theChan: "
+//	<< *theChan
+//	<< ", theMessage: "
+//	<< theMessage
+//	<< endl ;
 return xClient::OnChannelMessage( theClient,
 	theChan,
 	theMessage ) ;
+}
+
+int stats::OnChannelCTCP( iClient* theClient,
+	Channel* theChan,
+	const string& CTCPCommand,
+	const string& theMessage )
+{
+//elog	<< "stats::OnChannelCTCP> theClient: "
+//	<< *theClient
+//	<< ", theChan: "
+//	<< *theChan
+//	<< ", CTCPCommand: "
+//	<< CTCPCommand
+//	<< ", theMessage: "
+//	<< theMessage
+//	<< endl ;
+return xClient::OnChannelCTCP( theClient, theChan,
+	CTCPCommand, theMessage ) ;
 }
 
 int stats::OnPrivateMessage( iClient* theClient,
 	const string& theMessage,
 	bool )
 {
-elog	<< "stats::OnPrivateMessage> theClient: "
-	<< *theClient
-	<< ", theMessage: "
-	<< theMessage
-	<< endl ;
+//elog	<< "stats::OnPrivateMessage> theClient: "
+//	<< *theClient
+//	<< ", theMessage: "
+//	<< theMessage
+//	<< endl ;
 
 if( !theClient->isOper() &&
 	((theClient->getMode( iClient::MODE_REGISTERED )) &&
@@ -380,7 +441,56 @@ time_t countingTime = ::time( 0 ) - startTime ;
 
 Notice( theClient, "I have been counting for %d seconds",
 	countingTime ) ;
-Notice( theClient, "EventName   EventCount  Average" ) ;
+Notice( theClient, "Total Network Users: %d, Total Network Channels: %d",
+	Network->clientList_size(),
+	Network->channelList_size() ) ;
+
+Channel* largestChan = 0 ;
+for( xNetwork::constChannelIterator chanItr = Network->channels_begin() ;
+	chanItr != Network->channels_end() ; ++chanItr )
+	{
+	if( 0 == largestChan )
+		{
+		largestChan = chanItr->second ;
+		}
+	else if( chanItr->second->size() > largestChan->size() )
+		{
+		largestChan = chanItr->second ;
+		}
+	}
+
+if( largestChan != 0 )
+	{
+	Notice( theClient, "Largest channel is %s, with %d users",
+		largestChan->getName().c_str(),
+		largestChan->size() ) ;
+	}
+
+#ifdef EDEBUG
+	Notice( theClient, "Length of last burst: %d, "
+		"Number of bytes processed since beginning of last "
+		"burst: %d",
+		MyUplink->getLastBurstDuration(),
+		MyUplink->getBurstBytes() ) ;
+#endif
+
+	{
+	stringstream ss ;
+
+	ss.width( 20 ) ;
+	ss.setf( ios::left ) ;
+	ss	<< "EventName" ;
+
+	ss.width( 12 ) ;
+	ss.setf( ios::left ) ;
+	ss	<< "EventCount" ;
+
+	ss.width( 15 ) ;
+	ss.setf( ios::left ) ;
+	ss	<< "Average" ;
+
+	Notice( theClient, "%s", ss.str().c_str() ) ;
+	}
 
 unsigned long int totalEvents = 0 ;
 
@@ -394,11 +504,42 @@ for( eventType whichEvent = 0 ; whichEvent <= EVT_CREATE ; ++whichEvent )
 // event to the total events received
 for( eventType whichEvent = 0 ; whichEvent <= EVT_CREATE ; ++whichEvent )
 	{
-	Notice( theClient, "%s  %d  %f/second",
-		eventNames[ whichEvent ].c_str(),
-		eventTotal[ whichEvent ],
-		(double) eventTotal[ whichEvent ] /
-			(double) totalEvents ) ;
+	string writeMe ;
+	stringstream ss ;
+
+	ss.str( string() ) ;
+	ss.setf( ios::left ) ;
+	ss.fill( ' ' ) ;
+//	ss.width( 25 ) ;
+	ss	<< eventNames[ whichEvent ] ;
+	writeMe = ss.str() ;
+
+	ss.str( string() ) ;
+
+	// For some reason, I can't get the stringstream IO
+	// manipulation stuff to work properly here
+	// *shrug* do it the hard way then...
+	for( size_t i = 23 - eventNames[ whichEvent ].size() ; 
+		i > 0 ; --i )
+		{
+		ss	<< ' ' ;
+		}
+	writeMe += ss.str() ;
+
+	ss.str( string() ) ;
+	ss.width( 12 ) ;
+	ss.setf( ios::left ) ;
+	ss	<< eventTotal[ whichEvent ] ;
+	writeMe += ss.str() ;
+
+	ss.str( string() ) ;
+	ss.width( 15 ) ;
+	ss.setf( ios::left ) ;
+	ss	<< ((double) eventTotal[ whichEvent ] /
+			(double) totalEvents) ;
+	writeMe += ss.str() ;
+
+	Notice( theClient, "%s", writeMe.c_str() ) ;
 	}
 
 Notice( theClient, "Total Events: %d, Total Average Events/Second: %f",

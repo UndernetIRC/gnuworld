@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server.h,v 1.84 2003/06/06 20:03:31 dan_karrels Exp $
+ * $Id: server.h,v 1.85 2003/06/07 00:26:23 dan_karrels Exp $
  */
 
 #ifndef __SERVER_H
-#define __SERVER_H "$Id: server.h,v 1.84 2003/06/06 20:03:31 dan_karrels Exp $"
+#define __SERVER_H "$Id: server.h,v 1.85 2003/06/07 00:26:23 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
@@ -966,6 +966,28 @@ public:
 	 * This does not alter the server itself.
 	 */
 	virtual bool	RemoveJupe( const iServer* );
+
+	/**
+	 * Return the length of time needed for the last burst.
+	 */
+	virtual time_t	getLastBurstDuration() const
+		{ return (burstEnd - burstStart) ; }
+
+#ifdef EDEBUG
+	/**
+	 * Return the number of bytes since the beginning of the
+	 * last burst.
+	 */
+	virtual size_t	getBurstBytes() const
+		{ return burstBytes ; }
+
+	/**
+	 * Return the number of commands processed since the beginning
+	 * of the last burst.
+	 */
+	virtual size_t	getBurstLines() const
+		{ return burstLines ; }
+#endif // EDEBUG
 
 protected:
 

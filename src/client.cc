@@ -1,6 +1,6 @@
 /*
  * client.cc
- * $Id: client.cc,v 1.52 2003/06/06 20:03:32 dan_karrels Exp $
+ * $Id: client.cc,v 1.53 2003/06/07 00:26:24 dan_karrels Exp $
  */
 
 #include	<new>
@@ -30,7 +30,7 @@
 #include	"events.h"
 
 const char xClient_h_rcsId[] = __CLIENT_H ;
-const char xClient_cc_rcsId[] = "$Id: client.cc,v 1.52 2003/06/06 20:03:32 dan_karrels Exp $" ;
+const char xClient_cc_rcsId[] = "$Id: client.cc,v 1.53 2003/06/07 00:26:24 dan_karrels Exp $" ;
 const char config_h_rcsId[] = __CONFIG_H ;
 const char misc_h_rcsId[] = __MISC_H ;
 const char Numeric_h_rcsId[] = __NUMERIC_H ;
@@ -47,7 +47,6 @@ namespace gnuworld
 
 using std::string ;
 using std::stringstream ;
-using std::ends ;
 using std::endl ;
 
 xClient::xClient()
@@ -139,8 +138,7 @@ if( !Connected )
 stringstream s ;
 s	<< getCharYYXXX()
 	<< " Q :"
-	<< Message
-	<< ends ;
+	<< Message ;
 
 MyUplink->Write( s ) ;
 
@@ -206,8 +204,7 @@ if( (MyUplink != NULL) && MyUplink->isConnected() && !Value.empty() )
 		<< " M "
 		<< getCharYYXXX()
 		<< " "
-		<< Value
-		<< ends ;
+		<< Value ;
 
 	return MyUplink->Write( s ) ;
 	}
@@ -530,7 +527,12 @@ int xClient::OnChannelMessage( iClient*, Channel*, const string& )
 return 0 ;
 }
 
-int xClient::OnNotice( iClient*, const string&, bool )
+int xClient::OnPrivateNotice( iClient*, const string&, bool )
+{
+return 0;
+}
+
+int xClient::OnChannelNotice( iClient*, Channel*, const string& )
 {
 return 0;
 }
@@ -754,8 +756,7 @@ for( xServer::opVectorType::const_iterator ptr = opVector.begin(),
 		stringstream s ;
 		s	<< getCharYYXXX() << " M "
 			<< theChan->getName() << ' '
-			<< "+" << modeString << ' ' << args
-			<< ends ;
+			<< "+" << modeString << ' ' << args ;
 
 		Write( s ) ;
 
@@ -863,8 +864,7 @@ for( xServer::voiceVectorType::const_iterator ptr = voiceVector.begin(),
 		stringstream s ;
 		s	<< getCharYYXXX() << " M "
 			<< theChan->getName() << ' '
-			<< "+" << modeString << ' ' << args
-			<< ends ;
+			<< "+" << modeString << ' ' << args ;
 
 		Write( s ) ;
 
@@ -1121,8 +1121,7 @@ for( xServer::opVectorType::const_iterator ptr = opVector.begin(),
 		stringstream s ;
 		s	<< getCharYYXXX() << " M "
 			<< theChan->getName() << ' '
-			<< "-" << modeString << ' ' << args
-			<< ends ;
+			<< "-" << modeString << ' ' << args ;
 
 		Write( s ) ;
 
@@ -1302,8 +1301,7 @@ for( xServer::voiceVectorType::const_iterator ptr = voiceVector.begin(),
 		stringstream s ;
 		s	<< getCharYYXXX() << " M "
 			<< theChan->getName() << ' '
-			<< "-" << modeString << ' ' << args
-			<< ends ;
+			<< "-" << modeString << ' ' << args ;
 
 		Write( s ) ;
 
@@ -1536,8 +1534,7 @@ for( xServer::banVectorType::const_iterator ptr = banVector.begin(),
 		stringstream s ;
 		s	<< getCharYYXXX() << " M "
 			<< theChan->getName() << ' '
-			<< modeString << ' ' << args
-			<< ends ;
+			<< modeString << ' ' << args ;
 
 		Write( s ) ;
 
@@ -1682,7 +1679,7 @@ stringstream s ;
 s	<< getCharYYXXX() << " K "
 	<< theChan->getName() << ' '
 	<< theClient->getCharYYXXX() << " :"
-	<< reason << ends ;
+	<< reason ;
 
 Write( s ) ;
 
@@ -1755,7 +1752,7 @@ for( vector< iClient* >::const_iterator ptr = theClients.begin() ;
 	s	<< getCharYYXXX() << " K "
 		<< theChan->getName() << ' '
 		<< (*ptr)->getCharYYXXX() << " :"
-		<< reason << ends ;
+		<< reason ;
 
 	Write( s ) ;
 	}

@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_M.cc,v 1.2 2003/06/03 23:19:07 dan_karrels Exp $
+ * $Id: msg_M.cc,v 1.3 2003/06/07 00:26:23 dan_karrels Exp $
  */
 
 #include	<new>
@@ -37,7 +37,7 @@
 #include	"StringTokenizer.h"
 #include	"ServerCommandHandler.h"
 
-const char msg_M_cc_rcsId[] = "$Id: msg_M.cc,v 1.2 2003/06/03 23:19:07 dan_karrels Exp $" ;
+const char msg_M_cc_rcsId[] = "$Id: msg_M.cc,v 1.3 2003/06/07 00:26:23 dan_karrels Exp $" ;
 const char misc_h_rcsId[] = __MISC_H ;
 const char events_h_rcsId[] = __EVENTS_H ;
 const char server_h_rcsId[] = __SERVER_H ;
@@ -54,7 +54,6 @@ namespace gnuworld
 using std::string ;
 using std::vector ;
 using std::endl ;
-using std::ends ;
 
 class msg_M : public ServerCommandHandler
 {

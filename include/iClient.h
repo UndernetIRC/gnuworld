@@ -17,11 +17,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: iClient.h,v 1.36 2002/12/03 20:25:31 dan_karrels Exp $
+ * $Id: iClient.h,v 1.37 2003/06/07 00:26:23 dan_karrels Exp $
  */
 
 #ifndef __ICLIENT_H
-#define __ICLIENT_H "$Id: iClient.h,v 1.36 2002/12/03 20:25:31 dan_karrels Exp $"
+#define __ICLIENT_H "$Id: iClient.h,v 1.37 2003/06/07 00:26:23 dan_karrels Exp $"
 
 #include	<string>
 #include	<list>
@@ -90,6 +90,10 @@ public:
 
 	/// MODE_G is true if the iCilent has user mode g set.
 	const static modeType	MODE_G ;
+
+	/// MODE_SERVNOTICES is true if this user is receiving server
+	/// notices.  This may not be transmitted on all networks.
+	const static modeType	MODE_SERVNOTICES ;
 
 	/// Iterator for channels this user is on.
 	typedef channelListType::iterator channelIterator ;

@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: Network.cc,v 1.52 2003/06/06 13:14:16 dan_karrels Exp $
+ * $Id: Network.cc,v 1.53 2003/06/07 00:26:24 dan_karrels Exp $
  */
 
 #include	<new>
@@ -42,7 +42,7 @@
 #include	"ip.h"
 
 const char xNetwork_h_rcsId[] = __NETWORK_H ;
-const char xNetwork_cc_rcsId[] = "$Id: Network.cc,v 1.52 2003/06/06 13:14:16 dan_karrels Exp $" ;
+const char xNetwork_cc_rcsId[] = "$Id: Network.cc,v 1.53 2003/06/07 00:26:24 dan_karrels Exp $" ;
 const char ELog_h_rcsId[] = __ELOG_H ;
 const char iClient_h_rcsId[] = __ICLIENT_H ;
 const char Channel_h_rcsId[] = __CHANNEL_H ;
@@ -630,7 +630,6 @@ if( !nickMap.insert( nickMapType::value_type(
  */
 void xNetwork::OnSplit( const unsigned int& intYY )
 {
-
 // yyVector will be used to hold server numerics of servers
 // to be removed.
 typedef vector< unsigned int > yyVectorType ;
@@ -674,12 +673,18 @@ for( yyVectorType::const_iterator yyIterator = yyVector.begin() ;
 	// Remove the server, its clients, any empty channels,
 	// and post events for all of the above.
 	iServer* tmpServer =  removeServer( removeMe->getIntYY(), true ) ;
-	string Reason = "Uplink Splited";
+
+	// Dont post an event for the actual server that is being
+	// squit, let the msg_SQ handle that.
+	if( intYY != tmpServer->getIntYY() )
+		{
+		string Reason = "Uplink Squit";
 	
-	theServer->PostEvent(EVT_NETBREAK,
-		  static_cast<void *>(tmpServer),
-		  static_cast<void*>(findServer(intYY)),
-		  static_cast<void*>(&Reason));
+		theServer->PostEvent(EVT_NETBREAK,
+			  static_cast<void *>(tmpServer),
+			  static_cast<void*>(findServer(intYY)),
+			  static_cast<void*>(&Reason));
+		}
 	
 	delete tmpServer;		  
 	}

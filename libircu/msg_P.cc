@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_P.cc,v 1.2 2003/06/06 20:03:31 dan_karrels Exp $
+ * $Id: msg_P.cc,v 1.3 2003/06/07 00:26:23 dan_karrels Exp $
  */
 
 #include	<string>
@@ -32,7 +32,7 @@
 #include	"ServerCommandHandler.h"
 #include	"StringTokenizer.h"
 
-const char msg_P_cc_rcsId[] = "$Id: msg_P.cc,v 1.2 2003/06/06 20:03:31 dan_karrels Exp $" ;
+const char msg_P_cc_rcsId[] = "$Id: msg_P.cc,v 1.3 2003/06/07 00:26:23 dan_karrels Exp $" ;
 const char server_h_rcsId[] = __SERVER_H ;
 const char Network_h_rcsId[] = __NETWORK_H ;
 const char iClient_h_rcsId[] = __ICLIENT_H ;
@@ -48,6 +48,44 @@ using std::string ;
 using std::endl ;
 
 CREATE_HANDLER(msg_P)
+
+void channelCTCP( iClient* srcClient,
+	Channel* theChan,
+	const string& command,
+	const string& message )
+{
+for( xNetwork::localClientIterator lcItr = Network->localClient_begin() ;
+	lcItr != Network->localClient_end() ; ++lcItr )
+	{
+	// Only deliver the channel ctcp (message) if this client
+	// is on the channel, and is mode -d
+	if( (*lcItr)->isOnChannel( theChan ) &&
+		!(*lcItr)->getMode( iClient::MODE_DEAF ) )
+		{
+		(*lcItr)->OnChannelCTCP( srcClient,
+			theChan,
+			command,
+			message ) ;
+		}
+	}
+}
+
+void channelMessage( iClient* srcClient,
+	Channel* theChan,
+	const string& message )
+{
+for( xNetwork::localClientIterator lcItr = Network->localClient_begin() ;
+	lcItr != Network->localClient_end() ; ++lcItr )
+	{
+	// Only deliver the channel ctcp (message) if this client
+	// is on the channel, and is mode -d
+	if( (*lcItr)->isOnChannel( theChan ) &&
+		!(*lcItr)->getMode( iClient::MODE_DEAF ) )
+		{
+		(*lcItr)->OnChannelMessage( srcClient, theChan, message ) ;
+		}
+	}
+}
 
 /**
  * A nick has sent a private message
@@ -152,19 +190,41 @@ bool CTCP = (Param[ 2 ][ 0 ] == 1) ? true : false ;
 // CTCP messages begin and end with '\1'
 // In the case of CTCP, it is of the form:
 // abcDE P EFghi :\1ctcp_command\1 message
-string message( Param.assemble( 2 ) ) ;
-string command( Param[ 2 ] ) ;
+// abcDE P EFghi :\1PING 123456789\1
+// Note that Param[ 2 ] is \1PING 123456789\1 message
+
+string message( Param[ 2 ] ) ;
+string command ;
 
 if( CTCP )
 	{
 	// CTCP, remove the control chars from the command
-	command.erase( command.begin() ) ;
-	command.erase( command.size() - 1 ) ;
+	// Tokenizer by the CTCP delimiter, \1
+	StringTokenizer st( Param[ 2 ], '\1' ) ;
 
-	// It's possible to have a CTCP command without a message
-	if( Param.size() >= 4 )
+	// Make sure there is at least one token
+	if( st.empty() )
 		{
-		message = Param.assemble( 3 ) ;
+		elog	<< "msg_P> Found empty tokenizer for CTCP, from: "
+			<< Param[ 2 ]
+			<< endl ;
+		return false ;
+		}
+
+	// The CTCP command is now everything that was surrounded
+	// by the two \1's, or the first token of st, st[ 0 ]
+	command = st[ 0 ] ;
+
+	// If there was an optional message after the CTCP command,
+	// st.size() will be greater than 1.
+	if( st.size() > 1 )
+		{
+		message = st.assemble( 2 ) ;
+		}
+	else
+		{
+		// No message, clear it
+		message = "" ;
 		}
 	}
 
@@ -182,10 +242,8 @@ if( CTCP )
 			<< *theChan
 			<< endl ;
 
-		return targetClient->OnChannelCTCP( srcClient,
-			theChan,
-			command,
-			message ) ;
+		channelCTCP( srcClient, theChan, command, message ) ;
+		return true ;
 		}
 	else
 		{
@@ -195,8 +253,6 @@ if( CTCP )
 			<< command
 			<< ", message: "
 			<< message
-			<< ", on channel: "
-			<< *theChan
 			<< endl ;
 
 		return targetClient->OnCTCP( srcClient,
@@ -209,17 +265,16 @@ else
 	{
 	if( theChan != 0 )
 		{
-		elog	<< "msg_P> Channel message from: "
-			<< *srcClient
-			<< ", message: "
-			<< message
-			<< ", on channel: "
-			<< *theChan
-			<< endl ;
+//		elog	<< "msg_P> Channel message from: "
+//			<< *srcClient
+//			<< ", message: "
+//			<< message
+//			<< ", on channel: "
+//			<< *theChan
+//			<< endl ;
 
-		return targetClient->OnChannelMessage( srcClient,
-			theChan,
-			message ) ;
+		channelMessage( srcClient, theChan, message ) ;
+		return true ;
 		}
 	else
 		{

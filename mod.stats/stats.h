@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: stats.h,v 1.6 2003/06/06 20:03:31 dan_karrels Exp $
+ * $Id: stats.h,v 1.7 2003/06/07 00:26:23 dan_karrels Exp $
  */
 
 #ifndef __STATS_H
-#define __STATS_H "$Id: stats.h,v 1.6 2003/06/06 20:03:31 dan_karrels Exp $"
+#define __STATS_H "$Id: stats.h,v 1.7 2003/06/07 00:26:23 dan_karrels Exp $"
 
 #include	<fstream>
 #include	<string>
@@ -50,8 +50,14 @@ public:
 	virtual void ImplementServer( xServer* ) ;
 	virtual int OnPrivateMessage( iClient*, const string&,
 		bool = false ) ;
+	virtual int OnCTCP( iClient*, const string&,
+		const string&, bool = false ) ;
 	virtual int OnChannelMessage( iClient*, Channel*,
 		const string& ) ;
+	virtual int OnChannelCTCP( iClient*, Channel*,
+		const string&, const string& ) ;
+	virtual int OnPrivateNotice( iClient*, const string&, bool ) ;
+	virtual int OnChannelNotice( iClient*, Channel*, const string& ) ;
 	virtual int OnEvent( const eventType&,
 		void* = 0, void* = 0, void* = 0, void* = 0 ) ;
         virtual int OnChannelEvent( const channelEventType&,

@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_V.cc,v 1.1 2002/11/20 22:16:18 dan_karrels Exp $
+ * $Id: msg_V.cc,v 1.2 2003/06/07 00:26:23 dan_karrels Exp $
  */
 
 #include <sstream>
@@ -25,13 +25,12 @@
 #include "ServerCommandHandler.h"
 #include "xparameters.h"
 
-const char msg_V_cc_rcsId[] = "$Id: msg_V.cc,v 1.1 2002/11/20 22:16:18 dan_karrels Exp $";
+const char msg_V_cc_rcsId[] = "$Id: msg_V.cc,v 1.2 2003/06/07 00:26:23 dan_karrels Exp $";
 
 namespace gnuworld
 {
 
 using std::endl ;
-using std::ends ;
 using std::stringstream ;
 
 CREATE_HANDLER(msg_V)
@@ -85,8 +84,7 @@ versionReply << theServer->getCharYY()
              << " 351 "
              << Param[0]
              << " :" __DATE__ " " __TIME__
-             << " GNUworld Services Core"
-             << ends;
+             << " GNUworld Services Core" ;
 
 theServer->Write(versionReply);
 
