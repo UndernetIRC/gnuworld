@@ -1,7 +1,7 @@
 /* cservice_config.h */
 
 #ifndef __CSERVICE_CONFIG_H
-#define __CSERVICE_CONFIG_H "$Id: cservice_config.h,v 1.1 2001/03/06 02:34:32 dan_karrels Exp $"
+#define __CSERVICE_CONFIG_H "$Id: cservice_config.h,v 1.2 2001/03/07 15:10:53 dan_karrels Exp $"
 
 /**
  * Define this if you wish for all SQL queries to be sent
@@ -21,10 +21,20 @@
 #define LOG_DEBUG
 
 /**
- * blah blah blah
- * Somebody who knows what this is please complete
- * this description.
+ * The maximum number of results to return to the user on
+ * an LBANLIST query.
  */
-#define MAX_RESULTS 15
+#define MAX_LBAN_RESULTS 10
+
+/**
+ * The maximum number of results to return to the user on
+ * an ACCESS query.
+ */
+#define MAX_ACCESS_RESULTS 15
+
+/**
+ * The maximum number of search results to return to the user.
+ */
+#define MAX_SEARCH_RESULTS 10
 
 #endif // __CSERVICE_CONFIG_H

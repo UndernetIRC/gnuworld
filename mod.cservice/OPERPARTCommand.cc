@@ -8,7 +8,7 @@
  *
  * Caveats: None
  *
- * $Id: OPERPARTCommand.cc,v 1.7 2001/03/05 12:46:50 isomer Exp $
+ * $Id: OPERPARTCommand.cc,v 1.8 2001/03/07 15:10:53 dan_karrels Exp $
  */
 
 
@@ -21,7 +21,7 @@
 #include	"responses.h"
 #include	"Network.h"
 
-const char OPERPARTCommand_cc_rcsId[] = "$Id: OPERPARTCommand.cc,v 1.7 2001/03/05 12:46:50 isomer Exp $" ;
+const char OPERPARTCommand_cc_rcsId[] = "$Id: OPERPARTCommand.cc,v 1.8 2001/03/07 15:10:53 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -30,6 +30,13 @@ using std::string ;
  
 bool OPERPARTCommand::Exec( iClient* theClient, const string& Message )
 { 
+StringTokenizer st( Message ) ;
+if( st.size() < 2 )
+	{
+	Usage(theClient);
+	return true;
+	}
+
 /*
  *  Check if the user is an oper.
  */
@@ -40,15 +47,9 @@ sqlUser* theUser = bot->isAuthed(theClient, false);
 
 if(!theClient->isOper())
 	{
-	bot->Notice(theClient, bot->getResponse(theUser, language::ircops_only_cmd,
+	bot->Notice(theClient,
+		bot->getResponse(theUser, language::ircops_only_cmd,
 		"This command is reserved to IRC Operators"));
-	return true;
-	}
-
-StringTokenizer st( Message ) ;
-if( st.size() < 2 )
-	{
-	Usage(theClient);
 	return true;
 	}
 
@@ -70,8 +71,7 @@ if (!theChan)
 if (!theChan->getInChan())
 	{
 	bot->Notice(theClient, 
-		bot->getResponse(theUser,
-			language::i_am_not_on_chan,
+		bot->getResponse(theUser, language::i_am_not_on_chan,
 			string("I'm not in that channel!")));
 	return false;
 	}

@@ -8,7 +8,7 @@
  *
  * Caveats: None
  *
- * $Id: OPERJOINCommand.cc,v 1.8 2001/03/05 21:41:30 gte Exp $
+ * $Id: OPERJOINCommand.cc,v 1.9 2001/03/07 15:10:53 dan_karrels Exp $
  */
 
 
@@ -21,7 +21,7 @@
 #include	"responses.h"
 #include	"Network.h"
 
-const char OPERJOINCommand_cc_rcsId[] = "$Id: OPERJOINCommand.cc,v 1.8 2001/03/05 21:41:30 gte Exp $" ;
+const char OPERJOINCommand_cc_rcsId[] = "$Id: OPERJOINCommand.cc,v 1.9 2001/03/07 15:10:53 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -30,6 +30,13 @@ using std::string ;
  
 bool OPERJOINCommand::Exec( iClient* theClient, const string& Message )
 { 
+StringTokenizer st( Message ) ;
+if( st.size() < 2 )
+	{
+	Usage(theClient);
+	return true;
+	}
+
 /*
  *  Check the user is an oper.
  */
@@ -38,14 +45,8 @@ sqlUser* theUser = bot->isAuthed(theClient, false);
 if(!theClient->isOper())
 	{
 	bot->Notice(theClient, bot->getResponse(theUser,
-		language::ircops_only_cmd, "This command is reserved to IRC Operators"));
-	return true;
-	}
-
-StringTokenizer st( Message ) ;
-if( st.size() < 2 )
-	{
-	Usage(theClient);
+		language::ircops_only_cmd,
+		"This command is reserved to IRC Operators"));
 	return true;
 	}
 
@@ -57,7 +58,8 @@ Channel* tmpChan = Network->findChannel(st[1]);
 sqlChannel* theChan = bot->getChannelRecord(st[1]);
 if (!theChan)
 	{
-	bot->Notice(theClient, bot->getResponse(theUser, language::chan_not_reg,
+	bot->Notice(theClient,
+		bot->getResponse(theUser, language::chan_not_reg,
 		"The channel %s doesn't appear to be registered").c_str(),
 		st[1].c_str());
 	return false;
@@ -66,17 +68,20 @@ if (!theChan)
 /* Check the bot isn't in the channel. */ 
 if (theChan->getInChan())
 	{
-	bot->Notice(theClient, bot->getResponse(theUser,
-		language::already_on_chan, "I'm already in that channel!"));
+	bot->Notice(theClient,
+		bot->getResponse(theUser, language::already_on_chan,
+		"I'm already in that channel!"));
 	return false;
 	}
  
 // Tell the world.
 
 strstream s;
-s	<< server->getCharYY() << " WA :"
+s	<< server->getCharYY()
+	<< " WA :"
 	<< "An IRC Operator is asking me to join channel "
-	<< theChan->getName() << ends;
+	<< theChan->getName()
+	<< ends;
 
 bot->Write(s);
 delete[] s.str();

@@ -2830,10 +2830,10 @@ return -1 ;
 
 void cservice::dbErrorMessage(iClient* theClient)
 {
-	Notice(theClient,
- 		"An error occured while performing this action, "
- 		"the database may be unavailable. Please try again later."); 
-	dbErrors++;
+Notice(theClient,
+	"An error occured while performing this action, "
+	"the database may be unavailable. Please try again later."); 
+dbErrors++;
 }
  
 void Command::Usage( iClient* theClient )

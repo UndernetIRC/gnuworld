@@ -8,7 +8,7 @@
  *
  * Caveats: None
  *
- * $Id: JOINCommand.cc,v 1.9 2001/03/05 12:46:50 isomer Exp $
+ * $Id: JOINCommand.cc,v 1.10 2001/03/07 15:10:53 dan_karrels Exp $
  */
 
 
@@ -21,7 +21,7 @@
 #include	"responses.h"
 #include	"Network.h"
 
-const char JOINCommand_cc_rcsId[] = "$Id: JOINCommand.cc,v 1.9 2001/03/05 12:46:50 isomer Exp $" ;
+const char JOINCommand_cc_rcsId[] = "$Id: JOINCommand.cc,v 1.10 2001/03/07 15:10:53 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -73,7 +73,7 @@ if (level < level::join)
 	return false;
 	} 
 
-	/* Check the bot isn't in the channel. */ 
+/* Check the bot isn't in the channel. */ 
 if (theChan->getInChan())
 	{
 	bot->Notice(theClient, bot->getResponse(theUser,
@@ -97,4 +97,4 @@ bot->reopQ.insert(cservice::reopQType::value_type(theChan->getName(),
 return true;
 } 
 
-} // namespace gnuworld.
+} // namespace gnuworld

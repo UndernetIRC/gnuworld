@@ -7,53 +7,55 @@
 #include	"cservice.h" 
 #include	"responses.h"
 
-const char SHOWIGNORECommand_cc_rcsId[] = "$Id: SHOWIGNORECommand.cc,v 1.9 2001/03/05 21:41:30 gte Exp $" ;
+const char SHOWIGNORECommand_cc_rcsId[] = "$Id: SHOWIGNORECommand.cc,v 1.10 2001/03/07 15:10:53 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
 
-using namespace gnuworld;
+using std::string ;
  
 bool SHOWIGNORECommand::Exec( iClient* theClient, const string& Message )
 { 
-	StringTokenizer st( Message ) ;
-	if( st.size() < 1 )
+StringTokenizer st( Message ) ;
+if( st.size() < 1 )
 	{
-		Usage(theClient);
-		return true;
+	Usage(theClient);
+	return true;
 	}
 
-	int count = 0;
+size_t count = 0;
 
-	sqlUser* theUser = bot->isAuthed(theClient, false);
-	
-	if (bot->silenceList.size() != 0) bot->Notice(theClient, 
-							bot->getResponse(theUser,
-								language::ignore_list_start,
-								string("Ignore list:")));
+sqlUser* theUser = bot->isAuthed(theClient, false);
 
-	for( cservice::silenceListType::const_iterator ptr = bot->silenceList.begin() ;
-		ptr != bot->silenceList.end() ; ++ptr )
-		{
-		bot->Notice(theClient, bot->getResponse(theUser,
-			language::rpl_ignorelist, "%s for %i minutes").c_str(),
-			ptr->second.c_str(),
-			(((ptr->first - bot->currentTime()) / 60) % 60));
-		count++;
-		}
-
-	if (!count)
-		{ 
-		bot->Notice(theClient, bot->getResponse(theUser,
-						language::ignore_list_empty,
-						string("Ignore list is empty")));
-		} else 
-		{
-		bot->Notice(theClient, bot->getResponse(theUser,
-						language::ignore_list_end,
-						string("-- End of Ignore List")));
-		}
+// TODO: Violation of encapsulation
+if( bot->silenceList.empty() )
+	{
+	bot->Notice(theClient, bot->getResponse(theUser,
+		language::ignore_list_empty,
+		string("Ignore list is empty")));
 	return true ;
+	}
+
+bot->Notice(theClient,
+	bot->getResponse(theUser, language::ignore_list_start,
+	string("Ignore list:")));
+
+// TODO: Same as above
+for( cservice::silenceListType::const_iterator ptr = bot->silenceList.begin() ;
+	ptr != bot->silenceList.end() ; ++ptr )
+	{
+	bot->Notice(theClient, bot->getResponse(theUser,
+		language::rpl_ignorelist, "%s for %i minutes").c_str(),
+		ptr->second.c_str(),
+		(((ptr->first - bot->currentTime()) / 60) % 60));
+	count++;
+	}
+
+bot->Notice(theClient,
+	bot->getResponse(theUser, language::ignore_list_end,
+	string("-- End of Ignore List")));
+
+return true ;
 } 
 
 } // namespace gnuworld.
