@@ -3,5 +3,5 @@
 
 DELETE FROM translations where response_id = 9999;
 COPY "translations" FROM stdin; 
-1	9999	Happy Easter from the Undernet Channel Services!\nWibble!\nWhat you say?	31337
+1	9999	\026Undernet Channel Services MOTD\026\n\nService Announcements:\nNone at present.	31337
 \.
