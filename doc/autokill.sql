@@ -1,14 +1,14 @@
 --
--- $Id: autokill.sql,v 1.8 2002/07/20 18:39:59 nighty Exp $
+-- $Id: autokill.sql,v 1.9 2002/07/22 02:53:39 nighty Exp $
 --
 
 --
 -- Clean up the temporary table from last time.
 DROP TABLE to_die;
--- Select all user_id's idle > 90 days into a temp table.
+-- Select all user_id's idle > 60 days into a temp table.
 --
 \qecho [*] Fetching list of idle user accounts:
-SELECT user_id,last_seen INTO TABLE to_die FROM users_lastseen WHERE (last_seen <= now()::abstime::int4 - (86400 * 90));
+SELECT user_id,last_seen INTO TABLE to_die FROM users_lastseen WHERE (last_seen <= now()::abstime::int4 - (86400 * 60));
 -- Remove any who currently have a pending app (Shouldn't happen <g>)
 \qecho [*] Moving those with old channel applications to user "AutoPurged".
 UPDATE pending set manager_id = (select id from users where lower(user_name) = 'autopurged') where pending.manager_id = to_die.user_id;
