@@ -77,7 +77,7 @@ const unsigned long int flg_RGCHAN = 0x1000;
 const unsigned long int flg_USERINFO = 0x2000;
 const unsigned long int flg_STATUS = 0x4000;
 const unsigned long int flg_SHUTDOWN = 0x8000;
-const unsigned long int flg_SCAN = 0x10000;
+const unsigned long int flg_SCAN = 0x10000 | flg_NOLOGIN;
 const unsigned long int flg_LEARNNET = 0x20000;
 /*
  Default commands that are added upon adding a new oper

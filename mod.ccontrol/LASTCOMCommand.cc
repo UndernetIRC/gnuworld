@@ -13,7 +13,7 @@
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 
-const char LASTCOMCommand_cc_rcsId[] = "$Id: LASTCOMCommand.cc,v 1.6 2001/12/23 09:07:57 mrbean_ Exp $";
+const char LASTCOMCommand_cc_rcsId[] = "$Id: LASTCOMCommand.cc,v 1.7 2002/01/25 11:29:03 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -30,7 +30,7 @@ unsigned int NumOfCom;
 unsigned int Days = 0;
 StringTokenizer st( Message ) ;
 strstream theQuery;
-
+#ifndef LOGTOHD
 if(!dbConnected)
         {
         bot->Notice(theClient,"Sorry, but the db connection is down now, please try again alittle later");
@@ -108,7 +108,12 @@ for (int i = (bot->SQLDb->Tuples() - 1) ; i >= 0; i--)
 	{
 	bot->Notice(theClient,"[ %s - %s ] %s",bot->convertToAscTime(atoi(bot->SQLDb->GetValue(i, 0))),bot->SQLDb->GetValue(i,1),bot->SQLDb->GetValue(i,2));
 	}
-
+#else
+	if(st.size() > 1)
+		bot->showLogs(theClient,atoi(st[1].c_str()));
+	else
+		bot->showLogs(theClient);
+#endif
 bot->Notice(theClient,"End of debug log");
 return true;
 }

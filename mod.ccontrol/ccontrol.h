@@ -3,8 +3,10 @@
  */
 
 #ifndef __CCONTROL_H
-#define __CCONTROL_H "$Id: ccontrol.h,v 1.58 2002/01/17 20:04:05 mrbean_ Exp $"
+#define __CCONTROL_H "$Id: ccontrol.h,v 1.59 2002/01/25 11:29:03 mrbean_ Exp $"
 
+//Undef this if you want to log to the database
+#define LOGTOHD 
 
 #include	<string>
 #include	<vector>
@@ -32,6 +34,10 @@
 #include	"ccGate.h"
 #include	<pthread.h>
 
+#ifdef LOGTOHD
+    #include "ccLog.h"
+#endif
+
 namespace gnuworld
 {
  
@@ -40,6 +46,9 @@ using std::vector ;
 
 namespace uworld
 {
+
+
+
 
 using gnuworld::xServer;
 
@@ -138,6 +147,12 @@ protected:
 	
 	typedef clientsIpMapType::iterator clientsIpIterator;
 	
+#ifdef LOGTOHD
+	typedef list<ccLog*>		ccLogList;
+
+	typedef ccLogList::iterator 	ccLogIterator;
+#endif
+
 public:
 
 	/**
@@ -456,11 +471,14 @@ public:
 	 * This method logs the commands to the database 
 	 * for lastcom report
 	 */
-
+#ifndef LOGTOHD
 	bool DailyLog( ccUser * , const char *, ... );
 
 	bool DailyLog( iClient * , const char *, ... );
-
+#else
+	bool DailyLog(ccLog*);
+#endif
+	
 	/**
 	 * This method convers a unix time to ascii time
 	 */
@@ -574,6 +592,16 @@ public:
 	void	addServer(ccServer*);
 
 	void	remServer(ccServer*);
+
+#ifdef LOGTOHD
+
+	void	initLogs();
+
+	void	addLog(ccLog*);
+
+	void    showLogs(iClient* , unsigned int = 20);
+
+#endif
 	
 	/**
 	 * This is a constant iterator type used to perform a read-only
@@ -776,6 +804,18 @@ protected:
 	 */
 	commandMapType		commandMap ;
 	
+#ifdef LOGTOHD
+	ccLogList		LogList;
+	
+	unsigned long		NumOfLogs;
+	
+	string			LogFileName;
+
+	unsigned int 		LogsToSave;
+		
+	fstream			LogFile;
+#endif
+
 	/**
 	 * The email address that ccontrol will send the email from
 	 */

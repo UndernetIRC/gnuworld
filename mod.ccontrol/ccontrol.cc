@@ -37,7 +37,7 @@
 #include	"ip.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.120 2002/01/17 20:04:05 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.121 2002/01/25 11:29:03 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -288,7 +288,7 @@ RegisterCommand( new STATUSCommand( this, "STATUS", "Shows debug status "
 RegisterCommand( new SHUTDOWNCommand( this, "SHUTDOWN", " <REASON> Shutdown the bot "
         ,commandLevel::flg_SHUTDOWN,false,false,false,operLevel::CODERLEVEL,true ) ) ;
 
-RegisterCommand( new SCANCommand( this, "SCAN", " -h <host> / -m <real name> [-v]"
+RegisterCommand( new SCANCommand( this, "SCAN", " -h <host> / -n <real name> [-v]"
 		" Scans for all users which much a certain host / real name ",commandLevel::flg_NOLOGIN,false,false,false,operLevel::OPERLEVEL,true ) ) ;
 
 loadCommands();
@@ -305,6 +305,9 @@ loadServers();
 connectCount = 0;
 connectRetry = 5;
 
+#ifdef LOGTOHD
+	initLogs();
+#endif
 }
 
 
@@ -511,10 +514,23 @@ else
 	// Log the command
 	if(!commHandler->second->getNoLog()) //Dont log command which arent suppose to be logged
 		{	
+#ifndef LOGTOHD
 		if(theUser)
 			DailyLog(theUser,"%s",Message.c_str());
 		else
 		    	DailyLog(theClient,"%s",Message.c_str());
+#else
+		ccLog* newLog = new (std::nothrow) ccLog();
+		newLog->Time = ::time(0);
+		newLog->Desc = Message;
+		newLog->Host = theClient->getNickUserHost();
+		if(theUser)
+			newLog->User = theUser->getUserName();
+		else
+			newLog->User = "Unknown";			
+		newLog->CommandName = Command;
+		DailyLog(newLog);
+#endif
 		}			
 	// Execute the command handler
 	commHandler->second->Exec( theClient, Message) ;
@@ -785,6 +801,8 @@ switch( theEvent )
 		newGline->setReason(newG->getReason());
 		newGline->setExpires(newG->getExpiration());
 		newGline->Insert();
+		//need to load the id
+		newGline->loadData(newGline->getHost());
 		addGline(newGline);
 		break;
 		}
@@ -1831,6 +1849,7 @@ for( uIterator = usersMap.begin();uIterator != usersMap.end();++uIterator)
 return true;
 }
 
+#ifndef LOGTOHD
 bool ccontrol::DailyLog(ccUser* Oper, const char *Log, ... )
 {
 
@@ -2036,6 +2055,84 @@ else
 
 return true;
 }
+
+#else
+bool ccontrol::DailyLog(ccLog* newLog)
+{
+
+commandIterator tCommand = findCommand(newLog->CommandName);
+string log;
+StringTokenizer st(newLog->Desc);
+if(tCommand != command_end())
+	{
+	if(!strcasecmp(tCommand->second->getRealName(),"LOGIN"))
+		{
+		log.assign(string("LOGIN ") + st[1] + string(" *****"));
+		}
+	else if(!strcasecmp(tCommand->second->getRealName(),"NEWPASS"))
+		{
+		log.assign("NEWPASS *****");
+		}
+	else if(!strcasecmp(tCommand->second->getRealName(),"MODUSER"))
+		{
+		if(st.size() > 2)
+			{
+			log.assign("MODUSER " + st[1] + " ");
+			unsigned int place = 2;
+			while(place < st.size())
+				{
+				if(!strcasecmp(st[place],"-p"))
+					{
+					log.append(" -p ******");
+					place+=2;
+					}
+				else	
+					{
+					log.append(" " + st[place]);
+					place++;
+					}
+				}
+			}
+		}
+	else if(!strcasecmp(tCommand->second->getRealName(),"ADDUSER"))
+		{
+		if(st.size() > 3)
+			{
+			log.assign("ADDUSER " + st[1] + string(" ") + st[2]+ " *****");
+			}
+		}
+	else
+		{
+		log.assign(newLog->Desc);
+		}
+	}
+else
+	{
+	log.assign(newLog->Desc);
+	}
+
+newLog->Desc = log;
+if(!LogFile)
+	{
+	LogFile.open(LogFileName.c_str(),ios::binary|ios::in|ios::out);
+	}
+if(!LogFile)
+	{//There was a problem in opening the log file
+	MsgChanLog("Error while logging to the logs file!\n");
+	return true;
+	}
+
+LogFile.seekg(0,ios::beg);
+LogFile.read((char*)&NumOfLogs,sizeof(NumOfLogs));
+LogFile.seekp(0,ios::beg);
+++NumOfLogs;
+LogFile.write((char*)&NumOfLogs,sizeof(NumOfLogs));
+LogFile.seekp(0,ios::end);
+newLog->Save(LogFile);
+return true;
+}
+
+#endif
 
 bool ccontrol::CreateReport(time_t From, time_t Til)
 {
@@ -3296,6 +3393,147 @@ void ccontrol::remServer(ccServer* tempServer)
 {
 serversMap.erase(serversMap.find(tempServer->getName()));
 }
+
+#ifdef LOGTOHD
+void ccontrol::initLogs()
+{
+//TODO: Get this from the conf file
+LogFileName = "CommandsLog.Log";
+NumOfLogs = 0;
+//TODO: Get this from the conf file
+LogsToSave = 100;
+
+LogFile.open(LogFileName.c_str(),ios::binary|ios::in|ios::out);
+
+if(!LogFile)
+	{//There was a problem in opening the log file
+	elog << "Error while initilizing the logs file!\n";
+	return ;
+	}
+
+if(LogFile.eof()) //If the file is empty, save the number of logs
+	{
+	LogFile.write((char*)&NumOfLogs,sizeof(NumOfLogs));
+	return;
+	}
+//The file is opened, and not empty, load the number of logs
+LogFile.seekg(0,ios::beg);
+LogFile.read((char*)&NumOfLogs,sizeof(NumOfLogs));
+LogFile.seekp(0,ios::end);
+	
+}
+
+void ccontrol::addLog(ccLog* newLog)
+{
+ccLog* oldLog;
+while(LogList.size() >= LogsToSave)
+	{
+	oldLog = LogList.back();
+	LogList.pop_back();
+	delete oldLog;
+	}
+LogList.push_front(newLog);
+}
+
+/*
+ ccontrol::showLogs - sends the lastcom log to a client
+ loading the logs from the file is done using the 
+ lazy evaluation tactic, meaning it only loads the data from
+ the hardisk if it has to , thous saving time
+
+*/
+
+void ccontrol::showLogs(iClient* theClient, unsigned int Amount)
+{
+
+if(Amount > LogsToSave)
+	{
+	Notice(theClient,"Sorry, but you can't view more than the last %d commands"
+		,LogsToSave);
+	Amount = LogsToSave;
+	}
+
+LogFile.seekg(0,ios::beg);
+LogFile.read((char*)&NumOfLogs,sizeof(NumOfLogs));
+
+unsigned long int Left = NumOfLogs;
+if(LogList.size() < Amount) 
+	{
+	if((!LogFile) || (LogFile.bad()))
+		{
+		LogFile.close();
+		LogFile.open(LogFileName.c_str(),ios::binary|ios::in|ios::out);
+
+		if(!LogFile)
+			{
+			Notice(theClient,"Error while reading the lastcom report");
+			MsgChanLog("Error while reading from the lastcom file!\n");
+			return;
+			}
+		}
+	LogFile.seekg(sizeof(NumOfLogs),ios::beg);
+	ccLog* tmpLog = new ccLog();
+	LogList.erase(LogList.begin(),LogList.end()); //Clean the list first
+	/*
+	    since every record has its own size, there is no way of knowing
+	    where in the file the last X records are, so we start reading
+	    from the begging of the file, this saves hd space but may 
+	    cost some time.
+	    
+	    this is done only once if at all per restart, so its
+	    not a big deal *g*
+	*/
+	while(Left > Amount)
+		{
+		if(!tmpLog->Load(LogFile))
+			{
+			Notice(theClient,"Error while reading the lastcom report");
+			return;
+			}
+		--Left;
+		}
+	delete tmpLog;
+	while(Left)
+		{
+		tmpLog = new (std::nothrow) ccLog();
+		if(!tmpLog->Load(LogFile))
+			{
+			Notice(theClient,"Error while reading the lastcom report");
+			return;
+			}
+		--Left;
+		addLog(tmpLog); 
+		}
+	}
+//At this point, we should have the log list full of the last LogsToSave
+//commands, and we need to show only Amount of them
+Left = LogList.size();
+if(Left == 0)
+	return;
+ccLogIterator curLog = LogList.end();
+while(Left > Amount)
+	{
+	--curLog;
+	Left--;
+	}
+if(curLog == LogList.end())
+	{
+	--curLog;
+	}
+while(Left > 0)
+	{
+	Notice(theClient,"[%s] - [(%s) - %s] - %s"
+		,convertToAscTime((*curLog)->Time)
+		,(*curLog)->User.c_str()
+		,(*curLog)->Host.c_str()
+		,(*curLog)->Desc.c_str());
+	--curLog;
+	Left--;
+	}
+
+}
+
+#endif
 
 void *initGate(void* arg)
 {

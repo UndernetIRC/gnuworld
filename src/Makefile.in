@@ -91,7 +91,7 @@ bin_PROGRAMS = gnuworld
 gnuworld_LDFLAGS = -rpath $(bindir) $(glibdir)/libgnuworld.la 	-R$(bindir) -export-dynamic -module $(LIBLTDL)
 
 gnuworld_DEPENDENCIES = $(LIBLTDL) $(glibdir)/libgnuworld.la
-gnuworld_SOURCES = Channel.cc 	ChannelUser.cc 	LoadClientTimerHandler.cc 	Network.cc 	ServerTimerHandlers.cc 	UnloadClientTimerHandler.cc 	client.cc 	iClient.cc 	iServer.cc 	ip.cc 	main.cc 	msg_AD.cc 	msg_B.cc 	msg_C.cc 	msg_CM.cc 	msg_D.cc 	msg_DS.cc 	msg_EA.cc 	msg_EB.cc 	msg_Error.cc 	msg_G.cc 	msg_GL.cc 	msg_I.cc 	msg_J.cc 	msg_JU.cc 	msg_K.cc 	msg_L.cc 	msg_M.cc 	msg_M351.cc 	msg_N.cc 	msg_NOOP.cc 	msg_P.cc 	msg_PART.cc 	msg_PASS.cc 	msg_PRIVMSG.cc 	msg_Q.cc 	msg_R.cc 	msg_RemPing.cc 	msg_S.cc 	msg_SQ.cc 	msg_Server.cc 	msg_T.cc 	msg_W.cc 	msg_WA.cc 	server.cc
+gnuworld_SOURCES = Channel.cc 	ChannelUser.cc 	LoadClientTimerHandler.cc 	Network.cc 	ServerTimerHandlers.cc 	UnloadClientTimerHandler.cc 	client.cc 	iClient.cc 	iServer.cc 	ip.cc 	main.cc 	msg_AC.cc 	msg_AD.cc 	msg_B.cc 	msg_C.cc 	msg_CM.cc 	msg_D.cc 	msg_DS.cc 	msg_EA.cc 	msg_EB.cc 	msg_Error.cc 	msg_G.cc 	msg_GL.cc 	msg_I.cc 	msg_J.cc 	msg_JU.cc 	msg_K.cc 	msg_L.cc 	msg_M.cc 	msg_M351.cc 	msg_N.cc 	msg_NOOP.cc 	msg_P.cc 	msg_PART.cc 	msg_PASS.cc 	msg_PRIVMSG.cc 	msg_Q.cc 	msg_R.cc 	msg_RemPing.cc 	msg_S.cc 	msg_SQ.cc 	msg_Server.cc 	msg_T.cc 	msg_W.cc 	msg_WA.cc 	server.cc
 
 INCLUDES = $(INCLTDL)
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
@@ -105,12 +105,12 @@ CPPFLAGS = @CPPFLAGS@
 LIBS = @LIBS@
 gnuworld_OBJECTS =  Channel.o ChannelUser.o LoadClientTimerHandler.o \
 Network.o ServerTimerHandlers.o UnloadClientTimerHandler.o client.o \
-iClient.o iServer.o ip.o main.o msg_AD.o msg_B.o msg_C.o msg_CM.o \
-msg_D.o msg_DS.o msg_EA.o msg_EB.o msg_Error.o msg_G.o msg_GL.o msg_I.o \
-msg_J.o msg_JU.o msg_K.o msg_L.o msg_M.o msg_M351.o msg_N.o msg_NOOP.o \
-msg_P.o msg_PART.o msg_PASS.o msg_PRIVMSG.o msg_Q.o msg_R.o \
-msg_RemPing.o msg_S.o msg_SQ.o msg_Server.o msg_T.o msg_W.o msg_WA.o \
-server.o
+iClient.o iServer.o ip.o main.o msg_AC.o msg_AD.o msg_B.o msg_C.o \
+msg_CM.o msg_D.o msg_DS.o msg_EA.o msg_EB.o msg_Error.o msg_G.o \
+msg_GL.o msg_I.o msg_J.o msg_JU.o msg_K.o msg_L.o msg_M.o msg_M351.o \
+msg_N.o msg_NOOP.o msg_P.o msg_PART.o msg_PASS.o msg_PRIVMSG.o msg_Q.o \
+msg_R.o msg_RemPing.o msg_S.o msg_SQ.o msg_Server.o msg_T.o msg_W.o \
+msg_WA.o server.o
 gnuworld_LDADD = $(LDADD)
 CXXCOMPILE = $(CXX) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
 LTCXXCOMPILE = $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
@@ -127,14 +127,15 @@ DEP_FILES =  .deps/Channel.P .deps/ChannelUser.P \
 .deps/LoadClientTimerHandler.P .deps/Network.P \
 .deps/ServerTimerHandlers.P .deps/UnloadClientTimerHandler.P \
 .deps/client.P .deps/iClient.P .deps/iServer.P .deps/ip.P .deps/main.P \
-.deps/msg_AD.P .deps/msg_B.P .deps/msg_C.P .deps/msg_CM.P .deps/msg_D.P \
-.deps/msg_DS.P .deps/msg_EA.P .deps/msg_EB.P .deps/msg_Error.P \
-.deps/msg_G.P .deps/msg_GL.P .deps/msg_I.P .deps/msg_J.P .deps/msg_JU.P \
-.deps/msg_K.P .deps/msg_L.P .deps/msg_M.P .deps/msg_M351.P \
-.deps/msg_N.P .deps/msg_NOOP.P .deps/msg_P.P .deps/msg_PART.P \
-.deps/msg_PASS.P .deps/msg_PRIVMSG.P .deps/msg_Q.P .deps/msg_R.P \
-.deps/msg_RemPing.P .deps/msg_S.P .deps/msg_SQ.P .deps/msg_Server.P \
-.deps/msg_T.P .deps/msg_W.P .deps/msg_WA.P .deps/server.P
+.deps/msg_AC.P .deps/msg_AD.P .deps/msg_B.P .deps/msg_C.P \
+.deps/msg_CM.P .deps/msg_D.P .deps/msg_DS.P .deps/msg_EA.P \
+.deps/msg_EB.P .deps/msg_Error.P .deps/msg_G.P .deps/msg_GL.P \
+.deps/msg_I.P .deps/msg_J.P .deps/msg_JU.P .deps/msg_K.P .deps/msg_L.P \
+.deps/msg_M.P .deps/msg_M351.P .deps/msg_N.P .deps/msg_NOOP.P \
+.deps/msg_P.P .deps/msg_PART.P .deps/msg_PASS.P .deps/msg_PRIVMSG.P \
+.deps/msg_Q.P .deps/msg_R.P .deps/msg_RemPing.P .deps/msg_S.P \
+.deps/msg_SQ.P .deps/msg_Server.P .deps/msg_T.P .deps/msg_W.P \
+.deps/msg_WA.P .deps/server.P
 SOURCES = $(gnuworld_SOURCES)
 OBJECTS = $(gnuworld_OBJECTS)
 
