@@ -12,7 +12,7 @@
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 
-const char REMGLINECommand_cc_rcsId[] = "$Id: REMGLINECommand.cc,v 1.19 2002/03/01 18:27:36 mrbean_ Exp $";
+const char REMGLINECommand_cc_rcsId[] = "$Id: REMGLINECommand.cc,v 1.20 2002/03/01 21:15:55 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -55,7 +55,6 @@ if(tmpGline != NULL)
 	}	
 server->removeGline(st[1],bot);
 bot->Notice( theClient, "Removal of gline succeeded\n" ) ;
-bot->MsgChanLog( "[REMGLINE]: %s by : %s\n", st[ 1 ].c_str(),theClient->getNickName().c_str() ) ;
 return true ;
 }
 
