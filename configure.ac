@@ -1,10 +1,10 @@
-dnl $Id: configure.ac,v 1.18 2003/09/02 01:37:05 dan_karrels Exp $
+dnl $Id: configure.ac,v 1.19 2003/09/14 16:35:52 dan_karrels Exp $
 dnl ----------------------------------------------------------
 
 echo Configuring GNUWorld...
 echo
 
-AC_REVISION($Revision: 1.18 $)
+AC_REVISION($Revision: 1.19 $)
 AC_INIT
 AC_CONFIG_SRCDIR([src/main.cc])
 AM_INIT_AUTOMAKE(gnuworld,2.2)
@@ -18,8 +18,7 @@ AC_LIBLTDL_CONVENIENCE
 dnl Substitute INCLTDL and LIBLTDL in the Makefiles
 dnl For some reason, INCLTDL and LIBLTDL aren't set
 dnl properly on OpenBSD
-dnl INCLTDL="-I${ac_top_srcdir}/libltdl"
-LIBLTDL="`pwd`/libltdl/libltdlc.la"
+LIBLTDL="\$(top_builddir)/libltdl/libltdlc.la"
 
 AM_MAINTAINER_MODE
 AC_ISC_POSIX
@@ -30,8 +29,8 @@ AC_LIBTOOL_DLOPEN
 dnl Configure libtool
 AM_PROG_LIBTOOL
 
-CFLAGS="-W -Wall -pipe $INCLTDL"
-CXXFLAGS="-W -Wall -pipe $INCLTDL"
+CXXFLAGS="-W -Wall -pipe"
+CFLAGS="$CFLAGS"
 
 AC_PREFIX_DEFAULT(`pwd`)
 
@@ -347,6 +346,9 @@ AM_CONDITIONAL(COND_MODSTATS,[test $build_modstats = true])
 for file in $NEW_MODS; do
 	AC_CONFIG_SUBDIRS($file)
 done
+
+LIBGNUWORLD="\$(top_builddir)/libgnuworld/libgnuworld.la"
+AC_SUBST(LIBGNUWORLD)
 
 AC_SUBST(NEW_MODS)
 AC_SUBST(DB)

@@ -1,10 +1,10 @@
 ## Process this file with automake to produce Makefile.in
-# "$Id: Makefile.am,v 1.49 2003/09/02 00:54:58 jeekay Exp $"
+# "$Id: Makefile.am,v 1.50 2003/09/14 16:35:54 dan_karrels Exp $"
 
 lib_LTLIBRARIES = libcservice.la
-libcservice_la_LDFLAGS = -module -export-dynamic -L@PGSQL_LIB@ \
+libcservice_la_LDFLAGS = -module -export-dynamic -L$(PGSQL_LIB) \
 	-lpq++
-libcservice_la_CXXFLAGS = -I@PGSQL_INCLUDE@ -I${top_srcdir}/include \
+libcservice_la_CXXFLAGS = -I$(PGSQL_INCLUDE) -I${top_srcdir}/include \
 	-I${top_srcdir}/libgnuworld
 
 libcservice_la_SOURCES = cservice.cc \

@@ -1,8 +1,8 @@
 ## Process this file with automake to produce Makefile.in
-# "$Id: Makefile.am,v 1.13 2003/09/02 00:54:58 jeekay Exp $"
+# "$Id: Makefile.am,v 1.14 2003/09/14 16:35:54 dan_karrels Exp $"
 
 lib_LTLIBRARIES = libnickserv.la
-libnickserv_la_LDFLAGS = -module -export-dynamic -L@PGSQL_LIB@ -lpq++
+libnickserv_la_LDFLAGS = -module -export-dynamic -L$(PGSQL_LIB) -lpq++
 
 libnickserv_la_SOURCES = \
   INFOCommand.cc         \
@@ -21,7 +21,7 @@ libnickserv_la_SOURCES = \
   sqlManager.cc          \
   sqlUser.cc
 
-libnickserv_la_CXXFLAGS = -I@PGSQL_INCLUDE@ \
+libnickserv_la_CXXFLAGS = -I$(PGSQL_INCLUDE) \
 	-I${top_srcdir}/include -I${top_srcdir}/libgnuworld
 
 EXTRA_DIST = levels.h \

@@ -466,7 +466,7 @@ ac_includes_default="\
 ac_default_prefix=`pwd`
 ac_subdirs_all="$ac_subdirs_all libltdl"
 ac_subdirs_all="$ac_subdirs_all $file"
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO AMTAR install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM AWK SET_MAKE am__leading_dot MAINTAINER_MODE_TRUE MAINTAINER_MODE_FALSE MAINT CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT DEPDIR am__include am__quote AMDEP_TRUE AMDEP_FALSE AMDEPBACKSLASH CCDEPMODE am__fastdepCC_TRUE am__fastdepCC_FALSE build build_cpu build_vendor build_os host host_cpu host_vendor host_os EGREP LN_S ECHO AR ac_ct_AR RANLIB ac_ct_RANLIB CPP CXX CXXFLAGS ac_ct_CXX CXXDEPMODE am__fastdepCXX_TRUE am__fastdepCXX_FALSE CXXCPP F77 FFLAGS ac_ct_F77 LIBTOOL subdirs threadLib COND_TESTDIR_TRUE COND_TESTDIR_FALSE COND_DBDIR_TRUE COND_DBDIR_FALSE COND_MODCCONTROL_TRUE COND_MODCCONTROL_FALSE COND_MODCLIENTEXAMPLE_TRUE COND_MODCLIENTEXAMPLE_FALSE COND_MODCLONER_TRUE COND_MODCLONER_FALSE COND_MODCSERVICE_TRUE COND_MODCSERVICE_FALSE COND_MODDRONESCAN_TRUE COND_MODDRONESCAN_FALSE COND_MODGNUTEST_TRUE COND_MODGNUTEST_FALSE COND_MODNICKSERV_TRUE COND_MODNICKSERV_FALSE COND_MODSCANNER_TRUE COND_MODSCANNER_FALSE COND_MODSTATS_TRUE COND_MODSTATS_FALSE NEW_MODS DB INCLTDL LIBLTDL LIBTOOL_DEPS PGSQL_INCLUDE PGSQL_LIB LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO AMTAR install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM AWK SET_MAKE am__leading_dot MAINTAINER_MODE_TRUE MAINTAINER_MODE_FALSE MAINT CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT DEPDIR am__include am__quote AMDEP_TRUE AMDEP_FALSE AMDEPBACKSLASH CCDEPMODE am__fastdepCC_TRUE am__fastdepCC_FALSE build build_cpu build_vendor build_os host host_cpu host_vendor host_os EGREP LN_S ECHO AR ac_ct_AR RANLIB ac_ct_RANLIB CPP CXX CXXFLAGS ac_ct_CXX CXXDEPMODE am__fastdepCXX_TRUE am__fastdepCXX_FALSE CXXCPP F77 FFLAGS ac_ct_F77 LIBTOOL subdirs threadLib COND_TESTDIR_TRUE COND_TESTDIR_FALSE COND_DBDIR_TRUE COND_DBDIR_FALSE COND_MODCCONTROL_TRUE COND_MODCCONTROL_FALSE COND_MODCLIENTEXAMPLE_TRUE COND_MODCLIENTEXAMPLE_FALSE COND_MODCLONER_TRUE COND_MODCLONER_FALSE COND_MODCSERVICE_TRUE COND_MODCSERVICE_FALSE COND_MODDRONESCAN_TRUE COND_MODDRONESCAN_FALSE COND_MODGNUTEST_TRUE COND_MODGNUTEST_FALSE COND_MODNICKSERV_TRUE COND_MODNICKSERV_FALSE COND_MODSCANNER_TRUE COND_MODSCANNER_FALSE COND_MODSTATS_TRUE COND_MODSTATS_FALSE LIBGNUWORLD NEW_MODS DB INCLTDL LIBLTDL LIBTOOL_DEPS PGSQL_INCLUDE PGSQL_LIB LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -1978,7 +1978,7 @@ echo "$as_me: error: this package needs a convenience libltdl" >&2;}
   INCLTDL="$LTDLINCL"
 
 
-LIBLTDL="`pwd`/libltdl/libltdlc.la"
+LIBLTDL="\$(top_builddir)/libltdl/libltdlc.la"
 
 echo "$as_me:$LINENO: checking whether to enable maintainer-specific portions of Makefiles" >&5
 echo $ECHO_N "checking whether to enable maintainer-specific portions of Makefiles... $ECHO_C" >&6
@@ -2955,18 +2955,32 @@ else
   # using a relative directory.
   cp "$am_depcomp" conftest.dir
   cd conftest.dir
+  # We will build objects and dependencies in a subdirectory because
+  # it helps to detect inapplicable dependency modes.  For instance
+  # both Tru64's cc and ICC support -MD to output dependencies as a
+  # side effect of compilation, but ICC will put the dependencies in
+  # the current directory while Tru64 will put them in the object
+  # directory.
+  mkdir sub
 
   am_cv_CC_dependencies_compiler_type=none
   if test "$am_compiler_list" = ""; then
      am_compiler_list=`sed -n 's/^#*\([a-zA-Z0-9]*\))$/\1/p' < ./depcomp`
   fi
   for depmode in $am_compiler_list; do
+    # Setup a source with many dependencies, because some compilers
+    # like to wrap large dependency lists on column 80 (with \), and
+    # we should not choose a depcomp mode which is confused by this.
+    #
     # We need to recreate these files for each test, as the compiler may
     # overwrite some of them when testing with obscure command lines.
     # This happens at least with the AIX C compiler.
-    echo '#include "conftest.h"' > conftest.c
-    echo 'int i;' > conftest.h
-    echo "${am__include} ${am__quote}conftest.Po${am__quote}" > confmf
+    : > sub/conftest.c
+    for i in 1 2 3 4 5 6; do
+      echo '#include "conftst'$i'.h"' >> sub/conftest.c
+      : > sub/conftst$i.h
+    done
+    echo "${am__include} ${am__quote}sub/conftest.Po${am__quote}" > confmf
 
     case $depmode in
     nosideeffect)
@@ -2984,11 +2998,12 @@ else
     # mode.  It turns out that the SunPro C++ compiler does not properly
     # handle `-M -o', and we need to detect this.
     if depmode=$depmode \
-       source=conftest.c object=conftest.o \
-       depfile=conftest.Po tmpdepfile=conftest.TPo \
-       $SHELL ./depcomp $depcc -c -o conftest.o conftest.c \
+       source=sub/conftest.c object=sub/conftest.${OBJEXT-o} \
+       depfile=sub/conftest.Po tmpdepfile=sub/conftest.TPo \
+       $SHELL ./depcomp $depcc -c -o sub/conftest.${OBJEXT-o} sub/conftest.c \
          >/dev/null 2>conftest.err &&
-       grep conftest.h conftest.Po > /dev/null 2>&1 &&
+       grep sub/conftst6.h sub/conftest.Po > /dev/null 2>&1 &&
+       grep sub/conftest.${OBJEXT-o} sub/conftest.Po > /dev/null 2>&1 &&
        ${MAKE-make} -s -f confmf > /dev/null 2>&1; then
       # icc doesn't choke on unknown options, it will just issue warnings
       # (even with -Werror).  So we grep stderr for any message
@@ -3714,7 +3729,7 @@ ia64-*-hpux*)
   ;;
 *-*-irix6*)
   # Find out which ABI we are using.
-  echo '#line 3717 "configure"' > conftest.$ac_ext
+  echo '#line 3732 "configure"' > conftest.$ac_ext
   if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -4804,18 +4819,32 @@ else
   # using a relative directory.
   cp "$am_depcomp" conftest.dir
   cd conftest.dir
+  # We will build objects and dependencies in a subdirectory because
+  # it helps to detect inapplicable dependency modes.  For instance
+  # both Tru64's cc and ICC support -MD to output dependencies as a
+  # side effect of compilation, but ICC will put the dependencies in
+  # the current directory while Tru64 will put them in the object
+  # directory.
+  mkdir sub
 
   am_cv_CXX_dependencies_compiler_type=none
   if test "$am_compiler_list" = ""; then
      am_compiler_list=`sed -n 's/^#*\([a-zA-Z0-9]*\))$/\1/p' < ./depcomp`
   fi
   for depmode in $am_compiler_list; do
+    # Setup a source with many dependencies, because some compilers
+    # like to wrap large dependency lists on column 80 (with \), and
+    # we should not choose a depcomp mode which is confused by this.
+    #
     # We need to recreate these files for each test, as the compiler may
     # overwrite some of them when testing with obscure command lines.
     # This happens at least with the AIX C compiler.
-    echo '#include "conftest.h"' > conftest.c
-    echo 'int i;' > conftest.h
-    echo "${am__include} ${am__quote}conftest.Po${am__quote}" > confmf
+    : > sub/conftest.c
+    for i in 1 2 3 4 5 6; do
+      echo '#include "conftst'$i'.h"' >> sub/conftest.c
+      : > sub/conftst$i.h
+    done
+    echo "${am__include} ${am__quote}sub/conftest.Po${am__quote}" > confmf
 
     case $depmode in
     nosideeffect)
@@ -4833,11 +4862,12 @@ else
     # mode.  It turns out that the SunPro C++ compiler does not properly
     # handle `-M -o', and we need to detect this.
     if depmode=$depmode \
-       source=conftest.c object=conftest.o \
-       depfile=conftest.Po tmpdepfile=conftest.TPo \
-       $SHELL ./depcomp $depcc -c -o conftest.o conftest.c \
+       source=sub/conftest.c object=sub/conftest.${OBJEXT-o} \
+       depfile=sub/conftest.Po tmpdepfile=sub/conftest.TPo \
+       $SHELL ./depcomp $depcc -c -o sub/conftest.${OBJEXT-o} sub/conftest.c \
          >/dev/null 2>conftest.err &&
-       grep conftest.h conftest.Po > /dev/null 2>&1 &&
+       grep sub/conftst6.h sub/conftest.Po > /dev/null 2>&1 &&
+       grep sub/conftest.${OBJEXT-o} sub/conftest.Po > /dev/null 2>&1 &&
        ${MAKE-make} -s -f confmf > /dev/null 2>&1; then
       # icc doesn't choke on unknown options, it will just issue warnings
       # (even with -Werror).  So we grep stderr for any message
@@ -5196,7 +5226,7 @@ fi
 
 
 # Provide some information about the compiler.
-echo "$as_me:5199:" \
+echo "$as_me:5229:" \
      "checking for Fortran 77 compiler version" >&5
 ac_compiler=`set X $ac_compile; echo $2`
 { (eval echo "$as_me:$LINENO: \"$ac_compiler --version </dev/null >&5\"") >&5
@@ -6201,11 +6231,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:6204: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:6234: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:6208: \$? = $ac_status" >&5
+   echo "$as_me:6238: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings
@@ -6433,11 +6463,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:6436: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:6466: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:6440: \$? = $ac_status" >&5
+   echo "$as_me:6470: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings
@@ -6500,11 +6530,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:6503: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:6533: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:6507: \$? = $ac_status" >&5
+   echo "$as_me:6537: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -8512,7 +8542,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 8515 "configure"
+#line 8545 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -8610,7 +8640,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 8613 "configure"
+#line 8643 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -10742,11 +10772,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:10745: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:10775: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:10749: \$? = $ac_status" >&5
+   echo "$as_me:10779: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings
@@ -10809,11 +10839,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:10812: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:10842: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:10816: \$? = $ac_status" >&5
+   echo "$as_me:10846: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -12052,7 +12082,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 12055 "configure"
+#line 12085 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -12150,7 +12180,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 12153 "configure"
+#line 12183 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -12972,11 +13002,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:12975: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:13005: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:12979: \$? = $ac_status" >&5
+   echo "$as_me:13009: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings
@@ -13039,11 +13069,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:13042: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:13072: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:13046: \$? = $ac_status" >&5
+   echo "$as_me:13076: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -14979,11 +15009,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:14982: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:15012: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:14986: \$? = $ac_status" >&5
+   echo "$as_me:15016: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings
@@ -15211,11 +15241,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:15214: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:15244: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:15218: \$? = $ac_status" >&5
+   echo "$as_me:15248: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings
@@ -15278,11 +15308,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:15281: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:15311: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:15285: \$? = $ac_status" >&5
+   echo "$as_me:15315: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -17290,7 +17320,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 17293 "configure"
+#line 17323 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -17388,7 +17418,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 17391 "configure"
+#line 17421 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -18395,8 +18425,8 @@ LIBTOOL='$(SHELL) $(top_builddir)/libtool'
 
 
 
-CFLAGS="-W -Wall -pipe $INCLTDL"
-CXXFLAGS="-W -Wall -pipe $INCLTDL"
+CXXFLAGS="-W -Wall -pipe"
+CFLAGS="$CFLAGS"
 
 
 
@@ -19083,18 +19113,32 @@ else
   # using a relative directory.
   cp "$am_depcomp" conftest.dir
   cd conftest.dir
+  # We will build objects and dependencies in a subdirectory because
+  # it helps to detect inapplicable dependency modes.  For instance
+  # both Tru64's cc and ICC support -MD to output dependencies as a
+  # side effect of compilation, but ICC will put the dependencies in
+  # the current directory while Tru64 will put them in the object
+  # directory.
+  mkdir sub
 
   am_cv_CC_dependencies_compiler_type=none
   if test "$am_compiler_list" = ""; then
      am_compiler_list=`sed -n 's/^#*\([a-zA-Z0-9]*\))$/\1/p' < ./depcomp`
   fi
   for depmode in $am_compiler_list; do
+    # Setup a source with many dependencies, because some compilers
+    # like to wrap large dependency lists on column 80 (with \), and
+    # we should not choose a depcomp mode which is confused by this.
+    #
     # We need to recreate these files for each test, as the compiler may
     # overwrite some of them when testing with obscure command lines.
     # This happens at least with the AIX C compiler.
-    echo '#include "conftest.h"' > conftest.c
-    echo 'int i;' > conftest.h
-    echo "${am__include} ${am__quote}conftest.Po${am__quote}" > confmf
+    : > sub/conftest.c
+    for i in 1 2 3 4 5 6; do
+      echo '#include "conftst'$i'.h"' >> sub/conftest.c
+      : > sub/conftst$i.h
+    done
+    echo "${am__include} ${am__quote}sub/conftest.Po${am__quote}" > confmf
 
     case $depmode in
     nosideeffect)
@@ -19112,11 +19156,12 @@ else
     # mode.  It turns out that the SunPro C++ compiler does not properly
     # handle `-M -o', and we need to detect this.
     if depmode=$depmode \
-       source=conftest.c object=conftest.o \
-       depfile=conftest.Po tmpdepfile=conftest.TPo \
-       $SHELL ./depcomp $depcc -c -o conftest.o conftest.c \
+       source=sub/conftest.c object=sub/conftest.${OBJEXT-o} \
+       depfile=sub/conftest.Po tmpdepfile=sub/conftest.TPo \
+       $SHELL ./depcomp $depcc -c -o sub/conftest.${OBJEXT-o} sub/conftest.c \
          >/dev/null 2>conftest.err &&
-       grep conftest.h conftest.Po > /dev/null 2>&1 &&
+       grep sub/conftst6.h sub/conftest.Po > /dev/null 2>&1 &&
+       grep sub/conftest.${OBJEXT-o} sub/conftest.Po > /dev/null 2>&1 &&
        ${MAKE-make} -s -f confmf > /dev/null 2>&1; then
       # icc doesn't choke on unknown options, it will just issue warnings
       # (even with -Werror).  So we grep stderr for any message
@@ -19490,18 +19535,32 @@ else
   # using a relative directory.
   cp "$am_depcomp" conftest.dir
   cd conftest.dir
+  # We will build objects and dependencies in a subdirectory because
+  # it helps to detect inapplicable dependency modes.  For instance
+  # both Tru64's cc and ICC support -MD to output dependencies as a
+  # side effect of compilation, but ICC will put the dependencies in
+  # the current directory while Tru64 will put them in the object
+  # directory.
+  mkdir sub
 
   am_cv_CXX_dependencies_compiler_type=none
   if test "$am_compiler_list" = ""; then
      am_compiler_list=`sed -n 's/^#*\([a-zA-Z0-9]*\))$/\1/p' < ./depcomp`
   fi
   for depmode in $am_compiler_list; do
+    # Setup a source with many dependencies, because some compilers
+    # like to wrap large dependency lists on column 80 (with \), and
+    # we should not choose a depcomp mode which is confused by this.
+    #
     # We need to recreate these files for each test, as the compiler may
     # overwrite some of them when testing with obscure command lines.
     # This happens at least with the AIX C compiler.
-    echo '#include "conftest.h"' > conftest.c
-    echo 'int i;' > conftest.h
-    echo "${am__include} ${am__quote}conftest.Po${am__quote}" > confmf
+    : > sub/conftest.c
+    for i in 1 2 3 4 5 6; do
+      echo '#include "conftst'$i'.h"' >> sub/conftest.c
+      : > sub/conftst$i.h
+    done
+    echo "${am__include} ${am__quote}sub/conftest.Po${am__quote}" > confmf
 
     case $depmode in
     nosideeffect)
@@ -19519,11 +19578,12 @@ else
     # mode.  It turns out that the SunPro C++ compiler does not properly
     # handle `-M -o', and we need to detect this.
     if depmode=$depmode \
-       source=conftest.c object=conftest.o \
-       depfile=conftest.Po tmpdepfile=conftest.TPo \
-       $SHELL ./depcomp $depcc -c -o conftest.o conftest.c \
+       source=sub/conftest.c object=sub/conftest.${OBJEXT-o} \
+       depfile=sub/conftest.Po tmpdepfile=sub/conftest.TPo \
+       $SHELL ./depcomp $depcc -c -o sub/conftest.${OBJEXT-o} sub/conftest.c \
          >/dev/null 2>conftest.err &&
-       grep conftest.h conftest.Po > /dev/null 2>&1 &&
+       grep sub/conftst6.h sub/conftest.Po > /dev/null 2>&1 &&
+       grep sub/conftest.${OBJEXT-o} sub/conftest.Po > /dev/null 2>&1 &&
        ${MAKE-make} -s -f confmf > /dev/null 2>&1; then
       # icc doesn't choke on unknown options, it will just issue warnings
       # (even with -Werror).  So we grep stderr for any message
@@ -21534,6 +21594,9 @@ subdirs="$subdirs $file"
 
 done
 
+LIBGNUWORLD="\$(top_builddir)/libgnuworld/libgnuworld.la"
+
+
 
 
 
@@ -22401,6 +22464,7 @@ s,@COND_MODSCANNER_TRUE@,$COND_MODSCANNER_TRUE,;t t
 s,@COND_MODSCANNER_FALSE@,$COND_MODSCANNER_FALSE,;t t
 s,@COND_MODSTATS_TRUE@,$COND_MODSTATS_TRUE,;t t
 s,@COND_MODSTATS_FALSE@,$COND_MODSTATS_FALSE,;t t
+s,@LIBGNUWORLD@,$LIBGNUWORLD,;t t
 s,@NEW_MODS@,$NEW_MODS,;t t
 s,@DB@,$DB,;t t
 s,@INCLTDL@,$INCLTDL,;t t
