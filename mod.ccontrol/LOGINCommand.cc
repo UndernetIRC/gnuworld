@@ -6,14 +6,14 @@
 
 #include	<string>
 #include	<cstdlib>
-
+#include	"Network.h"
 #include	"ccontrol.h"
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 #include	"md5hash.h" 
 #include        "ccUser.h"
 
-const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.13 2001/07/26 20:12:40 mrbean_ Exp $";
+const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.14 2001/07/30 17:16:39 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -105,9 +105,18 @@ else
 		return false;
 		}
 	//Ok the password match , prepare the ccUser data
+	AuthInfo *TempAuth = bot->IsAuth(theUser->getID());
+	if(TempAuth) //there is already a user authenticated under that nick
+		{
+		iClient *tClient = Network->findClient(TempAuth->getNumeric());
+		bot->Notice(tClient,"You have just been deauthenticated");
+		bot->MsgChanLog("Login conflict for user %s from %s and %s"
+				,st[1].c_str(),theClient->getNickName().c_str()
+				,tClient->getNickName().c_str());
+		bot->deAuthUser(tClient->getCharYYXXX());
+		}
 	theUser->setUserName(st[1]);
 	theUser->setNumeric(theClient->getCharYYXXX());
-
 	//Try creating an authentication entry for the user
 	if(bot->AuthUser(theUser))
 		if(!(bot->isSuspended(theUser)))
