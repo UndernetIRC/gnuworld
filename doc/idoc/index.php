@@ -2,11 +2,11 @@
 /*
  *
  * Undernet GNUworld Interactive Installation Guide (aka UGIIG)
- * $Id: index.php,v 1.7 2002/04/05 10:30:56 nighty Exp $
+ * $Id: index.php,v 1.8 2002/05/20 23:59:36 nighty Exp $
  *
  * Released under the GNU Public License : http://www.gnu.org/licenses/gpl.txt
  * by nighty <nighty@undernet.org>
- * Last modified: 04/04/2002
+ * Last modified: 05/21/2002
  *
  *
  */
@@ -50,7 +50,7 @@ function footer($prev,$next) {
 	//echo "<address>maintained by <b>&lt;</b><a href=\"mailto:" . $coder_email . "\">" . $coder_email . "</a><b>&gt;</b> - Last modified : <b>" . date("M-d-Y H:i:s",   (  filemtime("index.php")+( date("Z",filemtime("index.php"))/3600 )   )   ) . " UTC/GMT</b> - <b>[</b><a href=\"./\">Home</a><b>]</b></address>";
 	echo "<address>maintained by <b>&lt;</b><a href=\"mailto:" . $coder_email . "\">" . $coder_email . "</a><b>&gt;</b> - <b>[</b><a href=\"./\">Home</a><b>]</b>";
 	echo "&nbsp;<br><font size=-2><b>";
-?>$Id: index.php,v 1.7 2002/04/05 10:30:56 nighty Exp $<?
+?>$Id: index.php,v 1.8 2002/05/20 23:59:36 nighty Exp $<?
 	echo "</b></font></address>\n";
 	echo "</body>\n";
 	echo "</html>\n";
@@ -69,13 +69,13 @@ function ugig_err($err_code) {
 	echo "<br><br><a href=\"./\">Click Here, and start over</a>";
 	footer();
 	die;
-} 
+}
 
 $coder_email = "nighty@undernet.org";
 $coder_name = "nighty";
- 
+
 ?>
-<!-- $Id: index.php,v 1.7 2002/04/05 10:30:56 nighty Exp $ //-->
+<!-- $Id: index.php,v 1.8 2002/05/20 23:59:36 nighty Exp $ //-->
 <html>
 <head>
 <title>Undernet GNUworld Interactive Installation Guide</title>
@@ -210,7 +210,7 @@ if ($s==3) { // *** ADDITIONNAL INFORMATION FOR EXAMPLE CUSTOMIZATION + HELP DIS
 		ugig_err(0);
 	}
 	if (!isset($r) || $r<0 || $r>1) { ugig_err(0); }
-	
+
 	if ($r==0 && $subset=="") {
 		echo "<h1>Warning</h1>";
 		echo "<pre>";
@@ -294,7 +294,7 @@ This part will help you in setting up PostreSQL properly for a GNUworld usage of
 		<li> <a href="<?=$url_root?>&subset=A-5">Setting up security for the database (passwords)</a>
 <? } ?>
 	</ol>
-</ol>	
+</ol>
 <?
 			footer("","");
 		}
@@ -321,7 +321,7 @@ This part will provide the help you need to setup the GNUworld program.
 		<li> <a href="<?=$url_root?>&subset=B-7">Configuring and setting up 'THE JUDGE'</a>
 <? } ?>
 	</ol>
-</ol>	
+</ol>
 <?
 			footer("","");
 		}
@@ -338,7 +338,7 @@ This part will help you in setting up Apache and PHP with PostgreSQL support and
 		<li> <a href="<?=$url_root?>&subset=C-3">Building Apache with PHP and PostrgreSQL support</a>
 		<li> <a href="<?=$url_root?>&subset=C-4">Short HOWTO on apache's &lt;VirtualHost&gt; directive</a>
 	</ol>
-</ol>	
+</ol>
 <?
 			footer("","");
 		}
@@ -357,32 +357,32 @@ on your system and want to set up GNUworld using an already existing <?
 	<b>-</b> Check that you can access a web browsable directory (web space) on the machine
 	  (if you have an URL like http://www.some-site.com/~youruser/ and you place the files for that URL
 	   in a directory in your HOME (for example /home/youruser/public_html) then YOU DO HAVE a web space.)
-	   
-	<b>-</b> Check that the machine is running a web server with PHP4+ and PostgreSQL7+ support :
+
+	<b>-</b> Check that the machine is running a web server with PHP4+ and PostgreSQL 7.2+ support :
 	  create a file in your web space called <b>test_apache.php</b> and put the following code in it :
 	  <font color=#888888>
 	  	&lt;?
 	  	phpinfo();
 	  	?&gt;
 	  </font>
-	  
+
 	  Then access it to view the PHP options (http://www.some-site.com/~youruser/test_apache.php).
 	  If you view the source code, your server probably either doesnt have PHP support, or doesnt support
 	  the <b>.php</b> file extension. See your Server Administrator to fix this problem.
-	  
-	  Check that the PHP version in the first purple block is <b>4 or above</b>.
+
+	  Check that the PHP version in the first purple block is <b>4.1.2 or above</b>.
 	  Otherwise you don't have the required version of <b>PHP</b>, sorry.
-	  
+
 	  In the next block, in section <b>Configure Command</b>, check that the command
 	  contains <b>--with-pgsql</b>, otherwise your existing PHP does'nt have the PostgreSQL support.
-	  
+
 <? } ?>
 	<b>-</b> Check that your PostgreSQL installation was done with the following <b>./configure</b> option(s):
 		<b>--with-CXX</b> : building the C Client
 <? if (ereg("cservice",$modules)) { ?>
 		<b>--with-tcl</b> : building with TCL support (<b>pgtclsh</b>) for mod.cservice.
 <? } ?>
-	
+
 For the whole HOWTO here, we will assume PostreSQL is configured that way :
 (replace with appropriate PATHs if yours are different)
 
@@ -390,15 +390,15 @@ For the whole HOWTO here, we will assume PostreSQL is configured that way :
 		LIB directory :		<b>/usr/local/pgsql/lib</b>
 		Database directory :	<b>/usr/local/pgsql/data</b>
 
-		User having DBA privs :	<b>gnuworld</b>		
+		User having DBA privs :	<b>gnuworld</b>
 
 	<b>-</b> Check PostgreSQL version :
-		
+
 		<?=$os?>:/home/gnuworld$ <b>/usr/local/pgsql/bin/psql --version</b>
-		
-	  the first lines should return a version number above or equal to <b>7</b> like this :
-	  
-	  	<font color=#888888>psql (PostgreSQL) 7.2
+
+	  the first lines should return a version number above or equal to <b>7.2.1</b> like this :
+
+	  	<font color=#888888>psql (PostgreSQL) 7.2.1
 	  	contains readline, history support
 		Portions Copyright (c) 1996-2000, PostgreSQL, Inc
 		Portions Copyright (c) 1996 Regents of the University of California
@@ -406,10 +406,10 @@ For the whole HOWTO here, we will assume PostreSQL is configured that way :
 		usage and distribution terms.</font>
 
 	<b>-</b> Check that your user (assuming <b>gnuworld</b>) has DBA (DataBase Administrator) privileges :
-	
-		<?=$os?>:/home/gnuworld$ <b>/usr/local/pgsql/bin/createdb test_gnu</b>  
+
+		<?=$os?>:/home/gnuworld$ <b>/usr/local/pgsql/bin/createdb test_gnu</b>
 		<?=$os?>:/home/gnuworld$ <b>/usr/local/pgsql/bin/dropdb test_gnu</b>
-	  
+
 	  if you could run this without any error, then your user has those privileges.
 	  Otherwise you need your System Administrator to allow you those actions.
 </pre>
@@ -417,7 +417,7 @@ For the whole HOWTO here, we will assume PostreSQL is configured that way :
 <?
 			footer("*","B-1");
 		}
-		
+
 /* *** CAT. A : SETTING UP PGSQL *** */
 /*
 if ($subset=="") {
@@ -438,9 +438,9 @@ In order to get PostgreSQL you should visit their official website :
 	- <a href="http://www.postgresql.org/" target=_blank>http://www.postgresql.org/</a>
 	- <a href="ftp://ftp.postgresql.org/pub/" target=_blank>PostgreSQL Public FTP Site</a>
 
-Direct link to download <b>PostgreSQL 7.2</b> (recommended version) :
-	- <a href="ftp://ftp.postgresql.org/pub/v7.2/postgresql-7.2.tar.gz">FTP</a>
-	- <a href="http://www.postgresql.org/ftpsite/v7.2/postgresql-7.2.tar.gz">HTTP</a>
+Direct link to download <b>PostgreSQL 7.2.1</b> (recommended version) :
+	- <a href="ftp://ftp.postgresql.org/pub/v7.2.1/postgresql-7.2.1.tar.gz">FTP</a>
+	- <a href="http://www.postgresql.org/ftpsite/v7.2.1/postgresql-7.2.1.tar.gz">HTTP</a>
 </pre>
 <?
 	footer("*","A-2");
@@ -486,7 +486,7 @@ If you have it, check that you have the proper version by doing :
 this should return something above or equal to <b>8.0</b>.
 If this number is 8.0 or above, please <a href="<?=$url_root?>&subset=A-3">click here</a> or go to next step,
 if you have an older version of TCL please see <a href="<?=$url_root?>&subset=A-2-i">Getting and installing TCL 8.x+</a>.
-	
+
 </pre>
 <?
 	footer("A-1","A-3");
@@ -502,7 +502,7 @@ Get the latest TCL package in :
 
 Recommended <b>TCL 8.3.4</b> (version 8.4 is not stable yet) :
 	- <a href="ftp://ftp.rge.com/pub/languages/tcl/distrib/tcl8_3/tcl8.3.4.tar.gz">tcl8.3.4.tar.gz</a>
-	
+
 When you get the file <b>tcl8.3.4.tar.gz</b>, just unpack it in a place you have some space,
 your home directory can be a good place to put that.
 
@@ -543,12 +543,12 @@ if ($subset=="A-3") {
 ?>
 <h2>Building PostgreSQL</h2>
 <pre>
-Get the <b>postgresql-7.2.tar.gz</b> file you downloaded into step 1.
+Get the <b>postgresql-7.2.1.tar.gz</b> file you downloaded into step 1.
 Unpack it :
 
-	<?=$os?>:/root# <b>tar -xzf postgresql-7.2.tar.gz</b>
-	<?=$os?>:/root# <b>cd postgresql-7.2/</b>
-	<?=$os?>:/root/postgresql-7.2# <b>./configure --with-CXX \
+	<?=$os?>:/root# <b>tar -xzf postgresql-7.2.1.tar.gz</b>
+	<?=$os?>:/root# <b>cd postgresql-7.2.1/</b>
+	<?=$os?>:/root/postgresql-7.2.1# <b>./configure --with-CXX \
 <? if ($os=="freebsd") { ?>
 		--with-tcl --without-tk \
 		--with-tclconfig=/usr/local/lib/tcl8.3  \
@@ -557,7 +557,7 @@ Unpack it :
 <? } ?>
 <? if ($os=="linux") { ?>
 		--with-tcl --without-tk</b>
-		
+
 If the configure complains about not finding <b>tclConfig.sh</b>, or if
 you experience missing <b>.h</b> files when doing the next steps of compilation,
 you may want to re-run the <b>./configure</b> adding the following parameters :
@@ -566,12 +566,13 @@ you may want to re-run the <b>./configure</b> adding the following parameters :
 		--with-includes=/path/to/tcl/include
 		--with-libraries=/path/to/tcl/lib
 <? } ?>
-	
+
 
 You need <b>gmake 3.79</b> or above to build PostgreSQL (and you will also need it for GNUworld later),
 check you have it by running <b>gmake --version</b>, you should get something like this :
+Note: You will also need <b>automake 1.6<b> or above in order to build GNUworld.
 
-	<?=$os?>:/root/postgresql-7.2# <b>gmake --version</b><font color=#999999>
+	<?=$os?>:/root/postgresql-7.2.1# <b>gmake --version</b><font color=#999999>
 	GNU Make version 3.79.1, by Richard Stallman and Roland McGrath.
 <? if ($os=="linux") { ?>
 	Built for i686-pc-linux-gnu
@@ -588,10 +589,11 @@ check you have it by running <b>gmake --version</b>, you should get something li
 	Report bugs to &lt;bug-make@gnu.org&gt;.	</font>
 
 If you don't have <b>gmake</b>, you can get it <a href="ftp://ftp.grolier.fr/mirrors/ftp.gnu.org/gnu/make/make-3.79.1.tar.gz">here</a>.
+If you don't have <b>automake 1.6</b>, you can get it <a href="ftp://ftp.grolier.fr/mirrors/ftp.gnu.org/gnu/automake/automake-1.6.1.tar.gz">here</a>.
 If that's ok, you can go on and build PostgreSQL for real, then install it...
 
-	<?=$os?>:/root/postgresql-7.2# <b>gmake</b>
-	<?=$os?>:/root/postgresql-7.2# <b>gmake install</b>
+	<?=$os?>:/root/postgresql-7.2.1# <b>gmake</b>
+	<?=$os?>:/root/postgresql-7.2.1# <b>gmake install</b>
 
 <? if ($os=="freebsd") { ?>
 If you are using <b>bash</b> as your shell programm, add the following line :
@@ -614,9 +616,9 @@ Edit the file <b>/etc/ld.so.conf</b> and add the following line :
                    /usr/local/pgsql/lib
 
 
-save the file, then run : 
+save the file, then run :
 
-	<?=$os?>:/root/postgresql-7.2# <b>ldconfig</b>
+	<?=$os?>:/root/postgresql-7.2.1# <b>ldconfig</b>
 
 <? } ?>
 
@@ -645,13 +647,13 @@ making it possible to choose another user for your GNUworld to use, are describe
 
 Creating the user, assuming username <b>gnuworld</b> :
 
-	<?=$os?>:/root# <b>adduser</b><font color=#999999><? if ($os=="freebsd") { ?>	
+	<?=$os?>:/root# <b>adduser</b><font color=#999999><? if ($os=="freebsd") { ?>
 	Use option ``-silent'' if you don't want to see all warnings and questions.
 
 	Check /etc/shells
 	Check /etc/master.passwd
 	Check /etc/group
-	Enter your default shell: bash csh date false no sh tcsh 
+	Enter your default shell: bash csh date false no sh tcsh
 	[bash]: <font color=#009900><b>[</b>ENTER<b>]</b></font>
 	Your default shell is: bash -> /usr/bin/bash
 	Enter your default HOME partition: [/home]: <font color=#009900><b>[</b>ENTER<b>]</b></font>
@@ -669,18 +671,18 @@ Creating the user, assuming username <b>gnuworld</b> :
 	Uid [1001]: <font color=#009900><b>[</b>ENTER<b>]</b></font>
 	Enter login class: default []: <font color=#009900><b>[</b>ENTER<b>]</b></font>
 	Login group gnuworld [gnuworld]: <font color=#009900><b>[</b>ENTER<b>]</b></font>
-	Login group is ``gnuworld''. Invite gnuworld into other groups: guest no 
+	Login group is ``gnuworld''. Invite gnuworld into other groups: guest no
 	[no]: <font color=#009900><b>[</b>ENTER<b>]</b></font>
 	Enter password []: <font color=#000000><b>********</b></font>
 	Enter password again []: <font color=#000000><b>********</b></font>
-	
+
 	Name:     gnuworld
 	Password: ****
 	Fullname: GNUworld Account
 	Uid:      1001
 	Gid:      1001 (gnuworld)
-	Class:    
-	Groups:   gnuworld 
+	Class:
+	Groups:   gnuworld
 	HOME:     /home/gnuworld
 	Shell:    /usr/bin/bash
 	OK? (y/n) [y]: <font color=#009900><b>[</b>ENTER<b>]</b></font>
@@ -690,14 +692,14 @@ Creating the user, assuming username <b>gnuworld</b> :
 	Goodbye!</font>
 <? } ?>
 <? if ($os=="linux") { ?>
-	
-	
+
+
 	Login name for new user (8 characters or less) []: <font color=#000000><b>gnuworld</b></font>
 
 	User id for gnuworld [ defaults to next available]: <font color=#009900><b>[</b>ENTER<b>]</b></font>
 
 	Initial group for gnuworld [users]: <font color=#009900><b>[</b>ENTER<b>]</b></font>
-	
+
 	Additional groups for gnuworld (seperated
 	with commas, no spaces) []: <font color=#009900><b>[</b>ENTER<b>]</b></font>
 
@@ -744,9 +746,9 @@ Creating the user, assuming username <b>gnuworld</b> :
 	<?=$os?>:/root# <b>chown gnuworld /usr/local/pgsql/data</b>
 	<?=$os?>:/root# <b>su - gnuworld</b>
 	<?=$os?>:/home/gnuworld$ <b>/usr/local/pgsql/bin/initdb -D /usr/local/pgsql/data</b>
-	
+
 Then run <b>PostgreSQL</b> :
-	
+
 	<?=$os?>:/home/gnuworld$ <b>/usr/local/pgsql/bin/postmaster -S -B 64 -N 32 -i -D /usr/local/pgsql/data -o -F</b>
 
 Note: if you plan on using this *STRICTLY* locally, and you want to ensure ONLY local connections are possible
@@ -757,7 +759,7 @@ then you can run the following command instead of the above to run your PostgreS
 
 
 	<?=$os?>:/home/gnuworld$ <b>exit</b>
-	<?=$os?>:/root# 
+	<?=$os?>:/root#
 
 </pre>
 <?
@@ -802,7 +804,7 @@ After that change, you need to restart your PostreSQL, do the following :
 
 	<?=$os?>:/root# <b>su - gnuworld</b>
 	<?=$os?>:/home/gnuworld$ <b>/usr/local/pgsql/bin/pg_ctl -D /usr/local/pgsql/data restart</b>
-	
+
 
 </pre>
 <?
@@ -824,7 +826,7 @@ if (ereg("cservice",$modules)) {
 	<?=$os?>:/root# <b>su - gnuworld</b>
 <? } ?>
 	<?=$os?>:/home/gnuworld$ <b>cvs -d:pserver:anonymous@cvs.gnuworld.sourceforge.net:/cvsroot/gnuworld login</b>
-	
+
 Just hit the <b>[</b>ENTER<b>]</b> key as the password.
 
 	<?=$os?>:/home/gnuworld$ <b>cvs -z3 -d :pserver:anonymous@cvs.gnuworld.sourceforge.net:/cvsroot/gnuworld co gnuworld</b>
@@ -877,10 +879,10 @@ if ($modules=="ccontrol") {
 If you have the compiler complaining about <b>libpq++.h</b>, that means :
 <? if ($r) { ?>
 	- you didn't added the required stuff to <?
-	
+
 	if ($os=="linux") { echo "<b>/etc/ld.so.conf</b>\n"; }
 	if ($os=="freebsd") { echo "<b>LD_LIBRARY_PATH</b>\n"; }
-	
+
 	?>
 	  as explained in <a href="<?=$url_root?>&subset=A-3">Building PostgreSQL</a>.
 
@@ -893,11 +895,11 @@ If you have the compiler complaining about <b>libpq++.h</b>, that means :
 	  (see <a href="<?=$url_root?>&subset=R">Requirements</a>).
 <? } ?>
 
-	
-	<?=$os?>:/home/gnuworld/gnuworld$ <b>gmake install</b>	
-	<?=$os?>:/home/gnuworld/gnuworld$ <b>cd ..</b>		
-	<?=$os?>:/home/gnuworld$	
-	
+
+	<?=$os?>:/home/gnuworld/gnuworld$ <b>gmake install</b>
+	<?=$os?>:/home/gnuworld/gnuworld$ <b>cd ..</b>
+	<?=$os?>:/home/gnuworld$
+
 </pre>
 <?
 	footer("B-1","B-3");
@@ -948,7 +950,7 @@ command work on authenticated users.
 	<?=$os?>:/home/gnuworld/gnuworld/doc$ <b>/usr/local/pgsql/bin/psql cservice < cservice.addme.sql</b>
 
 <b>NOTE:</b> You will change the password for that user later.
-<? 
+<?
 	if (ereg("ccontrol",$modules)) {
 		echo "\n\n\n\n";
 	}
@@ -1006,7 +1008,7 @@ mandatory changes should be :
 	<b>sql_db</b> = cservice
 <? if ($secure) { ?>
 	<b>sql_pass</b> = the_password_for_user_gnuworld
-<? } ?>	
+<? } ?>
 
 you should edit the following variables in that configuration, and leave the others untouched :
 
@@ -1054,8 +1056,8 @@ you should edit the following variables in that configuration, and leave the oth
 <b>NOTE:</b>	If you don't have any password, you probably didn't restricted your PostgreSQL,
 	in that case, just leave the default one (<b>''</b>), it will just be ignored
 	but you need to put something, thus not leaving it blank.
-	
-	
+
+
 
 mod.ccontrol is not, by default, enabled in <b>GNUworld.conf</b>,
 you need to find the following line in that file :
@@ -1132,7 +1134,7 @@ You need to add the following lines only to the <b>ircd.conf</b> of the <b>uplin
 
 	<b>H:*:*:services.undernet.org</b>
 	<b>C:192.168.0.1:testlink:services.undernet.org::90</b>
-	
+
 <i>this assumes <b>90</b> is a valid Y:Line in your config and is of type <b>Server Class</b>,
 replace, if needed, with appropriate number.</i>
 
@@ -1158,11 +1160,11 @@ before asking your question on <b>#coder-com</b> on <b>Undernet</b> :
 
 
 <? if ($modules=="cservice ccontrol") { ?>
-If GNUworld is linked, you should be able to <b>/whois</b> the two <b>nickname</b>s 
+If GNUworld is linked, you should be able to <b>/whois</b> the two <b>nickname</b>s
 of the two clients (X-like and Uworld-like) you defined in <b>cservice.conf</b> and <b>ccontrol.conf</b>.
 <? } ?>
 <? if ($modules=="cservice") { ?>
-If GNUworld is linked, you should be able to <b>/whois</b> the <b>nickname</b> 
+If GNUworld is linked, you should be able to <b>/whois</b> the <b>nickname</b>
 of the X-like client you defined in <b>cservice.conf</b>.
 <? } ?>
 <? if ($modules=="ccontrol") { ?>
@@ -1175,7 +1177,7 @@ To login to <b>X</B>, issue the following command on IRC :
 
 		<b>/msg X@services.undernet.org login Admin temPass</b>
 		-X- AUTHENTICATION SUCCESSFULL AS Admin!
-		
+
 You will change your password later using the web interface since the 'newpass' command was lately
 removed in X and is now outdated.
 <? } ?>
@@ -1186,7 +1188,7 @@ To login to <b>Uworld</b>, issue the following command on IRC :
 
 		<b>/msg Uworld login Admin temPass</b>
 		-Uworld- Authentication successfull.
-		
+
 Then change your password :
 		<b>/msg Uworld newpass <i>your_new_password</i></b>
 		-Uworld- Password changed.
@@ -1258,13 +1260,13 @@ IMPORTANT NOTICE:</b>
 	&lt;?
 	/*
 
-	&lt;!-- <? echo "\$" . "Id" ?>: config.inc,v 1.12 2002/04/04 10:59:21 nighty Exp <? echo "\$" ?> //--&gt;
-	
+	&lt;!-- <? echo "\$" . "Id" ?>: config.inc,v 1.15 2002/05/21 XX:XX:XX nighty Exp <? echo "\$" ?> //--&gt;
+
 	'config.inc' For GNUworld's mod.cservice's website interface
-	
+
 	Created: <nighty@undernet.org> - 10/29/2001
-	Last modif: <nighty@undernet.org> - 04/04/2002
-	
+	Last modif: <nighty@undernet.org> - 05/21/2002
+
 	This file contains two sections,
 	- what you *MUST* edit to ensure your website can work properly.
 	- what you *CAN* edit to tweak it more precisely.
@@ -1281,7 +1283,7 @@ IMPORTANT NOTICE:</b>
 	define(LIVE_LOCATION,"/live"); // define this to "" if you dont put it in a subdirectory like '/live' (default) but in '/' for example.
 
 <font color=#000000>Set this to whatever your site will have as URL and the others for your convenience.</font>
-<? if ($r) { ?>	
+<? if ($r) { ?>
 	define(IFACE_URL,"<font color=#000000><b>http://www.your-site.com/live/</b></font>"); // The GUI main URL (the one to access it)
 <? } else { ?>
 	define(IFACE_URL,"<font color=#000000><b>http://www.some-site.com/~youruser/live/</b></font>"); // The GUI main URL (the one to access it)
@@ -1290,20 +1292,20 @@ IMPORTANT NOTICE:</b>
 
 	/* NOTE: to FORGE reply adresses, user 'nobody' needs a 'Tnobody' line added in /etc/sendmail.cf (or equiv.) */
 
-	define(NETWORK_NAME,"Undernet"); // Define this to your network name... better to be a "normal" single word ;)
+	define(NETWORK_NAME,"Your Network"); // Define this to your network name... better to be a "normal" single word ;)
 	define(BOT_NAME,"X"); // You bot's name, defines some strings in the website to fit more your configuration.
-	define(IRC_SERVER,"irc.undernet.org"); // Default server for irc:// option.
-	define(NETWORK_EMAIL,"cservice@undernet.org"); // the email of your network (default).
+	define(IRC_SERVER,"irc.network.net"); // Default server for irc:// option.
+	define(NETWORK_EMAIL,"cservice@network.net"); // the email of your network (default).
 
-	define(PURGE_EMAIL,"purge@undernet.org"); // the email where channel purge request form is sent.
-	define(XAT_EMAIL,"x@undernet.org"); // the email where manager change form is sent.
-	define(OBJECT_EMAIL,"object@undernet.org"); // the email where replies to password changes are sent.
+	define(PURGE_EMAIL,"purge@network.net"); // the email where channel purge request form is sent.
+	define(XAT_EMAIL,"x@network.net"); // the email where manager change form is sent.
+	define(OBJECT_EMAIL,"object@network.net"); // the email where replies to password changes are sent.
 
-	define(FROM_NEWUSER,"cmaster@undernet.org"); // the From: email for a NEWUSER registration email
-	define(FROM_NEWUSER_SUBJECT,"Your Undernet Channel Service Account"); // the subject of that mail.
-	
-	define(FROM_FPASS,"cmaster-recovery@undernet.org"); // the From: email for a FORGOTTEN PASSWORD email.
-	define(FROM_FPASS_SUBJECT,"Your Undernet Channel Service Password for "); // the sujbect of that mail. 'username' is added at this string's end.
+	define(FROM_NEWUSER,"cmaster@network.net"); // the From: email for a NEWUSER registration email
+	define(FROM_NEWUSER_SUBJECT,"Your Channel Service Account"); // the subject of that mail.
+
+	define(FROM_FPASS,"cmaster-recovery@network.net"); // the From: email for a FORGOTTEN PASSWORD email.
+	define(FROM_FPASS_SUBJECT,"Your Channel Service Password for "); // the sujbect of that mail. 'username' is added at this string's end.
 
 	/******************************/
 	/* LOCAL DATABASE DEFINITIONS */
@@ -1317,7 +1319,7 @@ You need to add the password of <b>gnuworld</b> for <b>LOCALDB_PASS</b> if you u
 	define(LOCALDB_NAME,"local_db"); // the local database that contains the gnuworld/doc/local_db.sql information.
 	define(LOCALDB_USER,"gnuworld"); // the local user that has full access to LOCALDB_NAME.
 	define(LOCALDB_PASS,""); // the password, use blank if you dont use passwords.
-	
+
 	/*******************************/
 	/* REMOTE DATABASE DEFINITIONS */
 	/*******************************/
@@ -1331,29 +1333,28 @@ You need to add the password of <b>gnuworld</b> for <b>REMOTEDB_PASS</b> if you 
 	define(REMOTEDB_USER,"gnuworld"); // the user that has access remotely to that db
 	define(REMOTEDB_PASS,""); // the password, use blank if you dont use passwords.
 	define(REMOTEDB_HOST,"127.0.0.1"); // define to whatever host/IP of the "remote" db is.
-	
+
 	/*******************************/
 	/* LOCAL WEBSITE CONFIGURATION */
 	/*******************************/
-	define(HEAD_LOGO,"cservice-head.jpg"); // this points to an existing image in website/docs/gnuworld/images. 59 pixels max height.
 	define(HOSTING_LOGO,""); // this image should go in website/docs/gnuworld/images and be maximum 250*33 pixels.
 	define(HOSTING_URL,"");
 
 <font color=#000000>There's a link to <b>CService Site</b> in the site's left menu, define here where that link should go,
 it will be sent to <b>_top</b> (the whole browser current window).</font>
 	define(CSERVICE_SITE_URL,"../");
-	
-	
-	
-	
-	
-	
+
+
+
+
+
+
 	/*---------------------*/
 	/*  WHAT YOU CAN EDIT  */
 	/*---------------------*/
 
 <font color=#000000>You should change all those variables to random salts you pick instead of <b>0123456789</b>.
-<u>NOTE:</u> the size of the SALT is not important, but a reasonable value like 10 chars give a certain amount of security.</font>	
+<u>NOTE:</u> the size of the SALT is not important, but a reasonable value like 10 chars give a certain amount of security.</font>
 	define(CRC_SALT_0001,"0123456789");
 	define(CRC_SALT_0002,"0123456789");
 	define(CRC_SALT_0003,"0123456789");
@@ -1374,8 +1375,14 @@ it will be sent to <b>_top</b> (the whole browser current window).</font>
 	define(CRC_SALT_0018,"0123456789");
 	define(CRC_SALT_0019,"0123456789");
 	define(CRC_SALT_0020,"0123456789");
-	
-	
+
+	/* SALTs for external authentication capabilities (experimental) */
+	define(CRC_SALT_EXT1,"0123456789");
+	define(CRC_SALT_EXT2,"0123456789");
+	define(CRC_SALT_EXT3,"0123456789");
+	define(CRC_SALT_EXT4,"0123456789");
+	define(CRC_SALT_EXT5,"0123456789");
+
 	/*
 	    those options are only used when using multiple mirrors of your CService website
 	    if you dont do mirrors at all, just leave those options as they are, this wont affect anything.
@@ -1383,21 +1390,42 @@ it will be sent to <b>_top</b> (the whole browser current window).</font>
 	    it will automatically redirect accesses to "LOCALMIRROR".
 	*/
 	define(ADMINONLY_MIRROR,0); // Define this to 1 if you want that only * person can login.
-	define(CLIENT_MIRROR_URL,"http://cservice.undernet.org/live/"); // define this in case ADMINONLY_MIRROR is set to 1.
+	define(CLIENT_MIRROR_URL,"http://cservice.network.net/live/"); // define this in case ADMINONLY_MIRROR is set to 1.
 
 <font color=#000000>As stated above, <font color=#ff0000><b>do not modify this unless you have the use of it</b></font>.
 The purpose is, for example, if you plan to have <b>http://cservice-live.undernet.org/</b>
 to point to a DNS Round Robin, with mirrors of the site.
 Each mirror also has its <b>cservice-live.xx.undernet.org</b> DNS pointer,
-for example depending on the country .. cservice-live.fr ... cservice-live.us.... 
+for example depending on the country .. cservice-live.fr ... cservice-live.us....
 Configuring the next parameters according to that will make that if you access a page from within
 the URL <b>http://cservice-live.undernet.org/</b>, the site will automatically refresh it to
 <b>http://cservice-live.xx.undernet.org/</b>, so you dont mess with multiple sites while browsing,
 because this would just NOT work according to the current web authentication scheme that reads
 a database locally for each mirror.</font>
-	define(LOCALMIRROR,"cservice-live.xx.undernet.org");
-	define(ROUNDROBIN,"cservice-live.undernet.org");
-	
+
+	define(LOCALMIRROR,"cservice-live.xx.network.net");
+	define(ROUNDROBIN,"cservice-live.network.net");
+
+
+<font color=#000000>Below is a brand new functionnality ... the site only comes with a single theme by default (called 'default')
+and if you look in 'gnuworld/doc/update_themes.sql' and in the 'website/docs/gnuworld/themes/data' directory you'll see it is easy
+to add other themes by yourself .. just copy the <b>INSERT</b> clause from the .sql file and change the first number '1' to '2', and so on...
+Soon an interface will come up to modify and create themes when online as a 901+ level.
+The AUTO_SWITCH_THEMES function will  permit for example for your site to automatically pick a different theme for a certain date or period you will decide,
+this can be used to christmas, halloween, new year, and other various stuff at your convenience.
+Unfortunately this function is not finished either at this time but will also work very shortly.
+</font>
+	/******************/
+	/* THEMES OPTIONS */
+	/******************/
+<font color=#000000><b>ATTENTION</b>: STD_THEME is case sensitive, check what was in the "INSERT" you eventually did.</font>
+	define(STD_THEME,"default");  // define this to your site Theme, this MUST be a valid sub-directory of 'website/docs/gnuworld/themes/data/'
+				      // If you want more information on this new feature, please visit http://cservice.undernet.org/gnuworld-setup/
+				      // or check the gnuworld/doc/idoc/ directory.
+	define(AUTO_SWITCH_THEMES,0); // If you set this .. dated themes will appear when they should (latest 'created_ts' "wins" if periods cover each other)
+				      // (not working at the moment... sorry)
+
+
 	/*************************/
 	/* VARIOUS CHECK OPTIONS */
 	/*************************/
@@ -1405,12 +1433,12 @@ a database locally for each mirror.</font>
 				// you *NEED* to have your X (mod.cservice) bot running with the code
 				// supporting it to enable this, check out 'gnuworld/doc/notes.sql' too.
 	define(NOTES_ADMIN_ONLY,1); // This applies if 'ENABLE_NOTES' is set to 1, when set to 0, everyone can use the feature
-				    // when set to 1, only * persons can.			
+				    // when set to 1, only * persons can.
 	define(NOTES_LIM_TOTAL,10); // Total number of notes a user can send to all users. (0 = unlimited)
 	define(NOTES_LIM_PERUSR,3); // Total number of notes a user can send to a single user. (0 = unlimited)
 	define(NOTES_LIM_INBOX,15); // Total number of notes a user can have in his 'notes box'. (0 = unlimited)
 	// of course, if ENABLE_NOTES is defined to '0', above three values have no effect.
-	
+
 	define(BOFH_PASS_ADMIN,1); // set this to 0 to disable password complexity checking for * people.
 	define(BOFH_PASS_USER,0); // set this to 1 to enable password complexity checking for all users (overriding BOFH_PASS_ADMIN=0).
 	define(PW_MIN_CHARS,6); // minimum chars a password must contain.
@@ -1418,11 +1446,11 @@ a database locally for each mirror.</font>
 	define(PW_MIN_MINSL,1); // minimum lower case letters a password must contain.
 	define(PW_MIN_DIGIT,1); // minimum digits a password must contain.
 	define(PW_MIN_OTHER,1); // minimum other chars a password must contain.
-	
+
 	define(IPCHK_MAXHITS,3); // Number of failed forgotten_pass/login attempts before IP_LOCK
-	
+
 	define(IPCHK_BANTIME,86400); // Time your IP/username is locked (seconds) when caught into IPCHK_MAXHITS+ failed attempts.
-	
+
 	define(NEWUSERS_IPCHECK,0); // define this to 1, if you want to enable ONE IP = ONE USERNAME per 24h.
 
 <font color=#000000>set the two following parameters to <b>0</b> to disable them.</font>
@@ -1436,18 +1464,18 @@ a database locally for each mirror.</font>
 
 	define(REGPROC_ALLOWMULTIPLE,0); // If this is set to 1, users will be allowed to register an unlimited amount
 					 // of channels, but will still be allowed to have only ONE channel being applied at a time.
-	
+
 
 	define(DEFAULT_REQUIRED_SUPPORTERS,10); // this option defines number of default required supporters (see below).
 	/*
 	This feature needs you to update the schema as following if you are NOT making a new installation :
 		ALTER TABLE variables ADD last_updated INT4;
-	
+
 	Current feature of REQUIRED_SUPPORTERS :
 			0	set it to 0 to allow instant registration (no supporters)	[VERY SMALL NETWORKS]
 			1-9	requiring 1 to 9 supporters for standard registration		[VARIOUS NETWORKS]
 			10	requires 10 supporters to register a channel.			[WIDE NETWORKS]
-	
+
 	>>>>>>> IMPORTANT NOTICE <<<<<<<<
 	The number of required supporters will be, if not existing in tables "variables" in the remote DB,
 	updated to the number you set above (ie. first run), BUT, if there's already a definition for it in the DB,
@@ -1460,15 +1488,15 @@ a database locally for each mirror.</font>
 	This requires to login with a user with an admin access of 901 or above (coder level only).
 	>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<
 	*/
-	
-	
-	
-	
+
+
+
+
 	/* To show you read this whole file, please comment or remove the next line. */
 
 <font color=#000000>add <b>//</b> at the begining of the following line :</font>
 	<font color=#000000><b>//</b></Font>die("&lt;h2&gt;&lt;b&gt;Error&lt;/b&gt;: Edit website/php_includes/config.inc file !&lt;/h2&gt;");
-	
+
 	?&gt;
 
 
@@ -1488,7 +1516,7 @@ if ($subset=="B-7") {
 <b>appjudge</b> is a <b>pgtclsh</b> script that, ran by <b>crontab</b>, will check
 for applications in <b>Pending</b> status to make them to <b>Notification</b> period,
 or <b>Reject</b> applications that didnt passed <b>Traffic Check</b>, or put in
-<b>Ready for review</b> state other applications that passed and are ready to be 
+<b>Ready for review</b> state other applications that passed and are ready to be
 reviewed by CService administrators for registration.
 
 In other words, you need this for your Automatic Registration System to work.
@@ -1522,23 +1550,23 @@ the defaults at <b>99</b> are definetly not good.
 	# Number of seconds in a day, I suggest you do not change this ;)
 	set DAY                         86400
 
-<font color=#00000>Tweak the following for your convenience</font>	
+<font color=#00000>Tweak the following for your convenience</font>
 	# Number of days an application has to pass the activity test
 	set MAX_DAYS                    99
-	
+
 	# Number of unique IP's that must visit a channel during the activity test
 	set UNIQUE_JOINS                99
-	
+
 	# Number of supporters that must visit the channel during the activity test
 	set MIN_SUPPORTERS              99
 
 	# Duration of the notify period
 	set NOTIFY_DAYS                 99
-	
+
 	# Number of days supporters have to confirm their support
 	set SUPPORT_DAYS                99
 
-<font color=#000000><b>DO NOT MODIFY THIS EITHER</b></font>	
+<font color=#000000><b>DO NOT MODIFY THIS EITHER</b></font>
 	# These are better left alone
 	set AS_PENDING_SUPPORT          0
 	set AS_TRAFFIC_CHECK            1
@@ -1603,7 +1631,7 @@ To get the latest version of PHP, go to <a href="http://www.php.net/downloads.ph
 Recommended version <a href="http://www.php.net/do_download.php?download_file=php-4.1.2.tar.gz">php-4.1.2.tar.gz</a>.
 CERT Security Advisory, you should upgrade to <b>php-4.1.2</b> for security reasons :
 	<a href="http://www.cert.org/advisories/CA-2002-05.html" target=_blank>http://www.cert.org/advisories/CA-2002-05.html</a>
-	
+
 
 Put that, as <b>root</b> in your <b>/root</b> home directory.
 
@@ -1638,7 +1666,7 @@ I will be a bit short on it because :
 	<?=$os?>:/root/apache_1.3.23# <b>make install</b>
 	<?=$os?>:/root/apache_1.3.23# <b>cd ../php-4.1.2/</b>
 	<?=$os?>:/root/php-4.1.2# <b>cp php.ini-dist /usr/local/lib/php.ini</b>
-	
+
 You can possibly edit the file <b>/usr/local/lib/php.ini</b> if you want to tweak anything,
 actually this should not be needed here.
 
@@ -1651,7 +1679,7 @@ actually this should not be needed here.
 	<?=$os?>:/usr/local/apache/htdocs# <b>ln -s /home/gnuworld/website/docs/gnuworld live</b>
 
 Edit the file <b>/usr/local/apache/conf/httpd.conf</b>...
-	Find 
+	Find
 		<b>&lt;IfModule mod_dir.c&gt;
 			DirectoryIndex index.html
 		&lt;/IfModule&gt;</b>
@@ -1688,7 +1716,7 @@ Now we can START apache :
 And you can go to :
 
 	<b>http://www.your-site.com/live/</b>
-	
+
 and see if that works (that should if you dont mess with your URL ;)).
 
 
@@ -1730,12 +1758,12 @@ Then, go to the end of the file and add the following :
 save <b>httpd.conf</b>,
 then <b>restart apache</b> :
 
-	<?=$os?>:/root# <b>/usr/local/apache/bin/apachectl restart</b>	
+	<?=$os?>:/root# <b>/usr/local/apache/bin/apachectl restart</b>
 
 Change the following line in <b>/home/gnuworld/website/php_includes/config.inc</b> :
 
 	<b>define(LIVE_LOCATION,"/live");</b>
-	
+
 replace by
 
 	<b>define(LIVE_LOCATION,"");</b>
@@ -1761,10 +1789,10 @@ or visit one of the following links for additionnal information :
 	Coder-Comittee			<a href="http://coder-com.undernet.org/" target=_blank>http://coder-com.undernet.org/</a>
 	Undernet CService		<a href="http://cservice.undernet.org/" target=_blank>http://cservice.undernet.org/</a>
 	Undernet CService Web Interface	<a href="http://cservice.undernet.org/live/" target=_blank>http://cservice.undernet.org/live/</a>
-	
+
 	GNUworld Home			<a href="http://gnuworld.undernet.org/" target=_blank>http://gnuworld.undernet.org/</a>
-	
-	
+
+
 	<a href="./?s=4">Frequently Asked Questions (FAQs)</a>
 	<a href="./?s=5">Upgrading GNUworld</a>
 	<a href="./?s=6">Credits</a>
@@ -1774,8 +1802,8 @@ or visit one of the following links for additionnal information :
 	footer("C-4","*");
 }
 
-		
-		
+
+
 	}
 }
 if ($s==4) { // *** FAQs
@@ -1835,8 +1863,8 @@ We recommend you read <a href="./?s=1">our current documentation</a> about it us
 You can obtain it from CVS:
 	<i>cvs -d:pserver:anonymous@cvs.gnuworld.sourceforge.net:/cvsroot/gnuworld</i>
 login (There is no password, just press enter)
-and then type:
-	<i>cvs -z3 -d:pserver:anonymous@cvs.gnuworld.sourceforge.net:/cvsroot/gnuworld checkout website</i>
+and tand then type:
+	<i>cvs -z3 -d:pserver:anonymous@cvs.gnuworld.sourceforge.net:/cvsroot/gnt:/cvsroot/gnuworld checkout website</i>
 
 <hr width=100% noshade size=1><br>
 
@@ -1902,9 +1930,9 @@ the following changes are also required in the remote database (cservice):
 	        suspend_by INT4 DEFAULT '0' NOT NULL,
 	        deleted INT2 DEFAULT '0' NOT NULL
 	);
-	
+
 	ALTER TABLE pendingusers ADD poster_ip VARCHAR(15) DEFAULT '';
-	
+
 	ALTER TABLE users ADD maxlogins INT4 DEFAULT 1;
 </b>
 
@@ -1925,7 +1953,7 @@ that new table is not created in your remote database structure (cservice):
 	        from_user_id INT4 CONSTRAINT users_notes_ref REFERENCES users( id ),
 	        message VARCHAR( 300 ),
 	        last_updated INT4 NOT NULL,
-	
+
 	        PRIMARY KEY(message_id, user_id)
 	);
 </b>
