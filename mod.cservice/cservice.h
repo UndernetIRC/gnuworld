@@ -1,5 +1,5 @@
 #ifndef __CSERVICE_H
-#define __CSERVICE_H "$Id: cservice.h,v 1.32 2001/01/28 16:05:42 gte Exp $"
+#define __CSERVICE_H "$Id: cservice.h,v 1.33 2001/01/29 04:07:51 gte Exp $"
 
 #include	<string>
 #include	<vector>
@@ -162,11 +162,8 @@ public:
 
 	vector<sqlBan*>* getBanRecords(sqlChannel* theChan);
 
-	//typedef priority_queue < unsigned int, vector< string >, less <unsigned int > > silenceListType;
-	// Decided there aren't going to be that many silences anyway + we need iterative/random removal
-	// access for show/remignore.
-
-	typedef vector < string >  silenceListType;
+ 	/* Silence List */
+	typedef vector < pair < time_t, string > > silenceListType ;
 	silenceListType silenceList;
  
 	// Cache of user records.

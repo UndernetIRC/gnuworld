@@ -4,9 +4,10 @@
  
 #include	"StringTokenizer.h"
 #include	"ELog.h" 
-#include	"cservice.h" 
+#include	"cservice.h"
+#include	"levels.h" 
 
-const char QUOTECommand_cc_rcsId[] = "$Id: QUOTECommand.cc,v 1.1 2001/01/29 02:16:27 gte Exp $" ;
+const char QUOTECommand_cc_rcsId[] = "$Id: QUOTECommand.cc,v 1.2 2001/01/29 04:07:51 gte Exp $" ;
 
 namespace gnuworld
 {

@@ -367,20 +367,23 @@ bool cservice::hasFlooded(iClient* theClient)
 
 			sqlUser* theUser = isAuthed(theClient, false);
 			if (theUser && getAdminAccessLevel(theUser)) return false;
-
-			// Bad boy!
-			setIgnored(theClient, true);
+ 
+//			setIgnored(theClient, true);  TODO: remove, we use silence :)
 			setFloodPoints(theClient, 0);
 			setLastRecieved(theClient, ::time(NULL)); 
 			Notice(theClient, "Flood me will you? I'm not going to listen to you anymore."); 
 		
 			// Send a silence numeric target, and mask to ignore messages from this user.
+			string silenceMask = "*!*" + theClient->getUserName() + "@" + theClient->getInsecureHost();
+
 			strstream s;
-			s << getCharYYXXX() << " SILENCE " << theClient->getCharYYXXX() << " *!*" 
-			  << theClient->getUserName() << "@" << theClient->getInsecureHost() << ends; 
+			s << getCharYYXXX() << " SILENCE " << theClient->getCharYYXXX() << " " << silenceMask << ends; 
 			Write( s );
 			delete[] s.str();
-		
+
+			time_t expireTime = currentTime() + 3600;
+			silenceList.push_back(make_pair(expireTime, silenceMask));
+
 			logAdminMessage("MSG-FLOOD from %s", theClient->getNickUserHost().c_str());
 			return true;
 		}
@@ -473,9 +476,15 @@ int cservice::OnCTCP( iClient* theClient, const string& CTCP,
 
 	if(Command == "VERSION")
 	{
-		xClient::DoCTCP(theClient, CTCP.c_str(), "Undernet P10 Channel Services Version 2 [" __DATE__ " " __TIME__ "] ($Id: cservice.cc,v 1.68 2001/01/29 02:21:58 gte Exp $)");
+		xClient::DoCTCP(theClient, CTCP.c_str(), "Undernet P10 Channel Services Version 2 [" __DATE__ " " __TIME__ "] ($Id: cservice.cc,v 1.69 2001/01/29 04:07:51 gte Exp $)");
 		return true;
 	}
+
+	if(Command == "PROBLEM?")
+	{
+		xClient::DoCTCP(theClient, CTCP.c_str(), "Blame Perry!");
+		return true;
+	} 
  
 	return true;
 } 
@@ -1157,9 +1166,9 @@ void cservice::OnChannelModeO( Channel* theChan, ChannelUser* theChanUser,
 	 *  Have more than 'maxdeoppro' been deopped?
 	 */
 
-	if (deopCounter >= reggedChan->getMassDeopPro())
+	if ((theChanUser) && (deopCounter >= reggedChan->getMassDeopPro()))
 	{
-		Notice(theChanUser->getClient(), "You just deopped more than %i people", 
+		Notice(theChanUser->getClient(), "You just deopped more than %i people! (Debug)", 
 			reggedChan->getMassDeopPro());
 	} 
 }
