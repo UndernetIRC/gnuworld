@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------------
--- "$Id: webcookies.sql,v 1.1 2001/10/14 05:04:46 nighty Exp $"
+-- "$Id: webcookies.sql,v 1.2 2001/10/15 11:49:35 nighty Exp $"
 -- Channel service DB SQL file for PostgreSQL.
 --
 -- Tables specific to webcookies (needs to be LOCAL).
@@ -12,7 +12,7 @@
 -- nighty <nighty@undernet.org>
 
 CREATE TABLE webcookies (
-        user_id INT4 CONSTRAINT users_supporters_ref REFERENCES users( id ),
+        user_id INT4,
         cookie VARCHAR(32) UNIQUE,
         expire INT4
 );
