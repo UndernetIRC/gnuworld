@@ -9,7 +9,7 @@
  * Displays all "Level" records for a specified channel.
  * Can optionally narrow down selection using a number of switches. 
  *
- * $Id: ACCESSCommand.cc,v 1.25 2001/02/10 17:29:40 gte Exp $
+ * $Id: ACCESSCommand.cc,v 1.26 2001/02/10 18:38:05 gte Exp $
  */
 
 #include	<string>
@@ -21,7 +21,7 @@
 #include	"match.h"
 #define MAX_RESULTS 15
  
-const char ACCESSCommand_cc_rcsId[] = "$Id: ACCESSCommand.cc,v 1.25 2001/02/10 17:29:40 gte Exp $" ;
+const char ACCESSCommand_cc_rcsId[] = "$Id: ACCESSCommand.cc,v 1.26 2001/02/10 18:38:05 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -210,11 +210,8 @@ if( PGRES_TUPLES_OK == status )
 				bot->Notice(theClient, "** SUSPENDED ** - Expires in %s",
 					bot->prettyDuration(suspend_expires_f).c_str());
 				}
-			if(duration > (bot->currentTime() + 86400))
-				{
 			bot->Notice(theClient, "LAST SEEN: %s ago.", 
-				bot->prettyDuration(duration).c_str()); 
-				}	 
+				bot->prettyDuration(duration).c_str());
 		}
 		if ((results >= MAX_RESULTS) && !showAll) break;
 
