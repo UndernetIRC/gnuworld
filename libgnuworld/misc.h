@@ -19,11 +19,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: misc.h,v 1.5 2003/07/22 21:36:48 dan_karrels Exp $
+ * $Id: misc.h,v 1.6 2003/12/29 23:59:36 dan_karrels Exp $
  */
 
 #ifndef __MISC_H
-#define __MISC_H "$Id: misc.h,v 1.5 2003/07/22 21:36:48 dan_karrels Exp $"
+#define __MISC_H "$Id: misc.h,v 1.6 2003/12/29 23:59:36 dan_karrels Exp $"
 
 #include	<string>
 #include	<iostream>
@@ -36,22 +36,20 @@
 namespace gnuworld
 {
 
-using std::string ;
-
 /**
  * Return 0 if the two strings are equivalent, according to
  * case insensitive searches.
  * Otherwise, it returns the comparison between
  * s1 and s2.
  */
-int strcasecmp( const string&, const string& ) ;
+int strcasecmp( const std::string&, const std::string& ) ;
 
 /**
  * Case insensitive comparison struct for use by STL structures/algorithms.
  */
 struct noCaseCompare
 {
-inline bool operator()( const string& lhs, const string& rhs ) const
+inline bool operator()( const std::string& lhs, const std::string& rhs ) const
 	{
 	return (strcasecmp( lhs, rhs ) < 0) ;
 	}
@@ -63,7 +61,7 @@ inline bool operator()( const string& lhs, const string& rhs ) const
  */
 struct eqstr
 {
-inline bool operator()( const string& s1, const string& s2 ) const
+inline bool operator()( const std::string& s1, const std::string& s2 ) const
 	{
 	return (0 == strcasecmp( s1, s2 )) ;
 	}
@@ -76,7 +74,7 @@ inline bool operator()( const string& s1, const string& s2 ) const
  */
 struct eHash
 {
-inline size_t operator()( const string& s ) const
+inline size_t operator()( const std::string& s ) const
 	{
 	if( s.empty() )
 		{
@@ -98,7 +96,7 @@ inline size_t operator()( const string& s ) const
  */
 struct Match
 {
-inline bool operator()( const string& lhs, const string& rhs ) const
+inline bool operator()( const std::string& lhs, const std::string& rhs ) const
 	{
 	return (match( lhs, rhs ) < 0) ;
 	}
@@ -108,31 +106,31 @@ inline bool operator()( const string& lhs, const string& rhs ) const
  * Return a copy of a given C++ string, whose characters
  * are all lower case.
  */
-string string_lower( const string& ) ;
+std::string string_lower( const std::string& ) ;
 
 /**
  * Return a copy of a given C++ string, whose
  * characters are all upper case.
  */
-string string_upper( const string& ) ;
+std::string string_upper( const std::string& ) ;
 
 /**
  * Convert all characters of a given C++ string to
  * lower case.
  */
-void string_tolower( string& ) ;
+void string_tolower( std::string& ) ;
 
 /**
  * Convert all characters of a given C++ string to
  * upper case.
  */
-void string_toupper( string& ) ;
+void string_toupper( std::string& ) ;
 
 /**
  * Examine a given C++ string and return true if it contains
  * all numeric characters, return false otherwise.
  */
-bool IsNumeric( const string& ) ;
+bool IsNumeric( const std::string& ) ;
 
 } // namespace gnuworld
 

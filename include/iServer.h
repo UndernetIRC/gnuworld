@@ -19,11 +19,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: iServer.h,v 1.13 2003/08/23 21:00:32 dan_karrels Exp $
+ * $Id: iServer.h,v 1.14 2003/12/29 23:59:36 dan_karrels Exp $
  */
 
 #ifndef __ISERVER_H
-#define __ISERVER_H "$Id: iServer.h,v 1.13 2003/08/23 21:00:32 dan_karrels Exp $"
+#define __ISERVER_H "$Id: iServer.h,v 1.14 2003/12/29 23:59:36 dan_karrels Exp $"
 
 #include	<iostream>
 #include	<string>
@@ -38,8 +38,6 @@ namespace gnuworld
 
 class xServer ;
 class xNetwork ;
-
-using std::string ;
 
 /**
  * This class represents a network server.
@@ -70,10 +68,10 @@ public:
 	 * as parameters.
 	 */
 	iServer( const unsigned int& _uplink,
-		const string& _yyxxx,
-		const string& _name,
+		const std::string& _yyxxx,
+		const std::string& _name,
 		const time_t& _connectTime,
-		const string& description = string() ) ;
+		const std::string& description = std::string() ) ;
 
 	/**
 	 * Destruct this iServer instance.
@@ -127,7 +125,7 @@ public:
 	/**
 	 * Return the name of this server.
 	 */
-	inline const string& getName() const
+	inline const std::string& getName() const
 		{ return name ; }
 
 	/**
@@ -145,7 +143,7 @@ public:
 	/**
 	 * Return the description of this server.
 	 */
-	inline const string& getDescription() const
+	inline const std::string& getDescription() const
 		{ return description ; }
 
 	/**
@@ -221,7 +219,7 @@ protected:
 	 * is used in the case of adding this server as a juped
 	 * server.
 	 */
-	inline void	setDescription( const string& newDescription )
+	inline void	setDescription( const std::string& newDescription )
 		{ description = newDescription ; }
 
 	/**
@@ -232,7 +230,7 @@ protected:
 	/**
 	 * Name of this server.
 	 */
-	string		name ;
+	std::string	name ;
 
 	/**
 	 * The time at which this server joined the network.
@@ -247,7 +245,7 @@ protected:
 	/**
 	 * The server's description field.
 	 */
-	string		description ;
+	std::string	description ;
 
 	/**
 	 * This variable is true when this server is bursting.

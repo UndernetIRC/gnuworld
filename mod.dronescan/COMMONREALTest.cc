@@ -16,18 +16,19 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: COMMONREALTest.cc,v 1.4 2003/08/02 18:17:21 jeekay Exp $
+ * $Id: COMMONREALTest.cc,v 1.5 2003/12/29 23:59:37 dan_karrels Exp $
  *
  * Checks to see whether the members of a channel have a common realname.
  */
 
-#include <map>
+#include	<sstream>
+#include	<map>
 
 #include "config.h"
 #include "dronescan.h"
 #include "dronescanTests.h"
 
-RCSTAG("$Id: COMMONREALTest.cc,v 1.4 2003/08/02 18:17:21 jeekay Exp $");
+RCSTAG("$Id: COMMONREALTest.cc,v 1.5 2003/12/29 23:59:37 dan_karrels Exp $");
 
 namespace gnuworld {
 
@@ -35,7 +36,7 @@ namespace ds {
 
 bool COMMONREALTest::isNormal( const Channel *theChannel )
 {
-	typedef map<string, unsigned short> realnameMapType;
+	typedef std::map<string, unsigned short> realnameMapType;
 	realnameMapType realnameMap;
 	
 	Channel::const_userIterator chanItr = theChannel->userList_begin();
@@ -73,7 +74,7 @@ bool COMMONREALTest::setVariable( const string& var, const string& value)
 
 const string COMMONREALTest::getStatus() const
 {
-	stringstream status;
+	std::stringstream status;
 	status << "realCutoff: " << realCutoff;
 	return status.str();
 }

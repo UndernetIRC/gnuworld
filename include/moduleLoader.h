@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: moduleLoader.h,v 1.16 2003/06/17 15:13:52 dan_karrels Exp $
+ * $Id: moduleLoader.h,v 1.17 2003/12/29 23:59:36 dan_karrels Exp $
  */
 
 #ifndef __MODULELOADER_H
-#define __MODULELOADER_H "$Id: moduleLoader.h,v 1.16 2003/06/17 15:13:52 dan_karrels Exp $"
+#define __MODULELOADER_H "$Id: moduleLoader.h,v 1.17 2003/12/29 23:59:36 dan_karrels Exp $"
 
 #include	<iostream>
 #include	<string>
@@ -35,15 +35,12 @@
 namespace gnuworld
 {
 
-using std::string ;
-using std::endl ;
-
 /**
  * This is a templated module loader class.  The templated type is the
  * type of object to retrieve from the module.  This class is used with
  * libtool for maximum portability.
  */
-template< typename modType, typename argType = string >
+template< typename modType, typename argType = std::string >
 class moduleLoader
 { 
 
@@ -73,14 +70,14 @@ protected:
 	/**
 	 * The name of the module which this instance represents.
 	 */
-	string			moduleName ;
+	std::string		moduleName ;
 
 public:
 	/**
 	 * Constructor, takes a module filename as the only
 	 * parameter.
 	 */
-	moduleLoader( const string& _moduleName )
+	moduleLoader( const std::string& _moduleName )
 	 : moduleName( _moduleName )
 	{
 	// Initialize the function pointer to 0
@@ -93,21 +90,21 @@ public:
 		elog	<< "moduleLoader> Failed to initialize "
 			<< "module loading system: "
 			<< lt_dlerror()
-			<< endl ;
+			<< std::endl ;
 		::exit( 0 ) ;
 		}
 
-	string fileName( moduleName ) ;
+	std::string fileName( moduleName ) ;
 	if( fileName[ 0 ] != '/' )
 		{
 		// No absolute path specified
 		// Attempt to find the module in the currect directory
-		fileName = string( "./" ) + fileName ;
+		fileName = std::string( "./" ) + fileName ;
 		}
 
 	// Libtool libraries end with .la, and at this point, this class
 	// only supports libtool libraries
-	if( string::npos == fileName.find( ".la" ) )
+	if( std::string::npos == fileName.find( ".la" ) )
 		{
 		// TODO: This should be more thorough
 		fileName += ".la" ;
@@ -115,7 +112,7 @@ public:
 
 //	elog	<< "moduleLoader> Attempting to load module "
 //		<< fileName
-//		<< endl;
+//		<< std::endl;
 
 	// lt_dlopenext() will do all that lt_dlopen() does,
 	// but also check for .la, .so, .sl, etc extensions
@@ -127,14 +124,14 @@ public:
 			<< moduleName
 			<< "): "
 			<< lt_dlerror()
-			<< endl;
+			<< std::endl;
 		::exit( 0 ) ;
 		}
 
 //	elog	<< "moduleLoader> Module "
 //		<< moduleName
 //		<< " successfully loaded"
-//		<< endl;
+//		<< std::endl;
 	}
 
 	/**
@@ -147,7 +144,7 @@ public:
 		{
 		elog	<< "~moduleLoader> Error closing module: "
 			<< lt_dlerror()
-			<< endl ;
+			<< std::endl ;
 		}
 	moduleHandle = 0 ;
 	}
@@ -162,16 +159,17 @@ public:
 	 * named symbols to be loaded from the same module.
 	 */
 	modType loadObject( argType arg,
-		const string& symbolSuffix = string() )
+		const std::string& symbolSuffix = std::string() )
 	{
-	const string symbolName = string( "_gnuwinit" ) + symbolSuffix ;
+	const std::string symbolName =
+		std::string( "_gnuwinit" ) + symbolSuffix ;
 	modFunc = (GNUWModuleFunc) lt_dlsym( moduleHandle,
 			symbolName.c_str() ) ;
 	if( 0 == modFunc )
 		{
 		elog	<< "moduleLoader::loadObject> Error: "
 			<< lt_dlerror()
-			<< endl ;
+			<< std::endl ;
 		exit( 0 ) ;
 		}
 
@@ -181,7 +179,7 @@ public:
 	if( 0 == modPtr )
 		{
 		elog	<< "moduleLoader> Unable to instantiate modType."
-			<< endl;
+			<< std::endl;
 		}
 
 	return modPtr ;
@@ -191,13 +189,13 @@ public:
 	 * Return a string containing the module's name, as passed
 	 * to the constructor
 	 */
-	inline const string&	getModuleName() const
+	inline const std::string&	getModuleName() const
 		{ return moduleName ; }
 
 	/**
 	 * Return the last error seen by the module system.
 	 */
-	inline const string&	getLastError() const
+	inline const std::string&	getLastError() const
 		{ return ld_dlerror() ; }
 
 	/**

@@ -17,14 +17,13 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: Gline.h,v 1.6 2002/12/28 22:44:54 mrbean_ Exp $
+ * $Id: Gline.h,v 1.7 2003/12/29 23:59:36 dan_karrels Exp $
  */
 
 #ifndef __GLINE_H
-#define __GLINE_H "$Id: Gline.h,v 1.6 2002/12/28 22:44:54 mrbean_ Exp $"
+#define __GLINE_H "$Id: Gline.h,v 1.7 2003/12/29 23:59:36 dan_karrels Exp $"
 
 #include	<string>
-#include	<iostream>
 
 #include	<ctime>
 
@@ -32,8 +31,6 @@
 
 namespace gnuworld
 {
-
-using std::string ;
 
 /**
  * A simple data storage class which represents a network G-Line.
@@ -49,9 +46,9 @@ public:
 	 * for the gline, and the duration (in seconds) of the
 	 * gline.
 	 */
-	Gline( const string& _setBy,
-		const string& _userHost,
-		const string& _reason,
+	Gline( const std::string& _setBy,
+		const std::string& _userHost,
+		const std::string& _reason,
 		const time_t& _duration ,
 		const time_t& _lastmod = ::time( 0 ))
 	: setBy( _setBy ),
@@ -84,25 +81,25 @@ public:
 	 * to the given userHost mask.
 	 * This does NOT perform a wildcard match.
 	 */
-	inline bool operator==( const string& _userHost ) const
+	inline bool operator==( const std::string& _userHost ) const
 		{ return (0 == strcasecmp( userHost, _userHost )) ; }
 
 	/**
 	 * Retrieve the nick!user@host of the user who set this gline.
 	 */
-	inline const string& getSetBy() const
+	inline const std::string& getSetBy() const
 		{ return setBy ; }
 
 	/**
 	 * Retrieve the user@host which has been glined.
 	 */
-	inline const string& getUserHost() const
+	inline const std::string& getUserHost() const
 		{ return userHost ; }
 
 	/**
 	 * Retrieve the reason for this gline.
 	 */
-	inline const string& getReason() const
+	inline const std::string& getReason() const
 		{ return reason ; }
 
 	/**
@@ -120,19 +117,19 @@ public:
 	/**
 	 * Retrieve the user/server who set this gline.
 	 */
-	inline void setSetBy( const string& _setBy )
+	inline void setSetBy( const std::string& _setBy )
 		{ setBy = _setBy; }
 
 	/**
 	 * Set the hostmask affected by this gline.
 	 */
-	inline void setHost( const string& _host )
+	inline void setHost( const std::string& _host )
 		{ userHost = _host; }
 
 	/**
 	 * Set the reason for this gline.
 	 */
-	inline void setReason( const string& _reason )
+	inline void setReason( const std::string& _reason )
 		{ reason = _reason; }
 
 	/**
@@ -166,17 +163,17 @@ protected:
 	/**
 	 * The nick!user@host of the user who set this gline.
 	 */
-	string		setBy ;
+	std::string	setBy ;
 
 	/**
 	 * The banned user@host.
 	 */
-	string		userHost ;
+	std::string	userHost ;
 
 	/**
 	 * The reason this gline was set.
 	 */
-	string		reason ;
+	std::string	reason ;
 
 	/**
 	 * The time at which this gline expires.

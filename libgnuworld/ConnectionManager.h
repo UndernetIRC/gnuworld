@@ -18,16 +18,15 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ConnectionManager.h,v 1.5 2003/12/17 18:21:36 dan_karrels Exp $
+ * $Id: ConnectionManager.h,v 1.6 2003/12/29 23:59:36 dan_karrels Exp $
  */
 
 #ifndef __CONNECTIONMANAGER_H
-#define __CONNECTIONMANAGER_H "$Id: ConnectionManager.h,v 1.5 2003/12/17 18:21:36 dan_karrels Exp $"
+#define __CONNECTIONMANAGER_H "$Id: ConnectionManager.h,v 1.6 2003/12/29 23:59:36 dan_karrels Exp $"
 
 #include	<sys/types.h>
 
 #include	<iostream>
-#include	<sstream>
 #include	<string>
 #include	<list>
 #include	<map>
@@ -41,11 +40,7 @@
 namespace gnuworld
 {
 
-using std::set ;
-using std::stringstream ;
-using std::multimap ;
 using std::string ;
-using std::map ;
 
 /**
  * The purpose of this class it to manage multiple incoming and
@@ -78,7 +73,7 @@ class ConnectionManager
 	 * There is a single instance of a connectionMapType for
 	 * each handler which has one or more Connection's registered.
 	 */
-	typedef set< Connection* > connectionMapType ;
+	typedef std::set< Connection* > connectionMapType ;
 
 	/**
 	 * This type is used as convenience to define an iterator
@@ -95,7 +90,7 @@ class ConnectionManager
 	 * This map stores connectionMapType's, keyed by the handler
 	 * which registered the connection(s).
 	 */
-	typedef map< ConnectionHandler*, connectionMapType > 
+	typedef std::map< ConnectionHandler*, connectionMapType > 
 		handlerMapType ;
 
 	/**
@@ -123,7 +118,7 @@ class ConnectionManager
 	 * used to prevent multiple entries of the same Connection
 	 * into the eraseMap.
 	 */
-	typedef multimap< ConnectionHandler*, connectionMapType::iterator >
+	typedef std::multimap< ConnectionHandler*, connectionMapType::iterator >
 		eraseMapType ;
 
 	/**

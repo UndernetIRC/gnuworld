@@ -17,11 +17,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  * 
- * $Id: gThread.h,v 1.4 2003/12/17 18:21:36 dan_karrels Exp $
+ * $Id: gThread.h,v 1.5 2003/12/29 23:59:36 dan_karrels Exp $
  */
 
 #ifndef __GTHREAD_H
-#define __GTHREAD_H "$Id: gThread.h,v 1.4 2003/12/17 18:21:36 dan_karrels Exp $"
+#define __GTHREAD_H "$Id: gThread.h,v 1.5 2003/12/29 23:59:36 dan_karrels Exp $"
 
 #include	<pthread.h>
 
@@ -32,9 +32,6 @@
 
 namespace gnuworld
 {
-
-using std::map ;
-using std::string ;
 
 /**
  * The base class for creating a thread.
@@ -54,7 +51,8 @@ protected:
 	/**
 	 * The type used to store mutexes.
 	 */
-	typedef map< string, pthread_mutex_t, noCaseCompare >	mutexMapType ;
+	typedef std::map< std::string, pthread_mutex_t, noCaseCompare >	
+			mutexMapType ;
 
 	/**
 	 * The iterator type to the mutex map.
@@ -109,13 +107,13 @@ public:
 	 * Create a mutex with the given case insensitive name.
 	 * True is returned if successfull, false otherwise.
 	 */
-	virtual bool		CreateMutex( const string& mutexName ) ;
+	virtual bool		CreateMutex( const std::string& mutexName ) ;
 
 	/**
 	 * Destroy a mutex with the given case insensitive name.
 	 * True is returned if successfull, false otherwise.
 	 */
-	virtual bool		DestroyMutex( const string& mutexName ) ;
+	virtual bool		DestroyMutex( const std::string& mutexName ) ;
 
 	/**
 	 * Destroy all active mutexes.
@@ -126,13 +124,14 @@ public:
 	 * Locks the mutex specified by mutexName.
 	 * This method blocks indefinitely until the lock is obtained.
 	 */
-	virtual void		LockMutex( const string& mutexName ) ;
+	virtual void		LockMutex( const std::string& mutexName ) 
+;
 
 	/**
 	 * Unlocks the mutex specified by mutexName.
 	 * This method will return immediately.
 	 */
-	virtual void		UnLockMutex( const string& mutexName ) ;
+	virtual void		UnLockMutex( const std::string& mutexName ) ;
 
 	/**
 	 * This method is invoked in a new thread when the Start()

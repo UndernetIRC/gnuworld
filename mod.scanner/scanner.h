@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: scanner.h,v 1.5 2003/11/26 23:30:22 dan_karrels Exp $
+ * $Id: scanner.h,v 1.6 2003/12/29 23:59:38 dan_karrels Exp $
  */
 
 #ifndef __SCANNER_H
@@ -34,8 +34,6 @@
 namespace gnuworld
 {
 
-using std::string ;
-
 /**
  * A scanner client for gnuworld.  It will attempt to determine if clients
  * connecting to the network have insecure proxies/socks/etc running.
@@ -51,7 +49,7 @@ public:
 	/**
 	 * Constructor receives a configuration file name.
 	 */
-	scanner( const string& ) ;
+	scanner( const std::string& ) ;
 
 	/**
 	 * Destructor does normal stuff.
@@ -65,7 +63,7 @@ public:
 	 * and the second argument is the actual message (minus
 	 * all of the server command stuff).
 	 */
-	virtual void OnPrivateMessage( iClient*, const string&,
+	virtual void OnPrivateMessage( iClient*, const std::string&,
 		bool secure = false ) ;
 
 	/**
@@ -100,7 +98,7 @@ public:
 	 * be used in log messages and G-Line.
 	 */
 	virtual void	RejectClient( Connection*,
-				const string& = string() ) ;
+				const std::string& = std::string() ) ;
 
 protected:
 

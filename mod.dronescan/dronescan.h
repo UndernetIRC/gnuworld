@@ -16,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: dronescan.h,v 1.21 2003/11/26 23:30:22 dan_karrels Exp $
+ * $Id: dronescan.h,v 1.22 2003/12/29 23:59:38 dan_karrels Exp $
  */
 
 #ifndef DRONESCAN_H
-#define DRONESCAN_H "$Id: dronescan.h,v 1.21 2003/11/26 23:30:22 dan_karrels Exp $"
+#define DRONESCAN_H "$Id: dronescan.h,v 1.22 2003/12/29 23:59:38 dan_karrels Exp $"
 
 #include <map>
 
@@ -98,8 +98,8 @@ public:
 	
 	typedef unsigned short int testEnabledType;
 	
-	typedef map< string , sqlUser* , noCaseCompare > userMapType;
-	typedef map< unsigned int , sqlFakeClient* > fcMapType;
+	typedef std::map< string , sqlUser* , noCaseCompare > userMapType;
+	typedef std::map< unsigned int , sqlFakeClient* > fcMapType;
 	
 	
 	/*******************************************
@@ -171,18 +171,19 @@ public:
 	fcMapType fakeClients;
 	
 	/** Typedef of currently seen drone channels */
-	typedef map< string , activeChannel* > droneChannelsType;
+	typedef std::map< string , activeChannel* > droneChannelsType;
 	droneChannelsType droneChannels;
 	
 	/** Join counter config options */
 	unsigned int jcInterval;
 	unsigned int jcCutoff;
-	typedef map< string , unsigned int , noCaseCompare > jcChanMapType;
+	typedef std::map< string , unsigned int , noCaseCompare > 
+		jcChanMapType;
 	jcChanMapType jcChanMap;
 	
 	/* Test control */
 	/** Test map type. */
-	typedef map< string, Test* > testMapType;
+	typedef std::map< string, Test* > testMapType;
 	typedef testMapType::value_type testPairType;
 	bool RegisterTest(Test*);
 	bool UnRegisterTest(const string&);
@@ -216,7 +217,7 @@ protected:
 	DS_STATE currentState;
 	
 	/** Character occurance frequencies. */
-	typedef map< char , double > charMapType;
+	typedef std::map< char , double > charMapType;
 	charMapType charMap;
 	
 	/** Average nickname entropy. */
@@ -245,13 +246,14 @@ protected:
 	xServer::timerID tidRefreshCaches;
 	
 	/** Command map type. */
-	typedef map< string , Command* , noCaseCompare > commandMapType;
+	typedef std::map< string , Command* , noCaseCompare > 
+		commandMapType;
 	typedef commandMapType::value_type commandPairType;
 	commandMapType commandMap;
 	bool RegisterCommand(Command*);
 	
 	/** Time of the last cache. */
-	map < string , time_t > lastUpdated;
+	std::map < string , time_t > lastUpdated;
 	
 	/** How often to refresh caches. */
 	unsigned int rcInterval;

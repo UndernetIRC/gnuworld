@@ -16,16 +16,18 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: MAXCHANSTest.cc,v 1.6 2003/08/02 18:17:21 jeekay Exp $
+ * $Id: MAXCHANSTest.cc,v 1.7 2003/12/29 23:59:37 dan_karrels Exp $
  *
  * Checks whether any member of a channel is in more than maxChans channels.
  */
+
+#include	<sstream>
 
 #include "config.h"
 #include "dronescan.h"
 #include "dronescanTests.h"
 
-RCSTAG("$Id: MAXCHANSTest.cc,v 1.6 2003/08/02 18:17:21 jeekay Exp $");
+RCSTAG("$Id: MAXCHANSTest.cc,v 1.7 2003/12/29 23:59:37 dan_karrels Exp $");
 
 namespace gnuworld {
 
@@ -67,7 +69,7 @@ bool MAXCHANSTest::setVariable( const string& var, const string& value )
 
 const string MAXCHANSTest::getStatus() const
 {
-	stringstream status;
+	std::stringstream status;
 	status << "maxChans: " << maxChans;
 	return status.str();
 }

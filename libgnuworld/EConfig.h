@@ -17,11 +17,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: EConfig.h,v 1.5 2003/12/17 18:21:36 dan_karrels Exp $
+ * $Id: EConfig.h,v 1.6 2003/12/29 23:59:36 dan_karrels Exp $
  */
 
 #ifndef __ECONFIG_H
-#define __ECONFIG_H "$Id: EConfig.h,v 1.5 2003/12/17 18:21:36 dan_karrels Exp $"
+#define __ECONFIG_H "$Id: EConfig.h,v 1.6 2003/12/29 23:59:36 dan_karrels Exp $"
 
 #include	<iostream>
 #include	<fstream>
@@ -34,10 +34,6 @@
 
 namespace gnuworld 
 {
-
-using std::list ;
-using std::string ;
-using std::multimap ;
 
 /**
  * A simple configuration file parser.
@@ -58,7 +54,8 @@ class EConfig
 	/**
 	 * The type of the map used to store the key/value pairs.
 	 */
-	typedef multimap< string, string, noCaseCompare > mapType ;
+	typedef std::multimap< std::string, std::string, noCaseCompare > 
+			mapType ;
 
 	/**
 	 * This struct is used to store information about an entry
@@ -69,7 +66,7 @@ class EConfig
 		/**
 		 * The key for the key/value pair.
 		 */
-		string			key ;
+		std::string		key ;
 
 		/**
 		 * The value for the key/value pair.
@@ -77,7 +74,7 @@ class EConfig
 		 * is a comment, and key contains the comment
 		 * (including preceeding '#' where necessary.
 		 */
-		string			value ;
+		std::string		value ;
 
 		/**
 		 * An iterator into the key/value map for this line,
@@ -98,7 +95,7 @@ class EConfig
 	 * line.  Even though there are no value tokens, be sure
 	 * to record whatever comment is present.
 	 */
-	lineInfo( const string& key )
+	lineInfo( const std::string& key )
 	 : key( key )
 	{}
 
@@ -112,7 +109,7 @@ class EConfig
 	/**
 	 * Constructor receives the key, value, and map iterator.
 	 */
-	lineInfo( const string& key, const string& value,
+	lineInfo( const std::string& key, const std::string& value,
 		const mapType::iterator& mapItr )
 	 : key( key ), value( value ), mapItr( mapItr )
 	{}
@@ -133,7 +130,7 @@ class EConfig
 	/**
 	 * Type used to store configuration file format.
 	 */
-	typedef list< lineInfo >	lineListType ;
+	typedef std::list< lineInfo >	lineListType ;
 
 public:
 
@@ -163,7 +160,7 @@ public:
 	/**
 	 * Create a new config parser for the given config file name.
 	 */
-	EConfig( const string& fileName ) ;
+	EConfig( const std::string& fileName ) ;
 
 	/**
 	 * Destroy the EConfig object.  This will also close the
@@ -208,12 +205,12 @@ public:
 	/**
 	 * Find the first key/value pair for the given key.
 	 */
-	virtual iterator Find( const string& findMe ) ;
+	virtual iterator Find( const std::string& findMe ) ;
 
 	/**
 	 * Find the first key/value pair for the given key.
 	 */
-	virtual const_iterator Find( const string& findMe ) const ;
+	virtual const_iterator Find( const std::string& findMe ) const ;
 
 	/**
 	 * Call this method to retrieve a const_iterator to the first
@@ -221,7 +218,7 @@ public:
 	 * not found, then an error message will be output and the
 	 * program will terminate.
 	 */
-	virtual iterator Require( const string& findMe ) ;
+	virtual iterator Require( const std::string& findMe ) ;
 
 	/**
 	 * Add a key/value pair to the config file.
@@ -229,13 +226,14 @@ public:
 	 * will add a duplicate, which is supported by the EConfig
 	 * class.
 	 */
-	virtual bool	Add( const string& key, const string& value ) ;
+	virtual bool	Add( const std::string& key,
+				const std::string& value ) ;
 
 	/**
 	 * Add a comment to the end of the file.
 	 * This comment line may be empty.
 	 */
-	virtual bool	AddComment( const string& newComment ) ;
+	virtual bool	AddComment( const std::string& newComment ) ;
 
 	/**
 	 * Delete a key/value pair by key.  Only one pair whose key
@@ -244,7 +242,7 @@ public:
 	 * If you have duplicates, and would like to remove a specific
 	 * entry, use the other form of Delete().
 	 */
-	virtual bool	Delete( const string& key ) ;
+	virtual bool	Delete( const std::string& key ) ;
 
 	/**
 	 * Remove a key value pair given its iterator.
@@ -257,7 +255,7 @@ public:
 	 * modifying the iterator itself.
 	 */
 	virtual bool	Replace( iterator itr,
-		const string& newValue ) ;
+		const std::string& newValue ) ;
 
 	/**
 	 * Debugging function for outputting the entire map to
@@ -290,7 +288,7 @@ protected:
 	/**
 	 * Remove blank spaces from the line of text.
 	 */
-	virtual bool	removeSpaces( string& ) ;
+	virtual bool	removeSpaces( std::string& ) ;
 
 	/**
 	 * Parse the input file.
@@ -305,7 +303,7 @@ protected:
 	/**
 	 * The name of the configuration file.
 	 */
-	string		configFileName ;
+	std::string	configFileName ;
 
 	/**
 	 * The map used to store the file's key/value pairs.

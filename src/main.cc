@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: main.cc,v 1.58 2003/11/27 02:07:36 dan_karrels Exp $
+ * $Id: main.cc,v 1.59 2003/12/29 23:59:38 dan_karrels Exp $
  */
 
 #include	<sys/time.h>
@@ -45,7 +45,7 @@
 #include	"md5hash.h"
 #include	"Signal.h"
 
-RCSTAG( "$Id: main.cc,v 1.58 2003/11/27 02:07:36 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: main.cc,v 1.59 2003/12/29 23:59:38 dan_karrels Exp $" ) ;
 
 // main() must be in the global namespace
 using namespace gnuworld ;
@@ -170,7 +170,8 @@ while( autoConnect )
 	// TODO: This will have to be updated when running
 	// in background.
 	{
-	ofstream pidFile( "gnuworld.pid", ios::trunc | ios::out ) ;
+	std::ofstream pidFile( "gnuworld.pid", std::ios::trunc | 
+				std::ios::out ) ;
 	if( !pidFile )
 		{
 		clog	<< "Unable to open pid file: gnuworld.pid"

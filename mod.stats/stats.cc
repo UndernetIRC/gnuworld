@@ -17,9 +17,10 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: stats.cc,v 1.28 2003/12/04 00:44:24 dan_karrels Exp $
+ * $Id: stats.cc,v 1.29 2003/12/29 23:59:38 dan_karrels Exp $
  */
 
+#include	<list>
 #include	<string>
 #include	<map>
 #include	<sstream>
@@ -39,7 +40,7 @@
 #include	"config.h"
 #include	"misc.h"
 
-RCSTAG( "$Id: stats.cc,v 1.28 2003/12/04 00:44:24 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: stats.cc,v 1.29 2003/12/29 23:59:38 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -165,7 +166,7 @@ for( eventType whichEvent = 0 ; whichEvent <= EVT_CREATE ; ++whichEvent )
 
 	// File not yet opened
 	fileTable[ whichEvent ].open( fileName.c_str(),
-		ios::out | ios::trunc ) ;
+		std::ios::out | std::ios::trunc ) ;
 	if( !fileTable[ whichEvent ].is_open() )
 		{
 		elog	<< "stats::openLogFiles> Unable to open file: "
@@ -430,7 +431,7 @@ for( eventType whichEvent = 0 ; whichEvent <= EVT_CREATE ; ++whichEvent )
 		continue ;
 		}
 
-	ofstream& outFile = fileTable[ whichEvent ] ;
+	std::ofstream& outFile = fileTable[ whichEvent ] ;
 
 	outFile		<< nowTM->tm_hour << ":"
 			<< nowTM->tm_min << ":"
@@ -523,10 +524,10 @@ Notice( theClient, "Total Network Users: %d, Total Network Channels: %d",
 	Network->clientList_size(),
 	Network->channelList_size() ) ;
 
-typedef map< size_t, size_t > channelUserInfoMapType ;
+typedef std::map< size_t, size_t > channelUserInfoMapType ;
 channelUserInfoMapType usersPerChannelMap ;
 
-ofstream usersPerChannelFile( channelInfoFileName.c_str() ) ;
+std::ofstream usersPerChannelFile( channelInfoFileName.c_str() ) ;
 if( !usersPerChannelFile )
 	{
 	cout	<< "stats::dumpStats> Failed to open channel info file: "
@@ -577,7 +578,7 @@ if( largestChan != 0 )
 channelUserInfoMapType channelsPerUserMap ;
 size_t maxChannels = 0 ;
 
-ofstream channelsPerUserFile( userInfoFileName.c_str() ) ;
+std::ofstream channelsPerUserFile( userInfoFileName.c_str() ) ;
 if( !channelsPerUserFile )
 	{
 	cout	<< "stats::dumpStats> Unable to open user info file: "
@@ -631,15 +632,15 @@ Notice( theClient, "Length of last burst: %d seconds, "
 	stringstream ss ;
 
 	ss.width( 20 ) ;
-	ss.setf( ios::left ) ;
+	ss.setf( std::ios::left ) ;
 	ss	<< "EventName" ;
 
 	ss.width( 12 ) ;
-	ss.setf( ios::left ) ;
+	ss.setf( std::ios::left ) ;
 	ss	<< "EventCount" ;
 
 	ss.width( 15 ) ;
-	ss.setf( ios::left ) ;
+	ss.setf( std::ios::left ) ;
 	ss	<< "Average" ;
 
 	Notice( theClient, "%s", ss.str().c_str() ) ;
@@ -670,7 +671,7 @@ for( eventType whichEvent = 0 ; whichEvent <= EVT_CREATE ; ++whichEvent )
 	stringstream ss ;
 
 	ss.str( string() ) ;
-	ss.setf( ios::left ) ;
+	ss.setf( std::ios::left ) ;
 	ss.fill( ' ' ) ;
 //	ss.width( 25 ) ;
 	ss	<< eventNames[ whichEvent ] ;
@@ -690,13 +691,13 @@ for( eventType whichEvent = 0 ; whichEvent <= EVT_CREATE ; ++whichEvent )
 
 	ss.str( string() ) ;
 	ss.width( 12 ) ;
-	ss.setf( ios::left ) ;
+	ss.setf( std::ios::left ) ;
 	ss	<< eventTotal[ whichEvent ] ;
 	writeMe += ss.str() ;
 
 	ss.str( string() ) ;
 	ss.width( 15 ) ;
-	ss.setf( ios::left ) ;
+	ss.setf( std::ios::left ) ;
 	ss	<< ((double) eventTotal[ whichEvent ] /
 			(double) countingTime) ;
 	writeMe += ss.str() ;
@@ -711,7 +712,7 @@ Notice( theClient, "Total Events: %d, Total Average Events/Second: %f",
 
 bool stats::hasAccess( const string& accountName ) const
 {
-for( list< string >::const_iterator itr = allowAccess.begin() ;
+for( std::list< string >::const_iterator itr = allowAccess.begin() ;
 	itr != allowAccess.end() ; ++itr )
 	{
 	if( !strcasecmp( accountName, *itr ) )

@@ -17,8 +17,10 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: scanner.cc,v 1.7 2003/11/26 23:30:22 dan_karrels Exp $
+ * $Id: scanner.cc,v 1.8 2003/12/29 23:59:38 dan_karrels Exp $
  */
+
+#include	<iostream>
 
 #include	"client.h"
 #include	"scanner.h"
@@ -96,7 +98,7 @@ switch( whichEvent )
 	default:
 		elog	<< "scanner::OnEvent> Received unknown event: "
 			<< whichEvent
-			<< endl ;
+			<< std::endl ;
 		break ;
 	}
 xClient::OnEvent( whichEvent, arg1, arg2, arg3, arg4 ) ;

@@ -20,11 +20,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
  * USA.
  *
- * $Id: cloner.h,v 1.8 2003/07/21 23:36:34 dan_karrels Exp $
+ * $Id: cloner.h,v 1.9 2003/12/29 23:59:37 dan_karrels Exp $
  */
 
 #ifndef __CLONER_H
-#define __CLONER_H "$Id: cloner.h,v 1.8 2003/07/21 23:36:34 dan_karrels Exp $"
+#define __CLONER_H "$Id: cloner.h,v 1.9 2003/12/29 23:59:37 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
@@ -36,10 +36,6 @@
 #include	"iClient.h"
 #include	"iServer.h"
 
-using std::string ;
-using std::vector ;
-using std::list ;
-
 namespace gnuworld
 {
 
@@ -47,29 +43,29 @@ class cloner : public xClient
 {
 
 public:
-	cloner( const string& configFileName ) ;
+	cloner( const std::string& configFileName ) ;
 	virtual ~cloner() ;
 
 	virtual void OnConnect() ;
 	virtual void OnTimer( xServer::timerID, void* ) ;
-	virtual void OnPrivateMessage( iClient*, const string&,
+	virtual void OnPrivateMessage( iClient*, const std::string&,
 			bool secure = false ) ;
 	virtual void addClone() ;
 
 protected:
 
-	virtual bool		hasAccess( const string& ) const ;
+	virtual bool		hasAccess( const std::string& ) const ;
 
-	virtual string		randomNick( int minLength = 5,
+	virtual std::string	randomNick( int minLength = 5,
 					int maxLength = 9 ) ;
-	virtual string		randomUser() ;
-	virtual string		randomHost() ;
+	virtual std::string	randomUser() ;
+	virtual std::string	randomHost() ;
 	virtual char		randomChar() ;
 
-	list< string >		allowAccess ;
-	list< iClient* >	clones ;
-	vector< string >	userNames ;
-	vector< string >	hostNames ;
+	std::list< std::string >	allowAccess ;
+	std::list< iClient* >		clones ;
+	std::vector< std::string >	userNames ;
+	std::vector< std::string >	hostNames ;
 	iServer*		fakeServer ;
 
 	bool			allowOpers ;
@@ -79,10 +75,10 @@ protected:
 	size_t			minNickLength ;
 	size_t			maxNickLength ;
 
-	string			cloneDescription ;
-	string			cloneMode ;
-	string			fakeServerName ;
-	string			fakeServerDescription ;
+	std::string		cloneDescription ;
+	std::string		cloneMode ;
+	std::string		fakeServerName ;
+	std::string		fakeServerDescription ;
 
 } ;
 

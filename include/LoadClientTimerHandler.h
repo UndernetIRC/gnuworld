@@ -17,11 +17,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: LoadClientTimerHandler.h,v 1.4 2003/06/28 16:26:45 dan_karrels Exp $
+ * $Id: LoadClientTimerHandler.h,v 1.5 2003/12/29 23:59:36 dan_karrels Exp $
  */
 
 #ifndef __LOADCLIENTTIMERHANDLER_H
-#define __LOADCLIENTTIMERHANDLER_H "$Id: LoadClientTimerHandler.h,v 1.4 2003/06/28 16:26:45 dan_karrels Exp $"
+#define __LOADCLIENTTIMERHANDLER_H "$Id: LoadClientTimerHandler.h,v 1.5 2003/12/29 23:59:36 dan_karrels Exp $"
 
 #include	<string>
 
@@ -29,8 +29,6 @@
 
 namespace gnuworld
 {
-
-using std::string ;
 
 class xServer ;
 
@@ -46,10 +44,10 @@ class LoadClientTimerHandler : public ServerTimerHandler
 protected:
 
 	/// The name of the module to be loaded
-	string		moduleName ;
+	std::string	moduleName ;
 
 	/// The configuration file name to pass to the client constructor
-	string		configFileName ;
+	std::string	configFileName ;
 
 public:
 
@@ -60,8 +58,8 @@ public:
 	 * - The configuration file name for the xClient.
 	 */
 	LoadClientTimerHandler( xServer* theServer,
-		 const string& _moduleName,
-		 const string& _configFileName )
+		 const std::string& _moduleName,
+		 const std::string& _configFileName )
 	: ServerTimerHandler( theServer, 0),
 	  moduleName( _moduleName ),
 	  configFileName( _configFileName )

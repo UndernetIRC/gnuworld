@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: Network.cc,v 1.62 2003/11/11 19:21:36 dan_karrels Exp $
+ * $Id: Network.cc,v 1.63 2003/12/29 23:59:38 dan_karrels Exp $
  */
 
 #include	<new>
@@ -26,6 +26,7 @@
 #include	<map>
 #include	<list>
 #include	<string>
+#include	<vector>
 #include	<iostream>
 #include	<algorithm>
 
@@ -44,7 +45,7 @@
 #include	"ip.h"
 #include	"config.h"
 
-RCSTAG( "$Id: Network.cc,v 1.62 2003/11/11 19:21:36 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: Network.cc,v 1.63 2003/12/29 23:59:38 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -669,7 +670,7 @@ void xNetwork::OnSplit( const unsigned int& intYY )
 {
 // yyVector will be used to hold server numerics of servers
 // to be removed.
-typedef vector< unsigned int > yyVectorType ;
+typedef std::vector< unsigned int > yyVectorType ;
 yyVectorType yyVector ;
 
 // Of course add the top level server to the list of servers
@@ -736,7 +737,7 @@ for( yyVectorType::const_iterator yyIterator = yyVector.begin() ;
  * This method does not modify any data tables, it only
  * walks the serverMap table.
  */
-void xNetwork::findLeaves( vector< unsigned int >& yyVector,
+void xNetwork::findLeaves( std::vector< unsigned int >& yyVector,
 	const unsigned int uplinkIntYY ) const
 {
 // Begin our walk down the serverMap looking for leaf servers

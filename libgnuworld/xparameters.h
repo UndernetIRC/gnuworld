@@ -17,13 +17,15 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: xparameters.h,v 1.3 2003/06/17 15:13:53 dan_karrels Exp $
+ * $Id: xparameters.h,v 1.4 2003/12/29 23:59:36 dan_karrels Exp $
  */
 
 #ifndef __XPARAMETERS_H
-#define __XPARAMETERS_H "$Id: xparameters.h,v 1.3 2003/06/17 15:13:53 dan_karrels Exp $"
+#define __XPARAMETERS_H "$Id: xparameters.h,v 1.4 2003/12/29 23:59:36 dan_karrels Exp $"
 
+#include	<string>
 #include        <vector>
+
 #include	<cassert>
 
 #include	"ELog.h"
@@ -149,14 +151,14 @@ public:
 	 * with the zero based index beginIndex.  A ' ' will
 	 * be placed between token in the string returned.
 	 */
-	inline string assemble( const size_type& beginIndex ) const
+	inline std::string assemble( const size_type& beginIndex ) const
 	{
 	assert( validSubscript( beginIndex ) ) ;
 	if( myVector.empty() )
 		{
-		return string() ;
+		return std::string() ;
 		}
-	string retMe( "" ) ;
+	std::string retMe( "" ) ;
 	for( vectorType::size_type i = beginIndex ;
 		i < myVector.size() ; ++i )
 		{

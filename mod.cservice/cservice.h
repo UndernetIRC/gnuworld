@@ -17,12 +17,13 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: cservice.h,v 1.99 2003/11/26 23:30:22 dan_karrels Exp $
+ * $Id: cservice.h,v 1.100 2003/12/29 23:59:37 dan_karrels Exp $
  */
 
 #ifndef __CSERVICE_H
-#define __CSERVICE_H "$Id: cservice.h,v 1.99 2003/11/26 23:30:22 dan_karrels Exp $"
+#define __CSERVICE_H "$Id: cservice.h,v 1.100 2003/12/29 23:59:37 dan_karrels Exp $"
 
+#include	<iostream>
 #include	<string>
 #include	<vector>
 #include	<map>
@@ -230,10 +231,10 @@ public:
 	typedef map< int, sqlChannel* > sqlChannelIDHashType ;
 
 	// Accesslevel cache, key is pair(chanid, userid).
-	typedef map < pair <int, int>, sqlLevel* > sqlLevelHashType ;
+	typedef map < std::pair <int, int>, sqlLevel* > sqlLevelHashType ;
 
  	/* Silence List */
-	typedef map < string, pair < time_t, string > > silenceListType;
+	typedef map < string, std::pair < time_t, string > > silenceListType;
 	silenceListType silenceList;
 
 	bool isIgnored(iClient*);
@@ -327,11 +328,11 @@ public:
 	xServer::timerID limit_timerID;
 
 	// Language definitions table (Loaded from Db).
-	typedef map < string, pair <int, string> > languageTableType;
+	typedef map < string, std::pair <int, string> > languageTableType;
 	languageTableType languageTable;
 
 	// Language translations table (Loaded from Db).
-	typedef map < pair <int, int>, string > translationTableType ;
+	typedef map < std::pair <int, int>, string > translationTableType ;
 	translationTableType translationTable;
 
 	void loadTranslationTable();
@@ -343,7 +344,7 @@ public:
 	virtual bool validUserMask(const string& userMask) const ;
 
 	/* Help topics (Loaded from Db) */
-	typedef map < pair <int, string>, string > helpTableType;
+	typedef map < std::pair <int, string>, string > helpTableType;
 	helpTableType helpTable;
 
 	void loadHelpTable();
@@ -503,7 +504,7 @@ public:
  	 * Global filesystem level admin logging stream.
 	 */
 
-	ofstream	adminLog ;
+	std::ofstream	adminLog ;
 
 	string adminlogPath;
 } ;

@@ -17,13 +17,12 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ELog.h,v 1.5 2003/12/17 18:21:36 dan_karrels Exp $
+ * $Id: ELog.h,v 1.6 2003/12/29 23:59:36 dan_karrels Exp $
  */
 
 #ifndef __ELOG_H
-#define __ELOG_H "$Id: ELog.h,v 1.5 2003/12/17 18:21:36 dan_karrels Exp $"
+#define __ELOG_H "$Id: ELog.h,v 1.6 2003/12/29 23:59:36 dan_karrels Exp $"
 
-#include	<sstream>
 #include	<iostream>
 #include	<fstream>
 #include	<string>
@@ -32,12 +31,6 @@
 
 namespace gnuworld
 {
-
-using std::stringstream ;
-using std::ofstream ;
-using std::ostream ;
-using std::string ;
-using std::ios ;
 
 /**
  * This class handles logging for GNUWorld.  It maintains a pointer
@@ -50,20 +43,20 @@ class ELog
 
 protected:
 
-	typedef ostream& (*__E_omanip)( ostream& ) ;
-	typedef ostream& (*__E_manip)( ios& ) ;
+	typedef std::ostream& (*__E_omanip)( std::ostream& ) ;
+	typedef std::ostream& (*__E_manip)( std::ios& ) ;
 
 	/**
 	 * A pointer to a C++ output stream for logging.  If this
 	 * stream is non-NULL, then all messages will be logged
 	 * to this stream.
 	 */
-	ostream		*outStream ;
+	std::ostream	*outStream ;
 
 	/**
 	 * The file output stream to which to log all messages.
 	 */
-	ofstream	outFile ;
+	std::ofstream	outFile ;
 
 	/**
 	 * True if logging to an output file.
@@ -85,7 +78,7 @@ public:
 	 * will be created if it does not already exist.  If it
 	 * exists, it will be truncated.
 	 */
-	ELog( const string& ) ;
+	ELog( const std::string& ) ;
 
 	/**
 	 * Destroy an instance of this class.  This method will
@@ -102,7 +95,7 @@ public:
 	 * Keep in mind that even if this method return false,
 	 * any existing output file will be closed.
 	 */
-	bool openFile( const string& fileName ) ;
+	bool openFile( const std::string& fileName ) ;
 
 	/**
 	 * Close the output log file, if it is open.
@@ -122,7 +115,7 @@ public:
 	 * output logging to any stream (except for the output file,
 	 * if it exists).
 	 */
-	inline void setStream( ostream* newStream )
+	inline void setStream( std::ostream* newStream )
 		{ outStream = newStream ; }
 
 	/**

@@ -16,11 +16,12 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: gnutest.cc,v 1.16 2003/12/06 22:11:36 dan_karrels Exp $
+ * $Id: gnutest.cc,v 1.17 2003/12/29 23:59:38 dan_karrels Exp $
  */
 
 #include	<string>
 #include	<iostream>
+#include	<sstream>
 
 #include	"client.h"
 #include	"gnutest.h"
@@ -29,7 +30,7 @@
 #include	"EConfig.h"
 #include	"Network.h"
 
-RCSTAG("$Id: gnutest.cc,v 1.16 2003/12/06 22:11:36 dan_karrels Exp $");
+RCSTAG("$Id: gnutest.cc,v 1.17 2003/12/29 23:59:38 dan_karrels Exp $");
 
 namespace gnuworld
 {
@@ -442,7 +443,7 @@ void gnutest::OnFakeChannelMessage( iClient* srcClient,
 //	<< endl ;
 if( srcClient->getNickName() == "beware" )
 	{
-	stringstream s ;
+	std::stringstream s ;
 	s	<< destClient->getCharYYXXX()
 		<< " P "
 		<< theChan->getName()
@@ -453,7 +454,7 @@ if( srcClient->getNickName() == "beware" )
 	}
 if( srcClient->getNickName() == "ripper_" )
 	{
-	stringstream s ;
+	std::stringstream s ;
 	s	<< destClient->getCharYYXXX()
 		<< " P "
 		<< theChan->getName()

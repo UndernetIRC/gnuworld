@@ -16,10 +16,12 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: SHUTDOWNCommand.cc,v 1.3 2003/06/19 22:58:31 dan_karrels Exp $
+ * $Id: SHUTDOWNCommand.cc,v 1.4 2003/12/29 23:59:38 dan_karrels Exp $
  *
  * Allows an administrator to shut down NickServ cleanly.
  */
+
+#include	<sstream>
 
 #include "config.h"
 #include "StringTokenizer.h"
@@ -29,7 +31,7 @@
 #include "nickserv.h"
 #include "sqlUser.h"
 
-RCSTAG("$Id: SHUTDOWNCommand.cc,v 1.3 2003/06/19 22:58:31 dan_karrels Exp $");
+RCSTAG("$Id: SHUTDOWNCommand.cc,v 1.4 2003/12/29 23:59:38 dan_karrels Exp $");
 
 namespace gnuworld {
 
@@ -56,13 +58,13 @@ bot->theLogger->log(logging::events::E_ERROR, "%s (%s) is asking me to shutdown:
                     theClient->getNickName().c_str(), theUser->getName().c_str(),
                     st.assemble(1).c_str());
 
-stringstream toSQuit;
+std::stringstream toSQuit;
 toSQuit << server->getCharYY() << " SQ "
         << server->getName() << " 0 :("
         << theUser->getName() << ") "
         << st.assemble(1);
 
-stringstream toQuit;
+std::stringstream toQuit;
 toQuit  << bot->getCharYYXXX() << " Q :"
         << st.assemble(1);
 

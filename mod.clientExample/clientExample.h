@@ -16,17 +16,15 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: clientExample.h,v 1.4 2003/06/28 16:26:45 dan_karrels Exp $
+ * $Id: clientExample.h,v 1.5 2003/12/29 23:59:37 dan_karrels Exp $
  */
 
 #ifndef __CLIENTEXAMPLE_H
-#define __CLIENTEXAMPLE_H "$Id: clientExample.h,v 1.4 2003/06/28 16:26:45 dan_karrels Exp $"
+#define __CLIENTEXAMPLE_H "$Id: clientExample.h,v 1.5 2003/12/29 23:59:37 dan_karrels Exp $"
 
 #include	<string>
 
 #include	"client.h"
-
-using std::string ;
 
 namespace gnuworld
 {
@@ -42,7 +40,7 @@ public:
 	/**
 	 * Constructor receives a configuration file name.
 	 */
-	clientExample( const string& ) ;
+	clientExample( const std::string& ) ;
 
 	/**
 	 * Destructor does normal stuff.
@@ -56,7 +54,7 @@ public:
 	 * and the second argument is the actual message (minus
 	 * all of the server command stuff).
 	 */
-	virtual void OnPrivateMessage( iClient*, const string&,
+	virtual void OnPrivateMessage( iClient*, const std::string&,
 		bool secure = false ) ;
 
 	/**

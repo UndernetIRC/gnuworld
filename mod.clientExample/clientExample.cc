@@ -16,8 +16,10 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: clientExample.cc,v 1.5 2003/06/28 16:26:45 dan_karrels Exp $
+ * $Id: clientExample.cc,v 1.6 2003/12/29 23:59:37 dan_karrels Exp $
  */
+
+#include	<string>
 
 #include	"client.h"
 #include	"clientExample.h"
@@ -34,7 +36,7 @@ namespace gnuworld
 
 extern "C"
 {
-  xClient* _gnuwinit(const string& args)
+  xClient* _gnuwinit(const std::string& args)
   { 
     return new clientExample( args );
   }
@@ -47,7 +49,7 @@ extern "C"
  * basic client info (nick/user/host/etc).
  * Any additional processing must be done here.
  */
-clientExample::clientExample( const string& configFileName )
+clientExample::clientExample( const std::string& configFileName )
  : xClient( configFileName )
 {}
 
@@ -57,7 +59,7 @@ clientExample::~clientExample()
 }
 
 void clientExample::OnPrivateMessage( iClient* theClient,
-	const string&, bool )
+	const std::string&, bool )
 {
 Notice( theClient, "Howdy :)" ) ;
 }

@@ -18,18 +18,17 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: Network.h,v 1.36 2003/11/11 19:21:20 dan_karrels Exp $
+ * $Id: Network.h,v 1.37 2003/12/29 23:59:36 dan_karrels Exp $
  */
 
 #ifndef __NETWORK_H
-#define __NETWORK_H "$Id: Network.h,v 1.36 2003/11/11 19:21:20 dan_karrels Exp $"
+#define __NETWORK_H "$Id: Network.h,v 1.37 2003/12/29 23:59:36 dan_karrels Exp $"
 
 #include	<vector>
 #include	<string>
 #include	<set>
 #include	<map>
 #include	<list>
-#include	<algorithm>
 
 #include	<ctime>
 
@@ -41,13 +40,6 @@
 
 namespace gnuworld
 {
-
-using std::set ;
-using std::string ;
-using std::vector ;
-using std::map ;
-using std::list ;
-using std::unary_function ;
 
 class xServer ;
 
@@ -94,7 +86,7 @@ private:
 	 * Keyed top level by the server's intYY, then each
 	 * set is keyed by intXXX for that particular server.
 	 */
-	typedef map< unsigned int, set< unsigned int > >
+	typedef std::map< unsigned int, std::set< unsigned int > >
 		reservedNumericMapType ;
 
 	/**
@@ -108,43 +100,45 @@ private:
 	 * This type maps fake iClient's to their owning
 	 * xClient's, keyed by the iClient's intYYXXX numeric.
 	 */
-	typedef map< unsigned int, std::pair< iClient*, xClient* > >
+	typedef std::map< unsigned int, std::pair< iClient*, xClient* > >
 		fakeClientMapType ;
 
 	/**
 	 * This type stores fake (juped) servers.
 	 */
-	typedef map< unsigned int, std::pair< iServer*, xClient* > >
+	typedef std::map< unsigned int, std::pair< iServer*, xClient* > >
 		fakeServerMapType ;
 
 	/**
 	 * This is the type of vector for storing
 	 * local (services) clients.
 	 */
-	typedef map< unsigned int, xClient* > xClientMapType ;
+	typedef std::map< unsigned int, xClient* > xClientMapType ;
 
 	/**
 	 * This is the type used to store the network Channel
 	 * instances.
 	 */
-	typedef map< string, Channel*, noCaseCompare > channelMapType ;
+	typedef std::map< std::string, Channel*, noCaseCompare > 
+			channelMapType ;
 
 	/**
 	 * This is the type used to store the nick name/iClient* pairs.
 	 */
-	typedef map< string, iClient*, noCaseCompare > nickMapType ;
+	typedef std::map< std::string, iClient*, noCaseCompare > 
+			nickMapType ;
 
 	/**
 	 * The type used to store information about iClient's,
 	 * keyed by integer numeric.
 	 */
-	typedef map< unsigned int, iClient* > numericMapType ;
+	typedef std::map< unsigned int, iClient* > numericMapType ;
 
 	/**
 	 * The type used to store information about iServer's,
 	 * keyed by integer numeric.
 	 */
-	typedef map< unsigned int, iServer* > serverMapType ;
+	typedef std::map< unsigned int, iServer* > serverMapType ;
 
 public:
 
@@ -232,13 +226,14 @@ public:
 	 * Find a remote client given the client's character numeric.
 	 * Returns NULL if not found.
 	 */
-	virtual iClient*	findClient( const string& yyxxx ) const ;
+	virtual iClient*	findClient( const std::string& yyxxx ) 
+					const ;
 
 	/**
 	 * Find a fake client by numeric.
 	 * Returns NULL if not found.
 	 */
-	virtual iClient*	findFakeClient( const string& yyxxx )
+	virtual iClient*	findFakeClient( const std::string& yyxxx )
 					const ;
 
 	/**
@@ -255,19 +250,21 @@ public:
 	 * Lookup all fake iClients belonging to an xClient.
 	 * If the xClient is NULL, return all fake clients.
 	 */
-	virtual list< iClient* > findFakeClients( xClient* ) const ;
+	virtual std::list< iClient* > findFakeClients( xClient* ) const ;
 
 	/**
 	 * Retrieve a pointer to an iClient given its nick name.
 	 * Returns NULL if not found.
 	 */
-	virtual iClient*	findNick( const string& nickName ) const ;
+	virtual iClient*	findNick( const std::string& nickName ) 
+					const ;
 
 	/**
 	 * Find a local (services) client by its character numeric.
 	 * Returns NULL if not found.
 	 */
-	virtual xClient*	findLocalClient( const string& yyxxx ) const ;
+	virtual xClient*	findLocalClient( const std::string& yyxxx )
+					const ;
 
 	/**
 	 * Find a local (services) client by its integer numeric.
@@ -280,12 +277,14 @@ public:
 	 * Find a local (services) client by its case-insensitive nickname.
 	 * Returns NULL if not found.
 	 */
-	virtual xClient*	findLocalNick( const string& nickName ) const ;
+	virtual xClient*	findLocalNick( const std::string& nickName )
+					const ;
 
 	/**
 	 * Lookup a fake (juped) iClient by nickname.
 	 */
-	virtual iClient*	findFakeNick( const string& nickName ) const ;
+	virtual iClient*	findFakeNick( const std::string& nickName )
+					const ;
 
 	/**
 	 * Find a remote server by its integer numeric.
@@ -309,31 +308,34 @@ public:
 	 * Find a remote server by its character numeric.
 	 * Returns NULL if not found.
 	 */
-	virtual iServer*	findServer( const string& YY ) const ;
+	virtual iServer*	findServer( const std::string& YY ) const ;
 
 	/**
 	 * Find a remote server by its case-insensitive name.
 	 * Returns NULL if not found.
 	 */
-	virtual iServer*	findServerName( const string& name ) const ;
+	virtual iServer*	findServerName( const std::string& name ) 
+					const ;
 
 	/**
 	 * Find a fake server by (case insensitive) name.
 	 */
-	virtual iServer*	findFakeServerName( const string& ) const ;
+	virtual iServer*	findFakeServerName( const std::string& ) 
+					const ;
 
 	/**
 	 * Find a remote server by a wildmask name.
 	 * Returns NULL if not found.
 	 */
-	virtual iServer*	findExpandedServerName( const string& name )
-					const ;
+	virtual iServer*	findExpandedServerName(
+					const std::string& name ) const ;
 
 	/**
 	 * Find a global channel by case insensitive name.
 	 * Returns NULL if not found.
 	 */
-	virtual Channel*	findChannel( const string& name ) const ;
+	virtual Channel*	findChannel( const std::string& name ) 
+					const ;
 
 	/* Removal methods. */
 
@@ -358,7 +360,7 @@ public:
 	 * pointer to it.
 	 * Returns NULL if not found.
 	 */
-	virtual iClient*	removeClient( const string& yyxxx ) ;
+	virtual iClient*	removeClient( const std::string& yyxxx ) ;
 
 	/**
 	 * Remove a remote client by its pointer.
@@ -388,7 +390,7 @@ public:
 	 * by (case-insensitive) name, and remove its reserved
 	 * numeric.
 	 */
-	virtual iServer*	removeFakeServerName( const string& ) ;
+	virtual iServer*	removeFakeServerName( const std::string& ) ;
 
 	/**
 	 * Remove a nick name from the internal nick name table.
@@ -397,7 +399,7 @@ public:
 	 * no heap space is allocated for elements in the nick name
 	 * table, they simply point to iClient instances.
 	 */
-	virtual void		removeNick( const string& nickName ) ;
+	virtual void		removeNick( const std::string& nickName ) ;
 
 	/**
 	 * Remove a remote server by its integer numeric, and
@@ -424,7 +426,7 @@ public:
 	 * other stale pointers to any clients.
 	 * Returns NULL if not found.
 	 */
-	virtual iServer*	removeServer( const string& YY ) ;
+	virtual iServer*	removeServer( const std::string& YY ) ;
 
 	/**
 	 * Remove a remote server by its case-insensitive name, and
@@ -436,14 +438,14 @@ public:
 	 * other stale pointers to any clients.
 	 * Returns NULL if not found.
 	 */
-	virtual iServer*	removeServerName( const string& name ) ;
+	virtual iServer*	removeServerName( const std::string& name ) ;
 
 	/**
 	 * Remove a channel from the network table, keyed by its
 	 * case insensitive name.
 	 * Returns NULL if not found.
 	 */
-	virtual Channel*	removeChannel( const string& name ) ;
+	virtual Channel*	removeChannel( const std::string& name ) ;
 
 	/**
 	 * Remove a channel from the network table.
@@ -459,8 +461,8 @@ public:
 	 * numeric and new nickname.
 	 * This method does NOT work for local clients.
 	 */
-	virtual void		rehashNick( const string& yyxxx,
-					const string& newNick ) ;
+	virtual void		rehashNick( const std::string& yyxxx,
+					const std::string& newNick ) ;
 
 	/**
 	 * This method performs a recursive removal of all servers
@@ -728,14 +730,6 @@ public:
 	size_t		countClients( const iServer* theServer ) const ;
 
 	/**
-	 * A base class unary function used in foreach_xClient.
-	 */
-	struct fe_xClientBase : public unary_function< xClient*, void >
-		{
-		virtual void operator() ( xClient* ) {}
-		} ;
-
-	/**
 	 * This method is used to set the xServer used for
 	 * backwards communication.  This is bad, and I would like
 	 * very much to get rid of it.
@@ -747,15 +741,16 @@ public:
 	 * characters, with any clients on the network.  Return a
 	 * list of pointers to const iClient's which match.
 	 */
-	virtual list< const iClient* > matchHost( const string& wildHost )
-			const ;
+	virtual std::list< const iClient* > matchHost(
+			const std::string& wildHost ) const ;
+
 	/**
 	 * Match the given user@host string, which may include
 	 * wildcards, to each client on the network.  Return a
 	 * list of pointers to const iClient's which match.
 	 */
-	virtual list< const iClient* >	matchUserHost( const string& )
-			const ;
+	virtual std::list< const iClient* >	matchUserHost(
+			const std::string& ) const ;
 
 	/**
 	 * Attempt to find hostnames which are equivalent to the given
@@ -763,41 +758,42 @@ public:
 	 * Return a list of pointers to const iClient's which are
 	 * found.
 	 */
-	virtual list< const iClient* > findHost( const string& hostName )
-			const ;
+	virtual std::list< const iClient* > findHost(
+			const std::string& hostName ) const ;
 
 	/**
 	 * Perform a similar match as to matchHost(), except return
 	 * only the number of matches found.
 	 */
-	virtual size_t	countMatchingHost( const string& wildHost ) const ;
+	virtual size_t	countMatchingHost( const std::string& wildHost ) 
+				const ;
 
 	/**
 	 * Perform a similar match as to matchUserHost(), except return
 	 * only the number of matches found.
 	 */
-	virtual size_t	countMatchingUserHost( const string& wildUserHost )
+	virtual size_t	countMatchingUserHost( const std::string& wildUserHost )
 				const ;
 	/**
 	 * Perform a similar operation as to findHost(), except return
 	 * only the number of hosts found.
 	 */
-	virtual size_t	countHost( const string& hostName ) const ;
+	virtual size_t	countHost( const std::string& hostName ) const ;
 
 	/**
 	 * Attempt to match the real hostname, which may include wildcard
 	 * characters, with any clients on the network.  Return a
 	 * list of pointers to const iClient's which match.
 	 */
-	virtual list< const iClient* > matchRealHost( const string& wildHost )
-			const ;
+	virtual std::list< const iClient* > matchRealHost(
+			const std::string& wildHost ) const ;
 	/**
 	 * Match the given user@host string, which may include
 	 * wildcards, to each client on the network.  Return a
 	 * list of pointers to const iClient's which match.
 	 */
-	virtual list< const iClient* >	matchRealUserHost( const string& )
-			const ;
+	virtual std::list< const iClient* >	matchRealUserHost(
+			const std::string& ) const ;
 
 	/**
 	 * Attempt to find real hostnames which are equivalent to the given
@@ -805,34 +801,35 @@ public:
 	 * Return a list of pointers to const iClient's which are
 	 * found.
 	 */
-	virtual list< const iClient* > findRealHost( const string& hostName )
-			const ;
+	virtual std::list< const iClient* > findRealHost(
+			const std::string& hostName ) const ;
 
 	/**
 	 * Perform a similar match as to matchRealHost(), except return
 	 * only the number of matches found.
 	 */
-	virtual size_t	countMatchingRealHost( const string& wildHost ) const ;
+	virtual size_t	countMatchingRealHost( const std::string& wildHost )
+				const ;
 
 	/**
 	 * Perform a similar match as to matchRealUserHost(), except return
 	 * only the number of matches found.
 	 */
-	virtual size_t	countMatchingRealUserHost( const string& wildUserHost )
+	virtual size_t	countMatchingRealUserHost( const std::string& wildUserHost )
 				const ;
 	/**
 	 * Perform a similar operation as to findRealHost(), except return
 	 * only the number of hosts found.
 	 */
-	virtual size_t	countRealHost( const string& hostName ) const ;
+	virtual size_t	countRealHost( const std::string& hostName ) const ;
 
 	/**
 	 * Match the given client real name string, which may include
 	 * wildcards, to each client on the network.  Return a
 	 * list of pointers to const iClient's which match.
 	 */
-	virtual list< const iClient* >	matchRealName( const string& )
-			const ;
+	virtual std::list< const iClient* >	matchRealName(
+			const std::string& ) const ;
 
 protected:
 
@@ -884,7 +881,7 @@ protected:
 	 * the server whose numeric is the second arguments, and
 	 * place each of those servers' numerics into the vector.
 	 */
-	virtual void	findLeaves( vector< unsigned int >& yyVector,
+	virtual void	findLeaves( std::vector< unsigned int >& yyVector,
 			const unsigned int intYY ) const ;
 
 	/**

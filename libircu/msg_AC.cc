@@ -16,8 +16,10 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * "$Id: msg_AC.cc,v 1.2 2003/06/17 15:13:53 dan_karrels Exp $"
+ * "$Id: msg_AC.cc,v 1.3 2003/12/29 23:59:36 dan_karrels Exp $"
  */
+
+#include	<iostream>
 
 #include	"ServerCommandHandler.h"
 #include	"server.h"
@@ -28,7 +30,7 @@
 #include	"ELog.h"
 #include	"config.h"
 
-RCSTAG( "$Id: msg_AC.cc,v 1.2 2003/06/17 15:13:53 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: msg_AC.cc,v 1.3 2003/12/29 23:59:36 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -46,7 +48,7 @@ bool msg_AC::Execute( const xParameters& Param )
 if( Param.size() != 3 )
 	{
 	elog	<< "msg_AC> Invalid number of parameters"
-		<< endl ;
+		<< std::endl ;
 	return false ;
 	}
 

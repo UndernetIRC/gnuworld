@@ -18,12 +18,14 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: client.cc,v 1.65 2003/12/06 22:11:37 dan_karrels Exp $
+ * $Id: client.cc,v 1.66 2003/12/29 23:59:38 dan_karrels Exp $
  */
 
 #include	<new>
+#include	<map>
 #include	<string>
 #include	<sstream>
+#include	<vector>
 #include	<iostream>
 
 #include	<cstdio>
@@ -47,7 +49,7 @@
 #include	"ELog.h"
 #include	"events.h"
 
-RCSTAG("$Id: client.cc,v 1.65 2003/12/06 22:11:37 dan_karrels Exp $" ) ;
+RCSTAG("$Id: client.cc,v 1.66 2003/12/29 23:59:38 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -55,6 +57,7 @@ namespace gnuworld
 using std::string ;
 using std::stringstream ;
 using std::endl ;
+using std::make_pair ;
 
 xClient::xClient()
 {
@@ -757,7 +760,7 @@ return true ;
 }
 
 bool xClient::Op( Channel* theChan,
-	const vector< iClient* >& clientVector )
+	const std::vector< iClient* >& clientVector )
 {
 assert( theChan != NULL ) ;
 
@@ -797,7 +800,7 @@ else
 
 xServer::opVectorType opVector ;
 
-for( vector< iClient* >::const_iterator ptr = clientVector.begin(),
+for( std::vector< iClient* >::const_iterator ptr = clientVector.begin(),
 	end = clientVector.end() ; ptr != end ; ++ptr )
 	{
 	if( NULL == *ptr )
@@ -863,7 +866,7 @@ return true ;
 }
 
 bool xClient::Voice( Channel* theChan,
-	const vector< iClient* >& clientVector )
+	const std::vector< iClient* >& clientVector )
 {
 assert( theChan != NULL ) ;
 
@@ -903,7 +906,7 @@ else
 
 xServer::voiceVectorType voiceVector ;
 
-for( vector< iClient* >::const_iterator ptr = clientVector.begin(),
+for( std::vector< iClient* >::const_iterator ptr = clientVector.begin(),
 	end = clientVector.end() ; ptr != end ; ++ptr )
 	{
 	if( NULL == *ptr )
@@ -1126,7 +1129,7 @@ return true ;
 }
 
 bool xClient::DeOp( Channel* theChan,
-	const vector< iClient* >& clientVector )
+	const std::vector< iClient* >& clientVector )
 {
 assert( theChan != NULL ) ;
 
@@ -1166,7 +1169,7 @@ else
 
 xServer::opVectorType opVector ;
 
-for( vector< iClient* >::const_iterator ptr = clientVector.begin(),
+for( std::vector< iClient* >::const_iterator ptr = clientVector.begin(),
 	end = clientVector.end() ; ptr != end ; ++ptr )
 	{
 	if( NULL == *ptr )
@@ -1310,7 +1313,7 @@ return true ;
 }
 
 bool xClient::DeVoice( Channel* theChan,
-	const vector< iClient* >& clientVector )
+	const std::vector< iClient* >& clientVector )
 {
 assert( theChan != NULL ) ;
 
@@ -1350,7 +1353,7 @@ else
 
 xServer::voiceVectorType voiceVector ;
 
-for( vector< iClient* >::const_iterator ptr = clientVector.begin(),
+for( std::vector< iClient* >::const_iterator ptr = clientVector.begin(),
 	end = clientVector.end() ; ptr != end ; ++ptr )
 	{
 	if( NULL == *ptr )
@@ -1553,7 +1556,7 @@ return true ;
 }
 
 bool xClient::Ban( Channel* theChan,
-	const vector< iClient* >& clientVector )
+	const std::vector< iClient* >& clientVector )
 {
 assert( theChan != NULL ) ;
 
@@ -1593,7 +1596,7 @@ else
 
 xServer::banVectorType banVector ;
 
-for( vector< iClient* >::const_iterator ptr = clientVector.begin(),
+for( std::vector< iClient* >::const_iterator ptr = clientVector.begin(),
 	end = clientVector.end() ; ptr != end ; ++ptr )
 	{
 	if( NULL == *ptr )
@@ -1805,7 +1808,8 @@ if( !OnChannel )
 return true ;
 }
 
-bool xClient::Kick( Channel* theChan, const vector< iClient* >& theClients,
+bool xClient::Kick( Channel* theChan,
+	const std::vector< iClient* >& theClients,
 	const string& reason )
 {
 assert( theChan != NULL ) ;
@@ -1851,7 +1855,7 @@ else
 
 // We will assume that this client is on the channel pointed to by theChan
 
-for( vector< iClient* >::const_iterator ptr = theClients.begin() ;
+for( std::vector< iClient* >::const_iterator ptr = theClients.begin() ;
 	ptr != theClients.end() ; ++ptr )
 	{
 	if( 0 == *ptr )
@@ -2056,5 +2060,152 @@ void xClient::OnTimerDestroy( xServer::timerID, void* )
 
 void xClient::OnSignal( int )
 {}
+
+// This method courtesy of OUTSider
+bool xClient::ClearMode( Channel* theChan, const string& modes,
+	bool modeAsServer )
+{
+assert( theChan != 0 ) ;
+
+if( !Connected || modes.empty() )
+	{
+	return false ;
+	}
+
+if( !modeAsServer && !me->isOper() )
+	{
+	return false ;
+	}
+
+xServer::opVectorType opVector ;
+xServer::voiceVectorType voiceVector ;
+xServer::banVectorType banVector ;
+xServer::modeVectorType modeVector ;
+
+for( string::size_type modePos = 0 ; modePos < modes.size() ; ++modePos )
+	{
+	switch( modes[ modePos ] )
+		{
+		case 'b':  // Ban ?
+			{
+			Channel::const_banIterator ptr = theChan->banList_begin();
+			while (ptr != theChan->banList_end())
+				{
+				banVector.push_back( make_pair(
+					false, *ptr ) ) ;
+		                theChan->removeBan(*ptr);
+		                ptr = theChan->banList_begin();
+				}
+			}
+			break;
+		case 'o':  //Chanops?
+			{
+			Channel::const_userIterator ptr = theChan->userList_begin();
+			while (ptr != theChan->userList_end())
+				{
+				if( ptr->second->getMode(ChannelUser::MODE_O))
+					{
+					opVector.push_back( make_pair(
+						false, ptr->second ) ) ;
+					ptr->second->removeMode(ChannelUser::MODE_O);
+					}
+				}
+			}
+			break;
+		case 'v':  //Chanvoice?
+			{
+			Channel::const_userIterator ptr = theChan->userList_begin();
+			while (ptr != theChan->userList_end())
+				{
+				if( ptr->second->getMode(ChannelUser::MODE_V))
+					{
+					voiceVector.push_back( make_pair(
+						false, ptr->second ) ) ;
+					ptr->second->removeMode(ChannelUser::MODE_V);
+					}
+				}
+			}
+			break;
+		case 'k':  //Key?
+			if(theChan->getMode(Channel::MODE_K))
+				{
+				theChan->removeMode(Channel::MODE_K);
+				theChan->setKey( "" );
+				MyUplink->OnChannelModeK( theChan,
+					false, 0, string() ) ;
+				}
+			break;
+		case 'i':  //Invite?
+			theChan->removeMode(Channel::MODE_I);
+			modeVector.push_back( make_pair( false,
+				Channel::MODE_I ) ) ;
+			break;
+		case 'l': //Limit?
+			if(theChan->getMode(Channel::MODE_L))
+				{
+				theChan->removeMode(Channel::MODE_L);
+				theChan->setLimit( 0 );
+				MyUplink->OnChannelModeL( theChan,
+					false, 0, 0 ) ;
+				}
+			break;
+		case 'p':  //Private?
+			theChan->removeMode(Channel::MODE_P);
+			modeVector.push_back( make_pair( false,
+				Channel::MODE_P ) ) ;
+			break;
+		case 's':  //Secret?
+			theChan->removeMode(Channel::MODE_S);
+			modeVector.push_back( make_pair( false,
+				Channel::MODE_S ) ) ;
+			break;
+		case 'm':  //Moderated?
+			theChan->removeMode(Channel::MODE_M);
+			modeVector.push_back( make_pair( false,
+				Channel::MODE_M ) ) ;
+			break;
+		case 'n':  //No External Messages?
+			theChan->removeMode(Channel::MODE_N);
+			modeVector.push_back( make_pair( false,
+				Channel::MODE_N ) ) ;
+			break;
+		case 't':  //Topic?
+			theChan->removeMode(Channel::MODE_T);
+			modeVector.push_back( make_pair( false,
+				Channel::MODE_T ) ) ;
+			break;
+		case 'r':  //Registered Only?
+			theChan->removeMode(Channel::MODE_R);
+			modeVector.push_back( make_pair( false,
+				Channel::MODE_R ) ) ;
+			break;
+		default:
+			break;
+		}
+	}
+
+if( !modeVector.empty() )
+	{
+	MyUplink->OnChannelMode( theChan, 0, modeVector ) ;
+	}
+if( !opVector.empty() )
+	{
+	MyUplink->OnChannelModeO( theChan, 0, opVector ) ;
+	}
+if( !voiceVector.empty() )
+	{
+	MyUplink->OnChannelModeV( theChan, 0, voiceVector ) ;
+	}
+if( !banVector.empty() )
+	{
+	MyUplink->OnChannelModeB( theChan, 0, banVector ) ;
+	}
+
+return Write( "%s CM %s :%s\r\n",
+	(modeAsServer) ? MyUplink->getCharYY().c_str() : 
+		getCharYYXXX().c_str(),
+	theChan->getName().c_str(),
+	modes.c_str() ) ;
+}
 
 } // namespace gnuworld

@@ -18,10 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: Channel.cc,v 1.43 2003/11/02 18:43:34 dan_karrels Exp $
+ * $Id: Channel.cc,v 1.44 2003/12/29 23:59:38 dan_karrels Exp $
  */
 
 #include	<new>
+#include	<map>
 #include	<string>
 #include	<iostream>
 #include	<sstream>
@@ -37,11 +38,12 @@
 #include	"server.h"
 #include	"ConnectionManager.h"
 
-RCSTAG("$Id: Channel.cc,v 1.43 2003/11/02 18:43:34 dan_karrels Exp $") ;
+RCSTAG("$Id: Channel.cc,v 1.44 2003/12/29 23:59:38 dan_karrels Exp $") ;
 
 namespace gnuworld
 {
 
+using std::vector ;
 using std::string ;
 using std::endl ;
 using std::stringstream ;
@@ -285,9 +287,9 @@ return false ;
 }
 
 void Channel::onMode(
-	const vector< pair< bool, Channel::modeType > >& modeVector )
+	const vector< std::pair< bool, Channel::modeType > >& modeVector )
 {
-typedef vector< pair< bool, Channel::modeType > > modeVectorType ;
+typedef vector< std::pair< bool, Channel::modeType > > modeVectorType ;
 for( modeVectorType::const_iterator mItr = modeVector.begin() ;
 	mItr != modeVector.end() ; ++mItr )
 	{
@@ -326,10 +328,10 @@ else
 	}
 }
 
-void Channel::onModeO( const vector< pair< bool, ChannelUser* > >&
+void Channel::onModeO( const vector< std::pair< bool, ChannelUser* > >&
 	opVector )
 {
-typedef vector< pair< bool, ChannelUser* > > opVectorType ;
+typedef vector< std::pair< bool, ChannelUser* > > opVectorType ;
 for( opVectorType::const_iterator ptr = opVector.begin() ;
 	ptr != opVector.end() ; ++ptr )
 	{
@@ -344,10 +346,10 @@ for( opVectorType::const_iterator ptr = opVector.begin() ;
 	}
 }
 
-void Channel::onModeV( const vector< pair< bool, ChannelUser* > >&
+void Channel::onModeV( const vector< std::pair< bool, ChannelUser* > >&
 	voiceVector )
 {
-typedef vector< pair< bool, ChannelUser* > > voiceVectorType ;
+typedef vector< std::pair< bool, ChannelUser* > > voiceVectorType ;
 for( voiceVectorType::const_iterator ptr = voiceVector.begin() ;
 	ptr != voiceVector.end() ; ++ptr )
 	{

@@ -1,7 +1,7 @@
 /**
  * MTrie.h
  *
- * $Id: MTrie.h,v 1.11 2003/12/17 18:21:36 dan_karrels Exp $
+ * $Id: MTrie.h,v 1.12 2003/12/29 23:59:36 dan_karrels Exp $
  */
 
 #ifndef __MTRIE_H
@@ -14,10 +14,6 @@
 
 #include	"StringTokenizer.h"
 
-using std::map ;
-using std::list ;
-using std::pair ;
-using std::string ;
 using gnuworld::StringTokenizer ;
 
 /**
@@ -52,7 +48,7 @@ public:
 	/**
 	 * The key/value pair type
 	 */
-	typedef pair< string, _valueT >	value_type ;
+	typedef std::pair< std::string, _valueT >	value_type ;
 
 	/**
 	 * The type used to represent the number of elements
@@ -71,7 +67,7 @@ public:
 	 * Insert a key/value pair.  The key must NOT have any
 	 * wildcard characters.
 	 */
-	bool	insert( const string& key, const data_type& value ) ;
+	bool	insert( const std::string& key, const data_type& value ) ;
 
 	/**
 	 * Return a list of the key/value pairs that match the given
@@ -79,7 +75,7 @@ public:
 	 * not do so.  In general, the most specific searches will
 	 * be fastest.
 	 */
-	virtual list< value_type >	find( const string& key ) const ;
+	virtual std::list< value_type >	find( const std::string& key ) const ;
 
 	/**
 	 * Remove all values associated with key's that match the given
@@ -89,7 +85,7 @@ public:
 	 * not deallocate the items stored in this structure.
 	 * The number of elements erased is returned.
 	 */
-	virtual size_type		erase( const string& key ) ;
+	virtual size_type		erase( const std::string& key ) ;
 
 	/**
 	 * Produce output about for each node in the trie in the
@@ -111,7 +107,7 @@ public:
 	 * Return all keys that have at least as many tokens as
 	 * minLength.
 	 */
-	virtual list< string >	findMinLength( size_t minLength )
+	virtual std::list< std::string > findMinLength( size_t minLength )
 				const ;
 protected:
 
@@ -131,7 +127,7 @@ protected:
 	 * Recursive helper method to the public findMinLength()
 	 */
 	virtual void	findMinLength( size_t minLength,
-				list< string >& retMe,
+				std::list< std::string >& retMe,
 				const MTrie< data_type >* ) const ;
 
 	/**
@@ -148,15 +144,15 @@ protected:
 	 * matching across multiple levels.
 	 */
 	virtual size_type erase( MTrie< data_type >*,
-				list< string >&,
-				const string& origKey,
-				const string& key ) ;
+				std::list< std::string >&,
+				const std::string& origKey,
+				const std::string& key ) ;
 
 	/**
 	 * Convenience method that puts together a list of
 	 * string tokens into a single string.
 	 */
-	string			getBase() const ;
+	std::string		getBase() const ;
 
 	/**
 	 * Recursive method used only for searching for '*' matched
@@ -171,8 +167,8 @@ protected:
 	 * strings.
 	 */
 	virtual size_type recursiveErase( MTrie< data_type >*,
-				list< string >& base,
-				const string& key ) ;
+				std::list< std::string >& base,
+				const std::string& key ) ;
 
 	/**
 	 * A recursive method used to output some debugging information.
@@ -199,7 +195,7 @@ protected:
 	/**
 	 * The type used to store values
 	 */
-	typedef list< data_type > valuesListType ;
+	typedef std::list< data_type > valuesListType ;
 
 	/**
 	 * An iterator for iterating the valuesList
@@ -219,7 +215,7 @@ protected:
 	/**
 	 * The type used to store pointers to levels in the trie
 	 */
-	typedef map< string, MTrie< _valueT >* > nodesMapType ;
+	typedef std::map< std::string, MTrie< _valueT >* > nodesMapType ;
 
 	/**
 	 * An iterator to nodes in the trie
@@ -242,14 +238,14 @@ protected:
 	 * It stores the current key associated with the node
 	 * being examined.
 	 */
-	mutable list< string >	base ;
+	mutable std::list< std::string >	base ;
 
 	/**
 	 * This variable is used in find() and erase() to reduce the 
 	 * number of arguments passed to the internal recursive methods.
 	 * It stores the values to be returned from the methods.
 	 */
-	mutable list< value_type >	returnMe ;
+	mutable std::list< value_type >	returnMe ;
 
 	/**
 	 * This variable is used in find() and erase() to reduce the 
@@ -257,7 +253,7 @@ protected:
 	 * It stores the key being searched for in the overall
 	 * find/erase.
 	 */
-	mutable string		origKey ;
+	mutable std::string	origKey ;
 
 	/**
 	 * The tokens object used in find() and erase().

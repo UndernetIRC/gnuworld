@@ -51,8 +51,8 @@ bool snoop::BurstChannels()
 {
 // It's ok if admin and relay chans are the same,
 // xServer::JoinChannel() will not join more than once
-getUplink()->JoinChannel( this, adminChanName ) ;
-getUplink()->JoinChannel( this, relayChanName ) ;
+Join( adminChanName ) ;
+Join( relayChanName ) ;
 return xClient::BurstChannels() ;
 }
 

@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server.h,v 1.95 2003/12/18 18:42:20 dan_karrels Exp $
+ * $Id: server.h,v 1.96 2003/12/29 23:59:36 dan_karrels Exp $
  */
 
 #ifndef __SERVER_H
-#define __SERVER_H "$Id: server.h,v 1.95 2003/12/18 18:42:20 dan_karrels Exp $"
+#define __SERVER_H "$Id: server.h,v 1.96 2003/12/29 23:59:36 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
@@ -54,14 +54,6 @@
 namespace gnuworld
 {
 
-using std::string ;
-using std::list ;
-using std::pair ;
-using std::vector ;
-using std::stringstream ;
-using std::priority_queue ;
-using std::map ;
-
 /// Forward declaration of xClient
 class xClient ;
 
@@ -82,7 +74,8 @@ protected:
 	/**
 	 * The type of the structure to hold Gline's internally.
 	 */
-	typedef map< string, Gline*, noCaseCompare >	glineListType ;
+	typedef std::map< std::string, Gline*, noCaseCompare >	
+			glineListType ;
 
 public:
 
@@ -108,7 +101,7 @@ public:
 	 * This type is used for passing information to handler
 	 * methods for channel op mode changes.
 	 */
-	typedef vector< pair< bool, ChannelUser* > > opVectorType ;
+	typedef std::vector< std::pair< bool, ChannelUser* > > opVectorType ;
 
 	/**
 	 * This type is used for passing information to handler
@@ -120,13 +113,15 @@ public:
 	 * This type is used for passing information to handler
 	 * methods for channel ban changes.
 	 */
-	typedef vector< pair< bool, string > > banVectorType ;
+	typedef std::vector< std::pair< bool, std::string > > 
+			banVectorType ;
 
 	/**
 	 * This type is used for passing multiple argument-less modes
 	 * to handler methods of simple channel modes.
 	 */
-	typedef vector< pair< bool, Channel::modeType > > modeVectorType ;
+	typedef std::vector< std::pair< bool, Channel::modeType > > 
+			modeVectorType ;
 
 	/**
 	 * The iterator type used to iterate through the
@@ -189,7 +184,7 @@ public:
 	 * Connection.
 	 * Inherited from ConnectionHandler.
 	 */
-	virtual void OnRead( Connection*, const string& ) ;
+	virtual void OnRead( Connection*, const std::string& ) ;
 
 	/**
 	 * Attach a fake server to this services server.
@@ -207,21 +202,22 @@ public:
 	 * Squit a server from the network and remove it
 	 * from the network tables.
 	 */
-	virtual bool SquitServer( const string& name, const string& reason ) ;
+	virtual bool SquitServer( const std::string& name,
+				const std::string& reason ) ;
 
 	/**
 	 * Append a std::string to the output buffer.
 	 * The second argument determines if data should be written
 	 * during burst time.
 	 */
-	virtual bool Write( const string& ) ;
+	virtual bool Write( const std::string& ) ;
 
 	/**
 	 * Similar to the above signature of Write() except that data
 	 * will be written to the normal output buffer even during
 	 * burst time.
 	 */
-	virtual bool WriteDuringBurst( const string& ) ;
+	virtual bool WriteDuringBurst( const std::string& ) ;
 
 	/**
 	 * Append a C variable argument list/character array to the output
@@ -244,14 +240,14 @@ public:
 	 * The second argument determines if data should be written
 	 * during burst time.
 	 */
-	virtual bool Write( const stringstream& ) ;
+	virtual bool Write( const std::stringstream& ) ;
 
 	/**
 	 * This method is similar to the above Write(), except
 	 * that the data will be written to the normal output
 	 * buffer even during burst time.
 	 */
-	virtual bool WriteDuringBurst( const stringstream& ) ;
+	virtual bool WriteDuringBurst( const std::stringstream& ) ;
 
 	/**
 	 * Process is responsible for parsing lines of data.
@@ -261,18 +257,18 @@ public:
 	/**
 	 * Add a network gline and update glines table.
 	 */
-	virtual bool setGline( const string& setBy,
-		const string& userHost,
-		const string& reason,
+	virtual bool setGline( const std::string& setBy,
+		const std::string& userHost,
+		const std::string& reason,
 		const time_t& duration, 
 		const time_t& lastmod = ::time(0),
 		const xClient* setClient = NULL,  
-		const string& server = "*") ;
+		const std::string& server = "*") ;
 
 	/**
 	 * Remove a network gline and update internal gline table.
 	 */
-	virtual bool removeGline( const string& userHost,
+	virtual bool removeGline( const std::string& userHost,
 		const xClient* remClient = NULL) ;
 
 	/**
@@ -295,19 +291,20 @@ public:
 	/**
 	 * Find a gline by lexical searching, case insensitive.
 	 */
-	virtual const Gline* findGline( const string& userHost ) const ;
+	virtual const Gline* findGline( const std::string& userHost ) const ;
 
 	/**
 	 * Find a gline by userHost (exact match only), and return
 	 * an interator to that gline.
 	 */
-	virtual glineIterator	findGlineIterator( const string& userHost ) ;
+	virtual glineIterator	findGlineIterator(
+					const std::string& userHost ) ;
 
 	/**
 	 * Find one or more glines matching a given userHost string.
 	 */
-	virtual vector< const Gline* > matchGline( const string& userHost )
-		const ;
+	virtual std::vector< const Gline* > matchGline(
+			const std::string& userHost ) const ;
 
 	/**
 	 * Send all glines to the network.
@@ -335,13 +332,13 @@ public:
 	 * quit message.
 	 */
 	virtual bool DetachClient( iClient*,
-			const string& = string( "Exiting, moo" ) ) ;
+			const std::string& = std::string( "Exiting, moo" ) ) ;
 
 	/**
 	 * Attempt to load a client given its client module name.
 	 */
-	virtual void	LoadClient( const string& moduleName,
-				const string& configFileName ) ;
+	virtual void	LoadClient( const std::string& moduleName,
+				const std::string& configFileName ) ;
 
 	/**
 	 * Attempt to unload a client given its module name.
@@ -349,14 +346,14 @@ public:
 	 * moduleName.  If uncertain, use the other form of
 	 * the UnloadClient() method.
 	 */
-	virtual void	UnloadClient( const string& moduleName,
-				const string& reason ) ;
+	virtual void	UnloadClient( const std::string& moduleName,
+				const std::string& reason ) ;
 
 	/**
 	 * Attempt to unload a client given its pointer.
 	 */
 	virtual void	UnloadClient( xClient*,
-				const string& reason ) ;
+				const std::string& reason ) ;
 
 	/**
 	 * Attach a client to the server.  This will add the client
@@ -376,8 +373,8 @@ public:
 	 * Clients must *not* call this method, use LoadClient()
 	 * instead.
 	 */
-	virtual bool AttachClient( const string& moduleName,
-			const string& configFileName,
+	virtual bool AttachClient( const std::string& moduleName,
+			const std::string& configFileName,
 			bool doBurst = false ) ;
 
 	/**
@@ -387,8 +384,8 @@ public:
 	 * Clients must *not* call this method, use UnloadClient()
 	 * instead.
 	 */
-	virtual bool DetachClient( const string& moduleName,
-			const string& reason ) ;
+	virtual bool DetachClient( const std::string& moduleName,
+			const std::string& reason ) ;
 
 	/**
 	 * Detach a client from the server.  This will call the
@@ -398,15 +395,15 @@ public:
 	 * instead.
 	 */
 	virtual bool DetachClient( xClient* Client,
-			const string& reason ) ;
+			const std::string& reason ) ;
 
 	/**
 	 * Output the information for a channel, and make the given
 	 * xClient operator in that channel.
 	 * This works at all times, bursting or not.
 	 */
-	virtual bool JoinChannel( xClient*, const string& chanName,
-		const string& chanModes = "+tn",
+	virtual bool JoinChannel( xClient*, const std::string& chanName,
+		const std::string& chanModes = "+tn",
 		const time_t& joinTime = 0,
 		bool getOps = true ) ;
 
@@ -414,34 +411,36 @@ public:
 	 * Have a fake (only) client join a channel.
 	 * This will NOT create the channel if it does not already exist.
 	 */
-	virtual bool JoinChannel( iClient*, const string& chanName ) ;
+	virtual bool JoinChannel( iClient*, const std::string& chanName ) ;
 
 	/**
 	 * Notify the network that one of the services clients has
 	 * parted a channel.
 	 */
-	virtual void PartChannel( xClient* theClient, const string& chanName,
-			const string& reason = string() ) ;
+	virtual void PartChannel( xClient* theClient,
+			const std::string& chanName,
+			const std::string& reason = std::string() ) ;
 
 	/**
 	 * Notify the network that a fake client has parted a channel.
 	 */
-	virtual void PartChannel( iClient* theClient, const string& chanName,
-			const string& reason = string() ) ;
+	virtual void PartChannel( iClient* theClient,
+			const std::string& chanName,
+			const std::string& reason = std::string() ) ;
 
 	/**
 	 * Notify the network that one of the services clients has
 	 * parted a channel.
 	 */
 	virtual void PartChannel( xClient* theClient, Channel* theChan,
-			const string& reason = string() ) ;
+			const std::string& reason = std::string() ) ;
 
 	/**
  	 * Handle the parting of a services client from a channel.  This
 	 * method updates internal tables.
  	 */
 	virtual void OnPartChannel( xClient* theClient,
-			const string& chanName ) ;
+			const std::string& chanName ) ;
 
 	/**
  	 * Handle the parting of a services client from a channel.  This
@@ -454,7 +453,7 @@ public:
 	 * updates internal tables.
 	 */
 	virtual void OnPartChannel( iClient* theClient,
-			const string& chanName ) ;
+			const std::string& chanName ) ;
 
 	/**
 	 * Handle the parting of a network client from a channel.  This method
@@ -484,7 +483,7 @@ public:
 	/**
 	 * Send a wallops to the network as the server.
 	 */
-	virtual int	Wallops( const string& ) ;
+	virtual int	Wallops( const std::string& ) ;
 
 	/**
 	 * Set modes as the server, update internal tables, and notify
@@ -493,8 +492,8 @@ public:
 	 * change(s), and cannot be NULL.
 	 */
 	virtual int	Mode( xClient*, Channel*,
-				const string& modes,
-				const string& args ) ;
+				const std::string& modes,
+				const std::string& args ) ;
 
 	/* Event registration stuff */
 
@@ -521,14 +520,14 @@ public:
 	 * and channel name for each xClient registered for
 	 * that <event,channel> pair.
 	 */
-	virtual bool RegisterChannelEvent( const string&,
+	virtual bool RegisterChannelEvent( const std::string&,
 		xClient* ) ;
 
 	/**
 	 * Halt delivery of any channel event for the particular channel
 	 * to the particular xClient.
 	 */
-	virtual bool UnRegisterChannelEvent( const string&,
+	virtual bool UnRegisterChannelEvent( const std::string&,
 		xClient* ) ;
 
 	/**
@@ -565,7 +564,8 @@ public:
 	 * will receive the EVT_ACCOUNT event.  If the argument is non-NULL,
 	 * then all but the sourceClient will receive the event.
 	 */
-	virtual void	UserLogin( iClient*, const string&, xClient* = 0 ) ;
+	virtual void	UserLogin( iClient*, const std::string&,
+				xClient* = 0 ) ;
 
 	/**
 	 * Post a system event to the rest of the system.  Note
@@ -602,7 +602,7 @@ public:
 	virtual void PostChannelKick( Channel* theChan,
 			iClient* srcClient, // may be NULL
 			iClient* destClient,
-			const string& kickMessage,
+			const std::string& kickMessage,
 			bool authoritative ) ;
 
 	/**
@@ -610,7 +610,7 @@ public:
 	 * register for events of this channel, and each will receive
 	 * this event for every channel in existence on the network.
 	 */
-	static const string	CHANNEL_ALL ;
+	static const std::string	CHANNEL_ALL ;
 
 	/**
 	 * Post a signal to the server and all clients.
@@ -675,7 +675,7 @@ public:
 	 * Return a string representation of this server's uplink's
 	 * server numeric.
 	 */
-	inline const string getUplinkCharYY() const
+	inline const std::string getUplinkCharYY() const
 		{ return Uplink->getCharYY() ; }
 
 	/* General server utility methods */
@@ -683,19 +683,19 @@ public:
 	/**
 	 * Return this server's name, as the network sees it.
 	 */
-	inline const string& getName() const
+	inline const std::string& getName() const
 		{ return ServerName ; }
 
 	/**
 	 * Return a description of this server.
 	 */
-	inline const string& getDescription() const
+	inline const std::string& getDescription() const
 		{ return ServerDescription ; }
 
 	/**
 	 * Return this server's uplink password.
 	 */
-	inline const string& getPassword() const
+	inline const std::string& getPassword() const
 		{ return Password ; }
 
 	/**
@@ -764,7 +764,8 @@ public:
 	/**
 	 * Shutdown the server.
 	 */
-	virtual void Shutdown( const string& reason = "Server Shutdown" ) ;
+	virtual void Shutdown( const std::string& reason =
+			string( "Server Shutdown" ) ) ;
 
 	/**
 	 * Output server statistics to the console (clog).
@@ -807,7 +808,7 @@ public:
 	 * if the mode is being set/unset by a server.
 	 */
 	virtual void	OnChannelModeK( Channel*, bool,
-				ChannelUser*, const string& ) ;
+				ChannelUser*, const std::string& ) ;
 
 	/**
 	 * This method is called when one or more mode 'o' changes
@@ -907,7 +908,7 @@ protected:
 	/**
 	 * Remove glines which match the given userHost, post event.
 	 */
-	virtual void	removeMatchingGlines( const string& ) ;
+	virtual void	removeMatchingGlines( const std::string& ) ;
 
 	/**
 	 * This method is responsible for updating the systems internal
@@ -926,26 +927,27 @@ protected:
 	 * This support method is called by Mode() to parse the modes
 	 * and arguments.
 	 */
-	virtual int	parseModeRequest( const Channel*, const string&,
-				const string& ) const ;
+	virtual int	parseModeRequest( const Channel*,
+				const std::string&,
+				const std::string& ) const ;
 
 	/**
 	 * Returns true if the given mask uses the nick!user@host syntax.
 	 */
-	virtual bool	banSyntax( const string& ) const ;
+	virtual bool	banSyntax( const std::string& ) const ;
 
 	/**
 	 * Read the config file.  Return true if success, false
 	 * otherwise.
 	 */
-	virtual bool	readConfigFile( const string& ) ;
+	virtual bool	readConfigFile( const std::string& ) ;
 
 	/**
 	 * Parses a config file and attempts to load all modules
 	 * specified therein.  If any part of the process fails,
 	 * false is returned.  Otherwise, true is returned.
 	 */
-	virtual bool	loadClients( const string& ) ;
+	virtual bool	loadClients( const std::string& ) ;
 
 	/**
 	 * Signal handler for the server itself.
@@ -989,8 +991,8 @@ protected:
 	 */
 	struct timerGreater
 	{
-	inline bool operator()( const pair< time_t, timerInfo* >& lhs,
-		const pair< time_t, timerInfo* >& rhs ) const
+	inline bool operator()( const std::pair< time_t, timerInfo* >& lhs,
+		const std::pair< time_t, timerInfo* >& rhs ) const
 		{
 		return lhs.first > rhs.first ;
 		}
@@ -1029,27 +1031,27 @@ protected:
 	/**
 	 * The name of the server, as the network sees it.
 	 */
-	string			ServerName ;
+	std::string		ServerName ;
 
 	/**
 	 * This server's description line.
 	 */
-	string			ServerDescription ;
+	std::string		ServerDescription ;
 
 	/**
 	 * The password for our uplink server.
 	 */
-	string			Password ;
+	std::string		Password ;
 
 	/**
 	 * The hostname/IP of our uplink
 	 */
-	string			UplinkName ;
+	std::string		UplinkName ;
 
 	/**
 	 * The type used to store the system event map.
 	 */
-	typedef vector< list< xClient* > > eventListType ;
+	typedef std::vector< std::list< xClient* > > eventListType ;
 
 	/**
 	 * This is the vector of lists of xClient pointers.
@@ -1063,7 +1065,7 @@ protected:
 	/**
 	 * Type used to store the channel event map.
 	 */
-	typedef map< string, list< xClient* >*, noCaseCompare >
+	typedef std::map< std::string, std::list< xClient* >*, noCaseCompare >
 		channelEventMapType ;
 
 	/**
@@ -1155,13 +1157,13 @@ protected:
 	 * The name of the file which contains the command handler
 	 * mapping from network message to handler.
 	 */
-	string			commandMapFileName ;
+	std::string		commandMapFileName ;
 
 	/**
 	 * The path prefix to the gnuworld libraries, of the form
 	 * "/path/to/lib/dir"
 	 */
-	string			libPrefix ;
+	std::string		libPrefix ;
 
 	/**
 	 * Burst() is called when the network connection is
@@ -1177,7 +1179,8 @@ protected:
 	/**
 	 * Type used to store runtime client modules.
 	 */
-	typedef vector< moduleLoader< xClient* >* >	clientModuleListType;
+	typedef std::vector< moduleLoader< xClient* >* >	
+			clientModuleListType;
 
 	/**
 	 * Structure used to store runtime client modules.
@@ -1196,7 +1199,7 @@ protected:
 	/**
 	 * A vector of modules representing ServerCommandHandlers.
 	 */
-	typedef vector< commandModuleType* > commandModuleListType ;
+	typedef std::vector< commandModuleType* > commandModuleListType ;
 
 	/**
 	 * The structure of moduleLoader's, each representing a
@@ -1208,7 +1211,7 @@ protected:
 	 * The type used to store ServerCommandHandlers, each
 	 * associated with a particular server message (key).
 	 */
-	typedef map< string, ServerCommandHandler*, noCaseCompare >
+	typedef std::map< std::string, ServerCommandHandler*, noCaseCompare >
 			commandMapType ;
 
 	/**
@@ -1222,13 +1225,14 @@ protected:
 	 * used to reload a module, and to ensure that a module is
 	 * not accidentally loaded more than once.
 	 */
-	commandModuleType*	lookupCommandModule( const string& ) const ;
+	commandModuleType*	lookupCommandModule( const std::string& ) 
+					const ;
 
 	/**
 	 * The type used to store timed events.
 	 */
-	typedef priority_queue< pair< time_t, timerInfo* >,
-		vector< pair< time_t, timerInfo* > >,
+	typedef std::priority_queue< std::pair< time_t, timerInfo* >,
+		std::vector< std::pair< time_t, timerInfo* > >,
 		timerGreater >
 		timerQueueType ;
 
@@ -1240,7 +1244,7 @@ protected:
 	/**
 	 * The type used to store timer ID's currently in use.
 	 */
-	typedef map< timerID, bool > uniqueTimerMapType ;
+	typedef std::map< timerID, bool > uniqueTimerMapType ;
 
 	/**
 	 * The structure used to store timer ID's current in use.
@@ -1256,24 +1260,24 @@ protected:
 	 * The output file to which to write raw data read from
 	 * the network.
 	 */
-	ofstream	socketFile ;
+	std::ofstream	socketFile ;
 
 	/**
 	 * The name of the file for which elog to write all
 	 * debugging information.
 	 */
-	string		elogFileName ;
+	std::string	elogFileName ;
 
 	/**
 	 * The name of the server config file.
 	 */
-	string		configFileName ;
+	std::string	configFileName ;
 
 	/**
 	 * The name of the simulation file from which to read all
 	 * simulation data, empty if in real mode.
 	 */
-	string		simFileName ;
+	std::string	simFileName ;
 
 	/**
 	 * The char array to be used to read in network data.
@@ -1320,9 +1324,9 @@ protected:
 	 * and associate that handler with the network message
 	 * (commandKey).
 	 */
-	bool		loadCommandHandler( const string& fileName,
-				const string& symbolName,
-				const string& commandKey ) ;
+	bool		loadCommandHandler( const std::string& fileName,
+				const std::string& symbolName,
+				const std::string& commandKey ) ;
 
 	/// Some debugging information, just a curiosity
 	/// burstLines is the total number of lines that have been

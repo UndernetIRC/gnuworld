@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: iClient.cc,v 1.31 2003/08/09 23:15:36 dan_karrels Exp $
+ * $Id: iClient.cc,v 1.32 2003/12/29 23:59:38 dan_karrels Exp $
  */
 
 #include	<new>
@@ -34,7 +34,7 @@
 #include	"ip.h"
 #include	"config.h"
 
-RCSTAG( "$Id: iClient.cc,v 1.31 2003/08/09 23:15:36 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: iClient.cc,v 1.32 2003/12/29 23:59:38 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -140,7 +140,7 @@ for( string::size_type i = 0 ; i < newModes.size() ; i++ )
 				<< newModes[ i ]
 				<< ", in modes string: "
 				<< newModes
-				<< endl ;
+				<< std::endl ;
 			break ;
 		} // switch
 	} // for

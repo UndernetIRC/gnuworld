@@ -16,16 +16,18 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: RANGETest.cc,v 1.5 2003/08/02 18:17:21 jeekay Exp $
+ * $Id: RANGETest.cc,v 1.6 2003/12/29 23:59:37 dan_karrels Exp $
  *
  * Checks the range of the entropy of a given channel.
  */
+
+#include	<sstream>
 
 #include "config.h"
 #include "dronescan.h"
 #include "dronescanTests.h"
 
-RCSTAG("$Id: RANGETest.cc,v 1.5 2003/08/02 18:17:21 jeekay Exp $");
+RCSTAG("$Id: RANGETest.cc,v 1.6 2003/12/29 23:59:37 dan_karrels Exp $");
 
 namespace gnuworld {
 
@@ -77,7 +79,7 @@ const string RANGETest::getVariable() const
 
 const string RANGETest::getStatus() const
 {
-	stringstream status;
+	std::stringstream status;
 	status << "channelRange: " << channelRange;
 	return status.str();
 }

@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ELog.cc,v 1.4 2003/12/17 18:21:36 dan_karrels Exp $
+ * $Id: ELog.cc,v 1.5 2003/12/29 23:59:36 dan_karrels Exp $
  */
 
 #include	<iostream>
@@ -29,7 +29,7 @@
 #include	"config.h"
 #include	"ELog.h"
 
-const char rcsId[] = "$Id: ELog.cc,v 1.4 2003/12/17 18:21:36 dan_karrels Exp $" ;
+const char rcsId[] = "$Id: ELog.cc,v 1.5 2003/12/29 23:59:36 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -65,7 +65,7 @@ if( isOpen() )
 	closeFile() ;
 	}
 logFile = true ;
-outFile.open( fileName.c_str(), ios::out | ios::trunc ) ;
+outFile.open( fileName.c_str(), std::ios::out | std::ios::trunc ) ;
 
 if( !isOpen() )
 	{

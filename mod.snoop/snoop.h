@@ -13,8 +13,6 @@
 #include	"EConfig.h"
 #include	"StringTokenizer.h"
 
-using std::string ;
-
 namespace gnuworld
 {
 
@@ -33,7 +31,7 @@ public:
 	 * Standard xClient constructor, receives the name of the
 	 * configuration file.
 	 */
-	snoop( const string& confFileName ) ;
+	snoop( const std::string& confFileName ) ;
 
 	/**
 	 * Destructor performs the cleanup.
@@ -54,7 +52,7 @@ public:
 	 */
 	virtual void	OnChannelMessage( iClient*,
 				Channel*,
-				const string& ) ;
+				const std::string& ) ;
 
 	/**
 	 * This method invoked when a fake client is to see a
@@ -65,7 +63,7 @@ public:
 	virtual void	OnFakeChannelMessage( iClient*,
 				iClient*,
 				Channel*,
-				const string& ) ;
+				const std::string& ) ;
 
 protected:
 
@@ -75,13 +73,13 @@ protected:
 	 * entirely correct, but hopefully it will avoid some
 	 * simple typos and types of abuse.
 	 */
-	bool		validNickname( const string& ) const ;
+	bool		validNickname( const std::string& ) const ;
 
 	/**
 	 * Notify the client of the proper usage of the given
 	 * command identified by the string.
 	 */
-	void		usage( iClient*, const string& ) ;
+	void		usage( iClient*, const std::string& ) ;
 
 	/**
 	 * Spawn a client for the given iClient.
@@ -118,25 +116,25 @@ protected:
 	 * The command char (string) to which the bot responds
 	 * in the admin channel.
 	 */
-	string		cmdchar ;
+	std::string	cmdchar ;
 
 	/**
 	 * The name of the admin channel.  Channel commands are only
 	 * accepted from this channel.
 	 * This channel is auto joined.
 	 */
-	string		adminChanName ;
+	std::string	adminChanName ;
 
 	/**
 	 * The channel to which to relay snooped messages
 	 * This channel is auto joined.
 	 */
-	string		relayChanName ;
+	std::string	relayChanName ;
 
 	/**
 	 * The default quit message for spawned clients.
 	 */
-	string		defaultQuitMessage ;
+	std::string	defaultQuitMessage ;
 
 	/**
 	 * The maximum nickname length for the network on which this

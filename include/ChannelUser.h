@@ -17,11 +17,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ChannelUser.h,v 1.12 2003/11/11 19:21:20 dan_karrels Exp $
+ * $Id: ChannelUser.h,v 1.13 2003/12/29 23:59:36 dan_karrels Exp $
  */
 
 #ifndef __CHANNELUSER_H
-#define __CHANNELUSER_H "$Id: ChannelUser.h,v 1.12 2003/11/11 19:21:20 dan_karrels Exp $"
+#define __CHANNELUSER_H "$Id: ChannelUser.h,v 1.13 2003/12/29 23:59:36 dan_karrels Exp $"
 
 #include	<string>
 
@@ -29,8 +29,6 @@
 
 namespace gnuworld
 {
-
-using std::string ;
 
 /// Forward declaration of class iClient.
 class iClient ;
@@ -164,22 +162,22 @@ public:
 	 * Thus, if the user changes its nickname, this
 	 * will be reflected automatically.
 	 */
-	const string& getNickName() const ;
+	const std::string& getNickName() const ;
 
 	/**
 	 * Retrieve this user's user name.
 	 */
-	const string& getUserName() const ;
+	const std::string& getUserName() const ;
 
 	/**
 	 * Retrieve this channel user's host name.
 	 */
-	const string& getHostName() const ;
+	const std::string& getHostName() const ;
 
 	/**
 	 * Retrieve this channel user's network numeric.
 	 */
-	const string getCharYYXXX() const ;
+	const std::string getCharYYXXX() const ;
 
 	/**
 	 * Retrieve this channel user's IP.

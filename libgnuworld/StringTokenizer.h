@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: StringTokenizer.h,v 1.5 2003/08/19 21:48:39 dan_karrels Exp $
+ * $Id: StringTokenizer.h,v 1.6 2003/12/29 23:59:36 dan_karrels Exp $
  */
 
 #ifndef __STRINGTOKENIZER_H
-#define __STRINGTOKENIZER_H "$Id: StringTokenizer.h,v 1.5 2003/08/19 21:48:39 dan_karrels Exp $"
+#define __STRINGTOKENIZER_H "$Id: StringTokenizer.h,v 1.6 2003/12/29 23:59:36 dan_karrels Exp $"
 
 #include	<vector>
 #include	<string>
@@ -30,9 +30,6 @@
 
 namespace gnuworld
 {
-
-using std::string ;
-using std::vector ;
 
 /**
  * This class provides a clean mechanism for parsing
@@ -50,7 +47,7 @@ private:
 	 * This is the type that will be used to store
 	 * the tokens in the StringTokenizer object.
 	 */
-	typedef vector< string > vectorType ;
+	typedef std::vector< std::string > vectorType ;
 
 public:
 
@@ -59,7 +56,7 @@ public:
 	 * tokenized, and the delimiter by which
 	 * tokens will be generated.
 	 */
-	StringTokenizer( const string& = string(), char = ' ' ) ;
+	StringTokenizer( const std::string& = std::string(), char = ' ' ) ;
 
 	/**
 	 * The destructor is a NOOP because no streams have been
@@ -81,14 +78,14 @@ public:
 	 * compiled at a later time to throw an exception while
 	 * in a production environment.
 	 */
-	const string&		getToken( const size_type& ) const ;
+	const std::string&	getToken( const size_type& ) const ;
 
 	/**
 	 * This method allows StringTokenizer objects to be used like
 	 * arrays.  This method just calls the getToken() method, and
 	 * its semantics are the same.
 	 */
-	inline const string&	operator[]( const size_type& sub ) const
+	inline const std::string& operator[]( const size_type& sub ) const
 		{ return getToken( sub ) ; }
 
 	/**
@@ -99,7 +96,7 @@ public:
 	 * is never called.  This will free up some processing time
 	 * spent copying the original string.
 	 */
-	inline const string	getOriginal() const
+	inline const std::string	getOriginal() const
 		{ return assemble() ; }
 
 	/**
@@ -132,7 +129,7 @@ public:
 	 * With no argument supplied, assemble() will return the entire
 	 * original string, delimiters included.
 	 */
-	string			assemble( const size_type& = 0 ) const ;
+	std::string		assemble( const size_type& = 0 ) const ;
 
 	/**
 	 * The immutable iterator type to use for walking through
@@ -202,7 +199,7 @@ protected:
 	 * Protected method called internally by the constructor once
 	 * at object instantiation to tokenize the given C++ string.
 	 */
-	virtual void		Tokenize( const string& ) ;
+	virtual void		Tokenize( const std::string& ) ;
 
 	/**
 	 * The delimiter by which the (original) string is tokenized.

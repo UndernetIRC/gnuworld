@@ -19,7 +19,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: NetworkTarget.h,v 1.1 2003/08/09 23:15:33 dan_karrels Exp $
+ * $Id: NetworkTarget.h,v 1.2 2003/12/29 23:59:36 dan_karrels Exp $
  */
 
 #ifndef __NETWORKTARGET_H
@@ -27,16 +27,12 @@
 
 #include	<string>
 
-#include	<cassert>
-
 #include	"Numeric.h"
 
 namespace gnuworld
 {
 
 class xNetwork ;
-
-using std::string ;
 
 /**
  * This class is basically a convenience class for addressing
@@ -102,7 +98,7 @@ public:
 	 * Instantiate a NetworkTarget given its base 64 char array
 	 * numerics.
 	 */
-	NetworkTarget( const string& stringYYXXX )
+	NetworkTarget( const std::string& stringYYXXX )
 	{
 		setCharYY( stringYYXXX.substr( 0, 2 ) ) ;
 		setCharXXX( stringYYXXX.substr( 2, 3 ) ) ;
@@ -139,21 +135,21 @@ public:
 	 * Return the char array base 64 representation of this
 	 * target's server.
 	 */
-	inline const string	getCharYY() const
-		{ return string( charYY ) ; }
+	inline const std::string	getCharYY() const
+		{ return std::string( charYY ) ; }
 
 	/**
 	 * Return the char array base 64 representation of this
 	 * target's client identifier (relative to its server).
 	 */
-	inline const string	getCharXXX() const
-		{ return string( charXXX ) ; }
+	inline const std::string	getCharXXX() const
+		{ return std::string( charXXX ) ; }
 
 	/**
 	 * Return the char array base 64 representation of this
 	 * target's full client/server numeric.
 	 */
-	inline const string	getCharYYXXX() const
+	inline const std::string	getCharYYXXX() const
 		{ return (getCharYY() + getCharXXX()) ; }
 
 protected:
@@ -184,7 +180,7 @@ protected:
 	 * Set the char array base 64 representation of this
 	 * target's server.
 	 */
-	inline void		setCharYY( const string& stringYY )
+	inline void		setCharYY( const std::string& stringYY )
 	{
 		charYY[ 0 ] = stringYY[ 0 ] ;
 		charYY[ 1 ] = stringYY[ 1 ] ;
@@ -196,7 +192,7 @@ protected:
 	 * Set the char array base 64 representation of this
 	 * target's client identifier (relative to its server).
 	 */
-	inline void		setCharXXX( const string& stringXXX )
+	inline void		setCharXXX( const std::string& stringXXX )
 	{
 		charXXX[ 0 ] = stringXXX[ 0 ] ;
 		charXXX[ 1 ] = stringXXX[ 1 ] ;

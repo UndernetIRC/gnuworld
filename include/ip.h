@@ -20,18 +20,16 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ip.h,v 1.5 2002/05/27 17:18:12 dan_karrels Exp $
+ * $Id: ip.h,v 1.6 2003/12/29 23:59:36 dan_karrels Exp $
  */
 
 #ifndef __IP_H
-#define __IP_H "$Id: ip.h,v 1.5 2002/05/27 17:18:12 dan_karrels Exp $"
+#define __IP_H "$Id: ip.h,v 1.6 2003/12/29 23:59:36 dan_karrels Exp $"
 
 #include	<string>
 
 namespace gnuworld
 {
-
-using std::string ;
 
 /**
  * A utility class that is used to retrieve information about
@@ -46,7 +44,7 @@ public:
 	 * Construct an xIP instance given an address in std::string
 	 * format.
 	 */
-	xIP( const string& IP, bool Base64 = false ) ;
+	xIP( const std::string& IP, bool Base64 = false ) ;
 
 	/**
  	 * Construct an xIP instance given an IP in long int format.

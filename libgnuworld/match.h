@@ -16,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: match.h,v 1.3 2003/06/28 01:21:18 dan_karrels Exp $
+ * $Id: match.h,v 1.4 2003/12/29 23:59:36 dan_karrels Exp $
  */
 
 #ifndef __MATCH_H
-#define __MATCH_H "$Id: match.h,v 1.3 2003/06/28 01:21:18 dan_karrels Exp $"
+#define __MATCH_H "$Id: match.h,v 1.4 2003/12/29 23:59:36 dan_karrels Exp $"
 
 #include	<string>
 
@@ -29,8 +29,6 @@
 
 namespace gnuworld
 {
-
-using std::string ;
 /*
  * Prototypes
  */
@@ -39,7 +37,7 @@ using std::string ;
  * XXX - match returns 0 if a match is found. Smelly interface
  * needs to be fixed. --Bleep
  */
-int match( const string&, const string& ) ;
+int match( const std::string&, const std::string& ) ;
 //int mmatch( const char *old_mask, const char *new_mask);
 int match( const char *ma, const char *na);
 char *collapse(char *pattern);

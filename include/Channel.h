@@ -18,15 +18,14 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: Channel.h,v 1.28 2003/11/02 18:43:34 dan_karrels Exp $
+ * $Id: Channel.h,v 1.29 2003/12/29 23:59:36 dan_karrels Exp $
  */
 
 #ifndef __CHANNEL_H
-#define __CHANNEL_H "$Id: Channel.h,v 1.28 2003/11/02 18:43:34 dan_karrels Exp $"
+#define __CHANNEL_H "$Id: Channel.h,v 1.29 2003/12/29 23:59:36 dan_karrels Exp $"
 
 #include	<string>
 #include	<map>
-#include	<iostream>
 #include	<vector>
 #include	<list>
 #include	<utility>
@@ -39,13 +38,6 @@
 
 namespace gnuworld
 {
-
-using std::string ;
-using std::map ;
-using std::list ;
-using std::vector ;
-using std::endl ;
-using std::pair ;
 
 /// Forward declaration of class iClient.
 class iClient ;
@@ -62,12 +54,12 @@ protected:
 	/**
 	 * The type used to hold this channel's users.
 	 */
-	typedef map< unsigned int, ChannelUser* > userListType ;
+	typedef std::map< unsigned int, ChannelUser* > userListType ;
 
 	/**
 	 * The type to be used to store channel bans.
 	 */
-	typedef list< string > banListType ;
+	typedef std::list< std::string > banListType ;
 
 	/// Make class xServer a friend of this class.
 	friend class xServer ;
@@ -138,7 +130,7 @@ public:
 	 * Construct a channel of the given name, constructed at the
 	 * given creation time.
 	 */
-	Channel( const string& _name,
+	Channel( const std::string& _name,
 		const time_t& _creationTime ) ;
 
 	/**
@@ -196,19 +188,19 @@ public:
 	 * Set a key on the channel.  This method will set the
 	 * channel mode and the key as well.
  	 */
-	inline void setKey( const string& newKey )
+	inline void setKey( const std::string& newKey )
 		{ key = newKey ; }
 
 	/**
 	 * Add a ban to this Channel's ban list.
 	 */
-	void setBan( const string& banMask ) ;
+	void setBan( const std::string& banMask ) ;
 
 	/**
 	 * Remove a ban from this channel's ban list.  This does a lexical
 	 * comparison, not a wildcard match.
 	 */
-	void removeBan( const string& banMask ) ;
+	void removeBan( const std::string& banMask ) ;
 
 	/**
 	 * Remove all the bans in the channels ban list.
@@ -220,13 +212,13 @@ public:
 	 * Find a ban in the channel's ban list which lexically matches
 	 * the given banMask.
 	 */
-	bool findBan( const string& banMask ) const ;
+	bool findBan( const std::string& banMask ) const ;
 
 	/**
 	 * Find a ban in the channel's ban list which wildcard matches
 	 * the given banMask.
 	 */
-	bool matchBan( const string& banMask ) const ;
+	bool matchBan( const std::string& banMask ) const ;
 
 	/**
 	 * Search for a ban that matches the mask in (banMask).
@@ -235,8 +227,8 @@ public:
 	 * Otherwise, (matchingBan) is unmodified, and false is
 	 * returned.
 	 */
-	inline bool getMatchingBan( const string& banMask,
-		string& matchingBan ) const ;
+	inline bool getMatchingBan( const std::string& banMask,
+		std::string& matchingBan ) const ;
 
 	/**
 	 * Retrieve the current channel modes.
@@ -247,7 +239,7 @@ public:
 	/**
 	 * Retrieve a string of the current channel modes.
 	 */
-	const string getModeString() const ;
+	const std::string getModeString() const ;
 
 	/**
 	 * Type used to store the size of the banlist.
@@ -263,7 +255,7 @@ public:
 	/**
 	 * Retrieve the name of this channel.
 	 */
-	inline const string& getName() const
+	inline const std::string& getName() const
 		{ return name ; }
 
 	/**
@@ -284,7 +276,7 @@ public:
 	 * existence of a key does not mean that channel
 	 * mode +k is set.
 	 */
-	inline const string& getKey() const
+	inline const std::string& getKey() const
 		{ return key ; }
 
 	/**
@@ -404,14 +396,14 @@ public:
 	/**
 	 * Returns the channel topic (if TOPIC_TRACK is defined)
 	 */
-    	const string& getTopic() const
+    	const std::string& getTopic() const
 		{ return topic; }
 
 	/**
 	 * Sets this channel's topic value to the value passed in.
 	 * This method exists only if TOPIC_TRACK is defined.
 	 */
-	void setTopic(const string& _Topic)
+	void setTopic(const std::string& _Topic)
 		{ topic = _Topic; }
 	
 #endif	
@@ -430,14 +422,15 @@ public:
 	/**
 	 * Return a level 2 ban for the given user.
 	 */
-	static string createBan( const iClient* ) ;
+	static std::string createBan( const iClient* ) ;
 
 protected:
 
 	/**
 	 * Handle one or more "simple" mode changes.
 	 */
-	virtual void	onMode( const vector< pair< bool, modeType > >& ) ;
+	virtual void	onMode( const std::vector<
+				std::pair< bool, modeType > >& ) ;
 
 	/**
 	 * This method is called when channel mode 'l' is set
@@ -449,21 +442,21 @@ protected:
 	 * This method is called when channel mode 'k' is set
 	 * or unset.
 	 */
-	virtual void	onModeK( bool, const string& ) ;
+	virtual void	onModeK( bool, const std::string& ) ;
 
 	/**
 	 * This method is called when one or more channel
 	 * mode (t)'s is/are set or unset.
 	 */
-	virtual void	onModeO( const vector<
-				pair< bool, ChannelUser* > >& ) ;
+	virtual void	onModeO( const std::vector<
+				std::pair< bool, ChannelUser* > >& ) ;
 
 	/**
 	 * This method is called when one or more channel
 	 * mode (v)'s is/are set or unset.
 	 */
-	virtual void	onModeV( const vector<
-				pair< bool, ChannelUser* > >& ) ;
+	virtual void	onModeV( const std::vector<
+				std::pair< bool, ChannelUser* > >& ) ;
 
 	/**
 	 * This method is called when one or more channel
@@ -472,12 +465,13 @@ protected:
 	 * bans that have been removed as a result of newly added
 	 * overlapping bans.
 	 */
-	virtual void	onModeB( vector< pair< bool, string > >& ) ;
+	virtual void	onModeB( std::vector<
+				std::pair< bool, std::string > >& ) ;
 
 	/**
 	 * The name of this channel.
 	 */
-	string		name ;
+	std::string	name ;
 
 	/**
 	 * The time at which this channel was created.
@@ -501,7 +495,7 @@ protected:
 	 * Note that this variable may hold values
 	 * even when channel mode +k is NOT set.
 	 */
-	string		key ;
+	std::string	key ;
 
 	/**
 	 * The structure used to hold the ChannelUser
@@ -518,7 +512,7 @@ protected:
 	/**
 	 * This channel's topic, only if TOPIC_TRACK is defined.
 	 */
-	string		topic;
+	std::string	topic;
 #endif
 
 } ;

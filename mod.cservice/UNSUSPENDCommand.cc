@@ -23,9 +23,10 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: UNSUSPENDCommand.cc,v 1.21 2003/06/28 01:21:20 dan_karrels Exp $
+ * $Id: UNSUSPENDCommand.cc,v 1.22 2003/12/29 23:59:37 dan_karrels Exp $
  */
 
+#include	<iostream>
 #include	<string>
 
 #include	"StringTokenizer.h"
@@ -35,7 +36,7 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char UNSUSPENDCommand_cc_rcsId[] = "$Id: UNSUSPENDCommand.cc,v 1.21 2003/06/28 01:21:20 dan_karrels Exp $" ;
+const char UNSUSPENDCommand_cc_rcsId[] = "$Id: UNSUSPENDCommand.cc,v 1.22 2003/12/29 23:59:37 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -212,7 +213,7 @@ if( !aLevel->commit() )
 	bot->Notice( theClient,
 		"Error updating channel status." ) ;
 	elog	<< "UNSUSPEND> SQL error"
-		<< endl ;
+		<< std::endl ;
 	return false ;
 	}
 

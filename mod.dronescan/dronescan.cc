@@ -16,10 +16,13 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: dronescan.cc,v 1.44 2003/12/17 18:21:36 dan_karrels Exp $
+ * $Id: dronescan.cc,v 1.45 2003/12/29 23:59:38 dan_karrels Exp $
  */
 
 #include	<string>
+#include	<vector>
+#include	<sstream>
+#include	<iostream>
 
 #include <cstdarg>	/* va_list */
 #include <cstdio>	/* *printf() */
@@ -42,7 +45,7 @@
 #include "sqlUser.h"
 #include "Timer.h"
 
-RCSTAG("$Id: dronescan.cc,v 1.44 2003/12/17 18:21:36 dan_karrels Exp $");
+RCSTAG("$Id: dronescan.cc,v 1.45 2003/12/29 23:59:38 dan_karrels Exp $");
 
 namespace gnuworld {
 
@@ -116,7 +119,7 @@ jcCutoff = atoi(dronescanConfig->Require("jcCutoff")->second.c_str());
 rcInterval = atoi(dronescanConfig->Require("rcInterval")->second.c_str());
 
 /* Set up variables that our tests will need */
-typedef vector<string> testVarsType;
+typedef std::vector<string> testVarsType;
 testVarsType testVars;
 
 /* Cycle over tests to get configuration variable name */
@@ -135,11 +138,11 @@ for( testVarsType::const_iterator itr = testVars.begin() ;
 		elog	<< "dronescan> Test " << theTest->getName()
 			<< " accepted parameter " << *itr
 			<< " @ " << theValue
-			<< endl;
+			<< std::endl;
 	} else {
 		elog	<< "dronescan> No test accepted variable: "
 			<< *itr << " @ " << theValue
-			<< endl;
+			<< std::endl;
 		::exit(1);
 	}
 }
@@ -151,24 +154,24 @@ string sqlDB(dronescanConfig->Require("sqlDB")->second);
 string sqlUser(dronescanConfig->Require("sqlUser")->second);
 string sqlPass(dronescanConfig->Require("sqlPass")->second);
 
-stringstream connectString;
+std::stringstream connectString;
 connectString	<< "host=" << sqlHost << " "
 		<< "port=" << sqlPort << " "
 		<< "dbname=" << sqlDB << " "
 		<< "user=" << sqlUser << " "
 		<< "password=" << sqlPass
 		;
-elog << "dronescan::dronescan> Connecting to SQL Server." << endl;
+elog << "dronescan::dronescan> Connecting to SQL Server." << std::endl;
 
 SQLDb = new PgDatabase(connectString.str().c_str());
 if(SQLDb->ConnectionBad()) {
 	elog	<< "dronescan> Failed to connect to SQL server: "
 		<< SQLDb->ErrorMessage()
-		<< endl;
+		<< std::endl;
 	::exit(0);
 }
 
-elog << "dronescan> Established connection to SQL server." << endl;
+elog << "dronescan> Established connection to SQL server." << std::endl;
 
 /* Preload caches */
 preloadFakeClientCache();
@@ -567,7 +570,7 @@ if(!MyUplink->UnRegisterTimer(tidClearJoinCounter, 0) ||
    !MyUplink->UnRegisterTimer(tidClearActiveList, 0)) {
 	elog	<< "dronescan::~dronescan> "
 		<< "Could not unregister timer. Expect problems shortly."
-		<< endl;
+		<< std::endl;
 }
 
 /* Done! */
@@ -615,7 +618,7 @@ void dronescan::OnTimer( xServer::timerID theTimer , void *)
 				elog	<< "dronescan::OnTimer> Unable "
 					<< "to find channel: "
 					<< itr->first
-					<< endl ;
+					<< std::endl ;
 				continue ;
 				}
 
@@ -656,10 +659,10 @@ void dronescan::doSqlError(const string& theQuery, const string& theError)
 	/* First, log it to error out */
 	elog	<< "SQL> Whilst executing: "
 		<< theQuery
-		<< endl;
+		<< std::endl;
 	elog	<< "SQL> "
 		<< theError
-		<< endl;
+		<< std::endl;
 }
  
 /** This function allows us to change our current state. */
@@ -679,13 +682,13 @@ void dronescan::changeState(DS_STATE newState)
 			calculateEntropy();
 			setNickStates();
 			elog	<< "*** DroneScan: Exiting state BURST"
-				<< endl;
+				<< std::endl;
 			break;
 			}
 		case RUN :
 			{
 			elog	<< "*** DroneScan: Exiting state RUN"
-				<< endl;
+				<< std::endl;
 			}
 		}
 
@@ -697,13 +700,13 @@ void dronescan::changeState(DS_STATE newState)
 			{
 			charMap.clear();
 			elog	<< "*** DroneScan: Entering state BURST"
-				<< endl;
+				<< std::endl;
 			break;
 			}
 		case RUN   : 
 			{
 			elog	<< "*** DroneScan: Entering state RUN"
-				<< endl;
+				<< std::endl;
 			checkChannels();
 			break;
 			}
@@ -743,7 +746,8 @@ void dronescan::calculateEntropy()
 	
 	theTimer->Start();
 	
-	elog << "dronescan::calculateEntropy> Calculating frequencies." << endl;
+	elog << "dronescan::calculateEntropy> Calculating frequencies."
+		<< std::endl;
 	/* First, learn the entropy from all nicks */
 	for( xNetwork::const_clientIterator ptr = Network->clients_begin() ;
 	     ptr != Network->clients_end() ; ++ptr)
@@ -760,14 +764,16 @@ void dronescan::calculateEntropy()
 	
 	theTimer->Start();
 	
-	elog << "dronescan::calculateEntropy> Normalising frequencies." << endl;
+	elog << "dronescan::calculateEntropy> Normalising frequencies."
+		<< std::endl;
 	for( charMapType::iterator itr = charMap.begin() ;
 	     itr != charMap.end(); ++itr)
 		itr->second /= totalNicks;
 	
 	log(DBG, "Normalised frequencies in: %u ms", theTimer->stopTimeMS());
 	
-	elog << "dronescan::calculateEntropy> Calculating average entropy." << endl;
+	elog << "dronescan::calculateEntropy> Calculating average entropy."
+		<< std::endl;
 
 	double totalEntropy = 0;
 	
@@ -804,7 +810,8 @@ double dronescan::calculateEntropy( const iClient *theClient )
 /** Calculate state of all nicks. */
 void dronescan::setNickStates()
 {
-	elog << "dronescan::setNickStates> Finding states of all nicks." << endl;
+	elog << "dronescan::setNickStates> Finding states of all nicks."
+		<< std::endl;
 	
 	theTimer->Start();
 	
@@ -886,7 +893,7 @@ bool dronescan::checkChannel( const Channel *theChannel , const iClient *theClie
 	if(failed >= voteCutoff)
 		{
 		/* This channel is voted abnormal. */
-		stringstream chanStat, chanParams;
+		std::stringstream chanStat, chanParams;
 		if(theChannel->getMode(Channel::MODE_I)) chanStat << "i";
 		if(theChannel->getMode(Channel::MODE_R)) chanStat << "r";
 		
@@ -995,7 +1002,7 @@ void dronescan::log(LOG_TYPE logType, const char *format, ...)
 {
 	if(logType < consoleLevel) return;
 	
-	stringstream newMessage;
+	std::stringstream newMessage;
 	
 	switch(logType) {
 		case DBG	: newMessage << "[D] ";	break;
@@ -1021,7 +1028,7 @@ void dronescan::log(LOG_TYPE logType, const char *format, ...)
 /** Set the topic of the console channel. */
 void dronescan::setConsoleTopic()
 {
-	stringstream setTopic;
+	std::stringstream setTopic;
 	setTopic	<< getCharYYXXX() << " T "
 			<< consoleChannel << " :"
 			;
@@ -1070,7 +1077,7 @@ sqlUser *dronescan::getSqlUser(const string& theNick)
 /** Are we due an update? */
 bool dronescan::updateDue(string _table)
 {
-	stringstream check;
+	std::stringstream check;
 	check	<< "SELECT max(last_updated) FROM " << _table;
 	
 	ExecStatusType status = SQLDb->Exec(check.str().c_str());
@@ -1094,7 +1101,7 @@ void dronescan::preloadFakeClientCache()
 	/* Are we due to update? */
 	if(!updateDue("FAKECLIENTS")) return;
 	
-	stringstream theQuery;
+	std::stringstream theQuery;
 	theQuery	<< sql::fakeclients ;
 	
 	if(!SQLDb->ExecTuplesOk(theQuery.str().c_str())) {
@@ -1144,7 +1151,7 @@ void dronescan::preloadFakeClientCache()
 	elog	<< "dronescan::preloadFakeClientCache> Loaded "
 		<< fakeClients.size()
 		<< " fake clients."
-		<< endl;
+		<< std::endl;
 	log(INFO, "Loaded %u fake clients.", fakeClients.size());
 }
 
@@ -1155,7 +1162,7 @@ void dronescan::preloadUserCache()
 	/* Are we due to update? */
 	if(!updateDue("USERS")) return;
 
-	stringstream theQuery;
+	std::stringstream theQuery;
 	theQuery	<< "SELECT user_name,last_seen,last_updated_by,last_updated,flags,access,created "
 			<< "FROM users"
 			;
@@ -1185,8 +1192,7 @@ void dronescan::preloadUserCache()
 	elog	<< "dronescan::preloadUserCache> Loaded "
 		<< userMap.size()
 		<< " users."
-		<< endl
-		;
+		<< std::endl ;
 }
 
 

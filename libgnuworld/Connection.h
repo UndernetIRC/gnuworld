@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: Connection.h,v 1.5 2003/12/17 18:21:36 dan_karrels Exp $
+ * $Id: Connection.h,v 1.6 2003/12/29 23:59:36 dan_karrels Exp $
  */
 
 #ifndef __CONNECTION_H
-#define __CONNECTION_H "$Id: Connection.h,v 1.5 2003/12/17 18:21:36 dan_karrels Exp $"
+#define __CONNECTION_H "$Id: Connection.h,v 1.6 2003/12/29 23:59:36 dan_karrels Exp $"
 
 #include	<sys/types.h>
 #include	<netinet/in.h>
@@ -38,12 +38,6 @@
 
 namespace gnuworld
 {
-
-/// Import the C++ standard string class
-using std::string ;
-
-using std::ostream ;
-using std::endl ;
 
 /// Forward declaration of the manager class
 class ConnectionManager ;
@@ -75,7 +69,7 @@ public:
 	 * a valid hostname, or a string representation of the
 	 * Connection's IP address.
 	 */
-	inline const string&	getHostname() const
+	inline const std::string&	getHostname() const
 		{ return hostname ; }
 
 	/**
@@ -83,7 +77,7 @@ public:
 	 * The IP may be empty if it represents a listening
 	 * socket.
 	 */
-	inline const string&	getIP() const
+	inline const std::string&	getIP() const
 		{ return IP ; }
 
 	/**
@@ -142,7 +136,7 @@ public:
 	/**
 	 * Append a string to the Connection's output buffer.
 	 */
-	virtual void		Write( const string& ) ;
+	virtual void		Write( const std::string& ) ;
 
 	/**
 	 * Return the flags of this connection.
@@ -238,7 +232,8 @@ public:
 	 * This friend operator allows for the easy output of a
 	 * Connection object to a given output stream.
 	 */
-	friend ostream& operator<<( ostream& out, const Connection& con )
+	friend std::ostream& operator<<( std::ostream& out, const 
+			Connection& con )
 		{
 		out	<< "Host: " << con.getHostname()
 			<< ", IP: " << con.getIP()
@@ -288,7 +283,7 @@ protected:
 	 * Create a new instance of this class given the remote
 	 * host (may be empty), the IP, remote port number.
 	 */
-	Connection( const string& host,
+	Connection( const std::string& host,
 			const unsigned short int remotePort,
 			const char delimiter ) ;
 
@@ -371,13 +366,13 @@ protected:
 	/**
 	 * Set the Connection's IP to the new IP
 	 */
-	inline void	setIP( const string& newIP )
+	inline void	setIP( const std::string& newIP )
 		{ IP = newIP ; }
 
 	/**
 	 * Set the Connection's hostname to newHost
 	 */
-	inline void	setHostname( const string& newHost )
+	inline void	setHostname( const std::string& newHost )
 		{ hostname = newHost ; }
 
 	/**
@@ -403,7 +398,7 @@ protected:
 	 * The remote hostname of this connection
 	 * This variable is empty() if this Connection is a listener
 	 */
-	string			hostname ;
+	std::string		hostname ;
 
 	/**
 	 * The local port number of this connection
@@ -429,7 +424,7 @@ protected:
 	 * The remote IP of this connection
 	 * This variable is empty() if this Connection is a listener
 	 */
-	string			IP ;
+	std::string		IP ;
 
 	/**
 	 * The socket (file) descriptor for the socket of this

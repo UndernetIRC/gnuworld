@@ -22,11 +22,13 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: events.h,v 1.16 2003/06/07 14:38:58 dan_karrels Exp $
+ * $Id: events.h,v 1.17 2003/12/29 23:59:36 dan_karrels Exp $
  */
 
 #ifndef __EVENTS_H
-#define __EVENTS_H "$Id: events.h,v 1.16 2003/06/07 14:38:58 dan_karrels Exp $"
+#define __EVENTS_H "$Id: events.h,v 1.17 2003/12/29 23:59:36 dan_karrels Exp $"
+
+#include	<string>
 
 namespace gnuworld
 {
@@ -125,7 +127,7 @@ typedef int channelEventType ;
  *  2) ChannelUser*
  */
 
-const string eventNames[] = {
+const std::string eventNames[] = {
 	"Oper Up", /* EVT_OPER */
 	"Net Break", /* EVT_NETBREAK */
 	"Net Join", /* EVT_NETJOIN */

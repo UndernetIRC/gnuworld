@@ -20,7 +20,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
  * USA.
  *
- * $Id: cloner.cc,v 1.31 2003/11/11 19:21:29 dan_karrels Exp $
+ * $Id: cloner.cc,v 1.32 2003/12/29 23:59:37 dan_karrels Exp $
  */
 
 #include	<new>
@@ -43,7 +43,7 @@
 #include	"misc.h"
 #include	"ELog.h"
 
-RCSTAG("$Id: cloner.cc,v 1.31 2003/11/11 19:21:29 dan_karrels Exp $");
+RCSTAG("$Id: cloner.cc,v 1.32 2003/12/29 23:59:37 dan_karrels Exp $");
 
 namespace gnuworld
 {
@@ -330,7 +330,7 @@ else if( command == "JOINALL" )
 		chanName.insert( chanName.begin(), '#' ) ;
 		}
 
-	for( list< iClient* >::const_iterator ptr = clones.begin(),
+	for( std::list< iClient* >::const_iterator ptr = clones.begin(),
 		endPtr = clones.end() ; ptr != endPtr ; ++ptr )
 		{
 		stringstream s ;
@@ -358,7 +358,7 @@ else if( command == "PARTALL" )
 			chanName.insert( chanName.begin(), '#' ) ;
 			}
 
-		for( list< iClient* >::const_iterator ptr = clones.begin(),
+		for( std::list< iClient* >::const_iterator ptr = clones.begin(),
 			endPtr = clones.end() ; ptr != endPtr ; ++ptr )
 			{
 			stringstream s ;
@@ -379,7 +379,7 @@ else if( command == "PARTALL" )
 
 		string partReason( st.assemble(2).c_str() ) ;
 
-		for( list< iClient* >::const_iterator ptr = clones.begin(),
+		for( std::list< iClient* >::const_iterator ptr = clones.begin(),
 			endPtr = clones.end() ; ptr != endPtr ; ++ptr )
 			{
 			stringstream s ;
@@ -408,7 +408,7 @@ else if( command == "KILLALL" || command == "QUITALL" )
 		quitMsg = st.assemble( 1 ) ;
 		}
 
-	for( list< iClient* >::const_iterator ptr = clones.begin(),
+	for( std::list< iClient* >::const_iterator ptr = clones.begin(),
 		endPtr = clones.end() ; ptr != endPtr ; ++ptr )
 		{
 		if( MyUplink->DetachClient( *ptr, quitMsg ) )
@@ -443,7 +443,7 @@ else if( command == "SAYALL" || command == "MSGALL" )
 		chanOrNickName = Target->getCharYYXXX();
 	        }
 
-	for( list< iClient* >::const_iterator ptr = clones.begin(),
+	for( std::list< iClient* >::const_iterator ptr = clones.begin(),
 		endPtr = clones.end() ; ptr != endPtr ; ++ptr )
 		{
 		stringstream s ;
@@ -481,7 +481,7 @@ else if( command == "ACTALL" || command == "DOALL" ||
 		chanOrNickName = Target->getCharYYXXX();
 	        }
 
-	for( list< iClient* >::const_iterator ptr = clones.begin(),
+	for( std::list< iClient* >::const_iterator ptr = clones.begin(),
 		endPtr = clones.end() ; ptr != endPtr ; ++ptr )
 		{
 		stringstream s ;
@@ -519,7 +519,7 @@ else if( command == "NOTICEALL" )
 		chanOrNickName = Target->getCharYYXXX();
 		}
 	
-	for( list< iClient* >::const_iterator ptr = clones.begin(),
+	for( std::list< iClient* >::const_iterator ptr = clones.begin(),
 		endPtr = clones.end() ; ptr != endPtr ; ++ptr )
 		{
 		stringstream s ;
@@ -635,7 +635,7 @@ return c ;
 
 bool cloner::hasAccess( const string& accountName ) const
 {
-for( list< string >::const_iterator itr = allowAccess.begin() ;
+for( std::list< string >::const_iterator itr = allowAccess.begin() ;
 	itr != allowAccess.end() ; ++itr )
 	{
 	if( !strcasecmp( accountName, *itr ) )

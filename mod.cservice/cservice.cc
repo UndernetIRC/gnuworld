@@ -18,10 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: cservice.cc,v 1.239 2003/12/04 11:22:10 mrbean_ Exp $
+ * $Id: cservice.cc,v 1.240 2003/12/29 23:59:37 dan_karrels Exp $
  */
 
 #include	<new>
+#include	<map>
 #include	<vector>
 #include	<iostream>
 #include	<sstream>
@@ -55,6 +56,7 @@
 namespace gnuworld
 {
 
+using std::pair ;
 using std::vector ;
 using std::endl ;
 using std::stringstream ;

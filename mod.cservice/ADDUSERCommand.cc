@@ -26,9 +26,10 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ADDUSERCommand.cc,v 1.24 2003/06/28 01:21:20 dan_karrels Exp $
+ * $Id: ADDUSERCommand.cc,v 1.25 2003/12/29 23:59:37 dan_karrels Exp $
  */
 
+#include	<map>
 #include	<string>
 #include	<sstream>
 #include	<iostream>
@@ -41,11 +42,12 @@
 #include	"responses.h"
 #include	"cservice_config.h"
 
-const char ADDUSERCommand_cc_rcsId[] = "$Id: ADDUSERCommand.cc,v 1.24 2003/06/28 01:21:20 dan_karrels Exp $" ;
+const char ADDUSERCommand_cc_rcsId[] = "$Id: ADDUSERCommand.cc,v 1.25 2003/12/29 23:59:37 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
 
+using std::pair ;
 using std::endl ;
 using std::ends ;
 using std::string ;

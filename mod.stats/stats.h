@@ -17,11 +17,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: stats.h,v 1.16 2003/11/26 23:30:22 dan_karrels Exp $
+ * $Id: stats.h,v 1.17 2003/12/29 23:59:38 dan_karrels Exp $
  */
 
 #ifndef __STATS_H
-#define __STATS_H "$Id: stats.h,v 1.16 2003/11/26 23:30:22 dan_karrels Exp $"
+#define __STATS_H "$Id: stats.h,v 1.17 2003/12/29 23:59:38 dan_karrels Exp $"
 
 #include	<fstream>
 #include	<string>
@@ -35,18 +35,13 @@
 namespace gnuworld
 {
 
-using std::ofstream ;
-using std::string ;
-using std::list ;
-using std::map ;
-
 class stats : public xClient
 {
 public:
 	/**
 	 * Create a new stats object, given its configuration filename.
 	 */
-	stats( const string& ) ;
+	stats( const std::string& ) ;
 
 	/**
 	 * Destroy a stats object.
@@ -64,41 +59,42 @@ public:
 	 * This method is invoked when someone sends a private
 	 * message to the stats bot.
 	 */
-	virtual void OnPrivateMessage( iClient*, const string&,
+	virtual void OnPrivateMessage( iClient*, const std::string&,
 		bool = false ) ;
 
 	/**
 	 * This method is invoked when someone sends a private
 	 * message CTCP to the stats bot.
 	 */
-	virtual void OnCTCP( iClient*, const string&,
-		const string&, bool = false ) ;
+	virtual void OnCTCP( iClient*, const std::string&,
+		const std::string&, bool = false ) ;
 
 	/**
 	 * This method is invoked when someone sends a channel
 	 * message to the stats bot.
 	 */
 	virtual void OnChannelMessage( iClient*, Channel*,
-		const string& ) ;
+		const std::string& ) ;
 
 	/**
 	 * This method is invoked when someone sends a channel
 	 * CTCP to the stats bot.
 	 */
 	virtual void OnChannelCTCP( iClient*, Channel*,
-		const string&, const string& ) ;
+		const std::string&, const std::string& ) ;
 
 	/**
 	 * This method is invoked when someone sends a private
 	 * notice to the stats bot.
 	 */
-	virtual void OnPrivateNotice( iClient*, const string&, bool ) ;
+	virtual void OnPrivateNotice( iClient*, const std::string&, bool ) ;
 
 	/**
 	 * This method is invoked when someone sends a channel
 	 * notice to the stats bot.
 	 */
-	virtual void OnChannelNotice( iClient*, Channel*, const string& ) ;
+	virtual void OnChannelNotice( iClient*, Channel*,
+				const std::string& ) ;
 
 	/**
 	 * This method is called when a general network event
@@ -120,7 +116,7 @@ public:
 	 * This method is invoked when a channel kick occurs.
 	 */
 	virtual void OnNetworkKick( Channel*, iClient*,
-		iClient*, const string&, bool ) ;
+		iClient*, const std::string&, bool ) ;
 
 	/**
 	 * This method is called when a registered timer
@@ -132,14 +128,14 @@ public:
 	 * Return the part message stats will use when it parts
 	 * a channel.
 	 */
-	inline const string&	getPartMessage() const
+	inline const std::string&	getPartMessage() const
 		{ return partMessage ; }
 
 	/**
 	 * Set the part message stats will use when it parts
 	 * a channel.
 	 */
-	inline void		setPartMessage( const string& newVal )
+	inline void		setPartMessage( const std::string& newVal )
 		{ partMessage = newVal ; }
 
 	/**
@@ -162,7 +158,7 @@ protected:
 	 * Return true if the given account name is permitted
 	 * access to this module.
 	 */
-	virtual bool		hasAccess( const string& ) const ;
+	virtual bool		hasAccess( const std::string& ) const ;
 
 	/// True if the stats should log during net burst (of gnuworld)
 	bool			logDuringBurst ;
@@ -171,14 +167,14 @@ protected:
 	bool			allowOpers ;
 
 	/// list of account names who can use this service
-	list< string >		allowAccess ;
+	std::list< std::string >	allowAccess ;
 
 	/// The path to the directory in which to store the logs files.
 	/// If the path does not exist, it will NOT be created.
-	string			data_path ;
+	std::string		data_path ;
 
 	/// The message to use when parting a channel.
-	string			partMessage ;
+	std::string		partMessage ;
 
 	/// The absolute time at which stats collection began.
 	time_t			startTime ;
@@ -195,15 +191,15 @@ protected:
 
 	/// This variable holds pointers to the individual
 	/// log files.
-	ofstream		fileTable[ EVT_CREATE + 1 ] ;
+	std::ofstream		fileTable[ EVT_CREATE + 1 ] ;
 
 	/// The name of the file to which channel information will
 	/// be written.
-	string			channelInfoFileName ;
+	std::string		channelInfoFileName ;
 
 	/// The name of the file to which user information will be
 	// written.
-	string			userInfoFileName ;
+	std::string		userInfoFileName ;
 } ;
 
 } // namespace gnuworld

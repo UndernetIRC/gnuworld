@@ -18,28 +18,20 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ConnectionHandler.h,v 1.2 2003/07/03 00:25:48 dan_karrels Exp $
+ * $Id: ConnectionHandler.h,v 1.3 2003/12/29 23:59:36 dan_karrels Exp $
  */
 
 #ifndef __CONNECTIONHANDLER_H
-#define __CONNECTIONHANDLER_H "$Id: ConnectionHandler.h,v 1.2 2003/07/03 00:25:48 dan_karrels Exp $"
+#define __CONNECTIONHANDLER_H "$Id: ConnectionHandler.h,v 1.3 2003/12/29 23:59:36 dan_karrels Exp $"
 
 #include	<sys/types.h>
 
 #include	<string>
-#include	<list>
-#include	<map>
-
-#include	<ctime>
 
 #include	"Connection.h"
 
 namespace gnuworld
 {
-
-using std::string ;
-using std::list ;
-using std::multimap ;
 
 class ConnectionManager ;
 
@@ -96,7 +88,7 @@ public:
 	 * the delimiter passed to the constructor of the associated
 	 * ConnectionManager instance.
 	 */
-	virtual void	OnRead( Connection*, const string& ) ;
+	virtual void	OnRead( Connection*, const std::string& ) ;
 
 	/**
 	 * This is a handler method called when a connection is

@@ -16,8 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: nickserv.cc,v 1.22 2003/11/26 23:30:22 dan_karrels Exp $
+ * $Id: nickserv.cc,v 1.23 2003/12/29 23:59:38 dan_karrels Exp $
  */
+
+#include	<sstream>
+#include	<iostream>
  
 #include <cstdarg>
 
@@ -28,7 +31,7 @@
 #include "netData.h"
 #include "nickserv.h"
 
-RCSTAG("$Id: nickserv.cc,v 1.22 2003/11/26 23:30:22 dan_karrels Exp $");
+RCSTAG("$Id: nickserv.cc,v 1.23 2003/12/29 23:59:38 dan_karrels Exp $");
 
 namespace gnuworld
 {
@@ -136,7 +139,7 @@ void nickserv::log(const eventType& theEvent, const string& _theMessage)
     if(!theUser) {
       // Something very odd is going on
       elog << "*** [nickserv::log] User in queue but not logged in: "
-        << theClient->getNickName() << endl;
+        << theClient->getNickName() << std::endl;
     }
     
     if(theUser->getLogMask() & theEvent) {
@@ -164,7 +167,7 @@ MyUplink->JoinChannel(this, consoleChannel, nickservConfig->Require("consoleChan
 
 MyUplink->RegisterChannelEvent(consoleChannel, this);
 
-stringstream setTopic;
+std::stringstream setTopic;
 setTopic << getCharYYXXX() << " T "
          << consoleChannel << " :"
          << "Current NickServ console level: ["
@@ -395,13 +398,13 @@ return commandMap.insert( commandPairType(theCommand->getName(), theCommand)).se
  */
 void nickserv::precacheUsers()
 {
-elog << "*** [NickServ:precacheUsers] Precaching users." << endl;
+elog << "*** [NickServ:precacheUsers] Precaching users." << std::endl;
 
 /* Get a connection instance to our backend */
 PgDatabase* cacheCon = theManager->getConnection();
 
 /* Retrieve the list of registered users */
-stringstream cacheQuery;
+std::stringstream cacheQuery;
 cacheQuery << "SELECT id,name,flags,level,lastseen_ts,registered_ts,logmask"
   << " FROM users";
 
@@ -416,13 +419,13 @@ if(cacheCon->ExecTuplesOk(cacheQuery.str().c_str())) {
 } else {
   elog << "*** [NickServ:precacheUsers] Error executing query: "
     << cacheCon->ErrorMessage()
-    << endl;
+    << std::endl;
   ::exit(0);
 }
 
 elog << "*** [NickServ:precacheUsers] Done. Loaded a total of "
   << sqlUserCache.size() << " user records."
-  << endl;
+  << std::endl;
 
 /* Dispose of our connection instance */
 theManager->removeConnection(cacheCon);

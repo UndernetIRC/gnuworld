@@ -19,19 +19,17 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, 
  * USA.
  *
- * $Id: Buffer.h,v 1.6 2003/12/17 18:21:36 dan_karrels Exp $
+ * $Id: Buffer.h,v 1.7 2003/12/29 23:59:36 dan_karrels Exp $
  */
 
 #ifndef __BUFFER_H
-#define __BUFFER_H "$Id: Buffer.h,v 1.6 2003/12/17 18:21:36 dan_karrels Exp $"
+#define __BUFFER_H "$Id: Buffer.h,v 1.7 2003/12/29 23:59:36 dan_karrels Exp $"
 
 #include	<iostream>
 #include	<string>
 
 namespace gnuworld
 {
-
-using std::string ;
 
 /**
  * This class represents a dynamic buffer capable or parsing out
@@ -70,13 +68,13 @@ public:
 	 * passed as argument, erasing the line from
 	 * the Buffer once complete.
 	 */
-	virtual bool		ReadLine( string& ) ;
+	virtual bool		ReadLine( std::string& ) ;
 
 	/**
 	 * Define the type of the variable used to maintain
 	 * size (number of bytes) of Buffer.
 	 */
-	typedef string::size_type size_type ;
+	typedef std::string::size_type size_type ;
 
 	/**
 	 * Return the the number of characters currently in
@@ -118,7 +116,7 @@ public:
 	 * This method is const, and therefore does not alter the
 	 * Buffer.
 	 */
-	inline string	substr( const size_type& index,
+	inline std::string	substr( const size_type& index,
 				const size_type& len ) const
 		{ return buf.substr( index, len ) ; }
 
@@ -126,14 +124,14 @@ public:
 	 * Return a const reference to a C++ string
 	 * representation of this Buffer.
 	 */
-	inline const string&	toString() const
+	inline const std::string&	toString() const
 		{ return buf ; }
 
 	/**
 	 * Return a const reference to a C++ string representation
 	 * of this Buffer.
 	 */
-	inline const string&	operator*() const
+	inline const std::string&	operator*() const
 		{ return buf ; }
 
 	/**
@@ -166,7 +164,7 @@ public:
 	 * Concatenate the given C++ string to the end of the
 	 * Buffer.
 	 */
-	inline Buffer&		operator+=( const string& addMe )
+	inline Buffer&		operator+=( const std::string& addMe )
 		{ buf += addMe ; return *this ; }
 
 	/**
@@ -180,7 +178,7 @@ public:
 	 * Assign to this Buffer the contents of the C++ string
 	 * passed as argument.
 	 */
-	inline Buffer&		operator=( const string& replaceWithMe )
+	inline Buffer&		operator=( const std::string& replaceWithMe )
 		{ buf = replaceWithMe ; return *this ; }
 
 	/**
@@ -206,7 +204,7 @@ protected:
 	/**
 	 * This is the internal representation of this Buffer.
 	 */
-	string		buf ;
+	std::string	buf ;
 
 	/**
 	 * This is the delimiting character.

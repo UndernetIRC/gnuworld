@@ -17,11 +17,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: iClient.h,v 1.39 2003/08/09 23:15:33 dan_karrels Exp $
+ * $Id: iClient.h,v 1.40 2003/12/29 23:59:36 dan_karrels Exp $
  */
 
 #ifndef __ICLIENT_H
-#define __ICLIENT_H "$Id: iClient.h,v 1.39 2003/08/09 23:15:33 dan_karrels Exp $"
+#define __ICLIENT_H "$Id: iClient.h,v 1.40 2003/12/29 23:59:36 dan_karrels Exp $"
 
 #include	<string>
 #include	<list>
@@ -35,10 +35,6 @@
 
 namespace gnuworld
 {
-
-using std::string ;
-using std::list ;
-using std::map ;
 
 class xClient ;
 
@@ -57,7 +53,7 @@ protected:
 	 * The type used to hold channel patronage information
 	 * for each particular user.
 	 */
-	typedef list< Channel* > channelListType ;
+	typedef std::list< Channel* > channelListType ;
 
 public:
 
@@ -109,15 +105,15 @@ public:
 	 * parameters for the client's state.
 	 */
 	iClient( const unsigned int& _uplink,
-		const string& _yyxxx,
-		const string& _nickName,
-		const string& _userName,
-		const string& _hostBase64,
-		const string& _insecureHost,
-		const string& _realInsecureHost,
-		const string& _mode,
-		const string& _account,
-		const string& _description,
+		const std::string& _yyxxx,
+		const std::string& _nickName,
+		const std::string& _userName,
+		const std::string& _hostBase64,
+		const std::string& _insecureHost,
+		const std::string& _realInsecureHost,
+		const std::string& _mode,
+		const std::string& _account,
+		const std::string& _description,
 		const time_t& _connectTime ) ;
 
 	/**
@@ -132,43 +128,43 @@ public:
 	/**
 	 * Retrieve the iClient's nick name.
 	 */
-	inline const string& getNickName() const
+	inline const std::string& getNickName() const
 		{ return nickName ; }
 
 	/**
 	 * Retrieve the iClient's user name.
 	 */
-	inline const string& getUserName() const
+	inline const std::string& getUserName() const
 		{ return userName ; }
 
 	/**
 	 * Retrieve the iClient's host name, NOT IP.
 	 */
-	inline const string& getInsecureHost() const
+	inline const std::string& getInsecureHost() const
 		{ return insecureHost ;}
 
 	/**
 	 * Retrieve the iClient's 'real' host name.
 	 */
-	inline const string& getRealInsecureHost() const
+	inline const std::string& getRealInsecureHost() const
 		{ return realInsecureHost ;}
 
 	/**
 	 * Retrieve a string of the form: nick!user@host for this user.
 	 */
-	inline const string getNickUserHost() const
+	inline const std::string getNickUserHost() const
 		{ return (nickName + '!' + userName + '@' + insecureHost) ; }
 
 	/**
 	 * Retrieve a string of the form: nick!user@real-host for this user.
 	 */
-	inline const string getRealNickUserHost() const
+	inline const std::string getRealNickUserHost() const
 		{ return (nickName + '!' + userName + '@' + realInsecureHost) ; }
 
 	/**
 	 * Retrieve client's 'real-name' field.
 	 */
-	inline const string& getDescription() const
+	inline const std::string& getDescription() const
 		{ return description ; }
 
 	/**
@@ -181,27 +177,27 @@ public:
 	 * This method will set the hidden host suffix.  This value
 	 * is only modified by the xServer on startup.
 	 */
-	inline static void	setHiddenHostSuffix( const string& newVal )
+	inline static void	setHiddenHostSuffix( const std::string& newVal )
 		{ hiddenHostSuffix = newVal ; }
 
 	/**
 	 * Retrieve client's 'account' field.
 	 */
-	inline const string& getAccount() const
+	inline const std::string& getAccount() const
 		{ return account ; }
 
 	/**
 	 * Return the suffix hostname to be appended to the
 	 * user's account name for use with host hiding.
 	 */
-	inline static const string& getHiddenHostSuffix()
+	inline static const std::string& getHiddenHostSuffix()
 		{ return hiddenHostSuffix ; }
 
 	/**
 	 * This method sets user mode +r and records the account
 	 * domain for this network client.
 	 */
-	inline void setAccount( const string& _account )
+	inline void setAccount( const std::string& _account )
 		{
 		account = _account ;
 		setModeR() ;
@@ -288,7 +284,7 @@ public:
 	 * During an iClient's lifetime on the network, the only
 	 * thing that may change is its nickname.
 	 */
-	inline void setNickName( const string& newNick )
+	inline void setNickName( const std::string& newNick )
 		{ nickName = newNick ; }
 
 	// The following methods are used to access and mutate
@@ -476,7 +472,7 @@ public:
 	 * Return a string representation of this iClient's user
 	 * modes.
 	 */
-	const string getStringModes() const ;
+	const std::string getStringModes() const ;
 
 	/**
 	 * Add an xClient's personal data representation to this
@@ -540,7 +536,7 @@ protected:
 	 * modes appropriately.
 	 * This is called by the constructor only.
 	 */
-	void		setModes( const string& ) ;
+	void		setModes( const std::string& ) ;
 
 	// The below variables are ordered to provide
 	// efficient instantiation.  Do not alter order.
@@ -548,11 +544,11 @@ protected:
 	/**
 	 * This client's nick name.
 	 */
-	string		nickName ;
+	std::string	nickName ;
 
 	/** This client's user name.
 	 */
-	string		userName ;
+	std::string	userName ;
 
 	/**
 	 * This client's 32 bit IP, stored in
@@ -564,18 +560,18 @@ protected:
 	 * This client's hostname as it appears to network users.
 	 * (Possibly a hidden-hostname is the user is +x)
 	 */
-	string		insecureHost ;
+	std::string	insecureHost ;
 
 	/**
 	 * This client's actual network hostname, unhidden and
 	 * exposed.
 	 */
-	string		realInsecureHost ;
+	std::string	realInsecureHost ;
 
 	/**
 	 * This client's 'real-name' field data.
 	 */
-	string		description ;
+	std::string	description ;
 
 	/**
 	 * The time at which this iClient connected to the network.
@@ -590,7 +586,7 @@ protected:
 	/**
 	 * This client's "Account".
 	 */
-	string		account ;
+	std::string	account ;
 
 	/**
 	 * The structure used to store which channels this user is in.
@@ -600,7 +596,7 @@ protected:
 	/**
 	 * This is the type used to represent the custom data map.
 	 */
-	typedef map< xClient*, void* >	customDataMapType ;
+	typedef std::map< xClient*, void* >	customDataMapType ;
 
 	/**
 	 * This structure is used to store generic data for
@@ -616,7 +612,7 @@ protected:
 	 * This variable is read from the .conf file, and
 	 * has the form of "mynetwork.org".
 	 */
-	static string			hiddenHostSuffix ;
+	static std::string		hiddenHostSuffix ;
 
 } ;
 

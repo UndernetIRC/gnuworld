@@ -16,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: gnutest.h,v 1.9 2003/12/06 22:11:37 dan_karrels Exp $
+ * $Id: gnutest.h,v 1.10 2003/12/29 23:59:38 dan_karrels Exp $
  */
 
 #ifndef __GNUTEST_H
-#define __GNUTEST_H "$Id: gnutest.h,v 1.9 2003/12/06 22:11:37 dan_karrels Exp $"
+#define __GNUTEST_H "$Id: gnutest.h,v 1.10 2003/12/29 23:59:38 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
@@ -33,9 +33,6 @@
 namespace gnuworld
 {
 
-using std::string ;
-using std::vector ;
-
 /**
  * The purpose of this class is to test new features added to
  * the gnuworld server core.
@@ -47,7 +44,7 @@ public:
 	/**
 	 * Constructor receives name of config file.
 	 */
-	gnutest( const string& ) ;
+	gnutest( const std::string& ) ;
 
 	/**
 	 * Destructor closes all streams and deallocates any memory
@@ -69,8 +66,8 @@ public:
 	 * deallocating timers, closing connections, closing log files,
 	 * and deallocating private data stored in iClients.
 	 */
-	virtual void OnDetach( const string& =
-			string( "Server Shutdown" ) ) ;
+	virtual void OnDetach( const std::string& =
+			std::string( "Server Shutdown" ) ) ;
 
 	/**
 	 * This method is called when the server connects to the network.
@@ -113,7 +110,7 @@ public:
 	 * This method is called when a network client messages
 	 * this client.
 	 */
-	virtual void	OnPrivateMessage( iClient*, const string&,
+	virtual void	OnPrivateMessage( iClient*, const std::string&,
 				bool secure = false ) ;
 
 	/**
@@ -123,7 +120,7 @@ public:
 	 */
 	virtual void OnChannelMessage( iClient* Sender,
 		Channel* theChan,
-		const string& Message ) ;
+		const std::string& Message ) ;
 
 
 	/**
@@ -133,7 +130,7 @@ public:
 	virtual void	OnFakeChannelMessage( iClient* srcClient,
 				iClient* destClient,
 				Channel* theChan,
-				const string& message ) ;
+				const std::string& message ) ;
 
 	/**
 	 * This method is invoked when a fake client belonging to this
@@ -142,7 +139,7 @@ public:
 	virtual void	OnFakeChannelNotice( iClient* srcClient,
 				iClient* destClient,
 				Channel* theChan,
-				const string& message ) ;
+				const std::string& message ) ;
 
 	/**
 	 * This method is called when a network message arrives for
@@ -150,7 +147,7 @@ public:
 	 */
 	virtual void	OnFakePrivateMessage( iClient* srcClient,
 				iClient* destClient,
-				const string& message,
+				const std::string& message,
 				bool secure = false ) ;
 
 	/**
@@ -159,7 +156,7 @@ public:
 	 */
 	virtual void	OnFakePrivateNotice( iClient* srcClient,
 				iClient* destClient,
-				const string& message,
+				const std::string& message,
 				bool secure = false ) ;
 
 	/**
@@ -169,8 +166,8 @@ public:
 	virtual void	OnFakeChannelCTCP( iClient* srcClient,
 				iClient* fakeClient,
 				Channel* theChan,
-				const string& command,
-				const string& message ) ;
+				const std::string& command,
+				const std::string& message ) ;
 
 	/**
 	 * Invoked when a fake client of this xClient receives a
@@ -178,8 +175,8 @@ public:
 	 */
 	virtual void	OnFakeCTCP( iClient* srcClient,
 				iClient* fakeClient,
-				const string& command,
-				const string& message,
+				const std::string& command,
+				const std::string& message,
 				bool secure = false ) ;
 
 	/**
@@ -191,7 +188,7 @@ public:
 	 * This method returns true if the client is on the given
 	 * channel, by name; false otherwise.
 	 */
-	virtual bool	isOnChannel( const string& chanName ) const ;
+	virtual bool	isOnChannel( const std::string& chanName ) const ;
 
 	/**
 	 * This method returned true if the client is on the given
@@ -211,7 +208,7 @@ protected:
 	 * This method is used to add a channel to the internal
 	 * structure of channels which the client is on.
 	 */
-	virtual bool	addChan( const string& ) ;
+	virtual bool	addChan( const std::string& ) ;
 
 	/**
 	 * This method is used to remove a channel from the internal
@@ -223,7 +220,7 @@ protected:
 	 * This method is used to remove a channel from the internal
 	 * structure of channels which the client is on.
 	 */
-	virtual bool	removeChan( const string& ) ;
+	virtual bool	removeChan( const std::string& ) ;
 
 	/**
 	 * Spawn a fake client.
@@ -265,18 +262,18 @@ protected:
 	 * This is the name of the operator only channel on which this
 	 * client sits.
 	 */
-	string		operChan ;
+	std::string	operChan ;
 
 	/**
 	 * I have no idea what this is.
 	 */
-	string		timerChan ;
+	std::string	timerChan ;
 
 	/**
 	 * The data structure used to store the names of channels
 	 * which this channel is on.
 	 */
-	vector< string >	channels ;
+	std::vector< std::string >	channels ;
 
 } ;
 

@@ -1,6 +1,6 @@
 /**********************************************************************
  * $Workfile: MD5.H $
- * $Revision: 1.1 $
+ * $Revision: 1.2 $
  *  $Modtime: 1/08/97 6:35p $
  *
  * PURPOSE:
@@ -59,7 +59,7 @@
  * So there! 
  **********************************************************************/
 #ifndef MD5_H
-#define MD5_H "$Id: md5hash.h,v 1.1 2002/08/07 20:28:06 dan_karrels Exp $"
+#define MD5_H "$Id: md5hash.h,v 1.2 2003/12/29 23:59:36 dan_karrels Exp $"
 
 #include <iostream>
  
@@ -67,9 +67,6 @@
 
 namespace gnuworld
 {
-
-using std::istream ;
-using std::ostream ;
 
 class md5Digest;     // Forward declaration.
 
@@ -104,8 +101,10 @@ private:
 
    friend int      operator==( const md5Digest &lhs, const md5Digest &rhs );
    friend int      operator!=( const md5Digest &lhs, const md5Digest &rhs );
-   friend istream& operator>>( istream& stream,       md5Digest& digest );
-   friend ostream& operator<<( ostream& stream, const md5Digest& digest );
+   friend std::istream& operator>>( std::istream& stream,
+				md5Digest& digest );
+   friend std::ostream& operator<<( std::ostream& stream,
+				const md5Digest& digest );
    friend void     md5::encode( md5Digest &digest );
 };
 

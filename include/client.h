@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: client.h,v 1.50 2003/12/06 22:11:36 dan_karrels Exp $
+ * $Id: client.h,v 1.51 2003/12/29 23:59:36 dan_karrels Exp $
  */
 
 #ifndef __CLIENT_H
-#define __CLIENT_H "$Id: client.h,v 1.50 2003/12/06 22:11:36 dan_karrels Exp $"
+#define __CLIENT_H "$Id: client.h,v 1.51 2003/12/29 23:59:36 dan_karrels Exp $"
 
 #include	<sstream>
 #include	<string>
@@ -35,9 +35,6 @@
 
 namespace gnuworld
 {
-
-using std::stringstream ; 
-using std::string ;
 
 /**
  * This is the public concrete base class that represents
@@ -68,7 +65,7 @@ public:
 	/**
 	 * Construct a new xClient from a config file.
 	 */
-	xClient( const string& ) ;
+	xClient( const std::string& ) ;
 
 	/**
 	 * The primary purpose of this method is do call the
@@ -96,24 +93,24 @@ public:
 	 * Kill will issue a KILL command to the network for
 	 * the given iClient (network generic client).
 	 */
-	virtual bool Kill( iClient*, const string& ) ;
+	virtual bool Kill( iClient*, const std::string& ) ;
 
 	/**
 	 * QuoteAsServer will send data to the network as the
 	 * server itself.  Try to avoid using this method.
 	 */
-	virtual bool QuoteAsServer( const string& Command );
+	virtual bool QuoteAsServer( const std::string& Command );
 
 	/**
 	 * Write a string of data to the network.
 	 */
-	virtual bool Write( const string& s )
+	virtual bool Write( const std::string& s )
 		{ return QuoteAsServer( s ) ; }
 
 	/**
 	 * Write a string of data to the network.
 	 */
-	virtual bool Write( const stringstream& s )
+	virtual bool Write( const std::stringstream& s )
 		{ return QuoteAsServer( s.str() ) ; }
 
 	/**
@@ -124,20 +121,30 @@ public:
 	/**
 	 * ModeAsServer will change modes in a channel as the server.
 	 */
-	virtual bool ModeAsServer( const string& Channel,
-			const string& Mode ) ;	
+	virtual bool ModeAsServer( const std::string& Channel,
+			const std::string& Mode ) ;	
 
 	/**
 	 * Change modes as the server for the given channel.
 	 */
-	virtual bool ModeAsServer( const Channel*, const string& ) ;
+	virtual bool ModeAsServer( const Channel*, const std::string& ) ;
 
 	/**
 	 * Mode is used to set the bot's modes.  If connected to the
 	 * network already, these new modes will be written to the
 	 * network.
 	 */
-	virtual bool Mode( const string& Mode ) ;
+	virtual bool Mode( const std::string& Mode ) ;
+
+	/**
+	 * Issue a clearmode (CM) for the given channel and update
+	 * all internal structures.
+	 * This method will also post a channel event for each
+	 * mode.
+	 */
+	virtual bool ClearMode( Channel* theChan,
+				const std::string& modes,
+				bool modeAsServer = false ) ;
 
 	/**
 	 * OnConnect is called when the server connects to the
@@ -161,8 +168,8 @@ public:
 	 * This method will be invoked when the server is unloading
 	 * the client for whatever reason.
 	 */
-	virtual void	OnDetach( const string& =
-				string( "Server Shutdown") ) ;
+	virtual void	OnDetach( const std::string& =
+				std::string( "Server Shutdown") ) ;
 
 	/**
 	 * OnKill() is called when the client has been KILL'd.
@@ -214,7 +221,7 @@ public:
 	virtual void OnNetworkKick( Channel* theChan,
 			iClient* srcClient, // may be NULL
 			iClient* destClient,
-			const string& kickMessage,
+			const std::string& kickMessage,
 			bool authoritative ) ;
 
 	/**
@@ -246,7 +253,7 @@ public:
 	 * be empty.
 	 */
 	virtual void OnChannelModeK( Channel*, bool polarity,
-			ChannelUser*, const string& ) ;
+			ChannelUser*, const std::string& ) ;
 
 	/**
 	 * This method is invoked when a user sets or removes
@@ -289,8 +296,8 @@ public:
 	 * the client.
 	 */
 	virtual void OnCTCP( iClient* Sender,
-		const string& CTCP,
-		const string& Message,
+		const std::string& CTCP,
+		const std::string& Message,
 		bool Secure = false ) ;
 
 	/**
@@ -299,8 +306,8 @@ public:
 	 */
 	virtual void OnFakeCTCP( iClient* Sender,
 		iClient* fakeClient,
-		const string& CTCP,
-		const string& Message,
+		const std::string& CTCP,
+		const std::string& Message,
 		bool Secure = false ) ;
 
 	/**
@@ -310,8 +317,8 @@ public:
 	 */
 	virtual void OnChannelCTCP( iClient* Sender,
 		Channel* theChan,
-		const string& CTCPCommand,
-		const string& Message ) ;
+		const std::string& CTCPCommand,
+		const std::string& Message ) ;
 
 	/**
 	 * This method is called when a channel CTCP occurs
@@ -321,15 +328,15 @@ public:
 	virtual void OnFakeChannelCTCP( iClient* Sender,
 		iClient* fakeClient,
 		Channel* theChan,
-		const string& CTCPCommand,
-		const string& Message ) ;
+		const std::string& CTCPCommand,
+		const std::string& Message ) ;
 
 	/**
 	 * OnPrivateMessage is called when a PRIVMSG command
 	 * is issued to the client.
 	 */
 	virtual void OnPrivateMessage( iClient* Sender,
-		const string& Message,
+		const std::string& Message,
 		bool secure = false ) ;
 
 	/**
@@ -338,7 +345,7 @@ public:
 	 */
 	virtual void OnFakePrivateMessage( iClient* Sender,
 		iClient* Target,
-		const string& Message,
+		const std::string& Message,
 		bool secure = false ) ;
 
 	/**
@@ -348,7 +355,7 @@ public:
 	 */
 	virtual void OnChannelMessage( iClient* Sender,
 		Channel* theChan,
-		const string& Message ) ;
+		const std::string& Message ) ;
 
 	/**
 	 * Invoked when a fake client in a channel receives
@@ -357,14 +364,14 @@ public:
 	virtual void OnFakeChannelMessage( iClient* Sender,
 		iClient* Target,
 		Channel* theChan,
-		const string& Message ) ;
+		const std::string& Message ) ;
 
 	/**
 	 * OnPrivateNotice is called when a NOTICE command
 	 * is issued to the client.
 	 */
 	virtual void OnPrivateNotice( iClient* Sender,
-		const string& Message,
+		const std::string& Message,
 		bool secure = false ) ;
 
 	/**
@@ -373,7 +380,7 @@ public:
 	 */
 	virtual void OnFakePrivateNotice( iClient* Sender,
 		iClient* Target,
-		const string& Message,
+		const std::string& Message,
 		bool secure = false ) ;
 
 	/**
@@ -382,7 +389,7 @@ public:
 	 */
 	virtual void OnChannelNotice( iClient* Sender,
 		Channel* theChan,
-		const string& Message ) ;
+		const std::string& Message ) ;
 
 	/**
 	 * Invoked when a fake client in a channel receives
@@ -391,14 +398,14 @@ public:
 	virtual void OnFakeChannelNotice( iClient* Sender,
 		iClient* Target,
 		Channel* theChan,
-		const string& Message ) ;
+		const std::string& Message ) ;
 
 	/**
 	 * OnServerMessage is called when a server messages
 	 * a client.
 	 */
 	virtual void OnServerMessage( iServer* Sender,
-		const string& Message, bool secure = false ) ;
+		const std::string& Message, bool secure = false ) ;
 
 	/**
 	 * Handle a timer event.  The first argument is the
@@ -427,7 +434,7 @@ public:
 	 * Op one or more users on a channel, join/part the channel
 	 * if necessary.
 	 */
-	virtual bool	Op( Channel*, const vector< iClient* >& ) ;
+	virtual bool	Op( Channel*, const std::vector< iClient* >& ) ;
 
 	/**
 	 * Voice a user on a channel, join/part the channel if necessary.
@@ -438,7 +445,7 @@ public:
 	 * Voice one or more users on a channel, join/part the channel
 	 * if necessary.
 	 */
-	virtual bool	Voice( Channel*, const vector< iClient* >& ) ;
+	virtual bool	Voice( Channel*, const std::vector< iClient* >& ) ;
  
 	/**
 	 * Deop a user on a channel, join/part the channel if necessary.
@@ -448,7 +455,7 @@ public:
 	/**
 	 * Deop a user on a channel, join/part the channel if necessary.
 	 */
-	virtual bool	DeOp( Channel*, const vector< iClient* >& ) ;
+	virtual bool	DeOp( Channel*, const std::vector< iClient* >& ) ;
 
 	/**
 	 * Devoice a user on a channel, join/part the channel if necessary.
@@ -459,7 +466,7 @@ public:
 	 * Devoice one or more users on a channel, join/part the channel
 	 * if necessary.
 	 */
-	virtual bool	DeVoice( Channel*, const vector< iClient* >& ) ; 
+	virtual bool	DeVoice( Channel*, const std::vector< iClient* >& ) ; 
 
 	/**
 	 * Set a ban on a channel, join/part the channel if necessary.
@@ -469,34 +476,34 @@ public:
 	/**
 	 * Set a ban on a channel, join/part the channel if necessary.
 	 */
-	virtual bool	Ban( Channel*, const vector< iClient* >& ) ;
+	virtual bool	Ban( Channel*, const std::vector< iClient* >& ) ;
 
 	/**
 	 * Ban kick a client from a channel for the given reason.
 	 */
-	virtual bool	BanKick( Channel*, iClient*, const string& ) ;
+	virtual bool	BanKick( Channel*, iClient*, const std::string& ) ;
 
 	/**
 	 * Remove a channel ban.
 	 */
-	virtual bool	UnBan( Channel*, const string& ) ;
+	virtual bool	UnBan( Channel*, const std::string& ) ;
 
 	/**
 	 * Kick a user from a channel, join/part if necessary.
 	 */
-	virtual bool	Kick( Channel*, iClient*, const string& ) ;
+	virtual bool	Kick( Channel*, iClient*, const std::string& ) ;
 
 	/**
 	 * Kick several users from a channel, join/part if necessary.
 	 */
-	virtual bool	Kick( Channel*, const vector< iClient* >&,
-				const string& ) ;
+	virtual bool	Kick( Channel*, const std::vector< iClient* >&,
+				const std::string& ) ;
 
 	/**
 	 * Join will cause the client to join a channel.
 	 */
-	virtual bool	Join( const string& chanName,
-				const string& modes = string(),
+	virtual bool	Join( const std::string& chanName,
+				const std::string& modes = std::string(),
 				const time_t& joinTime = 0,
 				bool getOps = false ) ;
 
@@ -504,7 +511,7 @@ public:
 	 * Join the given channel.
 	 */
 	virtual bool	Join( Channel* theChan,
-				const string& modes = string(),
+				const std::string& modes = std::string(),
 				const time_t& joinTime = 0,
 				bool getOps = false ) ;
 
@@ -516,12 +523,13 @@ public:
 	/**
 	 * This method is called when the bot joins a channel.
 	 */
-	virtual void	OnJoin( const string& ) ;
+	virtual void	OnJoin( const std::string& ) ;
 
 	/**
 	 * Part will cause the client to part a channel.
 	 */
-	virtual bool	Part( const string&, const string& = "" ) ;
+	virtual bool	Part( const std::string&,
+				const std::string& = std::string() ) ;
 
 	/**
 	 * Part the given channel.
@@ -536,13 +544,13 @@ public:
 	/**
 	 * This method is called when the bot parts a channel.
 	 */
-	virtual void	OnPart( const string& ) ;
+	virtual void	OnPart( const std::string& ) ;
 
 	/**
 	 * Invite a user to a channel.  Join the channel if necessary
 	 * (and then part).
 	 */
-	virtual bool	Invite( iClient*, const string& ) ;
+	virtual bool	Invite( iClient*, const std::string& ) ;
 
 	/**
 	 * Invite a user to a channel.  Join the channel if necessary
@@ -553,7 +561,7 @@ public:
 	/**
 	 * Return true if the bot is on the given channel.
 	 */
-	virtual bool	isOnChannel( const string& chanName ) const ;
+	virtual bool	isOnChannel( const std::string& chanName ) const ;
 
 	/**
 	 * Return true if the bot is on the given channel.
@@ -564,8 +572,8 @@ public:
 	 * DoCTCP will issue a CTCP (reply) to the given iClient.
 	 */
 	virtual bool DoCTCP( iClient* Target,
-		const string& CTCP,
-		const string& Message ) ;
+		const std::string& CTCP,
+		const std::string& Message ) ;
 
 	/**
 	 * Message will PRIVMSG a string of data to the given iClient.
@@ -578,55 +586,55 @@ public:
 	 */
 	virtual bool FakeMessage( const iClient* Target,
 		const iClient* srcClient,
-		const string& Message ) ;
+		const std::string& Message ) ;
 
 	/**
 	 * Message a channel with a fake client interface.
 	 */
 	virtual bool FakeMessage( const Channel* theChan,
 		const iClient* srcClient,
-		const string& Message ) ;
+		const std::string& Message ) ;
 
 	/**
 	 * Notice an iClient with a fake client interface.
 	 */
 	virtual bool FakeNotice( const iClient* Target,
 		const iClient* srcClient,
-		const string& Message ) ;
+		const std::string& Message ) ;
 
 	/**
 	 * Notice a channel with a fake client interface.
 	 */
 	virtual bool FakeNotice( const Channel* theChan,
 		const iClient* srcClient,
-		const string& Message ) ;
+		const std::string& Message ) ;
 
 	/**
 	 * Message will PRIVMSG a string of data to the given iClient.
 	 */
 	virtual bool Message( const iClient* Target,
-		const string& Message ) ;
+		const std::string& Message ) ;
 
 	/**
 	 * This format of Message will write a string of data
 	 * to a channel.
 	 */
-	virtual bool Message( const string& Channel,
+	virtual bool Message( const std::string& Channel,
 		const char* Message, ... ) ;
 
 	/**
 	 * This format of Message will write a string of data
 	 * to a channel.
 	 */
-	virtual bool Message( const string& Channel,
-		const string& Message ) ;
+	virtual bool Message( const std::string& Channel,
+		const std::string& Message ) ;
 
 	/**
 	 * This format of Message will write a string of data
 	 * to a channel.
 	 */
 	virtual bool Message( const Channel* theChan,
-		const string& Message ) ;
+		const std::string& Message ) ;
 
 	/**
 	 * Have this module message a channel.
@@ -643,12 +651,12 @@ public:
 	/**
 	 * Notice will send a NOTICE command to the given iClient.
 	 */
-	virtual bool Notice( const iClient* Target, const string& ) ;
+	virtual bool Notice( const iClient* Target, const std::string& ) ;
 
 	/**
 	 * This Notice() signature will send a channel NOTICE.
 	 */
-	virtual bool Notice( const string& Channel,
+	virtual bool Notice( const std::string& Channel,
 		const char* Message, ... ) ;
 
 	/**
@@ -660,12 +668,12 @@ public:
 	/**
 	 * This Notice() signature will send a channel NOTICE.
 	 */
-	virtual bool Notice( const Channel*, const string& ) ;
+	virtual bool Notice( const Channel*, const std::string& ) ;
 
 	/**
 	 * Have this bot send a global wallops message.
 	 */
-	virtual bool Wallops( const string& ) ;
+	virtual bool Wallops( const std::string& ) ;
 
 	/**
 	 * Have this bot send a global wallops message.
@@ -675,7 +683,7 @@ public:
 	/**
 	 * Have the server send a wallops.
 	 */
-	virtual bool WallopsAsServer( const string& ) ;
+	virtual bool WallopsAsServer( const std::string& ) ;
 
 	/**
 	 * Have the server send a wallops.
@@ -691,25 +699,25 @@ public:
 	/**
 	 * Return this bot's nick name.
 	 */
-	inline const string& getNickName() const
+	inline const std::string& getNickName() const
 		{ return nickName ; }
 
 	/**
 	 * Retrieve this bot's user name.
 	 */
-	inline const string& getUserName() const
+	inline const std::string& getUserName() const
 		{ return userName ; }
 
 	/**
 	 * Retrieve this bot's host name.
 	 */
-	inline const string& getHostName() const
+	inline const std::string& getHostName() const
 		{ return hostName ; }
 
 	/**
 	 * Retrieve this bot's description.
 	 */
-	inline const string& getDescription() const
+	inline const std::string& getDescription() const
 		{ return userDescription ; }
 
 	/**
@@ -729,39 +737,39 @@ public:
 	 * Retrieve this bot's uplink's numeric, character
 	 * array format.
 	 */
-	inline const string getUplinkCharYY() const
+	inline const std::string getUplinkCharYY() const
 		{ return MyUplink->getCharYY() ; }
 
 	/**
 	 * Retrieve this bot's uplink's client count numeric,
 	 * character array format.
 	 */
-	inline const string getUplinkCharXXX() const
+	inline const std::string getUplinkCharXXX() const
 		{ return MyUplink->getCharXXX() ; }
 
 	/**
 	 * Retrieve this bot's uplink's network numeric,
 	 * std::string format.
 	 */
-	inline const string getUplinkCharYYXXX() const
+	inline const std::string getUplinkCharYYXXX() const
 		{ return MyUplink->getCharYYXXX() ; }
 
 	/**
 	 * Retrieve this bot's uplink's server name.
 	 */
-	inline const string& getUplinkName() const
+	inline const std::string& getUplinkName() const
 		{ return MyUplink->getName() ; }
 
 	/**
 	 * Retrieve this bot's uplink's description.
 	 */
-	inline const string& getUplinkDescription() const
+	inline const std::string& getUplinkDescription() const
 		{ return MyUplink->getDescription() ; }
 
 	/**
 	 * Accessor method for the bot's user modes.
 	 */
-	virtual string getModes() const ;
+	virtual std::string getModes() const ;
 
 	/**
 	 * Return true if an arbitrary mode is set, false otherwise.
@@ -781,7 +789,7 @@ public:
 	 * Return the name of the configuration file from which this
 	 * client derived its configuration information.
 	 */
-	inline const string& getConfigFileName() const
+	inline const std::string& getConfigFileName() const
 		{ return configFileName ; }
 
 	/**
@@ -873,22 +881,22 @@ protected:
 	/**
 	 * This bot's nick name.
 	 */
-	string		nickName ;
+	std::string	nickName ;
 
 	/**
 	 * This bot's user name.
 	 */
-	string		userName ;
+	std::string	userName ;
 
 	/**
 	 * This bot's host name.
 	 */
-	string		hostName ;
+	std::string	hostName ;
 
 	/**
 	 * This bot's description.
 	 */
-	string		userDescription ;
+	std::string	userDescription ;
 
 	/**
 	 * Connected is true when we are connected to an xServer.
@@ -906,7 +914,7 @@ protected:
 	 * The name of the config file from which this client read
 	 * its configuration information.
 	 */
-	string		configFileName ;
+	std::string	configFileName ;
 } ;
 
 } // namespace gnuworld

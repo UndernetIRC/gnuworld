@@ -22,9 +22,10 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: SUSPENDCommand.cc,v 1.26 2003/08/07 21:31:42 gte Exp $
+ * $Id: SUSPENDCommand.cc,v 1.27 2003/12/29 23:59:37 dan_karrels Exp $
  */
 
+#include	<iostream>
 #include	<string>
 
 #include	<ctime>
@@ -36,7 +37,7 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char SUSPENDCommand_cc_rcsId[] = "$Id: SUSPENDCommand.cc,v 1.26 2003/08/07 21:31:42 gte Exp $" ;
+const char SUSPENDCommand_cc_rcsId[] = "$Id: SUSPENDCommand.cc,v 1.27 2003/12/29 23:59:37 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -249,7 +250,7 @@ if( 0 == finalDuration )
 		bot->Notice( theClient,
 			"Error updating channel status." );
 		elog	<< "UNSUSPEND> SQL error"
-			<< endl;
+			<< std::endl;
 		return false;
 		}
 

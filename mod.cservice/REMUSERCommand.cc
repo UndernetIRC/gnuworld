@@ -23,9 +23,10 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: REMUSERCommand.cc,v 1.15 2003/06/28 01:21:20 dan_karrels Exp $
+ * $Id: REMUSERCommand.cc,v 1.16 2003/12/29 23:59:37 dan_karrels Exp $
  */
 
+#include	<map>
 #include	<sstream>
 #include	<string>
 #include	<utility>
@@ -38,10 +39,11 @@
 #include	"libpq++.h"
 #include	"responses.h"
 
-const char REMUSERCommand_cc_rcsId[] = "$Id: REMUSERCommand.cc,v 1.15 2003/06/28 01:21:20 dan_karrels Exp $" ;
+const char REMUSERCommand_cc_rcsId[] = "$Id: REMUSERCommand.cc,v 1.16 2003/12/29 23:59:37 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
+using std::pair ;
 using std::ends ;
 using std::endl ;
 using std::string ;

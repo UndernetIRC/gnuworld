@@ -17,11 +17,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: UnloadClientTimerHandler.h,v 1.5 2003/06/28 16:26:45 dan_karrels Exp $
+ * $Id: UnloadClientTimerHandler.h,v 1.6 2003/12/29 23:59:36 dan_karrels Exp $
  */
 
 #ifndef __UNLOADCLIENTTIMERHANDLER_H
-#define __UNLOADCLIENTTIMERHANDLER_H "$Id: UnloadClientTimerHandler.h,v 1.5 2003/06/28 16:26:45 dan_karrels Exp $"
+#define __UNLOADCLIENTTIMERHANDLER_H "$Id: UnloadClientTimerHandler.h,v 1.6 2003/12/29 23:59:36 dan_karrels Exp $"
 
 #include	<string>
 
@@ -29,8 +29,6 @@
 
 namespace gnuworld
 {
-
-using std::string ;
 
 class xServer ;
 
@@ -45,10 +43,10 @@ class UnloadClientTimerHandler : public ServerTimerHandler
 protected:
 
 	/// The xClient module name
-	string		moduleName ;
+	std::string	moduleName ;
 
 	/// The reason for the unload, will be delivered to the xClient
-	string		reason ;
+	std::string	reason ;
 
 public:
 
@@ -59,8 +57,8 @@ public:
 	 * - The reason for unloading the client.
 	 */
 	UnloadClientTimerHandler( xServer* theServer,
-		const string& _moduleName,
-		const string& _reason )
+		const std::string& _moduleName,
+		const std::string& _reason )
 	: ServerTimerHandler( theServer, 0),
 	  moduleName( _moduleName ),
 	  reason( _reason )
