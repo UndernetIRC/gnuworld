@@ -47,7 +47,7 @@
 #include	"ServerTimerHandlers.h"
 
 const char xServer_h_rcsId[] = __XSERVER_H ;
-const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.87 2001/03/03 19:08:42 dan_karrels Exp $" ;
+const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.88 2001/03/04 00:07:25 dan_karrels Exp $" ;
 
 using std::string ;
 using std::vector ;
@@ -1785,15 +1785,14 @@ return 0 ;
 void xServer::PartChannel( xClient* theClient, const string& chanName,
 	const string& reason )
 {
-#ifndef NDEBUG
-  assert( theClient != NULL ) ;
-#endif
+assert( theClient != NULL ) ;
 
 Channel* theChan = Network->findChannel( chanName ) ;
 if( NULL == theChan )
 	{
 	elog	<< "xServer::PartChannel> Unable to find channel: "
-		<< chanName << endl ;
+		<< chanName
+		<< endl ;
 	return ;
 	}
 
@@ -1807,13 +1806,16 @@ PartChannel( theClient, theChan, reason ) ;
 void xServer::PartChannel( xClient* theClient, Channel* theChan,
 	const string& reason )
 {
-#ifndef NDEBUG
-  assert( theClient != NULL && theChan != NULL ) ;
-#endif
+assert( theClient != 0 ) ;
+assert( theChan != 0 ) ;
 
 strstream s ;
-s	<< theClient->getCharYYXXX() << " L "
-	<< theChan->getName() << " :" << reason << ends ;
+s	<< theClient->getCharYYXXX()
+	<< " L "
+	<< theChan->getName()
+	<< " :"
+	<< reason
+	<< ends ;
 
 Write( s ) ;
 delete[] s.str() ;
@@ -1832,15 +1834,14 @@ OnPartChannel( theClient->getInstance(), theChan ) ;
  */
 void xServer::OnPartChannel( iClient* theClient, const string& chanName )
 {
-#ifndef NDEBUG
-  assert( theClient != NULL ) ;
-#endif
+assert( theClient != NULL ) ;
 
 Channel* theChan = Network->findChannel( chanName ) ;
 if( NULL == theChan )
 	{
 	elog	<< "xServer::OnPartChannel> Unable to find channel: "
-		<< chanName << endl ;
+		<< chanName
+		<< endl ;
 	return ;
 	}
 
@@ -1857,10 +1858,8 @@ OnPartChannel( theClient, theChan ) ;
  */
 void xServer::OnPartChannel( iClient* theClient, Channel* theChan )
 {
-#ifndef NDEBUG
-  assert( theClient != 0 ) ;
-  assert( theChan != 0 ) ;
-#endif
+assert( theClient != 0 ) ;
+assert( theChan != 0 ) ;
 
 theClient->removeChannel( theChan ) ;
 delete theChan->removeUser( theClient ) ;
@@ -1873,20 +1872,18 @@ if( theChan->empty() )
 	// Empty channel
 	delete Network->removeChannel( theChan ) ;
 	}
-
 }
 
 void xServer::OnPartChannel( xClient* theClient, const string& chanName )
 {
-#ifndef NDEBUG
-  assert( theClient != NULL ) ;
-#endif
+assert( theClient != NULL ) ;
 
 Channel* theChan = Network->findChannel( chanName ) ;
 if( NULL == theChan )
 	{
 	elog	<< "xServer::OnPartChannel> Unable to find channel: "
-		<< chanName << endl ;
+		<< chanName
+		<< endl ;
 	return ;
 	}
 OnPartChannel( theClient, theChan ) ;
@@ -1895,10 +1892,8 @@ OnPartChannel( theClient, theChan ) ;
 
 void xServer::OnPartChannel( xClient* theClient, Channel* theChan )
 {
-#ifndef NDEBUG
-  assert( theClient != NULL && theChan != NULL ) ;
-#endif
-
+assert( theClient != 0 ) ;
+assert( theChan != 0 ) ;
 }
 
 bool xServer::JoinChannel( xClient* theClient, const string& chanName,

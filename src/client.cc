@@ -26,7 +26,7 @@
 #include	"events.h"
 
 const char xClient_h_rcsId[] = __XCLIENT_H ;
-const char xClient_cc_rcsId[] = "$Id: client.cc,v 1.33 2001/03/03 19:08:42 dan_karrels Exp $" ;
+const char xClient_cc_rcsId[] = "$Id: client.cc,v 1.34 2001/03/04 00:07:25 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -472,6 +472,7 @@ int xClient::Kill( iClient* theClient, const string& reason )
 {
 assert( theClient != 0 ) ;
 
+// TODO
 Write( "%s D %s :%s",
 	MyUplink->getCharYY(),
 	theClient->getCharYYXXX().c_str(),
@@ -686,6 +687,35 @@ if( !Connected )
 	return false ;
 	}
 
+bool onChannel = isOnChannel( theChan ) ;
+if( !onChannel )
+	{
+	// Join, giving ourselves ops
+	Join( theChan, string(), 0, true ) ;
+	}
+else
+	{
+	// Bot is already on the channel
+	ChannelUser* meUser = theChan->findUser( me ) ;
+	if( NULL == meUser )
+		{
+		elog	<< "xClient::Voice> Unable to find myself in "
+			<< "channel: "
+			<< theChan->getName()
+			<< endl ;
+		return false ;
+		}
+
+	// Make sure we have ops
+	if( !meUser->getMode( ChannelUser::MODE_O ) )
+		{
+		// The bot does NOT have ops
+		return false ;
+		}
+
+	// The bot has ops
+	}
+
 xServer::voiceVectorType voiceVector ;
 
 for( vector< iClient* >::const_iterator ptr = clientVector.begin(),
@@ -748,6 +778,11 @@ for( xServer::voiceVectorType::const_iterator ptr = voiceVector.begin(),
 	} // for()
 
 MyUplink->onChannelModeV( theChan, 0, voiceVector ) ;
+
+if( !onChannel )
+	{
+	Part( theChan ) ;
+	}
  
 return true ;
 
@@ -780,7 +815,30 @@ if( theUser->getMode( ChannelUser::MODE_V ) )
 bool onChannel = isOnChannel( theChan ) ;
 if( !onChannel )
 	{
-	Join( theChan ) ;
+	// Join, giving ourselves ops
+	Join( theChan, string(), 0, true ) ;
+	}
+else
+	{
+	// Bot is already on the channel
+	ChannelUser* meUser = theChan->findUser( me ) ;
+	if( NULL == meUser )
+		{
+		elog	<< "xClient::Voice> Unable to find myself in "
+			<< "channel: "
+			<< theChan->getName()
+			<< endl ;
+		return false ;
+		}
+
+	// Make sure we have ops
+	if( !meUser->getMode( ChannelUser::MODE_O ) )
+		{
+		// The bot does NOT have ops
+		return false ;
+		}
+
+	// The bot has ops
 	}
 
 Write( "%s M %s +v %s",
@@ -815,8 +873,9 @@ if( !Connected )
 ChannelUser* theUser = theChan->findUser( theClient ) ;
 if( NULL == theUser )
 	{
-	elog	<< "xClient::Op> Unable to find ChannelUser: "
-		<< *theClient << endl ;
+	elog	<< "xClient::DeOp> Unable to find ChannelUser: "
+		<< *theClient
+		<< endl ;
 	return false ;
 	}
 
@@ -829,7 +888,30 @@ if( !theUser->getMode( ChannelUser::MODE_O ) )
 bool onChannel = isOnChannel( theChan ) ;
 if( !onChannel )
 	{
-	Join( theChan ) ;
+	// Join, giving ourselves ops
+	Join( theChan, string(), 0, true ) ;
+	}
+else
+	{
+	// Bot is already on the channel
+	ChannelUser* meUser = theChan->findUser( me ) ;
+	if( NULL == meUser )
+		{
+		elog	<< "xClient::DeOp> Unable to find myself in "
+			<< "channel: "
+			<< theChan->getName()
+			<< endl ;
+		return false ;
+		}
+
+	// Make sure we have ops
+	if( !meUser->getMode( ChannelUser::MODE_O ) )
+		{
+		// The bot does NOT have ops
+		return false ;
+		}
+
+	// The bot has ops
 	}
 
 Write( "%s M %s -o %s",
@@ -848,6 +930,11 @@ opVector.push_back( xServer::opVectorType::value_type(
 
 MyUplink->onChannelModeO( theChan, 0, opVector ) ;
 
+if( !onChannel )
+	{
+	Part( theChan ) ;
+	}
+
 return true ;
 }
 
@@ -859,6 +946,35 @@ assert( theChan != NULL ) ;
 if( !Connected )
 	{
 	return false ;
+	}
+
+bool onChannel = isOnChannel( theChan ) ;
+if( !onChannel )
+	{
+	// Join, giving ourselves ops
+	Join( theChan, string(), 0, true ) ;
+	}
+else
+	{
+	// Bot is already on the channel
+	ChannelUser* meUser = theChan->findUser( me ) ;
+	if( NULL == meUser )
+		{
+		elog	<< "xClient::DeOp> Unable to find myself in "
+			<< "channel: "
+			<< theChan->getName()
+			<< endl ;
+		return false ;
+		}
+
+	// Make sure we have ops
+	if( !meUser->getMode( ChannelUser::MODE_O ) )
+		{
+		// The bot does NOT have ops
+		return false ;
+		}
+
+	// The bot has ops
 	}
 
 xServer::opVectorType opVector ;
@@ -921,6 +1037,11 @@ for( xServer::opVectorType::const_iterator ptr = opVector.begin(),
 	} // for()
 
 MyUplink->onChannelModeO( theChan, 0, opVector ) ;
+
+if( !onChannel )
+	{
+	Part( theChan ) ;
+	}
  
 return true ;
 }
@@ -938,8 +1059,9 @@ if( !Connected )
 ChannelUser* theUser = theChan->findUser( theClient ) ;
 if( NULL == theUser )
 	{
-	elog	<< "xClient::Voice> Unable to find ChannelUser: "
-		<< *theClient << endl ;
+	elog	<< "xClient::DeVoice> Unable to find ChannelUser: "
+		<< *theClient
+		<< endl ;
 	return false ;
 	}
 
@@ -952,7 +1074,30 @@ if( !theUser->getMode( ChannelUser::MODE_V ) )
 bool onChannel = isOnChannel( theChan ) ;
 if( !onChannel )
 	{
-	Join( theChan ) ;
+	// Join, giving ourselves ops
+	Join( theChan, string(), 0, true ) ;
+	}
+else
+	{
+	// Bot is already on the channel
+	ChannelUser* meUser = theChan->findUser( me ) ;
+	if( NULL == meUser )
+		{
+		elog	<< "xClient::DeVoice> Unable to find myself in "
+			<< "channel: "
+			<< theChan->getName()
+			<< endl ;
+		return false ;
+		}
+
+	// Make sure we have ops
+	if( !meUser->getMode( ChannelUser::MODE_O ) )
+		{
+		// The bot does NOT have ops
+		return false ;
+		}
+
+	// The bot has ops
 	}
 
 Write( "%s M %s -v %s",
@@ -960,16 +1105,16 @@ Write( "%s M %s -v %s",
 	theChan->getName().c_str(),
 	theClient->getCharYYXXX().c_str() ) ;
 
-if( !onChannel )
-	{
-	Part( theChan ) ;
-	}
-
 xServer::voiceVectorType voiceVector ;
 voiceVector.push_back( xServer::voiceVectorType::value_type(
 	false, theUser ) ) ;
 
 MyUplink->onChannelModeV( theChan, 0, voiceVector ) ;
+
+if( !onChannel )
+	{
+	Part( theChan ) ;
+	}
 
 return true ;
 }
@@ -982,6 +1127,35 @@ assert( theChan != NULL ) ;
 if( !Connected )
 	{
 	return false ;
+	}
+
+bool onChannel = isOnChannel( theChan ) ;
+if( !onChannel )
+	{
+	// Join, giving ourselves ops
+	Join( theChan, string(), 0, true ) ;
+	}
+else
+	{
+	// Bot is already on the channel
+	ChannelUser* meUser = theChan->findUser( me ) ;
+	if( NULL == meUser )
+		{
+		elog	<< "xClient::DeVoic> Unable to find myself in "
+			<< "channel: "
+			<< theChan->getName()
+			<< endl ;
+		return false ;
+		}
+
+	// Make sure we have ops
+	if( !meUser->getMode( ChannelUser::MODE_O ) )
+		{
+		// The bot does NOT have ops
+		return false ;
+		}
+
+	// The bot has ops
 	}
 
 xServer::voiceVectorType voiceVector ;
@@ -1045,6 +1219,11 @@ for( xServer::voiceVectorType::const_iterator ptr = voiceVector.begin(),
 	} // for()
 
 MyUplink->onChannelModeV( theChan, 0, voiceVector ) ;
+
+if( !onChannel )
+	{
+	Part( theChan ) ;
+	}
  
 return true ;
 }
@@ -1068,7 +1247,30 @@ if( 0 == theChan->findUser( theClient ) )
 bool onChannel = isOnChannel( theChan ) ;
 if( !onChannel )
 	{
-	Join( theChan ) ;
+	// Join, giving ourselves ops
+	Join( theChan, string(), 0, true ) ;
+	}
+else
+	{
+	// Bot is already on the channel
+	ChannelUser* meUser = theChan->findUser( me ) ;
+	if( NULL == meUser )
+		{
+		elog	<< "xClient::Ban> Unable to find myself in "
+			<< "channel: "
+			<< theChan->getName()
+			<< endl ;
+		return false ;
+		}
+
+	// Make sure we have ops
+	if( !meUser->getMode( ChannelUser::MODE_O ) )
+		{
+		// The bot does NOT have ops
+		return false ;
+		}
+
+	// The bot has ops
 	}
 
 string banMask = Channel::createBan( theClient ) ;
@@ -1080,16 +1282,16 @@ Write( "%s M %s +b :%s",
 
 // No users are kicked by just setting a ban.
 
-if( !onChannel )
-	{
-	Part( theChan ) ;
-	}
-
 xServer::banVectorType banVector ;
 banVector.push_back( xServer::banVectorType::value_type(
 	true, banMask ) ) ;
 
 MyUplink->onChannelModeB( theChan, 0, banVector ) ;
+
+if( !onChannel )
+	{
+	Part( theChan ) ;
+	}
 
 return true ;
 }
@@ -1112,7 +1314,30 @@ if( !theChan->findBan( banMask ) )
 bool onChannel = isOnChannel( theChan ) ;
 if( !onChannel )
 	{
-	Join( theChan ) ;
+	// Join, giving ourselves ops
+	Join( theChan, string(), 0, true ) ;
+	}
+else
+	{
+	// Bot is already on the channel
+	ChannelUser* meUser = theChan->findUser( me ) ;
+	if( NULL == meUser )
+		{
+		elog	<< "xClient::UnBan> Unable to find myself in "
+			<< "channel: "
+			<< theChan->getName()
+			<< endl ;
+		return false ;
+		}
+
+	// Make sure we have ops
+	if( !meUser->getMode( ChannelUser::MODE_O ) )
+		{
+		// The bot does NOT have ops
+		return false ;
+		}
+
+	// The bot has ops
 	}
 
 Write( "%s M %s -b %s",
@@ -1120,16 +1345,16 @@ Write( "%s M %s -b %s",
 	theChan->getName().c_str(),
 	banMask.c_str() ) ;
 
-if( !onChannel )
-	{
-	Part( theChan ) ;
-	}
-
 xServer::banVectorType banVector ;
 banVector.push_back( xServer::banVectorType::value_type(
 	false, banMask ) ) ;
 
 MyUplink->onChannelModeB( theChan, 0, banVector ) ;
+
+if( !onChannel )
+	{
+	Part( theChan ) ;
+	}
 
 return true ;
 }
@@ -1142,6 +1367,35 @@ assert( theChan != NULL ) ;
 if( !Connected )
 	{
 	return false ;
+	}
+
+bool onChannel = isOnChannel( theChan ) ;
+if( !onChannel )
+	{
+	// Join, giving ourselves ops
+	Join( theChan, string(), 0, true ) ;
+	}
+else
+	{
+	// Bot is already on the channel
+	ChannelUser* meUser = theChan->findUser( me ) ;
+	if( NULL == meUser )
+		{
+		elog	<< "xClient::Ban> Unable to find myself in "
+			<< "channel: "
+			<< theChan->getName()
+			<< endl ;
+		return false ;
+		}
+
+	// Make sure we have ops
+	if( !meUser->getMode( ChannelUser::MODE_O ) )
+		{
+		// The bot does NOT have ops
+		return false ;
+		}
+
+	// The bot has ops
 	}
 
 xServer::banVectorType banVector ;
@@ -1200,6 +1454,11 @@ for( xServer::banVectorType::const_iterator ptr = banVector.begin(),
 	} // for()
 
 MyUplink->onChannelModeB( theChan, 0, banVector ) ;
+
+if( !onChannel )
+	{
+	Part( theChan ) ;
+	}
  
 return true ;
 }
@@ -1224,7 +1483,30 @@ if( 0 == theChan->findUser( theClient ) )
 bool onChannel = isOnChannel( theChan ) ;
 if( !onChannel )
 	{
-	Join( theChan ) ;
+	// Join, giving ourselves ops
+	Join( theChan, string(), 0, true ) ;
+	}
+else
+	{
+	// Bot is already on the channel
+	ChannelUser* meUser = theChan->findUser( me ) ;
+	if( NULL == meUser )
+		{
+		elog	<< "xClient::BanKick> Unable to find myself in "
+			<< "channel: "
+			<< theChan->getName()
+			<< endl ;
+		return false ;
+		}
+
+	// Make sure we have ops
+	if( !meUser->getMode( ChannelUser::MODE_O ) )
+		{
+		// The bot does NOT have ops
+		return false ;
+		}
+
+	// The bot has ops
 	}
 
 string banMask = Channel::createBan( theClient ) ;
@@ -1275,7 +1557,30 @@ if( NULL == theChan->findUser( theClient ) )
 bool onChannel = isOnChannel( theChan ) ;
 if( !onChannel )
 	{
-	Join( theChan ) ;
+	// Join, giving ourselves ops
+	Join( theChan, string(), 0, true ) ;
+	}
+else
+	{
+	// Bot is already on the channel
+	ChannelUser* meUser = theChan->findUser( me ) ;
+	if( NULL == meUser )
+		{
+		elog	<< "xClient::Kick> Unable to find myself in "
+			<< "channel: "
+			<< theChan->getName()
+			<< endl ;
+		return false ;
+		}
+
+	// Make sure we have ops
+	if( !meUser->getMode( ChannelUser::MODE_O ) )
+		{
+		// The bot does NOT have ops
+		return false ;
+		}
+
+	// The bot has ops
 	}
 
 strstream s ;
@@ -1287,6 +1592,7 @@ s	<< getCharYYXXX() << " K "
 Write( s ) ;
 delete[] s.str() ;
 
+// TODO: OnPartChannel()
 if( !onChannel )
 	{
 	Part( theChan ) ;
@@ -1313,7 +1619,30 @@ if( theClients.empty() )
 bool onChannel = isOnChannel( theChan ) ;
 if( !onChannel )
 	{
-	Join( theChan ) ;
+	// Join, giving ourselves ops
+	Join( theChan, string(), 0, true ) ;
+	}
+else
+	{
+	// Bot is already on the channel
+	ChannelUser* meUser = theChan->findUser( me ) ;
+	if( NULL == meUser )
+		{
+		elog	<< "xClient::Kick> Unable to find myself in "
+			<< "channel: "
+			<< theChan->getName()
+			<< endl ;
+		return false ;
+		}
+
+	// Make sure we have ops
+	if( !meUser->getMode( ChannelUser::MODE_O ) )
+		{
+		// The bot does NOT have ops
+		return false ;
+		}
+
+	// The bot has ops
 	}
 
 // We will assume that this client is on the channel pointed to by theChan
@@ -1339,6 +1668,7 @@ for( vector< iClient* >::const_iterator ptr = theClients.begin() ;
 
 	}
 
+// TODO: OnPartChannel()
 if( !onChannel )
 	{
 	Part( theChan ) ;
