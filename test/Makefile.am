@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-## $Id: Makefile.am,v 1.16 2003/09/14 16:35:55 dan_karrels Exp $
+## $Id: Makefile.am,v 1.17 2003/11/27 18:29:32 dan_karrels Exp $
 
 noinst_PROGRAMS = test_burst \
 	test_mtrie_load \
@@ -57,5 +57,13 @@ test_signal_SOURCES = signal.cc
 test_signal_LDFLAGS = $(LIBGNUWORLD) $(threadLib)
 test_signal_CXXFLAGS = -I${top_srcdir}/include -I${top_srcdir}/libgnuworld
 
-EXTRA_DIST = testbot.h
-
+EXTRA_DIST = testbot.h \
+	README.burst \
+	README.econfig \
+	README.gthread \
+	README.match \
+	README.mtrie \
+	README.signal \
+	README.stringtokenizer \
+	README.testBot \
+	README.test_kick_transaction

@@ -25,10 +25,16 @@ libdronescan_la_SOURCES = 	\
 	MAXCHANSTest.cc		\
 	RANGETest.cc
 
-EXTRA_DIST = clientData.h \
+EXTRA_DIST = activeChannel.h \
+	clientData.h \
+	constants.h \
+	Convert.h \
 	dronescanCommands.h \
 	dronescan.h \
 	dronescanTests.h \
 	levels.h \
+	sqlFakeClient.h \
+	sqlUser.h \
 	Timer.h \
-	ChangeLog
+	ChangeLog \
+	Updates

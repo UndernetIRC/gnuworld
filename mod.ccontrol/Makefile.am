@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-# "$Id: Makefile.am,v 1.49 2003/09/14 16:35:53 dan_karrels Exp $"
+# "$Id: Makefile.am,v 1.50 2003/11/27 18:29:30 dan_karrels Exp $"
 
 lib_LTLIBRARIES = libccontrol.la
 libccontrol_la_SOURCES = ccontrol.cc \
@@ -82,4 +82,5 @@ EXTRA_DIST = ccBadChannel.h \
 	ccUser.h \
 	CommandsDec.h \
 	commLevels.h \
-	Constants.h
+	Constants.h \
+	README

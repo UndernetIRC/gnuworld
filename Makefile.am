@@ -1,4 +1,4 @@
-## $Id: Makefile.am,v 1.18 2003/09/14 16:35:52 dan_karrels Exp $
+## $Id: Makefile.am,v 1.19 2003/11/27 18:29:29 dan_karrels Exp $
 ## test
 
 @SET_MAKE@
@@ -111,41 +111,50 @@ EXTRA_DIST = bin/ccontrol.example.conf.in \
 	doc/motd.sql \
 	doc/movetables \
 	doc/notes.sql \
+	doc/README \
+	doc/README.appjudge \
+	doc/README.ccontrol \
+	doc/README.cservice \
+	doc/README.pgsql \
+	doc/README.sharedmemory \
 	doc/update.channels.sql \
+	doc/update_complaints_20031020.sql \
+	doc/update_complaints_20031026.sql \
+	doc/update_complaints.sql \
 	doc/update.delete.sql \
 	doc/update.gfxcode.sql \
 	doc/update.statistics.sql \
 	doc/update_fraud_lists.sql \
+	doc/update.statistics.sql \
 	doc/update_themes.sql \
 	doc/update_tzmove_l.sql \
 	doc/update_tzmove_r.sql \
+	doc/cmaster/maint/cleanup_traffic.sql \
+	doc/cmaster/maint/enc_pass.sh \
+	doc/cmaster/maint/fixDOS.sh \
+	doc/cmaster/maint/Manager1K.sh \
+	doc/cmaster/maint/WipeUser.sh \
+	doc/cmaster/regproc/appjudge \
+	doc/cmaster/regproc/appjudge-config \
+	doc/cmaster/regproc/cron-judge.in \
+	doc/cmaster/regproc/cycle-judge \
 	doc/cmaster/website/faq.html \
 	doc/cmaster/website/index.html \
 	doc/cmaster/website/install.html \
 	doc/cmaster/website/manual.html \
 	doc/cmaster/website/web.html \
-	doc/cmaster/cleanup_traffic.sql \
-	doc/cmaster/enc_pass.sh \
-	doc/cmaster/fixDOS.sh \
-	doc/cmaster/Manager1K.sh \
-	doc/cmaster/WipeUser.sh \
-	doc/cmaster/appjudge \
-	doc/cmaster/appjudge-config \
-	doc/cmaster/cron-judge.in \
-	doc/cmaster/cycle-judge \
 	doc/idoc/index.php \
 	doc/idoc/README \
 	doc/nickserv/nickserv.sql \
 	doc/nickserv/INSTALL \
 	doc/nickserv/USAGE \
-	db/gnuworldDB.h \
-	db/pgsqlDB.h \
 	include/defs.h \
 	include/Channel.h \
 	include/ChannelUser.h \
 	include/Gline.h \
 	include/LoadClientTimerHandler.h \
 	include/Network.h \
+	include/NetworkTarget.h \
 	include/Numeric.h \
 	include/ServerCommandHandler.h \
 	include/ServerTimerHandlers.h \
