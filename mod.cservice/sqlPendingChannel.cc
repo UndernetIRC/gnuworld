@@ -4,7 +4,7 @@
  * Class which contains details about channels which are 'pending'
  * registration.
  * 
- * $Id: sqlPendingChannel.cc,v 1.3 2001/06/10 17:36:57 gte Exp $
+ * $Id: sqlPendingChannel.cc,v 1.4 2001/06/10 17:42:20 gte Exp $
  */
  
 #include	<strstream>
@@ -24,7 +24,7 @@
 #include	"sqlPendingTraffic.h"
  
 const char sqlPendingChannel_h_rcsId[] = __SQLPENDINGCHANNEL_H ;
-const char sqlPendingChannel_cc_rcsId[] = "$Id: sqlPendingChannel.cc,v 1.3 2001/06/10 17:36:57 gte Exp $" ;
+const char sqlPendingChannel_cc_rcsId[] = "$Id: sqlPendingChannel.cc,v 1.4 2001/06/10 17:42:20 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -185,6 +185,8 @@ if( PGRES_COMMAND_OK != status )
 		ptr !=  trafficList.end(); ++ptr)
 		{
 		sqlPendingTraffic* theTraf = ptr->second;
+		int theip_number = theTraf->ip_number;
+
 		strstream queryString; 
 		queryString << "UPDATE pending_traffic SET "
 					<< "join_count = " 
@@ -192,7 +194,7 @@ if( PGRES_COMMAND_OK != status )
 					<< " WHERE channel_id = "
 					<< channel_id
 					<< " AND ip_number = "
-					<< theTraf->ip_number
+					<< theip_number
 					<< ends;
 		
 		#ifdef LOG_SQL
