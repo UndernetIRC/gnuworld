@@ -2,7 +2,7 @@
  * cservice.cc
  * Author: Greg Sikorski
  * Purpose: Overall control client.
- * $Id: cservice.cc,v 1.231 2003/04/24 20:19:37 gte Exp $
+ * $Id: cservice.cc,v 1.232 2003/05/07 20:13:02 gte Exp $
  */
 
 #include	<new>
@@ -1021,6 +1021,11 @@ short int cservice::getAdminAccessLevel( sqlUser* theUser )
  */
 
 if (theUser->getFlag(sqlUser::F_GLOBAL_SUSPEND))
+	{
+	return 0;
+	}
+
+if (theUser->getFlag(sqlUser::F_NOADMIN))
 	{
 	return 0;
 	}

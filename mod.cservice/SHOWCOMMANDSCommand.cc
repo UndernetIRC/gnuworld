@@ -8,7 +8,7 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char SHOWCOMMANDSCommand_cc_rcsId[] = "$Id: SHOWCOMMANDSCommand.cc,v 1.26 2002/10/09 21:04:24 gte Exp $" ;
+const char SHOWCOMMANDSCommand_cc_rcsId[] = "$Id: SHOWCOMMANDSCommand.cc,v 1.27 2003/05/07 20:13:02 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -31,7 +31,12 @@ static const char* lvl_25_cmds = "\002Level   25\002: voice devoice";
 static const char* lvl_1_cmds = "\002Level    1\002: banlist status%s";
 static const char* lvl_adm_cmds = "\002Level    *\002: force unforce stats";
 static const char* lvl_0_cmds = "\002Level    0\002: access chaninfo info help* lbanlist login motd* newpass showcommands showignore verify suspendme";
+
+#ifdef USE_OPERPARTJOIN
 static const char* lvl_oper_cmds = "\002Level Oper\002: operjoin* operpart*";
+#else
+static const char* lvl_oper_cmds = "\002Level Oper\002: ";
+#endif
 
 bool SHOWCOMMANDSCommand::Exec( iClient* theClient, const string& Message )
 {

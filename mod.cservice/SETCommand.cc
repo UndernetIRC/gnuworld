@@ -18,7 +18,7 @@
  *
  * Caveats: None.
  *
- * $Id: SETCommand.cc,v 1.52 2003/01/08 23:23:36 gte Exp $
+ * $Id: SETCommand.cc,v 1.53 2003/05/07 20:13:02 gte Exp $
  */
 
 #include	<string>
@@ -30,7 +30,7 @@
 #include	"responses.h"
 #include	"cservice_config.h"
 
-const char SETCommand_cc_rcsId[] = "$Id: SETCommand.cc,v 1.52 2003/01/08 23:23:36 gte Exp $" ;
+const char SETCommand_cc_rcsId[] = "$Id: SETCommand.cc,v 1.53 2003/05/07 20:13:02 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -124,6 +124,33 @@ if( st[1][0] != '#' ) // Didn't find a hash?
 	        return true;
 	}
 #endif
+
+
+	if (option == "NOADMIN")
+	{
+		if (value == "ON")
+		{
+			theUser->setFlag(sqlUser::F_NOADMIN);
+			theUser->commit(theClient);
+			bot->Notice(theClient,"You have lost the force :(");
+			return true;
+		}
+
+		if (value == "OFF")
+		{
+			theUser->removeFlag(sqlUser::F_NOADMIN);
+			theUser->commit(theClient);
+			bot->Notice(theClient,"Welcome back, brave Jedi.");
+			return true;
+		}
+
+		bot->Notice(theClient,
+			bot->getResponse(theUser,
+				language::set_cmd_syntax_on_off,
+				string("value of %s must be ON or OFF")).c_str(),
+			option.c_str());
+	        return true;
+	}
 
 #ifdef USE_SETMAXLOGINS
 	if (option == "MAXLOGINS")
