@@ -1,10 +1,12 @@
 #ifndef _NICKSERV_H
-#define _NICKSERV_H "$Id: nickserv.h,v 1.6 2002/08/25 22:38:49 jeekay Exp $"
+#define _NICKSERV_H "$Id: nickserv.h,v 1.7 2002/08/27 16:10:53 jeekay Exp $"
 
 #include "client.h"
 #include "EConfig.h"
 #include "server.h"
 
+#include "Logger.h"
+#include "logTarget.h"
 #include "nickservCommands.h"
 #include "sqlManager.h"
 #include "sqlUser.h"
@@ -14,8 +16,16 @@ namespace gnuworld {
 
 namespace ns {
 
-class nickserv : public xClient {
+class nickserv : public xClient, public logging::logTarget {
   public:
+
+    /***********************************************************
+     ** O V E R R I D E N   L O G T A R G E T   M E T H O D S **
+     ***********************************************************/
+
+    /** Receive a message for logging */
+    virtual void log(const logging::events::eventType&, const string&);
+
     
     /*******************************************************
      ** O V E R R I D E N   X C L I E N T   M E T H O D S **
@@ -53,6 +63,9 @@ class nickserv : public xClient {
     typedef vector< iClient* > QueueType;
     
     typedef map< string, sqlUser*, noCaseCompare > sqlUserHashType;
+
+    typedef map< string, logging::events::eventType, noCaseCompare > logUserCacheType;
+    typedef vector< iClient* > logUsersType;
     
   
     /*************************************
@@ -92,12 +105,15 @@ class nickserv : public xClient {
     sqlUser* isRegistered(string);
 
     
-    /*************************
-     ** S T A T I S T I C S **
-     *************************/
+    /*******************************
+     ** M I S C E L L A N E O U S **
+     *******************************/
 
     /** Holds a reference to our Stats collector */
     Stats::Stats* theStats;
+
+    /** Holds a reference to our Logger instance */
+    logging::Logger* theLogger;
    
     
     /*****************************************
@@ -144,6 +160,12 @@ class nickserv : public xClient {
     
     /** The cached list of registered users */
     sqlUserHashType sqlUserCache;
+
+    /** The list of cached logged users */
+    logUserCacheType logUserCache;
+
+    /** The list of log users */
+    logUsersType logUsers;
     
     
     /***********************

@@ -7,7 +7,7 @@
 #include "netData.h"
 #include "nickserv.h"
 
-const char NickServ_cc_rcsId[] = "$Id: nickserv.cc,v 1.9 2002/08/25 23:12:28 jeekay Exp $";
+const char NickServ_cc_rcsId[] = "$Id: nickserv.cc,v 1.10 2002/08/27 16:10:52 jeekay Exp $";
 
 namespace gnuworld
 {
@@ -74,11 +74,31 @@ RegisterCommand(new WHOAMICommand(this, "WHOAMI", ""));
 
 /* Get our Stats instance */
 theStats = Stats::getInstance();
+
+/* Get our logger instance */
+theLogger = logging::Logger::getInstance();
+
+/* Register ourselves as a logTarget */
+theLogger->addLogger(this);
 }
 
 nickserv::~nickserv()
 {
 delete nickservConfig;
+}
+
+
+
+/**
+ * This is the catcher for log messages. It compares the event type to the
+ * cached log event receivers. If it matches, send a notice off to that
+ * target.
+ */
+void nickserv::log(const eventType& theEvent, const string& theMessage)
+{
+  for(logUsersType::iterator ptr = logUsers.begin(); ptr != logUsers.end(); ptr++) {
+    
+  }
 }
 
 
