@@ -16,7 +16,7 @@
  *
  * Caveats: None
  *
- * $Id: VOICECommand.cc,v 1.16 2001/02/24 21:49:38 gte Exp $
+ * $Id: VOICECommand.cc,v 1.17 2001/03/18 17:25:00 dan_karrels Exp $
  */
 
 #include	<string>
@@ -30,14 +30,14 @@
 #include	"levels.h"
 #include	"responses.h"
 
-using std::map ;
-using std::vector ;
-
-const char VOICECommand_cc_rcsId[] = "$Id: VOICECommand.cc,v 1.16 2001/02/24 21:49:38 gte Exp $" ;
+const char VOICECommand_cc_rcsId[] = "$Id: VOICECommand.cc,v 1.17 2001/03/18 17:25:00 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
  
+using std::map ;
+using std::vector ;
+
 bool VOICECommand::Exec( iClient* theClient, const string& Message )
 { 
 StringTokenizer st( Message ) ;
@@ -223,5 +223,4 @@ bot->Voice(tmpChan, voiceList);
 return true ;
 } 
 
-} // namespace gnuworld.
-
+} // namespace gnuworld

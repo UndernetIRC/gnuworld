@@ -8,7 +8,7 @@
  *
  * Caveats: None.
  *
- * $Id: UNBANCommand.cc,v 1.9 2001/03/05 03:06:30 gte Exp $
+ * $Id: UNBANCommand.cc,v 1.10 2001/03/18 17:25:00 dan_karrels Exp $
  */
 
 #include	<string>
@@ -21,201 +21,212 @@
 #include	"responses.h"
 #include	"match.h"
 
-const char UNBANCommand_cc_rcsId[] = "$Id: UNBANCommand.cc,v 1.9 2001/03/05 03:06:30 gte Exp $" ;
+const char UNBANCommand_cc_rcsId[] = "$Id: UNBANCommand.cc,v 1.10 2001/03/18 17:25:00 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
 
-using namespace gnuworld;
+using std::string ;
 using namespace level;
  
 bool UNBANCommand::Exec( iClient* theClient, const string& Message )
 { 
-	StringTokenizer st( Message ) ;
+StringTokenizer st( Message ) ;
  
-	if( st.size() < 3 )
+if( st.size() < 3 )
 	{
-	    Usage(theClient);
-	    return true;
+    Usage(theClient);
+    return true;
 	}
  
-	// Is the user authorised?
+// Is the user authorised?
 	 
-	sqlUser* theUser = bot->isAuthed(theClient, true);
-	if(!theUser) return false;
+sqlUser* theUser = bot->isAuthed(theClient, true);
+if(!theUser)
+	{
+	return false;
+	}
 
-	/* Is the channel registered? */
+/* Is the channel registered? */
 	
-	sqlChannel* theChan = bot->getChannelRecord(st[1]);
-	if(!theChan)
+sqlChannel* theChan = bot->getChannelRecord(st[1]);
+if(!theChan)
 	{
-	    bot->Notice(theClient, 
+	bot->Notice(theClient, 
 		bot->getResponse(theUser,
-			language::chan_not_reg,
-			string("Sorry, %s isn't registered with me.")).c_str(), 
-		st[1].c_str());
-	    return false;
+		language::chan_not_reg,
+		string("Sorry, %s isn't registered with me.")).c_str(), 
+	st[1].c_str());
+
+	return false;
 	} 
 
-
- 	/* Check the bot is in the channel. */
+/* Check the bot is in the channel. */
  
-	if (!theChan->getInChan()) {
-		bot->Notice(theClient, 
-			bot->getResponse(theUser,
-				language::i_am_not_on_chan,
-				string("I'm not in that channel!")));
-		return false;
+if (!theChan->getInChan())
+	{
+	bot->Notice(theClient, 
+		bot->getResponse(theUser,
+			language::i_am_not_on_chan,
+			string("I'm not in that channel!")));
+	return false;
 	} 
 
+// Check level.
 
-	// Check level.
-
-	int level = bot->getEffectiveAccessLevel(theUser, theChan, true);
-	if(level < level::unban)
+int level = bot->getEffectiveAccessLevel(theUser, theChan, true);
+if(level < level::unban)
 	{
-	    bot->Notice(theClient, 
+	bot->Notice(theClient, 
 		bot->getResponse(theUser,
 			language::insuf_access,
-			string("Sorry, you have insufficient access to perform that command.")));
-	    return false;
+			string("Sorry, you have insufficient access to "
+				"perform that command.")));
+	return false;
 	}
 
-	Channel* theChannel = Network->findChannel(theChan->getName()); 
-	if (!theChannel) 
+Channel* theChannel = Network->findChannel(theChan->getName()); 
+if (!theChannel) 
 	{
-		bot->Notice(theClient, bot->getResponse(theUser, language::chan_is_empty).c_str(), 
+	bot->Notice(theClient,
+		bot->getResponse(theUser, language::chan_is_empty).c_str(),
 		theChan->getName().c_str());
-		return false;
+	return false;
 	} 
  
-	vector< sqlBan* >* banList = bot->getBanRecords(theChan);
-	vector< sqlBan* >::iterator ptr = banList->begin();
-	string banTarget = "";
+vector< sqlBan* >* banList = bot->getBanRecords(theChan);
+vector< sqlBan* >::iterator ptr = banList->begin();
+string banTarget ;
 
- 	/*
-	 *  Are they trying to unban by nick or hostmask?
-	 */
+/*
+ *  Are they trying to unban by nick or hostmask?
+ */
+bool isNick = bot->validUserMask( st[2] ) ? false : true ;
 
-	bool isNick = bot->validUserMask( st[2] ) ? false : true ;
-
-	/* Try by nickname first, remove any bans that match this users host */
+/* Try by nickname first, remove any bans that match this users host */
 	
-	if( isNick )
+if( isNick )
 	{
-		iClient* aNick = Network->findNick(st[2]);
-		if(!aNick)
+	iClient* aNick = Network->findNick(st[2]);
+	if(!aNick)
 		{
-			bot->Notice(theClient, 
-				bot->getResponse(theUser,
-					language::cant_find_on_chan,
-					string("I can't find %s on channel %s")).c_str(),
-					st[2].c_str(), theChan->getName().c_str());
-			return true;
+		bot->Notice(theClient, 
+			bot->getResponse(theUser,
+				language::cant_find_on_chan,
+				string("I can't find %s on channel %s")).c_str(),
+				st[2].c_str(),
+				theChan->getName().c_str());
+		return true;
 		}
 
-		banTarget = aNick->getNickUserHost();
-	} else
+	banTarget = aNick->getNickUserHost();
+	}
+else
 	{
-		banTarget = st[2];
+	banTarget = st[2];
 	}
 	
-	/*
-	 *  Loop over all bans, removing any that match our target
+/*
+ *  Loop over all bans, removing any that match our target
+ */
+
+size_t banCount = 0;
+unsigned short comparison = 0;
+
+while (ptr != banList->end())
+	{
+	sqlBan* theBan = *ptr;
+	/* 
+	 * If we're matching by a users full host, reverse the way we check
+	 * banmask.
 	 */
 
-	int banCount = 0;
-	unsigned short comparison = 0;
-
-	while (ptr != banList->end())
-	{
-		sqlBan* theBan = *ptr;
-		/* 
-		 * If we're matching by a users full host, reverse the way we check
-		 * banmask.
-		 */
-
-		if ( isNick )
+	if ( isNick )
 		{
-			comparison = match(theBan->getBanMask(), banTarget);
-		} else 
+		comparison = match(theBan->getBanMask(), banTarget);
+		}
+	else 
 		{
-			comparison = match(banTarget, theBan->getBanMask());
+		comparison = match(banTarget, theBan->getBanMask());
 		}
 
-		if ( comparison == 0 )
+	if ( comparison == 0 )
 		{ 
-			/* Matches! remove this ban - if we can. */ 
-			if (theBan->getLevel() > level)
+		/* Matches! remove this ban - if we can. */ 
+		if (theBan->getLevel() > level)
 			{
-				bot->Notice(theClient, 
-					bot->getResponse(theUser,
-						language::cant_rem_ban,
-						string("You have insufficient access to remove the ban %s from %s's database")).c_str(),
-					theBan->getBanMask().c_str(), theChan->getName().c_str());
-				++ptr;
+			bot->Notice(theClient, 
+				bot->getResponse(theUser,
+					language::cant_rem_ban,
+					string("You have insufficient access to remove the ban %s from %s's database")).c_str(),
+				theBan->getBanMask().c_str(),
+				theChan->getName().c_str());
+			++ptr;
 			}
-			else 
+		else 
 			{ 
-				bot->UnBan(theChannel, theBan->getBanMask());
-				ptr = banList->erase(ptr);
-				theBan->deleteRecord();
-				delete(theBan);
-				banCount++;
+			bot->UnBan(theChannel, theBan->getBanMask());
+			ptr = banList->erase(ptr);
+			theBan->deleteRecord();
+			delete(theBan);
+			banCount++;
 			}
 		} // if (banMatched)
-			else
+	else
 		{
-			++ptr;
+		++ptr;
 		} 
 
 	} // while()
 
+/*
+ *  Scan through the channel banlist too, and attempt to match any.
+ */
 
-	/*
-	 *  Scan through the channel banlist too, and attempt to match any.
-	 */
-
-	Channel::const_banIterator cPtr = theChannel->banList_begin();
-	while (cPtr != theChannel->banList_end())
+Channel::const_banIterator cPtr = theChannel->banList_begin();
+while (cPtr != theChannel->banList_end())
 	{ 
 
-		if ( isNick )
+	if ( isNick )
 		{
-			comparison = match((*cPtr), banTarget);
-		} else 
+		comparison = match((*cPtr), banTarget);
+		}
+	else 
 		{
-			comparison = match(banTarget, (*cPtr));
+		comparison = match(banTarget, (*cPtr));
 		}
 
-		if ( comparison == 0)
+	if ( comparison == 0)
 		{ 
- 			// Can't call xClient::UnBan inside the loop it will modify without
-			// a return value.
-			strstream s;
-			s	<< bot->getCharYYXXX() << " M " << theChannel->getName()
-				<< " -b " << (*cPtr) << ends; 
-			bot->Write( s );
-			delete[] s.str();
+		// Can't call xClient::UnBan inside the loop it will modify without
+		// a return value.
+		strstream s;
+		s	<< bot->getCharYYXXX()
+			<< " M " << theChannel->getName()
+			<< " -b " << (*cPtr)
+			<< ends; 
+		bot->Write( s );
+		delete[] s.str();
 
-			theChannel->removeBan(*cPtr);
-			cPtr = theChannel->banList_begin();
+		theChannel->removeBan(*cPtr);
+		cPtr = theChannel->banList_begin();
 
-			banCount++;
-		} else
+		banCount++;
+		}
+	else
 		{
-			++cPtr;
+		++cPtr;
 		}
 
 	} // while()
 
-	bot->Notice(theClient, 
-		bot->getResponse(theUser,
-			language::bans_removed,
-			string("Removed %i bans that matched %s")).c_str(),
-		banCount, banTarget.c_str());
+bot->Notice(theClient, 
+	bot->getResponse(theUser,
+		language::bans_removed,
+		string("Removed %i bans that matched %s")).c_str(),
+	banCount, banTarget.c_str());
 
-	return true;
+return true;
 
 } 
 
