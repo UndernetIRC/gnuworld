@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------------
--- "$Id: cservice.sql,v 1.19 2001/01/28 18:52:07 gte Exp $"
+-- "$Id: cservice.sql,v 1.20 2001/01/28 18:55:01 gte Exp $"
 -- Channel service DB SQL file for PostgreSQL.
 
 -- ChangeLog:
@@ -176,7 +176,8 @@ CREATE TABLE levels (
 	flags INT2 NOT NULL DEFAULT '0',
 -- 0x00 01 -- AutoOp
 -- 0x00 02 -- Protect  (From CS source, unused)
--- 0x00 04 -- Temp forced access. (removed on logout).
+-- 0x00 04 -- Temp forced access - Temp used by bot, ignore.
+-- 0x00 08 -- AutoVoice
 	suspend_expires INT4,
 	suspend_by VARCHAR( 128 ),
 	added INT4,
