@@ -1,5 +1,5 @@
 #!/usr/local/pgsql/bin/pgtclsh
-# $Id: appjudge,v 1.5 2003/01/15 00:13:30 nighty Exp $
+# $Id: appjudge,v 1.6 2003/05/07 14:22:22 nighty Exp $
 # Author: sengaia@undernet.org, 20010619
 # Last fix: nighty@undernet.org, 20030115 (fixed a typo hDB <> hSQL, and a forgoten variable reset in Step3)
 # This script automates a good part of the channel-registration process, you need
@@ -84,7 +84,11 @@ proc check_comments {hDB channel_id} {
 }
 
 # Open the DB
-set hSQL [pg_connect $SQL_DB]
+if {$SQL_PASS == ""} { 
+	set hSQL [pg_connect -conninfo "dbname=$SQL_DB user=$SQL_USER"]
+} else {
+	set hSQL [pg_connect -conninfo "dbname=$SQL_DB password=$SQL_PASS user=$SQL_USER"]
+}
 puts [format "%s: The court is now in session." [clock_stamp]]
 
 # Step 0.5: Reject applications that are still in status 0 after x days.
