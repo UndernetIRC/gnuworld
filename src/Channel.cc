@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: Channel.cc,v 1.33 2002/07/16 13:51:12 dan_karrels Exp $
+ * $Id: Channel.cc,v 1.34 2002/10/16 00:49:38 gte Exp $
  */
 
 #include	<new>
@@ -38,7 +38,7 @@
 #include	"ConnectionManager.h"
 
 const char Channel_h_rcsId[] = __CHANNEL_H ;
-const char Channel_cc_rcsId[] = "$Id: Channel.cc,v 1.33 2002/07/16 13:51:12 dan_karrels Exp $" ;
+const char Channel_cc_rcsId[] = "$Id: Channel.cc,v 1.34 2002/10/16 00:49:38 gte Exp $" ;
 const char iClient_h_rcsId[] = __ICLIENT_H ;
 const char ChannelUser_h_rcsId[] = __CHANNELUSER_H ;
 const char Network_h_rcsId[] = __NETWORK_H ;
@@ -526,7 +526,7 @@ if( ConnectionManager::isIpAddress( theClient->getInsecureHost() ) )
 	}
 else
 	{
-	if( 2 == st.size() )
+	if( (2 == st.size()) || theClient->isModeX() )
 		{
 		theBan += theClient->getInsecureHost() ;
 		}
