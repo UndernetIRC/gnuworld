@@ -1,5 +1,5 @@
 #ifndef __CSERVICE_H
-#define __CSERVICE_H "$Id: cservice.h,v 1.62 2001/04/16 23:18:44 gte Exp $"
+#define __CSERVICE_H "$Id: cservice.h,v 1.63 2001/04/17 02:13:17 gte Exp $"
 
 #include	<string>
 #include	<vector>
@@ -266,7 +266,11 @@ public:
  
 	/* TimerID we recieve every XX hours for expiration of cached entries */
 	xServer::timerID cache_timerID; 
- 
+
+	// Language definitions table (Loaded from Db).
+	typedef map < string, pair <int, string> > languageTableType;
+	languageTableType languageTable; 
+
 	// Language translations table (Loaded from Db).
 	typedef map < pair <int, int>, string > translationTableType ;
 	translationTableType translationTable;

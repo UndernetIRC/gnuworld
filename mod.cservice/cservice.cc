@@ -1284,7 +1284,23 @@ return string( "Unable to retrieve response. Please contact a cservice "
  */
 void cservice::loadTranslationTable()
 {
-ExecStatusType status = SQLDb->Exec(
+ExecStatusType status;
+
+status = SQLDb->Exec("SELECT id,code,name FROM languages");
+
+if (PGRES_TUPLES_OK == status)
+	for (int i = 0; i < SQLDb->Tuples(); i++)
+		languageTable.insert(languageTableType::value_type(SQLDb->GetValue(i, 1),
+			make_pair(atoi(SQLDb->GetValue(i, 0)), SQLDb->GetValue(i, 2))));
+
+#ifdef LOG_SQL
+	elog	<< "cmaster::loadTranslationTable> Loaded "
+			<< languageTable.size()
+			<< " language entries."
+			<< endl;
+#endif
+
+status = SQLDb->Exec(
 	"SELECT language_id,response_id,text FROM translations" ) ;
 
 if( PGRES_TUPLES_OK == status )

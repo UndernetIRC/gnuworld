@@ -13,10 +13,12 @@
  * Sets channel options on the specified channel.
  * 2001-03-16 - Perry Lorier <isomer@coders.net>
  * Added 'DESC' as an alias for 'DESCRIPTION'
+ * 2001-04-16 - Alex Badea <vampire@go.ro>
+ * Changed the implementation for SET LANG, everything is dynamic now.
  *
  * Caveats: None.
  *
- * $Id: SETCommand.cc,v 1.33 2001/04/16 23:18:44 gte Exp $
+ * $Id: SETCommand.cc,v 1.34 2001/04/17 02:13:17 gte Exp $
  */
 
 #include	<string>
@@ -27,7 +29,7 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char SETCommand_cc_rcsId[] = "$Id: SETCommand.cc,v 1.33 2001/04/16 23:18:44 gte Exp $" ;
+const char SETCommand_cc_rcsId[] = "$Id: SETCommand.cc,v 1.34 2001/04/17 02:13:17 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -91,45 +93,27 @@ if( st[1][0] != '#' ) // Didn't find a hash?
 			option.c_str());
 	        return true;
 		}
-	if (option == "LANG")
-		{
-		string lang = "English";
-		bool done = false;
-		if (value == "ENGLISH")
-			{ 
-			theUser->setLanguageId( 1 );
-			theUser->commit();
-			done = true;
-			}
-		if (value == "SPANISH")
-			{
-			lang = "Spanish";
-			theUser->setLanguageId( 10 );
-			theUser->commit(); 
-			done = true;
-			}
-		if (value == "CATALAN")
-			{
-			lang = "Catalan";
-			theUser->setLanguageId( 9 );
-			theUser->commit(); 
-			done = true;
-			}
 
-			if (done) 
-			{
-				bot->Notice(theClient, 
-				    bot->getResponse(theUser,
-				    	    language::lang_set_to,
-					    string("Language is set to %s.")).c_str(), lang.c_str());
-				return true;
-			} else 
-			{ 
-	        	bot->Notice(theClient, 
-	        		"ERROR: Invalid language selection. Choices are: English, Spanish, Catalan.");
-			return true;			
-			}
+	if (option == "LANG")
+	{ 
+		cservice::languageTableType::iterator ptr = bot->languageTable.find(value);
+		if (ptr != bot->languageTable.end()) 
+		{
+			string lang = ptr->second.second;
+			theUser->setLanguageId(ptr->second.first);
+			theUser->commit();
+			bot->Notice(theClient, 
+			    bot->getResponse(theUser,
+			    	    language::lang_set_to,
+				    string("Language is set to %s.")).c_str(), lang.c_str());
+			return true; 
 		}
+
+		bot->Notice(theClient,
+        		"ERROR: Invalid language selection.");
+		return true;
+		}
+	}
 
 	bot->Notice(theClient, 
 		bot->getResponse(theUser,

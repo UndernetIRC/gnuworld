@@ -1,9 +1,14 @@
 Newest changes at the top of the file:
-$Id: RELEASE.NOTES,v 1.7 2001/04/13 19:12:14 gte Exp $
+$Id: RELEASE.NOTES,v 1.8 2001/04/17 02:13:17 gte Exp $
+
+CMaster 1.0pl5 - Current
+* Add Vampire's (Alex Badea <vampire@go.ro>) code to make
+  addition of new languages dynamic.
 
 CMaster 1.0pl4 - 13/04/2001
 * Added REHASH command handler, to allow dynamic reloading
   of translation tables.
+* Fixed a rather obvious ommision that caused a memleak.
 
 CMaster 1.0pl3 - 03/04/2001
 
