@@ -1,8 +1,8 @@
 -- Language Definition Table for CMaster Undernet channel services.
 -- 24/12/01 - nighty <nighty@undernet.org>. (fixed missing field)
 
- 
--- Zap everything! 
+
+-- Zap everything!
 DELETE FROM translations;
 
 
@@ -1410,25 +1410,26 @@ COPY "translations" FROM stdin;
 
 -- Hungarian language definition.
 -- 13/07/2001 - Laccc <blaszlo@kabelkon.ro>
+-- 09/04/2003 - Laccc <Laccc@cservice.undernet.org>, updates/fixes.
 
-COPY "translations" FROM stdin; 
-11	1	Mar be vagy jelentkezve %s usernev alatt	31337	0
-11	2	AZONOTITAS SIKERULT a(z) %s usernev alatt	31337	0
+COPY "translations" FROM stdin;
+11	1	Mar be vagy jelentkezve %s felhasznaloi nev alatt	31337	0
+11	2	AZONOSITAS SIKERULT a(z) %s felhasznaloi nev alatt	31337	0
 11	3	Nincs eleg jogod ahhoz, hogy hasznald ezt a parancsot	31337	0
 11	4	A(z) %s csatorna ures	31337	0
 11	5	Nem latok %s nevet sehol	31337	0
-11	6	Nem kapok %s nevet a(z) %s csatin	31337	0
+11	6	Nem kapok %s nevet a(z) %s csatornan	31337	0
 11	7	A(z) %s csatorna nincs meg regisztralva	31337	0
-11	8	%s Operatori jogot adott neked (%s) / %s	31337	0
-11	9	%s beszelesi jogot adott neked (%s) / %s	31337	0
+11	8	%s Operatori jogot adott neked (%s)	31337	0
+11	9	%s beszelesi jogot adott neked (%s)	31337	0
 11	10	%s: Nem tartozkodsz ezen a csatornan	31337	0
 11	11	%s mar jenelneg is Operator a(z) %s csatornan	31337	0
 11	12	%s mar jelenleg is voice-olva van a(z) %s csatornan	31337	0
 11	13	%s elvette az Operatori jogodat (%s)	31337	0
 11	14	%s elvette a beszelesi jogodat (%s)	31337	0
-11	15	%s -nak/nek nincs Operatori jog adva a(z) %s csatornan	31337	0
-11	16	%s -nak/nek nincs beszelesi jog adva a(z) %s csatornan	31337	0
-11	17	AZONOSITAS SIKERTELEN a(z) %s usernev alatt (Hibas Jelszo)	31337	0
+11	15	%s felhasznalonak nincs Operatori jog adva a(z) %s csatornan	31337	0
+11	16	%s felhasznalonak nincs beszelesi jog adva a(z) %s csatornan	31337	0
+11	17	AZONOSITAS SIKERTELEN a(z) %s felhasznaloi nev alatt (Hibas Jelszo)	31337	0
 11	18	Nem vagyok azon a csatornan!	31337	0
 11	19	Ervenytelen ban szint, 1-%i kozott valaszthatsz.	31337	0
 11	20	Ervenytelen ban idotartalom. Maximum 336 orat hasznalhatsz.	31337	0
@@ -1438,18 +1439,18 @@ COPY "translations" FROM stdin;
 11	24	Ervenytelen minimum szint.	31337	0
 11	25	Ervenytelen maximum szint.	31337	0
 11	26	FELHASZNALO: %s JOG(ACCESS): %s %s	31337	0
-11	27	CSATRONA: %s -- AUTOMODE: %s	31337	0
+11	27	CSATRONA: %s -- AUTOMOD: %s	31337	0
 11	28	UTOLJARA MODOSITVA: %s (%s -el ezelott)	31337	0
-11	29	** FELFUGGESZTETT ** - Veget er %s utan (Level %i)	31337	0
+11	29	** FELFUGGESZTETT ** - Veget er %s mulva 	31337	0
 11	30	UTOLJARA VOLT: %s -el ezelott..	31337	0
 11	31	15-nel tobb hasonlo adat van.	31337	0
 11	32	Legyszives korlatold a keresed.	31337	0
 11	33	Vege az access listanak	31337	0
 11	34	Nem kaptam semmit!	31337	0
-11	35	Nem rakhatsz fel naladnal nagyobb vagy a te jogoddal egyenlo erteku felhasznalokat.	31337	0
-11	36	Ervenztelen access szint.	31337	0
-11	37	%s nevu felhasznalo mar jelen van a(z) %s csatorna felhasznaloi listajaban %i joggal.	31337	0
-11	38	%s nevu felhasznalot sikeresen hozzaadtam a(z) %s csatronahoz %i joggal	31337	0
+11	35	Nem rakhatsz fel naladnal nagyobb- vagy a te jogoddal egyenlo erteku felhasznalokat.	31337	0
+11	36	Ervenytelen access szint.	31337	0
+11	37	%s nevu felhasznalo mar jelen van a(z) %s csatorna felhasznaloi listajaban, %i joggal.	31337	0
+11	38	%s nevu felhasznalot sikeresen hozzaadtam a(z) %s csatronahoz, %i joggal	31337	0
 11	39	Valamit nem sikerult befejeznem: %s	31337	0
 11	40	%s: Vege a banlistanak	31337	0
 11	41	Nem lehet latni a felhasznalo adatait (Lathatatlan)	31337	0
@@ -1468,10 +1469,10 @@ COPY "translations" FROM stdin;
 11	54	Befejezetlen parancs	31337	0
 11	55	Hogy hasznalhasd %s -t, ahhoz /msg %s@%s -t kell hasznalj	31337	0
 11	56	Eloszor azonositsd magad, mielott hasznalnad ezt a parancsot.	31337	0
-11	57	A(z) %s csatornat felfuggesztette egy cservice administrator.	31337	0
+11	57	A(z) %s csatornat felfuggesztette egy CService Administrator.	31337	0
 11	58	A(z) %s csatornan levo jogod fel van fuggesztve.	31337	0
-11	59	A NOOP opcio erteke: %s	31337	0
-11	60	A STRICTOP opcio erteke %s	31337	0
+11	59	Aktivaltam a NOOP-ot a(z) %s csatornan	31337	0
+11	60	Aktivaltam a STRICTOP-ot a(z) %s csatornan	31337	0
 11	61	Tobb mint %i embernek vetted el az Operatori jogat	31337	0
 11	62	SZINTAXIS: %s	31337	0
 11	63	Ideiglenesen a(z) %s csatornan %i -re nott a jogod.	31337	0
@@ -1482,22 +1483,22 @@ COPY "translations" FROM stdin;
 11	68	%s %s Szint: %i	31337	0
 11	69	FELTETTE: %s (%s)	31337	0
 11	70	OTA: %s	31337	0
-11	71	LEJAR: %s	31337	0
+11	71	LEJAR:: %s	31337	0
 11	72	\002*** VEGE ***\002	31337	0
 11	73	Nem tudom ki az a(z) %s.	31337	0
 11	74	Mar nem vagy azonositva.	31337	0
-11	75	%s -nak/nek nincs joga a(z) %s csatornahoz.	31337	0
-11	76	Nem tudod modositani egyenlo- vagy magasabb erteku joggal rendelkezo szemely adatait.	31337	0
+11	75	%s felhasznalonak nincs joga a(z) %s csatornahoz.	31337	0
+11	76	Nem tudod modositani egyenlo- vagy naladnal magasabb erteku joggal rendelkezo szemely adatait.	31337	0
 11	77	Nem tudsz a te jogoddal egyenlo- vagy magasabb jogot adni.	31337	0
-11	78	%s joga %s lett a(z) %i csatornan.	31337	0
-11	79	%s AUTOMODE erteke most OP a(z) %s csatornan	31337	0
-11	80	%s AUTOMODE erteke most VOICE a(z) %s csatornan	31337	0
-11	81	%s AUTOMODE erteke most NONE a(z) %s csatornan	31337	0
+11	78	%s joga a(z) %s csatornan %i lett.	31337	0
+11	79	%s AUTOMOD erteke most OP lett a(z) %s csatornan	31337	0
+11	80	%s AUTOMOD erteke most VOICE lett a(z) %s csatornan	31337	0
+11	81	%s AUTOMOD erteke most NONE lett a(z) %s csatornan	31337	0
 11	82	A jelszo nem egyezhet meg a userneveddel sem a nickneveddel - szintaxis : NEWPASS <uj jelszo>	31337	0
 11	83	Sikeresen megvaltoztattam a jelszavad.	31337	0
-11	84	A NOOP opcio erteke: %s	31337	0
-11	85	A STRICTOP opcio erteke %s (es %s nincs azonositva)	31337	0
-11	86	A STRICTOP opico erteke %s (es %s -nak/nek nincs eleg joga)	31337	0
+11	84	Kiszedtem a NOOP-ot a(z) %s csatornarol	31337	0
+11	85	A(z) %s csatornan aktivalva van a STRICTOP (es %s nincs azonositva)	31337	0
+11	86	A(z) %s csatornan aktivalva van a STRICTOP (es %s felhasznalonak nincs eleg joga)	31337	0
 11	87	A(z) %s torolt csatorna.	31337	0
 11	88	%s mar jelenleg is regisztralva van.	31337	0
 11	89	Ervenytelen csatorna nev.	31337	0
@@ -1507,25 +1508,25 @@ COPY "translations" FROM stdin;
 11	93	Nem tudsz letorolni veled egyerteku- vagy magasabb joggal rendelkezo felhasznalot. 	31337	0
 11	94	Nem tudod letorolni magad olyan csatornarol, ami a tied.	31337	0
 11	95	Leszedtem %s -t a(z) %s csatornarol	31337	0
-11	96	Az informacioid most lathatatnakok (INVISIBLE ON).	31337	0
+11	96	Az informacioid most lathatatlanok (INVISIBLE ON).	31337	0
 11	97	Az informacioid most lathatoak (INVISIBLE OFF).	31337	0
 11	98	A(z) %s %s -nak most %s	31337	0
 11	99	A(z) %s erteke ON vagy OFF kell legyen	31337	0
 11	100	Ervenytelen USERFLAGS beallitas. Ervenyes ertekek: 0, 1, 2.	31337	0
-11	101	USERFLAGS erteke %s -nak most %i	31337	0
+11	101	A(z) %s csatornanak az USERFLAGS erteke most %i	31337	0
 11	102	A MASSDEOPPRO erteke 0-7 kozott kell legyen	31337	0
-11	103	A %s csatorna MASSDEOPPRO opciojanak az erteke %d	31337	0
+11	103	A(z) %s csatorna MASSDEOPPRO opciojanak az erteke %d	31337	0
 11	104	A FLOODPRO erteke 0-7 kozott kell legyen	31337	0
-11	105	A %s csatorna FLOODPRO opciojanak erteke %d	31337	0
+11	105	A(z) %s csatorna FLOODPRO opciojanak erteke %d	31337	0
 11	106	A KORULIRAS maximum 80 betus lehet!	31337	0
 11	107	A(z) %s csatorna KORULIRASA letorolve.	31337	0
 11	108	A(z) %s csatorna KORULIRASA: %s	31337	0
 11	109	Az URL maximum 75 betus lehet!	31337	0
 11	110	A(z) %s csatorna URL-je letorolve.	31337	0
-11	111	A(z) %s csatorna URL erteke: %s	31337	0
+11	111	A(z) %s csatorna URL-je: %s	31337	0
 11	112	A csatorna kulcsszavainak hossza nem lehet tobb mint 80 betu!	31337	0
 11	113	A(z) %s csatorna kulcsszavai: %s	31337	0
-11	114	A nyelv mostantol Magyar (%s).	31337	0
+11	114	A nyelv mostantol %s.	31337	0
 11	115	HIBA: Ervenytelen nyelv valasztas.	31337	0
 11	116	Nem kapom a(z) %s csatornat a halozaton!	31337	0
 11	117	HIBA: Ervenytelen csatorna beallitas.	31337	0
@@ -1547,11 +1548,11 @@ COPY "translations" FROM stdin;
 11	133	A csatorna mod: %s	31337	0
 11	134	Opicok: %s	31337	0
 11	135	Nem tudsz felfuggeszteni veled egyerteku- vagy magasabb joggal rendelkezo felhasznalokat.	31337	0
-11	136	Hibas ido egysegek	31337	0
+11	136	Hibas idoegysegek	31337	0
 11	137	Hibas felfuggesztesi idotartalom.	31337	0
 11	138	%s FELFUGGESZTESE visszavonva	31337	0
 11	139	%s mar jelenleg is fel van fuggesztve a(z) %s csatornan	31337	0
-11	140	%s FELFUGGESZTESE %s idon belul jar le	31337	0
+11	140	%s FELFUGGESZTESE %s ido mulva jar le	31337	0
 11	141	HIBA: A topicban nem lehet tobb mint 145 betu	31337	0
 11	142	Nincs eleg jogod ahhoz, hogy leszedjed a(z) %s bant a(z) %s csatornarol	31337	0
 11	143	Leszedtem %i olyan bant, ami talalt %s -el.	31337	0
@@ -1560,24 +1561,24 @@ COPY "translations" FROM stdin;
 11	146	%s nincs felfuggesztve a(z) %s csatornan	31337	0
 11	147	%s egy IRC operator	31337	0
 11	148	%s NINCS azonositva.	31337	0
-11	149	%s azonositva van, userneve: %s%s	31337	0
-11	150	%s egy Official CService Representative%s es %s a userneve	31337	0
-11	151	%s egy Official CService Administrator%s es %s a userneve	31337	0
-11	152	%s egy Official CService Developer%s es %s a userneve	31337	0
+11	149	%s azonositasa megtortent, felhasznaloi neve: %s%s	31337	0
+11	150	%s egy Hivatalos CService Kepviselo%s es %s a userneve	31337	0
+11	151	%s egy Hivatalos CService Adminisztrator%s es %s a userneve	31337	0
+11	152	%s egy Hivatalos CService Fejleszto%s es %s a userneve	31337	0
 11	153	Tobb mint %i informacio talal. [%s]	31337	0
 11	154	Legyszives korlatold a keresesi maszkot.	31337	0
-11	155	Nem kaptam semmit [%s] -ra	31337	0
+11	155	Nem kaptam semmit [%s] kulcsszora	31337	0
 11	156	%s: Letoroltem a csatorna modokat.	31337	0
 11	158	Ervenytelen opcio.	31337	0
-11	159	%s egy Official Undernet Service Bot.	31337	0
-11	160	%s egy Official Coder-Com Representative%s es %s a userneve	31337	0
-11	161	%s egy Official Coder-Com Contributer%s es %s a userneve	31337	0
-11	162	%s egy Official Coder-Com Developer%s es %s a userneve	31337	0
-11	163	%s egy Official Coder-Com Senior%s es %s a userneve	31337	0
+11	159	%s egy Hivatalos Undernet Bot.	31337	0
+11	160	%s egy Hivatalos Coder-Com Kepviselo%s es %s a userneve	31337	0
+11	161	%s egy Hivatalos Coder-Com Hozzajarulo%s es %s a userneve	31337	0
+11	162	%s egy Hivatalos Coder-Com Kepviselo%s es %s a userneve	31337	0
+11	163	%s egy Hivatalos Coder-Com Senior%s es %s a userneve	31337	0
 11	164	 es egy IRC operator	31337	0
-11	165	Feltettem a(z) %s bant a(z) %s csatornara %i szintre.	31337	0
+11	165	Feltettem a(z) %s bant a(z) %s csatornara, %i -es szintre.	31337	0
 11	166	%s: Ures a ban lista.	31337	0
-11	167	Mar jelenleg is bennt vagyok azon a csatornan!	31337	0
+11	167	Mar jelenleg is bent vagyok azon a csatornan!	31337	0
 11	168	Ezt a parancsot csak IRC Operatorok hasznalhatjak.	31337	0
 11	169	Nem vagyok op a(z) %s csatornan	31337	0
 11	170	%s %i percre	31337	0
@@ -1941,7 +1942,7 @@ COPY "translations" FROM stdin;
 -- 02/09/01
 -- B_O_S_S - boss@boss.org
 
-COPY "translations" FROM stdin; 
+COPY "translations" FROM stdin;
 14	1	Assif. anta mo3arafone sabi9ane %s	31337	0
 14	2	ta3arof naji7li  %s	31337	0
 14	3	Assif.	31337	0
