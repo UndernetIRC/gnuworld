@@ -2,7 +2,7 @@
 /*
  *
  * Undernet GNUworld Interactive Installation Guide (aka UGIIG)
- * $Id: index.php,v 1.6 2002/04/04 11:48:21 nighty Exp $
+ * $Id: index.php,v 1.7 2002/04/05 10:30:56 nighty Exp $
  *
  * Released under the GNU Public License : http://www.gnu.org/licenses/gpl.txt
  * by nighty <nighty@undernet.org>
@@ -50,7 +50,7 @@ function footer($prev,$next) {
 	//echo "<address>maintained by <b>&lt;</b><a href=\"mailto:" . $coder_email . "\">" . $coder_email . "</a><b>&gt;</b> - Last modified : <b>" . date("M-d-Y H:i:s",   (  filemtime("index.php")+( date("Z",filemtime("index.php"))/3600 )   )   ) . " UTC/GMT</b> - <b>[</b><a href=\"./\">Home</a><b>]</b></address>";
 	echo "<address>maintained by <b>&lt;</b><a href=\"mailto:" . $coder_email . "\">" . $coder_email . "</a><b>&gt;</b> - <b>[</b><a href=\"./\">Home</a><b>]</b>";
 	echo "&nbsp;<br><font size=-2><b>";
-?>$Id: index.php,v 1.6 2002/04/04 11:48:21 nighty Exp $<?
+?>$Id: index.php,v 1.7 2002/04/05 10:30:56 nighty Exp $<?
 	echo "</b></font></address>\n";
 	echo "</body>\n";
 	echo "</html>\n";
@@ -75,7 +75,7 @@ $coder_email = "nighty@undernet.org";
 $coder_name = "nighty";
  
 ?>
-<!-- $Id: index.php,v 1.6 2002/04/04 11:48:21 nighty Exp $ //-->
+<!-- $Id: index.php,v 1.7 2002/04/05 10:30:56 nighty Exp $ //-->
 <html>
 <head>
 <title>Undernet GNUworld Interactive Installation Guide</title>
@@ -1353,7 +1353,7 @@ it will be sent to <b>_top</b> (the whole browser current window).</font>
 	/*---------------------*/
 
 <font color=#000000>You should change all those variables to random salts you pick instead of <b>0123456789</b>.
-<u>NOTE:</u> the size of the SALT is not important, but a reasonable value like 10 chars give a certain ammount of security.</font>	
+<u>NOTE:</u> the size of the SALT is not important, but a reasonable value like 10 chars give a certain amount of security.</font>	
 	define(CRC_SALT_0001,"0123456789");
 	define(CRC_SALT_0002,"0123456789");
 	define(CRC_SALT_0003,"0123456789");
@@ -1434,7 +1434,7 @@ a database locally for each mirror.</font>
 				     // register a channel or be a channel supporter until they login to the bot on IRC.
 
 
-	define(REGPROC_ALLOWMULTIPLE,0); // If this is set to 1, users will be allowed to register an unlimited ammount
+	define(REGPROC_ALLOWMULTIPLE,0); // If this is set to 1, users will be allowed to register an unlimited amount
 					 // of channels, but will still be allowed to have only ONE channel being applied at a time.
 	
 
@@ -1452,7 +1452,7 @@ a database locally for each mirror.</font>
 	The number of required supporters will be, if not existing in tables "variables" in the remote DB,
 	updated to the number you set above (ie. first run), BUT, if there's already a definition for it in the DB,
 	the DB one will be the one used by the interface.
-	You can change the ammount of required supporters using the website itself in 'ACL Manager'.
+	You can change the amount of required supporters using the website itself in 'ACL Manager'.
 	You must be 901+ to view the [Modify] button next to number of required supporters, ensure
 	the "New Regs" are LOCKED (at the top of the ACL Manager page) then click on the [Modify] button,
 	One button there will allow you to reset to "config.inc"'s setting, or change to another number,
