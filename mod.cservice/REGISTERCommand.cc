@@ -8,7 +8,7 @@
  *
  * Caveats: None
  *
- * $Id: REGISTERCommand.cc,v 1.13 2001/03/05 03:06:30 gte Exp $
+ * $Id: REGISTERCommand.cc,v 1.14 2001/03/06 00:27:12 gte Exp $
  */
  
 #include	<string>
@@ -21,7 +21,7 @@
 #include	"Network.h"
 #include	"responses.h"
 
-const char REGISTERCommand_cc_rcsId[] = "$Id: REGISTERCommand.cc,v 1.13 2001/03/05 03:06:30 gte Exp $" ;
+const char REGISTERCommand_cc_rcsId[] = "$Id: REGISTERCommand.cc,v 1.14 2001/03/06 00:27:12 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -234,8 +234,14 @@ bool REGISTERCommand::Exec( iClient* theClient, const string& Message )
 		bot->Notice(theClient, "Unable to add level 500 user to channel");
 	}
  	
-	delete[] addUserQuery.str();
-	return true ;
+	delete[] addUserQuery.str(); 
+
+	/*
+	 *  Finally, commit a channellog entry.
+	 */
+ 
+	bot->writeChannelLog(tmpSqlChan, theClient, sqlChannel::EV_REGISTER, "to " + tmpUser->getUserName());
+	return true; 
 } 
 
 } // namespace gnuworld.
