@@ -37,7 +37,7 @@
 #include	"ip.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.123 2002/02/01 11:14:04 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.124 2002/02/01 11:30:14 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -2418,8 +2418,8 @@ for(glineIterator ptr = glineList.begin();ptr != glineList.end();)
 
 inRefresh = false;
 
-if(totalFound > 0)
-	MsgChanLog("[Refresh Glines] - %d expired\n",totalFound);
+//if(totalFound > 0)
+//	MsgChanLog("[Refresh Glines] - %d expired\n",totalFound);
 return true;
 
 }
