@@ -1,7 +1,7 @@
 /* ccFlood.h */
 
 #ifndef __CCLOGIN_H
-#define __CCLOGIN_H "$Id: ccLogin.h,v 1.4 2001/06/07 15:59:06 mrbean_ Exp $"
+#define __CCLOGIN_H "$Id: ccLogin.h,v 1.5 2001/07/20 09:09:31 mrbean_ Exp $"
 
 #define IGNORE_NOT_FOUND -1
 #define IGNORE_REMOVED -2
@@ -25,23 +25,23 @@ public:
 	virtual ~ccLogin();
 	//Mehods for getting info
 	
-	inline const string 	get_Numeric() const
+	inline const string 	getNumeric() const
 		{ return Numeric; }
 
-	inline const int 	get_Logins() const
+	inline const int 	getLogins() const
 		{ return Logins; }
 
-	inline time_t	 	get_IgnoreExpires() const
+	inline time_t	 	getIgnoreExpires() const
 		{ return IgnoreExpires; }
-	inline const string	get_IgnoredHost() const
+	inline const string	getIgnoredHost() const
 		{ return IgnoredHost; }
 	
 	//Methods for setting info
 	
-	inline void 		set_Numeric( string _Numeric ) 
+	inline void 		setNumeric( string _Numeric ) 
 		{ Numeric = _Numeric; }
 
-	inline void 		set_Logins( int _Logins ) 
+	inline void 		setLogins( int _Logins ) 
 		{ Logins = _Logins; }
 
 	inline void		add_Login()
@@ -53,10 +53,10 @@ public:
 	inline void		resetLogins() 
 		{ Logins = 0; }
 	
-	inline void		set_IgnoreExpires(time_t _Expires)
+	inline void		setIgnoreExpires(time_t _Expires)
 		{ IgnoreExpires =_Expires; }
 
-	inline void		set_IgnoredHost(string _Host)
+	inline void		setIgnoredHost(string _Host)
 		{ IgnoredHost =_Host; }
 	
 

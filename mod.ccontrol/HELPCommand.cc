@@ -14,7 +14,7 @@
 #include	"StringTokenizer.h"
 
 
-const char HELPCommand_cc_rcsId[] = "$Id: HELPCommand.cc,v 1.7 2001/06/11 21:08:31 mrbean_ Exp $";
+const char HELPCommand_cc_rcsId[] = "$Id: HELPCommand.cc,v 1.8 2001/07/20 09:09:31 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -45,7 +45,7 @@ if( 1 == st.size() )
 		{
 		ComLevel = ptr->second->getFlags();
 		ComLevel &= ~flg_NOLOG; 
-		if((ComLevel == 0) || (ComLevel & tmpAuth->get_Access()) )
+		if((ComLevel == 0) || (ComLevel & tmpAuth->getAccess()) )
 			bot->Notice( theClient, ptr->second->getName() ) ;
 		}
 	}

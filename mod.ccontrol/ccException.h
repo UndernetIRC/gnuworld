@@ -1,7 +1,7 @@
 /* ccException.h */
 
 #ifndef __CCEXCEPTION_H
-#define __CCEXCEPTION_H "$Id: ccException.h,v 1.1 2001/06/07 15:59:06 mrbean_ Exp $"
+#define __CCEXCEPTION_H "$Id: ccException.h,v 1.2 2001/07/20 09:09:31 mrbean_ Exp $"
 
 #include	<string>
 
@@ -24,28 +24,28 @@ public:
 	inline bool operator==( const string& ExceptionHost ) const
 		{ return (0 == strcasecmp( Host, ExceptionHost )) ; }
 	
-	inline const string 		get_Host() const
+	inline const string 		getHost() const
 			{ return Host; }
 		
-	inline const int		get_Connections() const
+	inline const int		getConnections() const
 		{ return Connections; }
 	
-	inline const string		get_AddedBy() const
+	inline const string		getAddedBy() const
 		{ return AddedBy; }
 		
-	inline time_t			get_AddedOn() const
+	inline time_t			getAddedOn() const
 		{ return AddedOn; }
 
-	inline void 		set_Host( const string& _Host ) 
+	inline void 		setHost( const string& _Host ) 
 		{ Host = _Host; }
 		
-	inline void		set_Connections( const int _Connections ) 
+	inline void		setConnections( const int _Connections ) 
 		{  Connections = _Connections; }
 	
-	inline void		set_AddedBy( const string& _AddedBy) 
+	inline void		setAddedBy( const string& _AddedBy) 
 		{ AddedBy = _AddedBy; }
 		
-	inline void		set_AddedOn( const time_t _AddedOn )
+	inline void		setAddedOn( const time_t _AddedOn )
 		{ AddedOn = _AddedOn; }
 	
 	int		loadData(const string& Host);

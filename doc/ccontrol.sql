@@ -1,4 +1,4 @@
--- "$Id: ccontrol.sql,v 1.8 2001/05/21 16:14:55 mrbean_ Exp $"
+-- "$Id: ccontrol.sql,v 1.9 2001/07/20 09:09:30 mrbean_ Exp $"
 -- 2001-13-02  : |MrBean|
 -- Added level patch for ccontrol module
 
@@ -18,6 +18,7 @@ CREATE TABLE opers (
 	password VARCHAR (40) NOT NULL,
 	access INT4 NOT NULL DEFAULT '0',
 -- For a full list of access mask see CControlCommands.h
+	server VARCHAR (128) NOT NULL,          -- the server the oper is assosiated to
 	last_updated_by VARCHAR (128),		-- nick!user@host
 	last_updated INT4 NOT NULL,
 	flags INT4 NOT NULL DEFAULT '0',

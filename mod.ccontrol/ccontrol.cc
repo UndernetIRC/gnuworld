@@ -26,7 +26,7 @@
 #include        "server.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.57 2001/07/18 06:42:35 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.58 2001/07/20 09:09:31 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -220,7 +220,7 @@ RegisterCommand( new CHECKNETWORKCommand( this, "CHECKNET", ""
 	"Checks if all known servers are in place",flg_CHECKNET ) ) ;
 RegisterCommand( new LASTCOMCommand( this, "LASTCOM", "[number of lines to show]"
 	"Post you the bot logs",flg_LASTCOM ) ) ;
-RegisterCommand( new FORCEGLINECommand( this, "FORCEGLINE", "[duration (sec)] <user@host> <reason> "
+RegisterCommand( new FORCEGLINECommand( this, "FORCEGLINE", "<user@host> <duration>[time units] <reason> "
 	"Gline a given user@host for the given reason",flg_FGLINE ) ) ;
 RegisterCommand( new EXCEPTIONCommand( this, "EXCEPTIONS", "(list / add / del) [host mask]"
 	"Add connection exceptions on hosts",flg_EXCEPTIONS ) ) ;
@@ -387,7 +387,7 @@ int ComAccess = commHandler->second->getFlags();
 
 bool ShouldntLog = ComAccess & flg_NOLOG;
 
-ComAccess &= ~flg_NOLOG;
+ComAccess = getTrueAccess(ComAccess);
 
 AuthInfo* theUser = IsAuth(theClient->getCharYYXXX());
 
@@ -396,7 +396,7 @@ if((!theUser) && (ComAccess))
 	Notice( theClient,
 		"You must be logged in to issue that command" ) ;
 	}
-else if( (ComAccess) && !(ComAccess & theUser->get_Access()))
+else if( (ComAccess) && !(ComAccess & theUser->getAccess()))
 	{
 	Notice( theClient, "You dont have access to that command" ) ;
 	}
@@ -443,14 +443,14 @@ switch( theEvent )
 
 		AuthInfo *TempAuth = IsAuth(tmpUser);
 		if(TempAuth)
-	    	    deAuthUser(tmpUser->getCharYYXXX());
+	    		deAuthUser(tmpUser->getCharYYXXX());
 		ccLogin *tempLogin = findLogin(tmpUser->getCharYYXXX());
 		if(tempLogin)
 			{
 			removeLogin(tempLogin);
-			if(tempLogin->get_IgnoredHost() != "")
+			if(tempLogin->getIgnoredHost() != "")
 				{
-				tempLogin->set_Numeric("0");
+				tempLogin->setNumeric("0");
 				tempLogin->resetLogins();
 				}
 			else
@@ -476,14 +476,14 @@ switch( theEvent )
 		assert(CheckServer != NULL);
 		if(CheckServer->loadNumericData(NewServer->getCharYY()))
 			{
-			if(strcasecmp(NewServer->getName(),CheckServer->get_Name()))
+			if(strcasecmp(NewServer->getName(),CheckServer->getName()))
 				{
 				strstream s ;
 				s	<< getCharYY() << " WA :"
     					<< "\002Database numeric collision warnning!\002 - "
 					<< NewServer->getName()
 					<< " != "
-					<< CheckServer->get_Name()
+					<< CheckServer->getName()
 					<< ends ;
 				Write( s ) ;
 				delete[] s.str();
@@ -496,9 +496,9 @@ switch( theEvent )
 			}
 		else
 			{
-			CheckServer->set_LastConnected(::time (0));
-			CheckServer->set_Uplink(UplinkServer->getName());
-			CheckServer->set_LastNumeric(NewServer->getCharYY());
+			CheckServer->setLastConnected(::time (0));
+			CheckServer->setUplink(UplinkServer->getName());
+			CheckServer->setLastNumeric(NewServer->getCharYY());
 			CheckServer->Update();
 			}
 		delete CheckServer;
@@ -529,32 +529,32 @@ switch( theEvent )
 			if(!tmpGline)
 				{
 				tmpGline = new ccGline(SQLDb);
-				tmpGline->set_Host("*@" + NewUser->getInsecureHost());
-				tmpGline->set_Expires(::time(0) + maxGlineLen);
-				tmpGline->set_Reason("Automatically banned for exccessive connections");
-				tmpGline->set_AddedOn(::time(0));
+				tmpGline->setHost("*@" + NewUser->getInsecureHost());
+				tmpGline->setExpires(::time(0) + maxGlineLen);
+				tmpGline->setReason("Automatically banned for exccessive connections");
+				tmpGline->setAddedOn(::time(0));
 				tmpGline->Insert();
-				wallopsAsServer("Adding gline on %s for %s",tmpGline->get_Host().c_str(),tmpGline->get_Reason().c_str());
-				tmpGline->loadData(tmpGline->get_Host());
+				wallopsAsServer("Adding gline on %s for %s",tmpGline->getHost().c_str(),tmpGline->getReason().c_str());
+				tmpGline->loadData(tmpGline->getHost());
 				addGline(tmpGline);
 				}
 			else
-				wallopsAsServer("Refreshing gline time on %s for %s",tmpGline->get_Host().c_str(),tmpGline->get_Reason().c_str());
+				wallopsAsServer("Refreshing gline time on %s for %s",tmpGline->getHost().c_str(),tmpGline->getReason().c_str());
 			MyUplink->setGline( nickName,
-					tmpGline->get_Host(),
-					tmpGline->get_Reason(),
-					tmpGline->get_Expires() - ::time(0) ) ;
+					tmpGline->getHost(),
+					tmpGline->getReason(),
+					tmpGline->getExpires() - ::time(0) ) ;
 			
 			}
 		else if(!inBurst)
 			{	
 			ccGline * tempGline = findMatchingGline(NewUser->getUserName() + '@' + NewUser->getInsecureHost());
-			if((tempGline) && (tempGline->get_Expires() > ::time(0)))
+			if((tempGline) && (tempGline->getExpires() > ::time(0)))
 				{
 				addGline(tempGline);
-				MyUplink->setGline(tempGline->get_AddedBy()
-				,tempGline->get_Host(),tempGline->get_Reason()
-				,tempGline->get_Expires() - ::time(0));
+				MyUplink->setGline(tempGline->getAddedBy()
+				,tempGline->getHost(),tempGline->getReason()
+				,tempGline->getExpires() - ::time(0));
 				}
 			}			
 		break;
@@ -772,7 +772,7 @@ AuthInfo* ccontrol::IsAuth( const string& Numeric ) const
 for( authListType::const_iterator ptr = authList.begin() ;
 	ptr != authList.end() ; ++ptr )
 	{
-	if( !strcasecmp( (*ptr)->get_Numeric(), Numeric ) )
+	if( !strcasecmp( (*ptr)->getNumeric(), Numeric ) )
 		{
 		return *ptr ;
 		}
@@ -791,7 +791,7 @@ AuthInfo* ccontrol::IsAuth( const unsigned int UserId ) const
 for( authListType::const_iterator ptr = authList.begin() ;
 	ptr != authList.end() ; ++ptr )
 	{
-	if( (*ptr)->get_Id() == UserId )
+	if( (*ptr)->getId() == UserId )
 		{
 		return *ptr ;
 		}
@@ -806,19 +806,20 @@ AuthInfo* TempAuth = IsAuth(TempUser);
 if(TempAuth)
 	{
 	//ccUser* TempUser = GetUser(Id);
-	TempAuth->set_Id(TempUser->getID());
-        TempAuth->set_Name(TempUser->getUserName());
-        TempAuth->set_Access(TempUser->getAccess());
-        TempAuth->set_Flags(TempUser->getFlags());
-        TempAuth->set_SuspendExpires(TempUser->getSuspendExpires());
-        TempAuth->set_SuspendedBy(TempUser->getSuspendedBy());
+	TempAuth->setId(TempUser->getID());
+        TempAuth->setName(TempUser->getUserName());
+        TempAuth->setAccess(TempUser->getAccess());
+        TempAuth->setFlags(TempUser->getFlags());
+        TempAuth->setSuspendExpires(TempUser->getSuspendExpires());
+        TempAuth->setSuspendedBy(TempUser->getSuspendedBy());
+	TempAuth->setServer(TempUser->getServer());
 	}
 }
 
 
 bool ccontrol::AddOper (ccUser* Oper)
 {
-static const char *Main = "INSERT into opers (user_name,password,access,last_updated_by,last_updated,flags) VALUES ('";
+static const char *Main = "INSERT into opers (user_name,password,access,last_updated_by,last_updated,flags,server) VALUES ('";
 
 strstream theQuery;
 theQuery	<< Main
@@ -827,7 +828,8 @@ theQuery	<< Main
 		<< Oper->getAccess() << ",'"
 		<< Oper->getLast_Updated_by()
 		<< "',now()::abstime::int4,"
-		<< Oper->getFlags() << ")"
+		<< Oper->getFlags() << ",'"
+		<< Oper->getServer() << "')"
 		<< ends;
 
 elog	<< "ACCESS::sqlQuery> "
@@ -925,14 +927,14 @@ bool ccontrol::AuthUser( ccUser* TempUser)
 AuthInfo *TempAuth = new (nothrow) AuthInfo;
 assert( TempAuth != 0 ) ;
 
-TempAuth->set_Id(TempUser->getID());
-TempAuth->set_Name(TempUser->getUserName());
-TempAuth->set_Access(TempUser->getAccess());
-TempAuth->set_Flags(TempUser->getFlags());
-TempAuth->set_Numeric(TempUser->getNumeric());
-TempAuth->set_SuspendExpires(TempUser->getSuspendExpires());
-TempAuth->set_SuspendedBy(TempUser->getSuspendedBy());
-
+TempAuth->setId(TempUser->getID());
+TempAuth->setName(TempUser->getUserName());
+TempAuth->setAccess(TempUser->getAccess());
+TempAuth->setFlags(TempUser->getFlags());
+TempAuth->setNumeric(TempUser->getNumeric());
+TempAuth->setSuspendExpires(TempUser->getSuspendExpires());
+TempAuth->setSuspendedBy(TempUser->getSuspendedBy());
+TempAuth->setServer(TempUser->getServer());
 authList.push_back( TempAuth ) ;
 return true;
 }    
@@ -1345,9 +1347,9 @@ ccGline *theGline = 0;
 for(glineIterator ptr = glineList.begin(); ptr != glineList.end(); ++ptr)
 	{
 	theGline = *ptr;
-	if(match(theGline->get_Host(),Host) == 0) 
+	if(match(theGline->getHost(),Host) == 0) 
 		{
-    		if(theGline->get_Expires() > ::time(0))
+    		if(theGline->getExpires() > ::time(0))
 			{
 			return theGline;
 			}
@@ -1363,8 +1365,8 @@ ccGline *theGline;
 for(glineIterator ptr = glineList.begin(); ptr != glineList.end();ptr++)
 	{
 	theGline = *ptr;
-    	if(theGline->get_Host() == HostName)
-		if(theGline->get_Expires() > ::time(0))
+    	if(theGline->getHost() == HostName)
+		if(theGline->getExpires() > ::time(0))
 			return theGline;
 	}
 
@@ -1405,9 +1407,9 @@ Message(Network->findChannel(msgChan),buffer);
 for( authListType::const_iterator ptr = authList.begin() ;
         ptr != authList.end() ; ++ptr )
         {
-        if((*ptr)->get_Flags() & getLOGS )
+        if((*ptr)->getFlags() & getLOGS )
                 { 
-                Message(Network->findClient((*ptr)->get_Numeric()),buffer);
+                Message(Network->findClient((*ptr)->getNumeric()),buffer);
                 }
 	}
 return true;
@@ -1422,13 +1424,13 @@ va_list list;
 va_start( list, Log ) ;
 vsprintf( buffer, Log, list ) ;
 va_end( list ) ;
-iClient *theClient = Network->findClient(Oper->get_Numeric());
+iClient *theClient = Network->findClient(Oper->getNumeric());
 buffer[512]= '\0';
 static const char *Main = "INSERT into comlog (ts,oper,command) VALUES (now()::abstime::int4,'";
 
 strstream theQuery;
 theQuery	<< Main
-		<< Oper->get_Name() 
+		<< Oper->getName() 
 		<< " (" << theClient->getNickUserHost() <<")','"
 		<< buffer << "')"
 		<< ends;
@@ -1593,10 +1595,10 @@ return FORCE_NEEDED_HOST;
 
 bool ccontrol::isSuspended(AuthInfo *theUser)
 {
-if( (theUser) && (theUser->get_Flags() & isSUSPENDED))
+if( (theUser) && (theUser->getFlags() & isSUSPENDED))
 	{
 	//Check if the suspend hadnt already expired
-	if(::time( 0 ) - theUser->get_SuspendExpires() < 0)
+	if(::time( 0 ) - theUser->getSuspendExpires() < 0)
 		{
 		return true;
 		}
@@ -1623,10 +1625,10 @@ inRefresh = true;
 
 for(glineIterator ptr = glineList.begin();ptr != glineList.end();) 
 	{
-	if((*ptr)->get_Expires() <= ::time(0))
+	if((*ptr)->getExpires() <= ::time(0))
 		{
 		//remove the gline from the core
-		MyUplink->removeGline((*ptr)->get_Host());
+		MyUplink->removeGline((*ptr)->getHost());
 		//remove the gline from ccontrol structure
 		//finally remove the gline from the database
 		(*ptr)->Delete();
@@ -1650,10 +1652,10 @@ ccGline *theGline = 0 ;
 for(glineIterator ptr = glineList.begin(); ptr != glineList.end(); ptr++)
 	{
 	theGline = *ptr;
-	MyUplink->setGline(theGline->get_AddedBy(),
-		theGline->get_Host(),
-		theGline->get_Reason(),
-		theGline->get_Expires() - ::time(0));
+	MyUplink->setGline(theGline->getAddedBy(),
+		theGline->getHost(),
+		theGline->getReason(),
+		theGline->getExpires() - ::time(0));
 	}
 
 return true;
@@ -1695,12 +1697,12 @@ for( int i = 0 ; i < SQLDb->Tuples() ; i++ )
 	tempGline =  new (nothrow) ccGline(SQLDb);
 	assert( tempGline != NULL ) ;
 
-	tempGline->set_Id(SQLDb->GetValue(i,0));
-	tempGline->set_Host(SQLDb->GetValue(i,1));
-	tempGline->set_AddedBy(SQLDb->GetValue(i,2)) ;
-	tempGline->set_AddedOn(static_cast< time_t >( atoi( SQLDb->GetValue(i,3) ) )) ;
-	tempGline->set_Expires(static_cast< time_t >( atoi( SQLDb->GetValue(i,4) ) )) ;
-	tempGline->set_Reason(SQLDb->GetValue(i,5));
+	tempGline->setId(SQLDb->GetValue(i,0));
+	tempGline->setHost(SQLDb->GetValue(i,1));
+	tempGline->setAddedBy(SQLDb->GetValue(i,2)) ;
+	tempGline->setAddedOn(static_cast< time_t >( atoi( SQLDb->GetValue(i,3) ) )) ;
+	tempGline->setExpires(static_cast< time_t >( atoi( SQLDb->GetValue(i,4) ) )) ;
+	tempGline->setReason(SQLDb->GetValue(i,5));
 	addGline(tempGline);
 	}
 return true;	
@@ -1731,10 +1733,10 @@ for(exceptionIterator ptr = exception_begin();ptr != exception_end();ptr++)
 	{
 	if(*(*ptr) == Host)
 		{
-		MsgChanLog("Found an Exception for %d connections\n",(*ptr)->get_Connections()); 
-		if((*ptr)->get_Connections() > Exception)
+		MsgChanLog("Found an Exception for %d connections\n",(*ptr)->getConnections()); 
+		if((*ptr)->getConnections() > Exception)
 			{
-			Exception = (*ptr)->get_Connections();
+			Exception = (*ptr)->getConnections();
 			}
 		} 
 	}
@@ -1750,9 +1752,9 @@ Notice(theClient,"-= Exceptions list - listing a total of %d exceptions =-"
 	
 for(exceptionIterator ptr = exception_begin();ptr != exception_end();ptr++)
 	Notice(theClient,"Host : %s  Connections : %d AddedBy : %s"
-	       ,(*ptr)->get_Host().c_str()
-	       ,(*ptr)->get_Connections()
-	       ,(*ptr)->get_AddedBy().c_str());
+	       ,(*ptr)->getHost().c_str()
+	       ,(*ptr)->getConnections()
+	       ,(*ptr)->getAddedBy().c_str());
 
 Notice(theClient,"-= End of exception list =-");
 
@@ -1786,10 +1788,10 @@ if(isException(Host))
 ccException* tempException = new (nothrow) ccException(SQLDb);
 assert(tempException != NULL);
 
-tempException->set_Host(Host);
-tempException->set_Connections(Connections);
-tempException->set_AddedBy(theClient->getNickUserHost());
-tempException->set_AddedOn(::time(0));
+tempException->setHost(Host);
+tempException->setConnections(Connections);
+tempException->setAddedBy(theClient->getNickUserHost());
+tempException->setAddedOn(::time(0));
 
 //Update the database, and the internal list
 if(!tempException->Insert())
@@ -1834,7 +1836,7 @@ ccLogin *ccontrol::findLogin( const string & Numeric )
 {
 for(loginIterator ptr = login_begin() ; ptr != login_end() ; ++ptr)
 	{
-	if((*ptr)->get_Numeric() == Numeric)
+	if((*ptr)->getNumeric() == Numeric)
 		{
 		return *ptr;
 		}
@@ -1867,7 +1869,7 @@ if(LogInfo == NULL)
 	}
 
 LogInfo->add_Login();
-if(LogInfo->get_Logins() > 5)
+if(LogInfo->getLogins() > 5)
 	{
 	ignoreUser(LogInfo);
 	}
@@ -1882,21 +1884,21 @@ int retMe = IGNORE_NOT_FOUND;
 for(loginIterator ptr = ignore_begin();ptr!=ignore_end();)
 	{
 	tempLogin = *ptr;
-	if(tempLogin->get_IgnoredHost() == Host)
+	if(tempLogin->getIgnoredHost() == Host)
 		{
 		strstream s;
 		s	<< getCharYYXXX() 
 			<< " SILENCE " 
-			<< tempLogin->get_Numeric() 
+			<< tempLogin->getNumeric() 
 			<< " -" 
-			<< tempLogin->get_IgnoredHost()
+			<< tempLogin->getIgnoredHost()
 			<< ends; 
 		Write( s );
 		delete[] s.str();
 		tempLogin->resetIgnore();
 		tempLogin->resetLogins();
 		ptr = ignoreList.erase(ptr);
-		if(tempLogin->get_Numeric() == "0")
+		if(tempLogin->getNumeric() == "0")
 			{
 			delete tempLogin;
 			}
@@ -1920,7 +1922,7 @@ return retMe;
 
 void ccontrol::ignoreUser( ccLogin *User )
 {
-iClient *theClient = Network->findClient(User->get_Numeric());
+iClient *theClient = Network->findClient(User->getNumeric());
 
 // TODO: Might wanna reconsider this assert()
 assert(theClient != NULL);
@@ -1944,8 +1946,8 @@ s	<< getCharYYXXX()
 Write( s );
 delete[] s.str();
 
-User->set_IgnoreExpires(::time(0)+60);
-User->set_IgnoredHost(silenceMask);
+User->setIgnoreExpires(::time(0)+60);
+User->setIgnoredHost(silenceMask);
 
 ignoreList.push_back(User);
 }
@@ -1957,12 +1959,12 @@ ccLogin *tempLogin;
 for(loginIterator ptr = ignore_begin();ptr!=ignore_end();ptr++)
 	{
 	tempLogin = *ptr;
-	if(tempLogin->get_IgnoreExpires() > ::time(0))
+	if(tempLogin->getIgnoreExpires() > ::time(0))
 		{
 		Notice(theClient,"Host : %s Expires At %s[%d]",
-		tempLogin->get_IgnoredHost().c_str(),
-		convertToAscTime(tempLogin->get_IgnoreExpires()),
-			tempLogin->get_IgnoreExpires());
+		tempLogin->getIgnoredHost().c_str(),
+		convertToAscTime(tempLogin->getIgnoreExpires()),
+			tempLogin->getIgnoreExpires());
 		}
 	}
 Notice(theClient,"-= End Of Ignore List =-");			
@@ -1975,21 +1977,21 @@ ccLogin *tempLogin;
 for(loginIterator ptr = ignore_begin();ptr!=ignore_end();)
 	{
 	tempLogin = *ptr;
-	if((tempLogin) &&(tempLogin->get_IgnoreExpires() <= ::time(0)))
+	if((tempLogin) &&(tempLogin->getIgnoreExpires() <= ::time(0)))
 		{
-		tempLogin->set_IgnoreExpires(0);
+		tempLogin->setIgnoreExpires(0);
 		strstream s;
 		s	<< getCharYYXXX() 
 			<< " SILENCE " 
-			<< tempLogin->get_Numeric() 
+			<< tempLogin->getNumeric() 
 			<< " -" 
-			<< tempLogin->get_IgnoredHost()
+			<< tempLogin->getIgnoredHost()
 			<< ends; 
 
 		Write( s );
 		delete[] s.str();
-		tempLogin->set_IgnoredHost("");
-		if(tempLogin->get_Numeric() == "0")
+		tempLogin->setIgnoredHost("");
+		if(tempLogin->getNumeric() == "0")
 			{
 			delete tempLogin;
 			}
@@ -2033,10 +2035,10 @@ for( int i = 0 ; i < SQLDb->Tuples() ; i++ )
 	tempException =  new (nothrow) ccException(SQLDb);
 	assert( tempException != 0 ) ;
 
-	tempException->set_Host(SQLDb->GetValue(i,0));
-	tempException->set_Connections(atoi(SQLDb->GetValue(i,1)));
-	tempException->set_AddedBy(SQLDb->GetValue(i,2)) ;
-	tempException->set_AddedOn(static_cast< time_t >( atoi( SQLDb->GetValue(i,3) ) )) ;
+	tempException->setHost(SQLDb->GetValue(i,0));
+	tempException->setConnections(atoi(SQLDb->GetValue(i,1)));
+	tempException->setAddedBy(SQLDb->GetValue(i,2)) ;
+	tempException->setAddedOn(static_cast< time_t >( atoi( SQLDb->GetValue(i,3) ) )) ;
 	exceptionList.push_back(tempException);
 	}
 return true;	
@@ -2050,13 +2052,13 @@ Notice(theClient,"-= Gline List =-");
 for(glineIterator ptr = gline_begin();ptr != gline_end();ptr++)
 	{
 	tempGline =*ptr;
-	if(tempGline ->get_Expires() > ::time(0))
+	if(tempGline ->getExpires() > ::time(0))
 		{
 		Notice(theClient,"Host : %s , Expires At : %s[%d] , AddedBy %s"
-			,tempGline->get_Host().c_str()
-			,convertToAscTime(tempGline->get_Expires())
-			,tempGline->get_Expires()
-			,tempGline->get_AddedBy().c_str());
+			,tempGline->getHost().c_str()
+			,convertToAscTime(tempGline->getExpires())
+			,tempGline->getExpires()
+			,tempGline->getAddedBy().c_str());
 		}
 	}
 Notice(theClient,"-= End Of Gline List =-");
@@ -2073,5 +2075,17 @@ void ccontrol::listServers( iClient * )
 {
 
 }
+
+unsigned int ccontrol::getTrueAccess( unsigned int Access )
+{
+return (Access & ~noACCESS);
+}
+
+	
+unsigned int ccontrol::getTrueFlags( unsigned int Flags )
+{
+return (Flags & ~noFLAG);
+}
+
 
 } // namespace gnuworld

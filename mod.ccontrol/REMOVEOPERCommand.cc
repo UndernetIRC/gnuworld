@@ -13,7 +13,7 @@
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 
-const char REMOVEOPERCommand_cc_rcsId[] = "$Id: REMOVEOPERCommand.cc,v 1.7 2001/06/11 21:08:31 mrbean_ Exp $";
+const char REMOVEOPERCommand_cc_rcsId[] = "$Id: REMOVEOPERCommand.cc,v 1.8 2001/07/20 09:09:31 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -38,7 +38,7 @@ if (!theUser)
 	}	    
 AuthInfo* tempAuth = bot->IsAuth(theClient->getCharYYXXX());
 	
-if((tempAuth->get_Flags() & (OPER | ADMIN | CODER)) < theUser->getFlags())
+if(bot->getTrueFlags(tempAuth->getFlags()) < theUser->getFlags())
 	{
 	bot->Notice(theClient,"You cant remove an oper who got higer access than yours");
 	return false;
@@ -52,11 +52,11 @@ if(bot->DeleteOper(string_lower(st[1])))
 	if(TDeauth)
 		{
 		//Get hte user iClient entry from the network , and notify him that he was deleted
-		iClient *TClient = Network->findClient(TDeauth->get_Numeric()); 
+		iClient *TClient = Network->findClient(TDeauth->getNumeric()); 
 		if(TClient)
 			bot->Notice(TClient,"You have been removed from my access list");
 		//Remove the user authenticate entry
-		bot->deAuthUser(TDeauth->get_Numeric());
+		bot->deAuthUser(TDeauth->getNumeric());
 		}	
 	delete theUser;
 	return true;	

@@ -13,7 +13,7 @@
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 
-const char CLEARCHANCommand_cc_rcsId[] = "$Id: CLEARCHANCommand.cc,v 1.6 2001/07/17 07:24:13 mrbean_ Exp $";
+const char CLEARCHANCommand_cc_rcsId[] = "$Id: CLEARCHANCommand.cc,v 1.7 2001/07/20 09:09:31 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -36,6 +36,11 @@ if( NULL == theChan )
 	bot->Notice( theClient, "Unable to find channel %s",
 		st[ 1 ].c_str() ) ;
 	return true ;
+	}
+if(bot->isOperChan(theChan))
+	{
+	bot->Notice(theClient,"C'mon , you know you cant clear an oper channel");
+	return false;
 	}
 
 string doModes; //This holds the modes the user asked to be removed

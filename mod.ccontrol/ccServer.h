@@ -1,7 +1,7 @@
 /* ccServer.h */
 
 #ifndef __CCSERVER_H
-#define __CCSERVER_H "$Id: ccServer.h,v 1.1 2001/05/02 12:38:10 mrbean_ Exp $"
+#define __CCSERVER_H "$Id: ccServer.h,v 1.2 2001/07/20 09:09:31 mrbean_ Exp $"
 
 #include	<string>
 
@@ -21,37 +21,37 @@ public:
 	virtual ~ccServer();
 	//Mehods for getting info
 	
-	inline const string& 	get_Name() const
+	inline const string& 	getName() const
 		{ return Name; }
 
-	inline const string& 	get_Uplink() const
+	inline const string& 	getUplink() const
 		{ return Uplink; }
 	
-	inline const string& 	get_LastNumeric() const
+	inline const string& 	getLastNumeric() const
 		{ return Numeric; }
     
-	inline const time_t&	get_LastConnected() const
+	inline const time_t&	getLastConnected() const
 		{ return LastConnected; }
 	    
-	inline const time_t&	get_LastSplitted() const
+	inline const time_t&	getLastSplitted() const
 		{ return LastSplitted; }
 
 	
 	//Methods for setting info
 	
-	inline void 		set_Name( const string& _Name ) 
+	inline void 		setName( const string& _Name ) 
 		{ Name = _Name; }
 
-	inline void 		set_Uplink( const string& _Uplink ) 
+	inline void 		setUplink( const string& _Uplink ) 
 		{ Uplink = _Uplink; }
 	
-	inline void 		set_LastNumeric( const string& _LastNumeric ) 
+	inline void 		setLastNumeric( const string& _LastNumeric ) 
 		{ Numeric = _LastNumeric; }
     
-	inline void		set_LastConnected( const time_t& _LastConnected ) 
+	inline void		setLastConnected( const time_t& _LastConnected ) 
 		{ LastConnected = _LastConnected; }
 	    
-	inline void		set_LastSplitted( const time_t& _LastSplitted ) 
+	inline void		setLastSplitted( const time_t& _LastSplitted ) 
 		{ LastSplitted = _LastSplitted; }
 
     

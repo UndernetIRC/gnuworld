@@ -1,7 +1,7 @@
 /* ccUser.h */
 
 #ifndef __CCUSER_H
-#define __CCUSER_H "$Id: ccUser.h,v 1.6 2001/02/26 16:58:06 mrbean_ Exp $"
+#define __CCUSER_H "$Id: ccUser.h,v 1.7 2001/07/20 09:09:31 mrbean_ Exp $"
 
 #include	<string>
 
@@ -59,7 +59,8 @@ public:
 	inline const bool    gotFlag(unsigned int _flag) const
 		{ return (Flags & _flag ? true : false) ; }
 
-	
+	inline const string&		getServer() const
+		{ return Server; }
 	/*
 	 * Methods to set data attributes
 	 */
@@ -103,6 +104,8 @@ public:
 	inline void setFlag( const unsigned int _flag )
 		{ Flags |= _flag; }
 
+	inline void setServer( const string& _server )
+		{ Server = _server; }
 	/*
 	 * Methods to load a user and update the 
 	 * the database
@@ -122,6 +125,7 @@ protected:
 	string Password;
 	string last_updated_by;
 	string Numeric;
+	string Server;
 	time_t SuspendExpires;
 	string SuspendedBy;
 	unsigned int Access;

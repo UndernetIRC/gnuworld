@@ -3,7 +3,7 @@
  */
 
 #ifndef __CCONTROL_H
-#define __CCONTROL_H "$Id: ccontrol.h,v 1.35 2001/07/18 06:42:35 mrbean_ Exp $"
+#define __CCONTROL_H "$Id: ccontrol.h,v 1.36 2001/07/20 09:09:31 mrbean_ Exp $"
 
 //Define gline response
 #define GLINE_OK 1;
@@ -510,6 +510,10 @@ public:
 	
 	void listServers( iClient * );
 	
+	unsigned int getTrueAccess( unsigned int Access );
+	
+	unsigned int getTrueFlags( unsigned int Flags );
+
 	/**
 	 * This is a constant iterator type used to perform a read-only
 	 * iteration of the operchan structure.

@@ -18,7 +18,7 @@
 #include	"ELog.h"
 #include	"Gline.h"
 
-const char FORCEGLINECommand_cc_rcsId[] = "$Id: FORCEGLINECommand.cc,v 1.3 2001/07/17 07:24:13 mrbean_ Exp $";
+const char FORCEGLINECommand_cc_rcsId[] = "$Id: FORCEGLINECommand.cc,v 1.4 2001/07/20 09:09:31 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -44,18 +44,6 @@ if( st.size() < 3 )
 StringTokenizer::size_type pos = 1 ;
 
 time_t gLength = bot->getDefaultGlineLength() ;
-if( atoi( st[ pos ].c_str() ) > 0 )
-	{
-	// User has specified a gline length
-	if( st.size() < 4 )
-		{
-		Usage( theClient ) ;
-		return true ;
-		}
-
-	gLength = atoi( st[ pos ].c_str() ) ;
-	pos++ ;
-	}
 
 // (pos) is the index of the next token, the user@host mask.
 
@@ -70,6 +58,35 @@ if( string::npos == atPos )
 
 string userName = st[ pos ].substr( 0, pos ) ;
 string hostName = st[ pos ].substr( pos + 1 ) ;
+string Length;
+Length.assign(st[2]);
+unsigned int Units = 1; //Defualt for seconds
+unsigned int ResStart = 1;
+if(!strcasecmp(Length.substr(Length.length()-1).c_str(),"d"))
+	{
+	Units = 24*3600;
+	Length.resize(Length.length()-1);
+	ResStart = 2;
+	}
+else if(!strcasecmp(Length.substr(Length.length()-1).c_str(),"h"))
+	{
+	Units = 3600;
+	Length.resize(Length.length()-1);
+	ResStart = 2;
+	}
+else if(!strcasecmp(Length.substr(Length.length()-1).c_str(),"s"))
+	{
+	Units = 1;
+	Length.resize(Length.length()-1);
+	ResStart = 2;
+	}
+gLength = atoi(Length.c_str()) * Units;
+
+if(gLength == 0) 
+	{
+	gLength = bot->getDefaultGlineLength() ;
+	bot->Notice(theClient,"No duration was set, setting to %d seconds by default",gLength) ;
+	}
 
 switch(bot->CheckGline(st[ pos ].c_str(),gLength))
 	{
@@ -95,7 +112,7 @@ string nickUserHost = theClient->getNickUserHost() ;
 
 server->setGline( nickUserHost,
 	st[ pos ],
-	st.assemble( pos + 1 ),
+	st.assemble( pos + ResStart ),
 	gLength ) ;
 
 ccGline *TmpGline = bot->findGline(st[pos]);
@@ -104,11 +121,11 @@ bool Up = false;
 if(TmpGline)
 	Up =  true;	
 else TmpGline = new ccGline(bot->SQLDb);
-TmpGline->set_Host(st [ pos ]);
-TmpGline->set_Expires(::time(0) + gLength);
-TmpGline->set_AddedBy(nickUserHost);
-TmpGline->set_Reason(st.assemble( pos +1 ));
-TmpGline->set_AddedOn(::time(0));
+TmpGline->setHost(st [ pos ]);
+TmpGline->setExpires(::time(0) + gLength);
+TmpGline->setAddedBy(nickUserHost);
+TmpGline->setReason(st.assemble( pos + ResStart ));
+TmpGline->setAddedOn(::time(0));
 if(Up)
 	{	
 	TmpGline->Update();
@@ -117,7 +134,7 @@ else
 	{
 	TmpGline->Insert();
 	//We need to update the Id
-	TmpGline->loadData(TmpGline->get_Host());
+	TmpGline->loadData(TmpGline->getHost());
 	}
 if(!Up)
 	bot->addGline(TmpGline);

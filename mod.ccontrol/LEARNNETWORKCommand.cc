@@ -15,7 +15,7 @@
 #include        "stdlib.h"
 #include        "server.h"
 
-const char LEARNNETWORKCommand_cc_rcsId[] = "$Id: LEARNNETWORKCommand.cc,v 1.7 2001/07/17 16:58:27 dan_karrels Exp $";
+const char LEARNNETWORKCommand_cc_rcsId[] = "$Id: LEARNNETWORKCommand.cc,v 1.8 2001/07/20 09:09:31 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -45,18 +45,18 @@ for( ; ptr != end ; ptr++ )
 		{
 		if(!NewServer->loadData(CurServer->getName().c_str()))
 			{ //If the server isnt in the database , update it
-			NewServer->set_Name(CurServer->getName());
-			//NewServer->set_Uplink(Network->findServer(CurServer->getUplinkIntYY())->getName());
-			NewServer->set_LastNumeric(CurServer->getCharYY());
-			NewServer->set_LastConnected(CurServer->getConnectTime());
-			NewServer->set_LastSplitted(0);
+			NewServer->setName(CurServer->getName());
+			//NewServer->setUplink(Network->findServer(CurServer->getUplinkIntYY())->getName());
+			NewServer->setLastNumeric(CurServer->getCharYY());
+			NewServer->setLastConnected(CurServer->getConnectTime());
+			NewServer->setLastSplitted(0);
 			if(NewServer->Insert())
 				{
 				AddedServers++;
 				}	
 				else
 				{
-				bot->MsgChanLog("Error while learning server : %s\n",NewServer->get_Name().c_str());
+				bot->MsgChanLog("Error while learning server : %s\n",NewServer->getName().c_str());
 				}	
 			}
 		}

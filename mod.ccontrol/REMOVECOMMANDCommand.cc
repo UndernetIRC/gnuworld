@@ -13,7 +13,7 @@
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 
-const char REMOVECOMMANDCommand_cc_rcsId[] = "$Id: REMOVECOMMANDCommand.cc,v 1.9 2001/07/17 07:24:13 mrbean_ Exp $";
+const char REMOVECOMMANDCommand_cc_rcsId[] = "$Id: REMOVECOMMANDCommand.cc,v 1.10 2001/07/20 09:09:31 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -47,11 +47,12 @@ if(CommandLevel == -1 )
 	delete theUser;
 	return false;	        
 	}
-CommandLevel &= ~flg_NOLOG;
+//CommandLevel &= ~flg_NOLOG;
+CommandLevel = bot->getTrueAccess(CommandLevel);
 //Check if the user is trying to remove a command for himself
 AuthInfo* tempUser = bot->IsAuth(theClient->getCharYYXXX());
 
-if(tempUser->get_Name() == st[1])
+if(tempUser->getName() == st[1])
 	{
 	bot->Notice(theClient,"I dont know about you, but i for one dont think removing your own command is such a good idea ... ");
 	delete theUser;

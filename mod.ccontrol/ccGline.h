@@ -1,7 +1,7 @@
 /* ccGline.h */
 
 #ifndef __CCGLINE_H
-#define __CCGLINE_H "$Id: ccGline.h,v 1.5 2001/05/15 20:43:15 mrbean_ Exp $"
+#define __CCGLINE_H "$Id: ccGline.h,v 1.6 2001/07/20 09:09:31 mrbean_ Exp $"
 
 #include	<string>
 
@@ -21,43 +21,43 @@ public:
 	virtual ~ccGline();
 	//Mehods for getting info
 	
-	inline const string& 	get_Id() const
+	inline const string& 	getId() const
 		{ return Id; }
 
-	inline const string& 	get_Host() const
+	inline const string& 	getHost() const
 		{ return Host; }
 	
-	inline const string& 	get_AddedBy() const
+	inline const string& 	getAddedBy() const
 		{ return AddedBy; }
     
-	inline const time_t&	get_AddedOn() const
+	inline const time_t&	getAddedOn() const
 		{ return AddedOn; }
 	    
-	inline const time_t&	get_Expires() const
+	inline const time_t&	getExpires() const
 		{ return Expires; }
 
-	inline const string&	get_Reason() const
+	inline const string&	getReason() const
 		{ return Reason; }
 
 	
 	//Methods for setting info
 	
-	inline void 		set_Id( const string& _Id ) 
+	inline void 		setId( const string& _Id ) 
 		{ Id = _Id; }
 
-	inline void 		set_Host( const string& _Host ) 
+	inline void 		setHost( const string& _Host ) 
 		{ Host = _Host; }
 	
-	inline void 		set_AddedBy( const string& _AddedBy ) 
+	inline void 		setAddedBy( const string& _AddedBy ) 
 		{ AddedBy = _AddedBy; }
     
-	inline void		set_AddedOn( const time_t& _AddedOn ) 
+	inline void		setAddedOn( const time_t& _AddedOn ) 
 		{ AddedOn = _AddedOn; }
 	    
-	inline void		set_Expires( const time_t& _Expires ) 
+	inline void		setExpires( const time_t& _Expires ) 
 		{ Expires = _Expires; }
 
-	inline void 		set_Reason( const string& _Reason ) 
+	inline void 		setReason( const string& _Reason ) 
 		{ Reason = _Reason; }
 	    
 	//Methods for updating 

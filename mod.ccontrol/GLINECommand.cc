@@ -19,7 +19,7 @@
 #include	"ELog.h"
 #include	"Gline.h"
 
-const char GLINECommand_cc_rcsId[] = "$Id: GLINECommand.cc,v 1.12 2001/07/18 06:42:35 mrbean_ Exp $";
+const char GLINECommand_cc_rcsId[] = "$Id: GLINECommand.cc,v 1.13 2001/07/20 09:09:31 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -62,28 +62,32 @@ string hostName = st[ pos ].substr( pos + 1 ) ;
 string Length;
 Length.assign(st[2]);
 unsigned int Units = 1; //Defualt for seconds
+unsigned int ResStart = 1;
+
 if(!strcasecmp(Length.substr(Length.length()-1).c_str(),"d"))
 	{
 	Units = 24*3600;
 	Length.resize(Length.length()-1);
+	ResStart = 2;
 	}
 else if(!strcasecmp(Length.substr(Length.length()-1).c_str(),"h"))
 	{
 	Units = 3600;
 	Length.resize(Length.length()-1);
+	ResStart = 2;
 	}
 else if(!strcasecmp(Length.substr(Length.length()-1).c_str(),"s"))
 	{
 	Units = 1;
 	Length.resize(Length.length()-1);
+	ResStart = 2;
 	}
-else if((Length.substr(Length.length()-1) < "0") 
-	|| (Length.substr(Length.length()-1) > "9")) 
-	{
-	bot->Notice(theClient,"Bogus time units, must be d - days, h - hours, s - seconds");
-	return false;
-	}	
 gLength = atoi(Length.c_str()) * Units;
+if(gLength == 0) 
+	{
+	gLength = bot->getDefaultGlineLength() ;
+	bot->Notice(theClient,"No duration was set, setting to %d seconds by default",gLength) ;
+	}
 
 switch(bot->CheckGline(st[ pos ].c_str(),gLength))
 	{
@@ -108,7 +112,7 @@ string nickUserHost = theClient->getNickUserHost() ;
 
 server->setGline( nickUserHost,
 	st[ pos ],
-	st.assemble( pos + 2 ),
+	st.assemble( pos + ResStart ),
 	gLength ) ;
 
 ccGline *TmpGline = bot->findGline(st[pos]);
@@ -117,11 +121,11 @@ bool Up = false;
 if(TmpGline)
 	Up =  true;	
 else TmpGline = new ccGline(bot->SQLDb);
-TmpGline->set_Host(st [ pos ]);
-TmpGline->set_Expires(::time(0) + gLength);
-TmpGline->set_AddedBy(nickUserHost);
-TmpGline->set_Reason(st.assemble( pos +1 ));
-TmpGline->set_AddedOn(::time(0));
+TmpGline->setHost(st [ pos ]);
+TmpGline->setExpires(::time(0) + gLength);
+TmpGline->setAddedBy(nickUserHost);
+TmpGline->setReason(st.assemble( pos + ResStart ));
+TmpGline->setAddedOn(::time(0));
 if(Up)
 	{	
 	TmpGline->Update();
@@ -130,7 +134,7 @@ else
 	{
 	TmpGline->Insert();
 	//We need to update the Id
-	TmpGline->loadData(TmpGline->get_Host());
+	TmpGline->loadData(TmpGline->getHost());
 	}
 if(!Up)
 	bot->addGline(TmpGline);

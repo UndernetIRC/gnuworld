@@ -187,6 +187,11 @@ const int isSMT     = 0x08;
 const int isCODER     = 0x20;
 const int getLOGS      = 0x10;
 
+const int noACCESS = flg_NOLOG;
+
+const int noFLAG = isSUSPENDED | getLOGS;
+
+
 } // namespace gnuworld
 
 #endif // __CCONTROLCOMMANDS_H

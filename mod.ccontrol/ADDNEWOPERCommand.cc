@@ -18,7 +18,7 @@
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 
-const char ADDNEWOPERCommand_cc_rcsId[] = "$Id: ADDNEWOPERCommand.cc,v 1.12 2001/07/18 06:42:35 mrbean_ Exp $";
+const char ADDNEWOPERCommand_cc_rcsId[] = "$Id: ADDNEWOPERCommand.cc,v 1.13 2001/07/20 09:09:31 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -89,15 +89,30 @@ if( NULL == tOper )
 	}
 
 //Make sure the new oper wont have a command the old one doesnt have enabled
-NewAccess &= tOper->get_Access(); 
-NewAccess &= ~flg_NOLOG;
+NewAccess &= tOper->getAccess(); 
+NewAccess = bot->getTrueAccess(NewAccess);
 //Check if the user doesnt try to add an oper with higher flag than he is
-if((tOper->get_Flags() & (OPER | ADMIN | SMT | CODER)) < NewFlags)
+unsigned int OperFlags = bot->getTrueFlags(tOper->getFlags());
+if(OperFlags & isOPER)
 	{
-	bot->Notice( theClient,
-		"You can't add an oper with higher access than yours!");
+	bot->Notice(theClient,
+		"Sorry, but only admins+ can add new opers");
 	return false;
-	}	     	
+	}
+
+if((OperFlags & isADMIN) && (OperFlags <= NewFlags))
+	{
+	bot->Notice(theClient,
+		"Sorry, but you can't add an oper with higher or equal access to yours");
+	return false;
+	}
+else if(OperFlags < NewFlags)
+	{
+	bot->Notice(theClient,
+		"Sorry, but you can't add an oper with higher access than yours");
+	return false;
+	}
+
 
 //Create the new user and update the database
 theUser = new ccUser(bot->SQLDb);
@@ -106,6 +121,7 @@ theUser->setPassword(bot->CryptPass(st[3]));
 theUser->setAccess(NewAccess);
 theUser->setFlags(NewFlags);
 theUser->setLast_Updated_By(theClient->getNickUserHost());
+theUser->setServer(tOper->getServer());
 if(bot->AddOper(theUser) == true)
 	bot->Notice(theClient, "Oper successfully Added.");
 else
