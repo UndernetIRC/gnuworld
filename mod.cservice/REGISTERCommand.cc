@@ -8,7 +8,7 @@
  *
  * Caveats: None
  *
- * $Id: REGISTERCommand.cc,v 1.11 2001/03/01 00:43:51 gte Exp $
+ * $Id: REGISTERCommand.cc,v 1.12 2001/03/02 04:04:53 isomer Exp $
  */
  
 #include	<string>
@@ -21,7 +21,7 @@
 #include	"Network.h"
 #include	"responses.h"
 
-const char REGISTERCommand_cc_rcsId[] = "$Id: REGISTERCommand.cc,v 1.11 2001/03/01 00:43:51 gte Exp $" ;
+const char REGISTERCommand_cc_rcsId[] = "$Id: REGISTERCommand.cc,v 1.12 2001/03/02 04:04:53 isomer Exp $" ;
 
 namespace gnuworld
 {
@@ -145,7 +145,7 @@ bool REGISTERCommand::Exec( iClient* theClient, const string& Message )
 	 
 		if ((status = bot->SQLDb->Exec(reclaimQuery.str())) == PGRES_COMMAND_OK)
 		{
-			bot->logAdminMessage("%s has registered %s", theUser->getUserName().c_str(), st[1].c_str());
+			bot->logAdminMessage("%s (%s) has registered %s", theClient->getNickName().c_str(), theUser->getUserName().c_str(), st[1].c_str());
 			bot->Notice(theClient, 
 				"Channel %s successfully reclaimed by %s",
 				st[1].c_str(), tmpUser->getUserName().c_str());
@@ -188,7 +188,7 @@ bool REGISTERCommand::Exec( iClient* theClient, const string& Message )
 	
 		if ((status = bot->SQLDb->Exec(theQuery.str())) == PGRES_COMMAND_OK)
 		{
-			bot->logAdminMessage("%s has registered %s", theUser->getUserName().c_str(), st[1].c_str());
+			bot->logAdminMessage("%s (%s) has registered %s", theClient->getNickName().c_str(), theUser->getUserName().c_str(), st[1].c_str());
 			bot->Notice(theClient, 
 				bot->getResponse(theUser,
 					language::regged_chan,
