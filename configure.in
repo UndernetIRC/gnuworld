@@ -1,7 +1,7 @@
-dnl $Id: configure.in,v 1.10 2000/12/16 22:43:44 dan_karrels Exp $
+dnl $Id: configure.in,v 1.11 2000/12/16 22:59:11 dan_karrels Exp $
 dnl ----------------------------------------------------------
 
-AC_REVISION($Revision: 1.10 $)
+AC_REVISION($Revision: 1.11 $)
 AC_INIT(src/main.cc)
 AM_INIT_AUTOMAKE(gnuworld,0.0)
 AM_CONFIG_HEADER(include/defs.h)
@@ -439,10 +439,10 @@ echo
 AC_SUBST(MOD_DIRS)
 
 dnl Create the standard Makefiles
-AC_OUTPUT(Makefile lib/Makefile src/Makefile)
-AC_OUTPUT(mod.gnutest/Makefile mod.cservice/Makefile)
-AC_OUTPUT(mod.stats/Makefile mod.clientExample/Makefile)
-AC_OUTPUT(mod.ccontrol/Makefile)
+AC_OUTPUT(Makefile lib/Makefile src/Makefile \
+mod.gnutest/Makefile mod.cservice/Makefile \
+mod.stats/Makefile mod.clientExample/Makefile \
+mod.ccontrol/Makefile)
 
 echo
 echo Configuration has been finished, and everything seems to be allright
