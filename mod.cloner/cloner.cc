@@ -170,10 +170,14 @@ if( command == "LOADCLONES" )
 
 	if( 0 == makeCloneCount )
 		{
-		MyUplink->RegisterTimer( ::time( 0 ), this, 0 ) ;
+		MyUplink->RegisterTimer( ::time( 0 ) + 1, this, 0 ) ;
 		}
 
 	makeCloneCount += static_cast< size_t >( numClones ) ;
+//	elog	<< "cloner::OnPrivateMessage> makeCloneCount: "
+//		<< makeCloneCount
+//		<< endl ;
+
 	Notice( theClient, "Queuing %d clones", numClones ) ;
 
 	}
@@ -237,6 +241,10 @@ return 0 ;
 
 int cloner::OnTimer( xServer::timerID, void* )
 {
+//elog	<< "cloner::OnTimer> makeCloneCount: "
+//	<< makeCloneCount
+//	<< endl ;
+
 if( 0 == makeCloneCount )
 	{
 	return -1 ;
@@ -250,6 +258,10 @@ if( cloneCount > cloneBurstCount )
 	}
 
 makeCloneCount -= cloneCount ;
+
+//elog	<< "cloner::OnTimer> cloneCount: "
+//	<< cloneCount
+//	<< endl ;
 
 for( size_t i = 0 ; i < cloneCount ; ++i )
 	{
