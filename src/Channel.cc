@@ -45,9 +45,11 @@ bool Channel::addUser( ChannelUser* newUser )
 {
 assert( newUser != 0 ) ;
 
-elog	<< "Channel::addUser> Number of users: "
-	<< userList.size()
-	<< endl ;
+//elog	<< "Channel::addUser> ("
+//	<< getName()
+//	<< ") Number of users: "
+//	<< userList.size()
+//	<< endl ;
 
 if( !userList.insert(
 	userListType::value_type( newUser->getIntYYXXX(), newUser ) ).second )

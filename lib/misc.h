@@ -4,7 +4,7 @@
  */
 
 #ifndef __MISC_H
-#define __MISC_H "$Id: misc.h,v 1.8 2001/03/03 00:17:57 dan_karrels Exp $"
+#define __MISC_H "$Id: misc.h,v 1.9 2001/03/03 01:26:36 dan_karrels Exp $"
 
 #include	<string>
 #include	<hash_map>
@@ -31,7 +31,7 @@ struct noCaseCompare
 {
 inline bool operator()( const string& lhs, const string& rhs ) const
 	{
-	return (::strcasecmp( lhs, rhs ) < 0) ;
+	return (strcasecmp( lhs, rhs ) < 0) ;
 	}
 } ;
 
@@ -43,7 +43,7 @@ struct eqstr
 {
 inline bool operator()( const string& s1, const string& s2 ) const
 	{
-	return (0 == ::strcasecmp( s1, s2 )) ;
+	return (0 == strcasecmp( s1, s2 )) ;
 	}
 } ;
 

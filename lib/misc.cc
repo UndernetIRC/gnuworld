@@ -2,6 +2,7 @@
  */
 
 #include	<string>
+
 #include	<cctype>
 #include	<cstdio>
 #include	<cstdlib>
@@ -10,7 +11,7 @@
 #include	"misc.h"
 
 const char Misc_h_rcsId[] = __MISC_H ;
-const char Misc_cc_rcsId[] = "$Id: misc.cc,v 1.4 2001/03/03 00:17:57 dan_karrels Exp $" ;
+const char Misc_cc_rcsId[] = "$Id: misc.cc,v 1.5 2001/03/03 01:26:36 dan_karrels Exp $" ;
 
 using std::string ;
 
@@ -117,12 +118,31 @@ string::const_iterator s1_end = s1.end(),
 for( ; (s1_ptr != s1_end) && (s2_ptr != s2_end) ;
 	++s1_ptr, ++s2_ptr )
 	{
-	if( *s1_ptr == *s2_ptr )
+	if( tolower( *s1_ptr ) == tolower( *s2_ptr ) )
 		{
 		continue ;
 		}
 
+	// Otherwise, the two characters are not
+	// equivalent
 	return (*s1_ptr < *s2_ptr) ? -1 : 1 ;
 	}
-return 0 ;
+
+// At least one of the two iterators has encountered its end()
+if( (s1_ptr == s1_end) && (s2_ptr == s2_end) )
+	{
+	// The two strings are equivalent
+	return 0 ;
+	}
+
+// Exactly one of the _ptr's is equivalent to its
+// respective _end
+if( s1_ptr == s1_end )
+	{
+	// s1 ran out first
+	return -1 ;
+	}
+
+// Otherwise, s2_ptr == s2_end
+return 1 ;
 }
