@@ -326,6 +326,12 @@ public:
 	inline bool addUser( ChannelUser* newUser ) ;
 
 	/**
+	 * Add an iClient to this chanenl's internal user
+	 * structure.
+	 */
+	inline bool addUser( iClient* theClient ) ;
+
+	/**
 	 * Remove a ChannelUser from this channel's internal
 	 * user structure.  Note that the memory associated
 	 * with the ChannelUser is NOT deallocated, it is

@@ -3,7 +3,7 @@
  */
 
 #ifndef __XNETWORK_H
-#define __XNETWORK_H "$Id: Network.h,v 1.10 2001/01/06 15:46:30 dan_karrels Exp $"
+#define __XNETWORK_H "$Id: Network.h,v 1.11 2001/02/03 19:16:33 dan_karrels Exp $"
 
 #include	<vector>
 #include	<string>
@@ -276,18 +276,6 @@ public:
 	virtual Channel*	removeChannel( const Channel* theChan ) ;
 
 	/* Utility methods */
-
-	/**
-	 * Return true if a services client is on the channel, false
-	 * otherwise.
-	 */
-	virtual inline bool	servicesOnChannel( const string& ) const ;
-
-	/**
-	 * Return true if a services client is on the channel, false
-	 * otherwise.
-	 */
-	virtual inline bool	servicesOnChannel( const Channel* ) const ;
 
 	/**
 	 * Change a remote client's nickname, given its character

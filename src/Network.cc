@@ -21,7 +21,7 @@
 #include	"misc.h"
 
 const char xNetwork_h_rcsId[] = __XNETWORK_H ;
-const char xNetwork_cc_rcsId[] = "$Id: Network.cc,v 1.15 2001/01/06 15:04:42 dan_karrels Exp $" ;
+const char xNetwork_cc_rcsId[] = "$Id: Network.cc,v 1.16 2001/02/03 19:16:33 dan_karrels Exp $" ;
 
 using std::string ;
 using std::endl ;
@@ -375,7 +375,7 @@ while( chanPtr != retMe->channels_end() )
 	{
 	delete (*chanPtr)->removeUser( retMe ) ;
 
-	if( (*chanPtr)->empty() && !servicesOnChannel( *chanPtr ) )
+	if( (*chanPtr)->empty() )
 		{
 		delete removeChannel( (*chanPtr)->getName() ) ;
 		}
@@ -463,7 +463,7 @@ for( clientVectorType::size_type i = 0 ; i < clients[ YY ].size() ; i++ )
 		delete (*chanPtr)->removeUser( theClient ) ;
 
 		// Is the channel now empty?
-		if( (*chanPtr)->empty() && !servicesOnChannel( *chanPtr ) )
+		if( (*chanPtr)->empty() )
 			{
 			// The channel is now empty, there is no worry
 			// of finding another user on this server
@@ -535,28 +535,6 @@ Channel* xNetwork::removeChannel( const Channel* theChan )
 #endif
 
 return removeChannel( theChan->getName() ) ;
-}
-
-bool xNetwork::servicesOnChannel( const string& chanName ) const
-{
-for( xClientVectorType::const_iterator ptr = localClients.begin(),
-	endPtr = localClients.end() ; ptr != endPtr ; ++ptr )
-	{
-	if( (*ptr)->isOnChannel( chanName ) )
-		{
-		return true ;
-		}
-	}
-return false ;
-}
-
-bool xNetwork::servicesOnChannel( const Channel* theChan ) const
-{
-#ifndef NDEBUG
-  assert( theChan != 0 ) ;
-#endif
-
-return servicesOnChannel( theChan->getName() ) ;
 }
 
 void xNetwork::rehashNick( const string& yyxxx,

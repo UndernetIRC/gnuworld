@@ -3,7 +3,7 @@
  */
 
 #ifndef __XCLIENT_H
-#define __XCLIENT_H "$Id: client.h,v 1.22 2001/01/31 22:34:52 dan_karrels Exp $"
+#define __XCLIENT_H "$Id: client.h,v 1.23 2001/02/03 19:16:33 dan_karrels Exp $"
 
 #include	<string>
 
@@ -508,6 +508,12 @@ public:
 		{ return Connected ; }
 
 	/**
+	 * Return this xClient's network instance (iClient*).
+	 */
+	inline iClient* getInstance() const
+		{ return me ; }
+
+	/**
 	 * Return this bot's nick name.
 	 */
 	inline const string& getNickName() const
@@ -678,6 +684,19 @@ protected:
 	 * calls.
 	 */
 	virtual bool	removeChan( Channel* ) ;
+
+	/**
+	 * This method sets the iClient instance of this xClient.
+	 */
+	virtual void	setInstance( iClient* me )
+		{ this->me = me ; }
+
+	/**
+	 * The iClient representation of this xClient.
+	 * This variable will be set by xNetwork once the
+	 * xClient links to the xServer.
+	 */
+	iClient*	me ;
 
 	/**
 	 * MyUplink is a pointer to the xServer to which this

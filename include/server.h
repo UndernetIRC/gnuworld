@@ -17,7 +17,7 @@
  */
 
 #ifndef __XSERVER_H
-#define __XSERVER_H "$Id: server.h,v 1.27 2001/01/31 22:03:22 dan_karrels Exp $"
+#define __XSERVER_H "$Id: server.h,v 1.28 2001/02/03 19:16:33 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
@@ -326,12 +326,6 @@ public:
 	 * a juped/fake server.
 	 */
 	virtual void BurstClient( xClient*, bool localClient = true ) ;
-
-	/**
-	 * Change channel modes as the server.
-	 * This method also updates internal tables.
-	 */
-	virtual void SetChannelMode( Channel* theChan, const string& theModes ) ;
 
 	/* Event registration stuff */
 
@@ -750,12 +744,17 @@ protected:
 	virtual void	onUserModeChange( xParameters& ) ;
 
 	/**
-	 * This variable represents how many times to attempt a system
-	 * call before giving up
+	 * This variable is false when no signal has occured, true
+	 * otherwise.  This variable is checked each iteration of
+	 * the main server loop.
 	 */
-	unsigned int	maxLoopCount ;
-
 	static bool		caughtSignal ;
+
+	/**
+	 * This variable holds the signal identifier for the most
+	 * recently issued software signal, or 0 if no signal
+	 * is currently pending.
+	 */
 	static int		whichSig ;
 
 	/**
@@ -774,9 +773,16 @@ protected:
 	  data( _data )
 	{}
 
+		/// The unique identifier of this timer
 		timerID		ID ;
+
+		/// The absolute time at which the timer expires
 		time_t		absTime ;
+
+		/// The handler for this timed event
 		TimerHandler*	theHandler ;
+
+		/// The argument to pass to the handler
 		void*		data ;
 	} ;
 
@@ -1047,8 +1053,8 @@ protected:
 	unsigned int		intXXX ;
 
 	/**
- 	 * This is the base 64 character array representation of this server's
-	 * numeric.
+ 	 * This is the base 64 character array representation of this
+	 * server's numeric.
 	 */
 	char			charYY[ 3 ] ;
 
@@ -1098,38 +1104,99 @@ protected:
 	void 			Burst() ;
 
 	/**
-	 * List used to store runtime modules.
+	 * Type used to store runtime client modules.
 	 */
 	typedef vector< moduleLoader< xClient* >* >	moduleListType;
+
+	/**
+	 * Structure used to store runtime client modules.
+	 */
 	moduleListType		moduleList;
 
+	/**
+	 * The type used to store timed events.
+	 */
 	typedef priority_queue< pair< time_t, timerInfo* >,
 		vector< pair< time_t, timerInfo* > >,
 		timerGreater >
 		timerQueueType ;
+
+	/**
+	 * The structure used to store timed events.
+	 */
 	timerQueueType  timerQueue ;
 
+	/**
+	 * The type used to store timer ID's currently in use.
+	 */
 	typedef map< timerID, bool > uniqueTimerMapType ;
+
+	/**
+	 * The structure used to store timer ID's current in use.
+	 */
 	uniqueTimerMapType		uniqueTimerMap ;
 
+	/**
+	 * The last unique timerID to be used.
+	 */
 	timerID		lastTimerID ;
 
 #ifdef LOG_SOCKET
+	/**
+	 * The output file to which to write raw data read from
+	 * the network.
+	 */
 	ofstream	socketFile ;
 #endif
 
 #ifdef EDEBUG
+	/**
+	 * The name of the file for which elog to write all
+	 * debugging information.
+	 */
 	string		elogFileName ;
 #endif
 
+	/**
+	 * The name of the server config file.
+	 */
 	string		configFileName ;
+
+	/**
+	 * The char array to be used to read in network data.
+	 * This is allocated only once in the server for
+	 * performance reasons.
+	 */
 	char*		inputCharBuffer ;
+
+	/**
+	 * True if all elog data should be output to clog.
+	 */
 	bool		verbose ;
 
+	/**
+	 * The signal handler method for the system.
+	 */
 	static void	sigHandler( int ) ;
+
+	/**
+	 * This method initializes the entire server.
+	 */
 	void		initializeSystem() ;
+
+	/**
+	 * This method initializes all server variables.
+	 */
 	void		initializeVariables() ;
+
+	/**
+	 * This method loads all command handlers.
+	 */
 	void		loadCommandHandlers() ;
+
+	/**
+	 * This method maps all relevant signals to sigHandler().
+	 */
 	bool		setupSignals() ;
 } ;
 

@@ -14,7 +14,7 @@
 #include	"xparameters.h"
 #include	"StringTokenizer.h"
 
-const char msg_PART_cc_rcsId[] = "$Id: msg_PART.cc,v 1.2 2001/02/03 17:47:23 dan_karrels Exp $" ;
+const char msg_PART_cc_rcsId[] = "$Id: msg_PART.cc,v 1.3 2001/02/03 19:16:33 dan_karrels Exp $" ;
 
 using std::string ;
 using std::endl ;
@@ -97,7 +97,7 @@ for( StringTokenizer::size_type i = 0 ; i < st.size() ; ++i )
 
 	// Is the channel now empty, and no services clients are
 	// on the channel?
-	if( theChan->empty() && !Network->servicesOnChannel( theChan ) )
+	if( theChan->empty() )
 		{
 		// No users in the channel, remove it.
 		delete Network->removeChannel( theChan->getName() ) ;

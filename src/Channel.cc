@@ -56,6 +56,14 @@ if( !userList.insert(
 return true ;
 }
 
+bool Channel::addUser( iClient* theClient )
+{
+ChannelUser* addMe = new (nothrow) ChannelUser( theClient ) ;
+assert( addMe != 0 ) ;
+
+return addUser( addMe ) ;
+}
+
 ChannelUser* Channel::removeUser( iClient* theClient )
 {
 #ifndef NDEBUG

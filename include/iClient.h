@@ -2,7 +2,7 @@
  */
 
 #ifndef __ICLIENT_H
-#define __ICLIENT_H "$Id: iClient.h,v 1.9 2000/12/23 15:57:02 dan_karrels Exp $"
+#define __ICLIENT_H "$Id: iClient.h,v 1.10 2001/02/03 19:16:33 dan_karrels Exp $"
 
 #include	<string>
 #include	<list>
@@ -360,7 +360,7 @@ protected:
 
 	/**
 	 * This client's 32 bit IP, stored in
-	 *  network (bigendian) byte order.
+	 * network (bigendian) byte order.
 	 */
 	unsigned int	IP ;
 

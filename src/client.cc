@@ -26,7 +26,7 @@
 #include	"events.h"
 
 const char xClient_h_rcsId[] = __XCLIENT_H ;
-const char xClient_cc_rcsId[] = "$Id: client.cc,v 1.27 2001/01/31 22:34:52 dan_karrels Exp $" ;
+const char xClient_cc_rcsId[] = "$Id: client.cc,v 1.28 2001/02/03 19:16:33 dan_karrels Exp $" ;
 
 using std::string ;
 using std::strstream ;
@@ -36,6 +36,7 @@ namespace gnuworld
 
 xClient::xClient()
 {
+me = 0 ;
 MyUplink = NULL ;
 Connected = false ;
 

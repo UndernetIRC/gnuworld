@@ -47,7 +47,7 @@
 #include	"ServerTimerHandlers.h"
 
 const char xServer_h_rcsId[] = __XSERVER_H ;
-const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.65 2001/02/02 18:10:30 dan_karrels Exp $" ;
+const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.66 2001/02/03 19:16:33 dan_karrels Exp $" ;
 
 using std::string ;
 using std::vector ;
@@ -287,7 +287,6 @@ REGISTER_MSG( "441", NOOP ) ;
 
 void xServer::initializeVariables()
 {
-maxLoopCount = MAXLOOPCOUNT_DEFAULT ;
 
 // Initialize more variables
 keepRunning = true ;
@@ -330,11 +329,6 @@ Password = conf.Require( "password" )->second ;
 Port = atoi( conf.Require( "port" )->second.c_str() ) ;
 intYY = atoi( conf.Require( "numeric" )->second.c_str() ) ;
 intXXX = atoi( conf.Require( "maxclients" )->second.c_str() ) ;
-
-if( conf.Find( "maxloopcount" ) != conf.end() )
-	{
-	maxLoopCount = atoi( conf.Find( "maxloopcount" )->second.c_str() ) ;
-	}
 
 return true ;
 }
@@ -1349,6 +1343,20 @@ if( !Network->addClient( Client ) )
 // the server and its tables.
 Client->ImplementServer( this ) ;
 
+iClient* theIClient = new (nothrow) iClient(
+	getIntYY(),
+	Client->getCharYYXXX(),
+	Client->getNickName(),
+	Client->getUserName(),
+	"AAAAAA",
+	Client->getHostName(),
+	Client->getModes(),
+	Client->getDescription(),
+	::time( 0 ) ) ;
+assert( theIClient != 0 ) ;
+
+Client->setInstance( theIClient ) ;
+
 return true ;
 }
 
@@ -1638,6 +1646,7 @@ Write( s ) ;
 delete[] s.str() ;
 
 OnPartChannel( theClient, theChan ) ;
+OnPartChannel( theClient->getInstance(), theChan ) ;
 }
 
 /**
@@ -1686,7 +1695,7 @@ delete theChan->removeUser( theClient ) ;
 PostChannelEvent( EVT_PART, theChan,
 	static_cast< void* >( theClient ) ) ;
 
-if( theChan->empty() && !Network->servicesOnChannel( theChan ) )
+if( theChan->empty() )
 	{
 	// Empty channel
 	delete Network->removeChannel( theChan ) ;
@@ -1716,11 +1725,6 @@ void xServer::OnPartChannel( xClient* theClient, Channel* theChan )
 #ifndef NDEBUG
   assert( theClient != NULL && theChan != NULL ) ;
 #endif
-
-// TODO: post message
-// TODO: Check for empty channel
-// Let the other xClient's know that one of their own
-// has parted a channel.
 
 }
 
@@ -1939,18 +1943,13 @@ if( !chanModes.empty() )
 			} // switch()
 		} // for()
 	} // if( !chanModes.empty() )
-}
 
-void xServer::SetChannelMode( Channel* theChan, const string& theModes )
-{
-strstream s ;
-s	<< getCharYYXXX() << " M " << theChan->getName()
-	<< ' ' << theModes << ends ;
-Write( s ) ;
-delete[] s.str() ;
+// An xClient has joined a channel, update its iClient instance
+iClient* theIClient = theClient->getInstance() ;
 
-// TODO: Update modes in channel table
-// theChan->OnModeChange()
+theIClient->addChannel( theChan ) ;
+theChan->addUser( theIClient ) ;
+
 }
 
 // K N Isomer 2 957217279 ~perry p136-tnt1.ham.ihug.co.nz DLbaCI KAC :*Unknown*
@@ -2768,8 +2767,9 @@ void xServer::updateGlines()
 {
 time_t now = ::time( 0 ) ;
 
-for( glineListType::iterator ptr = glineList.begin(),
-	end = glineList.end() ; ptr != end ; )
+glineListType::iterator ptr = glineList.begin(),
+	end = glineList.end() ;  
+for( ; ptr != end ; )
 	{
 	if( (*ptr)->getExpiration() <= now )
 		{

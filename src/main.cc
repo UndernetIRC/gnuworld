@@ -1,5 +1,5 @@
 /* main.cc
- * $Id: main.cc,v 1.25 2001/01/31 21:10:37 dan_karrels Exp $
+ * $Id: main.cc,v 1.26 2001/02/03 19:16:33 dan_karrels Exp $
  */
 
 #include	<fstream>
@@ -24,7 +24,7 @@
 using namespace gnuworld ;
 
 const char config_h_rcsId[] = __CONFIG_H ;
-const char main_cc_rcsId[] = "$Id: main.cc,v 1.25 2001/01/31 21:10:37 dan_karrels Exp $" ;
+const char main_cc_rcsId[] = "$Id: main.cc,v 1.26 2001/02/03 19:16:33 dan_karrels Exp $" ;
 
 using std::cerr ;
 using std::clog ;
@@ -252,7 +252,7 @@ while( keepRunning && _connected )
                 // may occur anyway
                 while( (selectRet < 0) &&
 			(EINTR == errno) &&
-			(cnt++ < maxLoopCount) ) ;
+			(cnt++ <= 10) ) ;
                  
 	// Did a timer expire?  Note that the above loop is
 	// non-deterministic.  All timers are checked before
