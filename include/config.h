@@ -1,9 +1,9 @@
 /* config.h
- * $Id: config.h,v 1.12 2002/04/27 14:54:49 dan_karrels Exp $
+ * $Id: config.h,v 1.13 2002/04/29 13:28:11 dan_karrels Exp $
  */
 
 #ifndef __CONFIG_H
-#define __CONFIG_H "$Id: config.h,v 1.12 2002/04/27 14:54:49 dan_karrels Exp $"
+#define __CONFIG_H "$Id: config.h,v 1.13 2002/04/29 13:28:11 dan_karrels Exp $"
 
 /* config.h */
 /* GNUWorld main configuration file */
@@ -34,7 +34,7 @@
  * This is the name of the default file from which GNUWorld
  * will read its server characteristics.
  */
-#define CONFFILE "gnuworld.conf"
+#define CONFFILE "GNUWorld.conf"
 
 /**
  * LOGFILE

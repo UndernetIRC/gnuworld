@@ -1,5 +1,5 @@
 /* main.cc
- * $Id: main.cc,v 1.36 2002/04/28 16:32:02 dan_karrels Exp $
+ * $Id: main.cc,v 1.37 2002/04/29 13:28:15 dan_karrels Exp $
  */
 
 #include	<new>
@@ -25,7 +25,7 @@
 void		gnu() ;
 
 const char config_h_rcsId[] = __CONFIG_H ;
-const char main_cc_rcsId[] = "$Id: main.cc,v 1.36 2002/04/28 16:32:02 dan_karrels Exp $" ;
+const char main_cc_rcsId[] = "$Id: main.cc,v 1.37 2002/04/29 13:28:15 dan_karrels Exp $" ;
 const char ELog_h_rcsId[] = __ELOG_H ;
 const char FileSocket_h_rcsId[] = __FILESOCKET_H ;
 const char server_h_rcsId[] = __SERVER_H ;
@@ -67,7 +67,7 @@ clog << endl ;
 void gnu()
 {
 cout	<< "GNUWorld version 1.1" << endl ;
-cout	<< "Copyright (C) 2001 Free Software Foundation, Inc." << endl ;
+cout	<< "Copyright (C) 2002 Free Software Foundation, Inc." << endl ;
 cout	<< "GNUWorld comes with NO WARRANTY," << endl ;
 cout	<< "to the extent permitted by law." << endl ;
 cout	<< "You may redistribute copies of GNUWorld" << endl ;

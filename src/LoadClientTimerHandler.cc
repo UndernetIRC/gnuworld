@@ -1,4 +1,4 @@
-/* LoadClientTiemrHandler.cc */
+/* LoadClientTimerHandler.cc */
 
 #include	<iostream>
 
@@ -7,7 +7,7 @@
 #include	"ELog.h"
 
 const char LoadClientTimerHandler_h_rcsId[] = __LOADCLIENTTIMERHANDLER_H ;
-const char LoadClientTimerHandler_cc_rcsId[] = "$Id: LoadClientTimerHandler.cc,v 1.2 2002/04/28 16:11:23 dan_karrels Exp $" ;
+const char LoadClientTimerHandler_cc_rcsId[] = "$Id: LoadClientTimerHandler.cc,v 1.3 2002/04/29 13:28:15 dan_karrels Exp $" ;
 const char ELog_h_rcsId[] = __ELOG_H ;
 
 namespace gnuworld

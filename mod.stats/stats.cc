@@ -110,7 +110,7 @@ switch( theEvent )
 		table[ "EVT_NICK" ]++ ;
 		break ;
 	default:
-		table[ "UKNOWN" ]++ ;
+		table[ "UNKNOWN" ]++ ;
 		break ;
 	} // switch()
 

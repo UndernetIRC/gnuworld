@@ -26,8 +26,8 @@ const char StringTokenizer_h_rcsId[] = __STRINGTOKENIZER_H ;
 const char xparameters_h_rcsId[] = __XPARAMETERS_H ;
 const char iClient_h_rcsId[] = __ICLIENT_H ;
 const char Channel_h_rcsId[] = __CHANNEL_H ;
-const char ChanenlUser_h_rcsId[] = __CHANNELUSER_H ;
-const char msg_C_cc_rcsId[] = "$Id: msg_C.cc,v 1.7 2002/04/28 16:11:23 dan_karrels Exp $" ;
+const char ChannelUser_h_rcsId[] = __CHANNELUSER_H ;
+const char msg_C_cc_rcsId[] = "$Id: msg_C.cc,v 1.8 2002/04/29 13:28:15 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
