@@ -9,7 +9,7 @@
 #include	"cservice.h" 
 #include	"responses.h" 
 
-const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.4 2001/01/03 03:02:05 gte Exp $" ;
+const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.5 2001/01/05 06:44:05 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -81,6 +81,8 @@ bool LOGINCommand::Exec( iClient* theClient, const string& Message )
 
 		bot->Notice(theClient, bot->getResponse(theUser, language::auth_success).c_str(), 
 			theUser->getUserName().c_str()); 
+		theUser->setLastSeen(::time(NULL));
+		theUser->commit();
 		theClient->setCustomData(bot, (void *)theUser);
 
 	} else

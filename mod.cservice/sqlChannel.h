@@ -1,7 +1,7 @@
 /* sqlChannel.h */
 
 #ifndef __SQLCHANNEL_H
-#define __SQLCHANNEL_H "$Id: sqlChannel.h,v 1.9 2001/01/02 07:55:12 gte Exp $"
+#define __SQLCHANNEL_H "$Id: sqlChannel.h,v 1.10 2001/01/05 06:44:05 gte Exp $"
 
 #include	<string>
 #include	<ctime>
@@ -79,8 +79,8 @@ public:
 	inline const unsigned int&	getChannelLimit() const
 		{ return channel_limit ; }
 	
-	inline const time_t&		getLastUpdate() const
-		{ return last_update ; }
+	inline const time_t&		getLastUpdated() const
+		{ return last_updated ; }
 
 	// Load channel data from the backend using the channel name as a key.
 	bool loadData( const string& );
@@ -129,7 +129,7 @@ public:
 	inline void setChannelLimit( const unsigned int& _channel_limit )
 		{ channel_limit = _channel_limit; }
 
-	// 'last_update' is only altered during commit().
+	// 'last_updated' is only altered during commit().
  
 	/*
 	 * Method to perform a SQL 'UPDATE' and commit changes to this
@@ -154,7 +154,7 @@ protected:
 	string		channel_mode ;
 	string		channel_key ;
 	unsigned int	channel_limit ;
-	time_t		last_update ; 
+	time_t		last_updated ; 
 	PgDatabase*	SQLDb;
 } ;
 

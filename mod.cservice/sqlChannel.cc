@@ -9,7 +9,7 @@
  * 30/12/2000: Moved static SQL data to constants.h --Gte
  * Set loadData up to take data from rows other than 0.
  * 
- * $Id: sqlChannel.cc,v 1.10 2001/01/01 07:51:58 gte Exp $
+ * $Id: sqlChannel.cc,v 1.11 2001/01/05 06:44:05 gte Exp $
  */
  
 #include	<strstream>
@@ -24,7 +24,7 @@ using std::string ;
 using std::endl ; 
  
 const char sqlChannel_h_rcsId[] = __SQLCHANNEL_H ;
-const char sqlChannel_cc_rcsId[] = "$Id: sqlChannel.cc,v 1.10 2001/01/01 07:51:58 gte Exp $" ;
+const char sqlChannel_cc_rcsId[] = "$Id: sqlChannel.cc,v 1.11 2001/01/05 06:44:05 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -121,6 +121,7 @@ void sqlChannel::setAllMembers(int row)
 	channel_mode = SQLDb->GetValue(row,10);
 	channel_key = SQLDb->GetValue(row,11);
 	channel_limit = atoi(SQLDb->GetValue(row,12));
+	last_updated = atoi(SQLDb->GetValue(row,13));
 }
 
 bool sqlChannel::commit()
@@ -146,7 +147,7 @@ bool sqlChannel::commit()
 	<< "channel_mode = '" << channel_mode << "', "
 	<< "channel_key = '" << channel_key << "', "
 	<< "channel_limit = " << channel_limit << ", "
-	<< "last_update = " << ::time(NULL) << ", "
+	<< "last_updated = " << ::time(NULL) << ", "
 	<< "description = '" << description << "' "
 	<< queryCondition << id
 	<< ends;

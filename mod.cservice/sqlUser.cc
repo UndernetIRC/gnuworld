@@ -4,7 +4,7 @@
  * Storage class for accessing user information either from the backend
  * or internal storage.
  * 
- * $Id: sqlUser.cc,v 1.5 2001/01/02 07:55:12 gte Exp $
+ * $Id: sqlUser.cc,v 1.6 2001/01/05 06:44:05 gte Exp $
  */
  
 #include	<strstream>
@@ -29,7 +29,6 @@ sqlUser::sqlUser(PgDatabase* _SQLDb)
    last_seen( 0 ),
    language_id( 0 ),
    flags( 0 ),
-   last_update( ::time( 0 ) ),
    SQLDb( _SQLDb ) 
 {
 }
@@ -125,9 +124,40 @@ void sqlUser::setAllMembers(int row)
 	language_id = atoi(SQLDb->GetValue(row, 6));
 	public_key = SQLDb->GetValue(row, 7); 
 	flags = atoi(SQLDb->GetValue(row, 8));
-	last_update_by = SQLDb->GetValue(row, 9); 
-	last_update = atoi(SQLDb->GetValue(row, 10));
+	last_updated_by = SQLDb->GetValue(row, 9); 
+	last_updated = atoi(SQLDb->GetValue(row, 10));
 }
+
+bool sqlUser::commit()
+{
+	/*
+	 *  Build an SQL statement to commit the transient data in this storage class
+	 *  back into the database.
+	 */
+
+	ExecStatusType status;
+	static const char* queryHeader =    "UPDATE users ";
+	static const char* queryCondition = "WHERE id = "; 
+
+	strstream queryString;
+	queryString << queryHeader 
+	<< "SET flags = " << flags << ", "
+	<< "password = '" << password << "', "
+	<< "last_seen = " << last_seen << ", "
+	<< "language_id = " << language_id << " "
+	<< queryCondition << id
+	<< ends;
+
+	elog << "sqlUser::commit> " << queryString.str() << endl; 
+
+	if ((status = SQLDb->Exec(queryString.str())) != PGRES_COMMAND_OK)
+	{
+		elog << "sqlUser::commit> Something went wrong: " << SQLDb->ErrorMessage() << endl; // Log to msgchan here.
+		return false;
+ 	} 
+
+ 	return true;
+}	
 
 
 sqlUser::~sqlUser()

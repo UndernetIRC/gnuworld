@@ -8,7 +8,7 @@
  *
  * Caveats: None
  *
- * $Id: REGISTERCommand.cc,v 1.2 2001/01/03 05:33:02 gte Exp $
+ * $Id: REGISTERCommand.cc,v 1.3 2001/01/05 06:44:05 gte Exp $
  */
  
 #include	<string>
@@ -20,7 +20,7 @@
 #include	"libpq++.h"
 #include	"Network.h"
 
-const char REGISTERCommand_cc_rcsId[] = "$Id: REGISTERCommand.cc,v 1.2 2001/01/03 05:33:02 gte Exp $" ;
+const char REGISTERCommand_cc_rcsId[] = "$Id: REGISTERCommand.cc,v 1.3 2001/01/05 06:44:05 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -36,7 +36,7 @@ bool REGISTERCommand::Exec( iClient* theClient, const string& Message )
 		return true;
 	}
 
-	static const char* queryHeader = "INSERT INTO channels (name, flags, registered_ts, channel_ts, channel_mode, last_update) "; 
+	static const char* queryHeader = "INSERT INTO channels (name, flags, registered_ts, channel_ts, channel_mode, last_updated) "; 
 
 	strstream theQuery; 
 	ExecStatusType status; 

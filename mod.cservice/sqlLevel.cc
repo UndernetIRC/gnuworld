@@ -4,7 +4,7 @@
  * Storage class for accessing channel user/level information either from the backend
  * or internal storage.
  * 
- * $Id: sqlLevel.cc,v 1.4 2001/01/03 03:02:05 gte Exp $
+ * $Id: sqlLevel.cc,v 1.5 2001/01/05 06:44:05 gte Exp $
  */
  
 #include	<strstream>
@@ -21,7 +21,7 @@ using std::string ;
 using std::endl ; 
  
 const char sqlLevel_h_rcsId[] = __SQLLEVEL_H ;
-const char sqlLevel_cc_rcsId[] = "$Id: sqlLevel.cc,v 1.4 2001/01/03 03:02:05 gte Exp $" ;
+const char sqlLevel_cc_rcsId[] = "$Id: sqlLevel.cc,v 1.5 2001/01/05 06:44:05 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -90,7 +90,7 @@ void sqlLevel::setAllMembers(int row)
 	added_by = SQLDb->GetValue(row, 7);
 	last_modif = atoi(SQLDb->GetValue(row, 8));
 	last_modif_by = SQLDb->GetValue(row, 9);
-	last_update = atoi(SQLDb->GetValue(row, 10)); 
+	last_updated = atoi(SQLDb->GetValue(row, 10)); 
 }
 
 sqlLevel::~sqlLevel()

@@ -275,7 +275,7 @@ int cservice::OnCTCP( iClient* theClient, const string& CTCP,
 
 	if(Command == "VERSION")
 	{
-		xClient::DoCTCP(theClient, CTCP.c_str(), "Undernet P10 Channel Services Version 2 [" __DATE__ " " __TIME__ "] ($Id: cservice.cc,v 1.29 2001/01/03 08:05:09 gte Exp $)");
+		xClient::DoCTCP(theClient, CTCP.c_str(), "Undernet P10 Channel Services Version 2 [" __DATE__ " " __TIME__ "] ($Id: cservice.cc,v 1.30 2001/01/05 06:44:05 gte Exp $)");
 		return true;
 	}
  
@@ -543,7 +543,7 @@ int cservice::OnTimer(xServer::timerID, void*)
 		{
 			updateType = 1;
 			theQuery << "SELECT " << sql::channel_fields
-			<< " FROM channels WHERE last_update > " << lastChannelRefresh;
+			<< " FROM channels WHERE last_updated >= " << lastChannelRefresh;
 			// Fetch updated channel information.
 		}
  
@@ -572,7 +572,7 @@ int cservice::OnTimer(xServer::timerID, void*)
 			for (int i = 0 ; i < SQLDb->Tuples(); i++)
 			{ 
 				sqlChannelHashType::iterator ptr = sqlChannelCache.find(SQLDb->GetValue(i, 1));
-				elog << "timer: looking for " << SQLDb->GetValue(i, 2) << endl;
+				elog << "timer: looking for " << SQLDb->GetValue(i, 1) << endl;
 				if(ptr != sqlChannelCache.end()) // Found something!
 				{
 					elog << "timer: found " << (ptr->second)->getName() << " in cache!" << endl;
