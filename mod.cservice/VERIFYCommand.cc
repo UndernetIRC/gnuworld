@@ -8,7 +8,7 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char VERIFYCommand_cc_rcsId[] = "$Id: VERIFYCommand.cc,v 1.21 2002/02/06 18:56:25 gte Exp $" ;
+const char VERIFYCommand_cc_rcsId[] = "$Id: VERIFYCommand.cc,v 1.22 2002/09/02 18:26:57 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -81,7 +81,7 @@ if (!theUser)
 		return false;
 	}
 
-sqlChannel* theChan = bot->getChannelRecord("#coder-com");
+sqlChannel* theChan = bot->getChannelRecord(bot->coderChan);
 if (!theChan)
 	{
 	return true;

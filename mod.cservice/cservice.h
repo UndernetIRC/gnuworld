@@ -1,11 +1,11 @@
 /**
  * cservice.h
  * Author: Greg Sikorski
- * $Id: cservice.h,v 1.89 2002/07/15 15:09:42 dan_karrels Exp $
+ * $Id: cservice.h,v 1.90 2002/09/02 18:26:58 gte Exp $
  */
 
 #ifndef __CSERVICE_H
-#define __CSERVICE_H "$Id: cservice.h,v 1.89 2002/07/15 15:09:42 dan_karrels Exp $"
+#define __CSERVICE_H "$Id: cservice.h,v 1.90 2002/09/02 18:26:58 gte Exp $"
 
 #include	<string>
 #include	<vector>
@@ -66,6 +66,7 @@ public:
 	string confSqlDb;
 	string confSqlPort;
 	string confSqlUser;
+	string confCCChan;
 	short connectRetries;
 	unsigned int connectCheckFreq;
 	unsigned int connectRetry;
@@ -234,8 +235,10 @@ public:
 	unsigned int customDataAlloc;
 
 	// Flood/Notice relay channel - Loaded via config.
+	// Added coderChan - Loaded via config.
 	string relayChan;
 	string debugChan;
+	string coderChan;
 
 	// Loaded via config.
 	// Interval at which we pick up updates from the Db.

@@ -2,7 +2,7 @@
  * cservice.cc
  * Author: Greg Sikorski
  * Purpose: Overall control client.
- * $Id: cservice.cc,v 1.217 2002/07/16 13:51:12 dan_karrels Exp $
+ * $Id: cservice.cc,v 1.218 2002/09/02 18:26:58 gte Exp $
  */
 
 #warning *** If you are upgrading from a previous release, please make note of
@@ -261,6 +261,7 @@ else
 // configuration file.
 relayChan = cserviceConfig->Require( "relay_channel" )->second ;
 debugChan = cserviceConfig->Require( "debug_channel" )->second ;
+coderChan = cserviceConfig->Require( "coder_channel" )->second ;
 pendingPageURL = cserviceConfig->Require( "pending_page_url" )->second ;
 updateInterval = atoi((cserviceConfig->Require( "update_interval" )->second).c_str());
 expireInterval = atoi((cserviceConfig->Require( "expire_interval" )->second).c_str());
@@ -1053,11 +1054,13 @@ if (theUser->getFlag(sqlUser::F_GLOBAL_SUSPEND))
 	return 0;
 	}
 
-sqlChannel* theChan = getChannelRecord("#coder-com"); // Move to config,
+sqlChannel* theChan = getChannelRecord(coderChan);
 if (!theChan)
 	{
 	elog	<< "cservice::getAdminAccessLevel> Unable to "
-		<< "locate channel '#coder-com'! Sorry, I can't continue.."
+		<< "locate channel '"
+		<< coderChan.c_str()
+		<< "'! Sorry, I can't continue.."
 		<< endl;
 	::exit(0);
 	}
