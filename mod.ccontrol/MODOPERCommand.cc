@@ -12,7 +12,7 @@
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 
-const char MODOPERCommand_cc_rcsId[] = "$Id: MODOPERCommand.cc,v 1.8 2001/05/14 21:26:37 mrbean_ Exp $";
+const char MODOPERCommand_cc_rcsId[] = "$Id: MODOPERCommand.cc,v 1.9 2001/05/23 21:16:47 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -24,7 +24,11 @@ using std::string ;
 bool MODOPERCommand::Exec( iClient* theClient, const string& Message)
 {	 
 StringTokenizer st( Message ) ;
-	
+if(st.size() < 3)
+	{
+	Usage(theClient);
+	return true;
+	}
 if( ((st.size() < 4) && (strcasecmp(st[2].c_str(),"getlogs") != 0)) 
 || ((st.size() < 3) && (!strcasecmp(st[2].c_str(),"getlogs"))))
 	{

@@ -23,7 +23,7 @@
 #include	"AuthInfo.h"
 #include        "server.h"
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.44 2001/05/23 20:16:18 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.45 2001/05/23 21:16:47 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -1611,87 +1611,6 @@ inRefresh = false;
 return true;
 
 }
-
-/*bool ccontrol::refreshGlines()
-{
-
-MsgChanLog("Refresh gline - Start\n");
-
-static const char *Main = "SELECT Id,Host FROM glines WHERE expiresat <= now()::abstime::int4;";
-
-strstream theQuery;
-theQuery	<< Main
-		<< ends;
-
-elog	<< "ccontrol::glineRefresh> "
-	<< theQuery.str()
-	<< endl; 
-
-ExecStatusType status = SQLDb->Exec( theQuery.str() ) ;
-delete[] theQuery.str() ;
-
-
-if( PGRES_TUPLES_OK != status )
-	{
-	elog	<< "ccontrol::refreshGline> SQL Failure: "
-		<< SQLDb->ErrorMessage()
-		<< endl ;
-
-	MsgChanLog("Refresh gline - DB error while finding expired glines\n");
-	return false;
-	}
-
-ccGline *tempGline = new (nothrow) ccGline(SQLDb);
-assert(tempGline != NULL);
-
-int totalFound;
-totalFound = SQLDb->Tuples();
-inRefresh = true;
-
-for( int i = 0 ; i < SQLDb->Tuples() ; i++ )
-	{
-	if(!tempGline->loadData(atoi(SQLDb->GetValue(i,0))))
-		{
-		//there has been a weird error while loading
-		//not handled yet
-		continue;
-		}
-	//remove the gline from the core
-	MyUplink->removeGline(tempGline->get_Host());
-	
-	//remove the gline from ccontrol structure
-	remGline(tempGline);
-	}
-//we have removed all expired glines from memory
-//now remove it from the database
-strstream delQuery;
-static const char *D = "DELETE FROM glines WHERE expiresat <= now()::abstime::int4;";
-delQuery        << D
-		<< ends;
-
-elog	<< "ccontrol::glineRefresh> "
-	<< delQuery.str()
-	<< endl; 
-
-status = SQLDb->Exec( delQuery.str() ) ;
-delete[] delQuery.str() ;
-delete tempGline;
-
-if( PGRES_COMMAND_OK != status )
-	{
-	elog	<< "ccontrol::refreshGline> SQL Failure: "
-		<< SQLDb->ErrorMessage()
-		<< endl ;
-	MsgChanLog("Refresh gline - DB error while removing expired glines\n");
-	inRefresh = false;
-	return false;
-	}
-MsgChanLog("Refresh gline - Ended , Total glines expired %d\n",totalFound);
-inRefresh = false;
-
-return true;
-
-}*/
 
 bool ccontrol::burstGlines()
 {
