@@ -75,7 +75,8 @@ void cservice::ImplementServer( xServer* theServer )
 	} 
 
  	// Attempt to register our interest in recieving NOTIFY events.
-	if (SQLDb->ExecCommandOk("LISTEN channels_u; LISTEN bans_u; LISTEN users_u; LISTEN levels_u;")) {
+	if (SQLDb->ExecCommandOk("LISTEN channels_u; LISTEN bans_u; LISTEN users_u; LISTEN levels_u;"))
+	{
 		elog << "cmaster::ImplementServer> Successfully registered LISTEN event for Db updates." << endl;
 		// Start the Db update timer rolling.
 		time_t theTime = time(NULL) + updateInterval;
@@ -85,6 +86,15 @@ void cservice::ImplementServer( xServer* theServer )
 		elog << "cmaster::ImplementServer> PostgreSQL error while attempting to register LISTEN event: " << SQLDb->ErrorMessage() << endl;
 	}
 
+	if (SQLDb->Exec("SELECT now()::abstime::int4;") == PGRES_TUPLES_OK) 
+	{ 
+		// Set our "Last Refresh" timers to the current database system time.
+		lastChannelRefresh = atoi(SQLDb->GetValue(0,0));
+		lastUserRefresh = atoi(SQLDb->GetValue(0,0));
+		lastLevelRefresh = atoi(SQLDb->GetValue(0,0));
+		lastBanRefresh = atoi(SQLDb->GetValue(0,0));
+	}
+ 
 
 xClient::ImplementServer( theServer ) ;
 }
@@ -170,11 +180,7 @@ cservice::cservice(const string& args)
 	userCacheHits = 0;
 	channelHits = 0;
 	channelCacheHits = 0;
-	lastChannelRefresh = time(NULL);
-	lastUserRefresh = time(NULL);
-	lastLevelRefresh = time(NULL);
-	lastBanRefresh = time(NULL);
-
+ 
 	// Load our translation tables.
 	loadTranslationTable(); 
 }
@@ -275,7 +281,7 @@ int cservice::OnCTCP( iClient* theClient, const string& CTCP,
 
 	if(Command == "VERSION")
 	{
-		xClient::DoCTCP(theClient, CTCP.c_str(), "Undernet P10 Channel Services Version 2 [" __DATE__ " " __TIME__ "] ($Id: cservice.cc,v 1.30 2001/01/05 06:44:05 gte Exp $)");
+		xClient::DoCTCP(theClient, CTCP.c_str(), "Undernet P10 Channel Services Version 2 [" __DATE__ " " __TIME__ "] ($Id: cservice.cc,v 1.31 2001/01/06 06:47:26 gte Exp $)");
 		return true;
 	}
  
@@ -537,57 +543,111 @@ int cservice::OnTimer(xServer::timerID, void*)
 	<< endl;
 
 	// Check we aren't getting our own updates.
-	if (notify->be_pid != SQLDb->getPID())
-	{ 
-		if (string(notify->relname) == "channels_u") 
-		{
-			updateType = 1;
-			theQuery << "SELECT " << sql::channel_fields
-			<< " FROM channels WHERE last_updated >= " << lastChannelRefresh;
-			// Fetch updated channel information.
-		}
- 
-		theQuery << ends;
-		elog << "sqlQuery> " << theQuery.str() << endl;
-
-		// Execute query, parse results.
-		status = SQLDb->Exec(theQuery.str());
-
-		// Free memory allocated by postgres API object.
-		free(notify); 
-
-		if (status != PGRES_TUPLES_OK)
-		{
-			elog << "cmaster::OnTimer> Something went wrong: " << SQLDb->ErrorMessage() << endl; // Log to msgchan here.
-			return false;
-		}
-
-		elog << "cmaster::OnTimer> Found " << SQLDb->Tuples() << " updated channel records." << endl;
-		/*
-		 *  Now, update the cache with information in this results set.
-		 */
-
-		if (SQLDb->Tuples() > 0) // We could get no results back if the last_update field wasn't set.
-		{ 
-			for (int i = 0 ; i < SQLDb->Tuples(); i++)
-			{ 
-				sqlChannelHashType::iterator ptr = sqlChannelCache.find(SQLDb->GetValue(i, 1));
-				elog << "timer: looking for " << SQLDb->GetValue(i, 1) << endl;
-				if(ptr != sqlChannelCache.end()) // Found something!
-				{
-					elog << "timer: found " << (ptr->second)->getName() << " in cache!" << endl;
-					(ptr->second)->setAllMembers(i);
-				}
-
-			}
-			
-		}
- 
-	} else // Our own notification.
+	if (notify->be_pid == SQLDb->getPID())
 	{
-		elog << "cmaster::OnTimer> Notification from our Backend PID, ignoring update." << endl;
+		elog << "cmaster::OnTimer> Notification from our Backend PID, ignoring update." << endl; 
+		free(notify); 
+		return false;
+	}
+
+
+	if (string(notify->relname) == "channels_u") 
+	{
+		updateType = 1;
+		theQuery << "SELECT " << sql::channel_fields
+		<< ",now()::abstime::int4 as db_unixtime FROM channels WHERE last_updated >= " << lastChannelRefresh;
+		// Fetch updated channel information.
+	}
+
+	if (string(notify->relname) == "users_u") 
+	{
+		updateType = 2;
+		theQuery << "SELECT " << sql::user_fields
+		<< ",now()::abstime::int4 as db_unixtime FROM users WHERE last_updated >= " << lastUserRefresh;
+		// Fetch updated user information.
 	} 
 
+	if (string(notify->relname) == "levels_u") 
+	{
+		updateType = 3;
+		theQuery << "SELECT " << sql::level_fields
+		<< ",now()::abstime::int4 as db_unixtime FROM levels WHERE last_updated >= " << lastLevelRefresh;
+		// Fetch updated level information.
+	} 
+
+	theQuery << ends;
+	elog << "sqlQuery> " << theQuery.str() << endl;
+
+	// Execute query, parse results.
+	status = SQLDb->Exec(theQuery.str());
+
+	// Free memory allocated by postgres API object.
+	free(notify); 
+
+	if (status != PGRES_TUPLES_OK)
+	{
+		elog << "cmaster::OnTimer> Something went wrong: " << SQLDb->ErrorMessage() << endl; // Log to msgchan here.
+		return false;
+	}
+
+	elog << "cmaster::OnTimer> Found " << SQLDb->Tuples() << " updated records." << endl;
+	/*
+	 *  Now, update the cache with information in this results set.
+	 */
+
+	if (SQLDb->Tuples() <= 0) // We could get no results back if the last_update field wasn't set.
+	{ 
+		return false;
+	}
+
+	switch(updateType)
+	{
+		case 1: // Channel update.
+		{
+			for (int i = 0 ; i < SQLDb->Tuples(); i++)
+			{ 
+				sqlChannelHashType::iterator ptr = sqlChannelCache.find(SQLDb->GetValue(i, 1)); 
+				if(ptr != sqlChannelCache.end()) // Found something!
+				{ 
+					(ptr->second)->setAllMembers(i);
+				}
+			
+			}
+		
+			// Set the "Last refreshed from channels table" timestamp.
+			lastChannelRefresh = atoi(SQLDb->GetValue(0,"db_unixtime"));
+			break;
+		}
+
+		case 2: // User updates.
+		{
+			for (int i = 0 ; i < SQLDb->Tuples(); i++)
+			{ 
+				sqlUserHashType::iterator ptr = sqlUserCache.find(SQLDb->GetValue(i, 1)); 
+				// Found something..
+				if(ptr != sqlUserCache.end()) (ptr->second)->setAllMembers(i); 
+			}
+		
+			// Set the "Last refreshed from channels table" timestamp.
+			lastUserRefresh = atoi(SQLDb->GetValue(0,"db_unixtime"));
+			break;
+		}
+
+		case 3: // Level updates.
+		{
+			for (int i = 0 ; i < SQLDb->Tuples(); i++)
+			{ 
+				sqlLevelHashType::iterator ptr = sqlLevelCache.find(make_pair(atoi(SQLDb->GetValue(i, 1)), atoi(SQLDb->GetValue(i, 0)))); 
+				// Found something..
+				if(ptr != sqlLevelCache.end()) (ptr->second)->setAllMembers(i); 
+			}
+		
+			// Set the "Last refreshed from channels table" timestamp.
+			lastLevelRefresh = atoi(SQLDb->GetValue(0,"db_unixtime"));
+			break;
+		}
+ 
+	}
 
 	return(0);
 }

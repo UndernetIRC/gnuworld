@@ -9,7 +9,7 @@
 #include	"responses.h"
 #include	"Network.h"
  
-const char STATUSCommand_cc_rcsId[] = "$Id: STATUSCommand.cc,v 1.4 2001/01/05 06:44:05 gte Exp $" ;
+const char STATUSCommand_cc_rcsId[] = "$Id: STATUSCommand.cc,v 1.5 2001/01/06 06:47:26 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -75,6 +75,11 @@ bool STATUSCommand::Exec( iClient* theClient, const string& Message )
 
 		bot->Notice(theClient, "[Access Level Record Stats] \002Cached Entries:\002 %i    \002Requests:\002 %i    \002Cache Hits:\002 %i    \002Efficiency:\002 %.2f%%", 
 			bot->sqlLevelCache.size(), bot->levelHits, bot->levelCacheHits, levelEf);
+ 
+		bot->Notice(theClient, "Last recieved Channel NOTIFY: %i", bot->lastChannelRefresh);
+		bot->Notice(theClient, "Last recieved User NOTIFY: %i", bot->lastUserRefresh);
+		bot->Notice(theClient, "Last recieved Level NOTIFY: %i", bot->lastLevelRefresh);
+		bot->Notice(theClient, "Last recieved Ban NOTIFY: %i", bot->lastBanRefresh);
 
 		bot->Notice(theClient, "\002Uptime:\002 %s",  bot->prettyDuration(bot->getUplink()->getStartTime()).c_str());
 		return true;

@@ -1,7 +1,7 @@
 /* sqlUser.h */
 
 #ifndef __SQLUSER_H
-#define __SQLUSER_H "$Id: sqlUser.h,v 1.7 2001/01/05 06:44:05 gte Exp $"
+#define __SQLUSER_H "$Id: sqlUser.h,v 1.8 2001/01/06 06:47:26 gte Exp $"
 
 #include	<string>
 #include	<ctime>
@@ -92,10 +92,9 @@ public:
 
 	bool loadData( int );
 	bool loadData( const string& );
-
-protected:
-
     void setAllMembers(int);
+
+protected: 
 
 	unsigned int	id ;
 	string		user_name ;
