@@ -4,7 +4,7 @@
  */
 
 #ifndef __MISC_H
-#define __MISC_H "$Id: misc.h,v 1.11 2001/03/24 01:31:42 dan_karrels Exp $"
+#define __MISC_H "$Id: misc.h,v 1.12 2001/06/11 21:40:07 dan_karrels Exp $"
 
 #include	<string>
 #include	<hash_map>
@@ -101,6 +101,12 @@ void string_toupper( string& ) ;
  * all numeric characters, return false otherwise.
  */
 bool IsNumeric( const string& ) ;
+
+/**
+ * Count the number of occurences of the given character in the
+ * given string.
+ */
+size_t countChar( const string&, const char& ) ;
 
 } // namespace gnuworld
 

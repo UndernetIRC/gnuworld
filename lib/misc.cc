@@ -11,7 +11,7 @@
 #include	"misc.h"
 
 const char Misc_h_rcsId[] = __MISC_H ;
-const char Misc_cc_rcsId[] = "$Id: misc.cc,v 1.6 2001/03/03 15:07:34 dan_karrels Exp $" ;
+const char Misc_cc_rcsId[] = "$Id: misc.cc,v 1.7 2001/06/11 21:40:07 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -113,44 +113,22 @@ return true ;
 int strcasecmp( const string& s1, const string& s2 )
 {
 return std::strcasecmp( s1.c_str(), s2.c_str() ) ;
+}
 
-/*
-string::const_iterator s1_ptr = s1.begin(),
-	s2_ptr = s2.begin() ;
-string::const_iterator s1_end = s1.end(),
-	s2_end = s2.end() ;
+size_t countChar( const string& s, const char& findMe )
+{
+size_t theCount = 0 ;
 
-for( ; (s1_ptr != s1_end) && (s2_ptr != s2_end) ;
-	++s1_ptr, ++s2_ptr )
+for( string::const_iterator ptr = s.begin(), endPtr = s.end() ;
+	ptr != endPtr ; ++ptr )
 	{
-	if( tolower( *s1_ptr ) == tolower( *s2_ptr ) )
+	if( *ptr == findMe )
 		{
-		continue ;
+		++theCount ;
 		}
-
-	// Otherwise, the two characters are not
-	// equivalent
-	return (*s1_ptr < *s2_ptr) ? -1 : 1 ;
 	}
 
-// At least one of the two iterators has encountered its end()
-if( (s1_ptr == s1_end) && (s2_ptr == s2_end) )
-	{
-	// The two strings are equivalent
-	return 0 ;
-	}
-
-// Exactly one of the _ptr's is equivalent to its
-// respective _end
-if( s1_ptr == s1_end )
-	{
-	// s1 ran out first
-	return -1 ;
-	}
-
-// Otherwise, s2_ptr == s2_end
-return 1 ;
-*/
+return theCount ;
 }
 
 } // namespace gnuworld
