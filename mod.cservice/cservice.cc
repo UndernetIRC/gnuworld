@@ -469,7 +469,7 @@ int cservice::OnCTCP( iClient* theClient, const string& CTCP,
 
 	if(Command == "VERSION")
 	{
-		xClient::DoCTCP(theClient, CTCP.c_str(), "Undernet P10 Channel Services Version 2 [" __DATE__ " " __TIME__ "] ($Id: cservice.cc,v 1.61 2001/01/25 00:19:13 gte Exp $)");
+		xClient::DoCTCP(theClient, CTCP.c_str(), "Undernet P10 Channel Services Version 2 [" __DATE__ " " __TIME__ "] ($Id: cservice.cc,v 1.62 2001/01/26 20:58:56 gte Exp $)");
 		return true;
 	}
  
@@ -872,7 +872,7 @@ int cservice::OnTimer(xServer::timerID, void*)
 	{
 		updateType = 2;
 		theQuery << "SELECT " << sql::user_fields
-		<< ",now()::abstime::int4 as db_unixtime FROM users,users_lastseen WHERE users.id = users_lastseen.user_id AND last_updated >= " << lastUserRefresh;
+		<< ",now()::abstime::int4 as db_unixtime FROM users,users_lastseen WHERE users.id = users_lastseen.user_id AND users.last_updated >= " << lastUserRefresh;
 		// Fetch updated user information.
 	} 
 
