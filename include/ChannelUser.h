@@ -1,7 +1,7 @@
 /* ChannelUser.h */
 
 #ifndef __CHANNELUSER_H
-#define __CHANNELUSER_H "$Id: ChannelUser.h,v 1.7 2001/08/26 22:22:55 dan_karrels Exp $"
+#define __CHANNELUSER_H "$Id: ChannelUser.h,v 1.8 2002/04/27 14:54:49 dan_karrels Exp $"
 
 #include	<string>
 
@@ -36,8 +36,8 @@ public:
 	/// Bit representing channel user mode +v
 	static const modeType	MODE_V ;
 
-	/// ZOMBIE is true if the iClient is in the zombie state
-	const static modeType   ZOMBIE ;
+	/// Bit representing channel user zombie state
+	static const modeType   ZOMBIE ;
 
 	/**
 	 * Construct a ChannelUser given an iClient
@@ -57,12 +57,24 @@ public:
 	inline bool getMode( const modeType& whichMode ) const
 		{ return (whichMode == (modes & whichMode)) ; }
 
+	/**
+	 * Return true if this user has mode +o on this channel,
+	 * false otherwise.
+	 */
 	inline bool isModeO() const
 		{ return getMode( MODE_O ) ; }
 
+	/**
+	 * Return true if this user has mode +v on this channel,
+	 * false otherwise.
+	 */
 	inline bool isModeV() const
 		{ return getMode( MODE_V ) ; }
 
+	/**
+	 * Return true if this user is currently a zombie in this
+	 * channel, false otherwise.
+	 */
 	inline bool isZombie() const
 		{ return getMode( ZOMBIE ) ; }
 
@@ -79,12 +91,21 @@ public:
 	inline void setMode( const modeType& whichMode )
 		{ modes |= whichMode ; }
 
+	/**
+	 * Set the user's mode +o state in this channel.
+	 */
 	inline void setModeO()
 		{ setMode( MODE_O ) ; }
 
+	/**
+	 * Set the user's mode +v state in this channel.
+	 */
 	inline void setModeV()
 		{ return setMode( MODE_V ) ; }
 
+	/**
+	 * Set this user's zombie state to true in this channel.
+	 */
 	inline void setZombie()
 		{ setMode( ZOMBIE ) ; }
 
@@ -94,12 +115,21 @@ public:
 	inline void removeMode( const modeType& whichMode )
 		{ modes &= ~whichMode ; }
 
+	/**
+	 * Remove the user's mode +o state in this channel.
+	 */
 	inline void removeModeO()
 		{ removeMode( MODE_O ) ; }
 
+	/**
+	 * Remove the user's mode +v state in this channel.
+	 */
 	inline void removeModeV()
 		{ removeMode( MODE_V ) ; }
 
+	/**
+	 * Remove the user's zombie state in this channel.
+	 */
 	inline void removeZombie()
 		{ removeMode( ZOMBIE ) ; }
 

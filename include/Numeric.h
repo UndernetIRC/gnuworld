@@ -5,7 +5,7 @@
  */
 
 #ifndef __NUMERIC_H
-#define __NUMERIC_H "$Id: Numeric.h,v 1.2 2001/03/31 01:26:10 dan_karrels Exp $"
+#define __NUMERIC_H "$Id: Numeric.h,v 1.3 2002/04/27 14:54:49 dan_karrels Exp $"
 
 /*
  * Numeric nicks are new as of version ircu2.10.00beta1.
@@ -133,7 +133,7 @@ inline const char* inttobase64( char* buf, unsigned int v, size_t count )
 {
 assert( buf != 0 ) ;
 
-buf[count] = '\0';  
+buf[count] = '\0';
 while (count > 0)
 	{
 	buf[ --count ] = convert2y[(v & NUMNICKMASK)];

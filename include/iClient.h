@@ -2,7 +2,7 @@
  */
 
 #ifndef __ICLIENT_H
-#define __ICLIENT_H "$Id: iClient.h,v 1.25 2002/02/02 21:23:41 gte Exp $"
+#define __ICLIENT_H "$Id: iClient.h,v 1.26 2002/04/27 14:54:49 dan_karrels Exp $"
 
 #include	<string>
 #include	<list>
@@ -133,7 +133,6 @@ public:
 	inline const string getNickUserHost() const
 		{ return (nickName + '!' + userName + '@' + insecureHost) ; }
 
-
 	/**
 	 * Retrieve client's 'real-name' field.
 	 */
@@ -152,11 +151,15 @@ public:
 	inline const string& getAccount() const
 		{ return account ; }
 
+	/**
+	 * I really have no idea what this is...someone wanna pass me
+	 * a bone here people?
+	 */
 	inline void setAccount( const string& _account )
 		{
-			account = _account ;
-			setMode(MODE_REGISTERED);
-			if (isModeR() && isModeX()) setHiddenHost();
+		account = _account ;
+		setMode(MODE_REGISTERED);
+		if (isModeR() && isModeX()) setHiddenHost();
 		}
 
 	/**
@@ -245,24 +248,45 @@ public:
 	inline bool getMode( const modeType& theMode ) const
 		{ return (theMode == (mode & theMode)) ; }
 
+	/**
+	 * Return true if this client has the +i mode set, false otherwise.
+	 */
 	inline bool isModeI() const
 		{ return getMode( MODE_INVISIBLE ) ; }
 
+	/**
+	 * Return true if this client has the +w mode set, false otherwise.
+	 */
 	inline bool isModeW() const
 		{ return getMode( MODE_WALLOPS ) ; }
 
+	/**
+	 * Return true if this client has the +k mode set, false otherwise.
+	 */
 	inline bool isModeK() const
 		{ return getMode( MODE_SERVICES ) ; }
 
+	/**
+	 * Return true if this client has the +o mode set, false otherwise.
+	 */
 	inline bool isModeO() const
 		{ return getMode( MODE_OPER ) ; }
 
+	/**
+	 * Return true if this client has the +d mode set, false otherwise.
+	 */
 	inline bool isModeD() const
 		{ return getMode( MODE_DEAF ) ; }
 
+	/**
+	 * Return true if this client has the +r mode set, false otherwise.
+	 */
 	inline bool isModeR() const
 		{ return getMode( MODE_REGISTERED ) ; }
 
+	/**
+	 * Return true if this client has the +x mode set, false otherwise.
+	 */
 	inline bool isModeX() const
 		{ return getMode( MODE_HIDDEN_HOST ) ; }
 
@@ -284,25 +308,43 @@ public:
 	inline void setMode( const modeType& newMode )
 		{ mode |= newMode ; }
 
+	/**
+	 * Set mode +i for this user.
+	 */
 	inline void setModeI()
 		{ setMode( MODE_INVISIBLE ) ; }
 
+	/**
+	 * Set mode +w for this user.
+	 */
 	inline void setModeW()
 		{ setMode( MODE_WALLOPS ) ; }
 
+	/**
+	 * Set mode +k for this user.
+	 */
 	inline void setModeK()
 		{ setMode( MODE_SERVICES ) ; }
 
+	/**
+	 * Set mode +d for this user.
+	 */
 	inline void setModeD()
 		{ setMode( MODE_DEAF ) ; }
 
+	/**
+	 * Set mode +o for this user.
+	 */
 	inline void setModeO()
 		{ setMode( MODE_OPER ) ; }
 
+	/**
+	 * Set mode +x for this user.
+	 */
 	inline void setModeX()
 		{
-			setMode( MODE_HIDDEN_HOST ) ;
-			if (isModeR() && isModeX()) setHiddenHost();
+		setMode( MODE_HIDDEN_HOST ) ;
+		if (isModeR() && isModeX()) setHiddenHost();
 		}
 
 	/**
@@ -311,21 +353,39 @@ public:
 	inline void removeMode( const modeType& theMode )
 		{ mode &= ~theMode ; }
 
+	/**
+	 * Remove user mode 'i'.
+	 */
 	inline void removeModeI()
 		{ removeMode( MODE_INVISIBLE ) ; }
 
+	/**
+	 * Remove user mode 'w'.
+	 */
 	inline void removeModeW()
 		{ removeMode( MODE_WALLOPS ) ; }
 
+	/**
+	 * Remove user mode 'k'.
+	 */
 	inline void removeModeK()
 		{ removeMode( MODE_SERVICES ) ; }
 
+	/**
+	 * Remove user mode 'd'.
+	 */
 	inline void removeModeD()
 		{ removeMode( MODE_DEAF ) ; }
 
+	/**
+	 * Remove user mode 'o'.
+	 */
 	inline void removeModeO()
 		{ removeMode( MODE_OPER ) ; }
 
+	/**
+	 * Remove user mode 'x'.
+	 */
 	inline void removeModeX()
 		{ removeMode( MODE_HIDDEN_HOST ) ; }
 
@@ -473,7 +533,6 @@ protected:
 	 */
 	string		description ;
 
-
 	/**
 	 * The time at which this iClient connected to the network.
 	 */
@@ -487,8 +546,7 @@ protected:
 	/**
 	 * This client's "Account".
 	 */
-
-	string		account;
+	string		account ;
 
 	/**
 	 * This client's integer per-server numeric.

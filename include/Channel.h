@@ -1,7 +1,7 @@
 /* Channel.h */
 
 #ifndef __CHANNEL_H
-#define __CHANNEL_H "$Id: Channel.h,v 1.20 2002/02/24 21:36:38 mrbean_ Exp $"
+#define __CHANNEL_H "$Id: Channel.h,v 1.21 2002/04/27 14:54:49 dan_karrels Exp $"
 
 #include	<string>
 #include	<map>
@@ -189,7 +189,6 @@ public:
 	/**
 	 * Remove all the bans in the channels ban list.
 	 */
-
 	inline void removeAllBans()
 		{ banList.clear(); }
 
@@ -375,10 +374,14 @@ public:
 	 * Returns the channel topic (if TOPIC_TRACK is defined)
 	 */
     	const string& getTopic() const
-	{ return topic; }
+		{ return topic; }
 
+	/**
+	 * Sets this channel's topic value to the value passed in.
+	 * This method exists only if TOPIC_TRACK is defined.
+	 */
 	void setTopic(const string& _Topic)
-	{ topic = _Topic; }
+		{ topic = _Topic; }
 	
 #endif	
 	
@@ -519,8 +522,12 @@ protected:
 	banListType	banList ;
 	
 #ifdef TOPIC_TRACK
+	/**
+	 * This channel's topic, only if TOPIC_TRACK is defined.
+	 */
 	string		topic;
 #endif
+
 } ;
 
 } // namespace gnuworld

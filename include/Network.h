@@ -1,9 +1,9 @@
-/* xNetwork.h
+/* Network.h
  * Author: Daniel Karrels dan@karrels.com
  */
 
 #ifndef __NETWORK_H
-#define __NETWORK_H "$Id: Network.h,v 1.23 2002/02/24 21:36:38 mrbean_ Exp $"
+#define __NETWORK_H "$Id: Network.h,v 1.24 2002/04/27 14:54:49 dan_karrels Exp $"
 
 #include	<vector>
 #include	<string>
@@ -193,7 +193,8 @@ public:
 	 * Find a remote server by a wildmask name.
 	 * Returns NULL if not found.
 	 */
-	virtual iServer*	findExpandedServerName( const string& name ) const ;
+	virtual iServer*	findExpandedServerName( const string& name )
+					const ;
 
 	/**
 	 * Find a global channel by case insensitive name.
@@ -307,7 +308,6 @@ public:
 	 */
 	virtual void		OnSplit( const unsigned int& intYY ) ;
 
-
 	/**
 	 * Define a non-const iterator for walking through the
 	 * structure of remote servers.
@@ -392,22 +392,19 @@ public:
 	 * Define a non-const iterator for walking through the 
 	 * channels structure
 	 */
-
 	typedef channelMapType::const_iterator	constChannelIterator;
 	
 	/**
 	 * Returns an iterator to the begining of the channels structure
 	 */
-
 	inline constChannelIterator		channels_begin() const
-	{ return channelMap.begin(); }
+		{ return channelMap.begin(); }
 	
 	/**
 	 * Returns an iterator to the end of the channels structure
 	 */
-
 	inline constChannelIterator		channels_end() const
-	{ return channelMap.end(); }
+		{ return channelMap.end(); }
 
 	/**
 	 * Return the number of channels currently stored in the
@@ -433,14 +430,13 @@ public:
 	 */
 	size_t		countClients( const iServer* theServer ) const ;
 
-
 	/**
 	 * A base class unary function used in foreach_xClient.
 	 */
 	struct fe_xClientBase : public unary_function< xClient*, void >
-	{
-	virtual void operator() ( xClient* ) {}
-	} ;
+		{
+		virtual void operator() ( xClient* ) {}
+		} ;
 
 	/**
 	 * Execute a unary function for each xClient.  Keep in mind

@@ -1,7 +1,7 @@
 /* Gline.h */
 
 #ifndef __GLINE_H
-#define __GLINE_H "$Id: Gline.h,v 1.3 2002/01/08 18:39:34 mrbean_ Exp $"
+#define __GLINE_H "$Id: Gline.h,v 1.4 2002/04/27 14:54:49 dan_karrels Exp $"
 
 #include	<string>
 #include	<iostream>
@@ -88,17 +88,30 @@ public:
 	inline const time_t& getExpiration() const
 		{ return expiration ; }
 
-	inline void setSetBy(const string& _setBy)
-	{ setBy = _setBy; }
-	
-	inline void setHost(const string& _host)
-	{ userHost = _host; }
-	
-	inline void setReason(const string& _reason)
-	{ reason = _reason; }
-	
-	inline void setExpiration(const time_t _expiration)
-	{ expiration = _expiration; }
+	/**
+	 * Retrieve the user/server who set this gline.
+	 */
+	inline void setSetBy( const string& _setBy )
+		{ setBy = _setBy; }
+
+	/**
+	 * Set the hostmask affected by this gline.
+	 */
+	inline void setHost( const string& _host )
+		{ userHost = _host; }
+
+	/**
+	 * Set the reason for this gline.
+	 */
+	inline void setReason( const string& _reason )
+		{ reason = _reason; }
+
+	/**
+	 * Set the expiration time on this gline.
+	 */
+	inline void setExpiration( const time_t _expiration )
+		{ expiration = _expiration; }
+
 	/**
 	 * Convenience operator method which allows the output
 	 * of a Gline instance to a C++ standard output stream.
@@ -111,7 +124,6 @@ public:
 		<< "Expires: " << rhs.expiration ;
 	return out ;
 	}
-	
 	
 protected:
 

@@ -1,9 +1,9 @@
 /* config.h
- * $Id: config.h,v 1.11 2002/02/24 21:36:38 mrbean_ Exp $
+ * $Id: config.h,v 1.12 2002/04/27 14:54:49 dan_karrels Exp $
  */
 
 #ifndef __CONFIG_H
-#define __CONFIG_H "$Id: config.h,v 1.11 2002/02/24 21:36:38 mrbean_ Exp $"
+#define __CONFIG_H "$Id: config.h,v 1.12 2002/04/27 14:54:49 dan_karrels Exp $"
 
 /* config.h */
 /* GNUWorld main configuration file */
@@ -90,9 +90,8 @@
 
 /**
  * TOPIC_TRACK
- * Set if you want gnuworld to track topics sets 
+ * Set if you want gnuworld to track topics in the network channels
  */
-
 #undef TOPIC_TRACK
 
 #endif /* __CONFIG_H */

@@ -50,7 +50,7 @@
 #include	"UnloadClientTimerHandler.h"
 
 const char server_h_rcsId[] = __SERVER_H ;
-const char server_cc_rcsId[] = "$Id: server.cc,v 1.128 2002/03/14 20:35:19 mrbean_ Exp $" ;
+const char server_cc_rcsId[] = "$Id: server.cc,v 1.129 2002/04/27 14:54:51 dan_karrels Exp $" ;
 const char config_h_rcsId[] = __CONFIG_H ;
 const char misc_h_rcsId[] = __MISC_H ;
 const char events_h_rcsId[] = __EVENTS_H ;
@@ -3817,12 +3817,12 @@ if( (string::npos == exPos) || (string::npos == atPos) ||
 return true ;
 }
 
-bool xServer::isJuped(const iServer* theServer)
+bool xServer::isJuped( const iServer* theServer ) const
 {
-for( jupedServerListType::iterator ptr = jupedServers.begin() ;
+for( jupedServerListType::const_iterator ptr = jupedServers.begin() ;
 	ptr != jupedServers.end() ; ++ptr )
 	{
-	if( *ptr== theServer->getIntYY() )
+	if( *ptr == theServer->getIntYY() )
 		{
 		return true;
 		}

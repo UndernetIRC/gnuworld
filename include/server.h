@@ -17,7 +17,7 @@
  */
 
 #ifndef __SERVER_H
-#define __SERVER_H "$Id: server.h,v 1.57 2002/04/06 21:39:28 mrbean_ Exp $"
+#define __SERVER_H "$Id: server.h,v 1.58 2002/04/27 14:54:50 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
@@ -732,16 +732,14 @@ public:
 	/**
 	 * Returns the total number of bytes recieved from the uplink
 	 */
-	
 	inline const unsigned long getTotalReceived() const
-	{ return theSock->getTotalReceived(); }
+		{ return theSock->getTotalReceived(); }
 
 	/**
 	 * Returns the total number of bytes sent to the uplink
 	 */
-	
 	inline const unsigned long getTotalSent() const
-	{ return theSock->getTotalSent(); }
+		{ return theSock->getTotalSent(); }
 	
 	/**
 	 * This is a simple mutator of the server's socket pointer.
@@ -874,8 +872,7 @@ public:
 	/**
 	 * Check if a server is juped
 	 */
-
-	 virtual bool isJuped( const iServer* );
+	 virtual bool isJuped( const iServer* ) const ;
 
 
 protected:
