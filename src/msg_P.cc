@@ -10,7 +10,7 @@
 #include	"client.h"
 #include	"ELog.h"
 
-const char msg_P_cc_rcsId[] = "$Id: msg_P.cc,v 1.1 2001/02/02 18:10:30 dan_karrels Exp $" ;
+const char msg_P_cc_rcsId[] = "$Id: msg_P.cc,v 1.2 2001/03/04 11:41:36 isomer Exp $" ;
 
 using std::string ;
 using std::endl ;
@@ -99,6 +99,11 @@ if( Message[ 0 ] == 1 && Message[ strlen( Message ) - 1 ] == 1 )
 	if( NULL == Message )
 		{
 		Message = "" ;
+		}
+	// Same reason as above. DOH!
+	if( NULL == Command )
+		{
+		Command = "" ;
 		}
 	}
 
