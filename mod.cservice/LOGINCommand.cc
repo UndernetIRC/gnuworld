@@ -12,7 +12,7 @@
 #include	"cservice_config.h"
 #include	"Network.h"
 
-const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.27 2001/09/26 01:10:31 gte Exp $" ;
+const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.28 2001/10/01 17:51:17 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -27,6 +27,12 @@ using namespace gnuworld;
 bool LOGINCommand::Exec( iClient* theClient, const string& Message )
 {
 bot->incStat("COMMANDS.LOGIN");
+
+if (!bot->getUplink()->IsEndOfBurst())
+{
+	bot->Notice(theClient, "LOGIN Temporarily disabled while connecting to network, please try again in a few minutes.");
+	return false;
+}
 
 StringTokenizer st( Message ) ;
 if( st.size() < 3 )
