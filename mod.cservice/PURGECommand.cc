@@ -8,7 +8,7 @@
  *
  * Caveats: None
  *
- * $Id: PURGECommand.cc,v 1.8 2001/03/16 11:50:59 isomer Exp $
+ * $Id: PURGECommand.cc,v 1.9 2001/03/18 00:19:16 gte Exp $
  */
  
 #include	<string>
@@ -22,7 +22,7 @@
 #include	"responses.h"
 #include	"cservice_config.h"
 
-const char PURGECommand_cc_rcsId[] = "$Id: PURGECommand.cc,v 1.8 2001/03/16 11:50:59 isomer Exp $" ;
+const char PURGECommand_cc_rcsId[] = "$Id: PURGECommand.cc,v 1.9 2001/03/18 00:19:16 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -80,10 +80,9 @@ if (level < level::purge)
  * Fetch some information about the owner of this channel, so we can
  * 'freeze' it for future investigation in the log.
  */
-
-/* TODO: why is this here? */
+ 
 strstream managerQuery;
-managerQuery	<< "SELECT users.user_name "
+managerQuery	<< "SELECT users.user_name,users.email "
 		<< "FROM users,levels "
 		<< "WHERE levels.user_id = users.id "
 		<< "AND levels.access = 500 "
@@ -102,7 +101,7 @@ managerQuery	<< "SELECT users.user_name "
 ExecStatusType status = bot->SQLDb->Exec(managerQuery.str()) ;
 delete[] managerQuery.str() ;
 
-if( status != PGRES_COMMAND_OK )
+if( status != PGRES_TUPLES_OK )
 	{
 	elog	<< "PURGE> SQL Error: "
 		<< bot->SQLDb->ErrorMessage()
@@ -111,6 +110,7 @@ if( status != PGRES_COMMAND_OK )
 	}
 
 string manager = bot->SQLDb->GetValue(0,0);
+string managerEmail = bot->SQLDb->GetValue(0,1);
 
 /*
  *  We simply flag this channel as 'deleted', and remove from the cache.
@@ -158,9 +158,8 @@ bot->Notice(theClient,
 bot->writeChannelLog(theChan, 
 	theClient, 
 	sqlChannel::EV_PURGE,
-	theClient->getNickName()+" (" + theUser->getUserName() 
-	 + ") has purged " + theChan->getName() + " (" + reason + "), " +
-	"Manager was " + manager );
+	"has purged " + theChan->getName() + " (" + reason + "), " +
+	"Manager was " + manager + " (" + managerEmail + ")" );
 
 /* Remove from cache.. part channel. */
 bot->sqlChannelCache.erase(theChan->getName());

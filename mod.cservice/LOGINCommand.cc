@@ -1,7 +1,7 @@
 /* LOGINCommand.cc */
 
 #include	<string>
-#include <iomanip.h>
+#include	<iomanip.h>
 
 #include	"md5hash.h" 
 #include	"StringTokenizer.h"
@@ -9,8 +9,10 @@
 #include	"cservice.h" 
 #include	"responses.h" 
 #include	"networkData.h"
+#include	"cservice_config.h"
+#include	"Network.h"
 
-const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.14 2001/03/06 23:44:00 gte Exp $" ;
+const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.15 2001/03/18 00:19:16 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -175,6 +177,93 @@ bot->Notice(theClient,
  * AUTOP set, and isn't already opp'd on - do the deed. 
  */ 
 
+strstream theQuery;
+theQuery	<< "SELECT channel_id,flags FROM "
+			<< "levels WHERE user_id = "
+			<< theUser->getID()
+			<< ends;
+
+#ifdef LOG_SQL
+	elog	<< "LOGIN::sqlQuery> "
+		<< theQuery.str()
+		<< endl;
+#endif
+
+ExecStatusType status = bot->SQLDb->Exec(theQuery.str()) ;
+delete[] theQuery.str() ;
+
+if( PGRES_TUPLES_OK != status )
+	{
+	elog	<< "LOGIN> SQL Error: "
+		<< bot->SQLDb->ErrorMessage()
+		<< endl ;
+	return false ; 
+	}
+ 
+typedef vector < pair < int, int > > autoOpVectorType;
+autoOpVectorType autoOpVector;
+
+for(int i = 0; i < bot->SQLDb->Tuples(); i++)
+	{ 
+		int channel_id = atoi(bot->SQLDb->GetValue(i, 0));
+		int flags = atoi(bot->SQLDb->GetValue(i, 1)); 
+
+		autoOpVector.push_back(autoOpVectorType::value_type(
+			make_pair(channel_id, flags)));
+	}
+ 
+for (autoOpVectorType::const_iterator resultPtr = autoOpVector.begin();
+	resultPtr != autoOpVector.end(); ++resultPtr)
+	{
+ 
+	/* If the autoop flag isn't set in this record */
+	if (!(resultPtr->second & sqlLevel::F_AUTOOP))
+		{ 
+		continue;
+		}
+
+	sqlChannel* theChan = bot->getChannelRecord(resultPtr->first);
+	if (!theChan)
+		{ 
+		continue;
+		}
+
+	/*
+	 * Check if they're already opped.
+	 */
+
+	Channel* netChan = Network->findChannel(theChan->getName());
+	if (!netChan)
+		{ 
+		continue;
+		}
+
+	ChannelUser* tmpChanUser = netChan->findUser(theClient) ;
+	if(!tmpChanUser)
+		{ 
+		continue;
+		} 
+
+	/*
+	 * Don't attempt to op if we're not in the channel, or not op'd.
+	 */
+
+	ChannelUser* tmpBotUser = netChan->findUser(bot->getInstance());
+	if (!tmpBotUser)
+		{ 
+		continue;
+		}
+
+	if (!theChan->getInChan() || !tmpBotUser->getMode(ChannelUser::MODE_O))
+		{ 
+		continue;
+		}
+
+	if(!tmpChanUser->getMode(ChannelUser::MODE_O))
+		{
+		bot->Op(netChan, theClient);
+		}
+	} 
 
 return true; 
 } 

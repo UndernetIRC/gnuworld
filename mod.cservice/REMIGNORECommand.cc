@@ -9,7 +9,7 @@
 #include	"responses.h"
 #include	"Network.h"
 
-const char REMIGNORECommand_cc_rcsId[] = "$Id: REMIGNORECommand.cc,v 1.5 2001/03/14 22:49:14 gte Exp $" ;
+const char REMIGNORECommand_cc_rcsId[] = "$Id: REMIGNORECommand.cc,v 1.6 2001/03/18 00:19:16 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -70,7 +70,7 @@ bool REMIGNORECommand::Exec( iClient* theClient, const string& Message )
 			bot->Notice(theClient, 
 				bot->getResponse(theUser,
 					language::unsilenced,
-					string("Removed %s from my silence list")).c_str(),
+					string("Removed %s from my ignore list")).c_str(),
 				st[1].c_str()); 
 			bot->logAdminMessage("%s (%s) has removed ignore: %s", 
 				theClient->getNickName().c_str(), theUser->getUserName().c_str(), st[1].c_str()); 

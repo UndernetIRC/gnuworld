@@ -1,7 +1,7 @@
 /* sqlLevel.h */
 
 #ifndef __SQLLEVEL_H
-#define __SQLLEVEL_H "$Id: sqlLevel.h,v 1.10 2001/03/13 22:39:33 gte Exp $"
+#define __SQLLEVEL_H "$Id: sqlLevel.h,v 1.11 2001/03/18 00:19:16 gte Exp $"
 
 #include	<string>
 #include	<ctime>
@@ -68,7 +68,10 @@ public:
 
 	inline const time_t&		getLastUpdated() const
 		{ return last_updated ; }
-	 
+
+	inline const time_t&		getLastUsed() const
+		{ return last_used ; } 
+ 
 	/*
 	 *  Methods to set data atrributes.
 	 */
@@ -109,6 +112,9 @@ public:
 	inline void setLastModifBy( const string& _last_modif_by )
 		{ last_modif_by = _last_modif_by; } 
 
+	inline void setLastUsed( const time_t& _last_used )
+		{ last_used = _last_used; } 
+ 
 	bool commit();
 	bool loadData( unsigned int, unsigned int ); 
 	void setAllMembers(int);
@@ -127,6 +133,7 @@ protected:
 	time_t			last_modif ;
 	string			last_modif_by ;
 	time_t			last_updated ;
+	time_t			last_used;
  
 	PgDatabase*		SQLDb;
 } ;

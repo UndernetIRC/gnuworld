@@ -482,7 +482,7 @@ else
 		s	<< getCharYYXXX() 
 			<< " SILENCE " 
 			<< theClient->getCharYYXXX() 
-			<< " +" 
+			<< " " 
 			<< silenceMask
 			<< ends; 
 		Write( s );
@@ -729,7 +729,7 @@ else if(Command == "VERSION")
 	xClient::DoCTCP(theClient, CTCP,
 		"Undernet P10 Channel Services Version 2 ["
 		__DATE__ " " __TIME__
-		"] Release 1.0");
+		"] Release 1.0pl1");
 	}
 else if(Command == "PROBLEM?")
 	{
@@ -741,7 +741,7 @@ else if(Command == "WHAT_YOU_SAY?")
 	} 
 else if(Command == "SOUND")
 	{
-	xClient::DoCTCP(theClient, CTCP.c_str(), "I'm deaf remember?");
+	xClient::DoCTCP(theClient, CTCP.c_str(), "I'm deaf, remember?");
 	}
 else if(Command == "DCC")
 	{
@@ -1094,7 +1094,7 @@ if(ptr != sqlLevelCache.end())
 	#endif
 
 	levelCacheHits++;
-
+	ptr->second->setLastUsed(currentTime());
 	return ptr->second ;
 	} 
 
@@ -1118,7 +1118,7 @@ if (theLevel->loadData(theUser->getID(), theChan->getID()))
 	#endif
 
 	levelHits++;
-
+	theLevel->setLastUsed(currentTime());
 	return theLevel;
 	}
 
@@ -2909,10 +2909,41 @@ newBan->setReason(theReason);
  *  add to internal list and commit to the db.
  */
  
-banList->push_back(newBan); 
+vector< sqlBan* >::iterator ptr = banList->begin(); 
+while (ptr != banList->end())
+	{
+	sqlBan* theBan = *ptr;
+		
+	if(string_lower(banTarget) == string_lower(theBan->getBanMask()))
+		{
+			/*
+			 * If this mask is already banned, we're just getting
+			 * lagged info.
+			 */
+			return true;
+		}
+	}
+ 
+banList->push_back(newBan);
 
 /* Insert this new record into the database. */
 newBan->insertRecord();
+
+/*
+ * Finally, if this guy is auth'd.. suspend his account.
+ */
+
+sqlUser* theUser = isAuthed(theClient, false); 
+if (theUser)
+	{
+	sqlLevel* accessRec = getLevelRecord(theUser, theChan);
+	if (accessRec)
+		{
+		accessRec->setSuspendExpire(currentTime() + 300);
+		accessRec->setSuspendBy(nickName);
+		accessRec->commit(); 
+		}
+	}
 
 Channel* netChan = Network->findChannel(theChan->getName());
 
@@ -2923,7 +2954,7 @@ if (!netChan)
 	}
  
 Kick( netChan, theClient, theReason ) ;
-
+ 
 return true ;
 }
 
