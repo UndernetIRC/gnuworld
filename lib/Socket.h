@@ -2,7 +2,7 @@
  */
 
 #ifndef __SOCKET_H
-#define __SOCKET_H "$Id: Socket.h,v 1.2 2000/11/05 23:09:40 dan_karrels Exp $"
+#define __SOCKET_H "$Id: Socket.h,v 1.3 2000/11/21 01:10:59 dan_karrels Exp $"
 
 #include	<new>
 #include	<iostream>
@@ -12,7 +12,9 @@
 #include	<vector>
 
 #include	<sys/types.h>
+#include	<netinet/in.h>
 #include	<arpa/inet.h> // sockaddr
+#include	<sys/socket.h>
 #include	<netdb.h>
 
 #include	<cstdio>
