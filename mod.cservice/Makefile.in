@@ -10,7 +10,7 @@
 # even the implied warranty of MERCHANTABILITY or FITNESS FOR A
 # PARTICULAR PURPOSE.
 
-# "$Id: Makefile.in,v 1.52 2001/02/04 16:43:28 dan_karrels Exp $"
+# "$Id: Makefile.in,v 1.53 2001/02/04 23:37:32 gte Exp $"
 
 
 SHELL = @SHELL@
@@ -130,7 +130,7 @@ DIST_COMMON =  Makefile.am Makefile.in
 
 DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
-TAR = tar
+TAR = gtar
 GZIP_ENV = --best
 DEP_FILES =  .deps/ACCESSCommand.P .deps/ADDUSERCommand.P \
 .deps/BANCommand.P .deps/BANLISTCommand.P .deps/CHANINFOCommand.P \

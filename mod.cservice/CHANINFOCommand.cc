@@ -13,7 +13,7 @@
  *
  * Command is aliased "INFO".
  *
- * $Id: CHANINFOCommand.cc,v 1.12 2001/01/30 21:34:16 gte Exp $
+ * $Id: CHANINFOCommand.cc,v 1.13 2001/02/04 23:37:32 gte Exp $
  */
 
 #include	<string>
@@ -25,7 +25,7 @@
 #include	"responses.h"
 #include	"libpq++.h"
  
-const char CHANINFOCommand_cc_rcsId[] = "$Id: CHANINFOCommand.cc,v 1.12 2001/01/30 21:34:16 gte Exp $" ;
+const char CHANINFOCommand_cc_rcsId[] = "$Id: CHANINFOCommand.cc,v 1.13 2001/02/04 23:37:32 gte Exp $" ;
  
 namespace gnuworld
 {
@@ -104,7 +104,7 @@ if( string::npos == st[ 1 ].find_first_of( '#' ) )
 		string channelList = ""; 
 	
 		channelsQuery << "SELECT channels.name,levels.access FROM levels,channels "
-				<< "WHERE levels.channel_id = channels.id AND levels.user_id = "
+				<< "WHERE levels.channel_id = channels.id AND channels.deleted = 0 AND levels.user_id = "
 				<< theUser->getID() << " ORDER BY levels.access DESC"
 				<< ends;
 		

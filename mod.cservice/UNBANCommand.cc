@@ -4,11 +4,11 @@
  * 13/01/2001 - Greg Sikorski <gte@atomicrevs.demon.co.uk>
  * Initial Version.
  *
- * Bans a user on a channel, adds this ban to the internal banlist.
+ * Unbans a user from a channel.
  *
  * Caveats: None.
  *
- * $Id: UNBANCommand.cc,v 1.6 2001/02/02 20:17:07 gte Exp $
+ * $Id: UNBANCommand.cc,v 1.7 2001/02/04 23:37:32 gte Exp $
  */
 
 #include	<string>
@@ -21,7 +21,7 @@
 #include	"responses.h"
 #include	"match.h"
 
-const char UNBANCommand_cc_rcsId[] = "$Id: UNBANCommand.cc,v 1.6 2001/02/02 20:17:07 gte Exp $" ;
+const char UNBANCommand_cc_rcsId[] = "$Id: UNBANCommand.cc,v 1.7 2001/02/04 23:37:32 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -39,7 +39,7 @@ bool UNBANCommand::Exec( iClient* theClient, const string& Message )
 	    return true;
 	}
  
-	// Is the channel registered?
+	/* Is the channel registered? */
 	
 	sqlChannel* theChan = bot->getChannelRecord(st[1]);
 	if(!theChan)
@@ -77,8 +77,9 @@ bool UNBANCommand::Exec( iClient* theClient, const string& Message )
 		return false;
 	} 
  
-	vector< sqlBan* >* banList = bot->getBanRecords(theChan); 
-	vector< sqlBan* >::iterator ptr = banList->begin(); 
+	vector< sqlBan* >* banList = bot->getBanRecords(theChan);
+	vector< sqlBan* >::iterator ptr = banList->begin();
+	string banTarget = "";
 
  	/*
 	 *  Are they trying to unban by nick or hostmask?
@@ -96,115 +97,104 @@ bool UNBANCommand::Exec( iClient* theClient, const string& Message )
 			bot->Notice(theClient, "Sorry, I cannot find the specified nick.");
 			return true;
 		}
-	 
-		/*
-		 *  Loop over all bans, removing any that match this users current
-		 *  n!u@host.
-		 */
 
-		int banCount = 0;
-		while (ptr != banList->end())
-		{
-			sqlBan* theBan = *ptr;
-			if ( match(theBan->getBanMask(), aNick->getNickUserHost()) == 0 )
-			{ 
-				/* Matches! remove this ban - if we can. */ 
-				if (theBan->getLevel() >= level)
-				{
-					bot->Notice(theClient, "You have insufficient access to remove the ban %s from %s",
-						theBan->getBanMask().c_str(), theChan->getName().c_str());
-					++ptr;
-				}
-				else 
-				{ 
-					bot->UnBan(theChannel, theBan->getBanMask());
-					ptr = banList->erase(ptr);
-					theBan->deleteRecord();
-					delete(theBan);
-					banCount++;
-				}
-			} // if (banMatched)
-				else
-			{
-				++ptr;
-			} 
-
-		} // while()
-
-
-		/*
-		 *  Scan through the channel banlist too, and attempt to match any.
-		 */
-
-		Channel::const_banIterator cPtr = theChannel->banList_begin();
-		while (cPtr != theChannel->banList_end())
-		{
-			if ( match((*cPtr), aNick->getNickUserHost()) == 0)
-			{ 
-	 			// Can't call xClient::UnBan inside the loop it will modify without
-				// a return value.
-				strstream s;
-				s	<< bot->getCharYYXXX() << " M " << theChannel->getName()
-					<< " -b " << (*cPtr) << ends; 
-				bot->Write( s );
-				delete[] s.str();
-
-				theChannel->removeBan(*cPtr);
-				cPtr = theChannel->banList_begin();
-
-				banCount++;
-			} else
-			{
-				++cPtr;
-			}
-
-
-		}
- 
-		bot->Notice(theClient, "Removed %i bans that matched %s",
-			banCount, aNick->getNickUserHost().c_str());
-		return true;
-	} // If (isNick)
-
+		banTarget = aNick->getNickUserHost();
+	} else
+	{
+		banTarget = st[2];
+	}
 	
-	/* Otherwise, try to delete by supplied mask */ 
- 
+	/*
+	 *  Loop over all bans, removing any that match our target
+	 */
+
+	int banCount = 0;
+	unsigned short comparison = 0;
+
 	while (ptr != banList->end())
 	{
 		sqlBan* theBan = *ptr;
-		
-		if(string_lower(st[2]) == string_lower(theBan->getBanMask()))
+		/* 
+		 * If we're matching by a users full host, reverse the way we check
+		 * banmask.
+		 */
+
+		if ( isNick )
 		{
-			/* Do we have enough access? */
+			comparison = match(theBan->getBanMask(), banTarget);
+		} else 
+		{
+			comparison = match(banTarget, theBan->getBanMask());
+		}
+
+		if ( comparison == 0 )
+		{ 
+			/* Matches! remove this ban - if we can. */ 
 			if (theBan->getLevel() > level)
 			{
-				bot->Notice(theClient, "You have insufficient access to remove that ban.");
+				bot->Notice(theClient, "You have insufficient access to remove the ban %s from %s's database",
+					theBan->getBanMask().c_str(), theChan->getName().c_str());
+				++ptr;
 			}
 			else 
 			{ 
-				banList->erase(ptr);
-				theBan->deleteRecord();
-				bot->Notice(theClient, "Removed ban %s from %s",
-					theBan->getBanMask().c_str(), theChan->getName().c_str()); 
-
 				bot->UnBan(theChannel, theBan->getBanMask());
- 
-				delete(theBan); 
-				return true;
+				ptr = banList->erase(ptr);
+				theBan->deleteRecord();
+				delete(theBan);
+				banCount++;
 			}
-		}  
- 
-	++ptr; 
-	}
+		} // if (banMatched)
+			else
+		{
+			++ptr;
+		} 
+
+	} // while()
+
 
 	/*
-	 *  If we get here, we've not found it in the channel banlist.
-	 *  Attempt to just remove the ban from IRC anyway..
+	 *  Scan through the channel banlist too, and attempt to match any.
 	 */
 
-	bot->UnBan(theChannel, st[2]); 
- 
-	return true ;
+	Channel::const_banIterator cPtr = theChannel->banList_begin();
+	while (cPtr != theChannel->banList_end())
+	{ 
+
+		if ( isNick )
+		{
+			comparison = match((*cPtr), banTarget);
+		} else 
+		{
+			comparison = match(banTarget, (*cPtr));
+		}
+
+		if ( comparison == 0)
+		{ 
+ 			// Can't call xClient::UnBan inside the loop it will modify without
+			// a return value.
+			strstream s;
+			s	<< bot->getCharYYXXX() << " M " << theChannel->getName()
+				<< " -b " << (*cPtr) << ends; 
+			bot->Write( s );
+			delete[] s.str();
+
+			theChannel->removeBan(*cPtr);
+			cPtr = theChannel->banList_begin();
+
+			banCount++;
+		} else
+		{
+			++cPtr;
+		}
+
+	} // while()
+
+	bot->Notice(theClient, "Removed %i bans that matched %s",
+		banCount, banTarget.c_str());
+
+	return true;
+
 } 
 
 } // namespace gnuworld.

@@ -4,15 +4,15 @@
  * 13/01/2001 - Greg Sikorski <gte@atomicrevs.demon.co.uk>
  * Initial Version.
  * 20/01/2001 - David Henriksen <david@itwebnet.dk>
- * BAN Command written.
+ * BAN Command started.
  * 23/01/2000 - Greg Sikorski <gte@atomicrevs.demon.co.uk>
- * Updated to new structures, changed quite a bit :)
+ * Cleanups/rewrites - don't allow adding of less specific bans.
  *
  * Bans a user on a channel, adds this ban to the internal banlist.
  *
  * Caveats: None.
  *
- * $Id: BANCommand.cc,v 1.10 2001/02/03 22:12:00 gte Exp $
+ * $Id: BANCommand.cc,v 1.11 2001/02/04 23:37:32 gte Exp $
  */
 
 #include	<string>
@@ -27,7 +27,7 @@
 #include	"responses.h"
 #include	"match.h"
 
-const char BANCommand_cc_rcsId[] = "$Id: BANCommand.cc,v 1.10 2001/02/03 22:12:00 gte Exp $" ;
+const char BANCommand_cc_rcsId[] = "$Id: BANCommand.cc,v 1.11 2001/02/04 23:37:32 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -44,11 +44,11 @@ if( st.size() < 3 )
 	return true;
 	}
  
-// Is the user authorized?
+/* Is the user authorised? */
 sqlUser* theUser = bot->isAuthed(theClient, true);
 if(!theUser) return false;
 
-// Is the channel registered?
+/* Is the channel registered? */
 sqlChannel* theChan = bot->getChannelRecord(st[1]);
 if(!theChan)
 	{
@@ -241,14 +241,6 @@ for(Channel::userIterator chanUsers = theChannel->userList_begin(); chanUsers !=
 
 /* Set the ban :) */
 theChannel->setBan(banTarget);
-
-// TODO: Use xClient::Ban() here 
-strstream s;
-s	<< bot->getCharYYXXX() << " M " << theChannel->getName()
-	<< " +b " << banTarget << ends;
-
-bot->Write( s );
-delete[] s.str();
  
 /* Kick 'em all out. */
 
@@ -257,12 +249,21 @@ if (banLevel == 42) banReason = "..I'll have a pan-galactic gargleblaster please
 string finalReason = "(" + theUser->getUserName() + ") " + banReason; 
 if( !clientsToKick.empty() )
 	{
+	// TODO: Use xClient::Ban() here 
+	strstream s;
+	s	<< bot->getCharYYXXX() << " M " << theChannel->getName()
+		<< " +b " << banTarget << ends;
+	
+	bot->Write( s );
+	delete[] s.str();
+
 	bot->Kick( theChannel, clientsToKick, finalReason ) ;
 	} 
 
 /*
  *  Fill out new ban details.
  */
+
 sqlBan* newBan = new (nothrow) sqlBan(bot->SQLDb);
 assert( newBan != 0 ) ;
 

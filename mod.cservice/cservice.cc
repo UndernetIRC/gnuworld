@@ -564,7 +564,7 @@ else if(Command == "VERSION")
 	xClient::DoCTCP(theClient, CTCP,
 		"Undernet P10 Channel Services Version 2 ["
 		__DATE__ " " __TIME__
-		"] ($Id: cservice.cc,v 1.83 2001/02/04 04:09:20 gte Exp $)");
+		"] ($Id: cservice.cc,v 1.84 2001/02/04 23:37:32 gte Exp $)");
 	}
 else if(Command == "PROBLEM?")
 	{
@@ -1321,7 +1321,8 @@ if( (st1.size() != 2) || (st1[ 0 ].size() > 9) )
 // Check that a '@' exists and that the username is
 // no more than 12 characters
 StringTokenizer st2( st1[ 1 ], '@' ) ;
-if( (st2.size() != 2) || (st2[ 1 ].size() > 12) )
+
+if( (st2.size() != 2) || (st2[ 0 ].size() > 12) )
 	{
 	return false ;
 	}
