@@ -20,7 +20,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
  * USA.
  *
- * $Id: cloner.cc,v 1.22 2002/08/02 15:53:05 reedloden Exp $
+ * $Id: cloner.cc,v 1.23 2002/08/03 15:27:55 dan_karrels Exp $
  */
 
 #include	<new>
@@ -45,7 +45,7 @@
 
 const char client_h_rcsId[] = __CLIENT_H ;
 const char cloner_h_rcsId[] = __CLONER_H ;
-const char cloner_cc_rcsId[] = "$Id: cloner.cc,v 1.22 2002/08/02 15:53:05 reedloden Exp $" ;
+const char cloner_cc_rcsId[] = "$Id: cloner.cc,v 1.23 2002/08/03 15:27:55 dan_karrels Exp $" ;
 const char iClient_h_rcsId[] = __ICLIENT_H ;
 const char EConfig_h_rcsId[] = __ECONFIG_H ;
 const char ELog_h_rcsId[] = __ELOG_H ;
@@ -189,9 +189,9 @@ if( command == "SHOWCOMMANDS" )
 	if( st.size() >= 1 )
 		{
 		Notice( theClient, "_-=[Cloner Commands]=-_" ) ;
-		Notice( theClient, "LOADCLONES JOINALL PARTALL
-			KILLALL/QUITALL SAYALL/MSGALL
-			ACTALL/DOALL/DESCRIBEALL NOTICEALL" ) ;
+		Notice( theClient, "LOADCLONES JOINALL PARTALL "
+			"KILLALL/QUITALL SAYALL/MSGALL "
+			"ACTALL/DOALL/DESCRIBEALL NOTICEALL" ) ;
 		Notice( theClient, "_-=[End of Cloner Commands]=-_" ) ;
 		}
 	}
@@ -216,45 +216,46 @@ else if( command == "HELP" )
 		}
 	else if( topic == "LOADCLONES" )
 		{
-		Notice( theClient, "%s <# of clones> - Queue creation
-			of clone(s)", topic.c_str() ) ;
+		Notice( theClient, "%s <# of clones> - Queue creation "
+			"  of clone(s)", topic.c_str() ) ;
 		}
 	else if( topic == "JOINALL" )
 		{
-		Notice( theClient, "%s <#channel> - Make all clones
-			/join a #channel", topic.c_str() ) ;
+		Notice( theClient, "%s <#channel> - Make all clones "
+			"/join a #channel", topic.c_str() ) ;
 		}
 	else if( topic == "PARTALL" )
 		{
-		Notice( theClient, "%s <#channel> [reason] - Make
-			all clones /part a #channel with an optional
-			reason", topic.c_str() ) ;
+		Notice( theClient, "%s <#channel> [reason] - Make "
+			"all clones /part a #channel with an optional "
+			"reason", topic.c_str() ) ;
 		}
 	else if( topic == "KILLALL" || topic == "QUITALL" )
 		{
-		Notice( theClient, "%s [reason] - Make all
-			clones /quit with an optional reason",
+		Notice( theClient, "%s [reason] - Make all "
+			"clones /quit with an optional reason",
 			topic.c_str() ) ;
 		}
 	else if( topic == "SAYALL" || topic == "MSGALL" )
 		{
-		Notice( theClient, "%s <#channel/nickname>
-			<message> - Make all clones /msg a #channel or
-			nickname", topic.c_str() ) ;
+		Notice( theClient, "%s <#channel/nickname> "
+			"<message> - Make all clones /msg a #channel or "
+			"nickname", topic.c_str() ) ;
 		}
 	else if( topic == "ACTALL" || topic == "DOALL" || topic ==
 		"DESCRIBEALL" )
 		{
-		Notice( theClient, "%s <#channel/nickname> <action> -
-			Make all clones /me a channel or nickname",
+		Notice( theClient, "%s <#channel/nickname> <action> - "
+			"Make all clones /me a channel or nickname",
 			topic.c_str() ) ;
 		}
 	else if( topic == "NOTICEALL" )
 		{
-		Notice( theClient, "%s <#channel/nickname>
-			<notice> - Make all clones /notice a #channel
-			or nickname", topic.c_str() ) ;
+		Notice( theClient, "%s <#channel/nickname> "
+			"<notice> - Make all clones /notice a #channel "
+			"or nickname", topic.c_str() ) ;
 		}
+	} // "HELP"
 else if( command == "LOADCLONES" )
 	{
 	if( st.size() < 2 )
@@ -283,8 +284,7 @@ else if( command == "LOADCLONES" )
 //		<< endl ;
 
 	Notice( theClient, "Queuing %d Clones", numClones ) ;
-
-	}
+	} // "LOADCLONES"
 else if( command == "JOINALL" )
 	{
 	if( st.size() < 2 )
@@ -370,13 +370,13 @@ else if( command == "KILLALL" || command == "QUITALL" )
 	{
         if( st.size() < 1 )
                 {
-                Notice( theClient, "Usage: %s [reason]", command.c_str() ) ;
+                Notice( theClient, "Usage: %s [reason]",
+			command.c_str() ) ;
                 return 0 ;
                 }
 
 	if( st.size() == 1 )
 		{
-
 		for( list< iClient* >::const_iterator ptr = clones.begin(),
 			endPtr = clones.end() ; ptr != endPtr ; ++ptr )
 			{
@@ -391,7 +391,6 @@ else if( command == "KILLALL" || command == "QUITALL" )
 
 	if( st.size() >= 2 )
 		{
-
 		string quitMsg( st.assemble(1).c_str() ) ;
 
 		for( list< iClient* >::const_iterator ptr = clones.begin(),
@@ -406,14 +405,13 @@ else if( command == "KILLALL" || command == "QUITALL" )
 			MyUplink->Write( s ) ;
 			}
 		}
-
 	} // KILLALL/QUITALL
 else if( command == "SAYALL" || command == "MSGALL" )
 	{
 	if( st.size() < 3 )
 		{
-		Notice( theClient, "Usage: %s <#channel/nickname>
-			<message>", command.c_str() ) ;
+		Notice( theClient, "Usage: %s <#channel/nickname> "
+			"<message>", command.c_str() ) ;
 		return 0 ;
 		}
 
@@ -431,16 +429,16 @@ else if( command == "SAYALL" || command == "MSGALL" )
 			<< privMsg
 			<< ends ;
 
-			MyUplink->Write( s ) ;
+		MyUplink->Write( s ) ;
 		}
 	} // SAYALL/MSGALL
-else if( command == "ACTALL" || command == "DOALL" || command ==
-	"DESCRIBEALL" )
+else if( command == "ACTALL" || command == "DOALL" ||
+	command == "DESCRIBEALL" )
 	{
 	if( st.size() < 3 )
 		{
-		Notice( theClient, "Usage: %s <#channel/nickname>
-			<action>", command.c_str() ) ;
+		Notice( theClient, "Usage: %s <#channel/nickname> "
+			"<action>", command.c_str() ) ;
 		return 0 ;
 		}
 
@@ -459,15 +457,15 @@ else if( command == "ACTALL" || command == "DOALL" || command ==
 			<< "\001"
 			<< ends ;
 
-			MyUplink->Write( s ) ;
+		MyUplink->Write( s ) ;
 		}
 	} // ACTALL/DOALL/DESCRIBEALL
 else if( command == "NOTICEALL" )
 	{
 	if( st.size() < 3 )
 		{
-		Notice( theClient, "Usage: %s <#channel/nickname>
-			<notice>", command.c_str() ) ;
+		Notice( theClient, "Usage: %s <#channel/nickname> "
+			"<notice>", command.c_str() ) ;
 		return 0 ;
 		}
 
@@ -485,7 +483,7 @@ else if( command == "NOTICEALL" )
 			<< notice
 			<< ends ;
 
-			MyUplink->Write( s ) ;
+		MyUplink->Write( s ) ;
 		}
 	} // NOTICEALL
 return 0 ;
@@ -530,7 +528,6 @@ return 0 ;
 
 void cloner::addClone()
 {
-
 char buf[ 4 ] = { 0 } ;
 
 string yyxxx( fakeServer->getCharYY() ) ;
@@ -571,7 +568,6 @@ return hostNames[ rand() % hostNames.size() ] ;
 
 string cloner::randomNick( int minLength, int maxLength )
 {
-         
 string retMe ;
 
 // Generate a random number between minLength and maxLength
@@ -585,7 +581,6 @@ for( int i = 0 ; i < randomLength ; i++ )
 
 //elog << "randomNick: " << retMe << endl ;
 return retMe ;
-
 }
 
 // ascii [65,122]
