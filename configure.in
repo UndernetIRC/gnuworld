@@ -1,10 +1,10 @@
-dnl $Id: configure.in,v 1.48 2002/06/04 20:08:11 dan_karrels Exp $
+dnl $Id: configure.in,v 1.49 2002/06/04 20:29:01 dan_karrels Exp $
 dnl ----------------------------------------------------------
 
 echo Configuring GNUWorld...
 echo
 
-AC_REVISION($Revision: 1.48 $)
+AC_REVISION($Revision: 1.49 $)
 AC_INIT
 AC_CONFIG_SRCDIR([src/main.cc])
 AM_INIT_AUTOMAKE(gnuworld,0.0)
@@ -219,14 +219,6 @@ dnl	echo gccMid: $gccMid
 	fi
 else
 	AC_DEFINE(HASHMAPNS, std)
-fi
-
-if test -d "/usr/include/"; then
-	CXXFLAGS="$CXXFLAGS -I/usr/include"
-fi
-
-if test -d "/usr/local/include/"; then
-	CXXFLAGS="$CXXFLAGS -I/usr/local/include"
 fi
 
 AC_SUBST(CXXFLAGS)
