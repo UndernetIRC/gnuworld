@@ -12,7 +12,7 @@
 #include	"cservice_config.h"
 #include	"Network.h"
 
-const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.32 2002/01/26 23:02:46 gte Exp $" ;
+const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.33 2002/01/26 23:08:42 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -152,7 +152,7 @@ bot->Notice(theClient,
 	bot->getResponse(theUser, language::auth_success).c_str(),
 	theUser->getUserName().c_str());
 
-string greeting = bot->getResponse(theUser, language::greeting);
+string greeting = bot->getResponse(0, language::greeting);
 if (!greeting.empty())
 {
 	bot->Notice(theClient, greeting.c_str());
