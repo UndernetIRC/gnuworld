@@ -12,7 +12,7 @@
 #include	"cservice_config.h"
 #include	"Network.h"
 
-const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.19 2001/06/21 23:23:56 gte Exp $" ;
+const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.20 2001/06/21 23:27:33 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -350,7 +350,7 @@ if( PGRES_TUPLES_OK != status )
  
 for(int i = 0; i < bot->SQLDb->Tuples(); i++)
 	{ 
-		string channelName = bot->SQLDb->GetValue(i, 1);
+		string channelName = bot->SQLDb->GetValue(i, 0);
 		bot->Notice(theClient, "You have been named as a supporter in a new channel application"
 			" for %s. Please visit the webpage to confirm your support, or register an objection with the application.",
 			channelName.c_str());
