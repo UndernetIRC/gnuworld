@@ -2,6 +2,7 @@
  * dronescan.cc
  */
 
+#include <stdio.h>	/* *printf */
 #include <stdarg.h>	/* va_list */
 #include <sys/time.h>	/* gettimeofday() */
 
