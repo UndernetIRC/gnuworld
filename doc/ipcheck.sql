@@ -27,11 +27,13 @@ CREATE TABLE ips (
    user_name varchar(20) NOT NULL,
    expiration int4 NOT NULL,
    hit_counts int4,
+   set_on int4 NOT NULL,
    CONSTRAINT ips_pkey PRIMARY KEY (expiration, ipnum, user_name)
 );
 
 CREATE  INDEX hit_counts_ips_key ON ips (hit_counts);
 CREATE  INDEX ips_expiration_key ON ips (expiration);
+CREATE  INDEX ips_set_on_key ON ips (set_on);
 CREATE  INDEX ips_ipnum_key ON ips (ipnum);
 CREATE  INDEX ips_user_name_key ON ips (user_name);
 
