@@ -1,11 +1,11 @@
 /**
  * cservice.h
  * Author: Greg Sikorski
- * $Id: cservice.h,v 1.87 2002/07/08 15:47:58 dan_karrels Exp $
+ * $Id: cservice.h,v 1.88 2002/07/15 14:58:16 dan_karrels Exp $
  */
 
 #ifndef __CSERVICE_H
-#define __CSERVICE_H "$Id: cservice.h,v 1.87 2002/07/08 15:47:58 dan_karrels Exp $"
+#define __CSERVICE_H "$Id: cservice.h,v 1.88 2002/07/15 14:58:16 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
@@ -186,10 +186,10 @@ public:
 
 	// Typedef's for user/channel Hashmaps.
 	// User hash, Key is Username.
-	typedef map< string, sqlUser*, eqstr > sqlUserHashType ;
+	typedef map< string, sqlUser*, noCaseCompare > sqlUserHashType ;
 
 	// Channel hash, Key is channelname.
-	typedef map< string, sqlChannel*, eqstr > sqlChannelHashType ;
+	typedef map< string, sqlChannel*, noCaseCompare > sqlChannelHashType ;
 	typedef map< int, sqlChannel* > sqlChannelIDHashType ;
 
 	// Accesslevel cache, key is pair(chanid, userid).
