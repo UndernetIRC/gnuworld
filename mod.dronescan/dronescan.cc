@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: dronescan.cc,v 1.35 2003/08/31 17:17:04 jeekay Exp $
+ * $Id: dronescan.cc,v 1.36 2003/09/04 18:58:15 jeekay Exp $
  */
 
 #include	<string>
@@ -32,6 +32,7 @@
 #include "server.h"
 #include "StringTokenizer.h"
 
+#include "activeChannel.h"
 #include "clientData.h"
 #include "dronescan.h"
 #include "dronescanCommands.h"
@@ -39,7 +40,7 @@
 #include "sqlUser.h"
 #include "Timer.h"
 
-RCSTAG("$Id: dronescan.cc,v 1.35 2003/08/31 17:17:04 jeekay Exp $");
+RCSTAG("$Id: dronescan.cc,v 1.36 2003/09/04 18:58:15 jeekay Exp $");
 
 namespace gnuworld {
 
@@ -271,7 +272,7 @@ void dronescan::OnCTCP( iClient* theClient, const string& CTCP,
 	} else if("PING" == Command) {
 		DoCTCP(theClient, CTCP, Message);
 	} else if("VERSION" == Command) {
-		DoCTCP(theClient, CTCP, "GNUWorld DroneScan v0.0.7");
+		DoCTCP(theClient, CTCP, "GNUWorld DroneScan v0.0.8");
 	}
 
 	xClient::OnCTCP(theClient, CTCP, Message, Secure);
@@ -336,10 +337,13 @@ void dronescan::OnChannelEvent( const channelEventType& theEvent,
 	if(theChannel->size() < channelCutoff) return ;
 
 	/* Iterate over our available tests, checking this channel */
-	if(find(droneChannels.begin(), droneChannels.end(), theChannel->getName()) == droneChannels.end()) {
+	if(droneChannels.find(theChannel->getName()) == droneChannels.end()) {
 		/* This channel is not currently listed as active */
 		checkChannel( theChannel );
 	}
+	
+	/* Reset lastjoin on the active channel */
+	droneChannels[theChannel->getName()]->setLastJoin(::time(0));
 	
 	/* Do join count processing if applicable */
 	string channelName = theChannel->getName();
@@ -558,10 +562,23 @@ void dronescan::OnTimer( xServer::timerID theTimer , void *)
 
 	if(theTimer == tidClearActiveList)
 		{
-		log(DBG, "Clearing %u active channels records.",
-			droneChannels.size()
-			);
-		droneChannels.clear();
+		droneChannelsType::iterator dcitr, next_dcitr;
+		time_t joinSince = ::time(0) - dcInterval;
+		
+		for( dcitr = droneChannels.begin() ;
+		     dcitr != droneChannels.end() ; dcitr = next_dcitr ) {
+		 	next_dcitr = dcitr;
+			++next_dcitr;
+			
+			if( dcitr->second->getLastJoin() <= joinSince ) {
+				log(DBG, "Removing %s.",
+					dcitr->first.c_str()
+					);
+				
+				delete dcitr->second;
+				droneChannels.erase(dcitr);
+			}
+		}
 		
 		theTime = time(0) + dcInterval;
 		tidClearActiveList = MyUplink->RegisterTimer(theTime, this, 0);
@@ -840,7 +857,8 @@ bool dronescan::checkChannel( const Channel *theChannel , const iClient *theClie
 			);
 		
 		/* Add this channel to the actives list */
-		droneChannels.push_back(theChannel->getName());
+		activeChannel *newActive = new activeChannel(theChannel->getName(), ::time(0));
+		droneChannels[theChannel->getName()] = newActive;
 
 		return false;
 		}

@@ -16,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: dronescan.h,v 1.17 2003/08/31 17:17:04 jeekay Exp $
+ * $Id: dronescan.h,v 1.18 2003/09/04 18:58:15 jeekay Exp $
  */
 
 #ifndef DRONESCAN_H
-#define DRONESCAN_H "$Id: dronescan.h,v 1.17 2003/08/31 17:17:04 jeekay Exp $"
+#define DRONESCAN_H "$Id: dronescan.h,v 1.18 2003/09/04 18:58:15 jeekay Exp $"
 
 #include <map>
 
@@ -37,6 +37,7 @@ class Timer;
 
 namespace ds {
 
+class activeChannel;
 class Command;
 class sqlUser;
 class Test;
@@ -162,7 +163,7 @@ public:
 	userMapType userMap;
 	
 	/** Typedef of currently seen drone channels */
-	typedef vector< string > droneChannelsType;
+	typedef map< string , activeChannel* > droneChannelsType;
 	droneChannelsType droneChannels;
 	
 	/** Join counter config options */

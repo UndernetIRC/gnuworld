@@ -1,3 +1,9 @@
+2003-09-04 0.0.8 Jeekay
+* Maded reporting of active channels less spammy. They now only are displayed if
+  there has not been a join inside the dcInterval, rather than once every
+  dcInterval.
+ * Bumped version to 0.0.8
+
 2003-08-31 0.0.7 Jeekay
 * Fixed various bits of code to allow it to compile on dodgy compilers.
 * Bumped version to 0.0.7

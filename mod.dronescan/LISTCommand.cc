@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: LISTCommand.cc,v 1.7 2003/08/10 15:16:01 jeekay Exp $
+ * $Id: LISTCommand.cc,v 1.8 2003/09/04 18:58:15 jeekay Exp $
  *
  * Display information about things.
  *
@@ -26,6 +26,7 @@
 #include "Network.h"
 #include "StringTokenizer.h"
 
+#include "activeChannel.h"
 #include "dronescan.h"
 #include "dronescanCommands.h"
 #include "sqlUser.h"
@@ -59,16 +60,18 @@ bool LISTCommand::Exec( const iClient *theClient, const string& Message , const 
 		    bot->droneChannels.begin() ; itr != bot->droneChannels.end()
 		    ; ++itr) {
 			/* Does this channel still exist? */
-			Channel *theChannel = Network->findChannel(*itr);
+			Channel *theChannel = Network->findChannel(itr->first);
 			
 			if(theChannel) {
-				bot->Reply(theClient, "  [%4u] %s",
+				bot->Reply(theClient, "  [%4u] (%u) %s",
 					theChannel->size(),
+					itr->second->getLastJoin(),
 					theChannel->getName().c_str()
 					);
 			} else {
-				bot->Reply(theClient, "  [   0] %s",
-					(*itr).c_str()
+				bot->Reply(theClient, "  [   0] (%u) %s",
+					itr->first.c_str(),
+					itr->second->getLastJoin()
 					);
 			}
 		}
