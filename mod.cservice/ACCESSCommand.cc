@@ -9,7 +9,7 @@
  * Displays all "Level" records for a specified channel.
  * Can optionally narrow down selection using a number of switches. 
  *
- * $Id: ACCESSCommand.cc,v 1.33 2001/02/20 23:00:08 plexus Exp $
+ * $Id: ACCESSCommand.cc,v 1.34 2001/02/24 21:02:30 gte Exp $
  */
 
 #include	<string>
@@ -22,7 +22,7 @@
 #include	"responses.h"
 #define MAX_RESULTS 15
  
-const char ACCESSCommand_cc_rcsId[] = "$Id: ACCESSCommand.cc,v 1.33 2001/02/20 23:00:08 plexus Exp $" ;
+const char ACCESSCommand_cc_rcsId[] = "$Id: ACCESSCommand.cc,v 1.34 2001/02/24 21:02:30 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -288,18 +288,7 @@ if( PGRES_TUPLES_OK == status )
 				bot->SQLDb->GetValue(i, 0), 
 				autoMode.c_str()
 			);
-	
-			if(modif)
-				{
-				bot->Notice(theClient, 
-					bot->getResponse(theUser,
-						language::last_mod,
-						string("LAST MODIFIED: %s (%s ago)")).c_str(), 
-					bot->SQLDb->GetValue(i, 7),
-					bot->prettyDuration(atoi(bot->SQLDb->GetValue(i,6))).c_str()
-				);	
-				}
-	
+	 
 			if(suspend_expires != 0)
 				{
 				bot->Notice(theClient,
@@ -314,6 +303,17 @@ if( PGRES_TUPLES_OK == status )
 						language::last_seen,
 						string("LAST SEEN: %s ago.")).c_str(), 
 				bot->prettyDuration(duration).c_str()
+
+			if(modif)
+				{
+				bot->Notice(theClient, 
+					bot->getResponse(theUser,
+						language::last_mod,
+						string("LAST MODIFIED: %s (%s ago)")).c_str(), 
+					bot->SQLDb->GetValue(i, 7),
+					bot->prettyDuration(atoi(bot->SQLDb->GetValue(i,6))).c_str()
+				);	
+				} 
 			);
 		}
 		if ((results >= MAX_RESULTS) && !showAll) break;
