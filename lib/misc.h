@@ -4,7 +4,7 @@
  */
 
 #ifndef __MISC_H
-#define __MISC_H "$Id: misc.h,v 1.9 2001/03/03 01:26:36 dan_karrels Exp $"
+#define __MISC_H "$Id: misc.h,v 1.10 2001/03/03 15:07:34 dan_karrels Exp $"
 
 #include	<string>
 #include	<hash_map>
@@ -12,6 +12,10 @@
 #include	<unistd.h>
 
 #include	<cctype>
+#include	<cstring>
+
+namespace gnuworld
+{
 
 using std::string ;
 using std::hash ;
@@ -92,5 +96,7 @@ void string_toupper( string& ) ;
  * all numeric characters, return false otherwise.
  */
 bool IsNumeric( const string& ) ;
+
+} // namespace gnuworld
 
 #endif /* __MISC__ */

@@ -14,12 +14,12 @@
 #include	"match.h"
 #include	"server.h"
 
+namespace gnuworld
+{
+
 using std::string ;
 using std::endl ;
 using std::strstream ;
-
-namespace gnuworld
-{
 
 Channel::Channel( const string& _name,
 	const time_t& _creationTime )
@@ -87,19 +87,29 @@ return removeUser( theClient->getIntYYXXX() ) ;
 
 ChannelUser* Channel::removeUser( const unsigned int& intYYXXX )
 {
+
+// Attempt to find the user in question
 userListType::iterator ptr = userList.find( intYYXXX ) ;
+
+// Was the user found?
 if( ptr != userList.end() )
 	{
+	// Yup, go ahead and remove the user from the userList
 	userList.erase( ptr ) ;
+
+	// Return a pointer to the ChannelUser
 	return ptr->second ;
 	}
 
+// Otherwise, the user was NOT found
+// Log the error
 elog	<< "Channel::removeUser> ("
 	<< getName() << ") "
 	<< "Unable to find user: "
 	<< intYYXXX
 	<< std::endl ;
 
+// Return error state
 return 0 ;
 }
 

@@ -47,7 +47,7 @@
 #include	"ServerTimerHandlers.h"
 
 const char xServer_h_rcsId[] = __XSERVER_H ;
-const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.83 2001/03/03 02:10:58 dan_karrels Exp $" ;
+const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.84 2001/03/03 15:07:34 dan_karrels Exp $" ;
 
 using std::string ;
 using std::vector ;
@@ -2105,8 +2105,8 @@ if( !chanModes.empty() )
 	StringTokenizer st( chanModes ) ;
 	StringTokenizer::size_type argPos = 1 ;
 
-	for( string::const_iterator ptr = chanModes.begin() ;
-		ptr != chanModes.end() ; ++ptr )
+	for( string::const_iterator ptr = st[ 0 ].begin() ;
+		ptr != st[ 0 ].end() ; ++ptr )
 		{
 		switch(  *ptr )
 			{

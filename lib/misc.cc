@@ -11,7 +11,10 @@
 #include	"misc.h"
 
 const char Misc_h_rcsId[] = __MISC_H ;
-const char Misc_cc_rcsId[] = "$Id: misc.cc,v 1.5 2001/03/03 01:26:36 dan_karrels Exp $" ;
+const char Misc_cc_rcsId[] = "$Id: misc.cc,v 1.6 2001/03/03 15:07:34 dan_karrels Exp $" ;
+
+namespace gnuworld
+{
 
 using std::string ;
 
@@ -93,8 +96,7 @@ for( string::size_type i = 0, end = Key.size() ; i < end ; i++ )
 /**
  * Return true if this string consists of all numerical
  * [0,9] characters.
- * Return false otherwise.
- */
+ * Return false otherwise. */
 bool IsNumeric( const string& s )
 {
 for( string::const_iterator ptr = s.begin(), endPtr = s.end() ;
@@ -106,10 +108,13 @@ for( string::const_iterator ptr = s.begin(), endPtr = s.end() ;
 		}
 	}
 return true ;
-}       
+}
 
 int strcasecmp( const string& s1, const string& s2 )
 {
+return std::strcasecmp( s1.c_str(), s2.c_str() ) ;
+
+/*
 string::const_iterator s1_ptr = s1.begin(),
 	s2_ptr = s2.begin() ;
 string::const_iterator s1_end = s1.end(),
@@ -145,4 +150,7 @@ if( s1_ptr == s1_end )
 
 // Otherwise, s2_ptr == s2_end
 return 1 ;
+*/
 }
+
+} // namespace gnuworld

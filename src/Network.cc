@@ -19,16 +19,16 @@
 #include	"Numeric.h"
 
 const char xNetwork_h_rcsId[] = __XNETWORK_H ;
-const char xNetwork_cc_rcsId[] = "$Id: Network.cc,v 1.19 2001/03/03 00:17:57 dan_karrels Exp $" ;
+const char xNetwork_cc_rcsId[] = "$Id: Network.cc,v 1.20 2001/03/03 15:07:34 dan_karrels Exp $" ;
+
+namespace gnuworld
+{
 
 using std::string ;
 using std::endl ;
 using std::hash_map ;
 using std::hash ;
 using std::unary_function ;
-
-namespace gnuworld
-{
 
 xNetwork::xNetwork()
 {}
@@ -377,10 +377,20 @@ if( NULL == retMe )
 iClient::channelIterator chanPtr = retMe->channels_begin() ;
 while( chanPtr != retMe->channels_end() )
 	{
+//	elog	<< "xNetwork::removeClient> Removing user "
+//		<< retMe->getCharYYXXX()
+//		<< " from channel "
+//		<< (*chanPtr)->getName()
+//		<< endl ;
+
 	delete (*chanPtr)->removeUser( retMe ) ;
 
 	if( (*chanPtr)->empty() )
 		{
+//		elog	<< "xNetwork::removeClient> Removing channel "
+//			<< (*chanPtr)->getName()
+//			<< endl ;
+
 		delete removeChannel( (*chanPtr)->getName() ) ;
 		}
 	++chanPtr ;

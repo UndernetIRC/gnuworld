@@ -16,7 +16,7 @@
 #include	"ELog.h"
 #include	"StringTokenizer.h"
 
-const char msg_J_cc_rcsId[] = "$Id: msg_J.cc,v 1.6 2001/03/03 02:10:58 dan_karrels Exp $" ;
+const char msg_J_cc_rcsId[] = "$Id: msg_J.cc,v 1.7 2001/03/03 15:07:34 dan_karrels Exp $" ;
 
 using std::string ;
 using std::endl ;
@@ -204,6 +204,9 @@ for( iClient::channelIterator ptr = theClient->channels_begin(),
 		delete Network->removeChannel( (*ptr)->getName() ) ;
 		}
 	}
+
+theClient->clearChannels() ;
+
 } // userPartAllChannels()
 
 } // namespace gnuworld

@@ -14,7 +14,7 @@
 #include	"ip.h"
 
 const char iClient_h_rcsId[] = __ICLIENT_H ;
-const char iClient_cc_rcsId[] = "$Id: iClient.cc,v 1.10 2001/03/03 00:17:57 dan_karrels Exp $" ;
+const char iClient_cc_rcsId[] = "$Id: iClient.cc,v 1.11 2001/03/03 15:07:34 dan_karrels Exp $" ;
 
 using std::string ;
 using std::map ;
@@ -233,6 +233,16 @@ customDataMap->erase( ptr ) ;
 // The customDataMap may now be empty, but let it remain allocated.
 // Return the data element
 return ptr->second ;
+}
+
+void iClient::addChannel( Channel* theChan )
+{
+
+// This method is public, make sure the pointer is valid
+assert( theChan != 0 ) ;
+
+// Add the channel to the channelList
+channelList.push_front( theChan ) ;
 }
 
 } // namespace gnuworld
