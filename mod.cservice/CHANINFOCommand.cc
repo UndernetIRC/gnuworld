@@ -13,7 +13,7 @@
  *
  * Command is aliased "INFO".
  *
- * $Id: CHANINFOCommand.cc,v 1.25 2001/07/07 22:51:25 gte Exp $
+ * $Id: CHANINFOCommand.cc,v 1.26 2001/07/08 02:41:17 gte Exp $
  */
 
 #include	<string>
@@ -26,7 +26,7 @@
 #include	"libpq++.h"
 #include	"cservice_config.h"
  
-const char CHANINFOCommand_cc_rcsId[] = "$Id: CHANINFOCommand.cc,v 1.25 2001/07/07 22:51:25 gte Exp $" ;
+const char CHANINFOCommand_cc_rcsId[] = "$Id: CHANINFOCommand.cc,v 1.26 2001/07/08 02:41:17 gte Exp $" ;
  
 namespace gnuworld
 {
@@ -124,45 +124,48 @@ if( string::npos == st[ 1 ].find_first_of( '#' ) )
 		bot->Notice(theClient, "\002** This account has been suspended by a CService Administrator **\002");
 		}
 
+	int adminAccess = 0;
+	if (tmpUser) adminAccess = bot->getAdminAccessLevel(tmpUser);
+
+	if(adminAccess)
+	{
+	/* 
+	 * Show admins some more details about the user.
+	 */
+
+	if (theUser->getFlag(sqlUser::F_GLOBAL_SUSPEND))
+		{ 
+		/*
+		 * Perform a lookup to get the last SUSPEND event from the userlog.
+		 */
+		unsigned int theTime;
+		string reason = theUser->getLastEvent(sqlUser::EV_SUSPEND, theTime);
+		
+		bot->Notice(theClient, "Account suspended %s ago, Reason: %s", bot->prettyDuration(theTime).c_str(),
+			reason.c_str());
+		} else 
+		{
+		/*
+		 *  Maybe they where unsuspended recently..
+		 */
+
+		unsigned int theTime;
+		string reason = theUser->getLastEvent(sqlUser::EV_UNSUSPEND, theTime);
+		if (!reason.empty())
+			{ 
+			bot->Notice(theClient, "Account was unsuspended %s ago%s", bot->prettyDuration(theTime).c_str(),
+				reason.c_str()); 
+			}
+		} 
+	}
+
 	/*
 	 * Run a query to see what channels this user has access on. :)
 	 * Only show to those with admin access, or the actual user.
 	 */
 
-	if( ((tmpUser) && bot->getAdminAccessLevel(tmpUser)) ||
-		(tmpUser == theUser) )
-		{
-			
-		/*
-		 * But first..
-		 * Show admins some more details about the user.
-		 */
-
-		if (theUser->getFlag(sqlUser::F_GLOBAL_SUSPEND))
-			{ 
-			/*
-			 * Perform a lookup to get the last SUSPEND event from the userlog.
-			 */
-			unsigned int theTime;
-			string reason = theUser->getLastEvent(sqlUser::EV_SUSPEND, theTime);
-			
-			bot->Notice(theClient, "Account suspended %s ago, Reason: %s", bot->prettyDuration(theTime).c_str(),
-				reason.c_str());
-			} else 
-			{
-			/*
-			 *  Maybe they where unsuspended recently..
-			 */
-
-			unsigned int theTime;
-			string reason = theUser->getLastEvent(sqlUser::EV_UNSUSPEND, theTime);
-			if (!reason.empty())
-				{ 
-				bot->Notice(theClient, "Account was unsuspended %s ago%s", bot->prettyDuration(theTime).c_str(),
-					reason.c_str()); 
-				}
-			}
- 
+	if( adminAccess || (tmpUser == theUser) )
+		{ 
 		strstream channelsQuery;
 		string channelList ;
 	
