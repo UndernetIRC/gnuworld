@@ -1,7 +1,7 @@
 /* sqlChannel.h */
 
 #ifndef __SQLCHANNEL_H
-#define __SQLCHANNEL_H "$Id: sqlChannel.h,v 1.24 2001/05/20 00:00:50 gte Exp $"
+#define __SQLCHANNEL_H "$Id: sqlChannel.h,v 1.25 2001/06/12 22:13:46 gte Exp $"
 
 #include	<string>
 #include	<map>
@@ -50,8 +50,9 @@ public:
 	static const unsigned short	EV_OPERJOIN = 4 ;
 	static const unsigned short	EV_OPERPART = 5 ;
 	static const unsigned short	EV_FORCE    = 6 ;
-	static const unsigned short	EV_REGISTER = 7 ; 
-	static const unsigned short	EV_PURGE    = 8 ; 
+	static const unsigned short	EV_REGISTER = 7 ;
+	static const unsigned short	EV_PURGE    = 8 ;
+
 	/* Manually added Comment */
 	static const unsigned short	EV_COMMENT  = 9 ;
 	static const unsigned short	EV_REMOVEALL= 10 ;
@@ -83,7 +84,10 @@ public:
 	
 	inline const string&		getDescription() const
 		{ return description ; }
-	
+
+	inline const string&		getComment() const
+		{ return comment ; }
+ 
 	inline const string&		getKeywords() const
 		{ return keywords ; }
 	
@@ -148,6 +152,9 @@ public:
 	inline void setDescription( const string& _description )
 		{ description = _description; }
 
+	inline void setComment( const string& _comment )
+		{ comment = _comment; }
+
 	inline void setKeywords( const string& _keywords )
 		{ keywords = _keywords; }
 
@@ -200,6 +207,7 @@ protected:
 	unsigned short	flood_pro ;
 	string		url ;
 	string		description ;
+	string		comment ;
 	string		keywords  ;
 	time_t		registered_ts ;
 	time_t		channel_ts ;

@@ -9,7 +9,7 @@
  * 30/12/2000: Moved static SQL data to constants.h --Gte
  * Set loadData up to take data from rows other than 0.
  * 
- * $Id: sqlChannel.cc,v 1.26 2001/06/02 22:02:21 gte Exp $
+ * $Id: sqlChannel.cc,v 1.27 2001/06/12 22:13:46 gte Exp $
  */
  
 #include	<strstream>
@@ -25,7 +25,7 @@
 #include	"cservice_config.h"
  
 const char sqlChannel_h_rcsId[] = __SQLCHANNEL_H ;
-const char sqlChannel_cc_rcsId[] = "$Id: sqlChannel.cc,v 1.26 2001/06/02 22:02:21 gte Exp $" ;
+const char sqlChannel_cc_rcsId[] = "$Id: sqlChannel.cc,v 1.27 2001/06/12 22:13:46 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -42,6 +42,7 @@ sqlChannel::sqlChannel(PgDatabase* _SQLDb)
    flood_pro(7),
    url(),
    description(),
+   comment(),
    keywords(),
    registered_ts(0),
    channel_ts(0),
@@ -167,12 +168,13 @@ mass_deop_pro = atoi(SQLDb->GetValue(row,3));
 flood_pro = atoi(SQLDb->GetValue(row,4));
 url = SQLDb->GetValue(row,5);
 description = SQLDb->GetValue(row,6);
-keywords = SQLDb->GetValue(row,7);
-registered_ts = atoi(SQLDb->GetValue(row,8));
-channel_ts = atoi(SQLDb->GetValue(row,9));
-channel_mode = SQLDb->GetValue(row,10); 
-userflags = atoi(SQLDb->GetValue(row,11));
-last_updated = atoi(SQLDb->GetValue(row,12));
+comment = SQLDb->GetValue(row,7);
+keywords = SQLDb->GetValue(row,8);
+registered_ts = atoi(SQLDb->GetValue(row,9));
+channel_ts = atoi(SQLDb->GetValue(row,10));
+channel_mode = SQLDb->GetValue(row,11); 
+userflags = atoi(SQLDb->GetValue(row,12));
+last_updated = atoi(SQLDb->GetValue(row,13));
 }
 
 bool sqlChannel::commit()
@@ -197,7 +199,8 @@ queryString	<< queryHeader
 		<< "channel_mode = '" << channel_mode << "', " 
 		<< "userflags = " << userflags << ", "
 		<< "last_updated = now()::abstime::int4, "
-		<< "description = '" << escapeSQLChars(description) << "' "
+		<< "description = '" << escapeSQLChars(description) << "', "
+		<< "comment = '" << escapeSQLChars(comment) << "' "
 		<< queryCondition << id
 		<< ends;
 

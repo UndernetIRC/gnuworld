@@ -1,4 +1,8 @@
-/* cservice.cc */
+/* 
+ *  cservice.cc 
+ *  Overall control client, general dumping ground for 'cservice'
+ *  related methods.
+ */
 
 #warning --
 #warning --
@@ -3387,7 +3391,7 @@ if( PGRES_TUPLES_OK == status )
 		}
 	}
 
-	logDebugMessage("Loaded pending channels, there are currently %i channels traffic monitored.",
+	logDebugMessage("Loaded pending channels, there are currently %i channels being traffic monitored.",
 		pendingChannelList.size());
 
 #ifdef LOG_DEBUG

@@ -18,7 +18,7 @@
  *
  * Caveats: None.
  *
- * $Id: SETCommand.cc,v 1.37 2001/05/20 00:00:50 gte Exp $
+ * $Id: SETCommand.cc,v 1.38 2001/06/12 22:13:46 gte Exp $
  */
 
 #include	<string>
@@ -29,7 +29,7 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char SETCommand_cc_rcsId[] = "$Id: SETCommand.cc,v 1.37 2001/05/20 00:00:50 gte Exp $" ;
+const char SETCommand_cc_rcsId[] = "$Id: SETCommand.cc,v 1.38 2001/06/12 22:13:46 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -915,6 +915,43 @@ if(option == "NOREG")
 			theChan->getChannelMode().c_str());
 	    return true; 
 	}
+
+
+	if(option == "COMMENT")
+	{
+	    /* Check for admin access */ 
+	    if(bot->getAdminAccessLevel(theUser) < level::set::comment)
+			{
+			/* No need to tell users about admin commands. */
+			Usage(theClient);
+			return true;
+			}
+		
+		string comment = st.assemble(3);
+
+		if(comment.size() > 200)
+	    {
+			bot->Notice(theClient, "The COMMENT can be a maximum of 200 chars!");
+			return true;
+	    }
+
+		theChan->setComment(comment);
+	    theChan->commit(); 
+
+		if(comment.empty())
+		{
+			bot->Notice(theClient, "COMMENT for %s is cleared.",
+				theChan->getName().c_str());
+		} else
+		{
+	    	bot->Notice(theClient, "COMMENT for %s is: %s",
+				theChan->getName().c_str(), comment.c_str());
+		}
+ 
+	    return true;
+	}
+ 
+
 	bot->Notice(theClient, 
 		bot->getResponse(theUser,
 			language::mode_invalid,

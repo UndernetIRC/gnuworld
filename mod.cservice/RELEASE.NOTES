@@ -1,9 +1,18 @@
 Newest changes at the top of the file:
-$Id: RELEASE.NOTES,v 1.12 2001/06/10 01:03:08 gte Exp $
+$Id: RELEASE.NOTES,v 1.13 2001/06/12 22:13:46 gte Exp $
 
 CMaster 1.0pl6 - Current
 * Disallow globally suspended users op's in registered 
   channels.
+* New channel setting, "Comments", for admins to note a quick
+  comment that will appear in CHANINFO. 
+
+* DB Maintainence to perform to be compatible with this
+  release:
+
+  ALTER TABLE channels ADD COLUMN comment VARCHAR (300); 
+  ALTER TABLE pending ADD COLUMN unique_join_count INT4 DEFAULT '0';
+  ALTER TABLE pending ADD COLUMN managername VARCHAR (80);
 
 CMaster 1.0pl5 - 20/05/2001
 * Add Vampire's (Alex Badea <vampire@go.ro>) code to make
