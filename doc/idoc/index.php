@@ -2,11 +2,11 @@
 /*
  *
  * Undernet GNUworld Interactive Installation Guide (aka UGIIG)
- * $Id: index.php,v 1.15 2003/08/17 06:42:23 nighty Exp $
+ * $Id: index.php,v 1.16 2003/12/03 03:34:03 nighty Exp $
  *
  * Released under the GNU Public License : http://www.gnu.org/licenses/gpl.txt
  * by nighty <nighty@undernet.org>
- * Last modified: 05/21/2002
+ * Last modified: 12/03/2003
  *
  *
  */
@@ -50,7 +50,7 @@ function footer($prev,$next) {
 	//echo "<address>maintained by <b>&lt;</b><a href=\"mailto:" . $coder_email . "\">" . $coder_email . "</a><b>&gt;</b> - Last modified : <b>" . date("M-d-Y H:i:s",   (  filemtime("index.php")+( date("Z",filemtime("index.php"))/3600 )   )   ) . " UTC/GMT</b> - <b>[</b><a href=\"./\">Home</a><b>]</b></address>";
 	echo "<address>maintained by <b>&lt;</b><a href=\"mailto:" . $coder_email . "\">" . $coder_email . "</a><b>&gt;</b> - <b>[</b><a href=\"./\">Home</a><b>]</b>";
 	echo "&nbsp;<br><font size=-2><b>";
-?>$Id: index.php,v 1.15 2003/08/17 06:42:23 nighty Exp $<?
+?>$Id: index.php,v 1.16 2003/12/03 03:34:03 nighty Exp $<?
 	echo "</b></font></address>\n";
 	echo "</body>\n";
 	echo "</html>\n";
@@ -74,8 +74,50 @@ function ugig_err($err_code) {
 $coder_email = "nighty@undernet.org";
 $coder_name = "nighty";
 
+define(PG_SQL_FTP_SOURCE,"ftp://ftp8.us.postgresql.org/pub/postgresql/source/");
+define(PG_SQL_FTP_SOURCE_FILE,"ftp://ftp8.us.postgresql.org/pub/postgresql/source/v7.2.4/postgresql-7.2.4.tar.gz");
+define(PG_SQL_RECOM_VERSION,"7.2.4");
+
+define(TCL_83_PORT_SOURCE,"http://www.freebsd.org/cgi/cvsweb.cgi/ports/lang/tcl83/");
+define(TCL_83_PORT_SOURCE_FILE,"http://www.freebsd.org/cgi/cvsweb.cgi/ports/lang/tcl83/tcl83.tar.gz?tarball=1");
+define(TCL_83_LINUX_SOURCE,"http://sourceforge.net/project/showfiles.php?group_id=10894");
+define(TCL_83_LINUX_SOURCE_FILE,"http://umn.dl.sourceforge.net/sourceforge/tcl/tcl8.3.5-src.tar.gz");
+define(TCL_83_LINUX_FILE_NAME,"tcl8.3.5-src.tar.gz");
+define(TCL_83_RECOM_VERSION,"8.3.5");
+
+define(APACHE_FTP_SOURCE,"http://mir2.ovh.net/ftp.apache.org/dist/httpd/");
+define(APACHE_FTP_SOURCE_FILE,"http://mir2.ovh.net/ftp.apache.org/dist/httpd/apache_1.3.29.tar.gz");
+define(APACHE_FILE_NAME,"apache_1.3.29.tar.gz");
+define(APACHE_RECOM_VERSION,"1.3.29");
+
+define(PHP_FTP_SOURCE,"http://www.php.net/downloads.php");
+define(PHP_FTP_SOURCE_FILE,"http://static.php.net/www.php.net/distributions/php-4.3.4.tar.gz");
+define(PHP_FILE_NAME,"php-4.3.4.tar.gz");
+define(PHP_RECOM_VERSION,"4.3.4");
+
+define(LIBPNG_URL,"http://www.libpng.org/");
+define(LIBPNG_URL_FILE,"http://download.sourceforge.net/libpng/libpng-1.0.15.tar.gz");
+define(LIBPNG_VERSION,"1.0.15");
+define(LIBPNG_FILE_NAME,"libpng-1.0.15.tar.gz");
+
+define(LIBJPEG_URL,"http://www.ijg.org/");
+define(LIBJPEG_URL_FILE,"http://www.ijg.org/files/jpegsrc.v6b.tar.gz");
+define(LIBJPEG_VERSION,"6b");
+define(LIBJPEG_FILE_NAME,"jpegsrc.v6b.tar.gz");
+
+define(FREETYPE2_URL,"http://freetype.sourceforge.net");
+define(FREETYPE2_URL_FILE,"http://umn.dl.sourceforge.net/sourceforge/freetype/freetype-2.1.4.tar.gz");
+define(FREETYPE2_VERSION,"2.1.4");
+define(FREETYPE2_FILE_NAME,"freetype-2.1.4.tar.gz");
+
+define(ZLIB_URL,"http://www.gzip.org/zlib/");
+define(ZLIB_URL_FILE,"http://www.libpng.org/pub/png/src/zlib-1.1.4.tar.gz");
+define(ZLIB_VERSION,"1.1.4");
+define(ZLIB_FILE_NAME,"zlib-1.1.4.tar.gz");
+
+
 ?>
-<!-- $Id: index.php,v 1.15 2003/08/17 06:42:23 nighty Exp $ //-->
+<!-- $Id: index.php,v 1.16 2003/12/03 03:34:03 nighty Exp $ //-->
 <html>
 <head>
 <title>Undernet GNUworld Interactive Installation Guide</title>
@@ -437,10 +479,10 @@ if ($subset=="A-1") {
 <pre>
 In order to get PostgreSQL you should visit their official website :
 	- <a href="http://www.postgresql.org/" target=_blank>http://www.postgresql.org/</a>
-	- <a href="ftp://ftp8.us.postgresql.org/pub/postgresql/source/" target=_blank>PostgreSQL Public FTP Site</a>
+	- <a href="<?=PG_SQL_FTP_SOURCE?>" target=_blank>PostgreSQL Public FTP Site</a>
 
-Direct link to download <b>PostgreSQL 7.2.1</b> (recommended version) :
-	- <a href="ftp://ftp8.us.postgresql.org/pub/postgresql/source/v7.2.1/postgresql-7.2.1.tar.gz">FTP</a>
+Direct link to download <b>PostgreSQL <?=PG_SQL_RECOM_VERSION?></b> (recommended version) :
+	- <a href="<?=PG_SQL_FTP_SOURCE_FILE?>">FTP</a>
 </pre>
 <?
 	footer("*","A-2");
@@ -498,26 +540,26 @@ if ($subset=="A-2-i") {
 <? if ($os=="linux") { ?>
 
 Get the latest TCL package in :
-	- <a href="ftp://ftp.rge.com/pub/languages/tcl/distrib/" target=_blank>ftp://ftp.rge.com/pub/languages/tcl/distrib/</a>
+	- <a href="<?=TCL_83_LINUX_SOURCE?>" target=_blank><?=TCL_83_LINUX_SOURCE?></a>
 
-Recommended <b>TCL 8.3.4</b> (version 8.4 is not stable yet) :
-	- <a href="ftp://ftp.rge.com/pub/languages/tcl/distrib/tcl8_3/tcl8.3.4.tar.gz">tcl8.3.4.tar.gz</a>
+Recommended <b>TCL <?=TCL_83_RECOM_VERSION?></b> :
+	- <a href="<?=TCL_83_LINUX_SOURCE_FILE?>"><?=TCL_83_LINUX_FILE_NAME?></a>
 
-When you get the file <b>tcl8.3.4.tar.gz</b>, just unpack it in a place you have some space,
+When you get the file <b><?=TCL_83_LINUX_FILE_NAME?></b>, just unpack it in a place you have some space,
 your home directory can be a good place to put that.
 
-	<?=$os?>:/root# <b>tar -xzf tcl8.3.4.tar.gz</b>
+	<?=$os?>:/root# <b>tar -xzf <?=TCL_83_LINUX_FILE_NAME?></b>
 
 now <b>cd</b> to the directory just created ...
 
-	<?=$os?>:/root# <b>cd tcl8.3.4/unix/</b>
-	<?=$os?>:/root/tcl8.3.4/unix#
+	<?=$os?>:/root# <b>cd <?=str_replace(".tar.gz","",TCL_83_LINUX_FILE_NAME)?>/unix/</b>
+	<?=$os?>:/root/<?=str_replace(".tar.gz","",TCL_83_LINUX_FILE_NAME)?>/unix#
 
-run the following commands to build and install TCL 8.3.4 on your <?=$OSNAME?> :
+run the following commands to build and install TCL <?=TCL_83_RECOM_VERSION?> on your <?=$OSNAME?> :
 
-	<?=$os?>:/root/tcl8.3.4/unix# <b>./configure</b>
-	<?=$os?>:/root/tcl8.3.4/unix# <b>make</b>
-	<?=$os?>:/root/tcl8.3.4/unix# <b>make install</b>
+	<?=$os?>:/root/<?=str_replace(".tar.gz","",TCL_83_LINUX_FILE_NAME)?>/unix# <b>./configure</b>
+	<?=$os?>:/root/<?=str_replace(".tar.gz","",TCL_83_LINUX_FILE_NAME)?>/unix# <b>make</b>
+	<?=$os?>:/root/<?=str_replace(".tar.gz","",TCL_83_LINUX_FILE_NAME)?>/unix# <b>make install</b>
 
 if you run into trouble, additional information can be found <a href="http://www.tcl-tk.net/doc/howto/compile.html#unix" target=_blank>here</a>.
 <? } ?>
@@ -525,7 +567,7 @@ if you run into trouble, additional information can be found <a href="http://www
 
 Check if you have the recommended <b>TCL 8.3.x</b> ports for your <?=$OSNAME?>,
 if the directory <b>/usr/ports/lang/tcl83</b> doesn't exist on your system,
-then download the corresponding FreeBSD ports <a href="ftp://ftp.grolier.fr/mirrors/ftp.freebsd.org/pub/FreeBSD/ports/ports-stable/lang/tcl83/" target=_blank>here</a>.
+then download the corresponding FreeBSD ports <a href="<?=TCL_83_PORT_SOURCE_FILE?>" target=_blank>here</a> (needs FreeBSD port installation knowledge).
 
 <b>cd</b> to the directory, and build TCL 8.3.x :
 
@@ -543,12 +585,12 @@ if ($subset=="A-3") {
 ?>
 <h2>Building PostgreSQL</h2>
 <pre>
-Get the <b>postgresql-7.2.1.tar.gz</b> file you downloaded into step 1.
+Get the <b>postgresql-<?=PG_SQL_RECOM_VERSION?>.tar.gz</b> file you downloaded into step 1.
 Unpack it :
 
-	<?=$os?>:/root# <b>tar -xzf postgresql-7.2.1.tar.gz</b>
-	<?=$os?>:/root# <b>cd postgresql-7.2.1/</b>
-	<?=$os?>:/root/postgresql-7.2.1# <b>./configure --with-CXX \
+	<?=$os?>:/root# <b>tar -xzf postgresql-<?=PG_SQL_RECOM_VERSION?>.tar.gz</b>
+	<?=$os?>:/root# <b>cd postgresql-<?=PG_SQL_RECOM_VERSION?>/</b>
+	<?=$os?>:/root/postgresql-<?=PG_SQL_RECOM_VERSION?># <b>./configure --with-CXX \
 		--enable-multibyte \
 <? if ($os=="freebsd") { ?>
 		--with-tcl --without-tk \
@@ -571,9 +613,9 @@ you may want to re-run the <b>./configure</b> adding the following parameters :
 
 You need <b>gmake 3.79</b> or above to build PostgreSQL (and you will also need it for GNUworld later),
 check you have it by running <b>gmake --version</b>, you should get something like this :
-Note: You will also need <b>automake 1.6<b> or above in order to build GNUworld.
+Note: You will also need <b>automake 1.6</b> or above in order to build GNUworld.
 
-	<?=$os?>:/root/postgresql-7.2.1# <b>gmake --version</b><font color=#999999>
+	<?=$os?>:/root/postgresql-<?=PG_SQL_RECOM_VERSION?># <b>gmake --version</b><font color=#999999>
 	GNU Make version 3.79.1, by Richard Stallman and Roland McGrath.
 <? if ($os=="linux") { ?>
 	Built for i686-pc-linux-gnu
@@ -593,8 +635,22 @@ If you don't have <b>gmake</b>, you can get it <a href="ftp://ftp.grolier.fr/mir
 If you don't have <b>automake 1.6</b>, you can get it <a href="ftp://ftp.grolier.fr/mirrors/ftp.gnu.org/gnu/automake/automake-1.6.1.tar.gz">here</a>.
 If that's ok, you can go on and build PostgreSQL for real, then install it...
 
-	<?=$os?>:/root/postgresql-7.2.1# <b>gmake</b>
-	<?=$os?>:/root/postgresql-7.2.1# <b>gmake install</b>
+	<?=$os?>:/root/postgresql-<?=PG_SQL_RECOM_VERSION?># <b>gmake</b>
+<?
+/*
+If compilation fails due to an error like ...<font color=#aaaaaa>
+	commands/SUBSYS.o(.text+0x4902): In function `DoCopy':
+	: undefined reference to `errno'
+	collect2: ld returned 1 exit status
+	gmake[2]: *** [postgres] Error 1
+	gmake[2]: Leaving directory `/root/postgresql-<?=PG_SQL_RECOM_VERSION?>/src/backend'</font>
+... then get the <b>patch</b> and apply it as follows before trying to compile again...
+
+		<?=$os?>:/root/postgresql-<?=PG_SQL_RECOM_VERSION?># <b>wget ...</b>
+		<?=$os?>:/root/postgresql-<?=PG_SQL_RECOM_VERSION?># <b>wget ...</b> ... to be continued..
+		<?=$os?>:/root/postgresql-<?=PG_SQL_RECOM_VERSION?># <b>wget ...</b>
+*/
+	?>	<?=$os?>:/root/postgresql-<?=PG_SQL_RECOM_VERSION?># <b>gmake install</b>
 
 <? if ($os=="freebsd") { ?>
 If you are using <b>bash</b> as your shell programm, add the following line :
@@ -619,7 +675,7 @@ Edit the file <b>/etc/ld.so.conf</b> and add the following line :
 
 save the file, then run :
 
-	<?=$os?>:/root/postgresql-7.2.1# <b>ldconfig</b>
+	<?=$os?>:/root/postgresql-<?=PG_SQL_RECOM_VERSION?># <b>ldconfig</b>
 
 <? } ?>
 
@@ -668,7 +724,7 @@ Creating the user, assuming username <b>gnuworld</b> :
 	Enter username [a-z0-9_-]: <font color=#000000><b>gnuworld</b></font>
 	Enter full name []: <font color=#000000><b>GNUworld Account</b></font>
 	Enter shell bash csh date false no sh tcsh [bash]: <font color=#009900><b>[</b>ENTER<b>]</b></font>
-	Enter home directory (full path) [/home/gnuworld]: <font color=#009900><b>[</b>ENTER<b>]</b></font>
+	Enter home directory (full patrld]: <font color=#009900><b>[</b>ENTER<b>]</b></font>
 	Uid [1001]: <font color=#009900><b>[</b>ENTER<b>]</b></font>
 	Enter login class: default []: <font color=#009900><b>[</b>ENTER<b>]</b></font>
 	Login group gnuworld [gnuworld]: <font color=#009900><b>[</b>ENTER<b>]</b></font>
@@ -1139,7 +1195,7 @@ You need to add the following lines only to the <b>ircd.conf</b> of the <b>uplin
 	<b>C:192.168.0.1:testlink:services.undernet.org::90</b>
 
 <i>this assumes <b>90</b> is a valid Y:Line in your config and is of type <b>Server Class</b>,
-replace, if needed, with appropriate number.</i>
+replace, if neededpropriate number.</i>
 
 
 Do not forget to either <b>kill -HUP &lt;your ircd PID&gt;</b> or <b>/rehash</b> as an Oper on it
@@ -1263,12 +1319,12 @@ IMPORTANT NOTICE:</b>
 	&lt;?
 	/*
 
-	&lt;!-- <? echo "\$" . "Id" ?>: config.inc,v 1.15 2002/05/21 XX:XX:XX nighty Exp <? echo "\$" ?> //--&gt;
+	&lt;!-- <? echo "\$" . "Id" ?>: config.inc,v -.-- ----/--/-- --:--:-- nighty Exp <? echo "\$" ?> //--&gt;
 
 	'config.inc' For GNUworld's mod.cservice's website interface
 
 	Created: <nighty@undernet.org> - 10/29/2001
-	Last modif: <nighty@undernet.org> - 05/21/2002
+	Last modif: <nighty@undernet.org> - --/--/----
 
 	This file contains two sections,
 	- what you *MUST* edit to ensure your website can work properly.
@@ -1303,6 +1359,7 @@ IMPORTANT NOTICE:</b>
 	define(PURGE_EMAIL,"purge@network.net"); // the email where channel purge request form is sent.
 	define(XAT_EMAIL,"x@network.net"); // the email where manager change form is sent.
 	define(OBJECT_EMAIL,"object@network.net"); // the email where replies to password changes are sent.
+	define(ABUSE_GLOBAL_EMAIL,"abuse@network.net"); // the email where abuse NOT REGARDING Channel Service should go (for complaints)
 
 	define(FROM_NEWUSER,"cmaster@network.net"); // the From: email for a NEWUSER registration email
 	define(FROM_NEWUSER_SUBJECT,"Your Channel Service Account"); // the subject of that mail.
@@ -1342,6 +1399,11 @@ You need to add the password of <b>gnuworld</b> for <b>REMOTEDB_PASS</b> if you 
 	/*******************************/
 	define(HOSTING_LOGO,""); // this image should go in website/docs/gnuworld/images and be maximum 250*33 pixels.
 	define(HOSTING_URL,"");
+	define(HOSTING_STATS,0); // 1: enable, 0: disable. If you enabled this you *NEED* to ensure that a file
+				 // called 'hosting_stats' is WRITABLE by the httpd user in /tmp.
+				 //
+				 // This option enables/disables the page access to 901+ on the web as well.
+				 // If the file is not found, or found not writable, it's disabled.
 
 <font color=#000000>There's a link to <b>CService Site</b> in the site's left menu, define here where that link should go,
 it will be sent to <b>_top</b> (the whole browser current window).</font>
@@ -1442,6 +1504,8 @@ Unfortunately this function is not finished either at this time but will also wo
 	define(NOTES_LIM_INBOX,15); // Total number of notes a user can have in his 'notes box'. (0 = unlimited)
 	// of course, if ENABLE_NOTES is defined to '0', above three values have no effect.
 
+	define(COOKIE_DOMAIN,""); // Blank:default. Define this to ".yourdomain.com" or anything else at your own risks ;P
+
 	define(BOFH_PASS_ADMIN,1); // set this to 0 to disable password complexity checking for * people.
 	define(BOFH_PASS_USER,0); // set this to 1 to enable password complexity checking for all users (overriding BOFH_PASS_ADMIN=0).
 	define(PW_MIN_CHARS,6); // minimum chars a password must contain.
@@ -1453,6 +1517,20 @@ Unfortunately this function is not finished either at this time but will also wo
 	define(IPCHK_MAXHITS,3); // Number of failed forgotten_pass/login attempts before IP_LOCK
 
 	define(IPCHK_BANTIME,86400); // Time your IP/username is locked (seconds) when caught into IPCHK_MAXHITS+ failed attempts.
+
+	define(ENABLE_COMPLAINTS_MODULE,0); // set this to 0 to disable , 1 to enable, the /complaints reporting module (for example if you dont use it ;P)
+
+<font color=#000000>The next parameter, instead of the <b>0</b>, if you have enabled the above complaint module,
+has to be an <b>existing user ID (number)</b> on your database. This will be the user that will post the anonymous
+objections (admin comments) to pending channels when a complaint is lodged for that.</font>
+	define(COMPLAINTS_ADMINCOMMENT_ID,0); // this is *MUST* be set to a PERMANENTLY VALID USERNAME ID, if COMPLAINTS MODULE is enabled.
+					      // this will be the user that will post the anonymous objections under the form of an admin comment
+					      // when a complaint of this type is sent.
+
+	define(NEWUSERS_GFXCHECK,0);				// 1 = add a graphical code entry check to "newusers", 0 = disable the feature (or if no "libgd" is present)
+	define(FONT_PATH,"/home/gnuworld/website/fonts/");	// ABSOLUTE PATH to the 'website/fonts/' directory (normally "/home/gnuworld/website/fonts/")
+	define(SPECIFIC_FONT,"rans.ttf");			// if you let this empty, fonts will be randomly chosen into FONT_PATH (one single font used per code/image).
+	define(JPEG_OUT_QUALITY,57);				// %Quality of the JPEG generated (the less you put this, the harder it will be to read/recognize, ranges 1 to 100).
 
 	define(NEWUSERS_IPCHECK,0); // define this to 1, if you want to enable ONE IP = ONE USERNAME per 24h.
 
@@ -1569,6 +1647,12 @@ the defaults at <b>99</b> are definetly not good.
 	# Number of days supporters have to confirm their support
 	set SUPPORT_DAYS                99
 
+<font color=#000000>You definetly need to change this <b>0</b> to an <b>existing user ID (number)</b> on your database,
+for example, if you had activated the complaints module earlier (when editing 'config.inc') it is wise to pick,
+here the same <b>ID</b> as in <b>COMPLAINTS_ADMINCOMMENT_ID</b> in 'config.inc'...</font>
+	# The Judge's Reviewer ID
+	set REVIEWER_ID                 0
+
 <font color=#000000><b>DO NOT MODIFY THIS EITHER</b></font>
 	# These are better left alone
 	set AS_PENDING_SUPPORT          0
@@ -1613,10 +1697,10 @@ if ($subset=="C-1") {
 <h2>Getting Apache</h2>
 <pre>
 
-To get the latest Apache server, go to <a href="http://mir2.ovh.net/ftp.apache.org/dist/httpd/" target=_blank>http://mir2.ovh.net/ftp.apache.org/dist/httpd/</a>,
+To get the latest Apache server, go to <a href="<?=APACHE_FTP_SOURCE?>" target=_blank><?=APACHE_FTP_SOURCE?></a>,
 and take the latest <b>1.3.x</b>.
 
-Recommended version <a href="http://mir2.ovh.net/ftp.apache.org/dist/httpd/apache_1.3.27.tar.gz">apache_1.3.27.tar.gz</a>.
+Recommended version <a href="<?=APACHE_FTP_SOURCE_FILE?>"><?=APACHE_FILE_NAME?></a>.
 
 Put that, as <b>root</b> in your <b>/root</b> home directory.
 
@@ -1629,9 +1713,9 @@ if ($subset=="C-2") {
 <h2>Getting PHP</h2>
 <pre>
 
-To get the latest version of PHP, go to <a href="http://www.php.net/downloads.php" target=_blank>http://www.php.net/downloads.php</a>.
+To get the latest version of PHP, go to <a href="<?=PHP_FTP_SOURCE?>" target=_blank><?=PHP_FTP_SOURCE?></a>.
 
-Recommended version <a href="http://static.php.net/www.php.net/distributions/php-4.3.2.tar.gz">php-4.3.2.tar.gz</a>.
+Recommended version <a href="<?=PHP_FTP_SOURCE_FILE?>"><?=PHP_FILE_NAME?></a>.
 
 <b>PHP also requires these programs if you plan to use the Graphical code check on 'New users' :
 ( compiling with libGD support )</b>
@@ -1643,24 +1727,24 @@ Recommended version <a href="http://static.php.net/www.php.net/distributions/php
     <td><b>Main Site</font></b></td>
   </tr>
   <tr>
-    <td><a href="http://www.libpng.org/pub/png/src/libpng-1.0.15.tar.gz">libPNG</a></td>
-    <td>1.0.15</td>
-    <td><a target=_blank href="http://www.libpng.org">http://www.libpng.org</a></td>
+    <td><a href="<?=LIBPNG_URL_FILE?>">libPNG</a></td>
+    <td><?=LIBPNG_VERSION?></td>
+    <td><a target=_blank href="<?=LIBPNG_URL?>"><?=LIBPNG_URL?></a></td>
   </tr>
   <tr>
-    <td><a href="http://www.ijg.org/files/jpegsrc.v6b.tar.gz">libJPEG</a></td>
-    <td>6b</td>
-    <td><a target=_blank href="http://www.ijg.org">http://www.ijg.org</a></td>
+    <td><a href="<?=LIBJPEG_URL_FILE?>">libJPEG</a></td>
+    <td><?=LIBJPEG_VERSION?></td>
+    <td><a target=_blank href="<?=LIBJPEG_URL?>"><?=LIBJPEG_URL?></a></td>
   </tr>
   <tr>
-    <td><a href="http://umn.dl.sourceforge.net/sourceforge/freetype/freetype-2.1.4.tar.gz">FreeType2</a></td>
-    <td>2.1.4</td>
-    <td><a target=_blank href="http://freetype.sourceforge.net">http://freetype.sourceforge.net</a></td>
+    <td><a href="<?=FREETYPE2_URL_FILE?>">FreeType2</a></td>
+    <td><?=FREETYPE2_VERSION?></td>
+    <td><a target=_blank href="<?=FREETYPE2_URL?>"><?=FREETYPE2_URL?></a></td>
   </tr>
   <tr>
-    <td><a href="http://www.libpng.org/pub/png/src/zlib-1.1.4.tar.gz">zlib</a></td>
-    <td>1.1.4</td>
-    <td><a target=_blank href="http://www.gzip.org/zlib/">http://www.gzip.org/zlib/</a></td>
+    <td><a href="<?=ZLIB_URL_FILE?>">zlib</a></td>
+    <td><?=ZLIB_VERSION?></td>
+    <td><a target=_blank href="<?=ZLIB_URL?>"><?=ZLIB_URL?></a></td>
   </tr>
 </table>
 <pre>
@@ -1676,66 +1760,73 @@ if ($subset=="C-3") {
 <pre>
 
 <i>Side note: of course it's always best to be up to date with php and apache version
-if you have apache_1.3.28 or php-4.3.3 .. don't hesitate, take it ;)</i>
+<?
+	$nv_ap = explode(".",APACHE_RECOM_VERSION);
+	$nv_ph = explode(".",PHP_RECOM_VERSION);
+
+	$nv_apache_v = $nv_ap[0] . "." . $nv_ap[1] . "." . ($nv_ap[2]+1);
+	$nv_php_v = $nv_ph[0] . "." . $nv_ph[1] . "." . ($nv_ph[2]+1);
+?>
+if you have apache_<?=$nv_apache_v?> or php-<?=$nv_php_v?> .. don't hesitate, take it ;)</i>
 
 I will be a bit short on it because :
 	- It should'nt need to be long ;)
 	- Apache and PHP documentations are way more complete than that one.
 
-	<?=$os?>:/root# <b>tar -xzf apache_1.3.27.tar.gz</b>
-	<?=$os?>:/root# <b>tar -xzf php-4.3.2.tar.gz</b>
+	<?=$os?>:/root# <b>tar -xzf <?=APACHE_FILE_NAME?></b>
+	<?=$os?>:/root# <b>tar -xzf <?=PHP_FILE_NAME?></b>
 
 	<u>* EITHER YOU COMPILE IT <b>WITH LIBGD SUPPORT</b> (for the Graphical code for new users)</u>
-		<?=$os?>:/root# <b>tar -xzf libpng-1.0.15.tar.gz</b>
-		<?=$os?>:/root# <b>tar -xzf jpegsrc.v6b.tar.gz</b>
-		<?=$os?>:/root# <b>tar -xzf freetype-2.1.4.tar.gz</b>
-		<?=$os?>:/root# <b>tar -xzf zlib-1.1.4.tar.gz</b>
-		<?=$os?>:/root# <b>cd apache_1.3.27/</b>
-		<?=$os?>:/root/apache_1.3.27# <b>./configure --prefix=/usr/local/apache</b>
-		<?=$os?>:/root/apache_1.3.27# <b>cd ../zlib-1.1.4/</b>
-		<?=$os?>:/root/zlib-1.1.4# <b>./configure --prefix=/usr</b>
-		<?=$os?>:/root/zlib-1.1.4# <b>make</b>
-		<?=$os?>:/root/zlib-1.1.4# <b>make install</b>
-		<?=$os?>:/root/zlib-1.1.4# <b>cd ../freetype-2.1.4/</b>
-		<?=$os?>:/root/freetype-2.1.4# <b>gmake</b>
-		<?=$os?>:/root/freetype-2.1.4# <b>gmake</b>		(yes twice)
-		<?=$os?>:/root/freetype-2.1.4# <b>gmake install</b>
-		<?=$os?>:/root/freetype-2.1.4# <b>cd ../libpng-1.0.15/</b>
-		<?=$os?>:/root/libpng-1.0.15# <b>cd scripts</b>
-		<?=$os?>:/root/libpng-1.0.15# <b>cp makefile.<?=$os?> ../Makefile</b>
-		<?=$os?>:/root/libpng-1.0.15# <b>cd ..</b>
-		<?=$os?>:/root/libpng-1.0.15# <b>make</b>
-		<?=$os?>:/root/libpng-1.0.15# <b>make install</b>
-		<?=$os?>:/root/libpng-1.0.15# <b>cd ../jpeg-6b/</b>
-		<?=$os?>:/root/jpeg-6b# <b>./configure</b>
-		<?=$os?>:/root/jpeg-6b# <b>make</b>
-		<?=$os?>:/root/jpeg-6b# <b>make install</b>
-		<?=$os?>:/root/jpeg-6b# <b>cd ../php-4.3.2/</b>
-		<?=$os?>:/root/php-4.3.2# <b>./configure --with-pgsql=/usr/local/pgsql --enable-track-vars --with-apache=../apache_1.3.27 \
+		<?=$os?>:/root# <b>tar -xzf <?=LIBPNG_FILE_NAME?></b>
+		<?=$os?>:/root# <b>tar -xzf <?=LIBJPEG_FILE_NAME?></b>
+		<?=$os?>:/root# <b>tar -xzf <?=FREETYPE2_FILE_NAME?></b>
+		<?=$os?>:/root# <b>tar -xzf <?=ZLIB_FILE_NAME?></b>
+		<?=$os?>:/root# <b>cd apache_<?=APACHE_RECOM_VERSION?>/</b>
+		<?=$os?>:/root/apache_<?=APACHE_RECOM_VERSION?># <b>./configure --prefix=/usr/local/apache</b>
+		<?=$os?>:/root/apache_<?=APACHE_RECOM_VERSION?># <b>cd ../zlib-<?=ZLIB_VERSION?>/</b>
+		<?=$os?>:/root/zlib-<?=ZLIB_VERSION?># <b>./configure --prefix=/usr</b>
+		<?=$os?>:/root/zlib-<?=ZLIB_VERSION?># <b>make</b>
+		<?=$os?>:/root/zlib-<?=ZLIB_VERSION?># <b>make install</b>
+		<?=$os?>:/root/zlib-<?=ZLIB_VERSION?># <b>cd ../freetype-<?=FREETYPE2_VERSION?>/</b>
+		<?=$os?>:/root/freetype-<?=FREETYPE2_VERSION?># <b>gmake</b>
+		<?=$os?>:/root/freetype-<?=FREETYPE2_VERSION?># <b>gmake</b>		(yes twice)
+		<?=$os?>:/root/freetype-<?=FREETYPE2_VERSION?># <b>gmake install</b>
+		<?=$os?>:/root/freetype-<?=FREETYPE2_VERSION?># <b>cd ../libpng-<?=LIBPNG_VERSION?>/</b>
+		<?=$os?>:/root/libpng-<?=LIBPNG_VERSION?># <b>cd scripts</b>
+		<?=$os?>:/root/libpng-<?=LIBPNG_VERSION?># <b>cp makefile.<?=$os?> ../Makefile</b>
+		<?=$os?>:/root/libpng-<?=LIBPNG_VERSION?># <b>cd ..</b>
+		<?=$os?>:/root/libpng-<?=LIBPNG_VERSION?># <b>make</b>
+		<?=$os?>:/root/libpng-<?=LIBPNG_VERSION?># <b>make install</b>
+		<?=$os?>:/root/libpng-<?=LIBPNG_VERSION?># <b>cd ../jpeg-<?=LIBJPEG_VERSION?>/</b>
+		<?=$os?>:/root/jpeg-<?=LIBJPEG_VERSION?># <b>./configure</b>
+		<?=$os?>:/root/jpeg-<?=LIBJPEG_VERSION?># <b>make</b>
+		<?=$os?>:/root/jpeg-<?=LIBJPEG_VERSION?># <b>make install</b>
+		<?=$os?>:/root/jpeg-<?=LIBJPEG_VERSION?># <b>cd ../php-<?=PHP_RECOM_VERSION?>/</b>
+		<?=$os?>:/root/php-<?=PHP_RECOM_VERSION?># <b>./configure --with-pgsql=/usr/local/pgsql --enable-track-vars --with-apache=../apache_<?=APACHE_RECOM_VERSION?> \
 					  --with-zlib --with-gd --enable-gd-native-ttf --with-ttf --enable-gd-imgstrttf \
-					  --with-jpeg-dir=../jpeg-6b --with-png-dir=../libpng-1.0.15 \
+					  --with-jpeg-dir=../jpeg-<?=LIBJPEG_VERSION?> --with-png-dir=../libpng-<?=LIBPNG_VERSION?> \
 					  --with-freetype-dir=/usr/include/freetype2/freetype</b>
 
 	<u>* OR YOU COMPILE IT <b>WITHOUT LIBGD SUPPORT</b> (NO Graphical code for new users, simplier)</u>
-		<?=$os?>:/root# <b>cd apache_1.3.27/</b>
-		<?=$os?>:/root/apache_1.3.27# <b>./configure --prefix=/usr/local/apache</b>
-		<?=$os?>:/root/php-4.3.2# <b>./configure --with-pgsql=/usr/local/pgsql --enable-track-vars --with-apache=../apache_1.3.27</b>
+		<?=$os?>:/root# <b>cd apache_<?=APACHE_RECOM_VERSION?>/</b>
+		<?=$os?>:/root/apache_<?=APACHE_RECOM_VERSION?># <b>./configure --prefix=/usr/local/apache</b>
+		<?=$os?>:/root/php-<?=PHP_RECOM_VERSION?># <b>./configure --with-pgsql=/usr/local/pgsql --enable-track-vars --with-apache=../apache_<?=APACHE_RECOM_VERSION?></b>
 
 	Then you continue with ...
 
-	<?=$os?>:/root/php-4.3.2# <b>make</b>
-	<?=$os?>:/root/php-4.3.2# <b>make install</b>
-	<?=$os?>:/root/php-4.3.2# <b>cd ../apache_1.3.27/</b>
-	<?=$os?>:/root/apache_1.3.27# <b>./configure --prefix=/usr/local/apache --activate-module=src/modules/php4/libphp4.a</b>
-	<?=$os?>:/root/apache_1.3.27# <b>make</b>
-	<?=$os?>:/root/apache_1.3.27# <b>make install</b>
-	<?=$os?>:/root/apache_1.3.27# <b>cd ../php-4.3.2</b>
-	<?=$os?>:/root/php-4.3.2# <b>cp php.ini-dist /usr/local/lib/php.ini</b>
+	<?=$os?>:/root/php-<?=PHP_RECOM_VERSION?># <b>make</b>
+	<?=$os?>:/root/php-<?=PHP_RECOM_VERSION?># <b>make install</b>
+	<?=$os?>:/root/php-<?=PHP_RECOM_VERSION?># <b>cd ../apache_<?=APACHE_RECOM_VERSION?>/</b>
+	<?=$os?>:/root/apache_<?=APACHE_RECOM_VERSION?># <b>./configure --prefix=/usr/local/apache --activate-module=src/modules/php4/libphp4.a</b>
+	<?=$os?>:/root/apache_<?=APACHE_RECOM_VERSION?># <b>make</b>
+	<?=$os?>:/root/apache_<?=APACHE_RECOM_VERSION?># <b>make install</b>
+	<?=$os?>:/root/apache_<?=APACHE_RECOM_VERSION?># <b>cd ../php-<?=PHP_RECOM_VERSION?></b>
+	<?=$os?>:/root/php-<?=PHP_RECOM_VERSION?># <b>cp php.ini-dist /usr/local/lib/php.ini</b>
 
 Make sure you edit <b>/usr/local/lib/php.ini</b> to set &quot;<b>register_globals</b>&quot; to &quot;<b>On</b>&quot;
 otherwise the interface wont work. (before starting apache or you will have to restart)
 
-	<?=$os?>:/root/php-4.3.2# <b>cd /usr/local/apache/htdocs/</b>
+	<?=$os?>:/root/php-<?=PHP_RECOM_VERSION?># <b>cd /usr/local/apache/htdocs/</b>
 	<?=$os?>:/usr/local/apache/htdocs# <b>chmod 711 ~gnuworld</b>
 	<?=$os?>:/usr/local/apache/htdocs# <b>chmod 711 ~gnuworld/website</b>
 	<?=$os?>:/usr/local/apache/htdocs# <b>chmod 755 ~gnuworld/website/php_includes</b>
