@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: dronescan.cc,v 1.20 2003/06/20 00:33:27 jeekay Exp $
+ * $Id: dronescan.cc,v 1.21 2003/06/20 00:58:47 jeekay Exp $
  */
 
 #include <cstdarg>	/* va_list */
@@ -34,7 +34,7 @@
 #include "dronescanTests.h"
 #include "Timer.h"
 
-RCSTAG("$Id: dronescan.cc,v 1.20 2003/06/20 00:33:27 jeekay Exp $");
+RCSTAG("$Id: dronescan.cc,v 1.21 2003/06/20 00:58:47 jeekay Exp $");
 
 namespace gnuworld {
 
@@ -538,10 +538,11 @@ int dronescan::OnTimer( xServer::timerID theTimer , void *)
 		{
 		for(jcChanMapType::const_iterator itr = jcChanMap.begin() ;
 		    itr != jcChanMap.end() ; ++itr) {
-			log(WARN, "Join flood over in %s. Total joins: %u",
-				itr->first.c_str(),
-				itr->second
-				);
+			if(itr->second >= jcCutoff)
+				log(WARN, "Join flood over in %s. Total joins: %u",
+					itr->first.c_str(),
+					itr->second
+					);
 		}
 		
 		log(DEBUG, "Clearing %u records from the join counter.",
