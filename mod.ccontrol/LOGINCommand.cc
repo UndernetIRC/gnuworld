@@ -13,7 +13,7 @@
 #include	"md5hash.h" 
 #include        "ccUser.h"
 
-const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.9 2001/07/17 16:58:27 dan_karrels Exp $";
+const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.10 2001/07/20 17:44:17 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -97,10 +97,10 @@ else
 
 	//Try creating an authentication entry for the user
 	if(bot->AuthUser(theUser))
-	if(!(theUser->gotFlag(isSUSPENDED)))
-		bot->Notice(theClient, "Authentication successful! ",theUser->getUserName().c_str()); 
-	else 
-		bot->Notice(theClient, "Authentication successful,However you are suspended ",theUser->getUserName().c_str()); 
+		if(!(bot->isSuspended(theUser)))
+			bot->Notice(theClient, "Authentication successful! ",theUser->getUserName().c_str()); 
+		else 
+			bot->Notice(theClient, "Authentication successful,However you are suspended ",theUser->getUserName().c_str()); 
 	else
 	        bot->Notice(theClient, "Error in authentication ",theUser->getUserName().c_str()); 
 	delete theUser;

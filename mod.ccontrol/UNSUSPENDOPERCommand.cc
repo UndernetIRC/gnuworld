@@ -12,7 +12,7 @@
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 
-const char UNSUSPENDOPERCommand_cc_rcsId[] = "$Id: UNSUSPENDOPERCommand.cc,v 1.6 2001/05/14 21:26:37 mrbean_ Exp $";
+const char UNSUSPENDOPERCommand_cc_rcsId[] = "$Id: UNSUSPENDOPERCommand.cc,v 1.7 2001/07/20 17:44:17 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -40,7 +40,7 @@ if(!tmpUser)
 	return false;
 	}
 	
-if(!(tmpUser->gotFlag(isSUSPENDED)))
+if(!(bot->isSuspended(tmpUser)))
 	{
 	bot->Notice(theClient,"%s is not suspended",st[1].c_str());
 	return false;
@@ -48,7 +48,7 @@ if(!(tmpUser->gotFlag(isSUSPENDED)))
 
 //Remove the suspention and update the database	
 tmpUser->setSuspendExpires(0);
-tmpUser->removeFlag(isSUSPENDED);
+tmpUser->setIsSuspended(false);
 tmpUser->setSuspendedBy("");
 	
 if(tmpUser->Update())

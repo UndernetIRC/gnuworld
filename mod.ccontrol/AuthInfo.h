@@ -1,7 +1,7 @@
 /* AuthInfo.h */
 
 #ifndef __AUTHINFO_H
-#define __AUTHINFO_H "$Id: AuthInfo.h,v 1.3 2001/07/20 09:09:31 mrbean_ Exp $"
+#define __AUTHINFO_H "$Id: AuthInfo.h,v 1.4 2001/07/20 17:44:17 mrbean_ Exp $"
 
 #include	<string>
 
@@ -35,6 +35,9 @@ public:
 	inline  const unsigned int 	getFlags() const
 		{ return Flags; }
 	
+	inline const bool		getIsSuspended() const
+		{ return IsSuspended; }
+		
 	inline const time_t		getSuspendExpires() const
 		{ return SuspendExpires; }
 	
@@ -47,9 +50,7 @@ public:
 	inline void 			setNumeric( const string _Numeric )
 		{ Numeric = _Numeric; } 			
 	
-	inline void 			setSuspendedBy( const string _SuspendedBy )
-		{ SuspendedBy = _SuspendedBy; } 			
-	
+
 	inline void 			setId( const int _Id )
 		{ Id = _Id; } 			
 
@@ -58,8 +59,15 @@ public:
 	inline void 			setFlags( const int _Flags )
 		{ Flags = _Flags; } 			
 	
+	inline void			setIsSuspended( const bool _suspend )
+		{ IsSuspended = _suspend; }
+			
 	inline void 			setSuspendExpires( const time_t _SuspendExpires )
 		{ SuspendExpires = _SuspendExpires; } 			
+	
+	inline void 			setSuspendedBy( const string _SuspendedBy )
+		{ SuspendedBy = _SuspendedBy; } 			
+	
 	
 	inline void 			setServer( const string& _Server )
 		{ Server = _Server; }
@@ -68,6 +76,7 @@ protected:
 
 	string		Name;
 	string		Numeric;
+	bool		IsSuspended;
 	string		SuspendedBy;
 	string 		Server;
 	unsigned int	Id;

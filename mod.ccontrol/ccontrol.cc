@@ -26,7 +26,7 @@
 #include        "server.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.58 2001/07/20 09:09:31 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.59 2001/07/20 17:44:17 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -323,6 +323,7 @@ for( commandMapType::iterator ptr = commandMap.begin() ;
 
 expiredGlines = theServer->RegisterTimer(::time(0) + GLInterval,this,NULL);
 expiredIgnores = theServer->RegisterTimer(::time(0) + 60,this,NULL);
+expiredSuspends = theServer->RegisterTimer(::time(0) + 60,this,NULL);
 
 if(SendReport)
 	{
@@ -620,6 +621,11 @@ else if (timer_id == expiredIgnores)
 	refreshIgnores();
 	expiredIgnores = MyUplink->RegisterTimer(::time(0) + 60,this,NULL);
 	}
+else if (timer_id == expiredSuspends)
+	{
+	refreshSuspention();
+	expiredSuspends = MyUplink->RegisterTimer(::time(0) + 60,this,NULL);
+	}
 
 return true;
 }
@@ -810,6 +816,7 @@ if(TempAuth)
         TempAuth->setName(TempUser->getUserName());
         TempAuth->setAccess(TempUser->getAccess());
         TempAuth->setFlags(TempUser->getFlags());
+	TempAuth->setIsSuspended(TempUser->getIsSuspended());
         TempAuth->setSuspendExpires(TempUser->getSuspendExpires());
         TempAuth->setSuspendedBy(TempUser->getSuspendedBy());
 	TempAuth->setServer(TempUser->getServer());
@@ -819,7 +826,7 @@ if(TempAuth)
 
 bool ccontrol::AddOper (ccUser* Oper)
 {
-static const char *Main = "INSERT into opers (user_name,password,access,last_updated_by,last_updated,flags,server) VALUES ('";
+static const char *Main = "INSERT into opers (user_name,password,access,last_updated_by,last_updated,flags,server,isSuspended) VALUES ('";
 
 strstream theQuery;
 theQuery	<< Main
@@ -829,7 +836,9 @@ theQuery	<< Main
 		<< Oper->getLast_Updated_by()
 		<< "',now()::abstime::int4,"
 		<< Oper->getFlags() << ",'"
-		<< Oper->getServer() << "')"
+		<< Oper->getServer() 
+		<< "' ,'" 
+		<<  (Oper->getIsSuspended() ? 't' : 'n') << "')"
 		<< ends;
 
 elog	<< "ACCESS::sqlQuery> "
@@ -932,6 +941,7 @@ TempAuth->setName(TempUser->getUserName());
 TempAuth->setAccess(TempUser->getAccess());
 TempAuth->setFlags(TempUser->getFlags());
 TempAuth->setNumeric(TempUser->getNumeric());
+TempAuth->setIsSuspended(TempUser->getIsSuspended());
 TempAuth->setSuspendExpires(TempUser->getSuspendExpires());
 TempAuth->setSuspendedBy(TempUser->getSuspendedBy());
 TempAuth->setServer(TempUser->getServer());
@@ -1595,7 +1605,7 @@ return FORCE_NEEDED_HOST;
 
 bool ccontrol::isSuspended(AuthInfo *theUser)
 {
-if( (theUser) && (theUser->getFlags() & isSUSPENDED))
+if( (theUser) && (theUser->getIsSuspended()))
 	{
 	//Check if the suspend hadnt already expired
 	if(::time( 0 ) - theUser->getSuspendExpires() < 0)
@@ -1606,6 +1616,82 @@ if( (theUser) && (theUser->getFlags() & isSUSPENDED))
 return false;
 }
 
+bool ccontrol::isSuspended(ccUser *theUser)
+{
+if( (theUser) && (theUser->getIsSuspended()))
+	{
+	//Check if the suspend hadnt already expired
+	if(::time( 0 ) - theUser->getSuspendExpires() < 0)
+		{
+		return true;
+		}
+	}
+return false;
+}
+
+bool ccontrol::refreshSuspention()
+{
+static const char *Main = "SELECT user_id FROM opers WHERE isSuspended = 't' AND suspend_expires < now()::abstime::int4";
+
+strstream theQuery;
+theQuery	<< Main
+		<< ends;
+
+elog	<< "ccontrol::RefreshSuspention> "
+	<< theQuery.str()
+	<< endl; 
+
+ExecStatusType status = SQLDb->Exec( theQuery.str() ) ;
+delete[] theQuery.str() ;
+
+if( PGRES_TUPLES_OK != status )
+	{
+	elog	<< "ccontrol::refreshSuspention> SQL Failure: "
+		<< SQLDb->ErrorMessage()
+		<< endl ;
+
+	return false ;
+	}
+
+if(SQLDb->Tuples() > 0)
+	{
+	AuthInfo *tmpAuth;
+	for( int i = 0 ; i < SQLDb->Tuples() ; i++ )
+		{
+		tmpAuth = IsAuth(atoi(SQLDb->GetValue(i,0)));
+		if(tmpAuth)
+			{ //The user is authenticated now, update his authentication
+			tmpAuth->setSuspendExpires(0);
+			tmpAuth->setSuspendedBy("");
+			tmpAuth->setIsSuspended(false);
+			}
+		}
+	static const char *DelMain = "update opers set isSuspended = 'n',Suspend_Expires = 0, Suspended_by = '' where IsSuspended = 'y' And suspend_expires < now()::abstime::int4";
+
+	strstream DelQuery;
+	DelQuery	<< DelMain
+			<< ends;
+
+	elog	<< "ccontrol::RefreshSuspention> "
+		<< DelQuery.str()
+		<< endl; 
+
+	status = SQLDb->Exec( DelQuery.str() ) ;
+	delete[] DelQuery.str() ;
+
+	if( PGRES_COMMAND_OK != status )
+		{
+		elog	<< "ccontrol::refreshSuspention> SQL Failure: "
+			<< SQLDb->ErrorMessage()
+			<< endl ;
+
+		return false ;
+		}
+			
+
+	}
+return true;
+}
 // TODO: This method should be in C++ not C!
 int ccontrol::countCinS(char *St,char Sign)
 {

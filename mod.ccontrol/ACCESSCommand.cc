@@ -14,7 +14,7 @@
 #include	"ccontrol.h"
 #include	"CControlCommands.h"
 
-const char ACCESSCommand_cc_rcsId[] = "$Id: ACCESSCommand.cc,v 1.7 2001/07/20 09:09:31 mrbean_ Exp $";
+const char ACCESSCommand_cc_rcsId[] = "$Id: ACCESSCommand.cc,v 1.8 2001/07/20 17:44:17 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -37,7 +37,7 @@ StringTokenizer st( Message ) ;
 string Uname;
 if(st.size() > 1)
 	{
-	Uname = "Where lower(user_name) = '" +  string_lower(st[1]) + "'";
+	Uname = "Where lower(user_name) = '" +  string_lower(st[1]) + "'\n";
 	}
 else
 	{
@@ -90,6 +90,14 @@ for (int i = 0 ; i < bot->SQLDb->Tuples(); i++)
 		Flags.c_str(),
 		bot->SQLDb->GetValue(i, 3),
 		bot->SQLDb->GetValue(i,4));
+	}
+if((Uname != "") && (bot->SQLDb->Tuples() == 0))
+	{
+	bot->Notice(theClient,"Can't find oper %s",st[1].c_str());
+	}
+else
+	{
+	bot->Notice(theClient,"-= End Of Access List =-");
 	}
 
 return true ;

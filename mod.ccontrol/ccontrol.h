@@ -3,7 +3,7 @@
  */
 
 #ifndef __CCONTROL_H
-#define __CCONTROL_H "$Id: ccontrol.h,v 1.36 2001/07/20 09:09:31 mrbean_ Exp $"
+#define __CCONTROL_H "$Id: ccontrol.h,v 1.37 2001/07/20 17:44:17 mrbean_ Exp $"
 
 //Define gline response
 #define GLINE_OK 1;
@@ -465,6 +465,10 @@ public:
 	int CheckGline(const char *, unsigned int);
 
 	bool isSuspended(AuthInfo *);
+
+	bool isSuspended(ccUser *);
+	
+	bool refreshSuspention();
 	
 	int countCinS( char * , char );
 
@@ -653,6 +657,8 @@ public:
 	/* TimerID = Expired ignores interval timer */
 	xServer::timerID expiredIgnores;
 
+	xServer::timerID expiredSuspends;
+	
 protected:
 
 	/**

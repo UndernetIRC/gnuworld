@@ -3,7 +3,7 @@
  * 
  * Storage class for accessing user information 
  * 
- * $Id: ccUser.cc,v 1.5 2001/07/20 10:15:40 mrbean_ Exp $
+ * $Id: ccUser.cc,v 1.6 2001/07/20 17:44:17 mrbean_ Exp $
  */
  
 #include	<strstream>
@@ -17,7 +17,7 @@
 #include	"ccUser.h" 
 
 const char ccUser_h_rcsId[] = __CCUSER_H ;
-const char ccUser_cc_rcsId[] = "$Id: ccUser.cc,v 1.5 2001/07/20 10:15:40 mrbean_ Exp $" ;
+const char ccUser_cc_rcsId[] = "$Id: ccUser.cc,v 1.6 2001/07/20 17:44:17 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -30,6 +30,7 @@ using std::ends ;
 ccUser::ccUser(PgDatabase* _SQLDb)
  : Id( 0 ),
    Server( "" ),
+   IsSuspended(0),
    SuspendExpires(0),
    Access( 0 ),
    Flags( 0 ), 
@@ -43,7 +44,7 @@ ccUser::~ccUser()
 bool ccUser::loadData(const string& Name)
 {
 
-static const char Main[] = "SELECT user_id,user_name,password,access,flags,suspend_expires,suspended_by,server FROM opers WHERE lower(user_name) = '";
+static const char Main[] = "SELECT user_id,user_name,password,access,flags,suspend_expires,suspended_by,server,isSuspended, CASE WHEN isSuspended THEN '1' ELSE '0' END FROM opers WHERE lower(user_name) = '";
 
 strstream theQuery;
 theQuery	<< Main
@@ -69,7 +70,7 @@ return false;
 
 bool ccUser::loadData( const unsigned int Id)
 {
-static const char Main[] = "SELECT user_id,user_name,password,access,flags,suspend_expires,suspended_by,server FROM opers WHERE user_id = ";
+static const char Main[] = "SELECT user_id,user_name,password,access,flags,suspend_expires,suspended_by,server,isSuspended, CASE WHEN isSuspended THEN '1' ELSE '0' END FROM opers WHERE user_id = ";
 
 strstream theQuery;
 
@@ -104,6 +105,8 @@ Flags = atoi(SQLDb->GetValue(0, 4));
 SuspendExpires = atoi(SQLDb->GetValue(0,5));
 SuspendedBy = SQLDb->GetValue(0,6);
 Server = SQLDb->GetValue(0,7);
+//IsSuspended = (SQLDb->GetValue(0,8) == "t" ? 1 : 0 );
+IsSuspended = (atoi(SQLDb->GetValue(0,9)) == 1 ? true : false);
 }    
 
 bool ccUser::Update()
@@ -125,6 +128,8 @@ theQuery	<< Main
 		<< SuspendedBy
 		<< "' ,server = '"
 		<< Server
+		<< "' ,isSuspended = '"
+		<< (IsSuspended ? 't' : 'n')
 		<< "' WHERE lower(user_name) = '" 
 		<< string_lower(UserName) << "'"
 		<<  ends;

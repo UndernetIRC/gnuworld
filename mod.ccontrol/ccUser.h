@@ -1,7 +1,7 @@
 /* ccUser.h */
 
 #ifndef __CCUSER_H
-#define __CCUSER_H "$Id: ccUser.h,v 1.7 2001/07/20 09:09:31 mrbean_ Exp $"
+#define __CCUSER_H "$Id: ccUser.h,v 1.8 2001/07/20 17:44:17 mrbean_ Exp $"
 
 #include	<string>
 
@@ -40,7 +40,10 @@ public:
 
 	inline const string&		getNumeric() const
 		{ return Numeric ; }
-        
+
+        inline const bool       getIsSuspended() const
+		{ return IsSuspended ; }
+	
 	inline const time_t&	getSuspendExpires() const
 		{ return SuspendExpires ; }
 
@@ -80,6 +83,9 @@ public:
 	inline void setNumeric( const string& _numeric )
 		{ Numeric = _numeric; }
 
+	inline void setIsSuspended(const bool _suspeneded)
+		{ IsSuspended = _suspeneded; }
+		
 	inline void setSuspendExpires( const unsigned int _expire )
 		{ SuspendExpires = _expire; }
 
@@ -126,6 +132,7 @@ protected:
 	string last_updated_by;
 	string Numeric;
 	string Server;
+	bool   IsSuspended;
 	time_t SuspendExpires;
 	string SuspendedBy;
 	unsigned int Access;
