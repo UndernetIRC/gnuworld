@@ -17,21 +17,21 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: iClient.h,v 1.40 2003/12/29 23:59:36 dan_karrels Exp $
+ * $Id: iClient.h,v 1.41 2004/01/07 03:08:29 dan_karrels Exp $
  */
 
 #ifndef __ICLIENT_H
-#define __ICLIENT_H "$Id: iClient.h,v 1.40 2003/12/29 23:59:36 dan_karrels Exp $"
+#define __ICLIENT_H "$Id: iClient.h,v 1.41 2004/01/07 03:08:29 dan_karrels Exp $"
 
 #include	<string>
 #include	<list>
-#include	<iostream>
 #include	<map>
 
 #include	<ctime>
 
 #include	"Channel.h"
 #include	"NetworkTarget.h"
+#include	"ELog.h"
 
 namespace gnuworld
 {

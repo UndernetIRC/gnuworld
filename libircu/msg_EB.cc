@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_EB.cc,v 1.5 2004/01/01 19:31:13 dan_karrels Exp $
+ * $Id: msg_EB.cc,v 1.6 2004/01/07 03:08:29 dan_karrels Exp $
  */
 
 #include	<sys/types.h>
@@ -34,7 +34,7 @@
 #include	"ServerCommandHandler.h"
 #include	"config.h"
 
-RCSTAG( "$Id: msg_EB.cc,v 1.5 2004/01/01 19:31:13 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: msg_EB.cc,v 1.6 2004/01/07 03:08:29 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -130,10 +130,9 @@ else
 			<< params[ 0 ]
 			<< endl ;
 		return -1 ;
-	}
+		}
 
 	targetServer->stopBursting() ;
-
 	theServer->PostEvent( EVT_BURST_CMPLT,
 		static_cast< void* >( targetServer ) ) ;
 	}

@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server.cc,v 1.191 2004/01/06 23:22:43 dan_karrels Exp $
+ * $Id: server.cc,v 1.192 2004/01/07 03:08:29 dan_karrels Exp $
  */
 
 #include	<sys/time.h>
@@ -71,7 +71,7 @@
 #include	"ConnectionHandler.h"
 #include	"Connection.h"
 
-RCSTAG( "$Id: server.cc,v 1.191 2004/01/06 23:22:43 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: server.cc,v 1.192 2004/01/07 03:08:29 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -135,7 +135,7 @@ elog	<< "Server Description: " << ServerDescription << endl ;
 //elog	<< "xServer::intXXX> " << getIntXXX() << endl ;
 
 me = new (std::nothrow) iServer(
-	0,
+	getIntYYXXX(),
 	getCharYYXXX(),
 	ServerName,
 	::time( 0 ) ) ;
@@ -979,6 +979,8 @@ fakeServer->setIntXXX( 64 * 64 * 64 - 1 ) ;
 
 BurstServer( fakeServer ) ;
 
+PostEvent( EVT_NETJOIN, static_cast< void* >( fakeServer ) ) ;
+
 return true ;
 }
 
@@ -1503,7 +1505,7 @@ Write( "%s N %s %d %d %s %s %s %s %s :%s\n",
 	fakeClient->getUserName().c_str(),
 	fakeClient->getInsecureHost().c_str(),
 	fakeClient->getStringModes().c_str(),
-	xIP( fakeClient->getIP() ).GetBase64IP(),
+	xIP( fakeClient->getIP() ).GetBase64IP().c_str(),
 	fakeClient->getCharYYXXX().c_str(),
 	description.c_str() ) ;
 
@@ -1566,10 +1568,6 @@ void xServer::LoadClient( const string& moduleName,
 //	<< ")"
 //	<< endl ;
 
-// First, unload the client.
-// This will queue the request.
-//UnloadClient( moduleName ) ;
-
 string fileName = moduleName ;
 if( '/' != fileName[ 0 ] )
 	{
@@ -1583,7 +1581,7 @@ LoadClientTimerHandler* handler = new (std::nothrow)
 	LoadClientTimerHandler( this, fileName, configFileName ) ;
 assert( handler != 0 ) ;
 
-RegisterTimer( ::time( 0 ), handler, 0 ) ;
+RegisterTimer( ::time( 0 ) + 2, handler, 0 ) ;
 }
 
 void xServer::UnloadClient( const string& moduleName,
@@ -1679,7 +1677,7 @@ for( xNetwork::clientIterator clientItr = Network->clients_begin() ;
 	} // for()
 
 // Deallocate the iClient instance of the xClient
-delete iClientPtr ;
+delete iClientPtr ; iClientPtr = 0 ;
 
 // Reset the iClient instance for good measure
 theClient->resetInstance() ;

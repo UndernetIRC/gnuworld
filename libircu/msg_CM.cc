@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_CM.cc,v 1.4 2003/11/02 18:43:34 dan_karrels Exp $
+ * $Id: msg_CM.cc,v 1.5 2004/01/07 03:08:29 dan_karrels Exp $
  */
 
 #include	<map>
@@ -33,7 +33,7 @@
 #include	"ServerCommandHandler.h"
 #include	"config.h"
 
-RCSTAG( "$Id: msg_CM.cc,v 1.4 2003/11/02 18:43:34 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: msg_CM.cc,v 1.5 2004/01/07 03:08:29 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -88,78 +88,85 @@ for( string::size_type i = 0 ; i < Modes.size() ; i++ )
 		{
 		case 'o':
 			clearOps = true ;
-			elog	<< tmpChan->getName()
-				<< "msg_CM> Doing CLEAR_CHANOPS"
-				<< endl;
+//			elog	<< tmpChan->getName()
+//				<< "msg_CM> Doing CLEAR_CHANOPS"
+//				<< endl;
 			break ;
 		case 'v':
 			clearVoice = true ;
-			elog	<< tmpChan->getName()
-				<< "msg_CM> Doing CLEAR_VOICED"
-				<< endl;
+//			elog	<< tmpChan->getName()
+//				<< "msg_CM> Doing CLEAR_VOICED"
+//				<< endl;
 			break ;
 		case 's':
 			modeVector.push_back( make_pair(
 				false, Channel::MODE_S ) ) ;
-			elog	<< tmpChan->getName()
-				<< "msg_CM> Doing CLEAR_SECRET"
-				<< endl;
+//			elog	<< tmpChan->getName()
+//				<< "msg_CM> Doing CLEAR_SECRET"
+//				<< endl;
 			break ;
 		case 'r':
 			modeVector.push_back( make_pair(
 				false, Channel::MODE_R ) ) ;
-			elog	<< tmpChan->getName()
-				<< "msg_CM> Doing CLEAR_REGISTER"
-				<< endl;
+//			elog	<< tmpChan->getName()
+//				<< "msg_CM> Doing CLEAR_REGISTER"
+//				<< endl;
 			break ;
 		case 'm':
 			modeVector.push_back( make_pair(
 				false, Channel::MODE_M ) ) ;
-			elog	<< tmpChan->getName()
-				<< "msg_CM> Doing CLEAR_MODERATED"
-				<< endl;
+//			elog	<< tmpChan->getName()
+//				<< "msg_CM> Doing CLEAR_MODERATED"
+//				<< endl;
 			break ;
 		case 't':
 			modeVector.push_back( make_pair(
 				false, Channel::MODE_T ) ) ;
-			elog	<< tmpChan->getName()
-				<< "msg_CM> Doing CLEAR_TOPICLIMIT"
-				<< endl;
+//			elog	<< tmpChan->getName()
+//				<< "msg_CM> Doing CLEAR_TOPICLIMIT"
+//				<< endl;
 			break ;
 		case 'i':
 			modeVector.push_back( make_pair(
 				false, Channel::MODE_I ) ) ;
-			elog	<< tmpChan->getName()
-				<< "msg_CM> Doing CLEAR_INVITEONLY"
-				<< endl;
+//			elog	<< tmpChan->getName()
+//				<< "msg_CM> Doing CLEAR_INVITEONLY"
+//				<< endl;
 			break ;
 		case 'n':
 			modeVector.push_back( make_pair(
 				false, Channel::MODE_N ) ) ;
-			elog	<< tmpChan->getName()
-				<< "msg_CM> Doing CLEAR_NOPRIVMSGS"
-				<< endl;
+//			elog	<< tmpChan->getName()
+//				<< "msg_CM> Doing CLEAR_NOPRIVMSGS"
+//				<< endl;
+			break ;
+		case 'p':
+			modeVector.push_back( make_pair(
+				false, Channel::MODE_P ) ) ;
+//			elog	<< tmpChan->getName()
+//				<< "msg_CM> Doing CLEAR_NOPRIVMSGS"
+//				<< endl;
 			break ;
 		case 'k':
 			theServer->OnChannelModeK( tmpChan, false, 0, 
 				string() ) ;
 			tmpChan->setKey( string() );
-			elog	<< tmpChan->getName()
-				<< "msg_CM> Doing CLEAR_KEY"
-				<< endl;
+//			elog	<< tmpChan->getName()
+//				<< "msg_CM> Doing CLEAR_KEY"
+//				<< endl;
 			break ;
 		case 'b':
 			clearBans = true ;
 			tmpChan->removeAllBans();
-			elog	<< tmpChan->getName()
-				<< "msg_CM> Doing CLEAR_BANS"
-				<< endl;
+//			elog	<< tmpChan->getName()
+//				<< "msg_CM> Doing CLEAR_BANS"
+//				<< endl;
 			break ;
 		case 'l':
 			theServer->OnChannelModeL( tmpChan, false, 0, 0 ) ;
-			elog	<< tmpChan->getName()
-				<< "msg_CM> Doing CLEAR_LIMIT"
-				<< endl;
+//			elog	<< tmpChan->getName()
+//				<< "msg_CM> Doing CLEAR_LIMIT"
+//				<< endl;
 			break ;
 		default:
 			// Unknown mode

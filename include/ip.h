@@ -20,11 +20,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ip.h,v 1.6 2003/12/29 23:59:36 dan_karrels Exp $
+ * $Id: ip.h,v 1.7 2004/01/07 03:08:29 dan_karrels Exp $
  */
 
 #ifndef __IP_H
-#define __IP_H "$Id: ip.h,v 1.6 2003/12/29 23:59:36 dan_karrels Exp $"
+#define __IP_H "$Id: ip.h,v 1.7 2004/01/07 03:08:29 dan_karrels Exp $"
 
 #include	<string>
 
@@ -71,14 +71,15 @@ public:
 	~xIP() {}
 
 	/**
-	 * Retrieve the IP in character array format.
+	 * Retrieve the IP in dotted decimals format.
+	 * This method invoked ::gethostbyaddr(), so might be slower.
 	 */
-	const char* GetIP() const ;
+	std::string	GetIP() const ;
 
 	/**
 	 * Retrieve the IP in xxx.xxx.xxx.xxx character array format.
 	 */
-	const char* GetNumericIP() const ;
+	std::string	GetNumericIP() const ;
 
 	/**
 	 * Retrieve the IP as an unsigned int.
@@ -98,7 +99,7 @@ public:
 	 * Return a character array representation of the base 64
 	 * IP.
 	 */
-	const char* GetBase64IP() const ;
+	std::string	GetBase64IP() const ;
 
 protected:
 

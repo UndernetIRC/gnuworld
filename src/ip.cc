@@ -18,10 +18,12 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ip.cc,v 1.9 2003/06/28 01:21:21 dan_karrels Exp $
+ * $Id: ip.cc,v 1.10 2004/01/07 03:08:29 dan_karrels Exp $
  */
 
 #include	<string>
+#include	<sstream>
+
 #include	<cstdio>
 #include	<cstdlib>
 #include	<cstring>
@@ -36,7 +38,7 @@
 #include	"Numeric.h"
 #include	"config.h"
 
-RCSTAG( "$Id: ip.cc,v 1.9 2003/06/28 01:21:21 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: ip.cc,v 1.10 2004/01/07 03:08:29 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -98,25 +100,23 @@ else
 
 }
 
-const char* xIP::GetIP() const
+string xIP::GetIP() const
 {
 struct hostent* hp = ::gethostbyaddr(
 	reinterpret_cast< const char* >( &IP ),
 	sizeof( unsigned int ), AF_INET ) ;
 
-return (hp ? hp->h_name : GetNumericIP()) ;
+return (hp ? string( hp->h_name ) : GetNumericIP()) ;
 }
 
-const char* xIP::GetNumericIP() const
+string xIP::GetNumericIP() const
 {
-static char buf[ 16 ] ;
-
-sprintf( buf, "%d.%d.%d.%d",
-	static_cast< int >( (IP >> 24) & 0xff ),
-	static_cast< int >( (IP >> 16) & 0xff ),
-	static_cast< int >( (IP >>  8) & 0xff ),
-	static_cast< int >( (IP & 0xff) ) ) ;
-return buf ;
+std::stringstream s ;
+s	<< static_cast< int >( (IP >> 24) & 0xff ) << '.'
+	<< static_cast< int >( (IP >> 16) & 0xff ) << '.'
+	<< static_cast< int >( (IP >>  8) & 0xff ) << '.'
+	<< static_cast< int >( (IP & 0xff) ) ;
+return s.str() ;
 }
 
 const unsigned int& xIP::GetLongIP() const
@@ -135,19 +135,17 @@ c = (IP >>  8) & 0xff ;
 d = IP & 0xff ;
 }
 
-const char* xIP::GetBase64IP() const
+string xIP::GetBase64IP() const
 {
-static char buf[ 128 ] ;
+std::stringstream s ;
+s	<< convert2y[ ((IP >> 30) & 0x3f) ]
+	<< convert2y[ ((IP >> 24) & 0x3f) ]
+	<< convert2y[ ((IP >> 18) & 0x3f) ]
+	<< convert2y[ ((IP >> 12) & 0x3f) ]
+	<< convert2y[ ((IP >> 6 ) & 0x3f) ]
+	<< convert2y[ (IP & 0x3f) ] ;
 
-sprintf( buf, "%c%c%c%c%c%c",
-	convert2y[ ((IP >> 30) & 0x3f) ],
-	convert2y[ ((IP >> 24) & 0x3f) ],
-	convert2y[ ((IP >> 18) & 0x3f) ],
-	convert2y[ ((IP >> 12) & 0x3f) ],
-	convert2y[ ((IP >> 6 ) & 0x3f) ],
-	convert2y[ (IP & 0x3f) ] ) ;
-
-return buf ;
+return s.str() ;
 }
 
 } // namespace gnuworld
