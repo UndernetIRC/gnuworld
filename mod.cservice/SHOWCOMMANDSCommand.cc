@@ -8,7 +8,7 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char SHOWCOMMANDSCommand_cc_rcsId[] = "$Id: SHOWCOMMANDSCommand.cc,v 1.14 2001/03/02 03:55:36 isomer Exp $" ;
+const char SHOWCOMMANDSCommand_cc_rcsId[] = "$Id: SHOWCOMMANDSCommand.cc,v 1.15 2001/03/03 16:56:55 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -44,7 +44,7 @@ bool SHOWCOMMANDSCommand::Exec( iClient* theClient, const string& Message )
 	{
 		bot->Notice(theClient, lvl_0_cmds);
 		if(theClient->isOper()) bot->Notice(theClient, lvl_oper_cmds);
-		bot->Notice(theClient, cmdFooter);
+//		bot->Notice(theClient, cmdFooter);
 		return true;
 	}
 
@@ -57,7 +57,7 @@ bool SHOWCOMMANDSCommand::Exec( iClient* theClient, const string& Message )
 	if (!theUser) {
 		bot->Notice(theClient, lvl_0_cmds);
 		if(theClient->isOper()) bot->Notice(theClient, lvl_oper_cmds);
-		bot->Notice(theClient, cmdFooter);
+//		bot->Notice(theClient, cmdFooter);
 		return true;	
 	}
 
@@ -97,7 +97,7 @@ bool SHOWCOMMANDSCommand::Exec( iClient* theClient, const string& Message )
 	bot->Notice(theClient, lvl_0_cmds); 
 	if (theClient->isOper()) 
 		           bot->Notice(theClient, lvl_oper_cmds);
-	bot->Notice(theClient, cmdFooter);
+//	bot->Notice(theClient, cmdFooter);
 	return true ;
 } 
 
