@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_P.cc,v 1.9 2003/12/06 22:11:36 dan_karrels Exp $
+ * $Id: msg_P.cc,v 1.10 2003/12/30 18:48:33 dan_karrels Exp $
  */
 
 #include	<string>
@@ -33,7 +33,7 @@
 #include	"StringTokenizer.h"
 #include	"config.h"
 
-RCSTAG( "$Id: msg_P.cc,v 1.9 2003/12/06 22:11:36 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: msg_P.cc,v 1.10 2003/12/30 18:48:33 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -97,23 +97,6 @@ for( Channel::userIterator userItr = theChan->userList_begin() ;
 		command,
 		message ) ;
 	} // for()
-
-/*
-for( xNetwork::localClientIterator lcItr = Network->localClient_begin() ;
-	lcItr != Network->localClient_end() ; ++lcItr )
-	{
-	// Only deliver the channel ctcp (message) if this client
-	// is on the channel, and is mode -d
-	if( lcItr->second->isOnChannel( theChan ) &&
-		!lcItr->second->getMode( iClient::MODE_DEAF ) )
-		{
-		lcItr->second->OnChannelCTCP( srcClient,
-			theChan,
-			command,
-			message ) ;
-		}
-	}
-*/
 }
 
 void channelMessage( iClient* srcClient,

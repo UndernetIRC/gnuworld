@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: client.cc,v 1.66 2003/12/29 23:59:38 dan_karrels Exp $
+ * $Id: client.cc,v 1.67 2003/12/30 18:48:33 dan_karrels Exp $
  */
 
 #include	<new>
@@ -49,7 +49,7 @@
 #include	"ELog.h"
 #include	"events.h"
 
-RCSTAG("$Id: client.cc,v 1.66 2003/12/29 23:59:38 dan_karrels Exp $" ) ;
+RCSTAG("$Id: client.cc,v 1.67 2003/12/30 18:48:33 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -177,7 +177,7 @@ return false ;
 
 bool xClient::QuoteAsServer( const string& Message )
 {
-if( MyUplink )
+if( isConnected() )
 	{
 	return MyUplink->Write( Message ) ;
 	}
@@ -264,11 +264,21 @@ if( !isConnected() )
 	return false ;
 	}
 
-return MyUplink->Write( "%s O %s :\001%s %s\001\r\n",
+string ctcpReply( "\001" ) ;
+ctcpReply += CTCP ;
+
+// Be careful not to include an extra space inside of the CTCP reply
+// if Message is empty
+if( !Message.empty() )
+	{
+	ctcpReply += string( " " ) + Message ;
+	}
+ctcpReply += "\001" ;
+
+return MyUplink->Write( "%s O %s :%s\r\n",
 	getCharYYXXX().c_str(),
 	Target->getCharYYXXX().c_str(),
-	CTCP.c_str(),
-	Message.c_str() ) ;
+	ctcpReply.c_str() ) ;
 }
 
 bool xClient::FakeMessage( const iClient* destClient,
@@ -278,7 +288,7 @@ bool xClient::FakeMessage( const iClient* destClient,
 assert( destClient != 0 ) ;
 assert( srcClient != 0 ) ;
 
-if( Message.empty() )
+if( Message.empty() || !isConnected() )
 	{
 	return false ;
 	}
@@ -296,7 +306,7 @@ bool xClient::FakeNotice( const iClient* destClient,
 assert( destClient != 0 ) ;
 assert( srcClient != 0 ) ;
 
-if( Message.empty() )
+if( Message.empty() || !isConnected() )
 	{
 	return false ;
 	}
@@ -314,7 +324,7 @@ bool xClient::FakeMessage( const Channel* theChan,
 assert( theChan != 0 ) ;
 assert( srcClient != 0 ) ;
 
-if( Message.empty() )
+if( Message.empty() || !isConnected() )
 	{
 	return false ;
 	}
@@ -332,7 +342,7 @@ bool xClient::FakeNotice( const Channel* theChan,
 assert( theChan != 0 ) ;
 assert( srcClient != 0 ) ;
 
-if( Message.empty() )
+if( Message.empty() || !isConnected() )
 	{
 	return false ;
 	}
@@ -411,19 +421,15 @@ return false ;
 
 bool xClient::Message( const string& chanName, const string& Message )
 {
-if( chanName.empty() || Message.empty() )
+if( chanName.empty() || Message.empty() || !isConnected() )
 	{
 	return false ;
 	}
 
-if( isConnected() )
-	{
-	return MyUplink->Write( "%s P %s :%s",
-		getCharYYXXX().c_str(),
-		chanName.c_str(),
-		Message.c_str() ) ;
-	}
-return false ;
+return MyUplink->Write( "%s P %s :%s",
+	getCharYYXXX().c_str(),
+	chanName.c_str(),
+	Message.c_str() ) ;
 }
 
 bool xClient::Notice( const iClient* Target, const string& Message )
@@ -431,14 +437,15 @@ bool xClient::Notice( const iClient* Target, const string& Message )
 //elog	<< "xClient::Notice( const iClient* )"
 //	<< endl ;
 
-if( isConnected() )
+if( !isConnected() )
 	{
-	return MyUplink->Write( "%s O %s :%s\r\n",
-		getCharYYXXX().c_str(),
-		Target->getCharYYXXX().c_str(),
-		Message.c_str() ) ;
+	return false ;
 	}
-return false ;
+
+return MyUplink->Write( "%s O %s :%s\r\n",
+	getCharYYXXX().c_str(),
+	Target->getCharYYXXX().c_str(),
+	Message.c_str() ) ;
 }
 
 bool xClient::Notice( const iClient* Target, const char* Message, ... )
@@ -497,7 +504,7 @@ assert( theChan != 0 ) ;
 //	<< theChan->getName()
 //	<< endl ;
 
-if( Message.empty() )
+if( Message.empty() || !isConnected() )
 	{
 	return false ;
 	}
@@ -657,7 +664,7 @@ bool xClient::Kill( iClient* theClient, const string& reason )
 {
 assert( theClient != 0 ) ;
 
-if( theClient->isModeK() )
+if( theClient->isModeK() || !isConnected() )
 	{
 	return false ;
 	}
@@ -1945,7 +1952,10 @@ bool xClient::Invite( iClient* theClient, const string& chanName )
 //assert( theClient != NULL ) ;
 
 Channel* theChan = Network->findChannel( chanName ) ;
-if( 0 == theChan )	return false ;
+if( 0 == theChan )
+	{
+	return false ;
+	}
 
 return Invite(theClient, theChan);
 }
@@ -1955,15 +1965,26 @@ bool xClient::Invite( iClient* theClient, Channel* theChan )
 assert( theClient != 0 ) ;
 assert( theChan != 0 ) ;
 
+if( !isConnected() )
+	{
+	return false ;
+	}
+
 bool OnChannel = isOnChannel( theChan ) ;
-if( !OnChannel ) Join( theChan ) ;
+if( !OnChannel )
+	{
+	Join( theChan ) ;
+	}
 
 Write( "%s I %s %s",
 	getCharYYXXX().c_str(),
 	theClient->getNickName().c_str(),
 	theChan->getName().c_str() ) ;
 
-if( !OnChannel ) Part( theChan ) ;
+if( !OnChannel )
+	{
+	Part( theChan ) ;
+	}
 
 return true ; 
 }
@@ -1990,6 +2011,11 @@ return (meUser) ? true : false ;
 bool xClient::Write( const char* format, ... )
 {
 assert( format != 0 ) ;
+
+if( !isConnected() )
+	{
+	return false ;
+	}
 
 char buf[ 4096 ] ;
 memset( buf, 0, 4096 ) ;
@@ -2088,7 +2114,8 @@ for( string::size_type modePos = 0 ; modePos < modes.size() ; ++modePos )
 		{
 		case 'b':  // Ban ?
 			{
-			Channel::const_banIterator ptr = theChan->banList_begin();
+			Channel::const_banIterator ptr =
+				theChan->banList_begin();
 			while (ptr != theChan->banList_end())
 				{
 				banVector.push_back( make_pair(
@@ -2100,28 +2127,32 @@ for( string::size_type modePos = 0 ; modePos < modes.size() ; ++modePos )
 			break;
 		case 'o':  //Chanops?
 			{
-			Channel::const_userIterator ptr = theChan->userList_begin();
-			while (ptr != theChan->userList_end())
+			Channel::const_userIterator ptr =
+				theChan->userList_begin();
+			for( ; ptr != theChan->userList_end() ; ++ptr )
 				{
 				if( ptr->second->getMode(ChannelUser::MODE_O))
 					{
 					opVector.push_back( make_pair(
 						false, ptr->second ) ) ;
-					ptr->second->removeMode(ChannelUser::MODE_O);
+					ptr->second->removeMode(
+						ChannelUser::MODE_O);
 					}
 				}
 			}
 			break;
 		case 'v':  //Chanvoice?
 			{
-			Channel::const_userIterator ptr = theChan->userList_begin();
-			while (ptr != theChan->userList_end())
+			Channel::const_userIterator ptr =
+				theChan->userList_begin();
+			for( ; ptr != theChan->userList_end() ; ++ptr )
 				{
 				if( ptr->second->getMode(ChannelUser::MODE_V))
 					{
 					voiceVector.push_back( make_pair(
 						false, ptr->second ) ) ;
-					ptr->second->removeMode(ChannelUser::MODE_V);
+					ptr->second->removeMode(
+						ChannelUser::MODE_V);
 					}
 				}
 			}
