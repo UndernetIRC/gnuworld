@@ -20,7 +20,7 @@
 #include	"misc.h"
 
 const char xNetwork_h_rcsId[] = __XNETWORK_H ;
-const char xNetwork_cc_rcsId[] = "$Id: Network.cc,v 1.2 2000/07/06 19:13:07 dan_karrels Exp $" ;
+const char xNetwork_cc_rcsId[] = "$Id: Network.cc,v 1.3 2000/07/06 20:47:06 dan_karrels Exp $" ;
 
 using std::string ;
 using std::endl ;
@@ -166,9 +166,8 @@ bool xNetwork::addChannel( Channel* theChan )
 //elog << "Adding channel: " << *theChan << endl ;
 
 return channelMap.insert(
-	channelMapType::value_type( theChan->getName().c_str(),
-	theChan ) ).second ;
-
+	channelMapType::value_type( theChan->getName(),
+		theChan ) ).second ;
 }
 
 iClient* xNetwork::findClient( const unsigned int& YY,
@@ -223,7 +222,7 @@ return findClient( yy, xxx ) ;
 
 iClient* xNetwork::findNick( const string& nick ) const
 {
-nickMapType::const_iterator ptr = nickMap.find( nick.c_str() ) ;
+nickMapType::const_iterator ptr = nickMap.find( nick ) ;
 if( ptr == nickMap.end() )
 	{
 	return 0 ;
@@ -319,7 +318,14 @@ return NULL ;
 
 Channel* xNetwork::findChannel( const string& name ) const
 {
-return channelMap.find( name.c_str() )->second ;
+channelMapType::const_iterator ptr = channelMap.find( name ) ;
+if( ptr == channelMap.end() )
+	{
+//	elog	<< "xNetwork::findChannel> Failed to find: "
+//		<< name << endl ;
+	return 0 ;
+	}
+return ptr->second ;
 }
 
 iClient* xNetwork::removeClient( const unsigned int& YY,
@@ -396,7 +402,7 @@ return removeClient( yy, xxx ) ;
 
 void xNetwork::removeNick( const string& nick )
 {
-nickMap.erase( nick.c_str() ) ;
+nickMap.erase( nick ) ;
 }
 
 /**
@@ -481,9 +487,11 @@ return removeServer( theServer->getIntYY() ) ;
 
 Channel* xNetwork::removeChannel( const string& name )
 {
-channelMapType::iterator ptr = channelMap.find( name.c_str() ) ;
+channelMapType::iterator ptr = channelMap.find( name ) ;
 if( ptr == channelMap.end() )
 	{
+	elog	<< "xNetwork::removeChannel> Failed to find channel: "
+		<< name << endl ;
 	return 0 ;
 	}
 channelMap.erase( ptr ) ;
@@ -517,8 +525,12 @@ addNick( theClient ) ;
 
 void xNetwork::addNick( iClient* theClient )
 {
-nickMap.insert( nickMapType::value_type(
-	theClient->getNickName().c_str(), theClient ) ) ;
+if( !nickMap.insert( nickMapType::value_type(
+	theClient->getNickName(), theClient ) ).second )
+	{
+	elog	<< "xNetwork::addNick> Failed to add nick: "
+		<< theClient->getNickName() << endl ;
+	}
 }
 
 /**

@@ -3,7 +3,7 @@
  */
 
 #ifndef __XNETWORK_H
-#define __XNETWORK_H "$Id: Network.h,v 1.2 2000/07/06 19:13:07 dan_karrels Exp $"
+#define __XNETWORK_H "$Id: Network.h,v 1.3 2000/07/06 20:47:06 dan_karrels Exp $"
 
 #include	<vector>
 #include	<string>
@@ -69,15 +69,13 @@ class xNetwork
 	 * instances.
 	 * TODO: This is not too scalable (need templated hashtable).
 	 */
-	typedef hash_map< const char*, Channel*, hash< const char* >, eqstr >
-		channelMapType ;
+	typedef hash_map< string, Channel*, eHash, eqstr > channelMapType ;
 //	typedef map< string, Channel*, noCaseCompare > channelMapType ;
 
 	/**
 	 * This is the type used to store the nick name/iClient* pairs.
 	 */
-	typedef hash_map< const char*, iClient*, hash< const char* >, eqstr >
-		nickMapType ;
+	typedef hash_map< string, iClient*, eHash, eqstr > nickMapType ;
 //	typedef VectorTrie< string, iClient* > nickMapType ;
 
 public:
