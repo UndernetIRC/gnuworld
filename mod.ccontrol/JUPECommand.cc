@@ -5,14 +5,16 @@
  */
 
 #include	<string>
+#include        <iomanip>
+
 #include	<cstdlib>
-#include        <iomanip.h>
 
 #include	"ccontrol.h"
+#include	"iServer.h"
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 
-const char JUPECommand_cc_rcsId[] = "$Id: JUPECommand.cc,v 1.4 2001/02/26 16:58:05 mrbean_ Exp $";
+const char JUPECommand_cc_rcsId[] = "$Id: JUPECommand.cc,v 1.5 2001/03/01 01:58:17 dan_karrels Exp $";
 
 namespace gnuworld
 {
@@ -45,13 +47,12 @@ bot->Wallops( writeMe ) ;
 // already juped.
 server->SquitServer( st[ 1 ], "Prepare to be juped" ) ;
 
-iServer* jupeServer = new iServer(
+iServer* jupeServer = new (nothrow) iServer(
 	0, // uplinkIntYY
 	"", // charYYXXX
 	st[ 1 ],
-	time( 0 ),
-	time( 0 ),
-	10 ) ;
+	time( 0 ) ) ;
+assert( jupeServer != 0 ) ;
 
 // Attach the new (fake) server.
 server->AttachServer( jupeServer, st.assemble( 2 ) ) ;
@@ -59,4 +60,5 @@ server->AttachServer( jupeServer, st.assemble( 2 ) ) ;
 return true ;
 
 }
-}
+
+} // namespace gnuworld

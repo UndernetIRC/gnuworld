@@ -47,7 +47,7 @@
 #include	"ServerTimerHandlers.h"
 
 const char xServer_h_rcsId[] = __XSERVER_H ;
-const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.79 2001/02/28 00:25:28 dan_karrels Exp $" ;
+const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.80 2001/03/01 01:58:17 dan_karrels Exp $" ;
 
 using std::string ;
 using std::vector ;
@@ -116,9 +116,7 @@ iServer* me = new (nothrow) iServer(
 	0,
 	getCharYYXXX(),
 	ServerName,
-	::time( 0 ),
-	::time( 0 ),
-	Version ) ;
+	::time( 0 ) ) ;
 assert( me != 0 ) ;
 
 if( !Network->addServer( me ) )

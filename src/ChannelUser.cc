@@ -2,18 +2,22 @@
 
 #include	<string>
 
+#include	<cassert>
+
 #include	"iClient.h"
 #include	"ChannelUser.h"
-
-using std::string ;
 
 namespace gnuworld
 {
 
+using std::string ;
+
 ChannelUser::ChannelUser( iClient* _theClient )
  : theClient( _theClient ),
    modes( 0 )
-{}
+{
+assert( theClient != 0 ) ;
+}
 
 ChannelUser::~ChannelUser()
 {}

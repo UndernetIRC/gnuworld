@@ -3,7 +3,7 @@
  */
 
 #ifndef __XNETWORK_H
-#define __XNETWORK_H "$Id: Network.h,v 1.11 2001/02/03 19:16:33 dan_karrels Exp $"
+#define __XNETWORK_H "$Id: Network.h,v 1.12 2001/03/01 01:58:17 dan_karrels Exp $"
 
 #include	<vector>
 #include	<string>
@@ -19,15 +19,15 @@
 #include	"client.h"
 #include	"misc.h" // struct noCaseCompare
 
+namespace gnuworld
+{
+
 using std::string ;
 using std::vector ;
 using std::map ;
 using std::hash ;
 using std::hash_map ;
 using std::unary_function ;
-
-namespace gnuworld
-{
 
 class xServer ;
 
@@ -377,7 +377,7 @@ public:
 	 * Return the number of channels currently stored in the
 	 * the channel table.
 	 */
-	inline size_t	channelList_size() const
+	inline size_t		channelList_size() const
 		{ return channelMap.size() ; }
 
 	/**
@@ -391,6 +391,11 @@ public:
 	 * in the client table.
 	 */
 	inline size_t	clientList_size() const ;
+
+	/**
+	 * Retrieve the number of clients on the given server.
+	 */
+	inline size_t	countClients( const iServer* theServer ) const ;
 
 	/**
 	 * A base class unary function used in foreach_xClient.

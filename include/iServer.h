@@ -4,7 +4,7 @@
  */
 
 #ifndef __ISERVER_H
-#define __ISERVER_H "$Id: iServer.h,v 1.5 2001/02/06 00:26:00 dan_karrels Exp $"
+#define __ISERVER_H "$Id: iServer.h,v 1.6 2001/03/01 01:58:17 dan_karrels Exp $"
 
 #include	<iostream>
 #include	<string>
@@ -14,10 +14,10 @@
 #include	"Numeric.h"
 #include	"ELog.h"
 
-using std::string ;
-
 namespace gnuworld
 {
+
+using std::string ;
 
 /**
  * This class represents a network server.
@@ -37,12 +37,10 @@ public:
 	 * Construct an iServer given its vital state variables
 	 * as parameters.
 	 */
-	iServer( const int& _uplink,
+	iServer( const unsigned int& _uplink,
 		const string& _yxx,
 		const string& _name,
-		const time_t& _connectTime,
-		const time_t& _startTime,
-		const int& _version ) ;
+		const time_t& _connectTime ) ;
 
 	/**
 	 * Destruct this iServer instance.
@@ -96,69 +94,6 @@ public:
 	 */
 	inline const time_t& getStartTime() const
 		{ return startTime ; }
-
-	/**
-	 * Return the version of this server.
-	 */
-	inline const int& getVersion() const
-		{ return version ; }
-
-	/**
-	 * Return the IP of this server.
-	 */
-	inline const long int& getIP() const
-		{ return IP ; }
-
-	/**
-	 * Return the number of clients that this server
-	 * holds.
-	 */
-	inline const size_t& getClients() const
-		{ return clients ; }
-
-	/**
-	 * Return the number of leaf servers this server holds.
-	 */
-	inline const size_t& getServers() const
-		{ return servers ; }
-
-	/**
-	 * Increment the number of clients this server holds.
-	 */
-	inline void incrementClients()
-		{ clients++ ; }
-
-	/**
-	 * Decrement the number of clients this server holds.
-	 */
-	inline void decrementClients()
-		{ clients-- ; }
-
-	/**
-	 * Increment the number of servers this server holds.
-	 */
-	inline void incrementServers()
-		{ servers++ ; }
-
-	/**
-	 * Decrement the number of servers this server holds.
-	 */
-	inline void decrementServers()
-		{ servers-- ; }
-
-	/**
-	 * Set the number of leaf servers this server holds to
-	 * the given number.
-	 */
-	inline void setServers( const size_t& _servers )
-		{ servers = _servers ; }
-
-	/**
-	 * Set the number of clients this server holds to the
-	 * given number.
-	 */
-	inline void setClients( const size_t& _clients )
-		{ clients = _clients ; }
 
 	/**
 	 * Nice debugging method for outputting the iServer's
@@ -218,26 +153,6 @@ protected:
 	 * The time at which this server was started.
 	 */
 	time_t		startTime ;
-
-	/**
-	 * The version number of this server.
-	 */
-	int		version ;
-
-	/**
-	 * Number of clients attached to this server.
-	 */
-	size_t		clients ;
-
-	/**
-	 * Number of servers attached to this server.
-	 */
-	size_t		servers ;
-
-	/**
-	 * The IP of this server.
-	 */
-	long int	IP ;
 
 	/**
 	 * This server's integer numeric.

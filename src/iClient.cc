@@ -14,7 +14,7 @@
 #include	"ip.h"
 
 const char iClient_h_rcsId[] = __ICLIENT_H ;
-const char iClient_cc_rcsId[] = "$Id: iClient.cc,v 1.8 2001/01/06 15:31:53 dan_karrels Exp $" ;
+const char iClient_cc_rcsId[] = "$Id: iClient.cc,v 1.9 2001/03/01 01:58:17 dan_karrels Exp $" ;
 
 using std::string ;
 using std::map ;
@@ -39,7 +39,8 @@ iClient::iClient( const unsigned int& _uplink,
 #ifdef CLIENT_DESC
 	description( _description),
 #endif
-	connectTime( _connectTime )
+	connectTime( _connectTime ),
+	mode( 0 )
 {
 if( 5 == _yxx.size() )
 	{
@@ -68,7 +69,6 @@ else
 	charXXX[ 2 ] = 0 ;
 	}
 
-mode = 0 ;
 setModes( _mode ) ;
 customDataMap = 0 ;
 }

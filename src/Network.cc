@@ -8,9 +8,7 @@
 #include	<algorithm>
 
 #include	<cstring>
-#ifndef NDEBUG
-  #include	<cassert>
-#endif
+#include	<cassert>
 
 #include	"Network.h"
 #include	"ELog.h"
@@ -22,7 +20,7 @@
 #include	"Numeric.h"
 
 const char xNetwork_h_rcsId[] = __XNETWORK_H ;
-const char xNetwork_cc_rcsId[] = "$Id: Network.cc,v 1.17 2001/02/05 20:06:38 dan_karrels Exp $" ;
+const char xNetwork_cc_rcsId[] = "$Id: Network.cc,v 1.18 2001/03/01 01:58:17 dan_karrels Exp $" ;
 
 using std::string ;
 using std::endl ;
@@ -41,9 +39,7 @@ xNetwork::~xNetwork()
 
 bool xNetwork::addClient( iClient* newClient )
 {
-#ifndef NDEBUG
-  assert( NULL != newClient ) ;
-#endif
+assert( NULL != newClient ) ;
 
 // Make sure the client is on a valid server
 networkVectorType::size_type YY =
@@ -89,7 +85,6 @@ if( clients[ YY ][ XXX ] != NULL )
 	}
 
 clients[ YY ][ XXX ] = newClient ;
-servers[ YY ]->incrementClients() ;
 
 addNick( newClient ) ;
 
@@ -103,9 +98,7 @@ return true ;
 // already have a numeric.
 bool xNetwork::addClient( xClient* newClient )
 {
-#ifndef NDEBUG
-  assert( NULL != newClient ) ;
-#endif
+assert( NULL != newClient ) ;
 
 // First, find a new numeric for this client
 xClientVectorType::size_type pos = 0 ;
@@ -136,9 +129,7 @@ return true ;
 
 bool xNetwork::addServer( iServer* newServer )
 {
-#ifndef NDEBUG
-  assert( newServer != NULL ) ;
-#endif
+assert( newServer != NULL ) ;
 
 serverVectorType::size_type YY =
 	static_cast< serverVectorType::size_type >( newServer->getIntYY() ) ;
@@ -178,9 +169,7 @@ return true ;
 
 bool xNetwork::addChannel( Channel* theChan )
 {
-#ifndef NDEBUG
-  assert( theChan != NULL ) ;
-#endif
+assert( theChan != NULL ) ;
 
 //elog << "Adding channel: " << *theChan << endl ;
 
@@ -297,7 +286,8 @@ for( xClientVectorType::size_type i = 0 ; i < localClients.size() ; i++ )
 		{
 		continue ;
 		}
-	if( !strcasecmp( nickName.c_str(), localClients[ i ]->getNickName().c_str() ) )
+	if( !strcasecmp( nickName.c_str(),
+		localClients[ i ]->getNickName().c_str() ) )
 		{
 		return localClients[ i ] ;
 		}
@@ -384,8 +374,6 @@ if( NULL == retMe )
 		<< endl ;
 	return 0 ;
 	}
-
-servers[ YY ]->decrementClients() ;
 
 // Remove all associations between client->channel
 iClient::channelIterator chanPtr = retMe->channels_begin() ;
@@ -551,9 +539,7 @@ return ptr->second ;
 
 Channel* xNetwork::removeChannel( const Channel* theChan )
 {
-#ifndef NDEBUG
-  assert( theChan != 0 ) ;
-#endif
+assert( theChan != 0 ) ;
 
 return removeChannel( theChan->getName() ) ;
 }
@@ -596,6 +582,8 @@ theServer->PostEvent( EVT_CHNICK,
 
 void xNetwork::addNick( iClient* theClient )
 {
+// This is a protected method, theClient is guaranteed to 
+// be non-NULL
 if( !nickMap.insert( nickMapType::value_type(
 	theClient->getNickName(), theClient ) ).second )
 	{
@@ -613,6 +601,7 @@ if( !nickMap.insert( nickMapType::value_type(
  */
 void xNetwork::OnSplit( const unsigned int& intYY )
 {
+// TODO: Post events
 for( serverVectorType::size_type i = 0 ; i < servers.size() ; ++i )
 	{
 	if( NULL == servers[ i ] )
@@ -664,7 +653,8 @@ size_t i = 0 ;
 for( networkVectorType::const_iterator ptr = clients.begin() ;
 	ptr != clients.end() ; ++ptr )
 	{
-	for( clientVectorType::size_type cPtr = 0 ; cPtr < (*ptr).size() ; ++cPtr )
+	for( clientVectorType::size_type cPtr = 0 ; cPtr < (*ptr).size() ;
+		++cPtr )
 		{
 		if( (*ptr)[ cPtr ] != NULL )
 			{
@@ -678,6 +668,48 @@ return i ;
 void xNetwork::foreach_xClient( xNetwork::fe_xClientBase f )
 {
 std::for_each( localClients.begin(), localClients.end(), f ) ;
+}
+
+size_t xNetwork::countClients( const iServer* theServer ) const
+{
+assert( theServer != 0 ) ;
+
+// Find the server in the internal server table
+serverVectorType::size_type serverID = 0 ;
+for( ; serverID < servers.size() ; ++serverID )
+	{
+	if( theServer == servers[ serverID ] )
+		{
+		// Found it
+		break ;
+		}
+	}
+
+// Was the server found?
+if( serverID >= servers.size() )
+	{
+	// Did not find the server
+	return 0 ;
+	}
+
+// Iterate through this server's info and count the number
+// of clients
+
+// numClients will hold the number of clients found
+size_t numClients = 0 ;
+
+for( clientVectorType::size_type clientID = 0 ;
+	clientID < clients[ serverID ].size() ; ++clientID )
+	{
+	// Only increment numClients if this client is non-NULL
+	if( NULL != clients[ serverID ][ clientID ] )
+		{
+		++numClients ;
+		}
+	}
+
+// Return the number of clients found to the caller
+return numClients ;
 }
 
 } // namespace gnuworld

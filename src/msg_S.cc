@@ -14,7 +14,7 @@
 #include	"ELog.h"
 #include	"xparameters.h"
 
-const char msg_S_cc_rcsId[] = "$Id: msg_S.cc,v 1.1 2001/02/02 18:10:30 dan_karrels Exp $" ;
+const char msg_S_cc_rcsId[] = "$Id: msg_S.cc,v 1.2 2001/03/01 01:58:17 dan_karrels Exp $" ;
 
 using std::string ;
 using std::endl ;
@@ -49,7 +49,8 @@ int xServer::MSG_S( xParameters& params )
 // We need at least 9 tokens
 if( params.size() < 9 )
 	{
-	elog	<< "xServer::MSG_S> Not enough parameters\n" ;
+	elog	<< "xServer::MSG_S> Not enough parameters"
+		<< endl ;
 	return -1 ;
 	}
 
@@ -58,13 +59,14 @@ iServer* uplinkServer = Network->findServer( uplinkIntYY ) ;
 
 if( NULL == uplinkServer )
 	{
-	elog	<< "xServer::MSG_S> Unable to find uplink server\n" ;
+	elog	<< "xServer::MSG_S> Unable to find uplink server"
+		<< endl ;
 	return -1 ;
 	}
 
 const string serverName( params[ 1 ] ) ;
 // Don't care about hop count
-time_t startTime = static_cast< time_t >( atoi( params[ 3 ] ) ) ;
+// Don't care about start time
 time_t connectTime = static_cast< time_t >( atoi( params[ 4 ] ) ) ;
 // Don't care about version
 
@@ -84,9 +86,12 @@ else
 if( NULL != Network->findServer( serverIntYY ) )
 	{
 	elog	<< "xServer::MSG_S> Server numeric collision, numeric: "
-		<< params[ 6 ] << ", old name: "
+		<< params[ 6 ]
+		<< ", old name: "
 		<< Network->findServer( serverIntYY )->getName()
-		<< ", new name: " << serverName << endl ;
+		<< ", new name: "
+		<< serverName
+		<< endl ;
 	delete Network->removeServer( serverIntYY ) ;
 	}
 
@@ -95,9 +100,7 @@ if( NULL != Network->findServer( serverIntYY ) )
 iServer* newServer = new (nothrow) iServer( uplinkIntYY,
 		params[ 6 ], // yxx
 		serverName,
-		connectTime,
-		startTime,
-		atoi( params[ 5 ] + 1 ) ) ;
+		connectTime ) ;
 assert( newServer != 0 ) ;
 
 Network->addServer( newServer ) ;

@@ -16,12 +16,12 @@
 #include	"Numeric.h"
 
 const char xIP_h_rcsId[] = __XIP_H ;
-const char xIP_cc_rcsId[] = "$Id: ip.cc,v 1.2 2000/08/04 23:39:09 dan_karrels Exp $" ;
-
-using std::string ;
+const char xIP_cc_rcsId[] = "$Id: ip.cc,v 1.3 2001/03/01 01:58:17 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
+
+using std::string ;
 
 xIP::xIP( const unsigned int& IP )
 {
@@ -42,9 +42,9 @@ xIP::xIP( const xIP& rhs )
 
 xIP::xIP( const string& IP, bool Base64 )
 {
-
 if( Base64 )
 	{
+	// TOOD: ntohl()?
 	// 30 24 18 12 6
 	this->IP = (convert2n[ IP[ 0 ] ] << 30) +
 		  (convert2n[ IP[ 1 ] ] << 24) +

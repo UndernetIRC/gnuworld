@@ -2,7 +2,7 @@
  */
 
 #ifndef __ICLIENT_H
-#define __ICLIENT_H "$Id: iClient.h,v 1.11 2001/02/06 01:46:06 dan_karrels Exp $"
+#define __ICLIENT_H "$Id: iClient.h,v 1.12 2001/03/01 01:58:17 dan_karrels Exp $"
 
 #include	<string>
 #include	<list>
@@ -14,12 +14,12 @@
 #include	"Numeric.h"
 #include	"Channel.h"
 
+namespace gnuworld
+{
+
 using std::string ;
 using std::list ;
 using std::map ;
-
-namespace gnuworld
-{
 
 class xClient ;
 
@@ -69,6 +69,7 @@ public:
 	/// Constant iterator for channels this user is on.
 	typedef channelListType::const_iterator const_channelIterator ;
 
+	/// Type used to store the number of channels for this iClient
 	typedef channelListType::size_type channels_sizeType ;
 
 	/**
@@ -369,16 +370,22 @@ protected:
 	 */
 	string		insecureHost ;
 
+#ifdef CLIENT_DESC
 	/**
 	 * This client's 'real-name' field data.
 	 */
-
-	string      description ;
+	string		description ;
+#endif // CLIENT_DESC
 
 	/**
 	 * The time at which this iClient connected to the network.
 	 */
 	time_t		connectTime ;
+
+	/**
+	 * This client's current user modes.
+	 */
+	modeType	mode ;
 
 	/**
 	 * This client's integer per-server numeric.
@@ -394,11 +401,6 @@ protected:
 	 * This client's per-server character numeric.
 	 */
 	char		charXXX[ 4 ] ;
-
-	/**
-	 * This client's current user modes.
-	 */
-	modeType	mode ;
 
 	/**
 	 * This client's integer network numeric.

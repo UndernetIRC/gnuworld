@@ -8,27 +8,23 @@
 #include	"Numeric.h"
 
 const char iServer_h_rcsId[] = __ISERVER_H ;
-const char iServer_cc_rcsId[] = "$Id: iServer.cc,v 1.2 2000/07/31 15:17:25 dan_karrels Exp $" ;
+const char iServer_cc_rcsId[] = "$Id: iServer.cc,v 1.3 2001/03/01 01:58:17 dan_karrels Exp $" ;
 
 using std::string ;
 
 namespace gnuworld
 {
 
-iServer::iServer( const int& _uplink,
+iServer::iServer( const unsigned int& _uplink,
 	const string& _yxx,
 	const string& _name,
-	const time_t& _connectTime,
-	const time_t& _startTime,
-	const int& _version )
+	const time_t& _connectTime )
 : uplinkIntYY( _uplink ),
 	name( _name ),
-	connectTime( _connectTime ),
-	startTime( _startTime ),
-	version( _version )
+	connectTime( _connectTime )
 {
 
-if( _yxx.size() == 5 )
+if( 5 == _yxx.size() )
 	{
 	// yyxxx, n2k
 	intYY = base64toint( _yxx.c_str(), 2 ) ;
@@ -46,9 +42,6 @@ else
 
 	intXXX = base64toint( _yxx.c_str() + 1, 2 ) ;
 	}
-
-clients = servers = 0 ;
-IP = 0 ;
 }
 
 iServer::~iServer()

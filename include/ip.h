@@ -6,14 +6,14 @@
  */
 
 #ifndef __XIP_H
-#define __XIP_H "$Id: ip.h,v 1.2 2000/08/04 23:39:09 dan_karrels Exp $"
+#define __XIP_H "$Id: ip.h,v 1.3 2001/03/01 01:58:17 dan_karrels Exp $"
 
 #include	<string>
 
-using std::string ;
-
 namespace gnuworld
 {
+
+using std::string ;
 
 /**
  * A utility class that is used to retrieve information about

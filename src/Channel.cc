@@ -43,11 +43,13 @@ userList.clear() ;
 
 bool Channel::addUser( ChannelUser* newUser )
 {
+assert( newUser != 0 ) ;
+
 if( !userList.insert(
 	userListType::value_type( newUser->getIntYYXXX(), newUser ) ).second )
 	{
-//	elog	<< "Channel::addUser> (" << getName() << "): "
-//		<< "Unable to add user: " << *newUser << endl ;
+	elog	<< "Channel::addUser> (" << getName() << "): "
+		<< "Unable to add user: " << *newUser << endl ;
 	return false ;
 	}
 
@@ -60,16 +62,15 @@ return true ;
 bool Channel::addUser( iClient* theClient )
 {
 ChannelUser* addMe = new (nothrow) ChannelUser( theClient ) ;
-assert( addMe != 0 ) ;
 
+// The signature of addUser() here will verify the pointer
 return addUser( addMe ) ;
 }
 
 ChannelUser* Channel::removeUser( iClient* theClient )
 {
-#ifndef NDEBUG
-  assert( theClient != 0 ) ;
-#endif
+// This method is public, so the pointer must be validated
+assert( theClient != 0 ) ;
 
 return removeUser( theClient->getIntYYXXX() ) ;
 }
@@ -83,17 +84,18 @@ if( ptr != userList.end() )
 	return ptr->second ;
 	}
 
-//elog		<< "Channel::removeUser> (" << getName() << ") "
-//		<< "Unable to find user: " << intYYXXX << std::endl ;
+elog	<< "Channel::removeUser> ("
+	<< getName() << ") "
+	<< "Unable to find user: "
+	<< intYYXXX
+	<< std::endl ;
 
 return 0 ;
 }
 
 ChannelUser* Channel::findUser( iClient* theClient ) const
 {
-#ifndef NDEBUG
-  assert( theClient != 0 ) ;
-#endif
+assert( theClient != 0 ) ;
 
 userListType::const_iterator ptr = userList.find( theClient->getIntYYXXX() ) ;
 if( ptr == userList.end() )
@@ -121,6 +123,8 @@ return true ;
 bool Channel::setUserMode( const ChannelUser::modeType& whichMode,
 	iClient* theClient )
 {
+
+// findUser() is also public, and so will verify theClient's pointer
 ChannelUser* theChanUser = findUser( theClient ) ;
 if( NULL == theChanUser )
 	{
@@ -135,6 +139,8 @@ return true ;
 bool Channel::getUserMode( const ChannelUser::modeType& whichMode,
 	iClient* theClient ) const
 {
+
+// findUser() is also public, and so will verify theClient's pointer
 ChannelUser* theChanUser = findUser( theClient ) ;
 if( NULL == theChanUser )
 	{
@@ -147,9 +153,7 @@ return theChanUser->getMode( whichMode ) ;
 
 void Channel::setBan( const string& newBan )
 {
-// TODO: Remove ambiguous bans, although this should be in
-// the xServer class somewhere so that events can
-// be posted withouth increasing coupling
+// xServer will worry about removing conflicting bans
 banList.push_front( newBan ) ;
 }
 
@@ -184,7 +188,7 @@ bool Channel::matchBan( const string& banMask ) const
 for( banListType::const_iterator ptr = banList.begin(),
 	end = banList.end() ; ptr != end ; ++ptr )
 	{
-	if( !match( banMask.c_str(), ptr->c_str() ) )
+	if( !match( banMask, *ptr ) )
 		{
 		// Found a match
 		return true ;
@@ -199,7 +203,7 @@ bool Channel::getMatchingBan( const string& banMask,
 for( banListType::const_iterator ptr = banList.begin(),
 	end = banList.end() ; ptr != end ; ++ptr )
 	{
-	if( !match( banMask.c_str(), ptr->c_str() ) )
+	if( !match( banMask, *ptr ) )
 		{
 		matchingBan = *ptr ;
 		return true ;

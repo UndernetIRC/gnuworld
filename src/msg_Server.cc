@@ -14,12 +14,12 @@
 #include	"ELog.h"
 #include	"xparameters.h"
 
-const char msg_Server_cc_rcsId[] = "$Id: msg_Server.cc,v 1.3 2001/02/06 01:46:06 dan_karrels Exp $" ;
-
-using std::endl ;
+const char msg_Server_cc_rcsId[] = "$Id: msg_Server.cc,v 1.4 2001/03/01 01:58:17 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
+
+using std::endl ;
 
 /**
  * New server message
@@ -79,9 +79,7 @@ if( Param[ 1 ][ 0 ] == '1' )
 		uplinkYY,
 		Param[ 5 ], // yyxxx
 		Param[ 0 ], // name
-		atoi( Param[ 3 ] ), // connect time
-		atoi( Param[ 2 ] ), // start time
-		atoi( Param[ 4 ] + 1 ) ) ; // version
+		atoi( Param[ 3 ] ) ) ; // connect time
 	assert( Uplink != 0 ) ;
 
 	// Find this server (me)

@@ -2,6 +2,7 @@
  * Author: Daniel Karrels dan@karrels.com
  */
 
+#include	<new>
 #include	<vector>
 #include	<iostream>
 #include	<strstream>
@@ -20,14 +21,14 @@
 #include	"misc.h"
 #include	"ELog.h"
 
+namespace gnuworld
+{
+
 using std::vector ;
 using std::endl ;
 using std::strstream ;
 using std::ends ;
 using std::string ;
-
-namespace gnuworld
-{
 
 /*
  *  Exported function used by moduleLoader to gain an
@@ -81,13 +82,12 @@ if( userNames.empty() )
 	exit( 0 ) ;
 	}
 
-fakeServer = new iServer(
+fakeServer = new (nothrow) iServer(
 	0, // uplinkIntYY
 	"", // charYYXXX
 	conf.Find( "fakeservername" )->second,
-	time( 0 ),
-	time( 0 ),
-	10 ) ;
+	time( 0 ) ) ;
+assert( fakeServer != 0 ) ;
 
 }
 
@@ -171,25 +171,26 @@ return 0 ;
 void cloner::addClone()
 {
 
-char buf[ 4 ] ;
+char buf[ 4 ] = { 0 } ;
 
 string yyxxx( fakeServer->getCharYY() ) ;
 
-inttobase64( buf, fakeServer->getClients() + 1, 3 ) ;
+inttobase64( buf, Network->countClients( fakeServer ) + 1, 3 ) ;
 buf[ 3 ] = 0 ;
 
 yyxxx += buf ;
 
-MyUplink->AttachClient( new iClient(
-	fakeServer->getIntYY(),
-	yyxxx,
-	randomNick( 5 ),
-	randomUser(),
-	randomNick( 6, 6 ),
-	randomHost(),
-	randomMode(), 
-	"I'm a clone.",
-	time( 0 ) ) ) ;
+MyUplink->AttachClient(
+	new iClient(
+		fakeServer->getIntYY(),
+		yyxxx,
+		randomNick( 5 ),
+		randomUser(),
+		randomNick( 6, 6 ),
+		randomHost(),
+		randomMode(), 
+		"I'm a clone.",
+		::time( 0 ) ) ) ;
 
 }
 
