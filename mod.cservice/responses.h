@@ -1,5 +1,5 @@
 #ifndef __RESPONSES_H
-#define __RESPONSES_H "$Id: responses.h,v 1.1 2000/12/28 21:19:53 gte Exp $"
+#define __RESPONSES_H "$Id: responses.h,v 1.2 2000/12/30 05:47:29 gte Exp $"
 
 /* 
  * responses.h
@@ -10,7 +10,7 @@
  * Defines 'response' ID's, unique references to textual responses
  * from the bot.
  *
- * $Id: responses.h,v 1.1 2000/12/28 21:19:53 gte Exp $
+ * $Id: responses.h,v 1.2 2000/12/30 05:47:29 gte Exp $
  */
 
 namespace gnuworld { 
@@ -25,6 +25,7 @@ namespace gnuworld {
 		const int chan_not_reg =      7;
 		const int youre_opped_by =    8;
 		const int youre_voiced_by =   9;
+		const int invited_by =       10;
 	}
 }
 

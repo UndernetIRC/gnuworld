@@ -1,5 +1,5 @@
 #ifndef __CSERVICECOMMANDS_H
-#define __CSERVICECOMMANDS_H "$Id: cserviceCommands.h,v 1.8 2000/12/30 00:36:38 gte Exp $"
+#define __CSERVICECOMMANDS_H "$Id: cserviceCommands.h,v 1.9 2000/12/30 05:47:29 gte Exp $"
 
 #include	<string>
 #include	"iClient.h"
@@ -81,7 +81,9 @@ DECLARE_COMMAND( VOICE )
 DECLARE_COMMAND( ADDUSER )
 DECLARE_COMMAND( REMUSER )
 DECLARE_COMMAND( MODINFO )
-DECLARE_COMMAND( SET )
+DECLARE_COMMAND( SET ) 
+DECLARE_COMMAND( INVITE )
+DECLARE_COMMAND( TOPIC )
  
 } // namespace gnuworld
 
