@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: WHOISCommand.cc,v 1.20 2003/08/09 23:15:34 dan_karrels Exp $
+ * $Id: WHOISCommand.cc,v 1.21 2004/01/11 11:13:01 dan_karrels Exp $
  */
 
 #include	<string>
@@ -32,7 +32,7 @@
 #include	"ip.h"
 #include	"config.h"
 
-RCSTAG( "$Id: WHOISCommand.cc,v 1.20 2003/08/09 23:15:34 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: WHOISCommand.cc,v 1.21 2004/01/11 11:13:01 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -74,7 +74,7 @@ if((Target->isModeX()) && (Target->isModeR()))
 		st[ 1 ].c_str(),
 		Target->getNickUserHost().c_str(),
 		Target->getRealNickUserHost().c_str(),
-		xIP(Target->getIP() ).GetNumericIP()
+		xIP(Target->getIP() ).GetNumericIP().c_str()
 	) ;
 	
 	}
@@ -83,7 +83,7 @@ else
 	bot->Notice( theClient, "%s is %s [%s]",
 		st[ 1 ].c_str(),
 		Target->getNickUserHost().c_str(),
-		xIP(Target->getIP() ).GetNumericIP()
+		xIP(Target->getIP() ).GetNumericIP().c_str()
 		) ;
 	}
 

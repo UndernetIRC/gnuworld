@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * "$Id: msg_AC.cc,v 1.3 2003/12/29 23:59:36 dan_karrels Exp $"
+ * "$Id: msg_AC.cc,v 1.4 2004/01/11 11:13:01 dan_karrels Exp $"
  */
 
 #include	<iostream>
@@ -30,7 +30,7 @@
 #include	"ELog.h"
 #include	"config.h"
 
-RCSTAG( "$Id: msg_AC.cc,v 1.3 2003/12/29 23:59:36 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: msg_AC.cc,v 1.4 2004/01/11 11:13:01 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -52,10 +52,21 @@ if( Param.size() != 3 )
 	return false ;
 	}
 
+if( 0 == Network->findClient( Param[ 0 ] ) )
+	{
+	elog	<< "msg_AC> Unable to find source client: "
+		<< Param[ 0 ]
+		<< std::endl ;
+	return false ;
+	}
+
 // Find the target user
-iClient* theClient = Network->findClient(Param[1]);
+iClient* theClient = Network->findClient( Param[ 1 ] ) ;
 if( !theClient )
 	{
+	elog	<< "msg_AC> Unable to find target client: "
+		<< Param[ 1 ]
+		<< std::endl ;
 	return false;
 	}
 
