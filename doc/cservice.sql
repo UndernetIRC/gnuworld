@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------------
--- "$Id: cservice.sql,v 1.21 2001/02/14 19:12:31 gte Exp $"
+-- "$Id: cservice.sql,v 1.22 2001/02/14 20:18:37 gte Exp $"
 -- Channel service DB SQL file for PostgreSQL.
 
 -- ChangeLog:
@@ -201,6 +201,7 @@ CREATE TABLE channellog (
 -- 0x00 01 -- EV_MISC - Uncategorised event.
 -- 0x00 02 -- EV_JOIN - When someone 'JOIN's the bot.
 -- 0x00 04 -- EV_PART - When someone 'PART's the bot. 
+-- 0x00 08 -- EV_FORCE - When someone FORCE's access in a channel.
 	message TEXT,
 	last_updated INT4 NOT NULL,
 	deleted INT2 DEFAULT '0'
