@@ -2830,7 +2830,7 @@ switch( whichEvent )
 						/* Already cached, update and save. */
 						trafRecord = Tptr->second;
 						trafRecord->join_count++;
-						trafRecord->commit();
+						//trafRecord->commit();
 						}
 
 						ptr->second->unique_join_count = ptr->second->trafficList.size();
