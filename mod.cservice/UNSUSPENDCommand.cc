@@ -8,7 +8,7 @@
  *
  * Caveats: None.
  *
- * $Id: UNSUSPENDCommand.cc,v 1.6 2001/02/16 20:20:26 plexus Exp $
+ * $Id: UNSUSPENDCommand.cc,v 1.7 2001/02/20 23:01:56 gte Exp $
  */
 
 #include	<string>
@@ -20,7 +20,7 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char UNSUSPENDCommand_cc_rcsId[] = "$Id: UNSUSPENDCommand.cc,v 1.6 2001/02/16 20:20:26 plexus Exp $" ;
+const char UNSUSPENDCommand_cc_rcsId[] = "$Id: UNSUSPENDCommand.cc,v 1.7 2001/02/20 23:01:56 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -109,7 +109,7 @@ bool UNSUSPENDCommand::Exec( iClient* theClient, const string& Message )
 	aLevel->setSuspendExpire(0);
 	aLevel->setSuspendBy("");
 	aLevel->setLastModif(bot->currentTime());
-	aLevel->setLastModifBy(theClient->getNickUserHost()); 
+	aLevel->setLastModifBy( string( "(" + theUser->getUserName() + ") " +theClient->getNickUserHost() ) ); 
 	aLevel->commit();
 
 	bot->Notice(theClient, 

@@ -13,7 +13,7 @@
  * Shouldn't really happen, as trying to MODINFO a forced access doesn't
  * make sense - adduser and then MODINFO that :)
  *
- * $Id: MODINFOCommand.cc,v 1.12 2001/02/16 20:20:26 plexus Exp $
+ * $Id: MODINFOCommand.cc,v 1.13 2001/02/20 23:01:56 gte Exp $
  */
 
 #include	<string>
@@ -24,7 +24,7 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char MODINFOCommand_cc_rcsId[] = "$Id: MODINFOCommand.cc,v 1.12 2001/02/16 20:20:26 plexus Exp $" ;
+const char MODINFOCommand_cc_rcsId[] = "$Id: MODINFOCommand.cc,v 1.13 2001/02/20 23:01:56 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -169,7 +169,7 @@ bool MODINFOCommand::Exec( iClient* theClient, const string& Message )
 		sqlLevel* aLevel = bot->getLevelRecord(targetUser, theChan);
 		aLevel->setAccess(newAccess);
 		aLevel->setLastModif(bot->currentTime());
-		aLevel->setLastModifBy(theClient->getNickUserHost());
+		aLevel->setLastModifBy( string( "(" + theUser->getUserName() + ") " +theClient->getNickUserHost() ) );
 
 		// Only commit changes if this has been loaded from the Db.
 		// (Ie: If its a forced temporary access, this flag won't be set)..

@@ -10,7 +10,7 @@
 #include	"responses.h" 
 #include	"networkData.h"
 
-const char NEWPASSCommand_cc_rcsId[] = "$Id: NEWPASSCommand.cc,v 1.5 2001/02/20 16:24:04 dan_karrels Exp $" ;
+const char NEWPASSCommand_cc_rcsId[] = "$Id: NEWPASSCommand.cc,v 1.6 2001/02/20 23:01:56 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -56,6 +56,8 @@ string salt;
 srand(clock() * 1000000); 
 
 // TODO: What is the significance of '8' here?
+// Schema states a fixed 8 bytes of random salt are used in generating the 
+// passowrd.
 for ( unsigned short int i = 0 ; i < 8; i++) 
 	{ 
 	int randNo = 1+(int) (64.0*rand()/(RAND_MAX+1.0));

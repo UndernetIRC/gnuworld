@@ -169,7 +169,7 @@ RegisterCommand(new OPERPARTCommand(this, "OPERPART", "<#channel>", 8));
 RegisterCommand(new CLEARMODECommand(this, "CLEARMODE", "<#channel>", 4));
 
 RegisterCommand(new REMIGNORECommand(this, "REMIGNORE", "<mask>", 5));
-RegisterCommand(new REGISTERCommand(this, "REGISTER", "<#channel> <usename>", 8));
+RegisterCommand(new REGISTERCommand(this, "REGISTER", "<#channel> <username>", 8));
 RegisterCommand(new PURGECommand(this, "PURGE", "<#channel> <reason>", 8));
 RegisterCommand(new FORCECommand(this, "FORCE", "<#channel>", 8));
 RegisterCommand(new UNFORCECommand(this, "UNFORCE", "<#channel>", 8));
@@ -660,7 +660,7 @@ else if(Command == "VERSION")
 	xClient::DoCTCP(theClient, CTCP,
 		"Undernet P10 Channel Services Version 2 ["
 		__DATE__ " " __TIME__
-		"] ($Id: cservice.cc,v 1.113 2001/02/20 22:31:04 gte Exp $)");
+		"] ($Id: cservice.cc,v 1.114 2001/02/20 23:01:56 gte Exp $)");
 	}
 else if(Command == "PROBLEM?")
 	{
