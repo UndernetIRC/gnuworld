@@ -197,6 +197,7 @@ RegisterCommand(new SAYCommand(this, "SAY", "<#channel> <text>", 5));
 RegisterCommand(new QUOTECommand(this, "QUOTE", "<text>", 5));
 RegisterCommand(new REHASHCommand(this, "REHASH", "[translations]", 5));
 RegisterCommand(new STATSCommand(this, "STATS", "", 8));
+RegisterCommand(new ADDCOMMENTCommand(this, "ADDCOMMENT", "<username> <comment>", 10));
 
 cserviceConfig = new (std::nothrow) EConfig( args ) ;
 assert( cserviceConfig != 0 ) ;
@@ -732,7 +733,7 @@ else if(Command == "VERSION")
 	xClient::DoCTCP(theClient, CTCP,
 		"Undernet P10 Channel Services II ["
 		__DATE__ " " __TIME__
-		"] Release 1.1pl1");
+		"] Release 1.1pl2");
 	}
 else if(Command == "PROBLEM?")
 	{

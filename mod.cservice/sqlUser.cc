@@ -4,7 +4,7 @@
  * Storage class for accessing user information either from the backend
  * or internal storage.
  *
- * $Id: sqlUser.cc,v 1.27 2001/09/26 01:26:40 gte Exp $
+ * $Id: sqlUser.cc,v 1.28 2001/10/07 23:22:17 gte Exp $
  */
 
 #include	<strstream.h>
@@ -29,8 +29,9 @@ const sqlUser::flagType sqlUser::F_GLOBAL_SUSPEND =	0x01 ;
 const sqlUser::flagType sqlUser::F_LOGGEDIN =		0x02 ;
 const sqlUser::flagType sqlUser::F_INVIS =			0x04 ;
 
-const unsigned int sqlUser::EV_SUSPEND 	= 1;
+const unsigned int sqlUser::EV_SUSPEND		= 1;
 const unsigned int sqlUser::EV_UNSUSPEND	= 2;
+const unsigned int sqlUser::EV_COMMENT		= 3;
 
 sqlUser::sqlUser(PgDatabase* _SQLDb)
  : networkClient(0),

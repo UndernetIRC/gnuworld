@@ -18,7 +18,7 @@
  *
  * Caveats: None.
  *
- * $Id: SETCommand.cc,v 1.43 2001/09/05 03:47:56 gte Exp $
+ * $Id: SETCommand.cc,v 1.44 2001/10/07 23:22:17 gte Exp $
  */
 
 #include	<string>
@@ -29,7 +29,7 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char SETCommand_cc_rcsId[] = "$Id: SETCommand.cc,v 1.43 2001/09/05 03:47:56 gte Exp $" ;
+const char SETCommand_cc_rcsId[] = "$Id: SETCommand.cc,v 1.44 2001/10/07 23:22:17 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -911,7 +911,7 @@ else
 	if(option == "COMMENT")
 	{
 	    /* Check for admin access */
-	    if(bot->getAdminAccessLevel(theUser) < level::set::comment)
+	    if(level < level::set::comment)
 			{
 			/* No need to tell users about admin commands. */
 			Usage(theClient);

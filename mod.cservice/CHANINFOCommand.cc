@@ -13,7 +13,7 @@
  *
  * Command is aliased "INFO".
  *
- * $Id: CHANINFOCommand.cc,v 1.32 2001/09/26 01:10:31 gte Exp $
+ * $Id: CHANINFOCommand.cc,v 1.33 2001/10/07 23:22:17 gte Exp $
  */
 
 #include	<string>
@@ -26,7 +26,7 @@
 #include	"libpq++.h"
 #include	"cservice_config.h"
 
-const char CHANINFOCommand_cc_rcsId[] = "$Id: CHANINFOCommand.cc,v 1.32 2001/09/26 01:10:31 gte Exp $" ;
+const char CHANINFOCommand_cc_rcsId[] = "$Id: CHANINFOCommand.cc,v 1.33 2001/10/07 23:22:17 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -47,6 +47,9 @@ if( st.size() < 2 )
 	}
 
 sqlUser* tmpUser = bot->isAuthed(theClient, false);
+
+int adminAccess = 0;
+if (tmpUser) adminAccess = bot->getAdminAccessLevel(tmpUser);
 
 /*
  *  Are we checking info about a user or a channel?
@@ -145,14 +148,19 @@ if( string::npos == st[ 1 ].find_first_of( '#' ) )
 		bot->Notice(theClient, "\002** This account has been suspended by a CService Administrator **\002");
 		}
 
-	int adminAccess = 0;
-	if (tmpUser) adminAccess = bot->getAdminAccessLevel(tmpUser);
-
 	if(adminAccess)
 	{
 	/*
 	 * Show admins some more details about the user.
 	 */
+	unsigned int theTime;
+	string userComments = theUser->getLastEvent(sqlUser::EV_COMMENT, theTime);
+
+	if (!userComments.empty())
+		{
+			bot->Notice(theClient,"\002Admin Comment\002: %s ago (%s)", bot->prettyDuration(theTime).c_str(),
+				userComments.c_str());
+		}
 
 	if (theUser->getFlag(sqlUser::F_GLOBAL_SUSPEND))
 		{
@@ -346,7 +354,7 @@ if( !theChan->getDescription().empty() )
 		theChan->getDescription().c_str());
 	}
 
-if( !theChan->getComment().empty() )
+if( !theChan->getComment().empty() && adminAccess )
 	{
 	if((tmpUser) && bot->getAdminAccessLevel(tmpUser))
 		{

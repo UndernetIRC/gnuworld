@@ -6,7 +6,7 @@
 #include	"ELog.h"
 #include	"cservice.h"
 
-const char SUPPORTCommand_cc_rcsId[] = "$Id: SUPPORTCommand.cc,v 1.3 2001/09/05 03:47:56 gte Exp $" ;
+const char SUPPORTCommand_cc_rcsId[] = "$Id: SUPPORTCommand.cc,v 1.4 2001/10/07 23:22:17 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -320,7 +320,7 @@ if (supportChar == 'N')
 					<< escapeSQLChars(managerName) << "', '"
 					<< escapeSQLChars(managerEmail) << "', "
 					<< "'', "
-					<< "1, (now()::abstime::int4 + (86400*30)), now()::abstime::int4, '* REGPROC', '-NON SUPPORT-'"
+					<< "1, (now()::abstime::int4 + (86400*3)), now()::abstime::int4, '* REGPROC', '-NON SUPPORT-'"
 					<< ")" << ends;
 
 		elog	<< "SUPPORTCommand::sqlQuery> "
