@@ -1,7 +1,7 @@
 #!/usr/local/pgsql/bin/pgtclsh
-# $Id: appjudge,v 1.9 2003/07/14 10:35:44 nighty Exp $
+# $Id: appjudge,v 1.10 2003/07/19 01:12:53 nighty Exp $
 # Author: sengaia@undernet.org, 20010619
-# Last fix: nighty@undernet.org, 20030115 (fixed a typo hDB <> hSQL, and a forgoten variable reset in Step3)
+# Last modif: nighty@undernet.org, 20030717 (added a feature to rejects apps with anyone suspended on it at review time)
 # This script automates a good part of the channel-registration process, you need
 # to set up sensible settings in appjudge-config for it to do you any good though.
 
@@ -21,7 +21,7 @@ proc log_channel {hDB channel_id state areason acode} {
 		set mgr_name [lindex [array get mgr_res "user_name"] 1]
                 set mgr_flags [lindex [array get mgr_res "flags"] 1]
 		set mgr_what "$mgr_name ($mgr_id"
-		if {[expr $mgr_flags && 8]} { set mgr_what "${mgr_what}, fraud)" } else { set mgr_what "${mgr_what})" }
+		if {[expr $mgr_flags & 8]} { set mgr_what "${mgr_what}, fraud)" } else { set mgr_what "${mgr_what})" }
 	}
 
 	# gather the supporters
@@ -35,7 +35,7 @@ proc log_channel {hDB channel_id state areason acode} {
 			set user_name [lindex [array get user_res "user_name"] 1]
 			set user_flags [lindex [array get user_res "flags"] 1]
 			set user_what "$user_name ($sup_id"
-			if {[expr $user_flags && 8]} { set user_what "${user_what}, fraud)" } else { set user_what "${user_what})" }
+			if {[expr $user_flags & 8]} { set user_what "${user_what}, fraud)" } else { set user_what "${user_what})" }
 			set sup_list "${sup_list}, $user_what"
 		}
 	}
@@ -84,7 +84,7 @@ proc check_comments {hDB channel_id} {
 }
 
 # Open the DB
-if {$SQL_PASS == ""} { 
+if {$SQL_PASS == ""} {
 	set hSQL [pg_connect -conninfo "dbname=$SQL_DB user=$SQL_USER"]
 } else {
 	set hSQL [pg_connect -conninfo "dbname=$SQL_DB password=$SQL_PASS user=$SQL_USER"]
@@ -148,33 +148,54 @@ pg_select $hSQL "SELECT channel_id,status,manager_id,reviewed FROM pending WHERE
 	set mgr_id [lindex [array get t_notified "manager_id"] 1]
 	set reviewed [lindex [array get t_notified "reviewed"] 1]
 	# Figure out what to do
-	if {![check_comments $hSQL $chan_id]} {
+	if {![check_comments $hSQL $chan_id]} { # 0 objection found !
 
 		# Has a human being seen this application?
 		if {$reviewed == "Y"} {
-			# check for fraudulent users
 			set supporter_ids ""
 			pg_select $hSQL "SELECT channel_id,user_id FROM supporters WHERE (channel_id = $chan_id)" sup_res {
                 		lappend supporter_ids [lindex [array get sup_res "user_id"] 1]
         		}
+			# check for fraudulous users
 			set isfraud 0
 		        foreach sup_id $supporter_ids  {
                 		pg_select $hSQL "SELECT id,user_name,flags FROM users where id=$sup_id" user_res {
 	                        	set user_flags [lindex [array get user_res "flags"] 1]
-	                        	if {[expr $user_flags && 8]} { incr isfraud }
+	                        	if {[expr $user_flags & 8]} { incr isfraud }
                 		}
         		}
-			if {$isfraud > 0} {
-				puts [format "%s: Moving channel %s to status %d (%d fraudulent supporters found)" [clock_stamp] [get_channel $hSQL $chan_id] $AS_PENDREVIEW $isfraud]
+               		pg_select $hSQL "SELECT id,user_name,flags FROM users where id=$mgr_id" user_res {
+                        	set user_flags [lindex [array get user_res "flags"] 1]
+                        	if {[expr $user_flags & 8]} { incr isfraud }
+               		}
+			if {$isfraud > 0} { # move it to 'Ready for review' is anyone if fraudulous
+				puts [format "%s: Moving channel %s to status %d (%d fraudulent applicant/supporters found)" [clock_stamp] [get_channel $hSQL $chan_id] $AS_PENDREVIEW $isfraud]
 				pg_exec $hSQL "UPDATE pending SET status=$AS_PENDREVIEW,last_updated=now()::abstime::int4 WHERE channel_id=$chan_id"
 			} else {
-				# Register the channel
-		        	log_channel $hSQL $chan_id "ACCEPTED" "All checks passed." 7
-				puts [format "%s: Moving channel %s to status %d (notify period ended)" [clock_stamp] [get_channel $hSQL $chan_id] $AS_COMPLETED]
-				pg_exec $hSQL "UPDATE pending SET status=$AS_COMPLETED,reviewed_by_id=$REVIEWER_ID,decision_ts=now()::abstime::int4,decision='Accepted by The Judge', last_updated=now()::abstime::int4 WHERE channel_id=$chan_id"
-				puts [format "%s: Registering channel %s (all checks passed)" [clock_stamp] [get_channel $hSQL $chan_id]]
-				pg_exec $hSQL "UPDATE channels SET registered_ts=now()::abstime::int4, last_updated = now()::abstime::int4 WHERE id=$chan_id"
-				pg_exec $hSQL "INSERT INTO levels (channel_id,user_id,access,added,added_by,last_modif,last_modif_by,last_updated) VALUES($chan_id,$mgr_id,500,now()::abstime::int4,'The Judge',now()::abstime::int4,'The Judge',now()::abstime::int4)"
+				# check for suspended applicant/supporter
+				set issusp 0
+			        foreach sup_id $supporter_ids  {
+	                		pg_select $hSQL "SELECT id,user_name,flags FROM users where id=$sup_id" user_res {
+		                        	set user_flags [lindex [array get user_res "flags"] 1]
+		                        	if {[expr $user_flags & 1]} { incr issusp }
+	                		}
+	        		}
+	               		pg_select $hSQL "SELECT id,user_name,flags FROM users where id=$mgr_id" user_res {
+	                        	set user_flags [lindex [array get user_res "flags"] 1]
+	                        	if {[expr $user_flags & 1]} { incr issusp }
+	               		}
+				if ($issusp > 0) { # reject the channel if any suspended found !
+					puts [format "%s: Moving channel %s to status %d (%d suspended applicant/supporters found)" [clock_stamp] [get_channel $hSQL $chan_id] $AS_REJECTED $issusp]
+					reject_app $hSQL $chan_id "The applicant and/or one or more of the supporters are suspended."
+				} else {
+					# Register the channel
+			        	log_channel $hSQL $chan_id "ACCEPTED" "All checks passed." 7
+					puts [format "%s: Moving channel %s to status %d (notify period ended)" [clock_stamp] [get_channel $hSQL $chan_id] $AS_COMPLETED]
+					pg_exec $hSQL "UPDATE pending SET status=$AS_COMPLETED,reviewed_by_id=$REVIEWER_ID,decision_ts=now()::abstime::int4,decision='Accepted by The Judge', last_updated=now()::abstime::int4 WHERE channel_id=$chan_id"
+					puts [format "%s: Registering channel %s (all checks passed)" [clock_stamp] [get_channel $hSQL $chan_id]]
+					pg_exec $hSQL "UPDATE channels SET registered_ts=now()::abstime::int4, last_updated = now()::abstime::int4 WHERE id=$chan_id"
+					pg_exec $hSQL "INSERT INTO levels (channel_id,user_id,access,added,added_by,last_modif,last_modif_by,last_updated) VALUES($chan_id,$mgr_id,500,now()::abstime::int4,'The Judge',now()::abstime::int4,'The Judge',now()::abstime::int4)"
+				}
 			}
 		} else {
 			# No, label it for review

@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------------
--- "$Id: cservice.sql,v 1.75 2003/05/08 11:57:01 nighty Exp $"
+-- "$Id: cservice.sql,v 1.76 2003/07/19 01:12:53 nighty Exp $"
 -- Channel service DB SQL file for PostgreSQL.
 
 -- ChangeLog:
@@ -298,6 +298,8 @@ CREATE TABLE userlog (
 -- 8 -- EV_PWRESET - When a user's verif q/a get changed
 -- 9 -- EV_FPASSWD - When a user uses "Forgotten Password"
 -- 10-- EV_PWCHANGE - When a user changes his password on the web (New Password)
+-- 11-- EV_POSTCOMPLAINT - When a user identified posts a complaint on the web
+-- 12-- EV_POSTCLOSE - When a Ticket/Complaint is closed or resolved.
 	message TEXT,
 	last_updated INT4 NOT NULL 
 );
