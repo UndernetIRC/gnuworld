@@ -1927,6 +1927,15 @@ if( !theChan )
 	return;
 	}
 
+sqlChannel* reggedChan = getChannelRecord(theChan->getName());
+
+if (!reggedChan) return false;
+
+if (!reggedChan->getInChan())
+	{ 
+	return false;
+	}
+
 vector< iClient* > deopList;
 
 for( Channel::const_userIterator ptr = theChan->userList_begin();
@@ -1982,6 +1991,15 @@ if( !theChan )
 	return;
 	}
 
+sqlChannel* reggedChan = getChannelRecord(theChan->getName());
+
+if (!reggedChan) return false;
+
+if (!reggedChan->getInChan())
+	{ 
+	return false;
+	}
+
 vector< iClient* > deopList;
 
 for( Channel::const_userIterator ptr = theChan->userList_begin();
@@ -1990,8 +2008,7 @@ for( Channel::const_userIterator ptr = theChan->userList_begin();
 	if( ptr->second->getMode(ChannelUser::MODE_O))
 		{
 			/* Are they authed? */
-			sqlUser* authUser = isAuthed(ptr->second->getClient(), false);
-			sqlChannel* reggedChan = getChannelRecord(theChan->getName());
+			sqlUser* authUser = isAuthed(ptr->second->getClient(), false); 
  
 			if (!authUser)
 				{
