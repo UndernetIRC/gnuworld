@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server.cc,v 1.163 2003/06/07 00:26:24 dan_karrels Exp $
+ * $Id: server.cc,v 1.164 2003/06/12 12:02:22 jeekay Exp $
  */
 
 #include	<sys/time.h>
@@ -72,7 +72,7 @@
 #include	"Connection.h"
 
 const char server_h_rcsId[] = __SERVER_H ;
-const char server_cc_rcsId[] = "$Id: server.cc,v 1.163 2003/06/07 00:26:24 dan_karrels Exp $" ;
+const char server_cc_rcsId[] = "$Id: server.cc,v 1.164 2003/06/12 12:02:22 jeekay Exp $" ;
 const char config_h_rcsId[] = __CONFIG_H ;
 const char misc_h_rcsId[] = __MISC_H ;
 const char events_h_rcsId[] = __EVENTS_H ;
@@ -2632,7 +2632,7 @@ return ID ;
 }
 
 bool xServer::UnRegisterTimer( const xServer::timerID& ID,
-	void*& data )
+	void* data )
 {
 // Make sure there are timers in the queue
 if( timerQueue.empty() )

@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server.h,v 1.85 2003/06/07 00:26:23 dan_karrels Exp $
+ * $Id: server.h,v 1.86 2003/06/12 12:02:21 jeekay Exp $
  */
 
 #ifndef __SERVER_H
-#define __SERVER_H "$Id: server.h,v 1.85 2003/06/07 00:26:23 dan_karrels Exp $"
+#define __SERVER_H "$Id: server.h,v 1.86 2003/06/12 12:02:21 jeekay Exp $"
 
 #include	<string>
 #include	<vector>
@@ -550,7 +550,7 @@ public:
 	 * RegisterTimer() will be returned through data.
 	 * Return true if successful, false otherwise.
 	 */
-	virtual bool	UnRegisterTimer( const timerID&, void*& data ) ;
+	virtual bool	UnRegisterTimer( const timerID&, void* data ) ;
 
 	/**
 	 * This method is called by the xClient's to notify the network
