@@ -13,7 +13,7 @@
  *
  * Command is aliased "INFO".
  *
- * $Id: CHANINFOCommand.cc,v 1.13 2001/02/04 23:37:32 gte Exp $
+ * $Id: CHANINFOCommand.cc,v 1.14 2001/02/06 23:07:44 gte Exp $
  */
 
 #include	<string>
@@ -25,7 +25,7 @@
 #include	"responses.h"
 #include	"libpq++.h"
  
-const char CHANINFOCommand_cc_rcsId[] = "$Id: CHANINFOCommand.cc,v 1.13 2001/02/04 23:37:32 gte Exp $" ;
+const char CHANINFOCommand_cc_rcsId[] = "$Id: CHANINFOCommand.cc,v 1.14 2001/02/06 23:07:44 gte Exp $" ;
  
 namespace gnuworld
 {
@@ -98,7 +98,7 @@ if( string::npos == st[ 1 ].find_first_of( '#' ) )
 	 * Only show to those with admin access, opers, or the actual user.
 	 */
 
-	if( ((tmpUser) && bot->getAdminAccessLevel(tmpUser)) || (theClient->isOper()) || (tmpUser == theUser) )
+	if( ((tmpUser) && bot->getAdminAccessLevel(tmpUser)) || (tmpUser == theUser) )
 	{
 		strstream channelsQuery;
 		string channelList = ""; 

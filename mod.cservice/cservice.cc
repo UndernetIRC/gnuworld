@@ -390,7 +390,7 @@ else
 		Write( s );
 		delete[] s.str();
 
-		time_t expireTime = currentTime() + 3600
+		time_t expireTime = currentTime() + 3600;
 		silenceList.push_back(make_pair(expireTime, silenceMask));
 	 
 		logAdminMessage("MSG-FLOOD from %s",
@@ -569,7 +569,7 @@ else if(Command == "VERSION")
 	xClient::DoCTCP(theClient, CTCP,
 		"Undernet P10 Channel Services Version 2 ["
 		__DATE__ " " __TIME__
-		"] ($Id: cservice.cc,v 1.86 2001/02/06 18:55:42 gte Exp $)");
+		"] ($Id: cservice.cc,v 1.87 2001/02/06 23:07:44 gte Exp $)");
 	}
 else if(Command == "PROBLEM?")
 	{
@@ -1773,7 +1773,7 @@ int cservice::OnWhois( iClient* sourceClient,
 	/*
 	 *  Return info about 'targetClient' to 'sourceClient'
 	 */
-//:uworld.eu.undernet.org 311 Gte- Gte- Gte atomicrevs.demon.co.uk * :I am the one that was.
+
 	strstream s;
 	s << getCharYY() << " 311 " 
 	<< sourceClient->getCharYYXXX() 
@@ -1783,14 +1783,63 @@ int cservice::OnWhois( iClient* sourceClient,
 	Write( s );
 	delete[] s.str();
 
-	strstream s1;
-	s1 << getCharYY() << " 318 " 
+	// Lookup server name
+
+	iServer* targetServer = Network->findServer( targetClient->getIntYY() ) ;
+
+	if (targetServer)
+	{
+		strstream s2;
+		s2 << getCharYY() << " 312 " 
+		<< sourceClient->getCharYYXXX() 
+		<< " " << targetClient->getNickName()
+		<< " " << targetServer->getName() << " :"
+		<< ends;
+		Write( s2 );
+		delete[] s2.str();
+		
+	}
+
+	strstream s4;
+	s4 << getCharYY() << " 317 " 
 	<< sourceClient->getCharYYXXX() 
 	<< " " << targetClient->getNickName()
-	<< " :End of /WHOIS list." << ends;
+	<< " 0 " << targetClient->getConnectTime()
+	<< " :seconds idle, signon time" << ends; 
+	Write( s4 );
+	delete[] s4.str(); 
 
-	Write( s1 );
-	delete[] s1.str();
+	if (targetClient->isOper())
+	{
+		strstream s5;
+		s5 << getCharYY() << " 313 " 
+		<< sourceClient->getCharYYXXX() 
+		<< " " << targetClient->getNickName()
+		<< " :is an IRC Operator" << ends; 
+		Write( s5 );
+		delete[] s5.str(); 
+	}
+
+	sqlUser* theUser = isAuthed(targetClient, false);
+
+	if (theUser)
+	{
+		strstream s6;
+		s6 << getCharYY() << " 316 " 
+		<< sourceClient->getCharYYXXX() 
+		<< " " << targetClient->getNickName()
+		<< " :is Logged in as " << theUser->getUserName() << ends; 
+		Write( s6 );
+		delete[] s6.str(); 
+	} 
+
+	strstream s3;
+	s3 << getCharYY() << " 318 " 
+	<< sourceClient->getCharYYXXX() 
+	<< " " << targetClient->getNickName()
+	<< " :End of /WHOIS list." << ends; 
+	Write( s3 );
+	delete[] s3.str();
 
 
 	return 0;
