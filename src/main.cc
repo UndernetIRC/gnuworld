@@ -1,5 +1,5 @@
 /* main.cc
- * $Id: main.cc,v 1.34 2002/02/24 21:36:41 mrbean_ Exp $
+ * $Id: main.cc,v 1.35 2002/04/28 15:04:12 dan_karrels Exp $
  */
 
 #include	<new>
@@ -8,6 +8,7 @@
 #include	<sys/time.h>
 #include	<sys/types.h>
 #include	<unistd.h>
+#include	<getopt.h>
 
 #include	<cstdio>
 #include	<cstdlib>
@@ -21,8 +22,10 @@
 #include	"moduleLoader.h"
 #include	"md5hash.h"
 
+void		gnu() ;
+
 const char config_h_rcsId[] = __CONFIG_H ;
-const char main_cc_rcsId[] = "$Id: main.cc,v 1.34 2002/02/24 21:36:41 mrbean_ Exp $" ;
+const char main_cc_rcsId[] = "$Id: main.cc,v 1.35 2002/04/28 15:04:12 dan_karrels Exp $" ;
 const char ELog_h_rcsId[] = __ELOG_H ;
 const char FileSocket_h_rcsId[] = __FILESOCKET_H ;
 const char server_h_rcsId[] = __SERVER_H ;
@@ -48,18 +51,37 @@ void usage( const string& progName )
 {
 clog << "Usage: " << progName << " [options]\n" ;
 clog << "\nOptions:\n" ;
-clog << "-c: Verbose output\n" ;
+clog << "  -c, --verbose\t\tVerbose output\n" ;
 #ifdef EDEBUG
-  clog << "-d <debug filename>: Specify the debug output file\n" ;
+  clog << "  -d <debug filename>, --debug=<debug file name>" << endl ;
+  clog << "\t\t\tSpecify the debug output file\n" ;
 #endif
-clog << "-f <conf filename>: Specify the config file name\n" ;
-clog << "-h: Print this help menu\n" ;
-clog << "-s <socket file>: Run in simulation mode\n" ;
+clog << "  -f <conf filename>, --config=<config filename>" << endl ;
+clog << "\t\t\tSpecify the config file name\n" ;
+clog << "  -h, --help\t\tPrint this help menu\n" ;
+clog << "  -s <socket file>, --socket=<socket file name>" << endl ;
+clog << "\t\t\tRun in simulation mode\n" ;
 clog << endl ;
+}
+
+void gnu()
+{
+cout	<< "GNUWorld version 1.1" << endl ;
+cout	<< "Copyright (C) 2001 Free Software Foundation, Inc." << endl ;
+cout	<< "GNUWorld comes with NO WARRANTY," << endl ;
+cout	<< "to the extent permitted by law." << endl ;
+cout	<< "You may redistribute copies of GNUWorld" << endl ;
+cout	<< "under the terms of the GNU General Public License." << endl ;
+cout	<< "For more information about these matters," << endl ;
+cout	<< "see the files named COPYING." << endl ;
+cout	<< endl ;
 }
 
 int main( int argc, char** argv )
 {
+
+// output gnu information
+gnu() ;
 
 md5 dummy ;
 
@@ -117,24 +139,47 @@ string simFileName ;
 verbose = false ;
 
 int c = EOF ;
-while( (c = getopt( argc, argv, "cd:f:hs:" )) != EOF )
+while( true )
 	{
+//	int this_option_optind = optind ? optind : 1 ;
+	int option_index = 0 ;
+	struct option cmdLineArgs[] = {
+		{ "verbose", no_argument, NULL, 0 },
+		{ "debug", no_argument, NULL, 1 },
+		{ "config", required_argument, NULL, 2 },
+		{ "help", no_argument, NULL, 3 },
+		{ "socket", required_argument, NULL, 4 },
+		{ 0, 0, 0, 0 }
+	} ;
+
+	c = getopt_long_only( argc, argv, "cd:f:hs:",
+		cmdLineArgs, &option_index ) ;
+	if( -1 == c )
+		{
+		break ;
+		}
+
 	switch( c )
 		{
+		case 0:
 		case 'c':
 			verbose = true ;
 			break ;
 #ifdef EDEBUG
+		case 1:
 		case 'd':
 			elogFileName = optarg ;
 			break ;
 #endif
+		case 2:
 		case 'f':
 			configFileName = optarg ;
 			break ;
+		case 3:
 		case 'h':
 			usage( argv[ 0 ] ) ;
 			::exit( 0 ) ;
+		case 4:
 		case 's':
 			simFileName = optarg ;
 			clog << "*** Running in simulation mode...\n" ;
@@ -151,7 +196,6 @@ while( (c = getopt( argc, argv, "cd:f:hs:" )) != EOF )
 			::exit( 0 ) ;
 		} // close switch
 	} // close while
-
 
 #ifdef EDEBUG
 	elog.openFile( elogFileName.c_str() ) ;
