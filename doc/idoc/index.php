@@ -2,11 +2,11 @@
 /*
  *
  * Undernet GNUworld Interactive Installation Guide (aka UGIIG)
- * $Id: index.php,v 1.3 2002/03/04 03:22:24 nighty Exp $
+ * $Id: index.php,v 1.4 2002/03/09 04:06:40 nighty Exp $
  *
  * Released under the GNU Public License : http://www.gnu.org/licenses/gpl.txt
  * by nighty <nighty@undernet.org>
- * Last modified: 03/04/2002
+ * Last modified: 03/09/2002
  *
  *
  */
@@ -50,7 +50,7 @@ function footer($prev,$next) {
 	//echo "<address>maintained by <b>&lt;</b><a href=\"mailto:" . $coder_email . "\">" . $coder_email . "</a><b>&gt;</b> - Last modified : <b>" . date("M-d-Y H:i:s",   (  filemtime("index.php")+( date("Z",filemtime("index.php"))/3600 )   )   ) . " UTC/GMT</b> - <b>[</b><a href=\"./\">Home</a><b>]</b></address>";
 	echo "<address>maintained by <b>&lt;</b><a href=\"mailto:" . $coder_email . "\">" . $coder_email . "</a><b>&gt;</b> - <b>[</b><a href=\"./\">Home</a><b>]</b>";
 	echo "&nbsp;<br><font size=-2><b>";
-?>$Id: index.php,v 1.3 2002/03/04 03:22:24 nighty Exp $<?
+?>$Id: index.php,v 1.4 2002/03/09 04:06:40 nighty Exp $<?
 	echo "</b></font></address>\n";
 	echo "</body>\n";
 	echo "</html>\n";
@@ -75,7 +75,7 @@ $coder_email = "nighty@undernet.org";
 $coder_name = "nighty";
  
 ?>
-<!-- $Id: index.php,v 1.3 2002/03/04 03:22:24 nighty Exp $ //-->
+<!-- $Id: index.php,v 1.4 2002/03/09 04:06:40 nighty Exp $ //-->
 <html>
 <head>
 <title>Undernet GNUworld Interactive Installation Guide</title>
@@ -158,7 +158,7 @@ you can either :
 		use either <b>eu.undernet.org</b> or <b>us.undernet.org</b> or <a href="http://www.undernet.org/servers.php" target=_blank>the Undernet servers list</a>,
 		depending on your location, as your IRC server (port <b>6667</b>)
 		and <b>/join #coder-com</b>.
-
+	- view discussions and post your questions on the <a href="http://www.undernet.org/forum/viewforum.php?forum=7" target=_blank>Undernet Coder-Comittee Forum</a> (<font color=#ff0000><b><blink>new</blink></b></font>)
 </pre>
 <br><br>
 <?
@@ -1251,7 +1251,7 @@ IMPORTANT NOTICE:</b>
 	&lt;?
 	/*
 
-	&lt;!-- $Id: index.php,v 1.3 2002/03/04 03:22:24 nighty Exp $ //--&gt;
+	&lt;!-- $Id: index.php,v 1.4 2002/03/09 04:06:40 nighty Exp $ //--&gt;
 	
 	'config.inc' For GNUworld's mod.cservice's website interface
 	
@@ -1613,7 +1613,7 @@ I will be a bit short on it because :
 	<?=$os?>:/root/php-4.1.2# <b>cp php.ini-dist /usr/local/lib/php.ini</b>
 	
 You can possibly edit the file <b>/usr/local/lib/php.ini</b> if you want to tweak anything,
-actually this should not be needed for our purpose.
+actually this should not be needed here.
 
 	<?=$os?>:/root/php-4.1.2# <b>cd /usr/local/apache/htdocs/</b>
 	<?=$os?>:/usr/local/apache/htdocs# <b>chmod 711 ~gnuworld</b>
@@ -1841,8 +1841,8 @@ the problem comes from the database schema that is outdated because you haven't 
 If any db schema occur, you will see that the files in <b>gnuworld/doc</b> directory, will have
 some change (when you <b>cvs update -d</b>), if there's is any then you need to ensure your
 database structure is correct by :
-	- watching changed/added files in <b>gnuworld/doc</b>
-	- watching <b>gnuworld/mod.cservice/RELEASE.NOTES</b>
+	- watching changed/added files in <a href="http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/gnuworld/gnuworld/doc/" target=_blank><b>gnuworld/doc</b></a>
+	- watching <a href="http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/gnuworld/gnuworld/mod.cservice/RELEASE.NOTES" target=_blank><b>gnuworld/mod.cservice/RELEASE.NOTES</b></a>
 
 and apply eventual patches or sql script you would need to.
 
@@ -1879,7 +1879,13 @@ the following changes are also required in the remote database (cservice):
 	);
 	
 	ALTER TABLE pendingusers ADD poster_ip VARCHAR(15) DEFAULT '';
+	
+	ALTER TABLE users ADD maxlogins INT4 DEFAULT 1;
 </b>
+
+<font color=#ff0000>CERT Security Advisory: you should upgrade to <b>php-4.1.2</b> for security reasons :</font>
+	<a href="http://www.cert.org/advisories/CA-2002-05.html" target=_blank>http://www.cert.org/advisories/CA-2002-05.html</a>
+
 
 If you have any questions please see <a href="./">home page</a> and links to help URLs, emails or IRC Channels.
 
