@@ -8,7 +8,7 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char SHOWCOMMANDSCommand_cc_rcsId[] = "$Id: SHOWCOMMANDSCommand.cc,v 1.4 2001/01/14 23:12:09 gte Exp $" ;
+const char SHOWCOMMANDSCommand_cc_rcsId[] = "$Id: SHOWCOMMANDSCommand.cc,v 1.5 2001/01/15 00:09:57 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -62,7 +62,7 @@ bool SHOWCOMMANDSCommand::Exec( iClient* theClient, const string& Message )
 	if (level >= 50) bot->Notice(theClient,  "\002Level   50\002: kick topic");
 	if (level >= 25) bot->Notice(theClient,  "\002Level   25\002: voice devoice");
 	if (level >= 1) bot->Notice(theClient,   "\002Level    1\002: status"); 
-	if (level >= 0) bot->Notice(theClient,   "\002Level    0\002: access banlist chaninfo help* isreg lbanlist* login motd* newpass* showcommands showignore* verify"); 
+	if (level >= 0) bot->Notice(theClient,   "\002Level    0\002: access banlist chaninfo help* lbanlist* login motd* newpass* showcommands showignore* verify"); 
 	bot->Notice(theClient, "Commands marked * are semi-complete :)");
  
 	return true ;

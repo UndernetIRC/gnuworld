@@ -4,7 +4,7 @@
  * Storage class for accessing user information either from the backend
  * or internal storage.
  * 
- * $Id: sqlUser.cc,v 1.9 2001/01/14 23:12:09 gte Exp $
+ * $Id: sqlUser.cc,v 1.10 2001/01/15 00:09:57 gte Exp $
  */
  
 #include	<strstream>
@@ -33,8 +33,8 @@ sqlUser::sqlUser(PgDatabase* _SQLDb)
    email(""),
    url(""),
    language_id( 0 ),
-   flags( 0 ),
    public_key(""),
+   flags( 0 ), 
    SQLDb( _SQLDb )
 {
 }

@@ -447,7 +447,7 @@ int cservice::OnCTCP( iClient* theClient, const string& CTCP,
 
 	if(Command == "VERSION")
 	{
-		xClient::DoCTCP(theClient, CTCP.c_str(), "Undernet P10 Channel Services Version 2 [" __DATE__ " " __TIME__ "] ($Id: cservice.cc,v 1.42 2001/01/14 23:12:09 gte Exp $)");
+		xClient::DoCTCP(theClient, CTCP.c_str(), "Undernet P10 Channel Services Version 2 [" __DATE__ " " __TIME__ "] ($Id: cservice.cc,v 1.43 2001/01/15 00:09:57 gte Exp $)");
 		return true;
 	}
  
@@ -618,6 +618,13 @@ short cservice::getAccessLevel( sqlUser* theUser, sqlChannel* theChan )
 	sqlLevel* theLevel = getLevelRecord(theUser, theChan);
 	if(theLevel)
 	{
+		
+		if (theLevel->getFlag(sqlLevel::F_FORCED))
+		{
+			// A forced access..
+			return theLevel->getForcedAccess();
+		}
+
 		/*
 		 *  Check to see if the channel has been suspended.
 		 */
@@ -646,13 +653,7 @@ short cservice::getAccessLevel( sqlUser* theUser, sqlChannel* theChan )
 					theChan->getName().c_str());
 			return 0;
 		}
-
-		if (theLevel->getFlag(sqlLevel::F_FORCED))
-		{
-			// A forced access..
-			return theLevel->getForcedAccess();
-		}
-
+ 
 		return theLevel->getAccess();
 	}
 

@@ -9,7 +9,7 @@
  * Caveats: None
  * 
  *
- * $Id: REMUSERCommand.cc,v 1.2 2001/01/14 18:21:32 gte Exp $
+ * $Id: REMUSERCommand.cc,v 1.3 2001/01/15 00:09:57 gte Exp $
  */
 
 #include	<string>
@@ -20,7 +20,7 @@
 #include	"levels.h"
 #include	"libpq++.h"
 
-const char REMUSERCommand_cc_rcsId[] = "$Id: REMUSERCommand.cc,v 1.2 2001/01/14 18:21:32 gte Exp $" ;
+const char REMUSERCommand_cc_rcsId[] = "$Id: REMUSERCommand.cc,v 1.3 2001/01/15 00:09:57 gte Exp $" ;
  
 namespace gnuworld
 {
@@ -124,10 +124,14 @@ bool REMUSERCommand::Exec( iClient* theClient, const string& Message )
  	}
  
 	// Remove tmpLevel from the cache. (It has to be there, we just got it even if it wasnt..)
+	// If its a forced record, don't bother..
 
-	pair<int, int> thePair;
-	thePair = make_pair(tmpLevel->getUserId(), tmpLevel->getChannelId());
-	bot->sqlLevelCache.erase(thePair);
+	if (!tmpLevel->getFlag(sqlLevel::F_FORCED))
+	{ 
+		pair<int, int> thePair;
+		thePair = make_pair(tmpLevel->getUserId(), tmpLevel->getChannelId());
+		bot->sqlLevelCache.erase(thePair);
+	}
 
 	return true ;
 } 
