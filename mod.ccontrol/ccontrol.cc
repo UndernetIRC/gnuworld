@@ -38,7 +38,7 @@
 #include	"ip.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.132 2002/03/12 19:08:04 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.133 2002/03/12 22:24:52 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -123,8 +123,6 @@ if (SQLDb->ConnectionBad ())
 else
 	{
 	elog	<< "ccontrol::ccontrol> Connection established to SQL "
-		<< "server. Backend PID: "
-		<< SQLDb->getPID()
 		<< endl ;
 	}
 dbConnected = true;
