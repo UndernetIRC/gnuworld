@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ConnectionManager.cc,v 1.10 2002/07/10 14:40:46 dan_karrels Exp $
+ * $Id: ConnectionManager.cc,v 1.11 2002/07/16 13:51:12 dan_karrels Exp $
  */
 
 #include	<unistd.h>
@@ -598,31 +598,16 @@ for( handlerMapIterator handlerItr = handlerMap.begin() ;
 //	<< " fd's"
 //	<< endl ;
 
-// fdCnt is the number of FD's returned by select()
-// loopCnt is the max number of attempts for select()
-int			fdCnt = -1,
-			loopCnt = 10 ;
+// timeval may be modified by select() on some systems,
+// so recreate it each time
+struct timeval to = { seconds, milliseconds } ;
 
-// Call select() repeatedly until either of the following:
-// - select() returns a value >= 0
-// - select() returns no error (other than EINTR)
-// - loopCnt becomes negative
-do
-	{
-	// timeval may be modified by select() on some systems,
-	// so recreate it each time
-	struct timeval to = { seconds, milliseconds } ;
-
-	// Make sure to clear errno
-	errno = 0 ;
-
-	// Call select()
-	// Block indefinitely if seconds is -1
-	fdCnt = ::select( 1 + highestFD, &readfds, &writefds, 0,
+// Call select()
+// Block indefinitely if seconds is -1
+int fdCnt = ::select( 1 + highestFD, &readfds, &writefds, 0,
 		(-1 == seconds) ? NULL : &to ) ;
-	} while( (EINTR == errno) && (--loopCnt >= 0) ) ;
 
-// Is there still an error from select()?
+// Is there an error from select()?
 if( fdCnt < 0 )
 	{
 	// Error in select()
@@ -973,7 +958,15 @@ char buf[ 4096 ] ;
 memset( buf, 0, 4096 ) ;
 
 // Attempt the read from the socket
+errno = 0 ;
 int readResult = ::recv( cPtr->getSockFD(), buf, 4096, 0 ) ;
+
+if( EAGAIN == errno )
+	{
+	// Nonblocking type error
+	// Ignore it
+	return true ;
+	}
 
 // Check for error on read()
 if( readResult < 0 )
@@ -1024,10 +1017,18 @@ bool ConnectionManager::handleWrite( ConnectionHandler* hPtr,
 // the send(), and the system will send() as much as it can
 // The above applies to NONBLOCKING sockets.
 //
+errno = 0 ;
 int writeResult = ::send( cPtr->getSockFD(),
-	cPtr->outputBuffer.c_str(),
+	cPtr->outputBuffer.data(),
 	cPtr->outputBuffer.size(),
 	0 ) ;
+
+if( (ENOBUFS == errno) || (EWOULDBLOCK == errno) || (EAGAIN == errno) )
+	{
+	// Nonblocking type error
+	// Ignore it for now
+	return true ;
+	}
 
 // Check for write error
 if( writeResult < 0 )

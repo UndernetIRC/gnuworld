@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server.cc,v 1.138 2002/07/10 14:40:48 dan_karrels Exp $
+ * $Id: server.cc,v 1.139 2002/07/16 13:51:12 dan_karrels Exp $
  */
 
 #include	<sys/time.h>
@@ -69,10 +69,11 @@
 #include	"LoadClientTimerHandler.h"
 #include	"UnloadClientTimerHandler.h"
 #include	"ConnectionManager.h"
+#include	"ConnectionHandler.h"
 #include	"Connection.h"
 
 const char server_h_rcsId[] = __SERVER_H ;
-const char server_cc_rcsId[] = "$Id: server.cc,v 1.138 2002/07/10 14:40:48 dan_karrels Exp $" ;
+const char server_cc_rcsId[] = "$Id: server.cc,v 1.139 2002/07/16 13:51:12 dan_karrels Exp $" ;
 const char config_h_rcsId[] = __CONFIG_H ;
 const char misc_h_rcsId[] = __MISC_H ;
 const char events_h_rcsId[] = __EVENTS_H ;
@@ -247,18 +248,16 @@ void xServer::initializeVariables()
 // Initialize more variables
 keepRunning = true ;
 bursting = false ;
-useBurstBuffer = false ;
-_connected = false ;
+useHoldBuffer = false ;
 StartTime = ::time( NULL ) ;
 
+serverConnection = 0 ;
 inputCharBuffer = 0 ;
 caughtSignal = false ;
 whichSig = 0 ;
 burstStart = burstEnd = 0 ;
 Uplink = NULL ;
-theSock = NULL ;
 Message = SRV_SUCCESS ;
-outputWriteSize = inputReadSize = 0 ;
 lastTimerID = 1 ;
 glineUpdateInterval = pingUpdateInterval = 0 ;
 
@@ -521,75 +520,20 @@ void xServer::Shutdown()
 // TODO
 }
 
-/**
- * Connect to the given hostname/IP address on the given
- * port number.  This method returns 0 on success, -1 on error.
- * Upon successful completion of the connect, the server's
- * connection is ready to be written to.
- */
-int xServer::Connect( const string& Address, unsigned short int Port )
+void xServer::OnConnect( Connection* theConn )
 {
-
-if( isConnected() )
+if( theConn != serverConnection )
 	{
-	OnDisConnect() ;
-	Message = SRV_SUCCESS ;
+	return ;
 	}
 
-// The Socket may be non-null here when we are actually
-// reading from a file.
-if( 0 == theSock )
-	{
-	// Allocate the socket.
-	theSock = new ClientSocket ;
-	assert( theSock != 0 ) ;
-	}
+// Just connected to our uplink
 
 // P10 version information, bogus.
 Version = 10 ;
 
-// Perform the actual connect to the given IP/hostname.
-if( theSock->connect( Address, Port ) < 0 )
-	{
-	return -1 ;
-	}
-
-// We got connected!
-
-// Maintain connection state.
-_connected = true ;
-
 // Initialize the connection time variable to current time.
 ConnectionTime = ::time( NULL ) ;
-
-// Obtain the size of the TCP input window.
-// The server will never attempt to read more bytes than this
-// from the socket connection.
-inputReadSize = theSock->recvBufSize() ;
-if( static_cast< int >( inputReadSize ) < 0 )
-	{
-	elog	<< "xServer::Connect> Failed to get receive buffer size"
-		<< endl ;
-	return -1 ;
-	}
-
-// Obtain the size of the TCP output window.
-// The server will never attempt to write more bytes than
-// this to the socket connection.
-outputWriteSize = theSock->sendBufSize() ;
-if( static_cast< int >( outputWriteSize ) < 0 )
-	{
-	elog	<< "xServer::Connect> Failed to get output buffer size"
-		<< endl ;
-	return -1 ;
-	}
-
-inputCharBuffer = new (std::nothrow) char[ inputReadSize + 1 ] ;
-assert( inputCharBuffer != 0 ) ;
-
-// Notify the curious user of the TCP window sizes.
-//elog << "inputReadSize: " << inputReadSize << endl ;
-//elog << "outputWriteSize: " << outputWriteSize << endl ;
 
 // Login to the uplink.
 WriteDuringBurst( "PASS :%s\n", Password.c_str() ) ;
@@ -603,28 +547,23 @@ WriteDuringBurst( "SERVER %s %d %d %d J%02d %s :%s\n",
 		Version,
 		getCharYYXXX().c_str(),
 		ServerDescription.c_str() ) ;
-
-return 0 ;
 }
 
 /**
  * Handle a disconnect from our uplink.  This method is
  * responsible for deallocating variables mostly.
  */
-void xServer::OnDisConnect()
+void xServer::OnDisConnect( Connection* theConn )
 {
-if( theSock )
+if( theConn != serverConnection )
 	{
-	theSock->close() ;
-	delete theSock ; theSock = 0 ;
+	return ;
 	}
 
-_connected = false ;
-inputReadSize = outputWriteSize = 0 ;
-
-// Clear socket buffers
-inputBuffer.clear() ;
-outputBuffer.clear() ;
+// Disconnected from uplink
+// The ConnectionManager will deallocate the memory associated with
+// the Connection object
+serverConnection = 0 ;
 
 Message = SRV_DISCONNECT ;
 
@@ -635,7 +574,7 @@ Message = SRV_DISCONNECT ;
 // of data
 void xServer::Process( char* s )
 {
-if( NULL == theSock || NULL == s || 0 == s[ 0 ] || ' ' == s[ 0 ] )
+if( (NULL == s) || (0 == s[ 0 ]) || (' ' == s[ 0 ]) )
 	{
 	return ;
 	}
@@ -858,8 +797,10 @@ if( !strcasecmp( serverName, this->ServerName ) )
 		<< endl ;
 	return false ;
 	}
-elog	<< "xServer::SquitServer> Searching for server " << serverName
-	<< "\n" ;
+
+//elog	<< "xServer::SquitServer> Searching for server "
+//	<< serverName
+//	<< endl ;
 
 // All juped servers are also put into the Network tables...
 // This call to findServerName() will find a juped server.
@@ -913,7 +854,6 @@ delete theServer ;
 
 // Squit successful.
 return true ;
-
 }
 
 /**
@@ -1017,7 +957,6 @@ Network->addServer( fakeServer ) ;
 
 // Success.
 return( 0 ) ;
-
 }
 
 /**
@@ -1044,7 +983,6 @@ eventList[ theEvent ].push_back( theClient ) ;
 
 // Registration succeeded
 return true ;
-
 }
 
 /**
@@ -1076,7 +1014,6 @@ chanPtr->second->push_back( theClient ) ;
 
 // Addition successful
 return true ;
-
 }
 
 /**
@@ -1120,7 +1057,6 @@ while( ptr != end )
 // Unable to find the client in the list of registered
 // listeners for this event. *shrug*
 return false ;
-
 }
 
 /**
@@ -1175,14 +1111,14 @@ return false ;
 void xServer::PostEvent( const eventType& theEvent,
 	void* Data1, void* Data2,
 	void* Data3, void* Data4,
-	const xClient* ourClient )
+	const xClient* excludeMe )
 {
-
 // Make sure the event is valid.
 if( !validEvent( theEvent ) )
 	{
 	elog	<< "xServer::PostEvent> Invalid event number: "
-		<< theEvent << endl ;
+		<< theEvent
+		<< endl ;
 	return ;
 	}
 
@@ -1195,8 +1131,10 @@ for( ; ptr != end ; ++ptr )
 	{
 	// Notify this client of the event
 	// if he didnt cause the event to trigger
-	if((*ptr) != ourClient)
+	if( (*ptr) != excludeMe )
+		{
 		(*ptr)->OnEvent( theEvent, Data1, Data2, Data3, Data4 ) ;
+		}
 	}
 }
 
@@ -1212,7 +1150,6 @@ void xServer::PostChannelEvent( const channelEventType& theEvent,
 	void* Data1, void* Data2,
 	void* Data3, void* Data4 )
 {
-
 assert( theChan != 0 ) ;
 
 // First deliver this channel event to any listeners for all channel
@@ -1258,9 +1195,6 @@ void xServer::PostChannelKick( Channel* theChan,
 {
 // Public method, verify arguments
 assert( theChan != 0 ) ;
-// Source can be a server
-//assert( srcClient != 0 ) ;
-
 assert( destClient != 0 ) ;
 
 // First deliver this channel event to any listeners for all channel
@@ -1301,205 +1235,6 @@ for( list< xClient* >::iterator ptr = listPtr->begin(), end = listPtr->end() ;
 		kickMessage,
 		authoritative ) ;
 	}
-
-}
-
-// Attempt a read from the network connection.
-// Returns the number of bytes read or -1 on error.
-void xServer::DoRead()
-{
-
-if( !_connected || (NULL == theSock) )
-	{
-	elog	<< "xServer::DoRead> Not connected, or invalid "
-		<< "socket" << endl ;
-
-	// Make sure the caller knows that there is no
-	// valid connection
-	_connected = false ;
-	return ;
-	}
-
-memset( inputCharBuffer, 0, inputReadSize + 1 ) ;
-
-int bytesRead = theSock->recv(
-	reinterpret_cast< unsigned char* >( inputCharBuffer ),
-	inputReadSize ) ;
-
-// Was the read successful?
-if( bytesRead <= 0 )
-	{
-	// Read error, the connection is no longer valid
-	_connected = false ;
-
-	elog	<< "xServer::DoRead> Got a read error: "
-		<< strerror( errno ) << endl ;
-	}
-else
-	{
-	inputBuffer += inputCharBuffer ;
-	}
-
-}
-
-void xServer::DoWrite()
-{
-
-if( !_connected || (NULL == theSock) )
-	{
-	elog	<< "xServer::DoWrite> Attempt to write, but no "
-		<< "connection!" << endl ;
-
-	// Make sure the caller knows that there is no
-	// valid connection
-	_connected = false ;
-	return ;
-	}
-
-if( outputBuffer.empty() )
-	{
-	elog	<< "xServer::DoWrite> Output buffer empty"
-		<< endl ;
-	return ;
-	}
-
-// Write at most one half the total output buffer size
-int bytesWritten = theSock->send( outputBuffer.toString(),
-	min( outputWriteSize >> 1, outputBuffer.size() ) ) ;
-
-if( bytesWritten <= 0 )
-	{
-	// Write error
-	_connected = false ;
-	}
-else
-	{
-	outputBuffer.Delete( bytesWritten ) ;
-	}
-}
-
-/**
- * Force a write of the output buffer to
- * the network.
- * Returns false if there is no valid connection
- * or the write fails.
- * Returns true otherwise.
- */
-bool xServer::flushBuffer()
-{
-
-// Make sure there is a valid connection.
-if( !_connected || !theSock )
-	{
-	// No connection, return false.
-	return false ;
-	}
-
-// Does the output buffer have any data to
-// be written?
-if( 0 == outputBuffer.size() )
-	{
-	// Nope, return true.
-	return true ;
-	}
-
-// Write the data to the network.
-// TODO: Only write ouputWriteSize bytes.
-int bytesWritten = theSock->send( outputBuffer.toString(),
-	min( outputWriteSize >> 1, outputBuffer.size() ) ) ;
-
-// Was the write successful?
-if( bytesWritten < 0 )
-	{
-	// Nope, write error.  The connection
-	// is no longer valid.
-	OnDisConnect() ;
-
-	// Return failure
-	return false ;
-	}
-
-// The write was successful.
-// Remove from the output buffer the data
-// was written.
-outputBuffer.Delete( bytesWritten ) ;
-
-// Return success.
-return true ;
-
-}
-
-/**
- * Return true is the socket is ready to be read.
- * Return false if the socket has no pending data,
- * or if the connection is invalid.
- */
-bool xServer::ReadyForRead()
-{
-if( !_connected || !theSock )
-	{
-	return false ;
-	}
-int readable = theSock->readable() ;
-if( readable < 0 )
-	{
-	// Error on socket
-	OnDisConnect() ;
-	return false ;
-	}
-return (readable > 0) ;
-}
-
-/**
- * Return true if the output buffer is not empty and
- * the conncetion is valid.
- * Return false otherwise.
- */
-bool xServer::ReadyForWrite() const
-{
-return ( _connected && theSock &&
-	(outputBuffer.size() > 0) && (theSock->writable() > 0) ) ;
-}
-
-/**
- * Read a \n terminated string from the socket
- * input buffer.
- * Make sure buf is sized large enough for any string
- * that may be sent across the network.
- */
-bool xServer::GetString( char* buf )
-{
-
-// Is there a valid connection and data to
-// be read?
-if( !_connected || inputBuffer.empty() )
-	{
-	// Nope, return false
-	return false ;
-	}
-
-// Read a line from the input buffer.
-string tmp ;
-if( !inputBuffer.ReadLine( tmp ) )
-	{
-	// No data to be read.
-	// This is not fatal.
-	return false ;
-	}
-
-// Remove any trailing \r or \n
-for( char c = tmp[ tmp.size() - 1 ] ; c == '\r' || c == '\n' ;
-	c = tmp[ tmp.size() - 1 ] )
-	{
-	tmp.erase( tmp.size() - 1 ) ;
-	}
-
-// Copy the line into the return buffer.
-strcpy( buf, tmp.c_str() ) ;
-
-// Return success.
-return true ;
-
 }
 
 /**
@@ -1509,7 +1244,6 @@ return true ;
  */
 bool xServer::AttachClient( xClient* Client, bool doBurst )
 {
-
 // Make sure the pointer is valid.
 assert( NULL != Client ) ;
 
@@ -1580,7 +1314,6 @@ bool xServer::AttachClient( const string& moduleName,
 	const string& configFileName,
 	bool doBurst )
 {
-
 // Create a moduleLoader instance, based on the given moduleName
 moduleLoader< xClient* >* ml =
 	new (std::nothrow) moduleLoader< xClient* >( moduleName ) ;
@@ -1821,13 +1554,13 @@ for( clientModuleListType::iterator modPtr = clientModuleList.begin() ;
  * Returns false if there is no valid connection,
  * true otherwise.
  */
-size_t xServer::Write( const string& buf )
+bool xServer::Write( const string& buf )
 {
 
 // Is there a valid connection?
-if( !_connected )
+if( !isConnected() )
 	{
-	return 0 ;
+	return false ;
 	}
 
 if( verbose )
@@ -1850,37 +1583,35 @@ if( verbose )
 //
 if( buf[ buf.size() - 1 ] != '\n' )
 	{
-	if( useBurstBuffer )
+	if( useHoldBuffer )
 		{
-		burstOutputBuffer += buf + '\n' ;
+		burstHoldBuffer += buf + '\n' ;
 		}
 	else
 		{
-		outputBuffer += buf + '\n' ;
+		ConnectionManager::Write( this, serverConnection, buf + '\n' ) ;
 		}
 	}
 else
 	{
-	if( useBurstBuffer || bursting )
+	if( useHoldBuffer )
 		{
-		burstOutputBuffer += buf + '\n' ;
+		burstHoldBuffer += buf + '\n' ;
 		}
 	else
 		{
-		outputBuffer += buf ;
+		ConnectionManager::Write( this, serverConnection, buf ) ;
 		}
 	}
 
 // Return success.
-return buf.size() ;
-
+return true ;
 }
 
-size_t xServer::WriteDuringBurst( const string& buf )
+bool xServer::WriteDuringBurst( const string& buf )
 {
-
 // Is there a valid connection?
-if( !_connected )
+if( !isConnected() )
 	{
 	return 0 ;
 	}
@@ -1903,29 +1634,24 @@ if( verbose )
 // not already done and append it to
 // the output buffer.
 //
+ConnectionManager::Write( this, serverConnection, buf ) ;
+
 if( buf[ buf.size() - 1 ] != '\n' )
 	{
-	outputBuffer += buf + '\n' ;
+	ConnectionManager::Write( this, serverConnection, string( "\n" ) ) ;
 	}
-else
-	{
-	outputBuffer += buf ;
-	}
-
-// Return success.
-return buf.size() ;
-
+return true ;
 }
 
 /**
  * Write the contents of a std::stringstream to the uplink connection.
  */
-size_t xServer::Write( const stringstream& s )
+bool xServer::Write( const stringstream& s )
 {
 return Write( string( s.str() ) ) ;
 }
 
-size_t xServer::WriteDuringBurst( const stringstream& s )
+bool xServer::WriteDuringBurst( const stringstream& s )
 {
 return WriteDuringBurst( string( s.str() ) ) ;
 }
@@ -1937,11 +1663,11 @@ return WriteDuringBurst( string( s.str() ) ) ;
  * true otherwise.
  * I despise this function. --dan
  */
-size_t xServer::Write( const char* format, ... )
+bool xServer::Write( const char* format, ... )
 {
 
 // Is there a valid connection?
-if( !_connected )
+if( !isConnected() )
 	{
 	// Nope, return false.
 	return false ;
@@ -1967,26 +1693,40 @@ va_end( _list ) ;
 		}
 #endif
 
-if( useBurstBuffer )
+if( buffer[ strlen( buffer ) - 1 ] != '\n' )
 	{
-	burstOutputBuffer += buffer ;
+	if( useHoldBuffer )
+		{
+		burstHoldBuffer += buffer ;
+		burstHoldBuffer += "\n" ;
+		}
+	else
+		{
+		ConnectionManager::Write( this, serverConnection, buffer ) ;
+		ConnectionManager::Write( this, serverConnection,
+			string( "\n" ) ) ;
+		}
 	}
 else
 	{
-	// Append the line to the output buffer.
-	outputBuffer += buffer ;
+	if( useHoldBuffer )
+		{
+		burstHoldBuffer += buffer ;
+		}
+	else
+		{
+		ConnectionManager::Write( this, serverConnection, buffer ) ;
+		}
 	}
 
-// Return number of bytes written
-return strlen( buffer ) ;
-
+return true ;
 }
 
-size_t xServer::WriteDuringBurst( const char* format, ... )
+bool xServer::WriteDuringBurst( const char* format, ... )
 {
 
 // Is there a valid connection?
-if( !_connected )
+if( !isConnected() )
 	{
 	// Nope, return false.
 	return false ;
@@ -2013,16 +1753,18 @@ va_end( _list ) ;
 #endif
 
 // Append the line to the output buffer.
-outputBuffer += buffer ;
+ConnectionManager::Write( this, serverConnection, buffer ) ;
+if( buffer[ strlen( buffer ) - 1 ] != '\n' )
+	{
+	ConnectionManager::Write( this, serverConnection, string( "\n" ) ) ;
+	}
 
-// Return number of bytes written.
-return strlen( buffer ) ;
-
+// Return success
+return true ;
 }
 
 bool xServer::removeGline( const string& userHost, const xClient* remClient )
 {
-
 // This method is true if we find the gline in our internal
 // structure of glines.
 bool foundGline = false ;
@@ -2087,7 +1829,6 @@ bool xServer::setGline(
 	const xClient* setClient,
 	const string& server )
 {
-
 // Remove any old matches
 removeMatchingGlines( userHost ) ;
 
@@ -2293,7 +2034,6 @@ if( NULL == theChan )
 	return ;
 	}
 OnPartChannel( theClient, theChan ) ;
-
 }
 
 void xServer::OnPartChannel( xClient* theClient, Channel* theChan )
@@ -2372,10 +2112,11 @@ else if( NULL == theChan )
 	// 0AT C #lksjhdlksjdlkjs 957214787
 
 //	elog	<< "xServer::BurstChannel> Creating new channel: "
-//		<< chanName << endl ;
+//		<< chanName
+//		<< endl ;
 
-		// Create the channel
-		// The client automatically gets op in this case
+	// Create the channel
+	// The client automatically gets op in this case
 	{
 	stringstream s ;
 	s	<< theClient->getCharYYXXX()
@@ -2462,8 +2203,7 @@ else if( bursting )
 		s	<< ":o" ;
 		}
 
-		s	<< ends ;
-
+	s	<< ends ;
 	Write( s ) ;
 	}
 else
@@ -2634,7 +2374,6 @@ if( !theChan->addUser( theChanUser ) )
 	}
 
 return true ;
-
 }
 
 // K N Isomer 2 957217279 ~perry p136-tnt1.ham.ihug.co.nz DLbaCI KAC :*Unknown*
@@ -2679,7 +2418,6 @@ while( ptr != Network->localClient_end() )
 // TODO: Burst juped servers.
 void xServer::Burst()
 {
-
 xNetwork::localClientIterator ptr = Network->localClient_begin(),
 	end = Network->localClient_end() ;
 
@@ -2699,7 +2437,6 @@ while( ptr != end )
 	}
 
 // TODO: Need to burst fake servers and clients
-
 }
 
 void xServer::dumpStats()
@@ -2707,7 +2444,8 @@ void xServer::dumpStats()
 clog	<< "Number of channels: " << Network->channelList_size() << endl ;
 clog	<< "Number of servers: " << Network->serverList_size() << endl ;
 clog	<< "Number of clients: " << Network->clientList_size() << endl ;
-clog	<< "Burst duration: " << (burstEnd - burstStart) << " seconds\n" ;
+clog	<< "Burst duration: " << (burstEnd - burstStart)
+	<< " seconds" << endl ;
 }
 
 xServer::timerID xServer::RegisterTimer( const time_t& absTime,
@@ -2741,7 +2479,6 @@ return ID ;
 bool xServer::UnRegisterTimer( const xServer::timerID& ID,
 	void*& data )
 {
-
 // Make sure there are timers in the queue
 if( timerQueue.empty() )
 	{
@@ -2805,7 +2542,6 @@ return foundTimer ;
 
 unsigned int xServer::CheckTimers()
 {
-
 // Make sure the timerQueue is not empty, and that
 // we are not bursting
 if( timerQueue.empty() )
@@ -2856,14 +2592,12 @@ return retMe ;
 
 bool xServer::PostSignal( int whichSig )
 {
-
 // First, notify the server signal handler
 bool handledSignal = OnSignal( whichSig ) ;
 
 //TODO: figure out why foreach_xClient doesnt work
 
 //Network->foreach_xClient( handleSignal( whichSig ) ) ;
-
 
 // Pass this signal on to each xClient.
 xNetwork::localClientIterator ptr = Network->localClient_begin() ;
@@ -2875,7 +2609,6 @@ for( ; ptr != Network->localClient_end() ; ++ptr )
 		}
 	(*ptr)->OnSignal( whichSig ) ;
 	}
-
 
 return handledSignal ;
 }
@@ -3695,14 +3428,12 @@ if( !banVector.empty() )
 	}
 
 return retMe ;
-
 }
 
 int xServer::parseModeRequest( const Channel* theChan,
 	const string& modes,
 	const string& args ) const
 {
-
 // Tokenize the argument list by ' '
 StringTokenizer argTokens( args ) ;
 
@@ -3818,7 +3549,6 @@ for( string::const_iterator modePtr = modes.begin() ;
 
 // All is well
 return 0 ;
-
 }
 
 // Make sure the banMask is of the form nick!user@host
@@ -3846,8 +3576,18 @@ for( jupedServerListType::const_iterator ptr = jupedServers.begin() ;
 		return true;
 		}
 	}
-
 return false;
+}
+
+void xServer::WriteBurstBuffer()
+{
+if( !isConnected() )
+	{
+	return ;
+	}
+
+ConnectionManager::Write( this, serverConnection, burstHoldBuffer.data() ) ;
+burstHoldBuffer.clear() ;
 }
 
 } // namespace gnuworld

@@ -2,7 +2,7 @@
  * cservice.cc
  * Author: Greg Sikorski
  * Purpose: Overall control client.
- * $Id: cservice.cc,v 1.216 2002/05/23 17:43:13 dan_karrels Exp $
+ * $Id: cservice.cc,v 1.217 2002/07/16 13:51:12 dan_karrels Exp $
  */
 
 #warning *** If you are upgrading from a previous release, please make note of
@@ -3620,7 +3620,7 @@ void cservice::checkDbConnectionStatus()
 			if (connectRetries >= 6)
 			{
 				logAdminMessage("Unable to contact database after 6 attempts, shutting down.");
-				MyUplink->flushBuffer();
+				//MyUplink->flushBuffer();
 				::exit(0);
 			} else
 			{

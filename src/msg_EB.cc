@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_EB.cc,v 1.7 2002/07/05 01:10:05 dan_karrels Exp $
+ * $Id: msg_EB.cc,v 1.8 2002/07/16 13:51:12 dan_karrels Exp $
  */
 
 #include	<sys/types.h>
@@ -33,7 +33,7 @@
 #include	"xparameters.h"
 #include	"ServerCommandHandler.h"
 
-const char msg_EB_cc_rcsId[] = "$Id: msg_EB.cc,v 1.7 2002/07/05 01:10:05 dan_karrels Exp $" ;
+const char msg_EB_cc_rcsId[] = "$Id: msg_EB.cc,v 1.8 2002/07/16 13:51:12 dan_karrels Exp $" ;
 const char server_h_rcsId[] = __SERVER_H ;
 const char iServer_h_rcsId[] = __ISERVER_H ;
 const char events_h_rcsId[] = __EVENTS_H ;
@@ -66,7 +66,7 @@ if( !strcmp( params[ 0 ], theServer->getUplinkCharYY().c_str() ) )
 
 	// Signal that all Write()'s should write to the
 	// normal output buffer
-	theServer->setUseBurstBuffer( false ) ;
+	theServer->setUseHoldBuffer( false ) ;
 
 	// Burst our clients
 	theServer->BurstClients() ;
@@ -95,18 +95,7 @@ if( !strcmp( params[ 0 ], theServer->getUplinkCharYY().c_str() ) )
 	theServer->Write( "%s EA\n", theServer->getCharYY() ) ;
 
 	// Is the burstOutputBuffer empty?
-	if( !theServer->isBurstOutputBufferEmpty() )
-		{
-		// It has data, concatenate this data
-		// onto the normal outputBuffer
-		theServer->transferBurstToOutputBuffer() ;
-
-		elog	<< "msg_EB> Adding "
-			<< theServer->burstOutputBufferSize()
-			<< " bytes from burstOutputBuffer to "
-			<< "outputBuffer"
-			<< endl ;
-		}
+	theServer->WriteBurstBuffer() ;
 
 	elog	<< "*** Completed net burst"
 		<< endl ;

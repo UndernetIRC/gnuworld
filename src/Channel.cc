@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: Channel.cc,v 1.32 2002/05/27 17:18:12 dan_karrels Exp $
+ * $Id: Channel.cc,v 1.33 2002/07/16 13:51:12 dan_karrels Exp $
  */
 
 #include	<new>
@@ -35,9 +35,10 @@
 #include	"ELog.h"
 #include	"match.h"
 #include	"server.h"
+#include	"ConnectionManager.h"
 
 const char Channel_h_rcsId[] = __CHANNEL_H ;
-const char Channel_cc_rcsId[] = "$Id: Channel.cc,v 1.32 2002/05/27 17:18:12 dan_karrels Exp $" ;
+const char Channel_cc_rcsId[] = "$Id: Channel.cc,v 1.33 2002/07/16 13:51:12 dan_karrels Exp $" ;
 const char iClient_h_rcsId[] = __ICLIENT_H ;
 const char ChannelUser_h_rcsId[] = __CHANNELUSER_H ;
 const char Network_h_rcsId[] = __NETWORK_H ;
@@ -517,7 +518,7 @@ else if( !theClient->getUserName().empty() )
 theBan += '@' ;
 
 StringTokenizer st( theClient->getInsecureHost(), '.' ) ;
-if( Socket::isIPAddress( theClient->getInsecureHost() ) )
+if( ConnectionManager::isIpAddress( theClient->getInsecureHost() ) )
 	{
 	theBan += st[ 0 ] + '.' ;
 	theBan += st[ 1 ] + '.' ;

@@ -17,14 +17,14 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_PASS.cc,v 1.5 2002/07/05 01:10:06 dan_karrels Exp $
+ * $Id: msg_PASS.cc,v 1.6 2002/07/16 13:51:12 dan_karrels Exp $
  */
 
 #include	"server.h"
 #include	"xparameters.h"
 #include	"ServerCommandHandler.h"
 
-const char msg_PASS_cc_rcsId[] = "$Id: msg_PASS.cc,v 1.5 2002/07/05 01:10:06 dan_karrels Exp $" ;
+const char msg_PASS_cc_rcsId[] = "$Id: msg_PASS.cc,v 1.6 2002/07/16 13:51:12 dan_karrels Exp $" ;
 const char server_h_rcsId[] = __SERVER_H ;
 const char xParameters_h_rcsId[] = __XPARAMETERS_H ;
 
@@ -36,7 +36,7 @@ CREATE_HANDLER(msg_PASS)
 bool msg_PASS::Execute( const xParameters& )
 {
 theServer->setBursting( true ) ;
-theServer->setUseBurstBuffer( true ) ;
+theServer->setUseHoldBuffer( true ) ;
 
 return true ;
 }

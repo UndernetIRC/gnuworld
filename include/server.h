@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server.h,v 1.68 2002/07/08 15:47:54 dan_karrels Exp $
+ * $Id: server.h,v 1.69 2002/07/16 13:51:02 dan_karrels Exp $
  */
 
 #ifndef __SERVER_H
-#define __SERVER_H "$Id: server.h,v 1.68 2002/07/08 15:47:54 dan_karrels Exp $"
+#define __SERVER_H "$Id: server.h,v 1.69 2002/07/16 13:51:02 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
@@ -38,8 +38,6 @@
 #include	"Numeric.h"
 #include	"iServer.h"
 #include	"iClient.h"
-#include	"Socket.h"
-#include	"ClientSocket.h"
 #include	"Buffer.h"
 #include	"events.h"
 #include	"Gline.h"
@@ -49,6 +47,9 @@
 #include	"ELog.h"
 #include	"TimerHandler.h"
 #include	"ServerCommandHandler.h"
+#include	"ConnectionManager.h"
+#include	"ConnectionHandler.h"
+#include	"Connection.h"
 
 namespace gnuworld
 {
@@ -80,7 +81,7 @@ enum MessageType
  * This class is the server proper; it is responsible for the connection
  * to the IRC network, and for maintaining the services clients.
  */
-class xServer
+class xServer : public ConnectionManager, ConnectionHandler
 {
 
 protected:
@@ -198,26 +199,9 @@ public:
 	inline glineIterator	gline_end()
 		{ return glineList.end() ; }
 
-	/**
-	 * Connect to a network uplink of the given address
-	 * (IP or hostname) and on the given port.
-	 */
-	virtual int Connect( const string& Address,
-			unsigned short int Port ) ;
+	virtual void OnDisConnect( Connection* ) ;
 
-	/**
-	 * Connect to the default uplink and port.
-	 */
-	virtual int Connect()
-		{ return Connect( UplinkName, Port ) ; }
-
-	/**
-	 * Call this method when a read/write error occurs on the
-	 * uplink socket.  This will close and deallocate the socket,
-	 * as well as clear the input/output buffers and post a
-	 * message for GetMessage() later.
-	 */
-	virtual void OnDisConnect() ;
+	virtual void OnConnect( Connection* ) ;
 
 	/**
 	 * Attach a fake server to this services server.
@@ -231,28 +215,18 @@ public:
 	virtual bool SquitServer( const string& name, const string& reason ) ;
 
 	/**
-	 * Perform the physical read of the socket.
-	 */
-	virtual void DoRead() ;
-
-	/**
-	 * Perform the physical write to the socket.
-	 */
-	virtual void DoWrite() ;
-
-	/**
 	 * Append a std::string to the output buffer.
 	 * The second argument determines if data should be written
 	 * during burst time.
 	 */
-	virtual size_t Write( const string& ) ;
+	virtual bool Write( const string& ) ;
 
 	/**
 	 * Similar to the above signature of Write() except that data
 	 * will be written to the normal output buffer even during
 	 * burst time.
 	 */
-	virtual size_t WriteDuringBurst( const string& ) ;
+	virtual bool WriteDuringBurst( const string& ) ;
 
 	/**
 	 * Append a C variable argument list/character array to the output
@@ -261,55 +235,28 @@ public:
 	 * method cannot support a final default argument -- this method
 	 * defaults to NOT writing during burst.
 	 */
-	virtual size_t Write( const char*, ... ) ;
+	virtual bool Write( const char*, ... ) ;
 
 	/**
 	 * This method is similar to the above Write(), except
 	 * that the data will be written to the normal output
 	 * buffer even during burst time.
 	 */
-	virtual size_t WriteDuringBurst( const char*, ... ) ;
+	virtual bool WriteDuringBurst( const char*, ... ) ;
 
 	/**
 	 * Append a std::stringstream to the output buffer.
 	 * The second argument determines if data should be written
 	 * during burst time.
 	 */
-	virtual size_t Write( const stringstream& ) ;
+	virtual bool Write( const stringstream& ) ;
 
 	/**
 	 * This method is similar to the above Write(), except
 	 * that the data will be written to the normal output
 	 * buffer even during burst time.
 	 */
-	virtual size_t WriteDuringBurst( const stringstream& ) ;
-
-	/**
-	 * Write any bufferred data to the network.
-	 * Returns false on write error.
-	 */
-	virtual inline bool flushBuffer() ;
-
-	/**
-	 * Read a '\n' delimited line from the input buffer.
-	 * Return true is none exist.  (size) is the length of
-	 * the C string buffer (buf).
-	 */
-	virtual inline bool GetString( char* buf ) ;
-
-	/**
-	 * Return true if a read attempt from the network
-	 * would NOT block.
-	 * This method is not const beause it may modify
-	 * _connected and Socket if an error occurs.
-	 */
-	virtual inline bool ReadyForRead() ;
-
-	/**
-	 * Return true if data exists to be written to the
-	 * network, and a write would NOT block.
-	 */
-	virtual inline bool ReadyForWrite() const ;
+	virtual bool WriteDuringBurst( const stringstream& ) ;
 
 	/**
 	 * Process is responsible for parsing lines of data.
@@ -680,7 +627,7 @@ public:
 	 * its uplink, false otherwise.
 	 */
 	virtual bool isConnected() const
-		{ return _connected ; }
+		{ return (serverConnection != 0) ; }
 
 	/* Numeric utility methods */
 
@@ -766,25 +713,6 @@ public:
 		{ return ConnectionTime ; }
 
 	/**
-	 * Returns the total number of bytes recieved from the uplink
-	 */
-	inline const unsigned long getTotalReceived() const
-		{ return theSock->getTotalReceived(); }
-
-	/**
-	 * Returns the total number of bytes sent to the uplink
-	 */
-	inline const unsigned long getTotalSent() const
-		{ return theSock->getTotalSent(); }
-	
-	/**
-	 * This is a simple mutator of the server's socket pointer.
-	 * This is used ONLY for implementing the simulation mode.
-	 */
-	inline void setSocket( ClientSocket* newSock )
-		{ theSock = newSock ; }
-
-	/**
 	 * Return a pointer to this server's uplink.
 	 */
 	inline iServer*		getUplink() const
@@ -803,8 +731,8 @@ public:
 	 * This method should ONLY be called by the server command
 	 * handlers.
 	 */
-	inline void setUseBurstBuffer( bool newVal )
-		{ useBurstBuffer = newVal ; }
+	inline void setUseHoldBuffer( bool newVal )
+		{ useHoldBuffer = newVal ; }
 
 	/**
 	 * Set the time of the most recent end of burst.
@@ -823,34 +751,11 @@ public:
 		{ burstStart = newVal ; }
 
 	/**
-	 * Return true if the burstOutputBuffer is empty, false otherwise.
-	 */
-	inline bool isBurstOutputBufferEmpty() const
-		{ return burstOutputBuffer.empty() ; }
-
-	/**
-	 * Return the number of bytes in the burstOutputBuffer.
-	 */
-	inline string::size_type burstOutputBufferSize() const
-		{ return burstOutputBuffer.size() ; }
-
-	/**
-	 * Clear the burstOutputBuffer of all data.
+	 * Transfer the burstHoldBuffer data to the outputBuffer.
 	 * This method should ONLY be called by the server command
 	 * handlers.
 	 */
-	inline void clearBurstOutputBuffer()
-		{ burstOutputBuffer.clear() ; }
-
-	/**
-	 * Transfer the burstOutputBuffer data to the outputBuffer.
-	 * This method should ONLY be called by the server command
-	 * handlers.
-	 */
-	inline void transferBurstToOutputBuffer()
-		{ outputBuffer += burstOutputBuffer ; 
-		  burstOutputBuffer.clear() ;
-		}
+	inline void WriteBurstBuffer() ;
 
 	/**
 	 * Shutdown the server.
@@ -1135,13 +1040,7 @@ protected:
 	inline bool validEvent( const eventType& theEvent ) const
 		{ return (theEvent >= 0 && theEvent < EVT_NOOP) ; }
 
-	/**
-	 * This points to the input/output stream to be used for
-	 * server->server communication.  This may point to an
-	 * instance of FileSocket if the server is running in
-	 * simulation mode.
-	 */
-	ClientSocket		*theSock ;
+	Connection		*serverConnection ;
 
 	/**
 	 * The name of the server, as the network sees it.
@@ -1242,14 +1141,9 @@ protected:
 
 	/**
 	 * This variable will be true when the default behavior
-	 * of Write() is to write to the burstOutputBuffer.
+	 * of Write() is to write to the burstHoldBuffer.
 	 */
-	bool			useBurstBuffer ;
-
-	/**
-	 * This variable is true when the socket connection is valid.
-	 */
-	bool			_connected ;
+	bool			useHoldBuffer ;
 
 	/**
 	 * This variable remains true while the server should continue
@@ -1299,31 +1193,9 @@ protected:
 	iServer* 		Uplink ;
 
 	/**
-	 * This is the buffer into which network commands are read
-	 * and from which they are later processed.
-	 */
-	Buffer			inputBuffer ;
-
-	/**
-	 * This is the output buffer from which data is written to
-	 * the network.
-	 */
-	Buffer			outputBuffer ;
-
-	/**
 	 * This buffer will hold data to be written during burst time.
 	 */
-	Buffer			burstOutputBuffer ;
-
-	/**
-	 * This is the size of the TCP input window.
-	 */
-	size_t			inputReadSize ;
-
-	/**
-	 * This is the size of the TCP output window.
-	 */
-	size_t			outputWriteSize ;
+	Buffer			burstHoldBuffer ;
 
 	/**
 	 * The name of the file which contains the command handler

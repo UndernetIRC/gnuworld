@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_SQ.cc,v 1.10 2002/07/05 01:10:06 dan_karrels Exp $
+ * $Id: msg_SQ.cc,v 1.11 2002/07/16 13:51:12 dan_karrels Exp $
  */
 
 #include	<iostream>
@@ -33,7 +33,7 @@
 #include	"xparameters.h"
 #include	"ServerCommandHandler.h"
 
-const char msg_SQ_cc_rcsId[] = "$Id: msg_SQ.cc,v 1.10 2002/07/05 01:10:06 dan_karrels Exp $" ;
+const char msg_SQ_cc_rcsId[] = "$Id: msg_SQ.cc,v 1.11 2002/07/16 13:51:12 dan_karrels Exp $" ;
 const char server_h_rcsId[] = __SERVER_H ;
 const char events_h_rcsId[] = __EVENTS_H ;
 const char Network_h_rcsId[] = __NETWORK_H ;
@@ -98,13 +98,18 @@ if( squitServer->getIntYY() == theServer->getUplinkIntYY() )
 		<< endl ;
 
 	// It's my uplink, we have been squit...those bastards!
-	theServer->OnDisConnect() ;
+	// Just for fun, let's see if doing nothing here will work
+	// Let the uplink close the connection, and let everything
+	// else fall into place
+	// *crosses fingers*
+	// TODO
+	return true ;
 	}
 else
 	{
-
 //	elog	<< "msg_SQ> " << squitServer->getName()
-//		<< " has been squit" << endl ;
+//		<< " has been squit"
+//		<< endl ;
 
 	string source( Param[ 0 ] ) ;
 	string reason( Param[ 3 ] ) ;
