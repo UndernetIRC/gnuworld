@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: stats.cc,v 1.9 2003/06/05 01:38:11 dan_karrels Exp $
+ * $Id: stats.cc,v 1.10 2003/06/06 00:44:11 dan_karrels Exp $
  */
 
 #include	<string>
@@ -381,7 +381,7 @@ void stats::dumpStats( iClient* theClient )
 {
 time_t countingTime = ::time( 0 ) - startTime ;
 
-Notice( theClient, "I have been counting for %s seconds",
+Notice( theClient, "I have been counting for %d seconds",
 	countingTime ) ;
 Notice( theClient, "EventType   EventCount  Average" ) ;
 
