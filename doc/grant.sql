@@ -25,3 +25,14 @@ grant all on noreg to gnuworld;
 grant all on regteam to gnuworld;
 grant all on webaccessteam to gnuworld;
 grant all on abuseteam to gnuworld;
+grant all on mailq to gnuworld;
+
+-- Sequences.
+grant all on bans_id_seq to gnuworld;
+grant all on channels_id_seq to gnuworld;
+grant all on checkpoints_id_seq to gnuworld;
+grant all on domain_id_seq to gnuworld;
+grant all on languages_id_seq to gnuworld;
+grant all on log_users_id_seq to gnuworld;
+grant all on noreg_id_seq to gnuworld;
+grant all on users_id_seq to gnuworld;

@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------------
--- "$Id: cservice.sql,v 1.48 2001/08/06 20:26:23 gte Exp $"
+-- "$Id: cservice.sql,v 1.49 2001/08/13 02:18:04 gte Exp $"
 -- Channel service DB SQL file for PostgreSQL.
 
 -- ChangeLog:
@@ -279,11 +279,14 @@ CREATE TABLE pending (
 	join_count INT4 DEFAULT '0',
 	unique_join_count INT4 DEFAULT '0',
 	decision_ts INT4,
-	decision VARCHAR (80), 
+	decision TEXT,
 	managername VARCHAR (80),
 	reg_acknowledged CHAR DEFAULT 'N',
 	comments TEXT,
-	last_updated INT4 NOT NULL, 
+	last_updated INT4 NOT NULL,
+	description TEXT,
+	reviewed CHAR NOT NULL DEFAULT 'N',
+	reviewed_by_id INT4 CONSTRAINT pending_review_ref REFERENCES users (id),
 	PRIMARY KEY(channel_id)
 );
 
