@@ -12,7 +12,7 @@
  *
  * Caveats: None.
  *
- * $Id: BANCommand.cc,v 1.12 2001/02/05 00:44:08 gte Exp $
+ * $Id: BANCommand.cc,v 1.13 2001/02/10 03:49:10 isomer Exp $
  */
 
 #include	<string>
@@ -27,7 +27,7 @@
 #include	"responses.h"
 #include	"match.h"
 
-const char BANCommand_cc_rcsId[] = "$Id: BANCommand.cc,v 1.12 2001/02/05 00:44:08 gte Exp $" ;
+const char BANCommand_cc_rcsId[] = "$Id: BANCommand.cc,v 1.13 2001/02/10 03:49:10 isomer Exp $" ;
 
 namespace gnuworld
 {
@@ -52,7 +52,12 @@ if(!theUser) return false;
 sqlChannel* theChan = bot->getChannelRecord(st[1]);
 if(!theChan)
 	{
-	bot->Notice(theClient, "Sorry, %s isn't registered with me.",
+	bot->Notice(theClient, 
+		bot->getResponse(
+			theUser, 
+			language::not_registered, 
+			string("Sorry, %s isn't registered with me.")
+		).c_str(),
 		st[1].c_str());
 	return false;
 	} 
@@ -61,7 +66,13 @@ if(!theChan)
 	
 if (!theChan->getInChan()) 
 	{
-	bot->Notice(theClient, "I'm not in that channel!");
+	bot->Notice(
+		theClient, 
+		bot->getResponse(theUser,
+			language::i_am_not_on_chan,
+			string("I'm not in that channel!")
+		)
+		);
 	return false;
 	}
  
@@ -123,19 +134,31 @@ switch(oCount)
 int level = bot->getEffectiveAccessLevel(theUser, theChan, true);
 if(level < level::ban)
 	{
-	bot->Notice(theClient, "Sorry, you have insufficient access to perform that command.");
+	bot->Notice(theClient, 
+		bot->getResponse(theUser, 
+			language::insuf_access,
+			string("Sorry, you have insufficient access to perform that command.")
+			)
+		);
 	return false;
 	}
 
-if(banLevel < 1 || banLevel > 500 || banLevel > level)
+if(banLevel < 1 || banLevel > level)
 	{
-	bot->Notice(theClient, "Invalid banlevel range. Valid range is 1-%i.", level);
+	bot->Notice(theClient, 
+		bot->getResponse(theUser,language::ban_level_range,
+		string("Invalid banlevel range. Valid range is 1-%i.")).c_str()
+		, level);
 	return true;
 	}
 
 if(banTime < 1 || banTime > 336)
 	{
-	bot->Notice(theClient, "Invalid ban duration. Your ban duration can be a maximum of 336 hours.");
+	bot->Notice(theClient, 
+		bot->getResponse(theUser,
+		language::ban_duration,
+		string("Invalid ban duration. Your ban duration can be a maximum of 336 hours."))
+	);
 	return true;
 	}
 

@@ -8,7 +8,7 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char SHOWCOMMANDSCommand_cc_rcsId[] = "$Id: SHOWCOMMANDSCommand.cc,v 1.9 2001/02/10 02:47:44 isomer Exp $" ;
+const char SHOWCOMMANDSCommand_cc_rcsId[] = "$Id: SHOWCOMMANDSCommand.cc,v 1.10 2001/02/10 03:49:10 isomer Exp $" ;
 
 namespace gnuworld
 {
@@ -52,10 +52,9 @@ bool SHOWCOMMANDSCommand::Exec( iClient* theClient, const string& Message )
 	int level = bot->getEffectiveAccessLevel(theUser, theChan, true);
 	int admin = bot->getEffectiveAccessLevel(theUser, bot->getChannelRecord("*"), true); 
 
-	if (theClient->isOper()) 
-		           bot->Notice(theClient,"\002Level Oper\002: operjoin* operpart*");
 	if (level >= 1000) bot->Notice(theClient,"\002Level 1000\002: anything");
-	if (level >= 900) bot->Notice(theClient, "\002Level  900\002: say shutdown");
+	if (level >= 900) bot->Notice(theClient, "\002Level  900\002: shutdown");
+	if (level >= 800) bot->Notice(theClient, "\002Level  800\002: say servnotice");
 	if (level >= 750) bot->Notice(theClient, "\002Level  750\002: purge");
 	if (level >= 600) bot->Notice(theClient, "\002Level  600\002: register remignore");
 	if (level >= 450) bot->Notice(theClient, "\002Level  450\002: join* part* set%s*",(level>=500) ? "+" : ""); 
@@ -67,9 +66,11 @@ bool SHOWCOMMANDSCommand::Exec( iClient* theClient, const string& Message )
 	if (level >= 25) bot->Notice(theClient,  "\002Level   25\002: voice devoice");
 	if (level >= 1) bot->Notice(theClient,   "\002Level    1\002: status%s",(level>=400||admin>0||theClient->isOper()) ? "+" : ""); 
 	if (level >= 0) bot->Notice(theClient,   "\002Level    0\002: access banlist chaninfo info help* lbanlist login motd* newpass showcommands showignore verify"); 
-	bot->Notice(theClient, "Commands marked * are semi-complete :)");
 	if (admin >= level::force) 
 			bot->Notice(theClient,   "\002Level    *\002: force unforce");
+	if (theClient->isOper()) 
+		           bot->Notice(theClient,"\002Level Oper\002: operjoin* operpart*");
+	bot->Notice(theClient, "Commands marked * are not yet fully functional :)");
 	return true ;
 } 
 
