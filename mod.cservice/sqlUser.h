@@ -1,13 +1,15 @@
 /* sqlUser.h */
 
 #ifndef __SQLUSER_H
-#define __SQLUSER_H "$Id: sqlUser.h,v 1.8 2001/01/06 06:47:26 gte Exp $"
+#define __SQLUSER_H "$Id: sqlUser.h,v 1.9 2001/01/08 04:13:04 gte Exp $"
 
 #include	<string>
 #include	<ctime>
 #include	"libpq++.h"
-
+ 
 using std::string ;
+
+class iClient;
 
 namespace gnuworld
 { 
@@ -82,7 +84,10 @@ public:
 
 	inline void setLanguageId( const unsigned int& _language_id )
 		{ language_id = _language_id; }
- 
+
+	inline iClient* isAuthed()
+		{ return networkClient; }
+
 	/*
 	 * Method to perform a SQL 'UPDATE' and commit changes to this
 	 * object back to the database.
@@ -93,7 +98,8 @@ public:
 	bool loadData( int );
 	bool loadData( const string& );
     void setAllMembers(int);
-
+	iClient*	networkClient;
+ 
 protected: 
 
 	unsigned int	id ;

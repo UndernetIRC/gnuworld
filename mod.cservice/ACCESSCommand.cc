@@ -8,7 +8,7 @@
  * Can optionally narrow down selection using a number of switches. (TODO).
  * Can display all channels a user has access on (TODO). 
  *
- * $Id: ACCESSCommand.cc,v 1.6 2001/01/02 07:55:12 gte Exp $
+ * $Id: ACCESSCommand.cc,v 1.7 2001/01/08 04:13:04 gte Exp $
  */
 
 #include	<string>
@@ -18,7 +18,7 @@
 #include	"cservice.h"
 #include	"libpq++.h"
 
-const char ACCESSCommand_cc_rcsId[] = "$Id: ACCESSCommand.cc,v 1.6 2001/01/02 07:55:12 gte Exp $" ;
+const char ACCESSCommand_cc_rcsId[] = "$Id: ACCESSCommand.cc,v 1.7 2001/01/08 04:13:04 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -78,6 +78,7 @@ bool ACCESSCommand::Exec( iClient* theClient, const string& Message )
 	{
 		sqlLevel::flagType flag; 
 		unsigned short int autoOp;
+		unsigned short int autoVoice;
 		int duration = 0;
 
 		for (int i = 0 ; i < bot->SQLDb->Tuples(); i++)
@@ -86,8 +87,10 @@ bool ACCESSCommand::Exec( iClient* theClient, const string& Message )
 			flag = atoi(bot->SQLDb->GetValue(i, 3));
 			duration = atoi(bot->SQLDb->GetValue(i, 4));
 			autoOp = (flag & sqlLevel::F_AUTOOP);
+			autoVoice = (flag & sqlLevel::F_AUTOVOICE);
 			bot->Notice(theClient, "USER: %s ACCESS: %s", bot->SQLDb->GetValue(i, 1), bot->SQLDb->GetValue(i, 2));
-			bot->Notice(theClient, "CHANNEL: %s -- AUTOOP: %s", bot->SQLDb->GetValue(i, 0), autoOp ? "ON" : "OFF");
+			bot->Notice(theClient, "CHANNEL: %s -- AUTOOP: %s -- AUTOVOICE: %s", bot->SQLDb->GetValue(i, 0), 
+				autoOp ? "ON" : "OFF", autoVoice ? "ON" : "OFF");
 			bot->Notice(theClient, "LAST SEEN: %s ago.",  bot->prettyDuration(duration).c_str()); 
 		}
 			bot->Notice(theClient, "End of access list");

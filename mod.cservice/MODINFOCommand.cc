@@ -8,7 +8,7 @@
  *
  * Caveats: None
  *
- * $Id: MODINFOCommand.cc,v 1.2 2001/01/02 07:55:12 gte Exp $
+ * $Id: MODINFOCommand.cc,v 1.3 2001/01/08 04:13:04 gte Exp $
  */
 
 #include	<string>
@@ -18,7 +18,7 @@
 #include	"cservice.h" 
 #include	"levels.h"
 
-const char MODINFOCommand_cc_rcsId[] = "$Id: MODINFOCommand.cc,v 1.2 2001/01/02 07:55:12 gte Exp $" ;
+const char MODINFOCommand_cc_rcsId[] = "$Id: MODINFOCommand.cc,v 1.3 2001/01/08 04:13:04 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -35,7 +35,7 @@ bool MODINFOCommand::Exec( iClient* theClient, const string& Message )
 	}
  
 	const string command = string_upper(st[2]); 
-	if ((command != "ACCESS") && (command != "AUTOOP")) 
+	if ((command != "ACCESS") && (command != "AUTOOP") && (command != "AUTOVOICE")) 
 	{
 		Usage(theClient);
 		return true;
@@ -91,17 +91,7 @@ bool MODINFOCommand::Exec( iClient* theClient, const string& Message )
 		bot->Notice(theClient, "%s doesn't appear to have access in %s.", targetUser->getUserName().c_str(), theChan->getName().c_str());
 		return false;
 	}
-
-	/*
-	 *  Check we aren't trying to change someone with access higher than ours.
-	 */
-
-	if (level <= targetLevel)
-	{
-		bot->Notice(theClient, "Cannot modify a user with equal or higher access than your own.");
-		return false;
-	}  
-
+ 
 	/*
 	 *  Figure out what they're doing - ACCESS or AUTOOP.
 	 */
@@ -109,6 +99,17 @@ bool MODINFOCommand::Exec( iClient* theClient, const string& Message )
 
 	if (command == "ACCESS")
 	{ 
+
+		/*
+		 *  Check we aren't trying to change someone with access higher than ours (or equal).
+		 */
+	
+		if (level <= targetLevel)
+		{
+			bot->Notice(theClient, "Cannot modify a user with equal or higher access than your own.");
+			return false;
+		}  
+	
 		/*
 		 *	Check we aren't trying to set someone's access higher than ours.
 		 */ 
@@ -127,15 +128,66 @@ bool MODINFOCommand::Exec( iClient* theClient, const string& Message )
 		if (level <= newAccess)
 		{
 			bot->Notice(theClient, "Cannot give a user higher or equal access to your own.");
+			return false;
 		} 
-
-	}
  
-	if (command == "AUTOOP")
+		sqlLevel* aLevel = bot->getLevelRecord(targetUser, theChan);
+		aLevel->setAccess(newAccess);
+		aLevel->setLastModif(::time(NULL));
+		aLevel->setLastModifBy(theClient->getNickUserHost());
+		aLevel->commit();
+		bot->Notice(theClient, "Modified %s's access level on channel %s to %i", 
+			targetUser->getUserName().c_str(), theChan->getName().c_str(),
+			newAccess);
+	}
+
+ 	int autoType = 0;
+	if (command == "AUTOOP") autoType = 1;
+	if (command == "AUTOVOICE") autoType = 2;
+
+	if (autoType)
 	{
+		
 		/*
-		 *  Check for "Yes" or "No" and act accordingly.
+		 *  Check we aren't trying to change someone with access higher than ours (or equal).
 		 */
+	
+		if (level < targetLevel)
+		{
+			bot->Notice(theClient, "Cannot modify a user with higher access than your own.");
+			return false;
+		}  
+
+		/*
+		 *  Check for "ON" or "OFF" and act accordingly.
+		 */
+
+		if (string_upper(st[4]) == "ON")
+		{
+			sqlLevel* aLevel = bot->getLevelRecord(targetUser, theChan);
+			if (autoType == 1) aLevel->setFlag(sqlLevel::F_AUTOOP);
+			if (autoType == 2) aLevel->setFlag(sqlLevel::F_AUTOVOICE);
+			aLevel->commit();
+			bot->Notice(theClient, "Enabled %s for %s on channel %s", 
+				(autoType == 1) ? "AUTOOP" : "AUTOVOICE", 
+				targetUser->getUserName().c_str(), theChan->getName().c_str()); 
+			return false;
+		}
+
+		if (string_upper(st[4]) == "OFF")
+		{
+			sqlLevel* aLevel = bot->getLevelRecord(targetUser, theChan);			
+			if (autoType == 1) aLevel->removeFlag(sqlLevel::F_AUTOOP);
+			if (autoType == 2) aLevel->removeFlag(sqlLevel::F_AUTOVOICE);
+			aLevel->commit();
+			bot->Notice(theClient, "Disabled %s for %s on channel %s", 
+				(autoType == 1) ? "AUTOOP" : "AUTOVOICE", 
+				targetUser->getUserName().c_str(), theChan->getName().c_str()); 
+			return false;
+		}
+
+		Usage(theClient);
+		return true; 
 	}
 
 	return true ;

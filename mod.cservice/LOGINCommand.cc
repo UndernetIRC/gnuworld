@@ -8,8 +8,9 @@
 #include	"ELog.h" 
 #include	"cservice.h" 
 #include	"responses.h" 
+#include	"networkData.h"
 
-const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.5 2001/01/05 06:44:05 gte Exp $" ;
+const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.6 2001/01/08 04:13:04 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -79,11 +80,31 @@ bool LOGINCommand::Exec( iClient* theClient, const string& Message )
 			return false;
 		}
 
+		/*
+		 *  Check this user isn't already spoken for..
+		 *  If someone HAS authenticated as this user, then deauth that other
+		 *  person.
+		 */
+
+		iClient* authTestUser = theUser->isAuthed();
+		if (authTestUser)
+		{
+			bot->Notice(authTestUser, "NOTICE: %s has now authenticated as %s, you are no longer authenticated.",
+				theClient->getNickUserHost().c_str(), theUser->getUserName().c_str());
+
+			networkData* tmpData = (networkData*)authTestUser->getCustomData(bot);
+			tmpData->currentUser = NULL; // Remove the pointer from the iClient to the sqlUser.
+		}
+ 
+		theUser->setLastSeen(::time(NULL));
+		theUser->networkClient = theClient; // Who is authed as this user.
+		theUser->commit();
+
+		networkData* newData = (networkData*)theClient->getCustomData(bot);
+		newData->currentUser = theUser; // Pointer back to the sqlUser from this iClient. 
+
 		bot->Notice(theClient, bot->getResponse(theUser, language::auth_success).c_str(), 
 			theUser->getUserName().c_str()); 
-		theUser->setLastSeen(::time(NULL));
-		theUser->commit();
-		theClient->setCustomData(bot, (void *)theUser);
 
 	} else
 	{

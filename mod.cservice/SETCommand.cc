@@ -8,7 +8,7 @@
  *
  * Caveats: SET LANG is still under consideration.
  *
- * $Id: SETCommand.cc,v 1.1 2000/12/30 00:36:38 gte Exp $
+ * $Id: SETCommand.cc,v 1.2 2001/01/08 04:13:04 gte Exp $
  */
 
 #include	<string>
@@ -20,7 +20,7 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char SETCommand_cc_rcsId[] = "$Id: SETCommand.cc,v 1.1 2000/12/30 00:36:38 gte Exp $" ;
+const char SETCommand_cc_rcsId[] = "$Id: SETCommand.cc,v 1.2 2001/01/08 04:13:04 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -37,7 +37,9 @@ bool SETCommand::Exec( iClient* theClient, const string& Message )
 	    Usage(theClient);
 	    return true;
 	}
- 
+
+    Channel* tmpChan = Network->findChannel(st[1]); 
+
 	// Is the channel registered?
 	
 	sqlChannel* theChan = bot->getChannelRecord(st[1]);
@@ -56,12 +58,7 @@ bool SETCommand::Exec( iClient* theClient, const string& Message )
 	// Check level.
 
 	int level = bot->getAccessLevel(theUser, theChan);
-	if(level < level::setcmd)
-	{
-	    bot->Notice(theClient, "Sorry, you have insufficient access to perform that command.");
-	    return false;
-	} 
-
+ 
 	string option = string_upper(st[2]);
 	string value = string_upper(st[3]);
 	
@@ -273,7 +270,11 @@ bool SETCommand::Exec( iClient* theClient, const string& Message )
 			bot->Notice(theClient, "NOOP: You do not have enough access!");
 			return true;
 	    }
-	    if(value == "ON") theChan->setFlag(sqlChannel::F_NOOP);
+	    if(value == "ON") 
+	    {
+			theChan->setFlag(sqlChannel::F_NOOP);
+			if (tmpChan) bot->deopAllOnChan(tmpChan); // Deop everyone. :)
+	    }
 	    else if(value == "OFF") theChan->removeFlag(sqlChannel::F_NOOP);
 	    else
 	    {
@@ -558,8 +559,7 @@ bool SETCommand::Exec( iClient* theClient, const string& Message )
 		return true;
 	    }
 	    string modes = ""; // Chan modes.
-	    string args = ""; // key or limit.
-	    Channel* tmpChan = Network->findChannel(st[1]);
+	    string args = ""; // key or limit. 
 	    
 	    StringTokenizer::size_type mpos = 4;
 	    StringTokenizer::size_type apos = 5;

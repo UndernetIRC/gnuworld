@@ -4,7 +4,7 @@
  * Storage class for accessing channel user/level information either from the backend
  * or internal storage.
  * 
- * $Id: sqlLevel.cc,v 1.5 2001/01/05 06:44:05 gte Exp $
+ * $Id: sqlLevel.cc,v 1.6 2001/01/08 04:13:04 gte Exp $
  */
  
 #include	<strstream>
@@ -21,7 +21,7 @@ using std::string ;
 using std::endl ; 
  
 const char sqlLevel_h_rcsId[] = __SQLLEVEL_H ;
-const char sqlLevel_cc_rcsId[] = "$Id: sqlLevel.cc,v 1.5 2001/01/05 06:44:05 gte Exp $" ;
+const char sqlLevel_cc_rcsId[] = "$Id: sqlLevel.cc,v 1.6 2001/01/08 04:13:04 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -92,6 +92,42 @@ void sqlLevel::setAllMembers(int row)
 	last_modif_by = SQLDb->GetValue(row, 9);
 	last_updated = atoi(SQLDb->GetValue(row, 10)); 
 }
+
+bool sqlLevel::commit()
+{
+	/*
+	 *  Build an SQL statement to commit the transient data in this storage class
+	 *  back into the database.
+	 */
+
+	ExecStatusType status;
+	static const char* queryHeader =    "UPDATE levels ";
+ 
+	strstream queryString;
+	queryString << queryHeader 
+	<< "SET flags = " << flags << ", "
+	<< "access = " << access << ", "
+	<< "suspend_expires = " << suspend_expires << ", "
+	<< "suspend_by = '" << suspend_by << "', "
+	<< "added = " << added << ", "
+	<< "added_by = '" << added_by << "', "
+	<< "last_modif = " << last_modif << ", "
+	<< "last_modif_by = '" << last_modif_by << "', "
+	<< "last_updated = now()::abstime::int4 "
+	<< " WHERE channel_id = " << channel_id << " AND user_id = " << user_id
+	<< ends;
+
+	elog << "sqlLevel::commit> " << queryString.str() << endl; 
+
+	if ((status = SQLDb->Exec(queryString.str())) != PGRES_COMMAND_OK)
+	{
+		elog << "sqlLevel::commit> Something went wrong: " << SQLDb->ErrorMessage() << endl; // Log to msgchan here.
+		return false;
+ 	} 
+
+ 	return true;
+}	
+
 
 sqlLevel::~sqlLevel()
 {

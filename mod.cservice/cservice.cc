@@ -17,12 +17,13 @@
 #include	"ELog.h" 
 #include	"libpq++.h"
 #include	"constants.h"
+#include	"networkData.h"
 
 using std::vector ;
 using std::endl ;
 using std::strstream ;
 using std::ends ;
-using std::string ;
+using std::string ; 
 
 namespace gnuworld
 {
@@ -95,6 +96,11 @@ void cservice::ImplementServer( xServer* theServer )
 		lastBanRefresh = atoi(SQLDb->GetValue(0,0));
 	}
  
+	// Register our interest in recieving some Network events from gnuworld.
+
+	theServer->RegisterEvent( EVT_KILL, this );
+	theServer->RegisterEvent( EVT_QUIT, this );
+	theServer->RegisterEvent( EVT_NICK, this );
 
 xClient::ImplementServer( theServer ) ;
 }
@@ -153,7 +159,7 @@ cservice::cservice(const string& args)
 	if (SQLDb->ConnectionBad ())
 	{
 		elog << "cmaster::cmaster> Unable to connect to SQL server." << endl 
-		     << "cmaster::cmaster> PostgreSQL error message: " << SQLDb->ErrorMessage () << endl ;
+		     << "cmaster::cmaster> PostgreSQL error message: " << SQLDb->ErrorMessage() << endl ;
 
 		::exit( 0 ) ;
 	}
@@ -171,6 +177,8 @@ cservice::cservice(const string& args)
 	userDescription = cserviceConfig->Require( "description" )->second ; 
 	relayChan = cserviceConfig->Require( "relay_channel" )->second ; 
 	updateInterval = atoi((cserviceConfig->Require( "update_interval" )->second).c_str());
+	input_flood = atoi((cserviceConfig->Require( "input_flood" )->second).c_str()); 
+	output_flood = atoi((cserviceConfig->Require( "output_flood" )->second).c_str());
 
 	//-- Move this to the configuration file?  This should be fairly static..
 
@@ -209,11 +217,12 @@ int cservice::BurstChannels()
 			 *  Check the auto-join flag is set, if so - join. :)
 			 */ 
 
-			MyUplink->JoinChannel( this, data[ 0 ], SQLDb->GetValue( i, 3 ) ) ;
+			MyUplink->JoinChannel( this, data[ 0 ], SQLDb->GetValue( i, 3 ) );
+			MyUplink->RegisterChannelEvent( data [0], this ) ;
 		}
 	}
 
-	return xClient::BurstChannels () ;
+	return xClient::BurstChannels();
 }
 	
 int cservice::OnConnect()
@@ -234,6 +243,11 @@ int cservice::OnPrivateMessage( iClient* theClient, const string& Message )
 		Notice( theClient, "Incomplete command" ) ;
 		return 0 ;
 	}
+
+	/*
+	 * Do flood checking - admins at 750 or above are excempt.
+	 * N.B: Only check that once someone has flooded ;)
+	 */
 
 	const string Command = string_upper( st[ 0 ] ) ;
 
@@ -281,7 +295,7 @@ int cservice::OnCTCP( iClient* theClient, const string& CTCP,
 
 	if(Command == "VERSION")
 	{
-		xClient::DoCTCP(theClient, CTCP.c_str(), "Undernet P10 Channel Services Version 2 [" __DATE__ " " __TIME__ "] ($Id: cservice.cc,v 1.31 2001/01/06 06:47:26 gte Exp $)");
+		xClient::DoCTCP(theClient, CTCP.c_str(), "Undernet P10 Channel Services Version 2 [" __DATE__ " " __TIME__ "] ($Id: cservice.cc,v 1.32 2001/01/08 04:13:04 gte Exp $)");
 		return true;
 	}
  
@@ -296,7 +310,13 @@ sqlUser* cservice::isAuthed(iClient* theClient, bool alert)
 	 *  If 'alert' is true, send a notice to the user informing
 	 *  them that they must be logged in.
 	 */
-	sqlUser* theUser = (sqlUser*)theClient->getCustomData(this);
+
+	networkData* tmpData = (networkData*)theClient->getCustomData(this);
+
+	if (!tmpData) return 0; // No custom data, can't be logged in.
+
+	sqlUser* theUser = tmpData->currentUser;
+
 	if(theUser) {
 		return theUser;
 	}
@@ -388,7 +408,7 @@ sqlLevel* cservice::getLevelRecord( sqlUser* theUser, sqlChannel* theChan )
 	sqlLevelHashType::iterator ptr = sqlLevelCache.find(thePair);
 	if(ptr != sqlLevelCache.end()) // Found something!
 	{ 
-		elog << "cmaster::getAccessLevel> Cache hit for user-id:chan-id " << theUser->getID() << ":" << theChan->getID() << endl;
+		elog << "cmaster::getLevelRecord> Cache hit for user-id:chan-id " << theUser->getID() << ":" << theChan->getID() << endl;
 		levelCacheHits++;
 		return ptr->second ;
 	} 
@@ -444,6 +464,21 @@ short cservice::getAccessLevel( sqlUser* theUser, sqlChannel* theChan )
 	sqlLevel* theLevel = getLevelRecord(theUser, theChan);
 	if(theLevel)
 	{
+		/*
+		 *  Check to see if the channel has been suspended.
+		 */
+
+		if (theChan->getFlag(sqlChannel::F_SUSPEND))
+		{
+			// Send them a notice.
+			return 0;
+		}
+
+		/*
+		 *  Check to see if this particular access record has been
+		 *  suspended too.
+		 */
+
 		return theLevel->getAccess();
 	}
 
@@ -459,8 +494,14 @@ const string& cservice::getResponse( sqlUser* theUser, int response_id )
 	 */
 
 	static string result;
+	int lang_id;
 
-	int lang_id = theUser->getLanguageId();
+	if (theUser) {
+		lang_id = theUser->getLanguageId();
+	} else {
+		lang_id = 1; // Default to english if not authenticated.
+	}
+	
 	pair<int, int> thePair;
 	thePair = make_pair(lang_id, response_id);
 
@@ -477,7 +518,7 @@ const string& cservice::getResponse( sqlUser* theUser, int response_id )
 	 * will most likely segfault anyway).
 	 */
 
-	result = "Unable to retrieve response. If you see this, you are already dead :)";
+	result = "Unable to retrieve response. Please contact a cservice administrator.";
 	return result;
 }
 
@@ -677,6 +718,22 @@ bool cservice::serverNotice( Channel* theChannel, const char* format, ... )
 	return false;
 } 
 
+bool cservice::serverNotice( Channel* theChannel, const string& Message)
+{
+	/*
+	 *  Send a notice to a channel from the server.
+	 */
+ 
+	strstream s;
+	s << MyUplink->getCharYY() << " O " << theChannel->getName() << " "
+	<< ":" << Message << ends;
+
+	Write( s );
+	delete[] s.str();
+	
+	return false;
+} 
+
 bool cservice::logAdminMessage(const char* format, ... )
 {
 	/*
@@ -698,7 +755,7 @@ bool cservice::logAdminMessage(const char* format, ... )
 		return false;
 	}
 	string message = "[" + nickName + "] " + string(buf);
-	serverNotice(tmpChan, message.c_str());
+	serverNotice(tmpChan, message);
 	return true;
 }
  
@@ -759,6 +816,141 @@ bool cservice::validUserMask(iClient* theClient, const string& userMask)
         }
 
         return true;
+}
+
+void cservice::OnChannelModeO( Channel* theChan, ChannelUser* theChanUser,
+	const xServer::opVectorType& theTargets)
+{
+	/*
+	 * There are a number of things to do when we recieve a mode O for
+	 * a channel/targets.
+	 * Firstly, we check the status of certain channel flags is it set
+	 * NOOP? is it set STRICTOP?
+	 * We will only ever recieve events for channels that are registered.
+	 */ 
+
+	sqlChannel* reggedChan = getChannelRecord(theChan->getName());
+	if(!reggedChan)
+	{
+		elog << "cservice::OnChannelModeO> WARNING, unable to locate channel record"
+		<< " for registered channel event: " << theChan->getName() << endl;
+		return;
+	}
+
+	vector< iClient* > deopList; // List of clients to deop.
+
+	for( xServer::opVectorType::const_iterator ptr = theTargets.begin() ;
+		ptr != theTargets.end() ; ++ptr )
+	{
+		ChannelUser* tmpUser = ptr->second;
+		bool polarity = ptr->first;
+		if (polarity) // If somebody is being opped.
+		{
+			// If the channel is NOOP, deop everyone who tries to get opped!
+			if (reggedChan->getFlag(sqlChannel::F_NOOP)) deopList.push_back(tmpUser->getClient());
+
+			// If the channel is STRICTOP, deop everyone who isn't authenticated or
+			// and doesn't have access on the channe.
+			if (reggedChan->getFlag(sqlChannel::F_STRICTOP))
+			{
+				sqlUser* authUser = isAuthed(tmpUser->getClient(), false);
+				if (!authUser) // Not authed, deop.
+				{
+					deopList.push_back(tmpUser->getClient());
+					// Authed but doesn't have access... deop.
+				} else if (!getAccessLevel(authUser,reggedChan)) deopList.push_back(tmpUser->getClient());
+			}	
+		} 
+	}
+
+	/*
+	 *  Send notices and perform the deop's.
+	 */
+
+	if (deopList.size() > 0)
+	{
+		if ((theChanUser) && (reggedChan->getFlag(sqlChannel::F_NOOP)) ) 
+			Notice(theChanUser->getClient(), "The NOOP flag is set on %s",
+			reggedChan->getName().c_str());
+
+		if ((theChanUser) && (reggedChan->getFlag(sqlChannel::F_STRICTOP)) ) 
+			Notice(theChanUser->getClient(), "The STRICTOP flag is set on %s",
+			reggedChan->getName().c_str());
+
+		DeOp(theChan, deopList);
+	}
+}
+
+int cservice::OnEvent( const eventType& theEvent,
+	void* data1, void* data2, void* data3, void* data4 )
+{
+	switch( theEvent )
+	{
+		case EVT_QUIT:
+		case EVT_KILL:
+		{
+			/*
+			 *  We need to deauth this user if they're authed.
+			 *  Also, clean up their custom data memory.
+			 */
+	
+			iClient* tmpUser = (theEvent == EVT_QUIT) ? (iClient*)data1 : (iClient*)data2;
+			sqlUser* tmpSqlUser = isAuthed(tmpUser, false);
+			if (tmpSqlUser)
+			{
+				tmpSqlUser->networkClient = NULL;
+				elog << "cservice::OnEvent> Deauthenticated user " << tmpSqlUser->getUserName() << endl;
+			}
+			// Clear up the custom data structure we appended to this iClient.
+			networkData* tmpData = (networkData*)tmpUser->getCustomData(this); 
+			tmpUser->removeCustomData(this);
+			free(tmpData); 
+			customDataAlloc--; 
+			break ;
+		}
+
+		case EVT_NICK:
+		{
+			/*
+			 *  Give this new user a custom data structure!
+			 */
+
+			iClient* tmpUser = (iClient*)data1;
+			networkData* newData = new networkData(); 
+			customDataAlloc++;
+			newData->currentUser = NULL; // Not authed.
+			tmpUser->setCustomData(this, (void*)newData);
+			break;
+		}
+	}
+ 
+	return 0;
+}
+ 
+void cservice::deopAllOnChan(Channel* theChan)
+{
+	/*
+	 *  Support function to deop all opped users on a channel.
+	 */
+
+	if (!theChan) return;
+
+	vector< iClient* > deopList;
+
+	for( Channel::const_userIterator ptr = theChan->userList_begin();
+	ptr != theChan->userList_end() ; ++ptr )
+	{
+	if( ptr->second->getMode(ChannelUser::MODE_O))
+		{
+			deopList.push_back( ptr->second->getClient() );
+		}
+	}
+
+if( !deopList.empty() )
+	{
+		DeOp(theChan, deopList);
+	}
+
 }
  
 void Command::Usage( iClient* theClient )

@@ -1,5 +1,5 @@
 #ifndef __CSERVICE_H
-#define __CSERVICE_H "$Id: cservice.h,v 1.17 2001/01/03 05:33:03 gte Exp $"
+#define __CSERVICE_H "$Id: cservice.h,v 1.18 2001/01/08 04:13:04 gte Exp $"
 
 #include	<string>
 #include	<vector>
@@ -64,6 +64,10 @@ public:
     virtual bool isOnChannel( const string& ) const;
     virtual bool RegisterCommand( Command* ) ;
     virtual bool UnRegisterCommand( const string& ) ; 
+	virtual void OnChannelModeO( Channel*, ChannelUser*,
+		const xServer::opVectorType& ) ;
+	virtual int OnEvent( const eventType&,
+		void*, void*, void*, void*);
     virtual int OnCTCP( iClient* Sender,
                 const string& CTCP,
                 const string& Message,
@@ -72,6 +76,7 @@ public:
 
 	// Sends a notice to a channel from the server.
 	bool serverNotice( Channel*, const char*, ... );
+	bool serverNotice( Channel*, const string& );
 
 	// Log an administrative alert to the relay channel & log.
 	bool logAdminMessage(const char*, ... );
@@ -125,16 +130,24 @@ public:
 	unsigned int userHits;
 	unsigned int userCacheHits;
 	unsigned int channelHits;
-	unsigned int channelCacheHits; 
+	unsigned int channelCacheHits; 			
 	unsigned int levelHits;
 	unsigned int levelCacheHits; 
 
+	// To keep track of how many custom data chunks
+	// we have allocated.
+	unsigned int customDataAlloc;
+
 	// Flood/Notice relay channel - Loaded via config.
 	string relayChan;
-
-	// Internal at which we pick up updates from the Db.
+ 
 	// Loaded via config.
+	// Internal at which we pick up updates from the Db.
 	int updateInterval;
+
+	// Input flood rate.
+	int input_flood;
+	int output_flood;
 
 	// Timestamp's of when we last checked the database for updates.
 	time_t lastChannelRefresh;
@@ -152,6 +165,9 @@ public:
 
 	// Check for valid hostmask.
 	virtual bool validUserMask(iClient* theClient, const string& userMask); 
+
+	// Deop everyone on this channel.
+	void cservice::deopAllOnChan(Channel*);
 } ;
  
 } // namespace gnuworld

@@ -1,7 +1,7 @@
 /* sqlLevel.h */
 
 #ifndef __SQLLEVEL_H
-#define __SQLLEVEL_H "$Id: sqlLevel.h,v 1.6 2001/01/05 06:44:05 gte Exp $"
+#define __SQLLEVEL_H "$Id: sqlLevel.h,v 1.7 2001/01/08 04:13:04 gte Exp $"
 
 #include	<string>
 #include	<ctime>
@@ -23,6 +23,7 @@ public:
 	static const flagType	F_AUTOOP =	0x01 ;
 	static const flagType	F_PROTECT =	0x02 ;
 	static const flagType	F_FORCED =	0x04 ;
+	static const flagType	F_AUTOVOICE =	0x08 ;
 
 	/*
 	 *  Methods to get data atrributes.
@@ -64,9 +65,6 @@ public:
 	inline const time_t&		getLastUpdated() const
 		{ return last_updated ; }
 	 
-	bool loadData( unsigned int, unsigned int ); 
-    void setAllMembers(int);
-
 	/*
 	 *  Methods to set data atrributes.
 	 */
@@ -103,7 +101,11 @@ public:
 
 	inline void setLastModifBy( const string& _last_modif_by )
 		{ last_modif_by = _last_modif_by; } 
- 
+
+	bool commit();
+	bool loadData( unsigned int, unsigned int ); 
+    void setAllMembers(int);
+		
 protected:
  
 	unsigned int	channel_id ;
