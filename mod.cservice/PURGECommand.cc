@@ -8,7 +8,7 @@
  *
  * Caveats: None
  *
- * $Id: PURGECommand.cc,v 1.1 2001/01/24 01:13:52 gte Exp $
+ * $Id: PURGECommand.cc,v 1.2 2001/01/25 00:19:13 gte Exp $
  */
  
 #include	<string>
@@ -20,7 +20,7 @@
 #include	"libpq++.h"
 #include	"Network.h"
 
-const char PURGECommand_cc_rcsId[] = "$Id: PURGECommand.cc,v 1.1 2001/01/24 01:13:52 gte Exp $" ;
+const char PURGECommand_cc_rcsId[] = "$Id: PURGECommand.cc,v 1.2 2001/01/25 00:19:13 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -97,7 +97,7 @@ bool PURGECommand::Exec( iClient* theClient, const string& Message )
 		bot->sqlChannelCache.erase(theChan->getName()); 
 		bot->getUplink()->UnRegisterChannelEvent( theChan->getName(), bot ) ;
 		bot->Part(theChan->getName());
-		delete[] theChan;
+		delete(theChan);
 	} else {
 		bot->Notice(theClient, "Something went wrong: %s", bot->SQLDb->ErrorMessage()); // Log to msgchan here?
  	}

@@ -19,6 +19,7 @@
 #include	"constants.h"
 #include	"networkData.h"
 #include	"levels.h"
+#include	"match.h"
 
 using std::vector ;
 using std::endl ;
@@ -227,7 +228,7 @@ int cservice::BurstChannels()
 	 *   is on, gaining ops if AlwaysOp is on, and so forth.
 	 */ 
 	strstream theQuery;
-	theQuery << "SELECT " << sql::channel_fields << " FROM channels WHERE lower(name) <> '*' AND registered_ts <> 0" << ends;
+	theQuery << "SELECT " << sql::channel_fields << " FROM channels WHERE lower(name) <> '*' AND registered_ts <> 0 AND deleted = 0" << ends;
 	elog << "cmaster::BurstChannels> " << theQuery.str() << endl; 
 
 	if ((status = SQLDb->Exec(theQuery.str())) == PGRES_TUPLES_OK)
@@ -468,7 +469,7 @@ int cservice::OnCTCP( iClient* theClient, const string& CTCP,
 
 	if(Command == "VERSION")
 	{
-		xClient::DoCTCP(theClient, CTCP.c_str(), "Undernet P10 Channel Services Version 2 [" __DATE__ " " __TIME__ "] ($Id: cservice.cc,v 1.60 2001/01/24 01:13:52 gte Exp $)");
+		xClient::DoCTCP(theClient, CTCP.c_str(), "Undernet P10 Channel Services Version 2 [" __DATE__ " " __TIME__ "] ($Id: cservice.cc,v 1.61 2001/01/25 00:19:13 gte Exp $)");
 		return true;
 	}
  
@@ -1168,7 +1169,7 @@ int cservice::OnEvent( const eventType& theEvent,
 			// Clear up the custom data structure we appended to this iClient.
 			networkData* tmpData = (networkData*)tmpUser->getCustomData(this); 
 			tmpUser->removeCustomData(this);
-			free(tmpData); 
+			delete(tmpData); 
 			customDataAlloc--; 
 			break ;
 		}
@@ -1243,8 +1244,33 @@ int cservice::OnChannelEvent( const channelEventType& whichEvent,
 				return 0;
 			}
 
-			getBanRecords(reggedChan);
+			/*
+			 *	First thing we do - check if this person is banned.
+			 */ 
 
+			vector< sqlBan* >* banList = getBanRecords(reggedChan);
+			vector< sqlBan* >::iterator ptr = banList->begin();
+			while (ptr != banList->end())
+			{
+				sqlBan* theBan = *ptr;
+
+				/* Matching ban? */
+
+				if(match(theBan->getBanMask().c_str(), theClient->getNickUserHost().c_str()) == 0)
+				{ 
+					strstream s;
+					s << getCharYYXXX() << " M " << reggedChan->getName() << " +b "
+					<< theBan->getBanMask() << ends;
+				
+					Write( s );
+					delete[] s.str(); 
+					Kick(theChan, theClient, string("(" + theBan->getSetBy() + ") " + theBan->getReason()) );
+					/* Thats it.. we aren't going to op them or anything. */
+					break;
+				}
+				++ptr;
+			}
+ 
 			/* Is it time to set an autotopic? */
 			if (reggedChan->getFlag(sqlChannel::F_AUTOTOPIC) && (reggedChan->getLastTopic() + topic_duration <= ::time(NULL)))
 			{
@@ -1284,7 +1310,6 @@ int cservice::OnChannelEvent( const channelEventType& whichEvent,
 				}
 			}
  
-			/* Finally, check if they are banned or not. */
 			break;
 		}
 

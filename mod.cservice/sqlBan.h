@@ -1,7 +1,7 @@
 /* sqlBan.h */
 
 #ifndef __SQLBAN_H
-#define __SQLBAN_H "$Id: sqlBan.h,v 1.2 2001/01/24 01:13:52 gte Exp $"
+#define __SQLBAN_H "$Id: sqlBan.h,v 1.3 2001/01/25 00:19:13 gte Exp $"
 
 #include	<string>
 #include	<ctime>
@@ -62,7 +62,10 @@ public:
 
 	inline void setSetBy( const string& _set_by )
 		{ set_by = _set_by; } 
- 
+
+	inline void setSetTS( const time_t& _set_ts )
+		{ set_ts = _set_ts; } 
+		
 	inline void setLevel( const unsigned short& _level )
 		{ level = _level; }
 
@@ -72,7 +75,10 @@ public:
 	inline void setReason( const string& _reason )
 		{ reason = _reason; } 
  
-	bool commit(); 
+	bool commit();
+	bool insertRecord();
+	bool deleteRecord();
+
     void setAllMembers(int);
 		
 protected:

@@ -12,7 +12,7 @@
  *
  * Caveats: None.
  *
- * $Id: BANCommand.cc,v 1.3 2001/01/24 01:13:51 gte Exp $
+ * $Id: BANCommand.cc,v 1.4 2001/01/25 00:19:13 gte Exp $
  */
 
 #include        <string>
@@ -26,7 +26,7 @@
 #include		"responses.h"
 #include		"match.h"
 
-const char BANCommand_cc_rcsId[] = "$Id: BANCommand.cc,v 1.3 2001/01/24 01:13:51 gte Exp $" ;
+const char BANCommand_cc_rcsId[] = "$Id: BANCommand.cc,v 1.4 2001/01/25 00:19:13 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -69,7 +69,7 @@ bool BANCommand::Exec( iClient* theClient, const string& Message )
 	int oCount = 0;
 	int banTime = 3;
 	int banLevel = 75;
-	string banReason = "";
+	string banReason = "No Reason";
 	
 	if(st.size() >= 6) oCount = 3;
 	if(st.size() == 5) oCount = 2;
@@ -124,7 +124,7 @@ bool BANCommand::Exec( iClient* theClient, const string& Message )
  
 	// Check level.
 	
-	int level = bot->getAccessLevel(theUser, theChan);
+	int level = bot->getEffectiveAccessLevel(theUser, theChan, true);
 	if(level < level::ban)
 	{
 		bot->Notice(theClient, "Sorry, you have insufficient access to perform that command.");
@@ -139,7 +139,7 @@ bool BANCommand::Exec( iClient* theClient, const string& Message )
 
 	if(banTime < 1 || banTime > 336)
 	{
-		bot->Notice(theClient, "Invalid ban duration. Your ban duration can max be 336 hours.");
+		bot->Notice(theClient, "Invalid ban duration. Your ban duration can be a maximum of 336 hours.");
 		return true;
 	}
 
@@ -159,6 +159,7 @@ bool BANCommand::Exec( iClient* theClient, const string& Message )
 		}
 
 		/* Ban and kick this user */
+		banTarget = "*!*" + aNick->getUserName() + "@" + aNick->getInsecureHost();
 	}
        
 
@@ -189,7 +190,7 @@ bool BANCommand::Exec( iClient* theClient, const string& Message )
 		{
 			banList->erase(ptr);
 			ptr = banList->begin(); 
-			//theBan->delete();
+			theBan->deleteRecord();
 			delete(theBan);
 			removed++;
 		} else {
@@ -210,8 +211,7 @@ bool BANCommand::Exec( iClient* theClient, const string& Message )
 		return false;
 	} 
 
-	vector< iClient* > clientsToKick ;
-
+	vector< iClient* > clientsToKick ; 
 	for(Channel::userIterator chanUsers = theChannel->userList_begin(); chanUsers != theChannel->userList_end(); ++chanUsers)
 	{
 		ChannelUser* tmpUser = chanUsers->second; 
@@ -248,8 +248,10 @@ bool BANCommand::Exec( iClient* theClient, const string& Message )
 	 */
 	
 	sqlBan* newBan = new sqlBan(bot->SQLDb);
+	newBan->setChannelID(theChan->getID());
 	newBan->setBanMask(banTarget);
 	newBan->setSetBy(theUser->getUserName());
+	newBan->setSetTS(bot->currentTime());
 	newBan->setLevel(banLevel);
 	newBan->setExpires(banDuration+::time(NULL));
 	newBan->setReason(banReason); 
@@ -258,7 +260,7 @@ bool BANCommand::Exec( iClient* theClient, const string& Message )
 	banList->push_back(newBan); 
 	
 	/* Insert this new record into the database. */
-	//newBan->insert();
+	newBan->insertRecord();
 
 	return true ;
 }
