@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: Network.cc,v 1.44 2002/06/07 14:38:19 dan_karrels Exp $
+ * $Id: Network.cc,v 1.45 2002/06/07 18:34:27 dan_karrels Exp $
  */
 
 #include	<new>
@@ -42,14 +42,16 @@
 #include	"ip.h"
 #include	"defs.h"
 
+/*
 #ifdef GNU_EXTENSIONS
  #include       <ext/hash_map>
 #else
  #include       <hash_map>
 #endif
+*/
 
 const char xNetwork_h_rcsId[] = __NETWORK_H ;
-const char xNetwork_cc_rcsId[] = "$Id: Network.cc,v 1.44 2002/06/07 14:38:19 dan_karrels Exp $" ;
+const char xNetwork_cc_rcsId[] = "$Id: Network.cc,v 1.45 2002/06/07 18:34:27 dan_karrels Exp $" ;
 const char ELog_h_rcsId[] = __ELOG_H ;
 const char iClient_h_rcsId[] = __ICLIENT_H ;
 const char Channel_h_rcsId[] = __CHANNEL_H ;
@@ -62,8 +64,9 @@ const char StringTokenizer_cc_rcsId[] = __STRINGTOKENIZER_H ;
 namespace gnuworld
 {
 
-using HASHMAPNS::hash ;
-using HASHMAPNS::hash_map ;
+using std::map ;
+//using HASHMAPNS::hash ;
+//using HASHMAPNS::hash_map ;
 using std::string ;
 using std::endl ;
 using std::list ;
