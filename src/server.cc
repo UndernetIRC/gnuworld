@@ -47,7 +47,7 @@
 #include	"ServerTimerHandlers.h"
 
 const char xServer_h_rcsId[] = __XSERVER_H ;
-const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.86 2001/03/03 15:54:26 dan_karrels Exp $" ;
+const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.87 2001/03/03 19:08:42 dan_karrels Exp $" ;
 
 using std::string ;
 using std::vector ;
@@ -2211,7 +2211,17 @@ if( getOps )
 	}
 
 // Add the ChannelUser to the channel
-theChan->addUser( theIClient ) ;
+if( !theChan->addUser( theChanUser ) )
+	{
+	elog	<< "xServer::JoinChannel> Unable to add xClient ("
+		<< theClient->getNickName()
+		<< ") to channel "
+		<< theChan->getName()
+		<< endl ;
+
+	// TODO
+	return false ;
+	}
 
 return true ;
 

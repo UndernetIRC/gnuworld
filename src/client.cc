@@ -26,13 +26,13 @@
 #include	"events.h"
 
 const char xClient_h_rcsId[] = __XCLIENT_H ;
-const char xClient_cc_rcsId[] = "$Id: client.cc,v 1.32 2001/02/12 14:08:13 plexus Exp $" ;
-
-using std::string ;
-using std::strstream ;
+const char xClient_cc_rcsId[] = "$Id: client.cc,v 1.33 2001/03/03 19:08:42 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
+
+using std::string ;
+using std::strstream ;
 
 xClient::xClient()
 {
@@ -77,7 +77,8 @@ void xClient::ImplementServer( xServer* Server )
 if( NULL == Server )
 	{
 	Connected = false ;
-	elog << "ImplementServer> NULL Uplink\n" ;
+	elog	<< "ImplementServer> NULL Uplink"
+		<< endl ;
 	return ;
 	}
 
@@ -224,9 +225,7 @@ return -1 ;
 
 int xClient::ModeAsServer( const Channel* theChan, const string& Mode )
 {
-#ifndef NDEBUG
-  assert( theChan != 0 ) ;
-#endif
+assert( theChan != 0 ) ;
 
 return ModeAsServer( theChan->getName(), Mode ) ;
 }
@@ -300,9 +299,7 @@ return 0 ;
 
 int xClient::Message( const Channel* theChan, const string& Message )
 {
-#ifndef NDEBUG
-  assert( theChan != 0 ) ;
-#endif
+assert( theChan != 0 ) ;
 
 if( Connected && MyUplink )
 	{
@@ -473,9 +470,7 @@ return 0 ;
 
 int xClient::Kill( iClient* theClient, const string& reason )
 {
-#ifndef NDEBUG
-  assert( theClient != 0 ) ;
-#endif
+assert( theClient != 0 ) ;
 
 Write( "%s D %s :%s",
 	MyUplink->getCharYY(),
@@ -500,9 +495,8 @@ return 0 ;
 
 bool xClient::Op( Channel* theChan, iClient* theClient )
 {
-#ifndef NDEBUG
-  assert( (theChan != NULL) && (theClient != NULL) ) ;
-#endif
+assert( theChan != NULL ) ;
+assert( theClient != NULL) ;
 
 if( !Connected )
 	{
@@ -513,7 +507,8 @@ ChannelUser* theUser = theChan->findUser( theClient ) ;
 if( NULL == theUser )
 	{
 	elog	<< "xClient::Op> Unable to find ChannelUser: "
-		<< *theClient << endl ;
+		<< *theClient
+		<< endl ;
 	return false ;
 	}
 
@@ -526,14 +521,39 @@ if( theUser->getMode( ChannelUser::MODE_O ) )
 bool onChannel = isOnChannel( theChan ) ;
 if( !onChannel )
 	{
-	Join( theChan ) ;
+	// Join, giving ourselves ops
+	Join( theChan, string(), 0, true ) ;
+	}
+else
+	{
+	// Bot is already on the channel
+	ChannelUser* meUser = theChan->findUser( me ) ;
+	if( NULL == meUser )
+		{
+		elog	<< "xClient::Op> Unable to find myself in "
+			<< "channel: "
+			<< theChan->getName()
+			<< endl ;
+		return false ;
+		}
+
+	// Make sure we have ops
+	if( !meUser->getMode( ChannelUser::MODE_O ) )
+		{
+		// The bot does NOT have ops
+		return false ;
+		}
+
+	// The bot has ops
 	}
 
+// Op the user
 Write( "%s M %s +o %s",
 	getCharYYXXX().c_str(),
 	theChan->getName().c_str(),
 	theClient->getCharYYXXX().c_str() ) ;
 
+// Was the bot on the channel previously?
 if( !onChannel )
 	{
 	Part( theChan ) ;
@@ -551,13 +571,40 @@ return true ;
 bool xClient::Op( Channel* theChan,
 	const vector< iClient* >& clientVector )
 {
-#ifndef NDEBUG
-  assert( theChan != NULL ) ;
-#endif
+assert( theChan != NULL ) ;
 
 if( !Connected )
 	{
 	return false ;
+	}
+
+bool onChannel = isOnChannel( theChan ) ;
+if( !onChannel )
+	{
+	// Join, giving ourselves ops
+	Join( theChan, string(), 0, true ) ;
+	}
+else
+	{
+	// Bot is already on the channel
+	ChannelUser* meUser = theChan->findUser( me ) ;
+	if( NULL == meUser )
+		{
+		elog	<< "xClient::Op> Unable to find myself in "
+			<< "channel: "
+			<< theChan->getName()
+			<< endl ;
+		return false ;
+		}
+
+	// Make sure we have ops
+	if( !meUser->getMode( ChannelUser::MODE_O ) )
+		{
+		// The bot does NOT have ops
+		return false ;
+		}
+
+	// The bot has ops
 	}
 
 xServer::opVectorType opVector ;
@@ -620,6 +667,11 @@ for( xServer::opVectorType::const_iterator ptr = opVector.begin(),
 	} // for()
 
 MyUplink->onChannelModeO( theChan, 0, opVector ) ;
+
+if( !onChannel )
+	{
+	Part( theChan ) ;
+	}
  
 return true ;
 }
@@ -627,9 +679,7 @@ return true ;
 bool xClient::Voice( Channel* theChan,
 	const vector< iClient* >& clientVector )
 {
-#ifndef NDEBUG
-  assert( theChan != NULL ) ;
-#endif
+assert( theChan != NULL ) ;
 
 if( !Connected )
 	{
@@ -705,9 +755,8 @@ return true ;
 
 bool xClient::Voice( Channel* theChan, iClient* theClient )
 {
-#ifndef NDEBUG
-  assert( (theChan != NULL) && (theClient != NULL) ) ;
-#endif
+assert( theChan != NULL ) ;
+assert( theClient != NULL) ;
 
 if( !Connected )
 	{
@@ -755,9 +804,8 @@ return true ;
  
 bool xClient::DeOp( Channel* theChan, iClient* theClient )
 {
-#ifndef NDEBUG
-  assert( (theChan != NULL) && (theClient != NULL) ) ;
-#endif
+assert( theChan != NULL ) ;
+assert( theClient != NULL ) ;
 
 if( !Connected )
 	{
@@ -806,9 +854,7 @@ return true ;
 bool xClient::DeOp( Channel* theChan,
 	const vector< iClient* >& clientVector )
 {
-#ifndef NDEBUG
-  assert( theChan != NULL ) ;
-#endif
+assert( theChan != NULL ) ;
 
 if( !Connected )
 	{
@@ -881,10 +927,8 @@ return true ;
  
 bool xClient::DeVoice( Channel* theChan, iClient* theClient )
 {
-#ifndef NDEBUG
-  assert( theChan != 0 ) ;
-  assert( theClient != 0 ) ;
-#endif
+assert( theChan != 0 ) ;
+assert( theClient != 0 ) ;
 
 if( !Connected )
 	{
@@ -933,9 +977,7 @@ return true ;
 bool xClient::DeVoice( Channel* theChan,
 	const vector< iClient* >& clientVector )
 {
-#ifndef NDEBUG
-  assert( theChan != NULL ) ;
-#endif
+assert( theChan != NULL ) ;
 
 if( !Connected )
 	{
@@ -1009,9 +1051,8 @@ return true ;
  
 bool xClient::Ban( Channel* theChan, iClient* theClient )
 {
-#ifndef NDEBUG
-  assert( (theChan != NULL) && (theClient != NULL) ) ;
-#endif
+assert( theChan != NULL ) ;
+assert( theClient != NULL ) ;
 
 if( !Connected )
 	{
@@ -1055,10 +1096,7 @@ return true ;
 
 bool xClient::UnBan( Channel* theChan, const string& banMask )
 {
-
-#ifndef NDEBUG
-  assert( theChan != 0 ) ;
-#endif
+assert( theChan != 0 ) ;
 
 if( !Connected )
 	{
@@ -1099,9 +1137,7 @@ return true ;
 bool xClient::Ban( Channel* theChan,
 	const vector< iClient* >& clientVector )
 {
-#ifndef NDEBUG
-  assert( theChan != NULL ) ;
-#endif
+assert( theChan != NULL ) ;
 
 if( !Connected )
 	{
@@ -1171,10 +1207,8 @@ return true ;
 bool xClient::BanKick( Channel* theChan, iClient* theClient,
 	const string& reason )
 {
-#ifndef NDEBUG
-  assert( theChan != 0 ) ;
-  assert( theClient != 0 ) ;
-#endif
+assert( theChan != 0 ) ;
+assert( theClient != 0 ) ;
 
 if( !Connected )
 	{
@@ -1220,9 +1254,8 @@ return true ;
 bool xClient::Kick( Channel* theChan, iClient* theClient,
 	const string& reason )
 {
-#ifndef NDEBUG
-  assert( theChan != NULL && theClient != NULL ) ;
-#endif
+assert( theChan != NULL ) ;
+assert( theClient != NULL ) ;
 
 if( !Connected )
 	{
@@ -1231,8 +1264,11 @@ if( !Connected )
 
 if( NULL == theChan->findUser( theClient ) )
 	{
-	elog	<< "xClient::Kick> Can't find " << theClient->getNickName()
-		<< " on channel " << theChan->getName() << endl ;
+	elog	<< "xClient::Kick> Can't find "
+		<< theClient->getNickName()
+		<< " on channel "
+		<< theChan->getName()
+		<< endl ;
 	return false ;
 	}
 
@@ -1262,9 +1298,7 @@ return true ;
 bool xClient::Kick( Channel* theChan, const vector< iClient* >& theClients,
 	const string& reason )
 {
-#ifndef NDEBUG
-  assert( theChan != NULL ) ;
-#endif
+assert( theChan != NULL ) ;
 
 if( !Connected )
 	{
@@ -1333,9 +1367,7 @@ bool xClient::Join( Channel* theChan,
 	const time_t& joinTime,
 	bool getOps )
 {
-#ifndef NDEBUG
-  assert( theChan != NULL ) ;
-#endif
+assert( theChan != NULL ) ;
 
 return Join( theChan->getName(), string(), joinTime, getOps ) ;
 }
@@ -1356,18 +1388,14 @@ return true ;
 
 bool xClient::Part( Channel* theChan )
 {
-#ifndef NDEBUG
-  assert( theChan != NULL ) ;
-#endif
+assert( theChan != NULL ) ;
 
 return Part( theChan->getName() ) ;
 }
 
 bool xClient::Invite( iClient* theClient, const string& chanName )
 {
-#ifndef NDEBUG
-  assert( theClient != NULL ) ;
-#endif
+assert( theClient != NULL ) ;
 
 Channel* theChan = Network->findChannel( chanName ) ;
 if( NULL == theChan )
@@ -1396,10 +1424,8 @@ return true ;
 
 bool xClient::Invite( iClient* theClient, Channel* theChan )
 {
-
-#ifndef NDEBUG
-  assert( (theClient != 0) && (theChan != 0) ) ;
-#endif
+assert( theClient != 0 ) ;
+assert( theChan != 0 ) ;
 
 bool onChannel = isOnChannel( theChan ) ;
 if( !onChannel )
@@ -1427,9 +1453,7 @@ return false ;
 
 bool xClient::isOnChannel( const Channel* theChan ) const
 {
-#ifndef NDEBUG
-  assert( theChan != NULL ) ;
-#endif
+assert( theChan != NULL ) ;
 return isOnChannel( theChan->getName() ) ;
 }
 
@@ -1447,9 +1471,7 @@ return Write( string( buf ) ) ;
 
 void xClient::OnJoin( Channel* theChan )
 {
-#ifndef NDEBUG
-  assert( theChan != 0 ) ;
-#endif
+assert( theChan != 0 ) ;
 
 addChan( theChan ) ;
 }
@@ -1468,9 +1490,7 @@ OnJoin( theChan ) ;
 
 void xClient::OnPart( Channel* theChan )
 {
-#ifndef NDEBUG
-  assert( theChan != 0 ) ;
-#endif
+assert( theChan != 0 ) ;
 
 removeChan( theChan ) ;
 }
