@@ -1,5 +1,5 @@
 #ifndef _SQLMANAGER_H
-#define _SQLMANAGER_H "$Id"
+#define _SQLMANAGER_H "$Id: sqlManager.h,v 1.4 2002/08/25 22:38:49 jeekay Exp $"
 
 #include <vector>
 

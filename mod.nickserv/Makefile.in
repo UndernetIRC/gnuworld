@@ -14,7 +14,7 @@
 
 @SET_MAKE@
 
-# "$Id: Makefile.in,v 1.6 2002/08/25 16:21:44 jeekay Exp $"
+# "$Id: Makefile.in,v 1.7 2002/08/25 22:38:49 jeekay Exp $"
 SHELL = @SHELL@
 
 srcdir = @srcdir@
@@ -104,9 +104,11 @@ libnickserv_la_SOURCES = \
   nickserv.cc            \
   sqlManager.cc          \
   sqlUser.cc             \
+  Stats.cc               \
   RECOVERCommand.cc      \
   REGISTERCommand.cc     \
   SETCommand.cc          \
+  STATSCommand.cc        \
   WHOAMICommand.cc
 
 
@@ -119,8 +121,8 @@ LTLIBRARIES = $(lib_LTLIBRARIES)
 
 libnickserv_la_LIBADD =
 am_libnickserv_la_OBJECTS = netData.lo nickserv.lo sqlManager.lo \
-	sqlUser.lo RECOVERCommand.lo REGISTERCommand.lo SETCommand.lo \
-	WHOAMICommand.lo
+	sqlUser.lo Stats.lo RECOVERCommand.lo REGISTERCommand.lo \
+	SETCommand.lo STATSCommand.lo WHOAMICommand.lo
 libnickserv_la_OBJECTS = $(am_libnickserv_la_OBJECTS)
 
 DEFS = @DEFS@
@@ -133,6 +135,7 @@ am__depfiles_maybe = depfiles
 @AMDEP_TRUE@DEP_FILES = ./$(DEPDIR)/RECOVERCommand.Plo \
 @AMDEP_TRUE@	./$(DEPDIR)/REGISTERCommand.Plo \
 @AMDEP_TRUE@	./$(DEPDIR)/SETCommand.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/STATSCommand.Plo ./$(DEPDIR)/Stats.Plo \
 @AMDEP_TRUE@	./$(DEPDIR)/WHOAMICommand.Plo \
 @AMDEP_TRUE@	./$(DEPDIR)/netData.Plo ./$(DEPDIR)/nickserv.Plo \
 @AMDEP_TRUE@	./$(DEPDIR)/sqlManager.Plo ./$(DEPDIR)/sqlUser.Plo
@@ -191,6 +194,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/RECOVERCommand.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/REGISTERCommand.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SETCommand.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/STATSCommand.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Stats.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/WHOAMICommand.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/netData.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nickserv.Plo@am__quote@

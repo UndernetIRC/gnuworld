@@ -5,16 +5,17 @@
  */
 
 #ifndef _LEVELS_H
-#define _LEVELS_H "$Id: levels.h,v 1.1 2002/08/25 00:10:48 jeekay Exp $"
+#define _LEVELS_H "$Id: levels.h,v 1.2 2002/08/25 22:38:49 jeekay Exp $"
 
 namespace gnuworld {
 
-namespace nickserv {
+namespace ns {
 
 namespace level {
 
 namespace admin {
-	const int remove = 500;
+	const unsigned int stats = 1;
+	const unsigned int remove = 500;
 }
 
 }

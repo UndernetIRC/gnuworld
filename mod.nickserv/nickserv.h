@@ -1,5 +1,5 @@
 #ifndef _NICKSERV_H
-#define _NICKSERV_H "$Id: nickserv.h,v 1.5 2002/08/25 00:10:48 jeekay Exp $"
+#define _NICKSERV_H "$Id: nickserv.h,v 1.6 2002/08/25 22:38:49 jeekay Exp $"
 
 #include "client.h"
 #include "EConfig.h"
@@ -8,6 +8,7 @@
 #include "nickservCommands.h"
 #include "sqlManager.h"
 #include "sqlUser.h"
+#include "Stats.h"
 
 namespace gnuworld {
 
@@ -64,6 +65,9 @@ class nickserv : public xClient {
     /** Load all users into the user cache */
     void precacheUsers();
     
+    /** Insert a nick/sqlUser* pair into the cache */
+    void addUserToCache(string, sqlUser*);
+    
     /** Add an iClient to the processing queue */
     int addToQueue(iClient*);
     
@@ -88,6 +92,14 @@ class nickserv : public xClient {
     sqlUser* isRegistered(string);
 
     
+    /*************************
+     ** S T A T I S T I C S **
+     *************************/
+
+    /** Holds a reference to our Stats collector */
+    Stats::Stats* theStats;
+   
+    
     /*****************************************
      ** N I C K S E R V   V A R I A B L E S **
      *****************************************/
@@ -101,6 +113,7 @@ class nickserv : public xClient {
      *********************************************/
     
     commandMapType commandMap;
+
 
     /*************************************
      ** C O N F I G   V A R I A B L E S **
@@ -121,6 +134,7 @@ class nickserv : public xClient {
     /** How frequently to commit to the database */
     int commitFreq;
     
+
     /*****************
      ** Q U E U E S **
      *****************/
@@ -138,11 +152,7 @@ class nickserv : public xClient {
      
     /** TimerID for processing the queue */
     gnuworld::xServer::timerID processQueue_timerID;
-     
-    
-    /*************************
-     ** S T A T I S T I C S **
-     *************************/
+
 }; // class nickserv
 
 } // namespace ns

@@ -7,7 +7,7 @@
 #include "netData.h"
 #include "nickserv.h"
 
-const char NickServ_cc_rcsId[] = "$Id: nickserv.cc,v 1.7 2002/08/25 16:21:44 jeekay Exp $";
+const char NickServ_cc_rcsId[] = "$Id: nickserv.cc,v 1.8 2002/08/25 22:38:49 jeekay Exp $";
 
 namespace gnuworld
 {
@@ -69,7 +69,11 @@ precacheUsers();
 RegisterCommand(new RECOVERCommand(this, "RECOVER", ""));
 RegisterCommand(new REGISTERCommand(this, "REGISTER", ""));
 RegisterCommand(new SETCommand(this, "SET", "<property> <value>"));
+RegisterCommand(new STATSCommand(this, "STATS", "<stat>"));
 RegisterCommand(new WHOAMICommand(this, "WHOAMI", ""));
+
+/* Get our Stats instance */
+theStats = Stats::getInstance();
 }
 
 nickserv::~nickserv()
@@ -289,6 +293,15 @@ theManager->removeConnection(cacheCon);
 
 
 /**
+ * This function simply takes a name/sqlUser* pair and adds them to the cache
+ */
+void nickserv::addUserToCache(string username, sqlUser* theUser)
+{
+  sqlUserCache.insert(sqlUserHashType::value_type(username, theUser));
+}
+
+
+/**
  * This function attempts to add a given iClient to the processing queue.
  * It will return 1 if the client did not already exist in the queue, else 0.
  * It is safe to ignore the return value.
@@ -330,12 +343,11 @@ if(queuePos != warnQueue.end()) {
  */
 void nickserv::processQueue()
 {
+theStats->incStat("NICKSERV.PROCESSQUEUE");
 
 /* A number of things can happen here.
  * Firstly, the warnQueue can be empty. If this is the case, return immediately.
  */
-
-elog << "warnQueue size: " << warnQueue.size() << endl;
 
 if(warnQueue.size() == 0) { return; }
 
@@ -394,8 +406,6 @@ for(QueueType::iterator queuePos = warnQueue.begin(); queuePos != warnQueue.end(
     continue;
   } // if(theData->warned)
 } // iterate over warnQueue
-
-elog << "killQueue size: " << killQueue.size() << endl;
 
 if(killQueue.size() == 0) { return; }
 

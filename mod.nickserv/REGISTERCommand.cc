@@ -6,9 +6,10 @@
 
 #include <ctime>
 
+#include "netData.h"
 #include "nickserv.h"
 
-const char REGISTERCommand_cc_rcsId[] = "$Id: REGISTERCommand.cc,v 1.2 2002/08/25 16:21:44 jeekay Exp $";
+const char REGISTERCommand_cc_rcsId[] = "$Id: REGISTERCommand.cc,v 1.3 2002/08/25 22:38:49 jeekay Exp $";
 
 namespace gnuworld
 {
@@ -43,6 +44,13 @@ theUser->setLastSeenTS(time(NULL));
 theUser->setRegisteredTS(time(NULL));
 theUser->insertUser();
 
+/* Assign the new user to the iClient */
+netData* theData = static_cast< netData* >( theClient->getCustomData(bot) );
+theData->authedUser = theUser;
+
+/* Insert the new user into the cache */
+bot->addUserToCache(theUser->getName(), theUser);
+
 bot->Notice(theClient, "Your nickname, %s, has been successfully registered.",
   theClient->getAccount().c_str());
 bot->Notice(theClient, "Note: AUTOKILL and RECOVER are enabled by default.");
@@ -50,6 +58,6 @@ bot->Notice(theClient, "Note: AUTOKILL and RECOVER are enabled by default.");
 return true;
 }
 
-} // namespace register
+} // namespace ns
 
 } // namespace gnuworld

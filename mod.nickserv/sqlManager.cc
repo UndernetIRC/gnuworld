@@ -79,14 +79,20 @@ delete tempCon;
  */
 void sqlManager::flush()
 {
-  cout << "Entering sqlManager::flush()" << endl;
   for(CommitQueueItr ptr = commitQueue.begin(); ptr != commitQueue.end(); ++ptr) {
     string statement = *ptr;
-    cout << "Executing: " << statement << endl;
     
+#ifdef LOG_SQL
+    elog << "*** [sqlManager:flush] Executing: " << statement << endl;
+#endif
     if(!SQLDb->ExecCommandOk(statement.c_str())) {
       string error = string(SQLDb->ErrorMessage());
-      cout << "Error: " << error << endl;
+#ifndef LOG_SQL
+      /* Make sure people without LOG_SQL still see what statement failed */
+      elog << "*** [sqlManager:flush] Executing: " << statement << endl;
+#endif
+      elog << "*** [sqlManager:flush] Error: " << error << endl;
+      // TODO: Log error
     }
   }
   
