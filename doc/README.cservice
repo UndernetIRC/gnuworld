@@ -1,4 +1,4 @@
--- "$Id: README.cservice,v 1.13 2002/01/28 04:33:59 nighty Exp $"
+-- "$Id: README.cservice,v 1.14 2002/03/13 10:36:25 nighty Exp $"
 --
 -- For more detailed information about setting up GNUworld, visit :
 --      http://coder-com.undernet.org/gnuworld-setup/
@@ -35,17 +35,17 @@ Make sure you are in the gnuworld/doc directory.
 > psql cservice < cservice.help.sql
 > psql cservice < cservice.web.sql
 
-Create a local (for the www) Database called 'cmaster' for webcookies
+Create a local (for the www) Database called 'local_db' for webcookies
 (without this local db the website will NOT work)
-Tho you can also choose to name the 'cservice' db 'cmaster' for a
+Tho you can also choose to name the 'cservice' db 'local_db' for a
 strictly and whole local use of DB + webserver, and issue the
 following to the same db and then  forgot the other 'createdb' thing.
 
 This database will also hosts the pending verif q/a reset requests.
 ---------------------------------------------------------------------
 
-> createdb cmaster
-> psql cmaster < local_db.sql
+> createdb local_db
+> psql local_db < local_db.sql
 
 
 Add administrator account
