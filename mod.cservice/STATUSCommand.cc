@@ -9,7 +9,7 @@
 #include	"responses.h"
 #include	"Network.h"
  
-const char STATUSCommand_cc_rcsId[] = "$Id: STATUSCommand.cc,v 1.1 2001/01/03 08:05:09 gte Exp $" ;
+const char STATUSCommand_cc_rcsId[] = "$Id: STATUSCommand.cc,v 1.2 2001/01/03 20:36:03 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -38,6 +38,44 @@ bool STATUSCommand::Exec( iClient* theClient, const string& Message )
 	/* 
 	 *  Check the channel is actually registered.
 	 */
+
+	if (st[1] == "*") 
+	{
+		/*
+		 *  Special case, display admin stats.
+		 */
+
+		if (bot->getAdminAccessLevel(theUser) <= level::admin::helper) // Don't show if they don't have any admin access.
+		{
+			bot->Notice(theClient, bot->getResponse(theUser, language::chan_not_reg).c_str(),
+				st[1].c_str());
+			return false; 
+		}
+
+		/*
+		 *  Show some fancy stats.
+		 */
+
+		float chanTotal = bot->channelCacheHits + bot->channelHits;
+		float chanEf = (bot->channelCacheHits ? ((float)bot->channelCacheHits / chanTotal * 100) : 0);
+
+		float userTotal = bot->userCacheHits + bot->userHits;
+		float userEf = (bot->userCacheHits ? ((float)bot->userCacheHits / userTotal * 100) : 0);
+
+		float levelTotal = bot->levelCacheHits + bot->levelHits;
+		float levelEf = (bot->levelCacheHits ? ((float)bot->levelCacheHits / levelTotal * 100) : 0);
+
+		bot->Notice(theClient, "CMaster Channel Services internal status:");
+		bot->Notice(theClient, "Channel record requests: %i", bot->channelHits);
+		bot->Notice(theClient, "Channel record cache hits: %i (%.2f%% efficiency)", bot->channelCacheHits, chanEf);
+
+		bot->Notice(theClient, "User record requests: %i", bot->userHits);
+		bot->Notice(theClient, "User record cache hits: %i (%.2f%% efficiency)", bot->userCacheHits, userEf);
+
+		bot->Notice(theClient, "Access Level record requests: %i", bot->levelHits);
+		bot->Notice(theClient, "Access Level record cache hits: %i (%.2f%% efficiency)", bot->levelCacheHits, levelEf);
+		return true;
+	}
 
 	sqlChannel* theChan = bot->getChannelRecord(st[1]);
 	if (!theChan) {
