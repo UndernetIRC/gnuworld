@@ -5,6 +5,8 @@ libchanfix_la_CXXFLAGS =	-I${top_srcdir}/include	\
 
 libchanfix_la_LDFLAGS = 	-module -export-dynamic
 
-libchanfix_la_SOURCES = 	chanfix.cc
+libchanfix_la_SOURCES = 	chanfix.cc		\
+				chanfix-misc.cc		\
+				chanfix-xclient.cc
 
 EXTRA_DIST =	chanfix.h

@@ -16,10 +16,12 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: chanfix.cc,v 1.1 2004/05/16 11:29:32 jeekay Exp $
+ * $Id: chanfix.cc,v 1.2 2004/05/18 20:55:02 jeekay Exp $
  */
 
 #include <string>
+
+#include "EConfig.h"
 
 #include "chanfix.h"
 
@@ -39,6 +41,17 @@ extern "C" {
 chanfix::chanfix( const string& configFileName )
 	: xClient( configFileName )
 {
+/* Get our config */
+EConfig *config = new EConfig(configFileName);
+assert( config != 0 );
+
+/* Initialise our config variables */
+confConsoleChannel = config->Require("consoleChannel")->second;
+confConsoleModes = config->Require("consoleModes")->second;
+
+confOpAuth = atoi(config->Require("opAuth")->second.c_str());
+confPeriod = atoi(config->Require("period")->second.c_str());
+confStartDelay = atoi(config->Require("startDelay")->second.c_str());
 }
 
 /** Destructor doing nothing as we have no heap. */

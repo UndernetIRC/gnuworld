@@ -50,12 +50,15 @@ am__installdirs = "$(DESTDIR)$(libdir)"
 libLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(lib_LTLIBRARIES)
 libchanfix_la_LIBADD =
-am_libchanfix_la_OBJECTS = libchanfix_la-chanfix.lo
+am_libchanfix_la_OBJECTS = libchanfix_la-chanfix.lo \
+	libchanfix_la-chanfix-misc.lo libchanfix_la-chanfix-xclient.lo
 libchanfix_la_OBJECTS = $(am_libchanfix_la_OBJECTS)
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)/include
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
-@AMDEP_TRUE@DEP_FILES = ./$(DEPDIR)/libchanfix_la-chanfix.Plo
+@AMDEP_TRUE@DEP_FILES = ./$(DEPDIR)/libchanfix_la-chanfix-misc.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/libchanfix_la-chanfix-xclient.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/libchanfix_la-chanfix.Plo
 CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
 LTCXXCOMPILE = $(LIBTOOL) --mode=compile $(CXX) $(DEFS) \
@@ -207,7 +210,10 @@ libchanfix_la_CXXFLAGS = -I${top_srcdir}/include	\
 				-I${top_srcdir}/libgnuworld
 
 libchanfix_la_LDFLAGS = -module -export-dynamic
-libchanfix_la_SOURCES = chanfix.cc
+libchanfix_la_SOURCES = chanfix.cc		\
+				chanfix-misc.cc		\
+				chanfix-xclient.cc
+
 EXTRA_DIST = chanfix.h
 all: all-am
 
@@ -278,6 +284,8 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libchanfix_la-chanfix-misc.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libchanfix_la-chanfix-xclient.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libchanfix_la-chanfix.Plo@am__quote@
 
 .cc.o:
@@ -327,6 +335,54 @@ libchanfix_la-chanfix.lo: chanfix.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libchanfix_la-chanfix.Plo' tmpdepfile='$(DEPDIR)/libchanfix_la-chanfix.TPlo' @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libchanfix_la_CXXFLAGS) $(CXXFLAGS) -c -o libchanfix_la-chanfix.lo `test -f 'chanfix.cc' || echo '$(srcdir)/'`chanfix.cc
+
+libchanfix_la-chanfix-misc.o: chanfix-misc.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libchanfix_la_CXXFLAGS) $(CXXFLAGS) -MT libchanfix_la-chanfix-misc.o -MD -MP -MF "$(DEPDIR)/libchanfix_la-chanfix-misc.Tpo" -c -o libchanfix_la-chanfix-misc.o `test -f 'chanfix-misc.cc' || echo '$(srcdir)/'`chanfix-misc.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libchanfix_la-chanfix-misc.Tpo" "$(DEPDIR)/libchanfix_la-chanfix-misc.Po"; else rm -f "$(DEPDIR)/libchanfix_la-chanfix-misc.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='chanfix-misc.cc' object='libchanfix_la-chanfix-misc.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libchanfix_la-chanfix-misc.Po' tmpdepfile='$(DEPDIR)/libchanfix_la-chanfix-misc.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libchanfix_la_CXXFLAGS) $(CXXFLAGS) -c -o libchanfix_la-chanfix-misc.o `test -f 'chanfix-misc.cc' || echo '$(srcdir)/'`chanfix-misc.cc
+
+libchanfix_la-chanfix-misc.obj: chanfix-misc.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libchanfix_la_CXXFLAGS) $(CXXFLAGS) -MT libchanfix_la-chanfix-misc.obj -MD -MP -MF "$(DEPDIR)/libchanfix_la-chanfix-misc.Tpo" -c -o libchanfix_la-chanfix-misc.obj `if test -f 'chanfix-misc.cc'; then $(CYGPATH_W) 'chanfix-misc.cc'; else $(CYGPATH_W) '$(srcdir)/chanfix-misc.cc'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libchanfix_la-chanfix-misc.Tpo" "$(DEPDIR)/libchanfix_la-chanfix-misc.Po"; else rm -f "$(DEPDIR)/libchanfix_la-chanfix-misc.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='chanfix-misc.cc' object='libchanfix_la-chanfix-misc.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libchanfix_la-chanfix-misc.Po' tmpdepfile='$(DEPDIR)/libchanfix_la-chanfix-misc.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libchanfix_la_CXXFLAGS) $(CXXFLAGS) -c -o libchanfix_la-chanfix-misc.obj `if test -f 'chanfix-misc.cc'; then $(CYGPATH_W) 'chanfix-misc.cc'; else $(CYGPATH_W) '$(srcdir)/chanfix-misc.cc'; fi`
+
+libchanfix_la-chanfix-misc.lo: chanfix-misc.cc
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libchanfix_la_CXXFLAGS) $(CXXFLAGS) -MT libchanfix_la-chanfix-misc.lo -MD -MP -MF "$(DEPDIR)/libchanfix_la-chanfix-misc.Tpo" -c -o libchanfix_la-chanfix-misc.lo `test -f 'chanfix-misc.cc' || echo '$(srcdir)/'`chanfix-misc.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libchanfix_la-chanfix-misc.Tpo" "$(DEPDIR)/libchanfix_la-chanfix-misc.Plo"; else rm -f "$(DEPDIR)/libchanfix_la-chanfix-misc.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='chanfix-misc.cc' object='libchanfix_la-chanfix-misc.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libchanfix_la-chanfix-misc.Plo' tmpdepfile='$(DEPDIR)/libchanfix_la-chanfix-misc.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libchanfix_la_CXXFLAGS) $(CXXFLAGS) -c -o libchanfix_la-chanfix-misc.lo `test -f 'chanfix-misc.cc' || echo '$(srcdir)/'`chanfix-misc.cc
+
+libchanfix_la-chanfix-xclient.o: chanfix-xclient.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libchanfix_la_CXXFLAGS) $(CXXFLAGS) -MT libchanfix_la-chanfix-xclient.o -MD -MP -MF "$(DEPDIR)/libchanfix_la-chanfix-xclient.Tpo" -c -o libchanfix_la-chanfix-xclient.o `test -f 'chanfix-xclient.cc' || echo '$(srcdir)/'`chanfix-xclient.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libchanfix_la-chanfix-xclient.Tpo" "$(DEPDIR)/libchanfix_la-chanfix-xclient.Po"; else rm -f "$(DEPDIR)/libchanfix_la-chanfix-xclient.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='chanfix-xclient.cc' object='libchanfix_la-chanfix-xclient.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libchanfix_la-chanfix-xclient.Po' tmpdepfile='$(DEPDIR)/libchanfix_la-chanfix-xclient.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libchanfix_la_CXXFLAGS) $(CXXFLAGS) -c -o libchanfix_la-chanfix-xclient.o `test -f 'chanfix-xclient.cc' || echo '$(srcdir)/'`chanfix-xclient.cc
+
+libchanfix_la-chanfix-xclient.obj: chanfix-xclient.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libchanfix_la_CXXFLAGS) $(CXXFLAGS) -MT libchanfix_la-chanfix-xclient.obj -MD -MP -MF "$(DEPDIR)/libchanfix_la-chanfix-xclient.Tpo" -c -o libchanfix_la-chanfix-xclient.obj `if test -f 'chanfix-xclient.cc'; then $(CYGPATH_W) 'chanfix-xclient.cc'; else $(CYGPATH_W) '$(srcdir)/chanfix-xclient.cc'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libchanfix_la-chanfix-xclient.Tpo" "$(DEPDIR)/libchanfix_la-chanfix-xclient.Po"; else rm -f "$(DEPDIR)/libchanfix_la-chanfix-xclient.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='chanfix-xclient.cc' object='libchanfix_la-chanfix-xclient.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libchanfix_la-chanfix-xclient.Po' tmpdepfile='$(DEPDIR)/libchanfix_la-chanfix-xclient.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libchanfix_la_CXXFLAGS) $(CXXFLAGS) -c -o libchanfix_la-chanfix-xclient.obj `if test -f 'chanfix-xclient.cc'; then $(CYGPATH_W) 'chanfix-xclient.cc'; else $(CYGPATH_W) '$(srcdir)/chanfix-xclient.cc'; fi`
+
+libchanfix_la-chanfix-xclient.lo: chanfix-xclient.cc
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libchanfix_la_CXXFLAGS) $(CXXFLAGS) -MT libchanfix_la-chanfix-xclient.lo -MD -MP -MF "$(DEPDIR)/libchanfix_la-chanfix-xclient.Tpo" -c -o libchanfix_la-chanfix-xclient.lo `test -f 'chanfix-xclient.cc' || echo '$(srcdir)/'`chanfix-xclient.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libchanfix_la-chanfix-xclient.Tpo" "$(DEPDIR)/libchanfix_la-chanfix-xclient.Plo"; else rm -f "$(DEPDIR)/libchanfix_la-chanfix-xclient.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='chanfix-xclient.cc' object='libchanfix_la-chanfix-xclient.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libchanfix_la-chanfix-xclient.Plo' tmpdepfile='$(DEPDIR)/libchanfix_la-chanfix-xclient.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libchanfix_la_CXXFLAGS) $(CXXFLAGS) -c -o libchanfix_la-chanfix-xclient.lo `test -f 'chanfix-xclient.cc' || echo '$(srcdir)/'`chanfix-xclient.cc
 
 mostlyclean-libtool:
 	-rm -f *.lo

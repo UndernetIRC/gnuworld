@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: chanfix.h,v 1.1 2004/05/16 11:29:32 jeekay Exp $
+ * $Id: chanfix.h,v 1.2 2004/05/18 20:55:02 jeekay Exp $
  */
 
 #ifndef CHANFIX_H
@@ -26,7 +26,11 @@
 
 #include "client.h"
 
+#include "logging.h"
+
 namespace gnuworld {
+
+class EConfig;
 
 namespace chanfix {
 
@@ -37,6 +41,47 @@ public:
 	
 	/** Destructor. */
 	virtual ~chanfix();
+	
+	
+	/*************************************
+	 * X C L I E N T   F U N C T I O N S *
+	 *************************************/
+	virtual void OnAttach();
+	virtual void BurstChannels();
+	virtual void OnTimer( const TimerHandler::timerID& , void* );
+	
+	
+	/***************************
+	 * C H A N F I X   M I S C *
+	 ***************************/
+	virtual void log(const logging::loglevel&, const string&);
+	virtual void setConsoleTopic();
+		
+	
+protected:
+	/*************************
+	 * C O N F I G   V A R S *
+	 *************************/
+	
+	/** Name of our console channel. */
+	string confConsoleChannel;
+	/** Modes of our console channel. */
+	string confConsoleModes;
+	
+	/** Points to award a +r op per period. */
+	unsigned short confOpAuth;
+	/** Duration of a period in seconds. */
+	unsigned short confPeriod;
+	/** Duration to wait between linking and counting. */
+	unsigned short confStartDelay;
+	
+	
+	/***************
+	 * T I M E R S *
+	 ***************/
+	
+	/** Counting timer. */
+	xServer::timerID timerCount;
 };
 
 } // namespace chanfix
