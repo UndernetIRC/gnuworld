@@ -43,7 +43,7 @@
 #include	"moduleLoader.h"
 
 const char xServer_h_rcsId[] = __XSERVER_H ;
-const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.57 2001/01/28 16:39:08 dan_karrels Exp $" ;
+const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.58 2001/01/28 16:50:53 dan_karrels Exp $" ;
 
 using std::string ;
 using std::vector ;
@@ -3127,8 +3127,8 @@ else if( NULL == theChan )
 		{
 		strstream s ;
 		s	<< theClient->getCharYYXXX()
-			<< " M " << chanName << chanModes
-			<< ends ;
+			<< " M " << chanName << ' '
+			<< chanModes << ends ;
 		Write( s ) ;
 		delete[] s.str() ;
 		}
