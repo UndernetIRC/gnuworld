@@ -1,7 +1,7 @@
 /**
  * MTrie.h
  *
- * $Id: MTrie.h,v 1.8 2003/08/02 01:40:16 dan_karrels Exp $
+ * $Id: MTrie.h,v 1.9 2003/08/19 20:32:32 dan_karrels Exp $
  */
 
 #ifndef __MTRIE_H
@@ -129,7 +129,6 @@ protected:
 	 * matching across multiple levels.
 	 */
 	virtual void	find( const MTrie< data_type >*,
-				const string& origKey,
 				const StringTokenizer&,
 				StringTokenizer::const_reverse_iterator )
 				const ;
@@ -154,7 +153,8 @@ protected:
 	 * strings.
 	 */
 	virtual void	recursiveFind( const MTrie< data_type >*,
-				const string& key ) const ;
+				bool blindRecursion = false )
+				const ;
 
 	/**
 	 * Recursive method used only for erasing '*' matched
@@ -215,6 +215,15 @@ protected:
 	 * It stores the values to be returned from the methods.
 	 */
 	mutable list< value_type >	returnMe ;
+
+	/**
+	 * This variable is used in find() and erase() to reduce the 
+	 * number of arguments passed to the internal recursive methods.
+	 * It stores the key being searched for in the overall
+	 * find/erase.
+	 */
+	mutable string		origKey ;
+
 } ;
 
 // This is a template class, cannot compile, so include the source

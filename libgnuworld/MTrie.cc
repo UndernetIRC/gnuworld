@@ -1,7 +1,7 @@
 /**
  * MTrie.cc
  *
- * $Id: MTrie.cc,v 1.11 2003/08/02 01:40:16 dan_karrels Exp $
+ * $Id: MTrie.cc,v 1.12 2003/08/19 20:32:32 dan_karrels Exp $
  */
 
 #include	<map>
@@ -15,7 +15,6 @@
 #include	"StringTokenizer.h"
 #include	"match.h"
 
-// TODO: Max number of levels? It could reduce memory by a large amount
 // TODO: allow comparison functor (case insensitive)
 
 using std::map ;
@@ -123,9 +122,7 @@ MTrie< _valueT >::find( const string& key ) const
 // levels.
 base.clear() ;
 returnMe.clear() ;
-
-//list< string > base ;
-//list< value_type > returnMe ;
+origKey = key ;
 
 StringTokenizer tokens( key, delimiter ) ;
 StringTokenizer::const_reverse_iterator tokenItr = tokens.rbegin() ;
@@ -135,8 +132,7 @@ StringTokenizer::const_reverse_iterator tokenItr = tokens.rbegin() ;
 // "www.yahoo.com" and "www.wwwww.yahoo.com"
 // The recursive find will handle all cases of '?', '*', and
 // normal non-wildcard keys.
-//find( this, returnMe, base, key, tokens, tokenItr ) ;
-find( this, key, tokens, tokenItr ) ;
+find( this, tokens, tokenItr ) ;
 
 return returnMe ;
 }
@@ -144,9 +140,6 @@ return returnMe ;
 template< typename _valueT >
 void MTrie< _valueT >::find(
 	const MTrie< _valueT >* currentNode,
-//	list< typename MTrie< _valueT >::value_type >& returnMe,
-//	list< string >& base,
-	const string& origKey,
 	const StringTokenizer& tokens,
 	StringTokenizer::const_reverse_iterator tokenItr ) const
 {
@@ -270,9 +263,6 @@ for( const_nodes_iterator nItr = currentNode->nodesMap.begin(),
 
 			// Question mark only, no '*' in the token.
 			find( nItr->second,
-//				returnMe,
-//				base,
-				origKey,
 				tokens,
 				tokenItr ) ;
 
@@ -308,10 +298,7 @@ for( const_nodes_iterator nItr = currentNode->nodesMap.begin(),
 //	clog	<< "true" << endl ;
 
 	base.push_front( nItr->first ) ;
-	recursiveFind( nItr->second, // MTrie*
-//		base,
-//		returnMe,
-		origKey ) ;
+	recursiveFind( nItr->second ) ;
 	base.pop_front() ;
 	} // for( nItr )
 }
@@ -319,12 +306,10 @@ for( const_nodes_iterator nItr = currentNode->nodesMap.begin(),
 template< typename _valueT >
 void MTrie< _valueT >::recursiveFind(
 	const MTrie< _valueT >* currentNode,
-//	list< string >& base,
-//	list< typename MTrie< _valueT >::value_type >& returnMe,
-	const string& key ) const
+	bool blindRecursion ) const
 {
 //clog	<< "MTrie::recursiveFind> key: "
-//	<< key
+//	<< origKey
 //	<< ", base: "
 //	<< getBase( base )
 //	<< endl ;
@@ -334,37 +319,43 @@ void MTrie< _valueT >::recursiveFind(
 // if this node has no values
 if( !currentNode->valuesList.empty() )
 	{
+	// We need the stringBase either way
 	string stringBase = getBase( base ) ;
-	if( !match( key, stringBase ) )
+
+	if( blindRecursion || !match( origKey, stringBase ) )
 		{
-	//	clog	<< "MTrie::recursiveFind> match"
-	//		<< endl ;
+		//	clog	<< "MTrie::recursiveFind> match"
+		//		<< endl ;
+
+		if( !blindRecursion && '*' == origKey[ 0 ] )
+			{
+			// Found a match starting at this node
+			blindRecursion = true ;
+			}
 
 		// This node matches
 		for( const_values_iterator vItr = 
-			currentNode->valuesList.begin() ;
-			vItr != currentNode->valuesList.end() ;
-			++vItr )
+			currentNode->valuesList.begin(),
+			vEndItr = currentNode->valuesList.end() ;
+			vItr != vEndItr ; ++vItr )
 			{
 	//		clog	<< "MTrie::recursiveFind> vItr: "
 	//			<< *vItr
 	//			<< endl ;
-			value_type addMe( getBase( base ), *vItr ) ;
+			value_type addMe( stringBase, *vItr ) ;
 			returnMe.push_back( addMe ) ;
 			} // for( vItr )
 		} // if( !match() )
 	} // if( !empty() )
 
-for( const_nodes_iterator nItr = currentNode->nodesMap.begin() ;
-	nItr != currentNode->nodesMap.end() ; ++nItr )
+for( const_nodes_iterator nItr = currentNode->nodesMap.begin(),
+	nEndItr = currentNode->nodesMap.end() ;
+	nItr != nEndItr ; ++nItr )
 	{
 	// match() is not important here, since we are doing
 	// a blind '*' search, check every node from here down
 	base.push_front( nItr->first ) ;
-	recursiveFind( nItr->second, // MTrie*
-//		base,
-//		returnMe,
-		key ) ;
+	recursiveFind( nItr->second, blindRecursion ) ;
 	base.pop_front() ;
 	} // for( nItr )
 }
