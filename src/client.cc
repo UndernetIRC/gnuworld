@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: client.cc,v 1.54 2003/06/17 15:13:54 dan_karrels Exp $
+ * $Id: client.cc,v 1.55 2003/06/18 21:08:26 dan_karrels Exp $
  */
 
 #include	<new>
@@ -47,7 +47,7 @@
 #include	"ELog.h"
 #include	"events.h"
 
-RCSTAG("$Id: client.cc,v 1.54 2003/06/17 15:13:54 dan_karrels Exp $" ) ;
+RCSTAG("$Id: client.cc,v 1.55 2003/06/18 21:08:26 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -1852,7 +1852,10 @@ return true ;
 bool xClient::isOnChannel( const string& chanName ) const
 {
 Channel* theChannel = Network->findChannel(chanName);
-
+if( 0 == theChannel )
+	{
+	return false ;
+	}
 return isOnChannel(theChannel) ;
 }
 
