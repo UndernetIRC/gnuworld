@@ -11,14 +11,16 @@
 #include	"server.h"
 #include	"xparameters.h"
 
-const char msg_RemPing_cc_rcsId[] = "$Id: msg_RemPing.cc,v 1.1 2001/02/02 18:10:30 dan_karrels Exp $" ;
+const char msg_RemPing_cc_rcsId[] = "$Id: msg_RemPing.cc,v 1.2 2001/05/18 15:27:10 dan_karrels Exp $" ;
+const char server_h_rcsId[] = __SERVER_H ;
+const char xParameters_h_rcsId[] = __XPARAMETERS_H ;
+
+namespace gnuworld
+{
 
 using std::string ;
 using std::strstream ;
 using std::ends ;
-
-namespace gnuworld
-{
 
 const string militime( const char* sec, const char* msec )
 {

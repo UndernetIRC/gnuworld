@@ -9,7 +9,13 @@
 #include	"iClient.h"
 #include	"client.h"
 
-const char msg_W_cc_rcsId[] = "$Id: msg_W.cc,v 1.2 2001/02/05 20:06:38 dan_karrels Exp $" ;
+const char msg_W_cc_rcsId[] = "$Id: msg_W.cc,v 1.3 2001/05/18 15:27:10 dan_karrels Exp $" ;
+const char server_h_rcsId[] = __SERVER_H ;
+const char xParameters_h_rcsId[] = __XPARAMETERS_H ;
+const char ELog_h_rcsId[] = __ELOG_H ;
+const char Network_h_rcsId[] = __NETWORK_H ;
+const char iClient_h_rcsId[] = __ICLIENT_H ;
+const char client_h_rcsId[] = __CLIENT_H ;
 
 namespace gnuworld
 {

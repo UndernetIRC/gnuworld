@@ -13,7 +13,13 @@
 #include	"ELog.h"
 #include	"xparameters.h"
 
-const char msg_SQ_cc_rcsId[] = "$Id: msg_SQ.cc,v 1.4 2001/05/07 19:02:15 mrbean_ Exp $" ;
+const char msg_SQ_cc_rcsId[] = "$Id: msg_SQ.cc,v 1.5 2001/05/18 15:27:10 dan_karrels Exp $" ;
+const char server_h_rcsId[] = __SERVER_H ;
+const char events_h_rcsId[] = __EVENTS_H ;
+const char Network_h_rcsId[] = __NETWORK_H ;
+const char iServer_h_rcsId[] = __ISERVER_H ;
+const char ELog_h_rcsId[] = __ELOG_H ;
+const char xParameters_h_rcsId[] = __XPARAMETERS_H ;
 
 namespace gnuworld
 {

@@ -4,11 +4,18 @@
 
 #include	"server.h"
 #include	"events.h"
+#include	"Network.h"
 #include	"iClient.h"
 #include	"Network.h"
 #include	"ELog.h"
 
-const char msg_Q_cc_rcsId[] = "$Id: msg_Q.cc,v 1.3 2001/03/24 01:31:42 dan_karrels Exp $" ;
+const char msg_Q_cc_rcsId[] = "$Id: msg_Q.cc,v 1.4 2001/05/18 15:27:10 dan_karrels Exp $" ;
+const char server_h_rcsId[] = __SERVER_H ;
+const char events_h_rcsId[] = __EVENTS_H ;
+const char Network_h_rcsId[] = __NETWORK_H ;
+const char iClient_h_rcsId[] = __ICLIENT_H ;
+const char ELog_h_rcsId[] = __ELOG_H ;
+const char xParameters_h_rcsId[] = __XPARAMETERS_H ;
 
 namespace gnuworld
 {

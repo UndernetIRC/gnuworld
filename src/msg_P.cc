@@ -9,14 +9,21 @@
 #include	"iClient.h"
 #include	"client.h"
 #include	"ELog.h"
+#include	"xparameters.h"
 
-const char msg_P_cc_rcsId[] = "$Id: msg_P.cc,v 1.2 2001/03/04 11:41:36 isomer Exp $" ;
-
-using std::string ;
-using std::endl ;
+const char msg_P_cc_rcsId[] = "$Id: msg_P.cc,v 1.3 2001/05/18 15:27:10 dan_karrels Exp $" ;
+const char server_h_rcsId[] = __SERVER_H ;
+const char Network_h_rcsId[] = __NETWORK_H ;
+const char iClient_h_rcsId[] = __ICLIENT_H ;
+const char client_h_rcsId[] = __CLIENT_H ;
+const char ELog_h_rcsId[] = __ELOG_H ;
+const char xParameters_h_rcsId[] = __XPARAMETERS_H ;
 
 namespace gnuworld
 {
+
+using std::string ;
+using std::endl ;
 
 /**
  * A nick has sent a private message

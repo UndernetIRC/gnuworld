@@ -7,12 +7,16 @@
 #include	"ELog.h"
 #include	"xparameters.h"
 
-const char msg_PRIVMSG_cc_rcsId[] = "$Id: msg_PRIVMSG.cc,v 1.2 2001/02/06 00:26:00 dan_karrels Exp $" ;
-
-using std::endl ;
+const char msg_PRIVMSG_cc_rcsId[] = "$Id: msg_PRIVMSG.cc,v 1.3 2001/05/18 15:27:10 dan_karrels Exp $" ;
+const char server_h_rcsId[] = __SERVER_H ;
+const char Network_h_rcsId[] = __NETWORK_H ;
+const char ELog_h_rcsId[] = __ELOG_H ;
+const char xParameters_h_rcsId[] = __XPARAMETERS_H ;
 
 namespace gnuworld
 {
+
+using std::endl ;
 
 // This is a blatant hack until ircu gets its protocol straight
 int xServer::MSG_PRIVMSG( xParameters& Param )

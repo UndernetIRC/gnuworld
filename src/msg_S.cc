@@ -14,13 +14,19 @@
 #include	"ELog.h"
 #include	"xparameters.h"
 
-const char msg_S_cc_rcsId[] = "$Id: msg_S.cc,v 1.2 2001/03/01 01:58:17 dan_karrels Exp $" ;
-
-using std::string ;
-using std::endl ;
+const char msg_S_cc_rcsId[] = "$Id: msg_S.cc,v 1.3 2001/05/18 15:27:10 dan_karrels Exp $" ;
+const char server_h_rcsId[] = __SERVER_H ;
+const char events_h_rcsId[] = __EVENTS_H ;
+const char Network_h_rcsId[] = __NETWORK_H ;
+const char iServer_h_rcsId[] = __ISERVER_H ;
+const char ELog_h_rcsId[] = __ELOG_H ;
+const char xParameters_h_rcsId[] = __XPARAMETERS_H ;
 
 namespace gnuworld
 {
+
+using std::string ;
+using std::endl ;
 
 /**
  * New server joined the network.

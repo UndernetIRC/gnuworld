@@ -15,7 +15,16 @@
 #include	"xparameters.h"
 #include	"StringTokenizer.h"
 
-const char msg_PART_cc_rcsId[] = "$Id: msg_PART.cc,v 1.6 2001/05/08 18:40:40 dan_karrels Exp $" ;
+const char msg_PART_cc_rcsId[] = "$Id: msg_PART.cc,v 1.7 2001/05/18 15:27:10 dan_karrels Exp $" ;
+const char server_h_rcsId[] = __SERVER_H ;
+const char events_h_rcsId[] = __EVENTS_H ;
+const char iClient_h_rcsId[] = __ICLIENT_H ;
+const char Channel_h_rcsId[] = __CHANNEL_H ;
+const char ChannelUser_h_rcsId[] = __CHANNELUSER_H ;
+const char Network_h_rcsId[] = __NETWORK_H ;
+const char ELog_h_rcsId[] = __ELOG_H ;
+const char xParameters_h_rcsId[] = __XPARAMETERS_H ;
+const char StringTokenizer_h_rcsId[] = __STRINGTOKENIZER_H ;
 
 namespace gnuworld
 {

@@ -1,9 +1,9 @@
 /* config.h
- * $Id: config.h,v 1.8 2001/02/10 02:47:44 isomer Exp $
+ * $Id: config.h,v 1.9 2001/05/18 15:27:09 dan_karrels Exp $
  */
 
 #ifndef __CONFIG_H
-#define __CONFIG_H "$Id: config.h,v 1.8 2001/02/10 02:47:44 isomer Exp $"
+#define __CONFIG_H "$Id: config.h,v 1.9 2001/05/18 15:27:09 dan_karrels Exp $"
 
 /* config.h */
 /* GNUWorld main configuration file */
@@ -15,7 +15,7 @@
  * EDEBUG
  * This define is pretty obvious...Will probably consume
  * massive quantities of CPU when debugging, recommended
- * only for debugging/testing/optimization purposes
+ * only for debugging/testing purposes.
  */
 #define EDEBUG
 
@@ -23,7 +23,7 @@
 
 /**
  * DEBUGFILE
- * The file that the debugger will write to
+ * The file to which the debugger will write.
  */
 #define DEBUGFILE "debug.log"
 
@@ -38,7 +38,7 @@
 
 /**
  * LOGFILE
- * Name of the file that gnuworld logs to =P
+ * Name of the file to which gnuworld logs :)
  */
 #define LOGFILE "gnuworld.log"
 
