@@ -17,7 +17,7 @@
  *
  * Caveats: None
  *
- * $Id: OPCommand.cc,v 1.22 2001/03/05 21:41:30 gte Exp $
+ * $Id: OPCommand.cc,v 1.23 2001/03/06 23:44:00 gte Exp $
  */
 
 #include	<string>
@@ -32,7 +32,7 @@
 
 using std::map ;
 
-const char OPCommand_cc_rcsId[] = "$Id: OPCommand.cc,v 1.22 2001/03/05 21:41:30 gte Exp $" ;
+const char OPCommand_cc_rcsId[] = "$Id: OPCommand.cc,v 1.23 2001/03/06 23:44:00 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -238,7 +238,23 @@ for( ; counter < st2.size() ; ++counter )
 			continue ;
 			} 
 		}
- 
+
+	/*
+	 * If the user is banned <75, don't allow them to be opp'd either
+	 */
+
+	sqlBan* tmpBan = bot->isBannedOnChan(theChan, tmpChanUser->getClient()); 
+	if( tmpBan && (tmpBan->getLevel() <= 75) ) 
+		{ 
+		/* Tell the person doing the op'ing this is bad */
+		bot->Notice(theClient,
+			"%s isn't allowed to be opped on %s",
+			tmpChanUser->getClient()->getNickName().c_str(), 
+			theChan->getName().c_str());
+		continue;
+		}
+	 
+
 	// Check for duplicates.
 	duplicateMapType::iterator ptr = duplicateMap.find(target);
 

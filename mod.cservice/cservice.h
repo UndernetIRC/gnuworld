@@ -1,5 +1,5 @@
 #ifndef __CSERVICE_H
-#define __CSERVICE_H "$Id: cservice.h,v 1.55 2001/03/06 02:34:32 dan_karrels Exp $"
+#define __CSERVICE_H "$Id: cservice.h,v 1.56 2001/03/06 23:44:00 gte Exp $"
 
 #include	<string>
 #include	<vector>
@@ -274,8 +274,12 @@ public:
 	/* Bans & kicks a specified user with a specific reason */
 	bool doInternalBanAndKick(sqlChannel*, iClient*, const string&);
 
+	/* Support function to check if a user is banned on a channel. */
+	sqlBan* isBannedOnChan(sqlChannel*, iClient*);
+
 	/* Matches DB bans, and kicks supplied user if neccessary */
 	bool checkBansOnJoin( Channel*, sqlChannel* , iClient* );
+
 	time_t currentTime() const ;
 
 	/* Queue to hold pending reops */ 

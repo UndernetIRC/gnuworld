@@ -10,7 +10,7 @@
 #include	"responses.h" 
 #include	"networkData.h"
 
-const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.13 2001/03/04 05:57:14 gte Exp $" ;
+const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.14 2001/03/06 23:44:00 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -169,6 +169,12 @@ newData->currentUser = theUser;
 bot->Notice(theClient,
 	bot->getResponse(theUser, language::auth_success).c_str(), 
 	theUser->getUserName().c_str()); 
+
+/*
+ * The fun part! For all channels this user has access on, and has
+ * AUTOP set, and isn't already opp'd on - do the deed. 
+ */ 
+
 
 return true; 
 } 

@@ -2051,11 +2051,32 @@ for( xServer::opVectorType::const_iterator ptr = theTargets.begin() ;
 				}
 			}	
 
-		/*
-		 *  The 'Fun' Part. Scan through channel bans to see if this hostmask
-		 *  is 'banned'.
-		 */
-		} // if()
+			/*
+			 *  The 'Fun' Part. Scan through channel bans to see if this hostmask
+			 *  is 'banned' at 75 or below.
+			 */
+
+			sqlBan* theBan = isBannedOnChan(reggedChan, tmpUser->getClient()); 
+			if( theBan && (theBan->getLevel() <= 75) ) 
+				{
+					deopList.push_back(tmpUser->getClient());
+
+					/* Tell the person bein op'd that they can't */
+					Notice(tmpUser->getClient(), 
+						"You are not allowed to be opped on %s",
+						reggedChan->getName().c_str());
+
+					/* Tell the person doing the op'ing this is bad */
+					if (theChanUser) 
+						{
+						Notice(theChanUser->getClient(),
+							"%s isn't allowed to be opped on %s",
+							tmpUser->getClient()->getNickName().c_str(), 
+							reggedChan->getName().c_str());
+						} 
+				}
+
+			} // if()
 	else
 		{
 		/* Somebody is being deopped? */
@@ -2349,6 +2370,7 @@ switch( whichEvent )
 		 * First thing we do - check if this person is banned.
 		 * If so, they're booted out.
 		 */ 
+
 		if (checkBansOnJoin(theChan, reggedChan, theClient))
 			{
 			break;
@@ -2367,7 +2389,7 @@ switch( whichEvent )
 			{
 			break;
 			}
-
+ 
 		/* Deal with auto-op first - check this users access level. */
 		sqlUser* theUser = isAuthed(theClient, false);
 		if (!theUser)
@@ -2377,18 +2399,33 @@ switch( whichEvent )
 			}
 
 		/* Check access in this channel. */
-		sqlLevel* theLevel = getLevelRecord(theUser, reggedChan); 
-		if (!theLevel)
+		int accessLevel = getEffectiveAccessLevel(theUser, reggedChan, false); 
+		if (!accessLevel)
 			{
 			/* No access.. */
 			break;
  			}
+ 
+		sqlLevel* theLevel = getLevelRecord(theUser, reggedChan);
+		if(!theLevel) 
+			{
+			break;
+			}
 
+		/* Check strictop isn't on, and this user is < 100 */
+		if (reggedChan->getFlag(sqlChannel::F_STRICTOP))
+			{
+			if (!(accessLevel >= level::op))
+				{
+				break; 
+				}
+			}	
+ 
 		/* Next, see if they have auto op set. */
 		if (theLevel->getFlag(sqlLevel::F_AUTOOP)) 
 			{
 			/* If they are suspended, or somehow have less than 100, don't op them */
-			if (getEffectiveAccessLevel(theUser, reggedChan, false))
+			if (accessLevel)
 				{
 				Op(theChan, theClient); 
 				break;
@@ -2399,7 +2436,7 @@ switch( whichEvent )
 		if (theLevel->getFlag(sqlLevel::F_AUTOVOICE)) 
 			{
 			/* If they are suspended, or somehow have less than 75, don't voice them */
-			if (getEffectiveAccessLevel(theUser, reggedChan, false))
+			if (accessLevel)
 				{
 				Voice(theChan, theClient);
 				break;
@@ -2418,6 +2455,32 @@ return xClient::OnChannelEvent( whichEvent, theChan,
 }
 
 /**
+ *  This function matches a client against the bans stored in the
+ *  database for this channel.
+ *  Returns an sqlBan if it matches, false otherwise.
+ *  'theChan' and 'theClient' must _not_ be null.
+ */
+sqlBan* cservice::isBannedOnChan(sqlChannel* theChan, iClient* theClient)
+{
+vector< sqlBan* >* banList = getBanRecords(theChan);
+vector< sqlBan* >::iterator ptr = banList->begin();
+
+while (ptr != banList->end())
+	{
+	sqlBan* theBan = *ptr; 
+
+	if( match(theBan->getBanMask(),
+		theClient->getNickUserHost()) == 0)
+			{
+			return theBan;
+			}
+	++ptr; 
+	} /* while() */
+	
+return NULL;
+}
+ 
+/**
  * This function compares a client with any active bans set in the DB.
  * If matched, the ban is applied and the user is kicked.
  * Returns true if matched, false if not.
@@ -2427,51 +2490,40 @@ return xClient::OnChannelEvent( whichEvent, theChan,
 bool cservice::checkBansOnJoin( Channel* netChan, sqlChannel* theChan,
 	iClient* theClient )
 {
-vector< sqlBan* >* banList = getBanRecords(theChan);
-vector< sqlBan* >::iterator ptr = banList->begin();
 
-while (ptr != banList->end())
+sqlBan* theBan = isBannedOnChan(theChan, theClient);
+
+// TODO: Ban through the server. 
+// TODO: Violation of rule of numbers
+/* If we found a matching ban */
+if( theBan && (theBan->getLevel() >= 75) )
 	{
-	sqlBan* theBan = *ptr; 
+	strstream s;
+	s	<< getCharYYXXX()
+		<< " M "
+		<< theChan->getName()
+		<< " +b "
+		<< theBan->getBanMask()
+		<< ends;
+	
+	Write( s );
+	delete[] s.str(); 
 
-	// TODO: Ban through the server, this method
-	// is not updating the network data tables.
-	// -- No method available to ban by specified mask in API.
-	/* Matching ban? */ 
-	// TODO: Violation of rule of numbers
-	if( (match(theBan->getBanMask(),
-		theClient->getNickUserHost()) == 0) &&
-		(theBan->getLevel() >= 75) )
+	netChan->setBan( theBan->getBanMask() ) ;
+
+	/* Don't kick banned +k bots */
+	if ( !theClient->getMode(iClient::MODE_SERVICES) )
 		{
-		strstream s;
-		s	<< getCharYYXXX()
-			<< " M "
-			<< theChan->getName()
-			<< " +b "
-			<< theBan->getBanMask()
-			<< ends;
-		
-		Write( s );
-		delete[] s.str(); 
-
-		netChan->setBan( theBan->getBanMask() ) ;
-
-		/* Don't kick banned +k bots */
-		if ( !theClient->getMode(iClient::MODE_SERVICES) )
-			{
-			Kick(netChan, theClient,
-				string( "("
-				+ theBan->getSetBy()
-				+ ") "
-				+ theBan->getReason()) );
-			}
+		Kick(netChan, theClient,
+			string( "("
+			+ theBan->getSetBy()
+			+ ") "
+			+ theBan->getReason()) );
+		}
 
 		return true;
-			} /* Matching Ban */ 
-
-	++ptr; 
-	} /* while() */
-	
+	} /* Matching Ban > 75 */ 
+ 
 return false;
 }
 

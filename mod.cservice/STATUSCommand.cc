@@ -9,7 +9,7 @@
 #include	"responses.h"
 #include	"Network.h"
  
-const char STATUSCommand_cc_rcsId[] = "$Id: STATUSCommand.cc,v 1.22 2001/03/02 20:35:33 gte Exp $" ;
+const char STATUSCommand_cc_rcsId[] = "$Id: STATUSCommand.cc,v 1.23 2001/03/06 23:44:00 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -99,11 +99,11 @@ bool STATUSCommand::Exec( iClient* theClient, const string& Message )
 			
 		bot->Notice(theClient, 
 			bot->getResponse(theUser,
-				language::status_last_user_not,
+				language::status_last_chan_not,
 				string("Last recieved Channel NOTIFY: %i")).c_str(), bot->lastChannelRefresh);
 		bot->Notice(theClient, 
 			bot->getResponse(theUser,
-				language::status_last_chan_not,
+				language::status_last_user_not,
 				string("Last recieved User NOTIFY: %i")).c_str(), bot->lastUserRefresh);
 		bot->Notice(theClient, 
 			bot->getResponse(theUser,
