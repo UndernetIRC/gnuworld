@@ -13,7 +13,7 @@
  *
  * Command is aliased "INFO".
  *
- * $Id: CHANINFOCommand.cc,v 1.46 2002/05/23 17:43:12 dan_karrels Exp $
+ * $Id: CHANINFOCommand.cc,v 1.47 2003/04/24 20:19:36 gte Exp $
  */
 
 #include	<string>
@@ -28,7 +28,7 @@
 #include	"libpq++.h"
 #include	"cservice_config.h"
 
-const char CHANINFOCommand_cc_rcsId[] = "$Id: CHANINFOCommand.cc,v 1.46 2002/05/23 17:43:12 dan_karrels Exp $" ;
+const char CHANINFOCommand_cc_rcsId[] = "$Id: CHANINFOCommand.cc,v 1.47 2003/04/24 20:19:36 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -88,6 +88,16 @@ if( string::npos == st[ 1 ].find_first_of( '#' ) )
 				bot->getResponse(tmpUser,
 					language::no_peeking,
 					string("Unable to view user details (Invisible)")));
+
+			/*
+			 * Show the channels this guy owns to opers.
+			 */
+
+			if (theClient->isOper())
+			{
+				bot->outputChannelAccesses(theClient, theUser, tmpUser, 500);
+			}
+
 			return false;
 			}
 		}
@@ -230,70 +240,18 @@ if( string::npos == st[ 1 ].find_first_of( '#' ) )
 			}
 #endif
 
-		stringstream channelsQuery;
-		string channelList ;
+		bot->outputChannelAccesses(theClient, theUser, tmpUser, 0);
 
-		channelsQuery	<< "SELECT channels.name,levels.access FROM levels,channels "
-				<< "WHERE levels.channel_id = channels.id AND channels.registered_ts <> 0 AND levels.user_id = "
-				<< theUser->getID()
-				<< " ORDER BY levels.access DESC"
-				<< ends;
-
-		#ifdef LOG_SQL
-			elog	<< "CHANINFO::sqlQuery> "
-				<< channelsQuery.str().c_str()
-				<< endl;
-		#endif
-
-		string chanName ;
-		string chanAccess ;
-
-		ExecStatusType status =
-			bot->SQLDb->Exec(channelsQuery.str().c_str()) ;
-
-		if( PGRES_TUPLES_OK != status )
-			{
-			bot->Notice( theClient,
-				"Internal error: SQL failed" ) ;
-
-			elog	<< "CHANINFO> SQL Error: "
-				<< bot->SQLDb->ErrorMessage()
-				<< endl ;
-			return false ;
-			}
-
-		for(int i = 0; i < bot->SQLDb->Tuples(); i++)
-			{
-			chanName = bot->SQLDb->GetValue(i,0);
-			chanAccess = bot->SQLDb->GetValue(i,1);
-			// 4 for 2 spaces, 2 brackets + comma.
-			if ((channelList.size() + chanName.size() + chanAccess.size() +5) >= 450)
-				{
-				bot->Notice(theClient,
-					bot->getResponse(tmpUser,
-						language::channels,
-						string("Channels: %s")).c_str(),
-					channelList.c_str());
-				channelList.erase( channelList.begin(),
-					channelList.end() ) ;
-				}
-
-			if (channelList.size() != 0)
-					{
-					channelList += ", ";
-					}
-			channelList += chanName;
-			channelList += " (";
-			channelList += chanAccess;
-			channelList +=  ")";
-			} // for()
-
-		bot->Notice(theClient,
-			bot->getResponse(tmpUser,
-				language::channels,
-				string("Channels: %s")).c_str(),
-			channelList.c_str());
 		}
+
+	/*
+	 * Show the channels this guy owns to opers.
+	 */
+
+	if (theClient->isOper() && !adminAccess)
+	{
+		bot->outputChannelAccesses(theClient, theUser, tmpUser, 500);
+	}
 
 	return true;
 }

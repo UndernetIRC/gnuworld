@@ -1,11 +1,11 @@
 /**
  * cservice.h
  * Author: Greg Sikorski
- * $Id: cservice.h,v 1.93 2003/01/08 23:23:37 gte Exp $
+ * $Id: cservice.h,v 1.94 2003/04/24 20:19:37 gte Exp $
  */
 
 #ifndef __CSERVICE_H
-#define __CSERVICE_H "$Id: cservice.h,v 1.93 2003/01/08 23:23:37 gte Exp $"
+#define __CSERVICE_H "$Id: cservice.h,v 1.94 2003/04/24 20:19:37 gte Exp $"
 
 #include	<string>
 #include	<vector>
@@ -480,6 +480,8 @@ public:
 	 * currently in the database.
 	 */
 	void loadConfigData();
+
+	void outputChannelAccesses(iClient*, sqlUser*, sqlUser*, unsigned int);
 
 } ;
 

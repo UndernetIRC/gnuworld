@@ -2,7 +2,7 @@
  * cservice.cc
  * Author: Greg Sikorski
  * Purpose: Overall control client.
- * $Id: cservice.cc,v 1.230 2003/01/29 23:19:58 gte Exp $
+ * $Id: cservice.cc,v 1.231 2003/04/24 20:19:37 gte Exp $
  */
 
 #include	<new>
@@ -34,6 +34,7 @@
 #include	"cservice_config.h"
 #include	"match.h"
 #include	"md5hash.h"
+#include	"responses.h"
 
 namespace gnuworld
 {
@@ -762,7 +763,7 @@ else if(Command == "VERSION")
 	xClient::DoCTCP(theClient, CTCP,
 		"Undernet P10 Channel Services II ["
 		__DATE__ " " __TIME__
-		"] Release 1.1pl12");
+		"] Release 1.1pl13");
 	}
 else if(Command == "PROBLEM?")
 	{
@@ -771,10 +772,6 @@ else if(Command == "PROBLEM?")
 else if(Command == "PUSHER")
 	{
 	xClient::DoCTCP(theClient, CTCP.c_str(), "Pak, Chooie, Unf.");
-	}
-else if(Command == "OPEN_THE_POD_BAY_DOORS")
-	{
-	xClient::DoCTCP(theClient, CTCP.c_str(), "Daisey.. Daisey, give me your ans--");
 	}
 else if(Command == "SOUND")
 	{
@@ -4117,6 +4114,79 @@ void cservice::loadConfigData()
 			}
 		}
 
+}
+
+/*
+ * Display a summary of channels "theUser" has access on to "theClient".
+ * Only show those above or equal to "minlevel".
+ */
+void cservice::outputChannelAccesses(iClient* theClient, sqlUser* theUser, sqlUser* tmpUser, unsigned int minlevel)
+{
+	stringstream channelsQuery;
+	string channelList ;
+
+	channelsQuery	<< "SELECT channels.name,levels.access FROM levels,channels "
+			<< "WHERE levels.channel_id = channels.id AND channels.registered_ts <> 0 AND levels.user_id = "
+			<< theUser->getID()
+			<< " AND levels.access >= "
+			<< minlevel
+			<< " ORDER BY levels.access DESC"
+			<< ends;
+
+	#ifdef LOG_SQL
+		elog	<< "CHANINFO::sqlQuery> "
+			<< channelsQuery.str().c_str()
+			<< endl;
+	#endif
+
+	string chanName ;
+	string chanAccess ;
+
+	ExecStatusType status =
+		SQLDb->Exec(channelsQuery.str().c_str()) ;
+
+	if( PGRES_TUPLES_OK != status )
+		{
+		Notice( theClient,
+			"Internal error: SQL failed" ) ;
+
+		elog	<< "CHANINFO> SQL Error: "
+			<< SQLDb->ErrorMessage()
+			<< endl ;
+		return  ;
+		}
+
+	for(int i = 0; i < SQLDb->Tuples(); i++)
+		{
+		chanName = SQLDb->GetValue(i,0);
+		chanAccess = SQLDb->GetValue(i,1);
+		// 4 for 2 spaces, 2 brackets + comma.
+		if ((channelList.size() + chanName.size() + chanAccess.size() +5) >= 450)
+			{
+			Notice(theClient,
+				getResponse(tmpUser,
+					language::channels,
+					string("Channels: %s")).c_str(),
+				channelList.c_str());
+			channelList.erase( channelList.begin(),
+				channelList.end() ) ;
+			}
+
+		if (channelList.size() != 0)
+				{
+				channelList += ", ";
+				}
+		channelList += chanName;
+		channelList += " (";
+		channelList += chanAccess;
+		channelList +=  ")";
+		} // for()
+
+	Notice(theClient,
+		getResponse(tmpUser,
+			language::channels,
+			string("Channels: %s")).c_str(),
+		channelList.c_str());
 }
 
 void Command::Usage( iClient* theClient )
