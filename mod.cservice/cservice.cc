@@ -2,7 +2,7 @@
  * cservice.cc
  * Author: Greg Sikorski
  * Purpose: Overall control client.
- * $Id: cservice.cc,v 1.234 2003/06/11 22:58:01 gte Exp $
+ * $Id: cservice.cc,v 1.235 2003/06/12 18:37:37 dan_karrels Exp $
  */
 
 #include	<new>
@@ -44,6 +44,7 @@ using std::endl ;
 using std::stringstream ;
 using std::ends ;
 using std::string ;
+using std::clog ;
 
 /*
  *  Exported function used by moduleLoader to gain an
