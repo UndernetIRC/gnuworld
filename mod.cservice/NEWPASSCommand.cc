@@ -10,7 +10,7 @@
 #include	"responses.h" 
 #include	"networkData.h"
 
-const char NEWPASSCommand_cc_rcsId[] = "$Id: NEWPASSCommand.cc,v 1.9 2001/02/25 23:39:44 gte Exp $" ;
+const char NEWPASSCommand_cc_rcsId[] = "$Id: NEWPASSCommand.cc,v 1.10 2001/03/14 18:24:55 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -54,6 +54,13 @@ if (st.assemble(1).size() > 50)
 	bot->Notice(theClient, "Your passphrase cannot exceed 50 characters.");
 	return false;
 	}
+
+if (st.assemble(1).size() < 6) 
+	{
+	bot->Notice(theClient, "Your passphrase cannot be less than 6 characters.");
+	return false;
+	}
+
 
 /* Work out some salt. */
 string salt;
