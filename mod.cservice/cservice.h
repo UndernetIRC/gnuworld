@@ -1,5 +1,5 @@
 #ifndef __CSERVICE_H
-#define __CSERVICE_H "$Id: cservice.h,v 1.50 2001/02/18 19:46:01 dan_karrels Exp $"
+#define __CSERVICE_H "$Id: cservice.h,v 1.51 2001/02/20 00:03:35 plexus Exp $"
 
 #include	<string>
 #include	<vector>
@@ -45,6 +45,8 @@ public:
 	inline int getPID() const
 		{ return pgConn->be_pid; }
 };
+ 
+class Command;
  
 class cservice : public xClient
 {
@@ -133,6 +135,9 @@ public:
 	/* Fetch a access level record for a user/channel combo. */
 	sqlLevel* getLevelRecord(sqlUser*, sqlChannel*);
 
+	/* Fetch the user status flags. L = in cache, P = got password, U = Is authed. */
+	string userStatusFlags( const string& );
+	
 	/* Formats a timestamp into a "X Days, XX:XX:XX" from 'Now'. */
 	const string prettyDuration( int ) const ;
 

@@ -9,7 +9,7 @@
  * Displays all "Level" records for a specified channel.
  * Can optionally narrow down selection using a number of switches. 
  *
- * $Id: ACCESSCommand.cc,v 1.30 2001/02/18 14:47:23 plexus Exp $
+ * $Id: ACCESSCommand.cc,v 1.31 2001/02/20 00:03:35 plexus Exp $
  */
 
 #include	<string>
@@ -22,7 +22,7 @@
 #include	"responses.h"
 #define MAX_RESULTS 15
  
-const char ACCESSCommand_cc_rcsId[] = "$Id: ACCESSCommand.cc,v 1.30 2001/02/18 14:47:23 plexus Exp $" ;
+const char ACCESSCommand_cc_rcsId[] = "$Id: ACCESSCommand.cc,v 1.31 2001/02/20 00:03:35 plexus Exp $" ;
 
 namespace gnuworld
 {
@@ -255,25 +255,28 @@ if( PGRES_TUPLES_OK == status )
 			if (flag & sqlLevel::F_AUTOOP) autoMode = "OP";
 			if (flag & sqlLevel::F_AUTOVOICE) autoMode = "VOICE"; 
 
-			// Process the -op / -voice / -none flags.
-
-			if(
-			    (aNone == true &&
-			     (((flag & sqlLevel::F_AUTOVOICE) ||
-			       (flag & sqlLevel::F_AUTOOP))   &&
-			      (aVoice == false && aOp == false))) ||
-			    ((aVoice == true && aOp == false && aNone == false) &&
-			     (!(flag & sqlLevel::F_AUTOVOICE)))   ||
-			    (aOp == true &&
-			     (!(flag & sqlLevel::F_AUTOOP)))
-			  )
-				continue;
-
+			if(aVoice == true || aOp == true || aNone == true)
+				{
+				if(aNone == true)
+					{
+					if(!aVoice && (flag & sqlLevel::F_AUTOVOICE)) continue;
+					if(!aOp && (flag & sqlLevel::F_AUTOOP)) continue;
+					}
+				else
+					{
+					if(!(flag & sqlLevel::F_AUTOVOICE) &&
+				           !(flag & sqlLevel::F_AUTOOP)) continue;
+					if(!aVoice && (flag & sqlLevel::F_AUTOVOICE)) continue;
+					if(!aOp && (flag & sqlLevel::F_AUTOOP)) continue; 
+					}
+				}
+				
 			bot->Notice(theClient,
 				bot->getResponse(theUser,
 					language::user_access_is,
-					string("USER: %s ACCESS: %s")).c_str(),
-				bot->SQLDb->GetValue(i, 1), bot->SQLDb->GetValue(i, 2)
+					string("USER: %s ACCESS: %s %s")).c_str(),
+				bot->SQLDb->GetValue(i, 1), bot->SQLDb->GetValue(i, 2),
+				bot->userStatusFlags(bot->SQLDb->GetValue(i, 1))
 			);	
 	
 			bot->Notice(theClient, 

@@ -1,5 +1,5 @@
 #ifndef __RESPONSES_H
-#define __RESPONSES_H "$Id: responses.h,v 1.8 2001/02/18 19:46:01 dan_karrels Exp $"
+#define __RESPONSES_H "$Id: responses.h,v 1.9 2001/02/20 00:03:35 plexus Exp $"
 
 /* 
  * responses.h
@@ -10,7 +10,7 @@
  * Defines 'response' ID's, unique references to textual responses
  * from the bot.
  *
- * $Id: responses.h,v 1.8 2001/02/18 19:46:01 dan_karrels Exp $
+ * $Id: responses.h,v 1.9 2001/02/20 00:03:35 plexus Exp $
  */
 
 namespace gnuworld
@@ -33,7 +33,7 @@ namespace gnuworld
 		const int youre_devoiced_by =		14;
 		const int not_opped =				15;
 		const int not_voiced =				16;
-		const int not_registered =			17; // user, not chan!
+		const int auth_failed =				17;
 		const int i_am_not_on_chan =		18;
 		const int ban_level_range =			19;
 		const int ban_duration =			20;
@@ -89,7 +89,7 @@ namespace gnuworld
 		const int lban_since =				70;
 		const int lban_exp =				71;
 		const int lban_end =				72;
-		const int auth_failed =				73;
+		const int not_registered =			73; // user, not chan!
 		const int no_longer_auth =			74;
 		const int doesnt_have_access =		75;
 		const int mod_access_higher =		76;

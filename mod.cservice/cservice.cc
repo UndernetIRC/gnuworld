@@ -660,7 +660,7 @@ else if(Command == "VERSION")
 	xClient::DoCTCP(theClient, CTCP,
 		"Undernet P10 Channel Services Version 2 ["
 		__DATE__ " " __TIME__
-		"] ($Id: cservice.cc,v 1.110 2001/02/18 19:46:01 dan_karrels Exp $)");
+		"] ($Id: cservice.cc,v 1.111 2001/02/20 00:03:35 plexus Exp $)");
 	}
 else if(Command == "PROBLEM?")
 	{
@@ -1435,6 +1435,23 @@ serverNotice(tmpChan, message);
 return true;
 }
  
+string cservice::userStatusFlags( const string& theUser ) 
+{
+
+string flagString = "";
+
+sqlUserHashType::iterator ptr = sqlUserCache.find(theUser);
+
+if(ptr != sqlUserCache.end())
+	{
+	sqlUser* tmpUser = ptr->second;
+	flagString = 'L';
+	if(tmpUser->getFlag(sqlUser::F_LOGGEDIN)) flagString += 'U';
+	}
+
+return flagString;
+}
+
 const string cservice::prettyDuration( int duration ) const
 { 
 
@@ -2047,7 +2064,9 @@ delete[] s3.str();
 return 0;
 }
 
-/**
+
+/*--doAutoTopic---------------------------------------------------------------
+ *
  * This support function sets the autotopic in a particular channel. 
  */
 void cservice::doAutoTopic(sqlChannel* theChan)
