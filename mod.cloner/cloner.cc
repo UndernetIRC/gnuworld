@@ -20,7 +20,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
  * USA.
  *
- * $Id: cloner.cc,v 1.29 2003/08/09 23:15:35 dan_karrels Exp $
+ * $Id: cloner.cc,v 1.30 2003/08/21 20:42:37 dan_karrels Exp $
  */
 
 #include	<new>
@@ -43,7 +43,7 @@
 #include	"misc.h"
 #include	"ELog.h"
 
-RCSTAG("$Id: cloner.cc,v 1.29 2003/08/09 23:15:35 dan_karrels Exp $");
+RCSTAG("$Id: cloner.cc,v 1.30 2003/08/21 20:42:37 dan_karrels Exp $");
 
 namespace gnuworld
 {
@@ -51,7 +51,6 @@ namespace gnuworld
 using std::vector ;
 using std::endl ;
 using std::stringstream ;
-using std::ends ;
 using std::string ;
 
 /*
@@ -201,8 +200,14 @@ string topic ;
 
 if( st.size() > 1 )
 	{
-	topic = st[ 1 ] ;
+	topic = string_upper( st[ 1 ] ) ;
 	}
+
+//elog	<< "cloner::OnPrivateMessage> command: "
+//	<< command
+//	<< ", topic: "
+//	<< topic
+//	<< endl ;
 
 if( command == "SHOWCOMMANDS" )
 	{
@@ -331,8 +336,7 @@ else if( command == "JOINALL" )
 		stringstream s ;
 		s	<< (*ptr)->getCharYYXXX()
 			<< " J "
-			<< chanName
-			<< ends ;
+			<< chanName ;
 
 		MyUplink->Write( s ) ;
 		}
@@ -360,13 +364,12 @@ else if( command == "PARTALL" )
 			stringstream s ;
 			s	<< (*ptr)->getCharYYXXX()
 				<< " L "
-				<< chanName
-				<< ends ;
+				<< chanName ;
 
 			MyUplink->Write( s ) ;
 			}
 		}
-	if( st.size() >= 2 )
+	if( st.size() > 2 )
 		{
 		string chanName( st[ 1 ] ) ;
 		if( chanName[ 0 ] != '#' )
@@ -384,8 +387,7 @@ else if( command == "PARTALL" )
 				<< " L "
 				<< chanName
 				<< " :"
-				<< partReason
-				<< ends ;
+				<< partReason ;
 
 			MyUplink->Write( s ) ;
 			}
@@ -400,37 +402,22 @@ else if( command == "KILLALL" || command == "QUITALL" )
                 return ;
                 }
 
-	if( st.size() == 1 )
-		{
-		for( list< iClient* >::const_iterator ptr = clones.begin(),
-			endPtr = clones.end() ; ptr != endPtr ; ++ptr )
-			{
-			MyUplink->DetachClient( *ptr ) ;
-//			stringstream s ;
-//			s	<< (*ptr)->getCharYYXXX()
-//				<< " Q :Quitting"
-//				<< ends ;
-
-//			MyUplink->Write( s ) ;
-			}
-		}
-
+	string quitMsg ;
 	if( st.size() >= 2 )
 		{
-		string quitMsg( st.assemble(1).c_str() ) ;
+		quitMsg = st.assemble( 1 ) ;
+		}
 
-		for( list< iClient* >::const_iterator ptr = clones.begin(),
-			endPtr = clones.end() ; ptr != endPtr ; ++ptr )
+	for( list< iClient* >::const_iterator ptr = clones.begin(),
+		endPtr = clones.end() ; ptr != endPtr ; ++ptr )
+		{
+		if( MyUplink->DetachClient( *ptr, quitMsg ) )
 			{
-			stringstream s ;
-			s	<< (*ptr)->getCharYYXXX()
-				<< " Q :"
-				<< quitMsg
-				<< ends ;
-
-			MyUplink->Write( s ) ;
+			delete *ptr ;
 			}
 		}
+	clones.clear() ;
+
 	} // KILLALL/QUITALL
 else if( command == "SAYALL" || command == "MSGALL" )
 	{
@@ -464,8 +451,7 @@ else if( command == "SAYALL" || command == "MSGALL" )
 			<< " P "
 			<< chanOrNickName
 			<< " :"
-			<< privMsg
-			<< ends ;
+			<< privMsg ;
 
 		MyUplink->Write( s ) ;
 		}
@@ -504,8 +490,7 @@ else if( command == "ACTALL" || command == "DOALL" ||
 			<< chanOrNickName
 			<< " :\001ACTION "
 			<< action
-			<< "\001"
-			<< ends ;
+			<< "\001" ;
 
 		MyUplink->Write( s ) ;
 		}
@@ -542,8 +527,7 @@ else if( command == "NOTICEALL" )
 			<< " O "
 			<< chanOrNickName
 			<< " :"
-			<< notice
-			<< ends ;
+			<< notice ;
 
 		MyUplink->Write( s ) ;
 		}
@@ -587,16 +571,9 @@ if( makeCloneCount > 0 )
 
 void cloner::addClone()
 {
-//char buf[ 4 ] = { 0 } ;
-
 // The XXX doesn't matter here, the core will choose an
 // appropriate value.
 string yyxxx( fakeServer->getCharYY() + "]]]" ) ;
-
-//inttobase64( buf, Network->countClients( fakeServer ) + 1, 3 ) ;
-//buf[ 3 ] = 0 ;
-
-//yyxxx += buf ;
 
 iClient* newClient = new iClient(
 		fakeServer->getIntYY(),
@@ -607,7 +584,7 @@ iClient* newClient = new iClient(
 		randomHost(),
 		randomHost(),
 		cloneMode,
-		"",
+		string(),
 		cloneDescription,
 		::time( 0 ) ) ;
 assert( newClient != 0 );

@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server.cc,v 1.178 2003/08/19 21:48:39 dan_karrels Exp $
+ * $Id: server.cc,v 1.179 2003/08/21 20:42:38 dan_karrels Exp $
  */
 
 #include	<sys/time.h>
@@ -71,7 +71,7 @@
 #include	"ConnectionHandler.h"
 #include	"Connection.h"
 
-RCSTAG( "$Id: server.cc,v 1.178 2003/08/19 21:48:39 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: server.cc,v 1.179 2003/08/21 20:42:38 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -123,7 +123,6 @@ elog	<< "Uplink Name: " << UplinkName << endl ;
 elog	<< "Uplink Port: " << Port << endl ;
 elog	<< "Server Name: " << ServerName << endl ;
 elog	<< "Server Description: " << ServerDescription << endl ;
-elog	<< endl ;
 
 //elog	<< "xServer::charYY> " << getCharYY() << endl ;
 //elog	<< "xServer::charXXX> " << getCharXXX() << endl ;
@@ -329,9 +328,10 @@ while( std::getline( commandMapFile, line ) )
 
 	} // while()
 
-elog	<< "xServer> Loaded "
+elog	<< "Loaded "
 	<< commandMap.size()
 	<< " command handlers"
+	<< endl
 	<< endl ;
 
 commandMapFile.close() ;
@@ -943,7 +943,7 @@ if( !Network->addFakeServer( fakeServer ) )
 	}
 
 // Set the intXXX/charXXX to the max possible
-fakeServer->setIntXXX( 64 * 64 * 64 ) ;
+fakeServer->setIntXXX( 64 * 64 * 64 - 1 ) ;
 
 BurstServer( fakeServer ) ;
 
@@ -1294,7 +1294,7 @@ iClient* theIClient = new (std::nothrow) iClient(
 	Client->getHostName(),
 	Client->getHostName(),
 	Client->getModes(),
-	"",
+	string(),
 	Client->getDescription(),
 	::time( 0 ) ) ;
 assert( theIClient != 0 ) ;
@@ -1330,6 +1330,10 @@ if( doBurst )
 	Client->BurstChannels() ;
 	Client->BurstGlines() ;
 	}
+
+elog	<< "Successfully loaded client module: "
+	<< theIClient->getNickName()
+	<< endl ;
 
 // Success
 return true ;
@@ -3999,10 +4003,17 @@ if( 0 == Network->removeClient( fakeClient ) )
 	return false ;
 	}
 
-Write( "%s Q :%s",
-	fakeClient->getCharYYXXX().c_str(),
-	quitMessage.c_str() ) ;
-
+if( !quitMessage.empty() )
+	{
+	Write( "%s Q :%s",
+		fakeClient->getCharYYXXX().c_str(),
+		quitMessage.c_str() ) ;
+	}
+else
+	{
+	Write( "%s Q :Exiting",
+		fakeClient->getCharYYXXX().c_str() ) ;
+	}
 return true ;
 }
 

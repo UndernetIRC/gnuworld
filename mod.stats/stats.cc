@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: stats.cc,v 1.24 2003/08/20 00:22:28 dan_karrels Exp $
+ * $Id: stats.cc,v 1.25 2003/08/21 20:42:38 dan_karrels Exp $
  */
 
 #include	<string>
@@ -39,7 +39,7 @@
 #include	"config.h"
 #include	"misc.h"
 
-RCSTAG( "$Id: stats.cc,v 1.24 2003/08/20 00:22:28 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: stats.cc,v 1.25 2003/08/21 20:42:38 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -523,8 +523,8 @@ Notice( theClient, "Total Network Users: %d, Total Network Channels: %d",
 	Network->clientList_size(),
 	Network->channelList_size() ) ;
 
-typedef map< size_t, size_t > channelUserInfoMap ;
-channelUserInfoMap usersPerChannelMap ;
+typedef map< size_t, size_t > channelUserInfoMapType ;
+channelUserInfoMapType usersPerChannelMap ;
 
 ofstream usersPerChannelFile( channelInfoFileName.c_str() ) ;
 if( !usersPerChannelFile )
@@ -548,12 +548,20 @@ for( xNetwork::const_channelIterator chanItr = Network->channels_begin() ;
 		{
 		largestChan = chanItr->second ;
 		}
-	if( usersPerChannelFile )
-		{
-		usersPerChannelFile	<< chanItr->second->size()
-					<< endl ;
-		}
 	}
+
+usersPerChannelFile	<< "Channel size\tNumber of channels of that size"
+			<< endl ;
+for( channelUserInfoMapType::const_iterator itr =
+	usersPerChannelMap.begin() ; itr != usersPerChannelMap.end() ;
+	++itr )
+	{
+	usersPerChannelFile	<< itr->first
+				<< "\t"
+				<< itr->second
+				<< endl ;
+	} // for( itr )
+
 if( usersPerChannelFile )
 	{
 	usersPerChannelFile.close() ;
@@ -566,15 +574,7 @@ if( largestChan != 0 )
 		largestChan->size() ) ;
 	}
 
-#ifdef EDEBUG
-	Notice( theClient, "Length of last burst: %d seconds, "
-		"Number of bytes processed since beginning of last "
-		"burst: %d",
-		MyUplink->getLastBurstDuration(),
-		MyUplink->getBurstBytes() ) ;
-#endif
-
-channelUserInfoMap channelsPerUserMap ;
+channelUserInfoMapType channelsPerUserMap ;
 size_t maxChannels = 0 ;
 
 ofstream channelsPerUserFile( userInfoFileName.c_str() ) ;
@@ -596,14 +596,22 @@ for( xNetwork::const_clientIterator cItr = Network->clients_begin() ;
 			{
 			maxChannels = cItr->second->channels_size() ;
 			}
-
-		if( channelsPerUserFile )
-			{
-			channelsPerUserFile	<< cItr->second->channels_size()
-						<< endl ;
-			}
 		}
 	} // for( cItr )
+
+channelsPerUserFile	<< "Number of channels\t"
+			<< "Number of users with that many channels"
+			<< endl ;
+
+for( channelUserInfoMapType::const_iterator itr =
+	channelsPerUserMap.begin() ; itr != channelsPerUserMap.end() ;
+	++itr )
+	{
+	channelsPerUserFile	<< itr->first
+				<< "\t"
+				<< itr->second
+				<< endl ;
+	} // for( itr )
 
 if( channelsPerUserFile )
 	{
@@ -612,6 +620,14 @@ if( channelsPerUserFile )
 
 Notice( theClient, "Maximum channels joined by a user: %u",
 	maxChannels ) ;
+
+#ifdef EDEBUG
+	Notice( theClient, "Length of last burst: %d seconds, "
+		"Number of bytes processed since beginning of last "
+		"burst: %d",
+		MyUplink->getLastBurstDuration(),
+		MyUplink->getBurstBytes() ) ;
+#endif
 
 	{
 	stringstream ss ;

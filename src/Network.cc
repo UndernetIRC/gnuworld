@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: Network.cc,v 1.60 2003/08/09 23:15:36 dan_karrels Exp $
+ * $Id: Network.cc,v 1.61 2003/08/21 20:42:38 dan_karrels Exp $
  */
 
 #include	<new>
@@ -44,7 +44,7 @@
 #include	"ip.h"
 #include	"config.h"
 
-RCSTAG( "$Id: Network.cc,v 1.60 2003/08/09 23:15:36 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: Network.cc,v 1.61 2003/08/21 20:42:38 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -131,9 +131,9 @@ if( !localClients.insert(
 	return false ;
 	}
 
-elog	<< "xNetwork::addClient(xClient)> Added client: "
-	<< *newClient
-	<< endl ;
+//elog	<< "xNetwork::addClient(xClient)> Added client: "
+//	<< *newClient
+//	<< endl ;
 
 return true ;
 }
@@ -374,7 +374,7 @@ iClient* xNetwork::removeClient( iClient* theClient )
 {
 assert( theClient != 0 ) ;
 
-return removeClient( theClient->getIntYY(), theClient->getIntXXX() ) ;
+return removeClient( theClient->getIntYYXXX() ) ;
 }
 
 xClient* xNetwork::removeLocalClient( xClient* theClient )
@@ -1090,7 +1090,7 @@ if( reservedNumericMap.find( fakeClient->getIntYY() ) ==
 	}
 
 // Make sure the nickname does not collide
-if( findFakeNick( fakeClient->getNickName() ) != 0 )
+if( findNick( fakeClient->getNickName() ) != 0 )
 	{
 	elog	<< "xNetwork::addFakeClient> Found matching nickname: "
 		<< fakeClient->getNickName()
@@ -1175,6 +1175,10 @@ iClient* xNetwork::removeFakeClient( iClient* fakeClient )
 {
 assert( fakeClient != 0 ) ;
 
+//elog	<< "xNetwork::removeFakeClient> Removing client: "
+//	<< *fakeClient
+//	<< endl ;
+
 fakeClientIterator cItr = fakeClientMap.find( 
 	fakeClient->getIntYYXXX() ) ;
 if( cItr == fakeClient_end() )
@@ -1230,9 +1234,9 @@ if( findServerName( fakeServer->getName() ) != 0 )
 	return false ;
 	}
 
-elog	<< "xNetwork::addFakeServer> No matching name found for: "
-	<< *fakeServer
-	<< endl ;
+//elog	<< "xNetwork::addFakeServer> No matching name found for: "
+//	<< *fakeServer
+//	<< endl ;
 
 // Allocate a new numeric
 unsigned int intYY = 0 ;
@@ -1277,10 +1281,10 @@ if( !serverMap.insert( make_pair( fakeServer->getIntYY(),
 	return false ;
 	}
 
-elog	<< "xNetwork::addFakeServer> Successfully added fake "
-	<< "server: "
-	<< *fakeServer
-	<< endl ;
+//elog	<< "xNetwork::addFakeServer> Successfully added fake "
+//	<< "server: "
+//	<< *fakeServer
+//	<< endl ;
 
 return true ;
 }
