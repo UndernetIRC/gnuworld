@@ -1,4 +1,4 @@
-# $Id: Makefile.in,v 1.3 2000/07/10 22:41:29 dan_karrels Exp $
+# $Id: Makefile.in,v 1.4 2000/07/10 22:54:56 dan_karrels Exp $
 # Default paths (system-wide installs)
 
 # Standard defines
@@ -82,7 +82,6 @@ clean:
 	$(RM) -f *.o libgnuworld.a
 
 distclean: clean
-	$(RM) Makefile
 
 depend: $(SRCS)
 	$(CXX) -MM $(CXXFLAGS) $(SRCS) >> Makefile

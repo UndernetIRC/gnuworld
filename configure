@@ -3099,10 +3099,6 @@ fi
 output_file="Makefile src/Makefile lib/Makefile"
 
 
-echo
-echo Checking for modules...
-echo
-
 
 
 
