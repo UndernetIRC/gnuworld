@@ -41,4 +41,10 @@ then you should
 NOTE: in the default GNUworld.conf use rather 'ccontrol.conf' as a default for CControl
 than the 'gnuworld3.conf' file (it's not complete).
 
+All Done
+--------
+That's it for the sql stuff.  Be sure to edit the configuration file for
+cmaster (../bin/ccontrol.conf), giving username, nickname, etc, and
+database information.
 
+The GNUworld development team.

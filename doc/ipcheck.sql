@@ -9,7 +9,7 @@
 --
 --
 -- you must import this file using : /path/to/pgsql/bin/psql ipcheck < ipcheck.sql
--- after you created the "ipcheck" database.
+-- after you created the "ipcheck" database. This database must be local to the website.
 --
 --
 -- nighty <nighty@undernet.org> - 09/13/2001

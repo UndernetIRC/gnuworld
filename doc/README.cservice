@@ -26,6 +26,9 @@ Make sure you are in the gnuworld/doc directory.
 
 Create a local (for the www) Database called 'cmaster' for webcookies
 (without this local db the website will NOT work)
+Tho you can also choose to name the 'cservice' db 'cmaster' for a
+strictly and whole local use of DB + webserver, and issue the
+following to the same db and then  forgot the other 'createdb' thing.
 ---------------------------------------------------------------------
 
 > createdb cmaster
@@ -45,13 +48,16 @@ Add administrator account
 This command will add an account called 'Admin' with level 1000 access on
 channel '*'...use this power wisely, The Dark Side is very powerful.
 
-> psql cservice <cservice.addme.sql
+This will also register channel #coder-com to 'Admin' to make the VERIFY
+command work on authenticated users.
+
+> psql cservice < cservice.addme.sql
 
 Using this account you will be able to login as Admin online with your
 cservice bot.
 
 Username: Admin
-Password: temPass (be sure to change this)
+Password: temPass (be sure to change this after login online)
 
 All Done
 --------
