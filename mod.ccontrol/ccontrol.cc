@@ -11,7 +11,7 @@
 /* ccontrol.cc
  * Authors: Daniel Karrels dan@karrels.com
  *	    Tomer Cohen    MrBean@toughguy.net
- * $Id: ccontrol.cc,v 1.167 2003/03/06 15:41:47 mrbean_ Exp $
+ * $Id: ccontrol.cc,v 1.168 2003/03/07 13:01:29 mrbean_ Exp $
  */
 
 #define MAJORVER "1"
@@ -56,7 +56,7 @@
 #include	"ip.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.167 2003/03/06 15:41:47 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.168 2003/03/07 13:01:29 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -874,13 +874,14 @@ expiredTimer = theServer->RegisterTimer(::time(0) + ExpiredInterval,this,NULL);
 dbConnectionCheck = theServer->RegisterTimer(::time(0) + dbConnectionTimer,this,NULL);
 glineQueueCheck = theServer->RegisterTimer(::time(0) + glineBurstInterval, this,NULL);
 
+#ifndef LOGTOHD
 if(SendReport)
 	{
 	struct tm Now = convertToTmTime(::time(0));
 	time_t theTime = ::time(0) + ((24 - Now.tm_hour)*3600 - (Now.tm_min)*60) ; //Set the daily timer to 24:00
 	postDailyLog = theServer->RegisterTimer(theTime, this, NULL); 
 	}
-
+#endif
 theServer->RegisterEvent( EVT_KILL, this );
 theServer->RegisterEvent( EVT_QUIT, this );
 theServer->RegisterEvent( EVT_NETJOIN, this );
@@ -1271,15 +1272,44 @@ switch( theEvent )
 					}
 				}
 			}
+		inBurst = false;
+		ccServer* curServer;
+		const iServer* curNetServer; 
+		for(serversConstIterator ptr = serversMap_begin();
+		        ptr != serversMap_end() && !inBurst; ++ptr)
+			{
+			curServer = ptr->second;
+			curNetServer = curServer->getNetServer();
+			if((curNetServer) && (curNetServer->isBursting()))
+				{
+				    inBurst = true;
+				}
+		
+		    	}
+
 		break;
 		}
 	case EVT_BURST_CMPLT:
 		{
 		inBurst = false;
-		refreshGlines();
-//		burstGlines();
+		ccServer* curServer;
+		const iServer* curNetServer; 
+		for(serversConstIterator ptr = serversMap_begin();
+		        ptr != serversMap_end() && !inBurst; ++ptr)
+			{
+			curServer = ptr->second;
+			curNetServer = curServer->getNetServer();
+			if((curNetServer) && (curNetServer->isBursting()))
+				{
+				    inBurst = true;
+				}
+		
+		    	}
 		checkMaxUsers();
-		refreshVersions();
+		if(!inBurst)
+			{
+			refreshVersions();
+			}
 		break;
 		}	
 	case EVT_GLINE:
@@ -1632,7 +1662,7 @@ if(dbConnected)
 				tmpGline->Insert();
 				tmpGline->loadData(tmpGline->getHost());
 				addGline(tmpGline);
-				if(!inBurst)
+				if(!getUplink()->isBursting())
 					addGlineToUplink(tmpGline);
 				}	
 			else
@@ -3229,7 +3259,7 @@ bool ccontrol::processGlineQueue()
 {
 
 
-if (inBurst || glineQueue.empty())
+if (getUplink()->isBursting() || glineQueue.empty())
         {
         return true;
         }
@@ -4406,6 +4436,7 @@ Notice(tmpClient,"Total of %d users in the map",usersMap.size());
 Notice(tmpClient,"GBCount : %d , GBInterval : %d",glineBurstCount,glineBurstInterval);
 Notice(tmpClient,"Max Clones : %d , Max Virtual Clones : %d",maxClones,maxVClones);
 Notice(tmpClient,"Save gline is : %s",saveGlines ? "True" : "False"); 
+Notice(tmpClient,"Bursting : %s",inBurst ? "True" : "False");
 }
 
 bool ccontrol::updateMisc(const string& varName, const unsigned int Value)

@@ -7,6 +7,7 @@
 #include <fstream>
 #include "ELog.h"
 #include <string>
+#include <stdio.h>
 #include "StringTokenizer.h"
 
 using namespace std;
@@ -25,7 +26,11 @@ if(out.bad())
 	return false;
 	}
 
-string Line;
+char time[20];
+time[0] = '\0';
+sprintf(time,"%li",::time(0));
+string Line = time;
+Line  += " ";
 string::size_type pos;
 for(pos = 0; pos < User.size();++pos)
 	{
