@@ -20,7 +20,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
  * USA.
  *
- * $Id: cloner.cc,v 1.27 2003/07/21 23:36:34 dan_karrels Exp $
+ * $Id: cloner.cc,v 1.28 2003/07/24 17:14:57 dan_karrels Exp $
  */
 
 #include	<new>
@@ -43,7 +43,7 @@
 #include	"misc.h"
 #include	"ELog.h"
 
-RCSTAG("$Id: cloner.cc,v 1.27 2003/07/21 23:36:34 dan_karrels Exp $");
+RCSTAG("$Id: cloner.cc,v 1.28 2003/07/24 17:14:57 dan_karrels Exp $");
 
 namespace gnuworld
 {
@@ -90,6 +90,7 @@ EConfig::const_iterator ptr = conf.Find( "permit_user" ) ;
 while( ptr != conf.end() && ptr->first == "permit_user" )
 	{
 	allowAccess.push_back( ptr->second ) ;
+	++ptr ;
 	}
 
 cloneBurstCount = atoi( conf.Require( "cloneburstcount" )->second.c_str() ) ;
