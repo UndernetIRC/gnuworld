@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_T.cc,v 1.6 2002/07/05 01:10:06 dan_karrels Exp $
+ * $Id: msg_T.cc,v 1.7 2002/07/23 22:33:19 dan_karrels Exp $
  */
 
 #include	<iostream>
@@ -30,7 +30,7 @@
 #include	"Channel.h"
 #include	"ServerCommandHandler.h"
 
-const char msg_T_cc_rcsId[] = "$Id: msg_T.cc,v 1.6 2002/07/05 01:10:06 dan_karrels Exp $" ;
+const char msg_T_cc_rcsId[] = "$Id: msg_T.cc,v 1.7 2002/07/23 22:33:19 dan_karrels Exp $" ;
 const char xParameters_h_rcsId[] = __XPARAMETERS_H ;
 const char server_h_rcsId[] = __SERVER_H ;
 const char ELog_h_rcsId[] = __ELOG_H ;
@@ -51,7 +51,7 @@ CREATE_HANDLER(msg_T)
 // Admin Channel ]=-
 bool msg_T::Execute( const xParameters& Param )
 {
-if( Param.size() < 4 )
+if( Param.size() < 3 )
 	{
 	elog	<< "msg_T> Invalid number of arguments"
 		<< endl ;
@@ -61,12 +61,12 @@ if( Param.size() < 4 )
 #ifdef TOPIC_TRACK
 
 Channel* Chan = Network->findChannel( Param[ 1 ] ) ;
-if(!Chan)
+if( 0 == Chan )
 	{
 	elog	<< "msg_T> Unable to locate channel: "
 		<< Param[ 1 ]
 		<< endl;
-	return 0;
+	return false ;
 	}
 
 Chan->setTopic( Param[ 2 ] ) ;
