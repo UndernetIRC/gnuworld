@@ -8,7 +8,7 @@
  * Can optionally narrow down selection using a number of switches.
  * Can display all channels a user has access on (TODO). 
  *
- * $Id: ACCESSCommand.cc,v 1.16 2001/01/28 23:16:33 gte Exp $
+ * $Id: ACCESSCommand.cc,v 1.17 2001/01/28 23:58:51 gte Exp $
  */
 
 #include	<string>
@@ -18,16 +18,16 @@
 #include	"cservice.h"
 #include	"libpq++.h"
 #include	"match.h"
+#define MAX_RESULTS 2
 
-
-const char ACCESSCommand_cc_rcsId[] = "$Id: ACCESSCommand.cc,v 1.16 2001/01/28 23:16:33 gte Exp $" ;
+const char ACCESSCommand_cc_rcsId[] = "$Id: ACCESSCommand.cc,v 1.17 2001/01/28 23:58:51 gte Exp $" ;
 
 namespace gnuworld
 {
 
 static const char* queryHeader =    "SELECT channels.name,users.user_name,levels.access,levels.flags,users_lastseen.last_seen,levels.suspend_expires,levels.last_modif,levels.last_modif_by FROM levels,channels,users,users_lastseen ";
 static const char* queryCondition = "WHERE levels.channel_id=channels.id AND levels.user_id=users.id AND users.id=users_lastseen.user_id ";
-static const char* queryFooter =    "ORDER BY levels.access DESC LIMIT 15;";
+static const char* queryFooter =    "ORDER BY levels.access DESC;";
  
 bool ACCESSCommand::Exec( iClient* theClient, const string& Message )
 {
@@ -50,8 +50,6 @@ if (!theChan)
 		bot->Notice(theClient, "Sorry, the channel %s isn't registered with me.", st[1].c_str());
 		return false;
 	} 
-
-unsigned int specificId = 0;
  
 /*
  *  Figure out the switches and append to the SQL statement accordingly.
@@ -148,13 +146,16 @@ if( PGRES_TUPLES_OK == status )
 	int suspend_expires = 0;
 	int suspend_expires_d = 0;
 	int suspend_expires_f = 0;
+	int results = 0;
 
 	for (int i = 0 ; i < bot->SQLDb->Tuples(); i++)
 		{
+
 		autoMode = "None";
 		/* Does the username match the query? */ 
 		if (match(st[2], bot->SQLDb->GetValue(i, 1)) == 0)
 		{
+			results++;			
 			flag = atoi(bot->SQLDb->GetValue(i, 3));
 			duration = atoi(bot->SQLDb->GetValue(i, 4));
 			suspend_expires = atoi(bot->SQLDb->GetValue(i, 5));
@@ -186,14 +187,17 @@ if( PGRES_TUPLES_OK == status )
 			bot->Notice(theClient, "LAST SEEN: %s ago.", 
 				bot->prettyDuration(duration).c_str()); 
 		}
-	} // for()
-	
+		if (results >= MAX_RESULTS) break;
 
-	bot->Notice(theClient, "End of access list");
-	if (bot->SQLDb->Tuples() == 15)
+	} // for()
+	 
+	if (results >= MAX_RESULTS)
 		{
-		bot->Notice(theClient, "There are more than 15 matching entries.");
-		bot->Notice(theClient, "Please restrict your query."); 
+			bot->Notice(theClient, "There are more than 15 matching entries.");
+			bot->Notice(theClient, "Please restrict your query."); 
+		} else
+		{
+			bot->Notice(theClient, "End of access list");
 		}
 	} 
 
