@@ -1,10 +1,10 @@
-dnl $Id: configure.in,v 1.17 2000/12/23 00:56:49 dan_karrels Exp $
+dnl $Id: configure.in,v 1.18 2001/02/03 19:25:08 dan_karrels Exp $
 dnl ----------------------------------------------------------
 
 echo Configuring GNUWorld...
 echo
 
-AC_REVISION($Revision: 1.17 $)
+AC_REVISION($Revision: 1.18 $)
 AC_INIT(src/main.cc)
 AM_INIT_AUTOMAKE(gnuworld,0.0)
 AM_CONFIG_HEADER(include/defs.h)
@@ -44,51 +44,6 @@ AC_CHECK_PROG(MV,mv,mv)
 AC_CHECK_PROG(CP,cp,cp)
 AC_CHECK_PROG(GREP,grep,grep)
 AC_CHECK_PROG(AR,ar,ar)
-
-AC_MSG_CHECKING(if C++ compiler uses std namespace )
-AC_TRY_COMPILE(
-[
-#include <iostream>
-namespace std{ void kludge(); }
-using namespace std;
-],[
-cout << "test" << endl;
-],[
- ac_std_namespace=yes
- AC_MSG_RESULT([yes])
-],[
- ac_std_namespace=maybe
-])
-if test "x$ac_std_namespace" = xmaybe ; then
-AC_TRY_COMPILE(
-[
-#include <iostream>
-namespace std{ void kludge(); }
-using namespace std;
-],[
-cout << "test" << endl;
-],[
- ac_std_namespace=yes
- AC_MSG_RESULT([yes])
- AC_MSG_WARN([
-===================================================================
-ERROR: This compiler platform does not have the iostream library
-in the std namespace.  This presents a problem for writing portable
-STL software.
-===================================================================
-])
-],[
- ac_std_namespace=no
- config_error=yes
- AC_MSG_RESULT([no]) 
- AC_MSG_WARN([
-===================================================================
-ERROR: This compiler platform does not support iostream
-or namespaces.  
-===================================================================
-])
-])
-fi
 
 AC_MSG_CHECKING(if C++ compiler supports bool)
 AC_TRY_COMPILE(
@@ -135,28 +90,6 @@ AC_TRY_COMPILE(
   AC_MSG_RESULT([$ac_reinterpret_cast])
   AC_WARN(C++ compiler reinterpret_cast<> does not work)
   config_error=yes
-])
-
-AC_MSG_CHECKING(if C++ compiler supports member function templates)
-AC_TRY_COMPILE(
-[  
-class foo
-{
-public:
-  template <class T> void method(T t);
-};
-
-template <class T> void foo::method(T t) {t = 0;}
-],[
-],[
-   ac_member_func_templates=yes
-   AC_DEFINE(SIGC_CXX_MEMBER_FUNC_TEMPLATES)
-   AC_MSG_RESULT([$ac_member_func_templates])
-],[
-  ac_member_func_templates=no
-  AC_MSG_RESULT([$ac_member_func_templates])
-  config_error=yes
-  AC_MSG_WARN([Test for member templates failed.])
 ])
 
 # Member class templates   
@@ -220,56 +153,6 @@ namespace Check
   AC_MSG_RESULT([$ac_cxx_namespaces])
   AC_MSG_WARN([Without namespaces all classes will be global.])
 ]) 
-
-AC_MSG_CHECKING(if C++ compiler supports friend template)
-AC_TRY_COMPILE(
-[ 
-struct A
-  {
-   template <class T>
-     friend T* gen();
-  };
-],[
-],[
-  ac_cxx_friend_templates=yes
-  AC_MSG_RESULT([$ac_cxx_friend_templates])
-  AC_DEFINE(SIGC_CXX_FRIEND_TEMPLATES)
-],[
-  ac_cxx_friend_templates=no
-  AC_MSG_RESULT([$ac_cxx_friend_templates])
-  AC_MSG_WARN([Access to dynamic will not be controlled.])
-])
-
-AC_MSG_CHECKING(if C++ compiler allows specialization of references)
-AC_TRY_COMPILE(
-[
-struct A {};
-struct B {};
-
-template <class T>
-struct P
-  {
-   typedef A* ptr;
-  };
-
-template <class T>
-struct P<T&>
-  {
-   typedef B* ptr;
-  };
-  
-],[
-    A* a;
-    B* b;
-    P<int>::ptr p=a;
-    P<int&>::ptr q=b;
-],[
-  ac_cxx_specialize_references=yes
-  AC_DEFINE(SIGC_CXX_SPECIALIZE_REFERENCES)
-],[
-  ac_cxx_specialize_references=no
-])
-AC_MSG_RESULT([$ac_cxx_specialize_references])
 
 AC_MSG_CHECKING(if C++ environment provides all required features)
 if test "x$config_error" = xyes ; then
