@@ -1,7 +1,7 @@
 #!/bin/bash
 # You can change the above to the good path to your "bash" binary if needed
 #
-# $Id: WipeUser.sh,v 1.1 2002/06/28 06:50:09 nighty Exp $
+# $Id: WipeUser.sh,v 1.2 2002/07/19 18:23:02 nighty Exp $
 #
 
 # some default script values
@@ -92,7 +92,7 @@ echo "*                                                                     *"
 echo "* Warning: This program stops on any input error.                     *"
 echo "*                                                                     *"
 echo "***********************************************************************"
-echo "\$Id: WipeUser.sh,v 1.1 2002/06/28 06:50:09 nighty Exp $"
+echo "\$Id: WipeUser.sh,v 1.2 2002/07/19 18:23:02 nighty Exp $"
 echo "***********************************************************************"
 echo "* Released under the GNU Public License                               *"
 echo "***********************************************************************"
@@ -156,6 +156,7 @@ QC009="SELECT COUNT(user_id) FROM pending_pwreset WHERE user_id=$USRID"
 QC010="SELECT COUNT(user_id) FROM acl WHERE user_id=$USRID"
 QC011="SELECT COUNT(manager_id) FROM pending_mgrchange WHERE manager_id=$USRID"
 QC012="SELECT COUNT(new_manager_id) FROM pending_mgrchange WHERE new_manager_id=$USRID"
+QC013="SELECT COUNT(user_id) FROM mailq WHERE user_id=$USRID"
 
 echo "--> Counting records..."
 
@@ -171,6 +172,7 @@ CNT09=`echo -n "$QC009" | $PSQLCMD -h $DBHOST $DBNAME | head -n 3 | tail -n 1 | 
 CNT10=`echo -n "$QC010" | $PSQLCMD -h $DBHOST $DBNAME | head -n 3 | tail -n 1 | awk '{ print $1 }' | sed -e 's/(//'`
 CNT11=`echo -n "$QC011" | $PSQLCMD -h $DBHOST $DBNAME | head -n 3 | tail -n 1 | awk '{ print $1 }' | sed -e 's/(//'`
 CNT12=`echo -n "$QC012" | $PSQLCMD -h $DBHOST $DBNAME | head -n 3 | tail -n 1 | awk '{ print $1 }' | sed -e 's/(//'`
+CNT13=`echo -n "$QC013" | $PSQLCMD -h $DBHOST $DBNAME | head -n 3 | tail -n 1 | awk '{ print $1 }' | sed -e 's/(//'`
 
 echo "--> The following entries would be removed if confirmed :"
 echo "-->"
@@ -185,6 +187,7 @@ echo "--> 	$CNT09	pending verif q/a reset entries"
 echo "--> 	$CNT10	ACL entry"
 echo "--> 	$CNT11	pending manager changes (user is old manager, channel will be PURGED)"
 echo "--> 	$CNT12	pending manager changes (user is temp manager, channel will be PURGED)"
+echo "-->	$CNT13  mailq entries"
 echo "-->	1	user entry"
 echo "-->"
 echo -n "<-- Are you sure you want to totally and definetively remove those entries from your databse [y/N] ? [N] "
@@ -221,7 +224,8 @@ QR009="DELETE FROM pending_pwreset WHERE user_id=$USRID"
 QR010="DELETE FROM acl WHERE user_id=$USRID"
 QR011="SELECT channel_id FROM pending_mgrchange WHERE manager_id=$USRID" # second set of channels to purge
 QR012="DELETE FROM pending_mgrchange WHERE new_manager_id=$USRID"
-QR013="DELETE FROM users WHERE id=$USRID"
+QR013="DELETE FROM mailq WHERE user_id=$USRID"
+QR014="DELETE FROM users WHERE id=$USRID"
 
 REM01=`echo -n "$QR001" | $PSQLCMD -h $DBHOST $DBNAME`
 echo "--> DB: $REM01"
@@ -249,6 +253,8 @@ REM12=`echo -n "$QR012" | $PSQLCMD -h $DBHOST $DBNAME`
 echo "--> DB: $REM12"
 REM13=`echo -n "$QR013" | $PSQLCMD -h $DBHOST $DBNAME`
 echo "--> DB: $REM13"
+REM14=`echo -n "$QR014" | $PSQLCMD -h $DBHOST $DBNAME`
+echo "--> DB: $REM14"
 
 echo "--> Username '$FORCEUSERNAME' has been totally removed."
 
