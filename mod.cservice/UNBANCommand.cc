@@ -8,7 +8,7 @@
  *
  * Caveats: None.
  *
- * $Id: UNBANCommand.cc,v 1.5 2001/01/29 20:48:10 gte Exp $
+ * $Id: UNBANCommand.cc,v 1.6 2001/02/02 20:17:07 gte Exp $
  */
 
 #include	<string>
@@ -21,7 +21,7 @@
 #include	"responses.h"
 #include	"match.h"
 
-const char UNBANCommand_cc_rcsId[] = "$Id: UNBANCommand.cc,v 1.5 2001/01/29 20:48:10 gte Exp $" ;
+const char UNBANCommand_cc_rcsId[] = "$Id: UNBANCommand.cc,v 1.6 2001/02/02 20:17:07 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -113,6 +113,7 @@ bool UNBANCommand::Exec( iClient* theClient, const string& Message )
 				{
 					bot->Notice(theClient, "You have insufficient access to remove the ban %s from %s",
 						theBan->getBanMask().c_str(), theChan->getName().c_str());
+					++ptr;
 				}
 				else 
 				{ 
