@@ -3,7 +3,7 @@
  */
 
 #ifndef __CCONTROL_H
-#define __CCONTROL_H "$Id: ccontrol.h,v 1.20 2001/05/01 22:26:49 mrbean_ Exp $"
+#define __CCONTROL_H "$Id: ccontrol.h,v 1.21 2001/05/02 21:10:18 mrbean_ Exp $"
 
 #include	<string>
 #include	<vector>
@@ -284,8 +284,13 @@ public:
 
 	ccGline* findMatchingGline( const string& );
 
-	bool MsgChanLog( const char * );
+	bool MsgChanLog( const char * , ... );
 
+	bool DailyLog( AuthInfo * , const char *, ... );
+
+	char *convertToAscTime(time_t);	
+
+	struct tm convertToTmTime(time_t NOW);
 //	bool AuthOper( ccUser* );
 	
     	/**
@@ -387,6 +392,7 @@ public:
 	 */
 	cmDatabase* SQLDb;
 
+
 protected:
 
 	/**
@@ -420,7 +426,7 @@ protected:
 	 * The command handler table.
 	 */
 	commandMapType		commandMap ;
-
+	
 } ; 
  
 } // namespace gnuworld

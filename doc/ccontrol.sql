@@ -1,4 +1,4 @@
--- "$Id: ccontrol.sql,v 1.5 2001/04/30 23:44:42 mrbean_ Exp $"
+-- "$Id: ccontrol.sql,v 1.6 2001/05/02 21:10:18 mrbean_ Exp $"
 -- 2001-13-02  : |MrBean|
 -- Added level patch for ccontrol module
 
@@ -53,5 +53,11 @@ CREATE TABLE servers (
 	SplitedOn INT4 NOT NULL DEFAULT '0',
 	LastNumeric VARCHAR(4)
 	);
-	
+
+CREATE TABLE comlog (
+	ts INT4 NOT NULL,
+	oper text,
+	command VARCHAR(512)
+	);
+		
 	

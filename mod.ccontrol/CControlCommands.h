@@ -107,7 +107,7 @@ DECLARE_COMMAND( ADDNEWSERVER )
 DECLARE_COMMAND( LEARNNETWORK )
 DECLARE_COMMAND( REMOVESERVER )
 DECLARE_COMMAND( CHECKNETWORK )
-
+DECLARE_COMMAND( LASTCOM )
 
 /*
  Patch for uworld commands level 
@@ -122,10 +122,11 @@ DECLARE_COMMAND( CHECKNETWORK )
 
 */
 
-const int flg_ACCESS   = 0x00; 
-const int flg_HELP     = 0x00;
-const int flg_LOGIN    = 0x00;
-const int flg_NEWPASS  = 0x00;
+const int flg_NOLOG = 0x80000000; //causes the bot not to log this command
+const int flg_ACCESS   = 0x00 | flg_NOLOG; 
+const int flg_HELP     = 0x00| flg_NOLOG;
+const int flg_LOGIN    = 0x00| flg_NOLOG;
+const int flg_NEWPASS  = 0x00| flg_NOLOG;
 const int flg_MODE     = 0x01;
 const int flg_INVITE   = 0x02;
 const int flg_JUPE     = 0x04;
@@ -156,6 +157,8 @@ const int flg_ADDSERVER = 0x2000;
 const int flg_LEARNNET = 0x2000;
 const int flg_REMSERVER = 0x2000;
 const int flg_CHECKNET = 0x2000;
+const int flg_LASTCOM = 0x2000 | flg_NOLOG;
+
 /*
  Default commands that are added upon adding a new oper
 */

@@ -13,7 +13,7 @@
 #include	"StringTokenizer.h"
 #include	"Network.h"
 
-const char REMOVESERVERCommand_cc_rcsId[] = "$Id: REMOVESERVERCommand.cc,v 1.2 2001/05/01 22:26:49 mrbean_ Exp $";
+const char REMOVESERVERCommand_cc_rcsId[] = "$Id: REMOVESERVERCommand.cc,v 1.3 2001/05/02 21:10:18 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -40,12 +40,8 @@ if(!NewServer->loadData(st [ 1 ])) //Check if the server is already in the datab
 	delete NewServer;
 	return false;
 	}
-string wallopMe = "Removing server ";
-wallopMe+= st[1].c_str();
-wallopMe+=" at the request of  : " ;
-wallopMe+= theClient->getCharYYXXX();
-wallopMe+='\n';
-bot->MsgChanLog(wallopMe.c_str());
+bot->MsgChanLog("Removing server : %s from the database, at the request of %s\n",
+		st[1].c_str(),theClient->getNickName().c_str());
 
 NewServer->set_Name(st[1]);
 if(NewServer->Delete())

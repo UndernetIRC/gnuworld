@@ -15,7 +15,7 @@
 #include	"Network.h"
 #include        "stdlib.h"
 
-const char LEARNNETWORKCommand_cc_rcsId[] = "$Id: LEARNNETWORKCommand.cc,v 1.3 2001/05/01 22:26:49 mrbean_ Exp $";
+const char LEARNNETWORKCommand_cc_rcsId[] = "$Id: LEARNNETWORKCommand.cc,v 1.4 2001/05/02 21:10:18 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -29,10 +29,7 @@ ccServer* NewServer = new ccServer(bot->SQLDb);
 assert(NewServer != NULL);
 unsigned int AddedServers = 0;
 
-string wallopMe = "Learning network status at the request of  : " ;
-wallopMe+= theClient->getCharYYXXX();
-wallopMe+= '\n';
-bot->MsgChanLog(wallopMe.c_str());
+bot->MsgChanLog("Learning network status at the request of : %s\n",theClient->getCharYYXXX().c_str());
 
 xNetwork::serverIterator ptr = Network->server_begin();
 xNetwork::serverIterator end = Network->server_end();
@@ -60,18 +57,13 @@ for( ; ptr != end ; ptr++ )
 				}	
 				else
 				{
-				wallopMe = "Error while learning server : " ;
-				wallopMe+=  NewServer->get_Name().c_str(); 
-				wallopMe+= '\n';
-				bot->MsgChanLog(wallopMe.c_str());
+				bot->MsgChanLog("Error while learning server : %s\n",NewServer->get_Name().c_str());
 				}	
 			}
 		}
 	}
 delete NewServer;
-char tWall[256];
-sprintf(tWall,"Finished learning the network, Learned a total of %d servers\n",AddedServers);
-bot->MsgChanLog(tWall);
+bot->MsgChanLog("Finished learning the network, Learned a total of %d servers\n",AddedServers);
 return true;
 }
 }

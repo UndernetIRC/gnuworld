@@ -14,7 +14,7 @@
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 
-const char JUPECommand_cc_rcsId[] = "$Id: JUPECommand.cc,v 1.6 2001/05/01 22:26:49 mrbean_ Exp $";
+const char JUPECommand_cc_rcsId[] = "$Id: JUPECommand.cc,v 1.7 2001/05/02 21:10:18 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -38,15 +38,11 @@ if( string::npos == st[ 1 ].find_first_of( '.' ) )
 	return false ;
 	}
 
-string writeMe( theClient->getCharYYXXX() ) ;
-writeMe += " is asking me to jupe " ;
-writeMe += st[ 1 ] + " because: " + st.assemble( 2 ) ;
-writeMe+='\n';
-bot->MsgChanLog(writeMe.c_str());
+bot->MsgChanLog("%s is asking me to jupe %s because : %s\n",theClient->getCharYYXXX().c_str(),st[1].c_str(),st.assemble(2).c_str());
 
 // This will squit the server, if it exists or not, or if it is
 // already juped.
-server->SquitServer( st[ 1 ], "Prepare to be juped" ) ;
+//server->SquitServer( st[ 1 ], "Prepare to be juped" ) ;
 
 iServer* jupeServer = new (nothrow) iServer(
 	0, // uplinkIntYY

@@ -23,7 +23,7 @@
 #include	"AuthInfo.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.29 2001/05/01 22:26:49 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.30 2001/05/02 21:10:18 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -57,6 +57,7 @@ EConfig conf( configFileName ) ;
 string sqlHost = conf.Find("sql_host" )->second;
 string sqlDb = conf.Find( "sql_db" )->second;
 string sqlPort = conf.Find( "sql_port" )->second;
+
 
 string Query = "host=" + sqlHost + " dbname=" + sqlDb + " port=" + sqlPort;
 
@@ -190,6 +191,8 @@ RegisterCommand( new REMOVESERVERCommand( this, "REMSERVER", "<Server name>"
 	"Removes a server from the bot database",flg_REMSERVER ) ) ;
 RegisterCommand( new CHECKNETWORKCommand( this, "CHECKNET", ""
 	"Checks if all known servers are in place",flg_CHECKNET ) ) ;
+RegisterCommand( new LASTCOMCommand( this, "LASTCOM", "[number of lines to show]"
+	"Post you the bot logs",flg_LASTCOM ) ) ;
 
 }
 
@@ -323,12 +326,12 @@ int ComAccess = commHandler->second->getFlags();
 
 AuthInfo* theUser = IsAuth(theClient->getCharYYXXX());
 
-if((!theUser) && (ComAccess != 0))
+if((!theUser) && (ComAccess != flg_NOLOG))
 	{
 	Notice( theClient,
 		"You must be logged in to issue that command" ) ;
 	}
-else if( (ComAccess != 0) && !(ComAccess & theUser->Access))
+else if( (ComAccess != flg_NOLOG) && !(ComAccess & theUser->Access))
 	{
 	Notice( theClient, "You dont have access to that command" ) ;
 	}
@@ -349,16 +352,23 @@ else if( (theUser) && (theUser->Flags & isSUSPENDED))
 			tmpUser->setSuspendExpires(0);
 			tmpUser->removeFlag(isSUSPENDED);
 			tmpUser->setSuspendedBy("");
-
 			tmpUser->Update();
     			delete tmpUser;
 			}
+		// Log the command
+		if(!(ComAccess & flg_NOLOG)) //Dont log command which arent suppose to be logged
+			DailyLog(theUser,Message.c_str());
 		// Execute the command handler
 		commHandler->second->Exec( theClient, Message) ;
 		}
 	}		
 else
+	{	
+	// Log the command
+	if(!(ComAccess & flg_NOLOG)) //Dont log command which arent suppose to be logged
+		DailyLog(theUser,Message.c_str());
 	commHandler->second->Exec( theClient, Message) ;
+	}
 // Call the base class OnPrivateMessage() method
 return xClient::OnPrivateMessage( theClient, Message ) ;
 }
@@ -415,13 +425,8 @@ switch( theEvent )
 			}				
 		if(!CheckServer->loadData(NewServer->getName()))
 			{    	
-			string wallopMe = "Unknown server connected : " ;
-			wallopMe+=  NewServer->getName().c_str(); 
-			wallopMe+= " From server : ";
-			wallopMe+= UplinkServer->getName().c_str() ;
-			wallopMe+='\n';
-			MsgChanLog(wallopMe.c_str());
-			Wallops( wallopMe ) ;
+			MsgChanLog("Unknown server connected : %s Uplink : %s\n"
+				    ,NewServer->getName().c_str(),UplinkServer->getName().c_str());
 			}
 		else
 			{
@@ -435,14 +440,9 @@ switch( theEvent )
 		}
 	case EVT_NETBREAK:
 		{
-		iServer* NewServer = static_cast< iServer* >( Data1);
-		iServer* UplinkServer = static_cast< iServer* >( Data2);
-		string wallopMe = "Net break between : " ;
-		wallopMe+=  NewServer->getName().c_str(); 
-		wallopMe+= " From server : ";
-		wallopMe+= UplinkServer->getName().c_str() ;
-		wallopMe+='\n';
-		MsgChanLog(wallopMe.c_str());
+		/*iServer* NewServer = static_cast< iServer* >( Data1);
+		iServer* UplinkServer = static_cast< iServer* >( Data2);*/
+		// still not handled
 		}
 		
 	} // switch()
@@ -1329,13 +1329,78 @@ for( int i = 0 ; i < SQLDb->Tuples() ; i++ )
 return NULL ;
 }
 
-bool ccontrol::MsgChanLog(const char *Msg)
+struct tm ccontrol::convertToTmTime(time_t NOW)
+{
+time_t *tNow;
+tNow = &NOW;
+struct tm* Now;
+Now = gmtime(tNow);
+return *Now;
+}
+
+char *ccontrol::convertToAscTime(time_t NOW)
+{
+time_t *tNow = &NOW;
+struct tm* Now;
+Now = gmtime(tNow);
+char *ATime = asctime(Now);
+ATime[strlen(ATime)-1] = '\0';
+return ATime;
+}
+
+bool ccontrol::MsgChanLog(const char *Msg, ... )
 {
 if(!Network->findChannel(msgChan))
 	return false;
-if(Message(Network->findChannel(msgChan),Msg));
+char buffer[ 1024 ] = { 0 } ;
+va_list list;
+
+va_start( list, Msg ) ;
+vsprintf( buffer, Msg, list ) ;
+va_end( list ) ;
+
+if(Message(Network->findChannel(msgChan),buffer));
 return true;
 }
 
+bool ccontrol::DailyLog(AuthInfo* Oper, const char *Log, ... )
+{
+
+char buffer[ 1024 ] = { 0 } ;
+va_list list;
+
+va_start( list, Log ) ;
+vsprintf( buffer, Log, list ) ;
+va_end( list ) ;
+
+static const char *Main = "INSERT into comlog (ts,oper,command) VALUES (now()::abstime::int4,'";
+
+strstream theQuery;
+theQuery	<< Main
+		<< Oper->Name <<"','"
+		<< buffer << "')"
+		<< ends;
+
+elog	<< "ccontrol::ComLog> "
+	<< theQuery.str()
+	<< endl; 
+
+ExecStatusType status = SQLDb->Exec( theQuery.str() ) ;
+delete[] theQuery.str() ;
+
+if( PGRES_COMMAND_OK == status ) 
+	{
+	return true;
+	}
+else
+	{
+	elog	<< "ccontrol::comLog> SQL Error: "
+		<< SQLDb->ErrorMessage()
+		<< endl ;
+	return false;
+	}
+
+return true;
+}
 
 } // namespace gnuworld
