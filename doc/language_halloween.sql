@@ -1,4 +1,6 @@
+-- $Id: language_halloween.sql,v 1.2 2002/10/31 13:49:25 nighty Exp $
 -- Muhauahuuahha.
+-- by R33D33R
 -- INSERT INTO languages VALUES(15, 'HA', 'Halloween', 31337);
 
 DELETE FROM translations WHERE language_id = 15;
