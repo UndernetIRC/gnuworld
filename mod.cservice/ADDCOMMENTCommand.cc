@@ -8,7 +8,7 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char ADDCOMMENTCommand_cc_rcsId[] = "$Id: ADDCOMMENTCommand.cc,v 1.1 2001/10/07 23:22:17 gte Exp $" ;
+const char ADDCOMMENTCommand_cc_rcsId[] = "$Id: ADDCOMMENTCommand.cc,v 1.2 2001/10/26 21:52:27 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -44,7 +44,7 @@ if (!targetUser)
 	bot->Notice(theClient,
 		bot->getResponse(theUser,
 			language::not_registered).c_str(),
-		st[2].c_str()
+		st[1].c_str()
 	);
 	return false;
 	}
