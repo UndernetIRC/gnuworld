@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_GL.cc,v 1.1 2002/11/20 22:16:18 dan_karrels Exp $
+ * $Id: msg_GL.cc,v 1.2 2003/05/23 17:28:34 dan_karrels Exp $
  */
 
 #include	<new>
@@ -37,7 +37,7 @@ const char xparameters_h_rcsId[] = __XPARAMETERS_H ;
 const char ELog_h_rcsId[] = __ELOG_H ;
 const char Gline_h_rcsId[] = __GLINE_H ;
 const char events_h_rcsId[] = __EVENTS_H ;
-const char msg_GL_cc_rcsId[] = "$Id: msg_GL.cc,v 1.1 2002/11/20 22:16:18 dan_karrels Exp $" ;
+const char msg_GL_cc_rcsId[] = "$Id: msg_GL.cc,v 1.2 2003/05/23 17:28:34 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -68,7 +68,7 @@ if( '-' == Params[ 2 ][ 0 ] )
 		end = theServer->gline_end() ;
 	for( ; ptr != end ; ++ptr )
 		{
-		if( (*ptr)->getUserHost() == (Params[ 2 ] + 1) )
+		if( ptr->second->getUserHost() == (Params[ 2 ] + 1) )
 			{
 			// Found it
 			break ;
@@ -97,10 +97,10 @@ if( '-' == Params[ 2 ][ 0 ] )
 		}
 
 	theServer->PostEvent( EVT_REMGLINE,
-		static_cast< void* >( *ptr ) ) ;
+		static_cast< void* >( ptr->second ) ) ;
 
 	theServer->eraseGline( ptr ) ;
-	delete *ptr ;
+	delete ptr->second ;
 
 	return true ;
 	}
@@ -113,37 +113,26 @@ if( Params.size() < 5 )
 	return false ;
 	}
 
-Gline* newGline = 0;
-xServer::glineIterator ptr = theServer->gline_begin(),
-	end = theServer->gline_end() ;
-for( ; ptr != end ; ++ptr )
-	{
-	if( !strcasecmp( (*ptr)->getUserHost(), Params[ 2 ] + 1 ) )
-		{
-		// Found it
-		break ;
-		}
-	}
-
-if( ptr == theServer->gline_end() )
-	{
-	newGline = new (std::nothrow) Gline(
+Gline* newGline = new (std::nothrow) Gline(
 		Params[ 0 ],
 		Params[ 2 ] + 1,
 		Params[ 4 ],
 		atoi( Params[ 3 ] ) ) ;
-	assert( newGline != 0 ) ;
+assert( newGline != 0 ) ;
 
-	theServer->addGline( newGline ) ;
-	}
-else
-	{
-	newGline = *ptr;
-	newGline->setExpiration(atoi(Params[ 3 ]) + ::time(0));
-	newGline->setSetBy(Params [ 0 ] );
-	newGline->setReason( Params [ 4 ] );
-	}
+// Temporary variable
+{
+	xServer::glineIterator gItr = theServer->findGlineIterator(
+		newGline->getUserHost() ) ;
+	if( gItr != theServer->gline_end() )
+		{
+		// This gline is already present
+		delete gItr->second ;
+		theServer->eraseGline( gItr ) ;
+		}
+}
 
+theServer->addGline( newGline ) ;
 theServer->PostEvent( EVT_GLINE,
 	static_cast< void* >( newGline ) ) ;
 

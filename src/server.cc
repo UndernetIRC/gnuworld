@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server.cc,v 1.154 2002/12/28 22:44:58 mrbean_ Exp $
+ * $Id: server.cc,v 1.155 2003/05/23 17:28:34 dan_karrels Exp $
  */
 
 #include	<sys/time.h>
@@ -72,7 +72,7 @@
 #include	"Connection.h"
 
 const char server_h_rcsId[] = __SERVER_H ;
-const char server_cc_rcsId[] = "$Id: server.cc,v 1.154 2002/12/28 22:44:58 mrbean_ Exp $" ;
+const char server_cc_rcsId[] = "$Id: server.cc,v 1.155 2003/05/23 17:28:34 dan_karrels Exp $" ;
 const char config_h_rcsId[] = __CONFIG_H ;
 const char misc_h_rcsId[] = __MISC_H ;
 const char events_h_rcsId[] = __EVENTS_H ;
@@ -210,7 +210,7 @@ xServer::~xServer()
 for( glineIterator ptr = gline_begin() ; ptr != gline_end() ;
 	++ptr )
 	{
-	delete *ptr ;
+	delete ptr->second ;
 	}
 glineList.clear() ;
 
@@ -1846,20 +1846,15 @@ bool xServer::removeGline( const string& userHost, const xClient* remClient )
 bool foundGline = false ;
 
 // Perform a linear search for the gline
-glineIterator ptr = gline_begin() ;
-for( ; ptr != gline_end() ; ++ptr )
+glineIterator gItr = findGlineIterator( userHost ) ;
+if( gItr != gline_end() )
 	{
-	// Is this the gline in question?
-	if(strcasecmp((*ptr)->getUserHost(),userHost))
-		{
-		continue;
-		}
-	// Yup, found it
 	foundGline = true ;
-	break ;
 	}
 
-// Found it, notify the network that we are removing it
+// Notify the network that we are removing it
+// Even if we didn't find the gline here, it may be present
+// to someone on the network *shrug*
 stringstream s ;
 s	<< charYY
 	<< " GL * -"
@@ -1873,22 +1868,22 @@ Write( s ) ;
 if( foundGline )
 	{
 	// Remove the gline from the internal gline structure
-	glineList.erase( ptr ) ;
+	eraseGline( gItr ) ;
 
 	// Let all clients know that the gline has been removed
-	if(remClient)
+	if( remClient )
 		{
 		PostEvent( EVT_REMGLINE,
-			static_cast< void* >( *ptr ), 0,0,0,remClient ) ;
+			static_cast< void* >( gItr->second ), 
+			0,0,0,remClient ) ;
 		}
 	else
 		{
 		PostEvent( EVT_REMGLINE,
-			static_cast< void* >( *ptr ) ) ;
+			static_cast< void* >( gItr->second ) ) ;
 		}
 	// Deallocate the gline
-	delete *ptr ;
-
+	delete gItr->second ;
 	}
 
 // Return success
@@ -1923,7 +1918,8 @@ s	<< getCharYY() << " GL "
 	<< reason << ends ;
 Write( s ) ;
 
-glineList.push_back( newGline ) ;
+glineList.insert( glineListType::value_type(
+	newGline->getUserHost(), newGline ) ) ;
 if(setClient)
 	{
 	PostEvent( EVT_GLINE,
@@ -1945,9 +1941,9 @@ vector< const Gline* > retMe ;
 for( const_glineIterator ptr = gline_begin() ;
 	ptr != gline_end() ; ++ptr )
 	{
-	if( !match( (*ptr)->getUserHost(), userHost ) )
+	if( !match( ptr->second->getUserHost(), userHost ) )
 		{
-		retMe.push_back( *ptr ) ;
+		retMe.push_back( ptr->second ) ;
 		}
 	}
 
@@ -1956,16 +1952,25 @@ return retMe ;
 
 const Gline* xServer::findGline( const string& userHost ) const
 {
-for( const_glineIterator ptr = gline_begin() ;
-	ptr != gline_end() ; ++ptr )
+const_glineIterator gItr = glineList.find( userHost ) ;
+if( gItr == glineList.end() )
 	{
-	if( !strcasecmp( (*ptr)->getUserHost(), userHost ) )
-		{
-		// Found it
-		return *ptr ;
-		}
+	return 0 ;
 	}
-return 0 ;
+return gItr->second ;
+}
+
+xServer::glineIterator xServer::findGlineIterator(
+	const string& userHost )
+{
+return glineList.find( userHost ) ;
+}
+
+void xServer::addGline( Gline* newGline )
+{
+assert( newGline != 0 ) ;
+glineList.insert( glineListType::value_type( newGline->getUserHost(),
+	newGline ) ) ;
 }
 
 void xServer::sendGlinesToNetwork()
@@ -1977,10 +1982,10 @@ for( const_glineIterator ptr = gline_begin() ;
 	{
 	stringstream s ;
 	s	<< getCharYY() << " GL * +"
-		<< (*ptr)->getUserHost() << ' '
-		<< ((*ptr)->getExpiration() - now) << ' '
-		<< (*ptr)->getLastmod() << " :"
-		<< (*ptr)->getReason() << ends ;
+		<< ptr->second->getUserHost() << ' '
+		<< (ptr->second->getExpiration() - now) << ' '
+		<< ptr->second->getLastmod() << " :"
+		<< ptr->second->getReason() << ends ;
 
 	Write( s ) ;
 	}
@@ -1988,19 +1993,17 @@ for( const_glineIterator ptr = gline_begin() ;
 
 void xServer::removeMatchingGlines( const string& wildHost )
 {
-for( glineIterator ptr = gline_begin() ; ptr != gline_end() ; )
+for( glineIterator ptr = gline_begin() ; ptr != gline_end() ; ++ptr )
 	{
 	// TODO: Does this work with two wildHost's?
-	if( !strcasecmp( wildHost, (*ptr)->getUserHost() ) )
+	if( !strcasecmp( wildHost, ptr->second->getUserHost() ) )
 		{
-		ptr = glineList.erase( ptr ) ;
+		glineList.erase( ptr ) ;
 
 		PostEvent( EVT_REMGLINE,
-			static_cast< void* >( *ptr ) ) ;
-		}
-	else
-		{
-		++ptr ;
+			static_cast< void* >( ptr->second ) ) ;
+
+		delete ptr->second ;
 		}
 	}
 }
@@ -3324,20 +3327,16 @@ time_t now = ::time( 0 ) ;
 
 glineIterator	ptr = gline_begin(),
 		end = gline_end() ;
-for( ; ptr != end ; )
+for( ; ptr != end ; ++ptr )
 	{
-	if( (*ptr)->getExpiration() <= now )
+	if( ptr->second->getExpiration() <= now )
 		{
 		// Expire the gline
 		PostEvent( EVT_REMGLINE,
-			static_cast< void* >( *ptr ) ) ;
+			static_cast< void* >( ptr->second ) ) ;
 
-		delete *ptr ;
-		ptr = glineList.erase( ptr ) ;
-		}
-	else
-		{
-		++ptr ;
+		delete ptr->second ;
+		glineList.erase( ptr ) ;
 		}
 	} // for()
 } // updateGlines()

@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server.h,v 1.78 2002/12/28 22:44:55 mrbean_ Exp $
+ * $Id: server.h,v 1.79 2003/05/23 17:28:34 dan_karrels Exp $
  */
 
 #ifndef __SERVER_H
-#define __SERVER_H "$Id: server.h,v 1.78 2002/12/28 22:44:55 mrbean_ Exp $"
+#define __SERVER_H "$Id: server.h,v 1.79 2003/05/23 17:28:34 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
@@ -95,7 +95,7 @@ protected:
 	/**
 	 * The type of the structure to hold Gline's internally.
 	 */
-	typedef list< Gline* >	glineListType ;
+	typedef map< string, Gline*, noCaseCompare >	glineListType ;
 
 public:
 
@@ -305,15 +305,18 @@ public:
 	 * NOT send a message to the network; for that functionality,
 	 * use SetGline() instead.
 	 */
-	virtual void addGline( Gline* newGline )
-		{ assert( newGline != 0 ) ;
-		  glineList.push_back( newGline ) ;
-		}
+	virtual void addGline( Gline* newGline ) ;
 
 	/**
 	 * Find a gline by lexical searching, case insensitive.
 	 */
 	virtual const Gline* findGline( const string& userHost ) const ;
+
+	/**
+	 * Find a gline by userHost (exact match only), and return
+	 * an interator to that gline.
+	 */
+	virtual glineIterator	findGlineIterator( const string& userHost ) ;
 
 	/**
 	 * Find one or more glines matching a given userHost string.
