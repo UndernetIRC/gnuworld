@@ -17,11 +17,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: EConfig.h,v 1.6 2003/12/29 23:59:36 dan_karrels Exp $
+ * $Id: EConfig.h,v 1.7 2004/01/16 00:59:47 dan_karrels Exp $
  */
 
 #ifndef __ECONFIG_H
-#define __ECONFIG_H "$Id: EConfig.h,v 1.6 2003/12/29 23:59:36 dan_karrels Exp $"
+#define __ECONFIG_H "$Id: EConfig.h,v 1.7 2004/01/16 00:59:47 dan_karrels Exp $"
 
 #include	<iostream>
 #include	<fstream>
@@ -203,6 +203,13 @@ public:
 		{ return valueMap.size() ; }
 
 	/**
+	 * Return true if there was an error in processing
+	 * the file.
+	 */
+	inline bool		hasError() const
+		{ return error ; }
+
+	/**
 	 * Find the first key/value pair for the given key.
 	 */
 	virtual iterator Find( const std::string& findMe ) ;
@@ -301,9 +308,20 @@ protected:
 	virtual bool	writeFile() ;
 
 	/**
+	 * Record that an error has occured.
+	 */
+	inline void	setError()
+		{ error = true ; }
+
+	/**
 	 * The name of the configuration file.
 	 */
 	std::string	configFileName ;
+
+	/**
+	 * The error status field.
+	 */
+	bool		error ;
 
 	/**
 	 * The map used to store the file's key/value pairs.

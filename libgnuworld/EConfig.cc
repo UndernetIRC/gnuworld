@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: EConfig.cc,v 1.5 2003/06/18 15:04:04 dan_karrels Exp $
+ * $Id: EConfig.cc,v 1.6 2004/01/16 00:59:47 dan_karrels Exp $
  */
 
 #include	<unistd.h> // unlink()
@@ -38,7 +38,7 @@
 #include	"ELog.h"
 #include	"misc.h"
 
-const char rcsId[] = "$Id: EConfig.cc,v 1.5 2003/06/18 15:04:04 dan_karrels Exp $" ;
+const char rcsId[] = "$Id: EConfig.cc,v 1.6 2004/01/16 00:59:47 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -50,7 +50,8 @@ using std::endl ;
 using std::map ;
 
 EConfig::EConfig( const string& _configFileName )
- : configFileName( _configFileName )
+ : configFileName( _configFileName ),
+   error( false )
 {
 ifstream configFile( configFileName.c_str() ) ;
 if( !configFile.is_open() )
@@ -58,11 +59,11 @@ if( !configFile.is_open() )
 	elog	<< "EConfig: Unable to open file: "
 		<< configFileName
 		<< endl ;
-	::exit( 0 ) ;
+	setError() ;
 	}
 if( !readFile( configFile ) )
 	{
-	::exit( 0 ) ;
+	setError() ;
 	}
 configFile.close() ;
 }
@@ -99,7 +100,7 @@ if( ptr == valueMap.end() )
 		<< "for key \""
 		<< key << "\""
 		<< endl ;
-	::exit( 0 ) ;
+	setError() ;
 	}
 
 // At least one key/value pair for this key exists; return it
