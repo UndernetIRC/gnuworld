@@ -16,7 +16,7 @@
 #include	"ELog.h"
 #include	"StringTokenizer.h"
 
-const char msg_J_cc_rcsId[] = "$Id: msg_J.cc,v 1.5 2001/03/03 00:17:57 dan_karrels Exp $" ;
+const char msg_J_cc_rcsId[] = "$Id: msg_J.cc,v 1.6 2001/03/03 02:10:58 dan_karrels Exp $" ;
 
 using std::string ;
 using std::endl ;
@@ -187,9 +187,6 @@ for( iClient::channelIterator ptr = theClient->channels_begin(),
 	// Post this event to all listeners
 	PostChannelEvent( EVT_PART, *ptr,
 		static_cast< void* >( theClient ) ) ; // iClient*
-
-	// Remove this channel from the iClient's internal structure
-	theClient->removeChannel( *ptr ) ;
 
 	// Remove this ChannelUser from the Channel's internal
 	// structure.

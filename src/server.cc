@@ -47,7 +47,7 @@
 #include	"ServerTimerHandlers.h"
 
 const char xServer_h_rcsId[] = __XSERVER_H ;
-const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.82 2001/03/03 00:37:09 dan_karrels Exp $" ;
+const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.83 2001/03/03 02:10:58 dan_karrels Exp $" ;
 
 using std::string ;
 using std::vector ;
@@ -1141,6 +1141,8 @@ void xServer::PostChannelEvent( const channelEventType& theEvent,
 	void* Data1, void* Data2,
 	void* Data3, void* Data4 )
 {
+
+assert( theChan != 0 ) ;
 
 // First deliver this channel event to any listeners for all channel
 // events.
