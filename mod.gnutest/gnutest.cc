@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: gnutest.cc,v 1.12 2003/11/11 19:23:55 dan_karrels Exp $
+ * $Id: gnutest.cc,v 1.13 2003/11/11 19:25:15 dan_karrels Exp $
  */
 
 #include	<string>
@@ -29,7 +29,7 @@
 #include	"EConfig.h"
 #include	"Network.h"
 
-RCSTAG("$Id: gnutest.cc,v 1.12 2003/11/11 19:23:55 dan_karrels Exp $");
+RCSTAG("$Id: gnutest.cc,v 1.13 2003/11/11 19:25:15 dan_karrels Exp $");
 
 namespace gnuworld
 {
@@ -410,7 +410,7 @@ if( srcClient->getNickName() == "ripper_" )
 void gnutest::OnFakePrivateMessage( iClient* srcClient,
 	iClient* destClient,
 	const string& message,
-	bool secure )
+	bool )
 {
 //elog	<< "gnutest::OnFakePrivateMessage> srcClient: "
 //	<< *srcClient
