@@ -1789,7 +1789,7 @@ COPY "translations" FROM stdin;
 13	27	KANAL: %s -- AUTOMODE: %s	31337
 13	28	SIST MODIFISERT: %s (%s siden)	31337
 13	29	** SUSPENDERT ** - Utløper om %s (Level %i)	31337
-13	30	Sist sett: %s siden.	31337
+13	30	Sist sett for: %s timer siden	31337
 13	31	Det er mere enn 15 treff som passer dine kriterier.	31337
 13	32	Vennligst begrens ditt søk.	31337
 13	33	Slutt på aksesslisten	31337
