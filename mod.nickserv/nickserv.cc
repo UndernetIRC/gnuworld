@@ -10,7 +10,7 @@
 #include "netData.h"
 #include "nickserv.h"
 
-const char NickServ_cc_rcsId[] = "$Id: nickserv.cc,v 1.14 2002/11/26 03:33:24 jeekay Exp $";
+const char NickServ_cc_rcsId[] = "$Id: nickserv.cc,v 1.15 2002/12/01 22:25:55 jeekay Exp $";
 
 namespace gnuworld
 {
@@ -535,7 +535,7 @@ for(QueueType::iterator queuePos = warnQueue.begin(); queuePos != warnQueue.end(
     Notice(theClient, "You are using a registered nickname. Please login or you will be disconnected.");
     theData->warned++;
     theStats->incStat("NS.WARN");
-    theLogger->log(logging::events::E_DEBUG, "Warned: (" + 
+    theLogger->log(logging::events::E_INFO, "Warned: (" + 
       theClient->getCharYYXXX() + ") " + theClient->getNickName());
     queuePos++;
     continue;
@@ -550,7 +550,7 @@ for(QueueType::iterator queuePos = killQueue.begin(); queuePos != killQueue.end(
   delete(theData);
   Kill(theClient, "[NickServ] AutoKill");
   theStats->incStat("NS.KILL");
-  theLogger->log(logging::events::E_DEBUG, "Killed: (" + 
+  theLogger->log(logging::events::E_INFO, "Killed: (" + 
     theClient->getCharYYXXX() + ") " + theClient->getNickName());
 } // iterate over killQueue
 
