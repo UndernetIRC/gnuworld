@@ -3,6 +3,7 @@
 	    Tomer Cohen    MrBean@toughguy.net
  */
 
+#include	<new>
 #include	<string>
 #include	<vector>
 #include	<iostream>
@@ -23,8 +24,9 @@
 #include	"ccontrol.h"
 #include	"AuthInfo.h"
 #include        "server.h"
+
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.52 2001/05/31 18:28:38 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.53 2001/06/03 14:02:56 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -579,8 +581,12 @@ int ccontrol::OnTimer(xServer::timerID timer_id, void*)
 
 if (timer_id ==  postDailyLog)
 	{ 
-	CreateReport(::time(0) - 24*3600,::time(0)); //Create the lastcom report 
-	MailReport(AbuseMail.c_str(),"Report.log"); //Email the report to the abuse team
+	// Create the lastcom report 
+	CreateReport(::time(0) - 24*3600,::time(0));
+
+	// Email the report to the abuse team
+	MailReport(AbuseMail.c_str(),"Report.log");
+
 	/* Refresh Timers */			
 	time_t theTime = time(NULL) + 24*3600; 
 	postDailyLog = MyUplink->RegisterTimer(theTime, this, NULL); 
@@ -588,7 +594,8 @@ if (timer_id ==  postDailyLog)
 else if (timer_id == expiredGlines)
 	{
 	refreshGlines();
-	expiredGlines = MyUplink->RegisterTimer(::time(0) + GLInterval,this,NULL);
+	expiredGlines = MyUplink->RegisterTimer(::time(0) + GLInterval,
+		this,NULL);
 	}
 else if (timer_id == expiredIgnores)
 	{
@@ -605,7 +612,7 @@ vector< string >::const_iterator ptr = operChans.begin(),
 	end = operChans.end() ;
 while( ptr != end )
 	{
-	if( !strcasecmp( (*ptr).c_str(), theChan.c_str() ) )
+	if( !strcasecmp( *ptr, theChan ) )
 		{
 		return true ;
 		}
@@ -747,7 +754,8 @@ AuthInfo* ccontrol::IsAuth( const string& Numeric ) const
 for( authListType::const_iterator ptr = authList.begin() ;
 	ptr != authList.end() ; ++ptr )
 	{
-	if( !strcasecmp( (*ptr)->Numeric.c_str(), Numeric.c_str() ) )
+	// TODO: Violation of encapsulation, use an accessor here
+	if( !strcasecmp( (*ptr)->Numeric, Numeric ) )
 		{
 		return *ptr ;
 		}
@@ -1302,30 +1310,32 @@ return tmpUser ;
 
 bool ccontrol::addGline( ccGline* TempGline)
 {
-
 glineList.push_back( TempGline ) ;
 return true;
 }    
 
-
 bool ccontrol::remGline( ccGline* TempGline)
 {
 glineList.erase( std::find( glineList.begin(),
-glineList.end(),
-TempGline ) ) ;
+	glineList.end(),
+	TempGline ) ) ;
 return true;
 }
 
 ccGline* ccontrol::findMatchingGline( const string& Host )
 {
-ccGline *theGline;
+// TODO: This method needs to be rewritten
+ccGline *theGline = 0;
 glineIterator tptr;
-for(glineIterator ptr = glineList.begin(); ptr != glineList.end(); ptr++)
+for(glineIterator ptr = glineList.begin(); ptr != glineList.end(); ++ptr)
 	{
 	theGline = *ptr;
 	if(match(theGline->get_Host(),Host) == 0) 
+		{
     		if(theGline->get_Expires() > ::time(0))
+			{
 			return theGline;
+			}
 		else
 			{
 			tptr = ptr++;
@@ -1335,6 +1345,7 @@ for(glineIterator ptr = glineList.begin(); ptr != glineList.end(); ptr++)
 			wallopsAsServer("Removing gline for host %s\n",theGline->get_Host().c_str());
 			delete theGline;
 			}
+		}
 	}
 
 return NULL ;
@@ -1342,6 +1353,8 @@ return NULL ;
 
 ccGline* ccontrol::findGline( const string& HostName )
 {
+// TODO: How does a method with "find" in its name mutate anything?
+// TODO: This method needs to be rewritten
 ccGline *theGline;
 glineIterator tptr;
 for(glineIterator ptr = glineList.begin(); ptr != glineList.end();)
@@ -1367,18 +1380,17 @@ return NULL ;
 
 struct tm ccontrol::convertToTmTime(time_t NOW)
 {
-time_t *tNow;
-tNow = &NOW;
-struct tm* Now;
-Now = gmtime(tNow);
+// TODO: why not just "return gmtime( &NOW ) ;" ?
+time_t *tNow = &NOW;
+struct tm* Now = gmtime(tNow);
 return *Now;
 }
 
+// TODO: This method should never exist
 char *ccontrol::convertToAscTime(time_t NOW)
 {
 time_t *tNow = &NOW;
-struct tm* Now;
-Now = gmtime(tNow);
+struct tm* Now = gmtime(tNow);
 char *ATime = asctime(Now);
 ATime[strlen(ATime)-1] = '\0';
 return ATime;
@@ -1387,7 +1399,10 @@ return ATime;
 bool ccontrol::MsgChanLog(const char *Msg, ... )
 {
 if(!Network->findChannel(msgChan))
+	{
 	return false;
+	}
+
 char buffer[ 1024 ] = { 0 } ;
 va_list list;
 
@@ -1395,12 +1410,16 @@ va_start( list, Msg ) ;
 vsprintf( buffer, Msg, list ) ;
 va_end( list ) ;
 
+// TODO: Statement with no affect
 if(Message(Network->findChannel(msgChan),buffer));
+
 for( authListType::const_iterator ptr = authList.begin() ;
         ptr != authList.end() ; ++ptr )
         {
+	// TODO: This should use an accessor
         if((*ptr)->Flags & getLOGS )
                 { 
+		// TODO: Statement with no affect
                 if(Message(Network->findClient((*ptr)->Numeric),buffer));
                 }
 	}
@@ -1422,12 +1441,13 @@ static const char *Main = "INSERT into comlog (ts,oper,command) VALUES (now()::a
 
 strstream theQuery;
 theQuery	<< Main
+		// TODO: Violation of encapsulation
 		<< Oper->Name 
 		<< " (" << theClient->getNickUserHost() <<")','"
 		<< buffer << "')"
 		<< ends;
 
-elog	<< "ccontrol::ComLog> "
+elog	<< "ccontrol::DailyLog> "
 	<< theQuery.str()
 	<< endl; 
 
@@ -1440,7 +1460,7 @@ if( PGRES_COMMAND_OK == status )
 	}
 else
 	{
-	elog	<< "ccontrol::comLog> SQL Error: "
+	elog	<< "ccontrol::DailyLog> SQL Error: "
 		<< SQLDb->ErrorMessage()
 		<< endl ;
 	return false;
@@ -1461,7 +1481,7 @@ theQuery 	<< queryHeader
 		<< " ORDER BY ts DESC"
 		<< ends;
 	
-elog	<< "LASTCOM> " 
+elog	<< "ccontrol::CreateReport> " 
 	<< theQuery.str() 
 	<< endl;
 	
@@ -1470,7 +1490,7 @@ delete[] theQuery.str() ;
 
 if( PGRES_TUPLES_OK != status )
 	{
-	elog	<< "LASTCOM> SQL Error: "
+	elog	<< "ccontrol::CreateReport> SQL Error: "
 		<< SQLDb->ErrorMessage()
 		<< endl ;
 	return false ;
@@ -1480,16 +1500,30 @@ if( PGRES_TUPLES_OK != status )
 ofstream LogFile;
 LogFile.open("Report.log",ios::out);
 if(!LogFile)
+	{
 	return false;
-LogFile << "ccontrol log for command issued between " << convertToAscTime(From); 
-LogFile << " and up til " << convertToAscTime(Til) << endl;
+	}
+
+LogFile	<< "ccontrol log for command issued between "
+	<< convertToAscTime(From)
+	<< " and up til "
+	<< convertToAscTime(Til)
+	<< endl;
 
 for (int i = 0 ; i < SQLDb->Tuples(); i++)
 	{
-	LogFile << "[ " << convertToAscTime(atoi(SQLDb->GetValue(i, 0))) << " - " << SQLDb->GetValue(i,1) << " ] " << SQLDb->GetValue(i,2) << endl;
+	LogFile	<< "[ "
+		<< convertToAscTime(atoi(SQLDb->GetValue(i, 0)))
+		<< " - "
+		<< SQLDb->GetValue(i,1)
+		<< " ] "
+		<< SQLDb->GetValue(i,2)
+		<< endl;
 	}
 
-LogFile << "End of debug log" << '\n';
+LogFile << "End of debug log"
+	<< endl ;
+
 LogFile.close();
 return true;
 }
@@ -1502,8 +1536,8 @@ Report.open(Sendmail_Path.c_str(),ios::in);
 
 if(!Report)
 	{
-	MsgChanLog("Error cant find sendmail, check the conf setting and
-try again\n");
+	MsgChanLog("Error cant find sendmail, check the conf setting and"
+		" try again\n");
 	return false;
 	}
 Report.close();
@@ -1514,6 +1548,7 @@ if(!Report)
 	MsgChanLog("Error while sending report\n");
 	return false;
 	}
+
 ofstream TMail;
 TMail.open("Report.mail",ios::out);
 if(!TMail)
@@ -1523,23 +1558,27 @@ if(!TMail)
 	}
 TMail << "Subject : CControl command log report\n";
 
-char Buffer[1024];
+string line ;
 
-while(!Report.eof())
+while( std::getline( Report, line ) )
 	{
-	Report.getline(Buffer,sizeof(Buffer),'\n');	
-	TMail << Buffer << endl;
+	TMail	<< line
+		<< endl ;
 	}
 TMail.close();
 Report.close();
-char SendMail[256];
+char SendMail[256] = { 0 };
 
-sprintf(SendMail, "%s -f %s %s < Report.mail\n",Sendmail_Path.c_str(),CCEmail.c_str(),
-MailTo);
+sprintf(SendMail, "%s -f %s %s < Report.mail\n",
+	Sendmail_Path.c_str(),
+	CCEmail.c_str(),
+	MailTo);
+
 system(SendMail);
 return true;
 }
 
+// TODO: This method should be in C++, not C!
 int ccontrol::CheckGline(const char * GlineHost,unsigned int Len)
 {
 
@@ -1588,6 +1627,7 @@ if( (theUser) && (theUser->Flags & isSUSPENDED))
 return false;
 }
 
+// TODO: This method should be in C++ not C!
 int ccontrol::countCinS(char *St,char Sign)
 {
 int count =0;
@@ -1601,6 +1641,7 @@ return count;
 bool ccontrol::refreshGlines()
 {
 
+// TODO: Rewrite method
 MsgChanLog("Refresh gline - Start\n");
 
 int totalFound = 0;
@@ -1636,20 +1677,20 @@ return true;
 
 bool ccontrol::burstGlines()
 {
-
 MsgChanLog("[Burst Glines] - Started\n");
-ccGline *theGline;
+
+ccGline *theGline = 0 ;
 for(glineIterator ptr = glineList.begin(); ptr != glineList.end(); ptr++)
 	{
 	theGline = *ptr;
-	MyUplink->setGline(theGline->get_AddedBy()
-	,theGline->get_Host(),theGline->get_Reason()
-	,theGline->get_Expires() - ::time(0));
+	MyUplink->setGline(theGline->get_AddedBy(),
+		theGline->get_Host(),
+		theGline->get_Reason(),
+		theGline->get_Expires() - ::time(0));
 	}
+
 MsgChanLog("[Burst Glines] - Ended\n");
-
 return true;
-
 }
 
 bool ccontrol::loadGlines()
@@ -1668,7 +1709,6 @@ elog	<< "ccontrol::loadGlines> "
 ExecStatusType status = SQLDb->Exec( theQuery.str() ) ;
 delete[] theQuery.str() ;
 
-
 if( PGRES_TUPLES_OK != status )
 	{
 	elog	<< "ccontrol::loadGlines> SQL Failure: "
@@ -1678,6 +1718,8 @@ if( PGRES_TUPLES_OK != status )
 	return false;
 	}
 
+// BUG: This should crash, if only this variable was initialized
+// as it should be!
 ccGline *tempGline;
 assert(tempGline != NULL);
 
@@ -1686,6 +1728,8 @@ inRefresh = true;
 for( int i = 0 ; i < SQLDb->Tuples() ; i++ )
 	{
 	tempGline =  new (nothrow) ccGline(SQLDb);
+	assert( tempGline != 0 ) ;
+
 	tempGline->set_Id(SQLDb->GetValue(i,0));
 	tempGline->set_Host(SQLDb->GetValue(i,1));
 	tempGline->set_AddedBy(SQLDb->GetValue(i,2)) ;
@@ -1699,6 +1743,10 @@ return true;
 
 void ccontrol::wallopsAsServer(const char *Msg,...)
 {
+if( 0 == MyUplink )
+	{
+	return ;
+	}
 
 char buffer[ 1024 ] = { 0 } ;
 va_list list;
@@ -1707,15 +1755,10 @@ va_start( list , Msg) ;
 vsprintf( buffer, Msg , list ) ;
 va_end( list ) ;
 
-strstream s ;
-s	<< MyUplink->getCharYY() << " WA :"
-        << buffer
-	<< ends ;
-Write( s ) ;
-delete s.str();
+MyUplink->Wallops( buffer ) ;
 }
 
-int ccontrol::getExceptions(const string &Host )
+int ccontrol::getExceptions( const string &Host )
 {
 int Exception = userMaxConnection;
 
@@ -1732,7 +1775,6 @@ elog	<< "ccontrol::getExceptions> "
 ExecStatusType status = SQLDb->Exec( theQuery.str() ) ;
 delete[] theQuery.str() ;
 
-
 if( PGRES_TUPLES_OK != status )
 	{
 	elog	<< "ccontrol::getExceptions> SQL Failure: "
@@ -1743,7 +1785,8 @@ if( PGRES_TUPLES_OK != status )
 
 for( int i = 0 ; i < SQLDb->Tuples() ; i++ )
 	{
-	if((!match(Host,SQLDb->GetValue(i,0))) || (Host == SQLDb->GetValue(i,0)))
+	if((!match(Host,SQLDb->GetValue(i,0))) ||
+		(Host == SQLDb->GetValue(i,0)))
 		{
 		if(atoi(SQLDb->GetValue(i,1)) > Exception)
 			Exception = atoi(SQLDb->GetValue(i,1));
@@ -1768,7 +1811,6 @@ elog	<< "ccontrol::listExceptions> "
 ExecStatusType status = SQLDb->Exec( theQuery.str() ) ;
 delete[] theQuery.str() ;
 
-
 if( PGRES_TUPLES_OK != status )
 	{
 	elog	<< "ccontrol::listExceptions> SQL Failure: "
@@ -1779,9 +1821,14 @@ if( PGRES_TUPLES_OK != status )
 
 for( int i = 0 ; i < SQLDb->Tuples() ; i++ )
 	{
-	Notice(theClient,"Host : %s Connections %s Addeded By : %s Added On %s\n",SQLDb->GetValue(i,0),SQLDb->GetValue(i,1),SQLDb->GetValue(i,2),convertToAscTime(atoi(SQLDb->GetValue(i,3))));
+	Notice(theClient,"Host : %s Connections %s Addeded By : %s "
+		"Added On %s",
+		SQLDb->GetValue(i,0),
+		SQLDb->GetValue(i,1),
+		SQLDb->GetValue(i,2),
+		convertToAscTime(atoi(SQLDb->GetValue(i,3))));
 	}
-Notice(theClient,"End of exceptions list\n");
+Notice(theClient,"End of exceptions list");
 return true;
 }
 
@@ -1794,25 +1841,27 @@ theQuery	<< Main
 		<< Host << "'"
 		<< ends;
 
-elog	<< "ccontrol::findException> "
+elog	<< "ccontrol::isnertException> "
 	<< theQuery.str()
 	<< endl; 
 
 ExecStatusType status = SQLDb->Exec( theQuery.str() ) ;
 delete[] theQuery.str() ;
 
-
 if( PGRES_TUPLES_OK != status )
 	{
-	elog	<< "ccontrol::findException> SQL Failure: "
+	elog	<< "ccontrol::insertException> SQL Failure: "
 		<< SQLDb->ErrorMessage()
 		<< endl ;
 	return false;
 	}
 
-if(SQLDb->Tuples()>0)
+if( SQLDb->Tuples() > 0 )
 	{
-	Notice(theClient,"There is already an exception for host %s, please use update\n",Host.c_str());		
+	Notice(theClient,
+		"There is already an exception for host %s, "
+		"please use update",
+		Host.c_str());		
 	return true;
 	}
 
@@ -1825,16 +1874,14 @@ query		<< quer
 		<< "',now()::abstime::int4)"
 		<< ends;
 
-elog	<< "ccontrol::addException> "
+elog	<< "ccontrol::insertException> "
 	<< query.str()
 	<< endl; 
 
 status = SQLDb->Exec( query.str() ) ;
-
 delete[] query.str();
-if( PGRES_COMMAND_OK != status )
-	return false;		    
-return true;
+
+return (PGRES_COMMAND_OK == status) ;
 }
 
 bool ccontrol::delException( iClient *theClient , const string &Host )
@@ -1846,17 +1893,16 @@ theQuery	<< Main
 		<< Host << "'"
 		<< ends;
 
-elog	<< "ccontrol::findException> "
+elog	<< "ccontrol::delException> "
 	<< theQuery.str()
 	<< endl; 
 
 ExecStatusType status = SQLDb->Exec( theQuery.str() ) ;
 delete[] theQuery.str() ;
 
-
 if( PGRES_TUPLES_OK != status )
 	{
-	elog	<< "ccontrol::findException> SQL Failure: "
+	elog	<< "ccontrol::delException> SQL Failure: "
 		<< SQLDb->ErrorMessage()
 		<< endl ;
 	return false;
@@ -1864,7 +1910,8 @@ if( PGRES_TUPLES_OK != status )
 
 if(SQLDb->Tuples() == 0)
 	{
-	Notice(theClient,"There is no exception for host %s",Host.c_str());		
+	Notice(theClient,"There is no exception for host %s",
+		Host.c_str());
 	return true;
 	}
 
@@ -1873,24 +1920,31 @@ strstream query;
 query		<< quer
 		<< Host << "'"
 		<< ends;
-elog 		<< query.str();
+
+elog 		<< "ccontrol::delException> "
+		<< query.str()
+		<< endl ;
+
 status = SQLDb->Exec( query.str() ) ;
 delete[] query.str();
+
 if( PGRES_COMMAND_OK != status )
 	{
 	elog	<< "ccontrol::findException> SQL Failure: "
-	<< SQLDb->ErrorMessage()
-	<< endl ;
+		<< SQLDb->ErrorMessage()
+		<< endl ;
 	return false;		    
 	}
 return true;
 }
 ccLogin *ccontrol::findLogin( const string & Numeric )
 {
-for(loginIterator ptr = login_begin();ptr != login_end();ptr++)
+for(loginIterator ptr = login_begin() ; ptr != login_end() ; ++ptr)
 	{
 	if((*ptr)->get_Numeric() == Numeric)
-	    return *ptr;
+		{
+		return *ptr;
+		}
 	ptr++;
 	}
 return NULL;
@@ -1901,21 +1955,27 @@ void ccontrol::addLogin( const string & Numeric)
 ccLogin *LogInfo = findLogin(Numeric);
 if(LogInfo == NULL)
 	{
-	LogInfo = new ccLogin(Numeric);
+	LogInfo = new (nothrow) ccLogin(Numeric);
 	assert(LogInfo != NULL);
+
 	loginList.push_back(LogInfo);
 	}
+
 LogInfo->add_Login();
 if(LogInfo->get_Logins() > 5)
-    ignoreUser(LogInfo);
+	{
+	ignoreUser(LogInfo);
+	}
 }	
 
 int ccontrol::removeIgnore( const string &Host )
 {
 
-ccLogin *tempLogin;
+// TODO: Rewrite this method
+ccLogin *tempLogin = 0;
 loginIterator tptr;
 int retMe = IGNORE_NOT_FOUND;
+
 for(loginIterator ptr = login_begin();ptr!=login_end();)
 	{
 	tempLogin = *ptr;
@@ -1944,33 +2004,43 @@ return retMe;
 
 int ccontrol::removeIgnore( iClient *theClient )
 {
-string Host = "*!*" + theClient->getUserName() 
-		    + "@"+ theClient->getInsecureHost();
+string Host = string( "*!*" )
+		+ theClient->getUserName() 
+		+ string( "@" )
+		+ theClient->getInsecureHost();
 int retMe = removeIgnore(Host);
 return retMe;
-}	
+}
 
 void ccontrol::ignoreUser( ccLogin *User )
 {
 iClient *theClient = Network->findClient(User->get_Numeric());
+
+// TODO: Might wanna reconsider this assert()
 assert(theClient != NULL);
+
 Notice(theClient,"Hmmmz i dont think i like you anymore , consider yourself ignored");
 MsgChanLog("Added %s to my ignore list\n",theClient->getNickUserHost().c_str());
+
 string silenceMask = string( "*!*" )
 	+ theClient->getUserName()
 	+ "@"
 	+ theClient->getInsecureHost();
-	strstream s;
+
+strstream s;
 s	<< getCharYYXXX() 
 	<< " SILENCE " 
 	<< theClient->getCharYYXXX() 
 	<< " " 
 	<< silenceMask
 	<< ends; 
+
 Write( s );
 delete[] s.str();
+
 User->set_IgnoreExpires(::time(0)+3600);
 User->set_IgnoredHost(silenceMask);
+
 ignoreList.push_back(User);
 }
 
@@ -1984,14 +2054,18 @@ for(loginIterator ptr = login_begin();ptr!=login_end();ptr++)
 	if(tempLogin->get_IgnoreExpires() > ::time(0))
 		{
 		Notice(theClient,"Host : %s Expires At %s[%d]",
-		tempLogin->get_IgnoredHost().c_str(),convertToAscTime(tempLogin->get_IgnoreExpires()),tempLogin->get_IgnoreExpires());
+		tempLogin->get_IgnoredHost().c_str(),
+		convertToAscTime(tempLogin->get_IgnoreExpires()),
+			tempLogin->get_IgnoreExpires());
 		}
 	}
 Notice(theClient,"-= End Of Ignore List =-");			
+return true ;
 }
 
 bool ccontrol::refreshIgnores()
 {
+// TODO: Rewrite this method
 loginIterator tptr;
 ccLogin *tempLogin;
 for(loginIterator ptr = login_begin();ptr!=login_end();)
