@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: stringtokenizer.cc,v 1.1 2002/11/29 18:28:00 dan_karrels Exp $
+ * $Id: stringtokenizer.cc,v 1.2 2002/11/29 18:41:54 dan_karrels Exp $
  */
 
 #include	<iostream>
@@ -40,6 +40,7 @@ size_t	maxLines = 10000 ;
 int main( int argc, char** argv )
 {
 int c = EOF ;
+bool verbose = false ;
 string inputFileName ;
 
 if( argc < 3 )
@@ -48,7 +49,7 @@ if( argc < 3 )
 	return 0 ;
 	}
 
-while( (c = getopt( argc, argv, "f:hn:" )) != EOF )
+while( (c = getopt( argc, argv, "f:hn:v" )) != EOF )
 	{
 	switch( c )
 		{
@@ -60,6 +61,9 @@ while( (c = getopt( argc, argv, "f:hn:" )) != EOF )
 			return 0 ;
 		case 'n':
 			maxLines = atoi( optarg ) ;
+			break ;
+		case 'v':
+			verbose = true ;
 			break ;
 		default:
 			usage( argv[ 0 ] ) ;
@@ -84,6 +88,9 @@ if( !inputFile )
 	return -1 ;
 	}
 
+cout	<< "Running in verbose mode"
+	<< endl ;
+
 cout	<< endl
 	<< "Reading "
 	<< maxLines
@@ -96,7 +103,7 @@ cout.flush() ;
 
 // Read the entire file into memory
 vector< string > lines ;
-clock_t begin, end, totalClocks1 = 0, totalClocks2 = 0 ;
+clock_t begin, end, totalClocks1 = 0 ;
 
 while( getData( inputFile, lines ) )
 	{
@@ -108,17 +115,19 @@ while( getData( inputFile, lines ) )
 		end = clock() ;
 
 		totalClocks1 += (end - begin) ;
-		}
 
-	begin = clock() ;
-	for( vector< string >::const_iterator ptr = lines.begin(),
-		endPtr = lines.end() ; ptr != endPtr ; ++ptr )
-		{
-		StringTokenizer st( *ptr ) ;
+		if( verbose )
+			{
+			cout	<< "[DATA] "
+				<< *ptr
+				<< endl ;
+			cout	<< "[TOKENIZED] ("
+				<< st.size()
+				<< ") "
+				<< st
+				<< endl ;
+			}
 		}
-	end = clock() ;
-
-	totalClocks2 += (end - begin) ;
 
 	cout	<< "." ;
 	cout.flush() ;
@@ -130,10 +139,6 @@ cout	<< "Done!"
 
 cout	<< "Measured for each separate instantiaion: "
 	<< (totalClocks1 / CLOCKS_PER_SEC)
-	<< " seconds"
-	<< endl ;
-cout	<< "Measured as a whole: "
-	<< ((end - begin) / CLOCKS_PER_SEC)
 	<< " seconds"
 	<< endl ;
 cout	<< endl ;
@@ -159,6 +164,8 @@ cout	<< "-n <number of lines> Reads <number of lines> lines of "
 	<< "                     file at a time. ("
 	<< maxLines
 	<< ")"
+	<< endl ;
+cout	<< "-v (false) Run in verbose, be careful of this :)"
 	<< endl ;
 }
 

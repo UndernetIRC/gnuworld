@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: StringTokenizer.cc,v 1.2 2002/11/29 18:27:58 dan_karrels Exp $
+ * $Id: StringTokenizer.cc,v 1.3 2002/11/29 18:41:54 dan_karrels Exp $
  */
 
 #include	<new>
@@ -31,7 +31,7 @@
 #include	"StringTokenizer.h"
 
 const char StringTokenizer_h_rcsId[] = __STRINGTOKENIZER_H ;
-const char StringTokenizer_cc_rcsId[] = "$Id: StringTokenizer.cc,v 1.2 2002/11/29 18:27:58 dan_karrels Exp $" ;
+const char StringTokenizer_cc_rcsId[] = "$Id: StringTokenizer.cc,v 1.3 2002/11/29 18:41:54 dan_karrels Exp $" ;
 const char config_h_rcsId[] = __CONFIG_H ;
 
 namespace gnuworld
@@ -82,7 +82,6 @@ return array[ sub ] ;
  */
 void StringTokenizer::Tokenize( const string& buf )
 {
-
 // Make sure that there is something
 // worth tokenizing
 if( buf.empty() )
@@ -125,7 +124,7 @@ for( ; currentPtr != endPtr ; ++currentPtr )
 		*addMePtr = 0 ;
 
 		// Is this an empty token?
-		if( ! (*addMe) )
+		if( addMe[ 0 ] != 0 )
 			{
 			// Nope, go ahead and add it to the vector
 			array.push_back( addMe ) ;
