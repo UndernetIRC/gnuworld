@@ -2,6 +2,15 @@
 -- English language definition.
 -- 27/12/00 - Greg Sikorski <gte@atomicrevs.demon.co.uk>.
 
+DELETE FROM languages;
+COPY "languages" FROM stdin;
+1	English	31337
+2	French	31337
+3	Danish	31337
+4	Dutch	31337
+5	German	31337
+\.
+
 DELETE FROM translations;
 COPY "translations" FROM stdin;
 1	1	Sorry, You are already authenticated as %s	31337
@@ -67,4 +76,21 @@ COPY "translations" FROM stdin;
 4	9	Je bent gevoiced door %s	31337
 4	10	%s: Je bent niet in dat kanaal	31337
 4	11	%s is reeds geopt op %s	31337
+\.
+
+-- German language definition.
+-- 03/01/2001 - Alexander Maassen <outsider@key2peace.org>.
+
+COPY "translations" FROM stdin;
+5	1	Sorry, Du bist schon authorisiert als %s	31337
+5	2	AUTHORISATION als %s ACCEPTIERT	31337
+5	3	Sorry, du hast zu wenig access fr dieses commando	31337
+5	4	Sorry, Channel %s ist lehr	31337
+5	5	Ich kann %s nirgendwo sehen	31337
+5	6	Ich kann %s nicht im Channel %s sehen	31337
+5	7	Channel %s is nicht registriert	31337
+5	8	%s hat dich geopt	31337
+5	9	%s hat dich gevoiced	31337
+5	10	%s: Du bist nicht im Channel	31337
+5	11	%s wurde bereits von %s geopt	31337
 \.
