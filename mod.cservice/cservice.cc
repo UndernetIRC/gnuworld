@@ -455,7 +455,7 @@ int cservice::OnCTCP( iClient* theClient, const string& CTCP,
 
 	if(Command == "VERSION")
 	{
-		xClient::DoCTCP(theClient, CTCP.c_str(), "Undernet P10 Channel Services Version 2 [" __DATE__ " " __TIME__ "] ($Id: cservice.cc,v 1.53 2001/01/19 23:01:56 gte Exp $)");
+		xClient::DoCTCP(theClient, CTCP.c_str(), "Undernet P10 Channel Services Version 2 [" __DATE__ " " __TIME__ "] ($Id: cservice.cc,v 1.54 2001/01/20 16:40:02 gte Exp $)");
 		return true;
 	}
  
@@ -1194,7 +1194,7 @@ int cservice::OnChannelEvent( const channelEventType& whichEvent,
 			}
 
 			/* Is it time to set an autotopic? */
-			if (reggedChan->getLastTopic() + topic_duration <= ::time(NULL))
+			if (reggedChan->getFlag(sqlChannel::F_AUTOTOPIC) && (reggedChan->getLastTopic() + topic_duration <= ::time(NULL)))
 			{
 				doAutoTopic(reggedChan);
 			}

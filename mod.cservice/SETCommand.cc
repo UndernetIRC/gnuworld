@@ -8,7 +8,7 @@
  *
  * Caveats: SET LANG is still under consideration.
  *
- * $Id: SETCommand.cc,v 1.8 2001/01/19 23:01:56 gte Exp $
+ * $Id: SETCommand.cc,v 1.9 2001/01/20 16:40:02 gte Exp $
  */
 
 #include	<string>
@@ -20,7 +20,7 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char SETCommand_cc_rcsId[] = "$Id: SETCommand.cc,v 1.8 2001/01/19 23:01:56 gte Exp $" ;
+const char SETCommand_cc_rcsId[] = "$Id: SETCommand.cc,v 1.9 2001/01/20 16:40:02 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -58,8 +58,7 @@ bool SETCommand::Exec( iClient* theClient, const string& Message )
 	}
 	// Check level.
 
-	int level = bot->getAccessLevel(theUser, theChan);
- 
+	int level = bot->getEffectiveAccessLevel(theUser, theChan, false); 
 	string option = string_upper(st[2]);
 	string value = string_upper(st[3]);
 	
