@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# From configure.in Revision: 1.14 
+# From configure.in Revision: 1.15 
 
 
 
@@ -3746,7 +3746,7 @@ done
 ac_given_srcdir=$srcdir
 ac_given_INSTALL="$INSTALL"
 
-trap 'rm -fr `echo "lib/Makefile src/Makefile \
+trap 'rm -fr `echo "Makefile lib/Makefile src/Makefile \
 mod.ccontrol/Makefile \
 mod.clientExample/Makefile \
 mod.cloner/Makefile \
@@ -3867,7 +3867,7 @@ EOF
 
 cat >> $CONFIG_STATUS <<EOF
 
-CONFIG_FILES=\${CONFIG_FILES-"lib/Makefile src/Makefile \
+CONFIG_FILES=\${CONFIG_FILES-"Makefile lib/Makefile src/Makefile \
 mod.ccontrol/Makefile \
 mod.clientExample/Makefile \
 mod.cloner/Makefile \
