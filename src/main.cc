@@ -1,5 +1,5 @@
 /* main.cc
- * $Id: main.cc,v 1.31 2001/07/17 13:42:51 dan_karrels Exp $
+ * $Id: main.cc,v 1.32 2001/07/20 01:30:22 dan_karrels Exp $
  */
 
 #include	<new>
@@ -19,9 +19,10 @@
 #include	"FileSocket.h" 
 #include	"server.h"
 #include	"moduleLoader.h"
+#include	"md5hash.h"
 
 const char config_h_rcsId[] = __CONFIG_H ;
-const char main_cc_rcsId[] = "$Id: main.cc,v 1.31 2001/07/17 13:42:51 dan_karrels Exp $" ;
+const char main_cc_rcsId[] = "$Id: main.cc,v 1.32 2001/07/20 01:30:22 dan_karrels Exp $" ;
 const char ELog_h_rcsId[] = __ELOG_H ;
 const char FileSocket_h_rcsId[] = __FILESOCKET_H ;
 const char server_h_rcsId[] = __SERVER_H ;
@@ -59,6 +60,8 @@ clog << endl ;
 
 int main( int argc, char** argv )
 {
+
+md5 dummy ;
 
 gnuworld::xServer* theServer =
 	new (nothrow) gnuworld::xServer( argc, argv ) ;
