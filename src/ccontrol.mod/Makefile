@@ -1,13 +1,13 @@
 # Generated automatically from Makefile.in by configure.
 
-SHLIB_CXX = g++ -fPIC
-SHLIB_LD = /usr/ccs/bin/ld -G -z text
+SHLIB_CXX = g++
+SHLIB_LD = g++ -shared -nostartfiles
 
-MOD_CXX = g++ -fPIC -shared
+MOD_CXX = g++
 MOD_LD = g++
 
-CXXFLAGS = -g -Wall -O2 -I/tmp/gnuworld/include -I/tmp/gnuworld/lib
-BIN_PATH = /tmp/gnuworld/bin
+CXXFLAGS = -g -Wall -O0 -I/home/dan/gnuworld/include -I/home/dan/gnuworld/lib
+BIN_PATH = /home/dan/gnuworld/bin
 
 OBJS = CControlCommands.o
 
@@ -39,47 +39,62 @@ depend:
 	$(CXX) $(CXXFLAGS) -MM ccontrol.cc CControlCommands.cc >> Makefile
 
 # DO NOT DELETE THIS LINE
-ccontrol.o: ccontrol.cc /tmp/gnuworld/include/client.h \
- /tmp/gnuworld/include/server.h /tmp/gnuworld/include/Numeric.h \
- /tmp/gnuworld/include/iServer.h /tmp/gnuworld/include/ELog.h \
- /tmp/gnuworld/include/config.h /tmp/gnuworld/include/iClient.h \
- /tmp/gnuworld/include/Channel.h /tmp/gnuworld/include/ChannelUser.h \
- /tmp/gnuworld/lib/xparameters.h /tmp/gnuworld/include/Ban.h \
- /tmp/gnuworld/lib/Socket.h /usr/include/netinet/tcp.h \
- /usr/local/lib/gcc-lib/sparc-sun-solaris2.8/2.95.2/../../../../include/g++-3/cstdio \
- /usr/local/lib/gcc-lib/sparc-sun-solaris2.8/2.95.2/../../../../include/g++-3/cerrno \
- /usr/local/lib/gcc-lib/sparc-sun-solaris2.8/2.95.2/../../../../include/g++-3/cstdlib \
+ccontrol.o: ccontrol.cc /home/dan/gnuworld/include/client.h \
+ /home/dan/gnuworld/include/server.h \
+ /home/dan/gnuworld/include/Numeric.h \
+ /home/dan/gnuworld/include/iServer.h \
+ /home/dan/gnuworld/include/ELog.h /home/dan/gnuworld/include/config.h \
+ /home/dan/gnuworld/include/iClient.h \
+ /home/dan/gnuworld/include/Channel.h \
+ /home/dan/gnuworld/include/ChannelUser.h \
+ /home/dan/gnuworld/lib/xparameters.h /home/dan/gnuworld/include/Ban.h \
+ /home/dan/gnuworld/lib/Socket.h /usr/include/netinet/tcp.h \
+ /usr/local/lib/gcc-lib/i686-pc-linux-gnu/2.95.2/../../../../include/g++-3/cstdio \
+ /usr/local/lib/gcc-lib/i686-pc-linux-gnu/2.95.2/../../../../include/g++-3/cerrno \
+ /usr/local/lib/gcc-lib/i686-pc-linux-gnu/2.95.2/../../../../include/g++-3/cstdlib \
  /usr/include/unistd.h /usr/include/netdb.h \
- /usr/local/lib/gcc-lib/sparc-sun-solaris2.8/2.95.2/include/limits.h \
- /usr/include/strings.h /usr/include/fcntl.h /usr/include/sys/stat.h \
- /usr/include/arpa/inet.h /tmp/gnuworld/lib/ClientSocket.h \
- /tmp/gnuworld/lib/Buffer.h /tmp/gnuworld/include/VectorTrie.h \
- /tmp/gnuworld/include/VectorTrieNode.h /tmp/gnuworld/include/events.h \
- /tmp/gnuworld/include/Gline.h /tmp/gnuworld/lib/misc.h \
- /tmp/gnuworld/include/moduleLoader.h \
- /tmp/gnuworld/include/MessageNode.h /tmp/gnuworld/include/EConfig.h \
- /tmp/gnuworld/lib/StringTokenizer.h /tmp/gnuworld/include/Network.h \
- /tmp/gnuworld/include/ccontrol.h \
- /tmp/gnuworld/include/CControlCommands.h
+ /usr/local/lib/gcc-lib/i686-pc-linux-gnu/2.95.2/include/limits.h \
+ /usr/include/strings.h /usr/include/fcntl.h /usr/include/sys/uio.h \
+ /usr/include/sys/time.h /usr/include/sys/stat.h \
+ /usr/include/arpa/inet.h /home/dan/gnuworld/lib/ClientSocket.h \
+ /home/dan/gnuworld/lib/Buffer.h \
+ /home/dan/gnuworld/include/VectorTrie.h \
+ /home/dan/gnuworld/include/VectorTrieNode.h \
+ /home/dan/gnuworld/include/events.h \
+ /home/dan/gnuworld/include/Gline.h /home/dan/gnuworld/lib/misc.h \
+ /home/dan/gnuworld/include/moduleLoader.h \
+ /home/dan/gnuworld/include/MessageNode.h \
+ /home/dan/gnuworld/include/EConfig.h \
+ /home/dan/gnuworld/lib/StringTokenizer.h \
+ /home/dan/gnuworld/include/Network.h \
+ /home/dan/gnuworld/include/ccontrol.h \
+ /home/dan/gnuworld/include/CControlCommands.h
 CControlCommands.o: CControlCommands.cc \
- /tmp/gnuworld/include/ccontrol.h /tmp/gnuworld/include/client.h \
- /tmp/gnuworld/include/server.h /tmp/gnuworld/include/Numeric.h \
- /tmp/gnuworld/include/iServer.h /tmp/gnuworld/include/ELog.h \
- /tmp/gnuworld/include/config.h /tmp/gnuworld/include/iClient.h \
- /tmp/gnuworld/include/Channel.h /tmp/gnuworld/include/ChannelUser.h \
- /tmp/gnuworld/lib/xparameters.h /tmp/gnuworld/include/Ban.h \
- /tmp/gnuworld/lib/Socket.h /usr/include/netinet/tcp.h \
- /usr/local/lib/gcc-lib/sparc-sun-solaris2.8/2.95.2/../../../../include/g++-3/cstdio \
- /usr/local/lib/gcc-lib/sparc-sun-solaris2.8/2.95.2/../../../../include/g++-3/cerrno \
+ /home/dan/gnuworld/include/ccontrol.h \
+ /home/dan/gnuworld/include/client.h \
+ /home/dan/gnuworld/include/server.h \
+ /home/dan/gnuworld/include/Numeric.h \
+ /home/dan/gnuworld/include/iServer.h \
+ /home/dan/gnuworld/include/ELog.h /home/dan/gnuworld/include/config.h \
+ /home/dan/gnuworld/include/iClient.h \
+ /home/dan/gnuworld/include/Channel.h \
+ /home/dan/gnuworld/include/ChannelUser.h \
+ /home/dan/gnuworld/lib/xparameters.h /home/dan/gnuworld/include/Ban.h \
+ /home/dan/gnuworld/lib/Socket.h /usr/include/netinet/tcp.h \
+ /usr/local/lib/gcc-lib/i686-pc-linux-gnu/2.95.2/../../../../include/g++-3/cstdio \
+ /usr/local/lib/gcc-lib/i686-pc-linux-gnu/2.95.2/../../../../include/g++-3/cerrno \
  /usr/include/unistd.h /usr/include/netdb.h \
- /usr/local/lib/gcc-lib/sparc-sun-solaris2.8/2.95.2/include/limits.h \
- /usr/include/strings.h /usr/include/fcntl.h /usr/include/sys/stat.h \
- /usr/include/arpa/inet.h /tmp/gnuworld/lib/ClientSocket.h \
- /tmp/gnuworld/lib/Buffer.h /tmp/gnuworld/include/VectorTrie.h \
- /tmp/gnuworld/include/VectorTrieNode.h /tmp/gnuworld/include/events.h \
- /tmp/gnuworld/include/Gline.h /tmp/gnuworld/lib/misc.h \
- /tmp/gnuworld/include/moduleLoader.h \
- /tmp/gnuworld/include/MessageNode.h \
- /tmp/gnuworld/include/CControlCommands.h \
- /tmp/gnuworld/lib/StringTokenizer.h /tmp/gnuworld/include/Network.h \
- /tmp/gnuworld/include/ip.h
+ /usr/local/lib/gcc-lib/i686-pc-linux-gnu/2.95.2/include/limits.h \
+ /usr/include/strings.h /usr/include/fcntl.h /usr/include/sys/uio.h \
+ /usr/include/sys/time.h /usr/include/sys/stat.h \
+ /usr/include/arpa/inet.h /home/dan/gnuworld/lib/ClientSocket.h \
+ /home/dan/gnuworld/lib/Buffer.h \
+ /home/dan/gnuworld/include/VectorTrie.h \
+ /home/dan/gnuworld/include/VectorTrieNode.h \
+ /home/dan/gnuworld/include/events.h \
+ /home/dan/gnuworld/include/Gline.h /home/dan/gnuworld/lib/misc.h \
+ /home/dan/gnuworld/include/moduleLoader.h \
+ /home/dan/gnuworld/include/MessageNode.h \
+ /home/dan/gnuworld/include/CControlCommands.h \
+ /home/dan/gnuworld/lib/StringTokenizer.h \
+ /home/dan/gnuworld/include/Network.h /home/dan/gnuworld/include/ip.h

@@ -1,12 +1,12 @@
 # Generated automatically from Makefile.in by configure.
 
-SHLIB_CXX = g++ -fPIC
-SHLIB_LD = /usr/ccs/bin/ld -G -z text
+SHLIB_CXX = g++
+SHLIB_LD = g++ -shared -nostartfiles
 
-MOD_CXX = g++ -fPIC
+MOD_CXX = g++
 MOD_LD = g++
 
-CXXFLAGS = -g -Wall -O0 -I/tmp/gnuworld/include -I/tmp/gnuworld/lib
+CXXFLAGS = -g -Wall -O0 -I/home/dan/gnuworld/include -I/home/dan/gnuworld/lib
 
 OBJS = cservice.o
 RM = rm
