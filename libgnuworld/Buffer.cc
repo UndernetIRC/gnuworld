@@ -25,7 +25,7 @@
 #include	"Buffer.h"
 
 const char Buffer_h_rcsId[] = __BUFFER_H ;
-const char Buffer_cc_rcsId[] = "$Id: Buffer.cc,v 1.2 2002/11/29 19:30:02 dan_karrels Exp $" ;
+const char Buffer_cc_rcsId[] = "$Id: Buffer.cc,v 1.3 2002/11/29 20:54:03 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -71,6 +71,23 @@ retMe = buf.substr( 0, pos + 1 ) ;
 buf.erase( 0, pos + 1 ) ;
 
 return true ;
+}
+
+// Delete numBytes bytes from the beginning
+// of the Buffer
+void Buffer::Delete( const size_type& numBytes )
+{
+if( numBytes >= size() )
+	{
+	// Clear the entire Buffer
+	// GNU's string implementation doesn't include clear() for some
+	// reason :(
+	buf.erase( buf.begin(), buf.end() ) ;
+	return ;
+	}
+
+// Else just erase the number of bytes given
+buf.erase( 0, numBytes ) ;
 }
 
 } // namespace gnuworld
