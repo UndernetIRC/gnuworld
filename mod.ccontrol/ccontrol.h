@@ -3,7 +3,7 @@
  */
 
 #ifndef __CCONTROL_H
-#define __CCONTROL_H "$Id: ccontrol.h,v 1.67 2002/03/15 06:53:48 mrbean_ Exp $"
+#define __CCONTROL_H "$Id: ccontrol.h,v 1.68 2002/03/20 22:23:50 mrbean_ Exp $"
 
 //Undef this if you want to log to the database
 #define LOGTOHD 
@@ -15,7 +15,7 @@
 #include        <iomanip>
 
 #include	<cstdio>
-
+#include	<stdarg.h>
 #include	"client.h"
 #include	"iClient.h"
 #include	"server.h"

@@ -1,5 +1,5 @@
 
--- "$Id: ccontrol.update.sql,v 1.16 2002/03/14 20:35:14 mrbean_ Exp $"
+-- "$Id: ccontrol.update.sql,v 1.17 2002/03/20 22:23:48 mrbean_ Exp $"
 
 -- ccontrol database changes update
 -- this file will add the new features to an old database
@@ -84,6 +84,10 @@
 --	Value4 VARCHAR(40),
 --	Value5 VARCHAR(128)
 --	);
--- 14/03/02 Add Lastcom command for opers
+-- 14/03/02 Add MaxUsers command for opers
 	
-update opers set saccess = (saccess | 262144);
+--update opers set saccess = (saccess | 262144);
+
+-- 20/03/02 Add LASTCOM command for opers
+update opers set saccess = (saccess | 8);
+
