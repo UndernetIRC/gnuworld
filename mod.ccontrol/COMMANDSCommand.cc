@@ -13,10 +13,9 @@
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 #include        "ccUser.h"
-#include	"AuthInfo.h"
 #include	"misc.h"
 
-const char COMMANDSCommand_cc_rcsId[] = "$Id: COMMANDSCommand.cc,v 1.5 2001/11/20 19:49:45 mrbean_ Exp $";
+const char COMMANDSCommand_cc_rcsId[] = "$Id: COMMANDSCommand.cc,v 1.6 2001/12/14 08:00:19 mrbean_ Exp $";
 
 namespace gnuworld
 {
