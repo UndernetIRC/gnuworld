@@ -302,7 +302,9 @@ unsigned short cservice::getFloodPoints(iClient* theClient)
 
 networkData* tmpData =
 	static_cast< networkData* >( theClient->getCustomData(this) ) ;
-assert(tmpData != NULL);
+
+if(!tmpData) return 0;
+//assert(tmpData != NULL);
  
 return tmpData->flood_points;
 }
@@ -311,7 +313,8 @@ void cservice::setFloodPoints(iClient* theClient, unsigned short amount)
 { 
 networkData* tmpData =
 	static_cast< networkData* >( theClient->getCustomData(this) ) ;
-assert(tmpData != NULL);
+if (!tmpData) return;
+//assert(tmpData != NULL);
 
 tmpData->flood_points = amount; 
 }	
@@ -324,7 +327,8 @@ void cservice::setLastRecieved(iClient* theClient, time_t last_recieved)
 {
 networkData* tmpData =
 	static_cast< networkData* >( theClient->getCustomData(this) ) ;
-assert(tmpData != NULL);
+if(!tmpData) return;
+//assert(tmpData != NULL);
 
 tmpData->messageTime = last_recieved;
 }	
@@ -337,7 +341,8 @@ time_t cservice::getLastRecieved(iClient* theClient)
 {
 networkData* tmpData =
 	static_cast< networkData* >( theClient->getCustomData(this) ) ;
-assert(tmpData != NULL);
+if(!tmpData) return 0;
+//assert(tmpData != NULL);
 
 return tmpData->messageTime;
 }	
@@ -411,7 +416,8 @@ void cservice::setOutputTotal(const iClient* theClient, unsigned int count)
 
 networkData* tmpData =
 	static_cast< networkData* >( theClient->getCustomData(this) );
-assert(tmpData != NULL);
+if (!tmpData) return;
+//assert(tmpData != NULL);
 
 tmpData->outputCount = count;
 } 
@@ -420,7 +426,8 @@ unsigned int cservice::getOutputTotal(const iClient* theClient)
 {
 networkData* tmpData =
 	static_cast< networkData* >( theClient->getCustomData(this) );
-assert(tmpData != NULL);
+if (!tmpData) return 0;
+//assert(tmpData != NULL);
 
 return tmpData->outputCount;
 }	
@@ -569,7 +576,7 @@ else if(Command == "VERSION")
 	xClient::DoCTCP(theClient, CTCP,
 		"Undernet P10 Channel Services Version 2 ["
 		__DATE__ " " __TIME__
-		"] ($Id: cservice.cc,v 1.88 2001/02/08 21:50:57 gte Exp $)");
+		"] ($Id: cservice.cc,v 1.89 2001/02/08 21:56:10 gte Exp $)");
 	}
 else if(Command == "PROBLEM?")
 	{
