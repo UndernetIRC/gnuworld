@@ -1,3 +1,10 @@
+/*
+ * SUSPENDOPERCommand.cc
+ *
+ * Set oper as suspended
+ *
+ */
+
 #include	<string>
 #include	<cstdlib>
 #include        <iomanip.h>
@@ -5,7 +12,7 @@
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 
-const char SUSPENDOPERCommand_cc_rcsId[] = "$Id: SUSPENDOPERCommand.cc,v 1.4 2001/02/25 19:52:06 mrbean_ Exp $";
+const char SUSPENDOPERCommand_cc_rcsId[] = "$Id: SUSPENDOPERCommand.cc,v 1.5 2001/02/26 16:58:06 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -22,21 +29,20 @@ if( st.size() < 4 )
 	Usage(theClient);
 	return true;
 	}
-	
+//Fetch the oper record from the database	
 ccUser *tmpUser = bot->GetUser(st[1]);
 if(!tmpUser)
 	{
 	bot->Notice(theClient,"%s isnt on my access list",st[1].c_str());
 	return false;
 	}
-	
-if(tmpUser->getFlags() & isSUSPENDED)
+if(tmpUser->gotFlag(isSUSPENDED))
 	{
 	bot->Notice(theClient,"%s is already suspended",st[1].c_str());
 	delete tmpUser;
 	return false;
 	}
-	
+//Fill in the suspendtion period according to the user entry	
 if(!strcasecmp(st[3].c_str(),"s"))
 	tmpUser->setSuspendExpires(atoi(st[2].c_str()));
 else if(!strcasecmp(st[3].c_str(),"m"))
@@ -51,6 +57,7 @@ else
 	delete tmpUser;
 	return false;
 	}
+//Set the suspention and update the db
 tmpUser->setSuspendExpires(tmpUser->getSuspendExpires() + time( 0 ));
 tmpUser->setSuspendedBy(theClient->getNickUserHost());	    
 tmpUser->setFlag(isSUSPENDED);

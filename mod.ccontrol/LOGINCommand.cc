@@ -1,3 +1,9 @@
+/*
+ * LOGINCommand.cc
+ *
+ * Authenticates you with the bot
+ */
+
 #include	<string>
 #include	<cstdlib>
 #include        <iomanip>
@@ -7,7 +13,7 @@
 #include	"md5hash.h" 
 #include        "ccUser.h"
 
-const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.6 2001/02/25 19:52:06 mrbean_ Exp $";
+const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.7 2001/02/26 16:58:05 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -23,10 +29,11 @@ if( st.size() < 3 )
 	Usage(theClient);
 	return true;
 	}
-
+//Try fetching the user authenticate entry
 AuthInfo* tmpUser = bot->IsAuth(theClient->getCharYYXXX());
 if (tmpUser) 
 	{
+	//Dont let him authenticate under a new name (for now)
 	bot->Notice(theClient, "You  are already authenticated! ");
 	return false;
 	}
@@ -43,15 +50,13 @@ if (!theUser)
 	}
 else
 	{ 
-		/*
-		 *  Compare password with MD5 hash stored in user record.
-		 */
-
-/*	if(!bot->UserGotMask(theUser,theClient->getNickUserHost()))
+	//Check if the users mask is in his access list
+	if(!bot->UserGotMask(theUser,theClient->getNickUserHost()))
 		{
 		bot->Notice(theClient,"Sorry but your mask doesnt appear in my access list!");
+		delete theUser;
 		return false;
-		}*/
+		}
 
 	md5	hash; // MD5 hash algorithm object.
 	md5Digest digest; // MD5Digest algorithm object.
@@ -82,19 +87,22 @@ else
 	if (md5Part != output.str()) // If the MD5 hash's don't match..
 		{
 		bot->Notice(theClient, "AUTHENTICATION FAILED as %s (Invalid Password).", theUser->getUserName().c_str());
+		delete theUser;
 		return false;
 		}
-
+	//Ok the password match , prepare the ccUser data
 	theUser->setUserName(st[1]);
 	theUser->setNumeric(theClient->getCharYYXXX());
-	if(bot->AuthOper(theUser))
-	if(!(theUser->getFlags() & isSUSPENDED))
+
+	//Try creating an authentication entry for the user
+	if(bot->AuthUser(theUser))
+	if(!(theUser->gotFlag(isSUSPENDED)))
 		bot->Notice(theClient, "Authentication successful! ",theUser->getUserName().c_str()); 
 	else 
 		bot->Notice(theClient, "Authentication successful,However you are suspended ",theUser->getUserName().c_str()); 
 	else
 	        bot->Notice(theClient, "Error in authentication ",theUser->getUserName().c_str()); 
-	delete (theUser);
+	delete theUser;
 	} 
 
 return true; 

@@ -1,3 +1,9 @@
+/*
+ * KICKCommand.cc
+ *
+ * Kick a user from a channel
+ */
+
 #include	<string>
 #include	<cstdlib>
 #include        <iomanip.h>
@@ -6,7 +12,7 @@
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 
-const char KICKCommand_cc_rcsId[] = "$Id: KICKCommand.cc,v 1.3 2001/02/23 20:19:43 mrbean_ Exp $";
+const char KICKCommand_cc_rcsId[] = "$Id: KICKCommand.cc,v 1.4 2001/02/26 16:58:05 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -24,6 +30,7 @@ if( st.size() < 4 )
 	return true ;
 	}
 
+//Check if the channel begins with # , if not add it
 string chanName = st[ 1 ] ;
 if( chanName[ 0 ] != '#' )
 	{
@@ -51,7 +58,19 @@ bot->Notice( theClient, "Kicking %s from channel %s because %s",
 	chanName.c_str(),
 	st.assemble( 3 ).c_str() ) ;
 
+//If its an oper channel , no need to join and part the channel , so just kick the user
+if( bot->isOperChan( chanName ) )
+	{
+	bot->Kick( theChan, Target, st.assemble( 3 ) ) ;
+	return true ;
+	}
+//Its not an oper channel 
+bot->Join( chanName, string(), 0, true ) ;
+
 bot->Kick( theChan, Target, st.assemble( 3 ) ) ;
+
+bot->Part( chanName ) ;
+
 return true ;
 }
 }

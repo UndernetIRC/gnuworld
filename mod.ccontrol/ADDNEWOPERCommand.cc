@@ -1,3 +1,15 @@
+/*
+ * ADDNEWOPERCommand.cc
+ *
+ * Adds a new oper to the bot database
+ * 
+ * when adding a new oper one must specify access flags
+ * 
+ * the oper initial commands is defined by these flags 
+ *
+ * the defualt flags can be found in CControlCommands.h file
+ */
+
 #include	<string>
 #include	<cstdlib>
 #include        <iomanip.h>
@@ -6,7 +18,7 @@
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 
-const char ADDNEWOPERCommand_cc_rcsId[] = "$Id: ADDNEWOPERCommand.cc,v 1.4 2001/02/25 19:52:06 mrbean_ Exp $";
+const char ADDNEWOPERCommand_cc_rcsId[] = "$Id: ADDNEWOPERCommand.cc,v 1.5 2001/02/26 16:58:05 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -23,14 +35,17 @@ if( st.size() < 4 )
 	Usage(theClient);
 	return true;
 	}
- 
+
+//Try fetching the user data from the database, note this is the new user handle
 ccUser* theUser = bot->GetUser(st[1]);
-if (theUser) 
+if (theUser)  
 	{ 
 	bot->Notice(theClient,"Oper %s already exsits in my db," 
 	"please change the oper handle and try again",theUser->getUserName().c_str());
-        return false;
+        delete theUser;
+	return false;
 	}	    
+
 unsigned int NewAccess;
 unsigned int NewFlags;
 if(!strcasecmp(st[2].c_str(),"coder"))
@@ -56,12 +71,15 @@ else
 
 AuthInfo *tOper = bot->IsAuth(theClient->getCharYYXXX());
 
+
+//Check if the user doesnt try to add an oper with higher flag than he is
 if(tOper->Flags < NewFlags)
 	{
 	bot->Notice(theClient,"You can't add an oper with higher access than yours!");
 	return false;
 	}	     	
 
+//Create the new user and update the database
 theUser = new ccUser(bot->SQLDb);
 theUser->setUserName(st[1]);
 theUser->setPassword(bot->CryptPass(st[3]));
@@ -72,6 +90,7 @@ if(bot->AddOper(theUser) == true)
 	bot->Notice(theClient, "Oper successfully Added.");
 else
 	bot->Notice(theClient, "Error while adding new oper.");
+delete theUser;
 return true; 
 }
 }

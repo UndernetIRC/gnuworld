@@ -1,7 +1,7 @@
 /* ccUser.h */
 
 #ifndef __CCUSER_H
-#define __CCUSER_H "$Id: ccUser.h,v 1.5 2001/02/25 19:52:06 mrbean_ Exp $"
+#define __CCUSER_H "$Id: ccUser.h,v 1.6 2001/02/26 16:58:06 mrbean_ Exp $"
 
 #include	<string>
 
@@ -50,9 +50,16 @@ public:
 	inline const unsigned int&	getAccess() const
 		{ return Access ; }
 
+	inline const bool    gotAccess(unsigned int _command) const
+		{ return (Access & _command ? true : false) ; }
+	
 	inline const unsigned int&	getFlags() const
 		{ return Flags ; }
+	
+	inline const bool    gotFlag(unsigned int _flag) const
+		{ return (Flags & _flag ? true : false) ; }
 
+	
 	/*
 	 * Methods to set data attributes
 	 */

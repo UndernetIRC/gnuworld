@@ -1,3 +1,10 @@
+/*
+ * WHOISCommand.cc
+ *
+ * Gives varius data about a user
+ *
+*/
+
 #include	<string>
 #include	<cstdlib>
 #include        <iomanip.h>
@@ -7,7 +14,7 @@
 #include	"StringTokenizer.h"
 #include	"ip.h"
 
-const char WHOISCommand_cc_rcsId[] = "$Id: WHOISCommand.cc,v 1.3 2001/02/23 20:19:43 mrbean_ Exp $";
+const char WHOISCommand_cc_rcsId[] = "$Id: WHOISCommand.cc,v 1.4 2001/02/26 16:58:06 mrbean_ Exp $";
 
 namespace gnuworld
 {

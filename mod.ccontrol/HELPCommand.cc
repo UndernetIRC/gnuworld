@@ -1,3 +1,10 @@
+/*
+ * HELPCommand.cc
+ *
+ * Shows help text on commands
+ *
+ */
+
 #include	<string>
 #include	<cstdlib>
 #include        <iomanip.h>
@@ -7,7 +14,7 @@
 #include	"StringTokenizer.h"
 
 
-const char HELPCommand_cc_rcsId[] = "$Id: HELPCommand.cc,v 1.3 2001/02/23 20:19:43 mrbean_ Exp $";
+const char HELPCommand_cc_rcsId[] = "$Id: HELPCommand.cc,v 1.4 2001/02/26 16:58:05 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -25,7 +32,7 @@ banner += bot->getNickName() + " ---" ;
 
 bot->Notice( theClient, banner ) ;
 
-
+// Check if the user didnt supply a command 
 if( 1 == st.size() )
 	{
 	// Spit out all commands
@@ -35,7 +42,7 @@ if( 1 == st.size() )
 		bot->Notice( theClient, ptr->second->getName() ) ;
 		}
 	}
-else
+else //Supplied a command, show only the help for that command (if it exists)
 	{
 	ccontrol::constCommandIterator ptr =
 		bot->findCommand( string_upper( st[ 1 ] ) ) ;

@@ -3,7 +3,7 @@
  */
 
 #ifndef __CCONTROL_H
-#define __CCONTROL_H "$Id: ccontrol.h,v 1.11 2001/02/25 19:52:06 mrbean_ Exp $"
+#define __CCONTROL_H "$Id: ccontrol.h,v 1.12 2001/02/26 16:58:06 mrbean_ Exp $"
 
 #include	<string>
 #include	<vector>
@@ -256,7 +256,7 @@ public:
 	
 	ccUser *GetOper( const string );
 
-	bool AuthOper( ccUser* );
+//	bool AuthOper( ccUser* );
 	
     	/**
 	 * This is a constant iterator type used to perform a read-only

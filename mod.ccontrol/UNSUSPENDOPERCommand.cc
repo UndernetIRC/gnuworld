@@ -1,3 +1,10 @@
+/*
+ * UNSUSPENDOPERCommand.cc
+ *
+ * Unsuspend an oper
+ *
+*/
+
 #include	<string>
 #include	<cstdlib>
 #include        <iomanip.h>
@@ -5,7 +12,7 @@
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 
-const char UNSUSPENDOPERCommand_cc_rcsId[] = "$Id: UNSUSPENDOPERCommand.cc,v 1.4 2001/02/25 19:52:06 mrbean_ Exp $";
+const char UNSUSPENDOPERCommand_cc_rcsId[] = "$Id: UNSUSPENDOPERCommand.cc,v 1.5 2001/02/26 16:58:06 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -22,7 +29,8 @@ if( st.size() < 2 )
 	Usage(theClient);
 	return true;
 	}
-	
+
+//Fetch the user record from the database	
 ccUser *tmpUser = bot->GetUser(st[1]);
 if(!tmpUser)
 	{
@@ -30,12 +38,13 @@ if(!tmpUser)
 	return false;
 	}
 	
-if(!(tmpUser->getFlags() & isSUSPENDED))
+if(!(tmpUser->gotFlag(isSUSPENDED)))
 	{
 	bot->Notice(theClient,"%s is not suspended",st[1].c_str());
 	return false;
 	}
-	
+
+//Remove the suspention and update the database	
 tmpUser->setSuspendExpires(0);
 tmpUser->removeFlag(isSUSPENDED);
 tmpUser->setSuspendedBy("");
@@ -50,6 +59,7 @@ if(tmpUser->Update())
 else
 	{
 	bot->Notice(theClient,"Error while unsuspendeding %s",st[1].c_str());
+	delete tmpUser;
 	return false;
 	}
 

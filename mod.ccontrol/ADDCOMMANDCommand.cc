@@ -1,3 +1,11 @@
+/*
+ * ADDCOMMANDCommand.cc
+ *
+ * Adds a new command to an oper
+ *     
+ */
+ 
+
 #include	<string>
 #include	<cstdlib>
 #include        <iomanip.h>
@@ -7,7 +15,7 @@
 #include	"StringTokenizer.h"
 #include        "ccUser.h"
 
-const char ADDCOMMANDCommand_cc_rcsId[] = "$Id: ADDCOMMANDCommand.cc,v 1.4 2001/02/25 19:52:06 mrbean_ Exp $";
+const char ADDCOMMANDCommand_cc_rcsId[] = "$Id: ADDCOMMANDCommand.cc,v 1.5 2001/02/26 16:58:05 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -25,7 +33,7 @@ if( st.size() < 3 )
 	}
 
 
-//User* theUser = bot->GetUser(st[1]);
+//Fetch the oper record from the db
 ccUser* theUser = bot->GetOper(st[1]);
 	
 if(!theUser)
@@ -45,6 +53,7 @@ if(CommandLevel < 0 )
 	
 AuthInfo *AClient = bot->IsAuth(theClient->getCharYYXXX());
 	
+//Only allow opers who have access to that command to add it to new opers
 if(!(AClient->Access & CommandLevel))
 	{
 	bot->Notice(theClient,"You must have access to a command inorder to add it");
@@ -52,25 +61,29 @@ if(!(AClient->Access & CommandLevel))
 	return false;
 	}
 	
-else if(theUser->getAccess() & CommandLevel)
+//else if(theUser->getAccess() & CommandLevel)
+else if(theUser->gotAccess(CommandLevel))	
 	{
 	bot->Notice(theClient,"%s already got access for %s",st[1].c_str(),st[2].c_str());
 	delete theUser;
 	return false;	        
 	}	
-	
+
+//Add the command and update the user db record	
 theUser->addCommand(CommandLevel);
 theUser->setLast_Updated_By(theClient->getNickUserHost());
 if(theUser->Update())
 	{
 	bot->Notice(theClient,"Successfully added the command for %s",st[1].c_str());
-	bot->UpdateAuth(theUser);
+	//If the user is authenticated update his authenticate entry
+	bot->UpdateAuth(theUser); 
 	delete theUser;
 	return true;
 	}
 else
 	{
 	bot->Notice(theClient,"Error while adding command for %s",st[1].c_str());
+	delete theUser;
 	return false;
 	}
 	

@@ -1,3 +1,10 @@
+/*
+ * TRANSLATECommand.cc
+ *
+ * Translates a numeric to a nick
+ *
+ */
+
 #include	<string>
 #include	<cstdlib>
 #include        <iomanip.h>
@@ -6,7 +13,7 @@
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 
-const char TRANSLATECommand_cc_rcsId[] = "$Id: TRANSLATECommand.cc,v 1.3 2001/02/23 20:19:43 mrbean_ Exp $";
+const char TRANSLATECommand_cc_rcsId[] = "$Id: TRANSLATECommand.cc,v 1.4 2001/02/26 16:58:06 mrbean_ Exp $";
 
 namespace gnuworld
 {

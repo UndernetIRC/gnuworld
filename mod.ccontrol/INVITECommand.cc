@@ -1,3 +1,10 @@
+/*
+ * INVITECommand.cc
+ *
+ * Cause the bot to invite you to a channel
+ *
+ */
+
 #include	<string>
 #include	<cstdlib>
 #include        <iomanip.h>
@@ -6,7 +13,7 @@
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 
-const char INVITECommand_cc_rcsId[] = "$Id: INVITECommand.cc,v 1.3 2001/02/23 20:19:43 mrbean_ Exp $";
+const char INVITECommand_cc_rcsId[] = "$Id: INVITECommand.cc,v 1.4 2001/02/26 16:58:05 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -26,6 +33,7 @@ if( st.size() == 1 )
 	return false ;
 	}
 
+//If the channel doesnt begin with # add it 
 string chanName = st[ 1 ] ;
 if( chanName[ 0 ] != '#' )
 	{

@@ -1,3 +1,10 @@
+/*
+ * SCANGLINECommand.cc
+ *
+ * Check if a certain host is glined, if it is returns the glines info
+ *
+ */
+
 #include	<string>
 #include	<cstdlib>
 #include        <iomanip.h>
@@ -5,7 +12,7 @@
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 
-const char SCANGLINECommand_cc_rcsId[] = "$Id: SCANGLINECommand.cc,v 1.3 2001/02/23 20:19:43 mrbean_ Exp $";
+const char SCANGLINECommand_cc_rcsId[] = "$Id: SCANGLINECommand.cc,v 1.4 2001/02/26 16:58:06 mrbean_ Exp $";
 
 namespace gnuworld
 {

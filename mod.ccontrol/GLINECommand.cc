@@ -1,3 +1,9 @@
+/*
+ * GLINECommand.cc
+ *
+ * Glines a specific mask 
+ */
+
 #include	<string>
 #include	<cstdlib>
 #include        <iomanip.h>
@@ -12,7 +18,7 @@
 #include	"ELog.h"
 #include	"Gline.h"
 
-const char GLINECommand_cc_rcsId[] = "$Id: GLINECommand.cc,v 1.3 2001/02/23 20:19:43 mrbean_ Exp $";
+const char GLINECommand_cc_rcsId[] = "$Id: GLINECommand.cc,v 1.4 2001/02/26 16:58:05 mrbean_ Exp $";
 
 namespace gnuworld
 {

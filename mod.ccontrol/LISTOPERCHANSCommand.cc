@@ -1,3 +1,10 @@
+/*
+ * LISTOPERCHANSCommand.cc
+ *
+ * List the channels thare are marked as ircops only
+ *
+ */
+
 #include	<string>
 #include	<cstdlib>
 #include        <iomanip.h>
@@ -6,7 +13,7 @@
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 
-const char LISTOPERCHANSCommand_cc_rcsId[] = "$Id: LISTOPERCHANSCommand.cc,v 1.3 2001/02/23 20:19:43 mrbean_ Exp $";
+const char LISTOPERCHANSCommand_cc_rcsId[] = "$Id: LISTOPERCHANSCommand.cc,v 1.4 2001/02/26 16:58:05 mrbean_ Exp $";
 
 namespace gnuworld
 {

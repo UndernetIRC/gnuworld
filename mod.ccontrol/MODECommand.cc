@@ -1,3 +1,9 @@
+/*
+ * MODECommand.cc
+ *
+ * Changes a channel mode
+ */
+
 #include	<string>
 #include	<cstdlib>
 #include        <iomanip.h>
@@ -6,7 +12,7 @@
 #include	"StringTokenizer.h"
 #include	"Network.h"
 
-const char MODECommand_cc_rcsId[] = "$Id: MODECommand.cc,v 1.3 2001/02/23 20:19:43 mrbean_ Exp $";
+const char MODECommand_cc_rcsId[] = "$Id: MODECommand.cc,v 1.4 2001/02/26 16:58:05 mrbean_ Exp $";
 
 namespace gnuworld
 {

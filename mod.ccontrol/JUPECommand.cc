@@ -1,3 +1,9 @@
+/*
+ * JUPECommand.cc
+ *
+ * Jupitur a  server
+ */
+
 #include	<string>
 #include	<cstdlib>
 #include        <iomanip.h>
@@ -6,14 +12,13 @@
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 
-const char JUPECommand_cc_rcsId[] = "$Id: JUPECommand.cc,v 1.3 2001/02/23 20:19:43 mrbean_ Exp $";
+const char JUPECommand_cc_rcsId[] = "$Id: JUPECommand.cc,v 1.4 2001/02/26 16:58:05 mrbean_ Exp $";
 
 namespace gnuworld
 {
 
 using std::string ;
 
-// jupe servername reason
 bool JUPECommand::Exec( iClient* theClient, const string& Message )
 {
 

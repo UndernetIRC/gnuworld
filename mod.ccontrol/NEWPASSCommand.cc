@@ -1,3 +1,9 @@
+/*
+ * NEWPASSCommand.cc
+ *
+ * Changes the user password
+ */
+
 #include	<string>
 #include	<cstdlib>
 #include        <iomanip.h>
@@ -6,7 +12,7 @@
 #include	"StringTokenizer.h"
 #include	"Network.h"
 
-const char NEWPASSCommand_cc_rcsId[] = "$Id: NEWPASSCommand.cc,v 1.4 2001/02/25 19:52:06 mrbean_ Exp $";
+const char NEWPASSCommand_cc_rcsId[] = "$Id: NEWPASSCommand.cc,v 1.5 2001/02/26 16:58:05 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -24,6 +30,7 @@ if( st.size() < 2 )
 	return true;
 	}
 
+//Fetch the user authentication entry
 AuthInfo *tmpUser = bot->IsAuth(theClient->getCharYYXXX());
 
 if(!tmpUser)
@@ -31,7 +38,8 @@ if(!tmpUser)
         bot->Notice(theClient,"You have to be logged in to use this command");
 	return false;
 	}
-	
+
+//Fetch the user record from the database	
 ccUser* theUser = bot->GetUser(tmpUser->Name);
 
 theUser->setPassword(bot->CryptPass(st[1]));

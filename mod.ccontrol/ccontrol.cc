@@ -22,7 +22,7 @@
 #include	"ccontrol.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.16 2001/02/25 19:52:06 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.17 2001/02/26 16:58:06 mrbean_ Exp $" ;
 
 using std::string ;
 using std::vector ;
@@ -331,11 +331,10 @@ else if( (theUser) && (theUser->Flags & isSUSPENDED))
 
 			tmpUser->Update();
     			delete tmpUser;
-			commHandler->second->Exec( theClient, Message) ;
 			}
+		// Execute the command handler
+		commHandler->second->Exec( theClient, Message) ;
 		}
-	// Execute the command handler
-
 	}		
 else
 	commHandler->second->Exec( theClient, Message) ;
@@ -788,22 +787,6 @@ authList.push_back( TempAuth ) ;
 return true;
 }    
 
-bool ccontrol::AuthOper( ccUser* TempUser)
-{
-AuthInfo *TempAuth = new (nothrow) AuthInfo;
-assert( TempAuth != 0 ) ;
-
-TempAuth->Id = TempUser->getID();
-TempAuth->Name = TempUser->getUserName();
-TempAuth->Access = TempUser->getAccess();
-TempAuth->Flags = TempUser->getFlags();
-TempAuth->Numeric = TempUser->getNumeric();
-TempAuth->SuspendExpires = 0;//TempUser->getSuspendExpires();
-TempAuth->SuspendedBy = TempUser->getSuspendedBy();
-
-authList.push_back( TempAuth ) ;
-return true;
-}    
 
 bool ccontrol::deAuthUser( const string& Numeric)
 {
