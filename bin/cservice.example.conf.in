@@ -143,3 +143,12 @@ login_delay = 360
 
 note_duration = 3600
 note_limit = 5
+
+#
+# Pre-cache 'x' days worth of user accounts.
+# This lets you preload all the users who have logged in during the last
+# 'x' number of days to avoid a large number of queries when processing
+# +r accounts during the initial net.burst.
+#
+
+preload_user_days = 1
