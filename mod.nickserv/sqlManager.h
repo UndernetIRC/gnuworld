@@ -1,10 +1,11 @@
 #ifndef _SQLMANAGER_H
-#define _SQLMANAGER_H "$Id: sqlManager.h,v 1.5 2002/08/25 23:12:28 jeekay Exp $"
+#define _SQLMANAGER_H "$Id: sqlManager.h,v 1.6 2002/08/27 20:55:53 jeekay Exp $"
 
 #include <vector>
 
 #include "libpq++.h"
 
+#include "Logger.h"
 #include "Stats.h"
 
 namespace gnuworld {
@@ -68,6 +69,9 @@ class sqlManager {
     
     /** A Stats instance for stats collecting */
     Stats* theStats;
+    
+    /** A Logger instance for logging */
+    logging::Logger* theLogger;
 }; // class sqlManager
 
 } // namespace ns

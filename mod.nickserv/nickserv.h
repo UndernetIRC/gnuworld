@@ -1,5 +1,5 @@
 #ifndef _NICKSERV_H
-#define _NICKSERV_H "$Id: nickserv.h,v 1.7 2002/08/27 16:10:53 jeekay Exp $"
+#define _NICKSERV_H "$Id: nickserv.h,v 1.8 2002/08/27 20:55:53 jeekay Exp $"
 
 #include "client.h"
 #include "EConfig.h"
@@ -64,7 +64,6 @@ class nickserv : public xClient, public logging::logTarget {
     
     typedef map< string, sqlUser*, noCaseCompare > sqlUserHashType;
 
-    typedef map< string, logging::events::eventType, noCaseCompare > logUserCacheType;
     typedef vector< iClient* > logUsersType;
     
   
@@ -160,9 +159,6 @@ class nickserv : public xClient, public logging::logTarget {
     
     /** The cached list of registered users */
     sqlUserHashType sqlUserCache;
-
-    /** The list of cached logged users */
-    logUserCacheType logUserCache;
 
     /** The list of log users */
     logUsersType logUsers;

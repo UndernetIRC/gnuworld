@@ -1,10 +1,11 @@
 #ifndef _SQLUSER_H
-#define _SQLUSER_H "$Id: sqlUser.h,v 1.7 2002/08/25 16:21:44 jeekay Exp $"
+#define _SQLUSER_H "$Id: sqlUser.h,v 1.8 2002/08/27 20:55:53 jeekay Exp $"
 
 #include <string>
 
 #include "libpq++.h"
 
+#include "logTarget.h"
 #include "sqlManager.h"
 
 namespace gnuworld
@@ -45,6 +46,10 @@ class sqlUser
     inline bool getFlag(const flagType& whichFlag) const
       { return (whichFlag == (flags & whichFlag)); }
     
+    /** Get all the flags */
+    inline bool getFlags() const
+      { return flags; }
+    
     /** Get the user level */
     inline unsigned int getLevel() const
        { return level; }
@@ -56,6 +61,10 @@ class sqlUser
     /** Get the registered ts */
     inline unsigned int getRegisteredTS() const
       { return registered_ts; }
+    
+    /** Get the log mask */
+    inline logging::events::eventType getLogMask() const
+      { return logmask; }
     
     
     /* MUTATOR METHODS */
@@ -72,6 +81,10 @@ class sqlUser
     inline void setFlag(const flagType& whichFlag)
       { flags |= whichFlag; }
     
+    /** Set all flags */
+    inline void setFlags(const flagType& whichFlags)
+      { flags = whichFlags; }
+    
     /** Set the user level */
     inline void setLevel(const unsigned int _level)
       { level = _level; }
@@ -84,6 +97,10 @@ class sqlUser
     inline void setRegisteredTS(const unsigned int _registered)
       { registered_ts = _registered; }
     
+    /** Set the log mask */
+    inline void setLogMask(const logging::events::eventType _logmask)
+      { logmask = _logmask; }
+        
     /* MISCELLANEOUS METHODS */
     
     /** Commit this user back to the database */
@@ -111,6 +128,7 @@ class sqlUser
     unsigned int level;
     unsigned int lastseen_ts;
     unsigned int registered_ts;
+    logging::events::eventType logmask;
     
     sqlManager* myManager;
 }; // class sqlUser

@@ -3,7 +3,7 @@
  *
  * Stores a database user
  *
- * $Id: sqlUser.cc,v 1.6 2002/08/25 16:21:44 jeekay Exp $
+ * $Id: sqlUser.cc,v 1.7 2002/08/27 20:55:53 jeekay Exp $
  */
  
  #include <ctime>
@@ -31,7 +31,8 @@ sqlUser::sqlUser(sqlManager* _myManager) :
   flags(0),
   level(0),
   lastseen_ts(0),
-  registered_ts(0)
+  registered_ts(0),
+  logmask(0)
 {
   myManager = _myManager;
 }
@@ -123,6 +124,7 @@ flags = atoi(theDB->GetValue(row, 2));
 level = atoi(theDB->GetValue(row, 3));
 lastseen_ts = atoi(theDB->GetValue(row, 4));
 registered_ts = atoi(theDB->GetValue(row, 5));
+logmask = atoi(theDB->GetValue(row, 6));
 
 if(id > maxUserId) maxUserId = id;
 }

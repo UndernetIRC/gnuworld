@@ -87,6 +87,7 @@ void sqlManager::flush()
 #ifdef LOG_SQL
     elog << "*** [sqlManager:flush] Executing: " << statement << endl;
 #endif
+    theLogger->log(logging::events::E_SQL, "Executing: " + statement);
     if(!SQLDb->ExecCommandOk(statement.c_str())) {
       theStats->incStat("SM.ERROR");
       string error = string(SQLDb->ErrorMessage());
@@ -95,6 +96,9 @@ void sqlManager::flush()
       elog << "*** [sqlManager:flush] Executing: " << statement << endl;
 #endif
       elog << "*** [sqlManager:flush] Error: " << error << endl;
+      
+      theLogger->log(logging::events::E_ERROR, "Executing: " + statement);
+      theLogger->log(logging::events::E_ERROR, "Error    : " + error);
       // TODO: Log error
     }
   }
@@ -135,6 +139,7 @@ SQLDb = getConnection();
 commitQueueMax = _commitQueueMax;
 
 theStats = Stats::getInstance();
+theLogger = logging::Logger::getInstance();
 } // sqlManager::sqlManager
 
 

@@ -18,6 +18,7 @@ Basic Installation Instructions:
 1) Create the nickserv db: createdb nickserv
 
 2) Load the NickServ schema: psql nickserv < nickserv.sql
+2a) Load the logging schema: psql nickserv < nickserv.logging.sql
 
 3) Configure to use nickserv: ./configure --enable-modules=nickserv --other-options-you-use
 

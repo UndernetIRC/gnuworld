@@ -7,7 +7,7 @@
 #include "netData.h"
 #include "nickserv.h"
 
-const char NickServ_cc_rcsId[] = "$Id: nickserv.cc,v 1.10 2002/08/27 16:10:52 jeekay Exp $";
+const char NickServ_cc_rcsId[] = "$Id: nickserv.cc,v 1.11 2002/08/27 20:55:53 jeekay Exp $";
 
 namespace gnuworld
 {
@@ -96,8 +96,22 @@ delete nickservConfig;
  */
 void nickserv::log(const eventType& theEvent, const string& theMessage)
 {
-  for(logUsersType::iterator ptr = logUsers.begin(); ptr != logUsers.end(); ptr++) {
+  iClient* theClient;
+  sqlUser* theUser;
+  for(logUsersType::iterator ptr = logUsers.begin(); ptr != logUsers.end(); ) {
+    theClient = *ptr;
+    theUser = isAuthed(theClient);
+    if(!theUser) {
+      // Something very odd is going on
+      elog << "*** [nickserv::log] User in queue but not logged in: "
+        << theClient->getNickName() << endl;
+    }
     
+    if(theUser->getLogMask() & theEvent) {
+      Notice(theClient, theMessage);
+    }
+    
+    ptr++;
   }
 }
 
@@ -175,6 +189,9 @@ switch( event ) {
     delete theData;
     removeFromQueue(theClient);
     
+    logUsersType::iterator ptr = find(logUsers.begin(), logUsers.end(), theClient);
+    if(ptr != logUsers.end()) { logUsers.erase(ptr); }
+    
     return 1;
     break;
   } // case EVT_KILL/QUIT
@@ -187,7 +204,10 @@ switch( event ) {
     if(theClient->isModeR()) {
       /* Find the sqlUser for their +r and assign it to this iClient */
       theData->authedUser = isRegistered(theClient->getAccount());
-      if(theData->authedUser) { theData->authedUser->commitLastSeen(); }
+      if(theData->authedUser) {
+        if(theData->authedUser->getLogMask()) { logUsers.push_back(theClient); }
+        theData->authedUser->commitLastSeen();
+      }
     }
 
     addToQueue(theClient);
@@ -207,7 +227,10 @@ switch( event ) {
     netData* theData = static_cast< netData* > (theClient->getCustomData(this));
     
     theData->authedUser = isRegistered(theClient->getAccount());
-    if(theData->authedUser) { theData->authedUser->commitLastSeen(); }
+    if(theData->authedUser) {
+      if(theData->authedUser->getLogMask()) { logUsers.push_back(theClient); }
+      theData->authedUser->commitLastSeen();
+    }
     
     return 1;
     break;
@@ -289,8 +312,11 @@ elog << "*** [NickServ:precacheUsers] Precaching users." << endl;
 PgDatabase* cacheCon = theManager->getConnection();
 
 /* Retrieve the list of registered users */
-string cacheQuery = "SELECT id,name,flags,level,lastseen_ts,registered_ts FROM users";
-if(cacheCon->ExecTuplesOk(cacheQuery.c_str())) {
+stringstream cacheQuery;
+cacheQuery << "SELECT id,name,flags,level,lastseen_ts,registered_ts,"
+  << "coalesce(logmask,'0') FROM users LEFT JOIN logging ON"
+  << " id=user_id";
+if(cacheCon->ExecTuplesOk(cacheQuery.str().c_str())) {
   for(int i = 0; i < cacheCon->Tuples(); i++) {
     sqlUser* tmpUser = new sqlUser(theManager);
     tmpUser->setAllMembers(cacheCon, i);
@@ -364,6 +390,7 @@ if(queuePos != warnQueue.end()) {
 void nickserv::processQueue()
 {
 theStats->incStat("NS.PROCESS");
+theLogger->log(logging::events::E_DEBUG, "Processing queue");
 
 /* A number of things can happen here.
  * Firstly, the warnQueue can be empty. If this is the case, return immediately.
@@ -421,8 +448,10 @@ for(QueueType::iterator queuePos = warnQueue.begin(); queuePos != warnQueue.end(
     continue;
   } else {
     Notice(theClient, "You are using a registered nickname. Please login or you will be disconnected.");
-    theStats->incStat("NS.WARN");
     theData->warned++;
+    theStats->incStat("NS.WARN");
+    theLogger->log(logging::events::E_DEBUG, "Warned: (" + 
+      theClient->getCharYYXXX() + ") " + theClient->getNickName());
     queuePos++;
     continue;
   } // if(theData->warned)
@@ -436,7 +465,11 @@ for(QueueType::iterator queuePos = killQueue.begin(); queuePos != killQueue.end(
   delete(theData);
   Kill(theClient, "[NickServ] AutoKill");
   theStats->incStat("NS.KILL");
+  theLogger->log(logging::events::E_DEBUG, "Killed: (" + 
+    theClient->getCharYYXXX() + ") " + theClient->getNickName());
 } // iterate over killQueue
+
+// No need to clear killQueue as its a locally scoped variable
 
 } // nickserv::processQueue()
 
