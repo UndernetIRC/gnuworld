@@ -98,10 +98,10 @@ GNUWorld -f localhost.conf
 That's it!  You will now have GNUWorld running!
 
 Should you have any problems, please email us at
-gnuworld-devel@sourceforge.net.  Don't forget to include a print out of
-the compiler errors, if any, or the logs from the problem.  It helps to
-run GNUWorld in verbose mode using the -c command line option.  Please
-also include OS and compiler type and version.
+gnuworld-devel@lists.sourceforge.net.  Don't forget to include a print
+out of the compiler errors, if any, or the logs from the problem.  It
+helps to run GNUWorld in verbose mode using the -c command line
+option.  Please also include OS and compiler type and version.
 
 You may also visit http://gnuworld.sourceforge.net to submit an online
 bug report.
