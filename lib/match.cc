@@ -16,9 +16,18 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- * $Id: match.cc,v 1.1 2001/01/12 22:16:21 dan_karrels Exp $
+ * $Id: match.cc,v 1.2 2001/01/27 20:16:40 dan_karrels Exp $
  */
-#include "match.h"
+#include	"match.h"
+
+#include	<string>
+
+using std::string ;
+
+int match( const string& s1, const string& s2 )
+{
+return match( s1.c_str(), s2.c_str() ) ;
+}
 
 /*
  * Compare if a given string (name) matches the given

@@ -210,7 +210,21 @@ public:
 	inline const modeType& getModes() const
 		{ return modes ; }
 
+	/**
+	 * Retrieve a string of the current channel modes.
+	 */
 	inline const string getModeString() const ;
+
+	/**
+	 * Type used to store the size of the banlist.
+	 */
+	typedef banListType::size_type banListSizeType ;
+
+	/**
+	 * Retrieve the number of elements in the ban list.
+	 */
+	inline banListSizeType banList_size() const
+		{ return banList.size() ; }
 
 	/**
 	 * Retrieve the name of this channel.

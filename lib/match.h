@@ -1,10 +1,12 @@
 /*
  * match.h
  *
- * $Id: match.h,v 1.1 2001/01/12 22:16:21 dan_karrels Exp $
+ * $Id: match.h,v 1.2 2001/01/27 20:16:40 dan_karrels Exp $
  */
 #ifndef INCLUDED_match_h
 #define INCLUDED_match_h
+
+#include	<string>
 
 #include	"match_table.h"
 #include	"ircd_chattr.h"
@@ -19,6 +21,7 @@
  */
 int mmatch(const char *old_mask, const char *new_mask);
 int match(const char *ma, const char *na);
+int match( const string&, const string& ) ;
 char *collapse(char *pattern);
 
 int matchcomp(char *cmask, int *minlen, int *charset, const char *mask);
