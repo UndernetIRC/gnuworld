@@ -27,7 +27,7 @@
 #include	"events.h"
 
 const char xClient_h_rcsId[] = __XCLIENT_H ;
-const char xClient_cc_rcsId[] = "$Id: client.cc,v 1.8 2000/08/02 23:35:11 dan_karrels Exp $" ;
+const char xClient_cc_rcsId[] = "$Id: client.cc,v 1.9 2000/08/03 15:50:13 dan_karrels Exp $" ;
 
 using std::string ;
 using std::strstream ;
@@ -581,6 +581,45 @@ if( !onChannel )
 	{
 	Part( theChan ) ;
 	}
+
+return true ;
+}
+
+bool xClient::UnBan( Channel* theChan, const string& banMask )
+{
+
+#ifndef NDEBUG
+  assert( theChan != 0 ) ;
+#endif
+
+if( !Connected )
+	{
+	return false ;
+	}
+
+if( !theChan->findBan( banMask ) )
+	{
+	return true ;
+	}
+
+// Ban exists, remove it
+bool onChannel = isOnChannel( theChan ) ;
+if( !onChannel )
+	{
+	Join( theChan ) ;
+	}
+
+Write( "%s M %s -b %s",
+	getCharYYXXX().c_str(),
+	theChan->getName().c_str(),
+	banMask.c_str() ) ;
+
+if( !onChannel )
+	{
+	Part( theChan ) ;
+	}
+
+theChan->removeBan( banMask ) ;
 
 return true ;
 }

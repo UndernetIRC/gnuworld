@@ -57,6 +57,10 @@ return true ;
 
 ChannelUser* Channel::removeUser( iClient* theClient )
 {
+#ifndef NDEBUG
+  assert( theClient != 0 ) ;
+#endif
+
 return removeUser( theClient->getIntYYXXX() ) ;
 }
 
@@ -77,7 +81,17 @@ return 0 ;
 
 ChannelUser* Channel::findUser( iClient* theClient ) const
 {
-return userList.find( theClient->getIntYYXXX() )->second ;
+#ifndef NDEBUG
+  assert( theClient != 0 ) ;
+#endif
+
+userListType::iterator ptr = userList.find( theClient->getIntYYXXX() ) ;
+if( ptr == userList.end() )
+	{
+	// User not found
+	return 0 ;
+	}
+return ptr->second ;
 }
 
 bool Channel::removeUserMode( const ChannelUser::modeType& whichMode,

@@ -3,7 +3,7 @@
  */
 
 #ifndef __XCLIENT_H
-#define __XCLIENT_H "$Id: client.h,v 1.5 2000/08/02 23:15:43 dan_karrels Exp $"
+#define __XCLIENT_H "$Id: client.h,v 1.6 2000/08/03 15:50:13 dan_karrels Exp $"
 
 #include	<string>
 
@@ -209,6 +209,11 @@ public:
 	 * Ban kick a client from a channel for the given reason.
 	 */
 	virtual bool	BanKick( Channel*, iClient*, const string& ) ;
+
+	/**
+	 * Remove a channel ban.
+	 */
+	virtual bool	UnBan( Channel*, const string& ) ;
 
 	/**
 	 * This method creates a ban mask for the given user on the
