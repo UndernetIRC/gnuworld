@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------------
--- "$Id: cservice.sql,v 1.41 2001/06/10 00:48:45 gte Exp $"
+-- "$Id: cservice.sql,v 1.42 2001/06/12 22:16:48 gte Exp $"
 -- Channel service DB SQL file for PostgreSQL.
 
 -- ChangeLog:
@@ -102,6 +102,9 @@ CREATE TABLE channels (
 	flood_pro INT2 NOT NULL DEFAULT 7,
 	url VARCHAR (128),
 	description VARCHAR (128),
+	-- Any administrative comments that apply globally to this
+	-- channel.
+	comment VARCHAR (300),
 	keywords VARCHAR(128),
 	registered_ts INT4,
 	channel_ts INT4 NOT NULL,
@@ -226,9 +229,14 @@ CREATE INDEX channellog_event_idx ON channellog(event);
 CREATE TABLE userlog (
 	ts INT4,
 	user_id INT4 CONSTRAINT user_log_ref REFERENCES users ( id ),
+	event INT4 DEFAULT '0',
+-- 1 -- EV_SUSPEND - Notification/Reason for suspension. 
 	message TEXT,
 	last_updated INT4 NOT NULL 
 );
+
+CREATE INDEX userlog_channelID_idx ON userlog(user_id);
+CREATE INDEX userlog_event_idx ON userlog(event);
 
 CREATE TABLE supporters (
 	channel_id INT4 CONSTRAINT channel_supporters_ref REFERENCES channels ( id ),
