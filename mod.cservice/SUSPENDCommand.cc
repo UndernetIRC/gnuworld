@@ -12,7 +12,7 @@
  * TODO: /msg x suspend #channel *, suspends all users below your access
  * level.
  *
- * $Id: SUSPENDCommand.cc,v 1.12 2001/04/02 18:10:47 gte Exp $
+ * $Id: SUSPENDCommand.cc,v 1.13 2001/05/11 23:45:38 gte Exp $
  */
 
 #include	<string>
@@ -26,7 +26,7 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char SUSPENDCommand_cc_rcsId[] = "$Id: SUSPENDCommand.cc,v 1.12 2001/04/02 18:10:47 gte Exp $" ;
+const char SUSPENDCommand_cc_rcsId[] = "$Id: SUSPENDCommand.cc,v 1.13 2001/05/11 23:45:38 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -50,6 +50,32 @@ if(!theUser)
 	return false;
 	}
 
+/*
+ * Trying to suspend a user, or a channel?
+ * If there is no #, check this person's admin access.
+ * If it passes, we can suspend a whole user account. <g>
+ * (Level 600)
+ */
+
+if (st[1][0] != '#')
+{
+	// Got ANY admin access?
+	int level = bot->getAdminAccessLevel(theUser);
+	if (!level)
+	{
+		Usage(theClient);
+		return true;
+	}
+
+	// Got enough admin access?
+
+	if(level < level::globalsuspend)
+	{ 
+	}
+
+	// Does this user account even exist?
+}
+ 
 // Is the channel registered?
 sqlChannel* theChan = bot->getChannelRecord(st[1]);
 if(!theChan)
