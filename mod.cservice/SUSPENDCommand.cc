@@ -7,7 +7,7 @@
  * Suspends an user on the specified channel, if suspend duration 0
  * is defined, the user will be unsuspended.
  *
- * $Id: SUSPENDCommand.cc,v 1.20 2001/09/05 03:47:56 gte Exp $
+ * $Id: SUSPENDCommand.cc,v 1.21 2001/09/21 23:43:35 gte Exp $
  */
 
 #include	<string>
@@ -21,7 +21,7 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char SUSPENDCommand_cc_rcsId[] = "$Id: SUSPENDCommand.cc,v 1.20 2001/09/05 03:47:56 gte Exp $" ;
+const char SUSPENDCommand_cc_rcsId[] = "$Id: SUSPENDCommand.cc,v 1.21 2001/09/21 23:43:35 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -52,7 +52,7 @@ if(!theUser)
  * If it passes, we can suspend a whole user account. <g>
  */
 
-if (st[1][0] != '#')
+if ((st[1][0] != '#') && (st[1][0] != '*'))
 {
 	/* Got enough admin access? */
 	int level = bot->getAdminAccessLevel(theUser);
