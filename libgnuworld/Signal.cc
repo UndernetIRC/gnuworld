@@ -18,39 +18,54 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: Signal.cc,v 1.4 2003/06/17 15:13:53 dan_karrels Exp $
+ * $Id: Signal.cc,v 1.5 2003/06/30 14:49:59 dan_karrels Exp $
  */
 
 #include	<pthread.h>
 #include	<signal.h>
-#include	<errno.h>
+#include	<fcntl.h>
 
 #include	<queue>
 #include	<iostream>
 
 #include	<cerrno>
+#include	<cstring>
 
 #include	"Signal.h"
+#include	"ELog.h"
 
-const char rcsId[] = "$Id: Signal.cc,v 1.4 2003/06/17 15:13:53 dan_karrels Exp $" ;
+const char rcsId[] = "$Id: Signal.cc,v 1.5 2003/06/30 14:49:59 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
-
 using std::queue ;
 using std::cout ;
 using std::endl ;
 
-queue< int >	Signal::signals1 ;
-queue< int >	Signal::signals2 ;
-pthread_mutex_t	Signal::signals1Mutex = PTHREAD_MUTEX_INITIALIZER ;
-
 // This will need to be changed to work properly in some code.
 //Signal sig ;
 
+bool Signal::signalError	= false ;
+int Signal::readFD		= -1 ;
+int Signal::writeFD		= -1 ;
+
+Signal*	Signal::theInstance	= 0 ;
+
+pthread_mutex_t Signal::singletonMutex = PTHREAD_MUTEX_INITIALIZER ;
+
 Signal::Signal()
 {
-::pthread_mutex_init( &signals1Mutex, 0 ) ;
+// No need to initialize signalError here since it is only initialized
+// directly above, and because this class models the Singleton
+// pattern.
+if( !openPipes() )
+	{
+	elog	<< "Signal> Failed to open FIFO pipes"
+		<< endl ;
+	// Failure to initialize pipes on startup is a critical
+	// failure.
+	::exit( 0 ) ;
+	}
 
 // Catch some signals
 #ifdef SIGINT
@@ -80,69 +95,177 @@ Signal::Signal()
 #ifdef SIGUSR2
   ::signal( SIGUSR2, AddSignal ) ;
 #endif
-
 }
 
 Signal::~Signal()
 {
-::pthread_mutex_destroy( &signals1Mutex ) ;
+delete theInstance ; theInstance = 0 ;
+closePipes() ;
+pthread_mutex_destroy( &singletonMutex ) ;
 }
 
+bool Signal::isError()
+{
+return ((-1 == readFD) || (-1 == writeFD) || signalError) ;
+}
+
+void Signal::closePipes()
+{
+::close( readFD ) ;
+::close( writeFD ) ;
+signalError = true ;
+}
+
+bool Signal::openPipes()
+{
+int rwFD[ 2 ] = { 0, 0 } ;
+
+// Create the pipe
+if( ::pipe( rwFD ) < 0 )
+	{
+	elog	<< "Signal::openPipes> pipe() failed: "
+		<< strerror( errno )
+		<< endl ;
+
+	signalError = true ;
+	return false ;
+	}
+
+// Set the fd's to non-blocking
+for( size_t i = 0 ; i < 2 ; ++i )
+	{
+	// Get current flags
+	int flags = ::fcntl( rwFD[ i ], F_GETFL ) ;
+	if( flags < 0 )
+		{
+		elog	<< "Signal> Failed to get flags for pipe fd: "
+			<< strerror( errno )
+			<< endl ;
+
+		closePipes() ;
+		return false ;
+		}
+
+	// Update flags to indicate non-blocking
+	flags |= O_NONBLOCK ;
+
+	// Set new flags
+	if( ::fcntl( rwFD[ i ], F_SETFL, flags ) < 0 )
+		{
+		elog	<< "Signal> Failed to set flags on pipe fd: "
+			<< strerror( errno )
+			<< endl ;
+
+		closePipes() ;
+		return false ;
+		}
+	} // for()
+
+// All is well
+readFD = rwFD[ 0 ] ;
+writeFD = rwFD[ 1 ] ;
+signalError = false ;
+
+return true ;
+}
+
+/**
+ * AddSignal() will not modify the open/close states of the pipes.
+ * If any error is detected, then signalError will be set to true
+ * and GetSignal() must handle the rest.
+ */
 void Signal::AddSignal( int whichSig )
 {
-if( EBUSY == ::pthread_mutex_trylock( &signals1Mutex ) )
-	{
-	// Another thread is using the first queue
-	// Add this signal to the second
-	signals2.push( whichSig ) ;
+errno = 0 ;
 
-	cout	<< "AddSignal> Added signal: "
-		<< whichSig
-		<< " to signals2"
+// Attempt to write this signal to the pipe.
+if( ::write( writeFD, &whichSig, sizeof( int ) ) < 0 )
+	{
+	// Check for non-blocking type errors.
+	if( (EINTR != errno) && (EWOULDBLOCK != errno) &&
+		(EINTR != EAGAIN) )
+		{
+		// Critical error occured, readFD no longer valid
+		signalError = true ;
+
+		// Do not close the pipes here, the readFD may be
+		// in use.  Let getSignal() handle updating the pipes.
+
+		// Do not attempt to create new pipes inside
+		// of the signal handler.
+		// The getSignal() below will attempt to reopen
+		// the pipes if it detects that one is closed.
+		return ;
+		} // if( errno )
+	} // if( ::read() )
+
+// In general, outputting data during a signal handler is a very
+// bad idea.
+// This is for testing purposes only.
+//std::cerr	<< "Signal::AddSignal> Successfully sent signal: "
+//	<< whichSig
+//	<< endl ;
+} // AddSignal()
+
+/**
+ * The semantics of the return statement are a little backwards here:
+ * - true indicates that the caller should check the value of theSignal
+ *   for either a new signal or an error state (-1)
+ * - false indicates that no error and no signal are ready
+ */
+bool Signal::getSignal( int& theSignal )
+{
+errno = 0 ;
+
+// Attempt to read the next signal from the pipe
+int readResult = ::read( readFD, &theSignal, sizeof( int ) ) ;
+if( readResult < 0 )
+	{
+	// Check for non-blocking type errors.
+	if( (EINTR != errno) && (EWOULDBLOCK != errno) &&
+		(EINTR != EAGAIN) )
+		{
+		// Critical error occured, readFD no longer valid
+
+		// closePipes() will set signalError to true.
+		closePipes() ;
+
+		// Attempt to re-open the pipes
+		openPipes() ;
+
+		theSignal = -1 ;
+		return true ;
+		}
+	else
+		{
+		// No signal detected
+		return false ;
+		}
+	}
+
+if( readResult != sizeof( int ) )
+	{
+	elog	<< "Signal::getSignal> Somehow read "
+		<< readResult
+		<< " bytes, where sizeof(int) is: "
+		<< sizeof( int )
 		<< endl ;
 	}
-else
-	{
-	// We have the lock on the signalsMutex
-	signals1.push( whichSig ) ;
-	::pthread_mutex_unlock( &signals1Mutex ) ;
 
-	cout	<< "AddSignal> Added signal: "
-		<< whichSig
-		<< " to signals1"
-		<< endl ;
-	}
+// Signal detected, read() returned ok
+return true ;
 }
 
-int Signal::getSignal()
+Signal* Signal::getInstance()
 {
-int retMe = -1 ;
-
-// Make sure to lock the mutex for signals1
-// If a signal handler encounters a locked mutex, it
-// will continue on to modify signals2.
-::pthread_mutex_lock( &signals1Mutex ) ;
-
-if( !signals1.empty() )
+::pthread_mutex_lock( &singletonMutex ) ;
+if( 0 == theInstance )
 	{
-	retMe = signals1.front() ;
-	signals1.pop() ;
-	::pthread_mutex_unlock( &signals1Mutex ) ;
-
-	return retMe ;
+	theInstance = new Signal ;
 	}
-::pthread_mutex_unlock( &signals1Mutex ) ;
+::pthread_mutex_unlock( &singletonMutex ) ;
 
-// Nothing found in the signals1
-// Now that this thread does not have the lock on the mutex,
-// any signal handlers will lock it and modify signals1.
-// We are safe to modify signals2
-if( !signals2.empty() )
-	{
-	retMe = signals2.front() ;
-	signals2.pop() ;
-	}
-return retMe ;
+return theInstance ;
 }
 
 } // namespace gnuworld

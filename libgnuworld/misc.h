@@ -19,13 +19,14 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: misc.h,v 1.2 2003/06/17 15:13:53 dan_karrels Exp $
+ * $Id: misc.h,v 1.3 2003/06/30 14:49:59 dan_karrels Exp $
  */
 
 #ifndef __MISC_H
-#define __MISC_H "$Id: misc.h,v 1.2 2003/06/17 15:13:53 dan_karrels Exp $"
+#define __MISC_H "$Id: misc.h,v 1.3 2003/06/30 14:49:59 dan_karrels Exp $"
 
 #include	<string>
+#include	<iostream>
 
 #include	<cctype>
 #include	<cstring>
@@ -138,6 +139,47 @@ bool IsNumeric( const string& ) ;
  * given string.
  */
 size_t countChar( const string&, const char& ) ;
+
+/**
+ * This specialization of the char_traits class is used for
+ * basic_string< unsigned char >.
+ */
+struct My_unsigned_char_traits
+{
+   typedef unsigned char char_type;
+   typedef int         int_type;
+   typedef std::streamoff   off_type;
+   typedef std::streampos   pos_type;
+   typedef mbstate_t   state_type;
+
+   static void assign(char_type& c1, const char_type& c2);
+//	{  __c1 = __c2; }
+   static bool eq(const char_type& c1, const char_type& c2);
+//	{ return __c1 == __c2; }
+   static bool lt(const char_type& c1, const char_type& c2);
+//	{ return __c1 < __c2; }
+
+   static int compare(const char_type* s1, const char_type* s2, size_t n);
+//	{ return memcmp(__s1, __s2, __n); }
+   static size_t length(const char_type* s);
+//	{ return strlen(__s); }
+   static const char_type* find(const char_type* s, size_t n, const
+		char_type& a);
+   static char_type* move(char_type* s1, const char_type* s2, size_t n)
+	{ return static_cast<char_type*>(memmove(s1, s2, n)); }
+   static char_type* copy(char_type* s1, const char_type* s2, size_t n)
+	{ return static_cast<char_type*>(memcpy(s1, s2, n)); }
+   static char_type* assign(char_type* s, size_t n, char_type a);
+
+   static int_type not_eof(const int_type& c);
+   static char_type to_char_type(const int_type& c);
+   static int_type to_int_type(const char_type& c);
+   static bool eq_int_type(const int_type& c1, const int_type& c2);
+   static int_type eof();
+};
+
+typedef std::basic_string< unsigned char, My_unsigned_char_traits >
+	binary_string ;
 
 } // namespace gnuworld
 

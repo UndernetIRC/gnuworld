@@ -18,17 +18,20 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: signal.cc,v 1.2 2003/06/28 01:21:21 dan_karrels Exp $
+ * $Id: signal.cc,v 1.3 2003/06/30 14:50:00 dan_karrels Exp $
  */
 
 #include	<sys/types.h>
+#include	<signal.h>
 #include	<unistd.h>
 
-#include	<fstream>
 #include	<iostream>
 
 #include	<cerrno>
 #include	<cstring>
+#include	<cctype>
+#include	<cstdlib>
+#include	<ctime>
 
 #include	"Signal.h"
 #include	"ELog.h"
@@ -38,76 +41,181 @@ using namespace gnuworld ;
 
 ELog gnuworld::elog ;
 
-/// Subclass class Signal to introduce a method which will
-/// force some more interesting situations to occur
-class mySignal : public Signal
+struct sigInfo
 {
-public:
-	void	forceLock()
-		{ ::pthread_mutex_lock( &signals1Mutex ) ; }
-	void	forceUnlock()
-		{ ::pthread_mutex_unlock( &signals1Mutex ) ; }
-
-
-
+int	signalID ;
 } ;
 
-int main()
+static const sigInfo sigArray[] =
 {
+#ifdef SIGINT
+	{ SIGINT },
+#endif
+#ifdef SIGHUP
+	{ SIGHUP },
+#endif
+#ifdef SIGPIPE
+	{ SIGPIPE },
+#endif
+#ifdef SIGTERM
+	{ SIGTERM },
+#endif
+#ifdef SIGPOLL
+	{ SIGPOLL },
+#endif
+#ifdef SIGUSR1
+	{ SIGUSR1 },
+#endif
+#ifdef SIGUSR2
+	{ SIGUSR2 },
+#endif
+	{ -31337 }
+} ;
 
-cout	<< "PID: "
-	<< getpid()
-	<< endl ;
+// Includes the -31337 element
+size_t signalCount ;
 
-ofstream outFile( "signal.pid" ) ;
-if( !outFile )
+void	handleChild() ;
+void	handleParent( pid_t childPID, int numSignals ) ;
+void	setupSignals() ;
+int	randomSignal() ;
+
+int main( int argc, char** argv )
+{
+if( argc != 2 )
 	{
-	cout	<< "Error: Unable to open file: signal.pid"
-		<< strerror( errno )
+	cout	<< "Usage: "
+		<< argv[ 0 ]
+		<< " <num signals>"
 		<< endl ;
 	return 0 ;
 	}
 
-outFile	<< getpid() << endl ;
-outFile.close() ;
+::srand( ::time( 0 ) ) ;
+setupSignals() ;
 
-// Force registration of signal handlers
-mySignal sig ;
+cout	<< "Parent PID: "
+	<< getpid()
+	<< endl ;
 
-// Force the signals1Mutex to lock
-// This should force placement of signals into signals2
-cout	<< "Locking signals1Mutex" << endl ;
-sig.forceLock() ;
+int numSignals = ::atoi( argv[ 1 ] ) ;
 
-cout	<< "Please issue signals now." << endl ;
-
-// The user is expected to introduce signals to this process
-// during this loop
-
-// If the user hits CTRL-C (which he/she should be doing here),
-// the sleep() function will return before completion, returning
-// the number of seconds left to sleep.
-// Continue until an entire 10 seconds goes by without receiving
-// any signals.
-while( sleep( 10 ) != 0 )
+// Fork a child
+pid_t thePID = fork() ;
+if( 0 == thePID )
 	{
-	}
-
-sig.forceUnlock() ;
-
-cout	<< "Sleeping without lock, please issue signals." << endl ;
-while( sleep( 10 ) != 0 )
-	{
-	}
-
-int theSig = -1 ;
-while( (theSig = sig.getSignal()) != -1 )
-	{
-	cout	<< "Retrieved signal: "
-		<< theSig
+	clog	<< "Child PID: "
+		<< getpid()
 		<< endl ;
-	}
 
+	handleChild() ;
+
+	clog	<< "Child exiting..."
+		<< endl ;
+
+	::exit( 0 ) ;
+	}
+else
+	{
+	// Parent
+	sleep( 2 ) ;
+
+	handleParent( thePID, numSignals ) ;
+
+	clog	<< "Parent exiting..."
+		<< endl ;
+
+	::exit( 0 ) ;
+	}
 return 0 ;
 }
 
+void handleChild()
+{
+// Instantiate the singleton, which will configure itself to
+// catch all signals
+Signal::getInstance() ;
+
+size_t totalSignalsCaught = 0 ;
+while( true )
+	{
+	::sleep( 1 ) ;
+
+	int theSignal = -1 ;
+	while( Signal::getSignal( theSignal ) )
+		{
+		if( theSignal < 0 )
+			{
+			// Error
+			clog	<< "handleChild> Error"
+				<< endl ;
+			continue ;
+			}
+
+		++totalSignalsCaught ;
+		clog	<< "Child> Got signal: "
+			<< theSignal
+			<< ", total signals caught: "
+			<< totalSignalsCaught
+			<< endl ;
+		}
+	}
+
+clog	<< "Child> Caught "
+	<< totalSignalsCaught
+	<< " signals"
+	<< endl ;
+
+} // handleChild()
+
+void handleParent( pid_t childPID, int numSignals )
+{
+size_t totalSignalsSent = 0 ;
+
+for( ; totalSignalsSent < static_cast< size_t >( numSignals ) ; )
+	{
+	for( size_t i = 0 ; i < (signalCount - 1) ; ++i )
+		{
+		++totalSignalsSent ;
+		clog	<< "Parent> Sending signal: "
+			<< sigArray[ i ].signalID
+			<< endl ;
+		::kill( childPID, sigArray[ i ].signalID ) ;
+		}
+	sleep( 2 ) ;
+	}
+
+/*
+for( int i = 0 ; i < numSignals ; ++i )
+	{
+	int theSig = randomSignal() ;
+	clog	<< "Parent> Sending signal "
+		<< theSig
+		<< endl ;
+
+	kill( childPID, theSig ) ;
+	} // for( i )
+*/
+clog	<< "Parent> Sent "
+	<< totalSignalsSent
+	<< " signals"
+	<< endl ;
+
+sleep( 10 ) ;
+
+//::kill( childPID, SIGKILL ) ;
+}
+
+void setupSignals()
+{
+// Count the number of signals
+for( size_t i = 0 ; sigArray[ i ].signalID != -31337 ;
+	++i, ++signalCount )
+	{
+	}
+}
+
+int randomSignal()
+{
+return (sigArray[ rand() % signalCount ].signalID) ;
+}

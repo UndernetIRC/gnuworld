@@ -18,32 +18,50 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: Signal.h,v 1.2 2003/06/17 15:13:53 dan_karrels Exp $
+ * $Id: Signal.h,v 1.3 2003/06/30 14:49:59 dan_karrels Exp $
  */
 
 #ifndef __SIGNAL_H
-#define __SIGNAL_H "$Id: Signal.h,v 1.2 2003/06/17 15:13:53 dan_karrels Exp $"
+#define __SIGNAL_H "$Id: Signal.h,v 1.3 2003/06/30 14:49:59 dan_karrels Exp $"
 
 #include	<pthread.h>
 
-#include	<queue>
-
 namespace gnuworld
 {
-using std::queue ;
 
 class Signal
 {
 
 protected:
-	static queue< int >	signals1 ;
-	static queue< int >	signals2 ;
 
-	static pthread_mutex_t	signals1Mutex ;
+	/// This variable is true if there exists an uncoverable error.
+	static bool		signalError ;
+
+	/// The FD for the read side of the pipe.
+	static int		readFD ;
+
+	/// The FD for the write side of the pipe.
+	static int		writeFD ;
+
+	/// A mutex to guard access to the Singleton.
+	static pthread_mutex_t	singletonMutex ;
+
+	/// The Singleton instance.
+	static Signal*		theInstance ;
 
 public:
-	Signal() ;
+	/**
+	 * Release resources associated with this class.
+	 */
 	virtual ~Signal() ;
+
+	/**
+	 * Retrieve the Singleton instance of this class, creating
+	 * it if necessary.
+	 * Once an instance is created, all signals currently
+	 * supported by this class will be remapped to this subsystem.
+	 */
+	static Signal*		getInstance() ;
 
 	/**
 	 * Add a signal to the signal queue.
@@ -53,11 +71,38 @@ public:
 	static void		AddSignal( int whichSig ) ;
 
 	/**
-	 * This method returns the oldest signal in the queue.
-	 * This method must be called by only one thread, and never
-	 * by the signal handler thread.
+	 * The semantics of the return statement are a little backwards here:
+	 * - true indicates that the caller should check the value of
+	 *   theSignal for either a new signal or an error state (-1)
+	 * - false indicates that no error and no signal are ready
 	 */
-	static int		getSignal() ;
+	static bool		getSignal( int& theSignal ) ;
+
+	/**
+	 * This method will return true if there is a non-recoverable
+	 * error in the signal handler subsystem.
+	 */
+	static bool		isError() ;
+
+private:
+	/**
+	 * Private constructor, make this class a Singleton.
+	 */
+	Signal() ;
+
+protected:
+	/**
+	 * Convenience method to close the pipes when a critical
+	 * error occurs.  In this case, signalError will remain
+	 * set, and both pipes are invalid, no signal delivery
+	 * will occur.
+	 */
+	static void		closePipes() ;
+
+	/**
+	 * Opens both pipes, and configures in nonblocking mode.
+	 */
+	static bool		openPipes() ;
 
 } ;
 
