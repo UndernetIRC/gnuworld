@@ -1,7 +1,7 @@
 /**
  * mtrie_perf_summary.cc
  *
- * $Id: mtrie_perf_summary.cc,v 1.1 2003/07/27 22:26:47 dan_karrels Exp $
+ * $Id: mtrie_perf_summary.cc,v 1.2 2003/07/28 15:28:57 dan_karrels Exp $
  */
 
 #include	<string>
@@ -22,29 +22,19 @@ cout	<< "Usage: "
 	<< progName
 	<< " <mtrie performance file>"
 	<< endl ;
+cout	<< "This program accepts any number of performance files "
+	<< "as input"
+	<< endl ;
 }
 
 int main( int argc, char** argv )
 {
-if( argc != 2 )
+if( argc < 2 )
 	{
 	usage( argv[ 0 ] ) ;
 	return 0 ;
 	}
-
-ifstream inFile( argv[ 1 ] ) ;
-if( !inFile )
-	{
-	cout	<< "Unable to open file: "
-		<< argv[ 1 ]
-		<< endl ;
-	return 0 ;
-	}
-
-clog	<< endl
-	<< "Reading "
-	<< argv[ 1 ]
-	<< "..." ;
+size_t numFiles = static_cast< size_t >( argc - 1 ) ;
 
 size_t totalNodes = 0 ;
 size_t totalValues = 0 ;
@@ -54,58 +44,82 @@ size_t maxLevel = 0 ;
 size_t maxNumSubtrees = 0 ;
 size_t maxNumValues = 0 ;
 
-string line ;
-while( getline( inFile, line ) )
+for( int i = 1 ; i < argc ; ++i )
 	{
-	if( line.empty() )
+	ifstream inFile( argv[ i ] ) ;
+	if( !inFile )
 		{
-		continue ;
-		}
-
-	StringTokenizer st( line ) ;
-	if( st.size() != 3 )
-		{
-		clog	<< "Error: Invalid number of tokens in line: "
-			<< line
+		cout	<< "Unable to open file: "
+			<< argv[ i ]
 			<< endl ;
-		inFile.close() ;
-		return -1 ;
+		return 0 ;
 		}
 
-	size_t theLevel =
-		static_cast< size_t >( atoi( st[ 0 ].c_str() ) ) ;
-	size_t numSubtrees =
-		static_cast< size_t >( atoi( st[ 1 ].c_str() ) ) ;
-	size_t numValues =
-		static_cast< size_t >( atoi( st[ 2 ].c_str() ) ) ;
+	clog	<< endl
+		<< "Reading "
+		<< argv[ i ]
+		<< "..." ;
 
-	++totalNodes ;
-	totalValues += numValues ;
-	totalSubtrees += numSubtrees ;
-
-	if( numValues > maxNumValues )
+	string line ;
+	while( getline( inFile, line ) )
 		{
-		maxNumValues = numValues ;
-		}
-	if( theLevel > maxLevel )
-		{
-		maxLevel = theLevel ;
-		}
-	if( numSubtrees > maxNumSubtrees )
-		{
-		maxNumSubtrees = numSubtrees ;
-		}
+		if( line.empty() )
+			{
+			continue ;
+			}
 
-	} // while( getline() )
-inFile.close() ;
+		StringTokenizer st( line ) ;
+		if( st.size() != 3 )
+			{
+			clog	<< "Error: Invalid number of tokens in line: "
+				<< line
+				<< endl ;
+			inFile.close() ;
+			return -1 ;
+			}
+
+		size_t theLevel =
+			static_cast< size_t >( atoi( st[ 0 ].c_str() ) ) ;
+		size_t numSubtrees =
+			static_cast< size_t >( atoi( st[ 1 ].c_str() ) ) ;
+		size_t numValues =
+			static_cast< size_t >( atoi( st[ 2 ].c_str() ) ) ;
+
+		++totalNodes ;
+		totalValues += numValues ;
+		totalSubtrees += numSubtrees ;
+
+		if( numValues > maxNumValues )
+			{
+			maxNumValues = numValues ;
+			}
+		if( theLevel > maxLevel )
+			{
+			maxLevel = theLevel ;
+			}
+		if( numSubtrees > maxNumSubtrees )
+			{
+			maxNumSubtrees = numSubtrees ;
+			}
+		} // while( getline() )
+
+	inFile.close() ;
+	} // for( i )
 
 clog	<< endl
-	<< "Information for input file "
-	<< argv[ 1 ] << endl
+	<< endl
+	<< "Information for all "
+	<< numFiles
+	<< " input files" << endl
+	<< endl
 	<< "Number of hosts: "
 	<< totalValues << endl
+	<< "Number of hosts per file: "
+	<< (totalValues / numFiles) << endl
 	<< "Number of nodes: "
 	<< totalNodes << endl
+	<< "Number of nodes per file: "
+	<< (totalNodes / numFiles) << endl
 	<< "Max level: "
 	<< maxLevel << endl
 	<< "Maximum number of subtrees: "
