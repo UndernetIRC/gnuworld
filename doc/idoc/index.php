@@ -2,7 +2,7 @@
 /*
  *
  * Undernet GNUworld Interactive Installation Guide (aka UGIIG)
- * $Id: index.php,v 1.13 2003/02/17 13:57:43 nighty Exp $
+ * $Id: index.php,v 1.14 2003/08/16 03:00:55 nighty Exp $
  *
  * Released under the GNU Public License : http://www.gnu.org/licenses/gpl.txt
  * by nighty <nighty@undernet.org>
@@ -50,7 +50,7 @@ function footer($prev,$next) {
 	//echo "<address>maintained by <b>&lt;</b><a href=\"mailto:" . $coder_email . "\">" . $coder_email . "</a><b>&gt;</b> - Last modified : <b>" . date("M-d-Y H:i:s",   (  filemtime("index.php")+( date("Z",filemtime("index.php"))/3600 )   )   ) . " UTC/GMT</b> - <b>[</b><a href=\"./\">Home</a><b>]</b></address>";
 	echo "<address>maintained by <b>&lt;</b><a href=\"mailto:" . $coder_email . "\">" . $coder_email . "</a><b>&gt;</b> - <b>[</b><a href=\"./\">Home</a><b>]</b>";
 	echo "&nbsp;<br><font size=-2><b>";
-?>$Id: index.php,v 1.13 2003/02/17 13:57:43 nighty Exp $<?
+?>$Id: index.php,v 1.14 2003/08/16 03:00:55 nighty Exp $<?
 	echo "</b></font></address>\n";
 	echo "</body>\n";
 	echo "</html>\n";
@@ -75,7 +75,7 @@ $coder_email = "nighty@undernet.org";
 $coder_name = "nighty";
 
 ?>
-<!-- $Id: index.php,v 1.13 2003/02/17 13:57:43 nighty Exp $ //-->
+<!-- $Id: index.php,v 1.14 2003/08/16 03:00:55 nighty Exp $ //-->
 <html>
 <head>
 <title>Undernet GNUworld Interactive Installation Guide</title>
@@ -378,9 +378,10 @@ on your system and want to set up GNUworld using an already existing <?
 
 <? } ?>
 	<b>-</b> Check that your PostgreSQL installation was done with the following <b>./configure</b> option(s):
-		<b>--with-CXX</b> : building the C Client
+		<b>--with-CXX</b>		: building the C Client
+		<b>--enable-multibyte</b>	: Needed to solve a createdb problem and allow php to build correctly.
 <? if (ereg("cservice",$modules)) { ?>
-		<b>--with-tcl</b> : building with TCL support (<b>pgtclsh</b>) for mod.cservice.
+		<b>--with-tcl</b>		: building with TCL support (<b>pgtclsh</b>) for mod.cservice.
 <? } ?>
 
 For the whole HOWTO here, we will assume PostreSQL is configured that way :
@@ -436,10 +437,10 @@ if ($subset=="A-1") {
 <pre>
 In order to get PostgreSQL you should visit their official website :
 	- <a href="http://www.postgresql.org/" target=_blank>http://www.postgresql.org/</a>
-	- <a href="ftp://ftp.postgresql.org/pub/" target=_blank>PostgreSQL Public FTP Site</a>
+	- <a href="ftp://ftp8.us.postgresql.org/pub/postgresql/source/" target=_blank>PostgreSQL Public FTP Site</a>
 
 Direct link to download <b>PostgreSQL 7.2.1</b> (recommended version) :
-	- <a href="ftp://ftp.postgresql.org/pub/source/v7.2.1/postgresql-7.2.1.tar.gz">FTP</a>
+	- <a href="ftp://ftp8.us.postgresql.org/pub/postgresql/source/v7.2.1/postgresql-7.2.1.tar.gz">FTP</a>
 </pre>
 <?
 	footer("*","A-2");
@@ -548,6 +549,7 @@ Unpack it :
 	<?=$os?>:/root# <b>tar -xzf postgresql-7.2.1.tar.gz</b>
 	<?=$os?>:/root# <b>cd postgresql-7.2.1/</b>
 	<?=$os?>:/root/postgresql-7.2.1# <b>./configure --with-CXX \
+		--enable-multibyte \
 <? if ($os=="freebsd") { ?>
 		--with-tcl --without-tk \
 		--with-tclconfig=/usr/local/lib/tcl8.3  \
@@ -824,6 +826,7 @@ if (ereg("cservice",$modules)) {
 <? if (!$secure && $r) { ?>
 	<?=$os?>:/root# <b>su - gnuworld</b>
 <? } ?>
+	<?=$os?>:/home/gnuworld$ <b>touch .cvspass</b>
 	<?=$os?>:/home/gnuworld$ <b>cvs -d:pserver:anonymous@cvs.gnuworld.sourceforge.net:/cvsroot/gnuworld login</b>
 
 Just hit the <b>[</b>ENTER<b>]</b> key as the password.
