@@ -24,7 +24,7 @@
 #include	"ccUser.h"
 #include	"Constants.h"
 
-const char GLINECommand_cc_rcsId[] = "$Id: GLINECommand.cc,v 1.41 2002/05/23 17:43:10 dan_karrels Exp $";
+const char GLINECommand_cc_rcsId[] = "$Id: GLINECommand.cc,v 1.42 2002/06/07 17:58:23 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -325,7 +325,8 @@ ptr != theChan->userList_end() ; ++ptr )
 //		bot->setRemoving(TmpGline->getHost());
 		server->setGline( nickUserHost,
 			    TmpGline->getHost(),
-			    TmpGline->getReason() + "[" + Us + "]" ,
+			    string("[") + Us + string("] ") +
+			    TmpGline->getReason(),
 			    gLength ,bot) ;
 //		bot->unSetRemoving();
 		glineList.insert(GlineMapType::value_type(TmpGline->getHost(),0));

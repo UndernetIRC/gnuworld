@@ -1,8 +1,22 @@
+/**
+    Main ccontrol implementation class
+    
+    @author Daniel Karrels dan@karrels.com
+    @autor Tomer Cohen	   MrBean@Undernet.org
+    
+    
+*/
+
+
 /* ccontrol.cc
  * Authors: Daniel Karrels dan@karrels.com
  *	    Tomer Cohen    MrBean@toughguy.net
- * $Id: ccontrol.cc,v 1.144 2002/05/25 15:03:58 mrbean_ Exp $
+ * $Id: ccontrol.cc,v 1.145 2002/06/07 17:58:24 mrbean_ Exp $
  */
+
+#define MAJORVER "1"
+#define MINORVER "0"
+#define RELDATE "27 may, 2002"
 
 #include        <sys/types.h> 
 #include        <sys/socket.h>
@@ -39,11 +53,10 @@
 #include	"commLevels.h"
 #include	"ccFloodData.h"
 #include	"ccUserData.h"
-#include	"ccGate.h"
 #include	"ip.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.144 2002/05/25 15:03:58 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.145 2002/06/07 17:58:24 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -80,6 +93,10 @@ bool dbConnected = false;
 ccontrol::ccontrol( const string& configFileName )
  : xClient( configFileName )
 {
+
+elog << "Initializing ccontrol version "
+     << MAJORVER << "." << MINORVER 
+     << " please standby... " << endl;
 
 // Read the config file
 EConfig conf( configFileName ) ;
@@ -165,8 +182,6 @@ userMaxConnection = atoi(conf.Require("max_connection")->second.c_str());
 maxGlineLen = atoi(conf.Require("max_GLen")->second.c_str());
 
 maxThreads = atoi(conf.Require("max_threads")->second.c_str());
-
-checkGates = atoi(conf.Require("check_gates")->second.c_str());
 
 checkClones = atoi(conf.Require("check_clones")->second.c_str());
 
@@ -612,18 +627,55 @@ RegisterCommand( new NOMODECommand( this, "NOMODE",
 	operLevel::SMTLEVEL,
 	true ) ) ;
 
+elog << "Loading commands ......... ";
+
 loadCommands();
-loadGlines();
-if(!loadExceptions())
+elog << "Done!" << endl;
+
+elog << "Loading glines ........... ";
+if(loadGlines())
 	{
-	elog	<< "ccontrol> Error while loading exceptions!!!! ,"
+	elog << "Success!" << endl;
+	}
+else
+	{
+	elog << "Failed!!!" << endl;
+	}
+
+elog << "Loading exceptions ....... ";
+if(loadExceptions())
+	{
+	elog << "Success!" << endl;
+	}
+else
+	{
+	elog	<< "Error while loading exceptions!!!! ,"
 		<< " shutting down"
 		<< endl;
 	::exit(1);
 	}
 	
-loadUsers();
-loadServers();
+elog << "Loading users ............ ";
+if(loadUsers())
+	{
+	elog << "Success!" << endl;
+	}
+else
+	{
+	elog << "Failed!!!" << endl;
+	}
+
+elog << "Loading servers info ..... ";
+if(loadServers())
+	{
+	elog << "Success!" << endl;
+	}
+else
+	{
+	elog << "Failed!!!" << endl;
+	}
+
+
 loadMaxUsers();
 loadVersions();
 loadBadChannels();
@@ -700,7 +752,6 @@ return true ;
 
 int ccontrol::BurstChannels()
 {
-//elog << "ccontrol::BurstChannels()\n" ;
 
 // msgChan is an operChan as well, no need to burst it separately
 for( vector< string >::size_type i = 0 ; i < operChans.size() ; i++ )
@@ -739,11 +790,6 @@ if(SendReport)
 	postDailyLog = theServer->RegisterTimer(theTime, this, NULL); 
 	}
 
-if(checkGates)
-	{
-	gatesStatusCheck = theServer->RegisterTimer(::time(0) + 1,this,NULL);
-	}
-	
 theServer->RegisterEvent( EVT_KILL, this );
 theServer->RegisterEvent( EVT_QUIT, this );
 theServer->RegisterEvent( EVT_NETJOIN, this );
@@ -764,6 +810,15 @@ int ccontrol::OnPrivateMessage( iClient* theClient, const string& Message,
 // Tokenize the message
 StringTokenizer st( Message ) ;
 
+if(theClient == Network->findClient(this->getCharYYXXX()))
+	{
+	/* 
+	 Got message from one self, this should never happen
+	 but in case it does, dont want to create an endless loop
+	 */
+	   
+	return xClient::OnPrivateMessage( theClient, Message ) ;
+	}
 // Make sure there is a command present
 if( st.empty() )
 	{
@@ -971,6 +1026,13 @@ else
 		xClient::DoCTCP(theClient,CTCP,
 		    "Oh crap! where would i hide the drugs now?");
 		}
+	else if(st[0] == "VERSION")
+		{
+		xClient::DoCTCP(theClient,CTCP,
+		    " CControl version "
+		    + string(MAJORVER) + "." + string(MINORVER)
+		    + " release date: " + RELDATE);
+		}
 	}
 	
 return true;
@@ -1168,24 +1230,6 @@ switch( theEvent )
 		ccUserData* UserData = new (std::nothrow) ccUserData(floodData);
 		NewUser->setCustomData(this,
 			static_cast< void* >( UserData ) );
-		if(checkGates)
-			{
-			string tIP = xIP( NewUser->getIP()).GetNumericIP();
-			if(strcasecmp(tIP,"0.0.0.0"))			
-				{
-				ccGate* tempGate = new (std::nothrow) ccGate(tIP,1080);
-				if(inBurst)
-					gatesWaitingQueue.push_back(tempGate);			
-				else
-					gatesWaitingQueue.push_front(tempGate);			
-				tempGate = new (std::nothrow) ccGate(tIP,23);
-				assert(tempGate != NULL);
-				if(inBurst)
-					gatesWaitingQueue.push_back(tempGate);			
-				else
-					gatesWaitingQueue.push_front(tempGate);			
-				}			
-			}
 		if(dbConnected)
 			{
 			if(checkClones)
@@ -1337,14 +1381,6 @@ else if (timer_id == expiredTimer)
 	expiredTimer = MyUplink->RegisterTimer(::time(0) + ExpiredInterval,
 		this,NULL);
 	}
-else if(timer_id == gatesStatusCheck)
-	{
-	if(checkGates)
-		{
-		GatesCheck();
-		gatesStatusCheck = MyUplink->RegisterTimer(::time(0) + 2,this,NULL);
-		}
-	}
 else if(timer_id == dbConnectionCheck)
 	{
 	checkDbConnection();
@@ -1437,7 +1473,7 @@ if( result )
 return result ;
 }
 
-bool ccontrol::Kick( Channel* theChan, iClient* theClient,
+/*bool ccontrol::Kick( Channel* theChan, iClient* theClient,
 	const string& reason )
 {
 assert( theChan != NULL ) ;
@@ -1448,7 +1484,7 @@ if( !isOnChannel( theChan->getName() ) )
 	}
 
 return xClient::Kick( theChan, theClient, reason ) ;
-}
+}*/
 
 bool ccontrol::addOperChan( const string& chanName )
 {
@@ -1506,7 +1542,20 @@ return true ;
 
 ccUser* ccontrol::IsAuth( const iClient* theClient ) 
 {
-return (static_cast< ccUserData* >(theClient->getCustomData(this)))->getDbUser() ;
+if(!theClient)
+	{
+	return NULL;
+	}
+
+ccUserData *tempData = static_cast< ccUserData* >(theClient->getCustomData(this));
+if(tempData)
+	{
+	return tempData->getDbUser() ;
+	}
+else
+	{
+	return NULL;
+	}
 }
 
 ccUser* ccontrol::IsAuth( const string& Numeric ) 
@@ -1585,10 +1634,11 @@ if(tUser)
     HostQ << ends;
     status = SQLDb->Exec( HostQ.str().c_str() ) ;
 
+#ifdef LOG_SQL
 elog	<< "ccontrol::DeleteOper> "
 	<< HostQ.str().c_str()
 	<< endl; 
-
+#endif
 if( PGRES_COMMAND_OK != status ) 
 	{
 	elog	<< "ccontrol::DeleteOper> SQL Failure: "
@@ -1607,9 +1657,11 @@ theQuery	<< Main
 		<< "'"
 		<< ends;
 
+#ifdef LOG_SQL
 elog	<< "ccontrol::DeleteOper> "
 	<< theQuery.str().c_str()
 	<< endl; 
+#endif
 
 status = SQLDb->Exec( theQuery.str().c_str() ) ;
 
@@ -1677,9 +1729,11 @@ theQuery	<< Main
 		<< ';'
 		<< ends;
 
+#ifdef LOG_SQL
 elog	<< "ccontrol::UserGotMask> "
 	<< theQuery.str().c_str()
 	<< endl; 
+#endif
 
 ExecStatusType status = SQLDb->Exec( theQuery.str().c_str() ) ;
 
@@ -1718,9 +1772,11 @@ theQuery	<< Main
 		<< ';'
 		<< ends;
 
+#ifdef LOG_SQL
 elog	<< "ccontrol::UserGotHost> "
 	<< theQuery.str().c_str()
 	<< endl; 
+#endif
 
 ExecStatusType status = SQLDb->Exec( theQuery.str().c_str() ) ;
 
@@ -1827,9 +1883,11 @@ theQuery	<< Main
 		<< host << "')"
 		<< ends;
 
+#ifdef LOG_SQL
 elog	<< "ccontrol::AddHost> "
 	<< theQuery.str().c_str()
 	<< endl; 
+#endif
 
 ExecStatusType status = SQLDb->Exec( theQuery.str().c_str() ) ;
 
@@ -1863,9 +1921,11 @@ theQuery	<< Main
 		<< host << "'"
 		<< ends;
 
+#ifdef LOG_SQL
 elog	<< "ccontrol::DelHost> "
 	<< theQuery.str().c_str()
 	<< endl; 
+#endif
 
 ExecStatusType status = SQLDb->Exec( theQuery.str().c_str() ) ;
 
@@ -1932,9 +1992,11 @@ theQuery	<< Main
 		<< "' ORDER BY line"
 		<< ends;
 
+#ifdef LOG_SQL
 elog	<< "ccontrol::GetHelp> "
 	<< theQuery.str().c_str()
 	<< endl; 
+#endif
 
 ExecStatusType status = SQLDb->Exec( theQuery.str().c_str() ) ;
 
@@ -1978,9 +2040,11 @@ theQuery	<< Main
 		<< "' ORDER BY line"
 		<< ends;
 
+#ifdef LOG_SQL
 elog	<< "ccontrol::GetHelp> "
 	<< theQuery.str().c_str()
 	<< endl; 
+#endif
 
 ExecStatusType status = SQLDb->Exec( theQuery.str().c_str() ) ;
 
@@ -2265,9 +2329,11 @@ theQuery	<< " (" << removeSqlChars(theClient->getNickUserHost()) <<")','"
 		<< removeSqlChars(buffer) << "')"
 		<< ends;
 
+#ifdef LOG_SQL
 elog	<< "ccontrol::DailyLog> "
 	<< theQuery.str().c_str()
 	<< endl; 
+#endif
 
 ExecStatusType status = SQLDb->Exec( theQuery.str().c_str() ) ;
 
@@ -2361,9 +2427,11 @@ theQuery	<< Main
 		<< removeSqlChars(buffer) << "')"
 		<< ends;
 
+#ifdef LOG_SQL
 elog	<< "ccontrol::DailyLog> "
 	<< theQuery.str().c_str()
 	<< endl; 
+#endif
 
 ExecStatusType status = SQLDb->Exec( theQuery.str().c_str() ) ;
 
@@ -2480,9 +2548,11 @@ theQuery 	<< queryHeader
 		<< " ORDER BY ts DESC"
 		<< ends;
 	
+#ifdef LOG_SQL
 elog	<< "ccontrol::CreateReport> " 
 	<< theQuery.str().c_str() 
 	<< endl;
+#endif
 	
 ExecStatusType status = SQLDb->Exec( theQuery.str().c_str() ) ;
 
@@ -2791,10 +2861,11 @@ stringstream theQuery;
 theQuery	<< Main
 		<< ends;
 
+#ifdef LOG_SQL
 elog	<< "ccontrol::loadGlines> "
 	<< theQuery.str().c_str()
 	<< endl; 
-
+#endif
 ExecStatusType status = SQLDb->Exec( theQuery.str().c_str() ) ;
 
 if( PGRES_TUPLES_OK != status )
@@ -2838,10 +2909,11 @@ stringstream theQuery;
 theQuery        << User::Query
                 << ends;
 
+#ifdef LOG_SQL
 elog    << "ccotrol::loadUsers> "
         << theQuery.str().c_str()
         << endl; 
- 
+#endif
 ExecStatusType status = SQLDb->Exec( theQuery.str().c_str() ) ;
 
 if (PGRES_TUPLES_OK != status)
@@ -2913,10 +2985,11 @@ stringstream theQuery;
 theQuery        << server::Query
                 << ends;
 
+#ifdef LOG_SQL
 elog    << "ccotrol::loadServers> "
         << theQuery.str().c_str()
         << endl; 
- 
+#endif
 ExecStatusType status = SQLDb->Exec( theQuery.str().c_str() ) ;
 
 if (PGRES_TUPLES_OK != status)
@@ -2946,10 +3019,12 @@ stringstream theQuery;
 theQuery        << "Select * from misc where VarName = 'MaxUsers';"
                 << ends;
 
+#ifdef LOG_SQL
 elog    << "ccotrol::loadMaxUsers> "
         << theQuery.str().c_str()
         << endl; 
- 
+#endif
+
 ExecStatusType status = SQLDb->Exec( theQuery.str().c_str() ) ;
 
 if (PGRES_TUPLES_OK != status)
@@ -3035,9 +3110,11 @@ stringstream theQuery;
 theQuery        << server::Query
                 << ends;
          
-elog    << "ccotrol::loadServers> "
+#ifdef LOG_SQL
+elog    << "ccotrol::loadBadChannels> "
         << theQuery.str()
         << endl;
+#endif
 
 ExecStatusType status = SQLDb->Exec( theQuery.str().c_str() ) ;
 //delete[] theQuery.str() ;
@@ -3368,10 +3445,11 @@ stringstream theQuery;
 theQuery	<< Main
 		<< ends;
 
+#ifdef LOG_SQL
 elog	<< "ccontrol::loadExceptions> "
 	<< theQuery.str().c_str()
 	<< endl; 
-
+#endif
 ExecStatusType status = SQLDb->Exec( theQuery.str().c_str() ) ;
 
 if( PGRES_TUPLES_OK != status )
@@ -3465,9 +3543,11 @@ stringstream theQuery;
 theQuery	<< Main
 		<< ends;
 
+#ifdef LOG_SQL
 elog	<< "ccontrol::loadCommands> "
 	<< theQuery.str().c_str()
 	<< endl; 
+#endif
 
 ExecStatusType status = SQLDb->Exec( theQuery.str().c_str() ) ;
 
@@ -3487,9 +3567,9 @@ for( int i = 0 ; i < SQLDb->Tuples() ; i++ )
 	NewCom = findRealCommand(SQLDb->GetValue(i,0));
 	if(!NewCom)
 		{
-		elog	<< "Can't find handler for command "
+		/*elog	<< "Can't find handler for command "
 			<< SQLDb->GetValue(i,0)
-			<< endl;	
+			<< endl;	*/
 		}
 	else
 		{
@@ -3532,10 +3612,11 @@ theQuery	<< Main
 		<< "'"
 		<< ends;
 
+#ifdef LOG_SQL
 elog	<< "ccontrol::updateCommands> "
 	<< theQuery.str().c_str()
 	<< endl; 
-
+#endif
 ExecStatusType status = SQLDb->Exec( theQuery.str().c_str() ) ;
 
 if( PGRES_COMMAND_OK != status )
@@ -3655,54 +3736,6 @@ return NewString;
 
 }
 
-void ccontrol::GatesCheck()
-{
-gateIterator ptr;
-ccGate* tmpGate;
-for(ptr = gatesCheckingQueue.begin();ptr!=gatesCheckingQueue.end();)
-	{
-	tmpGate = *ptr;
-	if(tmpGate->getStatus() == ccGate::statDone)
-		{
-		if(tmpGate->getFound())
-			{
-			MsgChanLog("Found socks proxy in %s\n",tmpGate->getHost().c_str());
-			}			
-		ptr = gatesCheckingQueue.erase(ptr);
-		delete tmpGate;
-		}
-	else
-		{
-		++ptr;
-		}
-	}
-
-int LeftThreads = maxThreads - gatesCheckingQueue.size();
-//MsgChanLog("Left threads is %d",LeftThreads);
-ptr = gatesWaitingQueue.begin();
-int er;
-pthread_t tId; 
-for(;(!(gatesWaitingQueue.empty()) && (LeftThreads > 0));--LeftThreads)
-	{
-	tmpGate = gatesWaitingQueue.front();
-	//gatesWaitingQueue.pop_front();
-	gatesWaitingQueue.erase(gatesWaitingQueue.begin());
-	//MsgChanLog("After %d\n",gatesWaitingQueue.size());
-	gatesCheckingQueue.push_back(tmpGate);
-	if((er = pthread_create(&tId,NULL,initGate,(void *)tmpGate)) < 0)
-		{
-		MsgChanLog("Error(%d) while creating thread\n",errno);
-		gatesCheckingQueue.pop_front();
-		delete tmpGate;
-		}
-	else
-		{
-		tmpGate->setThreadId(tId);
-		}
-	}
-
-}	
-
 void ccontrol::checkDbConnection()
 {
 
@@ -3800,11 +3833,7 @@ if(checkClones)
 	Notice(tmpClient,"Monitoring %d diffrent clones hosts\n",clientsIpMap.size());
 	Notice(tmpClient,"and %d diffrent virtual clones hosts\n",virtualClientsMap.size());
 	}	
-if(checkGates)
-	Notice(tmpClient,"Monitoring %d threads out of %d, and there are %d in the waiting queue",gatesCheckingQueue.size()
-		,maxThreads,gatesWaitingQueue.size());
 Notice(tmpClient,"Allocated Structures:");
-Notice(tmpClient,"ccGate:  %d",ccGate::numAllocated);
 Notice(tmpClient,"ccServer: %d",ccServer::numAllocated);
 Notice(tmpClient,"ccGline: %d",ccGline::numAllocated);
 Notice(tmpClient,"ccException: %d",ccException::numAllocated);
@@ -4094,11 +4123,11 @@ if(maxUsers < curUsers)
 			<< dateMax
 			<< " Where VarName = 'MaxUsers'"
 			<< ends;
-//#ifdef LOG_SQL
+#ifdef LOG_SQL
 	elog	<< "ccontrol::checkMaxUsers> "
 		<< DelQuery.str().c_str()
 		<< endl; 
-//#endif
+#endif
 	ExecStatusType status = SQLDb->Exec( DelQuery.str().c_str() ) ;
 
 	if( PGRES_COMMAND_OK != status )
@@ -4214,121 +4243,6 @@ badChannelsMap[Channel->getName()] = Channel;
 void ccontrol::remBadChannel(ccBadChannel* Channel)
 {
 badChannelsMap.erase(badChannelsMap.find(Channel->getName()));
-}
-
-void *initGate(void* arg)
-{
-
-pthread_detach(pthread_self()); //First we must de-attach 
-ccGate * tmpGate = (ccGate*) arg;
-
-int sockFd,conRet;
-fd_set ReadSet,WriteSet;
-bool error = false;
-int tError = 0;
-char Buf[512] = {0};
-struct sockHead{
-    char Version; //Socks version number
-    char Command; //Connect command = 1
-    short int Port; //Destination port
-    char destIp[4]; //Destination ip 
-    char userid[5]; //Userid
-    };
-struct tval{
-    long int secs;
-    long int milsecs;
-};
-timeval Timeout;
-Timeout.tv_sec = 3;
-Timeout.tv_usec = 0;
-
-sockHead sockHeader;
-sockHeader.Version = 4;
-sockHeader.Command = 1;
-sockHeader.Port = htons(6667);
-sockHeader.destIp[0] = 127;
-sockHeader.destIp[1] = 0;
-sockHeader.destIp[2] = 0;
-sockHeader.destIp[3] = 1;
-strcpy(sockHeader.userid,"blah");
-unsigned int Port = tmpGate->getPort();
-string Host = tmpGate->getHost();
-struct sockaddr_in MyAddr;
-MyAddr.sin_family = AF_INET;
-MyAddr.sin_port = htons(Port);
-MyAddr.sin_addr.s_addr = inet_addr(Host.c_str());
-sockFd = socket(AF_INET,SOCK_STREAM,0);
-int sockFlags = fcntl(sockFd,F_GETFL,0);
-fcntl(sockFd,F_SETFL,sockFlags | O_NONBLOCK);
-if((conRet = ::connect(sockFd,(struct sockaddr*) &MyAddr,sizeof(MyAddr)))< 0)
-        if(errno != EINPROGRESS)
-                error = true;
-        else if(conRet != 0)  
-                {
-		FD_ZERO(&ReadSet);
-                FD_SET(sockFd,&ReadSet);
-                WriteSet = ReadSet;
-		if((conRet = select(sockFd+1,&ReadSet,&WriteSet,NULL,&Timeout)) == 0)
-			{
-			error = true;
-			}
-		else if(FD_ISSET(sockFd,&ReadSet) || FD_ISSET(sockFd,&WriteSet))
-			{
-			socklen_t len = sizeof(tError);
-			if(getsockopt(sockFd,SOL_SOCKET,SO_ERROR,&tError,&len) < 0)
-				error = true;
-			}
-		else
-			error = true;
-		}
-if((!error) && !(tError))
-	{
-	fcntl(sockFd,F_SETFL,sockFlags);
-	tmpGate->setStatus(ccGate::statConnected);
-	int Res = 0;
-	if(tmpGate->getPort() == 1080)
-		{
-		int trys = 10;
-		do
-			{
-			errno =0;
-			Res = ::send(sockFd,(void *) &sockHeader,sizeof(sockHeader)-1,0);
-			}while((--trys) && (errno == EINTR));
-		}
-	if(Res >= 0)
-		{
-		FD_ZERO(&ReadSet);
-		FD_SET(sockFd,&ReadSet);
-		
-		Res = ::select(sockFd+1,&ReadSet,NULL,NULL,&Timeout);
-		if(Res >= 0)
-			{
-			if(FD_ISSET(sockFd,&ReadSet))
-				{
-				Res = ::recv(sockFd,Buf,sizeof(Buf),0);
-				if(Res >= 0)
-					{
-					if(tmpGate->getPort() == 1080)
-						{
-						if(Buf[1] == 90) //Found a socks! 
-							tmpGate->setFound(true);
-						}
-					else if(tmpGate->getPort() == 23)
-						{
-						if(strstr(Buf,"wingate>") != NULL)
-							tmpGate->setFound(true);
-						}
-						
-		    			}
-				}
-			}
-		}
-	}
-
-::close(sockFd);		
-tmpGate->setStatus(ccGate::statDone);
-pthread_exit(NULL);
-return NULL;
 }
 
 

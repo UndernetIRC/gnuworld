@@ -14,7 +14,7 @@
 
 @SET_MAKE@
 
-# "$Id: Makefile.in,v 1.117 2002/06/07 14:38:19 dan_karrels Exp $"
+# "$Id: Makefile.in,v 1.118 2002/06/07 17:58:24 mrbean_ Exp $"
 SHELL = @SHELL@
 
 srcdir = @srcdir@
@@ -105,7 +105,6 @@ libccontrol_la_SOURCES = ccontrol.cc \
 	ccBadChannel.cc \
 	ccException.cc \
 	ccFloodData.cc \
-	ccGate.cc \
 	ccGline.cc \
 	ccLog.cc \
 	ccServer.cc \
@@ -171,23 +170,22 @@ libccontrol_la_LIBADD =
 am_libccontrol_la_OBJECTS = ccontrol.lo CControlCommands.lo \
 	ADDCOMMANDCommand.lo ADDOPERCHANCommand.lo ADDSERVERCommand.lo \
 	ADDUSERCommand.lo ccBadChannel.lo ccException.lo ccFloodData.lo \
-	ccGate.lo ccGline.lo ccLog.lo ccServer.lo ccUser.lo \
-	CHANINFOCommand.lo CHECKNETCommand.lo CLEARCHANCommand.lo \
-	COMMANDSCommand.lo CONFIGCommand.lo DEAUTHCommand.lo \
-	DEOPCommand.lo EXCEPTIONCommand.lo FORCEGLINECommand.lo \
-	GCHANCommand.lo GLINECommand.lo HELPCommand.lo INVITECommand.lo \
-	JUPECommand.lo KICKCommand.lo LASTCOMCommand.lo \
-	LEARNNETCommand.lo LISTCommand.lo LISTHOSTSCommand.lo \
-	LISTIGNORESCommand.lo LISTOPERCHANSCommand.lo LOGINCommand.lo \
-	MAXUSERSCommand.lo MODECommand.lo MODERATECommand.lo \
-	MODUSERCommand.lo NEWPASSCommand.lo NOMODECommand.lo \
-	OPCommand.lo REMGCHANCommand.lo REMGLINECommand.lo \
-	REMOPERCHANCommand.lo REMCOMMANDCommand.lo \
-	REMOVEIGNORECommand.lo REMSERVERCommand.lo REMUSERCommand.lo \
-	SCANCommand.lo SCANGLINECommand.lo SHUTDOWNCommand.lo \
-	STATUSCommand.lo SUSPENDCommand.lo TRANSLATECommand.lo \
-	UNMODERATECommand.lo UNSUSPENDCommand.lo USERINFOCommand.lo \
-	WHOISCommand.lo
+	ccGline.lo ccLog.lo ccServer.lo ccUser.lo CHANINFOCommand.lo \
+	CHECKNETCommand.lo CLEARCHANCommand.lo COMMANDSCommand.lo \
+	CONFIGCommand.lo DEAUTHCommand.lo DEOPCommand.lo \
+	EXCEPTIONCommand.lo FORCEGLINECommand.lo GCHANCommand.lo \
+	GLINECommand.lo HELPCommand.lo INVITECommand.lo JUPECommand.lo \
+	KICKCommand.lo LASTCOMCommand.lo LEARNNETCommand.lo \
+	LISTCommand.lo LISTHOSTSCommand.lo LISTIGNORESCommand.lo \
+	LISTOPERCHANSCommand.lo LOGINCommand.lo MAXUSERSCommand.lo \
+	MODECommand.lo MODERATECommand.lo MODUSERCommand.lo \
+	NEWPASSCommand.lo NOMODECommand.lo OPCommand.lo \
+	REMGCHANCommand.lo REMGLINECommand.lo REMOPERCHANCommand.lo \
+	REMCOMMANDCommand.lo REMOVEIGNORECommand.lo REMSERVERCommand.lo \
+	REMUSERCommand.lo SCANCommand.lo SCANGLINECommand.lo \
+	SHUTDOWNCommand.lo STATUSCommand.lo SUSPENDCommand.lo \
+	TRANSLATECommand.lo UNMODERATECommand.lo UNSUSPENDCommand.lo \
+	USERINFOCommand.lo WHOISCommand.lo
 libccontrol_la_OBJECTS = $(am_libccontrol_la_OBJECTS)
 
 DEFS = @DEFS@
@@ -250,10 +248,9 @@ am__depfiles_maybe = depfiles
 @AMDEP_TRUE@	./$(DEPDIR)/WHOISCommand.Plo \
 @AMDEP_TRUE@	./$(DEPDIR)/ccBadChannel.Plo \
 @AMDEP_TRUE@	./$(DEPDIR)/ccException.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/ccFloodData.Plo ./$(DEPDIR)/ccGate.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/ccGline.Plo ./$(DEPDIR)/ccLog.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/ccServer.Plo ./$(DEPDIR)/ccUser.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/ccontrol.Plo
+@AMDEP_TRUE@	./$(DEPDIR)/ccFloodData.Plo ./$(DEPDIR)/ccGline.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/ccLog.Plo ./$(DEPDIR)/ccServer.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/ccUser.Plo ./$(DEPDIR)/ccontrol.Plo
 CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
 LTCXXCOMPILE = $(LIBTOOL) --mode=compile $(CXX) $(DEFS) \
@@ -360,7 +357,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ccBadChannel.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ccException.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ccFloodData.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ccGate.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ccGline.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ccLog.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ccServer.Plo@am__quote@

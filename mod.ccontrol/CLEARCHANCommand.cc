@@ -15,12 +15,14 @@
 #include	"Constants.h"
 #include	"ccBadChannel.h"
 
-const char CLEARCHANCommand_cc_rcsId[] = "$Id: CLEARCHANCommand.cc,v 1.18 2002/05/25 15:03:57 mrbean_ Exp $";
+const char CLEARCHANCommand_cc_rcsId[] = "$Id: CLEARCHANCommand.cc,v 1.19 2002/06/07 17:58:23 mrbean_ Exp $";
 
 namespace gnuworld
 {
 
 using std::string ;
+using std::vector ;
+using gnuworld::iClient;
 
 namespace uworld
 {
@@ -28,6 +30,8 @@ namespace uworld
 bool CLEARCHANCommand::Exec( iClient* theClient, const string& Message )
 {
 StringTokenizer st( Message ) ;
+bool Desynch = false;
+
 if( st.size() < 2 )
 	{
 	Usage( theClient ) ;
@@ -72,8 +76,45 @@ if(st.size() == 2)
 	doModes = "OBKLIM";
 else if(!strcasecmp(string_upper(st[ 2 ]).c_str(),"ALL"))
 	doModes = "OBKLINMSPT";
+else if(!strcasecmp(string_upper(st [ 2]).c_str(),"-D"))
+	Desynch = true;
 else	
 	doModes = string_upper(st [ 2 ]);
+
+if(Desynch)
+	{
+	vector<iClient*> KickVec;
+	bot->Join(theChan->getName(),"+i",0,true);
+	//bot->Mode(theChan,Channel::MODE_I);
+	for( Channel::const_userIterator ptr = theChan->userList_begin();
+		ptr != theChan->userList_end() ; ++ptr )
+			{
+			
+			if ( !ptr->second->getClient()->getMode(iClient::MODE_SERVICES) ) 
+				{
+				KickVec.push_back(ptr->second->getClient());
+				}
+			else
+				{
+				/* 
+				 its a +k user, need to make sure its not us
+				 */
+				if(strcmp(ptr->second->getClient()->getCharYYXXX().c_str(),
+					 bot->getCharYYXXX().c_str()))
+					{ 
+					bot->Message(ptr->second->getClient(),"OPERPART %s"
+						    ,theChan->getName().c_str());
+					}
+				}
+			}
+	if(KickVec.size() > 0)
+		{
+		string reason = "Desynch clearing";
+		bot->Kick(theChan,KickVec,reason);
+		}
+	bot->Part(theChan->getName());
+	return true;
+	}
 	
 for( string::size_type modePos = 0 ; modePos < doModes.size() ; ++modePos )
 	{

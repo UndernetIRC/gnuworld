@@ -18,7 +18,7 @@
 #include	"StringTokenizer.h"
 #include	"ELog.h"
 
-const char LASTCOMCommand_cc_rcsId[] = "$Id: LASTCOMCommand.cc,v 1.11 2002/05/23 17:43:11 dan_karrels Exp $";
+const char LASTCOMCommand_cc_rcsId[] = "$Id: LASTCOMCommand.cc,v 1.12 2002/06/07 17:58:24 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -36,6 +36,7 @@ bool LASTCOMCommand::Exec( iClient* theClient, const string& Message )
 
 
 StringTokenizer st( Message ) ;
+bot->MsgChanLog("LASTCOM %s\n");
 #ifndef LOGTOHD
 unsigned int NumOfCom;
 unsigned int Days = 0;
@@ -55,11 +56,9 @@ if( st.size() == 1 )
 			<< " ORDER BY ts DESC"
 			<< " LIMIT " << NumOfCom
 			<< ends;
-        bot->MsgChanLog("LASTCOM\n");
 	}
 else 
 	{
-        bot->MsgChanLog("LASTCOM %s\n");
 	NumOfCom = atoi(st[1].c_str());
 	if(st.size() > 2)
 		{

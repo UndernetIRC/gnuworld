@@ -3,7 +3,7 @@
  */
 
 #ifndef __CCONTROL_H
-#define __CCONTROL_H "$Id: ccontrol.h,v 1.74 2002/05/25 15:03:58 mrbean_ Exp $"
+#define __CCONTROL_H "$Id: ccontrol.h,v 1.75 2002/06/07 17:58:24 mrbean_ Exp $"
 
 //Undef this if you want to log to the database
 #define LOGTOHD 
@@ -34,7 +34,6 @@
 #include        "server.h"
 #include	"CommandsDec.h"
 #include 	"ccBadChannel.h"
-#include	"ccGate.h"
 #include	"defs.h"
 
 #ifdef LOGTOHD
@@ -141,13 +140,6 @@ protected:
 	
 	exceptionListType		exceptionList;
 	
-	typedef list< ccGate* >		gateQueueType;
-	
-	gateQueueType			gatesWaitingQueue;
-	
-	gateQueueType			gatesCheckingQueue;
-	
-	typedef gateQueueType::iterator gateIterator;
 	
 	//typedef map<string,int> 	clientsIpMapType;
 	typedef hash_map<string , int , eHash , eqstr> clientsIpMapType;
@@ -262,7 +254,7 @@ public:
 	 * This method will kick the given user from the given channel
 	 * for the given reason (arg 3).
 	 */
-	virtual bool Kick( Channel*, iClient*, const string& ) ;
+//	virtual bool Kick( Channel*, iClient*, const string& ) ;
 
 	/**
 	 * This method will cause the bot to join the channel with
@@ -593,8 +585,6 @@ public:
 	
 	const string expandDbServer(const string&);
 	
-	void GatesCheck();
-	
 	const string removeSqlChars(const string&);
 	
 	void checkDbConnection();
@@ -829,8 +819,6 @@ public:
 	/* TimerID = Expired glines/ignores/suspends/... interval timer */
 	xServer::timerID expiredTimer;
 
-	xServer::timerID gatesStatusCheck;
-	
 	xServer::timerID dbConnectionCheck;
 	
 protected:
@@ -922,8 +910,6 @@ protected:
 	
 	int			maxThreads;
 
-	bool			checkGates;	 
-	
 	bool			checkClones;
 	
 	time_t			dbConnectionTimer;
@@ -951,8 +937,6 @@ protected:
 	unsigned long int	curUsers;
 	
 } ; 
-
-void* initGate( void * );
 
 extern bool dbConnected;
 } //namespace uworld
