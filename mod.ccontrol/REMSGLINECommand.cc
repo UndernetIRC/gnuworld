@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: REMSGLINECommand.cc,v 1.5 2003/08/09 23:15:34 dan_karrels Exp $
+ * $Id: REMSGLINECommand.cc,v 1.6 2004/07/14 21:59:34 isomer Exp $
  */
 
 #include	<string>
@@ -30,7 +30,7 @@
 #include	"StringTokenizer.h"
 #include	"config.h"
 
-RCSTAG( "$Id: REMSGLINECommand.cc,v 1.5 2003/08/09 23:15:34 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: REMSGLINECommand.cc,v 1.6 2004/07/14 21:59:34 isomer Exp $" ) ;
 
 namespace gnuworld
 {
@@ -79,8 +79,7 @@ if(tmpGline != NULL)
 	bot->remGline(tmpGline);
 	delete tmpGline;
 	}	
-if(!realName)
-	server->removeGline(st[1],bot);
+server->removeGline(st[1],bot);
 bot->Notice( theClient, "Removal of gline(%s) succeeded\n",st[1].c_str() ) ;
 return true ;
 }
