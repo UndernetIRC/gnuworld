@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: wingateModule.cc,v 1.1 2002/08/08 21:31:45 dan_karrels Exp $
+ * $Id: wingateModule.cc,v 1.2 2003/06/28 01:21:21 dan_karrels Exp $
  */
 
 #include	<string>
@@ -74,7 +74,7 @@ void wingateModule::OnConnect( Connection* )
 // Nothing to do, wait for input
 }
 
-void wingateModule::OnConnectFail( Connection* cPtr )
+void wingateModule::OnConnectFail( Connection* )
 {
 // Client ok
 // No need to call CM::Disconnect(), it's already disconnected :)

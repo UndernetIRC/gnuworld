@@ -1,10 +1,10 @@
-dnl $Id: configure.ac,v 1.9 2003/06/20 18:58:50 dan_karrels Exp $
+dnl $Id: configure.ac,v 1.10 2003/06/28 01:21:18 dan_karrels Exp $
 dnl ----------------------------------------------------------
 
 echo Configuring GNUWorld...
 echo
 
-AC_REVISION($Revision: 1.9 $)
+AC_REVISION($Revision: 1.10 $)
 AC_INIT
 AC_CONFIG_SRCDIR([src/main.cc])
 AM_INIT_AUTOMAKE(gnuworld,2.2)
@@ -146,12 +146,13 @@ AC_ARG_WITH(debug,
 )
 
 dnl By default, do NOT build test directory
-TEST_DIR=""
+build_testdir=false
 AC_ARG_WITH(test,
 	AC_HELP_STRING([--with-test],
 			[Enable building of test programs]),
-	[TEST_DIR="test"]
+	[build_testdir=true]
 )
+AM_CONDITIONAL(COND_TESTDIR,[test $build_testdir = true])
 
 AC_ARG_WITH(pedantic,
 	AC_HELP_STRING([--with-pedantic],
@@ -198,9 +199,9 @@ AC_ARG_WITH(pgsql-include,
 )
 dnl echo PGSQL_INCLUDE: $PGSQL_INCLUDE
 
-DB=""
+build_dbdir=false
 if [test $check_pgsql = "yes" ]; then
-	DB="db"
+	build_dbdir=true
 	AC_MSG_CHECKING(for libpq++.h)
 	if [test -f "$PGSQL_INCLUDE/libpq++.h"]; then
 		/bin/true
@@ -239,6 +240,7 @@ if [test $check_pgsql = "yes" ]; then
 	fi
 	AC_MSG_RESULT(yes)
 fi
+AM_CONDITIONAL(COND_DBDIR,[test $build_dbdir = true])
 
 dnl echo "PGSQL_INCLUDE: $PGSQL_INCLUDE"
 dnl echo "PGSQL_LIB: $PGSQL_LIB"
@@ -249,6 +251,16 @@ CXXFLAGS="$CXXFLAGS -I`pwd`/include -I`pwd`/libgnuworld"
 echo
 echo "Detecting modules..."
 echo
+
+build_modccontrol=false
+build_modclientExample=false
+build_modcloner=false
+build_modcservice=false
+build_moddronescan=false
+build_modgnutest=false
+build_modnickserv=false
+build_modscanner=false
+build_modstats=false
 
 MOD_DIRS=""
 searchForMods=yes
@@ -271,6 +283,21 @@ dnl 	echo "tmp: $tmp"
 dnl	echo "tmp: $tmp"
 	MOD_DIRS="$MOD_DIRS $tmp"
 	searchForMods=no
+
+dnl	Prepare for conditionals
+	for moduleName in $MOD_DIRS; do
+	  case "$moduleName" in
+	    mod.ccontrol)	build_modccontrol=true;;
+	    mod.clientExample)	build_modclientExample=true;;
+	    mod.cloner)		build_modcloner=true;;
+	    mod.ccservice)	build_modcservice=true;;
+	    mod.dronescan)	build_moddronescan=true;;
+	    mod.gnutest)	build_modgnutest=true;;
+	    mod.nickserv)	build_modnickserv=true;;
+	    mod.scanner)	build_modscanner=true;;
+	    mod.stats)		build_modstats=true;;
+	  esac
+	done
 fi
 ],
 [
@@ -290,14 +317,34 @@ dnl	echo "mod_list: $mod_list"
 		fi
 
 		if [ test -f $file/Makefile.in ]; then
-			echo Adding module `echo $file | \cut -f2 -d"."`
-			MOD_DIRS="$MOD_DIRS $file"
+		  echo Adding module `echo $file | \cut -f2 -d"."`
+		  case "$file" in
+		    mod.ccontrol)	build_modccontrol=true;;
+		    mod.clientExample)	build_modclientExample=true;;
+		    mod.cloner)		build_modcloner=true;;
+		    mod.ccservice)	build_modcservice=true;;
+		    mod.dronescan)	build_moddronescan=true;;
+		    mod.gnutest)	build_modgnutest=true;;
+		    mod.nickserv)	build_modnickserv=true;;
+		    mod.scanner)	build_modscanner=true;;
+		    mod.stats)		build_modstats=true;;
+		  esac
 		fi
 	 done
 fi
 
+AM_CONDITIONAL(COND_MODCCONTROL,[test $build_modccontrol = true])
+AM_CONDITIONAL(COND_MODCLIENTEXAMPLE,[test $build_modclientExample = true])
+AM_CONDITIONAL(COND_MODCLONER,[test $build_modcloner = true])
+AM_CONDITIONAL(COND_MODCSERVICE,[test $build_modcservice = true])
+AM_CONDITIONAL(COND_MODDRONESCAN,[test $build_moddronescan = true])
+AM_CONDITIONAL(COND_MODGNUTEST,[test $build_modgnutest = true])
+AM_CONDITIONAL(COND_MODNICKSERV,[test $build_modnickserv = true])
+AM_CONDITIONAL(COND_MODSCANNER,[test $build_modscanner = true])
+AM_CONDITIONAL(COND_MODSTATS,[test $build_modstats = true])
+
 dnl echo "MOD_DIRS = $MOD_DIRS"
-AC_SUBST(MOD_DIRS)
+dnl AC_SUBST(MOD_DIRS)
 
 AC_SUBST(DB)
 AC_SUBST(TEST_DIR)

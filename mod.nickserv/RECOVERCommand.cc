@@ -1,6 +1,9 @@
 /**
  * RECOVERCommand.cc
  *
+ * Allows a user to kill off another user that is
+ * using their registered nickname.
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
@@ -16,10 +19,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: RECOVERCommand.cc,v 1.4 2003/06/19 22:58:31 dan_karrels Exp $
- *
- * Allows a user to kill off another user that is
- * using their registered nickname.
+ * $Id: RECOVERCommand.cc,v 1.5 2003/06/28 01:21:21 dan_karrels Exp $
  */
 
 #include "config.h"
@@ -27,7 +27,7 @@
 
 #include "nickserv.h"
 
-RCSTAG("$Id: RECOVERCommand.cc,v 1.4 2003/06/19 22:58:31 dan_karrels Exp $");
+RCSTAG("$Id: RECOVERCommand.cc,v 1.5 2003/06/28 01:21:21 dan_karrels Exp $");
 
 namespace gnuworld
 {
@@ -37,7 +37,7 @@ namespace ns
 
 using std::string;
 
-bool RECOVERCommand::Exec(iClient* theClient, const string& Message)
+bool RECOVERCommand::Exec(iClient* theClient, const string& )
 {
 bot->theStats->incStat("NS.CMD.RECOVER");
 

@@ -1,4 +1,4 @@
-/*
+/**
  * sqlChannel.cc
  *
  * Storage class for accessing user information either from the backend
@@ -9,7 +9,22 @@
  * 30/12/2000: Moved static SQL data to constants.h --Gte
  * Set loadData up to take data from rows other than 0.
  *
- * $Id: sqlChannel.cc,v 1.37 2002/05/23 17:43:13 dan_karrels Exp $
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
+ * USA.
+ *
+ * $Id: sqlChannel.cc,v 1.38 2003/06/28 01:21:20 dan_karrels Exp $
  */
 
 #include	<sstream>
@@ -26,7 +41,7 @@
 #include	"cservice_config.h"
 
 const char sqlChannel_h_rcsId[] = __SQLCHANNEL_H ;
-const char sqlChannel_cc_rcsId[] = "$Id: sqlChannel.cc,v 1.37 2002/05/23 17:43:13 dan_karrels Exp $" ;
+const char sqlChannel_cc_rcsId[] = "$Id: sqlChannel.cc,v 1.38 2003/06/28 01:21:20 dan_karrels Exp $" ;
 
 namespace gnuworld
 {

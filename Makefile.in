@@ -48,6 +48,28 @@ AWK = @AWK@
 CC = @CC@
 CCDEPMODE = @CCDEPMODE@
 CFLAGS = @CFLAGS@
+COND_DBDIR_FALSE = @COND_DBDIR_FALSE@
+COND_DBDIR_TRUE = @COND_DBDIR_TRUE@
+COND_MODCCONTROL_FALSE = @COND_MODCCONTROL_FALSE@
+COND_MODCCONTROL_TRUE = @COND_MODCCONTROL_TRUE@
+COND_MODCLIENTEXAMPLE_FALSE = @COND_MODCLIENTEXAMPLE_FALSE@
+COND_MODCLIENTEXAMPLE_TRUE = @COND_MODCLIENTEXAMPLE_TRUE@
+COND_MODCLONER_FALSE = @COND_MODCLONER_FALSE@
+COND_MODCLONER_TRUE = @COND_MODCLONER_TRUE@
+COND_MODCSERVICE_FALSE = @COND_MODCSERVICE_FALSE@
+COND_MODCSERVICE_TRUE = @COND_MODCSERVICE_TRUE@
+COND_MODDRONESCAN_FALSE = @COND_MODDRONESCAN_FALSE@
+COND_MODDRONESCAN_TRUE = @COND_MODDRONESCAN_TRUE@
+COND_MODGNUTEST_FALSE = @COND_MODGNUTEST_FALSE@
+COND_MODGNUTEST_TRUE = @COND_MODGNUTEST_TRUE@
+COND_MODNICKSERV_FALSE = @COND_MODNICKSERV_FALSE@
+COND_MODNICKSERV_TRUE = @COND_MODNICKSERV_TRUE@
+COND_MODSCANNER_FALSE = @COND_MODSCANNER_FALSE@
+COND_MODSCANNER_TRUE = @COND_MODSCANNER_TRUE@
+COND_MODSTATS_FALSE = @COND_MODSTATS_FALSE@
+COND_MODSTATS_TRUE = @COND_MODSTATS_TRUE@
+COND_TESTDIR_FALSE = @COND_TESTDIR_FALSE@
+COND_TESTDIR_TRUE = @COND_TESTDIR_TRUE@
 CPP = @CPP@
 CPPFLAGS = @CPPFLAGS@
 CXX = @CXX@
@@ -83,7 +105,6 @@ MAINT = @MAINT@
 MAINTAINER_MODE_FALSE = @MAINTAINER_MODE_FALSE@
 MAINTAINER_MODE_TRUE = @MAINTAINER_MODE_TRUE@
 MAKEINFO = @MAKEINFO@
-MOD_DIRS = @MOD_DIRS@
 OBJEXT = @OBJEXT@
 PACKAGE = @PACKAGE@
 PACKAGE_BUGREPORT = @PACKAGE_BUGREPORT@
@@ -144,16 +165,42 @@ sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 threadLib = @threadLib@
 topdir = @topdir@
-SUBDIRS = libgnuworld libltdl src libircu \
-	@DB@ @MOD_DIRS@ @TEST_DIR@
 
+@COND_MODCCONTROL_TRUE@MODCCONTROL = mod.ccontrol
 
-DIST_SUBDIRS = db libgnuworld libircu libltdl \
-	mod.ccontrol mod.clientExample \
-	mod.cloner mod.cservice \
-	mod.dronescan mod.gnutest \
-	mod.nickserv mod.scanner \
-	mod.stats src test
+@COND_MODCLIENTEXAMPLE_TRUE@MODCLIENTEXAMPLE = mod.clientExample
+
+@COND_MODCLONER_TRUE@MODCLONER = mod.cloner
+
+@COND_MODCSERVICE_TRUE@MODCSERVICE = mod.cservice
+
+@COND_MODDRONESCAN_TRUE@MODDRONESCAN = mod.dronescan
+
+@COND_MODGNUTEST_TRUE@MODGNUTEST = mod.gnutest
+
+@COND_MODNICKSERV_TRUE@MODNICKSERV = mod.nickserv
+
+@COND_MODSCANNER_TRUE@MODSCANNER = mod.scanner
+
+@COND_MODSTATS_TRUE@MODSTATS = mod.stats
+
+@COND_TESTDIR_TRUE@TESTDIR = test
+
+@COND_DBDIR_TRUE@DBDIR = db
+
+SUBDIRS = libgnuworld libltdl src \
+	$(MODCCONTROL) \
+	$(MODCLIENTEXAMPLE) \
+	$(MODCLONER) \
+	$(MODCSERVICE) \
+	$(MODDRONESCAN) \
+	$(MODGNUTEST) \
+	$(MODNICKSERV) \
+	$(MODSCANNER) \
+	$(MODSTATS) \
+	$(TESTDIR) \
+	$(DBDIR) \
+	libircu
 
 
 EXTRA_DIST = bin/ccontrol.example.conf.in \
@@ -166,161 +213,7 @@ EXTRA_DIST = bin/ccontrol.example.conf.in \
 	bin/nickserv.example.conf.in \
 	bin/scanner.example.conf.in \
 	bin/stats.example.conf.in \
-	contrib/00INDEX.TXT \
-	contrib/chktrans.py \
-	contrib/encrypt.sh \
-	doc/README.pgsql \
-	doc/README \
-	doc/README.appjudge \
-	doc/README.ccontrol \
-	doc/README.cservice \
-	doc/README.sharedmemory \
-	doc/autokill.sql \
-	doc/ccontrol.addme.sql \
-	doc/ccontrol.commands.sql \
-	doc/ccontrol.help.sql \
-	doc/ccontrol.sql \
-	doc/ccontrol.update.sql \
-	doc/checkvarargs.py \
-	doc/chktrans.py \
-	doc/cparse.py \
-	doc/cservice.addme.sql \
-	doc/cservice.config.sql \
-	doc/cservice.help.sql \
-	doc/cservice.sql \
-	doc/cservice.web.sql \
-	doc/genhelp.py \
-	doc/grant.sql \
-	doc/greeting.sql \
-	doc/language_christmas.sql \
-	doc/language_dutch.sql \
-	doc/language_easter.sql \
-	doc/language_german.sql \
-	doc/language_greek.sql \
-	doc/language_halloween.sql \
-	doc/language_swedish.sql \
-	doc/language_table.sql \
-	doc/languages.sql \
-	doc/local_db.sql \
-	doc/motd.sql \
-	doc/movetables \
-	doc/notes.sql \
-	doc/update.channels.sql \
-	doc/update.delete.sql \
-	doc/update.gfxcode.sql \
-	doc/update.statistics.sql \
-	doc/update_fraud_lists.sql \
-	doc/update_themes.sql \
-	doc/update_tzmove_l.sql \
-	doc/update_tzmove_r.sql \
-	doc/cmaster/website/faq.html \
-	doc/cmaster/website/index.html \
-	doc/cmaster/website/install.html \
-	doc/cmaster/website/manual.html \
-	doc/cmaster/website/web.html \
-	doc/cmaster/cleanup_traffic.sql \
-	doc/cmaster/enc_pass.sh \
-	doc/cmaster/fixDOS.sh \
-	doc/cmaster/Manager1K.sh \
-	doc/cmaster/WipeUser.sh \
-	doc/cmaster/appjudge \
-	doc/cmaster/appjudge-config \
-	doc/cmaster/cron-judge.in \
-	doc/cmaster/cycle-judge \
-	doc/idoc/index.php \
-	doc/idoc/README \
-	doc/nickserv/nickserv.sql \
-	doc/nickserv/INSTALL \
-	doc/nickserv/USAGE \
-	db/gnuworldDB.h \
-	db/pgsqlDB.h \
-	include/defs.h \
-	include/Channel.h \
-	include/ChannelUser.h \
-	include/Gline.h \
-	include/LoadClientTimerHandler.h \
-	include/Network.h \
-	include/Numeric.h \
-	include/ServerCommandHandler.h \
-	include/ServerTimerHandlers.h \
-	include/TimerHandler.h \
-	include/UnloadClientTimerHandler.h \
-	include/client.h \
-	include/config.h \
-	include/events.h \
-	include/iClient.h \
-	include/iServer.h \
-	include/ip.h \
-	include/moduleLoader.h \
-	include/server.h \
-	libgnuworld/Buffer.h \
-	libgnuworld/Connection.h \
-	libgnuworld/ConnectionHandler.h \
-	libgnuworld/ConnectionManager.h \
-	libgnuworld/EConfig.h \
-	libgnuworld/ELog.h \
-	libgnuworld/Signal.h \
-	libgnuworld/StringTokenizer.h \
-	libgnuworld/gThread.h \
-	libgnuworld/ircd_chattr.h \
-	libgnuworld/match.h \
-	libgnuworld/match_table.h \
-	libgnuworld/md5hash.h \
-	libgnuworld/misc.h \
-	libgnuworld/xparameters.h \
-	libltdl/acconfig.h \
-	libltdl/ltdl.h \
-	libltdl/config.h \
-	mod.ccontrol/CControlCommands.h \
-	mod.ccontrol/CommandsDec.h \
-	mod.ccontrol/Constants.h \
-	mod.ccontrol/ccBadChannel.h \
-	mod.ccontrol/ccException.h \
-	mod.ccontrol/ccFloodData.h \
-	mod.ccontrol/ccGline.h \
-	mod.ccontrol/ccLog.h \
-	mod.ccontrol/ccServer.h \
-	mod.ccontrol/ccUser.h \
-	mod.ccontrol/ccUserData.h \
-	mod.ccontrol/ccontrol.h \
-	mod.ccontrol/commLevels.h \
-	mod.clientExample/clientExample.h \
-	mod.cloner/cloner.h \
-	mod.cservice/constants.h \
-	mod.cservice/cservice.h \
-	mod.cservice/cserviceCommands.h \
-	mod.cservice/cservice_config.h \
-	mod.cservice/levels.h \
-	mod.cservice/networkData.h \
-	mod.cservice/responses.h \
-	mod.cservice/sqlBan.h \
-	mod.cservice/sqlChannel.h \
-	mod.cservice/sqlLevel.h \
-	mod.cservice/sqlPendingChannel.h \
-	mod.cservice/sqlPendingTraffic.h \
-	mod.cservice/sqlUser.h \
-	mod.dronescan/Timer.h \
-	mod.dronescan/clientData.h \
-	mod.dronescan/dronescan.h \
-	mod.dronescan/dronescanCommands.h \
-	mod.dronescan/dronescanTests.h \
-	mod.dronescan/levels.h \
-	mod.gnutest/gnutest.h \
-	mod.nickserv/Logger.h \
-	mod.nickserv/Stats.h \
-	mod.nickserv/levels.h \
-	mod.nickserv/logTarget.h \
-	mod.nickserv/netData.h \
-	mod.nickserv/nickserv.h \
-	mod.nickserv/nickservCommands.h \
-	mod.nickserv/responses.h \
-	mod.nickserv/sqlManager.h \
-	mod.nickserv/sqlUser.h \
-	mod.scanner/ScannerModule.h \
-	mod.scanner/dbThread.h \
-	mod.scanner/scanner.h \
-	mod.stats/stats.h \
-	test/testbot.h
+	bin/server_command_map
 
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -343,6 +236,9 @@ DIST_COMMON = README ././include/defs.h.in ./include/defs.h.in AUTHORS \
 	COPYING ChangeLog INSTALL Makefile.am Makefile.in NEWS TODO \
 	aclocal.m4 config.guess config.sub configure configure.ac \
 	depcomp install-sh ltconfig ltmain.sh missing mkinstalldirs
+DIST_SUBDIRS = libgnuworld libltdl src mod.ccontrol mod.clientExample \
+	mod.cloner mod.cservice mod.dronescan mod.gnutest mod.nickserv \
+	mod.scanner mod.stats test db libircu
 all: all-recursive
 
 .SUFFIXES:
@@ -550,7 +446,7 @@ distcleancheck_listfiles = find . -type f -print
 distdir: $(DISTFILES)
 	$(am__remove_distdir)
 	mkdir $(distdir)
-	$(mkinstalldirs) $(distdir)/././include $(distdir)/./include $(distdir)/bin $(distdir)/contrib $(distdir)/db $(distdir)/doc $(distdir)/doc/cmaster $(distdir)/doc/cmaster/website $(distdir)/doc/idoc $(distdir)/doc/nickserv $(distdir)/include $(distdir)/libgnuworld $(distdir)/libltdl $(distdir)/mod.ccontrol $(distdir)/mod.clientExample $(distdir)/mod.cloner $(distdir)/mod.cservice $(distdir)/mod.dronescan $(distdir)/mod.gnutest $(distdir)/mod.nickserv $(distdir)/mod.scanner $(distdir)/mod.stats $(distdir)/test
+	$(mkinstalldirs) $(distdir)/././include $(distdir)/./include $(distdir)/bin
 	@srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`; \
 	topsrcdirstrip=`echo "$(top_srcdir)" | sed 's|.|.|g'`; \
 	list='$(DISTFILES)'; for file in $$list; do \
@@ -757,6 +653,96 @@ uninstall-info: uninstall-info-recursive
 
 
 @SET_MAKE@
+	contrib/00INDEX.TXT \
+	contrib/chktrans.py \
+	contrib/encrypt.sh \
+	doc/README.pgsql \
+	doc/README \
+	doc/README.appjudge \
+	doc/README.ccontrol \
+	doc/README.cservice \
+	doc/README.sharedmemory \
+	doc/autokill.sql \
+	doc/ccontrol.addme.sql \
+	doc/ccontrol.commands.sql \
+	doc/ccontrol.help.sql \
+	doc/ccontrol.sql \
+	doc/ccontrol.update.sql \
+	doc/checkvarargs.py \
+	doc/chktrans.py \
+	doc/cparse.py \
+	doc/cservice.addme.sql \
+	doc/cservice.config.sql \
+	doc/cservice.help.sql \
+	doc/cservice.sql \
+	doc/cservice.web.sql \
+	doc/genhelp.py \
+	doc/grant.sql \
+	doc/greeting.sql \
+	doc/language_christmas.sql \
+	doc/language_dutch.sql \
+	doc/language_easter.sql \
+	doc/language_german.sql \
+	doc/language_greek.sql \
+	doc/language_halloween.sql \
+	doc/language_swedish.sql \
+	doc/language_table.sql \
+	doc/languages.sql \
+	doc/local_db.sql \
+	doc/motd.sql \
+	doc/movetables \
+	doc/notes.sql \
+	doc/update.channels.sql \
+	doc/update.delete.sql \
+	doc/update.gfxcode.sql \
+	doc/update.statistics.sql \
+	doc/update_fraud_lists.sql \
+	doc/update_themes.sql \
+	doc/update_tzmove_l.sql \
+	doc/update_tzmove_r.sql \
+	doc/cmaster/website/faq.html \
+	doc/cmaster/website/index.html \
+	doc/cmaster/website/install.html \
+	doc/cmaster/website/manual.html \
+	doc/cmaster/website/web.html \
+	doc/cmaster/cleanup_traffic.sql \
+	doc/cmaster/enc_pass.sh \
+	doc/cmaster/fixDOS.sh \
+	doc/cmaster/Manager1K.sh \
+	doc/cmaster/WipeUser.sh \
+	doc/cmaster/appjudge \
+	doc/cmaster/appjudge-config \
+	doc/cmaster/cron-judge.in \
+	doc/cmaster/cycle-judge \
+	doc/idoc/index.php \
+	doc/idoc/README \
+	doc/nickserv/nickserv.sql \
+	doc/nickserv/INSTALL \
+	doc/nickserv/USAGE \
+	db/gnuworldDB.h \
+	db/pgsqlDB.h \
+	include/defs.h \
+	include/Channel.h \
+	include/ChannelUser.h \
+	include/Gline.h \
+	include/LoadClientTimerHandler.h \
+	include/Network.h \
+	include/Numeric.h \
+	include/ServerCommandHandler.h \
+	include/ServerTimerHandlers.h \
+	include/TimerHandler.h \
+	include/UnloadClientTimerHandler.h \
+	include/client.h \
+	include/config.h \
+	include/events.h \
+	include/iClient.h \
+	include/iServer.h \
+	include/ip.h \
+	include/moduleLoader.h \
+	include/server.h \
+	libltdl/acconfig.h \
+	libltdl/ltdl.h \
+	libltdl/config.h
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:

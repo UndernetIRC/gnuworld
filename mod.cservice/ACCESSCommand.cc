@@ -1,4 +1,4 @@
-/*
+/**
  * ACCESSCommand.cc
  *
  * 24/12/2000 - Greg Sikorski <gte@atomicrevs.demon.co.uk>
@@ -12,7 +12,22 @@
  * Displays all "Level" records for a specified channel.
  * Can optionally narrow down selection using a number of switches.
  *
- * $Id: ACCESSCommand.cc,v 1.44 2002/12/08 19:41:53 gte Exp $
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
+ * USA.
+ *
+ * $Id: ACCESSCommand.cc,v 1.45 2003/06/28 01:21:20 dan_karrels Exp $
  */
 
 #include	<string>
@@ -28,7 +43,7 @@
 #include	"cservice_config.h"
 #include	"Network.h"
 
-const char ACCESSCommand_cc_rcsId[] = "$Id: ACCESSCommand.cc,v 1.44 2002/12/08 19:41:53 gte Exp $" ;
+const char ACCESSCommand_cc_rcsId[] = "$Id: ACCESSCommand.cc,v 1.45 2003/06/28 01:21:20 dan_karrels Exp $" ;
 
 namespace gnuworld
 {

@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: STATSCommand.cc,v 1.4 2003/06/19 22:58:31 dan_karrels Exp $
+ * $Id: STATSCommand.cc,v 1.5 2003/06/28 01:21:21 dan_karrels Exp $
  *
  * Give the user various statistics
  */
@@ -27,7 +27,7 @@
 #include "responses.h"
 #include "Stats.h"
 
-RCSTAG("$Id: STATSCommand.cc,v 1.4 2003/06/19 22:58:31 dan_karrels Exp $");
+RCSTAG("$Id: STATSCommand.cc,v 1.5 2003/06/28 01:21:21 dan_karrels Exp $");
 
 namespace gnuworld
 {
@@ -37,9 +37,8 @@ namespace ns
 
 using std::string;
 
-bool STATSCommand::Exec(iClient* theClient, const string& Message)
+bool STATSCommand::Exec(iClient* theClient, const string& )
 {
-
 bot->theStats->incStat("NS.CMD.STATS");
 
 sqlUser* theUser = bot->isAuthed(theClient);

@@ -69,9 +69,8 @@ public:
 	}
 } ;
 
-int main( int argc, const char** argv )
+int main()
 {
-
 subThread1 t1 ;
 subThread2 t2 ;
 subThread3 t3 ;

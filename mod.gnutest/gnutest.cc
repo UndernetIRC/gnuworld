@@ -1,4 +1,23 @@
-/* gnutest.cc */
+/**
+ * gnutest.cc
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
+ * USA.
+ *
+ * $Id: gnutest.cc,v 1.8 2003/06/28 01:21:21 dan_karrels Exp $
+ */
 
 #include	<string>
 
@@ -11,7 +30,7 @@
 
 const char client_h_rcsId[] = __CLIENT_H ;
 const char gnutest_h_rcsId[] = __GNUTEST_H ;
-const char gnutest_cc_rcsId[] = "$Id: gnutest.cc,v 1.7 2002/05/15 22:14:10 dan_karrels Exp $" ;
+const char gnutest_cc_rcsId[] = "$Id: gnutest.cc,v 1.8 2003/06/28 01:21:21 dan_karrels Exp $" ;
 const char iClient_h_rcsId[] = __ICLIENT_H ;
 const char StringTokenizer_h_rcsId[] = __STRINGTOKENIZER_H ;
 const char EConfig_h_rcsId[] = __ECONFIG_H ;
@@ -352,7 +371,7 @@ std::remove( channels.begin(), channels.end(), chanName ) ;
 return true ;
 }
 
-int gnutest::OnTimer( xServer::timerID id, void* data )
+int gnutest::OnTimer( xServer::timerID, void* )
 {
 Channel* theChan = Network->findChannel( timerChan ) ;
 if( NULL == theChan )

@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: MODUSERCommand.cc,v 1.2 2003/06/19 22:58:31 dan_karrels Exp $
+ * $Id: MODUSERCommand.cc,v 1.3 2003/06/28 01:21:21 dan_karrels Exp $
  *
  * Allow an administrator to alter the level of another user
  */
@@ -29,7 +29,7 @@
 #include "responses.h"
 #include "sqlUser.h"
 
-RCSTAG("$Id: MODUSERCommand.cc,v 1.2 2003/06/19 22:58:31 dan_karrels Exp $");
+RCSTAG("$Id: MODUSERCommand.cc,v 1.3 2003/06/28 01:21:21 dan_karrels Exp $");
 
 namespace gnuworld
 {
@@ -73,14 +73,14 @@ if(targetUser == theUser) {
 string attribute = string_upper(st[2]);
 
 if("ACCESS" == attribute) {
-  unsigned int newLevel = atoi(st[3].c_str());
+  int newLevel = atoi(st[3].c_str());
   
   if(newLevel < 0 || newLevel > 999) {
     bot->Notice(theClient, "Sorry, level must be between between 0 and 999, inclusive.");
     return true;
   }
   
-  if(newLevel >= theUser->getLevel()) {
+  if(static_cast< unsigned int >( newLevel ) >= theUser->getLevel()) {
     bot->Notice(theClient, "You cannot raise another user's level above your own.");
     return true;
   }

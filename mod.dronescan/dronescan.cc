@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: dronescan.cc,v 1.22 2003/06/20 01:09:48 jeekay Exp $
+ * $Id: dronescan.cc,v 1.23 2003/06/28 01:21:20 dan_karrels Exp $
  */
 
 #include <cstdarg>	/* va_list */
@@ -34,7 +34,7 @@
 #include "dronescanTests.h"
 #include "Timer.h"
 
-RCSTAG("$Id: dronescan.cc,v 1.22 2003/06/20 01:09:48 jeekay Exp $");
+RCSTAG("$Id: dronescan.cc,v 1.23 2003/06/28 01:21:20 dan_karrels Exp $");
 
 namespace gnuworld {
 
@@ -356,8 +356,6 @@ int dronescan::OnChannelEvent( const channelEventType& theEvent,
 		checkChannel( theChannel );
 	}
 	
-	
-	
 	/* Do join count processing if applicable */
 	string channelName = theChannel->getName();
 
@@ -372,14 +370,15 @@ int dronescan::OnChannelEvent( const channelEventType& theEvent,
 			);
 		}
 
-	return 0;
+return xClient::OnChannelEvent( theEvent, theChannel,
+	Data1, Data2, Data3, Data4 ) ;
 }
-
 
 /**
  * Here we receive private messages from iClients.
  */
-int dronescan::OnPrivateMessage( iClient* theClient, const string& Message, bool secure )
+int dronescan::OnPrivateMessage( iClient* theClient,
+	const string& Message, bool )
 {
 	if(!getAccess(theClient)) return 0;
 	
@@ -411,7 +410,7 @@ int dronescan::OnPrivateMessage( iClient* theClient, const string& Message, bool
 		return 0;
 		}
 #endif
-	
+
 	if("STATS" == Command)
 		{
 		Reply(theClient, "Allocated custom data: %d", customDataCounter);
@@ -516,7 +515,6 @@ int dronescan::OnPrivateMessage( iClient* theClient, const string& Message, bool
 	return 0;
 }
 
-
 /** Receive our own timed events. */
 int dronescan::OnTimer( xServer::timerID theTimer , void *)
 {
@@ -555,8 +553,6 @@ int dronescan::OnTimer( xServer::timerID theTimer , void *)
 	
 	return 0;
 }
-
-
 
 /*******************************************
  ** D R O N E S C A N   F U N C T I O N S **
@@ -632,7 +628,6 @@ void dronescan::handleNewClient( iClient* theClient )
 		setClientState(theClient);
 		}
 }
-
 
 /** Calculate the global entropy. */
 void dronescan::calculateEntropy()

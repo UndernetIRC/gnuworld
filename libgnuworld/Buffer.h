@@ -19,11 +19,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, 
  * USA.
  *
- * $Id: Buffer.h,v 1.2 2003/06/17 15:13:53 dan_karrels Exp $
+ * $Id: Buffer.h,v 1.3 2003/06/28 01:21:18 dan_karrels Exp $
  */
 
 #ifndef __BUFFER_H
-#define __BUFFER_H "$Id: Buffer.h,v 1.2 2003/06/17 15:13:53 dan_karrels Exp $"
+#define __BUFFER_H "$Id: Buffer.h,v 1.3 2003/06/28 01:21:18 dan_karrels Exp $"
 
 #include	<iostream>
 #include	<string>
@@ -52,7 +52,7 @@ public:
 	 * Initialize the Buffer with the given string and
 	 * delimiting character
 	 */
-	Buffer( const string& = string(), char = '\n' ) ;
+	Buffer( char = '\n' ) ;
 
 	/**
 	 * Destroy this Buffer object.  No internal allocation
@@ -78,27 +78,20 @@ public:
 	 * Return the the number of characters currently in
 	 * the Buffer.
 	 */
-	inline size_type		size() const
+	virtual size_type		size() const
 		{ return buf.size() ; }
 
 	/**
 	 * Return the the number of characters currently in
 	 * the Buffer.
 	 */
-	inline size_type		length() const
+	virtual size_type		length() const
 		{ return buf.length() ; }
-
-	/**
-	 * Return the number of bytes that this Buffer can hold
-	 * before having to reallocate internally.
-	 */
-	inline size_type		capacity() const
-		{ return buf.capacity() ; }
 
 	/**
 	 * Return true if the buffer is empty, false otherwise.
 	 */
-	inline bool			empty() const
+	virtual bool			empty() const
 		{ return buf.empty() ; }
 
 	/**
@@ -106,8 +99,8 @@ public:
 	 * For some reason, GNU gcc's implementation of std::string doesn't
 	 * include clear(), do it the old fashion way here.
 	 */
-	inline void			clear()
-		{ buf.erase( buf.begin(), buf.end() ) ; }
+	virtual void			clear()
+		{ buf.clear() ; }
 
 	/**
 	 * Remove the given number of bytes from the

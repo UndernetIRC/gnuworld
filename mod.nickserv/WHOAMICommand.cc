@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: WHOAMICommand.cc,v 1.6 2003/06/19 22:58:31 dan_karrels Exp $
+ * $Id: WHOAMICommand.cc,v 1.7 2003/06/28 01:21:21 dan_karrels Exp $
  */
 
 #include	<sstream>
@@ -24,7 +24,7 @@
 #include	"config.h"
 #include	"nickserv.h"
 
-RCSTAG("$Id: WHOAMICommand.cc,v 1.6 2003/06/19 22:58:31 dan_karrels Exp $");
+RCSTAG("$Id: WHOAMICommand.cc,v 1.7 2003/06/28 01:21:21 dan_karrels Exp $");
 
 using std::stringstream ;
 using std::ends ;
@@ -37,7 +37,7 @@ namespace ns
 
 using std::string;
 
-bool WHOAMICommand::Exec(iClient* theClient, const string& Message)
+bool WHOAMICommand::Exec(iClient* theClient, const string&)
 {
 bot->theStats->incStat("NS.CMD.WHOAMI");
 

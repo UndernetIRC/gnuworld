@@ -1,4 +1,5 @@
-/* ip.cc
+/**
+ * ip.cc
  * Copyright (C) 2002 Daniel Karrels <dan@karrels.com>
  *			Orlando Bassotto
  *
@@ -17,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ip.cc,v 1.8 2003/06/17 15:13:54 dan_karrels Exp $
+ * $Id: ip.cc,v 1.9 2003/06/28 01:21:21 dan_karrels Exp $
  */
 
 #include	<string>
@@ -35,7 +36,7 @@
 #include	"Numeric.h"
 #include	"config.h"
 
-RCSTAG( "$Id: ip.cc,v 1.8 2003/06/17 15:13:54 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: ip.cc,v 1.9 2003/06/28 01:21:21 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {

@@ -1,6 +1,5 @@
-/*
- * This is the header file for the server itself.
- * This class originally created by Orlando Bassotto.
+/**
+ * ServerCommandHandler.h
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -17,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * "$Id: ServerCommandHandler.h,v 1.2 2003/06/05 01:38:01 dan_karrels Exp $"
+ * "$Id: ServerCommandHandler.h,v 1.3 2003/06/28 01:21:18 dan_karrels Exp $"
  */
 
 #ifndef __SERVERCOMMANDHANDLER_H
-#define __SERVERCOMMANDHANDLER_H "$Id: ServerCommandHandler.h,v 1.2 2003/06/05 01:38:01 dan_karrels Exp $"
+#define __SERVERCOMMANDHANDLER_H "$Id: ServerCommandHandler.h,v 1.3 2003/06/28 01:21:18 dan_karrels Exp $"
 
 #include	"xparameters.h"
 #include	"ELog.h"

@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: Connection.cc,v 1.2 2003/06/17 15:13:53 dan_karrels Exp $
+ * $Id: Connection.cc,v 1.3 2003/06/28 01:21:18 dan_karrels Exp $
  */
 
 #include	<sys/types.h>
@@ -34,7 +34,7 @@
 #include	"Connection.h"
 #include	"Buffer.h"
 
-const char rcsId[] = "$Id: Connection.cc,v 1.2 2003/06/17 15:13:53 dan_karrels Exp $" ;
+const char rcsId[] = "$Id: Connection.cc,v 1.3 2003/06/28 01:21:18 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -55,8 +55,8 @@ Connection::Connection( const string& _hostname,
 : hostname( _hostname ),
 	localPort( 0 ),
 	remotePort( _remotePort ),
-	inputBuffer( string(), _delimiter ),
-	outputBuffer( string(), _delimiter ),
+	inputBuffer( _delimiter ),
+	outputBuffer( _delimiter ),
 	IP( string() ),
 	sockFD( -1 ),
 	flags( F_PENDING )
@@ -67,8 +67,8 @@ memset( &addr, 0, sizeof( struct sockaddr_in ) ) ;
 Connection::Connection( const char _delimiter )
 : localPort( 0 ),
 	remotePort( 0 ),
-	inputBuffer( string(), _delimiter ),
-	outputBuffer( string(), _delimiter ),
+	inputBuffer( _delimiter ),
+	outputBuffer( _delimiter ),
 	sockFD( -1 ),
 	flags( F_PENDING )
 {

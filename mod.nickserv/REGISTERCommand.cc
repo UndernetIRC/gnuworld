@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: REGISTERCommand.cc,v 1.5 2003/06/19 22:58:31 dan_karrels Exp $
+ * $Id: REGISTERCommand.cc,v 1.6 2003/06/28 01:21:21 dan_karrels Exp $
  *
  * This command allows a user to register their AC nick
  */
@@ -27,7 +27,7 @@
 #include "netData.h"
 #include "nickserv.h"
 
-RCSTAG("$Id: REGISTERCommand.cc,v 1.5 2003/06/19 22:58:31 dan_karrels Exp $");
+RCSTAG("$Id: REGISTERCommand.cc,v 1.6 2003/06/28 01:21:21 dan_karrels Exp $");
 
 namespace gnuworld
 {
@@ -37,7 +37,7 @@ namespace ns
 
 using std::string;
 
-bool REGISTERCommand::Exec(iClient* theClient, const string& Message)
+bool REGISTERCommand::Exec(iClient* theClient, const string& )
 {
 bot->theStats->incStat("NS.CMD.REGISTER");
 

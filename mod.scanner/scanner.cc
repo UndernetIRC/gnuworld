@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: scanner.cc,v 1.4 2002/08/08 21:31:45 dan_karrels Exp $
+ * $Id: scanner.cc,v 1.5 2003/06/28 01:21:21 dan_karrels Exp $
  */
 
 #include	"client.h"
@@ -66,7 +66,7 @@ theServer->RegisterEvent( EVT_NICK, this ) ;
 }
 
 int scanner::OnPrivateMessage( iClient* theClient,
-	const string& message, bool )
+	const string&, bool )
 {
 Notice( theClient, "Howdy :)" ) ;
 return 0 ;
@@ -108,7 +108,7 @@ return xClient::OnEvent( whichEvent, arg1, arg2, arg3, arg4 ) ;
  * db thread queue.  The db thread will then check the cache for existing
  * entries, and place a reply into the reply queue.
  */
-void scanner::handleNewClient( iClient* newClient )
+void scanner::handleNewClient( iClient* /* newClient */ )
 {
 // put into db processing queue
 
@@ -119,7 +119,8 @@ void scanner::handleNewClient( iClient* newClient )
  * address and IP of the given connection :)
  * logMsg can be empty, in which case, use the default string.
  */
-void scanner::RejectClient( Connection* cPtr, const string& logMsg )
+void scanner::RejectClient( Connection* /* cPtr */,
+	const string& /* logMsg */ )
 {
 // gline IP
 // gline host

@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: nickserv.cc,v 1.19 2003/06/19 22:58:31 dan_karrels Exp $
+ * $Id: nickserv.cc,v 1.20 2003/06/28 01:21:21 dan_karrels Exp $
  */
  
 #include <cstdarg>
@@ -28,7 +28,7 @@
 #include "netData.h"
 #include "nickserv.h"
 
-RCSTAG("$Id: nickserv.cc,v 1.19 2003/06/19 22:58:31 dan_karrels Exp $");
+RCSTAG("$Id: nickserv.cc,v 1.20 2003/06/28 01:21:21 dan_karrels Exp $");
 
 namespace gnuworld
 {
@@ -277,9 +277,9 @@ return xClient::OnCTCP(theClient, CTCP, Message, Secure);
  *  EVT_QUIT    : Delete the netData instance
  *                Remove the iClient from the process queue
  */
-int nickserv::OnEvent( const eventType& event, void* Data1, void* Data2, void* Data3, void* Data4)
+int nickserv::OnEvent( const eventType& event,
+	void* Data1, void* Data2, void* Data3, void* Data4)
 {
-
 /* The target user of the event */
 iClient* theClient = static_cast< iClient* >( Data1 );
 
@@ -338,7 +338,7 @@ switch( event ) {
   } // case EVT_ACCOUNT
 } // switch( event )
 
-return 0;
+return xClient::OnEvent( event, Data1, Data2, Data3, Data4 ) ;
 }
 
 
@@ -376,7 +376,7 @@ return 1 ;
  * When a timer expires, this function is called. It allows for periodic
  * processing of data.
  */
-int nickserv::OnTimer(xServer::timerID theTimer, void* theData)
+int nickserv::OnTimer(xServer::timerID theTimer, void* )
 {
 if(theTimer == processQueue_timerID) {
   processQueue();

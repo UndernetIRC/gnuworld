@@ -1,4 +1,4 @@
-/*
+/**
  * CHANINFOCommand.cc
  *
  * 29/12/2000 - Greg Sikorski <gte@atomicrevs.demon.co.uk>
@@ -13,7 +13,22 @@
  *
  * Command is aliased "INFO".
  *
- * $Id: CHANINFOCommand.cc,v 1.47 2003/04/24 20:19:36 gte Exp $
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
+ * USA.
+ *
+ * $Id: CHANINFOCommand.cc,v 1.48 2003/06/28 01:21:20 dan_karrels Exp $
  */
 
 #include	<string>
@@ -28,7 +43,7 @@
 #include	"libpq++.h"
 #include	"cservice_config.h"
 
-const char CHANINFOCommand_cc_rcsId[] = "$Id: CHANINFOCommand.cc,v 1.47 2003/04/24 20:19:36 gte Exp $" ;
+const char CHANINFOCommand_cc_rcsId[] = "$Id: CHANINFOCommand.cc,v 1.48 2003/06/28 01:21:20 dan_karrels Exp $" ;
 
 namespace gnuworld
 {

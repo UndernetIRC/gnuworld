@@ -18,22 +18,22 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *  
- * $Id: Buffer.cc,v 1.4 2003/06/17 15:13:53 dan_karrels Exp $
+ * $Id: Buffer.cc,v 1.5 2003/06/28 01:21:18 dan_karrels Exp $
  */
 
 #include	<string>
 
 #include	"Buffer.h"
 
-const char rcsId[] = "$Id: Buffer.cc,v 1.4 2003/06/17 15:13:53 dan_karrels Exp $" ;
+const char rcsId[] = "$Id: Buffer.cc,v 1.5 2003/06/28 01:21:18 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
 
 using std::string ;
 
-Buffer::Buffer( const string& aString, char delimiter )
-	: buf( aString ), delim( delimiter )
+Buffer::Buffer( char delimiter )
+ : delim( delimiter )
 {}
 
 Buffer::~Buffer()
@@ -80,9 +80,7 @@ void Buffer::Delete( const size_type& numBytes )
 if( numBytes >= size() )
 	{
 	// Clear the entire Buffer
-	// GNU's string implementation doesn't include clear() for some
-	// reason :(
-	buf.erase( buf.begin(), buf.end() ) ;
+	buf.clear() ;
 	return ;
 	}
 

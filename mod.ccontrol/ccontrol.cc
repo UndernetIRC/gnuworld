@@ -1,17 +1,33 @@
 /**
-    Main ccontrol implementation class
-    
-    @author Daniel Karrels dan@karrels.com
-    @autor Tomer Cohen	   MrBean@Undernet.org
-    
-    
+ * ccontrol.cc
+ * Main ccontrol implementation class
+ *
+ * @author Daniel Karrels dan@karrels.com
+ * @author Tomer Cohen	   MrBean@Undernet.org
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
+ * USA.
+ *
+ * $Id: ccontrol.cc,v 1.173 2003/06/28 01:21:19 dan_karrels Exp $
 */
 
 
 /* ccontrol.cc
  * Authors: Daniel Karrels dan@karrels.com
  *	    Tomer Cohen    MrBean@toughguy.net
- * $Id: ccontrol.cc,v 1.172 2003/05/19 22:19:45 mrbean_ Exp $
+ * $Id: ccontrol.cc,v 1.173 2003/06/28 01:21:19 dan_karrels Exp $
  */
 
 #define MAJORVER "1"
@@ -56,7 +72,7 @@
 #include	"ip.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.172 2003/05/19 22:19:45 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.173 2003/06/28 01:21:19 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -1091,9 +1107,8 @@ return xClient::Notice(Target,"%s",buffer);
 }        
 
 int ccontrol::OnCTCP( iClient* theClient, const string& CTCP,
-	const string& Message, bool Secure ) 
+	const string& Message, bool ) 
 {
-
 ccUser* theUser = IsAuth(theClient);
 if((!theUser) && !(theClient->isOper()))
 	{ //We need to add the flood points for this user
@@ -4003,8 +4018,7 @@ return true;
 }
 bool ccontrol::loadExceptions()
 {
-
-const static char Query[] = "Select Host,Connections,AddedBy,AddedOn,Reason from Exceptions";
+static const char Query[] = "Select Host,Connections,AddedBy,AddedOn,Reason from Exceptions";
 
 if(!dbConnected)
 	{
@@ -4858,7 +4872,7 @@ for(;ptr != VersionsList.end();++ptr)
 return false;
 }
 
-void ccontrol::listVersions(iClient* theClient)
+void ccontrol::listVersions(iClient*)
 {
 }
 

@@ -18,6 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
+ * $Id: signal.cc,v 1.2 2003/06/28 01:21:21 dan_karrels Exp $
  */
 
 #include	<sys/types.h>

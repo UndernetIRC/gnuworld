@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: INVITECommand.cc,v 1.2 2003/06/19 22:58:31 dan_karrels Exp $
+ * $Id: INVITECommand.cc,v 1.3 2003/06/28 01:21:21 dan_karrels Exp $
  *
  * Invite the user to the console channel.
  */
@@ -28,7 +28,7 @@
 #include "nickserv.h"
 #include "responses.h"
 
-RCSTAG("$Id: INVITECommand.cc,v 1.2 2003/06/19 22:58:31 dan_karrels Exp $");
+RCSTAG("$Id: INVITECommand.cc,v 1.3 2003/06/28 01:21:21 dan_karrels Exp $");
 
 namespace gnuworld
 {
@@ -38,9 +38,8 @@ namespace ns
 
 using std::string;
 
-bool INVITECommand::Exec(iClient* theClient, const string& Message)
+bool INVITECommand::Exec(iClient* theClient, const string& )
 {
-
 bot->theStats->incStat("NS.CMD.INVITE");
 
 sqlUser* theUser = bot->isAuthed(theClient);

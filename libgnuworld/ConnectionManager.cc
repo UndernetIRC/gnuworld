@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ConnectionManager.cc,v 1.5 2003/06/17 15:13:53 dan_karrels Exp $
+ * $Id: ConnectionManager.cc,v 1.6 2003/06/28 01:21:18 dan_karrels Exp $
  */
 
 #include	<unistd.h>
@@ -52,7 +52,7 @@
 #include	"Buffer.h"
 #include	"ELog.h"
 
-const char rcsId[] = "$Id: ConnectionManager.cc,v 1.5 2003/06/17 15:13:53 dan_karrels Exp $" ;
+const char rcsId[] = "$Id: ConnectionManager.cc,v 1.6 2003/06/28 01:21:18 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -983,8 +983,8 @@ bool ConnectionManager::handleRead( ConnectionHandler* hPtr,
 // protected member, no error checking
 
 // Create and set a temporary buffer to 0
-char buf[ 4097 ] ;
-memset( buf, 0, 4097 ) ;
+char buf[ 4096 ] ;
+memset( buf, 0, 4096 ) ;
 
 // Attempt the read from the socket
 errno = 0 ;
@@ -994,12 +994,12 @@ int readResult = -1 ;
 if( cPtr->isFile() )
 	{
 	// Connected to file
-	readResult = ::read( cPtr->getSockFD(), buf, 4096 ) ;
+	readResult = ::read( cPtr->getSockFD(), buf, 4095 ) ;
 	}
 else
 	{
 	// Network connection
-	readResult = ::recv( cPtr->getSockFD(), buf, 4096, 0 ) ;
+	readResult = ::recv( cPtr->getSockFD(), buf, 4095, 0 ) ;
 	}
 
 if( EAGAIN == errno )

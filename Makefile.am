@@ -1,16 +1,65 @@
-## $Id: Makefile.am,v 1.13 2003/06/19 21:18:15 dan_karrels Exp $
+## $Id: Makefile.am,v 1.14 2003/06/28 01:21:17 dan_karrels Exp $
 ## test
 
 @SET_MAKE@
-SUBDIRS = libgnuworld libltdl src libircu \
-	@DB@ @MOD_DIRS@ @TEST_DIR@
 
-DIST_SUBDIRS = db libgnuworld libircu libltdl \
-	mod.ccontrol mod.clientExample \
-	mod.cloner mod.cservice \
-	mod.dronescan mod.gnutest \
-	mod.nickserv mod.scanner \
-	mod.stats src test
+if COND_MODCCONTROL
+  MODCCONTROL = mod.ccontrol
+endif
+
+if COND_MODCLIENTEXAMPLE
+  MODCLIENTEXAMPLE = mod.clientExample
+endif
+
+if COND_MODCLONER
+  MODCLONER = mod.cloner
+endif
+
+if COND_MODCSERVICE
+  MODCSERVICE = mod.cservice
+endif
+
+if COND_MODDRONESCAN
+  MODDRONESCAN = mod.dronescan
+endif
+
+if COND_MODGNUTEST
+  MODGNUTEST = mod.gnutest
+endif
+
+if COND_MODNICKSERV
+  MODNICKSERV = mod.nickserv
+endif
+
+if COND_MODSCANNER
+  MODSCANNER = mod.scanner
+endif
+
+if COND_MODSTATS
+  MODSTATS = mod.stats
+endif
+
+if COND_TESTDIR
+  TESTDIR = test
+endif
+
+if COND_DBDIR
+  DBDIR = db
+endif
+
+SUBDIRS = libgnuworld libltdl src \
+	$(MODCCONTROL) \
+	$(MODCLIENTEXAMPLE) \
+	$(MODCLONER) \
+	$(MODCSERVICE) \
+	$(MODDRONESCAN) \
+	$(MODGNUTEST) \
+	$(MODNICKSERV) \
+	$(MODSCANNER) \
+	$(MODSTATS) \
+	$(TESTDIR) \
+	$(DBDIR) \
+	libircu
 
 EXTRA_DIST = bin/ccontrol.example.conf.in \
 	bin/clientExample.example.conf.in \
@@ -22,6 +71,7 @@ EXTRA_DIST = bin/ccontrol.example.conf.in \
 	bin/nickserv.example.conf.in \
 	bin/scanner.example.conf.in \
 	bin/stats.example.conf.in \
+	bin/server_command_map
 	contrib/00INDEX.TXT \
 	contrib/chktrans.py \
 	contrib/encrypt.sh \
@@ -109,71 +159,6 @@ EXTRA_DIST = bin/ccontrol.example.conf.in \
 	include/ip.h \
 	include/moduleLoader.h \
 	include/server.h \
-	libgnuworld/Buffer.h \
-	libgnuworld/Connection.h \
-	libgnuworld/ConnectionHandler.h \
-	libgnuworld/ConnectionManager.h \
-	libgnuworld/EConfig.h \
-	libgnuworld/ELog.h \
-	libgnuworld/Signal.h \
-	libgnuworld/StringTokenizer.h \
-	libgnuworld/gThread.h \
-	libgnuworld/ircd_chattr.h \
-	libgnuworld/match.h \
-	libgnuworld/match_table.h \
-	libgnuworld/md5hash.h \
-	libgnuworld/misc.h \
-	libgnuworld/xparameters.h \
 	libltdl/acconfig.h \
 	libltdl/ltdl.h \
-	libltdl/config.h \
-	mod.ccontrol/CControlCommands.h \
-	mod.ccontrol/CommandsDec.h \
-	mod.ccontrol/Constants.h \
-	mod.ccontrol/ccBadChannel.h \
-	mod.ccontrol/ccException.h \
-	mod.ccontrol/ccFloodData.h \
-	mod.ccontrol/ccGline.h \
-	mod.ccontrol/ccLog.h \
-	mod.ccontrol/ccServer.h \
-	mod.ccontrol/ccUser.h \
-	mod.ccontrol/ccUserData.h \
-	mod.ccontrol/ccontrol.h \
-	mod.ccontrol/commLevels.h \
-	mod.clientExample/clientExample.h \
-	mod.cloner/cloner.h \
-	mod.cservice/constants.h \
-	mod.cservice/cservice.h \
-	mod.cservice/cserviceCommands.h \
-	mod.cservice/cservice_config.h \
-	mod.cservice/levels.h \
-	mod.cservice/networkData.h \
-	mod.cservice/responses.h \
-	mod.cservice/sqlBan.h \
-	mod.cservice/sqlChannel.h \
-	mod.cservice/sqlLevel.h \
-	mod.cservice/sqlPendingChannel.h \
-	mod.cservice/sqlPendingTraffic.h \
-	mod.cservice/sqlUser.h \
-	mod.dronescan/Timer.h \
-	mod.dronescan/clientData.h \
-	mod.dronescan/dronescan.h \
-	mod.dronescan/dronescanCommands.h \
-	mod.dronescan/dronescanTests.h \
-	mod.dronescan/levels.h \
-	mod.gnutest/gnutest.h \
-	mod.nickserv/Logger.h \
-	mod.nickserv/Stats.h \
-	mod.nickserv/levels.h \
-	mod.nickserv/logTarget.h \
-	mod.nickserv/netData.h \
-	mod.nickserv/nickserv.h \
-	mod.nickserv/nickservCommands.h \
-	mod.nickserv/responses.h \
-	mod.nickserv/sqlManager.h \
-	mod.nickserv/sqlUser.h \
-	mod.scanner/ScannerModule.h \
-	mod.scanner/dbThread.h \
-	mod.scanner/scanner.h \
-	mod.stats/stats.h \
-	test/testbot.h
+	libltdl/config.h
