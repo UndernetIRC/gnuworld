@@ -14,7 +14,7 @@
 #include	"misc.h"
 
 const char EConfig_h_rcsId[] = __ECONFIG_H ;
-const char EConfig_cc_rcsId[] = "$Id: EConfig.cc,v 1.1 2000/06/30 18:46:07 dan_karrels Exp $" ;
+const char EConfig_cc_rcsId[] = "$Id: EConfig.cc,v 1.2 2000/08/01 00:02:34 dan_karrels Exp $" ;
 
 using std::string ;
 using std::fstream ;
@@ -131,14 +131,14 @@ bool inValue = false ;
 // Only continue up until the value field
 while( ptr != line.end() )
 	{
-	if( '=' == *ptr )
+	if( ('=' == *ptr) && !inValue )
 		{
 		// We've reached the value field
 		// Only remove comments from this point
 		// on.
-		if( *(ptr + 1) == ' ' )
+		if( ((ptr + 1) != line.end()) && (*(ptr + 1) == ' ') )
 			{
-			line.erase( ptr + 1 ) ;
+			ptr = line.erase( ptr + 1 ) ;
 			}
 		inValue = true ;
 		}
@@ -149,15 +149,15 @@ while( ptr != line.end() )
 		{
 
 		// erase() invalidates the iterator
-		line.erase( ptr ) ;
-
-		// No big deal, just start over with this line
-		ptr = line.begin() ;
+		ptr = line.erase( ptr ) ;
 
 		continue ;
 		}
 
-	++ptr ;
+	else
+		{
+		++ptr ;
+		}
 	}
 return true ;
 }

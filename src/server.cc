@@ -37,7 +37,7 @@
 //#include	"moduleLoader.h"
 
 const char xServer_h_rcsId[] = __XSERVER_H ;
-const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.10 2000/07/31 21:17:52 dan_karrels Exp $" ;
+const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.11 2000/08/01 00:02:34 dan_karrels Exp $" ;
 
 using std::string ;
 using std::vector ;
@@ -1425,7 +1425,6 @@ if( !_connected )
 // Go through the motions of putting the
 // string into a buffer.
 char buffer[ 4096 ] = { 0 } ;
-memset( buffer, 0, sizeof( buffer ) ) ;
 va_list _list ;
 
 va_start( _list, format ) ;
@@ -1862,7 +1861,7 @@ for( StringTokenizer::size_type i = 0 ; i < st.size() ; ++i )
 		static_cast< void* >( theChan ),
 		static_cast< void* >( theClient ) ) ;
 
-	if( theChan->empty() )
+	if( theChan->empty() && !Network->servicesOnChannel( theChan ) )
 		{
 		// No users in the channel, remove it.
 		delete Network->removeChannel( theChan->getName() ) ;
@@ -1929,7 +1928,7 @@ for( StringTokenizer::size_type i = 0 ; i < st.size() ; ++i )
 		static_cast< void* >( theChan ),
 		static_cast< void* >( theClient ) ) ;
 
-	if( theChan->empty() )
+	if( theChan->empty() && !Network->servicesOnChannel( theChan ) )
 		{
 		// No users in the channel, remove it.
 		delete Network->removeChannel( theChan->getName() ) ;
@@ -1988,7 +1987,7 @@ PostChannelEvent( EVT_KICK, theChan->getName(),
 	static_cast< void* >( theClient ) ) ;
 
 // Any users left in the channel?
-if( theChan->empty() )
+if( theChan->empty() && !Network->servicesOnChannel( theChan ) )
 	{
 	delete Network->removeChannel( theChan->getName() ) ;
 	}
@@ -2139,7 +2138,7 @@ if( '0' == Param[ 1 ][ 0 ] )
 			static_cast< void* >( Target ) ) ; // iClient*
 
 		delete (*ptr)->removeUser( Target->getIntYY() ) ;
-		if( (*ptr)->empty() )
+		if( (*ptr)->empty() && !Network->servicesOnChannel( *ptr ) )
 			{
 			delete Network->removeChannel( (*ptr)->getName() ) ;
 			}
@@ -2268,7 +2267,7 @@ if( '0' == Param[ 1 ][ 0 ] )
 		endPtr = Target->channels_end() ; ptr != endPtr ; ++ptr )
 		{
 		delete (*ptr)->removeUser( Target->getIntYY() ) ;
-		if( (*ptr)->empty() )
+		if( (*ptr)->empty() && !Network->servicesOnChannel( *ptr ) )
 			{
 			delete Network->removeChannel( (*ptr)->getName() ) ;
 			}

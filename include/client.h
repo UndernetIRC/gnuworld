@@ -3,7 +3,7 @@
  */
 
 #ifndef __XCLIENT_H
-#define __XCLIENT_H "$Id: client.h,v 1.1 2000/06/30 18:46:06 dan_karrels Exp $"
+#define __XCLIENT_H "$Id: client.h,v 1.2 2000/08/01 00:02:34 dan_karrels Exp $"
 
 #include	<queue>
 #include	<string>
@@ -98,6 +98,11 @@ public:
 	 */
 	virtual int Write( strstream& s )
 		{ return QuoteAsServer( s.str() ) ; }
+
+	/**
+	 * Write a variable length argument list to the network.
+	 */
+	virtual int Write( const char*, ... ) ;
 
 	/**
 	 * ModeAsServer will change modes in a channel as the server.
@@ -197,6 +202,9 @@ public:
 	virtual bool	Part( const string& ) ;
 
 	virtual bool	Part( Channel* ) ;
+
+	virtual bool	Invite( iClient*, const string& ) ;
+	virtual bool	Invite( iClient*, Channel* ) ;
 
 	virtual bool	isOnChannel( const string& chanName ) const ;
 	virtual bool	isOnChannel( const Channel* theChan ) const ;

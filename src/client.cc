@@ -27,7 +27,7 @@
 #include	"events.h"
 
 const char xClient_h_rcsId[] = __XCLIENT_H ;
-const char xClient_cc_rcsId[] = "$Id: client.cc,v 1.1 2000/06/30 18:46:07 dan_karrels Exp $" ;
+const char xClient_cc_rcsId[] = "$Id: client.cc,v 1.2 2000/08/01 00:02:34 dan_karrels Exp $" ;
 
 using std::string ;
 using std::strstream ;
@@ -414,6 +414,22 @@ if( !Connected )
 	return false ;
 	}
 
+bool onChannel = isOnChannel( theChan ) ;
+if( !onChannel )
+	{
+	Join( theChan ) ;
+	}
+
+Write( "%s M %s +o %s",
+	getCharYYXXX().c_str(),
+	theChan->getName().c_str(),
+	theClient->getCharYYXXX().c_str() ) ;
+
+if( !onChannel )
+	{
+	Part( theChan ) ;
+	}
+
 return true ;
 }
 
@@ -604,6 +620,60 @@ bool xClient::Part( Channel* theChan )
 return Part( theChan->getName() ) ;
 }
 
+bool xClient::Invite( iClient* theClient, const string& chanName )
+{
+#ifndef NDEBUG
+  assert( theClient != NULL ) ;
+#endif
+
+Channel* theChan = Network->findChannel( chanName ) ;
+if( NULL == theChan )
+	{
+	return false ;
+	}
+
+bool onChannel = isOnChannel( theChan ) ;
+if( !onChannel )
+	{
+	Join( theChan ) ;
+	}
+
+Write( "%s I %s %s", getCharYYXXX().c_str(), theClient->getCharYYXXX().c_str(),
+	theChan->getName().c_str() ) ;
+
+if( !onChannel )
+	{
+	Part( theChan ) ;
+	}
+
+return true ;
+}
+
+bool xClient::Invite( iClient* theClient, Channel* theChan )
+{
+
+#ifndef NDEBUG
+  assert( (theClient != 0) && (theChan != 0) ) ;
+#endif
+
+bool onChannel = isOnChannel( theChan ) ;
+if( !onChannel )
+	{
+	Join( theChan ) ;
+	}
+
+Write( "%s I %s %s", getCharYYXXX().c_str(),
+	theClient->getCharYYXXX().c_str(),
+	theChan->getName().c_str() ) ;
+
+if( !onChannel )
+	{
+	Part( theChan ) ;
+	}
+
+return true ; 
+}
+
 bool xClient::isOnChannel( const string& chanName ) const
 {
 return false ;
@@ -615,6 +685,18 @@ bool xClient::isOnChannel( const Channel* theChan ) const
   assert( theChan != NULL ) ;
 #endif
 return isOnChannel( theChan->getName() ) ;
+}
+
+int xClient::Write( const char* format, ... )
+{
+char buf[ 1024 ] = { 0 } ;
+va_list _list ;
+
+va_start( _list, format ) ;
+vsprintf( buf, format, _list ) ;
+va_end( _list ) ;
+
+return Write( string( buf ) ) ;
 }
 
 } // namespace gnuworld
