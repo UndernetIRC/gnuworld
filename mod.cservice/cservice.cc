@@ -526,10 +526,20 @@ else
 			make_pair(expireTime, theClient->getCharYYXXX())));
 
 		setIgnored(theClient, true);
-	 
+
+		string floodComment; 
+		StringTokenizer st(type) ;
+
+		if( st.size() >= 2 ) 
+		{
+			floodComment = st[0] + ' ' + st[1];
+		} else {
+			floodComment = st[0];
+		}
+ 
 		logAdminMessage("MSG-FLOOD from %s (%s)",
 			theClient->getNickUserHost().c_str(),
-			type.c_str());
+			floodComment.c_str());
 		return true;
 		} // if()
 	} // else()
@@ -704,7 +714,7 @@ else
 	 *  Check users flood limit, if exceeded..
 	 */
 
-	if (hasFlooded(theClient, commHandler->first))
+	if (hasFlooded(theClient, Message))
 		{
 		return false;
 		}
@@ -2782,7 +2792,9 @@ switch( whichEvent )
 					trafRecord->join_count++;
 					trafRecord->commit();
 					}
- 
+
+					ptr->second->unique_join_count = ptr->second->trafficList.size();
+
 					logDebugMessage("New total for IP#%u on %s is %i",
 						theClient->getIP(), theChan->getName().c_str(),
 						trafRecord->join_count);
@@ -3454,7 +3466,7 @@ if( PGRES_TUPLES_OK == status )
 		}
 	}
 
-	logDebugMessage("Loaded pending channels, there are currently %i channels being traffic monitored.",
+	logDebugMessage("Loaded Pending Channels, there are currently %i channels being traffic monitored.",
 		pendingChannelList.size());
 
 #ifdef LOG_DEBUG
