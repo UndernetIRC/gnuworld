@@ -12,7 +12,7 @@
 #include	"cservice_config.h"
 #include	"Network.h"
 
-const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.28 2001/10/01 17:51:17 gte Exp $" ;
+const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.29 2001/10/02 20:31:28 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -252,6 +252,15 @@ for (autoOpVectorType::const_iterator resultPtr = autoOpVector.begin();
 
 	sqlChannel* theChan = bot->getChannelRecord(resultPtr->channel_id);
 	if (!theChan)
+		{
+		continue;
+		}
+
+	/*
+	 * Make sure the channel isn't suspended..
+	 */
+
+	if (theChan->getFlag(sqlChannel::F_SUSPEND))
 		{
 		continue;
 		}
