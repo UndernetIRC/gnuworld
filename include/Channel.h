@@ -1,7 +1,7 @@
 /* Channel.h */
 
 #ifndef __CHANNEL_H
-#define __CHANNEL_H "$Id: Channel.h,v 1.18 2001/08/26 22:22:55 dan_karrels Exp $"
+#define __CHANNEL_H "$Id: Channel.h,v 1.19 2002/01/12 20:20:39 gte Exp $"
 
 #include	<string>
 #include	<map>
@@ -185,6 +185,13 @@ public:
 	 * comparison, not a wildcard match.
 	 */
 	void removeBan( const string& banMask ) ;
+
+	/**
+	 * Remove all the bans in the channels ban list.
+	 */
+
+	inline void removeAllBans()
+		{ banList.clear(); }
 
 	/**
 	 * Find a ban in the channel's ban list which lexically matches
@@ -467,7 +474,7 @@ protected:
 	 * The time at which this channel was created.
 	 */
 	time_t		creationTime ;
-	
+
 	/**
 	 * This channel's current modes.
 	 */
