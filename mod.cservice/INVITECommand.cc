@@ -8,7 +8,7 @@
  *
  * Caveats: None
  *
- * $Id: INVITECommand.cc,v 1.1 2000/12/30 05:47:29 gte Exp $
+ * $Id: INVITECommand.cc,v 1.2 2000/12/30 06:34:03 gte Exp $
  */
 
 
@@ -21,7 +21,7 @@
 #include	"responses.h"
 #include	"Network.h"
 
-const char INVITECommand_cc_rcsId[] = "$Id: INVITECommand.cc,v 1.1 2000/12/30 05:47:29 gte Exp $" ;
+const char INVITECommand_cc_rcsId[] = "$Id: INVITECommand.cc,v 1.2 2000/12/30 06:34:03 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -68,46 +68,14 @@ bool INVITECommand::Exec( iClient* theClient, const string& Message )
 		bot->Notice(theClient, bot->getResponse(theUser, language::insuf_access).c_str());
 		return false;
 	} 
-
-	if( st.size() < 3 )
-	{
-		/*
-		 *  No parameters, Just invite them to the channel.
-		 */
-
-		bot->Invite(theClient, theChan->getName());
-		return true;
-	}
-
- 	/*
-	 *  They've supplied a nick, invite them instead.
+ 
+	/*
+	 *  No parameters, Just invite them to the channel. 
 	 */
 
-	iClient* target = Network->findNick(st[2]);
-	if(!target)
-	{
-		bot->Notice(theClient, bot->getResponse(theUser, language::dont_see_them).c_str(),
-			st[2].c_str()); 
-		return false;
-	}
-						
-	bot->Invite(target, theChan->getName()); 
-
-	if(target != theClient) // Don't send a notice to the person who issued the command. 
-	{ 
-		sqlUser* tmpTargetUser = bot->isAuthed(target, false);
-		if (tmpTargetUser)
-		{
-			bot->Notice(target, bot->getResponse(tmpTargetUser, language::invited_by).c_str(),
-				theUser->getUserName().c_str(), theChan->getName().c_str());
-		} else 
-		{
-			bot->Notice(target, bot->getResponse(theUser, language::invited_by).c_str(),
-				theUser->getUserName().c_str(), theChan->getName().c_str());
-		} 
-	}
-
-	return true ;
+	bot->Invite(theClient, theChan->getName());
+ 
+	return true;
 } 
 
 } // namespace gnuworld.
