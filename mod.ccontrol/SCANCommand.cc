@@ -17,7 +17,7 @@
 #include	"match.h"
 #include	"Network.h"
 
-const char SCANCommand_cc_rcsId[] = "$Id: SCANCommand.cc,v 1.2 2002/01/02 22:22:25 mrbean_ Exp $";
+const char SCANCommand_cc_rcsId[] = "$Id: SCANCommand.cc,v 1.3 2002/01/03 19:26:30 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -138,22 +138,25 @@ if(showUsers)
 		{
 		curClient = *cptr;
 		ClientInfo = curClient->getNickUserHost();
-		for( iClient::const_channelIterator ptr = curClient->channels_begin() ;
-    		ptr != curClient->channels_end() ; ++ptr )
-    			{  
-    			ClientInfo += " ";
-    			curChannel = (*ptr)->findUser(const_cast< iClient* >(curClient));
-			if(curChannel->isModeO())
-				{
-				ClientInfo += "@";
+		if(!curClient->getMode(iClient::MODE_SERVICES)) //Dont show channels for +k users
+			{
+			for( iClient::const_channelIterator ptr = curClient->channels_begin() ;
+    			ptr != curClient->channels_end() ; ++ptr )
+    				{  
+    				ClientInfo += " ";
+    				curChannel = (*ptr)->findUser(const_cast< iClient* >(curClient));
+				if(curChannel->isModeO())
+					{
+					ClientInfo += "@";
+					}
+	    			if(curChannel->isModeV())
+					{
+					ClientInfo += "+";
+					}
+				ClientInfo += (*ptr)->getName();				
 				}
-    			if(curChannel->isModeV())
-				{
-				ClientInfo += "+";
-				}
-			ClientInfo += (*ptr)->getName();				
+			++shown;
 			}
-		++shown;
 		bot->Notice(theClient,ClientInfo);
 		}
 	}

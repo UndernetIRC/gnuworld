@@ -37,7 +37,7 @@
 #include	"ip.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.112 2002/01/02 22:32:34 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.113 2002/01/03 19:26:30 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -809,7 +809,7 @@ switch( theEvent )
 							tmpGline->setAddedOn(::time(0));
 							tmpGline->Insert();
 							tmpGline->loadData(tmpGline->getHost());
-						addGline(tmpGline);
+							addGline(tmpGline);
 							}
 						MyUplink->setGline( nickName,
 								tmpGline->getHost(),
@@ -818,7 +818,6 @@ switch( theEvent )
 						}	
 					else
 						{
-						string virtualHost = NewUser->getDescription() + "@";
 						int dots = 0;
 						string ipClass = "";
 						for(string::size_type ptr = 0;ptr < tIP.size(),dots < 3;++ptr)
@@ -830,12 +829,13 @@ switch( theEvent )
 							ipClass += tIP[ptr];
 							}
 						ipClass += '*';
-						virtualHost += ipClass;
-						CurConnections = ++virtualClientsMap[virtualHost];
+						CurConnections = ++virtualClientsMap[NewUser->getDescription() + "@" + ipClass];
 						if(CurConnections > getExceptions("*@"+ipClass))
 							{
-							MsgChanLog("Virtual clones for %s connections %d\n",
-							    virtualHost.c_str(),CurConnections);
+							MsgChanLog("Virtual clones for real name %s on %s, total connections %d\n",
+							    NewUser->getDescription().c_str()
+							    ,ipClass.c_str()
+							    ,CurConnections);
 							}
 						}
 					}
@@ -1517,9 +1517,7 @@ if(!dbConnected)
 strstream theQuery;
 theQuery	<< Main
 		<< string_lower(removeSqlChars(command))
-		<< "' and lower(subcommand) = "
-		<< "NULL"
-		<< " ORDER BY line"
+		<< "' ORDER BY line"
 		<< ends;
 
 elog	<< "ccontrol::GetHelp> "
@@ -1657,19 +1655,28 @@ bool ccontrol::addGline( ccGline* TempGline)
 {
 
 ccGline *theGline = 0;
+bool addedAlready = false;
 for(glineIterator ptr = glineList.begin(); ptr != glineList.end();)
 	{
 	theGline = *ptr;
 	if(theGline->getHost() == TempGline->getHost()) 
 		{
-		ptr = glineList.erase(ptr);
-		delete theGline;
+		if(TempGline != theGline)  //Make sure we are not deleting the one we need to add
+			{
+			ptr = glineList.erase(ptr);
+			delete theGline;
+			}
+		else 
+			{
+			addedAlready = true;
+			++ptr;
+			}		
 		}
 	else
 		++ptr;
 	}
-			
-glineList.push_back( TempGline ) ;
+if(!addedAlready) //if we found the gline we need to add, no need to add it			
+    glineList.push_back( TempGline ) ;
 return true;
 }    
 
@@ -1705,7 +1712,7 @@ ccGline *theGline;
 for(glineIterator ptr = glineList.begin(); ptr != glineList.end();++ptr)
 	{
 	theGline = *ptr;
-    	if((theGline->getHost() == HostName) || !(match(theGline->getHost(),HostName)))
+    	if(theGline->getHost() == HostName)
 		if(theGline->getExpires() > ::time(0))
 			return theGline;
 	}
