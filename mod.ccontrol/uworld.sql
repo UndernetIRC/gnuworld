@@ -21,4 +21,11 @@ CREATE TABLE hosts (
 	user_id INT4 NOT NULL,
 	host VARCHAR(128) NOT NULL
 	);
-	
+
+CREATE TABLE help (
+	command VARCHAR(40) NOT NULL,
+	subcommand VARCHAR(40),
+	line INT4 NOT NULL DEFAULT '1',
+	help VARCHAR(255)
+);
+			

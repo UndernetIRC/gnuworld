@@ -157,7 +157,9 @@ const int isADMIN     = 0x04;
 const int isCODER     = 0x08;
 
 
-typedef struct AuthStruct {
+//typedef struct AuthStruct {
+class AuthInfo{
+public:
     string Name;
     int Id;
     int Access;
@@ -165,10 +167,13 @@ typedef struct AuthStruct {
     string Numeric;
     int SuspendExpires;
     string SuspendedBy;
-    struct AuthStruct *Next,*Prev;
-} AuthInfo;
+    AuthInfo *Next,*Prev;
+};// AuthInfo;
 
-typedef struct UserInfo {
+//typedef struct UserInfo {
+class User{
+
+public:
     int Id;
     string UserName;
     string Password;
@@ -178,6 +183,6 @@ typedef struct UserInfo {
     string SuspendedBy;
     int Access;
     int Flags;
-} User;
+}; //User;
 
 #endif // __CCONTROLCOMMANDS_H

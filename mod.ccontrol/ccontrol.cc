@@ -21,7 +21,7 @@
 #include	"ccontrol.h"
  
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.11 2001/02/21 00:14:43 dan_karrels Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.12 2001/02/22 13:08:38 mrbean_ Exp $" ;
 
 using std::string ;
 using std::vector ;
@@ -892,5 +892,62 @@ bool ccontrol::DelHost ( User* user , string host )
     else
 	return false;
 }
+
+bool ccontrol::GetHelp( iClient* user , string command )
+{
+    int i;
+    char *h;
+    strstream Condition;
+    static const char *Main = "SELECT line,help FROM help WHERE lower(command) = '";
+    strstream theQuery;
+    theQuery	<< Main << string_lower(command) << "' ORDER BY line" << ends;
+    elog << "ACCESS::sqlQuery> " << theQuery.str() << endl; 
+
+    ExecStatusType status = SQLDb->Exec( theQuery.str() ) ;
+    if( PGRES_TUPLES_OK == status )
+    {
+	if(SQLDb->Tuples() > 0 )
+	    for(i=0;i < SQLDb->Tuples();i++)
+	    {	    	
+		h = SQLDb->GetValue(i,1);
+		h = ParseHelp(h);
+		Notice(user,h);
+	    }
+	else
+	    Notice(user,"Couldnt find help for %s",command.c_str());	
+	return true;
+    }
+    return false;	    
+}
+
+char *ccontrol::ReplaceStr(char *command, const char *from , const char *to)
+{
+    char *Str,*TTok;
+    int NewSize;
+    if(strlen(to) > strlen(from))
+        NewSize = strlen(command)*(strlen(to)-strlen(from));
+    else
+	NewSize = strlen(command);
+    Str = new char[NewSize];
+    TTok = strtok(command,from);
+    if(TTok != NULL)
+	strcpy(Str,TTok);
+    while((TTok = strtok(NULL,from)) != NULL)
+    {
+	strcat(Str,to);
+	strcat(Str,TTok);
+    }
+    
+    delete TTok;
+    return Str;
+}
+
+char *ccontrol::ParseHelp(char *command)
+{
+    char* TCommand;
+    TCommand = ReplaceStr(command,(char *)"$BOT$",nickName.c_str());
+    return TCommand;
+}
+
     
 } // namespace gnuworld 

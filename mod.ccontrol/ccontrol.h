@@ -3,7 +3,7 @@
  */
 
 #ifndef __CCONTROL_H
-#define __CCONTROL_H "$Id: ccontrol.h,v 1.6 2001/02/21 00:14:43 dan_karrels Exp $"
+#define __CCONTROL_H "$Id: ccontrol.h,v 1.7 2001/02/22 13:08:38 mrbean_ Exp $"
 
 #include	<string>
 #include	<vector>
@@ -249,6 +249,12 @@ public:
         bool DelHost( User* , string host );
 	
 	void UpdateAuth( int );
+
+	bool GetHelp( iClient* , string );
+
+	char *ReplaceStr(char*, const char*, const char* );
+	
+	char *ParseHelp(char* );
 
 	/**
 	 * This is a constant iterator type used to perform a read-only
