@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server.cc,v 1.171 2003/07/30 22:06:21 dan_karrels Exp $
+ * $Id: server.cc,v 1.172 2003/07/31 21:21:17 jeekay Exp $
  */
 
 #include	<sys/time.h>
@@ -71,7 +71,7 @@
 #include	"ConnectionHandler.h"
 #include	"Connection.h"
 
-RCSTAG( "$Id: server.cc,v 1.171 2003/07/30 22:06:21 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: server.cc,v 1.172 2003/07/31 21:21:17 jeekay Exp $" ) ;
 
 namespace gnuworld
 {
@@ -1338,6 +1338,12 @@ if( !Network->addClient( Client ) )
 	return false ;
 	}
 
+// Let the client know it has been added to
+// the server and its tables.
+Client->ImplementServer( this ) ;
+
+// TODO: Remove any existing iClient from the xClient
+
 // Create a new iClient representation for this xClient
 iClient* theIClient = new (std::nothrow) iClient(
 	getIntYY(),
@@ -1375,12 +1381,6 @@ if( !Network->addClient( theIClient ) )
 	// Failed to complete the procedure
 	return false ;
 	}
-
-// Let the client know it has been added to
-// the server and its tables.
-Client->ImplementServer( this ) ;
-
-PostEvent( EVT_NICK, static_cast< void* >( theIClient ) ) ;
 
 if( doBurst )
 	{
@@ -1597,7 +1597,7 @@ void xServer::removeClient( xClient* theClient )
 // Precondition: theClient != 0
 
 // Remove this xClient's iClient instance
-iClient* iClientPtr = theClient->getInstance() ;
+iClient* iClientPtr = Network->removeClient( theClient->getInstance() ) ;
 
 // Notify each channel that the iClient has parted.
 for( iClient::channelIterator chanItr = iClientPtr->channels_begin() ;
@@ -1634,6 +1634,12 @@ for( xNetwork::clientIterator clientItr = Network->clients_begin() ;
 //			<< endl ;
 		}
 	} // for()
+
+// Deallocate the iClient instance of the xClient
+delete iClientPtr ;
+
+// Reset the iClient instance for good measure
+theClient->resetInstance() ;
 
 // Walk the channelEventMap, and remove the xClient from all
 // channel's in which it is registered.
@@ -1673,7 +1679,6 @@ ConnectionManager::Disconnect(
 Network->removeLocalClient( theClient ) ;
 
 // Find this client in the module list
-bool foundLocalClient = false ;
 for( clientModuleListType::iterator modPtr = clientModuleList.begin() ;
 	modPtr != clientModuleList.end() ; ++modPtr )
 	{
@@ -1690,20 +1695,9 @@ for( clientModuleListType::iterator modPtr = clientModuleList.begin() ;
 		// Remove this module from the list of modules
 		clientModuleList.erase( modPtr ) ;
 
-		foundLocalClient = true ;
 		break ;
 		}
 	}
-
-if( !foundLocalClient )
-	{
-	elog	<< "xServer::removeClient> Unable to find xClient: "
-		<< *theClient
-		<< endl ;
-	}
-
-// Deallocate the iClientPtr associated with this xClient
-delete Network->removeClient( iClientPtr ) ;
 }
 
 /**
