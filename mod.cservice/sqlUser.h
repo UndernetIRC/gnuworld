@@ -1,7 +1,7 @@
 /* sqlUser.h */
 
 #ifndef __SQLUSER_H
-#define __SQLUSER_H "$Id: sqlUser.h,v 1.11 2001/01/22 00:22:31 gte Exp $"
+#define __SQLUSER_H "$Id: sqlUser.h,v 1.12 2001/02/18 19:46:01 dan_karrels Exp $"
 
 #include	<string>
 #include	<ctime>
@@ -24,8 +24,8 @@ public:
 
 	typedef unsigned short int	flagType ;
 	static const flagType F_GLOBAL_SUSPEND =	0x01 ;
-	static const flagType F_LOGGEDIN =	0x02 ;
-	static const flagType F_INVIS =	0x04 ;
+	static const flagType F_LOGGEDIN =		0x02 ;
+	static const flagType F_INVIS =			0x04 ;
 
 	/*
 	 *  Methods to get data atrributes.
@@ -56,7 +56,7 @@ public:
 		{ return public_key ; }
 
 	inline bool		getFlag( const flagType& whichFlag ) const
-		{ return (flags & whichFlag) ; }
+		{ return (whichFlag == (flags & whichFlag)) ; }
 
 	const flagType&		getFlags() const
 		{ return flags ; }
@@ -99,7 +99,7 @@ public:
 
 	bool loadData( int );
 	bool loadData( const string& );
-    void setAllMembers(int);
+	void setAllMembers(int);
 	iClient*	networkClient;
  
 protected: 

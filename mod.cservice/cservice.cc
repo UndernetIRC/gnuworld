@@ -72,7 +72,7 @@ for( commandMapType::iterator ptr = commandMap.begin() ;
         ptr->second->setServer( theServer ) ;
         }
 	 
-	// Attempt to register our interest in recieving NOTIFY events.
+// Attempt to register our interest in recieving NOTIFY events.
 if (SQLDb->ExecCommandOk("LISTEN channels_u; LISTEN bans_u; LISTEN users_u; LISTEN levels_u;"))
 	{
 	elog	<< "cmaster::ImplementServer> Successfully registered "
@@ -188,7 +188,10 @@ string sqlPort = cserviceConfig->Require( "sql_port" )->second;
 string Query = "host=" + sqlHost + " dbname=" + sqlDb + " port=" + sqlPort;
 
 elog	<< "cmaster::cmaster> Attempting to connect to "
-	<< sqlHost << "; Database: " << sqlDb << endl;
+	<< sqlHost
+	<< "; Database: "
+	<< sqlDb
+	<< endl;
  
 SQLDb = new (nothrow) cmDatabase( Query.c_str() ) ;
 assert( SQLDb != 0 ) ;
@@ -231,7 +234,15 @@ loadTranslationTable();
 
 cservice::~cservice()
 {
-delete cserviceConfig ;	
+delete cserviceConfig ;	cserviceConfig = 0 ;
+delete SQLDb ; SQLDb = 0 ;
+
+for( commandMapType::iterator ptr = commandMap.begin() ;
+	ptr != commandMap.end() ; ++ptr )
+	{
+	delete ptr->second ;
+	}
+commandMap.clear() ;
 }
 
 int cservice::BurstChannels()
@@ -247,7 +258,8 @@ theQuery	<< "SELECT " << sql::channel_fields
 		<< "registered_ts <> 0 AND deleted = 0"
 		<< ends;
 
-elog	<< "cmaster::BurstChannels> " << theQuery.str()
+elog	<< "cmaster::BurstChannels> "
+	<< theQuery.str()
 	<< endl; 
 
 ExecStatusType status = SQLDb->Exec(theQuery.str()) ;
@@ -307,7 +319,10 @@ unsigned short cservice::getFloodPoints(iClient* theClient)
 networkData* tmpData =
 	static_cast< networkData* >( theClient->getCustomData(this) ) ;
 
-if(!tmpData) return 0;
+if(!tmpData)
+	{
+	return 0;
+	}
 //assert(tmpData != NULL);
  
 return tmpData->flood_points;
@@ -317,7 +332,11 @@ void cservice::setFloodPoints(iClient* theClient, unsigned short amount)
 { 
 networkData* tmpData =
 	static_cast< networkData* >( theClient->getCustomData(this) ) ;
-if (!tmpData) return;
+
+if (!tmpData)
+	{
+	return;
+	}
 //assert(tmpData != NULL);
 
 tmpData->flood_points = amount; 
@@ -331,7 +350,11 @@ void cservice::setLastRecieved(iClient* theClient, time_t last_recieved)
 {
 networkData* tmpData =
 	static_cast< networkData* >( theClient->getCustomData(this) ) ;
-if(!tmpData) return;
+
+if(!tmpData)
+	{
+	return;
+	}
 //assert(tmpData != NULL);
 
 tmpData->messageTime = last_recieved;
@@ -345,7 +368,11 @@ time_t cservice::getLastRecieved(iClient* theClient)
 {
 networkData* tmpData =
 	static_cast< networkData* >( theClient->getCustomData(this) ) ;
-if(!tmpData) return 0;
+
+if(!tmpData)
+	{
+	return 0;
+	}
 //assert(tmpData != NULL);
 
 return tmpData->messageTime;
@@ -377,16 +404,24 @@ else
 		 */
 
 		sqlUser* theUser = isAuthed(theClient, false);
-		if (theUser && getAdminAccessLevel(theUser)) return false;
+		if (theUser && getAdminAccessLevel(theUser))
+			{
+			return false;
+			}
 
 		// Bad boy!
 		setFloodPoints(theClient, 0);
 		setLastRecieved(theClient, ::time(NULL)); 
-		Notice(theClient, "Flood me will you? I'm not going to listen to you anymore.");
+		Notice(theClient,
+			"Flood me will you? I'm not going to listen to "
+			"you anymore.");
 		
 		// Send a silence numeric target, and mask to ignore
 		// messages from this user.
-		string silenceMask = "*!*" + theClient->getUserName() + "@" + theClient->getInsecureHost();
+		string silenceMask = string( "*!*" )
+			+ theClient->getUserName()
+			+ "@"
+			+ theClient->getInsecureHost();
 
 		strstream s;
 		s	<< getCharYYXXX() 
@@ -419,7 +454,11 @@ void cservice::setOutputTotal(const iClient* theClient, unsigned int count)
 
 networkData* tmpData =
 	static_cast< networkData* >( theClient->getCustomData(this) );
-if (!tmpData) return;
+
+if (!tmpData)
+	{
+	return;
+	}
 //assert(tmpData != NULL);
 
 tmpData->outputCount = count;
@@ -429,7 +468,11 @@ unsigned int cservice::getOutputTotal(const iClient* theClient)
 {
 networkData* tmpData =
 	static_cast< networkData* >( theClient->getCustomData(this) );
-if (!tmpData) return 0;
+
+if (!tmpData)
+	{
+	return 0;
+	}
 //assert(tmpData != NULL);
 
 return tmpData->outputCount;
@@ -437,7 +480,7 @@ return tmpData->outputCount;
 
 bool cservice::hasOutputFlooded(iClient* theClient)
 {
-	if( (getLastRecieved(theClient) + flood_duration) <= ::time(NULL) )
+if( (getLastRecieved(theClient) + flood_duration) <= ::time(NULL) )
 	{
 	/*
 	 *  Reset a few things, they're out of the flood period now.
@@ -446,52 +489,58 @@ bool cservice::hasOutputFlooded(iClient* theClient)
 
 	setOutputTotal(theClient, 0);
 	setLastRecieved(theClient, ::time(NULL));
-	} else 
+	}
+else 
 	{
+	/*
+	 *  Inside the flood period, check their output count.
+	 */
+
+	if(getOutputTotal(theClient) > output_flood)
+		{
 		/*
-		 *  Inside the flood period, check their output count.
+		 *  Check admin access, if present then
+		 *  don't trigger.
 		 */
 
-		if(getOutputTotal(theClient) > output_flood)
-		{
-			/*
-			 *  Check admin access, if present then
-			 *  don't trigger.
-			 */
+		sqlUser* theUser = isAuthed(theClient, false);
+		if (theUser && getAdminAccessLevel(theUser))
+			{
+			return false;
+ 			}
 
-			sqlUser* theUser = isAuthed(theClient, false);
-			if (theUser && getAdminAccessLevel(theUser)) return false;
- 
-			setOutputTotal(theClient, 0);
-			setLastRecieved(theClient, ::time(NULL)); 
-			Notice(theClient, "I think I've sent you a little too much data, I'm going to ignore you for a while."); 
+		setOutputTotal(theClient, 0);
+		setLastRecieved(theClient, ::time(NULL)); 
+		Notice(theClient, "I think I've sent you a little "
+			"too much data, I'm going to ignore you "
+			"for a while."); 
 
-			// Send a silence numeric target, and mask to ignore messages from this user.
-			string silenceMask = "*!*"
-				+ theClient->getUserName()
-				+ "@"
-				+ theClient->getInsecureHost();
+		// Send a silence numeric target, and mask to ignore
+		// messages from this user.
+		string silenceMask = string( "*!*" )
+			+ theClient->getUserName()
+			+ "@"
+			+ theClient->getInsecureHost();
 
-			strstream s;
-			s	<< getCharYYXXX()
-				<< " SILENCE "
-				<< theClient->getCharYYXXX()
-				<< " "
-				<< silenceMask
-				<< ends; 
-			Write( s );
-			delete[] s.str();
+		strstream s;
+		s	<< getCharYYXXX()
+			<< " SILENCE "
+			<< theClient->getCharYYXXX()
+			<< " "
+			<< silenceMask
+			<< ends; 
+		Write( s );
+		delete[] s.str();
 
-			time_t expireTime = currentTime() + 3600;
-			silenceList.push_back(make_pair(expireTime, silenceMask));
+		time_t expireTime = currentTime() + 3600;
+		silenceList.push_back(make_pair(expireTime, silenceMask));
 
-			logAdminMessage("OUTPUT-FLOOD from %s", theClient->getNickUserHost().c_str());
-			return true;
+		logAdminMessage("OUTPUT-FLOOD from %s", theClient->getNickUserHost().c_str());
+		return true;
 		}
 	}
 
-	return false;
-
+return false;
 }	
  
 int cservice::OnPrivateMessage( iClient* theClient, const string& Message,
@@ -520,21 +569,21 @@ const string Command = string_upper( st[ 0 ] ) ;
  *  unsecurely.
  */
 
- if (!secure && ((Command == "LOGIN") || (Command == "NEWPASS")) )
- {
+if (!secure && ((Command == "LOGIN") || (Command == "NEWPASS")) )
+	{
 	Notice(theClient, "To use %s, you must /msg %s@%s",
 		Command.c_str(), nickName.c_str(), getUplinkName().c_str());
 	return false;
- }
+	}
  
-
 /* Attempt to find a handler for this method. */
 
 commandMapType::iterator commHandler = commandMap.find( Command ) ;
 if( commHandler == commandMap.end() )
 	{
 	/* Don't reply to unknown commands, but add to their flood 
-	 * total :) */
+	 * total :)
+	 */
 	if (hasFlooded(theClient))
 		{
 		return false;
@@ -565,7 +614,8 @@ else
 		return false;
 		}
 
-	setFloodPoints(theClient, getFloodPoints(theClient) + commHandler->second->getFloodPoints() );
+	setFloodPoints(theClient, getFloodPoints(theClient)
+		+ commHandler->second->getFloodPoints() );
 	commHandler->second->Exec( theClient, Message ) ;
 	}
 
@@ -610,7 +660,7 @@ else if(Command == "VERSION")
 	xClient::DoCTCP(theClient, CTCP,
 		"Undernet P10 Channel Services Version 2 ["
 		__DATE__ " " __TIME__
-		"] ($Id: cservice.cc,v 1.109 2001/02/18 14:47:24 plexus Exp $)");
+		"] ($Id: cservice.cc,v 1.110 2001/02/18 19:46:01 dan_karrels Exp $)");
 	}
 else if(Command == "PROBLEM?")
 	{
@@ -631,7 +681,10 @@ sqlUser* cservice::isAuthed(iClient* theClient, bool alert)
 networkData* tmpData =
 	static_cast< networkData* >( theClient->getCustomData(this) ) ;
 
-if(!tmpData) return 0;
+if(!tmpData)
+	{
+	return 0;
+	}
 
 //assert( tmpData != 0 ) ;
 
@@ -644,7 +697,8 @@ if( theUser )
 
 if( alert )
 	{
-	Notice(theClient, "Sorry, You must be logged in to use this command.");
+	Notice(theClient,
+		"Sorry, You must be logged in to use this command.");
 	}
 return 0;
 }
@@ -898,10 +952,10 @@ return 0;
  * channel taking into account channel & user level suspensions.
  * Also used to return the level of access granted to a forced access.
  *
- * Usage: When determining if we should grant a permission to a user to access
- * a particular command/function.
+ * Usage: When determining if we should grant a permission to a user
+ * to access a particular command/function.
  * To determine the effect access level of a target user.
- *--------------------------------------------------------------------------*/ 
+ */
 short int cservice::getEffectiveAccessLevel( sqlUser* theUser,
 	sqlChannel* theChan, bool notify )
 {
@@ -955,7 +1009,7 @@ return theLevel->getAccess();
  *  Returns the access level a particular user has on a particular
  *  channel. Plain and simple. If the user has 500 in the channel
  *  record, this function returns 500. 
- *--------------------------------------------------------------------------*/ 
+ */
 short int cservice::getAccessLevel( sqlUser* theUser,
 	sqlChannel* theChan )
 { 
@@ -974,7 +1028,7 @@ return 0;
  * language. 
  */
 const string cservice::getResponse( sqlUser* theUser, int response_id,
-	string msg = "")
+	string msg )
 { 
 
 // Language defaults to English
@@ -1006,15 +1060,14 @@ if (lang_id != 1)
 	return getResponse(theUser,1);
 	}
 
-if (msg != "")
+if( !msg.empty() )
 	{
 	return msg;
 	}
 
-string result = "Unable to retrieve response. Please contact a cservice "
-	"administrator.";
 
-return result;
+return string( "Unable to retrieve response. Please contact a cservice "
+	"administrator." ) ;
 }
 
 /**
@@ -1084,6 +1137,7 @@ if (!reopQ.empty())
 			{ 
 			ChannelUser* tmpChanUser;
 			tmpChanUser = tmpChan->findUser(me);
+
 			/* Don't op ourself if we're already opped.. */
 			if (tmpChanUser && !tmpChanUser->getMode(ChannelUser::MODE_O))
 				{
@@ -1095,9 +1149,11 @@ if (!reopQ.empty())
 					<< getCharYYXXX()
 					<< ends;
 				
-					Write( s );
-					delete[] s.str();
-					elog << "cservice::OnTimer> REOP " << tmpChan->getName() << endl;
+				Write( s );
+				delete[] s.str();
+				elog	<< "cservice::OnTimer> REOP "
+					<< tmpChan->getName()
+					<< endl;
 				}
 			} 
 			reopQ.erase(ptr->first); 
@@ -1520,13 +1576,15 @@ if( !deopList.empty() )
 	{
 	if ((theChanUser) && (reggedChan->getFlag(sqlChannel::F_NOOP)) ) 
 		{
-		Notice( theChanUser->getClient(), "The NOOP flag is set on %s",
+		Notice( theChanUser->getClient(),
+			"The NOOP flag is set on %s",
 			reggedChan->getName().c_str());
 		}
 
 	if ((theChanUser) && (reggedChan->getFlag(sqlChannel::F_STRICTOP)) ) 
 		{
-		Notice( theChanUser->getClient(), "The STRICTOP flag is set on %s",
+		Notice( theChanUser->getClient(),
+			"The STRICTOP flag is set on %s",
 			reggedChan->getName().c_str());
 		}
 
@@ -1540,8 +1598,9 @@ if( !deopList.empty() )
 
 if ((theChanUser) && (deopCounter >= reggedChan->getMassDeopPro()))
 	{
-		Notice(theChanUser->getClient(), "You just deopped more than %i people", 
-		reggedChan->getMassDeopPro());
+	Notice(theChanUser->getClient(),
+		"You just deopped more than %i people", 
+	reggedChan->getMassDeopPro());
 	} 
 }
 
@@ -1642,7 +1701,7 @@ if( !deopList.empty() )
 
 }
 
-int cservice::countChanOps(Channel* theChan)
+size_t cservice::countChanOps(const Channel* theChan)
 { 
 if( !theChan )
 	{
@@ -1650,20 +1709,19 @@ if( !theChan )
 	return 0;
 	}
 
-int i = 0;
+size_t chanOps = 0;
 
 for( Channel::const_userIterator ptr = theChan->userList_begin();
 	ptr != theChan->userList_end() ; ++ptr )
 	{
 	if( ptr->second->getMode(ChannelUser::MODE_O))
 		{
-		i++;			
+		chanOps++;			
 		} // If opped.
 	}
 
-return i;
+return chanOps;
 }
-
 
 /**
  * Support function to deop all non authed opped users on a channel.
@@ -1688,18 +1746,19 @@ for( Channel::const_userIterator ptr = theChan->userList_begin();
 			sqlChannel* reggedChan = getChannelRecord(theChan->getName());
  
 			if (!authUser)
-			{
+				{
 				/* Not authed, deop this guy + Don't deop +k things */
 				if ( !ptr->second->getClient()->getMode(iClient::MODE_SERVICES) ) 
 					deopList.push_back( ptr->second->getClient() ); 
 
 			/* Authed but no access? Tough. :) */
-			} else if ((reggedChan) && !(getEffectiveAccessLevel(authUser, reggedChan, false) >= level::op))
-			{
+				}
+			else if ((reggedChan) && !(getEffectiveAccessLevel(authUser, reggedChan, false) >= level::op))
+				{
 				/* Don't deop +k things */
 				if ( !ptr->second->getClient()->getMode(iClient::MODE_SERVICES) ) 
 					deopList.push_back( ptr->second->getClient() );
-			} 
+				} 
 
 		} // if opped.
 	} // forall users in channel.
@@ -1813,15 +1872,15 @@ return xClient::OnChannelEvent( whichEvent, theChan,
 	data1, data2, data3, data4 );
 }
 
-/*--checkBansOnJoin-----------------------------------------------------------
- *
+/**
  * This function compares a client with any active bans set in the DB.
  * If matched, the ban is applied and the user is kicked.
  * Returns true if matched, false if not.
  * N.B: Called from OnChannelEvent, theClient is guarantee'd to be in the
  * channel and netChan will exist.
  *--------------------------------------------------------------------------*/ 
-bool cservice::checkBansOnJoin( Channel* netChan, sqlChannel* theChan, iClient* theClient )
+bool cservice::checkBansOnJoin( Channel* netChan, sqlChannel* theChan,
+	iClient* theClient )
 {
 vector< sqlBan* >* banList = getBanRecords(theChan);
 vector< sqlBan* >::iterator ptr = banList->begin();
@@ -1854,10 +1913,13 @@ while (ptr != banList->end())
 		}
 	else
 		{
+		// TODO: Ban through the server, this method
+		// is not updating the network data tables
 		/* Matching ban? */ 
 		if( (match(theBan->getBanMask(),
-			theClient->getNickUserHost()) == 0) && (theBan->getLevel() >= 75) )
-			{ 
+			theClient->getNickUserHost()) == 0) &&
+			(theBan->getLevel() >= 75) )
+			{
 			strstream s;
 			s	<< getCharYYXXX()
 				<< " M "
@@ -1871,13 +1933,13 @@ while (ptr != banList->end())
 
 			/* Don't kick banned +k bots */
 			if ( !theClient->getMode(iClient::MODE_SERVICES) )
-			{
+				{
 				Kick(netChan, theClient,
 					string( "("
 					+ theBan->getSetBy()
 					+ ") "
 					+ theBan->getReason()) );
-			}
+				}
  
 			return true;
 			} /* Matching Ban */ 
@@ -1985,11 +2047,9 @@ delete[] s3.str();
 return 0;
 }
 
-
-/*--doAutoTopic---------------------------------------------------------------
- *
+/**
  * This support function sets the autotopic in a particular channel. 
- *--------------------------------------------------------------------------*/ 
+ */
 void cservice::doAutoTopic(sqlChannel* theChan)
 {
 
@@ -2038,27 +2098,35 @@ return false ;
 void cservice::writeChannelLog(sqlChannel* theChannel, iClient* theClient, 
 	unsigned short eventType, const string& theMessage)
 { 
-	sqlUser* theUser = isAuthed(theClient, false);
-	string userExtra = theUser ? theUser->getUserName() : "Not Logged In";
+sqlUser* theUser = isAuthed(theClient, false);
+string userExtra = theUser ? theUser->getUserName() : "Not Logged In";
 
-	strstream theLog;
- 	theLog << "INSERT INTO channellog (ts, channelID, event, message, last_updated) VALUES "
+strstream theLog;
+theLog	<< "INSERT INTO channellog (ts, channelID, event, message, "
+	<< "last_updated) VALUES "
 	<< "("
-	<< currentTime() << ", "
-	<< theChannel->getID() << ", "
-	<< eventType << ", "
- 	<< "'[" << nickName << "]: "
+	<< currentTime()
+	<< ", "
+	<< theChannel->getID()
+	<< ", "
+	<< eventType
+	<< ", "
+ 	<< "'["
+	<< nickName
+	<< "]: "
 	<< theClient->getNickUserHost()
 	<< " (" << userExtra << ") "
-	<< escapeSQLChars(theMessage) << "', "
+	<< escapeSQLChars(theMessage)
+	<< "', "
 	<< currentTime()
-	<< ")" << ends;
+	<< ")"
+	<< ends;
 
- 	elog << "cservice::writeChannelLog> " << theLog.str() << endl;
+elog << "cservice::writeChannelLog> " << theLog.str() << endl;
 
-	SQLDb->ExecCommandOk(theLog.str());
+SQLDb->ExecCommandOk(theLog.str());
 
-	delete[] theLog.str();
+delete[] theLog.str();
 }
 
 /**
@@ -2091,19 +2159,21 @@ return retMe ;
 time_t cservice::currentTime() const
 {
 /* Returns the current time according to the postgres server. */ 
-	return dbTimeOffset + ::time(NULL);
+return dbTimeOffset + ::time(NULL);
 } 
 
 int cservice::Notice( const iClient* Target, const string& Message )
 {
-int count=0;
+size_t count = 0 ;
+
 if( Connected && MyUplink )
 	{
 	setOutputTotal( Target, getOutputTotal(Target) + Message.size() );
-	char buffer[512];
-	char *b;
-	const char *m;
-	b=buffer;
+	char buffer[512] = { 0 };
+	char *b = buffer ;
+	const char *m = 0 ;
+
+	// TODO: wtf is this bs?
 	for (m=Message.c_str();*m!=0;m++) 
 		{
 		if (*m == '\n' || *m == '\r') 

@@ -4,7 +4,7 @@
  * Storage class for accessing channel user/level information either from the backend
  * or internal storage.
  * 
- * $Id: sqlLevel.cc,v 1.7 2001/01/14 23:12:09 gte Exp $
+ * $Id: sqlLevel.cc,v 1.8 2001/02/18 19:46:01 dan_karrels Exp $
  */
  
 #include	<strstream>
@@ -21,13 +21,10 @@ using std::string ;
 using std::endl ; 
  
 const char sqlLevel_h_rcsId[] = __SQLLEVEL_H ;
-const char sqlLevel_cc_rcsId[] = "$Id: sqlLevel.cc,v 1.7 2001/01/14 23:12:09 gte Exp $" ;
+const char sqlLevel_cc_rcsId[] = "$Id: sqlLevel.cc,v 1.8 2001/02/18 19:46:01 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
-
-using namespace gnuworld ;
-
 
 sqlLevel::sqlLevel(PgDatabase* _SQLDb)
  :channel_id(0),
@@ -36,104 +33,127 @@ sqlLevel::sqlLevel(PgDatabase* _SQLDb)
  forced_access(0),
  flags(0),
  suspend_expires(0),
- suspend_by(""),
+ suspend_by(),
  added(0),
- added_by(""),
+ added_by(),
  last_modif(::time(NULL)),
- last_modif_by(""),
+ last_modif_by(),
  SQLDb( _SQLDb )
 { 
 }
  
 bool sqlLevel::loadData(unsigned int userID, unsigned int channelID)
 {
-	/*
-	 * Fetch a matching Level record for this channel and user ID combo.
-	 */ 
+/*
+ * Fetch a matching Level record for this channel and user ID combo.
+ */ 
 
-	ExecStatusType status;
-	elog << "sqlLevel::loadData> Attempting to load level data for channel-id: " << channelID << " and user-id: " << userID << endl;
-	
-	strstream queryString;
-	queryString << "SELECT " << sql::level_fields 
-		<< " FROM levels WHERE channel_id = " << channelID 
-		<< " AND user_id = " << userID 
+elog	<< "sqlLevel::loadData> Attempting to load level data for "
+	<< "channel-id: "
+	<< channelID
+	<< " and user-id: "
+	<< userID
+	<< endl;
+
+strstream queryString;
+queryString	<< "SELECT "
+		<< sql::level_fields 
+		<< " FROM levels WHERE channel_id = "
+		<< channelID 
+		<< " AND user_id = "
+		<< userID 
 		<< ends;
 
-	elog << "sqlLevel::loadData> " << queryString.str() << endl;
+elog 	<< "sqlLevel::loadData> "
+	<< queryString.str()
+	<< endl;
 
-	if ((status = SQLDb->Exec(queryString.str())) == PGRES_TUPLES_OK)
-	{ 
-		/*
-		 *  If this combo doesn't exist, we won't get any rows back.
-		 */ 
+ExecStatusType status = SQLDb->Exec(queryString.str()) ;
+if( PGRES_TUPLES_OK == status )
+	{
+	/*
+	 *  If this combo doesn't exist, we won't get any rows back.
+	 */ 
 
-	if(SQLDb->Tuples() < 1) { 
-			return (false);
+	if(SQLDb->Tuples() < 1)
+		{
+		return (false);
 		} 
-		setAllMembers(0); // Fetch dat from row '0'
-		delete[] queryString.str() ;
-		return (true);
-	} 
+
+	// Fetch dat from row 0
+	setAllMembers(0);
 
 	delete[] queryString.str() ;
-	return (false); 
+	return (true);
+	} 
+
+delete[] queryString.str() ;
+return (false); 
 } 
 
 
 void sqlLevel::setAllMembers(int row)
 {
-	/*
-	 *  Support function for both loadData's.
-	 *  Assumes SQLDb contains a valid results set for all Level information.
-	 */
+/*
+ *  Support function for both loadData's.
+ *  Assumes SQLDb contains a valid results set for all Level information.
+ */
 
-	channel_id = atoi(SQLDb->GetValue(row, 0));
-	user_id = atoi(SQLDb->GetValue(row, 1));
-	access = atoi(SQLDb->GetValue(row, 2));
-	flags = atoi(SQLDb->GetValue(row, 3));
-	suspend_expires = atoi(SQLDb->GetValue(row, 4));
-	suspend_by = SQLDb->GetValue(row, 5);
-	added = atoi(SQLDb->GetValue(row, 6));
-	added_by = SQLDb->GetValue(row, 7);
-	last_modif = atoi(SQLDb->GetValue(row, 8));
-	last_modif_by = SQLDb->GetValue(row, 9);
-	last_updated = atoi(SQLDb->GetValue(row, 10)); 
+channel_id = atoi(SQLDb->GetValue(row, 0));
+user_id = atoi(SQLDb->GetValue(row, 1));
+access = atoi(SQLDb->GetValue(row, 2));
+flags = atoi(SQLDb->GetValue(row, 3));
+suspend_expires = atoi(SQLDb->GetValue(row, 4));
+suspend_by = SQLDb->GetValue(row, 5);
+added = atoi(SQLDb->GetValue(row, 6));
+added_by = SQLDb->GetValue(row, 7);
+last_modif = atoi(SQLDb->GetValue(row, 8));
+last_modif_by = SQLDb->GetValue(row, 9);
+last_updated = atoi(SQLDb->GetValue(row, 10)); 
 }
 
 bool sqlLevel::commit()
 {
-	/*
-	 *  Build an SQL statement to commit the transient data in this storage class
-	 *  back into the database.
-	 */
+/*
+ *  Build an SQL statement to commit the transient data in this
+ *  storage class back into the database.
+ */
 
-	ExecStatusType status;
-	static const char* queryHeader =    "UPDATE levels ";
+static const char* queryHeader =    "UPDATE levels ";
  
-	strstream queryString;
-	queryString << queryHeader 
-	<< "SET flags = " << flags << ", "
-	<< "access = " << access << ", "
-	<< "suspend_expires = " << suspend_expires << ", "
-	<< "suspend_by = '" << suspend_by << "', "
-	<< "added = " << added << ", "
-	<< "added_by = '" << added_by << "', "
-	<< "last_modif = " << last_modif << ", "
-	<< "last_modif_by = '" << last_modif_by << "', "
-	<< "last_updated = now()::abstime::int4 "
-	<< " WHERE channel_id = " << channel_id << " AND user_id = " << user_id
-	<< ends;
+strstream queryString;
+queryString	<< queryHeader 
+		<< "SET flags = " << flags << ", "
+		<< "access = " << access << ", "
+		<< "suspend_expires = " << suspend_expires << ", "
+		<< "suspend_by = '" << suspend_by << "', "
+		<< "added = " << added << ", "
+		<< "added_by = '" << added_by << "', "
+		<< "last_modif = " << last_modif << ", "
+		<< "last_modif_by = '" << last_modif_by << "', "
+		<< "last_updated = now()::abstime::int4 "
+		<< " WHERE channel_id = " << channel_id
+		<< " AND user_id = " << user_id
+		<< ends;
 
-	elog << "sqlLevel::commit> " << queryString.str() << endl; 
+elog	<< "sqlLevel::commit> "
+	<< queryString.str()
+	<< endl; 
 
-	if ((status = SQLDb->Exec(queryString.str())) != PGRES_COMMAND_OK)
+ExecStatusType status = SQLDb->Exec(queryString.str()) ;
+if( PGRES_COMMAND_OK != status )
 	{
-		elog << "sqlLevel::commit> Something went wrong: " << SQLDb->ErrorMessage() << endl; // Log to msgchan here.
-		return false;
+	// TODO: Log to msgchan here.
+	elog	<< "sqlLevel::commit> Something went wrong: "
+		<< SQLDb->ErrorMessage()
+		<< endl;
+
+	delete[] queryString.str() ;
+	return false;
  	} 
 
- 	return true;
+delete[] queryString.str() ;
+return true;
 }	
 
 

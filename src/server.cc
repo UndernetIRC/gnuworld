@@ -47,7 +47,7 @@
 #include	"ServerTimerHandlers.h"
 
 const char xServer_h_rcsId[] = __XSERVER_H ;
-const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.76 2001/02/12 14:09:07 plexus Exp $" ;
+const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.77 2001/02/18 19:46:01 dan_karrels Exp $" ;
 
 using std::string ;
 using std::vector ;
@@ -1482,7 +1482,7 @@ return DetachClient( Network->findLocalNick( Nick ) ) ;
  * Returns false if there is no valid connection,
  * true otherwise.
  */
-bool xServer::Write( const string& buf )
+size_t xServer::Write( const string& buf )
 {
 
 // Is there a valid connection?
@@ -1537,7 +1537,7 @@ return buf.size() ;
 
 }
 
-bool xServer::WriteDuringBurst( const string& buf )
+size_t xServer::WriteDuringBurst( const string& buf )
 {
 
 // Is there a valid connection?
@@ -1581,12 +1581,12 @@ return buf.size() ;
 /**
  * Write the contents of a std::strstream to the uplink connection.
  */
-bool xServer::Write( strstream& s )
+size_t xServer::Write( strstream& s )
 {
 return Write( string( s.str() ) ) ;
 }
 
-bool xServer::WriteDuringBurst( strstream& s )
+size_t xServer::WriteDuringBurst( strstream& s )
 {
 return WriteDuringBurst( string( s.str() ) ) ;
 }
@@ -1598,7 +1598,7 @@ return WriteDuringBurst( string( s.str() ) ) ;
  * true otherwise.
  * I despise this function. --dan
  */
-bool xServer::Write( const char* format, ... )
+size_t xServer::Write( const char* format, ... )
 {
 
 // Is there a valid connection?
@@ -1638,12 +1638,12 @@ else
 	outputBuffer += buffer ;
 	}
 
-// Return success.
-return true ;
+// Return number of bytes written
+return strlen( buffer ) ;
 
 }
 
-bool xServer::WriteDuringBurst( const char* format, ... )
+size_t xServer::WriteDuringBurst( const char* format, ... )
 {
 
 // Is there a valid connection?
@@ -1676,8 +1676,8 @@ va_end( _list ) ;
 // Append the line to the output buffer.
 outputBuffer += buffer ;
 
-// Return success.
-return true ;
+// Return number of bytes written.
+return strlen( buffer ) ;
 
 }
 
@@ -1700,7 +1700,11 @@ if( ptr == glineList.end() )
 
 // Found it
 strstream s ;
-s	<< charYY << " GL * -" << userHost << ends ;
+s	<< charYY
+	<< " GL * -"
+	<< userHost
+	<< ends ;
+
 Write( s ) ;
 delete[] s.str() ;
 
@@ -1709,9 +1713,7 @@ PostEvent( EVT_REMGLINE,
 	static_cast< void* >( *ptr ) ) ;
 
 delete *ptr ;
-
 return true ;
-
 }
 
 // C GL * +~*@209.9.117.131 180 :Banned (~*@209.9.117.131) until 957235403 (On Mon May  1

@@ -17,7 +17,7 @@
  */
 
 #ifndef __XSERVER_H
-#define __XSERVER_H "$Id: server.h,v 1.33 2001/02/12 14:06:03 plexus Exp $"
+#define __XSERVER_H "$Id: server.h,v 1.34 2001/02/18 19:46:01 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
@@ -183,14 +183,14 @@ public:
 	 * The second argument determines if data should be written
 	 * during burst time.
 	 */
-	virtual bool Write( const string& ) ;
+	virtual size_t Write( const string& ) ;
 
 	/**
 	 * Similar to the above signature of Write() except that data
 	 * will be written to the normal output buffer even during
 	 * burst time.
 	 */
-	virtual bool WriteDuringBurst( const string& ) ;
+	virtual size_t WriteDuringBurst( const string& ) ;
 
 	/**
 	 * Append a C variable argument list/character array to the output
@@ -199,28 +199,28 @@ public:
 	 * method cannot support a final default argument -- this method
 	 * defaults to NOT writing during burst.
 	 */
-	virtual bool Write( const char*, ... ) ;
+	virtual size_t Write( const char*, ... ) ;
 
 	/**
 	 * This method is similar to the above Write(), except
 	 * that the data will be written to the normal output
 	 * buffer even during burst time.
 	 */
-	virtual bool WriteDuringBurst( const char*, ... ) ;
+	virtual size_t WriteDuringBurst( const char*, ... ) ;
 
 	/**
 	 * Append a std::strstream to the output buffer.
 	 * The second argument determines if data should be written
 	 * during burst time.
 	 */
-	virtual bool Write( strstream& ) ;
+	virtual size_t Write( strstream& ) ;
 
 	/**
 	 * This method is similar to the above Write(), except
 	 * that the data will be written to the normal output
 	 * buffer even during burst time.
 	 */
-	virtual bool WriteDuringBurst( strstream& ) ;
+	virtual size_t WriteDuringBurst( strstream& ) ;
 
 	/**
 	 * Write any bufferred data to the network.

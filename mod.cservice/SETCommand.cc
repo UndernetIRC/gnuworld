@@ -12,7 +12,7 @@
  *
  * Caveats: None.
  *
- * $Id: SETCommand.cc,v 1.24 2001/02/18 14:47:24 plexus Exp $
+ * $Id: SETCommand.cc,v 1.25 2001/02/18 19:46:01 dan_karrels Exp $
  */
 
 #include	<string>
@@ -24,234 +24,241 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char SETCommand_cc_rcsId[] = "$Id: SETCommand.cc,v 1.24 2001/02/18 14:47:24 plexus Exp $" ;
+const char SETCommand_cc_rcsId[] = "$Id: SETCommand.cc,v 1.25 2001/02/18 19:46:01 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
 
-using namespace gnuworld;
 using namespace level;
  
 bool SETCommand::Exec( iClient* theClient, const string& Message )
 { 
-	StringTokenizer st( Message ) ;
+StringTokenizer st( Message ) ;
  
-	if( st.size() < 3 )
+if( st.size() < 3 )
 	{
-	    Usage(theClient);
-	    return true;
+	Usage(theClient);
+	return true;
 	}
 
-	/* Is the user authorised? */
-	 
-	sqlUser* theUser = bot->isAuthed(theClient, true);
-	if(!theUser) return false; 
+/* Is the user authorised? */
 
-	/*
-	 * First, is this a #channel or user set?
-	 */
- 
-	if( st[1][0] != '#' ) // Didn't find a hash?
+sqlUser* theUser = bot->isAuthed(theClient, true);
+if(!theUser)
 	{
-		// Look by user then.
-		string option = string_upper(st[1]);
-		string value = string_upper(st[2]); 
-		if (option == "INVISIBLE")
-		{
-			if (value == "ON")
-			{
-				theUser->setFlag(sqlUser::F_INVIS);
-				theUser->commit();
-				bot->Notice(theClient, 
-					bot->getResponse(theUser,
-						language::invis_on,
-						string("Your INVISIBLE setting is now ON.")));
-				return true;
-			}
+	return false; 
+	}
 
-			if (value == "OFF")
+/*
+ * First, is this a #channel or user set?
+ */
+ 
+if( st[1][0] != '#' ) // Didn't find a hash?
+	{
+	// Look by user then.
+	string option = string_upper(st[1]);
+	string value = string_upper(st[2]); 
+	if (option == "INVISIBLE")
+		{
+		if (value == "ON")
 			{
-				theUser->removeFlag(sqlUser::F_INVIS);
-				theUser->commit();
-				bot->Notice(theClient, 
-					bot->getResponse(theUser,
-						language::invis_off,
-						string("Your INVISIBLE setting is now OFF.")));
-				return true;
-			}
+			theUser->setFlag(sqlUser::F_INVIS);
+			theUser->commit();
 			bot->Notice(theClient, 
 				bot->getResponse(theUser,
-					language::set_cmd_syntax_on_off,
-					string("value of %s must be ON or OFF")).c_str(),
-				option.c_str());
-		        return true;
+					language::invis_on,
+					string("Your INVISIBLE setting is now ON.")));
+			return true;
+			}
+
+		if (value == "OFF")
+			{
+			theUser->removeFlag(sqlUser::F_INVIS);
+			theUser->commit();
+			bot->Notice(theClient, 
+				bot->getResponse(theUser,
+					language::invis_off,
+					string("Your INVISIBLE setting is now OFF.")));
+			return true;
+			}
+		bot->Notice(theClient, 
+			bot->getResponse(theUser,
+				language::set_cmd_syntax_on_off,
+				string("value of %s must be ON or OFF")).c_str(),
+			option.c_str());
+	        return true;
 		}
-		if (option == "LANG")
+	if (option == "LANG")
 		{
-			if (value == "EN")
+		if (value == "EN")
 			{
-				string lang = "English";
-				theUser->setLanguageId( 1 );
-				theUser->commit();
-				bot->Notice(theClient, 
-				    bot->getResponse(theUser,
-				    	    language::lang_set_to,
-					    string("Language is set to %s.")).c_str(), lang.c_str());
-				
-				return true;
+			string lang = "English";
+			theUser->setLanguageId( 1 );
+			theUser->commit();
+			bot->Notice(theClient, 
+			    bot->getResponse(theUser,
+			    	    language::lang_set_to,
+				    string("Language is set to %s.")).c_str(), lang.c_str());
+
+			return true;
 			}
-			if (value == "FR")
+		if (value == "FR")
 			{
-				string lang = "French";
-				theUser->setLanguageId( 2 );
-				theUser->commit();
-				bot->Notice(theClient, 
-				    bot->getResponse(theUser,
-				    	    language::lang_set_to,
-					    string("Language is set to %s.")).c_str(), lang.c_str());
-				
-				return true;
+			string lang = "French";
+			theUser->setLanguageId( 2 );
+			theUser->commit();
+			bot->Notice(theClient, 
+				bot->getResponse(theUser,
+			    	    language::lang_set_to,
+				    string("Language is set to %s.")).c_str(), lang.c_str());
+
+			return true;
 			}
-			if (value == "DK")
+		if (value == "DK")
 			{
-				string lang = "Danish";
-				theUser->setLanguageId( 3 );
-				theUser->commit();
-				bot->Notice(theClient, 
-				    bot->getResponse(theUser,
-				    	    language::lang_set_to,
-					    string("Language is set to %s.")).c_str(), lang.c_str());
-				
-				return true;
+			string lang = "Danish";
+			theUser->setLanguageId( 3 );
+			theUser->commit();
+			bot->Notice(theClient, 
+				bot->getResponse(theUser,
+					language::lang_set_to,
+					string("Language is set to %s.")).c_str(),
+					lang.c_str());
+
+			return true;
 			}
-			if (value == "NL")
+		if (value == "NL")
 			{
-				string lang = "Dutch";
-				theUser->setLanguageId( 4 );
-				theUser->commit();
-				bot->Notice(theClient, 
-				    bot->getResponse(theUser,
-				    	    language::lang_set_to,
-					    string("Language is set to %s.")).c_str(), lang.c_str());
+			string lang = "Dutch";
+			theUser->setLanguageId( 4 );
+			theUser->commit();
+			bot->Notice(theClient, 
+			    bot->getResponse(theUser,
+			    	    language::lang_set_to,
+				    string("Language is set to %s.")).c_str(), lang.c_str());
 				
-				return true;
+			return true;
 			}
 			if (value == "DE")
 			{
-				string lang = "German";
-				theUser->setLanguageId( 5 );
-				theUser->commit();
-				bot->Notice(theClient, 
-				    bot->getResponse(theUser,
-				    	    language::lang_set_to,
-					    string("Language is set to %s.")).c_str(), lang.c_str());
-				
-				return true;
-			}
-	        	bot->Notice(theClient, 
+			string lang = "German";
+			theUser->setLanguageId( 5 );
+			theUser->commit();
+			bot->Notice(theClient, 
 			    bot->getResponse(theUser,
-			    	    language::lang_invalid,
-				    string("ERROR: Invalid language selection.")));
-			return true;			
+			    	    language::lang_set_to,
+				    string("Language is set to %s.")).c_str(), lang.c_str());
+			
+			return true;
+			}
+        	bot->Notice(theClient, 
+		    bot->getResponse(theUser,
+		    	    language::lang_invalid,
+			    string("ERROR: Invalid language selection.")));
+		return true;			
 		}		
-		bot->Notice(theClient, 
-			bot->getResponse(theUser,
-				language::invalid_option,
-				string("Invalid option.")));
-		return true;
+	bot->Notice(theClient, 
+		bot->getResponse(theUser,
+			language::invalid_option,
+			string("Invalid option.")));
+	return true;
 	}
 
-    Channel* tmpChan = Network->findChannel(st[1]); 
+Channel* tmpChan = Network->findChannel(st[1]); 
 
-	/* Is the channel registered? */
+/* Is the channel registered? */
 	
-	sqlChannel* theChan = bot->getChannelRecord(st[1]);
-	if(!theChan)
+sqlChannel* theChan = bot->getChannelRecord(st[1]);
+if(!theChan)
 	{
-	    bot->Notice(theClient, 
+	bot->Notice(theClient, 
 		bot->getResponse(theUser,
 			language::chan_not_reg,
-			string("Sorry, %s isn't registered with me.")).c_str(), 
+			string("Sorry, %s isn't registered with me.")).c_str(),
 		st[1].c_str());
-	    return false;
+	return false;
 	} 
  
-	// Check level.
+// Check level.
 
-	int level = bot->getEffectiveAccessLevel(theUser, theChan, false); 
-	string option = string_upper(st[2]);
-	string value; 
+int level = bot->getEffectiveAccessLevel(theUser, theChan, false); 
+string option = string_upper(st[2]);
+string value; 
 
-	if (st.size() < 4)
+if (st.size() < 4)
 	{
-		value = "";
-	} else {
-	 	value = string_upper(st[3]);
+	value = "";
+	}
+else
+	{
+ 	value = string_upper(st[3]);
 	}
 
-	
-	if(option == "CAUTION")
+if(option == "CAUTION")
 	{
-	    /* Check for admin access */ 
-	    if(bot->getAdminAccessLevel(theUser) < level::set::caution)
-	    {
-			/* No need to tell users about admin commands. */
-			Usage(theClient);
-			return true;
-	    }
-	    if(value == "ON") theChan->setFlag(sqlChannel::F_CAUTION);
-	    else if(value == "OFF") theChan->removeFlag(sqlChannel::F_CAUTION);
-	    else
-	    {
+    /* Check for admin access */ 
+    if(bot->getAdminAccessLevel(theUser) < level::set::caution)
+	{
+	/* No need to tell users about admin commands. */
+	Usage(theClient);
+	return true;
+	}
+
+    if(value == "ON") theChan->setFlag(sqlChannel::F_CAUTION);
+    else if(value == "OFF") theChan->removeFlag(sqlChannel::F_CAUTION);
+    else
+	{
+	bot->Notice(theClient, 
+		bot->getResponse(theUser,
+			language::set_cmd_syntax_on_off,
+			string("value of %s must be ON or OFF")).c_str(),
+		option.c_str());
+	return true;
+	}
+
+	theChan->commit(); 
+	bot->Notice(theClient, 
+		bot->getResponse(theUser,
+			language::set_cmd_status,
+			string("%s for %s is %s")).c_str(),
+	option.c_str(),
+		theChan->getName().c_str(),
+		theChan->getFlag(sqlChannel::F_CAUTION) ? "ON" : "OFF");
+	return true;
+	}
+
+if(option == "NOREG")
+	{
+	// Check for admin access
+	sqlChannel* admChan = bot->getChannelRecord("*");
+	int admLevel = bot->getAccessLevel(theUser, admChan);
+	if(admLevel < level::set::noreg)
+		{
+		// No need to tell users about admin commands.
+		Usage(theClient);
+		return true;
+		}
+
+	if(value == "ON") theChan->setFlag(sqlChannel::F_NOREG);
+	else if(value == "OFF") theChan->removeFlag(sqlChannel::F_NOREG);
+	else
+		{
 		bot->Notice(theClient, 
 			bot->getResponse(theUser,
 				language::set_cmd_syntax_on_off,
 				string("value of %s must be ON or OFF")).c_str(),
 			option.c_str());
 		return true;
-	    }
-	    theChan->commit(); 
-	    bot->Notice(theClient, 
-			bot->getResponse(theUser,
-				language::set_cmd_status,
-				string("%s for %s is %s")).c_str(),
-			option.c_str(),
-			theChan->getName().c_str(),
-			theChan->getFlag(sqlChannel::F_CAUTION) ? "ON" : "OFF");
-	    return true;
-	}
-
-	if(option == "NOREG")
-	{
-	    // Check for admin access
-	    sqlChannel* admChan = bot->getChannelRecord("*");
-	    int admLevel = bot->getAccessLevel(theUser, admChan);
-	    if(admLevel < level::set::noreg)
-	    {
-			// No need to tell users about admin commands.
-			Usage(theClient);
-			return true;
-	    }
-	    if(value == "ON") theChan->setFlag(sqlChannel::F_NOREG);
-	    else if(value == "OFF") theChan->removeFlag(sqlChannel::F_NOREG);
-	    else
-	    {
-		bot->Notice(theClient, 
-			bot->getResponse(theUser,
-				language::set_cmd_syntax_on_off,
-				string("value of %s must be ON or OFF")).c_str(),
-			option.c_str());
-		return true;
-	    }
-	    theChan->commit(); 
-	    bot->Notice(theClient, 
-			bot->getResponse(theUser,
-				language::set_cmd_status,
-				string("%s for %s is %s")).c_str(),
-			option.c_str(),
-			theChan->getName().c_str(),
-			theChan->getFlag(sqlChannel::F_NOREG) ? "ON" : "OFF");
-	    return true;
+		}
+	theChan->commit(); 
+	bot->Notice(theClient, 
+		bot->getResponse(theUser,
+			language::set_cmd_status,
+			string("%s for %s is %s")).c_str(),
+		option.c_str(),
+		theChan->getName().c_str(),
+		theChan->getFlag(sqlChannel::F_NOREG) ? "ON" : "OFF");
+	return true;
 	}
 
 	if(option == "SPECIAL")
@@ -904,7 +911,8 @@ bool SETCommand::Exec( iClient* theClient, const string& Message )
 			bot->getResponse(theUser,
 				language::keywords_status,
 				string("KEYWORDS for %s are: %s")).c_str(),
-			theChan->getName().c_str(), keywords.c_str()));
+			theChan->getName().c_str(),
+			keywords.c_str());
 	    return true;
 	}
 

@@ -1,5 +1,5 @@
 #ifndef __RESPONSES_H
-#define __RESPONSES_H "$Id: responses.h,v 1.7 2001/02/16 20:20:26 plexus Exp $"
+#define __RESPONSES_H "$Id: responses.h,v 1.8 2001/02/18 19:46:01 dan_karrels Exp $"
 
 /* 
  * responses.h
@@ -10,12 +10,13 @@
  * Defines 'response' ID's, unique references to textual responses
  * from the bot.
  *
- * $Id: responses.h,v 1.7 2001/02/16 20:20:26 plexus Exp $
+ * $Id: responses.h,v 1.8 2001/02/18 19:46:01 dan_karrels Exp $
  */
 
-namespace gnuworld { 
-
-	namespace language {
+namespace gnuworld
+	{
+	namespace language
+	{
 		const int already_authed =			1;
 		const int auth_success =			2;
 		const int insuf_access =			3;

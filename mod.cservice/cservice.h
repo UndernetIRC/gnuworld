@@ -1,5 +1,5 @@
 #ifndef __CSERVICE_H
-#define __CSERVICE_H "$Id: cservice.h,v 1.49 2001/02/18 14:47:24 plexus Exp $"
+#define __CSERVICE_H "$Id: cservice.h,v 1.50 2001/02/18 19:46:01 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
@@ -25,22 +25,26 @@ using std::map ;
 
 class PgDatabase; 
 
+namespace gnuworld
+{ 
+ 
+class Command;
+
 /*
  *  Sublcass the postgres API to create our own accessor
  *  to get at the PID information.
  */
 
-class cmDatabase : public PgDatabase {
+class cmDatabase : public PgDatabase
+{
 public:
-	cmDatabase(const char* conninfo) : PgDatabase(conninfo) {}
-	inline int getPID()
+	cmDatabase(const char* conninfo)
+	  : PgDatabase(conninfo) {}
+	virtual ~cmDatabase() {}
+
+	inline int getPID() const
 		{ return pgConn->be_pid; }
 };
-
-namespace gnuworld
-{ 
- 
-class Command;
  
 class cservice : public xClient
 {
@@ -227,13 +231,15 @@ public:
 	void loadTranslationTable();
 
 	// Method to retrieve a translation string.
-	const string getResponse( sqlUser*, int , string = "");
+	const string getResponse( sqlUser*, int , string = string() );
  
 	// Check for valid hostmask.
 	virtual bool validUserMask(const string& userMask) const ;
 
-	// Count channel ops.
-	int countChanOps(Channel*);
+	/**
+	 * Count channel ops.
+	 */
+	size_t countChanOps(const Channel*);
 	
 	// Deop everyone on this channel.
 	void deopAllOnChan(Channel*); 

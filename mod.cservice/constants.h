@@ -1,5 +1,5 @@
 #ifndef __CONSTANTS_H
-#define __CONSTANTS_H "$Id: constants.h,v 1.9 2001/01/28 23:16:33 gte Exp $"
+#define __CONSTANTS_H "$Id: constants.h,v 1.10 2001/02/18 19:46:01 dan_karrels Exp $"
 
 /* 
  * constants.h
@@ -9,14 +9,13 @@
  * 
  * Defines constants used throughout the application.
  *
- * $Id: constants.h,v 1.9 2001/01/28 23:16:33 gte Exp $
+ * $Id: constants.h,v 1.10 2001/02/18 19:46:01 dan_karrels Exp $
  */
 
 namespace gnuworld 
 { 
-
 	namespace sql
-	{
+		{
 		/*
 		 *  Comma seperated lists of fields for use in retrieving various
 		 *  articles of data.
@@ -25,7 +24,7 @@ namespace gnuworld
 		const string user_fields = "id,user_name,password,email,url,language_id,public_key,flags,last_updated_by,users.last_updated,users_lastseen.last_seen";
 		const string level_fields = "channel_id,user_id,access,flags,suspend_expires,suspend_by,added,added_by,last_Modif,last_Modif_By,last_Updated";
 		const string ban_fields = "id,channel_id,banmask,set_by,set_ts,level,expires,reason,last_updated";
-	}
+		}
 }
 
 #endif

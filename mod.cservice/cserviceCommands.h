@@ -1,5 +1,5 @@
 #ifndef __CSERVICECOMMANDS_H
-#define __CSERVICECOMMANDS_H "$Id: cserviceCommands.h,v 1.25 2001/02/18 14:47:24 plexus Exp $"
+#define __CSERVICECOMMANDS_H "$Id: cserviceCommands.h,v 1.26 2001/02/18 19:46:01 dan_karrels Exp $"
 
 #include	<string>
 #include	"iClient.h"
@@ -48,7 +48,7 @@ protected:
         xServer*        server ;
         string          commName ;
         string          help ;
-		unsigned short  flood_points ;
+	unsigned short  flood_points ;
 
 } ;
  

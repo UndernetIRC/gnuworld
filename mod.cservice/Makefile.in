@@ -10,7 +10,7 @@
 # even the implied warranty of MERCHANTABILITY or FITNESS FOR A
 # PARTICULAR PURPOSE.
 
-# "$Id: Makefile.in,v 1.64 2001/02/18 14:47:24 plexus Exp $"
+# "$Id: Makefile.in,v 1.65 2001/02/18 19:46:01 dan_karrels Exp $"
 
 
 SHELL = @SHELL@
@@ -83,6 +83,8 @@ MOD_DIRS = @MOD_DIRS@
 MV = @MV@
 OBJDUMP = @OBJDUMP@
 PACKAGE = @PACKAGE@
+PGSQL_INCLUDE = @PGSQL_INCLUDE@
+PGSQL_LIB = @PGSQL_LIB@
 RANLIB = @RANLIB@
 RM = @RM@
 SRC_PATH = @SRC_PATH@
@@ -92,13 +94,13 @@ bindir = @bindir@
 glibdir = @glibdir@
 
 lib_LTLIBRARIES = libcservice.la
-libcservice_la_LDFLAGS = -module -export-dynamic -L/usr/local/pgsql/lib 	-lpq++
+libcservice_la_LDFLAGS = -module -export-dynamic -L@PGSQL_LIB@ 	-lpq++
 
 
 libcservice_la_SOURCES = cservice.cc 	networkData.cc 	sqlChannel.cc 	sqlUser.cc 	sqlLevel.cc 	sqlBan.cc 	ACCESSCommand.cc 	ADDUSERCommand.cc 	BANCommand.cc 	BANLISTCommand.cc 	CHANINFOCommand.cc 	CLEARMODECommand.cc 	DEOPCommand.cc 	DEVOICECommand.cc 	FORCECommand.cc 	HELPCommand.cc 	INVITECommand.cc 	ISREGCommand.cc 	JOINCommand.cc 	KICKCommand.cc 	LBANLISTCommand.cc 	LOGINCommand.cc 	MODINFOCommand.cc 	MOTDCommand.cc 	NEWPASSCommand.cc 	OPCommand.cc 	OPERJOINCommand.cc 	OPERPARTCommand.cc 	RANDOMCommand.cc 	REGISTERCommand.cc 	PARTCommand.cc 	PURGECommand.cc 	QUOTECommand.cc 	REMIGNORECommand.cc 	REMUSERCommand.cc 	SAYCommand.cc 	SEARCHCommand.cc 	SERVNOTICECommand.cc 	SETCommand.cc 	SHOWCOMMANDSCommand.cc 	SHOWIGNORECommand.cc 	STATUSCommand.cc 	SUSPENDCommand.cc 	TOPICCommand.cc 	UNBANCommand.cc 	UNFORCECommand.cc 	UNSUSPENDCommand.cc 	VERIFYCommand.cc 	VOICECommand.cc
 
 
-INCLUDES = -I/usr/local/pgsql/include
+INCLUDES = -I@PGSQL_INCLUDE@
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = ../include/defs.h
 CONFIG_CLEAN_FILES = 
@@ -126,7 +128,7 @@ CXXCOMPILE = $(CXX) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS
 LTCXXCOMPILE = $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
 CXXLD = $(CXX)
 CXXLINK = $(LIBTOOL) --mode=link $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) $(LDFLAGS) -o $@
-DIST_COMMON =  Makefile.am Makefile.in
+DIST_COMMON =  Makefile.am Makefile.in configure configure.in
 
 
 DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
@@ -270,7 +272,7 @@ distdir: $(DISTFILES)
 	@for file in $(DISTFILES); do \
 	  d=$(srcdir); \
 	  if test -d $$d/$$file; then \
-	    cp -pr $$/$$file $(distdir)/$$file; \
+	    cp -pr $$d/$$file $(distdir)/$$file; \
 	  else \
 	    test -f $(distdir)/$$file \
 	    || ln $$d/$$file $(distdir)/$$file 2> /dev/null \

@@ -1,7 +1,7 @@
 /* sqlBan.h */
 
 #ifndef __SQLBAN_H
-#define __SQLBAN_H "$Id: sqlBan.h,v 1.4 2001/01/27 04:22:19 gte Exp $"
+#define __SQLBAN_H "$Id: sqlBan.h,v 1.5 2001/02/18 19:46:01 dan_karrels Exp $"
 
 #include	<string>
 #include	<ctime>
@@ -79,21 +79,21 @@ public:
 	bool insertRecord();
 	bool deleteRecord();
 
-    void setAllMembers(int);
+	void setAllMembers(int);
 		
 protected:
  
 	unsigned int	id ; 
 	unsigned int	channel_id ;
-	string			banmask ;
-	string			set_by ;
-	time_t			set_ts ;
+	string		banmask ;
+	string		set_by ;
+	time_t		set_ts ;
 	unsigned short	level ;
-	time_t			expires ;
-	string			reason ; 
-	time_t			last_updated ;
+	time_t		expires ;
+	string		reason ; 
+	time_t		last_updated ;
  
-	PgDatabase*		SQLDb;
+	PgDatabase*	SQLDb;
 } ;
 
 } 

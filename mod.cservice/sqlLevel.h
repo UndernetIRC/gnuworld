@@ -1,7 +1,7 @@
 /* sqlLevel.h */
 
 #ifndef __SQLLEVEL_H
-#define __SQLLEVEL_H "$Id: sqlLevel.h,v 1.8 2001/01/14 23:12:09 gte Exp $"
+#define __SQLLEVEL_H "$Id: sqlLevel.h,v 1.9 2001/02/18 19:46:01 dan_karrels Exp $"
 
 #include	<string>
 #include	<ctime>
@@ -111,8 +111,8 @@ public:
 
 	bool commit();
 	bool loadData( unsigned int, unsigned int ); 
-    void setAllMembers(int);
-		
+	void setAllMembers(int);
+
 protected:
  
 	unsigned int	channel_id ;

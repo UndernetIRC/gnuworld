@@ -1,7 +1,7 @@
 /* sqlChannel.h */
 
 #ifndef __SQLCHANNEL_H
-#define __SQLCHANNEL_H "$Id: sqlChannel.h,v 1.17 2001/02/15 21:08:14 gte Exp $"
+#define __SQLCHANNEL_H "$Id: sqlChannel.h,v 1.18 2001/02/18 19:46:01 dan_karrels Exp $"
 
 #include	<string>
 #include	<ctime>
@@ -102,12 +102,17 @@ public:
 	inline const time_t&		getLastTopic() const
 		{ return last_topic ; }
  
-	// Load channel data from the backend using the channel name as a key.
+	/**
+	 * Load channel data from the backend using the channel name as
+	 * a key.
+	 */
 	bool loadData( const string& );
 
-	// Load channel data from the backend using the channel_id as a key.
+	/**
+	 * Load channel data from the backend using the channel_id as a
+	 * key.
+	 */
 	bool loadData( int ); 
-
 
 	/*
 	 *  Methods to set data atrributes.
@@ -157,13 +162,13 @@ public:
 
 	// 'last_updated' is only altered during commit().
  
-	/*
+	/**
 	 * Method to perform a SQL 'UPDATE' and commit changes to this
 	 * object back to the database.
 	 */
-
 	bool commit();
-    void setAllMembers(int);
+
+	void setAllMembers(int);
 
 protected: 
 

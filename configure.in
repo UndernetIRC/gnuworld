@@ -1,10 +1,10 @@
-dnl $Id: configure.in,v 1.18 2001/02/03 19:25:08 dan_karrels Exp $
+dnl $Id: configure.in,v 1.19 2001/02/18 19:46:00 dan_karrels Exp $
 dnl ----------------------------------------------------------
 
 echo Configuring GNUWorld...
 echo
 
-AC_REVISION($Revision: 1.18 $)
+AC_REVISION($Revision: 1.19 $)
 AC_INIT(src/main.cc)
 AM_INIT_AUTOMAKE(gnuworld,0.0)
 AM_CONFIG_HEADER(include/defs.h)
@@ -12,16 +12,14 @@ AM_CONFIG_HEADER(include/defs.h)
 CFLAGS="-g -Wall -O0 -pipe"
 CXXFLAGS="-g -Wall -O0 -pipe"
 CXX="g++"
-SHLIB_CXX="g++"
-SHLIB_LD="g++"
 LIBS=""
 
 libdir="`pwd`/bin"
 bindir="`pwd`/bin"
 glibdir="`pwd`/lib"
-LIB_PATH="`pwd`/lib"
-BIN_PATH="`pwd`/bin"
-SRC_PATH="`pwd`/src"
+dnl LIB_PATH="`pwd`/lib"
+dnl BIN_PATH="`pwd`/bin"
+dnl SRC_PATH="`pwd`/src"
 
 AC_SUBST(glibdir)
 AC_PROG_CC
@@ -281,6 +279,25 @@ dnl
 dnl AC_CHECK_FUNC(getpgid, AC_DEFINE(HAVE_GETPGID),)
 dnl AC_CHECK_FUNC(getpgrp, AC_FUNC_GETPGRP,)
 
+PGSQL_INCLUDE=""
+PGSQL_LIB=""
+
+AC_MSG_CHECKING(for libpq++.h)
+if test -f "/usr/local/pgsql/include/libpq++.h"; then
+	PGSQL_INCLUDE=/usr/local/pgsql/include
+	PGSQL_LIB=$PGSQL_INCLUDE
+elif test -f "/usr/include/pgsql/libpq++.h"; then
+	PGSQL_INCLUDE=/usr/include/pgsql
+	PGSQL_LIB=/usr/lib/pgsql
+else
+        AC_MSG_ERROR( Unable to find PostGreSQL )
+fi
+
+AC_MSG_RESULT(yes)
+
+AC_SUBST(PGSQL_INCLUDE)
+AC_SUBST(PGSQL_LIB)
+
 AC_SUBST(LDFLAGS)
 AC_SUBST(bindir)
 
@@ -334,10 +351,8 @@ dnl	echo "mod_list: $mod_list"
 		fi
 
 		if [ test -f $file/configure ]; then
-			echo "Found configure in $file"
-			cd $file
-			./configure
-			cd ..
+dnl			echo "Found configure in $file"
+			AC_CONFIG_SUBDIRS($file/configure)
 			MOD_DIRS="$MOD_DIRS $file"
 		elif [ test -f $file/Makefile.in ]; then
 			echo Adding module `echo $file | \cut -f2 -d"."`
