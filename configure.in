@@ -1,10 +1,10 @@
-dnl $Id: configure.in,v 1.49 2002/06/04 20:29:01 dan_karrels Exp $
+dnl $Id: configure.in,v 1.50 2002/06/06 23:09:05 dan_karrels Exp $
 dnl ----------------------------------------------------------
 
 echo Configuring GNUWorld...
 echo
 
-AC_REVISION($Revision: 1.49 $)
+AC_REVISION($Revision: 1.50 $)
 AC_INIT
 AC_CONFIG_SRCDIR([src/main.cc])
 AM_INIT_AUTOMAKE(gnuworld,0.0)
@@ -127,6 +127,16 @@ AC_ARG_WITH(debug, \
 
 if test $useDebug = yes ; then
 	CXXFLAGS="$CXXFLAGS -g"
+fi
+
+usePedantic=no
+AC_ARG_WITH(pedantic, \
+[  --with-pedantic	    Add -pedantic to compile options],
+[usePedantic=yes]
+}
+
+if test $usePedantic = yes ; then
+	CXXFLAGS="$CXXFLAGS -pedantic"
 fi
 
 useOptimization=no

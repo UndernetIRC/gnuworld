@@ -1010,11 +1010,6 @@ Optional Features:
   --enable-static=PKGS  build static libraries default=yes
   --enable-fast-install=PKGS  optimize for fast installation default=yes
   --disable-libtool-lock  avoid locking (might break parallel builds)
-\
-  --enable-modules=mods Enable one or more modules; all modules
-                          found in the current directory are enabled
-                          by default.  Specify \"no\" (without quotes)
-                          to build server only
 
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
@@ -1024,12 +1019,7 @@ Optional Packages:
 \
   --without-debug          Disable debugging in the executables
 \
-  --with-optimization      Optimize the executables
-\
-  --with-prof		    Generate profiling information
-\
-  --with-pgsql=PGSQLDIR   Specify location to find pgsql
-                          Default path is \"/usr/local/pgsql\"
+  --with-pedantic	    Add -pedantic to compile options
 
 Some influential environment variables:
   CC          C compiler command
@@ -4269,7 +4259,7 @@ test "x$enable_libtool_lock" != xno && enable_libtool_lock=yes
 case $host in
 *-*-irix6*)
   # Find out which ABI we are using.
-  echo '#line 4272 "configure"' > conftest.$ac_ext
+  echo '#line 4262 "configure"' > conftest.$ac_ext
   if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -4805,7 +4795,7 @@ chmod -w .
 save_CFLAGS="$CFLAGS"
 CFLAGS="$CFLAGS -o out/conftest2.$ac_objext"
 compiler_c_o=no
-if { (eval echo configure:4808: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>out/conftest.err; } && test -s out/conftest2.$ac_objext; then
+if { (eval echo configure:4798: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>out/conftest.err; } && test -s out/conftest2.$ac_objext; then
   # The compiler can only warn and ignore the option if not recognized
   # So say no if there are warnings
   if test -s out/conftest.err; then
@@ -5729,8 +5719,8 @@ shlibpath_var=
 shlibpath_overrides_runpath=unknown
 version_type=none
 dynamic_linker="$host_os ld.so"
-sys_lib_dlsearch_path_spec="/lib /usr/lib /usr/X11R6/lib"
-sys_lib_search_path_spec="/lib /usr/lib /usr/local/lib /usr/X11R6/lib"
+sys_lib_dlsearch_path_spec="/lib /usr/lib"
+sys_lib_search_path_spec="/lib /usr/lib /usr/local/lib"
 
 case $host_os in
 aix3*)
@@ -6598,7 +6588,7 @@ else
     lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 6601 "configure"
+#line 6591 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -6696,7 +6686,7 @@ else
     lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 6699 "configure"
+#line 6689 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -10575,168 +10565,7 @@ if test $useDebug = yes ; then
 	CXXFLAGS="$CXXFLAGS -g"
 fi
 
-useOptimization=no
-
-# Check whether --with-optimization or --without-optimization was given.
-if test "${with_optimization+set}" = set; then
-  withval="$with_optimization"
-  useOptimization=yes
-
-fi;
-
-if test $useOptimization = yes ; then
-	CXXFLAGS="$CXXFLAGS -O"
-else
-	CXXFLAGS="$CXXFLAGS -O0"
-fi
-
-useProf=no
-
-# Check whether --with-prof or --without-prof was given.
-if test "${with_prof+set}" = set; then
-  withval="$with_prof"
-  useProf=yes
-
-fi;
-
-if test $useProf = yes ; then
-	CXXFLAGS="$CXXFLAGS -pg"
-fi
-
-PGSQL_PREFIX=/usr/local/pgsql
-
-
-# Check whether --with-pgsql or --without-pgsql was given.
-if test "${with_pgsql+set}" = set; then
-  withval="$with_pgsql"
-  PGSQL_PREFIX=$withval
-
-fi;
-
-echo "$as_me:$LINENO: checking for libpq++.h" >&5
-echo $ECHO_N "checking for libpq++.h... $ECHO_C" >&6
-if test -f "$PGSQL_PREFIX/include/libpq++.h"; then
-	PGSQL_INCLUDE="/usr/local/pgsql/include"
-	PGSQL_LIB="/usr/local/pgsql/lib"
-elif test -f "/usr/local/include/libpq++.h"; then
-	PGSQL_INCLUDE=/usr/local/include
-	PGSQL_LIB=/usr/local/lib
-elif test -f "/usr/include/postgresql/libpq++.h"; then
-	PGSQL_INCLUDE=/usr/include/postgresql
-	PGSQL_LIB=/usr/lib/pgsql
-elif test -f "/usr/include/pgsql/libpq++.h"; then
-	PGSQL_INCLUDE=/usr/include/pgsql
-	PGSQL_LIB=/usr/lib/pgsql
-else
-        { { echo "$as_me:$LINENO: error: Unable to find PostGreSQL " >&5
-echo "$as_me: error: Unable to find PostGreSQL " >&2;}
-   { (exit 1); exit 1; }; }
-fi
-echo "$as_me:$LINENO: result: yes" >&5
-echo "${ECHO_T}yes" >&6
-
-
-
-
-
-
-
-
-CXXFLAGS="$CXXFLAGS -I`pwd`/include -I`pwd`/lib"
-
-hashMapFile=
-
-if test -f "/usr/include/g++/ext/hash_map" ; then
-	hashMapFile="/usr/include/g++/ext/hash_map"
-	cat >>confdefs.h <<\_ACEOF
-#define GNU_EXTENSIONS 1
-_ACEOF
-
-elif test -f "/usr/local/include/g++/ext/hash_map"; then
-	hashMapFile="usr/local/include/g++/ext/hash_map";
-	cat >>confdefs.h <<\_ACEOF
-#define GNU_EXTENSIONS 1
-_ACEOF
-
-fi
-
-gccVersion=`\gcc -v 2>&1 | \tail -1 | \cut -d" " -f3`
-
-gccMajor=`echo $gccVersion | \cut -d"." -f1`
-
-if test "$gccMajor" = "3"; then
-	# 3.0.x have ext/hash_map, but std namespace
-	gccMid=`echo $gccVersion | \cut -d"." -f2`
-
-	if test "$gccMid" = "0"; then
-		cat >>confdefs.h <<\_ACEOF
-#define HASHMAPNS std
-_ACEOF
-
-	else
-		# 3.1 or above
-		cat >>confdefs.h <<\_ACEOF
-#define HASHMAPNS __gnu_cxx
-_ACEOF
-
-	fi
-else
-	cat >>confdefs.h <<\_ACEOF
-#define HASHMAPNS std
-_ACEOF
-
-fi
-
-
-
-
-
-
-echo
-echo "Detecting modules..."
-echo
-
-MOD_DIRS=""
-searchForMods=yes
-
-# Check whether --enable-modules or --disable-modules was given.
-if test "${enable_modules+set}" = set; then
-  enableval="$enable_modules"
-
-if test $enableval = "yes" ; then
-	searchForMods=yes
-elif test $enableval = "no" ; then
-	searchForMods=no
-else
-	tmp="mod.$enableval"
-	tmp=`echo $tmp | sed 's/,/ mod./g'`
-	MOD_DIRS="$MOD_DIRS $tmp"
-	searchForMods=no
-fi
-
-else
-
-searchForMods=yes
-
-fi;
-if test $searchForMods = yes ; then
-	mod_list=`\ls | \grep "mod."`
-
-	for file in $mod_list; do
-		if  ! test -d $file ; then
-			echo "$file is not a directory!"
-			continue
-		fi
-
-		if  test -f $file/Makefile.in ; then
-			echo Adding module `echo $file | \cut -f2 -d"."`
-			MOD_DIRS="$MOD_DIRS $file"
-		fi
-	 done
-fi
-
-
-
+usePedantic=no
 ac_config_files="$ac_config_files Makefile db/Makefile lib/Makefile src/Makefile mod.ccontrol/Makefile mod.clientExample/Makefile mod.cloner/Makefile mod.cservice/Makefile mod.gnutest/Makefile mod.stats/Makefile"
 
 cat >confcache <<\_ACEOF
