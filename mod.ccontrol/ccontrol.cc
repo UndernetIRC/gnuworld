@@ -22,7 +22,7 @@
 #include	"ccontrol.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.15 2001/02/24 21:41:40 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.16 2001/02/25 19:52:06 mrbean_ Exp $" ;
 
 using std::string ;
 using std::vector ;
@@ -306,12 +306,10 @@ if((!theUser) && (ComAccess != 0))
 	{
 	Notice( theClient,
 		"You must be logged in to issue that command" ) ;
-	return false;
 	}
 else if( (ComAccess != 0) && !(ComAccess & theUser->Access))
 	{
 	Notice( theClient, "You dont have access to that command" ) ;
-	return false;
 	}
 else if( (theUser) && (theUser->Flags & isSUSPENDED))
 	{
@@ -320,25 +318,26 @@ else if( (theUser) && (theUser->Flags & isSUSPENDED))
 		{
 		Notice( theClient,
 			"Sorry but you are suspended");
-		return false;
 		}
 	else 
 		{ //if the suspend expired, unsuspend the user and execute the command
 		if( ::time( 0 ) - theUser->SuspendExpires >= 0) 
 			{	
-			User* tmpUser = GetUser(theUser->Name);
+			ccUser* tmpUser = GetUser(theUser->Name);
 
-			tmpUser->SuspendExpires = 0;
-			tmpUser->Flags &= ~isSUSPENDED;
-			tmpUser->SuspendedBy ="";
+			tmpUser->setSuspendExpires(0);
+			tmpUser->removeFlag(isSUSPENDED);
+			tmpUser->setSuspendedBy("");
 
-			UpdateOper(tmpUser);
+			tmpUser->Update();
     			delete tmpUser;
+			commHandler->second->Exec( theClient, Message) ;
 			}
 		}
 	// Execute the command handler
 
 	}		
+else
 	commHandler->second->Exec( theClient, Message) ;
 // Call the base class OnPrivateMessage() method
 return xClient::OnPrivateMessage( theClient, Message ) ;
@@ -556,7 +555,7 @@ for( authListType::const_iterator ptr = authList.begin() ;
 return NULL ;
 }
    
-AuthInfo* ccontrol::IsAuth( const int UserId ) const
+AuthInfo* ccontrol::IsAuth( const unsigned int UserId ) const
 {
 for( authListType::const_iterator ptr = authList.begin() ;
 	ptr != authList.end() ; ++ptr )
@@ -569,23 +568,22 @@ for( authListType::const_iterator ptr = authList.begin() ;
 return NULL ;
 }
 
-void ccontrol::UpdateAuth(int Id)
+void ccontrol::UpdateAuth(ccUser* TempUser)
 {
-    AuthInfo* TempAuth = IsAuth(Id);
+    AuthInfo* TempAuth = IsAuth(TempUser->getID());
     if(TempAuth)
     {
-	User* TempUser = GetUser(Id);
-	TempAuth->Id = TempUser->Id;
-        TempAuth->Name = TempUser->UserName;
-        TempAuth->Access = TempUser->Access;
-        TempAuth->Flags = TempUser->Flags;
-        //TempAuth->Next = NULL;
-        TempAuth->SuspendExpires = TempUser->SuspendExpires;
-        TempAuth->SuspendedBy = TempUser->SuspendedBy;
+	//ccUser* TempUser = GetUser(Id);
+	TempAuth->Id = TempUser->getID();
+        TempAuth->Name = TempUser->getUserName();
+        TempAuth->Access = TempUser->getAccess();
+        TempAuth->Flags = TempUser->getFlags();
+        TempAuth->SuspendExpires = TempUser->getSuspendExpires();
+        TempAuth->SuspendedBy = TempUser->getSuspendedBy();
     }
 }
 
-User* ccontrol::GetUser( const string& Name )
+ccUser* ccontrol::GetUser( const string& Name )
 {
 static const char Main[] = "SELECT user_id,user_name,password,access,flags,suspend_expires,suspended_by FROM opers WHERE lower(user_name) = '";
 
@@ -610,7 +608,7 @@ if( (PGRES_TUPLES_OK == status) && (SQLDb->Tuples() > 0) )
 return NULL;
 }
 
-User* ccontrol::GetUser( const int Id)
+ccUser* ccontrol::GetUser( const int Id)
 {
 static const char Main[] = "SELECT user_id,user_name,password,access,flags,suspend_expires,suspended_by FROM opers WHERE user_id = ";
 
@@ -636,34 +634,34 @@ if( (PGRES_TUPLES_OK == status) && (SQLDb->Tuples() > 0) )
 return NULL;
 }
 
-User* ccontrol::GetParm ()
+ccUser* ccontrol::GetParm ()
 {
-User* TempUser = new (nothrow) User;
+ccUser* TempUser = new ccUser(SQLDb);
 assert (TempUser != NULL);
 
-TempUser->Id = atoi(SQLDb->GetValue(0, 0));
-TempUser->UserName = SQLDb->GetValue(0, 1);
-TempUser->Password = SQLDb->GetValue(0, 2);
-TempUser->Access = atoi(SQLDb->GetValue(0, 3));
-TempUser->Flags = atoi(SQLDb->GetValue(0, 4));
-TempUser->SuspendExpires = atoi(SQLDb->GetValue(0,5));
-TempUser->SuspendedBy = SQLDb->GetValue(0,6);
+TempUser->setID(atoi(SQLDb->GetValue(0, 0)));
+TempUser->setUserName(SQLDb->GetValue(0, 1));
+TempUser->setPassword(SQLDb->GetValue(0, 2));
+TempUser->setAccess(atoi(SQLDb->GetValue(0, 3)));
+TempUser->setFlag(atoi(SQLDb->GetValue(0, 4)));
+TempUser->setSuspendExpires(atoi(SQLDb->GetValue(0,5)));
+TempUser->setSuspendedBy(SQLDb->GetValue(0,6));
 
 return TempUser;
 }
 
-bool ccontrol::AddOper (User* Oper)
+bool ccontrol::AddOper (ccUser* Oper)
 {
 static const char *Main = "INSERT into opers (user_name,password,access,last_updated_by,last_updated,flags) VALUES ('";
 
 strstream theQuery;
 theQuery	<< Main
-		<< Oper->UserName <<"','"
-		<< Oper->Password << "',"
-		<< Oper->Access << ",'"
-		<< Oper->last_updated_by
+		<< Oper->getUserName() <<"','"
+		<< Oper->getPassword() << "',"
+		<< Oper->getAccess() << ",'"
+		<< Oper->getLast_Updated_by()
 		<< "',now()::abstime::int4,"
-		<< Oper->Flags << ")"
+		<< Oper->getFlags() << ")"
 		<< ends;
 
 elog	<< "ACCESS::sqlQuery> "
@@ -719,7 +717,7 @@ else
 	}
 }
 
-bool ccontrol::UpdateOper (User* Oper)
+/*bool ccontrol::UpdateOper (User* Oper)
 {
 static const char *Main = "UPDATE opers SET password = '";
 
@@ -758,7 +756,7 @@ else
 		<< endl ;
 	return false;
 	}
-}
+}*/
 
 int ccontrol::getCommandLevel( const string& Command)
 {
@@ -773,19 +771,18 @@ if( commHandler != commandMap.end() )
 return -1 ;
 }	
 
-bool ccontrol::AuthUser( User* TempUser)
+bool ccontrol::AuthUser( ccUser* TempUser)
 {
 AuthInfo *TempAuth = new (nothrow) AuthInfo;
 assert( TempAuth != 0 ) ;
 
-TempAuth->Id = TempUser->Id;
-TempAuth->Name = TempUser->UserName;
-TempAuth->Access = TempUser->Access;
-TempAuth->Flags = TempUser->Flags;
-//TempAuth->Next = NULL;
-TempAuth->Numeric = TempUser->Numeric;
-TempAuth->SuspendExpires = TempUser->SuspendExpires;
-TempAuth->SuspendedBy = TempUser->SuspendedBy;
+TempAuth->Id = TempUser->getID();
+TempAuth->Name = TempUser->getUserName();
+TempAuth->Access = TempUser->getAccess();
+TempAuth->Flags = TempUser->getFlags();
+TempAuth->Numeric = TempUser->getNumeric();
+TempAuth->SuspendExpires = TempUser->getSuspendExpires();
+TempAuth->SuspendedBy = TempUser->getSuspendedBy();
 
 authList.push_back( TempAuth ) ;
 return true;
@@ -822,13 +819,13 @@ if(TempAuth)
 return true;
 }
 
-bool ccontrol::UserGotMask( User* user, const string& Host )
+bool ccontrol::UserGotMask( ccUser* user, const string& Host )
 {
 static const char *Main = "SELECT host FROM hosts WHERE user_id = ";
 
 strstream theQuery;
 theQuery	<< Main
-		<< user->Id
+		<< user->getID()
 		<< ';'
 		<< ends;
 
@@ -852,13 +849,13 @@ if( PGRES_TUPLES_OK == status )
 return false ;
 }
 
-bool ccontrol::UserGotHost( User* user, const string& Host )
+bool ccontrol::UserGotHost( ccUser* user, const string& Host )
 {
 static const char *Main = "SELECT host FROM hosts WHERE user_id = ";
 
 strstream theQuery;
 theQuery	<< Main
-		<< user->Id
+		<< user->getID()
 		<< ';'
 		<< ends;
 
@@ -956,14 +953,14 @@ if( st2[ 1 ].size() > 128 )
 return true ;
 }
 
-bool ccontrol::AddHost( User* user, const string& host )
+bool ccontrol::AddHost( ccUser* user, const string& host )
 {
 
 static const char *Main = "INSERT into hosts (user_id,host) VALUES (";
 
 strstream theQuery;
 theQuery	<< Main
-		<< user->Id <<",'"
+		<< user->getID() <<",'"
 		<< host << "')"
 		<< ends;
 
@@ -987,7 +984,7 @@ else
 	}
 }
 
-bool ccontrol::DelHost( User* user, const string& host )
+bool ccontrol::DelHost( ccUser* user, const string& host )
 {
 //    strstream Condition;
 //    Condition << "WHERE user_id = " << Id << ';';
@@ -996,7 +993,7 @@ static const char *Main = "DELETE FROM hosts WHERE user_id = ";
 
 strstream theQuery;
 theQuery	<< Main
-		<< user->Id
+		<< user->getID()
 		<< " And host = '"
 		<< host << "'"
 		<< ends;

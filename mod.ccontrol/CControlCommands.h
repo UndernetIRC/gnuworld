@@ -7,7 +7,6 @@
 #include	<string>
 
 #include	"iClient.h"
-//#include	"ccontrol.h"
 #include        "ccUser.h"
 
 using std::string ;
@@ -153,33 +152,17 @@ const int isADMIN     = 0x04;
 const int isCODER     = 0x08;
 
 
-//typedef struct AuthStruct {
 class AuthInfo{
 public:
     string Name;
-    int Id;
-    int Access;
-    int Flags;
+    unsigned int Id;
+    int unsigned Access;
+    int unsigned Flags;
     string Numeric;
     int SuspendExpires;
     string SuspendedBy;
-//    AuthInfo *Next,*Prev;
 };// AuthInfo;
 
-//typedef struct UserInfo {
-class User{
-
-public:
-    int Id;
-    string UserName;
-    string Password;
-    string last_updated_by;
-    string Numeric;
-    int SuspendExpires;
-    string SuspendedBy;
-    int Access;
-    int Flags;
-}; //User;
 
 } // namespace gnuworld
 

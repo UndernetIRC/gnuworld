@@ -3,7 +3,7 @@
  */
 
 #ifndef __CCONTROL_H
-#define __CCONTROL_H "$Id: ccontrol.h,v 1.10 2001/02/24 19:41:28 dan_karrels Exp $"
+#define __CCONTROL_H "$Id: ccontrol.h,v 1.11 2001/02/25 19:52:06 mrbean_ Exp $"
 
 #include	<string>
 #include	<vector>
@@ -214,39 +214,39 @@ public:
 
         AuthInfo *IsAuth( const string& ) const ;
 	
-	AuthInfo *IsAuth( const int ) const ;
+	AuthInfo *IsAuth( const unsigned int ) const ;
        
-        User *GetUser( const string& );
+        ccUser *GetUser( const string& );
 	
-	User *GetUser( const int );
+	ccUser *GetUser( const int );
 	
-	User *GetParm();
+	ccUser *GetParm();
         
-	bool AddOper( User* );
+	bool AddOper( ccUser* );
 	
 	bool DeleteOper( const string& );
 	
-	bool UpdateOper( User* );
+//	bool UpdateOper( ccUser* );
 	
-	bool AuthUser( User* );
+	bool AuthUser( ccUser* );
 	
 	int getCommandLevel( const string& );
 	
 	bool deAuthUser( const string& );
 
-	bool UserGotMask( User* , const string& );
+	bool UserGotMask( ccUser* , const string& );
 
-	bool UserGotHost( User* , const string& );
+	bool UserGotHost( ccUser* , const string& );
 
 	static string CryptPass( const string& );
 
 	virtual bool validUserMask(const string& userMask) const ;
 
-        bool AddHost( User* , const string& host );
+        bool AddHost( ccUser* , const string& host );
 
-        bool DelHost( User* , const string& host );
+        bool DelHost( ccUser* , const string& host );
 	
-	void UpdateAuth( int );
+	void UpdateAuth( ccUser* );
 
 	bool GetHelp( iClient* , const string& );
 

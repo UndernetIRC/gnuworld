@@ -6,7 +6,7 @@
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 
-const char ADDNEWOPERCommand_cc_rcsId[] = "$Id: ADDNEWOPERCommand.cc,v 1.3 2001/02/23 20:19:43 mrbean_ Exp $";
+const char ADDNEWOPERCommand_cc_rcsId[] = "$Id: ADDNEWOPERCommand.cc,v 1.4 2001/02/25 19:52:06 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -24,15 +24,15 @@ if( st.size() < 4 )
 	return true;
 	}
  
-User* theUser = bot->GetUser(st[1]);
+ccUser* theUser = bot->GetUser(st[1]);
 if (theUser) 
 	{ 
 	bot->Notice(theClient,"Oper %s already exsits in my db," 
-	"please change the oper handle and try again",theUser->UserName.c_str());
+	"please change the oper handle and try again",theUser->getUserName().c_str());
         return false;
 	}	    
-int NewAccess;
-int NewFlags;
+unsigned int NewAccess;
+unsigned int NewFlags;
 if(!strcasecmp(st[2].c_str(),"coder"))
 	{
 	NewAccess = CODER;
@@ -56,18 +56,18 @@ else
 
 AuthInfo *tOper = bot->IsAuth(theClient->getCharYYXXX());
 
-if(tOper->Access < NewAccess)
+if(tOper->Flags < NewFlags)
 	{
 	bot->Notice(theClient,"You can't add an oper with higher access than yours!");
 	return false;
 	}	     	
 
-theUser = new User;
-theUser->UserName = st[1];
-theUser->Password = bot->CryptPass(st[3]);
-theUser->Access=NewAccess;
-theUser->Flags=NewFlags;
-theUser->last_updated_by = theClient->getNickUserHost();
+theUser = new ccUser(bot->SQLDb);
+theUser->setUserName(st[1]);
+theUser->setPassword(bot->CryptPass(st[3]));
+theUser->setAccess(NewAccess);
+theUser->setFlags(NewFlags);
+theUser->setLast_Updated_By(theClient->getNickUserHost());
 if(bot->AddOper(theUser) == true)
 	bot->Notice(theClient, "Oper successfully Added.");
 else

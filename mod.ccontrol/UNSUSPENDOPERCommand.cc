@@ -5,7 +5,7 @@
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 
-const char UNSUSPENDOPERCommand_cc_rcsId[] = "$Id: UNSUSPENDOPERCommand.cc,v 1.3 2001/02/23 20:19:43 mrbean_ Exp $";
+const char UNSUSPENDOPERCommand_cc_rcsId[] = "$Id: UNSUSPENDOPERCommand.cc,v 1.4 2001/02/25 19:52:06 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -23,27 +23,27 @@ if( st.size() < 2 )
 	return true;
 	}
 	
-User *tmpUser = bot->GetUser(st[1]);
+ccUser *tmpUser = bot->GetUser(st[1]);
 if(!tmpUser)
 	{
 	bot->Notice(theClient,"%s isnt on my access list",st[1].c_str());
 	return false;
 	}
 	
-if(!(tmpUser->Flags & isSUSPENDED))
+if(!(tmpUser->getFlags() & isSUSPENDED))
 	{
 	bot->Notice(theClient,"%s is not suspended",st[1].c_str());
 	return false;
 	}
 	
-tmpUser->SuspendExpires = 0;
-tmpUser->Flags &= ~isSUSPENDED;
-tmpUser->SuspendedBy ="";
+tmpUser->setSuspendExpires(0);
+tmpUser->removeFlag(isSUSPENDED);
+tmpUser->setSuspendedBy("");
 	
-if(bot->UpdateOper(tmpUser))
+if(tmpUser->Update())
 	{
 	bot->Notice(theClient,"%s has been unsuspended",st[1].c_str());
-	bot->UpdateAuth(tmpUser->Id);
+	bot->UpdateAuth(tmpUser);
 	delete tmpUser;
 	return true;
 	}

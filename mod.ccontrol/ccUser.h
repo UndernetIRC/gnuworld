@@ -1,7 +1,7 @@
 /* ccUser.h */
 
 #ifndef __CCUSER_H
-#define __CCUSER_H "$Id: ccUser.h,v 1.4 2001/02/24 21:41:40 mrbean_ Exp $"
+#define __CCUSER_H "$Id: ccUser.h,v 1.5 2001/02/25 19:52:06 mrbean_ Exp $"
 
 #include	<string>
 
@@ -56,6 +56,9 @@ public:
 	/*
 	 * Methods to set data attributes
 	 */
+
+	inline void setID( const unsigned int _id )
+		{ Id = _id; }
 	 
 	inline void setUserName( const string& _username )
 		{ UserName = _username; }
@@ -69,7 +72,7 @@ public:
 	inline void setNumeric( const string& _numeric )
 		{ Numeric = _numeric; }
 
-	inline void setSuspendExpires( const unsigned _expire )
+	inline void setSuspendExpires( const unsigned int _expire )
 		{ SuspendExpires = _expire; }
 
 	inline void setSuspendedBy( const string& _suspendedby )
@@ -78,8 +81,14 @@ public:
 	inline void removeCommand( const unsigned int _command )
 		{ Access &= ~_command; }
 
+	inline void setAccess( const unsigned int _access )
+		{ Access = _access; }
+
 	inline void addCommand( const unsigned int _command )
 		{ Access |= _command; }
+
+	inline void setFlags( const unsigned int _flags )
+		{ Flags = _flags; }
 
 	inline void removeFlag( const unsigned int _flag )
 		{ Flags &= ~_flag; }

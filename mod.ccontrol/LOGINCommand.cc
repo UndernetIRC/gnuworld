@@ -7,7 +7,7 @@
 #include	"md5hash.h" 
 #include        "ccUser.h"
 
-const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.5 2001/02/24 21:41:40 mrbean_ Exp $";
+const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.6 2001/02/25 19:52:06 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -36,7 +36,12 @@ if (tmpUser)
 	 */
  
 ccUser* theUser = bot->GetOper(st[1]);
-if (theUser) 
+if (!theUser) 
+	{
+	bot->Notice(theClient, "Sorry, I don't know who %s is.", st[1].c_str());
+	return false;
+	}
+else
 	{ 
 		/*
 		 *  Compare password with MD5 hash stored in user record.
@@ -91,11 +96,6 @@ if (theUser)
 	        bot->Notice(theClient, "Error in authentication ",theUser->getUserName().c_str()); 
 	delete (theUser);
 	} 
-else
-	{
-	bot->Notice(theClient, "Sorry, I don't know who %s is.", st[1].c_str());
-	return false;
-	}
 
 return true; 
 } 

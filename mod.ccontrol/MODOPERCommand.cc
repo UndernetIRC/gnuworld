@@ -5,7 +5,7 @@
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 
-const char MODOPERCommand_cc_rcsId[] = "$Id: MODOPERCommand.cc,v 1.3 2001/02/23 20:19:43 mrbean_ Exp $";
+const char MODOPERCommand_cc_rcsId[] = "$Id: MODOPERCommand.cc,v 1.4 2001/02/25 19:52:06 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -24,7 +24,7 @@ if( st.size() < 4 )
 	return true;
 	}
 
-User *tmpUser = bot->GetUser(st[1]);
+ccUser *tmpUser = bot->GetUser(st[1]);
 if(!tmpUser)
 	{
         bot->Notice(theClient,"%s isnt on my access list",st[1].c_str());
@@ -32,7 +32,7 @@ if(!tmpUser)
 	}
 	
 AuthInfo* tmpAuth = bot->IsAuth(theClient->getCharYYXXX());
-if(tmpAuth->Flags < tmpUser->Flags)
+if(tmpAuth->Flags < tmpUser->getFlags())
 	{
 	bot->Notice(theClient,"You cant modify a user who got higher level than yours");
 	delete tmpUser;
@@ -40,11 +40,11 @@ if(tmpAuth->Flags < tmpUser->Flags)
 	}
 else if(!strcasecmp(st[2].c_str(),"newpass"))
 	{
-	tmpUser->Password = bot->CryptPass(st[3]);
-	tmpUser->last_updated_by = theClient->getNickUserHost();
-	if(bot->UpdateOper(tmpUser))
+	tmpUser->setPassword(bot->CryptPass(st[3]));
+	tmpUser->setLast_Updated_By(theClient->getNickUserHost());
+	if(tmpUser->Update())
 		{
-		bot->Notice(theClient,"Password for %s Changed to %s",st[1].c_str(),st[2].c_str());
+		bot->Notice(theClient,"Password for %s Changed to %s",st[1].c_str(),st[3].c_str());
 		}
 	else
 		{

@@ -5,7 +5,7 @@
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 
-const char SUSPENDOPERCommand_cc_rcsId[] = "$Id: SUSPENDOPERCommand.cc,v 1.3 2001/02/23 20:19:43 mrbean_ Exp $";
+const char SUSPENDOPERCommand_cc_rcsId[] = "$Id: SUSPENDOPERCommand.cc,v 1.4 2001/02/25 19:52:06 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -23,14 +23,14 @@ if( st.size() < 4 )
 	return true;
 	}
 	
-User *tmpUser = bot->GetUser(st[1]);
+ccUser *tmpUser = bot->GetUser(st[1]);
 if(!tmpUser)
 	{
 	bot->Notice(theClient,"%s isnt on my access list",st[1].c_str());
 	return false;
 	}
 	
-if(tmpUser->Flags & isSUSPENDED)
+if(tmpUser->getFlags() & isSUSPENDED)
 	{
 	bot->Notice(theClient,"%s is already suspended",st[1].c_str());
 	delete tmpUser;
@@ -38,26 +38,27 @@ if(tmpUser->Flags & isSUSPENDED)
 	}
 	
 if(!strcasecmp(st[3].c_str(),"s"))
-	tmpUser->SuspendExpires = atoi(st[2].c_str());
+	tmpUser->setSuspendExpires(atoi(st[2].c_str()));
 else if(!strcasecmp(st[3].c_str(),"m"))
-	tmpUser->SuspendExpires = atoi(st[2].c_str()) * 60;
+	tmpUser->setSuspendExpires(atoi(st[2].c_str()) * 60);
 else if(!strcasecmp(st[3].c_str(),"h"))
-	tmpUser->SuspendExpires = atoi(st[2].c_str()) * 3600;
+	tmpUser->setSuspendExpires(atoi(st[2].c_str()) * 3600);
 else if(!strcasecmp(st[3].c_str(),"d"))
-	tmpUser->SuspendExpires = atoi(st[2].c_str()) * 3600*24;
+	tmpUser->setSuspendExpires(atoi(st[2].c_str()) * 3600*24);
 else
 	{
 	bot->Notice(theClient,"%s is not a proper time refrence");
 	delete tmpUser;
+	return false;
 	}
-tmpUser->SuspendExpires += time( 0 );
-tmpUser->SuspendedBy = theClient->getNickUserHost();	    
-tmpUser->Flags |= isSUSPENDED;
+tmpUser->setSuspendExpires(tmpUser->getSuspendExpires() + time( 0 ));
+tmpUser->setSuspendedBy(theClient->getNickUserHost());	    
+tmpUser->setFlag(isSUSPENDED);
 	
-if(bot->UpdateOper(tmpUser))
+if(tmpUser->Update())
 	{
 	bot->Notice(theClient,"%s has been suspended",st[1].c_str());
-	bot->UpdateAuth(tmpUser->Id);
+	bot->UpdateAuth(tmpUser);
 	delete tmpUser;
 	return true;
 	}

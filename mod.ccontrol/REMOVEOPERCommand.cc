@@ -6,7 +6,7 @@
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 
-const char REMOVEOPERCommand_cc_rcsId[] = "$Id: REMOVEOPERCommand.cc,v 1.3 2001/02/23 20:19:43 mrbean_ Exp $";
+const char REMOVEOPERCommand_cc_rcsId[] = "$Id: REMOVEOPERCommand.cc,v 1.4 2001/02/25 19:52:06 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -21,7 +21,7 @@ if( st.size() < 2 )
 	Usage(theClient);
 	return true;
 	}
-User* theUser = bot->GetUser(st[1]);
+ccUser* theUser = bot->GetUser(st[1]);
 if (!theUser) 
 	{ 
 	bot->Notice(theClient,"Oper %s does not exists db," 
@@ -32,7 +32,7 @@ if (!theUser)
 if(bot->DeleteOper(string_lower(st[1])))     
 	{    
 	bot->Notice(theClient,"Successfully Deleted Oper %s ",st[1].c_str());
-	AuthInfo *TDeauth = bot->IsAuth(theUser->Id);
+	AuthInfo *TDeauth = bot->IsAuth(theUser->getID());
 	if(TDeauth)
 		{
 		iClient *TClient = Network->findClient(TDeauth->Numeric); 

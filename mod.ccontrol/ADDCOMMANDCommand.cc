@@ -5,8 +5,9 @@
 #include	"ccontrol.h"
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
+#include        "ccUser.h"
 
-const char ADDCOMMANDCommand_cc_rcsId[] = "$Id: ADDCOMMANDCommand.cc,v 1.3 2001/02/23 20:19:43 mrbean_ Exp $";
+const char ADDCOMMANDCommand_cc_rcsId[] = "$Id: ADDCOMMANDCommand.cc,v 1.4 2001/02/25 19:52:06 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -24,7 +25,8 @@ if( st.size() < 3 )
 	}
 
 
-User* theUser = bot->GetUser(st[1]);
+//User* theUser = bot->GetUser(st[1]);
+ccUser* theUser = bot->GetOper(st[1]);
 	
 if(!theUser)
 	{	
@@ -50,19 +52,19 @@ if(!(AClient->Access & CommandLevel))
 	return false;
 	}
 	
-else if(theUser->Access & CommandLevel)
+else if(theUser->getAccess() & CommandLevel)
 	{
 	bot->Notice(theClient,"%s already got access for %s",st[1].c_str(),st[2].c_str());
 	delete theUser;
 	return false;	        
 	}	
 	
-theUser->Access |= CommandLevel;
-theUser->last_updated_by = theClient->getNickUserHost();
-if(bot->UpdateOper(theUser))
+theUser->addCommand(CommandLevel);
+theUser->setLast_Updated_By(theClient->getNickUserHost());
+if(theUser->Update())
 	{
 	bot->Notice(theClient,"Successfully added the command for %s",st[1].c_str());
-	bot->UpdateAuth(theUser->Id);
+	bot->UpdateAuth(theUser);
 	delete theUser;
 	return true;
 	}
