@@ -12,7 +12,7 @@
 #include	"StringTokenizer.h"
 #include	"Network.h"
 
-const char MODECommand_cc_rcsId[] = "$Id: MODECommand.cc,v 1.5 2001/03/11 22:01:47 mrbean_ Exp $";
+const char MODECommand_cc_rcsId[] = "$Id: MODECommand.cc,v 1.6 2001/03/11 22:20:29 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -117,7 +117,7 @@ while( modePos < st.size() )
 					return true ;
 					}
 				//Dont deop +k				
-				if(theClient->getMode(iClient::MODE_SERVICES))
+				if(Target->getMode(iClient::MODE_SERVICES))
 					break;
 				// Add this nick's numeric (plus a space) to the end
 				// of the current argument string
