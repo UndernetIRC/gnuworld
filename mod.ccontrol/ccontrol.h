@@ -3,7 +3,7 @@
  */
 
 #ifndef __CCONTROL_H
-#define __CCONTROL_H "$Id: ccontrol.h,v 1.27 2001/05/17 19:54:57 mrbean_ Exp $"
+#define __CCONTROL_H "$Id: ccontrol.h,v 1.28 2001/05/21 16:14:55 mrbean_ Exp $"
 
 //Define gline response
 #define GLINE_OK 1;
@@ -465,6 +465,8 @@ public:
 
 	void wallopsAsServer(const char * , ... );
 
+	int getExceptions( const string & );
+	
 	/**
 	 * This is a constant iterator type used to perform a read-only
 	 * iteration of the operchan structure.

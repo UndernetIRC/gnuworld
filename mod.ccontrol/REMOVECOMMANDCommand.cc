@@ -13,7 +13,7 @@
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 
-const char REMOVECOMMANDCommand_cc_rcsId[] = "$Id: REMOVECOMMANDCommand.cc,v 1.7 2001/05/14 21:26:37 mrbean_ Exp $";
+const char REMOVECOMMANDCommand_cc_rcsId[] = "$Id: REMOVECOMMANDCommand.cc,v 1.8 2001/05/21 16:14:55 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -41,7 +41,7 @@ if(!theUser)
 	}
 	
 int CommandLevel = bot->getCommandLevel(st[2]);
-if(CommandLevel < 0 )
+if(CommandLevel == -1 )
 	{
 	bot->Notice(theClient,"Command %s does not exists!",st[2].c_str());
 	delete theUser;

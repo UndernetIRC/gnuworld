@@ -15,7 +15,7 @@
 #include        "ccUser.h"
 #include	"AuthInfo.h"
 
-const char ADDCOMMANDCommand_cc_rcsId[] = "$Id: ADDCOMMANDCommand.cc,v 1.7 2001/05/05 19:53:20 mrbean_ Exp $";
+const char ADDCOMMANDCommand_cc_rcsId[] = "$Id: ADDCOMMANDCommand.cc,v 1.8 2001/05/21 16:14:55 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -45,7 +45,7 @@ if( !theUser )
 	
 int CommandLevel = bot->getCommandLevel(st[2]);
 
-if( CommandLevel < 0 )
+if( CommandLevel == -1 )
 	{
 	bot->Notice( theClient,
 		"Command %s does not exist!",
@@ -57,6 +57,7 @@ if( CommandLevel < 0 )
 
 	return false;	        
 	}
+
 CommandLevel &= ~flg_NOLOG;
 	
 AuthInfo *AClient = bot->IsAuth( theClient );

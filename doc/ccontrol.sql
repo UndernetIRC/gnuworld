@@ -1,4 +1,4 @@
--- "$Id: ccontrol.sql,v 1.7 2001/05/14 21:26:37 mrbean_ Exp $"
+-- "$Id: ccontrol.sql,v 1.8 2001/05/21 16:14:55 mrbean_ Exp $"
 -- 2001-13-02  : |MrBean|
 -- Added level patch for ccontrol module
 
@@ -69,4 +69,10 @@ CREATE TABLE opernews (
 	Message VARCHAR(512) NOT NULL,
 	ExpiresOn INT4
 	);
-		
+
+CREATE TABLE exceptions (
+	Host VARCHAR(128) NOT NULL,
+	Connections INT4 NOT NULL,
+	AddedBy VARCHAR(128) NOT NULL,
+	AddedOn INT4 NOT NULL DEFAULT now()::abstime::int4
+	);	

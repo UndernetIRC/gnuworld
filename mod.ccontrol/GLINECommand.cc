@@ -19,7 +19,7 @@
 #include	"ELog.h"
 #include	"Gline.h"
 
-const char GLINECommand_cc_rcsId[] = "$Id: GLINECommand.cc,v 1.9 2001/05/17 19:54:57 mrbean_ Exp $";
+const char GLINECommand_cc_rcsId[] = "$Id: GLINECommand.cc,v 1.10 2001/05/21 16:14:55 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -72,7 +72,6 @@ if( string::npos == atPos )
 string userName = st[ pos ].substr( 0, pos ) ;
 string hostName = st[ pos ].substr( pos + 1 ) ;
 
-
 switch(bot->CheckGline(st[ pos ].c_str(),gLength))
 	{
 	case FORCE_NEEDED_HOST:
@@ -91,7 +90,6 @@ switch(bot->CheckGline(st[ pos ].c_str(),gLength))
 	    bot->Notice(theClient,"Glining more than 256 ppl is a NoNo");
 	return false;
 	}	
-
 // Avoid passing a reference to a temporary variable.
 string nickUserHost = theClient->getNickUserHost() ;
 

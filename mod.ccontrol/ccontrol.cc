@@ -23,7 +23,7 @@
 #include	"AuthInfo.h"
 #include        "server.h"
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.39 2001/05/17 19:54:57 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.40 2001/05/21 16:14:55 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -493,7 +493,7 @@ switch( theEvent )
 		{
 		iClient* NewUser = static_cast< iClient* >( Data1);
 		int CurConnections = Network->countHost(NewUser->getInsecureHost());		
-		if(CurConnections  > userMaxConnection)
+		if(CurConnections  > getExceptions(NewUser->getInsecureHost()))
 			{
 			ccGline *tmpGline = new ccGline(SQLDb);
 			tmpGline->set_Host("*@" + NewUser->getInsecureHost());
@@ -1508,9 +1508,10 @@ User[TPos - GlineHost] = '\0';
 strcpy(Host,TPos+1);
 if((countCinS(Host,'*') > 1) || (!strcasecmp(Host,"*")))
     return HUH_NO_HOST;
-if(Network->countHost(GlineHost) > 256)
+int TotalHost = Network->countMatch(GlineHost);
+if(TotalHost > 256)
     return HUH_NO_USERS;
-else if(Network->countHost(GlineHost) > 32)
+else if(TotalHost > 32)
     return FORCE_NEEDED_USERS;
 if(Len > 24*3600*2) //Longer than 2 days ? 
 	return FORCE_NEEDED_TIME;
@@ -1711,4 +1712,42 @@ s	<< MyUplink->getCharYY() << " WA :"
 Write( s ) ;
 delete s.str();
 }
+
+int ccontrol::getExceptions(const string &Host )
+{
+int Exception = userMaxConnection;
+
+static const char *Main = "SELECT Host,Connections FROM exceptions";
+
+strstream theQuery;
+theQuery	<< Main
+		<< ends;
+
+elog	<< "ccontrol::getExceptions> "
+	<< theQuery.str()
+	<< endl; 
+
+ExecStatusType status = SQLDb->Exec( theQuery.str() ) ;
+delete[] theQuery.str() ;
+
+
+if( PGRES_TUPLES_OK != status )
+	{
+	elog	<< "ccontrol::getExceptions> SQL Failure: "
+		<< SQLDb->ErrorMessage()
+		<< endl ;
+	return false;
+	}
+
+for( int i = 0 ; i < SQLDb->Tuples() ; i++ )
+	{
+	if(!match(Host,SQLDb->GetValue(i,0)))
+		{
+		if(atoi(SQLDb->GetValue(i,1)) > Exception)
+			Exception = atoi(SQLDb->GetValue(i,1));
+		}
+	}
+return Exception;
+}
+
 } // namespace gnuworld
