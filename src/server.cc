@@ -48,7 +48,7 @@
 #include	"ServerTimerHandlers.h"
 
 const char server_h_rcsId[] = __SERVER_H ;
-const char server_cc_rcsId[] = "$Id: server.cc,v 1.104 2001/06/11 00:35:42 gte Exp $" ;
+const char server_cc_rcsId[] = "$Id: server.cc,v 1.105 2001/06/11 21:09:17 dan_karrels Exp $" ;
 const char config_h_rcsId[] = __CONFIG_H ;
 const char misc_h_rcsId[] = __MISC_H ;
 const char events_h_rcsId[] = __EVENTS_H ;
@@ -1713,23 +1713,22 @@ return strlen( buffer ) ;
 bool xServer::removeGline( const string& userHost )
 {
 
+// This method is true if we find the gline in our internal
+// structure of glines.
+bool foundGline = false ;
+
 // Perform a linear search for the gline
 glineIterator ptr = gline_begin() ;
 for( ; ptr != gline_end() ; ++ptr )
 	{
 	// Is this the gline in question?
-	if( *(*ptr) == userHost )
+	if( !strcasecmp( (*ptr)->getUserHost(), userHost ) )
 		{
-		// Yup
+		// Yup, found it
+		foundGline = true ;
+
 		break ;
 		}
-	}
-
-// Did we find the gline?
-if( ptr == gline_end() )
-	{
-	// Nope, return false
-	return false ;
 	}
 
 // Found it, notify the network that we are removing it
@@ -1743,18 +1742,23 @@ s	<< charYY
 Write( s ) ;
 delete[] s.str() ;
 
-// Remove the gline from the internal gline structure
-glineList.erase( ptr ) ;
+// Did we find the gline in the interal gline structure?
+if( foundGline )
+	{
+	// Remove the gline from the internal gline structure
+	glineList.erase( ptr ) ;
 
-// Let all clients know that the gline has been removed
-PostEvent( EVT_REMGLINE,
-	static_cast< void* >( *ptr ) ) ;
+	// Let all clients know that the gline has been removed
+	PostEvent( EVT_REMGLINE,
+		static_cast< void* >( *ptr ) ) ;
 
-// Deallocate the gline
-delete *ptr ;
+	// Deallocate the gline
+	delete *ptr ;
+
+	}
 
 // Return success
-return true ;
+return foundGline ;
 }
 
 // C GL * +~*@209.9.117.131 180 :Banned (~*@209.9.117.131) until 957235403 (On Mon May  1
