@@ -18,7 +18,7 @@
  *
  * Caveats: None.
  *
- * $Id: BANCommand.cc,v 1.30 2002/05/23 17:43:12 dan_karrels Exp $
+ * $Id: BANCommand.cc,v 1.31 2002/10/16 00:13:40 gte Exp $
  */
 
 #include	<new>
@@ -36,7 +36,7 @@
 #include	"responses.h"
 #include	"match.h"
 
-const char BANCommand_cc_rcsId[] = "$Id: BANCommand.cc,v 1.30 2002/05/23 17:43:12 dan_karrels Exp $" ;
+const char BANCommand_cc_rcsId[] = "$Id: BANCommand.cc,v 1.31 2002/10/16 00:13:40 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -327,7 +327,8 @@ for(Channel::userIterator chanUsers = theChannel->userList_begin();
 	 *  Iterate over channel members, find a match and boot them..
 	 */
 
-	if(match(banTarget, tmpUser->getClient()->getNickUserHost()) == 0)
+	if( (match(banTarget, tmpUser->getClient()->getNickUserHost()) == 0) ||
+		(match(banTarget, tmpUser->getClient()->getRealNickUserHost()) == 0) )
 		{
 		/* Don't kick +k things */
 		if( !tmpUser->getClient()->getMode(iClient::MODE_SERVICES) )

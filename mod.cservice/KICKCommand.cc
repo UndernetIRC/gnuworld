@@ -11,7 +11,7 @@
 *
 * Suggestion: Support several nicks by seperating them with a comma.
 *             IE: /msg E kick #coder-com nick1,nick2,nick3 get outta here!
-* $Id: KICKCommand.cc,v 1.9 2001/09/05 03:47:56 gte Exp $
+* $Id: KICKCommand.cc,v 1.10 2002/10/16 00:13:40 gte Exp $
 */
 
 #include        <string>
@@ -24,7 +24,7 @@
 #include        "responses.h"
 #include		"match.h"
 
-const char KICKCommand_cc_rcsId[] = "$Id: KICKCommand.cc,v 1.9 2001/09/05 03:47:56 gte Exp $" ;
+const char KICKCommand_cc_rcsId[] = "$Id: KICKCommand.cc,v 1.10 2002/10/16 00:13:40 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -105,7 +105,8 @@ bool KICKCommand::Exec( iClient* theClient, const string& Message )
 		{
 			ChannelUser* tmpUser = chanUsers->second;
 
-			if(match(st[2].c_str(), tmpUser->getClient()->getNickUserHost().c_str()) == 0)
+			if( (match(st[2], tmpUser->getClient()->getNickUserHost()) == 0) ||
+			    (match(st[2], tmpUser->getClient()->getRealNickUserHost()) == 0) )
 			{
 				/* Don't kick +k things */
 				if ( !tmpUser->getClient()->getMode(iClient::MODE_SERVICES) && tmpUser->getClient() != theClient )

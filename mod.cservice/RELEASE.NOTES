@@ -1,5 +1,13 @@
 Newest changes at the top of the file:
-$Id: RELEASE.NOTES,v 1.24 2002/04/01 22:02:22 gte Exp $
+$Id: RELEASE.NOTES,v 1.25 2002/10/16 00:13:40 gte Exp $
+
+CMaster 1.1pl8 - 14/10/2002
+* Add some new commands for CS Admins to scan last hostmasks/usernames,
+  etc. (Spike)
+* Don't try and tell a server off for op'ing a suspended user.
+* Convert the coder-com channel setting to a configuration variable (OUTSider)
+* Quick tweak to BAN/KICK command to kick users matching the banmask on their real-host,
+  not just their hidden host.
 
 CMaster 1.1pl7 - 01/04/2002
 * Added some basic memo-serv functionality. To use,
