@@ -17,17 +17,15 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ELog.h,v 1.7 2005/01/12 03:50:27 dan_karrels Exp $
+ * $Id: ELog.h,v 1.8 2005/02/20 15:49:21 dan_karrels Exp $
  */
 
 #ifndef __ELOG_H
-#define __ELOG_H "$Id: ELog.h,v 1.7 2005/01/12 03:50:27 dan_karrels Exp $"
+#define __ELOG_H "$Id: ELog.h,v 1.8 2005/02/20 15:49:21 dan_karrels Exp $"
 
 #include	<iostream>
 #include	<fstream>
 #include	<string>
-
-#include	"gnuworld_config.h"
 
 namespace gnuworld
 {
