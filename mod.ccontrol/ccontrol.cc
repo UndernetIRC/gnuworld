@@ -21,7 +21,7 @@
 #include	"ccontrol.h"
  
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.1 2000/12/09 22:01:11 dan_karrels Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.2 2000/12/10 04:15:56 gte Exp $" ;
 
 using std::string ;
 using std::vector ;
@@ -30,6 +30,20 @@ using std::endl ;
 
 namespace gnuworld
 {
+
+/*
+ *  Exported function used by moduleLoader to gain an
+ *  instance of this module.
+ */
+
+extern "C"
+{
+  xClient* _gnuwinit(const string& args)
+  { 
+    return new ccontrol( args );
+  }
+
+} 
  
 ccontrol::ccontrol( const string& configFileName )
 {

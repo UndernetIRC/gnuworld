@@ -29,6 +29,20 @@ using std::string ;
 namespace gnuworld
 {
 
+/*
+ *  Exported function used by moduleLoader to gain an
+ *  instance of this module.
+ */
+
+extern "C"
+{
+  xClient* _gnuwinit(const string& args)
+  { 
+    return new cloner( args );
+  }
+
+} 
+ 
 cloner::cloner( const string& configFileName )
 {
 EConfig conf( configFileName ) ;

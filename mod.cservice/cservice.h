@@ -1,5 +1,5 @@
 #ifndef __CSERVICE_H
-#define __CSERVICE_H "$Id: cservice.h,v 1.1 2000/12/09 22:01:11 dan_karrels Exp $"
+#define __CSERVICE_H "$Id: cservice.h,v 1.2 2000/12/10 04:15:56 gte Exp $"
 
 #include	<string>
 #include	<vector>
@@ -9,6 +9,7 @@
 #include	"client.h"
 #include	"iClient.h"
 #include	"iServer.h"
+#include	"EConfig.h"
 
 //#define STMT_ALLCHANS "INSERT INTO channels (channel) values ('#ripperõò÷ûïëÚÓ«¥')" // Provide a result set with 1 column, 'Channel Name'.
 #define STMT_ALLCHANS "SELECT channel from channels" // Provide a result set with 1 column, 'Channel Name'.
@@ -36,6 +37,7 @@ public:
 protected:
 
     PgDatabase* SQLDb; /* PostgreSQL Database */
+	EConfig* cserviceConfig; /* Configfile */
  
 } ;
 

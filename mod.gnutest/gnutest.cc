@@ -12,6 +12,20 @@
 namespace gnuworld
 {
 
+/*
+ *  Exported function used by moduleLoader to gain an
+ *  instance of this module.
+ */
+
+extern "C"
+{
+  xClient* _gnuwinit(const string& args)
+  { 
+    return new gnutest( args );
+  }
+
+} 
+ 
 using std::string ;
 
 gnutest::gnutest( const string& fileName )

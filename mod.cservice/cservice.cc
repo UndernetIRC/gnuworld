@@ -14,7 +14,7 @@
 #include	"StringTokenizer.h"
 #include	"misc.h"
 #include	"ELog.h" 
-#include        "libpq++.h"
+#include	"libpq++.h"
 
 using std::vector ;
 using std::endl ;
@@ -24,6 +24,20 @@ using std::string ;
 
 namespace gnuworld
 {
+
+/*
+ *  Exported function used by moduleLoader to gain an
+ *  instance of this module.
+ */
+
+extern "C"
+{
+  xClient* _gnuwinit(const string& args)
+  { 
+    return new cservice( args );
+  }
+
+} 
 
 //-- Connect to the PG SQL database and load the configuration file.
  

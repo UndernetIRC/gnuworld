@@ -1,5 +1,5 @@
 # Default paths (system-wide installs)
-# $Id: Makefile.in,v 1.2 2000/12/09 22:52:42 dan_karrels Exp $
+# $Id: Makefile.in,v 1.3 2000/12/10 04:15:56 gte Exp $
 #
 
 # Standard defines
@@ -10,11 +10,11 @@ SHLIB_LD = @SHLIB_LD@
 
 DEFS = @DEFS@
 
-CXXFLAGS = @CXXFLAGS@
+CXXFLAGS = @CXXFLAGS@ -I/usr/local/pgsql/include
 
 BIN_PATH = @BIN_PATH@
-LIB_PATH = @LIB_PATH@
-LIBS = -L$(LIB_PATH) -lgnuworld @LIBS@
+LIB_PATH = @BIN_PATH@
+LIBS = -L$(LIB_PATH) -L/usr/local/pgsql/lib -lgnuworld -lpq++ @LIBS@
 
 RM = @RM@ -f
 CP = @CP@
@@ -41,10 +41,10 @@ make: all
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 $(LIB): $(OBJS)
-	$(SHLIB_LD) -o $(BIN_PATH)/GNUWorld $(OBJS) $(LIBS)
+	$(SHLIB_LD) -o $(BIN_PATH)/libcservice.so $(OBJS) $(LIBS)
 
 clean:
-	$(RM) -f *.o $(BIN_PATH)/GNUWorld
+	$(RM) -f *.o $(BIN_PATH)/libcservice.so
 
 distclean: clean
 
