@@ -188,6 +188,9 @@ clean-libtool:
 distclean-libtool:
 
 maintainer-clean-libtool:
+
+libgnuworld.la: $(libgnuworld_la_OBJECTS) $(libgnuworld_la_DEPENDENCIES)
+	$(CXXLINK) -rpath $(libdir) $(libgnuworld_la_LDFLAGS) $(libgnuworld_la_OBJECTS) $(libgnuworld_la_LIBADD) $(LIBS)
 .cc.o:
 	$(CXXCOMPILE) -c $<
 .cc.lo:
@@ -370,9 +373,6 @@ uninstall-am uninstall all-redirect all-am all installdirs \
 mostlyclean-generic distclean-generic clean-generic \
 maintainer-clean-generic clean mostlyclean distclean maintainer-clean
 
-
-libgnuworld.la:
-	$(LINK) -o $(bindir)/libgnuworld.la $(LDFLAGS)
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
