@@ -51,7 +51,7 @@ if(tempCon->ConnectionBad()) {
     << tempCon->ErrorMessage() << endl;
   ::exit(0);
 } else {
-  elog << "*** [sqlManager:getConnection] Connection established to DB"
+  elog << "*** [sqlManager:getConnection] Connection established to DB."
     << endl;
 }
 
@@ -67,7 +67,7 @@ void sqlManager::removeConnection(PgDatabase* tempCon)
 {
 assert(tempCon != 0);
 
-elog << "*** [sqlManager:removeConnection] Removing DB connection. " << endl;
+elog << "*** [sqlManager:removeConnection] Removing DB connection." << endl;
 delete tempCon;
 }
 
