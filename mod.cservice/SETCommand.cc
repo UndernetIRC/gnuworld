@@ -18,7 +18,7 @@
  *
  * Caveats: None.
  *
- * $Id: SETCommand.cc,v 1.34 2001/04/17 02:13:17 gte Exp $
+ * $Id: SETCommand.cc,v 1.35 2001/04/17 16:56:31 gte Exp $
  */
 
 #include	<string>
@@ -29,7 +29,7 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char SETCommand_cc_rcsId[] = "$Id: SETCommand.cc,v 1.34 2001/04/17 02:13:17 gte Exp $" ;
+const char SETCommand_cc_rcsId[] = "$Id: SETCommand.cc,v 1.35 2001/04/17 16:56:31 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -59,14 +59,14 @@ if(!theUser)
  */
  
 if( st[1][0] != '#' ) // Didn't find a hash?
-	{
+{
 	// Look by user then.
 	string option = string_upper(st[1]);
 	string value = string_upper(st[2]); 
 	if (option == "INVISIBLE")
-		{
+	{
 		if (value == "ON")
-			{
+		{
 			theUser->setFlag(sqlUser::F_INVIS);
 			theUser->commit();
 			bot->Notice(theClient, 
@@ -74,10 +74,10 @@ if( st[1][0] != '#' ) // Didn't find a hash?
 					language::invis_on,
 					string("Your INVISIBLE setting is now ON.")));
 			return true;
-			}
+		}
 
 		if (value == "OFF")
-			{
+		{
 			theUser->removeFlag(sqlUser::F_INVIS);
 			theUser->commit();
 			bot->Notice(theClient, 
@@ -85,14 +85,15 @@ if( st[1][0] != '#' ) // Didn't find a hash?
 					language::invis_off,
 					string("Your INVISIBLE setting is now OFF.")));
 			return true;
-			}
+		}
+
 		bot->Notice(theClient, 
 			bot->getResponse(theUser,
 				language::set_cmd_syntax_on_off,
 				string("value of %s must be ON or OFF")).c_str(),
 			option.c_str());
 	        return true;
-		}
+	}
 
 	if (option == "LANG")
 	{ 
@@ -112,15 +113,14 @@ if( st[1][0] != '#' ) // Didn't find a hash?
 		bot->Notice(theClient,
         		"ERROR: Invalid language selection.");
 		return true;
-		}
-	}
+	} 
 
 	bot->Notice(theClient, 
 		bot->getResponse(theUser,
 			language::invalid_option,
 			string("Invalid option.")));
-	return true;
-	}
+	return true; 
+}
 
 Channel* tmpChan = Network->findChannel(st[1]); 
 
