@@ -5,4 +5,5 @@ Makefile
 libtool
 opts
 autom4te.cache
+libltdl/autom4te.cache
 
