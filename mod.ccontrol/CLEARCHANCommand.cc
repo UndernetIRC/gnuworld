@@ -1,5 +1,5 @@
 /*
- * CLEARCHANCommand.cc
+ * CLEARCHANCommand.cc 
  *
  * Clears all/some channel modes
  *
@@ -13,7 +13,7 @@
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 
-const char CLEARCHANCommand_cc_rcsId[] = "$Id: CLEARCHANCommand.cc,v 1.1 2001/03/11 21:40:11 mrbean_ Exp $";
+const char CLEARCHANCommand_cc_rcsId[] = "$Id: CLEARCHANCommand.cc,v 1.2 2001/03/11 23:02:30 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -68,6 +68,12 @@ for( string::size_type modePos = 0 ; modePos < doModes.size() ; ++modePos )
 				args += ban + ' ';
 				modes+= "b";
 				theChan->removeBan(ban);
+				if(modes.size() > 5) //if we got more than 5 , set the mode and continue
+					{
+					bot->ModeAsServer( theChan, modes + ' ' + args ) ;
+					modes = "-";
+					args = "";
+					}
 				}
 			if(!args.empty())
 				bot->ModeAsServer( theChan, modes + ' ' + args ) ;
