@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------------
--- "$Id: cservice.sql,v 1.28 2001/03/18 22:46:04 gte Exp $"
+-- "$Id: cservice.sql,v 1.29 2001/03/27 20:31:02 gte Exp $"
 -- Channel service DB SQL file for PostgreSQL.
 
 -- ChangeLog:
@@ -287,6 +287,20 @@ CREATE RULE cm3 AS ON UPDATE TO users DO NOTIFY users_u;
 CREATE RULE cm4 AS ON UPDATE TO levels DO NOTIFY levels_u;
 
 CREATE RULE cm5 AS ON UPDATE TO translations DO NOTIFY translations_u;
+
+-- Function to create a new users_lastseen record for each new user added.
+ 
+CREATE FUNCTION new_user() RETURNS OPAQUE AS '
+-- creates the user's associated last_seen record
+BEGIN
+	INSERT INTO users_lastseen (user_id, last_seen, last_updated) VALUES(NEW.id, now()::abstime::int4,  now()::abstime::int4);
+	RETURN NEW;
+END;
+' LANGUAGE 'plpgsql';
+
+-- Trigger to call the function upon insert to users.
+
+CREATE TRIGGER t_new_user AFTER INSERT ON users FOR EACH ROW EXECUTE PROCEDURE new_user(); 
  
 -----------------------------------------------------------------------------------------
 
