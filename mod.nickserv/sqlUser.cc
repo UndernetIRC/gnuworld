@@ -3,7 +3,7 @@
  *
  * Stores a database user
  *
- * $Id: sqlUser.cc,v 1.1 2002/08/10 13:55:19 jeekay Exp $
+ * $Id: sqlUser.cc,v 1.2 2002/08/10 15:44:24 jeekay Exp $
  */
  
  #include "sqlUser.h"
@@ -12,7 +12,8 @@
  
  namespace ns {
  
- const sqlUser::flagType sqlUser::F_SUSPEND = 0x01;
+ const sqlUser::flagType sqlUser::F_SUSPEND  = 0x0001;
+ const sqlUser::flagType sqlUser::F_AUTOKILL = 0x0002;
  
  /**
   * Default constructor.
@@ -21,7 +22,8 @@
 sqlUser::sqlUser() :
   id(0),
   name(""),
-  flags(0)
+  flags(0),
+  level(0)
 {
 }
 
