@@ -5,7 +5,7 @@
 #include	"ELog.h"
 
 const char UnloadClientTimerHandler_h_rcsId[] = __UNLOADCLIENTTIMERHANDLER_H ;
-const char UnloadClientTimerHandler_cc_rcsId[] = "$Id: UnloadClientTimerHandler.cc,v 1.1 2001/06/14 22:14:13 dan_karrels Exp $" ;
+const char UnloadClientTimerHandler_cc_rcsId[] = "$Id: UnloadClientTimerHandler.cc,v 1.2 2001/08/18 14:49:49 dan_karrels Exp $" ;
 const char ELog_h_rcsId[] = __ELOG_H ;
 
 namespace gnuworld
@@ -18,7 +18,7 @@ elog	<< "UnloadClientTimerHandler::OnTimer("
 	<< ")"
 	<< endl ;
 
-theServer->DetachClient( moduleName ) ;
+theServer->DetachClient( moduleName, reason ) ;
 
 delete this ;
 return 0 ;

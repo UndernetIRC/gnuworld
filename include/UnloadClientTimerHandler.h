@@ -3,7 +3,7 @@
  */
 
 #ifndef __UNLOADCLIENTTIMERHANDLER_H
-#define __UNLOADCLIENTTIMERHANDLER_H "$Id: UnloadClientTimerHandler.h,v 1.1 2001/06/14 22:14:12 dan_karrels Exp $"
+#define __UNLOADCLIENTTIMERHANDLER_H "$Id: UnloadClientTimerHandler.h,v 1.2 2001/08/18 14:49:49 dan_karrels Exp $"
 
 #include	<string>
 
@@ -21,12 +21,15 @@ class UnloadClientTimerHandler : public ServerTimerHandler
 
 protected:
 	string		moduleName ;
+	string		reason ;
 
 public:
 	UnloadClientTimerHandler( xServer* theServer,
-		 const string& _moduleName )
+		const string& _moduleName,
+		const string& _reason )
 	: ServerTimerHandler( theServer, 0),
-	  moduleName( _moduleName )
+	  moduleName( _moduleName ),
+	  reason( _reason )
 	{}
 
 	virtual ~UnloadClientTimerHandler()

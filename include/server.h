@@ -17,7 +17,7 @@
  */
 
 #ifndef __SERVER_H
-#define __SERVER_H "$Id: server.h,v 1.47 2001/06/25 20:32:04 dan_karrels Exp $"
+#define __SERVER_H "$Id: server.h,v 1.48 2001/08/18 14:49:49 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
@@ -366,12 +366,14 @@ public:
 	/**
 	 * Attempt to unload a client given its module name.
 	 */
-	virtual void	UnloadClient( const string& moduleName ) ;
+	virtual void	UnloadClient( const string& moduleName,
+				const string& reason ) ;
 
 	/**
 	 * Attempt to unload a client given its pointer.
 	 */
-	virtual void	UnloadClient( xClient* ) ;
+	virtual void	UnloadClient( xClient*,
+				const string& reason ) ;
 
 	/**
 	 * Attach a client to the server.  This will add the client
@@ -402,7 +404,8 @@ public:
 	 * Clients must *not* call this method, use UnloadClient()
 	 * instead.
 	 */
-	virtual bool DetachClient( const string& moduleName ) ;
+	virtual bool DetachClient( const string& moduleName,
+			const string& reason ) ;
 
 	/**
 	 * Detach a client from the server.  This will call the
@@ -411,7 +414,8 @@ public:
 	 * Clients must *not* call this method, use UnloadClient()
 	 * instead.
 	 */
-	virtual bool DetachClient( xClient* Client ) ;
+	virtual bool DetachClient( xClient* Client,
+			const string& reason ) ;
 
 	/**
 	 * Output the information for a channel, and make the given

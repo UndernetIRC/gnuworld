@@ -50,7 +50,7 @@
 #include	"pair.h"
 
 const char server_h_rcsId[] = __SERVER_H ;
-const char server_cc_rcsId[] = "$Id: server.cc,v 1.114 2001/07/29 22:44:06 dan_karrels Exp $" ;
+const char server_cc_rcsId[] = "$Id: server.cc,v 1.115 2001/08/18 14:49:49 dan_karrels Exp $" ;
 const char config_h_rcsId[] = __CONFIG_H ;
 const char misc_h_rcsId[] = __MISC_H ;
 const char events_h_rcsId[] = __EVENTS_H ;
@@ -1618,7 +1618,7 @@ return Network->addClient( fakeClient ) ;
 /**
  * Detach an xClient from the xServer.
  */
-bool xServer::DetachClient( xClient* Client )
+bool xServer::DetachClient( xClient* Client, const string& reason )
 {
 if( NULL == Client )
 	{
@@ -1626,7 +1626,7 @@ if( NULL == Client )
 	}
 
 // Notify the client that it is being detached.
-Client->Exit( "Client has been detached by server" ) ;
+Client->Exit( reason ) ;
 
 // removeClient() does all of the internal updates
 removeClient( Client ) ;
@@ -1637,7 +1637,8 @@ return true ;
 /**
  * Detach an xClient by moduleName
  */
-bool xServer::DetachClient( const string& moduleName )
+bool xServer::DetachClient( const string& moduleName,
+	const string& reason )
 {
 for( moduleListType::const_iterator ptr = moduleList.begin() ;
 	ptr != moduleList.end() ; ++ptr )
@@ -1645,7 +1646,7 @@ for( moduleListType::const_iterator ptr = moduleList.begin() ;
 	if( !strcasecmp( (*ptr)->getModuleName(), moduleName ) )
 		{
 		// Found one
-		return DetachClient( (*ptr)->getObject() ) ;
+		return DetachClient( (*ptr)->getObject(), reason ) ;
 		}
 	}
 return false ;
@@ -1673,20 +1674,21 @@ assert( handler != 0 ) ;
 RegisterTimer( ::time( 0 ), handler, 0 ) ;
 }
 
-void xServer::UnloadClient( const string& moduleName )
+void xServer::UnloadClient( const string& moduleName,
+	const string& reason )
 {
 elog	<< "xServer::UnloadClient(const string&)> "
 	<< moduleName
 	<< endl ;
 
 UnloadClientTimerHandler* handler = new (std::nothrow)
-	UnloadClientTimerHandler( this, moduleName ) ;
+	UnloadClientTimerHandler( this, moduleName, reason ) ;
 assert( handler != 0 ) ;
 
 RegisterTimer( ::time( 0 ), handler, 0 ) ;
 }
 
-void xServer::UnloadClient( xClient* theClient )
+void xServer::UnloadClient( xClient* theClient, const string& reason )
 {
 elog	<< "xServer::UnloadClient(xClient*)> "
 	<< theClient->getNickName()
@@ -1698,7 +1700,7 @@ for( moduleListType::const_iterator ptr = moduleList.begin() ;
 	if( (*ptr)->getObject() == theClient )
 		{
 		// Found one
-		UnloadClient( (*ptr)->getModuleName() ) ;
+		UnloadClient( (*ptr)->getModuleName(), reason ) ;
 		return ;
 		}
 	}
