@@ -1,4 +1,4 @@
-# $Id: dronescan.example.conf.in,v 1.8 2003/06/11 20:28:11 dan_karrels Exp $
+# $Id: dronescan.example.conf.in,v 1.9 2003/06/15 16:54:14 jeekay Exp $
 # What nickname should the bot use?
 nickname = E
 
@@ -13,17 +13,6 @@ userdescription = Drone Scanner
 
 # What user modes should the bot use?
 mode = +idk
-
-# What tests should we perform?
-# This is a simple bitfield. Just add up the numbers of the options
-# you want enabled and enter it here.
-# Note that the entropy tests are always enabled.
-#  1 - Entropy (don't unset)
-#  2 - Join Count (see below)
-#  4 - Channel Range (see below)
-#  8 - Has Ops
-# 16 - MaxChans (see below)
-enabledTests = 31
 
 # Console channel name and initial modes
 consoleChannel = #ds.console
@@ -55,11 +44,12 @@ channelCutoff = 20
 # 3 - ERROR	DroneScan core errors.
 consoleLevel = 1
 
+# The minimum amount of votes needed for a channel to be considered abnormal
+voteCutoff = 30
+
 ################
 # JOIN COUNTER #
 ################
-
-# If you enabled test 2 in enabledTests, you must give these values:
 
 # The interval over which join counter checks for joins. This is in seconds.
 jcInterval = 10
@@ -73,8 +63,6 @@ jcCutoff = 10
 # CHANNEL RANGE #
 #################
 
-# If you enabled test 4 in enabledTests, you must give these values:
-
 # The total range of entropy in a channel before it is considered abnormal
 channelRange = 0.2
 
@@ -83,8 +71,15 @@ channelRange = 0.2
 # MAXCHANS #
 ############
 
-# If you enabled test 16 in enabledTests, you must give these values:
-
 # The minimum channel membership before a client in a channel is considered
 # normal:
 maxChans = 2
+
+
+##############
+# COMMONREAL #
+##############
+
+# The amount of users who must have the same realname before being considered
+# abnormal.
+realCutoff = 4
