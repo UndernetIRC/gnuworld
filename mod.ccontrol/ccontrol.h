@@ -3,7 +3,7 @@
  */
 
 #ifndef __CCONTROL_H
-#define __CCONTROL_H "$Id: ccontrol.h,v 1.34 2001/06/11 21:08:31 mrbean_ Exp $"
+#define __CCONTROL_H "$Id: ccontrol.h,v 1.35 2001/07/18 06:42:35 mrbean_ Exp $"
 
 //Define gline response
 #define GLINE_OK 1;
@@ -505,6 +505,8 @@ public:
 	bool loadExceptions();
 	
 	void listGlines( iClient * );
+
+	void listSuspended( iClient * );
 	
 	void listServers( iClient * );
 	

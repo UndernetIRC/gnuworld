@@ -19,7 +19,7 @@
 #include	"ELog.h"
 #include	"Gline.h"
 
-const char GLINECommand_cc_rcsId[] = "$Id: GLINECommand.cc,v 1.11 2001/07/17 07:24:13 mrbean_ Exp $";
+const char GLINECommand_cc_rcsId[] = "$Id: GLINECommand.cc,v 1.12 2001/07/18 06:42:35 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -36,7 +36,7 @@ bool GLINECommand::Exec( iClient* theClient, const string& Message )
 {
 
 StringTokenizer st( Message ) ;
-if( st.size() < 3 )
+if( st.size() < 4 )
 	{
 	Usage( theClient ) ;
 	return true ;
@@ -45,18 +45,6 @@ if( st.size() < 3 )
 StringTokenizer::size_type pos = 1 ;
 
 time_t gLength = bot->getDefaultGlineLength() ;
-if( atoi( st[ pos ].c_str() ) > 0 )
-	{
-	// User has specified a gline length
-	if( st.size() < 4 )
-		{
-		Usage( theClient ) ;
-		return true ;
-		}
-
-	gLength = atoi( st[ pos ].c_str() ) ;
-	pos++ ;
-	}
 
 // (pos) is the index of the next token, the user@host mask.
 
@@ -71,6 +59,32 @@ if( string::npos == atPos )
 
 string userName = st[ pos ].substr( 0, pos ) ;
 string hostName = st[ pos ].substr( pos + 1 ) ;
+string Length;
+Length.assign(st[2]);
+unsigned int Units = 1; //Defualt for seconds
+if(!strcasecmp(Length.substr(Length.length()-1).c_str(),"d"))
+	{
+	Units = 24*3600;
+	Length.resize(Length.length()-1);
+	}
+else if(!strcasecmp(Length.substr(Length.length()-1).c_str(),"h"))
+	{
+	Units = 3600;
+	Length.resize(Length.length()-1);
+	}
+else if(!strcasecmp(Length.substr(Length.length()-1).c_str(),"s"))
+	{
+	Units = 1;
+	Length.resize(Length.length()-1);
+	}
+else if((Length.substr(Length.length()-1) < "0") 
+	|| (Length.substr(Length.length()-1) > "9")) 
+	{
+	bot->Notice(theClient,"Bogus time units, must be d - days, h - hours, s - seconds");
+	return false;
+	}	
+gLength = atoi(Length.c_str()) * Units;
+
 switch(bot->CheckGline(st[ pos ].c_str(),gLength))
 	{
 	case FORCE_NEEDED_HOST:
@@ -94,7 +108,7 @@ string nickUserHost = theClient->getNickUserHost() ;
 
 server->setGline( nickUserHost,
 	st[ pos ],
-	st.assemble( pos + 1 ),
+	st.assemble( pos + 2 ),
 	gLength ) ;
 
 ccGline *TmpGline = bot->findGline(st[pos]);

@@ -18,7 +18,7 @@
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 
-const char ADDNEWOPERCommand_cc_rcsId[] = "$Id: ADDNEWOPERCommand.cc,v 1.11 2001/07/17 16:58:27 dan_karrels Exp $";
+const char ADDNEWOPERCommand_cc_rcsId[] = "$Id: ADDNEWOPERCommand.cc,v 1.12 2001/07/18 06:42:35 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -37,7 +37,6 @@ if( st.size() < 4 )
 
 // Try fetching the user data from the database, note this is
 // the new user handle
-//ccUser* theUser = bot->GetUser(st[1]);
 ccUser* theUser = bot->GetOper(st[1]);
 
 if (theUser)  
@@ -58,6 +57,12 @@ if(!strcasecmp(st[2].c_str(),"coder"))
 	NewAccess = CODER;
 	NewFlags = isCODER;
 	}
+else if(!strcasecmp(st[2].c_str(),"smt"))
+	{
+	NewAccess = SMT;
+	NewFlags = isSMT;
+	}
+
 else if(!strcasecmp(st[2].c_str(),"admin"))
 	{
 	NewAccess = ADMIN;
@@ -71,7 +76,7 @@ else if(!strcasecmp(st[2].c_str(),"oper"))
 else
 	{
 	bot->Notice(theClient,
-		"Illegal oper type; types are: oper, admin, coder");
+		"Illegal oper type; types are: oper, admin, smt ,coder");
 	return false;
 	}	     	
 
@@ -87,7 +92,7 @@ if( NULL == tOper )
 NewAccess &= tOper->get_Access(); 
 NewAccess &= ~flg_NOLOG;
 //Check if the user doesnt try to add an oper with higher flag than he is
-if((tOper->get_Flags() & (OPER | ADMIN | CODER)) < NewFlags)
+if((tOper->get_Flags() & (OPER | ADMIN | SMT | CODER)) < NewFlags)
 	{
 	bot->Notice( theClient,
 		"You can't add an oper with higher access than yours!");

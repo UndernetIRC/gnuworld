@@ -175,14 +175,16 @@ const int flg_LIST = 0x80000;
 
 const int OPER = flg_MODE | flg_INVITE | flg_GLINE | flg_CHINFO | flg_WHOIS | flg_TRANS | flg_KICK | flg_CLEARCHAN |flg_NEWPASS | flg_LIST & ~flg_NOLOG;
 const int ADMIN = OPER | flg_ADDOPCHN | flg_ADDNOP | flg_ADDCMD | flg_SUSPEND | flg_JUPE | flg_ADDSERVER | flg_FGLINE | flg_EXCEPTIONS & ~flg_NOLOG;
-const int CODER = ADMIN & ~flg_NOLOG;;
+const int SMT = ADMIN & ~flg_NOLOG;;
+const int CODER = SMT & ~flg_NOLOG;;
 
 //Oper flags 
 
 const int isSUSPENDED = 0x01;
 const int isOPER      = 0x02;
 const int isADMIN     = 0x04;
-const int isCODER     = 0x08;
+const int isSMT     = 0x08;
+const int isCODER     = 0x20;
 const int getLOGS      = 0x10;
 
 } // namespace gnuworld

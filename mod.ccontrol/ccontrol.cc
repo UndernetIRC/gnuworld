@@ -26,7 +26,7 @@
 #include        "server.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.56 2001/07/17 07:24:13 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.57 2001/07/18 06:42:35 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -156,7 +156,7 @@ RegisterCommand( new JUPECommand( this, "JUPE", "<servername> <reason> "
 	"Jupe a server for the given reason.",flg_JUPE ) ) ;
 RegisterCommand( new MODECommand( this, "MODE", "<channel> <modes> "
 	"Change modes on the given channel",flg_MODE ) ) ;
-RegisterCommand( new GLINECommand( this, "GLINE", "[duration (sec)] <user@host> <reason> "
+RegisterCommand( new GLINECommand( this, "GLINE", "<user@host> <duration>[time units (s,d,h)] <reason> "
 	"Gline a given user@host for the given reason",flg_GLINE ) ) ;
 RegisterCommand( new SCANGLINECommand( this, "SCANGLINE", "<mask> "
 	"Search current network glines for glines matching <mask>",flg_SGLINE ) ) ;
@@ -182,13 +182,13 @@ RegisterCommand( new LOGINCommand( this, "LOGIN", "<USER> <PASS> "
 	"Authenticate with the bot",flg_LOGIN ) ) ;
 RegisterCommand( new DEAUTHCommand( this, "DEAUTH", ""
 	"Deauthenticate with the bot",flg_LOGIN ) ) ;
-RegisterCommand( new ADDNEWOPERCommand( this, "ADDOPER", "<USER> <OPERTYPE> <PASS> "
+RegisterCommand( new ADDNEWOPERCommand( this, "ADDUSER", "<USER> <OPERTYPE> <PASS> "
 	"Add a new oper",flg_ADDNOP ) ) ;
-RegisterCommand( new REMOVEOPERCommand( this, "REMOPER", "<USER> <PASS> "
+RegisterCommand( new REMOVEOPERCommand( this, "REMUSER", "<USER> <PASS> "
 	"Remove an oper",flg_REMOP ) ) ;
 RegisterCommand( new ADDCOMMANDCommand( this, "ADDCOMMAND", "<USER> <COMMAND> "
 	"Add a new command to an oper",flg_ADDCMD ) ) ;
-RegisterCommand( new REMOVECOMMANDCommand( this, "DELCOMMAND", "<USER> <COMMAND> "
+RegisterCommand( new REMOVECOMMANDCommand( this, "REMCOMMAND", "<USER> <COMMAND> "
 	"Remove a command from oper",flg_DELCMD ) ) ;
 RegisterCommand( new NEWPASSCommand( this, "NEWPASS", "<PASSWORD> "
 	"Change password",flg_NEWPASS ) ) ;
@@ -2063,6 +2063,11 @@ Notice(theClient,"-= End Of Gline List =-");
 
 }
 			
+/*void ccontrol::listSuspended( iClient * )
+{
+
+}*/
+
 	
 void ccontrol::listServers( iClient * )
 {
