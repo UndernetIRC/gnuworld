@@ -14,7 +14,7 @@
 #include	"ccUser.h"
 #include	"misc.h"
 
-const char MODOPERCommand_cc_rcsId[] = "$Id: MODOPERCommand.cc,v 1.14 2001/07/24 12:12:34 mrbean_ Exp $";
+const char MODOPERCommand_cc_rcsId[] = "$Id: MODOPERCommand.cc,v 1.15 2001/07/25 22:24:59 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -232,6 +232,7 @@ while(pos < st.size())
 	else
 		{
 		bot->Notice(theClient,"Unknown option %s",st[pos].c_str());
+		pos++;
 		}
 	}
 delete tmpUser;
