@@ -21,7 +21,7 @@
 #include	"ccontrol.h"
  
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.5 2001/01/28 15:37:31 dan_karrels Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.6 2001/01/28 15:49:05 dan_karrels Exp $" ;
 
 using std::string ;
 using std::vector ;
@@ -371,6 +371,7 @@ if( isOperChan( chanName ) )
 	}
 
 xClient::Join( chanName, operChanModes, 0, true ) ;
+MyUplink->RegisterChannelEvent( chanName, this ) ;
 operChans.push_back( chanName ) ;
 
 Channel* theChan = Network->findChannel( chanName ) ;

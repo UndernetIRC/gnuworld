@@ -43,7 +43,7 @@
 #include	"moduleLoader.h"
 
 const char xServer_h_rcsId[] = __XSERVER_H ;
-const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.53 2001/01/18 22:44:35 gte Exp $" ;
+const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.54 2001/01/28 15:49:05 dan_karrels Exp $" ;
 
 using std::string ;
 using std::vector ;
@@ -940,7 +940,8 @@ return true ;
  * channel event that occurs in channel chanName, case
  * insensitive.
  */
-bool xServer::RegisterChannelEvent( const string& chanName, xClient* theClient )
+bool xServer::RegisterChannelEvent( const string& chanName,
+	xClient* theClient )
 {
 #ifndef NDEBUG
   assert( theClient != NULL ) ;
