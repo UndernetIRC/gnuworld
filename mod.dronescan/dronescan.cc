@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: dronescan.cc,v 1.37 2003/09/12 15:30:41 dan_karrels Exp $
+ * $Id: dronescan.cc,v 1.38 2003/09/15 13:53:45 dan_karrels Exp $
  */
 
 #include	<string>
@@ -40,7 +40,7 @@
 #include "sqlUser.h"
 #include "Timer.h"
 
-RCSTAG("$Id: dronescan.cc,v 1.37 2003/09/12 15:30:41 dan_karrels Exp $");
+RCSTAG("$Id: dronescan.cc,v 1.38 2003/09/15 13:53:45 dan_karrels Exp $");
 
 namespace gnuworld {
 
@@ -339,30 +339,19 @@ void dronescan::OnChannelEvent( const channelEventType& theEvent,
 	/* Iterate over our available tests, checking this channel */
 	if(droneChannels.find(theChannel->getName()) == droneChannels.end()) {
 		/* This channel is not currently listed as active */
+		// Check the channel for abnormalities, if enough
+		// are found then it will be added to the
+		// droneChannels structure by checkChannel()
 		checkChannel( theChannel );
 	}
 	
 	/* Reset lastjoin on the active channel */
 	droneChannelsType::iterator droneChanItr =
 		droneChannels.find( theChannel->getName() ) ;
-	if( droneChanItr == droneChannels.end() )
-		{
-		elog	<< "dronescan::OnChannelEvent> Unable to "
-			<< "find active channel for channel: "
-			<< *theChannel
-			<< endl ;
 
-		activeChannel* newAC = new (std::nothrow)
-			activeChannel( theChannel->getName(),
-				::time( 0 ) ) ;
-		assert( newAC != 0 ) ;
-
-		// By definition, this channel is not present in
-		// droneChannels, so the insert() must succeed
-		droneChannels.insert( make_pair( 
-			theChannel->getName(), newAC ) ) ;
-		}
-	else
+	// If the channel is still not in the droneChannels
+	// structure then it is a "normal" channel
+	if( droneChanItr != droneChannels.end() )
 		{
 		droneChanItr->second->setLastJoin( ::time( 0 ) ) ;
 		}
@@ -610,11 +599,22 @@ void dronescan::OnTimer( xServer::timerID theTimer , void *)
 		{
 		for(jcChanMapType::const_iterator itr = jcChanMap.begin() ;
 		    itr != jcChanMap.end() ; ++itr) {
+			Channel* theChan = Network->findChannel(
+				itr->first ) ;
+			if( 0 == theChan )
+				{
+				elog	<< "dronescan::OnTimer> Unable "
+					<< "to find channel: "
+					<< itr->first
+					<< endl ;
+				continue ;
+				}
+
 			if(itr->second >= jcCutoff)
 				log(WARN, "Join flood over in %s. Total joins: %u. Total size: %d",
 					itr->first.c_str(),
 					itr->second,
-					Network->findChannel(itr->first)->size()
+					theChan->size()
 					);
 		}
 		
@@ -890,7 +890,6 @@ bool dronescan::checkChannel( const Channel *theChannel , const iClient *theClie
 		return true;
 		}
 }
-
 
 /** Calculate the entropy of a given string. */
 double dronescan::calculateEntropy( const string& theString )
