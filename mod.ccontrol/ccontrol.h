@@ -3,7 +3,7 @@
  */
 
 #ifndef __CCONTROL_H
-#define __CCONTROL_H "$Id: ccontrol.h,v 1.84 2003/02/16 12:14:24 mrbean_ Exp $"
+#define __CCONTROL_H "$Id: ccontrol.h,v 1.85 2003/03/04 22:54:16 mrbean_ Exp $"
 
 //Undef this if you want to log to the database
 #define LOGTOHD 
@@ -117,7 +117,7 @@ protected:
 
 	typedef serversMapType::iterator     serversIterator;
 	
-	typedef list< ccGline* >        glineListType ;
+	typedef map< string, ccGline* >        glineListType ;
 	
 	/**
 	 * Holds the glines
@@ -472,6 +472,8 @@ public:
 	bool remGline( ccGline* );
 
 	ccGline* findMatchingGline( const iClient* );
+
+	ccGline* findMatchingRNGline( const iClient* );
 
 	ccGline* findGline( const string& );
 

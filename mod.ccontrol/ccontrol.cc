@@ -11,12 +11,12 @@
 /* ccontrol.cc
  * Authors: Daniel Karrels dan@karrels.com
  *	    Tomer Cohen    MrBean@toughguy.net
- * $Id: ccontrol.cc,v 1.162 2003/02/19 16:02:35 mrbean_ Exp $
+ * $Id: ccontrol.cc,v 1.163 2003/03/04 22:54:15 mrbean_ Exp $
  */
 
 #define MAJORVER "1"
-#define MINORVER "1pl5"
-#define RELDATE "16 February, 2003"
+#define MINORVER "1pl6"
+#define RELDATE "05 March, 2003"
 
 #include        <sys/types.h> 
 #include        <sys/socket.h>
@@ -56,7 +56,7 @@
 #include	"ip.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.162 2003/02/19 16:02:35 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.163 2003/03/04 22:54:15 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -763,8 +763,17 @@ commandMap.clear() ;
 // Deallocate each gline entry
 for(glineIterator GLptr = glineList.begin(); GLptr != glineList.end(); ++GLptr)
 	{
-	GLptr = glineList.erase(GLptr);
+	delete GLptr->second;
 	}
+
+glineList.clear();
+
+for(glineIterator GLptr = rnGlineList.begin(); GLptr != rnGlineList.end(); ++GLptr)
+	{
+	delete GLptr->second;
+	}
+
+rnGlineList.clear();
 
 }
 
@@ -833,14 +842,14 @@ ccGline *theGline = 0 ;
 for(glineListType::iterator ptr = glineList.begin()
     ; ptr != glineList.end(); ++ptr)
 	{
-	theGline = *ptr;
+	theGline = ptr->second;
 	addGlineToUplink(theGline);
 	}
 
 for(glineListType::iterator ptr = rnGlineList.begin()
     ; ptr != rnGlineList.end(); ++ptr)
 	{
-	theGline = *ptr;
+	theGline = ptr->second;
 	addGlineToUplink(theGline);
 	}
 
@@ -1597,7 +1606,8 @@ if(dbConnected)
 				tmpGline->Insert();
 				tmpGline->loadData(tmpGline->getHost());
 				addGline(tmpGline);
-				addGlineToUplink(tmpGline);
+				if(!inBurst)
+					addGlineToUplink(tmpGline);
 				}	
 			else
 				{
@@ -1624,13 +1634,21 @@ if(dbConnected)
 				}
 			}
 		}
-	if((!glSet) && (!inBurst)) 
+	if((!glSet)) 
 		{	
-		ccGline * tempGline = findMatchingGline(NewUser);
+		ccGline * tempGline = findMatchingRNGline(NewUser);
 		if((tempGline) && (tempGline->getExpires() > ::time(0)))
 			{
 			glSet = true;
-			addGlineToUplink(tempGline);
+			string tIP = xIP( NewUser->getIP()).GetNumericIP();
+			ccGline * theGline = new (std::nothrow) ccGline(SQLDb);
+			theGline->setHost(string("*@*") + tIP);
+			theGline->setAddedBy(tempGline->getAddedBy());
+			theGline->setExpires(tempGline->getExpires());
+			theGline->setAddedOn(tempGline->getAddedOn());
+			theGline->setLastUpdated(tempGline->getLastUpdated());
+			theGline->setReason(tempGline->getReason());
+			queueGline(theGline,false);
 			/*else
 				{
 				string* tServer = new (std::nothrow) string(NewUser->getCharYY());
@@ -2289,16 +2307,24 @@ return NULL;
 bool ccontrol::addGline( ccGline* TempGline)
 {
 
-ccGline *theGline = 0;
-bool addedAlready = false;
 glineIterator ptr;
-glineIterator endlist;
 if(TempGline->getHost().substr(0,1) == "$") //check if its a realname gline
 	{	
-	ptr = rnGlineList.begin();
-	endlist = rnGlineList.end();
+	//ptr = rnGlineList.begin();
+//	endlist = rnGlineList.end();
 
-	for(; ptr != endlist;)
+	ptr = rnGlineList.find(TempGline->getHost());
+	if(ptr != rnGlineList.end())
+		{
+		if(ptr->second != TempGline)
+			{
+			delete ptr->second;
+			rnGlineList.erase(ptr);
+			}
+		}				
+		rnGlineList[TempGline->getHost()] = TempGline;
+
+/*	for(; ptr != endlist;)
 		{
 		theGline = *ptr;
 		if(theGline->getHost() == TempGline->getHost()) 
@@ -2318,14 +2344,26 @@ if(TempGline->getHost().substr(0,1) == "$") //check if its a realname gline
 			++ptr;
 		}
 	if(!addedAlready) //if we found the gline we need to add, no need to add it			
-	        rnGlineList.push_back( TempGline ) ;
+	        rnGlineList.push_back( TempGline ) ;*/
 
 	}
 else
 	{
-	ptr = glineList.begin();
+	ptr = glineList.find(TempGline->getHost());
+	if(ptr != glineList.end())
+		{
+		if(ptr->second != TempGline)
+			{
+			delete ptr->second;
+			glineList.erase(ptr);
+			}
+		}				
+	glineList[TempGline->getHost()] = TempGline;
+
+/*	ptr = glineList.begin();
 	endlist = glineList.end();
 
+	
 	for(; ptr != endlist;)
 		{
 		theGline = *ptr;
@@ -2346,7 +2384,7 @@ else
 			++ptr;
 		}
 	if(!addedAlready) //if we found the gline we need to add, no need to add it			
-	        glineList.push_back( TempGline ) ;
+	        glineList.push_back( TempGline ) ;*/
 	}
 return true;
 }    
@@ -2355,15 +2393,11 @@ bool ccontrol::remGline( ccGline* TempGline)
 {
 if(TempGline->getHost().substr(0,1) == "$")
 	{
-	rnGlineList.erase( std::find( rnGlineList.begin(),
-		rnGlineList.end(),
-		TempGline ) ) ;
+	rnGlineList.erase(TempGline->getHost());
 	}
 else
 	{	
-	glineList.erase( std::find( glineList.begin(),
-		glineList.end(),
-		TempGline ) ) ;
+	glineList.erase(TempGline->getHost()) ;
 	}
 return true;
 }
@@ -2377,7 +2411,7 @@ string RealName = theClient->getDescription();
 string glineHost;
 for(glineIterator ptr = glineList.begin(); ptr != glineList.end(); ++ptr)
 	{
-	theGline = *ptr;
+	theGline = ptr->second;
 	if((match(theGline->getHost(),Host) == 0) || 
 	    ((match(theGline->getHost(),IP) == 0)))
 		{
@@ -2390,7 +2424,29 @@ for(glineIterator ptr = glineList.begin(); ptr != glineList.end(); ++ptr)
 
 for(glineIterator ptr = rnGlineList.begin(); ptr != rnGlineList.end(); ++ptr)
 	{
-	theGline = *ptr;
+	theGline = ptr->second;
+	glineHost = theGline->getHost().substr(1,theGline->getHost().size() - 1);
+	if(match(glineHost,RealName) == 0)
+		{
+    		if(theGline->getExpires() > ::time(0))
+			{
+			return theGline;
+			}
+		}
+	}
+
+return NULL ;
+}
+
+ccGline* ccontrol::findMatchingRNGline( const iClient* theClient )
+{
+ccGline *theGline = 0;
+string RealName = theClient->getDescription();
+string glineHost;
+
+for(glineIterator ptr = rnGlineList.begin(); ptr != rnGlineList.end(); ++ptr)
+	{
+	theGline = ptr->second;
 	glineHost = theGline->getHost().substr(1,theGline->getHost().size() - 1);
 	if(match(glineHost,RealName) == 0)
 		{
@@ -2406,28 +2462,41 @@ return NULL ;
 
 ccGline* ccontrol::findGline( const string& HostName )
 {
-ccGline *theGline;
-for(glineIterator ptr = glineList.begin(); ptr != glineList.end();++ptr)
+
+glineIterator ptr = glineList.find(HostName);
+if(ptr != glineList.end())
 	{
-	theGline = *ptr;
+	return ptr->second;
+	}
+	
+/*for(glineIterator ptr = glineList.begin(); ptr != glineList.end();++ptr)
+	{
+	theGline = ptr;
     	if(!strcasecmp(theGline->getHost(),HostName))
 		if(theGline->getExpires() > ::time(0))
 			return theGline;
-	}
+	}*/
 
 return NULL ;
 }
 
 ccGline* ccontrol::findRealGline( const string& HostName )
 {
-ccGline *theGline;
-for(glineIterator ptr = rnGlineList.begin(); ptr != rnGlineList.end();++ptr)
+
+glineIterator ptr = rnGlineList.find(HostName);
+if(ptr != rnGlineList.end())
+	{
+	return ptr->second;
+	}
+
+//ccGline *theGline;
+/*for(glineIterator ptr = rnGlineList.begin(); ptr != rnGlineList.end();++ptr)
 	{
 	theGline = *ptr;
     	if(!strcasecmp(theGline->getHost(),HostName))
 		if(theGline->getExpires() > ::time(0))
 			return theGline;
-	}
+	}*/
 
 return NULL ;
 }
@@ -3141,42 +3210,53 @@ if(!dbConnected)
 
 int totalFound = 0;
 inRefresh = true;
-
-for(glineIterator ptr = glineList.begin();ptr != glineList.end();) 
+ccGline * tempGline;
+list<string> remList;
+list<string>::iterator remIterator;
+for(glineIterator ptr = glineList.begin();ptr != glineList.end();++ptr) 
 	{
-	if(((*ptr)->getExpires() <= ::time(0)) 
-	    && (((*ptr)->getHost().substr(0,1) != "#") || 
-	    ((*ptr)->getExpires() != 0)))
+	tempGline = ptr->second;
+	if((tempGline->getExpires() <= ::time(0)) 
+	    && ((tempGline->getHost().substr(0,1) != "#") || 
+	    (tempGline->getExpires() != 0)))
 
 		{
 		//remove the gline from the database
-		ccGline* tGline = *ptr;
-		tGline->Delete();
-		ptr = glineList.erase(ptr);
-		delete tGline;
+		tempGline->Delete();
+		remList.push_back(ptr->first);
+//		ptr = glineList.erase(ptr);
+		delete tempGline;
 		++totalFound;
 		}
-	else
-		ptr++;
 	}
 
-for(glineIterator ptr = rnGlineList.begin();ptr != rnGlineList.end();) 
+for(remIterator = remList.begin();remIterator != remList.end();)
 	{
-	if(((*ptr)->getExpires() <= ::time(0)) 
-	    && (((*ptr)->getHost().substr(0,1) != "#") || 
-	    ((*ptr)->getExpires() != 0)))
-
+	glineList.erase(*remIterator);
+	remIterator = remList.erase(remIterator);
+	}
+	
+for(glineIterator ptr = rnGlineList.begin();ptr != rnGlineList.end();++ptr) 
+	{
+	tempGline = ptr->second;
+	if(tempGline->getExpires() <= ::time(0)) 
 		{
 		//remove the gline from the database
-		ccGline* tGline = *ptr;
-		tGline->Delete();
-		ptr = rnGlineList.erase(ptr);
-		delete tGline;
+		tempGline->Delete();
+		//ptr = rnGlineList.erase(ptr);
+		remList.push_back(ptr->first);
+		delete tempGline;
 		++totalFound;
 		}
-	else
-		ptr++;
+
 	}
+
+for(remIterator = remList.begin();remIterator != remList.end();)
+	{
+	rnGlineList.erase(*remIterator);
+	remIterator = remList.erase(remIterator);
+	}
+
 
 inRefresh = false;
 
@@ -3975,7 +4055,7 @@ ccGline* tempGline;
 Notice(theClient,"-= Gline List =-");
 for(glineIterator ptr = gline_begin();ptr != gline_end();++ptr)
 	{
-	tempGline =*ptr;
+	tempGline = ptr->second;
 	if((tempGline ->getExpires() > ::time(0)) 
 	    && (!match(Mask,tempGline->getHost())))
 		{
@@ -3990,7 +4070,7 @@ for(glineIterator ptr = gline_begin();ptr != gline_end();++ptr)
 Notice(theClient,"-= RealName Gline List =-");
 for(glineIterator ptr = rnGlineList.begin();ptr != rnGlineList.end();++ptr)
 	{
-	tempGline =*ptr;
+	tempGline = ptr->second;
 	if((tempGline ->getExpires() > ::time(0)) 
 	    && (!match(Mask,tempGline->getHost())))
 		{
@@ -4308,7 +4388,12 @@ void ccontrol::updateSqldb(PgDatabase* _SQLDb)
 
 for(glineIterator ptr = glineList.begin();ptr != glineList.end();++ptr) 
 	{
-	(*ptr)->setSqldb(_SQLDb);
+	(ptr->second)->setSqldb(_SQLDb);
+	}
+
+for(glineIterator ptr = rnGlineList.begin();ptr != rnGlineList.end();++ptr) 
+	{
+	(ptr->second)->setSqldb(_SQLDb);
 	}
 
 for(exceptionIterator ptr = exception_begin();ptr != exception_end();++ptr)
@@ -4357,7 +4442,9 @@ Notice(tmpClient,"ccGline: %d",ccGline::numAllocated);
 Notice(tmpClient,"ccException: %d",ccException::numAllocated);
 Notice(tmpClient,"ccUser: %d",ccUser::numAllocated);
 Notice(tmpClient,"Total of %d users in the map",usersMap.size()); 
-
+Notice(tmpClient,"GBCount : %d , GBInterval : %d",glineBurstCount,glineBurstInterval);
+Notice(tmpClient,"Max Clones : %d , Max Virtual Clones : %d",maxClones,maxVClones);
+ 
 }
 
 bool ccontrol::updateMisc(const string& varName, const unsigned int Value)
