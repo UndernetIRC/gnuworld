@@ -610,7 +610,7 @@ else if(Command == "VERSION")
 	xClient::DoCTCP(theClient, CTCP,
 		"Undernet P10 Channel Services Version 2 ["
 		__DATE__ " " __TIME__
-		"] ($Id: cservice.cc,v 1.99 2001/02/12 11:13:47 isomer Exp $)");
+		"] ($Id: cservice.cc,v 1.100 2001/02/12 11:18:19 isomer Exp $)");
 	}
 else if(Command == "PROBLEM?")
 	{
@@ -2082,6 +2082,7 @@ if( Connected && MyUplink )
 		else
 			*(b++)=*m;
 		}
+        *b='\0';
 	count+=MyUplink->Write( "%s O %s :%s\r\n",
 		getCharYYXXX().c_str(),
 		Target->getCharYYXXX().c_str(),
