@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ConnectionManager.cc,v 1.10 2003/08/05 02:11:01 dan_karrels Exp $
+ * $Id: ConnectionManager.cc,v 1.11 2003/10/19 20:18:05 jeekay Exp $
  */
 
 #include	<unistd.h>
@@ -52,7 +52,7 @@
 #include	"Buffer.h"
 #include	"ELog.h"
 
-const char rcsId[] = "$Id: ConnectionManager.cc,v 1.10 2003/08/05 02:11:01 dan_karrels Exp $" ;
+const char rcsId[] = "$Id: ConnectionManager.cc,v 1.11 2003/10/19 20:18:05 jeekay Exp $" ;
 
 namespace gnuworld
 {
@@ -544,7 +544,7 @@ if( connectionItr == handlerItr->second.end() )
 	return false ;
 	}
 
-cout	<< "ConnectionManager::Disconnect> Sheduling connection "
+cout	<< "ConnectionManager::Disconnect> Scheduling connection "
 	<< "for removal: "
 	<< *cPtr
 	<< endl ;
