@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-## $Id: Makefile.am,v 1.26 2003/09/14 16:35:54 dan_karrels Exp $
+## $Id: Makefile.am,v 1.27 2003/10/10 23:36:04 dan_karrels Exp $
 
 lib_LTLIBRARIES = libgnuworldcore.la
 libgnuworldcore_la_SOURCES = Channel.cc \
@@ -14,14 +14,15 @@ libgnuworldcore_la_SOURCES = Channel.cc \
 	ip.cc \
 	server.cc
 libgnuworldcore_la_CXXFLAGS = -I${top_srcdir}/include \
-	-I${top_srcdir}/libgnuworld
+	-I${top_srcdir}/libgnuworld -I${top_srcdir}/libltdl
 libgnuworldcore_la_DEPENDENCIES = $(LIBGNUWORLD) $(LIBLTDL)
 libgnuworldcore_la_LDFLAGS = $(LIBGNUWORLD) $(LIBLTDL) -export-dynamic
 
 bin_PROGRAMS = gnuworld
 gnuworld_SOURCES = main.cc
 
-gnuworld_CXXFLAGS = -I${top_srcdir}/include -I${top_srcdir}/libgnuworld
+gnuworld_CXXFLAGS = -I${top_srcdir}/include -I${top_srcdir}/libgnuworld \
+	-I${top_srcdir}/libltdl
 gnuworld_LDFLAGS = libgnuworldcore.la $(LIBLTDL) -export-dynamic \
 	$(threadLib) $(LIBGNUWORLD)
 gnuworld_DEPENDENCIES = $(LIBGNUWORLD) $(LIBLTDL) libgnuworldcore.la
