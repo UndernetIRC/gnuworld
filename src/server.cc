@@ -37,7 +37,7 @@
 //#include	"moduleLoader.h"
 
 const char xServer_h_rcsId[] = __XSERVER_H ;
-const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.16 2000/08/02 23:35:11 dan_karrels Exp $" ;
+const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.17 2000/08/04 18:21:02 dan_karrels Exp $" ;
 
 using std::string ;
 using std::vector ;
@@ -1738,6 +1738,7 @@ for( StringTokenizer::const_iterator ptr = st.begin() ; ptr != st.end() ;
 		elog	<< "xServer::parseBurstUsers> Unable to add user "
 			<< theClient->getNickName() << " to channel "
 			<< theChan->getName() << endl ;
+		delete chanUser ;
 		continue ;
 		}
 

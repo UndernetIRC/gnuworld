@@ -7,6 +7,7 @@
 #include	"iClient.h"
 #include	"StringTokenizer.h"
 #include	"EConfig.h"
+#include	"Network.h"
 
 namespace gnuworld
 {
@@ -95,37 +96,165 @@ if( st.empty() || (st.size() < 2 ) )
 	return 0 ;
 	}
 
-if( st[ 0 ] == "invite" || st[ 0 ] == "INVITE" )
+if( st[ 0 ] == "invite" )
 	{
 	Invite( theClient, st[ 1 ] ) ;
 	}
 else if( st[ 0 ] == "moo" )
 	{
-	if( st.size() < 2 )
-		{
-		Notice( theClient, "Did you forget something?" ) ;
-		return 0 ;
-		}
 	string raw = st.assemble( 1 ) ;
 	Write( raw ) ;
 	}
 else if( st[ 0 ] == "join" )
 	{
-	if( st.size() < 2 )
-		{
-		Notice( theClient, "Did you forget something?" ) ;
-		return 0 ;
-		}
 	Join( st[ 1 ] ) ;
 	}
 else if( st[ 0 ] == "part" )
 	{
-	if( st.size() < 2 )
+	Part( st[ 1 ] ) ;
+	}
+else if( st[ 0 ] == "ban" )
+	{
+	if( st.size() != 3 )
 		{
-		Notice( theClient, "Did you forget something?" ) ;
+		Notice( theClient, "Usage: ban #channel nickname" ) ;
 		return 0 ;
 		}
-	Part( st[ 1 ] ) ;
+
+	Channel* theChan = Network->findChannel( st[ 1 ] ) ;
+	if( NULL == theChan )
+		{
+		Notice( theClient, "Unable to find channel" ) ;
+		return 0 ;
+		}
+
+	iClient* theClient = Network->findNick( st[ 2 ] ) ;
+	if( NULL == theClient )
+		{
+		Notice( theClient, "Unable to find nickname" ) ;
+		return 0 ;
+		}
+
+	if( 0 == theChan->findUser( theClient ) )
+		{
+		Notice( theClient, "The user doesn't appear to be on that channel" ) ;
+		return 0 ;
+		}
+
+	Ban( theChan, theClient ) ;
+	}
+else if( st[ 0 ] == "unban" )
+	{
+	if( st.size() != 3 )
+		{
+		Notice( theClient, "Usage: unban #channel banmask" ) ;
+		return 0 ;
+		}
+
+	Channel* theChan = Network->findChannel( st[ 1 ] ) ;
+	if( NULL == theChan )
+		{
+		Notice( theClient, "Unable to find channel" ) ;
+		return 0 ;
+		}
+
+	if( !theChan->findBan( st[ 2 ] ) )
+		{
+		Notice( theClient, "Unable to find ban" ) ;
+		return 0 ;
+		}
+
+	UnBan( theChan, st[ 2 ] ) ;
+	}
+else if( st[ 0 ] == "bankick" )
+	{
+	if( st.size() < 4 )
+		{
+		Notice( theClient, "Usage: bankick #channel nick reason" ) ;
+		return 0 ;
+		}
+
+	Channel* theChan = Network->findChannel( st[ 1 ] ) ;
+	if( NULL == theChan )
+		{
+		Notice( theClient, "Unable to find channel" ) ;
+		return 0 ;
+		}
+
+	iClient* theClient = Network->findNick( st[ 2 ] ) ;
+	if( NULL == theClient )
+		{
+		Notice( theClient, "Unable to find nickname" ) ;
+		return 0 ;
+		}
+
+	if( 0 == theChan->findUser( theClient ) )
+		{
+		Notice( theClient, "The user doesn't appear to be on that channel" ) ;
+		return 0 ;
+		}
+
+	BanKick( theChan, theClient, st.assemble( 3 ) ) ;
+	}
+else if( st[ 0 ] == "op" )
+	{
+	if( st.size() != 3 )
+		{
+		Notice( theClient, "Usage: op #channel nick" ) ;
+		return 0 ;
+		}
+
+	Channel* theChan = Network->findChannel( st[ 1 ] ) ;
+	if( NULL == theChan )
+		{
+		Notice( theClient, "Unable to find channel" ) ;
+		return 0 ;
+		}
+
+	iClient* theClient = Network->findNick( st[ 2 ] ) ;
+	if( NULL == theClient )
+		{
+		Notice( theClient, "Unable to find nickname" ) ;
+		return 0 ;
+		}
+
+	if( 0 == theChan->findUser( theClient ) )
+		{
+		Notice( theClient, "The user doesn't appear to be on that channel" ) ;
+		return 0 ;
+		}
+
+	Op( theChan, theClient ) ;
+	}
+else if( st[ 0 ] == "deop" )
+	{
+	if( st.size() != 3 )
+		{
+		Notice( theClient, "Usage: deop #channel nick" ) ;
+		return 0 ;
+		}
+
+	Channel* theChan = Network->findChannel( st[ 1 ] ) ;
+	if( NULL == theChan )
+		{
+		Notice( theClient, "Unable to find channel" ) ;
+		return 0 ;
+		}
+
+	iClient* theClient = Network->findNick( st[ 2 ] ) ;
+	if( NULL == theClient )
+		{
+		Notice( theClient, "Unable to find nickname" ) ;
+		return 0 ;
+		}
+
+	if( 0 == theChan->findUser( theClient ) )
+		{
+		Notice( theClient, "The user doesn't appear to be on that channel" ) ;
+		return 0 ;
+		}
+
+	DeOp( theChan, theClient ) ;
 	}
 
 return xClient::OnPrivateMessage( theClient, message ) ;

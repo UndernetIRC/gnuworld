@@ -27,7 +27,7 @@
 #include	"events.h"
 
 const char xClient_h_rcsId[] = __XCLIENT_H ;
-const char xClient_cc_rcsId[] = "$Id: client.cc,v 1.9 2000/08/03 15:50:13 dan_karrels Exp $" ;
+const char xClient_cc_rcsId[] = "$Id: client.cc,v 1.10 2000/08/04 18:21:02 dan_karrels Exp $" ;
 
 using std::string ;
 using std::strstream ;
@@ -718,9 +718,17 @@ if( st.size() < 2 )
 	return (banMask + "*") ;
 	}
 
-// Remove everything in the host except the last two tokens
-banMask += "*" ;
-banMask += st.assemble( st.size() - 2 ) ;
+if( Socket::isIPAddress( theClient->getInsecureHost() ) )
+	{
+	banMask += st[ 0 ] + '.' + st[ 1 ] + ".*" ;
+	}
+else
+	{
+	// Hostname
+	// Remove everything in the host except the last two tokens
+	banMask += "*" ;
+	banMask += st.assemble( st.size() - 2 ) ;
+	}
 
 return banMask ;
 }
