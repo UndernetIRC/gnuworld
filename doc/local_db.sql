@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------------
--- "$Id: local_db.sql,v 1.5 2001/10/29 17:00:11 nighty Exp $"
+-- "$Id: local_db.sql,v 1.6 2001/11/05 00:33:02 nighty Exp $"
 -- Channel service DB SQL file for PostgreSQL.
 --
 --
@@ -66,5 +66,32 @@ CREATE  INDEX ips_expiration_key ON ips (expiration);
 CREATE  INDEX ips_set_on_key ON ips (set_on);
 CREATE  INDEX ips_ipnum_key ON ips (ipnum);
 CREATE  INDEX ips_user_name_key ON ips (user_name);
+
+CREATE TABLE pending_mgrchange (
+	id SERIAL,
+	channel_id INT4 NOT NULL,
+	manager_id INT4 NOT NULL,
+	new_manager_id INT4 NOT NULL,
+	change_type INT2,
+-- change_type : 0 : temporary
+-- change_type : 1 : permanent
+	opt_duration INT4,
+-- duration in seconds if temporary, 0 if permanent.
+	crc VARCHAR(128)
+);
+
+CREATE INDEX pending_mgrchange_id_idx ON pending_mgrchange(id);
+CREATE INDEX pending_mgrchange_channel_id_idx ON pending_mgrchange(channel_id);
+CREATE INDEX pending_mgrchange_manager_id_idx ON pending_mgrchange(manager_id);
+CREATE INDEX pending_mgrchange_new_manager_id_idx ON pending_mgrchange(new_manager_id);
+CREATE INDEX pending_mgrchange_change_type_idx ON pending_mgrchange(change_type);
+CREATE INDEX pending_mgrchange_opt_duration_idx ON pending_mgrchange(opt_duration);
+CREATE INDEX pending_mgrchange_crc_idx ON pending_mgrchange(crc);
+
+CREATE TABLE xatadmins (
+	admin_id INT4 NOT NULL
+);
+
+CREATE INDEX xatadmins_admin_id_idx ON xatadmins(admin_id);
 
 
