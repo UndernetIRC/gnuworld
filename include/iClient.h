@@ -2,7 +2,7 @@
  */
 
 #ifndef __ICLIENT_H
-#define __ICLIENT_H "$Id: iClient.h,v 1.24 2002/02/02 18:18:18 gte Exp $"
+#define __ICLIENT_H "$Id: iClient.h,v 1.25 2002/02/02 21:23:41 gte Exp $"
 
 #include	<string>
 #include	<list>
@@ -141,13 +141,23 @@ public:
 		{ return description ; }
 
 	/**
+	 * Overwrite this clients "Real Host" with a "Hidden Host".
+	 */
+	inline void setHiddenHost()
+		{ insecureHost = account + string(HIDDEN_HOST); }
+
+	/**
 	 * Set/Retrieve client's 'account' field.
 	 */
 	inline const string& getAccount() const
 		{ return account ; }
 
 	inline void setAccount( const string& _account )
-		{ account = _account ; setMode(MODE_REGISTERED); }
+		{
+			account = _account ;
+			setMode(MODE_REGISTERED);
+			if (isModeR() && isModeX()) setHiddenHost();
+		}
 
 	/**
 	 * Retrieve the iClient's connection time.
@@ -290,7 +300,10 @@ public:
 		{ setMode( MODE_OPER ) ; }
 
 	inline void setModeX()
-		{ setMode( MODE_HIDDEN_HOST ) ; insecureHost = account + string(HIDDEN_HOST); }
+		{
+			setMode( MODE_HIDDEN_HOST ) ;
+			if (isModeR() && isModeX()) setHiddenHost();
+		}
 
 	/**
 	 * Remove a user mode for this iClient.

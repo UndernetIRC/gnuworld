@@ -16,7 +16,7 @@
 #include	"ip.h"
 
 const char iClient_h_rcsId[] = __ICLIENT_H ;
-const char iClient_cc_rcsId[] = "$Id: iClient.cc,v 1.20 2002/02/02 18:19:56 gte Exp $" ;
+const char iClient_cc_rcsId[] = "$Id: iClient.cc,v 1.21 2002/02/02 21:24:09 gte Exp $" ;
 const char client_h_rcsId[] = __CLIENT_H ;
 const char Numeric_h_rcsId[] = __NUMERIC_H ;
 const char ip_h_rcsId[] = __IP_H ;
@@ -123,11 +123,12 @@ for( string::size_type i = 0 ; i < newModes.size() ; i++ )
 		case 'r':
 		case 'R':
 			mode |= MODE_REGISTERED ;
+			if (isModeR() && isModeX()) setHiddenHost();
 			break ;
 		case 'x':
 		case 'X':
 			mode |= MODE_HIDDEN_HOST ;
-			insecureHost = account + string(HIDDEN_HOST);
+			if (isModeR() && isModeX()) setHiddenHost();
 			break ;
 		default:
 			// Unknown mode
