@@ -1,5 +1,5 @@
 /* main.cc
- * $Id: main.cc,v 1.21 2001/01/08 19:48:41 dan_karrels Exp $
+ * $Id: main.cc,v 1.22 2001/01/12 22:16:21 dan_karrels Exp $
  */
 
 #include	<fstream>
@@ -24,7 +24,7 @@
 using namespace gnuworld ;
 
 const char config_h_rcsId[] = __CONFIG_H ;
-const char main_cc_rcsId[] = "$Id: main.cc,v 1.21 2001/01/08 19:48:41 dan_karrels Exp $" ;
+const char main_cc_rcsId[] = "$Id: main.cc,v 1.22 2001/01/12 22:16:21 dan_karrels Exp $" ;
 
 using std::cerr ;
 using std::clog ;
@@ -166,6 +166,8 @@ void xServer::mainLoop()
 {
 
 timeval tv = { 0, 0 } ;
+timeval local = { 0, 0 } ;
+
 fd_set readSet, writeSet ;
 time_t now = 0 ;
 int selectRet = -1 ;
@@ -237,8 +239,9 @@ while( keepRunning && isConnected() )
                 {
                 // Be sure to reset errno before calling select()
                 errno = 0 ;
+		local = tv ;
                 selectRet = ::select( sockFD + 1, &readSet, &writeSet,
-                        0, setTimer ? &tv : 0 ) ;
+                        0, setTimer ? &local : 0 ) ;
                 }
                 // We are not expecting any signals, but one
                 // may occur anyway

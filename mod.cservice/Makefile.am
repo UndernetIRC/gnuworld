@@ -1,43 +1,42 @@
 ## Process this file with automake to produce Makefile.in
-# "$Id: Makefile.am,v 1.19 2001/01/11 01:51:56 gte Exp $"
+# "$Id: Makefile.am,v 1.20 2001/01/12 22:16:21 dan_karrels Exp $"
 
 lib_LTLIBRARIES = libcservice.la
 libcservice_la_LDFLAGS = -module -export-dynamic -L/usr/local/pgsql/lib \
 	-lpq++
 
 libcservice_la_SOURCES = cservice.cc \
-	md5hash.cc \
 	networkData.cc \
-	LOGINCommand.cc \
 	sqlChannel.cc \
 	sqlUser.cc \
 	sqlLevel.cc \
 	ACCESSCommand.cc \
+	ADDUSERCommand.cc \
+	BANLISTCommand.cc \
 	CHANINFOCommand.cc \
+	DEOPCommand.cc \
+	DEVOICECommand.cc \
+	FORCECommand.cc \
+	INVITECommand.cc \
 	ISREGCommand.cc \
+	KICKCommand.cc \
+	LOGINCommand.cc \
+	MODINFOCommand.cc \
 	MOTDCommand.cc \
+	OPCommand.cc \
 	RANDOMCommand.cc \
+	REGISTERCommand.cc \
+	REMUSERCommand.cc \
 	SEARCHCommand.cc \
+	SERVNOTICECommand.cc \
+	SETCommand.cc \
 	SHOWCOMMANDSCommand.cc \
 	SHOWIGNORECommand.cc \
-	VERIFYCommand.cc \
-	OPCommand.cc \
-	DEOPCommand.cc \
-	VOICECommand.cc \
-	DEVOICECommand.cc \
-	ADDUSERCommand.cc \
-	REMUSERCommand.cc \
-	MODINFOCommand.cc \
-	SETCommand.cc \
-	TOPICCommand.cc \
-	INVITECommand.cc \
-	BANLISTCommand.cc \
-	KICKCommand.cc \
-	REGISTERCommand.cc \
-	FORCECommand.cc \
-	UNFORCECommand.cc \
-	SERVNOTICECommand.cc \
 	STATUSCommand.cc \
 	SUSPENDCommand.cc \
-	UNSUSPENDCommand.cc 
+	TOPICCommand.cc \
+	UNFORCECommand.cc \
+	UNSUSPENDCommand.cc \
+	VERIFYCommand.cc \
+	VOICECommand.cc
 INCLUDES = -I/usr/local/pgsql/include

@@ -90,7 +90,7 @@ bindir = @bindir@
 glibdir = @glibdir@
 
 lib_LTLIBRARIES = libgnuworld.la
-libgnuworld_la_SOURCES = ClientSocket.cc 	EConfig.cc 	ELog.cc 	FileSocket.cc 	Socket.cc 	StringTokenizer.cc 	misc.cc
+libgnuworld_la_SOURCES = ClientSocket.cc 	EConfig.cc 	ELog.cc 	FileSocket.cc 	Socket.cc 	StringTokenizer.cc 	match.cc 	md5hash.cc 	misc.cc
 
 libgnuworld_la_LDFLAGS = -version-info 0:0:0 -rpath $(bindir) -static
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
@@ -104,7 +104,7 @@ CPPFLAGS = @CPPFLAGS@
 LIBS = @LIBS@
 libgnuworld_la_LIBADD = 
 libgnuworld_la_OBJECTS =  ClientSocket.lo EConfig.lo ELog.lo \
-FileSocket.lo Socket.lo StringTokenizer.lo misc.lo
+FileSocket.lo Socket.lo StringTokenizer.lo match.lo md5hash.lo misc.lo
 CXXCOMPILE = $(CXX) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
 LTCXXCOMPILE = $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
 CXXLD = $(CXX)
@@ -117,7 +117,8 @@ DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 TAR = gtar
 GZIP_ENV = --best
 DEP_FILES =  .deps/ClientSocket.P .deps/EConfig.P .deps/ELog.P \
-.deps/FileSocket.P .deps/Socket.P .deps/StringTokenizer.P .deps/misc.P
+.deps/FileSocket.P .deps/Socket.P .deps/StringTokenizer.P .deps/match.P \
+.deps/md5hash.P .deps/misc.P
 SOURCES = $(libgnuworld_la_SOURCES)
 OBJECTS = $(libgnuworld_la_OBJECTS)
 
