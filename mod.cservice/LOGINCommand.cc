@@ -11,7 +11,7 @@
 #include	"cservice_config.h"
 #include	"Network.h"
 
-const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.40 2002/03/10 02:54:10 gte Exp $" ;
+const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.41 2002/03/16 20:01:07 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -98,8 +98,19 @@ if (!bot->isPasswordRight(theUser, st.assemble(2)))
 
 if(theUser->networkClientList.size() + 1 > theUser->getMaxLogins())
 {
-	bot->Notice(theClient, "AUTHENTICATION FAILED as %s.",
+	bot->Notice(theClient, "AUTHENTICATION FAILED as %s. (Maximum concurrent logins exceeded).",
 		theUser->getUserName().c_str());
+
+	string clientList;
+	for( sqlUser::networkClientListType::iterator ptr = theUser->networkClientList.begin() ;
+		ptr != theUser->networkClientList.end() ; )
+		{
+			clientList += (*ptr)->getNickUserHost();
+			++ptr;
+			if (ptr != theUser->networkClientList.end()) clientList += ", ";
+		}
+
+	bot->Notice(theClient, "Current Sessions: %s", clientList.c_str());
 	return false;
 }
 
