@@ -17,11 +17,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: iClient.h,v 1.35 2002/11/07 21:49:17 dan_karrels Exp $
+ * $Id: iClient.h,v 1.36 2002/12/03 20:25:31 dan_karrels Exp $
  */
 
 #ifndef __ICLIENT_H
-#define __ICLIENT_H "$Id: iClient.h,v 1.35 2002/11/07 21:49:17 dan_karrels Exp $"
+#define __ICLIENT_H "$Id: iClient.h,v 1.36 2002/12/03 20:25:31 dan_karrels Exp $"
 
 #include	<string>
 #include	<list>
@@ -472,7 +472,7 @@ public:
 	 * Return a string representation of this iClient's user
 	 * modes.
 	 */
-	inline const string getCharModes() const ;
+	const string getCharModes() const ;
 
 	/**
 	 * Return this client's uplink server's integer numeric.
