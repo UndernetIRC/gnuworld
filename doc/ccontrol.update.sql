@@ -1,5 +1,5 @@
 
--- "$Id: ccontrol.update.sql,v 1.13 2002/01/02 21:29:56 mrbean_ Exp $"
+-- "$Id: ccontrol.update.sql,v 1.14 2002/01/25 14:11:27 mrbean_ Exp $"
 
 -- ccontrol database changes update
 -- this file will add the new features to an old database
@@ -63,9 +63,13 @@ alter TABLE servers add LastUpdated INT4 NOT NULL;
 
 -- 30/12/01 - Add notice column to the opers table 
 
-alter TABLE opers add Notice BOOLEAN NOT NULL DEFAULT 't';
-update opers set notice = 't';
+-- alter TABLE opers add Notice BOOLEAN NOT NULL DEFAULT 't';
+-- update opers set notice = 't';
 
 -- 02/01/02 - update all opers so that they'll have access for scan
 
-update opers set saccess = (saccess | 65536);
+-- update opers set saccess = (saccess | 65536);
+
+-- 25/01/01 - update all opers who had access to LEARNNET to the new flags
+
+update opers set saccess = (saccess | 131072) where (saccess & 1)=1;

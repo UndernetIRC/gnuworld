@@ -37,7 +37,7 @@
 #include	"ip.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.121 2002/01/25 11:29:03 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.122 2002/01/25 14:11:31 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -2952,7 +2952,7 @@ for( int i = 0 ; i < SQLDb->Tuples() ; i++ )
 return true;	
 } 
 
-void ccontrol::listGlines( iClient *theClient )
+void ccontrol::listGlines( iClient *theClient, string Mask )
 {
 
 ccGline* tempGline;
@@ -2960,7 +2960,8 @@ Notice(theClient,"-= Gline List =-");
 for(glineIterator ptr = gline_begin();ptr != gline_end();++ptr)
 	{
 	tempGline =*ptr;
-	if(tempGline ->getExpires() > ::time(0))
+	if((tempGline ->getExpires() > ::time(0)) 
+	    && (!match(Mask,tempGline->getHost())))
 		{
 		Notice(theClient,"Host : %s , Expires At : %s[%d] , AddedBy %s"
 			,tempGline->getHost().c_str()

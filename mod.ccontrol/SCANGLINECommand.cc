@@ -12,7 +12,7 @@
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 
-const char SCANGLINECommand_cc_rcsId[] = "$Id: SCANGLINECommand.cc,v 1.7 2001/12/23 09:07:57 mrbean_ Exp $";
+const char SCANGLINECommand_cc_rcsId[] = "$Id: SCANGLINECommand.cc,v 1.8 2002/01/25 14:11:31 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -35,7 +35,10 @@ ccUser* tmpUser = bot->IsAuth(theClient);
 if(tmpUser)
         bot->MsgChanLog("(%s) - %s : SCANGLINE %s\n",tmpUser->getUserName().c_str()
                         ,theClient->getNickUserHost().c_str(),st.assemble(1).c_str());
-vector< const Gline* > glines = server->matchGline( st[ 1 ] ) ;
+
+bot->listGlines(theClient,st[1]);
+
+/*vector< const Gline* > glines = server->matchGline( st[ 1 ] ) ;
 
 bot->Notice( theClient, "Found %d matches", glines.size() ) ;
 if( glines.empty() )
@@ -53,7 +56,7 @@ for( vector< const Gline* >::const_iterator ptr = glines.begin() ;
 		(*ptr)->getExpiration(),
 		(*ptr)->getSetBy().c_str(),
 		(*ptr)->getReason().c_str() ) ;
-	}
+	}*/
 
 return true ;
 }

@@ -3,7 +3,7 @@
  */
 
 #ifndef __CCONTROL_H
-#define __CCONTROL_H "$Id: ccontrol.h,v 1.59 2002/01/25 11:29:03 mrbean_ Exp $"
+#define __CCONTROL_H "$Id: ccontrol.h,v 1.60 2002/01/25 14:11:31 mrbean_ Exp $"
 
 //Undef this if you want to log to the database
 #define LOGTOHD 
@@ -555,7 +555,7 @@ public:
 	
 	bool loadExceptions();
 	
-	void listGlines( iClient * );
+	void listGlines( iClient *, string Mask = "*" );
 
 	void listSuspended( iClient * );
 	

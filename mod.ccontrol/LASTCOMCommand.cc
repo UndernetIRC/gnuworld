@@ -13,7 +13,7 @@
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 
-const char LASTCOMCommand_cc_rcsId[] = "$Id: LASTCOMCommand.cc,v 1.7 2002/01/25 11:29:03 mrbean_ Exp $";
+const char LASTCOMCommand_cc_rcsId[] = "$Id: LASTCOMCommand.cc,v 1.8 2002/01/25 14:11:31 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -26,11 +26,13 @@ namespace uworld
 bool LASTCOMCommand::Exec( iClient* theClient, const string& Message )
 {
 
+
+StringTokenizer st( Message ) ;
+#ifndef LOGTOHD
 unsigned int NumOfCom;
 unsigned int Days = 0;
-StringTokenizer st( Message ) ;
 strstream theQuery;
-#ifndef LOGTOHD
+
 if(!dbConnected)
         {
         bot->Notice(theClient,"Sorry, but the db connection is down now, please try again alittle later");
