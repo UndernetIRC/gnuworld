@@ -1,5 +1,5 @@
 #ifndef __CSERVICECOMMANDS_H
-#define __CSERVICECOMMANDS_H "$Id: cserviceCommands.h,v 1.13 2001/01/03 05:33:03 gte Exp $"
+#define __CSERVICECOMMANDS_H "$Id: cserviceCommands.h,v 1.14 2001/01/03 08:05:09 gte Exp $"
 
 #include	<string>
 #include	"iClient.h"
@@ -88,6 +88,7 @@ DECLARE_COMMAND( INVITE )
 DECLARE_COMMAND( TOPIC )
 DECLARE_COMMAND( BANLIST )
 DECLARE_COMMAND( KICK )
+DECLARE_COMMAND( STATUS )
 
 // Admin level commands.
 
