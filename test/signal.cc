@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: signal.cc,v 1.3 2003/06/30 14:50:00 dan_karrels Exp $
+ * $Id: signal.cc,v 1.4 2003/07/17 13:09:03 dan_karrels Exp $
  */
 
 #include	<sys/types.h>
@@ -90,6 +90,8 @@ if( argc != 2 )
 		<< endl ;
 	return 0 ;
 	}
+
+elog.setStream( &std::clog ) ;
 
 ::srand( ::time( 0 ) ) ;
 setupSignals() ;
