@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------------
--- "$Id: cservice.sql,v 1.35 2001/04/30 18:51:25 gte Exp $"
+-- "$Id: cservice.sql,v 1.36 2001/05/06 21:38:40 gte Exp $"
 -- Channel service DB SQL file for PostgreSQL.
 
 -- ChangeLog:
@@ -331,9 +331,6 @@ CREATE FUNCTION delete_user() RETURNS OPAQUE AS '
 BEGIN
 	INSERT INTO deletion_transactions (tableID, key1, key2, key3, last_updated)
 	VALUES(1, OLD.id, 0, 0, now()::abstime::int4);
-	DELETE FROM levels WHERE user_id = OLD.id;
-	DELETE FROM userlog WHERE user_id = OLD.id; 
-	-- TODO: Removing users who have pending channels?
 	RETURN OLD;
 END;
 ' LANGUAGE 'plpgsql';
@@ -347,12 +344,6 @@ CREATE FUNCTION delete_channel() RETURNS OPAQUE AS '
 BEGIN
 	INSERT INTO deletion_transactions (tableID, key1, key2, key3, last_updated)
 	VALUES(2, OLD.id, 0, 0, now()::abstime::int4);
- 	-- Clean up trailing records that are referentially linked to this channel record.
-	DELETE FROM channellog WHERE channelid = OLD.id;
-	DELETE FROM bans WHERE channel_id = OLD.id;
-	DELETE FROM levels where channel_id = OLD.id;
-	DELETE FROM supporters where channel_id = OLD.id;
-	DELETE FROM pending where channel_id = OLD.id;
 	RETURN OLD;
 END;
 ' LANGUAGE 'plpgsql';
