@@ -16,10 +16,9 @@
 #include	"Gline.h"
 #include	"ip.h"
 #include	"ELog.h"
-#include	"Gline.h"
-#include	"gline.h"
+#include	"Constants.h"
 
-const char FORCEGLINECommand_cc_rcsId[] = "$Id: FORCEGLINECommand.cc,v 1.13 2001/11/20 19:49:45 mrbean_ Exp $";
+const char FORCEGLINECommand_cc_rcsId[] = "$Id: FORCEGLINECommand.cc,v 1.14 2001/12/08 17:17:29 mrbean_ Exp $";
 
 namespace gnuworld
 {

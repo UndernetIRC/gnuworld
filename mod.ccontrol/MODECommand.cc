@@ -11,8 +11,9 @@
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 #include	"Network.h"
+#include	"Constants.h"
 
-const char MODECommand_cc_rcsId[] = "$Id: MODECommand.cc,v 1.9 2001/07/23 10:28:51 mrbean_ Exp $";
+const char MODECommand_cc_rcsId[] = "$Id: MODECommand.cc,v 1.10 2001/12/08 17:17:29 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -33,7 +34,10 @@ if( st.size() < 3 )
 	Usage( theClient ) ;
 	return true ;
 	}
-
+if(st[1].size() > channel::MaxName)
+	{
+	bot->Notice(theClient,"Channel can't be more than %d chars",channel::MaxName);
+	}
 Channel* theChan = Network->findChannel( st[ 1 ] ) ;
 if( NULL == theChan )
 	{

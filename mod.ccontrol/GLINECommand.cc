@@ -19,11 +19,12 @@
 #include	"ip.h"
 #include	"ELog.h"
 #include	"Gline.h"
-#include	"gline.h"
+//#include	"gline.h"
 #include 	"time.h"
 #include	"ccUser.h"
+#include	"Constants.h"
 
-const char GLINECommand_cc_rcsId[] = "$Id: GLINECommand.cc,v 1.27 2001/12/06 20:02:40 mrbean_ Exp $";
+const char GLINECommand_cc_rcsId[] = "$Id: GLINECommand.cc,v 1.28 2001/12/08 17:17:29 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -224,9 +225,9 @@ typedef map<string , int> GlineMapType;
 GlineMapType glineList;
 
 
-if(st[1].size() > 200)
+if(st[1].size() > channel::MaxName)
 	{
-	bot->Notice(theClient,"Channel name can't be more than 200 chars");
+	bot->Notice(theClient,"Channel name can't be more than %d chars",channel::MaxName);
 	return false;
 	}
 

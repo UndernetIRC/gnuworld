@@ -30,14 +30,14 @@
 #include	"ccontrol.h"
 #include	"AuthInfo.h"
 #include        "server.h"
-#include 	"gline.h"
+#include 	"Constants.h"
 #include	"commLevels.h"
 #include	"ccFloodData.h"
 #include	"ccGate.h"
 #include	"ip.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.98 2001/12/07 19:12:44 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.99 2001/12/08 17:17:29 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -555,7 +555,10 @@ switch( theEvent )
 		iClient* tmpUser = (theEvent == EVT_QUIT) ?
 			static_cast< iClient* >( Data1 ) :
 			static_cast< iClient* >( Data2 ) ;
-		--clientsIpMap[xIP( tmpUser->getIP()).GetNumericIP()];
+		if(--clientsIpMap[xIP( tmpUser->getIP()).GetNumericIP()] < 1)
+			{
+			clientsIpMap.erase(clientsIpMap.find(xIP( tmpUser->getIP()).GetNumericIP()));
+			}
 		ccFloodData* floodData = static_cast< ccFloodData* >(
 		tmpUser->getCustomData(this) ) ;
 		tmpUser->removeCustomData(this);
@@ -782,8 +785,7 @@ return 0;
 return xClient::OnEvent( theEvent, Data1, Data2, Data3, Data4 ) ;
 }
 
-int ccontrol::OnChannelEvent( const channelEventType& theEvent,
-	Channel* theChan,
+int ccontrol::OnChannelEvent( const channelEventType& theEvent,	Channel* theChan,
 	void* Data1, void* Data2, void* Data3, void* Data4 )
 {
 
@@ -1983,10 +1985,10 @@ bool ParseEnded = false;
 int retMe = 0;
 string::size_type pos = Host.find_first_of('@');
 string Hostname = Host.substr(pos+1);
-if(Len > gline::MFU_TIME)  //Check for maximum time
-	retMe |= gline::BAD_TIME;
+if(Len >  gline::MFU_TIME)  //Check for maximum time
+	retMe |=  gline::BAD_TIME;
 if((signed int) Len < 0)
-	retMe |= gline::NEG_TIME;
+	retMe |=  gline::NEG_TIME;
 
 for(string::size_type pos = 0; pos < Hostname.size();++pos)
 	{
@@ -2001,12 +2003,12 @@ for(string::size_type pos = 0; pos < Hostname.size();++pos)
 	else if(Hostname[pos] == '/')
 		{
 		//For now not handled, return a bad host
-		retMe |= gline::BAD_HOST;
+		retMe |=  gline::BAD_HOST;
 		/*if(!(GlineType & isIP)) //must be an ip to specify 
-			return gline::BAD_HOST;
+			return  gline::BAD_HOST;
 		 Mask = atol((Host.substr(++pos)).c_str());
 		 if(!(Mask) || (Mask > 32))
-			return gline::BAD_HOST;
+			return  gline::BAD_HOST;
 		 if(Mask < 32)
 			GlineType |= isWildCard;
 		 ParseEnded = true;			
@@ -2020,23 +2022,23 @@ for(string::size_type pos = 0; pos < Hostname.size();++pos)
 
 Affected = Network->countMatchingUserHost(Host); //Calculate the number of affected
 if((Dots > 3) && (GlineType & isIP)) //IP addy cant have more than 3 dots
-	retMe |= gline::BAD_HOST;
+	retMe |=  gline::BAD_HOST;
 if((GlineType & (isIP || isWildCard) == isIP) && !(ParseEnded))
 	Mask +=8; //Add the last mask count if needed
 if((GlineType & isIP) && (Mask < 24))
-	retMe |= gline::HUH_NO_HOST;  //Its too wide
+	retMe |=  gline::HUH_NO_HOST;  //Its too wide
 if(!(GlineType & isIP) && (Dots < 2) && (GlineType & isWildCard))
-	retMe |= gline::HUH_NO_HOST; //Wildcard gline must have atleast 2 dots
-if(Affected > gline::MFGLINE_USERS) 
-	retMe |= gline::FU_NEEDED_USERS; //This gline must be set with -fu flag
-if(Len > gline::MFGLINE_TIME)
-	retMe |= gline::FU_NEEDED_TIME;
-if(Len > gline::MGLINE_TIME)
-	retMe |= gline::FORCE_NEEDED_TIME;
-if(GlineType & (isWildCard & (Len > gline::MGLINE_WILD_TIME)))
-	retMe |= gline::FORCE_NEEDED_WILDTIME;
+	retMe |=  gline::HUH_NO_HOST; //Wildcard gline must have atleast 2 dots
+if(Affected >  gline::MFGLINE_USERS) 
+	retMe |=  gline::FU_NEEDED_USERS; //This gline must be set with -fu flag
+if(Len >  gline::MFGLINE_TIME)
+	retMe |=  gline::FU_NEEDED_TIME;
+if(Len >  gline::MGLINE_TIME)
+	retMe |=  gline::FORCE_NEEDED_TIME;
+if(GlineType & (isWildCard & (Len >  gline::MGLINE_WILD_TIME)))
+	retMe |=  gline::FORCE_NEEDED_WILDTIME;
 if(!retMe)
-	retMe = gline::GLINE_OK;
+	retMe =  gline::GLINE_OK;
 return retMe;
 }
 
@@ -2199,7 +2201,7 @@ for(glineIterator ptr = glineList.begin(); ptr != glineList.end(); ptr++)
 	theGline = *ptr;
 	if((theGline->getExpires() == 0) && (theGline->getHost().substr(0,1) == "#"))
 		{
-		Expires = gline::PERM_TIME;
+		Expires =  gline::PERM_TIME;
 		}
 	else
 		{

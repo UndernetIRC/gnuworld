@@ -12,8 +12,9 @@
 #include	"ccontrol.h"
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
+#include	"Constants.h"
 
-const char ADDOPERCHANCommand_cc_rcsId[] = "$Id: ADDOPERCHANCommand.cc,v 1.6 2001/07/23 10:28:51 mrbean_ Exp $";
+const char ADDOPERCHANCommand_cc_rcsId[] = "$Id: ADDOPERCHANCommand.cc,v 1.7 2001/12/08 17:17:29 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -39,7 +40,7 @@ if( '#' != chanName[ 0 ] )
 	return true ;
 	}
 
-if(chanName.length() >  200)
+if(chanName.length() >  channel::MaxName)
 	{
 	bot->Notice( theClient,"Channel name too long" );
 	return true;

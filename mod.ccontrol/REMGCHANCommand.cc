@@ -11,8 +11,9 @@
 #include	"ccontrol.h"
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
+#include	"Constants.h"
 
-const char REMGCHANCommand_cc_rcsId[] = "$Id: REMGCHANCommand.cc,v 1.3 2001/11/20 19:49:45 mrbean_ Exp $";
+const char REMGCHANCommand_cc_rcsId[] = "$Id: REMGCHANCommand.cc,v 1.4 2001/12/08 17:17:29 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -38,9 +39,10 @@ if( st.size() < 2 )
 	Usage( theClient ) ;
 	return true ;
 	}
-if((st[1].substr(0,1) != "#") || (st[1].size() > 200))
+if((st[1].substr(0,1) != "#") || (st[1].size() > channel::MaxName))
 	{
-	bot->Notice(theClient,"Invalid channel name, must begin with # and cant be more than 200 chars");
+	bot->Notice(theClient,"Invalid channel name, must begin with # and cant be more than %d chars"
+			,channel::MaxName);
 	return false;
 	}
 ccGline *tmpGline = bot->findGline(bot->removeSqlChars(st[1]));

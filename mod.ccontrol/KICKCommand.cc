@@ -11,8 +11,9 @@
 #include	"ccontrol.h"
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
+#include	"Constants.h"
 
-const char KICKCommand_cc_rcsId[] = "$Id: KICKCommand.cc,v 1.6 2001/07/23 10:28:51 mrbean_ Exp $";
+const char KICKCommand_cc_rcsId[] = "$Id: KICKCommand.cc,v 1.7 2001/12/08 17:17:29 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -40,6 +41,10 @@ if( chanName[ 0 ] != '#' )
 	chanName.insert( chanName.begin(), '#' ) ;
 	}
 
+if(chanName.size() > channel::MaxName)
+	{
+	bot->Notice(theClient,"Channel name can't be more than %d chars",channel::MaxName);
+	}
 Channel* theChan = Network->findChannel( chanName ) ;
 if( NULL == theChan )
 	{

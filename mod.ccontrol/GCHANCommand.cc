@@ -18,10 +18,11 @@
 #include	"ip.h"
 #include	"ELog.h"
 #include	"Gline.h"
-#include	"gline.h"
+//#include	"gline.h"
 #include 	"time.h"
+#include	"Constants.h"
 
-const char GCHANCommand_cc_rcsId[] = "$Id: GCHANCommand.cc,v 1.4 2001/11/20 19:49:45 mrbean_ Exp $";
+const char GCHANCommand_cc_rcsId[] = "$Id: GCHANCommand.cc,v 1.5 2001/12/08 17:17:29 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -55,11 +56,11 @@ time_t gLength = bot->getDefaultGlineLength() ;
 
 // (pos) is the index of the next token, the user@host mask.
 
-if( (st[pos].substr(0,1) != "#" ) || (st[pos].size() > 200))
+if( (st[pos].substr(0,1) != "#" ) || (st[pos].size() > channel::MaxName))
 	{
 	// Channel name must start with #
 	bot->Notice( theClient, "GCHAN: Please specify a legal channel name "
-		"must start with # and no longer than 200 chars" ) ;
+		"must start with # and no longer than %d chars",channel::MaxName ) ;
 	return true ;
 	}
 
