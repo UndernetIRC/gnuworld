@@ -11,12 +11,12 @@
 /* ccontrol.cc
  * Authors: Daniel Karrels dan@karrels.com
  *	    Tomer Cohen    MrBean@toughguy.net
- * $Id: ccontrol.cc,v 1.156 2003/02/10 22:42:59 mrbean_ Exp $
+ * $Id: ccontrol.cc,v 1.157 2003/02/16 12:14:23 mrbean_ Exp $
  */
 
 #define MAJORVER "1"
-#define MINORVER "1pl4"
-#define RELDATE "10 February, 2003"
+#define MINORVER "1pl5"
+#define RELDATE "16 February, 2003"
 
 #include        <sys/types.h> 
 #include        <sys/socket.h>
@@ -56,7 +56,7 @@
 #include	"ip.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.156 2003/02/10 22:42:59 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.157 2003/02/16 12:14:23 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -177,8 +177,6 @@ Sendmail_Path = conf.Require("SendMail")->second;
 //SendReport flag that tells ccontrol if the user want the report to be mailed
 SendReport = atoi(conf.Require("mail_report")->second.c_str());
 
-userMaxConnection = atoi(conf.Require("max_connection")->second.c_str());
-
 maxGlineLen = atoi(conf.Require("max_GLen")->second.c_str());
 
 maxThreads = atoi(conf.Require("max_threads")->second.c_str());
@@ -186,6 +184,7 @@ maxThreads = atoi(conf.Require("max_threads")->second.c_str());
 checkClones = atoi(conf.Require("check_clones")->second.c_str());
 
 dbConnectionTimer = atoi(conf.Require("dbinterval")->second.c_str());
+
 
 // Set up the oper channels
 EConfig::const_iterator ptr = conf.Find( "operchan" ) ;
@@ -734,6 +733,12 @@ loadMaxUsers();
 loadVersions();
 loadBadChannels();
 
+if(!loadMisc())
+	{
+	glineBurstInterval = 5;
+	glineBurstCount = 5;
+	}
+	
 connectCount = 0;
 connectRetry = 5;
 curUsers = 0;
@@ -857,6 +862,7 @@ for( commandMapType::iterator ptr = commandMap.begin() ;
 
 expiredTimer = theServer->RegisterTimer(::time(0) + ExpiredInterval,this,NULL);
 dbConnectionCheck = theServer->RegisterTimer(::time(0) + dbConnectionTimer,this,NULL);
+glineQueueCheck = theServer->RegisterTimer(::time(0) + glineBurstInterval, this,NULL);
 
 if(SendReport)
 	{
@@ -1286,6 +1292,14 @@ switch( theEvent )
 			else
 				newGline->setAddedBy("Unknown");
 			}
+		else
+			{
+			if(newGline->getLastUpdated() >= newG->getLastmod())
+				{ 
+				return 0;
+				}
+				 
+			}
 		newGline->setAddedOn(::time(0));
 		//newGline->setLastUpdated(::time(0));
 		newGline->setHost(newG->getUserHost());
@@ -1382,7 +1396,11 @@ else if(timer_id == dbConnectionCheck)
 	checkDbConnection();
 	dbConnectionCheck = MyUplink->RegisterTimer(::time(0) + dbConnectionTimer,this,NULL);
 	}
-	
+else if(timer_id == glineQueueCheck)
+	{
+	processGlineQueue();
+	glineQueueCheck = MyUplink->RegisterTimer(::time(0) + glineBurstInterval,this,NULL);	
+	}
 return true;
 }
 
@@ -1561,6 +1579,10 @@ if(dbConnected)
 			if((CurConnections  > getExceptions("*@" + tIP)) 
 			    && (CurConnections > getExceptions("*@"+NewUser->getRealInsecureHost())))
 				{
+				MsgChanLog("Excessive connections (%d) from host *@%s\n"
+					    ,CurConnections,NewUser->getRealInsecureHost().c_str());
+				
+				/*				
 				MsgChanLog("Glining %s , total  connections : %d\n"
 				,tIP.c_str(),CurConnections);
 				MsgChanLog(" IP Exception : %d , HOST Exception %d\n"						
@@ -1586,7 +1608,7 @@ if(dbConnected)
 					tmpGline->loadData(tmpGline->getHost());
 					addGline(tmpGline);
 					}
-				addGlineToUplink(tmpGline);
+				addGlineToUplink(tmpGline);*/
 				}	
 			else
 				{
@@ -1602,7 +1624,7 @@ if(dbConnected)
 					}
 				ipClass += '*';
 				CurConnections = ++virtualClientsMap[NewUser->getDescription() + "@" + ipClass];
-				if(CurConnections > getExceptions("*@"+ipClass))
+				if(CurConnections > maxVClones)
 					{
 					MsgChanLog("Virtual clones for real name %s on %s, total connections %d\n",
 					    NewUser->getDescription().c_str()
@@ -1612,16 +1634,13 @@ if(dbConnected)
 				}
 			}
 		}
-	if(!glSet) 
+	if((!glSet) && (!inBurst)) 
 		{	
 		ccGline * tempGline = findMatchingGline(NewUser);
 		if((tempGline) && (tempGline->getExpires() > ::time(0)))
 			{
 			glSet = true;
-			if(!inBurst)
-				{
-				addGlineToUplink(tempGline);
-				}
+			addGlineToUplink(tempGline);
 			/*else
 				{
 				string* tServer = new (std::nothrow) string(NewUser->getCharYY());
@@ -1653,6 +1672,8 @@ if(theGline->getHost().substr(0,1) != "$")
 	}
 else 
 	{ // Its a realname gline, match all the users and gline their hosts
+	ccGline* tmpGline;
+	char us[100];
 	string RealName = theGline->getHost().substr(1,theGline->getHost().size()-1);
 	list<const iClient*> cList = Network->matchRealName(RealName);
 	list<const iClient*>::iterator ptr;
@@ -1664,9 +1685,20 @@ else
 		{
 		curClient = *ptr;    
 		Host = string("*@") + curClient->getRealInsecureHost();
-		MyUplink->setGline(theGline->getAddedBy(),
+		tmpGline = new (std::nothrow) ccGline(SQLDb);
+		us[0] = '\0';
+		sprintf(us,"%d",Network->countMatchingRealUserHost(Host));
+		tmpGline->setHost(Host);
+		tmpGline->setAddedBy(theGline->getAddedBy());
+		tmpGline->setExpires(theGline->getExpires());
+		tmpGline->setAddedOn(theGline->getAddedOn());
+		tmpGline->setLastUpdated(theGline->getLastUpdated());
+		tmpGline->setReason(string("[") + us + string("] ") +theGline->getReason());
+				
+		/*MyUplink->setGline(theGline->getAddedBy(),
 				    Host,theGline->getReason(),
-				    Expires,theGline->getLastUpdated(),this);
+				    Expires,theGline->getLastUpdated(),this);*/
+		queueGline(tmpGline,false);				    
 		}
 			
 	}
@@ -3171,6 +3203,60 @@ return true;
 
 }
 
+void ccontrol::queueGline(ccGline* theGline, bool shouldAdd)
+{
+glineQueue.push_back(glineQueueDataType(theGline,shouldAdd));
+}
+
+bool ccontrol::processGlineQueue()
+{
+
+
+if (glineQueue.empty())
+        {
+        return true;
+        }
+
+glineQueueDataType  curGlinePtr;
+ccGline* curGline; 
+unsigned int count;
+char us[100];
+us[0] = '\0';
+
+for(unsigned int i = 0; i< (glineQueue.size() > glineBurstCount ? glineBurstCount : glineQueue.size());++i)
+	{
+	curGlinePtr = glineQueue.front();
+	glineQueue.pop_front();
+	curGline = curGlinePtr.first;
+	count = Network->countMatchingRealUserHost(curGline->getHost());
+	us[0] = '\0';
+	sprintf(us,"%d",count);
+	curGline->setReason(string("[") + us + string("] ") + curGline->getReason());
+	addGlineToUplink(curGline);
+	if(curGlinePtr.second) //Do we need to add it to the db?
+		{
+		if(!curGline->Insert())
+			{
+			MsgChanLog("Error while adding gline on host %s to the db!\n",
+				    curGline->getHost().c_str());
+			}
+		else
+			{
+			curGline->loadData(curGline->getHost());			
+			}
+		addGline(curGline);			
+		}
+	else
+		{
+		delete curGline;
+		}
+		
+	}
+		
+return true;	
+}
+
+
 bool ccontrol::loadGlines()
 {
 //static const char *Main = "SELECT * FROM glines where ExpiresAt > now()::abstime::int4";
@@ -3459,6 +3545,84 @@ for(int i =0;i<SQLDb->Tuples();++i)
 return true;
 }
 
+bool ccontrol::loadMisc()
+{
+bool gotInterval= false;
+bool gotCount = false;
+bool gotVClones = false;
+bool gotClones = false;
+ 
+if(!dbConnected)
+        {   
+        return false;
+        }
+   
+stringstream theQuery;
+theQuery        << "Select * from misc"
+                << ends;
+
+#ifdef LOG_SQL
+elog    << "ccotrol::loadMisc()> "
+        << theQuery.str().c_str()
+        << endl; 
+#endif
+
+ExecStatusType status = SQLDb->Exec( theQuery.str().c_str() ) ;
+
+if (PGRES_TUPLES_OK != status)
+        {
+        elog << "Error on loading misc : " << SQLDb->ErrorMessage() << endl;
+	return false;
+        }
+
+for(int i=0; i< SQLDb->Tuples();++i)
+	{
+	if(!strcasecmp(SQLDb->GetValue(i,0),"GlineBurstCount"))
+		{
+		gotCount = true;
+		glineBurstCount = atoi(SQLDb->GetValue(i,1));
+		}
+	else if(!strcasecmp(SQLDb->GetValue(i,0),"GlineBurstInterval"))
+		{
+		gotInterval = true;
+		glineBurstInterval = atoi(SQLDb->GetValue(i,1));
+		}
+	else if(!strcasecmp(SQLDb->GetValue(i,0),"VClones"))
+		{
+		gotVClones = true;
+		maxVClones = atoi(SQLDb->GetValue(i,1));
+		}
+	else if(!strcasecmp(SQLDb->GetValue(i,0),"Clones"))
+		{
+		gotClones = true;
+		maxClones = atoi(SQLDb->GetValue(i,1));
+		}
+
+	}
+if(!gotCount)
+	{
+	glineBurstCount = 5;
+	updateMisc("GlineBurstCount",glineBurstCount);
+	}
+if(!gotInterval)
+	{
+	glineBurstInterval = 5;
+	updateMisc("GlineBurstInterval",glineBurstInterval);
+	}
+if(!gotClones)
+	{
+	maxClones = 32;
+	updateMisc("Clones",maxClones);
+	}
+if(!gotVClones)
+	{
+	maxVClones = 32;
+	updateMisc("VClones",maxVClones);
+	}
+
+return true;
+}
+
 void ccontrol::wallopsAsServer(const char *Msg,...)
 {
 if( 0 == MyUplink )
@@ -3478,7 +3642,7 @@ MyUplink->Wallops( buffer ) ;
 
 int ccontrol::getExceptions( const string &Host )
 {
-int Exception = userMaxConnection;
+int Exception = maxClones;
 
 for(exceptionIterator ptr = exception_begin();ptr != exception_end();ptr++)
 	{
@@ -4176,8 +4340,6 @@ int days;
 int hours;
 int mins;
 int secs;
-unsigned long  totalRecv = getUplink()->getTotalReceived() / uptime;
-unsigned long totalSent = getUplink()->getTotalSent() / uptime;
 
 days = uptime/(24*3600);
 uptime %= 24*3600;
@@ -4186,12 +4348,14 @@ uptime %= 3600;
 mins = uptime / 60;
 uptime %= 60;
 secs = uptime;
+Notice(tmpClient,"CControl version %s.%s [%s]",MAJORVER,MINORVER,RELDATE);
 Notice(tmpClient,"Uptime : %dD %dH %dM %dS",days,hours,mins,secs);
 if(checkClones)
 	{
 	Notice(tmpClient,"Monitoring %d diffrent clones hosts\n",clientsIpMap.size());
 	Notice(tmpClient,"and %d diffrent virtual clones hosts\n",virtualClientsMap.size());
 	}	
+Notice(tmpClient,"%d glines are waiting in the gline queue",glineQueue.size());
 Notice(tmpClient,"Allocated Structures:");
 Notice(tmpClient,"ccServer: %d",ccServer::numAllocated);
 Notice(tmpClient,"ccGline: %d",ccGline::numAllocated);
@@ -4199,29 +4363,83 @@ Notice(tmpClient,"ccException: %d",ccException::numAllocated);
 Notice(tmpClient,"ccUser: %d",ccUser::numAllocated);
 Notice(tmpClient,"Total of %d users in the map",usersMap.size()); 
 
-if(totalRecv > 1024*1024)
+}
+
+bool ccontrol::updateMisc(const string& varName, const unsigned int Value)
+{
+ 
+if(!strcasecmp(varName,"GlineBurstCount"))
 	{
-	Notice(tmpClient,"Received a total of %ld (average of %ld MB/Sec)",
-		getUplink()->getTotalReceived(),double(totalRecv)/1024*1024);
+	glineBurstCount = Value;
 	}
-else
+else if(!strcasecmp(varName,"GlineBurstInterval"))
 	{
-	Notice(tmpClient,"Received a total of %ld bytes (average of %ld Bytes/Sec)",
-		getUplink()->getTotalReceived(),long (totalRecv));	
+	glineBurstInterval = Value;
 	}
-	
-if(totalSent > 1024*1024)
+else if(!strcasecmp(varName,"Clones"))
 	{
-	Notice(tmpClient,"Sent a total of %ld bytes (average of %ld MB/Sec)",
-		getUplink()->getTotalSent(),double(totalSent)/1024*1024);
+	maxClones = Value;
 	}
-else
+else if(!strcasecmp(varName,"VClones"))
 	{
-	Notice(tmpClient,"Sent a total of %ld bytes (average of %ld Bytes/Sec)",
-		getUplink()->getTotalSent(),long(totalSent));	
+	maxVClones = Value;
 	}
 
-//Notice(tmpClient,"Received a total of %ld bytes",getUplink()->getTotalReceived());
+if(!dbConnected)
+        {   
+        return false;
+        }
+stringstream theQuery;   
+theQuery        << "Select * from misc where VarName = '"
+		<< varName << "'"
+                << ends;
+
+#ifdef LOG_SQL
+elog    << "ccotrol::updateMisc> "
+        << theQuery.str().c_str()
+        << endl; 
+#endif
+
+ExecStatusType status = SQLDb->Exec( theQuery.str().c_str() ) ;
+
+if (PGRES_TUPLES_OK != status)
+        {
+        elog << "Error update misc table : " << SQLDb->ErrorMessage() << endl;
+	return false;
+        }
+if(SQLDb->Tuples() == 0)
+	{
+	stringstream insertQ;
+	insertQ << "Insert into misc (VarName,Value1) Values ('"
+		<< varName << "',"
+		<< Value <<")"
+		<< ends;
+
+	status = SQLDb->Exec( insertQ.str().c_str() ) ;
+
+	if (PGRES_COMMAND_OK != status)
+    		{
+		return false;
+	        }
+	}
+else
+	{
+	stringstream updateQ;
+	updateQ << "Update misc set Value1 = "
+		<< Value 
+		<< " Where VarName = '"	
+		<< varName << "'"
+		<< ends;
+
+	status = SQLDb->Exec( updateQ.str().c_str() ) ;
+
+	if (PGRES_COMMAND_OK != status)
+    		{
+		elog << "Error update misc table : " << SQLDb->ErrorMessage() << endl;
+		return false;
+	        }
+	}
+return true;
 }
 
 unsigned int ccontrol::checkPassword(string NewPass , ccUser* tmpUser)

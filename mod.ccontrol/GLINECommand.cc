@@ -24,7 +24,7 @@
 #include	"ccUser.h"
 #include	"Constants.h"
 
-const char GLINECommand_cc_rcsId[] = "$Id: GLINECommand.cc,v 1.46 2003/02/10 12:22:08 mrbean_ Exp $";
+const char GLINECommand_cc_rcsId[] = "$Id: GLINECommand.cc,v 1.47 2003/02/16 12:14:23 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -325,16 +325,18 @@ ptr != theChan->userList_end() ; ++ptr )
 			TmpGline->setHost("*" + TmpClient->getUserName() + "@" + TmpClient->getRealInsecureHost());
 		TmpGline->setExpires(::time(0) + gLength);
 		TmpGline->setAddedBy(nickUserHost);
-		unsigned int Affected = Network->countMatchingRealUserHost(TmpGline->getHost()); 
-		char Us[20];
-		sprintf(Us,"%d",Affected);
-		TmpGline->setReason(string("[") + Us + string("] ") + st.assemble( pos + ResStart ));
+		//unsigned int Affected = Network->countMatchingRealUserHost(TmpGline->getHost()); 
+		//char Us[20];
+		//sprintf(Us,"%d",Affected);
+		//TmpGline->setReason(string("[") + Us + string("] ") + st.assemble( pos + ResStart ));
+		TmpGline->setReason(st.assemble( pos + ResStart ));
 		TmpGline->setAddedOn(::time(0));
 		TmpGline->setLastUpdated(::time(0));
-		TmpGline->Insert();
-		TmpGline->loadData(TmpGline->getHost());
-		bot->addGline(TmpGline);
-		bot->addGlineToUplink(TmpGline);
+//		TmpGline->Insert();
+//		TmpGline->loadData(TmpGline->getHost());
+//		bot->addGline(TmpGline);
+//		bot->addGlineToUplink(TmpGline);
+		bot->queueGline(TmpGline);
 /*		server->setGline( nickUserHost,
 			    TmpGline->getHost(),
 			    string("[") + Us + string("] ") +

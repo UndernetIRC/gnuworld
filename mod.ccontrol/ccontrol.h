@@ -3,7 +3,7 @@
  */
 
 #ifndef __CCONTROL_H
-#define __CCONTROL_H "$Id: ccontrol.h,v 1.83 2003/02/10 12:22:11 mrbean_ Exp $"
+#define __CCONTROL_H "$Id: ccontrol.h,v 1.84 2003/02/16 12:14:24 mrbean_ Exp $"
 
 //Undef this if you want to log to the database
 #define LOGTOHD 
@@ -14,6 +14,7 @@
 #include	<vector>
 #include	<map>
 #include        <iomanip>
+#include	<queue>
 
 #include	<cstdio>
 #include	<cstdarg>
@@ -125,6 +126,12 @@ protected:
 	glineListType			glineList ;
 
 	glineListType			rnGlineList;
+	
+	typedef pair< ccGline* , bool > glineQueueDataType;
+	
+	typedef list< glineQueueDataType > glineQueueType;
+	 
+	glineQueueType			glineQueue;
 	
 	typedef list< ccFloodData* >	ignoreListType;
 	
@@ -528,6 +535,10 @@ public:
 	
 	bool refreshGlines();
 	
+	void queueGline(ccGline* , bool = true);
+	
+	bool processGlineQueue();
+	
 	bool loadGlines();
 
 	bool loadUsers();
@@ -541,6 +552,8 @@ public:
 	bool loadBadChannels();
 	
 	void loadCommands();
+	
+	bool loadMisc();
 	
 	void wallopsAsServer(const char * , ... );
 
@@ -673,6 +686,8 @@ public:
 	void remBadChannel(ccBadChannel*);
 	
 	void listBadChannels( iClient* );
+	
+	bool updateMisc(const string&, const unsigned int);
 	
 	/**
 	 * This is a constant iterator type used to perform a read-only
@@ -857,6 +872,9 @@ public:
 
 	xServer::timerID dbConnectionCheck;
 	
+	xServer::timerID glineQueueCheck;
+	
+	
 protected:
 
 	/**
@@ -940,8 +958,10 @@ protected:
 
 	int 			ExpiredInterval;
 
-	int			userMaxConnection;
+	int			maxClones;
 	 
+	int			maxVClones;
+
 	int			maxGlineLen;
 	
 	int			maxThreads;
@@ -971,6 +991,10 @@ protected:
 	bool			checkVer;
 			
 	unsigned long int	curUsers;
+	
+	unsigned int 		glineBurstInterval;
+	
+	unsigned int 		glineBurstCount; 
 	
 } ; 
 
