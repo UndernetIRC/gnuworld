@@ -3,7 +3,7 @@
  */
 
 #ifndef __CCONTROL_H
-#define __CCONTROL_H "$Id: ccontrol.h,v 1.62 2002/03/01 18:27:36 mrbean_ Exp $"
+#define __CCONTROL_H "$Id: ccontrol.h,v 1.63 2002/03/01 21:02:07 mrbean_ Exp $"
 
 //Undef this if you want to log to the database
 #define LOGTOHD 
@@ -918,6 +918,8 @@ protected:
 	
 	bool			checkVer;
 			
+	unsigned long int	curUsers;
+	
 } ; 
 
 void* initGate( void * );

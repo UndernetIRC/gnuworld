@@ -15,7 +15,7 @@
 #include        "ccUser.h"
 #include	"misc.h"
 
-const char COMMANDSCommand_cc_rcsId[] = "$Id: COMMANDSCommand.cc,v 1.8 2002/03/01 18:27:36 mrbean_ Exp $";
+const char COMMANDSCommand_cc_rcsId[] = "$Id: COMMANDSCommand.cc,v 1.9 2002/03/01 21:02:07 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -47,7 +47,6 @@ if(st[1].size() > 128)
 	return false;
 	}
 
-ccUser* tmpUser = bot->IsAuth(theClient);
 bot->MsgChanLog("COMMANDS %s\n",st.assemble(1).c_str());
 		    
 Command* Comm = bot->findCommandInMem(st[2]);

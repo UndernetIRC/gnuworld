@@ -38,7 +38,7 @@
 #include	"ip.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.129 2002/03/01 18:27:36 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.130 2002/03/01 21:02:07 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -310,6 +310,7 @@ loadVersions();
 
 connectCount = 0;
 connectRetry = 5;
+curUsers = 0;
 
 #ifdef LOGTOHD
 	initLogs();
@@ -672,6 +673,7 @@ switch( theEvent )
 		iClient* tmpUser = (theEvent == EVT_QUIT) ?
 			static_cast< iClient* >( Data1 ) :
 			static_cast< iClient* >( Data2 ) ;
+		--curUsers;
 		if(checkClones)
 			{
 			string tIP = xIP( tmpUser->getIP()).GetNumericIP();
@@ -835,6 +837,7 @@ switch( theEvent )
 		{
 		bool glSet = false;
 		iClient* NewUser = static_cast< iClient* >( Data1);
+		curUsers++;
 		if(!inBurst)
 			{
 			checkMaxUsers();
@@ -3710,9 +3713,9 @@ chanFile.close();
 
 void ccontrol::checkMaxUsers()
 {
-if(maxUsers < Network->clientList_size())
+if(maxUsers < curUsers)
 	{
-	maxUsers = Network->clientList_size();
+	maxUsers = curUsers;
 	dateMax = ::time(0);
 	
 	static const char *UPMain = "update Misc set Value1 = ";
