@@ -1,12 +1,13 @@
 /* sqlChannel.h */
 
 #ifndef __SQLCHANNEL_H
-#define __SQLCHANNEL_H "$Id: sqlChannel.h,v 1.30 2001/08/10 20:11:16 gte Exp $"
+#define __SQLCHANNEL_H "$Id: sqlChannel.h,v 1.31 2001/08/30 19:30:20 gte Exp $"
 
 #include	<string>
 #include	<map>
 #include	<ctime>
 #include	"libpq++.h"
+#include	"sqlBan.h"
 
 using std::string ;
 
@@ -199,6 +200,9 @@ public:
 
 	typedef map< unsigned int, pair < unsigned short, string > > forceMapType ;
 	forceMapType forceMap;
+
+	typedef vector < sqlBan* > sqlBanVectorType;
+	sqlBanVectorType banList;
 
 protected:
 

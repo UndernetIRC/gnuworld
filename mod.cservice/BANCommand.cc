@@ -18,13 +18,13 @@
  *
  * Caveats: None.
  *
- * $Id: BANCommand.cc,v 1.26 2001/07/29 22:44:06 dan_karrels Exp $
+ * $Id: BANCommand.cc,v 1.27 2001/08/30 19:30:20 gte Exp $
  */
 
 #include	<new>
 #include	<string>
 #include	<cassert>
- 
+
 #include	"StringTokenizer.h"
 #include	"cservice.h"
 #include	"Network.h"
@@ -33,16 +33,16 @@
 #include	"responses.h"
 #include	"match.h"
 
-const char BANCommand_cc_rcsId[] = "$Id: BANCommand.cc,v 1.26 2001/07/29 22:44:06 dan_karrels Exp $" ;
+const char BANCommand_cc_rcsId[] = "$Id: BANCommand.cc,v 1.27 2001/08/30 19:30:20 gte Exp $" ;
 
 namespace gnuworld
 {
 
 using std::string ;
 using namespace level;
- 
+
 bool BANCommand::Exec( iClient* theClient, const string& Message )
-{ 
+{
 StringTokenizer st( Message ) ;
 if( st.size() < 3 )
 	{
@@ -50,7 +50,7 @@ if( st.size() < 3 )
 	return true;
 	}
 
- 
+
 /* Is the user authorised? */
 sqlUser* theUser = bot->isAuthed(theClient, true);
 if(!theUser)
@@ -62,8 +62,8 @@ if(!theUser)
 
 if(st[1][0] != '#')
 	{
-	bot->Notice(theClient, 
-		bot->getResponse(theUser, 
+	bot->Notice(theClient,
+		bot->getResponse(theUser,
 			language::inval_chan_name).c_str());
 	return false;
 	}
@@ -72,38 +72,38 @@ if(st[1][0] != '#')
 sqlChannel* theChan = bot->getChannelRecord(st[1]);
 if(!theChan)
 	{
-	bot->Notice(theClient, 
+	bot->Notice(theClient,
 		bot->getResponse(
-			theUser, 
-			language::chan_not_reg).c_str(), 
+			theUser,
+			language::chan_not_reg).c_str(),
 		st[1].c_str());
 	return false;
-	} 
+	}
 
-	
+
 /* Check the bot is in the channel. */
-	
-if (!theChan->getInChan()) 
+
+if (!theChan->getInChan())
 	{
 	bot->Notice(
-		theClient, 
+		theClient,
 		bot->getResponse(theUser,
 			language::i_am_not_on_chan).c_str()
 		);
 	return false;
 	}
- 
+
 int oCount = 0;
 int banTime = 3;
 int banLevel = 75;
 string banReason = "No Reason";
-	
+
 if(st.size() >= 6) oCount = 3;
 if(st.size() == 5) oCount = 2;
 if(st.size() == 4) oCount = 1;
-	
+
 switch(oCount)
-	{       
+	{
 	case 1:
 	 	{
 		/*
@@ -111,7 +111,7 @@ switch(oCount)
 		 *  or we'll also accept a reason and set defaults.
 		 */
 
- 		if(!IsNumeric(st[3])) 
+ 		if(!IsNumeric(st[3]))
  			{
 			banReason = st.assemble(3);
  			}
@@ -120,15 +120,15 @@ switch(oCount)
 			banTime = atoi(st[3].c_str());
 			}
 		break;
-		}	
-	case 2: 
+		}
+	case 2:
 		{
 		if(!IsNumeric(st[3]))
 			{
 			banReason = st.assemble(3);
 			break;
 			}
-	
+
 		if(!IsNumeric(st[4]))
 			{
 			banReason = st.assemble(4);
@@ -158,15 +158,15 @@ switch(oCount)
 		banLevel = atoi(st[4].c_str());
 		banReason = st.assemble(5);
 		break;
-		} 
+		}
 	} // switch()
- 
+
 // Check level.
 int level = bot->getEffectiveAccessLevel(theUser, theChan, true);
 if(level < level::ban)
 	{
-	bot->Notice(theClient, 
-		bot->getResponse(theUser, 
+	bot->Notice(theClient,
+		bot->getResponse(theUser,
 			language::insuf_access).c_str()
 		);
 	return false;
@@ -175,7 +175,7 @@ if(level < level::ban)
 // TODO: Violation of the rule of numbers
 if(banLevel < 1 || banLevel > level || 500 < banLevel)
 	{
-	bot->Notice(theClient, 
+	bot->Notice(theClient,
 		bot->getResponse(theUser,language::ban_level_range).c_str(),
 		(500 < level) ? 500 : level);
 	return true;
@@ -184,7 +184,7 @@ if(banLevel < 1 || banLevel > level || 500 < banLevel)
 // TODO: Violation of the rule of numbers
 if(banTime < 1 || banTime > 336)
 	{
-	bot->Notice(theClient, 
+	bot->Notice(theClient,
 		bot->getResponse(theUser,
 		language::ban_duration).c_str()
 	);
@@ -194,13 +194,13 @@ if(banTime < 1 || banTime > 336)
 // TODO: Violation of the rule of numbers
 if(banReason.size() > 128)
 	{
-	bot->Notice(theClient, 
+	bot->Notice(theClient,
 		bot->getResponse(theUser,
 		language::ban_reason_size).c_str()
 	);
 	return true;
 	}
- 
+
 int banDuration = banTime * 3600;
 string banTarget = st[2];
 
@@ -211,7 +211,7 @@ if( isNick )
 	iClient* aNick = Network->findNick(banTarget);
 	if(!aNick)
 		{
-		bot->Notice(theClient, 
+		bot->Notice(theClient,
 			bot->getResponse(theUser,
 			language::cant_find_on_chan).c_str(),
 			st[2].c_str(), theChan->getName().c_str()
@@ -219,7 +219,7 @@ if( isNick )
 		return true;
 		}
 
-	/* Ban and kick this user */ 
+	/* Ban and kick this user */
 	banTarget = Channel::createBan(aNick);
 	}
 
@@ -228,35 +228,34 @@ if( isNick )
  * start kicking.
  */
 
-Channel* theChannel = Network->findChannel(theChan->getName()); 
-if (!theChannel) 
+Channel* theChannel = Network->findChannel(theChan->getName());
+if (!theChannel)
 	{
 	bot->Notice(theClient,
-		bot->getResponse(theUser, language::chan_is_empty).c_str(), 
+		bot->getResponse(theUser, language::chan_is_empty).c_str(),
 		theChan->getName().c_str());
 	return false;
-	} 
- 
+	}
+
 /*
  *  Get a list of all bans on this channel, try and match this ban and
  *  find overlapping bans.
  */
-	
-vector< sqlBan* >* banList = bot->getBanRecords(theChan); 
-vector< sqlBan* >::iterator ptr = banList->begin();
- 
-while (ptr != banList->end())
+
+vector< sqlBan* >::iterator ptr = theChan->banList.begin();
+
+while (ptr != theChan->banList.end())
 	{
 	sqlBan* theBan = *ptr;
-		
+
 	if(string_lower(banTarget) == string_lower(theBan->getBanMask()))
 		{
-		bot->Notice(theClient, 
+		bot->Notice(theClient,
 			bot->getResponse(theUser,
 			language::ban_exists).c_str()
 		);
-		return true; 
-		}  
+		return true;
+		}
 
 	/*
 	 * Overlapping ban? We just remove the ban from our internal tables, as
@@ -266,48 +265,48 @@ while (ptr != banList->end())
 
 	// Matched overlapping ban.
 	if(match(banTarget, theBan->getBanMask()) == 0)
-		{ 
+		{
 		// If we have access to remove the overlapper..
 		if (theBan->getLevel() <= level)
-			{ 
+			{
 			// Update GNUWorld.
 			theChannel->removeBan(theBan->getBanMask());
-			ptr = banList->erase(ptr);
+			ptr = theChan->banList.erase(ptr);
 			theBan->deleteRecord();
 			delete(theBan);
 			}
 		else
 			{
-			++ptr;				
-			} 
+			++ptr;
+			}
 		}
 	// More specific ban?
 	else if ( match(theBan->getBanMask(), banTarget) == 0)
 		{
-		bot->Notice(theClient, 
+		bot->Notice(theClient,
 			bot->getResponse(theUser,
 			language::ban_covered).c_str(),
 			banTarget.c_str(), theBan->getBanMask().c_str());
 		return true;
-		} 
+		}
 	// Carry on regardless.
 	else
 		{
 		++ptr;
-		} 
+		}
 	} // while()
- 
-vector< iClient* > clientsToKick ; 
+
+vector< iClient* > clientsToKick ;
 for(Channel::userIterator chanUsers = theChannel->userList_begin();
 	chanUsers != theChannel->userList_end(); ++chanUsers)
 	{
-	ChannelUser* tmpUser = chanUsers->second; 
+	ChannelUser* tmpUser = chanUsers->second;
 	/*
 	 *  Iterate over channel members, find a match and boot them..
-	 */ 
+	 */
 
 	if(match(banTarget, tmpUser->getClient()->getNickUserHost()) == 0)
-		{ 
+		{
 		/* Don't kick +k things */
 		if( !tmpUser->getClient()->getMode(iClient::MODE_SERVICES) )
 			{
@@ -326,37 +325,37 @@ if (banLevel == 42)
 /*
  * If this ban level is < 75, we don't kick the user, we simply don't
  * allow any of the matching hosts to be opped anymore.
- */ 
+ */
 // TODO: Violation of rule of numbers
 if (banLevel < 75)
 	{
 	bot->DeOp(theChannel, clientsToKick);
 	}
 else
-	{ 
+	{
 	/*
 	 *  Otherwise, > 100 bans result in the user being kicked out
 	 *  and a ban placed on the channel.
 	 */
-	string finalReason = "(" + theUser->getUserName() + ") " + banReason; 
+	string finalReason = "(" + theUser->getUserName() + ") " + banReason;
 	if( !clientsToKick.empty() )
 		{
-		// TODO: Use xClient::Ban() here 
+		// TODO: Use xClient::Ban() here
 		strstream s;
 		s	<< bot->getCharYYXXX() << " M " << theChannel->getName()
 			<< " +b " << banTarget << ends;
-		
+
 		bot->Write( s );
 		delete[] s.str();
-	
-		bot->Kick( theChannel, clientsToKick, finalReason ) ;
-	
-		/* Update GNUWorld */
-		theChannel->setBan(banTarget); 
-		} 
-	} 
 
- 
+		bot->Kick( theChannel, clientsToKick, finalReason ) ;
+
+		/* Update GNUWorld */
+		theChannel->setBan(banTarget);
+		}
+	}
+
+
 /*
  *  Fill out new ban details.
  */
@@ -371,10 +370,10 @@ newBan->setSetBy(theUser->getUserName());
 newBan->setSetTS(bot->currentTime());
 newBan->setLevel(banLevel);
 newBan->setExpires(banDuration+bot->currentTime());
-newBan->setReason(banReason); 
-	
-/* Insert to our internal List. */ 
-banList->push_back(newBan); 
+newBan->setReason(banReason);
+
+/* Insert to our internal List. */
+theChan->banList.push_back(newBan);
 
 /* Insert this new record into the database. */
 newBan->insertRecord();

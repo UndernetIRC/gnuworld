@@ -1,40 +1,40 @@
 #ifndef __CSERVICE_H
-#define __CSERVICE_H "$Id: cservice.h,v 1.68 2001/06/24 15:00:46 gte Exp $"
+#define __CSERVICE_H "$Id: cservice.h,v 1.69 2001/08/30 19:30:20 gte Exp $"
 
 #include	<string>
 #include	<vector>
 #include	<hash_map>
-#include	<map> 
+#include	<map>
 #include	<ctime>
 
 #include	"client.h"
 #include	"iClient.h"
 #include	"iServer.h"
 #include	"EConfig.h"
-#include	"cserviceCommands.h" 
+#include	"cserviceCommands.h"
 #include	"sqlChannel.h"
 #include	"sqlUser.h"
 #include	"sqlLevel.h"
 #include	"sqlBan.h"
 #include	"libpq-int.h"
 #include	"sqlPendingChannel.h"
- 
+
 using std::string ;
 using std::vector ;
 using std::hash_map ;
 using std::map ;
 
-class PgDatabase; 
+class PgDatabase;
 
 namespace gnuworld
-{ 
+{
 
 /**
  *  Sublcass the postgres API to create our own accessor
  *  to get at the PID information.
- */ 
+ */
 class Command;
- 
+
 class cmDatabase : public PgDatabase
 {
 public:
@@ -45,13 +45,13 @@ public:
 	inline int getPID() const
 		{ return pgConn->be_pid; }
 };
- 
+
 class Command;
- 
+
 class cservice : public xClient
 {
 protected:
- 
+
 	EConfig* cserviceConfig; /* Configfile */
 	typedef map< string, Command*, noCaseCompare > commandMapType ;
 	typedef commandMapType::value_type pairType ;
@@ -59,7 +59,7 @@ protected:
 
 public:
 
-	cmDatabase* SQLDb; /* PostgreSQL Database */ 
+	cmDatabase* SQLDb; /* PostgreSQL Database */
 	string confSqlHost;
 	string confSqlDb;
 	string confSqlPort;
@@ -80,12 +80,12 @@ public:
 	virtual void ImplementServer( xServer* ) ;
 	virtual bool isOnChannel( const string& ) const;
 	virtual bool RegisterCommand( Command* ) ;
-	virtual bool UnRegisterCommand( const string& ) ; 
+	virtual bool UnRegisterCommand( const string& ) ;
 	virtual void OnChannelModeO( Channel*, ChannelUser*,
-		const xServer::opVectorType& ) ; 
+		const xServer::opVectorType& ) ;
 	virtual int OnChannelEvent( const channelEventType& whichEvent,
 		Channel* theChan,
-		void* data1, void* data2, void* data3, void* data4 ); 
+		void* data1, void* data2, void* data3, void* data4 );
 	virtual int OnEvent( const eventType&,
 		void*, void*, void*, void*);
 	virtual int OnCTCP( iClient* Sender,
@@ -94,10 +94,10 @@ public:
                 bool Secure = false ) ;
 	virtual int OnTimer(xServer::timerID, void*);
 	virtual int Notice( const iClient* Target,
-		const char* Message, ... ) ; 
+		const char* Message, ... ) ;
 	virtual int Notice( const iClient* Target, const string& ) ;
 	virtual int OnWhois( iClient* sourceClient,
-			iClient* targetClient ); 
+			iClient* targetClient );
 
 	/* Sends a notice to a channel from the server. */
 	bool serverNotice( Channel*, const char*, ... );
@@ -107,21 +107,21 @@ public:
 	bool logAdminMessage(const char*, ... );
 
 	/* Log an debug message to the debug channel */
-	bool logDebugMessage(const char*, ... ); 
+	bool logDebugMessage(const char*, ... );
 
 	/* Write a channel log */
-	void writeChannelLog(sqlChannel*, iClient*, unsigned short, const string&); 
+	void writeChannelLog(sqlChannel*, iClient*, unsigned short, const string&);
 
-	typedef commandMapType::const_iterator constCommandIterator ; 
+	typedef commandMapType::const_iterator constCommandIterator ;
 	constCommandIterator command_begin() const
-                { return commandMap.begin() ; } 
+                { return commandMap.begin() ; }
 
 	constCommandIterator command_end() const
-                { return commandMap.end() ; } 
+                { return commandMap.end() ; }
 
 	constCommandIterator findCommand( const string& theComm ) const
-                { return commandMap.find( theComm ) ; } 
- 
+                { return commandMap.find( theComm ) ; }
+
 	/* Returns the access sqlUser has in channel sqlChan. */
 	short getAccessLevel( sqlUser*, sqlChannel* );
 
@@ -135,7 +135,7 @@ public:
 	short getAdminAccessLevel( sqlUser* );
 
 	/* Fetch a user record for a user. */
-	sqlUser* getUserRecord( const string& ); 
+	sqlUser* getUserRecord( const string& );
 
 	/* Checks if this client is logged in, returns a sqlUser if true.
 	 * If "bool" is true, send a notice to the client telling them off. */
@@ -153,11 +153,11 @@ public:
 
 	/* Fetch the user status flags. L = in cache, P = got password, U = Is authed. */
 	string userStatusFlags( const string& );
-	
+
 	/* Formats a timestamp into a "X Days, XX:XX:XX" from 'Now'. */
 	const string prettyDuration( int ) const ;
 
-	/* Returns the current "Flood Points" this iClient has. */ 
+	/* Returns the current "Flood Points" this iClient has. */
  	unsigned short getFloodPoints(iClient*);
 
 	/* Sets the flood counter for this iClient. */
@@ -166,11 +166,11 @@ public:
 	/* Determins if a client is in "Flooded" state, and if so Notice them. */
 	bool hasFlooded(iClient*, const string&);
 
-	/* Sets the timestamp for when we first recieved a msg from this client. 
+	/* Sets the timestamp for when we first recieved a msg from this client.
 	 * within the flood period. */
 	void setLastRecieved(iClient*, time_t);
 
-	/* Find out when we first heard from this chap. */ 
+	/* Find out when we first heard from this chap. */
 	time_t getLastRecieved(iClient*);
 
 	void setOutputTotal(const iClient* theClient, unsigned int count);
@@ -188,23 +188,17 @@ public:
 	// Accesslevel cache, key is pair(chanid, userid).
 	typedef map < pair <int, int>, sqlLevel* > sqlLevelHashType ;
 
-	// Ban cache, key is channel id.
-	typedef vector < sqlBan* > sqlBanVectorType;
-	typedef map < int, sqlBanVectorType* > sqlBanHashType ; 
-
-	vector<sqlBan*>* getBanRecords(sqlChannel* theChan);
-
- 	/* Silence List */ 
+ 	/* Silence List */
 	typedef map < string, pair < time_t, string > > silenceListType;
 	silenceListType silenceList;
 
 	bool isIgnored(iClient*);
 	void setIgnored(iClient*, bool);
- 
+
 	// Cache of user records.
 	sqlUserHashType sqlUserCache;
 
-	// Cache of channel records. 
+	// Cache of channel records.
 	sqlChannelHashType sqlChannelCache;
 
 	// Cache of channel records indexed by channel ID.
@@ -213,18 +207,15 @@ public:
 	// Cache of Level records.
 	sqlLevelHashType sqlLevelCache;
 
-	// Cache of Ban Records.
-	sqlBanHashType sqlBanCache;
- 
 	// Some counters for statistical purposes.
 	unsigned int userHits;
 	unsigned int userCacheHits;
 	unsigned int channelHits;
-	unsigned int channelCacheHits; 			
+	unsigned int channelCacheHits;
 	unsigned int levelHits;
-	unsigned int levelCacheHits; 
+	unsigned int levelCacheHits;
 	unsigned int banHits;
-	unsigned int banCacheHits; 
+	unsigned int banCacheHits;
 	unsigned int dbErrors;
 	unsigned int joinCount;
 
@@ -238,7 +229,7 @@ public:
 	// Flood/Notice relay channel - Loaded via config.
 	string relayChan;
 	string debugChan;
- 
+
 	// Loaded via config.
 	// Interval at which we pick up updates from the Db.
 	int updateInterval;
@@ -278,27 +269,27 @@ public:
 	xServer::timerID update_timerID;
 
 	/* TimerID we recieve every XX seconds for expiration of bans/suspend. */
-	xServer::timerID expire_timerID; 
- 
+	xServer::timerID expire_timerID;
+
 	/* TimerID we recieve every XX hours for expiration of cached entries. */
-	xServer::timerID cache_timerID; 
+	xServer::timerID cache_timerID;
 
 	/* TimerID we recieve every XX hours for the notification of pending channels. */
-	xServer::timerID pending_timerID; 
+	xServer::timerID pending_timerID;
 
 	// Language definitions table (Loaded from Db).
 	typedef map < string, pair <int, string> > languageTableType;
-	languageTableType languageTable; 
+	languageTableType languageTable;
 
 	// Language translations table (Loaded from Db).
 	typedef map < pair <int, int>, string > translationTableType ;
 	translationTableType translationTable;
-	
+
 	void loadTranslationTable();
 
 	// Method to retrieve a translation string.
 	const string getResponse( sqlUser*, int , string = string() );
- 
+
 	// Check for valid hostmask.
 	virtual bool validUserMask(const string& userMask) const ;
 
@@ -306,9 +297,9 @@ public:
 	 * Count channel ops.
 	 */
 	static size_t countChanOps(const Channel*);
-	
+
 	// Deop everyone on this channel.
-	void deopAllOnChan(Channel*); 
+	void deopAllOnChan(Channel*);
 	void deopAllUnAuthedOnChan(Channel*);
 
 	/* sets a description (url) topic combo. */
@@ -325,7 +316,7 @@ public:
 
 	time_t currentTime() const ;
 
-	/* Queue to hold pending reops */ 
+	/* Queue to hold pending reops */
 	typedef map < string, time_t > reopQType;
 	reopQType reopQ;
 
@@ -339,12 +330,12 @@ public:
 	 *  'Pending' successful registration.
 	 */
 
-	void loadPendingChannelList(); 
+	void loadPendingChannelList();
 
 	/*
 	 *  Timer Functions.
 	 *  These support functions are called at periodic
-	 *  intervals to perform maintainence, etc. 
+	 *  intervals to perform maintainence, etc.
 	 */
 
 	/*
@@ -352,12 +343,12 @@ public:
 	 */
 	void expireSuspends();
 	void expireSilence();
-	void expireBans(); 
+	void expireBans();
 
 	/*
 	 *  Cache expiration functions.
 	 *  To expire idle user/level/ban records from the
-	 *  cache. 
+	 *  cache.
 	 *  N.B: We'll never expire out channel records because
 	 *  this information may be used to cancel 'unused'
 	 *  channels.
@@ -377,7 +368,7 @@ public:
 	 */
 
 	void cacheExpireLevels();
- 
+
 	/*
 	 * Process any pending reop requests by the bot.
 	 */
@@ -392,16 +383,30 @@ public:
 	/*
 	 *  Send a generic Error Message, may log/etc at a later date.
 	 */
-	void dbErrorMessage(iClient*); 
+	void dbErrorMessage(iClient*);
 
 	/*
 	 *  Misc uncategorisable functions.
 	 */
 
+	void preloadBanCache();
+	void preloadChannelCache();
+	void preloadLevelsCache();
+
+	void updateChannels();
+	void updateUsers();
+	void updateLevels();
+	void updateBans();
+
+	typedef map < string, int > statsMapType;
+	statsMapType statsMap;
+
+	inline void setStatistic(const string& name, unsigned int value)
+		{ statsMap.insert(statsMapType::value_type(name, value)); }
 } ;
 
 const string escapeSQLChars(const string& theString);
- 
+
 } // namespace gnuworld
 
 #endif // __CSERVICE_H

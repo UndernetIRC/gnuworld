@@ -8,7 +8,7 @@
  *
  * Caveats: None.
  *
- * $Id: UNSUSPENDCommand.cc,v 1.15 2001/08/10 20:11:16 gte Exp $
+ * $Id: UNSUSPENDCommand.cc,v 1.16 2001/08/30 19:30:20 gte Exp $
  */
 
 #include	<string>
@@ -20,7 +20,7 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char UNSUSPENDCommand_cc_rcsId[] = "$Id: UNSUSPENDCommand.cc,v 1.15 2001/08/10 20:11:16 gte Exp $" ;
+const char UNSUSPENDCommand_cc_rcsId[] = "$Id: UNSUSPENDCommand.cc,v 1.16 2001/08/30 19:30:20 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -121,7 +121,7 @@ if(!theChan)
 	}
 
 // Check level.
-int level = bot->getEffectiveAccessLevel(theUser, theChan, true);
+unsigned int level = bot->getEffectiveAccessLevel(theUser, theChan, true);
 if(level < level::unsuspend)
 	{
 	bot->Notice(theClient,

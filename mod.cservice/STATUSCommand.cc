@@ -10,7 +10,7 @@
 #include	"Network.h"
 #include	"cservice_config.h"
 
-const char STATUSCommand_cc_rcsId[] = "$Id: STATUSCommand.cc,v 1.32 2001/08/19 16:21:02 gte Exp $" ;
+const char STATUSCommand_cc_rcsId[] = "$Id: STATUSCommand.cc,v 1.33 2001/08/30 19:30:20 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -108,14 +108,6 @@ if (st[1] == "*")
 		bot->levelCacheHits,
 		levelEf);
 
-	bot->Notice(theClient,
-		bot->getResponse(theUser,
-			language::status_ban_rec,
-			string("[         Ban Record Stats] \002Cached Entries:\002 %i    \002DB Requests:\002 %i    \002Cache Hits:\002 %i    \002Efficiency:\002 %.2f%%")).c_str(),
-		bot->sqlBanCache.size(),
-		bot->banHits,
-		bot->banCacheHits,
-		banEf);
 
 	bot->Notice(theClient,"Last recieved Channel NOTIFY: %s",
 			bot->prettyDuration(bot->lastChannelRefresh).c_str());

@@ -1,5 +1,5 @@
-/* 
- * VOICECommand.cc 
+/*
+ * VOICECommand.cc
  *
  * 20/12/2000 - Perry Lorier <perry@coders.net>
  * Initial Version.
@@ -7,29 +7,29 @@
  * 28/12/2000 - Greg Sikorski <gte@atomicrevs.demon.co.uk>
  * Added multilingual support.
  *
- * 01/01/2001 - Greg Sikorski <gte@atomicrevs.demon.co.uk> 
+ * 01/01/2001 - Greg Sikorski <gte@atomicrevs.demon.co.uk>
  * Added duplicate checking to avoid people doing:
  * /msg e voice #coder-com Gte Gte Gte Gte Gte Gte Gte {etc}
  * And flooding the target with notices.
  *
  * 2001-03-21 - Perry Lorier <Isomer@coders.net>
  * Added "on chan" to the message
- * 
+ *
  * Voice's one or more users on a channel the user as access on.
  *
  *
  * Caveats: None
  *
- * $Id: VOICECommand.cc,v 1.18 2001/03/21 10:22:04 isomer Exp $
+ * $Id: VOICECommand.cc,v 1.19 2001/08/30 19:30:20 gte Exp $
  */
 
 #include	<string>
 #include	<map>
 #include	<vector>
- 
+
 #include	"StringTokenizer.h"
-#include	"ELog.h" 
-#include	"cservice.h" 
+#include	"ELog.h"
+#include	"cservice.h"
 #include	"Network.h"
 #include	"levels.h"
 #include	"responses.h"
@@ -37,24 +37,24 @@
 using std::map ;
 using std::vector ;
 
-const char VOICECommand_cc_rcsId[] = "$Id: VOICECommand.cc,v 1.18 2001/03/21 10:22:04 isomer Exp $" ;
+const char VOICECommand_cc_rcsId[] = "$Id: VOICECommand.cc,v 1.19 2001/08/30 19:30:20 gte Exp $" ;
 
 namespace gnuworld
 {
- 
+
 using std::map ;
 using std::vector ;
 
 bool VOICECommand::Exec( iClient* theClient, const string& Message )
-{ 
+{
 StringTokenizer st( Message ) ;
- 
+
 if( st.size() < 2 )
 	{
 	Usage(theClient);
 	return true;
 	}
- 
+
 /*
  *  Fetch the sqlUser record attached to this client. If there isn't one,
  *  they aren't logged in - tell them they should be.
@@ -65,7 +65,7 @@ if (!theUser)
 	return false;
 	}
 
-/* 
+/*
  *  Check the channel is actually registered.
  */
 
@@ -77,13 +77,13 @@ if (!theChan)
 			language::chan_not_reg).c_str(),
 		st[1].c_str());
 	return false;
-	} 
+	}
 
 /* Check the bot is in the channel. */
- 
+
 if (!theChan->getInChan())
 	{
-	bot->Notice(theClient, 
+	bot->Notice(theClient,
 		bot->getResponse(theUser,
 			language::i_am_not_on_chan,
 			string("I'm not in that channel!")));
@@ -100,17 +100,17 @@ if (level < level::voice)
 	bot->Notice(theClient,
 		bot->getResponse(theUser, language::insuf_access).c_str());
 	return false;
-	} 
+	}
 
-Channel* tmpChan = Network->findChannel(theChan->getName()); 
-if (!tmpChan) 
+Channel* tmpChan = Network->findChannel(theChan->getName());
+if (!tmpChan)
 	{
 	bot->Notice(theClient,
-		bot->getResponse(theUser, language::chan_is_empty).c_str(), 
+		bot->getResponse(theUser, language::chan_is_empty).c_str(),
 		theChan->getName().c_str());
 	return false;
 	}
- 
+
 vector< iClient* > voiceList; // List of clients to Voice.
 
 /*
@@ -123,19 +123,19 @@ unsigned short counter = 2; // Offset of first nick in list.
 string source;
 iClient* target = 0;
 
-typedef map < iClient*, int > duplicateMapType; 
-duplicateMapType duplicateMap; 
+typedef map < iClient*, int > duplicateMapType;
+duplicateMapType duplicateMap;
 
 if( st.size() < 3 )
 	{
 	// No nicks provided, assume we voice ourself. :)
 	voiceList.push_back(theClient);
 	source = Message;
-	delim = ' '; 
+	delim = ' ';
 	}
 else
 	{
-	string::size_type pos = st[2].find_first_of( ',' ) ; 
+	string::size_type pos = st[2].find_first_of( ',' ) ;
 
 	// Found a comma?
 	if( string::npos != pos )
@@ -146,16 +146,16 @@ else
 		counter = 0;
 		}
 	else
-		{ 
+		{
 		source = Message;
 		delim = ' ';
-		} 
+		}
 	}
- 
-StringTokenizer st2( source, delim ); 
+
+StringTokenizer st2( source, delim );
 
 while (counter < st2.size())
-	{ 
+	{
 	target = Network->findNick(st2[counter]);
 
 	if(!target)
@@ -165,8 +165,8 @@ while (counter < st2.size())
 				language::dont_see_them).c_str(),
 			st2[counter].c_str());
 		counter++;
-		continue ; 
-		} 
+		continue ;
+		}
 
 	ChannelUser* tmpChanUser = tmpChan->findUser(target) ;
 
@@ -175,9 +175,9 @@ while (counter < st2.size())
 		{
 		bot->Notice(theClient,
 			bot->getResponse(theUser,
-				language::cant_find_on_chan).c_str(), 
+				language::cant_find_on_chan).c_str(),
 			target->getNickName().c_str(),
-			theChan->getName().c_str()); 
+			theChan->getName().c_str());
 		counter++;
 		continue ;
 		}
@@ -185,23 +185,23 @@ while (counter < st2.size())
 	// User is already voiced?
 	if(tmpChanUser->getMode(ChannelUser::MODE_V))
 		{
-		bot->Notice(theClient, bot->getResponse(theUser, language::already_voiced).c_str(), 
+		bot->Notice(theClient, bot->getResponse(theUser, language::already_voiced).c_str(),
 			target->getNickName().c_str(), theChan->getName().c_str());
 		counter++;
 		continue ;
 		}
- 
+
 	// Check for duplicates.
 	duplicateMapType::iterator ptr = duplicateMap.find(target);
 	if(ptr == duplicateMap.end())
-		{ 
+		{
 		// Not a duplicate.
 		voiceList.push_back(target);
-		duplicateMap.insert(duplicateMapType::value_type(target, 0)); 
+		duplicateMap.insert(duplicateMapType::value_type(target, 0));
 
 		// Don't send a notice to the person who issued the command.
 		if(target != theClient)
-			{ 
+			{
 			sqlUser* tmpTargetUser = bot->isAuthed(target, false);
 			if (tmpTargetUser)
 				{
@@ -212,7 +212,7 @@ while (counter < st2.size())
 					theUser->getUserName().c_str(),
 					theChan->getName().c_str());
 				}
-			else 
+			else
 				{
 				bot->Notice(target,
 					bot->getResponse(theUser,
@@ -220,16 +220,16 @@ while (counter < st2.size())
 					theClient->getNickName().c_str(),
 					theUser->getUserName().c_str(),
 					theChan->getName().c_str());
-				} 
+				}
 			} // Don't send to person who issued.
 	   	} // Not a duplicate.
 
 	counter++;
 	}
 
-// Voice them. 
+// Voice them.
 bot->Voice(tmpChan, voiceList);
 return true ;
-} 
+}
 
 } // namespace gnuworld

@@ -1,15 +1,12 @@
 /*
  *  cservice.cc
- *  Overall control client, general dumping ground for 'cservice'
- *  related methods.
+ *  Overall control client.
  */
 
-#warning --
-#warning --
-#warning -- If you have not yet ran "update.delete.sql" in doc/ on your database,
-#warning -- do so now.
-#warning --
-#warning --
+#warning *** This release changes the behaviour of Database Updates from backend
+#warning *** notifications to periodic updates.
+#warning *** Ensure you set your update_interval to a sane value (Eg: 360)
+#warning *** before starting the service.
 
 #include	<new>
 #include	<vector>
@@ -82,45 +79,29 @@ void cservice::ImplementServer( xServer* theServer )
 {
 for( commandMapType::iterator ptr = commandMap.begin() ;
 	ptr != commandMap.end() ; ++ptr )
-        {
-        ptr->second->setServer( theServer ) ;
-        }
-
-/* Attempt to register our interest in recieving NOTIFY events. */
-if (SQLDb->ExecCommandOk("LISTEN channels_u; LISTEN users_u; LISTEN levels_u;"))
 	{
-	elog	<< "cmaster::ImplementServer> Successfully registered "
-		<< "LISTEN event for Db updates."
-		<< endl;
-
-	// Start the Db checker timer rolling.
-	time_t theTime = time(NULL) + connectCheckFreq;
-	dBconnection_timerID = theServer->RegisterTimer(theTime, this, NULL);
-
-	// Start the Db update/Reop timer rolling.
-	theTime = time(NULL) + updateInterval;
-	update_timerID = theServer->RegisterTimer(theTime, this, NULL);
-
-	// Start the ban suspend/expire timer rolling.
-	theTime = time(NULL) + expireInterval;
-	expire_timerID = theServer->RegisterTimer(theTime, this, NULL);
-
-	// Start the cache expire timer rolling.
-	theTime = time(NULL) + cacheInterval;
-	cache_timerID = theServer->RegisterTimer(theTime, this, NULL);
-
-	// Start the pending chan timer rolling.
-	theTime = time(NULL) + pendingChanPeriod;
-	pending_timerID = theServer->RegisterTimer(theTime, this, NULL);
-
+	ptr->second->setServer( theServer ) ;
 	}
-else
-	{
-	elog	<< "cmaster::ImplementServer> PostgreSQL error while "
-		<< "attempting to register LISTEN event: "
-		<< SQLDb->ErrorMessage()
-		<< endl;
-	}
+
+// Start the Db checker timer rolling.
+time_t theTime = time(NULL) + connectCheckFreq;
+dBconnection_timerID = theServer->RegisterTimer(theTime, this, NULL);
+
+// Start the Db update/Reop timer rolling.
+theTime = time(NULL) + updateInterval;
+update_timerID = theServer->RegisterTimer(theTime, this, NULL);
+
+// Start the ban suspend/expire timer rolling.
+theTime = time(NULL) + expireInterval;
+expire_timerID = theServer->RegisterTimer(theTime, this, NULL);
+
+// Start the cache expire timer rolling.
+theTime = time(NULL) + cacheInterval;
+cache_timerID = theServer->RegisterTimer(theTime, this, NULL);
+
+// Start the pending chan timer rolling.
+theTime = time(NULL) + pendingChanPeriod;
+pending_timerID = theServer->RegisterTimer(theTime, this, NULL);
 
 if (SQLDb->Exec("SELECT now()::abstime::int4;") == PGRES_TUPLES_OK)
 	{
@@ -137,7 +118,7 @@ if (SQLDb->Exec("SELECT now()::abstime::int4;") == PGRES_TUPLES_OK)
 	 */
 
 	dbTimeOffset = serverTime - ::time(NULL);
-	elog	<< "cservice::ImplementServer> Current DB server time: "
+	elog	<< "*** [CMaster::ImplementServer]:  Current DB server time: "
 		<< currentTime()
 		<< endl;
 	}
@@ -148,11 +129,12 @@ else
 	::exit(0);
 	}
 
-// Register our interest in recieving some Network events from gnuworld.
+/* Register our interest in recieving some Network events from gnuworld. */
 
 theServer->RegisterEvent( EVT_KILL, this );
 theServer->RegisterEvent( EVT_QUIT, this );
 theServer->RegisterEvent( EVT_NICK, this );
+theServer->RegisterEvent( EVT_BURST_ACK, this );
 
 xClient::ImplementServer( theServer ) ;
 }
@@ -225,31 +207,30 @@ confSqlUser = cserviceConfig->Require( "sql_user" )->second;
 
 string Query = "host=" + confSqlHost + " dbname=" + confSqlDb + " port=" + confSqlPort + " user=" + confSqlUser;
 
-elog	<< "cmaster::cmaster> Attempting to connect to "
-	<< confSqlHost
-	<< "; Database: "
-	<< confSqlDb
-	<< endl;
+elog	<< "*** [CMaster]: Attempting to make PostgreSQL connection to: "
+		<< confSqlHost
+		<< "; Database Name: "
+		<< confSqlDb
+		<< endl;
 
 SQLDb = new (std::nothrow) cmDatabase( Query.c_str() ) ;
 assert( SQLDb != 0 ) ;
 
-//-- Make sure we connected to the SQL database; if we didn't we exit entirely.
 if (SQLDb->ConnectionBad ())
 	{
-	elog	<< "cmaster::cmaster> Unable to connect to SQL server."
-		<< endl
-		<< "cmaster::cmaster> PostgreSQL error message: "
-		<< SQLDb->ErrorMessage()
-		<< endl ;
+	elog	<< "*** [CMaster]: Unable to connect to SQL server."
+			<< endl
+			<< "*** [CMaster]: PostgreSQL error message: "
+			<< SQLDb->ErrorMessage()
+			<< endl ;
 
 	::exit( 0 ) ;
 	}
 else
 	{
-	elog	<< "cmaster::cmaster> Connection established to SQL server. "
-		<< "Backend PID: " << SQLDb->getPID()
-		<< endl ;
+	elog	<< "*** [CMaster]: Connection established to SQL server. "
+			<< "Backend PID: " << SQLDb->getPID()
+			<< endl ;
 	}
 
 // The program will exit if these variables are not defined in the
@@ -280,8 +261,17 @@ dbErrors = 0;
 joinCount = 0;
 connectRetries = 0;
 
-// Load our translation tables.
+/* Load our translation tables. */
 loadTranslationTable();
+
+/* Preload the Channel Cache */
+preloadChannelCache();
+
+/* Preload the Ban Cache */
+preloadBanCache();
+
+/* Preload the Level cache */
+preloadLevelsCache();
 
 }
 
@@ -300,78 +290,41 @@ commandMap.clear() ;
 
 int cservice::BurstChannels()
 {
-/*
- *   Need to join every channel with AUTOJOIN set. (But not * ;))
- *   Various other things must be done, such as setting the topic if AutoTopic
- *   is on, gaining ops if AlwaysOp is on, and so forth.
- */
-strstream theQuery;
-theQuery	<< "SELECT " << sql::channel_fields
-		<< " FROM channels WHERE lower(name) <> '*' AND "
-		<< "registered_ts <> 0"
-		<< ends;
+	/*
+	 *   Need to join every channel with AUTOJOIN set. (But not * ;))
+ 	 *   Various other things must be done, such as setting the topic if AutoTopic
+ 	 *   is on.
+ 	 */
 
-#ifdef LOG_SQL
-	elog	<< "cmaster::BurstChannels> "
-		<< theQuery.str()
-		<< endl;
-#endif
-
-ExecStatusType status = SQLDb->Exec(theQuery.str()) ;
-delete[] theQuery.str() ;
-
-if( PGRES_TUPLES_OK == status )
+	sqlChannelHashType::iterator ptr = sqlChannelCache.begin();
+	while (ptr != sqlChannelCache.end())
 	{
-	for (int i = 0 ; i < SQLDb->Tuples(); i++)
+	sqlChannel* theChan = (ptr)->second;
+
+	if ( (theChan->getFlag(sqlChannel::F_AUTOJOIN)) && (theChan->getName() != "*") )
 		{
- 		/* Add this information to the channel cache. */
+		MyUplink->JoinChannel( this,
+			theChan->getName(),
+			theChan->getChannelMode(),
+			theChan->getChannelTS(),
+			true );
 
-		sqlChannel* newChan = new (std::nothrow)
-			sqlChannel(SQLDb);
-		assert( newChan != 0 ) ;
+		MyUplink->RegisterChannelEvent( theChan->getName(), this ) ;
 
-		newChan->setAllMembers(i);
-		newChan->setLastUsed(currentTime());
+		theChan->setInChan(true);
+		joinCount++;
+		}
+	++ptr;
+	}
 
-		sqlChannelCache.insert(sqlChannelHashType::value_type(newChan->getName(), newChan));
-		sqlChannelIDCache.insert(sqlChannelIDHashType::value_type(newChan->getID(), newChan));
+	logDebugMessage("Channel join complete.");
 
-		/*
-		 *  Check the auto-join flag is set, if so - join. :)
-		 */
-
-		if (newChan->getFlag(sqlChannel::F_AUTOJOIN))
-			{
-			MyUplink->JoinChannel( this,
-				newChan->getName(),
-				newChan->getChannelMode(),
-				newChan->getChannelTS(),
-				true );
-			MyUplink->RegisterChannelEvent( newChan->getName(),
-				this ) ;
-			newChan->setInChan(true);
-			joinCount++;
-
-			/* If neccessary, set the auto topic. */
-			if (newChan->getFlag(sqlChannel::F_AUTOTOPIC))
-			{
-				doAutoTopic(newChan);
-			}
-
-			}
-
-
-		} // for()
-	} // if()
-
-	loadPendingChannelList();
-
-return xClient::BurstChannels();
+	return xClient::BurstChannels();
 }
 
 int cservice::OnConnect()
 {
-return 0;
+	return 0;
 }
 
 unsigned short cservice::getFloodPoints(iClient* theClient)
@@ -776,9 +729,9 @@ else if(Command == "GENDER")
 else if(Command == "VERSION")
 	{
 	xClient::DoCTCP(theClient, CTCP,
-		"Undernet P10 Channel Services Version 2 ["
+		"Undernet P10 Channel Services II ["
 		__DATE__ " " __TIME__
-		"] Release 1.0pl8-support");
+		"] Release 1.1");
 	}
 else if(Command == "PROBLEM?")
 	{
@@ -941,87 +894,7 @@ return 0;
 }
 
 /**
- *  Returns a vector of sqlBan's for a given channel.
- *  If not found in the cache, load from the database.
- */
-vector<sqlBan*>* cservice::getBanRecords(sqlChannel* theChan)
-{
-
-sqlBanHashType::iterator ptr = sqlBanCache.find(theChan->getID());
-if(ptr != sqlBanCache.end())
-	{
-	// Found something!
-	#ifdef LOG_CACHE_HITS
-		elog	<< "cmaster::getBanRecords> Cache hit for "
-			<< theChan->getID()
-			<< endl;
-	#endif
-
-	banCacheHits++;
-	return ptr->second ;
-	}
-
-/*
- *  We didn't find anything in the cache, fetch the data from
- *  the backend and create a new vector<sqlban*> object.
- *  If we find no bans.. return a new blank container.
- */
-
-vector<sqlBan*>* banList = new (std::nothrow) vector<sqlBan*>;
-assert( banList != 0 ) ;
-
-/*
- * Execute some SQL to get all bans relating to this channel.
- */
-
-strstream theQuery;
-theQuery	<< "SELECT " << sql::ban_fields
-		<< " FROM bans WHERE channel_id = "
-		<< theChan->getID()
-		<< ends;
-
-#ifdef LOG_SQL
-	elog		<< "cmaster::getBanRecords> "
-			<< theQuery.str()
-			<< endl;
-#endif
-
-ExecStatusType status = SQLDb->Exec(theQuery.str()) ;
-delete[] theQuery.str() ;
-
-if( PGRES_TUPLES_OK == status )
-	{
-	for (int i = 0 ; i < SQLDb->Tuples(); i++)
-		{
-		sqlBan* newBan = new (std::nothrow) sqlBan(SQLDb);
-		assert( newBan != 0 ) ;
-
-		newBan->setAllMembers(i);
-		banList->push_back(newBan);
-		elog	<< "cservice::getBanRecords> Loaded ban for : "
-			<< newBan->getBanMask()
-			<< endl;
-		}
-	}
-
- /* Insert into the cache - even if its empty */
-
-sqlBanCache.insert(sqlBanHashType::value_type(theChan->getID(), banList));
-
-#ifdef LOG_CACHE_HITS
-	elog	<< "cmaster::getBanRecords> There are "
-		<< sqlBanCache.size()
-		<< " elements in the cache."
-		<< endl;
-#endif
-
-banHits++;
-
-return banList;
-}
-
-/**
- *  Locates a cservice user record by 'id', the channel name.
+ *  Locates a channel record by 'id', the channel name.
  */
 sqlChannel* cservice::getChannelRecord(const string& id)
 {
@@ -1033,13 +906,6 @@ sqlChannel* cservice::getChannelRecord(const string& id)
 sqlChannelHashType::iterator ptr = sqlChannelCache.find(id);
 if(ptr != sqlChannelCache.end())
 	{
-	// Found something!
-	#ifdef LOG_CACHE_HITS
-		elog	<< "cmaster::getChannelRecord> Cache hit for "
-			<< id
-			<< endl;
-	#endif
-
 	channelCacheHits++;
 	ptr->second->setLastUsed(currentTime());
 
@@ -1048,32 +914,9 @@ if(ptr != sqlChannelCache.end())
 	}
 
 /*
- *  We didn't find anything in the cache, fetch the data from
- *  the backend and create a new sqlUser object.
+ *  We didn't find anything in the cache.
  */
 
-sqlChannel* theChan = new (std::nothrow) sqlChannel(SQLDb);
-assert( theChan != 0 ) ;
-
-if (theChan->loadData(id))
-	{
- 	sqlChannelCache.insert(sqlChannelHashType::value_type(id, theChan));
-
-	#ifdef LOG_CACHE_HITS
-		elog	<< "cmaster::getChannelRecord> There are "
-			<< sqlChannelCache.size()
-			<< " elements in the cache."
-			<< endl;
-	#endif
-
-	channelHits++;
-	theChan->setLastUsed(currentTime());
-
-	// Return the channel to the caller
-	return theChan;
-	}
-
-delete theChan;
 return 0;
 }
 
@@ -1090,41 +933,17 @@ sqlChannel* cservice::getChannelRecord(int id)
 sqlChannelIDHashType::iterator ptr = sqlChannelIDCache.find(id);
 if(ptr != sqlChannelIDCache.end())
 	{
-	// Found something!
-	#ifdef LOG_CACHE_HITS
-		elog	<< "cmaster::getChannelRecord(ID)> Cache hit for "
-			<< id
-			<< endl;
-	#endif
+	channelCacheHits++;
+	ptr->second->setLastUsed(currentTime());
 
 	// Return the channel to the caller
 	return ptr->second ;
 	}
 
 /*
- *  We didn't find anything in the cache, fetch the data from
- *  the backend and create a new sqlUser object.
+ *  We didn't find anything in the cache.
  */
 
-sqlChannel* theChan = new (std::nothrow) sqlChannel(SQLDb);
-assert( theChan != 0 ) ;
-
-if (theChan->loadData(id))
-	{
- 	sqlChannelIDCache.insert(sqlChannelIDHashType::value_type(id, theChan));
-
-	#ifdef LOG_CACHE_HITS
-		elog	<< "cmaster::getChannelRecord(ID)> There are "
-			<< sqlChannelIDCache.size()
-			<< " elements in the ID cache."
-			<< endl;
-	#endif
-
-	// Return the channel to the caller
-	return theChan;
-	}
-
-delete theChan;
 return 0;
 }
 
@@ -1152,30 +971,9 @@ if(ptr != sqlLevelCache.end())
 	}
 
 /*
- *  We didn't find anything in the cache, fetch the data from
- *  the backend and create a new sqlUser object.
+ *  We didn't find anything in the cache.
  */
 
-sqlLevel* theLevel = new (std::nothrow) sqlLevel(SQLDb);
-assert( theLevel != 0 ) ;
-
-if (theLevel->loadData(theUser->getID(), theChan->getID()))
-	{
- 	sqlLevelCache.insert(sqlLevelHashType::value_type(thePair, theLevel));
-
-	#ifdef LOG_SQL
-		elog	<< "cmaster::getLevelRecord> There are "
-			<< sqlLevelCache.size()
-			<< " elements in the cache."
-			<< endl;
-	#endif
-
-	levelHits++;
-	theLevel->setLastUsed(currentTime());
-	return theLevel;
-	}
-
-delete theLevel;
 return 0;
 }
 
@@ -1372,9 +1170,9 @@ if (PGRES_TUPLES_OK == status)
 			make_pair(atoi(SQLDb->GetValue(i, 0)), SQLDb->GetValue(i, 2))));
 
 #ifdef LOG_SQL
-	elog	<< "cmaster::loadTranslationTable> Loaded "
+	elog	<< "*** [CMaster::loadTranslationTable]: Loaded "
 			<< languageTable.size()
-			<< " language entries."
+			<< " languages."
 			<< endl;
 #endif
 
@@ -1401,9 +1199,9 @@ if( PGRES_TUPLES_OK == status )
 	}
 
 #ifdef LOG_SQL
-	elog	<< "cmaster::loadTranslationTable> Loaded "
+	elog	<< "*** [CMaster::loadTranslationTable]: Loaded "
 		<< translationTable.size()
-		<< " entries."
+		<< " translations."
 		<< endl;
 #endif
 
@@ -1650,18 +1448,15 @@ for (expireVectorType::const_iterator resultPtr = expireVector.begin();
 			<< endl;
 	#endif
 
-	/* Then hunt it out in the cache.. */
-	vector<sqlBan*>* chanBans = getBanRecords(theChan);
-
 	/* Loop over all bans cached in this channel, match ID.. */
-	vector< sqlBan* >::iterator ptr = chanBans->begin();
+	vector< sqlBan* >::iterator ptr = theChan->banList.begin();
 
-	while (ptr != chanBans->end())
+	while (ptr != theChan->banList.end())
 		{
 		sqlBan* theBan = *ptr;
 		if ( theBan->getID() == resultPtr->second )
 			{
-			ptr = chanBans->erase(ptr);
+			ptr = theChan->banList.erase(ptr);
 
 			Channel* tmpChan = Network->findChannel(
 				theChan->getName());
@@ -1866,223 +1661,244 @@ if (ptr->second <= currentTime())
 }
 
 /**
- * This member function processes and pending database
- * update notifications, reloading any records as
- * neccessary.
- * TODO: Notification update for Ban records.
- * TODO: Add logging of username/records updated.
+ * Check the database to see if anything has changed.
+ * TODO: Lots.
  */
 void cservice::processDBUpdates()
 {
-PGnotify* notify = SQLDb->Notifies();
+	logDebugMessage("[DB-UPDATE]: Looking for changes:");
+	updateChannels();
+	updateUsers();
+	updateLevels();
+	updateBans();
+	logDebugMessage("[DB-UPDATE]: Complete.");
+}
 
-/*
- *  Check to see if the PGSQL connection is broken..
- */
-
-/* 'We get signal..' */
-if (!notify)
-	{
-	return;
-	}
-
-#ifdef LOG_DEBUG
-	elog	<< "cmaster::OnTimer> Recieved a notification event for '"
-		<< notify->relname
-		<< "' from Backend PID '"
-		<< notify->be_pid
-		<< "'"
-		<< endl;
-#endif
-
-// Check we aren't getting our own updates.
-if (notify->be_pid == SQLDb->getPID())
-	{
-	#ifdef LOG_DEBUG
-		elog	<< "cmaster::OnTimer> Notification from our Backend "
-			<< "PID, ignoring update."
-			<< endl;
-	#endif
-
-	// TODO: Be absolutely certain that we should be using free()
-	// here.
-	free(notify);
-	return;
-	}
-
-logDebugMessage("Recieved a notification event for '%s' from backend PID %i.",
-	notify->relname, notify->be_pid);
-
-assert( notify->relname != 0 ) ;
-string relname( notify->relname ) ;
-
-// Free memory allocated by postgres API object.
-// TODO: Be absolutely certain that we should be using free()
-// here.
-free(notify);
-
-// 1 = channel, 2 = user, 3 = level, 4 = ban.
-unsigned short updateType = 0;
+void cservice::updateChannels()
+{
 strstream theQuery ;
 
-if (relname == "channels_u")
-	{
-	updateType = 1;
-
-	// Fetch updated channel information.
-	theQuery	<< "SELECT "
+theQuery	<< "SELECT "
 			<< sql::channel_fields
 			<< ",now()::abstime::int4 as db_unixtime FROM "
 			<< "channels WHERE last_updated >= "
-			<< lastChannelRefresh;
-	}
-
-if( relname == "users_u" )
-	{
-	updateType = 2;
-
-	// Fetch updated user information.
-	theQuery	<< "SELECT "
-			<< sql::user_fields
-			<< ",now()::abstime::int4 as db_unixtime FROM "
-			<< "users WHERE "
-			<< "users.last_updated >= "
-			<< lastUserRefresh;
-	}
-
-if ( relname == "levels_u")
-	{
-	updateType = 3;
-
-	// Fetch updated level information.
-	theQuery	<< "SELECT "
-			<< sql::level_fields
-			<< ",now()::abstime::int4 as db_unixtime FROM "
-			<< "levels WHERE last_updated >= "
-			<< lastLevelRefresh;
-	}
-
-theQuery << ends;
+			<< lastChannelRefresh
+			<< " AND registered_ts <> 0"
+			<< ends;
 
 #ifdef LOG_SQL
-	elog	<< "cservice::OnTimer> sqlQuery: "
+elog	<< "*** [CMaster::processDBUpdates]:sqlQuery: "
 		<< theQuery.str()
 		<< endl;
 #endif
 
-// Execute query, parse results.
 ExecStatusType status = SQLDb->Exec(theQuery.str());
 delete[] theQuery.str() ;
 
 if (status != PGRES_TUPLES_OK)
 	{
-	elog	<< "cmaster::OnTimer> SQL error: "
-		<< SQLDb->ErrorMessage()
-		<< endl;
-
-	// TODO: Log to debugchan here.
+	elog	<< "*** [CMaster::updateChannels]: SQL error: "
+			<< SQLDb->ErrorMessage()
+			<< endl;
 	return;
 	}
 
-#ifdef LOG_DEBUG
-	elog	<< "cmaster::OnTimer> Found "
-		<< SQLDb->Tuples()
-		<< " updated records."
-		<< endl;
-#endif
-
-logDebugMessage("Found %i updated records.",
-	SQLDb->Tuples());
-
-/*
- *  Now, update the cache with information in this results set.
- */
-
 if (SQLDb->Tuples() <= 0)
 	{
-	// We could get no results back if the last_update
-	// field wasn't set properly.
+	/* Nothing to see here.. */
 	return;
 	}
 
 /* Update our time offset incase things drift.. */
 dbTimeOffset = atoi(SQLDb->GetValue(0,"db_unixtime")) - ::time(NULL);
+unsigned int updates = 0;
+unsigned int newchans = 0;
 
-switch(updateType)
+for (int i = 0 ; i < SQLDb->Tuples(); i++)
 	{
-	case 1: // Channel update.
+	sqlChannelHashType::iterator ptr =
+		sqlChannelCache.find(SQLDb->GetValue(i, 1));
+
+	if(ptr != sqlChannelCache.end())
 		{
-		for (int i = 0 ; i < SQLDb->Tuples(); i++)
+		/* Found something! Update it. */
+		(ptr->second)->setAllMembers(i);
+		updates++;
+		}
+	else
+		{
+		/*
+		 * Not in the cache.. must be a new channel.
+		 * Create new channel record, insert in cache.
+		 */
+
+		sqlChannel* newChan = new (std::nothrow) sqlChannel(SQLDb);
+		assert( newChan != 0 ) ;
+
+		newChan->setAllMembers(i);
+		sqlChannelCache.insert(sqlChannelHashType::value_type(newChan->getName(), newChan));
+		sqlChannelIDCache.insert(sqlChannelIDHashType::value_type(newChan->getID(), newChan));
+		logDebugMessage("[DB-UPDATE]: Found new channel: %s", newChan->getName().c_str());
+		newchans++;
+		}
+
+	}
+
+logDebugMessage("[DB-UPDATE]: Refreshed %i channel records, loaded %i new channel(s).",
+	updates, newchans);
+
+/* Set the "Last refreshed from channels table" timestamp. */
+lastChannelRefresh = atoi(SQLDb->GetValue(0,"db_unixtime"));
+}
+
+/*
+ * Check the levels table for recent updates.
+ */
+
+void cservice::updateLevels()
+{
+strstream theQuery ;
+
+theQuery	<< "SELECT "
+			<< sql::level_fields
+			<< ",now()::abstime::int4 as db_unixtime FROM "
+			<< "levels WHERE last_updated >= "
+			<< lastLevelRefresh
+			<< ends;
+
+#ifdef LOG_SQL
+elog	<< "*** [CMaster::updateLevels]: sqlQuery: "
+		<< theQuery.str()
+		<< endl;
+#endif
+
+ExecStatusType status = SQLDb->Exec(theQuery.str());
+delete[] theQuery.str() ;
+
+if (status != PGRES_TUPLES_OK)
+	{
+	elog	<< "*** [CMaster::updateLevels]: SQL error: "
+			<< SQLDb->ErrorMessage()
+			<< endl;
+	return;
+	}
+
+if (SQLDb->Tuples() <= 0)
+	{
+	/* Nothing to see here.. */
+	return;
+	}
+
+/* Update our time offset incase things drift.. */
+dbTimeOffset = atoi(SQLDb->GetValue(0,"db_unixtime")) - ::time(NULL);
+unsigned int updates = 0;
+unsigned int newlevs = 0;
+
+for (int i = 0 ; i < SQLDb->Tuples(); i++)
+	{
+	unsigned int channel_id = atoi(SQLDb->GetValue(i, 0));
+	unsigned int user_id = atoi(SQLDb->GetValue(i, 1));
+	sqlChannel* theChan = getChannelRecord(channel_id);
+
+	/*
+	 * If we don't have the channel cached, its not registered so
+	 * we aren't interested in this level record.
+	 */
+
+	if (!theChan) continue;
+
+	pair<int, int> thePair( user_id, channel_id );
+
+	sqlLevelHashType::iterator ptr = sqlLevelCache.find(thePair);
+
+	if(ptr != sqlLevelCache.end())
+		{
+		/* Found something! Update it. */
+		(ptr->second)->setAllMembers(i);
+		updates++;
+		} else
+		{
+		/*
+		 * Must be a new level record, add it.
+		 */
+
+		sqlLevel* newLevel = new (std::nothrow) sqlLevel(SQLDb);
+		newLevel->setAllMembers(i);
+		sqlLevelCache.insert(sqlLevelHashType::value_type(thePair, newLevel));
+		newlevs++;
+		}
+	}
+
+logDebugMessage("[DB-UPDATE]: Refreshed %i level record(s), loaded %i new level record(s).",
+	updates, newlevs);
+
+/* Set the "Last refreshed from levels table" timestamp. */
+lastLevelRefresh = atoi(SQLDb->GetValue(0,"db_unixtime"));
+}
+
+/*
+ * Check the users table to see if there have been any updates since we last looked.
+ */
+void cservice::updateUsers()
+{
+	strstream theQuery ;
+
+	theQuery	<< "SELECT "
+				<< sql::user_fields
+				<< ",now()::abstime::int4 as db_unixtime FROM "
+				<< "users WHERE last_updated >= "
+				<< lastUserRefresh
+				<< ends;
+
+	#ifdef LOG_SQL
+	elog	<< "*** [CMaster::updateUsers]: sqlQuery: "
+			<< theQuery.str()
+			<< endl;
+	#endif
+
+	ExecStatusType status = SQLDb->Exec(theQuery.str());
+	delete[] theQuery.str() ;
+
+	if (status != PGRES_TUPLES_OK)
+		{
+		elog	<< "*** [CMaster::updateUsers]: SQL error: "
+				<< SQLDb->ErrorMessage()
+				<< endl;
+		return;
+		}
+
+	if (SQLDb->Tuples() <= 0)
+		{
+		/* Nothing to see here.. */
+		return;
+		}
+
+	/* Update our time offset incase things drift.. */
+	dbTimeOffset = atoi(SQLDb->GetValue(0,"db_unixtime")) - ::time(NULL);
+	unsigned int updates = 0;
+
+	for (int i = 0 ; i < SQLDb->Tuples(); i++)
+		{
+		sqlUserHashType::iterator ptr = sqlUserCache.find(SQLDb->GetValue(i, 1));
+
+		if(ptr != sqlUserCache.end())
 			{
-			sqlChannelHashType::iterator ptr =
-				sqlChannelCache.find(SQLDb->GetValue(i, 1));
-			if(ptr != sqlChannelCache.end())
-				{
-				/* Found something! */
-				(ptr->second)->setAllMembers(i);
-				}
-			else
-				{
-				/* Not in the cache.. must be a new channel. */
-				/* Create new channel record, insert in cache. */
-				sqlChannel* newChan =
-					new (std::nothrow) sqlChannel(SQLDb);
-				assert( newChan != 0 ) ;
-
-				newChan->setAllMembers(i);
-			 	sqlChannelCache.insert(sqlChannelHashType::value_type(newChan->getName(), newChan));
-
-				/* Join the newly registered channel. */
-				//Join(newChan->getName(), newChan->getChannelMode(), 0, true);
-				}
-
+			/* Found something! Update it */
+			(ptr->second)->setAllMembers(i);
+			updates++;
 			}
+		}
 
-		// Set the "Last refreshed from channels table" timestamp.
-		lastChannelRefresh = atoi(SQLDb->GetValue(0,"db_unixtime"));
-		break;
-		} // case 1
+	logDebugMessage("[DB-UPDATE]: Refreshed %i user record(s).",
+		updates);
 
-	case 2: // User updates.
-		{
-		for (int i = 0 ; i < SQLDb->Tuples(); i++)
-			{
-			sqlUserHashType::iterator ptr =
-				sqlUserCache.find(SQLDb->GetValue(i, 1));
+	/* Set the "Last refreshed from Users table" timestamp. */
+	lastUserRefresh = atoi(SQLDb->GetValue(0,"db_unixtime"));
+}
 
-			if(ptr != sqlUserCache.end())
-				{
-				// Found something..
-				(ptr->second)->setAllMembers(i);
-				}
-			} // for()
-
-		// Set the "Last refreshed from channels table" timestamp.
-		lastUserRefresh = atoi(SQLDb->GetValue(0,"db_unixtime"));
-		break;
-		} // case 2
-
-	case 3: // Level updates.
-		{
-		for (int i = 0 ; i < SQLDb->Tuples(); i++)
-			{
-			sqlLevelHashType::iterator ptr =
-				sqlLevelCache.find(make_pair(atoi(SQLDb->GetValue(i, 1)), atoi(SQLDb->GetValue(i, 0))));
-
-			if(ptr != sqlLevelCache.end())
-				{
-				// Found something..
-				(ptr->second)->setAllMembers(i);
-				}
-			}
-
-		// Set the "Last refreshed from channels table" timestamp.
-		lastLevelRefresh = atoi(SQLDb->GetValue(0,"db_unixtime"));
-		break;
-		} // case 3
-
-	} // switch()
-
+void cservice::updateBans()
+{
+/* Todo */
 }
 
 /**
@@ -2396,9 +2212,6 @@ if(!reggedChan)
 
 // List of clients to deop.
 vector< iClient* > deopList;
-// Channel bans.
-vector< sqlBan*>* banList;
-banList = getBanRecords(reggedChan);
 
 // If we find a situation where we need to deop the person who has
 // performed the mode, do so.
@@ -2548,6 +2361,14 @@ int cservice::OnEvent( const eventType& theEvent,
 {
 switch( theEvent )
 	{
+	case EVT_BURST_ACK:
+		{
+//		iServer* theServer = static_cast< iServer* >( data1 );
+//		if ( theServer == MyUplink->Uplink )
+//			{
+//			}
+		break;
+		}
 	case EVT_QUIT:
 	case EVT_KILL:
 		{
@@ -2979,10 +2800,9 @@ return xClient::OnChannelEvent( whichEvent, theChan,
  */
 sqlBan* cservice::isBannedOnChan(sqlChannel* theChan, iClient* theClient)
 {
-vector< sqlBan* >* banList = getBanRecords(theChan);
-vector< sqlBan* >::iterator ptr = banList->begin();
+vector< sqlBan* >::iterator ptr = theChan->banList.begin();
 
-while (ptr != banList->end())
+while (ptr != theChan->banList.end())
 	{
 	sqlBan* theBan = *ptr;
 
@@ -3179,9 +2999,6 @@ theChan->setLastTopic(currentTime());
 bool cservice::doInternalBanAndKick(sqlChannel* theChan,
 	iClient* theClient, const string& theReason)
 {
-/* Fetch the banVector for this channel */
-vector< sqlBan* >* banList = getBanRecords(theChan);
-
 /*
  *  Check to see if this banmask already exists in the
  *  channel. (Ugh, and overlapping too.. hmm).
@@ -3209,8 +3026,8 @@ newBan->setReason(theReason);
  *  add to internal list and commit to the db.
  */
 
-vector< sqlBan* >::iterator ptr = banList->begin();
-while (ptr != banList->end())
+vector< sqlBan* >::iterator ptr = theChan->banList.begin();
+while (ptr != theChan->banList.end())
 	{
 	sqlBan* theBan = *ptr;
 
@@ -3225,7 +3042,7 @@ while (ptr != banList->end())
 	++ptr;
 	}
 
-banList->push_back(newBan);
+theChan->banList.push_back(newBan);
 
 /* Insert this new record into the database. */
 newBan->insertRecord();
@@ -3464,7 +3281,7 @@ theQuery	<<  "SELECT channels.name, pending.channel_id, user_id, pending.join_co
 			<< ends;
 
 #ifdef LOG_SQL
-	elog	<< "cmaster::loadPendingChannelList> "
+elog	<< "*** [CMaster::loadPendingChannelList]: Loading pending channel details."
 		<< theQuery.str()
 		<< endl;
 #endif
@@ -3576,10 +3393,150 @@ void cservice::checkDbConnectionStatus()
 
 		} else
 		{
+				SQLDb->ExecCommandOk("LISTEN channels_u; LISTEN users_u; LISTEN levels_u;");
 				logAdminMessage("Successfully reconnected to database server. Panic over ;)");
 		}
 	}
 
+}
+
+void cservice::preloadChannelCache()
+{
+strstream theQuery;
+theQuery	<< "SELECT " << sql::channel_fields
+			<< " FROM channels WHERE "
+			<< "registered_ts <> 0"
+			<< ends;
+
+elog	<< "*** [CMaster::preloadChannelCache]: Loading all registered channel records: "
+		<< endl;
+
+ExecStatusType status = SQLDb->Exec(theQuery.str()) ;
+delete[] theQuery.str() ;
+
+if( PGRES_TUPLES_OK == status )
+	{
+	for (int i = 0 ; i < SQLDb->Tuples(); i++)
+		{
+ 		/* Add this information to the channel cache. */
+
+		sqlChannel* newChan = new (std::nothrow) sqlChannel(SQLDb);
+		assert( newChan != 0 ) ;
+
+		newChan->setAllMembers(i);
+		newChan->setLastUsed(currentTime());
+
+		sqlChannelCache.insert(sqlChannelHashType::value_type(newChan->getName(), newChan));
+		sqlChannelIDCache.insert(sqlChannelIDHashType::value_type(newChan->getID(), newChan));
+
+		} // for()
+	} // if()
+
+elog	<< "*** [CMaster::preloadChannelCache]: Done. Loaded "
+		<< SQLDb->Tuples()
+		<< " registered channel records."
+		<< endl;
+}
+
+void cservice::preloadBanCache()
+{
+/*
+ * Execute a query to return all bans.
+ */
+
+strstream theQuery;
+theQuery	<< "SELECT " << sql::ban_fields
+			<< " FROM bans;"
+			<< ends;
+
+elog		<< "*** [CMaster::preloadBanCache]: Precaching Level table: "
+			<< endl;
+
+ExecStatusType status = SQLDb->Exec(theQuery.str()) ;
+delete[] theQuery.str() ;
+
+if( PGRES_TUPLES_OK == status )
+	{
+	for (int i = 0 ; i < SQLDb->Tuples(); i++)
+		{
+		/*
+		 * First, lookup this channel in the channel cache.
+		 */
+
+		unsigned int channel_id = atoi(SQLDb->GetValue(i, 1));
+		sqlChannel* theChan = getChannelRecord(channel_id);
+
+		/*
+		 * If we don't have the channel cached, its not registered so
+		 * we aren't interested in this ban.
+		 */
+
+		if (!theChan) continue;
+
+		sqlBan* newBan = new (std::nothrow) sqlBan(SQLDb);
+		newBan->setAllMembers(i);
+		theChan->banList.push_back(newBan);
+
+		} // for()
+	} // if()
+
+elog	<< "*** [CMaster::preloadBanCache]: Done. Loaded "
+		<< SQLDb->Tuples()
+		<< " bans."
+		<< endl;
+}
+
+void cservice::preloadLevelsCache()
+{
+/*
+ * Execute a query to return all level records.
+ */
+
+strstream theQuery;
+theQuery	<< "SELECT " << sql::level_fields
+			<< " FROM levels"
+			<< ends;
+
+elog		<< "*** [CMaster::preloadLevelCache]: Precaching Level table: "
+			<< endl;
+
+ExecStatusType status = SQLDb->Exec(theQuery.str()) ;
+delete[] theQuery.str() ;
+unsigned int goodCount = 0;
+
+if( PGRES_TUPLES_OK == status )
+	{
+		for (int i = 0 ; i < SQLDb->Tuples(); i++)
+		{
+		/*
+		 * First, lookup this channel in the channel cache.
+		 */
+
+		unsigned int channel_id = atoi(SQLDb->GetValue(i, 0));
+		unsigned int user_id = atoi(SQLDb->GetValue(i, 1));
+		sqlChannel* theChan = getChannelRecord(channel_id);
+
+		/*
+		 * If we don't have the channel cached, its not registered so
+		 * we aren't interested in this level record.
+		 */
+
+		if (!theChan) continue;
+
+		pair<int, int> thePair( user_id, channel_id );
+		sqlLevel* newLevel = new (std::nothrow) sqlLevel(SQLDb);
+		newLevel->setAllMembers(i);
+
+		sqlLevelCache.insert(sqlLevelHashType::value_type(thePair, newLevel));
+		goodCount++;
+
+		} // for()
+	} // if()
+
+elog	<< "*** [CMaster::preloadLevelCache]: Done. Loaded "
+		<< goodCount << " level records out of " << SQLDb->Tuples()
+		<< "."
+		<< endl;
 }
 
 void Command::Usage( iClient* theClient )
@@ -3588,4 +3545,3 @@ bot->Notice( theClient, string( "SYNTAX: " ) + getInfo() ) ;
 }
 
 } // namespace gnuworld
-
