@@ -11,8 +11,9 @@
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 #include	"Network.h"
+#include	"Constants.h"
 
-const char NEWPASSCommand_cc_rcsId[] = "$Id: NEWPASSCommand.cc,v 1.13 2001/12/13 08:50:00 mrbean_ Exp $";
+const char NEWPASSCommand_cc_rcsId[] = "$Id: NEWPASSCommand.cc,v 1.14 2001/12/13 09:10:35 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -46,19 +47,31 @@ if(!theUser)
         bot->Notice(theClient,"You have to be logged in to use this command");
 	return false;
 	}
-
-
-theUser->setPassword(bot->CryptPass(st[1]));
-if(theUser->Update())
+unsigned int passRet = bot->checkPasswprd(st[1],theUser);
+switch(passRet)
 	{
-	bot->Notice(theClient,"Password changed!");
-	return true;
+	case password::TOO_SHORT:
+		bot->Notice(theClient,"Password must be atleast %d chars",password::MIN_SIZE);
+		break;
+	case password::LIKE_UNAME:
+		bot->Notice(theClient,"Password can't be like your username");
+		break;
+	case password::PASS_OK:
+		{		
+		theUser->setPassword(bot->CryptPass(st[1]));
+		if(theUser->Update())
+			{
+			bot->Notice(theClient,"Password changed!");
+			return true;
+			}
+		else
+			{
+			bot->Notice(theClient,"Error while changing password");
+			return true;
+			}
+		}
 	}
-else
-	{
-	bot->Notice(theClient,"Error while changing password");
-	return true;
-	}
+	
 }	
 
 }

@@ -22,7 +22,7 @@
 #include	"commLevels.h"
 #include	"Constants.h"
 
-const char ADDUSERCommand_cc_rcsId[] = "$Id: ADDUSERCommand.cc,v 1.9 2001/12/13 08:50:00 mrbean_ Exp $";
+const char ADDUSERCommand_cc_rcsId[] = "$Id: ADDUSERCommand.cc,v 1.10 2001/12/13 09:10:35 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -168,6 +168,7 @@ else
 	theUser->setPassword(bot->CryptPass(st[4]));
 	theUser->setServer(Server);
 	}		
+
 theUser->setAccess(NewAccess);
 theUser->setSAccess(NewSAccess);
 theUser->setType(NewFlags);
