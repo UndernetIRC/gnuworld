@@ -2,7 +2,7 @@
  */
 
 #ifndef __ICLIENT_H
-#define __ICLIENT_H "$Id: iClient.h,v 1.21 2002/01/08 20:16:26 gte Exp $"
+#define __ICLIENT_H "$Id: iClient.h,v 1.22 2002/01/08 20:49:51 gte Exp $"
 
 #include	<string>
 #include	<list>
@@ -236,6 +236,9 @@ public:
 
 	inline bool isModeD() const
 		{ return getMode( MODE_DEAF ) ; }
+
+	inline bool isModeR() const
+		{ return getMode( MODE_REGISTERED ) ; }
 
 	/**
 	 * Return true if this iClient is an oper, false otherwise.
