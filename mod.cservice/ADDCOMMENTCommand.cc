@@ -8,7 +8,7 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char ADDCOMMENTCommand_cc_rcsId[] = "$Id: ADDCOMMENTCommand.cc,v 1.2 2001/10/26 21:52:27 gte Exp $" ;
+const char ADDCOMMENTCommand_cc_rcsId[] = "$Id: ADDCOMMENTCommand.cc,v 1.3 2001/11/28 01:47:56 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -55,7 +55,13 @@ if (!targetUser)
 
 targetUser->writeEvent(sqlUser::EV_COMMENT, theUser, st.assemble(2));
 
-bot->Notice(theClient, "Done. Added comment to %s", targetUser->getUserName().c_str());
+if (st.size() == 2)
+{
+	bot->Notice(theClient, "Comment Blanked for %s.", targetUser->getUserName().c_str());
+} else
+{
+	bot->Notice(theClient, "Done. Added comment to %s", targetUser->getUserName().c_str());
+}
 
 return true ;
 }
