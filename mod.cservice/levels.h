@@ -1,5 +1,5 @@
 #ifndef __LEVELS_H
-#define __LEVELS_H "$Id: levels.h,v 1.7 2001/01/03 05:33:03 gte Exp $"
+#define __LEVELS_H "$Id: levels.h,v 1.8 2001/01/04 03:56:39 gte Exp $"
 
 /* 
  * levels.h
@@ -9,7 +9,7 @@
  * 
  * Defines access level constants for use in command handlers. 
  *
- * $Id: levels.h,v 1.7 2001/01/03 05:33:03 gte Exp $
+ * $Id: levels.h,v 1.8 2001/01/04 03:56:39 gte Exp $
  */
 
 namespace gnuworld {
@@ -57,7 +57,7 @@ namespace gnuworld {
   const int registercmd = 750;
   const int purge = 750;
   const int force = 750; // And by definition, unforce.
-  const int remignore = 750;
+  const int remignore = 600;
 
   const int servnotice = 800;
   const int say = 800;

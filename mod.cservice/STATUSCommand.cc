@@ -9,7 +9,7 @@
 #include	"responses.h"
 #include	"Network.h"
  
-const char STATUSCommand_cc_rcsId[] = "$Id: STATUSCommand.cc,v 1.2 2001/01/03 20:36:03 gte Exp $" ;
+const char STATUSCommand_cc_rcsId[] = "$Id: STATUSCommand.cc,v 1.3 2001/01/04 03:56:39 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -65,15 +65,18 @@ bool STATUSCommand::Exec( iClient* theClient, const string& Message )
 		float levelTotal = bot->levelCacheHits + bot->levelHits;
 		float levelEf = (bot->levelCacheHits ? ((float)bot->levelCacheHits / levelTotal * 100) : 0);
 
-		bot->Notice(theClient, "CMaster Channel Services internal status:");
-		bot->Notice(theClient, "Channel record requests: %i", bot->channelHits);
-		bot->Notice(theClient, "Channel record cache hits: %i (%.2f%% efficiency)", bot->channelCacheHits, chanEf);
+		bot->Notice(theClient, "CMaster Channel Services internal status:"); 
 
-		bot->Notice(theClient, "User record requests: %i", bot->userHits);
-		bot->Notice(theClient, "User record cache hits: %i (%.2f%% efficiency)", bot->userCacheHits, userEf);
+		bot->Notice(theClient, "[     Channel Record Stats] \002Cached Entries:\002 %i    \002Requests:\002 %i    \002Cache Hits:\002 %i    \002Efficiency:\002 %.2f%%", 
+			bot->sqlChannelCache.size(), bot->channelHits, bot->channelCacheHits, chanEf);
 
-		bot->Notice(theClient, "Access Level record requests: %i", bot->levelHits);
-		bot->Notice(theClient, "Access Level record cache hits: %i (%.2f%% efficiency)", bot->levelCacheHits, levelEf);
+		bot->Notice(theClient, "[        User Record Stats] \002Cached Entries:\002 %i    \002Requests:\002 %i    \002Cache Hits:\002 %i    \002Efficiency:\002 %.2f%%", 
+			bot->sqlUserCache.size(), bot->userHits, bot->userCacheHits, userEf);
+
+		bot->Notice(theClient, "[Access Level Record Stats] \002Cached Entries:\002 %i     \002Requests:\002 %i    \002Cache Hits:\002 %i    \002Efficiency:\002 %.2f%%", 
+			bot->sqlLevelCache.size(), bot->levelHits, bot->levelCacheHits, levelEf);
+
+		bot->Notice(theClient, "\002Uptime:\002 %s",  bot->prettyDuration(bot->getUplink()->getStartTime()).c_str());
 		return true;
 	}
 
@@ -89,7 +92,8 @@ bool STATUSCommand::Exec( iClient* theClient, const string& Message )
 	 */
 
 	int level = bot->getAccessLevel(theUser, theChan);
-	if (level < level::status)
+	int admLevel = bot->getAdminAccessLevel(theUser); // Let authenticated admins view status also.
+	if ((level < level::status) && (admLevel <= 0))
 	{
 		bot->Notice(theClient, bot->getResponse(theUser, language::insuf_access).c_str());
 		return false;
@@ -101,13 +105,16 @@ bool STATUSCommand::Exec( iClient* theClient, const string& Message )
 
 	Channel* tmpChan = Network->findChannel(theChan->getName()); 
 
-	if (tmpChan) 
+	if (tmpChan)
 	{
-		bot->Notice(theClient, "Channel %s has %d users (TBA operators)",
-			tmpChan->getName().c_str(), tmpChan->size() ) ;
-
-		bot->Notice(theClient, "Mode is: %s",
-			tmpChan->getModeString().c_str() ) ;
+		if ((level) || (admLevel >= 600)) // If the person has access, or is a 600+ admin.
+		{
+			bot->Notice(theClient, "Channel %s has %d users (TBA operators)",
+				tmpChan->getName().c_str(), tmpChan->size() ) ;
+	 
+			bot->Notice(theClient, "Mode is: %s",
+				tmpChan->getModeString().c_str() ) ;
+		}
 	}
 
 	bot->Notice(theClient, "MassDeopPro: %i, FloodPro: %i", 
