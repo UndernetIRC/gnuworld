@@ -23,7 +23,7 @@
 #include	"AuthInfo.h"
 #include        "server.h"
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.42 2001/05/22 05:43:29 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.43 2001/05/22 20:20:16 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -219,6 +219,8 @@ RegisterCommand( new LASTCOMCommand( this, "LASTCOM", "[number of lines to show]
 	"Post you the bot logs",flg_LASTCOM ) ) ;
 RegisterCommand( new FORCEGLINECommand( this, "FORCEGLINE", "[duration (sec)] <user@host> <reason> "
 	"Gline a given user@host for the given reason",flg_FGLINE ) ) ;
+RegisterCommand( new EXCEPTIONCommand( this, "EXCEPTIONS", "(list / add / del) [host mask]"
+	"Add connection exceptions on hosts",flg_EXCEPTIONS ) ) ;
 
 loadGlines();
 
@@ -1307,8 +1309,15 @@ ccGline *theGline;
 for(glineIterator ptr = glineList.begin(); ptr != glineList.end(); ptr++)
 	{
 	theGline = *ptr;
-	if((match(theGline->get_Host(),Host) == 0) && theGline->get_Expires() > ::time(0))
-		return theGline;
+	if(match(theGline->get_Host(),Host) == 0) 
+    		if(theGline->get_Expires() > ::time(0))
+			return theGline;
+		else
+			{
+			theGline->Delete();
+			glineList.erase(ptr);
+			MyUplink->removeGline(theGline->get_Host());
+			}
 	}
 
 return NULL ;
@@ -1320,8 +1329,15 @@ ccGline *theGline;
 for(glineIterator ptr = glineList.begin(); ptr != glineList.end(); ptr++)
 	{
 	theGline = *ptr;
-	if((!strcasecmp(theGline->get_Host().c_str(),HostName.c_str())) && (theGline->get_Expires() > ::time(0)))
-		return theGline;
+	if(!strcasecmp(theGline->get_Host().c_str(),HostName.c_str()))
+    		if(theGline->get_Expires() > ::time(0))
+			return theGline;
+		else
+			{
+			theGline->Delete();
+			glineList.erase(ptr);
+			MyUplink->removeGline(theGline->get_Host());
+			}
 	}
 
 return NULL ;
@@ -1758,4 +1774,137 @@ for( int i = 0 ; i < SQLDb->Tuples() ; i++ )
 return Exception;
 }
 
+bool ccontrol::listExceptions( iClient *theClient )
+{
+
+static const char *Main = "SELECT * FROM exceptions";
+
+strstream theQuery;
+theQuery	<< Main
+		<< ends;
+
+elog	<< "ccontrol::listExceptions> "
+	<< theQuery.str()
+	<< endl; 
+
+ExecStatusType status = SQLDb->Exec( theQuery.str() ) ;
+delete[] theQuery.str() ;
+
+
+if( PGRES_TUPLES_OK != status )
+	{
+	elog	<< "ccontrol::listExceptions> SQL Failure: "
+		<< SQLDb->ErrorMessage()
+		<< endl ;
+	return false;
+	}
+
+for( int i = 0 ; i < SQLDb->Tuples() ; i++ )
+	{
+	Notice(theClient,"Host : %s Connections %s Addeded By : %s Added On %s\n",SQLDb->GetValue(i,0),SQLDb->GetValue(i,1),SQLDb->GetValue(i,2),convertToAscTime(atoi(SQLDb->GetValue(i,3))));
+	}
+Notice(theClient,"End of exceptions list\n");
+return true;
+}
+
+bool ccontrol::insertException( iClient *theClient , const string& Host , int Connections )
+{
+static const char *Main = "SELECT * FROM exceptions where Host = '";
+
+strstream theQuery;
+theQuery	<< Main
+		<< Host << "'"
+		<< ends;
+
+elog	<< "ccontrol::findException> "
+	<< theQuery.str()
+	<< endl; 
+
+ExecStatusType status = SQLDb->Exec( theQuery.str() ) ;
+delete[] theQuery.str() ;
+
+
+if( PGRES_TUPLES_OK != status )
+	{
+	elog	<< "ccontrol::findException> SQL Failure: "
+		<< SQLDb->ErrorMessage()
+		<< endl ;
+	return false;
+	}
+
+if(SQLDb->Tuples()>0)
+	{
+	Notice(theClient,"There is already an exception for host %s, please use update\n",Host.c_str());		
+	return true;
+	}
+
+static const char *quer = "INSERT into exceptions(host,connections,addedby,addedon) VALUES ('";
+strstream query;
+query		<< quer
+		<< Host << "',"
+		<< Connections
+		<< ",'" << theClient->getNickUserHost()
+		<< "',now()::abstime::int4)"
+		<< endl;
+
+elog	<< "ccontrol::addException> "
+	<< query.str()
+	<< endl; 
+
+status = SQLDb->Exec( query.str() ) ;
+
+delete[] query.str();
+if( PGRES_COMMAND_OK != status )
+	return false;		    
+return true;
+}
+
+bool ccontrol::delException( iClient *theClient , const string &Host )
+{
+static const char *Main = "SELECT * FROM exceptions where Host = '";
+
+strstream theQuery;
+theQuery	<< Main
+		<< Host << "'"
+		<< ends;
+
+elog	<< "ccontrol::findException> "
+	<< theQuery.str()
+	<< endl; 
+
+ExecStatusType status = SQLDb->Exec( theQuery.str() ) ;
+delete[] theQuery.str() ;
+
+
+if( PGRES_TUPLES_OK != status )
+	{
+	elog	<< "ccontrol::findException> SQL Failure: "
+		<< SQLDb->ErrorMessage()
+		<< endl ;
+	return false;
+	}
+
+if(SQLDb->Tuples() == 0)
+	{
+	Notice(theClient,"There is no exception for host %s",Host.c_str());		
+	return true;
+	}
+
+static const char *quer = "DELETE FROM exceptions WHERE host = '";
+strstream query;
+query		<< quer
+		<< Host << "'"
+		<< ends;
+elog 		<< query.str();
+status = SQLDb->Exec( query.str() ) ;
+delete[] query.str();
+if( PGRES_COMMAND_OK != status )
+	{
+	elog	<< "ccontrol::findException> SQL Failure: "
+	<< SQLDb->ErrorMessage()
+	<< endl ;
+	return false;		    
+	}
+return true;
+}
 } // namespace gnuworld

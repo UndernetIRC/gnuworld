@@ -109,7 +109,7 @@ DECLARE_COMMAND( REMOVESERVER )
 DECLARE_COMMAND( CHECKNETWORK )
 DECLARE_COMMAND( LASTCOM )
 DECLARE_COMMAND( FORCEGLINE )
-
+DECLARE_COMMAND( EXCEPTION )
 /*
  Patch for uworld commands level 
  Added by : |MrBean| (MrBean@toughguy.net)
@@ -161,14 +161,14 @@ const int flg_REMSERVER = 0x4000;
 const int flg_CHECKNET = 0x4000;
 const int flg_LASTCOM = 0x4000 | flg_NOLOG;
 const int flg_FGLINE = 0x8000;
-
+const int flg_EXCEPTIONS = 10000;
 /*
  Default commands that are added upon adding a new oper
 */
 
-const int OPER = flg_MODE | flg_INVITE | flg_GLINE | flg_CHINFO | flg_WHOIS | flg_TRANS | flg_KICK | flg_CLEARCHAN |flg_NEWPASS;
-const int ADMIN = OPER | flg_ADDOPCHN | flg_ADDNOP | flg_ADDCMD | flg_SUSPEND | flg_JUPE | flg_ADDSERVER | flg_FGLINE;
-const int CODER = ADMIN;
+const int OPER = flg_MODE | flg_INVITE | flg_GLINE | flg_CHINFO | flg_WHOIS | flg_TRANS | flg_KICK | flg_CLEARCHAN |flg_NEWPASS & ~flg_NOLOG;
+const int ADMIN = OPER | flg_ADDOPCHN | flg_ADDNOP | flg_ADDCMD | flg_SUSPEND | flg_JUPE | flg_ADDSERVER | flg_FGLINE | flg_EXCEPTIONS & ~flg_NOLOG;;
+const int CODER = ADMIN & ~flg_NOLOG;;
 
 //Oper flags 
 

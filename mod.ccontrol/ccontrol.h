@@ -3,7 +3,7 @@
  */
 
 #ifndef __CCONTROL_H
-#define __CCONTROL_H "$Id: ccontrol.h,v 1.28 2001/05/21 16:14:55 mrbean_ Exp $"
+#define __CCONTROL_H "$Id: ccontrol.h,v 1.29 2001/05/22 20:20:16 mrbean_ Exp $"
 
 //Define gline response
 #define GLINE_OK 1;
@@ -466,6 +466,12 @@ public:
 	void wallopsAsServer(const char * , ... );
 
 	int getExceptions( const string & );
+	
+	bool listExceptions( iClient * );
+	
+	bool insertException( iClient * , const string & , int );
+
+	bool delException( iClient * , const string & );
 	
 	/**
 	 * This is a constant iterator type used to perform a read-only
