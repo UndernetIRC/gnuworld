@@ -1,7 +1,12 @@
 Add more all-clones commands.
- Example: SAYALL, ACTALL, NOTICEALL.
+ Example: ? what else ?
 
 Add per-clone commands.
  Example: SPAWN, JOIN, PART, QUIT.
+
+Split SHOWCOMMANDS and HELP into two commands.
+ SHOWCOMMANDS will list all the commands.
+ HELP will give help on each command.
+ Example: HELP <topic/command>
 
 What else would be good to add? :)

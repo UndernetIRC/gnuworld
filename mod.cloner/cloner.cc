@@ -20,7 +20,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
  * USA.
  *
- * $Id: cloner.cc,v 1.17 2002/08/01 21:11:59 reedloden Exp $
+ * $Id: cloner.cc,v 1.18 2002/08/01 21:44:26 reedloden Exp $
  */
 
 #include	<new>
@@ -45,7 +45,7 @@
 
 const char client_h_rcsId[] = __CLIENT_H ;
 const char cloner_h_rcsId[] = __CLONER_H ;
-const char cloner_cc_rcsId[] = "$Id: cloner.cc,v 1.17 2002/08/01 21:11:59 reedloden Exp $" ;
+const char cloner_cc_rcsId[] = "$Id: cloner.cc,v 1.18 2002/08/01 21:44:26 reedloden Exp $" ;
 const char iClient_h_rcsId[] = __ICLIENT_H ;
 const char EConfig_h_rcsId[] = __ECONFIG_H ;
 const char ELog_h_rcsId[] = __ELOG_H ;
@@ -197,6 +197,15 @@ if( command == "SHOWCOMMANDS" || command == "HELP" )
 			reason" ) ;
 		Notice( theClient, "KILLALL/QUITALL [reason] - Make all
 			clones /quit with an optional reason" ) ;
+		Notice( theClient, "SAYALL/MSGALL <#channel/nickname>
+			<message> - Make all clones /msg a #channel or
+			nickname" ) ;
+		Notice( theClient, "ACTALL/DOALL/DESCRIBEALL
+			<#channel/nickname> <action> - Make all clones
+			/me a channel or nickname" ) ;
+		Notice( theClient, "NOTICEALL <#channel/nickname>
+			<notice> - Make all clones /notice a #channel
+			or nickname" ) ;
 		Notice( theClient, "_-=[End of Cloner Help]=-_" ) ;
 		}
 	}
@@ -350,43 +359,16 @@ else if( command == "KILLALL" || command == "QUITALL" )
 		}
 
 	} // KILLALL/QUITALL
-else if( command == "SAYALL" )
+else if( command == "SAYALL" || command == "MSGALL" )
 	{
 	if( st.size() < 3 )
 		{
-		Notice( theClient, "Usage: SAYALL <#channel> <message>" ) ;
+		Notice( theClient, "Usage: %s <#channel/nickname>
+			<message>", command ) ;
 		return 0 ;
 		}
 
-	string chanName( st[ 1 ] ) ;
-	if( chanName[ 0 ] != '#' )
-		{
-		chanName.insert( chanName.begin(), '#' ) ;
-		}
-		string privMsg( st.assemble(2).c_str() ) ;
-
-	for( list< iClient* >::const_iterator ptr = clones.begin(),
-		endPtr = clones.end() ; ptr != endPtr ; ++ptr )
-		{
-		stringstream s ;
-		s	<< (*ptr)->getCharYYXXX()
-			<< " P "
-			<< chanName
-			<< " :"
-		<< privMsg
-		<< ends ;
-		MyUplink->Write( s ) ;
-		}
-	} // SAYALL
-else if( command == "MSGALL" )
-	{
-	if( st.size() < 3 )
-		{
-		Notice( theClient, "Usage: MSGALL <nickname> <message>" ) ;
-		return 0 ;
-		}
-
-	string nickName( st[ 1 ] ) ;
+	string chanOrNickName( st[ 1 ] ) ;
 	string privMsg( st.assemble(2).c_str() ) ;
 
 	for( list< iClient* >::const_iterator ptr = clones.begin(),
@@ -395,13 +377,65 @@ else if( command == "MSGALL" )
 		stringstream s ;
 		s	<< (*ptr)->getCharYYXXX()
 			<< " P "
-			<< nickName
+			<< chanOrNickName
 			<< " :"
 			<< privMsg
 			<< ends ;
+		MyUplink->Write( s ) ;
+		}
+	} // SAYALL/MSGALL
+else if( command == "ACTALL" || command == "DOALL" || command ==
+	"DESCRIBEALL" )
+	{
+	if( st.size() < 3 )
+		{
+		Notice( theClient, "Usage: %s <#channel/nickname>
+			<action>", command ) ;
+		return 0 ;
+		}
+
+	string chanOrNickName( st[ 1 ] ) ;
+	string action( st.assemble(2).c_str() ) ;
+
+	for( list< iClient* >::const_iterator ptr = clones.begin(),
+		endPtr = clones.end() ; ptr != endPtr ; ++ptr )
+		{
+		stringstream s ;
+		s	<< (*ptr)->getCharYYXXX()
+			<< " P "
+			<< chanOrNickName
+			<< " :\001ACTION "
+			<< action
+			<< "\001"
+			<< ends ;
 			MyUplink->Write( s ) ;
 		}
-	} // MSGALL
+	} // ACTALL/DOALL/DESCRIBEALL
+else if( command == "NOTICEALL" )
+	{
+	if( st.size() < 3 )
+		{
+		Notice( theClient, "Usage: %s <#channel/nickname>
+			<notice>", command ) ;
+		return 0 ;
+		}
+
+	string chanOrNickName( st[ 1 ] ) ;
+	string notice( st.assemble(2).c_str() ) ;
+
+	for( list< iClient* >::const_iterator ptr = clones.begin(),
+		endPtr = clones.end() ; ptr != endPtr ; ++ptr )
+		{
+		stringstream s ;
+		s	<< (*ptr)->getCharYYXXX()
+			<< " O "
+			<< chanOrNickName
+			<< " :"
+			<< notice
+			<< ends ;
+			MyUplink->Write( s ) ;
+		}
+	} // NOTICEALL
 return 0 ;
 }
 
