@@ -1671,31 +1671,31 @@ void cservice::cacheExpireUsers()
 	endTime = ::clock();
 	logDebugMessage("User cache cleanup complete; Removed %i user records in %i ms.",
 		purgeCount, (endTime - startTime) /  CLOCKS_PER_SEC); 
-}
-
-void cservice::cacheExpireBans()
-{
-	logDebugMessage("Beginning Channel cache cleanup:");
-	sqlChannelHashType::iterator ptr = sqlChannelCache.begin();
-	while (ptr != sqlChannelCache.end())
-	{
-//		elog << (ptr)->first << endl;
-		++ptr;
-	} 
-	logDebugMessage("Channel cache cleanup complete.");
-}
-
+} 
 
 void cservice::cacheExpireLevels()
 {
-	logDebugMessage("Beginning Channel cache cleanup:");
+	logDebugMessage("Beginning Channel Level-cache cleanup:");
+
+	/*
+	 *  While we are at this, we'll clear out any FORCE'd access's
+	 *  in channels.
+	 */
+
 	sqlChannelHashType::iterator ptr = sqlChannelCache.begin();
 	while (ptr != sqlChannelCache.end())
 	{
-//		elog << (ptr)->first << endl;
+		sqlChannel* theChan = (ptr)->second;
+		if(theChan->forceMap.size() > 0)
+		{ 
+			logDebugMessage("Clearing out %i FORCE(s) from channel %s",
+						theChan->forceMap.size(), theChan->getName().c_str());
+			theChan->forceMap.clear(); 
+		}
+ 
 		++ptr;
 	} 
-	logDebugMessage("Channel cache cleanup complete.");
+	logDebugMessage("Channel Level cache-cleanup complete.");
 }
 
 /**
@@ -2026,8 +2026,7 @@ if (timer_id == expire_timerID)
 
 if (timer_id == cache_timerID)
 	{ 
-	cacheExpireUsers();
-	cacheExpireBans();
+	cacheExpireUsers(); 
 	cacheExpireLevels();
 
 	/* Refresh Timers */

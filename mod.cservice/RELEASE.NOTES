@@ -1,7 +1,7 @@
 Newest changes at the top of the file:
-$Id: RELEASE.NOTES,v 1.9 2001/04/30 01:26:21 gte Exp $
+$Id: RELEASE.NOTES,v 1.10 2001/05/16 21:03:16 gte Exp $
 
-CMaster 1.0pl5 - Current
+CMaster 1.0pl5 - Current 
 * Add Vampire's (Alex Badea <vampire@go.ro>) code to make
   addition of new languages dynamic.
 * Prevent core in PURGE when channel doesn't have a manager.
@@ -10,6 +10,7 @@ CMaster 1.0pl5 - Current
   channels.
 * New admin command to quickly remove all users from a 
   channel.
+* Expire FORCE'd accesses in the hourly maintainence.
 
 CMaster 1.0pl4 - 13/04/2001
 * Added REHASH command handler, to allow dynamic reloading
