@@ -3,7 +3,7 @@
  * 
  * Gline class
  * 
- * $Id: ccGline.cc,v 1.9 2001/11/20 19:49:45 mrbean_ Exp $
+ * $Id: ccGline.cc,v 1.10 2001/11/21 20:54:40 mrbean_ Exp $
  */
  
 #include	<strstream>
@@ -20,7 +20,7 @@
 #include	"ccontrol.h"
 
 const char ccGline_h_rcsId[] = __CCGLINE_H ;
-const char ccGline_cc_rcsId[] = "$Id: ccGline.cc,v 1.9 2001/11/20 19:49:45 mrbean_ Exp $" ;
+const char ccGline_cc_rcsId[] = "$Id: ccGline.cc,v 1.10 2001/11/21 20:54:40 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -33,6 +33,8 @@ using std::ends ;
 namespace uworld
 {
 
+unsigned int ccGline::numAllocated = 0;
+
 ccGline::ccGline(PgDatabase* _SQLDb)
  : Id(),
    AddedBy(),
@@ -41,12 +43,12 @@ ccGline::ccGline(PgDatabase* _SQLDb)
    Reason(),
    SQLDb( _SQLDb )
 {
-//++numAllocated;
+++numAllocated;
 }
 
 ccGline::~ccGline()
 {
-//--numAllocated;
+--numAllocated;
 }
 
 bool ccGline::Insert()

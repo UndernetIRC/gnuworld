@@ -1,7 +1,7 @@
 /* ccFloodData.h */
 
 #ifndef __CCFLOODDATA_H
-#define __CCFLOODDATA_H "$Id: ccFloodData.h,v 1.2 2001/08/26 22:22:55 dan_karrels Exp $"
+#define __CCFLOODDATA_H "$Id: ccFloodData.h,v 1.3 2001/11/21 20:54:40 mrbean_ Exp $"
 
 #include	<string>
 
@@ -40,6 +40,7 @@ public:
 		
 	 bool		 	addPoints(unsigned int );
 	
+	static unsigned int numAllocated;
 protected:
 	//Holds the flood points a user has
 	unsigned int Points;

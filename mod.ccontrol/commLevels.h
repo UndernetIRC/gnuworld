@@ -75,7 +75,8 @@ const unsigned long int flg_NOTES = 0x400;
 const unsigned long int flg_GCHAN = 0x800;
 const unsigned long int flg_RGCHAN = 0x1000;
 const unsigned long int flg_USERINFO = 0x2000;
-
+const unsigned long int flg_STATUS = 0x4000;
+const unsigned long int flg_SHUTDOWN = 0x8000;
 
 /*
  Default commands that are added upon adding a new oper
@@ -97,8 +98,7 @@ const unsigned long int SMT = ADMIN | flg_ADDSERVER;
 const unsigned long int SSMT = SADMIN | flg_REMSERVER;
 const unsigned long int CODER = SMT;
 const unsigned long int SCODER =  SSMT | flg_COMMANDS| flg_GCHAN | flg_RGCHAN
-			| flg_EXCEPTIONS;
-
+			| flg_EXCEPTIONS | flg_STATUS | flg_SHUTDOWN;
 }
 
 }

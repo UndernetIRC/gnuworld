@@ -1,7 +1,7 @@
 /* ccFlood.h */
 
 #ifndef __CCLOGIN_H
-#define __CCLOGIN_H "$Id: ccLogin.h,v 1.6 2001/07/23 10:28:51 mrbean_ Exp $"
+#define __CCLOGIN_H "$Id: ccLogin.h,v 1.7 2001/11/21 20:54:40 mrbean_ Exp $"
 
 #define IGNORE_NOT_FOUND -1
 #define IGNORE_REMOVED -2
@@ -62,7 +62,7 @@ public:
 	inline void		setIgnoredHost(string _Host)
 		{ IgnoredHost =_Host; }
 	
-
+	static unsigned int numAllocated;
 	
 protected:
 	string Numeric;

@@ -1,7 +1,7 @@
 /* 
  * ccFloodData.cc
  * 
- * $Id: ccFloodData.cc,v 1.1 2001/08/16 20:18:38 mrbean_ Exp $
+ * $Id: ccFloodData.cc,v 1.2 2001/11/21 20:54:40 mrbean_ Exp $
  */
  
 #include	<strstream>
@@ -17,7 +17,7 @@
 #include	"ccFloodData.h" 
 
 const char ccFloodData_h_rcsId[] = __CCFLOODDATA_H ;
-const char ccFLOODDATA_cc_rcsId[] = "$Id: ccFloodData.cc,v 1.1 2001/08/16 20:18:38 mrbean_ Exp $" ;
+const char ccFLOODDATA_cc_rcsId[] = "$Id: ccFloodData.cc,v 1.2 2001/11/21 20:54:40 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -30,14 +30,17 @@ using std::ends ;
 namespace uworld
 {
 
+unsigned int ccFloodData::numAllocated = 0;
 ccFloodData::ccFloodData()
  : Points(0),
    lastMessage(0)
 {
+++numAllocated;
 }
 
 ccFloodData::~ccFloodData()
 {
+--numAllocated;
 }
 
 bool ccFloodData::addPoints(unsigned int _Points)

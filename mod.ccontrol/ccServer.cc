@@ -3,7 +3,7 @@
  * 
  * Server class
  * 
- * $Id: ccServer.cc,v 1.6 2001/11/20 19:49:46 mrbean_ Exp $
+ * $Id: ccServer.cc,v 1.7 2001/11/21 20:54:40 mrbean_ Exp $
  */
  
 #include	<strstream>
@@ -20,7 +20,7 @@
 #include	"ccontrol.h"
 
 const char ccServer_h_rcsId[] = __CCSERVER_H ;
-const char ccServer_cc_rcsId[] = "$Id: ccServer.cc,v 1.6 2001/11/20 19:49:46 mrbean_ Exp $" ;
+const char ccServer_cc_rcsId[] = "$Id: ccServer.cc,v 1.7 2001/11/21 20:54:40 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -33,6 +33,8 @@ using std::ends ;
 namespace uworld
 {
 
+unsigned int ccServer::numAllocated = 0;
+
 ccServer::ccServer(PgDatabase* _SQLDb)
  : Name(),
    Uplink(),
@@ -42,10 +44,13 @@ ccServer::ccServer(PgDatabase* _SQLDb)
    SplitReason( "" ),
    SQLDb( _SQLDb )
 {
+++numAllocated;
 }
 
 ccServer::~ccServer()
-{}
+{
+--numAllocated;
+}
 
 bool ccServer::Insert()
 {

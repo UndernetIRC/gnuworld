@@ -37,7 +37,7 @@
 #include	"ip.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.86 2001/11/20 19:49:46 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.87 2001/11/21 20:54:40 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -281,7 +281,10 @@ RegisterCommand( new REMGCHANCommand( this, "REMGCHAN", "#channel "
 	" Removes a BADCHAN gline",commandLevel::flg_GCHAN,false,false,false,operLevel::CODERLEVEL,true ) ) ;
 RegisterCommand( new USERINFOCommand( this, "USERINFO", "<usermask/servermask> "
 	" Get information about opers",commandLevel::flg_USERINFO,false,false,false,operLevel::OPERLEVEL,true ) ) ;
-
+RegisterCommand( new STATUSCommand( this, "STATUS", "Shows debug status "
+        ,commandLevel::flg_STATUS,false,false,false,operLevel::CODERLEVEL,true ) ) ;
+RegisterCommand( new SHUTDOWNCommand( this, "SHUTDOWN", " <REASON> Shutdown the bot "
+        ,commandLevel::flg_SHUTDOWN,false,false,false,operLevel::CODERLEVEL,true ) ) ;
 loadGlines();
 loadExceptions();
 
@@ -2947,6 +2950,16 @@ for(exceptionIterator ptr = exception_begin();ptr != exception_end();++ptr)
 
 void ccontrol::showStatus(iClient* tmpClient)
 {
+Notice(tmpClient,"Currently there are %d hosts in the clones queue",clonesQueue.size());
+Notice(tmpClient,"Monitoring %d threads out of %d, and there are %d in the waiting queue",gatesCheckingQueue.size()
+		,maxThreads,gatesWaitingQueue.size());
+Notice(tmpClient,"Allocated Structures:");
+Notice(tmpClient,"ccGate:  %d",ccGate::numAllocated);
+Notice(tmpClient,"ccServer: %d",ccServer::numAllocated);
+Notice(tmpClient,"ccGline: %d",ccGline::numAllocated);
+Notice(tmpClient,"ccException: %d",ccException::numAllocated);
+Notice(tmpClient,"ccUser: %d",ccUser::numAllocated);
+ 
 }
 
 void *initGate(void* arg)

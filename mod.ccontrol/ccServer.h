@@ -1,7 +1,7 @@
 /* ccServer.h */
 
 #ifndef __CCSERVER_H
-#define __CCSERVER_H "$Id: ccServer.h,v 1.4 2001/10/17 21:39:11 mrbean_ Exp $"
+#define __CCSERVER_H "$Id: ccServer.h,v 1.5 2001/11/21 20:54:40 mrbean_ Exp $"
 
 #include	<string>
 
@@ -73,6 +73,8 @@ public:
 	bool loadNumericData( string );
 
 	bool Delete();
+
+	static unsigned int numAllocated;
         
 protected:
 	string Name;

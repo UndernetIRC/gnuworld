@@ -33,6 +33,14 @@ public:
 	
 	static const unsigned int statDone = 0x20;
 	
+	static const unsigned int isSOCKS4 = 0x01;
+
+        static const unsigned int isSOCKS5 = 0x02;
+
+        static const unsigned int isWINGATE = 0x03;
+
+        static const unsigned int isHTTP = 0x04;
+
 	inline const string& getHost() const
 		{ return Host; }
 	
@@ -44,6 +52,9 @@ public:
 		
 	inline const bool getFound() const
 		{ return Found; }
+
+	inline const unsigned int getType() const
+		{ return Type; }
 
 	inline const pthread_t getThreadId() const
 		{ return threadId; }
@@ -62,6 +73,9 @@ public:
 			
 	inline void setThreadId( const pthread_t _Id)
 		{ threadId = _Id; }			
+
+	static unsigned int numAllocated;
+
 protected:
     
 	string Host;
@@ -72,6 +86,8 @@ protected:
 
 	bool Found;
 	
+	unsigned int Type;
+
 	pthread_t threadId;
 	
 };

@@ -2,7 +2,7 @@
  */
 
 #ifndef __COMMANDSDEC_H
-#define __COMMANDSDEC_H "$Id: CommandsDec.h,v 1.4 2001/08/26 22:22:55 dan_karrels Exp $"
+#define __COMMANDSDEC_H "$Id: CommandsDec.h,v 1.5 2001/11/21 20:54:40 mrbean_ Exp $"
 
 namespace gnuworld
 {
@@ -74,7 +74,8 @@ DECLARE_COMMAND( COMMANDS )
 DECLARE_COMMAND( GCHAN )
 DECLARE_COMMAND( REMGCHAN )
 DECLARE_COMMAND( USERINFO )
-
+DECLARE_COMMAND( STATUS )
+DECLARE_COMMAND( SHUTDOWN )
 } // namespace uworld
 
 } // namespace gnuworld

@@ -1,7 +1,7 @@
 /* ccException.h */
 
 #ifndef __CCEXCEPTION_H
-#define __CCEXCEPTION_H "$Id: ccException.h,v 1.5 2001/11/20 19:49:45 mrbean_ Exp $"
+#define __CCEXCEPTION_H "$Id: ccException.h,v 1.6 2001/11/21 20:54:40 mrbean_ Exp $"
 
 #include	<string>
 
@@ -65,7 +65,7 @@ public:
 	
 	bool		Delete();
 	
-	//static unsigned int numAllocated;
+	static unsigned int numAllocated;
 		
 protected:
 	

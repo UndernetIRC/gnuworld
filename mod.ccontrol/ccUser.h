@@ -1,7 +1,7 @@
 /* ccUser.h */
 
 #ifndef __CCUSER_H
-#define __CCUSER_H "$Id: ccUser.h,v 1.12 2001/09/30 20:26:44 mrbean_ Exp $"
+#define __CCUSER_H "$Id: ccUser.h,v 1.13 2001/11/21 20:54:40 mrbean_ Exp $"
 
 #include	<string>
 
@@ -209,7 +209,8 @@ public:
 
 	void updateAccess(unsigned int Type);
 	
-		
+	static unsigned int numAllocated;
+	
 protected:
 	unsigned int Id;
 	string UserName;

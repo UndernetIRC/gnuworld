@@ -3,7 +3,7 @@
  * 
  * Exception class
  * 
- * $Id: ccException.cc,v 1.4 2001/11/20 19:49:45 mrbean_ Exp $
+ * $Id: ccException.cc,v 1.5 2001/11/21 20:54:40 mrbean_ Exp $
  */
  
 #include	<strstream>
@@ -20,7 +20,7 @@
 #include	"ccontrol.h"
 
 const char ccException_h_rcsId[] = __CCEXCEPTION_H ;
-const char ccException_cc_rcsId[] = "$Id: ccException.cc,v 1.4 2001/11/20 19:49:45 mrbean_ Exp $" ;
+const char ccException_cc_rcsId[] = "$Id: ccException.cc,v 1.5 2001/11/21 20:54:40 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -33,7 +33,9 @@ using std::ends ;
 namespace uworld
 {
 
-extern unsigned int dbConnected;
+//extern unsigned int dbConnected;
+
+unsigned int ccException::numAllocated = 0;
 
 ccException::ccException(PgDatabase* _SQLDb)
  : Host(""),
@@ -42,12 +44,12 @@ ccException::ccException(PgDatabase* _SQLDb)
    AddedOn(0),
    SQLDb(_SQLDb)
 {
-//++numAllocated;
+++numAllocated;
 }
 
 ccException::~ccException()
 {
-//--numAllocated;
+--numAllocated;
 }
 
 

@@ -3,7 +3,7 @@
  * 
  * Storage class for accessing user information 
  * 
- * $Id: ccUser.cc,v 1.11 2001/11/20 19:49:46 mrbean_ Exp $
+ * $Id: ccUser.cc,v 1.12 2001/11/21 20:54:40 mrbean_ Exp $
  */
  
 #include	<strstream>
@@ -19,7 +19,7 @@
 #include	"ccontrol.h"
 
 const char ccUser_h_rcsId[] = __CCUSER_H ;
-const char ccUser_cc_rcsId[] = "$Id: ccUser.cc,v 1.11 2001/11/20 19:49:46 mrbean_ Exp $" ;
+const char ccUser_cc_rcsId[] = "$Id: ccUser.cc,v 1.12 2001/11/21 20:54:40 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -31,6 +31,8 @@ using std::ends ;
 
 namespace uworld
 {
+
+unsigned int ccUser::numAllocated = 0;
 
 ccUser::ccUser(PgDatabase* _SQLDb)
  : Id( 0 ),
@@ -51,10 +53,13 @@ ccUser::ccUser(PgDatabase* _SQLDb)
    NeedOp(0),
    SQLDb( _SQLDb )
 {
+++numAllocated;
 }
 
 ccUser::~ccUser()
-{}
+{
+--numAllocated;
+}
 
 bool ccUser::loadData(const string& Name)
 {

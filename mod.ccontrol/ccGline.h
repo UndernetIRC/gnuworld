@@ -1,7 +1,7 @@
 /* ccGline.h */
 
 #ifndef __CCGLINE_H
-#define __CCGLINE_H "$Id: ccGline.h,v 1.8 2001/11/20 19:49:46 mrbean_ Exp $"
+#define __CCGLINE_H "$Id: ccGline.h,v 1.9 2001/11/21 20:54:40 mrbean_ Exp $"
 
 #include	<string>
 
@@ -78,7 +78,7 @@ public:
 	
 	bool Delete();
 	
-	//static unsigned int numAllocated;
+	static unsigned int numAllocated;
 	
 protected:
 	string Id;
