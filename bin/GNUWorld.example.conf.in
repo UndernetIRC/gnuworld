@@ -1,4 +1,4 @@
-# $Id: GNUWorld.example.conf.in,v 1.8 2003/07/10 00:58:23 dan_karrels Exp $
+# $Id: GNUWorld.example.conf.in,v 1.9 2003/08/04 20:49:23 dan_karrels Exp $
 # GNUWorld Core Configuration File
 #
 
@@ -8,6 +8,12 @@ password = 54321
 name = services.undernet.org
 description = UnderNet Services
 numeric = 51
+
+# Set this variable to yes if you want the server to attempt
+# to auto_reconnect when a connection is terminated, set
+# to no otherwise.
+# Be careful using this.
+auto_reconnect = yes
 
 # There is currently a bug in ircu which causes the first client
 # of a multiclient server to be lost, but only if maxclients is set

@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server.h,v 1.88 2003/07/03 00:25:48 dan_karrels Exp $
+ * $Id: server.h,v 1.89 2003/08/04 20:49:24 dan_karrels Exp $
  */
 
 #ifndef __SERVER_H
-#define __SERVER_H "$Id: server.h,v 1.88 2003/07/03 00:25:48 dan_karrels Exp $"
+#define __SERVER_H "$Id: server.h,v 1.89 2003/08/04 20:49:24 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
@@ -189,14 +189,6 @@ public:
 	 */
 	inline glineIterator	gline_end()
 		{ return glineList.end() ; }
-
-	/// Deprecated.
-	inline size_t		getTotalReceived() const
-		{ return 0 ; }
-
-	/// Deprecated.
-	inline size_t		getTotalSent() const
-		{ return 0 ; }
 
 	/**
 	 * This method is called when a Connection is disconnected.
@@ -643,6 +635,13 @@ public:
 	 */
 	virtual bool isVerbose() const
 		{ return verbose ; }
+
+	/**
+	 * Return true if the server is to auto reconnect on
+	 * connection termination, false otherwise.
+	 */
+	virtual bool getAutoConnect() const
+		{ return autoConnect ; }
 
 	/* Numeric utility methods */
 
@@ -1390,6 +1389,11 @@ protected:
 	 * True if all elog data should be output to clog.
 	 */
 	bool		verbose ;
+
+	/**
+	 * True if autoreconnect is enabled, false otherwise.
+	 */
+	bool		autoConnect ;
 
 	/**
 	 * This method initializes the entire server.

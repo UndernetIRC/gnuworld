@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ConnectionManager.cc,v 1.7 2003/07/03 00:25:48 dan_karrels Exp $
+ * $Id: ConnectionManager.cc,v 1.8 2003/08/04 20:49:24 dan_karrels Exp $
  */
 
 #include	<unistd.h>
@@ -52,7 +52,7 @@
 #include	"Buffer.h"
 #include	"ELog.h"
 
-const char rcsId[] = "$Id: ConnectionManager.cc,v 1.7 2003/07/03 00:25:48 dan_karrels Exp $" ;
+const char rcsId[] = "$Id: ConnectionManager.cc,v 1.8 2003/08/04 20:49:24 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -638,8 +638,8 @@ for( constHandlerMapIterator handlerItr = handlerMap.begin() ;
 		} // for( connectionItr )
 	} // for( handlerItr )
 
-int loopCount = 0 ;
 int selectRet = 0 ;
+unsigned short int loopCount = 0 ;
 do
 	{
 	// timeval may be modified by select() on some systems,

@@ -17,18 +17,19 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: main.cc,v 1.54 2003/07/03 00:25:48 dan_karrels Exp $
+ * $Id: main.cc,v 1.55 2003/08/04 20:49:24 dan_karrels Exp $
  */
-
-#include	<new>
-#include	<fstream>
-#include	<iostream>
 
 #include	<sys/time.h>
 #include	<sys/types.h>
 #include	<unistd.h>
 
+#include	<new>
+#include	<fstream>
+#include	<iostream>
+
 #include	<cstdio>
+#include	<cassert>
 #include	<cstdlib>
 #include	<cstring>
 
@@ -44,7 +45,7 @@
 #include	"md5hash.h"
 #include	"Signal.h"
 
-RCSTAG( "$Id: main.cc,v 1.54 2003/07/03 00:25:48 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: main.cc,v 1.55 2003/08/04 20:49:24 dan_karrels Exp $" ) ;
 
 // main() must be in the global namespace
 using namespace gnuworld ;
@@ -92,9 +93,39 @@ clog	<< "see the files named COPYING." << endl ;
 clog	<< endl ;
 }
 
+// These functions are used to duplicate/free
+// argv for reconnection of the server.
+// For some reason gcc 3.3 won't let me declare
+// argv as const char**
+char** dupArray( int argc, char** argv )
+{
+assert( argc >= 1 ) ;
+
+// Put a trailing NULL as the last element of the array
+char** retMe = new char*[ argc + 1 ] ;
+for( int i = 0 ; i < argc ; ++i )
+	{
+	retMe[ i ] = new char[ strlen( argv[ i ] ) + 1 ] ;
+	strcpy( retMe[ i ], argv[ i ] ) ;
+	}
+retMe[ argc ] = 0 ;
+return retMe ;
+}
+
+void releaseDup( int argc, char** releaseMe )
+{
+assert( argc >= 1 ) ;
+assert( releaseMe != 0 ) ;
+
+for( int i = 0 ; i < argc ; ++i )
+	{
+	delete[] releaseMe[ i ] ;
+	}
+delete[] releaseMe ;
+}
+
 int main( int argc, char** argv )
 {
-
 // output gnu information
 gnu() ;
 
@@ -113,10 +144,17 @@ if( 0 == Signal::getInstance() )
 // Seed the random number generator
 ::srand( ::time( 0 ) ) ;
 
-// Allocate a new instance of the xServer
-gnuworld::xServer* theServer =
-	new (std::nothrow) gnuworld::xServer( argc, argv ) ;
-assert( theServer != 0 ) ;
+bool autoConnect = true ;
+while( autoConnect )
+	{
+	// getopt() mutates argv, so only pass a copy so
+	// we can call getopt() again with the same option set
+	char** dupArgv = dupArray( argc, argv ) ;
+
+	// Allocate a new instance of the xServer
+	gnuworld::xServer* theServer =
+		new (std::nothrow) gnuworld::xServer( argc, dupArgv ) ;
+	assert( theServer != 0 ) ;
 
 	// Write out the pid
 	// TODO: This will have to be updated when running
@@ -136,10 +174,20 @@ assert( theServer != 0 ) ;
 		<< endl ;
 
 	pidFile.close() ;
-	}
+	} // pidFile
 
-theServer->run() ;
-delete theServer ;
+	theServer->run() ;
+
+	// update autoConnect here so we can tell how the server
+	// terminated.
+	autoConnect = theServer->getAutoConnect() ;
+
+	delete theServer ; theServer = 0 ;
+
+	releaseDup( argc, dupArgv ) ;
+	dupArgv = 0 ;
+	} // while( autoConnect )
+
 return 0 ;
 }
 
@@ -152,6 +200,7 @@ xServer::xServer( int argc, char** argv )
 {
 verbose = false ;
 
+optind = 0 ;
 int c = EOF ;
 while( (c = getopt( argc, argv, "cd:f:hs:")) != EOF )
 //while( true )

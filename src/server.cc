@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server.cc,v 1.172 2003/07/31 21:21:17 jeekay Exp $
+ * $Id: server.cc,v 1.173 2003/08/04 20:49:24 dan_karrels Exp $
  */
 
 #include	<sys/time.h>
@@ -71,7 +71,7 @@
 #include	"ConnectionHandler.h"
 #include	"Connection.h"
 
-RCSTAG( "$Id: server.cc,v 1.172 2003/07/31 21:21:17 jeekay Exp $" ) ;
+RCSTAG( "$Id: server.cc,v 1.173 2003/08/04 20:49:24 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -94,21 +94,6 @@ xNetwork*	Network = 0 ;
 // Allocate the static std::string in xServer representing
 // all channels.
 const string xServer::CHANNEL_ALL( "*" ) ;
-
-// This is a unary function class that will handle notifying
-// each xClient of a received signal
-struct handleSignal : public xNetwork::fe_xClientBase
-{
-handleSignal( int _whichSig ) : whichSig( _whichSig ) {}
-
-virtual void operator() ( xClient* theClient )
-{
-if( NULL == theClient ) return ;
-theClient->OnSignal( whichSig ) ;
-}
-
-int     whichSig ;
-} ;
 
 void xServer::initializeSystem()
 {
@@ -176,32 +161,7 @@ registerServerTimers() ;
  */
 xServer::~xServer()
 {
-// TODO: Delete all clients
-// TODO: Delete all commands in command map
-// TODO: Deallocate all timers
-//delete commandMap ;
-
-// Deallocate all of the Glines
-for( glineIterator ptr = gline_begin() ; ptr != gline_end() ;
-	++ptr )
-	{
-	delete ptr->second ;
-	}
-glineList.clear() ;
-
-// Deallocate all loaded modules/close dlm handles.
-for( clientModuleListType::iterator ptr = clientModuleList.begin() ;
-	ptr != clientModuleList.end() ; ++ptr )
-	{
-	delete *ptr ;
-	}
-clientModuleList.clear() ;
-
-while( !timerQueue.empty() )
-	{
-	delete timerQueue.top().second ;
-	timerQueue.pop() ;
-	}
+// All deallocations are performed in doShutdown()
 
 #ifdef EDEBUG
 	elog.closeFile()  ;
@@ -215,11 +175,11 @@ while( !timerQueue.empty() )
 
 void xServer::initializeVariables()
 {
-
 // Initialize more variables
 keepRunning = true ;
 bursting = false ;
 useHoldBuffer = false ;
+autoConnect = false ;
 StartTime = ::time( NULL ) ;
 
 serverConnection = 0 ;
@@ -253,6 +213,13 @@ Port = atoi( conf.Require( "port" )->second.c_str() ) ;
 intYY = atoi( conf.Require( "numeric" )->second.c_str() ) ;
 intXXX = atoi( conf.Require( "maxclients" )->second.c_str() ) ;
 commandMapFileName = conf.Require( "command_map" )->second ;
+
+// autoConnect initialized to false
+string strAutoConnect = conf.Require( "auto_reconnect" )->second ;
+if( (strAutoConnect == "yes") || (strAutoConnect == "true") )
+	{
+	autoConnect = true ;
+	}
 
 iClient::setHiddenHostSuffix(
 	conf.Require( "hidden_host_suffix" )->second ) ;
@@ -531,6 +498,7 @@ RegisterTimer( ::time( 0 ) + pingUpdateInterval,
 void xServer::Shutdown()
 {
 keepRunning = false ;
+autoConnect = false ;
 
 // Can't call removeClients() here because it is likely one of the
 // clients that has invoked this call, that would be bad.
@@ -2220,7 +2188,6 @@ bool xServer::JoinChannel( xClient* theClient,
 	const time_t& joinTime,
 	bool getOps )
 {
-
 // Determine the timestamp to use for the join
 time_t postJoinTime = joinTime ;
 if( 0 == postJoinTime )
@@ -2394,7 +2361,6 @@ else
 			<< chanName
 			<< " +o "
 			<< theClient->getCharYYXXX() ;
-
 		Write( s ) ;
 		}
 
@@ -2403,8 +2369,8 @@ else
 		// Set the channel modes
 		stringstream s ;
 		s	<< theClient->getCharYYXXX() << " M "
-			<< chanName << ' ' ;
-
+			<< chanName << ' '
+			<< chanModes ;
 		Write( s ) ;
 		}
 	}
@@ -2778,9 +2744,13 @@ bool xServer::PostSignal( int whichSig )
 // First, notify the server signal handler
 bool handledSignal = OnSignal( whichSig ) ;
 
-//TODO: figure out why foreach_xClient doesnt work
-
-//Network->foreach_xClient( handleSignal( whichSig ) ) ;
+if( SIGINT == whichSig )
+	{
+	elog	<< "xServer::PostSignal> Caught SIGINT, shutting "
+		<< "down"
+		<< endl ;
+	Shutdown() ;
+	}
 
 // Pass this signal on to each xClient.
 xNetwork::localClientIterator ptr = Network->localClient_begin() ;

@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: dronescan.cc,v 1.27 2003/08/02 19:36:49 jeekay Exp $
+ * $Id: dronescan.cc,v 1.28 2003/08/04 20:49:24 dan_karrels Exp $
  */
 
 #include	<string>
@@ -39,7 +39,7 @@
 #include "sqlUser.h"
 #include "Timer.h"
 
-RCSTAG("$Id: dronescan.cc,v 1.27 2003/08/02 19:36:49 jeekay Exp $");
+RCSTAG("$Id: dronescan.cc,v 1.28 2003/08/04 20:49:24 dan_karrels Exp $");
 
 namespace gnuworld {
 
@@ -421,7 +421,7 @@ void dronescan::OnPrivateMessage( iClient* theClient,
 	/* We have now seen this user! */
 	theUser->setLastSeen(::time(0));
 	theUser->commit();
-	
+
 	StringTokenizer st(Message);
 
 	if(st.size() < 1) return ;
@@ -441,7 +441,6 @@ void dronescan::OnPrivateMessage( iClient* theClient,
 		return ;
 		}
 	
-#if 0
 /* This is commented out because it doesn't work at the moment */
 	if("RELOAD" == Command)
 		{
@@ -449,7 +448,6 @@ void dronescan::OnPrivateMessage( iClient* theClient,
 		getUplink()->LoadClient("libdronescan.la", getConfigFileName());
 		return ;
 		}
-#endif
 
 	if("STATS" == Command)
 		{
