@@ -2,7 +2,7 @@
  * cservice.cc
  * Author: Greg Sikorski
  * Purpose: Overall control client.
- * $Id: cservice.cc,v 1.229 2003/01/08 23:23:37 gte Exp $
+ * $Id: cservice.cc,v 1.230 2003/01/29 23:19:58 gte Exp $
  */
 
 #include	<new>
@@ -2461,10 +2461,10 @@ for( xServer::opVectorType::const_iterator ptr = theTargets.begin() ;
 	} // for()
 
 /*
- *  Send notices and perform the deop's.
+ *  Send notices and perform the deop's. (But don't deop anything thats +k).
  */
 
-if (theChanUser && sourceHasBeenBad)
+if (theChanUser && sourceHasBeenBad && !theChanUser->getClient()->getMode(iClient::MODE_SERVICES))
 	deopList.push_back(theChanUser->getClient());
 
 if( !deopList.empty() )
@@ -2488,11 +2488,11 @@ if( !deopList.empty() )
 
 /*
  *  Have more than 'maxdeoppro' been deopped?
- *  If so, suspend and kick 'em.
+ *  If so, suspend and kick 'em. (Unless they're +k of course ;)
  */
 
 if ((theChanUser) && (deopCounter >= reggedChan->getMassDeopPro())
-	&& (reggedChan->getMassDeopPro() > 0))
+	&& (reggedChan->getMassDeopPro() > 0) && !theChanUser->getClient()->getMode(iClient::MODE_SERVICES))
 	{
 		doInternalBanAndKick(reggedChan, theChanUser->getClient(),
 			"### MASSDEOPPRO TRIGGERED! ###");
