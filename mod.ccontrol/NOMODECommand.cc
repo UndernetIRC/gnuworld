@@ -11,7 +11,7 @@
 #include	"Constants.h"
 #include	"ccBadChannel.h"
 
-const char NOMODECommand_cc_rcsId[] = "$Id: NOMODECommand.cc,v 1.1 2002/05/25 15:27:13 mrbean_ Exp $";
+const char NOMODECommand_cc_rcsId[] = "$Id: NOMODECommand.cc,v 1.2 2002/08/16 15:20:34 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -24,7 +24,7 @@ namespace uworld
 bool NOMODECommand::Exec( iClient* theClient, const string& Message )
 {
 StringTokenizer st( Message ) ;
-if( st.size() < 4 )
+if( st.size() < 3 )
 	{
 	Usage( theClient ) ;
 	return true ;
@@ -40,6 +40,12 @@ bot->MsgChanLog("NOMODE %s\n",bot->removeSqlChars(st.assemble(1)).c_str());
 	    
 if(!strcasecmp(st[1],"ADD"))
 	{
+	if( st.size() < 4 )
+	{
+	    Usage( theClient ) ;
+		return true ;
+	}
+
 	ccBadChannel* NewChannel = bot->isBadChannel(st[2]);
 	if(NewChannel)
 		{

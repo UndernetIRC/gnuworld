@@ -11,7 +11,7 @@
 /* ccontrol.cc
  * Authors: Daniel Karrels dan@karrels.com
  *	    Tomer Cohen    MrBean@toughguy.net
- * $Id: ccontrol.cc,v 1.148 2002/07/04 08:03:18 mrbean_ Exp $
+ * $Id: ccontrol.cc,v 1.149 2002/08/16 15:20:34 mrbean_ Exp $
  */
 
 #define MAJORVER "1"
@@ -56,7 +56,7 @@
 #include	"ip.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.148 2002/07/04 08:03:18 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.149 2002/08/16 15:20:34 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -629,12 +629,21 @@ RegisterCommand( new CONFIGCommand( this, "CONFIG",
 	true ) ) ;
 
 RegisterCommand( new NOMODECommand( this, "NOMODE", 
-	"<ADD/DEL> <#channel> <reason>  Manage the nomode list  ",
+	"<ADD/REM> <#channel> [reason]  Manage the nomode list  ",
 	commandLevel::flg_NOMODE,
 	false,
 	false,
 	false,
 	operLevel::SMTLEVEL,
+	true ) ) ;
+
+RegisterCommand( new SAYCommand( this, "SAY", 
+	"<-s/-b> Forced the bot to quote a command as the uplink or the bot",
+	commandLevel::flg_SAY,
+	false,
+	false,
+	false,
+	operLevel::CODERLEVEL,
 	true ) ) ;
 
 elog << "Loading commands ......... ";
@@ -645,7 +654,7 @@ elog << "Done!" << endl;
 elog << "Loading glines ........... ";
 if(loadGlines())
 	{
-	elog << "Success!" << endl;
+	elog << "Done!" << endl;
 	}
 else
 	{
@@ -655,7 +664,7 @@ else
 elog << "Loading exceptions ....... ";
 if(loadExceptions())
 	{
-	elog << "Success!" << endl;
+	elog << "Done!" << endl;
 	}
 else
 	{
@@ -668,7 +677,7 @@ else
 elog << "Loading users ............ ";
 if(loadUsers())
 	{
-	elog << "Success!" << endl;
+	elog << "Done!" << endl;
 	}
 else
 	{
@@ -678,7 +687,7 @@ else
 elog << "Loading servers info ..... ";
 if(loadServers())
 	{
-	elog << "Success!" << endl;
+	elog << "Done!" << endl;
 	}
 else
 	{
@@ -2887,6 +2896,13 @@ for(glineListType::iterator ptr = glineList.begin()
 			}
 		}
 	theGline->clearBurst();
+	if(theGline->getHost().substr(0,1) == "#") //is this a gchan 
+		{
+		MyUplink->setGline(theGline->getAddedBy(),
+			    theGline->getHost(),
+			    theGline->getReason(), Expires , this);
+			    
+		}
 	}
 return true;
 }
