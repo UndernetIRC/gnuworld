@@ -16,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: nickserv.h,v 1.15 2004/05/25 14:18:13 jeekay Exp $
+ * $Id: nickserv.h,v 1.16 2004/06/04 20:17:24 jeekay Exp $
  */
 
 #ifndef _NICKSERV_H
-#define _NICKSERV_H "$Id: nickserv.h,v 1.15 2004/05/25 14:18:13 jeekay Exp $"
+#define _NICKSERV_H "$Id: nickserv.h,v 1.16 2004/06/04 20:17:24 jeekay Exp $"
 
 #include "client.h"
 #include "EConfig.h"
@@ -77,7 +77,7 @@ class nickserv : public xClient, public logging::logTarget {
     virtual void OnPrivateMessage( iClient*, const string&, bool secure ) ;
     
     /** This method is called when a timer expires */
-    virtual void OnTimer(const gnuworld::xServer::timerID, void*) ;
+    virtual void OnTimer(const gnuworld::xServer::timerID&, void*) ;
     
     /*********************************
      ** N I C K S E R V   T Y P E S **

@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: stats.cc,v 1.29 2003/12/29 23:59:38 dan_karrels Exp $
+ * $Id: stats.cc,v 1.30 2004/06/04 20:17:24 jeekay Exp $
  */
 
 #include	<list>
@@ -40,7 +40,7 @@
 #include	"config.h"
 #include	"misc.h"
 
-RCSTAG( "$Id: stats.cc,v 1.29 2003/12/29 23:59:38 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: stats.cc,v 1.30 2004/06/04 20:17:24 jeekay Exp $" ) ;
 
 namespace gnuworld
 {
@@ -205,7 +205,7 @@ MyUplink->RegisterChannelEvent( "*", this ) ;
 MyUplink->RegisterTimer( ::time( 0 ) + 60, this ) ;
 }
 
-void stats::OnTimer( xServer::timerID, void* )
+void stats::OnTimer( const xServer::timerID&, void* )
 {
 //elog	<< "stats::OnTimer"
 //	<< endl ;

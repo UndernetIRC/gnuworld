@@ -20,7 +20,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccontrol.cc,v 1.181 2004/06/04 14:30:52 mrbean_ Exp $
+ * $Id: ccontrol.cc,v 1.182 2004/06/04 20:17:22 jeekay Exp $
 */
 
 #define MAJORVER "1"
@@ -65,7 +65,7 @@
 #include	"ip.h"
 #include	"config.h"
 
-RCSTAG( "$Id: ccontrol.cc,v 1.181 2004/06/04 14:30:52 mrbean_ Exp $" ) ;
+RCSTAG( "$Id: ccontrol.cc,v 1.182 2004/06/04 20:17:22 jeekay Exp $" ) ;
 
 namespace gnuworld
 {
@@ -1448,7 +1448,7 @@ xClient::OnChannelEvent( theEvent, theChan,
 	Data1, Data2, Data3, Data4 ) ;
 }
 
-void ccontrol::OnTimer(const xServer::timerID timer_id, void*)
+void ccontrol::OnTimer(const xServer::timerID& timer_id, void*)
 {
 if (timer_id ==  postDailyLog)
 	{ 

@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: dronescan.cc,v 1.48 2004/05/25 14:17:58 jeekay Exp $
+ * $Id: dronescan.cc,v 1.49 2004/06/04 20:17:23 jeekay Exp $
  */
 
 #include	<string>
@@ -45,7 +45,7 @@
 #include "sqlUser.h"
 #include "Timer.h"
 
-RCSTAG("$Id: dronescan.cc,v 1.48 2004/05/25 14:17:58 jeekay Exp $");
+RCSTAG("$Id: dronescan.cc,v 1.49 2004/06/04 20:17:23 jeekay Exp $");
 
 namespace gnuworld {
 
@@ -601,7 +601,7 @@ if(!MyUplink->UnRegisterTimer(tidClearJoinCounter, 0) ||
 
 
 /** Receive our own timed events. */
-void dronescan::OnTimer( const xServer::timerID theTimer , void *)
+void dronescan::OnTimer( const xServer::timerID& theTimer , void *)
 {
 	time_t theTime;
 

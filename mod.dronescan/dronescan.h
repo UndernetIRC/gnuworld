@@ -16,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: dronescan.h,v 1.24 2004/05/25 14:18:12 jeekay Exp $
+ * $Id: dronescan.h,v 1.25 2004/06/04 20:17:24 jeekay Exp $
  */
 
 #ifndef DRONESCAN_H
-#define DRONESCAN_H "$Id: dronescan.h,v 1.24 2004/05/25 14:18:12 jeekay Exp $"
+#define DRONESCAN_H "$Id: dronescan.h,v 1.25 2004/06/04 20:17:24 jeekay Exp $"
 
 #include <map>
 
@@ -90,7 +90,7 @@ public:
 	virtual void OnDetach() ;
 	
 	/** Receive our own timed events. */
-	virtual void OnTimer( const xServer::timerID , void* ) ;
+	virtual void OnTimer( const xServer::timerID& , void* ) ;
 	
 	/*****************************************
 	 ** D R O N E S C A N   T Y P E D E F S **

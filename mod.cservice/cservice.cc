@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: cservice.cc,v 1.241 2004/05/19 19:46:35 jeekay Exp $
+ * $Id: cservice.cc,v 1.242 2004/06/04 20:17:23 jeekay Exp $
  */
 
 #include	<new>
@@ -2113,7 +2113,7 @@ void cservice::updateBans()
  * control to the relevant member for the timer
  * triggered.
  */
-void cservice::OnTimer(const xServer::timerID timer_id, void*)
+void cservice::OnTimer(const xServer::timerID& timer_id, void*)
 {
 if (timer_id == limit_timerID)
 	{

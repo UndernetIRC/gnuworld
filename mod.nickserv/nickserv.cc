@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: nickserv.cc,v 1.28 2004/05/25 14:18:13 jeekay Exp $
+ * $Id: nickserv.cc,v 1.29 2004/06/04 20:17:24 jeekay Exp $
  */
 
 #include	<sstream>
@@ -31,7 +31,7 @@
 #include "netData.h"
 #include "nickserv.h"
 
-RCSTAG("$Id: nickserv.cc,v 1.28 2004/05/25 14:18:13 jeekay Exp $");
+RCSTAG("$Id: nickserv.cc,v 1.29 2004/06/04 20:17:24 jeekay Exp $");
 
 namespace gnuworld
 {
@@ -373,7 +373,7 @@ commHandler->second->Exec(theClient, Message);
  * When a timer expires, this function is called. It allows for periodic
  * processing of data.
  */
-void nickserv::OnTimer(const xServer::timerID theTimer, void* )
+void nickserv::OnTimer(const xServer::timerID& theTimer, void* )
 {
 if(theTimer == processQueue_timerID) {
   processQueue();

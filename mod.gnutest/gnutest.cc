@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: gnutest.cc,v 1.19 2004/05/25 14:18:12 jeekay Exp $
+ * $Id: gnutest.cc,v 1.20 2004/06/04 20:17:24 jeekay Exp $
  */
 
 #include	<string>
@@ -30,7 +30,7 @@
 #include	"EConfig.h"
 #include	"Network.h"
 
-RCSTAG("$Id: gnutest.cc,v 1.19 2004/05/25 14:18:12 jeekay Exp $");
+RCSTAG("$Id: gnutest.cc,v 1.20 2004/06/04 20:17:24 jeekay Exp $");
 
 namespace gnuworld
 {
@@ -756,7 +756,7 @@ std::remove( channels.begin(), channels.end(), chanName ) ;
 return true ;
 }
 
-void gnutest::OnTimer( const xServer::timerID, void* )
+void gnutest::OnTimer( const xServer::timerID&, void* )
 {
 Channel* theChan = Network->findChannel( timerChan ) ;
 if( NULL == theChan )

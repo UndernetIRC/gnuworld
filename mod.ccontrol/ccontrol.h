@@ -16,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccontrol.h,v 1.92 2004/05/19 19:46:35 jeekay Exp $
+ * $Id: ccontrol.h,v 1.93 2004/06/04 20:17:22 jeekay Exp $
  */
 
 #ifndef __CCONTROL_H
-#define __CCONTROL_H "$Id: ccontrol.h,v 1.92 2004/05/19 19:46:35 jeekay Exp $"
+#define __CCONTROL_H "$Id: ccontrol.h,v 1.93 2004/06/04 20:17:22 jeekay Exp $"
 
 //Undef this if you want to log to the database
 #define LOGTOHD 
@@ -242,7 +242,7 @@ public:
 		void* = 0, void* = 0,
 		void* = 0, void* = 0 ) ;
 
-	virtual void OnTimer(const xServer::timerID, void*);
+	virtual void OnTimer(const xServer::timerID&, void*);
 	
 	virtual void OnConnect();
 	

@@ -20,7 +20,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
  * USA.
  *
- * $Id: cloner.cc,v 1.32 2003/12/29 23:59:37 dan_karrels Exp $
+ * $Id: cloner.cc,v 1.33 2004/06/04 20:17:23 jeekay Exp $
  */
 
 #include	<new>
@@ -43,7 +43,7 @@
 #include	"misc.h"
 #include	"ELog.h"
 
-RCSTAG("$Id: cloner.cc,v 1.32 2003/12/29 23:59:37 dan_karrels Exp $");
+RCSTAG("$Id: cloner.cc,v 1.33 2004/06/04 20:17:23 jeekay Exp $");
 
 namespace gnuworld
 {
@@ -534,7 +534,7 @@ else if( command == "NOTICEALL" )
 	} // NOTICEALL
 }
 
-void cloner::OnTimer( xServer::timerID, void* )
+void cloner::OnTimer( const xServer::timerID&, void* )
 {
 //elog	<< "cloner::OnTimer> makeCloneCount: "
 //	<< makeCloneCount

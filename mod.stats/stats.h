@@ -17,11 +17,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: stats.h,v 1.17 2003/12/29 23:59:38 dan_karrels Exp $
+ * $Id: stats.h,v 1.18 2004/06/04 20:17:24 jeekay Exp $
  */
 
 #ifndef __STATS_H
-#define __STATS_H "$Id: stats.h,v 1.17 2003/12/29 23:59:38 dan_karrels Exp $"
+#define __STATS_H "$Id: stats.h,v 1.18 2004/06/04 20:17:24 jeekay Exp $"
 
 #include	<fstream>
 #include	<string>
@@ -122,7 +122,7 @@ public:
 	 * This method is called when a registered timer
 	 * expires.
 	 */
-	virtual void	OnTimer( xServer::timerID, void* ) ;
+	virtual void	OnTimer( const xServer::timerID&, void* ) ;
 
 	/**
 	 * Return the part message stats will use when it parts

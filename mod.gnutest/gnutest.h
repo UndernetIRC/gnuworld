@@ -16,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: gnutest.h,v 1.11 2004/05/25 14:18:12 jeekay Exp $
+ * $Id: gnutest.h,v 1.12 2004/06/04 20:17:24 jeekay Exp $
  */
 
 #ifndef __GNUTEST_H
-#define __GNUTEST_H "$Id: gnutest.h,v 1.11 2004/05/25 14:18:12 jeekay Exp $"
+#define __GNUTEST_H "$Id: gnutest.h,v 1.12 2004/06/04 20:17:24 jeekay Exp $"
 
 #include	<string>
 #include	<vector>
@@ -182,7 +182,7 @@ public:
 	/**
 	 * This method is called when a timer expires.
 	 */
-	virtual void	OnTimer( const xServer::timerID, void* ) ;
+	virtual void	OnTimer( const xServer::timerID&, void* ) ;
 
 	/**
 	 * This method returns true if the client is on the given
