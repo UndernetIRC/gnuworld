@@ -1,7 +1,8 @@
--- 2001-13-02 
--- Added by |MrBean| (MrBean@toughguy.net)
--- Level patch for ccontrol module
+-- 2001-13-02  : |MrBean|
+-- Added level patch for ccontrol module
 
+-- 2001-22-02 : |MrBean|
+-- Added help table for a new help system being developed
 
 CREATE TABLE opers (
 	user_id SERIAL,	
