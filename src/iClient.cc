@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: iClient.cc,v 1.32 2003/12/29 23:59:38 dan_karrels Exp $
+ * $Id: iClient.cc,v 1.33 2004/02/13 17:24:42 jeekay Exp $
  */
 
 #include	<new>
@@ -34,7 +34,7 @@
 #include	"ip.h"
 #include	"config.h"
 
-RCSTAG( "$Id: iClient.cc,v 1.32 2003/12/29 23:59:38 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: iClient.cc,v 1.33 2004/02/13 17:24:42 jeekay Exp $" ) ;
 
 namespace gnuworld
 {
@@ -42,15 +42,16 @@ namespace gnuworld
 using std::string ;
 using std::map ;
 
-const iClient::modeType iClient::MODE_OPER        = 0x01 ;
-const iClient::modeType iClient::MODE_WALLOPS     = 0x02 ;
-const iClient::modeType iClient::MODE_INVISIBLE   = 0x04 ;
-const iClient::modeType iClient::MODE_DEAF        = 0x08 ;
-const iClient::modeType iClient::MODE_SERVICES    = 0x10 ;
-const iClient::modeType iClient::MODE_REGISTERED  = 0x20 ;
-const iClient::modeType iClient::MODE_HIDDEN_HOST = 0x40 ;
-const iClient::modeType iClient::MODE_G		  = 0x80 ;
-const iClient::modeType iClient::MODE_SERVNOTICES = 0x100 ;
+const iClient::modeType iClient::MODE_OPER        = 0x0001 ;
+const iClient::modeType iClient::MODE_WALLOPS     = 0x0002 ;
+const iClient::modeType iClient::MODE_INVISIBLE   = 0x0004 ;
+const iClient::modeType iClient::MODE_DEAF        = 0x0008 ;
+const iClient::modeType iClient::MODE_SERVICES    = 0x0010 ;
+const iClient::modeType iClient::MODE_REGISTERED  = 0x0020 ;
+const iClient::modeType iClient::MODE_HIDDEN_HOST = 0x0040 ;
+const iClient::modeType iClient::MODE_G           = 0x0080 ;
+const iClient::modeType iClient::MODE_SERVNOTICES = 0x0100 ;
+const iClient::modeType iClient::MODE_FAKE        = 0x0200 ;
 
 string iClient::hiddenHostSuffix( "we.all.worship.mrbean.org" ) ;
 

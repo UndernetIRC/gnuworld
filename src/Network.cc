@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: Network.cc,v 1.64 2004/01/05 00:13:19 dan_karrels Exp $
+ * $Id: Network.cc,v 1.65 2004/02/13 17:24:41 jeekay Exp $
  */
 
 #include	<new>
@@ -45,7 +45,7 @@
 #include	"ip.h"
 #include	"config.h"
 
-RCSTAG( "$Id: Network.cc,v 1.64 2004/01/05 00:13:19 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: Network.cc,v 1.65 2004/02/13 17:24:41 jeekay Exp $" ) ;
 
 namespace gnuworld
 {
@@ -1198,7 +1198,11 @@ if( !numericMap.insert( make_pair( fakeClient->getIntYYXXX(),
 
 	return false ;
 	}
+
 addNick( fakeClient ) ;
+
+/* Mark the iClient as being fake */
+fakeClient->setFake();
 
 return true ;
 }

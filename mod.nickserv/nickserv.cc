@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: nickserv.cc,v 1.25 2004/02/13 17:04:23 jeekay Exp $
+ * $Id: nickserv.cc,v 1.26 2004/02/13 17:24:41 jeekay Exp $
  */
 
 #include	<sstream>
@@ -31,7 +31,7 @@
 #include "netData.h"
 #include "nickserv.h"
 
-RCSTAG("$Id: nickserv.cc,v 1.25 2004/02/13 17:04:23 jeekay Exp $");
+RCSTAG("$Id: nickserv.cc,v 1.26 2004/02/13 17:24:41 jeekay Exp $");
 
 namespace gnuworld
 {
@@ -515,7 +515,7 @@ for(QueueType::iterator queuePos = warnQueue.begin(); queuePos != warnQueue.end(
 	
   /* Is this a juped nick? */
   /* TODO: There should be an iClient call for this */
-  if(MyUplink->getIntYY() == theClient->getIntYY()) {
+  if(theClient->isFake()) {
     /* This is a juped nick. Let's not try to kill it eh. */
     queuePos = warnQueue.erase(queuePos);
     continue;

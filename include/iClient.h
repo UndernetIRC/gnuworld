@@ -17,11 +17,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: iClient.h,v 1.41 2004/01/07 03:08:29 dan_karrels Exp $
+ * $Id: iClient.h,v 1.42 2004/02/13 17:24:41 jeekay Exp $
  */
 
 #ifndef __ICLIENT_H
-#define __ICLIENT_H "$Id: iClient.h,v 1.41 2004/01/07 03:08:29 dan_karrels Exp $"
+#define __ICLIENT_H "$Id: iClient.h,v 1.42 2004/02/13 17:24:41 jeekay Exp $"
 
 #include	<string>
 #include	<list>
@@ -90,6 +90,9 @@ public:
 	/// MODE_SERVNOTICES is true if this user is receiving server
 	/// notices.  This may not be transmitted on all networks.
 	static const modeType	MODE_SERVNOTICES ;
+	
+	/** MODE_FAKE is true if this user is a fake client. */
+	static const modeType MODE_FAKE;
 
 	/// Iterator for channels this user is on.
 	typedef channelListType::iterator channelIterator ;
@@ -346,6 +349,12 @@ public:
 		{ return getMode( MODE_G ) ; }
 
 	/**
+	 * Return true if this iClient is a fake, false otherwise.
+	 */
+	inline bool isFake() const
+		{ return getMode( MODE_FAKE ) ; }
+
+	/**
 	 * Return true if this iClient is an oper, false otherwise.
 	 */
 	inline bool isOper() const
@@ -413,6 +422,12 @@ public:
 	 */
 	inline void setModeR()
 		{ setMode( MODE_REGISTERED ) ; }
+
+	/**
+	 * Designate this iClient as a fake.
+	 */
+	inline void setFake()
+		{ setMode( MODE_FAKE ) ; }
 
 	/**
 	 * Remove a user mode for this iClient.
