@@ -1,5 +1,5 @@
 #!/usr/local/pgsql/bin/pgtclsh
-# $Id: appjudge,v 1.7 2003/05/13 11:06:16 nighty Exp $
+# $Id: appjudge,v 1.1 2003/06/19 19:21:12 dan_karrels Exp $
 # Author: sengaia@undernet.org, 20010619
 # Last fix: nighty@undernet.org, 20030115 (fixed a typo hDB <> hSQL, and a forgoten variable reset in Step3)
 # This script automates a good part of the channel-registration process, you need

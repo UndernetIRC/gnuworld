@@ -1,7 +1,7 @@
 #!/bin/bash
 # You can change the above to the good path to your "bash" binary if needed
 #
-# $Id: Manager1K.sh,v 1.2 2002/06/26 18:34:20 nighty Exp $
+# $Id: Manager1K.sh,v 1.1 2003/06/19 19:21:12 dan_karrels Exp $
 #
 
 # some default script values
@@ -96,7 +96,7 @@ echo "*                                                                     *"
 echo "* Warning: This program stops on any input error.                     *"
 echo "*                                                                     *"
 echo "***********************************************************************"
-echo "\$Id: Manager1K.sh,v 1.2 2002/06/26 18:34:20 nighty Exp $"
+echo "\$Id: Manager1K.sh,v 1.1 2003/06/19 19:21:12 dan_karrels Exp $"
 echo "***********************************************************************"
 echo "* Released under the GNU Public License                               *"
 echo "***********************************************************************"
