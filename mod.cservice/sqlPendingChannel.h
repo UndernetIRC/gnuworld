@@ -5,7 +5,7 @@
  */
 
 #ifndef __SQLPENDINGCHANNEL_H
-#define __SQLPENDINGCHANNEL_H "$Id: sqlPendingChannel.h,v 1.1 2001/04/15 22:12:36 gte Exp $"
+#define __SQLPENDINGCHANNEL_H "$Id: sqlPendingChannel.h,v 1.2 2001/04/16 23:18:44 gte Exp $"
 
 #include	<string> 
  
@@ -19,7 +19,8 @@ class sqlPendingChannel
 public:
 	unsigned int channel_id;
 	unsigned int join_count;
-
+	typedef map < int, int > supporterListType;
+	supporterListType supporterList;
 };
 
 }

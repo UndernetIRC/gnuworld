@@ -1,5 +1,5 @@
 #ifndef __CSERVICE_H
-#define __CSERVICE_H "$Id: cservice.h,v 1.61 2001/04/15 22:12:36 gte Exp $"
+#define __CSERVICE_H "$Id: cservice.h,v 1.62 2001/04/16 23:18:44 gte Exp $"
 
 #include	<string>
 #include	<vector>
@@ -311,6 +311,14 @@ public:
 	pendingChannelListType pendingChannelList;
 
 	/*
+	 *  Load the pendingChannelList from the database.
+	 *  This list contains details about channels currently
+	 *  'Pending' successful registration.
+	 */
+
+	void loadPendingChannelList();
+
+	/*
 	 *  Timer Functions.
 	 *  These support functions are called at periodic
 	 *  intervals to perform maintainence, etc. 
@@ -366,6 +374,7 @@ public:
 	/*
 	 *  Misc uncategorisable functions.
 	 */
+
 } ;
 
 const string escapeSQLChars(const string& theString);

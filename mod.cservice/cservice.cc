@@ -3101,6 +3101,13 @@ Notice(theClient,
 	"the database may be unavailable. Please try again later."); 
 dbErrors++;
 }
+
+void cservice::loadPendingChannelList()
+{
+//	SELECT channels.name, pending.channel_id, user_id, pending.join_count, supporters.join_count from pending,supporters,channels where pending.channel_id = supporters.channel_id and channels.id = pending.channel_id;
+	sqlPendingChannel* newPending = new sqlPendingChannel();
+	pendingChannelList.insert( pendingChannelListType::value_type("#amigachat", newPending)  );
+}
  
 void Command::Usage( iClient* theClient )
 {

@@ -16,7 +16,7 @@
  *
  * Caveats: None.
  *
- * $Id: SETCommand.cc,v 1.32 2001/03/16 11:50:59 isomer Exp $
+ * $Id: SETCommand.cc,v 1.33 2001/04/16 23:18:44 gte Exp $
  */
 
 #include	<string>
@@ -27,7 +27,7 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char SETCommand_cc_rcsId[] = "$Id: SETCommand.cc,v 1.32 2001/03/16 11:50:59 isomer Exp $" ;
+const char SETCommand_cc_rcsId[] = "$Id: SETCommand.cc,v 1.33 2001/04/16 23:18:44 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -93,75 +93,44 @@ if( st[1][0] != '#' ) // Didn't find a hash?
 		}
 	if (option == "LANG")
 		{
-		bot->Notice(theClient, "Option temporarily disabled, back soon.");
-		return true;
-		if (value == "EN")
-			{
-			string lang = "English";
+		string lang = "English";
+		bool done = false;
+		if (value == "ENGLISH")
+			{ 
 			theUser->setLanguageId( 1 );
 			theUser->commit();
-			bot->Notice(theClient, 
-			    bot->getResponse(theUser,
-			    	    language::lang_set_to,
-				    string("Language is set to %s.")).c_str(), lang.c_str());
+			done = true;
+			}
+		if (value == "SPANISH")
+			{
+			lang = "Spanish";
+			theUser->setLanguageId( 10 );
+			theUser->commit(); 
+			done = true;
+			}
+		if (value == "CATALAN")
+			{
+			lang = "Catalan";
+			theUser->setLanguageId( 9 );
+			theUser->commit(); 
+			done = true;
+			}
 
-			return true;
-			}
-		if (value == "FR")
+			if (done) 
 			{
-			string lang = "French";
-			theUser->setLanguageId( 2 );
-			theUser->commit();
-			bot->Notice(theClient, 
-				bot->getResponse(theUser,
-			    	    language::lang_set_to,
-				    string("Language is set to %s.")).c_str(), lang.c_str());
+				bot->Notice(theClient, 
+				    bot->getResponse(theUser,
+				    	    language::lang_set_to,
+					    string("Language is set to %s.")).c_str(), lang.c_str());
+				return true;
+			} else 
+			{ 
+	        	bot->Notice(theClient, 
+	        		"ERROR: Invalid language selection. Choices are: English, Spanish, Catalan.");
+			return true;			
+			}
+		}
 
-			return true;
-			}
-		if (value == "DK")
-			{
-			string lang = "Danish";
-			theUser->setLanguageId( 3 );
-			theUser->commit();
-			bot->Notice(theClient, 
-				bot->getResponse(theUser,
-					language::lang_set_to,
-					string("Language is set to %s.")).c_str(),
-					lang.c_str());
-
-			return true;
-			}
-		if (value == "NL")
-			{
-			string lang = "Dutch";
-			theUser->setLanguageId( 4 );
-			theUser->commit();
-			bot->Notice(theClient, 
-			    bot->getResponse(theUser,
-			    	    language::lang_set_to,
-				    string("Language is set to %s.")).c_str(), lang.c_str());
-				
-			return true;
-			}
-			if (value == "DE")
-			{
-			string lang = "German";
-			theUser->setLanguageId( 5 );
-			theUser->commit();
-			bot->Notice(theClient, 
-			    bot->getResponse(theUser,
-			    	    language::lang_set_to,
-				    string("Language is set to %s.")).c_str(), lang.c_str());
-			
-			return true;
-			}
-        	bot->Notice(theClient, 
-		    bot->getResponse(theUser,
-		    	    language::lang_invalid,
-			    string("ERROR: Invalid language selection.")));
-		return true;			
-		}		
 	bot->Notice(theClient, 
 		bot->getResponse(theUser,
 			language::invalid_option,
