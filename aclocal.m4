@@ -1,7 +1,7 @@
 dnl aclocal.m4
 dnl   macros autoconf uses when building configure from configure.in
 dnl
-dnl $Id: aclocal.m4,v 1.3 2000/12/09 22:52:42 dan_karrels Exp $
+dnl $Id: aclocal.m4,v 1.4 2000/12/09 22:58:08 dan_karrels Exp $
 dnl
 
 dnl This entire function (minus a few minor modifications) was taken
@@ -166,8 +166,14 @@ case "$cv_var_system" in
     SHLIB_CXX="${CXX} -fPIC"
     AC_DEFINE(MODULES_OK)dnl
     ;;
+  FreeBSD)
+    AC_MSG_RESULT(FreeBSD)
+    SHLIB_CXX="${CXX} -fpic"
+    SHLIB_LD="ld -Bshareable -x"
+    AC_DEFINE(MODULES_OK)dnl
+    ;;
   *BSD)
-    AC_MSG_RESULT(FreeBSD/NetBSD/OpenBSD - choose your poison)
+    AC_MSG_RESULT(NetBSD/OpenBSD - choose your poison)
     SHLIB_CXX="${CXX} -fpic"
     SHLIB_LD="ld -Bshareable -x -r"
     AC_DEFINE(MODULES_OK)dnl
