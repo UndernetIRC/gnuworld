@@ -1,5 +1,5 @@
 #ifndef __LEVELS_H
-#define __LEVELS_H "$Id: levels.h,v 1.14 2001/02/28 22:50:36 plexus Exp $"
+#define __LEVELS_H "$Id: levels.h,v 1.15 2001/04/13 19:12:14 gte Exp $"
 
 /* 
  * levels.h
@@ -9,7 +9,7 @@
  * 
  * Defines access level constants for use in command handlers. 
  *
- * $Id: levels.h,v 1.14 2001/02/28 22:50:36 plexus Exp $
+ * $Id: levels.h,v 1.15 2001/04/13 19:12:14 gte Exp $
  */
 
 namespace gnuworld {
@@ -57,6 +57,8 @@ namespace gnuworld {
   const int logs = 501; // Level that logs are visible at 
   
   const int registercmd = 600;
+  const int rehash = 900;
+
   const int purge = 750; 
   const int remignore = 600;
 
@@ -64,8 +66,8 @@ namespace gnuworld {
   const int say = 800;
 
   // Debug Commands
-  const int shutdown = 1000;
-  const int quote = 1000; 
+  const int shutdown = 900;
+  const int quote = 1000;
  
   namespace set {
     const int alwaysop = 450;

@@ -10,7 +10,7 @@
 # even the implied warranty of MERCHANTABILITY or FITNESS FOR A
 # PARTICULAR PURPOSE.
 
-# "$Id: Makefile.in,v 1.71 2001/03/07 23:22:11 dan_karrels Exp $"
+# "$Id: Makefile.in,v 1.72 2001/04/13 19:12:14 gte Exp $"
 
 
 SHELL = @SHELL@
@@ -98,7 +98,7 @@ lib_LTLIBRARIES = libcservice.la
 libcservice_la_LDFLAGS = -module -export-dynamic -L@PGSQL_LIB@ 	-lpq++
 
 
-libcservice_la_SOURCES = cservice.cc 	networkData.cc 	sqlChannel.cc 	sqlUser.cc 	sqlLevel.cc 	sqlBan.cc 	ACCESSCommand.cc 	ADDUSERCommand.cc 	BANCommand.cc 	BANLISTCommand.cc 	CHANINFOCommand.cc 	CLEARMODECommand.cc 	DEOPCommand.cc 	DEVOICECommand.cc 	FORCECommand.cc 	HELPCommand.cc 	INVITECommand.cc 	ISREGCommand.cc 	JOINCommand.cc 	KICKCommand.cc 	LBANLISTCommand.cc 	LOGINCommand.cc 	MODINFOCommand.cc 	MOTDCommand.cc 	NEWPASSCommand.cc 	OPCommand.cc 	OPERJOINCommand.cc 	OPERPARTCommand.cc 	PARTCommand.cc 	PURGECommand.cc 	QUOTECommand.cc 	RANDOMCommand.cc 	REGISTERCommand.cc 	REMIGNORECommand.cc 	REMUSERCommand.cc 	SAYCommand.cc 	SEARCHCommand.cc 	SERVNOTICECommand.cc 	SETCommand.cc 	SHOWCOMMANDSCommand.cc 	SHOWIGNORECommand.cc 	STATUSCommand.cc 	SUSPENDCommand.cc 	TOPICCommand.cc 	UNBANCommand.cc 	UNFORCECommand.cc 	UNSUSPENDCommand.cc 	VERIFYCommand.cc 	VOICECommand.cc
+libcservice_la_SOURCES = cservice.cc 	networkData.cc 	sqlChannel.cc 	sqlUser.cc 	sqlLevel.cc 	sqlBan.cc 	ACCESSCommand.cc 	ADDUSERCommand.cc 	BANCommand.cc 	BANLISTCommand.cc 	CHANINFOCommand.cc 	CLEARMODECommand.cc 	DEOPCommand.cc 	DEVOICECommand.cc 	FORCECommand.cc 	HELPCommand.cc 	INVITECommand.cc 	ISREGCommand.cc 	JOINCommand.cc 	KICKCommand.cc 	LBANLISTCommand.cc 	LOGINCommand.cc 	MODINFOCommand.cc 	MOTDCommand.cc 	NEWPASSCommand.cc 	OPCommand.cc 	OPERJOINCommand.cc 	OPERPARTCommand.cc 	PARTCommand.cc 	PURGECommand.cc 	QUOTECommand.cc 	RANDOMCommand.cc 	REGISTERCommand.cc 	REHASHCommand.cc 	REMIGNORECommand.cc 	REMUSERCommand.cc 	SAYCommand.cc 	SEARCHCommand.cc 	SERVNOTICECommand.cc 	SETCommand.cc 	SHOWCOMMANDSCommand.cc 	SHOWIGNORECommand.cc 	STATUSCommand.cc 	SUSPENDCommand.cc 	TOPICCommand.cc 	UNBANCommand.cc 	UNFORCECommand.cc 	UNSUSPENDCommand.cc 	VERIFYCommand.cc 	VOICECommand.cc
 
 
 INCLUDES = -I@PGSQL_INCLUDE@
@@ -120,11 +120,11 @@ INVITECommand.lo ISREGCommand.lo JOINCommand.lo KICKCommand.lo \
 LBANLISTCommand.lo LOGINCommand.lo MODINFOCommand.lo MOTDCommand.lo \
 NEWPASSCommand.lo OPCommand.lo OPERJOINCommand.lo OPERPARTCommand.lo \
 PARTCommand.lo PURGECommand.lo QUOTECommand.lo RANDOMCommand.lo \
-REGISTERCommand.lo REMIGNORECommand.lo REMUSERCommand.lo SAYCommand.lo \
-SEARCHCommand.lo SERVNOTICECommand.lo SETCommand.lo \
-SHOWCOMMANDSCommand.lo SHOWIGNORECommand.lo STATUSCommand.lo \
-SUSPENDCommand.lo TOPICCommand.lo UNBANCommand.lo UNFORCECommand.lo \
-UNSUSPENDCommand.lo VERIFYCommand.lo VOICECommand.lo
+REGISTERCommand.lo REHASHCommand.lo REMIGNORECommand.lo \
+REMUSERCommand.lo SAYCommand.lo SEARCHCommand.lo SERVNOTICECommand.lo \
+SETCommand.lo SHOWCOMMANDSCommand.lo SHOWIGNORECommand.lo \
+STATUSCommand.lo SUSPENDCommand.lo TOPICCommand.lo UNBANCommand.lo \
+UNFORCECommand.lo UNSUSPENDCommand.lo VERIFYCommand.lo VOICECommand.lo
 CXXCOMPILE = $(CXX) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
 LTCXXCOMPILE = $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
 CXXLD = $(CXX)
@@ -134,7 +134,7 @@ DIST_COMMON =  Makefile.am Makefile.in configure
 
 DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
-TAR = tar
+TAR = gtar
 GZIP_ENV = --best
 DEP_FILES =  .deps/ACCESSCommand.P .deps/ADDUSERCommand.P \
 .deps/BANCommand.P .deps/BANLISTCommand.P .deps/CHANINFOCommand.P \
@@ -145,14 +145,15 @@ DEP_FILES =  .deps/ACCESSCommand.P .deps/ADDUSERCommand.P \
 .deps/MOTDCommand.P .deps/NEWPASSCommand.P .deps/OPCommand.P \
 .deps/OPERJOINCommand.P .deps/OPERPARTCommand.P .deps/PARTCommand.P \
 .deps/PURGECommand.P .deps/QUOTECommand.P .deps/RANDOMCommand.P \
-.deps/REGISTERCommand.P .deps/REMIGNORECommand.P .deps/REMUSERCommand.P \
-.deps/SAYCommand.P .deps/SEARCHCommand.P .deps/SERVNOTICECommand.P \
-.deps/SETCommand.P .deps/SHOWCOMMANDSCommand.P \
-.deps/SHOWIGNORECommand.P .deps/STATUSCommand.P .deps/SUSPENDCommand.P \
-.deps/TOPICCommand.P .deps/UNBANCommand.P .deps/UNFORCECommand.P \
-.deps/UNSUSPENDCommand.P .deps/VERIFYCommand.P .deps/VOICECommand.P \
-.deps/cservice.P .deps/networkData.P .deps/sqlBan.P .deps/sqlChannel.P \
-.deps/sqlLevel.P .deps/sqlUser.P
+.deps/REGISTERCommand.P .deps/REHASHCommand.P .deps/REMIGNORECommand.P \
+.deps/REMUSERCommand.P .deps/SAYCommand.P .deps/SEARCHCommand.P \
+.deps/SERVNOTICECommand.P .deps/SETCommand.P \
+.deps/SHOWCOMMANDSCommand.P .deps/SHOWIGNORECommand.P \
+.deps/STATUSCommand.P .deps/SUSPENDCommand.P .deps/TOPICCommand.P \
+.deps/UNBANCommand.P .deps/UNFORCECommand.P .deps/UNSUSPENDCommand.P \
+.deps/VERIFYCommand.P .deps/VOICECommand.P .deps/cservice.P \
+.deps/networkData.P .deps/sqlBan.P .deps/sqlChannel.P .deps/sqlLevel.P \
+.deps/sqlUser.P
 SOURCES = $(libcservice_la_SOURCES)
 OBJECTS = $(libcservice_la_OBJECTS)
 

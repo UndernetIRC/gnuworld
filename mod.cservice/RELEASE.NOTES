@@ -1,5 +1,9 @@
 Newest changes at the top of the file:
-$Id: RELEASE.NOTES,v 1.6 2001/04/02 18:35:57 gte Exp $
+$Id: RELEASE.NOTES,v 1.7 2001/04/13 19:12:14 gte Exp $
+
+CMaster 1.0pl4 - 13/04/2001
+* Added REHASH command handler, to allow dynamic reloading
+  of translation tables.
 
 CMaster 1.0pl3 - 03/04/2001
 
