@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------------
--- "$Id: local_db.sql,v 1.2 2001/10/21 02:17:14 nighty Exp $"
+-- "$Id: local_db.sql,v 1.3 2001/10/21 02:40:43 nighty Exp $"
 -- Channel service DB SQL file for PostgreSQL.
 --
 -- Tables specific to webcookies (needs to be LOCAL).
@@ -35,7 +35,7 @@ CREATE INDEX pending_pwreset_expiration_idx ON pending_pwreset(expiration);
 CREATE TABLE helpmgr_users (
 	user_id INT4 NOT NULL,
 	language_id INT2,
-	flags INT2 DEFAULT '0'
+	flags INT2 DEFAULT '1'
 );
 
 CREATE INDEX helpmgr_users_user_id_idx ON helpmgr_users(user_id);
