@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: SHUTDOWNCommand.cc,v 1.5 2003/11/24 14:43:50 dan_karrels Exp $
+ * $Id: SHUTDOWNCommand.cc,v 1.6 2003/11/24 14:45:42 dan_karrels Exp $
  */
 
 #include	<string>
@@ -31,7 +31,7 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char SHUTDOWNCommand_cc_rcsId[] = "$Id: SHUTDOWNCommand.cc,v 1.5 2003/11/24 14:43:50 dan_karrels Exp $" ;
+const char SHUTDOWNCommand_cc_rcsId[] = "$Id: SHUTDOWNCommand.cc,v 1.6 2003/11/24 14:45:42 dan_karrels Exp $" ;
 namespace gnuworld
 {
 using std::string ;
@@ -75,13 +75,13 @@ server->Shutdown() ;
 
 char buf[ 512 ] = { 0 } ;
 
-sprintf( buf, "%s SQ %s :%s made me shutdown (%s)\n",
-			bot->getCharYY().c_str(),
-			bot->getUplinkName().c_str(),
-			theClient->getNickName().c_str(),
-			st.assemble(1).c_str() );
+//sprintf( buf, "%s SQ %s :%s made me shutdown (%s)\n",
+//			bot->getCharYY().c_str(),
+//			bot->getUplinkName().c_str(),
+//			theClient->getNickName().c_str(),
+//			st.assemble(1).c_str() );
 
-bot->QuoteAsServer( buf );
+//bot->QuoteAsServer( buf );
 
 return true;
 }
