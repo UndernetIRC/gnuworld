@@ -3,18 +3,19 @@
  */
 
 #ifndef __CCONTROL_H
-#define __CCONTROL_H "$Id: ccontrol.h,v 1.3 2000/07/10 22:41:29 dan_karrels Exp $"
+#define __CCONTROL_H "$Id: ccontrol.h,v 1.4 2000/07/11 19:31:56 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
 #include	<map>
+
+#include	<cstdio>
 
 #include	"client.h"
 #include	"iClient.h"
 #include	"server.h"
 #include	"CControlCommands.h"
 #include	"Channel.h"
-#include    <stdio.h>
 
 using std::string ;
 using std::vector ;

@@ -34,10 +34,10 @@
 #include	"MessageNode.h"
 #include	"Socket.h"
 #include	"StringTokenizer.h"
-#include	"moduleLoader.h"
+//#include	"moduleLoader.h"
 
 const char xServer_h_rcsId[] = __XSERVER_H ;
-const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.4 2000/07/09 18:08:11 dan_karrels Exp $" ;
+const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.5 2000/07/11 19:31:56 dan_karrels Exp $" ;
 
 using std::string ;
 using std::vector ;
@@ -219,6 +219,7 @@ REGISTER_MSG( "A", NOOP ) ;
 /*
  * Load and attach any modules specified in the config.
  */ 
+/*
 EConfig::const_iterator ptr = conf.Find( "module" ) ;
 for( ; ptr != conf.end() && ptr->first == "module" ; ++ptr )
 	{
@@ -245,6 +246,7 @@ for( ; ptr != conf.end() && ptr->first == "module" ; ++ptr )
  
 	AttachClient(clientPtr); 
 	}
+*/
 }
 
 /**
@@ -263,7 +265,8 @@ for( glineListType::iterator ptr = glineList.begin() ; ptr != glineList.end() ;
 	delete *ptr ;
 	}
 glineList.clear() ;
- 
+
+/*
 // Deallocate all loaded modules/close dlm handles.
 for( moduleListType::iterator ptr = moduleList.begin() ; ptr != moduleList.end() ;
 	++ptr )
@@ -271,6 +274,8 @@ for( moduleListType::iterator ptr = moduleList.begin() ; ptr != moduleList.end()
 	delete *ptr ;
 	}
 moduleList.clear() ;
+*/
+
 }
  
 /**

@@ -1,7 +1,7 @@
-dnl $Id: configure.in,v 1.4 2000/07/10 22:54:56 dan_karrels Exp $
+dnl $Id: configure.in,v 1.5 2000/07/11 19:31:55 dan_karrels Exp $
 dnl ----------------------------------------------------------
 
-AC_REVISION($Revision: 1.4 $)
+AC_REVISION($Revision: 1.5 $)
 AC_INIT(src/main.cc)
 AC_CONFIG_HEADER(include/defs.h)
 
@@ -395,9 +395,11 @@ dnl
 dnl set some last minute sanity defaults
 dnl
 
-output_file="Makefile src/Makefile lib/Makefile"
+AC_OUTPUT(Makefile src/Makefile lib/Makefile)
 
-dnl AC_OUTPUT(Makefile src/Makefile lib/Makefile)
+echo
+echo Checking for modules...
+echo
 
 dnl This variable is global and will exported to Makefiles
 dnl MOD_DIRS=""
@@ -433,7 +435,6 @@ dnl		echo "Skipping..."
 dnl	fi
 dnl  done
 
-AC_SUBST(MOD_DIRS)
 AC_SUBST(LDFLAGS)
 AC_SUBST(bindir)
 
