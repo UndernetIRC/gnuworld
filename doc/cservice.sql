@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------------
--- "$Id: cservice.sql,v 1.55 2001/11/06 04:00:59 nighty Exp $"
+-- "$Id: cservice.sql,v 1.56 2001/12/02 13:20:42 nighty Exp $"
 -- Channel service DB SQL file for PostgreSQL.
 
 -- ChangeLog:
@@ -372,6 +372,7 @@ CREATE TABLE noreg (
 	-- 1 - Non-support registered against this channel/manager application.
 	-- 2 - Abuse.
 	-- 3 - Elective.
+	-- 4 - Fraud Username.
 	never_reg INT4 NOT NULL DEFAULT '0',
 	-- Never, ever register this channel, or user or pair.
 	for_review INT4 NOT NULL DEFAULT '0',
