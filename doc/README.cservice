@@ -20,6 +20,7 @@ Load the schema
 Make sure you are in the gnuworld/doc directory.
 
 > psql cservice < cservice.sql
+> psql cservice < languages.sql
 > psql cservice < language_table.sql
 > psql cservice < cservice.web.sql
 
