@@ -326,8 +326,10 @@ int dronescan::OnChannelEvent( const channelEventType& theEvent,
  */
 int dronescan::OnPrivateMessage( iClient* theClient, const string& Message, bool secure )
 {
-	if(!theClient->isOper() && (theClient->getAccount() != "reppir"))
-		return 0;
+	if(!getAccess(theClient)) return 0;
+	
+	elog << "Got access " << getAccess(theClient) << " from " <<
+	theClient->getNickName() << endl;
 	
 	StringTokenizer st(Message);
 	
@@ -695,7 +697,6 @@ bool dronescan::checkChannel( const Channel *theChannel , const iClient *theClie
 		{
 		/* This channel is voted abnormal. */
 		stringstream chanStat, chanParams;
-		chanStat << "+";
 		if(theChannel->getMode(Channel::MODE_I)) chanStat << "i";
 		if(theChannel->getMode(Channel::MODE_R)) chanStat << "r";
 		
@@ -709,14 +710,15 @@ bool dronescan::checkChannel( const Channel *theChannel , const iClient *theClie
 			chanParams << theChannel->getLimit();
 		}
 		
-		log(WARN, "  AC: %20s - %-5s %-15s - %u/%u tests failed - %u users",
-			theChannel->getName().c_str(),
-			chanStat.str().c_str(),
-			chanParams.str().c_str(),
+		log(WARN, "[%u/%u] (%3u) %s +%s %s",
 			(testVector.size() - normal),
 			testVector.size(),
-			theChannel->size()
+			theChannel->size(),
+			theChannel->getName().c_str(),
+			chanStat.str().c_str(),
+			chanParams.str().c_str()
 			);
+
 		return false;
 		}
 }
@@ -757,6 +759,7 @@ bool dronescan::isNormal( const iClient* theClient )
 CLIENT_STATE dronescan::setClientState( iClient *theClient )
 {
 	clientData* theData = static_cast< clientData* > (theClient->getCustomData(this));
+	assert(theData != 0);	
 	
 	double userEntropy = calculateEntropy(theClient->getNickName());
 	theData->setEntropy(userEntropy);
@@ -865,6 +868,32 @@ void dronescan::Reply(const iClient *theClient, char *format, ...)
 	va_end(_list);
 	
 	Message(theClient, buffer);
+}
+
+
+/** Return the access of an iClient. */
+unsigned short dronescan::getAccess(const iClient *theClient)
+{
+	Channel *theChannel = Network->findChannel(consoleChannel);
+	if(!theChannel) return 0;
+	
+	ChannelUser *theCU = theChannel->findUser(theClient);
+	if(!theCU) {
+		/* TODO: Complain loudly */
+		return 0;
+	}
+	
+	/* Are we opped? */
+	if(theCU->isModeO()) return 1000;
+		
+	/* Are we voiced? */
+	if(theCU->isModeV()) return 500;
+		
+	/* Are we opered? */
+	if(theClient->isOper()) return 100;
+
+	/* Not opped, voiced or opered. */
+	return 0;	
 }
 
 

@@ -1,5 +1,5 @@
 #ifndef DRONESCAN_H
-#define DRONESCAN_H "$Id: dronescan.h,v 1.7 2003/06/12 12:03:57 jeekay Exp $"
+#define DRONESCAN_H "$Id: dronescan.h,v 1.8 2003/06/14 19:45:55 jeekay Exp $"
 
 #include <map>
 
@@ -126,6 +126,9 @@ public:
 	/** See if a given test is enabled. */
 	inline bool testEnabled(testEnabledType theTest)
 		{ return ((enabledTests & theTest) != 0); }
+	
+	/** Return a users access */
+	unsigned short getAccess( const iClient* );
 	
 	
 	/** Configuration variables used by tests. */
