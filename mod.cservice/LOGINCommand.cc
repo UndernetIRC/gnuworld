@@ -12,7 +12,7 @@
 #include	"cservice_config.h"
 #include	"Network.h"
 
-const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.16 2001/03/18 22:01:02 gte Exp $" ;
+const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.17 2001/03/18 22:49:51 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -217,11 +217,12 @@ for (autoOpVectorType::const_iterator resultPtr = autoOpVector.begin();
 	{
  
 	/* If the autoop flag isn't set in this record */
-	if (!(resultPtr->second & sqlLevel::F_AUTOOP))
-		{ 
+	if (!(resultPtr->second & sqlLevel::F_AUTOOP) &&
+		!(resultPtr->second & sqlLevel::F_AUTOVOICE))
+		{
 		continue;
 		}
-
+ 
 	sqlChannel* theChan = bot->getChannelRecord(resultPtr->first);
 	if (!theChan)
 		{ 
@@ -280,10 +281,26 @@ for (autoOpVectorType::const_iterator resultPtr = autoOpVector.begin();
 		continue;
 		}
 
-	if(!tmpChanUser->getMode(ChannelUser::MODE_O))
+	/*
+ 	 *  If its AUTOOP, check for op's and do the deed.
+	 *  Otherwise, its just AUTOVOICE :)
+	 */
+
+	if (resultPtr->second & sqlLevel::F_AUTOOP)
 		{
-		bot->Op(netChan, theClient);
+		if(!tmpChanUser->getMode(ChannelUser::MODE_O))
+			{
+			bot->Op(netChan, theClient);
+			}
 		}
+		else
+		{
+		if(!tmpChanUser->getMode(ChannelUser::MODE_V))
+			{
+			bot->Voice(netChan, theClient);
+			} 
+		}
+
 	} 
 
 return true; 
