@@ -1,4 +1,4 @@
-## $Id: Makefile.am,v 1.22 2005/01/12 03:50:23 dan_karrels Exp $
+## $Id: Makefile.am,v 1.23 2005/01/17 23:07:23 dan_karrels Exp $
 ## test
 
 @SET_MAKE@
@@ -91,6 +91,7 @@ EXTRA_DIST = bin/ccontrol.example.conf.in \
 	doc/README.appjudge \
 	doc/README.ccontrol \
 	doc/README.cservice \
+	doc/README.dronescan \
 	doc/README.sharedmemory \
 	doc/autokill.sql \
 	doc/ccontrol.addme.sql \
@@ -106,6 +107,7 @@ EXTRA_DIST = bin/ccontrol.example.conf.in \
 	doc/cservice.help.sql \
 	doc/cservice.sql \
 	doc/cservice.web.sql \
+	doc/dronescan.sql \
 	doc/genhelp.py \
 	doc/grant.sql \
 	doc/greeting.sql \
@@ -169,14 +171,16 @@ EXTRA_DIST = bin/ccontrol.example.conf.in \
 	include/Numeric.h \
 	include/ServerCommandHandler.h \
 	include/ServerTimerHandlers.h \
+	include/Timer.h \
 	include/TimerHandler.h \
 	include/UnloadClientTimerHandler.h \
 	include/client.h \
-	include/gnuworld_config.h \
 	include/events.h \
 	include/iClient.h \
 	include/iServer.h \
 	include/ip.h \
+	include/gnuworld_config.h \
+	include/gw_hashmap.h \
 	include/moduleLoader.h \
 	include/server.h \
 	libltdl/acconfig.h \

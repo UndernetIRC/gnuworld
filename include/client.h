@@ -18,12 +18,13 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: client.h,v 1.56 2005/01/08 23:33:42 dan_karrels Exp $
+ * $Id: client.h,v 1.57 2005/01/17 23:08:57 dan_karrels Exp $
  */
 
 #ifndef __CLIENT_H
-#define __CLIENT_H "$Id: client.h,v 1.56 2005/01/08 23:33:42 dan_karrels Exp $"
+#define __CLIENT_H "$Id: client.h,v 1.57 2005/01/17 23:08:57 dan_karrels Exp $"
 
+#include	<map>
 #include	<sstream>
 #include	<string>
 
@@ -119,18 +120,32 @@ public:
 	virtual bool Write( const char*, ... ) ;
 
 	/**
-	 * ModeAsServer will change modes in a channel as the server.
+	 * This method will change modes in a channel.
+	 * If the fourth argument is true, then the modes will be
+	 * changed as the server, otherwise the client will set
+	 * the modes (joining and parting the channel if necessary).
+	 * Removing mode 'k' expects an argument, but it doesn't matter
+	 * what the argument is.
+	 * Removing mode 'l' requires NO argument to be issued.
 	 */
-	virtual bool ModeAsServer( const std::string& chanName,
+	virtual bool Mode( const std::string& chanName,
 			const std::string& modes,
-			const std::string& args ) ;	
+			const std::string& args,
+			bool modeAsServer = false ) ;
 
 	/**
-	 * Change modes as the server for the given channel.
+	 * This method will change modes in a channel.
+	 * If the fourth argument is true, then the modes will be
+	 * changed as the server, otherwise the client will set
+	 * the modes (joining and parting the channel if necessary).
+	 * Removing mode 'k' expects an argument, but it doesn't matter
+	 * what the argument is.
+	 * Removing mode 'l' requires NO argument to be issued.
 	 */
-	virtual bool ModeAsServer( Channel*,
+	virtual bool Mode( Channel*,
 			const std::string& modes,
-			const std::string& args ) ;
+			const std::string& args,
+			bool modeAsServer = false ) ;
 
 	/**
 	 * Mode is used to set the bot's modes.  If connected to the

@@ -1,0 +1,21 @@
+
+Creating dronescan DB configuration
+-----------------------------------
+
+First, create the dronescan database in pgql:
+
+/usr/local/pgsql/bin/createdb dronescan
+
+Next, add the dronescan user:
+
+/usr/local/pgsql/bin/createuser dronescan
+
+Just answer yes to all questions.
+
+Finally, add the .sql file:
+
+/usr/local/pgsql/bin/psql dronescan < dronescan.sql
+
+This will create the database called dronescan, and db user dronescan, 
+with default (empty) password.
+

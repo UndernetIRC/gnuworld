@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: client.cc,v 1.75 2005/01/12 03:50:38 dan_karrels Exp $
+ * $Id: client.cc,v 1.76 2005/01/17 23:10:15 dan_karrels Exp $
  */
 
 #include	<new>
@@ -47,7 +47,7 @@
 #include	"ELog.h"
 #include	"events.h"
 
-RCSTAG("$Id: client.cc,v 1.75 2005/01/12 03:50:38 dan_karrels Exp $" ) ;
+RCSTAG("$Id: client.cc,v 1.76 2005/01/17 23:10:15 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -235,9 +235,10 @@ if( isConnected() && Format && Format[ 0 ] != 0 )
 return false ;
 }
 
-bool xClient::ModeAsServer( const string& chanName,
+bool xClient::Mode( const string& chanName,
 	const string& modes,
-	const string& args )
+	const string& args,
+	bool modeAsServer )
 {
 if( !isConnected() )
 	{
@@ -250,12 +251,13 @@ if( 0 == theChan )
 	return false ;
 	}
 
-return ModeAsServer( theChan, modes, args ) ;
+return Mode( theChan, modes, args, modeAsServer ) ;
 }
 
-bool xClient::ModeAsServer( Channel* theChan,
+bool xClient::Mode( Channel* theChan,
 	const string& modes,
-	const string& args )
+	const string& args,
+	bool modeAsServer )
 {
 assert( theChan != 0 ) ;
 
@@ -264,8 +266,28 @@ if( !isConnected() )
 	return false ;
 	}
 
-return (1 == getUplink()->Mode( this, theChan, modes, args ))
-	? true : false ;
+bool doJoinPart = false ;
+if( !modeAsServer && !isOnChannel( theChan ) )
+	{
+	doJoinPart = true ;
+	Join( theChan, string(), 0, true ) ;
+	}
+
+xClient* theClient = 0 ;
+if( !modeAsServer )
+	{
+	// Set the mode as the client, so theClient needs to
+	// be non-NULL
+	theClient = this ;
+	}
+
+bool retVal = getUplink()->Mode( theClient, theChan, modes, args ) ;
+
+if( doJoinPart )
+	{
+	Part( theChan ) ;
+	}
+return retVal ;
 }
 
 bool xClient::DoCTCP( iClient* Target,

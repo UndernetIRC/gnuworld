@@ -16,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: gnutest.h,v 1.13 2005/01/08 23:33:43 dan_karrels Exp $
+ * $Id: gnutest.h,v 1.14 2005/01/17 23:09:54 dan_karrels Exp $
  */
 
 #ifndef __GNUTEST_H
-#define __GNUTEST_H "$Id: gnutest.h,v 1.13 2005/01/08 23:33:43 dan_karrels Exp $"
+#define __GNUTEST_H "$Id: gnutest.h,v 1.14 2005/01/17 23:09:54 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
@@ -184,43 +184,7 @@ public:
 	 */
 	virtual void	OnTimer( const xServer::timerID&, void* ) ;
 
-	/**
-	 * This method returns true if the client is on the given
-	 * channel, by name; false otherwise.
-	 */
-	virtual bool	isOnChannel( const std::string& chanName ) const ;
-
-	/**
-	 * This method returned true if the client is on the given
-	 * channel, by pointer; false otherwise.
-	 */
-	virtual bool	isOnChannel( const Channel* theChan ) const ;
-
 protected:
-
-	/**
-	 * This method is used to add a channel to the internal
-	 * structure of channels which the client is on.
-	 */
-	virtual bool	addChan( Channel* ) ;
-
-	/**
-	 * This method is used to add a channel to the internal
-	 * structure of channels which the client is on.
-	 */
-	virtual bool	addChan( const std::string& ) ;
-
-	/**
-	 * This method is used to remove a channel from the internal
-	 * structure of channels which the client is on.
-	 */
-	virtual bool	removeChan( Channel* ) ;
-
-	/**
-	 * This method is used to remove a channel from the internal
-	 * structure of channels which the client is on.
-	 */
-	virtual bool	removeChan( const std::string& ) ;
 
 	/**
 	 * Spawn a fake client.
@@ -275,10 +239,16 @@ protected:
 	std::string	timerChan ;
 
 	/**
-	 * The data structure used to store the names of channels
-	 * which this channel is on.
+	 * This type is used for the helpTable, which will store basic
+	 * information about what commands gnutest supports.
 	 */
-	std::vector< std::string >	channels ;
+	typedef std::map< std::string, std::string > helpTableType ;
+
+	/**
+	 * This is used to store basic information about what commands 
+	 * gnutest supports.
+	 */
+	helpTableType	helpTable ;
 
 } ;
 

@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server.h,v 1.103 2005/01/12 04:36:42 dan_karrels Exp $
+ * $Id: server.h,v 1.104 2005/01/17 23:08:58 dan_karrels Exp $
  */
 
 #ifndef __SERVER_H
-#define __SERVER_H "$Id: server.h,v 1.103 2005/01/12 04:36:42 dan_karrels Exp $"
+#define __SERVER_H "$Id: server.h,v 1.104 2005/01/17 23:08:58 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
@@ -515,7 +515,12 @@ public:
 	 * Set modes as the server, update internal tables, and notify
 	 * all clients of the mode change(s).
 	 * The first argument is the xClient requesting the mode
-	 * change(s), and cannot be NULL.
+	 * change(s).  If this argument is NULL, then the modes are
+	 * set as the server, otherwise the modes are set as the
+	 * client.
+	 * Note that this method is used by xClient::Mode(), but the
+	 * argument semantics are a bit different because of the addition
+	 * of the xClient*.
 	 */
 	virtual bool	Mode( xClient*, Channel*,
 				const std::string& modes,

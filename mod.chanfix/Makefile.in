@@ -229,7 +229,12 @@ libchanfix_la_SOURCES = chanfix.cc		\
 				cfChannelUser.cc	\
 				cmdCHECK.cc
 
-EXTRA_DIST = chanfix.h
+EXTRA_DIST = chanfix.h \
+		cfChannel.h \
+		cfChannelUser.h \
+		chanfix-commands.h \
+		logging.h
+
 all: all-am
 
 .SUFFIXES:

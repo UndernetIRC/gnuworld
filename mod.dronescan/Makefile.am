@@ -35,6 +35,5 @@ EXTRA_DIST = activeChannel.h \
 	levels.h \
 	sqlFakeClient.h \
 	sqlUser.h \
-	Timer.h \
 	ChangeLog \
-	Updates
+	README

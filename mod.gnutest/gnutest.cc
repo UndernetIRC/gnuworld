@@ -16,9 +16,10 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: gnutest.cc,v 1.25 2005/01/12 04:36:46 dan_karrels Exp $
+ * $Id: gnutest.cc,v 1.26 2005/01/17 23:09:53 dan_karrels Exp $
  */
 
+#include	<map>
 #include	<string>
 #include	<iostream>
 #include	<sstream>
@@ -30,7 +31,7 @@
 #include	"EConfig.h"
 #include	"Network.h"
 
-RCSTAG("$Id: gnutest.cc,v 1.25 2005/01/12 04:36:46 dan_karrels Exp $");
+RCSTAG("$Id: gnutest.cc,v 1.26 2005/01/17 23:09:53 dan_karrels Exp $");
 
 namespace gnuworld
 {
@@ -58,6 +59,52 @@ gnutest::gnutest( const string& fileName )
 {
 EConfig conf( fileName ) ;
 operChan = conf.Require( "operchan" )->second ;
+
+helpTable.insert( std::make_pair( "shutdown",
+	"Shutdown the server" ) ) ;
+helpTable.insert( std::make_pair( "reload",
+	"Reload the gnutest module" ) ) ;
+helpTable.insert( std::make_pair( "help", "Print this menu" ) ) ;
+helpTable.insert( std::make_pair( "moo <args>",
+	"Issue a raw command to the network" ) ) ;
+helpTable.insert( std::make_pair( "join <chan>", "Join a channel" ) ) ;
+helpTable.insert( std::make_pair( "part <chan>", "Part a channel" ) ) ;
+helpTable.insert( std::make_pair( "say <chan> <message>",
+	"Send a message to a channel" ) ) ;
+helpTable.insert( std::make_pair( "clearmode <chan> <modes>",
+	"Clear the given list of modes from a channel" ) ) ;
+helpTable.insert( std::make_pair( "chaninfo <chan>",
+	"Print some useless information about a channel" ) ) ;
+helpTable.insert( std::make_pair( "ban <chan> <nickname>",
+	"Ban a user from a channel" ) ) ;
+helpTable.insert( std::make_pair( "unban <chan> <banmask>",
+	"Remove a ban from a channel" ) ) ;
+helpTable.insert( std::make_pair( "bankick <chan> <nick> <reason>",
+	"Bankick a user from a channel" ) ) ;
+helpTable.insert( std::make_pair( "servmode <chan> <modestring>",
+	"Change modes in a channel as the server" ) ) ;
+helpTable.insert( std::make_pair( "mode <chan> <modestring>",
+	"Change modes in a channel as the client" ) ) ;
+helpTable.insert( std::make_pair( "op <chan> <nick>",
+	"Op a nick in a channel" ) ) ;
+helpTable.insert( std::make_pair( "deop <chan> <nick>",
+	"Deop a nick in a channel" ) ) ;
+helpTable.insert( std::make_pair( "servop <chan> <nick>",
+	"Op a nick in a channel as the server" ) ) ;
+helpTable.insert( std::make_pair( "schedule <chan>",
+	"Schedule a visit to a channel!" ) ) ;
+helpTable.insert( std::make_pair( "spawnclient <nick>",
+	"Spawn a fake client" ) ) ;
+helpTable.insert( std::make_pair( "removeclient <nick>",
+	"Remove a fake client from the network" ) ) ;
+helpTable.insert( std::make_pair( "removeserver <name>",
+	"Remove a fake server from the network" ) ) ;
+helpTable.insert( std::make_pair( "spawnserver <name> <description>",
+	"Spawn a fake server with the given description" ) ) ;
+helpTable.insert( std::make_pair( "spawnjoin <nick> <chan>",
+	"Order a fake client to join a channel" ) ) ;
+helpTable.insert( std::make_pair( "spawnpart <nick> <chan>",
+	"Order a fake client to part a channel" ) ) ;
 }
 
 gnutest::~gnutest()
@@ -104,7 +151,8 @@ void gnutest::OnChannelEvent( const channelEventType& whichEvent,
 if( theChan->getName() != operChan )
 	{
 	elog	<< "gnutest::OnChannelEvent> Got bad channel: "
-		<< theChan->getName() << endl ;
+		<< theChan->getName()
+		<< endl ;
 	return ;
 	}
 
@@ -194,6 +242,18 @@ else if( st[ 0 ] == "reload" )
 	MyUplink->LoadClient( "libgnutest", getConfigFileName() ) ;
 	return ;
 	}
+else if( st[ 0 ] == "help" )
+	{
+	Notice( theClient, "--- Help Menu ---" ) ;
+	for( helpTableType::const_iterator hItr = helpTable.begin() ;
+		hItr != helpTable.end() ; ++hItr )
+		{
+		Notice( theClient, "%s: %s",
+			hItr->first.c_str(),
+			hItr->second.c_str() ) ;
+		}
+	return ;
+	}
 
 if( st.size() < 2 )
 	{
@@ -213,12 +273,10 @@ else if( st[ 0 ] == "moo" )
 else if( st[ 0 ] == "join" )
 	{
 	Join( st[ 1 ] ) ;
-	addChan( st[ 1 ] ) ;
 	}
 else if( st[ 0 ] == "part" )
 	{
 	Part( st[ 1 ] ) ;
-	removeChan( st[ 1 ] ) ;
 	}
 else if( st[ 0 ] == "say" )
 	{
@@ -348,6 +406,26 @@ else if( st[ 0 ] == "bankick" )
 
 	BanKick( theChan, theClient, st.assemble( 3 ) ) ;
 	}
+else if( st[ 0 ] == "servmode" )
+	{
+	// mode #chan <mode string>
+	if( st.size() < 3 )
+		{
+		Notice( theClient, "Usage: servmode <channel> <modes>" ) ;
+		return ;
+		}
+
+	Channel* theChan = Network->findChannel( st[ 1 ] ) ;
+	if( NULL == theChan )
+		{
+		Notice( theClient, "Unable to find channel" ) ;
+		return ;
+		}
+
+	// Note that this only exercises the first argument of
+	// Mode()
+	Mode( theChan, st.assemble( 2 ), string(), true ) ;
+	}
 else if( st[ 0 ] == "mode" )
 	{
 	// mode #chan <mode string>
@@ -365,8 +443,8 @@ else if( st[ 0 ] == "mode" )
 		}
 
 	// Note that this only exercises the first argument of
-	// ModeAsServer()
-	ModeAsServer( theChan, st.assemble( 2 ), string() ) ;
+	// Mode()
+	Mode( theChan, st.assemble( 2 ), string(), false ) ;
 	}
 else if( st[ 0 ] == "op" )
 	{
@@ -813,50 +891,6 @@ else
 		<< *newClient
 		<< endl ;
 	}
-}
-
-bool gnutest::isOnChannel( const string& chanName ) const
-{
-if( !::strcasecmp( chanName.c_str(), operChan.c_str() ) )
-	{
-	return true ;
-	}
-
-return std::find( channels.begin(), channels.end(), chanName )
-	!= channels.end() ;
-}
-
-bool gnutest::isOnChannel( const Channel* theChan ) const
-{
-assert( theChan != 0 ) ;
-
-return isOnChannel( theChan->getName() ) ;
-}
-
-bool gnutest::addChan( Channel* theChan )
-{
-assert( theChan != 0 ) ;
-
-return addChan( theChan->getName() ) ;
-}
-
-bool gnutest::addChan( const string& chanName )
-{
-channels.push_back( chanName ) ;
-return true ;
-}
-
-bool gnutest::removeChan( Channel* theChan )
-{
-assert( theChan != 0 ) ;
-
-return removeChan( theChan->getName() ) ;
-}
-
-bool gnutest::removeChan( const string& chanName )
-{
-std::remove( channels.begin(), channels.end(), chanName ) ;
-return true ;
 }
 
 void gnutest::OnTimer( const xServer::timerID&, void* )

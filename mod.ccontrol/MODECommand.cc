@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: MODECommand.cc,v 1.20 2005/01/12 03:50:29 dan_karrels Exp $
+ * $Id: MODECommand.cc,v 1.21 2005/01/17 23:09:00 dan_karrels Exp $
  */
 
 #include	<string>
@@ -33,7 +33,7 @@
 #include	"ccBadChannel.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: MODECommand.cc,v 1.20 2005/01/12 03:50:29 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: MODECommand.cc,v 1.21 2005/01/17 23:09:00 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -82,7 +82,7 @@ if(Chan)
 // on perform the bulk of the heavy lifting with setting modes.
 // Note that this will have the negative effect of not telling
 // the requesting client of this command why something did not succeed.
-bot->ModeAsServer( theChan, st.assemble( 2 ), string() ) ;
+bot->Mode( theChan, st.assemble( 2 ), string(), true ) ;
 return true ;
 
 /*

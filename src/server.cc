@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server.cc,v 1.204 2005/01/12 03:50:38 dan_karrels Exp $
+ * $Id: server.cc,v 1.205 2005/01/17 23:10:18 dan_karrels Exp $
  */
 
 #include	<sys/time.h>
@@ -70,7 +70,7 @@
 #include	"ConnectionHandler.h"
 #include	"Connection.h"
 
-RCSTAG( "$Id: server.cc,v 1.204 2005/01/12 03:50:38 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: server.cc,v 1.205 2005/01/17 23:10:18 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -1991,15 +1991,8 @@ bool xServer::Mode( xClient* theClient,
 {
 assert( theChan != 0 ) ;
 
-if( NULL == theClient )
-	{
-	return false ;
-	}
-
 /*
-elog	<< "xServer::Mode> theClient: "
-	<< *theClient
-	<< ", theChan: "
+elog	<< "xServer::Mode> theChan: "
 	<< *theChan
 	<< ", modes: "
 	<< modes
@@ -2017,22 +2010,43 @@ if( modes.empty() )
 	return false ;
 	}
 
-// Return the iClient instance for the requesting xClient
-iClient* theIClient = theClient->getInstance() ;
-
-// Make sure the pointer is not NULL
-assert( theIClient != 0 ) ;
-
-// Attempt to find the ChannelUser for the requesting xClient
-// on the given channel
-ChannelUser* theUser = theChan->findUser( theIClient ) ;
-
-// Is the xClient in the channel?
-if( NULL == theIClient )
+// theUser is passed to the OnChannelMode*() methods below.
+// This represents the user that is changing modes.
+// If NULL, it represents that the server is changing modes.
+// If non-NULL, it means that a client is changing modes.
+// This if() will determine if the client or the server is changing
+// modes, and set theUser appropriately.
+// Assume the server is changing modes, and initialize to 0.
+ChannelUser* theUser = 0 ;
+if( theClient != 0 )
 	{
-	// Nope, the xClient is not in the channel...silly xClient
-	return false ;
-	}
+	// The mode is being set as client, make sure the
+	// client is in the channel, and is opped.
+
+	// Return the iClient instance for the requesting xClient
+	iClient* theIClient = theClient->getInstance() ;
+
+	// Make sure the pointer is not NULL
+	assert( theIClient != 0 ) ;
+
+	// Attempt to find the ChannelUser for the requesting xClient
+	// on the given channel.
+	theUser = theChan->findUser( theIClient ) ;
+
+	// Is the xClient in the channel?
+	if( NULL == theUser )
+		{
+		// Nope, the xClient is not in the channel...silly xClient
+		return false ;
+		}
+
+	// Is the xClient opped?
+	if( !theUser->isModeO() )
+		{
+		// Nope, need to be opped to change modes.
+		return false ;
+		}
+	} // if( theClient != 0 )
 
 string modesAndArgsString( modes + ' ' + args ) ;
 
@@ -2289,6 +2303,46 @@ for( ; tokenIndex < st.size() ; )
 					return false ;
 					}
 
+				// Make a few sanity checks.
+				// The argument index has already been
+				// updated, so no arguments will be
+				// confused.
+				if( 'o' == theChar )
+					{
+					if( targetUser->isModeO() && 
+						polarityBool )
+						{
+						// Trying to op already opped 
+						// user.
+						break ;
+						}
+					if( !targetUser->isModeO() &&
+						!polarityBool )
+						{
+						// Trying to deop user that is
+						// not opped.
+						break ;
+						}
+					} // if( 'o' )
+
+				if( 'v' == theChar )
+					{
+					if( targetUser->isModeV() && 
+						polarityBool )
+						{
+						// Trying to voice already 
+						// voiced user.
+						break ;
+						}
+					if( !targetUser->isModeV() &&
+						!polarityBool )
+						{
+						// Trying to devoice user 
+						// that is not voiced.
+						break ;
+						}
+					} // if( 'v' )
+
 				opVectorType::value_type thePair(
 					polarityBool, targetUser ) ;
 				if( 'v' == theChar )
@@ -2365,10 +2419,20 @@ for( rawModeVectorType::size_type modeIndex = 0 ;
 //			<< endl ;
 		} // modeOutputCount
 
+	// Determine which part of the system is changing modes,
+	// server or client.
+	// Assume server.
+	std::string modeSource( getCharYY() ) ;
+	if( theClient != 0 )
+		{
+		// Change modes as the client
+		modeSource = theClient->getCharYYXXX() ;
+		}
+
 	// In either of the cases which breaks out of the above for
 	// loop, write the mode string.
 	std::stringstream outputSS ;
-	outputSS	<< getCharYY()
+	outputSS	<< modeSource
 			<< " M "
 			<< theChan->getName()
 			<< " "

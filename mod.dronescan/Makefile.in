@@ -39,7 +39,8 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 subdir = mod.dronescan
-DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in ChangeLog
+DIST_COMMON = README $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
+	ChangeLog
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
@@ -261,9 +262,8 @@ EXTRA_DIST = activeChannel.h \
 	levels.h \
 	sqlFakeClient.h \
 	sqlUser.h \
-	Timer.h \
 	ChangeLog \
-	Updates
+	README
 
 all: all-am
 

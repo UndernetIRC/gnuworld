@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: MODERATECommand.cc,v 1.14 2005/01/12 03:50:29 dan_karrels Exp $
+ * $Id: MODERATECommand.cc,v 1.15 2005/01/17 23:09:01 dan_karrels Exp $
  */
 
 #include	<string>
@@ -32,7 +32,7 @@
 #include	"ccBadChannel.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: MODERATECommand.cc,v 1.14 2005/01/12 03:50:29 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: MODERATECommand.cc,v 1.15 2005/01/17 23:09:01 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -82,7 +82,7 @@ if(theChan->getMode(Channel::MODE_M))
 	}
 
 //theChan->setMode(Channel::MODE_M);
-bot->ModeAsServer( theChan, "+m", string() );
+bot->Mode( theChan, "+m", string(), true );
 return true;
 }
 

@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: UNMODERATECommand.cc,v 1.12 2005/01/12 03:50:29 dan_karrels Exp $
+ * $Id: UNMODERATECommand.cc,v 1.13 2005/01/17 23:09:16 dan_karrels Exp $
  */
 
 #include	<string>
@@ -30,7 +30,7 @@
 #include	"ccBadChannel.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: UNMODERATECommand.cc,v 1.12 2005/01/12 03:50:29 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: UNMODERATECommand.cc,v 1.13 2005/01/17 23:09:16 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -79,7 +79,7 @@ if(!theChan->getMode(Channel::MODE_M))
 	return false;
 	}
 
-bot->ModeAsServer( theChan, "-m", string() );
+bot->Mode( theChan, "-m", string(), true );
 
 return true ;
 
