@@ -295,6 +295,7 @@ iClient* newClient = new iClient(
 		randomUser(),
 		randomNick( 6, 6 ),
 		randomHost(),
+		randomHost(),
 		randomMode(),
 		"",
 		"I'm a clone.",
