@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: chanfix-misc.cc,v 1.3 2004/05/25 21:17:53 jeekay Exp $
+ * $Id: chanfix-misc.cc,v 1.4 2004/05/26 23:17:51 jeekay Exp $
  */
 
 #include <sstream>
@@ -61,7 +61,7 @@ void chanfix::log(const logging::loglevel& level, const string& message)
 		return;
 	}
 
-	Message(logChannel, message);
+	Message(logChannel, message.c_str());
 }
 
 

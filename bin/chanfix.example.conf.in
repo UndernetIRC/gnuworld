@@ -10,13 +10,13 @@ mode = +idk
 # Console channel
 consoleChannel = #chanfix
 # Console channel modes
-consoleModes = +ins
+consoleModes = +ns
 
 # Delay between linking and starting to count in seconds
-startDelay = 10
+startDelay = 120
 
 # Number of points to allocate to an authed op per period
 pointsAuth = 10
 
 # Duration of a single period in seconds
-period = 10
+period = 60

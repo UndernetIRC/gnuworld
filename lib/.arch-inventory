@@ -1,0 +1,2 @@
+precious \.so$
+precious \.so\.

@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: chanfix-core.cc,v 1.2 2004/05/25 21:17:53 jeekay Exp $
+ * $Id: chanfix-core.cc,v 1.3 2004/05/26 23:17:51 jeekay Exp $
  */
 
 #include <string>
@@ -54,12 +54,12 @@ void chanfix::doCountUpdate()
 	/* Iterator over all available channels */
 	log(logging::DEBUG, "Starting count cycle");
 
+	time_t starttime = ::time(0);
+
 	for( xNetwork::const_channelIterator itr = Network->channels_begin() ;
 	     itr != Network->channels_end() ;
 	     ++itr ) {
 		Channel *tmpChannel = itr->second;
-		log(logging::DEBUG, "Found channel %s",
-			tmpChannel->getName().c_str());
 
 		cfChannel *cfChan = 0;
 
@@ -67,10 +67,6 @@ void chanfix::doCountUpdate()
 		     citr != tmpChannel->userList_end() ;
 		     ++citr ) {
 			ChannelUser *chanUser = citr->second;
-
-			log(logging::DEBUG, "  Found client: %s",
-				chanUser->getNickName().c_str()
-				);
 
 			if( ! chanUser->isModeO() ) { continue ; }
 			if( ! chanUser->getClient()->isModeR() ) { continue ; }
@@ -81,12 +77,12 @@ void chanfix::doCountUpdate()
 			cfChannelUser *user = cfChan->getUser(chanUser->getClient()->getAccount());
 
 			user->addPoints(confPointsAuth);
-
-			log(logging::DEBUG, "  Found opped client: %s",
-				chanUser->getNickName().c_str()
-				);
 		}
 	}
+
+	time_t duration = ::time(0) - starttime;
+
+	log(logging::DEBUG, "Duration: %ld", duration);
 }
 
 } // namespace chanfix
