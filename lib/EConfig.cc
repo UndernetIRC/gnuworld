@@ -14,7 +14,7 @@
 #include	"misc.h"
 
 const char EConfig_h_rcsId[] = __ECONFIG_H ;
-const char EConfig_cc_rcsId[] = "$Id: EConfig.cc,v 1.4 2001/01/08 00:01:07 dan_karrels Exp $" ;
+const char EConfig_cc_rcsId[] = "$Id: EConfig.cc,v 1.5 2001/02/22 20:27:32 dan_karrels Exp $" ;
 
 using std::string ;
 using std::fstream ;
@@ -168,6 +168,15 @@ while( ptr != line.end() )
 		++ptr ;
 		}
 	}
+
+// Remove trailing whitespace
+while( !line.empty()
+	&& ((' ' == line[ line.size() - 1 ])
+	|| ('\t' == line[ line.size() - 1 ])) )
+	{
+	line.erase( line.size() - 1 ) ;
+	}
+
 return true ;
 }
 

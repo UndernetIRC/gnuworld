@@ -21,7 +21,7 @@
 #include	"ccontrol.h"
  
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.12 2001/02/22 13:08:38 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.13 2001/02/22 20:27:32 dan_karrels Exp $" ;
 
 using std::string ;
 using std::vector ;
@@ -59,12 +59,16 @@ string sqlPort = conf.Find( "sql_port" )->second;
 string Query = "host=" + sqlHost + " dbname=" + sqlDb + " port=" + sqlPort;
 
 elog	<< "cmaster::cmaster> Attempting to connect to "
-	<< sqlHost << "; Database: " << sqlDb << endl;
+	<< sqlHost
+	<< "; Database: "
+	<< sqlDb
+	<< endl;
  
 SQLDb = new (nothrow) cmDatabase( Query.c_str() ) ;
 assert( SQLDb != 0 ) ;
 
-//-- Make sure we connected to the SQL database; if we didn't we exit entirely.
+//-- Make sure we connected to the SQL database; if
+// we didn't we exit entirely.
 if (SQLDb->ConnectionBad ())
 	{
 	elog	<< "cmaster::cmaster> Unable to connect to SQL server."
@@ -163,9 +167,6 @@ RegisterCommand( new UNSUSPENDOPERCommand( this, "UNSUSPEND", "<OPER> "
 	"UnSuspend an oper",flg_UNSUSPEND ) ) ;
 RegisterCommand( new MODOPERCommand( this, "MODOPER", "<OPER> <OPTION> <NEWVALUE>"
 	"Modify an oper",flg_UNSUSPEND ) ) ;
-
-AuthList = NULL;
-AuthEnd = NULL;
 
 }
 
@@ -285,48 +286,54 @@ const string Command = string_upper( st[ 0 ] ) ;
 commandMapType::iterator commHandler = commandMap.find( Command ) ;
 
 // Was a handler found?
-
 if( commHandler == commandMap.end() )
 	{
 	// Nope, notify the client
 	Notice( theClient, "Unknown command" ) ;
+	return 0 ; 
 	}
-else	             //Check if the user is logged in , and he got access to that command
-{	
-	int ComAccess = commHandler->second->getFlags();
-	AuthInfo* theUser = IsAuth(theClient->getCharYYXXX());
-	if((!theUser) && (ComAccess != 0x00))
+
+// Check if the user is logged in , and he got
+// access to that command
+
+int ComAccess = commHandler->second->getFlags();
+AuthInfo* theUser = IsAuth(theClient->getCharYYXXX());
+
+if((!theUser) && (ComAccess != 0))
 	{
-	    Notice( theClient, "You must be logged in to issue that command" ) ;
+	Notice( theClient,
+		"You must be logged in to issue that command" ) ;
 	}
-	else if((ComAccess != 0x00) && !(ComAccess & theUser->Access))
+else if( (ComAccess != 0) && !(ComAccess & theUser->Access))
 	{
-	    Notice( theClient, "You dont have access to that command" ) ;
+	Notice( theClient, "You dont have access to that command" ) ;
 	}
-	else if((theUser) && (theUser->Flags & isSUSPENDED))
+else if( (theUser) && (theUser->Flags & isSUSPENDED))
 	{
-	    if((time( 0 ) - theUser->SuspendExpires < 0) && (ComAccess != 0x00))
-		Notice(theClient,"Sorry but you are suspended");
-	    else 
-	    {
-		if(time( 0 ) - theUser->SuspendExpires >= 0)
-		{	
-		    User* tmpUser = GetUser(theUser->Name);
-		    tmpUser->SuspendExpires = 0;
-		    tmpUser->Flags &= ~isSUSPENDED;
-		    tmpUser->SuspendedBy ="";
-		    UpdateOper(tmpUser);
-	    	    delete tmpUser;
+	if( (::time( 0 ) - theUser->SuspendExpires < 0)
+		&& (ComAccess != 0))
+		{
+		Notice( theClient,
+			"Sorry but you are suspended");
 		}
-		commHandler->second->Exec( theClient, Message) ;
-	    }		
-	}
-	else
-	{
-	// Yup, execute the handler
+	else 
+		{
+		if( ::time( 0 ) - theUser->SuspendExpires >= 0)
+			{	
+			User* tmpUser = GetUser(theUser->Name);
+
+			tmpUser->SuspendExpires = 0;
+			tmpUser->Flags &= ~isSUSPENDED;
+			tmpUser->SuspendedBy ="";
+
+			UpdateOper(tmpUser);
+    			delete tmpUser;
+			}
+		}
+	// Execute the command handler
 	commHandler->second->Exec( theClient, Message) ;
-	}
-}
+	}		
+
 // Call the base class OnPrivateMessage() method
 return xClient::OnPrivateMessage( theClient, Message ) ;
 }
@@ -530,32 +537,30 @@ Part( chanName ) ;
 return true ;
 }
 
-AuthInfo* ccontrol::IsAuth( const string& Numeric)
+AuthInfo* ccontrol::IsAuth( const string& Numeric ) const
 {
-    AuthInfo *ptr = AuthList;
-    while(ptr != NULL)
-    {
-	if(!strcasecmp(ptr->Numeric.c_str(),Numeric.c_str()))
-	    return ptr;
-	else
-	    ptr = ptr -> Next;
-    }
-    return ptr;
+for( authListType::const_iterator ptr = authList.begin() ;
+	ptr != authList.end() ; ++ptr )
+	{
+	if( !strcasecmp( (*ptr)->Numeric.c_str(), Numeric.c_str() ) )
+		{
+		return *ptr ;
+		}
+	}
+return 0 ;
 }
-
-    
-
-AuthInfo* ccontrol::IsAuth( const int UserId)
+   
+AuthInfo* ccontrol::IsAuth( const int UserId ) const
 {
-    AuthInfo *ptr = AuthList;
-    while(ptr != NULL)
-    {
-	if(ptr->Id == UserId)
-	    return ptr;
-	else
-	    ptr = ptr -> Next;
-    }
-    return ptr;
+for( authListType::const_iterator ptr = authList.begin() ;
+	ptr != authList.end() ; ++ptr )
+	{
+	if( (*ptr)->Id == UserId )
+		{
+		return *ptr ;
+		}
+	}
+return 0 ;
 }
 
 void ccontrol::UpdateAuth(int Id)
@@ -576,7 +581,6 @@ void ccontrol::UpdateAuth(int Id)
 
 User* ccontrol::GetUser( const string& Name )
 {
-strstream Condition;
 static const char Main[] = "SELECT user_id,user_name,password,access,flags,suspend_expires,suspended_by FROM opers WHERE lower(user_name) = '";
 
 strstream theQuery;
@@ -604,7 +608,6 @@ User* ccontrol::GetUser( const int Id)
 {
 static const char Main[] = "SELECT user_id,user_name,password,access,flags,suspend_expires,suspended_by FROM opers WHERE user_id = ";
 
-strstream Condition;
 strstream theQuery;
 
 theQuery	<< Main
@@ -617,6 +620,8 @@ elog	<< "ACCESS::sqlQuery> "
 	<< endl; 
 
 ExecStatusType status = SQLDb->Exec( theQuery.str() ) ;
+delete[] theQuery.str() ;
+
 if( (PGRES_TUPLES_OK == status) && (SQLDb->Tuples() > 0) )
 	{
 	return GetParm();
@@ -643,192 +648,259 @@ return TempUser;
 
 bool ccontrol::AddOper (User* Oper)
 {
-    strstream Condition;
-    static const char *Main = "INSERT into opers (user_name,password,access,last_updated_by,last_updated,flags) VALUES ('";
-    strstream theQuery;
-    theQuery	<< Main << Oper->UserName <<"','" << Oper->Password << 
-    "'," << Oper->Access << ",'" << Oper->last_updated_by << "',now()::abstime::int4,"
-    << Oper->Flags << ")" << ends;
-    elog << "ACCESS::sqlQuery> " << theQuery.str() << endl; 
+static const char *Main = "INSERT into opers (user_name,password,access,last_updated_by,last_updated,flags) VALUES ('";
 
-    ExecStatusType status = SQLDb->Exec( theQuery.str() ) ;
-    if( PGRES_COMMAND_OK == status ) 
+strstream theQuery;
+theQuery	<< Main
+		<< Oper->UserName <<"','"
+		<< Oper->Password << "',"
+		<< Oper->Access << ",'"
+		<< Oper->last_updated_by
+		<< "',now()::abstime::int4,"
+		<< Oper->Flags << ")"
+		<< ends;
+
+elog	<< "ACCESS::sqlQuery> "
+	<< theQuery.str()
+	<< endl; 
+
+ExecStatusType status = SQLDb->Exec( theQuery.str() ) ;
+delete[] theQuery.str() ;
+
+if( PGRES_COMMAND_OK == status ) 
+	{
 	return true;
-    else
+	}
+else
+	{
+	elog	<< "ccontrol::AddOper> SQL Failure: "
+		<< SQLDb->ErrorMessage()
+		<< endl ;
 	return false;
+	}
 }
 
 bool ccontrol::DeleteOper (const string& Name)
 {
-    strstream Condition;
+//    strstream Condition;
 //    Condition << "WHERE user_id = " << Id << ';';
-    static const char *Main = "DELETE FROM opers WHERE lower(user_name) = '";
-    strstream theQuery;
-    theQuery	<< Main << Name << "'" << ends;
-    elog << "ACCESS::sqlQuery> " << theQuery.str() << endl; 
 
-    ExecStatusType status = SQLDb->Exec( theQuery.str() ) ;
-    if( PGRES_COMMAND_OK == status ) 
+static const char *Main = "DELETE FROM opers WHERE lower(user_name) = '";
+
+strstream theQuery;
+theQuery	<< Main
+		<< Name
+		<< "'"
+		<< ends;
+
+elog	<< "ccontrol::DeleteOper> "
+	<< theQuery.str()
+	<< endl; 
+
+ExecStatusType status = SQLDb->Exec( theQuery.str() ) ;
+delete[] theQuery.str() ;
+
+if( PGRES_COMMAND_OK == status ) 
+	{
 	return true;
-    else
+	}
+else
+	{
+	elog	<< "ccontrol::DeleteOper> SQL Failure: "
+		<< SQLDb->ErrorMessage()
+		<< endl ;
 	return false;
+	}
 }
 
 bool ccontrol::UpdateOper (User* Oper)
 {
-    strstream Condition;
-    static const char *Main = "UPDATE opers SET password = '";
-    strstream theQuery;
-    theQuery	<< Main << Oper->Password << 
-    "', Access = " << Oper->Access << ", last_updated_by = '" << Oper->last_updated_by << "',last_updated = now()::abstime::int4,flags = "
-    << Oper->Flags <<  ",suspend_expires = " << Oper->SuspendExpires << " ,suspended_by = '"
-    << Oper->SuspendedBy << "' WHERE lower(user_name) = '" 
-    << string_lower(Oper->UserName.c_str()) << "'" <<  ends;
-    elog << "ACCESS::sqlQuery> " << theQuery.str() << endl; 
+static const char *Main = "UPDATE opers SET password = '";
 
-    ExecStatusType status = SQLDb->Exec( theQuery.str() ) ;
-    if( PGRES_COMMAND_OK == status ) 
+strstream theQuery;
+theQuery	<< Main
+		<< Oper->Password
+		<< "', Access = "
+		<< Oper->Access
+		<< ", last_updated_by = '"
+		<< Oper->last_updated_by
+		<< "',last_updated = now()::abstime::int4,flags = "
+		<< Oper->Flags
+		<<  ",suspend_expires = "
+		<< Oper->SuspendExpires
+		<< " ,suspended_by = '"
+		<< Oper->SuspendedBy
+		<< "' WHERE lower(user_name) = '" 
+		<< string_lower(Oper->UserName) << "'"
+		<<  ends;
+
+elog	<< "ccontrol::UpdateOper> "
+	<< theQuery.str()
+	<< endl; 
+
+ExecStatusType status = SQLDb->Exec( theQuery.str() ) ;
+delete[] theQuery.str() ;
+
+if( PGRES_COMMAND_OK == status ) 
+	{
 	return true;
-    else
+	}
+else
+	{
+	elog	<< "ccontrol::UpdateOper> SQL Failure: "
+		<< SQLDb->ErrorMessage()
+		<< endl ;
 	return false;
+	}
 }
 
 int ccontrol::getCommandLevel( const string& Command)
 {
-    //Command = string_upper(Command);
-    commandMapType::iterator commHandler = commandMap.find( Command ) ;
+commandMapType::iterator commHandler = commandMap.find( Command ) ;
+
 // Was a handler found?
-    if( commHandler == commandMap.end() )
-	return -1;
-    else
-	return commHandler->second->getFlags();
+if( commHandler != commandMap.end() )
+	{
+	return commHandler->second->getFlags() ;
+	}
+
+return -1 ;
 }	
 
 bool ccontrol::AuthUser( User* TempUser)
 {
-    AuthInfo *TempAuth;
-    TempAuth = new AuthInfo;
-    if(TempAuth == NULL)
-	return false;
-    if(AuthList == NULL)
-    {	
-	AuthList = TempAuth;
-	TempAuth->Prev = NULL;
-    }
-    else
-    {
-	TempAuth->Prev = AuthEnd;
-	AuthEnd->Next = TempAuth;           
-    }
-    
-    TempAuth->Id = TempUser->Id;
-    TempAuth->Name = TempUser->UserName;
-    TempAuth->Access = TempUser->Access;
-    TempAuth->Flags = TempUser->Flags;
-    TempAuth->Next = NULL;
-    TempAuth->Numeric = TempUser->Numeric;
-    TempAuth->SuspendExpires = TempUser->SuspendExpires;
-    TempAuth->SuspendedBy = TempUser->SuspendedBy;
-    AuthEnd = TempAuth;
-    return true;
+AuthInfo *TempAuth = new (nothrow) AuthInfo;
+assert( TempAuth != 0 ) ;
+
+TempAuth->Id = TempUser->Id;
+TempAuth->Name = TempUser->UserName;
+TempAuth->Access = TempUser->Access;
+TempAuth->Flags = TempUser->Flags;
+TempAuth->Next = NULL;
+TempAuth->Numeric = TempUser->Numeric;
+TempAuth->SuspendExpires = TempUser->SuspendExpires;
+TempAuth->SuspendedBy = TempUser->SuspendedBy;
+
+authList.push_back( TempAuth ) ;
+return true;
 }    
 
 bool ccontrol::deAuthUser( const string& Numeric)
 {
-
-    	AuthInfo *TempAuth = IsAuth(Numeric);
-	if(TempAuth)
+AuthInfo *TempAuth = IsAuth(Numeric);
+if(TempAuth)
 	{
-	    if(TempAuth == AuthList)
-		AuthList=TempAuth->Next;
-	    if(TempAuth == AuthEnd)
-		AuthEnd = TempAuth->Prev;
-	    if(TempAuth->Prev != NULL)
-		TempAuth->Prev->Next = TempAuth->Next;
-	    if(TempAuth->Next != NULL)
-		TempAuth->Next->Prev = TempAuth->Prev;
-	    delete (TempAuth);
+	authList.erase( std::find( authList.begin(),
+		authList.end(),
+		TempAuth ) ) ;
+
+	delete TempAuth ; 
 	}
 return true;
 }
 
-bool ccontrol::UserGotMask( User* user , string Host )
+bool ccontrol::UserGotMask( User* user, const string& Host )
 {
-    int i;
-    strstream Condition;
-    static const char *Main = "SELECT host FROM hosts WHERE user_id = ";
-    strstream theQuery;
-    theQuery	<< Main << user->Id << ';' << ends;
-    elog << "ACCESS::sqlQuery> " << theQuery.str() << endl; 
+static const char *Main = "SELECT host FROM hosts WHERE user_id = ";
 
-    ExecStatusType status = SQLDb->Exec( theQuery.str() ) ;
-    if( PGRES_TUPLES_OK == status )
-    for(i=0;i < SQLDb->Tuples();i++)
-	if(match(SQLDb->GetValue(i,0),Host) == 0)
-	    return 1;
-    return 0;
+strstream theQuery;
+theQuery	<< Main
+		<< user->Id
+		<< ';'
+		<< ends;
+
+elog	<< "ccontrol::UserGotMask> "
+	<< theQuery.str()
+	<< endl; 
+
+ExecStatusType status = SQLDb->Exec( theQuery.str() ) ;
+delete[] theQuery.str() ;
+
+if( PGRES_TUPLES_OK == status )
+	{
+	for( int i = 0 ; i < SQLDb->Tuples() ; i++ )
+		{
+		if(match(SQLDb->GetValue(i,0),Host) == 0)
+			{
+			return true ;
+			}
+		}
+	}
+return false ;
 }
 
-bool ccontrol::UserGotHost( User* user , string Host )
+bool ccontrol::UserGotHost( User* user, const string& Host )
 {
-    int i;
-    strstream Condition;
-    static const char *Main = "SELECT host FROM hosts WHERE user_id = ";
-    strstream theQuery;
-    theQuery	<< Main << user->Id << ';' << ends;
-    elog << "ACCESS::sqlQuery> " << theQuery.str() << endl; 
+static const char *Main = "SELECT host FROM hosts WHERE user_id = ";
 
-    ExecStatusType status = SQLDb->Exec( theQuery.str() ) ;
-    if( PGRES_TUPLES_OK == status )
-    for(i=0;i<SQLDb->Tuples();i++)
-	if(!strcasecmp(SQLDb->GetValue(i,0),Host.c_str()))
-	    return 1;
-    return 0;
+strstream theQuery;
+theQuery	<< Main
+		<< user->Id
+		<< ';'
+		<< ends;
+
+elog	<< "ccontrol::UserGotHost> "
+	<< theQuery.str()
+	<< endl; 
+
+ExecStatusType status = SQLDb->Exec( theQuery.str() ) ;
+delete[] theQuery.str() ;
+
+if( PGRES_TUPLES_OK == status )
+	{
+	for( int i = 0 ; i < SQLDb->Tuples() ; i++ )
+		{
+		if(!strcasecmp(SQLDb->GetValue(i,0),Host.c_str()))
+			{
+			return true ;
+			}
+		}
+	}
+return false ;
 }
 
-string ccontrol::CryptPass( string pass )
+string ccontrol::CryptPass( const string& pass )
 {
-	StringTokenizer st( pass ) ;
+StringTokenizer st( pass ) ;
 	
-	const char validChars[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.$*_";
+const char validChars[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.$*_";
 	
-	string salt;
-	int i;
+string salt;
 
-	srand(clock() * 1000000); 
-	for ( i=0 ; i < 8; i++) 
+for ( unsigned short int i = 0 ; i < 8 ; i++ ) 
 	{ 
-		int randNo = 1+(int) (64.0*rand()/(RAND_MAX+1.0));
-		salt += validChars[randNo]; 
+	int randNo = 1+(int) (64.0*rand()/(RAND_MAX+1.0));
+	salt += validChars[randNo]; 
 	} 
 
-	/* Work out a MD5 hash of our salt + password */
+/* Work out a MD5 hash of our salt + password */
 
-	md5	hash; // MD5 hash algorithm object.
-	md5Digest digest; // MD5Digest algorithm object.
+md5	hash; // MD5 hash algorithm object.
+md5Digest digest; // MD5Digest algorithm object.
  
-	strstream output;
-	string newPass;
-	newPass = salt + st.assemble(0);
+strstream output;
+string newPass;
+newPass = salt + st.assemble(0);
 
-	hash.update( (unsigned char *)newPass.c_str(), strlen( newPass.c_str() ));
-	hash.report( digest );
+hash.update( (const unsigned char *)newPass.c_str(), newPass.size() );
+hash.report( digest );
 	
-	/* Convert to Hex */
-
-	int data[ MD5_DIGEST_LENGTH ];
-	int ii;
-	for( ii = 0; ii < MD5_DIGEST_LENGTH; ii++ )
+/* Convert to Hex */
+int data[ MD5_DIGEST_LENGTH ] = { 0 } ;
+for( size_t ii = 0; ii < MD5_DIGEST_LENGTH; ii++ )
 	{
-		data[ii] = digest[ii];
+	data[ii] = digest[ii];
 	}
-	output << hex;
-	output.fill('0');
-	for( ii = 0; ii < MD5_DIGEST_LENGTH; ii++ ) {
-		output << setw(2) << data[ii];
+
+output << hex;
+output.fill('0');
+for( size_t ii = 0; ii < MD5_DIGEST_LENGTH; ii++ )
+	{
+	output << setw(2) << data[ii];
 	}
-	output << ends;
- 	return salt + output.str();
+output << ends;
+
+return string( salt + output.str() );
 }
 
 bool ccontrol::validUserMask(const string& userMask) const
@@ -861,93 +933,149 @@ if( st2[ 1 ].size() > 128 )
 return true ;
 }
 
-bool ccontrol::AddHost( User* user, string host )
+bool ccontrol::AddHost( User* user, const string& host )
 {
 
-    strstream Condition;
-    static const char *Main = "INSERT into hosts (user_id,host) VALUES (";
-    strstream theQuery;
-    theQuery << Main << user->Id <<",'" << host << "')"  << ends;
-    elog << "ACCESS::sqlQuery> " << theQuery.str() << endl; 
+static const char *Main = "INSERT into hosts (user_id,host) VALUES (";
 
-    ExecStatusType status = SQLDb->Exec( theQuery.str() ) ;
-    if( PGRES_COMMAND_OK == status ) 
+strstream theQuery;
+theQuery	<< Main
+		<< user->Id <<",'"
+		<< host << "')"
+		<< ends;
+
+elog	<< "ccontrol::AddHost> "
+	<< theQuery.str()
+	<< endl; 
+
+ExecStatusType status = SQLDb->Exec( theQuery.str() ) ;
+delete[] theQuery.str() ;
+
+if( PGRES_COMMAND_OK == status ) 
+	{
 	return true;
-    else
+	}
+else
+	{
+	elog	<< "ccontrol::AddHost> SQL Error: "
+		<< SQLDb->ErrorMessage()
+		<< endl ;
 	return false;
+	}
 }
 
-bool ccontrol::DelHost ( User* user , string host )
+bool ccontrol::DelHost( User* user, const string& host )
 {
-    strstream Condition;
+//    strstream Condition;
 //    Condition << "WHERE user_id = " << Id << ';';
-    static const char *Main = "DELETE FROM hosts WHERE user_id = ";
-    strstream theQuery;
-    theQuery	<< Main << user->Id << " And host = '"<< host << "'" << ends;
-    elog << "ACCESS::sqlQuery> " << theQuery.str() << endl; 
 
-    ExecStatusType status = SQLDb->Exec( theQuery.str() ) ;
-    if( PGRES_COMMAND_OK == status ) 
+static const char *Main = "DELETE FROM hosts WHERE user_id = ";
+
+strstream theQuery;
+theQuery	<< Main
+		<< user->Id
+		<< " And host = '"
+		<< host << "'"
+		<< ends;
+
+elog	<< "ccontrol::DelHost> "
+	<< theQuery.str()
+	<< endl; 
+
+ExecStatusType status = SQLDb->Exec( theQuery.str() ) ;
+delete[] theQuery.str() ;
+
+if( PGRES_COMMAND_OK == status ) 
+	{
 	return true;
-    else
+	}
+else
+	{
+	elog	<< "ccontrol::DelHost> SQL Error: "
+		<< SQLDb->ErrorMessage()
+		<< endl ;
 	return false;
+	}
 }
 
-bool ccontrol::GetHelp( iClient* user , string command )
+bool ccontrol::GetHelp( iClient* user, const string& command )
 {
-    int i;
-    char *h;
-    strstream Condition;
-    static const char *Main = "SELECT line,help FROM help WHERE lower(command) = '";
-    strstream theQuery;
-    theQuery	<< Main << string_lower(command) << "' ORDER BY line" << ends;
-    elog << "ACCESS::sqlQuery> " << theQuery.str() << endl; 
+static const char *Main = "SELECT line,help FROM help WHERE lower(command) = '";
 
-    ExecStatusType status = SQLDb->Exec( theQuery.str() ) ;
-    if( PGRES_TUPLES_OK == status )
-    {
+strstream theQuery;
+theQuery	<< Main
+		<< string_lower(command)
+		<< "' ORDER BY line"
+		<< ends;
+
+elog	<< "ccontrol::GetHelp> "
+	<< theQuery.str()
+	<< endl; 
+
+ExecStatusType status = SQLDb->Exec( theQuery.str() ) ;
+delete[] theQuery.str() ;
+
+if( PGRES_TUPLES_OK == status )
+	{
 	if(SQLDb->Tuples() > 0 )
-	    for(i=0;i < SQLDb->Tuples();i++)
-	    {	    	
-		h = SQLDb->GetValue(i,1);
-		h = ParseHelp(h);
-		Notice(user,h);
-	    }
+		{
+		for( int i = 0 ; i < SQLDb->Tuples() ; i++ )
+			{
+			string commInfo = replace(
+				SQLDb->GetValue( i, 1 ),
+				"$BOT$",
+				nickName ) ;
+
+			if( commInfo.empty() )
+				{
+				elog	<< "ccontrol::GetHelp> Unable "
+					<< "find $BOT$ in: "
+					<< SQLDb->GetValue( i, 1 )
+					<< ", when searching for "
+					<< "help on command: "
+					<< command
+					<< endl ;
+				}
+			else
+				{
+				// All is well
+				Notice( user, commInfo ) ;
+				}
+			} // for()
+		} // if( SQLDb->Tuples() > 0 )
 	else
-	    Notice(user,"Couldnt find help for %s",command.c_str());	
+		{
+		Notice( user,
+			"Couldnt find help for %s",
+			command.c_str());
+		}
 	return true;
-    }
-    return false;	    
+	}
+else
+	{
+	elog	<< "ccontrol::GetHelp> SQL Error: "
+		<< SQLDb->ErrorMessage()
+		<< endl ;
+	return false;	    
+	}
 }
 
-char *ccontrol::ReplaceStr(char *command, const char *from , const char *to)
+string ccontrol::replace( const string& srcString,
+	const string& from,
+	const string& to )
 {
-    char *Str,*TTok;
-    int NewSize;
-    if(strlen(to) > strlen(from))
-        NewSize = strlen(command)*(strlen(to)-strlen(from));
-    else
-	NewSize = strlen(command);
-    Str = new char[NewSize];
-    TTok = strtok(command,from);
-    if(TTok != NULL)
-	strcpy(Str,TTok);
-    while((TTok = strtok(NULL,from)) != NULL)
-    {
-	strcat(Str,to);
-	strcat(Str,TTok);
-    }
-    
-    delete TTok;
-    return Str;
+string::size_type beginPos = srcString.find( from ) ;
+if( string::npos == beginPos )
+	{
+	return string() ;
+	}
+
+string retMe( srcString.substr( 0, beginPos ) ) ;
+retMe += to ;
+retMe += srcString.substr( beginPos + from.size() ) ;
+
+return retMe ;
+
 }
 
-char *ccontrol::ParseHelp(char *command)
-{
-    char* TCommand;
-    TCommand = ReplaceStr(command,(char *)"$BOT$",nickName.c_str());
-    return TCommand;
-}
-
-    
-} // namespace gnuworld 
+} // namespace gnuworld

@@ -47,7 +47,7 @@
 #include	"ServerTimerHandlers.h"
 
 const char xServer_h_rcsId[] = __XSERVER_H ;
-const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.77 2001/02/18 19:46:01 dan_karrels Exp $" ;
+const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.78 2001/02/22 20:27:32 dan_karrels Exp $" ;
 
 using std::string ;
 using std::vector ;
@@ -1228,6 +1228,7 @@ if( outputBuffer.empty() )
 	return ;
 	}
 
+// Write at most one half the total output buffer size
 int bytesWritten = theSock->send( outputBuffer.toString(),
 	min( outputWriteSize >> 1, outputBuffer.size() ) ) ;
 

@@ -3,7 +3,7 @@
  */
 
 #ifndef __CCONTROL_H
-#define __CCONTROL_H "$Id: ccontrol.h,v 1.7 2001/02/22 13:08:38 mrbean_ Exp $"
+#define __CCONTROL_H "$Id: ccontrol.h,v 1.8 2001/02/22 20:27:32 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
@@ -70,18 +70,17 @@ protected:
 	 */
 	typedef commandMapType::value_type pairType ;
 
-public:
 	/**
-	 * PostgreSQL Database
+	 * The type used to store the authenticated users.
 	 */
-	cmDatabase* SQLDb;
+	typedef list< AuthInfo* >	authListType ;
 
 	/**
 	 * Holds the authenticated user list
 	 */
-	AuthInfo *AuthList;
+	authListType			authList ;
 
-        AuthInfo *AuthEnd;	
+public:
 
 	/**
 	 * Default, and only constructor, receives the name
@@ -214,9 +213,9 @@ public:
 	 */
 	virtual bool removeOperChan( const string& ) ;
 
-        AuthInfo *IsAuth( const string& );
+        AuthInfo *IsAuth( const string& ) const ;
 	
-	AuthInfo *IsAuth( const int );
+	AuthInfo *IsAuth( const int ) const ;
        
         User *GetUser( const string& );
 	
@@ -236,25 +235,25 @@ public:
 	
 	bool deAuthUser( const string& );
 
-	bool UserGotMask( User* , string );
+	bool UserGotMask( User* , const string& );
 
-	bool UserGotHost( User* , string );
-	
-	string CryptPass( string );
+	bool UserGotHost( User* , const string& );
+
+	static string CryptPass( const string& );
 
 	virtual bool validUserMask(const string& userMask) const ;
 
-        bool AddHost( User* , string host );
+        bool AddHost( User* , const string& host );
 
-        bool DelHost( User* , string host );
+        bool DelHost( User* , const string& host );
 	
 	void UpdateAuth( int );
 
-	bool GetHelp( iClient* , string );
+	bool GetHelp( iClient* , const string& );
 
-	char *ReplaceStr(char*, const char*, const char* );
-	
-	char *ParseHelp(char* );
+	static string replace( const string&,
+				const string&,
+				const string& ) ;
 
 	/**
 	 * This is a constant iterator type used to perform a read-only
@@ -324,6 +323,11 @@ public:
 	 */
 	inline const time_t& getDefaultGlineLength() const
 		{ return gLength ; }
+
+	/**
+	 * PostgreSQL Database
+	 */
+	cmDatabase* SQLDb;
 
 protected:
 

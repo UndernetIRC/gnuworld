@@ -22,7 +22,7 @@ strstream theQuery;
 theQuery	<< queryHeader 
 		<< ends;
 
-elog	<< "ACCESS::sqlQuery> "
+elog	<< "ACCESS> "
 	<< theQuery.str()
 	<< endl; 
 
