@@ -12,7 +12,7 @@
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 
-const char MODOPERCommand_cc_rcsId[] = "$Id: MODOPERCommand.cc,v 1.6 2001/05/05 19:53:20 mrbean_ Exp $";
+const char MODOPERCommand_cc_rcsId[] = "$Id: MODOPERCommand.cc,v 1.7 2001/05/05 20:29:09 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -97,7 +97,7 @@ else if(!strcasecmp(st[2].c_str(),"getlogs")) //Trying to toggle the get of logs
 	{
 	if(!tmpUser->gotFlag(getLOGS))
 		{
-		tmpUser->setFlags(getLOGS);
+		tmpUser->setFlag(getLOGS);
 		bot->Notice(theClient,"getLogs have been turned on for %s",st[1].c_str());
 		}
 	else
