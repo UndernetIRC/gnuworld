@@ -240,7 +240,7 @@ int dronescan::OnChannelEvent( const channelEventType& theEvent,
 	if(theChannel->size() < channelCutoff) return 0;
 
 	/* Iterate over our available tests, checking this channel */
-	checkChannel( theChannel , false );
+	checkChannel( theChannel );
 	
 	/* Do join count processing if applicable */
 	if(testEnabled(TST_JOINCOUNT))
