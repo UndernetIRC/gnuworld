@@ -1,5 +1,5 @@
-/* 
- * ADDUSERCommand.cc 
+/*
+ * ADDUSERCommand.cc
  *
  * 26/12/2000 - Greg Sikorski <gte@atomicrevs.demon.co.uk>
  * Initial Version.
@@ -11,30 +11,30 @@
  *
  * Caveats: None
  *
- * $Id: ADDUSERCommand.cc,v 1.18 2001/03/24 11:00:11 isomer Exp $
+ * $Id: ADDUSERCommand.cc,v 1.19 2001/08/30 21:43:07 gte Exp $
  */
- 
+
 #include	<string>
- 
+
 #include	"StringTokenizer.h"
-#include	"ELog.h" 
-#include	"cservice.h" 
+#include	"ELog.h"
+#include	"cservice.h"
 #include	"levels.h"
 #include	"libpq++.h"
 #include	"responses.h"
 #include	"cservice_config.h"
 
-const char ADDUSERCommand_cc_rcsId[] = "$Id: ADDUSERCommand.cc,v 1.18 2001/03/24 11:00:11 isomer Exp $" ;
+const char ADDUSERCommand_cc_rcsId[] = "$Id: ADDUSERCommand.cc,v 1.19 2001/08/30 21:43:07 gte Exp $" ;
 
 namespace gnuworld
 {
 
 using std::string ;
 
-static const char* queryHeader = "INSERT INTO levels (channel_id, user_id, access, flags, added, added_by, last_modif, last_modif_by, last_updated) "; 
- 
+static const char* queryHeader = "INSERT INTO levels (channel_id, user_id, access, flags, added, added_by, last_modif, last_modif_by, last_updated) ";
+
 bool ADDUSERCommand::Exec( iClient* theClient, const string& Message )
-{ 
+{
 StringTokenizer st( Message ) ;
 if( st.size() < 4 )
 	{
@@ -50,24 +50,24 @@ if( st.size() < 4 )
 sqlUser* theUser = bot->isAuthed(theClient, true);
 if (!theUser)
 	{
-	return false; 
+	return false;
 	}
 
 /*
  *  First, check the channel is registered.
  */
- 
+
 sqlChannel* theChan = bot->getChannelRecord(st[1]);
 if (!theChan)
 	{
-	bot->Notice(theClient, 
+	bot->Notice(theClient,
 		bot->getResponse(theUser,
 			language::chan_not_reg).c_str(),
 		st[1].c_str()
 	);
 	return false;
-	} 
- 
+	}
+
 /*
  *  Check the user has sufficient access on this channel.
  */
@@ -80,7 +80,7 @@ if (level < level::adduser)
 			language::insuf_access).c_str()
 	);
 	return false;
-	} 
+	}
 
 /*
  *  Check we aren't trying to add someone with access higher than ours.
@@ -112,14 +112,14 @@ if ((targetAccess <= 0) || (targetAccess > 999))
 sqlUser* targetUser = bot->getUserRecord(st[2]);
 if (!targetUser)
 	{
-	bot->Notice(theClient, 
+	bot->Notice(theClient,
 		bot->getResponse(theUser,
 			language::not_registered).c_str(),
 		st[2].c_str()
 	);
-	return false; 
+	return false;
 	}
- 
+
 /*
  *  Check this user doesn't already have access on this channel.
  *  (Note: If they're forced, this will only be shown in
@@ -131,19 +131,19 @@ int levelTest = newLevel ? newLevel->getAccess() : 0 ;
 
 if (levelTest != 0)
 	{
-	bot->Notice(theClient, 
+	bot->Notice(theClient,
 		bot->getResponse(theUser,
 			language::already_in_list).c_str(),
 		targetUser->getUserName().c_str(),
 		theChan->getName().c_str(),
 		levelTest);
 	return false;
-	} 
+	}
 
 /*
  *  Work out the flags this user should default to.
  */
- 
+
 unsigned short targetFlags = 0;
 
 if (theChan->getUserFlags() == 1) targetFlags = sqlLevel::F_AUTOOP;
@@ -153,24 +153,24 @@ if (theChan->getUserFlags() == 2) targetFlags = sqlLevel::F_AUTOVOICE;
  *  Now, build up the SQL query & execute it!
  */
 
-strstream theQuery; 
+strstream theQuery;
 theQuery	<< queryHeader
-		<< "VALUES (" 
+		<< "VALUES ("
 		<< theChan->getID() << ","
 		<< targetUser->getID() << ","
 		<< targetAccess << ","
 		<< targetFlags << ","
 		<< bot->currentTime() << ","
-		<< "'(" << theUser->getUserName() << ") " 
+		<< "'(" << theUser->getUserName() << ") "
                    << theClient->getNickUserHost() << "',"
 		<< bot->currentTime() << ","
 		<< "'(" << theUser->getUserName() << ") "
-                   << theClient->getNickUserHost() << "'," 
+                   << theClient->getNickUserHost() << "',"
 		<< bot->currentTime()
 		<< ");"
-		<< ends; 
+		<< ends;
 
-#ifdef LOG_SQL 	
+#ifdef LOG_SQL
 	elog	<< "ADDUSER::sqlQuery> "
 		<< theQuery.str()
 		<< endl;
@@ -181,12 +181,29 @@ delete[] theQuery.str() ;
 
 if( PGRES_COMMAND_OK == status )
 	{
-	bot->Notice(theClient, 
+	bot->Notice(theClient,
 		bot->getResponse(theUser,
 			language::add_success).c_str(),
 		targetUser->getUserName().c_str(),
 		theChan->getName().c_str(),
 		targetAccess);
+
+	/*
+	 * Add this new record to the level cache.
+	 */
+
+	sqlLevel* newLevel = new (std::nothrow) sqlLevel(bot->SQLDb);
+	newLevel->setChannelId(theChan->getID());
+	newLevel->setUserId(targetUser->getID());
+	newLevel->setAccess(targetAccess);
+	newLevel->setFlag(targetFlags);
+	newLevel->setAdded(bot->currentTime());
+	newLevel->setAddedBy("(" + theUser->getUserName() + ") " + theClient->getNickUserHost());
+	newLevel->setLastModif(bot->currentTime());
+	newLevel->setLastModifBy("(" + theUser->getUserName() + ") " + theClient->getNickUserHost());
+
+	pair<int, int> thePair( newLevel->getUserId(), newLevel->getChannelId());
+	bot->sqlLevelCache.insert(cservice::sqlLevelHashType::value_type(thePair, newLevel));
 
 	/*
 	 *  "If they where added to *, set their invisible flag" (Ace).
@@ -203,6 +220,6 @@ else
 	}
 
 return true ;
-} 
+}
 
 } // namespace gnuworld.
