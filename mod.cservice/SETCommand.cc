@@ -11,10 +11,12 @@
  * 20/02/2001 - Gator Robert White <gator@cajun-gator.net>
  * removed AlwaysOp 
  * Sets channel options on the specified channel.
+ * 2001-03-16 - Perry Lorier <isomer@coders.net>
+ * Added 'DESC' as an alias for 'DESCRIPTION'
  *
  * Caveats: None.
  *
- * $Id: SETCommand.cc,v 1.31 2001/03/08 23:49:01 gte Exp $
+ * $Id: SETCommand.cc,v 1.32 2001/03/16 11:50:59 isomer Exp $
  */
 
 #include	<string>
@@ -25,7 +27,7 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char SETCommand_cc_rcsId[] = "$Id: SETCommand.cc,v 1.31 2001/03/08 23:49:01 gte Exp $" ;
+const char SETCommand_cc_rcsId[] = "$Id: SETCommand.cc,v 1.32 2001/03/16 11:50:59 isomer Exp $" ;
 
 namespace gnuworld
 {
@@ -798,7 +800,7 @@ if(option == "NOREG")
 	    return true;
 	}
 
-	if(option == "DESCRIPTION")
+	if(option == "DESCRIPTION" || option == "DESC")
 	{
 		string desc = st.assemble(3);
 	    if(level < level::set::desc)

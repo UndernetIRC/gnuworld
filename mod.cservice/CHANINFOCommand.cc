@@ -13,7 +13,7 @@
  *
  * Command is aliased "INFO".
  *
- * $Id: CHANINFOCommand.cc,v 1.19 2001/03/06 02:34:32 dan_karrels Exp $
+ * $Id: CHANINFOCommand.cc,v 1.20 2001/03/16 11:50:59 isomer Exp $
  */
 
 #include	<string>
@@ -26,7 +26,7 @@
 #include	"libpq++.h"
 #include	"cservice_config.h"
  
-const char CHANINFOCommand_cc_rcsId[] = "$Id: CHANINFOCommand.cc,v 1.19 2001/03/06 02:34:32 dan_karrels Exp $" ;
+const char CHANINFOCommand_cc_rcsId[] = "$Id: CHANINFOCommand.cc,v 1.20 2001/03/16 11:50:59 isomer Exp $" ;
  
 namespace gnuworld
 {
@@ -278,6 +278,15 @@ if( !theChan->getDescription().empty() )
 			language::desc,
 			string("Desc: %s")).c_str(),
 		theChan->getDescription().c_str());
+	}
+
+if( !theChan->getKeywords().empty() )
+	{
+	bot->Notice(theClient, 
+		bot->getResponse(theUser,
+			language::keywords,
+			string("Keywords: %s")).c_str(),
+		theChan->getKeywords().c_str());
 	}
 
 if( !theChan->getURL().empty() )

@@ -1,5 +1,5 @@
 #ifndef __RESPONSES_H
-#define __RESPONSES_H "$Id: responses.h,v 1.13 2001/03/05 21:41:30 gte Exp $"
+#define __RESPONSES_H "$Id: responses.h,v 1.14 2001/03/16 11:50:59 isomer Exp $"
 
 /* 
  * responses.h
@@ -10,7 +10,7 @@
  * Defines 'response' ID's, unique references to textual responses
  * from the bot.
  *
- * $Id: responses.h,v 1.13 2001/03/05 21:41:30 gte Exp $
+ * $Id: responses.h,v 1.14 2001/03/16 11:50:59 isomer Exp $
  */
 
 namespace gnuworld
@@ -192,6 +192,7 @@ namespace gnuworld
 		const int im_not_op =				169;
 		const int rpl_ignorelist = 			170;
 		const int im_not_opped = 			171;
+		const int keywords = 				172;
 	}
 }
 

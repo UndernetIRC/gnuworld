@@ -6,12 +6,12 @@
 *
 * KICK one or more users from a channel, with access checking.
 *
-* Caveats: For now it only supports 1 target. We need a match()'er done
-*          before we can kick a whole mask. 
+* 2001-03-16: Perry Lorier <isomer@coders.net>
+* doesn't kick the initiator in a masskick
 *
 * Suggestion: Support several nicks by seperating them with a comma.
 *             IE: /msg E kick #coder-com nick1,nick2,nick3 get outta here!
-* $Id: KICKCommand.cc,v 1.7 2001/02/16 20:20:26 plexus Exp $
+* $Id: KICKCommand.cc,v 1.8 2001/03/16 11:50:59 isomer Exp $
 */
 
 #include        <string>
@@ -24,7 +24,7 @@
 #include        "responses.h"
 #include		"match.h"
 
-const char KICKCommand_cc_rcsId[] = "$Id: KICKCommand.cc,v 1.7 2001/02/16 20:20:26 plexus Exp $" ;
+const char KICKCommand_cc_rcsId[] = "$Id: KICKCommand.cc,v 1.8 2001/03/16 11:50:59 isomer Exp $" ;
 
 namespace gnuworld
 {
@@ -107,7 +107,7 @@ bool KICKCommand::Exec( iClient* theClient, const string& Message )
 			if(match(st[2].c_str(), tmpUser->getClient()->getNickUserHost().c_str()) == 0)
 			{ 
 				/* Don't kick +k things */
-				if ( !tmpUser->getClient()->getMode(iClient::MODE_SERVICES) ) 
+				if ( !tmpUser->getClient()->getMode(iClient::MODE_SERVICES) && tmpUser->getClient() != theClient ) 
 				{ 
 					toBoot.push_back(tmpUser->getClient());
 				}

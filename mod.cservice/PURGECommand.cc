@@ -8,7 +8,7 @@
  *
  * Caveats: None
  *
- * $Id: PURGECommand.cc,v 1.7 2001/03/07 15:10:53 dan_karrels Exp $
+ * $Id: PURGECommand.cc,v 1.8 2001/03/16 11:50:59 isomer Exp $
  */
  
 #include	<string>
@@ -22,7 +22,7 @@
 #include	"responses.h"
 #include	"cservice_config.h"
 
-const char PURGECommand_cc_rcsId[] = "$Id: PURGECommand.cc,v 1.7 2001/03/07 15:10:53 dan_karrels Exp $" ;
+const char PURGECommand_cc_rcsId[] = "$Id: PURGECommand.cc,v 1.8 2001/03/16 11:50:59 isomer Exp $" ;
 
 namespace gnuworld
 {
@@ -81,12 +81,11 @@ if (level < level::purge)
  * 'freeze' it for future investigation in the log.
  */
 
-/* TODO: why is this here?
+/* TODO: why is this here? */
 strstream managerQuery;
-managerQuery	<< "SELECT users_lastseen.last_seen,users.email "
-		<< "FROM users,users_lastseen,levels "
-		<< "WHERE users.id = users_lastseen.user_id "
-		<< "AND levels.user_id = users.id "
+managerQuery	<< "SELECT users.user_name "
+		<< "FROM users,levels "
+		<< "WHERE levels.user_id = users.id "
 		<< "AND levels.access = 500 "
 		<< "AND levels.channel_id = "
 		<< theChan->getID()
@@ -98,7 +97,20 @@ managerQuery	<< "SELECT users_lastseen.last_seen,users.email "
 		<< managerQuery.str()
 		<< endl; 
 #endif
-*/
+
+
+ExecStatusType status = bot->SQLDb->Exec(managerQuery.str()) ;
+delete[] managerQuery.str() ;
+
+if( status != PGRES_COMMAND_OK )
+	{
+	elog	<< "PURGE> SQL Error: "
+		<< bot->SQLDb->ErrorMessage()
+		<< endl ;
+	return false ;
+	}
+
+string manager = bot->SQLDb->GetValue(0,0);
 
 /*
  *  We simply flag this channel as 'deleted', and remove from the cache.
@@ -119,7 +131,7 @@ theQuery	<< "UPDATE channels set deleted = 1 WHERE id = "
 		<< endl; 
 #endif
 
-ExecStatusType status = bot->SQLDb->Exec(theQuery.str()) ;
+status = bot->SQLDb->Exec(theQuery.str()) ;
 delete[] theQuery.str() ;
 
 if( status != PGRES_COMMAND_OK )
@@ -143,7 +155,12 @@ bot->Notice(theClient,
 		string("Purged channel %s")).c_str(), 
 	st[1].c_str());
 
-bot->writeChannelLog(theChan, theClient, sqlChannel::EV_JOIN, string() );
+bot->writeChannelLog(theChan, 
+	theClient, 
+	sqlChannel::EV_PURGE,
+	theClient->getNickName()+" (" + theUser->getUserName() 
+	 + ") has purged " + theChan->getName() + " (" + reason + "), " +
+	"Manager was " + manager );
 
 /* Remove from cache.. part channel. */
 bot->sqlChannelCache.erase(theChan->getName());

@@ -11,12 +11,14 @@
  * Minor bug fixes.
  * 01/03/01 - Daniel Simard <svr@undernet.org>
  * Fixed Language module stuff.
+ * 2001-03-16: Perry Lorier <isomer@coders.net>
+ * Fixed ban's without a reason defaulting to level 75
  *
  * Bans a user on a channel, adds this ban to the internal banlist.
  *
  * Caveats: None.
  *
- * $Id: BANCommand.cc,v 1.23 2001/03/16 09:20:58 isomer Exp $
+ * $Id: BANCommand.cc,v 1.24 2001/03/16 11:50:59 isomer Exp $
  */
 
 #include	<string>
@@ -30,7 +32,7 @@
 #include	"responses.h"
 #include	"match.h"
 
-const char BANCommand_cc_rcsId[] = "$Id: BANCommand.cc,v 1.23 2001/03/16 09:20:58 isomer Exp $" ;
+const char BANCommand_cc_rcsId[] = "$Id: BANCommand.cc,v 1.24 2001/03/16 11:50:59 isomer Exp $" ;
 
 namespace gnuworld
 {
