@@ -8,7 +8,7 @@
  *
  * Caveats: None.
  *
- * $Id: LBANLISTCommand.cc,v 1.1 2001/01/13 20:51:33 gte Exp $
+ * $Id: LBANLISTCommand.cc,v 1.2 2001/01/24 01:13:51 gte Exp $
  */
 
 #include	<string>
@@ -19,7 +19,7 @@
 #include	"Network.h"
 #include	"levels.h"
 
-const char LBANLISTCommand_cc_rcsId[] = "$Id: LBANLISTCommand.cc,v 1.1 2001/01/13 20:51:33 gte Exp $" ;
+const char LBANLISTCommand_cc_rcsId[] = "$Id: LBANLISTCommand.cc,v 1.2 2001/01/24 01:13:51 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -31,7 +31,7 @@ bool LBANLISTCommand::Exec( iClient* theClient, const string& Message )
 { 
 	StringTokenizer st( Message ) ;
  
-	if( st.size() < 4 )
+	if( st.size() < 2 )
 	{
 	    Usage(theClient);
 	    return true;
@@ -50,6 +50,23 @@ bool LBANLISTCommand::Exec( iClient* theClient, const string& Message )
 	sqlUser* theUser = bot->isAuthed(theClient, true);
 	if(!theUser) return false;
 
+	vector < sqlBan* >* banList = bot->getBanRecords(theChan); 
+
+	bot->Notice(theClient,"\002*** Ban List for channel %s ***\002",
+		theChan->getName().c_str());
+
+	for( vector< sqlBan* >::const_iterator ptr = banList->begin() ; ptr != banList->end() ; ++ptr )
+	{
+		sqlBan* theBan = (*ptr);
+		bot->Notice(theClient, "%s %s Level: %i", 
+			theChan->getName().c_str(), theBan->getBanMask().c_str(), theBan->getLevel());
+		bot->Notice(theClient, "ADDED BY: %s (%s)",
+			theBan->getSetBy().c_str(), theBan->getReason().c_str());
+		bot->Notice(theClient, "SINCE: %i", theBan->getSetTS());
+		bot->Notice(theClient, "EXP: %i", theBan->getExpires());
+	}
+	bot->Notice(theClient,"\002*** END ***\002");
+ 
 	return true ;
 } 
 

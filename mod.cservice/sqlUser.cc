@@ -4,7 +4,7 @@
  * Storage class for accessing user information either from the backend
  * or internal storage.
  * 
- * $Id: sqlUser.cc,v 1.11 2001/01/22 00:22:31 gte Exp $
+ * $Id: sqlUser.cc,v 1.12 2001/01/24 01:13:52 gte Exp $
  */
  
 #include	<strstream>
@@ -180,7 +180,8 @@ bool sqlUser::commitLastSeen()
 
 	strstream queryString;
 	queryString << queryHeader 
-	<< "SET last_seen = " << last_seen << " "
+	<< "SET last_seen = " << last_seen << ", "
+	<< "last_updated = now()::abstime::int4 "
 	<< queryCondition << id
 	<< ends;
 

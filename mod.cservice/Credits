@@ -1,0 +1,34 @@
+CMaster channel services Development Team:
+------------------------------------------
+
+GNUworld server API: 
+ripper_ - Dan Karrels <dan@karrels.com>
+
+CMaster Client Developers/Contributers:
+Gte-    - Greg Sikorski <gte@atomicrevs.demon.co.uk>
+ripper_ - Dan Karrels <dan@karrels.com>
+Isomer  - Perry Lorier <perry@coders.net>
+Plexus  - David Henriksen <david@itwebnet.dk>
+
+CMaster SQL Schema/Replication:
+moof    - 
+Kev     - Kevin Mitchell <klmitch@MIT.EDU>
+Bleep   - Thomas Helvey <@home.com> 
+Sengaia - Arjen
+
+CMaster PHP Interface:
+LGM    - Alex Dawson <alex@theducks.org>
+Isomer - Perry Lorier <perry@coders.net>
+Gator  - Robert White <gator@cajun-gator.net>
+
+Co-ordinators:
+Gator    - Robert White <gator@cajun-gator.net>
+DrCkTaiL -
+
+CMaster Language Translations:
+svr    - Daniel Simard <svr@undernet.org>
+plexus - David Henriksen <david@itwebnet.dk>
+Sebastian Serruys <sebastian.serruys@pandora.be>
+Alexander Maassen <outsider@key2peace.org>
+
+And also, many thanks to all of cservice for their help in testing and debugging :)

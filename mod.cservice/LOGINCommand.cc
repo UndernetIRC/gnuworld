@@ -10,7 +10,7 @@
 #include	"responses.h" 
 #include	"networkData.h"
 
-const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.9 2001/01/22 00:22:31 gte Exp $" ;
+const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.10 2001/01/24 01:13:51 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -96,7 +96,7 @@ bool LOGINCommand::Exec( iClient* theClient, const string& Message )
 			tmpData->currentUser = NULL; // Remove the pointer from the iClient to the sqlUser.
 		}
  
-		theUser->setLastSeen(::time(NULL));
+		theUser->setLastSeen(bot->currentTime());
 		theUser->setFlag(sqlUser::F_LOGGEDIN);
 		theUser->networkClient = theClient; // Who is authed as this user. 
 

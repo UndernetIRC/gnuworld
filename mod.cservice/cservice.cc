@@ -86,10 +86,22 @@ void cservice::ImplementServer( xServer* theServer )
 	if (SQLDb->Exec("SELECT now()::abstime::int4;") == PGRES_TUPLES_OK) 
 	{ 
 		// Set our "Last Refresh" timers to the current database system time.
-		lastChannelRefresh = atoi(SQLDb->GetValue(0,0));
-		lastUserRefresh = atoi(SQLDb->GetValue(0,0));
-		lastLevelRefresh = atoi(SQLDb->GetValue(0,0));
-		lastBanRefresh = atoi(SQLDb->GetValue(0,0));
+		time_t serverTime = atoi(SQLDb->GetValue(0,0));
+		lastChannelRefresh = serverTime;
+		lastUserRefresh = serverTime;
+		lastLevelRefresh = serverTime;
+		lastBanRefresh = serverTime;
+
+		/* 
+		 * Calculate the current time offset from the DB server.
+		 * We always want to talk in DB server time. 
+		 */ 
+
+		dbTimeOffset = serverTime - ::time(NULL);
+		elog << "cservice::ImplementServer> Current DB server time: " << currentTime() << endl; 
+	} else {
+	 	elog << "Unable to retrieve time from postgres server!" << endl;
+		::exit(0);
 	}
  
 	// Register our interest in recieving some Network events from gnuworld.
@@ -141,6 +153,7 @@ cservice::cservice(const string& args)
     RegisterCommand(new NEWPASSCommand(this, "NEWPASS", "<new passphrase>", 5));
 
     RegisterCommand(new REGISTERCommand(this, "REGISTER", "<#channel>", 0));
+    RegisterCommand(new PURGECommand(this, "PURGE", "<#channel> <reaspon>", 0));
     RegisterCommand(new FORCECommand(this, "FORCE", "<#channel>", 0));
     RegisterCommand(new UNFORCECommand(this, "UNFORCE", "<#channel>", 0));
     RegisterCommand(new SERVNOTICECommand(this, "SERVNOTICE", "<#channel> <text>", 0));
@@ -455,7 +468,7 @@ int cservice::OnCTCP( iClient* theClient, const string& CTCP,
 
 	if(Command == "VERSION")
 	{
-		xClient::DoCTCP(theClient, CTCP.c_str(), "Undernet P10 Channel Services Version 2 [" __DATE__ " " __TIME__ "] ($Id: cservice.cc,v 1.59 2001/01/22 20:25:16 gte Exp $)");
+		xClient::DoCTCP(theClient, CTCP.c_str(), "Undernet P10 Channel Services Version 2 [" __DATE__ " " __TIME__ "] ($Id: cservice.cc,v 1.60 2001/01/24 01:13:52 gte Exp $)");
 		return true;
 	}
  
@@ -520,7 +533,7 @@ sqlUser* cservice::getUserRecord(const string& id)
 	return 0;
 }	
 
-vector<sqlBan*> cservice::getBanRecords(sqlChannel* theChan)
+vector<sqlBan*>* cservice::getBanRecords(sqlChannel* theChan)
 {
 	/*
 	 *  Returns a vector of sqlBan's for a given channel.
@@ -541,7 +554,7 @@ vector<sqlBan*> cservice::getBanRecords(sqlChannel* theChan)
 	 *  If we find no bans.. return a new blank container.
 	 */ 
 
-	vector<sqlBan*> banList = vector<sqlBan*>();
+	vector<sqlBan*>* banList = new vector<sqlBan*>;
 
 	/*
 	 * Execute some SQL to get all bans relating to this channel.
@@ -553,9 +566,13 @@ vector<sqlBan*> cservice::getBanRecords(sqlChannel* theChan)
 	elog << "cmaster::getBanRecords> " << theQuery.str() << endl; 
 
 	if ((status = SQLDb->Exec(theQuery.str())) == PGRES_TUPLES_OK)
-	{
-		for (int i = 0 ; i < SQLDb->Tuples (); i++)
+	{ 
+		for (int i = 0 ; i < SQLDb->Tuples(); i++)
 		{ 
+			sqlBan* newBan = new sqlBan(SQLDb);
+			newBan->setAllMembers(i);
+			banList->push_back(newBan);
+			elog << "Loaded ban for : " << newBan->getBanMask() << endl;
 		}
 	}
 
@@ -891,6 +908,9 @@ int cservice::OnTimer(xServer::timerID, void*)
 		return false;
 	}
 
+	/* Update our time offset incase things drift.. */
+	dbTimeOffset = atoi(SQLDb->GetValue(0,"db_unixtime")) - ::time(NULL);
+
 	switch(updateType)
 	{
 		case 1: // Channel update.
@@ -1025,7 +1045,7 @@ const string& cservice::prettyDuration( int duration )
 
 		char tmp[63] = {0};
         int days = 0, hours = 0, mins = 0, secs = 0, res = 0;
-        res = time(NULL) - duration;
+        res = currentTime() - duration;
         secs = res % 60;
         mins = (res / 60) % 60;
         hours = (res / 3600) % 24;
@@ -1040,7 +1060,7 @@ const string& cservice::prettyDuration( int duration )
         return result;
 }  
 
-bool cservice::validUserMask(iClient* theClient, const string& userMask)
+bool cservice::validUserMask(const string& userMask)
 {
         char tmpmask[512], *n, *u, *h;
         
@@ -1051,27 +1071,13 @@ bool cservice::validUserMask(iClient* theClient, const string& userMask)
         u = strtok(NULL, "@");
         h = strtok(NULL, " ");
         
-        if(!n || !*n || !u || !*u || !h || !*h)
-        {
-                Notice(theClient, "ERROR: Invalid hostmask, use n!u@h.");
-                return false;
-        }
-        if(strlen(n) > 9)
-        {
-                Notice(theClient, "ERROR: The specified nick!*@* is too long, max 9 chars allowed.");
-                return false;
-        }
-        if(strlen(u) > 12)
-        {
-                Notice(theClient, "ERROR: The specified *!user@* is too long, max 12 chars allowed.");
-                return false;
+        if(!n || !*n || !u || !*u || !h || !*h) return false;
 
-        }
-        if(strlen(h) > 128)
-        {
-                Notice(theClient, "ERROR: The specified *!*@host is too long, max 128 chars allowed.");
-                return false;
-        }
+        if(strlen(n) > 9) return false;
+
+        if(strlen(u) > 12) return false;
+
+        if(strlen(h) > 128) return false; 
 
         return true;
 }
@@ -1157,8 +1163,6 @@ int cservice::OnEvent( const eventType& theEvent,
 			if (tmpSqlUser)
 			{
 				tmpSqlUser->networkClient = NULL;
-				tmpSqlUser->removeFlag(sqlUser::F_LOGGEDIN);
-				tmpSqlUser->commit();
 				elog << "cservice::OnEvent> Deauthenticated user " << tmpSqlUser->getUserName() << endl;
 			}
 			// Clear up the custom data structure we appended to this iClient.
@@ -1298,6 +1302,10 @@ return xClient::OnChannelEvent( whichEvent, theChan, data1, data2, data3, data4 
 void cservice::doAutoTopic(sqlChannel* theChan)
 {
 	strstream s;
+
+	/* Quickly drop out if nothing is set.. */ 
+	if ((theChan->getDescription() == "") && (theChan->getURL() == "")) return;
+
 	string extra = (theChan->getURL().size() != 0) ? (" ( " + theChan->getURL() + " )") : "";
 
 	s << getCharYYXXX() << " T " << theChan->getName() << " :" 
@@ -1341,6 +1349,13 @@ const string gnuworld::escapeSQLChars(const string& theString)
 
 	return result;
 }	
+
+time_t cservice::currentTime()
+{
+	/* Returns the current time according to the postgres server. */ 
+
+	 return dbTimeOffset + ::time(NULL);
+} 
  
 void Command::Usage( iClient* theClient )
 {

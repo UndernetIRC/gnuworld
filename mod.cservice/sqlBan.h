@@ -1,7 +1,7 @@
 /* sqlBan.h */
 
 #ifndef __SQLBAN_H
-#define __SQLBAN_H "$Id: sqlBan.h,v 1.1 2001/01/13 18:54:18 gte Exp $"
+#define __SQLBAN_H "$Id: sqlBan.h,v 1.2 2001/01/24 01:13:52 gte Exp $"
 
 #include	<string>
 #include	<ctime>
@@ -34,6 +34,9 @@ public:
 
 	inline const string&		getSetBy() const
 		{ return set_by ; }
+
+	inline const time_t&		getSetTS() const
+		{ return set_ts ; }
 
 	inline const unsigned short&	getLevel() const
 		{ return level ; } 

@@ -9,7 +9,7 @@
 #include	"levels.h"
 
  
-const char VERIFYCommand_cc_rcsId[] = "$Id: VERIFYCommand.cc,v 1.10 2001/01/22 00:22:31 gte Exp $" ;
+const char VERIFYCommand_cc_rcsId[] = "$Id: VERIFYCommand.cc,v 1.11 2001/01/24 01:13:52 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -80,7 +80,7 @@ bool VERIFYCommand::Exec( iClient* theClient, const string& Message )
  
 	if (level == level::admin::coder) 
 	{
-		bot->Notice(theClient, "%s is an Official Cservice Developer%s and logged in as %s",
+		bot->Notice(theClient, "%s is an Official CService Developer%s and logged in as %s",
 			target->getNickUserHost().c_str(), extra.c_str(), theUser->getUserName().c_str());
 		return true;
 	}

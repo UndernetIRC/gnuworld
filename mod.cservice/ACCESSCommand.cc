@@ -8,7 +8,7 @@
  * Can optionally narrow down selection using a number of switches.
  * Can display all channels a user has access on (TODO). 
  *
- * $Id: ACCESSCommand.cc,v 1.12 2001/01/22 00:22:31 gte Exp $
+ * $Id: ACCESSCommand.cc,v 1.13 2001/01/24 01:13:51 gte Exp $
  */
 
 #include	<string>
@@ -18,7 +18,7 @@
 #include	"cservice.h"
 #include	"libpq++.h"
 
-const char ACCESSCommand_cc_rcsId[] = "$Id: ACCESSCommand.cc,v 1.12 2001/01/22 00:22:31 gte Exp $" ;
+const char ACCESSCommand_cc_rcsId[] = "$Id: ACCESSCommand.cc,v 1.13 2001/01/24 01:13:51 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -177,8 +177,7 @@ bool ACCESSCommand::Exec( iClient* theClient, const string& Message )
 			suspend_expires = atoi(bot->SQLDb->GetValue(i, 5));
 			suspend_expires_d = suspend_expires - time(NULL);
 			suspend_expires_f = time(NULL) - suspend_expires_d;
-
-			elog << "exp: " << suspend_expires << " final: " << suspend_expires_f << endl;
+ 
 			autoOp = (flag & sqlLevel::F_AUTOOP);
 			autoVoice = (flag & sqlLevel::F_AUTOVOICE);
 

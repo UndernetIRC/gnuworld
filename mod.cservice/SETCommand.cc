@@ -10,7 +10,7 @@
  *
  * Caveats: SET LANG is still under consideration.
  *
- * $Id: SETCommand.cc,v 1.11 2001/01/20 22:19:15 gte Exp $
+ * $Id: SETCommand.cc,v 1.12 2001/01/24 01:13:52 gte Exp $
  */
 
 #include	<string>
@@ -22,7 +22,7 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char SETCommand_cc_rcsId[] = "$Id: SETCommand.cc,v 1.11 2001/01/20 22:19:15 gte Exp $" ;
+const char SETCommand_cc_rcsId[] = "$Id: SETCommand.cc,v 1.12 2001/01/24 01:13:52 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -286,8 +286,8 @@ bool SETCommand::Exec( iClient* theClient, const string& Message )
 			Usage(theClient);
 			return true;
 	    }
-	    if(value == "ON") theChan->setFlag(sqlChannel::F_TEMP);
-	    else if(value == "OFF") theChan->removeFlag(sqlChannel::F_TEMP);
+	    if(value == "ON") theChan->setFlag(sqlChannel::F_VACATION);
+	    else if(value == "OFF") theChan->removeFlag(sqlChannel::F_VACATION);
 	    else
 	    {
 		bot->Notice(theClient, "value of VACATION must be ON or OFF");

@@ -1,5 +1,5 @@
 #ifndef __CSERVICECOMMANDS_H
-#define __CSERVICECOMMANDS_H "$Id: cserviceCommands.h,v 1.18 2001/01/19 02:29:31 gte Exp $"
+#define __CSERVICECOMMANDS_H "$Id: cserviceCommands.h,v 1.19 2001/01/24 01:13:52 gte Exp $"
 
 #include	<string>
 #include	"iClient.h"
@@ -105,10 +105,11 @@ DECLARE_COMMAND( NEWPASS )
 // Admin level commands.
 
 DECLARE_COMMAND( REGISTER )
+DECLARE_COMMAND( PURGE )
 DECLARE_COMMAND( FORCE )
 DECLARE_COMMAND( UNFORCE )
 DECLARE_COMMAND( SERVNOTICE )
-DECLARE_COMMAND( SAY )
+DECLARE_COMMAND( SAY ) 
  
 } // namespace gnuworld
 

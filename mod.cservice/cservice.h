@@ -1,5 +1,5 @@
 #ifndef __CSERVICE_H
-#define __CSERVICE_H "$Id: cservice.h,v 1.30 2001/01/22 20:25:16 gte Exp $"
+#define __CSERVICE_H "$Id: cservice.h,v 1.31 2001/01/24 01:13:52 gte Exp $"
 
 #include	<string>
 #include	<vector>
@@ -158,9 +158,9 @@ public:
 
 	// Ban cache, key is channel id.
 	typedef vector < sqlBan* > sqlBanVectorType;
-	typedef map < int, sqlBanVectorType > sqlBanHashType ; 
+	typedef map < int, sqlBanVectorType* > sqlBanHashType ; 
 
-	vector<sqlBan*> getBanRecords(sqlChannel* theChan);
+	vector<sqlBan*>* getBanRecords(sqlChannel* theChan);
 
 	//typedef priority_queue < unsigned int, vector< string >, less <unsigned int > > silenceListType;
 	// Decided there aren't going to be that many silences anyway + we need iterative/random removal
@@ -191,6 +191,8 @@ public:
 	unsigned int banHits;
 	unsigned int banCacheHits; 
 
+	/* No of seconds offset our local time is from server time. */
+	int dbTimeOffset;
 
 	// To keep track of how many custom data chunks
 	// we have allocated.
@@ -224,13 +226,16 @@ public:
 	const string& getResponse( sqlUser*, int );
 
 	// Check for valid hostmask.
-	virtual bool validUserMask(iClient* theClient, const string& userMask); 
+	virtual bool validUserMask(const string& userMask); 
 
 	// Deop everyone on this channel.
 	void deopAllOnChan(Channel*); 
 
 	/* sets a description (url) topic combo. */
 	void doAutoTopic(sqlChannel* theChan);
+
+	time_t currentTime();
+
 } ;
 
 const string escapeSQLChars(const string& theString);

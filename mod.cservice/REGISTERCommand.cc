@@ -8,7 +8,7 @@
  *
  * Caveats: None
  *
- * $Id: REGISTERCommand.cc,v 1.6 2001/01/17 22:12:15 gte Exp $
+ * $Id: REGISTERCommand.cc,v 1.7 2001/01/24 01:13:52 gte Exp $
  */
  
 #include	<string>
@@ -20,7 +20,7 @@
 #include	"libpq++.h"
 #include	"Network.h"
 
-const char REGISTERCommand_cc_rcsId[] = "$Id: REGISTERCommand.cc,v 1.6 2001/01/17 22:12:15 gte Exp $" ;
+const char REGISTERCommand_cc_rcsId[] = "$Id: REGISTERCommand.cc,v 1.7 2001/01/24 01:13:52 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -71,8 +71,10 @@ bool REGISTERCommand::Exec( iClient* theClient, const string& Message )
 		bot->Notice(theClient, "You have insufficient access to perform that command.");
 		return false;
 	} 
+
+	string::size_type pos = st[1].find_first_of( ',' ); /* Don't allow comma's in channel names. :) */
  
-	if (st[1][0] != '#')
+	if ( (st[1][0] != '#') || (string::npos != pos))
 	{
 		bot->Notice(theClient, "Invalid channel name.");
 		return false;
