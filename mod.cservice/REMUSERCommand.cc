@@ -9,7 +9,7 @@
  * Caveats: None
  * 
  *
- * $Id: REMUSERCommand.cc,v 1.6 2001/01/30 01:01:49 gte Exp $
+ * $Id: REMUSERCommand.cc,v 1.7 2001/01/30 01:16:15 gte Exp $
  */
 
 #include	<string>
@@ -20,7 +20,7 @@
 #include	"levels.h"
 #include	"libpq++.h"
 
-const char REMUSERCommand_cc_rcsId[] = "$Id: REMUSERCommand.cc,v 1.6 2001/01/30 01:01:49 gte Exp $" ;
+const char REMUSERCommand_cc_rcsId[] = "$Id: REMUSERCommand.cc,v 1.7 2001/01/30 01:16:15 gte Exp $" ;
  
 namespace gnuworld
 {
@@ -62,9 +62,10 @@ bool REMUSERCommand::Exec( iClient* theClient, const string& Message )
 	/*
 	 *  Check the user has sufficient access on this channel.
 	 */
+	sqlUser* targetUser = bot->getUserRecord(st[2]);
 
 	int level = bot->getEffectiveAccessLevel(theUser, theChan, true);
-	if (level < level::remuser)
+	if ((level < level::remuser) && ((targetUser) && targetUser != theUser))
 	{
 		bot->Notice(theClient, "You have insufficient access to perform that command.");
 		return false;
@@ -73,8 +74,7 @@ bool REMUSERCommand::Exec( iClient* theClient, const string& Message )
 	/*
 	 *  Check the person we're trying to remove actually exists.
 	 */
-
-	sqlUser* targetUser = bot->getUserRecord(st[2]);
+ 
 	if (!targetUser)
 	{
 		bot->Notice(theClient, "Sorry, I don't know who %s is.", st[2].c_str());
