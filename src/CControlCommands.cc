@@ -46,7 +46,8 @@ if( 1 == st.size() )
 	}
 else
 	{
-	ccontrol::constCommandIterator ptr = bot->findCommand( string_upper( st[ 1 ] ) ) ;
+	ccontrol::constCommandIterator ptr =
+		bot->findCommand( string_upper( st[ 1 ] ) ) ;
 	if( ptr == bot->command_end() )
 		{
 		bot->Notice( theClient, "Command not found" ) ;
@@ -72,13 +73,18 @@ if( st.size() < 2 )
 Channel* theChan = Network->findChannel( st[ 1 ] ) ;
 if( NULL == theChan )
 	{
-	bot->Notice( theClient, "Unable to find channel %s", st[ 1 ].c_str() ) ;
+	bot->Notice( theClient, "Unable to find channel %s",
+		st[ 1 ].c_str() ) ;
 	return true ;
 	}
 
 bot->Notice( theClient, "Channel %s is mode %s",
 	st[ 1 ].c_str(),
 	theChan->getModeString().c_str() ) ;
+bot->Notice( theClient, "Created at time: %d",
+	theChan->getCreationTime() ) ;
+bot->Notice( theClient, "Number of channel users: %d",
+	theChan->size() ) ;
 
 return true ;
 }
@@ -96,9 +102,8 @@ if( st.size() < 2 )
 string chanName = st[ 1 ] ;
 if( '#' != chanName[ 0 ] )
 	{
-	string temp = "#" ;
-	temp += chanName ;
-	chanName = temp ;
+	bot->Notice( theClient, "Invalid channel name" ) ;
+	return true ;
 	}
 
 if( bot->addOperChan( chanName ) )
@@ -127,9 +132,8 @@ if( st.size() < 2 )
 string chanName = st[ 1 ] ;
 if( '#' != chanName[ 0 ] )
 	{
-	string temp = "#" ;
-	temp += chanName ;
-	chanName = temp ;
+	bot->Notice( theClient, "Invalid channel name" ) ;
+	return true ;
 	}
 
 if( bot->removeOperChan( chanName ) )
@@ -175,68 +179,6 @@ while( ptr != bot->operChan_end() )
 	}
 
 bot->Notice( theClient, chanList ) ;
-return true ;
-}
-
-// addchan #channel
-bool ADDCHANCommand::Exec( iClient* theClient, const string& Message )
-{
-StringTokenizer st( Message ) ;
-if( st.size() < 2 )
-	{
-	Usage( theClient ) ;
-	return true ;
-	}
-
-string chanName = st[ 1 ] ;
-if( '#' != chanName[ 0 ] )
-	{
-	string temp = "#" ;
-	temp += chanName ;
-	chanName = temp ;
-	}
-
-if( bot->addChan( chanName ) )
-	{
-	bot->Notice( theClient, "Addition of channel %s SUCCEEDED",
-		chanName.c_str() ) ;
-	}
-else
-	{
-	bot->Notice( theClient, "Addition of channel %s FAILED",
-		chanName.c_str() ) ;
-	}
-return true ;
-}
-
-// remchan #channel
-bool REMCHANCommand::Exec( iClient* theClient, const string& Message )
-{
-StringTokenizer st( Message ) ;
-if( st.size() < 2 )
-	{
-	Usage( theClient ) ;
-	return true ;
-	}
-
-string chanName = st[ 1 ] ;
-if( '#' != chanName[ 0 ] )
-	{
-	string temp = "#" ;
-	temp += chanName ;
-	chanName = temp ;
-	}
-
-if( bot->removeChan( chanName ) )
-	{
-	bot->Notice( theClient, "Removal of channel %s SUCCEEDED",
-		chanName.c_str() ) ;
-	}
-else
-	{
-	bot->Notice( theClient, "Removal of channel %s FAILED",
-		chanName.c_str() ) ;
-	}
 return true ;
 }
 
@@ -402,7 +344,8 @@ if( st.size() < 3 )
 Channel* theChan = Network->findChannel( st[ 1 ] ) ;
 if( NULL == theChan )
 	{
-	bot->Notice( theClient, "Unable to find channel %s\n", st[ 1 ].c_str() ) ;
+	bot->Notice( theClient, "Unable to find channel %s\n",
+		st[ 1 ].c_str() ) ;
 	return true ;
 	}
 

@@ -3,7 +3,7 @@
  */
 
 #ifndef __CCONTROL_H
-#define __CCONTROL_H "$Id: ccontrol.h,v 1.4 2000/07/11 19:31:56 dan_karrels Exp $"
+#define __CCONTROL_H "$Id: ccontrol.h,v 1.5 2000/11/12 23:38:58 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
@@ -24,42 +24,9 @@ namespace gnuworld
 {
  
 using namespace ccontrolns ;
+
+/// Forward declaration of command handler class
 class ccontrolns::Command ;
-
-/**
- * A small class that contains information about the channels that
- * the ccontrol client is in.
- */
-class e3Channel
-{
-public:
-	/**
-	 * Basic constructor receives name of the channel and
-	 * default modes.
-	 */
-	e3Channel( const string& _chanName,
-		const string& _modes )
-	: chanName( _chanName ),
-	  modes( _modes )
-	{}
-	/**
-	 * This constructor just receives the name of the
-	 * channel, no default modes.
-	 */
-	e3Channel( const string& _chanName )
-	: chanName( _chanName )
-	{}
-
-	/**
-	 * The name of the channel.
-	 */
-	string chanName ;
-
-	/**
-	 * The default modes of the channel, if any.
-	 */
-	string modes ;
-} ;
 
 /**
  * The ccontrol client class.  This is an operator service for network
@@ -138,17 +105,10 @@ public:
 	inline bool isOperChan( const string& theChan ) const ;
 
 	/**
-	 * Return true if the given channel name corresponds to a
-	 * channel that this client sits in, but is NOT an IRC operator
-	 * only channel.
-	 */
-	inline bool isRegularChan( const string& theChan ) const ;
-
-	/**
 	 * Return true if this client is on the given channel.
 	 */
 	virtual bool isOnChannel( const string& chanName ) const
-		{ return isOperChan( chanName ) || isRegularChan( chanName ) ; }
+		{ return isOperChan( chanName ) ; }
 
 	/**
 	 * This method will kick the given user from the given channel
@@ -206,19 +166,6 @@ public:
 	 * is already in the channel.
 	 */
 	virtual bool removeOperChan( const string& ) ;
-
-	/**
-	 * This method will cause the client to join the given channel
-	 * (if it's not already in the channel), and op itself.  All IRCops
-	 * which join the channel will be opped.
-	 */
-	virtual bool addChan( const string& ) ;
-
-	/**
-	 * This method will cause the bot part the given channel added
-	 * using the addChan() method.
-	 */
-	virtual bool removeChan( const string& ) ;
 
 	/**
 	 * This is a constant iterator type used to perform a read-only
@@ -317,12 +264,6 @@ protected:
 	 * The table of oper only channels.
 	 */
 	vector< string >	operChans ;
-
-	/**
-	 * The table which stores information about the regular
-	 * channels this client is on.
-	 */
-	vector< e3Channel* >	channels ;
 
 	/**
 	 * The command handler table.

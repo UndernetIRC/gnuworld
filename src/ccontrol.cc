@@ -21,7 +21,7 @@
 #include	"ccontrol.h"
  
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.2 2000/07/11 19:31:56 dan_karrels Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.3 2000/11/12 23:38:58 dan_karrels Exp $" ;
 
 using std::string ;
 using std::vector ;
@@ -33,17 +33,28 @@ namespace gnuworld
  
 ccontrol::ccontrol( const string& configFileName )
 {
+
+// Read the config file
 EConfig conf( configFileName ) ;
 
-nickName = conf.Find( "nickname" )->second ;
-userName = conf.Find( "username" )->second ;
-hostName = conf.Find( "hostname" )->second ;
-userDescription = conf.Find( "userdescription" )->second ;
+// Read out critical client information
+nickName = conf.Require( "nickname" )->second ;
+userName = conf.Require( "username" )->second ;
+hostName = conf.Require( "hostname" )->second ;
+userDescription = conf.Require( "userdescription" )->second ;
 
+// Read the bot's modes
 Mode( conf.Find( "mode" )->second ) ;
 
+// operChanReason is the reason used when kicking non-opers from
+// oper-only channels
 operChanReason = conf.Find( "operchanreason" )->second ;
+
+// operChanModes are the modes to set when setting up an oper-only
+// channel
 operChanModes = conf.Find( "operchanmodes" )->second ;
+
+// gLength is the length of time (in seconds) for default glines
 gLength = atoi( conf.Find( "glength" )->second.c_str() ) ;
 
 // Set up the oper channels
@@ -54,25 +65,13 @@ while( ptr != conf.end() && ptr->first == "operchan" )
 	++ptr ;
 	}
 
-for( ptr = conf.Find( "channel" ) ; ptr != conf.end() && ptr->first == "channel" ;
-	++ptr )
-	{
-	StringTokenizer st( ptr->second ) ;
-	if( st.size() > 1 )
-		{
-		channels.push_back( new e3Channel( st[ 0 ], st[ 1 ] ) ) ;
-		}
-	else
-		{
-		channels.push_back( new e3Channel( st[ 0 ] ) ) ;
-		}
-	} // for()
-
+// Read out the client's message channel
 msgChan = conf.Find( "msgchan" )->second ;
 
 // Make sure that the msgChan is in the list of operchans
 if( operChans.end() == find( operChans.begin(), operChans.end(), msgChan ) )
 	{
+	// Not found, add it to the list of operChans
 	operChans.push_back( msgChan ) ;
 	}
 
@@ -103,10 +102,6 @@ RegisterCommand( new REMOPERCHANCommand( this, "REMOPERCHAN", "<channel>"
 	"\tRemove an oper channel" ) ) ;
 RegisterCommand( new LISTOPERCHANSCommand( this, "LISTOPERCHANS",
 	"\tList current IRCoperator only channels" ) ) ;
-RegisterCommand( new ADDCHANCommand( this, "ADDCHAN", "<channel>"
-	"\tAdd a channel to be monitored" ) ) ;
-RegisterCommand( new REMCHANCommand( this, "REMCHAN", "<channel>"
-	"\tRemove a channel from being monitored" ) ) ;
 RegisterCommand( new CHANINFOCommand( this, "CHANINFO", "<channel>"
 	"\tObtain information about a given channel" ) ) ;
 
@@ -114,40 +109,49 @@ RegisterCommand( new CHANINFOCommand( this, "CHANINFO", "<channel>"
 
 ccontrol::~ccontrol()
 {
-for( commandMapType::iterator ptr = commandMap.begin() ; ptr != commandMap.end() ; ++ptr )
+// Deallocate each command handler
+for( commandMapType::iterator ptr = commandMap.begin() ;
+	ptr != commandMap.end() ; ++ptr )
 	{
 	delete ptr->second ;
 	ptr->second = 0 ;
 	}
 commandMap.clear() ;
-for( vector< e3Channel* >::iterator ptr = channels.begin() ; ptr != channels.end() ;
-	++ptr )
-	{
-	delete *ptr ;
-	*ptr = 0 ;
-	}
-channels.clear() ;
 }
 
+// Register a command handler
 bool ccontrol::RegisterCommand( Command* newComm )
 {
 #ifdef EDEBUG
   assert( newComm != NULL ) ;
 #endif
 
+// Unregister the command handler first; prevent memory leaks
 UnRegisterCommand( newComm->getName() ) ;
+
+// Insert the new handler
 return commandMap.insert( pairType( newComm->getName(), newComm ) ).second ;
 }
 
 bool ccontrol::UnRegisterCommand( const string& commName )
 {
+// Find the command handler
 commandMapType::iterator ptr = commandMap.find( commName ) ;
+
+// Was the handler found?
 if( ptr == commandMap.end() )
 	{
+	// Nope
 	return false ;
 	}
+
+// Deallocate the handler
 delete ptr->second ;
+
+// Remove the handler
 commandMap.erase( ptr ) ;
+
+// Return success
 return true ;
 }
 
@@ -165,16 +169,7 @@ for( vector< string >::size_type i = 0 ; i < operChans.size() ; i++ )
 	MyUplink->RegisterChannelEvent( operChans[ i ], this ) ;
 	}
 
-for( vector< e3Channel* >::size_type i = 0 ; i < channels.size() ; i++ )
-	{
-	// Burst our channels
-	MyUplink->JoinChannel( this, channels[ i ]->chanName,
-		channels[ i ]->modes ) ;
-
-	// Receive events for this channel
-	MyUplink->RegisterChannelEvent( channels[ i ]->chanName, this ) ;
-	}
-
+// Don't forget to call the base class BurstChannels() method
 return xClient::BurstChannels() ;
 
 }
@@ -185,8 +180,8 @@ return xClient::BurstChannels() ;
 // explicitly set for each Command.
 void ccontrol::ImplementServer( xServer* theServer )
 {
-for( commandMapType::iterator ptr = commandMap.begin() ; ptr != commandMap.end() ;
-	++ptr )
+for( commandMapType::iterator ptr = commandMap.begin() ;
+	ptr != commandMap.end() ; ++ptr )
 	{
 	ptr->second->setServer( theServer ) ;
 	}
@@ -198,32 +193,42 @@ int ccontrol::OnPrivateMessage( iClient* theClient, const string& Message )
 
 //elog << "ccontrol::OnPrivateMessage()\n" ;
 
+// Only allow opers or services clients to use this client
 if( !theClient->isOper() && !theClient->getMode( iClient::MODE_SERVICES ) )
 	{
 	Notice( theClient, "You must be an IRCoperator to use this service." ) ;
 	return 0 ;
 	}
 
+// Tokenize the message
 StringTokenizer st( Message ) ;
+
+// Make sure there is a command present
 if( st.empty() )
 	{
 	Notice( theClient, "Incomplete command" ) ;
 	return 0 ;
 	}
 
+// This is no longer necessary, but oh well *shrug*
 const string Command = string_upper( st[ 0 ] ) ;
 
 // Attempt to find a handler for this method.
 commandMapType::iterator commHandler = commandMap.find( Command ) ;
+
+// Was a handler found?
 if( commHandler == commandMap.end() )
 	{
+	// Nope, notify the client
 	Notice( theClient, "Unknown command" ) ;
 	}
 else
 	{
+	// Yup, execute the handler
 	commHandler->second->Exec( theClient, Message ) ;
 	}
 
+// Call the base class OnPrivateMessage() method
 return xClient::OnPrivateMessage( theClient, Message ) ;
 }
 
@@ -234,44 +239,40 @@ return xClient::OnEvent( theEvent, Data1, Data2, Data3, Data4 ) ;
 }
 
 int ccontrol::OnChannelEvent( const channelEventType& theEvent,
-	const string& theChan,
+	const string& chanName,
 	void* Data1, void* Data2, void* Data3, void* Data4 )
 {
 
 switch( theEvent )
 	{
 	case EVT_JOIN:
-		iClient* theClient = static_cast< iClient* >( Data1 ) ;
-		if( theClient->isOper() && (isOperChan( theChan ) 
-			|| isRegularChan( theChan )) )
+		if( !isOperChan( chanName ) )
 			{
-			char buf[ 512 ] = { 0 } ;
-			sprintf( buf, "%s M %s +o %s\n",
-				getCharYYXXX().c_str(),
-				theChan.c_str(),
-				theClient->getCharYYXXX().c_str() ) ;
-			QuoteAsServer( buf ) ;
+			// We really don't care otherwise
+			// Note, this shouldn't happen
+			break ;
+			}
+
+		iClient* theClient = static_cast< iClient* >( Data1 ) ;
+		if( theClient->isOper() )
+			{
+			Channel* theChan = Network->findChannel( chanName  ) ;
+			if( NULL == theChan )
+				{
+				elog	<< "ccontrol::OnChannelEvent> "
+					<< "Unable to find channel: "
+					<< chanName << endl ;
+				break ;
+				}
+
+			Op( theChan, theClient ) ;
 			}
 		break ;
 	}
 
-return xClient::OnChannelEvent( theEvent, theChan, Data1,
+// Call the base class OnChannelEvent()
+return xClient::OnChannelEvent( theEvent, chanName, Data1,
 	Data2, Data3, Data4 ) ;
-}
-
-bool ccontrol::isRegularChan( const string& theChan ) const
-{
-vector< e3Channel* >::const_iterator ptr = channels.begin(),
-				end = channels.end() ;
-while( ptr != end )
-	{
-	if( !strcasecmp( (*ptr)->chanName.c_str(), theChan.c_str() ) )
-		{
-		return true ;
-		}
-	++ptr ;
-	}
-return false ;
 }
 
 bool ccontrol::isOperChan( const string& theChan ) const
@@ -319,22 +320,6 @@ for( vector< string >::iterator ptr = operChans.begin() ;
 		break ;
 		}
 	} // for()
-for( vector< e3Channel* >::iterator ptr = channels.begin() ;
-	ptr != channels.end() ; ++ptr )
-	{
-	if( NULL == *ptr )
-		{
-		elog	<< "ccontrol::Part> Found NULL!\n" ;
-		continue ;
-		}
-	if( !strcasecmp( (*ptr)->chanName.c_str(), chanName.c_str() ) )
-		{
-		channels.erase( ptr ) ;
-		delete *ptr ;
-		foundChannel = true ;
-		break ;
-		}
-	}
 
 if( !foundChannel )
 	{
@@ -428,35 +413,5 @@ Part( chanName ) ;
 
 return true ;
 }
-
-bool ccontrol::addChan( const string& chanName )
-{
-if( isRegularChan( chanName ) )
-	{
-	return false ;
-	}
-
-Join( chanName ) ;
-try
-	{
-	channels.push_back( new e3Channel( chanName ) ) ;
-	}
-catch( std::bad_alloc )
-	{
-	elog	<< "ccontrol::addChan> Memory allocation failure\n" ;
-	return false ;
-	}
-
-return true ;
-}
-
-bool ccontrol::removeChan( const string& chanName )
-{
-// Part() will remove the given channel from the internal tables
-Part( chanName ) ;
-
-return true ;
-
-} 
 
 } // namespace gnuworld 

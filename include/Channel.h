@@ -132,15 +132,18 @@ public:
 		iClient* ) const ;
 
 	/**
-	 * Remove the given mode from the ChannelUser associated with the given
-	 * iClient.
+	 * Remove the given mode from the ChannelUser associated with
+	 * the given iClient.
 	 */
-	inline bool removeUserMode( const ChannelUser::modeType& whichMode, iClient* ) ;
+	inline bool removeUserMode( const ChannelUser::modeType& whichMode,
+		iClient* ) ;
 
 	/**
-	 * Set the given mode for the ChannelUser associated with the given iClient.
+	 * Set the given mode for the ChannelUser associated with the
+	 * given iClient.
 	 */
-	inline bool setUserMode( const ChannelUser::modeType& whichMode, iClient* ) ;
+	inline bool setUserMode( const ChannelUser::modeType& whichMode,
+		iClient* ) ;
 
 	/**
 	 * Set a limit on the channel.  This method will set the
