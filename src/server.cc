@@ -47,7 +47,7 @@
 #include	"ServerTimerHandlers.h"
 
 const char xServer_h_rcsId[] = __XSERVER_H ;
-const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.85 2001/03/03 15:45:36 dan_karrels Exp $" ;
+const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.86 2001/03/03 15:54:26 dan_karrels Exp $" ;
 
 using std::string ;
 using std::vector ;
@@ -2100,67 +2100,94 @@ if( postJoinTime < theChan->getCreationTime() )
 	theChan->setCreationTime( joinTime ) ;
 	}
 
-if( !chanModes.empty() )
+// Is the string not empty, and not only consisting of spaces?
+if( !chanModes.empty() &&
+	(string::npos != chanModes.find_first_not_of( ' ' )))
 	{
 	StringTokenizer st( chanModes ) ;
+	StringTokenizer::size_type argPos = 1 ;
 
-	if( !st.empty() && !st[ 0 ].empty() )
+	bool plus = true ;
+
+	for( string::const_iterator ptr = st[ 0 ].begin() ;
+		ptr != st[ 0 ].end() ; ++ptr )
 		{
-		StringTokenizer::size_type argPos = 1 ;
-
-		for( string::const_iterator ptr = st[ 0 ].begin() ;
-			ptr != st[ 0 ].end() ; ++ptr )
+		switch(  *ptr )
 			{
-			switch(  *ptr )
-				{
-				case 't':
+			case '+':
+				plus = true ;
+				break ;
+			case '-':
+				plus = false ;
+				break ;
+			case 't':
+				if( plus )
 					theChan->onModeT( true ) ;
-					break ;
-				case 'n':
+				else
+					theChan->onModeT( false ) ;
+				break ;
+			case 'n':
+				if( plus )
 					theChan->onModeN( true ) ;
-					break ;
-				case 's':
+				else
+					theChan->onModeN( false ) ;
+				break ;
+			case 's':
+				if( plus )
 					theChan->onModeS( true ) ;
-					break ;
-				case 'p':
+				else
+					theChan->onModeS( false ) ;
+				break ;
+			case 'p':
+				if( plus )
 					theChan->onModeP( true ) ;
-					break ;
-				case 'm':
+				else
+					theChan->onModeP( false ) ;
+				break ;
+			case 'm':
+				if( plus )
 					theChan->onModeM( true ) ;
-					break ;
-				case 'i':
+				else
+					theChan->onModeM( false ) ;
+				break ;
+			case 'i':
+				if( plus )
 					theChan->onModeI( true ) ;
-					break ;
-				case 'k':
+				else
+					theChan->onModeI( false ) ;
+				break ;
+
+			// TODO: Finish with polarity
+			// TODO: Add in support for modes b,v,o
+			case 'k':
+				{
+				if( argPos >= st.size() )
 					{
-					if( argPos >= st.size() )
-						{
-						elog	<< "xServer::JoinChannel> Invalid"
-							<< " number of arguments to "
-							<< "chanModes"
-							<< endl ;
-						break ;
-						}
-					theChan->onModeK( true, st[ argPos++ ] ) ;
+					elog	<< "xServer::JoinChannel> Invalid"
+						<< " number of arguments to "
+						<< "chanModes"
+						<< endl ;
 					break ;
 					}
-				case 'l':
+				theChan->onModeK( true, st[ argPos++ ] ) ;
+				break ;
+				}
+			case 'l':
+				{
+				if( argPos >= st.size() )
 					{
-					if( argPos >= st.size() )
-						{
-						elog	<< "xServer::JoinChannel> Invalid"
-							<< " number of arguments to "
-							<< "chanModes"
-							<< endl ;
-						break ;
-						}
-					theChan->onModeL( true,
-						atoi( st[ argPos++ ].c_str() ) ) ;
+					elog	<< "xServer::JoinChannel> Invalid"
+						<< " number of arguments to "
+						<< "chanModes"
+						<< endl ;
 					break ;
 					}
-				} // switch()
-			} // for()
-		} // if( !st.empty() && !st[ 0 ].empty() )
+				theChan->onModeL( true,
+					atoi( st[ argPos++ ].c_str() ) ) ;
+				break ;
+				}
+			} // switch()
+		} // for()
 	} // if( !chanModes.empty() )
 
 // An xClient has joined a channel, update its iClient instance
