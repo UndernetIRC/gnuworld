@@ -4,7 +4,7 @@
  * Storage class for accessing user information either from the backend
  * or internal storage.
  * 
- * $Id: sqlChannel.cc,v 1.6 2000/12/21 22:20:57 gte Exp $
+ * $Id: sqlChannel.cc,v 1.7 2000/12/30 00:32:37 gte Exp $
  */
  
 #include	<strstream>
@@ -18,7 +18,7 @@ using std::string ;
 using std::endl ; 
  
 const char sqlChannel_h_rcsId[] = __SQLCHANNEL_H ;
-const char sqlChannel_cc_rcsId[] = "$Id: sqlChannel.cc,v 1.6 2000/12/21 22:20:57 gte Exp $" ;
+const char sqlChannel_cc_rcsId[] = "$Id: sqlChannel.cc,v 1.7 2000/12/30 00:32:37 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -117,8 +117,48 @@ void sqlChannel::setAllMembers()
 	channel_limit = atoi(SQLDb->GetValue(0,12)); 
 }
 
+bool sqlChannel::commit()
+{
+	/*
+	 *  Build an SQL statement to commit the transient data in this storage class
+	 *  back into the database.
+	 */
+
+	ExecStatusType status;
+	static const char* queryHeader =    "UPDATE channels ";
+	static const char* queryCondition = "WHERE id = "; 
+
+	strstream queryString;
+	queryString << queryHeader
+	<< "SET name = '" << name << "', "
+	<< "flags = " << flags << ", "
+	<< "mass_deop_pro = " << mass_deop_pro << ", "
+	<< "flood_pro = " << flood_pro << ", "
+	<< "url = '" << url << "', "
+	<< "keywords = '" << keywords << "', "
+	<< "registered_ts = " << registered_ts << ", "
+	<< "channel_ts = " << channel_ts << ", "
+	<< "channel_mode = '" << channel_mode << "', "
+	<< "channel_key = '" << channel_key << "', "
+	<< "channel_limit = " << channel_limit << ", "
+	<< "last_update = " << ::time(NULL) << ", "
+	<< "description = '" << description << "' "
+	<< queryCondition << id
+	<< ends;
+
+	elog << "sqlQuery> " << queryString.str() << endl; 
+
+	if ((status = SQLDb->Exec(queryString.str())) != PGRES_COMMAND_OK)
+	{
+		elog << "sqlQuery> Something went wrong: " << SQLDb->ErrorMessage() << endl; // Log to msgchan here.
+		return false;
+ 	} 
+
+ 	return true;
+}	
+
 sqlChannel::~sqlChannel()
 {
 }
 
-} // Namespace gnuworld.
+} // Namespace gnuworld
