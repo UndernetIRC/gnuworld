@@ -13,7 +13,7 @@
 #include	"Network.h"
 #include	"Constants.h"
 
-const char MODECommand_cc_rcsId[] = "$Id: MODECommand.cc,v 1.11 2001/12/23 09:07:57 mrbean_ Exp $";
+const char MODECommand_cc_rcsId[] = "$Id: MODECommand.cc,v 1.12 2001/12/23 09:34:24 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -103,9 +103,7 @@ while( modePos < st.size() )
 					return true ;
 					}
 
-				// Add the mode to the modeString
-				modeString += st[ modePos ][ charPos ] ;
-
+			
 				// arg needs to be a nickname
 				Target = Network->findNick( st[ argPos ] ) ;
 
@@ -127,10 +125,16 @@ while( modePos < st.size() )
 					return true ;
 					}
 				//Dont deop +k				
-				if((ChanUser->getMode(iClient::MODE_SERVICES)) && (!plus))
+				if((Target->getMode(iClient::MODE_SERVICES)) && (!plus))
 					{	
 					Op = false;
-					break;
+					// Move to next argument
+					argPos++ ;
+
+					// Make sure modePos skips over this argument
+					modePosIncrement++ ;
+				
+					continue;
 					}
 				if(plus)
 					if(Op)
@@ -143,6 +147,8 @@ while( modePos < st.size() )
 						ChanUser->removeModeO() ;
 					else
 						ChanUser->removeModeV() ;
+				// Add the mode to the modeString
+				modeString += st[ modePos ][ charPos ] ;
 					
 				// Add this nick's numeric (plus a space) to the end
 				// of the current argument string

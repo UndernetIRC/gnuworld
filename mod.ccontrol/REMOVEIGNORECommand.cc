@@ -13,9 +13,8 @@
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 #include	"Network.h"
-#include        "ccLogin.h"
 
-const char REMOVEIGNORECommand_cc_rcsId[] = "$Id: REMOVEIGNORECommand.cc,v 1.4 2001/12/23 09:07:57 mrbean_ Exp $";
+const char REMOVEIGNORECommand_cc_rcsId[] = "$Id: REMOVEIGNORECommand.cc,v 1.5 2001/12/23 09:34:24 mrbean_ Exp $";
 
 namespace gnuworld
 {
