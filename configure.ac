@@ -1,13 +1,13 @@
-dnl $Id: configure.ac,v 1.7 2003/06/11 20:28:10 dan_karrels Exp $
+dnl $Id: configure.ac,v 1.8 2003/06/12 20:30:17 dan_karrels Exp $
 dnl ----------------------------------------------------------
 
 echo Configuring GNUWorld...
 echo
 
-AC_REVISION($Revision: 1.7 $)
+AC_REVISION($Revision: 1.8 $)
 AC_INIT
 AC_CONFIG_SRCDIR([src/main.cc])
-AM_INIT_AUTOMAKE(gnuworld,0.0)
+AM_INIT_AUTOMAKE(gnuworld,2.2)
 AM_CONFIG_HEADER(include/defs.h)
 
 dnl Enable building of the convenience library
@@ -162,7 +162,7 @@ AC_ARG_WITH(pedantic,
 AC_ARG_WITH(optimization,
 	AC_HELP_STRING([--with-optimization],
 			[Optimize the executables]),
-	[CXXFLAGS="$CXXFLAGS -O"],
+	[CXXFLAGS="$CXXFLAGS -O2"],
 	[CXXFLAGS="$CXXFLAGS -O0"]
 )
 

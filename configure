@@ -1757,7 +1757,7 @@ fi
 
 # Define the identity of the package.
  PACKAGE=gnuworld
- VERSION=0.0
+ VERSION=2.2
 
 
 cat >>confdefs.h <<_ACEOF
@@ -21169,7 +21169,7 @@ fi;
 # Check whether --with-optimization or --without-optimization was given.
 if test "${with_optimization+set}" = set; then
   withval="$with_optimization"
-  CXXFLAGS="$CXXFLAGS -O"
+  CXXFLAGS="$CXXFLAGS -O2"
 else
   CXXFLAGS="$CXXFLAGS -O0"
 
