@@ -4,7 +4,7 @@
  * Storage class for accessing user information either from the backend
  * or internal storage.
  *
- * $Id: sqlUser.cc,v 1.21 2001/08/10 20:11:16 gte Exp $
+ * $Id: sqlUser.cc,v 1.22 2001/09/06 20:26:14 gte Exp $
  */
 
 #include	<strstream.h>
@@ -109,7 +109,7 @@ strstream queryString;
 queryString	<< "SELECT "
 		<< sql::user_fields
 		<< " FROM users WHERE lower(user_name) = '"
-		<< string_lower(userName)
+		<< escapeSQLChars(string_lower(userName))
 		<< "'"
 		<< ends;
 
