@@ -11,12 +11,12 @@
 /* ccontrol.cc
  * Authors: Daniel Karrels dan@karrels.com
  *	    Tomer Cohen    MrBean@toughguy.net
- * $Id: ccontrol.cc,v 1.155 2003/02/10 12:22:10 mrbean_ Exp $
+ * $Id: ccontrol.cc,v 1.156 2003/02/10 22:42:59 mrbean_ Exp $
  */
 
 #define MAJORVER "1"
-#define MINORVER "1pl3"
-#define RELDATE "28 December, 2002"
+#define MINORVER "1pl4"
+#define RELDATE "10 February, 2003"
 
 #include        <sys/types.h> 
 #include        <sys/socket.h>
@@ -56,7 +56,7 @@
 #include	"ip.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.155 2003/02/10 12:22:10 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.156 2003/02/10 22:42:59 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -1663,14 +1663,7 @@ else
 	for(ptr = cList.begin(); ptr != cList.end(); ++ptr)
 		{
 		curClient = *ptr;    
-		if(curClient->getUserName().substr(0,1) == "~")
-			{
-			Host = string("~*@") + curClient->getRealInsecureHost();
-			}
-		else
-			{
-			Host = curClient->getUserName() + "@" + curClient->getRealInsecureHost();
-			} 
+		Host = string("*@") + curClient->getRealInsecureHost();
 		MyUplink->setGline(theGline->getAddedBy(),
 				    Host,theGline->getReason(),
 				    Expires,theGline->getLastUpdated(),this);
