@@ -20,3 +20,8 @@ pointsAuth = 10
 
 # Duration of a single period in seconds
 period = 60
+
+# Maximum points a user can gain
+# Set this to be equal to 24 hours of ops
+# ie (24*60*60) * (pointsAuth / period)
+maxPoints = 100

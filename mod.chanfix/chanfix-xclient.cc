@@ -16,10 +16,13 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: chanfix-xclient.cc,v 1.3 2004/05/25 21:17:53 jeekay Exp $
+ * $Id: chanfix-xclient.cc,v 1.4 2004/06/03 22:18:00 jeekay Exp $
  */
 
+#include "StringTokenizer.h"
+
 #include "chanfix.h"
+#include "chanfix-commands.h"
 
 namespace gnuworld {
 
@@ -45,6 +48,47 @@ void chanfix::BurstChannels()
 }
 
 
+void chanfix::OnCTCP( iClient *theClient, const string& CTCP,
+	const string& Message, bool )
+{
+	StringTokenizer st(CTCP);
+	
+	if(st.empty()) return;
+	
+	string Command = string_upper(st[0]);
+	
+	if("DCC" == Command) {
+		DoCTCP(theClient, CTCP, "REJECT");
+	} else if("PING" == Command) {
+		DoCTCP(theClient, CTCP, Message);
+	} else if("VERSION" == Command) {
+		DoCTCP(theClient, CTCP, "GNUWorld ChanFix v0.0.1");
+	}
+}
+
+
+void chanfix::OnPrivateMessage( iClient *theClient,
+	const string& Message, bool)
+{
+	/* Only speak to opers */
+	if( ! theClient->isOper() ) return;
+	
+	StringTokenizer st(Message);
+	
+	if( st.empty() ) return;
+	
+	string Command = string_upper(st[0]);
+	commandMapType::iterator commandHandler = commandMap.find(Command);
+	
+	if( commandHandler == commandMap.end() ) {
+		Notice(theClient, "Invalid command: %s", Command.c_str());
+		return;
+	}
+	
+	commandHandler->second->Exec(theClient, Message);
+}
+
+
 void chanfix::OnTimer( const TimerHandler::timerID& theTimer , void* _data )
 {
 	xClient::OnTimer( theTimer , _data );
@@ -52,8 +96,6 @@ void chanfix::OnTimer( const TimerHandler::timerID& theTimer , void* _data )
 	time_t next = ::time(0);
 
 	if( theTimer == timerCount ) {
-		log(logging::DEBUG, "Entering count cycle");
-
 		doCountUpdate();
 
 		next += confPeriod;

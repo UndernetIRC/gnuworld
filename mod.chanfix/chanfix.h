@@ -15,8 +15,6 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
- *
- * $Id: chanfix.h,v 1.4 2004/05/25 21:17:53 jeekay Exp $
  */
 
 #ifndef CF_CHANFIX_H
@@ -35,6 +33,7 @@ namespace gnuworld {
 namespace chanfix {
 
 class cfChannel;
+class Command;
 
 class chanfix : public xClient {
 public:
@@ -50,6 +49,9 @@ public:
 	 *************************************/
 	virtual void OnAttach();
 	virtual void BurstChannels();
+	virtual void OnCTCP( iClient* , const string& ,
+		const string& , bool );
+	virtual void OnPrivateMessage( iClient* , const string& , bool );
 	virtual void OnTimer( const TimerHandler::timerID& , void* );
 
 
@@ -65,7 +67,7 @@ public:
 	 * C H A N F I X   C O R E *
 	 ***************************/
 	virtual void doCountUpdate();
-	virtual cfChannel* getChannel(const string&);
+	virtual cfChannel* getChannel(const string&, bool create = false);
 
 
 protected:
@@ -91,6 +93,8 @@ protected:
 
 	/** Points to award a +r op per period. */
 	unsigned short confPointsAuth;
+	/** Maximum points a user can get. */
+	unsigned int confMaxPoints;
 	/** Duration of a period in seconds. */
 	unsigned short confPeriod;
 	/** Duration to wait between linking and counting. */
@@ -103,6 +107,20 @@ protected:
 
 	/** Counting timer. */
 	xServer::timerID timerCount;
+	
+	
+	/*******************
+	 * C O M M A N D S *
+	 *******************/
+	
+	/** Type of the commandMap. */
+	typedef std::map< string , Command* , noCaseCompare > commandMapType;
+	/** Convenience type when creating a new command pair. */
+	typedef commandMapType::value_type commandPairType;
+	/** Map holding all available bot commands. */
+	commandMapType commandMap;
+	/** Register a command. */
+	bool RegisterCommand(Command*);
 };
 
 } // namespace chanfix

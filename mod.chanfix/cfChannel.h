@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: cfChannel.h,v 1.2 2004/05/25 21:17:53 jeekay Exp $
+ * $Id: cfChannel.h,v 1.3 2004/06/03 22:18:00 jeekay Exp $
  */
 
 #ifndef CF_CFCHANNEL_H
@@ -38,11 +38,17 @@ public:
 
 	/** Return a given user - add a new one if one is not present. */
 	cfChannelUser* getUser(const std::string&);
+	
+	/** Return the beginning of the users map. */
+	typedef std::map< std::string , cfChannelUser* > mapUsers;
+	typedef mapUsers::const_iterator mapUsersConstIterator;
+	inline mapUsersConstIterator getUsersBegin()
+		{ return users.begin(); }
+	inline mapUsersConstIterator getUsersEnd()
+		{ return users.end(); }
 
 
 protected:
-	typedef std::map< std::string , cfChannelUser* > mapUsers;
-
 	std::string name;
 	mapUsers users;
 }; // class cfChannel

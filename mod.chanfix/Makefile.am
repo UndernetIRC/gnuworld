@@ -7,10 +7,12 @@ libchanfix_la_CXXFLAGS =	-I${top_srcdir}/include		\
 libchanfix_la_LDFLAGS = 	-module -export-dynamic
 
 libchanfix_la_SOURCES = 	chanfix.cc		\
+				chanfix-commands.cc	\
 				chanfix-core.cc		\
 				chanfix-misc.cc		\
 				chanfix-xclient.cc	\
 				cfChannel.cc		\
-				cfChannelUser.cc
+				cfChannelUser.cc	\
+				cmdCHECK.cc
 
 EXTRA_DIST =	chanfix.h

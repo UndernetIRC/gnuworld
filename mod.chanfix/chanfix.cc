@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: chanfix.cc,v 1.3 2004/05/18 23:13:12 jeekay Exp $
+ * $Id: chanfix.cc,v 1.4 2004/06/03 22:18:00 jeekay Exp $
  */
 
 #include <string>
@@ -26,6 +26,7 @@
 
 #include "cfChannel.h"
 #include "chanfix.h"
+#include "chanfix-commands.h"
 
 namespace gnuworld {
 
@@ -55,8 +56,12 @@ confConsoleModes = config->Require("consoleModes")->second;
 confLogLevel = 255;
 
 confPointsAuth = atoi(config->Require("pointsAuth")->second.c_str());
+confMaxPoints = atoi(config->Require("maxPoints")->second.c_str());
 confPeriod = atoi(config->Require("period")->second.c_str());
 confStartDelay = atoi(config->Require("startDelay")->second.c_str());
+
+/* Register our commands */
+RegisterCommand(new CHECKCommand(this, "CHECK", "<#channel>"));
 }
 
 /** Destructor doing nothing as we have no heap. */

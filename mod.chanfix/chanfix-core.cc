@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: chanfix-core.cc,v 1.3 2004/05/26 23:17:51 jeekay Exp $
+ * $Id: chanfix-core.cc,v 1.4 2004/06/03 22:18:00 jeekay Exp $
  */
 
 #include <string>
@@ -35,11 +35,13 @@ namespace chanfix {
 
 using std::string;
 
-cfChannel* chanfix::getChannel(const string& channel)
+cfChannel* chanfix::getChannel(const string& channel, bool create)
 {
 	mapChannels::iterator itr = channels.find(channel);
 
 	if( itr != channels.end() ) { return itr->second; }
+	
+	if( ! create ) { return 0; }
 
 	cfChannel* newChan = new cfChannel(channel);
 
@@ -72,11 +74,17 @@ void chanfix::doCountUpdate()
 			if( ! chanUser->getClient()->isModeR() ) { continue ; }
 			if( chanUser->getClient()->isModeK() ) { continue ; }
 
-			if( ! cfChan ) { cfChan = getChannel(tmpChannel->getName()); }
+			if( ! cfChan ) { cfChan = getChannel(tmpChannel->getName(), true); }
 
 			cfChannelUser *user = cfChan->getUser(chanUser->getClient()->getAccount());
 
+			if( user->getPoints() >= confMaxPoints ) { continue ; }
+
 			user->addPoints(confPointsAuth);
+			
+			if( user->getPoints() >= confMaxPoints ) {
+				user->setPoints(confMaxPoints);
+			}
 		}
 	}
 
