@@ -2,7 +2,7 @@
  * cservice.cc
  * Author: Greg Sikorski
  * Purpose: Overall control client.
- * $Id: cservice.cc,v 1.219 2002/09/30 16:55:57 dan_karrels Exp $
+ * $Id: cservice.cc,v 1.220 2002/10/09 21:04:24 gte Exp $
  */
 
 #include	<new>
@@ -195,6 +195,8 @@ RegisterCommand(new OPERPARTCommand(this, "OPERPART", "<#channel>", 8));
 RegisterCommand(new CLEARMODECommand(this, "CLEARMODE", "<#channel>", 4));
 RegisterCommand(new SUSPENDMECommand(this, "SUSPENDME", "<password>", 15));
 
+RegisterCommand(new SCANHOSTCommand(this, "SCANHOST", "<mask> [-all]", 10));
+RegisterCommand(new SCANUNAMECommand(this, "SCANUNAME", "<mask> [-all]", 10));
 RegisterCommand(new REMIGNORECommand(this, "REMIGNORE", "<mask>", 5));
 RegisterCommand(new REGISTERCommand(this, "REGISTER", "<#channel> <username>", 8));
 RegisterCommand(new REMOVEALLCommand(this, "REMOVEALL", "<#channel>", 15));
@@ -752,7 +754,7 @@ else if(Command == "VERSION")
 	xClient::DoCTCP(theClient, CTCP,
 		"Undernet P10 Channel Services II ["
 		__DATE__ " " __TIME__
-		"] Release 1.1pl7");
+		"] Release 1.1pl8");
 	}
 else if(Command == "PROBLEM?")
 	{
@@ -3372,6 +3374,29 @@ for( string::const_iterator ptr = theString.begin() ;
 		retMe += *ptr ;
 		}
 	}
+return retMe ;
+}
+
+const string gnuworld::searchSQL(const string& theString)
+{
+string retMe ;
+
+for( string::const_iterator ptr = theString.begin() ;
+        ptr != theString.end() ; ++ptr )
+        {
+        if( *ptr == '*' )
+                {
+                retMe += "%" ;
+                }
+        else if ( *ptr == '?' )
+		{
+		retMe += "_" ;
+		}
+        else
+		{
+                retMe += *ptr ;
+                }
+        }
 return retMe ;
 }
 

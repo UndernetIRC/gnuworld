@@ -8,7 +8,7 @@
  *
  * Caveats: None
  *
- * $Id: OPERPARTCommand.cc,v 1.11 2002/05/23 17:43:13 dan_karrels Exp $
+ * $Id: OPERPARTCommand.cc,v 1.12 2002/10/09 21:04:23 gte Exp $
  */
 
 #include	<string>
@@ -21,12 +21,12 @@
 #include	"levels.h"
 #include	"responses.h"
 #include	"Network.h"
+#include	"cservice_config.h"
 
-const char OPERPARTCommand_cc_rcsId[] = "$Id: OPERPARTCommand.cc,v 1.11 2002/05/23 17:43:13 dan_karrels Exp $" ;
+const char OPERPARTCommand_cc_rcsId[] = "$Id: OPERPARTCommand.cc,v 1.12 2002/10/09 21:04:23 gte Exp $" ;
 
 namespace gnuworld
 {
-
 using std::endl ;
 using std::ends ;
 using std::string ;
@@ -35,6 +35,8 @@ using std::stringstream ;
 bool OPERPARTCommand::Exec( iClient* theClient, const string& Message )
 {
 bot->incStat("COMMANDS.OPERPART");
+
+#ifdef USE_OPERPARTJOIN
 
 StringTokenizer st( Message ) ;
 if( st.size() < 2 )
@@ -106,6 +108,9 @@ bot->joinCount--;
 bot->Part(theChan->getName(), "At the request of an IRC Operator");
 
 return true;
+
+#endif // USE_OPERPARTJOIN
+
 }
 
 } // namespace gnuworld.

@@ -1,11 +1,11 @@
 /**
  * cservice.h
  * Author: Greg Sikorski
- * $Id: cservice.h,v 1.90 2002/09/02 18:26:58 gte Exp $
+ * $Id: cservice.h,v 1.91 2002/10/09 21:04:24 gte Exp $
  */
 
 #ifndef __CSERVICE_H
-#define __CSERVICE_H "$Id: cservice.h,v 1.90 2002/09/02 18:26:58 gte Exp $"
+#define __CSERVICE_H "$Id: cservice.h,v 1.91 2002/10/09 21:04:24 gte Exp $"
 
 #include	<string>
 #include	<vector>
@@ -443,6 +443,7 @@ public:
 } ;
 
 const string escapeSQLChars(const string& theString);
+const string searchSQL(const string& theString); 
 
 } // namespace gnuworld
 

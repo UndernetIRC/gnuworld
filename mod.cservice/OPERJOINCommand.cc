@@ -8,7 +8,7 @@
  *
  * Caveats: None
  *
- * $Id: OPERJOINCommand.cc,v 1.12 2002/05/23 17:43:13 dan_karrels Exp $
+ * $Id: OPERJOINCommand.cc,v 1.13 2002/10/09 21:04:23 gte Exp $
  */
 
 #include	<string>
@@ -21,8 +21,9 @@
 #include	"levels.h"
 #include	"responses.h"
 #include	"Network.h"
+#include	"cservice_config.h"
 
-const char OPERJOINCommand_cc_rcsId[] = "$Id: OPERJOINCommand.cc,v 1.12 2002/05/23 17:43:13 dan_karrels Exp $" ;
+const char OPERJOINCommand_cc_rcsId[] = "$Id: OPERJOINCommand.cc,v 1.13 2002/10/09 21:04:23 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -33,8 +34,10 @@ using std::stringstream ;
 
 bool OPERJOINCommand::Exec( iClient* theClient, const string& Message )
 {
-
 bot->incStat("COMMANDS.OPERJOIN");
+
+#ifdef USE_OPERPARTJOIN
+
 StringTokenizer st( Message ) ;
 if( st.size() < 2 )
 	{
@@ -121,6 +124,9 @@ if (tmpChan)
 	}
 
 return true;
+
+#endif // USE_OPERPARTJOIN
+
 }
 
 } // namespace gnuworld.
