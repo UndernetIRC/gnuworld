@@ -19,11 +19,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: misc.h,v 1.20 2002/05/27 17:18:12 dan_karrels Exp $
+ * $Id: misc.h,v 1.21 2002/06/07 14:38:19 dan_karrels Exp $
  */
 
 #ifndef __MISC_H
-#define __MISC_H "$Id: misc.h,v 1.20 2002/05/27 17:18:12 dan_karrels Exp $"
+#define __MISC_H "$Id: misc.h,v 1.21 2002/06/07 14:38:19 dan_karrels Exp $"
 
 #include	<string>
 
@@ -33,17 +33,19 @@
 #include	"match.h"
 #include	"defs.h"
 
+/*
 #ifdef GNU_EXTENSIONS
  #include       <ext/hash_map>
 #else
  #include       <hash_map>
 #endif
+*/
 
 namespace gnuworld
 {
 
-using HASHMAPNS::hash ;
-using HASHMAPNS::hash_map ;
+//using HASHMAPNS::hash ;
+//using HASHMAPNS::hash_map ;
 using std::string ;
 
 /**
@@ -145,7 +147,6 @@ bool IsNumeric( const string& ) ;
  * given string.
  */
 size_t countChar( const string&, const char& ) ;
-
 
 } // namespace gnuworld
 

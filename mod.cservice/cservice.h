@@ -1,11 +1,11 @@
 /**
  * cservice.h
  * Author: Greg Sikorski
- * $Id: cservice.h,v 1.85 2002/05/23 20:35:42 dan_karrels Exp $
+ * $Id: cservice.h,v 1.86 2002/06/07 14:38:19 dan_karrels Exp $
  */
 
 #ifndef __CSERVICE_H
-#define __CSERVICE_H "$Id: cservice.h,v 1.85 2002/05/23 20:35:42 dan_karrels Exp $"
+#define __CSERVICE_H "$Id: cservice.h,v 1.86 2002/06/07 14:38:19 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
@@ -36,6 +36,8 @@ class PgDatabase;
 namespace gnuworld
 {
 
+using HASHMAPNS::hash_map ;
+using HASHMAPNS::hash ;
 using std::string ;
 using std::vector ;
 using std::map ;

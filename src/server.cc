@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server.cc,v 1.134 2002/06/06 02:41:24 dan_karrels Exp $
+ * $Id: server.cc,v 1.135 2002/06/07 14:38:19 dan_karrels Exp $
  */
 
 #include	<sys/time.h>
@@ -71,7 +71,7 @@
 #include	"Connection.h"
 
 const char server_h_rcsId[] = __SERVER_H ;
-const char server_cc_rcsId[] = "$Id: server.cc,v 1.134 2002/06/06 02:41:24 dan_karrels Exp $" ;
+const char server_cc_rcsId[] = "$Id: server.cc,v 1.135 2002/06/07 14:38:19 dan_karrels Exp $" ;
 const char config_h_rcsId[] = __CONFIG_H ;
 const char misc_h_rcsId[] = __MISC_H ;
 const char events_h_rcsId[] = __EVENTS_H ;
@@ -1502,7 +1502,7 @@ assert( NULL != Client ) ;
 // update Client.
 if( !Network->addClient( Client ) )
 	{
-	elog	<< "xServer::AttachClient> Network->addClient failed"
+	elog	<< "xServer::AttachClient> Failed to update network tables"
 		<< endl ;
 	return false ;
 	}

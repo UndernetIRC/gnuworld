@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: Network.cc,v 1.43 2002/05/27 17:18:12 dan_karrels Exp $
+ * $Id: Network.cc,v 1.44 2002/06/07 14:38:19 dan_karrels Exp $
  */
 
 #include	<new>
@@ -49,7 +49,7 @@
 #endif
 
 const char xNetwork_h_rcsId[] = __NETWORK_H ;
-const char xNetwork_cc_rcsId[] = "$Id: Network.cc,v 1.43 2002/05/27 17:18:12 dan_karrels Exp $" ;
+const char xNetwork_cc_rcsId[] = "$Id: Network.cc,v 1.44 2002/06/07 14:38:19 dan_karrels Exp $" ;
 const char ELog_h_rcsId[] = __ELOG_H ;
 const char iClient_h_rcsId[] = __ICLIENT_H ;
 const char Channel_h_rcsId[] = __CHANNEL_H ;
@@ -106,6 +106,12 @@ return true ;
 bool xNetwork::addClient( xClient* newClient )
 {
 assert( NULL != newClient ) ;
+
+if( findLocalNick( newClient->getNickName() ) != 0 )
+	{
+	// Nickname already exists on this serer
+	return false ;
+	}
 
 // First, find a new numeric for this client
 xClientVectorType::size_type pos = 0 ;

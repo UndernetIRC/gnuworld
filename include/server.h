@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server.h,v 1.65 2002/06/06 02:41:24 dan_karrels Exp $
+ * $Id: server.h,v 1.66 2002/06/07 14:38:19 dan_karrels Exp $
  */
 
 /* Command Map Description
@@ -35,7 +35,7 @@
  */
 
 #ifndef __SERVER_H
-#define __SERVER_H "$Id: server.h,v 1.65 2002/06/06 02:41:24 dan_karrels Exp $"
+#define __SERVER_H "$Id: server.h,v 1.66 2002/06/07 14:38:19 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
@@ -62,17 +62,19 @@
 #include	"TimerHandler.h"
 #include	"defs.h"
 
+/*
 #ifdef GNU_EXTENSIONS
  #include       <ext/hash_map>
 #else
  #include       <hash_map>
 #endif
+*/
 
 namespace gnuworld
 {
 
-using HASHMAPNS::hash ;
-using HASHMAPNS::hash_map ;
+//using HASHMAPNS::hash ;
+//using HASHMAPNS::hash_map ;
 using std::string ;
 using std::list ;
 using std::vector ;
@@ -1211,8 +1213,8 @@ protected:
 	 * the bound offset of the command handler methods
 	 * are stored in this structure.
 	 */
-	typedef hash_map< string, int (xServer::*)( xParameters& ),
-		eHash, eqstr > commandMapType ;
+	typedef map< string, int (xServer::*)( xParameters& ) >
+		commandMapType ;
 
 	/**
 	 * A pointer to the server command handler.
@@ -1271,8 +1273,7 @@ protected:
 	/**
 	 * Type used to store the channel event map.
 	 */
-	typedef hash_map< string, list< xClient* >*, eHash, eqstr >
-		channelEventMapType ;
+	typedef map< string, list< xClient* >* > channelEventMapType ;
 
 	/**
 	 * This structure provides a nice iterator interface, and

@@ -3,7 +3,7 @@
  * 
  * Exception class
  * 
- * $Id: ccException.cc,v 1.6 2002/05/23 17:43:11 dan_karrels Exp $
+ * $Id: ccException.cc,v 1.7 2002/06/07 14:38:19 dan_karrels Exp $
  */
  
 #include	<sstream>
@@ -20,7 +20,7 @@
 #include	"ccontrol.h"
 
 const char ccException_h_rcsId[] = __CCEXCEPTION_H ;
-const char ccException_cc_rcsId[] = "$Id: ccException.cc,v 1.6 2002/05/23 17:43:11 dan_karrels Exp $" ;
+const char ccException_cc_rcsId[] = "$Id: ccException.cc,v 1.7 2002/06/07 14:38:19 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -38,9 +38,9 @@ namespace uworld
 unsigned int ccException::numAllocated = 0;
 
 ccException::ccException(PgDatabase* _SQLDb)
- : Host(""),
+ : Host(string()),
    Connections(0),
-   AddedBy(""),
+   AddedBy(string()),
    AddedOn(0),
    SQLDb(_SQLDb)
 {
@@ -51,7 +51,6 @@ ccException::~ccException()
 {
 --numAllocated;
 }
-
 
 int ccException::loadData(const string& HostName)
 {
@@ -152,9 +151,11 @@ elog	<< "ccException::insertException> "
 
 ExecStatusType status = SQLDb->Exec( query.str().c_str() ) ;
 if(PGRES_COMMAND_OK != status)
+	{
 	elog	<< "ccontrol::Gline::Update> SQL Failure: "
 		<< SQLDb->ErrorMessage()
 		<< endl ;
+	}
 
 return (PGRES_COMMAND_OK == status) ;
 }

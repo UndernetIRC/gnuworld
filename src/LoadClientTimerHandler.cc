@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: LoadClientTimerHandler.cc,v 1.4 2002/05/27 17:18:12 dan_karrels Exp $
+ * $Id: LoadClientTimerHandler.cc,v 1.5 2002/06/07 14:38:19 dan_karrels Exp $
  */
 
 #include	<iostream>
@@ -27,8 +27,9 @@
 #include	"ELog.h"
 
 const char LoadClientTimerHandler_h_rcsId[] = __LOADCLIENTTIMERHANDLER_H ;
-const char LoadClientTimerHandler_cc_rcsId[] = "$Id: LoadClientTimerHandler.cc,v 1.4 2002/05/27 17:18:12 dan_karrels Exp $" ;
+const char LoadClientTimerHandler_cc_rcsId[] = "$Id: LoadClientTimerHandler.cc,v 1.5 2002/06/07 14:38:19 dan_karrels Exp $" ;
 const char ELog_h_rcsId[] = __ELOG_H ;
+const char server_h_rcsId[] = __SERVER_H ;
 
 namespace gnuworld
 {
@@ -44,7 +45,13 @@ elog	<< "LoadClientTimerHandler::OnTimer("
 
 // Load the client from the module, attach it to the server, and
 // burst it onto the network
-theServer->AttachClient( moduleName, configFileName, true ) ;
+if( !theServer->AttachClient( moduleName, configFileName, true ) )
+	{
+	elog	<< "LoadClientTimer> Failed to load client module: "
+		<< moduleName
+		<< endl ;
+	return -1 ;
+	}
 
 delete this ;
 return 0 ;

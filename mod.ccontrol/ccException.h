@@ -1,7 +1,7 @@
 /* ccException.h */
 
 #ifndef __CCEXCEPTION_H
-#define __CCEXCEPTION_H "$Id: ccException.h,v 1.6 2001/11/21 20:54:40 mrbean_ Exp $"
+#define __CCEXCEPTION_H "$Id: ccException.h,v 1.7 2002/06/07 14:38:19 dan_karrels Exp $"
 
 #include	<string>
 
@@ -26,17 +26,17 @@ public:
 	ccException(PgDatabase* _SQLDb);
 	virtual ~ccException();
 	
-	inline bool ccException::operator==( const string& ExceptionHost ) const
-		{ return ((!strcasecmp( Host, ExceptionHost ))
-		    || (!match(Host.c_str(),ExceptionHost.c_str()))) ; }
+	inline bool operator==( const string& ExceptionHost ) const
+		{ return (!strcasecmp( Host, ExceptionHost )
+		    || !match(Host.c_str(),ExceptionHost.c_str())) ; }
 
-	inline const string 		getHost() const
+	inline const string& 		getHost() const
 			{ return Host; }
 		
 	inline const int		getConnections() const
 		{ return Connections; }
 	
-	inline const string		getAddedBy() const
+	inline const string&		getAddedBy() const
 		{ return AddedBy; }
 		
 	inline time_t			getAddedOn() const
@@ -66,7 +66,7 @@ public:
 	bool		Delete();
 	
 	static unsigned int numAllocated;
-		
+
 protected:
 	
 	string 		Host;
