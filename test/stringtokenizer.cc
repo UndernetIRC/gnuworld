@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: stringtokenizer.cc,v 1.3 2002/11/29 19:30:04 dan_karrels Exp $
+ * $Id: stringtokenizer.cc,v 1.4 2003/03/10 18:34:17 dan_karrels Exp $
  */
 
 #include	<iostream>
@@ -28,9 +28,12 @@
 #include	<getopt.h>
 
 #include	"StringTokenizer.h"
+#include	"ELog.h"
 
 using namespace std ;
 using namespace gnuworld ;
+
+ELog gnuworld::elog ;
 
 void	usage( const char* ) ;
 bool	getData( ifstream& inputFile, vector< string >& ) ;
