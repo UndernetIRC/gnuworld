@@ -4,7 +4,7 @@
  * Class which contains details about channels which are 'pending'
  * registration.
  * 
- * $Id: sqlPendingChannel.cc,v 1.4 2001/06/10 17:42:20 gte Exp $
+ * $Id: sqlPendingChannel.cc,v 1.5 2001/06/13 00:14:47 gte Exp $
  */
  
 #include	<strstream>
@@ -24,7 +24,7 @@
 #include	"sqlPendingTraffic.h"
  
 const char sqlPendingChannel_h_rcsId[] = __SQLPENDINGCHANNEL_H ;
-const char sqlPendingChannel_cc_rcsId[] = "$Id: sqlPendingChannel.cc,v 1.4 2001/06/10 17:42:20 gte Exp $" ;
+const char sqlPendingChannel_cc_rcsId[] = "$Id: sqlPendingChannel.cc,v 1.5 2001/06/13 00:14:47 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -114,6 +114,14 @@ elog << "Commiting Pending Channel Details: " << endl
  */
 
 unique_join_count = trafficList.size();
+
+ExecStatusType beginStatus = SQLDb->Exec("BEGIN;") ; 
+
+if( PGRES_COMMAND_OK != beginStatus )
+{
+	elog << "Error starting transaction." << endl;
+}
+elog << "BEGIN" << endl;
  
 strstream queryString; 
 queryString << "UPDATE pending SET "
@@ -213,6 +221,15 @@ if( PGRES_COMMAND_OK != status )
 			}
  
 		}
+
+	ExecStatusType endStatus = SQLDb->Exec("END;") ; 
+
+	if( PGRES_COMMAND_OK != endStatus )
+	{
+		elog << "Error Ending transaction." << endl;
+	}
+
+	elog << "END" << endl;
 
 	return true;
 }
