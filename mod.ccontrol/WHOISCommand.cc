@@ -4,21 +4,22 @@
  * Gives varius data about a user
  *
 */
-
 #include	<string>
+#include	<iostream>
+
 #include	<cstdlib>
-#include        <iomanip.h>
+
 #include	"Network.h"
 #include	"ccontrol.h"
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 #include	"ip.h"
 
-const char WHOISCommand_cc_rcsId[] = "$Id: WHOISCommand.cc,v 1.13 2002/04/22 19:10:49 mrbean_ Exp $";
+const char WHOISCommand_cc_rcsId[] = "$Id: WHOISCommand.cc,v 1.14 2002/05/23 17:43:11 dan_karrels Exp $";
 
 namespace gnuworld
 {
-
+using std::endl ;
 using std::string ;
 
 namespace uworld
@@ -82,6 +83,7 @@ string::size_type curPlace;
 string tChannel;
 char curChar[10];
 bool hasCC; //Channel has control codes
+
 for( iClient::const_channelIterator ptr = Target->channels_begin() ;
 	ptr != Target->channels_end() ; ++ptr )
 	{
@@ -93,9 +95,10 @@ for( iClient::const_channelIterator ptr = Target->channels_begin() ;
 		if(((tChannel[curPlace] > 1) && (tChannel[curPlace] < 4))
 			|| (tChannel[curPlace] == 15) 
 			|| ((tChannel[curPlace] > 27) && (tChannel[curPlace] < 33))
-			|| (tChannel[curPlace] == 22)
-			|| (tChannel[curPlace] == 160)
+			|| (tChannel[curPlace] == 22))
+/*			|| (tChannel[curPlace] == 160)
 			|| ((tChannel[curPlace] > 252) 	&& (tChannel[curPlace] <= 254)))
+*/
 			{
 			hasCC = true;
 			sprintf(curChar,"%d",tChannel[curPlace]);
@@ -130,9 +133,8 @@ for( vector< string >::size_type i = 0 ; i < channels.size() ; i++ )
 		}
 	}
 
-bot->Notice( theClient, "On channels: %s",
-	chanNames.c_str() ) ;
-bot->Notice(theClient, "* - Channel contains control codes");
+bot->Notice( theClient, "On channels: %s", chanNames.c_str() ) ;
+bot->Notice( theClient, "* - Channel contains control codes" );
 
 return true ;
 }

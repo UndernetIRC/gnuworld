@@ -8,20 +8,22 @@
  */
 
 #include	<string>
-#include	<strstream>
+#include	<sstream>
+
 #include	<cstdlib>
+
 #include	"StringTokenizer.h"
 #include	"ccontrol.h"
 #include	"CControlCommands.h"
 
-const char ACCESSCommand_cc_rcsId[] = "$Id: ACCESSCommand.cc,v 1.14 2001/12/23 09:07:57 mrbean_ Exp $";
+const char ACCESSCommand_cc_rcsId[] = "$Id: ACCESSCommand.cc,v 1.15 2002/05/23 17:43:10 dan_karrels Exp $";
 
 namespace gnuworld
 {
 
 using std::string ;
 using std::endl ;
-using std::strstream ;
+using std::stringstream ;
 using std::ends ;
 
 namespace uworld
@@ -56,18 +58,17 @@ else
 	{
 	Uname = "";
 	}
-	
-strstream theQuery;
+
+stringstream theQuery;
 theQuery	<< queryHeader 
 		<< Uname
 		<< ends;
 
 elog	<< "ACCESS> "
-	<< theQuery.str()
+	<< theQuery.str().c_str()
 	<< Uname; 
 
-ExecStatusType status = bot->SQLDb->Exec( theQuery.str() ) ;
-delete[] theQuery.str() ;
+ExecStatusType status = bot->SQLDb->Exec( theQuery.str().c_str() ) ;
 
 if( PGRES_TUPLES_OK != status )
 	{

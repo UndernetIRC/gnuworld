@@ -6,7 +6,7 @@
 #include	<list>
 #include	<vector>
 #include	<iostream>
-#include	<strstream>
+#include	<sstream>
 #include	<string>
 
 #include	<ctime>
@@ -27,7 +27,7 @@ namespace gnuworld
 
 using std::vector ;
 using std::endl ;
-using std::strstream ;
+using std::stringstream ;
 using std::ends ;
 using std::string ;
 
@@ -198,14 +198,13 @@ else if( command == "JOINALL" )
 	for( list< iClient* >::const_iterator ptr = clones.begin(),
 		endPtr = clones.end() ; ptr != endPtr ; ++ptr )
 		{
-		strstream s ;
+		stringstream s ;
 		s	<< (*ptr)->getCharYYXXX()
 			<< " J "
 			<< chanName
 			<< ends ;
 
 		MyUplink->Write( s ) ;
-		delete[] s.str() ;
 		}
 	} // JOINALL
 else if( command == "PARTALL" )
@@ -225,14 +224,13 @@ else if( command == "PARTALL" )
 	for( list< iClient* >::const_iterator ptr = clones.begin(),
 		endPtr = clones.end() ; ptr != endPtr ; ++ptr )
 		{
-		strstream s ;
+		stringstream s ;
 		s	<< (*ptr)->getCharYYXXX()
 			<< " L "
 			<< chanName
 			<< ends ;
 
 		MyUplink->Write( s ) ;
-		delete[] s.str() ;
 		}
 	} // PARTALL
 

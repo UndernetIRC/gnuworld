@@ -1,6 +1,8 @@
 /* STATUSCommand.cc */
 
 #include	<string>
+#include	<sstream>
+#include	<iostream>
 
 #include	"StringTokenizer.h"
 #include	"ELog.h"
@@ -10,11 +12,15 @@
 #include	"Network.h"
 #include	"cservice_config.h"
 
-const char STATUSCommand_cc_rcsId[] = "$Id: STATUSCommand.cc,v 1.40 2002/03/13 22:21:44 gte Exp $" ;
+const char STATUSCommand_cc_rcsId[] = "$Id: STATUSCommand.cc,v 1.41 2002/05/23 17:43:13 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
+using std::cout ;
 using std::string ;
+using std::endl ;
+using std::ends ;
+using std::stringstream ;
 
 bool STATUSCommand::Exec( iClient* theClient, const string& Message )
 {
@@ -193,7 +199,7 @@ if (theChan->getFlag(sqlChannel::F_AUTOJOIN)) flagsSet += "AUTOJOIN ";
 if (theChan->getFlag(sqlChannel::F_LOCKED)) flagsSet += "LOCKED ";
 if (theChan->getFlag(sqlChannel::F_FLOATLIM))
 	{
-	strstream floatLim;
+	stringstream floatLim;
 	floatLim
 	<< "FLOATLIM (MGN:"
 	<< theChan->getLimitOffset()
@@ -205,7 +211,7 @@ if (theChan->getFlag(sqlChannel::F_FLOATLIM))
 	<< theChan->getLimitMax()
 	<< ")"
 	<< ends;
-	flagsSet += floatLim.str();
+	flagsSet += floatLim.str().c_str();
 	}
 
 bot->Notice(theClient,
@@ -216,7 +222,7 @@ bot->Notice(theClient,
  *  Get a list of authenticated users on this channel.
  */
 
-strstream authQuery;
+stringstream authQuery;
 authQuery	<< "SELECT users.user_name,levels.access FROM "
 		<< "users,levels WHERE users.id = levels.user_id "
 		<< "AND levels.channel_id = "
@@ -226,12 +232,11 @@ authQuery	<< "SELECT users.user_name,levels.access FROM "
 
 #ifdef LOG_SQL
 	elog	<< "sqlQuery> "
-		<< authQuery.str()
+		<< authQuery.str().c_str()
 		<< endl;
 #endif
 
-ExecStatusType status = bot->SQLDb->Exec( authQuery.str() ) ;
-delete[] authQuery.str();
+ExecStatusType status = bot->SQLDb->Exec( authQuery.str().c_str() ) ;
 
 if( PGRES_TUPLES_OK != status )
 	{

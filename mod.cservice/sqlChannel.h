@@ -1,12 +1,19 @@
-/* sqlChannel.h */
+/**
+ * sqlChannel.h
+ * Author: Greg Sikorski
+ * $Id: sqlChannel.h,v 1.41 2002/05/23 17:43:13 dan_karrels Exp $
+ */
 
 #ifndef __SQLCHANNEL_H
-#define __SQLCHANNEL_H "$Id: sqlChannel.h,v 1.40 2002/04/27 16:11:29 dan_karrels Exp $"
+#define __SQLCHANNEL_H "$Id: sqlChannel.h,v 1.41 2002/05/23 17:43:13 dan_karrels Exp $"
 
 #include	<string>
 #include	<map>
 #include	<vector>
+#include	<utility>
+
 #include	<ctime>
+
 #include	"libpq++.h"
 #include	"sqlBan.h"
 
@@ -240,7 +247,7 @@ public:
 	 * on this channel
 	 */
 
-	typedef map< unsigned int, pair < unsigned short, string > > forceMapType ;
+	typedef map< unsigned int, std::pair < unsigned short, string > > forceMapType ;
 	forceMapType forceMap;
 
 	typedef vector < sqlBan* > sqlBanVectorType;

@@ -6,14 +6,14 @@
 
 #include	<string>
 #include	<cstdlib>
-#include        <iomanip.h>
+#include        <iomanip>
 #include	"ccontrol.h"
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 #include	"Network.h"
 #include	"Constants.h"
 
-const char NEWPASSCommand_cc_rcsId[] = "$Id: NEWPASSCommand.cc,v 1.17 2002/01/02 21:00:03 mrbean_ Exp $";
+const char NEWPASSCommand_cc_rcsId[] = "$Id: NEWPASSCommand.cc,v 1.18 2002/05/23 17:43:11 dan_karrels Exp $";
 
 namespace gnuworld
 {

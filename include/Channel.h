@@ -1,14 +1,18 @@
-/* Channel.h */
+/*
+ * Channel.h
+ * Author: Daniel Karrels (dan@karerls.com)
+ * $Id: Channel.h,v 1.22 2002/05/23 17:43:09 dan_karrels Exp $
+ */
 
 #ifndef __CHANNEL_H
-#define __CHANNEL_H "$Id: Channel.h,v 1.21 2002/04/27 14:54:49 dan_karrels Exp $"
+#define __CHANNEL_H "$Id: Channel.h,v 1.22 2002/05/23 17:43:09 dan_karrels Exp $"
 
 #include	<string>
 #include	<map>
 #include	<iostream>
 #include	<vector>
 #include	<list>
-#include	<pair.h>
+#include	<utility>
 
 #include	<ctime>
 
@@ -24,7 +28,7 @@ using std::map ;
 using std::list ;
 using std::vector ;
 using std::endl ;
-
+using std::pair ;
 
 /// Forward declaration of class iClient.
 class iClient ;

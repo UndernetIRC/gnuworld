@@ -1,6 +1,8 @@
 /* REMIGNORECommand.cc */
 
 #include	<string>
+#include	<sstream>
+#include	<iostream>
 
 #include	"StringTokenizer.h"
 #include	"ELog.h"
@@ -9,11 +11,14 @@
 #include	"responses.h"
 #include	"Network.h"
 
-const char REMIGNORECommand_cc_rcsId[] = "$Id: REMIGNORECommand.cc,v 1.8 2001/09/05 03:47:56 gte Exp $" ;
+const char REMIGNORECommand_cc_rcsId[] = "$Id: REMIGNORECommand.cc,v 1.9 2002/05/23 17:43:13 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
+using std::endl ;
+using std::ends ;
 using std::string ;
+using std::stringstream ;
 
 bool REMIGNORECommand::Exec( iClient* theClient, const string& Message )
 {
@@ -52,13 +57,12 @@ for( cservice::silenceListType::iterator ptr = bot->silenceList.begin() ;
 	{
 	if ( string_lower(st[1]) == string_lower(ptr->first.c_str()) )
 		{
-		strstream s;
+		stringstream s;
 		s	<< bot->getCharYYXXX()
 			<< " SILENCE * -"
 			<< ptr->first.c_str()
 			<< ends;
 		bot->Write( s );
-		delete[] s.str();
 
 		/*
 		 * Locate this user by numeric.

@@ -3,10 +3,10 @@
  * 
  * Server class
  * 
- * $Id: ccServer.cc,v 1.8 2001/12/28 16:28:47 mrbean_ Exp $
+ * $Id: ccServer.cc,v 1.9 2002/05/23 17:43:11 dan_karrels Exp $
  */
  
-#include	<strstream>
+#include	<sstream>
 #include	<string> 
 
 #include	<ctime>
@@ -21,14 +21,14 @@
 #include	"Constants.h"
 
 const char ccServer_h_rcsId[] = __CCSERVER_H ;
-const char ccServer_cc_rcsId[] = "$Id: ccServer.cc,v 1.8 2001/12/28 16:28:47 mrbean_ Exp $" ;
+const char ccServer_cc_rcsId[] = "$Id: ccServer.cc,v 1.9 2002/05/23 17:43:11 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
 
 using std::string ; 
 using std::endl ; 
-using std::strstream ;
+using std::stringstream ;
 using std::ends ;
 
 namespace uworld
@@ -65,7 +65,7 @@ if(!dbConnected)
 	{
 	return false;
 	}
-strstream theQuery;
+stringstream theQuery;
 theQuery	<< Main
 		<< Name <<"','"
 		<< Uplink << "','"
@@ -79,11 +79,10 @@ theQuery	<< Main
 		<< ")" << ends;
 
 elog	<< "ccontrol::Server::Insert::sqlQuery> "
-	<< theQuery.str()
+	<< theQuery.str().c_str()
 	<< endl; 
 
-ExecStatusType status = SQLDb->Exec( theQuery.str() ) ;
-delete[] theQuery.str() ;
+ExecStatusType status = SQLDb->Exec( theQuery.str().c_str() ) ;
 
 if( PGRES_COMMAND_OK == status ) 
 	{
@@ -108,7 +107,7 @@ if(!dbConnected)
 	return false;
 	}
 
-strstream theQuery;
+stringstream theQuery;
 theQuery	<< Main
 		<< Name
 		<< "', LastUplink = '"
@@ -131,11 +130,10 @@ theQuery	<< Main
 		<<  "'" << ends;
 
 elog	<< "ccontrol::Server::Update> "
-	<< theQuery.str()
+	<< theQuery.str().c_str()
 	<< endl; 
 
-ExecStatusType status = SQLDb->Exec( theQuery.str() ) ;
-delete[] theQuery.str() ;
+ExecStatusType status = SQLDb->Exec( theQuery.str().c_str() ) ;
 
 if( PGRES_COMMAND_OK == status ) 
 	{
@@ -160,18 +158,17 @@ if(!dbConnected)
 	return false;
 	}
 
-strstream theQuery;
+stringstream theQuery;
 theQuery	<< server::Query
 		<< "Where lower(Name) = '"
 		<< string_lower(ServerName)
 		<< "'" << ends;
 
 elog	<< "ccontrol::Server::LoadData> "
-	<< theQuery.str()
+	<< theQuery.str().c_str()
 	<< endl; 
 
-ExecStatusType status = SQLDb->Exec( theQuery.str() ) ;
-delete[] theQuery.str() ;
+ExecStatusType status = SQLDb->Exec( theQuery.str().c_str() ) ;
 
 if( PGRES_TUPLES_OK != status )
 	{
@@ -196,18 +193,17 @@ if(!dbConnected)
 	return false;
 	}
 
-strstream theQuery;
+stringstream theQuery;
 theQuery	<< server::Query
 		<< "Where LastNumeric = '"
 		<< ServNumeric
 		<< "'" << ends;
 
 elog	<< "ccontrol::Server::LoadNumericData> "
-	<< theQuery.str()
+	<< theQuery.str().c_str()
 	<< endl; 
 
-ExecStatusType status = SQLDb->Exec( theQuery.str() ) ;
-delete[] theQuery.str() ;
+ExecStatusType status = SQLDb->Exec( theQuery.str().c_str() ) ;
 
 if( PGRES_TUPLES_OK != status )
 	{
@@ -248,17 +244,16 @@ if(!dbConnected)
 	return false;
 	}
 
-strstream theQuery;
+stringstream theQuery;
 theQuery	<< Main
 		<< string_lower(Name)
 		<< "'" << ends;
 
 elog	<< "ccontrol::Server::Delete> "
-	<< theQuery.str()
+	<< theQuery.str().c_str()
 	<< endl; 
 
-ExecStatusType status = SQLDb->Exec( theQuery.str() ) ;
-delete[] theQuery.str() ;
+ExecStatusType status = SQLDb->Exec( theQuery.str().c_str() ) ;
 
 if( PGRES_COMMAND_OK != status ) 
 	{

@@ -1,10 +1,12 @@
 /**
  * msg_C.cc
+ * Author: Daniel Karrels (dan@karrels.com)
+ * $Id: msg_C.cc,v 1.9 2002/05/23 17:43:17 dan_karrels Exp $
  */
 
 #include	<new>
 #include	<string>
-#include	<pair.h>
+#include	<utility>
 
 #include	<cassert>
 
@@ -27,11 +29,12 @@ const char xparameters_h_rcsId[] = __XPARAMETERS_H ;
 const char iClient_h_rcsId[] = __ICLIENT_H ;
 const char Channel_h_rcsId[] = __CHANNEL_H ;
 const char ChannelUser_h_rcsId[] = __CHANNELUSER_H ;
-const char msg_C_cc_rcsId[] = "$Id: msg_C.cc,v 1.8 2002/04/29 13:28:15 dan_karrels Exp $" ;
+const char msg_C_cc_rcsId[] = "$Id: msg_C.cc,v 1.9 2002/05/23 17:43:17 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
 
+using std::pair ;
 using std::string ;
 using std::endl ;
 
@@ -171,7 +174,6 @@ for( StringTokenizer::const_iterator ptr = st.begin() ; ptr != st.end() ;
 	} // for()
 
 return 0 ;
-
 }
 
 } // namespace gnuworld

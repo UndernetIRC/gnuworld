@@ -7,13 +7,13 @@
 
 #include	<string>
 #include	<cstdlib>
-#include        <iomanip.h>
+#include        <iomanip>
 
 #include	"ccontrol.h"
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 
-const char DEAUTHCommand_cc_rcsId[] = "$Id: DEAUTHCommand.cc,v 1.7 2001/12/23 09:07:57 mrbean_ Exp $";
+const char DEAUTHCommand_cc_rcsId[] = "$Id: DEAUTHCommand.cc,v 1.8 2002/05/23 17:43:10 dan_karrels Exp $";
 
 namespace gnuworld
 {

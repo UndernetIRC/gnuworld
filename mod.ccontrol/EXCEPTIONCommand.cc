@@ -7,12 +7,12 @@
 
 #include	<string>
 #include	<cstdlib>
-#include        <iomanip.h>
+#include        <iomanip>
 #include	"ccontrol.h"
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 
-const char EXCEPTIONCommand_cc_rcsId[] = "$Id: EXCEPTIONCommand.cc,v 1.10 2002/03/01 18:27:36 mrbean_ Exp $";
+const char EXCEPTIONCommand_cc_rcsId[] = "$Id: EXCEPTIONCommand.cc,v 1.11 2002/05/23 17:43:10 dan_karrels Exp $";
 
 namespace gnuworld
 {

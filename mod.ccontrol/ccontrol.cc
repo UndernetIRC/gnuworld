@@ -1,23 +1,27 @@
 /* ccontrol.cc
  * Authors: Daniel Karrels dan@karrels.com
  *	    Tomer Cohen    MrBean@toughguy.net
- * $Id: ccontrol.cc,v 1.142 2002/05/15 22:14:10 dan_karrels Exp $
+ * $Id: ccontrol.cc,v 1.143 2002/05/23 17:43:11 dan_karrels Exp $
  */
+
+#include        <sys/types.h> 
+#include        <sys/socket.h>
+#include	<unistd.h>
+#include        <netinet/in.h>
+#include        <netdb.h>
+#include	<fcntl.h>
 
 #include	<new>
 #include	<string>
+#include	<sstream>
 #include	<vector>
 #include	<iostream>
 #include	<algorithm>
 #include 	<fstream>
+
 #include	<cstring>
 #include	<csignal>
-
-#include        <sys/types.h> 
-#include        <sys/socket.h>
-#include        <netinet/in.h>
-#include        <netdb.h>
-#include	<fcntl.h>
+#include	<cstdio>
 
 #include	"client.h"
 #include	"iClient.h"
@@ -39,11 +43,13 @@
 #include	"ip.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.142 2002/05/15 22:14:10 dan_karrels Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.143 2002/05/23 17:43:11 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
 
+using std::ends ;
+using std::stringstream ;
 using std::string ;
 using std::vector ;
 using std::cout ;
@@ -915,8 +921,8 @@ return xClient::Notice(Target,"%s",buffer);
                         
 }        
 
-int ccontrol::OnCTCP( iClient* theClient, const string& CTCP
-		, const string& Message ,bool Secure = false ) 
+int ccontrol::OnCTCP( iClient* theClient, const string& CTCP,
+	const string& Message, bool Secure ) 
 {
 
 ccUser* theUser = IsAuth(theClient);
@@ -1497,7 +1503,6 @@ ccUser* ccontrol::IsAuth( const string& Numeric )
 return IsAuth(Network->findClient(Numeric));
 }
 
-
 bool ccontrol::AddOper (ccUser* Oper)
 {
 static const char *Main = "INSERT into opers (user_name,password,access,saccess,last_updated_by,last_updated,flags,server,isSuspended,suspend_expires,suspended_by,suspend_level,suspend_reason,isUhs,isOper,isAdmin,isSmt,isCoder,GetLogs,NeedOp,Notice) VALUES ('";
@@ -1506,7 +1511,7 @@ if(!dbConnected)
 	{
 	return false;
 	}
-strstream theQuery;
+stringstream theQuery;
 theQuery	<< Main
 		<< Oper->getUserName() <<"','"
 		<< Oper->getPassword() << "',"
@@ -1533,8 +1538,7 @@ theQuery	<< Main
 		<< ")"
 		<< ends;
 
-ExecStatusType status = SQLDb->Exec( theQuery.str() ) ;
-delete[] theQuery.str() ;
+ExecStatusType status = SQLDb->Exec( theQuery.str().c_str() ) ;
 
 if( PGRES_COMMAND_OK == status ) 
 	{
@@ -1564,16 +1568,16 @@ ccUser* tUser = usersMap[Name];
 if(tUser)
     {
     static const char *tMain = "DELETE FROM hosts WHERE User_Id = ";    
-    strstream HostQ;
+    stringstream HostQ;
     HostQ << tMain;
     HostQ << tUser->getID();
     HostQ << ends;
-    status = SQLDb->Exec( HostQ.str() ) ;
+    status = SQLDb->Exec( HostQ.str().c_str() ) ;
+
 elog	<< "ccontrol::DeleteOper> "
-	<< HostQ.str()
+	<< HostQ.str().c_str()
 	<< endl; 
 
-    delete[] HostQ.str();
 if( PGRES_COMMAND_OK != status ) 
 	{
 	elog	<< "ccontrol::DeleteOper> SQL Failure: "
@@ -1586,18 +1590,17 @@ if( PGRES_COMMAND_OK != status )
 
 static const char *Main = "DELETE FROM opers WHERE lower(user_name) = '";
 
-strstream theQuery;
+stringstream theQuery;
 theQuery	<< Main
 		<< removeSqlChars(Name)
 		<< "'"
 		<< ends;
 
 elog	<< "ccontrol::DeleteOper> "
-	<< theQuery.str()
+	<< theQuery.str().c_str()
 	<< endl; 
 
-status = SQLDb->Exec( theQuery.str() ) ;
-delete[] theQuery.str() ;
+status = SQLDb->Exec( theQuery.str().c_str() ) ;
 
 if( PGRES_COMMAND_OK == status ) 
 	{
@@ -1657,18 +1660,17 @@ if(!dbConnected)
 	return false;
 	}
 
-strstream theQuery;
+stringstream theQuery;
 theQuery	<< Main
 		<< user->getID()
 		<< ';'
 		<< ends;
 
 elog	<< "ccontrol::UserGotMask> "
-	<< theQuery.str()
+	<< theQuery.str().c_str()
 	<< endl; 
 
-ExecStatusType status = SQLDb->Exec( theQuery.str() ) ;
-delete[] theQuery.str() ;
+ExecStatusType status = SQLDb->Exec( theQuery.str().c_str() ) ;
 
 if( PGRES_TUPLES_OK != status )
 	{
@@ -1699,18 +1701,17 @@ if(!dbConnected)
 	return false;
 	}
 
-strstream theQuery;
+stringstream theQuery;
 theQuery	<< Main
 		<< user->getID()
 		<< ';'
 		<< ends;
 
 elog	<< "ccontrol::UserGotHost> "
-	<< theQuery.str()
+	<< theQuery.str().c_str()
 	<< endl; 
 
-ExecStatusType status = SQLDb->Exec( theQuery.str() ) ;
-delete[] theQuery.str() ;
+ExecStatusType status = SQLDb->Exec( theQuery.str().c_str() ) ;
 
 if( PGRES_TUPLES_OK == status )
 	{
@@ -1744,7 +1745,7 @@ for ( unsigned short int i = 0 ; i < 8 ; i++ )
 md5	hash; // MD5 hash algorithm object.
 md5Digest digest; // MD5Digest algorithm object.
  
-strstream output;
+stringstream output;
 string newPass;
 newPass = salt + st.assemble(0);
 
@@ -1766,7 +1767,7 @@ for( size_t ii = 0; ii < MD5_DIGEST_LENGTH; ii++ )
 	}
 output << ends;
 
-return string( salt + output.str() );
+return string( salt + output.str().c_str() );
 }
 
 bool ccontrol::validUserMask(const string& userMask) const
@@ -1809,18 +1810,17 @@ if(!dbConnected)
 
 static const char *Main = "INSERT into hosts (user_id,host) VALUES (";
 
-strstream theQuery;
+stringstream theQuery;
 theQuery	<< Main
 		<< user->getID() <<",'"
 		<< host << "')"
 		<< ends;
 
 elog	<< "ccontrol::AddHost> "
-	<< theQuery.str()
+	<< theQuery.str().c_str()
 	<< endl; 
 
-ExecStatusType status = SQLDb->Exec( theQuery.str() ) ;
-delete[] theQuery.str() ;
+ExecStatusType status = SQLDb->Exec( theQuery.str().c_str() ) ;
 
 if( PGRES_COMMAND_OK == status ) 
 	{
@@ -1845,7 +1845,7 @@ if(!dbConnected)
 
 static const char *Main = "DELETE FROM hosts WHERE user_id = ";
 
-strstream theQuery;
+stringstream theQuery;
 theQuery	<< Main
 		<< user->getID()
 		<< " And host = '"
@@ -1853,11 +1853,10 @@ theQuery	<< Main
 		<< ends;
 
 elog	<< "ccontrol::DelHost> "
-	<< theQuery.str()
+	<< theQuery.str().c_str()
 	<< endl; 
 
-ExecStatusType status = SQLDb->Exec( theQuery.str() ) ;
-delete[] theQuery.str() ;
+ExecStatusType status = SQLDb->Exec( theQuery.str().c_str() ) ;
 
 if( PGRES_COMMAND_OK == status ) 
 	{
@@ -1882,13 +1881,12 @@ if(!dbConnected)
 	return false;
 	}
 
-strstream theQuery;
+stringstream theQuery;
 theQuery	<< queryHeader 
 		<< User->getID()
 		<< ends;
 
-ExecStatusType status = SQLDb->Exec( theQuery.str() ) ;
-delete[] theQuery.str() ;
+ExecStatusType status = SQLDb->Exec( theQuery.str().c_str() ) ;
 
 if( PGRES_TUPLES_OK != status )
 	{
@@ -1917,18 +1915,17 @@ if(!dbConnected)
 	return false;
 	}
 
-strstream theQuery;
+stringstream theQuery;
 theQuery	<< Main
 		<< string_lower(removeSqlChars(command))
 		<< "' ORDER BY line"
 		<< ends;
 
 elog	<< "ccontrol::GetHelp> "
-	<< theQuery.str()
+	<< theQuery.str().c_str()
 	<< endl; 
 
-ExecStatusType status = SQLDb->Exec( theQuery.str() ) ;
-delete[] theQuery.str() ;
+ExecStatusType status = SQLDb->Exec( theQuery.str().c_str() ) ;
 
 if( PGRES_TUPLES_OK == status )
 	{
@@ -1962,7 +1959,7 @@ if(!dbConnected)
 	return false;
 	}
 
-strstream theQuery;
+stringstream theQuery;
 theQuery	<< Main
 		<< string_lower(removeSqlChars(command))
 		<< "' and lower(subcommand) = '"
@@ -1971,11 +1968,10 @@ theQuery	<< Main
 		<< ends;
 
 elog	<< "ccontrol::GetHelp> "
-	<< theQuery.str()
+	<< theQuery.str().c_str()
 	<< endl; 
 
-ExecStatusType status = SQLDb->Exec( theQuery.str() ) ;
-delete[] theQuery.str() ;
+ExecStatusType status = SQLDb->Exec( theQuery.str().c_str() ) ;
 
 if( PGRES_TUPLES_OK == status )
 	{
@@ -2244,7 +2240,7 @@ else
 	}
 strcpy(buffer,log.c_str());
 					
-strstream theQuery;
+stringstream theQuery;
 theQuery	<< Main;
 if(Oper)
 	{
@@ -2259,11 +2255,10 @@ theQuery	<< " (" << removeSqlChars(theClient->getNickUserHost()) <<")','"
 		<< ends;
 
 elog	<< "ccontrol::DailyLog> "
-	<< theQuery.str()
+	<< theQuery.str().c_str()
 	<< endl; 
 
-ExecStatusType status = SQLDb->Exec( theQuery.str() ) ;
-delete[] theQuery.str() ;
+ExecStatusType status = SQLDb->Exec( theQuery.str().c_str() ) ;
 
 if( PGRES_COMMAND_OK == status ) 
 	{
@@ -2348,7 +2343,7 @@ else
 	}
 strcpy(buffer,log.c_str());
 					
-strstream theQuery;
+stringstream theQuery;
 theQuery	<< Main
 		<< "Unknown"
 		<< " (" << removeSqlChars(theClient->getNickUserHost()) <<")','"
@@ -2356,11 +2351,10 @@ theQuery	<< Main
 		<< ends;
 
 elog	<< "ccontrol::DailyLog> "
-	<< theQuery.str()
+	<< theQuery.str().c_str()
 	<< endl; 
 
-ExecStatusType status = SQLDb->Exec( theQuery.str() ) ;
-delete[] theQuery.str() ;
+ExecStatusType status = SQLDb->Exec( theQuery.str().c_str() ) ;
 
 if( PGRES_COMMAND_OK == status ) 
 	{
@@ -2467,7 +2461,7 @@ if(!dbConnected)
 	}
 
 static const char* queryHeader = "SELECT * FROM comlog where ts >";
-strstream theQuery;
+stringstream theQuery;
 theQuery 	<< queryHeader 
 		<< From
 		<< " AND ts < "
@@ -2476,11 +2470,10 @@ theQuery 	<< queryHeader
 		<< ends;
 	
 elog	<< "ccontrol::CreateReport> " 
-	<< theQuery.str() 
+	<< theQuery.str().c_str() 
 	<< endl;
 	
-ExecStatusType status = SQLDb->Exec( theQuery.str() ) ;
-delete[] theQuery.str() ;
+ExecStatusType status = SQLDb->Exec( theQuery.str().c_str() ) ;
 
 if( PGRES_TUPLES_OK != status )
 	{
@@ -2677,16 +2670,15 @@ for(;curUser != usersMap.end();++curUser)
 
 static const char *DelMain = "update opers set isSuspended = 'n',Suspend_Expires = 0, Suspended_by = '',suspend_level = 0,suspend_reason='' where IsSuspended = 'y' And suspend_expires < now()::abstime::int4";
 
-strstream DelQuery;
+stringstream DelQuery;
 DelQuery	<< DelMain
 		<< ends;
 #ifdef LOG_SQL
 elog	<< "ccontrol::RefreshSuspention> "
-	<< DelQuery.str()
+	<< DelQuery.str().c_str()
 	<< endl; 
 #endif
-ExecStatusType status = SQLDb->Exec( DelQuery.str() ) ;
-delete[] DelQuery.str() ;
+ExecStatusType status = SQLDb->Exec( DelQuery.str().c_str() ) ;
 
 if( PGRES_COMMAND_OK != status )
 	{
@@ -2784,16 +2776,15 @@ if(!dbConnected)
 
 static const char *Main = "SELECT * FROM glines";
 
-strstream theQuery;
+stringstream theQuery;
 theQuery	<< Main
 		<< ends;
 
 elog	<< "ccontrol::loadGlines> "
-	<< theQuery.str()
+	<< theQuery.str().c_str()
 	<< endl; 
 
-ExecStatusType status = SQLDb->Exec( theQuery.str() ) ;
-delete[] theQuery.str() ;
+ExecStatusType status = SQLDb->Exec( theQuery.str().c_str() ) ;
 
 if( PGRES_TUPLES_OK != status )
 	{
@@ -2832,16 +2823,15 @@ if(!dbConnected)
         return false;
         }
    
-strstream theQuery;
+stringstream theQuery;
 theQuery        << User::Query
                 << ends;
 
 elog    << "ccotrol::loadUsers> "
-        << theQuery.str()
+        << theQuery.str().c_str()
         << endl; 
  
-ExecStatusType status = SQLDb->Exec( theQuery.str() ) ;
-delete[] theQuery.str() ;
+ExecStatusType status = SQLDb->Exec( theQuery.str().c_str() ) ;
 
 if (PGRES_TUPLES_OK != status)
         {
@@ -2908,16 +2898,15 @@ if(!dbConnected)
         return false;
         }
    
-strstream theQuery;
+stringstream theQuery;
 theQuery        << server::Query
                 << ends;
 
 elog    << "ccotrol::loadServers> "
-        << theQuery.str()
+        << theQuery.str().c_str()
         << endl; 
  
-ExecStatusType status = SQLDb->Exec( theQuery.str() ) ;
-delete[] theQuery.str() ;
+ExecStatusType status = SQLDb->Exec( theQuery.str().c_str() ) ;
 
 if (PGRES_TUPLES_OK != status)
         {
@@ -2943,16 +2932,15 @@ if(!dbConnected)
         return false;
         }
    
-strstream theQuery;
+stringstream theQuery;
 theQuery        << "Select * from misc where VarName = 'MaxUsers';"
                 << ends;
 
 elog    << "ccotrol::loadMaxUsers> "
-        << theQuery.str()
+        << theQuery.str().c_str()
         << endl; 
  
-ExecStatusType status = SQLDb->Exec( theQuery.str() ) ;
-delete[] theQuery.str() ;
+ExecStatusType status = SQLDb->Exec( theQuery.str().c_str() ) ;
 
 if (PGRES_TUPLES_OK != status)
         {
@@ -2963,12 +2951,11 @@ if(SQLDb->Tuples() == 0)
 	{
 	maxUsers = 0;
 	dateMax = 0;
-	strstream insertQ;
+	stringstream insertQ;
 	insertQ << "Insert into misc (VarName,Value1,Value2) Values ('MaxUsers',0,0);"
 		<< ends;
 
-	status = SQLDb->Exec( insertQ.str() ) ;
-	delete[] insertQ.str() ;
+	status = SQLDb->Exec( insertQ.str().c_str() ) ;
 
 	if (PGRES_COMMAND_OK != status)
     		{
@@ -2991,8 +2978,6 @@ if(!dbConnected)
         return false;
         }
    
-strstream theQuery;
- 
 ExecStatusType status = SQLDb->Exec( "Select * from misc where VarName = 'Version'") ;
 
 if (PGRES_TUPLES_OK != status)
@@ -3209,7 +3194,7 @@ for(ignoreIterator ptr = ignore_begin();ptr!=ignore_end();)
 	tempLogin = *ptr;
 	if(tempLogin->getIgnoredHost() == Host)
 		{
-		strstream s;
+		stringstream s;
 		s	<< getCharYYXXX() 
 			<< " SILENCE " 
 			<< tempLogin->getNumeric() 
@@ -3217,7 +3202,7 @@ for(ignoreIterator ptr = ignore_begin();ptr!=ignore_end();)
 			<< tempLogin->getIgnoredHost()
 			<< ends; 
 		Write( s );
-		delete[] s.str();
+
 		tempLogin->resetIgnore();
 		tempLogin->resetLogins();
 		ptr = ignoreList.erase(ptr);
@@ -3255,7 +3240,7 @@ string silenceMask = string( "*!*" )
 	+ "@"
 	+ theClient->getInsecureHost();
 
-strstream s;
+stringstream s;
 s	<< getCharYYXXX() 
 	<< " SILENCE " 
 	<< theClient->getCharYYXXX() 
@@ -3264,7 +3249,6 @@ s	<< getCharYYXXX()
 	<< ends; 
 
 Write( s );
-delete[] s.str();
 Flood->setIgnoreExpires(::time(0)+ flood::IGNORE_TIME);
 Flood->setIgnoredHost(silenceMask);
 
@@ -3300,7 +3284,7 @@ for(ignoreIterator ptr = ignore_begin();ptr!=ignore_end();)
 	if((tempLogin) &&(tempLogin->getIgnoreExpires() <= ::time(0)))
 		{
 		tempLogin->setIgnoreExpires(0);
-		strstream s;
+		stringstream s;
 		s	<< getCharYYXXX() 
 			<< " SILENCE " 
 			<< tempLogin->getNumeric() 
@@ -3309,7 +3293,7 @@ for(ignoreIterator ptr = ignore_begin();ptr!=ignore_end();)
 			<< ends; 
 
 		Write( s );
-		delete[] s.str();
+
 		tempLogin->setIgnoredHost("");
 		if(tempLogin->getNumeric() == "0")
 			{
@@ -3336,16 +3320,15 @@ if(!dbConnected)
 	return false;
 	}
 
-strstream theQuery;
+stringstream theQuery;
 theQuery	<< Main
 		<< ends;
 
 elog	<< "ccontrol::loadExceptions> "
-	<< theQuery.str()
+	<< theQuery.str().c_str()
 	<< endl; 
 
-ExecStatusType status = SQLDb->Exec( theQuery.str() ) ;
-delete[] theQuery.str() ;
+ExecStatusType status = SQLDb->Exec( theQuery.str().c_str() ) ;
 
 if( PGRES_TUPLES_OK != status )
 	{
@@ -3434,16 +3417,15 @@ if(!dbConnected)
 	return;
 	}
 
-strstream theQuery;
+stringstream theQuery;
 theQuery	<< Main
 		<< ends;
 
 elog	<< "ccontrol::loadCommands> "
-	<< theQuery.str()
+	<< theQuery.str().c_str()
 	<< endl; 
 
-ExecStatusType status = SQLDb->Exec( theQuery.str() ) ;
-delete[] theQuery.str() ;
+ExecStatusType status = SQLDb->Exec( theQuery.str().c_str() ) ;
 
 if( PGRES_TUPLES_OK != status )
 	{
@@ -3490,7 +3472,7 @@ if(!dbConnected)
 	return false;
 	}
 
-strstream theQuery;
+stringstream theQuery;
 theQuery	<< Main
 		<< Comm->getName()
 		<< "', isDisabled = "
@@ -3507,11 +3489,10 @@ theQuery	<< Main
 		<< ends;
 
 elog	<< "ccontrol::updateCommands> "
-	<< theQuery.str()
+	<< theQuery.str().c_str()
 	<< endl; 
 
-ExecStatusType status = SQLDb->Exec( theQuery.str() ) ;
-delete[] theQuery.str() ;
+ExecStatusType status = SQLDb->Exec( theQuery.str().c_str() ) ;
 
 if( PGRES_COMMAND_OK != status )
 	{
@@ -3555,14 +3536,13 @@ if(!dbConnected)
 	return false;
 	}
 
-strstream theQuery;
+stringstream theQuery;
 theQuery	<< Main
 		<< string_lower(Comm->getRealName())
 		<< "'" << ends;
 
 
-ExecStatusType status = SQLDb->Exec( theQuery.str() ) ;
-delete[] theQuery.str() ;
+ExecStatusType status = SQLDb->Exec( theQuery.str().c_str() ) ;
 
 if( PGRES_TUPLES_OK != status )
 	{
@@ -4063,7 +4043,7 @@ if(maxUsers < curUsers)
 	
 	static const char *UPMain = "update Misc set Value1 = ";
 
-	strstream DelQuery;
+	stringstream DelQuery;
 	DelQuery	<< UPMain
 			<< maxUsers
 			<< ", Value2 = " 
@@ -4072,11 +4052,10 @@ if(maxUsers < curUsers)
 			<< ends;
 //#ifdef LOG_SQL
 	elog	<< "ccontrol::checkMaxUsers> "
-		<< DelQuery.str()
+		<< DelQuery.str().c_str()
 		<< endl; 
 //#endif
-	ExecStatusType status = SQLDb->Exec( DelQuery.str() ) ;
-	delete[] DelQuery.str() ;
+	ExecStatusType status = SQLDb->Exec( DelQuery.str().c_str() ) ;
 
 	if( PGRES_COMMAND_OK != status )
 		{
@@ -4091,18 +4070,18 @@ if(maxUsers < curUsers)
 bool ccontrol::addVersion(const string& newVer)
 {
 static const char* verChar = "Insert into misc (VarName,Value5) Values ('Version','";
-strstream VerQuery;
+stringstream VerQuery;
 VerQuery	<< verChar
 		<< newVer
 		<< "')" 
 		<< ends;
 #ifdef LOG_SQL
 elog		<< "ccontrol::addVersion> "
-		<< VerQuery.str()
+		<< VerQuery.str().c_str()
 		<< endl; 
 #endif
-ExecStatusType status = SQLDb->Exec( VerQuery.str() ) ;
-delete[] VerQuery.str() ;
+
+ExecStatusType status = SQLDb->Exec( VerQuery.str().c_str() ) ;
 if( PGRES_COMMAND_OK != status )
 	{
 	elog	<< "ccontrol::addVersion> SQL Failure: "
@@ -4153,14 +4132,13 @@ void ccontrol::listVersions(iClient* theClient)
 bool ccontrol::updateCheckVer(const bool newVal)
 {
 checkVer = newVal;
-strstream ups;
+stringstream ups;
 ups 	<< "Update misc set Value1 = "
 	<< (newVal ? 1 : 0)
         << " where VarName = 'CheckVer'"
 	<< ends;
 
-ExecStatusType status = SQLDb->Exec( ups.str() ) ;
-delete[] ups.str() ;
+ExecStatusType status = SQLDb->Exec( ups.str().c_str() ) ;
 if( PGRES_COMMAND_OK != status )
 	{
 	elog	<< "ccontrol::updateCheckVer> SQL Failure: "
@@ -4176,7 +4154,6 @@ void *initGate(void* arg)
 
 pthread_detach(pthread_self()); //First we must de-attach 
 ccGate * tmpGate = (ccGate*) arg;
-
 
 int sockFd,conRet;
 fd_set ReadSet,WriteSet;
@@ -4280,7 +4257,8 @@ if((!error) && !(tError))
 			}
 		}
 	}
-close(sockFd);		
+
+::close(sockFd);		
 tmpGate->setStatus(ccGate::statDone);
 pthread_exit(NULL);
 return NULL;

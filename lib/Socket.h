@@ -2,12 +2,11 @@
  */
 
 #ifndef __SOCKET_H
-#define __SOCKET_H "$Id: Socket.h,v 1.9 2002/04/28 16:11:23 dan_karrels Exp $"
+#define __SOCKET_H "$Id: Socket.h,v 1.10 2002/05/23 17:43:10 dan_karrels Exp $"
 
 #include	<new>
 #include	<iostream>
 #include	<fstream>
-#include	<strstream>
 #include	<string>
 #include	<vector>
 

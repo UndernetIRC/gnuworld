@@ -1,10 +1,17 @@
+/**
+ * cservice.h
+ * Author: Greg Sikorski
+ * $Id: cservice.h,v 1.83 2002/05/23 17:43:13 dan_karrels Exp $
+ */
+
 #ifndef __CSERVICE_H
-#define __CSERVICE_H "$Id: cservice.h,v 1.82 2002/04/01 22:02:22 gte Exp $"
+#define __CSERVICE_H "$Id: cservice.h,v 1.83 2002/05/23 17:43:13 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
-#include	<hash_map.h>
+#include	<ext/hash_map>
 #include	<map>
+
 #include	<ctime>
 
 #include	"client.h"
@@ -17,16 +24,17 @@
 #include	"sqlLevel.h"
 #include	"sqlBan.h"
 #include	"sqlPendingChannel.h"
-
-using std::string ;
-using std::vector ;
-using std::hash_map ;
-using std::map ;
+#include	"defs.h"
 
 class PgDatabase;
 
 namespace gnuworld
 {
+
+using std::string ;
+using std::vector ;
+using HASHMAPNS::hash_map ;
+using std::map ;
 
 /**
  *  Sublcass the postgres API to create our own accessor

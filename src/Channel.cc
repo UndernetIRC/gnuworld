@@ -1,9 +1,13 @@
-/* Channel.cc */
+/*
+ * Channel.cc
+ * Author: Daniel Karrels (dan@karrels.com)
+ * $Id: Channel.cc,v 1.31 2002/05/23 17:43:14 dan_karrels Exp $
+ */
 
 #include	<new>
 #include	<string>
 #include	<iostream>
-#include	<strstream>
+#include	<sstream>
 
 #include	"Channel.h"
 #include	"iClient.h"
@@ -16,7 +20,7 @@
 #include	"server.h"
 
 const char Channel_h_rcsId[] = __CHANNEL_H ;
-const char Channel_cc_rcsId[] = "$Id: Channel.cc,v 1.30 2002/04/28 16:11:23 dan_karrels Exp $" ;
+const char Channel_cc_rcsId[] = "$Id: Channel.cc,v 1.31 2002/05/23 17:43:14 dan_karrels Exp $" ;
 const char iClient_h_rcsId[] = __ICLIENT_H ;
 const char ChannelUser_h_rcsId[] = __CHANNELUSER_H ;
 const char Network_h_rcsId[] = __NETWORK_H ;
@@ -31,7 +35,7 @@ namespace gnuworld
 
 using std::string ;
 using std::endl ;
-using std::strstream ;
+using std::stringstream ;
 using std::ends ;
 
 const Channel::modeType Channel::MODE_T = 0x01 ;
@@ -466,17 +470,14 @@ if( modes & MODE_L )
 	modeString += 'l' ;
 
 	// Can't put numerical variables into a string
-	strstream s ;
+	stringstream s ;
 	s	<< getLimit()
 		<< ends ;
 
 	argString += s.str() ;
-
-	delete[] s.str() ;
 	}
 
 return (modeString + ' ' + argString) ;
-
 }
 
 string Channel::createBan( const iClient* theClient )

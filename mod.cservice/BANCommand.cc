@@ -18,11 +18,14 @@
  *
  * Caveats: None.
  *
- * $Id: BANCommand.cc,v 1.29 2002/02/06 18:56:25 gte Exp $
+ * $Id: BANCommand.cc,v 1.30 2002/05/23 17:43:12 dan_karrels Exp $
  */
 
 #include	<new>
 #include	<string>
+#include	<sstream>
+#include	<iostream>
+
 #include	<cassert>
 
 #include	"StringTokenizer.h"
@@ -33,11 +36,15 @@
 #include	"responses.h"
 #include	"match.h"
 
-const char BANCommand_cc_rcsId[] = "$Id: BANCommand.cc,v 1.29 2002/02/06 18:56:25 gte Exp $" ;
+const char BANCommand_cc_rcsId[] = "$Id: BANCommand.cc,v 1.30 2002/05/23 17:43:12 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
 using std::string ;
+using std::endl ;
+using std::ends ;
+using std::stringstream ;
+
 using namespace level;
 
 bool BANCommand::Exec( iClient* theClient, const string& Message )
@@ -356,12 +363,11 @@ else
 	if( !clientsToKick.empty() )
 		{
 		// TODO: Use xClient::Ban() here
-		strstream s;
+		stringstream s;
 		s	<< bot->getCharYYXXX() << " M " << theChannel->getName()
 			<< " +b " << banTarget << ends;
 
 		bot->Write( s );
-		delete[] s.str();
 
 		bot->Kick( theChannel, clientsToKick, finalReason ) ;
 

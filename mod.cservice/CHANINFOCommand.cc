@@ -13,10 +13,12 @@
  *
  * Command is aliased "INFO".
  *
- * $Id: CHANINFOCommand.cc,v 1.45 2002/04/09 15:46:20 gte Exp $
+ * $Id: CHANINFOCommand.cc,v 1.46 2002/05/23 17:43:12 dan_karrels Exp $
  */
 
 #include	<string>
+#include	<sstream>
+#include	<iostream>
 
 #include	"StringTokenizer.h"
 #include	"ELog.h"
@@ -26,11 +28,14 @@
 #include	"libpq++.h"
 #include	"cservice_config.h"
 
-const char CHANINFOCommand_cc_rcsId[] = "$Id: CHANINFOCommand.cc,v 1.45 2002/04/09 15:46:20 gte Exp $" ;
+const char CHANINFOCommand_cc_rcsId[] = "$Id: CHANINFOCommand.cc,v 1.46 2002/05/23 17:43:12 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
 using std::string ;
+using std::endl ;
+using std::ends ;
+using std::stringstream ;
 
 static const char* queryHeader = "SELECT channels.name,users.user_name,levels.access,users_lastseen.last_seen FROM levels,channels,users,users_lastseen ";
 static const char* queryString = "WHERE levels.channel_id=channels.id AND users.id=users_lastseen.user_id AND levels.access = 500 AND levels.user_id = users.id ";
@@ -225,7 +230,7 @@ if( string::npos == st[ 1 ].find_first_of( '#' ) )
 			}
 #endif
 
-		strstream channelsQuery;
+		stringstream channelsQuery;
 		string channelList ;
 
 		channelsQuery	<< "SELECT channels.name,levels.access FROM levels,channels "
@@ -236,7 +241,7 @@ if( string::npos == st[ 1 ].find_first_of( '#' ) )
 
 		#ifdef LOG_SQL
 			elog	<< "CHANINFO::sqlQuery> "
-				<< channelsQuery.str()
+				<< channelsQuery.str().c_str()
 				<< endl;
 		#endif
 
@@ -244,8 +249,7 @@ if( string::npos == st[ 1 ].find_first_of( '#' ) )
 		string chanAccess ;
 
 		ExecStatusType status =
-			bot->SQLDb->Exec(channelsQuery.str()) ;
-		delete[] channelsQuery.str() ;
+			bot->SQLDb->Exec(channelsQuery.str().c_str()) ;
 
 		if( PGRES_TUPLES_OK != status )
 			{
@@ -311,7 +315,7 @@ if( !theChan )
  * The description and url, are received from the cache. --Plexus
  */
 
-strstream theQuery;
+stringstream theQuery;
 theQuery	<< queryHeader
 		<< queryString
 		<< "AND levels.channel_id = "
@@ -320,7 +324,7 @@ theQuery	<< queryHeader
 
 #ifdef LOG_SQL
 	elog	<< "CHANINFO::sqlQuery> "
-		<< theQuery.str()
+		<< theQuery.str().c_str()
 		<< endl;
 #endif
 
@@ -330,8 +334,7 @@ bot->Notice(theClient,
 		string("%s is registered by:")).c_str(),
 	st[1].c_str());
 
-ExecStatusType status = bot->SQLDb->Exec(theQuery.str()) ;
-delete[] theQuery.str() ;
+ExecStatusType status = bot->SQLDb->Exec(theQuery.str().c_str()) ;
 
 if( PGRES_TUPLES_OK == status )
 	{

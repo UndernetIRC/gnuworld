@@ -6,7 +6,7 @@
 
 #include	<string>
 #include	<cstdlib>
-#include        <iomanip.h>
+#include        <iomanip>
 
 #include	"ccontrol.h"
 #include	"CControlCommands.h"
@@ -18,7 +18,7 @@
 #include	"ELog.h"
 #include	"Constants.h"
 
-const char FORCEGLINECommand_cc_rcsId[] = "$Id: FORCEGLINECommand.cc,v 1.20 2002/03/01 21:31:57 mrbean_ Exp $";
+const char FORCEGLINECommand_cc_rcsId[] = "$Id: FORCEGLINECommand.cc,v 1.21 2002/05/23 17:43:10 dan_karrels Exp $";
 
 namespace gnuworld
 {

@@ -7,7 +7,7 @@
 
 #include	<string>
 #include	<cstdlib>
-#include        <iomanip.h>
+#include        <iomanip>
 #include	<map>
 
 #include	"ccontrol.h"
@@ -24,7 +24,7 @@
 #include	"ccUser.h"
 #include	"Constants.h"
 
-const char GLINECommand_cc_rcsId[] = "$Id: GLINECommand.cc,v 1.40 2002/04/22 19:10:49 mrbean_ Exp $";
+const char GLINECommand_cc_rcsId[] = "$Id: GLINECommand.cc,v 1.41 2002/05/23 17:43:10 dan_karrels Exp $";
 
 namespace gnuworld
 {

@@ -5,6 +5,8 @@
  */
 
 #include	<string>
+#include	<sstream>
+#include	<iostream>
 
 #include	"StringTokenizer.h"
 #include	"ELog.h"
@@ -13,11 +15,14 @@
 #include	"levels.h"
 #include	"cservice_config.h"
 
-const char REMOVEALLCommand_cc_rcsId[] = "$Id: REMOVEALLCommand.cc,v 1.3 2001/09/05 03:47:56 gte Exp $" ;
+const char REMOVEALLCommand_cc_rcsId[] = "$Id: REMOVEALLCommand.cc,v 1.4 2002/05/23 17:43:13 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
 using std::string ;
+using std::endl ;
+using std::ends ;
+using std::stringstream ;
 
 bool REMOVEALLCommand::Exec( iClient* theClient, const string& Message )
 {
@@ -75,7 +80,7 @@ if (level < level::removeall)
  *  Now, perform a fast query on the levels table for this channel.
  */
 
-strstream clearAllQuery;
+stringstream clearAllQuery;
 clearAllQuery	<< "SELECT user_id FROM levels WHERE"
 		<< " channel_id = "
 		<< theChan->getID()
@@ -83,12 +88,11 @@ clearAllQuery	<< "SELECT user_id FROM levels WHERE"
 
 #ifdef LOG_SQL
 	elog	<< "sqlQuery> "
-		<< clearAllQuery.str()
+		<< clearAllQuery.str().c_str()
 		<< endl;
 #endif
 
-ExecStatusType status = bot->SQLDb->Exec(clearAllQuery.str()) ;
-delete[] clearAllQuery.str() ;
+ExecStatusType status = bot->SQLDb->Exec(clearAllQuery.str().c_str()) ;
 
 if( status != PGRES_TUPLES_OK )
 	{
@@ -128,7 +132,7 @@ for (int i = 0 ; i < bot->SQLDb->Tuples(); i++)
  * from the database.
  */
 
-strstream deleteAllQuery;
+stringstream deleteAllQuery;
 deleteAllQuery	<< "DELETE FROM levels WHERE"
 		<< " channel_id = "
 		<< theChan->getID()
@@ -136,11 +140,11 @@ deleteAllQuery	<< "DELETE FROM levels WHERE"
 
 #ifdef LOG_SQL
 	elog	<< "sqlQuery> "
-		<< deleteAllQuery.str()
+		<< deleteAllQuery.str().c_str()
 		<< endl;
 #endif
 
-if (bot->SQLDb->ExecCommandOk(deleteAllQuery.str()))
+if (bot->SQLDb->ExecCommandOk(deleteAllQuery.str().c_str()))
 	{
 		bot->Notice(theClient, "Done. Zapped %i access records from %s",
 			delCounter, theChan->getName().c_str());
@@ -152,8 +156,6 @@ if (bot->SQLDb->ExecCommandOk(deleteAllQuery.str()))
 		bot->Notice(theClient, "A database error occured while removing the access records.");
 		bot->Notice(theClient, "Please contact a database administrator!");
 	}
-
-delete[] deleteAllQuery.str() ;
 
 return true;
 }

@@ -9,10 +9,13 @@
  * Caveats: None
  *
  *
- * $Id: REMUSERCommand.cc,v 1.13 2001/09/05 03:47:56 gte Exp $
+ * $Id: REMUSERCommand.cc,v 1.14 2002/05/23 17:43:13 dan_karrels Exp $
  */
 
+#include	<sstream>
 #include	<string>
+#include	<utility>
+#include	<iostream>
 
 #include	"StringTokenizer.h"
 #include	"ELog.h"
@@ -21,11 +24,14 @@
 #include	"libpq++.h"
 #include	"responses.h"
 
-const char REMUSERCommand_cc_rcsId[] = "$Id: REMUSERCommand.cc,v 1.13 2001/09/05 03:47:56 gte Exp $" ;
+const char REMUSERCommand_cc_rcsId[] = "$Id: REMUSERCommand.cc,v 1.14 2002/05/23 17:43:13 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
-using namespace gnuworld;
+using std::ends ;
+using std::endl ;
+using std::string ;
+using std::stringstream ;
 
 bool REMUSERCommand::Exec( iClient* theClient, const string& Message )
 {
@@ -40,7 +46,7 @@ bool REMUSERCommand::Exec( iClient* theClient, const string& Message )
 
 	static const char* queryHeader = "DELETE FROM levels WHERE ";
 
-	strstream theQuery;
+	stringstream theQuery;
 	ExecStatusType status;
 
 	/*
@@ -153,13 +159,15 @@ bool REMUSERCommand::Exec( iClient* theClient, const string& Message )
 	 */
 
 	theQuery << queryHeader
-	<< "channel_id = " << theChan->getID()
-	<< " AND user_id = " << targetUser->getID()
-	<< ";" << ends;
+		<< "channel_id = " << theChan->getID()
+		<< " AND user_id = " << targetUser->getID()
+		<< ";" << ends;
 
-	elog << "sqlQuery> " << theQuery.str() << endl;
+	elog	<< "sqlQuery> "
+		<< theQuery.str()
+		<< endl;
 
-	if ((status = bot->SQLDb->Exec(theQuery.str())) == PGRES_COMMAND_OK)
+	if ((status = bot->SQLDb->Exec(theQuery.str().c_str())) == PGRES_COMMAND_OK)
 	{
 		bot->Notice(theClient,
 			bot->getResponse(theUser,
@@ -173,7 +181,7 @@ bool REMUSERCommand::Exec( iClient* theClient, const string& Message )
 	/* Remove tmpLevel from the cache. (It has to be there, we just got it even if it wasnt..) */
 
 	pair<int, int> thePair;
-	thePair = make_pair(tmpLevel->getUserId(), tmpLevel->getChannelId());
+	thePair = std::make_pair(tmpLevel->getUserId(), tmpLevel->getChannelId());
 	bot->sqlLevelCache.erase(thePair);
 	delete(tmpLevel);
 

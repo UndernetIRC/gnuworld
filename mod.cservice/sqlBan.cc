@@ -4,11 +4,12 @@
  * Storage class for accessing Ban information either from the backend
  * or internal storage.
  *
- * $Id: sqlBan.cc,v 1.6 2002/04/28 16:02:26 gte Exp $
+ * $Id: sqlBan.cc,v 1.7 2002/05/23 17:43:13 dan_karrels Exp $
  */
 
-#include	<strstream>
+#include	<sstream>
 #include	<string>
+#include	<iostream>
 
 #include	<cstring>
 
@@ -20,13 +21,15 @@
 #include	"cservice_config.h"
 
 const char sqlBan_h_rcsId[] = __SQLBAN_H ;
-const char sqlBan_cc_rcsId[] = "$Id: sqlBan.cc,v 1.6 2002/04/28 16:02:26 gte Exp $" ;
+const char sqlBan_cc_rcsId[] = "$Id: sqlBan.cc,v 1.7 2002/05/23 17:43:13 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
 
 using std::string ;
 using std::endl ;
+using std::ends ;
+using std::stringstream ;
 
 sqlBan::sqlBan(PgDatabase* _SQLDb)
   : id(0),
@@ -69,7 +72,7 @@ bool sqlBan::commit()
 
 static const char* queryHeader =    "UPDATE bans ";
 
-strstream queryString;
+stringstream queryString;
 queryString	<< queryHeader
 		<< "SET channel_id = " << channel_id << ", "
 		<< "set_by = '" << escapeSQLChars(set_by) << "', "
@@ -84,12 +87,11 @@ queryString	<< queryHeader
 
 #ifdef LOG_SQL
 	elog	<< "sqlBan::commit> "
-		<< queryString.str()
+		<< queryString.str().c_str()
 		<< endl;
 #endif
 
-ExecStatusType status = SQLDb->Exec(queryString.str()) ;
-delete[] queryString.str() ;
+ExecStatusType status = SQLDb->Exec(queryString.str().c_str()) ;
 
 if( PGRES_COMMAND_OK != status )
 	{
@@ -112,7 +114,7 @@ bool sqlBan::insertRecord()
 
 static const char* queryHeader = "INSERT INTO bans (channel_id,banmask,set_by,set_ts,level,expires,reason,last_updated) VALUES (";
 
-strstream queryString;
+stringstream queryString;
 queryString	<< queryHeader
 		<< channel_id << ", '"
 		<< escapeSQLChars(banmask) << "', '"
@@ -126,12 +128,11 @@ queryString	<< queryHeader
 
 #ifdef LOG_SQL
 	elog	<< "sqlBan::insertRecord> "
-		<< queryString.str()
+		<< queryString.str().c_str()
 		<< endl;
 #endif
 
-ExecStatusType status = SQLDb->Exec(queryString.str()) ;
-delete[] queryString.str() ;
+ExecStatusType status = SQLDb->Exec(queryString.str().c_str()) ;
 
 if( PGRES_TUPLES_OK != status )
 	{
@@ -155,19 +156,18 @@ bool sqlBan::deleteRecord()
 
 static const char* queryHeader = "DELETE FROM bans WHERE id = ";
 
-strstream queryString;
+stringstream queryString;
 queryString	<< queryHeader
 		<< id
 		<< ends;
 
 #ifdef LOG_SQL
 	elog	<< "sqlBan::delete> "
-		<< queryString.str()
+		<< queryString.str().c_str()
 		<< endl;
 #endif
 
-ExecStatusType status = SQLDb->Exec(queryString.str()) ;
-delete[] queryString.str() ;
+ExecStatusType status = SQLDb->Exec(queryString.str().c_str()) ;
 
 if( PGRES_COMMAND_OK != status )
 	{

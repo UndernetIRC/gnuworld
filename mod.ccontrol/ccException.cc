@@ -3,10 +3,10 @@
  * 
  * Exception class
  * 
- * $Id: ccException.cc,v 1.5 2001/11/21 20:54:40 mrbean_ Exp $
+ * $Id: ccException.cc,v 1.6 2002/05/23 17:43:11 dan_karrels Exp $
  */
  
-#include	<strstream>
+#include	<sstream>
 #include	<string> 
 
 #include	<ctime>
@@ -20,14 +20,14 @@
 #include	"ccontrol.h"
 
 const char ccException_h_rcsId[] = __CCEXCEPTION_H ;
-const char ccException_cc_rcsId[] = "$Id: ccException.cc,v 1.5 2001/11/21 20:54:40 mrbean_ Exp $" ;
+const char ccException_cc_rcsId[] = "$Id: ccException.cc,v 1.6 2002/05/23 17:43:11 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
 
 using std::string ; 
 using std::endl ; 
-using std::strstream ;
+using std::stringstream ;
 using std::ends ;
 
 namespace uworld
@@ -62,19 +62,18 @@ if((!dbConnected) || !(SQLDb))
 	{
 	return false;
 	}
-	
-strstream theQuery;
+
+stringstream theQuery;
 theQuery	<< Main
 		<< string_lower(HostName)
 		<< "'"
 		<< ends;
 
 elog	<< "ccException::loadData> "
-	<< theQuery.str()
+	<< theQuery.str().c_str()
 	<< endl; 
 
-ExecStatusType status = SQLDb->Exec( theQuery.str() ) ;
-delete[] theQuery.str() ;
+ExecStatusType status = SQLDb->Exec( theQuery.str().c_str() ) ;
 
 if( (PGRES_TUPLES_OK != status) && (SQLDb->Tuples() > 0) )
 	{
@@ -99,7 +98,7 @@ if(!dbConnected)
 	return false;
 	}
 
-strstream theQuery;
+stringstream theQuery;
 theQuery	<< Main
 		<< AddedBy
 		<< "', Connections = "
@@ -111,11 +110,10 @@ theQuery	<< Main
 		<<  ends;
 
 elog	<< "ccException::Update> "
-	<< theQuery.str()
+	<< theQuery.str().c_str()
 	<< endl; 
 
-ExecStatusType status = SQLDb->Exec( theQuery.str() ) ;
-delete[] theQuery.str() ;
+ExecStatusType status = SQLDb->Exec( theQuery.str().c_str() ) ;
 
 if( PGRES_COMMAND_OK == status ) 
 	{
@@ -140,7 +138,7 @@ if(!dbConnected)
 	return false;
 	}
 
-strstream query;
+stringstream query;
 query		<< quer
 		<< Host << "',"
 		<< Connections
@@ -149,11 +147,10 @@ query		<< quer
 		<< ")" << ends;
 
 elog	<< "ccException::insertException> "
-	<< query.str()
+	<< query.str().c_str()
 	<< endl; 
 
-ExecStatusType status = SQLDb->Exec( query.str() ) ;
-delete[] query.str();
+ExecStatusType status = SQLDb->Exec( query.str().c_str() ) ;
 if(PGRES_COMMAND_OK != status)
 	elog	<< "ccontrol::Gline::Update> SQL Failure: "
 		<< SQLDb->ErrorMessage()
@@ -172,17 +169,16 @@ if(!dbConnected)
 	return false;
 	}
 
-strstream query;
+stringstream query;
 query		<< quer
 		<< Host << "'"
 		<< ends;
 
 elog 		<< "ccException::delException> "
-		<< query.str()
+		<< query.str().c_str()
 		<< endl ;
 
-ExecStatusType status = SQLDb->Exec( query.str() ) ;
-delete[] query.str();
+ExecStatusType status = SQLDb->Exec( query.str().c_str() ) ;
 
 if( PGRES_COMMAND_OK != status )
 	{

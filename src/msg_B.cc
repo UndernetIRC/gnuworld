@@ -1,5 +1,7 @@
 /**
  * msg_B.cc
+ * Author: Daniel Karrels (dan@karrels.com)
+ * $Id: msg_B.cc,v 1.11 2002/05/23 17:43:17 dan_karrels Exp $
  */
 
 #include	<sys/types.h>
@@ -9,7 +11,7 @@
 #include	<string>
 #include	<vector>
 #include	<iostream>
-#include	<pair.h>
+#include	<utility>
 
 #include	<cassert>
 
@@ -30,11 +32,12 @@ const char Channel_h_rcsId[] = __CHANNEL_H ;
 const char ChannelUser_h_rcsId[] = __CHANNELUSER_H ;
 const char Network_h_rcsId[] = __NETWORK_H ;
 const char iClient_h_rcsId[] = __ICLIENT_H ;
-const char msg_B_cc_rcsId[] = "$Id: msg_B.cc,v 1.10 2002/05/15 22:14:10 dan_karrels Exp $" ;
+const char msg_B_cc_rcsId[] = "$Id: msg_B.cc,v 1.11 2002/05/23 17:43:17 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
 
+using std::pair ;
 using std::string ;
 using std::vector ;
 using std::endl ;

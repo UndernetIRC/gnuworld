@@ -1,19 +1,25 @@
-/* ELog.cc */
+/**
+ * ELog.cc
+ * Author: Daniel Karrels (dan@karrels.com)
+ * $Id: ELog.cc,v 1.5 2002/05/23 17:43:10 dan_karrels Exp $
+ */
 
 #include	<iostream>
 #include	<fstream>
+#include	<sstream>
 #include	<string>
 
 #include	"config.h"
 #include	"ELog.h"
 
 const char ELog_h_rcsId[] = __ELOG_H ;
-const char ELog_cc_rcsId[] = "$Id: ELog.cc,v 1.4 2001/07/29 22:44:06 dan_karrels Exp $" ;
+const char ELog_cc_rcsId[] = "$Id: ELog.cc,v 1.5 2002/05/23 17:43:10 dan_karrels Exp $" ;
 const char config_h_rcsId[] = __CONFIG_H ;
 
 namespace gnuworld
 {
 
+using std::stringstream ;
 using std::string ;
 using std::endl ;
 
@@ -147,12 +153,12 @@ if( outStream ) *outStream << var ;
 return *this ;
 }
 
-ELog& ELog::operator<<( strstream& s )
+ELog& ELog::operator<<( stringstream& s )
 {
 #ifdef EDEBUG
-  outFile<< s ;
+  outFile << s.str() ;
 #endif
-if( outStream ) *outStream << s ;
+if( outStream ) *outStream << s.str() ;
 return *this ;
 }
 

@@ -7,14 +7,14 @@
 
 #include	<string>
 #include	<cstdlib>
-#include        <iomanip.h>
+#include        <iomanip>
 #include	"Network.h"
 #include	"ccontrol.h"
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 #include	"Constants.h"
 
-const char CLEARCHANCommand_cc_rcsId[] = "$Id: CLEARCHANCommand.cc,v 1.16 2002/03/12 19:08:03 mrbean_ Exp $";
+const char CLEARCHANCommand_cc_rcsId[] = "$Id: CLEARCHANCommand.cc,v 1.17 2002/05/23 17:43:10 dan_karrels Exp $";
 
 namespace gnuworld
 {

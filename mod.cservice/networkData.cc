@@ -9,7 +9,7 @@
  *
  */
  
-#include	<strstream>
+#include	<sstream>
 #include	<string> 
 
 #include	<cstring> 
@@ -19,7 +19,7 @@
 #include	"networkData.h" 
 
 const char networkData_h_rcsId[] = __NETWORKDATA_H ;
-const char networkData_cc_rcsId[] = "$Id: networkData.cc,v 1.5 2001/03/14 22:49:14 gte Exp $" ;
+const char networkData_cc_rcsId[] = "$Id: networkData.cc,v 1.6 2002/05/23 17:43:13 dan_karrels Exp $" ;
 
 namespace gnuworld
 {

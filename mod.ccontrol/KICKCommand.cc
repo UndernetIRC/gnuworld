@@ -6,14 +6,14 @@
 
 #include	<string>
 #include	<cstdlib>
-#include        <iomanip.h>
+#include        <iomanip>
 #include	"Network.h"
 #include	"ccontrol.h"
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 #include	"Constants.h"
 
-const char KICKCommand_cc_rcsId[] = "$Id: KICKCommand.cc,v 1.9 2002/03/01 18:27:36 mrbean_ Exp $";
+const char KICKCommand_cc_rcsId[] = "$Id: KICKCommand.cc,v 1.10 2002/05/23 17:43:11 dan_karrels Exp $";
 
 namespace gnuworld
 {

@@ -5,19 +5,27 @@
  *
  */
 
+#include	<sstream>
 #include	<string>
+#include	<iostream>
+#include        <iomanip>
+
 #include	<cstdlib>
-#include        <iomanip.h>
 
 #include	"ccontrol.h"
 #include	"CControlCommands.h"
+#include	"iClient.h"
 #include	"StringTokenizer.h"
+#include	"ELog.h"
 
-const char LASTCOMCommand_cc_rcsId[] = "$Id: LASTCOMCommand.cc,v 1.10 2002/03/25 23:40:25 mrbean_ Exp $";
+const char LASTCOMCommand_cc_rcsId[] = "$Id: LASTCOMCommand.cc,v 1.11 2002/05/23 17:43:11 dan_karrels Exp $";
 
 namespace gnuworld
 {
 
+using std::endl ;
+using std::stringstream ;
+using std::ends ;
 using std::string ;
 
 namespace uworld
@@ -31,7 +39,7 @@ StringTokenizer st( Message ) ;
 #ifndef LOGTOHD
 unsigned int NumOfCom;
 unsigned int Days = 0;
-strstream theQuery;
+stringstream theQuery;
 
 if(!dbConnected)
         {
@@ -42,8 +50,7 @@ if(!dbConnected)
 if( st.size() == 1 )
 	{
 	NumOfCom = 20;
-	static const char* queryHeader
-        = "SELECT * FROM comlog ";
+	static const char* queryHeader = "SELECT * FROM comlog ";
 	theQuery 	<< queryHeader 
 			<< " ORDER BY ts DESC"
 			<< " LIMIT " << NumOfCom
@@ -84,11 +91,10 @@ else
 	}
 	
 elog	<< "LASTCOM> " 
-	<< theQuery.str() 
+	<< theQuery.str().c_str() 
 	<< endl;
 	
-ExecStatusType status = bot->SQLDb->Exec( theQuery.str() ) ;
-delete[] theQuery.str() ;
+ExecStatusType status = bot->SQLDb->Exec( theQuery.str().c_str() ) ;
 
 if( PGRES_TUPLES_OK != status )
 	{
@@ -117,5 +123,3 @@ return true;
 }
 }
 
-	
-									

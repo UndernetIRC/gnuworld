@@ -9,10 +9,12 @@
  *
  * Caveats: None.
  *
- * $Id: SEARCHCommand.cc,v 1.7 2002/04/28 16:02:26 gte Exp $
+ * $Id: SEARCHCommand.cc,v 1.8 2002/05/23 17:43:13 dan_karrels Exp $
  */
 
 #include	<string>
+#include	<sstream>
+#include	<iostream>
 
 #include	"StringTokenizer.h"
 #include	"ELog.h"
@@ -23,12 +25,15 @@
 #include	"Network.h"
 #include	<iostream>
 
-const char SEARCHCommand_cc_rcsId[] = "$Id: SEARCHCommand.cc,v 1.7 2002/04/28 16:02:26 gte Exp $" ;
+const char SEARCHCommand_cc_rcsId[] = "$Id: SEARCHCommand.cc,v 1.8 2002/05/23 17:43:13 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
 
 using std::string ;
+using std::endl ;
+using std::ends ;
+using std::stringstream ;
 
 static const char* queryHeader =    "SELECT channels.name,channels.keywords FROM channels ";
 static const char* queryCondition = "WHERE channels.keywords ~* ";
@@ -80,28 +85,26 @@ if (matchString.empty())
 
 size_t results = 0;
 
-strstream extraCond;
+stringstream extraCond;
 extraCond	<< "'"
 		<< escapeSQLChars(matchString)
 		<< "' "
 		<< ends;
 
-strstream theQuery;
+stringstream theQuery;
 theQuery	<< queryHeader
 		<< queryCondition
-		<< extraCond.str()
+		<< extraCond.str().c_str()
 		<< queryFooter
 		<< ends;
 
 #ifdef LOG_SQL
 	elog	<< "SEARCH::sqlQuery> "
-		<< theQuery.str()
+		<< theQuery.str().c_str()
 		<< endl;
 #endif
 
-ExecStatusType status = bot->SQLDb->Exec(theQuery.str());
-delete[] theQuery.str() ;
-delete[] extraCond.str() ;
+ExecStatusType status = bot->SQLDb->Exec(theQuery.str().c_str());
 
 if( PGRES_TUPLES_OK != status )
 	{

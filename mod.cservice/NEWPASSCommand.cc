@@ -1,7 +1,9 @@
 /* NEWPASSCommand.cc */
 
 #include	<string>
-#include	<iomanip.h>
+#include	<sstream>
+#include	<iostream>
+#include	<iomanip>
 
 #include	"md5hash.h"
 #include	"StringTokenizer.h"
@@ -11,10 +13,15 @@
 #include	"networkData.h"
 #include	"cservice_config.h"
 
-const char NEWPASSCommand_cc_rcsId[] = "$Id: NEWPASSCommand.cc,v 1.13 2002/03/10 19:50:14 gte Exp $" ;
+const char NEWPASSCommand_cc_rcsId[] = "$Id: NEWPASSCommand.cc,v 1.14 2002/05/23 17:43:13 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
+using std::string ;
+using std::endl ;
+using std::ends ;
+using std::stringstream ;
+
 const char validChars[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.$*_";
 
 bool NEWPASSCommand::Exec( iClient* theClient, const string& Message )
@@ -103,17 +110,17 @@ for( size_t i = 0 ; i < MD5_DIGEST_LENGTH ; ++i )
 	data[ i ] = digest[ i ] ;
 	}
 
-strstream output;
-output << hex;
+stringstream output;
+output << std::hex;
 output.fill('0');
 for( size_t ii = 0; ii < MD5_DIGEST_LENGTH; ii++ )
 	{
-	output << setw(2) << data[ii];
+	output << std::setw(2) << data[ii];
 	}
 output << ends;
 
 // Prepend the md5 hash to the salt
-string finalPassword = salt + output.str();
+string finalPassword = salt + output.str().c_str();
 tmpUser->setPassword(finalPassword);
 
 if( tmpUser->commit() )
@@ -130,7 +137,6 @@ else
 		"NEWPASS: Unable to commit to database" ) ;
 	}
 
-delete[] output.str() ;
 return true;
 
 #endif

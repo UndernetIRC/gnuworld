@@ -1,9 +1,11 @@
-/* client.cc
+/*
+ * client.cc
+ * $Id: client.cc,v 1.45 2002/05/23 17:43:15 dan_karrels Exp $
  */
 
 #include	<new>
 #include	<string>
-#include	<strstream>
+#include	<sstream>
 #include	<iostream>
 
 #include	<cstdio>
@@ -28,7 +30,7 @@
 #include	"events.h"
 
 const char xClient_h_rcsId[] = __CLIENT_H ;
-const char xClient_cc_rcsId[] = "$Id: client.cc,v 1.44 2002/05/15 22:14:10 dan_karrels Exp $" ;
+const char xClient_cc_rcsId[] = "$Id: client.cc,v 1.45 2002/05/23 17:43:15 dan_karrels Exp $" ;
 const char config_h_rcsId[] = __CONFIG_H ;
 const char misc_h_rcsId[] = __MISC_H ;
 const char Numeric_h_rcsId[] = __NUMERIC_H ;
@@ -44,7 +46,7 @@ namespace gnuworld
 {
 
 using std::string ;
-using std::strstream ;
+using std::stringstream ;
 using std::ends ;
 using std::endl ;
 
@@ -128,14 +130,13 @@ if( !Connected )
 	return -1 ;
 	}
 
-strstream s ;
+stringstream s ;
 s	<< getCharYYXXX()
 	<< " Q :"
 	<< Message
 	<< ends ;
 
 MyUplink->Write( s ) ;
-delete[] s.str() ;
 
 Connected = false ;
 return OnQuit() ;
@@ -194,7 +195,7 @@ for( ; ptr != end ; ++ptr )
 // Output to the network if we are connected
 if( (MyUplink != NULL) && MyUplink->isConnected() && !Value.empty() )
 	{
-	strstream s ;
+	stringstream s ;
 	s	<< getCharYYXXX()
 		<< " M "
 		<< getCharYYXXX()
@@ -202,10 +203,7 @@ if( (MyUplink != NULL) && MyUplink->isConnected() && !Value.empty() )
 		<< Value
 		<< ends ;
 
-	int retMe = MyUplink->Write( s ) ;
-	delete[] s.str() ;
-
-	return retMe ;
+	return MyUplink->Write( s ) ;
 	}
 
 return( 1 ) ;
@@ -726,14 +724,13 @@ for( xServer::opVectorType::const_iterator ptr = opVector.begin(),
 	if( (MAX_CHAN_MODES == modeString.size()) ||
 		((ptr + 1) == end) )
 		{
-		strstream s ;
+		stringstream s ;
 		s	<< getCharYYXXX() << " M "
 			<< theChan->getName() << ' '
 			<< "+" << modeString << ' ' << args
 			<< ends ;
 
 		Write( s ) ;
-		delete[] s.str() ;
 
 		modeString.erase( modeString.begin(), modeString.end() ) ;
 		args.erase( args.begin(), args.end() ) ;
@@ -836,14 +833,13 @@ for( xServer::voiceVectorType::const_iterator ptr = voiceVector.begin(),
 	if( (MAX_CHAN_MODES == modeString.size()) ||
 		((ptr + 1) == end) )
 		{
-		strstream s ;
+		stringstream s ;
 		s	<< getCharYYXXX() << " M "
 			<< theChan->getName() << ' '
 			<< "+" << modeString << ' ' << args
 			<< ends ;
 
 		Write( s ) ;
-		delete[] s.str() ;
 
 		modeString.erase( modeString.begin(), modeString.end() ) ;
 		args.erase( args.begin(), args.end() ) ;
@@ -1095,14 +1091,13 @@ for( xServer::opVectorType::const_iterator ptr = opVector.begin(),
 	if( (MAX_CHAN_MODES == modeString.size()) ||
 		((ptr + 1) == end) )
 		{
-		strstream s ;
+		stringstream s ;
 		s	<< getCharYYXXX() << " M "
 			<< theChan->getName() << ' '
 			<< "-" << modeString << ' ' << args
 			<< ends ;
 
 		Write( s ) ;
-		delete[] s.str() ;
 
 		modeString.erase( modeString.begin(), modeString.end() ) ;
 		args.erase( args.begin(), args.end() ) ;
@@ -1277,14 +1272,13 @@ for( xServer::voiceVectorType::const_iterator ptr = voiceVector.begin(),
 	if( (MAX_CHAN_MODES == modeString.size()) ||
 		((ptr + 1) == end) )
 		{
-		strstream s ;
+		stringstream s ;
 		s	<< getCharYYXXX() << " M "
 			<< theChan->getName() << ' '
 			<< "-" << modeString << ' ' << args
 			<< ends ;
 
 		Write( s ) ;
-		delete[] s.str() ;
 
 		modeString.erase( modeString.begin(), modeString.end() ) ;
 		args.erase( args.begin(), args.end() ) ;
@@ -1512,14 +1506,13 @@ for( xServer::banVectorType::const_iterator ptr = banVector.begin(),
 	if( ((MAX_CHAN_MODES + 1) == modeString.size()) ||
 		((ptr + 1) == end) )
 		{
-		strstream s ;
+		stringstream s ;
 		s	<< getCharYYXXX() << " M "
 			<< theChan->getName() << ' '
 			<< modeString << ' ' << args
 			<< ends ;
 
 		Write( s ) ;
-		delete[] s.str() ;
 
 		modeString.erase( modeString.begin(), modeString.end() ) ;
 		args.erase( args.begin(), args.end() ) ;
@@ -1658,14 +1651,13 @@ else
 	// The bot has ops
 	}
 
-strstream s ;
+stringstream s ;
 s	<< getCharYYXXX() << " K "
 	<< theChan->getName() << ' '
 	<< theClient->getCharYYXXX() << " :"
 	<< reason << ends ;
 
 Write( s ) ;
-delete[] s.str() ;
 
 // TODO: OnPartChannel()
 if( !OnChannel )
@@ -1732,15 +1724,13 @@ for( vector< iClient* >::const_iterator ptr = theClients.begin() ;
 		continue ;
 		}
 
-	strstream s ;
+	stringstream s ;
 	s	<< getCharYYXXX() << " K "
 		<< theChan->getName() << ' '
 		<< (*ptr)->getCharYYXXX() << " :"
 		<< reason << ends ;
 
 	Write( s ) ;
-	delete[] s.str() ;
-
 	}
 
 // TODO: OnPartChannel()

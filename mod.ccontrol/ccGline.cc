@@ -3,10 +3,10 @@
  * 
  * Gline class
  * 
- * $Id: ccGline.cc,v 1.12 2002/03/15 06:53:48 mrbean_ Exp $
+ * $Id: ccGline.cc,v 1.13 2002/05/23 17:43:11 dan_karrels Exp $
  */
  
-#include	<strstream>
+#include	<sstream>
 #include	<string> 
 
 #include	<ctime>
@@ -20,14 +20,14 @@
 #include	"ccontrol.h"
 
 const char ccGline_h_rcsId[] = __CCGLINE_H ;
-const char ccGline_cc_rcsId[] = "$Id: ccGline.cc,v 1.12 2002/03/15 06:53:48 mrbean_ Exp $" ;
+const char ccGline_cc_rcsId[] = "$Id: ccGline.cc,v 1.13 2002/05/23 17:43:11 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
 
 using std::string ; 
 using std::endl ; 
-using std::strstream ;
+using std::stringstream ;
 using std::ends ;
 
 namespace uworld
@@ -61,14 +61,13 @@ if(!dbConnected)
 	{
 	return false;
 	}
-strstream delQuery;
+stringstream delQuery;
 delQuery	<< Del
 		<< string_lower(Host) << "'"
 		<< ends;
 
 
-ExecStatusType status = SQLDb->Exec( delQuery.str() ) ;
-delete[] delQuery.str() ;
+ExecStatusType status = SQLDb->Exec( delQuery.str().c_str() ) ;
 
 if( PGRES_COMMAND_OK != status ) 
 	{
@@ -81,7 +80,7 @@ if( PGRES_COMMAND_OK != status )
 //Now insert the new one
 static const char *Main = "INSERT into Glines (Host,AddedBy,AddedOn,ExpiresAt,Reason) VALUES ('";
 
-strstream theQuery;
+stringstream theQuery;
 theQuery	<< Main
 		<< Host << "','"
 		<< AddedBy << "',"
@@ -91,11 +90,10 @@ theQuery	<< Main
 		<< ends;
 
 elog	<< "Gline::Insert::sqlQuery> "
-	<< theQuery.str()
+	<< theQuery.str().c_str()
 	<< endl; 
 
-status = SQLDb->Exec( theQuery.str() ) ;
-delete[] theQuery.str() ;
+status = SQLDb->Exec( theQuery.str().c_str() ) ;
 
 if( PGRES_COMMAND_OK == status ) 
 	{
@@ -120,7 +118,7 @@ if(!dbConnected)
 	return false;
 	}
 
-strstream theQuery;
+stringstream theQuery;
 theQuery	<< Main
 		<< Id
 		<< "', Host = '"
@@ -137,11 +135,10 @@ theQuery	<< Main
 		<<  ends;
 
 elog	<< "ccontrol::Gline::Update> "
-	<< theQuery.str()
+	<< theQuery.str().c_str()
 	<< endl; 
 
-ExecStatusType status = SQLDb->Exec( theQuery.str() ) ;
-delete[] theQuery.str() ;
+ExecStatusType status = SQLDb->Exec( theQuery.str().c_str() ) ;
 
 if( PGRES_COMMAND_OK == status ) 
 	{
@@ -165,17 +162,16 @@ if(!dbConnected)
 	return false;
 	}
 
-strstream theQuery;
+stringstream theQuery;
 theQuery	<< Main
 		<< GlineId
 		<< ends;
 
 elog	<< "ccontrol::glineload> "
-	<< theQuery.str()
+	<< theQuery.str().c_str()
 	<< endl; 
 
-ExecStatusType status = SQLDb->Exec( theQuery.str() ) ;
-delete[] theQuery.str() ;
+ExecStatusType status = SQLDb->Exec( theQuery.str().c_str() ) ;
 
 if( PGRES_TUPLES_OK != status )
 	{
@@ -207,17 +203,16 @@ if(!dbConnected)
 	return false;
 	}
 
-strstream theQuery;
+stringstream theQuery;
 theQuery	<< Main
 		<< HostName.c_str()
 		<< "'" << ends;
 
 elog	<< "ccontrol::loadData> "
-	<< theQuery.str()
+	<< theQuery.str().c_str()
 	<< endl; 
 
-ExecStatusType status = SQLDb->Exec( theQuery.str() ) ;
-delete[] theQuery.str() ;
+ExecStatusType status = SQLDb->Exec( theQuery.str().c_str() ) ;
 
 if( PGRES_TUPLES_OK != status )
 	{
@@ -249,17 +244,16 @@ if(!dbConnected)
 	return false;
 	}
 
-strstream theQuery;
+stringstream theQuery;
 theQuery	<< Main
 		<< Id
 		<< ends;
 
 elog	<< "ccontrol::glineDelete> "
-	<< theQuery.str()
+	<< theQuery.str().c_str()
 	<< endl; 
 
-ExecStatusType status = SQLDb->Exec( theQuery.str() ) ;
-delete[] theQuery.str() ;
+ExecStatusType status = SQLDb->Exec( theQuery.str().c_str() ) ;
 
 if( PGRES_COMMAND_OK == status ) 
 	{

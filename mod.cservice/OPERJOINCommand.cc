@@ -8,11 +8,12 @@
  *
  * Caveats: None
  *
- * $Id: OPERJOINCommand.cc,v 1.11 2001/09/05 03:47:56 gte Exp $
+ * $Id: OPERJOINCommand.cc,v 1.12 2002/05/23 17:43:13 dan_karrels Exp $
  */
 
-
 #include	<string>
+#include	<sstream>
+#include	<iostream>
 
 #include	"StringTokenizer.h"
 #include	"ELog.h"
@@ -21,11 +22,14 @@
 #include	"responses.h"
 #include	"Network.h"
 
-const char OPERJOINCommand_cc_rcsId[] = "$Id: OPERJOINCommand.cc,v 1.11 2001/09/05 03:47:56 gte Exp $" ;
+const char OPERJOINCommand_cc_rcsId[] = "$Id: OPERJOINCommand.cc,v 1.12 2002/05/23 17:43:13 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
+using std::endl ;
+using std::ends ;
 using std::string ;
+using std::stringstream ;
 
 bool OPERJOINCommand::Exec( iClient* theClient, const string& Message )
 {
@@ -77,7 +81,7 @@ if (theChan->getInChan())
 
 // Tell the world.
 
-strstream s;
+stringstream s;
 s	<< server->getCharYY()
 	<< " WA :"
 	<< "An IRC Operator is asking me to join channel "
@@ -85,7 +89,6 @@ s	<< server->getCharYY()
 	<< ends;
 
 bot->Write(s);
-delete[] s.str();
 
 bot->logAdminMessage("%s is asking me to join channel %s",
 		theClient->getNickUserHost().c_str(),

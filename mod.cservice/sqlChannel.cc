@@ -9,11 +9,12 @@
  * 30/12/2000: Moved static SQL data to constants.h --Gte
  * Set loadData up to take data from rows other than 0.
  *
- * $Id: sqlChannel.cc,v 1.36 2002/02/01 21:13:09 gte Exp $
+ * $Id: sqlChannel.cc,v 1.37 2002/05/23 17:43:13 dan_karrels Exp $
  */
 
-#include	<strstream>
+#include	<sstream>
 #include	<string>
+#include	<iostream>
 
 #include	<cstring>
 
@@ -25,14 +26,14 @@
 #include	"cservice_config.h"
 
 const char sqlChannel_h_rcsId[] = __SQLCHANNEL_H ;
-const char sqlChannel_cc_rcsId[] = "$Id: sqlChannel.cc,v 1.36 2002/02/01 21:13:09 gte Exp $" ;
+const char sqlChannel_cc_rcsId[] = "$Id: sqlChannel.cc,v 1.37 2002/05/23 17:43:13 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
 
 using std::string ;
 using std::endl ;
-using std::strstream ;
+using std::stringstream ;
 using std::ends ;
 
 const sqlChannel::flagType sqlChannel::F_NOPURGE  = 0x00000001 ;
@@ -109,7 +110,7 @@ bool sqlChannel::loadData(const string& channelName)
 		<< endl;
 #endif
 
-strstream queryString ;
+stringstream queryString ;
 queryString	<< "SELECT "
 		<< sql::channel_fields
 		<< " FROM channels WHERE registered_ts <> 0"
@@ -120,13 +121,11 @@ queryString	<< "SELECT "
 
 #ifdef LOG_SQL
 	elog	<< "sqlChannel::loadData> "
-		<< queryString.str()
+		<< queryString.str().c_str()
 		<< endl;
 #endif
 
-ExecStatusType status = SQLDb->Exec(queryString.str()) ;
-
-delete[] queryString.str() ;
+ExecStatusType status = SQLDb->Exec(queryString.str().c_str()) ;
 
 if( PGRES_TUPLES_OK == status )
 	{
@@ -159,7 +158,7 @@ bool sqlChannel::loadData(int channelID)
 		<< endl;
 #endif
 
-strstream queryString;
+stringstream queryString;
 queryString	<< "SELECT "
 		<< sql::channel_fields
 		<< " FROM channels WHERE registered_ts <> 0 AND id = "
@@ -168,12 +167,11 @@ queryString	<< "SELECT "
 
 #ifdef LOG_SQL
 	elog	<< "sqlChannel::loadData> "
-		<< queryString.str()
+		<< queryString.str().c_str()
 		<< endl;
 #endif
 
-ExecStatusType status = SQLDb->Exec(queryString.str()) ;
-delete[] queryString.str() ;
+ExecStatusType status = SQLDb->Exec(queryString.str().c_str()) ;
 
 if( PGRES_TUPLES_OK == status )
 	{
@@ -231,7 +229,7 @@ bool sqlChannel::commit()
 static const char* queryHeader =    "UPDATE channels ";
 static const char* queryCondition = "WHERE id = ";
 
-strstream queryString;
+stringstream queryString;
 queryString	<< queryHeader
 		<< "SET flags = " << flags << ", "
 		<< "mass_deop_pro = " << mass_deop_pro << ", "
@@ -254,12 +252,11 @@ queryString	<< queryHeader
 
 #ifdef LOG_SQL
 	elog	<< "sqlChannel::commit> "
-		<< queryString.str()
+		<< queryString.str().c_str()
 		<< endl;
 #endif
 
-ExecStatusType status = SQLDb->Exec(queryString.str()) ;
-delete[] queryString.str() ;
+ExecStatusType status = SQLDb->Exec(queryString.str().c_str()) ;
 
 if( PGRES_COMMAND_OK != status )
 	{
@@ -276,7 +273,7 @@ bool sqlChannel::insertRecord()
 {
 static const char* queryHeader = "INSERT INTO channels (name, flags, registered_ts, channel_ts, channel_mode, last_updated) VALUES (";
 
-strstream queryString;
+stringstream queryString;
 queryString	<< queryHeader
 			<< "'" << escapeSQLChars(name) << "', "
 			<< flags << ", "
@@ -288,12 +285,11 @@ queryString	<< queryHeader
 
 #ifdef LOG_SQL
 	elog	<< "sqlChannel::insertRecord> "
-			<< queryString.str()
+			<< queryString.str().c_str()
 			<< endl;
 #endif
 
-ExecStatusType status = SQLDb->Exec(queryString.str()) ;
-delete[] queryString.str() ;
+ExecStatusType status = SQLDb->Exec(queryString.str().c_str()) ;
 
 if( PGRES_COMMAND_OK != status )
 	{

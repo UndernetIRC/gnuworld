@@ -6,7 +6,7 @@
 #include	<iostream>
 #include	<string>
 #include	<list>
-#include	<hash_map.h>
+#include	<ext/hash_map>
 #include	<algorithm>
 
 #include	<cassert>
@@ -22,9 +22,10 @@
 #include	"match.h"
 #include	"StringTokenizer.h"
 #include	"ip.h"
+#include	"defs.h"
 
 const char xNetwork_h_rcsId[] = __NETWORK_H ;
-const char xNetwork_cc_rcsId[] = "$Id: Network.cc,v 1.39 2002/05/19 23:12:02 dan_karrels Exp $" ;
+const char xNetwork_cc_rcsId[] = "$Id: Network.cc,v 1.40 2002/05/23 17:43:15 dan_karrels Exp $" ;
 const char ELog_h_rcsId[] = __ELOG_H ;
 const char iClient_h_rcsId[] = __ICLIENT_H ;
 const char Channel_h_rcsId[] = __CHANNEL_H ;
@@ -40,8 +41,8 @@ namespace gnuworld
 using std::string ;
 using std::endl ;
 using std::list ;
-using std::hash_map ;
-using std::hash ;
+using HASHMAPNS::hash_map ;
+using HASHMAPNS::hash ;
 using std::unary_function ;
 
 xNetwork::xNetwork()

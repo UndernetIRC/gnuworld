@@ -3,19 +3,22 @@
  */
 
 #ifndef __CCONTROL_H
-#define __CCONTROL_H "$Id: ccontrol.h,v 1.70 2002/05/15 22:14:10 dan_karrels Exp $"
+#define __CCONTROL_H "$Id: ccontrol.h,v 1.71 2002/05/23 17:43:11 dan_karrels Exp $"
 
 //Undef this if you want to log to the database
 #define LOGTOHD 
 
+#include	<pthread.h>
+
 #include	<string>
 #include	<vector>
 #include	<map>
-#include	<hash_map>
+#include	<ext/hash_map>
 #include        <iomanip>
 
 #include	<cstdio>
-#include	<stdarg.h>
+#include	<cstdarg>
+
 #include	"client.h"
 #include	"iClient.h"
 #include	"server.h"
@@ -32,7 +35,7 @@
 #include        "server.h"
 #include	"CommandsDec.h"
 #include	"ccGate.h"
-#include	<pthread.h>
+#include	"defs.h"
 
 #ifdef LOGTOHD
     #include "ccLog.h"
@@ -40,15 +43,13 @@
 
 namespace gnuworld
 {
- 
+
+using HASHMAPNS::hash_map ; 
 using std::string ;
 using std::vector ;
 
 namespace uworld
 {
-
-
-
 
 using gnuworld::xServer;
 using namespace std;

@@ -11,10 +11,12 @@
  *
  * Caveats: None
  *
- * $Id: ADDUSERCommand.cc,v 1.21 2002/04/28 16:02:26 gte Exp $
+ * $Id: ADDUSERCommand.cc,v 1.22 2002/05/23 17:43:12 dan_karrels Exp $
  */
 
 #include	<string>
+#include	<sstream>
+#include	<iostream>
 
 #include	"StringTokenizer.h"
 #include	"ELog.h"
@@ -24,12 +26,15 @@
 #include	"responses.h"
 #include	"cservice_config.h"
 
-const char ADDUSERCommand_cc_rcsId[] = "$Id: ADDUSERCommand.cc,v 1.21 2002/04/28 16:02:26 gte Exp $" ;
+const char ADDUSERCommand_cc_rcsId[] = "$Id: ADDUSERCommand.cc,v 1.22 2002/05/23 17:43:12 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
 
+using std::endl ;
+using std::ends ;
 using std::string ;
+using std::stringstream ;
 
 static const char* queryHeader = "INSERT INTO levels (channel_id, user_id, access, flags, added, added_by, last_modif, last_modif_by, last_updated) ";
 
@@ -157,7 +162,7 @@ if (theChan->getUserFlags() == 2) targetFlags = sqlLevel::F_AUTOVOICE;
 
 string lastModifMask = "(" + theUser->getUserName() + ") " + theClient->getNickUserHost();
 
-strstream theQuery;
+stringstream theQuery;
 theQuery	<< queryHeader
 		<< "VALUES ("
 		<< theChan->getID() << ","
@@ -174,12 +179,11 @@ theQuery	<< queryHeader
 
 #ifdef LOG_SQL
 	elog	<< "ADDUSER::sqlQuery> "
-		<< theQuery.str()
+		<< theQuery.str().c_str()
 		<< endl;
 #endif
 
-ExecStatusType status = bot->SQLDb->Exec(theQuery.str()) ;
-delete[] theQuery.str() ;
+ExecStatusType status = bot->SQLDb->Exec(theQuery.str().c_str()) ;
 
 if( PGRES_COMMAND_OK == status )
 	{

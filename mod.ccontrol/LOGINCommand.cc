@@ -5,7 +5,11 @@
  */
 
 #include	<string>
+#include	<sstream>
+#include	<iostream>
+
 #include	<cstdlib>
+
 #include	"Network.h"
 #include	"ccontrol.h"
 #include	"CControlCommands.h"
@@ -14,12 +18,15 @@
 #include        "ccUser.h"
 #include	"ip.h"
 
-const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.23 2002/02/12 19:49:21 mrbean_ Exp $";
+const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.24 2002/05/23 17:43:11 dan_karrels Exp $";
 
 namespace gnuworld
 {
 
 using std::string ;
+using std::endl ;
+using std::ends ;
+using std::stringstream ;
 
 namespace uworld
 {
@@ -85,7 +92,7 @@ else
 
 	md5	hash; // MD5 hash algorithm object.
 	md5Digest digest; // MD5Digest algorithm object.
-	strstream output;
+	stringstream output;
 	string salt = theUser->getPassword().substr(0, 8);
 	string md5Part = theUser->getPassword().substr(8);
 	string guess = salt + st.assemble(2);
@@ -109,7 +116,7 @@ else
 		}
 	output << ends;
 
-	if (md5Part != output.str()) // If the MD5 hash's don't match..
+	if (md5Part != output.str().c_str()) // If the MD5 hash's don't match..
 		{
 		bot->MsgChanLog("[FAILED LOGIN] %s - Bad Password\n",theClient->getNickUserHost().c_str());
 		bot->Notice(theClient, "FALSE LOGIN, DENIED");

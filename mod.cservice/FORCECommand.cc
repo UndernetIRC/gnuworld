@@ -1,6 +1,7 @@
 /* FORCECommand.cc */
 
 #include	<string>
+#include	<utility>
 
 #include	"StringTokenizer.h"
 #include	"ELog.h"
@@ -8,7 +9,7 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char FORCECommand_cc_rcsId[] = "$Id: FORCECommand.cc,v 1.12 2001/09/05 03:47:56 gte Exp $" ;
+const char FORCECommand_cc_rcsId[] = "$Id: FORCECommand.cc,v 1.13 2002/05/23 17:43:12 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -77,7 +78,7 @@ bool FORCECommand::Exec( iClient* theClient, const string& Message )
 
 	theChan->forceMap.insert(sqlChannel::forceMapType::value_type(
 		theUser->getID(),
-		make_pair(admLevel, theUser->getUserName())
+		std::make_pair(admLevel, theUser->getUserName())
 	));
 
 	bot->logAdminMessage("%s (%s) is getting access on %s",

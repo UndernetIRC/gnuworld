@@ -1,9 +1,9 @@
 /* ELog.h */
 
 #ifndef __ELOG_H
-#define __ELOG_H "$Id: ELog.h,v 1.5 2001/08/26 21:13:10 dan_karrels Exp $"
+#define __ELOG_H "$Id: ELog.h,v 1.6 2002/05/23 17:43:10 dan_karrels Exp $"
 
-#include	<strstream>
+#include	<sstream>
 #include	<iostream>
 #include	<fstream>
 #include	<string>
@@ -13,7 +13,7 @@
 namespace gnuworld
 {
 
-using std::strstream ;
+using std::stringstream ;
 using std::ofstream ;
 using std::ostream ;
 using std::string ;
@@ -116,7 +116,7 @@ public:
 	ELog& operator<<( const unsigned long int& ) ;
 	ELog& operator<<( const short int& ) ;
 	ELog& operator<<( const unsigned short int& ) ;
-	ELog& operator<<( strstream& s ) ;
+	ELog& operator<<( stringstream& s ) ;
 
 } ;
 

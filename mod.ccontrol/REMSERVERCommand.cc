@@ -7,18 +7,24 @@
 
 #include	<string>
 #include	<cstdlib>
-#include        <iomanip.h>
+#include        <iomanip>
+#include	<sstream>
+#include	<iostream>
+
 #include	"ccontrol.h"
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 #include	"Network.h"
 #include	"Constants.h"
 
-const char REMSERVERCommand_cc_rcsId[] = "$Id: REMSERVERCommand.cc,v 1.8 2002/03/01 18:27:36 mrbean_ Exp $";
+const char REMSERVERCommand_cc_rcsId[] = "$Id: REMSERVERCommand.cc,v 1.9 2002/05/23 17:43:11 dan_karrels Exp $";
 
 namespace gnuworld
 {
 
+using std::endl ;
+using std::ends ;
+using std::stringstream ;
 using std::string ;
 
 namespace uworld
@@ -56,16 +62,15 @@ if(!tmpServer)
 
 bot->MsgChanLog("REMSERVER %s\n",st.assemble(1).c_str());
 
-strstream theQuery;  
+stringstream theQuery;  
 theQuery        << User::Query
                 << " Where lower(server) = '"
  		<< string_lower(tmpServer->getName()) << "'"
 		<< ends;
 
 
-elog << theQuery.str() << endl;
-ExecStatusType status = bot->SQLDb->Exec( theQuery.str() ) ;
-delete[] theQuery.str() ;
+elog << theQuery.str().c_str() << endl;
+ExecStatusType status = bot->SQLDb->Exec( theQuery.str().c_str() ) ;
         
 if(PGRES_TUPLES_OK != status)
         {

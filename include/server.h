@@ -17,14 +17,14 @@
  */
 
 #ifndef __SERVER_H
-#define __SERVER_H "$Id: server.h,v 1.59 2002/05/15 22:14:10 dan_karrels Exp $"
+#define __SERVER_H "$Id: server.h,v 1.60 2002/05/23 17:43:10 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
 #include	<list>
-#include	<strstream>
+#include	<sstream>
 #include	<map>
-#include	<hash_map.h>
+#include	<ext/hash_map>
 #include	<queue>
 #include	<algorithm>
 
@@ -43,6 +43,7 @@
 #include	"moduleLoader.h"
 #include	"ELog.h"
 #include	"TimerHandler.h"
+#include	"defs.h"
 
 namespace gnuworld
 {
@@ -50,8 +51,8 @@ namespace gnuworld
 using std::string ;
 using std::list ;
 using std::vector ;
-using std::strstream ;
-using std::hash_map ;
+using std::stringstream ;
+using HASHMAPNS::hash_map ;
 using std::priority_queue ;
 using std::map ;
 
@@ -276,18 +277,18 @@ public:
 	virtual size_t WriteDuringBurst( const char*, ... ) ;
 
 	/**
-	 * Append a std::strstream to the output buffer.
+	 * Append a std::stringstream to the output buffer.
 	 * The second argument determines if data should be written
 	 * during burst time.
 	 */
-	virtual size_t Write( strstream& ) ;
+	virtual size_t Write( const stringstream& ) ;
 
 	/**
 	 * This method is similar to the above Write(), except
 	 * that the data will be written to the normal output
 	 * buffer even during burst time.
 	 */
-	virtual size_t WriteDuringBurst( strstream& ) ;
+	virtual size_t WriteDuringBurst( const stringstream& ) ;
 
 	/**
 	 * Write any bufferred data to the network.

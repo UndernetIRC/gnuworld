@@ -1,7 +1,9 @@
 /* LOGINCommand.cc */
 
 #include	<string>
-#include	<iomanip.h>
+#include	<sstream>
+#include	<iostream>
+#include	<iomanip>
 
 #include	"StringTokenizer.h"
 #include	"ELog.h"
@@ -11,7 +13,7 @@
 #include	"cservice_config.h"
 #include	"Network.h"
 
-const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.45 2002/04/09 15:46:22 gte Exp $" ;
+const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.46 2002/05/23 17:43:12 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -21,6 +23,10 @@ struct autoOpData {
 	unsigned int suspend_expires;
 } aOp;
 
+using std::string ;
+using std::endl ;
+using std::ends ;
+using std::stringstream ;
 using namespace gnuworld;
 
 bool LOGINCommand::Exec( iClient* theClient, const string& Message )
@@ -183,14 +189,13 @@ if(!bot->getAdminAccessLevel(theUser))
  */
 
 #if 1
-strstream ac;
+stringstream ac;
 ac	<< bot->getCharYY()
 	<< " AC "
 	<< theClient->getCharYYXXX()
 	<< " " << theUser->getUserName()
 	<< ends;
 bot->Write( ac );
-delete[] ac.str();
 theClient->setAccount(theUser->getUserName());
 #endif
 
@@ -212,7 +217,7 @@ if (theUser->getFlag(sqlUser::F_GLOBAL_SUSPEND))
  * AUTOP set, and isn't already op'd on - do the deed.
  */
 
-strstream theQuery;
+stringstream theQuery;
 theQuery	<< "SELECT channel_id,flags,suspend_expires FROM "
 			<< "levels WHERE user_id = "
 			<< theUser->getID()
@@ -220,12 +225,11 @@ theQuery	<< "SELECT channel_id,flags,suspend_expires FROM "
 
 #ifdef LOG_SQL
 	elog	<< "LOGIN::sqlQuery> "
-		<< theQuery.str()
+		<< theQuery.str().c_str()
 		<< endl;
 #endif
 
-ExecStatusType status = bot->SQLDb->Exec(theQuery.str()) ;
-delete[] theQuery.str() ;
+ExecStatusType status = bot->SQLDb->Exec(theQuery.str().c_str()) ;
 
 if( PGRES_TUPLES_OK != status )
 	{
@@ -364,7 +368,7 @@ for (autoOpVectorType::const_iterator resultPtr = autoOpVector.begin();
  *  a supporter for a channel.
  */
 
-strstream supporterQuery;
+stringstream supporterQuery;
 supporterQuery	<< "SELECT channels.name FROM"
 			<< " supporters,channels,pending WHERE"
 			<< " supporters.channel_id = channels.id"
@@ -378,12 +382,11 @@ supporterQuery	<< "SELECT channels.name FROM"
 
 #ifdef LOG_SQL
 	elog	<< "LOGIN::sqlQuery> "
-		<< supporterQuery.str()
+		<< supporterQuery.str().c_str()
 		<< endl;
 #endif
 
-status = bot->SQLDb->Exec(supporterQuery.str()) ;
-delete[] supporterQuery.str() ;
+status = bot->SQLDb->Exec(supporterQuery.str().c_str()) ;
 
 if( PGRES_TUPLES_OK != status )
 	{
@@ -411,7 +414,7 @@ for(int i = 0; i < bot->SQLDb->Tuples(); i++)
 
 if(!theUser->getFlag(sqlUser::F_NONOTES))
 	{
-	strstream noteQuery;
+	stringstream noteQuery;
 	noteQuery	<< "SELECT message_id FROM notes "
 				<< "WHERE user_id = "
 				<< theUser->getID()
@@ -419,12 +422,11 @@ if(!theUser->getFlag(sqlUser::F_NONOTES))
 
 #ifdef LOG_SQL
 	elog	<< "LOGIN::sqlQuery> "
-		<< noteQuery.str()
+		<< noteQuery.str().c_str()
 		<< endl;
 #endif
 
-	status = bot->SQLDb->Exec(noteQuery.str()) ;
-	delete[] noteQuery.str() ;
+	status = bot->SQLDb->Exec(noteQuery.str().c_str()) ;
 
 	unsigned int count = bot->SQLDb->Tuples();
 	if(count) bot->Notice(theClient, "You have %i note(s). To read them type /msg %s notes read all",

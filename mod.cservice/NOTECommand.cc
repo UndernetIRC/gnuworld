@@ -4,17 +4,24 @@
  */
 
 #include	<string>
+#include	<sstream>
+#include	<iostream>
+
 #include	"StringTokenizer.h"
 #include	"ELog.h"
 #include	"Network.h"
 #include	"cservice.h"
 #include	"cservice_config.h"
 
-const char NOTECommand_cc_rcsId[] = "$Id: NOTECommand.cc,v 1.5 2002/04/03 19:51:51 gte Exp $" ;
+const char NOTECommand_cc_rcsId[] = "$Id: NOTECommand.cc,v 1.6 2002/05/23 17:43:13 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
+
+using std::endl ;
+using std::ends ;
 using std::string ;
+using std::stringstream ;
 
 bool NOTECommand::Exec( iClient* theClient, const string& Message )
 {
@@ -99,7 +106,7 @@ if (string_lower(st[1]) == "send")
 
 	static const char* queryHeader = "INSERT INTO notes (user_id,from_user_id,message,last_updated) VALUES (";
 
-	strstream queryString;
+	stringstream queryString;
 	queryString	<< queryHeader
 				<< targetUser->getID() << ", "
 				<< theUser->getID() << ", '"
@@ -109,12 +116,11 @@ if (string_lower(st[1]) == "send")
 
 	#ifdef LOG_SQL
 		elog	<< "NOTECommand::Insert Note> "
-				<< queryString.str()
+				<< queryString.str().c_str()
 				<< endl;
 	#endif
 
-	ExecStatusType status = bot->SQLDb->Exec(queryString.str()) ;
-	delete[] queryString.str() ;
+	ExecStatusType status = bot->SQLDb->Exec(queryString.str().c_str()) ;
 
 	if( PGRES_COMMAND_OK != status )
 		{
@@ -146,7 +152,7 @@ if (string_lower(st[1]) == "read")
 	/*
 	 * Perform a query to list all notes belonging to this user.
 	 */
-	strstream allNotesQuery;
+	stringstream allNotesQuery;
 	allNotesQuery	<< "SELECT users.user_name, notes.message, notes.last_updated, message_id "
 					<< "FROM notes,users "
 					<< "WHERE notes.from_user_id = users.id "
@@ -155,8 +161,7 @@ if (string_lower(st[1]) == "read")
 					<< " ORDER BY notes.last_updated ASC"
 					<< ends;
 
-	ExecStatusType status = bot->SQLDb->Exec( allNotesQuery.str() ) ;
-	delete[] allNotesQuery.str() ;
+	ExecStatusType status = bot->SQLDb->Exec( allNotesQuery.str().c_str() ) ;
 
 	if( PGRES_TUPLES_OK != status )
 		{
@@ -202,19 +207,18 @@ if (string_lower(st[1]) == "erase")
 {
 	if(string_lower(st[2]) == "all")
 		{
-		strstream queryString;
+		stringstream queryString;
 		queryString	<< "DELETE FROM notes where user_id = "
 					<< theUser->getID()
 					<< ends;
 
 		#ifdef LOG_SQL
 			elog	<< "NOTECommand::Delete Notes> "
-					<< queryString.str()
+					<< queryString.str().c_str()
 					<< endl;
 		#endif
 
-		ExecStatusType status = bot->SQLDb->Exec(queryString.str()) ;
-		delete[] queryString.str() ;
+		ExecStatusType status = bot->SQLDb->Exec(queryString.str().c_str()) ;
 
 		if( PGRES_COMMAND_OK != status )
 			{
@@ -237,7 +241,7 @@ if (string_lower(st[1]) == "erase")
 		return false;
 		}
 
-		strstream queryString;
+		stringstream queryString;
 		queryString	<< "DELETE FROM notes where user_id = "
 					<< theUser->getID()
 					<< " AND message_id = "
@@ -246,12 +250,11 @@ if (string_lower(st[1]) == "erase")
 
 		#ifdef LOG_SQL
 			elog	<< "NOTECommand::Delete Notes> "
-					<< queryString.str()
+					<< queryString.str().c_str()
 					<< endl;
 		#endif
 
-		ExecStatusType status = bot->SQLDb->Exec(queryString.str()) ;
-		delete[] queryString.str() ;
+		ExecStatusType status = bot->SQLDb->Exec(queryString.str().c_str()) ;
 
 		if( PGRES_COMMAND_OK != status )
 			{

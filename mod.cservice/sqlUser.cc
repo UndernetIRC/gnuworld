@@ -4,11 +4,12 @@
  * Storage class for accessing user information either from the backend
  * or internal storage.
  *
- * $Id: sqlUser.cc,v 1.33 2002/04/01 22:02:22 gte Exp $
+ * $Id: sqlUser.cc,v 1.34 2002/05/23 17:43:14 dan_karrels Exp $
  */
 
-#include	<strstream.h>
-#include	<string.h>
+#include	<sstream>
+#include	<string>
+#include	<iostream>
 
 #include	<cstring>
 
@@ -24,17 +25,19 @@ namespace gnuworld
 
 using std::string ;
 using std::endl ;
+using std::ends ;
+using std::stringstream ;
 
 const sqlUser::flagType sqlUser::F_GLOBAL_SUSPEND =	0x01 ;
 const sqlUser::flagType sqlUser::F_LOGGEDIN =		0x02 ;
-const sqlUser::flagType sqlUser::F_INVIS =			0x04 ;
-const sqlUser::flagType sqlUser::F_FRAUD =			0x08 ;
+const sqlUser::flagType sqlUser::F_INVIS =		0x04 ;
+const sqlUser::flagType sqlUser::F_FRAUD =		0x08 ;
 const sqlUser::flagType sqlUser::F_NONOTES =		0x10 ;
 
 const unsigned int sqlUser::EV_SUSPEND		= 1;
 const unsigned int sqlUser::EV_UNSUSPEND	= 2;
 const unsigned int sqlUser::EV_ADMINMOD		= 3;
-const unsigned int sqlUser::EV_MISC			= 4;
+const unsigned int sqlUser::EV_MISC		= 4;
 const unsigned int sqlUser::EV_COMMENT		= 5;
 
 sqlUser::sqlUser(PgDatabase* _SQLDb)
@@ -72,7 +75,7 @@ bool sqlUser::loadData(int userID)
 		<< endl;
 #endif
 
-strstream queryString;
+stringstream queryString;
 queryString	<< "SELECT "
 		<< sql::user_fields
 		<< " FROM users WHERE id = "
@@ -81,12 +84,11 @@ queryString	<< "SELECT "
 
 #ifdef LOG_SQL
 	elog	<< "sqlUser::loadData> "
-		<< queryString.str()
+		<< queryString.str().c_str()
 		<< endl;
 #endif
 
-ExecStatusType status = SQLDb->Exec(queryString.str()) ;
-delete[] queryString.str() ;
+ExecStatusType status = SQLDb->Exec(queryString.str().c_str()) ;
 
 if( PGRES_TUPLES_OK == status )
 	{
@@ -120,7 +122,7 @@ bool sqlUser::loadData(const string& userName)
 		<< endl;
 #endif
 
-strstream queryString;
+stringstream queryString;
 queryString	<< "SELECT "
 		<< sql::user_fields
 		<< " FROM users WHERE lower(user_name) = '"
@@ -130,12 +132,11 @@ queryString	<< "SELECT "
 
 #ifdef LOG_SQL
 	elog	<< "sqlUser::loadData> "
-		<< queryString.str()
+		<< queryString.str().c_str()
 		<< endl;
 #endif
 
-ExecStatusType status = SQLDb->Exec(queryString.str()) ;
-delete[] queryString.str() ;
+ExecStatusType status = SQLDb->Exec(queryString.str().c_str()) ;
 
 if( PGRES_TUPLES_OK == status )
 	{
@@ -189,7 +190,7 @@ bool sqlUser::commit()
 static const char* queryHeader =    "UPDATE users ";
 static const char* queryCondition = "WHERE id = ";
 
-strstream queryString;
+stringstream queryString;
 queryString	<< queryHeader
 		<< "SET flags = " << flags << ", "
 		<< "password = '" << password << "', "
@@ -201,12 +202,11 @@ queryString	<< queryHeader
 
 #ifdef LOG_SQL
 	elog	<< "sqlUser::commit> "
-		<< queryString.str()
+		<< queryString.str().c_str()
 		<< endl;
 #endif
 
-ExecStatusType status = SQLDb->Exec(queryString.str()) ;
-delete[] queryString.str() ;
+ExecStatusType status = SQLDb->Exec(queryString.str().c_str()) ;
 
 if( PGRES_COMMAND_OK != status )
 	{
@@ -230,7 +230,7 @@ bool sqlUser::commitLastSeen()
 static const char* queryHeader =    "UPDATE users_lastseen ";
 static const char* queryCondition = "WHERE user_id = ";
 
-strstream queryString;
+stringstream queryString;
 queryString	<< queryHeader
 		<< "SET last_seen = "
 		<< last_seen
@@ -245,12 +245,11 @@ queryString	<< queryHeader
 
 #ifdef LOG_SQL
 	elog	<< "sqlUser::commitLastSeen> "
-		<< queryString.str()
+		<< queryString.str().c_str()
 		<< endl;
 #endif
 
-ExecStatusType status = SQLDb->Exec(queryString.str()) ;
-delete[] queryString.str() ;
+ExecStatusType status = SQLDb->Exec(queryString.str().c_str()) ;
 
 if( PGRES_COMMAND_OK != status )
 	{
@@ -267,7 +266,7 @@ return true;
 
 time_t sqlUser::getLastSeen()
 {
-strstream queryString;
+stringstream queryString;
 queryString	<< "SELECT last_seen"
 		<< " FROM users_lastseen WHERE user_id = "
 		<< id
@@ -275,12 +274,11 @@ queryString	<< "SELECT last_seen"
 
 #ifdef LOG_SQL
 	elog	<< "sqlUser::getLastSeen> "
-		<< queryString.str()
+		<< queryString.str().c_str()
 		<< endl;
 #endif
 
-ExecStatusType status = SQLDb->Exec(queryString.str()) ;
-delete[] queryString.str() ;
+ExecStatusType status = SQLDb->Exec(queryString.str().c_str()) ;
 
 if( PGRES_TUPLES_OK == status )
 	{
@@ -304,7 +302,7 @@ return (false);
 
 const string sqlUser::getLastHostMask()
 {
-strstream queryString;
+stringstream queryString;
 queryString	<< "SELECT last_hostmask"
 		<< " FROM users_lastseen WHERE user_id = "
 		<< id
@@ -312,12 +310,11 @@ queryString	<< "SELECT last_hostmask"
 
 #ifdef LOG_SQL
 	elog	<< "sqlUser::getLastHostMask> "
-		<< queryString.str()
+		<< queryString.str().c_str()
 		<< endl;
 #endif
 
-ExecStatusType status = SQLDb->Exec(queryString.str()) ;
-delete[] queryString.str() ;
+ExecStatusType status = SQLDb->Exec(queryString.str().c_str()) ;
 
 if( PGRES_TUPLES_OK == status )
 	{
@@ -344,7 +341,7 @@ void sqlUser::writeEvent(unsigned short eventType, sqlUser* theUser, const strin
 {
 string userExtra = theUser ? theUser->getUserName() : "Not Logged In";
 
-strstream theLog;
+stringstream theLog;
 theLog	<< "INSERT INTO userlog (ts, user_id, event, message, "
 	<< "last_updated) VALUES "
 	<< "("
@@ -362,19 +359,17 @@ theLog	<< "INSERT INTO userlog (ts, user_id, event, message, "
 
 #ifdef LOG_SQL
 	elog	<< "sqlUser::writeEvent> "
-		<< theLog.str()
+		<< theLog.str().c_str()
 		<< endl;
 #endif
 
-SQLDb->ExecCommandOk(theLog.str());
-
-delete[] theLog.str();
+SQLDb->ExecCommandOk(theLog.str().c_str());
 
 }
 
 const string sqlUser::getLastEvent(unsigned short eventType, unsigned int& eventTime)
 {
-strstream queryString;
+stringstream queryString;
 
 queryString	<< "SELECT message,ts"
 			<< " FROM userlog WHERE user_id = "
@@ -386,12 +381,11 @@ queryString	<< "SELECT message,ts"
 
 #ifdef LOG_SQL
 	elog	<< "sqlUser::getLastEvent> "
-			<< queryString.str()
+			<< queryString.str().c_str()
 			<< endl;
 #endif
 
-ExecStatusType status = SQLDb->Exec(queryString.str()) ;
-delete[] queryString.str() ;
+ExecStatusType status = SQLDb->Exec(queryString.str().c_str()) ;
 
 if( PGRES_TUPLES_OK == status )
 	{

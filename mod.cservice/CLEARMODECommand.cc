@@ -10,10 +10,12 @@
  *
  * Todo: Support ircu2.10.11's CLEARMODE feature.
  *
- * $Id: CLEARMODECommand.cc,v 1.6 2001/09/05 03:47:56 gte Exp $
+ * $Id: CLEARMODECommand.cc,v 1.7 2002/05/23 17:43:12 dan_karrels Exp $
  */
 
 #include	<string>
+#include	<sstream>
+#include	<iostream>
 
 #include	"StringTokenizer.h"
 #include	"cservice.h"
@@ -21,10 +23,15 @@
 #include	"responses.h"
 #include	"Network.h"
 
-const char CLEARMODECommand_cc_rcsId[] = "$Id: CLEARMODECommand.cc,v 1.6 2001/09/05 03:47:56 gte Exp $" ;
+const char CLEARMODECommand_cc_rcsId[] = "$Id: CLEARMODECommand.cc,v 1.7 2002/05/23 17:43:12 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
+using std::endl ;
+using std::ends ;
+using std::string ;
+using std::stringstream ;
+
 using namespace gnuworld;
 
 bool CLEARMODECommand::Exec( iClient* theClient, const string& Message )
@@ -82,7 +89,7 @@ if(!tmpChan)
 	return false;
 	}
 
-strstream s;
+stringstream s;
 s	<< bot->getCharYYXXX()
 	<< " M "
 	<< st[1]
@@ -101,7 +108,6 @@ tmpChan->setLimit( 0 );
 tmpChan->setKey( "" );
 
 bot->Write( s );
-delete[] s.str();
 
 bot->Notice(theClient,
     bot->getResponse(theUser,

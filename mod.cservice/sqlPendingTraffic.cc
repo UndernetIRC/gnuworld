@@ -1,11 +1,12 @@
 /* 
  * sqlPendingTraffic.cc
  * 
- * $Id: sqlPendingTraffic.cc,v 1.2 2001/06/13 20:22:07 gte Exp $
+ * $Id: sqlPendingTraffic.cc,v 1.3 2002/05/23 17:43:14 dan_karrels Exp $
  */
  
-#include	<strstream>
+#include	<sstream>
 #include	<string> 
+#include	<iostream>
 
 #include	<cstring> 
 #include	<ctime>
@@ -20,12 +21,14 @@
 #include	"sqlPendingTraffic.h"
  
 const char sqlPendingTraffic_h_rcsId[] = __SQLPENDINGTRAFFIC_H ;
-const char sqlPendingTraffic_cc_rcsId[] = "$Id: sqlPendingTraffic.cc,v 1.2 2001/06/13 20:22:07 gte Exp $" ;
+const char sqlPendingTraffic_cc_rcsId[] = "$Id: sqlPendingTraffic.cc,v 1.3 2002/05/23 17:43:14 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
 using std::string ; 
 using std::endl ; 
+using std::ends ;
+using std::stringstream ;
 
 sqlPendingTraffic::sqlPendingTraffic(PgDatabase* _SQLDb)
 :channel_id(0),
@@ -39,7 +42,7 @@ bool sqlPendingTraffic::insertRecord()
 { 
 int theip_number = ip_number;
  
-strstream queryString;
+stringstream queryString;
 queryString << "INSERT INTO pending_traffic (channel_id, ip_number, join_count) VALUES ("
 			<< channel_id << ", "
 			<< theip_number << ", "
@@ -48,12 +51,11 @@ queryString << "INSERT INTO pending_traffic (channel_id, ip_number, join_count) 
 
 #ifdef LOG_SQL
 	elog	<< "sqlPendingTraffic::insertRecord> "
-		<< queryString.str()
+		<< queryString.str().c_str()
 		<< endl; 
 #endif
 
-ExecStatusType status = SQLDb->Exec(queryString.str()) ;
-delete[] queryString.str() ;
+ExecStatusType status = SQLDb->Exec(queryString.str().c_str()) ;
 
 if( PGRES_COMMAND_OK != status )
 	{ 
@@ -71,7 +73,7 @@ bool sqlPendingTraffic::commit()
 {
 	int theip_number = ip_number;
 	
-	strstream queryString; 
+	stringstream queryString; 
 	queryString << "UPDATE pending_traffic SET "
 				<< "join_count = " 
 				<< join_count
@@ -83,12 +85,11 @@ bool sqlPendingTraffic::commit()
 	
 	#ifdef LOG_SQL
 		elog	<< "sqlPendingTraffic::commit> "
-				<< queryString.str()
+				<< queryString.str().c_str()
 				<< endl;
 	#endif
 	
-	ExecStatusType status = SQLDb->Exec(queryString.str()) ;
-	delete[] queryString.str() ;
+	ExecStatusType status = SQLDb->Exec(queryString.str().c_str()) ;
 	
 	if( PGRES_COMMAND_OK != status )
 		{

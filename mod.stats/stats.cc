@@ -1,20 +1,26 @@
-/* stats.cc */
+/**
+ * stats.cc
+ * Author: Daniel Karrels (dan@karrels.com)
+ * $Id: stats.cc,v 1.5 2002/05/23 17:43:14 dan_karrels Exp $
+ */
 
 #include	<string>
 #include	<map>
-#include	<strstream>
+#include	<sstream>
+#include	<iostream>
 
 #include	"stats.h"
 #include	"iClient.h"
 #include	"server.h"
 #include	"client.h"
 
-using std::string ;
-using std::strstream ;
-using std::ends ;
-
 namespace gnuworld
 {
+
+using std::string ;
+using std::stringstream ;
+using std::ends ;
+using std::endl ;
 
 /*
  *  Exported function used by moduleLoader to gain an
@@ -58,12 +64,10 @@ if( !theClient->isOper() )
 for( const_iterator ptr = table.begin(), end = table.end() ; ptr != end ;
 	++ptr )
 	{
-	strstream s ;
+	stringstream s ;
 	s	<< ptr->first << ": " << ptr->second << ends ;
-	string writeMe = s.str() ;
-	delete[] s.str() ;
 
-	Notice( theClient, writeMe ) ;
+	Notice( theClient, s.str() ) ;
 	} // for()
 
 return 0 ;
@@ -73,7 +77,7 @@ int stats::OnEvent( const eventType& theEvent,
 	void* data1, void* data2, void* data3, void* data4 )
 {
 
-//elog << "stats::OnEvent()\n" ;
+//elog << "stats::OnEvent()" << endl ;
 
 table[ "Total Events" ]++ ;
 

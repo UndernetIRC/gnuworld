@@ -1,10 +1,10 @@
-dnl $Id: configure.in,v 1.39 2002/04/27 14:48:59 dan_karrels Exp $
+dnl $Id: configure.in,v 1.40 2002/05/23 17:43:03 dan_karrels Exp $
 dnl ----------------------------------------------------------
 
 echo Configuring GNUWorld...
 echo
 
-AC_REVISION($Revision: 1.39 $)
+AC_REVISION($Revision: 1.40 $)
 AC_INIT
 AC_CONFIG_SRCDIR([src/main.cc])
 AM_INIT_AUTOMAKE(gnuworld,0.0)
@@ -17,8 +17,8 @@ AC_LIBLTDL_CONVENIENCE
 dnl Substitute INCLTDL and LIBLTDL in the Makefiles
 dnl For some reason, INCLTDL and LIBLTDL aren't set
 dnl properly on OpenBSD
-INCLTDL="-I../libltdl"
-LIBLTDL="../libltdl/libltdlc.la"
+INCLTDL="-I`pwd`/libltdl"
+LIBLTDL="`pwd`/libltdl/libltdlc.la"
 AC_SUBST(INCLTDL)
 AC_SUBST(LIBLTDL)
 
@@ -53,13 +53,13 @@ fi
 if [test "$threadLib" = no]; then
 	AC_MSG_RESULT([Unable to locate pthread_create in any library])
 else
-	AC_MSG_RESULT([Found pthread_create in $threadLib adding to libs])
 	LIBS=$threadLib
 fi
 
 CFLAGS="-Wall -pipe"
 CXXFLAGS="-Wall -pipe"
 CXX="g++"
+prefix="`pwd`"
 libdir="`pwd`/bin"
 bindir="`pwd`/bin"
 glibdir="`pwd`/lib"
@@ -88,14 +88,16 @@ dnl AC_CHECK_LIB(posix4,sem_init)
 AC_SEARCH_LIBS(pthread_create,lthread pthread c c_r)
 AC_SEARCH_LIBS(pthread_kill,lthread pthread c c_r)
 AC_CHECK_FUNCS(pthread_create)
+
 dnl ----------------------------------------------------------
 dnl
 dnl Checking for headers, functions, and a type declarations
 dnl
 
 AC_CHECK_HEADERS(sys/file.h unistd.h sys/stat.h sys/ioctl.h sys/resource.h )
-AC_CHECK_HEADERS(sys/time.h asm/ioctls.h xti_inet.h sys/filio.h)
+AC_CHECK_HEADERS(sys/time.h asm/ioctls.h xti_inet.h sys/filio.h getopt.h)
 AC_CHECK_HEADERS(sys/types.h sys/socket.h netinet/in.h sys/un.h pthread.h)
+AC_CHECK_HEADERS(hash_map)
 
 AC_HEADER_STDC
 AC_HEADER_TIME
@@ -141,6 +143,16 @@ else
 	CXXFLAGS="$CXXFLAGS -O0"
 fi
 
+useProf=no
+AC_ARG_WITH(prof, \
+[  --with-prof		    Generate profiling information],
+[useProf=yes]
+)
+
+if test $useProf = yes ; then
+	CXXFLAGS="$CXXFLAGS -pg"
+fi
+
 PGSQL_PREFIX=/usr/local/pgsql
 
 AC_ARG_WITH(pgsql, \
@@ -180,12 +192,20 @@ AC_SUBST(bindir)
 
 CXXFLAGS="$CXXFLAGS -I`pwd`/include -I`pwd`/lib"
 
-if test -d "/usr/local/include/g++/ext"; then
-	CXXFLAGS="$CXXFLAGS -I/usr/local/include/g++/ext"
+hashMapNS=""
+hashMapFile="/usr/include/g++/ext/hash_map"
+if test -d "/usr/local/include/g++/ext/hash_map"; then
+	hashMapfile="/usr/local/include/g++/ext/hash_map"
 fi
 
-if test -d "/usr/local/include/g++/backward"; then
-	CXXFLAGS="$CXXFLAGS -I/usr/local/include/g++/backward"
+dnl echo hashMapFile: $hashMapFile
+hashMapNS=`\grep namespace $hashMapFile | \head -1 | \cut -d " " -f2`
+dnl echo hashMapNS: $hashMapNS
+
+if test "$hashMapNS" = "__gnu_cxx" ; then
+	AC_DEFINE(HASHMAPNS,__gnu_cxx)
+else
+	AC_DEFINE(HASHMAPNS,std)
 fi
 
 AC_SUBST(CXXFLAGS)

@@ -3,10 +3,10 @@
  * 
  * Storage class for accessing user information 
  * 
- * $Id: ccUser.cc,v 1.14 2001/12/30 19:35:10 mrbean_ Exp $
+ * $Id: ccUser.cc,v 1.15 2002/05/23 17:43:11 dan_karrels Exp $
  */
  
-#include	<strstream>
+#include	<sstream>
 #include	<string> 
 
 #include	<cstring> 
@@ -19,14 +19,14 @@
 #include	"ccontrol.h"
 
 const char ccUser_h_rcsId[] = __CCUSER_H ;
-const char ccUser_cc_rcsId[] = "$Id: ccUser.cc,v 1.14 2001/12/30 19:35:10 mrbean_ Exp $" ;
+const char ccUser_cc_rcsId[] = "$Id: ccUser.cc,v 1.15 2002/05/23 17:43:11 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
 
 using std::string ; 
 using std::endl ; 
-using std::strstream ;
+using std::stringstream ;
 using std::ends ;
 
 namespace uworld
@@ -77,18 +77,17 @@ if(!dbConnected)
 	return false;
 	}
 
-strstream theQuery;
+stringstream theQuery;
 theQuery	<< Main
 		<< string_lower(Name)
 		<< "'"
 		<< ends;
 
 elog	<< "ccUser::loadData> "
-	<< theQuery.str()
+	<< theQuery.str().c_str()
 	<< endl; 
 
-ExecStatusType status = SQLDb->Exec( theQuery.str() ) ;
-delete[] theQuery.str() ;
+ExecStatusType status = SQLDb->Exec( theQuery.str().c_str() ) ;
 
 if( (PGRES_TUPLES_OK == status) && (SQLDb->Tuples() > 0) )
 	{
@@ -108,7 +107,7 @@ if(!dbConnected)
 	}
 	
 static const char Main[] = "SELECT user_id,user_name,password,access,saccess,flags,suspend_expires,suspended_by,server,isSuspended,IsUhs,IsOper,IsAdmin,IsSmt,IsCoder,GetLogs,NeedOp,Email,Suspend_Level,Suspend_Reason,Notice FROM opers WHERE user_id = ";
-strstream theQuery;
+stringstream theQuery;
 
 if(!dbConnected)
 	{
@@ -121,11 +120,10 @@ theQuery	<< Main
 		<< ends;
 
 elog	<< "ccontrol::loadData> "
-	<< theQuery.str()
+	<< theQuery.str().c_str()
 	<< endl; 
 
-ExecStatusType status = SQLDb->Exec( theQuery.str() ) ;
-delete[] theQuery.str() ;
+ExecStatusType status = SQLDb->Exec( theQuery.str().c_str() ) ;
 
 if( (PGRES_TUPLES_OK == status) && (SQLDb->Tuples() > 0) )
 	{
@@ -170,7 +168,7 @@ if(!dbConnected)
 	return false;
 	}
 
-strstream theQuery;
+stringstream theQuery;
 theQuery	<< Main
 		<< Password
 		<< "', Access = "
@@ -216,11 +214,10 @@ theQuery	<< Main
 		<<  ends;
 
 elog	<< "ccontrol::UpdateOper> "
-	<< theQuery.str()
+	<< theQuery.str().c_str()
 	<< endl; 
 
-ExecStatusType status = SQLDb->Exec( theQuery.str() ) ;
-delete[] theQuery.str() ;
+ExecStatusType status = SQLDb->Exec( theQuery.str().c_str() ) ;
 
 if( PGRES_COMMAND_OK == status ) 
 	{

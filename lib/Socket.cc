@@ -2,7 +2,7 @@
  */
 
 #include	<new>
-#include	<strstream>
+#include	<sstream>
 #include	<iostream>
 
 #include	<unistd.h>
@@ -35,14 +35,14 @@
 #endif
 
 const char Socket_h_rcsId[] = __SOCKET_H ;
-const char Socket_cc_rcsId[] = "$Id: Socket.cc,v 1.18 2002/04/06 21:39:29 mrbean_ Exp $" ;
+const char Socket_cc_rcsId[] = "$Id: Socket.cc,v 1.19 2002/05/23 17:43:10 dan_karrels Exp $" ;
 const char ELog_h_rcsId[] = __ELOG_H ;
 
 namespace gnuworld
 {
 
 using std::endl ;
-using std::strstream ;
+using std::stringstream ;
 using std::ends ;
 
 Socket::Socket()
@@ -151,16 +151,14 @@ return string( ipAddr ) ;
   
 string Socket::description() const
 {
-std::strstream s;
+stringstream s;
 s	<< "socket(file descr. = " << fd
 	<< " ): " << "portNum = "
 	<< addr.sin_port
 	<< " ip= " << inet_ntoa( addr.sin_addr )
 	<< std::ends ;
-string retval( s.str() ) ;
-delete[] s.str() ;
 
-return retval ;
+return string( s.str() ) ;
 }
 
 bool Socket::setSocket()

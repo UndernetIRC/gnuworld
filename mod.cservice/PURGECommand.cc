@@ -8,10 +8,12 @@
  *
  * Caveats: None
  *
- * $Id: PURGECommand.cc,v 1.14 2001/12/08 19:15:41 gte Exp $
+ * $Id: PURGECommand.cc,v 1.15 2002/05/23 17:43:13 dan_karrels Exp $
  */
 
 #include	<string>
+#include	<sstream>
+#include	<iostream>
 
 #include	"StringTokenizer.h"
 #include	"ELog.h"
@@ -22,10 +24,15 @@
 #include	"responses.h"
 #include	"cservice_config.h"
 
-const char PURGECommand_cc_rcsId[] = "$Id: PURGECommand.cc,v 1.14 2001/12/08 19:15:41 gte Exp $" ;
+const char PURGECommand_cc_rcsId[] = "$Id: PURGECommand.cc,v 1.15 2002/05/23 17:43:13 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
+using std::endl ;
+using std::ends ;
+using std::string ;
+using std::stringstream ;
+
 bool PURGECommand::Exec( iClient* theClient, const string& Message )
 {
 bot->incStat("COMMANDS.PURGE");
@@ -93,7 +100,7 @@ if(theChan->getFlag(sqlChannel::F_NOPURGE))
  * 'freeze' it for future investigation in the log.
  */
 
-strstream managerQuery;
+stringstream managerQuery;
 managerQuery	<< "SELECT users.user_name,users.email "
 		<< "FROM users,levels "
 		<< "WHERE levels.user_id = users.id "
@@ -105,12 +112,11 @@ managerQuery	<< "SELECT users.user_name,users.email "
 
 #ifdef LOG_SQL
 	elog	<< "sqlQuery> "
-		<< managerQuery.str()
+		<< managerQuery.str().c_str()
 		<< endl;
 #endif
 
-ExecStatusType status = bot->SQLDb->Exec(managerQuery.str()) ;
-delete[] managerQuery.str() ;
+ExecStatusType status = bot->SQLDb->Exec(managerQuery.str().c_str()) ;
 
 string manager = "No Manager";
 string managerEmail = "No Email Address";
@@ -150,7 +156,7 @@ theChan->commit();
  * Permanently delete all associated Level records for this channel.
  */
 
-strstream theQuery ;
+stringstream theQuery ;
 
 theQuery	<< "DELETE FROM levels WHERE channel_id = "
 			<< theChan->getID()
@@ -158,12 +164,11 @@ theQuery	<< "DELETE FROM levels WHERE channel_id = "
 
 #ifdef LOG_SQL
 elog	<< "sqlQuery> "
-		<< theQuery.str()
+		<< theQuery.str().c_str()
 		<< endl;
 #endif
 
-status = bot->SQLDb->Exec(theQuery.str()) ;
-delete[] theQuery.str() ;
+status = bot->SQLDb->Exec(theQuery.str().c_str()) ;
 
 if( status != PGRES_COMMAND_OK )
 	{

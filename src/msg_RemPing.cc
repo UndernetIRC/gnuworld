@@ -1,17 +1,19 @@
 /**
  * msg_RemPing.cc
+ * Author: Daniel Karrels (dan@karrels.com)
+ * $Id: msg_RemPing.cc,v 1.3 2002/05/23 17:43:17 dan_karrels Exp $
  */
 
 #include	<sys/time.h>
 #include	<unistd.h>
 
-#include	<strstream>
+#include	<sstream>
 #include	<string>
 
 #include	"server.h"
 #include	"xparameters.h"
 
-const char msg_RemPing_cc_rcsId[] = "$Id: msg_RemPing.cc,v 1.2 2001/05/18 15:27:10 dan_karrels Exp $" ;
+const char msg_RemPing_cc_rcsId[] = "$Id: msg_RemPing.cc,v 1.3 2002/05/23 17:43:17 dan_karrels Exp $" ;
 const char server_h_rcsId[] = __SERVER_H ;
 const char xParameters_h_rcsId[] = __XPARAMETERS_H ;
 
@@ -19,15 +21,15 @@ namespace gnuworld
 {
 
 using std::string ;
-using std::strstream ;
+using std::stringstream ;
 using std::ends ;
 
 const string militime( const char* sec, const char* msec )
 {
 struct timeval tv;
-strstream s ;
+stringstream s ;
 ::gettimeofday( &tv, NULL ) ;
-                                 
+
 if( sec && msec )
 	{
         s	<< (int)((tv.tv_sec - atoi(sec)) * 1000 +
@@ -41,9 +43,7 @@ else
 		<< static_cast< int >( tv.tv_usec )
 		<< ends ;
 	}
-string retMe( s.str() ) ;
-delete[] s.str() ;
-return retMe ;
+return string( s.str() ) ;
 }
 
 // Remote Ping message

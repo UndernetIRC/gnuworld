@@ -7,12 +7,12 @@
 
 #include	<string>
 #include	<cstdlib>
-#include        <iomanip.h>
+#include        <iomanip>
 #include	"ccontrol.h"
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 
-const char REMGLINECommand_cc_rcsId[] = "$Id: REMGLINECommand.cc,v 1.20 2002/03/01 21:15:55 mrbean_ Exp $";
+const char REMGLINECommand_cc_rcsId[] = "$Id: REMGLINECommand.cc,v 1.21 2002/05/23 17:43:11 dan_karrels Exp $";
 
 namespace gnuworld
 {

@@ -6,14 +6,14 @@
 
 #include	<string>
 #include	<cstdlib>
-#include        <iomanip.h>
+#include        <iomanip>
 #include	"ccontrol.h"
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 #include	"Network.h"
 #include	"Constants.h"
 
-const char MODECommand_cc_rcsId[] = "$Id: MODECommand.cc,v 1.14 2002/03/01 18:27:36 mrbean_ Exp $";
+const char MODECommand_cc_rcsId[] = "$Id: MODECommand.cc,v 1.15 2002/05/23 17:43:11 dan_karrels Exp $";
 
 namespace gnuworld
 {

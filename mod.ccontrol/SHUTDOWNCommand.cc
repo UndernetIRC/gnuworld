@@ -7,7 +7,7 @@
 
 #include	<string>
 #include	<cstdlib>
-#include        <iomanip.h>
+#include        <iomanip>
 #include	"ccontrol.h"
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
@@ -15,7 +15,7 @@
 #include	"server.h"
 #include	<string.h>
 
-const char SHUTDOWNCommand_cc_rcsId[] = "$Id: SHUTDOWNCommand.cc,v 1.4 2002/03/01 21:02:07 mrbean_ Exp $";
+const char SHUTDOWNCommand_cc_rcsId[] = "$Id: SHUTDOWNCommand.cc,v 1.5 2002/05/23 17:43:11 dan_karrels Exp $";
 
 namespace gnuworld
 {

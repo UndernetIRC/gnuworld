@@ -11,10 +11,12 @@
  *
  * Caveats: None
  *
- * $Id: TOPICCommand.cc,v 1.11 2001/09/05 03:47:56 gte Exp $
+ * $Id: TOPICCommand.cc,v 1.12 2002/05/23 17:43:13 dan_karrels Exp $
  */
 
 #include	<string>
+#include	<sstream>
+#include	<iostream>
 
 #include	"StringTokenizer.h"
 #include	"ELog.h"
@@ -23,10 +25,14 @@
 #include	"responses.h"
 #include	"Network.h"
 
-const char TOPICCommand_cc_rcsId[] = "$Id: TOPICCommand.cc,v 1.11 2001/09/05 03:47:56 gte Exp $" ;
+const char TOPICCommand_cc_rcsId[] = "$Id: TOPICCommand.cc,v 1.12 2002/05/23 17:43:13 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
+using std::string ;
+using std::endl ;
+using std::ends ;
+using std::stringstream ;
 
 bool TOPICCommand::Exec( iClient* theClient, const string& Message )
 {
@@ -100,7 +106,7 @@ if( topic.size() > 145 )
 	return false;
         }
 
-strstream s;
+stringstream s;
 s	<< bot->getCharYYXXX()
 	<< " T "
 	<< st[1]
@@ -111,7 +117,6 @@ s	<< bot->getCharYYXXX()
 	<< ends;
 
 bot->Write( s );
-delete[] s.str();
 
 return true ;
 }

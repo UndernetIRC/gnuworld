@@ -8,10 +8,12 @@
  *
  * Caveats: None.
  *
- * $Id: UNBANCommand.cc,v 1.13 2002/02/06 18:56:25 gte Exp $
+ * $Id: UNBANCommand.cc,v 1.14 2002/05/23 17:43:13 dan_karrels Exp $
  */
 
 #include	<string>
+#include	<sstream>
+#include	<iostream>
 
 #include	"StringTokenizer.h"
 #include	"ELog.h"
@@ -21,11 +23,15 @@
 #include	"responses.h"
 #include	"match.h"
 
-const char UNBANCommand_cc_rcsId[] = "$Id: UNBANCommand.cc,v 1.13 2002/02/06 18:56:25 gte Exp $" ;
+const char UNBANCommand_cc_rcsId[] = "$Id: UNBANCommand.cc,v 1.14 2002/05/23 17:43:13 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
 using std::string ;
+using std::endl ;
+using std::ends ;
+using std::stringstream ;
+
 using namespace level;
 
 bool UNBANCommand::Exec( iClient* theClient, const string& Message )
@@ -214,13 +220,12 @@ while (cPtr != theChannel->banList_end())
 		{
 		// Can't call xClient::UnBan inside the loop it will modify without
 		// a return value.
-		strstream s;
+		stringstream s;
 		s	<< bot->getCharYYXXX()
 			<< " M " << theChannel->getName()
 			<< " -b " << (*cPtr)
 			<< ends;
 		bot->Write( s );
-		delete[] s.str();
 
 		theChannel->removeBan(*cPtr);
 		cPtr = theChannel->banList_begin();

@@ -3,8 +3,9 @@
  */
 
 #ifndef __CLIENT_H
-#define __CLIENT_H "$Id: client.h,v 1.32 2001/12/28 16:28:47 mrbean_ Exp $"
+#define __CLIENT_H "$Id: client.h,v 1.33 2002/05/23 17:43:09 dan_karrels Exp $"
 
+#include	<sstream>
 #include	<string>
 
 #include	"server.h"
@@ -15,7 +16,8 @@
 
 namespace gnuworld
 {
- 
+
+using std::stringstream ; 
 using std::string ;
 
 /**
@@ -103,7 +105,7 @@ public:
 	/**
 	 * Write a string of data to the network.
 	 */
-	virtual int Write( strstream& s )
+	virtual int Write( const stringstream& s )
 		{ return QuoteAsServer( s.str() ) ; }
 
 	/**

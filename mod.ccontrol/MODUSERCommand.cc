@@ -7,7 +7,7 @@
 
 #include	<string>
 #include	<cstdlib>
-#include        <iomanip.h>
+#include        <iomanip>
 #include	"ccontrol.h"
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
@@ -15,7 +15,7 @@
 #include	"misc.h"
 #include	"Constants.h"
 
-const char MODUSERCommand_cc_rcsId[] = "$Id: MODUSERCommand.cc,v 1.19 2002/03/14 20:35:19 mrbean_ Exp $";
+const char MODUSERCommand_cc_rcsId[] = "$Id: MODUSERCommand.cc,v 1.20 2002/05/23 17:43:11 dan_karrels Exp $";
 
 namespace gnuworld
 {

@@ -7,7 +7,7 @@
 
 #include	<string>
 #include	<cstdlib>
-#include        <iomanip.h>
+#include        <iomanip>
 
 #include	"ccontrol.h"
 #include	"CControlCommands.h"
@@ -15,7 +15,7 @@
 #include	"Constants.h"
 #include	"Network.h"
 
-const char INVITECommand_cc_rcsId[] = "$Id: INVITECommand.cc,v 1.14 2002/03/01 19:26:39 mrbean_ Exp $";
+const char INVITECommand_cc_rcsId[] = "$Id: INVITECommand.cc,v 1.15 2002/05/23 17:43:10 dan_karrels Exp $";
 
 namespace gnuworld
 {

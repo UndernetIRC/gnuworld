@@ -8,11 +8,12 @@
  *
  * Caveats: None
  *
- * $Id: OPERPARTCommand.cc,v 1.10 2001/09/05 03:47:56 gte Exp $
+ * $Id: OPERPARTCommand.cc,v 1.11 2002/05/23 17:43:13 dan_karrels Exp $
  */
 
-
 #include	<string>
+#include	<sstream>
+#include	<iostream>
 
 #include	"StringTokenizer.h"
 #include	"ELog.h"
@@ -21,12 +22,15 @@
 #include	"responses.h"
 #include	"Network.h"
 
-const char OPERPARTCommand_cc_rcsId[] = "$Id: OPERPARTCommand.cc,v 1.10 2001/09/05 03:47:56 gte Exp $" ;
+const char OPERPARTCommand_cc_rcsId[] = "$Id: OPERPARTCommand.cc,v 1.11 2002/05/23 17:43:13 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
 
+using std::endl ;
+using std::ends ;
 using std::string ;
+using std::stringstream ;
 
 bool OPERPARTCommand::Exec( iClient* theClient, const string& Message )
 {
@@ -82,7 +86,7 @@ bot->writeChannelLog(theChan, theClient, sqlChannel::EV_OPERPART, "");
 
 // Tell the world.
 
-strstream s;
+stringstream s;
 s       << server->getCharYY()
 	<< " WA :"
 	<< "An IRC Operator is asking me to leave channel "
@@ -90,7 +94,6 @@ s       << server->getCharYY()
 	<< ends;
 
 bot->Write(s);
-delete[] s.str();
 
 bot->logAdminMessage("%s is asking me to leave channel %s",
 		theClient->getNickUserHost().c_str(),

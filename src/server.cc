@@ -12,10 +12,10 @@
 #include	<list>
 #include	<vector>
 #include	<algorithm>
-#include	<strstream>
+#include	<sstream>
 #include	<stack>
 #include	<iostream>
-#include	<pair.h>
+#include	<utility>
 
 #include	<sys/time.h>
 #include	<unistd.h>
@@ -50,7 +50,7 @@
 #include	"UnloadClientTimerHandler.h"
 
 const char server_h_rcsId[] = __SERVER_H ;
-const char server_cc_rcsId[] = "$Id: server.cc,v 1.130 2002/05/15 22:14:10 dan_karrels Exp $" ;
+const char server_cc_rcsId[] = "$Id: server.cc,v 1.131 2002/05/23 17:43:17 dan_karrels Exp $" ;
 const char config_h_rcsId[] = __CONFIG_H ;
 const char misc_h_rcsId[] = __MISC_H ;
 const char events_h_rcsId[] = __EVENTS_H ;
@@ -73,19 +73,20 @@ const char UnloadClientTimerHandler_h_rcsId[] = __UNLOADCLIENTTIMERHANDLER_H ;
 namespace gnuworld
 {
 
+using std::pair ;
 using std::string ;
 using std::vector ;
 using std::list ;
 using std::endl ;
 using std::ends ;
-using std::strstream ;
+using std::stringstream ;
 using std::stack ;
 using std::unary_function ;
 using std::clog ;
 using std::cout ;
 using std::min ;
 
-// The object containing the network data structures
+/// The object containing the network data structures
 xNetwork*	Network = 0 ;
 
 // Some static xServer variables for tracking signals
@@ -852,7 +853,7 @@ for( jupedServerListType::iterator ptr = jupedServers.begin() ;
 // Don't really care if we found a server in the jupe list or not.
 
 // Prepare the output buffer that will squit the server.
-strstream s ;
+stringstream s ;
 s	<< charYY
 	<< " SQ "
 	<< serverName
@@ -864,9 +865,6 @@ s	<< charYY
 
 // Notify the rest of the network of the SQUIT.
 Write( s ) ;
-
-// Deallocate stupid frozen strstream.
-delete[] s.str() ;
 
 // The server that is being squit has already been removed from
 // both the network server table and the juped servers table.
@@ -1883,14 +1881,14 @@ return buf.size() ;
 }
 
 /**
- * Write the contents of a std::strstream to the uplink connection.
+ * Write the contents of a std::stringstream to the uplink connection.
  */
-size_t xServer::Write( strstream& s )
+size_t xServer::Write( const stringstream& s )
 {
 return Write( string( s.str() ) ) ;
 }
 
-size_t xServer::WriteDuringBurst( strstream& s )
+size_t xServer::WriteDuringBurst( const stringstream& s )
 {
 return WriteDuringBurst( string( s.str() ) ) ;
 }
@@ -2007,7 +2005,7 @@ for( ; ptr != gline_end() ; ++ptr )
 	}
 
 // Found it, notify the network that we are removing it
-strstream s ;
+stringstream s ;
 s	<< charYY
 	<< " GL * -"
 	<< userHost
@@ -2015,7 +2013,6 @@ s	<< charYY
 
 // Write the data to the network output buffer(s)
 Write( s ) ;
-delete[] s.str() ;
 
 // Did we find the gline in the interal gline structure?
 if( foundGline )
@@ -2062,14 +2059,13 @@ Gline* newGline =
 assert( newGline != 0 ) ;
 
 // Notify the rest of the network
-strstream s ;
+stringstream s ;
 s	<< getCharYY() << " GL "
 	<< server << " +"
 	<< userHost << ' '
 	<< duration << " :"
 	<< reason << ends ;
 Write( s ) ;
-delete[] s.str() ;
 
 glineList.push_back( newGline ) ;
 if(setClient)
@@ -2123,14 +2119,13 @@ time_t now = ::time( 0 ) ;
 for( const_glineIterator ptr = gline_begin() ;
 	ptr != gline_end() ; ++ptr )
 	{
-	strstream s ;
+	stringstream s ;
 	s	<< getCharYY() << " GL * +"
 		<< (*ptr)->getUserHost() << ' '
 		<< ((*ptr)->getExpiration() - now) << " :"
 		<< (*ptr)->getReason() << ends ;
 
 	Write( s ) ;
-	delete[] s.str() ;
 	}
 }
 
@@ -2184,7 +2179,7 @@ void xServer::PartChannel( xClient* theClient, Channel* theChan,
 assert( theClient != 0 ) ;
 assert( theChan != 0 ) ;
 
-strstream s ;
+stringstream s ;
 s	<< theClient->getCharYYXXX()
 	<< " L "
 	<< theChan->getName()
@@ -2193,7 +2188,6 @@ s	<< theClient->getCharYYXXX()
 	<< ends ;
 
 Write( s ) ;
-delete[] s.str() ;
 
 OnPartChannel( theClient, theChan ) ;
 OnPartChannel( theClient->getInstance(), theChan ) ;
@@ -2296,7 +2290,7 @@ if( theChan && (0 == joinTime) )
 if( (NULL == theChan) && bursting )
 	{
 	// Need to burst the channel
-	strstream s ;
+	stringstream s ;
 	s	<< getCharYY()
 		<< " B "
 		<< chanName << ' '
@@ -2312,7 +2306,6 @@ if( (NULL == theChan) && bursting )
 		s	<< ends ;
 
 	Write( s ) ;
-	delete[] s.str() ;
 
 	// Instantiate the new channel
 	theChan = new (std::nothrow) Channel( chanName, time( 0 ) ) ;
@@ -2347,7 +2340,7 @@ else if( NULL == theChan )
 		// Create the channel
 		// The client automatically gets op in this case
 	{
-	strstream s ;
+	stringstream s ;
 	s	<< theClient->getCharYYXXX()
 		<< " C "
 		<< chanName
@@ -2355,19 +2348,17 @@ else if( NULL == theChan )
 		<< postJoinTime
 		<< ends ;
 	Write( s ) ;
-	delete[] s.str() ;
 	}
 
 	if( !chanModes.empty() )
 		{
-		strstream s ;
+		stringstream s ;
 		s	<< theClient->getCharYYXXX()
 			<< " M "
 			<< chanName << ' '
 			<< chanModes
 			<< ends ;
 		Write( s ) ;
-		delete[] s.str() ;
 		}
 
 	// Instantiate the new channel
@@ -2421,7 +2412,7 @@ else if( bursting )
 	// existing one, we need to set the our Network channel state to
 	// match that supplied in this line. (Because we are authoritive
 	// in this channel, any existing modes will be removed by ircu).
-	strstream s ;
+	stringstream s ;
 	s	<< getCharYY()
 		<< " B "
 		<< chanName << ' '
@@ -2437,26 +2428,24 @@ else if( bursting )
 		s	<< ends ;
 
 	Write( s ) ;
-	delete[] s.str() ;
 	}
 else
 	{
 	// After bursting, and the channel exists
 		{
-		strstream s2 ;
+		stringstream s2 ;
 		s2	<< theClient->getCharYYXXX()
 			<< " J "
 			<< chanName
 			<< ends ;
 
 		Write( s2 ) ;
-		delete[] s2.str() ;
 		}
 
 	if( getOps )
 		{
 		// Op the bot
-		strstream s ;
+		stringstream s ;
 		s	<< charYY
 			<< " M "
 			<< chanName
@@ -2465,19 +2454,17 @@ else
 			<< ends ;
 
 		Write( s ) ;
-		delete[] s.str() ;
 		}
 
 	if( !chanModes.empty() )
 		{
 		// Set the channel modes
-		strstream s ;
+		stringstream s ;
 		s	<< theClient->getCharYYXXX() << " M "
 			<< chanName << ' '
 			<< chanModes << ends ;
 
 		Write( s ) ;
-		delete[] s.str() ;
 		}
 	}
 
@@ -2616,7 +2603,7 @@ return true ;
 // K N Isomer 2 957217279 ~perry p136-tnt1.ham.ihug.co.nz DLbaCI KAC :*Unknown*
 void xServer::BurstClient( xClient* theClient, bool localClient )
 {
-strstream s ;
+stringstream s ;
 s	<< getCharYY() << " N "
 	<< theClient->getNickName() << ' '
 	<< (localClient ? '1' : '2') << " 31337 "
@@ -2627,7 +2614,6 @@ s	<< getCharYY() << " N "
 	<< theClient->getCharYYXXX() << " :"
 	<< theClient->getDescription() << ends ;
 Write( s ) ;
-delete[] s.str() ;
 
 theClient->Connect( 31337 ) ;
 }
@@ -3482,16 +3468,13 @@ if( msg.empty() )
 	return -1 ;
 	}
 
-strstream s ;
+stringstream s ;
 s	<< getCharYY()
 	<< " WA :"
 	<< msg
 	<< ends ;
 
-int retMe = Write( s ) ;
-delete[] s.str() ;
-
-return retMe ;
+return Write( s ) ;
 }
 
 int xServer::Mode( xClient* theClient,
@@ -3643,7 +3626,7 @@ for( string::const_iterator modePtr = modes.begin() ;
 
 // Write the modes to the network before updating tables and notifying
 // other xClients...this will keep the output buffers synched
-strstream s ;
+stringstream s ;
 s	<< getCharYY()
 	<< ' '
 	<< theChan->getName()
@@ -3659,7 +3642,6 @@ if( !args.empty() )
 s	<< ends ;
 
 retMe = Write( s ) ;
-delete[] s.str() ;
 
 // Update internal tables and notify all xClients of mode change(s)
 if( !opVector.empty() )

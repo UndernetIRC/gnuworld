@@ -7,7 +7,7 @@
 
 #include	<string>
 #include	<cstdlib>
-#include        <iomanip.h>
+#include        <iomanip>
 
 #include	"ccontrol.h"
 #include	"CControlCommands.h"
@@ -22,7 +22,7 @@
 #include 	"time.h"
 #include	"Constants.h"
 
-const char GCHANCommand_cc_rcsId[] = "$Id: GCHANCommand.cc,v 1.9 2002/03/01 18:27:36 mrbean_ Exp $";
+const char GCHANCommand_cc_rcsId[] = "$Id: GCHANCommand.cc,v 1.10 2002/05/23 17:43:10 dan_karrels Exp $";
 
 namespace gnuworld
 {

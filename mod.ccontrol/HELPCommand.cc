@@ -7,14 +7,14 @@
 
 #include	<string>
 #include	<cstdlib>
-#include        <iomanip.h>
+#include        <iomanip>
 
 #include	"ccontrol.h"
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 #include	"commLevels.h"
 
-const char HELPCommand_cc_rcsId[] = "$Id: HELPCommand.cc,v 1.17 2002/01/17 20:04:05 mrbean_ Exp $";
+const char HELPCommand_cc_rcsId[] = "$Id: HELPCommand.cc,v 1.18 2002/05/23 17:43:10 dan_karrels Exp $";
 
 namespace gnuworld
 {

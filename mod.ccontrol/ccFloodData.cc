@@ -3,11 +3,11 @@
  * 
  * flood data class
  * 
- * $Id: ccFloodData.cc,v 1.4 2001/12/30 00:06:10 mrbean_ Exp $
+ * $Id: ccFloodData.cc,v 1.5 2002/05/23 17:43:11 dan_karrels Exp $
  */
  
-#include	<strstream>
 #include	<string> 
+#include	<iostream>
 
 #include	<ctime>
 #include	<cstring> 
@@ -17,15 +17,13 @@
 #include	"Constants.h"
 
 const char ccFloodData_h_rcsId[] = __CCFLOODDATA_H ;
-const char ccFloodData_cc_rcsId[] = "$Id: ccFloodData.cc,v 1.4 2001/12/30 00:06:10 mrbean_ Exp $" ;
+const char ccFloodData_cc_rcsId[] = "$Id: ccFloodData.cc,v 1.5 2002/05/23 17:43:11 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
 
 using std::string ; 
 using std::endl ; 
-using std::strstream ;
-using std::ends ;
 
 namespace uworld
 {

@@ -12,10 +12,12 @@
  * Displays all "Level" records for a specified channel.
  * Can optionally narrow down selection using a number of switches.
  *
- * $Id: ACCESSCommand.cc,v 1.42 2001/09/05 03:47:56 gte Exp $
+ * $Id: ACCESSCommand.cc,v 1.43 2002/05/23 17:43:12 dan_karrels Exp $
  */
 
 #include	<string>
+#include	<sstream>
+#include	<iostream>
 
 #include	"StringTokenizer.h"
 #include	"ELog.h"
@@ -26,10 +28,15 @@
 #include	"cservice_config.h"
 #include	"Network.h"
 
-const char ACCESSCommand_cc_rcsId[] = "$Id: ACCESSCommand.cc,v 1.42 2001/09/05 03:47:56 gte Exp $" ;
+const char ACCESSCommand_cc_rcsId[] = "$Id: ACCESSCommand.cc,v 1.43 2002/05/23 17:43:12 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
+
+using std::endl ;
+using std::ends ;
+using std::stringstream ;
+using std::string ;
 
 static const char* queryHeader =    "SELECT channels.name,users.user_name,levels.access,levels.flags,users_lastseen.last_seen,levels.suspend_expires,levels.last_modif,levels.last_modif_by,levels.suspend_level FROM levels,channels,users,users_lastseen ";
 static const char* queryCondition = "WHERE levels.channel_id=channels.id AND levels.user_id=users.id AND users.id=users_lastseen.user_id ";
@@ -211,7 +218,7 @@ for( StringTokenizer::const_iterator ptr = st.begin() ; ptr != st.end() ;
 
 /* Sort out the additional conditions */
 
-strstream extraCond;
+stringstream extraCond;
 if (minAmount)
 	{
 	extraCond << "AND levels.access >= " << minAmount << " ";
@@ -222,10 +229,10 @@ if (maxAmount)
 	}
 extraCond << ends;
 
-strstream theQuery;
+stringstream theQuery;
 theQuery	<< queryHeader
 		<< queryCondition
-		<< extraCond.str()
+		<< extraCond.str().c_str()
 		<< "AND levels.channel_id = "
 		<< theChan->getID()
 		<< " "
@@ -234,7 +241,7 @@ theQuery	<< queryHeader
 
 #ifdef LOG_SQL
 	elog	<< "ACCESS::sqlQuery> "
-		<< theQuery.str()
+		<< theQuery.str().c_str()
 		<< endl;
 #endif
 
@@ -242,10 +249,7 @@ theQuery	<< queryHeader
  *  All done, display the output. (Only fetch 15 results).
  */
 
-ExecStatusType status = bot->SQLDb->Exec( theQuery.str() ) ;
-delete[] theQuery.str() ;
-delete[] extraCond.str() ;
-
+ExecStatusType status = bot->SQLDb->Exec( theQuery.str().c_str() ) ;
 if( PGRES_TUPLES_OK != status )
 	{
 	elog	<< "ACCESS> SQL Error: "

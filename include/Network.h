@@ -1,15 +1,16 @@
 /* Network.h
- * Author: Daniel Karrels dan@karrels.com
+ * Author: Daniel Karrels (dan@karrels.com)
+ * $Id: Network.h,v 1.27 2002/05/23 17:43:09 dan_karrels Exp $
  */
 
 #ifndef __NETWORK_H
-#define __NETWORK_H "$Id: Network.h,v 1.26 2002/05/19 22:24:48 dan_karrels Exp $"
+#define __NETWORK_H "$Id: Network.h,v 1.27 2002/05/23 17:43:09 dan_karrels Exp $"
 
 #include	<vector>
 #include	<string>
 #include	<map>
 #include	<list>
-#include	<hash_map>
+#include	<ext/hash_map>
 #include	<algorithm>
 
 #include	<ctime>
@@ -19,6 +20,7 @@
 #include	"Channel.h"
 #include	"client.h"
 #include	"misc.h" // struct noCaseCompare
+#include	"defs.h"
 
 namespace gnuworld
 {
@@ -27,8 +29,8 @@ using std::string ;
 using std::vector ;
 using std::map ;
 using std::list ;
-using std::hash ;
-using std::hash_map ;
+using HASHMAPNS::hash_map ;
+using HASHMAPNS::hash ;
 using std::unary_function ;
 
 class xServer ;

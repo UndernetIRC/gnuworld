@@ -4,11 +4,12 @@
  * Storage class for accessing channel user/level information either from the backend
  * or internal storage.
  *
- * $Id: sqlLevel.cc,v 1.14 2002/04/28 16:02:26 gte Exp $
+ * $Id: sqlLevel.cc,v 1.15 2002/05/23 17:43:13 dan_karrels Exp $
  */
 
-#include	<strstream>
+#include	<sstream>
 #include	<string>
+#include	<iostream>
 
 #include	<cstring>
 #include	<ctime>
@@ -23,13 +24,15 @@
 #include	"cservice_config.h"
 
 const char sqlLevel_h_rcsId[] = __SQLLEVEL_H ;
-const char sqlLevel_cc_rcsId[] = "$Id: sqlLevel.cc,v 1.14 2002/04/28 16:02:26 gte Exp $" ;
+const char sqlLevel_cc_rcsId[] = "$Id: sqlLevel.cc,v 1.15 2002/05/23 17:43:13 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
 
 using std::string ;
 using std::endl ;
+using std::ends ;
+using std::stringstream ;
 
 const sqlLevel::flagType sqlLevel::F_AUTOOP =	0x01 ;
 const sqlLevel::flagType sqlLevel::F_PROTECT =	0x02 ;
@@ -70,7 +73,7 @@ bool sqlLevel::loadData(unsigned int userID, unsigned int channelID)
 		<< endl;
 #endif
 
-strstream queryString;
+stringstream queryString;
 queryString	<< "SELECT "
 		<< sql::level_fields
 		<< " FROM levels WHERE channel_id = "
@@ -81,12 +84,11 @@ queryString	<< "SELECT "
 
 #ifdef LOG_SQL
 	elog 	<< "sqlLevel::loadData> "
-		<< queryString.str()
+		<< queryString.str().c_str()
 		<< endl;
 #endif
 
-ExecStatusType status = SQLDb->Exec(queryString.str()) ;
-delete[] queryString.str() ;
+ExecStatusType status = SQLDb->Exec(queryString.str().c_str()) ;
 
 if( PGRES_TUPLES_OK == status )
 	{
@@ -139,7 +141,7 @@ bool sqlLevel::commit()
 
 static const char* queryHeader =    "UPDATE levels ";
 
-strstream queryString;
+stringstream queryString;
 queryString	<< queryHeader
 		<< "SET flags = " << flags << ", "
 		<< "access = " << access << ", "
@@ -157,12 +159,11 @@ queryString	<< queryHeader
 
 #ifdef LOG_SQL
 	elog	<< "sqlLevel::commit> "
-		<< queryString.str()
+		<< queryString.str().c_str()
 		<< endl;
 #endif
 
-ExecStatusType status = SQLDb->Exec(queryString.str()) ;
-delete[] queryString.str() ;
+ExecStatusType status = SQLDb->Exec(queryString.str().c_str()) ;
 
 if( PGRES_COMMAND_OK != status )
 	{
@@ -181,7 +182,7 @@ bool sqlLevel::insertRecord()
 {
 static const char* queryHeader = "INSERT INTO levels (channel_id,user_id,access,flags,added,added_by,last_modif,last_modif_by,last_updated) VALUES (";
 
-strstream queryString;
+stringstream queryString;
 queryString	<< queryHeader
 			<< channel_id << ", "
 			<< user_id << ", "
@@ -196,12 +197,11 @@ queryString	<< queryHeader
 
 #ifdef LOG_SQL
 	elog	<< "sqlLevel::insertRecord> "
-			<< queryString.str()
+			<< queryString.str().c_str()
 			<< endl;
 #endif
 
-ExecStatusType status = SQLDb->Exec(queryString.str()) ;
-delete[] queryString.str() ;
+ExecStatusType status = SQLDb->Exec(queryString.str().c_str()) ;
 
 if( PGRES_COMMAND_OK != status )
 	{

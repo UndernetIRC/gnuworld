@@ -1,9 +1,10 @@
 /* main.cc
- * $Id: main.cc,v 1.37 2002/04/29 13:28:15 dan_karrels Exp $
+ * $Id: main.cc,v 1.38 2002/05/23 17:43:16 dan_karrels Exp $
  */
 
 #include	<new>
 #include	<fstream>
+#include	<iostream>
 
 #include	<sys/time.h>
 #include	<sys/types.h>
@@ -25,7 +26,7 @@
 void		gnu() ;
 
 const char config_h_rcsId[] = __CONFIG_H ;
-const char main_cc_rcsId[] = "$Id: main.cc,v 1.37 2002/04/29 13:28:15 dan_karrels Exp $" ;
+const char main_cc_rcsId[] = "$Id: main.cc,v 1.38 2002/05/23 17:43:16 dan_karrels Exp $" ;
 const char ELog_h_rcsId[] = __ELOG_H ;
 const char FileSocket_h_rcsId[] = __FILESOCKET_H ;
 const char server_h_rcsId[] = __SERVER_H ;
@@ -66,15 +67,15 @@ clog << endl ;
 
 void gnu()
 {
-cout	<< "GNUWorld version 1.1" << endl ;
-cout	<< "Copyright (C) 2002 Free Software Foundation, Inc." << endl ;
-cout	<< "GNUWorld comes with NO WARRANTY," << endl ;
-cout	<< "to the extent permitted by law." << endl ;
-cout	<< "You may redistribute copies of GNUWorld" << endl ;
-cout	<< "under the terms of the GNU General Public License." << endl ;
-cout	<< "For more information about these matters," << endl ;
-cout	<< "see the files named COPYING." << endl ;
-cout	<< endl ;
+clog	<< "GNUWorld version 1.1" << endl ;
+clog	<< "Copyright (C) 2002 Free Software Foundation, Inc." << endl ;
+clog	<< "GNUWorld comes with NO WARRANTY," << endl ;
+clog	<< "to the extent permitted by law." << endl ;
+clog	<< "You may redistribute copies of GNUWorld" << endl ;
+clog	<< "under the terms of the GNU General Public License." << endl ;
+clog	<< "For more information about these matters," << endl ;
+clog	<< "see the files named COPYING." << endl ;
+clog	<< endl ;
 }
 
 int main( int argc, char** argv )
