@@ -1,11 +1,13 @@
 #ifndef DRONESCAN_H
-#define DRONESCAN_H "$Id: dronescan.h,v 1.3 2003/05/04 21:01:12 jeekay Exp $"
+#define DRONESCAN_H "$Id: dronescan.h,v 1.4 2003/05/06 22:17:33 jeekay Exp $"
 
 #include <map>
 
 #include "client.h"
 
 #include "clientData.h"
+#include "dronescanCommands.h"
+#include "dronescanTests.h"
 #include "Timer.h"
 
 namespace gnuworld {
@@ -27,7 +29,10 @@ enum LOG_TYPE {
 };
 
 /* The bit field values of the enabled tests */
-#define TST_JOINCOUNT 0x0002
+#define TST_ABNORMALS	0x0001
+#define TST_JOINCOUNT	0x0002
+#define TST_CHANRANGE	0x0004
+#define TST_HASOP	0x0008
 
 class dronescan : public xClient {
 public:
@@ -88,18 +93,22 @@ public:
 	inline void resetAndCheck()
 		{ setConsoleTopic(); setNickStates(); checkChannels(); }
 	
-	/** Check global channels for drones. */
+	/**
+	 * Check global channels for drones. This is a convenience wrapper
+	 * for isAbnormal( Channel* ).
+	 */
 	void checkChannels() ;
+	void checkChannel( const Channel* , const iClient* = 0 ) ;
 	
 	/** Calculate the entropy of a given string. */
 	double calculateEntropy( const string& ) ;
 	
+	/** Return the entropy of a given client. */
+	double calculateEntropy( const iClient* ) ;
+	
 	/** Check if a channel is normal. */
-	unsigned int isAbnormal( const Channel* );
 	/** Check if an iClient's nick is normal. */
 	bool isNormal( const iClient* ) ;
-	/** Check whether a string is normal. */
-	bool isNormal( const string& ) ;
 	
 	/** Set a clientData's state depending on the iClient. */
 	CLIENT_STATE setClientState( iClient* );
@@ -111,12 +120,20 @@ public:
 	void setConsoleTopic() ;
 	
 	/** Reply to a given iClient. */
-	void Reply(iClient*, char*, ...);
+	void Reply(const iClient*, char*, ...) ;
 	
 	/** See if a given test is enabled. */
 	inline bool testEnabled(testEnabledType theTest)
 		{ return ((enabledTests & theTest) != 0); }
 	
+	
+	/** Configuration variables used by tests. */
+	
+	/** Abnormals options */
+	double channelMargin;
+	
+	/** Channel range options */
+	double channelRange;
 	 
 protected:
 	/** Configuration file. */
@@ -141,7 +158,6 @@ protected:
 	testEnabledType enabledTests;
 	
 	/** Margins. */
-	double channelMargin;
 	double nickMargin;
 	unsigned int channelCutoff;
 	
@@ -151,6 +167,7 @@ protected:
 	typedef map< string , unsigned int , noCaseCompare > jcChanMapType;
 	jcChanMapType jcChanMap;
 	
+	
 	/** Stats. */
 	unsigned int customDataCounter;
 	
@@ -159,6 +176,17 @@ protected:
 	
 	/** Timers for GNUWorld triggered events. */
 	xServer::timerID tidClearJoinCounter;
+	
+	/** Command map type. */
+	typedef map< string , Command* , noCaseCompare > commandMapType;
+	typedef commandMapType::value_type commandPairType;
+	commandMapType commandMap;
+	bool RegisterCommand(Command*);
+	
+	/** Test map type. */
+	typedef vector< Test* > testVectorType;
+	testVectorType testVector;
+	void RegisterTest(Test*);
 }; // class dronescan
 
 } // namespace ds

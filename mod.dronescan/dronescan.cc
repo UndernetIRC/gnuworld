@@ -68,6 +68,16 @@ channelMargin = atof(dronescanConfig->Require("channelMargin")->second.c_str());
 nickMargin = atof(dronescanConfig->Require("nickMargin")->second.c_str());
 channelCutoff = atoi(dronescanConfig->Require("channelCutoff")->second.c_str());
 
+if(testEnabled(TST_ABNORMALS))
+	{
+	RegisterTest(new ABNORMALSTest(this, "ABNORMALS", "Checks for the percentage of normal clients."));
+	}
+
+if(testEnabled(TST_HASOP))
+	{
+	RegisterTest(new HASOPTest(this, "HASOP", "Checks if a channel has any ops."));
+	}
+
 if(testEnabled(TST_JOINCOUNT))
 	{
 	/* Set up join counter config options. */
@@ -75,11 +85,23 @@ if(testEnabled(TST_JOINCOUNT))
 	jcCutoff = atoi(dronescanConfig->Require("jcCutoff")->second.c_str());
 	}
 
+if(testEnabled(TST_CHANRANGE))
+	{
+	/* Set up channel range config options */
+	channelRange = atof(dronescanConfig->Require("channelRange")->second.c_str());
+	
+	/* Register the test */
+	RegisterTest(new RANGETest(this, "RANGE", "Checks the entropy range."));
+	}
+
 /* Initialise statistics */
 customDataCounter = 0;
 
 /* Set up our timer. */
 theTimer = new Timer();
+
+/* Register commands available to users */
+RegisterCommand(new CHECKCommand(this, "CHECK", "(<#channel>) (<user>)"));
 } // dronescan::dronescan(const string&)
 
 
@@ -202,59 +224,27 @@ int dronescan::OnChannelEvent( const channelEventType& theEvent,
 	/* If we are bursting, we don't want to be checking joins. */
 	if(currentState == BURST) return 0;
 
-	/* For a ChannelEvent, Data1 is always the target iClient */
-	iClient *theClient = static_cast < iClient* > ( Data1 );
+	/* Iterate over our available tests, checking this channel */
+	checkChannel( theChannel , false );
 	
-	
-	/*****************************
-	 ** J O I N   C O U N T E R **
-	 *****************************/
-	
+	/* Do join count processing if applicable */
 	if(testEnabled(TST_JOINCOUNT))
 		{
-		string chanName = theChannel->getName();
-		jcChanMap[chanName]++;
+		string channelName = theChannel->getName();
 		
-		unsigned int joinCount = jcChanMap[chanName];
+		jcChanMap[channelName]++;
 		
-		log(DEBUG, "Caught join to %s. Total count now %d.",
-			chanName.c_str(),
-			joinCount
-			);
+		unsigned int joinCount = jcChanMap[channelName];
 		
 		if(joinCount > jcCutoff)
 			{
 			log(WARN, "%s has had %d joins within the last %ds.",
-				chanName.c_str(),
+				channelName.c_str(),
 				joinCount,
 				jcInterval
 				);
 			}
 		}
-	
-	
-	/*
-	 * If the client is normal, we don't care as they cannot cause a
-	 * channel to be marked abnormal. This also prevents spurious warning
-	 * messages when people enter a channel to investigate.
-	 */
-	
-	if(isNormal(theClient)) return 0;
-	
-	/* Is the client opered? If so, don't generate warnings. */
-	if(theClient->isOper()) return 0;
-	
-	/* An abnormal client has entered a channel. Check it. */
-	unsigned int abnormals;
-	if(!(abnormals = isAbnormal(theChannel))) return 0;
-	
-	/* We are above the channelMargin threshold for abnormals. Warn. */
-	log(WARN, "WARNING: %s joined %s. Membership is now %d/%d.",
-		theClient->getNickName().c_str(),
-		theChannel->getName().c_str(),
-		abnormals,
-		theChannel->size()
-		);
 	
 	return 0;
 }
@@ -263,23 +253,30 @@ int dronescan::OnChannelEvent( const channelEventType& theEvent,
 /**
  * Here we receive private messages from iClients.
  */
-int dronescan::OnPrivateMessage( iClient* theClient, const string& message, bool secure )
+int dronescan::OnPrivateMessage( iClient* theClient, const string& Message, bool secure )
 {
 	if(!theClient->isOper()) return 0;
 	
-	StringTokenizer st(message);
+	StringTokenizer st(Message);
 	
 	if(st.size() < 1) return 0;
 	
-	string command = string_upper(st[0]);
+	string Command = string_upper(st[0]);
+	commandMapType::iterator commandHandler = commandMap.find(Command);
 	
-	if("INVITE" == command)
+	if(commandHandler != commandMap.end())
+		{
+		commandHandler->second->Exec(theClient, Message);
+		return 1;
+		}
+		
+	if("INVITE" == Command)
 		{
 		Invite(theClient, consoleChannel);
 		return 0;
 		}
 	
-	if("STATS" == command)
+	if("STATS" == Command)
 		{
 		Reply(theClient, "Allocated custom data: %d", customDataCounter);
 		if(1)
@@ -296,7 +293,7 @@ int dronescan::OnPrivateMessage( iClient* theClient, const string& message, bool
 		return 0;
 		}
 	
-	if("RESET" == command)
+	if("RESET" == Command)
 		{
 		resetAndCheck();
 		return 0;
@@ -304,7 +301,7 @@ int dronescan::OnPrivateMessage( iClient* theClient, const string& message, bool
 	
 	if(st.size() < 2) return 0;
 	
-	if("INFO" == command)
+	if("INFO" == Command)
 		{
 		string nick = st[1];
 		iClient *targetClient = Network->findNick(nick);
@@ -318,28 +315,38 @@ int dronescan::OnPrivateMessage( iClient* theClient, const string& message, bool
 	
 	if(st.size() < 3) return 0;
 	
-	if("SET" == command)
+	if("SET" == Command)
 		{
-		string option = string_upper(st[1]);
+		string Option = string_upper(st[1]);
 		
-		if("CC" == option)
+		/* Global entropy options */
+		if("CC" == Option)
 			{
 			unsigned int newCC = atoi(st[2].c_str());
 			channelCutoff = newCC;
 			resetAndCheck();
 			}
-		if("CM" == option)
+		if("CM" == Option)
 			{
 			double newCM = atof(st[2].c_str());
 			if(newCM < 0 || newCM > 1) return 0;
 			channelMargin = newCM;
 			resetAndCheck();
 			}
-		if("NM" == option)
+		if("NM" == Option)
 			{
 			double newNM = atof(st[2].c_str());
 			if(newNM < 0 || newNM > 1) return 0;
 			nickMargin = newNM;
+			resetAndCheck();
+			}
+		
+		/* Channel entropy options */
+		if("CR" == Option)
+			{
+			double newCR = atof(st[2].c_str());
+			if(newCR < 0) return 0;
+			channelRange = newCR;
 			resetAndCheck();
 			}
 		}
@@ -500,6 +507,18 @@ void dronescan::calculateEntropy()
 	log(DEBUG, "Found entropy in: %d ms", theTimer->stopTimeMS());
 }
 
+
+/** Return the entropy of a given client. */
+double dronescan::calculateEntropy( const iClient *theClient )
+{
+	clientData *theData = static_cast< clientData* > ( theClient->getCustomData(this) );
+
+	assert(theData->getEntropy() != 0);
+	
+	return theData->getEntropy();	
+}
+
+
 /** Calculate state of all nicks. */
 void dronescan::setNickStates()
 {
@@ -534,21 +553,63 @@ void dronescan::checkChannels()
 	for( ; ptr != Network->channels_end() ; ++ptr )
 		{
 		++noChannels;
-		unsigned int abnormals;
-		if((abnormals = isAbnormal(ptr->second)))
-			{
-			log(WARN, "  AC: %s (%d/%d)",
-				ptr->second->getName().c_str(),
-				abnormals,
-				ptr->second->size()
-				);
-			}
+		
+		if(ptr->second->size() < channelCutoff) continue;
+		
+		checkChannel( ptr->second );
 		}
 	
 	log(INFO, "Finished checking %d channels. Duration: %d ms",
 		noChannels,
 		theTimer->stopTimeMS()
 		);
+}
+
+
+/** Check a channel for drones. */
+void dronescan::checkChannel( const Channel *theChannel , const iClient *theClient )
+{
+	unsigned short int normal = 0;
+
+	/* Iterate over the tests. */
+	for(testVectorType::iterator testItr = testVector.begin() ;
+	    testItr != testVector.end() ; ++testItr )
+		{
+		bool hasPassed = (*testItr)->isNormal(theChannel);
+
+		if(theClient)
+			{
+			Reply(theClient, "%20s: %s",
+				(*testItr)->getName().c_str(),
+				hasPassed ? "PASSED" : "FAILED"
+				);
+			}
+
+		if(hasPassed) ++normal;
+		}
+
+	/* If we were checking for a client, don't output to console. */
+	if(theClient) return;
+	
+	/* If the normal count is over half of the total test numbers
+	 * we report that it is normal. Else it is abnormal. */
+	
+	if(normal > (testVector.size() / 2))
+		{
+		/* This channel is voted normal. */
+		return;
+		}
+	else
+		{
+		/* This channel is voted abnormal. */
+		log(WARN, "  AC: %20s - %d/%d tests failed - %d users",
+			theChannel->getName().c_str(),
+			(testVector.size() - normal),
+			testVector.size(),
+			theChannel->size()
+			);
+		return;
+		}
 }
 
 
@@ -568,6 +629,7 @@ double dronescan::calculateEntropy( const string& theString )
 }
 
 
+#if 0
 /** Decide whether a channel is `abnormal'. */
 unsigned int dronescan::isAbnormal( const Channel* theChannel )
 {
@@ -592,6 +654,7 @@ unsigned int dronescan::isAbnormal( const Channel* theChannel )
 	else
 		return 0;
 }
+#endif
 
 
 /** Check whether an iClient's nick is `normal'. */
@@ -609,25 +672,13 @@ bool dronescan::isNormal( const iClient* theClient )
 }
 
 
-/** Decide whether a given string is `normal'. */
-bool dronescan::isNormal( const string& theString )
-{
-	double theEntropy = calculateEntropy(theString);
-	
-	if(
-	    theEntropy > averageEntropy * (1 + nickMargin) ||
-	    theEntropy < averageEntropy * (1 - nickMargin)
-	  )
-		return false;
-	
-	return true;
-}
-
-
 /** Set the iClient's state depending on certain features. */
 CLIENT_STATE dronescan::setClientState( iClient *theClient )
 {
 	clientData* theData = static_cast< clientData* > (theClient->getCustomData(this));
+	
+	double userEntropy = calculateEntropy(theClient->getNickName());
+	theData->setEntropy(userEntropy);
 	
 	/* Make sure our services don't skew anything */
 	if(theClient->isModeK()) return theData->setState(NORMAL);
@@ -646,10 +697,9 @@ CLIENT_STATE dronescan::setClientState( iClient *theClient )
 	/*
 	 * Second, check whether the nickname itself is abnormal.
 	 */
-	if(!isNormal( theClient->getNickName() ))
-		{
+	if( userEntropy > averageEntropy * (1 + nickMargin) ||
+	    userEntropy < averageEntropy * (1 - nickMargin) )
 		return theData->setState(ABNORMAL);
-		}
 	
 	/*
 	 * It has passed the checks. It is therefore normal.
@@ -661,7 +711,7 @@ CLIENT_STATE dronescan::setClientState( iClient *theClient )
 /** Log a message. */
 void dronescan::log(LOG_TYPE logType, char *format, ...)
 {
-	if(logType < INFO) return;
+//	if(logType < INFO) return;
 	
 	stringstream newMessage;
 	
@@ -712,22 +762,52 @@ void dronescan::setConsoleTopic()
 				;
 		}
 	
+	if(testEnabled(TST_CHANRANGE))
+		{
+		setTopic	<< "  ||"
+				<< "  channelRange: " << channelRange
+				;
+		}
+	
 	Write(setTopic);
 }
 
 
 /** Reply to an iClient. */
-void dronescan::Reply(iClient *theClient, char *format, ...)
+void dronescan::Reply(const iClient *theClient, char *format, ...)
 {
-	char buffer[1024] = {0};
+	char buffer[512] = {0};
 	va_list _list;
 	
 	va_start(_list, format);
-	vsnprintf(buffer, 1024, format, _list);
+	vsnprintf(buffer, 512, format, _list);
 	va_end(_list);
 	
 	Message(theClient, buffer);
 }
+
+
+/** Register a new command. */
+bool dronescan::RegisterCommand( Command *theCommand )
+{
+	return commandMap.insert( commandPairType(theCommand->getName(), theCommand)).second;
+}
+
+
+/** Register a new test. */
+void dronescan::RegisterTest( Test *theTest )
+{
+	testVector.push_back(theTest);
+}
+
+
+
+/** Return usage information for a client */
+void Command::Usage( const iClient *theClient )
+{
+	bot->Notice(theClient, string("SYNTAX: ") + getInfo());
+}
+
 
 
 } // namespace ds
