@@ -15,7 +15,7 @@
 #include 	"ccUser.h"
 #include	"misc.h"
 
-const char REMCOMMANDCommand_cc_rcsId[] = "$Id: REMCOMMANDCommand.cc,v 1.1 2001/07/26 20:12:40 mrbean_ Exp $";
+const char REMCOMMANDCommand_cc_rcsId[] = "$Id: REMCOMMANDCommand.cc,v 1.2 2001/07/29 13:33:20 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -45,16 +45,13 @@ if(!theUser)
 	return false;
 	}
 	
-int CommandLevel = bot->getCommandLevel(st[2]);
-if(CommandLevel == -1 )
+Command* Comm = bot->findCommandInMem(st[2]);
+if(!Comm)
 	{
 	bot->Notice(theClient,"Command %s does not exists!",st[2].c_str());
 	delete theUser;
 	return false;	        
 	}
-//CommandLevel &= ~flg_NOLOG;
-//CommandLevel = bot->getTrueAccess(CommandLevel);
-//Check if the user is trying to remove a command for himself
 AuthInfo* tempUser = bot->IsAuth(theClient->getCharYYXXX());
 
 if(!strcasecmp(tempUser->getName(),st[1]))
@@ -83,14 +80,14 @@ if((Admin) && (strcasecmp(tempUser->getServer(),theUser->getServer())))
 	}
 	
 
-if(!(theUser->gotAccess(CommandLevel)))
+if(!(theUser->gotAccess(Comm)))
 	{
 	bot->Notice(theClient,"%s doest have access for %s",st[1].c_str(),st[2].c_str());
 	delete theUser;
 	return false;	        
 	}	
 //Remove the command 	
-theUser->removeCommand(CommandLevel);
+theUser->removeCommand(Comm);
 theUser->setLast_Updated_By(theClient->getNickUserHost());
 if(theUser->Update())
 	{

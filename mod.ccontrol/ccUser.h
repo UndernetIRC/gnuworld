@@ -1,14 +1,17 @@
 /* ccUser.h */
 
 #ifndef __CCUSER_H
-#define __CCUSER_H "$Id: ccUser.h,v 1.9 2001/07/23 10:28:51 mrbean_ Exp $"
+#define __CCUSER_H "$Id: ccUser.h,v 1.10 2001/07/29 13:33:20 mrbean_ Exp $"
 
 #include	<string>
 
 #include	<ctime>
 
 #include	"libpq++.h"
- 
+
+#include	"CControlCommands.h" 
+
+//#include	"ccontrol.h"
 namespace gnuworld
 { 
 
@@ -65,12 +68,12 @@ public:
 	inline const string&		getSuspendedBy() const
 		    { return SuspendedBy ; }
 
-	inline const unsigned int&	getAccess() const
+	inline const unsigned long int&	getAccess() const
 		    { return Access ; }
 
-	inline const bool    		gotAccess(unsigned int _command) const
-		    { return (Access & _command ? true : false) ; }
-	
+	inline const unsigned long int&	getSAccess() const
+		    { return SAccess ; }
+
 	inline const unsigned int&	getFlags() const
 		    { return Flags ; }
 	
@@ -132,14 +135,13 @@ public:
 	inline void 			setSuspendedBy( const string& _suspendedby )
 		    { SuspendedBy = _suspendedby; }
 
-	inline void 			removeCommand( const unsigned int _command )
-		    { Access &= ~_command; }
 
-	inline void 			setAccess( const unsigned int _access )
+	inline void 			setAccess( const unsigned long int _access )
 		    { Access = _access; }
 
-	inline void 			addCommand( const unsigned int _command )
-		    { Access |= _command; }
+	inline void 			setSAccess( const unsigned long int _saccess )
+		    { SAccess = _saccess; }
+
 
 	inline void 			setFlags( const unsigned int _flags )
 		    { Flags = _flags; }
@@ -186,6 +188,16 @@ public:
 	
 	void setType(unsigned int Type);
 	
+	bool gotAccess(Command* Comm);
+	
+	void addCommand(Command* Comm);
+	
+	void removeCommand(Command* Comm);
+
+	void updateAccessFromFlags();
+
+	void updateAccess(unsigned int Type);
+		
 protected:
 	unsigned int Id;
 	string UserName;
@@ -197,7 +209,8 @@ protected:
 	bool   IsSuspended;
 	time_t SuspendExpires;
 	string SuspendedBy;
-	unsigned int Access;
+	unsigned long int Access;
+	unsigned long int SAccess;
 	unsigned int Flags;
 	bool IsUhs;
 	bool IsOper;

@@ -16,7 +16,7 @@
 #include	"AuthInfo.h"
 #include	"misc.h"
 
-const char ADDCOMMANDCommand_cc_rcsId[] = "$Id: ADDCOMMANDCommand.cc,v 1.13 2001/07/27 12:10:49 mrbean_ Exp $";
+const char ADDCOMMANDCommand_cc_rcsId[] = "$Id: ADDCOMMANDCommand.cc,v 1.14 2001/07/29 13:33:20 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -59,16 +59,14 @@ if( !theUser )
 	return false;
 	}
 pos++;	
-int CommandLevel = bot->getCommandLevel(st[pos]);
-
-if( CommandLevel == -1 )
+//int CommandLevel = bot->getCommandLevel(st[pos]);
+Command* Comm = bot->findCommandInMem(st[pos]);
+if( !Comm )
 	{
 	bot->Notice( theClient,
 		"Command %s does not exist!",
-		st[2].c_str());
+		st[pos].c_str());
 
-	// TODO: Bug?  Even if it's not, this is an obvious design
-	// error.
 	delete theUser;
 
 	return false;	        
@@ -82,7 +80,7 @@ if( NULL == AClient )
 	}
 
 // Only allow opers who have access to that command to add it to new opers
-if(!(AClient->getAccess() & CommandLevel ))
+if(!AClient->gotAccess(Comm) )
 	{
 	bot->Notice( theClient,
 		"You must have access to a command inorder to add it");
@@ -115,7 +113,7 @@ if(Forced)
 		return false;
 		}
 	}
-else if((bot->findCommandInMem(st[pos]))->getMinLevel() > theUser->getType())
+else if(Comm->getMinLevel() > theUser->getType())
 	{
 	if(AClient->getFlags() >= operLevel::SMTLEVEL)
 		bot->Notice(theClient,
@@ -126,7 +124,7 @@ else if((bot->findCommandInMem(st[pos]))->getMinLevel() > theUser->getType())
 	return false;
 	}
 		
-else if(theUser->gotAccess(CommandLevel))	
+else if(theUser->gotAccess(Comm))	
 	{
 	bot->Notice( theClient,
 		"%s already got access for %s",
@@ -137,13 +135,13 @@ else if(theUser->gotAccess(CommandLevel))
 	}
 
 //Add the command and update the user db record	
-theUser->addCommand(CommandLevel);
+theUser->addCommand(Comm);
 theUser->setLast_Updated_By(theClient->getNickUserHost());
 if(theUser->Update())
 	{
 	bot->Notice( theClient,
 		"Successfully added the command for %s",
-		st[1].c_str());
+		st[pos-1].c_str());
 	if(Forced)
 		bot->MsgChanLog("%s is using -fr to add %s to %s"
 				,theClient->getNickName().c_str(),st[pos].c_str()
@@ -157,7 +155,7 @@ else
 	{
 	bot->Notice( theClient,
 		"Error while adding command for %s",
-		st[1].c_str());
+		st[pos-1].c_str());
 	delete theUser;
 	return false;
 	}

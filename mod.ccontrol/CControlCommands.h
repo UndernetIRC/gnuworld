@@ -7,7 +7,6 @@
 #include	<string>
 
 #include	"iClient.h"
-#include        "ccUser.h"
 
 using std::string ;
 
@@ -29,7 +28,8 @@ public:
 	Command( ccontrol* _bot, const string& _commName,
 		const string& _help, const unsigned long _flags,
 		const bool _disabled, const bool _needOp,
-		const bool _noLog,const int unsigned _minLevel)
+		const bool _noLog,const int unsigned _minLevel
+		, const bool _secondAccess)
 	 : bot( _bot ),
 	   server( 0 ),
 	   commName( _commName ),
@@ -39,7 +39,8 @@ public:
 	   isDisabled ( _disabled ),
 	   needOp ( _needOp),
 	   noLog ( _noLog ),
-	   minLevel ( _minLevel )    	   	
+	   minLevel ( _minLevel ),
+	   secondAccess ( _secondAccess )    	   	
 	{}
 	virtual ~Command() {}
 
@@ -94,7 +95,9 @@ public:
 
 	inline const unsigned int getMinLevel() const
 		{ return minLevel ; }
-				
+
+	inline const bool getSecondAccess() const
+		{ return secondAccess ; }				
 protected:
 	ccontrol*	bot ;
 	xServer*	server ;
@@ -106,6 +109,7 @@ protected:
 	bool		needOp;
 	bool		noLog;
 	unsigned int	minLevel;
+	bool		secondAccess;
 } ;
 
 #define DECLARE_COMMAND(commName) \
@@ -116,9 +120,10 @@ public: \
 		const string& _commName, \
 		const string& _help,  \
 	        int _flags , bool isDisabled, \
-		bool needOp, bool noLog, int minLevel ) \
+		bool needOp, bool noLog, \
+		int minLevel , bool secondAccess ) \
 	: Command( _bot, _commName, _help,_flags,isDisabled \
-	,needOp,noLog,minLevel) \
+	,needOp,noLog,minLevel,secondAccess) \
 	{} \
 	virtual bool Exec( iClient*, const string&) ; \
 	virtual ~commName##Command() {} \
@@ -167,79 +172,6 @@ DECLARE_COMMAND( LISTIGNORES )
 DECLARE_COMMAND( REMOVEIGNORE )
 DECLARE_COMMAND( LIST )
 DECLARE_COMMAND( COMMANDS )
-/*
-
- These are the commands flags 
- To enable a command for an oper he must have the command 
- flag set in his access 
- 
- **NOTE** Commands with access 0 can be accessed without loginin first  
- 
-*/
-
-
-const unsigned int flg_ACCESS   = 0x01;
-const unsigned int flg_HELP     = 0x01;
-const unsigned int flg_LOGIN    = 0x0; 
-const unsigned int flg_DEAUTH    = 0x01;
-
-const unsigned int flg_NEWPASS  = 0x01;
-const unsigned int flg_MODE     = 0x02;
-const unsigned int flg_OP = 0x02;
-const unsigned int flg_DEOP = 0x02;
-const unsigned int flg_MODERATE = 0x02;
-const unsigned int flg_UNMODERATE = 0x02;
-const unsigned int flg_INVITE   = 0x04;
-const unsigned int flg_JUPE     = 0x08;
-const unsigned int flg_GLINE    = 0x10;
-const unsigned int flg_SGLINE   = 0x10;
-const unsigned int flg_REMGLINE = 0x10;
-const unsigned int flg_REMOPCHN = 0x20;
-const unsigned int flg_ADDOPCHN = 0x20;
-const unsigned int flg_LOPCHN   = 0x20;
-const unsigned int flg_CHINFO   = 0x40;
-const unsigned int flg_WHOIS    = 0x80;
-const unsigned int flg_ADDNOP   = 0x100;
-const unsigned int flg_REMOP    = 0x100;
-const unsigned int flg_MODOP    = 0x100;
-const unsigned int flg_TRANS    = 0x200;
-const unsigned int flg_KICK     = 0x400;
-const unsigned int flg_ADDCMD   = 0x800; 
-const unsigned int flg_DELCMD   = 0x800;
-const unsigned int flg_SUSPEND  = 0x1000;
-const unsigned int flg_UNSUSPEND  = 0x1000;
-const unsigned int flg_CLEARCHAN = 0x2000;
-
-const unsigned int flg_LISTHOSTS = 0x100;
-const unsigned int flg_ADDSERVER = 0x4000;
-const unsigned int flg_LEARNNET = 0x4000;
-const unsigned int flg_REMSERVER = 0x4000;
-const unsigned int flg_CHECKNET = 0x4000;
-const unsigned int flg_LASTCOM = 0x4000;
-const unsigned int flg_FGLINE = 0x8000;
-const unsigned int flg_EXCEPTIONS = 0x10000;
-const unsigned int flg_LISTIGNORES = 0x20000;
-const unsigned int flg_REMIGNORE = 0x40000;
-const unsigned int flg_LIST = 0x80000;
-const unsigned int flg_COMMANDS = 0x100000;
-
-
-
-/*
- Default commands that are added upon adding a new oper
-*/
-
-const unsigned int OPER = flg_MODE | flg_INVITE | flg_GLINE | flg_CHINFO | flg_WHOIS | flg_TRANS | flg_KICK | flg_CLEARCHAN |flg_NEWPASS | flg_LIST;
-const unsigned int ADMIN = OPER | flg_ADDOPCHN | flg_ADDNOP | flg_ADDCMD | flg_SUSPEND | flg_JUPE | flg_ADDSERVER | flg_FGLINE | flg_EXCEPTIONS;
-const unsigned int SMT = ADMIN;
-const unsigned int CODER = SMT | flg_COMMANDS;
-
-//Oper flags 
-
-//const int isOPER      = 0x02;
-//const int isADMIN     = 0x04;
-//const int isSMT     = 0x08;
-//const int isCODER     = 0x20;
 
 }
 

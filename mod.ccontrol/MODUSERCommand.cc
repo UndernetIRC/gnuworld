@@ -14,7 +14,7 @@
 #include	"ccUser.h"
 #include	"misc.h"
 
-const char MODUSERCommand_cc_rcsId[] = "$Id: MODUSERCommand.cc,v 1.1 2001/07/26 20:12:40 mrbean_ Exp $";
+const char MODUSERCommand_cc_rcsId[] = "$Id: MODUSERCommand.cc,v 1.2 2001/07/29 13:33:20 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -228,7 +228,22 @@ while(pos < st.size())
 		bot->UpdateAuth(tmpUser);
 		pos += 2;
 		}	
-	
+	else if(!strcasecmp(st[pos],"-ua")) //Trying to toggle the get of logs
+		{
+		tmpUser->updateAccessFromFlags();
+		tmpUser->setLast_Updated_By(theClient->getNickUserHost());
+		if(tmpUser->Update())
+			{
+			bot->Notice(theClient,"Successfully updated %s access",st[1].c_str());
+			bot->UpdateAuth(tmpUser);
+			}
+		else
+			{
+			bot->Notice(theClient,"Error while updating %s access",st[1].c_str());
+			bot->UpdateAuth(tmpUser);
+			}
+	    	pos++;
+		}
 	else
 		{
 		bot->Notice(theClient,"Unknown option %s",st[pos].c_str());

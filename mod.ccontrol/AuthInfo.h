@@ -1,11 +1,13 @@
 /* AuthInfo.h */
 
 #ifndef __AUTHINFO_H
-#define __AUTHINFO_H "$Id: AuthInfo.h,v 1.5 2001/07/23 10:28:51 mrbean_ Exp $"
+#define __AUTHINFO_H "$Id: AuthInfo.h,v 1.6 2001/07/29 13:33:20 mrbean_ Exp $"
 
 #include	<string>
 
 #include	<ctime>
+
+#include 	<CControlCommands.h>
 
 namespace gnuworld
 {
@@ -32,8 +34,11 @@ public:
 	inline const unsigned int	getId() const
 		{ return Id; }
 		
-	inline const unsigned int	getAccess() const
+	inline const unsigned long int	getAccess() const
 		{ return Access; }
+
+	inline const unsigned long int	getSAccess() const
+		{ return SAccess; }
 		
 	inline  const unsigned int 	getFlags() const
 		{ return Flags; }
@@ -63,8 +68,12 @@ public:
 	inline void 			setId( const int _Id )
 		{ Id = _Id; } 			
 
-	inline void 			setAccess( const int _Access )
+	inline void 			setAccess( const unsigned long int _Access )
 		{ Access = _Access; } 			
+
+	inline void 			setSAccess( const unsigned long int _SAccess )
+		{ SAccess = _SAccess; } 			
+
 	inline void 			setFlags( const int _Flags )
 		{ Flags = _Flags; } 			
 	
@@ -86,7 +95,8 @@ public:
 	
 	inline void			setGetLogs( const bool _GetLogs )
 		{ GetLogs = _GetLogs; }
-				
+
+	bool gotAccess(Command* Comm);
 		
 protected:
 
@@ -97,7 +107,8 @@ protected:
 	time_t		SuspendExpires;
 	string 		Server;
 	unsigned int	Id;
-	unsigned int	Access;
+	unsigned long int Access;
+	unsigned long int SAccess;
 	unsigned int	Flags;
 	bool		NeedOp;
 	bool		GetLogs;

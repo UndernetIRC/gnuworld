@@ -25,9 +25,10 @@
 #include	"AuthInfo.h"
 #include        "server.h"
 #include 	"gline.h"
+#include	"commLevels.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.63 2001/07/26 20:12:40 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.64 2001/07/29 13:33:20 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -156,89 +157,89 @@ if( operChans.end() == find( operChans.begin(), operChans.end(), msgChan ) )
 // Be sure to use all capital letters for the command name
 
 RegisterCommand( new HELPCommand( this, "HELP", "[topic]"
-	"\t\tObtain general help or help for a specific command",flg_HELP,false,false,true,operLevel::UHSLEVEL ) ) ;
+	"\t\tObtain general help or help for a specific command",commandLevel::flg_HELP,false,false,true,operLevel::UHSLEVEL,false ) ) ;
 RegisterCommand( new INVITECommand( this, "INVITE", "<#channel> "
-	"\t\tRequest an invitation to a channel",flg_INVITE,false,false,false,operLevel::UHSLEVEL ) ) ;
+	"\t\tRequest an invitation to a channel",commandLevel::flg_INVITE,false,false,false,operLevel::UHSLEVEL,false ) ) ;
 RegisterCommand( new JUPECommand( this, "JUPE", "<servername> <reason> "
-	"Jupe a server for the given reason.",flg_JUPE,false,false,false,operLevel::UHSLEVEL ) ) ;
+	"Jupe a server for the given reason.",commandLevel::flg_JUPE,false,false,false,operLevel::UHSLEVEL,false ) ) ;
 RegisterCommand( new MODECommand( this, "MODE", "<channel> <modes> "
-	"Change modes on the given channel",flg_MODE,false,false,false,operLevel::UHSLEVEL ) ) ;
+	"Change modes on the given channel",commandLevel::flg_MODE,false,false,false,operLevel::UHSLEVEL,false ) ) ;
 RegisterCommand( new GLINECommand( this, "GLINE", "<user@host> <duration>[time units (s,d,h)] <reason> "
-	"Gline a given user@host for the given reason",flg_GLINE,false,false,false,operLevel::UHSLEVEL ) ) ;
+	"Gline a given user@host for the given reason",commandLevel::flg_GLINE,false,false,false,operLevel::UHSLEVEL,false ) ) ;
 RegisterCommand( new SCANGLINECommand( this, "SCANGLINE", "<mask> "
-	"Search current network glines for glines matching <mask>",flg_SGLINE,false,false,false,operLevel::UHSLEVEL ) ) ;
+	"Search current network glines for glines matching <mask>",commandLevel::flg_SGLINE,false,false,false,operLevel::UHSLEVEL,false ) ) ;
 RegisterCommand( new REMGLINECommand( this, "REMGLINE", "<user@host> "
-	"Remove the gline matching <mask>",flg_REMGLINE,false,false,false,operLevel::UHSLEVEL ) ) ;
+	"Remove the gline matching <mask>",commandLevel::flg_REMGLINE,false,false,false,operLevel::UHSLEVEL,false ) ) ;
 RegisterCommand( new TRANSLATECommand( this, "TRANSLATE", "<numeric>"
-	"Translate a numeric into user information",flg_TRANS,false,false,false,operLevel::UHSLEVEL ) ) ;
+	"Translate a numeric into user information",commandLevel::flg_TRANS,false,false,false,operLevel::UHSLEVEL,false ) ) ;
 RegisterCommand( new WHOISCommand( this, "WHOIS", "<nickname>"
-	"Obtain information on a given nickname",flg_WHOIS,false,false,false,operLevel::UHSLEVEL ) ) ;
+	"Obtain information on a given nickname",commandLevel::flg_WHOIS,false,false,false,operLevel::UHSLEVEL,false ) ) ;
 RegisterCommand( new KICKCommand( this, "KICK", "<channel> <nick> <reason>"
-	"Kick a user from a channel",flg_KICK,false,false,false,operLevel::UHSLEVEL ) ) ;
+	"Kick a user from a channel",commandLevel::flg_KICK,false,false,false,operLevel::UHSLEVEL,false ) ) ;
 RegisterCommand( new ADDOPERCHANCommand( this, "ADDOPERCHAN", "<channel>"
-	"Add an oper channel",flg_ADDOPCHN,false,false,false,operLevel::UHSLEVEL ) ) ;
+	"Add an oper channel",commandLevel::flg_ADDOPCHN,false,false,false,operLevel::UHSLEVEL,false ) ) ;
 RegisterCommand( new REMOPERCHANCommand( this, "REMOPERCHAN", "<channel>"
-	"Remove an oper channel",flg_REMOPCHN,false,false,false,operLevel::UHSLEVEL ) ) ;
+	"Remove an oper channel",commandLevel::flg_REMOPCHN,false,false,false,operLevel::UHSLEVEL,false ) ) ;
 RegisterCommand( new LISTOPERCHANSCommand( this, "LISTOPERCHANS",
-	"List current IRCoperator only channels",flg_LOPCHN,false,false,false,operLevel::UHSLEVEL ) ) ;
+	"List current IRCoperator only channels",commandLevel::flg_LOPCHN,false,false,false,operLevel::UHSLEVEL,false ) ) ;
 RegisterCommand( new CHANINFOCommand( this, "CHANINFO", "<channel>"
-	"Obtain information about a given channel",flg_CHINFO,false,false,false,operLevel::UHSLEVEL ) ) ;
+	"Obtain information about a given channel",commandLevel::flg_CHINFO,false,false,false,operLevel::UHSLEVEL,false ) ) ;
 RegisterCommand( new ACCESSCommand( this, "ACCESS",
-	"Obtain the access list",flg_ACCESS,false,false,true,operLevel::UHSLEVEL ) ) ;
+	"Obtain the access list",commandLevel::flg_ACCESS,false,false,true,operLevel::UHSLEVEL,false ) ) ;
 RegisterCommand( new LOGINCommand( this, "LOGIN", "<USER> <PASS> "
-	"Authenticate with the bot",flg_LOGIN,false,true,true,operLevel::UHSLEVEL ) ) ;
+	"Authenticate with the bot",commandLevel::flg_LOGIN,false,true,true,operLevel::UHSLEVEL,false ) ) ;
 RegisterCommand( new DEAUTHCommand( this, "DEAUTH", ""
-	"Deauthenticate with the bot",flg_DEAUTH,false,false,true,operLevel::UHSLEVEL ) ) ;
+	"Deauthenticate with the bot",commandLevel::flg_DEAUTH,false,false,true,operLevel::UHSLEVEL,false ) ) ;
 RegisterCommand( new ADDUSERCommand( this, "ADDUSER", "<USER> <OPERTYPE> <PASS> "
-	"Add a new oper",flg_ADDNOP,false,false,false,operLevel::UHSLEVEL ) ) ;
+	"Add a new oper",commandLevel::flg_ADDNOP,false,false,false,operLevel::UHSLEVEL,false ) ) ;
 RegisterCommand( new REMUSERCommand( this, "REMUSER", "<USER> <PASS> "
-	"Remove an oper",flg_REMOP,false,false,false,operLevel::UHSLEVEL ) ) ;
+	"Remove an oper",commandLevel::flg_REMOP,false,false,false,operLevel::UHSLEVEL,false ) ) ;
 RegisterCommand( new ADDCOMMANDCommand( this, "ADDCOMMAND", "<USER> <COMMAND> "
-	"Add a new command to an oper",flg_ADDCMD,false,false,false,operLevel::UHSLEVEL ) ) ;
+	"Add a new command to an oper",commandLevel::flg_ADDCMD,false,false,false,operLevel::UHSLEVEL,false ) ) ;
 RegisterCommand( new REMCOMMANDCommand( this, "REMCOMMAND", "<USER> <COMMAND> "
-	"Remove a command from oper",flg_DELCMD,false,false,false,operLevel::UHSLEVEL ) ) ;
+	"Remove a command from oper",commandLevel::flg_DELCMD,false,false,false,operLevel::UHSLEVEL,false ) ) ;
 RegisterCommand( new NEWPASSCommand( this, "NEWPASS", "<PASSWORD> "
-	"Change password",flg_NEWPASS,false,false,true,operLevel::UHSLEVEL ) ) ;
+	"Change password",commandLevel::flg_NEWPASS,false,false,true,operLevel::UHSLEVEL,false ) ) ;
 RegisterCommand( new SUSPENDCommand( this, "SUSPEND", "<OPER> <DURATION> <TIME UNITS>"
-	"Suspend an oper",flg_SUSPEND,false,false,false,operLevel::UHSLEVEL ) ) ;
+	"Suspend an oper",commandLevel::flg_SUSPEND,false,false,false,operLevel::UHSLEVEL,false ) ) ;
 RegisterCommand( new UNSUSPENDCommand( this, "UNSUSPEND", "<OPER> "
-	"UnSuspend an oper",flg_UNSUSPEND,false,false,false,operLevel::UHSLEVEL ) ) ;
+	"UnSuspend an oper",commandLevel::flg_UNSUSPEND,false,false,false,operLevel::UHSLEVEL,false ) ) ;
 RegisterCommand( new MODUSERCommand( this, "MODUSER", "<OPER> <OPTION> <NEWVALUE> [OPTION] [NEWVALUE] ... "
-	"Modify an oper",flg_UNSUSPEND,false,false,false,operLevel::UHSLEVEL ) ) ;
+	"Modify an oper",commandLevel::flg_MODOP,false,false,false,operLevel::UHSLEVEL,false ) ) ;
 RegisterCommand( new MODERATECommand( this, "MODERATE", "<#Channel> "
-	"Moderate A Channel",flg_UNSUSPEND,false,false,false,operLevel::UHSLEVEL ) ) ;
+	"Moderate A Channel",commandLevel::flg_MODERATE,false,false,false,operLevel::UHSLEVEL,false ) ) ;
 RegisterCommand( new UNMODERATECommand( this, "UNMODERATE", "<#Channel> "
-	"UNModerate A Channel",flg_UNSUSPEND,false,false,false,operLevel::UHSLEVEL ) ) ;
+	"UNModerate A Channel",commandLevel::flg_UNMODERATE,false,false,false,operLevel::UHSLEVEL,false ) ) ;
 RegisterCommand( new OPCommand( this, "OP", "<#Channel> <nick> [nick] .. "
-	"Op user(s) on a Channel",flg_OP,false,false,false,operLevel::UHSLEVEL ) ) ;
+	"Op user(s) on a Channel",commandLevel::flg_OP,false,false,false,operLevel::UHSLEVEL,false ) ) ;
 RegisterCommand( new DEOPCommand( this, "DEOP", "<#Channel> <nick> [nick] .. "
-	"Deop user(s) on a Channel",flg_DEOP,false,false,false,operLevel::UHSLEVEL ) ) ;
+	"Deop user(s) on a Channel",commandLevel::flg_DEOP,false,false,false,operLevel::UHSLEVEL,false ) ) ;
 RegisterCommand( new LISTHOSTSCommand( this, "LISTHOSTS", "<oper> "
-	"Shows an oper hosts list",flg_LISTHOSTS,false,false,false,operLevel::UHSLEVEL ) ) ;
+	"Shows an oper hosts list",commandLevel::flg_LISTHOSTS,false,false,false,operLevel::UHSLEVEL,false ) ) ;
 RegisterCommand( new CLEARCHANCommand( this, "CLEARCHAN", "<#chan> "
-	"Removes all channel modes",flg_CLEARCHAN,false,false,false,operLevel::UHSLEVEL ) ) ;
+	"Removes all channel modes",commandLevel::flg_CLEARCHAN,false,false,false,operLevel::UHSLEVEL,false ) ) ;
 RegisterCommand( new ADDSERVERCommand( this, "ADDSERVER", "<Server> "
-	"Add a new server to the bot database",flg_ADDSERVER,false,false,false,operLevel::UHSLEVEL ) ) ;
+	"Add a new server to the bot database",commandLevel::flg_ADDSERVER,false,false,false,operLevel::UHSLEVEL,false ) ) ;
 RegisterCommand( new LEARNNETCommand( this, "LEARNNET", ""
-	"Update the servers database according to the current situation",flg_LEARNNET,false,false,false,operLevel::UHSLEVEL ) ) ;
+	"Update the servers database according to the current situation",commandLevel::flg_LEARNNET,false,false,false,operLevel::UHSLEVEL,true ) ) ;
 RegisterCommand( new REMSERVERCommand( this, "REMSERVER", "<Server name>"
-	"Removes a server from the bot database",flg_REMSERVER,false,false,false,operLevel::UHSLEVEL ) ) ;
+	"Removes a server from the bot database",commandLevel::flg_REMSERVER,false,false,false,operLevel::UHSLEVEL,true ) ) ;
 RegisterCommand( new CHECKNETCommand( this, "CHECKNET", ""
-	"Checks if all known servers are in place",flg_CHECKNET,false,false,false,operLevel::UHSLEVEL ) ) ;
+	"Checks if all known servers are in place",commandLevel::flg_CHECKNET,false,false,false,operLevel::UHSLEVEL,true ) ) ;
 RegisterCommand( new LASTCOMCommand( this, "LASTCOM", "[number of lines to show]"
-	"Post you the bot logs",flg_LASTCOM,false,false,true,operLevel::UHSLEVEL ) ) ;
+	"Post you the bot logs",commandLevel::flg_LASTCOM,false,false,true,operLevel::UHSLEVEL, true) ) ;
 RegisterCommand( new FORCEGLINECommand( this, "FORCEGLINE", "<user@host> <duration>[time units] <reason> "
-	"Gline a given user@host for the given reason",flg_FGLINE,false,false,false,operLevel::UHSLEVEL ) ) ;
+	"Gline a given user@host for the given reason",commandLevel::flg_FGLINE,false,false,false,operLevel::UHSLEVEL,true ) ) ;
 RegisterCommand( new EXCEPTIONCommand( this, "EXCEPTIONS", "(list / add / del) [host mask]"
-	"Add connection exceptions on hosts",flg_EXCEPTIONS,false,false,false,operLevel::UHSLEVEL ) ) ;
+	"Add connection exceptions on hosts",commandLevel::flg_EXCEPTIONS,false,false,false,operLevel::UHSLEVEL,true ) ) ;
 RegisterCommand( new LISTIGNORESCommand( this, "LISTIGNORES", ""
-	"List the ignore list",flg_LISTIGNORES,false,false,false,operLevel::UHSLEVEL ) ) ;
+	"List the ignore list",commandLevel::flg_LISTIGNORES,false,false,false,operLevel::UHSLEVEL,true ) ) ;
 RegisterCommand( new REMOVEIGNORECommand( this, "REMIGNORE", "(nick/host)"
-	" Removes a host/nick from the  ignore list",flg_REMIGNORE,false,false,false,operLevel::UHSLEVEL ) ) ;
+	" Removes a host/nick from the  ignore list",commandLevel::flg_REMIGNORE,false,false,false,operLevel::UHSLEVEL,true ) ) ;
 RegisterCommand( new LISTCommand( this, "LIST", "(glines)"
-	" Get all kinds of lists from the bot",flg_LIST,false,false,false,operLevel::UHSLEVEL ) ) ;
+	" Get all kinds of lists from the bot",commandLevel::flg_LIST,false,false,false,operLevel::UHSLEVEL,true ) ) ;
 RegisterCommand( new COMMANDSCommand( this, "COMMANDS", "<command> <option> <new value>"
-	" Change commands options",flg_LIST,false,false,false,operLevel::UHSLEVEL ) ) ;
+	" Change commands options",commandLevel::flg_COMMANDS,false,false,false,operLevel::UHSLEVEL,true ) ) ;
 
 loadGlines();
 loadExceptions();
@@ -401,7 +402,7 @@ if( commHandler == command_end() )
 
 int ComAccess = commHandler->second->getFlags();
 
-//bool ShouldntLog = ComAccess & flg_NOLOG;
+//bool ShouldntLog = ComAccess & commandLevel::flg_NOLOG;
 
 AuthInfo* theUser = IsAuth(theClient->getCharYYXXX());
 
@@ -419,7 +420,7 @@ else if((!theUser) && (ComAccess))
 	Notice( theClient,
 		"You must be logged in to issue that command" ) ;
 	}
-else if( (ComAccess) && !(ComAccess & theUser->getAccess()))
+else if( (ComAccess) && !(theUser->gotAccess(commHandler->second)))
 	{
 	Notice( theClient, "You dont have access to that command" ) ;
 	}
@@ -441,14 +442,6 @@ else
 	// Execute the command handler
 	commHandler->second->Exec( theClient, Message) ;
 	}		
-//else
-//	{	
-	// Log the command
-//	if(!(ComAccess & flg_NOLOG)) //Dont log command which arent suppose to be logged
-//		DailyLog(theUser,Message.c_str());
-//	commHandler->second->Exec( theClient, Message) ;
-//	}
-// Call the base class OnPrivateMessage() method
 return xClient::OnPrivateMessage( theClient, Message ) ;
 }
 
@@ -842,6 +835,7 @@ if(TempAuth)
 	TempAuth->setId(TempUser->getID());
         TempAuth->setName(TempUser->getUserName());
         TempAuth->setAccess(TempUser->getAccess());
+        TempAuth->setSAccess(TempUser->getSAccess());
         TempAuth->setFlags(TempUser->getType());
 	TempAuth->setIsSuspended(TempUser->getIsSuspended());
         TempAuth->setSuspendExpires(TempUser->getSuspendExpires());
@@ -855,13 +849,14 @@ if(TempAuth)
 
 bool ccontrol::AddOper (ccUser* Oper)
 {
-static const char *Main = "INSERT into opers (user_name,password,access,last_updated_by,last_updated,flags,server,isSuspended,isUhs,isOper,isAdmin,isSmt,isCoder,GetLogs,NeedOp) VALUES ('";
+static const char *Main = "INSERT into opers (user_name,password,access,saccess,last_updated_by,last_updated,flags,server,isSuspended,isUhs,isOper,isAdmin,isSmt,isCoder,GetLogs,NeedOp) VALUES ('";
 
 strstream theQuery;
 theQuery	<< Main
 		<< Oper->getUserName() <<"','"
 		<< Oper->getPassword() << "',"
-		<< Oper->getAccess() << ",'"
+		<< Oper->getAccess() << ","
+		<< Oper->getSAccess() << ",'"
 		<< Oper->getLast_Updated_by()
 		<< "',now()::abstime::int4,"
 		<< Oper->getFlags() << ",'"
@@ -976,6 +971,7 @@ assert( TempAuth != 0 ) ;
 TempAuth->setId(TempUser->getID());
 TempAuth->setName(TempUser->getUserName());
 TempAuth->setAccess(TempUser->getAccess());
+TempAuth->setSAccess(TempUser->getSAccess());
 TempAuth->setFlags(TempUser->getType());
 TempAuth->setNumeric(TempUser->getNumeric());
 TempAuth->setIsSuspended(TempUser->getIsSuspended());

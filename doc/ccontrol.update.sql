@@ -1,5 +1,5 @@
 
--- "$Id: ccontrol.update.sql,v 1.4 2001/07/26 20:24:21 mrbean_ Exp $"
+-- "$Id: ccontrol.update.sql,v 1.5 2001/07/29 13:33:19 mrbean_ Exp $"
 
 -- ccontrol database changes update
 -- this file will add the new features to an old database
@@ -17,6 +17,7 @@ ALTER TABLE opers ADD isSMT BOOLEAN NOT NULL DEFAULT 'n';
 ALTER TABLE opers ADD isCODER BOOLEAN NOT NULL DEFAULT 'n';
 ALTER TABLE opers ADD getLOGS BOOLEAN NOT NULL DEFAULT 'n';
 ALTER TABLE opers ADD needOP BOOLEAN NOT NULL DEFAULT 'n';
+ALTER TABLE opers ADD saccess INT4 NOT NULL DEFAULT '0';
 
 -- Update all the other opers to the new settings
 
@@ -35,4 +36,9 @@ CREATE TABLE commands (
 	NeedOp     BOOLEAN NOT NULL DEFAULT 'n',
 	NoLog      BOOLEAN NOT NULL DEFAULT 'n',
 	MinLevel  INT4 NOT NULL DEFAULT '1'
+	SAccess BOOLEAN NOT NULL DEFAULT 'n'
 	);
+
+-- For those who already have the commands table
+ALTER  TABLE commands add SAccess BOOLEAN NOT NULL DEFAULT 'n';
+

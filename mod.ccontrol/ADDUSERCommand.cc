@@ -19,8 +19,9 @@
 #include	"StringTokenizer.h"
 #include        "ccUser.h"
 #include	"misc.h"
+#include	"commLevels.h"
 
-const char ADDUSERCommand_cc_rcsId[] = "$Id: ADDUSERCommand.cc,v 1.1 2001/07/26 20:12:40 mrbean_ Exp $";
+const char ADDUSERCommand_cc_rcsId[] = "$Id: ADDUSERCommand.cc,v 1.2 2001/07/29 13:33:20 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -53,29 +54,35 @@ if (theUser)
 	return false;
 	}
 
-unsigned int NewAccess = 0 ;
+unsigned long int NewAccess = 0 ;
+unsigned long int NewSAccess = 0 ;
+
 unsigned int NewFlags = 0 ;
 
 // TODO: use std::string::operator=(const char*) const
 if(!strcasecmp(st[2],"coder"))
 	{
-	NewAccess = CODER;
+	NewAccess = commandLevel::CODER;
+	NewSAccess = commandLevel::SCODER;
 	NewFlags = operLevel::CODERLEVEL;
 	}
 else if(!strcasecmp(st[2],"smt"))
 	{
-	NewAccess = SMT;
+	NewAccess = commandLevel::SMT;
+	NewSAccess = commandLevel::SSMT;
 	NewFlags = operLevel::SMTLEVEL;
 	}
 
 else if(!strcasecmp(st[2],"admin"))
 	{
-	NewAccess = ADMIN;
+	NewAccess = commandLevel::ADMIN;
+	NewSAccess = commandLevel::SADMIN;
         NewFlags = operLevel::ADMINLEVEL;
 	}
 else if(!strcasecmp(st[2],"oper"))
 	{
-        NewAccess = OPER;
+        NewAccess = commandLevel::OPER;
+	NewSAccess = commandLevel::SOPER;
         NewFlags = operLevel::OPERLEVEL;
 	}
 else
@@ -124,6 +131,7 @@ theUser = new ccUser(bot->SQLDb);
 theUser->setUserName(st[1]);
 theUser->setPassword(bot->CryptPass(st[3]));
 theUser->setAccess(NewAccess);
+theUser->setSAccess(NewSAccess);
 theUser->setType(NewFlags);
 theUser->setLast_Updated_By(theClient->getNickUserHost());
 theUser->setServer(tOper->getServer());
