@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: stats.cc,v 1.27 2003/11/26 23:30:22 dan_karrels Exp $
+ * $Id: stats.cc,v 1.28 2003/12/04 00:44:24 dan_karrels Exp $
  */
 
 #include	<string>
@@ -39,7 +39,7 @@
 #include	"config.h"
 #include	"misc.h"
 
-RCSTAG( "$Id: stats.cc,v 1.27 2003/11/26 23:30:22 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: stats.cc,v 1.28 2003/12/04 00:44:24 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -81,9 +81,9 @@ if( '/' != data_path[ data_path.size() - 1 ] )
 	{
 	data_path += "/" ;
 	}
-elog	<< "stats> data_path: "
-	<< data_path
-	<< endl ;
+//elog	<< "stats> data_path: "
+//	<< data_path
+//	<< endl ;
 
 allowOpers = false ;
 string stringOperAccess = conf.Require( "allow_opers" )->second ;

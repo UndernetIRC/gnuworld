@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: client.h,v 1.48 2003/11/26 23:30:21 dan_karrels Exp $
+ * $Id: client.h,v 1.49 2003/12/04 00:44:22 dan_karrels Exp $
  */
 
 #ifndef __CLIENT_H
-#define __CLIENT_H "$Id: client.h,v 1.48 2003/11/26 23:30:21 dan_karrels Exp $"
+#define __CLIENT_H "$Id: client.h,v 1.49 2003/12/04 00:44:22 dan_karrels Exp $"
 
 #include	<sstream>
 #include	<string>
@@ -553,6 +553,34 @@ public:
 		const char* Message, ... ) ;
 
 	/**
+	 * Message an iClient with a fake client interface.
+	 */
+	virtual bool FakeMessage( const iClient* Target,
+		const iClient* srcClient,
+		const string& Message ) ;
+
+	/**
+	 * Message a channel with a fake client interface.
+	 */
+	virtual bool FakeMessage( const Channel* theChan,
+		const iClient* srcClient,
+		const string& Message ) ;
+
+	/**
+	 * Notice an iClient with a fake client interface.
+	 */
+	virtual bool FakeNotice( const iClient* Target,
+		const iClient* srcClient,
+		const string& Message ) ;
+
+	/**
+	 * Notice a channel with a fake client interface.
+	 */
+	virtual bool FakeNotice( const Channel* theChan,
+		const iClient* srcClient,
+		const string& Message ) ;
+
+	/**
 	 * Message will PRIVMSG a string of data to the given iClient.
 	 */
 	virtual bool Message( const iClient* Target,
@@ -578,6 +606,12 @@ public:
 	 */
 	virtual bool Message( const Channel* theChan,
 		const string& Message ) ;
+
+	/**
+	 * Have this module message a channel.
+	 */
+	virtual bool Message( const Channel* theChan,
+		const char* Format, ... ) ;
 
 	/**
 	 * Notice will send a NOTICE command to the given iClient.

@@ -1,10 +1,10 @@
-dnl $Id: configure.ac,v 1.21 2003/11/11 19:21:19 dan_karrels Exp $
+dnl $Id: configure.ac,v 1.22 2003/12/04 00:44:22 dan_karrels Exp $
 dnl ----------------------------------------------------------
 
 echo Configuring GNUWorld...
 echo
 
-AC_REVISION($Revision: 1.21 $)
+AC_REVISION($Revision: 1.22 $)
 AC_INIT
 AC_CONFIG_SRCDIR([src/main.cc])
 AM_INIT_AUTOMAKE(gnuworld,2.3)
@@ -258,6 +258,7 @@ build_modgnutest=false
 build_modnickserv=false
 build_modscanner=false
 build_modstats=false
+build_modsnoop=false
 
 NEW_MODS=""
 MOD_DIRS=""
@@ -294,6 +295,7 @@ dnl	Prepare for conditionals
 	    mod.nickserv)	build_modnickserv=true;;
 	    mod.scanner)	build_modscanner=true;;
 	    mod.stats)		build_modstats=true;;
+	    mod.snoop)		build_modsnoop=true;;
 	    *)			NEW_MODS="$NEW_MODS $moduleName";;
 	  esac
 	done
@@ -327,6 +329,7 @@ dnl	echo "mod_list: $mod_list"
 		    mod.nickserv)	build_modnickserv=true;;
 		    mod.scanner)	build_modscanner=true;;
 		    mod.stats)		build_modstats=true;;
+		    mod.snoop)		build_modsnoop=true;;
 		    *)			NEW_MODS="$NEW_MODS $file";;
 		  esac
 		fi
@@ -342,6 +345,7 @@ AM_CONDITIONAL(COND_MODGNUTEST,[test $build_modgnutest = true])
 AM_CONDITIONAL(COND_MODNICKSERV,[test $build_modnickserv = true])
 AM_CONDITIONAL(COND_MODSCANNER,[test $build_modscanner = true])
 AM_CONDITIONAL(COND_MODSTATS,[test $build_modstats = true])
+AM_CONDITIONAL(COND_MODSNOOP,[test $build_modsnoop = true])
 
 for file in $NEW_MODS; do
 	AC_CONFIG_SUBDIRS($file)
@@ -374,6 +378,7 @@ mod.gnutest/Makefile \
 mod.nickserv/Makefile \
 mod.scanner/Makefile \
 mod.stats/Makefile \
+mod.snoop/Makefile \
 bin/server_command_map \
 bin/ccontrol.example.conf \
 bin/clientExample.example.conf \
@@ -384,6 +389,7 @@ bin/GNUWorld.example.conf \
 bin/nickserv.example.conf \
 bin/scanner.example.conf \
 bin/stats.example.conf \
+bin/snoop.example.conf \
 bin/dronescan.example.conf])
 
 AC_OUTPUT

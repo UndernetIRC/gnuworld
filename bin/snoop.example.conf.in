@@ -1,0 +1,23 @@
+# $Id: snoop.example.conf.in,v 1.1 2003/12/04 00:44:22 dan_karrels Exp $
+# conf file for snoop bot
+username = snoopy
+nickname = snoopy_
+hostname = undernet.org
+userdescription = Inquiring Minds Want to Know
+
+mode = +i
+
+# permit the given user -- by account login name -- to use the
+# module.  You may have as many of these as you like (including none).
+# This is case-insensitive.
+#permit_user = reppir
+#permit_user = Jeekay
+
+# Set this to true if you want to permit opers to use the module,
+# set to false otherwise (will not affect other users who have access)
+allow_opers = true
+
+cmdchar = snoopy
+adminchan = #2010
+relaychan = #coder-com
+defaultquitmessage = Exiting

@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: client.cc,v 1.63 2003/11/26 23:30:23 dan_karrels Exp $
+ * $Id: client.cc,v 1.64 2003/12/04 00:44:24 dan_karrels Exp $
  */
 
 #include	<new>
@@ -47,7 +47,7 @@
 #include	"ELog.h"
 #include	"events.h"
 
-RCSTAG("$Id: client.cc,v 1.63 2003/11/26 23:30:23 dan_karrels Exp $" ) ;
+RCSTAG("$Id: client.cc,v 1.64 2003/12/04 00:44:24 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -268,6 +268,78 @@ return MyUplink->Write( "%s O %s :\001%s %s\001\r\n",
 	Message.c_str() ) ;
 }
 
+bool xClient::FakeMessage( const iClient* destClient,
+	const iClient* srcClient,
+	const string& Message )
+{
+assert( destClient != 0 ) ;
+assert( srcClient != 0 ) ;
+
+if( Message.empty() )
+	{
+	return false ;
+	}
+
+return getUplink()->Write( "%s P %s :%s",
+	srcClient->getCharYYXXX().c_str(),
+	destClient->getCharYYXXX().c_str(),
+	Message.c_str() ) ;
+}
+
+bool xClient::FakeNotice( const iClient* destClient,
+	const iClient* srcClient,
+	const string& Message )
+{
+assert( destClient != 0 ) ;
+assert( srcClient != 0 ) ;
+
+if( Message.empty() )
+	{
+	return false ;
+	}
+
+return getUplink()->Write( "%s O %s :%s",
+	srcClient->getCharYYXXX().c_str(),
+	destClient->getCharYYXXX().c_str(),
+	Message.c_str() ) ;
+}
+
+bool xClient::FakeMessage( const Channel* theChan,
+	const iClient* srcClient,
+	const string& Message )
+{
+assert( theChan != 0 ) ;
+assert( srcClient != 0 ) ;
+
+if( Message.empty() )
+	{
+	return false ;
+	}
+
+return getUplink()->Write( "%s P %s :%s",
+	srcClient->getCharYYXXX().c_str(),
+	theChan->getName().c_str(),
+	Message.c_str() ) ;
+}
+
+bool xClient::FakeNotice( const Channel* theChan,
+	const iClient* srcClient,
+	const string& Message )
+{
+assert( theChan != 0 ) ;
+assert( srcClient != 0 ) ;
+
+if( Message.empty() )
+	{
+	return false ;
+	}
+
+return getUplink()->Write( "%s P %s :%s",
+	srcClient->getCharYYXXX().c_str(),
+	theChan->getName().c_str(),
+	Message.c_str() ) ;
+}
+
 bool xClient::Message( const iClient* Target, const string& Message )
 {
 if( isConnected() )
@@ -353,6 +425,9 @@ return false ;
 
 bool xClient::Notice( const iClient* Target, const string& Message )
 {
+//elog	<< "xClient::Notice( const iClient* )"
+//	<< endl ;
+
 if( isConnected() )
 	{
 	return MyUplink->Write( "%s O %s :%s\r\n",
@@ -365,6 +440,9 @@ return false ;
 
 bool xClient::Notice( const iClient* Target, const char* Message, ... )
 {
+//elog	<< "xClient::Notice( const iClient* )"
+//	<< endl ;
+
 if( isConnected() && Message && Message[ 0 ] != 0 )
 	{
 	char buffer[ 1024 ] ;
@@ -386,6 +464,9 @@ return false ;
 
 bool xClient::Notice( const string& Channel, const char* Message, ... )
 {
+//elog	<< "xClient::Notice( const string& Channel )"
+//	<< endl ;
+
 if( isConnected() && Message && Message[ 0 ] != 0 )
 	{
 	char buffer[ 1024 ] ;
@@ -408,16 +489,19 @@ return false ;
 bool xClient::Notice( const Channel* theChan, const string& Message )
 {
 assert( theChan != 0 ) ;
+
+//elog	<< "xClient::Notice( const Channel* )> name: "
+//	<< theChan->getName()
+//	<< endl ;
+
 if( Message.empty() )
 	{
 	return false ;
 	}
 
-return MyUplink->Write( "%s O #%s :%s\r\n",
+return MyUplink->Write( "%s O %s :%s\r\n",
 	getCharYYXXX().c_str(),
-	('#' == theChan->getName()[ 0 ])
-		? (theChan->getName().c_str() + 1)
-		: theChan->getName().c_str(),
+	theChan->getName().c_str(),
 	Message.c_str() ) ;
 }
 
@@ -435,7 +519,29 @@ if( isConnected() && Message && Message[ 0 ] != 0 )
 	vsnprintf(buffer, 1024, Message, list);
 	va_end(list);
 
-	return MyUplink->Write("%s O #%s :%s\r\n",
+	return MyUplink->Write("%s O %s :%s\r\n",
+		getCharYYXXX().c_str(),
+		theChan->getName().c_str(),
+		buffer ) ;
+	}
+return false ;
+}
+
+bool xClient::Message( const Channel* theChan, const char* Message, ... )
+{
+assert( theChan != 0 ) ;
+
+if( isConnected() && Message && Message[ 0 ] != 0 )
+	{
+	char buffer[ 1024 ] ;
+	memset( buffer, 0, 1024 ) ;
+	va_list list;
+
+	va_start(list, Message);
+	vsnprintf(buffer, 1024, Message, list);
+	va_end(list);
+
+	return MyUplink->Write("%s P %s :%s\r\n",
 		getCharYYXXX().c_str(),
 		theChan->getName().c_str(),
 		buffer ) ;

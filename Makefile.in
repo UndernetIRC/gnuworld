@@ -65,6 +65,8 @@ COND_MODNICKSERV_FALSE = @COND_MODNICKSERV_FALSE@
 COND_MODNICKSERV_TRUE = @COND_MODNICKSERV_TRUE@
 COND_MODSCANNER_FALSE = @COND_MODSCANNER_FALSE@
 COND_MODSCANNER_TRUE = @COND_MODSCANNER_TRUE@
+COND_MODSNOOP_FALSE = @COND_MODSNOOP_FALSE@
+COND_MODSNOOP_TRUE = @COND_MODSNOOP_TRUE@
 COND_MODSTATS_FALSE = @COND_MODSTATS_FALSE@
 COND_MODSTATS_TRUE = @COND_MODSTATS_TRUE@
 COND_TESTDIR_FALSE = @COND_TESTDIR_FALSE@
@@ -178,6 +180,8 @@ threadLib = @threadLib@
 
 @COND_MODSTATS_TRUE@MODSTATS = mod.stats
 
+@COND_MODSNOOP_TRUE@MODSNOOP = mod.snoop
+
 @COND_TESTDIR_TRUE@TESTDIR = test
 
 @COND_DBDIR_TRUE@DBDIR = db
@@ -192,6 +196,7 @@ SUBDIRS = libgnuworld libltdl src $(NEW_MODS) \
 	$(MODNICKSERV) \
 	$(MODSCANNER) \
 	$(MODSTATS) \
+	$(MODSNOOP) \
 	$(TESTDIR) \
 	$(DBDIR) \
 	libircu
@@ -317,7 +322,7 @@ CONFIG_CLEAN_FILES = bin/server_command_map bin/ccontrol.example.conf \
 	bin/cservice.example.conf bin/gnutest.example.conf \
 	bin/GNUWorld.example.conf bin/nickserv.example.conf \
 	bin/scanner.example.conf bin/stats.example.conf \
-	bin/dronescan.example.conf
+	bin/snoop.example.conf bin/dronescan.example.conf
 DIST_SOURCES =
 
 RECURSIVE_TARGETS = info-recursive dvi-recursive pdf-recursive \
@@ -332,7 +337,8 @@ DIST_COMMON = README $(srcdir)/Makefile.in $(srcdir)/configure \
 	ltmain.sh missing mkinstalldirs
 DIST_SUBDIRS = libgnuworld libltdl src @NEW_MODS@ mod.ccontrol \
 	mod.clientExample mod.cloner mod.cservice mod.dronescan \
-	mod.gnutest mod.nickserv mod.scanner mod.stats test db libircu
+	mod.gnutest mod.nickserv mod.scanner mod.stats mod.snoop test \
+	db libircu
 all: all-recursive
 
 .SUFFIXES:
@@ -388,6 +394,8 @@ bin/nickserv.example.conf: $(top_builddir)/config.status $(top_srcdir)/bin/nicks
 bin/scanner.example.conf: $(top_builddir)/config.status $(top_srcdir)/bin/scanner.example.conf.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 bin/stats.example.conf: $(top_builddir)/config.status $(top_srcdir)/bin/stats.example.conf.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+bin/snoop.example.conf: $(top_builddir)/config.status $(top_srcdir)/bin/snoop.example.conf.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 bin/dronescan.example.conf: $(top_builddir)/config.status $(top_srcdir)/bin/dronescan.example.conf.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@

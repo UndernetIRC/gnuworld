@@ -471,7 +471,7 @@ ac_includes_default="\
 ac_default_prefix=`pwd`
 ac_subdirs_all="$ac_subdirs_all libltdl"
 ac_subdirs_all="$ac_subdirs_all $file"
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO AMTAR install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM AWK SET_MAKE am__leading_dot MAINTAINER_MODE_TRUE MAINTAINER_MODE_FALSE MAINT CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT DEPDIR am__include am__quote AMDEP_TRUE AMDEP_FALSE AMDEPBACKSLASH CCDEPMODE am__fastdepCC_TRUE am__fastdepCC_FALSE build build_cpu build_vendor build_os host host_cpu host_vendor host_os LN_S ECHO RANLIB ac_ct_RANLIB CPP EGREP LIBTOOL CXX CXXFLAGS ac_ct_CXX CXXDEPMODE am__fastdepCXX_TRUE am__fastdepCXX_FALSE subdirs threadLib CXXCPP COND_TESTDIR_TRUE COND_TESTDIR_FALSE COND_DBDIR_TRUE COND_DBDIR_FALSE COND_MODCCONTROL_TRUE COND_MODCCONTROL_FALSE COND_MODCLIENTEXAMPLE_TRUE COND_MODCLIENTEXAMPLE_FALSE COND_MODCLONER_TRUE COND_MODCLONER_FALSE COND_MODCSERVICE_TRUE COND_MODCSERVICE_FALSE COND_MODDRONESCAN_TRUE COND_MODDRONESCAN_FALSE COND_MODGNUTEST_TRUE COND_MODGNUTEST_FALSE COND_MODNICKSERV_TRUE COND_MODNICKSERV_FALSE COND_MODSCANNER_TRUE COND_MODSCANNER_FALSE COND_MODSTATS_TRUE COND_MODSTATS_FALSE LIBGNUWORLD NEW_MODS DB INCLTDL LIBLTDL LIBTOOL_DEPS PGSQL_INCLUDE PGSQL_LIB LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO AMTAR install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM AWK SET_MAKE am__leading_dot MAINTAINER_MODE_TRUE MAINTAINER_MODE_FALSE MAINT CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT DEPDIR am__include am__quote AMDEP_TRUE AMDEP_FALSE AMDEPBACKSLASH CCDEPMODE am__fastdepCC_TRUE am__fastdepCC_FALSE build build_cpu build_vendor build_os host host_cpu host_vendor host_os LN_S ECHO RANLIB ac_ct_RANLIB CPP EGREP LIBTOOL CXX CXXFLAGS ac_ct_CXX CXXDEPMODE am__fastdepCXX_TRUE am__fastdepCXX_FALSE subdirs threadLib CXXCPP COND_TESTDIR_TRUE COND_TESTDIR_FALSE COND_DBDIR_TRUE COND_DBDIR_FALSE COND_MODCCONTROL_TRUE COND_MODCCONTROL_FALSE COND_MODCLIENTEXAMPLE_TRUE COND_MODCLIENTEXAMPLE_FALSE COND_MODCLONER_TRUE COND_MODCLONER_FALSE COND_MODCSERVICE_TRUE COND_MODCSERVICE_FALSE COND_MODDRONESCAN_TRUE COND_MODDRONESCAN_FALSE COND_MODGNUTEST_TRUE COND_MODGNUTEST_FALSE COND_MODNICKSERV_TRUE COND_MODNICKSERV_FALSE COND_MODSCANNER_TRUE COND_MODSCANNER_FALSE COND_MODSTATS_TRUE COND_MODSTATS_FALSE COND_MODSNOOP_TRUE COND_MODSNOOP_FALSE LIBGNUWORLD NEW_MODS DB INCLTDL LIBLTDL LIBTOOL_DEPS PGSQL_INCLUDE PGSQL_LIB LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -11096,6 +11096,7 @@ build_modgnutest=false
 build_modnickserv=false
 build_modscanner=false
 build_modstats=false
+build_modsnoop=false
 
 NEW_MODS=""
 MOD_DIRS=""
@@ -11126,6 +11127,7 @@ else
 	    mod.nickserv)	build_modnickserv=true;;
 	    mod.scanner)	build_modscanner=true;;
 	    mod.stats)		build_modstats=true;;
+	    mod.snoop)		build_modsnoop=true;;
 	    *)			NEW_MODS="$NEW_MODS $moduleName";;
 	  esac
 	done
@@ -11157,6 +11159,7 @@ if test $searchForMods = yes; then
 		    mod.nickserv)	build_modnickserv=true;;
 		    mod.scanner)	build_modscanner=true;;
 		    mod.stats)		build_modstats=true;;
+		    mod.snoop)		build_modsnoop=true;;
 		    *)			NEW_MODS="$NEW_MODS $file";;
 		  esac
 		fi
@@ -11254,6 +11257,16 @@ else
 fi
 
 
+
+if test $build_modsnoop = true; then
+  COND_MODSNOOP_TRUE=
+  COND_MODSNOOP_FALSE='#'
+else
+  COND_MODSNOOP_TRUE='#'
+  COND_MODSNOOP_FALSE=
+fi
+
+
 for file in $NEW_MODS; do
 
 
@@ -11273,7 +11286,7 @@ LIBGNUWORLD="\$(top_builddir)/libgnuworld/libgnuworld.la"
 
 
 
-                                                                                                                                                                                                                                                                    ac_config_files="$ac_config_files Makefile db/Makefile libgnuworld/Makefile libircu/Makefile src/Makefile test/Makefile mod.ccontrol/Makefile mod.clientExample/Makefile mod.cloner/Makefile mod.cservice/Makefile mod.dronescan/Makefile mod.gnutest/Makefile mod.nickserv/Makefile mod.scanner/Makefile mod.stats/Makefile bin/server_command_map bin/ccontrol.example.conf bin/clientExample.example.conf bin/cloner.example.conf bin/cservice.example.conf bin/gnutest.example.conf bin/GNUWorld.example.conf bin/nickserv.example.conf bin/scanner.example.conf bin/stats.example.conf bin/dronescan.example.conf"
+                                                                                                                                                                                                                                                                                        ac_config_files="$ac_config_files Makefile db/Makefile libgnuworld/Makefile libircu/Makefile src/Makefile test/Makefile mod.ccontrol/Makefile mod.clientExample/Makefile mod.cloner/Makefile mod.cservice/Makefile mod.dronescan/Makefile mod.gnutest/Makefile mod.nickserv/Makefile mod.scanner/Makefile mod.stats/Makefile mod.snoop/Makefile bin/server_command_map bin/ccontrol.example.conf bin/clientExample.example.conf bin/cloner.example.conf bin/cservice.example.conf bin/gnutest.example.conf bin/GNUWorld.example.conf bin/nickserv.example.conf bin/scanner.example.conf bin/stats.example.conf bin/snoop.example.conf bin/dronescan.example.conf"
 
 
 cat >confcache <<\_ACEOF
@@ -11476,6 +11489,13 @@ if test -z "${COND_MODSTATS_TRUE}" && test -z "${COND_MODSTATS_FALSE}"; then
   { { echo "$as_me:$LINENO: error: conditional \"COND_MODSTATS\" was never defined.
 Usually this means the macro was only invoked conditionally." >&5
 echo "$as_me: error: conditional \"COND_MODSTATS\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${COND_MODSNOOP_TRUE}" && test -z "${COND_MODSNOOP_FALSE}"; then
+  { { echo "$as_me:$LINENO: error: conditional \"COND_MODSNOOP\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+echo "$as_me: error: conditional \"COND_MODSNOOP\" was never defined.
 Usually this means the macro was only invoked conditionally." >&2;}
    { (exit 1); exit 1; }; }
 fi
@@ -11937,6 +11957,7 @@ do
   "mod.nickserv/Makefile" ) CONFIG_FILES="$CONFIG_FILES mod.nickserv/Makefile" ;;
   "mod.scanner/Makefile" ) CONFIG_FILES="$CONFIG_FILES mod.scanner/Makefile" ;;
   "mod.stats/Makefile" ) CONFIG_FILES="$CONFIG_FILES mod.stats/Makefile" ;;
+  "mod.snoop/Makefile" ) CONFIG_FILES="$CONFIG_FILES mod.snoop/Makefile" ;;
   "bin/server_command_map" ) CONFIG_FILES="$CONFIG_FILES bin/server_command_map" ;;
   "bin/ccontrol.example.conf" ) CONFIG_FILES="$CONFIG_FILES bin/ccontrol.example.conf" ;;
   "bin/clientExample.example.conf" ) CONFIG_FILES="$CONFIG_FILES bin/clientExample.example.conf" ;;
@@ -11947,6 +11968,7 @@ do
   "bin/nickserv.example.conf" ) CONFIG_FILES="$CONFIG_FILES bin/nickserv.example.conf" ;;
   "bin/scanner.example.conf" ) CONFIG_FILES="$CONFIG_FILES bin/scanner.example.conf" ;;
   "bin/stats.example.conf" ) CONFIG_FILES="$CONFIG_FILES bin/stats.example.conf" ;;
+  "bin/snoop.example.conf" ) CONFIG_FILES="$CONFIG_FILES bin/snoop.example.conf" ;;
   "bin/dronescan.example.conf" ) CONFIG_FILES="$CONFIG_FILES bin/dronescan.example.conf" ;;
   "depfiles" ) CONFIG_COMMANDS="$CONFIG_COMMANDS depfiles" ;;
   "include/defs.h" ) CONFIG_HEADERS="$CONFIG_HEADERS include/defs.h" ;;
@@ -12119,6 +12141,8 @@ s,@COND_MODSCANNER_TRUE@,$COND_MODSCANNER_TRUE,;t t
 s,@COND_MODSCANNER_FALSE@,$COND_MODSCANNER_FALSE,;t t
 s,@COND_MODSTATS_TRUE@,$COND_MODSTATS_TRUE,;t t
 s,@COND_MODSTATS_FALSE@,$COND_MODSTATS_FALSE,;t t
+s,@COND_MODSNOOP_TRUE@,$COND_MODSNOOP_TRUE,;t t
+s,@COND_MODSNOOP_FALSE@,$COND_MODSNOOP_FALSE,;t t
 s,@LIBGNUWORLD@,$LIBGNUWORLD,;t t
 s,@NEW_MODS@,$NEW_MODS,;t t
 s,@DB@,$DB,;t t

@@ -1,4 +1,4 @@
-## $Id: Makefile.am,v 1.19 2003/11/27 18:29:29 dan_karrels Exp $
+## $Id: Makefile.am,v 1.20 2003/12/04 00:44:21 dan_karrels Exp $
 ## test
 
 @SET_MAKE@
@@ -39,6 +39,10 @@ if COND_MODSTATS
   MODSTATS = mod.stats
 endif
 
+if COND_MODSNOOP
+  MODSNOOP = mod.snoop
+endif
+
 if COND_TESTDIR
   TESTDIR = test
 endif
@@ -57,6 +61,7 @@ SUBDIRS = libgnuworld libltdl src $(NEW_MODS) \
 	$(MODNICKSERV) \
 	$(MODSCANNER) \
 	$(MODSTATS) \
+	$(MODSNOOP) \
 	$(TESTDIR) \
 	$(DBDIR) \
 	libircu
