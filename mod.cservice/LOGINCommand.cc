@@ -13,7 +13,7 @@
 #include	"cservice_config.h"
 #include	"Network.h"
 
-const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.46 2002/05/23 17:43:12 dan_karrels Exp $" ;
+const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.47 2002/11/25 03:53:16 jeekay Exp $" ;
 
 namespace gnuworld
 {
@@ -185,19 +185,10 @@ if(!bot->getAdminAccessLevel(theUser))
  * service on the net that cares and added to the Client structure.
  * Format:
  * [Source Server] AC [Authenticated User's Numeric] [Authenticated UserName]
- * Eg: AXAAA AC APAFD gte
+ * Eg: AX AC APAFD gte
  */
 
-#if 1
-stringstream ac;
-ac	<< bot->getCharYY()
-	<< " AC "
-	<< theClient->getCharYYXXX()
-	<< " " << theUser->getUserName()
-	<< ends;
-bot->Write( ac );
-theClient->setAccount(theUser->getUserName());
-#endif
+server->UserLogin(theClient, theUser->getUserName(), bot);
 
 /*
  * If the user account has been suspended, make sure they don't get
