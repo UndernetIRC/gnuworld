@@ -1,5 +1,5 @@
 #ifndef __CSERVICE_H
-#define __CSERVICE_H "$Id: cservice.h,v 1.73 2001/10/19 00:11:20 gte Exp $"
+#define __CSERVICE_H "$Id: cservice.h,v 1.74 2001/10/22 18:53:25 gte Exp $"
 
 #include	<string>
 #include	<vector>
@@ -61,6 +61,7 @@ public:
 
 	cmDatabase* SQLDb; /* PostgreSQL Database */
 	string confSqlHost;
+	string confSqlPass;
 	string confSqlDb;
 	string confSqlPort;
 	string confSqlUser;

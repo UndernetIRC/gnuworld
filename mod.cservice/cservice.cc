@@ -148,7 +148,7 @@ cservice::cservice(const string& args)
 
 RegisterCommand(new SHOWCOMMANDSCommand(this, "SHOWCOMMANDS", "[#channel]", 3));
 RegisterCommand(new LOGINCommand(this, "LOGIN", "<username> <password>", 10));
-RegisterCommand(new ACCESSCommand(this, "ACCESS", "[channel] [username] [-min n] [-max n] [-op] [-voice] [-none] [-modif [mask]]", 5));
+RegisterCommand(new ACCESSCommand(this, "ACCESS", "[channel] [username] [-min n] [-max n] [-op] [-voice] [-none] [-modif]", 5));
 RegisterCommand(new CHANINFOCommand(this, "CHANINFO", "<#channel>", 3));
 RegisterCommand(new ISREGCommand(this, "ISREG", "<#channel>", 4));
 RegisterCommand(new VERIFYCommand(this, "VERIFY", "<nick>", 3));
@@ -203,11 +203,13 @@ cserviceConfig = new (std::nothrow) EConfig( args ) ;
 assert( cserviceConfig != 0 ) ;
 
 confSqlHost = cserviceConfig->Require( "sql_host" )->second;
+confSqlPass = cserviceConfig->Require( "sql_pass" )->second;
 confSqlDb = cserviceConfig->Require( "sql_db" )->second;
 confSqlPort = cserviceConfig->Require( "sql_port" )->second;
 confSqlUser = cserviceConfig->Require( "sql_user" )->second;
 
-string Query = "host=" + confSqlHost + " dbname=" + confSqlDb + " port=" + confSqlPort + " user=" + confSqlUser;
+string Query = "host=" + confSqlHost + " dbname=" + confSqlDb + " port=" + confSqlPort + " user=" + confSqlUser
+			   + " pass=" + confSqlPass;
 
 elog	<< "*** [CMaster]: Attempting to make PostgreSQL connection to: "
 		<< confSqlHost
@@ -3447,7 +3449,8 @@ void cservice::checkDbConnectionStatus()
 		/* Remove the old database connection object. */
 		delete(SQLDb);
 
-		string Query = "host=" + confSqlHost + " dbname=" + confSqlDb + " port=" + confSqlPort + " user=" + confSqlUser;
+		string Query = "host=" + confSqlHost + " dbname=" + confSqlDb + " port=" + confSqlPort + " user=" + confSqlUser
+					 + " pass=" + confSqlPass;
 
 		SQLDb = new (std::nothrow) cmDatabase( Query.c_str() ) ;
 		assert( SQLDb != 0 ) ;
