@@ -14,7 +14,7 @@
 
 @SET_MAKE@
 
-# "$Id: Makefile.in,v 1.134 2002/08/17 02:03:54 reedloden Exp $"
+# "$Id: Makefile.in,v 1.135 2002/08/27 19:22:05 mrbean_ Exp $"
 SHELL = @SHELL@
 
 srcdir = @srcdir@
@@ -147,6 +147,7 @@ libccontrol_la_SOURCES = ccontrol.cc \
 	REMOVEIGNORECommand.cc \
 	REMSERVERCommand.cc \
 	REMUSERCommand.cc \
+	REOPCommand.cc \
 	SAYCommand.cc \
 	SCANCommand.cc \
 	SCANGLINECommand.cc \
@@ -187,7 +188,7 @@ am_libccontrol_la_OBJECTS = ccontrol.lo CControlCommands.lo \
 	NEWPASSCommand.lo NOMODECommand.lo OPCommand.lo \
 	REMGCHANCommand.lo REMGLINECommand.lo REMOPERCHANCommand.lo \
 	REMCOMMANDCommand.lo REMOVEIGNORECommand.lo REMSERVERCommand.lo \
-	REMUSERCommand.lo SAYCommand.lo SCANCommand.lo \
+	REMUSERCommand.lo REOPCommand.lo SAYCommand.lo SCANCommand.lo \
 	SCANGLINECommand.lo SHUTDOWNCommand.lo STATUSCommand.lo \
 	SUSPENDCommand.lo TRANSLATECommand.lo UNMODERATECommand.lo \
 	UNSUSPENDCommand.lo USERINFOCommand.lo WHOISCommand.lo
@@ -241,6 +242,7 @@ am__depfiles_maybe = depfiles
 @AMDEP_TRUE@	./$(DEPDIR)/REMOVEIGNORECommand.Plo \
 @AMDEP_TRUE@	./$(DEPDIR)/REMSERVERCommand.Plo \
 @AMDEP_TRUE@	./$(DEPDIR)/REMUSERCommand.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/REOPCommand.Plo \
 @AMDEP_TRUE@	./$(DEPDIR)/SAYCommand.Plo \
 @AMDEP_TRUE@	./$(DEPDIR)/SCANCommand.Plo \
 @AMDEP_TRUE@	./$(DEPDIR)/SCANGLINECommand.Plo \
@@ -356,6 +358,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/REMOVEIGNORECommand.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/REMSERVERCommand.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/REMUSERCommand.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/REOPCommand.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SAYCommand.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SCANCommand.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SCANGLINECommand.Plo@am__quote@

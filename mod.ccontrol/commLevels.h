@@ -82,6 +82,7 @@ const unsigned long int flg_MAXUSERS = 0x40000;
 const unsigned long int flg_CONFIG = 0x80000;
 const unsigned long int flg_SAY = 0x100000;
 const unsigned long int flg_NOMODE = 0x200000;
+const unsigned long int flg_REOP = 0x400000;
 
 /*
  Default commands that are added upon adding a new oper
@@ -94,7 +95,7 @@ const unsigned long int OPER = flg_HELP | flg_DEAUTH | flg_NEWPASS
 			| flg_TRANS | flg_KICK | flg_CLEARCHAN | flg_LISTHOSTS;
 const unsigned long int SOPER = flg_CHECKNET | flg_LISTIGNORES | flg_LIST 
 			| flg_NOTES | flg_USERINFO | flg_SCAN | flg_MAXUSERS
-			| flg_LASTCOM;
+			| flg_LASTCOM | flg_REOP;
 const unsigned long int ADMIN = OPER | flg_JUPE | flg_REMOPCHN | flg_ADDOPCHN 
 			| flg_ADDNOP | flg_REMOP |flg_MODOP | flg_ADDCMD 
 			| flg_DELCMD | flg_SUSPEND | flg_UNSUSPEND;

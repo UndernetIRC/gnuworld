@@ -24,7 +24,7 @@
 #include	"ccUser.h"
 #include	"Constants.h"
 
-const char GLINECommand_cc_rcsId[] = "$Id: GLINECommand.cc,v 1.42 2002/06/07 17:58:23 mrbean_ Exp $";
+const char GLINECommand_cc_rcsId[] = "$Id: GLINECommand.cc,v 1.43 2002/08/27 19:22:05 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -200,12 +200,16 @@ if(!isChan)
 			}
 		if((gCheck & gline::FU_NEEDED_TIME) && (Ok))
 			{
-			bot->Notice(theClient,"Please user forcegline to gline for more than %d second",gline::MFGLINE_TIME);
+			bot->Notice(theClient,"Please use forcegline to gline for more than %d second",gline::MFGLINE_TIME);
 			Ok = false;
 			}
 		if((gCheck & gline::FORCE_NEEDED_WILDTIME) && (Ok))
 			{
-			bot->Notice(theClient,"Wildcard gline for more than %d seconds, must be set with forcegline",gline::MGLINE_WILD_TIME);
+			bot->Notice(theClient,"Wildcard gline for more than %d"
+			    " seconds (or more than %d without ident)," 
+			    "must be set with forcegline"
+			    ,gline::MGLINE_WILD_TIME ,
+			    gline::MGLINE_WILD_NOID_TIME);
 			Ok = false;
 			}
 	    	if(!Ok)

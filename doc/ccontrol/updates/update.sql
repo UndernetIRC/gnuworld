@@ -1,8 +1,9 @@
 
--- "$Id: update.sql,v 1.2 2002/08/22 21:35:13 mrbean_ Exp $"
+-- "$Id: update.sql,v 1.3 2002/08/27 19:22:05 mrbean_ Exp $"
 
 -- ccontrol database changes update
 -- this file will add the new features to an old database
+
 -- this script will only update the opers who doesnt have getlogs enabled
 -- because of misfunctionality of postgresql
 
@@ -93,10 +94,14 @@
 
 -- 16/05/02 Add the BadChannels table
 
-CREATE TABLE BadChannels (
-        Name VARCHAR(400) NOT NULL,
-        Reason VARCHAR(512) NOT NULL,
-        AddedBy VARCHAR(200) NOT NULL
-        );
+-- CREATE TABLE BadChannels (
+--        Name VARCHAR(400) NOT NULL,
+--        Reason VARCHAR(512) NOT NULL,
+--        AddedBy VARCHAR(200) NOT NULL
+--        );
 
-update opers set saccess = (saccess | 2097152) where isCODER = 't';
+-- update opers set saccess = (saccess | 2097152) where isCODER = 't';
+
+27/08/02 Add REOP command to opers
+  update opers set saccess = (saccess | 4194304);
+  

@@ -3,7 +3,7 @@
  */
 
 #ifndef __CCONTROL_H
-#define __CCONTROL_H "$Id: ccontrol.h,v 1.78 2002/08/11 01:15:18 reedloden Exp $"
+#define __CCONTROL_H "$Id: ccontrol.h,v 1.79 2002/08/27 19:22:06 mrbean_ Exp $"
 
 //Undef this if you want to log to the database
 #define LOGTOHD 
@@ -503,7 +503,6 @@ public:
 	 * This method checks the gline paramerters for valid time/host
 	 */
 
-//	int CheckGline(const char *, unsigned int);
 	
 	int checkGline(const string ,unsigned int ,unsigned int &);
 
@@ -526,6 +525,8 @@ public:
 	bool loadVersions();
 	
 	bool loadBadChannels();
+	
+	void loadCommands();
 	
 	void wallopsAsServer(const char * , ... );
 
@@ -561,10 +562,6 @@ public:
 
 	void listSuspended( iClient * );
 	
-	void listServers( iClient * );
-	
-	void loadCommands();
-	
 	bool updateCommand ( Command* );
 	
 	Command* findRealCommand( const string& );
@@ -573,7 +570,7 @@ public:
 
 	bool UpdateCommandFromDb ( Command* Comm );
 
-	bool CleanServers();
+
 	
 	const string expandDbServer(const string&);
 	
@@ -587,11 +584,19 @@ public:
 	
 	unsigned int checkPassword(string,ccUser*);
 	
+	/**
+	    Servers Functions
+	 */
+	 
 	ccServer* getServer(const string& );
 	
 	void	addServer(ccServer*);
 
 	void	remServer(ccServer*);
+
+	bool CleanServers();
+
+	void listServers( iClient * );
 
 #ifdef LOGTOHD
 
@@ -604,12 +609,20 @@ public:
 #endif
 	
 		
+	/**
+	    Signals Commands
+	 */
+	 
 	int OnSignal(int sig); 
 	
 	void saveServersInfo();
 	
 	void saveChannelsInfo();
 	
+	/**
+	 MaxUsers Functions
+	 */
+	 
 	void checkMaxUsers();
 	
 	const unsigned int getMaxUsers() const
@@ -621,21 +634,31 @@ public:
 	const unsigned long getCurUsers() const
 	{ return curUsers; }
 	
+	/**
+	    Server Versions Functions
+	 */
+	 
 	bool addVersion(const string&);
 	
 	bool remVersion(const string&);
 	
 	bool isValidVersion(const string&);
 	
+	bool updateCheckVer(const bool);
+	
 	void listVersions(iClient*);
 	
-	bool updateCheckVer(const bool);
+	/**
+	    BadChannel Functions
+	 */
 	
 	ccBadChannel* isBadChannel(const string&);
 	
 	void addBadChannel(ccBadChannel*);
 	
 	void remBadChannel(ccBadChannel*);
+	
+	void listBadChannels( iClient* );
 	
 	/**
 	 * This is a constant iterator type used to perform a read-only

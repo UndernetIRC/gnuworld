@@ -46,8 +46,9 @@ namespace gline
         const unsigned int FORCE_NEEDED_WILDTIME = 0x100;
         const unsigned int FU_NEEDED_TIME = 0x200;
         const unsigned int NEG_TIME = 0x400;
-        const unsigned int MGLINE_TIME = 24*3600;
-        const unsigned int MGLINE_WILD_TIME = 10*60;
+        const unsigned int MGLINE_TIME = 3*24*3600;
+        const unsigned int MGLINE_WILD_NOID_TIME = 7200;
+	const unsigned int MGLINE_WILD_TIME = 24*3600;
         const unsigned int MFGLINE_USERS = 255;
         const unsigned int MFGLINE_TIME = 14*3600*24;
         const unsigned int PERM_TIME = 730*3600*24;
@@ -72,6 +73,11 @@ namespace password
 	const unsigned int LIKE_UNAME = 2;
 	const unsigned int PASS_OK = 3;
 	
+}
+
+namespace badChannels
+{
+	static const char Query[] = "SELECT Name,Reason,AddedBy from BadChannels";
 }
 
 }

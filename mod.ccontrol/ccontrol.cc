@@ -11,12 +11,12 @@
 /* ccontrol.cc
  * Authors: Daniel Karrels dan@karrels.com
  *	    Tomer Cohen    MrBean@toughguy.net
- * $Id: ccontrol.cc,v 1.149 2002/08/16 15:20:34 mrbean_ Exp $
+ * $Id: ccontrol.cc,v 1.150 2002/08/27 19:22:06 mrbean_ Exp $
  */
 
 #define MAJORVER "1"
-#define MINORVER "0"
-#define RELDATE "27 may, 2002"
+#define MINORVER "1"
+#define RELDATE "27 August, 2002"
 
 #include        <sys/types.h> 
 #include        <sys/socket.h>
@@ -56,7 +56,7 @@
 #include	"ip.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.149 2002/08/16 15:20:34 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.150 2002/08/27 19:22:06 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -342,6 +342,14 @@ RegisterCommand( new DEAUTHCommand( this, "DEAUTH", ""
 	true,
 	operLevel::OPERLEVEL,
 	false ) ) ;
+RegisterCommand( new DEAUTHCommand( this, "LOGOUT", ""
+        "Deauthenticate with the bot",
+        commandLevel::flg_DEAUTH,
+        false,
+        false,
+        true,
+        operLevel::OPERLEVEL,
+        false ) ) ;
 RegisterCommand( new ADDUSERCommand( this, "ADDUSER",
 	"<USER> <OPERTYPE> [SERVER*] <PASS> "
 	"Add a new oper",
@@ -544,7 +552,7 @@ RegisterCommand( new REMOVEIGNORECommand( this, "REMIGNORE", "(nick/host)"
 	false,
 	operLevel::OPERLEVEL,
 	true ) ) ;
-RegisterCommand( new LISTCommand( this, "LIST", "(glines/servers)"
+RegisterCommand( new LISTCommand( this, "LIST", "(glines/servers/badchannels)"
 	" Get all kinds of lists from the bot",
 	commandLevel::flg_LIST,
 	false,
@@ -638,13 +646,21 @@ RegisterCommand( new NOMODECommand( this, "NOMODE",
 	true ) ) ;
 
 RegisterCommand( new SAYCommand( this, "SAY", 
-	"<-s/-b> Forced the bot to quote a command as the uplink or the bot",
+	"<-s/-b> <#chan/nick> Forced the bot to \"talk\" as the uplink or the bot",
 	commandLevel::flg_SAY,
 	false,
 	false,
 	false,
 	operLevel::CODERLEVEL,
 	true ) ) ;
+RegisterCommand( new REOPCommand( this, "REOP", "<#chan> <nick> "
+	"Removes all channel ops, and reops the specified nick",
+	commandLevel::flg_REOP,
+	false,
+	false,
+	false,
+	operLevel::OPERLEVEL,
+	false ) ) ;
 
 elog << "Loading commands ......... ";
 
@@ -1155,44 +1171,43 @@ switch( theEvent )
 		 * server , and check if we know it
 		 *
 		 */
-		if(dbConnected)
+		iServer* NewServer = static_cast< iServer* >( Data1);
+		iServer* UplinkServer = static_cast< iServer* >( Data2);
+		ccServer* CheckServer = getServer(NewServer->getName());
+		if(!CheckServer)
+			{    	
+			MsgChanLog("Unknown server connected : %s Uplink : %s\n"
+				    ,NewServer->getName().c_str(),UplinkServer->getName().c_str());
+			}
+		else 
 			{
-			iServer* NewServer = static_cast< iServer* >( Data1);
-			iServer* UplinkServer = static_cast< iServer* >( Data2);
-			ccServer* CheckServer = getServer(NewServer->getName());
-			if(!CheckServer)
-				{    	
-				MsgChanLog("Unknown server connected : %s Uplink : %s\n"
-					    ,NewServer->getName().c_str(),UplinkServer->getName().c_str());
-				}
-			else 
+			CheckServer->setLastConnected(::time (0));
+			CheckServer->setUplink(UplinkServer->getName());
+			CheckServer->setLastNumeric(NewServer->getCharYY());
+			CheckServer->setNetServer(NewServer);
+			if(dbConnected)
 				{
-				CheckServer->setLastConnected(::time (0));
-				CheckServer->setUplink(UplinkServer->getName());
-				CheckServer->setLastNumeric(NewServer->getCharYY());
-				CheckServer->setNetServer(NewServer);
 				CheckServer->Update();
-				Write("%s V :%s\n",getCharYYXXX().c_str(),NewServer->getCharYY());
 				}
-		
+			Write("%s V :%s\n",getCharYYXXX().c_str(),NewServer->getCharYY());
 			}
 		break;
 		}
 	case EVT_NETBREAK:
 		{
-		if(dbConnected)
+		iServer* NewServer = static_cast< iServer* >( Data1);
+		string Reason = *(static_cast<string *>(Data3));
+		
+		if(!getUplink()->isJuped(NewServer))
 			{
-			iServer* NewServer = static_cast< iServer* >( Data1);
-			string Reason = *(static_cast<string *>(Data3));
-			
-			if(!getUplink()->isJuped(NewServer))
+			ccServer* CheckServer = getServer(NewServer->getName());
+    	                if(CheckServer)
 				{
-				ccServer* CheckServer = getServer(NewServer->getName());
-	    	                if(CheckServer)
+				CheckServer->setSplitReason(Reason);
+				CheckServer->setLastSplitted(::time(NULL));
+				CheckServer->setNetServer(NULL);
+				if(dbConnected)
 					{
-					CheckServer->setSplitReason(Reason);
-					CheckServer->setLastSplitted(::time(NULL));
-					CheckServer->setNetServer(NULL);
 					CheckServer->Update();
 					}
 				}
@@ -2712,6 +2727,7 @@ unsigned int GlineType = isIP;
 bool ParseEnded = false;
 int retMe = 0;
 string::size_type pos = Host.find_first_of('@');
+string Ident = Host.substr(0,pos);
 string Hostname = Host.substr(pos+1);
 if(Len >  gline::MFU_TIME)  //Check for maximum time
 	retMe |=  gline::BAD_TIME;
@@ -2763,8 +2779,30 @@ if(Len >  gline::MFGLINE_TIME)
 	retMe |=  gline::FU_NEEDED_TIME;
 if(Len >  gline::MGLINE_TIME)
 	retMe |=  gline::FORCE_NEEDED_TIME;
-if(GlineType & (isWildCard & (Len >  gline::MGLINE_WILD_TIME)))
-	retMe |=  gline::FORCE_NEEDED_WILDTIME;
+if(GlineType & (isWildCard))
+	{//Need to check the Ident now
+	bool hasId = false;
+	for(string::size_type pos = 0; pos < Ident.size();++pos)
+		{
+		if((Ident[pos] == '*') || (Ident[pos] == '?'))
+			{
+			continue;
+			}
+		else
+			{ //Its not */? so we have a legal ident
+			hasId = true;
+			break;
+			}
+		}
+	if((hasId & (Len >  gline::MGLINE_WILD_TIME)) 
+		|| (!hasId & (Len >  gline::MGLINE_WILD_NOID_TIME)))
+		{
+		retMe |=  gline::FORCE_NEEDED_WILDTIME;
+		}
+	}
+	
+//if(GlineType & (isWildCard & (Len >  gline::MGLINE_WILD_TIME)))
+//	retMe |=  gline::FORCE_NEEDED_WILDTIME;
 if(!retMe)
 	retMe =  gline::GLINE_OK;
 return retMe;
@@ -3168,7 +3206,7 @@ if(!dbConnected)
         }
 
 stringstream theQuery;
-theQuery        << server::Query
+theQuery        << badChannels::Query
                 << ends;
          
 #ifdef LOG_SQL
@@ -3593,6 +3631,18 @@ for(serversConstIterator ptr = serversMap_begin();ptr != serversMap_end();++ptr)
 	Notice(theClient,"Version : %s" ,tmpServer->getVersion().c_str());
 	}
 	 
+}
+
+void ccontrol::listBadChannels( iClient* theClient)
+{
+ccBadChannel* tempBadChan;
+for(badChannelsIterator ptr = badChannels_begin();ptr != badChannels_end();++ptr)
+        {
+        tempBadChan = ptr->second;
+        Notice(theClient,"Channel : %s - Reason : %s - AddedBy : %s",tempBadChan->getName().c_str(),
+                tempBadChan->getReason().c_str(),tempBadChan->getAddedBy().c_str());
+        }
+
 }
 
 
