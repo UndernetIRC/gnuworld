@@ -24,7 +24,7 @@
 #include	"AuthInfo.h"
 #include        "server.h"
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.51 2001/05/31 18:17:59 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.52 2001/05/31 18:28:38 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -1994,7 +1994,6 @@ bool ccontrol::refreshIgnores()
 {
 loginIterator tptr;
 ccLogin *tempLogin;
-MsgChanLog("[Refreshing Ignores] - Started\n");
 for(loginIterator ptr = login_begin();ptr!=login_end();)
 	{
 	tempLogin = *ptr;
@@ -2019,7 +2018,6 @@ for(loginIterator ptr = login_begin();ptr!=login_end();)
 	else
 		ptr++;
 	}
-MsgChanLog("[Refreshing Ignores] - Ended\n");
 
 return true;
 
