@@ -20,9 +20,10 @@
 #include	"misc.h"
 #include	"Numeric.h"
 #include	"match.h"
+#include	"StringTokenizer.h"
 
 const char xNetwork_h_rcsId[] = __NETWORK_H ;
-const char xNetwork_cc_rcsId[] = "$Id: Network.cc,v 1.25 2001/05/14 16:07:05 dan_karrels Exp $" ;
+const char xNetwork_cc_rcsId[] = "$Id: Network.cc,v 1.26 2001/05/17 20:04:24 dan_karrels Exp $" ;
 const char ELog_h_rcsId[] = __ELOG_H ;
 const char iClient_h_rcsId[] = __ICLIENT_H ;
 const char Channel_h_rcsId[] = __CHANNEL_H ;
@@ -30,6 +31,7 @@ const char client_h_rcsId[] = __CLIENT_H ;
 const char misc_h_rcsId[] = __MISC_H ;
 const char Numeric_h_rcsId[] = __NUMERIC_H ;
 const char match_h_rcsId[] = __MATCH_H ;
+const char StringTokenizer_cc_rcsId[] = __STRINGTOKENIZER_H ;
 
 namespace gnuworld
 {
@@ -766,6 +768,51 @@ for( networkVectorType::const_iterator sPtr = clients.begin() ;
 		}
 	}
 
+return retMe ;
+}
+
+list< const iClient* > xNetwork::matchUserHost(
+	const string& wildUserHost ) const
+{
+
+// Tokenize the wildUserHost into username and hostname
+StringTokenizer st( wildUserHost, '@' ) ;
+
+// Make sure there are exactly two tokens
+if( st.size() != 2 )
+	{
+	// Invalid format of wildUserHost, return empty list
+	return list< const iClient* >() ;
+	}
+
+// Get a list of matching hosts to that of wildUserHost
+list< const iClient* > matchingHosts = matchHost( st[ 1 ] ) ;
+
+// Were any found?
+if( matchingHosts.empty() )
+	{
+	// No matching hosts found, return the empty list
+	return matchingHosts ;
+	}
+
+// Create a list to return to the caller, create matchingHosts.size()
+// empty slots to speed up memory allocation
+list< const iClient* > retMe( matchingHosts.size() ) ;
+
+// Iterate through the list of matching hostnames
+for( list< const iClient* >::const_iterator ptr = matchingHosts.begin() ;
+	ptr != matchingHosts.end() ; ++ptr )
+	{
+	// Does this iClient's username also match that of the
+	// wildUserHost username?
+	if( !match( st[ 0 ], (*ptr)->getUserName() ) )
+		{
+		// Found a matching username
+		retMe.push_back( *ptr ) ;
+		}
+	}
+
+// Return the list of matching username and hostnames
 return retMe ;
 }
 

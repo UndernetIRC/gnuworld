@@ -3,7 +3,7 @@
  */
 
 #ifndef __NETWORK_H
-#define __NETWORK_H "$Id: Network.h,v 1.15 2001/05/13 00:26:01 dan_karrels Exp $"
+#define __NETWORK_H "$Id: Network.h,v 1.16 2001/05/17 20:04:24 dan_karrels Exp $"
 
 #include	<vector>
 #include	<string>
@@ -424,14 +424,40 @@ public:
 	virtual void	setServer( xServer* _theServer )
 		{ theServer = _theServer ; }
 
+	/**
+	 * Attempt to match the hostname, which may include wildcard
+	 * characters, with any clients on the network.  Return a
+	 * list of pointers to const iClient's which match.
+	 */
 	virtual list< const iClient* > matchHost( const string& wildHost ) 
 			const ;
+	/**
+	 * Match the given user@host string, which may include
+	 * wildcards, to each client on the network.  Return a
+	 * list of pointers to const iClient's which match.
+	 */
+	virtual list< const iClient* >	matchUserHost( const string& )
+			const ;
 
+	/**
+	 * Attempt to find hostnames which are equivalent to the given
+	 * hostname, found using a case insensitive search.
+	 * Return a list of pointers to const iClient's which are
+	 * found.
+	 */
 	virtual list< const iClient* > findHost( const string& hostName ) 
 			const ;
 
+	/**
+	 * Perform a similar match as to matchHost(), except return
+	 * only the number of matches found.
+	 */
 	virtual size_t	countMatchingHost( const string& wildHost ) const ;
 
+	/**
+	 * Perform a similar operation as to findHost(), except return
+	 * only the number of hosts found.
+	 */
 	virtual size_t	countHost( const string& hostName ) const ;
 
 protected:
