@@ -26,7 +26,7 @@
 #include	"events.h"
 
 const char xClient_h_rcsId[] = __XCLIENT_H ;
-const char xClient_cc_rcsId[] = "$Id: client.cc,v 1.22 2001/01/12 22:49:24 dan_karrels Exp $" ;
+const char xClient_cc_rcsId[] = "$Id: client.cc,v 1.23 2001/01/13 21:06:29 dan_karrels Exp $" ;
 
 using std::string ;
 using std::strstream ;
@@ -528,107 +528,168 @@ if( !onChannel )
 	Part( theChan ) ;
 	}
 
-theUser->setMode( ChannelUser::MODE_O ) ;
+xServer::opVectorType opVector ;
+opVector.push_back( xServer::opVectorType::value_type(
+	true, theUser ) ) ;
 
-// TODO: Post message
+MyUplink->onChannelModeO( theChan, 0, opVector ) ;
 
 return true ;
 }
 
-bool xClient::Op( Channel* theChan, const vector< iClient* >& theClients )
+bool xClient::Op( Channel* theChan,
+	const vector< iClient* >& clientVector )
 {
 #ifndef NDEBUG
   assert( theChan != NULL ) ;
 #endif
-	unsigned short runCounter = 0;
-	unsigned short totalCounter = 0;
 
 if( !Connected )
 	{
 	return false ;
 	}
- 
-string opList;    // Stack of numerics we're opping.
-string paramList; // To build up our "+ooo"'s.
 
-for( vector< iClient* >::const_iterator ptr = theClients.begin(); ptr != theClients.end() ; ++ptr )
-	{ 
-		ChannelUser* theUser = theChan->findUser( *ptr );
-		if(theUser) // If on Channel.
+xServer::opVectorType opVector ;
+
+for( vector< iClient* >::const_iterator ptr = clientVector.begin(),
+	end = clientVector.end() ; ptr != end ; ++ptr )
+	{
+	if( NULL == *ptr )
 		{
-			if( !theUser->getMode( ChannelUser::MODE_O ) ) // If not alread opped..
-			{
-				opList += " " + (*ptr)->getCharYYXXX();
-				paramList += "o";
-				theUser->setMode( ChannelUser::MODE_O ) ;
-				runCounter++; 
-			}
-			totalCounter++;
+		elog	<< "xClient::Op(vector)> Found NULL "
+			<< "iClient!"
+			<< endl ;
+		continue ;
+		}
 
-			if ((runCounter == 6) || (totalCounter == theClients.size()))
-			{
-				strstream s ;
-				s	<< getCharYYXXX() << " M "
-					<< theChan->getName() << " +" << paramList
-					<< opList << ends ;
-				Write( s ) ;
-				delete[] s.str() ;
-				opList = "";
-				paramList = "";
-				runCounter = 0;
-			} 
-		} 
+	ChannelUser* theUser = theChan->findUser( *ptr ) ;
+	if( NULL == theUser )
+		{
+		elog	<< "xClient::Op(vector)> Unable to find "
+			<< "client on channel: "
+			<< theChan->getName()
+			<< endl ;
+		continue ;
+		}
+
+	if( !theUser->getMode( ChannelUser::MODE_O ) )
+		{
+		// User is not already opped
+		opVector.push_back( xServer::opVectorType::value_type(
+			true, theUser ) ) ;
+		}
 	}
+
+string modeString = "+" ;
+string args ;
+
+for( xServer::opVectorType::const_iterator ptr = opVector.begin(),
+	end = opVector.end() ; ptr != end ; ++ptr )
+	{
+	modeString += 'o' ;
+	args += ptr->second->getCharYYXXX() + ' ' ;
+
+	if( ((MAX_CHAN_MODES + 1) == modeString.size()) ||
+		((ptr + 1) == end) )
+		{
+		strstream s ;
+		s	<< getCharYYXXX() << " M "
+			<< theChan->getName() << ' '
+			<< modeString << ' ' << args
+			<< ends ;
+
+		Write( s ) ;
+		delete[] s.str() ;
+
+		modeString.erase( modeString.begin(), modeString.end() ) ;
+		args.erase( args.begin(), args.end() ) ;
+
+		} // if()
+
+	} // for()
+
+MyUplink->onChannelModeO( theChan, 0, opVector ) ;
  
 return true ;
 }
 
-bool xClient::Voice( Channel* theChan, const vector< iClient* >& theClients )
+bool xClient::Voice( Channel* theChan,
+	const vector< iClient* >& clientVector )
 {
 #ifndef NDEBUG
   assert( theChan != NULL ) ;
 #endif
-	unsigned short runCounter = 0;
-	unsigned short totalCounter = 0;
 
 if( !Connected )
 	{
 	return false ;
 	}
- 
-string voiceList; // Stack of numerics we're Voicing.
-string paramList; // To build up our "+vvv"'s.
 
-for( vector< iClient* >::const_iterator ptr = theClients.begin(); ptr != theClients.end() ; ++ptr )
-	{ 
-		ChannelUser* theUser = theChan->findUser( *ptr );
-		if(theUser) // If on Channel.
+xServer::voiceVectorType voiceVector ;
+
+for( vector< iClient* >::const_iterator ptr = clientVector.begin(),
+	end = clientVector.end() ; ptr != end ; ++ptr )
+	{
+	if( NULL == *ptr )
 		{
-			if( !theUser->getMode( ChannelUser::MODE_V ) ) // If not alread voiced..
-			{
-				voiceList += " " + (*ptr)->getCharYYXXX();
-				paramList += "v";
-				theUser->setMode( ChannelUser::MODE_V ) ;
-				runCounter++; 
-			}
-			totalCounter++;
+		elog	<< "xClient::Voice(vector)> Found NULL "
+			<< "iClient for channel: "
+			<< theChan->getName()
+			<< endl ;
+		continue ;
+		}
 
-			if ((runCounter == 6) || (totalCounter == theClients.size()))
-			{
-				strstream s ;
-				s	<< getCharYYXXX() << " M "
-					<< theChan->getName() << " +" << paramList
-					<< voiceList << ends ;
-				Write( s ) ;
-				delete[] s.str() ;
-				voiceList = "";
-				paramList = "";
-				runCounter = 0;
-			} 
-		} 
+	ChannelUser* theUser = theChan->findUser( *ptr ) ;
+	if( NULL == theUser )
+		{
+		elog	<< "xClient::Voice(vector)> Unable to find "
+			<< "client on channel: "
+			<< theChan->getName()
+			<< endl ;
+		continue ;
+		}
+
+	if( !theUser->getMode( ChannelUser::MODE_V ) )
+		{
+		// User is not already voiced
+		voiceVector.push_back(
+			xServer::voiceVectorType::value_type(
+			true, theUser ) ) ;
+		}
 	}
+
+string modeString = "+" ;
+string args ;
+
+for( xServer::voiceVectorType::const_iterator ptr = voiceVector.begin(),
+	end = voiceVector.end() ; ptr != end ; ++ptr )
+	{
+	modeString += 'v' ;
+	args += ptr->second->getCharYYXXX() + ' ' ;
+
+	if( ((MAX_CHAN_MODES + 1) == modeString.size()) ||
+		((ptr + 1) == end) )
+		{
+		strstream s ;
+		s	<< getCharYYXXX() << " M "
+			<< theChan->getName() << ' '
+			<< modeString << ' ' << args
+			<< ends ;
+
+		Write( s ) ;
+		delete[] s.str() ;
+
+		modeString.erase( modeString.begin(), modeString.end() ) ;
+		args.erase( args.begin(), args.end() ) ;
+
+		} // if()
+
+	} // for()
+
+MyUplink->onChannelModeV( theChan, 0, voiceVector ) ;
  
 return true ;
+
 }
 
 bool xClient::Voice( Channel* theChan, iClient* theClient )
@@ -672,9 +733,11 @@ if( !onChannel )
 	Part( theChan ) ;
 	}
 
-theUser->setMode( ChannelUser::MODE_V ) ;
+xServer::voiceVectorType voiceVector ;
+voiceVector.push_back( xServer::voiceVectorType::value_type(
+	true, theUser ) ) ;
 
-// TODO: Post message
+MyUplink->onChannelModeV( theChan, 0, voiceVector ) ;
 
 return true ;
 } 
@@ -720,58 +783,87 @@ if( !onChannel )
 	Part( theChan ) ;
 	}
 
-// Update the user's channel state
-theUser->removeMode( ChannelUser::MODE_O ) ;
+xServer::opVectorType opVector ;
+opVector.push_back( xServer::opVectorType::value_type(
+	false, theUser ) ) ;
 
-// TODO: Post message
+MyUplink->onChannelModeO( theChan, 0, opVector ) ;
 
 return true ;
 }
 
-bool xClient::DeOp( Channel* theChan, const vector< iClient* >& theClients )
+bool xClient::DeOp( Channel* theChan,
+	const vector< iClient* >& clientVector )
 {
 #ifndef NDEBUG
   assert( theChan != NULL ) ;
 #endif
-	unsigned short runCounter = 0;
-	unsigned short totalCounter = 0;
 
 if( !Connected )
 	{
 	return false ;
 	}
- 
-string deopList;  // Stack of numerics we're de-opping.
-string paramList; // To build up our "-ooo"'s.
 
-for( vector< iClient* >::const_iterator ptr = theClients.begin(); ptr != theClients.end() ; ++ptr )
-	{ 
-		ChannelUser* theUser = theChan->findUser( *ptr );
-		if(theUser) // If on Channel.
+xServer::opVectorType opVector ;
+
+for( vector< iClient* >::const_iterator ptr = clientVector.begin(),
+	end = clientVector.end() ; ptr != end ; ++ptr )
+	{
+	if( NULL == *ptr )
 		{
-			if( theUser->getMode( ChannelUser::MODE_O ) ) // If opped..
-			{
-				deopList += " " + (*ptr)->getCharYYXXX();
-				paramList += "o";
-				theUser->removeMode( ChannelUser::MODE_O ) ;
-				runCounter++; 
-			}
-			totalCounter++;
+		elog	<< "xClient::DeOp(vector)> Found NULL "
+			<< "iClient!"
+			<< endl ;
+		continue ;
+		}
 
-			if ((runCounter == 6) || (totalCounter == theClients.size()))
-			{
-				strstream s ;
-				s	<< getCharYYXXX() << " M "
-					<< theChan->getName() << " -" << paramList
-					<< deopList << ends ;
-				Write( s ) ;
-				delete[] s.str() ;
-				deopList = "";
-				paramList = "";
-				runCounter = 0;
-			} 
-		} 
+	ChannelUser* theUser = theChan->findUser( *ptr ) ;
+	if( NULL == theUser )
+		{
+		elog	<< "xClient::DeOp(vector)> Unable to find "
+			<< "client on channel: "
+			<< theChan->getName()
+			<< endl ;
+		continue ;
+		}
+
+	if( theUser->getMode( ChannelUser::MODE_O ) )
+		{
+		// User is opped
+		opVector.push_back( xServer::opVectorType::value_type(
+			false, theUser ) ) ;
+		}
 	}
+
+string modeString = "-" ;
+string args ;
+
+for( xServer::opVectorType::const_iterator ptr = opVector.begin(),
+	end = opVector.end() ; ptr != end ; ++ptr )
+	{
+	modeString += 'o' ;
+	args += ptr->second->getCharYYXXX() + ' ' ;
+
+	if( ((MAX_CHAN_MODES + 1) == modeString.size()) ||
+		((ptr + 1) == end) )
+		{
+		strstream s ;
+		s	<< getCharYYXXX() << " M "
+			<< theChan->getName() << ' '
+			<< modeString << ' ' << args
+			<< ends ;
+
+		Write( s ) ;
+		delete[] s.str() ;
+
+		modeString.erase( modeString.begin(), modeString.end() ) ;
+		args.erase( args.begin(), args.end() ) ;
+
+		} // if()
+
+	} // for()
+
+MyUplink->onChannelModeO( theChan, 0, opVector ) ;
  
 return true ;
 }
@@ -779,7 +871,8 @@ return true ;
 bool xClient::DeVoice( Channel* theChan, iClient* theClient )
 {
 #ifndef NDEBUG
-  assert( (theChan != NULL) && (theClient != NULL) ) ;
+  assert( theChan != 0 ) ;
+  assert( theClient != 0 ) ;
 #endif
 
 if( !Connected )
@@ -817,58 +910,88 @@ if( !onChannel )
 	Part( theChan ) ;
 	}
 
-// Update the user's channel state
-theUser->removeMode( ChannelUser::MODE_V ) ;
+xServer::voiceVectorType voiceVector ;
+voiceVector.push_back( xServer::voiceVectorType::value_type(
+	false, theUser ) ) ;
 
-// TODO: Post message
+MyUplink->onChannelModeV( theChan, 0, voiceVector ) ;
 
 return true ;
 }
 
-bool xClient::DeVoice( Channel* theChan, const vector< iClient* >& theClients )
+bool xClient::DeVoice( Channel* theChan,
+	const vector< iClient* >& clientVector )
 {
 #ifndef NDEBUG
   assert( theChan != NULL ) ;
 #endif
-	unsigned short runCounter = 0;
-	unsigned short totalCounter = 0;
 
 if( !Connected )
 	{
 	return false ;
 	}
- 
-string devoiceList;  // Stack of numerics we're de-voicing.
-string paramList;    // To build up our "-vvv"'s.
 
-for( vector< iClient* >::const_iterator ptr = theClients.begin(); ptr != theClients.end() ; ++ptr )
-	{ 
-		ChannelUser* theUser = theChan->findUser( *ptr );
-		if(theUser) // If on Channel.
+xServer::voiceVectorType voiceVector ;
+
+for( vector< iClient* >::const_iterator ptr = clientVector.begin(),
+	end = clientVector.end() ; ptr != end ; ++ptr )
+	{
+	if( NULL == *ptr )
 		{
-			if( theUser->getMode( ChannelUser::MODE_V ) ) // If voiced..
-			{
-				devoiceList += " " + (*ptr)->getCharYYXXX();
-				paramList += "v";
-				theUser->removeMode( ChannelUser::MODE_V ) ;
-				runCounter++; 
-			}
-			totalCounter++;
+		elog	<< "xClient::DeVoice(vector)> Found NULL "
+			<< "iClient!"
+			<< endl ;
+		continue ;
+		}
 
-			if ((runCounter == 6) || (totalCounter == theClients.size()))
-			{
-				strstream s ;
-				s	<< getCharYYXXX() << " M "
-					<< theChan->getName() << " -" << paramList
-					<< devoiceList << ends ;
-				Write( s ) ;
-				delete[] s.str() ;
-				devoiceList = "";
-				paramList = "";
-				runCounter = 0;
-			} 
-		} 
+	ChannelUser* theUser = theChan->findUser( *ptr ) ;
+	if( NULL == theUser )
+		{
+		elog	<< "xClient::DeVoice(vector)> Unable to find "
+			<< "client on channel: "
+			<< theChan->getName()
+			<< endl ;
+		continue ;
+		}
+
+	if( theUser->getMode( ChannelUser::MODE_V ) )
+		{
+		// User is voiced
+		voiceVector.push_back(
+			xServer::voiceVectorType::value_type(
+			false, theUser ) ) ;
+		}
 	}
+
+string modeString = "-" ;
+string args ;
+
+for( xServer::voiceVectorType::const_iterator ptr = voiceVector.begin(),
+	end = voiceVector.end() ; ptr != end ; ++ptr )
+	{
+	modeString += 'v' ;
+	args += ptr->second->getCharYYXXX() + ' ' ;
+
+	if( ((MAX_CHAN_MODES + 1) == modeString.size()) ||
+		((ptr + 1) == end) )
+		{
+		strstream s ;
+		s	<< getCharYYXXX() << " M "
+			<< theChan->getName() << ' '
+			<< modeString << ' ' << args
+			<< ends ;
+
+		Write( s ) ;
+		delete[] s.str() ;
+
+		modeString.erase( modeString.begin(), modeString.end() ) ;
+		args.erase( args.begin(), args.end() ) ;
+
+		} // if()
+
+	} // for()
+
+MyUplink->onChannelModeV( theChan, 0, voiceVector ) ;
  
 return true ;
 }
@@ -896,15 +1019,12 @@ if( !onChannel )
 	Join( theChan ) ;
 	}
 
-string banMask = makeBan( theChan, theClient ) ;
+string banMask = Channel::createBan( theClient ) ;
 
 Write( "%s M %s +b :%s",
 	getCharYYXXX().c_str(),
 	theChan->getName().c_str(),
 	banMask.c_str() ) ;
-
-// Update the channel's ban list
-theChan->setBan( banMask ) ;
 
 // No users are kicked by just setting a ban.
 
@@ -912,6 +1032,12 @@ if( !onChannel )
 	{
 	Part( theChan ) ;
 	}
+
+xServer::banVectorType banVector ;
+banVector.push_back( xServer::banVectorType::value_type(
+	true, banMask ) ) ;
+
+MyUplink->onChannelModeB( theChan, 0, banVector ) ;
 
 return true ;
 }
@@ -950,12 +1076,17 @@ if( !onChannel )
 	Part( theChan ) ;
 	}
 
-theChan->removeBan( banMask ) ;
+xServer::banVectorType banVector ;
+banVector.push_back( xServer::banVectorType::value_type(
+	false, banMask ) ) ;
+
+MyUplink->onChannelModeB( theChan, 0, banVector ) ;
 
 return true ;
 }
 
-bool xClient::Ban( Channel* theChan, const vector< iClient* >& theClients )
+bool xClient::Ban( Channel* theChan,
+	const vector< iClient* >& clientVector )
 {
 #ifndef NDEBUG
   assert( theChan != NULL ) ;
@@ -966,13 +1097,71 @@ if( !Connected )
 	return false ;
 	}
 
+xServer::banVectorType banVector ;
+
+for( vector< iClient* >::const_iterator ptr = clientVector.begin(),
+	end = clientVector.end() ; ptr != end ; ++ptr )
+	{
+	if( NULL == *ptr )
+		{
+		elog	<< "xClient::Ban(vector)> Found NULL "
+			<< "iClient!"
+			<< endl ;
+		continue ;
+		}
+
+	ChannelUser* theUser = theChan->findUser( *ptr ) ;
+	if( NULL == theUser )
+		{
+		elog	<< "xClient::Ban(vector)> Unable to find "
+			<< "client on channel: "
+			<< theChan->getName()
+			<< endl ;
+		continue ;
+		}
+
+	banVector.push_back( xServer::banVectorType::value_type(
+		true, Channel::createBan( *ptr ) ) ) ;
+	}
+
+string modeString = "+" ;
+string args ;
+
+for( xServer::banVectorType::const_iterator ptr = banVector.begin(),
+	end = banVector.end() ; ptr != end ; ++ptr )
+	{
+	modeString += 'b' ;
+	args += ptr->second + ' ' ;
+
+	if( ((MAX_CHAN_MODES + 1) == modeString.size()) ||
+		((ptr + 1) == end) )
+		{
+		strstream s ;
+		s	<< getCharYYXXX() << " M "
+			<< theChan->getName() << ' '
+			<< modeString << ' ' << args
+			<< ends ;
+
+		Write( s ) ;
+		delete[] s.str() ;
+
+		modeString.erase( modeString.begin(), modeString.end() ) ;
+		args.erase( args.begin(), args.end() ) ;
+
+		} // if()
+
+	} // for()
+
+MyUplink->onChannelModeB( theChan, 0, banVector ) ;
+ 
 return true ;
 }
 
 bool xClient::BanKick( Channel* theChan, iClient* theClient, const string& reason )
 {
 #ifndef NDEBUG
-  assert( (theChan != NULL) && (theClient != NULL) ) ;
+  assert( theChan != 0 ) ;
+  assert( theClient != 0 ) ;
 #endif
 
 if( !Connected )
@@ -992,7 +1181,7 @@ if( !onChannel )
 	Join( theChan ) ;
 	}
 
-string banMask = makeBan( theChan, theClient ) ;
+string banMask = Channel::createBan( theClient ) ;
 
 Write( "%s M %s +b :%s",
 	getCharYYXXX().c_str(),
@@ -1018,50 +1207,6 @@ theChan->setBan( banMask ) ;
 MyUplink->OnPartChannel( theClient, theChan ) ;
 
 return true ;
-}
-
-string xClient::makeBan( Channel* theChan, iClient* theClient )
-{
-#ifndef NDEBUG
-  assert( (theChan != 0) && (theClient != 0) ) ;
-#endif
-
-// Setup the ban mask.
-
-// Ban all nicks, and non-identd'd hosts
-string banMask = "*!*" ;
-
-// Add the username
-if( !theClient->getUserName().empty() )
-	{
-	banMask += (theClient->getUserName().c_str() + 1) ;
-	}
-
-// Add the @ symbol between user@host
-banMask += "@" ;
-
-// Parse the user's hostname
-StringTokenizer st( theClient->getInsecureHost(), '.' ) ;
-if( st.size() < 2 )
-	{
-	elog	<< "xClient::makeBan> Invalid hostname: "
-		<< st.toString() << endl ;
-	return (banMask + "*") ;
-	}
-
-if( Socket::isIPAddress( theClient->getInsecureHost() ) )
-	{
-	banMask += st[ 0 ] + '.' + st[ 1 ] + ".*" ;
-	}
-else
-	{
-	// Hostname
-	// Remove everything in the host except the last two tokens
-	banMask += "*" ;
-	banMask += st.assemble( st.size() - 2 ) ;
-	}
-
-return banMask ;
 }
 
 bool xClient::Kick( Channel* theChan, iClient* theClient, const string& reason )
@@ -1164,7 +1309,10 @@ if( !onChannel )
 return true ;
 }
 
-bool xClient::Join( const string& chanName )
+bool xClient::Join( const string& chanName,
+	const string& chanModes,
+	const time_t& joinTime,
+	bool getOps )
 {
 if( !Connected )
 	{
@@ -1172,17 +1320,20 @@ if( !Connected )
 	}
 
 // Ask the server to join this bot into the given channel.
-MyUplink->JoinChannel( this, chanName ) ;
+MyUplink->JoinChannel( this, chanName, string(), joinTime, getOps ) ;
 return true ;
 }
 
-bool xClient::Join( Channel* theChan )
+bool xClient::Join( Channel* theChan,
+	const string& chanModes,
+	const time_t& joinTime,
+	bool getOps )
 {
 #ifndef NDEBUG
   assert( theChan != NULL ) ;
 #endif
 
-return Join( theChan->getName() ) ;
+return Join( theChan->getName(), string(), joinTime, getOps ) ;
 }
 
 bool xClient::Part( const string& chanName )

@@ -11,6 +11,7 @@
 #include	"xparameters.h"
 #include	"StringTokenizer.h"
 #include	"ELog.h"
+#include	"match.h"
 
 using std::string ;
 using std::endl ;
@@ -135,9 +136,12 @@ if( NULL == theChanUser )
 return theChanUser->getMode( whichMode ) ;
 }
 
-void Channel::setBan( const string& banMask )
+void Channel::setBan( const string& newBan )
 {
-banList.push_front( banMask ) ;
+// TODO: Remove ambiguous bans, although this should be in
+// the xServer class somewhere so that events can
+// be posted withouth increasing coupling
+banList.push_front( newBan ) ;
 }
 
 void Channel::removeBan( const string& banMask )
@@ -145,8 +149,7 @@ void Channel::removeBan( const string& banMask )
 for( banListType::iterator ptr = banList.begin(), end = banList.end() ;
 	ptr != end ; ++ptr )
 	{
-	// TODO: Case insensitive search?
-	if( *ptr == banMask )
+	if( !strcasecmp( ptr->c_str(), banMask.c_str() ) )
 		{
 		banList.erase( ptr ) ;
 		return ;
@@ -156,14 +159,44 @@ for( banListType::iterator ptr = banList.begin(), end = banList.end() ;
 
 bool Channel::findBan( const string& banMask ) const
 {
-return std::find( banList.begin(), banList.end(), banMask )
-	!= banList.end() ;
+for( banListType::const_iterator ptr = banList.begin(),
+	end = banList.end() ; ptr != end ; ++ptr )
+	{
+	if( !strcasecmp( ptr->c_str(), banMask.c_str() ) )
+		{
+		return true ;
+		}
+	}
+return false ;
 }
 
 bool Channel::matchBan( const string& banMask ) const
 {
-// TODO
-return findBan( banMask ) ;
+for( banListType::const_iterator ptr = banList.begin(),
+	end = banList.end() ; ptr != end ; ++ptr )
+	{
+	if( !match( banMask.c_str(), ptr->c_str() ) )
+		{
+		// Found a match
+		return true ;
+		}
+	}
+return false ;
+}
+
+bool Channel::getMatchingBan( const string& banMask,
+	string& matchingBan ) const
+{
+for( banListType::const_iterator ptr = banList.begin(),
+	end = banList.end() ; ptr != end ; ++ptr )
+	{
+	if( !match( banMask.c_str(), ptr->c_str() ) )
+		{
+		matchingBan = *ptr ;
+		return true ;
+		}
+	}
+return false ;
 }
 
 void Channel::onModeT( bool polarity )
@@ -312,6 +345,38 @@ if( modes & MODE_L )
 
 return (modeString + ' ' + argString) ;
 
+}
+
+string Channel::createBan( const iClient* theClient )
+{
+#ifndef NDEBUG
+  assert( theClient != 0 ) ;
+#endif
+
+string theBan = "*!*" ;
+
+theBan += theClient->getUserName() + '@' ;
+
+StringTokenizer st( theClient->getInsecureHost(), '.' ) ;
+if( Socket::isIPAddress( theClient->getInsecureHost() ) )
+	{
+	theBan += st[ 0 ] + '.' ;
+	theBan += st[ 1 ] + '.' ;
+	theBan += st[ 2 ] + ".*" ;
+	}
+else
+	{
+	if( 2 == st.size() )
+		{
+		theBan += theClient->getInsecureHost() ;
+		}
+	else
+		{
+		theBan += "*." + st.assemble( 1 ) ;
+		}
+	}
+
+return theBan ;
 }
 
 } // namespace gnuworld

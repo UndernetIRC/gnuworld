@@ -201,6 +201,16 @@ public:
 	inline bool matchBan( const string& banMask ) const ;
 
 	/**
+	 * Search for a ban that matches the mask in (banMask).
+	 * If a matching ban is found, it is stored in (matchingBan),
+	 * and true is returned.
+	 * Otherwise, (matchingBan) is unmodified, and false is
+	 * returned.
+	 */
+	inline bool getMatchingBan( const string& banMask,
+		string& matchingBan ) const ;
+
+	/**
 	 * Retrieve the current channel modes.
 	 */
 	inline const modeType& getModes() const
@@ -296,11 +306,16 @@ public:
 	 * to a C++ output stream.
 	 */
 	friend ELog& operator<<( ELog& out, const Channel& rhs )
-	{
-	out	<< "Name: " << rhs.name << endl
-		<< "Creation time: " << rhs.creationTime ;
-	return out ;
-	}
+		{
+		out	<< "Name: " << rhs.name << endl
+			<< "Creation time: " << rhs.creationTime ;
+		return out ;
+		}
+
+	/**
+	 * Return a level 2 ban for the given user.
+	 */
+	inline static string createBan( const iClient* ) ;
 
 protected:
 

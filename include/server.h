@@ -17,7 +17,7 @@
  */
 
 #ifndef __XSERVER_H
-#define __XSERVER_H "$Id: server.h,v 1.23 2001/01/12 23:42:05 dan_karrels Exp $"
+#define __XSERVER_H "$Id: server.h,v 1.24 2001/01/13 21:06:29 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
@@ -278,7 +278,9 @@ public:
 	 * This works at all times, bursting or not.
 	 */
 	virtual void JoinChannel( xClient*, const string& chanName,
-		const string& chanModes = "+tn" ) ;
+		const string& chanModes = "+tn",
+		const time_t& joinTime = 0,
+		bool getOps = true ) ;
 
 	/**
 	 * Notify the network that one of the services clients has
@@ -568,75 +570,6 @@ public:
 
 	void		mainLoop() ;
 
-protected:
-
-	/**
-	 * Allow only subclasses to call the default
-	 * constructor.
-	 */
-	xServer() {}
-
-	/**
-	 * Disable copy constructor, this method is declared but NOT defined.
-	 */
-	xServer( const xServer& ) ;
-
-	/**
-	 * Disable assignment, this method is declared but NOT defined.
-	 */
-	xServer operator=( const xServer& ) ;
-
-	/**
-	 * Burst out information about all xClients on this server.
-	 */
-	virtual void BurstClients() ;
-
-	/**
-	 * Output channel information for each client on this server.
-	 */
-	virtual void BurstChannels() ;
-
-	/**
-	 * Parse a burst line for channel bans.
-	 */
-	virtual void parseBurstBans( Channel*, const char* ) ;
-
-	/**
-	 * Parse a burst line for channel users.
-	 */
-	virtual void parseBurstUsers( Channel*, const char* ) ;
-
-	/**
-	 * Convenience method that will part a given network
-	 * client from all channels, and notify each listening
-	 * xClient of the parts.
-	 */
-	virtual void userPartAllChannels( iClient* ) ;
-
-	/**
-	 * Read the config file.  Return true if success, false
-	 * otherwise.
-	 */
-	virtual bool readConfigFile( const string& ) ;
-
-	/**
-	 * Parses a config file and attempts to load all modules
-	 * specified therein.  If any part of the process fails,
-	 * false is returned.  Otherwise, true is returned.
-	 */
-	virtual bool loadModules( const string& ) ;
-
-	/**
-	 * Signal handler for the server itself.
-	 * Returns true if the signal was handled.
-	 */
-	virtual bool	OnSignal( int ) ;
-
-	/**
-	 * This method is called when a user mode change is detected.
-	 */
-	virtual void	onUserModeChange( xParameters& ) ;
-
 	/**
 	 * This method is called when a channel mode 't' change is
 	 * Keep in mind that the source ChannelUser may be NULL
@@ -729,6 +662,75 @@ protected:
 	 */
 	virtual void	onChannelModeB( Channel*, ChannelUser*,
 		const banVectorType& ) ;
+
+protected:
+
+	/**
+	 * Allow only subclasses to call the default
+	 * constructor.
+	 */
+	xServer() {}
+
+	/**
+	 * Disable copy constructor, this method is declared but NOT defined.
+	 */
+	xServer( const xServer& ) ;
+
+	/**
+	 * Disable assignment, this method is declared but NOT defined.
+	 */
+	xServer operator=( const xServer& ) ;
+
+	/**
+	 * Burst out information about all xClients on this server.
+	 */
+	virtual void BurstClients() ;
+
+	/**
+	 * Output channel information for each client on this server.
+	 */
+	virtual void BurstChannels() ;
+
+	/**
+	 * Parse a burst line for channel bans.
+	 */
+	virtual void parseBurstBans( Channel*, const char* ) ;
+
+	/**
+	 * Parse a burst line for channel users.
+	 */
+	virtual void parseBurstUsers( Channel*, const char* ) ;
+
+	/**
+	 * Convenience method that will part a given network
+	 * client from all channels, and notify each listening
+	 * xClient of the parts.
+	 */
+	virtual void userPartAllChannels( iClient* ) ;
+
+	/**
+	 * Read the config file.  Return true if success, false
+	 * otherwise.
+	 */
+	virtual bool readConfigFile( const string& ) ;
+
+	/**
+	 * Parses a config file and attempts to load all modules
+	 * specified therein.  If any part of the process fails,
+	 * false is returned.  Otherwise, true is returned.
+	 */
+	virtual bool loadModules( const string& ) ;
+
+	/**
+	 * Signal handler for the server itself.
+	 * Returns true if the signal was handled.
+	 */
+	virtual bool	OnSignal( int ) ;
+
+	/**
+	 * This method is called when a user mode change is detected.
+	 */
+	virtual void	onUserModeChange( xParameters& ) ;
 
 	/**
 	 * This variable represents how many times to attempt a system

@@ -3,7 +3,7 @@
  */
 
 #ifndef __XCLIENT_H
-#define __XCLIENT_H "$Id: client.h,v 1.19 2001/01/12 22:49:23 dan_karrels Exp $"
+#define __XCLIENT_H "$Id: client.h,v 1.20 2001/01/13 21:06:29 dan_karrels Exp $"
 
 #include	<string>
 
@@ -360,13 +360,6 @@ public:
 	virtual bool	UnBan( Channel*, const string& ) ;
 
 	/**
-	 * This method creates a ban mask for the given user on the
-	 * given channel.
-	 * Should this be a const method?
-	 */
-	virtual string	makeBan( Channel*, iClient* ) ;
-
-	/**
 	 * Kick a user from a channel, join/part if necessary.
 	 */
 	virtual bool	Kick( Channel*, iClient*, const string& ) ;
@@ -380,12 +373,18 @@ public:
 	/**
 	 * Join will cause the client to join a channel.
 	 */
-	virtual bool	Join( const string& ) ;
+	virtual bool	Join( const string& chanName,
+				const string& modes = string(),
+				const time_t& joinTime = 0,
+				bool getOps = false ) ;
 
 	/**
 	 * Join the given channel.
 	 */
-	virtual bool	Join( Channel* ) ;
+	virtual bool	Join( Channel* theChan,
+				const string& modes = string(),
+				const time_t& joinTime = 0,
+				bool getOps = false ) ;
 
 	/**
 	 * This method is called when the bot joins a channel.

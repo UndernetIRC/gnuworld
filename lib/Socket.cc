@@ -35,7 +35,7 @@
 #endif
 
 const char Socket_h_rcsId[] = __SOCKET_H ;
-const char Socket_cc_rcsId[] = "$Id: Socket.cc,v 1.12 2001/01/12 23:42:06 dan_karrels Exp $" ;
+const char Socket_cc_rcsId[] = "$Id: Socket.cc,v 1.13 2001/01/13 21:06:29 dan_karrels Exp $" ;
 
 using gnuworld::elog ;
 using std::endl ;
@@ -244,6 +244,7 @@ if( optval < 0 )
 	elog	<< "Error: " << strerror( errno ) << endl ;
 	}
 
+/*
 optval = ::fcntl( fd, F_SETFL, optval | O_NONBLOCK ) ;
 if( optval < 0 )
 	{
@@ -251,6 +252,7 @@ if( optval < 0 )
 		<< endl;
 	elog	<< "Error: " << strerror( errno ) << endl ;
 	}
+*/
 
 return true ;
 }

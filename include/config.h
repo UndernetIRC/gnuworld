@@ -1,9 +1,9 @@
 /* config.h
- * $Id: config.h,v 1.6 2001/01/12 23:42:05 dan_karrels Exp $
+ * $Id: config.h,v 1.7 2001/01/13 21:06:29 dan_karrels Exp $
  */
 
 #ifndef __CONFIG_H
-#define __CONFIG_H "$Id: config.h,v 1.6 2001/01/12 23:42:05 dan_karrels Exp $"
+#define __CONFIG_H "$Id: config.h,v 1.7 2001/01/13 21:06:29 dan_karrels Exp $"
 
 /* config.h */
 /* GNUWorld main configuration file */
@@ -74,5 +74,11 @@
  * call before giving up.
  */
 #define MAXLOOPCOUNT_DEFAULT 10
+
+/**
+ * MAX_CHAN_MODES
+ * The maximum number of channel modes per command.
+ */
+#define MAX_CHAN_MODES 6
 
 #endif /* __CONFIG_H */

@@ -43,7 +43,7 @@
 #include	"moduleLoader.h"
 
 const char xServer_h_rcsId[] = __XSERVER_H ;
-const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.48 2001/01/12 23:42:06 dan_karrels Exp $" ;
+const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.49 2001/01/13 21:06:29 dan_karrels Exp $" ;
 
 using std::string ;
 using std::vector ;
@@ -3011,13 +3011,15 @@ OnPartChannel( theClient, theChan ) ;
 void xServer::OnPartChannel( iClient* theClient, Channel* theChan )
 {
 #ifndef NDEBUG
-  assert( (theClient != NULL) && (theChan != NULL) ) ;
+  assert( theClient != 0 ) ;
+  assert( theChan != 0 ) ;
 #endif
 
 theClient->removeChannel( theChan ) ;
 delete theChan->removeUser( theClient ) ;
 
-// TODO: Post message
+PostChannelEvent( EVT_PART, theChan,
+	static_cast< void* >( theClient ) ) ;
 
 if( theChan->empty() && !Network->servicesOnChannel( theChan ) )
 	{
@@ -3057,25 +3059,38 @@ void xServer::OnPartChannel( xClient* theClient, Channel* theChan )
 
 }
 
-// TODO: This method is a bit ugly.
 void xServer::JoinChannel( xClient* theClient, const string& chanName,
-	const string& chanModes )
+	const string& chanModes,
+	const time_t& joinTime, bool getOps )
 {
 
-Channel* theChan = Network->findChannel( chanName ) ;
-if( NULL == theChan )
+// Determine the timestamp to use for the join
+time_t postJoinTime = joinTime ;
+if( 0 == postJoinTime )
 	{
-	// Channel doesn't exist yet.
+	postJoinTime = ::time( 0 ) ;
+	}
+
+Channel* theChan = Network->findChannel( chanName ) ;
+if( (NULL == theChan) && bursting )
+	{
+	// Need to burst the channel
+
+	}
+else if( NULL == theChan )
+	{
+	// Channel doesn't exist yet, and we're NOT bursting
 	// 0AT C #lksjhdlksjdlkjs 957214787
+
 //	elog	<< "xServer::BurstChannel> Creating new channel: "
 //		<< chanName << endl ;
 
 	// Create the channel
-
+	// The client automatically gets op in this case
 	{
 		strstream s ;
 		s	<< theClient->getCharYYXXX() << " C "
-			<< chanName << ' ' << time( 0 ) ;
+			<< chanName << ' ' << postJoinTime ;
 
 		if( !chanModes.empty() )
 			{
@@ -3096,39 +3111,45 @@ if( NULL == theChan )
 	}
 else if( bursting )
 	{
-	// The channel already exists, burst the client into the channel.
-	// Here is where we will actually use the Channel::creationTime :)
+	// Channel exists, still bursting
 	// 0 B #coder-com 000031337 +tn 0AT,EAA:o,KAB,0AA
 	strstream s ;
 	s	<< getCharYY() << " B " << chanName << ' '
-		<< theChan->getCreationTime() << ' '
+		<< postJoinTime << ' '
 		<< chanModes << ' '
-		<< theClient->getCharYYXXX() << ":o"
-		<< ends ;
+		<< theClient->getCharYYXXX() ;
+
+	if( getOps )
+		{
+		s	<< ":o" ;
+		}
+
+		s	<< ends ;
+
 	Write( s ) ;
 	delete[] s.str() ;
-
 	}
 else
 	{
-	// After bursting, just join the channel and give the client
-	// ops.
-	{
+	// After bursting, and the channel exists
+		{
 		strstream s2 ;
 		s2	<< theClient->getCharYYXXX() << " J "
 			<< chanName << ends ;
 		Write( s2 ) ;
 		delete[] s2.str() ;
-	}
+		}
 
-	// Op the bot
-	strstream s ;
-	s	<< charYY << " M " << chanName
-		<< " +o " << theClient->getCharYYXXX()
-		<< ends ;
-	Write( s ) ;
-	delete[] s.str() ;
-
+	if( getOps )
+		{
+		// Op the bot
+		strstream s ;
+		s	<< charYY << " M " << chanName
+			<< " +o " << theClient->getCharYYXXX()
+			<< ends ;
+		Write( s ) ;
+		delete[] s.str() ;
+		}
 	}
 
 }
@@ -3974,7 +3995,7 @@ unsigned int xServer::CheckTimers()
 
 // Make sure the timerQueue is not empty, and that
 // we are not bursting
-if( timerQueue.empty() || bursting )
+if( timerQueue.empty() )
 	{
 	return 0 ;
 	}
