@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------------
--- "$Id: webcookies.sql,v 1.2 2001/10/15 11:49:35 nighty Exp $"
+-- "$Id: webcookies.sql,v 1.3 2001/10/15 12:44:26 nighty Exp $"
 -- Channel service DB SQL file for PostgreSQL.
 --
 -- Tables specific to webcookies (needs to be LOCAL).
@@ -7,7 +7,7 @@
 -- If your local DB is named "cmaster" .. then just 'psql cmaster < webcookies.sql'
 -- otherwise,
 --                createdb cmaster
---                psql cmaster webcookies.sql
+--                psql cmaster < webcookies.sql
 --
 -- nighty <nighty@undernet.org>
 
