@@ -16,11 +16,13 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: chanfix.h,v 1.2 2004/05/18 20:55:02 jeekay Exp $
+ * $Id: chanfix.h,v 1.3 2004/05/18 23:13:12 jeekay Exp $
  */
 
-#ifndef CHANFIX_H
-#define CHANFIX_H
+#ifndef CF_CHANFIX_H
+#define CF_CHANFIX_H
+
+#include <map>
 
 #include <string.h>
 
@@ -30,9 +32,9 @@
 
 namespace gnuworld {
 
-class EConfig;
-
 namespace chanfix {
+
+class cfChannel;
 
 class chanfix : public xClient {
 public:
@@ -54,11 +56,27 @@ public:
 	/***************************
 	 * C H A N F I X   M I S C *
 	 ***************************/
+	virtual void log(const logging::loglevel&, const char*, ... );
 	virtual void log(const logging::loglevel&, const string&);
 	virtual void setConsoleTopic();
+	
+	
+	/***************************
+	 * C H A N F I X   C O R E *
+	 ***************************/
+	virtual void doCountUpdate();
+	virtual cfChannel* getChannel(const string&);
 		
 	
 protected:
+	/***********************
+	 * C O N T A I N E R S *
+	 ***********************/
+	 
+	 typedef std::map< string , cfChannel* > mapChannels;
+	 mapChannels channels;
+	 
+	 
 	/*************************
 	 * C O N F I G   V A R S *
 	 *************************/
@@ -68,8 +86,11 @@ protected:
 	/** Modes of our console channel. */
 	string confConsoleModes;
 	
+	/** Bitmap of what to log. */
+	logging::loglevel confLogLevel;
+	
 	/** Points to award a +r op per period. */
-	unsigned short confOpAuth;
+	unsigned short confPointsAuth;
 	/** Duration of a period in seconds. */
 	unsigned short confPeriod;
 	/** Duration to wait between linking and counting. */

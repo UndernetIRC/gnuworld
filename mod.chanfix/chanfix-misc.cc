@@ -16,10 +16,12 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: chanfix-misc.cc,v 1.1 2004/05/18 20:55:02 jeekay Exp $
+ * $Id: chanfix-misc.cc,v 1.2 2004/05/18 23:13:12 jeekay Exp $
  */
 
 #include <sstream>
+
+#include <stdarg.h>
 
 #include "Network.h"
 
@@ -33,8 +35,23 @@ using std::endl;
 using std::stringstream;
 
 
+void chanfix::log(const logging::loglevel& level, const char* format, ... )
+{
+	char buf[1024] = {0};
+	va_list list;
+	
+	va_start(list, format);
+	vsnprintf(buf, 1024, format, list);
+	va_end(list);
+	
+	log(level, string(buf));
+}
+
+
 void chanfix::log(const logging::loglevel& level, const string& message)
 {
+	if( 0 == confLogLevel & level ) { return; }
+
 	/* Check our logging channel exists */
 	Channel *logChannel = Network->findChannel(confConsoleChannel);
 	
@@ -52,7 +69,7 @@ void chanfix::setConsoleTopic()
 {
 	char buffer[512];
 	sprintf(buffer, "Giving %u points per %us",
-		confOpAuth,
+		confPointsAuth,
 		confPeriod
 		);
 	

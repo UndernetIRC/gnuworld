@@ -16,13 +16,15 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: chanfix.cc,v 1.2 2004/05/18 20:55:02 jeekay Exp $
+ * $Id: chanfix.cc,v 1.3 2004/05/18 23:13:12 jeekay Exp $
  */
 
 #include <string>
 
 #include "EConfig.h"
+#include "ELog.h"
 
+#include "cfChannel.h"
 #include "chanfix.h"
 
 namespace gnuworld {
@@ -49,7 +51,10 @@ assert( config != 0 );
 confConsoleChannel = config->Require("consoleChannel")->second;
 confConsoleModes = config->Require("consoleModes")->second;
 
-confOpAuth = atoi(config->Require("opAuth")->second.c_str());
+//confLogLevel = atoi(config->Require("logLevel")->second.c_str());
+confLogLevel = 255;
+
+confPointsAuth = atoi(config->Require("pointsAuth")->second.c_str());
 confPeriod = atoi(config->Require("period")->second.c_str());
 confStartDelay = atoi(config->Require("startDelay")->second.c_str());
 }
@@ -57,6 +62,11 @@ confStartDelay = atoi(config->Require("startDelay")->second.c_str());
 /** Destructor doing nothing as we have no heap. */
 chanfix::~chanfix()
 {
+for( mapChannels::iterator itr = channels.begin() ;
+     itr != channels.end() ;
+     ++itr ) {
+	delete itr->second;
+}
 }
 
 } // namespace chanfix

@@ -1,5 +1,5 @@
 /**
- * logging.h
+ * cfChannelUser.cc
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -16,31 +16,36 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: logging.h,v 1.2 2004/05/18 23:13:12 jeekay Exp $
+ * $Id: cfChannelUser.cc,v 1.1 2004/05/18 23:13:12 jeekay Exp $
  */
 
-#ifndef CF_LOGGING_H
-#define CF_LOGGING_H
+#include <string>
+
+#include "cfChannelUser.h"
 
 namespace gnuworld {
 
 namespace chanfix {
 
-namespace logging {
+using std::string;
 
-	typedef unsigned short loglevel;
+cfChannelUser::cfChannelUser(const string& _name) :
+	name(_name) ,
+	points(0)
+{
+}
 
-	const loglevel DEBUG	= 0x01 ;
-	const loglevel INFO	= 0x02 ;
-	const loglevel NOTICE	= 0x04 ;
-	const loglevel WARNING	= 0x08 ;
-	const loglevel ERROR	= 0x10 ;
-	const loglevel CRITICAL	= 0x20 ;
+cfChannelUser::~cfChannelUser()
+{
+}
 
-} // namespace logging
+
+void cfChannelUser::addPoints(unsigned int _points)
+{
+	points += _points;
+}
+
 
 } // namespace chanfix
 
 } // namespace gnuworld
-
-#endif

@@ -1,5 +1,5 @@
 /**
- * logging.h
+ * cfChannel.h
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -16,28 +16,36 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: logging.h,v 1.2 2004/05/18 23:13:12 jeekay Exp $
+ * $Id: cfChannel.h,v 1.1 2004/05/18 23:13:12 jeekay Exp $
  */
 
-#ifndef CF_LOGGING_H
-#define CF_LOGGING_H
+#ifndef CF_CFCHANNEL_H
+#define CF_CFCHANNEL_H
+
+#include <map>
+#include <string>
 
 namespace gnuworld {
 
 namespace chanfix {
 
-namespace logging {
+class cfChannelUser;
 
-	typedef unsigned short loglevel;
+class cfChannel {
+public:
+	cfChannel(const std::string&);
+	virtual ~cfChannel();
+	
+	/** Return a given user - add a new one if one is not present. */
+	cfChannelUser* getUser(const std::string&);
 
-	const loglevel DEBUG	= 0x01 ;
-	const loglevel INFO	= 0x02 ;
-	const loglevel NOTICE	= 0x04 ;
-	const loglevel WARNING	= 0x08 ;
-	const loglevel ERROR	= 0x10 ;
-	const loglevel CRITICAL	= 0x20 ;
 
-} // namespace logging
+protected:
+	typedef std::map< std::string , cfChannelUser* > mapUsers;
+	
+	std::string name;
+	mapUsers users;
+}; // class cfChannel
 
 } // namespace chanfix
 

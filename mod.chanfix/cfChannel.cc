@@ -1,5 +1,5 @@
 /**
- * logging.h
+ * cfChannel.h
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -16,31 +16,50 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: logging.h,v 1.2 2004/05/18 23:13:12 jeekay Exp $
+ * $Id: cfChannel.cc,v 1.1 2004/05/18 23:13:12 jeekay Exp $
  */
 
-#ifndef CF_LOGGING_H
-#define CF_LOGGING_H
+#include <string>
+
+#include <assert.h>
+
+#include "cfChannel.h"
+#include "cfChannelUser.h"
 
 namespace gnuworld {
 
 namespace chanfix {
 
-namespace logging {
+using std::string;
 
-	typedef unsigned short loglevel;
+cfChannel::cfChannel(const string& _name) :
+	name(_name)
+{
+}
 
-	const loglevel DEBUG	= 0x01 ;
-	const loglevel INFO	= 0x02 ;
-	const loglevel NOTICE	= 0x04 ;
-	const loglevel WARNING	= 0x08 ;
-	const loglevel ERROR	= 0x10 ;
-	const loglevel CRITICAL	= 0x20 ;
+cfChannel::~cfChannel()
+{
+for( mapUsers::iterator itr = users.begin() ;
+     itr != users.end() ;
+     ++itr ) {
+	delete itr->second;
+}
+}
 
-} // namespace logging
+
+cfChannelUser* cfChannel::getUser(const string& username)
+{
+	mapUsers::iterator itr = users.find(username);
+	
+	if( itr != users.end() ) { return itr->second; }
+	
+	cfChannelUser *tmpUser = new cfChannelUser(username);
+	
+	users[username] = tmpUser;
+	
+	return tmpUser;
+}
 
 } // namespace chanfix
 
 } // namespace gnuworld
-
-#endif

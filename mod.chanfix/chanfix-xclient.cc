@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: chanfix-xclient.cc,v 1.1 2004/05/18 20:55:02 jeekay Exp $
+ * $Id: chanfix-xclient.cc,v 1.2 2004/05/18 23:13:12 jeekay Exp $
  */
 
 #include "chanfix.h"
@@ -53,6 +53,8 @@ void chanfix::OnTimer( const TimerHandler::timerID& theTimer , void* _data )
 	
 	if( theTimer == timerCount ) {
 		log(logging::DEBUG, "Entering count cycle");
+		
+		doCountUpdate();
 		
 		next += confPeriod;
 		
