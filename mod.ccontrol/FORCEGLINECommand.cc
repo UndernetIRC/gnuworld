@@ -19,7 +19,7 @@
 #include	"Gline.h"
 #include	"gline.h"
 
-const char FORCEGLINECommand_cc_rcsId[] = "$Id: FORCEGLINECommand.cc,v 1.8 2001/08/13 15:10:53 mrbean_ Exp $";
+const char FORCEGLINECommand_cc_rcsId[] = "$Id: FORCEGLINECommand.cc,v 1.9 2001/08/14 22:44:47 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -77,25 +77,27 @@ string hostName = st[ pos ].substr( pos + 1 ) ;
 string Length;
 Length.assign(st[pos+1]);
 unsigned int Units = 1; //Defualt for seconds
-unsigned int ResStart = 1;
+unsigned int ResStart = 2;
 bool Ok = true;
 if(!strcasecmp(Length.substr(Length.length()-1).c_str(),"d"))
 	{
 	Units = 24*3600;
 	Length.resize(Length.length()-1);
-	ResStart = 2;
 	}
 else if(!strcasecmp(Length.substr(Length.length()-1).c_str(),"h"))
 	{
 	Units = 3600;
 	Length.resize(Length.length()-1);
-	ResStart = 2;
+	}
+else if(!strcasecmp(Length.substr(Length.length()-1).c_str(),"m"))
+	{
+	Units = 60;
+	Length.resize(Length.length()-1);
 	}
 else if(!strcasecmp(Length.substr(Length.length()-1).c_str(),"s"))
 	{
 	Units = 1;
 	Length.resize(Length.length()-1);
-	ResStart = 2;
 	}
 gLength = atoi(Length.c_str()) * Units;
 

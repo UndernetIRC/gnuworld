@@ -1,6 +1,6 @@
 
 #ifndef __GLINECONSTS_H
-#define __GLINECONSTS_H "$Id: gline.h,v 1.2 2001/08/13 15:10:53 mrbean_ Exp $"
+#define __GLINECONSTS_H "$Id: gline.h,v 1.3 2001/08/14 22:44:47 mrbean_ Exp $"
 
 
 namespace gnuworld
@@ -27,7 +27,7 @@ namespace gline
 	const unsigned int MGLINE_WILD_TIME = 10*60;
 	const unsigned int MFGLINE_USERS = 255;
 	const unsigned int MFGLINE_TIME = 30*3600*24;
-
+	const unsigned int PERM_TIME = 730*3600*24; 
 	}
 
 }

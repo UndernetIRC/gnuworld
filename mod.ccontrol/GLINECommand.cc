@@ -21,7 +21,7 @@
 #include	"gline.h"
 #include 	"time.h"
 
-const char GLINECommand_cc_rcsId[] = "$Id: GLINECommand.cc,v 1.17 2001/08/13 15:10:53 mrbean_ Exp $";
+const char GLINECommand_cc_rcsId[] = "$Id: GLINECommand.cc,v 1.18 2001/08/14 22:44:47 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -69,25 +69,27 @@ string Length;
 
 Length.assign(st[2]);
 unsigned int Units = 1; //Defualt for seconds
-unsigned int ResStart = 1;
+unsigned int ResStart = 2;
 
 if(!strcasecmp(Length.substr(Length.length()-1).c_str(),"d"))
 	{
 	Units = 24*3600;
 	Length.resize(Length.length()-1);
-	ResStart = 2;
 	}
 else if(!strcasecmp(Length.substr(Length.length()-1).c_str(),"h"))
 	{
 	Units = 3600;
 	Length.resize(Length.length()-1);
-	ResStart = 2;
+	}
+else if(!strcasecmp(Length.substr(Length.length()-1).c_str(),"m"))
+	{
+	Units = 60;
+	Length.resize(Length.length()-1);
 	}
 else if(!strcasecmp(Length.substr(Length.length()-1).c_str(),"s"))
 	{
 	Units = 1;
 	Length.resize(Length.length()-1);
-	ResStart = 2;
 	}
 gLength = atoi(Length.c_str()) * Units;
 if(gLength == 0) 

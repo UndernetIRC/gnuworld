@@ -28,7 +28,7 @@
 #include	"commLevels.h"
 //#include	"CommandsDec.h"
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.66 2001/08/13 15:10:53 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.67 2001/08/14 22:44:47 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -240,6 +240,8 @@ RegisterCommand( new LISTCommand( this, "LIST", "(glines)"
 	" Get all kinds of lists from the bot",commandLevel::flg_LIST,false,false,false,operLevel::UHSLEVEL,true ) ) ;
 RegisterCommand( new COMMANDSCommand( this, "COMMANDS", "<command> <option> <new value>"
 	" Change commands options",commandLevel::flg_COMMANDS,false,false,false,operLevel::UHSLEVEL,true ) ) ;
+RegisterCommand( new GCHANCommand( this, "GCHAN", "#channel <length/-per> <reason>"
+	" Close down a channel",commandLevel::flg_GCHAN,false,false,false,operLevel::CODERLEVEL,true ) ) ;
 
 loadGlines();
 loadExceptions();
@@ -537,6 +539,7 @@ switch( theEvent )
 		inBurst = false;
 		refreshGlines();
 		burstGlines();
+		elog << "Bursting glinesssssssss" << endl;
 		break;
 		}	
 	case EVT_NICK:
@@ -1800,7 +1803,11 @@ inRefresh = true;
 
 for(glineIterator ptr = glineList.begin();ptr != glineList.end();) 
 	{
-	if((*ptr)->getExpires() <= ::time(0))
+//	if((*ptr)->getExpires() <= ::time(0))
+	if(((*ptr)->getExpires() <= ::time(0)) 
+	    && (((*ptr)->getHost().substr(0,1) != "#") || 
+	    ((*ptr)->getExpires() != 0)))
+
 		{
 		//remove the gline from the core
 		MyUplink->removeGline((*ptr)->getHost());
@@ -1820,7 +1827,7 @@ return true;
 
 }
 
-bool ccontrol::burstGlines()
+/*bool ccontrol::burstGlines()
 {
 
 ccGline *theGline = 0 ;
@@ -1831,6 +1838,31 @@ for(glineIterator ptr = glineList.begin(); ptr != glineList.end(); ptr++)
 		theGline->getHost(),
 		theGline->getReason(),
 		theGline->getExpires() - ::time(0));
+	}
+
+return true;
+}*/
+
+bool ccontrol::burstGlines()
+{
+
+ccGline *theGline = 0 ;
+unsigned int Expires = 0;
+for(glineIterator ptr = glineList.begin(); ptr != glineList.end(); ptr++)
+	{
+	theGline = *ptr;
+	if((theGline->getExpires() == 0) && (theGline->getHost().substr(0,1) == "#"))
+		{
+		Expires = gline::PERM_TIME;
+		}
+	else
+		{
+		Expires = theGline->getExpires() - ::time(0);
+		}
+	MyUplink->setGline(theGline->getAddedBy(),
+		theGline->getHost(),
+		theGline->getReason(),
+		Expires);
 	}
 
 return true;
