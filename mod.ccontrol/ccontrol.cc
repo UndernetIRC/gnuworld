@@ -23,7 +23,7 @@
 #include	"AuthInfo.h"
 #include        "server.h"
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.49 2001/05/30 21:16:45 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.50 2001/05/30 21:35:11 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -310,9 +310,8 @@ for( commandMapType::iterator ptr = commandMap.begin() ;
 	ptr->second->setServer( theServer ) ;
 	}
 
-time_t Exp = ::time(0) + 30;
 expiredGlines = theServer->RegisterTimer(::time(0) + GLInterval,this,NULL);
-expiredIgnores = theServer->RegisterTimer(Exp,this,NULL);
+expiredIgnores = theServer->RegisterTimer(::time(0) + 60,this,NULL);
 
 if(SendReport)
 	{
@@ -592,7 +591,7 @@ else if (timer_id == expiredIgnores)
 	expiredIgnores = MyUplink->RegisterTimer(::time(0) + 60,this,NULL);
 	}
 
-return 1;
+return true;
 }
 
 bool ccontrol::isOperChan( const string& theChan ) const
@@ -1898,7 +1897,7 @@ ccLogin *LogInfo = findLogin(Numeric);
 if(LogInfo == NULL)
 	{
 	LogInfo = new ccLogin(Numeric);
-	Assert(LogInfo != NULL);
+	assert(LogInfo != NULL);
 	loginList.push_back(LogInfo);
 	}
 LogInfo->add_Login();
@@ -1927,7 +1926,7 @@ s	<< getCharYYXXX()
 	<< ends; 
 Write( s );
 delete[] s.str();
-User->set_IgnoreExpires(::time(0)+30);
+User->set_IgnoreExpires(::time(0)+3600);
 User->set_IgnoredHost(silenceMask);
 ignoreList.push_back(User);
 }
@@ -1943,8 +1942,6 @@ MsgChanLog("[Refreshing Ignores] - Started\n");
 for(loginIterator ptr = login_begin();ptr!=login_end();)
 	{
 	tempLogin = *ptr;
-	MsgChanLog("[Refreshing Ignores] - Checking ignores on %s\n",tempLogin->get_IgnoredHost().c_str());
-	
 	if(tempLogin->get_IgnoreExpires() <= ::time(0))
 		{
 		tempLogin->set_IgnoreExpires(0);
@@ -1958,7 +1955,6 @@ for(loginIterator ptr = login_begin();ptr!=login_end();)
 
 		Write( s );
 		delete[] s.str();
-		MsgChanLog("Removing expired ignore for host %s\n",tempLogin->get_IgnoredHost().c_str());
 		tempLogin->set_IgnoredHost("");
 		tptr = ptr;
 		ptr++;
