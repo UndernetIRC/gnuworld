@@ -14,7 +14,7 @@
  *
  * Caveats: None.
  *
- * $Id: BANCommand.cc,v 1.15 2001/02/11 23:52:57 plexus Exp $
+ * $Id: BANCommand.cc,v 1.16 2001/02/12 00:57:26 plexus Exp $
  */
 
 #include	<string>
@@ -29,7 +29,7 @@
 #include	"responses.h"
 #include	"match.h"
 
-const char BANCommand_cc_rcsId[] = "$Id: BANCommand.cc,v 1.15 2001/02/11 23:52:57 plexus Exp $" ;
+const char BANCommand_cc_rcsId[] = "$Id: BANCommand.cc,v 1.16 2001/02/12 00:57:26 plexus Exp $" ;
 
 namespace gnuworld
 {
@@ -44,6 +44,14 @@ if( st.size() < 3 )
 	{
 	Usage(theClient);
 	return true;
+	}
+
+/* Do not allow bans on * channel */
+
+if(st[1][0] != '#')
+	{
+	bot->Notice(theClient, "Invalid channel name.");
+	return false;
 	}
  
 /* Is the user authorised? */
@@ -64,13 +72,6 @@ if(!theChan)
 	return false;
 	} 
 
-/* Do not allow bans on * channel */
-
-if(st[1][0] != '#')
-	{
-	bot->Notice(theClient, "Invalid channel name.");
-	return false;
-	}
 	
 /* Check the bot is in the channel. */
 	
