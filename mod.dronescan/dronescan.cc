@@ -566,6 +566,7 @@ void dronescan::checkChannels()
 	log(INFO, "Checking channels for drones:");
 
 	unsigned int noChannels = 0;
+	unsigned int failure = 0;
 
 	theTimer->Start();
 
@@ -577,18 +578,19 @@ void dronescan::checkChannels()
 		
 		if(ptr->second->size() < channelCutoff) continue;
 		
-		checkChannel( ptr->second );
+		if(!checkChannel( ptr->second )) ++failure;
 		}
 	
-	log(INFO, "Finished checking %u channels. Duration: %u ms",
+	log(INFO, "Finished checking %u channels. %u possibles. Duration: %u ms",
 		noChannels,
+		failure,
 		theTimer->stopTimeMS()
 		);
 }
 
 
 /** Check a channel for drones. */
-void dronescan::checkChannel( const Channel *theChannel , const iClient *theClient )
+bool dronescan::checkChannel( const Channel *theChannel , const iClient *theClient )
 {
 	unsigned short int normal = 0;
 
@@ -610,7 +612,7 @@ void dronescan::checkChannel( const Channel *theChannel , const iClient *theClie
 		}
 
 	/* If we were checking for a client, don't output to console. */
-	if(theClient) return;
+	if(theClient) return true;
 	
 	/* If the normal count is over half of the total test numbers
 	 * we report that it is normal. Else it is abnormal. */
@@ -619,7 +621,7 @@ void dronescan::checkChannel( const Channel *theChannel , const iClient *theClie
 	if(normal >= (testVector.size() / 2))
 		{
 		/* This channel is voted normal. */
-		return;
+		return true;
 		}
 	else
 		{
@@ -630,7 +632,7 @@ void dronescan::checkChannel( const Channel *theChannel , const iClient *theClie
 			testVector.size(),
 			theChannel->size()
 			);
-		return;
+		return false;
 		}
 }
 

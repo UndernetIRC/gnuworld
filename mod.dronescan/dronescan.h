@@ -1,5 +1,5 @@
 #ifndef DRONESCAN_H
-#define DRONESCAN_H "$Id: dronescan.h,v 1.5 2003/05/08 11:42:53 jeekay Exp $"
+#define DRONESCAN_H "$Id: dronescan.h,v 1.6 2003/06/11 14:00:17 jeekay Exp $"
 
 #include <map>
 
@@ -99,7 +99,7 @@ public:
 	 * for isAbnormal( Channel* ).
 	 */
 	void checkChannels() ;
-	void checkChannel( const Channel* , const iClient* = 0 ) ;
+	bool checkChannel( const Channel* , const iClient* = 0 ) ;
 	
 	/** Calculate the entropy of a given string. */
 	double calculateEntropy( const string& ) ;
