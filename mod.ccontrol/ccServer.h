@@ -16,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccServer.h,v 1.7 2003/06/28 01:21:19 dan_karrels Exp $
+ * $Id: ccServer.h,v 1.8 2004/03/25 20:55:40 mrbean_ Exp $
  */
 
 #ifndef __CCSERVER_H
-#define __CCSERVER_H "$Id: ccServer.h,v 1.7 2003/06/28 01:21:19 dan_karrels Exp $"
+#define __CCSERVER_H "$Id: ccServer.h,v 1.8 2004/03/25 20:55:40 mrbean_ Exp $"
 
 #include	<string>
 
@@ -73,6 +73,10 @@ public:
 	
 	inline const iServer* getNetServer() const
 		{ return NetServer; }
+
+	inline const bool getReportMissing() const
+		{ return ReportMissing; }
+				
 		
 	//Methods for setting info
 	
@@ -106,6 +110,9 @@ public:
 	inline void		setNetServer(iServer* NewServer)
 		{ NetServer = NewServer; }
 		
+	inline void		setReportMissing( const bool _ReportMissing )
+		{ ReportMissing = _ReportMissing; }
+		
 	inline void 		setSqldb(PgDatabase* _SQLDb)
 		{ SQLDb = _SQLDb; }
 		
@@ -136,6 +143,7 @@ protected:
 	time_t AddedOn;
 	time_t LastUpdated;
 	iServer* NetServer;
+	bool ReportMissing;
 	PgDatabase* SQLDb;
 
 }; // class ccServer

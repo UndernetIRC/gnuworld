@@ -20,7 +20,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccontrol.cc,v 1.177 2004/03/09 11:50:43 mrbean_ Exp $
+ * $Id: ccontrol.cc,v 1.178 2004/03/25 20:55:40 mrbean_ Exp $
 */
 
 #define MAJORVER "1"
@@ -65,7 +65,7 @@
 #include	"ip.h"
 #include	"config.h"
 
-RCSTAG( "$Id: ccontrol.cc,v 1.177 2004/03/09 11:50:43 mrbean_ Exp $" ) ;
+RCSTAG( "$Id: ccontrol.cc,v 1.178 2004/03/25 20:55:40 mrbean_ Exp $" ) ;
 
 namespace gnuworld
 {
@@ -4118,12 +4118,16 @@ for(serversConstIterator ptr = serversMap_begin();ptr != serversMap_end();++ptr)
 		,base64toint(tmpServer->getLastNumeric().c_str()),
 		tmpServer->getName().c_str());
 		}
-	else
+	else if(tmpServer->getReportMissing())
 		{
 		Notice(theClient,"%s (%d) - Name : %s *MISSING*",tmpServer->getLastNumeric().c_str()
 		,base64toint(tmpServer->getLastNumeric().c_str()),
 		tmpServer->getName().c_str());
 		}
+	else
+		{
+		Notice(theClient,"Name : %s",tmpServer->getName().c_str());
+		}		
 	Notice(theClient,"Version : %s" ,tmpServer->getVersion().c_str());
 	}
 	 

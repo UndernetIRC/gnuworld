@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ADDSERVERCommand.cc,v 1.14 2003/08/09 23:15:33 dan_karrels Exp $
+ * $Id: ADDSERVERCommand.cc,v 1.15 2004/03/25 20:55:40 mrbean_ Exp $
  */
 
 #include	<string>
@@ -29,7 +29,7 @@
 #include	"Network.h"
 #include	"Constants.h"
 
-RCSTAG( "$Id: ADDSERVERCommand.cc,v 1.14 2003/08/09 23:15:33 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: ADDSERVERCommand.cc,v 1.15 2004/03/25 20:55:40 mrbean_ Exp $" ) ;
 
 namespace gnuworld
 {
@@ -91,6 +91,15 @@ if(NewServer->loadData(SName))
 	return false;
 	}
 NewServer->setName(SName);
+bool Report = true;
+if(st.size() > 2) 
+	{
+	if(!strcasecmp(st[2],"-nr"))
+		{
+		Report = false;
+		}
+	}
+
 //We need to check if the server is currently connected , 
 //if so update all the data
 iServer* CurServer = Network->findServerName(SName);
@@ -102,6 +111,11 @@ if(CurServer)
 	NewServer->setNetServer(CurServer);
 	bot->Write("%s V :%s\n",bot->getCharYYXXX().c_str(),
 		CurServer->getCharYY().c_str());
+	}
+NewServer->setReportMissing(Report);	
+if(!Report)
+	{
+	NewServer->setVersion("Virtual Server V1.0123B3");
 	}
 NewServer->setAddedOn(::time(0));
 NewServer->setLastUpdated(::time(0));

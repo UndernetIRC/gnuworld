@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: CHECKNETCommand.cc,v 1.13 2003/08/09 23:15:33 dan_karrels Exp $
+ * $Id: CHECKNETCommand.cc,v 1.14 2004/03/25 20:55:40 mrbean_ Exp $
  */
 
 #include	<string>
@@ -29,7 +29,7 @@
 #include	"ccServer.h"
 #include	"config.h"
 
-RCSTAG( "$Id: CHECKNETCommand.cc,v 1.13 2003/08/09 23:15:33 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: CHECKNETCommand.cc,v 1.14 2004/03/25 20:55:40 mrbean_ Exp $" ) ;
 
 namespace gnuworld
 {
@@ -52,7 +52,7 @@ for (ccontrol::serversConstIterator ptr = bot->serversMap_begin() ;
 	ptr != bot->serversMap_end();++ptr)
 	{ //For each server on the database check if its connetcted
 	CurServer = ptr->second;
-	if(!CurServer->getNetServer()) //If the server isnt connected 
+	if(CurServer->getReportMissing() && !CurServer->getNetServer()) //If the server isnt connected 
 		{
 		Msg = "Server \002";
 		Msg += CurServer->getName(); 

@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: Constants.h,v 1.10 2003/06/28 01:21:19 dan_karrels Exp $
+ * $Id: Constants.h,v 1.11 2004/03/25 20:55:40 mrbean_ Exp $
  */
 
 #ifndef __CONSTANTS_H_
@@ -39,7 +39,7 @@ namespace server
 {
 const unsigned int MaxName = 63;
 static const char Query[] = "SELECT name,lastuplink,lastconnected,"
-	"splitedon,lastnumeric,splitreason,version,addedon,lastupdated"
+	"splitedon,lastnumeric,splitreason,version,addedon,lastupdated,reportmissing"
 	" FROM servers ";
 }
 

@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccServer.cc,v 1.12 2003/08/09 23:15:34 dan_karrels Exp $
+ * $Id: ccServer.cc,v 1.13 2004/03/25 20:55:40 mrbean_ Exp $
  */
  
 #include	<sstream>
@@ -35,7 +35,7 @@
 #include	"Constants.h"
 #include	"config.h"
 
-RCSTAG( "$Id: ccServer.cc,v 1.12 2003/08/09 23:15:34 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: ccServer.cc,v 1.13 2004/03/25 20:55:40 mrbean_ Exp $" ) ;
 
 namespace gnuworld
 {
@@ -61,6 +61,7 @@ ccServer::ccServer(PgDatabase* _SQLDb)
    AddedOn( ::time(0) ),
    LastUpdated( 0 ),
    NetServer(NULL),
+   ReportMissing(true),
    SQLDb( _SQLDb )
 {
 ++numAllocated;
@@ -73,7 +74,7 @@ ccServer::~ccServer()
 
 bool ccServer::Insert()
 {
-static const char *Main = "INSERT into servers (Name,LastUplink,LastNumeric,LastConnected,SplitedOn,SplitReason,Version,AddedOn,LastUpdated) VALUES ('";
+static const char *Main = "INSERT into servers (Name,LastUplink,LastNumeric,LastConnected,SplitedOn,SplitReason,Version,AddedOn,LastUpdated,ReportMissing) VALUES ('";
 
 if(!dbConnected)
 	{
@@ -90,7 +91,10 @@ theQuery	<< Main
 		<< "','" << ccontrol::removeSqlChars(Version)
 		<< "'," << AddedOn
 		<< "," << LastUpdated
-		<< ")" << ends;
+		<< "," 
+		<< (ReportMissing ? "'t'" : "'n'")
+		<< ")" 
+		<< ends;
 
 elog	<< "ccontrol::Server::Insert::sqlQuery> "
 	<< theQuery.str().c_str()
@@ -140,6 +144,8 @@ theQuery	<< Main
 		<< AddedOn
 		<< ", LastUpdated = " 
 		<< LastUpdated
+		<< ", ReportMissing = " 
+		<< (ReportMissing ? "'t'" : "'n'")
 		<< " WHERE lower(Name) = '" << string_lower(Name)
 		<<  "'" << ends;
 
@@ -245,6 +251,7 @@ SplitReason = SQLDb->GetValue(place,5);
 Version = SQLDb->GetValue(place,6);
 AddedOn = static_cast< time_t >( atoi( SQLDb->GetValue(place,7) ) ) ;
 LastUpdated = static_cast< time_t >( atoi( SQLDb->GetValue(place,8) ) ) ;
+ReportMissing = (!strcasecmp(SQLDb->GetValue(place,9),"t") ? true : false);
 return true;
 
 }
