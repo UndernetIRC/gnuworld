@@ -1,5 +1,5 @@
 #ifndef __CSERVICE_H
-#define __CSERVICE_H "$Id: cservice.h,v 1.31 2001/01/24 01:13:52 gte Exp $"
+#define __CSERVICE_H "$Id: cservice.h,v 1.32 2001/01/28 16:05:42 gte Exp $"
 
 #include	<string>
 #include	<vector>
@@ -233,6 +233,9 @@ public:
 
 	/* sets a description (url) topic combo. */
 	void doAutoTopic(sqlChannel* theChan);
+
+	/* Bans & kicks a specified user with a specific reason */
+	bool doInternalBanAndKick(sqlChannel*, iClient*, const string& theReason);
 
 	time_t currentTime();
 

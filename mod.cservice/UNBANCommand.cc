@@ -8,7 +8,7 @@
  *
  * Caveats: None.
  *
- * $Id: UNBANCommand.cc,v 1.3 2001/01/25 00:19:13 gte Exp $
+ * $Id: UNBANCommand.cc,v 1.4 2001/01/28 16:05:42 gte Exp $
  */
 
 #include	<string>
@@ -18,8 +18,9 @@
 #include	"cservice.h"
 #include	"Network.h"
 #include	"levels.h"
+#include	"responses.h"
 
-const char UNBANCommand_cc_rcsId[] = "$Id: UNBANCommand.cc,v 1.3 2001/01/25 00:19:13 gte Exp $" ;
+const char UNBANCommand_cc_rcsId[] = "$Id: UNBANCommand.cc,v 1.4 2001/01/28 16:05:42 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -67,6 +68,14 @@ bool UNBANCommand::Exec( iClient* theClient, const string& Message )
 	    return false;
 	}
 
+	Channel* theChannel = Network->findChannel(theChan->getName()); 
+	if (!theChannel) 
+	{
+		bot->Notice(theClient, bot->getResponse(theUser, language::chan_is_empty).c_str(), 
+		theChan->getName().c_str());
+		return false;
+	} 
+ 
 	vector< sqlBan* >* banList = bot->getBanRecords(theChan); 
 	vector< sqlBan* >::iterator ptr = banList->begin(); 
 
@@ -87,6 +96,7 @@ bool UNBANCommand::Exec( iClient* theClient, const string& Message )
 				theBan->deleteRecord();
 				bot->Notice(theClient, "Removed ban %s from %s",
 					theBan->getBanMask().c_str(), theChan->getName().c_str()); 
+				theChannel->removeBan(theBan->getBanMask());
 
 				strstream s;
 				s << bot->getCharYYXXX() << " M " << theChan->getName() << " -b "
@@ -95,7 +105,7 @@ bool UNBANCommand::Exec( iClient* theClient, const string& Message )
 				bot->Write( s );
 				delete[] s.str();
 
-				delete(theBan);				
+				delete(theBan); 
 				return true;
 			}
 		}  

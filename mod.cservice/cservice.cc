@@ -469,7 +469,7 @@ int cservice::OnCTCP( iClient* theClient, const string& CTCP,
 
 	if(Command == "VERSION")
 	{
-		xClient::DoCTCP(theClient, CTCP.c_str(), "Undernet P10 Channel Services Version 2 [" __DATE__ " " __TIME__ "] ($Id: cservice.cc,v 1.63 2001/01/27 04:22:19 gte Exp $)");
+		xClient::DoCTCP(theClient, CTCP.c_str(), "Undernet P10 Channel Services Version 2 [" __DATE__ " " __TIME__ "] ($Id: cservice.cc,v 1.64 2001/01/28 16:05:42 gte Exp $)");
 		return true;
 	}
  
@@ -1103,6 +1103,7 @@ void cservice::OnChannelModeO( Channel* theChan, ChannelUser* theChanUser,
 	}
 
 	vector< iClient* > deopList; // List of clients to deop.
+	int deopCounter = 0;
 
 	for( xServer::opVectorType::const_iterator ptr = theTargets.begin() ;
 		ptr != theTargets.end() ; ++ptr )
@@ -1125,7 +1126,10 @@ void cservice::OnChannelModeO( Channel* theChan, ChannelUser* theChanUser,
 					// Authed but doesn't have access... deop.
 				} else if (!(getEffectiveAccessLevel(authUser,reggedChan, false) >= level::op)) deopList.push_back(tmpUser->getClient());
 			}	
-		} 
+		} else {
+			/* Somebody is being deopped? */
+			deopCounter++;
+		}
 	}
 
 	/*
@@ -1144,6 +1148,16 @@ void cservice::OnChannelModeO( Channel* theChan, ChannelUser* theChanUser,
 
 		DeOp(theChan, deopList);
 	}
+
+	/*
+	 *  Have more than 'maxdeoppro' been deopped?
+	 */
+
+	if (deopCounter >= reggedChan->getMassDeopPro())
+	{
+		Notice(theChanUser->getClient(), "You just deopped more than %i people", 
+			reggedChan->getMassDeopPro());
+	} 
 }
 
 int cservice::OnEvent( const eventType& theEvent,
@@ -1366,6 +1380,15 @@ void cservice::doAutoTopic(sqlChannel* theChan)
 
 	theChan->setLastTopic(::time(NULL));
 }	
+
+/*--doInternalBanAndKick------------------------------------------------------
+ *
+ * Bans a user via IRC and the database with 'theReason' and then kicks.
+ *--------------------------------------------------------------------------*/ 
+bool cservice::doInternalBanAndKick(sqlChannel* theChan, iClient* theClient, const string& theReason)
+{
+	vector< sqlBan* >* banList = getBanRecords(theChan); 
+}
 
 /*--escapeSQLChars------------------------------------------------------------
  *
