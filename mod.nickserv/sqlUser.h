@@ -1,5 +1,5 @@
 #ifndef _SQLUSER_H
-#define _SQLUSER_H "$Id: sqlUser.h,v 1.4 2002/08/16 21:37:32 jeekay Exp $"
+#define _SQLUSER_H "$Id: sqlUser.h,v 1.5 2002/08/23 21:25:25 jeekay Exp $"
 
 #include <string>
 
@@ -49,8 +49,12 @@ class sqlUser
        { return level; }
     
     /** Get the user lastseen */
-    inline unsigned int getLastSeen() const
-      { return lastseen; }
+    inline unsigned int getLastSeenTS() const
+      { return lastseen_ts; }
+    
+    /** Get the registered ts */
+    inline unsigned int getRegisteredTS() const
+      { return registered_ts; }
     
     
     /* MUTATOR METHODS */
@@ -72,13 +76,20 @@ class sqlUser
       { level = _level; }
     
     /** Set the lastseen */
-    inline void setLastSeen(const unsigned int _lastseen)
-      { lastseen = _lastseen; }
+    inline void setLastSeenTS(const unsigned int _lastseen)
+      { lastseen_ts = _lastseen; }
+    
+    /** Set the registered ts */
+    inline void setRegisteredTS(const unsigned int _registered)
+      { registered_ts = _registered; }
     
     /* MISCELLANEOUS METHODS */
     
     /** Commit this user back to the database */
     void commit();
+    
+    /** Update this users lastseen */
+    void commitLastSeen();
     
     /** Load data for this user from a given DB handle */
     void setAllMembers(PgDatabase*, int);
@@ -88,7 +99,8 @@ class sqlUser
     string name;
     flagType flags;
     unsigned int level;
-    unsigned int lastseen;
+    unsigned int lastseen_ts;
+    unsigned int registered_ts;
     
     sqlManager* myManager;
 }; // class sqlUser

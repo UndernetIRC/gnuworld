@@ -3,7 +3,7 @@
  *
  * Stores a database user
  *
- * $Id: sqlUser.cc,v 1.3 2002/08/16 21:37:32 jeekay Exp $
+ * $Id: sqlUser.cc,v 1.4 2002/08/23 21:25:25 jeekay Exp $
  */
  
  #include <sstream>
@@ -26,7 +26,8 @@ sqlUser::sqlUser(sqlManager* _myManager) :
   name(""),
   flags(0),
   level(0),
-  lastseen(0)
+  lastseen_ts(0),
+  registered_ts(0)
 {
   myManager = _myManager;
 }
@@ -51,7 +52,21 @@ void sqlUser::commit()
     << " name = '" << name << "'"
     << " flags = " << flags
     << " level = " << level
-    << " lastseen = " << lastseen
+    << " lastseen_ts = " << lastseen_ts
+    << " registered_ts = " << registered_ts
+    << " WHERE id = " << id
+    << ends;
+  myManager->queueCommit(commitStatement.str());
+}
+
+/**
+ * This function updates this users lastseen back to the DB
+ */
+void sqlUser::commitLastSeen()
+{
+  stringstream commitStatement;
+  commitStatement << "UPDATE users SET"
+    << " lastseen_ts = now()::abstime::int4"
     << " WHERE id = " << id
     << ends;
   myManager->queueCommit(commitStatement.str());
@@ -68,7 +83,8 @@ id = atoi(theDB->GetValue(row, 0));
 name = theDB->GetValue(row, 1);
 flags = atoi(theDB->GetValue(row, 2));
 level = atoi(theDB->GetValue(row, 3));
-lastseen = atoi(theDB->GetValue(row, 4));
+lastseen_ts = atoi(theDB->GetValue(row, 4));
+registered_ts = atoi(theDB->GetValue(row, 5));
 }
 
 } // namespace ns
