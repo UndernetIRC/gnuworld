@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: Connection.h,v 1.2 2003/08/05 01:34:24 dan_karrels Exp $
+ * $Id: Connection.h,v 1.3 2003/08/05 01:46:30 dan_karrels Exp $
  */
 
 #ifndef __CONNECTION_H
-#define __CONNECTION_H "$Id: Connection.h,v 1.2 2003/08/05 01:34:24 dan_karrels Exp $"
+#define __CONNECTION_H "$Id: Connection.h,v 1.3 2003/08/05 01:46:30 dan_karrels Exp $"
 
 #include	<sys/types.h>
 #include	<netinet/in.h>
@@ -215,6 +215,20 @@ public:
 	 */
 	inline time_t	getConnectTime() const
 		{ return connectTime ; }
+
+	/**
+	 * Return the number of bytes currently in the output
+	 * buffer.
+	 */
+	inline size_t	getOutputBufferSize() const
+		{ return outputBuffer.size() ; }
+
+	/**
+	 * Return the number of bytes currently in the input
+	 * buffer.
+	 */
+	inline size_t	getInputBufferSize() const
+		{ return inputBuffer.size() ; }
 
 	/**
 	 * This friend operator allows for the easy output of a
