@@ -18425,7 +18425,7 @@ LIBTOOL='$(SHELL) $(top_builddir)/libtool'
 
 
 
-CXXFLAGS="-W -Wall -pipe"
+CXXFLAGS="-W -Wall -pipe -I\$(top_srcdir)/libltdl"
 CFLAGS="$CFLAGS"
 
 
