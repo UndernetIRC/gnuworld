@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: commLevels.h,v 1.19 2004/06/04 14:30:52 mrbean_ Exp $
+ * $Id: commLevels.h,v 1.20 2004/06/05 16:51:30 mrbean_ Exp $
  */
 
 #ifndef __COMMANDLEVELS_H
@@ -114,12 +114,12 @@ const unsigned long int OPER = flg_HELP | flg_DEAUTH | flg_NEWPASS
 		        | flg_UNMODERATE | flg_INVITE | flg_GLINE | flg_SCGLINE 
 			| flg_REMGLINE | flg_LOPCHN | flg_CHINFO | flg_WHOIS 
 			| flg_TRANS | flg_KICK | flg_CLEARCHAN | flg_LISTHOSTS
-			| flg_UNJUPE;
+			| flg_UNJUPE | flg_MODOP;
 const unsigned long int SOPER = flg_CHECKNET | flg_LISTIGNORES | flg_LIST 
 			| flg_NOTES | flg_USERINFO | flg_SCAN | flg_MAXUSERS
 			| flg_LASTCOM | flg_REOP;
 const unsigned long int ADMIN = OPER | flg_JUPE | flg_REMOPCHN | flg_ADDOPCHN 
-			| flg_ADDNOP | flg_REMOP |flg_MODOP | flg_ADDCMD 
+			| flg_ADDNOP | flg_REMOP | flg_ADDCMD 
 			| flg_DELCMD | flg_SUSPEND | flg_UNSUSPEND;
 const unsigned long int SADMIN = SOPER | flg_LEARNNET | flg_FGLINE 
 			| flg_REMIGNORE;
