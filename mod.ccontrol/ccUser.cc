@@ -3,7 +3,7 @@
  * 
  * Storage class for accessing user information 
  * 
- * $Id: ccUser.cc,v 1.9 2001/07/30 16:58:39 mrbean_ Exp $
+ * $Id: ccUser.cc,v 1.10 2001/09/30 20:26:44 mrbean_ Exp $
  */
  
 #include	<strstream>
@@ -18,7 +18,7 @@
 #include	"commLevels.h"
 
 const char ccUser_h_rcsId[] = __CCUSER_H ;
-const char ccUser_cc_rcsId[] = "$Id: ccUser.cc,v 1.9 2001/07/30 16:58:39 mrbean_ Exp $" ;
+const char ccUser_cc_rcsId[] = "$Id: ccUser.cc,v 1.10 2001/09/30 20:26:44 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -36,6 +36,8 @@ ccUser::ccUser(PgDatabase* _SQLDb)
    Server( "" ),
    IsSuspended(0),
    SuspendExpires(0),
+   SuspendLevel(0),
+   SuspendReason(""),      
    Access( 0 ),
    SAccess( 0 ),
    Flags( 0 ), 
@@ -56,7 +58,7 @@ ccUser::~ccUser()
 bool ccUser::loadData(const string& Name)
 {
 
-static const char Main[] = "SELECT user_id,user_name,password,access,saccess,flags,suspend_expires,suspended_by,server,isSuspended,IsUhs,IsOper,IsAdmin,IsSmt,IsCoder,GetLogs,NeedOp,Email FROM opers WHERE lower(user_name) = '";
+static const char Main[] = "SELECT user_id,user_name,password,access,saccess,flags,suspend_expires,suspended_by,server,isSuspended,IsUhs,IsOper,IsAdmin,IsSmt,IsCoder,GetLogs,NeedOp,Email,Suspend_Level,Suspend_Reason FROM opers WHERE lower(user_name) = '";
 
 strstream theQuery;
 theQuery	<< Main
@@ -82,7 +84,7 @@ return false;
 
 bool ccUser::loadData( const unsigned int Id)
 {
-static const char Main[] = "SELECT user_id,user_name,password,access,saccess,flags,suspend_expires,suspended_by,server,isSuspended,IsUhs,IsOper,IsAdmin,IsSmt,IsCoder,GetLogs,NeedOp FROM opers,Email WHERE user_id = ";
+static const char Main[] = "SELECT user_id,user_name,password,access,saccess,flags,suspend_expires,suspended_by,server,isSuspended,IsUhs,IsOper,IsAdmin,IsSmt,IsCoder,GetLogs,NeedOp,Email,Suspend_Level,Suspend_Reason FROM opers WHERE user_id = ";
 strstream theQuery;
 
 theQuery	<< Main
@@ -126,6 +128,8 @@ IsCoder = (!strcasecmp(SQLDb->GetValue(0,14),"t") ? 1 : 0 );
 GetLogs = (!strcasecmp(SQLDb->GetValue(0,15),"t") ? 1 : 0 );
 NeedOp = (!strcasecmp(SQLDb->GetValue(0,16),"t") ? 1 : 0 );
 Email = SQLDb->GetValue(0,17);
+SuspendLevel = atoi(SQLDb->GetValue(0,18));
+SuspendReason = SQLDb->GetValue(0,19);
 }    
 
 bool ccUser::Update()
@@ -147,6 +151,10 @@ theQuery	<< Main
 		<< SuspendExpires
 		<< " ,suspended_by = '"
 		<< SuspendedBy
+		<< "' ,suspend_level = "
+		<< SuspendLevel
+		<< ", suspend_reason = '"
+		<< SuspendReason
 		<< "' ,server = '"
 		<< Server
 		<< "' ,isSuspended = "

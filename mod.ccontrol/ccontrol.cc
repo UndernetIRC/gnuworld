@@ -29,7 +29,7 @@
 #include	"ccFloodData.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.74 2001/09/26 13:58:28 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.75 2001/09/30 20:26:44 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -914,7 +914,7 @@ if(TempAuth)
 
 bool ccontrol::AddOper (ccUser* Oper)
 {
-static const char *Main = "INSERT into opers (user_name,password,access,saccess,last_updated_by,last_updated,flags,server,isSuspended,isUhs,isOper,isAdmin,isSmt,isCoder,GetLogs,NeedOp) VALUES ('";
+static const char *Main = "INSERT into opers (user_name,password,access,saccess,last_updated_by,last_updated,flags,server,isSuspended,suspend_expires,suspended_by,suspend_level,suspend_reason,isUhs,isOper,isAdmin,isSmt,isCoder,GetLogs,NeedOp) VALUES ('";
 
 strstream theQuery;
 theQuery	<< Main
@@ -928,7 +928,11 @@ theQuery	<< Main
 		<< Oper->getServer() 
 		<< "' ," 
 		<< (Oper->getIsSuspended() ? "'t'" : "'n'") 
-		<< "," << (Oper->isUhs() ? "'t'" : "'n'")
+		<< "," << Oper->getSuspendExpires()
+		<< ",'" << Oper->getSuspendedBy()
+		<< "'," << Oper->getSuspendLevel()
+		<< ",'" << Oper->getSuspendReason()
+		<< "'," << (Oper->isUhs() ? "'t'" : "'n'")
 		<< "," << (Oper->isOper() ? "'t'" : "'n'")
 		<< "," << (Oper->isAdmin() ? "'t'" : "'n'")
 		<< "," << (Oper->isSmt() ? "'t'" : "'n'")
@@ -1042,6 +1046,8 @@ TempAuth->setNumeric(TempUser->getNumeric());
 TempAuth->setIsSuspended(TempUser->getIsSuspended());
 TempAuth->setSuspendExpires(TempUser->getSuspendExpires());
 TempAuth->setSuspendedBy(TempUser->getSuspendedBy());
+TempAuth->setSuspendLevel(TempUser->getSuspendLevel());
+TempAuth->setSuspendReason(TempUser->getSuspendReason());
 TempAuth->setServer(TempUser->getServer());
 TempAuth->setNeedOp(TempUser->getNeedOp());
 TempAuth->setGetLogs(TempUser->getLogs());
@@ -1818,9 +1824,11 @@ if(SQLDb->Tuples() > 0)
 			tmpAuth->setSuspendExpires(0);
 			tmpAuth->setSuspendedBy("");
 			tmpAuth->setIsSuspended(false);
+			tmpAuth->setSuspendLevel(0);
+			tmpAuth->setSuspendReason("");
 			}
 		}
-	static const char *DelMain = "update opers set isSuspended = 'n',Suspend_Expires = 0, Suspended_by = '' where IsSuspended = 'y' And suspend_expires < now()::abstime::int4";
+	static const char *DelMain = "update opers set isSuspended = 'n',Suspend_Expires = 0, Suspended_by = '',suspend_level = 0,suspend_reason='' where IsSuspended = 'y' And suspend_expires < now()::abstime::int4";
 
 	strstream DelQuery;
 	DelQuery	<< DelMain

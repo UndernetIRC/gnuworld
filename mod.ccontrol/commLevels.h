@@ -90,15 +90,14 @@ const unsigned long int SOPER = flg_CHECKNET | flg_LISTIGNORES | flg_LIST
 			| flg_NOTES | flg_USERINFO;
 const unsigned long int ADMIN = OPER | flg_JUPE | flg_REMOPCHN | flg_ADDOPCHN 
 			| flg_ADDNOP | flg_REMOP |flg_MODOP | flg_ADDCMD 
-			| flg_DELCMD | flg_SUSPEND | flg_UNSUSPEND 
-			| flg_ADDSERVER;
-const unsigned long int SADMIN = SOPER | flg_LEARNNET| flg_REMSERVER 
-			| flg_LASTCOM | flg_FGLINE | flg_EXCEPTIONS 
-			| flg_REMIGNORE;
-const unsigned long int SMT = ADMIN;
-const unsigned long int SSMT = SADMIN;
+			| flg_DELCMD | flg_SUSPEND | flg_UNSUSPEND;
+const unsigned long int SADMIN = SOPER | flg_LEARNNET | flg_LASTCOM 
+			| flg_FGLINE | flg_REMIGNORE;
+const unsigned long int SMT = ADMIN | flg_ADDSERVER;
+const unsigned long int SSMT = SADMIN | flg_REMSERVER;
 const unsigned long int CODER = SMT;
-const unsigned long int SCODER =  SSMT | flg_COMMANDS| flg_GCHAN | flg_RGCHAN;
+const unsigned long int SCODER =  SSMT | flg_COMMANDS| flg_GCHAN | flg_RGCHAN
+			| flg_EXCEPTIONS;
 
 }
 

@@ -1,7 +1,7 @@
 /* ccUser.h */
 
 #ifndef __CCUSER_H
-#define __CCUSER_H "$Id: ccUser.h,v 1.11 2001/09/26 11:42:19 mrbean_ Exp $"
+#define __CCUSER_H "$Id: ccUser.h,v 1.12 2001/09/30 20:26:44 mrbean_ Exp $"
 
 #include	<string>
 
@@ -65,9 +65,15 @@ public:
 	inline const time_t&		getSuspendExpires() const
 		    { return SuspendExpires ; }
 
+	inline const unsigned int	getSuspendLevel() const
+		{ return SuspendLevel; }
+		
 	inline const string&		getSuspendedBy() const
 		    { return SuspendedBy ; }
 
+	inline const string&		getSuspendReason() const
+		    { return SuspendReason ; }
+	
 	inline const unsigned long int&	getAccess() const
 		    { return Access ; }
 
@@ -132,9 +138,14 @@ public:
 	inline void 			setSuspendExpires( const unsigned int _expire )
 		    { SuspendExpires = _expire; }
 
+	inline void 			setSuspendLevel( const unsigned int _level )
+		    { SuspendLevel = _level; }
+		    
 	inline void 			setSuspendedBy( const string& _suspendedby )
 		    { SuspendedBy = _suspendedby; }
 
+	inline void 			setSuspendReason( const string& _reason )
+		    { SuspendReason = _reason; }
 
 	inline void 			setAccess( const unsigned long int _access )
 		    { Access = _access; }
@@ -210,6 +221,8 @@ protected:
 	bool   IsSuspended;
 	time_t SuspendExpires;
 	string SuspendedBy;
+	unsigned int SuspendLevel;
+	string SuspendReason;
 	unsigned long int Access;
 	unsigned long int SAccess;
 	unsigned int Flags;

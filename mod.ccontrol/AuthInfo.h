@@ -1,7 +1,7 @@
 /* AuthInfo.h */
 
 #ifndef __AUTHINFO_H
-#define __AUTHINFO_H "$Id: AuthInfo.h,v 1.6 2001/07/29 13:33:20 mrbean_ Exp $"
+#define __AUTHINFO_H "$Id: AuthInfo.h,v 1.7 2001/09/30 20:26:44 mrbean_ Exp $"
 
 #include	<string>
 
@@ -49,6 +49,12 @@ public:
 	inline const time_t		getSuspendExpires() const
 		{ return SuspendExpires; }
 	
+	inline const unsigned int 	getSuspendLevel() const
+		{ return SuspendLevel; }
+	
+	inline const string&		getSuspendReason() const
+		{ return SuspendReason; }
+		
 	inline const string&		getServer() const
 		{ return Server; }
 		
@@ -86,7 +92,12 @@ public:
 	inline void 			setSuspendedBy( const string _SuspendedBy )
 		{ SuspendedBy = _SuspendedBy; } 			
 	
+	inline void			setSuspendLevel( const unsigned int _Level )
+		{ SuspendLevel = _Level; }
 	
+	inline void			setSuspendReason( const string _Reason )
+		{ SuspendReason = _Reason; }
+		
 	inline void 			setServer( const string& _Server )
 		{ Server = _Server; }
 
@@ -105,6 +116,8 @@ protected:
 	bool		IsSuspended;
 	string		SuspendedBy;
 	time_t		SuspendExpires;
+	unsigned int	SuspendLevel;
+	string		SuspendReason;
 	string 		Server;
 	unsigned int	Id;
 	unsigned long int Access;

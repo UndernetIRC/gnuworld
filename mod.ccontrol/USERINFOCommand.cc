@@ -18,7 +18,7 @@
 #include	"AuthInfo.h"
 #include	"Network.h"
 
-const char USERINFOCommand_cc_rcsId[] = "$Id: USERINFOCommand.cc,v 1.1 2001/08/19 15:58:28 mrbean_ Exp $";
+const char USERINFOCommand_cc_rcsId[] = "$Id: USERINFOCommand.cc,v 1.2 2001/09/30 20:26:44 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -40,8 +40,8 @@ if( st.size() < 2 )
 	}
 
 static const char Main[] = "SELECT user_name,password,server,isSuspended "
-		",Suspend_Expires,Suspended_By,SuspendReason,isUHS,isOPER"
-		",isADMIN,isSMT,isCODER,getLogs,NeedOp,Email,user_id from opers";
+		",Suspend_Expires,Suspended_By,Suspend_Reason,isUHS,isOPER"
+		",isADMIN,isSMT,isCODER,getLogs,NeedOp,Email,user_id,suspend_level from opers";
 
 strstream theQuery;
 theQuery	<< Main
@@ -71,6 +71,8 @@ string SuspendReason;
 time_t SuspendExpires;
 AuthInfo* tmpAuth;
 unsigned int Id;
+unsigned int SuspendLevel;
+string SLevel;
 for(int i = 0;i< bot->SQLDb->Tuples();++i)
 	{
 	if(!(match(st[1],bot->SQLDb->GetValue(i,0))) || 
@@ -85,6 +87,23 @@ for(int i = 0;i< bot->SQLDb->Tuples();++i)
 			Suspended = true;
 			SuspendedBy.assign(bot->SQLDb->GetValue(i,5));
 			SuspendReason.assign(bot->SQLDb->GetValue(i,6));
+			SuspendLevel=atoi(bot->SQLDb->GetValue(i,16));
+			if(SuspendLevel == operLevel::OPERLEVEL)
+				{
+				SLevel.assign("OPER");
+				}
+			else if(SuspendLevel == operLevel::ADMINLEVEL)
+				{
+				SLevel.assign("ADMIN");
+				}
+			else if(SuspendLevel == operLevel::SMTLEVEL)
+				{
+				SLevel.assign("SMT");
+				}
+			else if(SuspendLevel == operLevel::CODERLEVEL)
+				{
+				SLevel.assign("CODER");
+				}
 			}
 		else
 			{
@@ -143,6 +162,7 @@ for(int i = 0;i< bot->SQLDb->Tuples();++i)
 			bot->Notice(theClient,"User was suspended By : %s , Until %s"
 			,SuspendedBy.c_str(),bot->convertToAscTime(SuspendExpires));
 			bot->Notice(theClient,"Reason : %s",SuspendReason.c_str());
+			bot->Notice(theClient,"Level : %s",SLevel.c_str());
 			}
 		bot->Notice(theClient,"User Flags : GetLogs \002%s\002 NeedOp \002%s\002"
 			    ,GetLogs,NeedOp);
