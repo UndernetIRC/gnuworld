@@ -1,4 +1,4 @@
-# $Id: Makefile.in,v 1.7 2000/12/09 22:01:11 dan_karrels Exp $
+# $Id: Makefile.in,v 1.8 2000/12/09 22:55:10 dan_karrels Exp $
 # Default paths (system-wide installs)
 
 # Standard defines
@@ -12,9 +12,6 @@ SHLIB_LD = @SHLIB_LD@
 
 DEFS = @DEFS@
 LIBS = @LIBS@
-
-SHLIB_CXX = @MOD_CXX@
-SHLIB_LD = @SHLIB_LD@
 
 AR = @AR@
 RANLIB = @RANLIB@
@@ -36,10 +33,6 @@ SRCS = Buffer.cc \
 	Socket.cc \
 	StringTokenizer.cc
 
-#	EIOThread.cc
-#	EReadThread.cc
-#	EThread.cc
-#	EWriteThread.cc
 OBJS = $(patsubst %.cc, %.o, $(SRCS))
 LIB = $(BIN_PATH)/libgnuworld.so
 
