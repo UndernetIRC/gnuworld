@@ -37,7 +37,7 @@
 #include	"ip.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.118 2002/01/10 20:31:23 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.119 2002/01/12 10:00:40 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -771,12 +771,12 @@ switch( theEvent )
 			{
 			newGline = new (std::nothrow) ccGline(SQLDb);
 			assert (newGline != NULL);
+			iServer* serverAdded = Network->findServer(newG->getSetBy());
+			if(serverAdded)
+				newGline->setAddedBy(serverAdded->getName());
+			else
+				newGline->setAddedBy("Unknown");
 			}
-		iServer* serverAdded = Network->findServer(newG->getSetBy());
-		if(serverAdded)
-			newGline->setAddedBy(serverAdded->getName());
-		else
-			newGline->setAddedBy("Unknown");
 		newGline->setAddedOn(::time(0));
 		//newGline->setLastUpdated(::time(0));
 		newGline->setHost(newG->getUserHost());
@@ -863,8 +863,12 @@ switch( theEvent )
 							tmpGline = new ccGline(SQLDb);
 							tmpGline->setHost("*@" + tIP);
 							tmpGline->setExpires(::time(0) + maxGlineLen);
+							string Reason = "Automatically banned for excessive connections [- ";
+							Reason += CurConnections;
+							Reason += " -]";
 							tmpGline->setReason("Automatically banned for excessive connections ");
 							tmpGline->setAddedOn(::time(0));
+							tmpGline->setAddedBy("Auto Gline");
 							tmpGline->Insert();
 							tmpGline->loadData(tmpGline->getHost());
 							addGline(tmpGline);
