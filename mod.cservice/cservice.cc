@@ -569,7 +569,7 @@ else if(Command == "VERSION")
 	xClient::DoCTCP(theClient, CTCP,
 		"Undernet P10 Channel Services Version 2 ["
 		__DATE__ " " __TIME__
-		"] ($Id: cservice.cc,v 1.87 2001/02/06 23:07:44 gte Exp $)");
+		"] ($Id: cservice.cc,v 1.88 2001/02/08 21:50:57 gte Exp $)");
 	}
 else if(Command == "PROBLEM?")
 	{
@@ -589,7 +589,10 @@ sqlUser* cservice::isAuthed(iClient* theClient, bool alert)
 {
 networkData* tmpData =
 	static_cast< networkData* >( theClient->getCustomData(this) ) ;
-assert( tmpData != 0 ) ;
+
+if(!tmpData) return 0;
+
+//assert( tmpData != 0 ) ;
 
 sqlUser* theUser = tmpData->currentUser;
 
