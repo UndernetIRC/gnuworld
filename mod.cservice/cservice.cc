@@ -3309,7 +3309,15 @@ void cservice::loadPendingChannelList()
 if (pendingChannelList.size() > 0)
 {
 	pendingChannelListType::iterator ptr = pendingChannelList.begin();
-	
+
+	ExecStatusType beginStatus = SQLDb->Exec("BEGIN;") ; 
+	if( PGRES_COMMAND_OK != beginStatus )
+	{
+		elog << "Error starting transaction." << endl;
+	}
+
+	elog << "BEGIN" << endl;
+ 	
 	while (ptr != pendingChannelList.end())
 		{
 		sqlPendingChannel* pendingChan = ptr->second;
@@ -3324,6 +3332,14 @@ if (pendingChannelList.size() > 0)
 		delete(pendingChan);
 		++ptr;
 		} /* while() */ 
+
+	ExecStatusType endStatus = SQLDb->Exec("END;") ; 
+	if( PGRES_COMMAND_OK != endStatus )
+	{
+		elog << "Error Ending transaction." << endl;
+	}
+
+	elog << "END" << endl;
 
 	pendingChannelList.clear();
 } 
