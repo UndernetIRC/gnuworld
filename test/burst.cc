@@ -91,6 +91,8 @@ if( 1 == argc )
 	return 0 ;
 	}
 
+elog.setStream( &cout ) ;
+
 size_t numKB = 250 ;
 unsigned short int portNum = 45678 ;
 string socketFileName ;
@@ -175,6 +177,34 @@ while( !done )
 		continue ;
 		}
 
+	// Poll(), blocking for up to 1 second
+	cm.Poll( 1, 0 ) ;
+
+	if( lh.burstPtr->getOutputBufferSize() >=
+		(4 * attemptReadSize) )
+		{
+		// Don't overfill the output buffer
+		continue ;
+		}
+
+	time_t connectDuration = lh.burstPtr->getConnectTime() - ::time( 0 ) ;
+	size_t recvRate = lh.burstPtr->getBytesRead() / connectDuration ;
+	size_t sendRate = lh.burstPtr->getBytesWritten()
+		/ connectDuration ;
+
+	cout	<< "Duration: "
+		<< connectDuration
+		<< " seconds; Read: "
+		<< lh.burstPtr->getBytesRead()
+		<< " bytes total, "
+		<< (recvRate >> 10)
+		<< " KB/sec; Write: "
+		<< lh.burstPtr->getBytesWritten()
+		<< " bytes total, "
+		<< (sendRate >> 10)
+		<< " KB/sec"
+		<< endl ;
+
 	// Connection exists, pass it some input
 	int readBytes = ::read( inputFileFD, inputBuffer, attemptReadSize ) ;
 	if( readBytes <= 0 )
@@ -196,8 +226,6 @@ while( !done )
 		<< " bytes"
 		<< endl ;
 
-	// Poll(), blocking for up to 1 second
-	cm.Poll( 1, 0 ) ;
 	} // while( !done )
 
 
