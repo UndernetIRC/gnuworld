@@ -26,6 +26,9 @@ namespace gnuworld {
 
 class Timer {
 public:
+	inline Timer(bool autostart = true)
+		{ if(autostart) { Start(); } }
+
 	inline void Start()
 		{ gettimeofday(&startTime, 0); }
 	inline void Stop()
