@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------------
--- "$Id: cservice.sql,v 1.14 2001/01/05 05:27:33 gte Exp $"
+-- "$Id: cservice.sql,v 1.15 2001/01/11 03:02:51 gte Exp $"
 -- Channel service DB SQL file for PostgreSQL.
 
 -- ChangeLog:
@@ -69,7 +69,7 @@ CREATE TABLE translations (
 
 CREATE TABLE channels (
 	id SERIAL,
-	name VARCHAR (200) NOT NULL UNIQUE,
+	name TEXT NOT NULL UNIQUE,
 	flags INT4 NOT NULL DEFAULT '0',
 -- 0x0000 0001 - No Purge
 -- 0x0000 0002 - Special Channel
@@ -109,7 +109,7 @@ CREATE TABLE channels (
 
 -- A channel is inactive if the manager hasn't logged in for 21 days
 
-CREATE INDEX channel_name_idx ON channels (name);
+CREATE INDEX channel_name_idx ON channels (lower(name));
 
 -- Table for bans; channel_id references the channel entry this ban belongs to.
 
@@ -134,7 +134,7 @@ CREATE TABLE bans (
 CREATE TABLE users (
 
 	id SERIAL,
-	user_name VARCHAR (32) NOT NULL,
+	user_name TEXT NOT NULL,
 	password VARCHAR (40) NOT NULL,
 	last_seen INT4,
 	email VARCHAR (128),
@@ -151,7 +151,7 @@ CREATE TABLE users (
 	PRIMARY KEY ( id )
 ) ;
 
-CREATE INDEX users_username_idx ON users( user_name );
+CREATE INDEX users_username_idx ON users( lower(user_name) );
 
 
 CREATE TABLE levels (
