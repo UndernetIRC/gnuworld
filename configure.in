@@ -1,10 +1,10 @@
-dnl $Id: configure.in,v 1.46 2002/06/03 20:21:04 dan_karrels Exp $
+dnl $Id: configure.in,v 1.47 2002/06/03 22:19:25 dan_karrels Exp $
 dnl ----------------------------------------------------------
 
 echo Configuring GNUWorld...
 echo
 
-AC_REVISION($Revision: 1.46 $)
+AC_REVISION($Revision: 1.47 $)
 AC_INIT
 AC_CONFIG_SRCDIR([src/main.cc])
 AM_INIT_AUTOMAKE(gnuworld,0.0)
@@ -29,6 +29,21 @@ AC_LIBTOOL_DLOPEN
 
 dnl Configure libtool
 AM_PROG_LIBTOOL
+
+CFLAGS="-Wall -pipe"
+CXXFLAGS="-Wall -pipe"
+prefix="`pwd`"
+libdir="`pwd`/bin"
+glibdir="`pwd`/lib"
+
+AC_SUBST(glibdir)
+AC_PROG_CC
+AC_PROG_CXX
+AC_PROG_CPP
+AC_LANG([C++])
+
+AC_PROG_MAKE_SET(gmake)
+AC_SUBST(LIBTOOL_DEPS)
 
 dnl Configure libltdl
 AC_CONFIG_SUBDIRS(libltdl)
@@ -55,22 +70,6 @@ if [test "$threadLib" = no]; then
 else
 	LIBS=$threadLib
 fi
-
-CFLAGS="-Wall -pipe"
-CXXFLAGS="-Wall -pipe"
-CXX="g++"
-AC_PREFIX_DEFAULT($PWD)
-libdir="${prefix}/bin"
-glibdir="`pwd`/lib"
-
-AC_SUBST(glibdir)
-AC_PROG_CC
-AC_PROG_CXX
-AC_PROG_CPP
-AC_LANG([C++])
-
-AC_PROG_MAKE_SET(gmake)
-AC_SUBST(LIBTOOL_DEPS)
 
 dnl ----------------------------------------------------------
 dnl ----------------------------------------------------------
