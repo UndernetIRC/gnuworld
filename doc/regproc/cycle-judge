@@ -1,3 +1,0 @@
-#!/bin/sh
-/bin/mv /usr/local/pgsql/regproc/judge.log /usr/local/pgsql/regproc/logs/judge.log.`/bin/date +%Y%m%d`
-/usr/bin/touch /usr/local/pgsql/regproc/judge.log
