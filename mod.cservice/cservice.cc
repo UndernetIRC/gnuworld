@@ -233,13 +233,13 @@ int cservice::OnCTCP( iClient* theClient, const string& CTCP,
 
 	if(Command == "GENDER")
 	{
-		xClient::DoCTCP(theClient, CTCP.c_str(), "I'm bender. I bend things.");
+		xClient::DoCTCP(theClient, CTCP.c_str(), "I am Bender; please insert girder.");
 		return true;
 	}
 
 	if(Command == "VERSION")
 	{
-		xClient::DoCTCP(theClient, CTCP.c_str(), "Undernet Channel Services Version 2 [" __DATE__ " " __TIME__ "] ($Id: cservice.cc,v 1.17 2000/12/28 05:03:09 gte Exp $)");
+		xClient::DoCTCP(theClient, CTCP.c_str(), "Undernet Channel Services Version 2 [" __DATE__ " " __TIME__ "] ($Id: cservice.cc,v 1.18 2000/12/28 21:19:53 gte Exp $)");
 		return true;
 	}
  

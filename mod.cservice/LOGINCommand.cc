@@ -5,8 +5,9 @@
 #include	"StringTokenizer.h"
 #include	"ELog.h" 
 #include	"cservice.h" 
+#include	"responses.h"
 
-const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.2 2000/12/23 20:03:57 gte Exp $" ;
+const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.3 2000/12/28 21:19:53 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -24,12 +25,13 @@ bool LOGINCommand::Exec( iClient* theClient, const string& Message )
 	}
 
  	/*
-	 *  Check theClient isn't already logged in.
+	 *  Check theClient isn't already logged in, if so, tell them they shouldn't be.
 	 */
-
-	sqlUser* tmpUser = (sqlUser*) theClient->getCustomData(bot);
+ 
+	sqlUser* tmpUser = bot->isAuthed(theClient, false);
 	if (tmpUser) {
-		bot->Notice(theClient, "Sorry, You are already authenticated as %s.", tmpUser->getUserName().c_str());
+		bot->Notice(theClient, bot->getResponse(tmpUser, language::already_authed).c_str(),
+			tmpUser->getUserName().c_str());
 		return false;
 	}
 
@@ -40,7 +42,12 @@ bool LOGINCommand::Exec( iClient* theClient, const string& Message )
 	sqlUser* theUser = bot->getUserRecord(st[1]);
 	if (theUser) {
 		theClient->setCustomData(bot, (void *)theUser);
-		bot->Notice(theClient, "AUTHENTICATION SUCCESSFUL as %s", theUser->getUserName().c_str()); 
+		/*
+		 *  Compare password with MD5 hash stored in user record.
+		 */
+
+		bot->Notice(theClient, bot->getResponse(theUser, language::auth_success).c_str(), 
+			theUser->getUserName().c_str()); 
 	} else
 	{
 		bot->Notice(theClient, "Sorry, I don't know who %s is.", st[1].c_str());

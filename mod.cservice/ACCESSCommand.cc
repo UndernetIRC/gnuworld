@@ -8,7 +8,7 @@
  * Can optionally narrow down selection using a number of switches. (TODO).
  * Can display all channels a user has access on (TODO). 
  *
- * $Id: ACCESSCommand.cc,v 1.4 2000/12/28 01:21:42 gte Exp $
+ * $Id: ACCESSCommand.cc,v 1.5 2000/12/28 21:19:53 gte Exp $
  */
 
 #include	<string>
@@ -18,7 +18,7 @@
 #include	"cservice.h"
 #include	"libpq++.h"
 
-const char ACCESSCommand_cc_rcsId[] = "$Id: ACCESSCommand.cc,v 1.4 2000/12/28 01:21:42 gte Exp $" ;
+const char ACCESSCommand_cc_rcsId[] = "$Id: ACCESSCommand.cc,v 1.5 2000/12/28 21:19:53 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -57,7 +57,7 @@ bool ACCESSCommand::Exec( iClient* theClient, const string& Message )
 	sqlChannel* theChan = bot->getChannelRecord(st[1]);
 	if (!theChan) 
 	{
-		bot->Notice(theClient, "Sorry, %s isn't registered with me.", st[1].c_str());
+		bot->Notice(theClient, "Sorry, the channel %s isn't registered with me.", st[1].c_str());
 		return false;
 	} 
 
@@ -90,7 +90,7 @@ bool ACCESSCommand::Exec( iClient* theClient, const string& Message )
 			bot->Notice(theClient, "CHANNEL: %s -- AUTOOP: %s", bot->SQLDb->GetValue(i, 0), autoOp ? "ON" : "OFF");
 			bot->Notice(theClient, "LAST SEEN: %s ago.",  bot->prettyDuration(duration).c_str()); 
 		}
-			bot->Notice(theClient, "End of access list"); 
+			bot->Notice(theClient, "End of access list");
 		if (bot->SQLDb->Tuples() == 15)
 		{
 			bot->Notice(theClient, "There are more than 15 matching entries.");
