@@ -89,9 +89,9 @@ COPY "translations" FROM stdin;
 1	70	SINCE: %i	31337
 1	71	EXP: %s	31337
 1	72	\002*** END ***\002	31337
-1	73	Sorry, I don't know who %s is.	31337
-1	74	Sorry, you are not authorized with me anymore.	31337
-1	75	doesn't appear to have access in %s.	31337
+1	73	I don't know who %s is.	31337
+1	74	You are not authorised with me anymore.	31337
+1	75	%s doesn't appear to have access in %s.	31337
 1	76	Cannot modify a user with equal or higher access than your own.	31337
 1	77	Cannot give a user higher or equal access to your own.	31337
 1	78	Modified %s's access level on channel %s to %i	31337
