@@ -1,11 +1,11 @@
 /**
  * cservice.h
  * Author: Greg Sikorski
- * $Id: cservice.h,v 1.84 2002/05/23 19:41:32 dan_karrels Exp $
+ * $Id: cservice.h,v 1.85 2002/05/23 20:35:42 dan_karrels Exp $
  */
 
 #ifndef __CSERVICE_H
-#define __CSERVICE_H "$Id: cservice.h,v 1.84 2002/05/23 19:41:32 dan_karrels Exp $"
+#define __CSERVICE_H "$Id: cservice.h,v 1.85 2002/05/23 20:35:42 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
@@ -27,12 +27,8 @@
 
 #ifdef GNU_EXTENSIONS
  #include       <ext/hash_map>
- using __gnu_cxx::hash_map ;
- using __gnu_cxx::hash ;
 #else
  #include       <hash_map>
- using std::hash_map ;
- using std::hash ;
 #endif
 
 class PgDatabase;
