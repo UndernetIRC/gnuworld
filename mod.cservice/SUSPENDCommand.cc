@@ -7,9 +7,12 @@
  * Suspends an user on the specified channel, if suspend duration 0
  * is defined, the user will be unsuspended.
  *
- * Caveats: None.
+ * Caveats: Suspend yourself? No!
  *
- * $Id: SUSPENDCommand.cc,v 1.1 2001/01/11 01:51:56 gte Exp $
+ * TODO: /msg x suspend #channel *, suspends all users below your access
+ * level.
+ *
+ * $Id: SUSPENDCommand.cc,v 1.2 2001/01/14 18:21:32 gte Exp $
  */
 
 #include	<string>
@@ -20,7 +23,7 @@
 #include	"Network.h"
 #include	"levels.h"
 
-const char SUSPENDCommand_cc_rcsId[] = "$Id: SUSPENDCommand.cc,v 1.1 2001/01/11 01:51:56 gte Exp $" ;
+const char SUSPENDCommand_cc_rcsId[] = "$Id: SUSPENDCommand.cc,v 1.2 2001/01/14 18:21:32 gte Exp $" ;
 
 namespace gnuworld
 {

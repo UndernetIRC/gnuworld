@@ -235,6 +235,9 @@ int cservice::BurstChannels()
 			MyUplink->JoinChannel( this, id, SQLDb->GetValue( i,  10), regTime, true );
 			MyUplink->RegisterChannelEvent( id, this ) ;
 
+			// Update the interal channel record to reflect the modes fetched for
+			// this channel from the database.
+
 			// Add this information to the channel cache.
 			
 			sqlChannel* theChan = new sqlChannel(SQLDb);
@@ -444,7 +447,7 @@ int cservice::OnCTCP( iClient* theClient, const string& CTCP,
 
 	if(Command == "VERSION")
 	{
-		xClient::DoCTCP(theClient, CTCP.c_str(), "Undernet P10 Channel Services Version 2 [" __DATE__ " " __TIME__ "] ($Id: cservice.cc,v 1.40 2001/01/13 22:08:25 gte Exp $)");
+		xClient::DoCTCP(theClient, CTCP.c_str(), "Undernet P10 Channel Services Version 2 [" __DATE__ " " __TIME__ "] ($Id: cservice.cc,v 1.41 2001/01/14 18:21:32 gte Exp $)");
 		return true;
 	}
  

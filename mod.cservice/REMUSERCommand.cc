@@ -7,8 +7,9 @@
  * Removes a users access from a particular channel.
  *
  * Caveats: None
+ * 
  *
- * $Id: REMUSERCommand.cc,v 1.1 2000/12/27 20:03:52 gte Exp $
+ * $Id: REMUSERCommand.cc,v 1.2 2001/01/14 18:21:32 gte Exp $
  */
 
 #include	<string>
@@ -19,7 +20,7 @@
 #include	"levels.h"
 #include	"libpq++.h"
 
-const char REMUSERCommand_cc_rcsId[] = "$Id: REMUSERCommand.cc,v 1.1 2000/12/27 20:03:52 gte Exp $" ;
+const char REMUSERCommand_cc_rcsId[] = "$Id: REMUSERCommand.cc,v 1.2 2001/01/14 18:21:32 gte Exp $" ;
  
 namespace gnuworld
 {
@@ -85,13 +86,15 @@ bool REMUSERCommand::Exec( iClient* theClient, const string& Message )
 	 *  Check this user has access on this channel.
 	 */
 
-	int targetLevel = bot->getAccessLevel(targetUser, theChan);
-	if (targetLevel == 0)
+	sqlLevel* tmpLevel = bot->getLevelRecord(targetUser, theChan);
+
+	if (!tmpLevel)
 	{
 		bot->Notice(theClient, "%s doesn't appear to have access in %s.", targetUser->getUserName().c_str(), theChan->getName().c_str());
 		return false;
 	}
 
+	int targetLevel = tmpLevel->getAccess();
 	/*
 	 *  Check we aren't trying to remove someone with access higher than ours.
 	 */
@@ -119,6 +122,12 @@ bool REMUSERCommand::Exec( iClient* theClient, const string& Message )
 	} else {
 		bot->Notice(theClient, "Something went wrong: %s", bot->SQLDb->ErrorMessage()); // Log to msgchan here.
  	}
+ 
+	// Remove tmpLevel from the cache. (It has to be there, we just got it even if it wasnt..)
+
+	pair<int, int> thePair;
+	thePair = make_pair(tmpLevel->getUserId(), tmpLevel->getChannelId());
+	bot->sqlLevelCache.erase(thePair);
 
 	return true ;
 } 

@@ -8,7 +8,7 @@
  *
  * Caveats: None
  *
- * $Id: REGISTERCommand.cc,v 1.3 2001/01/05 06:44:05 gte Exp $
+ * $Id: REGISTERCommand.cc,v 1.4 2001/01/14 18:21:31 gte Exp $
  */
  
 #include	<string>
@@ -20,7 +20,7 @@
 #include	"libpq++.h"
 #include	"Network.h"
 
-const char REGISTERCommand_cc_rcsId[] = "$Id: REGISTERCommand.cc,v 1.3 2001/01/05 06:44:05 gte Exp $" ;
+const char REGISTERCommand_cc_rcsId[] = "$Id: REGISTERCommand.cc,v 1.4 2001/01/14 18:21:31 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -106,10 +106,10 @@ bool REGISTERCommand::Exec( iClient* theClient, const string& Message )
 		bot->logAdminMessage("%s has registered %s", theUser->getUserName().c_str(), st[1].c_str());
 		bot->Notice(theClient, "Registered channel %s", st[1].c_str());
 	} else {
-		bot->Notice(theClient, "Something went wrong: %s", bot->SQLDb->ErrorMessage()); // Log to msgchan here.
+		bot->Notice(theClient, "Something went wrong: %s", bot->SQLDb->ErrorMessage()); // Log to msgchan here?
  	}
 
-	bot->Join(st[1]);
+	bot->Join(st[1], "+tn", ::time(NULL), true);
 	return true ;
 } 
 
