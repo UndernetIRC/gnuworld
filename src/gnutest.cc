@@ -256,6 +256,27 @@ else if( st[ 0 ] == "deop" )
 
 	DeOp( theChan, theClient ) ;
 	}
+else if( st[ 0 ] == "schedule" )
+	{
+	Channel* theChan = Network->findChannel( st[ 1 ] ) ;
+	if( NULL == theChan )
+		{
+		Notice( theClient, "Unable to find channel" ) ;
+		return 0 ;
+		}
+
+	xServer::timerID id = MyUplink->RegisterTimer( ::time( 0 ) + 60,
+		this ) ;
+	if( 0 == id )
+		{
+		Notice( theClient, "Failed" ) ;
+		}
+	else
+		{
+		Notice( theClient, "Scheduled for 1 minute from now" ) ;
+		timerChan = theChan->getName() ;
+		}
+	}
 
 return xClient::OnPrivateMessage( theClient, message ) ;
 }
@@ -306,6 +327,21 @@ bool gnutest::removeChan( Channel* theChan )
 std::remove( channels.begin(), channels.end(), theChan->getName() ) ;
 
 return true ;
+}
+
+int gnutest::OnTimer( xServer::timerID id, void* data )
+{
+Channel* theChan = Network->findChannel( timerChan ) ;
+if( NULL == theChan )
+	{
+	elog	<< "gnutest::OnTimer> Unable to find channel: "
+		<< timerChan << endl ;
+	return 0 ;
+	}
+
+Message( theChan, "Respect my authoritah!" ) ;
+
+return 0 ;
 }
 
 } // namespace gnuworld

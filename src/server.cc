@@ -39,7 +39,7 @@
 //#include	"moduleLoader.h"
 
 const char xServer_h_rcsId[] = __XSERVER_H ;
-const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.20 2000/08/05 00:06:27 dan_karrels Exp $" ;
+const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.21 2000/08/05 17:23:34 dan_karrels Exp $" ;
 
 using std::string ;
 using std::vector ;
@@ -4124,7 +4124,7 @@ xServer::timerID xServer::RegisterTimer( const time_t& absTime,
   assert( theClient != 0 ) ;
 #endif
 
-if( absTime >= ::time( 0 ) )
+if( absTime <= ::time( 0 ) )
 	{
 	return 0 ;
 	}

@@ -33,7 +33,7 @@ const string& ChannelUser::getHostName() const
 return theClient->getInsecureHost() ;
 }
 
-const long int& ChannelUser::getIP() const
+const unsigned int& ChannelUser::getIP() const
 {
 return theClient->getIP() ;
 }

@@ -27,7 +27,7 @@
 #include	"events.h"
 
 const char xClient_h_rcsId[] = __XCLIENT_H ;
-const char xClient_cc_rcsId[] = "$Id: client.cc,v 1.11 2000/08/04 23:39:09 dan_karrels Exp $" ;
+const char xClient_cc_rcsId[] = "$Id: client.cc,v 1.12 2000/08/05 17:23:34 dan_karrels Exp $" ;
 
 using std::string ;
 using std::strstream ;
@@ -294,6 +294,22 @@ if( Connected && MyUplink && Message && Message[ 0 ] != 0 )
 		(Channel[ 0 ] == '#') ? (Channel.c_str() + 1) :
 			Channel.c_str(),
 		buffer ) ;
+	}
+return -1 ;
+}
+
+int xClient::Message( const Channel* theChan, const string& Message )
+{
+#ifndef NDEBUG
+  assert( theChan != 0 ) ;
+#endif
+
+if( Connected && MyUplink )
+	{
+	return MyUplink->Write( "%s P %s :%s",
+		getCharYYXXX().c_str(),
+		theChan->getName().c_str(),
+		Message.c_str() ) ;
 	}
 return -1 ;
 }

@@ -105,7 +105,7 @@ public:
 	/**
 	 * Retrieve this channel user's IP.
 	 */
-	inline const long int& getIP() const ;
+	inline const unsigned int& getIP() const ;
 
 	/**
 	 * Retrieve this channel user's integer representation

@@ -3,7 +3,7 @@
  */
 
 #ifndef __XCLIENT_H
-#define __XCLIENT_H "$Id: client.h,v 1.7 2000/08/04 23:39:09 dan_karrels Exp $"
+#define __XCLIENT_H "$Id: client.h,v 1.8 2000/08/05 17:23:34 dan_karrels Exp $"
 
 #include	<string>
 
@@ -326,6 +326,12 @@ public:
 	 * to a channel.
 	 */
 	virtual int Message( const string& Channel, const char* Message, ... ) ;
+
+	/**
+	 * This format of Message will write a string of data
+	 * to a channel.
+	 */
+	virtual int Message( const Channel* theChan, const string& Message ) ;
 
 	/**
 	 * Notice will send a NOTICE command to the given iClient.
