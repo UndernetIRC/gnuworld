@@ -1,9 +1,9 @@
 #ifndef __CSERVICE_H
-#define __CSERVICE_H "$Id: cservice.h,v 1.71 2001/09/12 21:02:47 gte Exp $"
+#define __CSERVICE_H "$Id: cservice.h,v 1.72 2001/09/23 02:18:52 gte Exp $"
 
 #include	<string>
 #include	<vector>
-#include	<hash_map>
+#include	<hash_map.h>
 #include	<map>
 #include	<ctime>
 
