@@ -2,7 +2,7 @@
  * cservice.cc
  * Author: Greg Sikorski
  * Purpose: Overall control client.
- * $Id: cservice.cc,v 1.224 2002/12/08 19:41:53 gte Exp $
+ * $Id: cservice.cc,v 1.225 2002/12/23 22:10:22 gte Exp $
  */
 
 #include	<new>
@@ -1609,6 +1609,16 @@ void cservice::cacheExpireUsers()
 	while (ptr != sqlUserCache.end())
 	{
 		tmpUser = ptr->second;
+		/*
+		 * Have a quick look if this person has been logged in more than 12hrs.
+		 * If so, update the last-seen so their account doesn't expire after xx days. ;)
+		 */
+		if ( tmpUser->isAuthed() && ((tmpUser->getInstantiatedTS() + 43200) < ::time(NULL))  )
+		{
+			tmpUser->setLastSeen(currentTime());
+			tmpUser->setInstantiatedTS(::time(NULL));
+		}
+
 		/*
 	 	 *  If this user has been idle one hour, and currently
 		 *  isn't logged in, boot him out the window.
@@ -3977,9 +3987,6 @@ void cservice::doCoderStats(iClient* theClient)
 		userCacheHits,
 		userEf);
 
-	Notice(theClient, "Total number of clients on network: %i",
-		Network->clientList_size());
-
 	/*
 	 * Count how many users are actually logged in right now.
 	 */
@@ -3994,9 +4001,42 @@ void cservice::doCoderStats(iClient* theClient)
 		++ptr;
 	}
 
+	/*
+	 * Iterate over all the clients on the network and
+	 * see how many are +x.
+	 */
+
+	unsigned int plusXCount = 0;
+	unsigned int plusWCount = 0;
+	unsigned int plusDCount = 0;
+
+	xNetwork::const_clientIterator ptr2 = Network->clients_begin();
+	while(ptr2 != Network->clients_end())
+	{
+		iClient* tmpClient = ptr2->second;
+		if (tmpClient->isModeX()) plusXCount++;
+		if (tmpClient->isModeW()) plusWCount++;
+		if (tmpClient->isModeD()) plusWCount++;
+		++ptr2;
+	}
+
+	Notice(theClient, "--- Total clients : %i", Network->clientList_size());
+
 	float authTotal = ((float)authCount / (float)Network->clientList_size()) * 100;
-	Notice(theClient, "Total number of clients authenticated with me: %i (%.2f%%)",
+	Notice(theClient, "--- Total Auth'd  : %i (%.2f%% of total)",
 		authCount, authTotal);
+
+	float plusXTotal = ((float)plusXCount / (float)Network->clientList_size()) * 100;
+	Notice(theClient, "--- Total umode +x: %i (%.2f%% of total)",
+		plusXCount, plusXTotal);
+
+	float plusWTotal = ((float)plusWCount / (float)Network->clientList_size()) * 100;
+	Notice(theClient, "--- Total umode +w: %i (%.2f%% of total)",
+		plusWCount, plusWTotal);
+
+	float plusDTotal = ((float)plusDCount / (float)Network->clientList_size()) * 100;
+	Notice(theClient, "--- Total umode +d: %i (%.2f%% of total)",
+		plusDCount, plusDTotal);
 
 	float joinTotal = ((float)joinCount / (float)Network->channelList_size()) * 100;
 	Notice(theClient, "I am in %i channels out of %i on the network. (%.2f%%)",

@@ -1,7 +1,7 @@
 /* sqlUser.h */
 
 #ifndef __SQLUSER_H
-#define __SQLUSER_H "$Id: sqlUser.h,v 1.29 2002/04/27 16:11:29 dan_karrels Exp $"
+#define __SQLUSER_H "$Id: sqlUser.h,v 1.30 2002/12/23 22:10:22 gte Exp $"
 
 #include	<string>
 #include	<vector>
@@ -75,6 +75,9 @@ public:
 	inline const time_t&		getLastUsed() const
 		{ return last_used ; }
 
+	inline const time_t&		getInstantiatedTS() const
+		{ return instantiated_ts ; }
+
 	inline const string&		getEmail() const
 		{ return email ; }
 
@@ -125,11 +128,17 @@ public:
 	inline void setLastSeen( const time_t& _last_seen, const string& _last_hostmask )
 		{ last_seen = _last_seen; last_hostmask = _last_hostmask ; commitLastSeen(); }
 
+	inline void setLastSeen( const time_t& _last_seen )
+		{ last_seen = _last_seen; commitLastSeen(); }
+
 	inline void setLanguageId( const unsigned int& _language_id )
 		{ language_id = _language_id; }
 
 	inline void setLastUsed( const time_t& _last_used )
 		{ last_used = _last_used; }
+
+	inline void setInstantiatedTS( const time_t& _instantiated_ts)
+		{ instantiated_ts = _instantiated_ts; }
 
 	inline void setEmail( const string& _email )
 		{ email = _email; }
@@ -177,6 +186,7 @@ protected:
 	string		last_updated_by ;
 	time_t		last_updated ;
 	time_t		last_used;
+	time_t		instantiated_ts;
 	string		email ;
 	string		last_hostmask ;
 	unsigned int maxlogins;
