@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_C.cc,v 1.11 2002/07/05 01:10:05 dan_karrels Exp $
+ * $Id: msg_C.cc,v 1.12 2002/07/31 13:53:52 dan_karrels Exp $
  */
 
 #include	<new>
@@ -32,7 +32,6 @@
 #include	"events.h"
 
 #include	"ELog.h"
-#include	"Socket.h"
 #include	"StringTokenizer.h"
 #include	"xparameters.h"
 #include	"iClient.h"
@@ -41,13 +40,12 @@
 #include	"ServerCommandHandler.h"
 
 const char ELog_h_rcsId[] = __ELOG_H ;
-const char Socket_h_rcsId[] = __SOCKET_H ;
 const char StringTokenizer_h_rcsId[] = __STRINGTOKENIZER_H ;
 const char xparameters_h_rcsId[] = __XPARAMETERS_H ;
 const char iClient_h_rcsId[] = __ICLIENT_H ;
 const char Channel_h_rcsId[] = __CHANNEL_H ;
 const char ChannelUser_h_rcsId[] = __CHANNELUSER_H ;
-const char msg_C_cc_rcsId[] = "$Id: msg_C.cc,v 1.11 2002/07/05 01:10:05 dan_karrels Exp $" ;
+const char msg_C_cc_rcsId[] = "$Id: msg_C.cc,v 1.12 2002/07/31 13:53:52 dan_karrels Exp $" ;
 
 namespace gnuworld
 {

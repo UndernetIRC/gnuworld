@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server.cc,v 1.142 2002/07/31 03:14:05 dan_karrels Exp $
+ * $Id: server.cc,v 1.143 2002/07/31 13:53:53 dan_karrels Exp $
  */
 
 #include	<sys/time.h>
@@ -61,7 +61,6 @@
 #include	"Gline.h"
 #include	"match.h"
 #include	"ELog.h"
-#include	"Socket.h"
 #include	"StringTokenizer.h"
 #include	"xparameters.h"
 #include	"moduleLoader.h"
@@ -73,7 +72,7 @@
 #include	"Connection.h"
 
 const char server_h_rcsId[] = __SERVER_H ;
-const char server_cc_rcsId[] = "$Id: server.cc,v 1.142 2002/07/31 03:14:05 dan_karrels Exp $" ;
+const char server_cc_rcsId[] = "$Id: server.cc,v 1.143 2002/07/31 13:53:53 dan_karrels Exp $" ;
 const char config_h_rcsId[] = __CONFIG_H ;
 const char misc_h_rcsId[] = __MISC_H ;
 const char events_h_rcsId[] = __EVENTS_H ;
@@ -85,7 +84,6 @@ const char EConfig_h_rcsId[] = __ECONFIG_H ;
 const char Gline_h_rcsId[] = __GLINE_H ;
 const char match_h_rcsId[] = __MATCH_H ;
 const char ELog_h_rcsId[] = __ELOG_H ;
-const char Socket_h_rcsId[] = __SOCKET_H ;
 const char StringTokenizer_h_rcsId[] = __STRINGTOKENIZER_H ;
 const char xParameters_h_rcsId[] = __XPARAMETERS_H ;
 const char moduleLoader_h_rcsId[] = __MODULELOADER_H ;

@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: main.cc,v 1.44 2002/07/16 15:30:49 dan_karrels Exp $
+ * $Id: main.cc,v 1.45 2002/07/31 13:53:52 dan_karrels Exp $
  */
 
 #include	<new>
@@ -36,15 +36,13 @@
 
 #include	"config.h"
 #include	"ELog.h"
-#include	"FileSocket.h" 
 #include	"server.h"
 #include	"moduleLoader.h"
 #include	"md5hash.h"
 
 const char config_h_rcsId[] = __CONFIG_H ;
-const char main_cc_rcsId[] = "$Id: main.cc,v 1.44 2002/07/16 15:30:49 dan_karrels Exp $" ;
+const char main_cc_rcsId[] = "$Id: main.cc,v 1.45 2002/07/31 13:53:52 dan_karrels Exp $" ;
 const char ELog_h_rcsId[] = __ELOG_H ;
-const char FileSocket_h_rcsId[] = __FILESOCKET_H ;
 const char server_h_rcsId[] = __SERVER_H ;
 const char moduleLoader_h_rcsId[] = __MODULELOADER_H ;
 
@@ -261,7 +259,7 @@ initializeSystem() ;
 // Run in simulation mode?
 if( !simFileName.empty() )
 	{
-//	setSocket( new FileSocket( simFileName ) ) ;
+	// TODO
 	}
 }
 
