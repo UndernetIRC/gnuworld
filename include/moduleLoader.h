@@ -1,5 +1,5 @@
 #ifndef __MODLOADER_H
-#define __MODLOADER_H "$Id: moduleLoader.h,v 1.3 2000/12/10 00:10:16 dan_karrels Exp $"
+#define __MODLOADER_H "$Id: moduleLoader.h,v 1.4 2000/12/17 00:27:35 dan_karrels Exp $"
 
 #include	<string>
 
@@ -56,7 +56,7 @@ public:
 	 */
 	modType loadObject( const string& configFileName )
 	{
-	modFunc = (GNUWModuleFunc) ::dlsym(moduleHandle, "_gnuwinit");
+	modFunc = (GNUWModuleFunc) ::dlsym(moduleHandle, "__gnuwinit");
 
 	const char* error = ::dlerror(); 
  	if( error != NULL )
