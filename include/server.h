@@ -17,7 +17,7 @@
  */
 
 #ifndef __SERVER_H
-#define __SERVER_H "$Id: server.h,v 1.54 2002/01/12 21:42:49 gte Exp $"
+#define __SERVER_H "$Id: server.h,v 1.55 2002/01/17 20:03:59 mrbean_ Exp $"
 
 #include	<string>
 #include	<vector>
@@ -325,12 +325,13 @@ public:
 	virtual bool setGline( const string& setBy,
 		const string& userHost,
 		const string& reason,
-		const time_t& duration ) ;
+		const time_t& duration, const xClient* setClient = NULL ) ;
 
 	/**
 	 * Remove a network gline and update internal gline table.
 	 */
-	virtual bool removeGline( const string& userHost ) ;
+	virtual bool removeGline( const string& userHost,
+		const  xClient* remClient = NULL) ;
 
 	/**
 	 * Find a gline by lexical searching, case insensitive.
@@ -555,7 +556,8 @@ public:
 	 * events.
 	 */
 	virtual void PostEvent( const eventType&,
-		void* = 0, void* = 0, void* = 0, void* = 0 ) ;
+		void* = 0, void* = 0, void* = 0, void* = 0 ,
+		const xClient* ourClient = 0) ;
 
 	/**
 	 * Post a channel event to the rest of the system.  Note

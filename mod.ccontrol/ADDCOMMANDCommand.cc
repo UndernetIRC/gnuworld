@@ -15,7 +15,7 @@
 #include        "ccUser.h"
 #include	"misc.h"
 
-const char ADDCOMMANDCommand_cc_rcsId[] = "$Id: ADDCOMMANDCommand.cc,v 1.20 2001/12/23 09:07:57 mrbean_ Exp $";
+const char ADDCOMMANDCommand_cc_rcsId[] = "$Id: ADDCOMMANDCommand.cc,v 1.21 2002/01/17 20:04:04 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -149,7 +149,7 @@ else if(theUser->gotAccess(Comm))
 
 //Add the command and update the user db record	
 theUser->addCommand(Comm);
-theUser->setLast_Updated_By(theClient->getNickUserHost());
+theUser->setLast_Updated_By(bot->removeSqlChars(theClient->getNickUserHost()));
 if(theUser->Update())
 	{
 	bot->Notice( theClient,

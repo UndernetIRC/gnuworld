@@ -13,8 +13,9 @@
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 #include	"Constants.h"
+#include	"Network.h"
 
-const char INVITECommand_cc_rcsId[] = "$Id: INVITECommand.cc,v 1.11 2001/12/28 16:28:47 mrbean_ Exp $";
+const char INVITECommand_cc_rcsId[] = "$Id: INVITECommand.cc,v 1.12 2002/01/17 20:04:05 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -45,19 +46,43 @@ ccUser* tmpUser = bot->IsAuth(theClient);
 if(tmpUser)
         bot->MsgChanLog("(%s) - %s : INVITE %s\n",tmpUser->getUserName().c_str()
                         ,theClient->getNickUserHost().c_str(),st.assemble(1).c_str());
+else
+        bot->MsgChanLog("(Unknown) - %s : INVITE %s\n"
+                        ,theClient->getNickUserHost().c_str(),st.assemble(1).c_str());
+
 //If the channel doesnt begin with # add it 
 string chanName = st[ 1 ] ;
 if( chanName[ 0 ] != '#' )
 	{
 	chanName.insert( chanName.begin(), '#' ) ;
 	}
+string invNum;
+if(st.size() > 2)
+	{
+	iClient* tmpClient = Network->findNick(st[2]);
+	if(tmpClient == NULL)
+		{
+		bot->Notice(theClient,"I cant find %s anywere",st[2].c_str());
+		return true;
+		}
+	if((!tmpUser) && (tmpClient != theClient))
+		{
+		bot->Notice(theClient,"You must login to invite someone else!");
+		return true;
+		}
 
+	invNum = tmpClient->getNickName();
+	}
+else
+	{
+	invNum = theClient->getNickName();
+	}
 char buf[ 512 ] = { 0 } ;
 
 // Invite buffer
 sprintf( buf, "%s I %s :%s\n",
 	bot->getCharYYXXX().c_str(),
-	theClient->getNickName().c_str(),
+	invNum.c_str(),
 	chanName.c_str() ) ;
 
 if( bot->isOperChan( chanName ) )

@@ -52,6 +52,7 @@ namespace gline
         const unsigned int MFGLINE_TIME = 14*3600*24;
         const unsigned int PERM_TIME = 730*3600*24;
         const unsigned int MFU_TIME = 100*3600*24;
+	const unsigned int NOLOGIN_TIME = 3600;	
 
         }
 

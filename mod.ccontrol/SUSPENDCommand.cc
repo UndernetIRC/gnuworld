@@ -13,7 +13,7 @@
 #include	"StringTokenizer.h"
 #include	"ccUser.h"
 
-const char SUSPENDCommand_cc_rcsId[] = "$Id: SUSPENDCommand.cc,v 1.8 2001/12/23 09:07:57 mrbean_ Exp $";
+const char SUSPENDCommand_cc_rcsId[] = "$Id: SUSPENDCommand.cc,v 1.9 2002/01/17 20:04:05 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -147,7 +147,7 @@ if(!strcasecmp(st[3],"-l"))
 	}
 //Set the suspention and update the db
 tmpUser->setSuspendExpires(Len + time( 0 ));
-tmpUser->setSuspendedBy(theClient->getNickUserHost());	    
+tmpUser->setSuspendedBy(bot->removeSqlChars(theClient->getNickUserHost()));	    
 tmpUser->setIsSuspended(true);
 tmpUser->setSuspendLevel(Level);
 tmpUser->setSuspendReason(bot->removeSqlChars(st.assemble(ResPos)));	

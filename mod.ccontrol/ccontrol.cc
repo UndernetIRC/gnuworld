@@ -37,7 +37,7 @@
 #include	"ip.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.119 2002/01/12 10:00:40 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.120 2002/01/17 20:04:05 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -224,7 +224,7 @@ RegisterCommand( new CHANINFOCommand( this, "CHANINFO", "<channel>"
 RegisterCommand( new ACCESSCommand( this, "ACCESS",
 	"Obtain the access list",commandLevel::flg_ACCESS,false,false,true,operLevel::OPERLEVEL,false ) ) ;
 RegisterCommand( new LOGINCommand( this, "LOGIN", "<USER> <PASS> "
-	"Authenticate with the bot",commandLevel::flg_LOGIN,false,true,true,operLevel::OPERLEVEL,false ) ) ;
+	"Authenticate with the bot",commandLevel::flg_NOLOGIN,false,true,true,operLevel::OPERLEVEL,false ) ) ;
 RegisterCommand( new DEAUTHCommand( this, "DEAUTH", ""
 	"Deauthenticate with the bot",commandLevel::flg_DEAUTH,false,false,true,operLevel::OPERLEVEL,false ) ) ;
 RegisterCommand( new ADDUSERCommand( this, "ADDUSER", "<USER> <OPERTYPE> [SERVER*] <PASS> "
@@ -264,7 +264,7 @@ RegisterCommand( new REMSERVERCommand( this, "REMSERVER", "<Server name>"
 RegisterCommand( new CHECKNETCommand( this, "CHECKNET", ""
 	"Checks if all known servers are in place",commandLevel::flg_CHECKNET,false,false,false,operLevel::OPERLEVEL,true ) ) ;
 RegisterCommand( new LASTCOMCommand( this, "LASTCOM", "[number of lines to show]"
-	"Post you the bot logs",commandLevel::flg_LASTCOM,false,false,true,operLevel::OPERLEVEL, true) ) ;
+	"Post you the bot logs",commandLevel::flg_LASTCOM,false,false,false,operLevel::OPERLEVEL, true) ) ;
 RegisterCommand( new FORCEGLINECommand( this, "FORCEGLINE", "<user@host> <duration>[time units] <reason> "
 	"Gline a given user@host for the given reason",commandLevel::flg_FGLINE,false,false,false,operLevel::OPERLEVEL,true ) ) ;
 RegisterCommand( new EXCEPTIONCommand( this, "EXCEPTIONS", "(list / add / del) [host mask]"
@@ -289,17 +289,21 @@ RegisterCommand( new SHUTDOWNCommand( this, "SHUTDOWN", " <REASON> Shutdown the 
         ,commandLevel::flg_SHUTDOWN,false,false,false,operLevel::CODERLEVEL,true ) ) ;
 
 RegisterCommand( new SCANCommand( this, "SCAN", " -h <host> / -m <real name> [-v]"
-		" Scans for all users which much a certain host / real name ",commandLevel::flg_SCAN,false,false,false,operLevel::OPERLEVEL,true ) ) ;
+		" Scans for all users which much a certain host / real name ",commandLevel::flg_NOLOGIN,false,false,false,operLevel::OPERLEVEL,true ) ) ;
 
 loadCommands();
 loadGlines();
-loadExceptions();
+if(!loadExceptions())
+	{
+	elog << "Error while loading exceptions!!!! , shutting down" << endl;
+	::exit(1);
+	}
+	
 loadUsers();
 loadServers();
 
 connectCount = 0;
 connectRetry = 5;
-removingGline = false;
 
 }
 
@@ -437,17 +441,12 @@ if( st.empty() )
 	Notice( theClient, "Incomplete command" ) ;
 	return 0 ;
 	}
-// This is no longer necessary, but oh well *shrug*
+
 const string Command = string_upper( st[ 0 ] ) ;
 
-/*if(Command == "351")
-	{
-	MsgChanLog("351 ! %s\n",st.assemble(0).c_str());
-	return xClient::OnPrivateMessage( theClient, Message ) ;
-	}*/
 ccUser* theUser = IsAuth(theClient);
 
-if(!theUser)
+if((!theUser) && !(theClient->isOper()))
 	{ //We need to add the flood points for this user
 	ccFloodData* floodData = (static_cast< ccUserData* >(
 	theClient->getCustomData(this) ))->getFlood() ;
@@ -457,8 +456,9 @@ if(!theUser)
 	
 		MsgChanLog("[FLOOD MESSAGE]: %s has been ignored"
 			,theClient->getNickName().c_str());
-		return false;
 		}
+	
+	return xClient::OnPrivateMessage( theClient, Message ) ;
 	}
 
 
@@ -479,25 +479,24 @@ if( commHandler == command_end() )
 
 int ComAccess = commHandler->second->getFlags();
 
-//bool ShouldntLog = ComAccess & commandLevel::flg_NOLOG;
+if((!theUser) && !(ComAccess & commandLevel::flg_NOLOGIN))
+	{//The user isnt authenticated, 
+	 //and he must be to run this command
+	 Notice(theClient,"Sorry, but you must be authenticated to run this command");
+	 return xClient::OnPrivateMessage( theClient, Message ) ;
+	}	 	 
 
-bool NeedOp = ((commHandler->second->getNeedOp()) && !(theClient->isOper()) && (ComAccess) && (theUser->getNeedOp()));
-
-if(NeedOp)
+if((theUser) && (!theClient->isOper()) 
+    && (commHandler->second->getNeedOp()) && (theUser->getNeedOp()))
 	{
 	Notice(theClient,
 		"You must be operd up to use this command");
 	}
-else if((!theUser) && (ComAccess))
-	{
-	//User who are not logged in, are ignored
-	return xClient::OnPrivateMessage( theClient, Message ) ;
-	}
-else if( (ComAccess) && !(theUser->gotAccess(commHandler->second)))
+else if( (ComAccess) && (theUser) && !(theUser->gotAccess(commHandler->second)))
 	{
 	Notice( theClient, "You dont have access to that command" ) ;
 	}
-else if(( isSuspended(theUser) ) && ( ComAccess ) )
+else if(( (theUser) && isSuspended(theUser) ) && ( ComAccess ) )
 		{
 		Notice( theClient,
 			"Sorry but you are suspended");
@@ -511,7 +510,12 @@ else
 	{
 	// Log the command
 	if(!commHandler->second->getNoLog()) //Dont log command which arent suppose to be logged
-		DailyLog(theUser,"%s",Message.c_str());
+		{	
+		if(theUser)
+			DailyLog(theUser,"%s",Message.c_str());
+		else
+		    	DailyLog(theClient,"%s",Message.c_str());
+		}			
 	// Execute the command handler
 	commHandler->second->Exec( theClient, Message) ;
 	}		
@@ -521,7 +525,6 @@ return xClient::OnPrivateMessage( theClient, Message ) ;
 int ccontrol::OnServerMessage( iServer* Server, const string& Message,
 	bool )
 {
-//elog << "On server message : " << Message << endl;
 StringTokenizer st( Message ) ;
 
 if(st.size() < 2)
@@ -537,7 +540,6 @@ if(!strcasecmp(st[1],"351"))
 		elog << "Invalid number of parameters on 351! :" << Message << endl;
 	        return xClient::OnServerMessage(Server,Message);
 		}
-		
 	ccServer* tmpServer = serversMap[Server->getName()];
 	
 	if(tmpServer)
@@ -760,11 +762,11 @@ switch( theEvent )
 			}
 
 		Gline* newG = static_cast< Gline* >(Data1);
-		if((removingGline) //Avoid adding our own glines twice
+	/*	if((removingGline) //Avoid adding our own glines twice
 		    && (!strcasecmp(rGlineHost,newG->getUserHost())))
 		    {
 		    return 0;
-		    }
+		    }*/
 
 		ccGline* newGline = findGline(newG->getUserHost());
 		if(!newGline)
@@ -794,11 +796,11 @@ switch( theEvent )
 			}
 			
 		Gline* newG = static_cast< Gline* >(Data1);
-		if((removingGline) //Avoid removing our own glines twice
+/*		if((removingGline) //Avoid removing our own glines twice
 		    && (!strcasecmp(rGlineHost,newG->getUserHost())))
 		    {
 		    return 0;
-		    }
+		    }*/
 		ccGline* newGline = findGline(newG->getUserHost());
 		if(newGline)
 			{
@@ -873,12 +875,12 @@ switch( theEvent )
 							tmpGline->loadData(tmpGline->getHost());
 							addGline(tmpGline);
 							}
-						setRemoving(tmpGline->getHost());
+						//setRemoving(tmpGline->getHost());
 						MyUplink->setGline( nickName,
 								tmpGline->getHost(),
 								tmpGline->getReason(),
-								tmpGline->getExpires() - ::time(0) ) ;
-						unSetRemoving();*/
+								tmpGline->getExpires() - ::time(0) , this) ;
+						//unSetRemoving();*/
 						}	
 					else
 						{
@@ -916,11 +918,11 @@ switch( theEvent )
 					{
 					//addGline(tempGline);
 					glSet = true;
-					setRemoving(tempGline->getHost());
+					//setRemoving(tempGline->getHost());
 					MyUplink->setGline(tempGline->getAddedBy()
 					,tempGline->getHost(),tempGline->getReason()
-					,tempGline->getExpires() - ::time(0));
-					unSetRemoving();
+					,tempGline->getExpires() - ::time(0),this);
+					//unSetRemoving();
 					}
 				}			
 			}
@@ -1152,7 +1154,7 @@ return true ;
 
 ccUser* ccontrol::IsAuth( const iClient* theClient ) 
 {
-return (static_cast<ccUserData*>(theClient->getCustomData(this)))->getDbUser() ;
+return (static_cast< ccUserData* >(theClient->getCustomData(this)))->getDbUser() ;
 }
 
 ccUser* ccontrol::IsAuth( const string& Numeric ) 
@@ -1843,7 +1845,115 @@ va_list list;
 va_start( list, Log ) ;
 vsprintf( buffer, Log, list ) ;
 va_end( list ) ;
-iClient *theClient = Network->findClient(Oper->getNumeric());
+iClient* theClient;
+if(Oper)
+	{	
+	theClient = Network->findClient(Oper->getNumeric());
+	}
+buffer[512]= '\0';
+static const char *Main = "INSERT into comlog (ts,oper,command) VALUES (now()::abstime::int4,'";
+StringTokenizer st(buffer);
+commandIterator tCommand = findCommand((string_upper(st[0])));
+string log;
+if(tCommand != command_end())
+	{
+	if(!strcasecmp(tCommand->second->getRealName(),"LOGIN"))
+		{
+		log.assign(string("LOGIN ") + st[1] + string(" *****"));
+		}
+	else if(!strcasecmp(tCommand->second->getRealName(),"NEWPASS"))
+		{
+		log.assign("NEWPASS *****");
+		}
+	else if(!strcasecmp(tCommand->second->getRealName(),"MODUSER"))
+		{
+		if(st.size() > 2)
+			{
+			log.assign("MODUSER " + st[1] + " ");
+			unsigned int place = 2;
+			while(place < st.size())
+				{
+				if(!strcasecmp(st[place],"-p"))
+					{
+					log.append(" -p ******");
+					place+=2;
+					}
+				else	
+					{
+					log.append(" " + st[place]);
+					place++;
+					}
+				}
+			}
+		}
+	else if(!strcasecmp(tCommand->second->getRealName(),"ADDUSER"))
+		{
+		if(st.size() > 3)
+			{
+			log.assign("ADDUSER " + st[1] + string(" ") + st[2]+ " *****");
+			}
+		}
+	else
+		{
+		log.assign(buffer);
+		}
+	}
+else
+	{
+	log.assign(buffer);
+	}
+strcpy(buffer,log.c_str());
+					
+strstream theQuery;
+theQuery	<< Main;
+if(Oper)
+	{
+	theQuery << Oper->getUserName();
+	}
+else
+	{
+	theQuery << "Unknown";
+	}
+theQuery	<< " (" << removeSqlChars(theClient->getNickUserHost()) <<")','"
+		<< removeSqlChars(buffer) << "')"
+		<< ends;
+
+elog	<< "ccontrol::DailyLog> "
+	<< theQuery.str()
+	<< endl; 
+
+ExecStatusType status = SQLDb->Exec( theQuery.str() ) ;
+delete[] theQuery.str() ;
+
+if( PGRES_COMMAND_OK == status ) 
+	{
+	return true;
+	}
+else
+	{
+	elog	<< "ccontrol::DailyLog> SQL Error: "
+		<< SQLDb->ErrorMessage()
+		<< endl ;
+	return false;
+	}
+
+return true;
+}
+
+bool ccontrol::DailyLog(iClient* theClient, const char *Log, ... )
+{
+
+if(!dbConnected)
+	{
+	return false;
+	}
+
+char buffer[ 1024 ] = { 0 } ;
+va_list list;
+
+va_start( list, Log ) ;
+vsprintf( buffer, Log, list ) ;
+va_end( list ) ;
 buffer[512]= '\0';
 static const char *Main = "INSERT into comlog (ts,oper,command) VALUES (now()::abstime::int4,'";
 StringTokenizer st(buffer);
@@ -1900,8 +2010,8 @@ strcpy(buffer,log.c_str());
 					
 strstream theQuery;
 theQuery	<< Main
-		<< Oper->getUserName() 
-		<< " (" << theClient->getNickUserHost() <<")','"
+		<< "Unknown"
+		<< " (" << removeSqlChars(theClient->getNickUserHost()) <<")','"
 		<< removeSqlChars(buffer) << "')"
 		<< ends;
 
@@ -2189,9 +2299,9 @@ for(glineIterator ptr = glineList.begin();ptr != glineList.end();)
 
 		{
 		//remove the gline from the core
-		setRemoving((*ptr)->getHost());
-		MyUplink->removeGline((*ptr)->getHost());
-		unSetRemoving();
+		//setRemoving((*ptr)->getHost());
+		MyUplink->removeGline((*ptr)->getHost(),this);
+		//unSetRemoving();
 		//remove the gline from ccontrol structure
 		//finally remove the gline from the database
 		ccGline* tGline = *ptr;
@@ -2228,12 +2338,12 @@ for(glineIterator ptr = glineList.begin(); ptr != glineList.end(); ptr++)
 		{
 		Expires = theGline->getExpires() - ::time(0);
 		}
-	setRemoving(theGline->getHost());
+	//setRemoving(theGline->getHost());
 	MyUplink->setGline(theGline->getAddedBy(),
 		theGline->getHost(),
 		theGline->getReason(),
-		Expires);
-	unSetRemoving();
+		Expires,this);
+	//unSetRemoving();
 	}
 
 return true;
@@ -2488,7 +2598,7 @@ assert(tempException != NULL);
 
 tempException->setHost(removeSqlChars(Host));
 tempException->setConnections(Connections);
-tempException->setAddedBy(theClient->getNickUserHost());
+tempException->setAddedBy(removeSqlChars(theClient->getNickUserHost()));
 tempException->setAddedOn(::time(0));
 
 //Update the database, and the internal list
@@ -2725,7 +2835,7 @@ if( PGRES_TUPLES_OK != status )
 	elog	<< "ccontrol::loadExceptions> SQL Failure: "
 		<< SQLDb->ErrorMessage()
 		<< endl ;
-
+	
 	return false;
 	}
 

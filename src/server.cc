@@ -50,7 +50,7 @@
 #include	"UnloadClientTimerHandler.h"
 
 const char server_h_rcsId[] = __SERVER_H ;
-const char server_cc_rcsId[] = "$Id: server.cc,v 1.123 2002/01/12 21:42:17 gte Exp $" ;
+const char server_cc_rcsId[] = "$Id: server.cc,v 1.124 2002/01/17 20:04:05 mrbean_ Exp $" ;
 const char config_h_rcsId[] = __CONFIG_H ;
 const char misc_h_rcsId[] = __MISC_H ;
 const char events_h_rcsId[] = __EVENTS_H ;
@@ -1139,7 +1139,8 @@ return false ;
  */
 void xServer::PostEvent( const eventType& theEvent,
 	void* Data1, void* Data2,
-	void* Data3, void* Data4 )
+	void* Data3, void* Data4,
+	const xClient* ourClient )
 {
 
 // Make sure the event is valid.
@@ -1158,7 +1159,9 @@ list< xClient* >::iterator ptr = eventList[ theEvent ].begin(),
 for( ; ptr != end ; ++ptr )
 	{
 	// Notify this client of the event
-	(*ptr)->OnEvent( theEvent, Data1, Data2, Data3, Data4 ) ;
+	// if he didnt cause the event to trigger
+	if((*ptr) != ourClient)
+		(*ptr)->OnEvent( theEvent, Data1, Data2, Data3, Data4 ) ;
 	}
 }
 
@@ -1981,7 +1984,7 @@ return strlen( buffer ) ;
 
 }
 
-bool xServer::removeGline( const string& userHost )
+bool xServer::removeGline( const string& userHost, const xClient* remClient )
 {
 
 // This method is true if we find the gline in our internal
@@ -2020,9 +2023,16 @@ if( foundGline )
 	glineList.erase( ptr ) ;
 
 	// Let all clients know that the gline has been removed
-	PostEvent( EVT_REMGLINE,
-		static_cast< void* >( *ptr ) ) ;
-
+	if(remClient)
+		{
+		PostEvent( EVT_REMGLINE,
+			static_cast< void* >( *ptr ), 0,0,0,remClient ) ;
+		}
+	else
+		{
+		PostEvent( EVT_REMGLINE,
+			static_cast< void* >( *ptr ) ) ;
+		}
 	// Deallocate the gline
 	delete *ptr ;
 
@@ -2038,7 +2048,8 @@ bool xServer::setGline(
 	const string& setBy,
 	const string& userHost,
 	const string& reason,
-	const time_t& duration )
+	const time_t& duration,
+	const xClient* setClient )
 {
 
 // Remove any old matches
@@ -2058,8 +2069,16 @@ Write( s ) ;
 delete[] s.str() ;
 
 glineList.push_back( newGline ) ;
-PostEvent( EVT_GLINE,
-	static_cast< void* >( newGline ) ) ;
+if(setClient)
+	{
+	PostEvent( EVT_GLINE,
+		static_cast< void* >( newGline ), 0,0,0,setClient ) ;
+	}
+else
+	{
+	PostEvent( EVT_GLINE,
+		static_cast< void* >( newGline ) ) ;
+	}
 
 return true ;
 }

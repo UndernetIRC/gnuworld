@@ -3,7 +3,7 @@
  */
 
 #ifndef __CCONTROL_H
-#define __CCONTROL_H "$Id: ccontrol.h,v 1.57 2002/01/10 20:31:24 mrbean_ Exp $"
+#define __CCONTROL_H "$Id: ccontrol.h,v 1.58 2002/01/17 20:04:05 mrbean_ Exp $"
 
 
 #include	<string>
@@ -459,6 +459,8 @@ public:
 
 	bool DailyLog( ccUser * , const char *, ... );
 
+	bool DailyLog( iClient * , const char *, ... );
+
 	/**
 	 * This method convers a unix time to ascii time
 	 */
@@ -573,11 +575,6 @@ public:
 
 	void	remServer(ccServer*);
 	
-	inline void	setRemoving(const string& host)
-	{ rGlineHost = host; }	
-	
-	inline void unSetRemoving()
-	{ removingGline = false; }
 	/**
 	 * This is a constant iterator type used to perform a read-only
 	 * iteration of the operchan structure.
@@ -840,9 +837,6 @@ protected:
 	
 	unsigned int		connectRetry;
 	
-	bool			removingGline;
-	
-	string			rGlineHost;
 } ; 
 
 void* initGate( void * );

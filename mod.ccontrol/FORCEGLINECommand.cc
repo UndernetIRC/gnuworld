@@ -18,7 +18,7 @@
 #include	"ELog.h"
 #include	"Constants.h"
 
-const char FORCEGLINECommand_cc_rcsId[] = "$Id: FORCEGLINECommand.cc,v 1.17 2002/01/10 20:31:23 mrbean_ Exp $";
+const char FORCEGLINECommand_cc_rcsId[] = "$Id: FORCEGLINECommand.cc,v 1.18 2002/01/17 20:04:04 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -226,7 +226,7 @@ if(!Ok)
 	return false;
 	}
 // Avoid passing a reference to a temporary variable.
-string nickUserHost = theClient->getNickUserHost() ;
+string nickUserHost = bot->removeSqlChars(theClient->getNickUserHost()) ;
 string Reason = st.assemble( pos + ResStart );
 char Us[100];
 Us[0] = '\0';
@@ -236,12 +236,12 @@ if(Reason.size() > 255)
 	bot->Notice(theClient,"Gline reason can't be more than 255 chars");
 	return false;
 	}
-bot->setRemoving(st[pos]);
+//bot->setRemoving(st[pos]);
 server->setGline( nickUserHost,
 	st[ pos ],
 	st.assemble( pos + ResStart ) + "[" + Us + "]",
-	gLength ) ;
-bot->unSetRemoving();
+	gLength , bot) ;
+//bot->unSetRemoving();
 ccGline *TmpGline = bot->findGline(st[pos]);
 bool Up = false;
 

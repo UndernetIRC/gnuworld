@@ -15,7 +15,7 @@
 #include	"misc.h"
 #include	"Constants.h"
 
-const char MODUSERCommand_cc_rcsId[] = "$Id: MODUSERCommand.cc,v 1.14 2001/12/30 19:35:10 mrbean_ Exp $";
+const char MODUSERCommand_cc_rcsId[] = "$Id: MODUSERCommand.cc,v 1.15 2002/01/17 20:04:05 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -114,7 +114,7 @@ while(pos < st.size())
 			case password::PASS_OK:
 				{
 				tmpUser->setPassword(bot->CryptPass(st[pos+1]));
-				tmpUser->setLast_Updated_By(theClient->getNickUserHost());
+				tmpUser->setLast_Updated_By(bot->removeSqlChars(theClient->getNickUserHost()));
 				if(tmpUser->Update())
 					{
 					bot->Notice(theClient,"Password for %s Changed to %s",st[1].c_str(),st[pos+1].c_str());
@@ -218,7 +218,7 @@ while(pos < st.size())
 			bot->Notice(theClient,"unknown option %s for -gl must be on/off",st[pos+1].c_str());
 			return false;
 			}
-		tmpUser->setLast_Updated_By(theClient->getNickUserHost());
+		tmpUser->setLast_Updated_By(bot->removeSqlChars(theClient->getNickUserHost()));
 		tmpUser->Update();
 		pos += 2;
 		}	
@@ -244,7 +244,7 @@ while(pos < st.size())
 			bot->Notice(theClient,"unknown option %s for -mt must be n/m/notice/message",st[pos+1].c_str());
 			return false;
 			}
-		tmpUser->setLast_Updated_By(theClient->getNickUserHost());
+		tmpUser->setLast_Updated_By(bot->removeSqlChars(theClient->getNickUserHost()));
 		tmpUser->Update();
 		pos += 2;
 		}	
@@ -281,7 +281,7 @@ while(pos < st.size())
 		else
 			{
 			tmpUser->setServer(bot->removeSqlChars(SName));
-			tmpUser->setLast_Updated_By(theClient->getNickUserHost());
+			tmpUser->setLast_Updated_By(bot->removeSqlChars(theClient->getNickUserHost()));
 			if(tmpUser->Update())
 				{
 				bot->Notice(theClient,"%s has been associated with %s",st[1].c_str(),SName.c_str());
@@ -321,7 +321,7 @@ while(pos < st.size())
 			{
 			bot->Notice(theClient,"unknown option %s for -no must be on/off",st[pos+1].c_str());
 			}
-		tmpUser->setLast_Updated_By(theClient->getNickUserHost());
+		tmpUser->setLast_Updated_By(bot->removeSqlChars(theClient->getNickUserHost()));
 		tmpUser->Update();
 		pos += 2;
 		}	
@@ -334,7 +334,7 @@ while(pos < st.size())
 		else
 			{
 			tmpUser->updateAccessFromFlags();
-			tmpUser->setLast_Updated_By(theClient->getNickUserHost());
+			tmpUser->setLast_Updated_By(bot->removeSqlChars(theClient->getNickUserHost()));
 			if(tmpUser->Update())
 				{
 				bot->Notice(theClient,"Successfully updated %s access",st[1].c_str());
@@ -406,6 +406,7 @@ while(pos < st.size())
 			return false;
 			}
 		tmpUser->setEmail(bot->removeSqlChars(st[pos+1]));
+		tmpUser->setLast_Updated_By(bot->removeSqlChars(theClient->getNickUserHost()));
 		if(tmpUser->Update())
 			{
 			bot->Notice(theClient,"Successfully updated %s email address",st[1].c_str());

@@ -24,7 +24,7 @@
 #include	"ccUser.h"
 #include	"Constants.h"
 
-const char GLINECommand_cc_rcsId[] = "$Id: GLINECommand.cc,v 1.33 2002/01/10 20:31:23 mrbean_ Exp $";
+const char GLINECommand_cc_rcsId[] = "$Id: GLINECommand.cc,v 1.34 2002/01/17 20:04:04 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -64,9 +64,14 @@ StringTokenizer::size_type pos = 1 ;
 time_t gLength = bot->getDefaultGlineLength() ;
 
 ccUser* tmpUser = bot->IsAuth(theClient);
+
 if(tmpUser)
         bot->MsgChanLog("(%s) - %s : GLINE %s\n",tmpUser->getUserName().c_str()        
                         ,theClient->getNickUserHost().c_str(),st.assemble(1).c_str());
+else
+        bot->MsgChanLog("(Unknown) - %s : GLINE %s\n"        
+                        ,theClient->getNickUserHost().c_str(),st.assemble(1).c_str());
+
 bool isChan;
 if(st[pos].substr(0,1) == "#")
         isChan = true;
@@ -132,60 +137,74 @@ if(gLength == 0)
 	bot->Notice(theClient,"No duration was set, setting to %d seconds by default",gLength) ;
 	ResStart = 1;
 	}
-string nickUserHost = theClient->getNickUserHost() ;
+string nickUserHost = bot->removeSqlChars(theClient->getNickUserHost()) ;
+	
 if(!isChan)
 	{
 	unsigned int Users;
-	int gCheck = bot->checkGline(string(userName + "@" + hostName),gLength,Users);
-	if(gCheck & gline::NEG_TIME)
+	if(!tmpUser)
 		{
-		bot->Notice(theClient,"Hmmz, dont you think that giving a negative time is kinda stupid?");
-		Ok = false;
-		}	
-	if(gCheck & gline::HUH_NO_HOST)
+		if((string::npos != hostName.find_first_of("*")) 
+		    || (string::npos != hostName.find_first_of("?")) 
+		    || ((unsigned)gLength > gline::NOLOGIN_TIME))
+			{
+			bot->Notice(theClient,"You must login to issue this gline!");
+			return true;
+			}
+		}
+	else
 		{
-		bot->Notice(theClient,"I dont think glining that host is such a good idea, do you?");
-		Ok = false;
-		}
-	if(gCheck & gline::BAD_HOST)
-		{
-		bot->Notice(theClient,"illegal host");
-		Ok = false;
-		}
-	if(gCheck & gline::BAD_TIME)
-		{
-		bot->Notice(theClient,"Glining for more than %d seconds is a NoNo",gline::MFGLINE_TIME);
-		Ok = false;
-		}
-	if((gCheck & gline::FORCE_NEEDED_HOST) && (Ok))
-		{	
-		bot->Notice(theClient,"Please use forcegline to gline that host");
-		Ok = false;
-		}
-	if((gCheck & gline::FORCE_NEEDED_TIME) && (Ok))
-	    	{
-		bot->Notice(theClient,"Please use forcegline to gline for that amount of time");
-		Ok = false;
-		}
-	if((gCheck & gline::FU_NEEDED_USERS) && (Ok))
-		{
-		bot->Notice(theClient,"This host affects more than %d users, please use forcegline",gline::MFGLINE_USERS);
-		Ok = false;
-		}
-	if((gCheck & gline::FU_NEEDED_TIME) && (Ok))
-		{
-		bot->Notice(theClient,"Please user forcegline to gline for more than %d second",gline::MFGLINE_TIME);
-		Ok = false;
-		}
-	if((gCheck & gline::FORCE_NEEDED_WILDTIME) && (Ok))
-		{
-		bot->Notice(theClient,"Wildcard gline for more than %d seconds, must be set with forcegline",gline::MGLINE_WILD_TIME);
-		Ok = false;
-		}
-	if(!Ok)
-		{
-		bot->Notice(theClient,"Please fix all of the above, and try again");
-		return false;
+		int gCheck = bot->checkGline(string(userName + "@" + hostName),gLength,Users);
+		if(gCheck & gline::NEG_TIME)
+			{
+			bot->Notice(theClient,"Hmmz, dont you think that giving a negative time is kinda stupid?");
+			Ok = false;
+			}	
+		if(gCheck & gline::HUH_NO_HOST)
+			{
+			bot->Notice(theClient,"I dont think glining that host is such a good idea, do you?");
+			Ok = false;
+			}
+		if(gCheck & gline::BAD_HOST)
+			{
+			bot->Notice(theClient,"illegal host");
+			Ok = false;
+			}
+		if(gCheck & gline::BAD_TIME)
+			{
+			bot->Notice(theClient,"Glining for more than %d seconds is a NoNo",gline::MFGLINE_TIME);
+			Ok = false;
+			}
+		if((gCheck & gline::FORCE_NEEDED_HOST) && (Ok))
+			{	
+			bot->Notice(theClient,"Please use forcegline to gline that host");
+			Ok = false;
+			}
+		if((gCheck & gline::FORCE_NEEDED_TIME) && (Ok))
+		    	{
+			bot->Notice(theClient,"Please use forcegline to gline for that amount of time");
+			Ok = false;
+			}
+		if((gCheck & gline::FU_NEEDED_USERS) && (Ok))
+			{
+			bot->Notice(theClient,"This host affects more than %d users, please use forcegline",gline::MFGLINE_USERS);
+			Ok = false;
+			}
+		if((gCheck & gline::FU_NEEDED_TIME) && (Ok))
+			{
+			bot->Notice(theClient,"Please user forcegline to gline for more than %d second",gline::MFGLINE_TIME);
+			Ok = false;
+			}
+		if((gCheck & gline::FORCE_NEEDED_WILDTIME) && (Ok))
+			{
+			bot->Notice(theClient,"Wildcard gline for more than %d seconds, must be set with forcegline",gline::MGLINE_WILD_TIME);
+			Ok = false;
+			}
+	    	if(!Ok)
+			{
+			bot->Notice(theClient,"Please fix all of the above, and try again");
+			return false;
+			}
 		}
 	char Us[100];
 	Us[0] = '\0';
@@ -197,12 +216,12 @@ if(!isChan)
 		return false;
 		}
 
-	bot->setRemoving(userName + "@" +hostName);
+	//bot->setRemoving(userName + "@" +hostName);
 	server->setGline( nickUserHost,
 		userName + "@" +hostName,
 		Reason + "[" + Us + "]",
-		gLength ) ;
-	bot->unSetRemoving();
+		gLength ,bot) ;
+	//bot->unSetRemoving();
 	ccGline *TmpGline = bot->findGline(userName + "@" + hostName);
 	bool Up = false;
 	
@@ -232,7 +251,10 @@ if(!isChan)
 //Its a channel gline
 //ccUser *tmpAuth = bot->IsAuth(theClient);
 if(!tmpUser)
+	{
+	bot->Notice(theClient,"You must login to issue this gline!");
 	return false;
+	}
 if(tmpUser->getType() < operLevel::SMTLEVEL)
 	{
 	bot->Notice(theClient,"Only smt+ can use the gline #channel command");
@@ -291,12 +313,12 @@ ptr != theChan->userList_end() ; ++ptr )
 		TmpGline->Insert();
 		TmpGline->loadData(TmpGline->getHost());
 		bot->addGline(TmpGline);
-		bot->setRemoving(TmpGline->getHost());
+//		bot->setRemoving(TmpGline->getHost());
 		server->setGline( nickUserHost,
 			    TmpGline->getHost(),
 			    TmpGline->getReason() + "[" + Us + "]" ,
-			    gLength ) ;
-		bot->unSetRemoving();
+			    gLength ,bot) ;
+//		bot->unSetRemoving();
 		glineList.insert(GlineMapType::value_type(TmpGline->getHost(),0));
 		}
 	}

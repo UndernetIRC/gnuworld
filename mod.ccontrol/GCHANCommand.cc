@@ -22,7 +22,7 @@
 #include 	"time.h"
 #include	"Constants.h"
 
-const char GCHANCommand_cc_rcsId[] = "$Id: GCHANCommand.cc,v 1.7 2002/01/10 20:31:23 mrbean_ Exp $";
+const char GCHANCommand_cc_rcsId[] = "$Id: GCHANCommand.cc,v 1.8 2002/01/17 20:04:04 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -125,7 +125,7 @@ else if(st.size() < 4)
 	}
 
 // Avoid passing a reference to a temporary variable.
-string nickUserHost = theClient->getNickUserHost() ;
+string nickUserHost = bot->removeSqlChars(theClient->getNickUserHost()) ;
 string Reason = st.assemble( pos + ResStart );
 if(Reason.size() > 255)
 	{
@@ -133,12 +133,12 @@ if(Reason.size() > 255)
 	return false;
 	}
 
-bot->setRemoving(st[pos]);
+//bot->setRemoving(st[pos]);
 server->setGline( nickUserHost,
 	st[ pos ],
 	Reason ,
-	gLength ) ;
-bot->unSetRemoving();
+	gLength , bot) ;
+//bot->unSetRemoving();
 ccGline *TmpGline = bot->findGline(bot->removeSqlChars(st[pos]));
 bool Up = false;
 if(TmpGline)

@@ -12,9 +12,9 @@
 #include	"ccontrol.h"
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
+#include	"commLevels.h"
 
-
-const char HELPCommand_cc_rcsId[] = "$Id: HELPCommand.cc,v 1.16 2002/01/05 15:34:54 mrbean_ Exp $";
+const char HELPCommand_cc_rcsId[] = "$Id: HELPCommand.cc,v 1.17 2002/01/17 20:04:05 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -37,8 +37,8 @@ if(!dbConnected)
         }
 
 ccUser *tmpAuth = bot->IsAuth(theClient);
-if(!tmpAuth)
-	return false;
+//if(!tmpAuth)
+//	return false;
 string banner = "--- Help Menu for " ;
 banner += bot->getNickName() + " --- (Showing commands which are available for you)" ;
 
@@ -56,7 +56,7 @@ if( 1 == st.size() )
 		{
 		ComLevel = ptr->second->getFlags();
 		//ComLevel &= ~flg_NOLOG; 
-		if((ComLevel == 0) || (tmpAuth->gotAccess(ptr->second)) )
+		if((ComLevel & commandLevel::flg_NOLOGIN) || ((tmpAuth) && (tmpAuth->gotAccess(ptr->second))) )
 			{
 			Show += (ptr->second->getName() + " ");
 			++Num;

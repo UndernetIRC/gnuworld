@@ -15,7 +15,7 @@
 #include 	"ccUser.h"
 #include	"misc.h"
 
-const char REMCOMMANDCommand_cc_rcsId[] = "$Id: REMCOMMANDCommand.cc,v 1.8 2001/12/23 09:07:57 mrbean_ Exp $";
+const char REMCOMMANDCommand_cc_rcsId[] = "$Id: REMCOMMANDCommand.cc,v 1.9 2002/01/17 20:04:05 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -108,7 +108,7 @@ if(!(theUser->gotAccess(Comm)))
 	}	
 //Remove the command 	
 theUser->removeCommand(Comm);
-theUser->setLast_Updated_By(theClient->getNickUserHost());
+theUser->setLast_Updated_By(bot->removeSqlChars(theClient->getNickUserHost()));
 if(theUser->Update())
 	{
 	bot->Notice(theClient,"Successfully removed the command from %s",st[1].c_str());

@@ -13,7 +13,7 @@
 #include	"StringTokenizer.h"
 #include	"Constants.h"
 
-const char REMGCHANCommand_cc_rcsId[] = "$Id: REMGCHANCommand.cc,v 1.6 2002/01/10 20:31:23 mrbean_ Exp $";
+const char REMGCHANCommand_cc_rcsId[] = "$Id: REMGCHANCommand.cc,v 1.7 2002/01/17 20:04:05 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -58,9 +58,9 @@ if(tmpGline != NULL)
 	bot->remGline(tmpGline);
 	delete tmpGline;
 	}	
-bot->setRemoving(st[1]);
-server->removeGline( st [ 1 ] );
-bot->unSetRemoving();
+//bot->setRemoving(st[1]);
+server->removeGline( st [ 1 ] ,bot);
+//bot->unSetRemoving();
 bot->MsgChanLog( "[REMGCHAN]: %s by : %s\n", st[ 1 ].c_str(),theClient->getNickName().c_str() ) ;
 return true ;
 }
