@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------------
--- "$Id: cservice.sql,v 1.39 2001/05/21 22:51:35 gte Exp $"
+-- "$Id: cservice.sql,v 1.40 2001/06/02 21:47:30 gte Exp $"
 -- Channel service DB SQL file for PostgreSQL.
 
 -- ChangeLog:
@@ -326,18 +326,47 @@ CREATE INDEX noreg_channel_name_idx ON noreg (lower(channel_name));
 CREATE INDEX noreg_expire_time_idx ON noreg (expire_time);
 
 -- Update notification rules.
---
+-- (N.B: Disabled, aparently conditional RULES are no longer
+-- supported in postgres 7.1.x).
 
-CREATE RULE cm1 AS ON UPDATE TO channels DO NOTIFY channels_u;
+--CREATE RULE cm1 AS ON UPDATE TO channels DO NOTIFY channels_u; 
+--CREATE RULE cm2 AS ON UPDATE TO bans DO NOTIFY bans_u; 
+--CREATE RULE cm3 AS ON UPDATE TO users DO NOTIFY users_u; 
+--CREATE RULE cm4 AS ON UPDATE TO levels DO NOTIFY levels_u; 
  
-CREATE RULE cm2 AS ON UPDATE TO bans DO NOTIFY bans_u;
- 
-CREATE RULE cm3 AS ON UPDATE TO users DO NOTIFY users_u;
- 
-CREATE RULE cm4 AS ON UPDATE TO levels DO NOTIFY levels_u;
+CREATE FUNCTION update_users() RETURNS OPAQUE AS '
+BEGIN
+	NOTIFY users_u;
+	RETURN NEW;
+END;
+' LANGUAGE 'plpgsql'; 
 
-CREATE RULE cm5 AS ON UPDATE TO translations DO NOTIFY translations_u;
+CREATE FUNCTION update_channels() RETURNS OPAQUE AS '
+BEGIN
+	NOTIFY channels_u;
+	RETURN NEW;
+END;
+' LANGUAGE 'plpgsql';
 
+CREATE FUNCTION update_levels() RETURNS OPAQUE AS '
+BEGIN
+	NOTIFY levels_u;
+	RETURN NEW;
+END;
+' LANGUAGE 'plpgsql';
+
+CREATE FUNCTION update_bans() RETURNS OPAQUE AS '
+BEGIN 
+	NOTIFY bans_u;
+	RETURN NEW;
+END;
+' LANGUAGE 'plpgsql';
+
+CREATE TRIGGER t_update_users AFTER UPDATE ON users FOR EACH ROW EXECUTE PROCEDURE update_users();
+CREATE TRIGGER t_update_bans AFTER UPDATE ON bans FOR EACH ROW EXECUTE PROCEDURE update_bans();
+CREATE TRIGGER t_update_channels AFTER UPDATE ON channels FOR EACH ROW EXECUTE PROCEDURE update_channels();
+CREATE TRIGGER t_update_levels AFTER UPDATE ON levels FOR EACH ROW EXECUTE PROCEDURE update_levels();
+ 
 -- Function to create a new users_lastseen record for each new user added.
 -- If the function fails, you may need to add the plpgsql scripting language support
 -- to your database:
