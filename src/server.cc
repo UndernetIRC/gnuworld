@@ -39,7 +39,6 @@
 #include	"EConfig.h"
 #include	"Gline.h"
 #include	"match.h"
-
 #include	"ELog.h"
 #include	"Socket.h"
 #include	"StringTokenizer.h"
@@ -50,7 +49,7 @@
 #include	"UnloadClientTimerHandler.h"
 
 const char server_h_rcsId[] = __SERVER_H ;
-const char server_cc_rcsId[] = "$Id: server.cc,v 1.111 2001/07/17 16:58:27 dan_karrels Exp $" ;
+const char server_cc_rcsId[] = "$Id: server.cc,v 1.112 2001/07/17 22:06:15 dan_karrels Exp $" ;
 const char config_h_rcsId[] = __CONFIG_H ;
 const char misc_h_rcsId[] = __MISC_H ;
 const char events_h_rcsId[] = __EVENTS_H ;
