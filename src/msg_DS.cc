@@ -5,7 +5,9 @@
 #include	"server.h"
 #include	"xparameters.h"
 
-const char msg_DS_cc_rcsId[] = "$Id: msg_DS.cc,v 1.1 2001/02/02 18:10:30 dan_karrels Exp $" ;
+const char server_h_rcsId[] = __SERVER_H ;
+const char xparameters_h_rcsId[] = __XPARAMETERS_H ;
+const char msg_DS_cc_rcsId[] = "$Id: msg_DS.cc,v 1.2 2002/04/28 16:11:23 dan_karrels Exp $" ;
 
 namespace gnuworld
 {

@@ -17,7 +17,15 @@
 #include	"ELog.h"
 #include	"StringTokenizer.h"
 
-const char msg_J_cc_rcsId[] = "$Id: msg_J.cc,v 1.11 2001/07/29 22:44:06 dan_karrels Exp $" ;
+const char server_h_rcsId[] = __SERVER_H ;
+const char xparameters_h_rcsId[] = __XPARAMETERS_H ;
+const char Network_h_rcsId[] = __NETWORK_H ;
+const char events_h_rcsId[] = __EVENTS_H ;
+const char ELog_h_rcsId[] = __ELOG_H ;
+const char Channel_h_rcsId[] = __CHANNEL_H ;
+const char iClient_h_rcsId[] = __ICLIENT_H ;
+const char ChannelUser_h_rcsId[] = __CHANNELUSER_H ;
+const char msg_J_cc_rcsId[] = "$Id: msg_J.cc,v 1.12 2002/04/28 16:11:23 dan_karrels Exp $" ;
 
 namespace gnuworld
 {

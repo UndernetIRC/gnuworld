@@ -2,6 +2,7 @@
  * msg_SQ.cc
  */
 
+#include	<iostream>
 #include	<string>
 
 #include	<cstring>
@@ -13,7 +14,7 @@
 #include	"ELog.h"
 #include	"xparameters.h"
 
-const char msg_SQ_cc_rcsId[] = "$Id: msg_SQ.cc,v 1.5 2001/05/18 15:27:10 dan_karrels Exp $" ;
+const char msg_SQ_cc_rcsId[] = "$Id: msg_SQ.cc,v 1.6 2002/04/28 16:11:23 dan_karrels Exp $" ;
 const char server_h_rcsId[] = __SERVER_H ;
 const char events_h_rcsId[] = __EVENTS_H ;
 const char Network_h_rcsId[] = __NETWORK_H ;

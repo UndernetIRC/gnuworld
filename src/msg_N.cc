@@ -13,13 +13,16 @@
 #include	"ip.h"
 #include	"Network.h"
 #include	"ELog.h"
+#include	"xparameters.h"
 
-const char msg_N_cc_rcsId[] = "$Id: msg_N.cc,v 1.6 2002/02/02 18:19:56 gte Exp $" ;
+const char msg_N_cc_rcsId[] = "$Id: msg_N.cc,v 1.7 2002/04/28 16:11:23 dan_karrels Exp $" ;
 const char iClient_h_rcsId[] = __ICLIENT_H ;
 const char events_h_rcsId[] = __EVENTS_H ;
 const char ip_h_rcsId[] = __IP_H ;
 const char Network_h_rcsId[] = __NETWORK_H ;
 const char ELog_h_rcsId[] = __ELOG_H ;
+const char server_h_rcsId[] = __SERVER_H ;
+const char xparameters_h_rcsId[] = __XPARAMETERS_H ;
 
 namespace gnuworld
 {
@@ -118,9 +121,11 @@ assert( newClient != 0 ) ;
 if( !Network->addClient( newClient ) )
 	{
 	elog	<< "xServer::MSG_B> Failed to add client: "
-		<< *newClient << ", user already exists? "
+		<< *newClient
+		<< ", user already exists? "
 		<< (Network->findClient( newClient->getCharYYXXX() ) ?
-		   "yes" : "no") << endl ;
+		   "yes" : "no")
+		<< endl ;
 	delete newClient ;
 	return -1 ;
 	}
@@ -129,7 +134,6 @@ if( !Network->addClient( newClient ) )
 PostEvent( EVT_NICK, static_cast< void* >( newClient ) ) ;
 
 return 0 ;
-
 }
 
 } // namespace gnuworld

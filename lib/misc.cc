@@ -2,6 +2,7 @@
  */
 
 #include	<string>
+#include	<algorithm>
 
 #include	<cctype>
 #include	<cstdio>
@@ -12,7 +13,7 @@
 #include	"misc.h"
 
 const char Misc_h_rcsId[] = __MISC_H ;
-const char Misc_cc_rcsId[] = "$Id: misc.cc,v 1.8 2001/07/29 22:44:06 dan_karrels Exp $" ;
+const char Misc_cc_rcsId[] = "$Id: misc.cc,v 1.9 2002/04/28 16:11:23 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -118,6 +119,10 @@ return ::strcasecmp( s1.c_str(), s2.c_str() ) ;
 
 size_t countChar( const string& s, const char& findMe )
 {
+return std::count( s.begin(), s.end(), findMe ) ;
+}
+/*
+
 size_t theCount = 0 ;
 
 for( string::const_iterator ptr = s.begin(), endPtr = s.end() ;
@@ -131,5 +136,5 @@ for( string::const_iterator ptr = s.begin(), endPtr = s.end() ;
 
 return theCount ;
 }
-
+*/
 } // namespace gnuworld

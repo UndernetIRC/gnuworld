@@ -12,7 +12,12 @@
 #include	"ELog.h"
 #include	"iServer.h"
 
-const char msg_EA_cc_rcsId[] = "$Id: msg_EA.cc,v 1.2 2001/02/03 17:43:12 dan_karrels Exp $" ;
+const char server_h_rcsId[] = __SERVER_H ;
+const char Network_h_rcsId[] = __NETWORK_H ;
+const char events_h_rcsId[] = __EVENTS_H ;
+const char ELog_h_rcsId[] = __ELOG_H ;
+const char iServer_h_rcsId[] = __ISERVER_H ;
+const char msg_EA_cc_rcsId[] = "$Id: msg_EA.cc,v 1.3 2002/04/28 16:11:23 dan_karrels Exp $" ;
 
 using std::string ;
 using std::endl ;

@@ -2,7 +2,7 @@
  */
 
 #ifndef __SOCKET_H
-#define __SOCKET_H "$Id: Socket.h,v 1.8 2002/04/06 21:39:29 mrbean_ Exp $"
+#define __SOCKET_H "$Id: Socket.h,v 1.9 2002/04/28 16:11:23 dan_karrels Exp $"
 
 #include	<new>
 #include	<iostream>
@@ -56,14 +56,12 @@ protected:
 	/**
 	 * This holds the total number of bytes revceived on the socket
 	 */
-	 
-	unsigned long int	totalReceived;
+	unsigned long int	totalReceived ;
 	
 	/**
 	 * This holds the total number of bytes sent on the socket
 	 */
-
-	unsigned long int	totalSent;
+	unsigned long int	totalSent ;
 	
 public:
 
@@ -202,16 +200,14 @@ public:
 	/**
 	 * Returns the total number of bytes that was received on this socket
 	 */
-	 
 	const unsigned long getTotalReceived() const
-	{ return totalReceived; } 
+		{ return totalReceived; } 
 
 	/**
 	 * Returns the total number of bytes that was sent on this socket
 	 */
-
 	const unsigned long getTotalSent() const
-	{ return totalSent; } 
+		{ return totalSent; } 
 
 protected:
 

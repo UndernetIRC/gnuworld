@@ -2,6 +2,8 @@
  * msg_W.cc
  */
 
+#include	<iostream>
+
 #include	"server.h"
 #include	"xparameters.h"
 #include	"ELog.h"
@@ -9,7 +11,7 @@
 #include	"iClient.h"
 #include	"client.h"
 
-const char msg_W_cc_rcsId[] = "$Id: msg_W.cc,v 1.3 2001/05/18 15:27:10 dan_karrels Exp $" ;
+const char msg_W_cc_rcsId[] = "$Id: msg_W.cc,v 1.4 2002/04/28 16:11:23 dan_karrels Exp $" ;
 const char server_h_rcsId[] = __SERVER_H ;
 const char xParameters_h_rcsId[] = __XPARAMETERS_H ;
 const char ELog_h_rcsId[] = __ELOG_H ;
@@ -19,6 +21,8 @@ const char client_h_rcsId[] = __CLIENT_H ;
 
 namespace gnuworld
 {
+
+using std::endl ;
 
 // ABAG7 W Az :Gte-
 int xServer::MSG_W( xParameters& Param )

@@ -4,7 +4,7 @@
  */
 
 #ifndef __MISC_H
-#define __MISC_H "$Id: misc.h,v 1.14 2002/03/25 23:40:22 mrbean_ Exp $"
+#define __MISC_H "$Id: misc.h,v 1.15 2002/04/28 16:11:23 dan_karrels Exp $"
 
 #include	<string.h>
 #include	<hash_map.h>
@@ -73,6 +73,10 @@ inline size_t operator()( const string& s ) const
 	}
 } ;
 
+/**
+ * A functor suitable for using in STL style containers which provides
+ * wildcard matching routine.
+ */
 struct Match
 {
 inline bool operator()( const string& lhs, const string& rhs ) const

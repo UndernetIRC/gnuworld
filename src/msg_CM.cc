@@ -1,8 +1,10 @@
 /*
  * msg_CM. cc
  *
- * $Id: msg_CM.cc,v 1.2 2002/01/12 20:20:12 gte Exp $
+ * $Id: msg_CM.cc,v 1.3 2002/04/28 16:11:23 dan_karrels Exp $
  */
+
+#include	<iostream>
 
 #include	"server.h"
 #include	"Channel.h"
@@ -10,9 +12,15 @@
 #include	"Network.h"
 #include	"iClient.h"
 #include	"xparameters.h"
+#include	"ELog.h"
+
+const char msg_CM_cc_rcsId[] = "$Id: msg_CM.cc,v 1.3 2002/04/28 16:11:23 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
+
+using std::endl ;
+
 /**
  * CLEARMODE message handler.
  * ZZAAA CM #channel obv
@@ -21,6 +29,13 @@ namespace gnuworld
  */
 int xServer::MSG_CM( xParameters& Param )
 {
+
+if( Param.size() < 3 )
+	{
+	elog	<< "MSG_CM> Invalid number of parameters"
+		<< endl ;
+	return -1 ;
+	}
 
 const unsigned int CLEAR_CHANOPS    = 0x00000001 ;
 const unsigned int CLEAR_VOICED     = 0x00000002 ;
@@ -33,20 +48,18 @@ const unsigned int CLEAR_KEY        = 0x00000080 ;
 const unsigned int CLEAR_BANS       = 0x00000100 ;
 const unsigned int CLEAR_LIMIT      = 0x00000200 ;
 
-Channel* tmpChan = Network->findChannel(Param[1]);
-
-if(!tmpChan)
+Channel* tmpChan = Network->findChannel( Param[ 1 ] ) ;
+if( !tmpChan )
 	{
-		// Log Error.
-		return 0;
+	// Log Error.
+	return 0;
 	}
 
 /*
  * First, determine what we are going to clear.
  */
-
-string Modes = Param[2];
-unsigned int clearModes = 0;
+string Modes = Param[ 2 ] ;
+unsigned int clearModes = 0 ;
 
 for( string::size_type i = 0 ; i < Modes.size() ; i++ )
 	{
@@ -55,62 +68,82 @@ for( string::size_type i = 0 ; i < Modes.size() ; i++ )
 		case 'o':
 		case 'O':
 			clearModes |= CLEAR_CHANOPS ;
-			elog << tmpChan->getName() << "Doing CLEAR_CHANOPS" << endl;
+			elog	<< tmpChan->getName()
+				<< "Doing CLEAR_CHANOPS"
+				<< endl;
 			break ;
 		case 'v':
 		case 'V':
 			clearModes |= CLEAR_VOICED ;
-			elog << tmpChan->getName() << "Doing CLEAR_VOICED" << endl;
+			elog	<< tmpChan->getName()
+				<< "Doing CLEAR_VOICED"
+				<< endl;
 			break ;
 		case 's':
 		case 'S':
 			clearModes |= CLEAR_SECRET ;
-			tmpChan->removeMode(Channel::MODE_S);
-			elog << tmpChan->getName() << "Doing CLEAR_SECRET" << endl;
+			tmpChan->removeMode( Channel::MODE_S ) ;
+			elog	<< tmpChan->getName()
+				<< "Doing CLEAR_SECRET"
+				<< endl;
 			break ;
 		case 'm':
 		case 'M':
 			clearModes |= CLEAR_MODERATED;
-			tmpChan->removeMode(Channel::MODE_M);
-			elog << tmpChan->getName() << "Doing CLEAR_MODERATED" << endl;
+			tmpChan->removeMode( Channel::MODE_M ) ;
+			elog	<< tmpChan->getName()
+				<< "Doing CLEAR_MODERATED"
+				<< endl;
 			break ;
 		case 't':
 		case 'T':
 			clearModes |= CLEAR_TOPICLIMIT ;
-			tmpChan->removeMode(Channel::MODE_T);
-			elog << tmpChan->getName() << "Doing CLEAR_TOPICLIMIT" << endl;
+			tmpChan->removeMode( Channel::MODE_T ) ;
+			elog	<< tmpChan->getName()
+				<< "Doing CLEAR_TOPICLIMIT"
+				<< endl;
 			break ;
 		case 'i':
 		case 'I':
 			clearModes |= CLEAR_INVITEONLY ;
-			tmpChan->removeMode(Channel::MODE_I);
-			elog << tmpChan->getName() << "Doing CLEAR_INVITEONLY" << endl;
+			tmpChan->removeMode( Channel::MODE_I ) ;
+			elog	<< tmpChan->getName()
+				<< "Doing CLEAR_INVITEONLY"
+				<< endl;
 			break ;
 		case 'n':
 		case 'N':
 			clearModes |= CLEAR_NOPRIVMSGS ;
-			tmpChan->removeMode(Channel::MODE_N);
-			elog << tmpChan->getName() << "Doing CLEAR_NOPRIVMSGS" << endl;
+			tmpChan->removeMode( Channel::MODE_N ) ;
+			elog	<< tmpChan->getName()
+				<< "Doing CLEAR_NOPRIVMSGS"
+				<< endl;
 			break ;
 		case 'k':
 		case 'K':
 			clearModes |= CLEAR_KEY ;
-			tmpChan->removeMode(Channel::MODE_K);
-			tmpChan->setKey("");
-			elog << tmpChan->getName() << "Doing CLEAR_KEY" << endl;
+			tmpChan->removeMode( Channel::MODE_K ) ;
+			tmpChan->setKey( string() );
+			elog	<< tmpChan->getName()
+				<< "Doing CLEAR_KEY"
+				<< endl;
 			break ;
 		case 'b':
 		case 'B':
 			clearModes |= CLEAR_BANS ;
 			tmpChan->removeAllBans();
-			elog << tmpChan->getName() << "Doing CLEAR_BANS" << endl;
+			elog	<< tmpChan->getName()
+				<< "Doing CLEAR_BANS"
+				<< endl;
 			break ;
 		case 'l':
 		case 'L':
 			clearModes |= CLEAR_LIMIT ;
-			tmpChan->removeMode(Channel::MODE_L);
-			tmpChan->setLimit(0);
-			elog << tmpChan->getName() << "Doing CLEAR_LIMIT" << endl;
+			tmpChan->removeMode( Channel::MODE_L ) ;
+			tmpChan->setLimit( 0 ) ;
+			elog	<< tmpChan->getName()
+				<< "Doing CLEAR_LIMIT"
+				<< endl;
 			break ;
 		default:
 			// Unknown mode
@@ -118,18 +151,23 @@ for( string::size_type i = 0 ; i < Modes.size() ; i++ )
 		} // switch
 	} // for
 
-if (clearModes & (CLEAR_CHANOPS | CLEAR_VOICED))
+if( clearModes & (CLEAR_CHANOPS | CLEAR_VOICED) )
 	{
 	/*
 	 * Lets loop over everyone in the channel and either deop
 	 * or devoice them.
 	 */
-
 	for( Channel::const_userIterator ptr = tmpChan->userList_begin();
 		ptr != tmpChan->userList_end() ; ++ptr )
 		{
-			if(clearModes & CLEAR_CHANOPS) ptr->second->removeModeO();
-			if(clearModes & CLEAR_VOICED) ptr->second->removeModeV();
+		if( clearModes & CLEAR_CHANOPS )
+			{
+			ptr->second->removeModeO();
+			}
+		if( clearModes & CLEAR_VOICED )
+			{
+			ptr->second->removeModeV();
+			}
 		}
 	}
 

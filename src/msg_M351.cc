@@ -10,7 +10,7 @@
 #include	"ELog.h"
 #include	"xparameters.h"
 
-const char msg_M351_cc_rcsId[] = "$Id: msg_M351.cc,v 1.3 2002/04/26 16:02:50 dan_karrels Exp $" ;
+const char msg_M351_cc_rcsId[] = "$Id: msg_M351.cc,v 1.4 2002/04/28 16:11:23 dan_karrels Exp $" ;
 const char server_h_rcsId[] = __SERVER_H ;
 const char Network_h_rcsId[] = __NETWORK_H ;
 const char ELog_h_rcsId[] = __ELOG_H ;
@@ -54,19 +54,19 @@ if( NULL == tmpServer )
 		<< endl ;
 	return -1 ;
 	}
-char numeric2[ 6 ] = { 0 } ;
 
+char numeric2[ 6 ] = { 0 } ;
 strcpy( numeric2, tmpServer->getCharYY()) ;
 Param.setValue( 0, numeric2 ) ;
+
 string tMessage;
 for( xParameters::size_type i = 0 ; i < Param.size() ; ++i )
 	{
-	tMessage+=Param[i];
-	tMessage += " ";
+	tMessage += Param[ i ] ;
+	tMessage += " " ;
 	}
 
 return theClient->OnServerMessage(tmpServer,tMessage);
-
 }
 
 } // namespace gnuworld

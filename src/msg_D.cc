@@ -16,7 +16,14 @@
 #include	"ELog.h"
 #include	"StringTokenizer.h"
 
-const char msg_D_rcsId[] = "$Id: msg_D.cc,v 1.3 2001/03/24 01:31:42 dan_karrels Exp $" ;
+const char server_h_rcsId[] = __SERVER_H ;
+const char iClient_h_rcsId[] = __ICLIENT_H ;
+const char iServer_h_rcsId[] = __ISERVER_H ;
+const char events_h_rcsId[] = __EVENTS_H ;
+const char Network_h_rcsId[] = __NETWORK_H ;
+const char ELog_h_rcsId[] = __ELOG_H ;
+const char StringTokenizer_h_rcsId[] = __STRINGTOKENIZER_H ;
+const char msg_D_rcsId[] = "$Id: msg_D.cc,v 1.4 2002/04/28 16:11:23 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -122,7 +129,6 @@ else
 delete target ;
 
 return 0 ;
-
 }
 
 } // namespace gnuworld

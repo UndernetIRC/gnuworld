@@ -2,6 +2,8 @@
  * msg_I.cc
  */
 
+#include	<iostream>
+
 #include	"server.h"
 #include	"xparameters.h"
 #include	"Channel.h"
@@ -10,10 +12,19 @@
 #include	"client.h"
 #include	"Network.h"
 
-const char msg_I_cc_rcsId[] = "$Id: msg_I.cc,v 1.1 2001/02/06 00:03:39 dan_karrels Exp $" ;
+const char server_h_rcsId[] = __SERVER_H ;
+const char xparameters_h_rcsId[] = __XPARAMETERS_H ;
+const char Network_h_rcsId[] = __NETWORK_H ;
+const char Channel_h_rcsId[] = __CHANNEL_H ;
+const char iClient_h_rcsId[] = __ICLIENT_H ;
+const char client_h_rcsId[] = __CLIENT_H ;
+const char ELog_h_rcsId[] = __ELOG_H ;
+const char msg_I_cc_rcsId[] = "$Id: msg_I.cc,v 1.2 2002/04/28 16:11:23 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
+
+using std::endl ;
 
 // ABAHo I X :#lksdlkj
 int xServer::MSG_I( xParameters& Param )

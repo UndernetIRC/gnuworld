@@ -22,7 +22,15 @@
 #include	"Network.h"
 #include	"iClient.h"
 
-const char msg_B_cc_rcsId[] = "$Id: msg_B.cc,v 1.8 2001/08/26 22:22:55 dan_karrels Exp $" ;
+const char server_h_rcsId[] = __SERVER_H ;
+const char xparameters_h_rcsId[] = __XPARAMETERS_H ;
+const char StringTokenizer_h_rcsId[] = __STRINGTOKENIZER_H ;
+const char ELog_h_rcsId[] = __ELOG_H ;
+const char Channel_h_rcsId[] = __CHANNEL_H ;
+const char ChannelUser_h_rcsId[] = __CHANNELUSER_H ;
+const char Network_h_rcsId[] = __NETWORK_H ;
+const char iClient_h_rcsId[] = __ICLIENT_H ;
+const char msg_B_cc_rcsId[] = "$Id: msg_B.cc,v 1.9 2002/04/28 16:11:23 dan_karrels Exp $" ;
 
 namespace gnuworld
 {

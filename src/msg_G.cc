@@ -8,6 +8,9 @@
 #include	"xparameters.h"
 #include	"ELog.h"
 
+const char server_h_rcsId[] = __SERVER_H ;
+const char xparameters_h_rcsId[] = __XPARAMETERS_H ;
+const char ELog_h_rcsId[] = __ELOG_H ;
 const char msg_G_cc_rcsId[] = "$Id:" ;
 
 using std::string ;

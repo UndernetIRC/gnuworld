@@ -28,7 +28,7 @@
 #include	"events.h"
 
 const char xClient_h_rcsId[] = __CLIENT_H ;
-const char xClient_cc_rcsId[] = "$Id: client.cc,v 1.42 2001/12/28 16:28:47 mrbean_ Exp $" ;
+const char xClient_cc_rcsId[] = "$Id: client.cc,v 1.43 2002/04/28 16:11:23 dan_karrels Exp $" ;
 const char config_h_rcsId[] = __CONFIG_H ;
 const char misc_h_rcsId[] = __MISC_H ;
 const char Numeric_h_rcsId[] = __NUMERIC_H ;
@@ -229,7 +229,8 @@ int xClient::Wallops( const char* Format, ... )
 {
 if( Connected && MyUplink && Format && Format[ 0 ] != 0 )
 	{
-	char buffer[ 1024 ] = { 0 } ;
+	char buffer[ 1024 ] ;
+	memset( buffer, 0, 1024 ) ;
 	va_list list;
 
 	va_start( list, Format ) ;
@@ -320,7 +321,8 @@ int xClient::Message( const iClient* Target, const char* Message, ... )
 {
 if( Connected && MyUplink && Message && Message[ 0 ] !=0 )
 	{
-	char buffer[ 1024 ] = { 0 } ;
+	char buffer[ 1024 ] ;
+	memset( buffer, 0, 1024 ) ;
 	va_list list;
 
 	va_start( list, Message ) ;
@@ -385,7 +387,8 @@ int xClient::Notice( const iClient* Target, const char* Message, ... )
 {
 if( Connected && MyUplink && Message && Message[ 0 ] != 0 )
 	{
-	char buffer[ 1024 ] = { 0 } ;
+	char buffer[ 1024 ] ;
+	memset( buffer, 0, 1024 ) ;
 	va_list list;
 
 	va_start(list, Message);
@@ -405,7 +408,8 @@ int xClient::Notice( const string& Channel, const char* Message, ... )
 {
 if( Connected && MyUplink && Message && Message[ 0 ] != 0 )
 	{
-	char buffer[ 1024 ] = { 0 } ;
+	char buffer[ 1024 ] ;
+	memset( buffer, 0, 1024 ) ;
 	va_list list;
 
 	va_start(list, Message);
@@ -1860,7 +1864,8 @@ return isOnChannel( theChan->getName() ) ;
 
 int xClient::Write( const char* format, ... )
 {
-char buf[ 4096 ] = { 0 } ;
+char buf[ 4096 ] ;
+memset( buf, 0, 4096 ) ;
 va_list _list ;
 
 va_start( _list, format ) ;
@@ -1883,7 +1888,8 @@ Channel* theChan = Network->findChannel( chanName ) ;
 if( NULL == theChan )
 	{
 	elog	<< "xClient::OnJoin> Failed to find channel: "
-		<< chanName << endl ;
+		<< chanName
+		<< endl ;
 	return ;
 	}
 OnJoin( theChan ) ;
@@ -1902,7 +1908,8 @@ Channel* theChan = Network->findChannel( chanName ) ;
 if( NULL == theChan )
 	{
 	elog	<< "xClient::OnPart> Failed to find channel: "
-		<< chanName << endl ;
+		<< chanName
+		<< endl ;
 	return ;
 	}
 OnPart( theChan ) ;

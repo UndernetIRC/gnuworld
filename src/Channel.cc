@@ -16,7 +16,7 @@
 #include	"server.h"
 
 const char Channel_h_rcsId[] = __CHANNEL_H ;
-const char Channel_cc_rcsId[] = "$Id: Channel.cc,v 1.29 2002/02/24 21:36:41 mrbean_ Exp $" ;
+const char Channel_cc_rcsId[] = "$Id: Channel.cc,v 1.30 2002/04/28 16:11:23 dan_karrels Exp $" ;
 const char iClient_h_rcsId[] = __ICLIENT_H ;
 const char ChannelUser_h_rcsId[] = __CHANNELUSER_H ;
 const char Network_h_rcsId[] = __NETWORK_H ;
@@ -49,11 +49,7 @@ Channel::Channel( const string& _name,
    creationTime( _creationTime ),
    modes( 0 ),
    limit( 0 )
-{
-#ifdef TOPIC_TRACK
-topic = "";
-#endif
-}
+{}
 
 Channel::~Channel()
 {
@@ -336,7 +332,7 @@ if( polarity )
 else
 	{
 	removeMode( MODE_K ) ;
-	setKey( "" ) ;
+	setKey( string() ) ;
 	}
 }
 
