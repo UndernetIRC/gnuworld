@@ -114,4 +114,4 @@ if( command == "DUMPDB" )
 return 0 ;
 }
 
-} // namespace euworld
+} // namespace gnuworld
