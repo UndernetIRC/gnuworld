@@ -3,7 +3,7 @@
  */
 
 #ifndef __CCONTROL_H
-#define __CCONTROL_H "$Id: ccontrol.h,v 1.50 2001/12/07 13:00:20 mrbean_ Exp $"
+#define __CCONTROL_H "$Id: ccontrol.h,v 1.51 2001/12/09 14:36:35 mrbean_ Exp $"
 
 
 #include	<string>
@@ -549,13 +549,7 @@ public:
 
 	bool CleanServers();
 	
-	const string expandDbServer(const string);
-	
-	void addClone(const string);
-	
-	void delClone(const string);
-	
-	void CheckClones(const int);
+	const string expandDbServer(const string&);
 	
 	void GatesCheck();
 	
@@ -717,8 +711,6 @@ public:
 
 	xServer::timerID expiredSuspends;
 
-	xServer::timerID clonesCheck;
-		
 	xServer::timerID gatesStatusCheck;
 	
 	xServer::timerID dbConnectionCheck;

@@ -14,8 +14,10 @@
 #include	"iServer.h"
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
+#include	"Network.h"
+#include	"Constants.h"
 
-const char JUPECommand_cc_rcsId[] = "$Id: JUPECommand.cc,v 1.10 2001/07/29 22:44:06 dan_karrels Exp $";
+const char JUPECommand_cc_rcsId[] = "$Id: JUPECommand.cc,v 1.11 2001/12/09 14:36:35 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -36,22 +38,75 @@ if( st.size() < 3 )
 	}
 
 // The server name to be juped must have at least 1 '.'
-if( (string::npos == st[ 1 ].find_first_of( '.' )) || (st[1].length() > 63) )
+if( st[1].length() > server::MaxName) 
 	{
 	bot->Notice( theClient, "Bogus server name" ) ;
 	return false ;
 	}
+iServer* Server;
+string SName;
+unsigned int contime;
+if(string::npos != st[ 1 ].find_first_of( '*' ))
+	{
+	Server = Network->findExpandedServerName(st[1]);
+	if(!Server)
+		{
+		bot->Notice(theClient,"There is no linked server that matches %s"
+			    ,st[1].c_str());
+			    return false;
+		}
+	SName = Server->getName();
+	contime = Server->getStartTime();
+	}
+else if(string::npos == st[ 1 ].find_first_of( '.' ))
+	{
+	bot->Notice( theClient, "Bogus server name" ) ;
+	return false ;
+	}
+else 
+	{
+	SName = st[1];
+	contime = ::time(0);
+	}
+if(!strcasecmp(SName,Network->findServer(bot->getUplink()->getUplinkCharYY())->getName()))
+	{
+	bot->Notice(theClient,"What are you trying to do? get me splited?");
+	bot->MsgChanLog("%s just tried to jupe my uplink!\n",theClient->getNickName().c_str());
+	return false;
+	}
+bot->MsgChanLog("%s is asking me to jupe %s because : %s\n",theClient->getNickName().c_str(),SName.c_str(),st.assemble(2).c_str());
 
-bot->MsgChanLog("%s is asking me to jupe %s because : %s\n",theClient->getCharYYXXX().c_str(),st[1].c_str(),st.assemble(2).c_str());
-
+if(dbConnected)
+	{
+	ccServer* tmpServer = new ccServer(bot->SQLDb);
+	if(tmpServer->loadData(SName))
+		{
+		tmpServer->setSplitReason(string("Squited by ") + theClient->getNickUserHost() 
+					    + string(" because : ") + st.assemble(2));
+		tmpServer->setLastSplitted(time(0));
+		tmpServer->Update();
+		}				    
+	delete tmpServer;
+	}
+		
 // This will squit the server, if it exists or not, or if it is
 // already juped.
 //server->SquitServer( st[ 1 ], "Prepare to be juped" ) ;
+/*strstream s;
+s 	<< bot->getCharYYXXX()
+	<< " SQUIT " 
+	<< SName
+	<< " " << contime
+	<< " :"
+	<< st.assemble(2)
+	<< ends;
+bot->Write(s);
+delete[] s.str();*/
 
 iServer* jupeServer = new (std::nothrow) iServer(
 	0, // uplinkIntYY
 	"", // charYYXXX
-	st[ 1 ],
+	SName,
 	time( 0 ) ) ;
 assert( jupeServer != 0 ) ;
 

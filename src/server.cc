@@ -50,7 +50,7 @@
 #include	"UnloadClientTimerHandler.h"
 
 const char server_h_rcsId[] = __SERVER_H ;
-const char server_cc_rcsId[] = "$Id: server.cc,v 1.118 2001/10/17 21:39:11 mrbean_ Exp $" ;
+const char server_cc_rcsId[] = "$Id: server.cc,v 1.119 2001/12/09 14:36:35 mrbean_ Exp $" ;
 const char config_h_rcsId[] = __CONFIG_H ;
 const char misc_h_rcsId[] = __MISC_H ;
 const char events_h_rcsId[] = __EVENTS_H ;
@@ -852,7 +852,7 @@ s	<< charYY
 	<< " SQ "
 	<< serverName
 	<< ' '
-	<< time( 0 )
+	<< theServer->getStartTime()
 	<< " :"
 	<< reason
 	<< ends ;
@@ -900,7 +900,6 @@ if( tmp != NULL )
 	// SquitServer() will also deallocate the server.
 	// Make sure not to attempt to use the bogus tmp pointer.
 	tmp = 0 ;
-
 	}
 else if( !jupedServers.empty() )
 	{
@@ -957,7 +956,7 @@ Write( "%s S %s %d %d %d J%02d %s 0 :JUPE Reason: %s\n",
 		fakeServer->getName().c_str(),
 		2,
 		0, 
-		fakeServer->getConnectTime(),
+		fakeServer->getConnectTime()-24*3600*365,
 		10, // version
 		charYYXXX.c_str(),
 		description.c_str() ) ;

@@ -17,7 +17,7 @@
 #include	"ccUser.h"
 #include	"AuthInfo.h"
 
-const char LEARNNETCommand_cc_rcsId[] = "$Id: LEARNNETCommand.cc,v 1.4 2001/11/20 19:49:45 mrbean_ Exp $";
+const char LEARNNETCommand_cc_rcsId[] = "$Id: LEARNNETCommand.cc,v 1.5 2001/12/09 14:36:35 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -77,7 +77,7 @@ for( ; ptr != end ; ptr++ )
 		{
 		continue ;
 		}
-	else
+	else if(!server->isJuped(CurServer))
 		{
 		if(!NewServer->loadData(CurServer->getName().c_str()))
 			{ //If the server isnt in the database , update it

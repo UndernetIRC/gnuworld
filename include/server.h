@@ -17,7 +17,7 @@
  */
 
 #ifndef __SERVER_H
-#define __SERVER_H "$Id: server.h,v 1.51 2001/10/17 21:39:11 mrbean_ Exp $"
+#define __SERVER_H "$Id: server.h,v 1.52 2001/12/09 14:36:33 mrbean_ Exp $"
 
 #include	<string>
 #include	<vector>
@@ -853,6 +853,13 @@ public:
 	 */
 	virtual void updateGlines() ;
 
+	/**
+	 * Check if a server is juped
+	 */
+	 
+	 virtual bool isJuped( const iServer* );
+	
+
 protected:
 
 	/**
@@ -931,12 +938,6 @@ protected:
 	 */
 	virtual bool	banSyntax( const string& ) const ;
 
-	/**
-	 * Check if a server is juped
-	 */
-	 
-	 virtual bool isJuped( const iServer* );
-	
 	/**
 	 * Parse a burst line for channel bans.
 	 */

@@ -20,8 +20,9 @@
 #include        "ccUser.h"
 #include	"misc.h"
 #include	"commLevels.h"
+#include	"Constants.h"
 
-const char ADDUSERCommand_cc_rcsId[] = "$Id: ADDUSERCommand.cc,v 1.7 2001/12/05 21:03:57 mrbean_ Exp $";
+const char ADDUSERCommand_cc_rcsId[] = "$Id: ADDUSERCommand.cc,v 1.8 2001/12/09 14:36:35 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -47,9 +48,9 @@ if(!dbConnected)
         return false;
         }
 
-if(st[1].size() > 64)
+if(st[1].size() > User::MaxName)
 	{
-	bot->Notice(theClient,"Oper name can't be more than 64 chars");
+	bot->Notice(theClient,"Oper name can't be more than %d chars",User::MaxName);
 	return false;
 	}
 
@@ -87,6 +88,11 @@ else if(!strcasecmp(st[2],"smt"))
 
 else if(!strcasecmp(st[2],"admin"))
 	{
+	if(st.size() < 5)
+		{
+		bot->Notice(theClient,"When adding new admin, you must specify a server");
+		return false;
+		}
 	NewAccess = commandLevel::ADMIN;
 	NewSAccess = commandLevel::SADMIN;
         NewFlags = operLevel::ADMINLEVEL;
@@ -137,16 +143,38 @@ else if(OperFlags < NewFlags)
 	return false;
 	}
 
-
 //Create the new user and update the database
 theUser = new ccUser(bot->SQLDb);
 theUser->setUserName(st[1]);
-theUser->setPassword(bot->CryptPass(st[3]));
+if(st.size() < 5)
+	{
+	theUser->setPassword(bot->CryptPass(st[3]));
+	theUser->setServer(tOper->getServer());
+	}
+else   
+	{
+	if(OperFlags < operLevel::SMTLEVEL)
+		{
+		bot->Notice(theClient,"Sorry, only SMT+ can specify a server name");
+		delete theUser;
+		return false;
+		}
+	string Server;
+	Server = bot->expandDbServer(st[3]);
+	if(!strcasecmp(Server,""))
+		{
+		bot->Notice(theClient,"I cant find a server that matches %s in the database"
+			    ,st[3].c_str());
+		delete theUser;
+		return false;
+		}
+	theUser->setPassword(bot->CryptPass(st[4]));
+	theUser->setServer(Server);
+	}		
 theUser->setAccess(NewAccess);
 theUser->setSAccess(NewSAccess);
 theUser->setType(NewFlags);
 theUser->setLast_Updated_By(theClient->getNickUserHost());
-theUser->setServer(tOper->getServer());
 theUser->setNeedOp(true);
 if(bot->AddOper(theUser) == true)
 	{

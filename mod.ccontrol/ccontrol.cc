@@ -37,7 +37,7 @@
 #include	"ip.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.99 2001/12/08 17:17:29 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.100 2001/12/09 14:36:35 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -623,7 +623,7 @@ switch( theEvent )
 				MsgChanLog("Unknown server connected : %s Uplink : %s\n"
 					    ,NewServer->getName().c_str(),UplinkServer->getName().c_str());
 				}
-			else
+			else 
 				{
 				CheckServer->setLastConnected(::time (0));
 				CheckServer->setUplink(UplinkServer->getName());
@@ -640,15 +640,18 @@ switch( theEvent )
 			{
 			iServer* NewServer = static_cast< iServer* >( Data1);
 			string Reason = *(static_cast<string *>(Data3));
-			ccServer* CheckServer = new (std::nothrow) ccServer(SQLDb);
-        	        assert(CheckServer != NULL);
-	                if(CheckServer->loadNumericData(NewServer->getCharYY()))
-    		                {
-				CheckServer->setSplitReason(Reason);
-				CheckServer->setLastSplitted(::time(NULL));
-				CheckServer->Update();
+			if(!getUplink()->isJuped(NewServer))
+				{
+				ccServer* CheckServer = new (std::nothrow) ccServer(SQLDb);
+        		        assert(CheckServer != NULL);
+	    	                if(CheckServer->loadData(NewServer->getName()))
+					{
+					CheckServer->setSplitReason(Reason);
+					CheckServer->setLastSplitted(::time(NULL));
+					CheckServer->Update();
+					}
+				delete CheckServer;			     
 				}
-			delete CheckServer;			     
 			}
 		break;
 		}
@@ -657,12 +660,6 @@ switch( theEvent )
 		inBurst = false;
 		refreshGlines();
 		burstGlines();
-		if(!clonesQueue.empty())
-			{
-			MsgChanLog("There are currently %d users in the clone queue\n",
-				    clonesQueue.size());
-			clonesCheck = MyUplink->RegisterTimer(::time(0) + 1,this,NULL);
-			}
 		break;
 		}	
 	case EVT_NICK:
@@ -733,36 +730,6 @@ switch( theEvent )
 						}	
 					}
 				}
-				/*if(!inBurst)
-					{
-					int CurConnections = Network->countHost(NewUser->getInsecureHost());		
-					if(CurConnections  > getExceptions("*@" + NewUser->getInsecureHost()))
-						{
-						glSet = true;
-						ccGline *tmpGline;
-						tmpGline = findGline("*@" + NewUser->getInsecureHost()); 
-						if(!tmpGline)
-							{
-							tmpGline = new ccGline(SQLDb);
-							tmpGline->setHost("*@" + NewUser->getInsecureHost());
-							tmpGline->setExpires(::time(0) + maxGlineLen);
-							tmpGline->setReason("Automatically banned for excessive connections");
-							tmpGline->setAddedOn(::time(0));
-							tmpGline->Insert();
-							tmpGline->loadData(tmpGline->getHost());
-						//addGline(tmpGline);
-							}
-						MyUplink->setGline( nickName,
-								tmpGline->getHost(),
-								tmpGline->getReason(),
-								tmpGline->getExpires() - ::time(0) ) ;
-						}	
-					}
-				else 
-					{
-					addClone(NewUser->getInsecureHost());
-					}
-				}*/
 			if(!glSet) 
 				{	
 				ccGline * tempGline = findMatchingGline(NewUser->getUserName() + '@' + NewUser->getInsecureHost());
@@ -842,23 +809,6 @@ else if (timer_id == expiredSuspends)
 	{
 	refreshSuspention();
 	expiredSuspends = MyUplink->RegisterTimer(::time(0) + 60,this,NULL);
-	}
-
-else if((timer_id == clonesCheck) && (checkClones))
-	{
-	if(!inBurst) 
-		{
-		if(!clonesQueue.empty())
-			{
-			if(dbConnected) 
-				CheckClones(100);
-			clonesCheck = MyUplink->RegisterTimer(::time(0) + 2,this,NULL);
-			}
-		else
-			{
-			MsgChanLog("Finished checking the clones queue\n");
-			}			
-		}
 	}
 
 else if(timer_id == gatesStatusCheck)
@@ -2841,72 +2791,42 @@ return true;
 
 }
 
-const string ccontrol::expandDbServer(const string Name)
-{
-
-}
-
-void ccontrol::addClone(const string Addy)
-{
-string* tstr = new string(Addy);
-clonesQueue.push_back(tstr);
-}
-
-void ccontrol::delClone(const string Addy)
-{
-for(clonesIterator ptr = clonesQueue.begin(); ptr != clonesQueue.end();)
-	{
-	if(!strcasecmp(**ptr,Addy))
-		{
-		delete *ptr;
-		ptr = clonesQueue.erase(ptr);
-		}
-	else
-		{
-		++ptr;
-		}
-	}
-}
-
-void ccontrol::CheckClones(const int Amount)
+const string ccontrol::expandDbServer(const string& Name)
 {
 
 if(!dbConnected)
 	{
-	return;
+	return "";
 	}
 
-int CurConnections;
-if(Amount < 0)
-	return;
-int Num = Amount;	
-for(clonesIterator ptr = clonesQueue.begin();((ptr != clonesQueue.end()) && (Num));--Num)
+string Namelike = replace(Name,"*","%");
+
+strstream theQuery;
+theQuery	<< "Select name from servers "
+		<< " Where lower(name) like '"
+		<< string_lower(Namelike) << "'"
+		<< ends;
+
+elog 		<< "ccontrol::expandDbServer> "
+		<< theQuery.str()
+		<< ends;
+		
+ExecStatusType status = SQLDb->Exec( theQuery.str() ) ;
+delete[] theQuery.str() ;
+
+if( PGRES_TUPLES_OK != status )
 	{
-	CurConnections = Network->countHost(**ptr);		
-	if(CurConnections  > getExceptions("*@" + **ptr))
-		{
-		ccGline *tmpGline;
-		tmpGline = findGline("*@" + **ptr); 
-		if(!tmpGline)
-			{
-			tmpGline = new ccGline(SQLDb);
-			tmpGline->setHost("*@" + **ptr);
-			tmpGline->setExpires(::time(0) + maxGlineLen);
-			tmpGline->setReason("Automatically banned for excessive connections");
-			tmpGline->setAddedOn(::time(0));
-			tmpGline->Insert();
-			tmpGline->loadData(tmpGline->getHost());
-			addGline(tmpGline);
-			}
-		MyUplink->setGline( nickName,
-				tmpGline->getHost(),
-				tmpGline->getReason(),
-				tmpGline->getExpires() - ::time(0) ) ;
-		}
-	delete (*ptr);
-	ptr = clonesQueue.erase(ptr);
+	elog	<< "ccontrol::DeleteOper> SQL Failure: "
+		<< SQLDb->ErrorMessage()
+		<< endl ;
+
+	return "";
 	}
-	
+if(SQLDb->Tuples() > 0)
+	return SQLDb->GetValue(0,0);
+else
+	return "";
+
 }
 
 const string ccontrol::removeSqlChars(const string& Msg)
