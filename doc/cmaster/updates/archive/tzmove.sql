@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------------
--- "$Id: update_tzmove_r.sql,v 1.1 2002/08/09 01:10:46 reedloden Exp $"
+-- "$Id: tzmove.sql,v 1.1 2002/08/09 01:22:07 reedloden Exp $"
 -- Channel service DB SQL file for PostgreSQL.
 
 -- Script to run ONCE if you just updated with the new TimeZone feature stored in db
