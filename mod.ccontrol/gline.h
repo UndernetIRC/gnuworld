@@ -1,6 +1,6 @@
 
 #ifndef __GLINECONSTS_H
-#define __GLINECONSTS_H "$Id: gline.h,v 1.4 2001/08/16 09:01:56 mrbean_ Exp $"
+#define __GLINECONSTS_H "$Id: gline.h,v 1.5 2001/08/26 22:22:55 dan_karrels Exp $"
 
 
 namespace gnuworld
@@ -32,7 +32,9 @@ namespace gline
 	const unsigned int MFU_TIME = 100*3600*24;
 	}
 
-}
-}
+} // namespace uworld
+
+} // namespace gnuworld
 
 #endif // __GLINE_H
+

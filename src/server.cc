@@ -15,6 +15,7 @@
 #include	<strstream>
 #include	<stack>
 #include	<iostream>
+#include	<pair.h>
 
 #include	<sys/time.h>
 #include	<unistd.h>
@@ -47,10 +48,9 @@
 #include	"ServerTimerHandlers.h"
 #include	"LoadClientTimerHandler.h"
 #include	"UnloadClientTimerHandler.h"
-#include	"pair.h"
 
 const char server_h_rcsId[] = __SERVER_H ;
-const char server_cc_rcsId[] = "$Id: server.cc,v 1.116 2001/08/25 18:07:15 dan_karrels Exp $" ;
+const char server_cc_rcsId[] = "$Id: server.cc,v 1.117 2001/08/26 22:22:55 dan_karrels Exp $" ;
 const char config_h_rcsId[] = __CONFIG_H ;
 const char misc_h_rcsId[] = __MISC_H ;
 const char events_h_rcsId[] = __EVENTS_H ;

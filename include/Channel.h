@@ -1,20 +1,20 @@
 /* Channel.h */
 
 #ifndef __CHANNEL_H
-#define __CHANNEL_H "$Id: Channel.h,v 1.17 2001/07/29 22:44:06 dan_karrels Exp $"
+#define __CHANNEL_H "$Id: Channel.h,v 1.18 2001/08/26 22:22:55 dan_karrels Exp $"
 
 #include	<string>
 #include	<map>
 #include	<iostream>
 #include	<vector>
 #include	<list>
+#include	<pair.h>
 
 #include	<ctime>
 
 #include	"ChannelUser.h"
 #include	"xparameters.h"
 #include	"ELog.h"
-#include	"pair.h"
 
 namespace gnuworld
 {
@@ -144,21 +144,21 @@ public:
 	 * Return true if the given mode is set for the the ChannelUser
 	 * corresponding to the given iClient.
 	 */
-	inline bool getUserMode( const ChannelUser::modeType& whichMode,
+	bool getUserMode( const ChannelUser::modeType& whichMode,
 		iClient* ) const ;
 
 	/**
 	 * Remove the given mode from the ChannelUser associated with
 	 * the given iClient.
 	 */
-	inline bool removeUserMode( const ChannelUser::modeType& whichMode,
+	bool removeUserMode( const ChannelUser::modeType& whichMode,
 		iClient* ) ;
 
 	/**
 	 * Set the given mode for the ChannelUser associated with the
 	 * given iClient.
 	 */
-	inline bool setUserMode( const ChannelUser::modeType& whichMode,
+	bool setUserMode( const ChannelUser::modeType& whichMode,
 		iClient* ) ;
 
 	/**
@@ -178,25 +178,25 @@ public:
 	/**
 	 * Add a ban to this Channel's ban list.
 	 */
-	inline void setBan( const string& banMask ) ;
+	void setBan( const string& banMask ) ;
 
 	/**
 	 * Remove a ban from this channel's ban list.  This does a lexical
 	 * comparison, not a wildcard match.
 	 */
-	inline void removeBan( const string& banMask ) ;
+	void removeBan( const string& banMask ) ;
 
 	/**
 	 * Find a ban in the channel's ban list which lexically matches
 	 * the given banMask.
 	 */
-	inline bool findBan( const string& banMask ) const ;
+	bool findBan( const string& banMask ) const ;
 
 	/**
 	 * Find a ban in the channel's ban list which wildcard matches
 	 * the given banMask.
 	 */
-	inline bool matchBan( const string& banMask ) const ;
+	bool matchBan( const string& banMask ) const ;
 
 	/**
 	 * Search for a ban that matches the mask in (banMask).
@@ -217,7 +217,7 @@ public:
 	/**
 	 * Retrieve a string of the current channel modes.
 	 */
-	inline const string getModeString() const ;
+	const string getModeString() const ;
 
 	/**
 	 * Type used to store the size of the banlist.
@@ -327,13 +327,13 @@ public:
 	 * Add a ChannelUser to this channel's internal user
 	 * structure.
 	 */
-	inline bool addUser( ChannelUser* newUser ) ;
+	bool addUser( ChannelUser* newUser ) ;
 
 	/**
 	 * Add an iClient to this chanenl's internal user
 	 * structure.
 	 */
-	inline bool addUser( iClient* theClient ) ;
+	bool addUser( iClient* theClient ) ;
 
 	/**
 	 * Remove a ChannelUser from this channel's internal
@@ -341,12 +341,12 @@ public:
 	 * with the ChannelUser is NOT deallocated, it is
 	 * returned to the caller.
 	 */
-	inline ChannelUser* removeUser( iClient* theClient ) ;
+	ChannelUser* removeUser( iClient* theClient ) ;
 
 	/**
 	 * Remove the given ChannelUser from this Channel.
 	 */
-	inline ChannelUser* removeUser( ChannelUser* theUser ) ;
+	ChannelUser* removeUser( ChannelUser* theUser ) ;
 
 	/**
 	 * Remove a ChannelUser from this channel's internal
@@ -354,13 +354,13 @@ public:
 	 * with the ChannelUser is NOT deallocated, it is
 	 * returned to the caller.
 	 */
-	inline ChannelUser* removeUser( const unsigned int& intYYXXX ) ;
+	ChannelUser* removeUser( const unsigned int& intYYXXX ) ;
 
 	/**
 	 * Return the ChannelUser associated with the given iClient,
 	 * NULL if not found.
 	 */
-	inline ChannelUser* findUser( iClient* theClient ) const ;
+	ChannelUser* findUser( iClient* theClient ) const ;
 
 	/**
 	 * Convenience operator for outputting Channel information
@@ -376,7 +376,7 @@ public:
 	/**
 	 * Return a level 2 ban for the given user.
 	 */
-	inline static string createBan( const iClient* ) ;
+	static string createBan( const iClient* ) ;
 
 protected:
 

@@ -1,12 +1,11 @@
 /* ccFloodData.h */
 
 #ifndef __CCFLOODDATA_H
-#define __CCFLOODDATA_H "$Id: ccFloodData.h,v 1.1 2001/08/16 20:18:38 mrbean_ Exp $"
+#define __CCFLOODDATA_H "$Id: ccFloodData.h,v 1.2 2001/08/26 22:22:55 dan_karrels Exp $"
 
 #include	<string>
 
 #include	<ctime>
-
 
 namespace gnuworld
 { 
@@ -48,9 +47,11 @@ protected:
 	//The last time we got data from this user
 	time_t lastMessage;
 
-}; //ccFloodData
+}; // ccFloodData
 
-} //uworld
-} //gnuworld	
+} // uworld
+
+} // gnuworld	
 
 #endif // __CCFLOODDATA_H
+

@@ -3,7 +3,7 @@
  */
 
 #ifndef __NETWORK_H
-#define __NETWORK_H "$Id: Network.h,v 1.18 2001/06/14 22:14:12 dan_karrels Exp $"
+#define __NETWORK_H "$Id: Network.h,v 1.19 2001/08/26 22:22:55 dan_karrels Exp $"
 
 #include	<vector>
 #include	<string>
@@ -393,18 +393,18 @@ public:
 	 * Return the number of servers currently stored in the
 	 * the server table.
 	 */
-	inline size_t	serverList_size() const ;
+	size_t		serverList_size() const ;
 
 	/**
 	 * Return the number of network clients currently stored
 	 * in the client table.
 	 */
-	inline size_t	clientList_size() const ;
+	size_t		clientList_size() const ;
 
 	/**
 	 * Retrieve the number of clients on the given server.
 	 */
-	inline size_t	countClients( const iServer* theServer ) const ;
+	size_t		countClients( const iServer* theServer ) const ;
 
 	/**
 	 * A base class unary function used in foreach_xClient.

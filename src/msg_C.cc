@@ -4,6 +4,7 @@
 
 #include	<new>
 #include	<string>
+#include	<pair.h>
 
 #include	<cassert>
 
@@ -18,9 +19,8 @@
 #include	"iClient.h"
 #include	"Channel.h"
 #include	"ChannelUser.h"
-#include	"pair.h"
 
-const char msg_C_cc_rcsId[] = "$Id: msg_C.cc,v 1.5 2001/07/29 22:44:06 dan_karrels Exp $" ;
+const char msg_C_cc_rcsId[] = "$Id: msg_C.cc,v 1.6 2001/08/26 22:22:55 dan_karrels Exp $" ;
 
 namespace gnuworld
 {

@@ -1,7 +1,7 @@
 /* ChannelUser.h */
 
 #ifndef __CHANNELUSER_H
-#define __CHANNELUSER_H "$Id: ChannelUser.h,v 1.6 2001/07/17 16:58:26 dan_karrels Exp $"
+#define __CHANNELUSER_H "$Id: ChannelUser.h,v 1.7 2001/08/26 22:22:55 dan_karrels Exp $"
 
 #include	<string>
 
@@ -115,51 +115,50 @@ public:
 	 * Thus, if the user changes its nickname, this
 	 * will be reflected automatically.
 	 */
-	inline const string& getNickName() const ;
+	const string& getNickName() const ;
 
 	/**
 	 * Retrieve this user's user name.
 	 */
-	inline const string& getUserName() const ;
+	const string& getUserName() const ;
 
 	/**
 	 * Retrieve this channel user's host name.
 	 */
-	inline const string& getHostName() const ;
+	const string& getHostName() const ;
 
 	/**
 	 * Retrieve this channel user's network numeric.
 	 */
-	inline const string getCharYYXXX() const ;
+	const string getCharYYXXX() const ;
 
 	/**
 	 * Retrieve this channel user's IP.
 	 */
-	inline const unsigned int& getIP() const ;
+	const unsigned int& getIP() const ;
 
 	/**
 	 * Retrieve this channel user's integer representation
 	 * of its server numeric.
 	 */
-	inline const unsigned int& getIntYY() const ;
+	const unsigned int& getIntYY() const ;
 
 	/**
 	 * Retrieve this channel user's integer representation
 	 * of its client numeric.
 	 */
-	inline const unsigned int& getIntXXX() const ;
+	const unsigned int& getIntXXX() const ;
 
 	/**
 	 * Retrieve this channel user's integer representation
 	 * of its network numeric.
-	 * BUG: Do not use this method, it is still being tested.
 	 */
-	inline const unsigned int getIntYYXXX() const ;
+	const unsigned int getIntYYXXX() const ;
 
 	/**
 	 * Return true if this client is an oper.
  	 */
-	inline bool isOper() const ;
+	bool isOper() const ;
 
 	/**
 	 * Return a pointer to the iClient to which this ChannelUser

@@ -9,6 +9,7 @@
 #include	<string>
 #include	<vector>
 #include	<iostream>
+#include	<pair.h>
 
 #include	<cassert>
 
@@ -20,9 +21,8 @@
 #include	"ChannelUser.h"
 #include	"Network.h"
 #include	"iClient.h"
-#include	"pair.h"
 
-const char msg_B_cc_rcsId[] = "$Id: msg_B.cc,v 1.7 2001/07/29 22:44:06 dan_karrels Exp $" ;
+const char msg_B_cc_rcsId[] = "$Id: msg_B.cc,v 1.8 2001/08/26 22:22:55 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
