@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ConnectionManager.h,v 1.5 2002/05/29 16:10:45 dan_karrels Exp $
+ * $Id: ConnectionManager.h,v 1.6 2002/05/31 01:34:06 dan_karrels Exp $
  */
 
 #ifndef __CONNECTIONMANAGER_H
-#define __CONNECTIONMANAGER_H "$Id: ConnectionManager.h,v 1.5 2002/05/29 16:10:45 dan_karrels Exp $"
+#define __CONNECTIONMANAGER_H "$Id: ConnectionManager.h,v 1.6 2002/05/31 01:34:06 dan_karrels Exp $"
 
 #include	<sys/types.h>
 
@@ -181,11 +181,11 @@ public:
 	 * not work properly.
 	 * The ConnectionHandler must be non-NULL.
 	 */
-	virtual const Connection*	Connect(
+	virtual Connection*	Connect(
 				ConnectionHandler*,
 				const string& host,
-				unsigned short int port,
-				bool TCP = true ) ;
+				const unsigned short int remotePort,
+				const bool TCP = true ) ;
 
 	/**
 	 * Attempt to establish a listening Connection on the
@@ -196,39 +196,53 @@ public:
 	 * be written to or read from directly.
 	 * The ConnectionHandler must be non-NULL.
 	 */
-	virtual const Connection*	Listen(
+	virtual Connection*	Listen(
 				ConnectionHandler*,
-				const unsigned short int port ) ;
+				const unsigned short int localPort ) ;
 
 	/**
-	 * DisConnect() forces the connection associated with
-	 * hostname/port to be disconnected and deallocated.
+	 * DisConnect() forces the connection(s) associated with
+	 * hostname/ports to be disconnected and deallocated.
+	 * By specifying the optional localPort, only outgoing
+	 * connections which match all 3 search criteria will be
+	 * removed; not specifying a third parameter will cause all
+	 * connections which match the first two search criteria to
+	 * be removed.
 	 * OnDisconnect() is NOT called.
 	 * The ConnectionHandler must be non-NULL.
 	 * The Connection will not be removed if the ConnectionHandler
 	 * does not own the particular Connection.
 	 * This method schedules the given Connection to be disconnected
 	 * in the next call to Poll().
-	 * To close a listening Connection, pass an empty hostname.
+	 * To close a listening Connection, pass an empty hostname, in
+	 * which case the remotePort will be ignored.
 	 */
 	virtual bool	DisconnectByHost( ConnectionHandler*,
-				const string& hostname,
-				const unsigned short int port ) ;
+			const string& hostname,
+			const unsigned short int remotePort,
+			const unsigned short int localPort = 0 ) ;
 
 	/**
-	 * DisConnect() forces the connection associated with
-	 * IP/port to be disconnected and deallocated.
+	 * DisConnect() forces the connection(s) associated with
+	 * IP/ports to be disconnected and deallocated.
+	 * By specifying the optional localPort, only outgoing
+	 * connections which match all 3 search criteria will be
+	 * removed; not specifying a third parameter will cause all
+	 * connections which match the first two search criteria to
+	 * be removed.
 	 * OnDisconnect() is NOT called.
 	 * The ConnectionHandler must be non-NULL.
 	 * The Connection will not be removed if the ConnectionHandler
 	 * does not own the particular Connection.
 	 * This method schedules the given Connection to be disconnected
 	 * in the next call to Poll().
-	 * To close a listening Connection, pass an empty IP.
+	 * To close a listening Connection, pass an empty hostname, in
+	 * which case the remotePort will be ignored.
 	 */
 	virtual bool	DisconnectByIP( ConnectionHandler*,
-				const string& IP,
-				const unsigned short int port ) ;
+			const string& IP,
+			const unsigned short int remotePort,
+			const unsigned short int localPort = 0 ) ;
 
 	/**
 	 * Disconnect the given Connection from ConnectionHandler's

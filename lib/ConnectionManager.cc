@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ConnectionManager.cc,v 1.5 2002/05/29 16:10:45 dan_karrels Exp $
+ * $Id: ConnectionManager.cc,v 1.6 2002/05/31 01:34:06 dan_karrels Exp $
  */
 
 #include	<unistd.h>
@@ -99,9 +99,9 @@ for( handlerMapIterator handlerItr = handlerMap.begin() ;
 handlerMap.clear() ;
 }
 
-const Connection* ConnectionManager::Connect( ConnectionHandler* hPtr,
+Connection* ConnectionManager::Connect( ConnectionHandler* hPtr,
 	const string& host,
-	const unsigned short int port,
+	const unsigned short int remotePort,
 	const bool TCP )
 {
 
@@ -117,12 +117,12 @@ if( host.empty() )
 cout	<< "Connect> "
 	<< host
 	<< ":"
-	<< port
+	<< remotePort
 	<< endl ;
 
 // Allocate a new Connection object
 Connection* newConnection = new (nothrow)
-	Connection( host, port, TCP, delimiter ) ;
+	Connection( host, remotePort, TCP, delimiter ) ;
 assert( newConnection != 0 ) ;
 
 // Set the absolute time for this Connection's timeout to occur
@@ -172,7 +172,7 @@ if( -1 == sockFD )
 // Setup some basic options
 struct sockaddr_in* addr = newConnection->getAddr() ;
 addr->sin_family = AF_INET ;
-addr->sin_port = htons( static_cast< u_short >( port ) ) ;
+addr->sin_port = htons( static_cast< u_short >( remotePort ) ) ;
 addr->sin_addr.s_addr = inet_addr( newConnection->getIP().c_str() ) ;
 
 // Update the new Connection object
@@ -251,6 +251,30 @@ if( newConnection != 0 )
 		}
 	}
 
+// Obtain the local machine's port number for this Connection
+struct sockaddr_in sockAddr ;
+memset( &sockAddr, 0, sizeof( struct sockaddr_in ) ) ;
+
+socklen_t sockAddrLen =
+	static_cast< socklen_t >( sizeof( struct sockaddr ) ) ;
+
+// Get the information for the socket on this machine
+if( ::getsockname( newConnection->getSockFD(),
+	reinterpret_cast< struct sockaddr* >( &sockAddr ),
+	&sockAddrLen ) < 0 )
+	{
+	// getsockname() failed
+	cout	<< "finishConnect> getsockname() failed: "
+		<< strerror( errno )
+		<< endl ;
+
+	// Return failure
+	return false ;
+	}
+
+// Update remote port number for this Connection
+newConnection->setLocalPort( ntohs( sockAddr.sin_port ) ) ;
+
 // Return a pointer to the Connection object, whether or not
 // it's NULL
 return newConnection ;
@@ -258,7 +282,8 @@ return newConnection ;
 
 bool ConnectionManager::DisconnectByHost( ConnectionHandler* hPtr,
 	const string& hostname,
-	const unsigned short int port )
+	const unsigned short int remotePort,
+	const unsigned short int localPort )
 {
 // Public method, check method arguments
 assert( hPtr != 0 ) ;
@@ -275,51 +300,87 @@ if( handlerItr == handlerMap.end() )
 	return false ;
 	}
 
-// connectionItr will be used to walk the handlers connectionMap
-// After the below for() loop, it will be equivalent to either
-// the Connection this method seeks, or handlerItr->second.end(),
-// in which case the Connection was not found.
-connectionMapIterator connectionItr = handlerItr->second.begin() ;
-
-// Walk the connectionMap
-for( ; connectionItr != handlerItr->second.end() ; ++connectionItr )
+// Walk the connectionMap, looking for one or more matching Connections
+for( connectionMapIterator connectionItr = handlerItr->second.begin(),
+	connectionEndItr = handlerItr->second.end() ;
+	connectionItr != connectionEndItr ; ++connectionItr )
 	{
-	// Store the address of the Connection object in connectionPtr
+	// Store the address of the Connection object in cPtr
 	// Convenience variable
-	Connection* connectionPtr = *connectionItr ;
+	Connection* cPtr = *connectionItr ;
 
-	// Compare port numbers first, since they are faster
-	if( (port == connectionPtr->getPort()) &&
-		!strcasecmp( connectionPtr->getHostname().c_str(),
-			hostname.c_str() ) )
+	// If the hostname is empty, then we are attempting to remove
+	// a listening socket
+	if( hostname.empty() && cPtr->isListening() )
 		{
-		// Found it
-		break ;
+		// We are looking for a listening Connection, and
+		// we found one.
+		// The only criteria for a listening Connection is
+		// the localPort.
+		if( localPort == cPtr->getLocalPort() )
+			{
+			// Found the listener we seek
+			scheduleErasure( hPtr, connectionItr ) ;
+
+			// Since a machine (in most cases, in this
+			// one at least) may only have a single
+			// listener for a given port, there is no
+			// use in continuing with this loop.
+			// Return success
+			return true ;
+			}
 		}
+
+	// Not looking for a listener
+	// If localPort == 0, then remove all Connections matching
+	// hostname/remotePort
+
+	// First check for a remotePort match
+	if( remotePort != cPtr->getRemotePort() )
+		{
+		// No match, continue with next item
+		continue ;
+		}
+
+	// Look for a match on the hostname
+	if( !strcasecmp( hostname.c_str(), cPtr->getHostname().c_str() ) )
+		{
+		// Found a match on the hostname
+
+		// Check if we are to remove all Connections matching
+		// the two previous criteria, regardless of localPort
+		if( 0 == localPort )
+			{
+			// Remove all
+			scheduleErasure( hPtr, connectionItr ) ;
+
+			// Keep going until end of connectionMap
+			}
+
+		// Check now if the localPorts match exactly
+		else if( localPort == cPtr->getLocalPort() )
+			{
+			// Exact match
+			scheduleErasure( hPtr, connectionItr ) ;
+
+			// Since there can only be a single (by
+			// definition of TCP connections) connection
+			// based on a unique set of hostname/localport/
+			// remoteport, there is no need to continue
+			// looking for more matches: there are none.
+			return true ;
+			}
+		} // if( hostname == ... )
 	} // for()
 
-// Did we find it?
-if( connectionItr == handlerItr->second.end() ) ;
-	{
-	// Nope
-	return false ;
-	}
-
-cout	<< "ConnectionManager::DisconnectByHost> Sheduling connection "
-	<< "for removal: "
-	<< *connectionItr
-	<< endl ;
-
-// Schedule this connectionItr to be removed
-scheduleErasure( hPtr, connectionItr ) ;
-
-// We found the item to be removed, so return success
-return true ;
+// Unable to find a matching Connection, return failure
+return false ;
 }
 
 bool ConnectionManager::DisconnectByIP( ConnectionHandler* hPtr,
 	const string& IP,
-	const unsigned short int port )
+	const unsigned short int remotePort,
+	const unsigned short int localPort )
 {
 // Public method, check args
 assert( hPtr != 0 ) ;
@@ -338,45 +399,81 @@ if( handlerItr == handlerMap.end() )
 	return false ;
 	}
 
-// connectionItr will be used to walk the handlers connectionMap
-// After the below for() loop, it will be equivalent to either
-// the Connection this method seeks, or handlerItr->second.end(),
-// in which case the Connection was not found.
-connectionMapIterator connectionItr = handlerItr->second.begin() ;
-
-// Walk the connectionMap for this handler
-for( ; connectionItr != handlerItr->second.end() ; ++connectionItr )
+// Walk the connectionMap, looking for one or more matching Connections
+for( connectionMapIterator connectionItr = handlerItr->second.begin(),
+	connectionEndItr = handlerItr->second.end() ;
+	connectionItr != connectionEndItr ; ++connectionItr )
 	{
-	// Store the address of the Connection object in connectionPtr
-	// as a convenience variable
-	Connection* connectionPtr = *connectionItr ;
+	// Store the address of the Connection object in cPtr
+	// Convenience variable
+	Connection* cPtr = *connectionItr ;
 
-	// Compare port numbers first, since they are faster
-	if( (port == connectionPtr->getPort()) &&
-		(connectionPtr->getIP() == IP) )
+	// If the IP is empty, then we are attempting to remove
+	// a listening socket
+	if( IP.empty() && cPtr->isListening() )
 		{
-		// Found it
-		break ;
+		// We are looking for a listening Connection, and
+		// we found one.
+		// The only criteria for a listening Connection is
+		// the localPort.
+		if( localPort == cPtr->getLocalPort() )
+			{
+			// Found the listener we seek
+			scheduleErasure( hPtr, connectionItr ) ;
+
+			// Since a machine (in most cases, in this
+			// one at least) may only have a single
+			// listener for a given port, there is no
+			// use in continuing with this loop.
+			// Return success
+			return true ;
+			}
 		}
+
+	// Not looking for a listener
+	// If localPort == 0, then remove all Connections matching
+	// IP/remotePort
+
+	// First check for a remotePort match
+	if( remotePort != cPtr->getRemotePort() )
+		{
+		// No match, continue with next item
+		continue ;
+		}
+
+	// Look for a match on the IP
+	if( IP == cPtr->getIP() )
+		{
+		// Found a match on the IP
+
+		// Check if we are to remove all Connections matching
+		// the two previous criteria, regardless of localPort
+		if( 0 == localPort )
+			{
+			// Remove all
+			scheduleErasure( hPtr, connectionItr ) ;
+
+			// Keep going until end of connectionMap
+			}
+
+		// Check now if the localPorts match exactly
+		else if( localPort == cPtr->getLocalPort() )
+			{
+			// Exact match
+			scheduleErasure( hPtr, connectionItr ) ;
+
+			// Since there can only be a single (by
+			// definition of TCP connections) connection
+			// based on a unique set of IP/localport/
+			// remoteport, there is no need to continue
+			// looking for more matches: there are none.
+			return true ;
+			}
+		} // if( hostname == ... )
 	} // for()
 
-// Did we find it?
-if( connectionItr == handlerItr->second.end() ) ;
-	{
-	// Nope
-	return false ;
-	}
-
-cout	<< "ConnectionManager::DisconnectByIP> Sheduling connection "
-	<< "for removal: "
-	<< *connectionItr
-	<< endl ;
-
-// Add to eraseMap to be erased later in Poll()
-scheduleErasure( hPtr, connectionItr ) ;
-
-// We found the item to be removed, so return success
-return true ;
+// Unable to find a matching Connection, return failure
+return false ;
 }
 
 bool ConnectionManager::Disconnect( ConnectionHandler* hPtr,
@@ -532,12 +629,9 @@ if( fdCnt < 0 )
 	return ;
 	}
 
-// Were there any state changes pending?
-if( 0 == fdCnt )
-	{
-	// No pending state changes
-	return ;
-	}
+// Continue with the rest of the loop, even if no connections were found
+// to be awaiting service: a pending Connection still needs to have its
+// timeout checked.
 
 // This variable is used for checking timeouts
 time_t now = ::time( 0 ) ;
@@ -587,6 +681,10 @@ for( handlerMapIterator handlerItr = handlerMap.begin() ;
 
 				// Attempt to write any buffered data
 				// if the connection is valid
+				// A Connection's outputBuffer cannot
+				// be modified since when we last checked,
+				// so no threat of a possibly blocking
+				// call here.
 				if( connectOK &&
 					!connectionPtr->outputBuffer.empty() )
 					{
@@ -599,6 +697,10 @@ for( handlerMapIterator handlerItr = handlerMap.begin() ;
 		// Next let's check if this is a listening (server) socket
 		else if( connectionPtr->isListening() )
 			{
+//			cout	<< "Poll> Checking listener: "
+//				<< *connectionPtr
+//				<< endl ;
+
 			// Yup.  See if anyone is waiting to connect
 			if( FD_ISSET( tempFD, &readfds ) )
 				{
@@ -611,6 +713,10 @@ for( handlerMapIterator handlerItr = handlerMap.begin() ;
 		// Check for pending outgoing connection
 		else if( connectionPtr->isPending() )
 			{
+//			cout	<< "Poll> Checking pending: "
+//				<< *connectionPtr
+//				<< endl ;
+
 			// Ready for write state?
 			if( FD_ISSET( tempFD, &writefds ) )
 				{
@@ -708,9 +814,9 @@ for( eraseMapIterator eraseItr = eraseMap.begin(),
 		// Obtain a convenience pointer for readability
 		Connection* connectionPtr = *(eraseItr->second) ;
 
-		cout	<< "Poll> Removing connection: "
-			<< *connectionPtr
-			<< endl ;
+//		cout	<< "Poll> Removing connection: "
+//			<< *connectionPtr
+//			<< endl ;
 
 		// Close the Connection's socket (file) descriptor
 		closeSocket( connectionPtr->getSockFD() ) ;
@@ -964,9 +1070,9 @@ if( connectResult < 0 )
 	// first attempt
 	if( errno != EISCONN )
 		{
-		cout	<< "finishConnect> Failed connect: "
-			<< strerror( errno )
-			<< endl ;
+//		cout	<< "finishConnect> Failed connect: "
+//			<< strerror( errno )
+//			<< endl ;
 
 		// Unable to establish connection
 		// Notify handler
@@ -1001,7 +1107,6 @@ assert( newConnection != 0 ) ;
 newConnection->setIncoming() ;
 newConnection->setPending() ;
 newConnection->setTCP( true ) ;
-newConnection->setPort( cPtr->getPort() ) ;
 
 // len is the size of a sockaddr structure, for use by accept()
 size_t len = sizeof( struct sockaddr ) ;
@@ -1046,8 +1151,22 @@ if( (newFD < 0) && (EAGAIN != errno) && (EWOULDBLOCK != errno))
 newConnection->setConnected() ;
 newConnection->setSockFD( newFD ) ;
 
+// Store the remote machine's IP address into the Connection's memory
 const char* IP = inet_ntoa( newConnection->getAddr()->sin_addr ) ;
 newConnection->setIP( IP ) ;
+
+// Because a reverse lookup is flaky at best (and blocks), just assign
+// the newConnection's hostname to be the same as its IP; this will
+// allow DisconnectByHost() to still function properly.
+newConnection->setHostname( IP ) ;
+
+// Update remote port number for this Connection
+newConnection->setRemotePort(
+	ntohs( newConnection->getAddr()->sin_port ) ) ;
+
+// The new connection's localPort is the port to which it connected,
+// which is the port of the listener
+newConnection->setLocalPort( cPtr->getLocalPort() ) ;
 
 // From man page:
 // Note that any per file descriptor flags (everything that can be  set
@@ -1190,14 +1309,14 @@ if( cPtr->isListening() )
 cPtr->outputBuffer += msg.str() ;
 }
 
-const Connection* ConnectionManager::Listen( ConnectionHandler* hPtr,
-	const unsigned short int port )
+Connection* ConnectionManager::Listen( ConnectionHandler* hPtr,
+	const unsigned short int localPort )
 {
 // Public method, check arguments
 assert( hPtr != 0 ) ;
 
-cout	<< "ConnectionManager::List> Port: "
-	<< port
+cout	<< "ConnectionManager::Listen> Port: "
+	<< localPort
 	<< endl ;
 
 // Attempt to open a socket
@@ -1239,7 +1358,7 @@ newConnection->setSockFD( listenFD ) ;
 newConnection->setListen() ;
 newConnection->setPending() ;
 newConnection->setTCP() ;
-newConnection->setPort( port ) ;
+newConnection->setLocalPort( localPort ) ;
 // Leave hostname/IP empty for the new Connection.  This will
 // distinguish the connection more easily for use in
 // DisconnectByHost() and DisconnectByIP()
@@ -1247,7 +1366,7 @@ newConnection->setPort( port ) ;
 // Setup the sockaddr structure
 struct sockaddr_in* addr = newConnection->getAddr() ;
 addr->sin_family = AF_INET ;
-addr->sin_port = htons( static_cast< u_short >( port ) ) ;
+addr->sin_port = htons( static_cast< u_short >( localPort ) ) ;
 
 // Attempt to bind to the given port
 if( ::bind( listenFD,

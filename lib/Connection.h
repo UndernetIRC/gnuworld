@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: Connection.h,v 1.5 2002/05/29 16:10:45 dan_karrels Exp $
+ * $Id: Connection.h,v 1.6 2002/05/31 01:34:06 dan_karrels Exp $
  */
 
 #ifndef __CONNECTION_H
-#define __CONNECTION_H "$Id: Connection.h,v 1.5 2002/05/29 16:10:45 dan_karrels Exp $"
+#define __CONNECTION_H "$Id: Connection.h,v 1.6 2002/05/31 01:34:06 dan_karrels Exp $"
 
 #include	<sys/types.h>
 #include	<netinet/in.h>
@@ -85,10 +85,16 @@ public:
 		{ return IP ; }
 
 	/**
-	 * Return the port number for this connection.
+	 * Return the local port number for this Connection.
 	 */
-	inline unsigned short int	getPort() const
-		{ return port ; }
+	inline unsigned short int	getLocalPort() const
+		{ return localPort ; }
+
+	/**
+	 * Return the remote port number for this Connection.
+	 */
+	inline unsigned short int	getRemotePort() const
+		{ return remotePort ; }
 
 	/**
 	 * Return true if this connection is TCP, false if UDP.
@@ -192,7 +198,8 @@ public:
 		{
 		out	<< "Host: " << con.getHostname()
 			<< ", IP: " << con.getIP()
-			<< ", port: " << con.getPort()
+			<< ", localPort: " << con.getLocalPort()
+			<< ", remotePort: " << con.getRemotePort()
 			<< ", sockFD: " << con.getSockFD()
 			<< ", state: "
 			<< (con.isConnected() ? "connected" : "pending") ;
@@ -211,11 +218,11 @@ protected:
 
 	/**
 	 * Create a new instance of this class given the remote
-	 * host (may be empty), the IP, port number, and TCP/UDP
+	 * host (may be empty), the IP, remote port number, and TCP/UDP
 	 * flag (true if TCP).
 	 */
 	Connection( const string& host,
-			const unsigned short int port,
+			const unsigned short int remotePort,
 			const bool TCP,
 			const char delimiter ) ;
 
@@ -251,9 +258,15 @@ protected:
 	inline void	setListen()
 		{ setFlag( F_LISTEN ) ; }
 
-	/// Set this connection's port number
-	inline void	setPort( const unsigned short int newPort )
-		{ port = newPort ; }
+	/// Set this connection's local port number
+	inline void	setLocalPort(
+				const unsigned short int newLocalPort )
+		{ localPort = newLocalPort ; }
+
+	/// Set this connection's remote port number
+	inline void	setRemotePort(
+				const unsigned short int newRemotePort )
+		{ remotePort = newRemotePort ; }
 
 	/// Set the TCP variable, default value is true
 	inline void	setTCP( bool newVal = true )
@@ -292,8 +305,11 @@ protected:
 	/// This variable is empty() if this Connection is a listener
 	string			hostname ;
 
+	/// The local port number of this connection
+	unsigned short int	localPort ;
+
 	/// The remote port number of this connection
-	unsigned short int	port ;
+	unsigned short int	remotePort ;
 
 	/// True if TCP connection, false if UDP
 	bool			TCP ;
