@@ -610,7 +610,7 @@ else if(Command == "VERSION")
 	xClient::DoCTCP(theClient, CTCP,
 		"Undernet P10 Channel Services Version 2 ["
 		__DATE__ " " __TIME__
-		"] ($Id: cservice.cc,v 1.98 2001/02/12 10:59:29 isomer Exp $)");
+		"] ($Id: cservice.cc,v 1.99 2001/02/12 11:13:47 isomer Exp $)");
 	}
 else if(Command == "PROBLEM?")
 	{
@@ -2065,8 +2065,9 @@ if( Connected && MyUplink )
 	{
 	setOutputTotal( Target, getOutputTotal(Target) + Message.size() );
 	char buffer[512];
-	char *b=buffer;
+	char *b;
 	const char *m;
+	b=buffer;
 	for (m=Message.c_str();m!=0;m++) 
 		{
 		if (*m == '\n' || *m == '\r') 
