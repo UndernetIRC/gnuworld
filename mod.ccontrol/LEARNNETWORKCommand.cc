@@ -14,8 +14,9 @@
 #include        "iServer.h"
 #include	"Network.h"
 #include        "stdlib.h"
+#include        "server.h"
 
-const char LEARNNETWORKCommand_cc_rcsId[] = "$Id: LEARNNETWORKCommand.cc,v 1.5 2001/05/07 19:02:15 mrbean_ Exp $";
+const char LEARNNETWORKCommand_cc_rcsId[] = "$Id: LEARNNETWORKCommand.cc,v 1.6 2001/07/17 07:24:13 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -47,7 +48,7 @@ for( ; ptr != end ; ptr++ )
 		if(!NewServer->loadData(CurServer->getName().c_str()))
 			{ //If the server isnt in the database , update it
 			NewServer->set_Name(CurServer->getName());
-			NewServer->set_Uplink(Network->findServer(CurServer->getUplinkIntYY())->getName());
+			//NewServer->set_Uplink(Network->findServer(CurServer->getUplinkIntYY())->getName());
 			NewServer->set_LastNumeric(CurServer->getCharYY());
 			NewServer->set_LastConnected(CurServer->getConnectTime());
 			NewServer->set_LastSplitted(0);

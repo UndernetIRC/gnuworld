@@ -26,7 +26,7 @@
 #include        "server.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.55 2001/06/11 21:08:31 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.56 2001/07/17 07:24:13 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -192,7 +192,7 @@ RegisterCommand( new REMOVECOMMANDCommand( this, "DELCOMMAND", "<USER> <COMMAND>
 	"Remove a command from oper",flg_DELCMD ) ) ;
 RegisterCommand( new NEWPASSCommand( this, "NEWPASS", "<PASSWORD> "
 	"Change password",flg_NEWPASS ) ) ;
-RegisterCommand( new SUSPENDOPERCommand( this, "SUSPEND", "<OPER> "
+RegisterCommand( new SUSPENDOPERCommand( this, "SUSPEND", "<OPER> <DURATION> <TIME UNITS>"
 	"Suspend an oper",flg_SUSPEND ) ) ;
 RegisterCommand( new UNSUSPENDOPERCommand( this, "UNSUSPEND", "<OPER> "
 	"UnSuspend an oper",flg_UNSUSPEND ) ) ;
@@ -1423,7 +1423,7 @@ va_start( list, Log ) ;
 vsprintf( buffer, Log, list ) ;
 va_end( list ) ;
 iClient *theClient = Network->findClient(Oper->get_Numeric());
-
+buffer[512]= '\0';
 static const char *Main = "INSERT into comlog (ts,oper,command) VALUES (now()::abstime::int4,'";
 
 strstream theQuery;

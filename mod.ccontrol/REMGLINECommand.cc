@@ -12,7 +12,7 @@
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 
-const char REMGLINECommand_cc_rcsId[] = "$Id: REMGLINECommand.cc,v 1.9 2001/05/17 19:54:57 mrbean_ Exp $";
+const char REMGLINECommand_cc_rcsId[] = "$Id: REMGLINECommand.cc,v 1.10 2001/07/17 07:24:13 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -30,7 +30,6 @@ if( st.size() < 2 )
 	return true ;
 	}
 
-bot->wallopsAsServer("%s is removing gline for %s",theClient->getNickName().c_str(),st[1].c_str());
 ccGline *tmpGline = bot->findGline(st[1]);
 if(tmpGline != NULL)
 	{

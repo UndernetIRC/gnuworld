@@ -14,7 +14,7 @@
 #include	"StringTokenizer.h"
 #include	"ip.h"
 
-const char WHOISCommand_cc_rcsId[] = "$Id: WHOISCommand.cc,v 1.4 2001/02/26 16:58:06 mrbean_ Exp $";
+const char WHOISCommand_cc_rcsId[] = "$Id: WHOISCommand.cc,v 1.5 2001/07/17 07:24:13 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -67,6 +67,11 @@ if( Target->isOper() )
 		st[ 1 ].c_str() ) ;
 	}
 
+if(Target->getMode(iClient::MODE_SERVICES))
+	{
+	return true;
+	}
+	
 vector< string > channels ;
 for( iClient::const_channelIterator ptr = Target->channels_begin() ;
 	ptr != Target->channels_end() ; ++ptr )

@@ -14,7 +14,7 @@
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 
-const char JUPECommand_cc_rcsId[] = "$Id: JUPECommand.cc,v 1.7 2001/05/02 21:10:18 mrbean_ Exp $";
+const char JUPECommand_cc_rcsId[] = "$Id: JUPECommand.cc,v 1.8 2001/07/17 07:24:13 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -32,7 +32,7 @@ if( st.size() < 3 )
 	}
 
 // The server name to be juped must have at least 1 '.'
-if( string::npos == st[ 1 ].find_first_of( '.' ) )
+if( (string::npos == st[ 1 ].find_first_of( '.' )) || (st[1].length() > 63) )
 	{
 	bot->Notice( theClient, "Bogus server name" ) ;
 	return false ;

@@ -13,7 +13,7 @@
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 
-const char CLEARCHANCommand_cc_rcsId[] = "$Id: CLEARCHANCommand.cc,v 1.5 2001/06/28 19:10:17 dan_karrels Exp $";
+const char CLEARCHANCommand_cc_rcsId[] = "$Id: CLEARCHANCommand.cc,v 1.6 2001/07/17 07:24:13 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -44,7 +44,7 @@ string args = ""; //Holds the arguments for the remModes
 
 //Check if the user specified the modes, if not assume he ment all of the modes
 if(st.size() == 2)
-	doModes = "OBKLI";
+	doModes = "OBKLIM";
 else if(!strcasecmp(string_upper(st[ 2 ]).c_str(),"ALL"))
 	doModes = "OBKLINMSPT";
 else	

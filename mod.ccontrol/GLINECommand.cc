@@ -19,7 +19,7 @@
 #include	"ELog.h"
 #include	"Gline.h"
 
-const char GLINECommand_cc_rcsId[] = "$Id: GLINECommand.cc,v 1.10 2001/05/21 16:14:55 mrbean_ Exp $";
+const char GLINECommand_cc_rcsId[] = "$Id: GLINECommand.cc,v 1.11 2001/07/17 07:24:13 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -71,7 +71,6 @@ if( string::npos == atPos )
 
 string userName = st[ pos ].substr( 0, pos ) ;
 string hostName = st[ pos ].substr( pos + 1 ) ;
-
 switch(bot->CheckGline(st[ pos ].c_str(),gLength))
 	{
 	case FORCE_NEEDED_HOST:
@@ -112,18 +111,12 @@ TmpGline->set_AddedOn(::time(0));
 if(Up)
 	{	
 	TmpGline->Update();
-	bot->wallopsAsServer("%s is refreshing Gline expiration time on host %s for %d\n",
-	theClient->getNickName().c_str(),st[pos].c_str(),::time(0) + gLength);
 	}
 else
 	{
 	TmpGline->Insert();
 	//We need to update the Id
 	TmpGline->loadData(TmpGline->get_Host());
-	bot->wallopsAsServer("%s is adding gline for %s, expires at %s for: %s\n"
-	,theClient->getNickName().c_str(),
-	st[pos].c_str(),bot->convertToAscTime(time( 0 ) + gLength),
-	st.assemble( pos + 1 ).c_str());
 	}
 if(!Up)
 	bot->addGline(TmpGline);

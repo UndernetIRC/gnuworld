@@ -13,7 +13,7 @@
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 
-const char LASTCOMCommand_cc_rcsId[] = "$Id: LASTCOMCommand.cc,v 1.1 2001/05/05 20:29:09 mrbean_ Exp $";
+const char LASTCOMCommand_cc_rcsId[] = "$Id: LASTCOMCommand.cc,v 1.2 2001/07/17 07:24:13 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -57,7 +57,7 @@ else
 		static const char* queryHeader
 		    = "SELECT * FROM comlog ";
 		theQuery 	<< queryHeader 
-				<< " ORDER BY ts ASC"
+				<< " ORDER BY ts DESC"
 				<< " LIMIT " << NumOfCom
 				<< ends;
 					    
@@ -82,7 +82,7 @@ if( PGRES_TUPLES_OK != status )
 
 // SQL Query succeeded
 bot->Notice(theClient,"Listing last %d messages from day %d",NumOfCom,Days);
-for (int i = 0 ; i < bot->SQLDb->Tuples(); i++)
+for (int i = (bot->SQLDb->Tuples() - 1) ; i >= 0; i--)
 	{
 	bot->Notice(theClient,"[ %s - %s ] %s",bot->convertToAscTime(atoi(bot->SQLDb->GetValue(i, 0))),bot->SQLDb->GetValue(i,1),bot->SQLDb->GetValue(i,2));
 	}
