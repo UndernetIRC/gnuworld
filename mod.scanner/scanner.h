@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: scanner.h,v 1.1 2002/08/07 20:28:07 dan_karrels Exp $
+ * $Id: scanner.h,v 1.2 2002/08/08 21:31:45 dan_karrels Exp $
  */
 
 #ifndef __SCANNER_H
@@ -28,6 +28,8 @@
 #include	"client.h"
 #include	"server.h"
 #include	"iClient.h"
+#include	"dbThread.h"
+#include	"ScannerModule.h"
 
 using std::string ;
 
@@ -40,6 +42,8 @@ namespace gnuworld
  */
 class scanner : public xClient
 {
+
+	dbThread		theThread ;
 
 public:
 	/**
@@ -75,14 +79,32 @@ public:
 	 */
 	virtual int BurstChannels() ;
 
+	/**
+	 * The event handler method, all network events will cause this
+	 * method to be invoked.
+	 */
 	virtual int	OnEvent( const eventType&,
 				void* = 0,
 				void* = 0,
 				void* = 0,
 				void* = 0 ) ;
 
+	/* For use by scanner modules */
+
+	/**
+	 * RejectClient() is called to notify the scanner that the
+	 * given Connection represents an insecurity.
+	 * If the optional second argument is specified, then it will
+	 * be used in log messages and G-Line.
+	 */
+	virtual void	RejectClient( Connection*,
+				const string& = string() ) ;
+
 protected:
 
+	/**
+	 * This method is called when a new client connects to the network.
+	 */
 	virtual void	handleNewClient( iClient* ) ;
 
 } ;

@@ -14,7 +14,7 @@
 
 @SET_MAKE@
 
-# "$Id: Makefile.in,v 1.3 2002/08/08 18:32:34 dan_karrels Exp $"
+# "$Id: Makefile.in,v 1.4 2002/08/08 21:31:45 dan_karrels Exp $"
 SHELL = @SHELL@
 
 srcdir = @srcdir@
@@ -98,7 +98,12 @@ install_sh = @install_sh@
 threadLib = @threadLib@
 
 lib_LTLIBRARIES = libscanner.la
-libscanner_la_SOURCES = scanner.cc
+libscanner_la_SOURCES = ScannerModule.h \
+	dbThread.cc \
+	scanner.cc \
+	wingateModule.cc
+
+
 libscanner_la_LDFLAGS = -module -export-dynamic $(threadLib)
 
 INCLUDES = $(INCLTDL)
@@ -109,7 +114,7 @@ CONFIG_CLEAN_FILES =
 LTLIBRARIES = $(lib_LTLIBRARIES)
 
 libscanner_la_LIBADD =
-am_libscanner_la_OBJECTS = scanner.lo
+am_libscanner_la_OBJECTS = dbThread.lo scanner.lo wingateModule.lo
 libscanner_la_OBJECTS = $(am_libscanner_la_OBJECTS)
 
 DEFS = @DEFS@
@@ -119,7 +124,8 @@ LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
-@AMDEP_TRUE@DEP_FILES = ./$(DEPDIR)/scanner.Plo
+@AMDEP_TRUE@DEP_FILES = ./$(DEPDIR)/dbThread.Plo ./$(DEPDIR)/scanner.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/wingateModule.Plo
 CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
 LTCXXCOMPILE = $(LIBTOOL) --mode=compile $(CXX) $(DEFS) \
@@ -127,6 +133,14 @@ LTCXXCOMPILE = $(LIBTOOL) --mode=compile $(CXX) $(DEFS) \
 	$(AM_CXXFLAGS) $(CXXFLAGS)
 CXXLD = $(CXX)
 CXXLINK = $(LIBTOOL) --mode=link $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) \
+	$(AM_LDFLAGS) $(LDFLAGS) -o $@
+CFLAGS = @CFLAGS@
+COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
+	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
+LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) \
+	$(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
+CCLD = $(CC)
+LINK = $(LIBTOOL) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(AM_LDFLAGS) $(LDFLAGS) -o $@
 DIST_SOURCES = $(libscanner_la_SOURCES)
 DIST_COMMON = Makefile.am Makefile.in
@@ -178,7 +192,9 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/dbThread.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/scanner.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/wingateModule.Plo@am__quote@
 
 distclean-depend:
 	-rm -rf ./$(DEPDIR)

@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ConnectionManager.h,v 1.1 2002/08/07 20:28:06 dan_karrels Exp $
+ * $Id: ConnectionManager.h,v 1.2 2002/08/08 21:31:44 dan_karrels Exp $
  */
 
 #ifndef __CONNECTIONMANAGER_H
-#define __CONNECTIONMANAGER_H "$Id: ConnectionManager.h,v 1.1 2002/08/07 20:28:06 dan_karrels Exp $"
+#define __CONNECTIONMANAGER_H "$Id: ConnectionManager.h,v 1.2 2002/08/08 21:31:44 dan_karrels Exp $"
 
 #include	<sys/types.h>
 
@@ -86,6 +86,9 @@ class ConnectionManager
 	 */
 	typedef connectionMapType::iterator	connectionMapIterator ;
 
+	/**
+	 * A const iterator used to iterate through a connectionMap.
+	 */
 	typedef connectionMapType::const_iterator constConnectionMapIterator ;
 
 	/**
@@ -101,6 +104,9 @@ class ConnectionManager
 	 */
 	typedef handlerMapType::iterator	handlerMapIterator ;
 
+	/**
+	 * A const iterator used to iterate through the handlerMap.
+	 */
 	typedef handlerMapType::const_iterator	constHandlerMapIterator ;
 
 	/**
@@ -191,6 +197,11 @@ public:
 				const string& host,
 				const unsigned short int remotePort ) ;
 
+	/**
+	 * Connect to a file instead of a network host.  This method
+	 * has the same semantics as Connect(), except that OnConnect()
+	 * may be called during the call to ConnectToFile().
+	 */
 	virtual Connection*	ConnectToFile( ConnectionHandler*,
 					const string& ) ;
 
@@ -265,6 +276,12 @@ public:
 	 */
 	virtual bool	Disconnect( ConnectionHandler*,
 				Connection* ) ;
+
+	/**
+	 * Return the number of outstanding connections for the given
+	 * ConnectionHandler.
+	 */
+	virtual size_t	numConnections( ConnectionHandler* ) const ;
 
 	/**
 	 * This method performs the actual read/write calls for all

@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ConnectionManager.cc,v 1.1 2002/08/07 20:28:06 dan_karrels Exp $
+ * $Id: ConnectionManager.cc,v 1.2 2002/08/08 21:31:44 dan_karrels Exp $
  */
 
 #include	<unistd.h>
@@ -1547,6 +1547,19 @@ if( newConnect != 0 )
 	}
 
 return newConnect ;
+}
+
+size_t ConnectionManager::numConnections( ConnectionHandler* hPtr ) const
+{
+assert( hPtr != 0 ) ;
+
+constHandlerMapIterator hItr = handlerMap.find( hPtr ) ;
+if( hItr == handlerMap.end() )
+	{
+	return 0 ;
+	}
+
+return hItr->second.size() ;
 }
 
 } // namespace gnuworld

@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: scanner.cc,v 1.3 2002/08/07 21:11:11 dan_karrels Exp $
+ * $Id: scanner.cc,v 1.4 2002/08/08 21:31:45 dan_karrels Exp $
  */
 
 #include	"client.h"
@@ -103,9 +103,29 @@ switch( whichEvent )
 return xClient::OnEvent( whichEvent, arg1, arg2, arg3, arg4 ) ;
 }
 
+/**
+ * This method will basically just put the client address into the
+ * db thread queue.  The db thread will then check the cache for existing
+ * entries, and place a reply into the reply queue.
+ */
 void scanner::handleNewClient( iClient* newClient )
 {
+// put into db processing queue
 
+}
+
+/**
+ * This is a pretty simple job to reject the client, simply gline the
+ * address and IP of the given connection :)
+ * logMsg can be empty, in which case, use the default string.
+ */
+void scanner::RejectClient( Connection* cPtr, const string& logMsg )
+{
+// gline IP
+// gline host
+// kill clients for fun? :)
+
+// place ip/host into rejected queue for db thread to update db
 
 }
 
