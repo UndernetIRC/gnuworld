@@ -3,12 +3,13 @@
  */
 
 #ifndef __XNETWORK_H
-#define __XNETWORK_H "$Id: Network.h,v 1.7 2000/08/02 22:48:10 dan_karrels Exp $"
+#define __XNETWORK_H "$Id: Network.h,v 1.8 2000/11/02 19:24:29 dan_karrels Exp $"
 
 #include	<vector>
 #include	<string>
 #include	<map>
 #include	<hash_map>
+#include	<algorithm>
 
 #include	<ctime>
 
@@ -24,6 +25,7 @@ using std::vector ;
 using std::map ;
 using std::hash ;
 using std::hash_map ;
+using std::unary_function ;
 
 namespace gnuworld
 {
@@ -379,10 +381,39 @@ public:
 	inline const_localClientIterator localClient_end() const
 		{ return localClients.end() ; }
 
+	/**
+	 * Return the number of channels currently stored in the
+	 * the channel table.
+	 */
 	inline size_t	channelList_size() const
 		{ return channelMap.size() ; }
+
+	/**
+	 * Return the number of servers currently stored in the
+	 * the server table.
+	 */
 	inline size_t	serverList_size() const ;
+
+	/**
+	 * Return the number of network clients currently stored
+	 * in the client table.
+	 */
 	inline size_t	clientList_size() const ;
+
+	/**
+	 * A base class unary function used in foreach_xClient.
+	 */
+	struct fe_xClientBase : public unary_function< xClient*, void >
+	{
+	virtual void operator() ( xClient* ) {}
+	} ;
+
+	/**
+	 * Execute a unary function for each xClient.  Keep in mind
+	 * that the arguments passed to the operator() of this
+	 * functor may be NULL.
+	 */
+	virtual void	foreach_xClient( fe_xClientBase  ) ;
 
 protected:
 

@@ -17,7 +17,7 @@
  */
 
 #ifndef __XSERVER_H
-#define __XSERVER_H "$Id: server.h,v 1.10 2000/08/06 22:45:21 gte Exp $"
+#define __XSERVER_H "$Id: server.h,v 1.11 2000/11/02 19:24:29 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
@@ -26,6 +26,7 @@
 #include	<map>
 #include	<hash_map>
 #include	<queue>
+#include	<algorithm>
 
 #include	<ctime>
 
@@ -105,6 +106,7 @@ using std::vector ;
 using std::strstream ;
 using std::hash_map ;
 using std::priority_queue ;
+using std::map ;
 
 /**
  * This class is the server proper; it is responsible for the connection
@@ -382,7 +384,7 @@ public:
 	 * absolute time at which the timed event is to occur.
 	 * The second argument is a pointer to an argument to be
 	 * passed to the timer handler.
-	 * Returns 0 on failure.
+	 * Returns 0 on failure, a valid timerID otherwise.
 	 */
 	virtual timerID RegisterTimer( const time_t& absoluteTime,
 		xClient* theClient,
@@ -390,9 +392,11 @@ public:
 
 	/**
 	 * Remove a timed event from the timer system.
+	 * If data is non-NULL, the timer argument passed to
+	 * RegisterTimer() will be returned through data.
 	 * Return true if successful, false otherwise.
 	 */
-	virtual bool	UnRegisterTimer( timerID ) ;
+	virtual bool	UnRegisterTimer( const timerID&, void*& data ) ;
 
 	/**
 	 * Post a system event to the rest of the system.  Note
@@ -417,6 +421,13 @@ public:
 	 * this event for every channel in existence on the network.
 	 */
 	const static string	CHANNEL_ALL ;
+
+	/**
+	 * Post a signal to the server and all clients.
+	 * Returns true if the signal was handled, false
+	 * otherwise.
+	 */
+	virtual bool	PostSignal( int ) ;
 
 	/*
 	 * Server message system
@@ -603,6 +614,12 @@ protected:
 	virtual void parseBurstUsers( Channel*, const char* ) ;
 
 	/**
+	 * Signal handler for the server itself.
+	 * Returns true if the signal was handled.
+	 */
+	virtual bool	OnSignal( int ) ;
+
+	/**
 	 * The structure type to hold information about client timed
 	 * events.
 	 */
@@ -632,6 +649,11 @@ protected:
 		return lhs.first > rhs.first ;
 		}
 	} ;
+
+	/**
+	 * Return a unique timerID.
+	 */
+	timerID		getUniqueTimerID() ;
 
 	/* Network message handlers */
 
@@ -962,6 +984,9 @@ protected:
 		timerGreater >
 		timerQueueType ;
 	timerQueueType  timerQueue ;
+
+	typedef map< timerID, bool > uniqueTimerMapType ;
+	uniqueTimerMapType		uniqueTimerMap ;
 
 	timerID		lastTimerID ;
 } ;

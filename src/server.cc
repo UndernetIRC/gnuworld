@@ -21,6 +21,7 @@
 #include	<cstring>
 #include	<cassert>
 #include	<cerrno>
+#include	<csignal>
 
 #include	"config.h"
 #include	"misc.h"
@@ -39,7 +40,7 @@
 //#include	"moduleLoader.h"
 
 const char xServer_h_rcsId[] = __XSERVER_H ;
-const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.25 2000/08/06 22:45:21 gte Exp $" ;
+const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.26 2000/11/02 19:24:29 dan_karrels Exp $" ;
 
 using std::string ;
 using std::vector ;
@@ -48,11 +49,25 @@ using std::endl ;
 using std::ends ;
 using std::strstream ;
 using std::stack ;
+using std::unary_function ;
 
 namespace gnuworld
 {
 
 const string xServer::CHANNEL_ALL( "*" ) ;
+
+struct handleSignal : public xNetwork::fe_xClientBase
+{
+handleSignal( int _whichSig ) : whichSig( _whichSig ) {}
+
+virtual void operator() ( xClient* theClient )
+{
+if( NULL == theClient ) return ;
+theClient->OnSignal( whichSig ) ;
+}
+ 
+int     whichSig ;
+} ;
 
 /**
  * Instantiate a new xServer.  There is only one global
@@ -4132,14 +4147,16 @@ xServer::timerID xServer::RegisterTimer( const time_t& absTime,
   assert( theClient != 0 ) ;
 #endif
 
+// Don't register a timer that has already expired.
 if( absTime <= ::time( 0 ) )
 	{
 	return 0 ;
 	}
 
-// TODO: Make sure this doesn't overflow
-timerID ID = lastTimerID++ ;
+// Retrieve a unique timerID
+timerID ID = getUniqueTimerID() ;
 
+// Allocate a timerInfo structure to represent this timer
 timerInfo* ti = 0 ;
 try
 	{
@@ -4151,26 +4168,46 @@ catch( std::bad_alloc )
 	return 0 ;
 	}
 
+// Add this timerInfo structure to the timerQueue
 timerQueue.push( timerQueueType::value_type( absTime, ti ) ) ;
 
+// Add the unique timerID to the timerID map
+uniqueTimerMap.insert( uniqueTimerMapType::value_type( ID, true ) ) ;
+
+// Return the valid timerID of this timer
 return ID ;
 }
 
-bool xServer::UnRegisterTimer( xServer::timerID ID )
+bool xServer::UnRegisterTimer( const xServer::timerID& ID,
+	void*& data )
 {
 
+// Make sure there are timers in the queue
 if( timerQueue.empty() )
 	{
+	// The timerQueue is empty -- the timerID specified
+	// is invalid at best.
 	return true ;
 	}
 
+// Create a local stack to store elements popped from the timerQueue
+// in searching for the timer in question (could also have used
+// another priority queue)
 stack< timerQueueType::value_type > localStack ;
+
+// Continue while the timerQueue is not empty, and we have not
+// found the timerID in question.
 while( !timerQueue.empty() && (timerQueue.top().second->ID != ID) )
 	{
+	// Add this timer to the local stack
 	localStack.push( timerQueue.top() ) ;
+
+	// Remove this timer from the timerQueue
 	timerQueue.pop() ;
 	}
 
+// This variable will represent the case that we found
+// the timer in question
 bool foundTimer = false ;
 
 // timerQueue is now empty, or its top element has the timer
@@ -4180,7 +4217,19 @@ if( !timerQueue.empty() )
 	// Find was successful
 	foundTimer = true ;
 
+	// Assign the timer argument back to "data"
+	if( data != 0 )
+		{
+		data = timerQueue.top().second->data ;
+		}
+
+	// Remove this timerID from the uniqueTimerMap
+	uniqueTimerMap.erase( timerQueue.top().second->ID ) ;
+
+	// Deallocate the timerInfo structure for this timer
 	delete timerQueue.top().second ;
+
+	// Remove the timerInfo from the timerQueue
 	timerQueue.pop() ;
 	}
 
@@ -4197,26 +4246,91 @@ return foundTimer ;
 unsigned int xServer::CheckTimers()
 {
 
+// Make sure the timerQueue is not empty, and that
+// we are not bursting
 if( timerQueue.empty() || bursting )
 	{
 	return 0 ;
 	}
 
+// Create a variable to count the number of timers executed
 unsigned int numTimers = 0 ;
+
+// What time is this method being invoked?
 time_t now = ::time( 0 ) ;
 
 while( !timerQueue.empty() && (timerQueue.top().second->absTime <= now) )
 	{
+	// Grab a timerInfo structure
 	timerInfo* info = timerQueue.top().second ;
+
+	// Remove the structure from the timerQueue
 	timerQueue.pop() ;
 
+	// Call the timer handler method for the client
 	info->theClient->OnTimer( info->ID, info->data ) ;
 
+	// Remove the timerID from the uniqueTimerMap
+	uniqueTimerMap.erase( info->ID ) ;
+
+	// Deallocate the timerInfo structure for this timer
 	delete info ;
+
+	// Increment the counter for number of timers executed
 	++numTimers ;
 	}
 
+// Return the number of timers executed
 return numTimers ;
+}
+
+xServer::timerID xServer::getUniqueTimerID()
+{
+timerID retMe = lastTimerID++ ;
+while( uniqueTimerMap.find( retMe ) != uniqueTimerMap.end() )
+	{
+	retMe = lastTimerID++ ;
+	}
+return retMe ;
+}
+
+bool xServer::PostSignal( int whichSig )
+{
+
+// First, notify the server signal handler
+bool handledSignal = OnSignal( whichSig ) ;
+
+Network->foreach_xClient( handleSignal( whichSig ) ) ;
+
+/*
+// Pass this signal on to each xClient.
+xNetwork::localClientIterator ptr = Network->localClient_begin() ;
+for( ; ptr != Network->localClient_end() ; ++ptr )
+	{
+	if( NULL == *ptr )
+		{
+		continue ;
+		}
+	(*ptr)->OnSignal( whichSig ) ;
+	}
+*/
+
+return handledSignal ;
+}
+
+bool xServer::OnSignal( int whichSig )
+{
+bool retMe = false ;
+switch( whichSig )
+	{
+	case SIGUSR1:
+		dumpStats() ;
+		retMe = true ;
+		break ;
+	default:
+		break ;
+	}
+return retMe ;
 }
 
 } // namespace gnuworld

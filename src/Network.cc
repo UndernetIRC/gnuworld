@@ -5,6 +5,7 @@
 #include	<iostream>
 #include	<string>
 #include	<hash_map>
+#include	<algorithm>
 
 #include	<cstring>
 #ifndef NDEBUG
@@ -20,12 +21,13 @@
 #include	"misc.h"
 
 const char xNetwork_h_rcsId[] = __XNETWORK_H ;
-const char xNetwork_cc_rcsId[] = "$Id: Network.cc,v 1.12 2000/08/02 23:35:11 dan_karrels Exp $" ;
+const char xNetwork_cc_rcsId[] = "$Id: Network.cc,v 1.13 2000/11/02 19:24:29 dan_karrels Exp $" ;
 
 using std::string ;
 using std::endl ;
 using std::hash_map ;
 using std::hash ;
+using std::unary_function ;
 
 namespace gnuworld
 {
@@ -652,6 +654,11 @@ for( networkVectorType::const_iterator ptr = clients.begin() ;
 		}
 	}
 return i ;
+}
+
+void xNetwork::foreach_xClient( xNetwork::fe_xClientBase f )
+{
+std::for_each( localClients.begin(), localClients.end(), f ) ;
 }
 
 } // namespace gnuworld

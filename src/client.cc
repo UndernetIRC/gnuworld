@@ -27,7 +27,7 @@
 #include	"events.h"
 
 const char xClient_h_rcsId[] = __XCLIENT_H ;
-const char xClient_cc_rcsId[] = "$Id: client.cc,v 1.12 2000/08/05 17:23:34 dan_karrels Exp $" ;
+const char xClient_cc_rcsId[] = "$Id: client.cc,v 1.13 2000/11/02 19:24:29 dan_karrels Exp $" ;
 
 using std::string ;
 using std::strstream ;
@@ -1028,6 +1028,11 @@ return true ;
 }
 
 int xClient::OnTimer( xServer::timerID ID, void* data )
+{
+return 0 ;
+}
+
+int xClient::OnSignal( int whichSig )
 {
 return 0 ;
 }

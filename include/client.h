@@ -3,7 +3,7 @@
  */
 
 #ifndef __XCLIENT_H
-#define __XCLIENT_H "$Id: client.h,v 1.8 2000/08/05 17:23:34 dan_karrels Exp $"
+#define __XCLIENT_H "$Id: client.h,v 1.9 2000/11/02 19:24:29 dan_karrels Exp $"
 
 #include	<string>
 
@@ -156,6 +156,15 @@ public:
 		const string& chanName,
 		void* Data1 = NULL, void* Data2 = NULL,
 		void* Data3 = NULL, void* Data4 = NULL ) ;
+
+	/**
+	 * This method is called for each signal that occurs
+	 * in the system.  There is no registration needed to
+	 * receive signals, just overload this method.  Be
+	 * sure to end the method with a call to the base
+	 * class OnSignal (or the closest base class).
+	 */
+	virtual int OnSignal( int ) ;
 
 	/**
 	 * OnCTCP is called when a CTCP command is issued to

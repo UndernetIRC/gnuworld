@@ -1,5 +1,5 @@
 /* main.cc
- * $Id: main.cc,v 1.8 2000/08/04 23:43:19 dan_karrels Exp $
+ * $Id: main.cc,v 1.9 2000/11/02 19:24:29 dan_karrels Exp $
  */
 
 #include	<fstream>
@@ -29,7 +29,7 @@
 using namespace gnuworld ;
 
 const char config_h_rcsId[] = __CONFIG_H ;
-const char main_cc_rcsId[] = "$Id: main.cc,v 1.8 2000/08/04 23:43:19 dan_karrels Exp $" ;
+const char main_cc_rcsId[] = "$Id: main.cc,v 1.9 2000/11/02 19:24:29 dan_karrels Exp $" ;
 
 using std::cerr ;
 using std::clog ;
@@ -44,14 +44,21 @@ volatile bool keepRunning = true ;
 
 void sigHandler( int whichSig )
 {
+if( Server != NULL )
+	{
+	// Let the server handle it, for now.
+	if( Server->PostSignal( whichSig ) )
+		{
+		// The server handled it ok.
+		return ;
+		}
+	}
+
+// Either the server is NULL, or it was unable to handle the
+// signal.
+
 switch( whichSig )
 	{
-	case SIGUSR1:
-		if( Server )
-			{
-			Server->dumpStats() ;
-			}
-		break ;
 	default:
 		elog << "*** Shutting down...\n" ;
 		keepRunning = false ;
@@ -134,6 +141,11 @@ if( SIG_ERR == ::signal( SIGUSR1, sigHandler ) )
 if( SIG_ERR == ::signal( SIGTERM, sigHandler ) )
 	{
 	clog	<< "*** Unable to establish signal hander for SIGTERM\n" ;
+	return 0 ;
+	}
+if( SIG_ERR == ::signal( SIGHUP, sigHandler ) )
+	{
+	clog	<< "*** Unable to establish signal hander for SIGHUP\n" ;
 	return 0 ;
 	}
 
