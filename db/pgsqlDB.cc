@@ -1,5 +1,5 @@
 /**
- * gnuworldDB.cc
+ * pgsqlDB.cc
  * Author: Daniel Karrels (dan@karrels.com)
  * Copyright (C) 2002 Daniel Karrels <dan@karrels.com>
  *
@@ -18,13 +18,40 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: gnuworldDB.cc,v 1.2 2002/05/29 18:46:11 dan_karrels Exp $
+ * $Id: pgsqlDB.cc,v 1.1 2002/05/29 18:46:11 dan_karrels Exp $
  */
 
-#include	"gnuworldDB.h"
+#include	"pgsqlDB.h"
 
-const char gnuworldDB_cc_rcsId[] = "$Id: gnuworldDB.cc,v 1.2 2002/05/29 18:46:11 dan_karrels Exp $" ;
-const char gnuworldDB_h_rcsId[] = __GNUWORLDDB_H ;
+const char pgsqlDB_cc_rcsId[] = "$Id: pgsqlDB.cc,v 1.1 2002/05/29 18:46:11 dan_karrels Exp $" ;
+const char pgsqlDB_h_rcsId[] = __PGSQLDB_H ;
 
 namespace gnuworld
+{
+pgsqlDB::pgsqlDB()
 {}
+
+pgsqlDB::~pgsqlDB()
+{}
+
+bool pgsqlDB::Connect( const string& host,
+	const unsigned short int port,
+	const strnig& dbName,
+	const string& pass )
+{
+
+
+
+
+}
+
+bool pgsqlDB::Exec( const string& )
+{}
+
+bool pgsqlDB::Exec( const stringstream& )
+{}
+
+uns
+
+
+} // namespace gnuworld
