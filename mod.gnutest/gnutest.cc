@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: gnutest.cc,v 1.13 2003/11/11 19:25:15 dan_karrels Exp $
+ * $Id: gnutest.cc,v 1.14 2003/11/27 02:07:36 dan_karrels Exp $
  */
 
 #include	<string>
@@ -29,7 +29,7 @@
 #include	"EConfig.h"
 #include	"Network.h"
 
-RCSTAG("$Id: gnutest.cc,v 1.13 2003/11/11 19:25:15 dan_karrels Exp $");
+RCSTAG("$Id: gnutest.cc,v 1.14 2003/11/27 02:07:36 dan_karrels Exp $");
 
 namespace gnuworld
 {
@@ -61,6 +61,32 @@ operChan = conf.Require( "operchan" )->second ;
 
 gnutest::~gnutest()
 {}
+
+void gnutest::OnAttach()
+{
+//elog	<< "gnutest::OnAttach()" << endl ;
+xClient::OnAttach() ;
+}
+
+void gnutest::OnDetach( const string& reason )
+{
+//elog	<< "gnutest::OnDetach("
+//	<< reason
+//	<< ")" << endl ;
+xClient::OnDetach( reason ) ;
+}
+
+void gnutest::OnConnect()
+{
+//elog	<< "gnutest::OnConnect()" << endl ;
+xClient::OnConnect() ;
+}
+
+void gnutest::OnDisconnect()
+{
+//elog	<< "gnuteset::OnDisconnect()" << endl ;
+xClient::OnDisconnect() ;
+}
 
 bool gnutest::BurstChannels()
 {
@@ -127,14 +153,14 @@ void gnutest::OnPrivateMessage( iClient* theClient,
 	const string& message,
 	bool )
 {
-if( !theClient->isOper() )
-	{
+//if( !theClient->isOper() )
+//	{
 //	elog	<< "gnutest::OnPrivateMessage> Denying access "
 //		<< "to non-oper: "
 //		<< *theClient
 //		<< endl ;
-	return ;
-	}
+//	return ;
+//	}
 
 //elog	<< "gnutest::OnPrivateMessage> Message: "
 //	<< message
@@ -158,8 +184,9 @@ else if( st[ 0 ] == "reload" )
 	{
 	Notice( theClient, "Reloading client...see you on the flip side" ) ;
 
-	MyUplink->UnloadClient( this, string() ) ;
+	MyUplink->UnloadClient( this, "Reloading..." ) ;
 	MyUplink->LoadClient( "libgnutest", getConfigFileName() ) ;
+	return ;
 	}
 
 if( st.size() < 2 )

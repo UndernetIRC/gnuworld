@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: main.cc,v 1.57 2003/11/11 19:21:36 dan_karrels Exp $
+ * $Id: main.cc,v 1.58 2003/11/27 02:07:36 dan_karrels Exp $
  */
 
 #include	<sys/time.h>
@@ -45,7 +45,7 @@
 #include	"md5hash.h"
 #include	"Signal.h"
 
-RCSTAG( "$Id: main.cc,v 1.57 2003/11/11 19:21:36 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: main.cc,v 1.58 2003/11/27 02:07:36 dan_karrels Exp $" ) ;
 
 // main() must be in the global namespace
 using namespace gnuworld ;
@@ -92,7 +92,7 @@ clog	<< endl ;
 void gnu()
 {
 clog	<< endl ;
-clog	<< "GNUWorld version 2.3" << endl ;
+clog	<< "GNUWorld version " << VERSION << endl ;
 clog	<< "Copyright (C) 2002 Free Software Foundation, Inc." << endl ;
 clog	<< "GNUWorld comes with NO WARRANTY," << endl ;
 clog	<< "to the extent permitted by law." << endl ;

@@ -16,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: gnutest.h,v 1.7 2003/11/11 19:21:34 dan_karrels Exp $
+ * $Id: gnutest.h,v 1.8 2003/11/27 02:07:36 dan_karrels Exp $
  */
 
 #ifndef __GNUTEST_H
-#define __GNUTEST_H "$Id: gnutest.h,v 1.7 2003/11/11 19:21:34 dan_karrels Exp $"
+#define __GNUTEST_H "$Id: gnutest.h,v 1.8 2003/11/27 02:07:36 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
@@ -54,6 +54,12 @@ public:
 	 * created by this instance.
 	 */
 	virtual ~gnutest() ;
+
+	virtual void OnAttach() ;
+	virtual void OnDetach( const string& =
+			string( "Server Shutdown" ) ) ;
+	virtual void OnConnect() ;
+	virtual void OnDisconnect() ;
 
 	/**
 	 * This method is called when a channel event occurs on one
