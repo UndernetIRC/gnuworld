@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #------------------------------------------------------------------------------------
-#-- "$Id: movetables,v 1.1 2001/11/24 04:37:43 nighty Exp $"
+#-- "$Id: movetables,v 1.2 2001/11/24 04:48:08 nighty Exp $"
 #-- WARNING:!!!
 #--                This script shall ONLY be used if you have something else
 #--                than 'exceptions','ips' or 'webcookies' in your local database
@@ -14,10 +14,11 @@
 
 #--
 #-- Edit the following 3 variables
+#-- (note: do not put the trailing '/' in PGBINDIR)
 
 PGBINDIR="/usr/local/pgsql/bin"
-SRCDB="dbname@127.0.0.1"
-DSTDB="dbname@127.0.0.1"
+SRCDB="local_db@127.0.0.1"
+DSTDB="remote_db@1.2.3.4"
 
 #--
 #--
@@ -31,10 +32,27 @@ echo "--"
 
 TABLESTOMOVE="pending_pwreset helpmgr_users pending_mgrchange xatadmins"
 
+if [ "$1" != "-YES" ]; then
+
+	echo "@@ NOTICE: This will MOVE the following tables :"
+	echo "@@         $TABLESTOMOVE"
+	echo "@@    from $SRCDB,"
+	echo "@@      to $DSTDB."
+	echo "@@"
+	echo "?? If you are sure you want this to happen and you have read local_db.sql, then use '`basename $0` -YES'"
+	echo ">> Missing argument."
+	echo " "
+	
+	exit 1
+
+fi
+
 for i in $TABLESTOMOVE; do
 	TMPFILE="/tmp/tmpmovtable.$$"
 	$PGBINDIR/pg_dump -x -t $i $SRCDB > $TMPFILE
 	$PGBINDIR/psql $DSTDB < $TMPFILE
+	echo "DROP TABLE $i;" > $TMPFILE
+	$PGBINDIR/psql $SRCDB < $TMPFILE
 	echo "** moved table '$i' from $SRCDB to $DSTDB."
 	rm -f $TMPFILE
 done
