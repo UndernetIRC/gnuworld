@@ -8,7 +8,7 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char FORCECommand_cc_rcsId[] = "$Id: FORCECommand.cc,v 1.9 2001/02/17 17:47:49 gte Exp $" ;
+const char FORCECommand_cc_rcsId[] = "$Id: FORCECommand.cc,v 1.10 2001/02/22 19:09:34 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -45,9 +45,18 @@ bool FORCECommand::Exec( iClient* theClient, const string& Message )
 	} 
 
  	/*
-	 *  First, check the channel is registered.
+	 *  First, check the channel is registered/real.
 	 */
- 
+
+	if ( (st[1][0] != '#') )
+	{
+		bot->Notice(theClient, 
+			bot->getResponse(theUser,
+				language::inval_chan_name,
+				string("Invalid channel name.")));
+		return false;
+	} 
+	 
 	sqlChannel* theChan = bot->getChannelRecord(st[1]);
 	if (!theChan) 
 	{

@@ -8,7 +8,7 @@
  *
  * Caveats: None
  *
- * $Id: ADDUSERCommand.cc,v 1.12 2001/02/16 20:20:26 plexus Exp $
+ * $Id: ADDUSERCommand.cc,v 1.13 2001/02/22 19:09:34 gte Exp $
  */
  
 #include	<string>
@@ -20,7 +20,7 @@
 #include	"libpq++.h"
 #include	"responses.h"
 
-const char ADDUSERCommand_cc_rcsId[] = "$Id: ADDUSERCommand.cc,v 1.12 2001/02/16 20:20:26 plexus Exp $" ;
+const char ADDUSERCommand_cc_rcsId[] = "$Id: ADDUSERCommand.cc,v 1.13 2001/02/22 19:09:34 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -168,6 +168,8 @@ if (levelTest != 0)
 		 *  update the cache.
 		 */
 		 newLevel->setAccess(targetAccess);
+		 // Record is on the DB now.
+		 newLevel->setFlag(sqlLevel::F_ONDB);
 		}
 	}
 

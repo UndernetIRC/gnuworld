@@ -9,7 +9,7 @@
 #include	"responses.h"
 #include	"Network.h"
  
-const char STATUSCommand_cc_rcsId[] = "$Id: STATUSCommand.cc,v 1.16 2001/02/18 14:47:24 plexus Exp $" ;
+const char STATUSCommand_cc_rcsId[] = "$Id: STATUSCommand.cc,v 1.17 2001/02/22 19:09:34 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -45,7 +45,7 @@ bool STATUSCommand::Exec( iClient* theClient, const string& Message )
 		 *  Special case, display admin stats.
 		 */
 
-		if (bot->getAdminAccessLevel(theUser) <= level::admin::helper) // Don't show if they don't have any admin access.
+		if (!bot->getAdminAccessLevel(theUser)) // Don't show if they don't have any admin access.
 		{
 			bot->Notice(theClient, bot->getResponse(theUser, language::chan_not_reg).c_str(),
 				st[1].c_str());
@@ -142,7 +142,7 @@ bool STATUSCommand::Exec( iClient* theClient, const string& Message )
 
 	int level = bot->getEffectiveAccessLevel(theUser, theChan, true);
 	int admLevel = bot->getAdminAccessLevel(theUser); // Let authenticated admins view status also.
-	if ((level < level::status) && (admLevel <= 0))
+	if ((level < level::status) && (admLevel <= 0) && !isOper(theClient))
 	{
 		bot->Notice(theClient, bot->getResponse(theUser, language::insuf_access).c_str());
 		return false;
@@ -156,7 +156,8 @@ bool STATUSCommand::Exec( iClient* theClient, const string& Message )
 
 	if (tmpChan)
 	{
-		if ((level >= 400) || (admLevel >= 1)) // If the person has access >400, or is a 600+ admin.
+		// If the person has access >400, or is a 1+ admin (or and Oper).
+		if ((level >= 400) || (admLevel >= 1) || isOper(theClient)) 
 		{
 			bot->Notice(theClient, 
 				bot->getResponse(theUser,

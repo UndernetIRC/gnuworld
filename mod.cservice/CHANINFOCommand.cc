@@ -13,7 +13,7 @@
  *
  * Command is aliased "INFO".
  *
- * $Id: CHANINFOCommand.cc,v 1.15 2001/02/16 20:20:26 plexus Exp $
+ * $Id: CHANINFOCommand.cc,v 1.16 2001/02/22 19:09:34 gte Exp $
  */
 
 #include	<string>
@@ -25,7 +25,7 @@
 #include	"responses.h"
 #include	"libpq++.h"
  
-const char CHANINFOCommand_cc_rcsId[] = "$Id: CHANINFOCommand.cc,v 1.15 2001/02/16 20:20:26 plexus Exp $" ;
+const char CHANINFOCommand_cc_rcsId[] = "$Id: CHANINFOCommand.cc,v 1.16 2001/02/22 19:09:34 gte Exp $" ;
  
 namespace gnuworld
 {
@@ -69,8 +69,8 @@ if( string::npos == st[ 1 ].find_first_of( '#' ) )
 	if (theUser->getFlag(sqlUser::F_INVIS))
 		{
 			
-		/* If they don't have * access or are opered, deny. */ 
-		if( !((tmpUser) && bot->getAdminAccessLevel(tmpUser)) && !(theClient->isOper()))
+		/* If they don't have * access, deny. */ 
+		if( !((tmpUser) && bot->getAdminAccessLevel(tmpUser)) && (tmpUser != theUser))
 			{
 			bot->Notice(theClient, 
 				bot->getResponse(tmpUser,
@@ -117,7 +117,7 @@ if( string::npos == st[ 1 ].find_first_of( '#' ) )
 
 	/*
 	 * Run a query to see what channels this user has access on. :)
-	 * Only show to those with admin access, opers, or the actual user.
+	 * Only show to those with admin access, or the actual user.
 	 */
 
 	if( ((tmpUser) && bot->getAdminAccessLevel(tmpUser)) || (tmpUser == theUser) )
