@@ -13,7 +13,7 @@
  *
  * Command is aliased "INFO".
  *
- * $Id: CHANINFOCommand.cc,v 1.20 2001/03/16 11:50:59 isomer Exp $
+ * $Id: CHANINFOCommand.cc,v 1.21 2001/05/20 00:00:49 gte Exp $
  */
 
 #include	<string>
@@ -26,7 +26,7 @@
 #include	"libpq++.h"
 #include	"cservice_config.h"
  
-const char CHANINFOCommand_cc_rcsId[] = "$Id: CHANINFOCommand.cc,v 1.20 2001/03/16 11:50:59 isomer Exp $" ;
+const char CHANINFOCommand_cc_rcsId[] = "$Id: CHANINFOCommand.cc,v 1.21 2001/05/20 00:00:49 gte Exp $" ;
  
 namespace gnuworld
 {
@@ -118,6 +118,11 @@ if( string::npos == st[ 1 ].find_first_of( '#' ) )
 			language::last_seen,
 			string("Last Seen: %s")).c_str(),
 		bot->prettyDuration(theUser->getLastSeen()).c_str()); 
+
+	if (theUser->getFlag(sqlUser::F_GLOBAL_SUSPEND))
+		{
+		bot->Notice(theClient, "\002This account has been suspended by a CService Administrator\002");
+		}
 
 	/*
 	 * Run a query to see what channels this user has access on. :)

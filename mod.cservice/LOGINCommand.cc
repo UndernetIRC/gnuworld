@@ -12,7 +12,7 @@
 #include	"cservice_config.h"
 #include	"Network.h"
 
-const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.17 2001/03/18 22:49:51 gte Exp $" ;
+const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.18 2001/05/20 00:00:49 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -173,8 +173,21 @@ bot->Notice(theClient,
 	theUser->getUserName().c_str()); 
 
 /*
+ * If the user account has been suspended, make sure they don't get
+ * auto-opped.
+ */
+
+if (theUser->getFlag(sqlUser::F_GLOBAL_SUSPEND))
+	{
+	bot->Notice(theClient,
+		"..however your account has been suspended by a CService administrator."
+		" You will be unable to use any channel access you may have."); 
+	return true;
+	}
+
+/*
  * The fun part! For all channels this user has access on, and has
- * AUTOP set, and isn't already opp'd on - do the deed. 
+ * AUTOP set, and isn't already op'd on - do the deed. 
  */ 
 
 strstream theQuery;

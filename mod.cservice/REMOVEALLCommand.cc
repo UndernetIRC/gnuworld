@@ -13,7 +13,7 @@
 #include	"levels.h"
 #include	"cservice_config.h"
 
-const char REMOVEALLCommand_cc_rcsId[] = "$Id: REMOVEALLCommand.cc,v 1.1 2001/04/30 01:26:21 gte Exp $" ;
+const char REMOVEALLCommand_cc_rcsId[] = "$Id: REMOVEALLCommand.cc,v 1.2 2001/05/20 00:00:50 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -143,6 +143,9 @@ if (bot->SQLDb->ExecCommandOk(deleteAllQuery.str()))
 	{ 
 		bot->Notice(theClient, "Done. Zapped %i access records from %s", 
 			delCounter, theChan->getName().c_str()); 
+		bot->writeChannelLog(theChan, 
+			theClient, 
+			sqlChannel::EV_REMOVEALL, "" );
 	} else 
 	{
 		bot->Notice(theClient, "A database error occured while removing the access records.");

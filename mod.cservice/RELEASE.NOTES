@@ -1,5 +1,5 @@
 Newest changes at the top of the file:
-$Id: RELEASE.NOTES,v 1.10 2001/05/16 21:03:16 gte Exp $
+$Id: RELEASE.NOTES,v 1.11 2001/05/20 00:00:50 gte Exp $
 
 CMaster 1.0pl5 - Current 
 * Add Vampire's (Alex Badea <vampire@go.ro>) code to make
@@ -11,6 +11,9 @@ CMaster 1.0pl5 - Current
 * New admin command to quickly remove all users from a 
   channel.
 * Expire FORCE'd accesses in the hourly maintainence.
+* Move PART to a level 500 command to prevent abuse.
+* Decided to move last_seen from the user fetching query
+* to retrieve only when it is first accessed.
 
 CMaster 1.0pl4 - 13/04/2001
 * Added REHASH command handler, to allow dynamic reloading

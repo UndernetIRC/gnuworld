@@ -1143,6 +1143,16 @@ return 0;
  */
 short int cservice::getAdminAccessLevel( sqlUser* theUser )
 {
+	
+/*
+ *  First thing, check if this ACCOUNT has been globally 
+ *  suspended.
+ */
+
+if (theUser->getFlag(sqlUser::F_GLOBAL_SUSPEND))
+	{
+	return 0;
+	}
 
 sqlChannel* theChan = getChannelRecord("*");
 if (!theChan)
@@ -1192,7 +1202,23 @@ if( !theLevel )
 	return 0 ;
 	} 
 
-/* Check to see if the channel has been suspended. */ 
+/*
+ *  First thing, check if this ACCOUNT has been globally 
+ *  suspended.
+ */
+
+if (theUser->getFlag(sqlUser::F_GLOBAL_SUSPEND))
+	{ 
+	iClient* theClient = theUser->isAuthed();
+	if (theClient && notify)
+		{
+		Notice(theClient, "Your account has been suspended.");
+		}
+	return 0; 
+	}
+
+/* Then, check to see if the channel has been suspended. */ 
+
 if (theChan->getFlag(sqlChannel::F_SUSPEND))
 	{
 	/* Send them a notice to let them know they've been bad? */
@@ -1851,8 +1877,7 @@ if( relname == "users_u" )
 	theQuery	<< "SELECT "
 			<< sql::user_fields
 			<< ",now()::abstime::int4 as db_unixtime FROM "
-			<< "users,users_lastseen WHERE users.id = "
-			<< "users_lastseen.user_id AND "
+			<< "users WHERE "
 			<< "users.last_updated >= "
 			<< lastUserRefresh;
 	} 

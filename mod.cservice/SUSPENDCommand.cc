@@ -12,7 +12,7 @@
  * TODO: /msg x suspend #channel *, suspends all users below your access
  * level.
  *
- * $Id: SUSPENDCommand.cc,v 1.13 2001/05/11 23:45:38 gte Exp $
+ * $Id: SUSPENDCommand.cc,v 1.14 2001/05/20 00:00:50 gte Exp $
  */
 
 #include	<string>
@@ -26,7 +26,7 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char SUSPENDCommand_cc_rcsId[] = "$Id: SUSPENDCommand.cc,v 1.13 2001/05/11 23:45:38 gte Exp $" ;
+const char SUSPENDCommand_cc_rcsId[] = "$Id: SUSPENDCommand.cc,v 1.14 2001/05/20 00:00:50 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -37,7 +37,7 @@ using namespace level;
 bool SUSPENDCommand::Exec( iClient* theClient, const string& Message )
 { 
 StringTokenizer st( Message ) ;
-if( st.size() < 4 )
+if( st.size() < 2 )
 	{
 	Usage(theClient);
 	return true;
@@ -59,22 +59,39 @@ if(!theUser)
 
 if (st[1][0] != '#')
 {
-	// Got ANY admin access?
+	// Got enough admin access?
 	int level = bot->getAdminAccessLevel(theUser);
-	if (!level)
+	if (level < level::globalsuspend)
 	{
 		Usage(theClient);
 		return true;
-	}
-
-	// Got enough admin access?
-
-	if(level < level::globalsuspend)
-	{ 
-	}
-
+	} 
+ 
 	// Does this user account even exist?
+	sqlUser* targetUser = bot->getUserRecord(st[1]);
+	if (!targetUser)
+		{
+		bot->Notice(theClient, 
+			bot->getResponse(theUser, language::not_registered,
+				string("I don't know who %s is")).c_str(),
+		    	st[1].c_str());
+		return true;
+		}
+
+	// Suspend them.
+	targetUser->setFlag(sqlUser::F_GLOBAL_SUSPEND);
+	targetUser->commit();
+	bot->Notice(theClient, "%s has been globally suspended and will have level 0 access in all"
+		" channels until unsuspended.",
+		targetUser->getUserName().c_str());
+	return true;
 }
+
+if( st.size() < 4 )
+	{
+	Usage(theClient);
+	return true;
+	}
  
 // Is the channel registered?
 sqlChannel* theChan = bot->getChannelRecord(st[1]);

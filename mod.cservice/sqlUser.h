@@ -1,7 +1,7 @@
 /* sqlUser.h */
 
 #ifndef __SQLUSER_H
-#define __SQLUSER_H "$Id: sqlUser.h,v 1.14 2001/03/11 02:00:23 gte Exp $"
+#define __SQLUSER_H "$Id: sqlUser.h,v 1.15 2001/05/20 00:00:50 gte Exp $"
 
 #include	<string>
 #include	<ctime>
@@ -38,10 +38,7 @@ public:
 		{ return user_name ; }
 
 	inline const string&		getPassword() const
-		{ return password ; }
-
-	inline const time_t&		getLastSeen() const
-		{ return last_seen ; }
+		{ return password ; } 
  
 	inline const string&		getUrl() const
 		{ return url ; }
@@ -95,7 +92,8 @@ public:
 	 */
 
 	bool commit();
-	bool commitLastSeen();
+	bool commitLastSeen(); 
+	time_t	getLastSeen();
 
 	bool loadData( int );
 	bool loadData( const string& );

@@ -18,7 +18,7 @@
  *
  * Caveats: None.
  *
- * $Id: SETCommand.cc,v 1.36 2001/05/11 16:39:13 gte Exp $
+ * $Id: SETCommand.cc,v 1.37 2001/05/20 00:00:50 gte Exp $
  */
 
 #include	<string>
@@ -29,7 +29,7 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char SETCommand_cc_rcsId[] = "$Id: SETCommand.cc,v 1.36 2001/05/11 16:39:13 gte Exp $" ;
+const char SETCommand_cc_rcsId[] = "$Id: SETCommand.cc,v 1.37 2001/05/20 00:00:50 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -97,6 +97,9 @@ if( st[1][0] != '#' ) // Didn't find a hash?
 
 	if (option == "LANG")
 	{ 
+		bot->Notice(theClient, "Coming soon!");
+		return true;
+
 		cservice::languageTableType::iterator ptr = bot->languageTable.find(value);
 		if (ptr != bot->languageTable.end()) 
 		{

@@ -4,7 +4,7 @@
  * Storage class for accessing user information either from the backend
  * or internal storage.
  * 
- * $Id: sqlUser.cc,v 1.16 2001/04/28 20:40:27 gte Exp $
+ * $Id: sqlUser.cc,v 1.17 2001/05/20 00:00:50 gte Exp $
  */
  
 #include	<strstream>
@@ -58,10 +58,8 @@ bool sqlUser::loadData(int userID)
 strstream queryString;
 queryString	<< "SELECT "
 		<< sql::user_fields 
-		<< " FROM users,users_lastseen WHERE users.id ="
-		<< "users_lastseen.user_id AND id = "
-		<< userID
-		<< " AND users.deleted != 1"
+		<< " FROM users WHERE id = "
+		<< userID 
 		<< ends;
 
 #ifdef LOG_SQL
@@ -108,11 +106,9 @@ bool sqlUser::loadData(const string& userName)
 strstream queryString;
 queryString	<< "SELECT "
 		<< sql::user_fields 
-		<< " FROM users,users_lastseen WHERE users.id ="
-		<< " users_lastseen.user_id AND lower(user_name) = '"
+		<< " FROM users WHERE lower(user_name) = '"
 		<< string_lower(userName) 
-		<< "'"
-		<< " AND users.deleted != 1"
+		<< "'" 
 		<< ends;
 
 #ifdef LOG_SQL
@@ -158,8 +154,7 @@ url = SQLDb->GetValue(row, 3);
 language_id = atoi(SQLDb->GetValue(row, 4)); 
 flags = atoi(SQLDb->GetValue(row, 5));
 last_updated_by = SQLDb->GetValue(row, 6); 
-last_updated = atoi(SQLDb->GetValue(row, 7));
-last_seen = atoi(SQLDb->GetValue(row, 8));
+last_updated = atoi(SQLDb->GetValue(row, 7)); 
 
 /* Fetch the "Last Seen" time from the users_lastseen table. */
 
@@ -246,6 +241,43 @@ if( PGRES_COMMAND_OK != status )
 
 return true;
 }	
+
+time_t sqlUser::getLastSeen()
+{
+strstream queryString;
+queryString	<< "SELECT last_seen" 
+		<< " FROM users_lastseen WHERE user_id = "
+		<< id 
+		<< ends;
+
+#ifdef LOG_SQL
+	elog	<< "sqlUser::getLastSeen> "
+		<< queryString.str()
+		<< endl;
+#endif
+
+ExecStatusType status = SQLDb->Exec(queryString.str()) ;
+delete[] queryString.str() ;
+
+if( PGRES_TUPLES_OK == status )
+	{ 
+	/*
+	 *  If the user doesn't exist, we won't get any rows back.
+	 */ 
+
+	if(SQLDb->Tuples() < 1)
+		{
+		return (false);
+		} 
+
+	last_seen = atoi(SQLDb->GetValue(0, 0));
+
+	return (last_seen);
+	} 
+
+return (false);
+
+}
  
 sqlUser::~sqlUser()
 {
