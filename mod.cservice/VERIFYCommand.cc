@@ -8,7 +8,7 @@
 #include	"Network.h"
 #include	"levels.h"
  
-const char VERIFYCommand_cc_rcsId[] = "$Id: VERIFYCommand.cc,v 1.5 2000/12/28 05:03:09 gte Exp $" ;
+const char VERIFYCommand_cc_rcsId[] = "$Id: VERIFYCommand.cc,v 1.6 2000/12/30 00:36:38 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -16,7 +16,7 @@ namespace gnuworld
 using namespace gnuworld;
  
 bool VERIFYCommand::Exec( iClient* theClient, const string& Message )
-{
+{ 
 	StringTokenizer st( Message ) ;
 	if( st.size() < 2 )
 	{
@@ -83,7 +83,7 @@ bool VERIFYCommand::Exec( iClient* theClient, const string& Message )
 
 	if (level == level::admin::hbic) 
 	{
-		bot->Notice(theClient, "%s is the Cservice HBIC%s (Authenticated as %s)", target->getNickUserHost().c_str(), extra.c_str(), theUser->getUserName().c_str());
+		bot->Notice(theClient, "%s is my Grandma%s (Authenticated as %s)", target->getNickUserHost().c_str(), extra.c_str(), theUser->getUserName().c_str());
 		return true;
 	}
 

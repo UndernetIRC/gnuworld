@@ -83,7 +83,7 @@ cservice::cservice(const string& args)
 	 */
  
     RegisterCommand(new SHOWCOMMANDSCommand(this, "SHOWCOMMANDS", ""));
-    RegisterCommand(new LOGINCommand(this, "LOGIN", "<usernamne> <password>")); 
+    RegisterCommand(new LOGINCommand(this, "LOGIN", "<username> <password>")); 
     RegisterCommand(new ACCESSCommand(this, "ACCESS", "[channel] [nick] [-min n] [-max n] [-autoop] [-noautoop] [-modif [mask]]"));
     RegisterCommand(new CHANINFOCommand(this, "CHANINFO", "<#channel>")); 
     RegisterCommand(new ISREGCommand(this, "ISREG", "<#channel>")); 
@@ -98,6 +98,7 @@ cservice::cservice(const string& args)
     RegisterCommand(new ADDUSERCommand(this, "ADDUSER", "<#channel> <nick> <access>"));
     RegisterCommand(new REMUSERCommand(this, "REMUSER", "<#channel> <nick>"));
     RegisterCommand(new MODINFOCommand(this, "MODINFO", "<#channel> [ACCESS <nick> <level>] [AUTOOP <nick> <on|off>]"));
+    RegisterCommand(new SETCommand(this, "SET", "[#channel] <variable> <value>"));
 
 	//-- Load in our cservice configuration file. 
 	cserviceConfig = new EConfig( args ) ;
@@ -154,11 +155,13 @@ int cservice::BurstChannels()
 {
 	ExecStatusType status;
  
-	//-- We need to join every channel in the database that has been ADDCHAN'd by the
-	//   manager.  Various other things must be done, such as setting the topic if AutoTopic
-	//   is on, gaining ops if AlwaysOp is on, and so forth.
+	/*
+	 *   Need to join every channel with AUTOJOIN set. (But not * ;))
+	 *   Various other things must be done, such as setting the topic if AutoTopic
+	 *   is on, gaining ops if AlwaysOp is on, and so forth.
+	 */
 
-	if ((status = SQLDb->Exec( "select name,flags,channel_ts,channel_mode,channel_key,channel_limit from channels" )) == PGRES_TUPLES_OK)
+	if ((status = SQLDb->Exec( "SELECT name,flags,channel_ts,channel_mode,channel_key,channel_limit FROM channels WHERE name <> '*'" )) == PGRES_TUPLES_OK)
 	{
 		for (int i = 0 ; i < SQLDb->Tuples (); i++)
 		{
@@ -239,7 +242,7 @@ int cservice::OnCTCP( iClient* theClient, const string& CTCP,
 
 	if(Command == "VERSION")
 	{
-		xClient::DoCTCP(theClient, CTCP.c_str(), "Undernet Channel Services Version 2 [" __DATE__ " " __TIME__ "] ($Id: cservice.cc,v 1.18 2000/12/28 21:19:53 gte Exp $)");
+		xClient::DoCTCP(theClient, CTCP.c_str(), "Undernet Channel Services Version 2 [" __DATE__ " " __TIME__ "] ($Id: cservice.cc,v 1.19 2000/12/30 00:36:38 gte Exp $)");
 		return true;
 	}
  
