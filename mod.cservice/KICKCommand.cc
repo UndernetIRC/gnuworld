@@ -11,7 +11,7 @@
 *
 * Suggestion: Support several nicks by seperating them with a comma.
 *             IE: /msg E kick #coder-com nick1,nick2,nick3 get outta here!
-* $Id: KICKCommand.cc,v 1.5 2001/02/03 22:12:00 gte Exp $
+* $Id: KICKCommand.cc,v 1.6 2001/02/05 00:44:08 gte Exp $
 */
 
 #include        <string>
@@ -24,7 +24,7 @@
 #include        "responses.h"
 #include		"match.h"
 
-const char KICKCommand_cc_rcsId[] = "$Id: KICKCommand.cc,v 1.5 2001/02/03 22:12:00 gte Exp $" ;
+const char KICKCommand_cc_rcsId[] = "$Id: KICKCommand.cc,v 1.6 2001/02/05 00:44:08 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -103,7 +103,11 @@ bool KICKCommand::Exec( iClient* theClient, const string& Message )
  
 			if(match(st[2].c_str(), tmpUser->getClient()->getNickUserHost().c_str()) == 0)
 			{ 
-				toBoot.push_back(tmpUser->getClient());
+				/* Don't kick +k things */
+				if ( !tmpUser->getClient()->getMode(iClient::MODE_SERVICES) ) 
+				{ 
+					toBoot.push_back(tmpUser->getClient());
+				}
 			} 
 		}
 	 
@@ -112,15 +116,15 @@ bool KICKCommand::Exec( iClient* theClient, const string& Message )
 		 *  Do a lookup on nickname, and check they are in the channel.
 		 */
 
-		iClient* target = Network->findNick(st[2]);
-		
+		iClient* target = Network->findNick(st[2]); 
+
 		if(!target)
 		{
 			bot->Notice(theClient, bot->getResponse(theUser, language::dont_see_them).c_str(),
 			    st[2].c_str());
 			return false;
-		}
-	
+		} 
+
 		/*
 		 *  Check they are on the channel.
 		 */
@@ -130,6 +134,14 @@ bool KICKCommand::Exec( iClient* theClient, const string& Message )
 		{
 			bot->Notice(theClient, bot->getResponse(theUser, language::cant_find_on_chan).c_str(), 
 				target->getNickName().c_str(), theChan->getName().c_str()); 
+			return false;
+		}
+
+		/* Don't kick +k things */
+		if ( target->getMode(iClient::MODE_SERVICES) ) 
+		{
+			bot->Notice(theClient, "I don't think %s would appreciate that?",
+				target->getNickName().c_str());
 			return false;
 		}
 

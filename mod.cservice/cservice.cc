@@ -564,7 +564,7 @@ else if(Command == "VERSION")
 	xClient::DoCTCP(theClient, CTCP,
 		"Undernet P10 Channel Services Version 2 ["
 		__DATE__ " " __TIME__
-		"] ($Id: cservice.cc,v 1.84 2001/02/04 23:37:32 gte Exp $)");
+		"] ($Id: cservice.cc,v 1.85 2001/02/05 00:44:09 gte Exp $)");
 	}
 else if(Command == "PROBLEM?")
 	{
@@ -1736,11 +1736,15 @@ while (ptr != banList->end())
 			Write( s );
 			delete[] s.str(); 
 
-			Kick(netChan, theClient,
-				string( "("
-				+ theBan->getSetBy()
-				+ ") "
-				+ theBan->getReason()) );
+			/* Don't kick banned +k bots */
+			if ( !theClient->getMode(iClient::MODE_SERVICES) )
+			{
+				Kick(netChan, theClient,
+					string( "("
+					+ theBan->getSetBy()
+					+ ") "
+					+ theBan->getReason()) );
+			}
  
 			return true;
 			} /* Matching Ban */ 

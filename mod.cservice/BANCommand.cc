@@ -12,7 +12,7 @@
  *
  * Caveats: None.
  *
- * $Id: BANCommand.cc,v 1.11 2001/02/04 23:37:32 gte Exp $
+ * $Id: BANCommand.cc,v 1.12 2001/02/05 00:44:08 gte Exp $
  */
 
 #include	<string>
@@ -27,7 +27,7 @@
 #include	"responses.h"
 #include	"match.h"
 
-const char BANCommand_cc_rcsId[] = "$Id: BANCommand.cc,v 1.11 2001/02/04 23:37:32 gte Exp $" ;
+const char BANCommand_cc_rcsId[] = "$Id: BANCommand.cc,v 1.12 2001/02/05 00:44:08 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -235,7 +235,11 @@ for(Channel::userIterator chanUsers = theChannel->userList_begin(); chanUsers !=
 
 	if(match(banTarget, tmpUser->getClient()->getNickUserHost()) == 0)
 		{ 
-		clientsToKick.push_back(tmpUser->getClient());
+			/* Don't kick +k things */
+			if( !tmpUser->getClient()->getMode(iClient::MODE_SERVICES) )
+			{
+				clientsToKick.push_back(tmpUser->getClient());
+			}
 		}
 	} // for()
 

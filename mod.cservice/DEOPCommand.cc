@@ -8,7 +8,7 @@
  *
  * Caveats: None
  *
- * $Id: DEOPCommand.cc,v 1.5 2001/01/17 19:50:54 gte Exp $
+ * $Id: DEOPCommand.cc,v 1.6 2001/02/05 00:44:08 gte Exp $
  */
 
 #include	<string>
@@ -23,7 +23,7 @@
 
 using std::map ;
 
-const char DEOPCommand_cc_rcsId[] = "$Id: DEOPCommand.cc,v 1.5 2001/01/17 19:50:54 gte Exp $" ;
+const char DEOPCommand_cc_rcsId[] = "$Id: DEOPCommand.cc,v 1.6 2001/02/05 00:44:08 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -137,6 +137,14 @@ bool DEOPCommand::Exec( iClient* theClient, const string& Message )
 				st2[counter].c_str());
 			cont = false;
 		} 
+
+		/* Don't deop +k things */
+		if ((cont) && (target->getMode(iClient::MODE_SERVICES)) )
+		{
+			bot->Notice(theClient, "I don't think %s would appreciate that?",
+				target->getNickName().c_str());
+			cont = false;
+		}
 
 		ChannelUser* tmpChanUser;
 		if (cont) tmpChanUser = tmpChan->findUser(target) ;
