@@ -20,8 +20,8 @@
 #include	<ctime>
 #include	<cstdlib>
 #include	<cstring>
- 
-#include	"client.h" 
+
+#include	"client.h"
 #include  	"cservice.h"
 #include	"EConfig.h"
 #include	"events.h"
@@ -213,7 +213,7 @@ RegisterCommand(new SERVNOTICECommand(this, "SERVNOTICE", "<#channel> <text>", 5
 RegisterCommand(new SAYCommand(this, "SAY", "<#channel> <text>", 5));
 RegisterCommand(new QUOTECommand(this, "QUOTE", "<text>", 5));
 RegisterCommand(new REHASHCommand(this, "REHASH", "[translations]", 5));
- 
+
 cserviceConfig = new (std::nothrow) EConfig( args ) ;
 assert( cserviceConfig != 0 ) ;
 
@@ -229,7 +229,7 @@ elog	<< "cmaster::cmaster> Attempting to connect to "
 	<< "; Database: "
 	<< confSqlDb
 	<< endl;
- 
+
 SQLDb = new (std::nothrow) cmDatabase( Query.c_str() ) ;
 assert( SQLDb != 0 ) ;
 
@@ -989,7 +989,7 @@ delete[] theQuery.str() ;
 if( PGRES_TUPLES_OK == status )
 	{
 	for (int i = 0 ; i < SQLDb->Tuples(); i++)
-		{ 
+		{
 		sqlBan* newBan = new (std::nothrow) sqlBan(SQLDb);
 		assert( newBan != 0 ) ;
 
@@ -2151,9 +2151,10 @@ if (timer_id == pending_timerID)
 
 			if (tmpChan)
 				{
-				serverNotice(tmpChan, "This channel is currently being processed for registration.");
-				serverNotice(tmpChan, "If you wish to view the details of the application or to object, please visit:");
-				serverNotice(tmpChan, "%s?id=%i-%i", pendingPageURL.c_str(), created_ts, channel_id);
+				serverNotice(tmpChan,
+				"This channel is currently being processed for registration. "
+				"If you wish to view the details of the application or to object, please visit: "
+				"%s?id=%i-%i", pendingPageURL.c_str(), created_ts, channel_id);
 				}
 			}
 		}
@@ -2565,7 +2566,7 @@ switch( theEvent )
 
 		iClient* tmpUser =
 			static_cast< iClient* >( data1 );
-		networkData* newData = new (std::nothrow) networkData(); 
+		networkData* newData = new (std::nothrow) networkData();
 		assert( newData != 0 ) ;
 
 		customDataAlloc++;
@@ -3512,9 +3513,9 @@ void cservice::checkDbConnectionStatus()
 
 		/* Remove the old database connection object. */
 		delete(SQLDb);
-	
-		string Query = "host=" + confSqlHost + " dbname=" + confSqlDb + " port=" + confSqlPort + " user=" + confSqlUser; 
-	
+
+		string Query = "host=" + confSqlHost + " dbname=" + confSqlDb + " port=" + confSqlPort + " user=" + confSqlUser;
+
 		SQLDb = new (std::nothrow) cmDatabase( Query.c_str() ) ;
 		assert( SQLDb != 0 ) ;
 
