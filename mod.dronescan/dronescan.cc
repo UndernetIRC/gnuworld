@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: dronescan.cc,v 1.45 2003/12/29 23:59:38 dan_karrels Exp $
+ * $Id: dronescan.cc,v 1.46 2004/01/16 00:57:37 dan_karrels Exp $
  */
 
 #include	<string>
@@ -45,7 +45,7 @@
 #include "sqlUser.h"
 #include "Timer.h"
 
-RCSTAG("$Id: dronescan.cc,v 1.45 2003/12/29 23:59:38 dan_karrels Exp $");
+RCSTAG("$Id: dronescan.cc,v 1.46 2004/01/16 00:57:37 dan_karrels Exp $");
 
 namespace gnuworld {
 
@@ -800,8 +800,7 @@ void dronescan::calculateEntropy()
 double dronescan::calculateEntropy( const iClient *theClient )
 {
 	clientData *theData = static_cast< clientData* > ( theClient->getCustomData(this) );
-
-	assert(theData->getEntropy() != 0);
+	if( 0 == theData ) return 0.0 ;
 	
 	return theData->getEntropy();	
 }

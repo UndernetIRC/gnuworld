@@ -1,14 +1,17 @@
-dnl $Id: configure.ac,v 1.26 2004/01/08 18:32:35 dan_karrels Exp $
+dnl $Id: configure.ac,v 1.27 2004/01/16 00:57:36 dan_karrels Exp $
 dnl ----------------------------------------------------------
 
 echo Configuring GNUWorld...
 echo
 
-AC_REVISION($Revision: 1.26 $)
+AC_REVISION($Revision: 1.27 $)
 AC_INIT
 AC_CONFIG_SRCDIR([src/main.cc])
 AM_INIT_AUTOMAKE(gnuworld,2.5)
 AM_CONFIG_HEADER(include/defs.h)
+
+AC_DISABLE_STATIC
+AC_ENABLE_SHARED
 
 AC_PROG_INSTALL
 dnl Enable building of the convenience library

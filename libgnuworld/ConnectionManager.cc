@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ConnectionManager.cc,v 1.13 2004/01/07 18:33:42 dan_karrels Exp $
+ * $Id: ConnectionManager.cc,v 1.14 2004/01/16 00:57:36 dan_karrels Exp $
  */
 
 #include	<unistd.h>
@@ -52,7 +52,7 @@
 #include	"Buffer.h"
 #include	"ELog.h"
 
-const char rcsId[] = "$Id: ConnectionManager.cc,v 1.13 2004/01/07 18:33:42 dan_karrels Exp $" ;
+const char rcsId[] = "$Id: ConnectionManager.cc,v 1.14 2004/01/16 00:57:36 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -653,7 +653,7 @@ do
 
 	// timeval may be modified by select() on some systems,
 	// so recreate it each time
-	struct timeval to = { seconds, milliseconds } ;
+	struct timeval to = { seconds, milliseconds * 1000 } ;
 
 	// Call select()
 	// Block indefinitely if seconds is -1
