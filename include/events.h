@@ -22,11 +22,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: events.h,v 1.14 2003/06/05 01:38:01 dan_karrels Exp $
+ * $Id: events.h,v 1.15 2003/06/06 20:03:31 dan_karrels Exp $
  */
 
 #ifndef __EVENTS_H
-#define __EVENTS_H "$Id: events.h,v 1.14 2003/06/05 01:38:01 dan_karrels Exp $"
+#define __EVENTS_H "$Id: events.h,v 1.15 2003/06/06 20:03:31 dan_karrels Exp $"
 
 namespace gnuworld
 {
@@ -124,6 +124,29 @@ typedef int channelEventType ;
  *  1) iClient*
  *  2) ChannelUser*
  */
+
+const string eventNames[] = {
+	"Oper Up", /* EVT_OPER */
+	"Net Break", /* EVT_NETBREAK */
+	"Net Join", /* EVT_NETJOIN */
+	"Burst Complete", /* EVT_BURST_CMPLT */
+	"Burst Acknowledge", /* EVT_BURST_ACK */
+	"Gline Add", /* EVT_GLINE */
+	"Gline Remove", /* EVT_REMGLINE */
+	"Server Jupe", /* EVT_JUPE */
+	"Server UnJupe", /* EVT_UNJUPE */
+	"Client Quit", /* EVT_QUIT */
+	"Client Kill", /* EVT_KILL */
+	"Client Connect", /* EVT_NICK */
+	"Nick Change", /* EVT_CHNICK */
+	"Account Login", /* EVT_ACCOUNT */
+	"Raw", /* EVT_RAW */
+	"Channel Join", /* EVT_JOIN */
+	"Channel Part", /* EVT_PART */
+	"Channel Topic Change", /* EVT_TOPIC */
+	"Channel Kick", /* EVT_KICK */
+	"Channel Create" /* EVT_CREATE */
+} ;
 
 } // namespace gnuworld
 

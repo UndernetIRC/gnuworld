@@ -16,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: xparameters.h,v 1.1 2002/08/07 20:28:06 dan_karrels Exp $
+ * $Id: xparameters.h,v 1.2 2003/06/06 20:03:31 dan_karrels Exp $
  */
 
 #ifndef __XPARAMETERS_H
-#define __XPARAMETERS_H "$Id: xparameters.h,v 1.1 2002/08/07 20:28:06 dan_karrels Exp $"
+#define __XPARAMETERS_H "$Id: xparameters.h,v 1.2 2003/06/06 20:03:31 dan_karrels Exp $"
 
 #include        <vector>
 #include	<cassert>
@@ -66,6 +66,26 @@ public:
 	 * dynamically allocated, so this method is a NOOP.
 	 */
 	~xParameters() {}
+
+	/**
+	 * This type is used to perform a read only iteration
+	 * of this objects array of strings.
+	 */
+	typedef vectorType::const_iterator const_iterator ;
+
+	/**
+	 * Return a const_iterator to the beginning of the array
+	 * of strings.
+	 */
+	inline const_iterator	begin() const
+		{ return myVector.begin() ; }
+
+	/**
+	 * Return a const_iterator to the end of the array
+	 * of strings.
+	 */
+	inline const_iterator	end() const
+		{ return myVector.end() ; }
 
 	/**
 	 * Insert a pointer to a character array (token) into the
@@ -122,6 +142,31 @@ public:
 	 */
 	inline bool validSubscript( const size_type& i ) const
 		{ return (i < myVector.size()) ; }
+
+	/**
+	 * Return a string containing all tokens beginning
+	 * with the zero based index beginIndex.  A ' ' will
+	 * be placed between token in the string returned.
+	 */
+	inline string assemble( const size_type& beginIndex ) const
+	{
+	assert( validSubscript( beginIndex ) ) ;
+	if( myVector.empty() )
+		{
+		return string() ;
+		}
+	string retMe( "" ) ;
+	for( vectorType::size_type i = beginIndex ;
+		i < myVector.size() ; ++i )
+		{
+		retMe += myVector[ i ] ;
+		if( (i + 1) < myVector.size() )
+			{
+			retMe += ' ' ;
+			}
+		}
+	return retMe ;
+	}
 
 	/**
 	 * A simple operator to output an xParameters object to

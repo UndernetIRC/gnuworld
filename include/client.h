@@ -21,7 +21,7 @@
  */
 
 #ifndef __CLIENT_H
-#define __CLIENT_H "$Id: client.h,v 1.38 2003/05/26 21:44:29 dan_karrels Exp $"
+#define __CLIENT_H "$Id: client.h,v 1.39 2003/06/06 20:03:31 dan_karrels Exp $"
 
 #include	<sstream>
 #include	<string>
@@ -352,11 +352,31 @@ public:
 		bool Secure = false ) ;
 
 	/**
+	 * This method is called when a channel CTCP occurs
+	 * in a channel in which an xClient resides, and the
+	 * xClient is user mode -d.
+	 */
+	virtual int OnChannelCTCP( iClient* Sender,
+		Channel* theChan,
+		const string& CTCPCommand,
+		const string& Message ) ;
+
+	/**
 	 * OnPrivateMessage is called when a PRIVMSG command
 	 * is issued to the client.
 	 */
 	virtual int OnPrivateMessage( iClient* Sender,
-		const string& Message, bool secure = false ) ;
+		const string& Message,
+		bool secure = false ) ;
+
+	/**
+	 * This method is called when a channel message occurs
+	 * in a channel in which an xClient resides, and the
+	 * xClient is user mode -d.
+	 */
+	virtual int OnChannelMessage( iClient* Sender,
+		Channel* theChan,
+		const string& Message ) ;
 
 	/**
 	 * OnNotice is called when a NOTICE command

@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: stats.cc,v 1.11 2003/06/06 13:14:16 dan_karrels Exp $
+ * $Id: stats.cc,v 1.12 2003/06/06 20:03:31 dan_karrels Exp $
  */
 
 #include	<string>
@@ -49,7 +49,6 @@ using std::endl ;
  *  Exported function used by moduleLoader to gain an
  *  instance of this module.
  */
-
 extern "C"
 {
   xClient* _gnuwinit(const string& args)
@@ -92,19 +91,61 @@ else
 	}
 
 partMessage = conf.Require( "part_message" )->second ;
-startTime = ::time( 0 ) ;
+startTime = 0 ;
+
+openLogFiles() ;
+
+memset( eventMinuteTotal, 0, sizeof( eventMinuteTotal ) ) ;
+memset( eventTotal, 0, sizeof( eventTotal ) ) ;
 }
 
 stats::~stats()
 {
-for( fileIterator fileItr = fileTable.begin() ;
-	fileItr!= fileTable.end() ; ++fileItr )
+for( eventType whichEvent = 0 ; whichEvent <= EVT_CREATE ; ++whichEvent )
 	{
-	(fileItr->second)->flush() ;
-	(fileItr->second)->close() ;
-	delete fileItr->second ;
+	fileTable[ whichEvent ].flush() ;
+	fileTable[ whichEvent ].close() ;
 	}
-fileTable.clear() ;
+}
+
+void stats::openLogFiles()
+{
+// For each possible event, open a log file to receive minutely
+// event totals.
+// Note that the file names will be retrieve from the eventNames
+// array, and spaces (' ') will be substituted with underscore ('_').
+for( eventType whichEvent = 0 ; whichEvent <= EVT_CREATE ; ++whichEvent )
+	{
+	string fileName( eventNames[ whichEvent ] ) ;
+
+	// Substitute ' ' for '_'
+	for( string::iterator sItr = fileName.begin() ;
+		sItr != fileName.end() ; ++sItr )
+		{
+		if( ' ' == *sItr )
+			{
+			*sItr = '_' ;
+			}
+		} // for( sItr )
+
+	// Update the fileName to include the full path
+	fileName = data_path + fileName ;
+
+	// File not yet opened
+	fileTable[ whichEvent ].open( fileName.c_str(),
+		ios::out | ios::trunc ) ;
+	if( !fileTable[ whichEvent ].is_open() )
+		{
+		elog	<< "stats::openLogFiles> Unable to open file: "
+			<< fileName
+			<< endl ;
+		return ;
+		}
+
+//	elog	<< "stats::openLogFiles> Opened log file: "
+//		<< fileName
+//		<< endl ;
+	} // for( whichEvent )
 }
 
 void stats::ImplementServer( xServer* theServer )
@@ -116,10 +157,6 @@ for( eventType whichEvent = 0 ; whichEvent != EVT_NOOP ; ++whichEvent )
 	{
 	switch( whichEvent )
 		{
-		case EVT_RAW:
-		case EVT_BURST_CMPLT:
-		case EVT_BURST_ACK:
-			break ;
 		default:
 			theServer->RegisterEvent( whichEvent, this ) ;
 			break ;
@@ -127,14 +164,64 @@ for( eventType whichEvent = 0 ; whichEvent != EVT_NOOP ; ++whichEvent )
 	} // for()
 
 theServer->RegisterChannelEvent( "*", this ) ;
+
+// Register to receive timed events every minute
+// This event will be used to flush data to the log files
+theServer->RegisterTimer( ::time( 0 ) + 60, this ) ;
+}
+
+int stats::OnTimer( xServer::timerID, void* )
+{
+//elog	<< "stats::OnTimer"
+//	<< endl ;
+
+// Timed events are once-run, make sure to request a new
+// timed event 1 minute from now
+MyUplink->RegisterTimer( ::time( 0 ) + 60, this ) ;
+
+// Flush logs
+writeLog() ;
+
+// Reset the minutely event counters
+
+
+memset( eventMinuteTotal, 0, sizeof( eventMinuteTotal ) ) ;
+
+return 0 ;
+}
+
+int stats::OnChannelMessage( iClient* theClient,
+	Channel* theChan,
+	const string& theMessage )
+{
+elog	<< "stats::OnChannelMessage> theClient: "
+	<< *theClient
+	<< ", theChan: "
+	<< *theChan
+	<< ", theMessage: "
+	<< theMessage
+	<< endl ;
+return xClient::OnChannelMessage( theClient,
+	theChan,
+	theMessage ) ;
 }
 
 int stats::OnPrivateMessage( iClient* theClient,
 	const string& theMessage,
 	bool )
 {
-if( !theClient->isOper() && theClient->getNickName() != "ripper_" )
+elog	<< "stats::OnPrivateMessage> theClient: "
+	<< *theClient
+	<< ", theMessage: "
+	<< theMessage
+	<< endl ;
+
+if( !theClient->isOper() &&
+	((theClient->getMode( iClient::MODE_REGISTERED )) &&
+	(theClient->getAccount() != "reppir")) )
 	{
+	elog	<< "stats::OnPrivateMessage> Denying access"
+		<< endl ;
 	return 0 ;
 	}
 
@@ -171,18 +258,18 @@ if( st.size() < 2 )
 
 if( st[ 0 ] == "join" )
 	{
-	elog	<< "stats::OnPrivateMessage> Joining: "
-		<< st[ 1 ]
-		<< endl ;
+//	elog	<< "stats::OnPrivateMessage> Joining: "
+//		<< st[ 1 ]
+//		<< endl ;
 	Join( st[ 1 ] ) ;
 	return 0 ;
 	}
 
 if( st[ 0 ] == "part" )
 	{
-	elog	<< "stats::OnPrivateMessage> Part: "
-		<< st[ 1 ]
-		<< endl ;
+//	elog	<< "stats::OnPrivateMessage> Part: "
+//		<< st[ 1 ]
+//		<< endl ;
 	Part( st[ 1 ], partMessage ) ;
 	return 0 ;
 	}
@@ -217,14 +304,8 @@ if( st[ 0 ] == "say" )
 return 0 ;
 }
 
-void stats::WriteLog( const string& fileName, const string& line )
+void stats::writeLog()
 {
-//elog	<< "stats::WriteLog> fileName: "
-//	<< fileName
-//	<< ", line: "
-//	<< line
-//	<< endl ;
-
 // Should we log during a net burst
 if( !logDuringBurst && MyUplink->isBursting() )
 	{
@@ -232,60 +313,20 @@ if( !logDuringBurst && MyUplink->isBursting() )
 	return ;
 	}
 
-/*
-fileIterator fileItr = fileTable.find( fileName ) ;
-if( fileItr == fileTable.end() )
-	{
-	// File not yet opened
-	ofstream* outFile = new ofstream( (data_path + fileName).c_str(),
-			ios::out | ios::trunc ) ;
-	if( !(*outFile) )
-		{
-		elog	<< "stats::WriteLog> Unable to open file: "
-			<< (data_path + fileName)
-			<< endl ;
-		return ;
-		}
-
-	elog	<< "stats::writeLog> Opened log file: "
-		<< (data_path + fileName)
-		<< endl ;
-
-	pair< fileTableType::iterator, bool > thePair =
-		fileTable.insert(
-		fileTableType::value_type( fileName, outFile ) ) ;
-	if( !thePair.second )
-		{
-		elog	<< "stats::WriteLog> Failed to insert file "
-			<< fileName
-			<< endl ;
-		delete outFile ;
-		return ;
-		}
-	fileItr = thePair.first ;
-	}
-*/
-
-memoryCount[ fileName ]++ ;
-//elog	<< "stats::WriteLog> memoryCount[ "
-//	<< fileName
-//	<< " ]: "
-//	<< memoryCount[ fileName ]
-//	<< endl ;
-
-/*
 // Get the current time
 time_t now = ::time(0) ;
 struct tm* nowTM = gmtime( &now ) ;
 
-ofstream* outFile = fileItr->second ;
+for( eventType whichEvent = 0 ; whichEvent <= EVT_CREATE ; ++whichEvent )
+	{
+	ofstream& outFile = fileTable[ whichEvent ] ;
 
-*outFile	<< nowTM->tm_hour << ":"
-		<< nowTM->tm_min << ":"
-		<< nowTM->tm_sec << " "
-		<< line
-		<< endl ;
-*/
+	outFile		<< nowTM->tm_hour << ":"
+			<< nowTM->tm_min << ":"
+			<< nowTM->tm_sec << " "
+			<< eventMinuteTotal[ whichEvent ]
+			<< endl ;
+	}
 }
 
 int stats::OnChannelEvent( const channelEventType& whichEvent,
@@ -300,26 +341,13 @@ if( 0 == startTime )
 	startTime = ::time( 0 ) ;
 	}
 
-switch( whichEvent )
-	{
-	case EVT_JOIN:
-		WriteLog( "EVT_JOIN" ) ;
-		break ;
-	case EVT_PART:
-		WriteLog( "EVT_PART" ) ;
-		break ;
-	case EVT_TOPIC:
-		WriteLog( "EVT_TOPIC" ) ;
-		break ;
-	case EVT_KICK:
-		WriteLog( "EVT_KICK" ) ;
-		break ;
-	case EVT_CREATE:
-		WriteLog( "EVT_CREATE" ) ;
-		break ;
-	}
+assert( whichEvent <= EVT_CREATE ) ;
 
-return xClient::OnChannelEvent( whichEvent, theChan, arg1, arg2, arg3, arg4 ) ;
+eventMinuteTotal[ whichEvent ]++ ;
+eventTotal[ whichEvent ]++ ;
+
+return xClient::OnChannelEvent( whichEvent, theChan,
+	arg1, arg2, arg3, arg4 ) ;
 }
 
 int stats::OnEvent( const eventType& whichEvent,
@@ -333,51 +361,15 @@ if( 0 == startTime )
 	startTime = ::time( 0 ) ;
 	}
 
+assert( whichEvent <= EVT_CREATE ) ;
+
+eventMinuteTotal[ whichEvent ]++ ;
+eventTotal[ whichEvent ]++ ;
+
 // NEVER uncomment this line on a large network heh
 //elog	<< "stats::OnEvent> Event number: "
 //	<< whichEvent
 //	<< endl ;
-
-WriteLog( "Total_Events" ) ;
-
-switch( whichEvent )
-	{
-	case EVT_OPER:
-		WriteLog( "EVT_OPER" ) ;
-		break ;
-	case EVT_NETBREAK:
-		WriteLog( "EVT_NETBREAK" ) ;
-		break ;
-	case EVT_NETJOIN:
-		WriteLog( "EVT_NETJOIN" ) ;
-		break ;
-	case EVT_GLINE:
-		WriteLog( "EVT_GLINE" ) ;
-		break ;
-	case EVT_REMGLINE:
-		WriteLog( "EVT_REMGLINE" ) ;
-		break ;
-	case EVT_QUIT:
-		WriteLog( "EVT_QUIT" ) ;
-		break ;
-	case EVT_KILL:
-		WriteLog( "EVT_KILL" ) ;
-		break ;
-	case EVT_NICK:
-		WriteLog( "EVT_NICK" ) ;
-		break ;
-	case EVT_CHNICK:
-		WriteLog( "EVT_CHNICK" ) ;
-		break ;
-	case EVT_ACCOUNT:
-		WriteLog( "EVT_ACCOUNT" ) ;
-		break ;
-	default:
-		elog	<< "stats::OnEvent> Received unknown event: "
-			<< whichEvent
-			<< endl ;
-		break ;
-	} // switch()
 
 return xClient::OnEvent( whichEvent, arg1, arg2, arg3, arg4 ) ;
 }
@@ -388,18 +380,25 @@ time_t countingTime = ::time( 0 ) - startTime ;
 
 Notice( theClient, "I have been counting for %d seconds",
 	countingTime ) ;
-Notice( theClient, "EventType   EventCount  Average" ) ;
+Notice( theClient, "EventName   EventCount  Average" ) ;
 
 unsigned long int totalEvents = 0 ;
 
-for( constMemoryCountIterator countItr = memoryCount.begin() ;
-	countItr != memoryCount.end() ; ++countItr )
+// First, find the total number of events to occur
+for( eventType whichEvent = 0 ; whichEvent <= EVT_CREATE ; ++whichEvent )
 	{
-	totalEvents += countItr->second ;
+	totalEvents += eventTotal[ whichEvent ] ;
+	}
+
+// Now output number of each event, and percentage of that
+// event to the total events received
+for( eventType whichEvent = 0 ; whichEvent <= EVT_CREATE ; ++whichEvent )
+	{
 	Notice( theClient, "%s  %d  %f/second",
-		countItr->first.c_str(),
-		countItr->second,
-		(double) countItr->second / (double) totalEvents ) ;
+		eventNames[ whichEvent ].c_str(),
+		eventTotal[ whichEvent ],
+		(double) eventTotal[ whichEvent ] /
+			(double) totalEvents ) ;
 	}
 
 Notice( theClient, "Total Events: %d, Total Average Events/Second: %f",

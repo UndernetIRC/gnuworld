@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_P.cc,v 1.1 2002/11/20 22:16:18 dan_karrels Exp $
+ * $Id: msg_P.cc,v 1.2 2003/06/06 20:03:31 dan_karrels Exp $
  */
 
 #include	<string>
@@ -30,14 +30,16 @@
 #include	"ELog.h"
 #include	"xparameters.h"
 #include	"ServerCommandHandler.h"
+#include	"StringTokenizer.h"
 
-const char msg_P_cc_rcsId[] = "$Id: msg_P.cc,v 1.1 2002/11/20 22:16:18 dan_karrels Exp $" ;
+const char msg_P_cc_rcsId[] = "$Id: msg_P.cc,v 1.2 2003/06/06 20:03:31 dan_karrels Exp $" ;
 const char server_h_rcsId[] = __SERVER_H ;
 const char Network_h_rcsId[] = __NETWORK_H ;
 const char iClient_h_rcsId[] = __ICLIENT_H ;
 const char client_h_rcsId[] = __CLIENT_H ;
 const char ELog_h_rcsId[] = __ELOG_H ;
 const char xParameters_h_rcsId[] = __XPARAMETERS_H ;
+const char StringTokenizer_h_rcsId[] = __STRINGTOKENIZER_H ;
 
 namespace gnuworld
 {
@@ -57,6 +59,7 @@ CREATE_HANDLER(msg_P)
  *
  * QAE P PAA :translate xaa
  * QAE P AAPAA :translate xaa
+ * abcDE P #chanName :testing 12 3
  */
 bool msg_P::Execute( const xParameters& Param )
 {
@@ -67,107 +70,174 @@ if( Param.size() < 3 )
 	return false ;
 	}
 
-char* Sender	= Param[ 0 ] ;
-char* Receiver	= Param[ 1 ] ;
-
-// Is the PRIVMSG being sent to a channel?
-if( ('#' == *Receiver) || ('+' == *Receiver))
+Channel* theChan = 0 ;
+if( '#' == Param[ 1 ][ 0 ] )
 	{
-	// It's a channel message, just ignore it
+	// Channel message
+	theChan = Network->findChannel( Param[ 1 ] ) ;
+	if( 0 == theChan )
+		{
+		elog	<< "msg_P> Unable to locate channel: "
+			<< Param[ 1 ]
+			<< endl ;
+		return  false ;
+		}
+	}
+
+if( '+' == Param[ 1 ][ 0 ] )
+	{
+	// Chances of receiving a local channel are slim to
+	// none anyway
+	// *shrug*
 	return true ;
 	}
 
-char		*Server		= NULL,
-		*Pos		= NULL,
-		*Command	= NULL ;
-
-bool		CTCP		= false ;
-bool		secure		= false ;
-
-xClient		*Client		= NULL ;
-
-// Search for user@host in the receiver string
-Pos = strchr( Receiver, '@' ) ;
-
-// Was there a '@' in the Receiver string?
-if( NULL != Pos )
+iClient* srcClient = Network->findClient( Param[ 0 ] ) ;
+if( 0 == srcClient )
 	{
-	// Yup, nickname specified
-	Server = Receiver + (Pos - Receiver) + 1 ;
-	Receiver[ Pos - Receiver ] = 0 ;
-	Client = Network->findLocalNick( Receiver ) ;
+	elog	<< "msg_P> Unable to find source client: "
+		<< Param[ 1 ]
+		<< endl ;
+	return false ;
+	}
+
+// abcDE P FGhij :hi, how are you?
+bool		secure = false ;
+xClient*	targetClient = 0 ;
+
+if( (0 == theChan) && (strchr( Param[ 1 ], '@' ) != 0) )
+	{
+	// nick@host.name specified, secure message
 	secure = true ;
-	}
-else if( Receiver[ 0 ] == theServer->getCharYY()[ 0 ]
-	&& Receiver[ 1 ] == theServer->getCharYY()[ 1 ] )
-	{
-	// It's mine
-	Client = Network->findLocalClient( Receiver ) ;
-	}
-else
-	{
-	elog	<< "msg_P> Received a message for unknown client: "
-		<< Param
-		<< endl ;
-	return false ;
-	}
 
-char* Message = Param[ 2 ] ;
-
-// Is it a CTCP message?
-if( Message[ 0 ] == 1 && Message[ strlen( Message ) - 1 ] == 1 )
-	{
-	Message++ ;
-	CTCP = true ;
-	Message[ strlen( Message ) - 1 ] = 0 ;
-
-	// TODO: Get rid of this hideous method call
-	// strtok() is a pos
-	Command = strtok( Message, " " ) ;
-	char* Msg = strtok( NULL, "\r" ) ; 
-	Message = Msg ;
-
-	// Message == 0 will cause std::string() constructor to crash.
-	if( NULL == Message )
+	StringTokenizer st( Param[ 1 ], '@' ) ;
+	targetClient = Network->findLocalNick( st[ 0 ] ) ;
+	if( 0 == targetClient )
 		{
-		Message = "" ;
+		elog	<< "msg_P> Received message for unknown "
+			<< "client: "
+			<< Param[ 1 ]
+			<< ", nick: "
+			<< st[ 0 ]
+			<< endl ;
+		return true ;
 		}
-	// Same reason as above. DOH!
-	if( NULL == Command )
+	// Found the target xClient
+	}
+else if( (0 == theChan) &&
+	(Param[ 1 ][ 0 ] == theServer->getCharYY()[ 0 ]) &&
+	(Param[ 1 ][ 1 ] == theServer->getCharYY()[ 1 ]) )
+	{
+	// Normal message to an xClient
+	targetClient = Network->findLocalClient( Param[ 1 ] ) ;
+	if( 0 == targetClient )
 		{
-		Command = "" ;
+		elog	<< "msg_P> Unable to find local client: "
+			<< Param[ 1 ]
+			<< endl ;
+		return true ;
 		}
 	}
-
-// :Sender PRIVMSG YXX :Message
-// :Sender PRIVMSG YXX :\001Command\001
-// :Sender PRIVMSG YXX :\001Command\001 Message
-
-if( NULL == Client )
+else if( 0 == theChan )
 	{
-	elog	<< "msg_P> Local client not found: "
-		<< Receiver
-		<< endl ;
-	return false ;
+	// May be a message to a juped client on a juped server,
+	// ignore it.
+	return true ;
 	}
 
-iClient* Target = Network->findClient( Sender ) ;
-if( NULL == Target )
+bool CTCP = (Param[ 2 ][ 0 ] == 1) ? true : false ;
+
+// Prepare a message string to pass to the client which is
+// void of any CTCP control chars
+// CTCP messages begin and end with '\1'
+// In the case of CTCP, it is of the form:
+// abcDE P EFghi :\1ctcp_command\1 message
+string message( Param.assemble( 2 ) ) ;
+string command( Param[ 2 ] ) ;
+
+if( CTCP )
 	{
-	elog	<< "msg_P> Unable to find Sender: "
-		<< Sender
-		<< endl ;
-	return false ;
+	// CTCP, remove the control chars from the command
+	command.erase( command.begin() ) ;
+	command.erase( command.size() - 1 ) ;
+
+	// It's possible to have a CTCP command without a message
+	if( Param.size() >= 4 )
+		{
+		message = Param.assemble( 3 ) ;
+		}
 	}
 
 if( CTCP )
 	{
-	return Client->OnCTCP( Target, Command, Message, secure ) ;
+	if( theChan != 0 )
+		{
+		elog	<< "msg_P> Found channel ctcp, command from: "
+			<< *srcClient
+			<< ", command: "
+			<< command
+			<< ", message: "
+			<< message
+			<< ", on channel: "
+			<< *theChan
+			<< endl ;
+
+		return targetClient->OnChannelCTCP( srcClient,
+			theChan,
+			command,
+			message ) ;
+		}
+	else
+		{
+		elog	<< "msg_P> Found privmsg CTCP, command from: "
+			<< *srcClient
+			<< ", command: "
+			<< command
+			<< ", message: "
+			<< message
+			<< ", on channel: "
+			<< *theChan
+			<< endl ;
+
+		return targetClient->OnCTCP( srcClient,
+			command,
+			message,
+			secure ) ;
+		}
 	}
 else
 	{
-	return Client->OnPrivateMessage( Target, Message, secure ) ;
+	if( theChan != 0 )
+		{
+		elog	<< "msg_P> Channel message from: "
+			<< *srcClient
+			<< ", message: "
+			<< message
+			<< ", on channel: "
+			<< *theChan
+			<< endl ;
+
+		return targetClient->OnChannelMessage( srcClient,
+			theChan,
+			message ) ;
+		}
+	else
+		{
+		elog	<< "msg_P> Private message from: "
+			<< *srcClient
+			<< ", message: "
+			<< message
+			<< endl ;
+
+		return targetClient->OnPrivateMessage( srcClient,
+			message,
+			secure ) ;
+		}
 	}
-}
+
+// This should not happen
+return true ;
+
+} // msg_P
 
 } // namespace gnuworld

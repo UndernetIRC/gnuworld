@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: stats.h,v 1.5 2003/06/05 01:38:11 dan_karrels Exp $
+ * $Id: stats.h,v 1.6 2003/06/06 20:03:31 dan_karrels Exp $
  */
 
 #ifndef __STATS_H
-#define __STATS_H "$Id: stats.h,v 1.5 2003/06/05 01:38:11 dan_karrels Exp $"
+#define __STATS_H "$Id: stats.h,v 1.6 2003/06/06 20:03:31 dan_karrels Exp $"
 
 #include	<fstream>
 #include	<string>
@@ -32,6 +32,7 @@
 #include	"iClient.h"
 #include	"misc.h" // noCaseCompare
 #include	"server.h"
+#include	"events.h"
 
 namespace gnuworld
 {
@@ -42,29 +43,23 @@ using std::map ;
 
 class stats : public xClient
 {
-
-protected:
-	typedef map< string, ofstream*, noCaseCompare > fileTableType ;
-	typedef map< string, long int > memoryCountType ;
-
 public:
 	stats( const string& ) ;
 	virtual ~stats() ;
 
-	typedef fileTableType::iterator fileIterator ;
-	typedef fileTableType::const_iterator constFileIterator ;
-
-	typedef memoryCountType::const_iterator constMemoryCountIterator ;
-
 	virtual void ImplementServer( xServer* ) ;
 	virtual int OnPrivateMessage( iClient*, const string&,
 		bool = false ) ;
+	virtual int OnChannelMessage( iClient*, Channel*,
+		const string& ) ;
 	virtual int OnEvent( const eventType&,
 		void* = 0, void* = 0, void* = 0, void* = 0 ) ;
         virtual int OnChannelEvent( const channelEventType&,
                 Channel*,  
                 void* Data1 = NULL, void* Data2 = NULL,
                 void* Data3 = NULL, void* Data4 = NULL ) ;
+
+	virtual int	OnTimer( xServer::timerID, void* ) ;
 
 	inline const string&	getPartMessage() const
 		{ return partMessage ; }
@@ -75,16 +70,34 @@ public:
 	virtual void		dumpStats( iClient* ) ;
 
 protected:
-	void			WriteLog( const string& file,
-					const string& line = string() ) ;
+	/**
+	 * WriteLog() will flush all data to the log files.
+	 */
+	virtual void		writeLog() ;
+
+	/**
+	 * Opens all of the log files.
+	 */
+	virtual void		openLogFiles() ;
 
 	bool			logDuringBurst ;
 	string			data_path ;
 	string			partMessage ;
 	time_t			startTime ;
 
-	fileTableType		fileTable ;
-	memoryCountType		memoryCount ;
+	/// This variable holds the totals for each event,
+	/// and is reset each minute when the log files are
+	/// written.
+	unsigned long int	eventMinuteTotal[ EVT_CREATE + 1 ] ;
+
+	/// This variable holds the totals for each event
+	/// since time of connect (optionally excluding net
+	/// bursts).
+	unsigned long int	eventTotal[ EVT_CREATE + 1 ] ;
+
+	/// This variable holds pointers to the individual
+	/// log files.
+	ofstream		fileTable[ EVT_CREATE + 1 ] ;
 
 } ;
 

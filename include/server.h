@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server.h,v 1.83 2003/06/06 13:14:15 dan_karrels Exp $
+ * $Id: server.h,v 1.84 2003/06/06 20:03:31 dan_karrels Exp $
  */
 
 #ifndef __SERVER_H
-#define __SERVER_H "$Id: server.h,v 1.83 2003/06/06 13:14:15 dan_karrels Exp $"
+#define __SERVER_H "$Id: server.h,v 1.84 2003/06/06 20:03:31 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
@@ -236,7 +236,8 @@ public:
 	/**
 	 * Attach a fake server to this services server.
 	 */
-	virtual bool AttachServer( iServer*, const string& = "JUPED Server" ) ;
+	virtual bool AttachServer( iServer*,
+		const string& = "JUPED Server" ) ;
 
 	/**
 	 * Squit a server from the network and remove it
