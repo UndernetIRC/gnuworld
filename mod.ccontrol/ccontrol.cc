@@ -11,7 +11,7 @@
 /* ccontrol.cc
  * Authors: Daniel Karrels dan@karrels.com
  *	    Tomer Cohen    MrBean@toughguy.net
- * $Id: ccontrol.cc,v 1.161 2003/02/19 15:57:26 mrbean_ Exp $
+ * $Id: ccontrol.cc,v 1.162 2003/02/19 16:02:35 mrbean_ Exp $
  */
 
 #define MAJORVER "1"
@@ -56,7 +56,7 @@
 #include	"ip.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.161 2003/02/19 15:57:26 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.162 2003/02/19 16:02:35 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -1584,25 +1584,19 @@ if(dbConnected)
 				
 				glSet = true;
 				ccGline *tmpGline;
-				tmpGline = findGline("*@" + tIP); 
-				if(!tmpGline)
-					tmpGline = findGline("*@" + NewUser->getRealInsecureHost());
-				if(!tmpGline)
-					{
-					tmpGline = new ccGline(SQLDb);
-					tmpGline->setHost("*@" + tIP);
-					tmpGline->setExpires(::time(0) + maxGlineLen);
-					char us[100];
-					us[0] = '\0';
-					sprintf(us,"[%d] Automatically banned for excessive connections",CurConnections);
-					tmpGline->setReason(us);
-					tmpGline->setAddedOn(::time(0));
-					tmpGline->setAddedBy(nickName);
-					tmpGline->setLastUpdated(::time(0));
-					tmpGline->Insert();
-					tmpGline->loadData(tmpGline->getHost());
-					addGline(tmpGline);
-					}
+				tmpGline = new ccGline(SQLDb);
+				tmpGline->setHost("*@" + tIP);
+				tmpGline->setExpires(::time(0) + maxGlineLen);
+				char us[100];
+				us[0] = '\0';
+				sprintf(us,"[%d] Automatically banned for excessive connections",CurConnections);
+				tmpGline->setReason(us);
+				tmpGline->setAddedOn(::time(0));
+				tmpGline->setAddedBy(nickName);
+				tmpGline->setLastUpdated(::time(0));
+				tmpGline->Insert();
+				tmpGline->loadData(tmpGline->getHost());
+				addGline(tmpGline);
 				addGlineToUplink(tmpGline);
 				}	
 			else
