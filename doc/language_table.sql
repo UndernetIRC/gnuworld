@@ -958,7 +958,7 @@ COPY "translations" FROM stdin;
 8	95	Am sters user-ul %s de pe %s	31337
 8	96	Acum INVISIBLE este ON	31337
 8	97	Acum INVISIBLE este OFF	31337
-y8	98	%s pentru %s e %s	31337
+8	98	%s pentru %s e %s	31337
 8	99	valoarea lui %s trebuie sa fie ON sau OFF	31337
 8	100	Valoarea pentru USERFLAGS e incorecta. Valorile admise sunt 0, 1, 2.	31337
 8	101	USERFLAGS pentru %s este %i	31337
