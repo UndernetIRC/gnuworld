@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------------
--- "$Id: cservice.web.sql,v 1.3 2001/02/22 23:17:52 gte Exp $"
+-- "$Id: cservice.web.sql,v 1.4 2001/02/22 23:26:57 gte Exp $"
 -- Channel service DB SQL file for PostgreSQL.
 --
 -- Tables specific to webbased registration process.
@@ -19,3 +19,15 @@ CREATE TABLE pendingusers (
 	question_id INT2,
 	verificationdata VARCHAR(30)
 );
+
+-- This table stores the timestamp of the last request 
+-- from a particular IP. 
+-- Used to block abuse, such as requesting a password 50,000
+-- times a minute.
+
+CREATE TABLE lastrequests (
+	ip VARCHAR(15),
+	last_request_ts INT4
+);
+
+CREATE INDEX lastrequests_ip_idx ON lastrequests(ip);
