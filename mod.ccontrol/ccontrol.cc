@@ -11,7 +11,7 @@
 /* ccontrol.cc
  * Authors: Daniel Karrels dan@karrels.com
  *	    Tomer Cohen    MrBean@toughguy.net
- * $Id: ccontrol.cc,v 1.157 2003/02/16 12:14:23 mrbean_ Exp $
+ * $Id: ccontrol.cc,v 1.158 2003/02/16 12:25:25 mrbean_ Exp $
  */
 
 #define MAJORVER "1"
@@ -56,7 +56,7 @@
 #include	"ip.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.157 2003/02/16 12:14:23 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.158 2003/02/16 12:25:25 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -1673,7 +1673,6 @@ if(theGline->getHost().substr(0,1) != "$")
 else 
 	{ // Its a realname gline, match all the users and gline their hosts
 	ccGline* tmpGline;
-	char us[100];
 	string RealName = theGline->getHost().substr(1,theGline->getHost().size()-1);
 	list<const iClient*> cList = Network->matchRealName(RealName);
 	list<const iClient*>::iterator ptr;
@@ -1686,18 +1685,12 @@ else
 		curClient = *ptr;    
 		Host = string("*@") + curClient->getRealInsecureHost();
 		tmpGline = new (std::nothrow) ccGline(SQLDb);
-		us[0] = '\0';
-		sprintf(us,"%d",Network->countMatchingRealUserHost(Host));
 		tmpGline->setHost(Host);
 		tmpGline->setAddedBy(theGline->getAddedBy());
 		tmpGline->setExpires(theGline->getExpires());
 		tmpGline->setAddedOn(theGline->getAddedOn());
 		tmpGline->setLastUpdated(theGline->getLastUpdated());
-		tmpGline->setReason(string("[") + us + string("] ") +theGline->getReason());
-				
-		/*MyUplink->setGline(theGline->getAddedBy(),
-				    Host,theGline->getReason(),
-				    Expires,theGline->getLastUpdated(),this);*/
+		tmpGline->setReason(theGline->getReason());
 		queueGline(tmpGline,false);				    
 		}
 			
