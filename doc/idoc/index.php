@@ -2,7 +2,7 @@
 /*
  *
  * Undernet GNUworld Interactive Installation Guide (aka UGIIG)
- * $Id: index.php,v 1.19 2004/06/01 08:30:25 nighty Exp $
+ * $Id: index.php,v 1.20 2004/07/25 02:55:00 nighty Exp $
  *
  * Released under the GNU Public License : http://www.gnu.org/licenses/gpl.txt
  * by nighty <nighty@undernet.org>
@@ -50,7 +50,7 @@ function footer($prev,$next) {
 	//echo "<address>maintained by <b>&lt;</b><a href=\"mailto:" . $coder_email . "\">" . $coder_email . "</a><b>&gt;</b> - Last modified : <b>" . date("M-d-Y H:i:s",   (  filemtime("index.php")+( date("Z",filemtime("index.php"))/3600 )   )   ) . " UTC/GMT</b> - <b>[</b><a href=\"./\">Home</a><b>]</b></address>";
 	echo "<address>maintained by <b>&lt;</b><a href=\"mailto:" . $coder_email . "\">" . $coder_email . "</a><b>&gt;</b> - <b>[</b><a href=\"./\">Home</a><b>]</b>";
 	echo "&nbsp;<br><font size=-2><b>";
-?>$Id: index.php,v 1.19 2004/06/01 08:30:25 nighty Exp $<?
+?>$Id: index.php,v 1.20 2004/07/25 02:55:00 nighty Exp $<?
 	echo "</b></font></address>\n";
 	echo "</body>\n";
 	echo "</html>\n";
@@ -86,14 +86,14 @@ define(TCL_83_LINUX_FILE_NAME,"tcl8.3.5-src.tar.gz");
 define(TCL_83_RECOM_VERSION,"8.3.5");
 
 define(APACHE_FTP_SOURCE,"http://mir2.ovh.net/ftp.apache.org/dist/httpd/");
-define(APACHE_FTP_SOURCE_FILE,"http://mir2.ovh.net/ftp.apache.org/dist/httpd/apache_1.3.29.tar.gz");
-define(APACHE_FILE_NAME,"apache_1.3.29.tar.gz");
-define(APACHE_RECOM_VERSION,"1.3.29");
+define(APACHE_FTP_SOURCE_FILE,"http://mir2.ovh.net/ftp.apache.org/dist/httpd/apache_1.3.31.tar.gz");
+define(APACHE_FILE_NAME,"apache_1.3.31.tar.gz");
+define(APACHE_RECOM_VERSION,"1.3.31");
 
 define(PHP_FTP_SOURCE,"http://www.php.net/downloads.php");
-define(PHP_FTP_SOURCE_FILE,"http://static.php.net/www.php.net/distributions/php-4.3.4.tar.gz");
-define(PHP_FILE_NAME,"php-4.3.4.tar.gz");
-define(PHP_RECOM_VERSION,"4.3.4");
+define(PHP_FTP_SOURCE_FILE,"http://static.php.net/www.php.net/distributions/php-4.3.8.tar.gz");
+define(PHP_FILE_NAME,"php-4.3.8.tar.gz");
+define(PHP_RECOM_VERSION,"4.3.8");
 
 define(LIBPNG_URL,"http://www.libpng.org/");
 define(LIBPNG_URL_FILE,"http://download.sourceforge.net/libpng/libpng-1.0.15.tar.gz");
@@ -117,7 +117,7 @@ define(ZLIB_FILE_NAME,"zlib-1.1.4.tar.gz");
 
 
 ?>
-<!-- $Id: index.php,v 1.19 2004/06/01 08:30:25 nighty Exp $ //-->
+<!-- $Id: index.php,v 1.20 2004/07/25 02:55:00 nighty Exp $ //-->
 <html>
 <head>
 <title>Undernet GNUworld Interactive Installation Guide</title>
