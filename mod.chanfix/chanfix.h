@@ -20,11 +20,10 @@
 #ifndef CF_CHANFIX_H
 #define CF_CHANFIX_H
 
-#include <map>
-
 #include <string.h>
 
 #include "client.h"
+#include "gw_hashmap.h"
 
 #include "logging.h"
 
@@ -75,7 +74,7 @@ protected:
 	 * C O N T A I N E R S *
 	 ***********************/
 
-	 typedef std::map< string , cfChannel* > mapChannels;
+	 typedef HASHMAP< string , cfChannel* > mapChannels;
 	 mapChannels channels;
 
 
@@ -114,7 +113,7 @@ protected:
 	 *******************/
 
 	/** Type of the commandMap. */
-	typedef std::map< string , Command* , noCaseCompare > commandMapType;
+	typedef HASHMAP< string , Command* > commandMapType;
 	/** Convenience type when creating a new command pair. */
 	typedef commandMapType::value_type commandPairType;
 	/** Map holding all available bot commands. */

@@ -1,14 +1,19 @@
-dnl $Id: configure.ac,v 1.28 2004/05/16 11:29:29 jeekay Exp $
+dnl $Id: configure.ac,v 1.29 2004/06/05 14:17:32 jeekay Exp $
 dnl ----------------------------------------------------------
 
 echo Configuring GNUWorld...
 echo
 
-AC_REVISION($Revision: 1.28 $)
+AC_REVISION($Revision: 1.29 $)
 AC_INIT
 AC_CONFIG_SRCDIR([src/main.cc])
 AM_INIT_AUTOMAKE(gnuworld,2.5)
 AM_CONFIG_HEADER(include/defs.h)
+
+AC_PROG_CXX
+AC_LANG([C++])
+
+AC_PROG_MAKE_SET(gmake)
 
 AC_DISABLE_STATIC
 AC_ENABLE_SHARED
@@ -36,13 +41,6 @@ CXXFLAGS="-W -Wall -pipe -I\$(top_srcdir)/libltdl"
 CFLAGS="$CFLAGS"
 
 AC_PREFIX_DEFAULT(`pwd`)
-
-AC_PROG_CC
-AC_PROG_CXX
-AC_PROG_CPP
-AC_LANG([C++])
-
-AC_PROG_MAKE_SET(gmake)
 
 dnl Configure libltdl
 AC_CONFIG_SUBDIRS(libltdl)
@@ -115,6 +113,9 @@ dnl
 AC_CHECK_HEADERS(sys/file.h unistd.h sys/stat.h sys/ioctl.h sys/resource.h )
 AC_CHECK_HEADERS(sys/time.h asm/ioctls.h xti_inet.h sys/filio.h getopt.h)
 AC_CHECK_HEADERS(sys/types.h sys/socket.h netinet/in.h sys/un.h pthread.h)
+
+dnl See if we have hashmaps available to us
+AC_CHECK_HEADERS(ext/hash_map map)
 
 AC_HEADER_STDC
 AC_HEADER_TIME

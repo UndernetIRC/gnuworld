@@ -14,7 +14,7 @@
 
 @SET_MAKE@
 
-# "$Id: Makefile.in,v 1.177 2004/05/18 16:51:03 dan_karrels Exp $"
+# "$Id: Makefile.in,v 1.178 2004/06/05 14:17:33 jeekay Exp $"
 
 SOURCES = $(libgnutest_la_SOURCES)
 

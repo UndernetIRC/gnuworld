@@ -20,8 +20,9 @@
 #ifndef CF_CFCHANNEL_H
 #define CF_CFCHANNEL_H
 
-#include <map>
 #include <string>
+
+#include "gw_hashmap.h"
 
 namespace gnuworld {
 
@@ -38,7 +39,7 @@ public:
 	cfChannelUser* getUser(const std::string&);
 
 	/** Return the beginning of the users map. */
-	typedef std::map< std::string , cfChannelUser* > mapUsers;
+	typedef HASHMAP< std::string , cfChannelUser* > mapUsers;
 	typedef mapUsers::const_iterator mapUsersConstIterator;
 	inline mapUsersConstIterator getUsersBegin()
 		{ return users.begin(); }

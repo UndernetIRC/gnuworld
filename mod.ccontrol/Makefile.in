@@ -14,7 +14,7 @@
 
 @SET_MAKE@
 
-# "$Id: Makefile.in,v 1.211 2004/06/04 14:30:51 mrbean_ Exp $"
+# "$Id: Makefile.in,v 1.212 2004/06/05 14:17:32 jeekay Exp $"
 
 SOURCES = $(libccontrol_la_SOURCES)
 
