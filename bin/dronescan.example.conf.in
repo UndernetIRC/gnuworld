@@ -1,19 +1,18 @@
-# $Id: dronescan.example.conf.in,v 1.6 2003/06/05 01:38:01 dan_karrels Exp $
+# $Id: dronescan.example.conf.in,v 1.7 2003/06/11 15:23:36 dan_karrels Exp $
 # What nickname should the bot use?
-nickname = DS
+nickname = E
 
 # What username should the bot use?
 username = dronescan
 
 # What hostname should the bot use?
-hostname = netgamers.org
+hostname = undernet.org
 
 # What should the bots real name be?
 userdescription = Drone Scanner
 
 # What user modes should the bot use?
 mode = +idk
-
 
 # What tests should we perform?
 # This is a simple bitfield. Just add up the numbers of the options
