@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * "$Id: msg_AC.cc,v 1.4 2004/01/11 11:13:01 dan_karrels Exp $"
+ * "$Id: msg_AC.cc,v 1.5 2004/01/11 11:25:55 dan_karrels Exp $"
  */
 
 #include	<iostream>
@@ -30,7 +30,7 @@
 #include	"ELog.h"
 #include	"config.h"
 
-RCSTAG( "$Id: msg_AC.cc,v 1.4 2004/01/11 11:13:01 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: msg_AC.cc,v 1.5 2004/01/11 11:25:55 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -48,14 +48,6 @@ bool msg_AC::Execute( const xParameters& Param )
 if( Param.size() != 3 )
 	{
 	elog	<< "msg_AC> Invalid number of parameters"
-		<< std::endl ;
-	return false ;
-	}
-
-if( 0 == Network->findClient( Param[ 0 ] ) )
-	{
-	elog	<< "msg_AC> Unable to find source client: "
-		<< Param[ 0 ]
 		<< std::endl ;
 	return false ;
 	}
