@@ -20,13 +20,13 @@ COPY "translations" FROM stdin;
 1	5	I don't see %s anywhere	31337
 1	6	I can't find %s on channel %s	31337
 1	7	The channel %s doesn't appear to be registered	31337
-1	8	You're opped by %s	31337
-1	9	You're voiced by %s	31337
+1	8	You're opped by %s (%s)	31337
+1	9	You're voiced by %s (%s)	31337
 1	10	%s: You are not in that channel	31337
 1	11	%s is already opped in %s	31337
 1	12	%s is already voiced in %s	31337
-1	13	You're deopped by %s	31337
-1	14	You're devoiced by %s	31337
+1	13	You're deopped by %s (%s)	31337
+1	14	You're devoiced by %s (%s)	31337
 1	15	%s is not opped in %s	31337
 1	16	%s is not voiced in %s	31337
 1	17	AUTHENTICATION FAILED as %s (Invalid Password)	31337
@@ -43,7 +43,7 @@ COPY "translations" FROM stdin;
 2	5	Je ne vois pas %s nul part	31337
 2	6	Je ne vois pas %s sur le canal %s	31337
 2	7	Le canal %s ne semble pas être enregistré	31337
-2	8	Vous avez été oppé par %s	31337
+2	8	Vous avez été oppé par %s (%s)	31337
 \.
 
 -- Danish language definition.
@@ -57,8 +57,8 @@ COPY "translations" FROM stdin;
 3	5	Jeg kan ikke se %s nogen steder	31337
 3	6	Jeg kan ikke finde %s på kanalen %s	31337
 3	7	Kanelen %s ser ikke ud til at være registreret	31337
-3	8	Du er op'et af %s	31337
-3	9	Du er voice'et af %s	31337
+3	8	Du er op'et af %s (%s)	31337
+3	9	Du er voice'et af %s (%s)	31337
 \.
 
 -- Dutch language definition.
@@ -72,8 +72,8 @@ COPY "translations" FROM stdin;
 4	5	Ik zie nergens %s	31337
 4	6	Ik kan %s niet vinden op het kanaal %s	31337
 4	7	Het kanaal %s ziet er niet geregistreerd uit	31337
-4	8	Je bent geopt door %s	31337
-4	9	Je bent gevoiced door %s	31337
+4	8	Je bent geopt door %s (%s)	31337
+4	9	Je bent gevoiced door %s (%s)	31337
 4	10	%s: Je bent niet in dat kanaal	31337
 4	11	%s is reeds geopt op %s	31337
 \.
@@ -89,8 +89,8 @@ COPY "translations" FROM stdin;
 5	5	Ich kann %s nirgendwo sehen	31337
 5	6	Ich kann %s nicht im Channel %s sehen	31337
 5	7	Channel %s is nicht registriert	31337
-5	8	%s hat dich geopt	31337
-5	9	%s hat dich gevoiced	31337
+5	8	%s (%s) hat dich geopt	31337
+5	9	%s (%s) hat dich gevoiced	31337
 5	10	%s: Du bist nicht im Channel	31337
 5	11	%s wurde bereits von %s geopt	31337
 \.
