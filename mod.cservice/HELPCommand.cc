@@ -8,7 +8,7 @@
  *
  * Caveats: Needs to be written :)
  *
- * $Id: HELPCommand.cc,v 1.3 2001/10/19 00:11:20 gte Exp $
+ * $Id: HELPCommand.cc,v 1.4 2001/10/22 19:24:25 gte Exp $
  */
 
 #include	<string>
@@ -18,7 +18,7 @@
 #include	"cservice.h"
 #include 	"responses.h"
 
-const char HELPCommand_cc_rcsId[] = "$Id: HELPCommand.cc,v 1.3 2001/10/19 00:11:20 gte Exp $" ;
+const char HELPCommand_cc_rcsId[] = "$Id: HELPCommand.cc,v 1.4 2001/10/22 19:24:25 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -37,7 +37,7 @@ bool HELPCommand::Exec( iClient* theClient, const string& Message )
 	}
 
 	sqlUser* theUser = bot->isAuthed(theClient, false);
-	string msg = bot->getHelpMessage(theUser, string_upper(st[1]));
+	string msg = bot->getHelpMessage(theUser, string_upper(st.assemble(1)));
 
 	if (msg.empty())
 	msg = bot->getHelpMessage(theUser, "INDEX");
