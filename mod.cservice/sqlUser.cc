@@ -4,18 +4,19 @@
  * Storage class for accessing user information either from the backend
  * or internal storage.
  * 
- * $Id: sqlUser.cc,v 1.17 2001/05/20 00:00:50 gte Exp $
+ * $Id: sqlUser.cc,v 1.18 2001/06/24 13:59:06 gte Exp $
  */
  
-#include	<strstream>
-#include	<string> 
+#include	<strstream.h>
+#include	<string.h>
 
 #include	<cstring> 
 
 #include	"ELog.h"
-#include	"misc.h"
+#include	"misc.h" 
 #include	"sqlUser.h" 
 #include	"constants.h"
+#include	"cservice.h"
 #include	"cservice_config.h"
 
 namespace gnuworld
@@ -278,10 +279,75 @@ if( PGRES_TUPLES_OK == status )
 return (false);
 
 }
+
+
+void sqlUser::writeEvent(unsigned short eventType, const string& theMessage)
+{
+
+strstream theLog;
+theLog	<< "INSERT INTO userlog (ts, user_id, event, message, "
+	<< "last_updated) VALUES "
+	<< "(now()::abstime::int4, " 
+	<< id
+	<< ", "
+	<< eventType
+	<< ", '"
+	<< escapeSQLChars(theMessage)
+	<< "', now()::abstime::int4)"
+	<< ends;
+
+#ifdef LOG_SQL
+	elog	<< "sqlUser::writeLog> "
+		<< theLog.str()
+		<< endl;
+#endif
+
+SQLDb->ExecCommandOk(theLog.str());
+
+delete[] theLog.str();
+
+}
+
+const string sqlUser::getLastEvent(unsigned short eventType)
+{
+strstream queryString;
+
+queryString	<< "SELECT message" 
+			<< " FROM userlog WHERE user_id = "
+			<< id 
+			<< " ORDER BY ts DESC LIMIT 1"
+			<< ends;
+
+#ifdef LOG_SQL
+	elog	<< "sqlUser::getLastEvent> "
+			<< queryString.str()
+			<< endl;
+#endif
+
+ExecStatusType status = SQLDb->Exec(queryString.str()) ;
+delete[] queryString.str() ;
+
+if( PGRES_TUPLES_OK == status )
+	{ 
+
+	if(SQLDb->Tuples() < 1)
+		{
+		return("");
+		} 
+
+	string reason = SQLDb->GetValue(0, 0);
+
+	return (reason);
+	} 
+
+return ("");
+ 
+}
  
 sqlUser::~sqlUser()
 {
 // No heap space allocated
 }
 
+ 
 } // namespace gnuworld.

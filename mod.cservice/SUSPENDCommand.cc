@@ -12,7 +12,7 @@
  * TODO: /msg x suspend #channel *, suspends all users below your access
  * level.
  *
- * $Id: SUSPENDCommand.cc,v 1.15 2001/05/22 18:21:22 gte Exp $
+ * $Id: SUSPENDCommand.cc,v 1.16 2001/06/24 13:59:06 gte Exp $
  */
 
 #include	<string>
@@ -26,7 +26,7 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char SUSPENDCommand_cc_rcsId[] = "$Id: SUSPENDCommand.cc,v 1.15 2001/05/22 18:21:22 gte Exp $" ;
+const char SUSPENDCommand_cc_rcsId[] = "$Id: SUSPENDCommand.cc,v 1.16 2001/06/24 13:59:06 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -37,7 +37,7 @@ using namespace level;
 bool SUSPENDCommand::Exec( iClient* theClient, const string& Message )
 { 
 StringTokenizer st( Message ) ;
-if( st.size() < 2 )
+if( st.size() < 3 )
 	{
 	Usage(theClient);
 	return true;
@@ -99,6 +99,9 @@ if (st[1][0] != '#')
 	bot->Notice(theClient, "%s has been globally suspended and will have level 0 access in all"
 		" channels until unsuspended.",
 		targetUser->getUserName().c_str());
+ 
+	targetUser->writeEvent(sqlUser::EV_SUSPEND, st.assemble(2));
+
 	return true;
 }
 

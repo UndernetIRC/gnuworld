@@ -13,7 +13,7 @@
  *
  * Command is aliased "INFO".
  *
- * $Id: CHANINFOCommand.cc,v 1.23 2001/06/12 22:13:46 gte Exp $
+ * $Id: CHANINFOCommand.cc,v 1.24 2001/06/24 13:59:06 gte Exp $
  */
 
 #include	<string>
@@ -26,7 +26,7 @@
 #include	"libpq++.h"
 #include	"cservice_config.h"
  
-const char CHANINFOCommand_cc_rcsId[] = "$Id: CHANINFOCommand.cc,v 1.23 2001/06/12 22:13:46 gte Exp $" ;
+const char CHANINFOCommand_cc_rcsId[] = "$Id: CHANINFOCommand.cc,v 1.24 2001/06/24 13:59:06 gte Exp $" ;
  
 namespace gnuworld
 {
@@ -121,7 +121,11 @@ if( string::npos == st[ 1 ].find_first_of( '#' ) )
 
 	if (theUser->getFlag(sqlUser::F_GLOBAL_SUSPEND))
 		{
-		bot->Notice(theClient, "\002This account has been suspended by a CService Administrator\002");
+		bot->Notice(theClient, "\002This account has been suspended by a CService Administrator\002"); 
+		/*
+		 * Perform a lookup to get the last SUSPEND event from the userlog.
+		 */
+		bot->Notice(theClient, "Reason: %s", theUser->getLastEvent(sqlUser::EV_SUSPEND).c_str());
 		}
 
 	/*

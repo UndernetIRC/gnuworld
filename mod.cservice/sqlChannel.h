@@ -1,7 +1,7 @@
 /* sqlChannel.h */
 
 #ifndef __SQLCHANNEL_H
-#define __SQLCHANNEL_H "$Id: sqlChannel.h,v 1.25 2001/06/12 22:13:46 gte Exp $"
+#define __SQLCHANNEL_H "$Id: sqlChannel.h,v 1.26 2001/06/24 13:59:06 gte Exp $"
 
 #include	<string>
 #include	<map>
@@ -39,7 +39,7 @@ public:
 	static const flagType	F_AUTOJOIN  = 0x00200000 ;
 
 	/*
-	 *   Channel 'Event' Flags, used int he channelog table.
+	 *   Channel 'Event' Flags, used in the channelog table.
 	 *   These flags are used to filter channel log records.
 	 *   in reports.
 	 */

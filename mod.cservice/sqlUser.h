@@ -1,7 +1,7 @@
 /* sqlUser.h */
 
 #ifndef __SQLUSER_H
-#define __SQLUSER_H "$Id: sqlUser.h,v 1.15 2001/05/20 00:00:50 gte Exp $"
+#define __SQLUSER_H "$Id: sqlUser.h,v 1.16 2001/06/24 13:59:06 gte Exp $"
 
 #include	<string>
 #include	<ctime>
@@ -26,6 +26,12 @@ public:
 	static const flagType F_GLOBAL_SUSPEND =	0x01 ;
 	static const flagType F_LOGGEDIN =		0x02 ; // Depricated.
 	static const flagType F_INVIS =			0x04 ;
+
+	/*
+	 *   User 'Event' Flags, used in the userlog table. 
+	 */
+
+	static const unsigned short	EV_SUSPEND     = 1 ;
 
 	/*
 	 *  Methods to get data atrributes.
@@ -97,8 +103,10 @@ public:
 
 	bool loadData( int );
 	bool loadData( const string& );
-	void setAllMembers(int);
+	void setAllMembers( int );
 	iClient*	networkClient;
+	void writeEvent( unsigned short, const string& );
+	const string getLastEvent( unsigned short );
  
 protected: 
 
@@ -116,6 +124,7 @@ protected:
 	PgDatabase*	SQLDb;
 } ;
 
-#endif // __SQLUSER_H
-
 } // namespace gnuworld
+
+#endif // __SQLUSER_H
+ 

@@ -11,10 +11,10 @@
 #warning -- 
 #warning --	
 
-#include	<vector>
-#include	<iostream>
-#include	<strstream>
-#include	<string>
+#include	<vector.h>
+#include	<iostream.h>
+#include	<strstream.h>
+#include	<string.h>
 
 #include	<ctime>
 #include	<cstdlib>
@@ -3202,6 +3202,7 @@ return true ;
  * This method writes a 'channellog' record, recording an event that has
  * occured in this channel. 
  */ 
+
 void cservice::writeChannelLog(sqlChannel* theChannel, iClient* theClient, 
 	unsigned short eventType, const string& theMessage)
 { 
