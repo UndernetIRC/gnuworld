@@ -10,7 +10,7 @@
 # even the implied warranty of MERCHANTABILITY or FITNESS FOR A
 # PARTICULAR PURPOSE.
 
-# "$Id: Makefile.in,v 1.7 2000/12/17 19:52:33 dan_karrels Exp $"
+# "$Id: Makefile.in,v 1.8 2000/12/19 21:32:35 dan_karrels Exp $"
 
 
 SHELL = @SHELL@
@@ -93,7 +93,7 @@ glibdir = @glibdir@
 
 lib_LTLIBRARIES = libcloner.la
 libcloner_la_SOURCES = cloner.cc
-libcloner_la_LDFLAGS = -module -export-dynamic 	$(glibdir)/libgnuworld.la
+libcloner_la_LDFLAGS = -module -export-dynamic 	$(glibdir)/libgnuworld.la -R$(bindir)
 
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = ../include/defs.h

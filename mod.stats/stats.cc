@@ -7,6 +7,7 @@
 #include	"stats.h"
 #include	"iClient.h"
 #include	"server.h"
+#include	"client.h"
 
 using std::string ;
 using std::strstream ;
@@ -14,6 +15,20 @@ using std::ends ;
 
 namespace gnuworld
 {
+
+/*
+ *  Exported function used by moduleLoader to gain an
+ *  instance of this module.
+ */
+
+extern "C"
+{
+  xClient* _gnuwinit(const string& args)
+  {
+    return new stats( args );
+  }
+
+}
 
 stats::stats( const string& fileName )
  : xClient( fileName )

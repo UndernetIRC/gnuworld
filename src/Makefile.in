@@ -91,7 +91,8 @@ glibdir = @glibdir@
 
 bin_PROGRAMS = gnuworld
 
-gnuworld_LDFLAGS = -rpath $(bindir) -dlopen $(glibdir)/libgnuworld.la
+gnuworld_LDFLAGS = -rpath $(bindir) -dlopen $(glibdir)/libgnuworld.la 	-R$(bindir) -export-dynamic -module
+
 gnuworld_SOURCES = Channel.cc 	ChannelUser.cc 	Network.cc 	client.cc 	iClient.cc 	iServer.cc 	ip.cc 	main.cc 	server.cc
 
 INCLUDES = -I../lib

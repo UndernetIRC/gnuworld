@@ -2,7 +2,8 @@
 bin_PROGRAMS = gnuworld
 
 ##gnuworld_LDADD = $(bindir)/libgnuworld.la
-gnuworld_LDFLAGS = -rpath $(bindir) -dlopen $(glibdir)/libgnuworld.la
+gnuworld_LDFLAGS = -rpath $(bindir) -dlopen $(glibdir)/libgnuworld.la \
+	-R$(bindir) -export-dynamic -module
 gnuworld_SOURCES = Channel.cc \
 	ChannelUser.cc \
 	Network.cc \
