@@ -8,6 +8,7 @@
 #include	<new>
 #include	<string>
 #include	<vector>
+#include	<iostream>
 #include	<pair.h>
 
 #include	<cassert>
@@ -21,14 +22,14 @@
 #include	"Network.h"
 #include	"iClient.h"
 
-const char msg_B_cc_rcsId[] = "$Id: msg_B.cc,v 1.4 2001/02/05 19:20:25 dan_karrels Exp $" ;
+const char msg_B_cc_rcsId[] = "$Id: msg_B.cc,v 1.5 2001/03/03 01:03:28 dan_karrels Exp $" ;
+
+namespace gnuworld
+{
 
 using std::string ;
 using std::vector ;
 using std::endl ;
-
-namespace gnuworld
-{
 
 // MSG_B
 // This is the BURST command.
@@ -59,7 +60,8 @@ int xServer::MSG_B( xParameters& Param )
 // servernumeric #channel time_stamp arguments
 if( Param.size() < 4 )
 	{
-	elog	<< "xServer::MSG_B> Invalid number of arguments\n" ;
+	elog	<< "xServer::MSG_B> Invalid number of arguments"
+		<< endl ;
 	return -1 ;
 	}
 
@@ -79,7 +81,8 @@ if( NULL == theChan )
 		{
 		// The addition of this channel failed, *shrug*
 		elog	<< "xServer::MSG_B> Failed to add channel: "
-			<< Param[ 1 ] << endl ;
+			<< Param[ 1 ]
+			<< endl ;
 
 		// Prevent a memory leak by deleting the channel
 		delete theChan ;
@@ -232,7 +235,8 @@ for( StringTokenizer::const_iterator ptr = st.begin() ; ptr != st.end() ;
 		elog	<< "xServer::parseBurstUsers> ("
 			<< theChan->getName() << ")"
 			<< ": Unable to find client: "
-			<< (*ptr).substr( 0, pos ) << endl ;
+			<< (*ptr).substr( 0, pos )
+			<< endl ;
 
 		// Skip this user
 		continue ;
@@ -257,7 +261,8 @@ for( StringTokenizer::const_iterator ptr = st.begin() ; ptr != st.end() ;
 		// The addition failed
 		elog	<< "xServer::parseBurstUsers> Unable to add user "
 			<< theClient->getNickName() << " to channel "
-			<< theChan->getName() << endl ;
+			<< theChan->getName()
+			<< endl ;
 
 		// Prevent a memory leak by deallocating the unused
 		// ChannelUser object
