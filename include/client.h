@@ -21,7 +21,7 @@
  */
 
 #ifndef __CLIENT_H
-#define __CLIENT_H "$Id: client.h,v 1.34 2002/06/02 23:14:19 dan_karrels Exp $"
+#define __CLIENT_H "$Id: client.h,v 1.35 2002/06/06 02:41:24 dan_karrels Exp $"
 
 #include	<sstream>
 #include	<string>
@@ -31,7 +31,6 @@
 #include	"iClient.h"
 #include	"events.h"
 #include	"TimerHandler.h"
-#include	"ConnectionHandler.h"
 
 namespace gnuworld
 {
@@ -48,7 +47,7 @@ using std::string ;
  * This has proven to be extremely easy: I built a functioning
  * services client in 11 minutes, though it didn't do much :)
  */
-class xClient : public TimerHandler, ConnectionHandler
+class xClient : public TimerHandler
 {
 
 	/// Let xServer access our protected members.

@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: main.cc,v 1.40 2002/06/02 23:14:23 dan_karrels Exp $
+ * $Id: main.cc,v 1.41 2002/06/06 02:41:24 dan_karrels Exp $
  */
 
 #include	<new>
@@ -44,7 +44,7 @@
 void		gnu() ;
 
 const char config_h_rcsId[] = __CONFIG_H ;
-const char main_cc_rcsId[] = "$Id: main.cc,v 1.40 2002/06/02 23:14:23 dan_karrels Exp $" ;
+const char main_cc_rcsId[] = "$Id: main.cc,v 1.41 2002/06/06 02:41:24 dan_karrels Exp $" ;
 const char ELog_h_rcsId[] = __ELOG_H ;
 const char FileSocket_h_rcsId[] = __FILESOCKET_H ;
 const char server_h_rcsId[] = __SERVER_H ;
@@ -275,9 +275,6 @@ char charBuf[ 1024 ] = { 0 } ;
 
 while( keepRunning && _connected )
         {
-
-	// TODO
-	cm.Poll() ;
 
         memset( charBuf, 0, 1024 ) ;
 
