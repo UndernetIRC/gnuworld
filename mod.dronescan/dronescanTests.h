@@ -1,5 +1,5 @@
 #ifndef DRONESCANTESTS_H
-#define DRONESCANTESTS_H "$Id: dronescanTests.h,v 1.1 2003/05/06 22:17:33 jeekay Exp $"
+#define DRONESCANTESTS_H "$Id: dronescanTests.h,v 1.2 2003/05/08 11:42:53 jeekay Exp $"
 
 namespace gnuworld {
 
@@ -38,7 +38,7 @@ public:					\
 
 DECLARE_TEST( ABNORMALS )
 DECLARE_TEST( HASOP )
-DECLARE_TEST( JOINCOUNT )
+DECLARE_TEST( MAXCHANS )
 DECLARE_TEST( RANGE )
 
 } // namespace ds

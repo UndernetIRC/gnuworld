@@ -146,6 +146,7 @@ libdronescan_la_SOURCES = \
 	CHECKCommand.cc		\
 	ABNORMALSTest.cc	\
 	HASOPTest.cc		\
+	MAXCHANSTest.cc		\
 	RANGETest.cc
 
 
@@ -158,7 +159,7 @@ LTLIBRARIES = $(lib_LTLIBRARIES)
 
 libdronescan_la_LIBADD =
 am_libdronescan_la_OBJECTS = dronescan.lo CHECKCommand.lo \
-	ABNORMALSTest.lo HASOPTest.lo RANGETest.lo
+	ABNORMALSTest.lo HASOPTest.lo MAXCHANSTest.lo RANGETest.lo
 libdronescan_la_OBJECTS = $(am_libdronescan_la_OBJECTS)
 
 DEFAULT_INCLUDES =  -I. -I$(srcdir) -I$(top_builddir)/include
@@ -166,8 +167,9 @@ depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
 @AMDEP_TRUE@DEP_FILES = ./$(DEPDIR)/ABNORMALSTest.Plo \
 @AMDEP_TRUE@	./$(DEPDIR)/CHECKCommand.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/HASOPTest.Plo ./$(DEPDIR)/RANGETest.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/dronescan.Plo
+@AMDEP_TRUE@	./$(DEPDIR)/HASOPTest.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/MAXCHANSTest.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/RANGETest.Plo ./$(DEPDIR)/dronescan.Plo
 CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
 LTCXXCOMPILE = $(LIBTOOL) --mode=compile $(CXX) $(DEFS) \
@@ -229,6 +231,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ABNORMALSTest.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CHECKCommand.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/HASOPTest.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MAXCHANSTest.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/RANGETest.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/dronescan.Plo@am__quote@
 

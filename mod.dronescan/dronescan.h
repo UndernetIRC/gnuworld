@@ -1,5 +1,5 @@
 #ifndef DRONESCAN_H
-#define DRONESCAN_H "$Id: dronescan.h,v 1.4 2003/05/06 22:17:33 jeekay Exp $"
+#define DRONESCAN_H "$Id: dronescan.h,v 1.5 2003/05/08 11:42:53 jeekay Exp $"
 
 #include <map>
 
@@ -33,6 +33,7 @@ enum LOG_TYPE {
 #define TST_JOINCOUNT	0x0002
 #define TST_CHANRANGE	0x0004
 #define TST_HASOP	0x0008
+#define TST_MAXCHANS	0x0010
 
 class dronescan : public xClient {
 public:
@@ -134,6 +135,9 @@ public:
 	
 	/** Channel range options */
 	double channelRange;
+	
+	/** Maxchans options */
+	unsigned int maxChans;
 	 
 protected:
 	/** Configuration file. */
@@ -168,8 +172,11 @@ protected:
 	jcChanMapType jcChanMap;
 	
 	
+	/** What level to log to the console. */
+	int consoleLevel;
+	
 	/** Stats. */
-	unsigned int customDataCounter;
+	int customDataCounter;
 	
 	/** Internally used timer. */
 	Timer *theTimer;

@@ -94,6 +94,18 @@ if(testEnabled(TST_CHANRANGE))
 	RegisterTest(new RANGETest(this, "RANGE", "Checks the entropy range."));
 	}
 
+if(testEnabled(TST_MAXCHANS))
+	{
+	/* Set up the max chans config options */
+	maxChans = atoi(dronescanConfig->Require("maxChans")->second.c_str());
+	
+	/* Register the test */
+	RegisterTest(new MAXCHANSTest(this, "MAXCHANS", "Checks the max channel membership of a channel."));
+	}
+
+/* Set up console logging level. */
+consoleLevel = atoi(dronescanConfig->Require("consoleLevel")->second.c_str());
+
 /* Initialise statistics */
 customDataCounter = 0;
 
@@ -241,7 +253,7 @@ int dronescan::OnChannelEvent( const channelEventType& theEvent,
 		
 		if(joinCount > jcCutoff)
 			{
-			log(WARN, "%s has had %d joins within the last %ds.",
+			log(WARN, "%s has had %u joins within the last %us.",
 				channelName.c_str(),
 				joinCount,
 				jcInterval
@@ -283,16 +295,22 @@ int dronescan::OnPrivateMessage( iClient* theClient, const string& Message, bool
 		{
 		Reply(theClient, "Allocated custom data: %d", customDataCounter);
 		if(1)
-			Reply(theClient, "CM/NM/CC: %0.2lf/%0.2lf/%d",
+			Reply(theClient, "CM/NM/CC: %0.2lf/%0.2lf/%u",
 				channelMargin,
 				nickMargin,
 				channelCutoff
 				);
 		if(testEnabled(TST_JOINCOUNT))
-			Reply(theClient, "jcI/jcC : %d/%d",
+			Reply(theClient, "jcI/jcC : %u/%u",
 				jcInterval,
 				jcCutoff
 				);
+		if(testEnabled(TST_CHANRANGE))
+			Reply(theClient, "CR      : %0.3lf",
+				channelRange);
+		if(testEnabled(TST_MAXCHANS))
+			Reply(theClient, "MaxChans: %u",
+				maxChans);
 		return 0;
 		}
 	
@@ -363,7 +381,7 @@ int dronescan::OnTimer( xServer::timerID theTimer , void *)
 {
 	if(theTimer == tidClearJoinCounter)
 		{
-		log(DEBUG, "Clearing %d records from the join counter.",
+		log(DEBUG, "Clearing %u records from the join counter.",
 			jcChanMap.size()
 			);
 		jcChanMap.clear();
@@ -429,7 +447,7 @@ void dronescan::changeState(DS_STATE newState)
 			}
 		}
 	
-	log(INFO, "Changed state in: %d ms", stateTimer.stopTimeMS());
+	log(INFO, "Changed state in: %u ms", stateTimer.stopTimeMS());
 }
  
 
@@ -477,7 +495,7 @@ void dronescan::calculateEntropy()
 		++totalNicks;
 		}
 	
-	log(DEBUG, "Calculated frequencies in: %d ms", theTimer->stopTimeMS());
+	log(DEBUG, "Calculated frequencies in: %u ms", theTimer->stopTimeMS());
 	
 	theTimer->Start();
 	
@@ -486,7 +504,7 @@ void dronescan::calculateEntropy()
 	     itr != charMap.end(); ++itr)
 		itr->second /= totalNicks;
 	
-	log(DEBUG, "Normalised frequencies in: %d ms", theTimer->stopTimeMS());
+	log(DEBUG, "Normalised frequencies in: %u ms", theTimer->stopTimeMS());
 	
 	elog << "dronescan::calculateEntropy> Calculating average entropy." << endl;
 
@@ -502,12 +520,12 @@ void dronescan::calculateEntropy()
 		}
 	
 	log(DEBUG, "Total entropy  : %lf", totalEntropy);
-	log(DEBUG, "Total nicks    : %d", totalNicks);
+	log(DEBUG, "Total nicks    : %u", totalNicks);
 			
 	averageEntropy = totalEntropy / totalNicks;
 	log(DEBUG, "Average entropy: %lf ", averageEntropy);
 	
-	log(DEBUG, "Found entropy in: %d ms", theTimer->stopTimeMS());
+	log(DEBUG, "Found entropy in: %u ms", theTimer->stopTimeMS());
 }
 
 
@@ -536,7 +554,7 @@ void dronescan::setNickStates()
 		setClientState( ptr->second );
 		}
 	
-	log(DEBUG, "Set all nick states in: %d ms",
+	log(DEBUG, "Set all nick states in: %u ms",
 		theTimer->stopTimeMS()
 		);
 }
@@ -562,7 +580,7 @@ void dronescan::checkChannels()
 		checkChannel( ptr->second );
 		}
 	
-	log(INFO, "Finished checking %d channels. Duration: %d ms",
+	log(INFO, "Finished checking %u channels. Duration: %u ms",
 		noChannels,
 		theTimer->stopTimeMS()
 		);
@@ -597,7 +615,8 @@ void dronescan::checkChannel( const Channel *theChannel , const iClient *theClie
 	/* If the normal count is over half of the total test numbers
 	 * we report that it is normal. Else it is abnormal. */
 	
-	if(normal > (testVector.size() / 2))
+	/* Use >= so for an even size() we need over half to fail */
+	if(normal >= (testVector.size() / 2))
 		{
 		/* This channel is voted normal. */
 		return;
@@ -605,7 +624,7 @@ void dronescan::checkChannel( const Channel *theChannel , const iClient *theClie
 	else
 		{
 		/* This channel is voted abnormal. */
-		log(WARN, "  AC: %20s - %d/%d tests failed - %d users",
+		log(WARN, "  AC: %20s - %u/%u tests failed - %u users",
 			theChannel->getName().c_str(),
 			(testVector.size() - normal),
 			testVector.size(),
@@ -630,34 +649,6 @@ double dronescan::calculateEntropy( const string& theString )
 	
 	return entropy / theString.length();
 }
-
-
-#if 0
-/** Decide whether a channel is `abnormal'. */
-unsigned int dronescan::isAbnormal( const Channel* theChannel )
-{
-	if(theChannel->size() < channelCutoff) return 0;
-	
-	unsigned int abnormals = 0;
-				
-	Channel::const_userIterator chanItr =
-		theChannel->userList_begin();
-	for( ; chanItr != theChannel->userList_end() ; ++chanItr )
-		{
-		ChannelUser* theCU = chanItr->second;
-		iClient* theClient = theCU->getClient();
-					
-		if(theClient->isModeK())	return 0;
-		
-		if(!isNormal(theClient))	++abnormals;
-		}
-
-	if((double)abnormals / (double)theChannel->size() > channelMargin)
-		return abnormals;
-	else
-		return 0;
-}
-#endif
 
 
 /** Check whether an iClient's nick is `normal'. */
@@ -714,7 +705,7 @@ CLIENT_STATE dronescan::setClientState( iClient *theClient )
 /** Log a message. */
 void dronescan::log(LOG_TYPE logType, char *format, ...)
 {
-	if(logType < INFO) return;
+	if(logType < consoleLevel) return;
 	
 	stringstream newMessage;
 	
@@ -808,7 +799,7 @@ void dronescan::RegisterTest( Test *theTest )
 /** Return usage information for a client */
 void Command::Usage( const iClient *theClient )
 {
-	bot->Notice(theClient, string("SYNTAX: ") + getInfo());
+	bot->Reply(theClient, "SYNTAX: %s", getInfo().c_str());
 }
 
 

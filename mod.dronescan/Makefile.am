@@ -6,6 +6,7 @@ libdronescan_la_SOURCES = 	\
 	CHECKCommand.cc		\
 	ABNORMALSTest.cc	\
 	HASOPTest.cc		\
+	MAXCHANSTest.cc		\
 	RANGETest.cc
 
 INCLUDES = -I@PGSQL_INCLUDE@ $(INCLTDL)
