@@ -6,8 +6,12 @@ libdronescan_la_SOURCES = 	\
 	dronescan.cc		\
 	sqlUser.cc		\
 	ACCESSCommand.cc	\
+	ADDUSERCommand.cc	\
 	CHECKCommand.cc		\
 	LISTCommand.cc		\
+	MODUSERCommand.cc	\
+	QUOTECommand.cc		\
+	REMUSERCommand.cc	\
 	STATUSCommand.cc	\
 	ABNORMALSTest.cc	\
 	COMMONREALTest.cc	\

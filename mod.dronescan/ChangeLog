@@ -1,3 +1,10 @@
+2003-08-01 0.0.5 Jeekay
+* Added support for dynamic variables in tests
+* Added QUOTECommand
+* Started standardising levels
+* Added ADDUSER, MODUSER and REMUSER
+* Bumped version to 0.0.5
+
 2003-07-07 0.0.4 Jeekay
 * Added support for DB authenticated users
 * Added LIST USERS

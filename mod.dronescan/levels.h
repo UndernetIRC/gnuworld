@@ -16,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: levels.h,v 1.3 2003/07/26 16:47:18 jeekay Exp $
+ * $Id: levels.h,v 1.4 2003/08/02 18:17:21 jeekay Exp $
  */
 
 #ifndef LEVELS_H
-#define LEVELS_H "$Id: levels.h,v 1.3 2003/07/26 16:47:18 jeekay Exp $"
+#define LEVELS_H "$Id: levels.h,v 1.4 2003/08/02 18:17:21 jeekay Exp $"
 
 namespace gnuworld {
 
@@ -28,10 +28,24 @@ namespace ds {
 
 namespace level {
 
-	const unsigned short access	= 500;
-	const unsigned short check	= 500;
-	const unsigned short list	= 500;
-	const unsigned short status	= 500;
+	/* Try to keep anything non-authed opers need below 200 */
+
+	/* Standard level is 300 */
+
+	const unsigned short access	= 300;
+	const unsigned short check	= 300;
+	const unsigned short list	= 300;
+	const unsigned short status	= 300;
+
+	/* Higher admin commands */
+	
+	const unsigned short adduser	= 750;
+	const unsigned short moduser	= 750;
+	const unsigned short remuser	= 750;
+
+	/* Commands at 1000 should really be debug commands only */
+
+	const unsigned short quote	= 1000;
 
 } // namespace level
 

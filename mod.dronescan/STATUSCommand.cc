@@ -18,7 +18,7 @@
  *
  * 2003-07-07	GK@NG	Initial writing
  *
- * $Id: STATUSCommand.cc,v 1.1 2003/07/26 16:47:18 jeekay Exp $
+ * $Id: STATUSCommand.cc,v 1.2 2003/08/02 18:17:21 jeekay Exp $
  */
 
 #include "Convert.h"
@@ -30,7 +30,7 @@
 #include "dronescanTests.h"
 #include "sqlUser.h"
 
-RCSTAG("$Id: STATUSCommand.cc,v 1.1 2003/07/26 16:47:18 jeekay Exp $");
+RCSTAG("$Id: STATUSCommand.cc,v 1.2 2003/08/02 18:17:21 jeekay Exp $");
 
 namespace gnuworld {
 
@@ -46,7 +46,10 @@ bool STATUSCommand::Exec( const iClient *theClient, const string& Message, const
 	 *  STATUS
 	 */
 	
-	if(st.size() != 1) return false;
+	if(st.size() != 1) {
+		Usage(theClient);
+		return false;
+	}
 	
 	time_t uptime = ::time(0) - bot->getUplink()->getStartTime();
 	bot->Reply(theClient, "Uptime: %u (%s)",

@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: MAXCHANSTest.cc,v 1.5 2003/07/26 16:47:18 jeekay Exp $
+ * $Id: MAXCHANSTest.cc,v 1.6 2003/08/02 18:17:21 jeekay Exp $
  *
  * Checks whether any member of a channel is in more than maxChans channels.
  */
@@ -25,7 +25,7 @@
 #include "dronescan.h"
 #include "dronescanTests.h"
 
-RCSTAG("$Id: MAXCHANSTest.cc,v 1.5 2003/07/26 16:47:18 jeekay Exp $");
+RCSTAG("$Id: MAXCHANSTest.cc,v 1.6 2003/08/02 18:17:21 jeekay Exp $");
 
 namespace gnuworld {
 
@@ -47,6 +47,12 @@ bool MAXCHANSTest::isNormal( const Channel *theChannel )
 	return false;
 	
 } // bool MAXCHANSTest::isNormal( const Channel* )
+
+
+const string MAXCHANSTest::getVariable() const
+{
+	return "maxChans";
+}
 
 
 bool MAXCHANSTest::setVariable( const string& var, const string& value )

@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: dronescan.cc,v 1.25 2003/07/26 16:47:18 jeekay Exp $
+ * $Id: dronescan.cc,v 1.26 2003/08/02 18:17:21 jeekay Exp $
  */
 
 #include	<string>
@@ -39,7 +39,7 @@
 #include "sqlUser.h"
 #include "Timer.h"
 
-RCSTAG("$Id: dronescan.cc,v 1.25 2003/07/26 16:47:18 jeekay Exp $");
+RCSTAG("$Id: dronescan.cc,v 1.26 2003/08/02 18:17:21 jeekay Exp $");
 
 namespace gnuworld {
 
@@ -105,19 +105,26 @@ RegisterTest(new HASOPTest(this, "HASOP", "Checks if a channel has no ops.", 10)
 RegisterTest(new MAXCHANSTest(this, "MAXCHANS", "Checks the max channel membership of a channel.", 10));
 RegisterTest(new RANGETest(this, "RANGE", "Checks the entropy range.", 10));
 
-/* Set up join counter config options. */
+/* Set up core options */
+dcInterval = atoi(dronescanConfig->Require("dcInterval")->second.c_str());
+consoleLevel = atoi(dronescanConfig->Require("consoleLevel")->second.c_str());
 jcInterval = atoi(dronescanConfig->Require("jcInterval")->second.c_str());
 jcCutoff = atoi(dronescanConfig->Require("jcCutoff")->second.c_str());
 
 /* Set up variables that our tests will need */
 typedef vector<string> testVarsType;
 testVarsType testVars;
-testVars.push_back("channelRange");
-testVars.push_back("maxChans");
-testVars.push_back("realCutoff");
+
+/* Cycle over tests to get configuration variable name */
+for( testMapType::const_iterator itr = testMap.begin() ;
+     itr != testMap.end() ; ++itr) {
+	testVars.push_back( itr->second->getVariable() );
+}
 
 for( testVarsType::const_iterator itr = testVars.begin() ;
      itr != testVars.end() ; ++itr) {
+	if(*itr == "") continue;
+	
 	string theValue = dronescanConfig->Require(*itr)->second;
 	
 	if(Test *theTest = setTestVariable(string_upper(*itr), theValue)) {
@@ -147,12 +154,6 @@ elog << "dronescan> Established connection to SQL server." << endl;
 /* Preload users */
 preloadUserCache();
 
-/* Set up active drone channels clearance */
-dcInterval = atoi(dronescanConfig->Require("dcInterval")->second.c_str());
-
-/* Set up console logging level. */
-consoleLevel = atoi(dronescanConfig->Require("consoleLevel")->second.c_str());
-
 /* Initialise statistics */
 customDataCounter = 0;
 
@@ -161,8 +162,12 @@ theTimer = new Timer();
 
 /* Register commands available to users */
 RegisterCommand(new ACCESSCommand(this, "ACCESS", "() (<user>)"));
+RegisterCommand(new ADDUSERCommand(this, "ADDUSER", "<user> <access>"));
 RegisterCommand(new CHECKCommand(this, "CHECK", "(<#channel>) (<user>)"));
 RegisterCommand(new LISTCommand(this, "LIST", "(active)"));
+RegisterCommand(new MODUSERCommand(this, "MODUSER", "(ACCESS <user> <level>"));
+RegisterCommand(new QUOTECommand(this, "QUOTE", "<string>"));
+RegisterCommand(new REMUSERCommand(this, "REMUSER", "<user>"));
 RegisterCommand(new STATUSCommand(this, "STATUS", ""));
 } // dronescan::dronescan(const string&)
 
@@ -300,7 +305,7 @@ void dronescan::OnCTCP( iClient* theClient, const string& CTCP,
 	} else if("PING" == Command) {
 		DoCTCP(theClient, CTCP, Message);
 	} else if("VERSION" == Command) {
-		DoCTCP(theClient, CTCP, "GNUWorld DroneScan v0.0.4");
+		DoCTCP(theClient, CTCP, "GNUWorld DroneScan v0.0.5");
 	}
 
 	xClient::OnCTCP(theClient, CTCP, Message, Secure);
@@ -968,13 +973,20 @@ sqlUser *dronescan::getSqlUser(const string& theNick)
 void dronescan::preloadUserCache()
 {
 	stringstream theQuery;
-	theQuery	<< "SELECT user_name,last_seen,last_updated_by,last_updated,flags,access "
+	theQuery	<< "SELECT user_name,last_seen,last_updated_by,last_updated,flags,access,created "
 			<< "FROM users"
 			;
 	
 	ExecStatusType status = SQLDb->Exec(theQuery.str().c_str());
 	
 	if(PGRES_TUPLES_OK == status) {
+		/* First we need to clear the current cache. */
+		for(userMapType::iterator itr = userMap.begin() ;
+		    itr != userMap.end() ; ++itr) {
+			delete itr->second;
+		}
+		userMap.clear();
+		
 		for(int i = 0; i < SQLDb->Tuples(); ++i) {
 			sqlUser *newUser = new sqlUser(SQLDb);
 			assert(newUser != 0);

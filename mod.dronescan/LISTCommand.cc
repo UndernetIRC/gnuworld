@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: LISTCommand.cc,v 1.5 2003/07/26 16:47:18 jeekay Exp $
+ * $Id: LISTCommand.cc,v 1.6 2003/08/02 18:17:21 jeekay Exp $
  *
  * Display information about things.
  *
@@ -58,9 +58,19 @@ bool LISTCommand::Exec( const iClient *theClient, const string& Message , const 
 		for(dronescan::droneChannelsType::const_iterator itr =
 		    bot->droneChannels.begin() ; itr != bot->droneChannels.end()
 		    ; ++itr) {
-			bot->Reply(theClient, "  %s",
-				(*itr).c_str()
-				);
+			/* Does this channel still exist? */
+			Channel *theChannel = Network->findChannel(*itr);
+			
+			if(theChannel) {
+				bot->Reply(theClient, "  [%3u] %s",
+					theChannel->size(),
+					theChannel->getName().c_str()
+					);
+			} else {
+				bot->Reply(theClient, "  [N/A] %s",
+					(*itr).c_str()
+					);
+			}
 		}
 	}
 	
@@ -87,7 +97,7 @@ bool LISTCommand::Exec( const iClient *theClient, const string& Message , const 
 		bot->Reply(theClient, "Users:");
 		for(dronescan::userMapType::const_iterator itr = bot->userMap.begin() ;
 		    itr != bot->userMap.end() ; ++itr) {
-			bot->Reply(theClient, "Username : %-10s Access: %4u",
+			bot->Reply(theClient, "Username: %-10s Access: %4u",
 				itr->second->getUserName().c_str(),
 				itr->second->getAccess()
 				);

@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: COMMONREALTest.cc,v 1.3 2003/07/26 16:47:18 jeekay Exp $
+ * $Id: COMMONREALTest.cc,v 1.4 2003/08/02 18:17:21 jeekay Exp $
  *
  * Checks to see whether the members of a channel have a common realname.
  */
@@ -27,7 +27,7 @@
 #include "dronescan.h"
 #include "dronescanTests.h"
 
-RCSTAG("$Id: COMMONREALTest.cc,v 1.3 2003/07/26 16:47:18 jeekay Exp $");
+RCSTAG("$Id: COMMONREALTest.cc,v 1.4 2003/08/02 18:17:21 jeekay Exp $");
 
 namespace gnuworld {
 
@@ -53,6 +53,12 @@ bool COMMONREALTest::isNormal( const Channel *theChannel )
 	
 	return true;
 } // bool COMMONREALTest::isNormal(const Channel*)
+
+
+const string COMMONREALTest::getVariable() const
+{
+	return "realCutoff";
+}
 
 
 bool COMMONREALTest::setVariable( const string& var, const string& value)

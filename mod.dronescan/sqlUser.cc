@@ -37,6 +37,7 @@ last_updated_by = SQLDb->GetValue(row, 2);
 last_updated = atoi(SQLDb->GetValue(row, 3));
 flags = atoi(SQLDb->GetValue(row, 4));
 access = atoi(SQLDb->GetValue(row, 5));
+created = atoi(SQLDb->GetValue(row, 6));
 }
 
 bool sqlUser::commit()
@@ -69,6 +70,60 @@ if(PGRES_COMMAND_OK != status) {
 return true;
 
 }
+
+
+bool sqlUser::insert()
+{
+stringstream insertString;
+insertString	<< "INSERT INTO users "
+		<< "(user_name, created, last_seen, last_updated, last_updated_by, flags, access) "
+		<< "VALUES "
+		<< "("
+		<< "'" << user_name << "', "
+		<< created << ", "
+		<< last_seen << ", "
+		<< last_updated << ", "
+		<< "'" << last_updated_by << "', "
+		<< flags << ", "
+		<< access
+		<< ")"
+		;
+
+#ifdef LOG_SQL
+elog	<< "sqlUser::insert> "
+	<< insertString
+	<< endl;
+#endif
+
+ExecStatusType status = SQLDb->Exec(insertString.str().c_str());
+
+if(PGRES_COMMAND_OK != status) {
+	elog << "sqlUser::insert> " << SQLDb->ErrorMessage();
+	return false;
+}
+
+return true;
+} // sqlUser::insert()
+
+
+bool sqlUser::remove()
+{
+stringstream deleteString;
+deleteString	<< "DELETE FROM users "
+		<< "WHERE user_name = '" << user_name << "'"
+		;
+
+ExecStatusType status = SQLDb->Exec(deleteString.str().c_str());
+
+if(PGRES_COMMAND_OK != status) {
+	elog << "sqlUser::delete> " << SQLDb->ErrorMessage();
+	return false;
+}
+
+return true;
+
+}
+
 
 } // namespace ds
 

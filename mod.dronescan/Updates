@@ -1,3 +1,25 @@
+2003-08-02 0.0.5 Jeekay
+-----------------------
+ALTER TABLE users RENAME TO users_old;
+-----------------------
+CREATE TABLE users (
+    user_name character varying(20) NOT NULL,
+    created integer DEFAULT 0 NOT NULL,
+    last_seen integer DEFAULT 0 NOT NULL,
+    last_updated integer DEFAULT 0 NOT NULL,
+    last_updated_by character varying(128) NOT NULL,
+    flags integer DEFAULT 0 NOT NULL,
+    "access" integer DEFAULT 0 NOT NULL
+);
+-----------------------
+INSERT INTO users (user_name, last_seen, last_updated, last_updated_by, flags, "access")
+SELECT user_name, last_seen, last_updated, last_updated_by, flags, "access" FROM users_old;
+-----------------------
+DROP TABLE users_old;
+-----------------------
+
+
+
 2003-07-07 0.0.4 Jeekay
 -----------------------
 CREATE TABLE users (

@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: RANGETest.cc,v 1.4 2003/07/26 16:47:18 jeekay Exp $
+ * $Id: RANGETest.cc,v 1.5 2003/08/02 18:17:21 jeekay Exp $
  *
  * Checks the range of the entropy of a given channel.
  */
@@ -25,7 +25,7 @@
 #include "dronescan.h"
 #include "dronescanTests.h"
 
-RCSTAG("$Id: RANGETest.cc,v 1.4 2003/07/26 16:47:18 jeekay Exp $");
+RCSTAG("$Id: RANGETest.cc,v 1.5 2003/08/02 18:17:21 jeekay Exp $");
 
 namespace gnuworld {
 
@@ -66,6 +66,12 @@ bool RANGETest::setVariable( const string& var, const string& value )
 	channelRange = atoi(value.c_str());
 	
 	return true;
+}
+
+
+const string RANGETest::getVariable() const
+{
+	return "channelRange";
 }
 
 

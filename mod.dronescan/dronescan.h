@@ -16,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: dronescan.h,v 1.14 2003/07/26 16:47:18 jeekay Exp $
+ * $Id: dronescan.h,v 1.15 2003/08/02 18:17:21 jeekay Exp $
  */
 
 #ifndef DRONESCAN_H
-#define DRONESCAN_H "$Id: dronescan.h,v 1.14 2003/07/26 16:47:18 jeekay Exp $"
+#define DRONESCAN_H "$Id: dronescan.h,v 1.15 2003/08/02 18:17:21 jeekay Exp $"
 
 #include <map>
 
@@ -150,6 +150,10 @@ public:
 	
 	/* Preloaders */
 	void preloadUserCache();
+	
+	/* Allow commands access to the database pointer */
+	inline PgDatabase *getSqlDb()
+		{ return SQLDb; }
 	
 	/** Internal variables */
 	userMapType userMap;
