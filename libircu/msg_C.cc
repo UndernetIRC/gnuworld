@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_C.cc,v 1.2 2003/06/11 11:28:58 dan_karrels Exp $
+ * $Id: msg_C.cc,v 1.3 2003/06/11 13:52:50 dan_karrels Exp $
  */
 
 #include	<new>
@@ -45,7 +45,7 @@ const char xparameters_h_rcsId[] = __XPARAMETERS_H ;
 const char iClient_h_rcsId[] = __ICLIENT_H ;
 const char Channel_h_rcsId[] = __CHANNEL_H ;
 const char ChannelUser_h_rcsId[] = __CHANNELUSER_H ;
-const char msg_C_cc_rcsId[] = "$Id: msg_C.cc,v 1.2 2003/06/11 11:28:58 dan_karrels Exp $" ;
+const char msg_C_cc_rcsId[] = "$Id: msg_C.cc,v 1.3 2003/06/11 13:52:50 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -141,17 +141,36 @@ for( StringTokenizer::const_iterator ptr = st.begin() ; ptr != st.end() ;
 			}
 		}
 
-	// Add this channel to the client's channel structure.
-	if( !theClient->addChannel( theChan ) )
+	ChannelUser* theUser = 0 ;
+	if( theClient->findChannel( theChan ) )
 		{
-		if( theClient->findChannel( theChan ) )
+		// The client knows about this channel already
+		// Verify that the channel knows about the user.
+		theUser = theChan->findUser( theClient ) ;
+		if( 0 == theUser )
 			{
-			// This user<->channel association already
-			// exists.  This not good, but no harm done.
-			// Could be a zombie
-			theChan->findUser( theClient )->removeZombie() ;
+			// The client knows of the channel, but not
+			// the other way around.
+			// theUser will be created and added to the
+			// channel membership table below.
+			elog	<< "msg_C> Half-way membership found "
+				<< " for client "
+				<< *theClient
+				<< ", in channel "
+				<< *theChan
+				<< endl ;
 			}
 		else
+			{
+			// User is already in the channel, probably lag or
+			// a non-authoritative kick
+			theUser->removeZombie() ;
+			}
+		}
+	else
+		{
+		// Add this channel to the client's channel structure.
+		if( !theClient->addChannel( theChan ) )
 			{
 			elog	<< "msg_C> Unable to add channel "
 				<< *theChan
@@ -163,33 +182,20 @@ for( StringTokenizer::const_iterator ptr = st.begin() ; ptr != st.end() ;
 			}
 		}
 
-	// Create a new ChannelUser to represent this iClient's
-	// membership in this channel.
-	ChannelUser* theUser =
-		new (std::nothrow) ChannelUser( theClient ) ;
-	assert( theUser != 0 ) ;
-
-	// The user who creates a channel is automatically +o
-	theUser->setModeO() ;
-
-	// Build associations
-
-	// Add the ChannelUser to the Channel's information
-	if( !theChan->addUser( theUser ) )
+	// The client now knows about the channel, build the second
+	// half of the channel<->user association, if necessary.
+	if( 0 == theUser )
 		{
-		if( theChan->findUser( theUser->getClient() ) != 0 )
-			{
-			// The user<->channel association already exists.
-			// The Channel::findUser() method inserts
-			// by numeric, not by pointer, so memory
-			// leaks here will never be a problem
-			// (addUser() will fail if the numeric exists,
-			// and will not add another instance of the
-			// same user to the channel).
-			}
-		else
+		// Create a new ChannelUser to represent this iClient's
+		// membership in this channel.
+		theUser = new (std::nothrow) ChannelUser( theClient ) ;
+		assert( theUser != 0 ) ;
+
+		// Add the ChannelUser to the Channel's information
+		if( !theChan->addUser( theUser ) )
 			{
 			// Addition failed, log the error
+			// This should never happen.
 			elog	<< "msg_C> Unable to add user "
 				<< theUser->getNickName()
 				<< " to channel "
@@ -206,6 +212,14 @@ for( StringTokenizer::const_iterator ptr = st.begin() ; ptr != st.end() ;
 			// Continue to next channel
 			continue ;
 			}
+		}
+
+	// The user who creates a channel is automatically +o
+	if( atoi( Param[ 2 ] ) <= theChan->getCreationTime() )
+		{
+		// The CREATE timestamp is earlier or the same time
+		// as the channel timestamp, the user gets ops.
+		theUser->setModeO() ;
 		}
 
 	// Notify all listening xClients of this event
