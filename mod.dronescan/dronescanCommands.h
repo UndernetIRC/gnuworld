@@ -16,17 +16,18 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: dronescanCommands.h,v 1.4 2003/06/19 23:47:43 jeekay Exp $
+ * $Id: dronescanCommands.h,v 1.5 2003/07/26 16:47:18 jeekay Exp $
  */
 
 #ifndef DRONESCANCOMMANDS_H
-#define DRONESCANCOMMANDS_H "$Id: dronescanCommands.h,v 1.4 2003/06/19 23:47:43 jeekay Exp $"
+#define DRONESCANCOMMANDS_H "$Id: dronescanCommands.h,v 1.5 2003/07/26 16:47:18 jeekay Exp $"
 
 namespace gnuworld {
 
 namespace ds {
 
 class dronescan;
+class sqlUser;
 
 class Command {
 public:
@@ -36,7 +37,7 @@ public:
 
 	virtual ~Command() { } ;
 	
-	virtual bool Exec(const iClient*, const string&) = 0;
+	virtual bool Exec(const iClient*, const string&, const sqlUser*) = 0;
 	
 	void setServer(xServer *_server)
 		{ server = _server; }
@@ -70,15 +71,14 @@ class commandName##Command : public Command \
       const string& _help) : \
         Command(_bot, _commandName, _help) {} \
     virtual ~commandName##Command() {} \
-    virtual bool Exec(const iClient*, const string&); \
+    virtual bool Exec(const iClient*, const string&, const sqlUser*); \
 };
 
 /* Admin commands */
 DECLARE_COMMAND( ACCESS )
-DECLARE_COMMAND( LIST )
-
-/* Debug commands */
 DECLARE_COMMAND( CHECK )
+DECLARE_COMMAND( LIST )
+DECLARE_COMMAND( STATUS )
 
 } // namespace ds
 

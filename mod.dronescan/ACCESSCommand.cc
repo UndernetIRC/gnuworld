@@ -20,10 +20,10 @@
  *
  * 2003-06-15	GK@NG	Initial writing
  *
- * $Id: ACCESSCommand.cc,v 1.2 2003/06/19 22:58:30 dan_karrels Exp $
+ * $Id: ACCESSCommand.cc,v 1.3 2003/07/26 16:47:18 jeekay Exp $
  */
 
-#include "config.h"
+#include <time.h>
 
 #include "Network.h"
 #include "StringTokenizer.h"
@@ -31,44 +31,60 @@
 #include "levels.h"
 #include "dronescan.h"
 #include "dronescanCommands.h"
+#include "sqlUser.h"
 
-RCSTAG("$Id: ACCESSCommand.cc,v 1.2 2003/06/19 22:58:30 dan_karrels Exp $");
+RCSTAG("$Id: ACCESSCommand.cc,v 1.3 2003/07/26 16:47:18 jeekay Exp $");
 
 namespace gnuworld {
 
 namespace ds {
 
-bool ACCESSCommand::Exec( const iClient *theClient, const string& Message )
+bool ACCESSCommand::Exec( const iClient *theClient, const string& Message, const sqlUser* theUser )
 {
-	/* Does this user have access to this command? */
-	if(bot->getAccess(theClient) < level::access) return false;
+	if(theUser->getAccess() < level::access) return false;
 
 	StringTokenizer st(Message);
 	
 	/* Usage:
 	 *  ACCESS
-	 *  ACCESS <user>
+	 *  ACCESS <username>
 	 */
-
-	/* If there are no arguments, return the access of theClient */
-	if(st.size() == 1) {
-		bot->Reply(theClient, "Your access level is %u",
-			bot->getAccess(theClient)
-			);
-		return true;
+	
+	const sqlUser *targetUser = theUser;
+	
+	if(st.size() == 2) {
+		targetUser = bot->getSqlUser(st[1]);
+		if(!targetUser) {
+			bot->Reply(theClient, "No such user %s",
+				st[1].c_str()
+				);
+			return true;
+		}
 	}
 	
-	/* Attempt to find specified user */
-	iClient *targetUser = Network->findNick(st[1]);
-	if(targetUser) {
-		bot->Reply(theClient, "%s's access level is %u",
-			targetUser->getNickName().c_str(),
-			bot->getAccess(targetUser)
-			);
-		return true;
-	}
+	time_t lastseen = targetUser->getLastSeen();
+	char lastseen_r[21];
+	struct tm *lastseen_b = gmtime(&lastseen);
+	strftime(lastseen_r, 20, "%F %H:%M:%S", lastseen_b);
 	
-	return false;
+	/* Give the client information about the targetUser */
+	bot->Reply(theClient, "Username : %-10s Access: %4u",
+		targetUser->getUserName().c_str(),
+		targetUser->getAccess()
+		);
+	bot->Reply(theClient, "Last Seen: %s",
+		lastseen_r
+		);
+	
+	lastseen = targetUser->getLastUpdated();
+	lastseen_b = gmtime(&lastseen);
+	strftime(lastseen_r, 20, "%F %H:%M:%S", lastseen_b);
+	bot->Reply(theClient, "Last Updated: %s (by %s)",
+		lastseen_r,
+		targetUser->getLastUpdatedBy().c_str()
+		);		
+	
+	return true;
 } // ACCESSCommand::Exec(iClient*, const string&)
 
 } // namespace ds

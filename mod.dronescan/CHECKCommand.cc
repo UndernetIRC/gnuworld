@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: CHECKCommand.cc,v 1.3 2003/06/19 22:58:30 dan_karrels Exp $
+ * $Id: CHECKCommand.cc,v 1.4 2003/07/26 16:47:18 jeekay Exp $
  *
  * Display information about a given channel or user.
  */
@@ -28,13 +28,13 @@
 #include "dronescan.h"
 #include "dronescanCommands.h"
 
-RCSTAG("$Id: CHECKCommand.cc,v 1.3 2003/06/19 22:58:30 dan_karrels Exp $");
+RCSTAG("$Id: CHECKCommand.cc,v 1.4 2003/07/26 16:47:18 jeekay Exp $");
 
 namespace gnuworld {
 
 namespace ds {
 
-bool CHECKCommand::Exec( const iClient *theClient, const string& Message )
+bool CHECKCommand::Exec( const iClient *theClient, const string& Message, const sqlUser* )
 {
 	StringTokenizer st(Message);
 	
@@ -75,8 +75,9 @@ bool CHECKCommand::Exec( const iClient *theClient, const string& Message )
 			if(userEntropy < minEntropy || minEntropy == 0) minEntropy = userEntropy;
 			if(userEntropy > maxEntropy) maxEntropy = userEntropy;
 			
-			bot->Reply(theClient, "[%s] %0.3lf %s (%s)",
+			bot->Reply(theClient, "[%s] (%s) %0.3lf %s (%s)",
 				bot->isNormal(targetClient) ? "N" : "A",
+				targetClient->getCharYY(),
 				userEntropy,
 				targetClient->getRealNickUserHost().c_str(),
 				targetClient->getDescription().c_str()

@@ -16,17 +16,19 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: dronescan.h,v 1.13 2003/06/28 16:26:46 dan_karrels Exp $
+ * $Id: dronescan.h,v 1.14 2003/07/26 16:47:18 jeekay Exp $
  */
 
 #ifndef DRONESCAN_H
-#define DRONESCAN_H "$Id: dronescan.h,v 1.13 2003/06/28 16:26:46 dan_karrels Exp $"
+#define DRONESCAN_H "$Id: dronescan.h,v 1.14 2003/07/26 16:47:18 jeekay Exp $"
 
 #include <map>
 
 #include "client.h"
 
 #include "clientData.h"
+
+class PgDatabase;
 
 namespace gnuworld {
 
@@ -36,6 +38,7 @@ class Timer;
 namespace ds {
 
 class Command;
+class sqlUser;
 class Test;
 
 enum DS_STATE {
@@ -90,6 +93,8 @@ public:
 	
 	typedef unsigned short int testEnabledType;
 	
+	typedef map< string , sqlUser* , noCaseCompare > userMapType;
+	
 	
 	/*******************************************
 	 ** D R O N E S C A N   F U N C T I O N S **
@@ -141,7 +146,13 @@ public:
 	void Reply(const iClient*, char*, ...) ;
 	
 	/** Return a users access */
-	unsigned short getAccess( const iClient* );
+	sqlUser *getSqlUser( const string& ) ;
+	
+	/* Preloaders */
+	void preloadUserCache();
+	
+	/** Internal variables */
+	userMapType userMap;
 	
 	/** Typedef of currently seen drone channels */
 	typedef vector< string > droneChannelsType;
@@ -159,6 +170,9 @@ public:
 	typedef testMapType::value_type testPairType;
 	bool RegisterTest(Test*);
 	bool UnRegisterTest(const string&);
+
+	/** Tests map */
+	testMapType testMap;
 	
 	/** Set a variable in one of the tests. */
 	Test *setTestVariable(const string&, const string&);
@@ -171,12 +185,12 @@ public:
 	/** Abnormals options */
 	double channelMargin;
 	
-	/** Channel range options */
-	double channelRange;
-	
 protected:
 	/** Configuration file. */
 	EConfig *dronescanConfig;
+	
+	/** Our database instance */
+	PgDatabase *SQLDb;
 	
 	/** Configuration variables. */
 	string consoleChannel;
@@ -218,9 +232,6 @@ protected:
 	typedef commandMapType::value_type commandPairType;
 	commandMapType commandMap;
 	bool RegisterCommand(Command*);
-
-	/** Tests vector */
-	testMapType testMap;
 }; // class dronescan
 
 } // namespace ds

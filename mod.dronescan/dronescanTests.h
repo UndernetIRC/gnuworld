@@ -16,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: dronescanTests.h,v 1.4 2003/06/19 22:58:30 dan_karrels Exp $
+ * $Id: dronescanTests.h,v 1.5 2003/07/26 16:47:18 jeekay Exp $
  */
 
 #ifndef DRONESCANTESTS_H
-#define DRONESCANTESTS_H "$Id: dronescanTests.h,v 1.4 2003/06/19 22:58:30 dan_karrels Exp $"
+#define DRONESCANTESTS_H "$Id: dronescanTests.h,v 1.5 2003/07/26 16:47:18 jeekay Exp $"
 
 namespace gnuworld {
 
@@ -48,6 +48,9 @@ public:
 	virtual inline unsigned short getWeight() const
 		{ return weight; }
 	
+	virtual inline const string getStatus() const
+		{ return ""; }
+	
 protected:
 	dronescan	*bot;
 	string		testName;
@@ -68,6 +71,7 @@ public:					\
 
 #define DECLARE_TEST_SET(testName) DECLARE_TEST(testName) \
 	virtual bool setVariable( const string&, const string& ); \
+	virtual const string getStatus() const; \
 protected:
 
 DECLARE_TEST_FULL( ABNORMALS )
@@ -84,7 +88,9 @@ DECLARE_TEST_SET( MAXCHANS )
 	unsigned short maxChans;
 };
 
-DECLARE_TEST_FULL( RANGE )
+DECLARE_TEST_SET( RANGE )
+	double channelRange;
+};
 
 } // namespace ds
 

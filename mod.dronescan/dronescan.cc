@@ -16,13 +16,15 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: dronescan.cc,v 1.24 2003/06/28 16:26:45 dan_karrels Exp $
+ * $Id: dronescan.cc,v 1.25 2003/07/26 16:47:18 jeekay Exp $
  */
 
 #include	<string>
 
 #include <cstdarg>	/* va_list */
 #include <cstdio>	/* *printf() */
+
+#include "libpq++.h"
 
 #include "config.h"
 #include "EConfig.h"
@@ -34,9 +36,10 @@
 #include "dronescan.h"
 #include "dronescanCommands.h"
 #include "dronescanTests.h"
+#include "sqlUser.h"
 #include "Timer.h"
 
-RCSTAG("$Id: dronescan.cc,v 1.24 2003/06/28 16:26:45 dan_karrels Exp $");
+RCSTAG("$Id: dronescan.cc,v 1.25 2003/07/26 16:47:18 jeekay Exp $");
 
 namespace gnuworld {
 
@@ -97,26 +100,19 @@ channelCutoff = atoi(dronescanConfig->Require("channelCutoff")->second.c_str());
 
 RegisterTest(new ABNORMALSTest(this, "ABNORMALS", "Checks for the percentage of normal clients.", 10));
 RegisterTest(new COMMONREALTest(this, "COMMONREAL", "Checks for common realnames", 10));
-
-RegisterTest(new HASOPTest(this, "HASOP", "Checks if a channel has no ops.", 10));
-
 RegisterTest(new HASALLOPTest(this, "HASALLOP", "Checks if a channel has all ops.", 10));
+RegisterTest(new HASOPTest(this, "HASOP", "Checks if a channel has no ops.", 10));
+RegisterTest(new MAXCHANSTest(this, "MAXCHANS", "Checks the max channel membership of a channel.", 10));
+RegisterTest(new RANGETest(this, "RANGE", "Checks the entropy range.", 10));
 
 /* Set up join counter config options. */
 jcInterval = atoi(dronescanConfig->Require("jcInterval")->second.c_str());
 jcCutoff = atoi(dronescanConfig->Require("jcCutoff")->second.c_str());
 
-/* Set up channel range config options */
-channelRange = atof(dronescanConfig->Require("channelRange")->second.c_str());
-/* Register the test */
-RegisterTest(new RANGETest(this, "RANGE", "Checks the entropy range.", 10));
-
-/* Register the test */
-RegisterTest(new MAXCHANSTest(this, "MAXCHANS", "Checks the max channel membership of a channel.", 10));
-
 /* Set up variables that our tests will need */
 typedef vector<string> testVarsType;
 testVarsType testVars;
+testVars.push_back("channelRange");
 testVars.push_back("maxChans");
 testVars.push_back("realCutoff");
 
@@ -133,8 +129,23 @@ for( testVarsType::const_iterator itr = testVars.begin() ;
 		elog	<< "dronescan> No test accepted variable: "
 			<< *itr << " @ " << theValue
 			<< endl;
+		::exit(1);
 	}
 }
+
+/* Set up database */
+SQLDb = new PgDatabase("host=127.0.0.1 dbname=dronescan");
+if(SQLDb->ConnectionBad()) {
+	elog	<< "dronescan> Failed to connect to SQL server: "
+		<< SQLDb->ErrorMessage()
+		<< endl;
+	::exit(0);
+}
+
+elog << "dronescan> Established connection to SQL server." << endl;
+
+/* Preload users */
+preloadUserCache();
 
 /* Set up active drone channels clearance */
 dcInterval = atoi(dronescanConfig->Require("dcInterval")->second.c_str());
@@ -152,6 +163,7 @@ theTimer = new Timer();
 RegisterCommand(new ACCESSCommand(this, "ACCESS", "() (<user>)"));
 RegisterCommand(new CHECKCommand(this, "CHECK", "(<#channel>) (<user>)"));
 RegisterCommand(new LISTCommand(this, "LIST", "(active)"));
+RegisterCommand(new STATUSCommand(this, "STATUS", ""));
 } // dronescan::dronescan(const string&)
 
 
@@ -288,7 +300,7 @@ void dronescan::OnCTCP( iClient* theClient, const string& CTCP,
 	} else if("PING" == Command) {
 		DoCTCP(theClient, CTCP, Message);
 	} else if("VERSION" == Command) {
-		DoCTCP(theClient, CTCP, "GNUWorld DroneScan v0.0.3");
+		DoCTCP(theClient, CTCP, "GNUWorld DroneScan v0.0.4");
 	}
 
 	xClient::OnCTCP(theClient, CTCP, Message, Secure);
@@ -382,7 +394,13 @@ xClient::OnChannelEvent( theEvent, theChannel,
 void dronescan::OnPrivateMessage( iClient* theClient,
 	const string& Message, bool )
 {
-	if(!getAccess(theClient)) return ;
+	sqlUser *theUser = getSqlUser(theClient->getAccount());
+
+	if(!theUser) return ;
+	
+	/* We have now seen this user! */
+	theUser->setLastSeen(::time(0));
+	theUser->commit();
 	
 	StringTokenizer st(Message);
 
@@ -393,7 +411,7 @@ void dronescan::OnPrivateMessage( iClient* theClient,
 	
 	if(commandHandler != commandMap.end())
 		{
-		commandHandler->second->Exec(theClient, Message);
+		commandHandler->second->Exec(theClient, Message, theUser);
 		return ;
 		}
 		
@@ -427,10 +445,6 @@ void dronescan::OnPrivateMessage( iClient* theClient,
 			jcInterval,
 			jcCutoff
 			);
-
-		Reply(theClient, "CR      : %0.3lf",
-			channelRange);
-
 		return ;
 		}
 	
@@ -481,16 +495,6 @@ void dronescan::OnPrivateMessage( iClient* theClient,
 			double newNM = atof(st[2].c_str());
 			if(newNM < 0 || newNM > 1) return ;
 			nickMargin = newNM;
-			resetAndCheck();
-			return ;
-			}
-		
-		/* Channel entropy options */
-		if("CR" == Option)
-			{
-			double newCR = atof(st[2].c_str());
-			if(newCR < 0) return ;
-			channelRange = newCR;
 			resetAndCheck();
 			return ;
 			}
@@ -930,10 +934,6 @@ void dronescan::setConsoleTopic()
 			<< "  jcCutoff: " << jcCutoff
 			;
 
-	setTopic	<< "  ||"
-			<< "  channelRange: " << channelRange
-			;
-	
 	Write(setTopic);
 }
 
@@ -952,30 +952,46 @@ void dronescan::Reply(const iClient *theClient, char *format, ...)
 }
 
 
-/** Return the access of an iClient. */
-unsigned short dronescan::getAccess(const iClient *theClient)
+sqlUser *dronescan::getSqlUser(const string& theNick)
 {
-	Channel *theChannel = Network->findChannel(consoleChannel);
-	/* TODO: Complain loudly */
-	if(!theChannel) return 0;
+	userMapType::const_iterator itr = userMap.find(theNick);
 	
-	ChannelUser *theCU = theChannel->findUser(theClient);
-	if(!theCU) {
-		if(theClient->isOper()) return 100;
-		return 0;
+	if(itr != userMap.end()) {
+		return itr->second;
 	}
 	
-	/* Are we opped? */
-	if(theCU->isModeO()) return 1000;
-		
-	/* Are we voiced? */
-	if(theCU->isModeV()) return 500;
-		
-	/* Are we opered? */
-	if(theClient->isOper()) return 100;
+	return 0;
+}
 
-	/* Not opped, voiced or opered. */
-	return 0;	
+
+/** Preload the users cache */
+void dronescan::preloadUserCache()
+{
+	stringstream theQuery;
+	theQuery	<< "SELECT user_name,last_seen,last_updated_by,last_updated,flags,access "
+			<< "FROM users"
+			;
+	
+	ExecStatusType status = SQLDb->Exec(theQuery.str().c_str());
+	
+	if(PGRES_TUPLES_OK == status) {
+		for(int i = 0; i < SQLDb->Tuples(); ++i) {
+			sqlUser *newUser = new sqlUser(SQLDb);
+			assert(newUser != 0);
+			
+			newUser->setAllMembers(i);
+			userMap.insert(userMapType::value_type(newUser->getUserName(), newUser));
+		}
+	} else {
+		elog	<< "dronescan::preloadUserCache> "
+			<< SQLDb->ErrorMessage();
+	}
+	
+	elog	<< "dronescan::preloadUserCache> Loaded "
+		<< userMap.size()
+		<< " users."
+		<< endl
+		;
 }
 
 

@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: LISTCommand.cc,v 1.4 2003/06/20 01:09:48 jeekay Exp $
+ * $Id: LISTCommand.cc,v 1.5 2003/07/26 16:47:18 jeekay Exp $
  *
  * Display information about things.
  *
@@ -28,12 +28,13 @@
 
 #include "dronescan.h"
 #include "dronescanCommands.h"
+#include "sqlUser.h"
 
 namespace gnuworld {
 
 namespace ds {
 
-bool LISTCommand::Exec( const iClient *theClient, const string& Message )
+bool LISTCommand::Exec( const iClient *theClient, const string& Message , const sqlUser* )
 {
 	/* Usage: LIST <name> */
 
@@ -79,6 +80,17 @@ bool LISTCommand::Exec( const iClient *theClient, const string& Message )
 					itr->first.c_str(),
 					itr->second
 					);
+		}
+	}
+	
+	if("USERS" == Name) {
+		bot->Reply(theClient, "Users:");
+		for(dronescan::userMapType::const_iterator itr = bot->userMap.begin() ;
+		    itr != bot->userMap.end() ; ++itr) {
+			bot->Reply(theClient, "Username : %-10s Access: %4u",
+				itr->second->getUserName().c_str(),
+				itr->second->getAccess()
+				);
 		}
 	}
 	

@@ -1,3 +1,9 @@
+2003-07-07 0.0.4 Jeekay
+* Added support for DB authenticated users
+* Added LIST USERS
+* Added STATUS
+* Bumped version to 0.0.4
+
 2003-06-20 0.0.3 Jeekay
 * Added throttling of join flood to the console.
 * Added LIST JOINFLOOD command to show channels currently being flooded.

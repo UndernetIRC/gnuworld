@@ -1,17 +1,22 @@
 lib_LTLIBRARIES = libdronescan.la
-libdronescan_la_LDFLAGS = -module -export-dynamic
+libdronescan_la_LDFLAGS = -module -export-dynamic -L@PGSQL_LIB@ -lpq++
 
 libdronescan_la_SOURCES = 	\
-	ABNORMALSTest.cc	\
+	dronescan.cc		\
+	sqlUser.cc		\
 	ACCESSCommand.cc	\
 	CHECKCommand.cc		\
-	COMMONREALTest.cc	\
 	LISTCommand.cc		\
+	STATUSCommand.cc	\
+	ABNORMALSTest.cc	\
+	COMMONREALTest.cc	\
 	HASALLOPTest.cc		\
 	HASOPTest.cc		\
 	MAXCHANSTest.cc		\
-	RANGETest.cc		\
-	dronescan.cc
+	RANGETest.cc
+
+
+INCLUDES = -I@PGSQL_INCLUDE@ $(INCLTDL)
 
 EXTRA_DIST = clientData.h \
 	dronescanCommands.h \
