@@ -5,9 +5,10 @@
  */
 
 #ifndef __SQLPENDINGCHANNEL_H
-#define __SQLPENDINGCHANNEL_H "$Id: sqlPendingChannel.h,v 1.3 2001/04/30 01:26:21 gte Exp $"
+#define __SQLPENDINGCHANNEL_H "$Id: sqlPendingChannel.h,v 1.4 2001/06/10 01:03:08 gte Exp $"
 
 #include	<string> 
+#include	"sqlPendingTraffic.h"
  
 using std::string ;
 
@@ -18,13 +19,21 @@ class sqlPendingChannel
 {
 
 public:
-	sqlPendingChannel();
+	sqlPendingChannel(PgDatabase*);
 	bool commit();
+	void loadTrafficCache();
 
 	unsigned int channel_id;
 	unsigned int join_count;
+	unsigned int unique_join_count;
+
 	typedef map < int, int > supporterListType;
 	supporterListType supporterList;
+
+	typedef map < unsigned int, sqlPendingTraffic* > trafficListType;
+	trafficListType trafficList;
+
+	PgDatabase*	SQLDb;
 };
 
 }

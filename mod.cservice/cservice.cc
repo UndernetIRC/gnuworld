@@ -748,7 +748,7 @@ else if(Command == "VERSION")
 	xClient::DoCTCP(theClient, CTCP,
 		"Undernet P10 Channel Services Version 2 ["
 		__DATE__ " " __TIME__
-		"] Release 1.0pl5");
+		"] Release 1.0pl6-devel");
 	}
 else if(Command == "PROBLEM?")
 	{
@@ -2069,13 +2069,29 @@ if (timer_id == cache_timerID)
 
 if (timer_id == pending_timerID)
 	{ 
+	/* 
+	 * Load the list of pending channels. 
+	 */
+	loadPendingChannelList(); 
+
+	/* 
+	 * For each pending channel, load up its IP traffic
+	 * cache. 
+	 */ 
+	pendingChannelListType::iterator ptr = pendingChannelList.begin(); 
+	while (ptr != pendingChannelList.end())
+		{
+		sqlPendingChannel* pendingChan = ptr->second;
+		pendingChan->loadTrafficCache();
+		++ptr;
+		};
+
 	/*
-	 * Quickly loop over all pending channels, and do a notification. 
+	 * Load a list of channels in NOTIFICATION stage and send them
+	 * a notice. 
 	 */
 
-	// Load the list of pending channels.
-	loadPendingChannelList();
-
+/*
 	pendingChannelListType::iterator ptr = pendingChannelList.begin();
 	
 	while (ptr != pendingChannelList.end())
@@ -2089,13 +2105,13 @@ if (timer_id == pending_timerID)
 			serverNotice(tmpChan, "http://www.cservice.undernet.org/pendingchannel.php?id=%i", pendingChan->channel_id);
 			}
 		++ptr; 
-		} /* while() */
+		}
 	
- 
+*/
 	/* Refresh Timers */
 	time_t theTime = time(NULL) +pendingChanPeriod;
 	pending_timerID = MyUplink->RegisterTimer(theTime, this, NULL);
-	} 
+	}
 
 
 return 0 ;
@@ -2684,7 +2700,55 @@ switch( whichEvent )
 			 *  Yes, this channel is pending registration, update join count
 			 *  and check out this user joining.
 			 */
+
 			ptr->second->join_count++;
+
+			/*
+			 *  Now, has this users IP joined this channel before?
+			 *  If not - we keep a record of it.
+			 */
+
+			sqlPendingChannel::trafficListType::iterator Tptr =  
+				ptr->second->trafficList.find(theClient->getIP());
+
+			sqlPendingTraffic* trafRecord;
+
+			/*
+			 * If we have more than 50 unique IP's join, we don't bother
+			 * recording anymore.
+			 */
+
+			if (ptr->second->unique_join_count <= 50)
+				{
+				if(Tptr == ptr->second->trafficList.end())
+					{
+					/* New IP, create and write the record. */
+	
+					trafRecord = new sqlPendingTraffic(SQLDb);
+					trafRecord->ip_number = theClient->getIP();
+					trafRecord->join_count = 0;
+					trafRecord->channel_id = ptr->second->channel_id;
+					trafRecord->insertRecord();
+
+					ptr->second->trafficList.insert(sqlPendingChannel::trafficListType::value_type(
+						theClient->getIP(), trafRecord));
+	
+					logDebugMessage("Created new IP traffic record for %u (%s) on %s",
+						theClient->getIP(), theClient->getNickUserHost().c_str(),
+						theChan->getName().c_str()); 
+					} else
+					{
+					/* Already cached. */
+					trafRecord = Tptr->second;
+					}
+
+					trafRecord->join_count++;
+
+					logDebugMessage("New total for %u on %s is %i",
+						theClient->getIP(), theChan->getName().c_str(),
+						trafRecord->join_count);
+				}
+ 
 			sqlUser* theUser = isAuthed(theClient, false);
 			if (!theUser)
 				{
@@ -2692,6 +2756,7 @@ switch( whichEvent )
 				 *  If this user isn't authed, he can't possibly be flagged
 				 *  as one of the valid supporters, so we drop out.
 				 */
+
 				return xClient::OnChannelEvent( whichEvent, theChan,
 					data1, data2, data3, data4 );
 				}
@@ -2704,7 +2769,7 @@ switch( whichEvent )
 				if (Supptr != ptr->second->supporterList.end())
 					{ 
 						Supptr->second++;
-						elog << "Supporter " << theUser->getID() << " joined " << theChan->getName() << endl;
+						logDebugMessage("Supporter %i has just joined %s.", theUser->getID(), theChan->getName().c_str());
 					}
 
 			return xClient::OnChannelEvent( whichEvent, theChan,
@@ -3252,13 +3317,14 @@ if (pendingChannelList.size() > 0)
 	while (ptr != pendingChannelList.end())
 		{
 		sqlPendingChannel* pendingChan = ptr->second;
+
 		/* Commit the record */
 		pendingChan->commit();
 
 		/* Stop listening on this channels events for now. */
 		MyUplink->UnRegisterChannelEvent(ptr->first, this);
 
-		ptr->second = NULL;
+		ptr->second = NULL; 
 		delete(pendingChan);
 		++ptr;
 		} /* while() */ 
@@ -3272,7 +3338,7 @@ if (pendingChannelList.size() > 0)
  */
 
 strstream theQuery;
-theQuery	<<  "SELECT channels.name, pending.channel_id, user_id, pending.join_count, supporters.join_count"
+theQuery	<<  "SELECT channels.name, pending.channel_id, user_id, pending.join_count, supporters.join_count, pending.unique_join_count"
 			<< " FROM pending,supporters,channels"
 			<< " WHERE pending.channel_id = supporters.channel_id"
 			<< " AND channels.id = pending.channel_id"
@@ -3310,9 +3376,10 @@ if( PGRES_TUPLES_OK == status )
 			}
 				else 
 			{
-			newPending = new sqlPendingChannel();
+			newPending = new sqlPendingChannel(SQLDb);
 			newPending->channel_id = atoi(SQLDb->GetValue(i,1));
 			newPending->join_count = atoi(SQLDb->GetValue(i,3));
+			newPending->unique_join_count = atoi(SQLDb->GetValue(i,5));
 			pendingChannelList.insert( pendingChannelListType::value_type(chanName, newPending) );
 
 			/*
@@ -3338,6 +3405,7 @@ if( PGRES_TUPLES_OK == status )
 			<< " channels being notified and recorded."
 			<< endl;
 #endif
+
 }
  
 void Command::Usage( iClient* theClient )

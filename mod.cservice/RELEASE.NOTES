@@ -1,7 +1,11 @@
 Newest changes at the top of the file:
-$Id: RELEASE.NOTES,v 1.11 2001/05/20 00:00:50 gte Exp $
+$Id: RELEASE.NOTES,v 1.12 2001/06/10 01:03:08 gte Exp $
 
-CMaster 1.0pl5 - Current 
+CMaster 1.0pl6 - Current
+* Disallow globally suspended users op's in registered 
+  channels.
+
+CMaster 1.0pl5 - 20/05/2001
 * Add Vampire's (Alex Badea <vampire@go.ro>) code to make
   addition of new languages dynamic.
 * Prevent core in PURGE when channel doesn't have a manager.
