@@ -1826,7 +1826,7 @@ fi
 
 # Define the identity of the package.
  PACKAGE=gnuworld
- VERSION=2.5
+ VERSION=2.6
 
 
 cat >>confdefs.h <<_ACEOF

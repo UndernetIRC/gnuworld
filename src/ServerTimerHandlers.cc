@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ServerTimerHandlers.cc,v 1.10 2004/05/19 19:46:36 jeekay Exp $
+ * $Id: ServerTimerHandlers.cc,v 1.11 2005/01/12 03:50:38 dan_karrels Exp $
  */
 
 #include	<string>
@@ -27,9 +27,9 @@
 #include	"ServerTimerHandlers.h"
 #include	"server.h"
 #include	"ELog.h"
-#include	"config.h"
+#include	"gnuworld_config.h"
 
-RCSTAG( "$Id: ServerTimerHandlers.cc,v 1.10 2004/05/19 19:46:36 jeekay Exp $" ) ;
+RCSTAG( "$Id: ServerTimerHandlers.cc,v 1.11 2005/01/12 03:50:38 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {

@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: CHECKNETCommand.cc,v 1.15 2005/01/08 23:33:42 dan_karrels Exp $
+ * $Id: CHECKNETCommand.cc,v 1.16 2005/01/12 03:50:29 dan_karrels Exp $
  */
 
 #include	<string>
@@ -26,9 +26,9 @@
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 #include	"ccServer.h"
-#include	"config.h"
+#include	"gnuworld_config.h"
 
-RCSTAG( "$Id: CHECKNETCommand.cc,v 1.15 2005/01/08 23:33:42 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: CHECKNETCommand.cc,v 1.16 2005/01/12 03:50:29 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {

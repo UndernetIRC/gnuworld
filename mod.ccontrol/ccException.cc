@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccException.cc,v 1.12 2003/08/09 23:15:34 dan_karrels Exp $
+ * $Id: ccException.cc,v 1.13 2005/01/12 03:50:29 dan_karrels Exp $
  */
  
 #include	<sstream>
@@ -32,9 +32,9 @@
 #include	"match.h"
 #include	"ccException.h" 
 #include	"ccontrol.h"
-#include	"config.h"
+#include	"gnuworld_config.h"
 
-RCSTAG( "$Id: ccException.cc,v 1.12 2003/08/09 23:15:34 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: ccException.cc,v 1.13 2005/01/12 03:50:29 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {

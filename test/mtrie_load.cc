@@ -1,7 +1,7 @@
 /**
  * mtrie_load.cc
  *
- * $Id: mtrie_load.cc,v 1.4 2004/05/18 16:51:05 dan_karrels Exp $
+ * $Id: mtrie_load.cc,v 1.5 2005/01/12 03:50:38 dan_karrels Exp $
  */
 
 #include	<map>
@@ -12,7 +12,7 @@
 
 #include	<ctime>
 
-#include	"config.h"
+#include	"gnuworld_config.h"
 
 #ifdef HAVE_GETOPT_H
 #include	<getopt.h>

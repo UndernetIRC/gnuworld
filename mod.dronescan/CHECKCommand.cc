@@ -19,7 +19,7 @@
  * Display information about a given channel or user.
  */
 
-#include "config.h"
+#include "gnuworld_config.h"
 #include "Network.h"
 #include "StringTokenizer.h"
 

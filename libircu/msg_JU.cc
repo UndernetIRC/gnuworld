@@ -17,16 +17,16 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_JU.cc,v 1.4 2004/06/04 14:30:50 mrbean_ Exp $
+ * $Id: msg_JU.cc,v 1.5 2005/01/12 03:50:28 dan_karrels Exp $
  */
 
 #include	"server.h"
 #include 	"Network.h"
 #include	"xparameters.h"
 #include	"ServerCommandHandler.h"
-#include	"config.h"
+#include	"gnuworld_config.h"
 
-RCSTAG( "$Id: msg_JU.cc,v 1.4 2004/06/04 14:30:50 mrbean_ Exp $" ) ;
+RCSTAG( "$Id: msg_JU.cc,v 1.5 2005/01/12 03:50:28 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {

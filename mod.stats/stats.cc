@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: stats.cc,v 1.30 2004/06/04 20:17:24 jeekay Exp $
+ * $Id: stats.cc,v 1.31 2005/01/12 03:50:37 dan_karrels Exp $
  */
 
 #include	<list>
@@ -37,10 +37,10 @@
 #include	"ELog.h"
 #include	"StringTokenizer.h"
 #include	"Network.h"
-#include	"config.h"
+#include	"gnuworld_config.h"
 #include	"misc.h"
 
-RCSTAG( "$Id: stats.cc,v 1.30 2004/06/04 20:17:24 jeekay Exp $" ) ;
+RCSTAG( "$Id: stats.cc,v 1.31 2005/01/12 03:50:37 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {

@@ -17,11 +17,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: config.h,v 1.22 2003/11/11 19:21:21 dan_karrels Exp $
+ * $Id: gnuworld_config.h,v 1.1 2005/01/12 03:50:27 dan_karrels Exp $
  */
 
 #ifndef __CONFIG_H
-#define __CONFIG_H "$Id: config.h,v 1.22 2003/11/11 19:21:21 dan_karrels Exp $"
+#define __CONFIG_H "$Id: gnuworld_config.h,v 1.1 2005/01/12 03:50:27 dan_karrels Exp $"
 
 /* GNUWorld main configuration file */
 /* All core settings are set/defined here.
@@ -42,6 +42,22 @@
  * can use quite a bit more memory on large networks.
  */
 #undef CLIENT_DESC
+
+/**
+ * ASUKA
+ * Define this variable if gnuworld will be running on Asuka.
+ * Enabling this by default will not have adverse effects on gnuworld's
+ * functionality, except to increase memory usage a bit.
+ */
+#undef ASUKA
+
+/**
+ * SRVX
+ * Define this variable if gnuworld will be running on srvx.
+ * Enabling this by default will not have adverse effects on gnuworld's
+ * functionality, except to increase memory usage a bit.
+ */
+#define SRVX
 
 /**
  * MAX_CHAN_MODES

@@ -22,7 +22,7 @@
 #include	<sstream>
 #include	<map>
 
-#include "config.h"
+#include "gnuworld_config.h"
 #include "dronescan.h"
 #include "dronescanTests.h"
 

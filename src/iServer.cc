@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: iServer.cc,v 1.9 2003/08/23 21:00:33 dan_karrels Exp $
+ * $Id: iServer.cc,v 1.10 2005/01/12 03:50:38 dan_karrels Exp $
  */
 
 #include	<string>
@@ -27,10 +27,10 @@
 
 #include	"iServer.h"
 #include	"Numeric.h"
-#include	"config.h"
+#include	"gnuworld_config.h"
 #include	"NetworkTarget.h"
 
-RCSTAG( "$Id: iServer.cc,v 1.9 2003/08/23 21:00:33 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: iServer.cc,v 1.10 2005/01/12 03:50:38 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {

@@ -19,7 +19,7 @@
 
 #include <new>
 
-#include "config.h"
+#include "gnuworld_config.h"
 #include "Stats.h"
 
 namespace gnuworld {

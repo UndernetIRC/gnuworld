@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: MODUSERCommand.cc,v 1.24 2003/08/09 23:15:33 dan_karrels Exp $
+ * $Id: MODUSERCommand.cc,v 1.25 2005/01/12 03:50:29 dan_karrels Exp $
  */
 
 #include	<string>
@@ -31,9 +31,9 @@
 #include	"ccUser.h"
 #include	"misc.h"
 #include	"Constants.h"
-#include	"config.h"
+#include	"gnuworld_config.h"
 
-RCSTAG( "$Id: MODUSERCommand.cc,v 1.24 2003/08/09 23:15:33 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: MODUSERCommand.cc,v 1.25 2005/01/12 03:50:29 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {

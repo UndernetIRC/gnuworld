@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: FORCEGLINECommand.cc,v 1.30 2003/08/09 23:15:33 dan_karrels Exp $
+ * $Id: FORCEGLINECommand.cc,v 1.31 2005/01/12 03:50:29 dan_karrels Exp $
  */
 
 #include	<string>
@@ -33,9 +33,9 @@
 #include	"ip.h"
 #include	"ELog.h"
 #include	"Constants.h"
-#include	"config.h"
+#include	"gnuworld_config.h"
 
-RCSTAG( "$Id: FORCEGLINECommand.cc,v 1.30 2003/08/09 23:15:33 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: FORCEGLINECommand.cc,v 1.31 2005/01/12 03:50:29 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {

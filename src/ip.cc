@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ip.cc,v 1.10 2004/01/07 03:08:29 dan_karrels Exp $
+ * $Id: ip.cc,v 1.11 2005/01/12 03:50:38 dan_karrels Exp $
  */
 
 #include	<string>
@@ -36,9 +36,9 @@
 
 #include	"ip.h"
 #include	"Numeric.h"
-#include	"config.h"
+#include	"gnuworld_config.h"
 
-RCSTAG( "$Id: ip.cc,v 1.10 2004/01/07 03:08:29 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: ip.cc,v 1.11 2005/01/12 03:50:38 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {

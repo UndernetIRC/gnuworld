@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccServer.cc,v 1.13 2004/03/25 20:55:40 mrbean_ Exp $
+ * $Id: ccServer.cc,v 1.14 2005/01/12 03:50:29 dan_karrels Exp $
  */
  
 #include	<sstream>
@@ -33,9 +33,9 @@
 #include	"ccServer.h" 
 #include	"ccontrol.h"
 #include	"Constants.h"
-#include	"config.h"
+#include	"gnuworld_config.h"
 
-RCSTAG( "$Id: ccServer.cc,v 1.13 2004/03/25 20:55:40 mrbean_ Exp $" ) ;
+RCSTAG( "$Id: ccServer.cc,v 1.14 2005/01/12 03:50:29 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {

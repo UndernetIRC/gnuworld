@@ -14,7 +14,7 @@
 
 @SET_MAKE@
 
-# "$Id: Makefile.in,v 1.86 2005/01/09 20:34:48 dan_karrels Exp $"
+# "$Id: Makefile.in,v 1.87 2005/01/12 03:50:34 dan_karrels Exp $"
 
 SOURCES = $(libscanner_la_SOURCES)
 

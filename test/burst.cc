@@ -15,7 +15,7 @@
 #include	<cstring>
 #include	<cerrno>
 
-#include	"config.h"
+#include	"gnuworld_config.h"
 
 #ifdef HAVE_GETOPT_H
 #include	<getopt.h>

@@ -17,11 +17,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: iClient.h,v 1.43 2004/06/14 22:17:56 jeekay Exp $
+ * $Id: iClient.h,v 1.44 2005/01/12 03:50:27 dan_karrels Exp $
  */
 
 #ifndef __ICLIENT_H
-#define __ICLIENT_H "$Id: iClient.h,v 1.43 2004/06/14 22:17:56 jeekay Exp $"
+#define __ICLIENT_H "$Id: iClient.h,v 1.44 2005/01/12 03:50:27 dan_karrels Exp $"
 
 #include	<string>
 #include	<list>
@@ -32,6 +32,7 @@
 #include	"Channel.h"
 #include	"NetworkTarget.h"
 #include	"ELog.h"
+#include	"gnuworld_config.h"
 
 namespace gnuworld
 {
@@ -117,6 +118,27 @@ public:
 		const std::string& _mode,
 		const std::string& _account,
 		const time_t _account_ts,
+		const std::string& _description,
+		const time_t& _connectTime ) ;
+
+	/**
+	 * Construct a new iClient given a large list of
+	 * parameters for the client's state.
+	 * This signature assumes that either/both of asuka are being
+	 * used.
+	 */
+	iClient( const unsigned int& _uplink,
+		const std::string& _yyxxx,
+		const std::string& _nickName,
+		const std::string& _userName,
+		const std::string& _hostBase64,
+		const std::string& _insecureHost,
+		const std::string& _realInsecureHost,
+		const std::string& _mode,
+		const std::string& _account,
+		const time_t _account_ts,
+		const std::string& _setHost,
+		const std::string& _fakeHost,
 		const std::string& _description,
 		const time_t& _connectTime ) ;
 
@@ -228,6 +250,22 @@ public:
 		
 		account_ts = _account_ts;
 		}
+
+#ifdef ASUKA
+	/**
+	 * Retrieve the iClient's sethost.
+	 */
+	inline const std::string& getSetHost() const
+		{ return setHost ; }
+#endif
+
+#ifdef SRVX
+	/**
+	 * Retrieve the iClient's fakehost.
+	 */
+	inline const std::string& getFakeHost() const
+		{ return fakeHost ; }
+#endif
 
 	/**
 	 * Retrieve the iClient's connection time.
@@ -623,6 +661,20 @@ protected:
 	
 	/** The timestamp of this client's account. */
 	time_t		account_ts ;
+
+#ifdef ASUKA
+	/**
+	 * This client's sethost.
+	 */
+	std::string	setHost ;
+#endif
+
+#ifdef SRVX
+	/**
+	 * This client's fakehost.
+	 */
+	std::string	fakeHost ;
+#endif
 
 	/**
 	 * The structure used to store which channels this user is in.

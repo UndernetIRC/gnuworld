@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_N.cc,v 1.7 2004/06/16 15:17:48 jeekay Exp $
+ * $Id: msg_N.cc,v 1.8 2005/01/12 03:50:28 dan_karrels Exp $
  */
 
 #include	<new>
@@ -34,9 +34,10 @@
 #include	"ELog.h"
 #include	"xparameters.h"
 #include	"ServerCommandHandler.h"
-#include	"config.h"
+#include	"StringTokenizer.h"
+#include	"gnuworld_config.h"
 
-RCSTAG( "$Id: msg_N.cc,v 1.7 2004/06/16 15:17:48 jeekay Exp $" ) ;
+RCSTAG( "$Id: msg_N.cc,v 1.8 2005/01/12 03:50:28 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -47,33 +48,61 @@ using std::endl ;
 CREATE_HANDLER(msg_N)
 
 /**
- * A new user has joined the network, or a user has changed
- * its nickname.
- * O N EUworld1 2 000201527 gnuworld1 undernet.org AAAAAA OAA :P10 Undernet
- * EUworld Service
+ * A new user has joined the network, we are receiving a burst,
+ * or a user has changed his/her nickname.
  *
- * O: another server numeric
- * 2: hopcount
- * 000201527: timestamp
- * gnuworld1: username
- * undernet.org: domain
- * AAAAAA: base64 IP
- * OAA: numnick
- * :P10 Undernet: description
+ * Possible cases:
+ * 1) Simple nick change
+ *    AUAAB N Gte- 949527071
+ * 2) Client without modes
+ *    AU N Gte2 3 949526996 Gte 212.49.240.147 DUMfCT AUAAB :I am the
+ *    one that was.
+ * 3) Client with modes
+ *    B0 N hektik 2 948677656 hektik p62-max7.ham.ihug.co.nz +i DLbcbC
+ *    B0AAA :DiMeBoX ProduXiiions
  *
- * B N hektik 2 948677656 hektik p62-max7.ham.ihug.co.nz +i DLbcbC BAA
- * :DiMeBoX ProduXiiions
+ * 1) <nickname>
+ * 2) <hops>
+ * 3) <TS>
+ * 4) <userid>
+ * 5) <host>
+ * 6) [<+modes>]
+ * 7+) [<mode parameters>]
+ * -3 <base64 IP>
+ * -2 <numeric>
+ * -1 <fullname
  *
- * AU N Gte2 3 949526996 Gte 212.49.240.147 DUMfCT AUAAB :I am the one
- *  that was.
+ * AF N Client1 1 947957573 User userhost.net +oiwg DAqAoB AFAAA
+ * :Generic Client.
+ *
+ * AF - numeric of the server the user is on
+ * N - NICK token
+ * Client1 - nick
+ * 1 - hopcount
+ * 947957573 - timestamp
+ * User - username
+ * userhost.net - domain
+ * +oiwg - modes
+ * DAqAoB - base64 IP
+ * AFAAA - numnick
+ * :Generic Client - description
  */
 bool msg_N::Execute( const xParameters& params )
 {
+if( params.size() < 3 )
+	{
+	// Error
+	elog	<< "msg_N> Invalid format: "
+		<< params
+		<< endl ;
+	return false ;
+	}
+
 // AUAAB N Gte- 949527071
-if( params.size() < 5 )
+if( 3 == params.size() )
 	{
 	// User changing nick
-//	elog	<< "N> Rehashing nickname: "
+//	elog	<< "msg_N> Rehashing nickname: "
 //		<< params
 //		<< endl ;
 
@@ -94,117 +123,101 @@ if( NULL == nickUplink )
 // Default arguments, assuming
 // no modes set.
 const char* modes = "+" ;
-const char* host = params[ 6 ] ;
-const char* yyxxx = params[ 7 ] ;
-const char* description = params [ 8 ] ;
-string account = "";
-time_t account_ts = 0;
 
-// Are modes specified? (With a +r?)
-// If so, token 7 is the authenticated account name,
-// the rest shuffle up.
-if( 11 == params.size() )
+/*
+ * 1) <nickname>
+ * 2) <hops>
+ * 3) <TS>
+ * 4) <userid>
+ * 5) <host>
+ * 6) [<+modes>]
+ * 7+) [<mode parameters>]
+ * -3 <base64 IP>
+ * -2 <numeric>
+ * -1 <fullname
+ */
+
+string account ;
+time_t account_ts = 0 ;
+string sethost ;
+string fakehost ;
+
+xParameters::size_type currentArgIndex = 6 ;
+
+// precondition: currentArgIndex points at the next params[] index
+// to check
+if( '+' == params[ currentArgIndex ][ 0 ] )
 	{
-	// User logged in with AC account
-	// server nick '1' someothernumber username hostname
-	// modes account base64host numeric <description>
+	// Got modes
+	currentArgIndex = 7 ;
+
+	// If any of the modes 'r', 'h', 'f' are present, then
+	// another param will follow.
+	// The mode order will always be rhf if all 3 are present.
 	modes = params[ 6 ] ;
-	account = params[ 7 ];
-	host = params[ 8 ] ;
-	yyxxx = params[ 9 ] ;
-	description = params[ 10 ];
-	}
-else if( 10 == params.size() )
-	{
-	// User not logged in
-	// server nick '1' someothernumber username hostname
-	// modes base64host numeric <description>
 
-	// Just plain modes here without any parameters
-	modes = params[ 6 ] ;
-	host = params[ 7 ] ;
-	yyxxx = params[ 8 ] ;
-	description = params[ 9 ];
-	}
-else if( 12 == params.size() )
-	{
-	// asuka sethost, user logged in
-	// server nick '1' someothernumber username hostname
-	// modes account sethost base64host numeric <description>
-	modes = params[ 6 ] ;
-	account = params[ 7 ] ;
-	host = params[ 9 ] ;
-	yyxxx = params[ 10 ] ;
-	description = params[ 11 ] ;
+	for( const char* modePtr = params[ 6 ] ; *modePtr ; ++modePtr )
+		{
+		switch( *modePtr )
+			{
+			case 'r':
+				account = params[ currentArgIndex++ ] ;
+				break ;
+			case 'h':
+				sethost = params[ currentArgIndex++ ] ;
+				break ;
+			case 'f':
+				fakehost = params[ currentArgIndex++ ] ;
+				break ;
+			default: break ;
+			} // switch( *modePtr )
+		} // for()
+	} // if( '+' )
+// postcondition: currentArgIndex points at the next params[] index
+// to check
 
-//	elog	<< "msg_N> 12 params: "
-//		<< params
-//		<< endl ;
-	}
-else if( 9 == params.size() )
+if( !account.empty() )
 	{
-	// server nick '1' someothernumber username hostname
-	// base64host numeric <description>
-	host = params[ 6 ] ;
-	yyxxx = params[ 7 ] ;
-	description = params[ 8 ] ;
-	}
-else
-	{
-	elog	<< "msg_N> Unknown token formation: "
-		<< params
-		<< endl ;
-	return false ;
-	}
-
-/* If we have an account, does it have a timestamp? */
-if( ! account.empty() ) {
-	/* Here begins the C hack */
-	const char *data = account.c_str();
-	
-	char *colon = strstr(data, ":");
-	
-	if( 0 != colon ) {
-		/* Account contains a : */
-		
-		/* Sanity check */
-		if( 0 == *(colon + 1) ) {
-			elog	<< "msg_N> Invalid account format: "
-				<< account
-				<< endl;
-		} else {
-			/* Token: account:TS */
-			char username[32];
-			
-			unsigned int username_length = colon - data;
-			
-			if( username_length > 32 ) {
-				elog	<< "msg_N> Invalid account length: "
-					<< username_length
-					<< endl;
-			} else {
-				strncpy(username, data, username_length);
-				username[username_length] = 0;
-				
-				account_ts = atoi(colon + 1);
-				account = string(username);
+	StringTokenizer st( account, ':' ) ;
+	account = st[ 0 ] ;
+	if( 2 == st.size() )
+		{
+		// timestamp present
+		std::stringstream ss ;
+		ss	<< st[ 1 ] ;
+		if( !(ss >> account_ts) )
+			{
+			elog	<< "msg_N> Invalid account timestamp: "
+				<< st[ 1 ]
+				<< endl ;
+			// non-fatal error
 			}
-		}
-	}
-}
+		} // if( 2 == st.size() )
+	} // if( !account.empty() )
+
+/*
+ * -3 <base64 IP>
+ * -2 <numeric>
+ * -1 <fullname
+ */
+const char* host = params[ currentArgIndex++ ] ;
+const char* yyxxx = params[ currentArgIndex++ ] ;
+const char* description = params [ currentArgIndex ] ;
 
 iClient* newClient = new (std::nothrow) iClient(
 		nickUplink->getIntYY(),
-		yyxxx,
-		params[ 1 ], // nickname
-		params[ 4 ], // username
-		host, // base 64 host
-		params[ 5 ], // insecurehost
-		params[ 5 ], // realInsecurehost
-		modes,
-		account,
-		account_ts,
-		description,
+		yyxxx,		// numeric
+		params[ 1 ],	// nickname
+		params[ 4 ],	// username
+		host,		// base64 encoded ip
+		params[ 5 ],	// insecureHost
+		params[ 5 ],	// realInsecureHost
+		modes,		// modes (default: +)
+		account,	// account
+		account_ts,	// account timestamp
+		sethost,	// asuka sethost
+		fakehost,	// srvx fakehost
+		description,	// real name / infoline
 		atoi( params[ 3 ] ) // connection time
 		) ;
 assert( newClient != 0 ) ;
@@ -217,7 +230,7 @@ if( !Network->addClient( newClient ) )
 		<< (Network->findClient( newClient->getCharYYXXX() ) ?
 		   "yes" : "no")
 		<< endl ;
-	delete newClient ;
+	delete newClient ; newClient = 0 ;
 	return false ;
 	}
 

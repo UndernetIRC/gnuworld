@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccLog.cc,v 1.7 2003/08/09 23:15:34 dan_karrels Exp $
+ * $Id: ccLog.cc,v 1.8 2005/01/12 03:50:29 dan_karrels Exp $
  */
  
 #include "ccLog.h"
@@ -26,9 +26,9 @@
 #include <stdio.h>
 #include "StringTokenizer.h"
 
-#include	"config.h"
+#include	"gnuworld_config.h"
 
-RCSTAG( "$Id: ccLog.cc,v 1.7 2003/08/09 23:15:34 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: ccLog.cc,v 1.8 2005/01/12 03:50:29 dan_karrels Exp $" ) ;
 
 using namespace std;
 

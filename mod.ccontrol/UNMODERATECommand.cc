@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: UNMODERATECommand.cc,v 1.11 2005/01/08 23:33:42 dan_karrels Exp $
+ * $Id: UNMODERATECommand.cc,v 1.12 2005/01/12 03:50:29 dan_karrels Exp $
  */
 
 #include	<string>
@@ -28,9 +28,9 @@
 #include	"Network.h"
 #include	"Constants.h"
 #include	"ccBadChannel.h"
-#include	"config.h"
+#include	"gnuworld_config.h"
 
-RCSTAG( "$Id: UNMODERATECommand.cc,v 1.11 2005/01/08 23:33:42 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: UNMODERATECommand.cc,v 1.12 2005/01/12 03:50:29 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {

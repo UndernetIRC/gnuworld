@@ -21,7 +21,7 @@
 
 #include <ctime>
 
-#include "config.h"
+#include "gnuworld_config.h"
 #include "netData.h"
 #include "nickserv.h"
 

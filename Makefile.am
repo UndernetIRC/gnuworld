@@ -1,4 +1,4 @@
-## $Id: Makefile.am,v 1.21 2004/05/16 11:29:27 jeekay Exp $
+## $Id: Makefile.am,v 1.22 2005/01/12 03:50:23 dan_karrels Exp $
 ## test
 
 @SET_MAKE@
@@ -172,7 +172,7 @@ EXTRA_DIST = bin/ccontrol.example.conf.in \
 	include/TimerHandler.h \
 	include/UnloadClientTimerHandler.h \
 	include/client.h \
-	include/config.h \
+	include/gnuworld_config.h \
 	include/events.h \
 	include/iClient.h \
 	include/iServer.h \

@@ -20,7 +20,7 @@
  * USA.
  */
 
-#include "config.h"
+#include "gnuworld_config.h"
 #include "Network.h"
 
 #include "nickserv.h"

@@ -20,7 +20,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccontrol.cc,v 1.182 2004/06/04 20:17:22 jeekay Exp $
+ * $Id: ccontrol.cc,v 1.183 2005/01/12 03:50:29 dan_karrels Exp $
 */
 
 #define MAJORVER "1"
@@ -63,9 +63,9 @@
 #include	"ccFloodData.h"
 #include	"ccUserData.h"
 #include	"ip.h"
-#include	"config.h"
+#include	"gnuworld_config.h"
 
-RCSTAG( "$Id: ccontrol.cc,v 1.182 2004/06/04 20:17:22 jeekay Exp $" ) ;
+RCSTAG( "$Id: ccontrol.cc,v 1.183 2005/01/12 03:50:29 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {

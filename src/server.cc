@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server.cc,v 1.203 2005/01/09 20:34:50 dan_karrels Exp $
+ * $Id: server.cc,v 1.204 2005/01/12 03:50:38 dan_karrels Exp $
  */
 
 #include	<sys/time.h>
@@ -48,7 +48,7 @@
 #include	<cerrno>
 #include	<csignal>
 
-#include	"config.h"
+#include	"gnuworld_config.h"
 #include	"misc.h"
 #include	"events.h"
 #include	"ip.h"
@@ -70,7 +70,7 @@
 #include	"ConnectionHandler.h"
 #include	"Connection.h"
 
-RCSTAG( "$Id: server.cc,v 1.203 2005/01/09 20:34:50 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: server.cc,v 1.204 2005/01/12 03:50:38 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -932,6 +932,8 @@ iClient* theIClient = new (std::nothrow) iClient(
 	Client->getModes(),
 	string(),
 	0,
+	string(),
+	string(),
 	Client->getDescription(),
 	::time( 0 ) ) ;
 assert( theIClient != 0 ) ;

@@ -19,7 +19,7 @@
  * Allows an administrator to see what attributes a registered user has.
  */
 
-#include "config.h"
+#include "gnuworld_config.h"
 #include "StringTokenizer.h"
 
 #include "levels.h"

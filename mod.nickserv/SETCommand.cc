@@ -19,7 +19,7 @@
  * Allow a user to set various flags on themselves
  */
 
-#include "config.h"
+#include "gnuworld_config.h"
 #include "StringTokenizer.h"
 
 #include "levels.h"

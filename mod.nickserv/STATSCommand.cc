@@ -19,7 +19,7 @@
  * Give the user various statistics
  */
 
-#include "config.h"
+#include "gnuworld_config.h"
 #include "levels.h"
 #include "nickserv.h"
 #include "responses.h"

@@ -19,7 +19,7 @@
  * Invite the user to the console channel.
  */
 
-#include "config.h"
+#include "gnuworld_config.h"
 #include "Network.h"
 
 #include "levels.h"

@@ -22,7 +22,7 @@
 #include <sys/types.h>
 #include <regex.h>
 
-#include "config.h"
+#include "gnuworld_config.h"
 #include "Network.h"
 #include "StringTokenizer.h"
 

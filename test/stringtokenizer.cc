@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: stringtokenizer.cc,v 1.7 2004/05/18 16:51:05 dan_karrels Exp $
+ * $Id: stringtokenizer.cc,v 1.8 2005/01/12 03:50:38 dan_karrels Exp $
  */
 
 #include	<iostream>
@@ -27,7 +27,7 @@
 #include	<ctime>
 #include	<cstdlib>
 
-#include	"config.h"
+#include	"gnuworld_config.h"
 
 #ifdef HAVE_GETOPT_H
 #include	<getopt.h>

@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * "$Id: msg_AC.cc,v 1.6 2004/06/14 22:17:56 jeekay Exp $"
+ * "$Id: msg_AC.cc,v 1.7 2005/01/12 03:50:28 dan_karrels Exp $"
  */
 
 #include	<iostream>
@@ -28,9 +28,9 @@
 #include	"Network.h"
 #include	"iClient.h"
 #include	"ELog.h"
-#include	"config.h"
+#include	"gnuworld_config.h"
 
-RCSTAG( "$Id: msg_AC.cc,v 1.6 2004/06/14 22:17:56 jeekay Exp $" ) ;
+RCSTAG( "$Id: msg_AC.cc,v 1.7 2005/01/12 03:50:28 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {

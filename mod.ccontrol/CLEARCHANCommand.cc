@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: CLEARCHANCommand.cc,v 1.23 2005/01/08 23:33:42 dan_karrels Exp $
+ * $Id: CLEARCHANCommand.cc,v 1.24 2005/01/12 03:50:29 dan_karrels Exp $
  */
 
 #include	<string>
@@ -29,9 +29,9 @@
 #include	"StringTokenizer.h"
 #include	"Constants.h"
 #include	"ccBadChannel.h"
-#include	"config.h"
+#include	"gnuworld_config.h"
 
-RCSTAG( "$Id: CLEARCHANCommand.cc,v 1.23 2005/01/08 23:33:42 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: CLEARCHANCommand.cc,v 1.24 2005/01/12 03:50:29 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {

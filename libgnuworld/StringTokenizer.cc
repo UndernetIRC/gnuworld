@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: StringTokenizer.cc,v 1.5 2003/06/17 15:13:53 dan_karrels Exp $
+ * $Id: StringTokenizer.cc,v 1.6 2005/01/12 03:50:27 dan_karrels Exp $
  */
 
 #include	<new>
@@ -27,10 +27,10 @@
 
 #include	<cassert>
 
-#include	"config.h"
+#include	"gnuworld_config.h"
 #include	"StringTokenizer.h"
 
-const char rcsId[] = "$Id: StringTokenizer.cc,v 1.5 2003/06/17 15:13:53 dan_karrels Exp $" ;
+const char rcsId[] = "$Id: StringTokenizer.cc,v 1.6 2005/01/12 03:50:27 dan_karrels Exp $" ;
 
 namespace gnuworld
 {

@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: GLINECommand.cc,v 1.53 2003/08/09 23:15:33 dan_karrels Exp $
+ * $Id: GLINECommand.cc,v 1.54 2005/01/12 03:50:29 dan_karrels Exp $
  */
 
 #include	<string>
@@ -38,9 +38,9 @@
 #include 	"time.h"
 #include	"ccUser.h"
 #include	"Constants.h"
-#include	"config.h"
+#include	"gnuworld_config.h"
 
-RCSTAG( "$Id: GLINECommand.cc,v 1.53 2003/08/09 23:15:33 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: GLINECommand.cc,v 1.54 2005/01/12 03:50:29 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {

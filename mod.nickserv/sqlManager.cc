@@ -22,7 +22,7 @@
 
 #include <cassert>
 
-#include "config.h"
+#include "gnuworld_config.h"
 #include "ELog.h"
 #include "sqlManager.h"
 

@@ -22,7 +22,7 @@
 
 #include <cstdarg>
 
-#include "config.h"
+#include "gnuworld_config.h"
 #include "Network.h"
 #include "StringTokenizer.h"
 
@@ -604,6 +604,8 @@ for( vector<string>::iterator itr = jupeQueue.begin();
       "+ikd",
       string(),
       0,
+      string(),
+      string(),
       "Juped Nick",
       ::time( 0 )
     );

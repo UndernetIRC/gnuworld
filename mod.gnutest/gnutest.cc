@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: gnutest.cc,v 1.23 2005/01/09 20:34:48 dan_karrels Exp $
+ * $Id: gnutest.cc,v 1.24 2005/01/12 03:50:33 dan_karrels Exp $
  */
 
 #include	<string>
@@ -30,7 +30,7 @@
 #include	"EConfig.h"
 #include	"Network.h"
 
-RCSTAG("$Id: gnutest.cc,v 1.23 2005/01/09 20:34:48 dan_karrels Exp $");
+RCSTAG("$Id: gnutest.cc,v 1.24 2005/01/12 03:50:33 dan_karrels Exp $");
 
 namespace gnuworld
 {
@@ -791,6 +791,8 @@ iClient* newClient = new (std::nothrow) iClient(
 	"+i", // mode
 	string(), // account
 	0, // account_ts
+	string(), // sethost
+	string(), // fakehost
 	"test spawn client, moo", // description
 	31337 // connect time
 	) ;

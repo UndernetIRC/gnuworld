@@ -20,7 +20,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ADDUSERCommand.cc,v 1.19 2005/01/08 23:33:42 dan_karrels Exp $
+ * $Id: ADDUSERCommand.cc,v 1.20 2005/01/12 03:50:28 dan_karrels Exp $
  */
 
 #include	<string>
@@ -32,9 +32,9 @@
 #include	"misc.h"
 #include	"commLevels.h"
 #include	"Constants.h"
-#include	"config.h"
+#include	"gnuworld_config.h"
 
-RCSTAG( "$Id: ADDUSERCommand.cc,v 1.19 2005/01/08 23:33:42 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: ADDUSERCommand.cc,v 1.20 2005/01/12 03:50:28 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {

@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: SGLINECommand.cc,v 1.10 2004/03/26 14:24:37 mrbean_ Exp $
+ * $Id: SGLINECommand.cc,v 1.11 2005/01/12 03:50:29 dan_karrels Exp $
  */
 
 #include	<string>
@@ -34,9 +34,9 @@
 #include	"ip.h"
 #include	"ELog.h"
 #include	"Constants.h"
-#include	"config.h"
+#include	"gnuworld_config.h"
 
-RCSTAG( "$Id: SGLINECommand.cc,v 1.10 2004/03/26 14:24:37 mrbean_ Exp $" ) ;
+RCSTAG( "$Id: SGLINECommand.cc,v 1.11 2005/01/12 03:50:29 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {

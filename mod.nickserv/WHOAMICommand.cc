@@ -19,7 +19,7 @@
 
 #include	<sstream>
 
-#include	"config.h"
+#include	"gnuworld_config.h"
 #include	"nickserv.h"
 
 using std::stringstream ;

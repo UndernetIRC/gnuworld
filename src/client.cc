@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: client.cc,v 1.74 2005/01/09 20:34:49 dan_karrels Exp $
+ * $Id: client.cc,v 1.75 2005/01/12 03:50:38 dan_karrels Exp $
  */
 
 #include	<new>
@@ -34,7 +34,7 @@
 #include	<cstring>
 #include	<cstdlib>
 
-#include	"config.h"
+#include	"gnuworld_config.h"
 #include	"misc.h"
 #include	"iClient.h"
 #include	"iServer.h"
@@ -47,7 +47,7 @@
 #include	"ELog.h"
 #include	"events.h"
 
-RCSTAG("$Id: client.cc,v 1.74 2005/01/09 20:34:49 dan_karrels Exp $" ) ;
+RCSTAG("$Id: client.cc,v 1.75 2005/01/12 03:50:38 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {

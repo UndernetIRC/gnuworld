@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: Network.cc,v 1.65 2004/02/13 17:24:41 jeekay Exp $
+ * $Id: Network.cc,v 1.66 2005/01/12 03:50:37 dan_karrels Exp $
  */
 
 #include	<new>
@@ -43,9 +43,9 @@
 #include	"match.h"
 #include	"StringTokenizer.h"
 #include	"ip.h"
-#include	"config.h"
+#include	"gnuworld_config.h"
 
-RCSTAG( "$Id: Network.cc,v 1.65 2004/02/13 17:24:41 jeekay Exp $" ) ;
+RCSTAG( "$Id: Network.cc,v 1.66 2005/01/12 03:50:37 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {

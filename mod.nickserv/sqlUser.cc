@@ -22,7 +22,7 @@
 #include <ctime>
 #include <sstream>
 
-#include "config.h"
+#include "gnuworld_config.h"
 #include "sqlManager.h"
 #include "sqlUser.h"
 

@@ -20,7 +20,7 @@
  * It is used as a quick reference to logged in users and for checking warnings
  */
 
-#include "config.h"
+#include "gnuworld_config.h"
 #include "netData.h"
 
 namespace gnuworld

@@ -360,7 +360,7 @@ EXTRA_DIST = bin/ccontrol.example.conf.in \
 	include/TimerHandler.h \
 	include/UnloadClientTimerHandler.h \
 	include/client.h \
-	include/config.h \
+	include/gnuworld_config.h \
 	include/events.h \
 	include/iClient.h \
 	include/iServer.h \

@@ -20,7 +20,7 @@
 #include <cstdarg>
 #include <cstdio>
 
-#include "config.h"
+#include "gnuworld_config.h"
 #include "Logger.h"
 
 namespace gnuworld {

@@ -19,7 +19,7 @@
  * Allow an administrator to alter the level of another user
  */
 
-#include "config.h"
+#include "gnuworld_config.h"
 #include "StringTokenizer.h"
 
 #include "levels.h"

@@ -19,7 +19,7 @@
  * Checks to see whether a channel has all ops in it.
  */
 
-#include "config.h"
+#include "gnuworld_config.h"
 #include "dronescan.h"
 #include "dronescanTests.h"
 

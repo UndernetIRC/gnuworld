@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: LASTCOMCommand.cc,v 1.15 2003/08/09 23:15:33 dan_karrels Exp $
+ * $Id: LASTCOMCommand.cc,v 1.16 2005/01/12 03:50:29 dan_karrels Exp $
  */
 
 #include	<sstream>
@@ -33,9 +33,9 @@
 #include	"iClient.h"
 #include	"StringTokenizer.h"
 #include	"ELog.h"
-#include	"config.h"
+#include	"gnuworld_config.h"
 
-RCSTAG( "$Id: LASTCOMCommand.cc,v 1.15 2003/08/09 23:15:33 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: LASTCOMCommand.cc,v 1.16 2005/01/12 03:50:29 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {

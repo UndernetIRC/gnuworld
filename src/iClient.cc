@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: iClient.cc,v 1.34 2004/06/14 22:17:58 jeekay Exp $
+ * $Id: iClient.cc,v 1.35 2005/01/12 03:50:38 dan_karrels Exp $
  */
 
 #include	<new>
@@ -32,9 +32,9 @@
 #include	"iClient.h"
 #include	"client.h"
 #include	"ip.h"
-#include	"config.h"
+#include	"gnuworld_config.h"
 
-RCSTAG( "$Id: iClient.cc,v 1.34 2004/06/14 22:17:58 jeekay Exp $" ) ;
+RCSTAG( "$Id: iClient.cc,v 1.35 2005/01/12 03:50:38 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -55,7 +55,7 @@ const iClient::modeType iClient::MODE_FAKE        = 0x0200 ;
 
 string iClient::hiddenHostSuffix( "we.all.worship.mrbean.org" ) ;
 
-iClient::iClient( const unsigned int& _uplink,
+iClient::iClient( const unsigned int& /* _uplink */,
 	const string& _yyxxx,
 	const string& _nickName,
 	const string& _userName,
@@ -79,7 +79,48 @@ iClient::iClient( const unsigned int& _uplink,
 	account( _account ),
 	account_ts( _account_ts )
 {
-(void) _uplink ;
+setModes( _mode ) ;
+customDataMap = 0 ;
+}
+
+iClient::iClient( const unsigned int& /* _uplink */,
+	const string& _yyxxx,
+	const string& _nickName,
+	const string& _userName,
+	const string& _hostBase64,
+	const string& _insecureHost,
+	const string& _realInsecureHost,
+	const string& _mode,
+	const string& _account,
+	const time_t _account_ts,
+	const string& _setHost,
+	const string& _fakeHost,
+	const string& _description,
+	const time_t& _connectTime )
+: NetworkTarget( _yyxxx ),
+	nickName( _nickName ),
+	userName( _userName ),
+	IP( xIP( _hostBase64, true ).GetLongIP() ),
+	insecureHost( _insecureHost ),
+	realInsecureHost( _realInsecureHost ),
+	description( _description),
+	connectTime( _connectTime ),
+	mode( 0 ),
+	account( _account ),
+	account_ts( _account_ts ),
+#ifdef ASUKA
+	setHost( _setHost ),
+#endif
+#ifdef SRVX
+	fakeHost( _fakeHost )
+#endif
+{
+#ifndef ASUKA
+  (void) _setHost ;
+#endif
+#ifndef SRVX
+  (void) _fakeHost ;
+#endif
 setModes( _mode ) ;
 customDataMap = 0 ;
 }

@@ -27,7 +27,7 @@
 
 #include "libpq++.h"
 
-#include "config.h"
+#include "gnuworld_config.h"
 #include "EConfig.h"
 #include "Network.h"
 #include "server.h"
