@@ -17,11 +17,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: config.h,v 1.20 2003/06/17 15:13:52 dan_karrels Exp $
+ * $Id: config.h,v 1.21 2003/06/19 23:38:32 dan_karrels Exp $
  */
 
 #ifndef __CONFIG_H
-#define __CONFIG_H "$Id: config.h,v 1.20 2003/06/17 15:13:52 dan_karrels Exp $"
+#define __CONFIG_H "$Id: config.h,v 1.21 2003/06/19 23:38:32 dan_karrels Exp $"
 
 /* config.h */
 /* GNUWorld main configuration file */
@@ -106,7 +106,7 @@
 #undef TOPIC_TRACK
 
 #ifndef RCSTAG
-#define RCSTAG(tag) static const char rcsid[] __attribute__((unused)) = tag
+#define RCSTAG(tag) static const char rcsId[] = tag
 #endif
 
 #endif /* __CONFIG_H */
