@@ -43,7 +43,7 @@
 #include	"moduleLoader.h"
 
 const char xServer_h_rcsId[] = __XSERVER_H ;
-const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.54 2001/01/28 15:49:05 dan_karrels Exp $" ;
+const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.55 2001/01/28 16:01:01 dan_karrels Exp $" ;
 
 using std::string ;
 using std::vector ;
@@ -3858,6 +3858,7 @@ for( const char* modePtr = Param[ 2 ] ; *modePtr ; ++modePtr )
 				theClient->removeMode( iClient::MODE_WALLOPS ) ;
 			break ;
 		case 'o':
+		case 'O':
 			if( plus )
 				{
 				theClient->addMode( iClient::MODE_OPER ) ;
