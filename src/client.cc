@@ -1,6 +1,6 @@
 /*
  * client.cc
- * $Id: client.cc,v 1.46 2002/10/31 18:52:52 dan_karrels Exp $
+ * $Id: client.cc,v 1.47 2002/11/26 03:09:44 jeekay Exp $
  */
 
 #include	<new>
@@ -30,7 +30,7 @@
 #include	"events.h"
 
 const char xClient_h_rcsId[] = __CLIENT_H ;
-const char xClient_cc_rcsId[] = "$Id: client.cc,v 1.46 2002/10/31 18:52:52 dan_karrels Exp $" ;
+const char xClient_cc_rcsId[] = "$Id: client.cc,v 1.47 2002/11/26 03:09:44 jeekay Exp $" ;
 const char config_h_rcsId[] = __CONFIG_H ;
 const char misc_h_rcsId[] = __MISC_H ;
 const char Numeric_h_rcsId[] = __NUMERIC_H ;
@@ -1795,31 +1795,14 @@ return Part( theChan->getName() ) ;
 
 bool xClient::Invite( iClient* theClient, const string& chanName )
 {
-assert( theClient != NULL ) ;
+// No need for this assert as we dont use theClient and its tested in
+// Invite(iClient*,Channel*)
+//assert( theClient != NULL ) ;
 
 Channel* theChan = Network->findChannel( chanName ) ;
-if( NULL == theChan )
-	{
-	return false ;
-	}
+if( 0 == theChan )	return false ;
 
-bool OnChannel = isOnChannel( theChan ) ;
-if( !OnChannel )
-	{
-	Join( theChan ) ;
-	}
-
-Write( "%s I %s %s",
-	getCharYYXXX().c_str(),
-	theClient->getNickName().c_str(),
-	theChan->getName().c_str() ) ;
-
-if( !OnChannel )
-	{
-	Part( theChan ) ;
-	}
-
-return true ;
+return Invite(theClient, theChan);
 }
 
 bool xClient::Invite( iClient* theClient, Channel* theChan )
@@ -1828,33 +1811,32 @@ assert( theClient != 0 ) ;
 assert( theChan != 0 ) ;
 
 bool OnChannel = isOnChannel( theChan ) ;
-if( !OnChannel )
-	{
-	Join( theChan ) ;
-	}
+if( !OnChannel ) Join( theChan ) ;
 
 Write( "%s I %s %s",
 	getCharYYXXX().c_str(),
 	theClient->getNickName().c_str(),
 	theChan->getName().c_str() ) ;
 
-if( !OnChannel )
-	{
-	Part( theChan ) ;
-	}
+if( !OnChannel ) Part( theChan ) ;
 
 return true ; 
 }
 
 bool xClient::isOnChannel( const string& chanName ) const
 {
-return false ;
+Channel* theChannel = Network->findChannel(chanName);
+
+return isOnChannel(theChannel) ;
 }
 
 bool xClient::isOnChannel( const Channel* theChan ) const
 {
 assert( theChan != NULL ) ;
-return isOnChannel( theChan->getName() ) ;
+
+ChannelUser* meUser = theChan->findUser( me ) ;
+
+return (meUser) ? true : false ;
 }
 
 int xClient::Write( const char* format, ... )
