@@ -7,7 +7,7 @@
 #include	"cservice.h" 
 #include 	"responses.h"
 
-const char MOTDCommand_cc_rcsId[] = "$Id: MOTDCommand.cc,v 1.4 2001/02/21 00:14:43 dan_karrels Exp $" ;
+const char MOTDCommand_cc_rcsId[] = "$Id: MOTDCommand.cc,v 1.5 2001/03/08 23:49:01 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -23,7 +23,7 @@ if( st.size() != 1 )
 	return true;
 	}
 
-bot->Notice(theClient, "There is no motd (or spoon for that matter)");
+bot->Notice(theClient, "How are you gentlemen! All your base are belong to us.");
          
 return true ;
 } 

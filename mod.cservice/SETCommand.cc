@@ -14,7 +14,7 @@
  *
  * Caveats: None.
  *
- * $Id: SETCommand.cc,v 1.30 2001/03/07 23:22:11 dan_karrels Exp $
+ * $Id: SETCommand.cc,v 1.31 2001/03/08 23:49:01 gte Exp $
  */
 
 #include	<string>
@@ -25,7 +25,7 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char SETCommand_cc_rcsId[] = "$Id: SETCommand.cc,v 1.30 2001/03/07 23:22:11 dan_karrels Exp $" ;
+const char SETCommand_cc_rcsId[] = "$Id: SETCommand.cc,v 1.31 2001/03/08 23:49:01 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -91,6 +91,8 @@ if( st[1][0] != '#' ) // Didn't find a hash?
 		}
 	if (option == "LANG")
 		{
+		bot->Notice(theClient, "Option temporarily disabled, back soon.");
+		return true;
 		if (value == "EN")
 			{
 			string lang = "English";
