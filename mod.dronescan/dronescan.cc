@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: dronescan.cc,v 1.31 2003/08/10 12:26:39 jeekay Exp $
+ * $Id: dronescan.cc,v 1.32 2003/08/12 18:17:11 dan_karrels Exp $
  */
 
 #include	<string>
@@ -39,7 +39,7 @@
 #include "sqlUser.h"
 #include "Timer.h"
 
-RCSTAG("$Id: dronescan.cc,v 1.31 2003/08/10 12:26:39 jeekay Exp $");
+RCSTAG("$Id: dronescan.cc,v 1.32 2003/08/12 18:17:11 dan_karrels Exp $");
 
 namespace gnuworld {
 
@@ -368,7 +368,7 @@ void dronescan::OnPrivateMessage( iClient* theClient,
 	sqlUser *theUser = getSqlUser(theClient->getAccount());
 
 	if(!theUser) return ;
-	
+
 	/* We have now seen this user! */
 	theUser->setLastSeen(::time(0));
 	theUser->commit();
@@ -385,7 +385,7 @@ void dronescan::OnPrivateMessage( iClient* theClient,
 		commandHandler->second->Exec(theClient, Message, theUser);
 		return ;
 		}
-		
+	
 	if("INVITE" == Command)
 		{
 		Invite(theClient, consoleChannel);

@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_GL.cc,v 1.5 2003/06/17 15:13:53 dan_karrels Exp $
+ * $Id: msg_GL.cc,v 1.6 2003/08/12 18:17:11 dan_karrels Exp $
  */
 
 #include	<new>
@@ -33,7 +33,7 @@
 #include	"ServerCommandHandler.h"
 #include	"config.h"
 
-RCSTAG( "$Id: msg_GL.cc,v 1.5 2003/06/17 15:13:53 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: msg_GL.cc,v 1.6 2003/08/12 18:17:11 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -62,7 +62,7 @@ if( '-' == Params[ 2 ][ 0 ] )
 
 	xServer::glineIterator gItr = theServer->findGlineIterator(
 		Params[ 2 ] + 1 ) ;
-	if( gItr == theServer->gline_end() )
+	if( gItr == theServer->glines_end() )
 		{
 		// Unable to find the gline to be removed *shrug*
 		return true ;
@@ -98,7 +98,7 @@ assert( newGline != 0 ) ;
 {
 	xServer::glineIterator gItr = theServer->findGlineIterator(
 		newGline->getUserHost() ) ;
-	if( gItr != theServer->gline_end() )
+	if( gItr != theServer->glines_end() )
 		{
 		// This gline is already present
 		delete gItr->second ;

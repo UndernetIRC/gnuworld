@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server.h,v 1.90 2003/08/09 23:15:33 dan_karrels Exp $
+ * $Id: server.h,v 1.91 2003/08/12 18:17:11 dan_karrels Exp $
  */
 
 #ifndef __SERVER_H
-#define __SERVER_H "$Id: server.h,v 1.90 2003/08/09 23:15:33 dan_karrels Exp $"
+#define __SERVER_H "$Id: server.h,v 1.91 2003/08/12 18:17:11 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
@@ -137,26 +137,26 @@ public:
 	 * Return a const iterator to the beginning of the gline
 	 * structure.
 	 */
-	inline const_glineIterator gline_begin() const
+	inline const_glineIterator glines_begin() const
 		{ return glineList.begin() ; }
 
 	/**
 	 * Return a const iterator to the end of the gline
 	 * structure.
 	 */
-	inline const_glineIterator gline_end() const
+	inline const_glineIterator glines_end() const
 		{ return glineList.end() ; }
 
 	/**
 	 * Return an iterator to the beginning of the gline structure.
 	 */
-	inline glineIterator	gline_begin()
+	inline glineIterator	glines_begin()
 		{ return glineList.begin() ; }
 
 	/**
 	 * Return an iterator to the end of the gline structure.
 	 */
-	inline glineIterator	gline_end()
+	inline glineIterator	glines_end()
 		{ return glineList.end() ; }
 
 	/**

@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server.cc,v 1.176 2003/08/09 23:15:36 dan_karrels Exp $
+ * $Id: server.cc,v 1.177 2003/08/12 18:17:12 dan_karrels Exp $
  */
 
 #include	<sys/time.h>
@@ -71,7 +71,7 @@
 #include	"ConnectionHandler.h"
 #include	"Connection.h"
 
-RCSTAG( "$Id: server.cc,v 1.176 2003/08/09 23:15:36 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: server.cc,v 1.177 2003/08/12 18:17:12 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -1909,7 +1909,7 @@ bool foundGline = false ;
 
 // Perform a search for the gline
 glineIterator gItr = findGlineIterator( userHost ) ;
-if( gItr != gline_end() )
+if( gItr != glines_end() )
 	{
 	foundGline = true ;
 	}
@@ -1965,7 +1965,7 @@ bool xServer::setGline(
 // Remove any old matches
 {
 	xServer::glineIterator gItr = findGlineIterator( userHost ) ;
-	if( gItr != gline_end() )
+	if( gItr != glines_end() )
 		{
 		// This gline is already present
 		delete gItr->second ;
@@ -2011,8 +2011,8 @@ vector< const Gline* > xServer::matchGline( const string& userHost ) const
 {
 vector< const Gline* > retMe ;
 
-for( const_glineIterator ptr = gline_begin() ;
-	ptr != gline_end() ; ++ptr )
+for( const_glineIterator ptr = glines_begin() ;
+	ptr != glines_end() ; ++ptr )
 	{
 	if( !match( ptr->second->getUserHost(), userHost ) )
 		{
@@ -2050,8 +2050,8 @@ void xServer::sendGlinesToNetwork()
 {
 time_t now = ::time( 0 ) ;
 
-for( const_glineIterator ptr = gline_begin() ;
-	ptr != gline_end() ; ++ptr )
+for( const_glineIterator ptr = glines_begin() ;
+	ptr != glines_end() ; ++ptr )
 	{
 	stringstream s ;
 	s	<< getCharYY() << " GL * +"
@@ -2066,7 +2066,8 @@ for( const_glineIterator ptr = gline_begin() ;
 
 void xServer::removeMatchingGlines( const string& wildHost )
 {
-for( glineIterator ptr = gline_begin() ; ptr != gline_end() ; ++ptr )
+for( glineIterator ptr = glines_begin() ; ptr != glines_end() ;
+	++ptr )
 	{
 	// TODO: Does this work with two wildHost's?
 	if( !match( wildHost, ptr->second->getUserHost() ) )
@@ -3398,8 +3399,8 @@ void xServer::updateGlines()
 {
 time_t now = ::time( 0 ) ;
 
-glineIterator	ptr = gline_begin(),
-		end = gline_end() ;
+glineIterator	ptr = glines_begin(),
+		end = glines_end() ;
 for( ; ptr != end ; ++ptr )
 	{
 	if( ptr->second->getExpiration() <= now )
@@ -3878,10 +3879,11 @@ elog	<< "xServer::doShutdown> Removed "
 
 count = 0 ;
 // Clear the channels
-while( Network->clients_begin() != Network->clients_end() )
+for( xNetwork::clientIterator cItr = Network->clients_begin() ;
+	cItr != Network->clients_end() ; ++cItr )
 	{
 	++count ;
-	iClient* theClient = Network->clients_begin()->second ;
+	iClient* theClient = cItr->second ;
 	delete Network->removeClient( theClient ) ;
 	}
 elog	<< "xServer::doShutdown> Removed "
@@ -3893,10 +3895,11 @@ elog	<< "xServer::doShutdown> Removed "
 //	<< endl ;
 
 count = 0 ;
-while( Network->channels_begin() != Network->channels_end() )
+for( xNetwork::channelIterator cItr = Network->channels_begin() ;
+	cItr != Network->channels_end() ; ++cItr )
 	{
 	++count ;
-	Channel* theChan = Network->channels_begin()->second ;
+	Channel* theChan = cItr->second ;
 
 	elog	<< "xServer::doShutdown> Found channel: "
 		<< *theChan
@@ -3911,10 +3914,11 @@ elog	<< "xServer::doShutdown> Removed "
 
 // Remove servers
 count = 0 ;
-while( Network->servers_begin() != Network->servers_end() )
+for( xNetwork::serverIterator sItr = Network->servers_begin() ;
+	sItr != Network->servers_end() ; ++sItr )
 	{
 	++count ;
-	iServer* tmpServer = Network->servers_begin()->second ;
+	iServer* tmpServer = sItr->second ;
 	delete Network->removeServer( tmpServer->getIntYY() ) ;
 	}
 
@@ -3928,11 +3932,12 @@ elog	<< "xServer::doShutdown> Removing "
 
 count = 0 ;
 // Remove glines
-while( gline_begin() != gline_end() )
+for( glineIterator gItr = glines_begin() ; gItr != glines_end() ; 
+	++gItr )
 	{
 	++count ;
-	delete gline_begin()->second ;
-	eraseGline( gline_begin() ) ;
+	delete gItr->second ;
+	eraseGline( gItr ) ;
 	}
 elog	<< "xServer::doShutdown> Removed "
 	<< count
