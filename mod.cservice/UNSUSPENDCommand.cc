@@ -8,7 +8,7 @@
  *
  * Caveats: None.
  *
- * $Id: UNSUSPENDCommand.cc,v 1.11 2001/05/20 00:00:50 gte Exp $
+ * $Id: UNSUSPENDCommand.cc,v 1.12 2001/07/07 22:51:25 gte Exp $
  */
 
 #include	<string>
@@ -20,7 +20,7 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char UNSUSPENDCommand_cc_rcsId[] = "$Id: UNSUSPENDCommand.cc,v 1.11 2001/05/20 00:00:50 gte Exp $" ;
+const char UNSUSPENDCommand_cc_rcsId[] = "$Id: UNSUSPENDCommand.cc,v 1.12 2001/07/07 22:51:25 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -78,11 +78,24 @@ if (st[1][0] != '#')
 		return true;
 		}
 
-	// Suspend them.
+	if (!targetUser->getFlag(sqlUser::F_GLOBAL_SUSPEND)) 
+	{
+		bot->Notice(theClient, "%s isn't suspended.", targetUser->getUserName().c_str());
+		return true;
+	}
+
+	// Unsuspend them.
 	targetUser->removeFlag(sqlUser::F_GLOBAL_SUSPEND);
 	targetUser->commit();
 	bot->Notice(theClient, "%s has been unsuspended.",
 		targetUser->getUserName().c_str());
+
+	targetUser->writeEvent(sqlUser::EV_UNSUSPEND, theUser, "");
+
+	bot->logAdminMessage("%s (%s) has unsuspended %s's user account.",
+	theClient->getNickName().c_str(), theUser->getUserName().c_str(),
+	targetUser->getUserName().c_str()); 
+
 	return true;
 }
 
@@ -96,6 +109,7 @@ if( st.size() < 3 )
 // Is the channel registered?
 
 sqlChannel* theChan = bot->getChannelRecord(st[1]);
+
 if(!theChan)
 	{
 	bot->Notice(theClient, 

@@ -1,7 +1,7 @@
 /* sqlUser.h */
 
 #ifndef __SQLUSER_H
-#define __SQLUSER_H "$Id: sqlUser.h,v 1.16 2001/06/24 13:59:06 gte Exp $"
+#define __SQLUSER_H "$Id: sqlUser.h,v 1.17 2001/07/07 22:51:25 gte Exp $"
 
 #include	<string>
 #include	<ctime>
@@ -32,6 +32,7 @@ public:
 	 */
 
 	static const unsigned short	EV_SUSPEND     = 1 ;
+	static const unsigned short	EV_UNSUSPEND   = 2 ;
 
 	/*
 	 *  Methods to get data atrributes.
@@ -104,9 +105,9 @@ public:
 	bool loadData( int );
 	bool loadData( const string& );
 	void setAllMembers( int );
-	iClient*	networkClient;
-	void writeEvent( unsigned short, const string& );
-	const string getLastEvent( unsigned short );
+	iClient*	networkClient; 
+	void writeEvent( unsigned short, sqlUser*, const string& );
+	const string getLastEvent( unsigned short, unsigned int&);
  
 protected: 
 

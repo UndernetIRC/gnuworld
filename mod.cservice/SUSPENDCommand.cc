@@ -12,7 +12,7 @@
  * TODO: /msg x suspend #channel *, suspends all users below your access
  * level.
  *
- * $Id: SUSPENDCommand.cc,v 1.16 2001/06/24 13:59:06 gte Exp $
+ * $Id: SUSPENDCommand.cc,v 1.17 2001/07/07 22:51:25 gte Exp $
  */
 
 #include	<string>
@@ -26,7 +26,7 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char SUSPENDCommand_cc_rcsId[] = "$Id: SUSPENDCommand.cc,v 1.16 2001/06/24 13:59:06 gte Exp $" ;
+const char SUSPENDCommand_cc_rcsId[] = "$Id: SUSPENDCommand.cc,v 1.17 2001/07/07 22:51:25 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -92,7 +92,14 @@ if (st[1][0] != '#')
 			string("Cannot suspend a user with equal or higher access than your own.")));
 	return false; 
 	}
- 
+
+	if (targetUser->getFlag(sqlUser::F_GLOBAL_SUSPEND)) 
+	{
+		bot->Notice(theClient, "%s is already suspended, you could always try execution?",
+			targetUser->getUserName().c_str());
+		return true;
+	}
+
 	// Suspend them.
 	targetUser->setFlag(sqlUser::F_GLOBAL_SUSPEND);
 	targetUser->commit();
@@ -100,7 +107,11 @@ if (st[1][0] != '#')
 		" channels until unsuspended.",
 		targetUser->getUserName().c_str());
  
-	targetUser->writeEvent(sqlUser::EV_SUSPEND, st.assemble(2));
+	targetUser->writeEvent(sqlUser::EV_SUSPEND, theUser, st.assemble(2));
+
+	bot->logAdminMessage("%s (%s) has globally suspended %s's user account.",
+		theClient->getNickName().c_str(), theUser->getUserName().c_str(),
+		targetUser->getUserName().c_str());
 
 	return true;
 }

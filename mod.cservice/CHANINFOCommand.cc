@@ -13,7 +13,7 @@
  *
  * Command is aliased "INFO".
  *
- * $Id: CHANINFOCommand.cc,v 1.24 2001/06/24 13:59:06 gte Exp $
+ * $Id: CHANINFOCommand.cc,v 1.25 2001/07/07 22:51:25 gte Exp $
  */
 
 #include	<string>
@@ -26,7 +26,7 @@
 #include	"libpq++.h"
 #include	"cservice_config.h"
  
-const char CHANINFOCommand_cc_rcsId[] = "$Id: CHANINFOCommand.cc,v 1.24 2001/06/24 13:59:06 gte Exp $" ;
+const char CHANINFOCommand_cc_rcsId[] = "$Id: CHANINFOCommand.cc,v 1.25 2001/07/07 22:51:25 gte Exp $" ;
  
 namespace gnuworld
 {
@@ -121,11 +121,7 @@ if( string::npos == st[ 1 ].find_first_of( '#' ) )
 
 	if (theUser->getFlag(sqlUser::F_GLOBAL_SUSPEND))
 		{
-		bot->Notice(theClient, "\002This account has been suspended by a CService Administrator\002"); 
-		/*
-		 * Perform a lookup to get the last SUSPEND event from the userlog.
-		 */
-		bot->Notice(theClient, "Reason: %s", theUser->getLastEvent(sqlUser::EV_SUSPEND).c_str());
+		bot->Notice(theClient, "\002** This account has been suspended by a CService Administrator **\002");
 		}
 
 	/*
@@ -136,6 +132,37 @@ if( string::npos == st[ 1 ].find_first_of( '#' ) )
 	if( ((tmpUser) && bot->getAdminAccessLevel(tmpUser)) ||
 		(tmpUser == theUser) )
 		{
+			
+		/*
+		 * But first..
+		 * Show admins some more details about the user.
+		 */
+
+		if (theUser->getFlag(sqlUser::F_GLOBAL_SUSPEND))
+			{ 
+			/*
+			 * Perform a lookup to get the last SUSPEND event from the userlog.
+			 */
+			unsigned int theTime;
+			string reason = theUser->getLastEvent(sqlUser::EV_SUSPEND, theTime);
+			
+			bot->Notice(theClient, "Account suspended %s ago, Reason: %s", bot->prettyDuration(theTime).c_str(),
+				reason.c_str());
+			} else 
+			{
+			/*
+			 *  Maybe they where unsuspended recently..
+			 */
+
+			unsigned int theTime;
+			string reason = theUser->getLastEvent(sqlUser::EV_UNSUSPEND, theTime);
+			if (!reason.empty())
+				{ 
+				bot->Notice(theClient, "Account was unsuspended %s ago%s", bot->prettyDuration(theTime).c_str(),
+					reason.c_str()); 
+				}
+			}
+ 
 		strstream channelsQuery;
 		string channelList ;
 	

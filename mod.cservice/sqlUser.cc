@@ -4,7 +4,7 @@
  * Storage class for accessing user information either from the backend
  * or internal storage.
  * 
- * $Id: sqlUser.cc,v 1.18 2001/06/24 13:59:06 gte Exp $
+ * $Id: sqlUser.cc,v 1.19 2001/07/07 22:51:25 gte Exp $
  */
  
 #include	<strstream.h>
@@ -281,38 +281,43 @@ return (false);
 }
 
 
-void sqlUser::writeEvent(unsigned short eventType, const string& theMessage)
-{
+void sqlUser::writeEvent(unsigned short eventType, sqlUser* theUser, const string& theMessage)
+{ 
+string userExtra = theUser ? theUser->getUserName() : "Not Logged In";
 
 strstream theLog;
 theLog	<< "INSERT INTO userlog (ts, user_id, event, message, "
 	<< "last_updated) VALUES "
-	<< "(now()::abstime::int4, " 
+	<< "("
+	<< "now()::abstime::int4"
+	<< ", "
 	<< id
 	<< ", "
 	<< eventType
-	<< ", '"
+	<< ", "
+ 	<< "'" 
 	<< escapeSQLChars(theMessage)
-	<< "', now()::abstime::int4)"
+	<< " (By " << userExtra << ")"
+	<< "', now()::abstime::int4)" 
 	<< ends;
 
 #ifdef LOG_SQL
-	elog	<< "sqlUser::writeLog> "
+	elog	<< "sqlUser::writeEvent> "
 		<< theLog.str()
 		<< endl;
 #endif
-
+ 
 SQLDb->ExecCommandOk(theLog.str());
 
 delete[] theLog.str();
 
 }
 
-const string sqlUser::getLastEvent(unsigned short eventType)
+const string sqlUser::getLastEvent(unsigned short eventType, unsigned int& eventTime)
 {
 strstream queryString;
 
-queryString	<< "SELECT message" 
+queryString	<< "SELECT message,ts" 
 			<< " FROM userlog WHERE user_id = "
 			<< id 
 			<< " ORDER BY ts DESC LIMIT 1"
@@ -336,6 +341,7 @@ if( PGRES_TUPLES_OK == status )
 		} 
 
 	string reason = SQLDb->GetValue(0, 0);
+	eventTime = atoi(SQLDb->GetValue(0, 1));
 
 	return (reason);
 	} 
