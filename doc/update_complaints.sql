@@ -1,7 +1,7 @@
 --
--- $Id: update_complaints.sql,v 1.1 2003/07/19 01:12:53 nighty Exp $
+-- $Id: update_complaints.sql,v 1.2 2003/10/20 02:26:50 nighty Exp $
 --
--- This goes to remote DB ... eg: 
+-- This goes to remote DB if you have an older database schema... eg:
 --	/usr/local/pgsql/bin/psql cservice < update_complaints.sql
 --
 
@@ -40,7 +40,7 @@ CREATE TABLE complaints_threads (
 	in_reply_to int4 NOT NULL,
 	PRIMARY KEY (id)
 );
-	
+
 
 CREATE TABLE complaint_types (
 	-- not used for now...

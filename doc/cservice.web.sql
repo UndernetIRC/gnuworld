@@ -1,11 +1,11 @@
 ------------------------------------------------------------------------------------
--- "$Id: cservice.web.sql,v 1.30 2003/04/28 04:05:28 nighty Exp $"
+-- "$Id: cservice.web.sql,v 1.31 2003/10/20 02:26:50 nighty Exp $"
 -- Channel service DB SQL file for PostgreSQL.
 --
--- Tables specific to webbased registration process.
+-- Tables specific to website
 --
 -- Perry Lorier <perry@coders.net>
--- nighty <nighty@undernet.org> - Corrected tables and added missing fields
+-- nighty <nighty@undernet.org>
 
 
 
@@ -14,7 +14,7 @@ CREATE TABLE acl (
 	user_id INT4 NOT NULL,
 	isstaff INT2 NOT NULL,
 	flags INT4 DEFAULT '0' NOT NULL,
--- 0x0001 - ACL_XCHGMGR_REVIEW	
+-- 0x0001 - ACL_XCHGMGR_REVIEW
 -- 0x0002 - ACL_XCHGMGR_ADMIN
 -- 0x0004 - ACL_XMAILCH_REVIEW
 -- 0x0008 - ACL_XMAILCH_ADMIN
@@ -34,7 +34,7 @@ CREATE TABLE acl (
 	suspend_by INT4 DEFAULT '0' NOT NULL,
 	deleted INT2 DEFAULT '0' NOT NULL
 );
-	
+
 
 CREATE TABLE fraud_lists (
 	id SERIAL,
@@ -159,8 +159,8 @@ CREATE INDEX pending_emailchanges_cookie_idx ON pending_emailchanges(cookie);
 CREATE INDEX pending_emailchanges_user_id_idx ON pending_emailchanges(user_id);
 CREATE INDEX pending_emailchanges_expiration_idx ON pending_emailchanges(expiration);
 
--- This table stores the timestamp of the last request 
--- from a particular IP. 
+-- This table stores the timestamp of the last request
+-- from a particular IP.
 -- Used to block abuse, such as requesting a password 50,000
 -- times a minute.
 
@@ -171,18 +171,18 @@ CREATE TABLE lastrequests (
 
 CREATE INDEX lastrequests_ip_idx ON lastrequests(ip);
 
- -- list of admins that have the ability to modify NOREG entries (other admins may only list them) 
+ -- list of admins that have the ability to modify NOREG entries (other admins may only list them)
 
---CREATE TABLE webaccessteam ( 
+--CREATE TABLE webaccessteam (
 --	admin_id int4 REFERENCES users(id) NOT NULL,
 --	level INT4 NOT NULL DEFAULT '0'
 --);
- 
+
 -- recorded objections for channels.
-CREATE TABLE objections ( 
-	channel_id int4 REFERENCES channels(id) NOT NULL, 
-	user_id int4 REFERENCES users(id) NOT NULL, 
-	comment text NOT NULL, 
+CREATE TABLE objections (
+	channel_id int4 REFERENCES channels(id) NOT NULL,
+	user_id int4 REFERENCES users(id) NOT NULL,
+	comment text NOT NULL,
 	created_ts int4 NOT NULL,
 	admin_only varchar(1) DEFAULT 'N'
 -- 'Y' : the objection is an admin comment on only * users sees it.
@@ -198,3 +198,66 @@ CREATE TABLE timezones (
 	last_updated INT4 NOT NULL
 );
 
+CREATE TABLE complaints (
+	id SERIAL,
+	from_id int4 NOT NULL,
+	from_email varchar (255) NOT NULL,
+	inrec_email varchar (255) NOT NULL,
+	complaint_type int4 NOT NULL,
+	complaint_text text NOT NULL,
+	complaint_logs text NOT NULL,
+	complaint_channel1_id int4 NOT NULL,
+	complaint_channel1_name text NOT NULL,
+	complaint_channel2_id int4 NOT NULL,
+	complaint_channel2_name text NOT NULL,
+	complaint_users_id int4 NOT NULL,
+	status int4 NOT NULL,
+	nicelevel int4 NOT NULL,
+	reviewed_by_id int4 NOT NULL,
+	reviewed_ts int4 NOT NULL,
+	created_ts int4 NOT NULL,
+	created_ip varchar (15) DEFAULT '0.0.0.0' NOT NULL,
+	created_crc varchar (128) NOT NULL,
+	crc_expiration int4 NOT NULL,
+	ticket_number varchar(32) NOT NULL,
+	PRIMARY KEY (id)
+);
+
+CREATE TABLE complaints_threads (
+	id SERIAL,
+	complaint_ref int4 NOT NULL CONSTRAINT complaints_threads_ref REFERENCES complaints (id),
+	reply_by int4 NOT NULL,
+	reply_ts int4 NOT NULL,
+	reply_text text NOT NULL,
+	actions_text text NOT NULL,
+	in_reply_to int4 NOT NULL,
+	PRIMARY KEY (id)
+);
+
+
+CREATE TABLE complaint_types (
+	-- not used for now...
+	id SERIAL,
+	complaint_label varchar(255) NOT NULL,
+	PRIMARY KEY (id)
+);
+
+DELETE FROM complaint_types;
+COPY "complaint_types" FROM stdin;
+1	My username is suspended
+2	Members of a registered channel are spamming my channel
+3	I object to this channel application but I want to do so anonymously
+4	My channel was purged and I want you to reconsider
+5	My channel was purged and I want to know why
+99	Other complaint
+\.
+
+CREATE TABLE complaints_reference (
+	complaints_ref int4 NOT NULL CONSTRAINT complaints_reference_ref REFERENCES complaints (id),
+	referenced_by int4 NOT NULL,
+	referenced_to int4 NOT NULL,
+	reference_ts int4 NOT NULL,
+	is_new int4 DEFAULT '1' NOT NULL
+);
+
+CREATE INDEX complaints_ref_ref ON complaints_reference(complaints_ref,referenced_to);
