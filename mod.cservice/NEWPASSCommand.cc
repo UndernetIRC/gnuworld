@@ -11,7 +11,7 @@
 #include	"networkData.h"
 #include	"cservice_config.h"
 
-const char NEWPASSCommand_cc_rcsId[] = "$Id: NEWPASSCommand.cc,v 1.12 2002/03/10 03:23:55 gte Exp $" ;
+const char NEWPASSCommand_cc_rcsId[] = "$Id: NEWPASSCommand.cc,v 1.13 2002/03/10 19:50:14 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -22,7 +22,7 @@ bool NEWPASSCommand::Exec( iClient* theClient, const string& Message )
 bot->incStat("COMMANDS.NEWPASS");
 
 #ifndef USE_NEWPASS
-bot->Notice(theClient, "To change account password, please use the web interface.");
+bot->Notice(theClient, "To change your account password, please use the web interface.");
 return true;
 #else
 
