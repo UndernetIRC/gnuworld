@@ -1,3 +1,6 @@
+--
+-- Clean up the temporary table from last time.
+DROP TABLE to_die;
 -- Select all user_id's idle > 90 days into a temp table.
 --
 \qecho [*] Fetching list of idle user accounts:
@@ -28,6 +31,9 @@ DELETE FROM supporters where user_id = to_die.user_id;
 -- Clean up objection records.
 \qecho [*] Removing Objection records..
 DELETE FROM objections where user_id = to_die.user_id;
+-- Clean up mailq records.
+\qecho [*] Removing mailq records..
+DELETE FROM mailq where user_id = to_die.user_id;
 --
 -- Clean up last_seens.
 \qecho [*] Removing last_seens..
@@ -36,6 +42,3 @@ DELETE FROM users_lastseen where user_id = to_die.user_id;
 -- Clean up users (Finally!).
 \qecho [*] Removing user accounts..
 DELETE FROM users where id = to_die.user_id;
---
--- Clean up the temporary table.
-DROP TABLE to_die;
