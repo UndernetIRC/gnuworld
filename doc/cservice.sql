@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------------
--- "$Id: cservice.sql,v 1.69 2002/08/30 10:18:44 nighty Exp $"
+-- "$Id: cservice.sql,v 1.70 2002/10/17 01:32:53 gte Exp $"
 -- Channel service DB SQL file for PostgreSQL.
 
 -- ChangeLog:
@@ -306,10 +306,10 @@ CREATE INDEX userlog_event_idx ON userlog(event);
 CREATE TABLE supporters (
 	channel_id INT4 CONSTRAINT channel_supporters_ref REFERENCES channels ( id ),
 	user_id INT4 CONSTRAINT users_supporters_ref REFERENCES users( id ),
-	support CHAR,
--- NULL - not answered yet
--- Y - Supports this channel
--- N - Doesn't support this channel
+	support CHAR DEFAULT '?',
+-- ? - Not answered yet.
+-- Y - Supports this channel.
+-- N - Doesn't support this channel.
 	reason TEXT,
 -- Reason for not supporting it if required.
 	join_count INT4 DEFAULT '0',
