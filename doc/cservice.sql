@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------------
--- "$Id: cservice.sql,v 1.76 2003/07/19 01:12:53 nighty Exp $"
+-- "$Id: cservice.sql,v 1.77 2003/12/05 14:26:51 nighty Exp $"
 -- Channel service DB SQL file for PostgreSQL.
 
 -- ChangeLog:
@@ -326,6 +326,7 @@ CREATE TABLE supporters (
 );
 
 CREATE INDEX supporters_support_idx ON supporters(support);
+create index supporters_user_id_idx ON supporters(user_id);
 
 CREATE TABLE pending (
 	channel_id INT4 CONSTRAINT pending_channel_ref REFERENCES channels (id),
