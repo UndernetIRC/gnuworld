@@ -9,7 +9,7 @@
 #include	"iClient.h"
 #include	"client.h"
 
-const char msg_W_cc_rcsId[] = "$Id: msg_W.cc,v 1.1 2001/02/04 16:43:28 dan_karrels Exp $" ;
+const char msg_W_cc_rcsId[] = "$Id: msg_W.cc,v 1.2 2001/02/05 20:06:38 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -31,14 +31,6 @@ if( NULL == sourceClient )
 		<< Param[ 0 ]
 		<< endl ;
 	return -1 ;
-	}
-
-// Only deliver the command to the services clients if the source
-// client is an oper
-if( !sourceClient->isOper() )
-	{
-	// Exit silently
-	return 0 ;
 	}
 
 iClient* targetClient = Network->findNick( Param[ 2 ] ) ;

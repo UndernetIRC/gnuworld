@@ -26,7 +26,7 @@
 #include	"events.h"
 
 const char xClient_h_rcsId[] = __XCLIENT_H ;
-const char xClient_cc_rcsId[] = "$Id: client.cc,v 1.30 2001/02/04 16:43:28 dan_karrels Exp $" ;
+const char xClient_cc_rcsId[] = "$Id: client.cc,v 1.31 2001/02/05 20:06:38 dan_karrels Exp $" ;
 
 using std::string ;
 using std::strstream ;
@@ -462,6 +462,11 @@ return 0 ;
 }
 
 int xClient::OnWhois( iClient* sourceClient, iClient* targetClient )
+{
+return 0 ;
+}
+
+int xClient::OnInvite( iClient* sourceClient, Channel* theChan )
 {
 return 0 ;
 }

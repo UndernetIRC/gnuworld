@@ -3,7 +3,7 @@
  */
 
 #ifndef __XCLIENT_H
-#define __XCLIENT_H "$Id: client.h,v 1.25 2001/02/04 16:42:47 dan_karrels Exp $"
+#define __XCLIENT_H "$Id: client.h,v 1.26 2001/02/05 20:06:38 dan_karrels Exp $"
 
 #include	<string>
 
@@ -150,6 +150,13 @@ public:
 	 */
 	virtual int OnWhois( iClient* sourceClient,
 			iClient* targetClient ) ;
+
+	/**
+	 * This method is called when a network client invites
+	 * a services client to a channel.
+	 */
+	virtual int OnInvite( iClient* sourceClient,
+			Channel* theChan );
 
 	/**
 	 * OnEvent is called when a network event occurs.

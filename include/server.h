@@ -17,7 +17,7 @@
  */
 
 #ifndef __XSERVER_H
-#define __XSERVER_H "$Id: server.h,v 1.31 2001/02/05 18:58:12 dan_karrels Exp $"
+#define __XSERVER_H "$Id: server.h,v 1.32 2001/02/05 20:06:38 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
@@ -930,11 +930,14 @@ protected:
 	/// K(ICK) message handler.
 	DECLARE_MSG(K);
 
-	// DE(SYNCH) ?
+	/// DE(SYNCH) ?
 	DECLARE_MSG(DS);
 
-	// AD(MIN)
+	/// AD(MIN)
 	DECLARE_MSG(AD);
+
+	/// I(NVITE)
+	DECLARE_MSG(I);
 
 	/// NOOP message.
 	/// Use this handler for any messages that we don't need to handle.

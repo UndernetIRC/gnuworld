@@ -23,6 +23,7 @@ gnuworld_SOURCES = Channel.cc \
 	msg_Error.cc \
 	msg_G.cc \
 	msg_GL.cc \
+	msg_I.cc \
 	msg_J.cc \
 	msg_K.cc \
 	msg_L.cc \

@@ -19,9 +19,10 @@
 #include	"Channel.h"
 #include	"client.h"
 #include	"misc.h"
+#include	"Numeric.h"
 
 const char xNetwork_h_rcsId[] = __XNETWORK_H ;
-const char xNetwork_cc_rcsId[] = "$Id: Network.cc,v 1.16 2001/02/03 19:16:33 dan_karrels Exp $" ;
+const char xNetwork_cc_rcsId[] = "$Id: Network.cc,v 1.17 2001/02/05 20:06:38 dan_karrels Exp $" ;
 
 using std::string ;
 using std::endl ;
@@ -52,8 +53,15 @@ networkVectorType::size_type YY =
 // client bursts.
 if( YY >= clients.size() )
 	{
+	char charYY[ 3 ] = { 0 } ;
+
 	// No server!
-	elog	<< "xNetwork::addClient> Server not found." << endl ;
+	elog	<< "xNetwork::addClient> Server not found: "
+		<< YY
+		<< "("
+		<< inttobase64( charYY, YY, 2 )
+		<< ")"
+		<< endl ;
 	return false ;
 	}
 
@@ -72,7 +80,9 @@ while( XXX >= clients[ YY ].size() )
 if( clients[ YY ][ XXX ] != NULL )
 	{
 	// Numeric collission
-	elog	<< "xNetwork::addClient: Numeric collision" << endl ;
+	elog	<< "xNetwork::addClient: Numeric collision: " 
+		<< newClient->getCharYYXXX()
+		<< endl ;
 
 	// Delete the old one
 	delete clients[ YY ][ XXX ] ;
@@ -145,7 +155,9 @@ while( YY >= servers.size() )
 
 if( NULL != servers[ YY ] )
 	{
-	elog	<< "xNetwork::addServer> Numeric collission!\n" ;
+	elog	<< "xNetwork::addServer> Numeric collission: "
+		<< newServer->getCharYY()
+		<< endl ;
 
 	// The show must go on!
 	delete servers[ YY ] ;
@@ -341,12 +353,16 @@ iClient* xNetwork::removeClient( const unsigned int& YY,
 
 if( static_cast< networkVectorType::size_type >( YY ) >= clients.size() )
 	{
-	elog	<< "xNetwork::removeClient> Bad YY\n" ;
+	elog	<< "xNetwork::removeClient> Bad YY: "
+		<< YY
+		<< endl ;
 	return 0 ;
 	}
 if( static_cast< clientVectorType::size_type >( XXX ) >= clients[ YY ].size() )
 	{
-	elog	<< "xNetwork::removeClient> Bad XXX\n" ;
+	elog	<< "xNetwork::removeClient> Bad XXX: "
+		<< XXX
+		<< endl ;
 	return 0 ;
 	}
 
@@ -358,14 +374,16 @@ if( retMe != NULL )
 	removeNick( retMe->getNickName() ) ;
 	}
 
-#ifdef EDEBUG
 if( NULL == retMe )
 	{
 	elog	<< "xNetwork::removeClient( int, int )> Unable to find user "
-		<< "YY: " << YY << ", XXX: " << XXX << endl ;
+		<< "YY: "
+		<< YY
+		<< ", XXX: "
+		<< XXX
+		<< endl ;
 	return 0 ;
 	}
-#endif
 
 servers[ YY ]->decrementClients() ;
 
@@ -436,7 +454,9 @@ iServer* xNetwork::removeServer( const unsigned int& YY,
 // Make sure the server numeric (YY) is valid.
 if( static_cast< serverVectorType::size_type >( YY ) >= servers.size() )
 	{
-	elog	<< "xNetwork::removeServer> Bad YY\n" ;
+	elog	<< "xNetwork::removeServer> Bad YY: "
+		<< YY
+		<< endl ;
 	return 0 ;
 	}
 
@@ -521,7 +541,8 @@ channelMapType::iterator ptr = channelMap.find( name ) ;
 if( ptr == channelMap.end() )
 	{
 	elog	<< "xNetwork::removeChannel> Failed to find channel: "
-		<< name << endl ;
+		<< name
+		<< endl ;
 	return 0 ;
 	}
 channelMap.erase( ptr ) ;
@@ -544,7 +565,10 @@ iClient* theClient = findClient( yyxxx ) ;
 if( NULL == theClient )
 	{
 	elog	<< "xNetwork::rehashNick> Unable to find numeric: "
-		<< yyxxx << ", new nick: " << newNick << endl ;
+		<< yyxxx
+		<< ", new nick: "
+		<< newNick
+		<< endl ;
 	return ;
 	}
 
@@ -576,7 +600,8 @@ if( !nickMap.insert( nickMapType::value_type(
 	theClient->getNickName(), theClient ) ).second )
 	{
 	elog	<< "xNetwork::addNick> Failed to add nick: "
-		<< theClient->getNickName() << endl ;
+		<< theClient->getNickName()
+		<< endl ;
 	}
 }
 
