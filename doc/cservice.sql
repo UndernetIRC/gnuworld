@@ -1,8 +1,12 @@
 ------------------------------------------------------------------------------------
--- "$Id: cservice.sql,v 1.10 2000/12/28 05:10:01 gte Exp $"
+-- "$Id: cservice.sql,v 1.11 2000/12/30 18:34:15 gte Exp $"
 -- Channel service DB SQL file for PostgreSQL.
 
 -- ChangeLog:
+-- 2000-12-30: Gte
+--             Added some update notification events for CMaster to listen
+--             on and refresh its internal cache.
+--
 -- 2000-12-22: Gte
 --             Fixed invalid UserID reference in userlog table.
 --
@@ -160,6 +164,7 @@ CREATE TABLE levels (
 	PRIMARY KEY( channel_id, user_id )
 );
 
+
 CREATE INDEX levels_access_idx ON levels( access ) ;
 
 CREATE TABLE channellog (
@@ -206,8 +211,17 @@ CREATE TABLE baddomain (
 	PRIMARY KEY(id)
 );
 
+-- Update notification rules.
+--
 
-	
+CREATE RULE cm1 AS ON UPDATE TO channels DO NOTIFY channels_u;
+CREATE RULE cm2 AS ON DELETE TO channels DO NOTIFY channels_d;
+CREATE RULE cm3 AS ON UPDATE TO bans DO NOTIFY bans_u;
+CREATE RULE cm4 AS ON DELETE TO bans DO NOTIFY bans_d;
+CREATE RULE cm5 AS ON UPDATE TO users DO NOTIFY users_u;
+CREATE RULE cm6 AS ON DELETE TO users DO NOTIFY users_d;
+CREATE RULE cm7 AS ON UPDATE TO levels DO NOTIFY levels_u;
+CREATE RULE cm8 AS ON DELETE TO levels DO NOTIFY levels_d;
 
 -----------------------------------------------------------------------------------------
 

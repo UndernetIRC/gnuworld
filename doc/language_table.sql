@@ -12,7 +12,24 @@ COPY "translations" FROM stdin;
 1	6	I can't find %s on channel %s	31337
 1	7	The channel %s doesn't appear to be registered	31337
 1	8	You're opped by %s	31337
+1	9	You're voiced by %s	31337
 \.
+
+
+-- French language definition.
+-- 29/12/00 - Daniel Simard <svr@undernet.org>.
+
+COPY "translations" FROM stdin;
+2	1	Désolé. Vous êtes déjà authentifié avec le nick %s	31337
+2	2	AUTHENTICATION ACCEPTÉ pour %s	31337
+2	3	Désolé. Votre accès est insuffisante pour utiliser cette commande	31337
+2	4	Désolé. Le canal %s est vide	31337
+2	5	Je ne vois pas %s nul part	31337
+2	6	Je ne vois pas %s sur le canal %s	31337
+2	7	Le canal %s ne semble pas être enregistré	31337
+2	8	Vous avez été oppé par %s	31337
+\.
+
 
 -- Danish language definition.
 -- 28/12/2000 - David Henriksen <david@itwebnet.dk>.
@@ -26,4 +43,19 @@ COPY "translations" FROM stdin;
 3	6	Jeg kan ikke finde %s på kanalen %s	31337
 3	7	Kanelen %s ser ikke ud til at være registreret	31337
 3	8	Du er op'et af %s	31337
+3	9	Du er voice'et af %s	31337
+\.
+
+-- Dutch language definition.
+-- 30/12/2000 - Sebastian Serruys <sebastian.serruys@pandora.be>.
+
+COPY "translations" FROM stdin;
+4	1	Sorry, Je bent reeds geautoriseerd als %s	31337
+4	2	AUTORISATIE SUCCESVOL als %s	31337
+4	3	Sorry, je hebt onvoldoende toegang om dat commando uit te voeren	31337
+4	4	Sorry, het kanaal %s is leeg	31337
+4	5	Ik zie nergens %s	31337
+4	6	Ik kan %s niet vinden op het kanaal %s	31337
+4	7	Het kanaal %s ziet er niet geregistreerd uit	31337
+4	8	Je bent geopt door %s	31337
 \.
