@@ -12,7 +12,7 @@
 #include	"cservice_config.h"
 #include	"Network.h"
 
-const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.29 2001/10/02 20:31:28 gte Exp $" ;
+const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.30 2002/01/08 03:25:00 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -183,6 +183,26 @@ newData->currentUser = theUser;
 bot->Notice(theClient,
 	bot->getResponse(theUser, language::auth_success).c_str(),
 	theUser->getUserName().c_str());
+
+/*
+ * Send out AC token onto the network.
+ * The AC Token (Account) is read by ircu2.10.11 and any other
+ * service on the net that cares and added to the Client structure.
+ * Format:
+ * [Source Server] AC [Authenticated User's Numeric] [Authenticated UserName]
+ * Eg: AXAAA AC APAFD gte
+ */
+
+#if 0
+strstream ac;
+ac	<< bot->getCharYY()
+	<< " AC "
+	<< theClient->getCharYYXXX()
+	<< " " << theUser->getUserName()
+	<< ends;
+bot->Write( ac );
+delete[] ac.str();
+#endif
 
 /*
  * If the user account has been suspended, make sure they don't get
