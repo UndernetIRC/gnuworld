@@ -1,0 +1,64 @@
+/* sqlUser.h */
+
+#ifndef __SQLUSER_H
+#define __SQLUSER_H "$Id: sqlUser.h,v 1.1 2000/12/09 15:39:06 dan_karrels Exp $"
+
+#include	<string>
+
+#include	<ctime>
+
+using std::string ;
+
+class sqlUser
+{
+
+public:
+
+	sqlUser() ;
+	virtual ~sqlUser() ;
+
+	typedef unsigned short int	flagType ;
+	static const flagType F_GLOBAL_SUSPEND =	0x01 ;
+
+	const unsigned int&	getId() const
+		{ return id ; }
+	const string&		getUserName() const
+		{ return user_name ; }
+	const string&		getPassword() const
+		{ return password ; }
+	const time_t&		getLastSeen() const
+		{ return last_seen ; }
+	const string&		getEmail() const
+		{ return email ; }
+	const string&		getUrl() const
+		{ return url ; }
+	const unsigned int&	getLanguageId() const
+		{ return language_id ; }
+	const string&		getPublicKey() const
+		{ return public_key ; }
+	inline bool		getFlag( const flagType& whichFlag ) const
+		{ return (flags & whichFlag) ; }
+	const flagType&		getFlags() const
+		{ return flags ; }
+	const string&		getLastUpdateBy() const
+		{ return last_update_by ; }
+	const time_t&		getLastUpdate() const
+		{ return last_update ; }
+
+protected:
+
+	unsigned int	id ;
+	string		user_name ;
+	string		password ;
+	time_t		last_seen ;
+	string		email ;
+	string		url ;
+	unsigned int	language_id ;
+	string		public_key ;
+	flagType	flags ;
+	string		last_update_by ;
+	time_t		last_update ;
+
+} ;
+
+#endif // __SQLUSER_H
