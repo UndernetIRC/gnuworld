@@ -20,7 +20,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
  * USA.
  *
- * $Id: cloner.cc,v 1.24 2002/08/03 21:49:14 dan_karrels Exp $
+ * $Id: cloner.cc,v 1.25 2003/01/07 15:57:48 jeekay Exp $
  */
 
 #include	<new>
@@ -45,7 +45,7 @@
 
 const char client_h_rcsId[] = __CLIENT_H ;
 const char cloner_h_rcsId[] = __CLONER_H ;
-const char cloner_cc_rcsId[] = "$Id: cloner.cc,v 1.24 2002/08/03 21:49:14 dan_karrels Exp $" ;
+const char cloner_cc_rcsId[] = "$Id: cloner.cc,v 1.25 2003/01/07 15:57:48 jeekay Exp $" ;
 const char iClient_h_rcsId[] = __ICLIENT_H ;
 const char EConfig_h_rcsId[] = __ECONFIG_H ;
 const char ELog_h_rcsId[] = __ELOG_H ;
@@ -423,6 +423,18 @@ else if( command == "SAYALL" || command == "MSGALL" )
 	string chanOrNickName( st[ 1 ] ) ;
 	string privMsg( st.assemble(2).c_str() ) ;
 
+        if( chanOrNickName[ 0 ] != '#' )
+                { // Assume nickname
+                iClient* Target = Network->findNick( st[ 1 ] ) ;
+                if( NULL == Target )
+                        {
+                        Notice( theClient, "Unable to find nick: %s"
+	                         , st[ 1 ].c_str() ) ;
+	                return 0 ;
+	                }
+		chanOrNickName = Target->getCharYYXXX();
+	        }
+
 	for( list< iClient* >::const_iterator ptr = clones.begin(),
 		endPtr = clones.end() ; ptr != endPtr ; ++ptr )
 		{
@@ -449,6 +461,18 @@ else if( command == "ACTALL" || command == "DOALL" ||
 
 	string chanOrNickName( st[ 1 ] ) ;
 	string action( st.assemble(2).c_str() ) ;
+
+        if( chanOrNickName[ 0 ] != '#' )
+                { // Assume nickname
+                iClient* Target = Network->findNick( st[ 1 ] ) ;
+                if( NULL == Target )
+                        {
+                        Notice( theClient, "Unable to find nick: %s"
+                                , st[ 1 ].c_str() ) ;
+                        return 0 ;
+                        }
+		chanOrNickName = Target->getCharYYXXX();
+	        }
 
 	for( list< iClient* >::const_iterator ptr = clones.begin(),
 		endPtr = clones.end() ; ptr != endPtr ; ++ptr )
@@ -477,6 +501,18 @@ else if( command == "NOTICEALL" )
 	string chanOrNickName( st[ 1 ] ) ;
 	string notice( st.assemble(2).c_str() ) ;
 
+	if( chanOrNickName[ 0 ] != '#' ) 
+		{ // Assume nickname
+		iClient* Target = Network->findNick( st[ 1 ] ) ;
+		if( NULL == Target )
+		        {
+		        Notice( theClient, "Unable to find nick: %s"
+				, st[ 1 ].c_str() ) ;
+		        return 0 ;
+		        }
+		chanOrNickName = Target->getCharYYXXX();
+		}
+	
 	for( list< iClient* >::const_iterator ptr = clones.begin(),
 		endPtr = clones.end() ; ptr != endPtr ; ++ptr )
 		{

@@ -1,3 +1,8 @@
+2002-10-01 23:22  Alexander Maassen <outsider@key2peace.org>
+
+	* mod.cloner/cloner.cc:
+	Fixed sayall/noticeall/actall to convert targetnick to numeric
+
 2002-08-07 21:11  Daniel Karrels <dan_karrels@users.sourceforge.net>
 
 	* mod.scanner/scanner.cc, src/main.cc, src/server.cc:
