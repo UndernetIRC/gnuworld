@@ -1752,104 +1752,107 @@ COPY "translations" FROM stdin;
 12	170	%s %i dakika icin.	31337
 \.
 
+-- Erik Torrissen / Mr_|r0n
+-- iron@shellsolution.net
+
 COPY "translations" FROM stdin;
-13	1	Beklager, Du er allerede autorisert som %s	31337
-13	2	Autorisasjon Vellykket as %s	31337
-13	3	Beklager, Du har utilstrekkelig adgang til å utføre den kommandoen	31337
-13	4	Beklager, men kanalen %s er tom	31337
-13	5	Jeg kan ikke se %s noe sted	31337
+13	1	Du er allerede logget inn som %s	31337
+13	2	Vellykket autorisasjon som %s	31337
+13	3	Du har utilstrekkelig adgang til å utføre den kommandoen	31337
+13	4	Kanalen %s er tom	31337
+13	5	Jeg kan ikke se %s noen steder	31337
 13	6	Jeg kan ikke finne %s på kanalen %s	31337
 13	7	Kanalen %s ser ikke ut til å være registrert	31337
-13	8	Du er op'et av %s (%s)	31337
-13	9	Du er voice'et av %s (%s)	31337
+13	8	Du har fått op status av %s (%s)	31337
+13	9	Du er voice status av %s (%s)	31337
 13	10	%s: Du er ikke i denne kanalen	31337
-13	11	%s er allerede op'et i %s	31337
-13	12	%s er allerede voice'et i %s	31337
-13	13	Du er deop'et av %s (%s)	31337
-13	14	Du er devoice'et av %s (%s)	31337
-13	15	%s er ikke op'et i %s	31337
-13	16	%s er ikke voice'et i %s	31337
-13	17	Autorisasjon Mislykket som %s (Invalid Password)	31337
-13	18	Jeg er ikke i den kanalen!	31337
-13	19	Ugyldig banlevel område. Gyldigt område er 1-%i.	31337
-13	20	Ugyldig ban varighet. Din ban Varighet kan max bestå av 336 timer.	31337
+13	11	%s er allerede operatør i %s	31337
+13	12	%s er allerede voicet i %s	31337
+13	13	Du har blitt tatt fra operatør status av %s (%s)	31337
+13	14	Du har blitt devoicet av %s (%s)	31337
+13	15	%s er ikke operatør i %s	31337
+13	16	%s er ikke voice i %s	31337
+13	17	Mislykket autorisasjon som %s (Feil Passord)	31337
+13	18	Jeg er ikke i den kanalen	31337
+13	19	Ugyldig banlevel. Gyldig område er 1-%i.	31337
+13	20	Ugyldig ban varighet. Din ban varighet kan max bestå av 336 timer.	31337
 13	21	Ban grunn kan ikke overstige 128 bokstaver	31337
 13	22	Spesifiserte ban er allerede i min banliste!	31337
-13	23	Ban'et %s er allerede dekket av %s	31337
+13	23	Ban %s er allerede dekket av %s	31337
 13	24	Ugyldig minimum level.	31337
 13	25	Ugyldig maximum level.	31337
-13	26	Bruker: %s Adgang: %s %s	31337
+13	26	Bruker: %s Tilgang: %s %s	31337
 13	27	Kanal: %s -- AUTOMODE: %s	31337
 13	28	Sist Endret: %s (%s ago)	31337
 13	29	** SUSPENDERT ** - Utløper om %s (Level %i)	31337
-13	30	SIST SETT: %s ago.	31337
-13	31	Det er mer enn 15 matchende inntastninger.	31337
+13	30	SIST SETT: %s siden.	31337
+13	31	Det er mer enn 15 treff.	31337
 13	32	Vær så snill og begrens din forespørsel.	31337
-13	33	Slutt på adgangs liste.	31337
-13	34	Ingen match!	31337
-13	35	Kan ikke tilføye en bruker med lik eller høyere adgang enn deg selv.	31337
-13	36	Ugyldig adgangs level.	31337
-13	37	%s er allerede tilføyet til %s med adgangs level %i.	31337
-13	38	Tilføyet bruker %s til %s med adgangs level %i	31337
+13	33	Slutt på tilgangs liste.	31337
+13	34	Ingen treff!	31337
+13	35	Kan ikke tilføye en bruker med lik eller høyere tilgang enn deg selv.	31337
+13	36	Ugyldig tilgangs level.	31337
+13	37	%s er allerede tilføyet til %s med tilgangs level %i.	31337
+13	38	Tilføyet bruker %s til %s med tilgangs level %i	31337
 13	39	Noe gikk galt: %s	31337
 13	40	%s: Slutt på ban liste	31337
-13	41	Ute av stand til å vise bruker detaljer (Usynlig)	31337
+13	41	Bruker detaljer kan ikke vises (Usynlig)	31337
 13	42	Informasjon om: %s (%i)	31337
-13	43	Nåværende logget på via: %s	31337
+13	43	Bruker logget på via: %s	31337
 13	44	URL: %s	31337
 13	45	Språk: %i	31337
 13	46	Kanaler: %s	31337
 13	47	Input Flood Antall: %i	31337
 13	48	Ouput Flood (Bytes): %i	31337
 13	49	%s er registrert av:	31337
-13	50	%s - Sist sett: %s ago	31337
+13	50	%s - Sist sett: %s siden	31337
 13	51	Desc: %s	31337
-13	52	Flood meg vil du? Jeg vil ikke høre på deg mer.	31337
-13	53	Jeg tror jeg sendte deg litt for mye data, Jeg vil ignorere deg for en liten stund.	31337
-13	54	Ufyllstendig Kommando	31337
-13	55	For å bruke %s, må du /msg %s@%s	31337
-13	56	Beklager, du må være logget inn for å bruke denne kommandoen.	31337
-13	57	Kanalen %s har blitt suspendert av en cservice administrator.	31337
-13	58	Din adgang på %s har blitt suspendert.	31337
-13	59	NOOP flaget er satt på %s	31337
-13	60	STRICTOP flaget er satt på %s	31337
+13	52	Flooder du meg? Jeg vil ikke høre på deg mer.	31337
+13	53	Jeg tror jeg sendte deg litt for mye data. Du er ignorert for en stund.	31337
+13	54	Ufullstendig Kommando	31337
+13	55	For å bruke %s, må du utføre /msg %s@%s	31337
+13	56	Du må være logget inn for å bruke denne kommandoen.	31337
+13	57	Kanalen %s har blitt suspendert av en CService Administrator.	31337
+13	58	Din tilgang på %s har blitt suspendert.	31337
+13	59	NO OP flagget er satt på %s	31337
+13	60	STRICTOP flagget er satt på %s	31337
 13	61	Du har nettopp deop'et mer enn %i personer	31337
 13	62	SYNTAKS: %s	31337
-13	63	Midlertidigt øket din adgang på kanalen %s til %i	31337
+13	63	Midlertidig øket din tilgang på kanalen %s til %i	31337
 13	64	%s er registrert.	31337
 13	65	%s er ikke registrert.	31337
 13	66	Jeg tror ikke %s ville satt pris på det.	31337
-13	67	\002*** Ban List for kanal %s ***\002	31337
-13	68	%s %s Adgang: %i	31337
+13	67	\002*** Ban Liste for kanal %s ***\002	31337
+13	68	%s %s Tilgang: %i	31337
 13	69	TILFØYD AV: %s (%s)	31337
 13	70	SIDEN: %s	31337
-13	71	UTG: %s	31337
+13	71	UTGÅR: %s	31337
 13	72	\002*** SLUTT ***\002	31337
 13	73	Jeg vet ikke hvem %s er.	31337
-13	74	Du er ikke lenger autorisert med meg.	31337
+13	74	Du er ikke lenger autorisert.	31337
 13	75	%s ser ikke ut til å ha adgang i %s.	31337
-13	76	Kan ikke endre en bruker med lik eller høyere adgang enn deg selv.	31337
-13	77	Kan ikke gi en bruker høyere eller lik adgang til deg selv.	31337
-13	78	Endret %s's adgangs level på kanal %s til %i	31337
-13	79	Satt AUTOMODE til OP for %s on channel %s	31337
-13	80	Satt AUTOMODE til VOICE for %s on channel %s	31337
-13	81	Satt AUTOMODE til ONE for %s on channel %s	31337	
-13	82	Ditt passord kan ikke være ditt brukernavn eller ditt nåværende nick - syntaks er: NEWPASS <nytt passord>	31337
-13	83	Passord Vellykket forandret.	31337
-13	84	NOOP flagget er satt på %s	31337
-13	85	STRICTOP flagget er satt på %s (og %s er ikke autorisert)	31337
-13	86	STRICTOP flagget er satt på %s (og %s har utilstrekkelig adgang)	31337
+13	76	Kan ikke endre en bruker med lik eller høyere tilgang enn deg selv.	31337
+13	77	Kan ikke gi en bruker høyere eller lik tilgang til deg selv.	31337
+13	78	Endret %s's tilgang på kanal %s til %i	31337
+13	79	Nå er AUTOMODE OP for %s på %s	31337
+13	80	Nå er AUTOMODE VOICE for %s på %s	31337
+13	81	Nå er AUTOMODE NONE for %s på %s	31337	
+13	82	Ditt passord kan ikke være ditt brukernavn eller ditt nåværende nick - syntaks: NEWPASS <nytt passord>	31337
+13	83	Passord ble forandret.	31337
+13	84	NO OP instillingen er satt på %s	31337
+13	85	STRICTOP flagget er i bruk på %s (og %s er ikke autorisert)	31337
+13	86	STRICTOP flagget er i bruk på %s (og %s har ikke nok tilgang)	31337
 13	87	Slettet kanal %s	31337
-13	88	%s er allerede registrert med meg.	31337
+13	88	%s er allerede registrert.	31337
 13	89	Ugyldig kanal navn.	31337
 13	90	Registrert kanal %s	31337
-13	91	Fjernet %s fra min ignorerings liste	31337
+13	91	% er ikke lenger ignorert.	31337
 13	92	Kunne ikke finne %s i min ignorerings liste	31337
-13	93	Kan ikke fjerne en bruker med lik eller høyere adgang enn deg selv	31337
-13	94	Du kan ikke fjerne deg selv fra en kanal du selv eier	31337
-13	95	Fjernet bruker %s fra %s	31337
-13	96	Din USYNLIG innstilling er nå PÅ.	31337
-13	97	Din USYNLIG innstilling er nå AV.	31337
+13	93	Kan ikke fjerne en bruker med lik eller høyere tilgang enn deg selv	31337
+13	94	Du kan ikke fjerne deg selv fra din egen kanal.	31337
+13	95	%s har ikke lenger tilgang på %s	31337
+13	96	Du er nå USYNLIG.	31337
+13	97	Du er IKKE lenger USYNLIG.	31337
 13	98	%s for %s er %s	31337
 13	99	Verdien av %s må være ON eller OFF	31337
 13	100	Ugyldig BRUKERFLAGG innstilling. Korrekte verdier er 0, 1, 2.	31337
@@ -1858,17 +1861,17 @@ COPY "translations" FROM stdin;
 13	103	MASSDEOPPRO for %s er satt til %d	31337
 13	104	Verdien av FLOODPRO skal være 0-7	31337
 13	105	FLOODPRO for %s er satt til %d	31337
-13	106	DESCRIPTION kan maximum ha 80 chars!	31337
+13	106	DESCRIPTION kan maximum ha 80 bokstaver.	31337
 13	107	DESCRIPTION for %s er fjernet.	31337
 13	108	DESCRIPTION for %s er: %s	31337
-13	109	URL kan maximum ha 75 chars!	31337
+13	109	URL kan maximum ha 75 bokstaver	31337
 13	110	URL for %s is fjernet.	31337
 13	111	URL for %s er: %s	31337
-13	112	Strengen av nøkkelord kan ikke overstige 80 chars!	31337
+13	112	Nøkkel ord kan ikke overstige 80 bokstaver!	31337
 13	113	NØKKELORD for %s er: %s	31337
 13	114	Språk er satt til %s.	31337
 13	115	FEIL: Ugyldig språk valg.	31337
-13	116	Kan ikke finne kanal %s på nettverket!	31337
+13	116	Kan ikke finne %s på nettverket!	31337
 13	117	FEIL: Ugyldig kanal innstilling.	31337
 13	118	Ignore liste:	31337
 13	119	Ignore listen er tom	31337
@@ -1878,36 +1881,36 @@ COPY "translations" FROM stdin;
 13	123	[        Bruker Statistikk] \002Cached Inntastninger:\002 %i    \002DB Forespørseler:\002 %i    \002Cache Treff:\002 %i    \002Effektivitet:\002 %.2f%%	31337
 13	124	[Adgangs Level Statistikk] \002Cached Inntastninger:\002 %i    \002DB Forespørseler:\002 %i    \002Cache Treff:\002 %i    \002Effektivitet:\002 %.2f%%	31337
 13	125	[         Ban Statistikk] \002Cached Inntastninger:\002 %i    \002DB Forespørseler:\002 %i    \002Cache Treff:\002 %i    \002Effektivitet:\002 %.2f%%	31337
-13	126	Sist mottat Bruker NOTIFY: %i	31337
-13	127	Sist mottat Kanal NOTIFY: %i	31337
-13	128	Sist mottat Level NOTIFY: %i	31337
-13	129	Sist mottat Ban NOTIFY: %i	31337
+13	126	Sist motatt Bruker NOTIFY: %i	31337
+13	127	Sist motatt Kanal NOTIFY: %i	31337
+13	128	Sist motatt Level NOTIFY: %i	31337
+13	129	Sist motatt Ban NOTIFY: %i	31337
 13	130	Custom data beholdere tildelt: %i	31337
 13	131	\002Uptime:\002 %s	31337
 13	132	Kanalen %s har %d brukere (%i operatører)	31337
-13	133	Mode er: %s	31337
+13	133	Modes: %s	31337
 13	134	Flagg satt: %s	31337
 13	135	Kan ikke suspendere en bruker med lik eller høyere adgang enn deg selv.	31337
-13	136	Ugyldige tids enheter	31337
+13	136	Ugyldig tid.	31337
 13	137	Ugyldig suspensjons varighet.	31337
 13	138	SUSPENSJON for %s er annullert.	31337
 13	139	%s er allerede suspendert på %s	31337
 13	140	SUSPENSJON for %s vil utgå om %s	31337
 13	141	FEIL: Topic kan ikke overstige 145 bokstaver	31337
-13	142	Du har utilstrekkelig adgang til å fjerne ban'et %s fra %s's database	31337
-13	143	Fjernet %i bans som matchet %s	31337
-13	144	Fjernet din midlertidige adgang av %i fra kanal %s	31337
+13	142	Du har utilstrekkelig tilgang til å fjerne ban %s fra %s sin database	31337
+13	143	Fjernet %i bans som klaffet med %s	31337
+13	144	Fjernet din midlertidige tilgang av %i fra kanal %s	31337
 13	145	Ser ikke ut til at du har en tvunget adgang i %s, kanskje den har utløpt?	31337
 13	146	%s er ikke suspendert på %s	31337
 13	147	%s er en IRC operatør	31337
 13	148	%s er IKKE logget inn.	31337
 13	149	%s er logget inn som %s%s	31337
 13	150	%s er en Offisiell CService Representant%s og logget inn som %s	31337
-13	151	%s er en Offisiell CService Administrator%s og logget inn som %s	31337
+13	151	%s er en Offisiell CService Administratør%s og logget inn som %s	31337
 13	152	%s er en Offisiell CService Utvikler%s og logget inn som %s	31337
-13	153	Det er mer enn %i inntastninger som matcher [%s]	31337
-13	154	Vær så snill og begrens din søke maske	31337
-13	155	Ingen matchende inntastninger for [%s]	31337
+13	153	Det er mer enn %i inntastninger som klaffer [%s]	31337
+13	154	Vær så snill og begrens din søke klaffer	31337
+13	155	Ingen klaffende inntastninger for [%s]	31337
 13	156	%s: Kanal modes fjernet.	31337
 13	158	Ugyldig valg.	31337
 13	159	%s er en Offisiell Undernet Service Bot.	31337
@@ -1920,7 +1923,6 @@ COPY "translations" FROM stdin;
 13	166	%s: ban liste er tom.		31337
 13	167	Jeg er allerede i den kanalen!	31337
 13	168	Denne kommandoen er reservert for IRC Operatører	31337
-13	169	Jeg er ikke op'et på %s	31337
+13	169	Jeg er ikke operatør på %s	31337
 13	170	%s for %i minutter	31337
 \.
-
