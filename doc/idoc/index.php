@@ -2,11 +2,11 @@
 /*
  *
  * Undernet GNUworld Interactive Installation Guide (aka UGIIG)
- * $Id: index.php,v 1.5 2002/03/11 06:53:06 nighty Exp $
+ * $Id: index.php,v 1.6 2002/04/04 11:48:21 nighty Exp $
  *
  * Released under the GNU Public License : http://www.gnu.org/licenses/gpl.txt
  * by nighty <nighty@undernet.org>
- * Last modified: 03/11/2002
+ * Last modified: 04/04/2002
  *
  *
  */
@@ -50,7 +50,7 @@ function footer($prev,$next) {
 	//echo "<address>maintained by <b>&lt;</b><a href=\"mailto:" . $coder_email . "\">" . $coder_email . "</a><b>&gt;</b> - Last modified : <b>" . date("M-d-Y H:i:s",   (  filemtime("index.php")+( date("Z",filemtime("index.php"))/3600 )   )   ) . " UTC/GMT</b> - <b>[</b><a href=\"./\">Home</a><b>]</b></address>";
 	echo "<address>maintained by <b>&lt;</b><a href=\"mailto:" . $coder_email . "\">" . $coder_email . "</a><b>&gt;</b> - <b>[</b><a href=\"./\">Home</a><b>]</b>";
 	echo "&nbsp;<br><font size=-2><b>";
-?>$Id: index.php,v 1.5 2002/03/11 06:53:06 nighty Exp $<?
+?>$Id: index.php,v 1.6 2002/04/04 11:48:21 nighty Exp $<?
 	echo "</b></font></address>\n";
 	echo "</body>\n";
 	echo "</html>\n";
@@ -75,7 +75,7 @@ $coder_email = "nighty@undernet.org";
 $coder_name = "nighty";
  
 ?>
-<!-- $Id: index.php,v 1.5 2002/03/11 06:53:06 nighty Exp $ //-->
+<!-- $Id: index.php,v 1.6 2002/04/04 11:48:21 nighty Exp $ //-->
 <html>
 <head>
 <title>Undernet GNUworld Interactive Installation Guide</title>
@@ -146,7 +146,7 @@ using modified parameters of this HOWTO, please let <a href="mailto:<?=$coder_em
 GNUworld Homepage			: <a href="http://gnuworld.undernet.org/" target="_blank">http://gnuworld.undernet.org/</a>
 Undernet Coder-Comittee Homepage	: <a href="http://coder-com.undernet.org/" target="_blank">http://coder-com.undernet.org/</a>
 Undernet Homepage			: <a href="http://www.undernet.org/" target="_blank">http://www.undernet.org/</a>
-Undernet Website Interface		: <a href="http://cservice.undernet.org/live/" target="_blank">http://cservice.undernet.org/live/</a>
+Undernet CService Website Interface	: <a href="http://cservice.undernet.org/live/" target="_blank">http://cservice.undernet.org/live/</a>
 Undernet CService Website		: <a href="http://cservice.undernet.org/" target="_blank">http://cservice.undernet.org/</a>
 
 If you have any questions about <b>GNUworld</b>,
@@ -158,7 +158,7 @@ you can either :
 		use either <b>eu.undernet.org</b> or <b>us.undernet.org</b> or <a href="http://www.undernet.org/servers.php" target=_blank>the Undernet servers list</a>,
 		depending on your location, as your IRC server (port <b>6667</b>)
 		and <b>/join #coder-com</b>.
-	- view discussions and post your questions on the <a href="http://www.undernet.org/forum/viewforum.php?forum=7" target=_blank>Undernet Coder-Comittee Forum</a> (<font color=#ff0000><b><blink>new</blink></b></font>)
+	- view discussions and post your questions on the <a href="http://www.undernet.org/forum/viewforum.php?forum=7" target=_blank>Undernet Coder-Comittee Forum</a>
 </pre>
 <br><br>
 <?
@@ -748,6 +748,14 @@ Creating the user, assuming username <b>gnuworld</b> :
 Then run <b>PostgreSQL</b> :
 	
 	<?=$os?>:/home/gnuworld$ <b>/usr/local/pgsql/bin/postmaster -S -B 64 -N 32 -i -D /usr/local/pgsql/data -o -F</b>
+
+Note: if you plan on using this *STRICTLY* locally, and you want to ensure ONLY local connections are possible
+therefore not requiring your to lock out port 5432 on your firewall to prevent remote access to your PostgreSQL database,
+then you can run the following command instead of the above to run your PostgreSQL :
+	<?=$os?>:/home/gnuworld$ <b>/usr/local/pgsql/bin/postmaster -S -B 64 -N 32 -i -D /usr/local/pgsql/data -o -F -h 127.0.0.1</b>
+<font color=#ff0000><b>You should run only ONE of those commands, not both !</b></font>
+
+
 	<?=$os?>:/home/gnuworld$ <b>exit</b>
 	<?=$os?>:/root# 
 
@@ -1168,9 +1176,8 @@ To login to <b>X</B>, issue the following command on IRC :
 		<b>/msg X@services.undernet.org login Admin temPass</b>
 		-X- AUTHENTICATION SUCCESSFULL AS Admin!
 		
-Then change your password :
-		<b>/msg X@services.undernet.org newpass <i>your_new_password</i></b>
-		-X- Password changed.
+You will change your password later using the web interface since the 'newpass' command was lately
+removed in X and is now outdated.
 <? } ?>
 
 
@@ -1251,17 +1258,18 @@ IMPORTANT NOTICE:</b>
 	&lt;?
 	/*
 
-	&lt;!-- <? echo "\$" . "Id" ?>: config.inc,v 1.9 2002/03/11 06:07:21 nighty Exp <? echo "\$" ?> //--&gt;
+	&lt;!-- <? echo "\$" . "Id" ?>: config.inc,v 1.12 2002/04/04 10:59:21 nighty Exp <? echo "\$" ?> //--&gt;
 	
 	'config.inc' For GNUworld's mod.cservice's website interface
 	
 	Created: <nighty@undernet.org> - 10/29/2001
-	Last modif: <nighty@undernet.org> - 03/11/2002
+	Last modif: <nighty@undernet.org> - 04/04/2002
 	
 	This file contains two sections,
 	- what you *MUST* edit to ensure your website can work properly.
 	- what you *CAN* edit to tweak it more precisely.
 
+	Enjoy!@#
 
 	*/
 
@@ -1374,6 +1382,8 @@ it will be sent to <b>_top</b> (the whole browser current window).</font>
 	    if you do mirrors, the following options means that if the website is accessed with "ROUNDROBIN",
 	    it will automatically redirect accesses to "LOCALMIRROR".
 	*/
+	define(ADMINONLY_MIRROR,0); // Define this to 1 if you want that only * person can login.
+	define(CLIENT_MIRROR_URL,"http://cservice.undernet.org/live/"); // define this in case ADMINONLY_MIRROR is set to 1.
 
 <font color=#000000>As stated above, <font color=#ff0000><b>do not modify this unless you have the use of it</b></font>.
 The purpose is, for example, if you plan to have <b>http://cservice-live.undernet.org/</b>
@@ -1391,6 +1401,16 @@ a database locally for each mirror.</font>
 	/*************************/
 	/* VARIOUS CHECK OPTIONS */
 	/*************************/
+	define(ENABLE_NOTES,1); // set this to 1 to enable or 0 to disable the "Notes" link on the web
+				// you *NEED* to have your X (mod.cservice) bot running with the code
+				// supporting it to enable this, check out 'gnuworld/doc/notes.sql' too.
+	define(NOTES_ADMIN_ONLY,1); // This applies if 'ENABLE_NOTES' is set to 1, when set to 0, everyone can use the feature
+				    // when set to 1, only * persons can.			
+	define(NOTES_LIM_TOTAL,10); // Total number of notes a user can send to all users. (0 = unlimited)
+	define(NOTES_LIM_PERUSR,3); // Total number of notes a user can send to a single user. (0 = unlimited)
+	define(NOTES_LIM_INBOX,15); // Total number of notes a user can have in his 'notes box'. (0 = unlimited)
+	// of course, if ENABLE_NOTES is defined to '0', above three values have no effect.
+	
 	define(BOFH_PASS_ADMIN,1); // set this to 0 to disable password complexity checking for * people.
 	define(BOFH_PASS_USER,0); // set this to 1 to enable password complexity checking for all users (overriding BOFH_PASS_ADMIN=0).
 	define(PW_MIN_CHARS,6); // minimum chars a password must contain.
@@ -1432,8 +1452,11 @@ a database locally for each mirror.</font>
 	The number of required supporters will be, if not existing in tables "variables" in the remote DB,
 	updated to the number you set above (ie. first run), BUT, if there's already a definition for it in the DB,
 	the DB one will be the one used by the interface.
-	You can change the ammount of required supporters using the website itself in 'Webaxs Admin'.
-	One button there will allow you to reset to "config.inc"'s setting.
+	You can change the ammount of required supporters using the website itself in 'ACL Manager'.
+	You must be 901+ to view the [Modify] button next to number of required supporters, ensure
+	the "New Regs" are LOCKED (at the top of the ACL Manager page) then click on the [Modify] button,
+	One button there will allow you to reset to "config.inc"'s setting, or change to another number,
+	after validating, re-open "New Regs" and see the changes.
 	This requires to login with a user with an admin access of 901 or above (coder level only).
 	>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<
 	*/
@@ -1593,6 +1616,9 @@ if ($subset=="C-3") {
 <h2>Building Apache with PHP and PostgreSQL support</h2>
 <pre>
 
+<i>Side note: of course it's always best to be up to date with php and apache version
+if you have apache_1.3.24 or php-4.1.3 .. don't hesitate, take it ;)</i>
+
 I will be a bit short on it because :
 	- It should'nt need to be long ;)
 	- Apache and PHP documentations are way more complete than that one.
@@ -1639,13 +1665,13 @@ Edit the file <b>/usr/local/apache/conf/httpd.conf</b>...
 
 
 
-	then find
+	then find (look for example for 'AddType') :
 		<b># And for PHP 4.x, use:
 		#
 		#AddType application/x-httpd-php .php
 		#AddType application/x-httpd-php-source .phps</b>
 
-	and replace by :
+	and replace by : (if you haven't found the lines above, add them in the file then)
 		<b># And for PHP 4.x, use:
 		#
 		AddType application/x-httpd-php .php
@@ -1732,11 +1758,11 @@ Congratulations, you have set up <b>GNUworld</b> on your machine.
 You can go back to <a href="./">Home page</a>,
 or visit one of the following links for additionnal information :
 
-	Coder-Comittee		<a href="http://coder-com.undernet.org/" target=_blank>http://coder-com.undernet.org/</a>
-	Undernet CService	<a href="http://cservice.undernet.org/" target=_blank>http://cservice.undernet.org/</a>
-	Undernet Web Interface	<a href="http://cservice.undernet.org/live/" target=_blank>http://cservice.undernet.org/live/</a>
+	Coder-Comittee			<a href="http://coder-com.undernet.org/" target=_blank>http://coder-com.undernet.org/</a>
+	Undernet CService		<a href="http://cservice.undernet.org/" target=_blank>http://cservice.undernet.org/</a>
+	Undernet CService Web Interface	<a href="http://cservice.undernet.org/live/" target=_blank>http://cservice.undernet.org/live/</a>
 	
-	GNUworld Home		<a href="http://gnuworld.undernet.org/" target=_blank>http://gnuworld.undernet.org/</a>
+	GNUworld Home			<a href="http://gnuworld.undernet.org/" target=_blank>http://gnuworld.undernet.org/</a>
 	
 	
 	<a href="./?s=4">Frequently Asked Questions (FAQs)</a>
@@ -1763,6 +1789,9 @@ if ($s==4) { // *** FAQs
 <li> <a href=#faq4>Were can i get the Website module for GNUWorld X ?</a>
 <li> <a href=#faq5>How can i upgrade GNUWorld without install it again ?</a>
 <li> <a href=#faq6>How can i have that documentation on my server ?</a>
+<li> <a href=#faq7>I changed number of required supporters in the config but the page doesnt take it</a>
+<li> <a href=#faqu1>My website is doing errors complaining about 'tz_setting' and/or 'acl', how do i fix this ?</a>
+<li> <a href=#faqu2>I enabled 'NOTES' in my config.inc file and the page is doing errors about it</a>
 </ul>
 <hr width=100% noshade size=1><br>
 <pre>
@@ -1824,38 +1853,33 @@ Please read the <i>README</i> file first.
 
 <hr width=100% noshade size=1><br>
 
-</pre>
-<?
-}
-if ($s==5) { // *** UPGRADING
-?>
-<pre>
-Upgrading GNUworld or the website can be done easily if a few rules are followed, sometimes,
-just in case you get a weird error, have a look at this page first, you may find very usefull
-information here.
+<a name=faq7><b>I changed number of required supporters in the config but the page doesnt take it</b>
 
-This page assumes that you have installed GNUworld using <a href="./?s=1">our guide</a>.
+This is because the config.inc value is only a "default" one you can restore when you want.
+When you *FIRST* run the website, and when no "number of supporters required" value is yet set
+in the database, it reads it from config.inc and stores it as "first default" in the databse,
+but then, if it exists and has a value in the database, it will NEVER re-read it from the config.inc file
+unless you specifically ask for it in the 'ACL Manager' page, this is also the place where you can,
+and should change that value when it has already been set once.
 
-Quite all the times, there's a problem after upgrading GNUworld and/or website,
-the problem comes from the database schema that is outdated because you haven't updated it aside.
+To modify this you need a "coder" level (901 or above), go to 'ACL Manager' page, ensure that
+the "New Regs" are <b>LOCKED</b>, then click on the <b>[Modify]</b> button on the right of the
+"Required number of supporters", you can here, either reset database value to the current config.inc's one,
+or set it to something else between 0 and 10.
+When done, have the "New Regs" unlocked and you have it (dont forget to eventually reload the Channel Registration
+Page in order to correctly see the changes).
 
-If any db schema occur, you will see that the files in <b>gnuworld/doc</b> directory, will have
-some change (when you <b>cvs update -d</b>), if there's is any then you need to ensure your
-database structure is correct by :
-	- watching changed/added files in <a href="http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/gnuworld/gnuworld/doc/" target=_blank><b>gnuworld/doc</b></a>
-	- watching <a href="http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/gnuworld/gnuworld/mod.cservice/RELEASE.NOTES" target=_blank><b>gnuworld/mod.cservice/RELEASE.NOTES</b></a>
-
-and apply eventual patches or sql script you would need to.
+<hr width=100% noshade size=1><br>
 
 
+<a name=faqu1><b>My website is doing errors complaining about 'tz_setting' and/or 'acl', how do i fix this ?</b>
 Latest patch problem user may encouter is the "timezone" setting that has been
 moved to the database instead of being stored in a cookie, this implied changes about the database,
 added to that a new ACL system came up, replacing the WebAxs page, this also required some database
 schema modification ...
 
 For people upgrading from a version that still had the <b>WebAxs</b> link in the left menu,
-to the new website version, the one with <b>ACL Manager</b>, or .. more likely,
-the one complaining about <b>tz_setting</b> in page header errors, then you need to :
+to the new website version, the one with <b>ACL Manager</b>... you need to :
 
 execute the two <b>update_tzmove_r.sql</b> and <b>update_tzmove_l.sql</b> files in <b>gnuworld/doc</b> directory,
 respectively to remote (cservice) and local (local_db) databases,
@@ -1884,6 +1908,62 @@ the following changes are also required in the remote database (cservice):
 	ALTER TABLE users ADD maxlogins INT4 DEFAULT 1;
 </b>
 
+<hr width=100% noshade size=1><br>
+
+<a name=faqu2><b>I enabled 'NOTES' in my config.inc file and the page is doing errors about it</b>
+
+This feature was added recently, in order to handle it properly you need
+the latest CVS version of GNUworld (mod.cservice) and of the website.
+
+If the errors are complaining about a "notes" thing missing somewhere, it's probably because
+that new table is not created in your remote database structure (cservice):
+	Run <b>psql cservice</b> and type the following at the <b>cservice:=#</b> prompt :
+<b>
+	CREATE TABLE notes (
+	        message_id SERIAL,
+	        user_id INT4 CONSTRAINT users_notes_ref REFERENCES users( id ),
+	        from_user_id INT4 CONSTRAINT users_notes_ref REFERENCES users( id ),
+	        message VARCHAR( 300 ),
+	        last_updated INT4 NOT NULL,
+	
+	        PRIMARY KEY(message_id, user_id)
+	);
+</b>
+
+<hr width=100% noshade size=1><br>
+
+
+</pre>
+<?
+}
+if ($s==5) { // *** UPGRADING
+?>
+<pre>
+Upgrading GNUworld or the website can be done easily if a few rules are followed, sometimes,
+just in case you get a weird error, have a look at this page first, you may find very usefull
+information here.
+
+This page assumes that you have installed GNUworld using <a href="./?s=1">our guide</a>.
+
+Quite all the times, there's a problem after upgrading GNUworld and/or website,
+the problem comes from the database schema that is outdated because you haven't updated it aside.
+
+If any db schema occur, you will see that the files in <b>gnuworld/doc</b> directory, will have
+some change (when you <b>cvs update -d</b>), if there's is any then you need to ensure your
+database structure is correct by :
+	- watching changed/added files in <a href="http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/gnuworld/gnuworld/doc/" target=_blank><b>gnuworld/doc</b></a>
+	- watching <a href="http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/gnuworld/gnuworld/mod.cservice/RELEASE.NOTES" target=_blank><b>gnuworld/mod.cservice/RELEASE.NOTES</b></a>
+
+and apply eventual patches or sql script you would need to.
+
+Here are some links to FAQs regarding latest problems you may encounter in upgrading GNUworld :
+</pre>
+<ul>
+<li> <a href=./?s=4#faqu1>My website is doing errors complaining about 'tz_setting' and/or 'acl', how do i fix this ?</a>
+<li> <a href=./?s=4#faqu2>I enabled 'NOTES' in my config.inc file and the page is doing errors about it</a>
+</ul>
+<pre>
+
 <font color=#ff0000>CERT Security Advisory: you should upgrade to <b>php-4.1.2</b> for security reasons :</font>
 	<a href="http://www.cert.org/advisories/CA-2002-05.html" target=_blank>http://www.cert.org/advisories/CA-2002-05.html</a>
 
@@ -1903,6 +1983,7 @@ or in pointing bugs or mistakes.
 
 Special thanks to A1kmm for pushing me in putting this "non-root setup guidelines".
 Thanks to MrIron for providing support with the FAQs...
+Thanks to d[a]aave for pointing out how to ensure PostgreSQL runs strictly locally secured.
 
 This documentation is in no way perfect and will be modified from time to time according
 to GNUworld evolutions and users problems.
