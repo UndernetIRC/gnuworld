@@ -18,7 +18,7 @@
 #include	"ELog.h"
 #include	"Gline.h"
 
-const char GLINECommand_cc_rcsId[] = "$Id: GLINECommand.cc,v 1.4 2001/02/26 16:58:05 mrbean_ Exp $";
+const char GLINECommand_cc_rcsId[] = "$Id: GLINECommand.cc,v 1.5 2001/04/24 17:36:40 gte Exp $";
 
 namespace gnuworld
 {
@@ -86,11 +86,11 @@ server->setGline( nickUserHost,
 
 strstream s ;
 s	<< server->getCharYY() << " WA :"
-	<< theClient->getCharYYXXX()
+        << theClient->getNickName().c_str()
 	<< " is adding gline for: "
 	<< st[ pos ]
 	<< ", expires at " << (time( 0 ) + gLength)
-	<< " because: " << st.assemble( pos + 1 )
+	<< " reason: " << st.assemble( pos + 1 )
 	<< ends ;
 bot->Write( s ) ;
 delete[] s.str() ;
