@@ -12,7 +12,7 @@
  * TODO: /msg x suspend #channel *, suspends all users below your access
  * level.
  *
- * $Id: SUSPENDCommand.cc,v 1.6 2001/01/30 03:02:46 gte Exp $
+ * $Id: SUSPENDCommand.cc,v 1.7 2001/02/05 18:57:36 gte Exp $
  */
 
 #include	<string>
@@ -23,7 +23,7 @@
 #include	"Network.h"
 #include	"levels.h"
 
-const char SUSPENDCommand_cc_rcsId[] = "$Id: SUSPENDCommand.cc,v 1.6 2001/01/30 03:02:46 gte Exp $" ;
+const char SUSPENDCommand_cc_rcsId[] = "$Id: SUSPENDCommand.cc,v 1.7 2001/02/05 18:57:36 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -132,6 +132,8 @@ bool SUSPENDCommand::Exec( iClient* theClient, const string& Message )
 
 	aLevel->setSuspendExpire(finalDuration + bot->currentTime());
 	aLevel->setSuspendBy(theClient->getNickUserHost());
+	aLevel->setLastModif(bot->currentTime());
+	aLevel->setLastModifBy(theClient->getNickUserHost()); 
 	aLevel->commit();
 	
 	bot->Notice(theClient, "SUSPENSION for %s will expire in %s",

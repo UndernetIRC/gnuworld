@@ -8,7 +8,7 @@
  *
  * Caveats: None
  *
- * $Id: ADDUSERCommand.cc,v 1.10 2001/01/30 00:12:16 gte Exp $
+ * $Id: ADDUSERCommand.cc,v 1.11 2001/02/05 18:57:36 gte Exp $
  */
  
 #include	<string>
@@ -19,7 +19,7 @@
 #include	"levels.h"
 #include	"libpq++.h"
 
-const char ADDUSERCommand_cc_rcsId[] = "$Id: ADDUSERCommand.cc,v 1.10 2001/01/30 00:12:16 gte Exp $" ;
+const char ADDUSERCommand_cc_rcsId[] = "$Id: ADDUSERCommand.cc,v 1.11 2001/02/05 18:57:36 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -163,11 +163,11 @@ theQuery << queryHeader << "VALUES ("
 	<< targetUser->getID() << ","
 	<< targetAccess << ","
 	<< targetFlags << ","
-	<< ::time(NULL) << ","
+	<< bot->currentTime() << ","
 	<< "'" << theClient->getNickUserHost() << "',"
-	<< ::time(NULL) << ","
+	<< bot->currentTime() << ","
 	<< "'" << theClient->getNickUserHost() << "'," 
-	<< ::time(NULL)
+	<< bot->currentTime()
 	<< ");"
 	<< ends; 
  

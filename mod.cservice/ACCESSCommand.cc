@@ -7,7 +7,7 @@
  * Displays all "Level" records for a specified channel.
  * Can optionally narrow down selection using a number of switches. 
  *
- * $Id: ACCESSCommand.cc,v 1.23 2001/01/31 19:53:25 gte Exp $
+ * $Id: ACCESSCommand.cc,v 1.24 2001/02/05 18:57:36 gte Exp $
  */
 
 #include	<string>
@@ -19,7 +19,7 @@
 #include	"match.h"
 #define MAX_RESULTS 15
  
-const char ACCESSCommand_cc_rcsId[] = "$Id: ACCESSCommand.cc,v 1.23 2001/01/31 19:53:25 gte Exp $" ;
+const char ACCESSCommand_cc_rcsId[] = "$Id: ACCESSCommand.cc,v 1.24 2001/02/05 18:57:36 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -48,6 +48,23 @@ if (!theChan)
 		bot->Notice(theClient, "Sorry, the channel %s isn't registered with me.", st[1].c_str());
 		return false;
 	} 
+
+/* Don't let ordinary people view * accesses */
+if (theChan->getName() == "*") 
+{
+	sqlUser* theUser = bot->isAuthed(theClient, false);
+	if (!theUser) 
+	{
+		bot->Notice(theClient, "Sorry, the channel %s isn't registered with me.", st[1].c_str());
+		return false;
+	}
+
+	if (theUser && !bot->getAdminAccessLevel(theUser))
+	{
+		bot->Notice(theClient, "Sorry, the channel %s isn't registered with me.", st[1].c_str());
+		return false; 
+	}
+}
  
 /*
  *  Figure out the switches and append to the SQL statement accordingly.

@@ -8,7 +8,7 @@
  *
  * Caveats: None.
  *
- * $Id: UNSUSPENDCommand.cc,v 1.4 2001/01/30 03:02:46 gte Exp $
+ * $Id: UNSUSPENDCommand.cc,v 1.5 2001/02/05 18:57:36 gte Exp $
  */
 
 #include	<string>
@@ -19,7 +19,7 @@
 #include	"Network.h"
 #include	"levels.h"
 
-const char UNSUSPENDCommand_cc_rcsId[] = "$Id: UNSUSPENDCommand.cc,v 1.4 2001/01/30 03:02:46 gte Exp $" ;
+const char UNSUSPENDCommand_cc_rcsId[] = "$Id: UNSUSPENDCommand.cc,v 1.5 2001/02/05 18:57:36 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -90,6 +90,8 @@ bool UNSUSPENDCommand::Exec( iClient* theClient, const string& Message )
  
 	aLevel->setSuspendExpire(0);
 	aLevel->setSuspendBy("");
+	aLevel->setLastModif(bot->currentTime());
+	aLevel->setLastModifBy(theClient->getNickUserHost()); 
 	aLevel->commit();
 
 	bot->Notice(theClient, "SUSPENSION for %s is cancelled",
