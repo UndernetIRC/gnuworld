@@ -40,6 +40,7 @@ ACLOCAL = @ACLOCAL@
 AMDEP_FALSE = @AMDEP_FALSE@
 AMDEP_TRUE = @AMDEP_TRUE@
 AMTAR = @AMTAR@
+AR = @AR@
 AUTOCONF = @AUTOCONF@
 AUTOHEADER = @AUTOHEADER@
 AUTOMAKE = @AUTOMAKE@
@@ -85,6 +86,8 @@ ECHO_N = @ECHO_N@
 ECHO_T = @ECHO_T@
 EGREP = @EGREP@
 EXEEXT = @EXEEXT@
+F77 = @F77@
+FFLAGS = @FFLAGS@
 INCLTDL = @INCLTDL@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
@@ -118,8 +121,10 @@ SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
 VERSION = @VERSION@
+ac_ct_AR = @ac_ct_AR@
 ac_ct_CC = @ac_ct_CC@
 ac_ct_CXX = @ac_ct_CXX@
+ac_ct_F77 = @ac_ct_F77@
 ac_ct_RANLIB = @ac_ct_RANLIB@
 ac_ct_STRIP = @ac_ct_STRIP@
 am__fastdepCC_FALSE = @am__fastdepCC_FALSE@
@@ -137,7 +142,6 @@ build_os = @build_os@
 build_vendor = @build_vendor@
 datadir = @datadir@
 exec_prefix = @exec_prefix@
-glibdir = @glibdir@
 host = @host@
 host_alias = @host_alias@
 host_cpu = @host_cpu@
@@ -316,10 +320,10 @@ RECURSIVE_TARGETS = info-recursive dvi-recursive pdf-recursive \
 	all-recursive install-data-recursive install-exec-recursive \
 	installdirs-recursive install-recursive uninstall-recursive \
 	check-recursive installcheck-recursive
-DIST_COMMON = README ./include/defs.h.in AUTHORS COPYING ChangeLog \
-	INSTALL Makefile.am Makefile.in NEWS TODO aclocal.m4 \
-	config.guess config.sub configure configure.ac depcomp \
-	install-sh ltconfig ltmain.sh missing mkinstalldirs
+DIST_COMMON = README ././include/defs.h.in ./include/defs.h.in AUTHORS \
+	COPYING ChangeLog INSTALL Makefile.am Makefile.in NEWS TODO \
+	aclocal.m4 config.guess config.sub configure configure.ac \
+	depcomp install-sh ltconfig ltmain.sh missing mkinstalldirs
 DIST_SUBDIRS = libgnuworld libltdl src @NEW_MODS@ mod.ccontrol \
 	mod.clientExample mod.cloner mod.cservice mod.dronescan \
 	mod.gnutest mod.nickserv mod.scanner mod.stats test db libircu
@@ -532,7 +536,7 @@ distcleancheck_listfiles = find . -type f -print
 distdir: $(DISTFILES)
 	$(am__remove_distdir)
 	mkdir $(distdir)
-	$(mkinstalldirs) $(distdir)/./include $(distdir)/bin $(distdir)/contrib $(distdir)/db $(distdir)/doc $(distdir)/doc/cmaster $(distdir)/doc/cmaster/website $(distdir)/doc/idoc $(distdir)/doc/nickserv $(distdir)/include $(distdir)/libltdl
+	$(mkinstalldirs) $(distdir)/././include $(distdir)/./include $(distdir)/bin $(distdir)/contrib $(distdir)/db $(distdir)/doc $(distdir)/doc/cmaster $(distdir)/doc/cmaster/website $(distdir)/doc/idoc $(distdir)/doc/nickserv $(distdir)/include $(distdir)/libltdl
 	@srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`; \
 	topsrcdirstrip=`echo "$(top_srcdir)" | sed 's|.|.|g'`; \
 	list='$(DISTFILES)'; for file in $$list; do \

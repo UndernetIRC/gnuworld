@@ -1,4 +1,4 @@
-## $Id: Makefile.am,v 1.16 2003/07/09 18:31:23 dan_karrels Exp $
+## $Id: Makefile.am,v 1.17 2003/09/02 01:37:05 dan_karrels Exp $
 ## test
 
 @SET_MAKE@
@@ -71,7 +71,7 @@ EXTRA_DIST = bin/ccontrol.example.conf.in \
 	bin/nickserv.example.conf.in \
 	bin/scanner.example.conf.in \
 	bin/stats.example.conf.in \
-	bin/server_command_map \
+	bin/server_command_map.in \
 	contrib/00INDEX.TXT \
 	contrib/chktrans.py \
 	contrib/encrypt.sh \

@@ -40,6 +40,7 @@ ACLOCAL = @ACLOCAL@
 AMDEP_FALSE = @AMDEP_FALSE@
 AMDEP_TRUE = @AMDEP_TRUE@
 AMTAR = @AMTAR@
+AR = @AR@
 AUTOCONF = @AUTOCONF@
 AUTOHEADER = @AUTOHEADER@
 AUTOMAKE = @AUTOMAKE@
@@ -85,6 +86,8 @@ ECHO_N = @ECHO_N@
 ECHO_T = @ECHO_T@
 EGREP = @EGREP@
 EXEEXT = @EXEEXT@
+F77 = @F77@
+FFLAGS = @FFLAGS@
 INCLTDL = @INCLTDL@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
@@ -118,8 +121,10 @@ SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
 VERSION = @VERSION@
+ac_ct_AR = @ac_ct_AR@
 ac_ct_CC = @ac_ct_CC@
 ac_ct_CXX = @ac_ct_CXX@
+ac_ct_F77 = @ac_ct_F77@
 ac_ct_RANLIB = @ac_ct_RANLIB@
 ac_ct_STRIP = @ac_ct_STRIP@
 am__fastdepCC_FALSE = @am__fastdepCC_FALSE@
@@ -137,7 +142,6 @@ build_os = @build_os@
 build_vendor = @build_vendor@
 datadir = @datadir@
 exec_prefix = @exec_prefix@
-glibdir = @glibdir@
 host = @host@
 host_alias = @host_alias@
 host_cpu = @host_cpu@
@@ -173,24 +177,45 @@ noinst_PROGRAMS = test_burst \
 	test_bot \
 	test_kick_transaction
 
-LDADD = $(glibdir)/libgnuworld.la
+LDADD = $(top_builddir)/libgnuworld/libgnuworld.la
 
 test_burst_SOURCES = burst.cc
+test_burst_CXXFLAGS = -I${top_srcdir}/include -I${top_srcdir}/libgnuworld
+
 test_mtrie_SOURCES = mtrie.cc
+test_mtrie_CXXFLAGS = -I${top_srcdir}/include -I${top_srcdir}/libgnuworld
+
 test_mtrie_load_SOURCES = mtrie_load.cc
+test_mtrie_load_CXXFLAGS = -I${top_srcdir}/include -I${top_srcdir}/libgnuworld
+
 test_mtrie_perf_SOURCES = mtrie_perf.cc
+test_mtrie_perf_CXXFLAGS = -I${top_srcdir}/include -I${top_srcdir}/libgnuworld
+
 test_mtrie_perf_summary_SOURCES = mtrie_perf_summary.cc
+test_mtrie_perf_summary_CXXFLAGS = -I${top_srcdir}/include -I${top_srcdir}/libgnuworld
+
 test_stringtokenizer_SOURCES = stringtokenizer.cc
+test_stringtokenizer_CXXFLAGS = -I${top_srcdir}/include -I${top_srcdir}/libgnuworld
+
 test_econfig_SOURCES = econfig.cc
+test_econfig_CXXFLAGS = -I${top_srcdir}/include -I${top_srcdir}/libgnuworld
+
 test_match_SOURCES = match.cc
+test_match_CXXFLAGS = -I${top_srcdir}/include -I${top_srcdir}/libgnuworld
+
 test_bot_SOURCES = testbot.cc
+test_bot_CXXFLAGS = -I${top_srcdir}/include -I${top_srcdir}/libgnuworld
+
 test_kick_transaction_SOURCES = test_kick_transaction.cc
+test_kick_transaction_CXXFLAGS = -I${top_srcdir}/include -I${top_srcdir}/libgnuworld
 
 test_gThread_SOURCES = gThread.cc
-test_gThread_LDFLAGS = $(glibdir)/libgnuworld.la @threadLib@
+test_gThread_LDFLAGS = $(top_builddir)/libgnuworld/libgnuworld.la @threadLib@
+test_gThread_CXXFLAGS = -I${top_srcdir}/include -I${top_srcdir}/libgnuworld
 
 test_signal_SOURCES = signal.cc
-test_signal_LDFLAGS = $(glibdir)/libgnuworld.la @threadLib@
+test_signal_LDFLAGS = $(top_builddir)/libgnuworld/libgnuworld.la @threadLib@
+test_signal_CXXFLAGS = -I${top_srcdir}/include -I${top_srcdir}/libgnuworld
 
 EXTRA_DIST = testbot.h
 subdir = test
@@ -206,77 +231,88 @@ noinst_PROGRAMS = test_burst$(EXEEXT) test_mtrie_load$(EXEEXT) \
 	test_kick_transaction$(EXEEXT)
 PROGRAMS = $(noinst_PROGRAMS)
 
-am_test_bot_OBJECTS = testbot.$(OBJEXT)
+am_test_bot_OBJECTS = test_bot-testbot.$(OBJEXT)
 test_bot_OBJECTS = $(am_test_bot_OBJECTS)
 test_bot_LDADD = $(LDADD)
-test_bot_DEPENDENCIES = $(glibdir)/libgnuworld.la
+test_bot_DEPENDENCIES = $(top_builddir)/libgnuworld/libgnuworld.la
 test_bot_LDFLAGS =
-am_test_burst_OBJECTS = burst.$(OBJEXT)
+am_test_burst_OBJECTS = test_burst-burst.$(OBJEXT)
 test_burst_OBJECTS = $(am_test_burst_OBJECTS)
 test_burst_LDADD = $(LDADD)
-test_burst_DEPENDENCIES = $(glibdir)/libgnuworld.la
+test_burst_DEPENDENCIES = $(top_builddir)/libgnuworld/libgnuworld.la
 test_burst_LDFLAGS =
-am_test_econfig_OBJECTS = econfig.$(OBJEXT)
+am_test_econfig_OBJECTS = test_econfig-econfig.$(OBJEXT)
 test_econfig_OBJECTS = $(am_test_econfig_OBJECTS)
 test_econfig_LDADD = $(LDADD)
-test_econfig_DEPENDENCIES = $(glibdir)/libgnuworld.la
+test_econfig_DEPENDENCIES = $(top_builddir)/libgnuworld/libgnuworld.la
 test_econfig_LDFLAGS =
-am_test_gThread_OBJECTS = gThread.$(OBJEXT)
+am_test_gThread_OBJECTS = test_gThread-gThread.$(OBJEXT)
 test_gThread_OBJECTS = $(am_test_gThread_OBJECTS)
 test_gThread_LDADD = $(LDADD)
-test_gThread_DEPENDENCIES = $(glibdir)/libgnuworld.la
-am_test_kick_transaction_OBJECTS = test_kick_transaction.$(OBJEXT)
+test_gThread_DEPENDENCIES = $(top_builddir)/libgnuworld/libgnuworld.la
+am_test_kick_transaction_OBJECTS = \
+	test_kick_transaction-test_kick_transaction.$(OBJEXT)
 test_kick_transaction_OBJECTS = $(am_test_kick_transaction_OBJECTS)
 test_kick_transaction_LDADD = $(LDADD)
-test_kick_transaction_DEPENDENCIES = $(glibdir)/libgnuworld.la
+test_kick_transaction_DEPENDENCIES = \
+	$(top_builddir)/libgnuworld/libgnuworld.la
 test_kick_transaction_LDFLAGS =
-am_test_match_OBJECTS = match.$(OBJEXT)
+am_test_match_OBJECTS = test_match-match.$(OBJEXT)
 test_match_OBJECTS = $(am_test_match_OBJECTS)
 test_match_LDADD = $(LDADD)
-test_match_DEPENDENCIES = $(glibdir)/libgnuworld.la
+test_match_DEPENDENCIES = $(top_builddir)/libgnuworld/libgnuworld.la
 test_match_LDFLAGS =
-am_test_mtrie_OBJECTS = mtrie.$(OBJEXT)
+am_test_mtrie_OBJECTS = test_mtrie-mtrie.$(OBJEXT)
 test_mtrie_OBJECTS = $(am_test_mtrie_OBJECTS)
 test_mtrie_LDADD = $(LDADD)
-test_mtrie_DEPENDENCIES = $(glibdir)/libgnuworld.la
+test_mtrie_DEPENDENCIES = $(top_builddir)/libgnuworld/libgnuworld.la
 test_mtrie_LDFLAGS =
-am_test_mtrie_load_OBJECTS = mtrie_load.$(OBJEXT)
+am_test_mtrie_load_OBJECTS = test_mtrie_load-mtrie_load.$(OBJEXT)
 test_mtrie_load_OBJECTS = $(am_test_mtrie_load_OBJECTS)
 test_mtrie_load_LDADD = $(LDADD)
-test_mtrie_load_DEPENDENCIES = $(glibdir)/libgnuworld.la
+test_mtrie_load_DEPENDENCIES = \
+	$(top_builddir)/libgnuworld/libgnuworld.la
 test_mtrie_load_LDFLAGS =
-am_test_mtrie_perf_OBJECTS = mtrie_perf.$(OBJEXT)
+am_test_mtrie_perf_OBJECTS = test_mtrie_perf-mtrie_perf.$(OBJEXT)
 test_mtrie_perf_OBJECTS = $(am_test_mtrie_perf_OBJECTS)
 test_mtrie_perf_LDADD = $(LDADD)
-test_mtrie_perf_DEPENDENCIES = $(glibdir)/libgnuworld.la
+test_mtrie_perf_DEPENDENCIES = \
+	$(top_builddir)/libgnuworld/libgnuworld.la
 test_mtrie_perf_LDFLAGS =
-am_test_mtrie_perf_summary_OBJECTS = mtrie_perf_summary.$(OBJEXT)
+am_test_mtrie_perf_summary_OBJECTS = \
+	test_mtrie_perf_summary-mtrie_perf_summary.$(OBJEXT)
 test_mtrie_perf_summary_OBJECTS = $(am_test_mtrie_perf_summary_OBJECTS)
 test_mtrie_perf_summary_LDADD = $(LDADD)
-test_mtrie_perf_summary_DEPENDENCIES = $(glibdir)/libgnuworld.la
+test_mtrie_perf_summary_DEPENDENCIES = \
+	$(top_builddir)/libgnuworld/libgnuworld.la
 test_mtrie_perf_summary_LDFLAGS =
-am_test_signal_OBJECTS = signal.$(OBJEXT)
+am_test_signal_OBJECTS = test_signal-signal.$(OBJEXT)
 test_signal_OBJECTS = $(am_test_signal_OBJECTS)
 test_signal_LDADD = $(LDADD)
-test_signal_DEPENDENCIES = $(glibdir)/libgnuworld.la
-am_test_stringtokenizer_OBJECTS = stringtokenizer.$(OBJEXT)
+test_signal_DEPENDENCIES = $(top_builddir)/libgnuworld/libgnuworld.la
+am_test_stringtokenizer_OBJECTS = \
+	test_stringtokenizer-stringtokenizer.$(OBJEXT)
 test_stringtokenizer_OBJECTS = $(am_test_stringtokenizer_OBJECTS)
 test_stringtokenizer_LDADD = $(LDADD)
-test_stringtokenizer_DEPENDENCIES = $(glibdir)/libgnuworld.la
+test_stringtokenizer_DEPENDENCIES = \
+	$(top_builddir)/libgnuworld/libgnuworld.la
 test_stringtokenizer_LDFLAGS =
 
 DEFAULT_INCLUDES =  -I. -I$(srcdir) -I$(top_builddir)/include
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
-@AMDEP_TRUE@DEP_FILES = ./$(DEPDIR)/burst.Po ./$(DEPDIR)/econfig.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/gThread.Po ./$(DEPDIR)/match.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/mtrie.Po ./$(DEPDIR)/mtrie_load.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/mtrie_perf.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/mtrie_perf_summary.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/signal.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/stringtokenizer.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/test_kick_transaction.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/testbot.Po
+@AMDEP_TRUE@DEP_FILES = ./$(DEPDIR)/test_bot-testbot.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/test_burst-burst.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/test_econfig-econfig.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/test_gThread-gThread.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/test_kick_transaction-test_kick_transaction.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/test_match-match.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/test_mtrie-mtrie.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/test_mtrie_load-mtrie_load.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/test_mtrie_perf-mtrie_perf.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/test_mtrie_perf_summary-mtrie_perf_summary.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/test_signal-signal.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/test_stringtokenizer-stringtokenizer.Po
 CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
 LTCXXCOMPILE = $(LIBTOOL) --mode=compile $(CXX) $(DEFS) \
@@ -353,18 +389,18 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/burst.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/econfig.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gThread.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/match.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mtrie.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mtrie_load.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mtrie_perf.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mtrie_perf_summary.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/signal.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/stringtokenizer.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_kick_transaction.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/testbot.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_bot-testbot.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_burst-burst.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_econfig-econfig.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_gThread-gThread.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_kick_transaction-test_kick_transaction.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_match-match.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_mtrie-mtrie.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_mtrie_load-mtrie_load.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_mtrie_perf-mtrie_perf.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_mtrie_perf_summary-mtrie_perf_summary.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_signal-signal.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_stringtokenizer-stringtokenizer.Po@am__quote@
 
 distclean-depend:
 	-rm -rf ./$(DEPDIR)
@@ -401,6 +437,402 @@ distclean-depend:
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/$*.Plo' tmpdepfile='$(DEPDIR)/$*.TPlo' @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LTCXXCOMPILE) -c -o $@ `test -f '$<' || echo '$(srcdir)/'`$<
+
+test_bot-testbot.o: testbot.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_bot_CXXFLAGS) $(CXXFLAGS) -MT test_bot-testbot.o -MD -MP -MF "$(DEPDIR)/test_bot-testbot.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o test_bot-testbot.o `test -f 'testbot.cc' || echo '$(srcdir)/'`testbot.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/test_bot-testbot.Tpo" "$(DEPDIR)/test_bot-testbot.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/test_bot-testbot.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='testbot.cc' object='test_bot-testbot.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/test_bot-testbot.Po' tmpdepfile='$(DEPDIR)/test_bot-testbot.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_bot_CXXFLAGS) $(CXXFLAGS) -c -o test_bot-testbot.o `test -f 'testbot.cc' || echo '$(srcdir)/'`testbot.cc
+
+test_bot-testbot.obj: testbot.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_bot_CXXFLAGS) $(CXXFLAGS) -MT test_bot-testbot.obj -MD -MP -MF "$(DEPDIR)/test_bot-testbot.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o test_bot-testbot.obj `if test -f 'testbot.cc'; then $(CYGPATH_W) 'testbot.cc'; else $(CYGPATH_W) '$(srcdir)/testbot.cc'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/test_bot-testbot.Tpo" "$(DEPDIR)/test_bot-testbot.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/test_bot-testbot.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='testbot.cc' object='test_bot-testbot.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/test_bot-testbot.Po' tmpdepfile='$(DEPDIR)/test_bot-testbot.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_bot_CXXFLAGS) $(CXXFLAGS) -c -o test_bot-testbot.obj `if test -f 'testbot.cc'; then $(CYGPATH_W) 'testbot.cc'; else $(CYGPATH_W) '$(srcdir)/testbot.cc'; fi`
+
+test_bot-testbot.lo: testbot.cc
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_bot_CXXFLAGS) $(CXXFLAGS) -MT test_bot-testbot.lo -MD -MP -MF "$(DEPDIR)/test_bot-testbot.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o test_bot-testbot.lo `test -f 'testbot.cc' || echo '$(srcdir)/'`testbot.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/test_bot-testbot.Tpo" "$(DEPDIR)/test_bot-testbot.Plo"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/test_bot-testbot.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='testbot.cc' object='test_bot-testbot.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/test_bot-testbot.Plo' tmpdepfile='$(DEPDIR)/test_bot-testbot.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_bot_CXXFLAGS) $(CXXFLAGS) -c -o test_bot-testbot.lo `test -f 'testbot.cc' || echo '$(srcdir)/'`testbot.cc
+
+test_burst-burst.o: burst.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_burst_CXXFLAGS) $(CXXFLAGS) -MT test_burst-burst.o -MD -MP -MF "$(DEPDIR)/test_burst-burst.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o test_burst-burst.o `test -f 'burst.cc' || echo '$(srcdir)/'`burst.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/test_burst-burst.Tpo" "$(DEPDIR)/test_burst-burst.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/test_burst-burst.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='burst.cc' object='test_burst-burst.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/test_burst-burst.Po' tmpdepfile='$(DEPDIR)/test_burst-burst.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_burst_CXXFLAGS) $(CXXFLAGS) -c -o test_burst-burst.o `test -f 'burst.cc' || echo '$(srcdir)/'`burst.cc
+
+test_burst-burst.obj: burst.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_burst_CXXFLAGS) $(CXXFLAGS) -MT test_burst-burst.obj -MD -MP -MF "$(DEPDIR)/test_burst-burst.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o test_burst-burst.obj `if test -f 'burst.cc'; then $(CYGPATH_W) 'burst.cc'; else $(CYGPATH_W) '$(srcdir)/burst.cc'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/test_burst-burst.Tpo" "$(DEPDIR)/test_burst-burst.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/test_burst-burst.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='burst.cc' object='test_burst-burst.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/test_burst-burst.Po' tmpdepfile='$(DEPDIR)/test_burst-burst.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_burst_CXXFLAGS) $(CXXFLAGS) -c -o test_burst-burst.obj `if test -f 'burst.cc'; then $(CYGPATH_W) 'burst.cc'; else $(CYGPATH_W) '$(srcdir)/burst.cc'; fi`
+
+test_burst-burst.lo: burst.cc
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_burst_CXXFLAGS) $(CXXFLAGS) -MT test_burst-burst.lo -MD -MP -MF "$(DEPDIR)/test_burst-burst.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o test_burst-burst.lo `test -f 'burst.cc' || echo '$(srcdir)/'`burst.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/test_burst-burst.Tpo" "$(DEPDIR)/test_burst-burst.Plo"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/test_burst-burst.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='burst.cc' object='test_burst-burst.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/test_burst-burst.Plo' tmpdepfile='$(DEPDIR)/test_burst-burst.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_burst_CXXFLAGS) $(CXXFLAGS) -c -o test_burst-burst.lo `test -f 'burst.cc' || echo '$(srcdir)/'`burst.cc
+
+test_econfig-econfig.o: econfig.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_econfig_CXXFLAGS) $(CXXFLAGS) -MT test_econfig-econfig.o -MD -MP -MF "$(DEPDIR)/test_econfig-econfig.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o test_econfig-econfig.o `test -f 'econfig.cc' || echo '$(srcdir)/'`econfig.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/test_econfig-econfig.Tpo" "$(DEPDIR)/test_econfig-econfig.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/test_econfig-econfig.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='econfig.cc' object='test_econfig-econfig.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/test_econfig-econfig.Po' tmpdepfile='$(DEPDIR)/test_econfig-econfig.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_econfig_CXXFLAGS) $(CXXFLAGS) -c -o test_econfig-econfig.o `test -f 'econfig.cc' || echo '$(srcdir)/'`econfig.cc
+
+test_econfig-econfig.obj: econfig.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_econfig_CXXFLAGS) $(CXXFLAGS) -MT test_econfig-econfig.obj -MD -MP -MF "$(DEPDIR)/test_econfig-econfig.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o test_econfig-econfig.obj `if test -f 'econfig.cc'; then $(CYGPATH_W) 'econfig.cc'; else $(CYGPATH_W) '$(srcdir)/econfig.cc'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/test_econfig-econfig.Tpo" "$(DEPDIR)/test_econfig-econfig.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/test_econfig-econfig.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='econfig.cc' object='test_econfig-econfig.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/test_econfig-econfig.Po' tmpdepfile='$(DEPDIR)/test_econfig-econfig.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_econfig_CXXFLAGS) $(CXXFLAGS) -c -o test_econfig-econfig.obj `if test -f 'econfig.cc'; then $(CYGPATH_W) 'econfig.cc'; else $(CYGPATH_W) '$(srcdir)/econfig.cc'; fi`
+
+test_econfig-econfig.lo: econfig.cc
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_econfig_CXXFLAGS) $(CXXFLAGS) -MT test_econfig-econfig.lo -MD -MP -MF "$(DEPDIR)/test_econfig-econfig.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o test_econfig-econfig.lo `test -f 'econfig.cc' || echo '$(srcdir)/'`econfig.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/test_econfig-econfig.Tpo" "$(DEPDIR)/test_econfig-econfig.Plo"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/test_econfig-econfig.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='econfig.cc' object='test_econfig-econfig.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/test_econfig-econfig.Plo' tmpdepfile='$(DEPDIR)/test_econfig-econfig.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_econfig_CXXFLAGS) $(CXXFLAGS) -c -o test_econfig-econfig.lo `test -f 'econfig.cc' || echo '$(srcdir)/'`econfig.cc
+
+test_gThread-gThread.o: gThread.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_gThread_CXXFLAGS) $(CXXFLAGS) -MT test_gThread-gThread.o -MD -MP -MF "$(DEPDIR)/test_gThread-gThread.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o test_gThread-gThread.o `test -f 'gThread.cc' || echo '$(srcdir)/'`gThread.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/test_gThread-gThread.Tpo" "$(DEPDIR)/test_gThread-gThread.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/test_gThread-gThread.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='gThread.cc' object='test_gThread-gThread.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/test_gThread-gThread.Po' tmpdepfile='$(DEPDIR)/test_gThread-gThread.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_gThread_CXXFLAGS) $(CXXFLAGS) -c -o test_gThread-gThread.o `test -f 'gThread.cc' || echo '$(srcdir)/'`gThread.cc
+
+test_gThread-gThread.obj: gThread.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_gThread_CXXFLAGS) $(CXXFLAGS) -MT test_gThread-gThread.obj -MD -MP -MF "$(DEPDIR)/test_gThread-gThread.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o test_gThread-gThread.obj `if test -f 'gThread.cc'; then $(CYGPATH_W) 'gThread.cc'; else $(CYGPATH_W) '$(srcdir)/gThread.cc'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/test_gThread-gThread.Tpo" "$(DEPDIR)/test_gThread-gThread.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/test_gThread-gThread.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='gThread.cc' object='test_gThread-gThread.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/test_gThread-gThread.Po' tmpdepfile='$(DEPDIR)/test_gThread-gThread.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_gThread_CXXFLAGS) $(CXXFLAGS) -c -o test_gThread-gThread.obj `if test -f 'gThread.cc'; then $(CYGPATH_W) 'gThread.cc'; else $(CYGPATH_W) '$(srcdir)/gThread.cc'; fi`
+
+test_gThread-gThread.lo: gThread.cc
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_gThread_CXXFLAGS) $(CXXFLAGS) -MT test_gThread-gThread.lo -MD -MP -MF "$(DEPDIR)/test_gThread-gThread.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o test_gThread-gThread.lo `test -f 'gThread.cc' || echo '$(srcdir)/'`gThread.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/test_gThread-gThread.Tpo" "$(DEPDIR)/test_gThread-gThread.Plo"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/test_gThread-gThread.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='gThread.cc' object='test_gThread-gThread.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/test_gThread-gThread.Plo' tmpdepfile='$(DEPDIR)/test_gThread-gThread.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_gThread_CXXFLAGS) $(CXXFLAGS) -c -o test_gThread-gThread.lo `test -f 'gThread.cc' || echo '$(srcdir)/'`gThread.cc
+
+test_kick_transaction-test_kick_transaction.o: test_kick_transaction.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_kick_transaction_CXXFLAGS) $(CXXFLAGS) -MT test_kick_transaction-test_kick_transaction.o -MD -MP -MF "$(DEPDIR)/test_kick_transaction-test_kick_transaction.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o test_kick_transaction-test_kick_transaction.o `test -f 'test_kick_transaction.cc' || echo '$(srcdir)/'`test_kick_transaction.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/test_kick_transaction-test_kick_transaction.Tpo" "$(DEPDIR)/test_kick_transaction-test_kick_transaction.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/test_kick_transaction-test_kick_transaction.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='test_kick_transaction.cc' object='test_kick_transaction-test_kick_transaction.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/test_kick_transaction-test_kick_transaction.Po' tmpdepfile='$(DEPDIR)/test_kick_transaction-test_kick_transaction.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_kick_transaction_CXXFLAGS) $(CXXFLAGS) -c -o test_kick_transaction-test_kick_transaction.o `test -f 'test_kick_transaction.cc' || echo '$(srcdir)/'`test_kick_transaction.cc
+
+test_kick_transaction-test_kick_transaction.obj: test_kick_transaction.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_kick_transaction_CXXFLAGS) $(CXXFLAGS) -MT test_kick_transaction-test_kick_transaction.obj -MD -MP -MF "$(DEPDIR)/test_kick_transaction-test_kick_transaction.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o test_kick_transaction-test_kick_transaction.obj `if test -f 'test_kick_transaction.cc'; then $(CYGPATH_W) 'test_kick_transaction.cc'; else $(CYGPATH_W) '$(srcdir)/test_kick_transaction.cc'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/test_kick_transaction-test_kick_transaction.Tpo" "$(DEPDIR)/test_kick_transaction-test_kick_transaction.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/test_kick_transaction-test_kick_transaction.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='test_kick_transaction.cc' object='test_kick_transaction-test_kick_transaction.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/test_kick_transaction-test_kick_transaction.Po' tmpdepfile='$(DEPDIR)/test_kick_transaction-test_kick_transaction.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_kick_transaction_CXXFLAGS) $(CXXFLAGS) -c -o test_kick_transaction-test_kick_transaction.obj `if test -f 'test_kick_transaction.cc'; then $(CYGPATH_W) 'test_kick_transaction.cc'; else $(CYGPATH_W) '$(srcdir)/test_kick_transaction.cc'; fi`
+
+test_kick_transaction-test_kick_transaction.lo: test_kick_transaction.cc
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_kick_transaction_CXXFLAGS) $(CXXFLAGS) -MT test_kick_transaction-test_kick_transaction.lo -MD -MP -MF "$(DEPDIR)/test_kick_transaction-test_kick_transaction.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o test_kick_transaction-test_kick_transaction.lo `test -f 'test_kick_transaction.cc' || echo '$(srcdir)/'`test_kick_transaction.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/test_kick_transaction-test_kick_transaction.Tpo" "$(DEPDIR)/test_kick_transaction-test_kick_transaction.Plo"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/test_kick_transaction-test_kick_transaction.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='test_kick_transaction.cc' object='test_kick_transaction-test_kick_transaction.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/test_kick_transaction-test_kick_transaction.Plo' tmpdepfile='$(DEPDIR)/test_kick_transaction-test_kick_transaction.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_kick_transaction_CXXFLAGS) $(CXXFLAGS) -c -o test_kick_transaction-test_kick_transaction.lo `test -f 'test_kick_transaction.cc' || echo '$(srcdir)/'`test_kick_transaction.cc
+
+test_match-match.o: match.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_match_CXXFLAGS) $(CXXFLAGS) -MT test_match-match.o -MD -MP -MF "$(DEPDIR)/test_match-match.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o test_match-match.o `test -f 'match.cc' || echo '$(srcdir)/'`match.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/test_match-match.Tpo" "$(DEPDIR)/test_match-match.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/test_match-match.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='match.cc' object='test_match-match.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/test_match-match.Po' tmpdepfile='$(DEPDIR)/test_match-match.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_match_CXXFLAGS) $(CXXFLAGS) -c -o test_match-match.o `test -f 'match.cc' || echo '$(srcdir)/'`match.cc
+
+test_match-match.obj: match.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_match_CXXFLAGS) $(CXXFLAGS) -MT test_match-match.obj -MD -MP -MF "$(DEPDIR)/test_match-match.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o test_match-match.obj `if test -f 'match.cc'; then $(CYGPATH_W) 'match.cc'; else $(CYGPATH_W) '$(srcdir)/match.cc'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/test_match-match.Tpo" "$(DEPDIR)/test_match-match.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/test_match-match.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='match.cc' object='test_match-match.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/test_match-match.Po' tmpdepfile='$(DEPDIR)/test_match-match.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_match_CXXFLAGS) $(CXXFLAGS) -c -o test_match-match.obj `if test -f 'match.cc'; then $(CYGPATH_W) 'match.cc'; else $(CYGPATH_W) '$(srcdir)/match.cc'; fi`
+
+test_match-match.lo: match.cc
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_match_CXXFLAGS) $(CXXFLAGS) -MT test_match-match.lo -MD -MP -MF "$(DEPDIR)/test_match-match.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o test_match-match.lo `test -f 'match.cc' || echo '$(srcdir)/'`match.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/test_match-match.Tpo" "$(DEPDIR)/test_match-match.Plo"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/test_match-match.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='match.cc' object='test_match-match.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/test_match-match.Plo' tmpdepfile='$(DEPDIR)/test_match-match.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_match_CXXFLAGS) $(CXXFLAGS) -c -o test_match-match.lo `test -f 'match.cc' || echo '$(srcdir)/'`match.cc
+
+test_mtrie-mtrie.o: mtrie.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_mtrie_CXXFLAGS) $(CXXFLAGS) -MT test_mtrie-mtrie.o -MD -MP -MF "$(DEPDIR)/test_mtrie-mtrie.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o test_mtrie-mtrie.o `test -f 'mtrie.cc' || echo '$(srcdir)/'`mtrie.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/test_mtrie-mtrie.Tpo" "$(DEPDIR)/test_mtrie-mtrie.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/test_mtrie-mtrie.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='mtrie.cc' object='test_mtrie-mtrie.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/test_mtrie-mtrie.Po' tmpdepfile='$(DEPDIR)/test_mtrie-mtrie.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_mtrie_CXXFLAGS) $(CXXFLAGS) -c -o test_mtrie-mtrie.o `test -f 'mtrie.cc' || echo '$(srcdir)/'`mtrie.cc
+
+test_mtrie-mtrie.obj: mtrie.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_mtrie_CXXFLAGS) $(CXXFLAGS) -MT test_mtrie-mtrie.obj -MD -MP -MF "$(DEPDIR)/test_mtrie-mtrie.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o test_mtrie-mtrie.obj `if test -f 'mtrie.cc'; then $(CYGPATH_W) 'mtrie.cc'; else $(CYGPATH_W) '$(srcdir)/mtrie.cc'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/test_mtrie-mtrie.Tpo" "$(DEPDIR)/test_mtrie-mtrie.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/test_mtrie-mtrie.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='mtrie.cc' object='test_mtrie-mtrie.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/test_mtrie-mtrie.Po' tmpdepfile='$(DEPDIR)/test_mtrie-mtrie.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_mtrie_CXXFLAGS) $(CXXFLAGS) -c -o test_mtrie-mtrie.obj `if test -f 'mtrie.cc'; then $(CYGPATH_W) 'mtrie.cc'; else $(CYGPATH_W) '$(srcdir)/mtrie.cc'; fi`
+
+test_mtrie-mtrie.lo: mtrie.cc
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_mtrie_CXXFLAGS) $(CXXFLAGS) -MT test_mtrie-mtrie.lo -MD -MP -MF "$(DEPDIR)/test_mtrie-mtrie.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o test_mtrie-mtrie.lo `test -f 'mtrie.cc' || echo '$(srcdir)/'`mtrie.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/test_mtrie-mtrie.Tpo" "$(DEPDIR)/test_mtrie-mtrie.Plo"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/test_mtrie-mtrie.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='mtrie.cc' object='test_mtrie-mtrie.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/test_mtrie-mtrie.Plo' tmpdepfile='$(DEPDIR)/test_mtrie-mtrie.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_mtrie_CXXFLAGS) $(CXXFLAGS) -c -o test_mtrie-mtrie.lo `test -f 'mtrie.cc' || echo '$(srcdir)/'`mtrie.cc
+
+test_mtrie_load-mtrie_load.o: mtrie_load.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_mtrie_load_CXXFLAGS) $(CXXFLAGS) -MT test_mtrie_load-mtrie_load.o -MD -MP -MF "$(DEPDIR)/test_mtrie_load-mtrie_load.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o test_mtrie_load-mtrie_load.o `test -f 'mtrie_load.cc' || echo '$(srcdir)/'`mtrie_load.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/test_mtrie_load-mtrie_load.Tpo" "$(DEPDIR)/test_mtrie_load-mtrie_load.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/test_mtrie_load-mtrie_load.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='mtrie_load.cc' object='test_mtrie_load-mtrie_load.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/test_mtrie_load-mtrie_load.Po' tmpdepfile='$(DEPDIR)/test_mtrie_load-mtrie_load.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_mtrie_load_CXXFLAGS) $(CXXFLAGS) -c -o test_mtrie_load-mtrie_load.o `test -f 'mtrie_load.cc' || echo '$(srcdir)/'`mtrie_load.cc
+
+test_mtrie_load-mtrie_load.obj: mtrie_load.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_mtrie_load_CXXFLAGS) $(CXXFLAGS) -MT test_mtrie_load-mtrie_load.obj -MD -MP -MF "$(DEPDIR)/test_mtrie_load-mtrie_load.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o test_mtrie_load-mtrie_load.obj `if test -f 'mtrie_load.cc'; then $(CYGPATH_W) 'mtrie_load.cc'; else $(CYGPATH_W) '$(srcdir)/mtrie_load.cc'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/test_mtrie_load-mtrie_load.Tpo" "$(DEPDIR)/test_mtrie_load-mtrie_load.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/test_mtrie_load-mtrie_load.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='mtrie_load.cc' object='test_mtrie_load-mtrie_load.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/test_mtrie_load-mtrie_load.Po' tmpdepfile='$(DEPDIR)/test_mtrie_load-mtrie_load.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_mtrie_load_CXXFLAGS) $(CXXFLAGS) -c -o test_mtrie_load-mtrie_load.obj `if test -f 'mtrie_load.cc'; then $(CYGPATH_W) 'mtrie_load.cc'; else $(CYGPATH_W) '$(srcdir)/mtrie_load.cc'; fi`
+
+test_mtrie_load-mtrie_load.lo: mtrie_load.cc
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_mtrie_load_CXXFLAGS) $(CXXFLAGS) -MT test_mtrie_load-mtrie_load.lo -MD -MP -MF "$(DEPDIR)/test_mtrie_load-mtrie_load.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o test_mtrie_load-mtrie_load.lo `test -f 'mtrie_load.cc' || echo '$(srcdir)/'`mtrie_load.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/test_mtrie_load-mtrie_load.Tpo" "$(DEPDIR)/test_mtrie_load-mtrie_load.Plo"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/test_mtrie_load-mtrie_load.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='mtrie_load.cc' object='test_mtrie_load-mtrie_load.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/test_mtrie_load-mtrie_load.Plo' tmpdepfile='$(DEPDIR)/test_mtrie_load-mtrie_load.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_mtrie_load_CXXFLAGS) $(CXXFLAGS) -c -o test_mtrie_load-mtrie_load.lo `test -f 'mtrie_load.cc' || echo '$(srcdir)/'`mtrie_load.cc
+
+test_mtrie_perf-mtrie_perf.o: mtrie_perf.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_mtrie_perf_CXXFLAGS) $(CXXFLAGS) -MT test_mtrie_perf-mtrie_perf.o -MD -MP -MF "$(DEPDIR)/test_mtrie_perf-mtrie_perf.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o test_mtrie_perf-mtrie_perf.o `test -f 'mtrie_perf.cc' || echo '$(srcdir)/'`mtrie_perf.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/test_mtrie_perf-mtrie_perf.Tpo" "$(DEPDIR)/test_mtrie_perf-mtrie_perf.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/test_mtrie_perf-mtrie_perf.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='mtrie_perf.cc' object='test_mtrie_perf-mtrie_perf.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/test_mtrie_perf-mtrie_perf.Po' tmpdepfile='$(DEPDIR)/test_mtrie_perf-mtrie_perf.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_mtrie_perf_CXXFLAGS) $(CXXFLAGS) -c -o test_mtrie_perf-mtrie_perf.o `test -f 'mtrie_perf.cc' || echo '$(srcdir)/'`mtrie_perf.cc
+
+test_mtrie_perf-mtrie_perf.obj: mtrie_perf.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_mtrie_perf_CXXFLAGS) $(CXXFLAGS) -MT test_mtrie_perf-mtrie_perf.obj -MD -MP -MF "$(DEPDIR)/test_mtrie_perf-mtrie_perf.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o test_mtrie_perf-mtrie_perf.obj `if test -f 'mtrie_perf.cc'; then $(CYGPATH_W) 'mtrie_perf.cc'; else $(CYGPATH_W) '$(srcdir)/mtrie_perf.cc'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/test_mtrie_perf-mtrie_perf.Tpo" "$(DEPDIR)/test_mtrie_perf-mtrie_perf.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/test_mtrie_perf-mtrie_perf.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='mtrie_perf.cc' object='test_mtrie_perf-mtrie_perf.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/test_mtrie_perf-mtrie_perf.Po' tmpdepfile='$(DEPDIR)/test_mtrie_perf-mtrie_perf.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_mtrie_perf_CXXFLAGS) $(CXXFLAGS) -c -o test_mtrie_perf-mtrie_perf.obj `if test -f 'mtrie_perf.cc'; then $(CYGPATH_W) 'mtrie_perf.cc'; else $(CYGPATH_W) '$(srcdir)/mtrie_perf.cc'; fi`
+
+test_mtrie_perf-mtrie_perf.lo: mtrie_perf.cc
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_mtrie_perf_CXXFLAGS) $(CXXFLAGS) -MT test_mtrie_perf-mtrie_perf.lo -MD -MP -MF "$(DEPDIR)/test_mtrie_perf-mtrie_perf.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o test_mtrie_perf-mtrie_perf.lo `test -f 'mtrie_perf.cc' || echo '$(srcdir)/'`mtrie_perf.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/test_mtrie_perf-mtrie_perf.Tpo" "$(DEPDIR)/test_mtrie_perf-mtrie_perf.Plo"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/test_mtrie_perf-mtrie_perf.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='mtrie_perf.cc' object='test_mtrie_perf-mtrie_perf.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/test_mtrie_perf-mtrie_perf.Plo' tmpdepfile='$(DEPDIR)/test_mtrie_perf-mtrie_perf.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_mtrie_perf_CXXFLAGS) $(CXXFLAGS) -c -o test_mtrie_perf-mtrie_perf.lo `test -f 'mtrie_perf.cc' || echo '$(srcdir)/'`mtrie_perf.cc
+
+test_mtrie_perf_summary-mtrie_perf_summary.o: mtrie_perf_summary.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_mtrie_perf_summary_CXXFLAGS) $(CXXFLAGS) -MT test_mtrie_perf_summary-mtrie_perf_summary.o -MD -MP -MF "$(DEPDIR)/test_mtrie_perf_summary-mtrie_perf_summary.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o test_mtrie_perf_summary-mtrie_perf_summary.o `test -f 'mtrie_perf_summary.cc' || echo '$(srcdir)/'`mtrie_perf_summary.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/test_mtrie_perf_summary-mtrie_perf_summary.Tpo" "$(DEPDIR)/test_mtrie_perf_summary-mtrie_perf_summary.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/test_mtrie_perf_summary-mtrie_perf_summary.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='mtrie_perf_summary.cc' object='test_mtrie_perf_summary-mtrie_perf_summary.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/test_mtrie_perf_summary-mtrie_perf_summary.Po' tmpdepfile='$(DEPDIR)/test_mtrie_perf_summary-mtrie_perf_summary.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_mtrie_perf_summary_CXXFLAGS) $(CXXFLAGS) -c -o test_mtrie_perf_summary-mtrie_perf_summary.o `test -f 'mtrie_perf_summary.cc' || echo '$(srcdir)/'`mtrie_perf_summary.cc
+
+test_mtrie_perf_summary-mtrie_perf_summary.obj: mtrie_perf_summary.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_mtrie_perf_summary_CXXFLAGS) $(CXXFLAGS) -MT test_mtrie_perf_summary-mtrie_perf_summary.obj -MD -MP -MF "$(DEPDIR)/test_mtrie_perf_summary-mtrie_perf_summary.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o test_mtrie_perf_summary-mtrie_perf_summary.obj `if test -f 'mtrie_perf_summary.cc'; then $(CYGPATH_W) 'mtrie_perf_summary.cc'; else $(CYGPATH_W) '$(srcdir)/mtrie_perf_summary.cc'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/test_mtrie_perf_summary-mtrie_perf_summary.Tpo" "$(DEPDIR)/test_mtrie_perf_summary-mtrie_perf_summary.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/test_mtrie_perf_summary-mtrie_perf_summary.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='mtrie_perf_summary.cc' object='test_mtrie_perf_summary-mtrie_perf_summary.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/test_mtrie_perf_summary-mtrie_perf_summary.Po' tmpdepfile='$(DEPDIR)/test_mtrie_perf_summary-mtrie_perf_summary.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_mtrie_perf_summary_CXXFLAGS) $(CXXFLAGS) -c -o test_mtrie_perf_summary-mtrie_perf_summary.obj `if test -f 'mtrie_perf_summary.cc'; then $(CYGPATH_W) 'mtrie_perf_summary.cc'; else $(CYGPATH_W) '$(srcdir)/mtrie_perf_summary.cc'; fi`
+
+test_mtrie_perf_summary-mtrie_perf_summary.lo: mtrie_perf_summary.cc
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_mtrie_perf_summary_CXXFLAGS) $(CXXFLAGS) -MT test_mtrie_perf_summary-mtrie_perf_summary.lo -MD -MP -MF "$(DEPDIR)/test_mtrie_perf_summary-mtrie_perf_summary.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o test_mtrie_perf_summary-mtrie_perf_summary.lo `test -f 'mtrie_perf_summary.cc' || echo '$(srcdir)/'`mtrie_perf_summary.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/test_mtrie_perf_summary-mtrie_perf_summary.Tpo" "$(DEPDIR)/test_mtrie_perf_summary-mtrie_perf_summary.Plo"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/test_mtrie_perf_summary-mtrie_perf_summary.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='mtrie_perf_summary.cc' object='test_mtrie_perf_summary-mtrie_perf_summary.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/test_mtrie_perf_summary-mtrie_perf_summary.Plo' tmpdepfile='$(DEPDIR)/test_mtrie_perf_summary-mtrie_perf_summary.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_mtrie_perf_summary_CXXFLAGS) $(CXXFLAGS) -c -o test_mtrie_perf_summary-mtrie_perf_summary.lo `test -f 'mtrie_perf_summary.cc' || echo '$(srcdir)/'`mtrie_perf_summary.cc
+
+test_signal-signal.o: signal.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_signal_CXXFLAGS) $(CXXFLAGS) -MT test_signal-signal.o -MD -MP -MF "$(DEPDIR)/test_signal-signal.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o test_signal-signal.o `test -f 'signal.cc' || echo '$(srcdir)/'`signal.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/test_signal-signal.Tpo" "$(DEPDIR)/test_signal-signal.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/test_signal-signal.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='signal.cc' object='test_signal-signal.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/test_signal-signal.Po' tmpdepfile='$(DEPDIR)/test_signal-signal.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_signal_CXXFLAGS) $(CXXFLAGS) -c -o test_signal-signal.o `test -f 'signal.cc' || echo '$(srcdir)/'`signal.cc
+
+test_signal-signal.obj: signal.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_signal_CXXFLAGS) $(CXXFLAGS) -MT test_signal-signal.obj -MD -MP -MF "$(DEPDIR)/test_signal-signal.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o test_signal-signal.obj `if test -f 'signal.cc'; then $(CYGPATH_W) 'signal.cc'; else $(CYGPATH_W) '$(srcdir)/signal.cc'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/test_signal-signal.Tpo" "$(DEPDIR)/test_signal-signal.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/test_signal-signal.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='signal.cc' object='test_signal-signal.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/test_signal-signal.Po' tmpdepfile='$(DEPDIR)/test_signal-signal.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_signal_CXXFLAGS) $(CXXFLAGS) -c -o test_signal-signal.obj `if test -f 'signal.cc'; then $(CYGPATH_W) 'signal.cc'; else $(CYGPATH_W) '$(srcdir)/signal.cc'; fi`
+
+test_signal-signal.lo: signal.cc
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_signal_CXXFLAGS) $(CXXFLAGS) -MT test_signal-signal.lo -MD -MP -MF "$(DEPDIR)/test_signal-signal.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o test_signal-signal.lo `test -f 'signal.cc' || echo '$(srcdir)/'`signal.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/test_signal-signal.Tpo" "$(DEPDIR)/test_signal-signal.Plo"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/test_signal-signal.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='signal.cc' object='test_signal-signal.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/test_signal-signal.Plo' tmpdepfile='$(DEPDIR)/test_signal-signal.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_signal_CXXFLAGS) $(CXXFLAGS) -c -o test_signal-signal.lo `test -f 'signal.cc' || echo '$(srcdir)/'`signal.cc
+
+test_stringtokenizer-stringtokenizer.o: stringtokenizer.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_stringtokenizer_CXXFLAGS) $(CXXFLAGS) -MT test_stringtokenizer-stringtokenizer.o -MD -MP -MF "$(DEPDIR)/test_stringtokenizer-stringtokenizer.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o test_stringtokenizer-stringtokenizer.o `test -f 'stringtokenizer.cc' || echo '$(srcdir)/'`stringtokenizer.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/test_stringtokenizer-stringtokenizer.Tpo" "$(DEPDIR)/test_stringtokenizer-stringtokenizer.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/test_stringtokenizer-stringtokenizer.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='stringtokenizer.cc' object='test_stringtokenizer-stringtokenizer.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/test_stringtokenizer-stringtokenizer.Po' tmpdepfile='$(DEPDIR)/test_stringtokenizer-stringtokenizer.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_stringtokenizer_CXXFLAGS) $(CXXFLAGS) -c -o test_stringtokenizer-stringtokenizer.o `test -f 'stringtokenizer.cc' || echo '$(srcdir)/'`stringtokenizer.cc
+
+test_stringtokenizer-stringtokenizer.obj: stringtokenizer.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_stringtokenizer_CXXFLAGS) $(CXXFLAGS) -MT test_stringtokenizer-stringtokenizer.obj -MD -MP -MF "$(DEPDIR)/test_stringtokenizer-stringtokenizer.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o test_stringtokenizer-stringtokenizer.obj `if test -f 'stringtokenizer.cc'; then $(CYGPATH_W) 'stringtokenizer.cc'; else $(CYGPATH_W) '$(srcdir)/stringtokenizer.cc'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/test_stringtokenizer-stringtokenizer.Tpo" "$(DEPDIR)/test_stringtokenizer-stringtokenizer.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/test_stringtokenizer-stringtokenizer.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='stringtokenizer.cc' object='test_stringtokenizer-stringtokenizer.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/test_stringtokenizer-stringtokenizer.Po' tmpdepfile='$(DEPDIR)/test_stringtokenizer-stringtokenizer.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_stringtokenizer_CXXFLAGS) $(CXXFLAGS) -c -o test_stringtokenizer-stringtokenizer.obj `if test -f 'stringtokenizer.cc'; then $(CYGPATH_W) 'stringtokenizer.cc'; else $(CYGPATH_W) '$(srcdir)/stringtokenizer.cc'; fi`
+
+test_stringtokenizer-stringtokenizer.lo: stringtokenizer.cc
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_stringtokenizer_CXXFLAGS) $(CXXFLAGS) -MT test_stringtokenizer-stringtokenizer.lo -MD -MP -MF "$(DEPDIR)/test_stringtokenizer-stringtokenizer.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o test_stringtokenizer-stringtokenizer.lo `test -f 'stringtokenizer.cc' || echo '$(srcdir)/'`stringtokenizer.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/test_stringtokenizer-stringtokenizer.Tpo" "$(DEPDIR)/test_stringtokenizer-stringtokenizer.Plo"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/test_stringtokenizer-stringtokenizer.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='stringtokenizer.cc' object='test_stringtokenizer-stringtokenizer.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/test_stringtokenizer-stringtokenizer.Plo' tmpdepfile='$(DEPDIR)/test_stringtokenizer-stringtokenizer.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_stringtokenizer_CXXFLAGS) $(CXXFLAGS) -c -o test_stringtokenizer-stringtokenizer.lo `test -f 'stringtokenizer.cc' || echo '$(srcdir)/'`stringtokenizer.cc
 
 mostlyclean-libtool:
 	-rm -f *.lo
