@@ -43,7 +43,7 @@
 #include	"moduleLoader.h"
 
 const char xServer_h_rcsId[] = __XSERVER_H ;
-const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.50 2001/01/13 22:06:53 gte Exp $" ;
+const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.51 2001/01/13 23:31:12 gte Exp $" ;
 
 using std::string ;
 using std::vector ;
@@ -3134,6 +3134,10 @@ else if( bursting )
 	{
 	// Channel exists, still bursting
 	// 0 B #coder-com 000031337 +tn 0AT,EAA:o,KAB,0AA
+	// TODO: If the timestamp we are bursting is less than the existing one,
+	// we need to set the our Network channel state to match that supplied
+	// in this line. (Because we are authoritive in this channel, any existing
+	// modes will be removed by ircu).
 	strstream s ;
 	s	<< getCharYY() << " B " << chanName << ' '
 		<< postJoinTime << ' '
