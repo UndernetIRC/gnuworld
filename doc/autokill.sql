@@ -1,5 +1,5 @@
 --
--- $Id: autokill.sql,v 1.7 2002/07/20 06:01:39 nighty Exp $
+-- $Id: autokill.sql,v 1.8 2002/07/20 18:39:59 nighty Exp $
 --
 
 --
@@ -40,8 +40,8 @@ DELETE FROM mailq where user_id = to_die.user_id;
 DELETE FROM notes where user_id= to_die.user_id OR from_user_id = to_die.user_id;
 --
 -- Clean up webaccessteam records..
-\qecho [*] Removing webaccessteam records..
-DELETE FROM webaccessteam where admin_id = to_die.user_id;
+--\qecho [*] Removing webaccessteam records..
+--DELETE FROM webaccessteam where admin_id = to_die.user_id;
 --
 -- Clean up last_seens.
 \qecho [*] Removing last_seens..
