@@ -1,7 +1,7 @@
 /* sqlUser.h */
 
 #ifndef __SQLUSER_H
-#define __SQLUSER_H "$Id: sqlUser.h,v 1.20 2001/09/09 21:56:41 gte Exp $"
+#define __SQLUSER_H "$Id: sqlUser.h,v 1.21 2001/09/09 23:29:13 gte Exp $"
 
 #include	<string>
 #include	<ctime>
@@ -31,8 +31,8 @@ public:
 	 *   User 'Event' Flags, used in the userlog table.
 	 */
 
-	static const unsigned short	EV_SUSPEND;
-	static const unsigned short	EV_UNSUSPEND;
+	static const unsigned int	EV_SUSPEND;
+	static const unsigned int	EV_UNSUSPEND;
 
 	/*
 	 *  Methods to get data atrributes.

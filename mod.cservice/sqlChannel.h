@@ -1,7 +1,7 @@
 /* sqlChannel.h */
 
 #ifndef __SQLCHANNEL_H
-#define __SQLCHANNEL_H "$Id: sqlChannel.h,v 1.33 2001/09/09 21:54:22 gte Exp $"
+#define __SQLCHANNEL_H "$Id: sqlChannel.h,v 1.34 2001/09/09 23:29:13 gte Exp $"
 
 #include	<string>
 #include	<map>
@@ -46,19 +46,19 @@ public:
 	 *   in reports.
 	 */
 
-	static const unsigned short	EV_MISC;
-	static const unsigned short	EV_JOIN;
-	static const unsigned short	EV_PART;
-	static const unsigned short	EV_OPERJOIN;
-	static const unsigned short	EV_OPERPART;
-	static const unsigned short	EV_FORCE;
-	static const unsigned short	EV_REGISTER ;
-	static const unsigned short	EV_PURGE;
+	static const unsigned int	EV_MISC;
+	static const unsigned int	EV_JOIN;
+	static const unsigned int	EV_PART;
+	static const unsigned int	EV_OPERJOIN;
+	static const unsigned int	EV_OPERPART;
+	static const unsigned int	EV_FORCE;
+	static const unsigned int	EV_REGISTER ;
+	static const unsigned int	EV_PURGE;
 
 	/* Manually added Comment */
-	static const unsigned short	EV_COMMENT;
-	static const unsigned short	EV_REMOVEALL;
-	static const unsigned short	EV_IDLE;
+	static const unsigned int	EV_COMMENT;
+	static const unsigned int	EV_REMOVEALL;
+	static const unsigned int	EV_IDLE;
 
 	/*
 	 *  Methods to get data atrributes.
