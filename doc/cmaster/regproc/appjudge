@@ -1,5 +1,7 @@
 #!/usr/local/pgsql/bin/pgtclsh
+# $Id: appjudge,v 1.2 2002/04/13 23:27:58 nighty Exp $
 # Author: sengaia@undernet.org, 20010619
+# Last fix: nighty@undernet.org, 20020414
 # This script automates a good part of the channel-registration process, you need 
 # to set up sensible settings in appjudge-config for it to do you any good though.
 
@@ -59,22 +61,31 @@ pg_select $hSQL "SELECT channel_id,status,check_start_ts FROM pending WHERE (sta
         reject_app $hSQL $chan_id "One or more of the supporters did not confirm their support."
 }
 
+
 # Step 1: reject applications that failed to pass the activity test within the required timeframe
 set app_timeout [expr $DAY * $MAX_DAYS]
 pg_select $hSQL "SELECT channel_id,status,check_start_ts,unique_join_count FROM pending WHERE (status = $AS_TRAFFIC_CHECK) AND (now()::abstime::int4 > (check_start_ts + $app_timeout))" t_expired {
 	set chan_id [lindex [array get t_expired "channel_id"] 1]
 	set joins [lindex [array get t_expired "unique_join_count"] 1]
 
-	# Does it pass the unique join check?
-	if {$joins >= $UNIQUE_JOINS} {
-		# Yes - Label it for human inspection and pass it on
-		# get supporter count
-		pg_select $hSQL "SELECT COUNT(*) AS supcount FROM supporters WHERE channel_id=$chan_id" res_supc { set sup_joins [lindex [array get sup_res "supcount"] 1] }
-		puts [format "%s: Moving channel %s to status %d (application labeled for human inspection)" [clock_stamp] [get_channel $hSQL $chan_id] $AS_NOTIFICATION]
-		pg_exec $hSQL "UPDATE pending SET status=$AS_NOTIFICATION,check_start_ts=now()::abstime::int4,comments='REVIEW: Only $sup_joins supporters have been seen.', last_updated=now()::abstime::int4 WHERE channel_id=$chan_id"
-	} else {
-		# No - Reject 
-		reject_app $hSQL $chan_id "Not enough activity in the channel."
+	# Were there less than $MIN_SUPPORTERS?
+        pg_select $hSQL "SELECT COUNT(*) AS supcount FROM supporters WHERE (channel_id = $chan_id) AND (join_count > 0)" sup_res {
+                set sup_joins [lindex [array get sup_res "supcount"] 1]
+        }
+	if {$sup_joins < $MIN_SUPPORTERS} {
+		reject_app $hSQL $chan_id "Not enough supporter activity in the channel."
+	} else {	
+		# Does it pass the unique join check?
+		if {$joins >= $UNIQUE_JOINS} {
+			# Yes - Label it for human inspection and pass it on
+			# get supporter count
+			pg_select $hSQL "SELECT COUNT(*) AS supcount FROM supporters WHERE channel_id=$chan_id" res_supc { set sup_joins [lindex [array get sup_res "supcount"] 1] }
+			puts [format "%s: Moving channel %s to status %d (application labeled for human inspection)" [clock_stamp] [get_channel $hSQL $chan_id] $AS_NOTIFICATION]
+			pg_exec $hSQL "UPDATE pending SET status=$AS_NOTIFICATION,check_start_ts=now()::abstime::int4,comments='REVIEW: Only $sup_joins supporters have been seen.', last_updated=now()::abstime::int4 WHERE channel_id=$chan_id"
+		} else {
+			# No - Reject 
+			reject_app $hSQL $chan_id "Not enough activity in the channel."
+		}
 	}
 }
 
