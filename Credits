@@ -18,6 +18,14 @@ Greg (Gte) - Lots of real world testing and development of gnuworld and its
 modules.  Greg is the father of the cservice module, which I
 (ripper_) continually break.
 
+Tomer (MrBean) - Creator of the ccontrol (oper services) module.  Tomer
+has generated a huge amount of code, and withstood the weight of my (ripper_)
+nitpicking.  Good job on your first major project :)
+
+Julien (nighty) - Development of the web interface almost entirely on his
+own.  This system looks good, and works even better.  Thanks for all of
+your tireless hours without tangible rewards!
+
 Doug (seiki) - Thanks a lot for letting me thrash your machine during
 development and testing of gnuworld.  You really made a lot of sacrifices
 and had to put up with my complaining :)
