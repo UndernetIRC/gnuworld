@@ -2720,7 +2720,7 @@ switch( whichEvent )
 	
 					trafRecord = new sqlPendingTraffic(SQLDb);
 					trafRecord->ip_number = theClient->getIP();
-					trafRecord->join_count = 0;
+					trafRecord->join_count = 1;
 					trafRecord->channel_id = ptr->second->channel_id;
 					trafRecord->insertRecord();
 
@@ -2732,12 +2732,12 @@ switch( whichEvent )
 						theChan->getName().c_str()); 
 					} else
 					{
-					/* Already cached. */
+					/* Already cached, update and save. */
 					trafRecord = Tptr->second;
-					}
-
 					trafRecord->join_count++;
-
+					trafRecord->commit();
+					}
+ 
 					logDebugMessage("New total for IP#%u on %s is %i",
 						theClient->getIP(), theChan->getName().c_str(),
 						trafRecord->join_count);
@@ -2763,6 +2763,7 @@ switch( whichEvent )
 				if (Supptr != ptr->second->supporterList.end())
 					{ 
 						Supptr->second++;
+						ptr->second->commitSupporter(Supptr->first, Supptr->second);
 						logDebugMessage("New total for Supporter #%i (%s) on %s is %i.", theUser->getID(), 
 							theUser->getUserName().c_str(), theChan->getName().c_str(), Supptr->second);
 					}

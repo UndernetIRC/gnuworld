@@ -5,7 +5,7 @@
  */
 
 #ifndef __SQLPENDINGCHANNEL_H
-#define __SQLPENDINGCHANNEL_H "$Id: sqlPendingChannel.h,v 1.5 2001/06/10 17:36:57 gte Exp $"
+#define __SQLPENDINGCHANNEL_H "$Id: sqlPendingChannel.h,v 1.6 2001/06/13 20:22:07 gte Exp $"
 
 #include	<string> 
 #include	"sqlPendingTraffic.h"
@@ -23,6 +23,7 @@ public:
 	~sqlPendingChannel();
 
 	bool commit();
+	bool commitSupporter(unsigned int, unsigned int);
 	void loadTrafficCache();
 
 	unsigned int channel_id;

@@ -1,7 +1,7 @@
 /* 
  * sqlPendingTraffic.cc
  * 
- * $Id: sqlPendingTraffic.cc,v 1.1 2001/06/10 01:03:08 gte Exp $
+ * $Id: sqlPendingTraffic.cc,v 1.2 2001/06/13 20:22:07 gte Exp $
  */
  
 #include	<strstream>
@@ -20,7 +20,7 @@
 #include	"sqlPendingTraffic.h"
  
 const char sqlPendingTraffic_h_rcsId[] = __SQLPENDINGTRAFFIC_H ;
-const char sqlPendingTraffic_cc_rcsId[] = "$Id: sqlPendingTraffic.cc,v 1.1 2001/06/10 01:03:08 gte Exp $" ;
+const char sqlPendingTraffic_cc_rcsId[] = "$Id: sqlPendingTraffic.cc,v 1.2 2001/06/13 20:22:07 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -66,6 +66,39 @@ if( PGRES_COMMAND_OK != status )
 
 	return true;
 }
+
+bool sqlPendingTraffic::commit()
+{
+	int theip_number = ip_number;
+	
+	strstream queryString; 
+	queryString << "UPDATE pending_traffic SET "
+				<< "join_count = " 
+				<< join_count
+				<< " WHERE channel_id = "
+				<< channel_id
+				<< " AND ip_number = "
+				<< theip_number
+				<< ends;
+	
+	#ifdef LOG_SQL
+		elog	<< "sqlPendingTraffic::commit> "
+				<< queryString.str()
+				<< endl;
+	#endif
+	
+	ExecStatusType status = SQLDb->Exec(queryString.str()) ;
+	delete[] queryString.str() ;
+	
+	if( PGRES_COMMAND_OK != status )
+		{
+			elog << "sqlPendingTraffic::commit> Error updating pending_traffic "
+				 << "record for " << ip_number << endl;
+		}
+
+	return true;
+}
+
  
 }
 

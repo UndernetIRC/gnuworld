@@ -4,7 +4,7 @@
  * Class which contains details about channels which are 'pending'
  * registration.
  * 
- * $Id: sqlPendingChannel.cc,v 1.5 2001/06/13 00:14:47 gte Exp $
+ * $Id: sqlPendingChannel.cc,v 1.6 2001/06/13 20:22:07 gte Exp $
  */
  
 #include	<strstream>
@@ -24,7 +24,7 @@
 #include	"sqlPendingTraffic.h"
  
 const char sqlPendingChannel_h_rcsId[] = __SQLPENDINGCHANNEL_H ;
-const char sqlPendingChannel_cc_rcsId[] = "$Id: sqlPendingChannel.cc,v 1.5 2001/06/13 00:14:47 gte Exp $" ;
+const char sqlPendingChannel_cc_rcsId[] = "$Id: sqlPendingChannel.cc,v 1.6 2001/06/13 20:22:07 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -114,14 +114,6 @@ elog << "Commiting Pending Channel Details: " << endl
  */
 
 unique_join_count = trafficList.size();
-
-ExecStatusType beginStatus = SQLDb->Exec("BEGIN;") ; 
-
-if( PGRES_COMMAND_OK != beginStatus )
-{
-	elog << "Error starting transaction." << endl;
-}
-elog << "BEGIN" << endl;
  
 strstream queryString; 
 queryString << "UPDATE pending SET "
@@ -157,82 +149,40 @@ if( PGRES_COMMAND_OK != status )
 	for(supporterListType::iterator ptr = supporterList.begin();
 		ptr !=  supporterList.end(); ++ptr)
 		{ 
-		strstream queryString; 
-		queryString << "UPDATE supporters SET "
-					<< "join_count = " 
-					<< ptr->second 
-					<< " WHERE channel_id = "
-					<< channel_id
-					<< " AND user_id = "
-					<< ptr->first
-					<< ends;
-		
-		#ifdef LOG_SQL
-			elog	<< "sqlPendingChannel::commit> "
-					<< queryString.str()
-					<< endl;
-		#endif
-		
-		ExecStatusType status = SQLDb->Exec(queryString.str()) ;
-		delete[] queryString.str() ;
-		
-		if( PGRES_COMMAND_OK != status )
-			{
-				elog << "sqlPendingChannel::commit> Error updating supporter "
-					 << "record for " << ptr->first << endl;
-			}
-
-		}
-
-
-	/*
-	 *  Finally (!) update the traffic check details.
-	 */
-
-	for(trafficListType::iterator ptr = trafficList.begin();
-		ptr !=  trafficList.end(); ++ptr)
-		{
-		sqlPendingTraffic* theTraf = ptr->second;
-		int theip_number = theTraf->ip_number;
-
-		strstream queryString; 
-		queryString << "UPDATE pending_traffic SET "
-					<< "join_count = " 
-					<< theTraf->join_count
-					<< " WHERE channel_id = "
-					<< channel_id
-					<< " AND ip_number = "
-					<< theip_number
-					<< ends;
-		
-		#ifdef LOG_SQL
-			elog	<< "sqlPendingChannel::commit> "
-					<< queryString.str()
-					<< endl;
-		#endif
-		
-		ExecStatusType status = SQLDb->Exec(queryString.str()) ;
-		delete[] queryString.str() ;
-		
-		if( PGRES_COMMAND_OK != status )
-			{
-				elog << "sqlPendingChannel::commit> Error updating pending_traffic "
-					 << "record for " << theTraf->ip_number << endl;
-			}
+ }
  
+		return true;
+}
+
+
+bool sqlPendingChannel::commitSupporter(unsigned int sup_id, unsigned int count)
+{
+	strstream queryString; 
+	queryString << "UPDATE supporters SET "
+				<< "join_count = " 
+				<< count 
+				<< " WHERE channel_id = "
+				<< channel_id
+				<< " AND user_id = "
+				<< sup_id
+				<< ends;
+	
+	#ifdef LOG_SQL
+		elog	<< "sqlPendingChannel::commit> "
+				<< queryString.str()
+				<< endl;
+	#endif
+	
+	ExecStatusType status = SQLDb->Exec(queryString.str()) ;
+	delete[] queryString.str() ;
+	
+	if( PGRES_COMMAND_OK != status )
+		{
+			elog << "sqlPendingChannel::commit> Error updating supporter "
+				 << "record for " << sup_id << endl;
 		}
-
-	ExecStatusType endStatus = SQLDb->Exec("END;") ; 
-
-	if( PGRES_COMMAND_OK != endStatus )
-	{
-		elog << "Error Ending transaction." << endl;
-	}
-
-	elog << "END" << endl;
 
 	return true;
 }
-
 
 }

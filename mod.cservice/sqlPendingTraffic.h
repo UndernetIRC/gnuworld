@@ -6,7 +6,7 @@
  */
 
 #ifndef __SQLPENDINGTRAFFIC_H
-#define __SQLPENDINGTRAFFIC_H "$Id: sqlPendingTraffic.h,v 1.1 2001/06/10 01:03:08 gte Exp $"
+#define __SQLPENDINGTRAFFIC_H "$Id: sqlPendingTraffic.h,v 1.2 2001/06/13 20:22:07 gte Exp $"
 
 #include	<string> 
  
@@ -21,6 +21,7 @@ class sqlPendingTraffic
 public:
 	sqlPendingTraffic(PgDatabase*);
 	bool insertRecord();
+	bool commit();
 
 	unsigned int channel_id; 
 	unsigned int ip_number;
