@@ -43,7 +43,7 @@
 #include	"moduleLoader.h"
 
 const char xServer_h_rcsId[] = __XSERVER_H ;
-const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.56 2001/01/28 16:18:48 dan_karrels Exp $" ;
+const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.57 2001/01/28 16:39:08 dan_karrels Exp $" ;
 
 using std::string ;
 using std::vector ;
@@ -3074,6 +3074,11 @@ if( 0 == postJoinTime )
 	}
 
 Channel* theChan = Network->findChannel( chanName ) ;
+if( theChan != NULL )
+	{
+	postJoinTime = theChan->getCreationTime() ;
+	}
+
 if( (NULL == theChan) && bursting )
 	{
 	// Need to burst the channel
@@ -3108,22 +3113,25 @@ else if( NULL == theChan )
 //	elog	<< "xServer::BurstChannel> Creating new channel: "
 //		<< chanName << endl ;
 
-	// Create the channel
-	// The client automatically gets op in this case
+		// Create the channel
+		// The client automatically gets op in this case
 	{
+	strstream s ;
+	s	<< theClient->getCharYYXXX() << " C "
+		<< chanName << ' ' << postJoinTime ;
+	Write( s ) ;
+	delete[] s.str() ;
+	}
+
+	if( !chanModes.empty() )
+		{
 		strstream s ;
-		s	<< theClient->getCharYYXXX() << " C "
-			<< chanName << ' ' << postJoinTime ;
-
-		if( !chanModes.empty() )
-			{
-			s	<< ' ' << chanModes ;
-			}
-		s	<< ends ;
-
+		s	<< theClient->getCharYYXXX()
+			<< " M " << chanName << chanModes
+			<< ends ;
 		Write( s ) ;
 		delete[] s.str() ;
-	}
+		}
 
 	// Instantiate the new channel
 	theChan = new Channel( chanName, time( 0 ) ) ;
@@ -3139,7 +3147,7 @@ else if( bursting )
 
 	// Is the timestamp we are bursting older than the current
 	// timestamp?
-	if( joinTime < theChan->getCreationTime() )
+	if( postJoinTime < theChan->getCreationTime() )
 		{
 		// We are bursting an older timestamp
 		// Remove all modes
@@ -3202,7 +3210,7 @@ else
 		}
 	}
 
-if( joinTime < theChan->getCreationTime() )
+if( postJoinTime < theChan->getCreationTime() )
 	{
 	theChan->setCreationTime( joinTime ) ;
 	}
