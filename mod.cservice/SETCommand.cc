@@ -18,7 +18,7 @@
  *
  * Caveats: None.
  *
- * $Id: SETCommand.cc,v 1.49 2002/04/01 22:02:22 gte Exp $
+ * $Id: SETCommand.cc,v 1.50 2002/04/09 15:46:22 gte Exp $
  */
 
 #include	<string>
@@ -28,8 +28,9 @@
 #include	"Network.h"
 #include	"levels.h"
 #include	"responses.h"
+#include	"cservice_config.h"
 
-const char SETCommand_cc_rcsId[] = "$Id: SETCommand.cc,v 1.49 2002/04/01 22:02:22 gte Exp $" ;
+const char SETCommand_cc_rcsId[] = "$Id: SETCommand.cc,v 1.50 2002/04/09 15:46:22 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -96,6 +97,7 @@ if( st[1][0] != '#' ) // Didn't find a hash?
 	        return true;
 	}
 
+#ifdef USE_NOTES
 	if (option == "NONOTES")
 	{
 		if (value == "ON")
@@ -121,6 +123,7 @@ if( st[1][0] != '#' ) // Didn't find a hash?
 			option.c_str());
 	        return true;
 	}
+#endif
 
 	if (option == "MAXLOGINS")
 		{

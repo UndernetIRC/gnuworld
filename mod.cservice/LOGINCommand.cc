@@ -11,7 +11,7 @@
 #include	"cservice_config.h"
 #include	"Network.h"
 
-const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.44 2002/04/01 22:02:22 gte Exp $" ;
+const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.45 2002/04/09 15:46:22 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -407,6 +407,8 @@ for(int i = 0; i < bot->SQLDb->Tuples(); i++)
  * See if they have any notes.
  */
 
+#ifdef USE_NOTES
+
 if(!theUser->getFlag(sqlUser::F_NONOTES))
 	{
 	strstream noteQuery;
@@ -428,6 +430,8 @@ if(!theUser->getFlag(sqlUser::F_NONOTES))
 	if(count) bot->Notice(theClient, "You have %i note(s). To read them type /msg %s notes read all",
 		count, bot->getNickName().c_str());
 	}
+
+#endif
 
 return true;
 }
