@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server.cc,v 1.149 2002/10/31 18:52:53 dan_karrels Exp $
+ * $Id: server.cc,v 1.150 2002/11/06 21:29:30 dan_karrels Exp $
  */
 
 #include	<sys/time.h>
@@ -72,7 +72,7 @@
 #include	"Connection.h"
 
 const char server_h_rcsId[] = __SERVER_H ;
-const char server_cc_rcsId[] = "$Id: server.cc,v 1.149 2002/10/31 18:52:53 dan_karrels Exp $" ;
+const char server_cc_rcsId[] = "$Id: server.cc,v 1.150 2002/11/06 21:29:30 dan_karrels Exp $" ;
 const char config_h_rcsId[] = __CONFIG_H ;
 const char misc_h_rcsId[] = __MISC_H ;
 const char events_h_rcsId[] = __EVENTS_H ;
@@ -281,6 +281,9 @@ Port = atoi( conf.Require( "port" )->second.c_str() ) ;
 intYY = atoi( conf.Require( "numeric" )->second.c_str() ) ;
 intXXX = atoi( conf.Require( "maxclients" )->second.c_str() ) ;
 commandMapFileName = conf.Require( "command_map" )->second ;
+
+iClient::setHiddenHostSuffix(
+	conf.Require( "hidden_host_suffix" )->second ) ;
 
 libPrefix = conf.Require( "libdir" )->second ;
 if( libPrefix[ libPrefix.size() - 1 ] != '/' )

@@ -17,11 +17,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: iClient.h,v 1.32 2002/11/04 16:36:04 dan_karrels Exp $
+ * $Id: iClient.h,v 1.33 2002/11/06 21:29:29 dan_karrels Exp $
  */
 
 #ifndef __ICLIENT_H
-#define __ICLIENT_H "$Id: iClient.h,v 1.32 2002/11/04 16:36:04 dan_karrels Exp $"
+#define __ICLIENT_H "$Id: iClient.h,v 1.33 2002/11/06 21:29:29 dan_karrels Exp $"
 
 #include	<string>
 #include	<list>
@@ -171,13 +171,27 @@ public:
 	 * Overwrite this clients "Real Host" with a "Hidden Host".
 	 */
 	inline void setHiddenHost()
-		{ insecureHost = account + string(HIDDEN_HOST); }
+		{ insecureHost = account + hiddenHostSuffix ; }
 
 	/**
-	 * Set/Retrieve client's 'account' field.
+	 * This method will set the hidden host suffix.  This value
+	 * is only modified by the xServer on startup.
+	 */
+	inline static void	setHiddenHostSuffix( const string& newVal )
+		{ hiddenHostSuffix = newVal ; }
+
+	/**
+	 * Retrieve client's 'account' field.
 	 */
 	inline const string& getAccount() const
 		{ return account ; }
+
+	/**
+	 * Return the suffix hostname to be appended to the
+	 * user's account name for use with host hiding.
+	 */
+	inline static const string& getHiddenHostSuffix()
+		{ return hiddenHostSuffix ; }
 
 	/**
 	 * I really have no idea what this is...someone wanna pass me
@@ -649,6 +663,13 @@ protected:
 	 * whose customDataMap's aren't used.
 	 */
 	customDataMapType		*customDataMap ;
+
+	/**
+	 * The suffix for all hidden host names.
+	 * This variable is read from the .conf file, and
+	 * has the form of "mynetwork.org".
+	 */
+	static string			hiddenHostSuffix ;
 
 } ;
 

@@ -17,18 +17,15 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: config.h,v 1.15 2002/08/17 02:03:54 reedloden Exp $
+ * $Id: config.h,v 1.16 2002/11/06 21:29:29 dan_karrels Exp $
  */
 
 #ifndef __CONFIG_H
-#define __CONFIG_H "$Id: config.h,v 1.15 2002/08/17 02:03:54 reedloden Exp $"
+#define __CONFIG_H "$Id: config.h,v 1.16 2002/11/06 21:29:29 dan_karrels Exp $"
 
 /* config.h */
 /* GNUWorld main configuration file */
 /* All core settings are set/defined here.
- * Make sure to change HIDDEN_HOST to your
- * network's hidden host or it will say
- * .users.undernet.org in X/etc. ;)
  */
 
 /**
@@ -100,13 +97,6 @@
  * The maximum number of channel modes per command.
  */
 #define MAX_CHAN_MODES 10
-
-/**
- * HIDDEN_HOST
- * The suffix to be appended to the authenticated username
- * to form the hidden host-mask when a user sets +x.
- */
-#define HIDDEN_HOST ".users.undernet.org"
 
 /**
  * TOPIC_TRACK
