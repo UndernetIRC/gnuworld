@@ -2302,6 +2302,10 @@ vector< iClient* > deopList;
 // Channel bans.
 vector< sqlBan*>* banList;
 banList = getBanRecords(reggedChan);
+
+// If we find a situation where we need to deop the person who has
+// performed the mode, do so.
+bool sourceHasBeenBad = false;
  
 int deopCounter = 0;
 
@@ -2323,57 +2327,69 @@ for( xServer::opVectorType::const_iterator ptr = theTargets.begin() ;
 			deopList.push_back(tmpUser->getClient());
 			}
 
+		sqlUser* authUser = isAuthed(tmpUser->getClient(), false);
+
+		// Has the target user's account been suspended?
+		if (authUser && authUser->getFlag(sqlUser::F_GLOBAL_SUSPEND))
+		{ 
+			Notice(theChanUser->getClient(), "The user %s (%s) has been suspended by a CService Administrator.",
+				authUser->getUserName().c_str(), tmpUser->getClient()->getNickName().c_str()); 
+			deopList.push_back(tmpUser->getClient()); 
+			sourceHasBeenBad = true;
+		}
+
 		// If the channel is STRICTOP, deop everyone who isn't
 		// authenticated or and doesn't have access on the
 		// channel.
+
 		if (reggedChan->getFlag(sqlChannel::F_STRICTOP))
 			{
-			sqlUser* authUser =
-				isAuthed(tmpUser->getClient(), false);
-
 			if (!authUser)
 				{
 				// Not authed, deop.
 				if ( !tmpUser->getClient()->getMode(iClient::MODE_SERVICES) )
 				deopList.push_back(tmpUser->getClient());
+				sourceHasBeenBad = true;
 				// Authed but doesn't have access... deop.
 				}
 			else if (!(getEffectiveAccessLevel(authUser,reggedChan, false) >= level::op))
 				{
 				if ( !tmpUser->getClient()->getMode(iClient::MODE_SERVICES) )					
 				deopList.push_back(tmpUser->getClient());
+				sourceHasBeenBad = true;
 				}
 			}	
 
-			/*
-			 *  The 'Fun' Part. Scan through channel bans to see if this hostmask
-			 *  is 'banned' at 75 or below.
-			 */
+		/*
+		 *  The 'Fun' Part. Scan through channel bans to see if this hostmask
+		 *  is 'banned' at 75 or below.
+		 */
 
-			sqlBan* theBan = isBannedOnChan(reggedChan, tmpUser->getClient()); 
-			if( theBan && (theBan->getLevel() <= 75) ) 
-				{
-					if ( !tmpUser->getClient()->getMode(iClient::MODE_SERVICES) )
-						{
-						deopList.push_back(tmpUser->getClient());
+		sqlBan* theBan = isBannedOnChan(reggedChan, tmpUser->getClient()); 
+		if( theBan && (theBan->getLevel() <= 75) ) 
+			{
+				if ( !tmpUser->getClient()->getMode(iClient::MODE_SERVICES) )
+					{
+					deopList.push_back(tmpUser->getClient());
+					sourceHasBeenBad = true;
 
-						/* Tell the person bein op'd that they can't */
-						Notice(tmpUser->getClient(), 
-							"You are not allowed to be opped on %s",
-							reggedChan->getName().c_str());
+					/* Tell the person bein op'd that they can't */
+					Notice(tmpUser->getClient(), 
+						"You are not allowed to be opped on %s",
+						reggedChan->getName().c_str());
 	
-						/* Tell the person doing the op'ing this is bad */
-						if (theChanUser) 
-							{
-							Notice(theChanUser->getClient(),
-								"%s isn't allowed to be opped on %s",
-								tmpUser->getClient()->getNickName().c_str(), 
-								reggedChan->getName().c_str());
-							} 
-						}
-				}
+					/* Tell the person doing the op'ing this is bad */
+					if (theChanUser) 
+						{
+						Notice(theChanUser->getClient(),
+							"%s isn't allowed to be opped on %s",
+							tmpUser->getClient()->getNickName().c_str(), 
+							reggedChan->getName().c_str());
+						} 
+					}
+			}
 
-			} // if()
+		} // if()
 	else
 		{
 		/* Somebody is being deopped? */
@@ -2394,6 +2410,9 @@ for( xServer::opVectorType::const_iterator ptr = theTargets.begin() ;
 /*
  *  Send notices and perform the deop's.
  */
+
+if (sourceHasBeenBad)
+	deopList.push_back(theChanUser->getClient());
 
 if( !deopList.empty() )
 	{

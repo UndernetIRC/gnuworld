@@ -20,7 +20,7 @@
  *
  * Caveats: None
  *
- * $Id: OPCommand.cc,v 1.24 2001/03/21 10:22:04 isomer Exp $
+ * $Id: OPCommand.cc,v 1.25 2001/06/03 18:35:30 gte Exp $
  */
 
 #include	<string>
@@ -35,7 +35,7 @@
 
 using std::map ;
 
-const char OPCommand_cc_rcsId[] = "$Id: OPCommand.cc,v 1.24 2001/03/21 10:22:04 isomer Exp $" ;
+const char OPCommand_cc_rcsId[] = "$Id: OPCommand.cc,v 1.25 2001/06/03 18:35:30 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -210,16 +210,24 @@ for( ; counter < st2.size() ; ++counter )
 		continue ;
 		} 
 
+	// Has the target user's account been suspended?
+	sqlUser* authUser = bot->isAuthed(tmpChanUser->getClient(), false);
+
+	if (authUser && authUser->getFlag(sqlUser::F_GLOBAL_SUSPEND))
+		{ 
+			bot->Notice(theClient, "The user %s (%s) has been suspended by a CService Administrator.",
+				authUser->getUserName().c_str(), tmpChanUser->getClient()->getNickName().c_str()); 
+			continue;
+		}
+
 	/*
 	 *  If the channel has the STRICTOP flag set, we are only allowed to op people who
 	 *  are authorised, and have access in this channel.
-	 */
+	 */ 
 
 	if(theChan->getFlag(sqlChannel::F_STRICTOP))
 		{
-		sqlUser* authUser = bot->isAuthed(tmpChanUser->getClient(),
-					false);
-
+ 
 		/* Not authed, don't allow this op. */
 		if (!authUser)
 			{ 
