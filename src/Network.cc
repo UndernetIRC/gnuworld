@@ -24,7 +24,7 @@
 #include	"ip.h"
 
 const char xNetwork_h_rcsId[] = __NETWORK_H ;
-const char xNetwork_cc_rcsId[] = "$Id: Network.cc,v 1.36 2002/05/19 16:13:37 dan_karrels Exp $" ;
+const char xNetwork_cc_rcsId[] = "$Id: Network.cc,v 1.37 2002/05/19 18:54:09 dan_karrels Exp $" ;
 const char ELog_h_rcsId[] = __ELOG_H ;
 const char iClient_h_rcsId[] = __ICLIENT_H ;
 const char Channel_h_rcsId[] = __CHANNEL_H ;
@@ -63,6 +63,10 @@ if( !numericMap.insert( numericMapType::value_type(
 		<< endl ;
 	return false ;
 	}
+
+//elog	<< "xNetwork::addClient> Added client: "
+//	<< *newClient
+//	<< endl ;
 
 addNick( newClient ) ;
 
@@ -123,7 +127,9 @@ bool xNetwork::addChannel( Channel* theChan )
 {
 assert( theChan != NULL ) ;
 
-//elog << "Adding channel: " << *theChan << endl ;
+//elog	<< "Adding channel: "
+//	<< *theChan
+//	<< endl ;
 
 return channelMap.insert(
 	channelMapType::value_type( theChan->getName(),
@@ -289,8 +295,16 @@ iClient* xNetwork::removeClient( const unsigned int& intYYXXX )
 numericMapType::iterator ptr = numericMap.find( intYYXXX ) ;
 if( ptr == numericMap.end() )
 	{
+	elog	<< "xNetwork::removeClient> Unable to find client "
+		<< "numeric: "
+		<< intYYXXX
+		<< endl ;
 	return 0 ;
 	}
+
+//elog	<< "xNetwork::removeClient> Removing client: "
+//	<< *(ptr->second)
+//	<< endl ;
 
 numericMap.erase( ptr ) ;
 
@@ -317,13 +331,13 @@ while( chanPtr != retMe->channels_end() )
 			<< *retMe
 			<< endl ;
 		}
-	delete theChanUser ;
+	delete theChanUser ; theChanUser = 0 ;
 
 	if( (*chanPtr)->empty() )
 		{
-//		elog	<< "xNetwork::removeClient> Removing channel "
-//			<< (*chanPtr)->getName()
-//			<< endl ;
+		elog	<< "xNetwork::removeClient> Removing channel "
+			<< (*chanPtr)->getName()
+			<< endl ;
 
 		delete removeChannel( (*chanPtr)->getName() ) ;
 		}
@@ -374,45 +388,72 @@ iServer* xNetwork::removeServer( const unsigned int& YY,
 {
 
 // Attempt to find the server being removed
-serverMapType::iterator ptr = serverMap.find( YY ) ;
+serverMapType::iterator serverIterator = serverMap.find( YY ) ;
 
 // Did we find the server?
-if( ptr == serverMap.end() )
+if( serverIterator == serverMap.end() )
 	{
-	// Nope, return NULL
+	// Nope, log an error
+	elog	<< "xNetwork::removeServer> Failed to find server "
+		<< "numeric: "
+		<< YY
+		<< endl ;
+
+	// Let the caller know that the remove failed
 	return 0 ;
 	}
 
 // Grab a pointer to the iServer for convenience and readability
-iServer* serverPtr = ptr->second ;
+iServer* serverPtr = serverIterator->second ;
 
 // Remove the server from the internal table
-serverMap.erase( ptr ) ;
+serverMap.erase( serverIterator ) ;
+
+// Verbose debugging information
+//elog	<< "xNetwork::removeServer> Removing server: "
+//	<< *serverPtr
+//	<< endl ;
 
 // Walk through the numericMap looking for clients which are on
 // the server being removed.
 // This algorithm is O(N) :(
-for( numericMapType::iterator ptr = numericMap.begin(),
-	endPtr = numericMap.end() ; ptr != endPtr ; ++ptr )
+for( numericMapType::iterator clientIterator = numericMap.begin() ; 
+	clientIterator != numericMap.end() ; )
 	{
 	// Is this client on the server that is being removed?
-	if( YY != ptr->second->getIntYY() )
+	if( YY != clientIterator->second->getIntYY() )
 		{
 		// Nope, move to next client
+		++clientIterator ;
+
+		// Skip rest of the loop
 		continue ;
 		}
-
-	// This client is on the server being removed
 
 	// Let removeClient() handle:
 	// - Removing the client<->channel interactions
 	// - Removing the channel itself, if empty
 	// - Removing the client from the internal tables
 	//
-	// Note that removal of an element from the numericMap
-	// by removeClient() does NOT invalidate other iterators
-	// into that table; so (ptr) is still valid after this call
-	iClient* theClient = removeClient( ptr->second ) ;
+	// The removal of an element from a hash_map<> invalidates
+	// the iterator (or perhaps all iterators, still searching
+	// for documentation on this).  However, hash_map::erase()
+	// does not return an updated iterator, so we have to make
+	// a little work around here to make sure we keep a valid
+	// iterator.
+
+	// nextIterator is the iterator past the current iterator
+	numericMapType::iterator nextIterator( clientIterator ) ;
+	++nextIterator ;
+
+	// Remove the iClient and perform functions described above.
+	// This method calls numericMap.erase(), and so after the
+	// call to removeClient(), the clientIterator is no longer
+	// valid.
+	iClient* theClient = removeClient( clientIterator->second ) ;
+
+	// Point the clientIterator to the nextIterator
+	clientIterator = nextIterator ;
 
 	// Should we post this as an EVT_QUIT event?
 	// It seems that this may add unneeded complexity in handling
@@ -529,16 +570,30 @@ if( !nickMap.insert( nickMapType::value_type(
  */
 void xNetwork::OnSplit( const unsigned int& intYY )
 {
-// TODO: Post events
-for( serverMapType::iterator ptr = serverMap.begin(),
-	endPtr = serverMap.end() ; ptr != endPtr ; ++ptr )
+
+// This is kinda pathetic:
+// hash_map<> invalidates iterators which are deallocated, and
+// may have other undetermined behavior (still searching for
+// accurate documentation).
+// Therefore, if a server is removed, just reset the iterator
+// to the beginning of the structure.  This is done to simplify
+// matters since this is a recursive function.  Performance loss
+// should be negligable since there aren't a signficant number
+// of servers on any network (*crosses fingers*)
+//
+for( serverMapType::iterator ptr = serverMap.begin() ;
+	ptr != serverMap.end() ; )
 	{
 	iServer* serverPtr = ptr->second ;
 
 	if( theServer->getUplinkIntYY() == serverPtr->getIntYY() )
 		{
 		// It's our uplink.  Prevent infinite recursion here
-		// by just ignoring this server.
+		// by just ignoring this server (base case).
+
+		// Since no server is being removed here, increment
+		// the server iterator to the next server
+		++ptr ;
 //		elog	<< "xServer::OnSplit> Found uplink"
 //			<< endl ;
 		}
@@ -567,6 +622,8 @@ for( serverMapType::iterator ptr = serverMap.begin(),
 		// Remove serverPtr's leaf servers.
 		OnSplit( removeIntYY ) ;
 
+		// Handle invalidated iterators the easy way
+		ptr = serverMap.begin() ;
 		}
 	}
 }

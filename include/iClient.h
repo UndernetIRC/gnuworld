@@ -2,7 +2,7 @@
  */
 
 #ifndef __ICLIENT_H
-#define __ICLIENT_H "$Id: iClient.h,v 1.26 2002/04/27 14:54:49 dan_karrels Exp $"
+#define __ICLIENT_H "$Id: iClient.h,v 1.27 2002/05/19 18:54:07 dan_karrels Exp $"
 
 #include	<string>
 #include	<list>
@@ -467,6 +467,10 @@ public:
 			<< theClient.userName << '@'
 			<< theClient.insecureHost
 			<< " Numeric: " << theClient.getCharYYXXX()
+			<< ", int YY/XXX/YYXXX: "
+			<< theClient.getIntYY() << '/'
+			<< theClient.getIntXXX() << '/'
+			<< theClient.getIntYYXXX()
 			<< std::endl ;
 		return out ;
 		}
