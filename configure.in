@@ -1,10 +1,10 @@
-dnl $Id: configure.in,v 1.13 2000/12/17 19:52:32 dan_karrels Exp $
+dnl $Id: configure.in,v 1.14 2000/12/19 21:56:17 dan_karrels Exp $
 dnl ----------------------------------------------------------
 
 echo Configuring GNUWorld...
 echo
 
-AC_REVISION($Revision: 1.13 $)
+AC_REVISION($Revision: 1.14 $)
 AC_INIT(src/main.cc)
 AM_INIT_AUTOMAKE(gnuworld,0.0)
 AM_CONFIG_HEADER(include/defs.h)
@@ -31,6 +31,7 @@ AC_PROG_CPP
 AC_LANG_CPLUSPLUS
 AC_ISC_POSIX
 
+AC_DISABLE_STATIC
 AC_LIBTOOL_DLOPEN
 AM_PROG_LIBTOOL
 AC_SUBST(LIBTOOL_DEPS)
