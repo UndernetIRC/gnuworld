@@ -1335,7 +1335,8 @@ if(ptr != translationTable.end())
  */
 if (lang_id != 1)
 	{
-	return getResponse(theUser,1);
+	// TODO: Set the language for this user to english.
+	// return getResponse(theUser,1);
 	}
 
 if( !msg.empty() )
