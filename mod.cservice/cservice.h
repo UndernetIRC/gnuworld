@@ -1,5 +1,5 @@
 #ifndef __CSERVICE_H
-#define __CSERVICE_H "$Id: cservice.h,v 1.20 2001/01/12 19:56:08 gte Exp $"
+#define __CSERVICE_H "$Id: cservice.h,v 1.21 2001/01/12 22:49:24 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
@@ -59,7 +59,8 @@ public:
 
 	virtual int OnConnect();
     virtual int BurstChannels();
-    virtual int OnPrivateMessage( iClient*, const string& );
+    virtual int OnPrivateMessage( iClient*, const string&,
+		bool = false  );
     virtual void ImplementServer( xServer* ) ;
     virtual bool isOnChannel( const string& ) const;
     virtual bool RegisterCommand( Command* ) ;

@@ -354,7 +354,8 @@ bool cservice::hasFlooded(iClient* theClient)
 	return false;
 } 
 
-int cservice::OnPrivateMessage( iClient* theClient, const string& Message )
+int cservice::OnPrivateMessage( iClient* theClient, const string& Message,
+	bool secure )
 { 
 	/*
 	 *	Private message handler. Pass off the command to the relevant
@@ -436,7 +437,7 @@ int cservice::OnCTCP( iClient* theClient, const string& CTCP,
 
 	if(Command == "VERSION")
 	{
-		xClient::DoCTCP(theClient, CTCP.c_str(), "Undernet P10 Channel Services Version 2 [" __DATE__ " " __TIME__ "] ($Id: cservice.cc,v 1.36 2001/01/12 21:36:38 gte Exp $)");
+		xClient::DoCTCP(theClient, CTCP.c_str(), "Undernet P10 Channel Services Version 2 [" __DATE__ " " __TIME__ "] ($Id: cservice.cc,v 1.37 2001/01/12 22:49:24 dan_karrels Exp $)");
 		return true;
 	}
  

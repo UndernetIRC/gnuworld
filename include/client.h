@@ -3,7 +3,7 @@
  */
 
 #ifndef __XCLIENT_H
-#define __XCLIENT_H "$Id: client.h,v 1.18 2001/01/06 15:46:30 dan_karrels Exp $"
+#define __XCLIENT_H "$Id: client.h,v 1.19 2001/01/12 22:49:23 dan_karrels Exp $"
 
 #include	<string>
 
@@ -287,7 +287,7 @@ public:
 	 * is issued to the client.
 	 */
 	virtual int OnPrivateMessage( iClient* Sender,
-		const string& Message ) ;
+		const string& Message, bool secure = false ) ;
 
 	/**
 	 * Handle a timer event.  The first argument is the

@@ -38,7 +38,8 @@ public:
 		{ return table.end() ; }
 
 	virtual void ImplementServer( xServer* ) ;
-	virtual int OnPrivateMessage( iClient*, const string& ) ;
+	virtual int OnPrivateMessage( iClient*, const string&,
+		bool = false ) ;
 	virtual int OnEvent( const eventType&,
 		void* = 0, void* = 0, void* = 0, void* = 0 ) ;
 

@@ -90,7 +90,8 @@ int gnutest::OnEvent( const eventType& whichEvent,
 return xClient::OnEvent( whichEvent, data1, data2, data3, data4 ) ;
 }
 
-int gnutest::OnPrivateMessage( iClient* theClient, const string& message )
+int gnutest::OnPrivateMessage( iClient* theClient, const string& message,
+	bool )
 {
 
 if( !theClient->isOper() )

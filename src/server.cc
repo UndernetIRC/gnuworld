@@ -43,7 +43,7 @@
 #include	"moduleLoader.h"
 
 const char xServer_h_rcsId[] = __XSERVER_H ;
-const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.46 2001/01/08 18:33:15 dan_karrels Exp $" ;
+const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.47 2001/01/12 22:49:24 dan_karrels Exp $" ;
 
 using std::string ;
 using std::vector ;
@@ -1464,7 +1464,7 @@ if( !_connected )
 	return false ;
 	}
 
-#ifdef EDEBUG
+#ifdef OUTPUT_TO_CONSOLE
 	// Output the debugging information
 	// to the console.
 	cout << "[OUT]: " << buf  ;
@@ -2969,6 +2969,7 @@ char		*Server		= NULL,
 		*Command	= NULL ;
 
 bool		CTCP		= false ;
+bool		secure		= false ;
 
 xClient		*Client		= NULL ;
 
@@ -2982,6 +2983,7 @@ if( NULL != Pos )
 	Server = Receiver + (Pos - Receiver) + 1 ;
 	Receiver[ Pos - Receiver ] = 0 ;
 	Client = Network->findLocalNick( Receiver ) ;
+	secure = true ;
 	}
 else if( Receiver[ 0 ] == charYY[ 0 ]
 	&& Receiver[ 1 ] == charYY[ 1 ] )
@@ -3037,11 +3039,11 @@ if( NULL == Target )
 
 if( CTCP )
 	{
-	return Client->OnCTCP( Target, Command, Message ) ;
+	return Client->OnCTCP( Target, Command, Message, secure ) ;
 	}
 else
 	{
-	return Client->OnPrivateMessage( Target, Message ) ;
+	return Client->OnPrivateMessage( Target, Message, secure ) ;
 	}
 }
 

@@ -2,7 +2,7 @@
  */
 
 #ifndef __CLIENTEXAMPLE_H
-#define __CLIENTEXAMPLE_H "$Id: clientExample.h,v 1.1 2001/01/06 15:31:53 dan_karrels Exp $"
+#define __CLIENTEXAMPLE_H "$Id: clientExample.h,v 1.2 2001/01/12 22:49:24 dan_karrels Exp $"
 
 #include	<string>
 
@@ -38,7 +38,8 @@ public:
 	 * and the second argument is the actual message (minus
 	 * all of the server command stuff).
 	 */
-	virtual int OnPrivateMessage( iClient*, const string& ) ;
+	virtual int OnPrivateMessage( iClient*, const string&,
+		bool secure = false ) ;
 
 	/**
 	 * This method is called by the server when a server connection

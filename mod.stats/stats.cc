@@ -47,7 +47,8 @@ for( eventType i = 0 ; i != EVT_NOOP ; ++i )
 	}
 }
 
-int stats::OnPrivateMessage( iClient* theClient, const string& Message )
+int stats::OnPrivateMessage( iClient* theClient, const string& Message,
+	bool )
 {
 if( !theClient->isOper() )
 	{

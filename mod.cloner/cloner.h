@@ -3,7 +3,7 @@
  */
 
 #ifndef __CLONER_H
-#define __CLONER_H "$Id: cloner.h,v 1.1 2000/06/30 18:46:06 dan_karrels Exp $"
+#define __CLONER_H "$Id: cloner.h,v 1.1 2001/01/12 22:49:24 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
@@ -28,7 +28,8 @@ public:
 	virtual ~cloner() ;
 
 	virtual int OnConnect() ;
-	virtual int OnPrivateMessage( iClient*, const string& ) ;
+	virtual int OnPrivateMessage( iClient*, const string&,
+			bool secure = false ) ;
 	virtual void addClone() ;
 
 protected:

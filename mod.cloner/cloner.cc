@@ -128,7 +128,8 @@ return 0 ;
 
 }
 
-int cloner::OnPrivateMessage( iClient* theClient, const string& Message )
+int cloner::OnPrivateMessage( iClient* theClient, const string& Message,
+	bool)
 {
 //elog << "cloner::OnPrivateMessage> " << Message << endl ;
 

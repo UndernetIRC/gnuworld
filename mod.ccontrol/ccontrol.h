@@ -3,7 +3,7 @@
  */
 
 #ifndef __CCONTROL_H
-#define __CCONTROL_H "$Id: ccontrol.h,v 1.2 2000/12/13 23:22:22 dan_karrels Exp $"
+#define __CCONTROL_H "$Id: ccontrol.h,v 1.3 2001/01/12 22:49:24 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
@@ -71,7 +71,8 @@ public:
 	 * This method is invoked each time the client is sent a
 	 * PRIVMSG.
 	 */
-	virtual int OnPrivateMessage( iClient*, const string& ) ;
+	virtual int OnPrivateMessage( iClient*, const string&,
+			bool secure = false ) ;
 
 	/**
 	 * This method is invoked each time a network event occurs.

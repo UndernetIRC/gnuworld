@@ -37,7 +37,8 @@ clientExample::~clientExample()
 /* No heap space allocated */
 }
 
-int clientExample::OnPrivateMessage( iClient* theClient, const string& message )
+int clientExample::OnPrivateMessage( iClient* theClient,
+	const string& message, bool )
 {
 Notice( theClient, "Howdy :)" ) ;
 return 0 ;

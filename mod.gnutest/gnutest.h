@@ -1,7 +1,7 @@
 /* gnutest.h */
 
 #ifndef __GNUTEST_H
-#define __GNUTEST_H "$Id: gnutest.h,v 1.1 2000/12/13 23:22:23 dan_karrels Exp $"
+#define __GNUTEST_H "$Id: gnutest.h,v 1.2 2001/01/12 22:49:24 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
@@ -33,7 +33,8 @@ public:
 		void* data3 = 0, void* data4 = 0 ) ;
 
 	virtual int	BurstChannels() ;
-	virtual int	OnPrivateMessage( iClient*, const string& ) ;
+	virtual int	OnPrivateMessage( iClient*, const string&,
+				bool secure = false ) ;
 	virtual int	OnTimer( xServer::timerID, void* ) ;
 
 	virtual bool	isOnChannel( const string& chanName ) const ;

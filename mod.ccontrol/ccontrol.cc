@@ -21,7 +21,7 @@
 #include	"ccontrol.h"
  
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.3 2000/12/13 23:22:22 dan_karrels Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.4 2001/01/12 22:49:24 dan_karrels Exp $" ;
 
 using std::string ;
 using std::vector ;
@@ -202,7 +202,8 @@ for( commandMapType::iterator ptr = commandMap.begin() ;
 xClient::ImplementServer( theServer ) ;
 }
 
-int ccontrol::OnPrivateMessage( iClient* theClient, const string& Message )
+int ccontrol::OnPrivateMessage( iClient* theClient, const string& Message,
+	bool )
 {
 
 //elog << "ccontrol::OnPrivateMessage()\n" ;
