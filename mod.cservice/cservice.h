@@ -1,5 +1,5 @@
 #ifndef __CSERVICE_H
-#define __CSERVICE_H "$Id: cservice.h,v 1.29 2001/01/22 00:22:31 gte Exp $"
+#define __CSERVICE_H "$Id: cservice.h,v 1.30 2001/01/22 20:25:16 gte Exp $"
 
 #include	<string>
 #include	<vector>
@@ -157,9 +157,10 @@ public:
 	typedef map < pair <int, int>, sqlLevel* > sqlLevelHashType ;
 
 	// Ban cache, key is channel id.
-	typedef map < int, vector < sqlBan* > > sqlBanHashType ;
+	typedef vector < sqlBan* > sqlBanVectorType;
+	typedef map < int, sqlBanVectorType > sqlBanHashType ; 
 
-	const vector < sqlBan* >& getBanRecords(sqlChannel* theChan);
+	vector<sqlBan*> getBanRecords(sqlChannel* theChan);
 
 	//typedef priority_queue < unsigned int, vector< string >, less <unsigned int > > silenceListType;
 	// Decided there aren't going to be that many silences anyway + we need iterative/random removal

@@ -9,7 +9,7 @@
 #include	"responses.h"
 #include	"Network.h"
  
-const char STATUSCommand_cc_rcsId[] = "$Id: STATUSCommand.cc,v 1.7 2001/01/16 01:31:40 gte Exp $" ;
+const char STATUSCommand_cc_rcsId[] = "$Id: STATUSCommand.cc,v 1.8 2001/01/22 20:25:16 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -65,6 +65,9 @@ bool STATUSCommand::Exec( iClient* theClient, const string& Message )
 		float levelTotal = bot->levelCacheHits + bot->levelHits;
 		float levelEf = (bot->levelCacheHits ? ((float)bot->levelCacheHits / levelTotal * 100) : 0);
 
+		float banTotal = bot->banCacheHits + bot->banHits;
+		float banEf = (bot->banCacheHits ? ((float)bot->banCacheHits / banTotal * 100) : 0);
+
 		bot->Notice(theClient, "CMaster Channel Services internal status:"); 
 
 		bot->Notice(theClient, "[     Channel Record Stats] \002Cached Entries:\002 %i    \002DB Requests:\002 %i    \002Cache Hits:\002 %i    \002Efficiency:\002 %.2f%%", 
@@ -75,7 +78,10 @@ bool STATUSCommand::Exec( iClient* theClient, const string& Message )
 
 		bot->Notice(theClient, "[Access Level Record Stats] \002Cached Entries:\002 %i    \002DB Requests:\002 %i    \002Cache Hits:\002 %i    \002Efficiency:\002 %.2f%%", 
 			bot->sqlLevelCache.size(), bot->levelHits, bot->levelCacheHits, levelEf);
- 
+
+		bot->Notice(theClient, "[         Ban Record Stats] \002Cached Entries:\002 %i    \002DB Requests:\002 %i    \002Cache Hits:\002 %i    \002Efficiency:\002 %.2f%%", 
+			bot->sqlBanCache.size(), bot->banHits, bot->banCacheHits, banEf);
+			
 		bot->Notice(theClient, "Last recieved Channel NOTIFY: %i", bot->lastChannelRefresh);
 		bot->Notice(theClient, "Last recieved User NOTIFY: %i", bot->lastUserRefresh);
 		bot->Notice(theClient, "Last recieved Level NOTIFY: %i", bot->lastLevelRefresh);

@@ -455,7 +455,7 @@ int cservice::OnCTCP( iClient* theClient, const string& CTCP,
 
 	if(Command == "VERSION")
 	{
-		xClient::DoCTCP(theClient, CTCP.c_str(), "Undernet P10 Channel Services Version 2 [" __DATE__ " " __TIME__ "] ($Id: cservice.cc,v 1.58 2001/01/22 00:22:31 gte Exp $)");
+		xClient::DoCTCP(theClient, CTCP.c_str(), "Undernet P10 Channel Services Version 2 [" __DATE__ " " __TIME__ "] ($Id: cservice.cc,v 1.59 2001/01/22 20:25:16 gte Exp $)");
 		return true;
 	}
  
@@ -520,7 +520,7 @@ sqlUser* cservice::getUserRecord(const string& id)
 	return 0;
 }	
 
-const vector < sqlBan* >& cservice::getBanRecords(sqlChannel* theChan)
+vector<sqlBan*> cservice::getBanRecords(sqlChannel* theChan)
 {
 	/*
 	 *  Returns a vector of sqlBan's for a given channel.
@@ -540,7 +540,32 @@ const vector < sqlBan* >& cservice::getBanRecords(sqlChannel* theChan)
 	 *  the backend and create a new vector<sqlban*> object.
 	 *  If we find no bans.. return a new blank container.
 	 */ 
- 
+
+	vector<sqlBan*> banList = vector<sqlBan*>();
+
+	/*
+	 * Execute some SQL to get all bans relating to this channel.
+	 */
+
+	ExecStatusType status;
+	strstream theQuery;
+	theQuery << "SELECT " << sql::ban_fields << " FROM bans WHERE channel_id = " << theChan->getID() << ends;
+	elog << "cmaster::getBanRecords> " << theQuery.str() << endl; 
+
+	if ((status = SQLDb->Exec(theQuery.str())) == PGRES_TUPLES_OK)
+	{
+		for (int i = 0 ; i < SQLDb->Tuples (); i++)
+		{ 
+		}
+	}
+
+	 /* Insert into the cache - even if its empty */
+
+	sqlBanCache.insert(sqlBanHashType::value_type(theChan->getID(), banList));
+	elog << "cmaster::getBanRecords> There are " << sqlBanCache.size() << " elements in the cache." << endl;
+	banHits++;
+
+	return banList;
 }	
  
 sqlChannel* cservice::getChannelRecord(const string& id)
@@ -1213,6 +1238,8 @@ int cservice::OnChannelEvent( const channelEventType& whichEvent,
 					<< " for registered channel event: " << theChan->getName() << endl;
 				return 0;
 			}
+
+			getBanRecords(reggedChan);
 
 			/* Is it time to set an autotopic? */
 			if (reggedChan->getFlag(sqlChannel::F_AUTOTOPIC) && (reggedChan->getLastTopic() + topic_duration <= ::time(NULL)))
