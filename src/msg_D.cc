@@ -16,7 +16,7 @@
 #include	"ELog.h"
 #include	"StringTokenizer.h"
 
-const char msg_D_rcsId[] = "$Id: msg_D.cc,v 1.1 2001/02/02 18:10:30 dan_karrels Exp $" ;
+const char msg_D_rcsId[] = "$Id: msg_D.cc,v 1.2 2001/03/03 00:17:57 dan_karrels Exp $" ;
 
 using std::string ;
 using std::endl ;
@@ -74,7 +74,8 @@ else
 if( (NULL == serverSource) && (NULL == source) )
 	{
 	elog	<< "xServer::MSG_D> Unable to find source: "
-		<< Param[ 0 ] << endl ;
+		<< Param[ 0 ]
+		<< endl ;
 	return -1 ;
 	}
 
@@ -87,7 +88,8 @@ iClient* target = Network->removeClient( Param[ 1 ] ) ;
 if( NULL == target )
 	{
 	elog	<< "xServer::MSG_D> Unable to find target client: "
-		<< Param[ 1 ] << endl ;
+		<< Param[ 1 ]
+		<< endl ;
 	return -1 ;
 	}
 

@@ -20,7 +20,7 @@
 #include	"Channel.h"
 #include	"ChannelUser.h"
 
-const char msg_C_cc_rcsId[] = "$Id: msg_C.cc,v 1.1 2001/02/02 18:10:30 dan_karrels Exp $" ;
+const char msg_C_cc_rcsId[] = "$Id: msg_C.cc,v 1.2 2001/03/03 00:17:57 dan_karrels Exp $" ;
 
 using std::string ;
 using std::endl ;
@@ -42,7 +42,8 @@ int xServer::MSG_C( xParameters& Param )
 if( Param.size() < 3 )
 	{
 	// Insufficient arguments provided
-	elog	<< "xServer::MSG_C> Invalid number of parameters\n" ;
+	elog	<< "xServer::MSG_C> Invalid number of parameters"
+		<< endl ;
 
 	// Return error
 	return -1 ;
@@ -56,8 +57,10 @@ if( NULL == theClient )
 	{
 	// Nope, log the error
 	elog	<< "xServer::MSG_C> ("
-		<< Param[ 1 ] << ") Unable to find client: "
-		<< Param[ 0 ] << endl ;
+		<< Param[ 1 ]
+		<< ") Unable to find client: "
+		<< Param[ 0 ]
+		<< endl ;
 
 	// Return error
 	return -1 ;
@@ -68,7 +71,7 @@ time_t creationTime =
 	static_cast< time_t >( atoi( Param[ Param.size() - 1 ] ) ) ;
 
 // Tokenize based on ','.  Multiple channels may be put into the
-// same C command.
+// same C(REATE) command.
 StringTokenizer st( Param[ 1 ], ',' ) ;
 
 for( StringTokenizer::const_iterator ptr = st.begin() ; ptr != st.end() ;
@@ -97,7 +100,8 @@ for( StringTokenizer::const_iterator ptr = st.begin() ; ptr != st.end() ;
 			{
 			// Addition failed, log the error
 			elog	<< "xServer::MSG_C> Failed to add channel: "
-				<< *theChan << endl ;
+				<< *theChan
+				<< endl ;
 
 			// Prevent memory leaks by removing the unused
 			// channel
@@ -124,8 +128,10 @@ for( StringTokenizer::const_iterator ptr = st.begin() ; ptr != st.end() ;
 		{
 		// Addition failed, log the error
 		elog	<< "xServer::MSG_C> Unable to add user "
-			<< theUser->getNickName() << " to channel "
-			<< theChan->getName() << endl ;
+			<< theUser->getNickName()
+			<< " to channel "
+			<< theChan->getName()
+			<< endl ;
 
 		// Prevent a memory leak by deallocating the unused
 		// ChannelUser structure

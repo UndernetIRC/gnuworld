@@ -17,13 +17,13 @@
 #include	"ELog.h"
 #include	"StringTokenizer.h"
 
-const char msg_K_cc_rcsId[] = "$Id: msg_K.cc,v 1.2 2001/02/03 19:16:33 dan_karrels Exp $" ;
-
-using std::string ;
-using std::endl ;
+const char msg_K_cc_rcsId[] = "$Id: msg_K.cc,v 1.3 2001/03/03 00:17:57 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
+
+using std::string ;
+using std::endl ;
 
 // AIAAA K #coder-com 0C] :This is now an IRCoperator only channel
 // Note that when a user is kicked from a channel, the user is not
@@ -38,7 +38,8 @@ int xServer::MSG_K( xParameters& Param )
 if( Param.size() < 3 )
 	{
 	// Invalid number of arguments
-	elog	<< "xServer::MSG_K> Invalid number of arguments\n" ;
+	elog	<< "xServer::MSG_K> Invalid number of arguments"
+		<< endl ;
 
 	// Return error
 	return -1 ;
@@ -60,8 +61,10 @@ if( NULL == theClient )
 	{
 	// Nope, log the error
 	elog	<< "xServer::MSG_K> ("
-		<< Param[ 1 ] << ") Unable to find client: "
-		<< Param[ 2 ] << endl ;
+		<< Param[ 1 ]
+		<< ") Unable to find client: "
+		<< Param[ 2 ]
+		<< endl ;
 
 	// Return error
 	return -1 ;
@@ -75,7 +78,8 @@ if( NULL == theChan )
 	{
 	// Nope, log the error
 	elog	<< "xServer::MSG_K> Unable to find channel: "
-		<< Param[ 1 ] << endl ;
+		<< Param[ 1 ]
+		<< endl ;
 
 	// Return error
 	return -1 ;

@@ -4,18 +4,25 @@
  */
 
 #ifndef __MISC_H
-#define __MISC_H "$Id: misc.h,v 1.7 2000/11/18 23:36:51 dan_karrels Exp $"
+#define __MISC_H "$Id: misc.h,v 1.8 2001/03/03 00:17:57 dan_karrels Exp $"
 
 #include	<string>
 #include	<hash_map>
 
 #include	<unistd.h>
 
-#include	<cstring>
 #include	<cctype>
 
 using std::string ;
 using std::hash ;
+
+/**
+ * Return 0 if the two strings are equivalent, according to
+ * case insensitive searches.
+ * Otherwise, it returns the comparison between
+ * s1 and s2.
+ */
+int strcasecmp( const string&, const string& ) ;
 
 /**
  * Case insensitive comparison struct for use by STL structures/algorithms.
@@ -24,7 +31,7 @@ struct noCaseCompare
 {
 inline bool operator()( const string& lhs, const string& rhs ) const
 	{
-	return (::strcasecmp( lhs.c_str(), rhs.c_str() ) < 0) ;
+	return (::strcasecmp( lhs, rhs ) < 0) ;
 	}
 } ;
 
@@ -36,7 +43,7 @@ struct eqstr
 {
 inline bool operator()( const string& s1, const string& s2 ) const
 	{
-	return (0 == ::strcasecmp( s1.c_str(), s2.c_str() )) ;
+	return (0 == ::strcasecmp( s1, s2 )) ;
 	}
 } ;
 

@@ -14,7 +14,7 @@
 #include	"StringTokenizer.h"
 #include	"events.h"
 
-const char msg_L_cc_rcsId[] = "$Id: msg_L.cc,v 1.2 2001/02/03 19:16:33 dan_karrels Exp $" ;
+const char msg_L_cc_rcsId[] = "$Id: msg_L.cc,v 1.3 2001/03/03 00:17:57 dan_karrels Exp $" ;
 
 using std::string ;
 using std::endl ;
@@ -33,7 +33,8 @@ int xServer::MSG_L( xParameters& Param )
 // client_numeric #channel
 if( Param.size() < 2 )
 	{
-	elog	<< "xServer::MSG_L> Invalid number of arguments\n" ;
+	elog	<< "xServer::MSG_L> Invalid number of arguments"
+		<< endl ;
 	return -1 ;
 	}
 
@@ -46,9 +47,11 @@ if( NULL == theClient )
 	// Nope, no matching client found
 
 	// Log the error
-	elog	<< "xServer::MSG_L> (" << Param[ 1 ]
+	elog	<< "xServer::MSG_L> ("
+		<< Param[ 1 ]
 		<< "): Unable to find client: "
-		<< Param[ 0 ] << endl ;
+		<< Param[ 0 ]
+		<< endl ;
 
 	// Return error
 	return -1 ;
@@ -78,7 +81,8 @@ for( StringTokenizer::size_type i = 0 ; i < st.size() ; ++i )
 		{
 		// Channel not found, log the error
 		elog	<< "xServer::MSG_L> Unable to find channel: "
-			<< st[ i ] << endl ;
+			<< st[ i ]
+			<< endl ;
 
 		// Continue on to the next channel
 		continue ;

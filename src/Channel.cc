@@ -48,8 +48,12 @@ assert( newUser != 0 ) ;
 if( !userList.insert(
 	userListType::value_type( newUser->getIntYYXXX(), newUser ) ).second )
 	{
-	elog	<< "Channel::addUser> (" << getName() << "): "
-		<< "Unable to add user: " << *newUser << endl ;
+	elog	<< "Channel::addUser> ("
+		<< getName()
+		<< "): "
+		<< "Unable to add user: "
+		<< *newUser
+		<< endl ;
 	return false ;
 	}
 
@@ -112,8 +116,12 @@ bool Channel::removeUserMode( const ChannelUser::modeType& whichMode,
 ChannelUser* theChanUser = findUser( theClient ) ;
 if( NULL == theChanUser )
 	{
-//	elog	<< "Channel::removeUserMode> (" << getName() << ") "
-//		<< "Unable to find user\n" ;
+	elog	<< "Channel::removeUserMode> ("
+		<< getName()
+		<< ") "
+		<< "Unable to find user: "
+		<< theClient->getCharYYXXX()
+		<< endl ;
 	return false ;
 	}
 theChanUser->removeMode( whichMode ) ;
@@ -123,13 +131,16 @@ return true ;
 bool Channel::setUserMode( const ChannelUser::modeType& whichMode,
 	iClient* theClient )
 {
-
 // findUser() is also public, and so will verify theClient's pointer
 ChannelUser* theChanUser = findUser( theClient ) ;
 if( NULL == theChanUser )
 	{
-//	elog	<< "Channel::setUserMode> (" << getName() << ") "
-//		<< "Unable to find user\n" ;
+	elog	<< "Channel::setUserMode> ("
+		<< getName()
+		<< ") "
+		<< "Unable to find user: "
+		<< theClient->getCharYYXXX()
+		<< endl ;
 	return false ;
 	}
 theChanUser->setMode( whichMode ) ;
@@ -144,8 +155,12 @@ bool Channel::getUserMode( const ChannelUser::modeType& whichMode,
 ChannelUser* theChanUser = findUser( theClient ) ;
 if( NULL == theChanUser )
 	{
-//	elog	<< "Channel::getUserMode> (" << getName() << ") "
-//		<< "Unable to find user\n" ;
+	elog	<< "Channel::getUserMode> ("
+		<< getName()
+		<< ") "
+		<< "Unable to find user: "
+		<< theClient->getCharYYXXX()
+		<< endl ;
 	return false ;
 	}
 return theChanUser->getMode( whichMode ) ;
@@ -162,7 +177,7 @@ void Channel::removeBan( const string& banMask )
 for( banListType::iterator ptr = banList.begin(), end = banList.end() ;
 	ptr != end ; ++ptr )
 	{
-	if( !strcasecmp( ptr->c_str(), banMask.c_str() ) )
+	if( !strcasecmp( *ptr, banMask ) )
 		{
 		banList.erase( ptr ) ;
 		return ;
@@ -175,7 +190,7 @@ bool Channel::findBan( const string& banMask ) const
 for( banListType::const_iterator ptr = banList.begin(),
 	end = banList.end() ; ptr != end ; ++ptr )
 	{
-	if( !strcasecmp( ptr->c_str(), banMask.c_str() ) )
+	if( !strcasecmp( *ptr, banMask ) )
 		{
 		return true ;
 		}

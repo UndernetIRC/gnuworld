@@ -1,18 +1,19 @@
 /* Gline.h */
 
 #ifndef __GLINE_H
-#define __GLINE_H "$Id: Gline.h,v 1.1 2000/06/30 18:46:06 dan_karrels Exp $"
+#define __GLINE_H "$Id: Gline.h,v 1.2 2001/03/03 00:17:57 dan_karrels Exp $"
 
 #include	<string>
 #include	<iostream>
 
-#include	<cstring>
 #include	<ctime>
 
-using std::string ;
+#include	"misc.h"
 
 namespace gnuworld
 {
+
+using std::string ;
 
 /**
  * A simple data storage class which represents a network G-Line.
@@ -35,7 +36,7 @@ public:
 	: setBy( _setBy ),
 	  userHost( _userHost ),
 	  reason( _reason ),
-	  expiration( _duration + time( 0 ) )
+	  expiration( _duration + ::time( 0 ) )
 	{}
 
 	/**
@@ -61,7 +62,7 @@ public:
 	 * This does NOT perform a wildcard match.
 	 */
 	inline bool operator==( const string& _userHost ) const
-		{ return !strcasecmp( userHost.c_str(), _userHost.c_str() ) ; }
+		{ return (0 == strcasecmp( userHost, _userHost )) ; }
 
 	/**
 	 * Retrieve the nick!user@host of the user who set this gline.

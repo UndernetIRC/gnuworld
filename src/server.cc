@@ -47,7 +47,7 @@
 #include	"ServerTimerHandlers.h"
 
 const char xServer_h_rcsId[] = __XSERVER_H ;
-const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.80 2001/03/01 01:58:17 dan_karrels Exp $" ;
+const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.81 2001/03/03 00:17:57 dan_karrels Exp $" ;
 
 using std::string ;
 using std::vector ;
@@ -763,7 +763,8 @@ if( pairPtr != commandMap->end() )
 else
 	{
 	elog	<< "xServer::Process> Unable to find handler for: "
-		<< Command << endl ;
+		<< Command
+		<< endl ;
 	}
 }
 
@@ -775,10 +776,11 @@ bool xServer::SquitServer( const string& serverName, const string& reason )
 {
 
 // Is it our server?
-if( !strcasecmp( serverName.c_str(), this->ServerName.c_str() ) )
+if( !strcasecmp( serverName, this->ServerName ) )
 	{
 	// I don't see that happening
-	elog	<< "xServer::SquitServer> Attempt to squit myself!\n" ;
+	elog	<< "xServer::SquitServer> Attempt to squit myself!"
+		<< endl ;
 	return false ;
 	}
 
@@ -789,7 +791,8 @@ if( NULL == theServer )
 	{
 	// The server doesn't exist.
 	elog	<< "xServer::SquitServer> Unable to find server: "
-		<< serverName << endl ;
+		<< serverName
+		<< endl ;
 	return false ;
 	}
 
@@ -811,8 +814,14 @@ for( jupedServerListType::iterator ptr = jupedServers.begin() ;
 
 // Prepare the output buffer that will squit the server.
 strstream s ;
-s	<< charYY << " SQ " << serverName
-	<< ' ' << time( 0 ) << " :" << reason << ends ;
+s	<< charYY
+	<< " SQ "
+	<< serverName
+	<< ' '
+	<< time( 0 )
+	<< " :"
+	<< reason
+	<< ends ;
 
 // Notify the rest of the network of the SQUIT.
 Write( s ) ;

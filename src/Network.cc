@@ -7,7 +7,6 @@
 #include	<hash_map>
 #include	<algorithm>
 
-#include	<cstring>
 #include	<cassert>
 
 #include	"Network.h"
@@ -20,7 +19,7 @@
 #include	"Numeric.h"
 
 const char xNetwork_h_rcsId[] = __XNETWORK_H ;
-const char xNetwork_cc_rcsId[] = "$Id: Network.cc,v 1.18 2001/03/01 01:58:17 dan_karrels Exp $" ;
+const char xNetwork_cc_rcsId[] = "$Id: Network.cc,v 1.19 2001/03/03 00:17:57 dan_karrels Exp $" ;
 
 using std::string ;
 using std::endl ;
@@ -286,8 +285,7 @@ for( xClientVectorType::size_type i = 0 ; i < localClients.size() ; i++ )
 		{
 		continue ;
 		}
-	if( !strcasecmp( nickName.c_str(),
-		localClients[ i ]->getNickName().c_str() ) )
+	if( !strcasecmp( nickName, localClients[ i ]->getNickName() ) )
 		{
 		return localClients[ i ] ;
 		}
@@ -317,7 +315,7 @@ for( serverVectorType::size_type i = 0 ; i < servers.size() ; i++ )
 		{
 		continue ;
 		}
-	if( !strcasecmp( servers[ i ]->getName().c_str(), name.c_str() ) )
+	if( !strcasecmp( servers[ i ]->getName(), name ) )
 		{
 		return servers[ i ] ;
 		}

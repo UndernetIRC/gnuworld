@@ -10,7 +10,7 @@
 #include	"misc.h"
 
 const char Misc_h_rcsId[] = __MISC_H ;
-const char Misc_cc_rcsId[] = "$Id: misc.cc,v 1.3 2000/11/18 23:36:51 dan_karrels Exp $" ;
+const char Misc_cc_rcsId[] = "$Id: misc.cc,v 1.4 2001/03/03 00:17:57 dan_karrels Exp $" ;
 
 using std::string ;
 
@@ -106,3 +106,23 @@ for( string::const_iterator ptr = s.begin(), endPtr = s.end() ;
 	}
 return true ;
 }       
+
+int strcasecmp( const string& s1, const string& s2 )
+{
+string::const_iterator s1_ptr = s1.begin(),
+	s2_ptr = s2.begin() ;
+string::const_iterator s1_end = s1.end(),
+	s2_end = s2.end() ;
+
+for( ; (s1_ptr != s1_end) && (s2_ptr != s2_end) ;
+	++s1_ptr, ++s2_ptr )
+	{
+	if( *s1_ptr == *s2_ptr )
+		{
+		continue ;
+		}
+
+	return (*s1_ptr < *s2_ptr) ? -1 : 1 ;
+	}
+return 0 ;
+}

@@ -3,6 +3,7 @@
  */
 
 #include	<string>
+#include	<iostream>
 
 #include	"server.h"
 #include	"events.h"
@@ -14,13 +15,13 @@
 #include	"xparameters.h"
 #include	"StringTokenizer.h"
 
-const char msg_PART_cc_rcsId[] = "$Id: msg_PART.cc,v 1.3 2001/02/03 19:16:33 dan_karrels Exp $" ;
-
-using std::string ;
-using std::endl ;
+const char msg_PART_cc_rcsId[] = "$Id: msg_PART.cc,v 1.4 2001/03/03 00:17:57 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
+
+using std::string ;
+using std::endl ;
 
 // nick PART #channel,#channel2 <part msg>
 int xServer::MSG_PART( xParameters& Param )
@@ -43,9 +44,11 @@ if( NULL == theClient )
 	// Nope, no matching client found
 
 	// Log the error
-	elog	<< "xServer::MSG_PART> (" << Param[ 1 ]
+	elog	<< "xServer::MSG_PART> ("
+		<< Param[ 1 ]
 		<< "): Unable to find client: "
-		<< Param[ 0 ] << endl ;
+		<< Param[ 0 ]
+		<< endl ;
 
 	// Return error
 	return -1 ;
@@ -75,7 +78,8 @@ for( StringTokenizer::size_type i = 0 ; i < st.size() ; ++i )
 		{
 		// Channel not found, log the error
 		elog	<< "xServer::MSG_L> Unable to find channel: "
-			<< st[ i ] << endl ;
+			<< st[ i ]
+			<< endl ;
 
 		// Continue on to the next channel
 		continue ;

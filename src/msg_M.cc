@@ -17,7 +17,7 @@
 #include	"ELog.h"
 #include	"StringTokenizer.h"
 
-const char msg_M_cc_rcsId[] = "$Id: msg_M.cc,v 1.3 2001/02/06 01:47:40 dan_karrels Exp $" ;
+const char msg_M_cc_rcsId[] = "$Id: msg_M.cc,v 1.4 2001/03/03 00:17:57 dan_karrels Exp $" ;
 
 using std::string ;
 using std::vector ;
@@ -37,7 +37,8 @@ int xServer::MSG_M( xParameters& Param )
 
 if( Param.size() < 3 )
 	{
-	elog	<< "xServer::MSG_M> Invalid number of arguments\n" ;
+	elog	<< "xServer::MSG_M> Invalid number of arguments"
+		<< endl ;
 	return -1 ;
 	}
 
@@ -66,13 +67,18 @@ else
 if( (NULL == clientSource) && (NULL == serverSource) )
 	{
 	elog	<< "xServer::MSG_M> Unable to find source: "
-		<< Param[ 0 ] << endl ;
+		<< Param[ 0 ]
+		<< endl ;
 	// return -1
 	}
 
+// Is it a user mode change?
 if( '#' != Param[ 1 ][ 0 ] )
 	{
+	// Yup, process the user's mode change(s)
 	onUserModeChange( Param ) ;
+
+	// Return
 	return 0 ;
 	}
 
@@ -81,7 +87,8 @@ Channel* theChan = Network->findChannel( Param[ 1 ] ) ;
 if( NULL == theChan )
 	{
 	elog	<< "xServer::MSG_M> Unable to find channel: "
-		<< Param[ 1 ] << endl ;
+		<< Param[ 1 ]
+		<< endl ;
 	return -1 ;
 	}
 
@@ -94,8 +101,10 @@ if( clientSource != 0 )
 	theUser = theChan->findUser( clientSource ) ;
 	if( NULL == theUser )
 		{
-		elog	<< "xServer::MSG_M> Unable to find channel "
-			<< "user" << endl ;
+		elog	<< "xServer::MSG_M> ("
+			<< theChan->getName()
+			<< ") Unable to find channel user"
+			<< endl ;
 		return -1 ;
 		}
 	}
@@ -168,7 +177,8 @@ for( const char* modePtr = Param[ 2 ] ; *modePtr ; ++modePtr )
 				{
 				elog	<< "xServer::MSG_M> Unable to "
 					<< "find op target user: "
-					<< Param[ argPos - 1 ] << endl ;
+					<< Param[ argPos - 1 ]
+					<< endl ;
 				break ;
 				}
 			opVector.push_back(
@@ -184,7 +194,8 @@ for( const char* modePtr = Param[ 2 ] ; *modePtr ; ++modePtr )
 				{
 				elog	<< "xServer::MSG_M> Unable to "
 					<< "find voice target client: "
-					<< Param[ argPos - 1 ] << endl ;
+					<< Param[ argPos - 1 ]
+					<< endl ;
 				break ;
 				}
 			ChannelUser* targetUser = theChan->findUser(
@@ -193,7 +204,8 @@ for( const char* modePtr = Param[ 2 ] ; *modePtr ; ++modePtr )
 				{
 				elog	<< "xServer::MSG_M> Unable to "
 					<< "find voice target user: "
-					<< Param[ argPos - 1 ] << endl ;
+					<< Param[ argPos - 1 ]
+					<< endl ;
 				break ;
 				}
 			voiceVector.push_back(
@@ -240,7 +252,8 @@ iClient* theClient = Network->findNick( Param[ 1 ] ) ;
 if( NULL == theClient )
 	{
 	elog	<< "xServer::MSG_M> Unable to find target client: "
-		<< Param[ 1 ] << endl ;
+		<< Param[ 1 ]
+		<< endl ;
 	return ;
 	}
 

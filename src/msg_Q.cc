@@ -2,18 +2,20 @@
  * msg_Q.cc
  */
 
+#include	<iostream>
+
 #include	"server.h"
 #include	"events.h"
 #include	"iClient.h"
 #include	"Network.h"
 #include	"ELog.h"
 
-const char msg_Q_cc_rcsId[] = "$Id: msg_Q.cc,v 1.1 2001/02/02 18:10:30 dan_karrels Exp $" ;
-
-using std::endl ;
+const char msg_Q_cc_rcsId[] = "$Id: msg_Q.cc,v 1.2 2001/03/03 00:17:57 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
+
+using std::endl ;
 
 /**
  * A client has quit.
@@ -27,7 +29,8 @@ iClient* theClient = Network->removeClient( Param[ 0 ] ) ;
 if( NULL == theClient )
 	{
 	elog	<< "xServer::MSG_Q> Unable to find client: "
-		<< Param[ 0 ] << endl ;
+		<< Param[ 0 ]
+		<< endl ;
 	return -1 ;
 	}
 

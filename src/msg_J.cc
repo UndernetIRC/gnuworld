@@ -16,7 +16,7 @@
 #include	"ELog.h"
 #include	"StringTokenizer.h"
 
-const char msg_J_cc_rcsId[] = "$Id: msg_J.cc,v 1.4 2001/03/02 23:38:03 dan_karrels Exp $" ;
+const char msg_J_cc_rcsId[] = "$Id: msg_J.cc,v 1.5 2001/03/03 00:17:57 dan_karrels Exp $" ;
 
 using std::string ;
 using std::endl ;
@@ -38,7 +38,8 @@ int xServer::MSG_J( xParameters& Param )
 if( Param.size() < 2 )
 	{
 	// Insufficient arguments provided, log the error
-	elog	<< "xServer::MSG_J> Invalid number of arguments\n" ;
+	elog	<< "xServer::MSG_J> Invalid number of arguments"
+		<< endl ;
 
 	// Return error
 	return -1 ;
@@ -53,7 +54,8 @@ if( NULL == Target )
 	// Nope, log the error
 	elog	<< "xServer::MSG_J> ("
 		<< Param[ 1 ] << ") Unable to find user: "
-		<< Param[ 0 ] << endl ;
+		<< Param[ 0 ]
+		<< endl ;
 
 	// Return error
 	return -1 ;
@@ -114,7 +116,8 @@ for( StringTokenizer::size_type i = 0 ; i < st.size() ; i++ )
 			// Addition to network tables failed
 			// Log the error
 			elog	<< "xServer::MSG_J> Unable to add channel: "
-				<< theChan->getName() << endl ;
+				<< theChan->getName()
+				<< endl ;
 
 			// Prevent memory leaks by deallocating the
 			// Channel and ChannelUser objects
@@ -142,9 +145,11 @@ for( StringTokenizer::size_type i = 0 ; i < st.size() ; i++ )
 		{
 		// Addition of this ChannelUser to the Channel failed
 		// Log the error
-//		elog	<< "xServer::MSG_J> Unable to add user "
-//			<< theUser->getNickName() << " to channel: "
-//			<< theChan->getName() << endl ;
+		elog	<< "xServer::MSG_J> Unable to add user "
+			<< theUser->getNickName()
+			<< " to channel: "
+			<< theChan->getName()
+			<< endl ;
 
 		// Prevent memory leaks by deallocating the unused
 		// ChannelUser object

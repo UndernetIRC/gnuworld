@@ -14,7 +14,7 @@
 #include	"ip.h"
 
 const char iClient_h_rcsId[] = __ICLIENT_H ;
-const char iClient_cc_rcsId[] = "$Id: iClient.cc,v 1.9 2001/03/01 01:58:17 dan_karrels Exp $" ;
+const char iClient_cc_rcsId[] = "$Id: iClient.cc,v 1.10 2001/03/03 00:17:57 dan_karrels Exp $" ;
 
 using std::string ;
 using std::map ;
@@ -114,7 +114,8 @@ for( string::size_type i = 0 ; i < newModes.size() ; i++ )
 
 void iClient::removeChannel( Channel* theChan )
 {
-for( channelListType::iterator ptr = channelList.begin() ; ptr != channelList.end() ;
+for( channelListType::iterator ptr = channelList.begin() ;
+	ptr != channelList.end() ;
 	++ptr )
 	{
 	if( *ptr == theChan )
