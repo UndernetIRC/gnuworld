@@ -1,10 +1,10 @@
-dnl $Id: configure.in,v 1.36 2001/11/08 23:13:27 mrbean_ Exp $
+dnl $Id: configure.in,v 1.37 2002/04/26 15:47:26 dan_karrels Exp $
 dnl ----------------------------------------------------------
 
 echo Configuring GNUWorld...
 echo
 
-AC_REVISION($Revision: 1.36 $)
+AC_REVISION($Revision: 1.37 $)
 AC_INIT(src/main.cc)
 AM_INIT_AUTOMAKE(gnuworld,0.0)
 AM_CONFIG_HEADER(include/defs.h)
@@ -38,15 +38,15 @@ threadLib=no
 AC_CHECK_LIB(lthread, pthread_create, threadLib=-lpthread)
 
 if [test "$threadLib" = no]; then
-AC_CHECK_LIB(pthread, pthread_create, threadLib=-pthread)
+AC_CHECK_LIB(pthread, pthread_create, threadLib=-lpthread)
 fi
 
 if [test "$threadLib" = no]; then
-AC_CHECK_LIB(c, pthread_create, threadLib=-pthread)
+AC_CHECK_LIB(c, pthread_create, threadLib=-lpthread)
 fi
 
 if [test "$threadLib" = no]; then
-AC_CHECK_LIB(c_r, pthread_create, threadLib=-pthread)
+AC_CHECK_LIB(c_r, pthread_create, threadLib=-lpthread)
 fi
 
 if [test "$threadLib" = no]; then

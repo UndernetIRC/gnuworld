@@ -1,4 +1,4 @@
-# Makefile.in generated automatically by automake 1.4 from Makefile.am
+# Makefile.in generated automatically by automake 1.4-p1 from Makefile.am
 
 # Copyright (C) 1994, 1995-8, 1999 Free Software Foundation, Inc.
 # This Makefile.in is free software; the Free Software Foundation
@@ -66,6 +66,8 @@ CPP = @CPP@
 CXX = @CXX@
 CXXFLAGS = @CXXFLAGS@
 DLLTOOL = @DLLTOOL@
+ECHO = @ECHO@
+EXEEXT = @EXEEXT@
 INCLTDL = @INCLTDL@
 LDFLAGS = @LDFLAGS@
 LIBLTDL = @LIBLTDL@
@@ -76,11 +78,13 @@ LN_S = @LN_S@
 MAKEINFO = @MAKEINFO@
 MOD_DIRS = @MOD_DIRS@
 OBJDUMP = @OBJDUMP@
+OBJEXT = @OBJEXT@
 PACKAGE = @PACKAGE@
 PGSQL_INCLUDE = @PGSQL_INCLUDE@
 PGSQL_LIB = @PGSQL_LIB@
 RANLIB = @RANLIB@
 SRC_PATH = @SRC_PATH@
+STRIP = @STRIP@
 VERSION = @VERSION@
 bindir = @bindir@
 glibdir = @glibdir@
@@ -121,7 +125,7 @@ OBJECTS = $(libgnuworld_la_OBJECTS)
 
 all: all-redirect
 .SUFFIXES:
-.SUFFIXES: .S .c .cc .lo .o .s
+.SUFFIXES: .S .c .cc .lo .o .obj .s
 $(srcdir)/Makefile.in: Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4) 
 	cd $(top_srcdir) && $(AUTOMAKE) --gnu lib/Makefile
 
@@ -139,6 +143,11 @@ distclean-noinstLTLIBRARIES:
 
 maintainer-clean-noinstLTLIBRARIES:
 
+# FIXME: We should only use cygpath when building on Windows,
+# and only if it is available.
+.c.obj:
+	$(COMPILE) -c `cygpath -w $<`
+
 .s.o:
 	$(COMPILE) -c $<
 
@@ -147,6 +156,7 @@ maintainer-clean-noinstLTLIBRARIES:
 
 mostlyclean-compile:
 	-rm -f *.o core *.core
+	-rm -f *.$(OBJEXT)
 
 clean-compile:
 
@@ -175,6 +185,8 @@ libgnuworld.la: $(libgnuworld_la_OBJECTS) $(libgnuworld_la_DEPENDENCIES)
 	$(CXXLINK)  $(libgnuworld_la_LDFLAGS) $(libgnuworld_la_OBJECTS) $(libgnuworld_la_LIBADD) $(LIBS)
 .cc.o:
 	$(CXXCOMPILE) -c $<
+.cc.obj:
+	$(CXXCOMPILE) -c `cygpath -w $<`
 .cc.lo:
 	$(LTCXXCOMPILE) -c $<
 
