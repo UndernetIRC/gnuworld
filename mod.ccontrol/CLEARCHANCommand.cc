@@ -13,7 +13,7 @@
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 
-const char CLEARCHANCommand_cc_rcsId[] = "$Id: CLEARCHANCommand.cc,v 1.4 2001/04/30 23:44:42 mrbean_ Exp $";
+const char CLEARCHANCommand_cc_rcsId[] = "$Id: CLEARCHANCommand.cc,v 1.5 2001/06/28 19:10:17 dan_karrels Exp $";
 
 namespace gnuworld
 {
@@ -60,7 +60,7 @@ for( string::size_type modePos = 0 ; modePos < doModes.size() ; ++modePos )
 			string modes = "-";
 			string args = "";
 			Channel::banListSizeType end = theChan->banList_size();
-			Channel::banListType::iterator ptr = theChan->banList_begin() ; 
+			Channel::banIterator ptr = theChan->banList_begin() ; 
 			for(Channel::banListSizeType i=0; i != end ;i++)
 				{ 
 				ban = *ptr;

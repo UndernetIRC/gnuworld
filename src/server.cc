@@ -50,7 +50,7 @@
 #include	"UnloadClientTimerHandler.h"
 
 const char server_h_rcsId[] = __SERVER_H ;
-const char server_cc_rcsId[] = "$Id: server.cc,v 1.109 2001/06/25 20:32:05 dan_karrels Exp $" ;
+const char server_cc_rcsId[] = "$Id: server.cc,v 1.110 2001/06/28 19:10:17 dan_karrels Exp $" ;
 const char config_h_rcsId[] = __CONFIG_H ;
 const char misc_h_rcsId[] = __MISC_H ;
 const char events_h_rcsId[] = __EVENTS_H ;
@@ -354,6 +354,9 @@ REGISTER_MSG( "F", NOOP ) ;
 
 // SILENCE
 REGISTER_MSG( "U", NOOP ) ;
+
+// *shrug*
+REGISTER_MSG( "WU", NOOP ) ;
 
 }
 
