@@ -10,7 +10,7 @@
  *
  * Todo: Support ircu2.10.11's CLEARMODE feature.
  *
- * $Id: CLEARMODECommand.cc,v 1.3 2001/02/16 20:20:26 plexus Exp $
+ * $Id: CLEARMODECommand.cc,v 1.4 2001/03/05 12:46:50 isomer Exp $
  */
 
 #include	<string>
@@ -22,7 +22,7 @@
 #include	"responses.h"
 #include	"Network.h"
 
-const char CLEARMODECommand_cc_rcsId[] = "$Id: CLEARMODECommand.cc,v 1.3 2001/02/16 20:20:26 plexus Exp $" ;
+const char CLEARMODECommand_cc_rcsId[] = "$Id: CLEARMODECommand.cc,v 1.4 2001/03/05 12:46:50 isomer Exp $" ;
 
 namespace gnuworld
 {
@@ -55,7 +55,8 @@ bool CLEARMODECommand::Exec( iClient* theClient, const string& Message )
 	/* Check the bot is in the channel. */
  
 	if (!theChan->getInChan()) {
-		bot->Notice(theClient, "I'm not in that channel!");
+		bot->Notice(theClient, bot->getResponse(theUser,
+			language::i_am_not_on_chan, "I'm not in that channel!"));
 		return false;
 	} 
 

@@ -1,5 +1,5 @@
 #ifndef __RESPONSES_H
-#define __RESPONSES_H "$Id: responses.h,v 1.11 2001/02/28 22:50:36 plexus Exp $"
+#define __RESPONSES_H "$Id: responses.h,v 1.12 2001/03/05 12:46:50 isomer Exp $"
 
 /* 
  * responses.h
@@ -10,7 +10,7 @@
  * Defines 'response' ID's, unique references to textual responses
  * from the bot.
  *
- * $Id: responses.h,v 1.11 2001/02/28 22:50:36 plexus Exp $
+ * $Id: responses.h,v 1.12 2001/03/05 12:46:50 isomer Exp $
  */
 
 namespace gnuworld
@@ -184,6 +184,13 @@ namespace gnuworld
 		const int is_coder_contrib =			161;
 		const int is_coder_devel =			162;
 		const int is_coder_senior =			163;
+		const int is_also_an_ircop = 			164;
+		const int ban_added =				165;
+		const int ban_list_empty = 			166;
+		const int already_on_chan = 			167;
+		const int ircops_only_cmd =			168;
+		const int im_not_op =				169;
+		const int rpl_ignorelist = 			170;
 	}
 }
 

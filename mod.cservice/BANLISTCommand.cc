@@ -11,7 +11,7 @@
  *
  * Caveats: None.
  *
- * $Id: BANLISTCommand.cc,v 1.6 2001/03/03 01:51:55 gte Exp $
+ * $Id: BANLISTCommand.cc,v 1.7 2001/03/05 12:46:50 isomer Exp $
  */
 
 #include        <string>
@@ -23,7 +23,7 @@
 #include        "levels.h"
 #include        "responses.h"
 
-const char BANLISTCommand_cc_rcsId[] = "$Id: BANLISTCommand.cc,v 1.6 2001/03/03 01:51:55 gte Exp $" ;
+const char BANLISTCommand_cc_rcsId[] = "$Id: BANLISTCommand.cc,v 1.7 2001/03/05 12:46:50 isomer Exp $" ;
 
 namespace gnuworld
 {
@@ -82,7 +82,7 @@ if( 0 == tmpChan->banList_size() )
 	{
 	bot->Notice(theClient,
 		bot->getResponse(theUser,
-			0,
+			language::ban_list_empty,
 			string("%s: ban list is empty.")).c_str(),
 		st[1].c_str());
 	}

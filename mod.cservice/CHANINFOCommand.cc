@@ -13,7 +13,7 @@
  *
  * Command is aliased "INFO".
  *
- * $Id: CHANINFOCommand.cc,v 1.16 2001/02/22 19:09:34 gte Exp $
+ * $Id: CHANINFOCommand.cc,v 1.17 2001/03/05 12:46:50 isomer Exp $
  */
 
 #include	<string>
@@ -25,7 +25,7 @@
 #include	"responses.h"
 #include	"libpq++.h"
  
-const char CHANINFOCommand_cc_rcsId[] = "$Id: CHANINFOCommand.cc,v 1.16 2001/02/22 19:09:34 gte Exp $" ;
+const char CHANINFOCommand_cc_rcsId[] = "$Id: CHANINFOCommand.cc,v 1.17 2001/03/05 12:46:50 isomer Exp $" ;
  
 namespace gnuworld
 {
@@ -54,6 +54,15 @@ if( string::npos == st[ 1 ].find_first_of( '#' ) )
 	// Nope, look by user then.
 	sqlUser* tmpUser = bot->isAuthed(theClient, false);
 	sqlUser* theUser = bot->getUserRecord(st[1]);
+        if (theUser->getMode(iClient::MODE_SERVICES)) {
+                bot->Notice(theClient,
+                        bot->getResponse(tmpUser,
+                                language::is_service_bot,
+                                string("%s is an Official Undernet Service Bot.")).c_str();
+                        theUser->getNickName().c_str());
+                return false;
+        }
+
 	if (!theUser) 
 		{
 		bot->Notice(theClient, 

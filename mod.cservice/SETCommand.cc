@@ -14,7 +14,7 @@
  *
  * Caveats: None.
  *
- * $Id: SETCommand.cc,v 1.28 2001/02/27 23:10:05 gte Exp $
+ * $Id: SETCommand.cc,v 1.29 2001/03/05 12:46:50 isomer Exp $
  */
 
 #include	<string>
@@ -26,7 +26,7 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char SETCommand_cc_rcsId[] = "$Id: SETCommand.cc,v 1.28 2001/02/27 23:10:05 gte Exp $" ;
+const char SETCommand_cc_rcsId[] = "$Id: SETCommand.cc,v 1.29 2001/03/05 12:46:50 isomer Exp $" ;
 
 namespace gnuworld
 {
@@ -618,7 +618,11 @@ if(option == "NOREG")
 	    else if(value == "OFF") theChan->removeFlag(sqlChannel::F_AUTOTOPIC);
 	    else
 	    {
-		bot->Notice(theClient, "value of AUTOTOPIC must be ON or OFF");
+		bot->Notice(theClient, 
+			bot->getResponse(theUser,
+				language::set_cmd_syntax_on_off,
+				string("value of %s must be ON or OFF")).c_str(),
+			option.c_str());
 		return true;
 	    }
 	    theChan->commit(); 

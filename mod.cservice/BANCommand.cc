@@ -16,7 +16,7 @@
  *
  * Caveats: None.
  *
- * $Id: BANCommand.cc,v 1.19 2001/03/03 01:51:55 gte Exp $
+ * $Id: BANCommand.cc,v 1.20 2001/03/05 12:46:49 isomer Exp $
  */
 
 #include	<string>
@@ -31,7 +31,7 @@
 #include	"responses.h"
 #include	"match.h"
 
-const char BANCommand_cc_rcsId[] = "$Id: BANCommand.cc,v 1.19 2001/03/03 01:51:55 gte Exp $" ;
+const char BANCommand_cc_rcsId[] = "$Id: BANCommand.cc,v 1.20 2001/03/05 12:46:49 isomer Exp $" ;
 
 namespace gnuworld
 {
@@ -341,7 +341,8 @@ banList->push_back(newBan);
 /* Insert this new record into the database. */
 newBan->insertRecord();
 
-bot->Notice(theClient, "Added ban %s to %s at level %i",
+bot->Notice(theClient,
+	bot->getResponse(theUser, language::ban_added, "Added ban %s to %s at level %i"),
 	newBan->getBanMask().c_str(), theChannel->getName().c_str(), newBan->getLevel());
 
 return true ;

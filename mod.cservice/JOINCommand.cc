@@ -8,7 +8,7 @@
  *
  * Caveats: None
  *
- * $Id: JOINCommand.cc,v 1.8 2001/03/05 03:06:30 gte Exp $
+ * $Id: JOINCommand.cc,v 1.9 2001/03/05 12:46:50 isomer Exp $
  */
 
 
@@ -21,7 +21,7 @@
 #include	"responses.h"
 #include	"Network.h"
 
-const char JOINCommand_cc_rcsId[] = "$Id: JOINCommand.cc,v 1.8 2001/03/05 03:06:30 gte Exp $" ;
+const char JOINCommand_cc_rcsId[] = "$Id: JOINCommand.cc,v 1.9 2001/03/05 12:46:50 isomer Exp $" ;
 
 namespace gnuworld
 {
@@ -76,7 +76,8 @@ if (level < level::join)
 	/* Check the bot isn't in the channel. */ 
 if (theChan->getInChan())
 	{
-	bot->Notice(theClient, "I'm already in that channel!");
+	bot->Notice(theClient, bot->getResponse(theUser,
+		language::already_on_chan, "I'm already in that channel!"));
 	return false;
 	}
 

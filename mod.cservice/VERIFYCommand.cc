@@ -10,7 +10,7 @@
 #include	"responses.h"
 
  
-const char VERIFYCommand_cc_rcsId[] = "$Id: VERIFYCommand.cc,v 1.15 2001/03/01 00:43:51 gte Exp $" ;
+const char VERIFYCommand_cc_rcsId[] = "$Id: VERIFYCommand.cc,v 1.16 2001/03/05 12:46:50 isomer Exp $" ;
 
 namespace gnuworld
 {
@@ -55,7 +55,8 @@ bool VERIFYCommand::Exec( iClient* theClient, const string& Message )
 
 	sqlUser* theUser = bot->isAuthed(target, false);
 
-	if (target->isOper()) extra = " and an IRC operator";
+	if (target->isOper()) extra = bot->getResponse(tmpUser,
+		language::is_also_an_ircop, " and an IRC operator");
 
 	if (!theUser) 
 	{
@@ -138,7 +139,7 @@ bool VERIFYCommand::Exec( iClient* theClient, const string& Message )
 	{
 		bot->Notice(theClient, 
 			bot->getResponse(tmpUser,
-				language::is_coder_rep,
+				language::is_coder_contrib,
 				string("%s is an Official Coder-Com Contributer%s and logged in as %s")).c_str(),
 			target->getNickUserHost().c_str(), extra.c_str(), theUser->getUserName().c_str());
 		return true;
@@ -148,7 +149,7 @@ bool VERIFYCommand::Exec( iClient* theClient, const string& Message )
 	{
 		bot->Notice(theClient, 
 			bot->getResponse(tmpUser,
-				language::is_coder_rep,
+				language::is_coder_devel,
 				string("%s is an Official Coder-Com Developer%s and logged in as %s")).c_str(),
 			target->getNickUserHost().c_str(), extra.c_str(), theUser->getUserName().c_str());
 		return true;

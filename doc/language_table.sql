@@ -12,6 +12,7 @@ COPY "languages" FROM stdin;
 5	German	31337
 6	Portuguese	31337
 7	Italian	31337
+8	Romanian	31337
 \.
 
 DELETE FROM translations;
@@ -174,9 +175,17 @@ COPY "translations" FROM stdin;
 1	156	%s: Cleared channel modes.	31337
 1	158	Invalid option.	31337
 1	159	%s is an Official Undernet Service Bot.	31337
-1	160	Added ban %s to %s at level %i	31337
-1	161	%s: ban list is empty.		31337
-1	162	I'm already in that channel!	31337
+1	160	%s is an Official Coder-Com Representative%s and logged in as %s	31337
+1	161	%s is an Official Coder-Com Contributer%s and logged in as %s	31337
+1	162	%s is an Official Coder-Com Developer%s and logged in as %s	31337
+1	163	%s is an Official Coder-Com Senior%s and logged in as %s	31337
+1	164	 and an IRC operator	31337
+1	165	Added ban %s to %s at level %i	31337
+1	166	%s: ban list is empty.		31337
+1	167	I'm already in that channel!	31337
+1	168	This command is reserved to IRC Operators	31337
+1	169	I'm not opped on %s	31337
+1	170	%s for %i minutes	31337
 \.
 
 -- French language definition.
@@ -731,3 +740,177 @@ COPY "translations" FROM stdin;
 7	162	Sono già in quel canale!	31337
 \.
 
+-- Romanian language definition.
+-- 04/03/01 - Alex Badea <vampire@go.ro>
+
+COPY "translations" FROM stdin;
+8	1	Esti deja autentificat ca %s	31337
+8	2	AUTENTIFICARE REUSITA ca %s	31337
+8	3	Nu ai suficient acces pentru aceasta comanda	31337
+8	4	Canalul %s e gol	31337
+8	5	Nu-l vad pe %s nicaieri	31337
+8	6	Nu-l gasesc pe %s pe canalul %s	31337
+8	7	Canalul %s nu pare sa fie inregistrat	31337
+8	8	Ai primit op de la %s (%s)	31337
+8	9	Ai primit voce de la %s (%s)	31337
+8	10	%s: Nu esti pe canal	31337
+8	11	%s are deja op pe %s	31337
+8	12	%s are deja voce pe %s	31337
+8	13	Ai fost deopat de %s (%s)	31337
+8	14	Ai fost de-voiced de %s (%s)	31337
+8	15	%s nu are op pe %s	31337
+8	16	%s nu are voce pe %s	31337
+8	17	AUTENTIFICARE ESUATA ca %s (parola incorecta)	31337
+8	18	Nu sunt pe canal!	31337
+8	19	Nivelul de ban e incorect. Domeniul admis este 1-%i.	31337
+8	20	Durata banului e incorecta. Poti da ban pe o durata maxima de 336 de ore.	31337
+8	21	Motivul banului nu poate depasi 128 de caractere.	31337
+8	22	Respectivul ban e deja pe lista!	31337
+8	23	Banul pe %s e deja sub incidenta banului pe %s	31337
+8	24	Nivel minim invalid.	31337
+8	25	Nivel maxim invalid.	31337
+8	26	USER: %s ACCES: %s %s	31337
+8	27	CANAL: %s -- AUTOMODE: %s	31337
+8	28	MODIFICAT: %s (in urma cu %s)	31337
+8	29	** SUSPENDAT ** - Expira in %s	31337
+8	30	VAZUT: in urma cu %s	31337
+8	31	Sunt mai mult de 15 rezultate.	31337
+8	32	Restrictioneaza-ti cererea.	31337
+8	33	Sfarsit lista de accese	31337
+8	34	N-am gasit nimic!	31337
+8	35	Nu poti adauga un user cu acces mai mare sau egal cu al tau. 	31337
+8	36	Nivel de acces incorect.	31337
+8	37	%s e deja pe lista %s cu acces de %i.	31337
+8	38	Am adaugat %s la %s cu acces de %i	31337
+8	39	Ceva n-am mers cum trebuie: %s	31337
+8	40	%s: Sfarsit lista de banuri		31337
+8	41	Nu pot da detalii despre user (e invizibil)	31337
+8	42	Informatii despre: %s (%i)	31337
+8	43	In prezent logat prin: %s	31337
+8	44	URL: %s	31337
+8	45	Limba: %i	31337
+8	46	Canale: %s	31337
+8	47	Flood la intrare (puncte): %i	31337
+8	48	Flood la iesire (bytes): %i	31337
+8	49	%s e inregistrat de:	31337
+8	50	%s - vazut in urma cu %s	31337
+8	51	Desc: %s	31337
+8	52	Ma floodezi, huh? N-ai decat sa vorbeshti in punga.	31337
+8	53	Cred ca ti-am trimis cam multe date; o sa te ignor pentru o vreme.	31337
+8	54	Comanda incompleta	31337
+8	55	Pentru a folosi %s, trebuie sa /msg %s@%s	31337
+8	56	Trebuie sa fii logat ca sa folosesti aceasta comanda.	31337
+8	57	Canalul %s a fost suspendat de un administrator de la CService	31337
+8	58	Accesul pe %s ti-a fost suspendat	31337
+8	59	Flagul NOOP e activ pe %s	31337
+8	60	Flagul STRICTOP e activ pe %s	31337
+8	61	Ai deopat mau mult de %i persoane	31337
+8	62	SINTAXA: %s	31337
+8	63	Accesul pe %s ti-a fost marit temporar la %i	31337
+8	64	%s e inregistrat.	31337
+8	65	%s nu e inregistrat.	31337
+8	66	Nu cred ca lui %s i-ar placea chestia asta.	31337
+8	67	\002*** Ban List pentru canalul %s ***\002	31337
+8	68	%s %s Nivel: %i	31337
+8	69	DAT DE: %s (%s)	31337
+8	70	DE LA: %i	31337
+8	71	EXP: %s	31337
+8	72	\002*** SFARSIT ***\002	31337
+8	73	Nu stiu cine e %s.	31337
+8	74	Nu mai esti autorizat.	31337
+8	75	nu pare sa aiba acces pe %s.	31337
+8	76	Nu poti modifica un user cu acces egal sau mai mare ca al tau.	31337
+8	77	Nu poti da unui user acces mai mare sau egal cu al tau.	31337
+8	78	Am modificat nivelul lui %s pe %s la %i	31337
+8	79	Am setat AUTOMODE la OP pentru %s pe %s	31337
+8	80	Am setat AUTOMODE la VOICE pentru %s pe %s	31337
+8	81	Am setat AUTOMODE la NONE pentru %s pe %s	31337	
+8	82	Parola nu poate fi username-ul sau nick-ul tau. - sintaxa e: NEWPASS <parola noua>	31337
+8	83	Parola a fost schimbata.	31337
+8	84	Flag-ul NOOP e activ pe %s	31337
+8	85	Flag-ul STRICTOP e activ pe %s (si %s nu e logat)	31337
+8	86	Flag-ul STRICTOP e activ pe %s (si %s nu are destul acces)	31337
+8	87	Am purjat canalul %s	31337
+8	88	%s e deja inregistrat.	31337
+8	89	Nume de canal incorect.	31337
+8	90	Am inregistrat canalul %s	31337
+8	91	Am sters %s din lista de silence	31337
+8	92	N-am gasit %s in lista de silence	31337
+8	93	Nu poti sterge un user cu acces egal sau mai mare ca al tau	31337
+8	94	Nu poti sa te stergi singur de pe un canal unde esti manager	31337
+8	95	Am sters user-ul %s de pe %s	31337
+8	96	Acum INVISIBLE este ON	31337
+8	97	Acum INVISIBLE este OFF	31337
+8	98	%s pentru %s e %s	31337
+8	99	valoarea lui %s trebuie sa fie ON sau OFF	31337
+8	100	Valoarea pentru USERFLAGS e incorecta. Valorile admise sunt 0, 1, 2.	31337
+8	101	USERFLAGS pentru %s este %i	31337
+8	102	valoarea pentru MASSDEOPPRO trebuie sa fie 0-7	31337
+8	103	MASSDEOPPRO pentru %s este %d	31337
+8	104	valoarea pentru FLOODPRO trebuie sa fie 0-7	31337
+8	105	FLOODPRO pentru %s este %d	31337
+8	106	DESCRIPTION poate sa aiba maxim 80 de caractere!	31337
+8	107	Am sters DESCRIPTION pentru %s	31337
+8	108	DESCRIPTION pentru %s este: %s	31337
+8	109	URL poate sa aiba maxim 75 de caractere!	31337
+8	110	Am sters URL pentru %s	31337
+8	111	URL pentru %s este: %s	31337
+8	112	Sirul de cuvinte cheie nu poate depasi 80 de caractere!	31337
+8	113	KEYWORDS pentru %s sunt: %s	31337
+8	114	Limba este acum %s.	31337
+8	115	EROARE: Limba ceruta e incorecta.	31337
+8	116	Nu gasesc canalul %s in retea!	31337
+8	117	EROARE: Setare de canal incorecta.	31337
+8	118	Lista de ignore:	31337
+8	119	Lista de ignore e goala	31337
+8	120	-- Sfarsit lista de ignore	31337
+8	121	Stare interna pentru CMaster Channel Services:	31337
+8	122	[         Canale] \002In cache:\002 %i    \002Cereri din DB:\002 %i    \002Hituri din cache:\002 %i    \002Eficienta:\002 %.2f%%	31337
+8	123	[    Utilizatori] \002In cache:\002 %i    \002Cereri din DB:\002 %i    \002Hituri din cache:\002 %i    \002Eficienta:\002 %.2f%%	31337
+8	124	[Nivele de acces] \002In cache:\002 %i    \002Cereri din DB:\002 %i    \002Hituri din cache:\002 %i    \002Eficienta:\002 %.2f%%	31337
+8	125	[        Ban-uri] \002In cache:\002 %i    \002Cereri din DB:\002 %i    \002Hituri din cache:\002 %i    \002Eficienta:\002 %.2f%%	31337
+8	126	Ultimul User NOTIFY primit: %i	31337
+8	127	Ultimul Channel NOTIFY primit: %i	31337
+8	128	Ultimul Level NOTIFY primit: %i	31337
+8	129	Ultimul Ban NOTIFY primit: %i	31337
+8	130	Containere de date custom alocate: %i	31337
+8	131	\002Uptime:\002 %s	31337
+8	132	Canalul %s are %d useri (%i operatori)	31337
+8	133	Moduri: %s	31337
+8	134	Flaguri: %s	31337
+8	135	Nu poti suspenda un user cu acces egal sau mai mare ca al tau.	31337
+8	136	Ce unitati de timp sunt alea?	31337
+8	137	Durata de suspend incorecta.	31337
+8	138	SUSPENDAREA pentru %s anulata	31337
+8	139	%s e deja suspendat pe %s	31337
+8	140	SUSPENDAREA pentru %s exipra in %s	31337
+8	141	EROARE: Topicul nu poate depasi 145 de caractere	31337
+8	142	Nu ai destul acces pentru a scoate banul %s de pe %s	31337
+8	143	Am scos %i banuri care s-au potrivit cu %s	31337
+8	144	Accesul temporar de %i pe %s a fost revocat	31337
+8	145	Nu pari sa ai acces fortat pe %s, poate a expirat?	31337
+8	146	%s nu e suspendat pe %s	31337
+8	147	%s este un IRCop	31337
+8	148	%s NU e logat	31337
+8	149	%s e logat ca %s%s	31337
+8	150	%s e un Reprezentant Oficial al CService%s si e logat ca %s	31337
+8	151	%s e un Administrator Oficial al CService%s si e logat ca %s	31337
+8	152	%s e un Programator Oficial al CService%s and logged in as %s	31337
+8	153	Sunt mai mult de %i rezultate care se potrivesc cu [%s]	31337
+8	154	Restrictioneaza-ti masca de cautare	31337
+8	155	Nu sunt rezultate care sa se potriveasca cu [%s]	31337
+8	156	%s: Am curatati modurile de canal.	31337
+8	158	Optiune incorecta.	31337
+8	159	%s este un Bot Oficial al Undernet.	31337
+8	160	%s este un Reprezentant Oficial al Coder-Com%s si e logat ca %s	31337
+8	161	%s este un Contributor Oficial al Coder-Com%s si e logat ca %s	31337
+8	162	%s este un Programator Oficial al Coder-Com%s si e logat ca %s	31337
+8	163	%s este un Reprezentant Senior al Coder-Com%s si e logat ca %s	31337
+8	164	 si un IRCop	31337
+8	165	Am adaugat ban pe %s pe %s la nivelul %i	31337
+8	166	%s: lista de banuri e goala		31337
+8	167	Sunt deja pe canal!	31337
+8	168	Aceasta comanda este rezervata pentru IRCopi	31337
+8	169	Nu sunt operator pe %s	31337
+8	170	%s pentru %i minute	31337
+\.

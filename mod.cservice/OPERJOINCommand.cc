@@ -8,7 +8,7 @@
  *
  * Caveats: None
  *
- * $Id: OPERJOINCommand.cc,v 1.6 2001/02/21 00:14:43 dan_karrels Exp $
+ * $Id: OPERJOINCommand.cc,v 1.7 2001/03/05 12:46:50 isomer Exp $
  */
 
 
@@ -21,7 +21,7 @@
 #include	"responses.h"
 #include	"Network.h"
 
-const char OPERJOINCommand_cc_rcsId[] = "$Id: OPERJOINCommand.cc,v 1.6 2001/02/21 00:14:43 dan_karrels Exp $" ;
+const char OPERJOINCommand_cc_rcsId[] = "$Id: OPERJOINCommand.cc,v 1.7 2001/03/05 12:46:50 isomer Exp $" ;
 
 namespace gnuworld
 {
@@ -33,10 +33,12 @@ bool OPERJOINCommand::Exec( iClient* theClient, const string& Message )
 /*
  *  Check the user is an oper.
  */
+sqlUser* theUser = bot->isAuthed(theClient, false);
 
 if(!theClient->isOper())
 	{
-	bot->Notice(theClient, "This command is reserved to IRC Operators");
+	bot->Notice(theClient, bot->getResponse(theUser,
+		language::ircops_only_cmd, "This command is reserved to IRC Operators"));
 	return true;
 	}
 
@@ -55,8 +57,8 @@ Channel* tmpChan = Network->findChannel(st[1]);
 sqlChannel* theChan = bot->getChannelRecord(st[1]);
 if (!theChan)
 	{
-	bot->Notice(theClient,
-		"The channel %s doesn't appear to be registered",
+	bot->Notice(theClient, bot->getResponse(theUser, language::chan_not_reg,
+		"The channel %s doesn't appear to be registered"),
 		st[1].c_str());
 	return false;
 	} 
@@ -64,7 +66,8 @@ if (!theChan)
 /* Check the bot isn't in the channel. */ 
 if (theChan->getInChan())
 	{
-	bot->Notice(theClient, "I'm already in that channel!");
+	bot->Notice(theClient, bot->getResponse(theUser,
+		language::already_on_chan, "I'm already in that channel!"));
 	return false;
 	}
  
