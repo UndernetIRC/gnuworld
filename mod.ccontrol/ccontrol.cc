@@ -23,7 +23,7 @@
 #include	"AuthInfo.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.20 2001/03/10 18:33:23 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.21 2001/03/11 21:40:11 mrbean_ Exp $" ;
 
 using std::string ;
 using std::vector ;
@@ -174,11 +174,13 @@ RegisterCommand( new MODERATECommand( this, "MODERATE", "<#Channel> "
 RegisterCommand( new UNMODERATECommand( this, "UNMODERATE", "<#Channel> "
 	"UNModerate A Channel",flg_UNSUSPEND ) ) ;
 RegisterCommand( new OPCommand( this, "OP", "<#Channel> <nick> [nick] .. "
-	"Op user(s) on a Channel",flg_UNSUSPEND ) ) ;
+	"Op user(s) on a Channel",flg_OP ) ) ;
 RegisterCommand( new DEOPCommand( this, "DEOP", "<#Channel> <nick> [nick] .. "
-	"Deop user(s) on a Channel",flg_UNSUSPEND ) ) ;
+	"Deop user(s) on a Channel",flg_DEOP ) ) ;
 RegisterCommand( new LISTHOSTSCommand( this, "LISTHOSTS", "<oper> "
-	"Shows an oper hosts list",flg_UNSUSPEND ) ) ;
+	"Shows an oper hosts list",flg_LISTHOSTS ) ) ;
+RegisterCommand( new CLEARCHANCommand( this, "CLEARCHAN", "<#chan> "
+	"Removes all channel modes",flg_CLEARCHAN ) ) ;
 
 }
 
@@ -525,7 +527,6 @@ if( NULL == theChan )
 
 // Kick any users from the channel that aren't opers
 vector< iClient* > clientsToKick ;
-iClient *tUser = 0;
 for( Channel::const_userIterator ptr = theChan->userList_begin() ;
 	ptr != theChan->userList_end() ; ++ptr )
 	{ //Dont kick opers and +k ppl

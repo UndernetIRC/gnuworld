@@ -102,6 +102,9 @@ DECLARE_COMMAND( UNMODERATE )
 DECLARE_COMMAND( OP )
 DECLARE_COMMAND( DEOP )
 DECLARE_COMMAND( LISTHOSTS )
+DECLARE_COMMAND( CLEARCHAN )
+
+
 /*
  Patch for uworld commands level 
  Added by : |MrBean| (MrBean@toughguy.net)
@@ -139,13 +142,19 @@ const int flg_ADDCMD   = 0x400;
 const int flg_DELCMD   = 0x400;
 const int flg_SUSPEND  = 0x800;
 const int flg_UNSUSPEND  = 0x800;
+const int flg_CLEARCHAN = 0x1000;
+const int flg_OP = 0x01;
+const int flg_DEOP = 0x01;
+const int flg_MODERATE = 0x01;
+const int flg_UNMODERATE = 0x01;
+const int flg_LISTHOSTS = 0x80;
 
 /*
  Default commands that are added upon adding a new oper
 */
 
-const int OPER = flg_MODE | flg_INVITE | flg_GLINE | flg_CHINFO | flg_WHOIS | flg_TRANS | flg_KICK;
-const int ADMIN = OPER | flg_ADDOPCHN | flg_ADDNOP | flg_ADDCMD | flg_SUSPEND;
+const int OPER = flg_MODE | flg_INVITE | flg_GLINE | flg_CHINFO | flg_WHOIS | flg_TRANS | flg_KICK | flg_CLEARCHAN;
+const int ADMIN = OPER | flg_ADDOPCHN | flg_ADDNOP | flg_ADDCMD | flg_SUSPEND | flg_JUPE;
 const int CODER = ADMIN;
 
 //Oper flags 

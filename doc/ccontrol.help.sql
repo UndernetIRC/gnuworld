@@ -1,6 +1,14 @@
 
--- 2001-03-02 |MrBean| "$Id: ccontrol.help.sql,v 1.2 2001/03/04 20:27:41 mrbean_ Exp $"
+-- 2001-03-02 |MrBean| "$Id: ccontrol.help.sql,v 1.3 2001/03/11 21:40:10 mrbean_ Exp $"
 -- Created the file and added all help topics to the database
+
+-- 2201-03-11 |MrBean|
+-- Added OP,DEOP,MODERATE,UNMODERATE,CLEARCHAN
+-- Now the script first deletes previous help , and then reinsert all of the topics
+
+-- Delete the current help entries
+
+Delete FROM help;
 
 -- ACCESS 
 
@@ -39,11 +47,29 @@ INSERT INTO help (command,line,help) VALUES ('CHANINFO',1,'------ CHANINFO COMMA
 INSERT INTO help (command,line,help) VALUES ('CHANINFO',2,'Gives you all sort of information about a channel');
 INSERT INTO help (command,line,help) VALUES ('CHANINFO',3,'Usage : /msg $BOT$ chaninfo <channel>');
 
+-- CLEARCHAN
+
+INSERT INTO help (command,line,help) VALUES ('CLEARCHAN',1,'------ CLEARCHAN COMMAND ------');
+INSERT INTO help (command,line,help) VALUES ('CLEARCHAN',2,'Clears channel modes ');
+INSERT INTO help (command,line,help) VALUES ('CLEARCHAN',3,'Usage : /msg $BOT$ clearchan <#channel> [mode string]');
+INSERT INTO help (command,line,help) VALUES ('CLEARCHAN',4,'<#channel> -  the channel to moderate');
+INSERT INTO help (command,line,help) VALUES ('CLEARCHAN',5,'<mode string> - can be ALL (for all channel modes) or any combination of ilpskmntob');
+INSERT INTO help (command,line,help) VALUES ('CLEARCHAN',6,'o = remove all channel ops');
+INSERT INTO help (command,line,help) VALUES ('CLEARCHAN',7,'b = remove all bans');
+INSERT INTO help (command,line,help) VALUES ('CLEARCHAN',8,'*NOTE* - if you dont specify a mode string the bot will remove modes obikl');
+
+
 -- DEAUTH 
 
 INSERT INTO help (command,line,help) VALUES ('DEAUTH',1,'------ DEAUTH COMMAND ------');
 INSERT INTO help (command,line,help) VALUES ('DEAUTH',2,'Deauthenticates you with the bot');
 INSERT INTO help (command,line,help) VALUES ('DEAUTH',3,'Usage : /msg $BOT$ deauth');
+
+-- DEOP
+
+INSERT INTO help (command,line,help) VALUES ('DEOP',1,'------ DEOP COMMAND ------');
+INSERT INTO help (command,line,help) VALUES ('DEOP',2,'Deops users on a specific channel');
+INSERT INTO help (command,line,help) VALUES ('DEOP',3,'Usage : /msg $BOT$ deop <#chan> <nick1> [nick2] [nick3] .. ');
 
 -- DELCOMMAND
 
@@ -114,6 +140,14 @@ INSERT INTO help (command,line,help) VALUES ('MODE',4,'<#channel> -  the channel
 INSERT INTO help (command,line,help) VALUES ('MODE',5,'<mode string> - the string that contains the mode');
 INSERT INTO help (command,line,help) VALUES ('MODE',6,'Ex : /msg k mode #coder-com +o |MrBean|');
 
+-- MODERATE
+
+INSERT INTO help (command,line,help) VALUES ('MODERATE',1,'------ MODERATE COMMAND ------');
+INSERT INTO help (command,line,help) VALUES ('MODERATE',2,'Moderates a channel ');
+INSERT INTO help (command,line,help) VALUES ('MODERATE',3,'Usage : /msg $BOT$ moderate <#channel> ');
+INSERT INTO help (command,line,help) VALUES ('MODERATE',4,'<#channel> -  the channel to moderate');
+
+
 -- MODOPER
 
 INSERT INTO help (command,line,help) VALUES ('MODOPER',1,'------ MODOPER COMMAND ------');
@@ -143,6 +177,12 @@ INSERT INTO help (command,subcommand,line,help) VALUES ('MODOPER','DELHOST',2,'U
 
 INSERT INTO help (command,line,help) VALUES ('NEWPASS',1,'------ NEWPASS COMMAND ------');
 INSERT INTO help (command,line,help) VALUES ('NEWPASS',2,'Changes your password');
+
+-- OP
+
+INSERT INTO help (command,line,help) VALUES ('OP',1,'------ OP COMMAND ------');
+INSERT INTO help (command,line,help) VALUES ('OP',2,'Op users on a specific channel');
+INSERT INTO help (command,line,help) VALUES ('OP',3,'Usage : /msg $BOT$ op <#chan> <nick1> [nick2] [nick3] .. ');
 
 -- REMGLINE
 
@@ -187,6 +227,13 @@ INSERT INTO help (command,line,help) VALUES ('TRANSLATE',1,'------ TRANSLATE COM
 INSERT INTO help (command,line,help) VALUES ('TRANSLATE',2,'Translates a numeric into a nick');
 INSERT INTO help (command,line,help) VALUES ('TRANSLATE',3,'Usage : /msg $BOT$ transalte <numeric>');
 INSERT INTO help (command,line,help) VALUES ('TRANSLATE',4,'the numeric you want to translate');
+
+-- UNMODERATE
+
+INSERT INTO help (command,line,help) VALUES ('UNMODERATE',1,'------ UNMODERATE COMMAND ------');
+INSERT INTO help (command,line,help) VALUES ('UNMODERATE',2,'UnModerates a channel ');
+INSERT INTO help (command,line,help) VALUES ('UNMODERATE',3,'Usage : /msg $BOT$ unmoderate <#channel> ');
+INSERT INTO help (command,line,help) VALUES ('UNMODERATE',4,'<#channel> -  the channel to moderate');
 
 -- UNSUSPEND 
 
