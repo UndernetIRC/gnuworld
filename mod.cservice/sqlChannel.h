@@ -1,18 +1,21 @@
 /* sqlChannel.h */
 
 #ifndef __SQLCHANNEL_H
-#define __SQLCHANNEL_H "$Id: sqlChannel.h,v 1.39 2002/02/01 21:13:09 gte Exp $"
+#define __SQLCHANNEL_H "$Id: sqlChannel.h,v 1.40 2002/04/27 16:11:29 dan_karrels Exp $"
 
 #include	<string>
 #include	<map>
+#include	<vector>
 #include	<ctime>
 #include	"libpq++.h"
 #include	"sqlBan.h"
 
-using std::string ;
-
 namespace gnuworld
 {
+
+using std::string ;
+using std::map ;
+using std::vector ;
 
 class sqlChannel
 {

@@ -1,9 +1,10 @@
 /* sqlUser.h */
 
 #ifndef __SQLUSER_H
-#define __SQLUSER_H "$Id: sqlUser.h,v 1.28 2002/04/01 22:02:22 gte Exp $"
+#define __SQLUSER_H "$Id: sqlUser.h,v 1.29 2002/04/27 16:11:29 dan_karrels Exp $"
 
 #include	<string>
+#include	<vector>
 #include	<ctime>
 #include	"libpq++.h"
 
@@ -11,6 +12,7 @@ namespace gnuworld
 {
 
 using std::string ;
+using std::vector ;
 
 class iClient;
 
