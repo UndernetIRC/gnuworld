@@ -17,7 +17,7 @@
  */
 
 #ifndef __XSERVER_H
-#define __XSERVER_H "$Id: server.h,v 1.26 2001/01/28 19:27:35 dan_karrels Exp $"
+#define __XSERVER_H "$Id: server.h,v 1.27 2001/01/31 22:03:22 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
@@ -813,6 +813,9 @@ protected:
 
 	/// P(RIVMSG) message handler.
 	DECLARE_MSG(P);
+
+	// PRIVMSG message handler, bogus.
+	DECLARE_MSG(PRIVMSG);
 
 	/// B(URST) message handler.
 	DECLARE_MSG(B);

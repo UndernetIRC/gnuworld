@@ -2,7 +2,7 @@
  */
 
 #ifndef __SOCKET_H
-#define __SOCKET_H "$Id: Socket.h,v 1.4 2000/12/15 00:13:44 dan_karrels Exp $"
+#define __SOCKET_H "$Id: Socket.h,v 1.5 2001/01/31 22:03:22 dan_karrels Exp $"
 
 #include	<new>
 #include	<iostream>
@@ -89,18 +89,6 @@ public:
 	virtual int send( const unsigned char* b, size_t nb ) ;
 
 	/**
-	 * Receive no more than (nb) bytes into the unsigned
-	 * character array pointer to by (b).
-	 * The number of bytes read is returned, or -1 on error.
-	 */
-	virtual int recv( unsigned char* b, size_t nb ) ;
-
-	/**
-	 * Attempt to read numBytes bytes from the connection.
-	 */
-	virtual int recv( string&, size_t numBytes ) ;
-
-	/**
 	 * Send as much of the C NULL terminated string (s)
 	 * to the socket connection as possible.
 	 * Returns the number of bytes written, or -1 on error.
@@ -112,7 +100,19 @@ public:
 	 * socket connection as possible.
 	 * Returns number of bytes written, or -1 on error.
 	 */
-	virtual int send( const string& val ) ;
+	virtual int send( const string& val, const size_t ) ;
+
+	/**
+	 * Receive no more than (nb) bytes into the unsigned
+	 * character array pointer to by (b).
+	 * The number of bytes read is returned, or -1 on error.
+	 */
+	virtual int recv( unsigned char* b, size_t nb ) ;
+
+	/**
+	 * Attempt to read numBytes bytes from the connection.
+	 */
+	virtual int recv( string&, size_t numBytes ) ;
 
 	/**
 	 * Return this Socket's file descriptor.

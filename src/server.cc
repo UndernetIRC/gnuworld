@@ -44,7 +44,7 @@
 #include	"ServerTimerHandlers.h"
 
 const char xServer_h_rcsId[] = __XSERVER_H ;
-const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.61 2001/01/31 21:31:26 dan_karrels Exp $" ;
+const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.62 2001/01/31 22:03:22 dan_karrels Exp $" ;
 
 using std::string ;
 using std::vector ;
@@ -169,15 +169,8 @@ void xServer::loadCommandHandlers()
 {
 
 // Allocate the command map
-try
-	{
-	commandMap = new commandMapType ;
-	}
-catch( std::bad_alloc )
-	{
-	elog		<< "xServer()> Memory allocation failure\n" ;
-	exit( 0 ) ;
-	}
+commandMap = new (nothrow) commandMapType ;
+assert( commandMap != 0 ) ;
 
 // Register messages
 // This basically adds command handler into
@@ -216,6 +209,7 @@ REGISTER_MSG( "G", G );
 //
 REGISTER_MSG( "O", P );
 REGISTER_MSG( "P", P );
+REGISTER_MSG( "PRIVMSG", PRIVMSG );
 
 // Mode
 REGISTER_MSG( "M", M );
@@ -313,12 +307,7 @@ lastTimerID = 1 ;
 ::memset( charXXX, 0, sizeof( charXXX ) ) ;
 
 Network = new (nothrow) xNetwork ;
-if( NULL == Network )
-	{
-	clog	<< "xServer::initializeVariables> Memory allocation "
-		<< "failure" << endl ;
-	::exit( 0 ) ;
-	}
+assert( Network != 0 ) ;
 
 Network->setServer( this ) ;
 
@@ -363,12 +352,7 @@ for( ; ptr != conf.end() && ptr->first == "module" ; ++ptr )
 
 	moduleLoader< xClient* >* ml =
 		new (nothrow) moduleLoader< xClient* >( modInfo[ 0 ] ) ;
-	if( NULL == ml )
-		{
-		elog	<< "xServer> Memory allocation failure "
-			<< "loading modules\n" ;
-		return false ;
-		}
+	assert( ml != 0 ) ;
 
 	moduleList.push_back(ml); // Add moduleLoader to list. 
 	xClient* clientPtr = ml->loadObject(modInfo[1]);
@@ -419,16 +403,9 @@ if( isConnected() )
 // reading from a file.
 if( 0 == theSock )
 	{
-	try
-		{
-		// Allocate the socket.
-		theSock = new ClientSocket ;
-		}
-	catch( std::bad_alloc )
-		{
-		elog << "xServer::Connect> Memory allocation failure\n" ;
-		return -1 ;
-		}
+	// Allocate the socket.
+	theSock = new ClientSocket ;
+	assert( theSock != 0 ) ;
 	}
 
 // P10 version information, bogus.
@@ -469,11 +446,7 @@ if( static_cast< int >( outputWriteSize ) < 0 )
 	}
 
 inputCharBuffer = new (nothrow) char[ inputReadSize + 1 ] ;
-if( NULL == inputCharBuffer )
-	{
-	elog	<< "xServer::Connect> Memory allocation failure\n" ;
-	::exit( 0 ) ;
-	}
+assert( inputCharBuffer != 0 ) ;
 
 // Notify the curious user of the TCP window sizes.
 //elog << "inputReadSize: " << inputReadSize << endl ;
@@ -1212,7 +1185,8 @@ if( outputBuffer.empty() )
 	return ;
 	}
 
-int bytesWritten = theSock->send( outputBuffer.toString() ) ;
+int bytesWritten = theSock->send( outputBuffer.toString(),
+	min( outputWriteSize >> 1, outputBuffer.size() ) ) ;
 
 if( bytesWritten <= 0 )
 	{
@@ -1252,7 +1226,8 @@ if( 0 == outputBuffer.size() )
 
 // Write the data to the network.
 // TODO: Only write ouputWriteSize bytes.
-int bytesWritten = theSock->send( outputBuffer.toString() ) ;
+int bytesWritten = theSock->send( outputBuffer.toString(),
+	min( outputWriteSize >> 1, outputBuffer.size() ) ) ;
 
 // Was the write successful?
 if( bytesWritten < 0 )
@@ -1580,16 +1555,9 @@ bool xServer::setGline(
 
 // TODO: Remove any old matches, or just update the expiration time
 
-Gline* newGline = 0 ;
-try
-	{
-	newGline = new Gline( setBy, userHost, reason, duration ) ;
-	}
-catch( std::bad_alloc )
-	{
-	elog	<< "xServer::setGline> Memory allocation failure\n" ;
-	exit( 0 ) ;
-	}
+Gline* newGline =
+	new (nothrow) Gline( setBy, userHost, reason, duration ) ;
+assert( newGline != 0 ) ;
 
 // Notify the rest of the network
 strstream s ;
@@ -1668,18 +1636,9 @@ Channel* theChan = Network->findChannel( Param[ 1 ] ) ;
 if( NULL == theChan )
 	{
 	// The channel does not yet exist, go ahead and create it.
-	try
-		{
-		// Provide the channel name and timestamp to the
-		// Channel constructor
-		theChan = new Channel( Param[ 1 ], atoi( Param[ 2 ] ) ) ;
-		}
-	catch( std::bad_alloc )
-		{
-		// Memory allocation failure, uh oh
-		elog	<< "xServer::MSG_B> Memory allocation failure\n" ;
-		return -1 ;
-		}
+	theChan = new (nothrow)
+		Channel( Param[ 1 ], atoi( Param[ 2 ] ) ) ;
+	assert( theChan != 0 ) ;
 
 	// Add the new Channel to the network channel table
 	if( !Network->addChannel( theChan ) )
@@ -1848,21 +1807,9 @@ for( StringTokenizer::const_iterator ptr = st.begin() ; ptr != st.end() ;
 
 	// Create a ChannelUser object to represent this user's presence
 	// in this channel
-	ChannelUser* chanUser = 0 ;
-	try
-		{
-		// Allocate using the iClient object as constructor
-		// argument
-		chanUser = new ChannelUser( theClient ) ;
-		}
-	catch( std::bad_alloc )
-		{
-		// Memory allocation failure
-		elog	<< "xServer::parseBurstUsers> Memory allocation "
-			<< "failure\n" ;
-
-		continue ;
-		}
+	ChannelUser* chanUser =
+		new (nothrow) ChannelUser( theClient ) ;
+	assert( chanUser != 0 ) ;
 
 	// Add this channel to the user's channel structure.
 	theClient->addChannel( theChan ) ;
@@ -2338,21 +2285,8 @@ for( StringTokenizer::const_iterator ptr = st.begin() ; ptr != st.end() ;
 	if( NULL == theChan )
 		{
 		// Channel doesn't exist..this transmutes to a create
-		try
-			{
-			// Pass the channel name and join time to
-			// the Channel constructor
-			theChan = new Channel( *ptr, creationTime ) ;
-			}
-		catch( std::bad_alloc )
-			{
-			// Memory allocation failure
-			elog	<< "xServer::MSG_C> Memory allocation "
-				"failure\n" ;
-
-			// Return error
-			return -1 ;
-			}
+		theChan = new (nothrow) Channel( *ptr, creationTime ) ;
+		assert( theChan != 0 ) ;
 
 		// Add this channel to the network channel table
 		if( !Network->addChannel( theChan ) )
@@ -2372,21 +2306,9 @@ for( StringTokenizer::const_iterator ptr = st.begin() ; ptr != st.end() ;
 
 	// Create a new ChannelUser to represent this iClient's
 	// membership in this channel.
-	ChannelUser* theUser = 0 ;
-	try
-		{
-		// Allocate the ChannelUser.
-		theUser = new ChannelUser( theClient ) ;
-		}
-	catch( std::bad_alloc )
-		{
-		// Memory allocation failure
-		// Log the error
-		elog	<< "xServer::MSG_C> Memory allocation failure\n" ;
-
-		// Move to the next channel
-		continue ;
-		}
+	ChannelUser* theUser =
+		new (nothrow) ChannelUser( theClient ) ;
+	assert( theUser != 0 ) ;
 
 	// The user who creates a channel is automatically +o
 	theUser->setMode( ChannelUser::MODE_O ) ;
@@ -2514,24 +2436,12 @@ for( StringTokenizer::size_type i = 0 ; i < st.size() ; i++ )
 		}
 
 	Channel* theChan = 0 ;
-	ChannelUser* theUser = 0 ;
 
 	// Attempt to allocate a ChannelUser structure for this
 	// user<->channel association
-	try
-		{
-		// Pass the iClient* of this client to the
-		// ChannelUser constructor
-		theUser = new ChannelUser( Target ) ;
-		}
-	catch( std::bad_alloc )
-		{
-		// Memory allocation failure, log the error
-		elog	<< "xServer::MSG_J> Memory allocation failure\n" ;
-
-		// Continue to next channel
-		continue ;
-		}
+	ChannelUser* theUser =
+		new (nothrow) ChannelUser( Target ) ;
+	assert( theUser != 0 ) ;
 
 	// This variable represents which event actually occurs
 	channelEventType whichEvent = EVT_JOIN ;
@@ -2543,25 +2453,10 @@ for( StringTokenizer::size_type i = 0 ; i < st.size() ; i++ )
 	if( NULL == theChan )
 		{
 		// Nope, this transmutes to a CREATE
-		try
-			{
-			// Create a new Channel to represent this
-			// network channel
-			theChan = new Channel( st[ i ], ::time( 0 ) ) ;
-			}
-		catch( std::bad_alloc )
-			{
-			// Memory allocation failure, log the error
-			elog	<< "xServer::MSG_J> Memory allocation "
-				<< "failure\n" ;
-
-			// Prevent memory leaks by deallocating the
-			// ChannelUser information for this user
-			delete theUser ;
-
-			// Continue to next channel
-			continue ;
-			}
+		// Create a new Channel to represent this
+		// network channel
+		theChan = new (nothrow) Channel( st[ i ], ::time( 0 ) ) ;
+		assert( theChan != 0 ) ;
 
 		// Add the channel to the network tables
 		if( !Network->addChannel( theChan ) )
@@ -2723,6 +2618,35 @@ delete target ;
 return 0 ;
 
 }
+
+// This is a blatant hack until ircu gets its protocol straight
+int xServer::MSG_PRIVMSG( xParameters& Param )
+{
+if( Param.empty() )
+	{
+	elog	<< "xServer::MSG_PRIVMSG> Invalid number of "
+		<< "arguments"
+		<< endl ;
+	return -1 ;
+	}
+
+// Dont try this at home kids
+char numeric[ 6 ] = { 0 } ;
+
+iClient* theClient = Network->findNick( Param[ 0 ] ) ;
+if( NULL == theClient )
+	{
+	elog	<< "xServer::MSG_PRIVMSG> Unable to find nick: "
+		<< Param[ 0 ]
+		<< endl ;
+	return -1 ;
+	}
+
+Param.setValue( 0, numeric ) ;
+
+return MSG_P( Param ) ;
+}
+
 
 /**
  * A nick has sent a private message
@@ -2890,39 +2814,24 @@ if( Param[ 1 ][ 0 ] == '1' )
 		uplinkYY = base64toint( Param[ 5 ], 2 ) ;
 		}
 
-	iServer* me = 0 ;
-	try
-		{
-		// Our uplink has its own numeric as its uplinkIntYY.
-		Uplink = new iServer( 
-			uplinkYY,
-			Param[ 5 ], // yyxxx
-			Param[ 0 ], // name
-			atoi( Param[ 3 ] ), // connect time
-			atoi( Param[ 2 ] ), // start time
-			atoi( Param[ 4 ] + 1 ) ) ; // version
-		me = new iServer(
-			Uplink->getIntYY(),
-			getCharYYXXX(),
-			ServerName,
-			ConnectionTime,
-			StartTime,
-			Version ) ;
-		}
-	catch( std::bad_alloc )
-		{
+	// Our uplink has its own numeric as its uplinkIntYY.
+	Uplink = new (nothrow) iServer( 
+		uplinkYY,
+		Param[ 5 ], // yyxxx
+		Param[ 0 ], // name
+		atoi( Param[ 3 ] ), // connect time
+		atoi( Param[ 2 ] ), // start time
+		atoi( Param[ 4 ] + 1 ) ) ; // version
+	assert( Uplink != 0 ) ;
 
-		// Prevent a memory leak, Uplink may have been allocated,
-		// and me failed.
-		delete Uplink ;
-
-		// Set both pointer to 0.
-		Uplink = me = 0 ;
-
-		elog	<< "xServer::MSG_Server> Memory allocation failure\n" ;
-
-		return -1 ;
-		}
+	iServer* me = new (nothrow) iServer(
+		Uplink->getIntYY(),
+		getCharYYXXX(),
+		ServerName,
+		ConnectionTime,
+		StartTime,
+		Version ) ;
+	assert( me != 0 ) ;
 
 	// We now have a pointer to our own uplink
 	// Add it to the tables
@@ -3206,7 +3115,8 @@ if( (NULL == theChan) && bursting )
 	delete[] s.str() ;
 
 	// Instantiate the new channel
-	theChan = new Channel( chanName, time( 0 ) ) ;
+	theChan = new (nothrow) Channel( chanName, time( 0 ) ) ;
+	assert( theChan != 0 ) ;
 
 	// Add it to the network channel table
 	Network->addChannel( theChan ) ; 
@@ -3241,7 +3151,8 @@ else if( NULL == theChan )
 		}
 
 	// Instantiate the new channel
-	theChan = new Channel( chanName, time( 0 ) ) ;
+	theChan = new (nothrow) Channel( chanName, time( 0 ) ) ;
+	assert( theChan != 0 ) ;
 
 	// Add it to the network channel table
 	Network->addChannel( theChan ) ;
@@ -3517,10 +3428,7 @@ if( params.size() > 9 )
 	description = params[ 9 ];
 	}
 
-iClient* newClient = 0 ;
-try
-	{
-	newClient = new iClient(
+iClient* newClient = new (nothrow) iClient(
 		nickUplink->getIntYY(),
 		yyxxx,
 		params[ 1 ], // nickname
@@ -3531,12 +3439,7 @@ try
 		description,
 		atoi( params[ 3 ] ) // connection time
 		) ;
-	}
-catch( std::bad_alloc )
-	{
-	elog	<< "xServer::MSG_N> Memory allocation failure\n" ;
-	return -1 ;
-	}
+assert( newClient != 0 ) ;
 
 //elog << "Adding client: " << *newClient ;
 if( !Network->addClient( newClient ) )
@@ -3626,21 +3529,13 @@ if( NULL != Network->findServer( serverIntYY ) )
 
 // Dun really care about the server description
 
-iServer* newServer = 0 ;
-try
-	{
-	newServer = new iServer( uplinkIntYY,
+iServer* newServer = new (nothrow) iServer( uplinkIntYY,
 		params[ 6 ], // yxx
 		serverName,
 		connectTime,
 		startTime,
 		atoi( params[ 5 ] + 1 ) ) ;
-	}
-catch( std::bad_alloc )
-	{
-	elog	<< "xServer::MSG_S> Memory allocation failure\n" ;
-	return -1 ;
-	}
+assert( newServer != 0 ) ;
 
 Network->addServer( newServer ) ;
 //elog << "Added server: " << *newServer ;
@@ -3703,12 +3598,7 @@ Gline* newGline = new (nothrow) Gline(
 	Params[ 2 ] + 1,
 	Params[ 4 ],
 	atoi( Params[ 3 ] ) ) ;
-if( NULL == newGline )
-	{
-	elog	<< "xServer::MSG_GL> Memory allocation failure"
-		<< endl ;
-	return -1 ;
-	}
+assert( newGline != 0 ) ;
 
 glineList.push_back( newGline ) ;
 PostEvent( EVT_GLINE,
@@ -4185,16 +4075,9 @@ if( absTime <= ::time( 0 ) )
 timerID ID = getUniqueTimerID() ;
 
 // Allocate a timerInfo structure to represent this timer
-timerInfo* ti = 0 ;
-try
-	{
-	ti = new timerInfo( ID, absTime, theHandler, data ) ;
-	}
-catch( std::bad_alloc )
-	{
-	elog	<< "xServer::RegisterTimer> Memory allocation error\n" ;
-	return 0 ;
-	}
+timerInfo* ti =
+	new (nothrow) timerInfo( ID, absTime, theHandler, data ) ;
+assert( ti != 0 ) ;
 
 // Add this timerInfo structure to the timerQueue
 timerQueue.push( timerQueueType::value_type( absTime, ti ) ) ;

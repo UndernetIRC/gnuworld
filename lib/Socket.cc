@@ -35,7 +35,7 @@
 #endif
 
 const char Socket_h_rcsId[] = __SOCKET_H ;
-const char Socket_cc_rcsId[] = "$Id: Socket.cc,v 1.14 2001/01/31 21:10:37 dan_karrels Exp $" ;
+const char Socket_cc_rcsId[] = "$Id: Socket.cc,v 1.15 2001/01/31 22:03:22 dan_karrels Exp $" ;
 
 using gnuworld::elog ;
 using std::endl ;
@@ -435,7 +435,7 @@ return send( reinterpret_cast< const unsigned char* >( s ), strlen( s ) ) ;
 }
 
 // support call by reference
-int Socket::send( const string& val )
+int Socket::send( const string& val, const size_t numBytes )
 {
 if( fd < 0 )
 	{
@@ -448,7 +448,7 @@ short int cnt = 10 ;
 do
 	{
 	errno = 0 ;
-	result = ::send( fd, val.c_str(), val.size(), 0 ) ;
+	result = ::send( fd, val.c_str(), numBytes, 0 ) ;
 	} while( (result < 0) &&
 		(--cnt >= 0) &&
 		(EINTR == errno) ) ;

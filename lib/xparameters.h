@@ -3,7 +3,7 @@
  */
 
 #ifndef __xPARAMETERS_H
-#define __xPARAMETERS_H "$Id: xparameters.h,v 1.2 2000/08/04 23:39:09 dan_karrels Exp $"
+#define __xPARAMETERS_H "$Id: xparameters.h,v 1.3 2001/01/31 22:03:22 dan_karrels Exp $"
 
 #include        <vector>
 #include	<cassert>
@@ -62,6 +62,13 @@ public:
 	{ assert( validSubscript( pos ) ) ; return myVector[ pos ] ; }
 
 	/**
+	 * Set a particular element to a new value, NULL is
+	 * permitted.
+	 */
+	void setValue( const size_t pos, char* newVal )
+	{ assert( validSubscript( pos ) ) ; myVector[ pos ] = newVal ; }
+
+	/**
 	 * Remove all tokens, if any, from this xParameters object.
 	 */
 	inline void Clear()
@@ -78,6 +85,13 @@ public:
 	 */
 	inline size_type size() const
 		{ return myVector.size() ; }
+
+	/**
+	 * Return true if there exist no tokens represented by this
+	 * class.
+	 */
+	inline bool empty() const
+		{ return myVector.empty() ; }
 
 	/**
 	 * Return true if the given variable (i) is a valid index
