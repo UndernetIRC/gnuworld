@@ -211,7 +211,7 @@ EXTRA_DIST = bin/ccontrol.example.conf.in \
 	bin/nickserv.example.conf.in \
 	bin/scanner.example.conf.in \
 	bin/stats.example.conf.in \
-	bin/server_command_map \
+	bin/server_command_map.in \
 	contrib/00INDEX.TXT \
 	contrib/chktrans.py \
 	contrib/encrypt.sh \
