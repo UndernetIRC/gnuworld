@@ -23,7 +23,7 @@
 #include	"StringTokenizer.h"
 
 const char xNetwork_h_rcsId[] = __NETWORK_H ;
-const char xNetwork_cc_rcsId[] = "$Id: Network.cc,v 1.28 2001/06/14 22:14:13 dan_karrels Exp $" ;
+const char xNetwork_cc_rcsId[] = "$Id: Network.cc,v 1.29 2001/08/12 02:11:55 dan_karrels Exp $" ;
 const char ELog_h_rcsId[] = __ELOG_H ;
 const char iClient_h_rcsId[] = __ICLIENT_H ;
 const char Channel_h_rcsId[] = __CHANNEL_H ;
@@ -810,7 +810,7 @@ if( matchingHosts.empty() )
 
 // Create a list to return to the caller, create matchingHosts.size()
 // empty slots to speed up memory allocation
-list< const iClient* > retMe( matchingHosts.size() ) ;
+list< const iClient* > retMe ;
 
 // Iterate through the list of matching hostnames
 for( list< const iClient* >::const_iterator ptr = matchingHosts.begin() ;
