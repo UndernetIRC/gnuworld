@@ -8,7 +8,7 @@
  *
  * Caveats: None
  *
- * $Id: REGISTERCommand.cc,v 1.10 2001/02/20 22:31:04 gte Exp $
+ * $Id: REGISTERCommand.cc,v 1.11 2001/03/01 00:43:51 gte Exp $
  */
  
 #include	<string>
@@ -21,7 +21,7 @@
 #include	"Network.h"
 #include	"responses.h"
 
-const char REGISTERCommand_cc_rcsId[] = "$Id: REGISTERCommand.cc,v 1.10 2001/02/20 22:31:04 gte Exp $" ;
+const char REGISTERCommand_cc_rcsId[] = "$Id: REGISTERCommand.cc,v 1.11 2001/03/01 00:43:51 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -99,47 +99,111 @@ bool REGISTERCommand::Exec( iClient* theClient, const string& Message )
 				string("Invalid channel name.")));
 		return false;
 	}
- 
-	/* If the channel exists, grab the creation timestamp and use this as the channel_ts in the Db. */
-	unsigned int channel_ts = 0;
-	Channel* tmpChan = Network->findChannel(st[1]);
-	channel_ts = tmpChan ? tmpChan->getCreationTime() : ::time(NULL);
- 
-	/*
-	 *  Now, build up the SQL query & execute it!
-	 */ 
-	strstream theQuery; 
 
+ 	/*
+	 *  Reclaim Addition:
+	 *  If this channel exists in the database (without a registered_ts set),
+	 *  then it is currently unclaimed. This register command will
+	 *  update the timestamp, and proceed to adduser.
+	 */
+
+	strstream checkQuery;
 	ExecStatusType status; 
 
-	theQuery << queryHeader << "VALUES (" 
-	<< "'" << escapeSQLChars(st[1]) << "',"
-	<< "0" << ","
-	<< ::time(NULL) << ","
-	<< channel_ts << ","
-	<< "'+tn'" << ","
-	<< ::time(NULL)
-	<< ");"
-	<< ends; 
- 
-	elog << "sqlQuery> " << theQuery.str() << endl; 
+	checkQuery 	<< "SELECT name FROM channels WHERE "
+				<< "deleted = 0 AND "
+				<< "registered_ts = 0 AND lower(name) = '"
+				<< escapeSQLChars(string_lower(st[1]))
+				<< "'"
+				<< ends;
 
-	if ((status = bot->SQLDb->Exec(theQuery.str())) == PGRES_COMMAND_OK)
+	elog << "sqlQuery> " << checkQuery.str() << endl; 
+
+	bool isUnclaimed = false;
+	if ((status = bot->SQLDb->Exec(checkQuery.str())) == PGRES_TUPLES_OK)
+	{ 
+		if (bot->SQLDb->Tuples() > 0) isUnclaimed = true;
+	}
+
+	delete[] checkQuery.str();
+
+	if (isUnclaimed)
 	{
-		bot->logAdminMessage("%s has registered %s", theUser->getUserName().c_str(), st[1].c_str());
-		bot->Notice(theClient, 
-			bot->getResponse(theUser,
-				language::regged_chan,
-				string("Registered channel %s")).c_str(), 
-			st[1].c_str());
-	} else {
-		bot->Notice(theClient, "Unable to commit channel record, channel may be purged.");
- 	}
+		/*
+		 *  Quick query to set registered_ts back for this chan.
+		 */
 
- 	delete[] theQuery.str();
+		strstream reclaimQuery;
+		ExecStatusType status; 
+	
+		reclaimQuery<< "UPDATE channels set registered_ts = "
+					<< bot->currentTime() << " "
+					<< "WHERE lower(name) = '"
+					<< escapeSQLChars(string_lower(st[1]))
+					<< "'"
+					<< ends;
+	 
+		if ((status = bot->SQLDb->Exec(reclaimQuery.str())) == PGRES_COMMAND_OK)
+		{
+			bot->logAdminMessage("%s has registered %s", theUser->getUserName().c_str(), st[1].c_str());
+			bot->Notice(theClient, 
+				"Channel %s successfully reclaimed by %s",
+				st[1].c_str(), tmpUser->getUserName().c_str());
+		}
+
+		elog << "sqlQuery> " << reclaimQuery.str() << endl;
+		
+		delete[] reclaimQuery.str();
+ 
+	}
+		else /* We perform a normal registration. */
+	{
+		/* 
+		 * If the channel exists on IRC, grab the creation timestamp
+		 * and use this as the channel_ts in the Db. 
+		 */
+	
+		unsigned int channel_ts = 0;
+		Channel* tmpChan = Network->findChannel(st[1]);
+		channel_ts = tmpChan ? tmpChan->getCreationTime() : ::time(NULL);
+	 
+		/*
+		 *  Now, build up the SQL query & execute it!
+		 */ 
+		strstream theQuery; 
+	
+		ExecStatusType status; 
+	
+		theQuery << queryHeader << "VALUES (" 
+		<< "'" << escapeSQLChars(st[1]) << "',"
+		<< "0" << ","
+		<< bot->currentTime() << ","
+		<< channel_ts << ","
+		<< "'+tn'" << ","
+		<< bot->currentTime()
+		<< ")"
+		<< ends; 
+	 
+		elog << "sqlQuery> " << theQuery.str() << endl; 
+	
+		if ((status = bot->SQLDb->Exec(theQuery.str())) == PGRES_COMMAND_OK)
+		{
+			bot->logAdminMessage("%s has registered %s", theUser->getUserName().c_str(), st[1].c_str());
+			bot->Notice(theClient, 
+				bot->getResponse(theUser,
+					language::regged_chan,
+					string("Registered channel %s")).c_str(), 
+				st[1].c_str());
+		} else {
+			bot->Notice(theClient, "Unable to commit channel record, channel may be purged.");
+	 	}
+	
+	 	delete[] theQuery.str();
+ 
+	}
 
 	/*
-	 *  Now add the chap at 500 in the new channel.
+	 *  Now add the target chap at 500 in the new channel.
 	 */
  
 	sqlChannel* tmpSqlChan = bot->getChannelRecord(st[1]);

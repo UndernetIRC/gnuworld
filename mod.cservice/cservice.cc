@@ -72,15 +72,20 @@ for( commandMapType::iterator ptr = commandMap.begin() ;
         ptr->second->setServer( theServer ) ;
         }
 	 
-// Attempt to register our interest in recieving NOTIFY events.
+/* Attempt to register our interest in recieving NOTIFY events. */
 if (SQLDb->ExecCommandOk("LISTEN channels_u; LISTEN bans_u; LISTEN users_u; LISTEN levels_u;"))
 	{
 	elog	<< "cmaster::ImplementServer> Successfully registered "
 			<< "LISTEN event for Db updates." << endl;
 
-	// Start the Db update timer rolling.
+	// Start the Db update/Reop timer rolling.
 	time_t theTime = time(NULL) + updateInterval;
-	theServer->RegisterTimer(theTime, this, NULL); 
+	update_timerID = theServer->RegisterTimer(theTime, this, NULL);
+
+	// Start the ban suspend/expire timer rolling.
+	theTime = time(NULL) + expireInterval;
+	expire_timerID = theServer->RegisterTimer(theTime, this, NULL);
+
 	}
 else 
 	{
@@ -217,7 +222,9 @@ else
 // The program will exit if these variables are not defined in the
 // configuration file.
 relayChan = cserviceConfig->Require( "relay_channel" )->second ; 
+debugChan = cserviceConfig->Require( "debug_channel" )->second ; 
 updateInterval = atoi((cserviceConfig->Require( "update_interval" )->second).c_str());
+expireInterval = atoi((cserviceConfig->Require( "expire_interval" )->second).c_str());
 input_flood = atoi((cserviceConfig->Require( "input_flood" )->second).c_str()); 
 output_flood = atoi((cserviceConfig->Require( "output_flood" )->second).c_str());
 flood_duration = atoi((cserviceConfig->Require( "flood_duration" )->second).c_str());
@@ -265,7 +272,7 @@ elog	<< "cmaster::BurstChannels> "
 ExecStatusType status = SQLDb->Exec(theQuery.str()) ;
 if( PGRES_TUPLES_OK == status )
 	{
-	for (int i = 0 ; i < SQLDb->Tuples (); i++)
+	for (int i = 0 ; i < SQLDb->Tuples(); i++)
 		{ 
  		/* Add this information to the channel cache. */
 
@@ -1116,71 +1123,81 @@ return true;
  * suspended access level records, and unsuspend them. 
  * TODO
  */
-//void cservice::expireSuspends
-
-/**
- * Time to see if anyone updated the database while we
- * weren't looking. :)
- */
-int cservice::OnTimer(xServer::timerID timer_id, void*)
+void cservice::expireSuspends()
 {
-
-// elog	<< "cmaster::OnTimer> Checking for updates.."
-//	<< endl;
-
-time_t theTime = time(NULL) + updateInterval;
-MyUplink->RegisterTimer(theTime, this, NULL);
-
-/*
- *  Any pending reop's?
- *  TODO: Rewrite this bit --Gte
- */
-
-if (!reopQ.empty())
-{
-	reopQType::iterator ptr = reopQ.begin();
-	while ( ptr != reopQ.end() )
-	{
-	if (ptr->second <= currentTime()) 
-		{
-		Channel* tmpChan = Network->findChannel(ptr->first);
-		if (tmpChan)
-			{ 
-			ChannelUser* tmpChanUser;
-			tmpChanUser = tmpChan->findUser(me);
-
-			/* Don't op ourself if we're already opped.. */
-			if (tmpChanUser && !tmpChanUser->getMode(ChannelUser::MODE_O))
-				{
-				strstream s;
-				s	<< MyUplink->getCharYY()
-					<< " M "
-					<< tmpChan->getName()
-					<< " +o "
-					<< getCharYYXXX()
-					<< ends;
-				
-				Write( s );
-				delete[] s.str();
-				elog	<< "cservice::OnTimer> REOP "
-					<< tmpChan->getName()
-					<< endl;
-				}
-			} 
-			reopQ.erase(ptr->first); 
-		}
-		++ptr;
-	}
 }
 
+/**
+ * This member function executes an SQL query to return all
+ * bans that have expired. It removes them from the internal
+ * cache as well as the database.
+ */ 
+void cservice::expireBans()
+{
+}
+
+/**
+ * This member function checks the reop buffer for any
+ * pending reop's, performing them if neccessary.
+ * TODO: Update internal state for 'me'.
+ */ 
+void cservice::performReops()
+{
+/* TODO: Rewrite this bit --Gte */
+
+if (reopQ.empty()) return;
+
+reopQType::iterator ptr = reopQ.begin();
+while ( ptr != reopQ.end() )
+{
+if (ptr->second <= currentTime()) 
+	{
+	Channel* tmpChan = Network->findChannel(ptr->first);
+	if (tmpChan)
+		{ 
+		ChannelUser* tmpChanUser;
+		tmpChanUser = tmpChan->findUser(me);
+
+		/* Don't op ourself if we're already opped.. */
+		if (tmpChanUser && !tmpChanUser->getMode(ChannelUser::MODE_O))
+			{
+			strstream s;
+			s	<< MyUplink->getCharYY()
+				<< " M "
+				<< tmpChan->getName()
+				<< " +o "
+				<< getCharYYXXX()
+				<< ends;
+			
+			Write( s );
+			delete[] s.str();
+			elog	<< "cservice::OnTimer> REOP "
+				<< tmpChan->getName()
+				<< endl;
+			}
+		} 
+		reopQ.erase(ptr->first); 
+	} /* If channel exists */
+	++ptr;
+} /* While */
+ 
+}
+
+/**
+ * This member function processes and pending database
+ * update notifications, reloading any records as
+ * neccessary.
+ * TODO: Notification update for Ban records.
+ * TODO: Add logging of username/records updated.
+ */
+void cservice::processDBUpdates()
+{
 PGnotify* notify = SQLDb->Notifies();
 
-/*
- *  We got a notification event..
- */
+/* 'We get signal..' */ 
 if (!notify)
 	{
-	return true;
+	return;
 	}
 
 elog	<< "cmaster::OnTimer> Recieved a notification event for '"
@@ -1200,7 +1217,7 @@ if (notify->be_pid == SQLDb->getPID())
 	// TODO: Be absolutely certain that we should be using free()
 	// here.
 	free(notify); 
-	return false;
+	return;
 	}
 
 assert( notify->relname != 0 ) ;
@@ -1269,7 +1286,7 @@ if (status != PGRES_TUPLES_OK)
 		<< endl;
 
 	// TODO: Log to debugchan here.
-	return false;
+	return;
 	}
 
 elog	<< "cmaster::OnTimer> Found "
@@ -1285,7 +1302,7 @@ if (SQLDb->Tuples() <= 0)
 	{ 
 	// We could get no results back if the last_update
 	// field wasn't set.
-	return false;
+	return;
 	}
 
 /* Update our time offset incase things drift.. */
@@ -1366,6 +1383,37 @@ switch(updateType)
  
 	} // switch()
 
+}
+
+/**
+ * Timer handler.
+ * This member handles a number of timers, dispatching
+ * control to the relevant member for the timer
+ * triggered.
+ */
+int cservice::OnTimer(xServer::timerID timer_id, void*)
+{
+
+if (timer_id ==  update_timerID)
+	{ 
+	performReops();
+	processDBUpdates();
+
+	/* Refresh Timers */			
+	time_t theTime = time(NULL) + updateInterval;
+	update_timerID = MyUplink->RegisterTimer(theTime, this, NULL); 
+
+	}
+
+if (timer_id == expire_timerID)
+	{ 
+
+	/* Refresh Timers */
+	time_t theTime = time(NULL) + expireInterval;
+	expire_timerID = MyUplink->RegisterTimer(theTime, this, NULL);			
+
+	} 
+ 
 return 0 ;
 }
  
@@ -1445,6 +1493,32 @@ string message = string( "[" ) + nickName + "] " + buf ;
 serverNotice(tmpChan, message);
 return true;
 }
+
+bool cservice::logDebugMessage(const char* format, ... )
+{
+
+char buf[ 1024 ] = { 0 } ;
+va_list _list ;
+	
+va_start( _list, format ) ;
+vsprintf( buf, format, _list ) ;
+va_end( _list ) ;
+	
+// Try and locate the debug channel.
+Channel* tmpChan = Network->findChannel(debugChan);
+if (!tmpChan) 
+	{
+	elog	<< "cservice::logAdminMessage> Unable to locate debug "
+		<< "channel on network!"
+		<< endl;
+	return false;
+	}
+
+string message = string( "[" ) + nickName + "] " + buf ;
+serverNotice(tmpChan, message);
+return true;
+}
+
  
 string cservice::userStatusFlags( const string& theUser ) 
 {

@@ -1,5 +1,5 @@
 #ifndef __CSERVICE_H
-#define __CSERVICE_H "$Id: cservice.h,v 1.51 2001/02/20 00:03:35 plexus Exp $"
+#define __CSERVICE_H "$Id: cservice.h,v 1.52 2001/03/01 00:43:51 gte Exp $"
 
 #include	<string>
 #include	<vector>
@@ -27,14 +27,13 @@ class PgDatabase;
 
 namespace gnuworld
 { 
- 
-class Command;
 
-/*
+/**
  *  Sublcass the postgres API to create our own accessor
  *  to get at the PID information.
- */
-
+ */ 
+class Command;
+ 
 class cmDatabase : public PgDatabase
 {
 public:
@@ -96,6 +95,9 @@ public:
 
 	/* Log an administrative alert to the relay channel & log. */
 	bool logAdminMessage(const char*, ... );
+
+	/* Log an debug message to the debug channel */
+	bool logDebugMessage(const char*, ... ); 
 
 	/* Write a channel log */
 	void writeChannelLog(sqlChannel*, iClient*, unsigned short, const string&); 
@@ -212,10 +214,14 @@ public:
 
 	// Flood/Notice relay channel - Loaded via config.
 	string relayChan;
+	string debugChan;
  
 	// Loaded via config.
-	// Internal at which we pick up updates from the Db.
+	// Interval at which we pick up updates from the Db.
 	int updateInterval;
+
+	// Interval at which we check for expired bans/suspends.
+	int expireInterval;
 
 	// Input flood rate.
 	unsigned int input_flood;
@@ -228,6 +234,12 @@ public:
 	time_t lastUserRefresh;
 	time_t lastLevelRefresh;
 	time_t lastBanRefresh;
+
+	/* TimerID we recieve every second (eg: Reop, DB update). */
+	xServer::timerID update_timerID;
+
+	/* TimerID we recieve every XX seconds for expiration of bans/suspend. */
+	xServer::timerID expire_timerID; 
 
 	// Language translations table (Loaded from Db).
 	typedef map < pair <int, int>, string > translationTableType ;
@@ -260,11 +272,15 @@ public:
 	bool checkBansOnJoin( Channel*, sqlChannel* , iClient* );
 	time_t currentTime() const ;
 
-	/* Queue to hold pending reops */
-//	typedef queue < pair <time_t , string>, list< pair < time_t, string> > > reopQType; 
+	/* Queue to hold pending reops */ 
 	typedef map < string, time_t > reopQType;
 	reopQType reopQ;
 
+	/* Two support members to check the db for expired bans */
+	void expireSuspends();
+	void expireBans(); 
+	void performReops();
+	void processDBUpdates();
 } ;
 
 const string escapeSQLChars(const string& theString);

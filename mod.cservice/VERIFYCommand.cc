@@ -10,7 +10,7 @@
 #include	"responses.h"
 
  
-const char VERIFYCommand_cc_rcsId[] = "$Id: VERIFYCommand.cc,v 1.14 2001/02/28 22:50:36 plexus Exp $" ;
+const char VERIFYCommand_cc_rcsId[] = "$Id: VERIFYCommand.cc,v 1.15 2001/03/01 00:43:51 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -76,14 +76,12 @@ bool VERIFYCommand::Exec( iClient* theClient, const string& Message )
 		return false;
 	}
 
-        sqlChannel* theChan = bot->getChannelRecord("#coder-com");
+	sqlChannel* theChan = bot->getChannelRecord("#coder-com");
 	if (!theChan) return true;
 
  	// TODO: Move all the levels to constants in levels.h
 
 	int level = bot->getAdminAccessLevel(theUser); 
-	
-	
 	int cLevel = bot->getEffectiveAccessLevel(theUser, theChan, false);
 
 	if (level == 0 && cLevel == 0) 
@@ -165,7 +163,7 @@ bool VERIFYCommand::Exec( iClient* theClient, const string& Message )
 			target->getNickUserHost().c_str(), extra.c_str(), theUser->getUserName().c_str());
 		return true;
 	}
- 
+
 	return true ;
 } 
 
