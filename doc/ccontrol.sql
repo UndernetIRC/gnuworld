@@ -1,4 +1,4 @@
--- "$Id: ccontrol.sql,v 1.22 2001/12/30 19:35:09 mrbean_ Exp $"
+-- "$Id: ccontrol.sql,v 1.23 2002/01/01 12:42:12 mrbean_ Exp $"
 
 -- 2001-10-14 : nighty
 -- corrected fieldname typo in "suspendReason" -> "suspend_reason"
@@ -40,7 +40,7 @@ CREATE TABLE opers (
 	email VARCHAR(128),
 	last_updated_by VARCHAR (128),		-- nick!user@host
 	last_updated INT4 NOT NULL,
-	notice BOOLEAN NOT NULL DEFAULT 'n',
+	notice BOOLEAN NOT NULL DEFAULT 't',
 	PRIMARY KEY( user_id )
 );
 

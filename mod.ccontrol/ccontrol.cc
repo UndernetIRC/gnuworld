@@ -37,7 +37,7 @@
 #include	"ip.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.108 2001/12/30 19:35:10 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.109 2002/01/01 12:42:14 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -533,7 +533,7 @@ if(!strcasecmp(st[1],"351"))
 	        return xClient::OnServerMessage(Server,Message);
 		}
 		
-	ccServer* tmpServer = serversMap[Server->getCharYY()];
+	ccServer* tmpServer = serversMap[Server->getName()];
 	
 	if(tmpServer)
 		{
@@ -541,7 +541,7 @@ if(!strcasecmp(st[1],"351"))
 		}
 	else
 		{
-		serversMap.erase(serversMap.find(Server->getCharYY()));
+		serversMap.erase(serversMap.find(Server->getName()));
 		}
 	}
 return xClient::OnServerMessage(Server,Message);
@@ -637,9 +637,28 @@ switch( theEvent )
 		iClient* tmpUser = (theEvent == EVT_QUIT) ?
 			static_cast< iClient* >( Data1 ) :
 			static_cast< iClient* >( Data2 ) ;
-		if(--clientsIpMap[xIP( tmpUser->getIP()).GetNumericIP()] < 1)
+		if(checkClones)
 			{
-			clientsIpMap.erase(clientsIpMap.find(xIP( tmpUser->getIP()).GetNumericIP()));
+			string tIP = xIP( tmpUser->getIP()).GetNumericIP();
+			if(--clientsIpMap[tIP] < 1)
+				{
+				clientsIpMap.erase(clientsIpMap.find(tIP));
+				}
+				string virtualHost = tmpUser->getDescription() + "@";
+				int dots = 0;
+				for(string::size_type ptr = 0;ptr < tIP.size(),dots < 3;++ptr)
+					{
+					if(tIP[ptr] == '.')
+						{
+						++dots;
+						}
+					virtualHost += tIP[ptr];
+					}
+				virtualHost += '*';
+			if(--virtualClientsMap[virtualHost] < 1)
+				{
+				virtualClientsMap.erase(virtualClientsMap.find(virtualHost));
+				}
 			}
 		ccUserData* UserData = static_cast< ccUserData* >(
 		tmpUser->getCustomData(this))  ;
@@ -681,25 +700,8 @@ switch( theEvent )
 			{
 			iServer* NewServer = static_cast< iServer* >( Data1);
 			iServer* UplinkServer = static_cast< iServer* >( Data2);
-			elog << "recv notification for " << NewServer->getCharYY() <<endl;
-			ccServer* CheckServer = new (std::nothrow) ccServer(SQLDb);
-			assert(CheckServer != NULL);
-			if(CheckServer->loadNumericData(NewServer->getCharYY()))
-				{
-				if(strcasecmp(NewServer->getName(),CheckServer->getName()))
-					{
-					strstream s ;
-					s	<< getCharYY() << " WA :"
-    						<< "\002Database numeric collision warnning!\002 - "
-						<< NewServer->getName()
-						<< " != "
-						<< CheckServer->getName()
-						<< ends ;
-					Write( s ) ;
-					delete[] s.str();
-					}
-				}				
-			if(!CheckServer->loadData(NewServer->getName()))
+			ccServer* CheckServer = getServer(NewServer->getName());
+			if(!CheckServer)
 				{    	
 				MsgChanLog("Unknown server connected : %s Uplink : %s\n"
 					    ,NewServer->getName().c_str(),UplinkServer->getName().c_str());
@@ -709,21 +711,11 @@ switch( theEvent )
 				CheckServer->setLastConnected(::time (0));
 				CheckServer->setUplink(UplinkServer->getName());
 				CheckServer->setLastNumeric(NewServer->getCharYY());
+				CheckServer->setNetServer(NewServer);
 				CheckServer->Update();
+				Write("%s V :%s\n",getCharYYXXX().c_str(),NewServer->getCharYY());
 				}
 		
-			delete CheckServer;
-			CheckServer = serversMap[NewServer->getCharYY()];
-			if(CheckServer)
-				{
-				elog << "Updating " << CheckServer->getName().c_str() <<endl;
-				CheckServer->setNetServer(NewServer);
-				}
-			else
-				{
-				elog << NewServer->getCharYY() << "isnt on map!" << endl;
-				serversMap.erase(serversMap.find(NewServer->getCharYY()));
-				}
 			}
 		break;
 		}
@@ -736,20 +728,14 @@ switch( theEvent )
 			
 			if(!getUplink()->isJuped(NewServer))
 				{
-				ccServer* CheckServer = new (std::nothrow) ccServer(SQLDb);
-        		        assert(CheckServer != NULL);
-	    	                if(CheckServer->loadData(NewServer->getName()))
+				ccServer* CheckServer = getServer(NewServer->getName());
+	    	                if(CheckServer)
 					{
 					CheckServer->setSplitReason(Reason);
 					CheckServer->setLastSplitted(::time(NULL));
+					CheckServer->setNetServer(NULL);
 					CheckServer->Update();
 					}
-				delete CheckServer;			     
-				CheckServer = serversMap[NewServer->getCharYY()];
-				if(CheckServer)
-					CheckServer->setNetServer(NULL);
-				else
-					serversMap.erase(serversMap.find(NewServer->getCharYY()));
 				}
 			}
 		break;
@@ -759,7 +745,6 @@ switch( theEvent )
 		inBurst = false;
 		refreshGlines();
 		burstGlines();
-		updateVersions();
 		break;
 		}	
 	case EVT_NICK:
@@ -773,7 +758,6 @@ switch( theEvent )
 		ccUserData* UserData = new (std::nothrow) ccUserData(floodData);
 		NewUser->setCustomData(this,
 			static_cast< void* >( UserData ) );
-				
 		if(checkGates)
 			{
 			string tIP = xIP( NewUser->getIP()).GetNumericIP();
@@ -829,6 +813,26 @@ switch( theEvent )
 								tmpGline->getReason(),
 								tmpGline->getExpires() - ::time(0) ) ;*/
 						}	
+					else
+						{
+						string virtualHost = NewUser->getDescription() + "@";
+						int dots = 0;
+						for(string::size_type ptr = 0;ptr < tIP.size(),dots < 3;++ptr)
+							{
+							if(tIP[ptr] == '.')
+								{
+								++dots;
+								}
+							virtualHost += tIP[ptr];
+							}
+						virtualHost += '*';
+						CurConnections = ++virtualClientsMap[virtualHost];
+						if(CurConnections > userMaxConnection)
+							{
+							MsgChanLog("Virtual clones for %s connections %d\n",
+							    virtualHost.c_str(),CurConnections);
+							}
+						}
 					}
 				}
 			if(!glSet) 
@@ -928,14 +932,11 @@ return true;
 int ccontrol::OnConnect()
 {
 iServer* tmpServer = Network->findServer(getUplink()->getUplinkCharYY());
-ccServer* tServer = serversMap[tmpServer->getCharYY()];
+ccServer* tServer = getServer(tmpServer->getName());
 if(tServer)
 	{
 	tServer->setNetServer(tmpServer);
-	}
-else
-	{
-	serversMap.erase(serversMap.find(tmpServer->getCharYY()));
+	Write("%s V :%s\n",getCharYYXXX().c_str(),tmpServer->getCharYY());
 	}
 
 return xClient::OnConnect();
@@ -2312,7 +2313,7 @@ for(int i =0;i<SQLDb->Tuples();++i)
 	tempServer = new (std::nothrow) ccServer(SQLDb);
 	assert(tempServer != NULL);
 	tempServer->loadDataFromDB(i);
-	serversMap[tempServer->getLastNumeric()] = tempServer;
+	serversMap[tempServer->getName()] = tempServer;
 	}
 return true;
 }
@@ -2879,7 +2880,7 @@ return true;
 const string ccontrol::expandDbServer(const string& Name)
 {
 
-ccServer* tmpServer = getServerName(Name);
+ccServer* tmpServer = getServer(Name);
 if(tmpServer)
 	return tmpServer->getName();
 return "";
@@ -3051,7 +3052,10 @@ uptime %= 60;
 secs = uptime;
 Notice(tmpClient,"Uptime : %dD %dH %dM %dS",days,hours,mins,secs);
 if(checkClones)
+	{
 	Notice(tmpClient,"Monitoring %d diffrent clones hosts\n",clientsIpMap.size());
+	Notice(tmpClient,"and %d diffrent virtual clones hosts\n",virtualClientsMap.size());
+	}	
 if(checkGates)
 	Notice(tmpClient,"Monitoring %d threads out of %d, and there are %d in the waiting queue",gatesCheckingQueue.size()
 		,maxThreads,gatesWaitingQueue.size());
@@ -3077,54 +3081,28 @@ if(!strcasecmp(NewPass,tmpUser->getUserName()))
 return password::PASS_OK;
 }
 
-void ccontrol::updateVersions()
+ccServer* ccontrol::getServer(const string& Name)
 {
-for(serversIterator ptr = serversMap.begin();ptr != serversMap.end();++ptr)
-	{
-	if(ptr->second->getNetServer())
-		Write("%s V :%s\n",getCharYYXXX().c_str(),ptr->second->getLastNumeric().c_str());
-	}
-
-}
-
-ccServer* ccontrol::getServer(const string& Numeric)
-{
-ccServer* tempServer = serversMap[Numeric];
+ccServer* tempServer = serversMap[Name];
 if(tempServer)
 	return tempServer;
-serversMap.erase(serversMap.find(Numeric));
+serversMap.erase(serversMap.find(Name));
 return NULL;
 
 }
 
-ccServer* ccontrol::getServerName(const string& Name)
-{
-
-ccServer* tempServer;
-
-for(serversIterator ptr = serversMap.begin();ptr != serversMap.end();++ptr)
-	{
-	tempServer = ptr->second;
-	if(!match(Name,tempServer->getName()))
-		{
-		return tempServer;
-		}
-	}
-return NULL;
-
-}
 
 void ccontrol::addServer(ccServer* tempServer)
 {
-if(!serversMap[tempServer->getLastNumeric()])
+if(!serversMap[tempServer->getName()])
 	{
-	serversMap[tempServer->getLastNumeric()] = tempServer;
+	serversMap[tempServer->getName()] = tempServer;
 	}
 }
 
 void ccontrol::remServer(ccServer* tempServer)
 {
-serversMap.erase(serversMap.find(tempServer->getLastNumeric()));
+serversMap.erase(serversMap.find(tempServer->getName()));
 }
 
 void *initGate(void* arg)

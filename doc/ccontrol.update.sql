@@ -1,5 +1,5 @@
 
--- "$Id: ccontrol.update.sql,v 1.11 2001/12/30 19:35:09 mrbean_ Exp $"
+-- "$Id: ccontrol.update.sql,v 1.12 2002/01/01 12:42:13 mrbean_ Exp $"
 
 -- ccontrol database changes update
 -- this file will add the new features to an old database
@@ -63,4 +63,5 @@ alter TABLE servers add LastUpdated INT4 NOT NULL;
 
 -- 30/12/01 - Add notice column to the opers table 
 
-alter TABLE opers add Notice BOOLEAN NOT NULL DEFAULT 'n';
+alter TABLE opers add Notice BOOLEAN NOT NULL DEFAULT 't';
+update opers set notice = 't';

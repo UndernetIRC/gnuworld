@@ -3,7 +3,7 @@
  */
 
 #ifndef __CCONTROL_H
-#define __CCONTROL_H "$Id: ccontrol.h,v 1.54 2001/12/30 19:35:10 mrbean_ Exp $"
+#define __CCONTROL_H "$Id: ccontrol.h,v 1.55 2002/01/01 12:42:14 mrbean_ Exp $"
 
 
 #include	<string>
@@ -93,6 +93,7 @@ protected:
 	 */
 	usersMapType			usersMap ;
 
+	
 	typedef usersMapType::iterator     usersIterator;
 	
 
@@ -566,12 +567,8 @@ public:
 	
 	unsigned int checkPassword(string,ccUser*);
 	
-	void updateVersions();
-	
 	ccServer* getServer(const string& );
 	
-	ccServer* getServerName(const string& );
-
 	void	addServer(ccServer*);
 
 	void	remServer(ccServer*);
@@ -697,6 +694,14 @@ public:
 	clientsIpIterator clientsIp_end()
 		{ return clientsIpMap.end(); }
 
+	clientsIpMapType		virtualClientsMap;
+	
+	clientsIpIterator virtualClientsMap_begin()
+		{ return virtualClientsMap.begin(); }
+					
+	clientsIpIterator virtualClientsMap_end()
+		{ return virtualClientsMap.end(); }
+	
 	typedef  usersMapType::const_iterator	usersConstIterator;
 	
 	usersConstIterator		usersMap_begin() const
@@ -704,6 +709,7 @@ public:
 
 	usersConstIterator		usersMap_end() const
 		{ return usersMap.end(); }
+
 
 	typedef  serversMapType::const_iterator	serversConstIterator;
 	

@@ -16,7 +16,7 @@
 #include	"ip.h"
 
 const char iClient_h_rcsId[] = __ICLIENT_H ;
-const char iClient_cc_rcsId[] = "$Id: iClient.cc,v 1.17 2001/07/29 22:44:06 dan_karrels Exp $" ;
+const char iClient_cc_rcsId[] = "$Id: iClient.cc,v 1.18 2002/01/01 12:42:14 mrbean_ Exp $" ;
 const char client_h_rcsId[] = __CLIENT_H ;
 const char Numeric_h_rcsId[] = __NUMERIC_H ;
 const char ip_h_rcsId[] = __IP_H ;
@@ -47,9 +47,7 @@ iClient::iClient( const unsigned int& _uplink,
 	userName( _userName ),
 	IP( xIP( _hostBase64, true ).GetLongIP() ),
 	insecureHost( _insecureHost ),
-#ifdef CLIENT_DESC
 	description( _description),
-#endif
 	connectTime( _connectTime ),
 	mode( 0 )
 {

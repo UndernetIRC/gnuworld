@@ -17,7 +17,7 @@
 #include	"ccUser.h"
 #include	"misc.h"
 
-const char LEARNNETCommand_cc_rcsId[] = "$Id: LEARNNETCommand.cc,v 1.9 2001/12/28 16:28:47 mrbean_ Exp $";
+const char LEARNNETCommand_cc_rcsId[] = "$Id: LEARNNETCommand.cc,v 1.10 2002/01/01 12:42:14 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -62,7 +62,7 @@ for( ; ptr != end ; ptr++ )
 		}
 	else if((!server->isJuped(CurServer)) && (strcmp(CurServer->getName().c_str(),bot->getUplinkName().c_str())))
 		{
-		if(!bot->getServer(CurServer->getCharYY()))
+		if(!bot->getServer(CurServer->getName()))
 			{ //If the server isnt in the database , update it
 			NewServer = new (std::nothrow) ccServer(bot->SQLDb);
 			NewServer->setName(CurServer->getName());

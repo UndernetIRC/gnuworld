@@ -14,7 +14,7 @@
 #include	"Network.h"
 #include	"Constants.h"
 
-const char REMSERVERCommand_cc_rcsId[] = "$Id: REMSERVERCommand.cc,v 1.6 2001/12/30 19:35:10 mrbean_ Exp $";
+const char REMSERVERCommand_cc_rcsId[] = "$Id: REMSERVERCommand.cc,v 1.7 2002/01/01 12:42:14 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -47,7 +47,7 @@ if(st[1].size() > server::MaxName)
 	return false;
 	}
 
-ccServer* tmpServer = bot->getServerName(bot->removeSqlChars(st[1]));
+ccServer* tmpServer = bot->getServer(bot->removeSqlChars(st[1]));
 if(!tmpServer)
 	{
 	bot->Notice(theClient, "Server %s is not  in my database!\n",st [ 1 ].c_str());

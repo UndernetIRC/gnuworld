@@ -2,7 +2,7 @@
  */
 
 #ifndef __ICLIENT_H
-#define __ICLIENT_H "$Id: iClient.h,v 1.19 2001/08/26 22:22:55 dan_karrels Exp $"
+#define __ICLIENT_H "$Id: iClient.h,v 1.20 2002/01/01 12:42:14 mrbean_ Exp $"
 
 #include	<string>
 #include	<list>
@@ -119,13 +119,13 @@ public:
 	inline const string getNickUserHost() const
 		{ return (nickName + '!' + userName + '@' + insecureHost) ; }
 
-#ifdef CLIENT_DESC
+
 	/**
 	 * Retrieve client's 'real-name' field.
 	 */
 	inline const string& getDescription() const
 		{ return description ; }
-#endif
+
 
 	/**
 	 * Retrieve the iClient's connection time.
@@ -414,12 +414,12 @@ protected:
 	 */
 	string		insecureHost ;
 
-#ifdef CLIENT_DESC
+
 	/**
 	 * This client's 'real-name' field data.
 	 */
 	string		description ;
-#endif // CLIENT_DESC
+
 
 	/**
 	 * The time at which this iClient connected to the network.
