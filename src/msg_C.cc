@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_C.cc,v 1.13 2002/11/07 21:49:18 dan_karrels Exp $
+ * $Id: msg_C.cc,v 1.14 2002/11/07 22:15:58 dan_karrels Exp $
  */
 
 #include	<new>
@@ -45,7 +45,7 @@ const char xparameters_h_rcsId[] = __XPARAMETERS_H ;
 const char iClient_h_rcsId[] = __ICLIENT_H ;
 const char Channel_h_rcsId[] = __CHANNEL_H ;
 const char ChannelUser_h_rcsId[] = __CHANNELUSER_H ;
-const char msg_C_cc_rcsId[] = "$Id: msg_C.cc,v 1.13 2002/11/07 21:49:18 dan_karrels Exp $" ;
+const char msg_C_cc_rcsId[] = "$Id: msg_C.cc,v 1.14 2002/11/07 22:15:58 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -144,19 +144,21 @@ for( StringTokenizer::const_iterator ptr = st.begin() ; ptr != st.end() ;
 	// Add this channel to the client's channel structure.
 	if( !theClient->addChannel( theChan ) )
 		{
-		elog	<< "msg_C> Unable to add channel "
-			<< *theChan
-			<< " to iClient "
-			<< *theClient ;
-
 		if( theClient->findChannel( theChan ) )
 			{
-			elog	<< " (already exists)" ;
+			// This user<->channel association already
+			// exists.  This not good, but no harm done.
 			}
+		else
+			{
+			elog	<< "msg_C> Unable to add channel "
+				<< *theChan
+				<< " to iClient "
+				<< *theClient
+				<< endl ;
 
-		elog	<< endl ;
-
-		continue ;
+			continue ;
+			}
 		}
 
 	// Create a new ChannelUser to represent this iClient's
@@ -173,28 +175,35 @@ for( StringTokenizer::const_iterator ptr = st.begin() ; ptr != st.end() ;
 	// Add the ChannelUser to the Channel's information
 	if( !theChan->addUser( theUser ) )
 		{
-		// Addition failed, log the error
-		elog	<< "msg_C> Unable to add user "
-			<< theUser->getNickName()
-			<< " to channel "
-			<< theChan->getName() ;
-
 		if( theChan->findUser( theUser->getClient() ) != 0 )
 			{
-			elog	<< " (already exists)" ;
+			// The user<->channel association already exists.
+			// The Channel::findUser() method inserts
+			// by numeric, not by pointer, so memory
+			// leaks here will never be a problem
+			// (addUser() will fail if the numeric exists,
+			// and will not add another instance of the
+			// same user to the channel).
 			}
+		else
+			{
+			// Addition failed, log the error
+			elog	<< "msg_C> Unable to add user "
+				<< theUser->getNickName()
+				<< " to channel "
+				<< theChan->getName()
+				<< endl ;
 
-		elog	<< endl ;
+			// Prevent a memory leak by deallocating the
+			// unused ChannelUser structure
+			delete theUser ; theUser = 0 ;
 
-		// Prevent a memory leak by deallocating the unused
-		// ChannelUser structure
-		delete theUser ; theUser = 0 ;
+			// Remove the channel information from the client
+			theClient->removeChannel( theChan ) ;
 
-		// Remove the channel information from the client
-		theClient->removeChannel( theChan ) ;
-
-		// Continue to next channel
-		continue ;
+			// Continue to next channel
+			continue ;
+			}
 		}
 
 	// Notify all listening xClients of this event
