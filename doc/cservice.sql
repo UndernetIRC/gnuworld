@@ -1,8 +1,10 @@
 ------------------------------------------------------------------------------------
--- "$Id: cservice.sql,v 1.61 2002/02/16 06:14:01 nighty Exp $"
+-- "$Id: cservice.sql,v 1.62 2002/03/07 12:09:56 nighty Exp $"
 -- Channel service DB SQL file for PostgreSQL.
 
 -- ChangeLog:
+-- 2002-03-07: nighty
+--             Updated channel_log/user_log events types.
 -- 2002-02-16: nighty
 --             Added one field to 'users' for TimeZone.
 -- 2001-12-29: nighty
@@ -275,6 +277,10 @@ CREATE TABLE userlog (
 -- 4 -- EV_MISC - Uncategorised event.
 -- 5 -- EV_COMMENT - Admin comment on username.
 -- 6 -- EV_MGRCHANGE - When a user status is to swith manager with another user (also logged) on a channel
+-- 7 -- EV_MAILCHANGE - When a user's email gets changed
+-- 8 -- EV_PWRESET - When a user's verif q/a get changed
+-- 9 -- EV_FPASSWD - When a user uses "Forgotten Password"
+-- 10-- EV_PWCHANGE - When a user changes his password on the web (New Password)
 	message TEXT,
 	last_updated INT4 NOT NULL 
 );
