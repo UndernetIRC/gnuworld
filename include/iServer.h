@@ -4,7 +4,7 @@
  */
 
 #ifndef __ISERVER_H
-#define __ISERVER_H "$Id: iServer.h,v 1.6 2001/03/01 01:58:17 dan_karrels Exp $"
+#define __ISERVER_H "$Id: iServer.h,v 1.7 2001/08/08 20:01:36 gte Exp $"
 
 #include	<iostream>
 #include	<string>
@@ -96,6 +96,12 @@ public:
 		{ return startTime ; }
 
 	/**
+	 * Return true if no BURST state exists, false otherwise.
+	 */
+	virtual bool isBursting() const
+		{ return bursting ; }
+
+	/**
 	 * Nice debugging method for outputting the iServer's
 	 * information to an ELog stream.
 	 */
@@ -168,6 +174,11 @@ protected:
 	 * This server's character array numeric.
 	 */
 	char		charYY[ 3 ] ;
+
+	/**
+	 * This variable is true when this server is bursting.
+	 */
+	bool		bursting ;
 
 } ;
 

@@ -8,7 +8,7 @@
 #include	"Numeric.h"
 
 const char iServer_h_rcsId[] = __ISERVER_H ;
-const char iServer_cc_rcsId[] = "$Id: iServer.cc,v 1.3 2001/03/01 01:58:17 dan_karrels Exp $" ;
+const char iServer_cc_rcsId[] = "$Id: iServer.cc,v 1.4 2001/08/08 20:05:57 gte Exp $" ;
 
 using std::string ;
 
@@ -21,7 +21,8 @@ iServer::iServer( const unsigned int& _uplink,
 	const time_t& _connectTime )
 : uplinkIntYY( _uplink ),
 	name( _name ),
-	connectTime( _connectTime )
+	connectTime( _connectTime ),
+	bursting( false )
 {
 
 if( 5 == _yxx.size() )

@@ -14,7 +14,7 @@
 #include	"ELog.h"
 #include	"xparameters.h"
 
-const char msg_S_cc_rcsId[] = "$Id: msg_S.cc,v 1.4 2001/07/29 22:44:06 dan_karrels Exp $" ;
+const char msg_S_cc_rcsId[] = "$Id: msg_S.cc,v 1.5 2001/08/08 20:05:57 gte Exp $" ;
 const char server_h_rcsId[] = __SERVER_H ;
 const char events_h_rcsId[] = __EVENTS_H ;
 const char Network_h_rcsId[] = __NETWORK_H ;
@@ -108,6 +108,11 @@ iServer* newServer = new (std::nothrow) iServer( uplinkIntYY,
 		serverName,
 		connectTime ) ;
 assert( newServer != 0 ) ;
+
+// If we've finished our sync to the network, then this S
+// must be another server merging later on.
+if (!bursting)
+	newServer->bursting = true;
 
 Network->addServer( newServer ) ;
 //elog << "Added server: " << *newServer ;

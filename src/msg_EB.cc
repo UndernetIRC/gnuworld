@@ -14,7 +14,7 @@
 #include	"ELog.h"
 #include	"xparameters.h"
 
-const char msg_EB_cc_rcsId[] = "$Id: msg_EB.cc,v 1.3 2001/06/14 22:14:13 dan_karrels Exp $" ;
+const char msg_EB_cc_rcsId[] = "$Id: msg_EB.cc,v 1.4 2001/08/08 20:05:57 gte Exp $" ;
 const char server_h_rcsId[] = __SERVER_H ;
 const char iServer_h_rcsId[] = __ISERVER_H ;
 const char events_h_rcsId[] = __EVENTS_H ;
@@ -37,6 +37,8 @@ if( !strcmp( params[ 0 ], Uplink->getCharYY() ) )
 	{
 	// It's my uplink
 	burstEnd = ::time( 0 ) ;
+
+	Uplink->bursting = false;
 
 	// Signal that all Write()'s should write to the
 	// normal output buffer
@@ -78,10 +80,10 @@ if( !strcmp( params[ 0 ], Uplink->getCharYY() ) )
 
 	elog	<< "*** Completed net burst"
 		<< endl ;
-	}
-
-if( !bursting )
+	} else
 	{
+	/* Its another server that has just completed its net.burst. */
+
 	iServer* theServer = Network->findServer( params[ 0 ] ) ;
 	if( NULL == theServer )
 		{
@@ -89,7 +91,9 @@ if( !bursting )
 			<< params[ 0 ]
 			<< endl ;
 		return -1 ;
-		}
+	}
+
+	theServer->bursting = false;
 
 	PostEvent( EVT_BURST_CMPLT, static_cast< void* >( theServer ) ) ;
 	}
