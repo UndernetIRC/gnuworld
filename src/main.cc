@@ -1,5 +1,5 @@
 /* main.cc
- * $Id: main.cc,v 1.7 2000/08/01 16:44:09 dan_karrels Exp $
+ * $Id: main.cc,v 1.8 2000/08/04 23:43:19 dan_karrels Exp $
  */
 
 #include	<fstream>
@@ -29,7 +29,7 @@
 using namespace gnuworld ;
 
 const char config_h_rcsId[] = __CONFIG_H ;
-const char main_cc_rcsId[] = "$Id: main.cc,v 1.7 2000/08/01 16:44:09 dan_karrels Exp $" ;
+const char main_cc_rcsId[] = "$Id: main.cc,v 1.8 2000/08/04 23:43:19 dan_karrels Exp $" ;
 
 using std::cerr ;
 using std::clog ;
@@ -284,6 +284,7 @@ while( keepRunning )
 	if( 0 == messages )
 		{
 		// No data handled, pause
+		Server->CheckTimers() ;
 		::usleep( 1000 ) ;
 		}
 

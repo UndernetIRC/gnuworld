@@ -37,7 +37,7 @@
 //#include	"moduleLoader.h"
 
 const char xServer_h_rcsId[] = __XSERVER_H ;
-const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.18 2000/08/04 23:39:09 dan_karrels Exp $" ;
+const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.19 2000/08/04 23:43:19 dan_karrels Exp $" ;
 
 using std::string ;
 using std::vector ;
@@ -4139,7 +4139,7 @@ timerQueue.push( timerQueueType::value_type( absTime, ti ) ) ;
 return ID ;
 }
 
-unsigned int xServer::checkTimers()
+unsigned int xServer::CheckTimers()
 {
 
 if( timerQueue.empty() || bursting )

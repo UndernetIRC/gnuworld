@@ -17,7 +17,7 @@
  */
 
 #ifndef __XSERVER_H
-#define __XSERVER_H "$Id: server.h,v 1.7 2000/08/04 23:39:09 dan_karrels Exp $"
+#define __XSERVER_H "$Id: server.h,v 1.8 2000/08/04 23:43:19 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
@@ -556,7 +556,7 @@ public:
 	 * Execute any waiting client timers.
 	 * Return the number of timers executed.
 	 */
-	virtual unsigned int checkTimers() ;
+	virtual unsigned int CheckTimers() ;
 
 protected:
 
