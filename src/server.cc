@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server.cc,v 1.157 2003/05/27 00:23:23 dan_karrels Exp $
+ * $Id: server.cc,v 1.158 2003/05/27 23:13:38 dan_karrels Exp $
  */
 
 #include	<sys/time.h>
@@ -72,7 +72,7 @@
 #include	"Connection.h"
 
 const char server_h_rcsId[] = __SERVER_H ;
-const char server_cc_rcsId[] = "$Id: server.cc,v 1.157 2003/05/27 00:23:23 dan_karrels Exp $" ;
+const char server_cc_rcsId[] = "$Id: server.cc,v 1.158 2003/05/27 23:13:38 dan_karrels Exp $" ;
 const char config_h_rcsId[] = __CONFIG_H ;
 const char misc_h_rcsId[] = __MISC_H ;
 const char events_h_rcsId[] = __EVENTS_H ;
@@ -2554,12 +2554,14 @@ clog	<< "Number of servers: " << Network->serverList_size() << endl ;
 clog	<< "Number of clients: " << Network->clientList_size() << endl ;
 clog	<< "Last burst duration: " << (burstEnd - burstStart)
 	<< " seconds" << endl ;
+#ifdef EDEBUG
 clog	<< "Read " << burstBytes
 	<< " bytes and processed " << burstLines
 	<< " commands over the last "
 	<< (::time( 0 ) - burstStart)
 	<< " seconds."
 	<< endl ;
+#endif
 }
 
 xServer::timerID xServer::RegisterTimer( const time_t& absTime,
