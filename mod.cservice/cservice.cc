@@ -610,7 +610,7 @@ else if(Command == "VERSION")
 	xClient::DoCTCP(theClient, CTCP,
 		"Undernet P10 Channel Services Version 2 ["
 		__DATE__ " " __TIME__
-		"] ($Id: cservice.cc,v 1.104 2001/02/15 23:31:33 gte Exp $)");
+		"] ($Id: cservice.cc,v 1.105 2001/02/15 23:42:02 gte Exp $)");
 	}
 else if(Command == "PROBLEM?")
 	{
@@ -1082,19 +1082,25 @@ if (!reopQ.empty())
 	if (ptr->second <= currentTime()) 
 		{
 		Channel* tmpChan = Network->findChannel(ptr->first);
-		if (tmpChan) 
+		if (tmpChan)
 			{ 
-			strstream s;
-			s	<< MyUplink->getCharYY()
-				<< " M "
-				<< tmpChan->getName()
-				<< " +o "
-				<< getCharYYXXX()
-				<< ends;
-			
-				Write( s );
-				delete[] s.str();
-				elog << "cservice::OnTimer> REOP " << tmpChan->getName() << endl;
+			ChannelUser* tmpChanUser;
+			tmpChanUser = tmpChan->findUser(me);
+			/* Don't op ourself if we're already opped.. */
+			if (tmpChanUser && !tmpChanUser->getMode(ChannelUser::MODE_O))
+				{
+				strstream s;
+				s	<< MyUplink->getCharYY()
+					<< " M "
+					<< tmpChan->getName()
+					<< " +o "
+					<< getCharYYXXX()
+					<< ends;
+				
+					Write( s );
+					delete[] s.str();
+					elog << "cservice::OnTimer> REOP " << tmpChan->getName() << endl;
+				}
 			} 
 			reopQ.erase(ptr->first); 
 		}
