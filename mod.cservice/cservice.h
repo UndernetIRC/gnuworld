@@ -1,5 +1,5 @@
 #ifndef __CSERVICE_H
-#define __CSERVICE_H "$Id: cservice.h,v 1.39 2001/02/04 03:22:53 gte Exp $"
+#define __CSERVICE_H "$Id: cservice.h,v 1.40 2001/02/04 04:09:20 gte Exp $"
 
 #include	<string>
 #include	<vector>
@@ -229,6 +229,7 @@ public:
 
 	// Deop everyone on this channel.
 	void deopAllOnChan(Channel*); 
+	void deopAllUnAuthedOnChan(Channel*);
 
 	/* sets a description (url) topic combo. */
 	void doAutoTopic(sqlChannel* theChan);

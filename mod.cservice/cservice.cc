@@ -564,7 +564,7 @@ else if(Command == "VERSION")
 	xClient::DoCTCP(theClient, CTCP,
 		"Undernet P10 Channel Services Version 2 ["
 		__DATE__ " " __TIME__
-		"] ($Id: cservice.cc,v 1.82 2001/02/04 03:22:53 gte Exp $)");
+		"] ($Id: cservice.cc,v 1.83 2001/02/04 04:09:20 gte Exp $)");
 	}
 else if(Command == "PROBLEM?")
 	{
@@ -1535,6 +1535,49 @@ if( !deopList.empty() )
 }
 
 /**
+ * Support function to deop all non authed opped users on a channel.
+ */
+void cservice::deopAllUnAuthedOnChan(Channel* theChan)
+{ 
+if( !theChan )
+	{
+	/* Don't try this on a null channel. */
+	return;
+	}
+
+vector< iClient* > deopList;
+
+for( Channel::const_userIterator ptr = theChan->userList_begin();
+	ptr != theChan->userList_end() ; ++ptr )
+	{
+	if( ptr->second->getMode(ChannelUser::MODE_O))
+		{
+			/* Are they authed? */
+			sqlUser* authUser = isAuthed(ptr->second->getClient(), false);
+			sqlChannel* reggedChan = getChannelRecord(theChan->getName());
+ 
+			if (!authUser)
+			{
+				/* Not authed, deop this guy. */
+				deopList.push_back( ptr->second->getClient() );
+
+			/* Authed but no access? Tough. :) */
+			} else if ((reggedChan) && !(getEffectiveAccessLevel(authUser, reggedChan, false) >= level::op))
+			{
+				deopList.push_back( ptr->second->getClient() );
+			} 
+
+		} // if opped.
+	} // forall users in channel.
+
+if( !deopList.empty() )
+	{
+	DeOp(theChan, deopList);
+	}
+
+}
+ 
+/**
  * Handler for registered channel events.
  * Performs a number of functions, autoop, autovoice, bankicks, etc.
  * TODO: This method is entirely too large.
@@ -1568,7 +1611,7 @@ switch( whichEvent )
 		 * First thing we do - check if this person is banned.
 		 * If so, they're booted out.
 		 */ 
-		if (checkBansOnJoin(reggedChan, theClient))
+		if (checkBansOnJoin(theChan, reggedChan, theClient))
 			{
 			break;
 			}
@@ -1684,7 +1727,7 @@ while (ptr != banList->end())
 			strstream s;
 			s	<< getCharYYXXX()
 				<< " M "
-				<< thedChan->getName()
+				<< theChan->getName()
 				<< " +b "
 				<< theBan->getBanMask()
 				<< ends;
