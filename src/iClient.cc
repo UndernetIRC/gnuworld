@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: iClient.cc,v 1.25 2002/11/06 21:29:29 dan_karrels Exp $
+ * $Id: iClient.cc,v 1.26 2002/11/07 21:49:18 dan_karrels Exp $
  */
 
 #include	<new>
@@ -35,7 +35,7 @@
 #include	"ip.h"
 
 const char iClient_h_rcsId[] = __ICLIENT_H ;
-const char iClient_cc_rcsId[] = "$Id: iClient.cc,v 1.25 2002/11/06 21:29:29 dan_karrels Exp $" ;
+const char iClient_cc_rcsId[] = "$Id: iClient.cc,v 1.26 2002/11/07 21:49:18 dan_karrels Exp $" ;
 const char client_h_rcsId[] = __CLIENT_H ;
 const char Numeric_h_rcsId[] = __NUMERIC_H ;
 const char ip_h_rcsId[] = __IP_H ;
@@ -287,6 +287,13 @@ if( std::find( channelList.begin(), channelList.end(), theChan )
 channelList.push_front( theChan ) ;
 
 return true ;
+}
+
+bool iClient::findChannel( const Channel* theChan ) const
+{
+// Doesn't matter if theChan is NULL, it is never dereferenced
+return std::find( channelList.begin(), channelList.end(),
+	theChan ) != channelList.end() ;
 }
 
 } // namespace gnuworld

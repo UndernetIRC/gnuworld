@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_M.cc,v 1.18 2002/11/06 21:29:30 dan_karrels Exp $
+ * $Id: msg_M.cc,v 1.19 2002/11/07 21:49:18 dan_karrels Exp $
  */
 
 #include	<new>
@@ -37,7 +37,7 @@
 #include	"StringTokenizer.h"
 #include	"ServerCommandHandler.h"
 
-const char msg_M_cc_rcsId[] = "$Id: msg_M.cc,v 1.18 2002/11/06 21:29:30 dan_karrels Exp $" ;
+const char msg_M_cc_rcsId[] = "$Id: msg_M.cc,v 1.19 2002/11/07 21:49:18 dan_karrels Exp $" ;
 const char misc_h_rcsId[] = __MISC_H ;
 const char events_h_rcsId[] = __EVENTS_H ;
 const char server_h_rcsId[] = __SERVER_H ;
@@ -268,9 +268,9 @@ for( const char* modePtr = Param[ 2 ] ; *modePtr ; ++modePtr )
 			if( polarity && targetUser->isZombie() )
 				{
 				targetUser->removeZombie() ;
-				elog	<< "msg_M> Removing "
-					<< "zombie"
-					<< endl ;
+//				elog	<< "msg_M> Removing "
+//					<< "zombie"
+//					<< endl ;
 				}
 			break ;
 			}

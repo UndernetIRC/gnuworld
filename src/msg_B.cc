@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_B.cc,v 1.16 2002/11/04 16:36:04 dan_karrels Exp $
+ * $Id: msg_B.cc,v 1.17 2002/11/07 21:49:18 dan_karrels Exp $
  */
 
 #include	<sys/types.h>
@@ -50,7 +50,7 @@ const char Channel_h_rcsId[] = __CHANNEL_H ;
 const char ChannelUser_h_rcsId[] = __CHANNELUSER_H ;
 const char Network_h_rcsId[] = __NETWORK_H ;
 const char iClient_h_rcsId[] = __ICLIENT_H ;
-const char msg_B_cc_rcsId[] = "$Id: msg_B.cc,v 1.16 2002/11/04 16:36:04 dan_karrels Exp $" ;
+const char msg_B_cc_rcsId[] = "$Id: msg_B.cc,v 1.17 2002/11/07 21:49:18 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -101,14 +101,19 @@ CREATE_LOADER(msg_B)
 //
 // Q B #hgsd 933357379 +tn PIs,OfK,OAu,PZl:o,eAA
 //
+// Here is a special case, when the only occupant of the channel
+// is a zombie:
+// BG B #nails 1036089823
+//
 bool msg_B::Execute( const xParameters& Param )
 {
 
 // Make sure there are at least four arguments supplied:
 // servernumeric #channel time_stamp arguments
-if( Param.size() < 4 )
+if( Param.size() < 3 )
 	{
-	elog	<< "msg_B> Invalid number of arguments"
+	elog	<< "msg_B> Invalid number of arguments: "
+		<< Param
 		<< endl ;
 	return false ;
 	}
@@ -153,6 +158,12 @@ else
 		theChan->setCreationTime( newCreationTime ) ;
 		// TODO: Clear channel modes etc?
 		}
+	}
+
+if( 3 == Param.size() )
+	{
+	// Special case above, zombie in channel, just leave it
+	return true ;
 	}
 
 // Parse out the channel state

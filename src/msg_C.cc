@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_C.cc,v 1.12 2002/07/31 13:53:52 dan_karrels Exp $
+ * $Id: msg_C.cc,v 1.13 2002/11/07 21:49:18 dan_karrels Exp $
  */
 
 #include	<new>
@@ -45,7 +45,7 @@ const char xparameters_h_rcsId[] = __XPARAMETERS_H ;
 const char iClient_h_rcsId[] = __ICLIENT_H ;
 const char Channel_h_rcsId[] = __CHANNEL_H ;
 const char ChannelUser_h_rcsId[] = __CHANNELUSER_H ;
-const char msg_C_cc_rcsId[] = "$Id: msg_C.cc,v 1.12 2002/07/31 13:53:52 dan_karrels Exp $" ;
+const char msg_C_cc_rcsId[] = "$Id: msg_C.cc,v 1.13 2002/11/07 21:49:18 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -147,8 +147,14 @@ for( StringTokenizer::const_iterator ptr = st.begin() ; ptr != st.end() ;
 		elog	<< "msg_C> Unable to add channel "
 			<< *theChan
 			<< " to iClient "
-			<< *theClient
-			<< endl ;
+			<< *theClient ;
+
+		if( theClient->findChannel( theChan ) )
+			{
+			elog	<< " (already exists)" ;
+			}
+
+		elog	<< endl ;
 
 		continue ;
 		}
@@ -171,8 +177,14 @@ for( StringTokenizer::const_iterator ptr = st.begin() ; ptr != st.end() ;
 		elog	<< "msg_C> Unable to add user "
 			<< theUser->getNickName()
 			<< " to channel "
-			<< theChan->getName()
-			<< endl ;
+			<< theChan->getName() ;
+
+		if( theChan->findUser( theUser->getClient() ) != 0 )
+			{
+			elog	<< " (already exists)" ;
+			}
+
+		elog	<< endl ;
 
 		// Prevent a memory leak by deallocating the unused
 		// ChannelUser structure

@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: Channel.cc,v 1.36 2002/10/31 18:52:52 dan_karrels Exp $
+ * $Id: Channel.cc,v 1.37 2002/11/07 21:49:17 dan_karrels Exp $
  */
 
 #include	<new>
@@ -38,7 +38,7 @@
 #include	"ConnectionManager.h"
 
 const char Channel_h_rcsId[] = __CHANNEL_H ;
-const char Channel_cc_rcsId[] = "$Id: Channel.cc,v 1.36 2002/10/31 18:52:52 dan_karrels Exp $" ;
+const char Channel_cc_rcsId[] = "$Id: Channel.cc,v 1.37 2002/11/07 21:49:17 dan_karrels Exp $" ;
 const char iClient_h_rcsId[] = __ICLIENT_H ;
 const char ChannelUser_h_rcsId[] = __CHANNELUSER_H ;
 const char Network_h_rcsId[] = __NETWORK_H ;
@@ -218,7 +218,6 @@ return true ;
 bool Channel::getUserMode( const ChannelUser::modeType& whichMode,
 	iClient* theClient ) const
 {
-
 // findUser() is also public, and so will verify theClient's pointer
 ChannelUser* theChanUser = findUser( theClient ) ;
 if( NULL == theChanUser )

@@ -17,11 +17,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: iClient.h,v 1.34 2002/11/07 20:13:56 dan_karrels Exp $
+ * $Id: iClient.h,v 1.35 2002/11/07 21:49:17 dan_karrels Exp $
  */
 
 #ifndef __ICLIENT_H
-#define __ICLIENT_H "$Id: iClient.h,v 1.34 2002/11/07 20:13:56 dan_karrels Exp $"
+#define __ICLIENT_H "$Id: iClient.h,v 1.35 2002/11/07 21:49:17 dan_karrels Exp $"
 
 #include	<string>
 #include	<list>
@@ -266,6 +266,11 @@ public:
 	 * Remove a channel from this user's channel patronage structure.
 	 */
 	bool removeChannel( Channel* theChannel ) ;
+
+	/**
+	 * Return true if this iClient is in the given channel.
+	 */
+	bool findChannel( const Channel* theChannel ) const ;
 
 	/**
 	 * Clear this client's list of channels.  No heap space needs

@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: Channel.h,v 1.25 2002/10/31 18:52:50 dan_karrels Exp $
+ * $Id: Channel.h,v 1.26 2002/11/07 21:49:17 dan_karrels Exp $
  */
 
 #ifndef __CHANNEL_H
-#define __CHANNEL_H "$Id: Channel.h,v 1.25 2002/10/31 18:52:50 dan_karrels Exp $"
+#define __CHANNEL_H "$Id: Channel.h,v 1.26 2002/11/07 21:49:17 dan_karrels Exp $"
 
 #include	<string>
 #include	<map>
@@ -422,8 +422,8 @@ public:
 	 */
 	friend ELog& operator<<( ELog& out, const Channel& rhs )
 		{
-		out	<< "Name: " << rhs.name << endl
-			<< "Creation time: " << rhs.creationTime ;
+		out	<< "Name: " << rhs.name
+			<< ", creation time: " << rhs.creationTime ;
 		return out ;
 		}
 
