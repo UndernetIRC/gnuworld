@@ -145,7 +145,7 @@ target_alias = @target_alias@
 threadLib = @threadLib@
 topdir = @topdir@
 
-bin_PROGRAMS = stringtokenizer econfig gThread signal
+bin_PROGRAMS = stringtokenizer econfig gThread signal match
 
 stringtokenizer_SOURCES = stringtokenizer.cc
 stringtokenizer_LDFLAGS = $(glibdir)/libgnuworld.la
@@ -162,13 +162,17 @@ gThread_DEPENDENCIES = $(glibdir)/libgnuworld.la
 signal_SOURCES = signal.cc
 signal_LDFLAGS = $(glibdir)/libgnuworld.la @threadLib@
 signal_DEPENDENCIES = $(glibdir)/libgnuworld.la
+
+match_SOURCES = match.cc
+match_LDFLAGS = $(glibdir)/libgnuworld.la
+match_DEPENDENCIES = $(glibdir)/libgnuworld.la
 subdir = test
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = $(top_builddir)/include/defs.h
 CONFIG_CLEAN_FILES =
 bin_PROGRAMS = stringtokenizer$(EXEEXT) econfig$(EXEEXT) \
-	gThread$(EXEEXT) signal$(EXEEXT)
+	gThread$(EXEEXT) signal$(EXEEXT) match$(EXEEXT)
 PROGRAMS = $(bin_PROGRAMS)
 
 am_econfig_OBJECTS = econfig.$(OBJEXT)
@@ -177,6 +181,9 @@ econfig_LDADD = $(LDADD)
 am_gThread_OBJECTS = gThread.$(OBJEXT)
 gThread_OBJECTS = $(am_gThread_OBJECTS)
 gThread_LDADD = $(LDADD)
+am_match_OBJECTS = match.$(OBJEXT)
+match_OBJECTS = $(am_match_OBJECTS)
+match_LDADD = $(LDADD)
 am_signal_OBJECTS = signal.$(OBJEXT)
 signal_OBJECTS = $(am_signal_OBJECTS)
 signal_LDADD = $(LDADD)
@@ -188,7 +195,7 @@ DEFAULT_INCLUDES =  -I. -I$(srcdir) -I$(top_builddir)/include
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
 @AMDEP_TRUE@DEP_FILES = ./$(DEPDIR)/econfig.Po ./$(DEPDIR)/gThread.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/signal.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/match.Po ./$(DEPDIR)/signal.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/stringtokenizer.Po
 CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
@@ -198,10 +205,10 @@ LTCXXCOMPILE = $(LIBTOOL) --mode=compile $(CXX) $(DEFS) \
 CXXLD = $(CXX)
 CXXLINK = $(LIBTOOL) --mode=link $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) \
 	$(AM_LDFLAGS) $(LDFLAGS) -o $@
-DIST_SOURCES = $(econfig_SOURCES) $(gThread_SOURCES) $(signal_SOURCES) \
-	$(stringtokenizer_SOURCES)
+DIST_SOURCES = $(econfig_SOURCES) $(gThread_SOURCES) $(match_SOURCES) \
+	$(signal_SOURCES) $(stringtokenizer_SOURCES)
 DIST_COMMON = Makefile.am Makefile.in
-SOURCES = $(econfig_SOURCES) $(gThread_SOURCES) $(signal_SOURCES) $(stringtokenizer_SOURCES)
+SOURCES = $(econfig_SOURCES) $(gThread_SOURCES) $(match_SOURCES) $(signal_SOURCES) $(stringtokenizer_SOURCES)
 
 all: all-am
 
@@ -247,6 +254,9 @@ econfig$(EXEEXT): $(econfig_OBJECTS) $(econfig_DEPENDENCIES)
 gThread$(EXEEXT): $(gThread_OBJECTS) $(gThread_DEPENDENCIES) 
 	@rm -f gThread$(EXEEXT)
 	$(CXXLINK) $(gThread_LDFLAGS) $(gThread_OBJECTS) $(gThread_LDADD) $(LIBS)
+match$(EXEEXT): $(match_OBJECTS) $(match_DEPENDENCIES) 
+	@rm -f match$(EXEEXT)
+	$(CXXLINK) $(match_LDFLAGS) $(match_OBJECTS) $(match_LDADD) $(LIBS)
 signal$(EXEEXT): $(signal_OBJECTS) $(signal_DEPENDENCIES) 
 	@rm -f signal$(EXEEXT)
 	$(CXXLINK) $(signal_LDFLAGS) $(signal_OBJECTS) $(signal_LDADD) $(LIBS)
@@ -262,6 +272,7 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/econfig.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gThread.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/match.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/signal.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/stringtokenizer.Po@am__quote@
 
