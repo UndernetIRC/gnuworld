@@ -444,7 +444,7 @@ int cservice::OnCTCP( iClient* theClient, const string& CTCP,
 
 	if(Command == "VERSION")
 	{
-		xClient::DoCTCP(theClient, CTCP.c_str(), "Undernet P10 Channel Services Version 2 [" __DATE__ " " __TIME__ "] ($Id: cservice.cc,v 1.45 2001/01/16 20:03:40 gte Exp $)");
+		xClient::DoCTCP(theClient, CTCP.c_str(), "Undernet P10 Channel Services Version 2 [" __DATE__ " " __TIME__ "] ($Id: cservice.cc,v 1.46 2001/01/16 23:40:23 gte Exp $)");
 		return true;
 	}
  
@@ -851,7 +851,7 @@ int cservice::OnTimer(xServer::timerID, void*)
 					newChan->setAllMembers(i);
 				 	sqlChannelCache.insert(sqlChannelHashType::value_type(newChan->getName(), newChan));
 					/* Join the newly registered channel. */
-					Join(newChan->getName(), newChan->getChannelMode(), 0, true);
+					//Join(newChan->getName(), newChan->getChannelMode(), 0, true);
 				}
 			
 			}

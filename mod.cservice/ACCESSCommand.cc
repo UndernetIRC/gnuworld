@@ -5,10 +5,10 @@
  * Initial Version.
  *
  * Displays all "Level" records for a specified channel.
- * Can optionally narrow down selection using a number of switches. (TODO).
+ * Can optionally narrow down selection using a number of switches.
  * Can display all channels a user has access on (TODO). 
  *
- * $Id: ACCESSCommand.cc,v 1.9 2001/01/16 23:20:10 gte Exp $
+ * $Id: ACCESSCommand.cc,v 1.10 2001/01/16 23:40:23 gte Exp $
  */
 
 #include	<string>
@@ -18,7 +18,7 @@
 #include	"cservice.h"
 #include	"libpq++.h"
 
-const char ACCESSCommand_cc_rcsId[] = "$Id: ACCESSCommand.cc,v 1.9 2001/01/16 23:20:10 gte Exp $" ;
+const char ACCESSCommand_cc_rcsId[] = "$Id: ACCESSCommand.cc,v 1.10 2001/01/16 23:40:23 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -61,6 +61,19 @@ bool ACCESSCommand::Exec( iClient* theClient, const string& Message )
 		return false;
 	} 
 
+	unsigned int specificId = 0;
+
+	if ( st.size() == 3 ) /* /msg x access #foo username */
+	{
+		sqlUser* targetUser = bot->getUserRecord(st[2]);
+		if (!targetUser)
+		{
+			bot->Notice(theClient, "Sorry, I don't know who %s is.", st[2].c_str());
+			return false; 
+		}
+
+		specificId = targetUser->getID();
+	} 
 
 
 	/*
@@ -69,8 +82,8 @@ bool ACCESSCommand::Exec( iClient* theClient, const string& Message )
 
 	unsigned short currentType = 0; /* 0 = None, 1 = min, 2 = max, 3 = modif. */
 	unsigned short autoOp = 0; /* 0 = any, 1 = just autoop, 2 = not autoop */
-	unsigned short minAmount = 0;
-	unsigned short maxAmount = 0;
+	unsigned int minAmount = 0;
+	unsigned int maxAmount = 0;
 	bool modif = false;
 	string modifMask;
 
@@ -134,6 +147,7 @@ bool ACCESSCommand::Exec( iClient* theClient, const string& Message )
 	strstream extraCond;
 	if (minAmount) extraCond << "AND levels.access >= " << minAmount << " ";
 	if (maxAmount) extraCond << "AND levels.access <= " << maxAmount << " ";
+	if (specificId) extraCond << "AND levels.user_id = " << specificId << " ";
 	extraCond << ends;
 
  	strstream theQuery;
