@@ -14,7 +14,7 @@
 #include	"StringTokenizer.h"
 #include	"ip.h"
 
-const char WHOISCommand_cc_rcsId[] = "$Id: WHOISCommand.cc,v 1.12 2002/03/25 23:40:25 mrbean_ Exp $";
+const char WHOISCommand_cc_rcsId[] = "$Id: WHOISCommand.cc,v 1.13 2002/04/22 19:10:49 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -81,11 +81,13 @@ string curChannel ;
 string::size_type curPlace;
 string tChannel;
 char curChar[10];
+bool hasCC; //Channel has control codes
 for( iClient::const_channelIterator ptr = Target->channels_begin() ;
 	ptr != Target->channels_end() ; ++ptr )
 	{
 	curChannel = "";
 	tChannel = (*ptr)->getName();
+	hasCC = false;
 	for(curPlace = 0; curPlace < tChannel.size();++curPlace)
 		{
 		if(((tChannel[curPlace] > 1) && (tChannel[curPlace] < 4))
@@ -95,14 +97,21 @@ for( iClient::const_channelIterator ptr = Target->channels_begin() ;
 			|| (tChannel[curPlace] == 160)
 			|| ((tChannel[curPlace] > 252) 	&& (tChannel[curPlace] <= 254)))
 			{
+			hasCC = true;
 			sprintf(curChar,"%d",tChannel[curPlace]);
-			curChannel += string("^") + curChar;
+			curChannel += string("*") + curChar;
 			}
 		else
 			{
 			curChannel += tChannel[curPlace];
 			}
 		}
+
+	if(hasCC)
+		{
+		curChannel = string("*") + curChannel;
+		}
+
 	channels.push_back( curChannel) ;
 	}
 
@@ -123,6 +132,7 @@ for( vector< string >::size_type i = 0 ; i < channels.size() ; i++ )
 
 bot->Notice( theClient, "On channels: %s",
 	chanNames.c_str() ) ;
+bot->Notice(theClient, "* - Channel contains control codes");
 
 return true ;
 }

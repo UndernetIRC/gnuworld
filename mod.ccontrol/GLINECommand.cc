@@ -24,7 +24,7 @@
 #include	"ccUser.h"
 #include	"Constants.h"
 
-const char GLINECommand_cc_rcsId[] = "$Id: GLINECommand.cc,v 1.39 2002/04/06 21:40:58 mrbean_ Exp $";
+const char GLINECommand_cc_rcsId[] = "$Id: GLINECommand.cc,v 1.40 2002/04/22 19:10:49 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -79,18 +79,31 @@ if(!isChan)
 	string::size_type atPos = st[ pos ].find_first_of( '@' ) ;
 	if( string::npos == atPos )
 		{
-		// user has probably specified a nickname (asked by isomer:P)
-		iClient* tClient = Network->findNick(st[pos]);
-		if(!tClient)
+		if((atPos = st [ pos ].find_first_of('.')) == string::npos) 
 			{
-			bot->Notice( theClient, "i can't find %s online, "
-				    "please specify a host instead",st[pos].c_str() ) ;
-			return true ;
+			// user has probably specified a nickname (asked by isomer:P)
+			iClient* tClient = Network->findNick(st[pos]);
+			if(!tClient)
+				{
+				bot->Notice( theClient, "i can't find %s online, "
+					    "please specify a host instead",st[pos].c_str() ) ;
+				return true ;
+				}
+			else
+				{
+				userName = tClient->getUserName();
+				if(userName[0] == '~')
+					{
+					userName = "~*";
+					}
+				hostName = tClient->getInsecureHost();
+				}
 			}
 		else
 			{
-			userName = tClient->getUserName();
-			hostName = tClient->getInsecureHost();
+			//user  forgot to add *@ so lets add it for him
+			userName = "*";
+			hostName = st[ pos  ];
 			}
 		}
 	else

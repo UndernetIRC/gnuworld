@@ -38,7 +38,7 @@
 #include	"ip.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.139 2002/04/06 21:40:58 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.140 2002/04/22 19:10:49 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -719,7 +719,7 @@ switch( theEvent )
 				delete tempLogin;
 				}		
 			}
-			
+		delete UserData;
 		break ;
 		} // case EVT_KILL/case EVT_QUIT
 	
@@ -3154,7 +3154,7 @@ for( int i = 0 ; i < SQLDb->Tuples() ; i++ )
 		{
 		elog	<< "Can't find handler for command "
 			<< SQLDb->GetValue(i,0)
-			<< ends;	
+			<< endl;	
 		}
 	else
 		{
