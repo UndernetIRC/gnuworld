@@ -29,7 +29,7 @@
 #include	"ccFloodData.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.78 2001/10/28 10:12:38 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.79 2001/10/28 14:17:56 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -70,12 +70,24 @@ EConfig conf( configFileName ) ;
 string sqlHost = conf.Find("sql_host" )->second;
 string sqlDb = conf.Find( "sql_db" )->second;
 string sqlPort = conf.Find( "sql_port" )->second;
+string sqlPass = conf.Require( "sql_pass" )->second;
+string sqlUser = conf.Require( "sql_user" )->second;
 
 inBurst = true;
 inRefresh = false;
 
 string Query = "host=" + sqlHost + " dbname=" + sqlDb + " port=" + sqlPort;
+if (strcasecmp(sqlUser,"''"))
+	{
+	Query += (" user=" + sqlUser);
+	}
 
+if (strcasecmp(sqlPass,"''"))
+	{
+	Query += (" password=" + sqlPass);
+	}
+	
+elog << Query << "\n";
 elog	<< "ccontrol::ccontrol> Attempting to connect to "
 	<< sqlHost
 	<< "; Database: "
