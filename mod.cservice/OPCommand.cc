@@ -8,7 +8,7 @@
 #include	"Network.h"
 #include	"levels.h"
 
-const char OPCommand_cc_rcsId[] = "$Id: OPCommand.cc,v 1.4 2000/12/23 20:03:57 gte Exp $" ;
+const char OPCommand_cc_rcsId[] = "$Id: OPCommand.cc,v 1.5 2000/12/24 02:25:49 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -54,20 +54,29 @@ bool OPCommand::Exec( iClient* theClient, const string& Message )
 				return true;
 			}
 
-			// TODO: Update gnuworld internal state - or write a gnuw op function. :)
-			strstream tmp ;
-			tmp << bot->getCharYYXXX() << " M " << theChan->getName() << " +o "
-				<< target->getCharYYXXX() << ends ;
-
-			bot->Write( tmp ) ;
-			delete[] tmp.str() ; 
-			bot->Notice(theClient, "Username: %s, Email: %s (Level %i).", theUser->getUserName().c_str(), theUser->getEmail().c_str(), level); 
+			Channel* tmpChan = Network->findChannel(theChan->getName());
+			if (tmpChan) 
+			{
+				ChannelUser* tmpChanUser = tmpChan->findUser(target) ;
+				if (tmpChanUser) {
+					bot->Op(tmpChan, target);
+					elog << "opping" << endl;
+				} else {
+	 				bot->Notice(theClient, "Sorry, %s isn't on %s.", target->getNickName().c_str(), theChan->getName().c_str()); 
+					return false;
+				} 
+			} else {
+				bot->Notice(theClient, "Sorry, that channel is empty.");
+				return false;
+			} 
 		} else {
 			bot->Notice(theClient, "Sorry, you have insufficient access to perform that command.");
-		}
+			return false;
+		} 
 
 	} else {
 		bot->Notice(theClient, "Sorry, %s isn't registered with me.", st[1].c_str());
+		return false;
 	}
 
 	return true ;

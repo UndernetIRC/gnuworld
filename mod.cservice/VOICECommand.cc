@@ -8,7 +8,7 @@
 #include	"Network.h"
 #include	"levels.h"
 
-const char VOICECommand_cc_rcsId[] = "$Id: VOICECommand.cc,v 1.3 2000/12/23 20:03:57 gte Exp $" ;
+const char VOICECommand_cc_rcsId[] = "$Id: VOICECommand.cc,v 1.4 2000/12/24 02:25:49 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -54,14 +54,12 @@ bool VOICECommand::Exec( iClient* theClient, const string& Message )
 				return true;
 			}
 
-			// TODO: Update gnuworld internal state - or write a gnuw op function. :)
-			strstream tmp ;
-			tmp << bot->getCharYYXXX() << " M " << theChan->getName() << " +v "
-				<< target->getCharYYXXX() << ends ;
-
-			bot->Write( tmp ) ;
-			delete[] tmp.str() ; 
-			bot->Notice(theClient, "Username: %s, Email: %s (Level %i).", theUser->getUserName().c_str(), theUser->getEmail().c_str(), level); 
+			Channel* tmpChan = Network->findChannel(theChan->getName());
+			if (tmpChan) {
+// TODO:				bot->Voice(tmpChan, target);
+			} else {
+				bot->Notice(theClient, "Sorry, that channel is empty.");
+			} 
 		} else {
 			bot->Notice(theClient, "Sorry, you have insufficient access to perform that command.");
 		}
