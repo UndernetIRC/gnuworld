@@ -8,7 +8,7 @@
  *
  * Caveats: None.
  *
- * $Id: UNSUSPENDCommand.cc,v 1.19 2001/11/15 18:10:01 gte Exp $
+ * $Id: UNSUSPENDCommand.cc,v 1.20 2003/01/08 23:23:36 gte Exp $
  */
 
 #include	<string>
@@ -20,7 +20,7 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char UNSUSPENDCommand_cc_rcsId[] = "$Id: UNSUSPENDCommand.cc,v 1.19 2001/11/15 18:10:01 gte Exp $" ;
+const char UNSUSPENDCommand_cc_rcsId[] = "$Id: UNSUSPENDCommand.cc,v 1.20 2003/01/08 23:23:36 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -87,7 +87,7 @@ if ((st[1][0] != '#') && (st[1][0] != '*'))
 
 	// Unsuspend them.
 	targetUser->removeFlag(sqlUser::F_GLOBAL_SUSPEND);
-	targetUser->commit();
+	targetUser->commit(theClient);
 	bot->Notice(theClient, "%s has been unsuspended.",
 		targetUser->getUserName().c_str());
 

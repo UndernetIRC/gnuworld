@@ -1,7 +1,7 @@
 /* sqlUser.h */
 
 #ifndef __SQLUSER_H
-#define __SQLUSER_H "$Id: sqlUser.h,v 1.31 2002/12/24 19:31:28 gte Exp $"
+#define __SQLUSER_H "$Id: sqlUser.h,v 1.32 2003/01/08 23:23:37 gte Exp $"
 
 #include	<string>
 #include	<vector>
@@ -157,7 +157,7 @@ public:
 	 * object back to the database.
 	 */
 
-	bool commit();
+	bool commit(iClient* who);
 	bool commitLastSeen();
 	bool commitLastSeenWithoutMask();
 	time_t	getLastSeen();

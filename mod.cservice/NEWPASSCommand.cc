@@ -13,7 +13,7 @@
 #include	"networkData.h"
 #include	"cservice_config.h"
 
-const char NEWPASSCommand_cc_rcsId[] = "$Id: NEWPASSCommand.cc,v 1.14 2002/05/23 17:43:13 dan_karrels Exp $" ;
+const char NEWPASSCommand_cc_rcsId[] = "$Id: NEWPASSCommand.cc,v 1.15 2003/01/08 23:23:34 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -123,7 +123,7 @@ output << ends;
 string finalPassword = salt + output.str().c_str();
 tmpUser->setPassword(finalPassword);
 
-if( tmpUser->commit() )
+if( tmpUser->commit(theClient) )
 	{
 	bot->Notice(theClient,
 		bot->getResponse(tmpUser,

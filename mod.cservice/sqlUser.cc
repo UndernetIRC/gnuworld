@@ -4,7 +4,7 @@
  * Storage class for accessing user information either from the backend
  * or internal storage.
  *
- * $Id: sqlUser.cc,v 1.36 2002/12/24 19:31:28 gte Exp $
+ * $Id: sqlUser.cc,v 1.37 2003/01/08 23:23:37 gte Exp $
  */
 
 #include	<sstream>
@@ -181,12 +181,18 @@ maxlogins = atoi(SQLDb->GetValue(row, 9));
 
 }
 
-bool sqlUser::commit()
+bool sqlUser::commit(iClient* who)
 {
 /*
  *  Build an SQL statement to commit the transient data in this storage class
  *  back into the database.
  */
+if(who)
+{
+	last_updated_by = who->getNickUserHost();
+} else {
+	last_updated_by = "Marvin, the paranoid android.";
+}
 
 static const char* queryHeader =    "UPDATE users ";
 static const char* queryCondition = "WHERE id = ";
@@ -197,7 +203,8 @@ queryString	<< queryHeader
 		<< "password = '" << password << "', "
 		<< "language_id = " << language_id << ", "
 		<< "maxlogins = " << maxlogins << ", "
-		<< "last_updated = now()::abstime::int4 "
+		<< "last_updated = now()::abstime::int4, "
+		<< "last_updated_by = '" << escapeSQLChars(last_updated_by) << "' "
 		<< queryCondition << id
 		<< ends;
 

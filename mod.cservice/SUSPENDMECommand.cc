@@ -1,7 +1,7 @@
 /*
  * SUSPENDMECommand.cc
  *
- * $Id: SUSPENDMECommand.cc,v 1.2 2002/03/13 22:21:44 gte Exp $
+ * $Id: SUSPENDMECommand.cc,v 1.3 2003/01/08 23:23:36 gte Exp $
  */
 
 #include	<string>
@@ -14,7 +14,7 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char SUSPENDMECommand_cc_rcsId[] = "$Id: SUSPENDMECommand.cc,v 1.2 2002/03/13 22:21:44 gte Exp $" ;
+const char SUSPENDMECommand_cc_rcsId[] = "$Id: SUSPENDMECommand.cc,v 1.3 2003/01/08 23:23:36 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -62,7 +62,7 @@ if(theUser->getFlag(sqlUser::F_GLOBAL_SUSPEND))
 
 // Suspend them.
 theUser->setFlag(sqlUser::F_GLOBAL_SUSPEND);
-theUser->commit();
+theUser->commit(theClient);
 bot->Notice(theClient, "You have been globally suspended and will have level 0 access in all"
 	" channels until you are unsuspended by a CService administrator.");
 

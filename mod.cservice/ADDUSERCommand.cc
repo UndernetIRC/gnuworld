@@ -11,7 +11,7 @@
  *
  * Caveats: None
  *
- * $Id: ADDUSERCommand.cc,v 1.22 2002/05/23 17:43:12 dan_karrels Exp $
+ * $Id: ADDUSERCommand.cc,v 1.23 2003/01/08 23:23:34 gte Exp $
  */
 
 #include	<string>
@@ -26,7 +26,7 @@
 #include	"responses.h"
 #include	"cservice_config.h"
 
-const char ADDUSERCommand_cc_rcsId[] = "$Id: ADDUSERCommand.cc,v 1.22 2002/05/23 17:43:12 dan_karrels Exp $" ;
+const char ADDUSERCommand_cc_rcsId[] = "$Id: ADDUSERCommand.cc,v 1.23 2003/01/08 23:23:34 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -217,7 +217,7 @@ if( PGRES_COMMAND_OK == status )
 	if (theChan->getName() == "*")
 		{
 		targetUser->setFlag(sqlUser::F_INVIS);
-		targetUser->commit();
+		targetUser->commit(theClient);
 		}
 	}
 else

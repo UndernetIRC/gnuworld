@@ -1,11 +1,11 @@
 /**
  * cservice.h
  * Author: Greg Sikorski
- * $Id: cservice.h,v 1.92 2002/10/19 19:54:00 gte Exp $
+ * $Id: cservice.h,v 1.93 2003/01/08 23:23:37 gte Exp $
  */
 
 #ifndef __CSERVICE_H
-#define __CSERVICE_H "$Id: cservice.h,v 1.92 2002/10/19 19:54:00 gte Exp $"
+#define __CSERVICE_H "$Id: cservice.h,v 1.93 2003/01/08 23:23:37 gte Exp $"
 
 #include	<string>
 #include	<vector>
@@ -32,6 +32,26 @@ namespace gnuworld
 using std::string ;
 using std::vector ;
 using std::map ;
+
+/*
+ * Class for the configuration variables extracted from the database.
+ * An attempted conversion to a number is stored in 'int_value' for
+ * convenience.
+ */
+
+class ConfigData
+{
+
+public:
+	string string_value;
+	unsigned int int_value;
+
+	inline const string&	asString() const
+		{ return string_value ; }
+
+	inline const unsigned int&	asInt() const
+		{ return int_value ; }
+};
 
 /**
  *  Sublcass the postgres API to create our own accessor
@@ -445,6 +465,22 @@ public:
 	unsigned int noteLimit;
 
 	void doCoderStats(iClient* theClient);
+
+	typedef map< string, ConfigData*, noCaseCompare > configHashType;
+	configHashType configTable;
+
+	/* Method to retrieve a configuration variable */
+	ConfigData* getConfigVar(const string&);
+
+	/* A dummy config entry with nothing in it. */
+	ConfigData empty_config;
+
+	/*
+	 * Method to pre-load the configTable above with everything thats
+	 * currently in the database.
+	 */
+	void loadConfigData();
+
 } ;
 
 const string escapeSQLChars(const string& theString);

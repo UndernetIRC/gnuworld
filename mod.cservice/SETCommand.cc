@@ -18,7 +18,7 @@
  *
  * Caveats: None.
  *
- * $Id: SETCommand.cc,v 1.51 2002/12/30 03:43:39 gte Exp $
+ * $Id: SETCommand.cc,v 1.52 2003/01/08 23:23:36 gte Exp $
  */
 
 #include	<string>
@@ -30,7 +30,7 @@
 #include	"responses.h"
 #include	"cservice_config.h"
 
-const char SETCommand_cc_rcsId[] = "$Id: SETCommand.cc,v 1.51 2002/12/30 03:43:39 gte Exp $" ;
+const char SETCommand_cc_rcsId[] = "$Id: SETCommand.cc,v 1.52 2003/01/08 23:23:36 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -70,7 +70,7 @@ if( st[1][0] != '#' ) // Didn't find a hash?
 		if (value == "ON")
 		{
 			theUser->setFlag(sqlUser::F_INVIS);
-			theUser->commit();
+			theUser->commit(theClient);
 			bot->Notice(theClient,
 				bot->getResponse(theUser,
 					language::invis_on,
@@ -81,7 +81,7 @@ if( st[1][0] != '#' ) // Didn't find a hash?
 		if (value == "OFF")
 		{
 			theUser->removeFlag(sqlUser::F_INVIS);
-			theUser->commit();
+			theUser->commit(theClient);
 			bot->Notice(theClient,
 				bot->getResponse(theUser,
 					language::invis_off,
@@ -103,7 +103,7 @@ if( st[1][0] != '#' ) // Didn't find a hash?
 		if (value == "ON")
 		{
 			theUser->setFlag(sqlUser::F_NONOTES);
-			theUser->commit();
+			theUser->commit(theClient);
 			bot->Notice(theClient,"You are no longer able to receive notes from anyone.");
 			return true;
 		}
@@ -111,7 +111,7 @@ if( st[1][0] != '#' ) // Didn't find a hash?
 		if (value == "OFF")
 		{
 			theUser->removeFlag(sqlUser::F_NONOTES);
-			theUser->commit();
+			theUser->commit(theClient);
 			bot->Notice(theClient,"You are now able to receive notes.");
 			return true;
 		}
@@ -136,7 +136,7 @@ if( st[1][0] != '#' ) // Didn't find a hash?
 			}
 
 		theUser->setMaxLogins(maxlogins);
-		theUser->commit();
+		theUser->commit(theClient);
 
 		bot->Notice(theClient, "Max Logins now set to %i", maxlogins);
 		return true;
@@ -150,7 +150,7 @@ if( st[1][0] != '#' ) // Didn't find a hash?
 		{
 			string lang = ptr->second.second;
 			theUser->setLanguageId(ptr->second.first);
-			theUser->commit();
+			theUser->commit(theClient);
 			bot->Notice(theClient,
 			    bot->getResponse(theUser,
 			    	    language::lang_set_to,

@@ -1,5 +1,13 @@
 Newest changes at the top of the file:
-$Id: RELEASE.NOTES,v 1.29 2002/12/24 19:31:28 gte Exp $
+$Id: RELEASE.NOTES,v 1.30 2003/01/08 23:23:35 gte Exp $
+
+CMaster 1.1pl12 - 09/01/2003
+* Change sqlUser->Commit() method to accept an iClient, to ensure
+  that last_updated_by is always set when the record is changed.
+* Add new methods to fetch config settings from the database instead
+  of config files. (Not ready yet, everything needs to be moved over
+  first).
+* Fix a typo in SUSPEND/UNSUSPEND syntax help.
 
 CMaster 1.1pl11 - 24/12/2002
 * Add some more stats.

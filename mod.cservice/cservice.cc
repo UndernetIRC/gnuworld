@@ -2,7 +2,7 @@
  * cservice.cc
  * Author: Greg Sikorski
  * Purpose: Overall control client.
- * $Id: cservice.cc,v 1.228 2002/12/24 19:31:28 gte Exp $
+ * $Id: cservice.cc,v 1.229 2003/01/08 23:23:37 gte Exp $
  */
 
 #include	<new>
@@ -182,8 +182,8 @@ RegisterCommand(new CHANINFOCommand(this, "INFO", "<username>", 3));
 RegisterCommand(new BANLISTCommand(this, "BANLIST", "<#channel>", 3));
 RegisterCommand(new KICKCommand(this, "KICK", "<#channel> <nick> <reason>", 4));
 RegisterCommand(new STATUSCommand(this, "STATUS", "<#channel>", 4));
-RegisterCommand(new SUSPENDCommand(this, "SUSPEND", "<#channel> <nick> <duration> [level]", 5));
-RegisterCommand(new UNSUSPENDCommand(this, "UNSUSPEND", "<#channel> <nick>", 5));
+RegisterCommand(new SUSPENDCommand(this, "SUSPEND", "<#channel> <username> <duration> [level]", 5));
+RegisterCommand(new UNSUSPENDCommand(this, "UNSUSPEND", "<#channel> <username>", 5));
 RegisterCommand(new BANCommand(this, "BAN", "<#channel> <nick | *!*user@*.host> [duration] [level] [reason]", 5));
 RegisterCommand(new UNBANCommand(this, "UNBAN", "<#channel> <*!*user@*.host>", 5));
 RegisterCommand(new LBANLISTCommand(this, "LBANLIST", "<#channel> <banmask>", 5));
@@ -269,6 +269,8 @@ loginDelay = atoi((cserviceConfig->Require( "login_delay" )->second).c_str());
 noteDuration = atoi((cserviceConfig->Require( "note_duration" )->second).c_str());
 noteLimit = atoi((cserviceConfig->Require( "note_limit" )->second).c_str());
 preloadUserDays = atoi((cserviceConfig->Require( "preload_user_days" )->second).c_str());
+
+loadConfigData();
 
 userHits = 0;
 userCacheHits = 0;
@@ -727,6 +729,8 @@ int cservice::OnCTCP( iClient* theClient, const string& CTCP,
  * This should be in the config file.
  */
 
+incStat("CORE.CTCP");
+
 if (isIgnored(theClient)) return 0;
 
 if (hasFlooded(theClient, "CTCP"))
@@ -758,7 +762,7 @@ else if(Command == "VERSION")
 	xClient::DoCTCP(theClient, CTCP,
 		"Undernet P10 Channel Services II ["
 		__DATE__ " " __TIME__
-		"] Release 1.1pl11");
+		"] Release 1.1pl12");
 	}
 else if(Command == "PROBLEM?")
 	{
@@ -2214,6 +2218,7 @@ vsnprintf( buf, 1024, format, _list ) ;
 va_end( _list ) ;
 
 // Try and locate the relay channel.
+//Channel* tmpChan = Network->findChannel(getConfigVar("CMASTER.RELAY_CHAN")->asString());
 Channel* tmpChan = Network->findChannel(relayChan);
 if (!tmpChan)
 	{
@@ -2239,6 +2244,7 @@ vsnprintf( buf, 1024, format, _list ) ;
 va_end( _list ) ;
 
 // Try and locate the debug channel.
+//Channel* tmpChan = Network->findChannel(getConfigVar("CMASTER.DEBUG_CHAN")->asString());
 Channel* tmpChan = Network->findChannel(debugChan);
 if (!tmpChan)
 	{
@@ -4055,6 +4061,62 @@ void cservice::doCoderStats(iClient* theClient)
 
 	Notice(theClient,"\002Uptime:\002 %s",
 		prettyDuration(getUplink()->getStartTime() + dbTimeOffset).c_str());
+
+	/*
+	 * Now, dump all the config settings.
+	 */
+
+	Notice(theClient, "-------------------------");
+	Notice(theClient, "Configuration Variables: ");
+	Notice(theClient, "-------------------------");
+
+	for( cservice::configHashType::iterator ptr = configTable.begin() ;
+	ptr != configTable.end() ; ++ptr )
+	{
+	Notice(theClient, "%s: %s", ptr->first.c_str(), ptr->second->asString().c_str());
+	}
+}
+
+/*
+ * Function to retrieve the specified config variable from the in-memory cache.
+ */
+ConfigData* cservice::getConfigVar(const string& variable)
+{
+	configHashType::iterator ptr = configTable.find(variable);
+
+	if(ptr != configTable.end())
+	{
+		return ptr->second;
+	} else {
+		return &empty_config;
+	}
+}
+
+/*
+ * Pre-load the configuration information from the db.
+ */
+void cservice::loadConfigData()
+{
+	stringstream theQuery;
+	theQuery	<< "SELECT var_name,contents FROM variables;"
+				<< ends;
+
+	ExecStatusType status = SQLDb->Exec(theQuery.str().c_str()) ;
+
+	if( PGRES_TUPLES_OK == status )
+		{
+		for (int i = 0 ; i < SQLDb->Tuples(); i++)
+			{
+			ConfigData* newConfig = new (std::nothrow) ConfigData();
+			assert( newConfig != 0 ) ;
+
+			newConfig->string_value = SQLDb->GetValue(i, 1);
+			newConfig->int_value = atoi(newConfig->string_value.c_str());
+
+			configTable.insert(configHashType::value_type(SQLDb->GetValue(i, 0), newConfig));
+			}
+		}
+
 }
 
 void Command::Usage( iClient* theClient )

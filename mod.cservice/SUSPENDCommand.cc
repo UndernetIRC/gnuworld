@@ -7,7 +7,7 @@
  * Suspends an user on the specified channel, if suspend duration 0
  * is defined, the user will be unsuspended.
  *
- * $Id: SUSPENDCommand.cc,v 1.23 2002/12/08 19:41:53 gte Exp $
+ * $Id: SUSPENDCommand.cc,v 1.24 2003/01/08 23:23:36 gte Exp $
  */
 
 #include	<string>
@@ -21,7 +21,7 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char SUSPENDCommand_cc_rcsId[] = "$Id: SUSPENDCommand.cc,v 1.23 2002/12/08 19:41:53 gte Exp $" ;
+const char SUSPENDCommand_cc_rcsId[] = "$Id: SUSPENDCommand.cc,v 1.24 2003/01/08 23:23:36 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -97,7 +97,7 @@ if ((st[1][0] != '#') && (st[1][0] != '*'))
 
 	// Suspend them.
 	targetUser->setFlag(sqlUser::F_GLOBAL_SUSPEND);
-	targetUser->commit();
+	targetUser->commit(theClient);
 	bot->Notice(theClient, "%s has been globally suspended and will have level 0 access in all"
 		" channels until unsuspended.",
 		targetUser->getUserName().c_str());
