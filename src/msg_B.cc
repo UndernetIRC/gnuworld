@@ -21,7 +21,7 @@
 #include	"Network.h"
 #include	"iClient.h"
 
-const char msg_B_cc_rcsId[] = "$Id: msg_B.cc,v 1.3 2001/02/04 20:01:08 dan_karrels Exp $" ;
+const char msg_B_cc_rcsId[] = "$Id: msg_B.cc,v 1.4 2001/02/05 19:20:25 dan_karrels Exp $" ;
 
 using std::string ;
 using std::vector ;
@@ -357,11 +357,11 @@ void xServer::parseBurstBans( Channel* theChan, const char* theBans )
 // This is a protected method, so the method arguments are
 // guaranteed to be valid
 
-elog	<< "xServer::parseBurstBans> Found bans for channel "
-	<< theChan->getName()
-	<< ": "
-	<< theBans
-	<< endl ;
+//elog	<< "xServer::parseBurstBans> Found bans for channel "
+//	<< theChan->getName()
+//	<< ": "
+//	<< theBans
+//	<< endl ;
 
 // Tokenize the ban string
 StringTokenizer st( theBans ) ;

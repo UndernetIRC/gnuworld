@@ -47,7 +47,7 @@
 #include	"ServerTimerHandlers.h"
 
 const char xServer_h_rcsId[] = __XSERVER_H ;
-const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.72 2001/02/05 18:58:12 dan_karrels Exp $" ;
+const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.73 2001/02/05 19:20:25 dan_karrels Exp $" ;
 
 using std::string ;
 using std::vector ;
@@ -1495,7 +1495,7 @@ if( verbose )
 //
 if( buf[ buf.size() - 1 ] != '\n' )
 	{
-	if( useBurstBuffer || bursting )
+	if( useBurstBuffer )
 		{
 		burstOutputBuffer += buf + '\n' ;
 		}
@@ -1612,7 +1612,7 @@ va_end( _list ) ;
 		}
 #endif
 
-if( useBurstBuffer || bursting )
+if( useBurstBuffer )
 	{
 	burstOutputBuffer += buffer ;
 	}
