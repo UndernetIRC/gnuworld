@@ -14,9 +14,7 @@
 
 @SET_MAKE@
 
-# "$Id: Makefile.in,v 1.10 2004/05/16 11:29:34 jeekay Exp $"
-
-SOURCES = $(libsnoop_la_SOURCES)
+SOURCES = $(libchanfix_la_SOURCES)
 
 srcdir = @srcdir@
 top_srcdir = @top_srcdir@
@@ -39,8 +37,8 @@ NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
 host_triplet = @host@
-subdir = mod.snoop
-DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
+subdir = mod.chanfix
+DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in ChangeLog
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
@@ -51,13 +49,13 @@ CONFIG_CLEAN_FILES =
 am__installdirs = "$(DESTDIR)$(libdir)"
 libLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(lib_LTLIBRARIES)
-libsnoop_la_LIBADD =
-am_libsnoop_la_OBJECTS = libsnoop_la-snoop.lo
-libsnoop_la_OBJECTS = $(am_libsnoop_la_OBJECTS)
+libchanfix_la_LIBADD =
+am_libchanfix_la_OBJECTS = libchanfix_la-chanfix.lo
+libchanfix_la_OBJECTS = $(am_libchanfix_la_OBJECTS)
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)/include
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
-@AMDEP_TRUE@DEP_FILES = ./$(DEPDIR)/libsnoop_la-snoop.Plo
+@AMDEP_TRUE@DEP_FILES = ./$(DEPDIR)/libchanfix_la-chanfix.Plo
 CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
 LTCXXCOMPILE = $(LIBTOOL) --mode=compile $(CXX) $(DEFS) \
@@ -66,8 +64,8 @@ LTCXXCOMPILE = $(LIBTOOL) --mode=compile $(CXX) $(DEFS) \
 CXXLD = $(CXX)
 CXXLINK = $(LIBTOOL) --mode=link $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) \
 	$(AM_LDFLAGS) $(LDFLAGS) -o $@
-SOURCES = $(libsnoop_la_SOURCES)
-DIST_SOURCES = $(libsnoop_la_SOURCES)
+SOURCES = $(libchanfix_la_SOURCES)
+DIST_SOURCES = $(libchanfix_la_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -204,13 +202,13 @@ subdirs = @subdirs@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 threadLib = @threadLib@
-lib_LTLIBRARIES = libsnoop.la
-libsnoop_la_SOURCES = snoop.cc
-libsnoop_la_CXXFLAGS = -I${top_srcdir}/include \
-	-I${top_srcdir}/libgnuworld
+lib_LTLIBRARIES = libchanfix.la
+libchanfix_la_CXXFLAGS = -I${top_srcdir}/include	\
+				-I${top_srcdir}/libgnuworld
 
-libsnoop_la_LDFLAGS = -module -export-dynamic
-EXTRA_DIST = snoop.h
+libchanfix_la_LDFLAGS = -module -export-dynamic
+libchanfix_la_SOURCES = chanfix.cc
+EXTRA_DIST = chanfix.h
 all: all-am
 
 .SUFFIXES:
@@ -224,9 +222,9 @@ $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__confi
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu  mod.snoop/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu  mod.chanfix/Makefile'; \
 	cd $(top_srcdir) && \
-	  $(AUTOMAKE) --gnu  mod.snoop/Makefile
+	  $(AUTOMAKE) --gnu  mod.chanfix/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
@@ -271,8 +269,8 @@ clean-libLTLIBRARIES:
 	  echo "rm -f \"$${dir}/so_locations\""; \
 	  rm -f "$${dir}/so_locations"; \
 	done
-libsnoop.la: $(libsnoop_la_OBJECTS) $(libsnoop_la_DEPENDENCIES) 
-	$(CXXLINK) -rpath $(libdir) $(libsnoop_la_LDFLAGS) $(libsnoop_la_OBJECTS) $(libsnoop_la_LIBADD) $(LIBS)
+libchanfix.la: $(libchanfix_la_OBJECTS) $(libchanfix_la_DEPENDENCIES) 
+	$(CXXLINK) -rpath $(libdir) $(libchanfix_la_LDFLAGS) $(libchanfix_la_OBJECTS) $(libchanfix_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -280,7 +278,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsnoop_la-snoop.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libchanfix_la-chanfix.Plo@am__quote@
 
 .cc.o:
 @am__fastdepCXX_TRUE@	if $(CXXCOMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \
@@ -306,29 +304,29 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LTCXXCOMPILE) -c -o $@ $<
 
-libsnoop_la-snoop.o: snoop.cc
-@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsnoop_la_CXXFLAGS) $(CXXFLAGS) -MT libsnoop_la-snoop.o -MD -MP -MF "$(DEPDIR)/libsnoop_la-snoop.Tpo" -c -o libsnoop_la-snoop.o `test -f 'snoop.cc' || echo '$(srcdir)/'`snoop.cc; \
-@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libsnoop_la-snoop.Tpo" "$(DEPDIR)/libsnoop_la-snoop.Po"; else rm -f "$(DEPDIR)/libsnoop_la-snoop.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='snoop.cc' object='libsnoop_la-snoop.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libsnoop_la-snoop.Po' tmpdepfile='$(DEPDIR)/libsnoop_la-snoop.TPo' @AMDEPBACKSLASH@
+libchanfix_la-chanfix.o: chanfix.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libchanfix_la_CXXFLAGS) $(CXXFLAGS) -MT libchanfix_la-chanfix.o -MD -MP -MF "$(DEPDIR)/libchanfix_la-chanfix.Tpo" -c -o libchanfix_la-chanfix.o `test -f 'chanfix.cc' || echo '$(srcdir)/'`chanfix.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libchanfix_la-chanfix.Tpo" "$(DEPDIR)/libchanfix_la-chanfix.Po"; else rm -f "$(DEPDIR)/libchanfix_la-chanfix.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='chanfix.cc' object='libchanfix_la-chanfix.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libchanfix_la-chanfix.Po' tmpdepfile='$(DEPDIR)/libchanfix_la-chanfix.TPo' @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsnoop_la_CXXFLAGS) $(CXXFLAGS) -c -o libsnoop_la-snoop.o `test -f 'snoop.cc' || echo '$(srcdir)/'`snoop.cc
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libchanfix_la_CXXFLAGS) $(CXXFLAGS) -c -o libchanfix_la-chanfix.o `test -f 'chanfix.cc' || echo '$(srcdir)/'`chanfix.cc
 
-libsnoop_la-snoop.obj: snoop.cc
-@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsnoop_la_CXXFLAGS) $(CXXFLAGS) -MT libsnoop_la-snoop.obj -MD -MP -MF "$(DEPDIR)/libsnoop_la-snoop.Tpo" -c -o libsnoop_la-snoop.obj `if test -f 'snoop.cc'; then $(CYGPATH_W) 'snoop.cc'; else $(CYGPATH_W) '$(srcdir)/snoop.cc'; fi`; \
-@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libsnoop_la-snoop.Tpo" "$(DEPDIR)/libsnoop_la-snoop.Po"; else rm -f "$(DEPDIR)/libsnoop_la-snoop.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='snoop.cc' object='libsnoop_la-snoop.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libsnoop_la-snoop.Po' tmpdepfile='$(DEPDIR)/libsnoop_la-snoop.TPo' @AMDEPBACKSLASH@
+libchanfix_la-chanfix.obj: chanfix.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libchanfix_la_CXXFLAGS) $(CXXFLAGS) -MT libchanfix_la-chanfix.obj -MD -MP -MF "$(DEPDIR)/libchanfix_la-chanfix.Tpo" -c -o libchanfix_la-chanfix.obj `if test -f 'chanfix.cc'; then $(CYGPATH_W) 'chanfix.cc'; else $(CYGPATH_W) '$(srcdir)/chanfix.cc'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libchanfix_la-chanfix.Tpo" "$(DEPDIR)/libchanfix_la-chanfix.Po"; else rm -f "$(DEPDIR)/libchanfix_la-chanfix.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='chanfix.cc' object='libchanfix_la-chanfix.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libchanfix_la-chanfix.Po' tmpdepfile='$(DEPDIR)/libchanfix_la-chanfix.TPo' @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsnoop_la_CXXFLAGS) $(CXXFLAGS) -c -o libsnoop_la-snoop.obj `if test -f 'snoop.cc'; then $(CYGPATH_W) 'snoop.cc'; else $(CYGPATH_W) '$(srcdir)/snoop.cc'; fi`
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libchanfix_la_CXXFLAGS) $(CXXFLAGS) -c -o libchanfix_la-chanfix.obj `if test -f 'chanfix.cc'; then $(CYGPATH_W) 'chanfix.cc'; else $(CYGPATH_W) '$(srcdir)/chanfix.cc'; fi`
 
-libsnoop_la-snoop.lo: snoop.cc
-@am__fastdepCXX_TRUE@	if $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsnoop_la_CXXFLAGS) $(CXXFLAGS) -MT libsnoop_la-snoop.lo -MD -MP -MF "$(DEPDIR)/libsnoop_la-snoop.Tpo" -c -o libsnoop_la-snoop.lo `test -f 'snoop.cc' || echo '$(srcdir)/'`snoop.cc; \
-@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libsnoop_la-snoop.Tpo" "$(DEPDIR)/libsnoop_la-snoop.Plo"; else rm -f "$(DEPDIR)/libsnoop_la-snoop.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='snoop.cc' object='libsnoop_la-snoop.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libsnoop_la-snoop.Plo' tmpdepfile='$(DEPDIR)/libsnoop_la-snoop.TPlo' @AMDEPBACKSLASH@
+libchanfix_la-chanfix.lo: chanfix.cc
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libchanfix_la_CXXFLAGS) $(CXXFLAGS) -MT libchanfix_la-chanfix.lo -MD -MP -MF "$(DEPDIR)/libchanfix_la-chanfix.Tpo" -c -o libchanfix_la-chanfix.lo `test -f 'chanfix.cc' || echo '$(srcdir)/'`chanfix.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libchanfix_la-chanfix.Tpo" "$(DEPDIR)/libchanfix_la-chanfix.Plo"; else rm -f "$(DEPDIR)/libchanfix_la-chanfix.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='chanfix.cc' object='libchanfix_la-chanfix.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libchanfix_la-chanfix.Plo' tmpdepfile='$(DEPDIR)/libchanfix_la-chanfix.TPlo' @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsnoop_la_CXXFLAGS) $(CXXFLAGS) -c -o libsnoop_la-snoop.lo `test -f 'snoop.cc' || echo '$(srcdir)/'`snoop.cc
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libchanfix_la_CXXFLAGS) $(CXXFLAGS) -c -o libchanfix_la-chanfix.lo `test -f 'chanfix.cc' || echo '$(srcdir)/'`chanfix.cc
 
 mostlyclean-libtool:
 	-rm -f *.lo

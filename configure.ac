@@ -1,10 +1,10 @@
-dnl $Id: configure.ac,v 1.27 2004/01/16 00:57:36 dan_karrels Exp $
+dnl $Id: configure.ac,v 1.28 2004/05/16 11:29:29 jeekay Exp $
 dnl ----------------------------------------------------------
 
 echo Configuring GNUWorld...
 echo
 
-AC_REVISION($Revision: 1.27 $)
+AC_REVISION($Revision: 1.28 $)
 AC_INIT
 AC_CONFIG_SRCDIR([src/main.cc])
 AM_INIT_AUTOMAKE(gnuworld,2.5)
@@ -254,6 +254,7 @@ echo "Detecting modules..."
 echo
 
 build_modccontrol=false
+build_modchanfix=false
 build_modclientExample=false
 build_modcloner=false
 build_modcservice=false
@@ -291,6 +292,7 @@ dnl	Prepare for conditionals
 	for moduleName in $MOD_DIRS; do
 	  case "$moduleName" in
 	    mod.ccontrol)	build_modccontrol=true;;
+	    mod.chanfix)	build_modchanfix=true;;
 	    mod.clientExample)	build_modclientExample=true;;
 	    mod.cloner)		build_modcloner=true;;
 	    mod.cservice)	build_modcservice=true;;
@@ -325,6 +327,7 @@ dnl	echo "mod_list: $mod_list"
 		  echo Adding module `echo $file | \cut -f2 -d"."`
 		  case "$file" in
 		    mod.ccontrol)	build_modccontrol=true;;
+		    mod.chanfix)	build_modchanfix=true;;
 		    mod.clientExample)	build_modclientExample=true;;
 		    mod.cloner)		build_modcloner=true;;
 		    mod.cservice)	build_modcservice=true;;
@@ -341,6 +344,7 @@ dnl	echo "mod_list: $mod_list"
 fi
 
 AM_CONDITIONAL(COND_MODCCONTROL,[test $build_modccontrol = true])
+AM_CONDITIONAL(COND_MODCHANFIX,[test $build_modchanfix = true])
 AM_CONDITIONAL(COND_MODCLIENTEXAMPLE,[test $build_modclientExample = true])
 AM_CONDITIONAL(COND_MODCLONER,[test $build_modcloner = true])
 AM_CONDITIONAL(COND_MODCSERVICE,[test $build_modcservice = true])
@@ -374,6 +378,7 @@ libircu/Makefile \
 src/Makefile \
 test/Makefile \
 mod.ccontrol/Makefile \
+mod.chanfix/Makefile \
 mod.clientExample/Makefile \
 mod.cloner/Makefile \
 mod.cservice/Makefile \
@@ -385,6 +390,7 @@ mod.stats/Makefile \
 mod.snoop/Makefile \
 bin/server_command_map \
 bin/ccontrol.example.conf \
+bin/chanfix.example.conf \
 bin/clientExample.example.conf \
 bin/cloner.example.conf \
 bin/cservice.example.conf \

@@ -1,10 +1,14 @@
-## $Id: Makefile.am,v 1.20 2003/12/04 00:44:21 dan_karrels Exp $
+## $Id: Makefile.am,v 1.21 2004/05/16 11:29:27 jeekay Exp $
 ## test
 
 @SET_MAKE@
 
 if COND_MODCCONTROL
   MODCCONTROL = mod.ccontrol
+endif
+
+if COND_MODCHANFIX
+  MODCHANFIX = mod.chanfix
 endif
 
 if COND_MODCLIENTEXAMPLE
@@ -53,6 +57,7 @@ endif
 
 SUBDIRS = libgnuworld libltdl src $(NEW_MODS) \
 	$(MODCCONTROL) \
+	$(MODCHANFIX) \
 	$(MODCLIENTEXAMPLE) \
 	$(MODCLONER) \
 	$(MODCSERVICE) \
@@ -67,6 +72,7 @@ SUBDIRS = libgnuworld libltdl src $(NEW_MODS) \
 	libircu
 
 EXTRA_DIST = bin/ccontrol.example.conf.in \
+	bin/chanfix.example.conf.in \
 	bin/clientExample.example.conf.in \
 	bin/cloner.example.conf.in \
 	bin/cservice.example.conf.in \
