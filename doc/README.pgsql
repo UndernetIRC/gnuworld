@@ -1,4 +1,4 @@
--- "$Id: README.pgsql,v 1.4 2001/10/14 06:58:59 nighty Exp $"
+-- "$Id: README.pgsql,v 1.5 2001/10/14 07:07:06 nighty Exp $"
 --
 -- Building PostgreSQL for GNUworld
 --
@@ -7,8 +7,17 @@
 --
 
 in order to build postgres you need :
-	- a recent version of gmake (GNU make 3.79+ ftp://)
-	- a recent version of TCL (TCL 8+ ftp://)
+	- a recent version of gmake (GNU make 3.79 ftp://gnu.wwc.edu/make/make-3.79.tar.gz)
+	- a recent version of TCL (TCL 8+ http://dev.scriptics.com/ftp/tcl/tcl8_3/tcl8.3.3.tar.gz)
+		NOTE: for FreeBSD users *only* :
+
+			root:# cd /usr/ports/lang/tcl83
+			root:# make
+
+				it will auto-download it.
+
+			root:# make install
+
 	- unpack the postgresql tarball (latest is version 7.1.3 : ftp://ftp.us.postgresql.org/v7.1.3/postgresql-7.1.3.tar.gz) :
 		tar -xzvf postgresql-7.1.3.tar.gz
 	- 'cd' to the directory :
