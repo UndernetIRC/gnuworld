@@ -13,7 +13,7 @@
 #include	"StringTokenizer.h"
 #include	"Network.h"
 
-const char CHECKNETCommand_cc_rcsId[] = "$Id: CHECKNETCommand.cc,v 1.3 2001/11/20 19:49:45 mrbean_ Exp $";
+const char CHECKNETCommand_cc_rcsId[] = "$Id: CHECKNETCommand.cc,v 1.4 2001/12/05 16:50:21 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -89,7 +89,7 @@ for (int i = 0 ; i < bot->SQLDb->Tuples(); i++)
 return true;
 
 bot->Notice(theClient,"Finished checking the network status\n");
-bot->Notice(theClient,"Found a total of %d missing servers\n,TServers");
+bot->Notice(theClient,"Found a total of %d missing servers\n",TServers);
 }
 
 }
