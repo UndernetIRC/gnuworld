@@ -1,7 +1,7 @@
 dnl aclocal.m4
 dnl   macros autoconf uses when building configure from configure.in
 dnl
-dnl $Id: aclocal.m4,v 1.5 2000/12/10 03:19:04 gte Exp $
+dnl $Id: aclocal.m4,v 1.6 2000/12/10 17:06:27 dan_karrels Exp $
 dnl
 
 dnl This entire function (minus a few minor modifications) was taken
@@ -108,7 +108,7 @@ case "$cv_var_system" in
     MOD_LD="${CXX}"
     SHLIB_LD="${CXX} -shared -nostartfiles -rdynamic"
     SHLIB_CXX="${CXX} -rdynamic"
-    CXX="${CXX} -rdynamic"
+    CXX="${CXX}"
     AC_DEFINE(MODULES_OK)dnl
     ;;
   Lynx)

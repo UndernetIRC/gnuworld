@@ -1382,7 +1382,7 @@ EOF
     MOD_LD="${CXX}"
     SHLIB_LD="${CXX} -shared -nostartfiles -rdynamic"
     SHLIB_CXX="${CXX} -rdynamic"
-    CXX="${CXX} -rdynamic"
+    CXX="${CXX}"
     cat >> confdefs.h <<\EOF
 #define MODULES_OK 1
 EOF

@@ -1,4 +1,4 @@
-# $Id: Makefile.in,v 1.9 2000/12/10 16:52:45 dan_karrels Exp $
+# $Id: Makefile.in,v 1.10 2000/12/10 17:06:27 dan_karrels Exp $
 # Default paths (system-wide installs)
 
 # Standard defines
@@ -41,7 +41,7 @@ make: all
 	${CXX} ${CXXFLAGS} -c $< -o $@
 
 $(LIB): ${OBJS}
-	$(AR) rv $(LIB) $(OBJS) $(LIBS)
+	$(AR) rv $(LIB) $(OBJS)
 	$(RANLIB) $(LIB)
 
 clean:
