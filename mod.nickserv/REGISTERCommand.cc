@@ -9,7 +9,7 @@
 #include "netData.h"
 #include "nickserv.h"
 
-const char REGISTERCommand_cc_rcsId[] = "$Id: REGISTERCommand.cc,v 1.3 2002/08/25 22:38:49 jeekay Exp $";
+const char REGISTERCommand_cc_rcsId[] = "$Id: REGISTERCommand.cc,v 1.4 2002/08/25 23:12:28 jeekay Exp $";
 
 namespace gnuworld
 {
@@ -21,6 +21,7 @@ using std::string;
 
 bool REGISTERCommand::Exec(iClient* theClient, const string& Message)
 {
+bot->theStats->incStat("NS.CMD.REGISTER");
 
 /* Is this nick already registered? */
 sqlUser* theUser = bot->isRegistered(theClient->getAccount());

@@ -79,13 +79,16 @@ delete tempCon;
  */
 void sqlManager::flush()
 {
+  theStats->incStat("SM.FLUSH");
   for(CommitQueueItr ptr = commitQueue.begin(); ptr != commitQueue.end(); ++ptr) {
     string statement = *ptr;
+    theStats->incStat("SM.EXEC");
     
 #ifdef LOG_SQL
     elog << "*** [sqlManager:flush] Executing: " << statement << endl;
 #endif
     if(!SQLDb->ExecCommandOk(statement.c_str())) {
+      theStats->incStat("SM.ERROR");
       string error = string(SQLDb->ErrorMessage());
 #ifndef LOG_SQL
       /* Make sure people without LOG_SQL still see what statement failed */
@@ -130,6 +133,8 @@ sqlManager::sqlManager(const string& _dbString, int _commitQueueMax)
 dbString = _dbString;
 SQLDb = getConnection();
 commitQueueMax = _commitQueueMax;
+
+theStats = Stats::getInstance();
 } // sqlManager::sqlManager
 
 

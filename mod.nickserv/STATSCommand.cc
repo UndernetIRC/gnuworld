@@ -8,7 +8,7 @@
 #include "nickserv.h"
 #include "Stats.h"
 
-const char STATSCommand_cc_rcsId[] = "$Id: STATSCommand.cc,v 1.1 2002/08/25 22:38:49 jeekay Exp $";
+const char STATSCommand_cc_rcsId[] = "$Id: STATSCommand.cc,v 1.2 2002/08/25 23:12:28 jeekay Exp $";
 
 namespace gnuworld
 {
@@ -20,6 +20,8 @@ using std::string;
 
 bool STATSCommand::Exec(iClient* theClient, const string& Message)
 {
+
+bot->theStats->incStat("NS.CMD.STATS");
 
 sqlUser* theUser = bot->isAuthed(theClient);
 
@@ -34,7 +36,7 @@ Stats::statsMapType::const_iterator statsEnd   = bot->theStats->getStatsMapEnd()
 for(Stats::statsMapType::const_iterator ptr = statsBegin; ptr != statsEnd; ptr++) {
   string stat = ptr->first;
   unsigned int amount = ptr->second;
-  bot->Notice(theClient, "%s: %ud", stat.c_str(), amount);
+  bot->Notice(theClient, "%s: %u", stat.c_str(), amount);
 }
 
 return true;

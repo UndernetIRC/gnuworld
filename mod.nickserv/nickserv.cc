@@ -7,7 +7,7 @@
 #include "netData.h"
 #include "nickserv.h"
 
-const char NickServ_cc_rcsId[] = "$Id: nickserv.cc,v 1.8 2002/08/25 22:38:49 jeekay Exp $";
+const char NickServ_cc_rcsId[] = "$Id: nickserv.cc,v 1.9 2002/08/25 23:12:28 jeekay Exp $";
 
 namespace gnuworld
 {
@@ -343,7 +343,7 @@ if(queuePos != warnQueue.end()) {
  */
 void nickserv::processQueue()
 {
-theStats->incStat("NICKSERV.PROCESSQUEUE");
+theStats->incStat("NS.PROCESS");
 
 /* A number of things can happen here.
  * Firstly, the warnQueue can be empty. If this is the case, return immediately.
@@ -401,6 +401,7 @@ for(QueueType::iterator queuePos = warnQueue.begin(); queuePos != warnQueue.end(
     continue;
   } else {
     Notice(theClient, "You are using a registered nickname. Please login or you will be disconnected.");
+    theStats->incStat("NS.WARN");
     theData->warned++;
     queuePos++;
     continue;
@@ -414,6 +415,7 @@ for(QueueType::iterator queuePos = killQueue.begin(); queuePos != killQueue.end(
   netData* theData = static_cast<netData*>(theClient->removeCustomData(this));
   delete(theData);
   Kill(theClient, "[NickServ] AutoKill");
+  theStats->incStat("NS.KILL");
 } // iterate over killQueue
 
 } // nickserv::processQueue()

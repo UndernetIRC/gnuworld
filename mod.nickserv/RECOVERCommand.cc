@@ -9,7 +9,7 @@
 
 #include "nickserv.h"
 
-const char RECOVERCommand_cc_rcsId[] = "$Id: RECOVERCommand.cc,v 1.1 2002/08/25 16:21:44 jeekay Exp $";
+const char RECOVERCommand_cc_rcsId[] = "$Id: RECOVERCommand.cc,v 1.2 2002/08/25 23:12:28 jeekay Exp $";
 
 namespace gnuworld
 {
@@ -21,6 +21,8 @@ using std::string;
 
 bool RECOVERCommand::Exec(iClient* theClient, const string& Message)
 {
+bot->theStats->incStat("NS.CMD.RECOVER");
+
 string authedNick = theClient->getAccount();
 
 iClient* targetClient = Network->findNick(authedNick);

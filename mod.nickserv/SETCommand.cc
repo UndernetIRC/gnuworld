@@ -8,7 +8,7 @@
 
 #include "nickserv.h"
 
-const char SETCommand_cc_rcsId[] = "$Id: SETCommand.cc,v 1.2 2002/08/25 16:21:44 jeekay Exp $";
+const char SETCommand_cc_rcsId[] = "$Id: SETCommand.cc,v 1.3 2002/08/25 23:12:28 jeekay Exp $";
 
 namespace gnuworld
 {
@@ -20,6 +20,8 @@ using std::string;
 
 bool SETCommand::Exec(iClient* theClient, const string& Message)
 {
+bot->theStats->incStat("NS.CMD.SET");
+
 /* Is this user logged in? */
 sqlUser* theUser = bot->isAuthed(theClient);
 
