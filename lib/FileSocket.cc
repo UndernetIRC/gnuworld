@@ -12,7 +12,7 @@
 #include	"ELog.h"
 
 const char FileSocket_h_rcsId[] = __FILESOCKET_H ;
-const char FileSocket_cc_rcsId[] = "$Id: FileSocket.cc,v 1.2 2000/07/09 18:08:11 dan_karrels Exp $" ;
+const char FileSocket_cc_rcsId[] = "$Id: FileSocket.cc,v 1.3 2000/12/15 00:13:44 dan_karrels Exp $" ;
 
 using std::string ;
 using std::ifstream ;
@@ -29,7 +29,7 @@ if( !inFile.is_open() )
 	exit( 0 ) ;
 	}
 string line ;
-while( (theFile.size() <= maxLines) && getline( inFile, line ) )
+while( (theFile.size() <= maxLines) && std::getline( inFile, line ) )
 	{
 	theFile.push( line ) ;
 	}
@@ -45,8 +45,8 @@ int FileSocket::close()
 return 0 ;
 }
 
-Socket::socketFd FileSocket::connect( const string& uplink,
-	int port )
+int FileSocket::connect( const string& uplink,
+	unsigned short int port )
 {
 return theFile.size() ;
 }
@@ -68,7 +68,7 @@ return theFile.front().size() ;
 int FileSocket::writable() const
 {
 // Always writable
-return 100 ;
+return 1 ;
 }
 
 int FileSocket::send( const string& theString )
@@ -77,7 +77,7 @@ int FileSocket::send( const string& theString )
 return theString.size() ;
 }
 
-int FileSocket::recv( unsigned char* buf, int nb )
+int FileSocket::recv( unsigned char* buf, size_t nb )
 {
 if( theFile.empty() )
 	{

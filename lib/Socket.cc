@@ -3,6 +3,7 @@
 
 #include	<new>
 #include	<strstream>
+#include	<iostream>
 
 #include	<unistd.h>
 #include	<fcntl.h>
@@ -33,26 +34,35 @@
 #endif
 
 const char Socket_h_rcsId[] = __SOCKET_H ;
-const char Socket_cc_rcsId[] = "$Id: Socket.cc,v 1.6 2000/12/08 00:31:00 dan_karrels Exp $" ;
+const char Socket_cc_rcsId[] = "$Id: Socket.cc,v 1.7 2000/12/15 00:13:44 dan_karrels Exp $" ;
 
-using namespace std ;
 using gnuworld::elog ;
+using std::endl ;
+using std::strstream ;
+using std::ends ;
 
-float Socket::_timeOut = -1.0;
-
-// moved thse into SocketInfo so that listen/accept funcs. can use them
-int SocketInfo::close()
+Socket::Socket()
 {
-if( fd < 0 )
-	{
-	errno = EBADF ;
-	return fd ;
-	}
+memset( &addr, 0, sizeof( struct sockaddr_in ) ) ;
+fd = -1 ;
+portNum = 0 ;
+}
 
-int _fd = fd;
-fd = -1;
-delete addr; addr = 0;
-return ::close( _fd ) ;
+Socket::Socket( const Socket& rhs )
+ : fd( rhs.fd ),
+   portNum( rhs.portNum )
+{
+memcpy( &addr, &rhs.addr, sizeof( struct sockaddr_in ) ) ;
+}
+
+int Socket::close()
+{
+memset( &addr, 0, sizeof( struct sockaddr_in ) ) ;
+portNum = 0 ;
+
+int retVal = ::close( fd ) ;
+fd = -1 ;
+return retVal ;
 }
 
 int Socket::recvBufSize() const
@@ -61,7 +71,7 @@ int recvSize = 0 ;
 
 socklen_t len = static_cast< socklen_t >( sizeof( recvSize ) ) ;
 
-if( ::getsockopt( _sockinfo.fd, SOL_SOCKET, SO_RCVBUF,
+if( ::getsockopt( fd, SOL_SOCKET, SO_RCVBUF,
 	reinterpret_cast< char* >( &recvSize ), &len ) < 0 )
 	{
 	elog	<< "Socket::recvBufSize> Error in getsockopt(): "
@@ -77,7 +87,7 @@ int sendSize = 0 ;
 
 socklen_t len = static_cast< socklen_t >( sizeof( sendSize ) ) ;
 
-if( ::getsockopt( _sockinfo.fd, SOL_SOCKET, SO_SNDBUF,
+if( ::getsockopt( fd, SOL_SOCKET, SO_SNDBUF,
 	reinterpret_cast< char* >( &sendSize ), &len ) < 0 )
 	{
 	elog	<< "Socket::sendBufSize> Error in getsockopt(): "
@@ -90,14 +100,14 @@ return sendSize ;
 int Socket::available() const
 {
 #ifdef FIONREAD
-	if( _sockinfo.fd < 0 )
+	if( fd < 0 )
 		{
 		errno = EBADF ;
 		return -1 ;
 		}
 
 	int bytes = 0 ;
-	if( ::ioctl( _sockinfo.fd, FIONREAD, &bytes ) < 0 )
+	if( ::ioctl( fd, FIONREAD, &bytes ) < 0 )
 		{
 		elog	<< "Socket::available> Error in call to ioctl(): "
 			<< strerror( errno ) << endl ;
@@ -132,141 +142,126 @@ return string( ipAddr ) ;
   
 string Socket::description() const
 {
-strstream s;
-s << "socket(file descr. = " << _sockinfo.fd<< " ): ";
-if( _sockinfo.addr )
-	{
-	s	<< "_portNo= " << _sockinfo.addr->sin_port
-		<<" ip= " << inet_ntoa( _sockinfo.addr->sin_addr )
-		<< ends ;
-	}
+std::strstream s;
+s	<< "socket(file descr. = " << fd
+	<< " ): " << "portNum = "
+	<< addr.sin_port
+	<< " ip= " << inet_ntoa( addr.sin_addr )
+	<< std::ends ;
 string retval( s.str() ) ;
 delete[] s.str() ;
 
 return retval ;
 }
 
-int Socket::resetSocket( SocketInfo& socket )
+bool Socket::setSocket()
 {
-if( _sockinfo.fd >= 0 )
+if( fd != -1 )
 	{
-	close() ;
+	// Socket is already open, ignore
+	elog	<< "Socket::setSocket> Attempt to reinitialize "
+		<< "socket" << endl ;
+	return false ;
 	}
 
-_sockinfo.fd = -1 ;
-delete _sockinfo.addr ; _sockinfo.addr = 0 ;
-
-return setSocket( socket ) ;
-}
-
-int Socket::setSocket( SocketInfo& socket )
-{
-if( _sockinfo.fd < 0 && socket.fd > 0 )
+fd = ::socket( AF_INET, SOCK_STREAM, 0 ) ;
+if( fd < 0 )
 	{
-	_sockinfo = socket;
-	_portNo = socket.addr->sin_port;
-	}
-else if( _sockinfo.fd < 0 )
-	{
-	elog << "Socket::setSocket> socket not initialized!" << endl ;
-	return 0 ;
+	elog	<< "Socket::setSocket> Unable to open new socket"
+		<< endl ;
+	return false ;
 	}
 
-if( _sockinfo.addr == 0 && _portNo > 0 )
-	{
-	try
-		{
-		_sockinfo.addr = new struct sockaddr_in;
-		}
-	catch( std::bad_alloc& )
-		{
-		elog << "Socket::setSocket> Memory allocation failure\n" ;
-		return -1 ;
-		}
+// zero out the address structure
+memset( static_cast< void* >( &addr ), 0,
+	sizeof( sockaddr_in ) ) ;
 
-	memset( static_cast< void* >( _sockinfo.addr ), 0,
-		sizeof( sockaddr_in ) ) ;
-	_sockinfo.addr->sin_family = AF_INET ;
-	_sockinfo.addr->sin_port =
-		htons( static_cast< u_short >( _portNo ) ) ;
-	}
+// setup with basic options
+addr.sin_family = AF_INET ;
+addr.sin_port = htons( static_cast< u_short >( portNum ) ) ;
 
-if( _sockinfo.addr != 0 && _portNo > 0 )
-	{
-	struct linger setLinger;
-	setLinger.l_onoff = 0; // don't linger!     
-	setLinger.l_linger = 0;
+// disabled linger
+struct linger setLinger;
+setLinger.l_onoff = 0; // don't linger!     
+setLinger.l_linger = 0;
     
-	if( ::setsockopt( _sockinfo.fd, SOL_SOCKET, SO_LINGER,
-		reinterpret_cast< const char* >( &setLinger ),
-		sizeof( setLinger ) ) < 0 )
-		{
-		elog << "Socket::setSocket> failed to set SO_LINGER" << endl ;
-		elog << "Error: " << strerror( errno ) << endl ;
-		}
+if( ::setsockopt( fd, SOL_SOCKET, SO_LINGER,
+	reinterpret_cast< const char* >( &setLinger ),
+	sizeof( setLinger ) ) < 0 )
+	{
+	elog	<< "Socket::setSocket> failed to set SO_LINGER"
+		<< endl ;
+	elog	<< "Error: " << strerror( errno ) << endl ;
 	}
 
 int optval = 1 ;
 
 // detect closed connection
-if( ::setsockopt( _sockinfo.fd, SOL_SOCKET, SO_KEEPALIVE,
+if( ::setsockopt( fd, SOL_SOCKET, SO_KEEPALIVE,
 	reinterpret_cast< const char* >( &optval ),
 	sizeof( optval ) ) < 0 )
 	{
-	elog << "Socket::setSocket> failed to set SO_KEEPALIVE" << endl ;
-	elog << "Error: " << strerror( errno ) << endl ;
+	elog	<< "Socket::setSocket> failed to set SO_KEEPALIVE"
+		<< endl ;
+	elog	<< "Error: " << strerror( errno ) << endl ;
 	}
 
 // immediately deliver msg
-if( ::setsockopt( _sockinfo.fd, IPPROTO_TCP, TCP_NODELAY,
+if( ::setsockopt( fd, IPPROTO_TCP, TCP_NODELAY,
 	reinterpret_cast< const char* >( &optval ),
 	sizeof( optval ) ) < 0 )
 	{
-	elog << "Socket::setSocket> failed to set TCP_NODELAY" << endl ;
-	elog << "Error: " << strerror( errno ) << endl ;
+	elog	<< "Socket::setSocket> failed to set TCP_NODELAY"
+		<< endl ;
+	elog	<< "Error: " << strerror( errno ) << endl ;
 	}
 
 // allow fast re-binds
-if( ::setsockopt( _sockinfo.fd, SOL_SOCKET, SO_REUSEADDR,
+if( ::setsockopt( fd, SOL_SOCKET, SO_REUSEADDR,
 	reinterpret_cast< const char* >( &optval ), sizeof( optval ) ) < 0 )
 	{
-	elog << "Socket::setSocket> failed to set SO_REUSEADDR" << endl ;
-	elog << "Error: " << strerror( errno ) << endl ;
+	elog	<< "Socket::setSocket> failed to set SO_REUSEADDR"
+		<< endl ;
+	elog	<< "Error: " << strerror( errno ) << endl ;
 	}
 
 // use max. buffer size
 optval = 1024 * 1024 ;
 
-if( ::setsockopt( _sockinfo.fd, SOL_SOCKET, SO_SNDBUF,
+if( ::setsockopt( fd, SOL_SOCKET, SO_SNDBUF,
 	reinterpret_cast< const char* >( &optval ), sizeof( optval ) ) < 0 )
 	{
-	elog << "Socket::setSocket> failed to set SO_SNDBUF" << endl ;
-	elog << "Error: " << strerror( errno ) << endl ;
+	elog	<< "Socket::setSocket> failed to set SO_SNDBUF"
+		<< endl ;
+	elog	<< "Error: " << strerror( errno ) << endl ;
 	}
 
-if( ::setsockopt( _sockinfo.fd, SOL_SOCKET, SO_RCVBUF,
+if( ::setsockopt( fd, SOL_SOCKET, SO_RCVBUF,
 	reinterpret_cast< const char* >( &optval ), sizeof( optval ) ) < 0 )
 	{
-	elog << "Socket::setSocket> failed to set SO_RCVBUF" << endl ;
-	elog << "Error: " << strerror( errno ) << endl ;
+	elog	<< "Socket::setSocket> failed to set SO_RCVBUF"
+		<< endl ;
+	elog	<< "Error: " << strerror( errno ) << endl ;
 	}
 
 // explicitly set to blocking
-optval = ::fcntl( _sockinfo.fd, F_GETFL, 0 ) ;
+optval = ::fcntl( fd, F_GETFL, 0 ) ;
 if( optval < 0 )
 	{
-	elog << "Socket::setSocket> failed to get sock flags" << endl ;
-	elog << "Error: " << strerror( errno ) << endl ;
+	elog	<< "Socket::setSocket> failed to get sock flags"
+		<< endl ;
+	elog	<< "Error: " << strerror( errno ) << endl ;
 	}
 
-optval = ::fcntl( _sockinfo.fd, F_SETFL, optval & ~O_NONBLOCK ) ;
+optval = ::fcntl( fd, F_SETFL, optval & ~O_NONBLOCK ) ;
 if( optval < 0 )
 	{
-	elog << "Socket::setSocket> failed to set O_NONBLOCK" << endl;
-	elog << "Error: " << strerror( errno ) << endl ;
+	elog	<< "Socket::setSocket> failed to set O_NONBLOCK"
+		<< endl;
+	elog	<< "Error: " << strerror( errno ) << endl ;
 	}
 
-return _portNo ;
+return true ;
 }
 
 // static
@@ -292,137 +287,10 @@ for( string::size_type i = 0 ; (i < h.size()) && (count < 4) ; ++i )
 return (3 == count) ;
 }
 
-// static
-int Socket::writableList( const vector< socketFd >& socFds, 
-	vector< socketFd >& writeList, float timeOut )
-{
-
-// don't block
-struct timeval		*usetimeout = 0,
-			timeout,
-			poll = { 0, 0 } ;
-
-if( timeOut >= 0.0 )
-	{
-	_timeOut = timeOut ;
-	timeout.tv_sec = static_cast< long >( ::floor( _timeOut ) ) ;
-	timeout.tv_usec = static_cast< long >( ::floor( 1000000 *
-		(_timeOut - timeout.tv_sec ) ) ) ;
-	usetimeout = &timeout ;
-	}
-else
-	{
-	usetimeout = &poll ;
-	}
-
-fd_set writefds;
-FD_ZERO( &writefds ) ;
-
-for( vector< socketFd >::size_type i = 0 ; i < socFds.size() ; ++i )
-	{
-	FD_SET( socFds[ i ], &writefds ) ;
-	}
-
-int		fdcnt,
-		cnt = 10 ;
-do
-	{
-	struct timeval to = *usetimeout ;
-	errno = 0 ;
-	fdcnt = ::select( FD_SETSIZE, 0, &writefds, 0, &to ) ;
-	} while( errno == EINTR && --cnt >= 0 ) ;
-
-if( fdcnt < 0 )
-	{
-	elog	<< "Socket::writeableList> error occured on select, fdcnt= "
-		<< fdcnt << endl ;
-	elog	<< "Error: " << strerror( errno ) << endl ;
-	return fdcnt ;
-	}
-
-if( 0 == fdcnt )
-	{
-	// No descriptors ready, no big deal.
-	return fdcnt ;
-	}
-
-for( vector< socketFd >::size_type i = 0 ; i < socFds.size() ; ++i )
-	{
-	if( FD_ISSET( socFds[ i ], &writefds ) )
-		{
-		writeList.push_back( socFds[ i ] ) ;
-		}
-	}
-  
-return fdcnt ;
-}
-
-int Socket::pendingInputList( const vector< socketFd >& socFds, 
-	vector< socketFd >& pendingList, float timeOut )
-{
-
-struct timeval		*usetimeout = 0,
-			timeout,
-			poll = { 0, 0 } ; // don't block
-
-if( timeOut >= 0.0 )
-	{
-	_timeOut = timeOut ;
-	timeout.tv_sec = static_cast< long >( floor( _timeOut ) ) ;
-	timeout.tv_usec = static_cast< long >( floor( 1000000 *
-		( _timeOut - timeout.tv_sec ) ) ) ;
-	usetimeout = &timeout ;
-	}
-else
-	{
-	usetimeout = &poll ;
-	}
-
-fd_set readfds ;
-FD_ZERO( &readfds ) ;
- 
-for( vector< socketFd >::size_type i = 0 ; i < socFds.size() ; ++i )
-	{
-	FD_SET( socFds[ i ], &readfds ) ;
-	}
-
-int		fdcnt,
-		cnt= 10 ;
-
-do
-	{
-	struct timeval to = *usetimeout ;
-	errno = 0 ;
-	fdcnt = ::select( FD_SETSIZE, &readfds, 0, 0, &to ) ;
-	} while( errno == EINTR && --cnt >= 0 ) ;
-
-if( fdcnt < 0 )
-	{
-	elog	<< "Socket::pendingInputList> error occured on select, fdcnt= "
-		<< fdcnt << endl ;
-	return fdcnt ;
-	}
-
-if( fdcnt == 0 )
-	{
-	return fdcnt ;
-	}
-
-for( vector< socketFd >::size_type i = 0 ; i < socFds.size() ; ++i )
-	{
-	if( FD_ISSET( socFds[ i ], &readfds ) )
-		{
-		pendingList.push_back( socFds[ i ] ) ;
-		}
-	}
-  
-return fdcnt ;
-}
-
 int Socket::readable() const
 {
 
-if( _sockinfo.fd < 0 )
+if( fd < 0 )
 	{
 	errno = EBADF ;
 	return -1 ;
@@ -430,34 +298,21 @@ if( _sockinfo.fd < 0 )
 
 fd_set readfds;
 FD_ZERO( &readfds ) ;
-FD_SET( _sockinfo.fd, &readfds ) ;
- 
-struct timeval		*usetimeout = 0,
-			timeout,
-			poll = { 0, 0 } ; // don't block
+FD_SET( fd, &readfds ) ;
 
-if( _timeOut >= 0.0 )
-	{
-	timeout.tv_sec = static_cast< long >( ::floor( _timeOut ) ) ;
-	timeout.tv_usec = static_cast< long >( ::floor( 1000000 *
-		( _timeOut - timeout.tv_sec ) ) ) ;
-	usetimeout = &timeout ;
-	}
-else
-	{
-	usetimeout = &poll ;
-	}
+struct timeval		poll = { 0, 0 },
+			*usetimeout = &poll ;
 
-int		fdcnt,
-		cnt= 10 ;
+int			fdcnt = -1,
+			cnt = 10 ;
 
 do
 	{
 	// since timeval may be modified by call
 	struct timeval to = *usetimeout;
 	errno = 0 ;
-	fdcnt = ::select( 1+_sockinfo.fd, &readfds, 0, 0, &to ) ;
-	} while( errno == EINTR && --cnt >= 0 ) ;
+	fdcnt = ::select( 1 + fd, &readfds, 0, 0, &to ) ;
+	} while( (errno == EINTR) && (--cnt >= 0) ) ;
 
 if( fdcnt < 0 )
 	{
@@ -470,12 +325,12 @@ if( fdcnt == 0 )
 	return fdcnt;
 	}
 
-return FD_ISSET( _sockinfo.fd, &readfds ) ;
+return FD_ISSET( fd, &readfds ) ;
 }
 
 int Socket::writable() const
 { 
-if( _sockinfo.fd < 0 )
+if( fd < 0 )
 	{
 	errno = EBADF ;
 	return -1 ;
@@ -483,7 +338,7 @@ if( _sockinfo.fd < 0 )
 
 fd_set writefds ;
 FD_ZERO( &writefds) ;
-FD_SET( _sockinfo.fd, &writefds ) ;
+FD_SET( fd, &writefds ) ;
 
 struct timeval	poll = { 0, 0 } ; // don't block
 int		fdcnt,
@@ -492,7 +347,7 @@ do
 	{
 	struct timeval to = poll ;
 	errno = 0 ;
-	fdcnt = ::select( 1 + _sockinfo.fd, 0, &writefds, 0, &to ) ;
+	fdcnt = ::select( 1 + fd, 0, &writefds, 0, &to ) ;
 	} while( errno == EINTR && --cnt >= 0 ) ;
 
 if( fdcnt < 0 )
@@ -507,12 +362,12 @@ if( fdcnt == 0 )
 	return fdcnt;
 	}
 
-return FD_ISSET( _sockinfo.fd, &writefds ) ;
+return FD_ISSET( fd, &writefds ) ;
 }
 
 int Socket::pendingIO() const
 {
-if( _sockinfo.fd < 0 )
+if( fd < 0 )
 	{
 	errno = EBADF ;
 	return -1 ;
@@ -524,9 +379,9 @@ fd_set excptfds;
 FD_ZERO( &readfds );
 FD_ZERO( &writefds );
 FD_ZERO( &excptfds );
-FD_SET( _sockinfo.fd, &readfds );
-FD_SET( _sockinfo.fd, &writefds );
-FD_SET( _sockinfo.fd, &excptfds );
+FD_SET( fd, &readfds );
+FD_SET( fd, &writefds );
+FD_SET( fd, &excptfds );
 
 struct timeval	poll = { 0, 0 }; // don't block
 int		fdcnt,
@@ -536,7 +391,7 @@ do
 	{
 	struct timeval to = poll;
 	errno = 0;
-	fdcnt = ::select( 1 + _sockinfo.fd, &readfds, &writefds,
+	fdcnt = ::select( 1 + fd, &readfds, &writefds,
 		&excptfds, &to ) ;
 	} while( (errno == EINTR) && (--cnt >= 0) ) ;
 
@@ -552,23 +407,16 @@ if( 0 == fdcnt )
 	return fdcnt;
 	}
 
-return FD_ISSET(_sockinfo.fd, &readfds) +
-	2 * (FD_ISSET(_sockinfo.fd, &writefds)) +
-	4 * (FD_ISSET(_sockinfo.fd, &excptfds)) ;
+return FD_ISSET( fd, &readfds ) +
+	2 * ( FD_ISSET( fd, &writefds ) ) +
+	4 * ( FD_ISSET( fd, &excptfds ) ) ;
 }
 
-int Socket::send( const unsigned char* buf, int nb )
+int Socket::send( const unsigned char* buf, size_t nb )
 {
-if( _sockinfo.fd < 0 )
+if( fd < 0 )
 	{
 	errno = EBADF ;
-	return -1 ;
-	}
-
-if( nb <= 0 )
-	{
-	errno = EINVAL ;
-	elog << "Socket::send> sorry, no bytes to send; nb= " << nb << endl ;
 	return -1 ;
 	}
 
@@ -577,23 +425,25 @@ short int cnt = 10 ;
 do
 	{
 	errno = 0 ;
-	result = ::send( _sockinfo.fd,
+	result = ::send( fd,
 		reinterpret_cast< const char* >( buf ), nb, 0 ) ;
 	} while( (--cnt >= 0) && (EINTR == errno) ) ;
 
 return result ;
-
 }
 
 int Socket::send( const char* s )
 {
+#ifndef DEBUG
+  assert( s != 0 ) ;
+#endif
 return send( reinterpret_cast< const unsigned char* >( s ), strlen( s ) ) ;
 }
 
 // support call by reference
 int Socket::send( const string& val )
 {
-if( _sockinfo.fd < 0 )
+if( fd < 0 )
 	{
 	errno = EBADF ;
 	return -1 ;
@@ -604,7 +454,7 @@ short int cnt = 10 ;
 do
 	{
 	errno = 0 ;
-	result = ::send( _sockinfo.fd, val.c_str(), val.size(), 0 ) ;
+	result = ::send( fd, val.c_str(), val.size(), 0 ) ;
 	} while( (--cnt >= 0) && (EINTR == errno) ) ;
 
 return result ;
@@ -620,17 +470,10 @@ return recv( buf, numBytes ) ;
 
 int Socket::recv( unsigned char* buf, size_t nb )
 {
-if( _sockinfo.fd < 0 )
+if( fd < 0 )
 	{
 	errno = EBADF ;
 	return -1 ;
-	}
-
-if( readable() < 0 )
-	{
-	elog	<< "Socket::recv> sorry, no connection for recv, abort."
-		<< endl;
-	return -1;
 	}
 
 int cnt = 10;
@@ -639,7 +482,7 @@ int nbresult = 0;
 do
 	{
 	errno = 0 ;
-	nbresult = ::recv( _sockinfo.fd, reinterpret_cast< char* >( buf ),
+	nbresult = ::recv( fd, reinterpret_cast< char* >( buf ),
 		nb, 0 ) ;
  	} while( (--cnt > 0) &&
 		(nbresult < 0) &&
@@ -653,7 +496,6 @@ if( cnt == 0 )
 	}
 
 return nbresult ;
-
 }
 
 // static

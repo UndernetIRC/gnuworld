@@ -1,9 +1,9 @@
 /* config.h
- * $Id: config.h,v 1.2 2000/07/08 01:41:05 dan_karrels Exp $
+ * $Id: config.h,v 1.3 2000/12/15 00:13:44 dan_karrels Exp $
  */
 
 #ifndef __CONFIG_H
-#define __CONFIG_H "$Id: config.h,v 1.2 2000/07/08 01:41:05 dan_karrels Exp $"
+#define __CONFIG_H "$Id: config.h,v 1.3 2000/12/15 00:13:44 dan_karrels Exp $"
 
 /* config.h */
 /* GNUWorld main configuration file */
@@ -11,7 +11,8 @@
  * Damnit Jim! Im a programmer not an author!
  */
 
-/* EDEBUG
+/**
+ * EDEBUG
  * This define is pretty obvious...Will probably consume
  * massive quantities of CPU when debugging, recommended
  * only for debugging/testing/optimization purposes
@@ -20,39 +21,51 @@
 
 #ifdef EDEBUG
 
-/* DEBUGFILE
+/**
+ * DEBUGFILE
  * The file that the debugger will write to
  */
 #define DEBUGFILE "debug.log"
 
 #endif // EDEBUG
 
-/* CONFFILE
- * This is the name of the file that GNUWorld will read
- * it's server characteristics from
+/**
+ * CONFFILE
+ * This is the name of the default file from which GNUWorld
+ * will read its server characteristics.
  */
 #define CONFFILE "gnuworld.conf"
 
-/* LOGFILE
+/**
+ * LOGFILE
  * Name of the file that gnuworld logs to =P
  */
 #define LOGFILE "gnuworld.log"
 
-/* LOG_SOCKET
- * This define allows to log incoming and outgoing data from/to sockets.
- * WARNING!!! Use it at your own risk! =P It sucks CPU and DISK!
- * --NeXTPhase
+/**
+ * LOG_SOCKET
+ * Define this variable to enable logging of incoming raw data.
+ * This is very useful for offline debugging.
  */
 #define LOG_SOCKET
 
 #ifdef LOG_SOCKET
 
-/* LOG_SOCKET_NAME
- * The name of the file to which to write the raw data read
- * from the network
+/**
+ * LOG_SOCKET_NAME
+ * The name of the default file to which to write raw data
+ * from the network.
  */
 #define LOG_SOCKET_NAME "socket.log"
 
 #endif /* LOG_SOCKET */
+
+/**
+ * CLIENT_DESC
+ * Define this variable if you want gnuworld to track the
+ * real name (description) of each network client.  This
+ * can use quite a bit more memory on large networks.
+ */
+#undef CLIENT_DESC
 
 #endif /* __CONFIG_H */

@@ -529,8 +529,8 @@ fi
 echo Configuring GNUWorld...
 echo
 
-CFLAGS="-g -Wall -O0"
-CXXFLAGS="-g -Wall -O0"
+CFLAGS="-g -Wall -O0 -pipe"
+CXXFLAGS="-g -Wall -O0 -pipe"
 CXX="g++"
 LIBS=""
 prefix="."

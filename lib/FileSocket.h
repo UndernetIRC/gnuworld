@@ -2,7 +2,7 @@
  */
 
 #ifndef __FILESOCKET_H
-#define __FILESOCKET_H "$Id: FileSocket.h,v 1.1 2000/06/30 18:46:06 dan_karrels Exp $"
+#define __FILESOCKET_H "$Id: FileSocket.h,v 1.2 2000/12/15 00:13:44 dan_karrels Exp $"
 
 #include	<string>
 #include	<queue>
@@ -49,8 +49,8 @@ public:
 	 * this method may randomly return bad descriptors,
 	 * representing connection errors.
 	 */
-	Socket::socketFd connect( const string& = string(),
-		int portNo = -1 ) ;
+	int connect( const string& = string(),
+		unsigned short int portNo = 0 ) ;
 
 	/**
 	 * Close the input stream (a file in this case).
@@ -108,7 +108,7 @@ public:
 	 * Return number of bytes read, 0 if none read (EOF),
 	 * or -1 on error.
 	 */
-	virtual int recv( unsigned char*, int ) ;
+	virtual int recv( unsigned char*, size_t ) ;
 
 protected:
 

@@ -2,7 +2,7 @@
  */
 
 #ifndef __SOCKET_H
-#define __SOCKET_H "$Id: Socket.h,v 1.3 2000/11/21 01:10:59 dan_karrels Exp $"
+#define __SOCKET_H "$Id: Socket.h,v 1.4 2000/12/15 00:13:44 dan_karrels Exp $"
 
 #include	<new>
 #include	<iostream>
@@ -22,70 +22,6 @@
 #include	<cerrno>
 #include	<cstdlib>
 
-/**
- * This structure is responsible for representing the state
- * associated with a connection to a remote machine.
- */
-struct SocketInfo
-{
-
-	/**
-	 * This is the actual file (socket) descriptor to the
-	 * remote machine, -1 if not connected.
-	 */
-	int fd ;
-
-	/**
-	 * This is the socket address structure containing
-	 * information about the remote machine to which we
-	 * are connected, NULL if not connected.
-	 */
-	struct sockaddr_in* addr ;
-
-	/**
-	 * Default construction of the SocketInfo just initializes
-	 * the (fd) and (addr) variables to -1 and NULL, respectively.
-	 */
-	inline SocketInfo()
-	  : fd( -1 ), addr( 0 )
-	{}
-
-	/**
-	 * Copy constructor.
-	 * The (fd) is copied using a primitive copy.
-	 * The socket address structure (addr) is allocated here,
-	 * and the contents of the SocketInfo structure (rhs)'s
-	 * (addr) variable is copied into (this->addr).
-	 */
-	inline SocketInfo( const SocketInfo& rhs )
-	  : fd( rhs.fd ), addr( 0 )
-		{
-		addr = new struct sockaddr_in ;
-		memcpy( addr, rhs.addr, sizeof( sockaddr_in ) ) ;
-		}
-
-	/**
-	 * Destructor for the SocketInfo structure.
-	 * This method does NOT close the socket descriptor associated
-	 * with this SocketInfo structure, it must be closed manually.
-	 * However, this SocketInfo's (addr) variable is deallocated,
-	 * and set to NULL (just for good programming style).
-	 */
-	inline ~SocketInfo()
-		{
- 		//::close(fd); let close do this, because deep copies may exist while
- 		// fd has not been "duped"
- 		delete addr ;
-		addr = 0 ;
-		}
-
-	/**
-	 * The close method will close the socket descriptor (fd), and
-	 * reset it to -1.
-	 */
-	int close() ;
-
-} ;
 
 /**
  * This class provides basic functionality for communications
@@ -93,57 +29,39 @@ struct SocketInfo
  */
 class Socket
 {
-public:
-
-	/**
-	 * This is the timeout to be used for polling the socket.
-	 * It is public and static to allow outside parties to
-	 * alter and query its value.  Note that it being static
-	 * makes it inherently thread UNsafe.
-	 */
-	static float _timeOut ;
-
-	/**
-	 * This is the type that will be used for representing
-	 * a socket descriptor.
-	 */
-	typedef int socketFd ;
 
 protected:
+
+	/**
+	 * This is the actual file (socket) descriptor to the
+	 * remote machine, -1 if not connected.
+	 */
+	int			fd ;
+
+	/**
+	 * This is the socket address structure containing
+	 * information about the remote machine to which we
+	 * are connected, NULL if not connected.
+	 */
+	struct sockaddr_in	addr ;
 
 	/**
 	 * This is the remote port number to which this Socket
 	 * is connected, -1 if not connected.
 	 */
-	int 		_portNo ; 
-
-	/**
-	 * This is the SocketInfo structure representing
-	 * (holding the state) a particular connection.
-	 */
-	SocketInfo	_sockinfo ;
+	unsigned short int	portNum ;
 
 public:
 
 	/**
 	 * Construct a Socket with default values, and not connected.
 	 */
-	inline Socket( int port= -1 )
-	 : _portNo( port ), _sockinfo()
-	{}
-
-	/**
-	 * Construct a socket given an existing connection on a
-	 * given port.
-	 */
-	Socket( const SocketInfo& connection, int port ) ;
+	Socket() ;
 
 	/**
 	 * Allow Socket's to be copied.
 	 */
-	inline Socket( const Socket& rhs )
-	  : _portNo( rhs._portNo ), _sockinfo( rhs._sockinfo )
-	{}
+	Socket( const Socket& rhs ) ;
 
 	/**
 	 * The destructor for the class Socket doesn't do much.
@@ -151,8 +69,7 @@ public:
 	 * close the connection manually (for now) before
 	 * destroying instances of class Socket.
 	 */
-	inline virtual ~Socket()
-	{  _portNo = -1 ; }
+	virtual ~Socket() {}
 
 	/**
 	 * Close the currently open socket connection, and
@@ -162,15 +79,14 @@ public:
 	 * Socket instance.  This is to permit safe copying
 	 * of the SocketInfo structure.
 	 */
-	inline virtual int close()
-	{ _portNo = -1 ; return _sockinfo.close() ; }
+	inline virtual int close() ;
 
 	/**
 	 * Send no more than (nb) bytes of the unsigned character
 	 * array pointer to by (b) to the socket.
 	 * Returns number of bytes written, -1 on error.
 	 */
-	virtual int send( const unsigned char* b, int nb ) ;
+	virtual int send( const unsigned char* b, size_t nb ) ;
 
 	/**
 	 * Receive no more than (nb) bytes into the unsigned
@@ -199,22 +115,10 @@ public:
 	virtual int send( const string& val ) ;
 
 	/**
-	 * Returns a const reference to the SocketInfo object
-	 * holding the state of this Socket.
+	 * Return this Socket's file descriptor.
 	 */
-	inline const SocketInfo& getInfo() const
-	{ return _sockinfo ; }
-
-	/**
-	 * This method opens and configures the socket.
-	 */
-	int setSocket( SocketInfo& sock ) ;
-
-	/**
-	 * This method initializes this Socket to default
-	 * values, and calls setSocket.
-	 */
-	int resetSocket( SocketInfo& sock ) ;
+	virtual int getFD() const
+		{ return fd ; }
 
 	/**
 	 * Return the IP address of the given host name.
@@ -281,35 +185,13 @@ public:
 	 */
 	virtual int writable() const ;
  
-	/**
-	 * Check a list of socketFd's for pendinginput.
-	 * The socket file descriptors are given in the vector
-	 * (socFds).  The list of socketFd's available for immediate
-	 * recv()'s are put into pendingList.
-	 * A timeout value of -1.0 defaults to an infinite wait
-	 * socket data to be ready on any of the socketFd's.
-	 * Returns the number of socketFd's ready for immediate recv(),
-	 * or -1 on error.
-	 */
-	static int pendingInputList( const vector< socketFd >& socFds,
-		vector< socketFd >& pendingList,
-		float timeOut = -1.0 ) ;
+protected:
 
 	/**
-	 * Check a list of socketFd's for space in the TCP
-	 * output buffer of each.  The vector of socketFd's to
-	 * check is (socFds).  The vector of socketFd's whose
-	 * TCP output buffer is not completely full is returned
-	 * in (writeList).  A timeout value of -1.0 (default)
-	 * indicates that the method is to wait indefinitely
-	 * for at leaste one of the socket descriptors to become
-	 * writable.
-	 * Returns the number of socketFd's ready for non-blocking
-	 * immediate send(), or -1 on error.
+	 * This method opens and configures the socket.
 	 */
-	static int writableList( const vector< socketFd >& socFds,
-		vector< socketFd >& writeList,
-		float timeOut = -1.0 ) ; 
+	bool setSocket() ;
+
 
 } ;
 

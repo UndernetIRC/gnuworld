@@ -1,15 +1,15 @@
-dnl $Id: configure.in,v 1.8 2000/12/09 22:01:11 dan_karrels Exp $
+dnl $Id: configure.in,v 1.9 2000/12/15 00:13:39 dan_karrels Exp $
 dnl ----------------------------------------------------------
 
-AC_REVISION($Revision: 1.8 $)
+AC_REVISION($Revision: 1.9 $)
 AC_INIT(src/main.cc)
 AC_CONFIG_HEADER(include/defs.h)
 
 echo Configuring GNUWorld...
 echo
 
-CFLAGS="-g -Wall -O0"
-CXXFLAGS="-g -Wall -O0"
+CFLAGS="-g -Wall -O0 -pipe"
+CXXFLAGS="-g -Wall -O0 -pipe"
 CXX="g++"
 LIBS=""
 prefix="."

@@ -2,7 +2,7 @@
  */
 
 #ifndef __CLIENTSOCKET_H
-#define __CLIENTSOCKET_H "$Id: ClientSocket.h,v 1.1 2000/06/30 18:46:06 dan_karrels Exp $"
+#define __CLIENTSOCKET_H "$Id: ClientSocket.h,v 1.2 2000/12/15 00:13:44 dan_karrels Exp $"
 
 #include	"Socket.h" // inherit send, recv, status methods
 #include	"cstring"
@@ -45,7 +45,8 @@ public:
 	 * connection was successful, or -1 on error.
 	 * This function blocks.
 	 */
-	virtual Socket::socketFd connect( const string& host, int portNo ) ;
+	virtual int connect( const string& host,
+		unsigned short int portNo ) ;
 
 protected:
 
