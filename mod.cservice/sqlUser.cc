@@ -4,7 +4,7 @@
  * Storage class for accessing user information either from the backend
  * or internal storage.
  *
- * $Id: sqlUser.cc,v 1.26 2001/09/26 01:10:31 gte Exp $
+ * $Id: sqlUser.cc,v 1.27 2001/09/26 01:26:40 gte Exp $
  */
 
 #include	<strstream.h>
@@ -318,7 +318,7 @@ if( PGRES_TUPLES_OK == status )
 
 	if(SQLDb->Tuples() < 1)
 		{
-		return (false);
+		return ("");
 		}
 
 	last_hostmask = SQLDb->GetValue(0, 0);
