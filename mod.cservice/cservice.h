@@ -1,5 +1,5 @@
 #ifndef __CSERVICE_H
-#define __CSERVICE_H "$Id: cservice.h,v 1.53 2001/03/02 19:30:41 gte Exp $"
+#define __CSERVICE_H "$Id: cservice.h,v 1.54 2001/03/05 03:06:30 gte Exp $"
 
 #include	<string>
 #include	<vector>
@@ -284,6 +284,7 @@ public:
 
 	/* Two support members to check the db for expired bans */
 	void expireSuspends();
+	void expireSilence();
 	void expireBans(); 
 	void performReops();
 	void processDBUpdates();

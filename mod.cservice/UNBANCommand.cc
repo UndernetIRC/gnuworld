@@ -8,7 +8,7 @@
  *
  * Caveats: None.
  *
- * $Id: UNBANCommand.cc,v 1.8 2001/02/16 20:20:26 plexus Exp $
+ * $Id: UNBANCommand.cc,v 1.9 2001/03/05 03:06:30 gte Exp $
  */
 
 #include	<string>
@@ -21,7 +21,7 @@
 #include	"responses.h"
 #include	"match.h"
 
-const char UNBANCommand_cc_rcsId[] = "$Id: UNBANCommand.cc,v 1.8 2001/02/16 20:20:26 plexus Exp $" ;
+const char UNBANCommand_cc_rcsId[] = "$Id: UNBANCommand.cc,v 1.9 2001/03/05 03:06:30 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -109,7 +109,8 @@ bool UNBANCommand::Exec( iClient* theClient, const string& Message )
 			bot->Notice(theClient, 
 				bot->getResponse(theUser,
 					language::cant_find_on_chan,
-					string("Sorry, I cannot find the specified nick.")));
+					string("I can't find %s on channel %s")).c_str(),
+					st[2].c_str(), theChan->getName().c_str());
 			return true;
 		}
 

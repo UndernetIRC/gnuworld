@@ -8,7 +8,7 @@
  *
  * Caveats: None
  *
- * $Id: JOINCommand.cc,v 1.7 2001/02/21 00:14:43 dan_karrels Exp $
+ * $Id: JOINCommand.cc,v 1.8 2001/03/05 03:06:30 gte Exp $
  */
 
 
@@ -21,7 +21,7 @@
 #include	"responses.h"
 #include	"Network.h"
 
-const char JOINCommand_cc_rcsId[] = "$Id: JOINCommand.cc,v 1.7 2001/02/21 00:14:43 dan_karrels Exp $" ;
+const char JOINCommand_cc_rcsId[] = "$Id: JOINCommand.cc,v 1.8 2001/03/05 03:06:30 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -51,8 +51,7 @@ if (!theUser)
 /* 
  *  Check the channel is actually registered.
  */
-
-Channel* tmpChan = Network->findChannel(st[1]);
+ 
 sqlChannel* theChan = bot->getChannelRecord(st[1]);
 if (!theChan)
 	{
@@ -93,19 +92,7 @@ bot->Join(theChan->getName(),
 /* Whack this reop on the Q */ 
 bot->reopQ.insert(cservice::reopQType::value_type(theChan->getName(),
 	bot->currentTime() + 15) );
-
-if (tmpChan)
-	{
-	if(theChan->getFlag(sqlChannel::F_NOOP))
-		{
-		bot->deopAllOnChan(tmpChan);
-		}
-	if(theChan->getFlag(sqlChannel::F_STRICTOP))
-		{
-		bot->deopAllUnAuthedOnChan(tmpChan);
-		}
-	}
-
+ 
 return true;
 } 
 

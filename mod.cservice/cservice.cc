@@ -403,6 +403,7 @@ if( (getLastRecieved(theClient) + flood_duration) <= ::time(NULL) )
 	 */
 
 	setFloodPoints(theClient, 0);
+	setOutputTotal(theClient, 0);
 	setLastRecieved(theClient, ::time(NULL));
 	}
 else 
@@ -448,7 +449,7 @@ else
 		Write( s );
 		delete[] s.str();
 
-		time_t expireTime = currentTime() + 3600;
+		time_t expireTime = currentTime() + 3600; 
 		silenceList.push_back(make_pair(expireTime, silenceMask));
 	 
 		logAdminMessage("MSG-FLOOD from %s",
@@ -495,6 +496,7 @@ return tmpData->outputCount;
 
 bool cservice::hasOutputFlooded(iClient* theClient)
 {
+
 if( (getLastRecieved(theClient) + flood_duration) <= ::time(NULL) )
 	{
 	/*
@@ -503,6 +505,7 @@ if( (getLastRecieved(theClient) + flood_duration) <= ::time(NULL) )
 	 */
 
 	setOutputTotal(theClient, 0);
+	setFloodPoints(theClient, 0);
 	setLastRecieved(theClient, ::time(NULL));
 	}
 else 
@@ -630,7 +633,8 @@ else
 		}
 
 	setFloodPoints(theClient, getFloodPoints(theClient)
-		+ commHandler->second->getFloodPoints() );
+		+ commHandler->second->getFloodPoints() ); 
+
 	commHandler->second->Exec( theClient, Message ) ;
 	}
 
@@ -1181,7 +1185,108 @@ return true;
  */
 void cservice::expireSuspends()
 {
+	elog << "cservice::expireSuspends> Checking for expired Suspensions.." << endl;
+	strstream expireQuery;
+	ExecStatusType status; 
+
+	expireQuery << "SELECT user_id,channel_id FROM levels "
+				<< "WHERE suspend_expires <= "
+				<< currentTime() 
+				<< " AND suspend_expires <> 0"
+				<< ends;
+
+	elog << "sqlQuery> " << expireQuery.str() << endl;
+ 
+	if ((status = SQLDb->Exec(expireQuery.str())) == PGRES_TUPLES_OK)
+	{ 
+		/*
+		 *  Loops over the results set, and attempt to locate
+		 *  this level record in the cache.
+		 */ 
+
+		elog << "cservice::expireSuspends> Found " 
+			 << SQLDb->Tuples()
+			 << " expired suspensions." << endl; 
+
+		/*
+		 *  Place our query results into temporary storage, because
+		 *  we might have to execute other queries inside the
+		 *  loop which will invalidate our results set.
+		 */
+
+		typedef vector < pair < string, string > > expireVectorType;
+		expireVectorType expireVector;
+ 
+		for (int i = 0 ; i < SQLDb->Tuples(); i++)
+		{ 
+			expireVector.push_back(expireVectorType::value_type(
+				SQLDb->GetValue(i, 0), 
+				SQLDb->GetValue(i, 1) )
+				);
+ 		}
+ 
+		for (expireVectorType::const_iterator resultPtr = expireVector.begin();
+			resultPtr != expireVector.end(); ++resultPtr)
+			{
+				/*
+				 * Attempt to find this level record in the cache.
+				 */
+				pair<int, int> thePair( atoi(resultPtr->first.c_str()), atoi(resultPtr->second.c_str()) );
+				
+				sqlLevelHashType::iterator Lptr = sqlLevelCache.find(thePair);
+				if(Lptr != sqlLevelCache.end())
+				{
+					/* Found it in the cache, remove suspend. */
+					elog << "cservice::expireSuspends> Found level record in cache: "
+						 << resultPtr->first << ":" << resultPtr->second << endl;
+					(Lptr->second)->setSuspendExpire(0);
+					(Lptr->second)->setSuspendBy(string()); 
+				}
+
+				/*
+				 *  Execute a query to update the status in the db.
+				 */
+
+				string updateQuery = "UPDATE levels SET suspend_expires = 0, suspend_by = ''"
+					" WHERE user_id = " + resultPtr->first + " AND channel_id = " +
+					resultPtr->second;
+
+				elog << "sqlQuery> " << updateQuery << endl; 
+			
+				if ((status = SQLDb->Exec(updateQuery.c_str())) != PGRES_COMMAND_OK)
+				{
+					elog << "cservice::expireSuspends> Unable to update record while unsuspending."
+						 << endl;
+				}
+
+			}
+
+	}
 }
+
+/**
+ * This function removes any ignores that have expired.
+ *
+ */
+void cservice::expireSilence()
+{
+	
+silenceListType::iterator ptr = silenceList.begin();
+while (ptr != silenceList.end())
+{
+	if ( ptr->first < currentTime() )
+	{
+		strstream s;
+		s << getCharYYXXX() << " SILENCE " << getCharYYXXX() << " -" << ptr->second << ends; 
+		Write( s );
+		delete[] s.str(); 
+		ptr = silenceList.erase(ptr);
+	} else {
+		++ptr;
+	}
+} 
+
+} 
 
 /**
  * This member function executes an SQL query to return all
@@ -1307,11 +1412,29 @@ if (ptr->second <= currentTime())
 			 */
 
 			tmpChanUser->setMode(ChannelUser::MODE_O);
-
+ 
 			elog	<< "cservice::OnTimer> REOP "
 				<< tmpChan->getName()
 				<< endl;
 			}
+
+			/*
+			 *  If STRICTOP or NOOP is set, do the 'right thing.
+			 */
+
+			sqlChannel* theChan = getChannelRecord(tmpChan->getName());
+			if (theChan)
+			{
+				if(theChan->getFlag(sqlChannel::F_NOOP))
+					{
+					deopAllOnChan(tmpChan);
+					}
+				if(theChan->getFlag(sqlChannel::F_STRICTOP))
+					{
+					deopAllUnAuthedOnChan(tmpChan);
+					}
+			}
+
 		} 
 		reopQ.erase(ptr->first); 
 	} /* If channel exists */
@@ -1545,6 +1668,9 @@ if (timer_id ==  update_timerID)
 if (timer_id == expire_timerID)
 	{ 
 	expireBans();
+	expireSuspends();
+	expireSilence();
+
 	/* Refresh Timers */
 	time_t theTime = time(NULL) + expireInterval;
 	expire_timerID = MyUplink->RegisterTimer(theTime, this, NULL);			
@@ -1772,6 +1898,7 @@ for( xServer::opVectorType::const_iterator ptr = theTargets.begin() ;
 		// get opped!
 		if (reggedChan->getFlag(sqlChannel::F_NOOP))
 			{
+			if ( !tmpUser->getClient()->getMode(iClient::MODE_SERVICES) )
 			deopList.push_back(tmpUser->getClient());
 			}
 
@@ -1786,11 +1913,13 @@ for( xServer::opVectorType::const_iterator ptr = theTargets.begin() ;
 			if (!authUser)
 				{
 				// Not authed, deop.
+				if ( !tmpUser->getClient()->getMode(iClient::MODE_SERVICES) )
 				deopList.push_back(tmpUser->getClient());
 				// Authed but doesn't have access... deop.
 				}
 			else if (!(getEffectiveAccessLevel(authUser,reggedChan, false) >= level::op))
 				{
+				if ( !tmpUser->getClient()->getMode(iClient::MODE_SERVICES) )					
 				deopList.push_back(tmpUser->getClient());
 				}
 			}	
@@ -1938,6 +2067,15 @@ if (!reggedChan->getInChan())
 	return;
 	}
 
+/* Check we're actually opped first.. */
+
+ChannelUser* tmpBotUser = theChan->findUser(getInstance());
+if (!tmpBotUser) return; 
+if(!tmpBotUser->getMode(ChannelUser::MODE_O))
+	{ 
+	return;
+	}
+
 vector< iClient* > deopList;
 
 for( Channel::const_userIterator ptr = theChan->userList_begin();
@@ -1998,6 +2136,15 @@ sqlChannel* reggedChan = getChannelRecord(theChan->getName());
 if (!reggedChan) return;
 
 if (!reggedChan->getInChan())
+	{ 
+	return;
+	}
+
+/* Check we're actually opped first.. */
+
+ChannelUser* tmpBotUser = theChan->findUser(getInstance());
+if (!tmpBotUser) return; 
+if(!tmpBotUser->getMode(ChannelUser::MODE_O))
 	{ 
 	return;
 	}
