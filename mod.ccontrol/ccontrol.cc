@@ -37,7 +37,7 @@
 #include	"ip.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.126 2002/02/01 14:17:18 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.127 2002/02/12 19:49:21 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -878,7 +878,7 @@ switch( theEvent )
 						MsgChanLog(" IP Exception : %d , HOST Exception %d\n"						
 						,getExceptions("*@" + tIP),getExceptions("*@" + NewUser->getInsecureHost()));
 
-						/*glSet = true;
+						glSet = true;
 						ccGline *tmpGline;
 						tmpGline = findGline("*@" + tIP); 
 						if(!tmpGline)
@@ -903,7 +903,7 @@ switch( theEvent )
 								tmpGline->getHost(),
 								tmpGline->getReason(),
 								tmpGline->getExpires() - ::time(0) , this) ;
-						//unSetRemoving();*/
+						//unSetRemoving();
 						}	
 					else
 						{
@@ -1803,7 +1803,7 @@ ccGline *theGline;
 for(glineIterator ptr = glineList.begin(); ptr != glineList.end();++ptr)
 	{
 	theGline = *ptr;
-    	if(theGline->getHost() == HostName)
+    	if(!strcasecmp(theGline->getHost(),HostName))
 		if(theGline->getExpires() > ::time(0))
 			return theGline;
 	}

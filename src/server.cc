@@ -50,7 +50,7 @@
 #include	"UnloadClientTimerHandler.h"
 
 const char server_h_rcsId[] = __SERVER_H ;
-const char server_cc_rcsId[] = "$Id: server.cc,v 1.125 2002/02/02 18:19:53 gte Exp $" ;
+const char server_cc_rcsId[] = "$Id: server.cc,v 1.126 2002/02/12 19:49:35 mrbean_ Exp $" ;
 const char config_h_rcsId[] = __CONFIG_H ;
 const char misc_h_rcsId[] = __MISC_H ;
 const char events_h_rcsId[] = __EVENTS_H ;
@@ -1997,13 +1997,13 @@ glineIterator ptr = gline_begin() ;
 for( ; ptr != gline_end() ; ++ptr )
 	{
 	// Is this the gline in question?
-	if( !strcasecmp( (*ptr)->getUserHost(), userHost ) )
+	if(strcasecmp((*ptr)->getUserHost(),userHost))
 		{
-		// Yup, found it
-		foundGline = true ;
-
-		break ;
+		continue;
 		}
+	// Yup, found it
+	foundGline = true ;
+	break ;
 	}
 
 // Found it, notify the network that we are removing it

@@ -15,7 +15,7 @@
 #include	"misc.h"
 #include	"Constants.h"
 
-const char MODUSERCommand_cc_rcsId[] = "$Id: MODUSERCommand.cc,v 1.15 2002/01/17 20:04:05 mrbean_ Exp $";
+const char MODUSERCommand_cc_rcsId[] = "$Id: MODUSERCommand.cc,v 1.16 2002/02/12 19:49:21 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -327,7 +327,7 @@ while(pos < st.size())
 		}	
 	else if(!strcasecmp(st[pos],"-ua")) //Trying to update the access?
 		{
-		if((AdFlag < operLevel::CODERLEVEL) && (AdFlag >= OpFlag))
+		if((AdFlag < operLevel::CODERLEVEL) && (AdFlag <= OpFlag))
 			{
 			bot->Notice(theClient,"You cant update an access of a user who has higher or equal level as yours");
 			}

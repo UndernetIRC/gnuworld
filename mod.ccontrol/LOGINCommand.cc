@@ -14,7 +14,7 @@
 #include        "ccUser.h"
 #include	"ip.h"
 
-const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.22 2002/02/01 11:14:04 mrbean_ Exp $";
+const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.23 2002/02/12 19:49:21 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -44,7 +44,7 @@ ccUser* theUser = bot->IsAuth(theClient);
 if (theUser) 
 	{
 	//Dont let him authenticate under a new name (for now)
-	bot->Notice(theClient, "You  are already authenticated! ");
+	bot->Notice(theClient, "You are already authenticated! ");
 	return false;
 	}
 

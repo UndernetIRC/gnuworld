@@ -15,7 +15,7 @@
 #include        "ccUser.h"
 #include	"misc.h"
 
-const char ADDCOMMANDCommand_cc_rcsId[] = "$Id: ADDCOMMANDCommand.cc,v 1.21 2002/01/17 20:04:04 mrbean_ Exp $";
+const char ADDCOMMANDCommand_cc_rcsId[] = "$Id: ADDCOMMANDCommand.cc,v 1.22 2002/02/12 19:49:21 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -102,14 +102,19 @@ if(!AClient->gotAccess(Comm) )
 	return false;
 	}
 	
-bool Admin = (AClient->getFlags()  < operLevel::SMTLEVEL);
+bool Admin;
+if(AClient->getType()  < operLevel::SMTLEVEL)
+	Admin = true;
+else
+	Admin = false;
+	
 
 if((Admin) && (AClient->getType() <= theUser->getType()))
 	{
 	bot->Notice(theClient,"You cant modify user who have a equal/higher access than you");
 	return false;
 	}
-else if(!(Admin) && (AClient->getFlags() < theUser->getType()))
+else if(!(Admin) && (AClient->getType() < theUser->getType()))
 	{
 	bot->Notice(theClient,"You cant modify user who have a higher access than you");
 	return false;
@@ -121,7 +126,7 @@ if((Admin) && (strcasecmp(AClient->getServer(),theUser->getServer())))
 	}
 if(Forced)
 	{
-	if((AClient->getFlags() < operLevel::SMTLEVEL) && ((bot->findCommandInMem(st[pos]))->getMinLevel() > theUser->getType()))
+	if((AClient->getType() < operLevel::SMTLEVEL) && ((bot->findCommandInMem(st[pos]))->getMinLevel() > theUser->getType()))
 		{
 		bot->Notice(theClient,"Only SMT+ can force the add of command");
 		return false;
@@ -129,7 +134,7 @@ if(Forced)
 	}
 else if(Comm->getMinLevel() > theUser->getType())
 	{
-	if(AClient->getFlags() >= operLevel::SMTLEVEL)
+	if(AClient->getType() >= operLevel::SMTLEVEL)
 		bot->Notice(theClient,
 			    "The min level required to use this command is higher than the one the oper has, use \002-fr\002 if you stil want to add it");
 	else
