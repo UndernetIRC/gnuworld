@@ -1,5 +1,5 @@
 # Default paths (system-wide installs)
-# $Id: Makefile.in,v 1.4 2000/07/10 22:51:52 dan_karrels Exp $
+# $Id: Makefile.in,v 1.5 2000/07/31 16:33:50 dan_karrels Exp $
 #
 
 # Standard defines
@@ -46,6 +46,7 @@ SRCS = ccontrol.cc \
 	Channel.cc \
 	ChannelUser.cc \
 	client.cc \
+	clientExample.cc \
 	cloner.cc \
 	EConfig.cc \
 	ELog.cc \
