@@ -189,10 +189,10 @@ LINK = $(LIBTOOL) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 DIST_SOURCES = $(libltdl_la_SOURCES) $(libltdlc_la_SOURCES)
 HEADERS = $(include_HEADERS) $(noinst_HEADERS)
 
-DIST_COMMON = README $(include_HEADERS) $(noinst_HEADERS) ../install-sh \
-	COPYING.LIB Makefile.am Makefile.in acconfig.h acinclude.m4 \
-	aclocal.m4 config-h.in config.guess config.sub configure \
-	configure.in install-sh ltmain.sh missing mkinstalldirs
+DIST_COMMON = README $(include_HEADERS) $(noinst_HEADERS) COPYING.LIB \
+	Makefile.am Makefile.in acconfig.h acinclude.m4 aclocal.m4 \
+	config-h.in config.guess config.sub configure configure.in \
+	install-sh ltmain.sh missing mkinstalldirs
 SOURCES = $(libltdl_la_SOURCES) $(libltdlc_la_SOURCES)
 
 all: config.h
@@ -388,7 +388,6 @@ distcleancheck_listfiles = find . -type f -print
 distdir: $(DISTFILES)
 	$(am__remove_distdir)
 	mkdir $(distdir)
-	$(mkinstalldirs) $(distdir)/..
 	@srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`; \
 	topsrcdirstrip=`echo "$(top_srcdir)" | sed 's|.|.|g'`; \
 	list='$(DISTFILES)'; for file in $$list; do \

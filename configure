@@ -21064,8 +21064,9 @@ cat >>conftest.$ac_ext <<_ACEOF
 _ACEOF
 if (eval "$ac_cpp conftest.$ac_ext") 2>&5 |
   $EGREP "socklen_t" >/dev/null 2>&1; then
-  cat >>confdefs.h <<\_ACEOF
-#define HAVE_SOCKLEN_T 1
+
+cat >>confdefs.h <<\_ACEOF
+#define HAVE_SOCKLEN_T
 _ACEOF
 
 fi

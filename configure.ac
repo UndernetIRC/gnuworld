@@ -1,10 +1,10 @@
-dnl $Id: configure.ac,v 1.1 2003/05/19 20:02:33 dan_karrels Exp $
+dnl $Id: configure.ac,v 1.2 2003/05/19 21:05:32 dan_karrels Exp $
 dnl ----------------------------------------------------------
 
 echo Configuring GNUWorld...
 echo
 
-AC_REVISION($Revision: 1.1 $)
+AC_REVISION($Revision: 1.2 $)
 AC_INIT
 AC_CONFIG_SRCDIR([src/main.cc])
 AM_INIT_AUTOMAKE(gnuworld,0.0)
@@ -128,7 +128,8 @@ found_socklen_t=no
 AC_EGREP_HEADER(socklen_t,sys/socket.h, AC_DEFINE(HAVE_SOCKLEN_T) found_socklen_t=yes)
 
 if test $found_socklen_t = yes; then
-  AC_EGREP_HEADER(socklen_t,bits/socket.h,AC_DEFINE(HAVE_SOCKLEN_T))
+  AC_EGREP_HEADER(socklen_t,bits/socket.h,
+	AC_DEFINE([HAVE_SOCKLEN_T],[],[Socket length type]))
 fi
 
 if test $found_socklen_t = yes; then
