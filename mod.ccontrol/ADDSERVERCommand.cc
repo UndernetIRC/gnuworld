@@ -13,7 +13,7 @@
 #include	"StringTokenizer.h"
 #include	"Network.h"
 
-const char ADDSERVERCommand_cc_rcsId[] = "$Id: ADDSERVERCommand.cc,v 1.3 2001/11/08 23:13:29 mrbean_ Exp $";
+const char ADDSERVERCommand_cc_rcsId[] = "$Id: ADDSERVERCommand.cc,v 1.4 2001/11/11 16:05:51 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -60,7 +60,7 @@ if(NewServer->Insert())
 	bot->Notice(theClient,"Server %s added successfully\n",st[1].c_str());
 else
 	bot->Notice(theClient,"Database error while adding server %s\n",st[1].c_str());
-
+delete NewServer;
 return true;
 }
 }

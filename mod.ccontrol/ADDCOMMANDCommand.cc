@@ -16,7 +16,7 @@
 #include	"AuthInfo.h"
 #include	"misc.h"
 
-const char ADDCOMMANDCommand_cc_rcsId[] = "$Id: ADDCOMMANDCommand.cc,v 1.16 2001/11/08 23:13:29 mrbean_ Exp $";
+const char ADDCOMMANDCommand_cc_rcsId[] = "$Id: ADDCOMMANDCommand.cc,v 1.17 2001/11/11 16:05:51 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -87,6 +87,7 @@ AuthInfo *AClient = bot->IsAuth( theClient );
 if( NULL == AClient )
 	{
 	bot->Notice( theClient, "You must first authenticate" ) ;
+	delete theUser;
 	return true ;
 	}
 
@@ -104,16 +105,19 @@ bool Admin = (AClient->getFlags()  < operLevel::SMTLEVEL);
 if((Admin) && (AClient->getFlags() <= theUser->getType()))
 	{
 	bot->Notice(theClient,"You cant modify user who have a equal/higher access than you");
+	delete theUser;
 	return false;
 	}
 else if(!(Admin) && (AClient->getFlags() < theUser->getType()))
 	{
 	bot->Notice(theClient,"You cant modify user who have a higher access than you");
+	delete theUser;
 	return false;
 	}
 if((Admin) && (strcasecmp(AClient->getServer(),theUser->getServer())))
 	{
 	bot->Notice(theClient,"You can only modify a user who is associated with the same server as you");
+	delete theUser;
 	return false;
 	}
 if(Forced)
@@ -121,6 +125,7 @@ if(Forced)
 	if((AClient->getFlags() < operLevel::SMTLEVEL) && ((bot->findCommandInMem(st[pos]))->getMinLevel() > theUser->getType()))
 		{
 		bot->Notice(theClient,"Only SMT+ can force the add of command");
+		delete theUser;
 		return false;
 		}
 	}
@@ -132,6 +137,7 @@ else if(Comm->getMinLevel() > theUser->getType())
 	else
 		bot->Notice(theClient,
 			    "The min level required to use this command is higher than the one the oper has");
+	delete theUser;
 	return false;
 	}
 		

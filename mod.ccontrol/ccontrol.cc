@@ -37,7 +37,7 @@
 #include	"ip.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.82 2001/11/08 23:13:29 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.83 2001/11/11 16:05:51 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -1963,8 +1963,10 @@ for(glineIterator ptr = glineList.begin();ptr != glineList.end();)
 		MyUplink->removeGline((*ptr)->getHost());
 		//remove the gline from ccontrol structure
 		//finally remove the gline from the database
-		(*ptr)->Delete();
+		ccGline* tGline = *ptr;
+		tGline->Delete();
 		ptr = glineList.erase(ptr);
+		delete tGline;
 		totalFound++;
 		}
 	else
@@ -2252,10 +2254,10 @@ for(loginIterator ptr = ignore_begin();ptr!=ignore_end();)
 		tempLogin->resetIgnore();
 		tempLogin->resetLogins();
 		ptr = ignoreList.erase(ptr);
-		if(tempLogin->getNumeric() == "0")
-			{
-			delete tempLogin;
-			}
+		//if(tempLogin->getNumeric() == "0")
+		//	{
+		delete tempLogin;
+		//	}
 		retMe = IGNORE_REMOVED;
 		}
 	else
@@ -2343,10 +2345,10 @@ for(loginIterator ptr = ignore_begin();ptr!=ignore_end();)
 		Write( s );
 		delete[] s.str();
 		tempLogin->setIgnoredHost("");
-		if(tempLogin->getNumeric() == "0")
-			{
-			delete tempLogin;
-			}
+		//if(tempLogin->getNumeric() == "0")
+		//	{
+		delete tempLogin;
+		//	}
 		ptr = ignoreList.erase(ptr);
 		}
 	else
@@ -2608,15 +2610,17 @@ const string ccontrol::expandDbServer(const string Name)
 
 void ccontrol::addClone(const string Addy)
 {
-clonesQueue.push_back(Addy);
+string* tstr = new string(Addy);
+clonesQueue.push_back(tstr);
 }
 
 void ccontrol::delClone(const string Addy)
 {
 for(clonesIterator ptr = clonesQueue.begin(); ptr != clonesQueue.end();)
 	{
-	if(!strcasecmp(*ptr,Addy))
+	if(!strcasecmp(**ptr,Addy))
 		{
+		delete *ptr;
 		ptr = clonesQueue.erase(ptr);
 		}
 	else
@@ -2634,15 +2638,15 @@ if(Amount < 0)
 int Num = Amount;	
 for(clonesIterator ptr = clonesQueue.begin();((ptr != clonesQueue.end()) && (Num));--Num)
 	{
-	CurConnections = Network->countHost(*ptr);		
-	if(CurConnections  > getExceptions("*@" + *ptr))
+	CurConnections = Network->countHost(**ptr);		
+	if(CurConnections  > getExceptions("*@" + **ptr))
 		{
 		ccGline *tmpGline;
-		tmpGline = findGline("*@" + *ptr); 
+		tmpGline = findGline("*@" + **ptr); 
 		if(!tmpGline)
 			{
 			tmpGline = new ccGline(SQLDb);
-			tmpGline->setHost("*@" + *ptr);
+			tmpGline->setHost("*@" + **ptr);
 			tmpGline->setExpires(::time(0) + maxGlineLen);
 			tmpGline->setReason("Automatically banned for excessive connections");
 			tmpGline->setAddedOn(::time(0));
@@ -2655,6 +2659,7 @@ for(clonesIterator ptr = clonesQueue.begin();((ptr != clonesQueue.end()) && (Num
 				tmpGline->getReason(),
 				tmpGline->getExpires() - ::time(0) ) ;
 		}
+	delete (*ptr);
 	ptr = clonesQueue.erase(ptr);
 	}
 	

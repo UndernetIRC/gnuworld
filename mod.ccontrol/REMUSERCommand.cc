@@ -13,7 +13,7 @@
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 
-const char REMUSERCommand_cc_rcsId[] = "$Id: REMUSERCommand.cc,v 1.3 2001/11/08 23:13:29 mrbean_ Exp $";
+const char REMUSERCommand_cc_rcsId[] = "$Id: REMUSERCommand.cc,v 1.4 2001/11/11 16:05:51 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -44,6 +44,7 @@ AuthInfo* tempAuth = bot->IsAuth(theClient->getCharYYXXX());
 if(tempAuth->getFlags() < theUser->getType())
 	{
 	bot->Notice(theClient,"You cant remove an oper who got higer access than yours");
+	delete theUser;
 	return false;
 	}
 if(bot->DeleteOper(string_lower(st[1])))     

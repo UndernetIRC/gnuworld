@@ -14,7 +14,7 @@
 #include	"ccUser.h"
 #include	"misc.h"
 
-const char MODUSERCommand_cc_rcsId[] = "$Id: MODUSERCommand.cc,v 1.5 2001/11/08 23:13:29 mrbean_ Exp $";
+const char MODUSERCommand_cc_rcsId[] = "$Id: MODUSERCommand.cc,v 1.6 2001/11/11 16:05:51 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -68,6 +68,7 @@ else if(AdFlag < OpFlag)
 if((Admin) && (strcasecmp(tmpAuth->getServer().c_str(),tmpUser->getServer().c_str())))
 	{
 	bot->Notice(theClient,"You can only modify a user who's associated to the same server as you");
+	delete tmpUser;
 	return false;
 	}
 unsigned int pos = 2;
@@ -97,11 +98,13 @@ while(pos < st.size())
 		if((pos + 1) >= st.size())
 			{
 			bot->Notice(theClient,"-ah option must get new hostmask");
+			delete tmpUser;
 			return false;
 			}
 		if(st[pos + 1].size() > 128)
 			{
 			bot->Notice(theClient,"Hostname can't be more than 128 chars");
+			delete tmpUser;
 			return false;
 			}
 		if(!bot->validUserMask(st[pos+1]))
@@ -127,11 +130,13 @@ while(pos < st.size())
 		if((pos + 1) >= st.size())
 			{
 			bot->Notice(theClient,"-dh option must get a host mask");
+			delete tmpUser;
 			return false;
 			}
 		if(st[pos + 1].size() > 128)
 			{
 			bot->Notice(theClient,"Hostname can't be more than 128 chars");
+			delete tmpUser;
 			return false;
 			}
 		if(!bot->UserGotHost(tmpUser,bot->removeSqlChars(st[pos+1])))
@@ -153,6 +158,7 @@ while(pos < st.size())
 		if((pos + 1) >= st.size())
 			{
 			bot->Notice(theClient,"-gl option must get on/off");
+			delete tmpUser;
 			return false;
 			}
 		if(!strcasecmp(st[pos+1],"on"))
@@ -168,6 +174,7 @@ while(pos < st.size())
 		else
 			{
 			bot->Notice(theClient,"unknown option %s for -gl must be on/off",st[pos+1].c_str());
+			delete tmpUser;
 			return false;
 			}
 		tmpUser->setLast_Updated_By(theClient->getNickUserHost());
@@ -180,21 +187,25 @@ while(pos < st.size())
 		if((pos + 1) >= st.size())
 			{
 			bot->Notice(theClient,"-s option must get a server");
+			delete tmpUser;
 			return false;
 			}
 		if(Admin)
 			{
 			bot->Notice(theClient,"Sorry, only SMT memebers can change the user server");
+			delete tmpUser;
 			return false;
 			}
 		if(st[pos + 1].size() > 128)
 			{
 			bot->Notice(theClient,"Server name can't be more than 128 chars");
+			delete tmpUser;
 			return false;
 			}
 		if(!strcasecmp(tmpUser->getServer(),st[pos+1]))
 			{
 			bot->Notice(theClient,"%s already is associated with %s",st[1].c_str(),st[3].c_str());
+			delete tmpUser;
 			return false;
 			}
 		else
@@ -205,11 +216,11 @@ while(pos < st.size())
 				{
 				bot->Notice(theClient,"%s has been associated with %s",st[1].c_str(),st[pos+1].c_str());
 				bot->UpdateAuth(tmpUser);
-				return true;
 				}
 			else
 				{
 				bot->Notice(theClient,"Error while associating %s with %s",st[1].c_str(),st[pos+1].c_str());
+				delete tmpUser;
 				return false;
 				}
 			pos += 2;
@@ -220,6 +231,7 @@ while(pos < st.size())
 		if((pos + 1) >= st.size())
 			{
 			bot->Notice(theClient,"-op option must get on/off");
+			delete tmpUser;
 			return false;
 			}
 		if(!strcasecmp(st[pos+1],"on"))
@@ -235,6 +247,7 @@ while(pos < st.size())
 		else
 			{
 			bot->Notice(theClient,"unknown option %s for -no must be on/off",st[pos+1].c_str());
+			delete tmpUser;
 			return false;
 			}
 		tmpUser->setLast_Updated_By(theClient->getNickUserHost());
@@ -269,6 +282,7 @@ while(pos < st.size())
 		if((pos + 1) >= st.size())
 			{
 			bot->Notice(theClient,"-uf option must get anew flags");
+			delete tmpUser;
 			return false;
 			}
 		unsigned int NewF;
@@ -322,6 +336,7 @@ while(pos < st.size())
 		if((pos + 1) >= st.size())
 			{
 			bot->Notice(theClient,"-e option must get an email addy");
+			delete tmpUser;
 			return false;
 			}
 		tmpUser->setEmail(bot->removeSqlChars(st[pos+1]));

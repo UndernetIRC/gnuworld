@@ -12,7 +12,7 @@
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 
-const char UNSUSPENDCommand_cc_rcsId[] = "$Id: UNSUSPENDCommand.cc,v 1.4 2001/11/08 23:13:29 mrbean_ Exp $";
+const char UNSUSPENDCommand_cc_rcsId[] = "$Id: UNSUSPENDCommand.cc,v 1.5 2001/11/11 16:05:51 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -62,17 +62,20 @@ else if(AdFlag < OpFlag)
 if((Admin) && (strcasecmp(tmpAuth->getServer().c_str(),tmpUser->getServer().c_str())))
 	{
 	bot->Notice(theClient,"You can only unsuspend a user who's associated to the same server as you");
+	delete tmpUser;
 	return false;
 	}
 if(tmpUser->getSuspendLevel() > AdFlag)
 	{
 	bot->Notice(theClient,"The suspend level is set to a higher level than yours");
+	delete tmpUser;
 	return false;
 	}
 	
 if(!(bot->isSuspended(tmpUser)))
 	{
 	bot->Notice(theClient,"%s is not suspended",st[1].c_str());
+	delete tmpUser;
 	return false;
 	}
 

@@ -3,7 +3,7 @@
  */
 
 #ifndef __CCONTROL_H
-#define __CCONTROL_H "$Id: ccontrol.h,v 1.46 2001/11/08 23:13:29 mrbean_ Exp $"
+#define __CCONTROL_H "$Id: ccontrol.h,v 1.47 2001/11/11 16:05:51 mrbean_ Exp $"
 
 
 #include	<string>
@@ -113,7 +113,7 @@ protected:
 	
 	exceptionListType		exceptionList;
 	
-	typedef list< string >		clonesQueueType;
+	typedef list< string* >		clonesQueueType;
 	
 	clonesQueueType			clonesQueue;
 	
@@ -791,3 +791,4 @@ void* initGate( void * );
 } // namespace gnuworld
  
 #endif // __CCONTROL_H
+

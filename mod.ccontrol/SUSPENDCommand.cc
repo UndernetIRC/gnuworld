@@ -13,7 +13,7 @@
 #include	"StringTokenizer.h"
 #include	"ccUser.h"
 
-const char SUSPENDCommand_cc_rcsId[] = "$Id: SUSPENDCommand.cc,v 1.4 2001/11/08 23:13:29 mrbean_ Exp $";
+const char SUSPENDCommand_cc_rcsId[] = "$Id: SUSPENDCommand.cc,v 1.5 2001/11/11 16:05:51 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -60,6 +60,7 @@ else if(AdFlag < OpFlag)
 if((Admin) && (strcasecmp(tmpAuth->getServer().c_str(),tmpUser->getServer().c_str())))
 	{
 	bot->Notice(theClient,"You can only suspend a user who's associated to the same server as you");
+	delete tmpUser;
 	return false;
 	}
 
@@ -97,6 +98,7 @@ unsigned int Len = atoi(Length.c_str()) * Units;
 if(Len == 0)
 	{
 	bot->Notice(theClient,"Invalid duration!");
+	delete tmpUser;
 	return false;
 	}
 unsigned int Level = operLevel::OPERLEVEL;;
@@ -106,6 +108,7 @@ if(!strcasecmp(st[3],"-l"))
 	if(st.size() < 6)
 		{
 		Usage(theClient);
+		delete tmpUser;
 		return false;
 		}
 	if(!strcasecmp(st[4],"OPER"))
@@ -127,11 +130,13 @@ if(!strcasecmp(st[3],"-l"))
 	else
 		{
 		bot->Notice(theClient,"Invalid suspend level must be OPER/ADMIN/SMT/CODER");
+		delete tmpUser;
 		return false;
 		}
 	if(Level > AdFlag)
 		{
 		bot->Notice(theClient,"You cant suspend with a level higher than yours!");
+		delete tmpUser;
 		return false;
 		}
 	ResPos = 5;

@@ -15,7 +15,7 @@
 #include 	"ccUser.h"
 #include	"misc.h"
 
-const char REMCOMMANDCommand_cc_rcsId[] = "$Id: REMCOMMANDCommand.cc,v 1.4 2001/11/08 23:13:29 mrbean_ Exp $";
+const char REMCOMMANDCommand_cc_rcsId[] = "$Id: REMCOMMANDCommand.cc,v 1.5 2001/11/11 16:05:51 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -53,6 +53,7 @@ if(!theUser)
 if(st[2].size() > 128)
 	{
 	bot->Notice(theClient,"Command name can't be more than 128 chars");
+	delete theUser;
 	return false;
 	}
 Command* Comm = bot->findCommandInMem(st[2]);
@@ -76,16 +77,19 @@ bool Admin = (tempUser->getFlags()  < operLevel::SMTLEVEL);
 if((Admin) && (tempUser->getFlags() <= theUser->getType()))
 	{
 	bot->Notice(theClient,"You cant modify user who have a equal/higher access than you");
+	delete theUser;
 	return false;
 	}
 else if(!(Admin) && (tempUser->getFlags() < theUser->getType()))
 	{
 	bot->Notice(theClient,"You cant modify user who have a higher access than you");
+	delete theUser;
 	return false;
 	}
 if((Admin) && (strcasecmp(tempUser->getServer(),theUser->getServer())))
 	{
 	bot->Notice(theClient,"You can only modify a user who is associated with the same server as you");
+	delete theUser;
 	return false;
 	}
 	
