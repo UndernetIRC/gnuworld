@@ -3,7 +3,7 @@
  *
  * Stores a database user
  *
- * $Id: sqlUser.cc,v 1.5 2002/08/25 00:10:48 jeekay Exp $
+ * $Id: sqlUser.cc,v 1.6 2002/08/25 16:21:44 jeekay Exp $
  */
  
  #include <ctime>
@@ -17,6 +17,7 @@
  
  const sqlUser::flagType sqlUser::F_SUSPEND  = 0x0001;
  const sqlUser::flagType sqlUser::F_AUTOKILL = 0x0002;
+ const sqlUser::flagType sqlUser::F_RECOVER  = 0x0004;
  
  unsigned long int sqlUser::maxUserId = 0;
  

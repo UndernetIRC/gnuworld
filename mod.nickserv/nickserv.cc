@@ -7,7 +7,7 @@
 #include "netData.h"
 #include "nickserv.h"
 
-const char NickServ_cc_rcsId[] = "$Id: nickserv.cc,v 1.6 2002/08/25 00:10:48 jeekay Exp $";
+const char NickServ_cc_rcsId[] = "$Id: nickserv.cc,v 1.7 2002/08/25 16:21:44 jeekay Exp $";
 
 namespace gnuworld
 {
@@ -66,6 +66,7 @@ theManager = sqlManager::getInstance(dbString, commitCount);
 precacheUsers();
 
 /* Register the commands we want to use */
+RegisterCommand(new RECOVERCommand(this, "RECOVER", ""));
 RegisterCommand(new REGISTERCommand(this, "REGISTER", ""));
 RegisterCommand(new SETCommand(this, "SET", "<property> <value>"));
 RegisterCommand(new WHOAMICommand(this, "WHOAMI", ""));

@@ -8,7 +8,7 @@
 
 #include "nickserv.h"
 
-const char SETCommand_cc_rcsId[] = "$Id: SETCommand.cc,v 1.1 2002/08/25 00:10:48 jeekay Exp $";
+const char SETCommand_cc_rcsId[] = "$Id: SETCommand.cc,v 1.2 2002/08/25 16:21:44 jeekay Exp $";
 
 namespace gnuworld
 {
@@ -55,19 +55,25 @@ if("ON" == status) {
   return true;
 }
 
-/* See if we have hit a real property */
-if("AUTOKILL" == property) {
-  if(bStatus) {
-    theUser->setFlag(sqlUser::F_AUTOKILL);
-  } else {
-    theUser->removeFlag(sqlUser::F_AUTOKILL);
-  }
-  theUser->commit();
-  bot->Notice(theClient, "%s set to %s", property.c_str(), status.c_str());
+/* Find out what flag we are trying to alter */
+sqlUser::flagType theFlag = 0;
+if("AUTOKILL" == property) theFlag = sqlUser::F_AUTOKILL;
+if("RECOVER" == property) theFlag = sqlUser::F_RECOVER;
+
+if(0 == theFlag) {
+  bot->Notice(theClient, "Unknown property %s.", property.c_str());
   return true;
 }
 
-bot->Notice(theClient, "Invalid PROPERTY specified.");
+if(bStatus) {
+  theUser->setFlag(theFlag);
+} else {
+  theUser->removeFlag(theFlag);
+}
+
+theUser->commit();
+
+bot->Notice(theClient, "%s set to %s", property.c_str(), status.c_str());
 
 return true;
 } // bool SETCommand::Exec

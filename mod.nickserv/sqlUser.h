@@ -1,5 +1,5 @@
 #ifndef _SQLUSER_H
-#define _SQLUSER_H "$Id: sqlUser.h,v 1.6 2002/08/25 00:10:48 jeekay Exp $"
+#define _SQLUSER_H "$Id: sqlUser.h,v 1.7 2002/08/25 16:21:44 jeekay Exp $"
 
 #include <string>
 
@@ -22,6 +22,7 @@ class sqlUser
     typedef unsigned short int flagType;
     static const flagType F_SUSPEND;
     static const flagType F_AUTOKILL;
+    static const flagType F_RECOVER;
 
     /** Default constructor makes an empty user */
     sqlUser(sqlManager*);

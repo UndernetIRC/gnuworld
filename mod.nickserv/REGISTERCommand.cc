@@ -8,7 +8,7 @@
 
 #include "nickserv.h"
 
-const char REGISTERCommand_cc_rcsId[] = "$Id: REGISTERCommand.cc,v 1.1 2002/08/25 00:10:48 jeekay Exp $";
+const char REGISTERCommand_cc_rcsId[] = "$Id: REGISTERCommand.cc,v 1.2 2002/08/25 16:21:44 jeekay Exp $";
 
 namespace gnuworld
 {
@@ -35,12 +35,17 @@ if(theUser) {
 theUser = new sqlUser(bot->theManager);
 
 theUser->setName(theClient->getAccount());
+
+/* Enable AUTOKILL and RECOVER by default */
+theUser->setFlag(sqlUser::F_AUTOKILL | sqlUser::F_RECOVER);
+
 theUser->setLastSeenTS(time(NULL));
 theUser->setRegisteredTS(time(NULL));
 theUser->insertUser();
 
 bot->Notice(theClient, "Your nickname, %s, has been successfully registered.",
   theClient->getAccount().c_str());
+bot->Notice(theClient, "Note: AUTOKILL and RECOVER are enabled by default.");
 
 return true;
 }
