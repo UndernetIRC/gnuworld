@@ -12,7 +12,7 @@
 #include	"cservice_config.h"
 #include	"Network.h"
 
-const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.31 2002/01/08 23:20:43 gte Exp $" ;
+const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.32 2002/01/26 23:02:46 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -152,6 +152,12 @@ bot->Notice(theClient,
 	bot->getResponse(theUser, language::auth_success).c_str(),
 	theUser->getUserName().c_str());
 
+string greeting = bot->getResponse(theUser, language::greeting);
+if (!greeting.empty())
+{
+	bot->Notice(theClient, greeting.c_str());
+}
+
 /*
  * Send out AC token onto the network.
  * The AC Token (Account) is read by ircu2.10.11 and any other
@@ -161,7 +167,7 @@ bot->Notice(theClient,
  * Eg: AXAAA AC APAFD gte
  */
 
-#if 1
+#if 0
 strstream ac;
 ac	<< bot->getCharYY()
 	<< " AC "

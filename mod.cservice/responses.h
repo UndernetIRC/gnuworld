@@ -1,16 +1,16 @@
 #ifndef __RESPONSES_H
-#define __RESPONSES_H "$Id: responses.h,v 1.15 2001/04/13 19:12:14 gte Exp $"
+#define __RESPONSES_H "$Id: responses.h,v 1.16 2002/01/26 23:02:46 gte Exp $"
 
-/* 
+/*
  * responses.h
  *
  * 28/12/2000 - Greg Sikorski <gte@atomicrevs.demon.co.uk>
  * Initial Version.
- * 
+ *
  * Defines 'response' ID's, unique references to textual responses
  * from the bot.
  *
- * $Id: responses.h,v 1.15 2001/04/13 19:12:14 gte Exp $
+ * $Id: responses.h,v 1.16 2002/01/26 23:02:46 gte Exp $
  */
 
 namespace gnuworld
@@ -23,8 +23,8 @@ namespace gnuworld
 		const int chan_is_empty =			4;
 		const int dont_see_them =			5;
 		const int cant_find_on_chan =			6;
-		const int chan_not_reg =			7; 
-		const int youre_opped_by =			8; 
+		const int chan_not_reg =			7;
+		const int youre_opped_by =			8;
 		const int youre_voiced_by =			9;
 		const int youre_not_in_chan =			10;
 		const int already_opped =			11;
@@ -60,7 +60,7 @@ namespace gnuworld
 
 		// "Unable to view user details (Invisible)"
 		const int no_peeking =				41;
-		const int info_about =				42; 
+		const int info_about =				42;
 		const int curr_logged_on =			43;
 		const int url =					44;
 		const int lang =				45;
@@ -193,6 +193,7 @@ namespace gnuworld
 		const int rpl_ignorelist = 			170;
 		const int im_not_opped = 			171;
 		const int keywords = 				172;
+		const int greeting = 				9998;
 		const int motd =					9999;
 	}
 }
