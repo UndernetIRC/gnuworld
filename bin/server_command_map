@@ -42,3 +42,6 @@ lib_msg_Y ERROR
 lib_msg_NOOP Z
 lib_msg_NOOP A
 lib_msg_NOOP U
+lib_msg_NOOP WU
+lib_msg_NOOP MO
+
