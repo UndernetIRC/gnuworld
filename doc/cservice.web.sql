@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------------
--- "$Id: cservice.web.sql,v 1.24 2002/02/25 11:05:03 nighty Exp $"
+-- "$Id: cservice.web.sql,v 1.25 2002/02/27 00:23:42 nighty Exp $"
 -- Channel service DB SQL file for PostgreSQL.
 --
 -- Tables specific to webbased registration process.
@@ -120,6 +120,7 @@ CREATE TABLE pendingusers (
 	expire INT4,
 	question_id INT2,
 	verificationdata VARCHAR(30),
+	poster_ip VARCHAR(15) DEFAULT '',
 	language INT4 NOT NULL
 );
 
