@@ -43,7 +43,7 @@
 #include	"moduleLoader.h"
 
 const char xServer_h_rcsId[] = __XSERVER_H ;
-const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.52 2001/01/14 18:37:13 dan_karrels Exp $" ;
+const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.53 2001/01/18 22:44:35 gte Exp $" ;
 
 using std::string ;
 using std::vector ;
@@ -2917,7 +2917,7 @@ else
 	Network->OnSplit( squitServer->getIntYY() ) ;
 
 	// Remove this server from the network tables.
-	Network->removeServer( squitServer->getIntYY() ) ;
+	Network->removeServer( squitServer->getIntYY(), true ) ;
 
 	}
 
