@@ -12,7 +12,7 @@
 #include	"cservice_config.h"
 #include	"Network.h"
 
-const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.22 2001/07/08 17:49:25 gte Exp $" ;
+const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.23 2001/07/16 18:04:43 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -56,7 +56,7 @@ if (tmpUser)
 
 if(st[1][0] == '#')
 {
-	bot->Notice(theClient, "Sorry, I don't know who %s is.", st[1].c_str());
+	bot->Notice(theClient, "AUTHENTICATION FAILED as %s.", st[1].c_str());
 	return false;
 }
 
@@ -67,7 +67,7 @@ if( !theUser )
 	bot->Notice(theClient, 
 		bot->getResponse(tmpUser,
 			language::not_registered,
-			string("Sorry, I don't know who %s is.")).c_str(), 
+			string("AUTHENTICATION FAILED as %s.")).c_str(), 
 		st[1].c_str());
 	return false;
 	}
@@ -114,7 +114,7 @@ if(md5Part != output.str() ) // If the MD5 hash's don't match..
 	bot->Notice(theClient, 
 		bot->getResponse(theUser,
 			language::auth_failed,
-			string("AUTHENTICATION FAILED as %s (Invalid Password).")).c_str(), 
+			string("AUTHENTICATION FAILED as %s.")).c_str(), 
 		theUser->getUserName().c_str());
 
 	delete[] output.str() ;

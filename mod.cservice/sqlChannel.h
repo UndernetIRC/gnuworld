@@ -1,7 +1,7 @@
 /* sqlChannel.h */
 
 #ifndef __SQLCHANNEL_H
-#define __SQLCHANNEL_H "$Id: sqlChannel.h,v 1.27 2001/06/24 15:00:46 gte Exp $"
+#define __SQLCHANNEL_H "$Id: sqlChannel.h,v 1.28 2001/07/16 18:04:43 gte Exp $"
 
 #include	<string>
 #include	<map>
@@ -37,7 +37,7 @@ public:
 	static const flagType	F_STRICTOP  = 0x00020000 ;
 	static const flagType	F_NOOP      = 0x00040000 ;
 	static const flagType	F_AUTOTOPIC = 0x00080000 ;
-	static const flagType	F_OPONLY    = 0x00100000 ;
+	static const flagType	F_OPONLY    = 0x00100000 ; // Deprecated
 	static const flagType	F_AUTOJOIN  = 0x00200000 ;
 
 	/*
