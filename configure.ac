@@ -1,15 +1,16 @@
-dnl $Id: configure.ac,v 1.12 2003/07/03 17:36:55 dan_karrels Exp $
+dnl $Id: configure.ac,v 1.13 2003/07/03 18:30:58 dan_karrels Exp $
 dnl ----------------------------------------------------------
 
 echo Configuring GNUWorld...
 echo
 
-AC_REVISION($Revision: 1.12 $)
+AC_REVISION($Revision: 1.13 $)
 AC_INIT
 AC_CONFIG_SRCDIR([src/main.cc])
 AM_INIT_AUTOMAKE(gnuworld,2.2)
 AM_CONFIG_HEADER(include/defs.h)
 
+AC_PROG_INSTALL
 dnl Enable building of the convenience library
 dnl and set LIBLTDL accordingly
 AC_LIBLTDL_CONVENIENCE
