@@ -4,7 +4,7 @@
  * Class which contains details about channels which are 'pending'
  * registration.
  * 
- * $Id: sqlPendingChannel.cc,v 1.6 2001/06/13 20:22:07 gte Exp $
+ * $Id: sqlPendingChannel.cc,v 1.7 2001/06/13 21:00:37 gte Exp $
  */
  
 #include	<strstream>
@@ -24,7 +24,7 @@
 #include	"sqlPendingTraffic.h"
  
 const char sqlPendingChannel_h_rcsId[] = __SQLPENDINGCHANNEL_H ;
-const char sqlPendingChannel_cc_rcsId[] = "$Id: sqlPendingChannel.cc,v 1.6 2001/06/13 20:22:07 gte Exp $" ;
+const char sqlPendingChannel_cc_rcsId[] = "$Id: sqlPendingChannel.cc,v 1.7 2001/06/13 21:00:37 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -50,7 +50,7 @@ sqlPendingChannel::~sqlPendingChannel()
 		ptr !=  trafficList.end(); ++ptr)
 		{ 
 			sqlPendingTraffic* toDie = ptr->second;
-			elog << "Autocleanup of Traffic record for #" << toDie->ip_number << endl;
+//			elog << "Autocleanup of Traffic record for #" << toDie->ip_number << endl;
 			delete(toDie);
 		} 
 }	
@@ -79,7 +79,7 @@ if( PGRES_TUPLES_OK == status )
 	for (int i = 0 ; i < SQLDb->Tuples(); i++)
 		{ 
 			unsigned int theIp = atoi(SQLDb->GetValue(i, 0));
-			elog << "IP: " << theIp << endl;
+//			elog << "IP: " << theIp << endl;
 
 			sqlPendingTraffic* trafRecord = new sqlPendingTraffic(SQLDb);
 			trafRecord->ip_number = theIp;
@@ -103,10 +103,10 @@ bool sqlPendingChannel::commit()
  * 3. Update Traffic table with new traffic counts.
  */
 
-elog << "Commiting Pending Channel Details: " << endl
-	<< "Channel ID: " << channel_id << endl
-	<< "Total Join Count: " << join_count
-	<< endl; 
+//elog << "Commiting Pending Channel Details: " << endl
+//	<< "Channel ID: " << channel_id << endl
+//	<< "Total Join Count: " << join_count
+//	<< endl; 
 
 /*
  *  Set the number of unique joins to be the number
