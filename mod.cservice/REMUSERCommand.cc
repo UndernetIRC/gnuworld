@@ -9,7 +9,7 @@
  * Caveats: None
  * 
  *
- * $Id: REMUSERCommand.cc,v 1.8 2001/02/16 20:20:26 plexus Exp $
+ * $Id: REMUSERCommand.cc,v 1.9 2001/02/27 18:57:44 gte Exp $
  */
 
 #include	<string>
@@ -21,7 +21,7 @@
 #include	"libpq++.h"
 #include	"responses.h"
 
-const char REMUSERCommand_cc_rcsId[] = "$Id: REMUSERCommand.cc,v 1.8 2001/02/16 20:20:26 plexus Exp $" ;
+const char REMUSERCommand_cc_rcsId[] = "$Id: REMUSERCommand.cc,v 1.9 2001/02/27 18:57:44 gte Exp $" ;
  
 namespace gnuworld
 {
@@ -84,6 +84,7 @@ bool REMUSERCommand::Exec( iClient* theClient, const string& Message )
 	 *  Check the person we're trying to remove actually exists.
 	 */
  
+
 	if (!targetUser)
 	{
 		bot->Notice(theClient, 
@@ -126,6 +127,16 @@ bool REMUSERCommand::Exec( iClient* theClient, const string& Message )
 		return false;
 	} 
 
+
+	if ((theChan->getName() == "*") && (targetUser == theUser))
+	{
+		bot->Notice(theClient,
+                        bot->getResponse(theUser,
+                                language::cant_rem_higher,
+                                string("CSC has your soul! YOU CAN NEVER ESCAPE!")));
+                return false;
+	}
+
 	if ((targetLevel == 500) && (targetUser == theUser))
 	{
 		bot->Notice(theClient, 
@@ -134,6 +145,7 @@ bool REMUSERCommand::Exec( iClient* theClient, const string& Message )
 				string("You can't remove yourself from a channel you own")));
 		return false;
 	} 
+
 
 	/*
 	 *  Now, build up the SQL query & execute it!
