@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------------
--- "$Id: cservice.web.sql,v 1.4 2001/02/22 23:26:57 gte Exp $"
+-- "$Id: cservice.web.sql,v 1.5 2001/03/04 16:56:06 gte Exp $"
 -- Channel service DB SQL file for PostgreSQL.
 --
 -- Tables specific to webbased registration process.
@@ -19,6 +19,8 @@ CREATE TABLE pendingusers (
 	question_id INT2,
 	verificationdata VARCHAR(30)
 );
+
+CREATE INDEX pendingusers_cookie_idx ON pendingusers(cookie);
 
 -- This table stores the timestamp of the last request 
 -- from a particular IP. 

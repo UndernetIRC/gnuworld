@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------------
--- "$Id: cservice.sql,v 1.26 2001/02/27 20:52:27 gte Exp $"
+-- "$Id: cservice.sql,v 1.27 2001/03/04 16:56:06 gte Exp $"
 -- Channel service DB SQL file for PostgreSQL.
 
 -- ChangeLog:
@@ -140,6 +140,8 @@ CREATE TABLE bans (
 	PRIMARY KEY (banmask,channel_id)
 );
 
+CREATE INDEX bans_expires_idx ON bans(expires);
+
 -- Access entries; admin access kept on channel '*'.
 
 CREATE TABLE users (
@@ -167,6 +169,7 @@ CREATE TABLE users (
 ) ;
 
 CREATE INDEX users_username_idx ON users( lower(user_name) );
+CREATE INDEX users_email_idx ON users( lower(email) );
  
 -- This table used to store the "Last Seen" informatation previously
 -- routinely updated in the users table.
@@ -218,6 +221,8 @@ CREATE TABLE channellog (
 	last_updated INT4 NOT NULL,
 	deleted INT2 DEFAULT '0'
 );
+
+CREATE INDEX channellog_channelID_idx ON channellog(channelID);
 
 CREATE TABLE userlog (
 	ts INT4,

@@ -11,6 +11,7 @@ COPY "languages" FROM stdin;
 4	Dutch	31337
 5	German	31337
 6	Portuguese	31337
+7	Italian	31337
 \.
 
 DELETE FROM translations;
@@ -561,3 +562,172 @@ COPY "translations" FROM stdin;
 6	161	%s: ban list is empty.		31337
 6	162	I'm already in that channel!	31337
 \.
+
+-- Italian language definition.
+-- 03/03/07 - Orlando Bassotto <future@break.net>.
+-- 04/03/07 - Ombretta Gorini <ombra.g@galactica.it>.
+
+COPY "translations" FROM stdin;
+7	1	Spiacente, sei già autenticato come %s	31337
+7	2	AUTENTICAZIONE RIUSCITA come %s	31337
+7	3	Spiacente, non hai un accesso sufficiente per eseguire quel comando	31337
+7	4	Spiacente, il canale %s è vuoto	31337
+7	5	Non vedo nessun %s	31337
+7	6	Non trovo %s nel canale %s	31337
+7	7	Il canale %s non risulta essere registrato	31337
+7	8	Ti è stato dato l'op da %s (%s)	31337
+7	9	Ti è stato dato il voice da %s (%s)	31337
+7	10	%s: Non sei in quel canale	31337
+7	11	%s ha già l'op in %s	31337
+7	12	%s ha già il voice in %s	31337
+7	13	Ti è stato tolto l'op da %s (%s)	31337
+7	14	Ti è stato tolto il voice da %s (%s)	31337
+7	15	%s non ha l'op in %s	31337
+7	16	%s non ha il voice in %s	31337
+7	17	AUTENTICAZIONE FALLITA come %s (Password non valida)	31337
+7	18	Non mi trovo in quel canale!	31337
+7	19	Range del livello del ban non valido. Il range valido è compreso tra 1 e %i.	31337
+7	20	Durata del ban non valida. La durata massima di un ban può essere di 336 ore.	31337
+7	21	Il motivo del ban non può superare i 128 caratteri	31337
+7	22	Il ban specificato è già presente nella mia lista dei ban!	31337
+7	23	Il ban %s è già coperto da %s	31337
+7	24	Livello minimo non valido.	31337
+7	25	Livello massimo non valido.	31337
+7	26	UTENTE: %s ACCESSO: %s %s	31337
+7	27	CANALE: %s -- AUTOMODE: %s	31337
+7	28	ULTIMA MODIFICA: %s (%s fà)	31337
+7	29	** SOSPESO ** - Scade il %s	31337
+7	30	VISTO L'ULTIMA VOLTA: %s.	31337
+7	31	Sono presenti più di 15 corrispondenze.	31337
+7	32	Per favore, restringi il campo di ricerca dell'interrogazione.	31337
+7	33	Fine della lista degli accessi	31337
+7	34	Nessuna Corrispondenza!	31337
+7	35	Non puoi aggiungere un utente con un livello di accesso uguale o superiore al tuo.	31337
+7	36	Livello di accesso non valido.	31337
+7	37	%s è già stato aggiunto in %s con livello di accesso %i.	31337
+7	38	Aggiunto l'utente %s a %s con livello di accesso %i	31337
+7	39	Qualcosa non va: %s	31337
+7	40	%s: Fine della lista dei ban	31337
+7	41	Impossibile visualizzare i dettagli dell'utente (Invisibile)	31337
+7	42	Informazioni su: %s (%i)	31337
+7	43	Attualmente autenticato attraverso: %s	31337
+7	44	URL: %s	31337
+7	45	Lingua: %i	31337
+7	46	Canali: %s	31337
+7	47	Input Flood Points: %i	31337
+7	48	Ouput Flood (Bytes): %i	31337
+7	49	%s è registrato da:	31337
+7	50	%s - visto l'ultima volta: %s 	31337
+7	51	Desc: %s	31337
+7	52	Vuoi floodarmi? Bene bene, allora mi sa che da adesso non ti ascolto più.	31337
+7	53	Penso che abbia visto abbastanza, adesso ti ignoro per un po'.	31337
+7	54	Comando non completo	31337
+7	55	Per usare %s, devi scrivere /msg %s@%s	31337
+7	56	Spiacente, devi autenticarti per usare questo comando.	31337
+7	57	Il canale %s è stato sospeso da un amministratore di CService.	31337
+7	58	Il tuo accesso su %s è stato sospeso.	31337
+7	59	Il flag NOOP è impostato su %s	31337
+7	60	Il flag STRICTOP è impostato su %s	31337
+7	61	Hai appena tolto l'op a più di %i persone	31337
+7	62	SINTASSI: %s	31337
+7	63	Il tuo accesso è stato temporaneamente incrementato sul canale %s a %i	31337
+7	64	%s è registrato.	31337
+7	65	%s non è registrato.	31337
+7	66	Non penso che %s possa apprezzarlo.	31337
+7	67	\002*** Lista dei Ban per il canale %s ***\002	31337
+7	68	%s %s Livello: %i	31337
+7	69	AGGIUNTO DA: %s (%s)	31337
+7	70	DAL: %i	31337
+7	71	SCADENZA: %s	31337
+7	72	\002*** FINE ***\002	31337
+7	73	Spiacente, ma non conosco chi sia %s.	31337
+7	74	Spiacente, non sei più autorizzato con me.	31337
+7	75	non sembra avere accesso in %s.	31337
+7	76	Non posso modificare un utente con un livello di accesso uguale o superiore al tuo.	31337
+7	77	Non puoi dare un accesso uguale o superiore al tuo a un altro utente.	31337
+7	78	Modificato il livello di accesso per %s sul canale %s a %i	31337
+7	79	Impostato AUTOMODE a OP per %s sul canale %s	31337
+7	80	Impostato AUTOMODE a VOICE per %s sul canale %s	31337
+7	81	Impostato AUTOMODE a NONE per %s sul canale %s	31337	
+7	82	La tua password non può essere il tuo username o il tuo attuale nick - la sintassi è: NEWPASS <nuova password>	31337
+7	83	La password è stata cambiata con successo.	31337
+7	84	Il flag NOOP è impostato su %s	31337
+7	85	Il flag STRICTOP è impostato su %s (e %s non è autenticato)	31337
+7	86	Il flag STRICTOP è impostato su %s (e %s non ha accesso sufficiente)	31337
+7	87	Purgato il canale %s	31337
+7	88	%s è già registrato da me.	31337
+7	89	Nome del canale non valido.	31337
+7	90	Registrato il canale %s	31337
+7	91	%s è stato rimosso dalla lista dei silence	31337
+7	92	Non trovo %s nella mia lista dei silence	31337
+7	93	Non puoi rimuovere un utente con accesso uguale o superiore al tuo	31337
+7	94	Non puoi rimuovere te stesso da un canale che possiedi	31337
+7	95	Rimosso l'utente %s da %s	31337
+7	96	L'impostazione INVISIBLE adesso è attiva (ON).	31337
+7	97	L'impostazione INVISIBLE adesso non è attiva (OFF).	31337
+7	98	%s per %s è %s	31337
+7	99	il valore di %s dev'essere ON oppure OFF	31337
+7	100	Impostazione USERFLAGS non valida. I valori corretti sono 0, 1 o 2.	31337
+7	101	USERFLAGS per %s è %i	31337
+7	102	il valore di MASSDEOPPRO dev'essere compreso tra 0 e 7 inclusi	31337
+7	103	MASSDEOPPRO per %s è impostato a %d	31337
+7	104	il valore di FLOODPRO dev'essere compreso tra 0 e 7 inclusi	31337
+7	105	FLOODPRO per %s è impostato a %d	31337
+7	106	La DESCRIPTION non può superare gli 80 caratteri.	31337
+7	107	La DESCRIPTION per %s è stata cancellata.	31337
+7	108	La DESCRIPTION per %s è: %s	31337
+7	109	L'URL non può superare i 75 caratteri.	31337
+7	110	L'URL per %s è stata cancellata.	31337
+7	111	L'URL per %s è: %s	31337
+7	112	La stringa contenente le parole chiave non può superare gli 80 caratteri.	31337
+7	113	Le KEYWORDS (parole chiave) per %s sono: %s	31337
+7	114	La lingua selezionata è %s.	31337
+7	115	ERRORE: Selezione della lingua non valida.	31337
+7	116	Non trovo il canale %s nella rete!	31337
+7	117	ERRORE: Impostazione del canale non valida.	31337
+7	118	Lista degli Ignore:	31337
+7	119	La lista degli Ignore è vuota	31337
+7	120	-- Fine della Lista degli Ignore	31337
+7	121	Stato interno CMaster Channel Services:	31337
+7	122	[     Channel Record Stats] \002Cached Entries:\002 %i    \002DB Richieste:\002 %i    \002Cache Hits:\002 %i    \002Efficienza:\002 %.2f%%	31337
+7	123	[        User Record Stats] \002Cached Entries:\002 %i    \002DB Richieste:\002 %i    \002Cache Hits:\002 %i    \002Efficienza:\002 %.2f%%	31337
+7	124	[Access Level Record Stats] \002Cached Entries:\002 %i    \002DB Richieste:\002 %i    \002Cache Hits:\002 %i    \002Efficienza:\002 %.2f%%	31337
+7	125	[         Ban Record Stats] \002Cached Entries:\002 %i    \002DB Richieste:\002 %i    \002Cache Hits:\002 %i    \002Efficienza:\002 %.2f%%	31337
+7	126	Last recieved User NOTIFY: %i	31337
+7	127	Last recieved Channel NOTIFY: %i	31337
+7	128	Last recieved Level NOTIFY: %i	31337
+7	129	Last recieved Ban NOTIFY: %i	31337
+7	130	Contenitori di dati proprietari allocati: %i	31337
+7	131	\002Tempo di vita:\002 %s	31337
+7	132	Il canale %s ha %d utenti (%i operatori)	31337
+7	133	Mode è: %s	31337
+7	134	Flags impostati: %s	31337
+7	135	Non posso sospendere un utente con accesso uguale o superiore al tuo.	31337
+7	136	unità di tempo sconosciuta	31337
+7	137	Durata della sospensione non valida.	31337
+7	138	La SOSPENSIONE per %s è stata annullata	31337
+7	139	%s è già stato sospeso in %s	31337
+7	140	La SOSPENSIONE per %s scadrà in %s	31337
+7	141	ERRORE: Il topic non può superare i 145 caratteri	31337
+7	142	Non hai accesso sufficiente per rimuovere il ban %s dal database di %s.	31337
+7	143	Sono stati rimossi %i ban che corrispondono a %s	31337
+7	144	Rimosso temporaneamente il tuo accesso di %i dal canale %s	31337
+7	145	Non sembra che tu abbia un accesso forzato in %s, forse è scaduto?	31337
+7	146	%s non è sospeso in %s	31337
+7	147	%s è un operatore IRC	31337
+7	148	%s NON è autenticato.	31337
+7	149	%s è autenticato come %s%s	31337
+7	150	%s è un Rappresentante Ufficiale di CService%s e autenticato come %s	31337
+7	151	%s è un Ammistratore Ufficiale di CService%s e autenticato come %s	31337
+7	152	%s è uno Sviluppatore Ufficiale di CService%s e autenticato come %s	31337
+7	153	Ci sono più di %i corrispondenze di [%s]	31337
+7	154	Per favore, restringi la tua maschera di ricerca	31337
+7	155	Non ci sono corrispondenze per [%s]	31337
+7	156	%s: Mode del canale annullati.	31337
+7	158	Opzione non valida.	31337
+7	159	%s è un Bot di Servizio Ufficiale di Undernet.	31337
+7	160	Aggiunto il ban %s a %s con livello %i	31337
+7	161	%s: lista dei ban vuota.		31337
+7	162	Sono già in quel canale!	31337
+\.
+
