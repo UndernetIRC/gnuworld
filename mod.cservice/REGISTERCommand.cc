@@ -8,7 +8,7 @@
  *
  * Caveats: None
  *
- * $Id: REGISTERCommand.cc,v 1.9 2001/02/16 20:20:26 plexus Exp $
+ * $Id: REGISTERCommand.cc,v 1.10 2001/02/20 22:31:04 gte Exp $
  */
  
 #include	<string>
@@ -21,7 +21,7 @@
 #include	"Network.h"
 #include	"responses.h"
 
-const char REGISTERCommand_cc_rcsId[] = "$Id: REGISTERCommand.cc,v 1.9 2001/02/16 20:20:26 plexus Exp $" ;
+const char REGISTERCommand_cc_rcsId[] = "$Id: REGISTERCommand.cc,v 1.10 2001/02/20 22:31:04 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -31,16 +31,14 @@ using namespace gnuworld;
 bool REGISTERCommand::Exec( iClient* theClient, const string& Message )
 { 
 	StringTokenizer st( Message ) ;
-	if( st.size() < 2 )
+	if( st.size() < 3 )
 	{
 		Usage(theClient);
 		return true;
 	}
 
 	static const char* queryHeader = "INSERT INTO channels (name, flags, registered_ts, channel_ts, channel_mode, last_updated) "; 
-
-	strstream theQuery; 
-	ExecStatusType status; 
+	static const char* addUserQueryHeader = "INSERT INTO levels (channel_id, user_id, access, flags, added, added_by, last_modif, last_modif_by, last_updated) ";
  
 	/*
 	 *  Fetch the sqlUser record attached to this client. If there isn't one,
@@ -66,6 +64,17 @@ bool REGISTERCommand::Exec( iClient* theClient, const string& Message )
 		return false;
 	} 
 
+	sqlUser* tmpUser = bot->getUserRecord(st[2]);
+	if (!tmpUser) 
+		{
+		bot->Notice(theClient, 
+			bot->getResponse(theUser,
+				language::not_registered,
+				string("The user %s doesn't appear to be registered.")).c_str(),
+			st[2].c_str());
+		return true;
+		}
+ 
 	/*
 	 *  Check the user has sufficient access for this command..
 	 */ 
@@ -99,6 +108,9 @@ bool REGISTERCommand::Exec( iClient* theClient, const string& Message )
 	/*
 	 *  Now, build up the SQL query & execute it!
 	 */ 
+	strstream theQuery; 
+
+	ExecStatusType status; 
 
 	theQuery << queryHeader << "VALUES (" 
 	<< "'" << escapeSQLChars(st[1]) << "',"
@@ -121,13 +133,41 @@ bool REGISTERCommand::Exec( iClient* theClient, const string& Message )
 				string("Registered channel %s")).c_str(), 
 			st[1].c_str());
 	} else {
-		bot->Notice(theClient, 
-			bot->getResponse(theUser,
-				language::its_bad_mmkay,
-				string("Something went wrong: %s")).c_str(), 
-			bot->SQLDb->ErrorMessage()); // Log to msgchan here?
+		bot->Notice(theClient, "Unable to commit channel record, channel may be purged.");
  	}
+
+ 	delete[] theQuery.str();
+
+	/*
+	 *  Now add the chap at 500 in the new channel.
+	 */
  
+	sqlChannel* tmpSqlChan = bot->getChannelRecord(st[1]);
+	if (!tmpSqlChan) return false;
+
+	strstream addUserQuery;
+
+	addUserQuery << addUserQueryHeader << "VALUES (" 
+	<< tmpSqlChan->getID() << ","
+	<< tmpUser->getID() << ","
+	<< "500,0," 
+	<< bot->currentTime() << ","
+	<< "'" << theClient->getNickUserHost() << "',"
+	<< bot->currentTime() << ","
+	<< "'" << theClient->getNickUserHost() << "'," 
+	<< bot->currentTime()
+	<< ");"
+	<< ends; 
+ 
+	elog << "REGISTER::sqlQuery> " << addUserQuery.str() << endl; 
+
+	status = bot->SQLDb->Exec(addUserQuery.str()) ;
+	if( PGRES_COMMAND_OK != status )
+	{
+		bot->Notice(theClient, "Unable to add level 500 user to channel");
+	}
+ 	
+	delete[] addUserQuery.str();
 	return true ;
 } 
 
