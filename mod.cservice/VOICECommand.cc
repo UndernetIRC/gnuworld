@@ -16,7 +16,7 @@
  *
  * Caveats: None
  *
- * $Id: VOICECommand.cc,v 1.14 2001/02/20 15:37:21 dan_karrels Exp $
+ * $Id: VOICECommand.cc,v 1.15 2001/02/20 18:55:41 gte Exp $
  */
 
 #include	<string>
@@ -33,7 +33,7 @@
 using std::map ;
 using std::vector ;
 
-const char VOICECommand_cc_rcsId[] = "$Id: VOICECommand.cc,v 1.14 2001/02/20 15:37:21 dan_karrels Exp $" ;
+const char VOICECommand_cc_rcsId[] = "$Id: VOICECommand.cc,v 1.15 2001/02/20 18:55:41 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -157,6 +157,7 @@ while (counter < st2.size())
 			bot->getResponse(theUser,
 				language::dont_see_them).c_str(),
 			st2[counter].c_str());
+		counter++;
 		continue ; 
 		} 
 
@@ -170,6 +171,7 @@ while (counter < st2.size())
 				language::cant_find_on_chan).c_str(), 
 			target->getNickName().c_str(),
 			theChan->getName().c_str()); 
+		counter++;
 		continue ;
 		}
 
@@ -178,6 +180,7 @@ while (counter < st2.size())
 		{
 		bot->Notice(theClient, bot->getResponse(theUser, language::already_voiced).c_str(), 
 			target->getNickName().c_str(), theChan->getName().c_str());
+		counter++;
 		continue ;
 		}
  
