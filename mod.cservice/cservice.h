@@ -1,5 +1,5 @@
 #ifndef __CSERVICE_H
-#define __CSERVICE_H "$Id: cservice.h,v 1.67 2001/06/18 02:20:58 gte Exp $"
+#define __CSERVICE_H "$Id: cservice.h,v 1.68 2001/06/24 15:00:46 gte Exp $"
 
 #include	<string>
 #include	<vector>
@@ -339,7 +339,7 @@ public:
 	 *  'Pending' successful registration.
 	 */
 
-	void loadPendingChannelList();
+	void loadPendingChannelList(); 
 
 	/*
 	 *  Timer Functions.

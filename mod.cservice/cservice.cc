@@ -2120,11 +2120,13 @@ if (timer_id == pending_timerID)
 
 	ExecStatusType status = SQLDb->Exec(theQuery.str()) ;
 	delete[] theQuery.str() ;
+	unsigned int noticeCount = 0;
 
 	if( PGRES_TUPLES_OK == status )
 		{
 		for (int i = 0 ; i < SQLDb->Tuples(); i++)
 			{ 
+			noticeCount++;
 			string channelName = SQLDb->GetValue(i,0);
 			unsigned int channel_id = atoi(SQLDb->GetValue(i, 1));
 			unsigned int created_ts = atoi(SQLDb->GetValue(i, 2));
@@ -2136,8 +2138,11 @@ if (timer_id == pending_timerID)
 				serverNotice(tmpChan, "If you wish to view the details of the application or to object, please visit:");
 				serverNotice(tmpChan, "%s?id=%i-%i", pendingPageURL.c_str(), created_ts, channel_id);
 				} 
-			}
+			} 
 		}
+
+	logDebugMessage("Loaded Pending Channels notification list, I have just notified %i channels that they are under registration.",
+		noticeCount);
 	
 
 	/* Refresh Timer */
@@ -2727,6 +2732,7 @@ switch( whichEvent )
 		theClient = static_cast< iClient* >( data1 ) ;
 
 		pendingChannelListType::iterator ptr = pendingChannelList.find(theChan->getName()); 
+
 		if(ptr != pendingChannelList.end())
 			{
 			/*
@@ -2820,7 +2826,7 @@ switch( whichEvent )
 				<< theChan->getName()
 				<< endl;
 			return 0;
-			}
+			} 
 
 		/* 
 		 * First thing we do - check if this person is banned.
@@ -2909,7 +2915,7 @@ switch( whichEvent )
 return xClient::OnChannelEvent( whichEvent, theChan,
 	data1, data2, data3, data4 );
 }
-
+ 
 /**
  *  This function matches a client against the bans stored in the
  *  database for this channel.
