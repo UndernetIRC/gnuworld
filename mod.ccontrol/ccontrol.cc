@@ -37,7 +37,7 @@
 #include	"ip.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.92 2001/12/05 22:21:50 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.93 2001/12/06 20:02:40 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -1739,7 +1739,58 @@ va_end( list ) ;
 iClient *theClient = Network->findClient(Oper->getNumeric());
 buffer[512]= '\0';
 static const char *Main = "INSERT into comlog (ts,oper,command) VALUES (now()::abstime::int4,'";
-
+StringTokenizer st(buffer);
+commandIterator tCommand = findCommand((string_upper(st[0])));
+string log;
+if(tCommand != command_end())
+	{
+	if(!strcasecmp(tCommand->second->getRealName(),"LOGIN"))
+		{
+		log.assign(string("LOGIN ") + st[1] + string(" *****"));
+		}
+	else if(!strcasecmp(tCommand->second->getRealName(),"NEWPASS"))
+		{
+		log.assign("NEWPASS *****");
+		}
+	else if(!strcasecmp(tCommand->second->getRealName(),"MODUSER"))
+		{
+		if(st.size() > 2)
+			{
+			log.assign("MODUSER " + st[1] + " ");
+			unsigned int place = 2;
+			while(place < st.size())
+				{
+				if(!strcasecmp(st[place],"-p"))
+					{
+					log.append(" -p ******");
+					place+=2;
+					}
+				else	
+					{
+					log.append(" " + st[place]);
+					place++;
+					}
+				}
+			}
+		}
+	else if(!strcasecmp(tCommand->second->getRealName(),"ADDUSER"))
+		{
+		if(st.size() > 3)
+			{
+			log.assign("ADDUSER " + st[1] + string(" ") + st[2]+ " *****");
+			}
+		}
+	else
+		{
+		log.assign(buffer);
+		}
+	}
+else
+	{
+	log.assign(buffer);
+	}
+strcpy(buffer,log.c_str());
+					
 strstream theQuery;
 theQuery	<< Main
 		<< Oper->getName() 
@@ -2960,7 +3011,7 @@ for(exceptionIterator ptr = exception_begin();ptr != exception_end();++ptr)
 
 void ccontrol::showStatus(iClient* tmpClient)
 {
-int uptime = getUplink()->getStartTime() - ::time(0);
+int uptime = ::time(0) - getUplink()->getStartTime();
 int days;
 int hours;
 int mins;

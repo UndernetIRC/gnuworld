@@ -23,7 +23,7 @@
 #include 	"time.h"
 #include	"ccUser.h"
 
-const char GLINECommand_cc_rcsId[] = "$Id: GLINECommand.cc,v 1.26 2001/11/20 19:49:45 mrbean_ Exp $";
+const char GLINECommand_cc_rcsId[] = "$Id: GLINECommand.cc,v 1.27 2001/12/06 20:02:40 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -243,12 +243,12 @@ for( Channel::const_userIterator ptr = theChan->userList_begin();
 ptr != theChan->userList_end() ; ++ptr )
 	{
 	TmpClient = ptr->second->getClient();
-	GlineMapType::iterator gptr = glineList.find("*@" + TmpClient->getInsecureHost());
+	GlineMapType::iterator gptr = glineList.find("*~@" + TmpClient->getInsecureHost());
 	if(gptr != glineList.end())
 		{
 		continue;
 		}
-	gptr = glineList.find("* " +TmpClient->getUserName() + "@" + TmpClient->getInsecureHost());		
+	gptr = glineList.find("*" +TmpClient->getUserName() + "@" + TmpClient->getInsecureHost());		
 	if(gptr != glineList.end())
 		{
 		continue;

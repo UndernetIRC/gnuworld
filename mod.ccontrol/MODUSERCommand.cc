@@ -14,7 +14,7 @@
 #include	"ccUser.h"
 #include	"misc.h"
 
-const char MODUSERCommand_cc_rcsId[] = "$Id: MODUSERCommand.cc,v 1.7 2001/11/20 19:49:45 mrbean_ Exp $";
+const char MODUSERCommand_cc_rcsId[] = "$Id: MODUSERCommand.cc,v 1.8 2001/12/06 20:02:40 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -92,7 +92,7 @@ while(pos < st.size())
 		tmpUser->setLast_Updated_By(theClient->getNickUserHost());
 		if(tmpUser->Update())
 			{
-			bot->Notice(theClient,"Password for %s Changed to %s",st[1].c_str(),st[3].c_str());
+			bot->Notice(theClient,"Password for %s Changed to %s",st[1].c_str(),st[pos+1].c_str());
 			}
 		else
 			{
@@ -211,9 +211,8 @@ while(pos < st.size())
 			}
 		if(!strcasecmp(tmpUser->getServer(),st[pos+1]))
 			{
-			bot->Notice(theClient,"%s already is associated with %s",st[1].c_str(),st[3].c_str());
-			delete tmpUser;
-			return false;
+			bot->Notice(theClient,"%s already is associated with %s",st[1].c_str(),st[pos+1].c_str());
+			pos+=2;
 			}
 		else
 			{
@@ -254,8 +253,6 @@ while(pos < st.size())
 		else
 			{
 			bot->Notice(theClient,"unknown option %s for -no must be on/off",st[pos+1].c_str());
-			delete tmpUser;
-			return false;
 			}
 		tmpUser->setLast_Updated_By(theClient->getNickUserHost());
 		tmpUser->Update();
