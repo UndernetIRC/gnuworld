@@ -43,7 +43,7 @@
 //#include	"moduleLoader.h"
 
 const char xServer_h_rcsId[] = __XSERVER_H ;
-const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.27 2000/11/05 23:09:40 dan_karrels Exp $" ;
+const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.28 2000/11/22 15:18:33 dan_karrels Exp $" ;
 
 using std::string ;
 using std::vector ;
@@ -2788,11 +2788,17 @@ return 0 ;
 int xServer::MSG_P( xParameters& Param )
 {
 
+if( Param.size() < 3 )
+	{
+	elog	<< "xServer::MSG_P> Invalid number of arguments\n" ;
+	return -1 ;
+	}
+
 char* Sender	= Param[ 0 ] ;
 char* Receiver	= Param[ 1 ] ;
 
 // Is the PRIVMSG being sent to a channel?
-if( *Receiver == '#' )
+if( ('#' == *Receiver) || ('+' == *Receiver))
 	{
 	// It's a channel message, just ignore it
 	return 0 ;
@@ -2864,7 +2870,8 @@ if( NULL == Client )
 iClient* Target = Network->findClient( Sender ) ;
 if( NULL == Target )
 	{
-	elog	<< "xServer::MSG_P> Unable to find Sender: " << Sender << endl ;
+	elog	<< "xServer::MSG_P> Unable to find Sender: "
+		<< Sender << endl ;
 	return -1 ;
 	}
 
