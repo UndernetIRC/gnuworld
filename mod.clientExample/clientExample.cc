@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: clientExample.cc,v 1.6 2003/12/29 23:59:37 dan_karrels Exp $
+ * $Id: clientExample.cc,v 1.7 2004/05/25 14:17:58 jeekay Exp $
  */
 
 #include	<string>
@@ -65,10 +65,10 @@ Notice( theClient, "Howdy :)" ) ;
 }
 
 // Burst any channels.
-bool clientExample::BurstChannels()
+void clientExample::BurstChannels()
 {
+xClient::BurstChannels() ;
 Join( "#some_oper_channel" ) ;
-return xClient::BurstChannels() ;
 }
 
 } // namespace gnuworld

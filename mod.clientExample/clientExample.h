@@ -16,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: clientExample.h,v 1.5 2003/12/29 23:59:37 dan_karrels Exp $
+ * $Id: clientExample.h,v 1.6 2004/05/25 14:17:58 jeekay Exp $
  */
 
 #ifndef __CLIENTEXAMPLE_H
-#define __CLIENTEXAMPLE_H "$Id: clientExample.h,v 1.5 2003/12/29 23:59:37 dan_karrels Exp $"
+#define __CLIENTEXAMPLE_H "$Id: clientExample.h,v 1.6 2004/05/25 14:17:58 jeekay Exp $"
 
 #include	<string>
 
@@ -62,7 +62,7 @@ public:
 	 * is established.  The purpose of this method is to inform
 	 * the xServer of the channels this client wishes to burst.
 	 */
-	virtual bool BurstChannels() ;
+	virtual void BurstChannels() ;
 
 protected:
 

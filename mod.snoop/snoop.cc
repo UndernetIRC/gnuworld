@@ -47,13 +47,14 @@ maxnicklen = ::atoi( conf.Require( "maxnicklen" )->second.c_str() ) ;
 snoop::~snoop()
 {}
 
-bool snoop::BurstChannels()
+void snoop::BurstChannels()
 {
+xClient::BurstChannels() ;
+
 // It's ok if admin and relay chans are the same,
 // xServer::JoinChannel() will not join more than once
 Join( adminChanName ) ;
 Join( relayChanName ) ;
-return xClient::BurstChannels() ;
 }
 
 void snoop::OnChannelMessage( iClient* srcClient,

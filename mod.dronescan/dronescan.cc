@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: dronescan.cc,v 1.47 2004/05/15 11:17:10 jeekay Exp $
+ * $Id: dronescan.cc,v 1.48 2004/05/25 14:17:58 jeekay Exp $
  */
 
 #include	<string>
@@ -45,7 +45,7 @@
 #include "sqlUser.h"
 #include "Timer.h"
 
-RCSTAG("$Id: dronescan.cc,v 1.47 2004/05/15 11:17:10 jeekay Exp $");
+RCSTAG("$Id: dronescan.cc,v 1.48 2004/05/25 14:17:58 jeekay Exp $");
 
 namespace gnuworld {
 
@@ -258,7 +258,7 @@ void dronescan::OnAttach()
  * The only channel of any interest to us is our console channel, which is
  * loaded from the configuration file.
  */
-bool dronescan::BurstChannels()
+void dronescan::BurstChannels()
 {
 	MyUplink->JoinChannel(this, consoleChannel,
 		dronescanConfig->Require("consoleChannelModes")->second);
@@ -601,7 +601,7 @@ if(!MyUplink->UnRegisterTimer(tidClearJoinCounter, 0) ||
 
 
 /** Receive our own timed events. */
-void dronescan::OnTimer( xServer::timerID theTimer , void *)
+void dronescan::OnTimer( const xServer::timerID theTimer , void *)
 {
 	time_t theTime;
 

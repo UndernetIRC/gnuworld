@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: scanner.cc,v 1.8 2003/12/29 23:59:38 dan_karrels Exp $
+ * $Id: scanner.cc,v 1.9 2004/05/25 14:18:13 jeekay Exp $
  */
 
 #include	<iostream>
@@ -73,11 +73,11 @@ Notice( theClient, "Howdy :)" ) ;
 }
 
 // Burst any channels.
-bool scanner::BurstChannels()
+void scanner::BurstChannels()
 {
-Join( "#some_oper_channel" ) ;
+xClient::BurstChannels() ;
 
-return xClient::BurstChannels() ;
+Join( "#some_oper_channel" ) ;
 }
 
 void scanner::OnEvent( const eventType& whichEvent,

@@ -16,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: gnutest.h,v 1.10 2003/12/29 23:59:38 dan_karrels Exp $
+ * $Id: gnutest.h,v 1.11 2004/05/25 14:18:12 jeekay Exp $
  */
 
 #ifndef __GNUTEST_H
-#define __GNUTEST_H "$Id: gnutest.h,v 1.10 2003/12/29 23:59:38 dan_karrels Exp $"
+#define __GNUTEST_H "$Id: gnutest.h,v 1.11 2004/05/25 14:18:12 jeekay Exp $"
 
 #include	<string>
 #include	<vector>
@@ -104,7 +104,7 @@ public:
 	 * This method is called for the client to burst all channels
 	 * once the server connects to the network.
 	 */
-	virtual bool	BurstChannels() ;
+	virtual void	BurstChannels() ;
 
 	/**
 	 * This method is called when a network client messages
@@ -182,7 +182,7 @@ public:
 	/**
 	 * This method is called when a timer expires.
 	 */
-	virtual void	OnTimer( xServer::timerID, void* ) ;
+	virtual void	OnTimer( const xServer::timerID, void* ) ;
 
 	/**
 	 * This method returns true if the client is on the given

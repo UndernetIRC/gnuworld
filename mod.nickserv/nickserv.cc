@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: nickserv.cc,v 1.27 2004/02/13 18:13:27 jeekay Exp $
+ * $Id: nickserv.cc,v 1.28 2004/05/25 14:18:13 jeekay Exp $
  */
 
 #include	<sstream>
@@ -31,7 +31,7 @@
 #include "netData.h"
 #include "nickserv.h"
 
-RCSTAG("$Id: nickserv.cc,v 1.27 2004/02/13 18:13:27 jeekay Exp $");
+RCSTAG("$Id: nickserv.cc,v 1.28 2004/05/25 14:18:13 jeekay Exp $");
 
 namespace gnuworld
 {
@@ -162,7 +162,7 @@ void nickserv::log(const eventType& theEvent, const string& _theMessage)
  * The only channel of any interest to us is our console channel, which is
  * loaded from the configuration file.
  */
-bool nickserv::BurstChannels()
+void nickserv::BurstChannels()
 {
 MyUplink->JoinChannel(this, consoleChannel, nickservConfig->Require("consoleChannelModes")->second);
 
@@ -373,7 +373,7 @@ commHandler->second->Exec(theClient, Message);
  * When a timer expires, this function is called. It allows for periodic
  * processing of data.
  */
-void nickserv::OnTimer(xServer::timerID theTimer, void* )
+void nickserv::OnTimer(const xServer::timerID theTimer, void* )
 {
 if(theTimer == processQueue_timerID) {
   processQueue();

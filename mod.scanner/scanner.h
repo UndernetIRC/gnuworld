@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: scanner.h,v 1.6 2003/12/29 23:59:38 dan_karrels Exp $
+ * $Id: scanner.h,v 1.7 2004/05/25 14:18:13 jeekay Exp $
  */
 
 #ifndef __SCANNER_H
@@ -77,7 +77,7 @@ public:
 	 * is established.  The purpose of this method is to inform
 	 * the xServer of the channels this client wishes to burst.
 	 */
-	virtual bool BurstChannels() ;
+	virtual void BurstChannels() ;
 
 	/**
 	 * The event handler method, all network events will cause this

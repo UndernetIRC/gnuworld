@@ -43,7 +43,7 @@ public:
 	 * This method is called by the xServer after being fully
 	 * connected.
 	 */
-	virtual bool	BurstChannels() ;
+	virtual void	BurstChannels() ;
 
 	/**
 	 * The channel message handler, used to accept public channel
