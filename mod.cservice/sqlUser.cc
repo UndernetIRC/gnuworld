@@ -4,7 +4,7 @@
  * Storage class for accessing user information either from the backend
  * or internal storage.
  *
- * $Id: sqlUser.cc,v 1.35 2002/12/23 22:10:22 gte Exp $
+ * $Id: sqlUser.cc,v 1.36 2002/12/24 19:31:28 gte Exp $
  */
 
 #include	<sstream>
@@ -255,6 +255,44 @@ ExecStatusType status = SQLDb->Exec(queryString.str().c_str()) ;
 if( PGRES_COMMAND_OK != status )
 	{
 	// TODO: Log to msgchan here.
+	elog	<< "sqlUser::commit> Something went wrong: "
+		<< SQLDb->ErrorMessage()
+		<< endl;
+
+	return false;
+ 	}
+
+return true;
+}
+
+bool sqlUser::commitLastSeenWithoutMask()
+{
+/*
+ *  -- Boy, we need a masked Commit() method in these classes. ;)
+ */
+
+static const char* queryHeader =    "UPDATE users_lastseen ";
+static const char* queryCondition = "WHERE user_id = ";
+
+stringstream queryString;
+queryString	<< queryHeader
+		<< "SET last_seen = "
+		<< last_seen
+		<< ", last_updated = now()::abstime::int4 "
+		<< queryCondition
+		<< id
+		<< ends;
+
+#ifdef LOG_SQL
+	elog	<< "sqlUser::commitLastSeenWithoutMask> "
+		<< queryString.str().c_str()
+		<< endl;
+#endif
+
+ExecStatusType status = SQLDb->Exec(queryString.str().c_str()) ;
+
+if( PGRES_COMMAND_OK != status )
+	{
 	elog	<< "sqlUser::commit> Something went wrong: "
 		<< SQLDb->ErrorMessage()
 		<< endl;

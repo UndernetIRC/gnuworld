@@ -1,7 +1,7 @@
 /* sqlUser.h */
 
 #ifndef __SQLUSER_H
-#define __SQLUSER_H "$Id: sqlUser.h,v 1.30 2002/12/23 22:10:22 gte Exp $"
+#define __SQLUSER_H "$Id: sqlUser.h,v 1.31 2002/12/24 19:31:28 gte Exp $"
 
 #include	<string>
 #include	<vector>
@@ -129,7 +129,7 @@ public:
 		{ last_seen = _last_seen; last_hostmask = _last_hostmask ; commitLastSeen(); }
 
 	inline void setLastSeen( const time_t& _last_seen )
-		{ last_seen = _last_seen; commitLastSeen(); }
+		{ last_seen = _last_seen; commitLastSeenWithoutMask(); }
 
 	inline void setLanguageId( const unsigned int& _language_id )
 		{ language_id = _language_id; }
@@ -159,6 +159,7 @@ public:
 
 	bool commit();
 	bool commitLastSeen();
+	bool commitLastSeenWithoutMask();
 	time_t	getLastSeen();
 	const string getLastHostMask();
 

@@ -2,7 +2,7 @@
  * cservice.cc
  * Author: Greg Sikorski
  * Purpose: Overall control client.
- * $Id: cservice.cc,v 1.227 2002/12/24 17:54:10 gte Exp $
+ * $Id: cservice.cc,v 1.228 2002/12/24 19:31:28 gte Exp $
  */
 
 #include	<new>
@@ -1604,19 +1604,21 @@ void cservice::cacheExpireUsers()
 	clock_t startTime = ::clock();
 	clock_t endTime = 0;
 	int purgeCount = 0;
+	int updateCount = 0;
 	string removeKey;
 
 	while (ptr != sqlUserCache.end())
 	{
 		tmpUser = ptr->second;
 		/*
-		 * Have a quick look if this person has been logged in more than 12hrs.
+		 * Have a quick look if this person has been logged in more than 24 hrs.
 		 * If so, update the last-seen so their account doesn't expire after xx days. ;)
 		 */
-		if ( tmpUser->isAuthed() && ((tmpUser->getInstantiatedTS() + 43200) < ::time(NULL))  )
+		if ( tmpUser->isAuthed() && ((tmpUser->getInstantiatedTS() + 86400) < ::time(NULL))  )
 		{
 			tmpUser->setLastSeen(currentTime());
 			tmpUser->setInstantiatedTS(::time(NULL));
+			updateCount++;
 		}
 
 		/*
@@ -1649,6 +1651,8 @@ void cservice::cacheExpireUsers()
 	endTime = ::clock();
 	logDebugMessage("User cache cleanup complete; Removed %i user records in %i ms.",
 		purgeCount, (endTime - startTime) /  CLOCKS_PER_SEC);
+	logDebugMessage("I also updated %i last_seen records for people logged in for >24 hours.",
+		updateCount);
 }
 
 void cservice::cacheExpireLevels()
