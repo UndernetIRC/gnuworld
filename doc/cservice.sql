@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------------
--- "$Id: cservice.sql,v 1.53 2001/10/21 02:58:14 nighty Exp $"
+-- "$Id: cservice.sql,v 1.54 2001/10/22 14:54:53 nighty Exp $"
 -- Channel service DB SQL file for PostgreSQL.
 
 -- ChangeLog:
@@ -70,12 +70,11 @@ CREATE TABLE translations (
 CREATE TABLE help (
 	topic VARCHAR(20) NOT NULL,
 	language_id INT4 CONSTRAINT help_language_id_ref REFERENCES languages ( id ),	
-	contents TEXT,
-	
-	PRIMARY KEY (language_id)
+	contents TEXT
 );
 
 CREATE INDEX help_topic_idx ON help (topic);
+CREATE INDEX help_language_id_idx ON help (language_id);
  
 -- Create the channel table first since we'll be referring back to it
 -- frequently.
