@@ -12,7 +12,7 @@
 #include	"StringTokenizer.h"
 #include	"Network.h"
 
-const char MODECommand_cc_rcsId[] = "$Id: MODECommand.cc,v 1.6 2001/03/11 22:20:29 mrbean_ Exp $";
+const char MODECommand_cc_rcsId[] = "$Id: MODECommand.cc,v 1.7 2001/05/25 09:14:35 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -51,7 +51,7 @@ StringTokenizer::size_type argPos = 3 ;
 
 // To be used later
 iClient* Target = 0 ;
-
+ChannelUser* ChanUser = NULL;
 // Store the command to be sent to the network in two strings
 // modeString holds the updated modes
 string modeString = "" ;
@@ -77,14 +77,15 @@ while( modePos < st.size() )
 
 	// Keep track of the polarity of the mode change.
 	bool plus = true ;
-
+	bool Op = false;
 	// Iterate through the characters of the mode at st[ modePos ]
 	for( string::size_type charPos = 0 ; charPos < st[ modePos ].size() ; ++charPos )
 		{
-		switch( st[ modePos ][ charPos ] )
+		switch( toupper(st[ modePos ][ charPos ]) )
 			{
-			case 'o':
-			case 'v':
+			case 'O':
+				Op = true;
+			case 'V':
 
 				// Make sure there is an argument for this mode
 				if( argPos >= st.size() )
@@ -108,7 +109,7 @@ while( modePos < st.size() )
 					}
 
 				// Make sure the user is in this particular channel
-				if( NULL == theChan->findUser( Target ) )
+				if( NULL == (ChanUser = theChan->findUser( Target ) ))
 					{
 					bot->Notice( theClient, "User %s was not found "
 						"on channel %s",
@@ -117,8 +118,23 @@ while( modePos < st.size() )
 					return true ;
 					}
 				//Dont deop +k				
-				if(Target->getMode(iClient::MODE_SERVICES))
+				if((ChanUser->getMode(iClient::MODE_SERVICES)) && (!plus))
+					{	
+					Op = false;
 					break;
+					}
+				if(plus)
+					if(Op)
+						ChanUser->setMode(ChannelUser::MODE_O);
+					else
+						ChanUser->setMode(ChannelUser::MODE_V);
+				else
+				
+					if(Op)
+						ChanUser->removeMode(ChannelUser::MODE_O);
+					else
+						ChanUser->removeMode(ChannelUser::MODE_V);
+					
 				// Add this nick's numeric (plus a space) to the end
 				// of the current argument string
 				argString += Target->getCharYYXXX() + ' ' ;
@@ -128,9 +144,12 @@ while( modePos < st.size() )
 
 				// Make sure modePos skips over this argument
 				modePosIncrement++ ;
+				
+				//Make sure to turn off op bool for next mode
+				Op = false;
 
 				break ;
-			case 'b':
+			case 'B':
 				// Each of these modes needs an argument
 				if( argPos >= st.size() )
 					{
@@ -143,7 +162,10 @@ while( modePos < st.size() )
 
 				// Add this argument to the current argument string
 				argString += st[ argPos ] + ' ' ;
-
+				if(!plus)
+					theChan->removeBan(st[ argPos ]);
+				else
+					theChan->setBan(st[ argPos ]);
 				// Mode to next argument
 				argPos++ ;
 
@@ -152,7 +174,7 @@ while( modePos < st.size() )
 
 				break ;
 
-			case 'k':
+			case 'K':
 				// Each of these modes needs an argument
 				if( argPos >= st.size() )
 					{
@@ -165,24 +187,36 @@ while( modePos < st.size() )
 
 				// Add this argument to the current argument string
 				argString += st[ argPos ] + ' ' ;
+		
+				if(plus)
+					{
+					theChan->setMode(Channel::MODE_K);
+					theChan->setKey(st [ argPos ]);
+					}
+				else
+					{
+					theChan->removeMode(Channel::MODE_K);
+					theChan->setKey("");
+					}
 
 				// Mode to next argument
 				argPos++ ;
 
 				// Make sure modePos skips over this argument
 				modePosIncrement++ ;
-
+				
 				break ;
-			case 'l':
+			case 'L':
 
 				// Mode -l requires no argument
 				if( !plus )
 					{
 					// No args needed
 					modeString += st[ modePos ][ charPos ] ;
+					theChan->removeMode(Channel::MODE_L);
 					break ;
 					}
-
+				
 				// Else, the user has specified +l, need an
 				// argument.
 
@@ -193,6 +227,8 @@ while( modePos < st.size() )
 					return true ;
 					}
 
+				theChan->setMode(Channel::MODE_L);
+
 				// Add this mode to the current modeString
 				modeString += st[ modePos ][ charPos ] ;
 
@@ -206,6 +242,55 @@ while( modePos < st.size() )
 				modePosIncrement++ ;
 
 				break ;
+			case 'I':  //Invite?
+				if(!plus)
+					theChan->removeMode(Channel::MODE_I);
+				else
+					theChan->setMode(Channel::MODE_I);
+				modeString += st[ modePos ][ charPos ] ;
+
+				break;
+			case 'P':  //Private?
+				if(!plus)
+					theChan->removeMode(Channel::MODE_P);
+				else
+					theChan->setMode(Channel::MODE_P);
+    				modeString += st[ modePos ][ charPos ] ;
+				break;
+			case 'S':  //Secret?
+				if(!plus)
+					theChan->removeMode(Channel::MODE_S);
+				else
+					theChan->setMode(Channel::MODE_S);
+			
+				modeString += st[ modePos ][ charPos ] ;
+
+				break;
+			case 'M':  //Moderated?
+				if(!plus)
+					theChan->removeMode(Channel::MODE_M);
+				else	
+					theChan->setMode(Channel::MODE_M);
+
+				modeString += st[ modePos ][ charPos ] ;
+
+				break;
+			case 'N':  //No External Messages?
+				if(!plus)
+					theChan->removeMode(Channel::MODE_N);
+				else					
+					theChan->setMode(Channel::MODE_N);
+
+				modeString += st[ modePos ][ charPos ] ;
+
+				break;
+			case 'T':  //Topic?
+				if(!plus)
+					theChan->removeMode(Channel::MODE_T);
+				else
+					theChan->setMode(Channel::MODE_T);
+				modeString += st[ modePos ][ charPos ] ;
+				break;
 			case '+':
 				if( plus )
 					{
