@@ -1,5 +1,5 @@
 /* main.cc
- * $Id: main.cc,v 1.16 2001/01/07 23:20:34 dan_karrels Exp $
+ * $Id: main.cc,v 1.17 2001/01/07 23:35:19 dan_karrels Exp $
  */
 
 #include	<fstream>
@@ -17,7 +17,6 @@
 
 #include	"config.h"
 #include	"ELog.h"
-#include	"Network.h"
 #include	"FileSocket.h" 
 #include	"server.h"
 #include	"moduleLoader.h"
@@ -25,14 +24,13 @@
 using namespace gnuworld ;
 
 const char config_h_rcsId[] = __CONFIG_H ;
-const char main_cc_rcsId[] = "$Id: main.cc,v 1.16 2001/01/07 23:20:34 dan_karrels Exp $" ;
+const char main_cc_rcsId[] = "$Id: main.cc,v 1.17 2001/01/07 23:35:19 dan_karrels Exp $" ;
 
 using std::cerr ;
 using std::clog ;
 using std::endl ;
 using std::string ;
  
-gnuworld::xNetwork*	gnuworld::Network ;
 gnuworld::ELog		gnuworld::elog ;
 
 void xServer::sigHandler( int whichSig )
@@ -152,24 +150,10 @@ if( verbose )
 
 srand( time( 0 ) ) ;
 
-try
+// Run in simulation mode?
+if( !simFileName.empty() )
 	{
-	Network = new xNetwork ;
-
-	// TODO: Find a way to reduce this coupling
-	Network->setServer( this ) ;
-
-	// Run in simulation mode?
-	if( !simFileName.empty() )
-		{
-		setSocket( new FileSocket( simFileName ) ) ;
-		}
-
-	}
-catch( std::bad_alloc )
-	{
-	cerr	<< "*** Memory allocation failure\n" ;
-	::exit( 0 ) ;
+	setSocket( new FileSocket( simFileName ) ) ;
 	}
 }
 
