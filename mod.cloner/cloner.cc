@@ -1,4 +1,5 @@
-/* cloner.cc
+/**
+ * cloner.cc
  * Load fake clones for testing or fun.
  *
  * Copyright (C) 2002 Daniel Karrels <dan@karrels.com>
@@ -19,7 +20,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
  * USA.
  *
- * $Id: cloner.cc,v 1.14 2002/07/31 21:57:55 reedloden Exp $
+ * $Id: cloner.cc,v 1.15 2002/08/01 13:27:35 reedloden Exp $
  */
 
 #include	<new>
@@ -44,7 +45,7 @@
 
 const char client_h_rcsId[] = __CLIENT_H ;
 const char cloner_h_rcsId[] = __CLONER_H ;
-const char cloner_cc_rcsId[] = "$Id: cloner.cc,v 1.14 2002/07/31 21:57:55 reedloden Exp $" ;
+const char cloner_cc_rcsId[] = "$Id: cloner.cc,v 1.15 2002/08/01 13:27:35 reedloden Exp $" ;
 const char iClient_h_rcsId[] = __ICLIENT_H ;
 const char EConfig_h_rcsId[] = __ECONFIG_H ;
 const char ELog_h_rcsId[] = __ELOG_H ;
@@ -262,7 +263,7 @@ else if( command == "KILLALL" || command == "QUITALL" )
 	{
         if( st.size() < 1 )
                 {
-                Notice( theClient, "Usage: KILLALL [quit message]" ) ;
+                Notice( theClient, "Usage: %s [reason]", command ) ;
                 return 0 ;
                 }
 
@@ -299,7 +300,7 @@ else if( command == "KILLALL" || command == "QUITALL" )
 			}
 		}
 
-	} // KILLALL
+	} // KILLALL/QUITALL
 return 0 ;
 }
 
@@ -411,5 +412,4 @@ return c ;
 //return (char) (1 + (int) (9.0 * rand() / (RAND_MAX + 1.0) ) ) ;
 }
 
-}
-// namespace gnuworld
+} // namespace gnuworld

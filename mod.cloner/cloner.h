@@ -19,11 +19,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
  * USA.
  *
- * $Id: cloner.h,v 1.4 2002/07/31 20:01:57 reedloden Exp $
+ * $Id: cloner.h,v 1.5 2002/08/01 13:27:35 reedloden Exp $
  */
 
 #ifndef __CLONER_H
-#define __CLONER_H "$Id: cloner.h,v 1.4 2002/07/31 20:01:57 reedloden Exp $"
+#define __CLONER_H "$Id: cloner.h,v 1.5 2002/08/01 13:27:35 reedloden Exp $"
 
 #include	<string>
 #include	<vector>
@@ -56,7 +56,7 @@ public:
 
 protected:
 
-	virtual string		randomNick( int minLength = 3,
+	virtual string		randomNick( int minLength = 5,
 					int maxLength = 9 ) ;
 	virtual string		randomUser() ;
 	virtual string		randomHost() ;
