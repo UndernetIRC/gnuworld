@@ -8,7 +8,7 @@
  *
  * Caveats: None
  *
- * $Id: MODINFOCommand.cc,v 1.3 2001/01/08 04:13:04 gte Exp $
+ * $Id: MODINFOCommand.cc,v 1.4 2001/01/13 23:38:04 gte Exp $
  */
 
 #include	<string>
@@ -18,7 +18,7 @@
 #include	"cservice.h" 
 #include	"levels.h"
 
-const char MODINFOCommand_cc_rcsId[] = "$Id: MODINFOCommand.cc,v 1.3 2001/01/08 04:13:04 gte Exp $" ;
+const char MODINFOCommand_cc_rcsId[] = "$Id: MODINFOCommand.cc,v 1.4 2001/01/13 23:38:04 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -115,7 +115,7 @@ bool MODINFOCommand::Exec( iClient* theClient, const string& Message )
 		 */ 
 
 		int newAccess = atoi(st[4].c_str());
-		if ((newAccess <= 0) || (newAccess > 500))
+		if ((newAccess <= 0) || (newAccess > 999))
 		{
 			bot->Notice(theClient, "Invalid access level.");
 			return false;
