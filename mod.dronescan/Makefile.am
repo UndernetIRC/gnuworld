@@ -5,20 +5,20 @@ libdronescan_la_CXXFLAGS = -I@PGSQL_INCLUDE@
 libdronescan_la_SOURCES = 	\
 	dronescan.cc		\
 	sqlUser.cc		\
+	ABNORMALSTest.cc	\
 	ACCESSCommand.cc	\
 	ADDUSERCommand.cc	\
 	CHECKCommand.cc		\
-	LISTCommand.cc		\
-	MODUSERCommand.cc	\
-	QUOTECommand.cc		\
-	REMUSERCommand.cc	\
-	STATUSCommand.cc	\
-	ABNORMALSTest.cc	\
 	COMMONREALTest.cc	\
 	HASALLOPTest.cc		\
 	HASOPTest.cc		\
+	LISTCommand.cc		\
 	MAXCHANSTest.cc		\
-	RANGETest.cc
+	MODUSERCommand.cc	\
+	QUOTECommand.cc		\
+	RANGETest.cc		\
+	REMUSERCommand.cc	\
+	STATUSCommand.cc
 
 EXTRA_DIST = clientData.h \
 	dronescanCommands.h \
