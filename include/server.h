@@ -17,7 +17,7 @@
  */
 
 #ifndef __XSERVER_H
-#define __XSERVER_H "$Id: server.h,v 1.1 2000/06/30 18:46:07 dan_karrels Exp $"
+#define __XSERVER_H "$Id: server.h,v 1.2 2000/07/09 18:08:11 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
@@ -522,6 +522,11 @@ public:
 	 */
 	virtual void Shutdown() ;
 
+	/**
+	 * Output server statistics to the console (clog).
+	 */
+	virtual void dumpStats() ;
+
 protected:
 
 	/**
@@ -549,6 +554,16 @@ protected:
 	 * Output channel information for each client on this server.
 	 */
 	virtual void BurstChannels() ;
+
+	/**
+	 * Parse a burst line for channel bans.
+	 */
+	virtual void parseBurstBans( Channel*, const char* ) ;
+
+	/**
+	 * Parse a burst line for channel users.
+	 */
+	virtual void parseBurstUsers( Channel*, const char* ) ;
 
 	/* Network message handlers */
 
@@ -746,6 +761,16 @@ protected:
 	 * This is the time that we last connected to our uplink.
 	 */
 	time_t			ConnectionTime ;
+
+	/**
+	 * Time at which we began the last burst.
+	 */
+	time_t			burstStart ;
+
+	/**
+	 * Time at which we ended the last burst.
+	 */
+	time_t			burstEnd ;
 
 	/**
 	 * This is the version of the xServer, pretty useless.

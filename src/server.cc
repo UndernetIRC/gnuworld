@@ -37,7 +37,7 @@
 #include	"moduleLoader.h"
 
 const char xServer_h_rcsId[] = __XSERVER_H ;
-const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.3 2000/07/08 01:41:05 dan_karrels Exp $" ;
+const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.4 2000/07/09 18:08:11 dan_karrels Exp $" ;
 
 using std::string ;
 using std::vector ;
@@ -83,6 +83,7 @@ bursting = false ;
 _connected = false ;
 StartTime = ::time( NULL ) ;
 
+burstStart = burstEnd = 0 ;
 Uplink = NULL ;
 theSock = NULL ;
 Message = SRV_SUCCESS ;
@@ -326,7 +327,7 @@ if( theSock->connect( Address, Port ) < 0 )
 _connected = true ;
 
 // Initialize the connection time variable to current time.
-ConnectionTime = time( NULL ) ;
+ConnectionTime = ::time( NULL ) ;
 
 // Obtain the size of the TCP input window.
 // The server will never attempt to read more bytes than this
@@ -1494,9 +1495,17 @@ return 0 ;
 // *!*lamer@*lamer.lamer.lamer.lamer5.com *!*lamer@*lamer.lamer.lamer.lamer4.com
 // *!*lamer@*lamer.lamer.lamer.lamer3.com *!*lamer@*lamer.lamer.lamer.lamer2.com
 //
+// Q B #ateneo 848728923 +tnl 2000 r]Q,ZLC,Smt,rGN,gPk,uhy,Z]N,oTL,uem,31b,Znt,
+//  3x3,oC0,TvC,3vs,oSo,IP7,oXL,aF2,CW9,sTq,Znw,Is9,gPD,rI1,ToI,ZZK,oGB,$Q
+// B #ateneo 848728923 4Qt,LE2,LXJ,3ys,oIG,lwc,TQX,HwR,3iZ,g2D,ZP3,3m2,uPi,Z0n,
+//  LTi,oG[,a3N,IH4,T3T,La],goY,geE,sar,oid,o90,35Y,TUL,Z7K,Zx7,TN1,C6$Q
+// B #ateneo 848728923 :%*!*@203.145.226.149 *!*@203.177.4.* *!*@203.145.226.134
+// *!*@202.8.230.*
+//
+// Q B #hgsd 933357379 +tn PIs,OfK,OAu,PZl:o,eAA
+//
 int xServer::MSG_B( xParameters& Param )
 {
-
 if( Param.size() < 4 )
 	{
 	elog	<< "xServer::MSG_B> Invalid number of arguments\n" ;
@@ -1535,6 +1544,7 @@ else
 // Parse out the channel state
 xParameters::size_type whichToken = 3 ;
 
+// Channel modes will always be the first thing to follow if it's in the burst
 if( '+' == Param[ whichToken ][ 0 ] )
 	{
 	// channel modes
@@ -1594,8 +1604,36 @@ if( whichToken >= Param.size() )
 	return 0 ;
 	}
 
+for( ; whichToken < Param.size() ; ++whichToken )
+	{
+	// Bans will always be the last thing burst, so no users
+	// will be burst afterwards.  This is useful because xParameters
+	// will only delimit tokens by ':', so the ban string is guaranteed
+	// to be caught.
+	if( '%' == Param[ whichToken ][ 0 ] )
+		{
+		// Channel bans
+		// Be sure to skip over the '%'
+		parseBurstBans( theChan, Param[ whichToken ] + 1 ) ;
+		}
+	else
+		{
+		// Userlist
+		parseBurstUsers( theChan, Param[ whichToken ] ) ;
+		}
+	}
+return 0 ;
+}
+
+// PIs,OfK,OAu,PZl:o,eAA
+void xServer::parseBurstUsers( Channel* theChan, const char* theUsers )
+{
+
+//clog	<< "xServer::parseBurstUsers> Channel: " << theChan->getName()
+//	<< ", users: " << theUsers << endl ;
+
 // Parse out users and their modes
-StringTokenizer st( Param[ whichToken ], ',' ) ;
+StringTokenizer st( theUsers, ',' ) ;
 
 for( StringTokenizer::const_iterator ptr = st.begin() ; ptr != st.end() ;
 	++ptr )
@@ -1607,12 +1645,12 @@ for( StringTokenizer::const_iterator ptr = st.begin() ; ptr != st.end() ;
 	iClient* theClient = Network->findClient( (*ptr).substr( 0, pos ) ) ;
 	if( NULL == theClient )
 		{
-		elog	<< "xServer::MSG_B> Unable to find client: "
-			<< *ptr << endl ;
+		elog	<< "xServer::parseBurstUsers> Unable to find client: "
+			<< (*ptr).substr( 0, pos ) << endl ;
 		continue ;
 		}
 
-//	elog	<< "xServer::MSG_B> Adding user " << theClient->getNickName()
+//	elog	<< "xServer::parseBurstUsers> Adding user " << theClient->getNickName()
 //		<< "(" << theClient->getCharYYXXX() << ") to channel "
 //		<< theChan->getName() << endl ;
 
@@ -1623,7 +1661,7 @@ for( StringTokenizer::const_iterator ptr = st.begin() ; ptr != st.end() ;
 		}
 	catch( std::bad_alloc )
 		{
-		elog	<< "xServer::MSG_B> Memory allocation failure\n" ;
+		elog	<< "xServer::parseBurstUsers> Memory allocation failure\n" ;
 
 		// Fatal error
 		exit( 0 ) ;
@@ -1659,10 +1697,18 @@ for( StringTokenizer::const_iterator ptr = st.begin() ; ptr != st.end() ;
 		// for()
 		}
 	} // while( ptr != st.end() )
+}
 
-// TODO: Post message
+void xServer::parseBurstBans( Channel* theChan, const char* theBans )
+{
+//clog	<< "xServer::parseBurstBans> Found bans for channel "
+//	<< theChan->getName() << ": " << theBans << endl ;
 
-return 0 ;
+StringTokenizer st( theBans ) ;
+for( StringTokenizer::size_type i = 0 ; i < st.size() ; ++i )
+	{
+	theChan->setBan( st[ i ] ) ;
+	}
 }
 
 int xServer::MSG_Error( xParameters& )
@@ -2212,6 +2258,9 @@ else
  */
 int xServer::MSG_Server( xParameters& Param )
 {
+
+burstEnd = 0 ;
+burstStart = ::time( 0 ) ;
 
 // Check the hopcount
 // 1: It's our uplink
@@ -2949,7 +2998,15 @@ catch( std::bad_alloc )
 	}
 
 //elog << "Adding client: " << *newClient ;
-Network->addClient( newClient ) ;
+if( !Network->addClient( newClient ) )
+	{
+	elog	<< "xServer::MSG_B> Failed to add client: "
+		<< *newClient << ", user already exists? "
+		<< (Network->findClient( newClient->getCharYYXXX() ) ?
+		   "yes" : "no") << endl ;
+	delete newClient ;
+	return -1 ;
+	}
 
 // TODO: Should this be posted?
 PostEvent( EVT_NICK, static_cast< void* >( newClient ) ) ;
@@ -3019,7 +3076,10 @@ else
 // Does the new server's numeric already exist?
 if( NULL != Network->findServer( serverIntYY ) )
 	{
-	elog	<< "xServer::MSG_S> Server numeric collision\n" ;
+	elog	<< "xServer::MSG_S> Server numeric collision, numeric: "
+		<< params[ 6 ] << ", old name: "
+		<< Network->findServer( serverIntYY )->getName()
+		<< ", new name: " << serverName << endl ;
 	delete Network->removeServer( serverIntYY ) ;
 	}
 
@@ -3081,6 +3141,7 @@ int xServer::MSG_EB( xParameters& params )
 if( !strcmp( params[ 0 ], Uplink->getCharYY() ) )
 	{
 	// It's my uplink
+	burstEnd = ::time( 0 ) ;
 
 	BurstClients() ;
 
@@ -3099,6 +3160,7 @@ if( !strcmp( params[ 0 ], Uplink->getCharYY() ) )
 	// Acknowledge their end of burst
 	Write( "%s EA\n", charYY ) ;
 
+	clog	<< "*** Completed net burst\n" ;
 	}
 
 if( !bursting )
@@ -3195,31 +3257,6 @@ if( Param.size() < 3 )
 	return -1 ;
 	}
 
-if( '#' == Param[ 1 ][ 0 ] )
-	{
-	Channel* theChan = Network->findChannel( Param[ 1 ] ) ;
-	if( NULL == theChan )
-		{
-		elog	<< "xServer::MSG_M> Unable to find channel: "
-			<< Param[ 1 ] << endl ;
-		return -1 ;
-		}
-
-	// This is a bit of a violation of encapsulation.
-	// Not too bad though.
-	theChan->OnModeChange( Param ) ;
-	// TODO: Post event
-
-	string modes( Param[ 2 ] ) ;
-
-	PostChannelEvent( EVT_MODE, theChan->getName(),
-		static_cast< void* >( &modes ) ) ;
-
-	return 0 ;
-	}
-
-// Local channels are not propogated across the network.
-
 // Param[ 1 ] could be either the nickname or the numeric
 // of a client.
 // At present, the second argument is the nickname, so
@@ -3237,6 +3274,30 @@ if( NULL == theClient )
 		return -1 ;
 		}
 	}
+
+if( '#' == Param[ 1 ][ 0 ] )
+	{
+	Channel* theChan = Network->findChannel( Param[ 1 ] ) ;
+	if( NULL == theChan )
+		{
+		elog	<< "xServer::MSG_M> Unable to find channel: "
+			<< Param[ 1 ] << endl ;
+		return -1 ;
+		}
+
+	// This is a bit of a violation of encapsulation.
+	// Not too bad though.
+	theChan->OnModeChange( theClient, Param ) ;
+
+	string modes( Param[ 2 ] ) ;
+
+	PostChannelEvent( EVT_MODE, theChan->getName(),
+		static_cast< void* >( &modes ) ) ;
+
+	return 0 ;
+	}
+
+// Local channels are not propogated across the network.
 
 // We're just going to assume that the user is only
 // changing modes for itself, as any decent irc server
@@ -3444,6 +3505,14 @@ if( !Network->addServer( newServer ) )
 
 //elog << "Added server: " << *newServer ;
 
+}
+
+void xServer::dumpStats()
+{
+clog	<< "Number of channels: " << Network->channelList_size() << endl ;
+clog	<< "Number of servers: " << Network->serverList_size() << endl ;
+clog	<< "Number of clients: " << Network->clientList_size() << endl ;
+clog	<< "Burst duration: " << (burstEnd - burstStart) << " seconds\n" ;
 }
 
 } // namespace gnuworld

@@ -6,16 +6,17 @@
 #include	<string>
 #include	<map>
 #include	<iostream>
+#include	<vector>
 
 #include	<ctime>
 
 #include	"ChannelUser.h"
 #include	"xparameters.h"
-#include	"Ban.h"
 #include	"ELog.h"
 
 using std::string ;
 using std::map ;
+using std::vector ;
 
 namespace gnuworld
 {
@@ -36,6 +37,11 @@ protected:
 	 * The type used to hold this channel's users.
 	 */
 	typedef map< unsigned int, ChannelUser* > userListType ;
+
+	/**
+	 * The type to be used to store channel bans.
+	 */
+	typedef vector< string > banListType ;
 
 	/// Make class xServer a friend of this class.
 	friend class xServer ;
@@ -150,6 +156,24 @@ public:
 		{ key = newKey ; setMode( MODE_K ) ; }
 
 	/**
+	 * The const_iterator type used to perform a read-only traversal
+	 * of the channel ban list.
+	 */
+	typedef banListType::const_iterator banListConstIterator ;
+
+	/**
+	 * Retrieve a const_iterator to the beginning of the ban list.
+	 */
+	inline banListConstIterator banList_begin() const
+		{ return banList.begin() ; }
+
+	/**
+	 * Retrieve a const_iterator to the end of the channel ban list.
+	 */
+	inline banListConstIterator banList_end() const
+		{ return banList.end() ; }
+
+	/**
 	 * Add a ban to this Channel's ban list.
 	 */
 	inline void setBan( const string& banMask ) ;
@@ -164,13 +188,13 @@ public:
 	 * Find a ban in the channel's ban list which lexically matches
 	 * the given banMask.
 	 */
-	inline const Ban* findBan( const string& banMask ) const ;
+	inline bool findBan( const string& banMask ) const ;
 
 	/**
 	 * Find a ban in the channel's ban list which wildcard matches
 	 * the given banMask.
 	 */
-	inline const Ban* matchBan( const string& banMask ) const ;
+	inline bool matchBan( const string& banMask ) const ;
 
 	/**
 	 * Retrieve the current channel modes.
@@ -288,7 +312,7 @@ protected:
 	 * It is protected here because it is formatted as an xServer
 	 * MSG handler method, and will be called by xServer.
 	 */
-	virtual void	OnModeChange( const xParameters& ) ;
+	virtual void	OnModeChange( iClient*, const xParameters& ) ;
 
 	/**
 	 * Set the creation time of this channel.  This is protected
@@ -331,6 +355,11 @@ protected:
 	 * instances.
 	 */
 	userListType	userList ;
+
+	/**
+	 * The structure used to store the channel bans.
+	 */
+	banListType	banList ;
 
 } ;
 

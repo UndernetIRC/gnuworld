@@ -10,7 +10,6 @@
 #include	"Network.h"
 #include	"xparameters.h"
 #include	"StringTokenizer.h"
-#include	"Ban.h"
 #include	"ELog.h"
 
 using std::string ;
@@ -45,8 +44,8 @@ bool Channel::addUser( ChannelUser* newUser )
 if( !userList.insert(
 	userListType::value_type( newUser->getIntYYXXX(), newUser ) ).second )
 	{
-	elog	<< "Channel::addUser> Unable to add user: "
-		<< *newUser << endl ;
+	elog	<< "Channel::addUser> (" << getName() << "): "
+		<< "Unable to add user: " << *newUser << endl ;
 	return false ;
 	}
 
@@ -124,26 +123,38 @@ return theChanUser->getMode( whichMode ) ;
 
 void Channel::setBan( const string& banMask )
 {
+banList.push_back( banMask ) ;
 }
 
 void Channel::removeBan( const string& banMask )
 {
+for( banListType::iterator ptr = banList.begin(), end = banList.end() ;
+	ptr != end ; ++ptr )
+	{
+	// TODO: Case insensitive search?
+	if( *ptr == banMask )
+		{
+		banList.erase( ptr ) ;
+		return ;
+		}
+	}
 }
 
-const Ban* Channel::findBan( const string& banMask ) const
+bool Channel::findBan( const string& banMask ) const
 {
-return 0 ;
+return std::find( banList.begin(), banList.end(), banMask )
+	!= banList.end() ;
 }
 
-const Ban* Channel::matchBan( const string& banMask ) const
+bool Channel::matchBan( const string& banMask ) const
 {
-return 0 ;
+// TODO
+return findBan( banMask ) ;
 }
 
 // ABCDE M #channel <modes>
-void Channel::OnModeChange( const xParameters& Param )
+void Channel::OnModeChange( iClient*, const xParameters& Param )
 {
-
 if( Param.size() < 3 )
 	{
 	elog	<< "Channel::OnModeChange> Invalid number of arguments\n" ;

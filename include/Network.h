@@ -3,7 +3,7 @@
  */
 
 #ifndef __XNETWORK_H
-#define __XNETWORK_H "$Id: Network.h,v 1.3 2000/07/06 20:47:06 dan_karrels Exp $"
+#define __XNETWORK_H "$Id: Network.h,v 1.4 2000/07/09 18:08:11 dan_karrels Exp $"
 
 #include	<vector>
 #include	<string>
@@ -67,16 +67,13 @@ class xNetwork
 	/**
 	 * This is the type used to store the network Channel
 	 * instances.
-	 * TODO: This is not too scalable (need templated hashtable).
 	 */
 	typedef hash_map< string, Channel*, eHash, eqstr > channelMapType ;
-//	typedef map< string, Channel*, noCaseCompare > channelMapType ;
 
 	/**
 	 * This is the type used to store the nick name/iClient* pairs.
 	 */
 	typedef hash_map< string, iClient*, eHash, eqstr > nickMapType ;
-//	typedef VectorTrie< string, iClient* > nickMapType ;
 
 public:
 
@@ -363,8 +360,10 @@ public:
 	inline const_localClientIterator localClient_end() const
 		{ return localClients.end() ; }
 
-//	typedef clientVectorType::iterator clientIterator ;
-//	typedef clientVectorType::const_iterator const_clientIterator ;
+	inline size_t	channelList_size() const
+		{ return channelMap.size() ; }
+	inline size_t	serverList_size() const ;
+	inline size_t	clientList_size() const ;
 
 protected:
 

@@ -20,7 +20,7 @@
 #include	"misc.h"
 
 const char xNetwork_h_rcsId[] = __XNETWORK_H ;
-const char xNetwork_cc_rcsId[] = "$Id: Network.cc,v 1.3 2000/07/06 20:47:06 dan_karrels Exp $" ;
+const char xNetwork_cc_rcsId[] = "$Id: Network.cc,v 1.4 2000/07/09 18:08:11 dan_karrels Exp $" ;
 
 using std::string ;
 using std::endl ;
@@ -185,8 +185,8 @@ if( static_cast< serverVectorType::size_type >( YY ) >= servers.size()
 if( static_cast< networkVectorType::size_type >( XXX ) >= clients[ YY ].size() )
 	{
 	// Client not found
-//	elog	<< "xNetwork::findClient> Client not found: "
-//		<< XXX << endl ;
+	elog	<< "xNetwork::findClient> Client not found: "
+		<< "YY: " << YY << ", XXX: " << XXX << endl ;
 	return 0 ;
 	}
 
@@ -504,7 +504,8 @@ void xNetwork::rehashNick( const string& yyxxx,
 iClient* theClient = findClient( yyxxx ) ;
 if( NULL == theClient )
 	{
-	elog	<< "xNetwork::rehashNick> Unable to find nick\n" ;
+	elog	<< "xNetwork::rehashNick> Unable to find numeric: "
+		<< yyxxx << ", new nick: " << newNick << endl ;
 	return ;
 	}
 
@@ -570,6 +571,37 @@ for( serverVectorType::size_type i = 0 ; i < servers.size() ; ++i )
 
 		}
 	}
+}
+
+size_t xNetwork::serverList_size() const
+{
+size_t i = 0 ;
+for( serverVectorType::const_iterator ptr = servers.begin() ;
+	ptr != servers.end() ; ++ptr )
+	{
+	if( *ptr != NULL )
+		{
+		++i ;
+		}
+	}
+return i ;
+}
+
+size_t xNetwork::clientList_size() const
+{
+size_t i = 0 ;
+for( networkVectorType::const_iterator ptr = clients.begin() ;
+	ptr != clients.end() ; ++ptr )
+	{
+	for( clientVectorType::size_type cPtr = 0 ; cPtr < (*ptr).size() ; ++cPtr )
+		{
+		if( (*ptr)[ cPtr ] != NULL )
+			{
+			++i ;
+			}
+		}
+	}
+return i ;
 }
 
 } // namespace gnuworld

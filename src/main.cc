@@ -1,5 +1,5 @@
 /* main.cc
- * $Id: main.cc,v 1.2 2000/07/06 19:13:07 dan_karrels Exp $
+ * $Id: main.cc,v 1.3 2000/07/09 18:08:11 dan_karrels Exp $
  */
 
 #include	<fstream>
@@ -9,7 +9,7 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<csignal> 
-#include    <dlfcn.h>
+#include	<dlfcn.h>
 
 #include	"config.h"
 #include	"ELog.h"
@@ -18,8 +18,7 @@
 #include	"cloner.h"
 #include	"stats.h"
 #include	"FileSocket.h" 
-#include    "moduleLoader.h"
-
+#include	"moduleLoader.h"
 
 #ifdef LOG_SOCKET
 	std::ofstream socketFile ;
@@ -28,22 +27,34 @@
 using namespace gnuworld ;
 
 const char config_h_rcsId[] = __CONFIG_H ;
-const char main_cc_rcsId[] = "$Id: main.cc,v 1.2 2000/07/06 19:13:07 dan_karrels Exp $" ;
+const char main_cc_rcsId[] = "$Id: main.cc,v 1.3 2000/07/09 18:08:11 dan_karrels Exp $" ;
 
 using std::cerr ;
 using std::clog ;
 using std::endl ;
 using std::string ;
  
-gnuworld::xNetwork* gnuworld::Network ;
-gnuworld::ELog gnuworld::elog ;
+gnuworld::xNetwork*	gnuworld::Network ;
+gnuworld::ELog		gnuworld::elog ;
+gnuworld::xServer*	Server ;
 
 volatile bool keepRunning = true ;
 
-void sigHandler( int )
+void sigHandler( int whichSig )
 {
-elog << "*** Shutting down...\n" ;
-keepRunning = false ;
+switch( whichSig )
+	{
+	case SIGUSR1:
+		if( Server )
+			{
+			Server->dumpStats() ;
+			}
+		break ;
+	default:
+		elog << "*** Shutting down...\n" ;
+		keepRunning = false ;
+		break ;
+	}
 }
 
 void usage( const string& progName )
@@ -113,6 +124,11 @@ if( SIG_ERR == ::signal( SIGINT, sigHandler ) )
 	clog	<< "*** Unable to establish signal hander for SIGINT\n" ;
 	return 0 ;
 	}
+if( SIG_ERR == ::signal( SIGUSR1, sigHandler ) )
+	{
+	clog	<< "*** Unable to establish signal hander for SIGUSR1\n" ;
+	return 0 ;
+	}
 
 #ifdef EDEBUG
 	elog.openFile( elogFileName.c_str() ) ;
@@ -144,7 +160,6 @@ if( verbose )
 srand( time( 0 ) ) ;
 
 char		s[ 4096 ] = { 0 } ;
-xServer		*Server ;
 
 try
 	{

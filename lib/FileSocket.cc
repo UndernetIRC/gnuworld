@@ -12,7 +12,7 @@
 #include	"ELog.h"
 
 const char FileSocket_h_rcsId[] = __FILESOCKET_H ;
-const char FileSocket_cc_rcsId[] = "$Id: FileSocket.cc,v 1.1 2000/06/30 18:46:06 dan_karrels Exp $" ;
+const char FileSocket_cc_rcsId[] = "$Id: FileSocket.cc,v 1.2 2000/07/09 18:08:11 dan_karrels Exp $" ;
 
 using std::string ;
 using std::ifstream ;
@@ -29,7 +29,7 @@ if( !inFile.is_open() )
 	exit( 0 ) ;
 	}
 string line ;
-while( getline( inFile, line ) && theFile.size() <= maxLines )
+while( (theFile.size() <= maxLines) && getline( inFile, line ) )
 	{
 	theFile.push( line ) ;
 	}

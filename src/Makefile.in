@@ -1,5 +1,5 @@
 # Default paths (system-wide installs)
-# $Id: Makefile.in,v 1.1 2000/06/30 18:46:07 dan_karrels Exp $
+# $Id: Makefile.in,v 1.2 2000/07/09 18:08:11 dan_karrels Exp $
 #
 
 # Standard defines
@@ -85,7 +85,7 @@ clean:
 
 distclean: clean
 	@for i in $(MOD_DIRS); do \
-		cd $$i; $(MAKE2) clean; cd ..; \
+		cd $$i; $(MAKE2) distclean; cd ..; \
 		$(RM) $i/Makefile
 	done;
 
