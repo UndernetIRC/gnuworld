@@ -38,7 +38,7 @@
 #include	"ip.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.135 2002/03/14 21:27:44 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.136 2002/03/14 22:16:40 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -1804,14 +1804,16 @@ return true;
 bool ccontrol::remBurstGline(ccGline* TempGline)
 {
 bGlineListType::iterator ptr = burstGlineList.begin();
-for(;ptr != burstGlineList.end();++ptr)
+for(;ptr != burstGlineList.end();)
 	{
 	if(ptr->first == TempGline)
-		break;
-	}
-if(ptr != burstGlineList.end())
-	{ //if the gline wasnt found
-	burstGlineList.erase(ptr);
+		{
+		ptr = burstGlineList.erase(ptr);
+		}
+	else
+		{
+		++ptr;
+		}
 	}
 return true;
 } 
@@ -2469,7 +2471,7 @@ ccGline *theGline = 0 ;
 iServer* curServer;
 unsigned int Expires = 0;
 for(bGlineListType::iterator ptr = burstGlineList.begin()
-    ; ptr != burstGlineList.end(); ++ptr)
+    ; ptr != burstGlineList.end(); )
 	{
 	theGline = ptr->first;
 	if((theGline->getExpires() == 0) && (theGline->getHost().substr(0,1) == "#"))
@@ -2488,6 +2490,7 @@ for(bGlineListType::iterator ptr = burstGlineList.begin()
 				theGline->getReason(),
 			Expires,this,curServer->getName());
 		}
+	ptr = burstGlineList.erase(ptr);
 	}
 return true;
 }
@@ -2678,7 +2681,6 @@ if (PGRES_TUPLES_OK != status)
         elog << "Error on loading maxusers : " << SQLDb->ErrorMessage() << endl;
 	return false;
         }
-elog << "Load max : tuples : " << SQLDb->Tuples() << endl;
 if(SQLDb->Tuples() == 0)
 	{
 	maxUsers = 0;
