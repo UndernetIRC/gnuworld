@@ -1690,11 +1690,10 @@ void cservice::cacheExpireLevels()
 /**
  * This member function checks the reop buffer for any
  * pending reop's, performing them if neccessary.
- * TODO: Update internal state for 'me'.
  */
 void cservice::performReops()
 {
-/* TODO: Rewrite this bit --Gte */
+/* TODO: Rewrite this bit? --Gte */
 
 if( reopQ.empty() )
 	{
@@ -1753,6 +1752,22 @@ if (ptr->second <= currentTime())
 				if(theChan->getFlag(sqlChannel::F_STRICTOP))
 					{
 					deopAllUnAuthedOnChan(tmpChan);
+					}
+				/*
+				 * Send default modes.
+				 */
+				if (theChan->getChannelMode() != "")
+					{
+					strstream s2;
+					s2	<< getCharYYXXX()
+						<< " M "
+						<< tmpChan->getName()
+						<< " "
+						<< theChan->getChannelMode()
+						<< ends;
+
+					Write( s2 );
+					delete[] s2.str();
 					}
 			}
 
