@@ -1,5 +1,5 @@
 /* main.cc
- * $Id: main.cc,v 1.9 2000/11/02 19:24:29 dan_karrels Exp $
+ * $Id: main.cc,v 1.10 2000/12/08 00:31:00 dan_karrels Exp $
  */
 
 #include	<fstream>
@@ -29,7 +29,7 @@
 using namespace gnuworld ;
 
 const char config_h_rcsId[] = __CONFIG_H ;
-const char main_cc_rcsId[] = "$Id: main.cc,v 1.9 2000/11/02 19:24:29 dan_karrels Exp $" ;
+const char main_cc_rcsId[] = "$Id: main.cc,v 1.10 2000/12/08 00:31:00 dan_karrels Exp $" ;
 
 using std::cerr ;
 using std::clog ;
@@ -208,7 +208,7 @@ catch( std::bad_alloc )
 //Server->AttachClient( new cloner( "cloner.conf" ) ) ;
 //Server->AttachClient( new stats( "stats.conf" ) ) ;
 //Server->AttachClient( new clientExample( "clientExample.conf" ) ) ;
-Server->AttachClient( new gnutest( "gnutest.conf" ) ) ;
+//Server->AttachClient( new gnutest( "gnutest.conf" ) ) ;
 
 // Connect to the server
 clog << "*** Connecting...\n" ;

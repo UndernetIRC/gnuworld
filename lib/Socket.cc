@@ -33,7 +33,7 @@
 #endif
 
 const char Socket_h_rcsId[] = __SOCKET_H ;
-const char Socket_cc_rcsId[] = "$Id: Socket.cc,v 1.5 2000/11/19 00:51:38 dan_karrels Exp $" ;
+const char Socket_cc_rcsId[] = "$Id: Socket.cc,v 1.6 2000/12/08 00:31:00 dan_karrels Exp $" ;
 
 using namespace std ;
 using gnuworld::elog ;
@@ -628,7 +628,8 @@ if( _sockinfo.fd < 0 )
 
 if( readable() < 0 )
 	{
-	elog << "Socket::recv> sorry, no connection for recv, abort." << endl;
+	elog	<< "Socket::recv> sorry, no connection for recv, abort."
+		<< endl;
 	return -1;
 	}
 
@@ -638,12 +639,17 @@ int nbresult = 0;
 do
 	{
 	errno = 0 ;
-	nbresult = ::recv( _sockinfo.fd, reinterpret_cast< char* >( buf ), nb, 0 ) ;
- 	} while( --cnt > 0 && (nbresult < 0) && (errno == EINTR) && (readable() >= 0) ) ;
+	nbresult = ::recv( _sockinfo.fd, reinterpret_cast< char* >( buf ),
+		nb, 0 ) ;
+ 	} while( (--cnt > 0) &&
+		(nbresult < 0) &&
+		(errno == EINTR) &&
+		(readable() >= 0) ) ;
 
 if( cnt == 0 )
 	{
-	elog << "Socket::recv> iterations: 10, errno: " << errno << endl ;
+	elog	<< "Socket::recv> iterations: 10, errno: "
+		<< errno << endl ;
 	}
 
 return nbresult ;

@@ -43,7 +43,7 @@
 //#include	"moduleLoader.h"
 
 const char xServer_h_rcsId[] = __XSERVER_H ;
-const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.28 2000/11/22 15:18:33 dan_karrels Exp $" ;
+const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.29 2000/12/08 00:31:00 dan_karrels Exp $" ;
 
 using std::string ;
 using std::vector ;
@@ -1125,10 +1125,19 @@ else if( 0 == bytesAvailable )
 	}
 
 // Create a string into which to read new data
-string readBuf( inputReadSize + 1, 0 ) ;
+char* readBuf = new (nothrow) char[ inputReadSize + 1 ] ;
+if( NULL == readBuf )
+	{
+	elog	<< "xServer::DoRead> Memory allocation failure\n" ;
+	::exit( 0 ) ;
+	}
+
+memset( readBuf, 0, inputReadSize + 1 ) ;
 
 // Attempt to read from the connection
-int bytesRead = theSock->recv( readBuf, inputReadSize ) ;
+int bytesRead = theSock->recv(
+	reinterpret_cast< unsigned char* >( readBuf ),
+	inputReadSize ) ;
 
 // Was the read successful?
 if( bytesRead < 0 )
@@ -1139,12 +1148,23 @@ if( bytesRead < 0 )
 	elog	<< "xServer::DoRead> Got a read error: "
 		<< strerror( errno ) << endl ;
 
+	delete[] readBuf ;
 	return bytesRead ;
 	}
+else if( 0 == bytesRead )
+	{
+	delete[] readBuf ;
+	return 0 ;
+	}
+
+// The buffer is already null terminated because of the
+// above call to memset()
 
 inputBuffer += readBuf ;
 
-elog << "xServer::DoRead> Read " << bytesRead << " bytes\n" ;
+delete[] readBuf ;
+
+//elog << "xServer::DoRead> Read " << bytesRead << " bytes\n" ;
 
 // Return the number of bytes read.
 return bytesRead ;

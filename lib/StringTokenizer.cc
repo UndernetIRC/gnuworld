@@ -13,7 +13,7 @@
 #include	"StringTokenizer.h"
 
 const char StringTokenizer_h_rcsId[] = __STRINGTOKENIZER_H ;
-const char StringTokenizer_cc_rcsId[] = "$Id: StringTokenizer.cc,v 1.2 2000/11/06 16:08:33 dan_karrels Exp $" ;
+const char StringTokenizer_cc_rcsId[] = "$Id: StringTokenizer.cc,v 1.3 2000/12/08 00:31:00 dan_karrels Exp $" ;
 
 using std::string ;
 using std::vector ;
@@ -72,7 +72,7 @@ if( buf.empty() )
 // addMe is the string which will be added to the vector
 // Initialize it to buf.size() empty characters to speed
 // up addition of characters onto the string
-string addMe( buf.size(), 0 ) ;
+string addMe ;
 
 // currentPtr is the current character pointer
 string::const_iterator currentPtr = buf.begin() ;
