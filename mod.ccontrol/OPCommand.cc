@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: OPCommand.cc,v 1.13 2005/01/12 03:50:29 dan_karrels Exp $
+ * $Id: OPCommand.cc,v 1.14 2005/03/17 18:35:14 mrbean_ Exp $
  */
 
 #include	<set>
@@ -32,7 +32,7 @@
 #include	"ccBadChannel.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: OPCommand.cc,v 1.13 2005/01/12 03:50:29 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: OPCommand.cc,v 1.14 2005/03/17 18:35:14 mrbean_ Exp $" ) ;
 
 namespace gnuworld
 {
@@ -79,10 +79,10 @@ iClient* Target = 0;
 
 // Use a std::set<> here to ensure that the same user is not
 // included more than once.
-typedef std::set< iClient* > opSetType ;
-opSetType opSet ;
 
 bot->MsgChanLog("OP %s\n",st.assemble(1).c_str());
+string modes = "+";
+string args="";
 
 for( StringTokenizer::size_type i = 2 ; i < st.size() ; ++i )
 	{
@@ -97,15 +97,14 @@ for( StringTokenizer::size_type i = 2 ; i < st.size() ; ++i )
 		{
 		continue ;
 		}
-
-	// Op, even if already opped
-	opSet.insert( Target ) ;
+	modes +="o";
+	args +=st[i]+ " ";
+	
 	} // for
 
-if( !opSet.empty() )
+if( !args.empty() )
 	{
-	std::vector< iClient* > opVector( opSet.begin(), opSet.end() ) ;
-	bot->Op( theChan, opVector ) ;
+	bot->Mode(theChan,modes,args,true);
 	}
 return true ;
 }

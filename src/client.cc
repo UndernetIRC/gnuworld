@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: client.cc,v 1.78 2005/03/16 23:03:12 mrbean_ Exp $
+ * $Id: client.cc,v 1.79 2005/03/17 18:35:10 mrbean_ Exp $
  */
 
 #include	<new>
@@ -47,7 +47,7 @@
 #include	"ELog.h"
 #include	"events.h"
 
-RCSTAG("$Id: client.cc,v 1.78 2005/03/16 23:03:12 mrbean_ Exp $" ) ;
+RCSTAG("$Id: client.cc,v 1.79 2005/03/17 18:35:10 mrbean_ Exp $" ) ;
 
 namespace gnuworld
 {
@@ -2218,10 +2218,9 @@ xServer::opVectorType opVector ;
 xServer::voiceVectorType voiceVector ;
 xServer::banVectorType banVector ;
 xServer::modeVectorType modeVector ;
-string lowermodes = string_lower(modes);
 for( string::size_type modePos = 0 ; modePos < modes.size() ; ++modePos )
 	{
-	switch( lowermodes[ modePos ] ) 
+	switch( modes[ modePos ] ) 
 		{
 		case 'b':  // Ban ?
 			{
@@ -2346,7 +2345,7 @@ return Write( "%s CM %s :%s\r\n",
 	(modeAsServer) ? MyUplink->getCharYY().c_str() : 
 		getCharYYXXX().c_str(),
 	theChan->getName().c_str(),
-	lowermodes.c_str()) ;
+	modes.c_str()) ;
 }
 
 } // namespace gnuworld

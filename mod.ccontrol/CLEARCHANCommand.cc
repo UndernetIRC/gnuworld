@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: CLEARCHANCommand.cc,v 1.24 2005/01/12 03:50:29 dan_karrels Exp $
+ * $Id: CLEARCHANCommand.cc,v 1.25 2005/03/17 18:35:21 mrbean_ Exp $
  */
 
 #include	<string>
@@ -31,7 +31,7 @@
 #include	"ccBadChannel.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: CLEARCHANCommand.cc,v 1.24 2005/01/12 03:50:29 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: CLEARCHANCommand.cc,v 1.25 2005/03/17 18:35:21 mrbean_ Exp $" ) ;
 
 namespace gnuworld
 {
@@ -89,13 +89,13 @@ if(Chan)
 
 //Check if the user specified the modes, if not assume he ment all of the modes
 if(st.size() == 2)
-	doModes = "OBKLIM";
+	doModes = "obklim";
 else if(!strcasecmp(string_upper(st[ 2 ]),"ALL"))
-	doModes = "OBKLINMSPT";
-else if(!strcasecmp(string_upper(st [ 2]),"-D"))
+	doModes = "obklimnspt";
+else if(!strcasecmp(string_upper(st [ 2]),"-d"))
 	Desynch = true;
 else	
-	doModes = string_upper(st [ 2 ]);
+	doModes = st [ 2 ];
 
 if(Desynch)
 	{

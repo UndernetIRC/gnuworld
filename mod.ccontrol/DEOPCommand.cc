@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: DEOPCommand.cc,v 1.13 2005/01/12 03:50:29 dan_karrels Exp $
+ * $Id: DEOPCommand.cc,v 1.14 2005/03/17 18:35:20 mrbean_ Exp $
  */
 
 #include	<set>
@@ -34,7 +34,7 @@
 #include	"ccBadChannel.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: DEOPCommand.cc,v 1.13 2005/01/12 03:50:29 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: DEOPCommand.cc,v 1.14 2005/03/17 18:35:20 mrbean_ Exp $" ) ;
 
 namespace gnuworld
 {
@@ -78,11 +78,10 @@ if(Chan)
 
 iClient* Target = 0;
 
-// Use a set<> here to prevent including a user more than once
-typedef std::set< iClient* > deopSetType ;
-deopSetType deopSet ;
 
 bot->MsgChanLog("DEOP %s\n",st.assemble(1).c_str());
+string modes = "-";
+string args = "";
 
 for( StringTokenizer::size_type i = 2 ; i < st.size() ; ++i )
 	{
@@ -105,26 +104,19 @@ for( StringTokenizer::size_type i = 2 ; i < st.size() ; ++i )
 		continue ;
 		}
 
-	if( tmpChanUser->getMode( ChannelUser::MODE_O ) )
-		{
-		// User already opped
-		continue ;
-		}
-
 	if( Target->getMode( iClient::MODE_SERVICES ) )
 		{
 		// Don't op services clients, they can op themselves.
 		continue ;
 		}
 
-	deopSet.insert( Target ) ;
+	modes += "o";
+	args += st[i] + " ";
 	} // for
 
-if( !deopSet.empty() )
+if(  !args.empty() )
 	{
-	std::vector< iClient* >
-		deopVector( deopSet.begin(), deopSet.end() ) ;
-	bot->DeOp( theChan, deopVector ) ;
+	bot->Mode(theChan,modes,args,true);
 	}
 return true;
 }
