@@ -1,5 +1,5 @@
 --
--- $Id: autokill.sql,v 1.14 2003/01/08 18:55:07 gte Exp $
+-- $Id: autokill.sql,v 1.15 2003/04/28 04:05:27 nighty Exp $
 --
 
 --
@@ -48,6 +48,10 @@ DELETE FROM notes where user_id= to_die.user_id OR from_user_id = to_die.user_id
 -- Clean up webaccessteam records..
 --\qecho [*] Removing webaccessteam records..
 --DELETE FROM webaccessteam where admin_id = to_die.user_id;
+--
+-- Clean up fraud_lists records..
+\qecho [*] Removing fraud_list_data..
+DELETE FROM fraud_list_data WHERE user_id = to_die.user_id;
 --
 -- Clean up last_seens.
 \qecho [*] Removing last_seens..

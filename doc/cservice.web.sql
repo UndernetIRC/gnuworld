@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------------
--- "$Id: cservice.web.sql,v 1.29 2003/03/14 04:41:25 nighty Exp $"
+-- "$Id: cservice.web.sql,v 1.30 2003/04/28 04:05:28 nighty Exp $"
 -- Channel service DB SQL file for PostgreSQL.
 --
 -- Tables specific to webbased registration process.
@@ -35,8 +35,16 @@ CREATE TABLE acl (
 	deleted INT2 DEFAULT '0' NOT NULL
 );
 	
-	
 
+CREATE TABLE fraud_lists (
+	id SERIAL,
+	name VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE fraud_list_data (
+	list_id INT4 NOT NULL,
+	user_id INT4 REFERENCES users(id) NOT NULL
+);
 
 
 CREATE TABLE pending_pwreset (
