@@ -1,5 +1,5 @@
 #ifndef __CSERVICE_H
-#define __CSERVICE_H "$Id: cservice.h,v 1.12 2000/12/27 20:03:52 gte Exp $"
+#define __CSERVICE_H "$Id: cservice.h,v 1.13 2000/12/28 01:21:42 gte Exp $"
 
 #include	<string>
 #include	<vector>
@@ -47,6 +47,10 @@ public:
     virtual bool isOnChannel( const string& ) const;
     virtual bool RegisterCommand( Command* ) ;
     virtual bool UnRegisterCommand( const string& ) ; 
+    virtual int OnCTCP( iClient* Sender,
+                const string& CTCP,
+                const string& Message,
+                bool Secure = false ) ;
     typedef commandMapType::const_iterator constCommandIterator ; 
     constCommandIterator command_begin() const
                 { return commandMap.begin() ; } 

@@ -1,4 +1,15 @@
-/* ACCESSCommand.cc */
+/* 
+ * ACCESSCommand.cc 
+ *
+ * 24/12/2000 - Greg Sikorski <gte@atomicrevs.demon.co.uk>
+ * Initial Version.
+ *
+ * Displays all "Level" records for a specified channel.
+ * Can optionally narrow down selection using a number of switches. (TODO).
+ * Can display all channels a user has access on (TODO). 
+ *
+ * $Id: ACCESSCommand.cc,v 1.4 2000/12/28 01:21:42 gte Exp $
+ */
 
 #include	<string>
  
@@ -7,7 +18,7 @@
 #include	"cservice.h"
 #include	"libpq++.h"
 
-const char ACCESSCommand_cc_rcsId[] = "$Id: ACCESSCommand.cc,v 1.3 2000/12/27 01:11:08 gte Exp $" ;
+const char ACCESSCommand_cc_rcsId[] = "$Id: ACCESSCommand.cc,v 1.4 2000/12/28 01:21:42 gte Exp $" ;
 
 namespace gnuworld
 {

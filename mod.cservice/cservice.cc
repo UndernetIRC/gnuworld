@@ -204,6 +204,43 @@ int cservice::OnPrivateMessage( iClient* theClient, const string& Message )
 
 return xClient::OnPrivateMessage( theClient, Message ) ;
 }
+
+ 
+int cservice::OnCTCP( iClient* theClient, const string& CTCP,
+                    const string& Message, bool Secure)
+{
+	/*
+	 * CTCP hander. Deal with PING, GENDER and VERSION. 
+	 */
+
+	StringTokenizer st( CTCP ) ;
+	if( st.empty() )
+		{
+			return 0;
+		}
+
+	const string Command = string_upper(st[0]);
+
+	if(Command == "PING")
+	{
+		xClient::DoCTCP(theClient, CTCP.c_str(), Message.c_str());
+		return true;
+	}
+
+	if(Command == "GENDER")
+	{
+		xClient::DoCTCP(theClient, CTCP.c_str(), "I'm bender. I bend things.");
+		return true;
+	}
+
+	if(Command == "VERSION")
+	{
+		xClient::DoCTCP(theClient, CTCP.c_str(), "Undernet Channel Services Version 2 ($Id: cservice.cc,v 1.16 2000/12/28 01:21:42 gte Exp $)");
+		return true;
+	}
+ 
+	return true;
+} 
  
 sqlUser* cservice::isAuthed(iClient* theClient, bool alert)
 {

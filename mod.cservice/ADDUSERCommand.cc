@@ -1,5 +1,16 @@
-/* ADDUSERCommand.cc */
-
+/* 
+ * ADDUSERCommand.cc 
+ *
+ * 26/12/2000 - Greg Sikorski <gte@atomicrevs.demon.co.uk>
+ * Initial Version.
+ *
+ * Adds a new user to a channel, obeying common sense.
+ *
+ * Caveats: None
+ *
+ * $Id: ADDUSERCommand.cc,v 1.2 2000/12/28 01:21:42 gte Exp $
+ */
+ 
 #include	<string>
  
 #include	"StringTokenizer.h"
@@ -8,7 +19,7 @@
 #include	"levels.h"
 #include	"libpq++.h"
 
-const char ADDUSERCommand_cc_rcsId[] = "$Id: ADDUSERCommand.cc,v 1.1 2000/12/27 03:15:42 gte Exp $" ;
+const char ADDUSERCommand_cc_rcsId[] = "$Id: ADDUSERCommand.cc,v 1.2 2000/12/28 01:21:42 gte Exp $" ;
 
 namespace gnuworld
 {

@@ -1,5 +1,16 @@
 #ifndef __LEVELS_H
-#define __LEVELS_H "$Id: levels.h,v 1.2 2000/12/27 01:11:08 gte Exp $"
+#define __LEVELS_H "$Id: levels.h,v 1.3 2000/12/28 01:21:42 gte Exp $"
+
+/* 
+ * levels.h
+ *
+ * 20/12/2000 - Perry Lorier <perry@coders.net>
+ * Initial Version.
+ * 
+ * Defines access level constants for use in command handlers. 
+ *
+ * $Id: levels.h,v 1.3 2000/12/28 01:21:42 gte Exp $
+ */
 
 namespace gnuworld {
 
