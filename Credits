@@ -18,6 +18,10 @@ Greg (Gte) - Lots of real world testing and development of gnuworld and its
 modules.  Greg is the father of the cservice module, which I
 (ripper_) continually break.
 
+Doug (seiki) - Thanks a lot for letting me thrash your machine during
+development and testing of gnuworld.  You really made a lot of sacrifices
+and had to put up with my complaining :)
+
 Ben (Obike) - Enormous help with the php security issues, and the web 
 interface in general.  Your expertise was invaluable.
 
