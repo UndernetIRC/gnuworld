@@ -20,7 +20,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
  * USA.
  *
- * $Id: cloner.cc,v 1.23 2002/08/03 15:27:55 dan_karrels Exp $
+ * $Id: cloner.cc,v 1.24 2002/08/03 21:49:14 dan_karrels Exp $
  */
 
 #include	<new>
@@ -45,7 +45,7 @@
 
 const char client_h_rcsId[] = __CLIENT_H ;
 const char cloner_h_rcsId[] = __CLONER_H ;
-const char cloner_cc_rcsId[] = "$Id: cloner.cc,v 1.23 2002/08/03 15:27:55 dan_karrels Exp $" ;
+const char cloner_cc_rcsId[] = "$Id: cloner.cc,v 1.24 2002/08/03 21:49:14 dan_karrels Exp $" ;
 const char iClient_h_rcsId[] = __ICLIENT_H ;
 const char EConfig_h_rcsId[] = __ECONFIG_H ;
 const char ELog_h_rcsId[] = __ELOG_H ;
@@ -177,7 +177,12 @@ if( st.empty() )
 	}
 
 string command( string_upper( st[ 0 ] ) ) ;
-string topic( string_upper( st[ 1 ] ) ) ;
+string topic ;
+
+if( st.size() > 1 )
+	{
+	topic = st[ 1 ] ;
+	}
 
 if( command == "SHOWCOMMANDS" )
 	{
