@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_M.cc,v 1.4 2003/06/17 15:13:53 dan_karrels Exp $
+ * $Id: msg_M.cc,v 1.5 2003/06/18 12:18:46 dan_karrels Exp $
  */
 
 #include	<new>
@@ -38,7 +38,7 @@
 #include	"ServerCommandHandler.h"
 #include	"config.h"
 
-RCSTAG( "$Id: msg_M.cc,v 1.4 2003/06/17 15:13:53 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: msg_M.cc,v 1.5 2003/06/18 12:18:46 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -194,6 +194,8 @@ for( const char* modePtr = Param[ 2 ] ; *modePtr ; ++modePtr )
 				elog	<< "msg_M> Invalid "
 					<< "format for message: missing "
 					<< "argument to mode +l"
+					<< " in channel "
+					<< *theChan
 					<< endl ;
 				continue ;
 				}
@@ -211,6 +213,8 @@ for( const char* modePtr = Param[ 2 ] ; *modePtr ; ++modePtr )
 				elog	<< "msg_M> Invalid "
 					<< "format for message: missing "
 					<< "argument for mode 'k'"
+					<< " in channel "
+					<< *theChan
 					<< endl ;
 				continue ;
 				}
@@ -226,6 +230,8 @@ for( const char* modePtr = Param[ 2 ] ; *modePtr ; ++modePtr )
 				elog	<< "msg_M> Invalid "
 					<< "format for message: missing "
 					<< "argument for mode 'o'"
+					<< " in channel "
+					<< *theChan
 					<< endl ;
 				continue ;
 				}
@@ -237,6 +243,8 @@ for( const char* modePtr = Param[ 2 ] ; *modePtr ; ++modePtr )
 				elog	<< "msg_M> Unable to "
 					<< "find op target client: "
 					<< Param[ argPos - 1 ]
+					<< " in channel "
+					<< *theChan
 					<< endl ;
 				break ;
 				}
@@ -247,6 +255,8 @@ for( const char* modePtr = Param[ 2 ] ; *modePtr ; ++modePtr )
 				elog	<< "msg_M> Unable to "
 					<< "find op target user: "
 					<< Param[ argPos - 1 ]
+					<< " in channel "
+					<< *theChan
 					<< endl ;
 				break ;
 				}
@@ -272,6 +282,8 @@ for( const char* modePtr = Param[ 2 ] ; *modePtr ; ++modePtr )
 				elog	<< "msg_M> Invalid "
 					<< "format for message: missing "
 					<< "argument for mode 'v'"
+					<< " in channel "
+					<< *theChan
 					<< endl ;
 				continue ;
 				}
@@ -283,6 +295,8 @@ for( const char* modePtr = Param[ 2 ] ; *modePtr ; ++modePtr )
 				elog	<< "msg_M> Unable to "
 					<< "find voice target client: "
 					<< Param[ argPos - 1 ]
+					<< " in channel "
+					<< *theChan
 					<< endl ;
 				break ;
 				}
@@ -293,6 +307,8 @@ for( const char* modePtr = Param[ 2 ] ; *modePtr ; ++modePtr )
 				elog	<< "msg_M> Unable to "
 					<< "find voice target user: "
 					<< Param[ argPos - 1 ]
+					<< " in channel "
+					<< *theChan
 					<< endl ;
 				break ;
 				}
@@ -308,6 +324,8 @@ for( const char* modePtr = Param[ 2 ] ; *modePtr ; ++modePtr )
 				elog	<< "msg_M> Invalid "
 					<< "format for message: missing "
 					<< "argument for mode 'b'"
+					<< " in channel "
+					<< *theChan
 					<< endl ;
 				continue ;
 				}
