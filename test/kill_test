@@ -1,0 +1,9 @@
+#!/bin/tcsh
+kill -HUP `cat signal.pid`
+kill -INT `cat signal.pid`
+kill -PIPE `cat signal.pid`
+kill -TERM `cat signal.pid`
+kill -POLL `cat signal.pid`
+kill -USR1 `cat signal.pid`
+kill -USR2 `cat signal.pid`
+

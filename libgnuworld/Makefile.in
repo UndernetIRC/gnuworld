@@ -147,6 +147,7 @@ libgnuworld_la_SOURCES = Buffer.cc \
 	ConnectionManager.cc \
 	EConfig.cc \
 	ELog.cc \
+	Signal.cc \
 	StringTokenizer.cc \
 	gThread.cc \
 	match.cc \
@@ -162,8 +163,8 @@ LTLIBRARIES = $(noinst_LTLIBRARIES)
 libgnuworld_la_LDFLAGS =
 libgnuworld_la_LIBADD =
 am_libgnuworld_la_OBJECTS = Buffer.lo Connection.lo ConnectionHandler.lo \
-	ConnectionManager.lo EConfig.lo ELog.lo StringTokenizer.lo \
-	gThread.lo match.lo md5hash.lo misc.lo
+	ConnectionManager.lo EConfig.lo ELog.lo Signal.lo \
+	StringTokenizer.lo gThread.lo match.lo md5hash.lo misc.lo
 libgnuworld_la_OBJECTS = $(am_libgnuworld_la_OBJECTS)
 
 DEFAULT_INCLUDES =  -I. -I$(srcdir) -I$(top_builddir)/include
@@ -174,6 +175,7 @@ am__depfiles_maybe = depfiles
 @AMDEP_TRUE@	./$(DEPDIR)/ConnectionHandler.Plo \
 @AMDEP_TRUE@	./$(DEPDIR)/ConnectionManager.Plo \
 @AMDEP_TRUE@	./$(DEPDIR)/EConfig.Plo ./$(DEPDIR)/ELog.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/Signal.Plo \
 @AMDEP_TRUE@	./$(DEPDIR)/StringTokenizer.Plo \
 @AMDEP_TRUE@	./$(DEPDIR)/gThread.Plo ./$(DEPDIR)/match.Plo \
 @AMDEP_TRUE@	./$(DEPDIR)/md5hash.Plo ./$(DEPDIR)/misc.Plo
@@ -222,6 +224,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ConnectionManager.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/EConfig.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ELog.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Signal.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/StringTokenizer.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gThread.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/match.Plo@am__quote@
