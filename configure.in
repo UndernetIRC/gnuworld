@@ -1,10 +1,10 @@
-dnl $Id: configure.in,v 1.26 2001/07/17 13:42:50 dan_karrels Exp $
+dnl $Id: configure.in,v 1.27 2001/07/17 15:30:45 dan_karrels Exp $
 dnl ----------------------------------------------------------
 
 echo Configuring GNUWorld...
 echo
 
-AC_REVISION($Revision: 1.26 $)
+AC_REVISION($Revision: 1.27 $)
 AC_INIT(src/main.cc)
 AM_INIT_AUTOMAKE(gnuworld,0.0)
 AM_CONFIG_HEADER(include/defs.h)
@@ -20,6 +20,8 @@ INCLTDL="-I../libltdl"
 LIBLTDL="../libltdl/libltdlc.la"
 AC_SUBST(INCLTDL)
 AC_SUBST(LIBLTDL)
+
+AC_ISC_POSIX
 
 dnl Check for dlopen support
 AC_LIBTOOL_DLOPEN
@@ -44,7 +46,6 @@ AC_PROG_CC
 AC_PROG_CXX
 AC_PROG_CPP
 AC_LANG_CPLUSPLUS
-AC_ISC_POSIX
 
 AC_PROG_MAKE_SET(gmake)
 AC_SUBST(LIBTOOL_DEPS)
@@ -366,13 +367,8 @@ dnl	echo "mod_list: $mod_list"
 			continue
 		fi
 
-		if [ test -f $file/configure ]; then
-dnl			echo "Found configure in $file"
-			AC_CONFIG_SUBDIRS($file/configure)
-			MOD_DIRS="$MOD_DIRS $file"
-		elif [ test -f $file/Makefile.in ]; then
+		if [ test -f $file/Makefile.in ]; then
 			echo Adding module `echo $file | \cut -f2 -d"."`
-			makefiles="$makefiles $file/Makefile"
 			MOD_DIRS="$MOD_DIRS $file"
 		fi
 	 done
