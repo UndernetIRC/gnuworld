@@ -2,7 +2,7 @@
 /*
  *
  * Undernet GNUworld Interactive Installation Guide (aka UGIIG)
- * $Id: index.php,v 1.2 2002/03/04 03:21:35 nighty Exp $
+ * $Id: index.php,v 1.3 2002/03/04 03:22:24 nighty Exp $
  *
  * Released under the GNU Public License : http://www.gnu.org/licenses/gpl.txt
  * by nighty <nighty@undernet.org>
@@ -50,7 +50,7 @@ function footer($prev,$next) {
 	//echo "<address>maintained by <b>&lt;</b><a href=\"mailto:" . $coder_email . "\">" . $coder_email . "</a><b>&gt;</b> - Last modified : <b>" . date("M-d-Y H:i:s",   (  filemtime("index.php")+( date("Z",filemtime("index.php"))/3600 )   )   ) . " UTC/GMT</b> - <b>[</b><a href=\"./\">Home</a><b>]</b></address>";
 	echo "<address>maintained by <b>&lt;</b><a href=\"mailto:" . $coder_email . "\">" . $coder_email . "</a><b>&gt;</b> - <b>[</b><a href=\"./\">Home</a><b>]</b>";
 	echo "&nbsp;<br><font size=-2><b>";
-?>$Id: index.php,v 1.2 2002/03/04 03:21:35 nighty Exp $<?
+?>$Id: index.php,v 1.3 2002/03/04 03:22:24 nighty Exp $<?
 	echo "</b></font></address>\n";
 	echo "</body>\n";
 	echo "</html>\n";
@@ -75,7 +75,7 @@ $coder_email = "nighty@undernet.org";
 $coder_name = "nighty";
  
 ?>
-<!-- $Id: index.php,v 1.2 2002/03/04 03:21:35 nighty Exp $ //-->
+<!-- $Id: index.php,v 1.3 2002/03/04 03:22:24 nighty Exp $ //-->
 <html>
 <head>
 <title>Undernet GNUworld Interactive Installation Guide</title>
@@ -1251,7 +1251,7 @@ IMPORTANT NOTICE:</b>
 	&lt;?
 	/*
 
-	&lt;!-- $Id: index.php,v 1.2 2002/03/04 03:21:35 nighty Exp $ //--&gt;
+	&lt;!-- $Id: index.php,v 1.3 2002/03/04 03:22:24 nighty Exp $ //--&gt;
 	
 	'config.inc' For GNUworld's mod.cservice's website interface
 	
@@ -1817,7 +1817,7 @@ and use the CVS command:
 
 <hr width=100% noshade size=1><br>
 
-<a name=faq6><b>How can i have that document on my server ?</b>
+<a name=faq6><b>How can i have that documentation on my server ?</b>
 You should find it in <i>gnuworld/doc/idoc</i> directory.
 Please read the <i>README</i> file first.
 
