@@ -23,7 +23,7 @@
 #include	"AuthInfo.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.21 2001/03/11 21:40:11 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.22 2001/03/26 00:08:31 dan_karrels Exp $" ;
 
 using std::string ;
 using std::vector ;
@@ -200,9 +200,7 @@ commandMap.clear() ;
 // Register a command handler
 bool ccontrol::RegisterCommand( Command* newComm )
 {
-#ifdef EDEBUG
-  assert( newComm != NULL ) ;
-#endif
+assert( newComm != NULL ) ;
 
 // Unregister the command handler first; prevent memory leaks
 UnRegisterCommand( newComm->getName() ) ;
@@ -296,12 +294,11 @@ if( st.empty() )
 // This is no longer necessary, but oh well *shrug*
 const string Command = string_upper( st[ 0 ] ) ;
 
-
 // Attempt to find a handler for this method.
-commandMapType::iterator commHandler = commandMap.find( Command ) ;
+commandIterator commHandler = findCommand( Command ) ;
 
 // Was a handler found?
-if( commHandler == commandMap.end() )
+if( commHandler == command_end() )
 	{
 	// Nope, notify the client
 	Notice( theClient, "Unknown command" ) ;
@@ -372,7 +369,7 @@ switch( theEvent )
 			static_cast< iClient* >( Data1 ) :
 			static_cast< iClient* >( Data2 ) ;
 
-		AuthInfo *TempAuth = IsAuth(tmpUser->getCharYYXXX());
+		AuthInfo *TempAuth = IsAuth(tmpUser);
 		if(TempAuth)
 	    	    deAuthUser(tmpUser->getCharYYXXX());
 		
@@ -431,9 +428,7 @@ return false ;
 
 bool ccontrol::isOperChan( const Channel* theChan ) const
 {
-#ifndef NDEBUG
-  assert( theChan != 0 ) ;
-#endif
+assert( theChan != 0 ) ;
 
 return isOperChan( theChan->getName() ) ;
 }
@@ -489,9 +484,7 @@ return result ;
 bool ccontrol::Kick( Channel* theChan, iClient* theClient,
 	const string& reason )
 {
-#ifndef NDEBUG
-  assert( theChan != NULL ) ;
-#endif
+assert( theChan != NULL ) ;
 
 if( !isOnChannel( theChan->getName() ) )
 	{
@@ -529,7 +522,8 @@ if( NULL == theChan )
 vector< iClient* > clientsToKick ;
 for( Channel::const_userIterator ptr = theChan->userList_begin() ;
 	ptr != theChan->userList_end() ; ++ptr )
-	{ //Dont kick opers and +k ppl
+	{
+	// Dont kick opers and +k ppl
 	if(( !ptr->second->isOper() ) && ( !ptr->second->getClient()->getMode(iClient::MODE_SERVICES) ))
 		{
 		clientsToKick.push_back( ptr->second->getClient() ) ;
@@ -572,6 +566,12 @@ for( authListType::const_iterator ptr = authList.begin() ;
 	}
 return NULL ;
 }
+
+AuthInfo* ccontrol::IsAuth( const ccUser* theUser ) const
+{
+assert( theUser != 0 ) ;
+return IsAuth( theUser->getID() ) ;
+}
    
 AuthInfo* ccontrol::IsAuth( const unsigned int UserId ) const
 {
@@ -588,9 +588,10 @@ return NULL ;
 
 void ccontrol::UpdateAuth(ccUser* TempUser)
 {
-    AuthInfo* TempAuth = IsAuth(TempUser->getID());
-    if(TempAuth)
-    {
+AuthInfo* TempAuth = IsAuth(TempUser);
+
+if(TempAuth)
+	{
 	//ccUser* TempUser = GetUser(Id);
 	TempAuth->Id = TempUser->getID();
         TempAuth->Name = TempUser->getUserName();
@@ -598,7 +599,7 @@ void ccontrol::UpdateAuth(ccUser* TempUser)
         TempAuth->Flags = TempUser->getFlags();
         TempAuth->SuspendExpires = TempUser->getSuspendExpires();
         TempAuth->SuspendedBy = TempUser->getSuspendedBy();
-    }
+	}
 }
 
 ccUser* ccontrol::GetUser( const string& Name )
@@ -652,9 +653,9 @@ if( (PGRES_TUPLES_OK == status) && (SQLDb->Tuples() > 0) )
 return NULL;
 }
 
-ccUser* ccontrol::GetParm ()
+ccUser* ccontrol::GetParm()
 {
-ccUser* TempUser = new ccUser(SQLDb);
+ccUser* TempUser = new (nothrow) ccUser(SQLDb);
 assert (TempUser != NULL);
 
 TempUser->setID(atoi(SQLDb->GetValue(0, 0)));
@@ -693,13 +694,11 @@ if( PGRES_COMMAND_OK == status )
 	{
 	return true;
 	}
-else
-	{
-	elog	<< "ccontrol::AddOper> SQL Failure: "
-		<< SQLDb->ErrorMessage()
-		<< endl ;
-	return false;
-	}
+
+elog	<< "ccontrol::AddOper> SQL Failure: "
+	<< SQLDb->ErrorMessage()
+	<< endl ;
+return false;
 }
 
 bool ccontrol::DeleteOper (const string& Name)
@@ -778,10 +777,10 @@ else
 
 int ccontrol::getCommandLevel( const string& Command)
 {
-commandMapType::iterator commHandler = commandMap.find( Command ) ;
+commandIterator commHandler = findCommand( Command ) ;
 
 // Was a handler found?
-if( commHandler != commandMap.end() )
+if( commHandler != command_end() )
 	{
 	return commHandler->second->getFlags() ;
 	}
@@ -805,7 +804,6 @@ TempAuth->SuspendedBy = TempUser->getSuspendedBy();
 authList.push_back( TempAuth ) ;
 return true;
 }    
-
 
 bool ccontrol::deAuthUser( const string& Numeric)
 {
@@ -838,17 +836,24 @@ elog	<< "ccontrol::UserGotMask> "
 ExecStatusType status = SQLDb->Exec( theQuery.str() ) ;
 delete[] theQuery.str() ;
 
-if( PGRES_TUPLES_OK == status )
+if( PGRES_TUPLES_OK != status )
 	{
-	for( int i = 0 ; i < SQLDb->Tuples() ; i++ )
+	elog	<< "ccontrol::UserGotMask> SQL Failure: "
+		<< SQLDb->ErrorMessage()
+		<< endl ;
+
+	return false ;
+	}
+
+for( int i = 0 ; i < SQLDb->Tuples() ; i++ )
+	{
+	if(match(SQLDb->GetValue(i,0),Host) == 0)
 		{
-		if(match(SQLDb->GetValue(i,0),Host) == 0)
-			{
-			return true ;
-			}
+		break ;
 		}
 	}
-return false ;
+
+return true ;
 }
 
 bool ccontrol::UserGotHost( ccUser* user, const string& Host )
@@ -1071,7 +1076,9 @@ delete[] theQuery.str() ;
 if( PGRES_TUPLES_OK == status )
 	{
 	if(SQLDb->Tuples() > 0 )
+		{
 		DoHelp(user);
+		}
 	else
 		{
 		Notice( user,
@@ -1111,7 +1118,9 @@ delete[] theQuery.str() ;
 if( PGRES_TUPLES_OK == status )
 	{
 	if(SQLDb->Tuples() > 0 )
+		{
 		DoHelp(user);
+		}
 	else
 		{
 		Notice( user,
@@ -1135,9 +1144,9 @@ void ccontrol::DoHelp(iClient* theClient)
 for( int i = 0 ; i < SQLDb->Tuples() ; i++ )
 	{
 	string commInfo = replace(
-	SQLDb->GetValue( i, 1 ),
-	"$BOT$",
-	nickName ) ;
+		SQLDb->GetValue( i, 1 ),
+		"$BOT$",
+		nickName ) ;
 	Notice(theClient,commInfo);
 	} // for()
 }
@@ -1146,11 +1155,13 @@ string ccontrol::replace( const string& srcString,
 	const string& from,
 	const string& to )
 {
-unsigned int beginPos;
-string retMe = srcString;
+string retMe( srcString ) ;
+string::size_type beginPos = 0 ;
 
 while((beginPos = retMe.find(from)) <= retMe.size())
+	{
 	retMe.replace(beginPos,from.size(),to);
+	}
 
 return retMe ;
 
@@ -1159,15 +1170,13 @@ return retMe ;
 ccUser* ccontrol::GetOper( const string Name)
 {
 ccUser* tmpUser = new (nothrow) ccUser(SQLDb);
-if(!tmpUser)
-	return NULL;
-if(tmpUser->loadData(Name))
-	return tmpUser;
-else
+assert( tmpUser != 0 ) ;
+
+if( !tmpUser->loadData(Name) )
 	{
-	delete tmpUser;
-	return NULL;
+	delete tmpUser ; tmpUser = 0 ;
 	}
+return tmpUser ;
 }
 
 } // namespace gnuworld

@@ -3,7 +3,7 @@
  */
 
 #ifndef __CCONTROL_H
-#define __CCONTROL_H "$Id: ccontrol.h,v 1.15 2001/03/10 18:33:23 mrbean_ Exp $"
+#define __CCONTROL_H "$Id: ccontrol.h,v 1.16 2001/03/26 00:08:31 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
@@ -27,6 +27,9 @@
 namespace gnuworld
 {
  
+using std::string ;
+using std::vector ;
+
 /*
  *  Sublcass the postgres API to create our own accessor
  *  to get at the PID information.
@@ -42,9 +45,6 @@ public:
 	inline int getPID() const
 		{ return pgConn->be_pid; }
 };
-
-using std::string ;
-using std::vector ;
 
 /// Forward declaration of command handler class
 class Command ;
@@ -216,6 +216,8 @@ public:
 	AuthInfo* IsAuth( const iClient* theClient ) const ;
 
         AuthInfo *IsAuth( const string& ) const ;
+
+	AuthInfo *IsAuth( const ccUser* ) const ;
 	
 	AuthInfo *IsAuth( const unsigned int ) const ;
        
@@ -328,6 +330,31 @@ public:
 	 * given command token.
 	 */
 	constCommandIterator findCommand( const string& theComm ) const
+		{ return commandMap.find( theComm ) ; }
+
+	/**
+	 * The type of a mutable iterator to the command map.
+	 */
+	typedef commandMapType::iterator commandIterator ;
+
+	/**
+	 * Retrieve a mutable iterator to the beginning of the command
+	 * table.
+	 */
+	commandIterator command_begin()
+		{ return commandMap.begin() ; }
+
+	/**
+	 * Retrieve a mutable iterator to the end of the command table.
+	 */
+	commandIterator command_end()
+		{ return commandMap.end() ; }
+
+	/**
+	 * Retrieve a mutable iterator to a command handler for the
+	 * given command token.
+	 */
+	commandIterator findCommand( const string& theComm )
 		{ return commandMap.find( theComm ) ; }
 
 	/**
