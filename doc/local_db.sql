@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------------
--- "$Id: local_db.sql,v 1.7 2001/11/05 00:51:10 nighty Exp $"
+-- "$Id: local_db.sql,v 1.8 2001/11/05 01:04:56 nighty Exp $"
 -- Channel service DB SQL file for PostgreSQL.
 --
 --
@@ -78,7 +78,8 @@ CREATE TABLE pending_mgrchange (
 	opt_duration INT4,
 -- duration in seconds if temporary, 0 if permanent.
 	crc VARCHAR(128),
-	confirmed INT2 DEFAULT 0
+	confirmed INT2 DEFAULT 0,
+	from_host VARCHAR(15) DEFAULT '0.0.0.0'
 );
 
 CREATE INDEX pending_mgrchange_id_idx ON pending_mgrchange(id);
