@@ -10,7 +10,7 @@
  *
  * Caveats: SET LANG is still under consideration.
  *
- * $Id: SETCommand.cc,v 1.13 2001/01/28 23:16:33 gte Exp $
+ * $Id: SETCommand.cc,v 1.14 2001/01/31 01:05:36 gte Exp $
  */
 
 #include	<string>
@@ -22,7 +22,7 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char SETCommand_cc_rcsId[] = "$Id: SETCommand.cc,v 1.13 2001/01/28 23:16:33 gte Exp $" ;
+const char SETCommand_cc_rcsId[] = "$Id: SETCommand.cc,v 1.14 2001/01/31 01:05:36 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -641,112 +641,19 @@ bool SETCommand::Exec( iClient* theClient, const string& Message )
 		bot->Notice(theClient, "MODE: You do not have enough access!");
 		return true;
 	    }
-	    string modes = ""; // Chan modes.
-	    string args = ""; // key or limit. 
-	    
-	    StringTokenizer::size_type mpos = 4;
-	    StringTokenizer::size_type apos = 5;
-	    bool plus;
-	    while(mpos < st.size())
-	    {
-		if(mpos == apos) apos++;
-
-		string::size_type mposInc = 1;
-		
-		plus = true;
-		
-		for(string::size_type cpos = 0; cpos < st[mpos].size(); ++cpos)
+		if (!tmpChan)
 		{
-		    switch(st[mpos][cpos])
-		    {
-			case 'k':
-				if(apos >= st.size())
-				{
-				    bot->Notice(theClient, "ERROR: You have specified a KEY mode(+k), without arguments!");
-				    return true;
-				}
-				modes += st[mpos][cpos];
-				args += st[apos] + ' ';
-				apos++;
-				mposInc++;
-				break;
-			case 'l':
-				if(!plus) // -l doesn't need any arguments.
-				{
-				    modes += st[mpos][cpos];
-				    break;
-				}
-				if(apos >= st.size())
-				{
-				    bot->Notice(theClient, "ERROR: You have specified a LIMIT mode(+l), without arguments!");
-				    return true;
-				}
-				modes += st[mpos][cpos];
-				args += st[apos] + ' ';
-				apos++;
-				mposInc++;
-				break;
-			
-			/*
-			 * The +sntipm mode checking isn't really
-			 * required, but is added so cmaster can
-			 * tell the user if he/she is using invalid
-			 * channel modes. aka userfriendly :p
-			 */
-			 
-			case 's':
-				modes += st[mpos][cpos];
-				break;
-			case 'p':
-				modes += st[mpos][cpos];
-				break;
-			case 'n':
-				modes += st[mpos][cpos];
-				break;
-			case 't':
-				modes += st[mpos][cpos];
-				break;
-			case 'i':
-				modes += st[mpos][cpos];
-				break;
-			case 'm':
-				modes += st[mpos][cpos];
-				break;
-			case '+':
-				if(plus) break;
-				plus = true;
-				modes += st[mpos][cpos];
-				break;
-			case '-':
-				if(!plus) break;
-				plus = false;
-				modes += st[mpos][cpos];
-				break;
-			default:
-				bot->Notice(theClient, "ERROR: You have defined one or more, invalid channel modes!");
-				return true;
-				break;
-		    }
+			bot->Notice(theClient, "Can't locate channel %s on the network!",
+				st[1].c_str());
+			return false;
 		}
-		mpos += mposInc;
-	}
- 
-	strstream s;
-	
-	s << bot->getCharYYXXX() << " M " << theChan->getName()
-	  << " " << modes + ' ' << args << endl << ends;
-	
-	bot->Write( s.str() );
-	
-	delete[] s.str();
+		theChan->setChannelMode(tmpChan->getModeString());
+		theChan->commit(); 
 
-	// updates internal tables, idea taken from ccontrol.
-//	tmpChan->OnModeChange(theClient->getCharYYXXX(), modes, args);
-
-	string finalMode = modes + ' ' + args;	
-	theChan->setChannelMode(finalMode);
-	theChan->commit();
-	    return true;
+	    bot->Notice(theClient, "MODE for %s is %s",
+			theChan->getName().c_str(),
+			theChan->getChannelMode().c_str());
+	    return true; 
 	}
 
 	bot->Notice(theClient, "ERROR: Invalid channel setting.");	    

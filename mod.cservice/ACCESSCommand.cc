@@ -5,10 +5,9 @@
  * Initial Version.
  *
  * Displays all "Level" records for a specified channel.
- * Can optionally narrow down selection using a number of switches.
- * Can display all channels a user has access on (TODO). 
+ * Can optionally narrow down selection using a number of switches. 
  *
- * $Id: ACCESSCommand.cc,v 1.21 2001/01/31 00:27:39 gte Exp $
+ * $Id: ACCESSCommand.cc,v 1.22 2001/01/31 01:05:36 gte Exp $
  */
 
 #include	<string>
@@ -19,10 +18,8 @@
 #include	"libpq++.h"
 #include	"match.h"
 #define MAX_RESULTS 15
-
-// Todo: NO limit for * access 600+!
-
-const char ACCESSCommand_cc_rcsId[] = "$Id: ACCESSCommand.cc,v 1.21 2001/01/31 00:27:39 gte Exp $" ;
+ 
+const char ACCESSCommand_cc_rcsId[] = "$Id: ACCESSCommand.cc,v 1.22 2001/01/31 01:05:36 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -35,8 +32,7 @@ bool ACCESSCommand::Exec( iClient* theClient, const string& Message )
 {
 /* 
  * This command will build up a custom SQL query and execute it on
- * the 'levels' table.
- *
+ * the 'levels' table. 
  */
 
 StringTokenizer st( Message ) ;
