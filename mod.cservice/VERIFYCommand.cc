@@ -10,7 +10,7 @@
 #include	"responses.h"
 
  
-const char VERIFYCommand_cc_rcsId[] = "$Id: VERIFYCommand.cc,v 1.13 2001/02/16 20:20:26 plexus Exp $" ;
+const char VERIFYCommand_cc_rcsId[] = "$Id: VERIFYCommand.cc,v 1.14 2001/02/28 22:50:36 plexus Exp $" ;
 
 namespace gnuworld
 {
@@ -76,11 +76,17 @@ bool VERIFYCommand::Exec( iClient* theClient, const string& Message )
 		return false;
 	}
 
+        sqlChannel* theChan = bot->getChannelRecord("#coder-com");
+	if (!theChan) return true;
+
  	// TODO: Move all the levels to constants in levels.h
 
 	int level = bot->getAdminAccessLevel(theUser); 
- 
-	if (level == 0) 
+	
+	
+	int cLevel = bot->getEffectiveAccessLevel(theUser, theChan, false);
+
+	if (level == 0 && cLevel == 0) 
 	{ 
 		bot->Notice(theClient, 
 			bot->getResponse(tmpUser,
@@ -110,12 +116,52 @@ bool VERIFYCommand::Exec( iClient* theClient, const string& Message )
 		return true;
 	}
  
-	if (level == level::admin::coder) 
+	if ((level > level::admin::admin) && (level <= level::admin::coder))
 	{
 		bot->Notice(theClient, 
 			bot->getResponse(tmpUser,
 				language::is_cservice_dev,
 				string("%s is an Official CService Developer%s and logged in as %s")).c_str(),
+			target->getNickUserHost().c_str(), extra.c_str(), theUser->getUserName().c_str());
+		return true;
+	}
+
+	if ((cLevel >= level::coder::base) && (cLevel <= level::coder::contrib))
+	{
+		bot->Notice(theClient, 
+			bot->getResponse(tmpUser,
+				language::is_coder_rep,
+				string("%s is an Official Coder-Com Representative%s and logged in as %s")).c_str(),
+			target->getNickUserHost().c_str(), extra.c_str(), theUser->getUserName().c_str());
+		return true;
+	}
+
+	if ((cLevel > level::coder::base) && (cLevel <= level::coder::contrib))
+	{
+		bot->Notice(theClient, 
+			bot->getResponse(tmpUser,
+				language::is_coder_rep,
+				string("%s is an Official Coder-Com Contributer%s and logged in as %s")).c_str(),
+			target->getNickUserHost().c_str(), extra.c_str(), theUser->getUserName().c_str());
+		return true;
+	}
+
+	if ((cLevel > level::coder::contrib) && (cLevel <= level::coder::devel))
+	{
+		bot->Notice(theClient, 
+			bot->getResponse(tmpUser,
+				language::is_coder_rep,
+				string("%s is an Official Coder-Com Developer%s and logged in as %s")).c_str(),
+			target->getNickUserHost().c_str(), extra.c_str(), theUser->getUserName().c_str());
+		return true;
+	}
+
+	if (cLevel > level::coder::devel)
+	{
+		bot->Notice(theClient, 
+			bot->getResponse(tmpUser,
+				language::is_coder_senior,
+				string("%s is an Official Coder-Com Senior%s and logged in as %s")).c_str(),
 			target->getNickUserHost().c_str(), extra.c_str(), theUser->getUserName().c_str());
 		return true;
 	}

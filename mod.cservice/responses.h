@@ -1,5 +1,5 @@
 #ifndef __RESPONSES_H
-#define __RESPONSES_H "$Id: responses.h,v 1.10 2001/02/21 00:14:44 dan_karrels Exp $"
+#define __RESPONSES_H "$Id: responses.h,v 1.11 2001/02/28 22:50:36 plexus Exp $"
 
 /* 
  * responses.h
@@ -10,7 +10,7 @@
  * Defines 'response' ID's, unique references to textual responses
  * from the bot.
  *
- * $Id: responses.h,v 1.10 2001/02/21 00:14:44 dan_karrels Exp $
+ * $Id: responses.h,v 1.11 2001/02/28 22:50:36 plexus Exp $
  */
 
 namespace gnuworld
@@ -180,6 +180,10 @@ namespace gnuworld
 		const int inv_invalid =				157;
 		const int invalid_option =			158;
 		const int is_service_bot =			159;
+		const int is_coder_rep =			160;
+		const int is_coder_contrib =			161;
+		const int is_coder_devel =			162;
+		const int is_coder_senior =			163;
 	}
 }
 
