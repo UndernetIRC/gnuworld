@@ -1,19 +1,33 @@
-dnl $Id: configure.in,v 1.23 2001/06/02 22:50:54 dan_karrels Exp $
+dnl $Id: configure.in,v 1.24 2001/06/02 23:44:42 dan_karrels Exp $
 dnl ----------------------------------------------------------
 
 echo Configuring GNUWorld...
 echo
 
-AC_REVISION($Revision: 1.23 $)
+AC_REVISION($Revision: 1.24 $)
 AC_INIT(src/main.cc)
 AM_INIT_AUTOMAKE(gnuworld,0.0)
 AM_CONFIG_HEADER(include/defs.h)
 
+dnl Enable building of the convenience library
+dnl and set LIBLTDL accordingly
 AC_LIBLTDL_CONVENIENCE
+
+dnl Substitute INCLTDL and LIBLTDL in the Makefiles
+dnl For some reason, INCLTDL and LIBLTDL aren't set
+dnl properly on OpenBSD
+INCLTDL="-I../libltdl"
+LIBLTDL="../libltdl/libltdlc.la"
 AC_SUBST(INCLTDL)
 AC_SUBST(LIBLTDL)
+
+dnl Check for dlopen support
 AC_LIBTOOL_DLOPEN
+
+dnl Configure libtool
 AM_PROG_LIBTOOL
+
+dnl Configure libltdl
 AC_CONFIG_SUBDIRS(libltdl)
 
 CFLAGS="-g -Wall -O0 -pipe"
@@ -24,9 +38,6 @@ LIBS=""
 libdir="`pwd`/bin"
 bindir="`pwd`/bin"
 glibdir="`pwd`/lib"
-dnl LIB_PATH="`pwd`/lib"
-dnl BIN_PATH="`pwd`/bin"
-dnl SRC_PATH="`pwd`/src"
 
 AC_SUBST(glibdir)
 AC_PROG_CC

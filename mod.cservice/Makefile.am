@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-# "$Id: Makefile.am,v 1.35 2001/04/30 01:26:21 gte Exp $"
+# "$Id: Makefile.am,v 1.36 2001/06/02 23:44:42 dan_karrels Exp $"
 
 lib_LTLIBRARIES = libcservice.la
 libcservice_la_LDFLAGS = -module -export-dynamic -L@PGSQL_LIB@ \
@@ -58,4 +58,5 @@ libcservice_la_SOURCES = cservice.cc \
 	VERIFYCommand.cc \
 	VOICECommand.cc
 
-INCLUDES = -I@PGSQL_INCLUDE@
+INCLUDES = -I@PGSQL_INCLUDE@ $(INCLTDL)
+

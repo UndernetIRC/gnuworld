@@ -1,4 +1,6 @@
 ## Process this file with automake to produce Makefile.in
+## $Id: Makefile.am,v 1.12 2001/06/02 23:44:42 dan_karrels Exp $
+
 bin_PROGRAMS = gnuworld
 
 gnuworld_LDFLAGS = -rpath $(bindir) -dlopen $(glibdir)/libgnuworld.la \

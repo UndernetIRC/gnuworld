@@ -10,7 +10,7 @@
 # even the implied warranty of MERCHANTABILITY or FITNESS FOR A
 # PARTICULAR PURPOSE.
 
-# "$Id: Makefile.in,v 1.51 2001/06/02 22:50:54 dan_karrels Exp $"
+# "$Id: Makefile.in,v 1.52 2001/06/02 23:44:42 dan_karrels Exp $"
 
 
 SHELL = @SHELL@
@@ -100,7 +100,7 @@ libccontrol_la_SOURCES = ccontrol.cc 	CControlCommands.cc 	ACCESSCommand.cc 	ADD
 
 
 libccontrol_la_LDFLAGS = -module -export-dynamic -L@PGSQL_LIB@ -lpq++
-INCLUDES = -I@PGSQL_INCLUDE@
+INCLUDES = -I@PGSQL_INCLUDE@ $(INCLTDL)
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = ../include/defs.h
 CONFIG_CLEAN_FILES = 
@@ -134,7 +134,7 @@ DIST_COMMON =  README Makefile.am Makefile.in TODO
 
 DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
-TAR = gtar
+TAR = tar
 GZIP_ENV = --best
 DEP_FILES =  .deps/ACCESSCommand.P .deps/ADDCOMMANDCommand.P \
 .deps/ADDNEWOPERCommand.P .deps/ADDNEWSERVERCommand.P \
@@ -274,7 +274,7 @@ distdir: $(DISTFILES)
 	@for file in $(DISTFILES); do \
 	  d=$(srcdir); \
 	  if test -d $$d/$$file; then \
-	    cp -pr $$d/$$file $(distdir)/$$file; \
+	    cp -pr $$/$$file $(distdir)/$$file; \
 	  else \
 	    test -f $(distdir)/$$file \
 	    || ln $$d/$$file $(distdir)/$$file 2> /dev/null \

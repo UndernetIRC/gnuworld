@@ -10,7 +10,7 @@
 # even the implied warranty of MERCHANTABILITY or FITNESS FOR A
 # PARTICULAR PURPOSE.
 
-# "$Id: Makefile.in,v 1.76 2001/06/02 22:50:54 dan_karrels Exp $"
+# "$Id: Makefile.in,v 1.77 2001/06/02 23:44:42 dan_karrels Exp $"
 
 
 SHELL = @SHELL@
@@ -102,7 +102,7 @@ libcservice_la_LDFLAGS = -module -export-dynamic -L@PGSQL_LIB@ 	-lpq++
 libcservice_la_SOURCES = cservice.cc 	networkData.cc 	sqlChannel.cc 	sqlUser.cc 	sqlLevel.cc 	sqlBan.cc 	sqlPendingChannel.cc 	ACCESSCommand.cc 	ADDUSERCommand.cc 	BANCommand.cc 	BANLISTCommand.cc 	CHANINFOCommand.cc 	CLEARMODECommand.cc 	DEOPCommand.cc 	DEVOICECommand.cc 	FORCECommand.cc 	HELPCommand.cc 	INVITECommand.cc 	ISREGCommand.cc 	JOINCommand.cc 	KICKCommand.cc 	LBANLISTCommand.cc 	LOGINCommand.cc 	MODINFOCommand.cc 	MOTDCommand.cc 	NEWPASSCommand.cc 	OPCommand.cc 	OPERJOINCommand.cc 	OPERPARTCommand.cc 	PARTCommand.cc 	PURGECommand.cc 	QUOTECommand.cc 	RANDOMCommand.cc 	REGISTERCommand.cc 	REHASHCommand.cc 	REMIGNORECommand.cc 	REMOVEALLCommand.cc 	REMUSERCommand.cc 	SAYCommand.cc 	SEARCHCommand.cc 	SERVNOTICECommand.cc 	SETCommand.cc 	SHOWCOMMANDSCommand.cc 	SHOWIGNORECommand.cc 	STATUSCommand.cc 	SUSPENDCommand.cc 	TOPICCommand.cc 	UNBANCommand.cc 	UNFORCECommand.cc 	UNSUSPENDCommand.cc 	VERIFYCommand.cc 	VOICECommand.cc
 
 
-INCLUDES = -I@PGSQL_INCLUDE@
+INCLUDES = -I@PGSQL_INCLUDE@ $(INCLTDL)
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = ../include/defs.h
 CONFIG_CLEAN_FILES = 
@@ -136,7 +136,7 @@ DIST_COMMON =  README Makefile.am Makefile.in configure
 
 DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
-TAR = gtar
+TAR = tar
 GZIP_ENV = --best
 DEP_FILES =  .deps/ACCESSCommand.P .deps/ADDUSERCommand.P \
 .deps/BANCommand.P .deps/BANLISTCommand.P .deps/CHANINFOCommand.P \
@@ -276,7 +276,7 @@ distdir: $(DISTFILES)
 	@for file in $(DISTFILES); do \
 	  d=$(srcdir); \
 	  if test -d $$d/$$file; then \
-	    cp -pr $$d/$$file $(distdir)/$$file; \
+	    cp -pr $$/$$file $(distdir)/$$file; \
 	  else \
 	    test -f $(distdir)/$$file \
 	    || ln $$d/$$file $(distdir)/$$file 2> /dev/null \
