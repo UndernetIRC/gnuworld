@@ -1,7 +1,7 @@
 /* ccUser.h */
 
 #ifndef __CCUSER_H
-#define __CCUSER_H "$Id: ccUser.h,v 1.14 2001/12/13 08:50:00 mrbean_ Exp $"
+#define __CCUSER_H "$Id: ccUser.h,v 1.15 2001/12/30 19:35:10 mrbean_ Exp $"
 
 #include	<string>
 
@@ -111,6 +111,9 @@ public:
 	inline const bool		getNeedOp() const
 		    { return NeedOp;  }
 
+	inline const bool		getNotice() const
+		    { return Notice;  }
+
 	inline const iClient*		getClient() const
 		    { return Client;  }
 
@@ -176,6 +179,9 @@ public:
 	inline void			setNeedOp( const bool _needOp )
 		    { NeedOp = _needOp; }
 	
+	inline void			setNotice( const bool _notice )
+		    { Notice = _notice; }
+
 	inline void			setClient(iClient* _Client)
 		    { Client = _Client; }
 		    
@@ -243,6 +249,7 @@ protected:
 	bool IsCoder;
 	bool GetLogs;
 	bool NeedOp;
+	bool Notice;
 	iClient* Client;
 	PgDatabase* SQLDb;
 

@@ -14,7 +14,7 @@
 #include	"Network.h"
 #include	"Constants.h"
 
-const char REMSERVERCommand_cc_rcsId[] = "$Id: REMSERVERCommand.cc,v 1.5 2001/12/23 09:07:57 mrbean_ Exp $";
+const char REMSERVERCommand_cc_rcsId[] = "$Id: REMSERVERCommand.cc,v 1.6 2001/12/30 19:35:10 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -47,8 +47,8 @@ if(st[1].size() > server::MaxName)
 	return false;
 	}
 
-string SName = bot->expandDbServer(bot->removeSqlChars(st[1]));
-if(!strcasecmp(SName,""))
+ccServer* tmpServer = bot->getServerName(bot->removeSqlChars(st[1]));
+if(!tmpServer)
 	{
 	bot->Notice(theClient, "Server %s is not  in my database!\n",st [ 1 ].c_str());
 	return false;
@@ -62,7 +62,7 @@ if(tmpUser)
 strstream theQuery;  
 theQuery        << User::Query
                 << " Where lower(server) = '"
- 		<< string_lower(SName) << "'"
+ 		<< string_lower(tmpServer->getName()) << "'"
 		<< ends;
 
 
@@ -72,7 +72,7 @@ delete[] theQuery.str() ;
         
 if(PGRES_TUPLES_OK != status)
         {
-	bot->Notice(theClient,"Got a db error, adding is aborted");	
+	bot->Notice(theClient,"Database error, i cant go on with removing the server");	
         return false;
         }
 
@@ -82,29 +82,21 @@ if(bot->SQLDb->Tuples() > 0)
 			,bot->SQLDb->Tuples());
 	return false;
 	}
-ccServer* NewServer = new ccServer(bot->SQLDb);
-assert(NewServer != NULL);
 
-if(!NewServer->loadData(SName)) //Check if the server is already in the database
-	{
-	bot->Notice(theClient, "Server %s is not  in my database!\n",SName.c_str());
-	delete NewServer;
-	return false;
-	}
 bot->MsgChanLog("Removing server : %s from the database, at the request of %s\n",
-		SName.c_str(),theClient->getNickName().c_str());
+		tmpServer->getName().c_str(),theClient->getNickName().c_str());
 
 //NewServer->setName(SName);
-if(NewServer->Delete())
+if(tmpServer->Delete())
 	{
-	bot->Notice(theClient,"Server \002%s\002 has been successfully removed\n",SName.c_str());
-	delete NewServer;
+	bot->Notice(theClient,"Server \002%s\002 has been successfully removed\n",tmpServer->getName().c_str());
+	bot->remServer(tmpServer);
+	delete tmpServer;
 	return true;
 	}
 else
 	{
-	bot->Notice(theClient,"Database error while removing server \002%s\002\n",SName.c_str());
-	delete NewServer;
+	bot->Notice(theClient,"Database error while removing server \002%s\002\n",tmpServer->getName().c_str());
 	return false;
 	}
 return true;

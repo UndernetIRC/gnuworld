@@ -15,7 +15,7 @@
 #include	"misc.h"
 #include	"Constants.h"
 
-const char MODUSERCommand_cc_rcsId[] = "$Id: MODUSERCommand.cc,v 1.13 2001/12/30 00:06:10 mrbean_ Exp $";
+const char MODUSERCommand_cc_rcsId[] = "$Id: MODUSERCommand.cc,v 1.14 2001/12/30 19:35:10 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -132,7 +132,7 @@ while(pos < st.size())
 //		if((Admin) && (AdFlag = OpFlag))
 		if(Same)
 			{
-			bot->Notice(theClient,"You cant change a password, for someone with the same level");
+			bot->Notice(theClient,"You cant add yourself another host");
 			pos+=2;
 			continue;
 			}			
@@ -222,6 +222,33 @@ while(pos < st.size())
 		tmpUser->Update();
 		pos += 2;
 		}	
+	else if(!strcasecmp(st[pos],"-mt")) //Trying to change the message type
+		{
+		if((pos + 1) >= st.size())
+			{
+			bot->Notice(theClient,"-gl option must get message type");
+			return false;
+			}
+		if((!strcasecmp(st[pos+1],"N")) || (!strcasecmp(st[pos+1],"NOTICE")))
+			{
+			tmpUser->setNotice(true);
+			bot->Notice(theClient,"%s will now get NOTICES",st[1].c_str());
+			}
+		else if((!strcasecmp(st[pos+1],"M")) || (!strcasecmp(st[pos+1],"MESSAGE")))
+			{
+			tmpUser->setNotice(false);
+			bot->Notice(theClient,"%s will now get MESSAGES",st[1].c_str());
+			}
+		else
+			{
+			bot->Notice(theClient,"unknown option %s for -mt must be n/m/notice/message",st[pos+1].c_str());
+			return false;
+			}
+		tmpUser->setLast_Updated_By(theClient->getNickUserHost());
+		tmpUser->Update();
+		pos += 2;
+		}	
+
 	else if(!strcasecmp(st[pos],"-s")) //Trying to change the user server
 		{
 		if((pos + 1) >= st.size())

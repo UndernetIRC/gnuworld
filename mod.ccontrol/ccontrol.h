@@ -3,7 +3,7 @@
  */
 
 #ifndef __CCONTROL_H
-#define __CCONTROL_H "$Id: ccontrol.h,v 1.53 2001/12/28 16:28:47 mrbean_ Exp $"
+#define __CCONTROL_H "$Id: ccontrol.h,v 1.54 2001/12/30 19:35:10 mrbean_ Exp $"
 
 
 #include	<string>
@@ -165,6 +165,10 @@ public:
 
 	virtual int OnServerMessage( iServer*, const string&,
 			bool secure = false ) ;
+
+	int Notice( const iClient* Target, const string& Message );
+         
+	int Notice( const iClient* Target, const char* Message, ... );
 
 	virtual int OnCTCP( iClient* ,
                 const string& ,
@@ -566,7 +570,11 @@ public:
 	
 	ccServer* getServer(const string& );
 	
+	ccServer* getServerName(const string& );
+
 	void	addServer(ccServer*);
+
+	void	remServer(ccServer*);
 	
 	/**
 	 * This is a constant iterator type used to perform a read-only

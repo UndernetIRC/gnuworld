@@ -3,7 +3,7 @@
  * 
  * Storage class for accessing user information 
  * 
- * $Id: ccUser.cc,v 1.13 2001/12/13 08:50:00 mrbean_ Exp $
+ * $Id: ccUser.cc,v 1.14 2001/12/30 19:35:10 mrbean_ Exp $
  */
  
 #include	<strstream>
@@ -19,7 +19,7 @@
 #include	"ccontrol.h"
 
 const char ccUser_h_rcsId[] = __CCUSER_H ;
-const char ccUser_cc_rcsId[] = "$Id: ccUser.cc,v 1.13 2001/12/13 08:50:00 mrbean_ Exp $" ;
+const char ccUser_cc_rcsId[] = "$Id: ccUser.cc,v 1.14 2001/12/30 19:35:10 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -51,6 +51,7 @@ ccUser::ccUser(PgDatabase* _SQLDb)
    IsCoder(0),
    GetLogs(0),
    NeedOp(0),
+   Notice(0),
    Client(NULL),
    SQLDb( _SQLDb )
 {
@@ -69,7 +70,7 @@ if(!dbConnected)
 	return false;
 	}
 	
-static const char Main[] = "SELECT user_id,user_name,password,access,saccess,flags,suspend_expires,suspended_by,server,isSuspended,IsUhs,IsOper,IsAdmin,IsSmt,IsCoder,GetLogs,NeedOp,Email,Suspend_Level,Suspend_Reason FROM opers WHERE lower(user_name) = '";
+static const char Main[] = "SELECT user_id,user_name,password,access,saccess,flags,suspend_expires,suspended_by,server,isSuspended,IsUhs,IsOper,IsAdmin,IsSmt,IsCoder,GetLogs,NeedOp,Email,Suspend_Level,Suspend_Reason,Notice FROM opers WHERE lower(user_name) = '";
 
 if(!dbConnected)
 	{
@@ -106,7 +107,7 @@ if(!dbConnected)
 	return false;
 	}
 	
-static const char Main[] = "SELECT user_id,user_name,password,access,saccess,flags,suspend_expires,suspended_by,server,isSuspended,IsUhs,IsOper,IsAdmin,IsSmt,IsCoder,GetLogs,NeedOp,Email,Suspend_Level,Suspend_Reason FROM opers WHERE user_id = ";
+static const char Main[] = "SELECT user_id,user_name,password,access,saccess,flags,suspend_expires,suspended_by,server,isSuspended,IsUhs,IsOper,IsAdmin,IsSmt,IsCoder,GetLogs,NeedOp,Email,Suspend_Level,Suspend_Reason,Notice FROM opers WHERE user_id = ";
 strstream theQuery;
 
 if(!dbConnected)
@@ -157,6 +158,7 @@ NeedOp = (!strcasecmp(SQLDb->GetValue(0,16),"t") ? 1 : 0 );
 Email = SQLDb->GetValue(0,17);
 SuspendLevel = atoi(SQLDb->GetValue(0,18));
 SuspendReason = SQLDb->GetValue(0,19);
+Notice = (!strcasecmp(SQLDb->GetValue(0,20),"t") ? 1 : 0 );
 }    
 
 bool ccUser::Update()
@@ -207,7 +209,9 @@ theQuery	<< Main
 		<< (NeedOp ? "'t'" : "'n'")
 		<< ", Email = '"
 		<< Email
-		<< "' WHERE lower(user_name) = '" 
+		<< "',Notice = "
+		<< (Notice ? "'t'" : "'n'")
+		<< " WHERE lower(user_name) = '" 
 		<< string_lower(UserName) << "'"
 		<<  ends;
 

@@ -37,7 +37,7 @@
 #include	"ip.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.107 2001/12/30 00:06:10 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.108 2001/12/30 19:35:10 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -546,6 +546,35 @@ if(!strcasecmp(st[1],"351"))
 	}
 return xClient::OnServerMessage(Server,Message);
 }
+
+int ccontrol::Notice( const iClient* Target, const string& Message )
+{
+ccUser* tmpUser = IsAuth(Target);
+if((tmpUser) && !(tmpUser->getNotice()))
+	{
+	return xClient::Message(Target,Message);
+	}
+return xClient::Notice(Target,Message);
+}
+         
+int ccontrol::Notice( const iClient* Target, const char* Message, ... )
+{
+
+char buffer[ 1024 ] = { 0 } ;
+va_list list;
+
+va_start(list, Message);
+vsnprintf(buffer, 1024, Message, list);
+va_end(list);
+
+ccUser* tmpUser = IsAuth(Target);
+if((tmpUser) && !(tmpUser->getNotice()))
+	{
+	return xClient::Message(Target,string(buffer));
+	}
+return xClient::Notice(Target,(buffer));
+                        
+}        
 
 int ccontrol::OnCTCP( iClient* theClient, const string& CTCP
 		, const string& Message ,bool Secure = false ) 
@@ -1062,7 +1091,7 @@ return IsAuth(Network->findClient(Numeric));
 
 bool ccontrol::AddOper (ccUser* Oper)
 {
-static const char *Main = "INSERT into opers (user_name,password,access,saccess,last_updated_by,last_updated,flags,server,isSuspended,suspend_expires,suspended_by,suspend_level,suspend_reason,isUhs,isOper,isAdmin,isSmt,isCoder,GetLogs,NeedOp) VALUES ('";
+static const char *Main = "INSERT into opers (user_name,password,access,saccess,last_updated_by,last_updated,flags,server,isSuspended,suspend_expires,suspended_by,suspend_level,suspend_reason,isUhs,isOper,isAdmin,isSmt,isCoder,GetLogs,NeedOp,Notice) VALUES ('";
 
 if(!dbConnected)
 	{
@@ -1091,6 +1120,7 @@ theQuery	<< Main
 		<< "," << (Oper->isCoder() ? "'t'" : "'n'")
 		<< "," << (Oper->getLogs() ? "'t'" : "'n'")
 		<< "," << (Oper->getNeedOp() ? "'t'" : "'n'")
+		<< "," << (Oper->getNotice() ? "'t'" : "'n'")
 		<< ")"
 		<< ends;
 
@@ -1706,7 +1736,7 @@ va_start( list, Msg ) ;
 vsprintf( buffer, Msg, list ) ;
 va_end( list ) ;
 
-Notice((Network->findChannel(msgChan))->getName(),buffer);
+xClient::Notice((Network->findChannel(msgChan))->getName(),buffer);
 usersIterator uIterator;
 ccUser* tempUser;
 for( uIterator = usersMap.begin();uIterator != usersMap.end();++uIterator)
@@ -1714,7 +1744,7 @@ for( uIterator = usersMap.begin();uIterator != usersMap.end();++uIterator)
         tempUser = uIterator->second;
 	if((tempUser) && (tempUser->getLogs() ) && (tempUser->getClient()))
                 { 
-                Message(tempUser->getClient(),buffer);
+                Notice(tempUser->getClient(),buffer);
                 }
 	}
 return true;
@@ -2239,7 +2269,16 @@ for(int i =0;i<SQLDb->Tuples();++i)
 	tempUser->setEmail(SQLDb->GetValue(i,17));
 	tempUser->setSuspendLevel(atoi(SQLDb->GetValue(i,18)));
 	tempUser->setSuspendReason(SQLDb->GetValue(i,19));
+	if(!strcasecmp(SQLDb->GetValue(i,20),"t"))
+		{
+		tempUser->setNotice(true);
+		}
+	else
+		{
+		tempUser->setNotice(false);
+		}
 	usersMap[tempUser->getUserName()]=tempUser;
+
 	}
 return true;
 }
@@ -2837,70 +2876,13 @@ return true;
 
 }
 
-bool ccontrol::CleanServers()
-{
-static const char *Main = "Delete from servers";
-
-if(!dbConnected)
-	{
-	return false;
-	}
-
-strstream theQuery;
-theQuery	<< Main
-		<< ends;
-
-
-ExecStatusType status = SQLDb->Exec( theQuery.str() ) ;
-delete[] theQuery.str() ;
-
-if( PGRES_COMMAND_OK != status )
-	{
-	elog	<< "ccontrol::CleanServers> SQL Failure: "
-		<< SQLDb->ErrorMessage()
-		<< endl ;
-
-	return false;
-	}
-return true;
-
-}
-
 const string ccontrol::expandDbServer(const string& Name)
 {
 
-if(!dbConnected)
-	{
-	return "";
-	}
-
-string Namelike = replace(Name,"*","%");
-
-strstream theQuery;
-theQuery	<< "Select name from servers "
-		<< " Where lower(name) like '"
-		<< string_lower(Namelike) << "'"
-		<< ends;
-
-elog 		<< "ccontrol::expandDbServer> "
-		<< theQuery.str()
-		<< ends;
-		
-ExecStatusType status = SQLDb->Exec( theQuery.str() ) ;
-delete[] theQuery.str() ;
-
-if( PGRES_TUPLES_OK != status )
-	{
-	elog	<< "ccontrol::DeleteOper> SQL Failure: "
-		<< SQLDb->ErrorMessage()
-		<< endl ;
-
-	return "";
-	}
-if(SQLDb->Tuples() > 0)
-	return SQLDb->GetValue(0,0);
-else
-	return "";
+ccServer* tmpServer = getServerName(Name);
+if(tmpServer)
+	return tmpServer->getName();
+return "";
 
 }
 
@@ -3099,7 +3081,6 @@ void ccontrol::updateVersions()
 {
 for(serversIterator ptr = serversMap.begin();ptr != serversMap.end();++ptr)
 	{
-	MsgChanLog("Server : %s num : %s\n",ptr->second->getName().c_str(),ptr->second->getLastNumeric().c_str()); 
 	if(ptr->second->getNetServer())
 		Write("%s V :%s\n",getCharYYXXX().c_str(),ptr->second->getLastNumeric().c_str());
 	}
@@ -3116,12 +3097,34 @@ return NULL;
 
 }
 
+ccServer* ccontrol::getServerName(const string& Name)
+{
+
+ccServer* tempServer;
+
+for(serversIterator ptr = serversMap.begin();ptr != serversMap.end();++ptr)
+	{
+	tempServer = ptr->second;
+	if(!match(Name,tempServer->getName()))
+		{
+		return tempServer;
+		}
+	}
+return NULL;
+
+}
+
 void ccontrol::addServer(ccServer* tempServer)
 {
 if(!serversMap[tempServer->getLastNumeric()])
 	{
 	serversMap[tempServer->getLastNumeric()] = tempServer;
 	}
+}
+
+void ccontrol::remServer(ccServer* tempServer)
+{
+serversMap.erase(serversMap.find(tempServer->getLastNumeric()));
 }
 
 void *initGate(void* arg)
