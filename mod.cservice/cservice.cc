@@ -122,7 +122,7 @@ cservice::cservice(const string& args)
  
     RegisterCommand(new SHOWCOMMANDSCommand(this, "SHOWCOMMANDS", "<#channel>", 3));
     RegisterCommand(new LOGINCommand(this, "LOGIN", "<username> <password>", 10)); 
-    RegisterCommand(new ACCESSCommand(this, "ACCESS", "[channel] [nick] [-min n] [-max n] [-autoop] [-noautoop] [-modif [mask]]", 1));
+    RegisterCommand(new ACCESSCommand(this, "ACCESS", "[channel] [nick] [-min n] [-max n] [-autoop] [-noautoop] [-modif [mask]]", 5));
     RegisterCommand(new CHANINFOCommand(this, "CHANINFO", "<#channel>", 3)); 
     RegisterCommand(new ISREGCommand(this, "ISREG", "<#channel>", 4)); 
     RegisterCommand(new VERIFYCommand(this, "VERIFY", "<nick>", 3));
@@ -532,7 +532,7 @@ int cservice::OnCTCP( iClient* theClient, const string& CTCP,
 
 	if(Command == "VERSION")
 	{
-		xClient::DoCTCP(theClient, CTCP.c_str(), "Undernet P10 Channel Services Version 2 [" __DATE__ " " __TIME__ "] ($Id: cservice.cc,v 1.73 2001/01/30 21:34:16 gte Exp $)");
+		xClient::DoCTCP(theClient, CTCP.c_str(), "Undernet P10 Channel Services Version 2 [" __DATE__ " " __TIME__ "] ($Id: cservice.cc,v 1.74 2001/01/31 00:27:39 gte Exp $)");
 		return true;
 	}
 
@@ -1456,7 +1456,8 @@ void cservice::doAutoTopic(sqlChannel* theChan)
  *--------------------------------------------------------------------------*/ 
 bool cservice::doInternalBanAndKick(sqlChannel* theChan, iClient* theClient, const string& theReason)
 {
-	vector< sqlBan* >* banList = getBanRecords(theChan); 
+//	vector< sqlBan* >* banList = getBanRecords(theChan); 
+	return true;
 }
 
 /*--escapeSQLChars------------------------------------------------------------

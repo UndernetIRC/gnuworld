@@ -1,5 +1,5 @@
 #ifndef __CSERVICE_H
-#define __CSERVICE_H "$Id: cservice.h,v 1.34 2001/01/30 21:34:16 gte Exp $"
+#define __CSERVICE_H "$Id: cservice.h,v 1.35 2001/01/31 00:27:39 gte Exp $"
 
 #include	<string>
 #include	<vector>
@@ -204,8 +204,8 @@ public:
 	int updateInterval;
 
 	// Input flood rate.
-	int input_flood;
-	int output_flood;
+	unsigned int input_flood;
+	unsigned int output_flood;
 	int flood_duration;
 	int topic_duration;
 

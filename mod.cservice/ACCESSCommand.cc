@@ -8,7 +8,7 @@
  * Can optionally narrow down selection using a number of switches.
  * Can display all channels a user has access on (TODO). 
  *
- * $Id: ACCESSCommand.cc,v 1.20 2001/01/30 00:12:16 gte Exp $
+ * $Id: ACCESSCommand.cc,v 1.21 2001/01/31 00:27:39 gte Exp $
  */
 
 #include	<string>
@@ -22,7 +22,7 @@
 
 // Todo: NO limit for * access 600+!
 
-const char ACCESSCommand_cc_rcsId[] = "$Id: ACCESSCommand.cc,v 1.20 2001/01/30 00:12:16 gte Exp $" ;
+const char ACCESSCommand_cc_rcsId[] = "$Id: ACCESSCommand.cc,v 1.21 2001/01/31 00:27:39 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -63,6 +63,8 @@ unsigned short currentType = 0;
 unsigned int minAmount = 0;
 unsigned int maxAmount = 0;
 bool modif = false;
+bool showAll = false;
+
 string modifMask;
 
 for( StringTokenizer::const_iterator ptr = st.begin() ; ptr != st.end() ;
@@ -84,6 +86,13 @@ for( StringTokenizer::const_iterator ptr = st.begin() ; ptr != st.end() ;
 		{
 		currentType = 3;
 		modif = true;
+		continue;
+		}
+
+	if (string_lower(*ptr) == "-all")
+		{ 
+		sqlUser* tmpUser = bot->isAuthed(theClient, false);
+		if ((tmpUser) && (bot->getAdminAccessLevel(tmpUser))) showAll = true; 
 		continue;
 		}
 
@@ -189,11 +198,11 @@ if( PGRES_TUPLES_OK == status )
 			bot->Notice(theClient, "LAST SEEN: %s ago.", 
 				bot->prettyDuration(duration).c_str()); 
 		}
-		if (results >= MAX_RESULTS) break;
+		if ((results >= MAX_RESULTS) && !showAll) break;
 
 	} // for()
 	 
-	if (results >= MAX_RESULTS)
+	if ((results >= MAX_RESULTS) && !showAll)
 		{
 			bot->Notice(theClient, "There are more than 15 matching entries.");
 			bot->Notice(theClient, "Please restrict your query."); 
