@@ -2,7 +2,7 @@
  * cservice.cc
  * Author: Greg Sikorski
  * Purpose: Overall control client.
- * $Id: cservice.cc,v 1.226 2002/12/23 22:12:12 gte Exp $
+ * $Id: cservice.cc,v 1.227 2002/12/24 17:54:10 gte Exp $
  */
 
 #include	<new>
@@ -4016,7 +4016,7 @@ void cservice::doCoderStats(iClient* theClient)
 		iClient* tmpClient = ptr2->second;
 		if (tmpClient->isModeX()) plusXCount++;
 		if (tmpClient->isModeW()) plusWCount++;
-		if (tmpClient->isModeD()) plusWCount++;
+		if (tmpClient->isModeD()) plusDCount++;
 		++ptr2;
 	}
 

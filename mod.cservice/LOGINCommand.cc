@@ -13,14 +13,14 @@
 #include	"cservice_config.h"
 #include	"Network.h"
 
-const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.48 2002/12/08 19:41:53 gte Exp $" ;
+const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.49 2002/12/24 17:54:10 gte Exp $" ;
 
 namespace gnuworld
 {
 struct autoOpData {
 	unsigned int channel_id;
 	unsigned int flags;
-	unsigned int suspend_expires;
+	time_t suspend_expires;
 } aOp;
 
 using std::string ;
