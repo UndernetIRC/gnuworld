@@ -14,7 +14,7 @@
 #include	"Network.h"
 #include	"Constants.h"
 
-const char REMSERVERCommand_cc_rcsId[] = "$Id: REMSERVERCommand.cc,v 1.4 2001/12/09 20:43:08 mrbean_ Exp $";
+const char REMSERVERCommand_cc_rcsId[] = "$Id: REMSERVERCommand.cc,v 1.5 2001/12/23 09:07:57 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -54,7 +54,10 @@ if(!strcasecmp(SName,""))
 	return false;
 	}	
 
-
+ccUser* tmpUser = bot->IsAuth(theClient);
+if(tmpUser)
+        bot->MsgChanLog("(%s) - %s : REMSERVER %s\n",tmpUser->getUserName().c_str()
+                        ,theClient->getNickUserHost().c_str(),st.assemble(1).c_str());
 
 strstream theQuery;  
 theQuery        << User::Query

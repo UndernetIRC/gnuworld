@@ -13,7 +13,7 @@
 #include	"StringTokenizer.h"
 #include	"Constants.h"
 
-const char CHANINFOCommand_cc_rcsId[] = "$Id: CHANINFOCommand.cc,v 1.8 2001/12/08 17:17:29 mrbean_ Exp $";
+const char CHANINFOCommand_cc_rcsId[] = "$Id: CHANINFOCommand.cc,v 1.9 2001/12/23 09:07:57 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -38,6 +38,11 @@ if(st[1].size() > channel::MaxName)
 	return false;
 	}
 
+ccUser* tmpUser = bot->IsAuth(theClient);
+if(tmpUser)
+	bot->MsgChanLog("(%s) - %s : CHANINFO %s\n",tmpUser->getUserName().c_str()
+	    ,theClient->getNickUserHost().c_str(),st[1].c_str());
+	    
 Channel* theChan = Network->findChannel( st[ 1 ] ) ;
 if( NULL == theChan )
 	{

@@ -13,7 +13,7 @@
 #include	"StringTokenizer.h"
 #include	"Network.h"
 
-const char CHECKNETCommand_cc_rcsId[] = "$Id: CHECKNETCommand.cc,v 1.5 2001/12/08 17:17:29 mrbean_ Exp $";
+const char CHECKNETCommand_cc_rcsId[] = "$Id: CHECKNETCommand.cc,v 1.6 2001/12/23 09:07:57 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -57,7 +57,11 @@ iServer* CurServer;
 unsigned int TServers = 0;
 
 bot->Notice(theClient,"Checking network status as for %d\n",::time(NULL));
-
+ccUser* tmpUser = bot->IsAuth(theClient);
+if(tmpUser)
+	bot->MsgChanLog("(%s) - %s : CHECKNET\n",tmpUser->getUserName().c_str()
+		    ,theClient->getNickUserHost().c_str());
+		    
 for (int i = 0 ; i < bot->SQLDb->Tuples(); i++)
 	{ //For each server on the database check if its connected
 	CurServer = Network->findServerName(bot->SQLDb->GetValue(i, 0));

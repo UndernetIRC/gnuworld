@@ -15,7 +15,7 @@
 #include	"Network.h"
 #include        "ccLogin.h"
 
-const char REMOVEIGNORECommand_cc_rcsId[] = "$Id: REMOVEIGNORECommand.cc,v 1.3 2001/07/23 10:28:51 mrbean_ Exp $";
+const char REMOVEIGNORECommand_cc_rcsId[] = "$Id: REMOVEIGNORECommand.cc,v 1.4 2001/12/23 09:07:57 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -35,7 +35,10 @@ if( st.size() < 2 )
 	Usage( theClient ) ;
 	return true ;
 	}
-
+ccUser* tmpUser = bot->IsAuth(theClient);
+if(tmpUser)
+        bot->MsgChanLog("(%s) - %s : REMIGNORE %s\n",tmpUser->getUserName().c_str()
+                        ,theClient->getNickUserHost().c_str(),st.assemble(1).c_str());
 string::size_type atPos = st[ 1 ].find_first_of( '@' ) ;
 if( string::npos == atPos )
 	{

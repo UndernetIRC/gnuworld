@@ -13,7 +13,7 @@
 #include	"Network.h"
 #include	"Constants.h"
 
-const char NEWPASSCommand_cc_rcsId[] = "$Id: NEWPASSCommand.cc,v 1.15 2001/12/14 08:22:28 mrbean_ Exp $";
+const char NEWPASSCommand_cc_rcsId[] = "$Id: NEWPASSCommand.cc,v 1.16 2001/12/23 09:07:57 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -62,11 +62,15 @@ switch(passRet)
 		if(theUser->Update())
 			{
 			bot->Notice(theClient,"Password changed!");
+        		bot->MsgChanLog("(%s) - %s : Changed Password \n",theUser->getUserName().c_str()
+                        		,theClient->getNickUserHost().c_str());
 			return true;
 			}
 		else
 			{
 			bot->Notice(theClient,"Error while changing password");
+        		bot->MsgChanLog("Error while changing password for (%s) - %s\n",theUser->getUserName().c_str()
+                        		,theClient->getNickUserHost().c_str(),st.assemble(1).c_str());
 			return true;
 			}
 		}

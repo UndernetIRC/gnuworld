@@ -15,7 +15,7 @@
 #include	"misc.h"
 #include	"Constants.h"
 
-const char MODUSERCommand_cc_rcsId[] = "$Id: MODUSERCommand.cc,v 1.10 2001/12/13 08:50:00 mrbean_ Exp $";
+const char MODUSERCommand_cc_rcsId[] = "$Id: MODUSERCommand.cc,v 1.11 2001/12/23 09:07:57 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -57,6 +57,12 @@ if(!tmpUser)
 	}
 //Check if the user got a higher or equal flags than the one he's trying to edit	
 ccUser* tmpAuth = bot->IsAuth(theClient);
+if(!tmpAuth)
+	{ //we should never get here
+	return false;
+	}
+bot->MsgChanLog("(%s) - %s : MODUSER %s\n",tmpAuth->getUserName().c_str()
+                        ,theClient->getNickUserHost().c_str(),st[1].c_str());
 unsigned int AdFlag = tmpAuth->getType(); //Get the admin flag
 unsigned int OpFlag = tmpUser->getType(); //Get the oper flag
 bool Admin = (AdFlag < operLevel::SMTLEVEL);

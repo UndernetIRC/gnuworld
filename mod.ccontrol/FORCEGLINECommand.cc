@@ -18,7 +18,7 @@
 #include	"ELog.h"
 #include	"Constants.h"
 
-const char FORCEGLINECommand_cc_rcsId[] = "$Id: FORCEGLINECommand.cc,v 1.15 2001/12/13 08:50:00 mrbean_ Exp $";
+const char FORCEGLINECommand_cc_rcsId[] = "$Id: FORCEGLINECommand.cc,v 1.16 2001/12/23 09:07:57 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -55,6 +55,10 @@ StringTokenizer::size_type pos = 1 ;
 
 bool Forced = false;
 
+ccUser* tmpUser = bot->IsAuth(theClient);
+if(tmpUser)
+        bot->MsgChanLog("(%s) - %s : FORCEGLINE %s\n",tmpUser->getUserName().c_str()        
+                        ,theClient->getNickUserHost().c_str(),st.assemble(1).c_str());
 if(!strcasecmp(st[pos],"-fu"))
 	{
 	Forced = true;
@@ -113,12 +117,12 @@ if(gLength == 0)
 	bot->Notice(theClient,"No duration was set, setting to %d seconds by default",gLength) ;
 	ResStart = 1;
 	}
-ccUser *tmpAuth = bot->IsAuth(theClient);
-if(!tmpAuth)
+//ccUser *tmpAuth = bot->IsAuth(theClient);
+if(!tmpUser)
 	{ // We shouldnt have got here in the first place, but check it anyway
 	return false;
 	}
-if((Forced) && (tmpAuth->getType() < operLevel::SMTLEVEL))
+if((Forced) && (tmpUser->getType() < operLevel::SMTLEVEL))
 	{
 	bot->Notice(theClient,"Only smt+ can use the -fu option");
 	return false;
@@ -159,7 +163,7 @@ if((gCheck & gline::FU_NEEDED_USERS) && (Ok))
 	else
 		{
 		Ok = false;
-		if(tmpAuth->getFlags() < operLevel::SMTLEVEL)
+		if(tmpUser->getFlags() < operLevel::SMTLEVEL)
 			{
 			bot->Notice(theClient,"Sorry but you cant set a gline which affects more than %d users"
 			,gline::MFGLINE_USERS);
@@ -183,7 +187,7 @@ if((gCheck & gline::FU_NEEDED_TIME) && (Ok))
 	else
 		{
 		Ok = false;
-		if(tmpAuth->getFlags() < operLevel::SMTLEVEL)
+		if(tmpUser->getFlags() < operLevel::SMTLEVEL)
 			{
 			bot->Notice(theClient,"Sorry but you cant set a gline for more than %d seconds"
 			,gline::MFGLINE_TIME);

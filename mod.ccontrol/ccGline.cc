@@ -3,7 +3,7 @@
  * 
  * Gline class
  * 
- * $Id: ccGline.cc,v 1.10 2001/11/21 20:54:40 mrbean_ Exp $
+ * $Id: ccGline.cc,v 1.11 2001/12/23 09:07:57 mrbean_ Exp $
  */
  
 #include	<strstream>
@@ -20,7 +20,7 @@
 #include	"ccontrol.h"
 
 const char ccGline_h_rcsId[] = __CCGLINE_H ;
-const char ccGline_cc_rcsId[] = "$Id: ccGline.cc,v 1.10 2001/11/21 20:54:40 mrbean_ Exp $" ;
+const char ccGline_cc_rcsId[] = "$Id: ccGline.cc,v 1.11 2001/12/23 09:07:57 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -54,7 +54,7 @@ ccGline::~ccGline()
 bool ccGline::Insert()
 {
 //First we gotta make sure, there is no old gline in the database
-static const char *Del = "DELETE FROM glines WHERE host = '";
+static const char *Del = "DELETE FROM glines WHERE lower(host) = '";
 
 if(!dbConnected)
 	{
@@ -62,7 +62,7 @@ if(!dbConnected)
 	}
 strstream delQuery;
 delQuery	<< Del
-		<< Host << "'"
+		<< string_lower(Host) << "'"
 		<< ends;
 
 

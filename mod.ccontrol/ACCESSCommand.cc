@@ -14,7 +14,7 @@
 #include	"ccontrol.h"
 #include	"CControlCommands.h"
 
-const char ACCESSCommand_cc_rcsId[] = "$Id: ACCESSCommand.cc,v 1.13 2001/11/20 19:49:45 mrbean_ Exp $";
+const char ACCESSCommand_cc_rcsId[] = "$Id: ACCESSCommand.cc,v 1.14 2001/12/23 09:07:57 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -112,7 +112,9 @@ else
 	{
 	bot->Notice(theClient,"-= End Of Access List =-");
 	}
-
+ccUser* tmpUser = bot->IsAuth(theClient);
+if(tmpUser)
+	bot->MsgChanLog("(%s) - %s Access\n",tmpUser->getUserName().c_str(),theClient->getNickUserHost().c_str());
 return true ;
 }
 

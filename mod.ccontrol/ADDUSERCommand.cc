@@ -22,7 +22,7 @@
 #include	"commLevels.h"
 #include	"Constants.h"
 
-const char ADDUSERCommand_cc_rcsId[] = "$Id: ADDUSERCommand.cc,v 1.10 2001/12/13 09:10:35 mrbean_ Exp $";
+const char ADDUSERCommand_cc_rcsId[] = "$Id: ADDUSERCommand.cc,v 1.11 2001/12/23 09:07:57 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -116,7 +116,9 @@ if( NULL == tOper )
 		"You must first authenticate" ) ;
 	return true ;
 	}
-
+bot->MsgChanLog("(%s) - %s : ADDUSER %s %s\n",tOper->getUserName().c_str()
+	    ,theClient->getNickUserHost().c_str()
+	    ,st[1].c_str(),st[2].c_str());
 //Make sure the new oper wont have a command the old one doesnt have enabled
 NewAccess &= tOper->getAccess(); 
 //NewAccess = bot->getTrueAccess(NewAccess);

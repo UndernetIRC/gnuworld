@@ -14,7 +14,7 @@
 #include	"Network.h"
 #include	"Constants.h"
 
-const char DEOPCommand_cc_rcsId[] = "$Id: DEOPCommand.cc,v 1.4 2001/12/08 17:17:29 mrbean_ Exp $";
+const char DEOPCommand_cc_rcsId[] = "$Id: DEOPCommand.cc,v 1.5 2001/12/23 09:07:57 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -52,7 +52,10 @@ iClient* Target = 0;
 typedef map < iClient*, int > duplicateMapType; 
 duplicateMapType duplicateMap; 
 
-
+ccUser* tmpUser = bot->IsAuth(theClient);
+if(tmpUser)
+	bot->MsgChanLog("(%s) - %s : DEOP %s\n",tmpUser->getUserName().c_str()
+                        ,theClient->getNickUserHost().c_str(),st.assemble(1).c_str());
 string mode = "-";
 string args = "";
 

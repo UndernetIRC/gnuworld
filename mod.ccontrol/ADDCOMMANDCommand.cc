@@ -15,7 +15,7 @@
 #include        "ccUser.h"
 #include	"misc.h"
 
-const char ADDCOMMANDCommand_cc_rcsId[] = "$Id: ADDCOMMANDCommand.cc,v 1.19 2001/12/13 08:50:00 mrbean_ Exp $";
+const char ADDCOMMANDCommand_cc_rcsId[] = "$Id: ADDCOMMANDCommand.cc,v 1.20 2001/12/23 09:07:57 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -53,6 +53,7 @@ if(!strcasecmp(st[pos],"-fr"))
 		}
 	}
 
+
 // Fetch the oper record from the db
 if(st[pos].size() > 64)
 	{
@@ -71,7 +72,7 @@ if( !theUser )
 	}
 pos++;	
 //int CommandLevel = bot->getCommandLevel(st[pos]);
-if(st[1].size() > 128)
+if(st[pos].size() > 128)
 	{
 	bot->Notice(theClient,"Command name can't be more than 128 chars");
 	return false;
@@ -91,7 +92,8 @@ if( NULL == AClient )
 	bot->Notice( theClient, "You must first authenticate" ) ;
 	return true ;
 	}
-
+bot->MsgChanLog("(%s) - %s : ADDCOMMAND %s\n",AClient->getUserName().c_str()
+	    ,theClient->getNickUserHost().c_str(),st.assemble(1).c_str());
 // Only allow opers who have access to that command to add it to new opers
 if(!AClient->gotAccess(Comm) )
 	{

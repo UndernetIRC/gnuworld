@@ -14,7 +14,7 @@
 #include        "ccUser.h"
 #include	"ip.h"
 
-const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.19 2001/12/13 08:50:00 mrbean_ Exp $";
+const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.20 2001/12/23 09:07:57 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -138,6 +138,8 @@ else
 			bot->Notice(theClient, "Authentication successful,However you are suspended ",theUser->getUserName().c_str()); 
 	else
 	        bot->Notice(theClient, "Error in authentication ",theUser->getUserName().c_str()); 
+        bot->MsgChanLog("(%s) - %s : AUTHENTICATED %s\n",theUser->getUserName().c_str()
+                        ,theClient->getNickUserHost().c_str());
 	} 
 
 return true; 

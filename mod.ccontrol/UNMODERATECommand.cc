@@ -16,7 +16,7 @@
 #include	"Network.h"
 #include	"Constants.h"
 
-const char UNMODERATECommand_cc_rcsId[] = "$Id: UNMODERATECommand.cc,v 1.4 2001/12/08 17:17:29 mrbean_ Exp $";
+const char UNMODERATECommand_cc_rcsId[] = "$Id: UNMODERATECommand.cc,v 1.5 2001/12/23 09:07:57 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -39,6 +39,10 @@ if(st[1].size() > channel::MaxName)
 	{
 	bot->Notice(theClient,"Channel name can't be more than %d chars",channel::MaxName);
 	}
+ccUser* tmpUser = bot->IsAuth(theClient);
+if(tmpUser)
+        bot->MsgChanLog("(%s) - %s : UNMODERATE %s\n",tmpUser->getUserName().c_str()
+                        ,theClient->getNickUserHost().c_str(),st.assemble(1).c_str());
 Channel* theChan = Network->findChannel( st[ 1 ] ) ;
 if( NULL == theChan )
 	{

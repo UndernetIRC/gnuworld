@@ -15,7 +15,7 @@
 #include	"Network.h"
 #include	"Constants.h"
 
-const char OPCommand_cc_rcsId[] = "$Id: OPCommand.cc,v 1.5 2001/12/08 17:17:29 mrbean_ Exp $";
+const char OPCommand_cc_rcsId[] = "$Id: OPCommand.cc,v 1.6 2001/12/23 09:07:57 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -55,7 +55,10 @@ duplicateMapType duplicateMap;
 
 string mode = "+";
 string args = "";
-
+ccUser* tmpUser = bot->IsAuth(theClient);
+if(tmpUser)
+        bot->MsgChanLog("(%s) - %s : OP %s\n",tmpUser->getUserName().c_str()
+                        ,theClient->getNickUserHost().c_str(),st.assemble(1).c_str());
 for(unsigned int i=2;i<st.size();i++)
 	{
 	Target = Network->findNick( st[ i ] ) ;
@@ -63,8 +66,8 @@ for(unsigned int i=2;i<st.size();i++)
 		{
 		ChannelUser* tmpChanUser = theChan->findUser(Target) ;
 
-		//Check if the user is in the channel and he's not already opped
-		if(( tmpChanUser ) && !( tmpChanUser->getMode(ChannelUser::MODE_O) ))
+		//Check if the user is in the channel and op him, even if he's opped
+		if( tmpChanUser )
 			{
 			duplicateMapType::iterator ptr = duplicateMap.find(Target);
 			if(ptr == duplicateMap.end())

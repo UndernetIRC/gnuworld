@@ -37,7 +37,7 @@
 #include	"ip.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.104 2001/12/14 16:36:18 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.105 2001/12/23 09:07:57 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -428,10 +428,14 @@ if( st.empty() )
 	Notice( theClient, "Incomplete command" ) ;
 	return 0 ;
 	}
-
 // This is no longer necessary, but oh well *shrug*
 const string Command = string_upper( st[ 0 ] ) ;
 
+/*if(Command == "351")
+	{
+	MsgChanLog("351 ! %s\n",st.assemble(0).c_str());
+	return xClient::OnPrivateMessage( theClient, Message ) ;
+	}*/
 ccUser* theUser = IsAuth(theClient->getCharYYXXX());
 
 if(!theUser)
@@ -645,6 +649,7 @@ switch( theEvent )
 		inBurst = false;
 		refreshGlines();
 		burstGlines();
+		//Write("%s V :EB\n",getCharYYXXX().c_str());
 		break;
 		}	
 	case EVT_NICK:
@@ -707,7 +712,7 @@ switch( theEvent )
 							tmpGline->setAddedOn(::time(0));
 							tmpGline->Insert();
 							tmpGline->loadData(tmpGline->getHost());
-						//addGline(tmpGline);
+						addGline(tmpGline);
 							}
 						MyUplink->setGline( nickName,
 								tmpGline->getHost(),

@@ -24,7 +24,7 @@
 #include	"ccUser.h"
 #include	"Constants.h"
 
-const char GLINECommand_cc_rcsId[] = "$Id: GLINECommand.cc,v 1.31 2001/12/14 16:36:18 mrbean_ Exp $";
+const char GLINECommand_cc_rcsId[] = "$Id: GLINECommand.cc,v 1.32 2001/12/23 09:07:57 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -63,6 +63,10 @@ StringTokenizer::size_type pos = 1 ;
 
 time_t gLength = bot->getDefaultGlineLength() ;
 
+ccUser* tmpUser = bot->IsAuth(theClient);
+if(tmpUser)
+        bot->MsgChanLog("(%s) - %s : GLINE %s\n",tmpUser->getUserName().c_str()        
+                        ,theClient->getNickUserHost().c_str(),st.assemble(1).c_str());
 bool isChan;
 if(st[pos].substr(0,1) == "#")
         isChan = true;
@@ -132,7 +136,7 @@ string nickUserHost = theClient->getNickUserHost() ;
 if(!isChan)
 	{
 	unsigned int Users;
-	int gCheck = bot->checkGline(st[pos],gLength,Users);
+	int gCheck = bot->checkGline(string(userName + "@" + hostName),gLength,Users);
 	if(gCheck & gline::NEG_TIME)
 		{
 		bot->Notice(theClient,"Hmmz, dont you think that giving a negative time is kinda stupid?");
@@ -225,10 +229,10 @@ if(!isChan)
 	} //end of regular gline
 
 //Its a channel gline
-ccUser *tmpAuth = bot->IsAuth(theClient);
-if(!tmpAuth)
+//ccUser *tmpAuth = bot->IsAuth(theClient);
+if(!tmpUser)
 	return false;
-if(tmpAuth->getType() < operLevel::SMTLEVEL)
+if(tmpUser->getType() < operLevel::SMTLEVEL)
 	{
 	bot->Notice(theClient,"Only smt+ can use the gline #channel command");
 	return false;

@@ -17,7 +17,7 @@
  */
 
 #ifndef __SERVER_H
-#define __SERVER_H "$Id: server.h,v 1.52 2001/12/09 14:36:33 mrbean_ Exp $"
+#define __SERVER_H "$Id: server.h,v 1.53 2001/12/23 09:07:55 mrbean_ Exp $"
 
 #include	<string>
 #include	<vector>
@@ -1148,6 +1148,10 @@ protected:
 	/// Use this handler for any messages that we don't need to handle.
 	/// Included for completeness.
 	DECLARE_MSG(NOOP);
+	
+	/// 351 message
+	/// when our client recieve back a version reply from a server
+	DECLARE_MSG(M351);
 
 	// Non-tokenized command handlers
 	// Replication of code *sigh*
