@@ -17,8 +17,10 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: EConfig.cc,v 1.4 2003/06/18 01:08:48 dan_karrels Exp $
+ * $Id: EConfig.cc,v 1.5 2003/06/18 15:04:04 dan_karrels Exp $
  */
+
+#include	<unistd.h> // unlink()
 
 #include	<string>
 #include	<fstream>
@@ -36,7 +38,7 @@
 #include	"ELog.h"
 #include	"misc.h"
 
-const char rcsId[] = "$Id: EConfig.cc,v 1.4 2003/06/18 01:08:48 dan_karrels Exp $" ;
+const char rcsId[] = "$Id: EConfig.cc,v 1.5 2003/06/18 15:04:04 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -69,7 +71,12 @@ EConfig::~EConfig()
 {
 // No heap space allocated
 valueMap.clear() ;
-fileList.clear() ;
+lineList.clear() ;
+}
+
+EConfig::iterator EConfig::Find( const string& findMe )
+{
+return valueMap.find( findMe ) ;
 }
 
 EConfig::const_iterator EConfig::Find( const string& findMe ) const
@@ -77,10 +84,10 @@ EConfig::const_iterator EConfig::Find( const string& findMe ) const
 return valueMap.find( findMe ) ;
 }
 
-EConfig::const_iterator EConfig::Require( const string& key ) const
+EConfig::iterator EConfig::Require( const string& key )
 {
 // Attempt to find the key in the map
-const_iterator ptr = valueMap.find( key ) ;
+iterator ptr = valueMap.find( key ) ;
 
 // Was it found?
 if( ptr == valueMap.end() )
@@ -121,7 +128,8 @@ while( getline( configFile, tmp ) )
 
 	if( tmp.empty() || '#' == tmp[ 0 ] )
 		{
-		fileList.push_back( lineInfo( tmp ) ) ;
+		lineInfo addMe( tmp ) ;
+		lineList.push_back( addMe ) ;
 
 		// Ignore this line
 		continue ;
@@ -145,7 +153,7 @@ while( getline( configFile, tmp ) )
 		valueMap.insert( mapPairType( st[ 0 ],
 			st.assemble( 1 ) ) ) ;
 
-	fileList.push_back( lineInfo( st[ 0 ], st.assemble( 1 ),
+	lineList.push_back( lineInfo( st[ 0 ], st.assemble( 1 ),
 		mapItr ) ) ;
 	}
 
@@ -155,7 +163,6 @@ return true ;
 
 bool EConfig::removeSpaces( string& line )
 {
-
 // If the first character is '#', just return true
 if( !line.empty() && ('#' == line[ 0 ]) )
 	{
@@ -219,7 +226,7 @@ iterator mapItr =
 // Update the fileMap, which is used to keep track of the
 // format of the config file
 lineInfo addMe( key, value, mapItr ) ;
-fileList.push_back( addMe ) ;
+lineList.push_back( addMe ) ;
 
 return writeFile() ;
 }
@@ -228,29 +235,29 @@ bool EConfig::writeFile()
 {
 // Move the old file to the /tmp directory to ensure we have
 // a backup.
-string shortName( configFileName ) ;
+string backupFileName( configFileName ) ;
 
 // Remove any leading directory path information
-string::size_type slashPos = shortName.find_last_of( '/' ) ;
+string::size_type slashPos = backupFileName.find_last_of( '/' ) ;
 if( string::npos != slashPos )
 	{
 	// There is leading path information
-	shortName = shortName.substr( slashPos, string::npos ) ;
+	backupFileName = backupFileName.substr( slashPos, string::npos ) ;
 	}
-shortName = string( "/tmp/" ) + shortName ;
+backupFileName = string( "/tmp/" ) + backupFileName ;
 
 //elog	<< "EConfig::writeFile> Renaming "
 //	<< configFileName
 //	<< " to "
-//	<< shortName
+//	<< backupFileName
 //	<< endl ;
 
-if( ::rename( configFileName.c_str(), shortName.c_str() ) < 0 )
+if( ::rename( configFileName.c_str(), backupFileName.c_str() ) < 0 )
 	{
 	elog	<< "EConfig::writeFile> Unable to rename "
 		<< configFileName
 		<< " to "
-		<< shortName
+		<< backupFileName
 		<< " because: "
 		<< strerror( errno )
 		<< endl ;
@@ -268,13 +275,13 @@ if( !configFile.is_open() )
 		<< strerror( errno )
 		<< endl ;
 
-	if( ::rename( shortName.c_str(), configFileName.c_str() ) < 0 )
+	if( ::rename( backupFileName.c_str(), configFileName.c_str() ) < 0 )
 		{
 		elog	<< "EConfig::writeFile> Unable to restore "
 			<< "original file \""
 			<< configFileName
 			<< "\" from backup \""
-			<< shortName
+			<< backupFileName
 			<< "\" because: "
 			<< strerror( errno )
 			<< endl ;
@@ -282,8 +289,8 @@ if( !configFile.is_open() )
 	return false ;
 	}
 
-for( fileListType::const_iterator fileItr = fileList.begin() ;
-	fileItr != fileList.end() ; ++fileItr )
+for( lineListType::const_iterator fileItr = lineList.begin() ;
+	fileItr != lineList.end() ; ++fileItr )
 	{
 	const lineInfo& theInfo = *fileItr ;
 	if( theInfo.value.empty() )
@@ -312,7 +319,134 @@ for( fileListType::const_iterator fileItr = fileList.begin() ;
 	} // for()
 
 configFile.close() ;
+
+// Writing of new file succeeded, remove the backup
+if( ::unlink( backupFileName.c_str() ) < 0 )
+	{
+	elog	<< "EConfig::writeFile> Unable to unlink "
+		<< "backup file "
+		<< backupFileName
+		<< " because: "
+		<< strerror( errno )
+		<< endl ;
+
+	// This is not a critical failure
+	// Allow the method to return true
+	}
+
 return true ;
 } // writeFile()
+
+bool EConfig::Delete( const string& key )
+{
+iterator itr = valueMap.find( key ) ;
+if( itr == valueMap.end() )
+	{
+	return false ;
+	}
+return Delete( itr ) ;
+}
+
+bool EConfig::Delete( iterator itr )
+{
+if( itr == valueMap.end() )
+	{
+	elog	<< "EConfig::Delete> Attempting to delete "
+		<< "valueMap.end()"
+		<< endl ;
+	return false ;
+	}
+valueMap.erase( itr ) ;
+
+bool foundIt = false ;
+for( lineListType::iterator lineItr = lineList.begin() ;
+	lineItr != lineList.end() ; ++lineItr )
+	{
+	if( itr == (*lineItr).mapItr )
+		{
+		// Found it
+		foundIt = true ;
+		lineList.erase( lineItr ) ;
+
+		break ;
+		}
+	}
+
+if( !foundIt )
+	{
+	elog	<< "EConfig::Delete> Unable to find lineList "
+		<< "entry corresponding to iterator: "
+		<< itr->first
+		<< '/'
+		<< itr->second
+		<< endl ;
+	}
+
+return (foundIt ? writeFile() : false) ;
+}
+
+bool EConfig::Replace( iterator itr, const string& newValue )
+{
+if( newValue.empty() )
+	{
+	return false ;
+	}
+
+if( itr == valueMap.end() )
+	{
+	return false ;
+	}
+valueMap.erase( itr ) ;
+
+bool foundIt = false ;
+
+// Replacing the value in-place here should maintain the
+// relative location of the key/value pair in the file.
+for( lineListType::iterator listItr = lineList.begin() ;
+	listItr != lineList.end() ; ++listItr )
+	{
+ 	if( (*listItr).mapItr == itr )
+		{
+		// Found it
+		foundIt = true ;
+		(*listItr).value = newValue ;
+		break ;
+		}
+	}
+
+if( !foundIt )
+	{
+	elog	<< "EConfig::Replace> Unable to find lineList "
+		<< "entry corresponding to iterator: "
+		<< itr->first
+		<< '/'
+		<< itr->second
+		<< endl ;
+	}
+
+valueMap.insert( mapType::value_type( itr->first, newValue ) ) ;
+
+return writeFile() ;
+}
+
+bool EConfig::AddComment( const string& commentData )
+{
+string newComment( commentData ) ;
+
+// If this command is not empty and does not begin with the
+// proper comment delimiter, then add the delimiter.
+if( !newComment.empty() && ('#' != newComment[ 0 ]) )
+	{
+	newComment = string( "# " ) + newComment ;
+	}
+
+// For some reason the compiler won't let me use the 3 argument
+// constructor for lineInfo here -- dan
+lineInfo addMe ;
+addMe.key = newComment ;
+lineList.push_back( addMe ) ;
+
+return writeFile() ;
+}
 
 } // namespace gnuworld

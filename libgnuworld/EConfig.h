@@ -17,11 +17,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: EConfig.h,v 1.3 2003/06/18 01:08:48 dan_karrels Exp $
+ * $Id: EConfig.h,v 1.4 2003/06/18 15:04:04 dan_karrels Exp $
  */
 
 #ifndef __ECONFIG_H
-#define __ECONFIG_H "$Id: EConfig.h,v 1.3 2003/06/18 01:08:48 dan_karrels Exp $"
+#define __ECONFIG_H "$Id: EConfig.h,v 1.4 2003/06/18 15:04:04 dan_karrels Exp $"
 
 #include	<iostream>
 #include	<fstream>
@@ -51,7 +51,6 @@ using std::multimap ;
  * - value may be any number of words, but may
  *   NOT continue onto the next line
  * - value fields may NOT have a '=' character in it
- *
  */
 class EConfig
 {
@@ -68,26 +67,43 @@ class EConfig
 	struct lineInfo
 	{
 		string			key ;
+
+		// An empty value string indicates that this line
+		// is a comment, and key contains the comment
+		// (including preceeding '#' where necessary.
 		string			value ;
 		mapType::iterator	mapItr ;
 
-	lineInfo() {}
+	lineInfo()
+	{}
 
 	// This constructor is called when there is a comment
 	// line.  Even though there are no value tokens, be sure
 	// to record whatever comment is present.
 	lineInfo( const string& key )
-	 : key( key ) {}
+	 : key( key )
+	{}
+	lineInfo( const lineInfo& rhs )
+	 : key( rhs.key ), value( rhs.value ), mapItr( rhs.mapItr )
+	{}
 	lineInfo( const string& key, const string& value,
 		const mapType::iterator& mapItr )
 	 : key( key ), value( value ), mapItr( mapItr )
 	{}
+	lineInfo& operator=( const lineInfo& rhs )
+	{
+		key = rhs.key ;
+		value = rhs.value ;
+		mapItr = rhs.mapItr ;
+		return *this ;
+	}
+
 	} ;
 
 	/**
 	 * Type used to store configuration file format.
 	 */
-	typedef list< lineInfo >	fileListType ;
+	typedef list< lineInfo >	lineListType ;
 
 public:
 
@@ -95,6 +111,12 @@ public:
 	 * The pair type for the mapType, it holds the key/value pairs.
 	 */
 	typedef mapType::value_type mapPairType ;
+
+	/**
+	 * The type used to store the number of significant key/value
+	 * pairs stored.
+	 */
+	typedef mapType::size_type	size_type ;
 
 	/**
 	 * A const iterator that users of this class may use
@@ -134,9 +156,32 @@ public:
 		{ return valueMap.end() ; }
 
 	/**
+	 * Obtain a iterator to the beginning of the map
+	 * of key/value pairs.
+	 */
+	inline iterator		begin()
+		{ return valueMap.begin() ; }
+
+	/**
+	 * Obtain a iterator to the end of the map of
+	 * key/value pairs.
+	 */
+	inline iterator		end()
+		{ return valueMap.end() ; }
+
+	/**
+	 * Return the number of significant key/value pairs stored.
+	 */
+	inline size_type	size() const
+		{ return valueMap.size() ; }
+
+	/**
 	 * Find the first key/value pair for the given key.
-	 * Note that each key may have more than one value,
-	 * so a const iterator is returned here.
+	 */
+	virtual iterator Find( const string& findMe ) ;
+
+	/**
+	 * Find the first key/value pair for the given key.
 	 */
 	virtual const_iterator Find( const string& findMe ) const ;
 
@@ -146,7 +191,7 @@ public:
 	 * not found, then an error message will be output and the
 	 * program will terminate.
 	 */
-	virtual const_iterator Require( const string& findMe ) const ;
+	virtual iterator Require( const string& findMe ) ;
 
 	/**
 	 * Add a key/value pair to the config file.
@@ -155,6 +200,34 @@ public:
 	 * class.
 	 */
 	virtual bool	Add( const string& key, const string& value ) ;
+
+	/**
+	 * Add a comment to the end of the file.
+	 * This comment line may be empty.
+	 */
+	virtual bool	AddComment( const string& newComment ) ;
+
+	/**
+	 * Delete a key/value pair by key.  Only one pair whose key
+	 * matches the given key will be deleted, and no guarantee
+	 * is made about which one.
+	 * If you have duplicates, and would like to remove a specific
+	 * entry, use the other form of Delete().
+	 */
+	virtual bool	Delete( const string& key ) ;
+
+	/**
+	 * Remove a key value pair given its iterator.
+	 */
+	virtual bool	Delete( iterator itr ) ;
+
+	/**
+	 * Replace the value of a given key/value pair.
+	 * It is important to use this method rather than just
+	 * modifying the iterator itself.
+	 */
+	virtual bool	Replace( iterator itr,
+		const string& newValue ) ;
 
 	/**
 	 * Debugging function for outputting the entire map to
@@ -216,9 +289,9 @@ protected:
 	 * The DS used to store the actual format of the config
 	 * file.
 	 */
-	fileListType	fileList ;
+	lineListType	lineList ;
 
-} ;
+} ; // class EConfig
 
 } // namespace gnuworld
 
