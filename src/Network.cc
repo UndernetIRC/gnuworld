@@ -6,7 +6,6 @@
 #include	<iostream>
 #include	<string>
 #include	<list>
-#include	<ext/hash_map>
 #include	<algorithm>
 
 #include	<cassert>
@@ -24,8 +23,18 @@
 #include	"ip.h"
 #include	"defs.h"
 
+#ifdef GNU_EXTENSIONS
+ #include       <ext/hash_map>
+ using __gnu_cxx::hash_map ;
+ using __gnu_cxx::hash ;
+#else
+ #include       <hash_map>
+ using std::hash_map ;
+ using std::hash ;
+#endif
+
 const char xNetwork_h_rcsId[] = __NETWORK_H ;
-const char xNetwork_cc_rcsId[] = "$Id: Network.cc,v 1.40 2002/05/23 17:43:15 dan_karrels Exp $" ;
+const char xNetwork_cc_rcsId[] = "$Id: Network.cc,v 1.41 2002/05/23 19:41:32 dan_karrels Exp $" ;
 const char ELog_h_rcsId[] = __ELOG_H ;
 const char iClient_h_rcsId[] = __ICLIENT_H ;
 const char Channel_h_rcsId[] = __CHANNEL_H ;
@@ -41,8 +50,6 @@ namespace gnuworld
 using std::string ;
 using std::endl ;
 using std::list ;
-using HASHMAPNS::hash_map ;
-using HASHMAPNS::hash ;
 using std::unary_function ;
 
 xNetwork::xNetwork()

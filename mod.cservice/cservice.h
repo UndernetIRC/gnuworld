@@ -1,15 +1,14 @@
 /**
  * cservice.h
  * Author: Greg Sikorski
- * $Id: cservice.h,v 1.83 2002/05/23 17:43:13 dan_karrels Exp $
+ * $Id: cservice.h,v 1.84 2002/05/23 19:41:32 dan_karrels Exp $
  */
 
 #ifndef __CSERVICE_H
-#define __CSERVICE_H "$Id: cservice.h,v 1.83 2002/05/23 17:43:13 dan_karrels Exp $"
+#define __CSERVICE_H "$Id: cservice.h,v 1.84 2002/05/23 19:41:32 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
-#include	<ext/hash_map>
 #include	<map>
 
 #include	<ctime>
@@ -26,6 +25,16 @@
 #include	"sqlPendingChannel.h"
 #include	"defs.h"
 
+#ifdef GNU_EXTENSIONS
+ #include       <ext/hash_map>
+ using __gnu_cxx::hash_map ;
+ using __gnu_cxx::hash ;
+#else
+ #include       <hash_map>
+ using std::hash_map ;
+ using std::hash ;
+#endif
+
 class PgDatabase;
 
 namespace gnuworld
@@ -33,7 +42,6 @@ namespace gnuworld
 
 using std::string ;
 using std::vector ;
-using HASHMAPNS::hash_map ;
 using std::map ;
 
 /**

@@ -1,14 +1,13 @@
 /* misc.h
  * Author: Daniel Karrels (dan@karrels.com
- * $Id: misc.h,v 1.16 2002/05/23 17:43:10 dan_karrels Exp $
+ * $Id: misc.h,v 1.17 2002/05/23 19:41:32 dan_karrels Exp $
  * Purpose: This file contains a few miscellaneous methods.
  */
 
 #ifndef __MISC_H
-#define __MISC_H "$Id: misc.h,v 1.16 2002/05/23 17:43:10 dan_karrels Exp $"
+#define __MISC_H "$Id: misc.h,v 1.17 2002/05/23 19:41:32 dan_karrels Exp $"
 
 #include	<string>
-#include	<ext/hash_map>
 
 #include	<cctype>
 #include	<cstring>
@@ -16,11 +15,20 @@
 #include	"match.h"
 #include	"defs.h"
 
+#ifdef GNU_EXTENSIONS
+ #include       <ext/hash_map>
+ using __gnu_cxx::hash_map ;
+ using __gnu_cxx::hash ;
+#else
+ #include       <hash_map>
+ using std::hash_map ;
+ using std::hash ;
+#endif
+
 namespace gnuworld
 {
 
 using std::string ;
-using HASHMAPNS::hash ;
 
 /**
  * Return 0 if the two strings are equivalent, according to

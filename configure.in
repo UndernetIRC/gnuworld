@@ -1,10 +1,10 @@
-dnl $Id: configure.in,v 1.41 2002/05/23 18:31:48 dan_karrels Exp $
+dnl $Id: configure.in,v 1.42 2002/05/23 19:41:30 dan_karrels Exp $
 dnl ----------------------------------------------------------
 
 echo Configuring GNUWorld...
 echo
 
-AC_REVISION($Revision: 1.41 $)
+AC_REVISION($Revision: 1.42 $)
 AC_INIT
 AC_CONFIG_SRCDIR([src/main.cc])
 AM_INIT_AUTOMAKE(gnuworld,0.0)
@@ -192,20 +192,10 @@ AC_SUBST(bindir)
 
 CXXFLAGS="$CXXFLAGS -I`pwd`/include -I`pwd`/lib"
 
-hashMapNS=""
-hashMapFile="/usr/include/g++/ext/hash_map"
-if test -d "/usr/local/include/g++/ext/hash_map"; then
-	hashMapfile="/usr/local/include/g++/ext/hash_map"
-fi
-
-dnl echo hashMapFile: $hashMapFile
-hashMapNS=`\grep namespace $hashMapFile | \head -1 | \cut -d " " -f2`
-dnl echo hashMapNS: $hashMapNS
-
-if test "$hashMapNS" = "__gnu_cxx" ; then
-	AC_DEFINE(HASHMAPNS,__gnu_cxx)
-else
-	AC_DEFINE(HASHMAPNS,std)
+if test -f "/usr/include/g++/ext/hash_map" ; then
+	AC_DEFINE(GNU_EXTENSIONS)
+elif test -f "/usr/local/include/g++/ext/hash_map"; then
+	AC_DEFINE(GNU_EXTENSIONS)
 fi
 
 AC_SUBST(CXXFLAGS)
