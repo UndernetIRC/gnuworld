@@ -18,24 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server.h,v 1.67 2002/07/05 01:10:05 dan_karrels Exp $
- */
-
-/* Command Map Description
- * -----------------------
- * Command messages read from the network are in the
- * form of characters and character strings.  Messages
- * are handled by passing the message and its arguments
- * to handler functions.
- * Command handler function names are all preceeded
- * with: MSG_
- * Pointers to offsets of these functions within the
- * global variable xServer* Server are stored in a
- * hash_map<>
+ * $Id: server.h,v 1.68 2002/07/08 15:47:54 dan_karrels Exp $
  */
 
 #ifndef __SERVER_H
-#define __SERVER_H "$Id: server.h,v 1.67 2002/07/05 01:10:05 dan_karrels Exp $"
+#define __SERVER_H "$Id: server.h,v 1.68 2002/07/08 15:47:54 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
@@ -46,6 +33,7 @@
 #include	<algorithm>
 
 #include	<ctime>
+#include	<cassert>
 
 #include	"Numeric.h"
 #include	"iServer.h"
@@ -61,21 +49,10 @@
 #include	"ELog.h"
 #include	"TimerHandler.h"
 #include	"ServerCommandHandler.h"
-#include	"defs.h"
-
-/*
-#ifdef GNU_EXTENSIONS
- #include       <ext/hash_map>
-#else
- #include       <hash_map>
-#endif
-*/
 
 namespace gnuworld
 {
 
-//using HASHMAPNS::hash ;
-//using HASHMAPNS::hash_map ;
 using std::string ;
 using std::list ;
 using std::vector ;
@@ -225,7 +202,8 @@ public:
 	 * Connect to a network uplink of the given address
 	 * (IP or hostname) and on the given port.
 	 */
-	virtual int Connect( const string& Address, int Port ) ;
+	virtual int Connect( const string& Address,
+			unsigned short int Port ) ;
 
 	/**
 	 * Connect to the default uplink and port.
@@ -251,8 +229,6 @@ public:
 	 * from the network tables.
 	 */
 	virtual bool SquitServer( const string& name, const string& reason ) ;
-
-	/* I/O stuff */
 
 	/**
 	 * Perform the physical read of the socket.
@@ -356,11 +332,23 @@ public:
 	virtual bool removeGline( const string& userHost,
 		const  xClient* remClient = NULL) ;
 
+	/**
+	 * Erase a gline from the internal data structures.  This does
+	 * NOT send a message to the network; for that functionality,
+	 * use RemoveGline() instead.
+	 */
 	virtual void eraseGline( glineIterator removeMe )
 		{ glineList.erase( removeMe ) ; }
 
+	/**
+	 * Add a gline to the internal data structures.  This does
+	 * NOT send a message to the network; for that functionality,
+	 * use SetGline() instead.
+	 */
 	virtual void addGline( Gline* newGline )
-		{ glineList.push_back( newGline ) ; }
+		{ assert( newGline != 0 ) ;
+		  glineList.push_back( newGline ) ;
+		}
 
 	/**
 	 * Find a gline by lexical searching, case insensitive.
@@ -583,6 +571,10 @@ public:
 	 * Post a system event to the rest of the system.  Note
 	 * that this method is public, so xClients may post
 	 * events.
+	 * The last argument is the an exclude xClient -- the
+	 * event will NOT be sent to that client (in the case that
+	 * an xClient calls PostEvent(), it may not want to receive
+	 * that event back).
 	 */
 	virtual void PostEvent( const eventType&,
 		void* = 0, void* = 0, void* = 0, void* = 0 ,
@@ -612,6 +604,7 @@ public:
 			iClient* destClient,
 			const string& kickMessage,
 			bool authoritative ) ;
+
 	/**
 	 * This variable represents "all channels."  Clients may
 	 * register for events of this channel, and each will receive
@@ -648,7 +641,7 @@ public:
 	/**
 	 * Retrieve a message.  Returns -1 if no message ready.
 	 */
-	virtual MessageType GetMessage()
+	virtual MessageType GetMessage() const
 		{ return Message ; }
 
 	/**
@@ -666,9 +659,19 @@ public:
 	virtual bool IsEndOfBurst() const
 		{ return !bursting ; }
 
+	/**
+	 * Return true if this server is currently bursting, false
+	 * otherwise.
+	 */
 	inline bool isBursting() const
 		{ return bursting ; }
 
+	/**
+	 * Set the bursting value to the given argument, with default
+	 * argument set to true.
+	 * This method should NOT be called by anything other than the
+	 * server command handlers.
+	 */
 	inline void setBursting( bool newVal = true )
 		{ bursting = newVal ; }
 
@@ -708,35 +711,6 @@ public:
 	 */
 	inline const char* getCharXXX() const
 		{ return charXXX ; }
-
-	inline iServer*		getUplink() const
-		{ return Uplink ; }
-
-	inline void		setUplink( iServer* newUplink )
-		{ Uplink = newUplink ; }
-
-	inline void setUseBurstBuffer( bool newVal )
-		{ useBurstBuffer = newVal ; }
-
-	inline void setBurstEnd( const time_t newVal )
-		{ burstEnd = newVal ; }
-
-	inline void setBurstStart( const time_t newVal )
-		{ burstStart = newVal ; }
-
-	inline bool isBurstOutputBufferEmpty() const
-		{ return burstOutputBuffer.empty() ; }
-
-	inline string::size_type burstOutputBufferSize() const
-		{ return burstOutputBuffer.size() ; }
-
-	inline void clearBurstOutputBuffer()
-		{ burstOutputBuffer.clear() ; }
-
-	inline void transferBurstToOutputBuffer()
-		{ outputBuffer += burstOutputBuffer ; 
-		  burstOutputBuffer.clear() ;
-		}
 
 	/**
 	 * Return an unsigned int representation of this server's uplink's
@@ -809,6 +783,74 @@ public:
 	 */
 	inline void setSocket( ClientSocket* newSock )
 		{ theSock = newSock ; }
+
+	/**
+	 * Return a pointer to this server's uplink.
+	 */
+	inline iServer*		getUplink() const
+		{ return Uplink ; }
+
+	/**
+	 * Set this server's uplink.
+	 * This method should ONLY be called by the server command
+	 * handlers.
+	 */
+	inline void		setUplink( iServer* newUplink )
+		{ Uplink = newUplink ; }
+
+	/**
+	 * Enable or disable the burstBuffer.
+	 * This method should ONLY be called by the server command
+	 * handlers.
+	 */
+	inline void setUseBurstBuffer( bool newVal )
+		{ useBurstBuffer = newVal ; }
+
+	/**
+	 * Set the time of the most recent end of burst.
+	 * This method should ONLY be called by the server command
+	 * handlers.
+	 */
+	inline void setBurstEnd( const time_t newVal )
+		{ burstEnd = newVal ; }
+
+	/**
+	 * Set the time of the most recent start of burst.
+	 * This method should ONLY be called by the server command
+	 * handlers.
+	 */
+	inline void setBurstStart( const time_t newVal )
+		{ burstStart = newVal ; }
+
+	/**
+	 * Return true if the burstOutputBuffer is empty, false otherwise.
+	 */
+	inline bool isBurstOutputBufferEmpty() const
+		{ return burstOutputBuffer.empty() ; }
+
+	/**
+	 * Return the number of bytes in the burstOutputBuffer.
+	 */
+	inline string::size_type burstOutputBufferSize() const
+		{ return burstOutputBuffer.size() ; }
+
+	/**
+	 * Clear the burstOutputBuffer of all data.
+	 * This method should ONLY be called by the server command
+	 * handlers.
+	 */
+	inline void clearBurstOutputBuffer()
+		{ burstOutputBuffer.clear() ; }
+
+	/**
+	 * Transfer the burstOutputBuffer data to the outputBuffer.
+	 * This method should ONLY be called by the server command
+	 * handlers.
+	 */
+	inline void transferBurstToOutputBuffer()
+		{ outputBuffer += burstOutputBuffer ; 
+		  burstOutputBuffer.clear() ;
+		}
 
 	/**
 	 * Shutdown the server.
@@ -1148,11 +1190,8 @@ protected:
 	typedef map< string, list< xClient* >* > channelEventMapType ;
 
 	/**
-	 * This structure provides a nice iterator interface, and
-	 * runs in O(logn) time.  This should probably be moved
-	 * to some form of a hashtable, though it will have to
-	 * be specially built to meet the server's needs.
-	 * Any volunteers? :)
+	 * The structure used to maintain xClient registrations for
+	 * channel events.
 	 */
 	channelEventMapType	channelEventMap ;
 
@@ -1217,7 +1256,7 @@ protected:
 	 * running.  It may be set false by user input, or caught
 	 * signals.
 	 */
-	volatile bool		keepRunning ;
+	bool			keepRunning ;
 
 	/**
 	 * This is the current message error number, or -1 if no
@@ -1228,7 +1267,7 @@ protected:
 	/**
 	 * This is the port number to which we connect on our uplink.
 	 */
-	int			Port ;
+	unsigned short int	Port ;
 
 	/**
 	 * This is the unsigned integer representation of our server numeric.
@@ -1286,8 +1325,16 @@ protected:
 	 */
 	size_t			outputWriteSize ;
 
+	/**
+	 * The name of the file which contains the command handler
+	 * mapping from network message to handler.
+	 */
 	string			commandMapFileName ;
 
+	/**
+	 * The path prefix to the command handler, of the form
+	 * "/path/to/command/map/file"
+	 */
 	string			commandHandlerPrefix ;
 
 	/**
@@ -1311,18 +1358,44 @@ protected:
 	 */
 	clientModuleListType		clientModuleList;
 
+	/**
+	 * The type of the modules used to load ServerCommandHandlers
+	 * from dynamically loadable libraries.
+	 * This is stored here in order to properly close them when
+	 * needed, including reloading command handlers.
+	 */
 	typedef moduleLoader< ServerCommandHandler*, xServer* >
 			commandModuleType ;
 
+	/**
+	 * A vector of modules representing ServerCommandHandlers.
+	 */
 	typedef vector< commandModuleType* > commandModuleListType ;
 
+	/**
+	 * The structure of moduleLoader's, each representing a
+	 * ServerCommandHandler.
+	 */
 	commandModuleListType		commandModuleList ;
 
+	/**
+	 * The type used to store ServerCommandHandlers, each
+	 * associated with a particular server message (key).
+	 */
 	typedef map< string, ServerCommandHandler*, noCaseCompare >
 			commandMapType ;
 
+	/**
+	 * The structure used to store ServerCommandHandlers, each
+	 * associated with a particular server message (key).
+	 */
 	commandMapType			commandMap ;
 
+	/**
+	 * Attempt to locate a commandModuleType by its key.  This is
+	 * used to reload a module, and to ensure that a module is
+	 * not accidentally loaded more than once.
+	 */
 	commandModuleType*	lookupCommandModule( const string& ) const ;
 
 	/**

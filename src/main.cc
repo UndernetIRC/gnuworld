@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: main.cc,v 1.41 2002/06/06 02:41:24 dan_karrels Exp $
+ * $Id: main.cc,v 1.42 2002/07/08 15:47:58 dan_karrels Exp $
  */
 
 #include	<new>
@@ -41,10 +41,8 @@
 #include	"moduleLoader.h"
 #include	"md5hash.h"
 
-void		gnu() ;
-
 const char config_h_rcsId[] = __CONFIG_H ;
-const char main_cc_rcsId[] = "$Id: main.cc,v 1.41 2002/06/06 02:41:24 dan_karrels Exp $" ;
+const char main_cc_rcsId[] = "$Id: main.cc,v 1.42 2002/07/08 15:47:58 dan_karrels Exp $" ;
 const char ELog_h_rcsId[] = __ELOG_H ;
 const char FileSocket_h_rcsId[] = __FILESOCKET_H ;
 const char server_h_rcsId[] = __SERVER_H ;
@@ -57,15 +55,21 @@ using std::cerr ;
 using std::clog ;
 using std::endl ;
 using std::string ;
- 
+
+// Output the GNU greeting
+void		gnu() ;
+
+// Instantiate the logging stream
 gnuworld::ELog		gnuworld::elog ;
 
+/// This method is called when a registered system signal occurs
 void xServer::sigHandler( int whichSig )
 {
 xServer::caughtSignal = true ;
 xServer::whichSig = whichSig ;
 }
 
+/// Output the command line arguments for gnuworld
 void usage( const string& progName )
 {
 clog << "Usage: " << progName << " [options]\n" ;
@@ -83,9 +87,10 @@ clog << "\t\t\tRun in simulation mode\n" ;
 clog << endl ;
 }
 
+/// Output the GNUWorld/GNU welcome message
 void gnu()
 {
-clog	<< "GNUWorld version 1.1" << endl ;
+clog	<< "GNUWorld version 2.1" << endl ;
 clog	<< "Copyright (C) 2002 Free Software Foundation, Inc." << endl ;
 clog	<< "GNUWorld comes with NO WARRANTY," << endl ;
 clog	<< "to the extent permitted by law." << endl ;
@@ -121,7 +126,7 @@ assert( theServer != 0 ) ;
 			<< endl ;
 
 		delete theServer ; theServer = 0 ;
-		return 0 ;
+		return -1 ;
 		}
 
 	pidFile	<< getpid()
@@ -141,8 +146,11 @@ if( theServer->Connect() < 0 )
 else
 	{
 	clog	<< "*** Connection Established!\n" ;
+
+	// This will block until the server is ready to shutdown
 	theServer->run() ;
 	}
+
 delete theServer ;
 return 0 ;
 }
@@ -232,10 +240,16 @@ while( (c = getopt( argc, argv, "cd:f:hs:")) != EOF )
 if( verbose )
 	{
 	elog.setStream( &clog ) ;
-	elog	<< "*** Running in verbose mode...\n" ;
+	elog	<< "*** Running in verbose mode..."
+		<< endl ;
 	}
 
-setupSignals();
+if( !setupSignals() )
+	{
+	clog	<< "Failed to establish signal handlers"
+		<< endl ;
+	::exit( -1 ) ;
+	}
 
 // Sets up the server internals
 initializeSystem() ;
@@ -245,12 +259,13 @@ initializeSystem() ;
 	if( !socketFile.is_open() )
 		{
 		clog	<< "*** Unable to open socket log file: "
-			<< LOG_SOCKET_NAME << endl ;
-		::exit( 0 ) ;
+			<< LOG_SOCKET_NAME
+			<< endl ;
+		::exit( -1 ) ;
 		}
 #endif
 
-srand( ::time( 0 ) ) ;
+::srand( ::time( 0 ) ) ;
 
 // Run in simulation mode?
 if( !simFileName.empty() )

@@ -1,11 +1,11 @@
 /**
  * cservice.h
  * Author: Greg Sikorski
- * $Id: cservice.h,v 1.86 2002/06/07 14:38:19 dan_karrels Exp $
+ * $Id: cservice.h,v 1.87 2002/07/08 15:47:58 dan_karrels Exp $
  */
 
 #ifndef __CSERVICE_H
-#define __CSERVICE_H "$Id: cservice.h,v 1.86 2002/06/07 14:38:19 dan_karrels Exp $"
+#define __CSERVICE_H "$Id: cservice.h,v 1.87 2002/07/08 15:47:58 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
@@ -23,21 +23,12 @@
 #include	"sqlLevel.h"
 #include	"sqlBan.h"
 #include	"sqlPendingChannel.h"
-#include	"defs.h"
-
-#ifdef GNU_EXTENSIONS
- #include       <ext/hash_map>
-#else
- #include       <hash_map>
-#endif
 
 class PgDatabase;
 
 namespace gnuworld
 {
 
-using HASHMAPNS::hash_map ;
-using HASHMAPNS::hash ;
 using std::string ;
 using std::vector ;
 using std::map ;
@@ -195,10 +186,10 @@ public:
 
 	// Typedef's for user/channel Hashmaps.
 	// User hash, Key is Username.
-	typedef hash_map< string, sqlUser*, eHash, eqstr > sqlUserHashType ;
+	typedef map< string, sqlUser*, eqstr > sqlUserHashType ;
 
 	// Channel hash, Key is channelname.
-	typedef hash_map< string, sqlChannel*, eHash, eqstr > sqlChannelHashType ;
+	typedef map< string, sqlChannel*, eqstr > sqlChannelHashType ;
 	typedef map< int, sqlChannel* > sqlChannelIDHashType ;
 
 	// Accesslevel cache, key is pair(chanid, userid).
@@ -350,7 +341,8 @@ public:
 	reopQType reopQ;
 
 	/* List of channels in 'pending' registration state. */
-	typedef hash_map < string, sqlPendingChannel*, eHash, eqstr > pendingChannelListType;
+	typedef map < string, sqlPendingChannel*, eqstr >
+		pendingChannelListType;
 	pendingChannelListType pendingChannelList;
 
 	/*

@@ -19,11 +19,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: misc.h,v 1.21 2002/06/07 14:38:19 dan_karrels Exp $
+ * $Id: misc.h,v 1.22 2002/07/08 15:47:57 dan_karrels Exp $
  */
 
 #ifndef __MISC_H
-#define __MISC_H "$Id: misc.h,v 1.21 2002/06/07 14:38:19 dan_karrels Exp $"
+#define __MISC_H "$Id: misc.h,v 1.22 2002/07/08 15:47:57 dan_karrels Exp $"
 
 #include	<string>
 
@@ -31,21 +31,10 @@
 #include	<cstring>
 
 #include	"match.h"
-#include	"defs.h"
-
-/*
-#ifdef GNU_EXTENSIONS
- #include       <ext/hash_map>
-#else
- #include       <hash_map>
-#endif
-*/
 
 namespace gnuworld
 {
 
-//using HASHMAPNS::hash ;
-//using HASHMAPNS::hash_map ;
 using std::string ;
 
 /**
@@ -81,6 +70,8 @@ inline bool operator()( const string& s1, const string& s2 ) const
 
 /**
  * A hashing operator for the system hash tables.
+ * This is not used for now, since hash_map has been removed
+ * from gnuworld completely.
  */
 struct eHash
 {
