@@ -1,5 +1,5 @@
 #!/usr/local/pgsql/bin/pgtclsh
-# $Id: appjudge,v 1.11 2003/08/23 16:02:25 nighty Exp $
+# $Id: appjudge,v 1.12 2003/08/29 13:52:33 nighty Exp $
 # Author: sengaia@undernet.org, 20010619
 # Last modif: nighty@undernet.org, 20030823 (fixed the feature, added more traps, packed a couple of procs, added ability of running the judge remotely)
 # This script automates a good part of the channel-registration process, you need
@@ -83,7 +83,8 @@ proc check_comments {hDB channel_id} {
 	return $check_res
 }
 
-proc check_fraudulous {hDB chan_id} {
+proc check_fraudulous {hDB chan_id mgr_id} {
+	global AS_PENDREVIEW
 	set supporter_ids ""
 	pg_select $hDB "SELECT channel_id,user_id FROM supporters WHERE (channel_id = $chan_id)" sup_res {
 		lappend supporter_ids [lindex [array get sup_res "user_id"] 1]
@@ -100,10 +101,16 @@ proc check_fraudulous {hDB chan_id} {
         	set user_flags [lindex [array get user_res "flags"] 1]
         	if {[expr $user_flags & 8]} { incr isfraud }
 	}
+	if {$isfraud > 0} {
+		# move it to 'Ready for review' if anyone is fraudulous
+		puts [format "%s: Moving channel %s to status %d (%d fraudulent applicant/supporters found)" [clock_stamp] [get_channel $hDB $chan_id] $AS_PENDREVIEW $isfraud]
+		pg_exec $hDB "UPDATE pending SET status=$AS_PENDREVIEW,last_updated=now()::abstime::int4 WHERE channel_id=$chan_id"
+	}	
 	return $isfraud
 }
 
-proc check_suspended {hDB chan_id} {
+proc check_suspended {hDB chan_id mgr_id} {
+	global AS_REJECTED
 	set supporter_ids ""
 	pg_select $hDB "SELECT channel_id,user_id FROM supporters WHERE (channel_id = $chan_id)" sup_res {
 		lappend supporter_ids [lindex [array get sup_res "user_id"] 1]
@@ -119,6 +126,11 @@ proc check_suspended {hDB chan_id} {
 	pg_select $hDB "SELECT id,user_name,flags FROM users where id=$mgr_id" user_res {
         	set user_flags [lindex [array get user_res "flags"] 1]
         	if {[expr $user_flags & 1]} { incr issusp }
+	}
+	if {$issusp > 0} {
+		# reject the channel if any suspended found !
+		puts [format "%s: Moving channel %s to status %d (%d suspended applicant/supporters found)" [clock_stamp] [get_channel $hDB $chan_id] $AS_REJECTED $issusp]
+		reject_app $hDB $chan_id "The applicant and/or one or more of the supporters are suspended."
 	}
 	return $issusp
 }
@@ -191,16 +203,8 @@ pg_select $hSQL "SELECT channel_id,status,manager_id,reviewed FROM pending WHERE
 	if {![check_comments $hSQL $chan_id]} { # NO objection found !, good.
 		# Has a human being seen this application?
 		if {$reviewed == "Y"} {
-			set issusp check_suspended $hSQL $chan_id
-			if ($issusp > 0) { # reject the channel if any suspended found !
-				puts [format "%s: Moving channel %s to status %d (%d suspended applicant/supporters found)" [clock_stamp] [get_channel $hSQL $chan_id] $AS_REJECTED $issusp]
-				reject_app $hSQL $chan_id "The applicant and/or one or more of the supporters are suspended."
-			} else {
-				set isfraud check_fraudulous $hSQL $chan_id
-				if {$isfraud > 0} { # move it to 'Ready for review' if anyone is fraudulous
-					puts [format "%s: Moving channel %s to status %d (%d fraudulent applicant/supporters found)" [clock_stamp] [get_channel $hSQL $chan_id] $AS_PENDREVIEW $isfraud]
-					pg_exec $hSQL "UPDATE pending SET status=$AS_PENDREVIEW,last_updated=now()::abstime::int4 WHERE channel_id=$chan_id"
-				} else {
+			if {![check_suspended $hSQL $chan_id $mgr_id]} {
+				if {![check_fraudulous $hSQL $chan_id $mgr_id]} {
 					# Register the channel
 			        	log_channel $hSQL $chan_id "ACCEPTED" "All checks passed." 7
 					puts [format "%s: Moving channel %s to status %d (notify period ended)" [clock_stamp] [get_channel $hSQL $chan_id] $AS_COMPLETED]
@@ -212,27 +216,19 @@ pg_select $hSQL "SELECT channel_id,status,manager_id,reviewed FROM pending WHERE
 			}
 		} else {
 			# No, label it for review if no one is suspended on it
-			set issusp check_suspended $hSQL $chan_id
-			if ($issusp > 0) { # reject the channel if any suspended found !
-				puts [format "%s: Moving channel %s to status %d (%d suspended applicant/supporters found)" [clock_stamp] [get_channel $hSQL $chan_id] $AS_REJECTED $issusp]
-				reject_app $hSQL $chan_id "The applicant and/or one or more of the supporters are suspended."
-			} else {
+			if {![check_suspended $hSQL $chan_id $mgr_id]} {
 				puts [format "%s: Moving channel %s to status %d (it was never reviewed)" [clock_stamp] [get_channel $hSQL $chan_id] $AS_PENDREVIEW]
         	                pg_exec $hSQL "UPDATE pending SET status=$AS_PENDREVIEW,last_updated=now()::abstime::int4 WHERE channel_id=$chan_id"
 			}
 		}
-	} else { # Objections found, label it for review if no one is suspended on it ;)
-		set issusp check_suspended $hSQL $chan_id
-		if ($issusp > 0) { # reject the channel if any suspended found !
-			puts [format "%s: Moving channel %s to status %d (%d suspended applicant/supporters found)" [clock_stamp] [get_channel $hSQL $chan_id] $AS_REJECTED $issusp]
-			reject_app $hSQL $chan_id "The applicant and/or one or more of the supporters are suspended."
-		} else {
+	} else {
+		# Objections found, label it for review if no one is suspended on it ;)
+		if {![check_suspended $hSQL $chan_id $mgr_id]} {
 			puts [format "%s: Moving channel %s to status %d (it was never reviewed)" [clock_stamp] [get_channel $hSQL $chan_id] $AS_PENDREVIEW]
         	        pg_exec $hSQL "UPDATE pending SET status=$AS_PENDREVIEW,last_updated=now()::abstime::int4 WHERE channel_id=$chan_id"
 		}
 	}
 }
-
 
 
 # Now that wasn't so hard...
