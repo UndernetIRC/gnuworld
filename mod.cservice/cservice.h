@@ -1,5 +1,5 @@
 #ifndef __CSERVICE_H
-#define __CSERVICE_H "$Id: cservice.h,v 1.43 2001/02/10 02:47:44 isomer Exp $"
+#define __CSERVICE_H "$Id: cservice.h,v 1.44 2001/02/10 21:49:09 gte Exp $"
 
 #include	<string>
 #include	<vector>
@@ -244,7 +244,7 @@ public:
 	time_t currentTime() const ;
 
 	/* Queue to hold pending reops */
-	typedef queue < string, list<string> > reopQType;
+	typedef queue < pair <int , string>, list< pair < int, string> > > reopQType;
 	reopQType reopQ;
 
 } ;

@@ -608,7 +608,7 @@ else if(Command == "VERSION")
 	xClient::DoCTCP(theClient, CTCP,
 		"Undernet P10 Channel Services Version 2 ["
 		__DATE__ " " __TIME__
-		"] ($Id: cservice.cc,v 1.94 2001/02/10 03:12:07 gte Exp $)");
+		"] ($Id: cservice.cc,v 1.95 2001/02/10 21:49:09 gte Exp $)");
 	}
 else if(Command == "PROBLEM?")
 	{
@@ -1469,7 +1469,7 @@ for( xServer::opVectorType::const_iterator ptr = theTargets.begin() ;
 			logAdminMessage("I've been deopped on %s!",
 				reggedChan->getName().c_str());
 			/* Add this chan to the reop queue, ready to op itself in 30 seconds. */
-			 reopQ.push( reggedChan->getName() );
+			 reopQ.push(reopQType::value_type(currentTime(), reggedChan->getName()) );
 			}
 		}
 	} // for()

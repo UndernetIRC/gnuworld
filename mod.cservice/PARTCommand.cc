@@ -1,12 +1,27 @@
-/* PARTCommand.cc */
+/* 
+ * PARTCommand.cc 
+ *
+ * 10/02/2001 - David Henriksen <david@itwebnet.dk>
+ * Initial Version. Written, and finished.
+ *
+ * Makes cmaster leave a registered channel.
+ *
+ * Caveats: None
+ *
+ * $Id: PARTCommand.cc,v 1.2 2001/02/10 21:49:09 gte Exp $
+ */
+
 
 #include	<string>
  
 #include	"StringTokenizer.h"
 #include	"ELog.h" 
 #include	"cservice.h" 
+#include	"levels.h"
+#include	"responses.h"
+#include	"Network.h"
 
-const char PARTCommand_cc_rcsId[] = "$Id: PARTCommand.cc,v 1.1 2001/01/29 02:16:27 gte Exp $" ;
+const char PARTCommand_cc_rcsId[] = "$Id: PARTCommand.cc,v 1.2 2001/02/10 21:49:09 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -22,7 +37,44 @@ bool PARTCommand::Exec( iClient* theClient, const string& Message )
 		return true;
 	}
  
-	return true ;
+	/*
+	 *  Fetch the sqlUser record attached to this client. If there isn't one,
+	 *  they aren't logged in - tell them they should be.
+	 */
+
+	sqlUser* theUser = bot->isAuthed(theClient, true);
+	if (!theUser) {
+		return false;
+	}
+
+	/* 
+	 *  Check the channel is actually registered.
+	 */
+
+	sqlChannel* theChan = bot->getChannelRecord(st[1]);
+	if (!theChan) {
+		bot->Notice(theClient, bot->getResponse(theUser, language::chan_not_reg).c_str(),
+			st[1].c_str());
+		return false;
+	} 
+
+	/*
+	 *  Check the user has sufficient access on this channel.
+	 */
+
+	int level = bot->getEffectiveAccessLevel(theUser, theChan, true);
+	if (level < level::part)
+	{
+		bot->Notice(theClient, bot->getResponse(theUser, language::insuf_access).c_str());
+		return false;
+	} 
+ 
+	theChan->setInChan(false); 
+	bot->getUplink()->UnRegisterChannelEvent(theChan->getName(), bot);
+	
+	bot->Part(theChan->getName());
+	
+	return true;
 } 
 
 } // namespace gnuworld.
