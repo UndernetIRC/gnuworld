@@ -2,5 +2,9 @@
 *.so
 *.0
 *.log
+*.Log
 gnuworld.pid
 gnuworld
+ccontrol.conf
+cservice.conf
+GNUWorld.conf
