@@ -1,4 +1,4 @@
--- $Id: dutch.sql,v 1.1 2002/08/30 10:18:46 nighty Exp $ --
+-- $Id: language_dutch.sql,v 1.3 2002/08/30 10:38:16 nighty Exp $ --
 -- Dutch language definition.
 -- 9/2/02 - Eagle-One (Ken Geboers) <Eagle-One@pandora.be>.
 

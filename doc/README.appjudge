@@ -1,0 +1,23 @@
+-- "$Id: README.appjudge,v 1.5 2002/08/30 10:38:15 nighty Exp $"
+--
+-- For more detailed information about setting up GNUworld, visit :
+--      http://coder-com.undernet.org/gnuworld-setup/
+--
+-- 2001-10-16: nighty <nighty@undernet.org>
+--
+
+     - copy cmaster/regproc/ and its subdirs to /usr/local/pgsql
+
+     - make it owned by your gnuworld user (the one running the postgres) :
+          chown -R gnuworld /usr/local/pgsql/regproc
+
+     - edit the file /usr/local/pgsql/regproc/appjudge-config and set your preferences.
+
+     - crontab the content of /usr/local/pgsql/regproc/cron-judge.in :
+          as root :  crontab -u gnuworld /usr/local/pgsql/regproc/cron-judge.in
+          or, as gnuworld : crontab /usr/local/pgsql/regproc/cron-judge.in
+
+
+
+- you're done!
+
