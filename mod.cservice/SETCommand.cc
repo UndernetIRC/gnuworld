@@ -18,7 +18,7 @@
  *
  * Caveats: None.
  *
- * $Id: SETCommand.cc,v 1.44 2001/10/07 23:22:17 gte Exp $
+ * $Id: SETCommand.cc,v 1.45 2001/12/27 02:48:08 gte Exp $
  */
 
 #include	<string>
@@ -29,7 +29,7 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char SETCommand_cc_rcsId[] = "$Id: SETCommand.cc,v 1.44 2001/10/07 23:22:17 gte Exp $" ;
+const char SETCommand_cc_rcsId[] = "$Id: SETCommand.cc,v 1.45 2001/12/27 02:48:08 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -943,6 +943,93 @@ else
 	}
 
 
+	if(option == "FLOATLIM")
+	{
+	    if(level < level::set::floatlim)
+	    {
+		bot->Notice(theClient,
+				bot->getResponse(theUser,
+				language::insuf_access,
+				string("You do not have enough access!")));
+		return true;
+	    }
+	    if(value == "ON")
+	    {
+	    	theChan->setFlag(sqlChannel::F_FLOATLIM);
+		}
+	    else if(value == "OFF") theChan->removeFlag(sqlChannel::F_FLOATLIM);
+	    else
+	    {
+		bot->Notice(theClient,
+			bot->getResponse(theUser,
+				language::set_cmd_syntax_on_off,
+				string("value of %s must be ON or OFF")).c_str(),
+			option.c_str());
+		return true;
+	    }
+	    theChan->commit();
+	    bot->Notice(theClient,
+			bot->getResponse(theUser,
+				language::set_cmd_status,
+				string("%s for %s is %s")).c_str(),
+			option.c_str(),
+			theChan->getName().c_str(),
+			theChan->getFlag(sqlChannel::F_FLOATLIM) ? "ON" : "OFF");
+	    return true;
+	}
+
+	if(option == "FLOATMARGIN")
+	{
+	    if(level < level::set::floatlim)
+	    {
+		bot->Notice(theClient,
+				bot->getResponse(theUser,
+				language::insuf_access,
+				string("You do not have enough access!")));
+		return true;
+	    }
+
+	unsigned int limit_offset = atoi(value.c_str());
+
+	if ((limit_offset <= 1) | (limit_offset > 20))
+		{
+			bot->Notice(theClient, "Invalid floating-limit Margin (2-20 Allowed).");
+			return true;
+		}
+
+	theChan->setLimitOffset(limit_offset);
+	theChan->commit();
+
+	bot->Notice(theClient, "Floating-limit Margin now set to %i", limit_offset);
+	return true;
+	}
+
+	if(option == "FLOATPERIOD")
+	{
+	    if(level < level::set::floatlim)
+	    {
+		bot->Notice(theClient,
+				bot->getResponse(theUser,
+				language::insuf_access,
+				string("You do not have enough access!")));
+		return true;
+	    }
+
+	unsigned int limit_period = atoi(value.c_str());
+
+	if ((limit_period < 20) | (limit_period > 200))
+		{
+			bot->Notice(theClient, "Invalid floating-limit period (20-200 Allowed).");
+			return true;
+		}
+
+	theChan->setLimitPeriod(limit_period);
+	theChan->commit();
+
+	bot->Notice(theClient, "Floating-limit period now set to %i", limit_period);
+	return true;
+	}
+
 	bot->Notice(theClient,
 		bot->getResponse(theUser,
 			language::mode_invalid,
@@ -951,4 +1038,3 @@ else
 }
 
 } // namespace gnuworld.
-

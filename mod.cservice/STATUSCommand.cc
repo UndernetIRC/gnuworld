@@ -10,7 +10,7 @@
 #include	"Network.h"
 #include	"cservice_config.h"
 
-const char STATUSCommand_cc_rcsId[] = "$Id: STATUSCommand.cc,v 1.35 2001/09/12 21:02:47 gte Exp $" ;
+const char STATUSCommand_cc_rcsId[] = "$Id: STATUSCommand.cc,v 1.36 2001/12/27 02:48:08 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -72,10 +72,6 @@ if (st[1] == "*")
 	float levelTotal = bot->levelCacheHits + bot->levelHits;
 	float levelEf = (bot->levelCacheHits ?
 		((float)bot->levelCacheHits / levelTotal * 100) : 0);
-
-	float banTotal = bot->banCacheHits + bot->banHits;
-	float banEf = (bot->banCacheHits ?
-		((float)bot->banCacheHits / banTotal * 100) : 0);
 
 	bot->Notice(theClient,
 		bot->getResponse(theUser,
@@ -229,6 +225,18 @@ if (theChan->getFlag(sqlChannel::F_NOOP)) flagsSet += "NOOP ";
 if (theChan->getFlag(sqlChannel::F_AUTOTOPIC)) flagsSet += "AUTOTOPIC ";
 if (theChan->getFlag(sqlChannel::F_AUTOJOIN)) flagsSet += "AUTOJOIN ";
 if (theChan->getFlag(sqlChannel::F_LOCKED)) flagsSet += "LOCKED ";
+if (theChan->getFlag(sqlChannel::F_FLOATLIM))
+	{
+	strstream floatLim;
+	floatLim
+	<< "FLOATLIM ("
+	<< theChan->getLimitOffset()
+	<< ":"
+	<< theChan->getLimitPeriod()
+	<< ")"
+	<< ends;
+	flagsSet += floatLim.str();
+	}
 
 bot->Notice(theClient,
 	bot->getResponse(theUser, language::status_flags,

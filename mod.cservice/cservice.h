@@ -1,5 +1,5 @@
 #ifndef __CSERVICE_H
-#define __CSERVICE_H "$Id: cservice.h,v 1.74 2001/10/22 18:53:25 gte Exp $"
+#define __CSERVICE_H "$Id: cservice.h,v 1.75 2001/12/27 02:48:08 gte Exp $"
 
 #include	<string>
 #include	<vector>
@@ -68,6 +68,8 @@ public:
 	short connectRetries;
 	unsigned int connectCheckFreq;
 	unsigned int connectRetry;
+	unsigned int limitCheckPeriod;
+
 	void checkDbConnectionStatus();
 	string pendingPageURL;
 
@@ -281,6 +283,9 @@ public:
 	/* TimerID we recieve every XX hours for the notification of pending channels. */
 	xServer::timerID pending_timerID;
 
+	/* TimerID we recieve every seconds when we should check if a channel limit needs changing */
+	xServer::timerID limit_timerID;
+
 	// Language definitions table (Loaded from Db).
 	typedef map < string, pair <int, string> > languageTableType;
 	languageTableType languageTable;
@@ -313,8 +318,11 @@ public:
 	void deopAllOnChan(Channel*);
 	void deopAllUnAuthedOnChan(Channel*);
 
-	/* sets a description (url) topic combo. */
-	void doAutoTopic(sqlChannel* theChan);
+	/* Sets a description (url) topic combo. */
+	void doAutoTopic(sqlChannel*);
+
+	/* Automatically updates the floating limit for this channel */
+	void doFloatingLimit(sqlChannel*, Channel*);
 
 	/* Bans & kicks a specified user with a specific reason */
 	bool doInternalBanAndKick(sqlChannel*, iClient*, const string&);
@@ -408,6 +416,8 @@ public:
 	void updateUsers();
 	void updateLevels();
 	void updateBans();
+
+	void updateLimits();
 
 	typedef map < string, int > statsMapType;
 	statsMapType statsMap;

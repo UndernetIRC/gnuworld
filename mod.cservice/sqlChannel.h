@@ -1,7 +1,7 @@
 /* sqlChannel.h */
 
 #ifndef __SQLCHANNEL_H
-#define __SQLCHANNEL_H "$Id: sqlChannel.h,v 1.36 2001/12/08 19:15:41 gte Exp $"
+#define __SQLCHANNEL_H "$Id: sqlChannel.h,v 1.37 2001/12/27 02:48:08 gte Exp $"
 
 #include	<string>
 #include	<map>
@@ -39,6 +39,7 @@ public:
 	static const flagType	F_AUTOTOPIC;
 	static const flagType	F_OPONLY; 	// Deprecated.
 	static const flagType	F_AUTOJOIN;
+	static const flagType	F_FLOATLIM;
 
 	/*
 	 *   Channel 'Event' Flags, used in the channelog table.
@@ -115,8 +116,17 @@ public:
 	inline const time_t&		getLastTopic() const
 		{ return last_topic ; }
 
+	inline const time_t&		getLastLimitCheck() const
+		{ return last_limit_check ; }
+
 	inline const time_t&		getLastUsed() const
 		{ return last_used ; }
+
+	inline const unsigned int& getLimitOffset() const
+		{ return limit_offset ; }
+
+	inline const time_t&	getLimitPeriod() const
+		{ return limit_period ; }
 
 	/**
 	 * Load channel data from the backend using the channel name as
@@ -187,8 +197,17 @@ public:
 	inline void setLastTopic( const time_t& _last_topic )
 		{ last_topic = _last_topic; }
 
+	inline void setLastLimitCheck( const time_t& _last_limit_check )
+		{ last_limit_check = _last_limit_check; }
+
 	inline void setLastUsed( const time_t& _last_used )
 		{ last_used = _last_used; }
+
+	inline void setLimitOffset( const unsigned int& _limit_offset )
+		{ limit_offset = _limit_offset; }
+
+	inline void setLimitPeriod( const time_t& _limit_period )
+		{ limit_period = _limit_period; }
 
 	/**
 	 * Method to perform a SQL 'UPDATE' and commit changes to this
@@ -231,6 +250,9 @@ protected:
 	time_t		last_topic ;
 	bool		inChan;
 	time_t		last_used;
+	unsigned int limit_offset;
+	time_t limit_period;
+	time_t last_limit_check;
 
 	PgDatabase*	SQLDb;
 

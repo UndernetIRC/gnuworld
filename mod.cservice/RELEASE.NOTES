@@ -1,5 +1,16 @@
 Newest changes at the top of the file:
-$Id: RELEASE.NOTES,v 1.19 2001/12/08 19:15:41 gte Exp $
+$Id: RELEASE.NOTES,v 1.20 2001/12/27 02:48:08 gte Exp $
+
+CMaster 1.1pl4 - 26/12/2001
+* Don't auto-part channels marked as SPECIAL.
+* Add "Floating Limit" support. (Ie: Set the channel +l to X 
+  above the total number of people in the channel every Y 
+  seconds.
+* Maintainence Required in this release:
+  ALTER TABLE channels ADD COLUMN limit_offset INT4 DEFAULT '3';
+  ALTER TABLE channels ADD COLUMN limit_period INT4 DEFAULT '20';
+  UPDATE channels SET limit_offset = 3;
+  UPDATE channels SET limit_period = 20;
 
 CMaster 1.1pl3 - 07/12/2001
 * Make PURGE obey the NOPURGE flag.

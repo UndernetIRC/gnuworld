@@ -103,6 +103,10 @@ cache_timerID = theServer->RegisterTimer(theTime, this, NULL);
 theTime = time(NULL) + pendingChanPeriod;
 pending_timerID = theServer->RegisterTimer(theTime, this, NULL);
 
+// Start the floating Limit timer rolling.
+theTime = time(NULL) + limitCheckPeriod;
+limit_timerID = theServer->RegisterTimer(theTime, this, NULL);
+
 if (SQLDb->Exec("SELECT now()::abstime::int4;") == PGRES_TUPLES_OK)
 	{
 	// Set our "Last Refresh" timers to the current database system time.
@@ -252,6 +256,7 @@ topic_duration = atoi((cserviceConfig->Require( "topic_duration" )->second).c_st
 pendingChanPeriod = atoi((cserviceConfig->Require( "pending_duration" )->second).c_str());
 connectCheckFreq = atoi((cserviceConfig->Require( "connection_check_frequency" )->second).c_str());
 connectRetry = atoi((cserviceConfig->Require( "connection_retry_total" )->second).c_str());
+limitCheckPeriod = atoi((cserviceConfig->Require( "limit_check" )->second).c_str());
 
 userHits = 0;
 userCacheHits = 0;
@@ -738,7 +743,7 @@ else if(Command == "VERSION")
 	xClient::DoCTCP(theClient, CTCP,
 		"Undernet P10 Channel Services II ["
 		__DATE__ " " __TIME__
-		"] Release 1.1pl3");
+		"] Release 1.1pl4");
 	}
 else if(Command == "PROBLEM?")
 	{
@@ -1995,6 +2000,15 @@ void cservice::updateBans()
 int cservice::OnTimer(xServer::timerID timer_id, void*)
 {
 
+if (timer_id == limit_timerID)
+	{
+	updateLimits();
+
+	/* Refresh Timers */
+	time_t theTime = time(NULL) + limitCheckPeriod;
+	limit_timerID = MyUplink->RegisterTimer(theTime, this, NULL);
+	}
+
 if (timer_id == dBconnection_timerID)
 	{
 	checkDbConnectionStatus();
@@ -2807,6 +2821,14 @@ switch( whichEvent )
 			doAutoTopic(reggedChan);
 			}
 
+		/* Is it time to deal with autolimit's? */
+		if (reggedChan->getFlag(sqlChannel::F_FLOATLIM) &&
+			(reggedChan->getLastLimitCheck()
+			+ reggedChan->getLimitPeriod() <= currentTime()))
+			{
+			doFloatingLimit(reggedChan, theChan);
+			}
+
 		/* Deal with auto-op first - check this users access level. */
 		sqlUser* theUser = isAuthed(theClient, false);
 		if (!theUser)
@@ -3033,6 +3055,82 @@ Write( s3 );
 delete[] s3.str();
 
 return 0;
+}
+
+void cservice::updateLimits()
+{
+	/*
+	 * Forall cached channel records, perform an update of the
+	 * channel limit.
+	 */
+
+	 sqlChannelHashType::iterator ptr = sqlChannelCache.begin();
+	 	while (ptr != sqlChannelCache.end())
+	 	{
+		sqlChannel* theChan = (ptr)->second;
+
+		if (!theChan->getFlag(sqlChannel::F_FLOATLIM))
+			{
+			++ptr;
+			continue;
+			}
+
+		if (!theChan->getInChan())
+			{
+			++ptr;
+			continue;
+			}
+
+		Channel* tmpChan = Network->findChannel(theChan->getName());
+
+		if (!tmpChan)
+			{
+			++ptr;
+			continue;
+			}
+
+		doFloatingLimit(theChan, tmpChan);
+
+		++ptr;
+		}
+
+}
+
+void cservice::doFloatingLimit(sqlChannel* reggedChan, Channel* theChan)
+{
+/*
+ * This event is triggered when someone has joined the channel and its
+ * "Time" to do autolimits, so we'll always want to update the limit.
+ */
+ 	unsigned int newLimit = theChan->size() + reggedChan->getLimitOffset();
+
+ 	/* Don't bother if the new limit is the same as the old one. */
+ 	if (newLimit == theChan->getLimit()) return;
+
+	/*
+ 	 * Check we're actually opped first.
+	 */
+
+	ChannelUser* tmpBotUser = theChan->findUser(getInstance());
+	if (!tmpBotUser) return;
+	if (!tmpBotUser->getMode(ChannelUser::MODE_O)) return;
+
+	theChan->setMode(Channel::MODE_L);
+	theChan->setLimit(newLimit);
+	reggedChan->setLastLimitCheck(currentTime());
+
+	incStat("CORE.FLOATLIM.ALTER");
+
+	strstream s;
+	s	<< getCharYYXXX()
+		<< " M "
+		<< theChan->getName()
+		<< " +l "
+		<< newLimit
+		<< ends;
+
+	Write( s );
+	delete[] s.str();
 }
 
 /*--doAutoTopic---------------------------------------------------------------

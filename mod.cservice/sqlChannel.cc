@@ -9,7 +9,7 @@
  * 30/12/2000: Moved static SQL data to constants.h --Gte
  * Set loadData up to take data from rows other than 0.
  *
- * $Id: sqlChannel.cc,v 1.33 2001/09/26 01:18:37 gte Exp $
+ * $Id: sqlChannel.cc,v 1.34 2001/12/27 02:48:08 gte Exp $
  */
 
 #include	<strstream>
@@ -25,7 +25,7 @@
 #include	"cservice_config.h"
 
 const char sqlChannel_h_rcsId[] = __SQLCHANNEL_H ;
-const char sqlChannel_cc_rcsId[] = "$Id: sqlChannel.cc,v 1.33 2001/09/26 01:18:37 gte Exp $" ;
+const char sqlChannel_cc_rcsId[] = "$Id: sqlChannel.cc,v 1.34 2001/12/27 02:48:08 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -44,6 +44,7 @@ const sqlChannel::flagType sqlChannel::F_TEMP     = 0x00000020 ;
 const sqlChannel::flagType sqlChannel::F_CAUTION  = 0x00000040 ;
 const sqlChannel::flagType sqlChannel::F_VACATION = 0x00000080 ;
 const sqlChannel::flagType sqlChannel::F_LOCKED   = 0x00000100 ;
+const sqlChannel::flagType sqlChannel::F_FLOATLIM = 0x00000200 ;
 
 const sqlChannel::flagType sqlChannel::F_ALWAYSOP  = 0x00010000 ;
 const sqlChannel::flagType sqlChannel::F_STRICTOP  = 0x00020000 ;
@@ -83,6 +84,9 @@ sqlChannel::sqlChannel(PgDatabase* _SQLDb)
    last_topic(0),
    inChan(false),
    last_used(0),
+   limit_offset(3),
+   limit_period(20),
+   last_limit_check(0),
    SQLDb( _SQLDb )
 {
 }
@@ -208,6 +212,8 @@ channel_ts = atoi(SQLDb->GetValue(row,10));
 channel_mode = SQLDb->GetValue(row,11);
 userflags = atoi(SQLDb->GetValue(row,12));
 last_updated = atoi(SQLDb->GetValue(row,13));
+limit_offset = atoi(SQLDb->GetValue(row,14));
+limit_period = atoi(SQLDb->GetValue(row,15));
 }
 
 bool sqlChannel::commit()
@@ -232,6 +238,8 @@ queryString	<< queryHeader
 		<< "channel_mode = '" << channel_mode << "', "
 		<< "userflags = " << userflags << ", "
 		<< "last_updated = now()::abstime::int4, "
+		<< "limit_offset = " << limit_offset << ", "
+		<< "limit_period = " << limit_period << ", "
 		<< "description = '" << escapeSQLChars(description) << "', "
 		<< "comment = '" << escapeSQLChars(comment) << "' "
 		<< queryCondition << id
