@@ -8,7 +8,7 @@
  *
  * Caveats: None
  *
- * $Id: OPERPARTCommand.cc,v 1.3 2001/02/14 21:23:12 gte Exp $
+ * $Id: OPERPARTCommand.cc,v 1.4 2001/02/15 21:08:14 gte Exp $
  */
 
 
@@ -21,7 +21,7 @@
 #include	"responses.h"
 #include	"Network.h"
 
-const char OPERPARTCommand_cc_rcsId[] = "$Id: OPERPARTCommand.cc,v 1.3 2001/02/14 21:23:12 gte Exp $" ;
+const char OPERPARTCommand_cc_rcsId[] = "$Id: OPERPARTCommand.cc,v 1.4 2001/02/15 21:08:14 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -65,7 +65,7 @@ bool OPERPARTCommand::Exec( iClient* theClient, const string& Message )
 		return false;
 	}
 
-	bot->writeChannelLog(theChan, theClient, sqlChannel::EV_PART, "");
+	bot->writeChannelLog(theChan, theClient, sqlChannel::EV_OPERPART, "");
 
 	// Tell the world. 
  

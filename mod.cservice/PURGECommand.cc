@@ -8,7 +8,7 @@
  *
  * Caveats: None
  *
- * $Id: PURGECommand.cc,v 1.3 2001/01/27 04:22:19 gte Exp $
+ * $Id: PURGECommand.cc,v 1.4 2001/02/15 21:08:14 gte Exp $
  */
  
 #include	<string>
@@ -20,7 +20,7 @@
 #include	"libpq++.h"
 #include	"Network.h"
 
-const char PURGECommand_cc_rcsId[] = "$Id: PURGECommand.cc,v 1.3 2001/01/27 04:22:19 gte Exp $" ;
+const char PURGECommand_cc_rcsId[] = "$Id: PURGECommand.cc,v 1.4 2001/02/15 21:08:14 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -71,8 +71,23 @@ bool PURGECommand::Exec( iClient* theClient, const string& Message )
 		bot->Notice(theClient, "You have insufficient access to perform that command");
 		return false;
 	} 
-
  
+ 	/*
+	 * Fetch some information about the owner of this channel, so we can 'freeze' it for
+	 * future investigation in the log.
+	 */
+
+	strstream managerQuery;
+	managerQuery << "SELECT users_lastseen.last_seen,users.email "
+	<< "FROM users,users_lastseen,levels "
+	<< "WHERE users.id = users_lastseen.user_id "
+	<< "AND levels.user_id = users.id "
+	<< "AND levels.access = 500 "
+	<< "AND levels.channel_id = " << theChan->getID()
+	<< " LIMIT 1" << ends;
+
+	elog << "sqlQuery> " << managerQuery.str() << endl; 
+
 	/*
 	 *  We simply flag this channel as 'deleted', and remove from the cache.
 	 *  Maintainence scripts can manually remove this channel and all related
@@ -85,7 +100,7 @@ bool PURGECommand::Exec( iClient* theClient, const string& Message )
 	<< theChan->getID() << ends; 
  
 	elog << "sqlQuery> " << theQuery.str() << endl; 
-
+ 
 	if ((status = bot->SQLDb->Exec(theQuery.str())) == PGRES_COMMAND_OK)
 	{
 		bot->logAdminMessage("%s (%s) has purged %s (%s)", 
@@ -94,11 +109,13 @@ bool PURGECommand::Exec( iClient* theClient, const string& Message )
 
 		bot->Notice(theClient, "Purged channel %s", st[1].c_str());
 
+		bot->writeChannelLog(theChan, theClient, sqlChannel::EV_JOIN, "");
+
 		/* Remove from cache.. part channel. */
 		bot->sqlChannelCache.erase(theChan->getName()); 
 		bot->getUplink()->UnRegisterChannelEvent( theChan->getName(), bot ) ;
 		bot->Part(theChan->getName());
-		delete(theChan);
+		delete(theChan); 
 	} else {
 		bot->Notice(theClient, "Something went wrong: %s", bot->SQLDb->ErrorMessage()); // Log to msgchan here?
  	}

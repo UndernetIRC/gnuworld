@@ -610,7 +610,7 @@ else if(Command == "VERSION")
 	xClient::DoCTCP(theClient, CTCP,
 		"Undernet P10 Channel Services Version 2 ["
 		__DATE__ " " __TIME__
-		"] ($Id: cservice.cc,v 1.102 2001/02/14 21:23:12 gte Exp $)");
+		"] ($Id: cservice.cc,v 1.103 2001/02/15 21:08:14 gte Exp $)");
 	}
 else if(Command == "PROBLEM?")
 	{
@@ -2008,9 +2008,7 @@ return false ;
  */ 
 void cservice::writeChannelLog(sqlChannel* theChannel, iClient* theClient, 
 	unsigned short eventType, const string& theMessage)
-{
-	string operExtra = theClient->isOper() ? "[OPER]" : "";
-
+{ 
 	sqlUser* theUser = isAuthed(theClient, false);
 	string userExtra = theUser ? theUser->getUserName() : "Not Logged In";
 
@@ -2023,7 +2021,6 @@ void cservice::writeChannelLog(sqlChannel* theChannel, iClient* theClient,
  	<< "'[" << nickName << "]: "
 	<< theClient->getNickUserHost()
 	<< " (" << userExtra << ") "
-	<< operExtra << " " 
 	<< escapeSQLChars(theMessage) << "', "
 	<< currentTime()
 	<< ")" << ends;

@@ -8,7 +8,7 @@
  *
  * Caveats: None
  *
- * $Id: PARTCommand.cc,v 1.5 2001/02/14 21:23:12 gte Exp $
+ * $Id: PARTCommand.cc,v 1.6 2001/02/15 21:08:14 gte Exp $
  */
 
 
@@ -21,7 +21,7 @@
 #include	"responses.h"
 #include	"Network.h"
 
-const char PARTCommand_cc_rcsId[] = "$Id: PARTCommand.cc,v 1.5 2001/02/14 21:23:12 gte Exp $" ;
+const char PARTCommand_cc_rcsId[] = "$Id: PARTCommand.cc,v 1.6 2001/02/15 21:08:14 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -75,10 +75,7 @@ bool PARTCommand::Exec( iClient* theClient, const string& Message )
 		bot->Notice(theClient, bot->getResponse(theUser, language::insuf_access).c_str());
 		return false;
 	} 
-
-	/* Write a log of this event.. */
-	bot->writeChannelLog(theChan, theClient, sqlChannel::EV_PART, "");
-
+ 
 	sqlLevel* aLevel = bot->getLevelRecord(theUser, theChan);
  
 	theChan->setInChan(false); 
@@ -88,10 +85,15 @@ bool PARTCommand::Exec( iClient* theClient, const string& Message )
 		{
 		if(aLevel->getFlag(sqlLevel::F_FORCED))
 			{
-			bot->Part(theChan->getName(), "At the request of a CService Administrator");
+			bot->Part(theChan->getName(), "At the request of a CService Administrator"); 
+			bot->writeChannelLog(theChan, theClient, sqlChannel::EV_PART, "[CS-ADMIN]");
+
 			return true;
 			}
 		}
+
+	/* Write a log of this event.. */
+	bot->writeChannelLog(theChan, theClient, sqlChannel::EV_PART, "");
 
 	string partReason = "At the request of " + theUser->getUserName();
 

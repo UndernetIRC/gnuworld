@@ -9,7 +9,7 @@
 #include	"responses.h"
 #include	"Network.h"
  
-const char STATUSCommand_cc_rcsId[] = "$Id: STATUSCommand.cc,v 1.13 2001/02/14 23:31:51 gte Exp $" ;
+const char STATUSCommand_cc_rcsId[] = "$Id: STATUSCommand.cc,v 1.14 2001/02/15 21:08:14 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -129,15 +129,22 @@ bool STATUSCommand::Exec( iClient* theClient, const string& Message )
 				tmpChan->getModeString().c_str() ) ;
 
 			/*
-			 *  Execute a quick query to find the last 3 'events that occured on this
-			 *  channel.
+			 *  Execute a quick query to find the last 3 join/part events that occured
+			 *  on this channel.
 			 */
 
 			strstream theQuery;
-			theQuery << "SELECT * FROM channellog WHERE channelID = " 
+			theQuery << "SELECT * FROM channellog WHERE (event = "
+			<< sqlChannel::EV_JOIN << " OR event = "
+			<< sqlChannel::EV_PART << " OR event = "
+			<< sqlChannel::EV_OPERJOIN << " OR event = "
+			<< sqlChannel::EV_OPERPART << ")"
+			<< " AND channelID = " 
 			<< theChan->getID() 
 			<< " ORDER BY ts DESC LIMIT 3"
 			<< ends;
+
+			elog << "sqlQuery> " << theQuery.str() << endl;
 
 			ExecStatusType status = bot->SQLDb->Exec( theQuery.str() ) ; 
 			delete[] theQuery.str();
@@ -160,6 +167,16 @@ bool STATUSCommand::Exec( iClient* theClient, const string& Message )
 								type = "JOIN";
 								break;
 							}
+							case sqlChannel::EV_OPERJOIN:
+							{
+								type = "OPERJOIN";
+								break;
+							}
+							case sqlChannel::EV_OPERPART:
+							{
+								type = "OPERPART";
+								break;
+							} 
 							case sqlChannel::EV_PART:
 							{
 								type = "PART";
