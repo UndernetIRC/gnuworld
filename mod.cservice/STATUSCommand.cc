@@ -9,7 +9,7 @@
 #include	"responses.h"
 #include	"Network.h"
  
-const char STATUSCommand_cc_rcsId[] = "$Id: STATUSCommand.cc,v 1.19 2001/02/24 21:48:32 gte Exp $" ;
+const char STATUSCommand_cc_rcsId[] = "$Id: STATUSCommand.cc,v 1.20 2001/02/25 03:18:27 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -293,8 +293,8 @@ bool STATUSCommand::Exec( iClient* theClient, const string& Message )
 					cservice::sqlUserHashType::iterator ptr = bot->sqlUserCache.find(bot->SQLDb->GetValue(i, 0));
 					if(ptr != bot->sqlUserCache.end())
 					{ 
-						iClient* tmpClient = ptr->second->networkClient;
-						if(ptr->second->getFlag(sqlUser::F_LOGGEDIN))
+						iClient* tmpClient = ptr->second->isAuthed();
+						if(tmpClient)
 						{
 							authList << bot->SQLDb->GetValue(i, 0) 
 							<< "/"
