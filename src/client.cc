@@ -20,13 +20,14 @@
 
 #include	"client.h"
 #include	"EConfig.h"
+#include	"StringTokenizer.h"
 
 #include	"ELog.h"
 #include	"MessageNode.h"
 #include	"events.h"
 
 const char xClient_h_rcsId[] = __XCLIENT_H ;
-const char xClient_cc_rcsId[] = "$Id: client.cc,v 1.6 2000/08/02 22:49:43 dan_karrels Exp $" ;
+const char xClient_cc_rcsId[] = "$Id: client.cc,v 1.7 2000/08/02 23:15:43 dan_karrels Exp $" ;
 
 using std::string ;
 using std::strstream ;
@@ -400,6 +401,7 @@ Write( "%s D %s :%s",
 	theClient->getCharYYXXX().c_str(),
 	reason.c_str() ) ;
 
+/*
 // Do NOT cast away constness
 string localReason( reason ) ;
 
@@ -410,6 +412,7 @@ MyUplink->PostEvent( EVT_KILL,
 
 // Remove the user
 delete Network->removeClient( theClient ) ;
+*/
 
 return 0 ;
 }
@@ -542,12 +545,41 @@ return true ;
 bool xClient::Ban( Channel* theChan, iClient* theClient )
 {
 #ifndef NDEBUG
-  assert( theChan != NULL && theClient != NULL ) ;
+  assert( (theChan != NULL) && (theClient != NULL) ) ;
 #endif
 
 if( !Connected )
 	{
 	return false ;
+	}
+
+if( 0 == theChan->findUser( theClient ) )
+	{
+	// User is not on that channel
+	return true ;
+	}
+
+bool onChannel = isOnChannel( theChan ) ;
+if( !onChannel )
+	{
+	Join( theChan ) ;
+	}
+
+string banMask = makeBan( theChan, theClient ) ;
+
+Write( "%s M %s :+b %s",
+	getCharYYXXX().c_str(),
+	theChan->getName().c_str(),
+	banMask.c_str() ) ;
+
+// Update the channel's ban list
+theChan->setBan( banMask ) ;
+
+// No users are kicked by just setting a ban.
+
+if( !onChannel )
+	{
+	Part( theChan ) ;
 	}
 
 return true ;
@@ -565,6 +597,90 @@ if( !Connected )
 	}
 
 return true ;
+}
+
+bool xClient::BanKick( Channel* theChan, iClient* theClient, const string& reason )
+{
+#ifndef NDEBUG
+  assert( (theChan != NULL) && (theClient != NULL) ) ;
+#endif
+
+if( !Connected )
+	{
+	return false ;
+	}
+
+if( 0 == theChan->findUser( theClient ) )
+	{
+	// User is not on that channel
+	return true ;
+	}
+
+bool onChannel = isOnChannel( theChan ) ;
+if( !onChannel )
+	{
+	Join( theChan ) ;
+	}
+
+string banMask = makeBan( theChan, theClient ) ;
+
+Write( "%s M %s :+b %s",
+	getCharYYXXX().c_str(),
+	theChan->getName().c_str(),
+	banMask.c_str() ) ;
+
+Write( "%s K %s %s :%s",
+	getCharYYXXX().c_str(),
+	theChan->getName().c_str(),
+	theClient->getCharYYXXX().c_str(),
+	reason.c_str() ) ;
+
+if( !onChannel )
+	{
+	Part( theChan ) ;
+	}
+
+// Update the channel's ban list
+theChan->setBan( banMask ) ;
+
+// Let the server know about the departure of the client
+// This will handle posting the message
+MyUplink->OnPartChannel( theClient, theChan ) ;
+
+return true ;
+}
+
+string xClient::makeBan( Channel* theChan, iClient* theClient )
+{
+#ifndef NDEBUG
+  assert( (theChan != 0) && (theClient != 0) ) ;
+#endif
+
+// Setup the ban mask.
+
+// Ban all nicks, and non-identd'd hosts
+string banMask = "*!*" ;
+
+// Add the username
+banMask += theClient->getUserName() ;
+
+// Add the @ symbol between user@host
+banMask += "@" ;
+
+// Parse the user's hostname
+StringTokenizer st( theClient->getInsecureHost(), '.' ) ;
+if( st.size() < 2 )
+	{
+	elog	<< "xClient::makeBan> Invalid hostname: "
+		<< st.toString() << endl ;
+	return (banMask + "*") ;
+	}
+
+// Remove everything in the host except the last two tokens
+banMask += "*" ;
+banMask += st.assemble( st.size() - 2 ) ;
+
+return banMask ;
 }
 
 bool xClient::Kick( Channel* theChan, iClient* theClient, const string& reason )

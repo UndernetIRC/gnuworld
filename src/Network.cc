@@ -20,7 +20,7 @@
 #include	"misc.h"
 
 const char xNetwork_h_rcsId[] = __XNETWORK_H ;
-const char xNetwork_cc_rcsId[] = "$Id: Network.cc,v 1.10 2000/08/02 22:48:10 dan_karrels Exp $" ;
+const char xNetwork_cc_rcsId[] = "$Id: Network.cc,v 1.11 2000/08/02 23:15:43 dan_karrels Exp $" ;
 
 using std::string ;
 using std::endl ;
@@ -360,7 +360,8 @@ if( retMe != NULL )
 if( NULL == retMe )
 	{
 	elog	<< "xNetwork::removeClient( int, int )> Unable to find user "
-		<< *retMe << endl ;
+		<< "YY: " << YY << ", XXX: " << XXX << endl ;
+	return 0 ;
 	// Non-fatal
 	}
 #endif

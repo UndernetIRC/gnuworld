@@ -3,7 +3,7 @@
  */
 
 #ifndef __XCLIENT_H
-#define __XCLIENT_H "$Id: client.h,v 1.4 2000/08/02 22:48:10 dan_karrels Exp $"
+#define __XCLIENT_H "$Id: client.h,v 1.5 2000/08/02 23:15:43 dan_karrels Exp $"
 
 #include	<string>
 
@@ -204,6 +204,18 @@ public:
 	 * Set a ban on a channel, join/part the channel if necessary.
 	 */
 	virtual bool	Ban( Channel*, const vector< iClient* >& ) ;
+
+	/**
+	 * Ban kick a client from a channel for the given reason.
+	 */
+	virtual bool	BanKick( Channel*, iClient*, const string& ) ;
+
+	/**
+	 * This method creates a ban mask for the given user on the
+	 * given channel.
+	 * Should this be a const method?
+	 */
+	virtual string	makeBan( Channel*, iClient* ) ;
 
 	/**
 	 * Kick a user from a channel, join/part if necessary.
