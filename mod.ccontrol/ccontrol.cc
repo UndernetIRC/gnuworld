@@ -37,7 +37,7 @@
 #include	"ip.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.111 2002/01/02 22:22:25 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.112 2002/01/02 22:32:34 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -787,13 +787,13 @@ switch( theEvent )
 				if(strcasecmp(tIP,"0.0.0.0"))			
 					{
 					int CurConnections = ++clientsIpMap[tIP];
-					/*if((CurConnections  > getExceptions("*@" + tIP)) 
+					if((CurConnections  > getExceptions("*@" + tIP)) 
 					    && (CurConnections > getExceptions("*@"+NewUser->getInsecureHost())))
 						{
 						MsgChanLog("Glining %s , total  connections : %d\n"
 						,tIP.c_str(),CurConnections);
 						MsgChanLog(" IP Exception : %d , HOST Exception %d\n"						
-						,getExceptions("*@" + tIP),getExceptions("*@" + NewUser->getInsecureHost()));*/
+						,getExceptions("*@" + tIP),getExceptions("*@" + NewUser->getInsecureHost()));
 
 						/*glSet = true;
 						ccGline *tmpGline;
@@ -815,9 +815,9 @@ switch( theEvent )
 								tmpGline->getHost(),
 								tmpGline->getReason(),
 								tmpGline->getExpires() - ::time(0) ) ;*/
-						/*}	
+						}	
 					else
-						{*/
+						{
 						string virtualHost = NewUser->getDescription() + "@";
 						int dots = 0;
 						string ipClass = "";
@@ -837,7 +837,7 @@ switch( theEvent )
 							MsgChanLog("Virtual clones for %s connections %d\n",
 							    virtualHost.c_str(),CurConnections);
 							}
-						//}
+						}
 					}
 				}
 			if(!glSet) 
