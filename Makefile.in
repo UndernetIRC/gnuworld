@@ -105,6 +105,7 @@ MAINT = @MAINT@
 MAINTAINER_MODE_FALSE = @MAINTAINER_MODE_FALSE@
 MAINTAINER_MODE_TRUE = @MAINTAINER_MODE_TRUE@
 MAKEINFO = @MAKEINFO@
+NEW_MODS = @NEW_MODS@
 OBJEXT = @OBJEXT@
 PACKAGE = @PACKAGE@
 PACKAGE_BUGREPORT = @PACKAGE_BUGREPORT@
@@ -119,7 +120,6 @@ RANLIB = @RANLIB@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
-TEST_DIR = @TEST_DIR@
 VERSION = @VERSION@
 ac_ct_AR = @ac_ct_AR@
 ac_ct_CC = @ac_ct_CC@
@@ -164,7 +164,6 @@ subdirs = @subdirs@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 threadLib = @threadLib@
-topdir = @topdir@
 
 @COND_MODCCONTROL_TRUE@MODCCONTROL = mod.ccontrol
 
@@ -188,7 +187,7 @@ topdir = @topdir@
 
 @COND_DBDIR_TRUE@DBDIR = db
 
-SUBDIRS = libgnuworld libltdl src \
+SUBDIRS = libgnuworld libltdl src @NEW_MODS@ \
 	$(MODCCONTROL) \
 	$(MODCLIENTEXAMPLE) \
 	$(MODCLONER) \
@@ -326,9 +325,9 @@ DIST_COMMON = README ././include/defs.h.in ./include/defs.h.in AUTHORS \
 	COPYING ChangeLog INSTALL Makefile.am Makefile.in NEWS TODO \
 	aclocal.m4 config.guess config.sub configure configure.ac \
 	depcomp install-sh ltconfig ltmain.sh missing mkinstalldirs
-DIST_SUBDIRS = libgnuworld libltdl src mod.ccontrol mod.clientExample \
-	mod.cloner mod.cservice mod.dronescan mod.gnutest mod.nickserv \
-	mod.scanner mod.stats test db libircu
+DIST_SUBDIRS = libgnuworld libltdl src @NEW_MODS@ mod.ccontrol \
+	mod.clientExample mod.cloner mod.cservice mod.dronescan \
+	mod.gnutest mod.nickserv mod.scanner mod.stats test db libircu
 all: all-recursive
 
 .SUFFIXES:

@@ -96,7 +96,7 @@ INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
 LDFLAGS = @LDFLAGS@
 LIBLTDL = @LIBLTDL@
 LIBOBJS = @LIBOBJS@
-LIBS = @threadLib@ @LIBS@
+LIBS = @LIBS@
 LIBTOOL = @LIBTOOL@
 LIBTOOL_DEPS = @LIBTOOL_DEPS@
 LN_S = @LN_S@
@@ -105,6 +105,7 @@ MAINT = @MAINT@
 MAINTAINER_MODE_FALSE = @MAINTAINER_MODE_FALSE@
 MAINTAINER_MODE_TRUE = @MAINTAINER_MODE_TRUE@
 MAKEINFO = @MAKEINFO@
+NEW_MODS = @NEW_MODS@
 OBJEXT = @OBJEXT@
 PACKAGE = @PACKAGE@
 PACKAGE_BUGREPORT = @PACKAGE_BUGREPORT@
@@ -119,7 +120,6 @@ RANLIB = @RANLIB@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
-TEST_DIR = @TEST_DIR@
 VERSION = @VERSION@
 ac_ct_AR = @ac_ct_AR@
 ac_ct_CC = @ac_ct_CC@
@@ -164,7 +164,6 @@ subdirs = @subdirs@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 threadLib = @threadLib@
-topdir = @topdir@
 
 noinst_LTLIBRARIES = libgnuworld.la
 libgnuworld_la_SOURCES = Buffer.cc \
@@ -180,6 +179,7 @@ libgnuworld_la_SOURCES = Buffer.cc \
 	md5hash.cc \
 	misc.cc
 
+libgnuworld_la_LDFLAGS = $(threadLib)
 
 EXTRA_DIST = Buffer.h \
 	Connection.h \
@@ -204,7 +204,6 @@ CONFIG_HEADER = $(top_builddir)/include/defs.h
 CONFIG_CLEAN_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 
-libgnuworld_la_LDFLAGS =
 libgnuworld_la_LIBADD =
 am_libgnuworld_la_OBJECTS = Buffer.lo Connection.lo ConnectionHandler.lo \
 	ConnectionManager.lo EConfig.lo ELog.lo Signal.lo \

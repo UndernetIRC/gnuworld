@@ -14,7 +14,7 @@
 
 @SET_MAKE@
 
-# "$Id: Makefile.in,v 1.147 2003/07/03 18:30:59 dan_karrels Exp $"
+# "$Id: Makefile.in,v 1.148 2003/07/09 18:31:25 dan_karrels Exp $"
 
 srcdir = @srcdir@
 top_srcdir = @top_srcdir@
@@ -107,6 +107,7 @@ MAINT = @MAINT@
 MAINTAINER_MODE_FALSE = @MAINTAINER_MODE_FALSE@
 MAINTAINER_MODE_TRUE = @MAINTAINER_MODE_TRUE@
 MAKEINFO = @MAKEINFO@
+NEW_MODS = @NEW_MODS@
 OBJEXT = @OBJEXT@
 PACKAGE = @PACKAGE@
 PACKAGE_BUGREPORT = @PACKAGE_BUGREPORT@
@@ -121,7 +122,6 @@ RANLIB = @RANLIB@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
-TEST_DIR = @TEST_DIR@
 VERSION = @VERSION@
 ac_ct_AR = @ac_ct_AR@
 ac_ct_CC = @ac_ct_CC@
@@ -166,7 +166,6 @@ subdirs = @subdirs@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 threadLib = @threadLib@
-topdir = @topdir@
 
 lib_LTLIBRARIES = libgnutest.la
 libgnutest_la_SOURCES = gnutest.cc

@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-## $Id: Makefile.am,v 1.6 2003/06/28 01:21:18 dan_karrels Exp $
+## $Id: Makefile.am,v 1.7 2003/07/09 18:31:24 dan_karrels Exp $
 
 noinst_LTLIBRARIES = libgnuworld.la
 libgnuworld_la_SOURCES = Buffer.cc \
@@ -14,7 +14,7 @@ libgnuworld_la_SOURCES = Buffer.cc \
 	match.cc \
 	md5hash.cc \
 	misc.cc
-LIBS = @threadLib@ @LIBS@
+libgnuworld_la_LDFLAGS = $(threadLib)
 
 EXTRA_DIST = Buffer.h \
 	Connection.h \

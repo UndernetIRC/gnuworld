@@ -1,4 +1,4 @@
-## $Id: Makefile.am,v 1.15 2003/06/28 01:26:58 dan_karrels Exp $
+## $Id: Makefile.am,v 1.16 2003/07/09 18:31:23 dan_karrels Exp $
 ## test
 
 @SET_MAKE@
@@ -47,7 +47,7 @@ if COND_DBDIR
   DBDIR = db
 endif
 
-SUBDIRS = libgnuworld libltdl src \
+SUBDIRS = libgnuworld libltdl src @NEW_MODS@ \
 	$(MODCCONTROL) \
 	$(MODCLIENTEXAMPLE) \
 	$(MODCLONER) \

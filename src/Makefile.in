@@ -96,7 +96,7 @@ INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
 LDFLAGS = @LDFLAGS@
 LIBLTDL = @LIBLTDL@
 LIBOBJS = @LIBOBJS@
-LIBS = @threadLib@ @LIBS@
+LIBS = @LIBS@
 LIBTOOL = @LIBTOOL@
 LIBTOOL_DEPS = @LIBTOOL_DEPS@
 LN_S = @LN_S@
@@ -105,6 +105,7 @@ MAINT = @MAINT@
 MAINTAINER_MODE_FALSE = @MAINTAINER_MODE_FALSE@
 MAINTAINER_MODE_TRUE = @MAINTAINER_MODE_TRUE@
 MAKEINFO = @MAKEINFO@
+NEW_MODS = @NEW_MODS@
 OBJEXT = @OBJEXT@
 PACKAGE = @PACKAGE@
 PACKAGE_BUGREPORT = @PACKAGE_BUGREPORT@
@@ -119,7 +120,6 @@ RANLIB = @RANLIB@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
-TEST_DIR = @TEST_DIR@
 VERSION = @VERSION@
 ac_ct_AR = @ac_ct_AR@
 ac_ct_CC = @ac_ct_CC@
@@ -164,7 +164,6 @@ subdirs = @subdirs@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 threadLib = @threadLib@
-topdir = @topdir@
 
 lib_LTLIBRARIES = libgnuworldcore.la
 libgnuworldcore_la_SOURCES = Channel.cc \
@@ -190,12 +189,13 @@ bin_PROGRAMS = gnuworld
 gnuworld_SOURCES = main.cc
 
 gnuworld_LDFLAGS = $(glibdir)/libgnuworld.la \
-	$(LIBLTDL) libgnuworldcore.la -R$(bindir) -export-dynamic
+	$(LIBLTDL) libgnuworldcore.la -R$(bindir) -export-dynamic \
+	$(threadLib)
 
 gnuworld_DEPENDENCIES = $(glibdir)/libgnuworld.la \
 	$(LIBLTDL) libgnuworldcore.la
 
-INCLUDES = $(INCLTDL)
+gnuworld_CXXFLAGS = $(INCLTDL)
 subdir = src
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
@@ -212,7 +212,7 @@ libgnuworldcore_la_OBJECTS = $(am_libgnuworldcore_la_OBJECTS)
 bin_PROGRAMS = gnuworld$(EXEEXT)
 PROGRAMS = $(bin_PROGRAMS)
 
-am_gnuworld_OBJECTS = main.$(OBJEXT)
+am_gnuworld_OBJECTS = gnuworld-main.$(OBJEXT)
 gnuworld_OBJECTS = $(am_gnuworld_OBJECTS)
 gnuworld_LDADD = $(LDADD)
 
@@ -225,9 +225,9 @@ am__depfiles_maybe = depfiles
 @AMDEP_TRUE@	./$(DEPDIR)/Network.Plo \
 @AMDEP_TRUE@	./$(DEPDIR)/ServerTimerHandlers.Plo \
 @AMDEP_TRUE@	./$(DEPDIR)/UnloadClientTimerHandler.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/client.Plo ./$(DEPDIR)/iClient.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/iServer.Plo ./$(DEPDIR)/ip.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/main.Po ./$(DEPDIR)/server.Plo
+@AMDEP_TRUE@	./$(DEPDIR)/client.Plo ./$(DEPDIR)/gnuworld-main.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/iClient.Plo ./$(DEPDIR)/iServer.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/ip.Plo ./$(DEPDIR)/server.Plo
 CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
 LTCXXCOMPILE = $(LIBTOOL) --mode=compile $(CXX) $(DEFS) \
@@ -325,10 +325,10 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ServerTimerHandlers.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/UnloadClientTimerHandler.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/client.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gnuworld-main.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/iClient.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/iServer.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ip.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/main.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/server.Plo@am__quote@
 
 distclean-depend:
@@ -366,6 +366,39 @@ distclean-depend:
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/$*.Plo' tmpdepfile='$(DEPDIR)/$*.TPlo' @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LTCXXCOMPILE) -c -o $@ `test -f '$<' || echo '$(srcdir)/'`$<
+
+gnuworld-main.o: main.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gnuworld_CXXFLAGS) $(CXXFLAGS) -MT gnuworld-main.o -MD -MP -MF "$(DEPDIR)/gnuworld-main.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o gnuworld-main.o `test -f 'main.cc' || echo '$(srcdir)/'`main.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/gnuworld-main.Tpo" "$(DEPDIR)/gnuworld-main.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/gnuworld-main.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='main.cc' object='gnuworld-main.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/gnuworld-main.Po' tmpdepfile='$(DEPDIR)/gnuworld-main.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gnuworld_CXXFLAGS) $(CXXFLAGS) -c -o gnuworld-main.o `test -f 'main.cc' || echo '$(srcdir)/'`main.cc
+
+gnuworld-main.obj: main.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gnuworld_CXXFLAGS) $(CXXFLAGS) -MT gnuworld-main.obj -MD -MP -MF "$(DEPDIR)/gnuworld-main.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o gnuworld-main.obj `if test -f 'main.cc'; then $(CYGPATH_W) 'main.cc'; else $(CYGPATH_W) '$(srcdir)/main.cc'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/gnuworld-main.Tpo" "$(DEPDIR)/gnuworld-main.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/gnuworld-main.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='main.cc' object='gnuworld-main.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/gnuworld-main.Po' tmpdepfile='$(DEPDIR)/gnuworld-main.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gnuworld_CXXFLAGS) $(CXXFLAGS) -c -o gnuworld-main.obj `if test -f 'main.cc'; then $(CYGPATH_W) 'main.cc'; else $(CYGPATH_W) '$(srcdir)/main.cc'; fi`
+
+gnuworld-main.lo: main.cc
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gnuworld_CXXFLAGS) $(CXXFLAGS) -MT gnuworld-main.lo -MD -MP -MF "$(DEPDIR)/gnuworld-main.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o gnuworld-main.lo `test -f 'main.cc' || echo '$(srcdir)/'`main.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/gnuworld-main.Tpo" "$(DEPDIR)/gnuworld-main.Plo"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/gnuworld-main.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='main.cc' object='gnuworld-main.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/gnuworld-main.Plo' tmpdepfile='$(DEPDIR)/gnuworld-main.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gnuworld_CXXFLAGS) $(CXXFLAGS) -c -o gnuworld-main.lo `test -f 'main.cc' || echo '$(srcdir)/'`main.cc
 
 mostlyclean-libtool:
 	-rm -f *.lo

@@ -1,10 +1,10 @@
-dnl $Id: configure.ac,v 1.13 2003/07/03 18:30:58 dan_karrels Exp $
+dnl $Id: configure.ac,v 1.14 2003/07/09 18:31:24 dan_karrels Exp $
 dnl ----------------------------------------------------------
 
 echo Configuring GNUWorld...
 echo
 
-AC_REVISION($Revision: 1.13 $)
+AC_REVISION($Revision: 1.14 $)
 AC_INIT
 AC_CONFIG_SRCDIR([src/main.cc])
 AM_INIT_AUTOMAKE(gnuworld,2.2)
@@ -33,11 +33,8 @@ AM_PROG_LIBTOOL
 CFLAGS="-W -Wall -pipe"
 CXXFLAGS="-W -Wall -pipe"
 
-prefix="`pwd`"
-bindir="`pwd`/bin"
-libdir="`pwd`/lib"
+AC_PREFIX_DEFAULT(`pwd`)
 glibdir="`pwd`/libgnuworld"
-topdir="`pwd`"
 
 AC_PROG_CC
 AC_PROG_CXX
@@ -264,6 +261,7 @@ build_modnickserv=false
 build_modscanner=false
 build_modstats=false
 
+NEW_MODS=""
 MOD_DIRS=""
 searchForMods=yes
 
@@ -298,6 +296,7 @@ dnl	Prepare for conditionals
 	    mod.nickserv)	build_modnickserv=true;;
 	    mod.scanner)	build_modscanner=true;;
 	    mod.stats)		build_modstats=true;;
+	    *)			NEW_MODS="$NEW_MODS $moduleName"
 	  esac
 	done
 fi
@@ -330,6 +329,7 @@ dnl	echo "mod_list: $mod_list"
 		    mod.nickserv)	build_modnickserv=true;;
 		    mod.scanner)	build_modscanner=true;;
 		    mod.stats)		build_modstats=true;;
+		    *)			NEW_MODS="$NEW_MODS $moduleName"
 		  esac
 		fi
 	 done
@@ -345,23 +345,20 @@ AM_CONDITIONAL(COND_MODNICKSERV,[test $build_modnickserv = true])
 AM_CONDITIONAL(COND_MODSCANNER,[test $build_modscanner = true])
 AM_CONDITIONAL(COND_MODSTATS,[test $build_modstats = true])
 
-dnl echo "MOD_DIRS = $MOD_DIRS"
-dnl AC_SUBST(MOD_DIRS)
+for file in $NEW_MODS; do
+	AC_CONFIG_SUBDIRS($file)
+done
 
+AC_SUBST(NEW_MODS)
 AC_SUBST(DB)
-AC_SUBST(TEST_DIR)
 AC_SUBST(CXXFLAGS)
 AC_SUBST(INCLTDL)
 AC_SUBST(LIBLTDL)
-AC_SUBST(bindir)
-AC_SUBST(prefix)
-AC_SUBST(libdir)
 AC_SUBST(glibdir)
 AC_SUBST(LIBTOOL_DEPS)
 AC_SUBST(PGSQL_INCLUDE)
 AC_SUBST(PGSQL_LIB)
-AC_SUBST(bindir)
-AC_SUBST(topdir)
+AC_SUBST(libdir)
 
 AC_CONFIG_FILES([Makefile \
 db/Makefile \
