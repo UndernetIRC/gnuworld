@@ -1,0 +1,2 @@
+precious ^.*(\.conf)$
+precious ^server_command_map$
