@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------------
--- "$Id: cservice.sql,v 1.42 2001/06/12 22:16:48 gte Exp $"
+-- "$Id: cservice.sql,v 1.43 2001/06/16 21:56:27 gte Exp $"
 -- Channel service DB SQL file for PostgreSQL.
 
 -- ChangeLog:
@@ -279,8 +279,11 @@ CREATE TABLE pending (
 CREATE TABLE pending_traffic (
 	channel_id INT4 CONSTRAINT pending_traffic_channel_ref REFERENCES channels (id),
 	ip_number INT4,
-	join_count INT4
+	join_count INT4,
+	PRIMARY KEY(channel_id, ip_number)
 );
+
+CREATE INDEX pending_traffic_channel_id_idx ON pending_traffic(channel_id);
 
 CREATE TABLE domain (
 	id SERIAL,

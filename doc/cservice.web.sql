@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------------
--- "$Id: cservice.web.sql,v 1.7 2001/06/10 00:48:45 gte Exp $"
+-- "$Id: cservice.web.sql,v 1.8 2001/06/16 21:56:27 gte Exp $"
 -- Channel service DB SQL file for PostgreSQL.
 --
 -- Tables specific to webbased registration process.
@@ -44,7 +44,7 @@ CREATE TABLE regteam (
 
 -- recorded objections for channels.
 CREATE TABLE objections ( 
-	 channel_id int4 REFERENCES channels(id) NOT NULL, 
+	channel_id int4 REFERENCES channels(id) NOT NULL, 
 	user_id int4 REFERENCES users(id) NOT NULL, 
 	comment text NOT NULL, 
 	created_ts int4 NOT NULL,
@@ -52,3 +52,11 @@ CREATE TABLE objections (
 -- 'Y' : the objection is an admin comment on only * users sees it.
 -- 'N' : the objection is a regular one and everyone can see it.
 );
+
+-- Table used to store run-time configurable settings.
+
+CREATE TABLE variables (
+	var_name VARCHAR(30),
+	contents text,
+	PRIMARY KEY(var_name)
+)
