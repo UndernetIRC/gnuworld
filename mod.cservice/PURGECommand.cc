@@ -8,7 +8,7 @@
  *
  * Caveats: None
  *
- * $Id: PURGECommand.cc,v 1.9 2001/03/18 00:19:16 gte Exp $
+ * $Id: PURGECommand.cc,v 1.10 2001/04/30 01:26:21 gte Exp $
  */
  
 #include	<string>
@@ -22,7 +22,7 @@
 #include	"responses.h"
 #include	"cservice_config.h"
 
-const char PURGECommand_cc_rcsId[] = "$Id: PURGECommand.cc,v 1.9 2001/03/18 00:19:16 gte Exp $" ;
+const char PURGECommand_cc_rcsId[] = "$Id: PURGECommand.cc,v 1.10 2001/04/30 01:26:21 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -109,9 +109,15 @@ if( status != PGRES_TUPLES_OK )
 	return false ;
 	}
 
-string manager = bot->SQLDb->GetValue(0,0);
-string managerEmail = bot->SQLDb->GetValue(0,1);
+string manager = "No Manager";
+string managerEmail = "No Email Address";
 
+if (bot->SQLDb->Tuples() != 0)
+{
+	manager = bot->SQLDb->GetValue(0,0);
+	managerEmail = bot->SQLDb->GetValue(0,1); 
+}
+ 
 /*
  *  We simply flag this channel as 'deleted', and remove from the cache.
  *  Maintainence scripts can manually remove this channel and all related

@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-# "$Id: Makefile.am,v 1.34 2001/04/13 19:12:14 gte Exp $"
+# "$Id: Makefile.am,v 1.35 2001/04/30 01:26:21 gte Exp $"
 
 lib_LTLIBRARIES = libcservice.la
 libcservice_la_LDFLAGS = -module -export-dynamic -L@PGSQL_LIB@ \
@@ -11,6 +11,7 @@ libcservice_la_SOURCES = cservice.cc \
 	sqlUser.cc \
 	sqlLevel.cc \
 	sqlBan.cc \
+	sqlPendingChannel.cc \
 	ACCESSCommand.cc \
 	ADDUSERCommand.cc \
 	BANCommand.cc \
@@ -40,6 +41,7 @@ libcservice_la_SOURCES = cservice.cc \
 	REGISTERCommand.cc \
 	REHASHCommand.cc \
 	REMIGNORECommand.cc \
+	REMOVEALLCommand.cc \
 	REMUSERCommand.cc \
 	SAYCommand.cc \
 	SEARCHCommand.cc \
@@ -57,4 +59,3 @@ libcservice_la_SOURCES = cservice.cc \
 	VOICECommand.cc
 
 INCLUDES = -I@PGSQL_INCLUDE@
-

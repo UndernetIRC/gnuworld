@@ -1,5 +1,5 @@
 #ifndef __CSERVICECOMMANDS_H
-#define __CSERVICECOMMANDS_H "$Id: cserviceCommands.h,v 1.27 2001/04/13 19:12:14 gte Exp $"
+#define __CSERVICECOMMANDS_H "$Id: cserviceCommands.h,v 1.28 2001/04/30 01:26:21 gte Exp $"
 
 #include	<string>
 #include	"iClient.h"
@@ -113,6 +113,7 @@ DECLARE_COMMAND( OPERPART )
 // Admin level commands.
 
 DECLARE_COMMAND( REGISTER )
+DECLARE_COMMAND( REMOVEALL )
 DECLARE_COMMAND( PURGE )
 DECLARE_COMMAND( FORCE )
 DECLARE_COMMAND( UNFORCE )

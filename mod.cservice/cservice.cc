@@ -188,6 +188,7 @@ RegisterCommand(new CLEARMODECommand(this, "CLEARMODE", "<#channel>", 4));
 
 RegisterCommand(new REMIGNORECommand(this, "REMIGNORE", "<mask>", 5));
 RegisterCommand(new REGISTERCommand(this, "REGISTER", "<#channel> <username>", 8));
+RegisterCommand(new REMOVEALLCommand(this, "REMOVEALL", "<#channel>", 15));
 RegisterCommand(new PURGECommand(this, "PURGE", "<#channel> <reason>", 8));
 RegisterCommand(new FORCECommand(this, "FORCE", "<#channel>", 8));
 RegisterCommand(new UNFORCECommand(this, "UNFORCE", "<#channel>", 8));
@@ -3210,6 +3211,23 @@ void cservice::loadPendingChannelList()
  *  Then, clear the list free'ing up memory and finally emptying the list. 
  */
 
+if (pendingChannelList.size() > 0)
+{
+	pendingChannelListType::iterator ptr = pendingChannelList.begin();
+	
+	while (ptr != pendingChannelList.end())
+		{
+		sqlPendingChannel* pendingChan = ptr->second;
+		/* Commit the record */
+		pendingChan->commit();
+
+		ptr->second = NULL;
+		delete(pendingChan);
+		++ptr;
+		} /* while() */ 
+
+	pendingChannelList.clear();
+} 
 
 /*
  * For simplicity, we assume that if a pending channel is in state "1", then it has 10 valid
