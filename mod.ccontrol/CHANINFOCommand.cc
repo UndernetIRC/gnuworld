@@ -13,7 +13,7 @@
 #include	"StringTokenizer.h"
 #include	"Constants.h"
 
-const char CHANINFOCommand_cc_rcsId[] = "$Id: CHANINFOCommand.cc,v 1.11 2002/05/23 17:43:10 dan_karrels Exp $";
+const char CHANINFOCommand_cc_rcsId[] = "$Id: CHANINFOCommand.cc,v 1.12 2002/07/03 17:44:23 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -55,7 +55,10 @@ bot->Notice( theClient, "Created at time: %d",
 	theChan->getCreationTime() ) ;
 bot->Notice( theClient, "Number of channel users: %d",
 	theChan->size() ) ;
-
+#ifdef TOPIC_TRACK
+bot->Notice(theClient,"Topic: %s",
+	theChan->getTopic().c_str());
+#endif
 return true ;
 }
 
