@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server.cc,v 1.195 2004/01/25 14:35:32 dan_karrels Exp $
+ * $Id: server.cc,v 1.196 2004/02/13 16:55:45 jeekay Exp $
  */
 
 #include	<sys/time.h>
@@ -71,7 +71,7 @@
 #include	"ConnectionHandler.h"
 #include	"Connection.h"
 
-RCSTAG( "$Id: server.cc,v 1.195 2004/01/25 14:35:32 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: server.cc,v 1.196 2004/02/13 16:55:45 jeekay Exp $" ) ;
 
 namespace gnuworld
 {
@@ -665,7 +665,7 @@ strncpy( inputCharBuffer, line.c_str(), len + 1 ) ;
 
 if( verbose )
 	{
-	clog	<< "[IN]: "
+	clog	<< "[IN ]: "
 		<< line ;
 	}
 
