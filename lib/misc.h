@@ -4,7 +4,7 @@
  */
 
 #ifndef __MISC_H
-#define __MISC_H "$Id: misc.h,v 1.13 2001/09/23 02:42:38 gte Exp $"
+#define __MISC_H "$Id: misc.h,v 1.14 2002/03/25 23:40:22 mrbean_ Exp $"
 
 #include	<string.h>
 #include	<hash_map.h>
@@ -13,6 +13,7 @@
 
 #include	<cctype>
 #include	<cstring>
+#include	"match.h"
 
 namespace gnuworld
 {
@@ -72,6 +73,14 @@ inline size_t operator()( const string& s ) const
 	}
 } ;
 
+struct Match
+{
+inline bool operator()( const string& lhs, const string& rhs ) const
+	{
+	return (match( lhs, rhs ) < 0) ;
+	}
+} ;
+
 /**
  * Return a copy of a given C++ string, whose characters
  * are all lower case.
@@ -107,6 +116,7 @@ bool IsNumeric( const string& ) ;
  * given string.
  */
 size_t countChar( const string&, const char& ) ;
+
 
 } // namespace gnuworld
 

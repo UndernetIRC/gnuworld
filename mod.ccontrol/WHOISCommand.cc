@@ -14,7 +14,7 @@
 #include	"StringTokenizer.h"
 #include	"ip.h"
 
-const char WHOISCommand_cc_rcsId[] = "$Id: WHOISCommand.cc,v 1.11 2002/03/01 18:27:36 mrbean_ Exp $";
+const char WHOISCommand_cc_rcsId[] = "$Id: WHOISCommand.cc,v 1.12 2002/03/25 23:40:25 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -40,7 +40,6 @@ if( NULL == Target )
 	bot->Notice( theClient, "Unable to find nick: %s", st[ 1 ].c_str() ) ;
 	return true ;
 	}
-ccUser* tmpUser = bot->IsAuth(theClient);
 bot->MsgChanLog("WHOIS %s\n",st.assemble(1).c_str());
 
 iServer* targetServer = Network->findServer( Target->getIntYY() ) ;

@@ -13,7 +13,7 @@
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 
-const char LASTCOMCommand_cc_rcsId[] = "$Id: LASTCOMCommand.cc,v 1.9 2002/03/01 18:27:36 mrbean_ Exp $";
+const char LASTCOMCommand_cc_rcsId[] = "$Id: LASTCOMCommand.cc,v 1.10 2002/03/25 23:40:25 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -48,12 +48,10 @@ if( st.size() == 1 )
 			<< " ORDER BY ts DESC"
 			<< " LIMIT " << NumOfCom
 			<< ends;
-	ccUser* tmpUser = bot->IsAuth(theClient);
         bot->MsgChanLog("LASTCOM\n");
 	}
 else 
 	{
-	ccUser* tmpUser = bot->IsAuth(theClient);
         bot->MsgChanLog("LASTCOM %s\n");
 	NumOfCom = atoi(st[1].c_str());
 	if(st.size() > 2)

@@ -3,7 +3,7 @@
  */
 
 #ifndef __CCONTROL_H
-#define __CCONTROL_H "$Id: ccontrol.h,v 1.68 2002/03/20 22:23:50 mrbean_ Exp $"
+#define __CCONTROL_H "$Id: ccontrol.h,v 1.69 2002/03/25 23:40:25 mrbean_ Exp $"
 
 //Undef this if you want to log to the database
 #define LOGTOHD 
@@ -51,7 +51,7 @@ namespace uworld
 
 
 using gnuworld::xServer;
-
+using namespace std;
 /*
  *  Sublcass the postgres API to create our own accessor
  *  to get at the PID information.

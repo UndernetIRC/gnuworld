@@ -10,6 +10,7 @@ namespace gnuworld
 
 namespace uworld
 {
+using namespace std;
 
 class ccGate
 {

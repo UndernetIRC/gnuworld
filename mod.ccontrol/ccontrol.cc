@@ -38,7 +38,7 @@
 #include	"ip.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.137 2002/03/15 06:53:48 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.138 2002/03/25 23:40:25 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -53,7 +53,7 @@ namespace uworld
 {
 
 using gnuworld::xServer;
-
+using namespace std;
 
 /*
  *  Exported function used by moduleLoader to gain an
@@ -851,12 +851,12 @@ switch( theEvent )
 			string tIP = xIP( NewUser->getIP()).GetNumericIP();
 			if(strcasecmp(tIP,"0.0.0.0"))			
 				{
-				ccGate* tempGate = new (nothrow) ccGate(tIP,1080);
+				ccGate* tempGate = new (std::nothrow) ccGate(tIP,1080);
 				if(inBurst)
 					gatesWaitingQueue.push_back(tempGate);			
 				else
 					gatesWaitingQueue.push_front(tempGate);			
-				tempGate = new (nothrow) ccGate(tIP,23);
+				tempGate = new (std::nothrow) ccGate(tIP,23);
 				assert(tempGate != NULL);
 				if(inBurst)
 					gatesWaitingQueue.push_back(tempGate);			

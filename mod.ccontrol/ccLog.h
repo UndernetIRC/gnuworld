@@ -1,6 +1,6 @@
 
 /*
- $Id: ccLog.h,v 1.3 2002/02/01 14:04:48 mrbean_ Exp $
+ $Id: ccLog.h,v 1.4 2002/03/25 23:40:25 mrbean_ Exp $
  */
  
 #ifndef __CCLOG_H_
