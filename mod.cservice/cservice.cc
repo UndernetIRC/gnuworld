@@ -1619,13 +1619,15 @@ void cservice::cacheExpireUsers()
 		 *  isn't logged in, boot him out the window.
 		 */
 		if ( ((tmpUser->getLastUsed() + 3600) < currentTime()) &&
-			!tmpUser->isAuthed() )
+			!tmpUser->isAuthed() ) 
 		{ 
+#ifdef LOG_DEBUG
 			elog << "cservice::cacheExpireUsers> "
 			<< tmpUser->getUserName() 
 			<< "; last used: " 
 			<< tmpUser->getLastUsed() 
 			<< endl;
+#endif
 			purgeCount++;
 			removeKey = ptr->first;
 			/* Advance the iterator past the soon to be
