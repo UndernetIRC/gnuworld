@@ -1,7 +1,7 @@
 /**
  * mtrie_perf.cc
  *
- * $Id: mtrie_perf.cc,v 1.1 2003/07/27 22:26:47 dan_karrels Exp $
+ * $Id: mtrie_perf.cc,v 1.2 2003/07/30 13:29:25 dan_karrels Exp $
  */
 
 #include	<string>
@@ -44,7 +44,7 @@ if( !inFile )
 	return 0 ;
 	}
 
-string outputFileName( "mtrie_perf." ) ;
+string outputFileName( "mtrie_perf_" ) ;
 StringTokenizer fileTokens( argv[ 1 ], '/' ) ;
 outputFileName += fileTokens[ fileTokens.size() - 1 ] ;
 

@@ -22,3 +22,11 @@ This program reads an mtrie_perf output file and spits out some useful
 information about the MTrie, like max level, average number of values
 per node, etc.
 
+mtrie_load
+----------
+Perform load testing of the matching trie, comparing it to a multimap.  It 
+reads a file with N (optionally wildcard) strings to search for.  The 
+default files are mtrie.match*.  This program accepts a handful of command 
+line arguments and should be easy to use.  By default a multimap is used, 
+add -t to the command line to use a matching trie instead.
+

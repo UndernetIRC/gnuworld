@@ -1,12 +1,16 @@
 /**
  * mtrie_perf_summary.cc
  *
- * $Id: mtrie_perf_summary.cc,v 1.2 2003/07/28 15:28:57 dan_karrels Exp $
+ * $Id: mtrie_perf_summary.cc,v 1.3 2003/07/30 13:29:25 dan_karrels Exp $
  */
 
 #include	<string>
+#include	<vector>
 #include	<fstream>
 #include	<iostream>
+#include	<iterator>
+#include	<algorithm>
+#include	<functional>
 
 #include	"ELog.h"
 #include	"StringTokenizer.h"
@@ -43,6 +47,63 @@ size_t totalSubtrees = 0 ;
 size_t maxLevel = 0 ;
 size_t maxNumSubtrees = 0 ;
 size_t maxNumValues = 0 ;
+
+// strip off ".log"
+StringTokenizer fileTokens( argv[ 1 ], '.' ) ;
+string fileNameBase( fileTokens[ 0 ] ) ;
+
+if( argc > 2 )
+	{
+	fileNameBase = "mtrie_perf_summary" ;
+	}
+
+string levelFileName( fileNameBase + "_level.dat" ) ;
+string valueFileName( fileNameBase + "_value.dat" ) ;
+string subtreeFileName( fileNameBase + "_subtree.dat" ) ;
+
+ofstream levelFile( levelFileName.c_str() ) ;
+if( !levelFile )
+	{
+	clog	<< "Unable to open output file: "
+		<< levelFileName
+		<< endl ;
+	return 0 ;
+	}
+
+ofstream valueFile( valueFileName.c_str() ) ;
+if( !valueFile )
+	{
+	clog	<< "Unable to open output file: "
+		<< valueFileName
+		<< endl ;
+	levelFile.close() ;
+	return 0 ;
+	}
+
+ofstream subtreeFile( subtreeFileName.c_str() ) ;
+if( !subtreeFile )
+	{
+	clog	<< "Unable to open output file: "
+		<< "mtrie_subtree.dat"
+		<< endl ;
+	levelFile.close() ;
+	valueFile.close() ;
+	return 0 ;
+	}
+
+clog	<< endl
+	<< "Writing level information to: "
+	<< levelFileName << endl
+	<< "Writing value information to: "
+	<< valueFileName << endl
+	<< "Writing subtree information to: "
+	<< subtreeFileName
+	<< endl ;
+
+typedef vector< size_t > vectorType ;
+vectorType levelVec ;
+vectorType subtreeVec ;
+vectorType valueVec ;
 
 for( int i = 1 ; i < argc ; ++i )
 	{
@@ -85,6 +146,10 @@ for( int i = 1 ; i < argc ; ++i )
 		size_t numValues =
 			static_cast< size_t >( atoi( st[ 2 ].c_str() ) ) ;
 
+		levelVec.push_back( theLevel ) ;
+		subtreeVec.push_back( numSubtrees ) ;
+		valueVec.push_back( numValues ) ;
+
 		++totalNodes ;
 		totalValues += numValues ;
 		totalSubtrees += numSubtrees ;
@@ -105,6 +170,18 @@ for( int i = 1 ; i < argc ; ++i )
 
 	inFile.close() ;
 	} // for( i )
+
+
+std::copy( levelVec.begin(), levelVec.end(),
+	std::ostream_iterator< size_t >( levelFile, " " ) ) ;
+std::copy( valueVec.begin(), valueVec.end(),
+	std::ostream_iterator< size_t >( valueFile, " " ) ) ;
+std::copy( subtreeVec.begin(), subtreeVec.end(),
+	std::ostream_iterator< size_t >( subtreeFile, " " ) ) ;
+
+levelFile.close() ;
+valueFile.close() ;
+subtreeFile.close() ;
 
 clog	<< endl
 	<< endl
