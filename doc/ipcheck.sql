@@ -12,7 +12,7 @@
 -- after you created the "ipcheck" database. This database must be local to the website.
 --
 --
--- nighty <nighty@undernet.org> - 09/13/2001
+-- nighty <nighty@undernet.org> - 09/13/2001 - Last modif. 10/14/2001
 
 CREATE TABLE exclusions (
    excluded varchar(15) DEFAULT '0.0.0.0' NOT NULL,
