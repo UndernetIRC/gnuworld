@@ -1,7 +1,7 @@
 /* ccGline.h */
 
 #ifndef __CCGLINE_H
-#define __CCGLINE_H "$Id: ccGline.h,v 1.12 2003/02/10 12:22:10 mrbean_ Exp $"
+#define __CCGLINE_H "$Id: ccGline.h,v 1.13 2003/03/06 12:34:13 mrbean_ Exp $"
 
 #include	<string>
 #include	<list>
@@ -21,9 +21,6 @@ namespace uworld
 class ccGline
 {
 public:
-	typedef list<string*>	burstServersType;
-	
-	typedef burstServersType::iterator burstIterator;
 
 	ccGline(PgDatabase*);
 	
@@ -100,7 +97,6 @@ protected:
 	time_t Expires;
 	time_t LastUpdated;
 	string Reason;
-	burstServersType	burstServers;
 	PgDatabase* SQLDb;
 	
 }; // class ccGline

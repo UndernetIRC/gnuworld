@@ -9,7 +9,7 @@
 #include	"ccontrol.h"
 #include	"CControlCommands.h"
 
-const char CONFIGCommand_cc_rcsId[] = "$Id: CONFIGCommand.cc,v 1.4 2003/02/19 15:19:29 mrbean_ Exp $";
+const char CONFIGCommand_cc_rcsId[] = "$Id: CONFIGCommand.cc,v 1.5 2003/03/06 12:34:13 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -117,6 +117,26 @@ for(unsigned int  pos =1; pos < st.size() ;)
 		if(!bot->updateMisc("GTime",atoi(st[pos+1].c_str())))
 			{
 			bot->MsgChanLog("Error while updating the gline duration in the db!\n");
+			}
+		else
+			{
+			bot->Notice(theClient,"%s was successfully updated to %s",
+				    st[pos].c_str(),st[pos+1].c_str());
+			}
+
+		pos+=2;			
+		}
+
+	else if(!strcasecmp(st[pos],"-SGline"))
+		{
+		if(st.size() < pos +2)
+			{
+			bot->Notice(theClient,"-SGline must get a yes/no answer indicating whether or not to save glines");
+			return true;
+			}
+		if(!bot->updateMisc("SGLine",(strcasecmp(st[pos+1],"YES") == 0) ? 1 : 0))
+			{
+			bot->MsgChanLog("Error while updating the save gline flag in the db\n");
 			}
 		else
 			{

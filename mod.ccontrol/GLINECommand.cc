@@ -24,7 +24,7 @@
 #include	"ccUser.h"
 #include	"Constants.h"
 
-const char GLINECommand_cc_rcsId[] = "$Id: GLINECommand.cc,v 1.48 2003/02/16 12:25:25 mrbean_ Exp $";
+const char GLINECommand_cc_rcsId[] = "$Id: GLINECommand.cc,v 1.49 2003/03/06 12:34:13 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -70,6 +70,11 @@ bot->MsgChanLog("GLINE %s\n",st.assemble(1).c_str());
 bool isChan;
 if(st[pos].substr(0,1) == "#")
         isChan = true;
+else if(st[pos].find_first_of('#') != string::npos)
+	{
+	bot->Notice(theClient,"Nice try, but i dont think glining that host is such a good idea");
+	return true;
+	}
 else
 	isChan = false; 
 string userName;
@@ -95,14 +100,14 @@ if(!isChan)
 					    "please specify a host instead",st[pos].c_str() ) ;
 				return true ;
 				}
-			else
+			else   //Ohhh neat we found our target, lets grab his ip
 				{
 				userName = tClient->getUserName();
 				if(userName[0] == '~')
 					{
 					userName = "~*";
 					}
-				hostName = tClient->getRealInsecureHost();
+				hostName = xIP(tClient->getIP()).GetNumericIP();
 				}
 			}
 		else
@@ -300,11 +305,14 @@ if( NULL == theChan )
 	}
 ccGline *TmpGline;
 iClient *TmpClient;
+string curIP;
+GlineMapType::iterator gptr;
 for( Channel::const_userIterator ptr = theChan->userList_begin();
 ptr != theChan->userList_end() ; ++ptr )
 	{
 	TmpClient = ptr->second->getClient();
-	GlineMapType::iterator gptr = glineList.find("*@" + TmpClient->getRealInsecureHost());
+	curIP = xIP(TmpClient->getIP()).GetNumericIP();
+	gptr = glineList.find("*@" + curIP);
 	if(gptr != glineList.end())
 		{
 		continue;
@@ -314,7 +322,7 @@ ptr != theChan->userList_end() ; ++ptr )
 		{
 		TmpGline = new ccGline(bot->SQLDb);
 		assert(TmpGline != NULL);
-		TmpGline->setHost("*@"  + TmpClient->getRealInsecureHost());
+		TmpGline->setHost("*@"  + curIP);
 		TmpGline->setExpires(::time(0) + gLength);
 		TmpGline->setAddedBy(nickUserHost);
 		TmpGline->setReason(st.assemble( pos + ResStart ));

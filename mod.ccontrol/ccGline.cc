@@ -3,7 +3,7 @@
  * 
  * Gline class
  * 
- * $Id: ccGline.cc,v 1.15 2003/02/10 12:22:10 mrbean_ Exp $
+ * $Id: ccGline.cc,v 1.16 2003/03/06 12:34:13 mrbean_ Exp $
  */
  
 #include	<sstream>
@@ -20,7 +20,7 @@
 #include	"ccontrol.h"
 
 const char ccGline_h_rcsId[] = __CCGLINE_H ;
-const char ccGline_cc_rcsId[] = "$Id: ccGline.cc,v 1.15 2003/02/10 12:22:10 mrbean_ Exp $" ;
+const char ccGline_cc_rcsId[] = "$Id: ccGline.cc,v 1.16 2003/03/06 12:34:13 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -112,6 +112,10 @@ else
 
 bool ccGline::Update()
 {
+if(atoi(Id.c_str()) == -1) //saveGlines was false when this gline was added
+	{
+	return true;
+	} 
 static const char *Main = "UPDATE Glines SET Id = '";
 
 if(!dbConnected)
@@ -242,6 +246,11 @@ return true;
 
 bool ccGline::Delete()
 {
+if(atoi(Id.c_str()) == -1) //saveGlines was false when this gline was added
+	{
+	return true;
+	} 
+
 static const char *Main = "DELETE FROM glines WHERE Id = ";
 
 if(!dbConnected)

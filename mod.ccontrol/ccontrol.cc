@@ -11,7 +11,7 @@
 /* ccontrol.cc
  * Authors: Daniel Karrels dan@karrels.com
  *	    Tomer Cohen    MrBean@toughguy.net
- * $Id: ccontrol.cc,v 1.163 2003/03/04 22:54:15 mrbean_ Exp $
+ * $Id: ccontrol.cc,v 1.164 2003/03/06 12:34:13 mrbean_ Exp $
  */
 
 #define MAJORVER "1"
@@ -56,7 +56,7 @@
 #include	"ip.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.163 2003/03/04 22:54:15 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.164 2003/03/06 12:34:13 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -646,6 +646,7 @@ RegisterCommand( new MAXUSERSCommand( this, "MAXUSERS",
 RegisterCommand( new CONFIGCommand( this, "CONFIG",
 	" -GTime <duration in secs> / -VClones <amount> -Clones <amount> "
 	" -GBCount <count> / -GBInterval <interval in secs> "
+	" -SGline <Yes/No> "
 	"Manages all kinds of configuration related values ",
 	commandLevel::flg_CONFIG,
 	false,
@@ -1314,9 +1315,16 @@ switch( theEvent )
 		newGline->setHost(newG->getUserHost());
 		newGline->setReason(newG->getReason());
 		newGline->setExpires(newG->getExpiration());
-		newGline->Insert();
-		//need to load the id
-		newGline->loadData(newGline->getHost());
+		if(saveGlines)
+			{
+			newGline->Insert();
+			//need to load the id
+			newGline->loadData(newGline->getHost());
+			}
+		else
+			{
+			newGline->setId("-1");
+			}
 		addGline(newGline);
 		break;
 		}
@@ -1590,7 +1598,21 @@ if(dbConnected)
 				{
 				MsgChanLog("Excessive connections (%d) from host *@%s\n"
 					    ,CurConnections,NewUser->getRealInsecureHost().c_str());
-				
+				char Log[200];
+				sprintf(Log,"Glining *@%s for excessive connections (%d)"
+					,tIP.c_str(),CurConnections);
+			        iClient* theClient = Network->findClient(this->getCharYYXXX());
+#ifndef LOGTOHD
+				DailyLog(theClient,"%s",Message.c_str());
+#else
+				ccLog* newLog = new (std::nothrow) ccLog();
+				newLog->Time = ::time(0);
+				newLog->Desc = Log;
+				newLog->Host = theClient->getRealNickUserHost().c_str();
+				newLog->User = "Me";			
+				newLog->CommandName = "AUTOGLINE";
+				DailyLog(newLog);
+#endif
 				glSet = true;
 				ccGline *tmpGline;
 				tmpGline = new ccGline(SQLDb);
@@ -1649,12 +1671,6 @@ if(dbConnected)
 			theGline->setLastUpdated(tempGline->getLastUpdated());
 			theGline->setReason(tempGline->getReason());
 			queueGline(theGline,false);
-			/*else
-				{
-				string* tServer = new (std::nothrow) string(NewUser->getCharYY());
-				assert(tServer != NULL);
-				tempGline->addBurst(tServer);
-				}*/
 			}
 		}			
 	}
@@ -1686,8 +1702,8 @@ else
 	list<const iClient*>::iterator ptr;
 	const iClient* curClient;
 	string Host;
-	Expires = (theGline->getExpires()-::time(0) > 3600*24 
-		    ? 3600*24 : theGline->getExpires() - ::time(0));
+	Expires = (theGline->getExpires()-::time(0) > 3600*6 
+		    ? 3600*6 : theGline->getExpires());
 	for(ptr = cList.begin(); ptr != cList.end(); ++ptr)
 		{
 		curClient = *ptr;    
@@ -1695,7 +1711,7 @@ else
 		tmpGline = new (std::nothrow) ccGline(SQLDb);
 		tmpGline->setHost(Host);
 		tmpGline->setAddedBy(theGline->getAddedBy());
-		tmpGline->setExpires(theGline->getExpires());
+		tmpGline->setExpires(Expires);
 		tmpGline->setAddedOn(theGline->getAddedOn());
 		tmpGline->setLastUpdated(theGline->getLastUpdated());
 		tmpGline->setReason(theGline->getReason());
@@ -2310,8 +2326,6 @@ bool ccontrol::addGline( ccGline* TempGline)
 glineIterator ptr;
 if(TempGline->getHost().substr(0,1) == "$") //check if its a realname gline
 	{	
-	//ptr = rnGlineList.begin();
-//	endlist = rnGlineList.end();
 
 	ptr = rnGlineList.find(TempGline->getHost());
 	if(ptr != rnGlineList.end())
@@ -2323,28 +2337,6 @@ if(TempGline->getHost().substr(0,1) == "$") //check if its a realname gline
 			}
 		}				
 		rnGlineList[TempGline->getHost()] = TempGline;
-
-/*	for(; ptr != endlist;)
-		{
-		theGline = *ptr;
-		if(theGline->getHost() == TempGline->getHost()) 
-			{
-			if(TempGline != theGline)  //Make sure we are not deleting the one we need to add
-				{
-				ptr = rnGlineList.erase(ptr);
-				delete theGline;
-				}
-			else 
-				{
-				addedAlready = true;
-				++ptr;
-				}		
-			}
-		else
-			++ptr;
-		}
-	if(!addedAlready) //if we found the gline we need to add, no need to add it			
-	        rnGlineList.push_back( TempGline ) ;*/
 
 	}
 else
@@ -2360,31 +2352,6 @@ else
 		}				
 	glineList[TempGline->getHost()] = TempGline;
 
-/*	ptr = glineList.begin();
-	endlist = glineList.end();
-
-	
-	for(; ptr != endlist;)
-		{
-		theGline = *ptr;
-		if(theGline->getHost() == TempGline->getHost()) 
-			{
-			if(TempGline != theGline)  //Make sure we are not deleting the one we need to add
-				{
-				ptr = glineList.erase(ptr);
-				delete theGline;
-				}
-			else 
-				{
-				addedAlready = true;
-				++ptr;
-				}		
-			}
-		else
-			++ptr;
-		}
-	if(!addedAlready) //if we found the gline we need to add, no need to add it			
-	        glineList.push_back( TempGline ) ;*/
 	}
 return true;
 }    
@@ -2469,14 +2436,6 @@ if(ptr != glineList.end())
 	return ptr->second;
 	}
 	
-/*for(glineIterator ptr = glineList.begin(); ptr != glineList.end();++ptr)
-	{
-	theGline = ptr;
-    	if(!strcasecmp(theGline->getHost(),HostName))
-		if(theGline->getExpires() > ::time(0))
-			return theGline;
-	}*/
-
 return NULL ;
 }
 
@@ -2488,15 +2447,6 @@ if(ptr != rnGlineList.end())
 	{
 	return ptr->second;
 	}
-
-//ccGline *theGline;
-/*for(glineIterator ptr = rnGlineList.begin(); ptr != rnGlineList.end();++ptr)
-	{
-	theGline = *ptr;
-    	if(!strcasecmp(theGline->getHost(),HostName))
-		if(theGline->getExpires() > ::time(0))
-			return theGline;
-	}*/
 
 return NULL ;
 }
@@ -3615,6 +3565,7 @@ bool gotCount = false;
 bool gotVClones = false;
 bool gotClones = false;
 bool gotGLen = false;
+bool gotSave = false;
  
 if(!dbConnected)
         {   
@@ -3668,6 +3619,12 @@ for(int i=0; i< SQLDb->Tuples();++i)
 		maxGlineLen = atoi(SQLDb->GetValue(i,1));
 		}
 
+	else if(!strcasecmp(SQLDb->GetValue(i,0),"SGline"))
+		{
+		gotSave = true;
+		saveGlines = (atoi(SQLDb->GetValue(i,1)) == 1);
+		}
+
 	}
 if(!gotCount)
 	{
@@ -3694,7 +3651,11 @@ if(!gotGLen)
 	maxGlineLen = 3600;
 	updateMisc("GTime",maxGlineLen);
 	}
-
+if(!gotSave)
+	{
+	saveGlines = true;
+	updateMisc("SGline",saveGlines);
+	}
 return true;
 }
 
@@ -4300,10 +4261,6 @@ for(serverIt = serversMap.begin();serverIt != serversMap.end();++serverIt)
 		return serverIt->first;
 	}
 return "";
-/*ccServer* tmpServer = getServer(Name);
-if(tmpServer)
-	return tmpServer->getName();
-return "";*/
 
 }
 
@@ -4444,7 +4401,7 @@ Notice(tmpClient,"ccUser: %d",ccUser::numAllocated);
 Notice(tmpClient,"Total of %d users in the map",usersMap.size()); 
 Notice(tmpClient,"GBCount : %d , GBInterval : %d",glineBurstCount,glineBurstInterval);
 Notice(tmpClient,"Max Clones : %d , Max Virtual Clones : %d",maxClones,maxVClones);
- 
+Notice(tmpClient,"Save gline is : %s",saveGlines ? "True" : "False"); 
 }
 
 bool ccontrol::updateMisc(const string& varName, const unsigned int Value)
@@ -4469,6 +4426,11 @@ else if(!strcasecmp(varName,"VClones"))
 else if(!strcasecmp(varName,"GTime"))
 	{
 	maxGlineLen = Value;
+	}
+
+else if(!strcasecmp(varName,"SGline"))
+	{
+	saveGlines = (Value == 1);
 	}
 
 if(!dbConnected)
@@ -4551,12 +4513,6 @@ if(serverIt != serversMap.end())
 	return serverIt->second;
 	}
 return NULL;
-
-/*ccServer* tempServer = serversMap[Name];
-if(tempServer)
-	return tempServer;
-serversMap.erase(serversMap.find(Name));
-return NULL;*/
 
 }
 

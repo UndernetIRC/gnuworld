@@ -18,7 +18,7 @@
 #include	"ELog.h"
 #include	"Constants.h"
 
-const char SGLINECommand_cc_rcsId[] = "$Id: SGLINECommand.cc,v 1.4 2003/02/10 12:22:09 mrbean_ Exp $";
+const char SGLINECommand_cc_rcsId[] = "$Id: SGLINECommand.cc,v 1.5 2003/03/06 12:34:13 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -63,6 +63,11 @@ string RealHost;
 ccUser* tmpUser = bot->IsAuth(theClient);
 bot->MsgChanLog("SGLINE %s\n",st.assemble(1).c_str());
 
+if(!RealName &&(string::npos != st[pos].find_first_of('#')))
+	{
+	bot->Notice(theClient,"I dont think glining that host is such a good idea");
+	return true;
+	}
 time_t gLength = bot->getDefaultGlineLength() ;
 
 // (pos) is the index of the next token, the user@host mask.

@@ -18,7 +18,7 @@
 #include	"ELog.h"
 #include	"Constants.h"
 
-const char FORCEGLINECommand_cc_rcsId[] = "$Id: FORCEGLINECommand.cc,v 1.26 2003/02/10 12:22:08 mrbean_ Exp $";
+const char FORCEGLINECommand_cc_rcsId[] = "$Id: FORCEGLINECommand.cc,v 1.27 2003/03/06 12:34:13 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -71,6 +71,11 @@ time_t gLength = bot->getDefaultGlineLength() ;
 
 // (pos) is the index of the next token, the user@host mask.
 
+if(string::npos != st[pos].find_first_of('#'))
+	{
+	bot->Notice(theClient,"I dont think glining that host is such a good idea, lose the #");
+	return true;
+	}
 if(st[pos].substr(0,1) == "$")
 	{
 	bot->Notice(theClient,"Please use sgline to set that gline");

@@ -3,7 +3,7 @@
  */
 
 #ifndef __CCONTROL_H
-#define __CCONTROL_H "$Id: ccontrol.h,v 1.85 2003/03/04 22:54:16 mrbean_ Exp $"
+#define __CCONTROL_H "$Id: ccontrol.h,v 1.86 2003/03/06 12:34:13 mrbean_ Exp $"
 
 //Undef this if you want to log to the database
 #define LOGTOHD 
@@ -997,6 +997,8 @@ protected:
 	unsigned int 		glineBurstInterval;
 	
 	unsigned int 		glineBurstCount; 
+	
+	bool			saveGlines;
 	
 } ; 
 
