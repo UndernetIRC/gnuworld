@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: main.cc,v 1.43 2002/07/16 13:51:12 dan_karrels Exp $
+ * $Id: main.cc,v 1.44 2002/07/16 15:30:49 dan_karrels Exp $
  */
 
 #include	<new>
@@ -42,7 +42,7 @@
 #include	"md5hash.h"
 
 const char config_h_rcsId[] = __CONFIG_H ;
-const char main_cc_rcsId[] = "$Id: main.cc,v 1.43 2002/07/16 13:51:12 dan_karrels Exp $" ;
+const char main_cc_rcsId[] = "$Id: main.cc,v 1.44 2002/07/16 15:30:49 dan_karrels Exp $" ;
 const char ELog_h_rcsId[] = __ELOG_H ;
 const char FileSocket_h_rcsId[] = __FILESOCKET_H ;
 const char server_h_rcsId[] = __SERVER_H ;
@@ -198,7 +198,8 @@ while( (c = getopt( argc, argv, "cd:f:hs:")) != EOF )
 		case 4:
 		case 's':
 			simFileName = optarg ;
-			clog << "*** Running in simulation mode...\n" ;
+			clog	<< "*** Running in simulation mode..."
+				<< endl ;
 			break ;
 		case ':':
 			clog << "*** Missing parameter\n" ;
@@ -217,11 +218,13 @@ while( (c = getopt( argc, argv, "cd:f:hs:")) != EOF )
 	elog.openFile( elogFileName.c_str() ) ;
 	if( !elog.isOpen() )
 		{
-		clog	<< "*** Unable to open elog file: " << elogFileName
+		clog	<< "*** Unable to open elog file: "
+			<< elogFileName
 			<< endl ;
 		::exit( 0 ) ;
 		}
-	clog	<< "*** Running in debug mode...\n" ;
+	clog	<< "*** Running in debug mode..."
+		<< endl ;
 #endif
 
 if( verbose )
@@ -283,38 +286,33 @@ while( keepRunning )
 	// and that Poll() can block indefinitely.
 	bool setTimers = false ;
 
-	timeval tv = { 0, 0 } ;
+	long seconds = -1 ;
 	time_t now = ::time( 0 ) ;
 
         if( !timerQueue.empty() )
                 {
+//		elog	<< "mainLoop> Found a timer"
+//			<< endl ;
+
                 // Yes, set select() timeout to time at which
                 // the nearest timer will expire
                 setTimers = true ;
 
 		// Set tv.tv_sec to the duration (in seconds) until
 		// the first timer will expire.
-                tv.tv_sec = timerQueue.top().second->absTime - now ;
+                seconds = timerQueue.top().second->absTime - now ;
 
-		if( tv.tv_sec < 0 )
+		if( seconds < 0 )
 			{
 			// A negative value here will result
 			// in inifinite blocking in Poll(),
 			// which is exactly opposite of what is needed here
-			tv.tv_sec = 0 ;
+			seconds = 0 ;
 			}
                 }
 
-	// Process all data
-	if( setTimers )
-		{
-		// Use a timeout
-		Poll( tv.tv_sec, 0 ) ;
-		}
-	else
-		{
-		Poll( -1 ) ;
-		}
+	// Process all available data
+	Poll( seconds ) ;
 
 	// Poll() will call all appropriate data handlers
 	// Check the timers

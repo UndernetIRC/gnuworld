@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_B.cc,v 1.14 2002/07/10 14:40:48 dan_karrels Exp $
+ * $Id: msg_B.cc,v 1.15 2002/07/16 15:30:49 dan_karrels Exp $
  */
 
 #include	<sys/types.h>
@@ -50,7 +50,7 @@ const char Channel_h_rcsId[] = __CHANNEL_H ;
 const char ChannelUser_h_rcsId[] = __CHANNELUSER_H ;
 const char Network_h_rcsId[] = __NETWORK_H ;
 const char iClient_h_rcsId[] = __ICLIENT_H ;
-const char msg_B_cc_rcsId[] = "$Id: msg_B.cc,v 1.14 2002/07/10 14:40:48 dan_karrels Exp $" ;
+const char msg_B_cc_rcsId[] = "$Id: msg_B.cc,v 1.15 2002/07/16 15:30:49 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -260,7 +260,7 @@ void msg_B::parseBurstUsers( Channel* theChan, const string& theUsers )
 // This is a protected method, so the method arguments are
 // guaranteed to be valid
 
-//clog	<< "msg_B::parseBurstUsers> Channel: " << theChan->getName()
+//elog	<< "msg_B::parseBurstUsers> Channel: " << theChan->getName()
 //	<< ", users: " << theUsers << endl ;
 
 // Parse out users and their modes

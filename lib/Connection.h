@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: Connection.h,v 1.9 2002/07/10 14:40:46 dan_karrels Exp $
+ * $Id: Connection.h,v 1.10 2002/07/16 15:30:49 dan_karrels Exp $
  */
 
 #ifndef __CONNECTION_H
-#define __CONNECTION_H "$Id: Connection.h,v 1.9 2002/07/10 14:40:46 dan_karrels Exp $"
+#define __CONNECTION_H "$Id: Connection.h,v 1.10 2002/07/16 15:30:49 dan_karrels Exp $"
 
 #include	<sys/types.h>
 #include	<netinet/in.h>
@@ -35,13 +35,14 @@
 
 #include	"Buffer.h"
 
+namespace gnuworld
+{
+
 /// Import the C++ standard string class
 using std::string ;
 
 using std::ostream ;
 using std::endl ;
-
-using gnuworld::Buffer ;
 
 /// Forward declaration of the manager class
 class ConnectionManager ;
@@ -338,5 +339,7 @@ protected:
 	time_t			absTimeout ;
 
 } ;
+
+} // namespace gnuworld
 
 #endif // __CONNECTION_H

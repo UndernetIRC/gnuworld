@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server.h,v 1.69 2002/07/16 13:51:02 dan_karrels Exp $
+ * $Id: server.h,v 1.70 2002/07/16 15:30:47 dan_karrels Exp $
  */
 
 #ifndef __SERVER_H
-#define __SERVER_H "$Id: server.h,v 1.69 2002/07/16 13:51:02 dan_karrels Exp $"
+#define __SERVER_H "$Id: server.h,v 1.70 2002/07/16 15:30:47 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
@@ -199,9 +199,11 @@ public:
 	inline glineIterator	gline_end()
 		{ return glineList.end() ; }
 
-	virtual void OnDisConnect( Connection* ) ;
+	virtual void OnDisconnect( Connection* ) ;
 
 	virtual void OnConnect( Connection* ) ;
+
+	virtual void OnRead( Connection*, const string& ) ;
 
 	/**
 	 * Attach a fake server to this services server.
@@ -755,7 +757,7 @@ public:
 	 * This method should ONLY be called by the server command
 	 * handlers.
 	 */
-	inline void WriteBurstBuffer() ;
+	virtual void WriteBurstBuffer() ;
 
 	/**
 	 * Shutdown the server.
@@ -1323,8 +1325,11 @@ protected:
 	 * The char array to be used to read in network data.
 	 * This is allocated only once in the server for
 	 * performance reasons.
+	 * It is of fixed size since this buffer isn't used for
+	 * actual reading from the network connection, only for
+	 * handling a single network message a time (max 512 bytes).
 	 */
-	char*		inputCharBuffer ;
+	char		inputCharBuffer[ 1024 ] ;
 
 	/**
 	 * True if all elog data should be output to clog.

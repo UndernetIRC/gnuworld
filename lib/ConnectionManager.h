@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ConnectionManager.h,v 1.9 2002/07/10 14:40:46 dan_karrels Exp $
+ * $Id: ConnectionManager.h,v 1.10 2002/07/16 15:30:49 dan_karrels Exp $
  */
 
 #ifndef __CONNECTIONMANAGER_H
-#define __CONNECTIONMANAGER_H "$Id: ConnectionManager.h,v 1.9 2002/07/10 14:40:46 dan_karrels Exp $"
+#define __CONNECTIONMANAGER_H "$Id: ConnectionManager.h,v 1.10 2002/07/16 15:30:49 dan_karrels Exp $"
 
 #include	<sys/types.h>
 
@@ -37,6 +37,9 @@
 
 #include	"Connection.h"
 #include	"ConnectionHandler.h"
+
+namespace gnuworld
+{
 
 using std::set ;
 using std::stringstream ;
@@ -378,5 +381,7 @@ protected:
 				connectionMapType::iterator ) ;
 
 } ;
+
+} // namespace gnuworld
 
 #endif // __CONNECTIONMANAGER_H

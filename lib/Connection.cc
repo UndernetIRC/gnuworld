@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: Connection.cc,v 1.9 2002/07/10 14:40:46 dan_karrels Exp $
+ * $Id: Connection.cc,v 1.10 2002/07/16 15:30:49 dan_karrels Exp $
  */
 
 #include	<sys/types.h>
@@ -33,6 +33,9 @@
 
 #include	"Connection.h"
 #include	"Buffer.h"
+
+namespace gnuworld
+{
 
 // Allocate these static variables in class Connection
 const Connection::flagType	Connection::F_PENDING = 0x01 ;
@@ -77,3 +80,4 @@ Connection::~Connection()
 /* No work to be done, no heap space allocated */
 }
 
+} // namespace gnuworld

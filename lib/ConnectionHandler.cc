@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ConnectionHandler.cc,v 1.8 2002/07/10 14:40:46 dan_karrels Exp $
+ * $Id: ConnectionHandler.cc,v 1.9 2002/07/16 15:30:49 dan_karrels Exp $
  */
 
 #include	<string>
@@ -26,6 +26,9 @@
 
 #include	"ConnectionHandler.h"
 #include	"Connection.h"
+
+namespace gnuworld
+{
 
 using std::string ;
 using std::cout ;
@@ -78,3 +81,5 @@ cout	<< "ConnectionHandler::OnTimeout> "
 	<< *cPtr
 	<< endl ;
 }
+
+} // namespace gnuworld

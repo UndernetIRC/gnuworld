@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ConnectionManager.cc,v 1.11 2002/07/16 13:51:12 dan_karrels Exp $
+ * $Id: ConnectionManager.cc,v 1.12 2002/07/16 15:30:49 dan_karrels Exp $
  */
 
 #include	<unistd.h>
@@ -50,14 +50,18 @@
 #include	"Connection.h"
 #include	"ConnectionHandler.h"
 #include	"Buffer.h"
+#include	"ELog.h"
 
+using std::clog ;
 using std::cout ;
 using std::endl ;
 using std::string ;
 using std::map ;
 using std::nothrow ;
 using std::stringstream ;
-using gnuworld::Buffer ;
+
+namespace gnuworld
+{
 
 ConnectionManager::ConnectionManager( const time_t defaultTimeoutDuration,
 	const char defaultDelimiter )
@@ -515,8 +519,7 @@ return true ;
 void ConnectionManager::Poll( const long seconds,
 	const long milliseconds )
 {
-
-cout	<< "Poll()" << endl ;
+//cout	<< "Poll()" << endl ;
 
 // Only execute this method if:
 // - The handlerMap is not empty, OR the eraseMap is not empty
@@ -524,6 +527,8 @@ cout	<< "Poll()" << endl ;
 // performed.
 if( handlerMap.empty() && eraseMap.empty() )
 	{
+	clog	<< "ConnectionManager::Poll> handlerMap.empty()"
+		<< endl ;
 	return ;
 	}
 
@@ -593,24 +598,29 @@ for( handlerMapIterator handlerItr = handlerMap.begin() ;
 		} // for( connectionItr )
 	} // for( handlerItr )
 
-//cout	<< "Poll> Attempting to read "
-//	<< connectionMap.size()
-//	<< " fd's"
-//	<< endl ;
-
 // timeval may be modified by select() on some systems,
 // so recreate it each time
 struct timeval to = { seconds, milliseconds } ;
 
 // Call select()
 // Block indefinitely if seconds is -1
+errno = 0 ;
 int fdCnt = ::select( 1 + highestFD, &readfds, &writefds, 0,
 		(-1 == seconds) ? NULL : &to ) ;
+
+//elog	<< "ConnectionManager::Poll()> seconds: "
+//	<< seconds
+//	<< ", fdCnt: "
+//	<< fdCnt
+//	<< endl ;
 
 // Is there an error from select()?
 if( fdCnt < 0 )
 	{
 	// Error in select()
+	clog	<< "ConnectionManager::Poll> Error in Poll(): "
+		<< strerror( errno )
+		<< endl ;
 	return ;
 	}
 
@@ -663,20 +673,19 @@ for( handlerMapIterator handlerItr = handlerMap.begin() ;
 				// for read
 				connectOK = handleRead( hPtr,
 					connectionPtr ) ;
+				} // if( FD_ISSET( read ) )
 
-				// Attempt to write any buffered data
-				// if the connection is valid
-				// A Connection's outputBuffer cannot
-				// be modified since when we last checked,
-				// so no threat of a possibly blocking
-				// call here.
-				if( connectOK &&
-					!connectionPtr->outputBuffer.empty() )
-					{
-					connectOK = handleWrite( hPtr,
-						connectionPtr ) ;
-					}
-				} // if( FD_ISSET() )
+			// Attempt to write any buffered data
+			// if the connection is valid
+			// A Connection's outputBuffer cannot
+			// be modified since when we last checked,
+			// so no threat of a possibly blocking
+			// call here.
+			if( connectOK && FD_ISSET( tempFD, &writefds ) )
+				{
+				connectOK = handleWrite( hPtr,
+					connectionPtr ) ;
+				}
 			} // if( connectionPtr->isConnected() )
 
 		// Next let's check if this is a listening (server) socket
@@ -961,12 +970,21 @@ memset( buf, 0, 4096 ) ;
 errno = 0 ;
 int readResult = ::recv( cPtr->getSockFD(), buf, 4096, 0 ) ;
 
+/*
 if( EAGAIN == errno )
 	{
 	// Nonblocking type error
 	// Ignore it
+	elog	<< "ConnectionManager::handleRead> EAGAIN"
+		<< endl ;
 	return true ;
 	}
+*/
+
+//elog	<< "ConnectionManager::handleRead> Read "
+//	<< readResult
+//	<< " bytes"
+//	<< endl ;
 
 // Check for error on read()
 if( readResult < 0 )
@@ -1027,8 +1045,16 @@ if( (ENOBUFS == errno) || (EWOULDBLOCK == errno) || (EAGAIN == errno) )
 	{
 	// Nonblocking type error
 	// Ignore it for now
+	elog	<< "ConnectionManager::handleWrite> errno: "
+		<< strerror( errno )
+		<< endl ;
 	return true ;
 	}
+
+//elog	<< "ConnectionManager::handleWrite> Read "
+//	<< writeResult
+//	<< " bytes"
+//	<< endl ;
 
 // Check for write error
 if( writeResult < 0 )
@@ -1055,9 +1081,9 @@ bool ConnectionManager::finishConnect( ConnectionHandler* hPtr,
 // Protected member method, no error checking performed on
 // method arguments
 
-//cout	<< "ConnectionManager::finishConnect> "
-//	<< *cPtr
-//	<< endl ;
+cout	<< "ConnectionManager::finishConnect> "
+	<< *cPtr
+	<< endl ;
 
 // Attempt to connect()
 int connectResult = ::connect( cPtr->getSockFD(),
@@ -1466,3 +1492,5 @@ for( ; (eraseItr != eraseMap.end()) && (eraseItr->first == hPtr) ;
 // and add it to the eraseMap to be erased by Poll()
 eraseMap.insert( eraseMapType::value_type( hPtr, connectionItr ) ) ;
 }
+
+} // namespace gnuworld

@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ConnectionHandler.h,v 1.8 2002/07/10 14:40:46 dan_karrels Exp $
+ * $Id: ConnectionHandler.h,v 1.9 2002/07/16 15:30:49 dan_karrels Exp $
  */
 
 #ifndef __CONNECTIONHANDLER_H
-#define __CONNECTIONHANDLER_H "$Id: ConnectionHandler.h,v 1.8 2002/07/10 14:40:46 dan_karrels Exp $"
+#define __CONNECTIONHANDLER_H "$Id: ConnectionHandler.h,v 1.9 2002/07/16 15:30:49 dan_karrels Exp $"
 
 #include	<sys/types.h>
 
@@ -33,6 +33,9 @@
 #include	<ctime>
 
 #include	"Connection.h"
+
+namespace gnuworld
+{
 
 using std::string ;
 using std::list ;
@@ -119,5 +122,7 @@ public:
 protected:
 
 } ;
+
+} // namespace gnuworld
 
 #endif // __CONNECTIONHANDLER_H

@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server.cc,v 1.139 2002/07/16 13:51:12 dan_karrels Exp $
+ * $Id: server.cc,v 1.140 2002/07/16 15:30:49 dan_karrels Exp $
  */
 
 #include	<sys/time.h>
@@ -73,7 +73,7 @@
 #include	"Connection.h"
 
 const char server_h_rcsId[] = __SERVER_H ;
-const char server_cc_rcsId[] = "$Id: server.cc,v 1.139 2002/07/16 13:51:12 dan_karrels Exp $" ;
+const char server_cc_rcsId[] = "$Id: server.cc,v 1.140 2002/07/16 15:30:49 dan_karrels Exp $" ;
 const char config_h_rcsId[] = __CONFIG_H ;
 const char misc_h_rcsId[] = __MISC_H ;
 const char events_h_rcsId[] = __EVENTS_H ;
@@ -238,8 +238,6 @@ while( !timerQueue.empty() )
 	socketFile.close() ;
 #endif
 
-delete[] inputCharBuffer ; inputCharBuffer = 0 ;
-
 } // ~xServer()
 
 void xServer::initializeVariables()
@@ -252,7 +250,6 @@ useHoldBuffer = false ;
 StartTime = ::time( NULL ) ;
 
 serverConnection = 0 ;
-inputCharBuffer = 0 ;
 caughtSignal = false ;
 whichSig = 0 ;
 burstStart = burstEnd = 0 ;
@@ -524,16 +521,25 @@ void xServer::OnConnect( Connection* theConn )
 {
 if( theConn != serverConnection )
 	{
+	elog	<< "xServer::OnConnect> Unknown connection"
+		<< endl ;
 	return ;
 	}
 
 // Just connected to our uplink
+serverConnection = theConn ;
 
 // P10 version information, bogus.
 Version = 10 ;
 
 // Initialize the connection time variable to current time.
 ConnectionTime = ::time( NULL ) ;
+
+elog	<< "*** Connected to "
+	<< serverConnection->getHostname()
+	<< ", port "
+	<< serverConnection->getRemotePort()
+	<< endl ;
 
 // Login to the uplink.
 WriteDuringBurst( "PASS :%s\n", Password.c_str() ) ;
@@ -545,7 +551,7 @@ WriteDuringBurst( "SERVER %s %d %d %d J%02d %s :%s\n",
 		StartTime,
 		ConnectionTime,
 		Version,
-		getCharYYXXX().c_str(),
+		(string( getCharYY() ) + "]]]").c_str(),
 		ServerDescription.c_str() ) ;
 }
 
@@ -553,10 +559,12 @@ WriteDuringBurst( "SERVER %s %d %d %d J%02d %s :%s\n",
  * Handle a disconnect from our uplink.  This method is
  * responsible for deallocating variables mostly.
  */
-void xServer::OnDisConnect( Connection* theConn )
+void xServer::OnDisconnect( Connection* theConn )
 {
 if( theConn != serverConnection )
 	{
+	elog	<< "xServer::OnDisconnect> Unknown connection"
+		<< endl ;
 	return ;
 	}
 
@@ -565,9 +573,43 @@ if( theConn != serverConnection )
 // the Connection object
 serverConnection = 0 ;
 
-Message = SRV_DISCONNECT ;
+elog	<< "xServer::OnDisconnect> Disconnected :("
+	<< endl ;
 
+Message = SRV_DISCONNECT ;
+keepRunning = false ;
 // TODO: Unload clients
+}
+
+void xServer::OnRead( Connection* theConn, const string& line )
+{
+if( theConn != serverConnection )
+	{
+	elog	<< "xServer::OnRead> Unknown connection"
+		<< endl ;
+	return ;
+	}
+
+size_t len = line.size() - 1 ;
+while( ('\n' == line[ len ]) || ('\r' == line[ len ]) )
+	{
+	--len ;
+	}
+
+memset( inputCharBuffer, 0, sizeof( inputCharBuffer ) ) ;
+strncpy( inputCharBuffer, line.c_str(), len + 1 ) ;
+
+if( verbose )
+	{
+	clog	<< "[IN]: "
+		<< line ;
+	}
+
+#ifdef LOG_SOCKET
+	socketFile	<< line ;
+#endif
+
+Process( inputCharBuffer ) ;
 }
 
 // This function parses and distributes incoming lines
@@ -1613,6 +1655,8 @@ bool xServer::WriteDuringBurst( const string& buf )
 // Is there a valid connection?
 if( !isConnected() )
 	{
+	elog	<< "xServer::WriteDuringBurst> Not connected"
+		<< endl ;
 	return 0 ;
 	}
 
