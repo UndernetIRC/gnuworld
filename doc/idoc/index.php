@@ -2,7 +2,7 @@
 /*
  *
  * Undernet GNUworld Interactive Installation Guide (aka UGIIG)
- * $Id: index.php,v 1.11 2002/10/07 23:57:09 nighty Exp $
+ * $Id: index.php,v 1.12 2002/10/20 10:21:45 nighty Exp $
  *
  * Released under the GNU Public License : http://www.gnu.org/licenses/gpl.txt
  * by nighty <nighty@undernet.org>
@@ -50,7 +50,7 @@ function footer($prev,$next) {
 	//echo "<address>maintained by <b>&lt;</b><a href=\"mailto:" . $coder_email . "\">" . $coder_email . "</a><b>&gt;</b> - Last modified : <b>" . date("M-d-Y H:i:s",   (  filemtime("index.php")+( date("Z",filemtime("index.php"))/3600 )   )   ) . " UTC/GMT</b> - <b>[</b><a href=\"./\">Home</a><b>]</b></address>";
 	echo "<address>maintained by <b>&lt;</b><a href=\"mailto:" . $coder_email . "\">" . $coder_email . "</a><b>&gt;</b> - <b>[</b><a href=\"./\">Home</a><b>]</b>";
 	echo "&nbsp;<br><font size=-2><b>";
-?>$Id: index.php,v 1.11 2002/10/07 23:57:09 nighty Exp $<?
+?>$Id: index.php,v 1.12 2002/10/20 10:21:45 nighty Exp $<?
 	echo "</b></font></address>\n";
 	echo "</body>\n";
 	echo "</html>\n";
@@ -75,7 +75,7 @@ $coder_email = "nighty@undernet.org";
 $coder_name = "nighty";
 
 ?>
-<!-- $Id: index.php,v 1.11 2002/10/07 23:57:09 nighty Exp $ //-->
+<!-- $Id: index.php,v 1.12 2002/10/20 10:21:45 nighty Exp $ //-->
 <html>
 <head>
 <title>Undernet GNUworld Interactive Installation Guide</title>
@@ -143,7 +143,7 @@ using modified parameters of this HOWTO, please let <a href="mailto:<?=$coder_em
 </ol>
 <br><br>
 <pre>
-GNUworld Homepage			: <a href="http://gnuworld.undernet.org/" target="_blank">http://gnuworld.undernet.org/</a>
+GNUworld Homepage			: <a href="http://www.gnuworld.org/" target="_blank">http://www.gnuworld.org/</a>
 Undernet Coder-Comittee Homepage	: <a href="http://coder-com.undernet.org/" target="_blank">http://coder-com.undernet.org/</a>
 Undernet Homepage			: <a href="http://www.undernet.org/" target="_blank">http://www.undernet.org/</a>
 Undernet CService Website Interface	: <a href="http://cservice.undernet.org/live/" target="_blank">http://cservice.undernet.org/live/</a>
@@ -1790,7 +1790,7 @@ or visit one of the following links for additionnal information :
 	Undernet CService		<a href="http://cservice.undernet.org/" target=_blank>http://cservice.undernet.org/</a>
 	Undernet CService Web Interface	<a href="http://cservice.undernet.org/live/" target=_blank>http://cservice.undernet.org/live/</a>
 
-	GNUworld Home			<a href="http://gnuworld.undernet.org/" target=_blank>http://gnuworld.undernet.org/</a>
+	GNUworld Home			<a href="http://www.gnuworld.org/" target=_blank>http://www.gnuworld.org/</a>
 
 
 	<a href="./?s=4">Frequently Asked Questions (FAQs)</a>
