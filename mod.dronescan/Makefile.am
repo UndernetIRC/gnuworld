@@ -1,5 +1,6 @@
 lib_LTLIBRARIES = libdronescan.la
 libdronescan_la_LDFLAGS = -module -export-dynamic -L@PGSQL_LIB@ -lpq++
+libdronescan_la_CXXFLAGS = -I@PGSQL_INCLUDE@
 
 libdronescan_la_SOURCES = 	\
 	dronescan.cc		\
@@ -14,9 +15,6 @@ libdronescan_la_SOURCES = 	\
 	HASOPTest.cc		\
 	MAXCHANSTest.cc		\
 	RANGETest.cc
-
-
-INCLUDES = -I@PGSQL_INCLUDE@ $(INCLTDL)
 
 EXTRA_DIST = clientData.h \
 	dronescanCommands.h \

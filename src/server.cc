@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server.cc,v 1.169 2003/07/10 00:58:25 dan_karrels Exp $
+ * $Id: server.cc,v 1.170 2003/07/26 20:43:08 dan_karrels Exp $
  */
 
 #include	<sys/time.h>
@@ -71,7 +71,7 @@
 #include	"ConnectionHandler.h"
 #include	"Connection.h"
 
-RCSTAG( "$Id: server.cc,v 1.169 2003/07/10 00:58:25 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: server.cc,v 1.170 2003/07/26 20:43:08 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -1627,11 +1627,11 @@ for( xNetwork::clientIterator clientItr = Network->clients_begin() ;
 
 	if( customData != 0 )
 		{
-		elog	<< "xServer::removeClient> xClient "
-			<< *theClient
-			<< " forgot to remove customData for client "
-			<< *(clientItr->second)
-			<< endl ;
+//		elog	<< "xServer::removeClient> xClient "
+//			<< *theClient
+//			<< " forgot to remove customData for client "
+//			<< *(clientItr->second)
+//			<< endl ;
 		}
 	} // for()
 
