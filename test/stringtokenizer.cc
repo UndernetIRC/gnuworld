@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: stringtokenizer.cc,v 1.2 2002/11/29 18:41:54 dan_karrels Exp $
+ * $Id: stringtokenizer.cc,v 1.3 2002/11/29 19:30:04 dan_karrels Exp $
  */
 
 #include	<iostream>
@@ -41,6 +41,7 @@ int main( int argc, char** argv )
 {
 int c = EOF ;
 bool verbose = false ;
+size_t totalLines = 0 ;
 string inputFileName ;
 
 if( argc < 3 )
@@ -116,6 +117,8 @@ while( getData( inputFile, lines ) )
 
 		totalClocks1 += (end - begin) ;
 
+		++totalLines ;
+
 		if( verbose )
 			{
 			cout	<< "[DATA] "
@@ -137,7 +140,9 @@ while( getData( inputFile, lines ) )
 cout	<< "Done!"
 	<< endl ;
 
-cout	<< "Measured for each separate instantiaion: "
+cout	<< "Tokenized "
+	<< totalLines
+	<< " lines in "
 	<< (totalClocks1 / CLOCKS_PER_SEC)
 	<< " seconds"
 	<< endl ;

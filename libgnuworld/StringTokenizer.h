@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: StringTokenizer.h,v 1.2 2002/11/29 18:27:58 dan_karrels Exp $
+ * $Id: StringTokenizer.h,v 1.3 2002/11/29 19:30:02 dan_karrels Exp $
  */
 
 #ifndef __STRINGTOKENIZER_H
-#define __STRINGTOKENIZER_H "$Id: StringTokenizer.h,v 1.2 2002/11/29 18:27:58 dan_karrels Exp $"
+#define __STRINGTOKENIZER_H "$Id: StringTokenizer.h,v 1.3 2002/11/29 19:30:02 dan_karrels Exp $"
 
 #include	<vector>
 #include	<string>
@@ -94,16 +94,13 @@ public:
 	/**
 	 * Return a const reference to the original C++ string before
 	 * tokenization.
+	 * A copy of the original string is *not* kept because, in
+	 * the setting in which this class was designed, getOriginal()
+	 * is never called.  This will free up some processing time
+	 * spent copying the original string.
 	 */
-	inline const string&	getOriginal() const
-		{ return original ; }
-
-	/**
-	 * Return a const reference to the original C++ string before
-	 * tokenization.
-	 */
-	inline const string&	toString() const
-		{ return original ; }
+	inline const string	getOriginal() const
+		{ return assemble() ; }
 
 	/**
 	 * Return the number of tokens in this StringTokenizer object.
@@ -132,8 +129,10 @@ public:
 	 * This method builds and returns a C++ string starting at the given
 	 * index, and continuing until the last token, placing the
 	 * appropriate delimiter between each token.
+	 * With no argument supplied, assemble() will return the entire
+	 * original string, delimiters included.
 	 */
-	string			assemble( const size_type& ) const ;
+	string			assemble( const size_type& = 0 ) const ;
 
 	/**
 	 * The immutable iterator type to use for walking through
@@ -191,11 +190,6 @@ protected:
 	 * at object instantiation to tokenize the given C++ string.
 	 */
 	virtual void		Tokenize( const string& ) ;
-
-	/**
-	 * The non-tokenized string.
-	 */
-	const string		original ;
 
 	/**
 	 * The delimiter by which the (original) string is tokenized.

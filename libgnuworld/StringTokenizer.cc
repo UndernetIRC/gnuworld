@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: StringTokenizer.cc,v 1.3 2002/11/29 18:41:54 dan_karrels Exp $
+ * $Id: StringTokenizer.cc,v 1.4 2002/11/29 19:30:02 dan_karrels Exp $
  */
 
 #include	<new>
@@ -31,7 +31,7 @@
 #include	"StringTokenizer.h"
 
 const char StringTokenizer_h_rcsId[] = __STRINGTOKENIZER_H ;
-const char StringTokenizer_cc_rcsId[] = "$Id: StringTokenizer.cc,v 1.3 2002/11/29 18:41:54 dan_karrels Exp $" ;
+const char StringTokenizer_cc_rcsId[] = "$Id: StringTokenizer.cc,v 1.4 2002/11/29 19:30:02 dan_karrels Exp $" ;
 const char config_h_rcsId[] = __CONFIG_H ;
 
 namespace gnuworld
@@ -48,10 +48,9 @@ using std::vector ;
  *   we will tokenize the string
  */
 StringTokenizer::StringTokenizer( const string& buf, char _delimiter )
-  : original( buf ),
-    delimiter( _delimiter )
+ : delimiter( _delimiter )
 {
-Tokenize( original ) ;
+Tokenize( buf ) ;
 }
 
 StringTokenizer::~StringTokenizer()
@@ -160,11 +159,10 @@ delete[] addMe ;
 /**
  * assemble()
  * Assemble into a string all tokens starting from index
- * start
+ * (start).
  */
 string StringTokenizer::assemble( const size_type& start ) const
 {
-
 // check if the beginning index is valid
 if( !validSubscript( start ) )
 	{
