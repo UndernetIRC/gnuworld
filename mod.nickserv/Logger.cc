@@ -1,4 +1,5 @@
-#include <stdarg.h>
+#include <cstdarg>
+#include <cstdio>
 
 #include "Logger.h"
 
@@ -54,7 +55,7 @@ void Logger::log(const events::eventType& theEvent, const char* format, ... ) {
   va_list _list;
 
   va_start(_list, format);
-  vsnprintf(buffer, 512, format, _list);
+  ::vsnprintf(buffer, 512, format, _list);
   va_end(_list);
 
   log(theEvent, string(buffer));
