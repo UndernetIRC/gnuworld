@@ -3,7 +3,7 @@
  * 
  * Gline class
  * 
- * $Id: ccGline.cc,v 1.11 2001/12/23 09:07:57 mrbean_ Exp $
+ * $Id: ccGline.cc,v 1.12 2002/03/15 06:53:48 mrbean_ Exp $
  */
  
 #include	<strstream>
@@ -20,7 +20,7 @@
 #include	"ccontrol.h"
 
 const char ccGline_h_rcsId[] = __CCGLINE_H ;
-const char ccGline_cc_rcsId[] = "$Id: ccGline.cc,v 1.11 2001/12/23 09:07:57 mrbean_ Exp $" ;
+const char ccGline_cc_rcsId[] = "$Id: ccGline.cc,v 1.12 2002/03/15 06:53:48 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -48,6 +48,7 @@ ccGline::ccGline(PgDatabase* _SQLDb)
 
 ccGline::~ccGline()
 {
+clearBurst(); //Clear the bursting list
 --numAllocated;
 }
 
@@ -274,5 +275,30 @@ else
 	}
 return true;
 }
+
+void ccGline::addBurst(string *Server)
+{
+burstIterator ptr = burstServers.begin();
+for(;ptr != burstServers.end();++ptr)
+	{
+	if(!strcmp((**ptr).c_str(),Server->c_str()))
+		break;
+	}
+if(ptr == burstServers.end())
+	{
+	burstServers.push_back(Server);
+	}
+}
+
+void ccGline::clearBurst()
+{
+burstIterator ptr = burstServers.begin();
+for(;ptr != burstServers.end();)
+	{
+	delete *ptr;
+	ptr = burstServers.erase(ptr);
+	}
+}
+
 }
 } //Namespace Gnuworld

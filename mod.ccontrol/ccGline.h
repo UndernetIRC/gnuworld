@@ -1,9 +1,10 @@
 /* ccGline.h */
 
 #ifndef __CCGLINE_H
-#define __CCGLINE_H "$Id: ccGline.h,v 1.9 2001/11/21 20:54:40 mrbean_ Exp $"
+#define __CCGLINE_H "$Id: ccGline.h,v 1.10 2002/03/15 06:53:48 mrbean_ Exp $"
 
 #include	<string>
+#include	<list>
 
 #include	<ctime>
 
@@ -13,14 +14,19 @@ namespace gnuworld
 { 
 
 using std::string ;
-
+using std::list ;
 namespace uworld
 {
 
 class ccGline
 {
 public:
+	typedef list<string*>	burstServersType;
+	
+	typedef burstServersType::iterator burstIterator;
+
 	ccGline(PgDatabase*);
+	
 	virtual ~ccGline();
 	//Mehods for getting info
 	
@@ -66,6 +72,12 @@ public:
 	inline void 		setSqldb(PgDatabase* _SQLDb)
 		{ SQLDb = _SQLDb; } 
 		
+	inline burstIterator 	getBurstBegin()
+	{ return burstServers.begin(); }
+	
+	inline burstIterator	getBurstEnd()
+	{ return burstServers.end(); }
+
 	//Methods for updating 
 
 	bool Insert();
@@ -78,6 +90,10 @@ public:
 	
 	bool Delete();
 	
+	void addBurst(string*);
+
+	void clearBurst();
+
 	static unsigned int numAllocated;
 	
 protected:
@@ -87,8 +103,9 @@ protected:
 	time_t AddedOn;
 	time_t Expires;
 	string Reason;
+	burstServersType	burstServers;
 	PgDatabase* SQLDb;
-
+	
 }; // class ccGline
 }
 } // namespace gnuworld
