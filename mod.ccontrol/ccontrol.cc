@@ -29,7 +29,7 @@
 #include	"ccFloodData.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.75 2001/09/30 20:26:44 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.76 2001/09/30 20:28:45 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -206,7 +206,7 @@ RegisterCommand( new REMCOMMANDCommand( this, "REMCOMMAND", "<USER> <COMMAND> "
 	"Remove a command from oper",commandLevel::flg_DELCMD,false,false,false,operLevel::UHSLEVEL,false ) ) ;
 RegisterCommand( new NEWPASSCommand( this, "NEWPASS", "<PASSWORD> "
 	"Change password",commandLevel::flg_NEWPASS,false,false,true,operLevel::UHSLEVEL,false ) ) ;
-RegisterCommand( new SUSPENDCommand( this, "SUSPEND", "<OPER> <DURATION> <TIME UNITS>"
+RegisterCommand( new SUSPENDCommand( this, "SUSPEND", "<OPER> <DURATION> [-l level] <REASON>"
 	"Suspend an oper",commandLevel::flg_SUSPEND,false,false,false,operLevel::UHSLEVEL,false ) ) ;
 RegisterCommand( new UNSUSPENDCommand( this, "UNSUSPEND", "<OPER> "
 	"UnSuspend an oper",commandLevel::flg_UNSUSPEND,false,false,false,operLevel::UHSLEVEL,false ) ) ;
