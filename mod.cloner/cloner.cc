@@ -20,7 +20,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
  * USA.
  *
- * $Id: cloner.cc,v 1.20 2002/08/01 23:46:23 reedloden Exp $
+ * $Id: cloner.cc,v 1.21 2002/08/02 15:49:46 reedloden Exp $
  */
 
 #include	<new>
@@ -45,7 +45,7 @@
 
 const char client_h_rcsId[] = __CLIENT_H ;
 const char cloner_h_rcsId[] = __CLONER_H ;
-const char cloner_cc_rcsId[] = "$Id: cloner.cc,v 1.20 2002/08/01 23:46:23 reedloden Exp $" ;
+const char cloner_cc_rcsId[] = "$Id: cloner.cc,v 1.21 2002/08/02 15:49:46 reedloden Exp $" ;
 const char iClient_h_rcsId[] = __ICLIENT_H ;
 const char EConfig_h_rcsId[] = __ECONFIG_H ;
 const char ELog_h_rcsId[] = __ELOG_H ;
@@ -177,6 +177,7 @@ if( st.empty() )
 	}
 
 string command( string_upper( st[ 0 ] ) ) ;
+string topic( string_upper( st[ 1 ] ) ) ;
 
 if( command == "SHOWCOMMANDS" || command == "HELP" )
 	{
@@ -187,33 +188,79 @@ if( command == "SHOWCOMMANDS" || command == "HELP" )
 		}
 	if( st.size() >= 1 )
 		{
-		Notice( theClient, "_-=[Cloner Help]=-_" ) ;
-		Notice( theClient, "LOADCLONES <# of clones> - Queue
-			creation of clone(s)" ) ;
-		Notice( theClient, "JOINALL <#channel> - Make all clones
-			/join a #channel" ) ;
-		Notice( theClient, "PARTALL <#channel> [reason] - Make
-			all clones /part a #channel with an optional
-			reason" ) ;
-		Notice( theClient, "KILLALL/QUITALL [reason] - Make all
-			clones /quit with an optional reason" ) ;
-		Notice( theClient, "SAYALL/MSGALL <#channel/nickname>
-			<message> - Make all clones /msg a #channel or
-			nickname" ) ;
-		Notice( theClient, "ACTALL/DOALL/DESCRIBEALL
-			<#channel/nickname> <action> - Make all clones
-			/me a channel or nickname" ) ;
-		Notice( theClient, "NOTICEALL <#channel/nickname>
-			<notice> - Make all clones /notice a #channel
-			or nickname" ) ;
-		Notice( theClient, "_-=[End of Cloner Help]=-_" ) ;
+		Notice( theClient, "_-=[Cloner Commands]=-_" ) ;
+		Notice( theClient, "LOADCLONES JOINALL PARTALL
+			KILLALL/QUITALL SAYALL/MSGALL
+			ACTALL/DOALL/DESCRIBEALL NOTICEALL" ) ;
+		Notice( theClient, "_-=[End of Cloner Commands]=-_" ) ;
 		}
 	}
+else if( command == "HELP" )
+	{
+	if( st.size() < 1 )
+		{
+		Notice( theClient, "Usage: %s <topic>",
+			command.c_str() ) ;
+		return 0 ;
+		}
+
+	if( topic == "SHOWCOMMANDS" )
+		{
+		Notice( theClient, "%s - Shows a list of all commands",
+			topic.c_str() ) ;
+		}
+	else if( topic == "HELP" )
+		{
+		Notice( theClient, "%s <topic> - Gives help on a topic",
+			topic.c_str() ) ;
+		}
+	else if( topic == "LOADCLONES" )
+		{
+		Notice( theClient, "%s <# of clones> - Queue creation
+			of clone(s)", topic.c_str() ) ;
+		}
+	else if( topic == "JOINALL" )
+		{
+		Notice( theClient, "%s <#channel> - Make all clones
+			/join a #channel", topic.c_str() ) ;
+		}
+	else if( topic == "PARTALL" )
+		{
+		Notice( theClient, "%s <#channel> [reason] - Make
+			all clones /part a #channel with an optional
+			reason", topic.c_str() ) ;
+		}
+	else if( topic == "KILLALL" || topic == "QUITALL" )
+		{
+		Notice( theClient, "%s [reason] - Make all
+			clones /quit with an optional reason",
+			topic.c_str() ) ;
+		}
+	else if( topic == "SAYALL" || topic == "MSGALL" )
+		{
+		Notice( theClient, "%s <#channel/nickname>
+			<message> - Make all clones /msg a #channel or
+			nickname", topic.c_str() ) ;
+		}
+	else if( topic == "ACTALL" || topic == "DOALL" || topic ==
+		"DESCRIBEALL" )
+		{
+		Notice( theClient, "%s <#channel/nickname> <action> -
+			Make all clones /me a channel or nickname",
+			topic.c_str() ) ;
+		}
+	else if( topic == "NOTICEALL" )
+		{
+		Notice( theClient, "%s <#channel/nickname>
+			<notice> - Make all clones /notice a #channel
+			or nickname", topic.c_str() ) ;
+		}
 else if( command == "LOADCLONES" )
 	{
 	if( st.size() < 2 )
 		{
-		Notice( theClient, "Usage: LOADCLONES <# of clones>" ) ;
+		Notice( theClient, "Usage: %s <# of clones>",
+			command.c_str() ) ;
 		return 0 ;
 		}
 
@@ -242,7 +289,8 @@ else if( command == "JOINALL" )
 	{
 	if( st.size() < 2 )
 		{
-		Notice( theClient, "Usage: JOINALL <#channel>" ) ;
+		Notice( theClient, "Usage: %s <#channel>",
+			command.c_str() ) ;
 		return 0 ;
 		}
 
@@ -268,7 +316,8 @@ else if( command == "PARTALL" )
 	{
 	if( st.size() < 2 )
 		{
-		Notice( theClient, "Usage: PARTALL <#channel> [reason]" ) ;
+		Notice( theClient, "Usage: %s <#channel> [reason]",
+			command.c_str() ) ;
 		return 0 ;
 		}
 
