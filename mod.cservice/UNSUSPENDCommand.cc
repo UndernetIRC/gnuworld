@@ -8,7 +8,7 @@
  *
  * Caveats: None.
  *
- * $Id: UNSUSPENDCommand.cc,v 1.1 2001/01/11 01:51:56 gte Exp $
+ * $Id: UNSUSPENDCommand.cc,v 1.2 2001/01/14 23:12:09 gte Exp $
  */
 
 #include	<string>
@@ -19,7 +19,7 @@
 #include	"Network.h"
 #include	"levels.h"
 
-const char UNSUSPENDCommand_cc_rcsId[] = "$Id: UNSUSPENDCommand.cc,v 1.1 2001/01/11 01:51:56 gte Exp $" ;
+const char UNSUSPENDCommand_cc_rcsId[] = "$Id: UNSUSPENDCommand.cc,v 1.2 2001/01/14 23:12:09 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -69,13 +69,15 @@ bool UNSUSPENDCommand::Exec( iClient* theClient, const string& Message )
 	    bot->Notice(theClient, "Done.");
 	    return true;
 	}
-	int usrLevel = bot->getAccessLevel(Target, theChan);
-	if(usrLevel < 1)
+
+	sqlLevel* usrLevel = bot->getLevelRecord(Target, theChan);
+	if(!usrLevel)
 	{
-	    bot->Notice(theClient, "No match!");
-	    bot->Notice(theClient, "Done.");
+	    bot->Notice(theClient, "%s doesn't appear to have access in %s.", 
+	    	Target->getUserName().c_str(), theChan->getName().c_str()); 
 	    return true;
 	}
+
 	sqlLevel* aLevel = bot->getLevelRecord(Target, theChan);
 
         bot->Notice(theClient, "SUSPENSION for %s is cancelled",

@@ -6,9 +6,14 @@
  *
  * Modifies a user's 'Level' record in a particular channel.
  *
- * Caveats: None
+ * Caveats:
+ * 1. In the rare case of somebody attempting to MODINFO a forced access
+ * that doesn't exist in the database, then the commit() will fail.
+ * This is fine, as the modified record doesn't really exist anyway.
+ * Shouldn't really happen, as trying to MODINFO a forced access doesn't
+ * make sense - adduser and then MODINFO that :)
  *
- * $Id: MODINFOCommand.cc,v 1.4 2001/01/13 23:38:04 gte Exp $
+ * $Id: MODINFOCommand.cc,v 1.5 2001/01/14 23:12:09 gte Exp $
  */
 
 #include	<string>
@@ -18,7 +23,7 @@
 #include	"cservice.h" 
 #include	"levels.h"
 
-const char MODINFOCommand_cc_rcsId[] = "$Id: MODINFOCommand.cc,v 1.4 2001/01/13 23:38:04 gte Exp $" ;
+const char MODINFOCommand_cc_rcsId[] = "$Id: MODINFOCommand.cc,v 1.5 2001/01/14 23:12:09 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -63,6 +68,7 @@ bool MODINFOCommand::Exec( iClient* theClient, const string& Message )
 	 *  Check the user has sufficient access on this channel.
 	 */
 
+	sqlLevel* tmpLevel = bot->getLevelRecord(theUser, theChan);
 	int level = bot->getAccessLevel(theUser, theChan);
 	if (level < level::modinfo)
 	{
@@ -85,7 +91,8 @@ bool MODINFOCommand::Exec( iClient* theClient, const string& Message )
 	 *  Check this user really does have access on this channel.
 	 */
 
-	int targetLevel = bot->getAccessLevel(targetUser, theChan);
+	sqlLevel* targetLevelRec = bot->getLevelRecord(targetUser, theChan);
+	int targetLevel = targetLevelRec->getAccess();
 	if (targetLevel == 0)
 	{
 		bot->Notice(theClient, "%s doesn't appear to have access in %s.", targetUser->getUserName().c_str(), theChan->getName().c_str());
@@ -106,9 +113,13 @@ bool MODINFOCommand::Exec( iClient* theClient, const string& Message )
 	
 		if (level <= targetLevel)
 		{
-			bot->Notice(theClient, "Cannot modify a user with equal or higher access than your own.");
-			return false;
-		}  
+			if (!tmpLevel->getFlag(sqlLevel::F_FORCED))
+			{
+				// If its not forced, they cant modify their own access.
+				bot->Notice(theClient, "Cannot modify a user with equal or higher access than your own.");
+				return false; 
+			}
+		}
 	
 		/*
 		 *	Check we aren't trying to set someone's access higher than ours.
@@ -135,7 +146,10 @@ bool MODINFOCommand::Exec( iClient* theClient, const string& Message )
 		aLevel->setAccess(newAccess);
 		aLevel->setLastModif(::time(NULL));
 		aLevel->setLastModifBy(theClient->getNickUserHost());
-		aLevel->commit();
+
+		// Only commit changes if this has been loaded from the Db.
+		// (Ie: If its a forced temporary access, this flag won't be set)..
+		if (aLevel->getFlag(sqlLevel::F_ONDB)) aLevel->commit();
 		bot->Notice(theClient, "Modified %s's access level on channel %s to %i", 
 			targetUser->getUserName().c_str(), theChan->getName().c_str(),
 			newAccess);
@@ -167,7 +181,10 @@ bool MODINFOCommand::Exec( iClient* theClient, const string& Message )
 			sqlLevel* aLevel = bot->getLevelRecord(targetUser, theChan);
 			if (autoType == 1) aLevel->setFlag(sqlLevel::F_AUTOOP);
 			if (autoType == 2) aLevel->setFlag(sqlLevel::F_AUTOVOICE);
-			aLevel->commit();
+
+			// Only commit changes if this has been loaded from the Db.
+			// (Ie: If its a forced temporary access, this flag won't be set)..
+			if (aLevel->getFlag(sqlLevel::F_ONDB)) aLevel->commit();
 			bot->Notice(theClient, "Enabled %s for %s on channel %s", 
 				(autoType == 1) ? "AUTOOP" : "AUTOVOICE", 
 				targetUser->getUserName().c_str(), theChan->getName().c_str()); 
@@ -179,7 +196,9 @@ bool MODINFOCommand::Exec( iClient* theClient, const string& Message )
 			sqlLevel* aLevel = bot->getLevelRecord(targetUser, theChan);			
 			if (autoType == 1) aLevel->removeFlag(sqlLevel::F_AUTOOP);
 			if (autoType == 2) aLevel->removeFlag(sqlLevel::F_AUTOVOICE);
-			aLevel->commit();
+			// Only commit changes if this has been loaded from the Db.
+			// (Ie: If its a forced temporary access, this flag won't be set)..
+			if (aLevel->getFlag(sqlLevel::F_ONDB)) aLevel->commit();
 			bot->Notice(theClient, "Disabled %s for %s on channel %s", 
 				(autoType == 1) ? "AUTOOP" : "AUTOVOICE", 
 				targetUser->getUserName().c_str(), theChan->getName().c_str()); 

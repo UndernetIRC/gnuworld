@@ -219,7 +219,7 @@ int cservice::BurstChannels()
 	theQuery << "SELECT " << sql::channel_fields << " FROM channels WHERE lower(name) <> '*' AND registered_ts <> ''" << ends;
 	elog << "cmaster::BurstChannels> " << theQuery.str() << endl;
 	string id;
-	time_t regTime;
+	time_t chanTime;
 
 	if ((status = SQLDb->Exec(theQuery.str())) == PGRES_TUPLES_OK)
 	{
@@ -230,9 +230,9 @@ int cservice::BurstChannels()
 			 */ 
 
 			id = SQLDb->GetValue(i, 1);
-			regTime = atoi(SQLDb->GetValue(i, 8));
+			chanTime = atoi(SQLDb->GetValue(i, 9));
 
-			MyUplink->JoinChannel( this, id, SQLDb->GetValue( i,  10), regTime, true );
+			MyUplink->JoinChannel( this, id, SQLDb->GetValue( i,  10), chanTime, true );
 			MyUplink->RegisterChannelEvent( id, this ) ;
 
 			// Update the interal channel record to reflect the modes fetched for
@@ -447,7 +447,7 @@ int cservice::OnCTCP( iClient* theClient, const string& CTCP,
 
 	if(Command == "VERSION")
 	{
-		xClient::DoCTCP(theClient, CTCP.c_str(), "Undernet P10 Channel Services Version 2 [" __DATE__ " " __TIME__ "] ($Id: cservice.cc,v 1.41 2001/01/14 18:21:32 gte Exp $)");
+		xClient::DoCTCP(theClient, CTCP.c_str(), "Undernet P10 Channel Services Version 2 [" __DATE__ " " __TIME__ "] ($Id: cservice.cc,v 1.42 2001/01/14 23:12:09 gte Exp $)");
 		return true;
 	}
  
@@ -574,6 +574,10 @@ sqlLevel* cservice::getLevelRecord( sqlUser* theUser, sqlChannel* theChan )
 	 	sqlLevelCache.insert(sqlLevelHashType::value_type(thePair, theLevel));
 		elog << "cmaster::getLevelRecord> There are " << sqlLevelCache.size() << " elements in the cache." << endl;
 		levelHits++;
+		theLevel->setFlag(sqlLevel::F_ONDB); // Flag to let us know this has been loaded from the Db.
+		theLevel->removeFlag(sqlLevel::F_FORCED); // Remove this incase someone forced an existing record, and
+												  // modified it causing it to be committed with the forced flag
+												  // still. (Remove when new single field commit scheme in place).
 		return theLevel;
 	}
 
@@ -628,6 +632,11 @@ short cservice::getAccessLevel( sqlUser* theUser, sqlChannel* theChan )
 			return 0;
 		}
 
+		/*
+		 *  Check to see if this particular access record has been
+		 *  suspended too.
+		 */
+
 		if (theLevel->getSuspendExpire() != 0)
 		{
 			// Send them a notice.
@@ -638,11 +647,11 @@ short cservice::getAccessLevel( sqlUser* theUser, sqlChannel* theChan )
 			return 0;
 		}
 
-
-		/*
-		 *  Check to see if this particular access record has been
-		 *  suspended too.
-		 */
+		if (theLevel->getFlag(sqlLevel::F_FORCED))
+		{
+			// A forced access..
+			return theLevel->getForcedAccess();
+		}
 
 		return theLevel->getAccess();
 	}

@@ -1,7 +1,7 @@
 /* sqlLevel.h */
 
 #ifndef __SQLLEVEL_H
-#define __SQLLEVEL_H "$Id: sqlLevel.h,v 1.7 2001/01/08 04:13:04 gte Exp $"
+#define __SQLLEVEL_H "$Id: sqlLevel.h,v 1.8 2001/01/14 23:12:09 gte Exp $"
 
 #include	<string>
 #include	<ctime>
@@ -24,6 +24,7 @@ public:
 	static const flagType	F_PROTECT =	0x02 ;
 	static const flagType	F_FORCED =	0x04 ;
 	static const flagType	F_AUTOVOICE =	0x08 ;
+	static const flagType	F_ONDB =	0x10 ;
 
 	/*
 	 *  Methods to get data atrributes.
@@ -37,6 +38,9 @@ public:
 
 	inline const unsigned short&	getAccess() const
 		{ return access ; } 
+
+	inline const unsigned short&	getForcedAccess() const
+		{ return forced_access ; }
 
 	inline const flagType&	getFlags() const
 		{ return flags ; }
@@ -77,6 +81,9 @@ public:
  	
 	inline void setAccess( const unsigned short& _access )
 		{ access = _access; }
+
+	inline void setForcedAccess( const unsigned short& _forced_access )
+		{ forced_access = _forced_access; } 
  
 	inline void setFlag( const flagType& whichFlag )
 		{ flags |= whichFlag; }
@@ -111,6 +118,7 @@ protected:
 	unsigned int	channel_id ;
 	unsigned int	user_id ;
 	unsigned short	access ;
+	unsigned short	forced_access ;
 	flagType		flags ;
 	time_t			suspend_expires ;
 	string			suspend_by ; 

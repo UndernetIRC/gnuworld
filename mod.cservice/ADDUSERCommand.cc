@@ -8,7 +8,7 @@
  *
  * Caveats: None
  *
- * $Id: ADDUSERCommand.cc,v 1.5 2001/01/13 20:20:12 gte Exp $
+ * $Id: ADDUSERCommand.cc,v 1.6 2001/01/14 23:12:09 gte Exp $
  */
  
 #include	<string>
@@ -19,7 +19,7 @@
 #include	"levels.h"
 #include	"libpq++.h"
 
-const char ADDUSERCommand_cc_rcsId[] = "$Id: ADDUSERCommand.cc,v 1.5 2001/01/13 20:20:12 gte Exp $" ;
+const char ADDUSERCommand_cc_rcsId[] = "$Id: ADDUSERCommand.cc,v 1.6 2001/01/14 23:12:09 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -123,6 +123,15 @@ bool ADDUSERCommand::Exec( iClient* theClient, const string& Message )
 			// If a forced person is trying to add themselves and they are already in the DB..
 			bot->Notice(theClient, "%s is already added to %s with access level %i.", targetUser->getUserName().c_str(), theChan->getName().c_str(), levelTest);
 			return false;
+		}
+
+		if(newLevel->getFlag(sqlLevel::F_FORCED))
+		{
+			/*
+			 *  If the access is forced and is now actually being added, 
+			 *  update the cache.
+			 */
+			 newLevel->setAccess(targetAccess);
 		}
 	}
  

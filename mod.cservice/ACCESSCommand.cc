@@ -8,7 +8,7 @@
  * Can optionally narrow down selection using a number of switches. (TODO).
  * Can display all channels a user has access on (TODO). 
  *
- * $Id: ACCESSCommand.cc,v 1.7 2001/01/08 04:13:04 gte Exp $
+ * $Id: ACCESSCommand.cc,v 1.8 2001/01/14 23:12:09 gte Exp $
  */
 
 #include	<string>
@@ -18,7 +18,7 @@
 #include	"cservice.h"
 #include	"libpq++.h"
 
-const char ACCESSCommand_cc_rcsId[] = "$Id: ACCESSCommand.cc,v 1.7 2001/01/08 04:13:04 gte Exp $" ;
+const char ACCESSCommand_cc_rcsId[] = "$Id: ACCESSCommand.cc,v 1.8 2001/01/14 23:12:09 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -43,7 +43,7 @@ bool ACCESSCommand::Exec( iClient* theClient, const string& Message )
  */
 
 	ExecStatusType status;
-	static const char* queryHeader =    "SELECT channels.name,users.user_name,levels.access,levels.flags,users.last_seen FROM levels,channels,users ";
+	static const char* queryHeader =    "SELECT channels.name,users.user_name,levels.access,levels.flags,users.last_seen,levels.suspend_expires FROM levels,channels,users ";
 	static const char* queryCondition = "WHERE levels.channel_id=channels.id AND levels.user_id=users.id ";
 	static const char* queryFooter =    "ORDER BY levels.access DESC LIMIT 15;";
 
@@ -80,17 +80,30 @@ bool ACCESSCommand::Exec( iClient* theClient, const string& Message )
 		unsigned short int autoOp;
 		unsigned short int autoVoice;
 		int duration = 0;
+		int suspend_expires = 0;
+		int suspend_expires_d = 0;
+		int suspend_expires_f = 0;
 
 		for (int i = 0 ; i < bot->SQLDb->Tuples(); i++)
 		{
 
 			flag = atoi(bot->SQLDb->GetValue(i, 3));
 			duration = atoi(bot->SQLDb->GetValue(i, 4));
+			suspend_expires = atoi(bot->SQLDb->GetValue(i, 5));
+			suspend_expires_d = suspend_expires - time(NULL);
+			suspend_expires_f = time(NULL) - suspend_expires_d;
+
+			elog << "exp: " << suspend_expires << " final: " << suspend_expires_f << endl;
 			autoOp = (flag & sqlLevel::F_AUTOOP);
 			autoVoice = (flag & sqlLevel::F_AUTOVOICE);
+
 			bot->Notice(theClient, "USER: %s ACCESS: %s", bot->SQLDb->GetValue(i, 1), bot->SQLDb->GetValue(i, 2));
 			bot->Notice(theClient, "CHANNEL: %s -- AUTOOP: %s -- AUTOVOICE: %s", bot->SQLDb->GetValue(i, 0), 
 				autoOp ? "ON" : "OFF", autoVoice ? "ON" : "OFF");
+			if(suspend_expires != 0)
+			{
+				bot->Notice(theClient, "** SUSPENDED ** - Expires in %s", bot->prettyDuration(suspend_expires_f).c_str());
+			}
 			bot->Notice(theClient, "LAST SEEN: %s ago.",  bot->prettyDuration(duration).c_str()); 
 		}
 			bot->Notice(theClient, "End of access list");

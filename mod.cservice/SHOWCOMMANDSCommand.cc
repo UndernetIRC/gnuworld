@@ -8,7 +8,7 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char SHOWCOMMANDSCommand_cc_rcsId[] = "$Id: SHOWCOMMANDSCommand.cc,v 1.3 2001/01/08 04:13:04 gte Exp $" ;
+const char SHOWCOMMANDSCommand_cc_rcsId[] = "$Id: SHOWCOMMANDSCommand.cc,v 1.4 2001/01/14 23:12:09 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -51,6 +51,9 @@ bool SHOWCOMMANDSCommand::Exec( iClient* theClient, const string& Message )
 
 	int level = bot->getAccessLevel(theUser, theChan);
 
+	if (level >= 900) bot->Notice(theClient, "\002Level  900\002: shutdown");
+	if (level >= 750) bot->Notice(theClient, "\002Level  750\002: purge");
+	if (level >= 600) bot->Notice(theClient, "\002Level  600\002: register remignore*");
 	if (level >= 500) bot->Notice(theClient, "\002Level  500\002: set*");
 	if (level >= 450) bot->Notice(theClient, "\002Level  450\002: join* part* remchan*"); 
 	if (level >= 400) bot->Notice(theClient, "\002Level  400\002: adduser clearmode* modinfo remuser"); 

@@ -12,7 +12,7 @@
  * TODO: /msg x suspend #channel *, suspends all users below your access
  * level.
  *
- * $Id: SUSPENDCommand.cc,v 1.2 2001/01/14 18:21:32 gte Exp $
+ * $Id: SUSPENDCommand.cc,v 1.3 2001/01/14 23:12:09 gte Exp $
  */
 
 #include	<string>
@@ -23,7 +23,7 @@
 #include	"Network.h"
 #include	"levels.h"
 
-const char SUSPENDCommand_cc_rcsId[] = "$Id: SUSPENDCommand.cc,v 1.2 2001/01/14 18:21:32 gte Exp $" ;
+const char SUSPENDCommand_cc_rcsId[] = "$Id: SUSPENDCommand.cc,v 1.3 2001/01/14 23:12:09 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -62,17 +62,20 @@ bool SUSPENDCommand::Exec( iClient* theClient, const string& Message )
 	    bot->Notice(theClient, "Sorry, you have insufficient access to perform that command.");
 	    return false;
 	}
+
 	// Check whether the user is in the access list.
 	sqlUser* Target = bot->getUserRecord(st[2]);
 	if(!Target)
 	{
-	    bot->Notice(theClient, "No such user!"); 
+	    bot->Notice(theClient, "No such user!");
 	    return true;
 	}
-	int usrLevel = bot->getAccessLevel(Target, theChan);
-	if(usrLevel < 1)
+
+	sqlLevel* usrLevel = bot->getLevelRecord(Target, theChan);
+	if(!usrLevel)
 	{
-	    bot->Notice(theClient, "No match!"); 
+	    bot->Notice(theClient, "%s doesn't appear to have access in %s.", 
+	    	Target->getUserName().c_str(), theChan->getName().c_str());
 	    return true; 
     }
 

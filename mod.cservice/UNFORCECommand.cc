@@ -8,7 +8,7 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char UNFORCECommand_cc_rcsId[] = "$Id: UNFORCECommand.cc,v 1.2 2001/01/03 03:02:05 gte Exp $" ;
+const char UNFORCECommand_cc_rcsId[] = "$Id: UNFORCECommand.cc,v 1.3 2001/01/14 23:12:09 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -68,6 +68,8 @@ bool UNFORCECommand::Exec( iClient* theClient, const string& Message )
 		{
 			bot->sqlLevelCache.erase(thePair);
 			bot->Notice(theClient, "Removed your temporary access of %i from channel %s", admLevel, theChan->getName().c_str());
+			bot->logAdminMessage("%s has removed their forced access on %s", 
+				theUser->getUserName().c_str(), theChan->getName().c_str());
 			return true;
 		}
 	} 
