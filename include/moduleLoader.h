@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: moduleLoader.h,v 1.18 2004/01/05 00:13:18 dan_karrels Exp $
+ * $Id: moduleLoader.h,v 1.19 2004/01/06 23:22:42 dan_karrels Exp $
  */
 
 #ifndef __MODULELOADER_H
-#define __MODULELOADER_H "$Id: moduleLoader.h,v 1.18 2004/01/05 00:13:18 dan_karrels Exp $"
+#define __MODULELOADER_H "$Id: moduleLoader.h,v 1.19 2004/01/06 23:22:42 dan_karrels Exp $"
 
 #include	<iostream>
 #include	<string>
@@ -84,7 +84,8 @@ public:
 	 * parameter.
 	 */
 	moduleLoader( const std::string& _moduleName )
-	 : moduleName( _moduleName )
+	 : moduleName( _moduleName ),
+	   hasError( false )
 	{
 	// Initialize the function pointer to 0
 	modFunc = 0 ;

@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server.cc,v 1.190 2004/01/05 00:13:19 dan_karrels Exp $
+ * $Id: server.cc,v 1.191 2004/01/06 23:22:43 dan_karrels Exp $
  */
 
 #include	<sys/time.h>
@@ -71,7 +71,7 @@
 #include	"ConnectionHandler.h"
 #include	"Connection.h"
 
-RCSTAG( "$Id: server.cc,v 1.190 2004/01/05 00:13:19 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: server.cc,v 1.191 2004/01/06 23:22:43 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -341,7 +341,7 @@ while( std::getline( commandMapFile, line ) )
 			<< st[ 2 ]
 			<< ", from module file: "
 			<< fileName
-			<< ", with symbol suffic: "
+			<< ", with symbol suffix: "
 			<< st[ 1 ]
 			<< endl ;
 		returnVal = false ;
@@ -404,7 +404,7 @@ if( NULL == sch )
 		<< commandKey
 		<< ", from module file: "
 		<< fileName
-		<< ", with symbol suffic: "
+		<< ", with symbol suffix: "
 		<< symbolName
 		<< endl ;
 
