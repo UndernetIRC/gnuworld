@@ -1,9 +1,9 @@
 /* main.cc
- * $Id: main.cc,v 1.27 2001/02/21 00:14:44 dan_karrels Exp $
+ * $Id: main.cc,v 1.28 2001/03/01 03:26:41 dan_karrels Exp $
  */
 
-#include	<fstream>
 #include	<new>
+#include	<fstream>
 
 #include	<sys/time.h>
 #include	<sys/types.h>
@@ -24,7 +24,7 @@
 using namespace gnuworld ;
 
 const char config_h_rcsId[] = __CONFIG_H ;
-const char main_cc_rcsId[] = "$Id: main.cc,v 1.27 2001/02/21 00:14:44 dan_karrels Exp $" ;
+const char main_cc_rcsId[] = "$Id: main.cc,v 1.28 2001/03/01 03:26:41 dan_karrels Exp $" ;
 
 using std::cerr ;
 using std::clog ;
@@ -58,6 +58,26 @@ int main( int argc, char** argv )
 gnuworld::xServer* theServer =
 	new (nothrow) gnuworld::xServer( argc, argv ) ;
 assert( theServer != 0 ) ;
+
+	// Write out the pid
+	// TODO: This will have to be updated when running
+	// in background.
+	{
+	ofstream pidFile( "gnuworld.pid", ios::trunc ) ;
+	if( !pidFile )
+		{
+		clog	<< "Unable to open pid file: gnuworld.pid"
+			<< endl ;
+
+		delete theServer ; theServer = 0 ;
+		return 0 ;
+		}
+
+	pidFile	<< getpid()
+		<< endl ;
+
+	pidFile.close() ;
+	}
 
 // Connect to the server
 clog << "*** Connecting...\n" ;
