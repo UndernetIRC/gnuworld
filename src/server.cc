@@ -43,7 +43,7 @@
 #include	"moduleLoader.h"
 
 const char xServer_h_rcsId[] = __XSERVER_H ;
-const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.33 2000/12/15 00:33:12 dan_karrels Exp $" ;
+const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.34 2000/12/20 00:49:31 dan_karrels Exp $" ;
 
 using std::string ;
 using std::vector ;
@@ -4537,5 +4537,95 @@ switch( whichSig )
 	}
 return retMe ;
 }
+
+/*
+void xServer::mainLoop()
+{
+
+timeval tv = { 0, 0 } ;
+fd_set readSet, writeset ;
+time_t now = 0 ;
+int selectRet = -1 ;
+bool setTimer = false ;
+unsigned int cnt = 0 ;
+
+while( keepRunning && isConnected )
+	{
+	setTimer = false ;
+	selectRet = -1 ;
+	cnt = 0 ;
+	now = ::time( 0 ) ;
+
+	FD_ZERO( &readSet ) ;
+	FD_ZERO( &writeSet ) ;
+
+	if( !outputBuffer.empty() )
+		{
+		FD_SET( sockFD, &writeSet ) ;
+		}
+
+	CheckTimers() ;
+
+	if( !timerQueue.empty() )
+		{
+		setTimer = true ;
+		tv.sec = timerQueue.head()->getExpireTime() - now ;
+		}
+	else
+		{
+		setTimer = false ;
+		}
+
+	do
+		{
+		errno = 0 ;
+		selectRet = ::select( sockFD + 1, &readSet, &writeSet,
+			0, setTimer ? &tv : 0 ) ;
+		}
+		while( (EINTR == errno) && (cnt++ < maxLoopCount) ) ;
+
+	if( selectRet < 0 )
+		{
+		// Problem
+		elog	<< "xServer::mainLoop> select() returned error: "
+			<< strerror( errno ) << endl ;
+		continue ;
+		}
+	else if( 0 == selectRet )
+		{
+		// select() timed out..timer has expired
+		CheckTimers() ;
+		continue ;
+		}
+
+	if( FD_ISSET( sockFD, &readSet ) )
+		{
+		DoRead() ;
+		if( !isConnected )
+			{
+			continue ;
+			}
+		}
+
+	if( FD_ISSET( sockFD, &writeSet ) )
+		{
+		DoWrite() ;
+		if( !isConnected )
+			{
+			continue ;
+		}
+
+	while( Server->GetString
+
+	if( caughSignal )
+		{
+
+		}
+
+	} // while( keepRunning && isConnected )
+
+
+}
+*/
 
 } // namespace gnuworld

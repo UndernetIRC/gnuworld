@@ -17,7 +17,7 @@
  */
 
 #ifndef __XSERVER_H
-#define __XSERVER_H "$Id: server.h,v 1.15 2000/12/13 23:22:22 dan_karrels Exp $"
+#define __XSERVER_H "$Id: server.h,v 1.16 2000/12/20 00:49:30 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
@@ -625,6 +625,8 @@ protected:
 	 * Returns true if the signal was handled.
 	 */
 	virtual bool	OnSignal( int ) ;
+
+	unsigned int	maxLoopCount ;
 
 	/**
 	 * The structure type to hold information about client timed
