@@ -660,7 +660,7 @@ else if(Command == "VERSION")
 	xClient::DoCTCP(theClient, CTCP,
 		"Undernet P10 Channel Services Version 2 ["
 		__DATE__ " " __TIME__
-		"] ($Id: cservice.cc,v 1.114 2001/02/20 23:01:56 gte Exp $)");
+		"] ($Id: cservice.cc,v 1.115 2001/02/21 00:14:44 dan_karrels Exp $)");
 	}
 else if(Command == "PROBLEM?")
 	{
@@ -1064,7 +1064,6 @@ if( !msg.empty() )
 	{
 	return msg;
 	}
-
 
 return string( "Unable to retrieve response. Please contact a cservice "
 	"administrator." ) ;

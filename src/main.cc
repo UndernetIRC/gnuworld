@@ -1,5 +1,5 @@
 /* main.cc
- * $Id: main.cc,v 1.26 2001/02/03 19:16:33 dan_karrels Exp $
+ * $Id: main.cc,v 1.27 2001/02/21 00:14:44 dan_karrels Exp $
  */
 
 #include	<fstream>
@@ -24,7 +24,7 @@
 using namespace gnuworld ;
 
 const char config_h_rcsId[] = __CONFIG_H ;
-const char main_cc_rcsId[] = "$Id: main.cc,v 1.26 2001/02/03 19:16:33 dan_karrels Exp $" ;
+const char main_cc_rcsId[] = "$Id: main.cc,v 1.27 2001/02/21 00:14:44 dan_karrels Exp $" ;
 
 using std::cerr ;
 using std::clog ;
@@ -155,7 +155,7 @@ initializeSystem() ;
 		}
 #endif
 
-srand( time( 0 ) ) ;
+srand( ::time( 0 ) ) ;
 
 // Run in simulation mode?
 if( !simFileName.empty() )

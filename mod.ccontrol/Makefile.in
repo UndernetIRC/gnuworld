@@ -10,7 +10,7 @@
 # even the implied warranty of MERCHANTABILITY or FITNESS FOR A
 # PARTICULAR PURPOSE.
 
-# "$Id: Makefile.in,v 1.31 2001/02/20 22:26:58 mrbean_ Exp $"
+# "$Id: Makefile.in,v 1.32 2001/02/21 00:14:43 dan_karrels Exp $"
 
 
 SHELL = @SHELL@
@@ -96,8 +96,8 @@ glibdir = @glibdir@
 lib_LTLIBRARIES = libccontrol.la
 libccontrol_la_SOURCES = ccontrol.cc 	CControlCommands.cc
 
-libccontrol_la_LDFLAGS = -module -export-dynamic -L/usr/local/pgsql/lib 	-lpq++
-INCLUDES = -I/usr/local/pgsql/include
+libccontrol_la_LDFLAGS = -module -export-dynamic -L@PGSQL_LIB@ -lpq++
+INCLUDES = -I@PGSQL_INCLUDE@
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = ../include/defs.h
 CONFIG_CLEAN_FILES = 
@@ -118,7 +118,7 @@ DIST_COMMON =  Makefile.am Makefile.in
 
 DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
-TAR = tar
+TAR = gtar
 GZIP_ENV = --best
 DEP_FILES =  .deps/CControlCommands.P .deps/ccontrol.P
 SOURCES = $(libccontrol_la_SOURCES)
@@ -241,7 +241,7 @@ distdir: $(DISTFILES)
 	@for file in $(DISTFILES); do \
 	  d=$(srcdir); \
 	  if test -d $$d/$$file; then \
-	    cp -pr $$/$$file $(distdir)/$$file; \
+	    cp -pr $$d/$$file $(distdir)/$$file; \
 	  else \
 	    test -f $(distdir)/$$file \
 	    || ln $$d/$$file $(distdir)/$$file 2> /dev/null \

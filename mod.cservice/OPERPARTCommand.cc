@@ -8,7 +8,7 @@
  *
  * Caveats: None
  *
- * $Id: OPERPARTCommand.cc,v 1.5 2001/02/16 20:20:26 plexus Exp $
+ * $Id: OPERPARTCommand.cc,v 1.6 2001/02/21 00:14:43 dan_karrels Exp $
  */
 
 
@@ -21,76 +21,84 @@
 #include	"responses.h"
 #include	"Network.h"
 
-const char OPERPARTCommand_cc_rcsId[] = "$Id: OPERPARTCommand.cc,v 1.5 2001/02/16 20:20:26 plexus Exp $" ;
+const char OPERPARTCommand_cc_rcsId[] = "$Id: OPERPARTCommand.cc,v 1.6 2001/02/21 00:14:43 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
 
-using namespace gnuworld;
+using std::string ;
  
 bool OPERPARTCommand::Exec( iClient* theClient, const string& Message )
 { 
-	/*
-	 *  Check if the user is an oper.
-	 */
+/*
+ *  Check if the user is an oper.
+ */
 
-        if(!theClient->isOper())
-        {
-        	bot->Notice(theClient, "This command is reserved to IRC Operators");
-        	return true;
-        }
-
-	StringTokenizer st( Message ) ;
-	if( st.size() < 2 )
+if(!theClient->isOper())
 	{
-		Usage(theClient);
-		return true;
+	bot->Notice(theClient, "This command is reserved to IRC Operators");
+	return true;
 	}
 
-	/* 
-	 *  Check the channel is actually registered.
-	 */
+StringTokenizer st( Message ) ;
+if( st.size() < 2 )
+	{
+	Usage(theClient);
+	return true;
+	}
 
-	sqlUser* theUser = bot->isAuthed(theClient, false);
-	sqlChannel* theChan = bot->getChannelRecord(st[1]);
-	if (!theChan) {
-		bot->Notice(theClient, bot->getResponse(theUser, language::chan_not_reg).c_str(),
-			st[1].c_str());
-		return false;
+/* 
+ *  Check the channel is actually registered.
+ */
+
+// cservice::getResponse() will properly handle a NULL
+// sqlUser
+sqlUser* theUser = bot->isAuthed(theClient, false);
+
+sqlChannel* theChan = bot->getChannelRecord(st[1]);
+if (!theChan)
+	{
+	bot->Notice(theClient,
+		bot->getResponse(theUser, language::chan_not_reg).c_str(),
+		st[1].c_str());
+	return false;
 	} 
 
-	/* Check the bot is in the channel. */
- 
-	if (!theChan->getInChan()) {
-		bot->Notice(theClient, 
-			bot->getResponse(theUser,
-				language::i_am_not_on_chan,
-				string("I'm not in that channel!")));
-		return false;
+/* Check the bot is in the channel. */
+
+if (!theChan->getInChan())
+	{
+	bot->Notice(theClient, 
+		bot->getResponse(theUser,
+			language::i_am_not_on_chan,
+			string("I'm not in that channel!")));
+	return false;
 	}
 
-	bot->writeChannelLog(theChan, theClient, sqlChannel::EV_OPERPART, "");
+bot->writeChannelLog(theChan, theClient, sqlChannel::EV_OPERPART, "");
 
-	// Tell the world. 
+// Tell the world. 
  
-	strstream s;
+strstream s;
+s       << server->getCharYY()
+	<< " WA :"
+	<< "An IRC Operator is asking me to leave channel "
+	<< theChan->getName()
+	<< ends;
 
-	s       << server->getCharYY() << " WA :"
-    	        << "An IRC Operator is asking me to leave channel "
-        	<< theChan->getName() << ends;
-	bot->Write(s);
-	delete[] s.str();
+bot->Write(s);
+delete[] s.str();
 	
-	bot->logAdminMessage("%s is asking me to leave channel %s",
-			theClient->getNickUserHost().c_str(),
-			theChan->getName().c_str());
-	 
-	theChan->setInChan(false);
-	bot->getUplink()->UnRegisterChannelEvent(theChan->getName(), bot);
+bot->logAdminMessage("%s is asking me to leave channel %s",
+		theClient->getNickUserHost().c_str(),
+		theChan->getName().c_str());
+
+theChan->setInChan(false);
+bot->getUplink()->UnRegisterChannelEvent(theChan->getName(), bot);
 	
-	bot->Part(theChan->getName(), "At the request of an IRC Operator");
+bot->Part(theChan->getName(), "At the request of an IRC Operator");
 	
-	return true;
+return true;
 } 
 
 } // namespace gnuworld.

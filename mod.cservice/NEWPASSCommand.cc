@@ -10,7 +10,7 @@
 #include	"responses.h" 
 #include	"networkData.h"
 
-const char NEWPASSCommand_cc_rcsId[] = "$Id: NEWPASSCommand.cc,v 1.6 2001/02/20 23:01:56 gte Exp $" ;
+const char NEWPASSCommand_cc_rcsId[] = "$Id: NEWPASSCommand.cc,v 1.7 2001/02/21 00:14:43 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -68,9 +68,11 @@ for ( unsigned short int i = 0 ; i < 8; i++)
 
 md5	hash; // MD5 hash algorithm object.
 md5Digest digest; // MD5Digest algorithm object.
- 
+
+// Prepend the salt to the password
 string newPass = salt + st.assemble(1);
 
+// Take the md5 hash of this newPass string
 hash.update( (const unsigned char *)newPass.c_str(), newPass.size() );
 hash.report( digest );
 	
@@ -90,7 +92,8 @@ for( size_t ii = 0; ii < MD5_DIGEST_LENGTH; ii++ )
 	output << setw(2) << data[ii];
 	}
 output << ends;
- 
+
+// Prepend the md5 hash to the salt
 string finalPassword = salt + output.str();
 tmpUser->setPassword(finalPassword); 
 

@@ -3,11 +3,12 @@
  */
 
 #ifndef __CCONTROL_H
-#define __CCONTROL_H "$Id: ccontrol.h,v 1.5 2001/02/20 22:26:58 mrbean_ Exp $"
+#define __CCONTROL_H "$Id: ccontrol.h,v 1.6 2001/02/21 00:14:43 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
 #include	<map>
+#include        <iomanip>
 
 #include	<cstdio>
 
@@ -20,28 +21,29 @@
 #include	"libpq-int.h"
 #include        "match.h"
 #include	"md5hash.h" 
-#include        <iomanip.h>
 
-class PgDatabase; 
-
+namespace gnuworld
+{
+ 
 /*
  *  Sublcass the postgres API to create our own accessor
  *  to get at the PID information.
  */
 
-class cmDatabase : public PgDatabase {
+class cmDatabase : public PgDatabase
+{
 public:
-	cmDatabase(const char* conninfo) : PgDatabase(conninfo) {}
-	inline int getPID()
+	cmDatabase(const string& conninfo)
+	 : PgDatabase(conninfo.c_str()) {}
+	virtual ~cmDatabase() {}
+
+	inline int getPID() const
 		{ return pgConn->be_pid; }
 };
 
 using std::string ;
 using std::vector ;
 
-namespace gnuworld
-{
- 
 using namespace ccontrolns ;
 
 /// Forward declaration of command handler class
@@ -69,8 +71,16 @@ protected:
 	typedef commandMapType::value_type pairType ;
 
 public:
-	cmDatabase* SQLDb; /* PostgreSQL Database */
-	AuthInfo *AuthList; //Holds the authenticated user list
+	/**
+	 * PostgreSQL Database
+	 */
+	cmDatabase* SQLDb;
+
+	/**
+	 * Holds the authenticated user list
+	 */
+	AuthInfo *AuthList;
+
         AuthInfo *AuthEnd;	
 
 	/**

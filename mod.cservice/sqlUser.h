@@ -1,19 +1,19 @@
 /* sqlUser.h */
 
 #ifndef __SQLUSER_H
-#define __SQLUSER_H "$Id: sqlUser.h,v 1.12 2001/02/18 19:46:01 dan_karrels Exp $"
+#define __SQLUSER_H "$Id: sqlUser.h,v 1.13 2001/02/21 00:14:44 dan_karrels Exp $"
 
 #include	<string>
 #include	<ctime>
 #include	"libpq++.h"
  
+namespace gnuworld
+{ 
+ 
 using std::string ;
 
 class iClient;
 
-namespace gnuworld
-{ 
- 
 class sqlUser
 {
 
@@ -31,40 +31,40 @@ public:
 	 *  Methods to get data atrributes.
 	 */ 
 
-	const unsigned int&	getID() const
+	inline const unsigned int&	getID() const
 		{ return id ; }
 
-	const string&		getUserName() const
+	inline const string&		getUserName() const
 		{ return user_name ; }
 
-	const string&		getPassword() const
+	inline const string&		getPassword() const
 		{ return password ; }
 
-	const time_t&		getLastSeen() const
+	inline const time_t&		getLastSeen() const
 		{ return last_seen ; }
 
-	const string&		getEmail() const
+	inline const string&		getEmail() const
 		{ return email ; }
 
-	const string&		getUrl() const
+	inline const string&		getUrl() const
 		{ return url ; }
 
-	const unsigned int&	getLanguageId() const
+	inline const unsigned int&	getLanguageId() const
 		{ return language_id ; }
 
-	const string&		getPublicKey() const
+	inline const string&		getPublicKey() const
 		{ return public_key ; }
 
 	inline bool		getFlag( const flagType& whichFlag ) const
 		{ return (whichFlag == (flags & whichFlag)) ; }
 
-	const flagType&		getFlags() const
+	inline const flagType&		getFlags() const
 		{ return flags ; }
 
-	const string&		getLastUpdatedBy() const
+	inline const string&		getLastUpdatedBy() const
 		{ return last_updated_by ; }
 
-	const time_t&		getLastUpdated() const
+	inline const time_t&		getLastUpdated() const
 		{ return last_updated ; }
 
 	/*
@@ -121,4 +121,4 @@ protected:
 
 #endif // __SQLUSER_H
 
-} // Namespace gnuworld
+} // namespace gnuworld

@@ -16,11 +16,13 @@
 #include	"ELog.h"
 #include	"md5hash.h" 
 
+namespace gnuworld
+{
+
 namespace ccontrolns
 {
 
 using std::string ;
-using namespace gnuworld ;
 
 void Command::Usage( iClient* theClient )
 {
@@ -655,7 +657,7 @@ if( glines.empty() )
 	return true ;
 	}
 
-bot->Notice( theClient, "Current time: %d", time( 0 ) ) ;
+bot->Notice( theClient, "Current time: %d", ::time( 0 ) ) ;
 
 for( vector< const Gline* >::const_iterator ptr = glines.begin() ;
 	ptr != glines.end() ; ++ptr )
@@ -804,26 +806,34 @@ bool ACCESSCommand::Exec( iClient* theClient, const string& Message)
 static const char* queryHeader =    "SELECT user_name,access,last_updated_by FROM opers; ";
  
 StringTokenizer st( Message ) ;
+
 strstream theQuery;
-theQuery	<< queryHeader  << ends;
+theQuery	<< queryHeader 
+		<< ends;
 
-elog << "ACCESS::sqlQuery> " << theQuery.str() << endl; 
-
+elog	<< "ACCESS::sqlQuery> "
+	<< theQuery.str()
+	<< endl; 
 
 ExecStatusType status = bot->SQLDb->Exec( theQuery.str() ) ;
 if( PGRES_TUPLES_OK == status )
 	{
-
 	for (int i = 0 ; i < bot->SQLDb->Tuples(); i++)
 		{
-
-		bot->Notice(theClient, "USER: %s ACCESS: %s MODIFIED BY: %s", bot->SQLDb->GetValue(i, 0),
-		bot->SQLDb->GetValue(i, 1),bot->SQLDb->GetValue(i, 2));
+		bot->Notice(theClient, "USER: %s ACCESS: %s MODIFIED BY: %s",
+			bot->SQLDb->GetValue(i, 0),
+			bot->SQLDb->GetValue(i, 1),
+			bot->SQLDb->GetValue(i, 2));
 		}
-	    return true ;
-    }
-    else elog << "Error in query!" << endl;
-   return false;    
+	return true ;
+	}
+else
+	{
+	elog	<< "Error in query!"
+		<< endl;
+	}
+
+return false;    
 }
 
 bool LOGINCommand::Exec( iClient* theClient, const string& Message)
@@ -1357,3 +1367,5 @@ bool MODOPERCommand::Exec( iClient* theClient, const string& Message)
 }		    				
 
 } // close namespace ccontrolns
+
+} // namespace gnuworld

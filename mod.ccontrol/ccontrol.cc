@@ -21,7 +21,7 @@
 #include	"ccontrol.h"
  
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.10 2001/02/20 22:26:58 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.11 2001/02/21 00:14:43 dan_karrels Exp $" ;
 
 using std::string ;
 using std::vector ;
@@ -576,45 +576,69 @@ void ccontrol::UpdateAuth(int Id)
 
 User* ccontrol::GetUser( const string& Name )
 {
-    strstream Condition;
-    const char *Main = "SELECT user_id,user_name,password,access,flags,suspend_expires,suspended_by FROM opers WHERE lower(user_name) = '";
-    strstream theQuery;
-    theQuery	<< Main << string_lower(Name.c_str()) << "'" << ends;
-    elog << "ACCESS::sqlQuery> " << theQuery.str() << endl; 
+strstream Condition;
+static const char Main[] = "SELECT user_id,user_name,password,access,flags,suspend_expires,suspended_by FROM opers WHERE lower(user_name) = '";
 
-    ExecStatusType status = SQLDb->Exec( theQuery.str() ) ;
-    if(( PGRES_TUPLES_OK == status ) && (SQLDb->Tuples()>0))
+strstream theQuery;
+theQuery	<< Main
+		<< string_lower(Name)
+		<< "'"
+		<< ends;
+
+elog	<< "ACCESS::sqlQuery> "
+	<< theQuery.str()
+	<< endl; 
+
+ExecStatusType status = SQLDb->Exec( theQuery.str() ) ;
+delete[] theQuery.str() ;
+
+if( (PGRES_TUPLES_OK == status) && (SQLDb->Tuples() > 0) )
+	{
         return GetParm();
-    return NULL;
+	}
+
+return NULL;
 }
 
 User* ccontrol::GetUser( const int Id)
 {
-    strstream Condition;
-    static const char *Main = "SELECT user_id,user_name,password,access,flags,suspend_expires,suspended_by FROM opers WHERE user_id = ";
-    strstream theQuery;
-    theQuery	<< Main << Id << ';' << ends;
-    elog << "ACCESS::sqlQuery> " << theQuery.str() << endl; 
+static const char Main[] = "SELECT user_id,user_name,password,access,flags,suspend_expires,suspended_by FROM opers WHERE user_id = ";
 
-    ExecStatusType status = SQLDb->Exec( theQuery.str() ) ;
-    if(( PGRES_TUPLES_OK == status ) && (SQLDb->Tuples()>0))
+strstream Condition;
+strstream theQuery;
+
+theQuery	<< Main
+		<< Id
+		<< ';'
+		<< ends;
+
+elog	<< "ACCESS::sqlQuery> "
+	<< theQuery.str()
+	<< endl; 
+
+ExecStatusType status = SQLDb->Exec( theQuery.str() ) ;
+if( (PGRES_TUPLES_OK == status) && (SQLDb->Tuples() > 0) )
+	{
 	return GetParm();
-    return NULL;
+	}
+
+return NULL;
 }
 
 User* ccontrol::GetParm ()
 {
-    User* TempUser;
-    TempUser = new User;
-    assert (TempUser != NULL);
-    TempUser->Id = atoi(SQLDb->GetValue(0, 0));
-    TempUser->UserName = SQLDb->GetValue(0, 1);
-    TempUser->Password = SQLDb->GetValue(0, 2);
-    TempUser->Access = atoi(SQLDb->GetValue(0, 3));
-    TempUser->Flags = atoi(SQLDb->GetValue(0, 4));
-    TempUser->SuspendExpires = atoi(SQLDb->GetValue(0,5));
-    TempUser->SuspendedBy = SQLDb->GetValue(0,6);
-    return TempUser;
+User* TempUser = new (nothrow) User;
+assert (TempUser != NULL);
+
+TempUser->Id = atoi(SQLDb->GetValue(0, 0));
+TempUser->UserName = SQLDb->GetValue(0, 1);
+TempUser->Password = SQLDb->GetValue(0, 2);
+TempUser->Access = atoi(SQLDb->GetValue(0, 3));
+TempUser->Flags = atoi(SQLDb->GetValue(0, 4));
+TempUser->SuspendExpires = atoi(SQLDb->GetValue(0,5));
+TempUser->SuspendedBy = SQLDb->GetValue(0,6);
+
+return TempUser;
 }
 
 bool ccontrol::AddOper (User* Oper)
