@@ -43,7 +43,7 @@
 //#include	"moduleLoader.h"
 
 const char xServer_h_rcsId[] = __XSERVER_H ;
-const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.29 2000/12/08 00:31:00 dan_karrels Exp $" ;
+const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.30 2000/12/09 15:38:30 dan_karrels Exp $" ;
 
 using std::string ;
 using std::vector ;
@@ -2841,7 +2841,7 @@ if( NULL != Pos )
 	// Yup, nickname specified
 	Server = Receiver + (Pos - Receiver) + 1 ;
 	Receiver[ Pos - Receiver ] = 0 ;
-	Client = Network->findLocalClient( Receiver ) ;
+	Client = Network->findLocalNick( Receiver ) ;
 	}
 else if( Receiver[ 0 ] == charYY[ 0 ]
 	&& Receiver[ 1 ] == charYY[ 1 ] )

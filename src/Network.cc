@@ -21,7 +21,7 @@
 #include	"misc.h"
 
 const char xNetwork_h_rcsId[] = __XNETWORK_H ;
-const char xNetwork_cc_rcsId[] = "$Id: Network.cc,v 1.13 2000/11/02 19:24:29 dan_karrels Exp $" ;
+const char xNetwork_cc_rcsId[] = "$Id: Network.cc,v 1.14 2000/12/09 15:38:30 dan_karrels Exp $" ;
 
 using std::string ;
 using std::endl ;
@@ -439,8 +439,8 @@ if( static_cast< serverVectorType::size_type >( YY ) >= servers.size() )
 	return 0 ;
 	}
 
-elog	<< "xNetwork::removeServer> Removing server " << YY
-	<< ", name: " << servers[ YY ]->getName() << endl ;
+//elog	<< "xNetwork::removeServer> Removing server " << YY
+//	<< ", name: " << servers[ YY ]->getName() << endl ;
 
 // Delete each client on this server
 for( clientVectorType::size_type i = 0 ; i < clients[ YY ].size() ; i++ )

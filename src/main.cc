@@ -1,5 +1,5 @@
 /* main.cc
- * $Id: main.cc,v 1.10 2000/12/08 00:31:00 dan_karrels Exp $
+ * $Id: main.cc,v 1.11 2000/12/09 15:38:30 dan_karrels Exp $
  */
 
 #include	<fstream>
@@ -14,7 +14,7 @@
 #include	"config.h"
 #include	"ELog.h"
 #include	"Network.h"
-//#include	"ccontrol.h"
+#include	"ccontrol.h"
 #include	"cloner.h"
 #include	"clientExample.h"
 #include	"stats.h"
@@ -29,7 +29,7 @@
 using namespace gnuworld ;
 
 const char config_h_rcsId[] = __CONFIG_H ;
-const char main_cc_rcsId[] = "$Id: main.cc,v 1.10 2000/12/08 00:31:00 dan_karrels Exp $" ;
+const char main_cc_rcsId[] = "$Id: main.cc,v 1.11 2000/12/09 15:38:30 dan_karrels Exp $" ;
 
 using std::cerr ;
 using std::clog ;
@@ -204,7 +204,7 @@ catch( std::bad_alloc )
 // TODO: Have all clients loaded from modules
 // --> Easier client manipulation at runtime
 // NOTE: This is a memory leak, *shrug*
-//Server->AttachClient( new ccontrol( "gnuworld3.conf" ) ) ;
+Server->AttachClient( new ccontrol( "ccontrol.conf" ) ) ;
 //Server->AttachClient( new cloner( "cloner.conf" ) ) ;
 //Server->AttachClient( new stats( "stats.conf" ) ) ;
 //Server->AttachClient( new clientExample( "clientExample.conf" ) ) ;

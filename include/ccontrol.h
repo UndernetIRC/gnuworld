@@ -3,7 +3,7 @@
  */
 
 #ifndef __CCONTROL_H
-#define __CCONTROL_H "$Id: ccontrol.h,v 1.5 2000/11/12 23:38:58 dan_karrels Exp $"
+#define __CCONTROL_H "$Id: ccontrol.h,v 1.6 2000/12/09 15:38:30 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
@@ -109,6 +109,12 @@ public:
 	 */
 	virtual bool isOnChannel( const string& chanName ) const
 		{ return isOperChan( chanName ) ; }
+
+	/**
+	 * Return true if this client is on the given channel.
+	 */
+	virtual bool isOnChannel( const Channel* theChan ) const
+		{ return isOperChan( theChan->getName() ) ; }
 
 	/**
 	 * This method will kick the given user from the given channel

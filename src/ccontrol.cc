@@ -21,7 +21,7 @@
 #include	"ccontrol.h"
  
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.3 2000/11/12 23:38:58 dan_karrels Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.4 2000/12/09 15:38:30 dan_karrels Exp $" ;
 
 using std::string ;
 using std::vector ;
@@ -253,18 +253,10 @@ switch( theEvent )
 			break ;
 			}
 
-		iClient* theClient = static_cast< iClient* >( Data1 ) ;
+		Channel* theChan = static_cast< Channel* >( Data1 ) ;
+		iClient* theClient = static_cast< iClient* >( Data2 ) ;
 		if( theClient->isOper() )
 			{
-			Channel* theChan = Network->findChannel( chanName  ) ;
-			if( NULL == theChan )
-				{
-				elog	<< "ccontrol::OnChannelEvent> "
-					<< "Unable to find channel: "
-					<< chanName << endl ;
-				break ;
-				}
-
 			Op( theChan, theClient ) ;
 			}
 		break ;
