@@ -610,7 +610,7 @@ else if(Command == "VERSION")
 	xClient::DoCTCP(theClient, CTCP,
 		"Undernet P10 Channel Services Version 2 ["
 		__DATE__ " " __TIME__
-		"] ($Id: cservice.cc,v 1.101 2001/02/12 11:23:33 isomer Exp $)");
+		"] ($Id: cservice.cc,v 1.102 2001/02/14 21:23:12 gte Exp $)");
 	}
 else if(Command == "PROBLEM?")
 	{
@@ -2003,6 +2003,39 @@ return false ;
 }
 
 /**
+ * This method writes a 'channellog' record, recording an event that has
+ * occured in this channel. 
+ */ 
+void cservice::writeChannelLog(sqlChannel* theChannel, iClient* theClient, 
+	unsigned short eventType, const string& theMessage)
+{
+	string operExtra = theClient->isOper() ? "[OPER]" : "";
+
+	sqlUser* theUser = isAuthed(theClient, false);
+	string userExtra = theUser ? theUser->getUserName() : "Not Logged In";
+
+	strstream theLog;
+ 	theLog << "INSERT INTO channellog (ts, channelID, event, message, last_updated) VALUES "
+	<< "("
+	<< currentTime() << ", "
+	<< theChannel->getID() << ", "
+	<< eventType << ", "
+ 	<< "'[" << nickName << "]: "
+	<< theClient->getNickUserHost()
+	<< " (" << userExtra << ") "
+	<< operExtra << " " 
+	<< escapeSQLChars(theMessage) << "', "
+	<< currentTime()
+	<< ")" << ends;
+
+ 	elog << "cservice::writeChannelLog> " << theLog.str() << endl;
+
+	SQLDb->ExecCommandOk(theLog.str());
+
+	delete[] theLog.str();
+}
+
+/**
  * Global method to replace ' with \' in strings for safe placement in
  * SQL statements.
  */
@@ -2023,39 +2056,12 @@ for( string::const_iterator ptr = theString.begin() ;
 		}
 	}
 return retMe ;
-/*
-        string result;
-        result = theString;
- 
-        string search = "'";
-        string replace = "\\\047";
-
-        string::size_type idx;
-
-        idx = string::npos;
-
-        while (true)
-        { 
-                if(idx == string::npos)
-                {
-                        idx = result.find(search);
-                } else {
-                        idx = result.find(search, idx+2);
-                }
-
-                if (idx == string::npos) break;
-
-                result.replace(idx, search.size(), replace);
-        }
-
-        return result; 
-*/
 }
 
 time_t cservice::currentTime() const
 {
 /* Returns the current time according to the postgres server. */ 
-return dbTimeOffset + ::time(NULL);
+	return dbTimeOffset + ::time(NULL);
 } 
 
 int cservice::Notice( const iClient* Target, const string& Message )

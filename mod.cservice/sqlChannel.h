@@ -1,7 +1,7 @@
 /* sqlChannel.h */
 
 #ifndef __SQLCHANNEL_H
-#define __SQLCHANNEL_H "$Id: sqlChannel.h,v 1.15 2001/01/28 23:16:33 gte Exp $"
+#define __SQLCHANNEL_H "$Id: sqlChannel.h,v 1.16 2001/02/14 21:23:12 gte Exp $"
 
 #include	<string>
 #include	<ctime>
@@ -36,6 +36,17 @@ public:
 	static const flagType	F_AUTOTOPIC = 0x00080000 ;
 	static const flagType	F_OPONLY    = 0x00100000 ;
 	static const flagType	F_AUTOJOIN  = 0x00200000 ;
+
+	/*
+	 *   Channel 'Event' Flags, used int he channelog table.
+	 *   These flags are used to filter channel log records.
+	 *   in reports.
+	 */
+
+	static const unsigned short	EV_MISC  = 0x00000001 ;
+	static const unsigned short	EV_JOIN  = 0x00000002 ;
+	static const unsigned short	EV_PART  = 0x00000004 ; 
+	static const unsigned short	EV_FORCE = 0x00000008 ; 
 
 	/*
 	 *  Methods to get data atrributes.

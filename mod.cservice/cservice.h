@@ -1,10 +1,10 @@
 #ifndef __CSERVICE_H
-#define __CSERVICE_H "$Id: cservice.h,v 1.46 2001/02/12 05:42:55 isomer Exp $"
+#define __CSERVICE_H "$Id: cservice.h,v 1.47 2001/02/14 21:23:12 gte Exp $"
 
 #include	<string>
 #include	<vector>
 #include	<hash_map>
-#include	<map>
+#include	<map> 
 #include	<ctime>
 
 #include	"client.h"
@@ -88,8 +88,11 @@ public:
 	bool serverNotice( Channel*, const char*, ... );
 	bool serverNotice( Channel*, const string& );
 
-	// Log an administrative alert to the relay channel & log.
+	/* Log an administrative alert to the relay channel & log. */
 	bool logAdminMessage(const char*, ... );
+
+	/* Write a channel log */
+	void writeChannelLog(sqlChannel*, iClient*, unsigned short, const string&); 
 
 	typedef commandMapType::const_iterator constCommandIterator ; 
 	constCommandIterator command_begin() const
@@ -225,7 +228,7 @@ public:
 
 	// Method to retrieve a translation string.
 	const string getResponse( sqlUser*, int , string = "");
-
+ 
 	// Check for valid hostmask.
 	virtual bool validUserMask(const string& userMask) const ;
 
@@ -237,14 +240,14 @@ public:
 	void doAutoTopic(sqlChannel* theChan);
 
 	/* Bans & kicks a specified user with a specific reason */
-	bool doInternalBanAndKick(sqlChannel*, iClient*, const string& theReason);
+	bool doInternalBanAndKick(sqlChannel*, iClient*, const string&);
 
 	/* Matches DB bans, and kicks supplied user if neccessary */
 	bool checkBansOnJoin( Channel*, sqlChannel* , iClient* );
 	time_t currentTime() const ;
 
 	/* Queue to hold pending reops */
-	typedef queue < pair <time_t , string>, list< pair < time_t, string> > > reopQType;
+	typedef queue < pair <time_t , string>, list< pair < time_t, string> > > reopQType; 
 	reopQType reopQ;
 
 } ;

@@ -9,7 +9,7 @@
 #include	"responses.h"
 #include	"Network.h"
  
-const char STATUSCommand_cc_rcsId[] = "$Id: STATUSCommand.cc,v 1.11 2001/02/10 00:38:40 gte Exp $" ;
+const char STATUSCommand_cc_rcsId[] = "$Id: STATUSCommand.cc,v 1.12 2001/02/14 21:23:12 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -127,7 +127,57 @@ bool STATUSCommand::Exec( iClient* theClient, const string& Message )
 	 
 			bot->Notice(theClient, "Mode is: %s",
 				tmpChan->getModeString().c_str() ) ;
-		}
+
+			/*
+			 *  Execute a quick query to find the last 3 'events that occured on this
+			 *  channel.
+			 */
+
+			strstream theQuery;
+			theQuery << "SELECT * FROM channellog WHERE channelID = " 
+			<< theChan->getID() 
+			<< " ORDER BY ts DESC LIMIT 3"
+			<< ends;
+
+			ExecStatusType status = bot->SQLDb->Exec( theQuery.str() ) ; 
+			delete[] theQuery.str();
+
+			if( PGRES_TUPLES_OK == status ) 
+				{
+				if (bot->SQLDb->Tuples() > 0) bot->Notice(theClient, "Last 3 channel events:");
+				for (int i = 0 ; i < bot->SQLDb->Tuples(); i++)
+					{
+						string type = "";
+						switch( atoi(bot->SQLDb->GetValue(i, 2)) )
+						{
+							case sqlChannel::EV_MISC:
+							{
+								type = "MISC";
+								break;
+							}
+							case sqlChannel::EV_JOIN:
+							{
+								type = "JOIN";
+								break;
+							}
+							case sqlChannel::EV_PART:
+							{
+								type = "PART";
+								break;
+							}
+							case sqlChannel::EV_FORCE:
+							{
+								type = "FORCE";
+								break; 
+							}
+						}
+						bot->Notice(theClient, "%s: %s %s",
+							bot->SQLDb->GetValue(i, 0), type.c_str(),
+							bot->SQLDb->GetValue(i, 3));
+					}
+				} 
+
+		} // Admin access.
 	}
 
 	bot->Notice(theClient, "MassDeopPro: %i, FloodPro: %i", 
