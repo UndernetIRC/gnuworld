@@ -8,7 +8,7 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char SHOWCOMMANDSCommand_cc_rcsId[] = "$Id: SHOWCOMMANDSCommand.cc,v 1.13 2001/02/18 14:47:24 plexus Exp $" ;
+const char SHOWCOMMANDSCommand_cc_rcsId[] = "$Id: SHOWCOMMANDSCommand.cc,v 1.14 2001/03/02 03:55:36 isomer Exp $" ;
 
 namespace gnuworld
 {
@@ -91,7 +91,7 @@ bool SHOWCOMMANDSCommand::Exec( iClient* theClient, const string& Message )
 	if (level >= 50) bot->Notice(theClient,  lvl_50_cmds, (level>=200) ? "+" : "");
 	if (level == 42) bot->Notice(theClient,  lvl_42_cmds);
 	if (level >= 25) bot->Notice(theClient,  lvl_25_cmds);
-	if (level >= 1) bot->Notice(theClient,   lvl_1_cmds, (level>=400||admin>0||theClient->isOper()) ? "+" : ""); 
+	if (level >= 1) bot->Notice(theClient,   lvl_1_cmds, (level>=200||admin>0||theClient->isOper()) ? "+" : ""); 
 	if (admin >= level::force) 
 			bot->Notice(theClient,   lvl_adm_cmds);
 	bot->Notice(theClient, lvl_0_cmds); 
