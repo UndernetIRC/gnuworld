@@ -1,9 +1,27 @@
-/* client.h
- * This file originally created by Orlando Bassotto.
+/**
+ * client.h
+ * Copyright (C) 2002 Daniel Karrels <dan@karrels.com>
+ *                    Orlando Bassotto
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *       
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of  
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
+ * USA.
+ *
  */
 
 #ifndef __CLIENT_H
-#define __CLIENT_H "$Id: client.h,v 1.33 2002/05/23 17:43:09 dan_karrels Exp $"
+#define __CLIENT_H "$Id: client.h,v 1.34 2002/06/02 23:14:19 dan_karrels Exp $"
 
 #include	<sstream>
 #include	<string>
@@ -13,6 +31,7 @@
 #include	"iClient.h"
 #include	"events.h"
 #include	"TimerHandler.h"
+#include	"ConnectionHandler.h"
 
 namespace gnuworld
 {
@@ -29,7 +48,7 @@ using std::string ;
  * This has proven to be extremely easy: I built a functioning
  * services client in 11 minutes, though it didn't do much :)
  */
-class xClient : public TimerHandler
+class xClient : public TimerHandler, ConnectionHandler
 {
 
 	/// Let xServer access our protected members.

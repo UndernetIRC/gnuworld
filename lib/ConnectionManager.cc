@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ConnectionManager.cc,v 1.6 2002/05/31 01:34:06 dan_karrels Exp $
+ * $Id: ConnectionManager.cc,v 1.7 2002/06/02 23:14:23 dan_karrels Exp $
  */
 
 #include	<unistd.h>
@@ -50,6 +50,15 @@
 #include	"Connection.h"
 #include	"ConnectionHandler.h"
 #include	"Buffer.h"
+
+const char ConnectionManager_h_rcsId[] = __CONNECTIONMANAGER_H ;
+const char ConnectionManager_cc_rcsId[] = "$Id: ConnectionManager.cc,v 1.7 2002/06/02 23:14:23 dan_karrels Exp $" ;
+const char Connection_h_rcsId[] = __CONNECTION_H ;
+const char ConnectionHandler_h_rcsId[] = __CONNECTIONHANDLER_H ;
+const char Buffer_h_rcsId[] = __BUFFER_H ;
+
+namespace gnuworld
+{
 
 using std::cout ;
 using std::endl ;
@@ -1274,41 +1283,6 @@ if( optval < 0 )
 return true ;
 }
 
-void ConnectionManager::Write( const ConnectionHandler* hPtr,
-	Connection* cPtr, const string& msg )
-{
-// Public method, check method arguments
-assert( hPtr != 0 ) ;
-assert( cPtr != 0 ) ;
-
-// Do nothing if the output message is empty, or the socket
-// is a listening socket (not connected anyway).
-if( msg.empty() || cPtr->isListening() )
-	{
-	return ;
-	}
-
-// Append the outgoing data onto the Connection's output buffer
-cPtr->outputBuffer += msg ;
-}
-
-void ConnectionManager::Write( const ConnectionHandler* hPtr,
-	Connection* cPtr, const stringstream& msg )
-{
-// Public method, check method arguments
-assert( hPtr != 0 ) ;
-assert( cPtr != 0 ) ;
-
-// Do nothing if the socket is a listening socket (not connected)
-if( cPtr->isListening() )
-	{
-	return ;
-	}
-
-// Append the outgoing data onto the Connection's output buffer
-cPtr->outputBuffer += msg.str() ;
-}
-
 Connection* ConnectionManager::Listen( ConnectionHandler* hPtr,
 	const unsigned short int localPort )
 {
@@ -1465,3 +1439,43 @@ for( ; (eraseItr != eraseMap.end()) && (eraseItr->first == hPtr) ;
 // and add it to the eraseMap to be erased by Poll()
 eraseMap.insert( eraseMapType::value_type( hPtr, connectionItr ) ) ;
 }
+
+bool ConnectionManager::RemoveHandler( ConnectionHandler* hPtr )
+{
+// Public method, check method argument
+assert( hPtr != 0 ) ;
+
+// Attempt to find the handler in the handlerMap
+handlerMapIterator hItr = handlerMap.find( hPtr ) ;
+if( hItr == handlerMap.end() )
+	{
+	// Unable to find the given handler
+	// Remove successful, if uneventful
+	return true ;
+	}
+
+// Leave the handler in the map for now, so that we may use
+// eraseMap to erase all of its Connections.  Once that is
+// complete, the eraseMap algorithm will detect that the
+// handler has no more Connections and remove the handler from
+// the handlerMap.
+// It's important to leave the handler in the handlerMap until
+// then because removing it now would cause its connectionMap
+// to be deallocated implicitly, which would invalidate all
+// iterators to Connection objects stored in the eraseMap for
+// the handler being removed.
+//
+for( connectionMapIterator connectionItr = hItr->second.begin(),
+	connectionEndItr = hItr->second.end() ;
+	connectionItr != connectionEndItr ; ++connectionItr )
+	{
+	// Make sure no duplicates are entered into the eraseMap
+	scheduleErasure( hPtr, connectionItr ) ;
+	}
+
+// Return success
+return true ;
+}
+
+} // namespace gnuworld
+

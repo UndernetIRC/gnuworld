@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server.h,v 1.63 2002/05/27 17:18:12 dan_karrels Exp $
+ * $Id: server.h,v 1.64 2002/06/02 23:14:19 dan_karrels Exp $
  */
 
 /* Command Map Description
@@ -31,11 +31,11 @@
  * with: MSG_
  * Pointers to offsets of these functions within the
  * global variable xServer* Server are stored in a
- * VectorTrie (see web page).
+ * hash_map<>
  */
 
 #ifndef __SERVER_H
-#define __SERVER_H "$Id: server.h,v 1.63 2002/05/27 17:18:12 dan_karrels Exp $"
+#define __SERVER_H "$Id: server.h,v 1.64 2002/06/02 23:14:19 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
@@ -60,6 +60,7 @@
 #include	"moduleLoader.h"
 #include	"ELog.h"
 #include	"TimerHandler.h"
+#include	"ConnectionManager.h"
 #include	"defs.h"
 
 #ifdef GNU_EXTENSIONS
@@ -899,8 +900,103 @@ public:
 	/**
 	 * Check if a server is juped
 	 */
-	 virtual bool isJuped( const iServer* ) const ;
+	virtual bool isJuped( const iServer* ) const ;
 
+	/*
+	 * ConnectionManager adapter interface.
+	 */
+
+        /**
+         * Connect() will attempt to establish a new connection to
+         * the given host, on the given port.  The (host) field may
+         * be the canonical host name, or the IP in the form of
+         * numbres and dots. If TCP is true (or
+         * not given to the method, thus default), then a TCP  
+         * connection will be made, UDP otherwise.
+         * This method creates a non-blocking socket with which to
+         * connect to the remote host, thus a return value of non-NULL
+         * does not necessarily mean that the connection is valid,
+         * just that the attempt is in progress.  
+         * A return value of NULL indicates that some part of the
+         * connection process failed, and errno is set appropriately.
+         * UDP sockets are currently not implemented fully, and will
+         * not work properly.
+         * The ConnectionHandler must be non-NULL.
+         */
+	virtual Connection*	Connect( ConnectionHandler*,
+				const string& host,
+				const unsigned short int remotePort,
+				const bool TCP = true ) ;
+        /**
+         * Attempt to establish a listening Connection on the
+         * given port number.  If successful, the Connection is
+         * returned.  The Connection returned is of no functional
+         * use except to indicate success or failure.  That
+         * Connection is the actual listening socket, and cannot
+         * be written to or read from directly.
+         * The ConnectionHandler must be non-NULL.
+         */
+	virtual Connection*	Listen( ConnectionHandler*,
+				const unsigned short int localPort ) ;
+
+        /**
+         * DisConnect() forces the connection(s) associated with
+         * hostname/ports to be disconnected and deallocated.
+         * By specifying the optional localPort, only outgoing
+         * connections which match all 3 search criteria will be
+         * removed; not specifying a third parameter will cause all
+         * connections which match the first two search criteria to
+         * be removed.
+         * OnDisconnect() is NOT called.
+         * The ConnectionHandler must be non-NULL.
+         * The Connection will not be removed if the ConnectionHandler
+         * does not own the particular Connection.
+         * This method schedules the given Connection to be disconnected
+         * in the next call to Poll().
+         * To close a listening Connection, pass an empty hostname, in
+         * which case the remotePort will be ignored.
+         */
+	virtual bool	DisconnectByHost( ConnectionHandler*,
+			const string& hostName,
+			const unsigned short int remotePort,
+			const unsigned short int localPort = 0 ) ;
+
+        /**
+         * DisConnect() forces the connection(s) associated with
+         * IP/ports to be disconnected and deallocated.
+         * By specifying the optional localPort, only outgoing
+         * connections which match all 3 search criteria will be
+         * removed; not specifying a third parameter will cause all
+         * connections which match the first two search criteria to
+         * be removed.
+         * OnDisconnect() is NOT called.
+         * The ConnectionHandler must be non-NULL.
+         * The Connection will not be removed if the ConnectionHandler
+         * does not own the particular Connection.
+         * This method schedules the given Connection to be disconnected
+         * in the next call to Poll().
+         * To close a listening Connection, pass an empty hostname, in
+         * which case the remotePort will be ignored.
+         */
+        virtual bool    DisconnectByIP( ConnectionHandler*,
+                        const string& IP,
+                        const unsigned short int remotePort,
+                        const unsigned short int localPort = 0 ) ;
+
+        /**
+         * Disconnect the given Connection from ConnectionHandler's
+         * list of Connections.
+         * The Connection will not be removed if the ConnectionHandler
+         * does not own the particular Connection.
+         * Return true if removal was successful, false if the
+         * Connection was not found under ConnectionHandler's control.
+         * Both the ConnectionHandler and the Connection must
+         * be non-NULL.
+         * This method schedules the given Connection to be disconnected
+         * in the next call to Poll().
+         */
+        virtual bool    Disconnect( ConnectionHandler*,
+                                Connection* ) ;
 
 protected:
 
@@ -1206,6 +1302,11 @@ protected:
 	 */
 	inline bool validEvent( const eventType& theEvent ) const
 		{ return (theEvent >= 0 && theEvent < EVT_NOOP) ; }
+
+	/**
+	 * The ConnectionManager instance.
+	 */
+	ConnectionManager	cm ;
 
 	/**
 	 * This is the command map type.  Pointers to

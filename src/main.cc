@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: main.cc,v 1.39 2002/05/27 17:18:12 dan_karrels Exp $
+ * $Id: main.cc,v 1.40 2002/06/02 23:14:23 dan_karrels Exp $
  */
 
 #include	<new>
@@ -44,7 +44,7 @@
 void		gnu() ;
 
 const char config_h_rcsId[] = __CONFIG_H ;
-const char main_cc_rcsId[] = "$Id: main.cc,v 1.39 2002/05/27 17:18:12 dan_karrels Exp $" ;
+const char main_cc_rcsId[] = "$Id: main.cc,v 1.40 2002/06/02 23:14:23 dan_karrels Exp $" ;
 const char ELog_h_rcsId[] = __ELOG_H ;
 const char FileSocket_h_rcsId[] = __FILESOCKET_H ;
 const char server_h_rcsId[] = __SERVER_H ;
@@ -102,8 +102,10 @@ int main( int argc, char** argv )
 // output gnu information
 gnu() ;
 
+// This is done to intialize the hasher
 md5 dummy ;
 
+// Allocate a new instance of the xServer
 gnuworld::xServer* theServer =
 	new (std::nothrow) gnuworld::xServer( argc, argv ) ;
 assert( theServer != 0 ) ;
@@ -129,7 +131,7 @@ assert( theServer != 0 ) ;
 	}
 
 // Connect to the server
-clog << "*** Connecting...\n" ;
+clog << "*** Connecting..." << endl ;
 
 if( theServer->Connect() < 0 )
 	{
@@ -273,6 +275,9 @@ char charBuf[ 1024 ] = { 0 } ;
 
 while( keepRunning && _connected )
         {
+
+	// TODO
+	cm.Poll() ;
 
         memset( charBuf, 0, 1024 ) ;
 

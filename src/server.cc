@@ -23,8 +23,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server.cc,v 1.132 2002/05/27 17:18:13 dan_karrels Exp $
+ * $Id: server.cc,v 1.133 2002/06/02 23:14:23 dan_karrels Exp $
  */
+
+#include	<sys/time.h>
+#include	<unistd.h>
 
 #include	<new>
 #include	<string>
@@ -35,9 +38,6 @@
 #include	<stack>
 #include	<iostream>
 #include	<utility>
-
-#include	<sys/time.h>
-#include	<unistd.h>
 
 #include	<cstdlib>
 #include	<cstdio>
@@ -67,9 +67,12 @@
 #include	"ServerTimerHandlers.h"
 #include	"LoadClientTimerHandler.h"
 #include	"UnloadClientTimerHandler.h"
+#include	"ConnectionManager.h"
+#include	"ConnectionHandler.h"
+#include	"Connection.h"
 
 const char server_h_rcsId[] = __SERVER_H ;
-const char server_cc_rcsId[] = "$Id: server.cc,v 1.132 2002/05/27 17:18:13 dan_karrels Exp $" ;
+const char server_cc_rcsId[] = "$Id: server.cc,v 1.133 2002/06/02 23:14:23 dan_karrels Exp $" ;
 const char config_h_rcsId[] = __CONFIG_H ;
 const char misc_h_rcsId[] = __MISC_H ;
 const char events_h_rcsId[] = __EVENTS_H ;
@@ -88,6 +91,9 @@ const char moduleLoader_h_rcsId[] = __MODULELOADER_H ;
 const char ServerTimerHandler_h_rcsId[] = __SERVERTIMERHANDLERS_H ;
 const char LoadClientTimerHandler_h_rcsId[] = __LOADCLIENTTIMERHANDLER_H ;
 const char UnloadClientTimerHandler_h_rcsId[] = __UNLOADCLIENTTIMERHANDLER_H ;
+const char ConnectionManager_h_rcsId[] = __CONNECTIONMANAGER_H ;
+const char ConnectionHandler_h_rcsId[] = __CONNECTIONHANDLER_H ;
+const char Connection_h_rcsId[] = __CONNECTION_H ;
 
 namespace gnuworld
 {
@@ -417,7 +423,6 @@ Network = new (std::nothrow) xNetwork ;
 assert( Network != 0 ) ;
 
 Network->setServer( this ) ;
-
 }
 
 bool xServer::readConfigFile( const string& fileName )
@@ -1495,6 +1500,10 @@ bool xServer::AttachClient( xClient* Client, bool doBurst )
 // Make sure the pointer is valid.
 assert( NULL != Client ) ;
 
+// Make sure the Client has a pointer to the system-wide
+// ConnectionManager.
+Client->setManager( &cm ) ;
+
 // addClient() will allocate a new YYXXX and
 // update Client.
 if( !Network->addClient( Client ) )
@@ -1768,6 +1777,9 @@ for( eventListType::iterator evPtr = eventList.begin(),
 	{
 	(*evPtr).remove( theClient ) ;
 	}
+
+// Remove all Connections associated with this client
+cm.RemoveHandler( theClient ) ;
 
 // Remove the client from the network data structures.
 // Be sure to do this before closing the client's module,
@@ -3830,6 +3842,42 @@ for( jupedServerListType::const_iterator ptr = jupedServers.begin() ;
 	}
 
 return false;
+}
+
+Connection* xServer::Connect( ConnectionHandler* hPtr,
+	const string& host,
+	const unsigned short int remotePort,
+	bool TCP )
+{
+return cm.Connect( hPtr, host, remotePort, TCP ) ;
+}
+
+Connection* xServer::Listen( ConnectionHandler* hPtr,
+	const unsigned short int localPort )
+{
+return cm.Listen( hPtr, localPort ) ;
+}
+
+bool xServer::DisconnectByHost( ConnectionHandler* hPtr,
+	const string& hostName,
+	const unsigned short int remotePort,
+	const unsigned short int localPort )
+{
+return cm.DisconnectByHost( hPtr, hostName, remotePort, localPort ) ;
+}
+
+bool xServer::DisconnectByIP( ConnectionHandler* hPtr,
+	const string& IP,
+	const unsigned short int remotePort,
+	const unsigned short int localPort )
+{
+return cm.DisconnectByIP( hPtr, IP, remotePort, localPort ) ;
+}
+
+bool xServer::Disconnect( ConnectionHandler* hPtr,
+	Connection* cPtr )
+{
+return cm.Disconnect( hPtr, cPtr ) ;
 }
 
 } // namespace gnuworld

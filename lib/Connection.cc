@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: Connection.cc,v 1.6 2002/05/31 01:34:06 dan_karrels Exp $
+ * $Id: Connection.cc,v 1.7 2002/06/02 23:14:23 dan_karrels Exp $
  */
 
 #include	<sys/types.h>
@@ -33,6 +33,13 @@
 
 #include	"Connection.h"
 #include	"Buffer.h"
+
+const char Connection_h_rcsId[] = __CONNECTION_H ;
+const char Connection_cc_rcsId[] = "$Id: Connection.cc,v 1.7 2002/06/02 23:14:23 dan_karrels Exp $" ;
+const char Buffer_h_rcsId[] = __BUFFER_H ;
+
+namespace gnuworld
+{
 
 // Allocate these static variables in class Connection
 const Connection::flagType	Connection::F_PENDING = 0x01 ;
@@ -77,3 +84,4 @@ Connection::~Connection()
 /* No work to be done, no heap space allocated */
 }
 
+} // namespace gnuworld

@@ -18,25 +18,26 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ConnectionHandler.h,v 1.5 2002/05/29 16:10:45 dan_karrels Exp $
+ * $Id: ConnectionHandler.h,v 1.6 2002/06/02 23:14:23 dan_karrels Exp $
  */
 
 #ifndef __CONNECTIONHANDLER_H
-#define __CONNECTIONHANDLER_H "$Id: ConnectionHandler.h,v 1.5 2002/05/29 16:10:45 dan_karrels Exp $"
+#define __CONNECTIONHANDLER_H "$Id: ConnectionHandler.h,v 1.6 2002/06/02 23:14:23 dan_karrels Exp $"
 
 #include	<sys/types.h>
 
+#include	<sstream>
 #include	<string>
-#include	<list>
-#include	<map>
 
 #include	<ctime>
 
 #include	"Connection.h"
 
+namespace gnuworld
+{
+
 using std::string ;
-using std::list ;
-using std::multimap ;
+using std::stringstream ;
 
 class ConnectionManager ;
 
@@ -60,6 +61,12 @@ public:
 	 * arguments.
 	 */
 	ConnectionHandler() ;
+
+	/**
+	 * Create a ConnectionHandler instance with the controlling
+	 * ConnectionManager as argument.
+	 */
+	ConnectionHandler( ConnectionManager* ) ;
 
 	/**
 	 * Destroy this ConnectionHandler instance.
@@ -116,8 +123,48 @@ public:
 	 */
 	virtual void	OnTimeout( Connection* ) ;
 
-protected:
+	/**
+	 * Appends data to the given Connection's output buffer,
+	 * to be sent during a call to ConnectionManagerPoll().
+	 * Connection must be non-NULL.
+	 * This object must have a valid (non-NULL) ConnectionManager
+	 * object associated with it.
+	 */
+	virtual void    Write( Connection*, const string& ) ;
+  
+	/**
+	 * Appends data to the given Connection's output buffer,
+	 * to be sent during a call to ConnectionManagerPoll().
+	 * Connection must be non-NULL.
+	 * This object must have a valid (non-NULL) ConnectionManager
+	 * object associated with it.
+	 */
+	virtual void    Write( Connection*, const stringstream& ) ;
+
+	/**
+	 * Allow this Handler to be associated with a new (or
+	 * initial) ConnectionHandler.
+	 * This is something of a blemish in the design, as a
+	 * result of fitting it into the rest of te GNUWorld
+	 * system.
+	 */
+	inline void	setManager( ConnectionManager* newCM )
+		{ cmPtr = newCM ; }
+
+private:
+
+	/**
+	 * A pointer to the ConnectionManager for this Handler.
+	 * This may be NULL if default constructor is chosen.
+	 * This variable is private, so that subclasses may
+	 * not directly access it.  This is done to improve
+	 * system coupling, by forcing an adapter in some OO
+	 * situations (GNUWorld in particular).
+	 */
+	ConnectionManager*	cmPtr ;
 
 } ;
+
+} // namespace gnuworld
 
 #endif // __CONNECTIONHANDLER_H

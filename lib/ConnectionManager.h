@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ConnectionManager.h,v 1.6 2002/05/31 01:34:06 dan_karrels Exp $
+ * $Id: ConnectionManager.h,v 1.7 2002/06/02 23:14:23 dan_karrels Exp $
  */
 
 #ifndef __CONNECTIONMANAGER_H
-#define __CONNECTIONMANAGER_H "$Id: ConnectionManager.h,v 1.6 2002/05/31 01:34:06 dan_karrels Exp $"
+#define __CONNECTIONMANAGER_H "$Id: ConnectionManager.h,v 1.7 2002/06/02 23:14:23 dan_karrels Exp $"
 
 #include	<sys/types.h>
 
@@ -37,6 +37,9 @@
 
 #include	"Connection.h"
 #include	"ConnectionHandler.h"
+
+namespace gnuworld
+{
 
 using std::set ;
 using std::stringstream ;
@@ -260,20 +263,11 @@ public:
 				Connection* ) ;
 
 	/**
-	 * Appends data to the given Connection's output buffer,
-	 * to be sent during a call to Poll().
-	 * ConnectionHandler and Connection must be non-NULL.
+	 * This method removes the handler from the internal data
+	 * structures, and all of the handlers Connections as well.
+	 * OnDisconnect() is NOT called for the closed connections.
 	 */
-	virtual void	Write( const ConnectionHandler*,
-				Connection*, const string& ) ;
-
-	/**
-	 * Appends data to the given Connection's output buffer,
-	 * to be sent during a call to Poll().
-	 * ConnectionHandler and Connection must be non-NULL.
-	 */
-	virtual void	Write( const ConnectionHandler*,
-				Connection*, const stringstream& ) ;
+	virtual bool	RemoveHandler( ConnectionHandler* ) ;
 
 	/**
 	 * This method performs the actual read/write calls for all
@@ -378,5 +372,7 @@ protected:
 				connectionMapType::iterator ) ;
 
 } ;
+
+} // namespace gnuworld
 
 #endif // __CONNECTIONMANAGER_H

@@ -18,29 +18,45 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ConnectionHandler.cc,v 1.5 2002/05/29 16:10:45 dan_karrels Exp $
+ * $Id: ConnectionHandler.cc,v 1.6 2002/06/02 23:14:23 dan_karrels Exp $
  */
 
 #include	<string>
+#include	<sstream>
 #include	<iostream>
 
+#include	"ConnectionManager.h"
 #include	"ConnectionHandler.h"
 #include	"Connection.h"
 
+const char ConnectionHandler_h_rcsId[] = __CONNECTIONHANDLER_H ;
+const char ConnectionHandler_cc_rcsId[] = "$Id: ConnectionHandler.cc,v 1.6 2002/06/02 23:14:23 dan_karrels Exp $" ;
+const char ConnectionManager_h_rcsId[] = __CONNECTIONMANAGER_H ;
+const char Connection_h_rcsId[] = __CONNECTION_H  ;
+
+namespace gnuworld
+{
+
+using std::stringstream ;
 using std::string ;
 using std::cout ;
 using std::endl ;
+
+ConnectionHandler::ConnectionHandler()
+ : cmPtr( 0 )
+{}
+
+ConnectionHandler::ConnectionHandler( ConnectionManager* _cmPtr )
+ : cmPtr( _cmPtr )
+{}
+
+ConnectionHandler::~ConnectionHandler()
+{}
 
 /**
  * These methods are empty.
  * Simply output a little debugging message if uncommented.
  */
-
-ConnectionHandler::ConnectionHandler()
-{}
-
-ConnectionHandler::~ConnectionHandler()
-{}
 
 void ConnectionHandler::OnConnect( Connection* cPtr )
 {
@@ -78,3 +94,43 @@ cout	<< "ConnectionHandler::OnTimeout> "
 	<< *cPtr
 	<< endl ;
 }
+
+void ConnectionHandler::Write( Connection* cPtr, const string& msg )
+{
+// Public method, check method arguments
+assert( cPtr != 0 ) ;
+
+// cmPtr must first be set
+assert( cmPtr != 0 ) ;
+
+// Do nothing if the output message is empty, or the socket
+// is a listening socket (not connected anyway).
+if( msg.empty() || cPtr->isListening() )
+	{
+	return ;
+	}
+
+// Append the outgoing data onto the Connection's output buffer
+cPtr->outputBuffer += msg ;
+}
+
+void ConnectionHandler::Write( Connection* cPtr, const stringstream& msg )
+{
+// Public method, check method arguments
+assert( cPtr != 0 ) ;
+
+// cmPtr must first be set
+assert( cmPtr != 0 ) ;
+
+// Do nothing if the output message is empty, or the socket
+// is a listening socket (not connected anyway).
+if( msg.str().empty() || cPtr->isListening() )
+	{
+	return ;
+	}
+
+// Append the outgoing data onto the Connection's output buffer
+cPtr->outputBuffer += msg.str() ;
+}
+
+} // namespace gnuworld
