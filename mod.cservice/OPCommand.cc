@@ -17,7 +17,7 @@
  *
  * Caveats: None
  *
- * $Id: OPCommand.cc,v 1.17 2001/02/21 00:14:43 dan_karrels Exp $
+ * $Id: OPCommand.cc,v 1.18 2001/02/21 01:59:09 dan_karrels Exp $
  */
 
 #include	<string>
@@ -32,7 +32,7 @@
 
 using std::map ;
 
-const char OPCommand_cc_rcsId[] = "$Id: OPCommand.cc,v 1.17 2001/02/21 00:14:43 dan_karrels Exp $" ;
+const char OPCommand_cc_rcsId[] = "$Id: OPCommand.cc,v 1.18 2001/02/21 01:59:09 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -164,7 +164,6 @@ else
 StringTokenizer st2( source, delim );
 
 for( ; counter < st2.size() ; ++counter )
-while (counter < st2.size())
 	{ 
 	target = Network->findNick(st2[counter]);
 
