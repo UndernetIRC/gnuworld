@@ -1,5 +1,5 @@
 
--- "$Id: update.sql,v 1.1 2002/08/09 01:10:45 reedloden Exp $"
+-- "$Id: update.sql,v 1.2 2002/08/22 21:35:13 mrbean_ Exp $"
 
 -- ccontrol database changes update
 -- this file will add the new features to an old database
@@ -99,4 +99,4 @@ CREATE TABLE BadChannels (
         AddedBy VARCHAR(200) NOT NULL
         );
 
-update opers set saccess = (saccess | 2097152) where isCODER = 't' or ISSMT = 't';
+update opers set saccess = (saccess | 2097152) where isCODER = 't';
