@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------------
--- "$Id: cservice.sql,v 1.43 2001/06/16 21:56:27 gte Exp $"
+-- "$Id: cservice.sql,v 1.44 2001/06/24 14:09:02 gte Exp $"
 -- Channel service DB SQL file for PostgreSQL.
 
 -- ChangeLog:
@@ -213,12 +213,16 @@ CREATE TABLE channellog (
 	channelID INT4 CONSTRAINT channel_log_ref REFERENCES channels ( id ),
 	event INT2 DEFAULT '0',
 	-- Defines the message event type, so we can filter nice reports.
--- 1 -- EV_MISC - Uncategorised event.
--- 2 -- EV_JOIN - When someone 'JOIN's the bot.
--- 3 -- EV_PART - When someone 'PART's the bot. 
--- 4 -- EV_OPERJOIN - When an oper 'JOIN's the bot.
--- 5 -- EV_OPERPART - When an oper 'PART's the bot. 
--- 6 -- EV_FORCE - When someone FORCE's access in a channel.
+-- 1  -- EV_MISC - Uncategorised event.
+-- 2  -- EV_JOIN - When someone 'JOIN's the bot.
+-- 3  -- EV_PART - When someone 'PART's the bot. 
+-- 4  -- EV_OPERJOIN - When an oper 'JOIN's the bot.
+-- 5  -- EV_OPERPART - When an oper 'PART's the bot. 
+-- 6  -- EV_FORCE - When someone FORCE's access in a channel.
+-- 7  -- EV_REGISTER - When this channel is (re)registered.
+-- 8  -- EV_PURGE - When this channle is purged.
+-- 9  -- EV_COMMENT - Generic comments.
+-- 10 -- EV_REMOVEALL - When REMOVEALL command is used.
 	message TEXT,
 	last_updated INT4 NOT NULL 
 );
@@ -258,6 +262,7 @@ CREATE TABLE pending (
 	channel_id INT4 CONSTRAINT pending_channel_ref REFERENCES channels (id),
 	manager_id INT4 CONSTRAINT pending_manager_ref REFERENCES users (id),
 	created_ts INT4 NOT NULL,
+	check_start_ts INT4 NOT NULL,
 	status INT4 DEFAULT '0',
 	-- Status of 'pending' channel:
 	-- 0 = 'Pending Supporters Confirmation'
@@ -275,6 +280,8 @@ CREATE TABLE pending (
 	last_updated INT4 NOT NULL, 
 	PRIMARY KEY(channel_id)
 );
+
+CREATE INDEX pending_status_idx ON pending(status);
 
 CREATE TABLE pending_traffic (
 	channel_id INT4 CONSTRAINT pending_traffic_channel_ref REFERENCES channels (id),
@@ -311,7 +318,7 @@ CREATE TABLE deletion_transactions (
 	key3 INT4,
 -- Up to 3 key's that uniquely identify the data
 -- being deleted in this table. See CMaster source
--- to determine how this is interpretted.
+-- to determine how this is interpreted.
 	last_updated INT4 NOT NULL
 );
 
