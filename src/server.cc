@@ -47,7 +47,7 @@
 #include	"ServerTimerHandlers.h"
 
 const char xServer_h_rcsId[] = __XSERVER_H ;
-const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.78 2001/02/22 20:27:32 dan_karrels Exp $" ;
+const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.79 2001/02/28 00:25:28 dan_karrels Exp $" ;
 
 using std::string ;
 using std::vector ;
@@ -1773,7 +1773,8 @@ return 0 ;
  * Write an xClient channel part to the network, and update
  * network tables.
  */
-void xServer::PartChannel( xClient* theClient, const string& chanName, const string& reason )
+void xServer::PartChannel( xClient* theClient, const string& chanName,
+	const string& reason )
 {
 #ifndef NDEBUG
   assert( theClient != NULL ) ;
@@ -1794,7 +1795,8 @@ PartChannel( theClient, theChan, reason ) ;
  * Write an xClient channel part to the network, and update
  * network tables.
  */
-void xServer::PartChannel( xClient* theClient, Channel* theChan, const string& reason )
+void xServer::PartChannel( xClient* theClient, Channel* theChan,
+	const string& reason )
 {
 #ifndef NDEBUG
   assert( theClient != NULL && theChan != NULL ) ;
@@ -2109,7 +2111,24 @@ if( !chanModes.empty() )
 // An xClient has joined a channel, update its iClient instance
 iClient* theIClient = theClient->getInstance() ;
 
+// Add the channel to the iClient's info
 theIClient->addChannel( theChan ) ;
+
+// Create a new ChannelUser instance for the channel's records
+ChannelUser* theChanUser = new (nothrow) ChannelUser( theIClient ) ;
+
+// Make sure the allocation was successful
+assert( theChanUser != 0 ) ;
+
+// Did the xClient request ops in the channel?
+if( getOps )
+	{
+	// Yes, update the ChannelUser's info to reflect its
+	// operator state
+	theChanUser->setMode( ChannelUser::MODE_O ) ;
+	}
+
+// Add the ChannelUser to the channel
 theChan->addUser( theIClient ) ;
 
 }
