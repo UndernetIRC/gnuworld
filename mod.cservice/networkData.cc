@@ -19,7 +19,7 @@
 #include	"networkData.h" 
 
 const char networkData_h_rcsId[] = __NETWORKDATA_H ;
-const char networkData_cc_rcsId[] = "$Id: networkData.cc,v 1.4 2001/03/06 02:34:33 dan_karrels Exp $" ;
+const char networkData_cc_rcsId[] = "$Id: networkData.cc,v 1.5 2001/03/14 22:49:14 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -31,7 +31,8 @@ networkData::networkData()
  : messageTime( 0 ),
    outputCount( 0 ),
    flood_points( 0 ),
-   currentUser( 0 ) 
+   currentUser( 0 ), 
+   ignored( false )
 {
 }
  

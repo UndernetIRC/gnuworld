@@ -1,5 +1,5 @@
 #ifndef __CSERVICE_H
-#define __CSERVICE_H "$Id: cservice.h,v 1.58 2001/03/13 22:39:33 gte Exp $"
+#define __CSERVICE_H "$Id: cservice.h,v 1.59 2001/03/14 22:49:14 gte Exp $"
 
 #include	<string>
 #include	<vector>
@@ -185,8 +185,12 @@ public:
 	vector<sqlBan*>* getBanRecords(sqlChannel* theChan);
 
  	/* Silence List */
-	typedef vector < pair < time_t, string > > silenceListType ;
+//	typedef vector < pair < time_t, string > > silenceListType ;
+	typedef map < string, pair < time_t, string > > silenceListType;
 	silenceListType silenceList;
+
+	bool isIgnored(iClient*);
+	void setIgnored(iClient*, bool);
  
 	// Cache of user records.
 	sqlUserHashType sqlUserCache;

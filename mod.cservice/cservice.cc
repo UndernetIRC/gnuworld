@@ -404,6 +404,34 @@ if(!tmpData)
 return tmpData->messageTime;
 }	
 
+bool cservice::isIgnored(iClient* theClient)
+{
+ 
+networkData* tmpData =
+	static_cast< networkData* >( theClient->getCustomData(this) ) ;
+
+if(!tmpData)
+	{
+	return 0;
+	} 
+ 
+return tmpData->ignored;
+}
+
+void cservice::setIgnored(iClient* theClient, bool _ignored)
+{
+ 
+networkData* tmpData =
+	static_cast< networkData* >( theClient->getCustomData(this) ) ;
+
+if(!tmpData)
+	{
+	return;
+	} 
+ 
+tmpData->ignored = _ignored;
+}
+ 
 bool cservice::hasFlooded(iClient* theClient)
 {
 if( (getLastRecieved(theClient) + flood_duration) <= ::time(NULL) )
@@ -454,14 +482,17 @@ else
 		s	<< getCharYYXXX() 
 			<< " SILENCE " 
 			<< theClient->getCharYYXXX() 
-			<< " " 
+			<< " +" 
 			<< silenceMask
 			<< ends; 
 		Write( s );
 		delete[] s.str();
 
 		time_t expireTime = currentTime() + 3600; 
-		silenceList.push_back(make_pair(expireTime, silenceMask));
+		silenceList.insert(silenceListType::value_type(silenceMask,
+			make_pair(expireTime, theClient->getCharYYXXX())));
+
+		setIgnored(theClient, true);
 	 
 		logAdminMessage("MSG-FLOOD from %s",
 			theClient->getNickUserHost().c_str());
@@ -562,7 +593,11 @@ else
 		delete[] s.str();
 
 		time_t expireTime = currentTime() + 3600;
-		silenceList.push_back(make_pair(expireTime, silenceMask));
+
+		silenceList.insert(silenceListType::value_type(silenceMask,
+			make_pair(expireTime, theClient->getCharYYXXX()))); 
+
+		setIgnored(theClient, true);
 
 		logAdminMessage("OUTPUT-FLOOD from %s", theClient->getNickUserHost().c_str());
 		return true;
@@ -579,6 +614,8 @@ int cservice::OnPrivateMessage( iClient* theClient, const string& Message,
  * Private message handler. Pass off the command to the relevant
  * handler.
  */
+
+if (isIgnored(theClient)) return 0;
 
 StringTokenizer st( Message ) ;
 if( st.empty() )
@@ -660,6 +697,8 @@ int cservice::OnCTCP( iClient* theClient, const string& CTCP,
  * Hit users with a '5' flood score for CTCP's.
  * This should be in the config file.
  */
+
+if (isIgnored(theClient)) return 0;
 
 if (hasFlooded(theClient))
 	{
@@ -1394,8 +1433,7 @@ for (expireVectorType::const_iterator resultPtr = expireVector.begin();
 }
 
 /**
- * This function removes any ignores that have expired.
- *
+ * This function removes any ignores that have expired. 
  */
 void cservice::expireSilence()
 {
@@ -1403,27 +1441,40 @@ void cservice::expireSilence()
 silenceListType::iterator ptr = silenceList.begin();
 while (ptr != silenceList.end())
 	{
-	if ( ptr->first < currentTime() )
+	if ( ptr->second.first < currentTime() )
 		{
+		string theMask = ptr->first;
 		strstream s;
 		s	<< getCharYYXXX()
 			<< " SILENCE "
-			<< getCharYYXXX()
+			<< ptr->second.second
 			<< " -"
-			<< ptr->second
+			<< theMask
 			<< ends; 
-
 		Write( s );
 		delete[] s.str(); 
 
-		ptr = silenceList.erase(ptr);
-		}
-	else
-		{
-		++ptr;
-		}
-	} // while()
+		/* 
+		 * Locate this user by numeric.
+		 * If the numeric is still in use, clear the ignored flag.
+		 * If someone else has inherited this numeric, no prob,
+		 * its cleared anyway. 
+		 */
 
+		iClient* theClient = Network->findClient(ptr->second.second);
+		if (theClient)
+			{
+				setIgnored(theClient, false);
+			}
+
+		++ptr;
+		silenceList.erase(theMask);
+		} else {
+			++ptr;
+		}
+
+	} // while()
+	
 } 
 
 /**
@@ -2698,7 +2749,8 @@ s	<< getCharYY()
 	<< " " << targetClient->getNickName()
 	<< " " << targetClient->getUserName()
 	<< " " << targetClient->getInsecureHost()
-	<< " * :"
+	<< " * :["
+	<< targetClient->getCharYYXXX() << "]"
 	<< ends; 
 Write( s );
 delete[] s.str();
@@ -2714,7 +2766,6 @@ if (targetServer)
 		<< sourceClient->getCharYYXXX() 
 		<< " " << targetClient->getNickName()
 		<< " " << targetServer->getName()
-		<< " :"
 		<< ends;
 	Write( s2 );
 
@@ -2759,6 +2810,19 @@ if (theUser)
 		<< ends; 
 	Write( s6 );
 	delete[] s6.str(); 
+	}
+
+if (isIgnored(targetClient))
+	{
+	strstream s7;
+	s7	<< getCharYY()
+		<< " 316 " 
+		<< sourceClient->getCharYYXXX() 
+		<< " " << targetClient->getNickName()
+		<< " :is currently being ignored. " 
+		<< ends; 
+	Write( s7 );
+	delete[] s7.str(); 
 	}
 
 strstream s3;

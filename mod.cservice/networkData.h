@@ -1,7 +1,7 @@
 /* networkData.h */
 
 #ifndef __NETWORKDATA_H
-#define __NETWORKDATA_H "$Id: networkData.h,v 1.5 2001/01/31 21:23:16 dan_karrels Exp $"
+#define __NETWORKDATA_H "$Id: networkData.h,v 1.6 2001/03/14 22:49:14 gte Exp $"
 
 #include	<string>
 #include	<ctime>
@@ -33,6 +33,9 @@ public:
 	// Pointer to the sqlUser record of this user (if it exists).
 	// Ie: If they're authed.
 	sqlUser* currentUser; 
+
+	// Are we ignored or not..
+	bool ignored;
 
 } ;
 

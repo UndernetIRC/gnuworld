@@ -8,7 +8,7 @@
  *
  * Caveats: None
  *
- * $Id: PARTCommand.cc,v 1.12 2001/03/14 18:17:31 gte Exp $
+ * $Id: PARTCommand.cc,v 1.13 2001/03/14 22:49:14 gte Exp $
  */
 
 
@@ -20,7 +20,7 @@
 #include	"responses.h"
 #include	"Network.h"
 
-const char PARTCommand_cc_rcsId[] = "$Id: PARTCommand.cc,v 1.12 2001/03/14 18:17:31 gte Exp $" ;
+const char PARTCommand_cc_rcsId[] = "$Id: PARTCommand.cc,v 1.13 2001/03/14 22:49:14 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -81,9 +81,7 @@ if (level < level::part)
 	bot->Notice(theClient,
 		bot->getResponse(theUser, language::insuf_access).c_str());
 	return false;
-	} 
- 
-sqlLevel* aLevel = bot->getLevelRecord(theUser, theChan);
+	}
  
 theChan->setInChan(false); 
 bot->getUplink()->UnRegisterChannelEvent(theChan->getName(), bot);
