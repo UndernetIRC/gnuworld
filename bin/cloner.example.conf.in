@@ -1,4 +1,4 @@
-# $Id: cloner.example.conf.in,v 1.3 2003/07/21 23:36:32 dan_karrels Exp $
+# $Id: cloner.example.conf.in,v 1.4 2004/01/01 19:31:12 dan_karrels Exp $
 # Configuration file for Cloner (mod.cloner)
 
 # The following fields pertain to the client that connects and
@@ -48,6 +48,12 @@ fakeuser=hillary
 fakeuser=mccain
 fakeuser=gore
 fakeuser=big_al
+fakeuser=george
+fakeuser=cheney
+fakeuser=lott
+fakeuser=blair
+fakeuser=bigdick
+fakeuser=rumsfeld
 
 # Real name field of each clone
 clonedescription = This is a clone, this is only a clone...

@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server.cc,v 1.188 2003/12/31 23:50:51 dan_karrels Exp $
+ * $Id: server.cc,v 1.189 2004/01/01 19:31:13 dan_karrels Exp $
  */
 
 #include	<sys/time.h>
@@ -71,7 +71,7 @@
 #include	"ConnectionHandler.h"
 #include	"Connection.h"
 
-RCSTAG( "$Id: server.cc,v 1.188 2003/12/31 23:50:51 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: server.cc,v 1.189 2004/01/01 19:31:13 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -188,6 +188,7 @@ void xServer::initializeVariables()
 keepRunning = true ;
 bursting = false ;
 sendEA = true ;
+sendEB = true ;
 useHoldBuffer = false ;
 autoConnect = false ;
 StartTime = ::time( NULL ) ;
@@ -237,17 +238,24 @@ if( libPrefix[ libPrefix.size() - 1 ] != '/' )
 
 // Load the control nickname(s), if any
 EConfig::const_iterator cnItr = conf.Find( "controlnick" ) ;
-for( ; (cnItr != conf.end()) && (cnItr->second == "controlnick") ;
+for( ; (cnItr != conf.end()) && (cnItr->first == "controlnick") ;
 	++cnItr )
 	{
+//	elog	<< "xServer> Adding control nickname: "
+//		<< cnItr->second
+//		<< endl ;
 	controlNickSet.insert( cnItr->second ) ;
 	}
 
 // Load the control access list, AC usernames, if any
 EConfig::const_iterator acItr = conf.Find( "allowcontrol" ) ;
-for( ; (acItr != conf.end()) && (acItr->second == "allowcontrol") ;
+for( ; (acItr != conf.end()) && (acItr->first == "allowcontrol") ;
 	++acItr )
 	{
+//	elog	<< "xServer> Adding control authorization for username: "
+//		<< acItr->second
+//		<< endl ;
+
 	allowControlSet.insert( acItr->second ) ;
 	}
 
@@ -4114,6 +4122,9 @@ return true ;
 
 bool xServer::findControlNick( const std::string& nickName ) const
 {
+//elog	<< "xServer::findControlNick> nickName: "
+//	<< nickName
+//	<< endl ;
 return (controlNickSet.find( nickName ) != controlNickSet.end()) ;
 }
 
@@ -4129,7 +4140,7 @@ elog	<< "xServer::ControlCommand> Received control message from: "
 	<< endl ;
 
 if( !hasControlAccess( srcClient->getAccount() ) ||
-	!srcClient->isModeO() )
+	!srcClient->isOper() )
 	{
 	// Silently return
 	return ;

@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_EB.cc,v 1.4 2003/12/31 23:50:50 dan_karrels Exp $
+ * $Id: msg_EB.cc,v 1.5 2004/01/01 19:31:13 dan_karrels Exp $
  */
 
 #include	<sys/types.h>
@@ -34,7 +34,7 @@
 #include	"ServerCommandHandler.h"
 #include	"config.h"
 
-RCSTAG( "$Id: msg_EB.cc,v 1.4 2003/12/31 23:50:50 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: msg_EB.cc,v 1.5 2004/01/01 19:31:13 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -51,9 +51,13 @@ bool msg_EB::Execute( const xParameters& params )
 {
 if( !strcmp( params[ 0 ], theServer->getUplinkCharYY().c_str() ) )
 	{
-	if( theServer->getSendEA() )
+//	elog	<< "msg_EB> sendEA: "
+//		<< theServer->getSendEA()
+//		<< endl ;
+
+	// It's my uplink
+	if( theServer->getSendEA() && theServer->getSendEB() )
 		{
-		// It's my uplink
 		theServer->setBurstEnd( ::time( 0 ) ) ;
 
 		// Our uplink is done bursting
@@ -73,7 +77,9 @@ if( !strcmp( params[ 0 ], theServer->getUplinkCharYY().c_str() ) )
 	// Burst our channels
 	theServer->BurstChannels() ;
 
-	if( theServer->getSendEA() )
+	// Only need EB to be sent to turn off bursting, since after
+	// EB no bursts can be sent
+	if( theServer->getSendEB() )
 		{
 		// We are no longer bursting
 		theServer->setBursting( false ) ;
@@ -99,8 +105,11 @@ if( !strcmp( params[ 0 ], theServer->getUplinkCharYY().c_str() ) )
 	elog	<< "*** Completed net burst"
 		<< endl ;
 
-	// Send our EB
-	theServer->Write( "%s EB\n", theServer->getCharYY().c_str() ) ;
+	if( theServer->getSendEB() )
+		{
+		// Send our EB
+		theServer->Write( "%s EB\n", theServer->getCharYY().c_str() ) ;
+		}
 
 	if( theServer->getSendEA() )
 		{

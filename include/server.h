@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server.h,v 1.97 2003/12/31 23:50:50 dan_karrels Exp $
+ * $Id: server.h,v 1.98 2004/01/01 19:31:12 dan_karrels Exp $
  */
 
 #ifndef __SERVER_H
-#define __SERVER_H "$Id: server.h,v 1.97 2003/12/31 23:50:50 dan_karrels Exp $"
+#define __SERVER_H "$Id: server.h,v 1.98 2004/01/01 19:31:12 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
@@ -657,7 +657,7 @@ public:
 
 	/**
 	 * Invoke this method with the value 'true' if you want
-	 * the EA token to be sent after the EB.  Setting to
+	 * the EA token to be sent.  Setting to
 	 * false will create the endless burst effect, and bursting
 	 * will always be true.
 	 * Default value is true.
@@ -665,6 +665,25 @@ public:
 	 */
 	inline void setSendEA( bool newVal = true )
 		{ sendEA = newVal ; }
+
+	/**
+	 * Return true if an EB will be sent after the EB.
+	 * Some modules may want the "endless" burst effect.
+	 * Default value is true.
+	 */
+	inline bool getSendEB() const
+		{ return sendEB ; }
+
+	/**
+	 * Invoke this method with the value 'true' if you want
+	 * the EB token to be sent.  Setting to
+	 * false will create the endless burst effect, and bursting
+	 * will always be true.
+	 * Default value is true.
+	 * Only modify this variable if you know what youre doing.
+	 */
+	inline void setSendEB( bool newVal = true )
+		{ sendEB = newVal ; }
 
 	/**
 	 * Set the bursting value to the given argument, with default
@@ -1172,12 +1191,21 @@ protected:
 
 	/**
 	 * This variable is set to true to indicate that the server
-	 * will send EA after sending EB.  Some modules may want
+	 * will send EA.  Some modules may want
 	 * the "endless" burst effect.
 	 * Default value is true.
 	 * Only modify this variable if you know what youre doing.
 	 */
 	bool			sendEA ;
+
+	/**
+	 * This variable is set to true to indicate that the server
+	 * will send EB.  Some modules may want
+	 * the "endless" burst effect.
+	 * Default value is true.
+	 * Only modify this variable if you know what youre doing.
+	 */
+	bool			sendEB ;
 
 	/**
 	 * This variable will be true when the default behavior

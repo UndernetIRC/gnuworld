@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: gnutest.cc,v 1.17 2003/12/29 23:59:38 dan_karrels Exp $
+ * $Id: gnutest.cc,v 1.18 2004/01/01 19:31:13 dan_karrels Exp $
  */
 
 #include	<string>
@@ -30,7 +30,7 @@
 #include	"EConfig.h"
 #include	"Network.h"
 
-RCSTAG("$Id: gnutest.cc,v 1.17 2003/12/29 23:59:38 dan_karrels Exp $");
+RCSTAG("$Id: gnutest.cc,v 1.18 2004/01/01 19:31:13 dan_karrels Exp $");
 
 namespace gnuworld
 {
@@ -65,6 +65,7 @@ gnutest::~gnutest()
 
 void gnutest::OnAttach()
 {
+//MyUplink->setSendEB( false ) ;
 //elog	<< "gnutest::OnAttach()" << endl ;
 xClient::OnAttach() ;
 }
