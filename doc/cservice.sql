@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------------
--- "$Id: cservice.sql,v 1.15 2001/01/11 03:02:51 gte Exp $"
+-- "$Id: cservice.sql,v 1.16 2001/01/20 19:34:11 gte Exp $"
 -- Channel service DB SQL file for PostgreSQL.
 
 -- ChangeLog:
@@ -116,13 +116,13 @@ CREATE INDEX channel_name_idx ON channels (lower(name));
 CREATE TABLE bans (
 
 	id SERIAL,
+	channel_id INT4 CONSTRAINT bans_channel_id_ref REFERENCES channels (id),
 	banmask VARCHAR (128) NOT NULL,
 	set_by VARCHAR (128),			-- nick!user@host
 	set_ts INT4,
 	level INT2,
-	duration INT4,				-- In seconds
-	reason VARCHAR (128),
-	channel_id INT4 CONSTRAINT bans_channel_id_ref REFERENCES channels (id),
+	expires INT4,					-- Expiration timestamp.
+	reason VARCHAR (128), 
 	last_updated INT4 NOT NULL,
 	deleted INT2 DEFAULT '0',
 
@@ -144,6 +144,7 @@ CREATE TABLE users (
 	flags INT2 NOT NULL DEFAULT '0',
 -- 0x00 01 -- Suspended globally
 -- 0x00 02 -- Logged in
+-- 0x00 04 -- Invisible
 	last_updated_by VARCHAR (128),		-- nick!user@host
 	last_updated INT4 NOT NULL,
 	deleted INT2 DEFAULT '0',
