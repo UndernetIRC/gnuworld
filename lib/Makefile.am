@@ -9,6 +9,3 @@ libgnuworld_la_SOURCES = Buffer.cc \
 	StringTokenizer.cc \
 	misc.cc
 libgnuworld_la_LDFLAGS = -version-info 0:0:0 -rpath $(bindir)
-
-libgnuworld.la:
-	$(LINK) -o $(bindir)/libgnuworld.la $(LDFLAGS)
