@@ -8,7 +8,7 @@
  *
  * Caveats: SET LANG is still under consideration.
  *
- * $Id: SETCommand.cc,v 1.5 2001/01/17 21:17:33 gte Exp $
+ * $Id: SETCommand.cc,v 1.6 2001/01/18 22:39:39 gte Exp $
  */
 
 #include	<string>
@@ -20,7 +20,7 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char SETCommand_cc_rcsId[] = "$Id: SETCommand.cc,v 1.5 2001/01/17 21:17:33 gte Exp $" ;
+const char SETCommand_cc_rcsId[] = "$Id: SETCommand.cc,v 1.6 2001/01/18 22:39:39 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -484,21 +484,22 @@ bool SETCommand::Exec( iClient* theClient, const string& Message )
 
 	if(option == "DESCRIPTION")
 	{
+		string desc = st.assemble(3);
 	    if(level < level::set::desc)
 	    {
 			bot->Notice(theClient, "DESCRIPTION: You do not have enough access!");
 		return true;
 	    }
-	    if(strlen(value.c_str()) > 80)
+	    if(strlen(desc.c_str()) > 80)
 	    {
 			bot->Notice(theClient, "The DESCRIPTION can max be 80 chars long!");
 			return true;
 	    }
-		theChan->setDescription(value);
+		theChan->setDescription(desc);
 	    theChan->commit(); 
 	    bot->Notice(theClient, "DESCRIPTION for %s is: %s",
 			theChan->getName().c_str(),
-			value.c_str());
+			desc.c_str());
 	    return true;
 	}
 

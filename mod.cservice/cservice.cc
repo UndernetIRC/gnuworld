@@ -446,7 +446,7 @@ int cservice::OnCTCP( iClient* theClient, const string& CTCP,
 
 	if(Command == "VERSION")
 	{
-		xClient::DoCTCP(theClient, CTCP.c_str(), "Undernet P10 Channel Services Version 2 [" __DATE__ " " __TIME__ "] ($Id: cservice.cc,v 1.48 2001/01/17 21:27:59 gte Exp $)");
+		xClient::DoCTCP(theClient, CTCP.c_str(), "Undernet P10 Channel Services Version 2 [" __DATE__ " " __TIME__ "] ($Id: cservice.cc,v 1.49 2001/01/18 22:39:39 gte Exp $)");
 		return true;
 	}
  
@@ -1228,6 +1228,40 @@ int cservice::OnChannelEvent( const channelEventType& whichEvent,
 return xClient::OnChannelEvent( whichEvent, theChan, data1, data2, data3, data4 );
 }
 
+
+/*--escapeSQLChars------------------------------------------------------------
+ *
+ * Global function to replace ' with \' in strings for safe placement in
+ * SQL statements.
+ *--------------------------------------------------------------------------*/ 
+const string& gnuworld::escapeSQLChars(const string& theString)
+{ 
+	static string result;
+	result = theString;
+ 
+	string search = "'";
+	string replace = "\\\047";
+
+	string::size_type idx;
+
+	idx = string::npos;
+
+	while (true)
+	{ 
+		if(idx == string::npos)
+		{
+			idx = result.find(search);
+		} else {
+			idx = result.find(search, idx+2);
+		}
+
+		if (idx == string::npos) break;
+
+		result.replace(idx, search.size(), replace);
+	}
+
+	return result;
+}	
  
 void Command::Usage( iClient* theClient )
 {

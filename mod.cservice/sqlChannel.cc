@@ -9,7 +9,7 @@
  * 30/12/2000: Moved static SQL data to constants.h --Gte
  * Set loadData up to take data from rows other than 0.
  * 
- * $Id: sqlChannel.cc,v 1.16 2001/01/17 19:50:54 gte Exp $
+ * $Id: sqlChannel.cc,v 1.17 2001/01/18 22:39:39 gte Exp $
  */
  
 #include	<strstream>
@@ -19,12 +19,13 @@
 #include	"misc.h"
 #include	"sqlChannel.h"
 #include	"constants.h"
+#include	"cservice.h"
 
 using std::string ; 
 using std::endl ; 
  
 const char sqlChannel_h_rcsId[] = __SQLCHANNEL_H ;
-const char sqlChannel_cc_rcsId[] = "$Id: sqlChannel.cc,v 1.16 2001/01/17 19:50:54 gte Exp $" ;
+const char sqlChannel_cc_rcsId[] = "$Id: sqlChannel.cc,v 1.17 2001/01/18 22:39:39 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -150,15 +151,15 @@ bool sqlChannel::commit()
 	<< "SET flags = " << flags << ", "
 	<< "mass_deop_pro = " << mass_deop_pro << ", "
 	<< "flood_pro = " << flood_pro << ", "
-	<< "url = '" << url << "', "
-	<< "keywords = '" << keywords << "', "
+	<< "url = '" << escapeSQLChars(url) << "', "
+	<< "keywords = '" << escapeSQLChars(keywords) << "', "
 	<< "registered_ts = " << registered_ts << ", "
 	<< "channel_ts = " << channel_ts << ", "
 	<< "channel_mode = '" << channel_mode << "', "
 	<< "channel_key = '" << channel_key << "', "
 	<< "channel_limit = " << channel_limit << ", "
 	<< "last_updated = now()::abstime::int4, "
-	<< "description = '" << description << "' "
+	<< "description = '" << escapeSQLChars(description) << "' "
 	<< queryCondition << id
 	<< ends;
 

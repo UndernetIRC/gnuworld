@@ -1,5 +1,5 @@
 #ifndef __CSERVICE_H
-#define __CSERVICE_H "$Id: cservice.h,v 1.25 2001/01/17 19:50:54 gte Exp $"
+#define __CSERVICE_H "$Id: cservice.h,v 1.26 2001/01/18 22:39:39 gte Exp $"
 
 #include	<string>
 #include	<vector>
@@ -217,8 +217,10 @@ public:
 	virtual bool validUserMask(iClient* theClient, const string& userMask); 
 
 	// Deop everyone on this channel.
-	void cservice::deopAllOnChan(Channel*);
+	void cservice::deopAllOnChan(Channel*); 
 } ;
+
+const string& escapeSQLChars(const string& theString);
  
 } // namespace gnuworld
 
