@@ -8,7 +8,7 @@
  *
  * Caveats: None.
  *
- * $Id: UNSUSPENDCommand.cc,v 1.18 2001/09/05 03:47:56 gte Exp $
+ * $Id: UNSUSPENDCommand.cc,v 1.19 2001/11/15 18:10:01 gte Exp $
  */
 
 #include	<string>
@@ -20,7 +20,7 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char UNSUSPENDCommand_cc_rcsId[] = "$Id: UNSUSPENDCommand.cc,v 1.18 2001/09/05 03:47:56 gte Exp $" ;
+const char UNSUSPENDCommand_cc_rcsId[] = "$Id: UNSUSPENDCommand.cc,v 1.19 2001/11/15 18:10:01 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -58,7 +58,7 @@ if(!theUser)
  * (Level 600)
  */
 
-if (st[1][0] != '#')
+if ((st[1][0] != '#') && (st[1][0] != '*'))
 {
 	// Got enough admin access?
 	int level = bot->getAdminAccessLevel(theUser);
