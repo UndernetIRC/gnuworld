@@ -45,16 +45,12 @@ extern "C"
 } 
  
 cloner::cloner( const string& configFileName )
+ : xClient( configFileName )
 {
+
 EConfig conf( configFileName ) ;
 
-nickName = conf.Find( "nickname" )->second ;
-userName = conf.Find( "username" )->second ;
-hostName = conf.Find( "hostname" )->second ;
-userDescription = conf.Find( "userdescription" )->second ;
-cloneDescription = conf.Find( "clonedescription" )->second ;
-
-Mode( conf.Find( "mode" )->second ) ;
+cloneDescription = conf.Require( "clonedescription" )->second ;
 
 EConfig::const_iterator ptr = conf.Find( "fakehost" ) ;
 while( ptr != conf.end() && ptr->first == "fakehost" )
@@ -65,7 +61,8 @@ while( ptr != conf.end() && ptr->first == "fakehost" )
 
 if( hostNames.empty() )
 	{
-	elog	<< "cloner> Must specify at least one hostname\n" ;
+	elog	<< "cloner> Must specify at least one hostname"
+		<< endl ;
 	exit( 0 ) ;
 	}
 
@@ -78,17 +75,18 @@ while( ptr != conf.end() && ptr->first == "fakeuser" )
 
 if( userNames.empty() )
 	{
-	elog	<< "cloner> Must specify at least one username\n" ;
+	elog	<< "cloner> Must specify at least one username"
+		<< endl ;
 	exit( 0 ) ;
 	}
 
 fakeServer = new (nothrow) iServer(
 	0, // uplinkIntYY
-	"", // charYYXXX
-	conf.Find( "fakeservername" )->second,
+	string(), // charYYXXX
+	conf.Require( "fakeservername" )->second,
 	time( 0 ) ) ;
-assert( fakeServer != 0 ) ;
 
+assert( fakeServer != 0 ) ;
 }
 
 cloner::~cloner()
@@ -106,6 +104,8 @@ if( NULL == Network->findServer( fakeServer->getIntYY() ) )
 
 for( vector< iClient* >::size_type i = 0 ; i < clones.size() ; ++i )
 	{
+	// TODO: This will break the gnuworld core, but this is just
+	// used for testing, so who cares :)
 	strstream s ;
 	s	<< fakeServer->getCharYY() << " N "
 		<< clones[ i ]->getNickName() << " 0 "
@@ -133,10 +133,12 @@ int cloner::OnPrivateMessage( iClient* theClient, const string& Message,
 {
 //elog << "cloner::OnPrivateMessage> " << Message << endl ;
 
+/*
 if( !theClient->isOper() )
 	{
 	return 0 ;
 	}
+*/
 
 StringTokenizer st( Message ) ;
 if( st.empty() )
