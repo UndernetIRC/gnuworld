@@ -253,12 +253,12 @@ COPY "translations" FROM stdin;
 2	67	\002*** Liste de Ban pour le canal %s ***\002	31337
 2	68	%s %s Niveau: %i	31337
 2	69	AJOUTÉ PAR: %s (%s)	31337
-2	70	DEPUIS: %i	31337
+2	70	DEPUIS: %s	31337
 2	71	EXP: %s	31337
 2	72	\002*** FIN ***\002	31337
 2	73	Désolé, Je ne sais pas qui est %s.	31337
 2	74	Désolé, Vous n'êtes plus authentifié.	31337
-2	75	Aucune accès correspondant sur %s.	31337
+2	75	%s Aucune accès correspondant sur %s.	31337
 2	76	Vous ne pouvez pas modifier un usager au même niveau ou supérieur à vous.	31337
 2	77	Vous ne pouvez pas donner un accès à un usager au même niveau ou supérieur à vous.	31337
 2	78	Modification du niveau de %s sur le canal %s à %i	31337
@@ -340,11 +340,19 @@ COPY "translations" FROM stdin;
 2	154	Veuillez svp restreindre votre requête.	31337
 2	155	Aucune entrée figurante pour votre requête. [%s]	31337
 2	156	%s: Les modes du canal on été effacés.	31337
-2	158	Option invalide.	31337
-2	159	%s est un Service Officiel du réseau Undernet.	31337
-2	160	Addition du ban %s sur %s au niveau %i	31337
-2	161	%s: la liste des bans est vide.		31337
-2	162	Je suis déjà sur ce canal!	31337
+2	158	Invalid option.	31337
+2	159	%s is an Official Undernet Service Bot.	31337
+2	160	%s is an Official Coder-Com Representative%s and logged in as %s	31337
+2	161	%s is an Official Coder-Com Contributer%s and logged in as %s	31337
+2	162	%s is an Official Coder-Com Developer%s and logged in as %s	31337
+2	163	%s is an Official Coder-Com Senior%s and logged in as %s	31337
+2	164	 and an IRC operator	31337
+2	165	Added ban %s to %s at level %i	31337
+2	166	%s: ban list is empty.		31337
+2	167	I'm already in that channel!	31337
+2	168	This command is reserved to IRC Operators	31337
+2	169	I'm not opped on %s	31337
+2	170	%s for %i minutes	31337
 \.
 
 -- Danish language definition.
@@ -420,12 +428,12 @@ COPY "translations" FROM stdin;
 3	67	\002*** Ban Liste for kanal %s ***\002	31337
 3	68	%s %s Level: %i	31337
 3	69	TILFØJET AF: %s (%s)	31337
-3	70	SIDEN: %i	31337
+3	70	SIDEN: %s	31337
 3	71	UDL: %s	31337
 3	72	\002*** SLUT ***\002	31337
 3	73	Sorry, Jeg ved ikke hvem %s er.	31337
 3	74	Sorry, du er ikke længere autoriseret med mig.	31337
-3	75	Ser ikke ud til at have adgang i %s.	31337
+3	75	%s Ser ikke ud til at have adgang i %s.	31337
 3	76	Kan ikke ændre en bruger med ens eller højere adgang end din egen.	31337
 3	77	Kan ikke give en bruger højere eller ens adgang end din egen.	31337
 3	78	Ændrede %s's adgangs level på kanal %s til %i	31337
@@ -595,12 +603,12 @@ COPY "translations" FROM stdin;
 6	67	\002*** Ban List for channel %s ***\002	31337
 6	68	%s %s Level: %i	31337
 6	69	ADDED BY: %s (%s)	31337
-6	70	SINCE: %i	31337
+6	70	SINCE: %s	31337
 6	71	EXP: %s	31337
 6	72	\002*** END ***\002	31337
 6	73	Sorry, I don't know who %s is.	31337
 6	74	Sorry, you are not authorized with me anymore.	31337
-6	75	doesn't appear to have access in %s.	31337
+6	75	%s doesn't appear to have access in %s.	31337
 6	76	Cannot modify a user with equal or higher access than your own.	31337
 6	77	Cannot give a user higher or equal access to your own.	31337
 6	78	Modified %s's access level on channel %s to %i	31337
@@ -684,9 +692,17 @@ COPY "translations" FROM stdin;
 6	156	%s: Cleared channel modes.	31337
 6	158	Invalid option.	31337
 6	159	%s is an Official Undernet Service Bot.	31337
-6	160	Added ban %s to %s at level %i	31337
-6	161	%s: ban list is empty.		31337
-6	162	I'm already in that channel!	31337
+6	160	%s is an Official Coder-Com Representative%s and logged in as %s	31337
+6	161	%s is an Official Coder-Com Contributer%s and logged in as %s	31337
+6	162	%s is an Official Coder-Com Developer%s and logged in as %s	31337
+6	163	%s is an Official Coder-Com Senior%s and logged in as %s	31337
+6	164	 and an IRC operator	31337
+6	165	Added ban %s to %s at level %i	31337
+6	166	%s: ban list is empty.		31337
+6	167	I'm already in that channel!	31337
+6	168	This command is reserved to IRC Operators	31337
+6	169	I'm not opped on %s	31337
+6	170	%s for %i minutes	31337
 \.
 
 -- Italian language definition.
@@ -763,12 +779,12 @@ COPY "translations" FROM stdin;
 7	67	\002*** Lista dei Ban per il canale %s ***\002	31337
 7	68	%s %s Livello: %i	31337
 7	69	AGGIUNTO DA: %s (%s)	31337
-7	70	DAL: %i	31337
+7	70	DAL: %s	31337
 7	71	SCADENZA: %s	31337
 7	72	\002*** FINE ***\002	31337
 7	73	Spiacente, ma non conosco chi sia %s.	31337
 7	74	Spiacente, non sei più autorizzato con me.	31337
-7	75	non sembra avere accesso in %s.	31337
+7	75	%s non sembra avere accesso in %s.	31337
 7	76	Non posso modificare un utente con un livello di accesso uguale o superiore al tuo.	31337
 7	77	Non puoi dare un accesso uguale o superiore al tuo a un altro utente.	31337
 7	78	Modificato il livello di accesso per %s sul canale %s a %i	31337
@@ -852,9 +868,13 @@ COPY "translations" FROM stdin;
 7	156	%s: Mode del canale annullati.	31337
 7	158	Opzione non valida.	31337
 7	159	%s è un Bot di Servizio Ufficiale di Undernet.	31337
-7	160	Aggiunto il ban %s a %s con livello %i	31337
-7	161	%s: lista dei ban vuota.		31337
-7	162	Sono già in quel canale!	31337
+7	160	%s is an Official Coder-Com Representative%s and logged in as %s	31337
+7	161	%s is an Official Coder-Com Contributer%s and logged in as %s	31337
+7	162	%s is an Official Coder-Com Developer%s and logged in as %s	31337
+7	163	%s is an Official Coder-Com Senior%s and logged in as %s	31337
+7	165	Aggiunto il ban %s a %s con livello %i	31337
+7	166	%s: lista dei ban vuota.		31337
+7	167	Sono già in quel canale!	31337
 \.
 
 -- Romanian language definition.
@@ -930,12 +950,12 @@ COPY "translations" FROM stdin;
 8	67	\002*** Ban List pentru canalul %s ***\002	31337
 8	68	%s %s Nivel: %i	31337
 8	69	DAT DE: %s (%s)	31337
-8	70	DE LA: %i	31337
+8	70	DE LA: %s	31337
 8	71	EXP: %s	31337
 8	72	\002*** SFARSIT ***\002	31337
 8	73	Nu stiu cine e %s.	31337
 8	74	Nu mai esti autorizat.	31337
-8	75	nu pare sa aiba acces pe %s.	31337
+8	75	%s nu pare sa aiba acces pe %s.	31337
 8	76	Nu poti modifica un user cu acces egal sau mai mare ca al tau.	31337
 8	77	Nu poti da unui user acces mai mare sau egal cu al tau.	31337
 8	78	Am modificat nivelul lui %s pe %s la %i	31337
@@ -1105,12 +1125,12 @@ COPY "translations" FROM stdin;
 9	67	\002*** Llista de Bandeigs al canal %s ***\002	31337
 9	68	%s %s Nivell: %i	31337
 9	69	AFEGIT PER: %s (%s)	31337
-9	70	DES DE: %i	31337
+9	70	DES DE: %s	31337
 9	71	EXP: %s	31337
 9	72	\002*** FI ***\002	31337
 9	73	Ho sento, no sé qui és %s.	31337
 9	74	Ho sento, ja no estàs autenticat/da.	31337
-9	75	no figura amb accés a %s	31337
+9	75	%s no figura amb accés a %s	31337
 9	76	No pots modificar cap usuari/a amb nivell d'accés igual o superior al teu.	31337
 9	77	No pots donar a un/a usuari/a un accés de nivell igual o superior al teu.	31337
 9	78	El nivell d'accés de %s al canal %s s'ha canviat a %i.	31337
@@ -1280,12 +1300,12 @@ COPY "translations" FROM stdin;
 10	67	\002*** Lista de bans para el canal %s ***\002	31337
 10	68	%s %s Nivel: %i	31337
 10	69	AÑADIDO POR: %s (%s)	31337
-10	70	DESDE: %i	31337
+10	70	DESDE: %s	31337
 10	71	EXP: %s	31337
 10	72	\002*** FIN ***\002	31337
 10	73	Lo siento, no sé quién es %s.	31337
 10	74	Lo siento, ya no estás autentificado/a.	31337
-10	75	no consta con acceso en %s	31337
+10	75	%s no consta con acceso en %s	31337
 10	76	No puedes modificar los usuarios/as con nivel de acceso igual o superior al tuyo.	31337
 10	77	No puedes dar a un/a usuario/a un acceso de nivel igual o superior al tuyo.	31337
 10	78	Se ha cambiado el nivel de acceso de %s en el canal %s a %i.	31337
