@@ -1,0 +1,19 @@
+Newest changes at the top of the file:
+
+Cmaster 1.0pl1 - 17/03/2001.
+
+* Masskick no longer effects the person issuing the command.
+* Channel Keywords now display in the chaninfo command.
+* A bug that prevented < level 75 bans being set without a reason
+  has been fixed.
+* A number of bugs relating to people being unable to set autoop/
+  modinfo user accounts has been fixed.
+* Set 'DESC' will now work as well as set 'DESCRIPTION'.
+* Idle not-logged in user accounts now expire from the bot's cache
+  hourly.
+* When you Login, you are now given op's in all channels you are
+  currently in (with AUTOOP on) and have enough access in.
+* A bug causing duplicate bans being set during a MASSDEOPPRO kick
+  has been resolved.
+
+Cmaster 1.0 Jan 2001 - Initial Development and release.
