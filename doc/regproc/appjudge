@@ -1,0 +1,122 @@
+#!/usr/local/pgsql/bin/pgtclsh
+# Author: sengaia@undernet.org, 20010619
+# This script automates a good part of the channel-registration process, you need 
+# to set up sensible settings in appjudge-config for it to do you any good though.
+
+# Load configuration
+source [file dirname $argv0]/appjudge-config
+
+proc clock_stamp {} {
+	return [clock format [clock seconds] -format "%Y%m%d %H:%M"]
+}
+
+proc get_channel {hDB channel_id} {
+	pg_select $hDB "SELECT id,name FROM channels WHERE id=$channel_id" chname { return [lindex [array get chname "name"] 1]}
+}
+
+proc reject_app {hDB channel_id reason} {
+	global AS_REJECTED
+	puts [format "%s: Rejecting application for channel %s: %s" [clock_stamp] [get_channel $hDB $channel_id] $reason]
+	pg_exec $hDB "UPDATE pending SET status=$AS_REJECTED, last_updated=now()::abstime::int4, decision_ts=now()::abstime::int4, decision='Rejected: $reason' WHERE channel_id=$channel_id"
+	# Need the associated userid
+	pg_select $hDB "SELECT channel_id,manager_id FROM pending WHERE channel_id=$channel_id" res_ch {
+		set notify_user [lindex [array get res_ch "manager_id"] 1]
+	}
+}
+
+proc check_comments {hDB channel_id} {
+	global AS_PENDREVIEW
+	set check_res 0
+	# Check for objections
+	pg_select $hDB "SELECT COUNT(*) AS objcount FROM objections WHERE channel_id=$channel_id" res_obj {
+		set objcount [lindex [array get res_obj "objcount"] 1]
+		if {$objcount} {
+			puts [format "%s: Moving channel %s to status %d (there are %d objections/comments)" [clock_stamp] [get_channel $hDB $channel_id] $AS_PENDREVIEW $objcount]
+			pg_exec $hDB "UPDATE pending SET status=$AS_PENDREVIEW,last_updated=now()::abstime::int4 WHERE channel_id=$channel_id"
+			set check_res 1
+		}
+	}
+	# Check wether or not the application was labeled for review
+	pg_select $hDB "SELECT channel_id,comments FROM pending WHERE channel_id=$channel_id" res_cmt {	
+		set comments [string trim [lindex [array get res_cmt "comments"] 1]]
+		if {[string match "REVIEW:*" $comments]} {
+			puts [format "%s: Moving channel %s to status %d (it was labeled for review)" [clock_stamp] [get_channel $hDB $channel_id] $AS_PENDREVIEW]
+			pg_exec $hDB "UPDATE pending SET status=$AS_PENDREVIEW, last_updated=now()::abstime::int4 WHERE channel_id=$channel_id"
+			set check_res 1
+		}
+	}
+	return $check_res
+}
+
+# Open the DB
+set hSQL [pg_connect $SQL_DB]
+puts [format "%s: The court is now in session." [clock_stamp]]
+
+# Step 0.5: Reject applications that are still in status 0 after x days.
+set sup_timeout [expr $DAY * $SUPPORT_DAYS]
+pg_select $hSQL "SELECT channel_id,status,check_start_ts FROM pending WHERE (status = $AS_PENDING_SUPPORT) AND (now()::abstime::int4 > (created_ts + $sup_timeout))" sup_expired {
+	set chan_id [lindex [array get sup_expired "channel_id"] 1]
+        reject_app $hSQL $chan_id "One or more of the supporters did not confirm their support."
+}
+
+# Step 1: reject applications that failed to pass the activity test within the required timeframe
+set app_timeout [expr $DAY * $MAX_DAYS]
+pg_select $hSQL "SELECT channel_id,status,check_start_ts,unique_join_count FROM pending WHERE (status = $AS_TRAFFIC_CHECK) AND (now()::abstime::int4 > (check_start_ts + $app_timeout))" t_expired {
+	set chan_id [lindex [array get t_expired "channel_id"] 1]
+	set joins [lindex [array get t_expired "unique_join_count"] 1]
+
+	# Does it pass the unique join check?
+	if {$joins >= $UNIQUE_JOINS} {
+		# Yes - Label it for human inspection and pass it on
+		# get supporter count
+		pg_select $hSQL "SELECT COUNT(*) AS supcount FROM supporters WHERE channel_id=$chan_id" res_supc { set sup_joins [lindex [array get sup_res "supcount"] 1] }
+		puts [format "%s: Moving channel %s to status %d (application labeled for human inspection)" [clock_stamp] [get_channel $hSQL $chan_id] $AS_NOTIFICATION]
+		pg_exec $hSQL "UPDATE pending SET status=$AS_NOTIFICATION,check_start_ts=now()::abstime::int4,comments='REVIEW: Only $sup_joins supporters have been seen.', last_updated=now()::abstime::int4 WHERE channel_id=$chan_id"
+	} else {
+		# No - Reject 
+		reject_app $hSQL $chan_id "Not enough activity in the channel."
+	}
+}
+
+# Step 2: pass along applications that have passed the activity test
+pg_select $hSQL "SELECT channel_id,status FROM pending WHERE (status=$AS_TRAFFIC_CHECK) AND (unique_join_count >= $UNIQUE_JOINS)" t_check {
+	# check if supporters joined often enough
+	set chan_id [lindex [array get t_check "channel_id"] 1]
+	pg_select $hSQL "SELECT COUNT(*) AS supcount FROM supporters WHERE (channel_id = $chan_id) AND (join_count > 0)" sup_res {
+		set sup_joins [lindex [array get sup_res "supcount"] 1]
+	}
+	
+	if {$sup_joins >= $MIN_SUPPORTERS} { 		
+		puts [format "%s: Moving channel %s to status %d (traffic check passed)" [clock_stamp] [get_channel $hSQL $chan_id] $AS_NOTIFICATION]
+		pg_exec $hSQL "UPDATE pending SET status=$AS_NOTIFICATION,check_start_ts=now()::abstime::int4,last_updated=now()::abstime::int4 WHERE channel_id=$chan_id"
+	}
+}
+
+# Step 3: check for end of notify period
+set notify_delay [expr $DAY * $NOTIFY_DAYS]
+
+pg_select $hSQL "SELECT channel_id,status,manager_id,reviewed FROM pending WHERE (status = $AS_NOTIFICATION) AND ((check_start_ts + $notify_delay) < now()::abstime::int4)" t_notified {
+	set chan_id [lindex [array get t_notified "channel_id"] 1]
+	set mgr_id [lindex [array get t_notified "manager_id"] 1]
+	set reviewed [lindex [array get t_notified "reviewed"] 1]
+	# Figure out what to do
+	if {![check_comments $hSQL $chan_id]} {
+
+		# Has a human being seen this application?
+		if {$reviewed == "Y"} { 
+			# Yes, register the channel
+			puts [format "%s: Moving channel %s to status %d (notify period ended)" [clock_stamp] [get_channel $hSQL $chan_id] $AS_COMPLETED]
+			pg_exec $hSQL "UPDATE pending SET status=$AS_COMPLETED,decision_ts=now()::abstime::int4,last_updated=now()::abstime::int4 WHERE channel_id=$chan_id"
+			puts [format "%s: Registering channel %s (all checks passed)" [clock_stamp] [get_channel $hSQL $chan_id]]	
+			pg_exec $hSQL "UPDATE channels SET registered_ts=now()::abstime::int4, last_updated = now()::abstime::int4 WHERE id=$chan_id"
+			pg_exec $hSQL "INSERT INTO levels (channel_id,user_id,access,added,added_by,last_modif,last_modif_by,last_updated) VALUES($chan_id,$mgr_id,500,now()::abstime::int4,'The Judge',now()::abstime::int4,'The Judge',now()::abstime::int4)"
+		} else {
+			# No, label it for review
+		        puts [format "%s: Moving channel %s to status %d (it was never reviewed)" [clock_stamp] [get_channel $hSQL $chan_id] $AS_PENDREVIEW]
+                        pg_exec $hDB "UPDATE pending SET status=$AS_PENDREVIEW,last_updated=now()::abstime::int4 WHERE channel_id=$channel_id"
+		}
+	}
+}
+
+# Now that wasn't so hard...
+pg_disconnect $hSQL
