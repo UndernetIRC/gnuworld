@@ -211,7 +211,7 @@ int cservice::BurstChannels()
 	 *   is on, gaining ops if AlwaysOp is on, and so forth.
 	 */ 
 	strstream theQuery;
-	theQuery << "SELECT " << sql::channel_fields << " FROM channels WHERE name <> '*' AND registered_ts <> ''" << ends;
+	theQuery << "SELECT " << sql::channel_fields << " FROM channels WHERE lower(name) <> '*' AND registered_ts <> ''" << ends;
 	elog << "cmaster::BurstChannels> " << theQuery.str() << endl;
 	string id;
 	if ((status = SQLDb->Exec(theQuery.str())) == PGRES_TUPLES_OK)
@@ -305,6 +305,53 @@ time_t cservice::getLastRecieved(iClient* theClient)
 	return tmpData->messageTime;
 }	
 
+bool cservice::hasFlooded(iClient* theClient)
+{
+	if( (getLastRecieved(theClient) + flood_duration) <= ::time(NULL) )
+	{
+	/*
+	 *  Reset a few things, they're out of the flood period now.
+	 *  Or, this is the first message from them.
+	 */
+
+	setFloodPoints(theClient, 0);
+	setLastRecieved(theClient, ::time(NULL));
+	} else 
+	{
+		/*
+		 *  Inside the flood period, check their points..
+		 */
+
+		if(getFloodPoints(theClient) > input_flood)
+		{
+			/*
+			 *  Check admin access, if present then
+			 *  don't trigger.
+			 */
+
+			sqlUser* theUser = isAuthed(theClient, false);
+			if (theUser && getAdminAccessLevel(theUser)) return false;
+
+			// Bad boy!
+			setIgnored(theClient, true);
+			setFloodPoints(theClient, 0);
+			setLastRecieved(theClient, ::time(NULL)); 
+			Notice(theClient, "Flood me will you? I'm not going to listen to you anymore."); 
+		
+			// Send a silence numeric target, and mask to ignore messages from this user.
+			strstream s;
+			s << getCharYYXXX() << " SILENCE " << theClient->getCharYYXXX() << " *!*" 
+			  << theClient->getUserName() << "@" << theClient->getInsecureHost() << ends; 
+			Write( s );
+			delete[] s.str();
+		
+			logAdminMessage("MSG-FLOOD from %s", theClient->getNickUserHost().c_str());
+			return true;
+		}
+	}
+
+	return false;
+} 
 
 int cservice::OnPrivateMessage( iClient* theClient, const string& Message )
 { 
@@ -331,49 +378,23 @@ int cservice::OnPrivateMessage( iClient* theClient, const string& Message )
 	const string Command = string_upper( st[ 0 ] ) ;
 
 	// Attempt to find a handler for this method.
+
 	commandMapType::iterator commHandler = commandMap.find( Command ) ;
 	if( commHandler == commandMap.end() )
 	{
 		Notice( theClient, "Unknown command" ) ; 
+		if (hasFlooded(theClient)) return false;
+		setFloodPoints(theClient, getFloodPoints(theClient) + 3); 
 	}
 	else
 	{
 		/*
 		 *  Check users flood limit, if exceeded..
 		 */
-		if( (getLastRecieved(theClient) + flood_duration) <= ::time(NULL) )
-		{
-			/*
-			 *  Reset a few things, they're out of the flood period now.
-			 *  Or, this is the first message from them.
-			 */
-			setFloodPoints(theClient, 0);
-			setLastRecieved(theClient, ::time(NULL));
-		} else {
-			/*
-			 *  Inside the flood period, check their points..
-			 */
-			if(getFloodPoints(theClient) > input_flood)
-			{
-				// Bad boy!
-				setIgnored(theClient, true);
-				setFloodPoints(theClient, 0);
-				setLastRecieved(theClient, ::time(NULL)); 
-				Notice(theClient, "Flood me will you? I'm not going to listen to you anymore."); 
 
-				// Send a silence numeric target, and mask to ignore messages from this user.
-				strstream s;
-				s << getCharYYXXX() << " SILENCE " << theClient->getCharYYXXX() << " *!*" 
-				  << theClient->getUserName() << "@" << theClient->getInsecureHost() << ends; 
-				Write( s );
-				delete[] s.str();
+ 		if (hasFlooded(theClient)) return false;
 
-				logAdminMessage("MSG-FLOOD from %s", theClient->getNickUserHost().c_str());
-				return false;
-			}
-		}
-
-		setFloodPoints(theClient, getFloodPoints(theClient) + commHandler->second->getFloodPoints() ); 
+		setFloodPoints(theClient, getFloodPoints(theClient) + commHandler->second->getFloodPoints() );
 		commHandler->second->Exec( theClient, Message ) ;
 	}
 
@@ -385,7 +406,12 @@ int cservice::OnCTCP( iClient* theClient, const string& CTCP,
 {
 	/*
 	 * CTCP hander. Deal with PING, GENDER and VERSION. 
+	 * Hit users with a '5' flood score for CTCP's.
 	 */
+
+	if (hasFlooded(theClient)) return false;
+
+	setFloodPoints(theClient, getFloodPoints(theClient) + 5 ); 
 
 	StringTokenizer st( CTCP ) ;
 	if( st.empty() )
@@ -409,7 +435,7 @@ int cservice::OnCTCP( iClient* theClient, const string& CTCP,
 
 	if(Command == "VERSION")
 	{
-		xClient::DoCTCP(theClient, CTCP.c_str(), "Undernet P10 Channel Services Version 2 [" __DATE__ " " __TIME__ "] ($Id: cservice.cc,v 1.34 2001/01/11 01:51:56 gte Exp $)");
+		xClient::DoCTCP(theClient, CTCP.c_str(), "Undernet P10 Channel Services Version 2 [" __DATE__ " " __TIME__ "] ($Id: cservice.cc,v 1.35 2001/01/12 19:56:08 gte Exp $)");
 		return true;
 	}
  
@@ -583,8 +609,22 @@ short cservice::getAccessLevel( sqlUser* theUser, sqlChannel* theChan )
 		if (theChan->getFlag(sqlChannel::F_SUSPEND))
 		{
 			// Send them a notice.
+			iClient* theClient = theUser->isAuthed();
+			if (theClient)
+				Notice(theClient, "The channel %s has been suspended by a cservice administrator.",
+					theChan->getName().c_str());
 			return 0;
 		}
+		if (theLevel->getSuspendExpire() != 0)
+		{
+			// Send them a notice.
+			iClient* theClient = theUser->isAuthed();
+			if (theClient)
+				Notice(theClient, "Your access on %s has been suspended.",
+					theChan->getName().c_str());
+			return 0;
+		}
+
 
 		/*
 		 *  Check to see if this particular access record has been
@@ -721,7 +761,7 @@ int cservice::OnTimer(xServer::timerID, void*)
 		// we'll end up fetching back the same info from people we've authed later on).
 	} 
 
-	if (string(notify->relname) == "levels_u") 
+	if (string(notify->relname) == "levels_u")
 	{
 		updateType = 3;
 		theQuery << "SELECT " << sql::level_fields

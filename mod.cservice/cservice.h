@@ -1,5 +1,5 @@
 #ifndef __CSERVICE_H
-#define __CSERVICE_H "$Id: cservice.h,v 1.19 2001/01/10 01:46:10 gte Exp $"
+#define __CSERVICE_H "$Id: cservice.h,v 1.20 2001/01/12 19:56:08 gte Exp $"
 
 #include	<string>
 #include	<vector>
@@ -115,6 +115,7 @@ public:
 	// Increments the flood counter for this iClient.
  	unsigned short getFloodPoints(iClient*);
  	void setFloodPoints(iClient*, unsigned short);
+	bool hasFlooded(iClient* theClient);
 
 	// Sets the timestamp for when we last recieved a msg from this client.
 	void setLastRecieved(iClient*, time_t);
