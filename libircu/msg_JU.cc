@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_JU.cc,v 1.2 2003/06/17 15:13:53 dan_karrels Exp $
+ * $Id: msg_JU.cc,v 1.3 2003/06/20 18:58:50 dan_karrels Exp $
  */
 
 #include	"server.h"
@@ -25,7 +25,7 @@
 #include	"ServerCommandHandler.h"
 #include	"config.h"
 
-RCSTAG( "$Id: msg_JU.cc,v 1.2 2003/06/17 15:13:53 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: msg_JU.cc,v 1.3 2003/06/20 18:58:50 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -35,7 +35,7 @@ CREATE_HANDLER(msg_JU)
 /**
  * JUPE message handler.
  */
-bool msg_JU::Execute( const xParameters& Param )
+bool msg_JU::Execute( const xParameters& )
 {
 // TODO
 return false ;

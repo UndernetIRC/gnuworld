@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: client.cc,v 1.55 2003/06/18 21:08:26 dan_karrels Exp $
+ * $Id: client.cc,v 1.56 2003/06/20 18:58:51 dan_karrels Exp $
  */
 
 #include	<new>
@@ -47,7 +47,7 @@
 #include	"ELog.h"
 #include	"events.h"
 
-RCSTAG("$Id: client.cc,v 1.55 2003/06/18 21:08:26 dan_karrels Exp $" ) ;
+RCSTAG("$Id: client.cc,v 1.56 2003/06/20 18:58:51 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -124,8 +124,7 @@ int xClient::BurstGlines()
 return 0;
 }
 
-
-int xClient::Connect( int ForceTime )
+int xClient::Connect( int )
 {
 if( !Connected && MyUplink && MyUplink->isConnected() )
 	{
@@ -567,12 +566,12 @@ Connected = false ;
 return 0 ;
 }
 
-int xClient::OnWhois( iClient* sourceClient, iClient* targetClient )
+int xClient::OnWhois( iClient*, iClient* )
 {
 return 0 ;
 }
 
-int xClient::OnInvite( iClient* sourceClient, Channel* theChan )
+int xClient::OnInvite( iClient*, Channel* )
 {
 return 0 ;
 }
@@ -1789,7 +1788,7 @@ return true ;
 }
 
 bool xClient::Join( Channel* theChan,
-	const string& chanModes,
+	const string&, // chanModes
 	const time_t& joinTime,
 	bool getOps )
 {
@@ -1931,12 +1930,12 @@ bool xClient::removeChan( Channel* )
 return true ;
 }
 
-int xClient::OnTimer( xServer::timerID ID, void* data )
+int xClient::OnTimer( xServer::timerID, void* )
 {
 return 0 ;
 }
 
-int xClient::OnSignal( int whichSig )
+int xClient::OnSignal( int )
 {
 return 0 ;
 }

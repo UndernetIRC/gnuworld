@@ -18317,8 +18317,8 @@ LIBTOOL='$(SHELL) $(top_builddir)/libtool'
 
 
 
-CFLAGS="$CFLAGS -Wall -pipe"
-CXXFLAGS="-Wall -pipe"
+CFLAGS="-W -Wall -pipe"
+CXXFLAGS="-W -Wall -pipe"
 
 prefix="`pwd`"
 bindir="`pwd`/bin"
