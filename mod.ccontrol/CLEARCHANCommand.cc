@@ -14,7 +14,7 @@
 #include	"StringTokenizer.h"
 #include	"Constants.h"
 
-const char CLEARCHANCommand_cc_rcsId[] = "$Id: CLEARCHANCommand.cc,v 1.15 2002/03/01 18:27:36 mrbean_ Exp $";
+const char CLEARCHANCommand_cc_rcsId[] = "$Id: CLEARCHANCommand.cc,v 1.16 2002/03/12 19:08:03 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -56,7 +56,6 @@ string doModes; //This holds the modes the user asked to be removed
 string remModes = ""; //Holds the modes that we are removing
 string args = ""; //Holds the arguments for the remModes
 
-ccUser* tmpUser = bot->IsAuth(theClient);
 bot->MsgChanLog("CLEARCHAN %s\n",st.assemble(1).c_str());
 //Check if the user specified the modes, if not assume he ment all of the modes
 if(st.size() == 2)

@@ -3,7 +3,7 @@
  */
 
 #ifndef __CCONTROL_H
-#define __CCONTROL_H "$Id: ccontrol.h,v 1.64 2002/03/03 11:38:55 mrbean_ Exp $"
+#define __CCONTROL_H "$Id: ccontrol.h,v 1.65 2002/03/12 19:08:04 mrbean_ Exp $"
 
 //Undef this if you want to log to the database
 #define LOGTOHD 
@@ -22,7 +22,6 @@
 #include	"CControlCommands.h"
 #include	"Channel.h"
 #include	"libpq++.h"
-#include	"libpq-int.h"
 #include        "match.h"
 #include	"md5hash.h" 
 #include        "ccUser.h"
@@ -65,8 +64,6 @@ public:
 	 : PgDatabase(conninfo.c_str()) {}
 	virtual ~cmDatabase() {}
 
-	inline int getPID() const
-		{ return pgConn->be_pid; }
 };
 
 /// Forward declaration of command handler class

@@ -38,7 +38,7 @@
 #include	"ip.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.131 2002/03/03 11:38:55 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.132 2002/03/12 19:08:04 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -3725,11 +3725,11 @@ if(maxUsers < curUsers)
 			<< dateMax
 			<< " Where VarName = 'MaxUsers'"
 			<< ends;
-#ifdef LOG_SQL
+//#ifdef LOG_SQL
 	elog	<< "ccontrol::checkMaxUsers> "
 		<< DelQuery.str()
 		<< endl; 
-#endif
+//#endif
 	ExecStatusType status = SQLDb->Exec( DelQuery.str() ) ;
 	delete[] DelQuery.str() ;
 
