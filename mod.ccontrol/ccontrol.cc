@@ -37,7 +37,7 @@
 #include	"ip.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.83 2001/11/11 16:05:51 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.84 2001/11/11 22:44:41 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -2747,6 +2747,7 @@ for(;(!(gatesWaitingQueue.empty()) && (LeftThreads > 0));--LeftThreads)
 void *initGate(void* arg)
 {
 
+pthread_detach(pthread_self()); //First we must de-attach 
 ccGate * tmpGate = (ccGate*) arg;
 
 
