@@ -10,7 +10,7 @@
 # even the implied warranty of MERCHANTABILITY or FITNESS FOR A
 # PARTICULAR PURPOSE.
 
-# "$Id: Makefile.in,v 1.2 2000/12/16 23:23:21 dan_karrels Exp $"
+# "$Id: Makefile.in,v 1.3 2000/12/16 23:33:17 dan_karrels Exp $"
 
 
 SHELL = @SHELL@
@@ -90,9 +90,9 @@ UNAME = @UNAME@
 VERSION = @VERSION@
 bindir = @bindir@
 
-lib_LTLIBRARIES = libgnutest.la
-libgnutest_la_SOURCES = gnutest.cc
-libgnutest_la_LDFLAGS = -module -export-dynamic
+lib_LTLIBRARIES = libstats.la
+libstats_la_SOURCES = stats.cc
+libstats_la_LDFLAGS = -module -export-dynamic
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = ../include/defs.h
 CONFIG_CLEAN_FILES = 
@@ -102,8 +102,8 @@ LTLIBRARIES =  $(lib_LTLIBRARIES)
 DEFS = @DEFS@ -I. -I$(srcdir) -I../include
 CPPFLAGS = @CPPFLAGS@
 LIBS = @LIBS@
-libgnutest_la_LIBADD = 
-libgnutest_la_OBJECTS =  gnutest.lo
+libstats_la_LIBADD = 
+libstats_la_OBJECTS =  stats.lo
 CXXCOMPILE = $(CXX) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
 LTCXXCOMPILE = $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
 CXXLD = $(CXX)
@@ -115,9 +115,9 @@ DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
 TAR = tar
 GZIP_ENV = --best
-DEP_FILES =  .deps/gnutest.P
-SOURCES = $(libgnutest_la_SOURCES)
-OBJECTS = $(libgnutest_la_OBJECTS)
+DEP_FILES =  .deps/stats.P
+SOURCES = $(libstats_la_SOURCES)
+OBJECTS = $(libstats_la_OBJECTS)
 
 all: all-redirect
 .SUFFIXES:
@@ -187,8 +187,8 @@ distclean-libtool:
 
 maintainer-clean-libtool:
 
-libgnutest.la: $(libgnutest_la_OBJECTS) $(libgnutest_la_DEPENDENCIES)
-	$(CXXLINK) -rpath $(libdir) $(libgnutest_la_LDFLAGS) $(libgnutest_la_OBJECTS) $(libgnutest_la_LIBADD) $(LIBS)
+libstats.la: $(libstats_la_OBJECTS) $(libstats_la_DEPENDENCIES)
+	$(CXXLINK) -rpath $(libdir) $(libstats_la_LDFLAGS) $(libstats_la_OBJECTS) $(libstats_la_LIBADD) $(LIBS)
 .cc.o:
 	$(CXXCOMPILE) -c $<
 .cc.lo:
