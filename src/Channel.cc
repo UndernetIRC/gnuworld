@@ -85,7 +85,7 @@ ChannelUser* Channel::findUser( iClient* theClient ) const
   assert( theClient != 0 ) ;
 #endif
 
-userListType::iterator ptr = userList.find( theClient->getIntYYXXX() ) ;
+userListType::const_iterator ptr = userList.find( theClient->getIntYYXXX() ) ;
 if( ptr == userList.end() )
 	{
 	// User not found
