@@ -1,5 +1,5 @@
 
--- "$Id: ccontrol.update.sql,v 1.6 2001/08/13 15:10:52 mrbean_ Exp $"
+-- "$Id: ccontrol.update.sql,v 1.7 2001/10/14 06:51:35 nighty Exp $"
 
 -- ccontrol database changes update
 -- this file will add the new features to an old database
@@ -8,7 +8,7 @@
 
 -- Add missing columns 
 ALTER TABLE opers ADD isSuspended BOOLEAN NOT NULL DEFAULT 'n';
-ALTER TABLE opers ADD suspendReason VARCHAR(256);
+ALTER TABLE opers ADD suspend_Reason VARCHAR(256);
 ALTER TABLE opers ADD email VARCHAR(128);
 ALTER TABLE opers ADD isUHS BOOLEAN NOT NULL DEFAULT 'n';
 ALTER TABLE opers ADD isOPER BOOLEAN NOT NULL DEFAULT 'n';

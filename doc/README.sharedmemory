@@ -1,7 +1,8 @@
-
-
+-- "$Id: README.sharedmemory,v 1.2 2001/10/14 06:54:40 nighty Exp $"
 --
 -- Manipulating shared memory 
+--
+-- 2001-10-04: nighty <nighty@undernet.org>
 --
 
 

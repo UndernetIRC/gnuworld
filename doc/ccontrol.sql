@@ -1,4 +1,8 @@
--- "$Id: ccontrol.sql,v 1.18 2001/10/14 06:25:18 nighty Exp $"
+-- "$Id: ccontrol.sql,v 1.19 2001/10/14 06:51:35 nighty Exp $"
+
+-- 2001-10-14 : nighty
+-- corrected fieldname typo in "suspendReason" -> "suspend_reason"
+
 -- 2001-13-02  : |MrBean|
 -- Added level patch for ccontrol module
 
