@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ConnectionManager.cc,v 1.2 2002/08/08 21:31:44 dan_karrels Exp $
+ * $Id: ConnectionManager.cc,v 1.3 2002/08/29 19:42:21 mrbean_ Exp $
  */
 
 #include	<unistd.h>
@@ -253,30 +253,32 @@ if( newConnection != 0 )
 		}
 	}
 
+if( newConnection != 0 )
+	{
 // Obtain the local machine's port number for this Connection
-struct sockaddr_in sockAddr ;
-memset( &sockAddr, 0, sizeof( struct sockaddr_in ) ) ;
+	struct sockaddr_in sockAddr ;
+	memset( &sockAddr, 0, sizeof( struct sockaddr_in ) ) ;
 
-socklen_t sockAddrLen =
+	socklen_t sockAddrLen =
 	static_cast< socklen_t >( sizeof( struct sockaddr ) ) ;
 
-// Get the information for the socket on this machine
-if( ::getsockname( newConnection->getSockFD(),
-	reinterpret_cast< struct sockaddr* >( &sockAddr ),
-	&sockAddrLen ) < 0 )
-	{
-	// getsockname() failed
-	cout	<< "finishConnect> getsockname() failed: "
-		<< strerror( errno )
-		<< endl ;
+	// Get the information for the socket on this machine
+	if( ::getsockname( newConnection->getSockFD(),
+		reinterpret_cast< struct sockaddr* >( &sockAddr ),
+		&sockAddrLen ) < 0 )
+		{
+		// getsockname() failed
+		cout	<< "finishConnect> getsockname() failed: "
+			<< strerror( errno )
+			<< endl ;
 
-	// Return failure
-	return false ;
+		// Return failure
+		return false ;
+		}
+
+	// Update remote port number for this Connection
+	newConnection->setLocalPort( ntohs( sockAddr.sin_port ) ) ;
 	}
-
-// Update remote port number for this Connection
-newConnection->setLocalPort( ntohs( sockAddr.sin_port ) ) ;
-
 // Return a pointer to the Connection object, whether or not
 // it's NULL
 return newConnection ;
@@ -979,8 +981,8 @@ bool ConnectionManager::handleRead( ConnectionHandler* hPtr,
 // protected member, no error checking
 
 // Create and set a temporary buffer to 0
-char buf[ 4096 ] ;
-memset( buf, 0, 4096 ) ;
+char buf[ 4097 ] ;
+memset( buf, 0, 4097 ) ;
 
 // Attempt the read from the socket
 errno = 0 ;
