@@ -1,4 +1,4 @@
--- $Id: language_greek.sql,v 1.4 2002/10/31 14:17:29 nighty Exp $
+-- $Id: language_greek.sql,v 1.5 2002/11/17 01:24:24 nighty Exp $
 -- Greek	 language definition.
 -- 04/05/02 - Marios Solomou <hawk@undernet.org>.
 -- 04/05/02 - deop <d30pma@cytanet.com.cy>.
@@ -84,8 +84,7 @@ COPY "translations" FROM stdin;
 19	75	O/H %s den fenetai na exei access sto %s.	31337	0
 19	76	Den mporeis na kaneis modinfo se ena xristi me isa i psilotera access apo ta dika sou.	31337	0
 19	77	Den mporeis na doseis se ena xristi psilotera i isa access me ta dika sou.	31337	0
-19	78	Exei ginei modinfo to orio twn access tou xristi %s's sto kanali %s se
-%i	31337	0
+19	78	Exei ginei modinfo to orio twn access tou xristi %s's sto kanali %s se %i	31337	0
 19	79	Exei tethei AUTOMODE gia OP gia ton/tin %s sto kanali %s	31337	0
 19	80	Exei tethei AUTOMODE gia VOICE gia ton/tin %s sto kanali %s	31337	0
 19	81	Exei tethei AUTOMODE se NONE gia ton/tin %s sto kanali %s	31337	0
