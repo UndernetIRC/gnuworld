@@ -1,10 +1,10 @@
 -- Muhauahuuahha.
--- INSERT INTO languages VALUES(15, 'HA', 'Haloween', 31337);
+-- INSERT INTO languages VALUES(15, 'HA', 'Halloween', 31337);
 
 DELETE FROM translations WHERE language_id = 15;
 
 COPY "translations" FROM stdin;
-15	1	You are already authenticated as %s	31337
+15	1	You're feeble disguise doesn't work, you are still %s	31337
 15	2	Welcome to the underworld %s	31337
 15	3	Muhauhauhauh, you can't do that :P	31337
 15	4	Sorry, the casket %s is empty	31337
@@ -16,10 +16,10 @@ COPY "translations" FROM stdin;
 15	10	%s: You are not in that casket	31337
 15	11	%s is already opped in %s	31337
 15	12	%s is already voiced in %s	31337
-15	13	You're deopped by %s (%s)	31337
-15	14	You're devoiced by %s (%s)	31337
-15	15	%s is not opped in %s	31337
-15	16	%s is not voiced in %s	31337
+15	13	You're scared by %s (%s)	31337
+15	14	You're frightened by %s (%s)	31337
+15	15	%s is not scared in %s	31337
+15	16	%s is not frightened in %s	31337
 15	17	%s is denied entry into the underworld	31337
 15	18	I'm not in that casket!	31337
 15	19	Invalid pitchfork-level range. Valid range is 1-%i.	31337
@@ -29,10 +29,10 @@ COPY "translations" FROM stdin;
 15	23	The pitchfork %s is already covered by %s	31337
 15	24	Invalid minimum level.	31337
 15	25	Invalid maximum level.	31337
-15	26	pumpkin: %s ACCESS: %s %s	31337
+15	26	pumpkin: %s GENERATION: %s %s	31337
 15	27	casket: %s -- AUTOMODE: %s	31337
 15	28	LAST MODIFIED: %s (%s ago)	31337
-15	29	** SUSPENDED ** - Expires in %s (Level %i)	31337
+15	29	** BANISHED ** - Expires in %s (Level %i)	31337
 15	30	LAST SEEN: %s ago.	31337
 15	31	There are more than 15 matching entries.	31337
 15	32	Please restrict your query.	31337
@@ -44,7 +44,7 @@ COPY "translations" FROM stdin;
 15	38	Added pumpkin %s to %s with access level %i	31337
 15	39	Something went wrong: %s	31337
 15	40	%s: End of pitchfork list	31337
-15	41	Unable to view pumpkin details (Invisible)	31337
+15	41	That user is impersonating the invisible man.	31337
 15	42	Information about: %s (%i)	31337
 15	43	Currently logged on via: %s	31337
 15	44	URL: %s	31337
@@ -59,16 +59,16 @@ COPY "translations" FROM stdin;
 15	53	I think I've sent you a little too much data, I'm going to ignore you for a while.	31337
 15	54	Incomplete command	31337
 15	55	To use %s, you must /msg %s@%s	31337
-15	56	Sorry, You must be logged in to use this command.	31337
+15	56	Sorry, You must chant the secret incantation to use this command.	31337
 15	57	The casket %s has been suspended by a cservice administrator.	31337
 15	58	Your access on %s has been suspended.	31337
 15	59	The NOOP flag is set on %s	31337
 15	60	The STRICTOP flag is set on %s	31337
-15	61	You just deopped more than %i people	31337
+15	61	You just scared more than %i people	31337
 15	62	SYNTAX: %s	31337
 15	63	Temporarily increased your access on casket %s to %i	31337
-15	64	%s is registered.	31337
-15	65	%s is not registered.	31337
+15	64	%s is present in the cemetary.	31337
+15	65	%s is not present in the cemetary.	31337
 15	66	I don't think %s would appreciate that.	31337
 15	67	\002*** pitchfork List for casket %s ***\002	31337
 15	68	%s %s Level: %i	31337
@@ -77,7 +77,7 @@ COPY "translations" FROM stdin;
 15	71	EXP: %s	31337
 15	72	\002*** END ***\002	31337
 15	73	I don't know who %s is.	31337
-15	74	You are not authorised with me anymore.	31337
+15	74	You are no longer in disguise.	31337
 15	75	%s doesn't appear to have access in %s.	31337
 15	76	Cannot modify a pumpkin with equal or higher access than your own.	31337
 15	77	Cannot give a pumpkin higher or equal access to your own.	31337
@@ -85,12 +85,12 @@ COPY "translations" FROM stdin;
 15	79	Set AUTOMODE to OP for %s on casket %s	31337
 15	80	Set AUTOMODE to VOICE for %s on casket %s	31337
 15	81	Set AUTOMODE to NONE for %s on casket %s	31337	
-15	82	Your passphrase cannot be your pumpkinname or current nick - syntax is: NEWPASS <new passphrase>	31337
+15	82	Your secret chant cannot be your pumpkinname or current nick - syntax is: NEWPASS <new passphrase>	31337
 15	83	Password successfully changed.	31337
 15	84	The NOOP flag is set on %s	31337
 15	85	The STRICTOP flag is set on %s (and %s isn't authenticated)	31337
 15	86	The STRICTOP flag is set on %s (and %s has insufficient access)	31337
-15	87	Purged casket %s	31337
+15	87	%s crumbles into dust, forever banished from the underworld	31337
 15	88	%s is already registered with me.	31337
 15	89	Invalid casket name.	31337
 15	90	Registered casket %s	31337
@@ -150,11 +150,11 @@ COPY "translations" FROM stdin;
 15	144	Removed your temporary access of %i from casket %s	31337
 15	145	You don't appear to have a forced access in %s, perhaps it expired?	31337
 15	146	%s isn't suspended on %s	31337
-15	147	%s is an IRC operator	31337
-15	148	%s is NOT logged in.	31337
-15	149	%s is logged in as %s%s	31337
-15	150	%s is an Official CService Representative%s and logged in as %s	31337
-15	151	%s is an Official CService Administrator%s and logged in as %s	31337
+15	147	%s is a vampire scriptkiddie slayer	31337
+15	148	%s is not in costume.	31337
+15	149	%s is disguised as %s%s	31337
+15	150	%s is an Official CService Trick-or-Treater%s and logged in as %s	31337
+15	151	%s is a Scary Official CService Trick-or-Treater%s and logged in as %s	31337
 15	152	%s is getting their ass kicked by Buffy%s and logged in as %s	31337
 15	153	There are more than %i entries matching [%s]	31337
 15	154	Please restrict your search mask	31337
