@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_Server.cc,v 1.2 2003/05/26 21:44:30 dan_karrels Exp $
+ * $Id: msg_Server.cc,v 1.3 2003/06/16 23:49:54 dan_karrels Exp $
  */
 
 #include	<new>
@@ -34,7 +34,7 @@
 #include	"xparameters.h"
 #include	"ServerCommandHandler.h"
 
-const char msg_Server_cc_rcsId[] = "$Id: msg_Server.cc,v 1.2 2003/05/26 21:44:30 dan_karrels Exp $" ;
+const char msg_Server_cc_rcsId[] = "$Id: msg_Server.cc,v 1.3 2003/06/16 23:49:54 dan_karrels Exp $" ;
 const char server_h_rcsId[] = __SERVER_H ;
 const char events_h_rcsId[] = __EVENTS_H ;
 const char Network_h_rcsId[] = __NETWORK_H ;
@@ -94,7 +94,7 @@ if( Param[ 1 ][ 0 ] == '1' )
 	// telling us who our uplink server is.
 	// We need to add our uplink to network tables.
 
-	// Assume 3 character numerics
+	// Assume 5 character numerics
 	unsigned int uplinkIntYY = base64toint( Param[ 5 ], 2 ) ;
 
 	// Our uplink has its own numeric as its uplinkIntYY.
@@ -104,6 +104,13 @@ if( Param[ 1 ][ 0 ] == '1' )
 		Param[ 0 ], // name
 		atoi( Param[ 3 ] ) ) ; // connect time
 	assert( tmpUplink != 0 ) ;
+
+	// Check for P10 versus J10, J10 means the server is
+	// bursting.
+	if( 'J' == Param[ 4 ][ 0 ] )
+		{
+		tmpUplink->setBursting( true ) ;
+		}
 
 	theServer->setUplink( tmpUplink ) ;
 

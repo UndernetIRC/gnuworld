@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_S.cc,v 1.1 2002/11/20 22:16:18 dan_karrels Exp $
+ * $Id: msg_S.cc,v 1.2 2003/06/16 23:49:54 dan_karrels Exp $
  */
 
 #include	<new>
@@ -34,7 +34,7 @@
 #include	"xparameters.h"
 #include	"ServerCommandHandler.h"
 
-const char msg_S_cc_rcsId[] = "$Id: msg_S.cc,v 1.1 2002/11/20 22:16:18 dan_karrels Exp $" ;
+const char msg_S_cc_rcsId[] = "$Id: msg_S.cc,v 1.2 2003/06/16 23:49:54 dan_karrels Exp $" ;
 const char server_h_rcsId[] = __SERVER_H ;
 const char events_h_rcsId[] = __EVENTS_H ;
 const char Network_h_rcsId[] = __NETWORK_H ;
@@ -122,6 +122,13 @@ assert( newServer != 0 ) ;
 // If we've finished our sync to the network, then this S
 // must be another server merging later on.
 if( !theServer->isBursting() )
+	{
+	newServer->setBursting( true ) ;
+	}
+
+// params[ 5 ] is either "P10", or "J10".  The J10 means
+// that the server is bursting
+if( 'J' == params[ 5 ][ 0 ] )
 	{
 	newServer->setBursting( true ) ;
 	}
