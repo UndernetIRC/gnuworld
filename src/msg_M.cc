@@ -18,7 +18,7 @@
 #include	"ELog.h"
 #include	"StringTokenizer.h"
 
-const char msg_M_cc_rcsId[] = "$Id: msg_M.cc,v 1.8 2001/06/23 16:27:52 dan_karrels Exp $" ;
+const char msg_M_cc_rcsId[] = "$Id: msg_M.cc,v 1.9 2001/06/24 02:14:24 dan_karrels Exp $" ;
 const char misc_h_rcsId[] = __MISC_H ;
 const char events_h_rcsId[] = __EVENTS_H ;
 const char server_h_rcsId[] = __SERVER_H ;
@@ -208,6 +208,9 @@ for( const char* modePtr = Param[ 2 ] ; *modePtr ; ++modePtr )
 			if( polarity )
 				{
 				targetUser->removeZombie() ;
+//				elog	<< "xServer::msg_M> Removing "
+//					<< "zombie"
+//					<< endl ;
 				}
 			break ;
 			}

@@ -17,7 +17,7 @@
 #include	"ELog.h"
 #include	"StringTokenizer.h"
 
-const char msg_K_cc_rcsId[] = "$Id: msg_K.cc,v 1.5 2001/06/23 16:27:52 dan_karrels Exp $" ;
+const char msg_K_cc_rcsId[] = "$Id: msg_K.cc,v 1.6 2001/06/24 02:14:24 dan_karrels Exp $" ;
 const char server_h_rcsId[] = __SERVER_H ;
 const char iClient_h_rcsId[] = __ICLIENT_H ;
 const char Channel_h_rcsId[] = __CHANNEL_H ;
@@ -168,6 +168,12 @@ else
 	// The kick is unauthoritative, the destination client
 	// is now in the zombie state
 	destChanUser->setZombie() ;
+
+	elog	<< "xServer::msg_K> Adding zombie for user "
+		<< *destChanUser
+		<< " on channel "
+		<< theChan->getName()
+		<< endl ;
 	}
 
 // Post the channel kick event
