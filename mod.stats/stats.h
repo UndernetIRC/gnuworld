@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: stats.h,v 1.7 2003/06/07 00:26:23 dan_karrels Exp $
+ * $Id: stats.h,v 1.8 2003/06/07 14:38:59 dan_karrels Exp $
  */
 
 #ifndef __STATS_H
-#define __STATS_H "$Id: stats.h,v 1.7 2003/06/07 00:26:23 dan_karrels Exp $"
+#define __STATS_H "$Id: stats.h,v 1.8 2003/06/07 14:38:59 dan_karrels Exp $"
 
 #include	<fstream>
 #include	<string>
@@ -64,6 +64,8 @@ public:
                 Channel*,  
                 void* Data1 = NULL, void* Data2 = NULL,
                 void* Data3 = NULL, void* Data4 = NULL ) ;
+	virtual void OnNetworkKick( Channel*, iClient*,
+		iClient*, const string&, bool ) ;
 
 	virtual int	OnTimer( xServer::timerID, void* ) ;
 

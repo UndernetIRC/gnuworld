@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_T.cc,v 1.1 2002/11/20 22:16:18 dan_karrels Exp $
+ * $Id: msg_T.cc,v 1.2 2003/06/07 14:38:59 dan_karrels Exp $
  */
 
 #include	<iostream>
@@ -30,7 +30,7 @@
 #include	"Channel.h"
 #include	"ServerCommandHandler.h"
 
-const char msg_T_cc_rcsId[] = "$Id: msg_T.cc,v 1.1 2002/11/20 22:16:18 dan_karrels Exp $" ;
+const char msg_T_cc_rcsId[] = "$Id: msg_T.cc,v 1.2 2003/06/07 14:38:59 dan_karrels Exp $" ;
 const char xParameters_h_rcsId[] = __XPARAMETERS_H ;
 const char server_h_rcsId[] = __SERVER_H ;
 const char ELog_h_rcsId[] = __ELOG_H ;
@@ -47,8 +47,7 @@ CREATE_HANDLER(msg_T)
 
 // Channel topics currently are not tracked.
 // kAI T #omniplex :-=[ Washington.DC.US.Krushnet.Org / Luxembourg.
-// LU.EU.KrushNet.Org
-// Admin Channel ]=-
+// LU.EU.KrushNet.Org Admin Channel ]=-
 bool msg_T::Execute( const xParameters& Param )
 {
 if( Param.size() < 3 )
@@ -58,10 +57,8 @@ if( Param.size() < 3 )
 	return false ;
 	}
 
-#ifdef TOPIC_TRACK
-
-Channel* Chan = Network->findChannel( Param[ 1 ] ) ;
-if( 0 == Chan )
+Channel* theChan = Network->findChannel( Param[ 1 ] ) ;
+if( 0 == theChan )
 	{
 	elog	<< "msg_T> Unable to locate channel: "
 		<< Param[ 1 ]
@@ -69,9 +66,23 @@ if( 0 == Chan )
 	return false ;
 	}
 
+#ifdef TOPIC_TRACK
+
 Chan->setTopic( Param[ 2 ] ) ;
 
 #endif // TOPIC_TRACK
+
+// srcClient may be NULL if a server is setting the topic
+iClient* srcClient = Network->findClient( Param[ 0 ] ) ;
+
+string newTopic( Param[ 2 ] ) ;
+
+// No need to pass the new topic, it has already been stored
+// in the theChan
+theServer->PostChannelEvent( EVT_TOPIC,
+	theChan,
+	static_cast< void* >( srcClient ),
+	static_cast< void* >( &newTopic ) ) ;
 
 return true ;
 }

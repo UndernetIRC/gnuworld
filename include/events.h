@@ -22,11 +22,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: events.h,v 1.15 2003/06/06 20:03:31 dan_karrels Exp $
+ * $Id: events.h,v 1.16 2003/06/07 14:38:58 dan_karrels Exp $
  */
 
 #ifndef __EVENTS_H
-#define __EVENTS_H "$Id: events.h,v 1.15 2003/06/06 20:03:31 dan_karrels Exp $"
+#define __EVENTS_H "$Id: events.h,v 1.16 2003/06/07 14:38:58 dan_karrels Exp $"
 
 namespace gnuworld
 {
@@ -71,8 +71,8 @@ enum
 {
 	EVT_JOIN = EVT_NOOP,
 	EVT_PART,
-	EVT_TOPIC,
-	EVT_KICK,
+	EVT_TOPIC, // passed even if TRACK_TOPIC is disabled
+	EVT_KICK, // moved to xClient::OnNetworkKick()
 	EVT_CREATE
 } ;
 

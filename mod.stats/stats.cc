@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: stats.cc,v 1.13 2003/06/07 00:26:23 dan_karrels Exp $
+ * $Id: stats.cc,v 1.14 2003/06/07 14:38:59 dan_karrels Exp $
  */
 
 #include	<string>
@@ -402,6 +402,12 @@ if( 0 == startTime )
 	startTime = ::time( 0 ) ;
 	}
 
+if( !logDuringBurst && MyUplink->isBursting() )
+	{
+	// Don't log
+	return 0 ;
+	}
+
 assert( whichEvent <= EVT_CREATE ) ;
 
 eventMinuteTotal[ whichEvent ]++ ;
@@ -409,6 +415,22 @@ eventTotal[ whichEvent ]++ ;
 
 return xClient::OnChannelEvent( whichEvent, theChan,
 	arg1, arg2, arg3, arg4 ) ;
+}
+
+void stats::OnNetworkKick( Channel* theChan,
+	iClient* srcClient,
+	iClient* destClient,
+	const string& kickMessage,
+	bool authoritative )
+{
+eventMinuteTotal[ EVT_KICK ]++ ;
+eventTotal[ EVT_KICK ]++ ;
+
+return xClient::OnNetworkKick( theChan,
+	srcClient,
+	destClient,
+	kickMessage,
+	authoritative ) ;
 }
 
 int stats::OnEvent( const eventType& whichEvent,
@@ -420,6 +442,12 @@ int stats::OnEvent( const eventType& whichEvent,
 if( 0 == startTime )
 	{
 	startTime = ::time( 0 ) ;
+	}
+
+if( !logDuringBurst && MyUplink->isBursting() )
+	{
+	// Don't log
+	return 0 ;
 	}
 
 assert( whichEvent <= EVT_CREATE ) ;
@@ -467,7 +495,7 @@ if( largestChan != 0 )
 	}
 
 #ifdef EDEBUG
-	Notice( theClient, "Length of last burst: %d, "
+	Notice( theClient, "Length of last burst: %d seconds, "
 		"Number of bytes processed since beginning of last "
 		"burst: %d",
 		MyUplink->getLastBurstDuration(),

@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_O.cc,v 1.3 2003/06/07 00:26:23 dan_karrels Exp $
+ * $Id: msg_O.cc,v 1.4 2003/06/07 14:38:59 dan_karrels Exp $
  */
 
 #include	<string>
@@ -32,7 +32,7 @@
 #include	"ServerCommandHandler.h"
 #include	"StringTokenizer.h"
 
-const char msg_P_cc_rcsId[] = "$Id: msg_O.cc,v 1.3 2003/06/07 00:26:23 dan_karrels Exp $" ;
+const char msg_P_cc_rcsId[] = "$Id: msg_O.cc,v 1.4 2003/06/07 14:38:59 dan_karrels Exp $" ;
 const char server_h_rcsId[] = __SERVER_H ;
 const char Network_h_rcsId[] = __NETWORK_H ;
 const char iClient_h_rcsId[] = __ICLIENT_H ;
@@ -179,11 +179,11 @@ if( theChan != 0 )
 	}
 else
 	{
-	elog	<< "msg_O> Private notice from: "
-		<< *srcClient
-		<< ", message: "
-		<< message
-		<< endl ;
+//	elog	<< "msg_O> Private notice from: "
+//		<< *srcClient
+//		<< ", message: "
+//		<< message
+//		<< endl ;
 
 	return targetClient->OnPrivateNotice( srcClient,
 		message,
