@@ -29,3 +29,14 @@ startDelay = 10
 commitFreq = 5
 commitCount = 1
 
+# What level of debug stuff should be sent to the console channel?
+# This is a bitfield, values as follows:
+#  1 - PROTOCOL
+#  2 - SQL
+#  4 - DEBUG
+#  8 - INFO
+# 16 - WARNING
+# 32 - ERROR
+# Simply add the numbers together from the levels you want.
+consoleLevel = 63
+
