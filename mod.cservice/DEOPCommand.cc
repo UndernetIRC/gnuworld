@@ -8,7 +8,7 @@
  *
  * Caveats: None
  *
- * $Id: DEOPCommand.cc,v 1.1 2001/01/01 07:51:58 gte Exp $
+ * $Id: DEOPCommand.cc,v 1.2 2001/01/02 01:27:56 gte Exp $
  */
 
 #include	<string>
@@ -23,7 +23,7 @@
 
 using std::map ;
 
-const char DEOPCommand_cc_rcsId[] = "$Id: DEOPCommand.cc,v 1.1 2001/01/01 07:51:58 gte Exp $" ;
+const char DEOPCommand_cc_rcsId[] = "$Id: DEOPCommand.cc,v 1.2 2001/01/02 01:27:56 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -97,14 +97,30 @@ bool DEOPCommand::Exec( iClient* theClient, const string& Message )
 	typedef map < iClient*, int > duplicateMapType; 
 	duplicateMapType duplicateMap;
 
-	while (counter < st.size())
+	string::size_type pos = st[2].find_first_of( ',' ) ; 
+	string source;
+	char delim;
+
+	if( string::npos != pos ) // Found a comma?
+	{
+		source = st.assemble(2); // We'll do a comma seperated search then.
+		delim = ',';
+		counter = 0;
+	} else { 
+		source = Message;
+		delim = ' ';
+	}
+
+	StringTokenizer st2( source, delim );
+
+	while (counter < st2.size())
 	{ 
-		target = Network->findNick(st[counter]);
+		target = Network->findNick(st2[counter]);
 
 		if(!target)
 		{
 			bot->Notice(theClient, bot->getResponse(theUser, language::dont_see_them).c_str(),
-				st[counter].c_str());
+				st2[counter].c_str());
 			cont = false;
 		} 
 

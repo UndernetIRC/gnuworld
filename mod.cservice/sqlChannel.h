@@ -1,7 +1,7 @@
 /* sqlChannel.h */
 
 #ifndef __SQLCHANNEL_H
-#define __SQLCHANNEL_H "$Id: sqlChannel.h,v 1.7 2001/01/01 07:51:58 gte Exp $"
+#define __SQLCHANNEL_H "$Id: sqlChannel.h,v 1.8 2001/01/02 01:27:56 gte Exp $"
 
 #include	<string>
 #include	<ctime>
@@ -133,10 +133,9 @@ public:
 	 */
 
 	bool commit();
-
-protected:
-
     void setAllMembers(int);
+
+protected: 
 
 	unsigned int	id ;
 	string		name ;

@@ -269,7 +269,7 @@ int cservice::OnCTCP( iClient* theClient, const string& CTCP,
 
 	if(Command == "VERSION")
 	{
-		xClient::DoCTCP(theClient, CTCP.c_str(), "Undernet Channel Services Version 2 [" __DATE__ " " __TIME__ "] ($Id: cservice.cc,v 1.25 2001/01/01 07:51:58 gte Exp $)");
+		xClient::DoCTCP(theClient, CTCP.c_str(), "Undernet Channel Services Version 2 [" __DATE__ " " __TIME__ "] ($Id: cservice.cc,v 1.26 2001/01/02 01:27:56 gte Exp $)");
 		return true;
 	}
  
@@ -478,12 +478,11 @@ int cservice::OnTimer(xServer::timerID, void*)
 	// Check we aren't getting our own updates.
 	if (notify->be_pid != SQLDb->getPID())
 	{ 
-		theQuery << "SELECT * FROM ";
-
 		if (string(notify->relname) == "channels_u") 
 		{
 			updateType = 1;
-			theQuery << "channels WHERE last_update > " << lastChannelRefresh;
+			theQuery << "SELECT " << sql::channel_fields
+			<< " FROM channels WHERE last_update > " << lastChannelRefresh;
 			// Fetch updated channel information.
 		}
  
@@ -492,25 +491,43 @@ int cservice::OnTimer(xServer::timerID, void*)
 
 		// Execute query, parse results.
 		status = SQLDb->Exec(theQuery.str());
- 
-		if (status == PGRES_TUPLES_OK)
-		{
-			elog << "cmaster::OnTimer> Found " << SQLDb->Tuples() << " updated channel records." << endl;
-			/*
-			 *  Now, update the cache with information in this results set.
-			 */
 
-		}  else 
+		// Free memory allocated by postgres API object.
+		free(notify); 
+
+		if (status != PGRES_TUPLES_OK)
 		{
 			elog << "cmaster::OnTimer> Something went wrong: " << SQLDb->ErrorMessage() << endl; // Log to msgchan here.
+			return false;
 		}
 
+		elog << "cmaster::OnTimer> Found " << SQLDb->Tuples() << " updated channel records." << endl;
+		/*
+		 *  Now, update the cache with information in this results set.
+		 */
+
+		if (SQLDb->Tuples() > 0) // We could get no results back if the last_update field wasn't set.
+		{ 
+			for (int i = 0 ; i < SQLDb->Tuples(); i++)
+			{ 
+				sqlChannelHashType::iterator ptr = sqlChannelCache.find(SQLDb->GetValue(i, 1));
+				elog << "timer: looking for " << SQLDb->GetValue(i, 2) << endl;
+				if(ptr != sqlChannelCache.end()) // Found something!
+				{
+					elog << "timer: found " << (ptr->second)->getName() << " in cache!" << endl;
+					(ptr->second)->setAllMembers(i);
+				}
+
+			}
+			
+		}
+ 
 	} else // Our own notification.
 	{
 		elog << "cmaster::OnTimer> Notification from our Backend PID, ignoring update." << endl;
 	} 
 
-	free(notify);
+
 	return(0);
 }
  

@@ -11,7 +11,7 @@
  *
  * Caveats: None
  *
- * $Id: TOPICCommand.cc,v 1.3 2000/12/31 05:06:27 gte Exp $
+ * $Id: TOPICCommand.cc,v 1.4 2001/01/02 01:27:56 gte Exp $
  */
 
 #include	<string>
@@ -23,7 +23,7 @@
 #include	"responses.h"
 #include	"Network.h"
 
-const char TOPICCommand_cc_rcsId[] = "$Id: TOPICCommand.cc,v 1.3 2000/12/31 05:06:27 gte Exp $" ;
+const char TOPICCommand_cc_rcsId[] = "$Id: TOPICCommand.cc,v 1.4 2001/01/02 01:27:56 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -77,13 +77,13 @@ bool TOPICCommand::Exec( iClient* theClient, const string& Message )
 	
 	if(strlen(topic.c_str()) > 145) // Default ircu TOPICLEN - maxusername?
 	{
-	    bot->Notice(theClient, "ERROR: Your defined topic is exceeding 160 chars!");
+	    bot->Notice(theClient, "ERROR: Your defined topic is exceeding 145 chars!");
 	    return false;
         }
         
 	strstream s;
 	s << bot->getCharYYXXX() << " T "
-	<< st[1] << " :" << topic << " (" << theUser->getUserName() << ")" << ends;
+	<< st[1] << " :" << " (" << theUser->getUserName() << ") " << topic << ends;
         
 	bot->Write( s );
 
