@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------------
--- "$Id: cservice.sql,v 1.24 2001/02/22 23:17:52 gte Exp $"
+-- "$Id: cservice.sql,v 1.25 2001/02/26 00:27:12 gte Exp $"
 -- Channel service DB SQL file for PostgreSQL.
 
 -- ChangeLog:
@@ -259,6 +259,8 @@ CREATE TABLE domain (
 	deleted INT2 DEFAULT '0',
 	PRIMARY KEY(id)
 ); 
+
+CREATE INDEX domain_domain_idx ON domain(domain);
 
 -- Update notification rules.
 --
