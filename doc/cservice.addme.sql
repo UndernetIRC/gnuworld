@@ -1,3 +1,4 @@
+-- "$Id $"
 -- 2001-02-23 : |MrBean|
 -- This script will reigster the admin channel * 
 -- And will create an admin by the name of Admin  

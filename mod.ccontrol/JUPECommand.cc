@@ -6,13 +6,12 @@
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 
+const char JUPECommand_cc_rcsId[] = "$Id $";
+
 namespace gnuworld
 {
 
 using std::string ;
-
-
-
 
 // jupe servername reason
 bool JUPECommand::Exec( iClient* theClient, const string& Message )

@@ -19,8 +19,6 @@
 namespace gnuworld
 {
 
-//namespace ccontrolns
-//{
 
 using std::string ;
 
@@ -29,6 +27,5 @@ void Command::Usage( iClient* theClient )
 bot->Notice( theClient, string( "Usage: " ) + ' ' + getInfo() ) ;
 }
 
-//} // close namespace ccontrolns
 
 } // namespace gnuworld

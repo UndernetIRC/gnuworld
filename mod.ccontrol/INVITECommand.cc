@@ -6,12 +6,12 @@
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 
+const char INVITECommand_cc_rcsId[] = "$Id $";
+
 namespace gnuworld
 {
 
 using std::string ;
-
-
 
 // invite #channel
 bool INVITECommand::Exec( iClient* theClient, const string& Message )

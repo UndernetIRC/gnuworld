@@ -6,6 +6,8 @@
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 
+const char DEAUTHCommand_cc_rcsId[] = "$Id $";
+
 namespace gnuworld
 {
 
@@ -15,19 +17,19 @@ bool DEAUTHCommand::Exec( iClient* theClient, const string& Message)
 {
 AuthInfo* tmpUser = bot->IsAuth(theClient->getCharYYXXX());
 if (!tmpUser) 
-{
-    bot->Notice(theClient,"Your are not authenticated");
-    return false;
-}
+	{
+	bot->Notice(theClient,"Your are not authenticated");
+	return false;
+	}
 if(bot->deAuthUser(theClient->getCharYYXXX()))
-{
-    bot->Notice(theClient,"DeAuthentication successfull");
-    return true;
-}
+	{
+	bot->Notice(theClient,"DeAuthentication successfull");
+	return true;
+	}
 else
-{
-    bot->Notice(theClient,"DeAuthentication failed");
-    return false;
-}
+	{
+	bot->Notice(theClient,"DeAuthentication failed");
+	return false;
+	}
 }	
 }

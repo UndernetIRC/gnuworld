@@ -7,6 +7,8 @@
 #include	"StringTokenizer.h"
 #include	"ip.h"
 
+const char WHOISCommand_cc_rcsId[] = "$Id $";
+
 namespace gnuworld
 {
 

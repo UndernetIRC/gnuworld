@@ -5,6 +5,9 @@
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 #include	"Network.h"
+
+const char MODECommand_cc_rcsId[] = "$Id $";
+
 namespace gnuworld
 {
 

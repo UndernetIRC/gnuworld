@@ -12,11 +12,11 @@
 #include	"ELog.h"
 #include	"Gline.h"
 
+const char GLINECommand_cc_rcsId[] = "$Id $";
+
 namespace gnuworld
 {
 
-//namespace ccontrolns
-//{
 
 using std::string ;
 
@@ -91,5 +91,4 @@ delete[] s.str() ;
 
 return true ;
 }
-//}
 }

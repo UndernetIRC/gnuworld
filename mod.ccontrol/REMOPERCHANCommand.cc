@@ -6,6 +6,8 @@
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 
+const char REMOPERCHANCommand_cc_rcsId[] = "$Id $";
+
 namespace gnuworld
 {
 
