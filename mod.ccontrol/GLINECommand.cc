@@ -23,7 +23,7 @@
 #include 	"time.h"
 #include	"ccUser.h"
 
-const char GLINECommand_cc_rcsId[] = "$Id: GLINECommand.cc,v 1.20 2001/08/16 20:18:38 mrbean_ Exp $";
+const char GLINECommand_cc_rcsId[] = "$Id: GLINECommand.cc,v 1.21 2001/08/16 20:47:19 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -234,7 +234,7 @@ for( Channel::const_userIterator ptr = theChan->userList_begin();
 ptr != theChan->userList_end() ; ++ptr )
 	{
 	GlineMapType::iterator gptr = glineList.find(ptr->second->getClient()->getInsecureHost());
-	if(gptr == glineList.end())
+	if((gptr == glineList.end()) && (!ptr->second->getClient()->getMode(iClient::MODE_SERVICES))) 
 		{
 		TmpGline = new ccGline(bot->SQLDb);
 		assert(TmpGline != NULL);

@@ -29,7 +29,7 @@
 #include	"ccFloodData.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.69 2001/08/16 20:18:38 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.70 2001/08/16 20:47:19 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -434,8 +434,8 @@ if(NeedOp)
 	}
 else if((!theUser) && (ComAccess))
 	{
-	Notice( theClient,
-		"You must be logged in to issue that command" ) ;
+	//User who are not logged in, are ignored
+	return xClient::OnPrivateMessage( theClient, Message ) ;
 	}
 else if( (ComAccess) && !(theUser->gotAccess(commHandler->second)))
 	{
