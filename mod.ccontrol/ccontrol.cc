@@ -23,7 +23,7 @@
 #include	"AuthInfo.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.23 2001/03/26 21:55:02 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.24 2001/03/29 20:57:42 mrbean_ Exp $" ;
 
 using std::string ;
 using std::vector ;
@@ -849,11 +849,11 @@ for( int i = 0 ; i < SQLDb->Tuples() ; i++ )
 	{
 	if(match(SQLDb->GetValue(i,0),Host) == 0)
 		{
-		break ;
+		return true ;
 		}
 	}
 
-return true ;
+return false ;
 }
 
 bool ccontrol::UserGotHost( ccUser* user, const string& Host )
@@ -1194,6 +1194,45 @@ glineList.end(),
 TempGline ) ) ;
 delete TempGline ; 
 return true;
+}
+
+ccGline* ccontrol::findMatchingGline( const string& Host )
+{
+static const char *Main = "SELECT Id,Host FROM glines";
+
+strstream theQuery;
+theQuery	<< Main
+		<< ends;
+
+elog	<< "ccontrol::findMatchingGline> "
+	<< theQuery.str()
+	<< endl; 
+
+ExecStatusType status = SQLDb->Exec( theQuery.str() ) ;
+delete[] theQuery.str() ;
+
+if( PGRES_TUPLES_OK != status )
+	{
+	elog	<< "ccontrol::findMatchingGline> SQL Failure: "
+		<< SQLDb->ErrorMessage()
+		<< endl ;
+
+	return NULL ;
+	}
+
+for( int i = 0 ; i < SQLDb->Tuples() ; i++ )
+	{
+	if(match(SQLDb->GetValue(i,2),Host) == 0)
+		{
+		ccGline *tempGline = new (nothrow) ccGline(SQLDb);
+		if(tempGline->loadData(atoi(SQLDb->GetValue(i,1))))
+		    return tempGline;
+		else
+		    return NULL;
+		}
+	}
+
+return NULL ;
 }
 
 } // namespace gnuworld

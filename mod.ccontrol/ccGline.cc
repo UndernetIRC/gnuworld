@@ -3,7 +3,7 @@
  * 
  * Gline class
  * 
- * $Id: ccGline.cc,v 1.1 2001/03/26 21:55:02 mrbean_ Exp $
+ * $Id: ccGline.cc,v 1.2 2001/03/29 20:57:42 mrbean_ Exp $
  */
  
 #include	<strstream>
@@ -17,7 +17,7 @@
 #include	"ccGline.h" 
 
 const char ccGline_h_rcsId[] = __CCGLINE_H ;
-const char ccGline_cc_rcsId[] = "$Id: ccGline.cc,v 1.1 2001/03/26 21:55:02 mrbean_ Exp $" ;
+const char ccGline_cc_rcsId[] = "$Id: ccGline.cc,v 1.2 2001/03/29 20:57:42 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -113,6 +113,40 @@ else
 		<< endl ;
 	return false;
 	}
+}
+
+bool ccGline::loadData(int GlineId)
+{
+static const char *Main = "SELECT * FROM glines WHERE Id = ";
+
+strstream theQuery;
+theQuery	<< Main << GlineId
+		<< ends;
+
+elog	<< "ccontrol::glineConstructor> "
+	<< theQuery.str()
+	<< endl; 
+
+ExecStatusType status = SQLDb->Exec( theQuery.str() ) ;
+delete[] theQuery.str() ;
+
+if( PGRES_TUPLES_OK != status )
+	{
+	elog	<< "ccontrol::glineConstructor> SQL Failure: "
+		<< SQLDb->ErrorMessage()
+		<< endl ;
+
+	return false ;
+	}
+
+
+Id = SQLDb->GetValue(0,0);
+Host = SQLDb->GetValue(0,1);
+AddedBy = SQLDb->GetValue(0,2);
+AddedOn = SQLDb->GetValue(0,3);
+Expires = SQLDb->GetValue(0,4);
+Reason = SQLDb->GetValue(0,5);
+return true;
 }
 
 
