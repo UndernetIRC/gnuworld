@@ -1,5 +1,5 @@
 
--- "$Id: ccontrol.update.sql,v 1.25 2004/03/25 20:58:06 mrbean_ Exp $"
+-- "$Id: ccontrol.update.sql,v 1.26 2004/06/04 15:01:57 mrbean_ Exp $"
 
 -- ccontrol database changes update
 -- this file will add the new features to an old database
@@ -114,5 +114,9 @@
      alter table opers add is_deleted BOOLEAN NOT NULL DEFAULT 'n';   
 
 -- 25/03/04 Add ReportMissing to servers
-    alter table servers add ReportMissing boolean no null default 't';
+--    alter table servers add ReportMissing boolean no null default 't';
+
+-- 04/06/04 Add UNJUPE command to the opers
+    update opers set saccess = (saccess | 33554432);
+    
       
