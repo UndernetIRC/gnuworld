@@ -1,0 +1,458 @@
+dnl $Id: configure.in,v 1.1 2000/06/30 18:46:06 dan_karrels Exp $
+dnl ----------------------------------------------------------
+
+AC_REVISION($Revision: 1.1 $)
+AC_INIT(src/main.cc)
+AC_CONFIG_HEADER(include/defs.h)
+
+echo Configuring GNUWorld...
+echo
+
+dnl ----------------------------------------------------------
+dnl
+dnl initial stuff
+dnl
+
+dnl Debug flags!
+CFLAGS="-g -Wall -O0"
+CXXFLAGS="-g -Wall -O0"
+CXX="g++"
+LIBS=""
+prefix="."
+
+AC_PROG_CC
+AC_PROG_CXX
+AC_PROG_RANLIB
+AC_PROG_CPP
+AC_LANG_CPLUSPLUS
+AC_ISC_POSIX
+AC_CHECK_PROG(UNAME,uname,uname)
+AC_CHECK_PROG(LN,ln,ln)
+AC_CHECK_PROG(RM,rm,rm)
+AC_CHECK_PROG(LD,ld,ld)
+AC_CHECK_PROG(MV,mv,mv)
+AC_CHECK_PROG(CP,cp,cp)
+
+GNUWORLD_CHECK_OS
+
+AC_MSG_CHECKING(if C++ compiler uses std namespace )
+AC_TRY_COMPILE(
+[
+#include <iostream>
+namespace std{ void kludge(); }
+using namespace std;
+],[
+cout << "test" << endl;
+],[
+ ac_std_namespace=yes
+ AC_MSG_RESULT([yes])
+],[
+ ac_std_namespace=maybe
+])
+if test "x$ac_std_namespace" = xmaybe ; then
+AC_TRY_COMPILE(
+[
+#include <iostream>
+namespace std{ void kludge(); }
+using namespace std;
+],[
+cout << "test" << endl;
+],[
+ ac_std_namespace=yes
+ AC_MSG_RESULT([yes])
+ AC_MSG_WARN([
+===================================================================
+ERROR: This compiler platform does not have the iostream library
+in the std namespace.  This presents a problem for writing portable
+STL software.
+===================================================================
+])
+],[
+ ac_std_namespace=no
+ config_error=yes
+ AC_MSG_RESULT([no]) 
+ AC_MSG_WARN([
+===================================================================
+ERROR: This compiler platform does not support iostream
+or namespaces.  
+===================================================================
+])
+])
+fi
+
+AC_MSG_CHECKING(if C++ compiler supports bool)
+AC_TRY_COMPILE(
+[
+],[
+   bool b=true;
+   bool b1=false;
+],[
+  ac_bool=yes
+  AC_MSG_RESULT([$ac_bool])
+],[
+  config_error=yes
+  AC_MSG_RESULT([$ac_bool])
+  AC_WARN(bool type is not supported by your compiler)   
+])
+
+AC_MSG_CHECKING([if C++ compiler supports static_cast<>])
+AC_TRY_COMPILE(
+[ 
+   class foo;
+],[
+   foo* c1 = 0 ;
+   void* c2 = static_cast< void* >( c1 ) ;
+],[
+  ac_static_cast=yes
+  AC_MSG_RESULT([$ac_static_cast])
+],[
+  AC_MSG_RESULT([$ac_static_cast])
+  AC_WARN(C++ compiler static_cast<> does not work)
+  config_error=yes
+])
+
+AC_MSG_CHECKING([if C++ compiler supports reinterpret_cast<>])
+AC_TRY_COMPILE(
+[ 
+   class foo;
+],[
+   char* blah = 0 ;
+   unsigned char* blah2 = reinterpret_cast< unsigned char* >( blah ) ;
+],[
+  ac_reinterpret_cast=yes
+  AC_MSG_RESULT([$ac_reinterpret_cast])
+],[
+  AC_MSG_RESULT([$ac_reinterpret_cast])
+  AC_WARN(C++ compiler reinterpret_cast<> does not work)
+  config_error=yes
+])
+
+AC_MSG_CHECKING(if C++ compiler supports member function templates)
+AC_TRY_COMPILE(
+[  
+class foo
+{
+public:
+  template <class T> void method(T t);
+};
+
+template <class T> void foo::method(T t) {t = 0;}
+],[
+],[
+   ac_member_func_templates=yes
+   AC_DEFINE(SIGC_CXX_MEMBER_FUNC_TEMPLATES)
+   AC_MSG_RESULT([$ac_member_func_templates])
+],[
+  ac_member_func_templates=no
+  AC_MSG_RESULT([$ac_member_func_templates])
+  config_error=yes
+  AC_MSG_WARN([Test for member templates failed.])
+])
+
+# Member class templates   
+AC_MSG_CHECKING(if C++ compiler supports member class templates)   
+AC_TRY_COMPILE(
+[  
+struct S 
+{
+  template <class T> struct A {};
+  template <class T> struct B {};
+};
+],[
+],[
+   ac_member_class_templates=yes
+   AC_DEFINE(SIGC_CXX_MEMBER_CLASS_TEMPLATES)
+   AC_MSG_RESULT([$ac_member_class_templates])
+],[
+  ac_member_class_templates=no
+  AC_MSG_RESULT([$ac_member_class_templates])
+  AC_MSG_WARN([Test for member templates failed.])
+])
+
+# Partial Specialization
+AC_MSG_CHECKING([if C++ compiler supports partial specialization])
+AC_TRY_COMPILE(
+[ 
+template<class T, class K>
+class k {
+public:  
+};
+template<class T> class k<void,T> { };
+],[
+  k<float, float> b;
+  k<void,void> a;
+],[
+  ac_cxx_partial_specialization=yes
+  AC_MSG_RESULT([$ac_cxx_partial_specialization])
+  AC_DEFINE(SIGC_CXX_PARTIAL_SPEC)
+],[
+  config_error=yes  
+  ac_cxx_partial_specialization=no
+  AC_MSG_RESULT([$ac_cxx_partial_specialization])
+  AC_MSG_WARN([Partial specialization is needed for signal templates.])
+])
+
+AC_MSG_CHECKING(if C++ compiler supports name spaces)
+AC_TRY_COMPILE(
+[
+namespace Check
+  {
+   int i;
+  }
+],[
+  Check::i=1;
+],[
+  ac_cxx_namespaces=yes
+  AC_MSG_RESULT([$ac_cxx_namespaces])
+  AC_DEFINE(SIGC_CXX_NAMESPACES)
+],[
+  ac_cxx_namespaces=no
+  AC_MSG_RESULT([$ac_cxx_namespaces])
+  AC_MSG_WARN([Without namespaces all classes will be global.])
+]) 
+
+AC_MSG_CHECKING(if C++ compiler supports friend template)
+AC_TRY_COMPILE(
+[ 
+struct A
+  {
+   template <class T>
+     friend T* gen();
+  };
+],[
+],[
+  ac_cxx_friend_templates=yes
+  AC_MSG_RESULT([$ac_cxx_friend_templates])
+  AC_DEFINE(SIGC_CXX_FRIEND_TEMPLATES)
+],[
+  ac_cxx_friend_templates=no
+  AC_MSG_RESULT([$ac_cxx_friend_templates])
+  AC_MSG_WARN([Access to dynamic will not be controlled.])
+])
+
+AC_MSG_CHECKING(if C++ compiler allows specialization of references)
+AC_TRY_COMPILE(
+[
+struct A {};
+struct B {};
+
+template <class T>
+struct P
+  {
+   typedef A* ptr;
+  };
+
+template <class T>
+struct P<T&>
+  {
+   typedef B* ptr;
+  };
+  
+],[
+    A* a;
+    B* b;
+    P<int>::ptr p=a;
+    P<int&>::ptr q=b;
+],[
+  ac_cxx_specialize_references=yes
+  AC_DEFINE(SIGC_CXX_SPECIALIZE_REFERENCES)
+],[
+  ac_cxx_specialize_references=no
+])
+AC_MSG_RESULT([$ac_cxx_specialize_references])
+
+AC_MSG_CHECKING(if C++ environment provides all required features)
+if test "x$config_error" = xyes ; then
+  AC_MSG_RESULT([no])
+  AC_MSG_ERROR([Your compiler is not powerful enough to compile GNUWorld.])
+fi
+AC_MSG_RESULT([yes])
+
+dnl ----------------------------------------------------------
+dnl ----------------------------------------------------------
+dnl
+dnl System specific checks
+dnl
+dnl ----------------------------------------------------------
+dnl ----------------------------------------------------------
+
+AC_CHECK_LIB(socket,socket)
+AC_CHECK_LIB(nsl,gethostbyname)
+AC_CHECK_LIB(dl,dlopen)
+dnl AC_CHECK_LIB(pthread,pthread_create)
+dnl AC_CHECK_LIB(posix4,sem_init)
+
+dnl ----------------------------------------------------------
+dnl
+dnl Checking for headers, functions, and a type declarations
+dnl
+
+AC_CHECK_HEADERS(sys/file.h unistd.h sys/stat.h sys/ioctl.h sys/resource.h )
+AC_CHECK_HEADERS(sys/time.h asm/ioctls.h xti_inet.h sys/filio.h)
+AC_CHECK_HEADERS(sys/types.h sys/socket.h netinet/in.h sys/un.h pthread.h)
+
+echo "Checking for C++ standard header files..."
+
+AC_MSG_CHECKING(for new)
+AC_TRY_CPP(new, AC_MSG_RESULT([yes]), AC_MSG_ERROR([no]))
+
+AC_MSG_CHECKING(for string)
+AC_TRY_CPP(string, AC_MSG_RESULT([yes]), AC_MSG_ERROR([no]))
+
+AC_MSG_CHECKING(for iostream)
+AC_TRY_CPP(iostream, AC_MSG_RESULT([yes]), AC_MSG_ERROR([no]))
+
+AC_MSG_CHECKING(for fstream)
+AC_TRY_CPP(fstream, AC_MSG_RESULT([yes]), AC_MSG_ERROR([no]))
+
+AC_MSG_CHECKING(for vector)
+AC_TRY_CPP(vector, AC_MSG_RESULT([yes]), AC_MSG_ERROR([no]))
+
+AC_MSG_CHECKING(for list)
+AC_TRY_CPP(list, AC_MSG_RESULT([yes]), AC_MSG_ERROR([no]))
+
+AC_MSG_CHECKING(for map)
+AC_TRY_CPP(map, AC_MSG_RESULT([yes]), AC_MSG_ERROR([no]))
+
+AC_MSG_CHECKING(for queue)
+AC_TRY_CPP(queue, AC_MSG_RESULT([yes]), AC_MSG_ERROR([no]))
+
+AC_MSG_CHECKING(for strstream)
+AC_TRY_CPP(strstream, AC_MSG_RESULT([yes]), AC_MSG_ERROR([no]))
+
+echo "Checking for C header files..."
+
+AC_MSG_CHECKING(for cstring)
+AC_TRY_CPP(cstring, AC_MSG_RESULT([yes]), AC_MSG_ERROR([no]))
+
+AC_MSG_CHECKING(for cstdlib)
+AC_TRY_CPP(iostream, AC_MSG_RESULT([yes]), AC_MSG_ERROR([no]))
+
+AC_MSG_CHECKING(for cerrno)
+AC_TRY_CPP(iostream, AC_MSG_RESULT([yes]), AC_MSG_ERROR([no]))
+
+AC_MSG_CHECKING(for cassert)
+AC_TRY_CPP(iostream, AC_MSG_RESULT([yes]), AC_MSG_ERROR([no]))
+
+AC_MSG_CHECKING(for cstdarg)
+AC_TRY_CPP(iostream, AC_MSG_RESULT([yes]), AC_MSG_ERROR([no]))
+
+AC_MSG_CHECKING(for ctime)
+AC_TRY_CPP(iostream, AC_MSG_RESULT([yes]), AC_MSG_ERROR([no]))
+
+AC_HEADER_STDC
+AC_HEADER_TIME
+AC_TYPE_SIGNAL
+AC_TYPE_MODE_T
+AC_TYPE_PID_T
+AC_TYPE_SIZE_T
+AC_TYPE_UID_T
+
+found_socklen_t=no
+AC_EGREP_HEADER(socklen_t,sys/socket.h, AC_DEFINE(HAVE_SOCKLEN_T) found_socklen_t=yes)
+
+if test $found_socklen_t = yes; then
+  AC_EGREP_HEADER(socklen_t,bits/socket.h,AC_DEFINE(HAVE_SOCKLEN_T))
+fi
+
+if test $found_socklen_t = yes; then
+  AC_MSG_CHECKING(for socklen_t)
+  AC_MSG_RESULT(yes)
+else
+  AC_CHECK_TYPE(socklen_t,int)
+fi
+
+dnl AC_EGREP_CPP(socklen_t,
+dnl [ socklen_t len ;
+dnl ], AC_DEFINE(HAVE_SOCKLEN_T),AC_CHECK_TYPE(socklen_t,int))
+
+
+dnl ----------------------------------------------------------
+dnl
+dnl check for struct linger
+dnl
+
+AC_MSG_CHECKING(for struct linger)
+AC_EGREP_HEADER([struct( |	)*linger], sys/socket.h, AC_MSG_RESULT(yes), AC_DEFINE(NO_STRUCT_LINGER) AC_MSG_RESULT(no, ugh.))
+
+dnl ----------------------------------------------------------
+dnl
+dnl svr3's getpgrp() didnt take arguments.  BSD's did.
+dnl POSIX said that there wasnt any usefulness to giving arguments
+dnl to getpgrp(), so that was forbidden.  So svr4 made a new syscall
+dnl getpgid() to fill in this functionality gap (grrrr).  BSD still
+dnl doesnt have any way to do it, even though they were the ones that
+dnl originally wanted to have it around, but svr3 insisted not so. (grrr)
+dnl
+
+AC_CHECK_FUNC(getpgid, AC_DEFINE(HAVE_GETPGID),)
+AC_CHECK_FUNC(getpgrp, AC_FUNC_GETPGRP,)
+
+dnl ----------------------------------------------------------
+dnl 
+dnl set some last minute sanity defaults
+dnl
+
+output_file="Makefile src/Makefile lib/Makefile"
+
+dnl AC_OUTPUT(Makefile src/Makefile lib/Makefile)
+
+echo
+echo Checking for modules...
+echo
+
+dnl This variable is global and will exported to Makefiles
+MOD_DIRS=""
+
+dnl This variable is local for the configure script
+mod_dirs=`/bin/ls src | /bin/grep .mod`
+dnl echo "mod_dirs: $mod_dirs"
+
+current_dir=`pwd`
+dnl echo "current_dir: $current_dir"
+
+for dir in $mod_dirs
+  do
+dnl	echo "Checking module dir: $dir"
+
+	if test ! -d "src/$dir"
+	then
+		echo "Found a .mod that is not a directory, skipping ($dir)."
+	elif test -f "src/$dir/configure"
+	then
+dnl		echo "Found configure"
+		cd src/$dir
+		./configure
+		cd $current_dir
+	elif test -f "src/$dir/Makefile.in"
+	then
+dnl		echo "Found Makefile.in"
+		output_file="$output_file src/$dir/Makefile"
+		MOD_DIRS="$MOD_DIRS $dir"
+	else
+		echo "./src/$dir: No configure or Makefile present"
+		echo "Skipping..."
+	fi
+  done
+
+AC_SUBST(MOD_DIRS)
+AC_SUBST(LDFLAGS)
+AC_SUBST(bindir)
+
+CXXFLAGS="$CXXFLAGS -I`pwd`/include -I`pwd`/lib"
+LIB_PATH="`pwd`/lib"
+BIN_PATH="`pwd`/bin"
+SRC_PATH="`pwd`/src"
+
+AC_SUBST(CXXFLAGS)
+AC_SUBST(LIB_PATH)
+AC_SUBST(BIN_PATH)
+AC_SUBST(SRC_PATH)
+
+AC_OUTPUT($output_file)
+
+echo
+echo Configuration has been finished, and everything seems to be allright
+echo Now you have the chance to modify include/config.h to set your
+echo preferred options...
+echo

@@ -1,0 +1,98 @@
+# Default paths (system-wide installs)
+# $Id: Makefile.in,v 1.1 2000/06/30 18:46:07 dan_karrels Exp $
+#
+
+# Standard defines
+CXX = @CXX@
+MOD_CXX = @MOD_CXX@
+MOD_LD = @MOD_LD@
+MOD_DIRS = @MOD_DIRS@
+
+SHLIB_CXX = @SHLIB_CXX@
+SHLIB_LD = @SHLIB_LD@
+
+SRC_PATH = @SRC_PATH@
+DEFS = @DEFS@
+
+CXXFLAGS = @CXXFLAGS@
+
+LIB_PATH = @LIB_PATH@
+BIN_PATH = @BIN_PATH@
+LIBS = -L$(LIB_PATH) -lgnuworld @LIBS@
+
+RM = @RM@ -f
+CP = @CP@
+MV = @MV@
+LN = @LN@
+
+############ You shouldn't change anything below this line ###################
+
+VERSION = @VERSION@
+
+SHELL = /bin/sh
+MFLAGS ='CXX=$(CXX)'					\
+	'ANSIFLAGS=$(ANSIFLAGS)'			\
+	'CXXFLAGS=$(CXXFLAGS)'				\
+	'DEFS=$(DEFS)'					\
+	'LDFLAGS=$(LDFLAGS)'				\
+	'LIBS=$(LIBS)'					\
+	'RM=$(RM)'					\
+	'MV=$(MV)'					\
+	'CP=$(CP)'					\
+	'LN=$(LN)'					\
+	'ABSOBJ=$(ABSOBJ)'
+
+MAKE2 = $(MAKE) $(MFLAGS)
+
+SRCS = Channel.cc \
+	ChannelUser.cc \
+	client.cc \
+	cloner.cc \
+	EConfig.cc \
+	ELog.cc \
+	iClient.cc \
+	ip.cc \
+	iServer.cc \
+	main.cc \
+	Network.cc \
+	server.cc
+OBJS = $(patsubst %.cc, %.o, $(SRCS))
+ABSOBJ = $(patsubst %.cc, $(SRC_PATH)/%.o, $(SRCS))
+
+all: $(OBJS) gnuworld
+everything: all
+make: all
+
+.SUFFIXES: .o .cc
+
+.cc.o:
+	$(MOD_CXX) $(CXXFLAGS) -c $< -o $@
+
+gnuworld: $(OBJS)
+	$(CXX) $(CXXFLAGS) -o $(BIN_PATH)/GNUWorld $(OBJS) $(LIBS)
+
+modules:
+	@for i in $(MOD_DIRS); do \
+		echo "Building module: $$i"; \
+		cd $$i; $(MAKE2) all; cd ..; \
+	done;
+
+clean:
+	@for i in $(MOD_DIRS); do \
+		cd $$i; $(MAKE2) clean; cd ..; \
+	done;
+	$(RM) -f *.o $(BIN_PATH)/GNUWorld
+
+distclean: clean
+	@for i in $(MOD_DIRS); do \
+		cd $$i; $(MAKE2) clean; cd ..; \
+		$(RM) $i/Makefile
+	done;
+
+depend: $(SRCS)
+	$(CXX) $(CXXFLAGS) -MM $(SRCS) >> Makefile
+	@for i in $(MOD_DIRS); do \
+		cd $$i; $(MAKE2) depend; cd ..; \
+	done;
+
+# DO NOT DELETE THIS LINE

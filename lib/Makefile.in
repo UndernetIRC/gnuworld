@@ -1,0 +1,85 @@
+# $Id: Makefile.in,v 1.1 2000/06/30 18:46:06 dan_karrels Exp $
+# Default paths (system-wide installs)
+
+# Standard defines
+CXX = @CXX@
+DEFS = @DEFS@
+LIBS = @LIBS@
+RANLIB = @RANLIB@
+SHLIB_CXX = @MOD_CXX@
+SHLIB_LD = @SHLIB_LD@
+
+# Set this to -g if you want to be able to debug the client, otherwise
+# use -O to have the compiler do some optimization instead.
+CXXFLAGS = @CXXFLAGS@
+
+# set this to whatever flag your compiler takes to turn on ansi mode.
+# gcc is ansi by default, but you can specify -ansi anyhow.  Digital's
+# 'cc' requires this, as may other non-gcc compilers.
+# Typically, its "-ansi" or "-std1" or some such thing.
+ANSIFLAGS =
+
+# Set this to -s if you want the binary to be striped.
+LDFLAGS = @LDFLAGS@
+
+############ You shouldn't change anything below this line ###################
+
+RM = rm -f
+CP = cp
+MV = mv
+INSTALL = ./bsdinstall -c -m 755
+INSTALL_DATA = ../bsdinstall -c -m 644
+
+VERSION = @VERSION@
+
+SHELL = /bin/sh
+MAKE2 = $(MAKE) $(MFLAGS)
+MFLAGS ='CC=$(CC)'					\
+	'CXX=$(CXX)'					\
+	'ANSIFLAGS=$(ANSIFLAGS)'			\
+	'CFLAGS=$(CFLAGS)'				\
+	'CXXFLAGS=$(CXXFLAGS)'				\
+	'DEFS=$(DEFS)'					\
+	'LDFLAGS=$(LDFLAGS)'				\
+	'LIBS=$(LIBS)'					\
+	'RM=$(RM)'					\
+	'MV=$(MV)'					\
+	'CP=$(CP)'					\
+	'AR=$(AR)'					\
+	'RANLIB=$(RANLIB)'
+
+SRCS = Buffer.cc \
+	ClientSocket.cc \
+	FileSocket.cc \
+	md5.cc \
+	misc.cc \
+	Socket.cc \
+	StringTokenizer.cc
+
+#	EIOThread.cc
+#	EReadThread.cc
+#	EThread.cc
+#	EWriteThread.cc
+OBJS = $(patsubst %.cc, %.o, $(SRCS))
+
+all: lib
+everything: all
+make: all
+
+.SUFFIXES: .o .cc .c
+
+.cc.o:
+	${SHLIB_CXX} ${CXXFLAGS} -c $< -o $@
+
+lib: ${OBJS}
+	$(SHLIB_LD) -o libgnuworld.so $(OBJS) $(LIBS)
+
+clean:
+	$(RM) -f *.o ../lib/libgnuworld.so
+
+distclean: clean
+
+depend: $(SRCS)
+	$(CXX) -MM $(CXXFLAGS) $(SRCS) >> Makefile
+
+# DO NOT DELETE THIS LINE

@@ -1,0 +1,874 @@
+/* server.h
+ * This is the header file for the server itself.
+ * This class originally created by Orlando Bassotto.
+ */
+
+/* Command Map Description
+ * -----------------------
+ * Command messages read from the network are in the
+ * form of characters and character strings.  Messages
+ * are handled by passing the message and its arguments
+ * to handler functions.
+ * Command handler function names are all preceeded
+ * with: MSG_
+ * Pointers to offsets of these functions within the
+ * global variable xServer* Server are stored in a
+ * VectorTrie (see web page).
+ */
+
+#ifndef __XSERVER_H
+#define __XSERVER_H "$Id: server.h,v 1.1 2000/06/30 18:46:07 dan_karrels Exp $"
+
+#include	<string>
+#include	<vector>
+#include	<list>
+#include	<strstream>
+#include	<map>
+
+#include	<ctime>
+
+#include	"Numeric.h"
+#include	"iServer.h"
+#include	"iClient.h"
+#include	"Socket.h"
+#include	"ClientSocket.h"
+#include	"Buffer.h"
+#include	"VectorTrie.h"
+#include	"events.h"
+#include	"Gline.h"
+#include	"xparameters.h"
+#include	"misc.h"
+#include	"moduleLoader.h"
+ 
+namespace gnuworld
+{
+
+/**
+ * This macro constructs a method prototype for a command
+ * handler with the given name MSG_handlerFunc.
+ */
+#define DECLARE_MSG( handlerFunc ) \
+ virtual int MSG_##handlerFunc( xParameters& ) ;
+
+/**
+ * This method registers a command handler with the xServer's
+ * command table.  It must first be prototyped in the xServer
+ * class declaration.
+ */
+#define REGISTER_MSG( key, handlerFunc ) \
+  if( !commandMap->Insert( key, \
+	&xServer::MSG_##handlerFunc, \
+	strlen( key ) ) ) \
+	{\
+	elog << "Unable to register function: "\
+		<< key << std::endl ;\
+	exit( 0 ) ; \
+	}
+
+/**
+ * This is a translation table of allowed characters in
+ * network commands.  This table is passed to the VectorTrie
+ * that class xServer uses for parsing incoming server
+ * commands.
+ */
+static const char serverCommandTransTable[] = {
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, -1, -1, -1, 26, 27,
+ 28, 29, 30, 31, 32, 33, 34, 35, -1, -1,
+ -1, -1, -1, -1, -1,  0,  1,  2,  3,  4,
+  5,  6,  7,  8,  9, 10, 11, 12, 13, 14,
+ 15, 16, 17, 18, 19, 20, 21, 22, 23, 24,
+ 25, -1, -1, -1, -1, 26, -1,  0,  1,  2,
+  3,  4,  5,  6,  7,  8,  9, 10, 11, 12,
+ 13, 14, 15, 16, 17, 18, 19, 20, 21, 22,
+ 23, 24, 25
+ } ;
+
+/// Forward declaration of xClient
+class xClient ;
+ 
+enum MessageType
+	{
+	SRV_SUCCESS, // all ok
+	SRV_RELOAD, // reload request
+	SRV_QUIT, // server shutdown
+	SRV_DISCONNECT // server disconnected
+	} ;
+
+using std::string ;
+using std::list ;
+using std::vector ;
+using std::multimap ;
+using std::strstream ;
+
+/**
+ * This class is the server proper; it is responsible for the connection
+ * to the IRC network, and for maintaining the services clients.
+ */
+class xServer
+{
+
+protected:
+
+	/**
+	 * The type used to store server numerics for juped
+	 * servers.
+	 */
+	typedef vector< unsigned int > jupedServerListType ;
+ 
+public:
+
+	/**
+	 * The sole argument to the constructor is the name of
+	 * the configuration file.  The xServer will derive
+	 * all the information it requires from the file.
+	 */
+	xServer( const string& _fileName ) ;
+
+	/**
+	 * Destroy the server and its clients, disconnect
+	 * from network.
+	 */
+	virtual ~xServer() ;
+
+	/**
+	 * Connect to a network uplink of the given address
+	 * (IP or hostname) and on the given port.
+	 */
+	virtual int Connect( const string& Address, int Port ) ;
+
+	/**
+	 * Connect to the default uplink and port.
+	 */
+	virtual int Connect()
+		{ return Connect( UplinkName, Port ) ; }
+
+	/**
+	 * Call this method when a read/write error occurs on the
+	 * uplink socket.  This will close and deallocate the socket,
+	 * as well as clear the input/output buffers and post a
+	 * message for GetMessage() later.
+	 */
+	virtual void OnDisConnect() ;
+
+	/**
+	 * Attach a fake server to this services server.
+	 */
+	virtual bool AttachServer( iServer*, const string& = "Juped Server" ) ;
+
+	/**
+	 * Squit a server from the network and remove it
+	 * from the network tables.
+	 */
+	virtual bool SquitServer( const string& name, const string& reason ) ;
+
+	/* I/O stuff */
+
+	/**
+	 * Perform the physical read of the socket.
+	 * Return the number of bytes read, or -1 on error.
+	 */
+	virtual int DoRead() ;
+
+	/**
+	 * Append a std::string to the output buffer.
+	 */
+	virtual bool Write( const string& ) ;
+
+	/**
+	 * Append a C variable argument list/character array to the output
+	 * buffer.
+	 */
+	virtual bool Write( const char*, ... ) ;
+
+	/**
+	 * Append a std::strstream to the output buffer.
+	 */
+	virtual bool Write( strstream& ) ;
+
+	/**
+	 * Write any bufferred data to the network.
+	 * Returns false on write error.
+	 */
+	virtual inline bool flushBuffer() ;
+
+	/**
+	 * Read a '\n' delimited line from the input buffer.
+	 * Return true is none exist.  (size) is the length of
+	 * the C string buffer (buf).
+	 */
+	virtual inline bool GetString( char* buf, const size_t& size ) ;
+
+	/**
+	 * Return true if a read attempt from the network
+	 * would NOT block.
+	 * This method is not const beause it may modify
+	 * _connected and Socket if an error occurs.
+	 */
+	virtual inline bool ReadyForRead() ;
+
+	/**
+	 * Return true if data exists to be written to the
+	 * network, and a write would NOT block.
+	 */
+	virtual inline bool ReadyForWrite() const ;
+
+	/**
+	 * Process is responsible for parsing lines of data.
+	 */
+	virtual void Process( char* String ) ;
+
+	/// Deprecated.
+	virtual void ProcessMessageQueue() ;
+
+	/**
+	 * Add a network gline and update glines table.
+	 */
+	virtual bool setGline( const string& setBy,
+		const string& userHost,
+		const string& reason,
+		const time_t& duration ) ;
+
+	/**
+	 * Remove a network gline and update internal gline table.
+	 */
+	virtual bool removeGline( const string& userHost ) ;
+
+	/**
+	 * Find a gline by lexical searching, case insensitive.
+	 */
+	virtual const Gline* findGline( const string& userHost ) const ;
+
+	/**
+	 * Find one or more glines matching a given userHost string.
+	 */
+	virtual vector< const Gline* > matchGline( const string& userHost ) const ;
+
+	/* Client stuff */
+
+	/**
+	 * Attach a client to the server.  This will add the client
+	 * to the internal table, and call the client's ImplementServer()
+	 * method.
+	 */
+	virtual bool AttachClient( xClient* Client ) ;
+
+	/**
+	 * Attach a fake client to a fake (juped) server.
+	 * The server must exist and must already be attached
+	 * to this server.
+	 */
+	virtual bool AttachClient( iClient* Client ) ;
+
+	/**
+	 * Detach a client from the server.  This will call the
+	 * client's Exit() method and remove the client from the
+	 * internal tables.
+	 */
+	virtual bool DetachClient( const string& Nick ) ;
+
+	/**
+	 * Detach a client from the server.  This will call the
+	 * client's Exit() method and remove the client from the
+	 * internal tables.
+	 */
+	virtual bool DetachClient( xClient* Client ) ;
+
+	/**
+	 * Output the information for a channel, and make the given
+	 * xClient operator in that channel.
+	 * This works at all times, bursting or not.
+	 */
+	virtual void JoinChannel( xClient*, const string& chanName,
+		const string& chanModes = "+tn" ) ;
+
+	/**
+	 * Notify the network that one of the services clients has
+	 * parted a channel.
+	 */
+	virtual void PartChannel( xClient* theClient, const string& chanName ) ;
+
+	/**
+	 * Notify the network that one of the services clients has
+	 * parted a channel.
+	 */
+	virtual void PartChannel( xClient* theClient, Channel* theChan ) ;
+
+	/**
+ 	 * Handle the parting of a services client from a channel.  This
+	 * method updates internal tables.
+ 	 */
+	virtual void OnPartChannel( xClient* theClient, const string& chanName ) ;
+
+	/**
+ 	 * Handle the parting of a services client from a channel.  This
+	 * method updates internal tables.
+ 	 */
+	virtual void OnPartChannel( xClient* theClient, Channel* theChan ) ;
+
+	/**
+	 * Handle the parting of a network client from a channel.  This method
+	 * updates internal tables.
+	 */
+	virtual void OnPartChannel( iClient* theClient, const string& chanName ) ;
+
+	/**
+	 * Handle the parting of a network client from a channel.  This method
+	 * updates internal tables.
+	 */
+	virtual void OnPartChannel( iClient* theClient, Channel* theChan ) ;
+
+	/**
+	 * Output the information about an xClient to the network.
+	 * (localClient) is true when the xClient is to appear to
+	 * reside on this xServer, false when it is to reside on
+	 * a juped/fake server.
+	 */
+	virtual void BurstClient( xClient*, bool localClient = true ) ;
+
+	/**
+	 * Change channel modes as the server.
+	 * This method also updates internal tables.
+	 */
+	virtual void SetChannelMode( Channel* theChan, const string& theModes ) ;
+
+	/* Event registration stuff */
+
+	/**
+	 * RegisterEvent is called by xClient's wishing
+	 * to receive a particular event.
+	 * When a particular event occurs, the server will call
+	 * OnEvent for each xClient registered to receive that
+	 * event.
+	 */
+	virtual bool RegisterEvent( const eventType&, xClient* ) ;
+
+	/**
+	 * Halt delivery of the given event to the given xClient.
+	 */
+	virtual bool UnRegisterEvent( const eventType&, xClient* ) ;
+
+	/**
+	 * The channel event distribution system is rather
+	 * expensive...such is the nature of IRC.
+	 * Each channel name is converted to lower case.
+	 * When a channel event occurs, the server will call
+	 * each OnChannelEvent() with the event type
+	 * and channel name for each xClient registered for
+	 * that <event,channel> pair.
+	 */
+	virtual bool RegisterChannelEvent( const string&,
+		xClient* ) ;
+
+	/**
+	 * Halt delivery of any channel event for the particular channel
+	 * to the particular xClient.
+	 */
+	virtual bool UnRegisterChannelEvent( const string&,
+		xClient* ) ;
+
+	/**
+	 * Post a system event to the rest of the system.  Note
+	 * that this method is public, so xClients may post
+	 * events.
+	 */
+	virtual void PostEvent( const eventType&,
+		void* = 0, void* = 0, void* = 0, void* = 0 ) ;
+
+	/**
+	 * Post a channel event to the rest of the system.  Note
+	 * that this method is public, so xClients may post
+	 * channel events.
+	 */
+	virtual void PostChannelEvent( const channelEventType&,
+		const string& chanName,
+		void* = 0, void* = 0, void* = 0, void* = 0 ) ;
+
+	/*
+	 * Server message system
+	 * The message system is used for communicating with
+	 * main() any server critical messages, such as a
+	 * disconnect on error.
+	 */
+
+	/**
+	 * Post a server message for the world to see.
+	 */
+	virtual void PostMessage( MessageType Msg )
+		{ Message = Msg ; }
+
+	/**
+	 * Return true if a message has been posted.
+	 */
+	virtual bool MessageReady() const
+		{ return (Message != SRV_SUCCESS) ; }
+
+	/**
+	 * Retrieve a message.  Returns -1 if no message ready.
+	 */
+	virtual MessageType GetMessage()
+		{ return Message ; }
+
+	/**
+	 * Once a message has been received, call this method to
+	 * make sure that the internal state is updated.
+	 */
+	virtual void ResetMessage()
+		{ Message = SRV_SUCCESS ; }
+
+	/* Utility methods */
+
+	/**
+	 * Return true if no BURST state exists, false otherwise.
+	 */
+	virtual bool IsEndOfBurst() const
+		{ return !bursting ; }
+
+	/**
+	 * Return true if the server has a valid connection to
+	 * its uplink, false otherwise.
+	 */
+	virtual bool isConnected() const
+		{ return _connected ; }
+
+	/* Numeric utility methods */
+
+	/**
+	 * Return an unsigned int representation of this server's
+	 * numeric server numeric.
+	 */
+	inline const unsigned int& getIntYY() const
+		{ return intYY ; }
+
+	/**
+	 * Return an unsigned int representation of this server's
+	 * maximum number of possible clients.
+ 	 */
+	inline const unsigned int& getIntXXX() const
+		{ return intXXX ; }
+
+	/**
+	 * Return a character array representation of this server's
+	 * server numeric, base64.
+	 */
+	inline const char* getCharYY() const
+		{ return charYY ; }
+
+	/**
+	 * Return a character array representation of this server's
+	 * maximum number of possible clients, base 64.
+	 */
+	inline const char* getCharXXX() const
+		{ return charXXX ; }
+
+	/**
+	 * Return an unsigned int representation of this server's uplink's
+	 * server numeric.
+	 */
+	inline const unsigned int& getUplinkIntYY() const
+		{ return Uplink->getIntYY() ; }
+
+	/**
+	 * Return a std::string representation of this server's full
+	 * numeric, base64.
+	 */
+	inline const string getCharYYXXX() const
+		{ return( string( charYY ) + charXXX ) ; }
+
+	/* General server utility methods */
+
+	/**
+	 * Return this server's name, as the network sees it.
+	 */
+	inline const string& getName() const
+		{ return ServerName ; }
+
+	/**
+	 * Return a description of this server.
+	 */
+	inline const string& getDescription() const
+		{ return ServerDescription ; }
+
+	/**
+	 * Return this server's uplink password.
+	 */
+	inline const string& getPassword() const
+		{ return Password ; }
+
+	/**
+	 * Return the time at which this server was instantiated.
+	 */
+	inline const time_t& getStartTime() const
+		{ return StartTime ; }
+
+	/**
+	 * Return the time this server last connected to its uplink.
+	 */
+	inline const time_t& getConnectionTime() const
+		{ return ConnectionTime ; }
+
+	/**
+	 * This is a simple mutator of the server's socket pointer.
+	 * This is used ONLY for implementing the simulation mode.
+	 */
+	inline void setSocket( ClientSocket* newSock )
+		{ theSock = newSock ; }
+
+	/**
+	 * Shutdown the server.
+	 */
+	virtual void Shutdown() ;
+
+protected:
+
+	/**
+	 * Allow only subclasses to call the default
+	 * constructor.
+	 */
+	xServer() {}
+
+	/**
+	 * Disable copy constructor, this method is declared but NOT defined.
+	 */
+	xServer( const xServer& ) ;
+
+	/**
+	 * Disable assignment, this method is declared but NOT defined.
+	 */
+	xServer operator=( const xServer& ) ;
+
+	/**
+	 * Burst out information about all xClients on this server.
+	 */
+	virtual void BurstClients() ;
+
+	/**
+	 * Output channel information for each client on this server.
+	 */
+	virtual void BurstChannels() ;
+
+	/* Network message handlers */
+
+	/// ERROR message handler, deprecated.
+	DECLARE_MSG(Error);
+
+	/// RPING message handler, deprecated.
+	DECLARE_MSG(RemPing);
+
+	/// VERSION message handler, deprecated.
+	DECLARE_MSG(Version);
+
+	/// P(RIVMSG) message handler.
+	DECLARE_MSG(P);
+
+	/// B(URST) message handler.
+	DECLARE_MSG(B);
+
+	/// EA (End of burst Acknowledge) message handler.
+	DECLARE_MSG(EA);
+
+	/// EB (End of BURST) message handler.
+	DECLARE_MSG(EB);
+
+	/// EndOfBurst message handler, deprecated.
+	DECLARE_MSG(EndOfBurst);
+
+	/// G(PING) message handler.
+	DECLARE_MSG(G);
+
+	/// PING message handler, deprecated.
+	DECLARE_MSG(Ping);
+
+	/// J(OIN) message handler.
+	DECLARE_MSG(J);
+
+	/// C(REATE) message handler.
+	DECLARE_MSG(C);
+
+	/// L(EAVE) message handler.
+	DECLARE_MSG(L);
+
+	/// M(ODE) message handler.
+	DECLARE_MSG(M);
+
+	/// N(ICK) message handler.
+	DECLARE_MSG(N);
+
+	/// NICK message handler, deprecated.
+	DECLARE_MSG(Nick);
+
+	/// Q(UIT) message handler.
+	DECLARE_MSG(Q);
+
+	/// QUIT message handler, deprecated.
+	DECLARE_MSG(Quit);
+
+	/// S(ERVER) message handler.
+	DECLARE_MSG(S);
+
+	/// SERVER message handler, deprecated.
+	DECLARE_MSG(Server);
+
+	/// SQ(UIT) message handler.
+	DECLARE_MSG(SQ);
+
+	/// D(KILL) message handler.
+	DECLARE_MSG(D);
+
+	/// WA(LLOPS) message handler.
+	DECLARE_MSG(WA);
+
+	// STATS message handler.
+	DECLARE_MSG(R);
+
+	/// PASS message handler.
+	DECLARE_MSG(PASS);
+
+	/// GL(INE) message handler
+	DECLARE_MSG(GL);
+
+	/// T(OPIC) message handler.
+	DECLARE_MSG(T);
+
+	/// K(ICK) message handler.
+	DECLARE_MSG(K);
+
+	// DE(SYNCH) ?
+	DECLARE_MSG(DS);
+
+	/// NOOP message.
+	/// Use this handler for any messages that we don't need to handle.
+	/// Included for completeness.
+	DECLARE_MSG(NOOP);
+
+	/**
+	 * Bounds checker for events.
+	 */
+	inline bool validEvent( const eventType& theEvent ) const
+		{ return (theEvent >= 0 && theEvent < EVT_NOOP) ; }
+
+	/**
+	 * This is the command map type.  Pointers to
+	 * the bound offset of the command handler methods
+	 * are stored in this structure.
+	 */
+	typedef VectorTrie< char*, int (xServer::*)( xParameters& ) >
+		commandMapType ;
+
+	/**
+	 * A pointer to the server command handler.
+	 */
+	commandMapType		*commandMap ;	
+
+	/**
+	 * This points to the input/output stream to be used for
+	 * server->server communication.  This may point to an
+	 * instance of FileSocket if the server is running in
+	 * simulation mode.
+	 */
+	ClientSocket		*theSock ;
+
+	/**
+	 * The name of the server, as the network sees it.
+	 */
+	string			ServerName ;
+
+	/**
+	 * This server's description line.
+	 */
+	string			ServerDescription ;
+
+	/**
+	 * The password for our uplink server.
+	 */
+	string			Password ;
+
+	/**
+	 * The hostname/IP of our uplink
+	 */
+	string			UplinkName ;
+
+	/**
+	 * This vector holds the server numerics of any servers
+	 * that we are juping.  The actual iServer instances
+	 * are maintained by the xNetwork instance, Network.
+	 */
+	jupedServerListType	jupedServers ;
+
+	/**
+	 * The type used to store the system event map.
+	 */
+	typedef vector< list< xClient* > > eventListType ;
+
+	/**
+	 * This is the vector of lists of xClient pointers.
+	 * When clients register to receive an event, that xClient's
+	 * pointer is added to eventListType[ theEvent ].
+	 * When an event of that type occurs, each xClient in the
+	 * list is called (OnEvent()).
+	 */
+	eventListType		eventList ;
+
+	/**
+	 * Type used to store the channel event map.
+	 */
+	typedef map< string, list< xClient* >*, noCaseCompare >
+		channelEventMapType ;
+
+	/**
+	 * This structure provides a nice iterator interface, and
+	 * runs in O(logn) time.  This should probably be moved
+	 * to some form of a hashtable, though it will have to
+	 * be specially built to meet the server's needs.
+	 * Any volunteers? :)
+	 */
+	channelEventMapType	channelEventMap ;
+
+	/**
+	 * The type of the structure to hold Gline's internally.
+	 */
+	typedef list< Gline* >	glineListType ;
+
+	/**
+	 * This structure holds the current network glines.
+	 */
+	glineListType		glineList ;
+
+	/**
+	 * This is the time this xServer was instantiated.
+	 */
+	time_t 			StartTime ;
+
+	/**
+	 * This is the time that we last connected to our uplink.
+	 */
+	time_t			ConnectionTime ;
+
+	/**
+	 * This is the version of the xServer, pretty useless.
+	 */
+	long			Version ;
+
+	/**
+	 * This variable is true when this server is bursting.
+	 */
+	bool			bursting ;
+
+	/**
+	 * This variable is true when the socket connection is valid.
+	 */
+	bool			_connected ;
+
+	/**
+	 * This is the current message error number, or -1 if no
+	 * error exists.
+	 */
+	MessageType		Message ;
+
+	/**
+	 * This is the port number to which we connect on our uplink.
+	 */
+	int			Port ;
+
+	/**
+	 * This is the unsigned integer representation of our server numeric.
+	 */
+	unsigned int		intYY ;
+
+	/**
+	 * This is the unsigned integer representation of the max number
+	 * of clients we can accept.
+	 */
+	unsigned int		intXXX ;
+
+	/**
+ 	 * This is the base 64 character array representation of this server's
+	 * numeric.
+	 */
+	char			charYY[ 3 ] ;
+
+	/**
+	 * This is the base 64 character array representation of this
+	 * server's maximum number of allowable clients.
+	 */
+	char			charXXX[ 4 ] ;
+
+	/**
+	 * This is a pointer into the network table to our uplink
+	 * server.  It is kept here for convenience.
+	 */
+	iServer* 		Uplink;
+
+	/**
+	 * This is the buffer into which network commands are read
+	 * and from which they are later processed.
+	 */
+	Buffer			inputBuffer ;
+
+	/**
+	 * This is the output buffer from which data is written to
+	 * the network.
+	 */
+	Buffer			outputBuffer ;
+
+	/**
+	 * This is the size of the TCP input window.
+	 */
+	size_t			inputReadSize ;
+
+	/**
+	 * This is the size of the TCP output window.
+	 */
+	size_t			outputWriteSize ;
+
+	/**
+	 * Burst() is called when the network connection is
+	 * established.  Its purpose is to call each xClient's
+	 * Connect() method so that each client may burst itself
+	 * and its channels.
+	 * NOTE: The scope of this method will be altered in
+	 * the future to reduce the requirements of xClient
+	 * when bursting its information.
+	 */
+	void 			Burst() ;
+
+	/**
+	 * EndOfBurst() is called once Burst() has completed.
+	 * It basically appends the END_OF_BURST token onto
+	 * the output buffer.
+	 */
+	void 			EndOfBurst() ;
+
+	/**
+	 * List used to store runtime modules.
+	 */
+	typedef vector< moduleLoader< xClient* >* >	moduleListType;
+	moduleListType		moduleList;
+
+} ;
+
+/// Deprecated method.
+void AddServer( const unsigned int& Uplink,
+	const string& YXX, 
+	const string& ServerName,
+	const time_t& ConnectionTime,
+	const time_t& StartTime,  
+	const int& Version ) ;
+
+/// Deprecated method.
+void AddUser( const unsigned int& Uplink,
+	const string& YXX,
+	const string& Nick,
+	const string& UserID,
+	const string& HostBase64,
+	const string& InsecureHost,
+	const string& Mode,
+	const time_t& ConnectionTime,
+	bool IncrementClients = true ) ;
+
+} // namespace gnuworld
+
+#endif // __XSERVER_H

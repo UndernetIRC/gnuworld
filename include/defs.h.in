@@ -1,0 +1,93 @@
+/* include/defs.h.in.  Generated automatically from configure.in by autoheader.  */
+
+/* Define if the `getpgrp' function takes no argument.  */
+#undef GETPGRP_VOID
+
+/* Define to `int' if <sys/types.h> doesn't define.  */
+#undef gid_t
+
+/* Define to `int' if <sys/types.h> doesn't define.  */
+#undef mode_t
+
+/* Define to `int' if <sys/types.h> doesn't define.  */
+#undef pid_t
+
+/* Define if you need to in order for stat and other things to work.  */
+#undef _POSIX_SOURCE
+
+/* Define as the return type of signal handlers (int or void).  */
+#undef RETSIGTYPE
+
+/* Define to `unsigned int' if <sys/types.h> doesn't define.  */
+#undef size_t
+
+/* Define to `unsigned int' if <sys/types.h> doesn't define.  */
+#undef socklen_t
+
+/* Define if you have the ANSI C header files.  */
+#undef STDC_HEADERS
+
+/* Define if `sys_siglist' is declared by <signal.h>.  */
+#undef SYS_SIGLIST_DECLARED
+
+/* Define if you can safely include both <sys/time.h> and <time.h>.  */
+#undef TIME_WITH_SYS_TIME
+
+/* Define to `int' if <sys/types.h> doesn't define.  */
+#undef uid_t
+
+/* define this if you have getpgid(2) */
+#undef HAVE_GETPGID
+
+/* define this if you have snprintf(3) */
+#undef HAVE_SNPRINTF
+
+/* define this if you have strerror(3) */
+#undef HAVE_STRERROR
+
+/* define this if you have sysconf(3) */
+#undef HAVE_SYSCONF
+
+/* define this if you have uname(2) */
+#undef HAVE_UNAME
+
+/* define this if you have vsnprintf(3) */
+#undef HAVE_VSNPRINTF
+
+/* define this if you don't have struct linger */
+#undef NO_STRUCT_LINGER
+
+/* define if allow sys/time.h with time.h */
+#undef TIME_WITH_SYS_TIME
+
+/* Define this if your getpgrp is broken posix */
+#undef GETPGRP_VOID
+
+/* Define if you have the <sys/fcntl.h> header file.  */
+#undef HAVE_SYS_FCNTL_H
+
+/* Define if you have the <sys/file.h> header file.  */
+#undef HAVE_SYS_FILE_H
+
+/* Define if you have the <sys/select.h> header file.  */
+#undef HAVE_SYS_SELECT_H
+
+/* Define if you have the <sys/syslimits.h> header file.  */
+#undef HAVE_SYS_SYSLIMITS_H
+
+/* Define if you have the <sys/time.h> header file.  */
+#undef HAVE_SYS_TIME_H
+
+/* Define if you have the <sys/un.h> header file.  */
+#undef HAVE_SYS_UN_H
+
+/* Define if you have the <pthread.h> header file. */
+#undef HAVE_PTHREAD_H
+
+/* Define if you have POSIX Threads */
+#undef THREADS
+
+#undef HAVE_ASM_IOCTLS_H
+#undef HAVE_XTI_INET_H
+#undef HAVE_SYS_FILIO_H
+#undef HAVE_SOCKLEN_T

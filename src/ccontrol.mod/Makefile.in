@@ -1,0 +1,40 @@
+
+SHLIB_CXX = @SHLIB_CXX@
+SHLIB_LD = @SHLIB_LD@
+
+MOD_CXX = @MOD_CXX@
+MOD_LD = @MOD_LD@
+
+CXXFLAGS = @CXXFLAGS@
+BIN_PATH = @BIN_PATH@
+
+OBJS = CControlCommands.o
+
+all: $(OBJS) ccontrol.o finish
+
+.cc.o:
+	$(MOD_CXX) $(CXXFLAGS) -c -o $@ $<
+
+# LIBS is passed in by make
+# ABSOBJ is also passed in by make
+# -> This is the full path to each of the core objects for GNUWorld
+finish:
+	$(SHLIB_LD) -o ccontrol.so ccontrol.o CControlCommands.o $(ABSOBJ) $(LIBS)
+
+link:
+	@-if [ -f $(BIN_PATH)/ccontrol.so ]; then \
+		@-echo "Removing stale link..." \
+		$(RM) $(BIN_PATH)/ccontrol.so; \
+	fi
+	$(LN) -s ccontrol.so $(BIN_PATH)/ccontrol.so
+
+clean:
+	$(RM) -f $(OBJS) ccontrol.so ccontrol.o
+
+distclean: clean
+	$(RM) -f config.status config.cache
+
+depend:
+	$(CXX) $(CXXFLAGS) -MM ccontrol.cc CControlCommands.cc >> Makefile
+
+# DO NOT DELETE THIS LINE

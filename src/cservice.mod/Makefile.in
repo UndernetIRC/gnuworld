@@ -1,0 +1,32 @@
+
+SHLIB_CXX = @SHLIB_CXX@
+SHLIB_LD = @SHLIB_LD@
+
+MOD_CXX = @MOD_CXX@
+MOD_LD = @MOD_LD@
+
+CXXFLAGS = @CXXFLAGS@
+
+OBJS = cservice.o
+RM = @RM@
+
+all: $(OBJS) cservice.o finish
+
+.cc.o:
+	$(MOD_CXX) $(CXXFLAGS) -I/usr/local/pgsql/include -c -o $@ $<
+
+# LIBS is passed in by make
+finish:
+	$(SHLIB_LD) -o cservice.so cservice.o -L/usr/local/pgsql/lib -lpq++ $(LIBS) \
+	$(ABSOBJ)
+
+clean:
+	$(RM) -f $(OBJS) cservice.so cservice.o
+
+distclean: clean
+	$(RM) -f config.status config.cache
+
+depend:
+	$(CXX) $(CXXFLAGS) -MM cservice.cc >> Makefile
+
+# DO NOT DELETE THIS LINE
