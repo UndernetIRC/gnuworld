@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: dronescan.cc,v 1.39 2003/10/12 16:06:44 jeekay Exp $
+ * $Id: dronescan.cc,v 1.40 2003/10/12 17:21:19 jeekay Exp $
  */
 
 #include	<string>
@@ -40,7 +40,7 @@
 #include "sqlUser.h"
 #include "Timer.h"
 
-RCSTAG("$Id: dronescan.cc,v 1.39 2003/10/12 16:06:44 jeekay Exp $");
+RCSTAG("$Id: dronescan.cc,v 1.40 2003/10/12 17:21:19 jeekay Exp $");
 
 namespace gnuworld {
 
@@ -111,6 +111,7 @@ dcInterval = atoi(dronescanConfig->Require("dcInterval")->second.c_str());
 consoleLevel = atoi(dronescanConfig->Require("consoleLevel")->second.c_str());
 jcInterval = atoi(dronescanConfig->Require("jcInterval")->second.c_str());
 jcCutoff = atoi(dronescanConfig->Require("jcCutoff")->second.c_str());
+rcInterval = atoi(dronescanConfig->Require("rcInterval")->second.c_str());
 
 /* Set up variables that our tests will need */
 typedef vector<string> testVarsType;
@@ -224,6 +225,10 @@ void dronescan::ImplementServer( xServer* theServer )
 	/* Set up our JC counter */
 	theTime = time(0) + jcInterval;
 	tidClearJoinCounter = theServer->RegisterTimer(theTime, this, 0);
+	
+	/* Set up cache refresh timer */
+	theTime = time(0) + rcInterval;
+	tidRefreshCaches = theServer->RegisterTimer(theTime, this, 0);
 
 	xClient::ImplementServer( theServer );
 } // dronescan::ImplementServer(xServer*)
@@ -627,6 +632,15 @@ void dronescan::OnTimer( xServer::timerID theTimer , void *)
 		theTime = time(0) + jcInterval;
 		tidClearJoinCounter = MyUplink->RegisterTimer(theTime, this, 0);
 		}
+	
+	if(theTimer == tidRefreshCaches) {
+		log(DBG, "Refreshing caches");
+		
+		preloadUserCache();
+		
+		theTime = time(0) + rcInterval;
+		tidRefreshCaches = MyUplink->RegisterTimer(theTime, this, 0);
+	}
 }
 
 /*******************************************
@@ -1040,12 +1054,31 @@ sqlUser *dronescan::getSqlUser(const string& theNick)
 /** Preload the users cache */
 void dronescan::preloadUserCache()
 {
+	/* Are we due to update? */
+	stringstream checkTime;
+	checkTime	<< "SELECT max(last_updated) FROM users";
+	
+	ExecStatusType status = SQLDb->Exec(checkTime.str().c_str());
+	
+	if(PGRES_TUPLES_OK == status) {
+		time_t maxUpdated = atoi(SQLDb->GetValue(0, 0));
+		
+		/* If noone has been updated, don't bother reloading. */
+		if( maxUpdated <= lastUpdated["USERS"] ) return;
+		
+		log(INFO, "Reloading users cache.");
+		lastUpdated["USERS"] = maxUpdated;
+	} else {
+		elog	<< "dronescan::preloadUserCache> "
+			<< SQLDb->ErrorMessage();
+	}
+
 	stringstream theQuery;
 	theQuery	<< "SELECT user_name,last_seen,last_updated_by,last_updated,flags,access,created "
 			<< "FROM users"
 			;
 	
-	ExecStatusType status = SQLDb->Exec(theQuery.str().c_str());
+	status = SQLDb->Exec(theQuery.str().c_str());
 	
 	if(PGRES_TUPLES_OK == status) {
 		/* First we need to clear the current cache. */

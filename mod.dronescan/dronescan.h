@@ -16,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: dronescan.h,v 1.18 2003/09/04 18:58:15 jeekay Exp $
+ * $Id: dronescan.h,v 1.19 2003/10/12 17:21:19 jeekay Exp $
  */
 
 #ifndef DRONESCAN_H
-#define DRONESCAN_H "$Id: dronescan.h,v 1.18 2003/09/04 18:58:15 jeekay Exp $"
+#define DRONESCAN_H "$Id: dronescan.h,v 1.19 2003/10/12 17:21:19 jeekay Exp $"
 
 #include <map>
 
@@ -234,12 +234,19 @@ protected:
 	
 	/** Timers for GNUWorld triggered events. */
 	xServer::timerID tidClearJoinCounter;
+	xServer::timerID tidRefreshCaches;
 	
 	/** Command map type. */
 	typedef map< string , Command* , noCaseCompare > commandMapType;
 	typedef commandMapType::value_type commandPairType;
 	commandMapType commandMap;
 	bool RegisterCommand(Command*);
+	
+	/** Time of the last cache. */
+	map < string , time_t > lastUpdated;
+	
+	/** How often to refresh caches. */
+	unsigned int rcInterval;
 }; // class dronescan
 
 } // namespace ds
