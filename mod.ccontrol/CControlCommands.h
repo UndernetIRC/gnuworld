@@ -1,8 +1,10 @@
-/* CControlCommands.h
+/**
+ * CControlCommands.h
+ * $Id: CControlCommands.h,v 1.30 2002/05/15 22:14:10 dan_karrels Exp $
  */
 
 #ifndef __CCONTROLCOMMANDS_H
-#define __CCONTROLCOMMANDS_H
+#define __CCONTROLCOMMANDS_H "$Id: CControlCommands.h,v 1.30 2002/05/15 22:14:10 dan_karrels Exp $"
 
 #include	<string>
 
@@ -28,8 +30,8 @@ public:
 	Command( ccontrol* _bot, const string& _commName,
 		const string& _help, const unsigned long _flags,
 		const bool _disabled, const bool _needOp,
-		const bool _noLog,const int unsigned _minLevel
-		, const bool _secondAccess)
+		const bool _noLog,const int unsigned _minLevel,
+		const bool _secondAccess)
 	 : bot( _bot ),
 	   server( 0 ),
 	   commName( _commName ),

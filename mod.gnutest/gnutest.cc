@@ -11,7 +11,7 @@
 
 const char client_h_rcsId[] = __CLIENT_H ;
 const char gnutest_h_rcsId[] = __GNUTEST_H ;
-const char gnutest_cc_rcsId[] = "$Id: gnutest.cc,v 1.6 2001/08/18 15:03:20 dan_karrels Exp $" ;
+const char gnutest_cc_rcsId[] = "$Id: gnutest.cc,v 1.7 2002/05/15 22:14:10 dan_karrels Exp $" ;
 const char iClient_h_rcsId[] = __ICLIENT_H ;
 const char StringTokenizer_h_rcsId[] = __STRINGTOKENIZER_H ;
 const char EConfig_h_rcsId[] = __ECONFIG_H ;
@@ -40,9 +40,7 @@ gnutest::gnutest( const string& fileName )
  : xClient( fileName )
 {
 EConfig conf( fileName ) ;
-
 operChan = conf.Require( "operchan" )->second ;
-
 }
 
 gnutest::~gnutest()

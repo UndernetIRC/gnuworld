@@ -3,7 +3,7 @@
  */
 
 #ifndef __CCONTROL_H
-#define __CCONTROL_H "$Id: ccontrol.h,v 1.69 2002/03/25 23:40:25 mrbean_ Exp $"
+#define __CCONTROL_H "$Id: ccontrol.h,v 1.70 2002/05/15 22:14:10 dan_karrels Exp $"
 
 //Undef this if you want to log to the database
 #define LOGTOHD 
@@ -922,7 +922,7 @@ protected:
 
 void* initGate( void * );
 
-extern unsigned int dbConnected;
+extern bool dbConnected;
 } //namespace uworld
 
 } // namespace gnuworld

@@ -1,8 +1,10 @@
-/* CommandsDec.h
+/**
+ * CommandsDec.h
+ * $Id: CommandsDec.h,v 1.8 2002/05/15 22:14:10 dan_karrels Exp $
  */
 
 #ifndef __COMMANDSDEC_H
-#define __COMMANDSDEC_H "$Id: CommandsDec.h,v 1.7 2002/03/01 18:27:36 mrbean_ Exp $"
+#define __COMMANDSDEC_H "$Id: CommandsDec.h,v 1.8 2002/05/15 22:14:10 dan_karrels Exp $"
 
 namespace gnuworld
 {

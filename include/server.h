@@ -17,7 +17,7 @@
  */
 
 #ifndef __SERVER_H
-#define __SERVER_H "$Id: server.h,v 1.58 2002/04/27 14:54:50 dan_karrels Exp $"
+#define __SERVER_H "$Id: server.h,v 1.59 2002/05/15 22:14:10 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
@@ -82,6 +82,8 @@ class xClient ;
 /// Forward declaration of Channel
 class Channel ;
 
+/// The type used to store messages for delivery to clients of
+/// class xServer
 enum MessageType
 	{
 	SRV_SUCCESS, // all ok
@@ -776,7 +778,7 @@ public:
 	 * if the mode is being set/unset by a server.
 	 * detected.
 	 */
-	virtual void	onChannelModeT( Channel*, bool, ChannelUser* ) ;
+	virtual void	OnChannelModeT( Channel*, bool, ChannelUser* ) ;
 
 	/**
 	 * This method is called when a channel mode 'n' change is
@@ -784,7 +786,7 @@ public:
 	 * Keep in mind that the source ChannelUser may be NULL
 	 * if the mode is being set/unset by a server.
 	 */
-	virtual void	onChannelModeN( Channel*, bool, ChannelUser* ) ;
+	virtual void	OnChannelModeN( Channel*, bool, ChannelUser* ) ;
 
 	/**
 	 * This method is called when a channel mode 's' change is
@@ -792,7 +794,7 @@ public:
 	 * Keep in mind that the source ChannelUser may be NULL
 	 * if the mode is being set/unset by a server.
 	 */
-	virtual void	onChannelModeS( Channel*, bool, ChannelUser* ) ;
+	virtual void	OnChannelModeS( Channel*, bool, ChannelUser* ) ;
 
 	/**
 	 * This method is called when a channel mode 'p' change is
@@ -800,7 +802,7 @@ public:
 	 * Keep in mind that the source ChannelUser may be NULL
 	 * if the mode is being set/unset by a server.
 	 */
-	virtual void	onChannelModeP( Channel*, bool, ChannelUser* ) ;
+	virtual void	OnChannelModeP( Channel*, bool, ChannelUser* ) ;
 
 	/**
 	 * This method is called when a channel mode 'm' change is
@@ -808,7 +810,7 @@ public:
 	 * Keep in mind that the source ChannelUser may be NULL
 	 * if the mode is being set/unset by a server.
 	 */
-	virtual void	onChannelModeM( Channel*, bool, ChannelUser* ) ;
+	virtual void	OnChannelModeM( Channel*, bool, ChannelUser* ) ;
 
 	/**
 	 * This method is called when a channel mode 'i' change is
@@ -816,7 +818,7 @@ public:
 	 * Keep in mind that the source ChannelUser may be NULL
 	 * if the mode is being set/unset by a server.
 	 */
-	virtual void	onChannelModeI( Channel*, bool, ChannelUser* ) ;
+	virtual void	OnChannelModeI( Channel*, bool, ChannelUser* ) ;
 
 	/**
 	 * This method is called when a channel mode 'l' change is
@@ -824,7 +826,7 @@ public:
 	 * Keep in mind that the source ChannelUser may be NULL
 	 * if the mode is being set/unset by a server.
 	 */
-	virtual void	onChannelModeL( Channel*, bool,
+	virtual void	OnChannelModeL( Channel*, bool,
 				ChannelUser*, unsigned int ) ;
 
 	/**
@@ -833,7 +835,7 @@ public:
 	 * Keep in mind that the source ChannelUser may be NULL
 	 * if the mode is being set/unset by a server.
 	 */
-	virtual void	onChannelModeK( Channel*, bool,
+	virtual void	OnChannelModeK( Channel*, bool,
 				ChannelUser*, const string& ) ;
 
 	/**
@@ -842,7 +844,7 @@ public:
 	 * Keep in mind that the source ChannelUser may be NULL
 	 * if the mode is being set/unset by a server.
 	 */
-	virtual void	onChannelModeO( Channel*, ChannelUser*,
+	virtual void	OnChannelModeO( Channel*, ChannelUser*,
 		const opVectorType& ) ;
 
 	/**
@@ -851,7 +853,7 @@ public:
 	 * Keep in mind that the source ChannelUser may be NULL
 	 * if the mode is being set/unset by a server.
 	 */
-	virtual void	onChannelModeV( Channel*, ChannelUser*,
+	virtual void	OnChannelModeV( Channel*, ChannelUser*,
 		const voiceVectorType& ) ;
 
 	/**
@@ -860,7 +862,7 @@ public:
 	 * Keep in mind that the source ChannelUser may be NULL
 	 * if the mode is being set/unset by a server.
 	 */
-	virtual void	onChannelModeB( Channel*, ChannelUser*,
+	virtual void	OnChannelModeB( Channel*, ChannelUser*,
 		banVectorType& ) ;
 
 	/**

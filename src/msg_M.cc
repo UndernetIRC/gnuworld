@@ -18,7 +18,7 @@
 #include	"ELog.h"
 #include	"StringTokenizer.h"
 
-const char msg_M_cc_rcsId[] = "$Id: msg_M.cc,v 1.12 2002/02/02 18:19:56 gte Exp $" ;
+const char msg_M_cc_rcsId[] = "$Id: msg_M.cc,v 1.13 2002/05/15 22:14:10 dan_karrels Exp $" ;
 const char misc_h_rcsId[] = __MISC_H ;
 const char events_h_rcsId[] = __EVENTS_H ;
 const char server_h_rcsId[] = __SERVER_H ;
@@ -138,27 +138,27 @@ for( const char* modePtr = Param[ 2 ] ; *modePtr ; ++modePtr )
 			polarity = false ;
 			break ;
 		case 't':
-			onChannelModeT( theChan,
+			OnChannelModeT( theChan,
 				polarity, theUser ) ;
 			break ;
 		case 'n':
-			onChannelModeN( theChan,
+			OnChannelModeN( theChan,
 				polarity, theUser ) ;
 			break ;
 		case 's':
-			onChannelModeS( theChan,
+			OnChannelModeS( theChan,
 				polarity, theUser ) ;
 			break ;
 		case 'p':
-			onChannelModeP( theChan,
+			OnChannelModeP( theChan,
 				polarity, theUser ) ;
 			break ;
 		case 'm':
-			onChannelModeM( theChan,
+			OnChannelModeM( theChan,
 				polarity, theUser ) ;
 			break ;
 		case 'i':
-			onChannelModeI( theChan,
+			OnChannelModeI( theChan,
 				polarity, theUser ) ;
 			break ;
 
@@ -174,7 +174,7 @@ for( const char* modePtr = Param[ 2 ] ; *modePtr ; ++modePtr )
 				continue ;
 				}
 
-			onChannelModeL( theChan,
+			OnChannelModeL( theChan,
 				polarity, theUser,
 				polarity ? atoi( Param[ argPos++ ] )
 					: 0 ) ;
@@ -191,7 +191,7 @@ for( const char* modePtr = Param[ 2 ] ; *modePtr ; ++modePtr )
 				continue ;
 				}
 
-			onChannelModeK( theChan,
+			OnChannelModeK( theChan,
 				polarity, theUser,
 				Param[ argPos++ ] ) ;
 			break ;
@@ -300,15 +300,15 @@ for( const char* modePtr = Param[ 2 ] ; *modePtr ; ++modePtr )
 
 if( !opVector.empty() )
 	{
-	onChannelModeO( theChan, theUser, opVector ) ;
+	OnChannelModeO( theChan, theUser, opVector ) ;
 	}
 if( !voiceVector.empty() )
 	{
-	onChannelModeV( theChan, theUser, voiceVector ) ;
+	OnChannelModeV( theChan, theUser, voiceVector ) ;
 	}
 if( !banVector.empty() )
 	{
-	onChannelModeB( theChan, theUser, banVector ) ;
+	OnChannelModeB( theChan, theUser, banVector ) ;
 	}
 
 return 0 ;

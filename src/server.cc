@@ -50,7 +50,7 @@
 #include	"UnloadClientTimerHandler.h"
 
 const char server_h_rcsId[] = __SERVER_H ;
-const char server_cc_rcsId[] = "$Id: server.cc,v 1.129 2002/04/27 14:54:51 dan_karrels Exp $" ;
+const char server_cc_rcsId[] = "$Id: server.cc,v 1.130 2002/05/15 22:14:10 dan_karrels Exp $" ;
 const char config_h_rcsId[] = __CONFIG_H ;
 const char misc_h_rcsId[] = __MISC_H ;
 const char events_h_rcsId[] = __EVENTS_H ;
@@ -2888,7 +2888,7 @@ mainLoop() ;
 // polarity is true if the mode is being set, false otherwise
 // sourceUser is the source of the mode change; this variable
 // may be NULL if a server is setting the mode
-void xServer::onChannelModeT( Channel* theChan, bool polarity,
+void xServer::OnChannelModeT( Channel* theChan, bool polarity,
 	ChannelUser* sourceUser )
 {
 theChan->onModeT( polarity ) ;
@@ -2930,7 +2930,7 @@ for( list< xClient* >::iterator ptr = listPtr->begin(), end = listPtr->end() ;
 // polarity is true if the mode is being set, false otherwise
 // sourceUser is the source of the mode change; this variable
 // may be NULL if a server is setting the mode
-void xServer::onChannelModeN( Channel* theChan, bool polarity,
+void xServer::OnChannelModeN( Channel* theChan, bool polarity,
 	ChannelUser* sourceUser )
 {
 theChan->onModeN( polarity ) ;
@@ -2972,7 +2972,7 @@ for( list< xClient* >::iterator ptr = listPtr->begin(), end = listPtr->end() ;
 // polarity is true if the mode is being set, false otherwise
 // sourceUser is the source of the mode change; this variable
 // may be NULL if a server is setting the mode
-void xServer::onChannelModeS( Channel* theChan, bool polarity,
+void xServer::OnChannelModeS( Channel* theChan, bool polarity,
 	ChannelUser* sourceUser )
 {
 theChan->onModeS( polarity ) ;
@@ -3014,7 +3014,7 @@ for( list< xClient* >::iterator ptr = listPtr->begin(), end = listPtr->end() ;
 // polarity is true if the mode is being set, false otherwise
 // sourceUser is the source of the mode change; this variable
 // may be NULL if a server is setting the mode
-void xServer::onChannelModeP( Channel* theChan, bool polarity,
+void xServer::OnChannelModeP( Channel* theChan, bool polarity,
 	ChannelUser* sourceUser )
 {
 theChan->onModeP( polarity ) ;
@@ -3056,7 +3056,7 @@ for( list< xClient* >::iterator ptr = listPtr->begin(), end = listPtr->end() ;
 // polarity is true if the mode is being set, false otherwise
 // sourceUser is the source of the mode change; this variable
 // may be NULL if a server is setting the mode
-void xServer::onChannelModeM( Channel* theChan, bool polarity,
+void xServer::OnChannelModeM( Channel* theChan, bool polarity,
 	ChannelUser* sourceUser )
 {
 theChan->onModeM( polarity ) ;
@@ -3098,7 +3098,7 @@ for( list< xClient* >::iterator ptr = listPtr->begin(), end = listPtr->end() ;
 // polarity is true if the mode is being set, false otherwise
 // sourceUser is the source of the mode change; this variable
 // may be NULL if a server is setting the mode
-void xServer::onChannelModeI( Channel* theChan, bool polarity,
+void xServer::OnChannelModeI( Channel* theChan, bool polarity,
 	ChannelUser* sourceUser )
 {
 theChan->onModeI( polarity ) ;
@@ -3140,7 +3140,7 @@ for( list< xClient* >::iterator ptr = listPtr->begin(), end = listPtr->end() ;
 // polarity is true if the mode is being set, false otherwise
 // sourceUser is the source of the mode change; this variable
 // may be NULL if a server is setting the mode
-void xServer::onChannelModeL( Channel* theChan, bool polarity,
+void xServer::OnChannelModeL( Channel* theChan, bool polarity,
 	ChannelUser* sourceUser, unsigned int limit )
 {
 theChan->onModeL( polarity, limit ) ;
@@ -3183,7 +3183,7 @@ for( list< xClient* >::iterator ptr = listPtr->begin(), end = listPtr->end() ;
 // polarity is true if the mode is being set, false otherwise
 // sourceUser is the source of the mode change; this variable
 // may be NULL if a server is setting the mode
-void xServer::onChannelModeK( Channel* theChan, bool polarity,
+void xServer::OnChannelModeK( Channel* theChan, bool polarity,
 	ChannelUser* sourceUser, const string& key )
 {
 theChan->onModeK( polarity, key ) ;
@@ -3226,7 +3226,7 @@ for( list< xClient* >::iterator ptr = listPtr->begin(), end = listPtr->end() ;
 // polarity is true if the mode is being set, false otherwise
 // sourceUser is the source of the mode change; this variable
 // may be NULL if a server is setting the mode
-void xServer::onChannelModeO( Channel* theChan, ChannelUser* sourceUser,
+void xServer::OnChannelModeO( Channel* theChan, ChannelUser* sourceUser,
 	const xServer::opVectorType& opVector )
 {
 theChan->onModeO( opVector ) ;
@@ -3268,7 +3268,7 @@ for( list< xClient* >::iterator ptr = listPtr->begin(), end = listPtr->end() ;
 // polarity is true if the mode is being set, false otherwise
 // sourceUser is the source of the mode change; this variable
 // may be NULL if a server is setting the mode
-void xServer::onChannelModeV( Channel* theChan, ChannelUser* sourceUser,
+void xServer::OnChannelModeV( Channel* theChan, ChannelUser* sourceUser,
 	const xServer::voiceVectorType& voiceVector )
 {
 theChan->onModeV( voiceVector ) ;
@@ -3311,7 +3311,7 @@ for( list< xClient* >::iterator ptr = listPtr->begin(), end = listPtr->end() ;
 // polarity is true if the mode is being set, false otherwise
 // sourceUser is the source of the mode change; this variable
 // may be NULL if a server is setting the mode
-void xServer::onChannelModeB( Channel* theChan, ChannelUser* sourceUser,
+void xServer::OnChannelModeB( Channel* theChan, ChannelUser* sourceUser,
 	xServer::banVectorType& banVector )
 {
 
@@ -3357,35 +3357,35 @@ void xServer::removeAllChanModes( Channel* theChan )
 // This is a protected method, theChan is non-NULL
 if( theChan->getMode( Channel::MODE_T ) )
 	{
-	onChannelModeT( theChan, false, 0 ) ;
+	OnChannelModeT( theChan, false, 0 ) ;
 	}
 if( theChan->getMode( Channel::MODE_N ) )
 	{
-	onChannelModeN( theChan, false, 0 ) ;
+	OnChannelModeN( theChan, false, 0 ) ;
 	}
 if( theChan->getMode( Channel::MODE_S ) )
 	{
-	onChannelModeS( theChan, false, 0 ) ;
+	OnChannelModeS( theChan, false, 0 ) ;
 	}
 if( theChan->getMode( Channel::MODE_P ) )
 	{
-	onChannelModeP( theChan, false, 0 ) ;
+	OnChannelModeP( theChan, false, 0 ) ;
 	}
 if( theChan->getMode( Channel::MODE_M ) )
 	{
-	onChannelModeM( theChan, false, 0 ) ;
+	OnChannelModeM( theChan, false, 0 ) ;
 	}
 if( theChan->getMode( Channel::MODE_I ) )
 	{
-	onChannelModeI( theChan, false, 0 ) ;
+	OnChannelModeI( theChan, false, 0 ) ;
 	}
 if( theChan->getMode( Channel::MODE_L ) )
 	{
-	onChannelModeL( theChan, false, 0, 0 ) ;
+	OnChannelModeL( theChan, false, 0, 0 ) ;
 	}
 if( theChan->getMode( Channel::MODE_K ) )
 	{
-	onChannelModeK( theChan, false, 0, string() ) ;
+	OnChannelModeK( theChan, false, 0, string() ) ;
 	}
 
 opVectorType opVector ;
@@ -3419,15 +3419,15 @@ for( ; ptr != end ; ++ptr )
 
 if( !opVector.empty() )
 	{
-	onChannelModeO( theChan, 0, opVector ) ;
+	OnChannelModeO( theChan, 0, opVector ) ;
 	}
 if( !voiceVector.empty() )
 	{
-	onChannelModeV( theChan, 0, voiceVector ) ;
+	OnChannelModeV( theChan, 0, voiceVector ) ;
 	}
 if( !banVector.empty() )
 	{
-	onChannelModeB( theChan, 0, banVector ) ;
+	OnChannelModeB( theChan, 0, banVector ) ;
 	}
 }
 
@@ -3569,27 +3569,27 @@ for( string::const_iterator modePtr = modes.begin() ;
 			polarity = false ;
 			break ;
 		case 't':
-			onChannelModeT( theChan, polarity,
+			OnChannelModeT( theChan, polarity,
 				theUser ) ;
 			break ;
 		case 'n':
-			onChannelModeN( theChan, polarity,
+			OnChannelModeN( theChan, polarity,
 				theUser ) ;
 			break ;
 		case 's':
-			onChannelModeS( theChan, polarity,
+			OnChannelModeS( theChan, polarity,
 				theUser ) ;
 			break ;
 		case 'p':
-			onChannelModeP( theChan, polarity,
+			OnChannelModeP( theChan, polarity,
 				theUser ) ;
 			break ;
 		case 'i':
-			onChannelModeI( theChan, polarity,
+			OnChannelModeI( theChan, polarity,
 				theUser ) ;
 			break ;
 		case 'm':
-			onChannelModeM( theChan, polarity,
+			OnChannelModeM( theChan, polarity,
 				theUser ) ;
 			break ;
 		case 'b':
@@ -3623,14 +3623,14 @@ for( string::const_iterator modePtr = modes.begin() ;
 			break ;
 		case 'k':
 			// Channel mode 'k' always has an argument
-			onChannelModeK( theChan, polarity, theUser,
+			OnChannelModeK( theChan, polarity, theUser,
 				*argPtr ) ;
 			++argPtr ;
 			break ;
 		case 'l':
 			// Channel mode 'l' only has an argument if
 			// it's being added, but not removed
-			onChannelModeL( theChan, polarity, theUser,
+			OnChannelModeL( theChan, polarity, theUser,
 				polarity ? atoi( (*argPtr).c_str() )
 				: 0 ) ;
 			if( polarity )
@@ -3664,15 +3664,15 @@ delete[] s.str() ;
 // Update internal tables and notify all xClients of mode change(s)
 if( !opVector.empty() )
 	{
-	onChannelModeO( theChan, theUser, opVector ) ;
+	OnChannelModeO( theChan, theUser, opVector ) ;
 	}
 if( !voiceVector.empty() )
 	{
-	onChannelModeV( theChan, theUser, voiceVector ) ;
+	OnChannelModeV( theChan, theUser, voiceVector ) ;
 	}
 if( !banVector.empty() )
 	{
-	onChannelModeB( theChan, theUser, banVector ) ;
+	OnChannelModeB( theChan, theUser, banVector ) ;
 	}
 
 return retMe ;

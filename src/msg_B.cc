@@ -30,7 +30,7 @@ const char Channel_h_rcsId[] = __CHANNEL_H ;
 const char ChannelUser_h_rcsId[] = __CHANNELUSER_H ;
 const char Network_h_rcsId[] = __NETWORK_H ;
 const char iClient_h_rcsId[] = __ICLIENT_H ;
-const char msg_B_cc_rcsId[] = "$Id: msg_B.cc,v 1.9 2002/04/28 16:11:23 dan_karrels Exp $" ;
+const char msg_B_cc_rcsId[] = "$Id: msg_B.cc,v 1.10 2002/05/15 22:14:10 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -132,30 +132,30 @@ if( '+' == Param[ whichToken ][ 0 ] )
 		switch( *currentPtr )
 			{
 			case 't':
-				onChannelModeT( theChan, true, 0 ) ;
+				OnChannelModeT( theChan, true, 0 ) ;
 				break ;
 			case 'n':
-				onChannelModeN( theChan, true, 0 ) ;
+				OnChannelModeN( theChan, true, 0 ) ;
 				break ;
 			case 'm':
-				onChannelModeM( theChan, true, 0 ) ;
+				OnChannelModeM( theChan, true, 0 ) ;
 				break ;
 			case 'p':
-				onChannelModeP( theChan, true, 0 ) ;
+				OnChannelModeP( theChan, true, 0 ) ;
 				break ;
 			case 's':
-				onChannelModeS( theChan, true, 0 ) ;
+				OnChannelModeS( theChan, true, 0 ) ;
 				break ;
 			case 'i':
-				onChannelModeI( theChan, true, 0 ) ;
+				OnChannelModeI( theChan, true, 0 ) ;
 				break ;
  			case 'l':
-				onChannelModeL( theChan, true, 0,
+				OnChannelModeL( theChan, true, 0,
 					::atoi( Param[ whichToken + 1 ] ) ) ;
 				whichToken++ ;
 				break ;
 			case 'k':
-				onChannelModeK( theChan, true, 0,
+				OnChannelModeK( theChan, true, 0,
 					Param[ whichToken + 1 ] ) ;
 				whichToken++ ;
 				break ;
@@ -370,11 +370,11 @@ for( StringTokenizer::const_iterator ptr = st.begin() ; ptr != st.end() ;
 // all listening clients
 if( !opVector.empty() )
 	{
-	onChannelModeO( theChan, 0, opVector ) ;
+	OnChannelModeO( theChan, 0, opVector ) ;
 	}
 if( !voiceVector.empty() )
 	{
-	onChannelModeV( theChan, 0, voiceVector ) ;
+	OnChannelModeV( theChan, 0, voiceVector ) ;
 	}
 
 }
@@ -404,7 +404,7 @@ for( StringTokenizer::size_type i = 0 ; i < st.size() ; ++i )
 
 if( !banVector.empty() )
 	{
-	onChannelModeB( theChan, 0, banVector ) ;
+	OnChannelModeB( theChan, 0, banVector ) ;
 	}
 }
 

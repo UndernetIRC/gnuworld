@@ -5,7 +5,7 @@
  */
 
 #ifndef __NUMERIC_H
-#define __NUMERIC_H "$Id: Numeric.h,v 1.3 2002/04/27 14:54:49 dan_karrels Exp $"
+#define __NUMERIC_H "$Id: Numeric.h,v 1.4 2002/05/15 22:14:10 dan_karrels Exp $"
 
 /*
  * Numeric nicks are new as of version ircu2.10.00beta1.
@@ -141,6 +141,17 @@ while (count > 0)
 	}
 
 return buf;
+}
+
+inline const unsigned int combinebase64int( const unsigned int& intYY,
+	const unsigned int& intXXX )
+{
+char charYYXXX[ 6 ] ;
+
+inttobase64( charYYXXX, intYY, 2 ) ;
+inttobase64( &charYYXXX[ 2 ], intXXX, 3 ) ;
+
+return base64toint( charYYXXX, 5 ) ;
 }
 
 } // namespace gnuworld

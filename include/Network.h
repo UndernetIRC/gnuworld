@@ -3,13 +3,13 @@
  */
 
 #ifndef __NETWORK_H
-#define __NETWORK_H "$Id: Network.h,v 1.24 2002/04/27 14:54:49 dan_karrels Exp $"
+#define __NETWORK_H "$Id: Network.h,v 1.25 2002/05/15 22:14:10 dan_karrels Exp $"
 
 #include	<vector>
 #include	<string>
 #include	<map>
 #include	<list>
-#include	<hash_map.h>
+#include	<hash_map>
 #include	<algorithm>
 
 #include	<ctime>
@@ -45,24 +45,6 @@ class xNetwork
 {
 
 private:
-	/**
-	 * This is the vector type that will hold
-	 * pointers to iServer's.
-	 */
-	typedef vector< iServer* > serverVectorType ;
-
-	/**
-	 * This is the vector type that will hold
-	 * pointers to iClient's.
-	 */
-	typedef vector< iClient* > clientVectorType ;
-
-	/**
-	 * This is a vector of clientVectorType's.
-	 * This type will be used to hold vectors of iClients,
-	 * one for each server. (Described below.)
-	 */
-	typedef vector< clientVectorType > networkVectorType ;
 
 	/**
 	 * This is the type of vector for storing
@@ -80,6 +62,18 @@ private:
 	 * This is the type used to store the nick name/iClient* pairs.
 	 */
 	typedef hash_map< string, iClient*, eHash, eqstr > nickMapType ;
+
+	/**
+	 * The type used to store information about iClient's,
+	 * keyed by integer numeric.
+	 */
+	typedef hash_map< unsigned int, iClient* > numericMapType ;
+
+	/**
+	 * The type used to store information about iServer's,
+	 * keyed by integer numeric.
+	 */
+	typedef hash_map< unsigned int, iServer* > serverMapType ;
 
 public:
 
@@ -205,8 +199,16 @@ public:
 	/* Removal methods. */
 
 	/**
-	 * Remove a remote client by integer numeric, and return a pointer
-	 * to it.
+	 * Remove a remote client by integer numeric and return a
+	 * pointer to the iClient.	
+	 * Return NULL if not found.
+	 */
+	virtual iClient*	removeClient(
+					const unsigned int& intYYXXX ) ;
+
+	/**
+	 * Remove a remote client by integer server and client numerics,
+	 * and return a pointer to the iClient.
 	 * Returns NULL if not found.
 	 */
 	virtual iClient*	removeClient( const unsigned int& YY,
@@ -287,6 +289,8 @@ public:
 
 	/**
 	 * Remove a channel from the network table.
+	 * Returns the Channel which has been removed, or NULL if the
+	 * channel was not found.
 	 */
 	virtual Channel*	removeChannel( const Channel* theChan ) ;
 
@@ -312,41 +316,41 @@ public:
 	 * Define a non-const iterator for walking through the
 	 * structure of remote servers.
 	 */
-	typedef serverVectorType::iterator serverIterator ;
+	typedef serverMapType::iterator serverIterator ;
 
 	/**
 	 * Define a const iterator for walking through the structure
 	 * of remote servers.
 	 */
-	typedef serverVectorType::const_iterator const_serverIterator ;
+	typedef serverMapType::const_iterator const_serverIterator ;
 
 	/**
 	 * Return a non-const iterator to the beginning of the
 	 * remote servers table.
 	 */
 	inline serverIterator server_begin()
-		{ return servers.begin() ; }
+		{ return serverMap.begin() ; }
 
 	/**
 	 * Return a non-const iterator to the end of the
 	 * remote servers table.
 	 */
 	inline serverIterator server_end()
-		{ return servers.end() ; }
+		{ return serverMap.end() ; }
 
 	/**
 	 * Return a const iterator to the beginning of the
 	 * remote servers table.
 	 */
 	inline const_serverIterator server_begin() const
-		{ return servers.begin() ; }
+		{ return serverMap.begin() ; }
 
 	/**
 	 * Return a const iterator to the end of the remote
 	 * servers table.
 	 */
 	inline const_serverIterator server_end() const
-		{ return servers.end() ; }
+		{ return serverMap.end() ; }
 
 	/**
 	 * Define a non-const iterator for walking through the
@@ -524,19 +528,6 @@ protected:
 	void addNick( iClient* ) ;
 
 	/**
-	 * This is a vector of iServer*, one for each server
-	 * on the network.
-	 */
-	serverVectorType		servers ;
-
-	/**
-	 * This is a vector of vector of iClient*.
-	 * The index into clients is the server on which
-	 * the client resides.
-	 */
-	networkVectorType		clients ;
-
-	/**
 	 * The vector of local clients.
 	 */
 	xClientVectorType		localClients ;
@@ -552,6 +543,18 @@ protected:
 	 * cross references.
 	 */
 	nickMapType			nickMap ;
+
+	/**
+	 * The container used to store the network iClient's,
+	 * keyed by iClient numeric.
+	 */
+	numericMapType			numericMap ;
+
+	/**
+	 * The container used to store the network iServer's,
+	 * keyed by iServer numeric.
+	 */
+	serverMapType			serverMap ;
 
 	/**
 	 * This variable is used backwards calls to the main server.
