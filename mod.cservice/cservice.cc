@@ -2113,7 +2113,7 @@ bool cservice::checkBansOnJoin( Channel* netChan, sqlChannel* theChan,
 {
 vector< sqlBan* >* banList = getBanRecords(theChan);
 vector< sqlBan* >::iterator ptr = banList->begin();
-bool deleted = false;
+//bool deleted = false;
 
 while (ptr != banList->end())
 	{
