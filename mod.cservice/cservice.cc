@@ -330,6 +330,8 @@ if( PGRES_TUPLES_OK == status )
 		assert( newChan != 0 ) ;
 
 		newChan->setAllMembers(i);
+		newChan->setLastUsed(currentTime());
+
 		sqlChannelCache.insert(sqlChannelHashType::value_type(newChan->getName(), newChan));
 		sqlChannelIDCache.insert(sqlChannelIDHashType::value_type(newChan->getID(), newChan));
 
@@ -1763,7 +1765,7 @@ void cservice::cacheExpireLevels()
 		 */
 
 		/* 2 Days for now, move to config.. (172800) */
-		if ( ((currentTime() - theChan->getLastUsed()) >= 3600) && theChan->getInChan() )
+		if ( ((currentTime() - theChan->getLastUsed()) >= 172800) && theChan->getInChan() )
 		{
 			/*
 			 * So long! and thanks for all the fish.
