@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: SGLINECommand.cc,v 1.7 2003/08/09 23:15:34 dan_karrels Exp $
+ * $Id: SGLINECommand.cc,v 1.8 2003/11/01 00:49:34 isomer Exp $
  */
 
 #include	<string>
@@ -36,7 +36,7 @@
 #include	"Constants.h"
 #include	"config.h"
 
-RCSTAG( "$Id: SGLINECommand.cc,v 1.7 2003/08/09 23:15:34 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: SGLINECommand.cc,v 1.8 2003/11/01 00:49:34 isomer Exp $" ) ;
 
 namespace gnuworld
 {
@@ -120,7 +120,7 @@ else //RealName Gline
 		}
 	if(st[pos].substr(0,1) != "$")
 		{
-		RealHost = "$" + st[pos];
+		RealHost = "$R" + st[pos];
 		}
 	else
 		{
