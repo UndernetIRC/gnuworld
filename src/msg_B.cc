@@ -21,7 +21,7 @@
 #include	"Network.h"
 #include	"iClient.h"
 
-const char msg_B_cc_rcsId[] = "$Id: msg_B.cc,v 1.2 2001/02/04 19:35:08 dan_karrels Exp $" ;
+const char msg_B_cc_rcsId[] = "$Id: msg_B.cc,v 1.3 2001/02/04 20:01:08 dan_karrels Exp $" ;
 
 using std::string ;
 using std::vector ;
@@ -366,7 +366,7 @@ elog	<< "xServer::parseBurstBans> Found bans for channel "
 // Tokenize the ban string
 StringTokenizer st( theBans ) ;
 
-banVectorType banVector ;
+banVectorType banVector( st.size() ) ;
 
 // Move through each token and add the ban
 for( StringTokenizer::size_type i = 0 ; i < st.size() ; ++i )

@@ -47,7 +47,7 @@
 #include	"ServerTimerHandlers.h"
 
 const char xServer_h_rcsId[] = __XSERVER_H ;
-const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.70 2001/02/04 19:41:43 dan_karrels Exp $" ;
+const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.71 2001/02/04 20:01:08 dan_karrels Exp $" ;
 
 using std::string ;
 using std::vector ;
@@ -2756,8 +2756,10 @@ for( Channel::userIterator ptr = theChan->userList_begin(),
 
 banVectorType banVector ;
 
-for( Channel::banIterator ptr = theChan->banList_begin(),
-	end = theChan->banList_end() ; ptr != end ; ++ptr )
+Channel::banIterator ptr = theChan->banList_begin(),
+	end = theChan->banList_end() ;
+
+for( ; ptr != end ; ++ptr )
 	{
 	banVector.push_back( banVectorType::value_type(
 		false, *ptr ) ) ;

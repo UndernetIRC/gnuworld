@@ -347,14 +347,15 @@ for( banVectorType::const_iterator newBanPtr = origBans.begin() ;
 		{
 		if( !match( newBanPtr->second, *currentBanPtr ) )
 			{
-			// Overlap, remove the old ban
-			currentBanPtr = banList.erase( currentBanPtr ) ;
-
 			// Add the removed ban to the banVector
 			// so that the caller can notify the rest
 			// of the system of the removal
 			banVector.push_back( banVectorType::value_type(
 				false, *currentBanPtr ) ) ;
+
+			// Overlap, remove the old ban
+			currentBanPtr = banList.erase( currentBanPtr ) ;
+
 			}
 		else
 			{
