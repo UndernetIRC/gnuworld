@@ -676,7 +676,7 @@ if( st.empty() )
 
 const string Command = string_upper(st[0]);
 
-if(Command == "PING")
+if(Command == "PING" || Command=="ECHO")
 	{
 	xClient::DoCTCP(theClient, CTCP, Message);
 	}
@@ -694,13 +694,35 @@ else if(Command == "VERSION")
 	}
 else if(Command == "PROBLEM?")
 	{
-	xClient::DoCTCP(theClient, CTCP.c_str(), "Blame Perry!");
+	xClient::DoCTCP(theClient, CTCP.c_str(), "Blame Gte!");
 	} 
 else if(Command == "WHAT_YOU_SAY?")
 	{
 	xClient::DoCTCP(theClient, CTCP.c_str(), "All your base are belong to us.");
 	} 
- 
+else if(Command == "SOUND")
+	{
+	xClient::DoCTCP(theClient, CTCP.c_str(), "I'm deaf remember?");
+	}
+else if(Command == "DCC")
+	{
+	xClient::DoCTCP(theClient, CTCP.c_str(), "REJECT");
+	}
+else if(Command == "FLOOD")
+	/* Ignored */;
+else if(Command == "PAGE")
+	{
+	xClient::DoCTCP(theClient, CTCP.c_str(), "I'm always here, no need to page");
+	}
+else if(Command == "USERINFO")
+	{
+	xClient::DoCTCP(theClient, CTCP.c_str(), "I'm a user, not an abuser");
+	}
+else 
+	{
+	xClient::DoCTCP(theClient, "ERRMSG", CTCP.c_str());
+	}
+
 return true;
 } 
  
@@ -742,6 +764,14 @@ return 0;
  */
 sqlUser* cservice::getUserRecord(const string& id)
 {
+/*
+ *  Check if this is a lookup by nick
+ */
+if (id[0]=='=') 
+	{
+	iClient *client = Network->findClient(id.c_str()+1);
+	return isAuthed(client,false);
+	}
 /*
  *  Check if this record is already in the cache.
  */
