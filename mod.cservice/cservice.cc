@@ -195,7 +195,7 @@ RegisterCommand(new UNFORCECommand(this, "UNFORCE", "<#channel>", 8));
 RegisterCommand(new SERVNOTICECommand(this, "SERVNOTICE", "<#channel> <text>", 5));
 RegisterCommand(new SAYCommand(this, "SAY", "<#channel> <text>", 5));
 RegisterCommand(new QUOTECommand(this, "QUOTE", "<text>", 5));
-RegisterCommand(new REHASHCommand(this, "REHASH", "[translations]", 5));
+RegisterCommand(new REHASHCommand(this, "REHASH", "[translations | help]]", 5));
 RegisterCommand(new STATSCommand(this, "STATS", "", 8));
 RegisterCommand(new ADDCOMMENTCommand(this, "ADDCOMMENT", "<username> <comment>", 10));
 
@@ -265,6 +265,9 @@ connectRetries = 0;
 
 /* Load our translation tables. */
 loadTranslationTable();
+
+/* Load help messages */
+loadHelpTable();
 
 /* Preload the Channel Cache */
 preloadChannelCache();
@@ -1138,6 +1141,52 @@ if(theLevel)
 
 /* By default, users have level 0 access on a channel. */
 return 0;
+}
+
+/**
+ * Returns the help message for the specified topic in
+ * this user's prefered language
+ */
+const string cservice::getHelpMessage(sqlUser* theUser, string topic)
+{
+	int lang_id = 1;
+
+	if (theUser)
+		lang_id = theUser->getLanguageId();
+
+	pair <int, string> thePair(lang_id, topic);
+	helpTableType::iterator ptr = helpTable.find(thePair);
+	if (ptr != helpTable.end())
+		return ptr->second;
+
+	if (lang_id != 1)
+		return getHelpMessage(NULL, topic);
+
+	return string("");
+}
+
+/**
+ *  Execute an SQL query to retrieve all the help messages.
+ */
+void cservice::loadHelpTable()
+{
+ExecStatusType status;
+
+status = SQLDb->Exec("SELECT language_id,topic,contents FROM help");
+
+if (PGRES_TUPLES_OK == status)
+	for (int i = 0; i < SQLDb->Tuples(); i++)
+		helpTable.insert(helpTableType::value_type(make_pair(
+			atoi(SQLDb->GetValue(i, 0)),
+			SQLDb->GetValue(i, 1)),
+			SQLDb->GetValue(i, 2)));
+
+#ifdef LOG_SQL
+	elog	<< "*** [CMaster::loadHelpTable]: Loaded "
+			<< helpTable.size()
+			<< " help messages."
+			<< endl;
+#endif
 }
 
 /**

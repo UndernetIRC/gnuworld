@@ -1,5 +1,5 @@
 #ifndef __CSERVICE_H
-#define __CSERVICE_H "$Id: cservice.h,v 1.72 2001/09/23 02:18:52 gte Exp $"
+#define __CSERVICE_H "$Id: cservice.h,v 1.73 2001/10/19 00:11:20 gte Exp $"
 
 #include	<string>
 #include	<vector>
@@ -295,6 +295,13 @@ public:
 
 	// Check for valid hostmask.
 	virtual bool validUserMask(const string& userMask) const ;
+
+	/* Help topics (Loaded from Db) */
+	typedef map < pair <int, string>, string > helpTableType;
+	helpTableType helpTable;
+
+	void loadHelpTable();
+	const string getHelpMessage(sqlUser*, string);
 
 	/**
 	 * Count channel ops.

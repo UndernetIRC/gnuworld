@@ -8,7 +8,7 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char REHASHCommand_cc_rcsId[] = "$Id: REHASHCommand.cc,v 1.3 2001/09/05 03:47:56 gte Exp $" ;
+const char REHASHCommand_cc_rcsId[] = "$Id: REHASHCommand.cc,v 1.4 2001/10/19 00:11:20 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -47,6 +47,14 @@ if (option == "TRANSLATIONS")
 		bot->loadTranslationTable();
 		bot->Notice(theClient, "Done. %i entries in language table.",
 			bot->translationTable.size());
+	}
+
+if (option == "HELP")
+	{
+		bot->helpTable.clear();
+		bot->loadHelpTable();
+		bot->Notice(theClient, "Done. %i entries in help table.",
+			bot->helpTable.size());
 	}
 
 return true ;
