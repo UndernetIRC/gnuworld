@@ -9,7 +9,7 @@
  * 30/12/2000: Moved static SQL data to constants.h --Gte
  * Set loadData up to take data from rows other than 0.
  * 
- * $Id: sqlChannel.cc,v 1.17 2001/01/18 22:39:39 gte Exp $
+ * $Id: sqlChannel.cc,v 1.18 2001/01/19 23:01:56 gte Exp $
  */
  
 #include	<strstream>
@@ -25,7 +25,7 @@ using std::string ;
 using std::endl ; 
  
 const char sqlChannel_h_rcsId[] = __SQLCHANNEL_H ;
-const char sqlChannel_cc_rcsId[] = "$Id: sqlChannel.cc,v 1.17 2001/01/18 22:39:39 gte Exp $" ;
+const char sqlChannel_cc_rcsId[] = "$Id: sqlChannel.cc,v 1.18 2001/01/19 23:01:56 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -46,6 +46,7 @@ sqlChannel::sqlChannel(PgDatabase* _SQLDb)
  channel_mode(""),
  channel_key(""),
  channel_limit(0),
+ last_topic(0),
  inChan(false),
  SQLDb( _SQLDb )
 {

@@ -138,7 +138,7 @@ cservice::cservice(const string& args)
     RegisterCommand(new BANCommand(this, "BAN", "<#channel> <nick | *!*user@*.host> [duration] [level] [reason]", 5));
     RegisterCommand(new UNBANCommand(this, "UNBAN", "<#channel> <*!*user@*.host>", 5));
     RegisterCommand(new LBANLISTCommand(this, "LBANLIST", "<#channel>", 5));
-    RegisterCommand(new NEWPASSCommand(this, "NEWPASS", "<new password>", 5));
+    RegisterCommand(new NEWPASSCommand(this, "NEWPASS", "<new passphrase>", 5));
 
     RegisterCommand(new REGISTERCommand(this, "REGISTER", "<#channel>", 0));
     RegisterCommand(new FORCECommand(this, "FORCE", "<#channel>", 0));
@@ -184,6 +184,7 @@ cservice::cservice(const string& args)
 	input_flood = atoi((cserviceConfig->Require( "input_flood" )->second).c_str()); 
 	output_flood = atoi((cserviceConfig->Require( "output_flood" )->second).c_str());
 	flood_duration = atoi((cserviceConfig->Require( "flood_duration" )->second).c_str());
+	topic_duration = atoi((cserviceConfig->Require( "topic_duration" )->second).c_str());
 
 	//-- Move this to the configuration file?  This should be fairly static..
 
@@ -238,6 +239,13 @@ int cservice::BurstChannels()
 				MyUplink->RegisterChannelEvent( newChan->getName(), this ) ;
 				newChan->setInChan(true);
 			}
+
+			/* If neccessary, set the auto topic. */
+			if (newChan->getFlag(sqlChannel::F_AUTOTOPIC))
+			{
+				doAutoTopic(newChan);
+			}
+
 
 			// Update the interal channel record to reflect the modes fetched for
 			// this channel from the database?  should be doing in 'JoinChannel'.
@@ -447,7 +455,7 @@ int cservice::OnCTCP( iClient* theClient, const string& CTCP,
 
 	if(Command == "VERSION")
 	{
-		xClient::DoCTCP(theClient, CTCP.c_str(), "Undernet P10 Channel Services Version 2 [" __DATE__ " " __TIME__ "] ($Id: cservice.cc,v 1.52 2001/01/19 02:46:24 gte Exp $)");
+		xClient::DoCTCP(theClient, CTCP.c_str(), "Undernet P10 Channel Services Version 2 [" __DATE__ " " __TIME__ "] ($Id: cservice.cc,v 1.53 2001/01/19 23:01:56 gte Exp $)");
 		return true;
 	}
  
@@ -1185,6 +1193,12 @@ int cservice::OnChannelEvent( const channelEventType& whichEvent,
 				return 0;
 			}
 
+			/* Is it time to set an autotopic? */
+			if (reggedChan->getLastTopic() + topic_duration <= ::time(NULL))
+			{
+				doAutoTopic(reggedChan);
+			}
+
 			/* Check noop isn't set */ 
 			if (reggedChan->getFlag(sqlChannel::F_NOOP)) break;
 
@@ -1229,6 +1243,22 @@ int cservice::OnChannelEvent( const channelEventType& whichEvent,
 return xClient::OnChannelEvent( whichEvent, theChan, data1, data2, data3, data4 );
 }
 
+/*--doAutoTopic---------------------------------------------------------------
+ *
+ * This support function sets the autotopic in a particular channel. 
+ *--------------------------------------------------------------------------*/ 
+void cservice::doAutoTopic(sqlChannel* theChan)
+{
+	strstream s;
+	string extra = (theChan->getURL().size() != 0) ? (" (" + theChan->getURL() + ")") : "";
+
+	s << getCharYYXXX() << " T " << theChan->getName() << " :" 
+		<< theChan->getDescription() << extra << ends; 
+	Write( s ); 
+	delete[] s.str(); 
+
+	theChan->setLastTopic(::time(NULL));
+}	
 
 /*--escapeSQLChars------------------------------------------------------------
  *

@@ -8,7 +8,7 @@
  *
  * Caveats: SET LANG is still under consideration.
  *
- * $Id: SETCommand.cc,v 1.7 2001/01/19 00:01:11 gte Exp $
+ * $Id: SETCommand.cc,v 1.8 2001/01/19 23:01:56 gte Exp $
  */
 
 #include	<string>
@@ -20,7 +20,7 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char SETCommand_cc_rcsId[] = "$Id: SETCommand.cc,v 1.7 2001/01/19 00:01:11 gte Exp $" ;
+const char SETCommand_cc_rcsId[] = "$Id: SETCommand.cc,v 1.8 2001/01/19 23:01:56 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -357,7 +357,11 @@ bool SETCommand::Exec( iClient* theClient, const string& Message )
 		bot->Notice(theClient, "AUTOTOPIC: You do not have enough access!");
 		return true;
 	    }
-	    if(value == "ON") theChan->setFlag(sqlChannel::F_AUTOTOPIC);
+	    if(value == "ON") 
+	    { 
+	    	theChan->setFlag(sqlChannel::F_AUTOTOPIC); 
+			bot->doAutoTopic(theChan);
+		}
 	    else if(value == "OFF") theChan->removeFlag(sqlChannel::F_AUTOTOPIC);
 	    else
 	    {
@@ -500,6 +504,11 @@ bool SETCommand::Exec( iClient* theClient, const string& Message )
 	    bot->Notice(theClient, "DESCRIPTION for %s is: %s",
 			theChan->getName().c_str(),
 			desc.c_str());
+		if (theChan->getFlag(sqlChannel::F_AUTOTOPIC))
+		{
+			bot->doAutoTopic(theChan);
+		}
+
 	    return true;
 	}
 
@@ -521,6 +530,11 @@ bool SETCommand::Exec( iClient* theClient, const string& Message )
 	    bot->Notice(theClient, "URL for %s is: %s",
 			theChan->getName().c_str(),
 			url.c_str());
+		if (theChan->getFlag(sqlChannel::F_AUTOTOPIC))
+		{
+			bot->doAutoTopic(theChan);
+		}
+
 	    return true;
 	}
 

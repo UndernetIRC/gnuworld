@@ -10,7 +10,7 @@
 #include	"responses.h" 
 #include	"networkData.h"
 
-const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.7 2001/01/11 01:51:56 gte Exp $" ;
+const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.8 2001/01/19 23:01:56 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -53,7 +53,7 @@ bool LOGINCommand::Exec( iClient* theClient, const string& Message )
 		strstream output;
 		string salt = theUser->getPassword().substr(0, 8);
 		string md5Part = theUser->getPassword().substr(8);
-		string guess = salt + st[2];
+		string guess = salt + st.assemble(2);
 
 		// Build a MD5 hash based on our salt + the guessed password.
 		hash.update( (unsigned char *)guess.c_str(), strlen( guess.c_str() ));

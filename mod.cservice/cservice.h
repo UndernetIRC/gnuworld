@@ -1,5 +1,5 @@
 #ifndef __CSERVICE_H
-#define __CSERVICE_H "$Id: cservice.h,v 1.27 2001/01/19 00:01:11 gte Exp $"
+#define __CSERVICE_H "$Id: cservice.h,v 1.28 2001/01/19 23:01:56 gte Exp $"
 
 #include	<string>
 #include	<vector>
@@ -198,6 +198,7 @@ public:
 	int input_flood;
 	int output_flood;
 	int flood_duration;
+	int topic_duration;
 
 	// Timestamp's of when we last checked the database for updates.
 	time_t lastChannelRefresh;
@@ -217,7 +218,10 @@ public:
 	virtual bool validUserMask(iClient* theClient, const string& userMask); 
 
 	// Deop everyone on this channel.
-	void cservice::deopAllOnChan(Channel*); 
+	void deopAllOnChan(Channel*); 
+
+	/* sets a description (url) topic combo. */
+	void doAutoTopic(sqlChannel* theChan);
 } ;
 
 const string escapeSQLChars(const string& theString);

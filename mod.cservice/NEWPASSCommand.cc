@@ -10,7 +10,7 @@
 #include	"responses.h" 
 #include	"networkData.h"
 
-const char NEWPASSCommand_cc_rcsId[] = "$Id: NEWPASSCommand.cc,v 1.2 2001/01/19 02:46:24 gte Exp $" ;
+const char NEWPASSCommand_cc_rcsId[] = "$Id: NEWPASSCommand.cc,v 1.3 2001/01/19 23:01:56 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -28,7 +28,7 @@ bool NEWPASSCommand::Exec( iClient* theClient, const string& Message )
 		Usage(theClient);
 		return true;
 	}
-
+ 
 	/*
 	 *  Fetch the sqlUser record attached to this client. If there isn't one,
 	 *  they aren't logged in - tell them they should be.
@@ -38,7 +38,15 @@ bool NEWPASSCommand::Exec( iClient* theClient, const string& Message )
 	if (!tmpUser) {
 		return false;
 	}
- 
+
+ 	/* Try and stop people using an invalid syntax.. */
+	if ( (string_lower(st[1]) == string_lower(tmpUser->getUserName())) 
+		  || (string_lower(st[1]) == string_lower(theClient->getNickName())) )
+	{
+		bot->Notice(theClient, "Your password cannot be your username or current nick - syntax is: NEWPASS <new passphrase>");
+		return false;
+	}
+
 	/* Work out some salt. */
 	string salt;
 	int i;
@@ -57,7 +65,7 @@ bool NEWPASSCommand::Exec( iClient* theClient, const string& Message )
  
 	strstream output;
 	string newPass;
-	newPass = salt + st[1];
+	newPass = salt + st.assemble(1);
 
 	hash.update( (unsigned char *)newPass.c_str(), strlen( newPass.c_str() ));
 	hash.report( digest );
