@@ -10,7 +10,7 @@
 # even the implied warranty of MERCHANTABILITY or FITNESS FOR A
 # PARTICULAR PURPOSE.
 
-# "$Id: Makefile.in,v 1.34 2001/02/23 16:16:58 dan_karrels Exp $"
+# "$Id: Makefile.in,v 1.35 2001/05/11 21:43:39 dan_karrels Exp $"
 
 
 SHELL = @SHELL@
@@ -81,7 +81,7 @@ LN_S = @LN_S@
 MAKEINFO = @MAKEINFO@
 MOD_DIRS = @MOD_DIRS@
 MV = @MV@
-OBJDUMP = @OBJDUMP@
+NM = @NM@
 PACKAGE = @PACKAGE@
 PGSQL_INCLUDE = @PGSQL_INCLUDE@
 PGSQL_LIB = @PGSQL_LIB@
@@ -89,6 +89,7 @@ RANLIB = @RANLIB@
 RM = @RM@
 SRC_PATH = @SRC_PATH@
 UNAME = @UNAME@
+USE_SYMBOL_UNDERSCORE = @USE_SYMBOL_UNDERSCORE@
 VERSION = @VERSION@
 bindir = @bindir@
 glibdir = @glibdir@
@@ -116,7 +117,7 @@ DIST_COMMON =  Makefile.am Makefile.in
 
 DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
-TAR = tar
+TAR = gtar
 GZIP_ENV = --best
 DEP_FILES =  .deps/gnutest.P
 SOURCES = $(libgnutest_la_SOURCES)
@@ -239,7 +240,7 @@ distdir: $(DISTFILES)
 	@for file in $(DISTFILES); do \
 	  d=$(srcdir); \
 	  if test -d $$d/$$file; then \
-	    cp -pr $$/$$file $(distdir)/$$file; \
+	    cp -pr $$d/$$file $(distdir)/$$file; \
 	  else \
 	    test -f $(distdir)/$$file \
 	    || ln $$d/$$file $(distdir)/$$file 2> /dev/null \

@@ -114,6 +114,11 @@ module = libcservice.so cservice.conf
 The "module" keyword tells gnuworld to attempt to load the given
 module.
 
+NOTE: Individual modules may require additional configuration.  Such is
+the case with modules libcservice (channel service) and ccontrol (oper
+services).  Please read the README files in each of them module
+subdirectories for more information.
+
 The "libcservice.so" is the actual name of the module, which you
 will be able to see in the current directory.  Note that some systems may
 name modules a bit differently.  For example, OpenBSD uses names like

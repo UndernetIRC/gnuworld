@@ -1,2 +1,2 @@
 @SET_MAKE@
-SUBDIRS = lib src @MOD_DIRS@
+SUBDIRS = lib db src @MOD_DIRS@
