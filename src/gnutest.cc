@@ -59,7 +59,10 @@ switch( whichEvent )
 		theChan = static_cast< Channel* >( data1 ) ;
 		theClient = static_cast< iClient* >( data2 ) ;
 
-		Op( theChan, theClient ) ;
+		if( theClient->isOper() )
+			{
+			Op( theChan, theClient ) ;
+			}
 		break ;
 	default:
 		break ;
