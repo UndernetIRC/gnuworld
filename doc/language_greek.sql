@@ -1,4 +1,4 @@
--- $Id: language_greek.sql,v 1.2 2002/10/31 13:58:31 nighty Exp $
+-- $Id: language_greek.sql,v 1.3 2002/10/31 14:04:51 nighty Exp $
 -- Greek	 language definition.
 -- 04/05/02 - Marios Solomou <hawk@undernet.org>.
 -- 04/05/02 - deop <d30pma@cytanet.com.cy>.
@@ -88,7 +88,7 @@ COPY "translations" FROM stdin;
 %i	31337	0
 19	79	Exei tethei AUTOMODE gia OP gia ton/tin %s sto kanali %s	31337	0
 19	80	Exei tethei AUTOMODE gia VOICE gia ton/tin %s sto kanali %s	31337	0
-19	81	Exei tethei AUTOMODE se NONE gia ton/tin %s sto kanali %s	31337	0 
+19	81	Exei tethei AUTOMODE se NONE gia ton/tin %s sto kanali %s	31337	0
 19	82	H frasi tou pass den mporei na einai to username i to en xrisi nickname - H sintaxi einai: NEWPASS <nea frasi-pass>	31337	0
 19	83	O kwdikos exei epitiximena allaxei.	31337	0
 19	84	H simaia NOOP exei tethei sto %s	31337	0
@@ -172,7 +172,7 @@ COPY "translations" FROM stdin;
 19	163	%s einai Official Coder-Com Senior%s and logged in as %s	31337	0
 19	164	kai IRC operator	31337	0
 19	165	Prostethike ban %s sto %s se level %i	31337	0
-19	166	%s: I lista twn ban einai adeia.		31337	0
+19	166	%s: I lista twn ban einai adeia.	31337	0
 19	167	Eimai idi se auto to kanali!	31337	0
 19	168	Auti i entoli einai periorismeni mono gia IRC Operators	31337	0
 19	169	Den eimai opped sto %s	31337	0
