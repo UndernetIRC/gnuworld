@@ -1,5 +1,5 @@
 /* main.cc
- * $Id: main.cc,v 1.35 2002/04/28 15:04:12 dan_karrels Exp $
+ * $Id: main.cc,v 1.36 2002/04/28 16:32:02 dan_karrels Exp $
  */
 
 #include	<new>
@@ -25,7 +25,7 @@
 void		gnu() ;
 
 const char config_h_rcsId[] = __CONFIG_H ;
-const char main_cc_rcsId[] = "$Id: main.cc,v 1.35 2002/04/28 15:04:12 dan_karrels Exp $" ;
+const char main_cc_rcsId[] = "$Id: main.cc,v 1.36 2002/04/28 16:32:02 dan_karrels Exp $" ;
 const char ELog_h_rcsId[] = __ELOG_H ;
 const char FileSocket_h_rcsId[] = __FILESOCKET_H ;
 const char server_h_rcsId[] = __SERVER_H ;
@@ -139,9 +139,10 @@ string simFileName ;
 verbose = false ;
 
 int c = EOF ;
-while( true )
+while( (c = getopt( argc, argv, "cd:f:hs:")) != EOF )
+//while( true )
 	{
-//	int this_option_optind = optind ? optind : 1 ;
+/*
 	int option_index = 0 ;
 	struct option cmdLineArgs[] = {
 		{ "verbose", no_argument, NULL, 0 },
@@ -151,14 +152,13 @@ while( true )
 		{ "socket", required_argument, NULL, 4 },
 		{ 0, 0, 0, 0 }
 	} ;
-
 	c = getopt_long_only( argc, argv, "cd:f:hs:",
 		cmdLineArgs, &option_index ) ;
 	if( -1 == c )
 		{
 		break ;
 		}
-
+*/
 	switch( c )
 		{
 		case 0:
