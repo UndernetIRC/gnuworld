@@ -12,7 +12,7 @@
  *
  * Caveats: None.
  *
- * $Id: BANCommand.cc,v 1.8 2001/01/30 21:34:16 gte Exp $
+ * $Id: BANCommand.cc,v 1.9 2001/02/02 20:20:44 gte Exp $
  */
 
 #include	<string>
@@ -27,7 +27,7 @@
 #include	"responses.h"
 #include	"match.h"
 
-const char BANCommand_cc_rcsId[] = "$Id: BANCommand.cc,v 1.8 2001/01/30 21:34:16 gte Exp $" ;
+const char BANCommand_cc_rcsId[] = "$Id: BANCommand.cc,v 1.9 2001/02/02 20:20:44 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -188,7 +188,7 @@ while (ptr != banList->end())
 	{
 	sqlBan* theBan = *ptr;
 		
-	if(string_lower(st[2]) == string_lower(theBan->getBanMask()))
+	if(string_lower(banTarget) == string_lower(theBan->getBanMask()))
 		{
 		bot->Notice(theClient, "Specified ban is already in my banlist!");
 		return true; 
