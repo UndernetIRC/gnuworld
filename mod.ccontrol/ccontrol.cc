@@ -23,7 +23,7 @@
 #include	"AuthInfo.h"
 #include        "server.h"
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.41 2001/05/21 16:27:32 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.42 2001/05/22 05:43:29 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -495,19 +495,27 @@ switch( theEvent )
 		int CurConnections = Network->countHost(NewUser->getInsecureHost());		
 		if(CurConnections  > getExceptions(NewUser->getInsecureHost()))
 			{
-			ccGline *tmpGline = new ccGline(SQLDb);
-			tmpGline->set_Host("*@" + NewUser->getInsecureHost());
-			tmpGline->set_Expires(::time(0) + maxGlineLen);
-			tmpGline->set_Reason("Automatically banned for exccessive connections");
-			tmpGline->set_AddedOn(::time(0));
-			tmpGline->Insert();
-			wallopsAsServer("Adding gline on %s for %s",tmpGline->get_Host().c_str(),tmpGline->get_Reason().c_str());
-			tmpGline->loadData(tmpGline->get_Host());
-			addGline(tmpGline);
+			ccGline *tmpGline;
+			tmpGline = findGline("*@" + NewUser->getInsecureHost()); 
+			if(!tmpGline)
+				{
+				tmpGline = new ccGline(SQLDb);
+				tmpGline->set_Host("*@" + NewUser->getInsecureHost());
+				tmpGline->set_Expires(::time(0) + maxGlineLen);
+				tmpGline->set_Reason("Automatically banned for exccessive connections");
+				tmpGline->set_AddedOn(::time(0));
+				tmpGline->Insert();
+				wallopsAsServer("Adding gline on %s for %s",tmpGline->get_Host().c_str(),tmpGline->get_Reason().c_str());
+				tmpGline->loadData(tmpGline->get_Host());
+				addGline(tmpGline);
+				}
+			else
+				wallopsAsServer("Refreshing gline time on %s for %s",tmpGline->get_Host().c_str(),tmpGline->get_Reason().c_str());
 			MyUplink->setGline( nickName,
 					tmpGline->get_Host(),
 					tmpGline->get_Reason(),
 					tmpGline->get_Expires() - ::time(0) ) ;
+			
 			}
 		else if(!inBurst)
 			{	
