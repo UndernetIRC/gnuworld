@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: client.h,v 1.51 2003/12/29 23:59:36 dan_karrels Exp $
+ * $Id: client.h,v 1.52 2004/01/07 18:33:42 dan_karrels Exp $
  */
 
 #ifndef __CLIENT_H
-#define __CLIENT_H "$Id: client.h,v 1.51 2003/12/29 23:59:36 dan_karrels Exp $"
+#define __CLIENT_H "$Id: client.h,v 1.52 2004/01/07 18:33:42 dan_karrels Exp $"
 
 #include	<sstream>
 #include	<string>
@@ -157,6 +157,18 @@ public:
 	 * Invoked when the uplink has been terminated.
 	 */
 	virtual void	OnDisconnect() ;
+
+	/**
+	 * This method is invoked when the server has been requested
+	 * to shutdown.  If currently connected to the network, this
+	 * method gives xClient's a chance to gracefully QUIT from
+	 * the network, or whatever other processing is useful.
+	 * To force data to be written before final shutdown (again,
+	 * if connected), set xServer::FlushData().
+	 * Timers will be executed after this method is invoked, once,
+	 * depending upon target time of course :)
+	 */
+	virtual void	OnShutdown() ;
 
 	/**
 	 * Invoked after the client has been loaded, perform

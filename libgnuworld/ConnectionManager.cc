@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ConnectionManager.cc,v 1.12 2003/12/06 22:11:36 dan_karrels Exp $
+ * $Id: ConnectionManager.cc,v 1.13 2004/01/07 18:33:42 dan_karrels Exp $
  */
 
 #include	<unistd.h>
@@ -52,7 +52,7 @@
 #include	"Buffer.h"
 #include	"ELog.h"
 
-const char rcsId[] = "$Id: ConnectionManager.cc,v 1.12 2003/12/06 22:11:36 dan_karrels Exp $" ;
+const char rcsId[] = "$Id: ConnectionManager.cc,v 1.13 2004/01/07 18:33:42 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -1118,6 +1118,11 @@ if( cPtr->isFile() )
 	return true ;
 	}
 
+if( cPtr->isFlush() )
+	{
+	return handleFlush( hPtr, cPtr ) ;
+	}
+
 errno = 0 ;
 int writeResult = ::send( cPtr->getSockFD(),
 	cPtr->outputBuffer.data(),
@@ -1158,6 +1163,110 @@ if( writeResult < 0 )
 // Successful write, update the Connection's output buffer
 cPtr->outputBuffer.Delete( writeResult ) ;
 cPtr->bytesWritten += writeResult ;
+
+// Write was successful, return succes
+return true ;
+}
+
+// Caller handles erasing/closing upon a failed call to handleWrite().
+bool ConnectionManager::handleFlush( ConnectionHandler* hPtr,
+	Connection* cPtr )
+{
+// protected member, no error checking
+
+// Make sure the Connection's F_FLUSH flag is cleared, so do it first
+cPtr->removeFlag( Connection::F_FLUSH ) ;
+
+// Set to blocking so that the send() will block
+
+// Retrieve the current flags
+int flags = ::fcntl( cPtr->getSockFD(), F_GETFL, 0 ) ;
+if( flags < 0 )
+	{
+	elog	<< "ConnectionManager::handleFlush> Unable to set "
+		<< "blocking for connection: "
+		<< strerror( errno )
+		<< endl ;
+
+	// Terminal error
+	hPtr->OnDisconnect( cPtr ) ;
+	return false ;
+	}
+
+// Remove nonblocking flag
+flags &= ~O_NONBLOCK ;
+
+// Attempt to set new flag (blocking)
+if( ::fcntl( cPtr->getSockFD(), F_SETFL, flags ) < 0 )
+	{
+	elog	<< "ConnectionManger::handleFlush> Failed to set "
+		<< "to blocking: "
+		<< strerror( errno )
+		<< endl ;
+
+	// Terminal error
+	hPtr->OnDisconnect( cPtr ) ;
+	return false ;
+	}
+
+while( !cPtr->outputBuffer.empty() )
+	{
+	errno = 0 ;
+	int writeResult = ::send( cPtr->getSockFD(),
+		cPtr->outputBuffer.data(),
+		cPtr->outputBuffer.size(),
+		0 ) ;
+
+	if( (ENOBUFS == errno) || (EWOULDBLOCK == errno) || (EAGAIN == errno) )
+		{
+		// Nonblocking type error
+		// Ignore it for now
+		elog	<< "ConnectionManager::handleFlush> errno: "
+			<< strerror( errno )
+			<< endl ;
+		return true ;
+		}
+
+	//elog	<< "ConnectionManager::handleFlush> Wrote "
+	//	<< writeResult
+	//	<< " bytes, remaining in buffer: "
+	//	<< (cPtr->outputBuffer.size() - writeResult)
+	//	<< endl ;
+
+	// Check for write error
+	if( writeResult < 0 )
+		{
+		// Error on write, socket no longer valid
+		// Notify the handler.
+		hPtr->OnDisconnect( cPtr ) ;
+
+		// Write error
+		return false ;
+		}
+
+	//elog	<< "ConnectionManager::handleFlush> Wrote: "
+	//	<< cPtr->outputBuffer.substr( 0, writeResult )
+	//	<< endl ;
+
+	// Successful write, update the Connection's output buffer
+	cPtr->outputBuffer.Delete( writeResult ) ;
+	cPtr->bytesWritten += writeResult ;
+	} // while( !empty() )
+
+// Reset to nonblocking
+flags |= O_NONBLOCK ;
+
+if( ::fcntl( cPtr->getSockFD(), F_SETFL, flags ) < 0 )
+	{
+	elog	<< "ConnectionManager::handleFlush> Failed to set to "
+		<< "nonblocking: "
+		<< strerror( errno )
+		<< endl ;
+
+	// Terminal error
+	hPtr->OnDisconnect( cPtr ) ;
+	return false ;
+	}
 
 // Write was successful, return succes
 return true ;

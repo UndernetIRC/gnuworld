@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: client.cc,v 1.67 2003/12/30 18:48:33 dan_karrels Exp $
+ * $Id: client.cc,v 1.68 2004/01/07 18:33:43 dan_karrels Exp $
  */
 
 #include	<new>
@@ -49,7 +49,7 @@
 #include	"ELog.h"
 #include	"events.h"
 
-RCSTAG("$Id: client.cc,v 1.67 2003/12/30 18:48:33 dan_karrels Exp $" ) ;
+RCSTAG("$Id: client.cc,v 1.68 2004/01/07 18:33:43 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -649,6 +649,9 @@ void xClient::OnConnect()
 {}
 
 void xClient::OnDisconnect()
+{}
+
+void xClient::OnShutdown()
 {}
 
 void xClient::OnKill()

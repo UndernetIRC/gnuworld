@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server.cc,v 1.192 2004/01/07 03:08:29 dan_karrels Exp $
+ * $Id: server.cc,v 1.193 2004/01/07 18:33:43 dan_karrels Exp $
  */
 
 #include	<sys/time.h>
@@ -71,7 +71,7 @@
 #include	"ConnectionHandler.h"
 #include	"Connection.h"
 
-RCSTAG( "$Id: server.cc,v 1.192 2004/01/07 03:08:29 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: server.cc,v 1.193 2004/01/07 18:33:43 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -189,9 +189,11 @@ keepRunning = true ;
 bursting = false ;
 sendEA = true ;
 sendEB = true ;
+lastLoop = false ;
 useHoldBuffer = false ;
 autoConnect = false ;
 StartTime = ::time( NULL ) ;
+shutDownReason = string( "Server Shutdown" ) ;
 
 serverConnection = 0 ;
 burstStart = burstEnd = 0 ;
@@ -527,13 +529,23 @@ RegisterTimer( ::time( 0 ) + pingUpdateInterval,
  */
 void xServer::Shutdown( const string& reason )
 {
-keepRunning = false ;
+lastLoop = true ;
+//keepRunning = false ;
 autoConnect = false ;
 
-Write( "%s SQ %s :%s",
-	getCharYY().c_str(),
-	getCharYY().c_str(),
-	reason.c_str() ) ;
+// Notify all xClients that a shutdown is being processed
+for( xNetwork::localClientIterator itr = Network->localClient_begin() ;
+	itr != Network->localClient_end() ; ++itr )
+	{
+	itr->second->OnShutdown() ;
+	}
+
+setShutDownReason( reason ) ;
+
+//Write( "%s SQ %s :%s",
+//	getCharYY().c_str(),
+//	getCharYY().c_str(),
+//	reason.c_str() ) ;
 
 // Can't call removeClients() here because it is likely one of the
 // clients that has invoked this call, that would be bad.
@@ -628,7 +640,9 @@ if( theConn != serverConnection )
 	return ;
 	}
 
-if( !keepRunning )
+// Don't process any incoming data on the last iteration of
+// the main control loop.
+if( !keepRunning || lastLoop )
 	{
 	// Part of the shutdown process includes flushing any
 	// data in the output buffer, and closing connections.
@@ -4213,6 +4227,15 @@ s	<< getCharYY()
 	<< " :"
 	<< message ;
 return Write( s.str() ) ;
+}
+
+void xServer::FlushData()
+{
+if( !isConnected() )
+	{
+	return ;
+	}
+serverConnection->Flush() ;
 }
 
 } // namespace gnuworld

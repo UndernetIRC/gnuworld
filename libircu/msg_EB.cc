@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_EB.cc,v 1.6 2004/01/07 03:08:29 dan_karrels Exp $
+ * $Id: msg_EB.cc,v 1.7 2004/01/07 18:33:43 dan_karrels Exp $
  */
 
 #include	<sys/types.h>
@@ -34,7 +34,7 @@
 #include	"ServerCommandHandler.h"
 #include	"config.h"
 
-RCSTAG( "$Id: msg_EB.cc,v 1.6 2004/01/07 03:08:29 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: msg_EB.cc,v 1.7 2004/01/07 18:33:43 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -84,9 +84,6 @@ if( !strcmp( params[ 0 ], theServer->getUplinkCharYY().c_str() ) )
 		// We are no longer bursting
 		theServer->setBursting( false ) ;
 		}
-
-	// For some silly reason, EB must come before EA
-	// *shrug*
 
 	// Called PostEvent() here to notify all attached clients
 	// that we are no longer bursting.  This will ensure

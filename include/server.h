@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server.h,v 1.99 2004/01/05 00:13:18 dan_karrels Exp $
+ * $Id: server.h,v 1.100 2004/01/07 18:33:42 dan_karrels Exp $
  */
 
 #ifndef __SERVER_H
-#define __SERVER_H "$Id: server.h,v 1.99 2004/01/05 00:13:18 dan_karrels Exp $"
+#define __SERVER_H "$Id: server.h,v 1.100 2004/01/07 18:33:42 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
@@ -185,6 +185,16 @@ public:
 	 * Inherited from ConnectionHandler.
 	 */
 	virtual void OnRead( Connection*, const std::string& ) ;
+
+	/**
+	 * Request that all data in the output buffer be flushed to
+	 * the network connection.  This will possibly block the
+	 * the server in the network send, so be careful about using
+	 * it.
+	 * The flush request is valid only for the next call to
+	 * the main process loop, it is reset after that.
+	 */
+	virtual void FlushData() ;
 
 	/**
 	 * Attach a fake server to this services server.
@@ -653,6 +663,13 @@ public:
 		{ return bursting ; }
 
 	/**
+	 * Return true if there is one more iteration of the main
+	 * processing loop to be performed before shutting down.
+	 */
+	inline bool isLastLoop() const
+		{ return lastLoop ; }
+
+	/**
 	 * Return true if an EA will be sent after the EB.
 	 * Some modules may want the "endless" burst effect.
 	 * Default value is true.
@@ -822,6 +839,19 @@ public:
 	 */
 	virtual void Shutdown( const std::string& reason =
 			string( "Server Shutdown" ) ) ;
+
+	/**
+	 * Set the reason for the server shutdown, to be displayed in
+	 * the SQ message.
+	 */
+	inline void	setShutDownReason( const std::string& newReason )
+		{ shutDownReason = newReason ; }
+
+	/**
+	 * Return the reason for the server shutdown.
+	 */
+	inline const std::string&	getShutDownReason() const
+		{ return shutDownReason ; }
 
 	/**
 	 * Output server statistics to the console (clog).
@@ -1213,6 +1243,14 @@ protected:
 	bool			sendEB ;
 
 	/**
+	 * This variable is used during a requested shutdown to
+	 * allow one last iteration of the main processing loop.
+	 * This will give xClient's a chance to request flushing
+	 * of output data, and timers to expire.
+	 */
+	bool			lastLoop ;
+
+	/**
 	 * This variable will be true when the default behavior
 	 * of Write() is to write to the burstHoldBuffer.
 	 */
@@ -1371,6 +1409,12 @@ protected:
 	 * simulation data, empty if in real mode.
 	 */
 	std::string	simFileName ;
+
+	/**
+	 * The reason used to shutdown the server, displayed in
+	 * the SQ message.
+	 */
+	std::string	shutDownReason ;
 
 	/**
 	 * The char array to be used to read in network data.

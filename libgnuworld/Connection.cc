@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: Connection.cc,v 1.4 2003/08/05 01:34:24 dan_karrels Exp $
+ * $Id: Connection.cc,v 1.5 2004/01/07 18:33:42 dan_karrels Exp $
  */
 
 #include	<sys/types.h>
@@ -34,7 +34,7 @@
 #include	"Connection.h"
 #include	"Buffer.h"
 
-const char rcsId[] = "$Id: Connection.cc,v 1.4 2003/08/05 01:34:24 dan_karrels Exp $" ;
+const char rcsId[] = "$Id: Connection.cc,v 1.5 2004/01/07 18:33:42 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -45,6 +45,7 @@ const Connection::flagType	Connection::F_CONNECTED = 0x02 ;
 const Connection::flagType	Connection::F_INCOMING = 0x04 ;
 const Connection::flagType	Connection::F_LISTEN = 0x08 ;
 const Connection::flagType	Connection::F_FILE = 0x10 ;
+const Connection::flagType	Connection::F_FLUSH = 0x20 ;
 
 using std::string ;
 

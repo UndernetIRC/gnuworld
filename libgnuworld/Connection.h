@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: Connection.h,v 1.6 2003/12/29 23:59:36 dan_karrels Exp $
+ * $Id: Connection.h,v 1.7 2004/01/07 18:33:42 dan_karrels Exp $
  */
 
 #ifndef __CONNECTION_H
-#define __CONNECTION_H "$Id: Connection.h,v 1.6 2003/12/29 23:59:36 dan_karrels Exp $"
+#define __CONNECTION_H "$Id: Connection.h,v 1.7 2004/01/07 18:33:42 dan_karrels Exp $"
 
 #include	<sys/types.h>
 #include	<netinet/in.h>
@@ -134,6 +134,13 @@ public:
 	static const flagType		F_FILE ;
 
 	/**
+	 * This flag will be set if the next write is to flush all
+	 * data from the output buffer.
+	 * The flag will be reset after the send().
+	 */
+	static const flagType		F_FLUSH ;
+
+	/**
 	 * Append a string to the Connection's output buffer.
 	 */
 	virtual void		Write( const std::string& ) ;
@@ -193,6 +200,14 @@ public:
 		{ return (flags & F_FILE) ; }
 
 	/**
+	 * Return true if the flush flag is set, indicating that the
+	 * next send() should write all available data, blocking
+	 * if necessary.
+	 */
+	inline bool	isFlush() const
+		{ return (flags & F_FLUSH) ; }
+
+	/**
 	 * Return the total number of bytes read from this
 	 * Connection.
 	 */
@@ -227,6 +242,12 @@ public:
 	 */
 	inline size_t	getInputBufferSize() const
 		{ return inputBuffer.size() ; }
+
+	/**
+	 * Set the F_FLUSH flag to true.
+	 */
+	inline void	Flush()
+		{ setFlag( F_FLUSH ) ; }
 
 	/**
 	 * This friend operator allows for the easy output of a

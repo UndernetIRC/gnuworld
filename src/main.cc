@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: main.cc,v 1.59 2003/12/29 23:59:38 dan_karrels Exp $
+ * $Id: main.cc,v 1.60 2004/01/07 18:33:43 dan_karrels Exp $
  */
 
 #include	<sys/time.h>
@@ -45,7 +45,7 @@
 #include	"md5hash.h"
 #include	"Signal.h"
 
-RCSTAG( "$Id: main.cc,v 1.59 2003/12/29 23:59:38 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: main.cc,v 1.60 2004/01/07 18:33:43 dan_karrels Exp $" ) ;
 
 // main() must be in the global namespace
 using namespace gnuworld ;
@@ -317,7 +317,10 @@ bool checkSignals = true ;
 // When this method is first invoked, the server is not connected
 while( keepRunning )
 	{
-	if( NULL == serverConnection )
+	// Check if a reconnection is necessary
+	// Do not reconnect if the server is in the process of
+	// shutting down.
+	if( !isConnected() && !isLastLoop() )
 		{
 		// Connect to the server/file
 		clog	<< "*** Connecting " ;
@@ -352,7 +355,32 @@ while( keepRunning )
 			}
 		} // if( NULL == serverConnection )
 
-	// Check for pending timers before calling Poll(), just for
+	// Check if this is the last iteration of the main processing
+	// loop.  If so, set keepRunning to false.
+	// The server Shutdown() (setting lastLoop to true) can occur
+	// in the timers or during the processing of network
+	// connections (Poll()), or possibly in a signal handler.
+	// That means that is lastLoop is already true at this point,
+	// then it was set thus on the last iteration, and this is indeed
+	// the final iteration of the processing loop.
+	if( isLastLoop() )
+		{
+		keepRunning = false ;
+
+		// All output for the xClients should be in the
+		// output buffer by now, go ahead and put the
+		// server's SQ message there as well
+		Write( "%s SQ %s :%s",
+			getCharYY().c_str(),
+			getCharYY().c_str(),
+			getShutDownReason().c_str() ) ;
+
+		// Make sure the SQ and all previous data are flushed
+		// to the network before disconnecting.
+		FlushData() ;
+		}
+
+	// Check for pending timers before calling Poll()
 	// If timers are pending, then set the duration until the next
 	// arriving timer expiration to be the maximum wait time
 	// for Poll()

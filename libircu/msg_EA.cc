@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_EA.cc,v 1.2 2003/06/17 15:13:53 dan_karrels Exp $
+ * $Id: msg_EA.cc,v 1.3 2004/01/07 18:33:43 dan_karrels Exp $
  */
 
 #include	<string>
@@ -33,7 +33,7 @@
 #include	"ServerCommandHandler.h"
 #include	"config.h"
 
-RCSTAG( "$Id: msg_EA.cc,v 1.2 2003/06/17 15:13:53 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: msg_EA.cc,v 1.3 2004/01/07 18:33:43 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -56,8 +56,8 @@ if( !strcmp( Param[ 0 ], theServer->getUplinkCharYY().c_str() ) )
 	theServer->setBursting( false ) ; // ACKNOWLEDGE! :)
 	}
 
-if( !theServer->isBursting() )
-	{
+//if( !theServer->isBursting() )
+//	{
 	iServer* burstServer = Network->findServer( Param[ 0 ] ) ;
 	if( NULL == burstServer )
 		{
@@ -69,7 +69,7 @@ if( !theServer->isBursting() )
 
 	theServer->PostEvent( EVT_BURST_ACK,
 		static_cast< void* >( burstServer ) );
-	}
+//	}
 
 return true ;
 }

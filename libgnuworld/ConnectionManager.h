@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ConnectionManager.h,v 1.6 2003/12/29 23:59:36 dan_karrels Exp $
+ * $Id: ConnectionManager.h,v 1.7 2004/01/07 18:33:42 dan_karrels Exp $
  */
 
 #ifndef __CONNECTIONMANAGER_H
-#define __CONNECTIONMANAGER_H "$Id: ConnectionManager.h,v 1.6 2003/12/29 23:59:36 dan_karrels Exp $"
+#define __CONNECTIONMANAGER_H "$Id: ConnectionManager.h,v 1.7 2004/01/07 18:33:42 dan_karrels Exp $"
 
 #include	<sys/types.h>
 
@@ -369,6 +369,15 @@ protected:
 	 * the connection is no longer valid.
 	 */
 	virtual bool	handleWrite( ConnectionHandler*, Connection* ) ;
+
+	/**
+	 * Attempt to flush all data from the given Connection.
+	 * Reset the F_FLUSH flag.
+	 * Post event OnDisconnect() if necessary.
+	 * Return true if the write(s) was successful, false if
+	 * the connection is no longer valid.
+	 */
+	virtual bool	handleFlush( ConnectionHandler*, Connection* ) ;
 
 	/**
 	 * Attempt to complete the connection to the given Connection.
