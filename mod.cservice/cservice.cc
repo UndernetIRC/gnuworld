@@ -175,6 +175,7 @@ RegisterCommand(new MOTDCommand(this, "MOTD", "", 4));
 RegisterCommand(new HELPCommand(this, "HELP", "[command]", 4));
 RegisterCommand(new RANDOMCommand(this, "RANDOM", "", 4));
 RegisterCommand(new SHOWIGNORECommand(this, "SHOWIGNORE", "", 3));
+RegisterCommand(new SUPPORTCommand(this, "SUPPORT", "#channel <YES|NO>", 15));
 
 RegisterCommand(new OPCommand(this, "OP", "<#channel> [nick] [nick] ..", 3));
 RegisterCommand(new DEOPCommand(this, "DEOP", "<#channel> [nick] [nick] ..", 3));
@@ -777,7 +778,7 @@ else if(Command == "VERSION")
 	xClient::DoCTCP(theClient, CTCP,
 		"Undernet P10 Channel Services Version 2 ["
 		__DATE__ " " __TIME__
-		"] Release 1.0pl8-devel");
+		"] Release 1.0pl8-support");
 	}
 else if(Command == "PROBLEM?")
 	{
@@ -2835,9 +2836,9 @@ switch( whichEvent )
 
 						ptr->second->unique_join_count = ptr->second->trafficList.size();
 
-						logDebugMessage("New total for IP#%u on %s is %i",
-							theClient->getIP(), theChan->getName().c_str(),
-							trafRecord->join_count);
+						//logDebugMessage("New total for IP#%u on %s is %i",
+						//	theClient->getIP(), theChan->getName().c_str(),
+						//	trafRecord->join_count);
 					}
 
 				sqlUser* theUser = isAuthed(theClient, false);

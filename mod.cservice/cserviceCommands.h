@@ -1,17 +1,17 @@
 #ifndef __CSERVICECOMMANDS_H
-#define __CSERVICECOMMANDS_H "$Id: cserviceCommands.h,v 1.28 2001/04/30 01:26:21 gte Exp $"
+#define __CSERVICECOMMANDS_H "$Id: cserviceCommands.h,v 1.29 2001/08/13 00:26:57 gte Exp $"
 
 #include	<string>
 #include	"iClient.h"
- 
+
 using std::string ;
 
 namespace gnuworld
-{ 
+{
 
 class cservice;
 class xServer;
- 
+
 class Command
 {
 
@@ -51,7 +51,7 @@ protected:
 	unsigned short  flood_points ;
 
 } ;
- 
+
 #define DECLARE_COMMAND(commName) \
 class commName##Command : public Command \
 { \
@@ -67,7 +67,7 @@ public: \
 } ;
 
 // Level 0 commands.
- 
+
 DECLARE_COMMAND( SHOWCOMMANDS )
 DECLARE_COMMAND( LOGIN )
 DECLARE_COMMAND( SEARCH )
@@ -78,18 +78,19 @@ DECLARE_COMMAND( HELP )
 DECLARE_COMMAND( ISREG )
 DECLARE_COMMAND( SHOWIGNORE )
 DECLARE_COMMAND( VERIFY )
-DECLARE_COMMAND( RANDOM ) 
+DECLARE_COMMAND( RANDOM )
+DECLARE_COMMAND( SUPPORT )
 
 // Channel user level commands.
 
 DECLARE_COMMAND( OP )
 DECLARE_COMMAND( VOICE )
 DECLARE_COMMAND( DEOP )
-DECLARE_COMMAND( DEVOICE ) 
+DECLARE_COMMAND( DEVOICE )
 DECLARE_COMMAND( ADDUSER )
 DECLARE_COMMAND( REMUSER )
 DECLARE_COMMAND( MODINFO )
-DECLARE_COMMAND( SET ) 
+DECLARE_COMMAND( SET )
 DECLARE_COMMAND( INVITE )
 DECLARE_COMMAND( TOPIC )
 DECLARE_COMMAND( BANLIST )
@@ -121,8 +122,8 @@ DECLARE_COMMAND( REMIGNORE )
 DECLARE_COMMAND( SERVNOTICE )
 DECLARE_COMMAND( SAY )
 DECLARE_COMMAND( QUOTE )
-DECLARE_COMMAND( REHASH ) 
- 
+DECLARE_COMMAND( REHASH )
+
 } // namespace gnuworld
 
 #endif // __CSERVICECOMMANDS_H
