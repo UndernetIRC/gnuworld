@@ -27,7 +27,7 @@
 #include	"events.h"
 
 const char xClient_h_rcsId[] = __XCLIENT_H ;
-const char xClient_cc_rcsId[] = "$Id: client.cc,v 1.16 2000/12/23 02:05:14 dan_karrels Exp $" ;
+const char xClient_cc_rcsId[] = "$Id: client.cc,v 1.17 2000/12/23 15:01:58 dan_karrels Exp $" ;
 
 using std::string ;
 using std::strstream ;
@@ -1092,7 +1092,7 @@ int xClient::OnSignal( int whichSig )
 return 0 ;
 }
 
-void xClient::deleteCustomData( void* )
+void xClient::deleteCustomData( iClient*, void* )
 {
 }
 

@@ -14,7 +14,7 @@
 #include	"ip.h"
 
 const char iClient_h_rcsId[] = __ICLIENT_H ;
-const char iClient_cc_rcsId[] = "$Id: iClient.cc,v 1.5 2000/12/23 02:05:14 dan_karrels Exp $" ;
+const char iClient_cc_rcsId[] = "$Id: iClient.cc,v 1.6 2000/12/23 15:01:58 dan_karrels Exp $" ;
 
 using std::string ;
 using std::map ;
@@ -77,7 +77,7 @@ iClient::~iClient()
 for( customDataMapType::iterator ptr = customDataMap.begin() ;
 	ptr != customDataMap.end() ; ++ptr )
 	{
-	ptr->first->deleteCustomData( ptr->second ) ;
+	ptr->first->deleteCustomData( this, ptr->second ) ;
 	}
 }
 

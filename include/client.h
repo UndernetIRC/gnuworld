@@ -3,7 +3,7 @@
  */
 
 #ifndef __XCLIENT_H
-#define __XCLIENT_H "$Id: client.h,v 1.12 2000/12/23 02:05:14 dan_karrels Exp $"
+#define __XCLIENT_H "$Id: client.h,v 1.13 2000/12/23 15:01:57 dan_karrels Exp $"
 
 #include	<string>
 
@@ -74,7 +74,7 @@ public:
 	 */
 	virtual int Exit( const string& Message ) ;
 
-	virtual void	deleteCustomData( void* ) ;
+	virtual void	deleteCustomData( iClient*, void* ) ;
 
 	/**
 	 * Kill will issue a KILL command to the network for
