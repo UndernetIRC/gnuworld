@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server.cc,v 1.140 2002/07/16 15:30:49 dan_karrels Exp $
+ * $Id: server.cc,v 1.141 2002/07/20 00:58:29 dan_karrels Exp $
  */
 
 #include	<sys/time.h>
@@ -73,7 +73,7 @@
 #include	"Connection.h"
 
 const char server_h_rcsId[] = __SERVER_H ;
-const char server_cc_rcsId[] = "$Id: server.cc,v 1.140 2002/07/16 15:30:49 dan_karrels Exp $" ;
+const char server_cc_rcsId[] = "$Id: server.cc,v 1.141 2002/07/20 00:58:29 dan_karrels Exp $" ;
 const char config_h_rcsId[] = __CONFIG_H ;
 const char misc_h_rcsId[] = __MISC_H ;
 const char events_h_rcsId[] = __EVENTS_H ;
@@ -553,6 +553,19 @@ WriteDuringBurst( "SERVER %s %d %d %d J%02d %s :%s\n",
 		Version,
 		(string( getCharYY() ) + "]]]").c_str(),
 		ServerDescription.c_str() ) ;
+}
+
+void xServer::OnConnectFail( Connection* theConn )
+{
+elog	<< "xServer::OnConnectFail> Failed to establish connection "
+	<< "to "
+	<< theConn->getHostname()
+	<< ":"
+	<< theConn->getRemotePort()
+	<< endl ;
+
+Message = SRV_DISCONNECT ;
+keepRunning = false ;
 }
 
 /**

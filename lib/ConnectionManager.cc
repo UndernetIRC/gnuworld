@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ConnectionManager.cc,v 1.13 2002/07/16 15:57:13 dan_karrels Exp $
+ * $Id: ConnectionManager.cc,v 1.14 2002/07/20 00:58:29 dan_karrels Exp $
  */
 
 #include	<unistd.h>
@@ -527,8 +527,8 @@ void ConnectionManager::Poll( const long seconds,
 // performed.
 if( handlerMap.empty() && eraseMap.empty() )
 	{
-	clog	<< "ConnectionManager::Poll> handlerMap.empty()"
-		<< endl ;
+//	clog	<< "ConnectionManager::Poll> handlerMap.empty()"
+//		<< endl ;
 	return ;
 	}
 
@@ -1079,9 +1079,9 @@ bool ConnectionManager::finishConnect( ConnectionHandler* hPtr,
 // Protected member method, no error checking performed on
 // method arguments
 
-cout	<< "ConnectionManager::finishConnect> "
-	<< *cPtr
-	<< endl ;
+//cout	<< "ConnectionManager::finishConnect> "
+//	<< *cPtr
+//	<< endl ;
 
 // Attempt to connect()
 int connectResult = ::connect( cPtr->getSockFD(),

@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server.h,v 1.71 2002/07/16 15:57:10 dan_karrels Exp $
+ * $Id: server.h,v 1.72 2002/07/20 00:58:25 dan_karrels Exp $
  */
 
 #ifndef __SERVER_H
-#define __SERVER_H "$Id: server.h,v 1.71 2002/07/16 15:57:10 dan_karrels Exp $"
+#define __SERVER_H "$Id: server.h,v 1.72 2002/07/20 00:58:25 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
@@ -210,6 +210,8 @@ public:
 	virtual void OnDisconnect( Connection* ) ;
 
 	virtual void OnConnect( Connection* ) ;
+
+	virtual void OnConnectFail( Connection* ) ;
 
 	virtual void OnRead( Connection*, const string& ) ;
 
