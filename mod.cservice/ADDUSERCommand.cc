@@ -8,7 +8,7 @@
  *
  * Caveats: None
  *
- * $Id: ADDUSERCommand.cc,v 1.4 2001/01/03 03:02:04 gte Exp $
+ * $Id: ADDUSERCommand.cc,v 1.5 2001/01/13 20:20:12 gte Exp $
  */
  
 #include	<string>
@@ -19,7 +19,7 @@
 #include	"levels.h"
 #include	"libpq++.h"
 
-const char ADDUSERCommand_cc_rcsId[] = "$Id: ADDUSERCommand.cc,v 1.4 2001/01/03 03:02:04 gte Exp $" ;
+const char ADDUSERCommand_cc_rcsId[] = "$Id: ADDUSERCommand.cc,v 1.5 2001/01/13 20:20:12 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -80,7 +80,7 @@ bool ADDUSERCommand::Exec( iClient* theClient, const string& Message )
 		return false;
 	}
 
-	if ((targetAccess <= 0) || (targetAccess > 500))
+	if ((targetAccess <= 0) || (targetAccess > 999))
 	{
 		bot->Notice(theClient, "Invalid access level.");
 		return false;
