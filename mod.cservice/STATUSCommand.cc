@@ -9,7 +9,7 @@
 #include	"responses.h"
 #include	"Network.h"
  
-const char STATUSCommand_cc_rcsId[] = "$Id: STATUSCommand.cc,v 1.12 2001/02/14 21:23:12 gte Exp $" ;
+const char STATUSCommand_cc_rcsId[] = "$Id: STATUSCommand.cc,v 1.13 2001/02/14 23:31:51 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -171,8 +171,9 @@ bool STATUSCommand::Exec( iClient* theClient, const string& Message )
 								break; 
 							}
 						}
-						bot->Notice(theClient, "%s: %s %s",
-							bot->SQLDb->GetValue(i, 0), type.c_str(),
+						bot->Notice(theClient, "%s ago: %s %s",
+							bot->prettyDuration( atoi(bot->SQLDb->GetValue(i, 0)) ).c_str(), 
+							type.c_str(),
 							bot->SQLDb->GetValue(i, 3));
 					}
 				} 

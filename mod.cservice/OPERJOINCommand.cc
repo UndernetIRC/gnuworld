@@ -8,7 +8,7 @@
  *
  * Caveats: None
  *
- * $Id: OPERJOINCommand.cc,v 1.2 2001/02/12 14:06:37 plexus Exp $
+ * $Id: OPERJOINCommand.cc,v 1.3 2001/02/14 23:31:51 gte Exp $
  */
 
 
@@ -21,7 +21,7 @@
 #include	"responses.h"
 #include	"Network.h"
 
-const char OPERJOINCommand_cc_rcsId[] = "$Id: OPERJOINCommand.cc,v 1.2 2001/02/12 14:06:37 plexus Exp $" ;
+const char OPERJOINCommand_cc_rcsId[] = "$Id: OPERJOINCommand.cc,v 1.3 2001/02/14 23:31:51 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -78,7 +78,9 @@ bool OPERJOINCommand::Exec( iClient* theClient, const string& Message )
 	bot->logAdminMessage("%s is asking me to join channel %s",
 			theClient->getNickUserHost().c_str(),
 			theChan->getName().c_str());
- 
+
+	bot->writeChannelLog(theChan, theClient, sqlChannel::EV_JOIN, "");
+
 	theChan->setInChan(true);
 	bot->getUplink()->RegisterChannelEvent( theChan->getName(), bot);
 	bot->Join(theChan->getName(), theChan->getChannelMode(), theChan->getChannelTS(), false);
