@@ -43,7 +43,7 @@
 #include	"moduleLoader.h"
 
 const char xServer_h_rcsId[] = __XSERVER_H ;
-const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.43 2001/01/07 23:43:18 dan_karrels Exp $" ;
+const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.44 2001/01/08 00:01:07 dan_karrels Exp $" ;
 
 using std::string ;
 using std::vector ;
@@ -314,6 +314,7 @@ void xServer::initializeVariables()
 maxLoopCount = MAXLOOPCOUNT_DEFAULT ;
 
 // Initialize more variables
+keepRunning = false ;
 bursting = false ;
 _connected = false ;
 StartTime = ::time( NULL ) ;

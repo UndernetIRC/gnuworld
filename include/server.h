@@ -17,7 +17,7 @@
  */
 
 #ifndef __XSERVER_H
-#define __XSERVER_H "$Id: server.h,v 1.21 2001/01/07 22:59:32 dan_karrels Exp $"
+#define __XSERVER_H "$Id: server.h,v 1.22 2001/01/08 00:01:07 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
@@ -1126,7 +1126,7 @@ protected:
 	char*		inputCharBuffer ;
 	bool		verbose ;
 
-	static void		sigHandler( int ) ;
+	static void	sigHandler( int ) ;
 	void		initializeSystem() ;
 	void		initializeVariables() ;
 	void		loadCommandHandlers() ;

@@ -14,11 +14,12 @@
 #include	"misc.h"
 
 const char EConfig_h_rcsId[] = __ECONFIG_H ;
-const char EConfig_cc_rcsId[] = "$Id: EConfig.cc,v 1.3 2000/11/18 23:36:51 dan_karrels Exp $" ;
+const char EConfig_cc_rcsId[] = "$Id: EConfig.cc,v 1.4 2001/01/08 00:01:07 dan_karrels Exp $" ;
 
 using std::string ;
 using std::fstream ;
 using std::map ;
+using std::clog ;
 using std::endl ;
 
 namespace gnuworld
@@ -69,7 +70,7 @@ if( ptr == valueMap.end() )
 	// Nope, this method is intended to "require" the config file
 	// to have a certain key/value pair.  Since this is not the
 	// case, print out an error and quit.
-	elog	<< "EConfig::Require> Configuration requires value "
+	clog	<< "EConfig::Require> Configuration requires value "
 		<< "for key \"" << key << "\"\n" ;
 	::exit( 0 ) ;
 	}
