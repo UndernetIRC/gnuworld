@@ -2,7 +2,7 @@
 /*
  *
  * Undernet GNUworld Interactive Installation Guide (aka UGIIG)
- * $Id: index.php,v 1.16 2003/12/03 03:34:03 nighty Exp $
+ * $Id: index.php,v 1.17 2004/02/24 22:39:37 nighty Exp $
  *
  * Released under the GNU Public License : http://www.gnu.org/licenses/gpl.txt
  * by nighty <nighty@undernet.org>
@@ -50,7 +50,7 @@ function footer($prev,$next) {
 	//echo "<address>maintained by <b>&lt;</b><a href=\"mailto:" . $coder_email . "\">" . $coder_email . "</a><b>&gt;</b> - Last modified : <b>" . date("M-d-Y H:i:s",   (  filemtime("index.php")+( date("Z",filemtime("index.php"))/3600 )   )   ) . " UTC/GMT</b> - <b>[</b><a href=\"./\">Home</a><b>]</b></address>";
 	echo "<address>maintained by <b>&lt;</b><a href=\"mailto:" . $coder_email . "\">" . $coder_email . "</a><b>&gt;</b> - <b>[</b><a href=\"./\">Home</a><b>]</b>";
 	echo "&nbsp;<br><font size=-2><b>";
-?>$Id: index.php,v 1.16 2003/12/03 03:34:03 nighty Exp $<?
+?>$Id: index.php,v 1.17 2004/02/24 22:39:37 nighty Exp $<?
 	echo "</b></font></address>\n";
 	echo "</body>\n";
 	echo "</html>\n";
@@ -74,8 +74,8 @@ function ugig_err($err_code) {
 $coder_email = "nighty@undernet.org";
 $coder_name = "nighty";
 
-define(PG_SQL_FTP_SOURCE,"ftp://ftp8.us.postgresql.org/pub/postgresql/source/");
-define(PG_SQL_FTP_SOURCE_FILE,"ftp://ftp8.us.postgresql.org/pub/postgresql/source/v7.2.4/postgresql-7.2.4.tar.gz");
+define(PG_SQL_FTP_SOURCE,"ftp://ftp8.us.postgresql.org/postgresql/source/");
+define(PG_SQL_FTP_SOURCE_FILE,"ftp://ftp8.us.postgresql.org/postgresql/source/v7.2.4/postgresql-7.2.4.tar.gz");
 define(PG_SQL_RECOM_VERSION,"7.2.4");
 
 define(TCL_83_PORT_SOURCE,"http://www.freebsd.org/cgi/cvsweb.cgi/ports/lang/tcl83/");
@@ -117,7 +117,7 @@ define(ZLIB_FILE_NAME,"zlib-1.1.4.tar.gz");
 
 
 ?>
-<!-- $Id: index.php,v 1.16 2003/12/03 03:34:03 nighty Exp $ //-->
+<!-- $Id: index.php,v 1.17 2004/02/24 22:39:37 nighty Exp $ //-->
 <html>
 <head>
 <title>Undernet GNUworld Interactive Installation Guide</title>
