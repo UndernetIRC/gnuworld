@@ -13,16 +13,16 @@ consoleChannelModes = +ntsim
 dbHost = 127.0.0.1
 dbPort = 5432
 dbDb = nickserv
-dbUser = rgh
+dbUser = nickserv
 dbPass = ""
 
 # The frequency with which to check the queue
-checkFreq = 10
+checkFreq = 60
 
 # The initial startup wait.
 # Note this does NOT include checkFreq so make sure to set
 # a value somewhat higher than 0
-startDelay = 10
+startDelay = 60
 
 # How frequently to commit to the database
 # _freq is max time to wait, _count is max entries to wait
