@@ -4,7 +4,7 @@
  */
 
 #ifndef __MISC_H
-#define __MISC_H "$Id: misc.h,v 1.6 2000/10/31 00:58:37 dan_karrels Exp $"
+#define __MISC_H "$Id: misc.h,v 1.7 2000/11/18 23:36:51 dan_karrels Exp $"
 
 #include	<string>
 #include	<hash_map>
@@ -73,6 +73,12 @@ string string_upper( const string& ) ;
  * lower case.
  */
 void string_tolower( string& ) ;
+
+/**
+ * Convert all characters of a given C++ string to
+ * upper case.
+ */
+void string_toupper( string& ) ;
 
 /**
  * Examine a given C++ string and return true if it contains

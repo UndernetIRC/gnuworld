@@ -14,7 +14,7 @@
 #include	"misc.h"
 
 const char EConfig_h_rcsId[] = __ECONFIG_H ;
-const char EConfig_cc_rcsId[] = "$Id: EConfig.cc,v 1.2 2000/11/12 17:20:45 dan_karrels Exp $" ;
+const char EConfig_cc_rcsId[] = "$Id: EConfig.cc,v 1.3 2000/11/18 23:36:51 dan_karrels Exp $" ;
 
 using std::string ;
 using std::fstream ;
@@ -60,13 +60,21 @@ return valueMap.find( findMe ) ;
 
 EConfig::const_iterator EConfig::Require( const string& key ) const
 {
+// Attempt to find the key in the map
 const_iterator ptr = valueMap.find( key ) ;
+
+// Was it found?
 if( ptr == valueMap.end() )
 	{
+	// Nope, this method is intended to "require" the config file
+	// to have a certain key/value pair.  Since this is not the
+	// case, print out an error and quit.
 	elog	<< "EConfig::Require> Configuration requires value "
 		<< "for key \"" << key << "\"\n" ;
 	::exit( 0 ) ;
 	}
+
+// At least one key/value pair for this key exists; return it
 return ptr ;
 }
 
