@@ -8,7 +8,7 @@
  *
  * Caveats: None.
  *
- * $Id: SAYCommand.cc,v 1.4 2001/03/07 15:10:53 dan_karrels Exp $
+ * $Id: SAYCommand.cc,v 1.5 2001/03/21 10:22:04 isomer Exp $
  */
 
 #include	<string>
@@ -18,7 +18,7 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char SAYCommand_cc_rcsId[] = "$Id: SAYCommand.cc,v 1.4 2001/03/07 15:10:53 dan_karrels Exp $" ;
+const char SAYCommand_cc_rcsId[] = "$Id: SAYCommand.cc,v 1.5 2001/03/21 10:22:04 isomer Exp $" ;
 
 namespace gnuworld
 {
@@ -49,13 +49,16 @@ if (!theUser)
 int admLevel = bot->getAdminAccessLevel(theUser);
 if (admLevel < level::say)
 	{
+/* CSC get far too many questions as to how to use these commands
+ * so they prefer it kept quiet about 'em.  Fair enough too.
+ *
 	bot->Notice(theClient,
 		bot->getResponse(theUser,
 			language::insuf_access,
 			string("Sorry, you have insufficient access to perform that command.")));
+ */
 	return false;
 	} 
-
 /*
  *  First, check the channel is registered.
  */

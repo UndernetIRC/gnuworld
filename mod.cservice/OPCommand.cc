@@ -13,11 +13,14 @@
  * /msg e op #coder-com Gte Gte Gte Gte Gte Gte Gte {etc}
  * And flooding the target with notices.
  *
+ * 2001-03-21 - Perry Lorier <isomer@coders.net>
+ * added 'on chan' to the message
+ *
  * OP's one or more users on a channel the user as access on.
  *
  * Caveats: None
  *
- * $Id: OPCommand.cc,v 1.23 2001/03/06 23:44:00 gte Exp $
+ * $Id: OPCommand.cc,v 1.24 2001/03/21 10:22:04 isomer Exp $
  */
 
 #include	<string>
@@ -32,7 +35,7 @@
 
 using std::map ;
 
-const char OPCommand_cc_rcsId[] = "$Id: OPCommand.cc,v 1.23 2001/03/06 23:44:00 gte Exp $" ;
+const char OPCommand_cc_rcsId[] = "$Id: OPCommand.cc,v 1.24 2001/03/21 10:22:04 isomer Exp $" ;
 
 namespace gnuworld
 {
@@ -282,7 +285,8 @@ for( ; counter < st2.size() ; ++counter )
 					bot->getResponse(theUser,
 					language::youre_opped_by).c_str(),
 					theClient->getNickName().c_str(),
-					theUser->getUserName().c_str());
+					theUser->getUserName().c_str(),
+					theChan->getName().c_str());
 				} 
 			} // Don't send to person who issued.
 	   	} // Not a duplicate.

@@ -12,11 +12,15 @@
  * /msg e voice #coder-com Gte Gte Gte Gte Gte Gte Gte {etc}
  * And flooding the target with notices.
  *
+ * 2001-03-21 - Perry Lorier <Isomer@coders.net>
+ * Added "on chan" to the message
+ * 
  * Voice's one or more users on a channel the user as access on.
+ *
  *
  * Caveats: None
  *
- * $Id: VOICECommand.cc,v 1.17 2001/03/18 17:25:00 dan_karrels Exp $
+ * $Id: VOICECommand.cc,v 1.18 2001/03/21 10:22:04 isomer Exp $
  */
 
 #include	<string>
@@ -30,7 +34,10 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char VOICECommand_cc_rcsId[] = "$Id: VOICECommand.cc,v 1.17 2001/03/18 17:25:00 dan_karrels Exp $" ;
+using std::map ;
+using std::vector ;
+
+const char VOICECommand_cc_rcsId[] = "$Id: VOICECommand.cc,v 1.18 2001/03/21 10:22:04 isomer Exp $" ;
 
 namespace gnuworld
 {
@@ -202,7 +209,8 @@ while (counter < st2.size())
 					bot->getResponse(tmpTargetUser,
 						language::youre_voiced_by).c_str(),
 					theClient->getNickName().c_str(),
-					theUser->getUserName().c_str());
+					theUser->getUserName().c_str(),
+					theChan->getName().c_str());
 				}
 			else 
 				{
@@ -210,7 +218,8 @@ while (counter < st2.size())
 					bot->getResponse(theUser,
 						language::youre_voiced_by).c_str(),
 					theClient->getNickName().c_str(),
-					theUser->getUserName().c_str());
+					theUser->getUserName().c_str(),
+					theChan->getName().c_str());
 				} 
 			} // Don't send to person who issued.
 	   	} // Not a duplicate.

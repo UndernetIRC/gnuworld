@@ -8,7 +8,7 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char VERIFYCommand_cc_rcsId[] = "$Id: VERIFYCommand.cc,v 1.17 2001/03/07 23:22:11 dan_karrels Exp $" ;
+const char VERIFYCommand_cc_rcsId[] = "$Id: VERIFYCommand.cc,v 1.18 2001/03/21 10:22:04 isomer Exp $" ;
 
 namespace gnuworld
 {
@@ -89,7 +89,11 @@ if (!theChan)
 // TODO: Move all the levels to constants in levels.h
 
 int level = bot->getAdminAccessLevel(theUser); 
-int cLevel = bot->getEffectiveAccessLevel(theUser, theChan, false);
+int cLevel;
+if (!theChan)
+	cLevel = 0;
+else
+	cLevel = bot->getEffectiveAccessLevel(theUser, theChan, false);
 
 if ( (0 == level) && (0 == cLevel) ) 
 	{

@@ -1,7 +1,7 @@
 /* sqlChannel.h */
 
 #ifndef __SQLCHANNEL_H
-#define __SQLCHANNEL_H "$Id: sqlChannel.h,v 1.21 2001/03/16 11:50:59 isomer Exp $"
+#define __SQLCHANNEL_H "$Id: sqlChannel.h,v 1.22 2001/03/21 10:22:04 isomer Exp $"
 
 #include	<string>
 #include	<map>
@@ -52,6 +52,9 @@ public:
 	static const unsigned short	EV_FORCE    = 6 ;
 	static const unsigned short	EV_REGISTER = 7 ; 
 	static const unsigned short	EV_PURGE    = 8 ;
+	static const unsigned short	EV_COMMENT  = 9 ; /* Manually added 
+							   * Comment
+							   */
 
 	/*
 	 *  Methods to get data atrributes.
