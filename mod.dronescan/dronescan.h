@@ -1,5 +1,5 @@
 #ifndef DRONESCAN_H
-#define DRONESCAN_H "$Id: dronescan.h,v 1.6 2003/06/11 14:00:17 jeekay Exp $"
+#define DRONESCAN_H "$Id: dronescan.h,v 1.7 2003/06/12 12:03:57 jeekay Exp $"
 
 #include <map>
 
@@ -41,7 +41,7 @@ public:
 	dronescan( const string& ) ;
 	
 	/** Destructor to clean up after ourselves. */
-	inline virtual ~dronescan() { } ;
+	inline virtual ~dronescan() ;
 	
 	/***********************************************************
 	 ** O V E R R I D E N   X C L I E N T   F U N C T I O N S **

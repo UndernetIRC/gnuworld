@@ -117,6 +117,62 @@ RegisterCommand(new CHECKCommand(this, "CHECK", "(<#channel>) (<user>)"));
 } // dronescan::dronescan(const string&)
 
 
+/*************************
+ ** D E S T R U C T O R **
+ *************************/
+dronescan::~dronescan()
+{
+/* We need to delete() anything we have new()d
+ * Currently this is:
+ *  dronescanConfig
+ *  Tests
+ *  Commands
+ *  clientData for every client on the net
+ *  theTimer
+ *
+ * It is important this is kept up to date so that reload() does not leak.
+ * We also need to unregister any timers we have so GNUworld doesn't segfault :)
+ */
+
+/* Delete our config */
+delete dronescanConfig;
+
+/* Delete our timer */
+delete theTimer;
+
+/* Delete commands */
+for(commandMapType::iterator itr = commandMap.begin() ;
+    itr != commandMap.end() ; ++itr) {
+	delete itr->second;
+}
+commandMap.clear();
+
+/* Delete tests */
+for(testVectorType::iterator itr = testVector.begin() ;
+    itr != testVector.end() ; ++itr) {
+	delete *itr;
+}
+testVector.clear();
+
+/* Iterate over clients to delete clientData */
+for(xNetwork::const_clientIterator ptr = Network->clients_begin() ;
+    ptr != Network->clients_end() ; ++ptr) {
+	iClient *theClient = ptr->second;
+	clientData *theData = static_cast< clientData* > (theClient->removeCustomData(this));
+	delete theData;
+}
+
+/* Unregister the join counting timer */
+if(!MyUplink->UnRegisterTimer(tidClearJoinCounter, 0)) {
+	elog	<< "dronescan::~dronescan> "
+		<< "Could not unregister timer. Expect problems shortly."
+		<< endl;
+}
+
+/* Done! */
+
+}
+
 
 /*****************************************************
  ** X C L I E N T   M E M B E R   F U N C T I O N S **
@@ -251,7 +307,7 @@ int dronescan::OnChannelEvent( const channelEventType& theEvent,
 		
 		unsigned int joinCount = jcChanMap[channelName];
 		
-		if(joinCount > jcCutoff)
+		if((joinCount >= jcCutoff) && (joinCount % jcCutoff == 0))
 			{
 			log(WARN, "%s has had %u joins within the last %us.",
 				channelName.c_str(),
@@ -289,6 +345,13 @@ int dronescan::OnPrivateMessage( iClient* theClient, const string& Message, bool
 	if("INVITE" == Command)
 		{
 		Invite(theClient, consoleChannel);
+		return 0;
+		}
+	
+	if("RELOAD" == Command)
+		{
+		getUplink()->UnloadClient(this, "Reloading...");
+		getUplink()->LoadClient("libdronescan.la", getConfigFileName());
 		return 0;
 		}
 	
