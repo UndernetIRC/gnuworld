@@ -1,4 +1,4 @@
--- "$Id: ccontrol.sql,v 1.30 2004/03/25 20:58:06 mrbean_ Exp $"
+-- "$Id: ccontrol.sql,v 1.31 2005/01/07 01:24:44 jeekay Exp $"
 
 -- 2002-25-02 : |MrBean|
 -- Added the Misc table
@@ -79,7 +79,7 @@ CREATE TABLE servers (
 	SplitReason VARCHAR(512),
 	Version VARCHAR(256),
 	AddedOn INT4 NOT NULL,
-	LastUpdated INT4 NOT NULL
+	LastUpdated INT4 NOT NULL,
 	ReportMissing BOOLEAN NO NULL DEFAULT 't'
 	);
 
