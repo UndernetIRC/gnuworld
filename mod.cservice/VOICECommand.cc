@@ -16,7 +16,7 @@
  *
  * Caveats: None
  *
- * $Id: VOICECommand.cc,v 1.15 2001/02/20 18:55:41 gte Exp $
+ * $Id: VOICECommand.cc,v 1.16 2001/02/24 21:49:38 gte Exp $
  */
 
 #include	<string>
@@ -33,7 +33,7 @@
 using std::map ;
 using std::vector ;
 
-const char VOICECommand_cc_rcsId[] = "$Id: VOICECommand.cc,v 1.15 2001/02/20 18:55:41 gte Exp $" ;
+const char VOICECommand_cc_rcsId[] = "$Id: VOICECommand.cc,v 1.16 2001/02/24 21:49:38 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -201,6 +201,7 @@ while (counter < st2.size())
 				bot->Notice(target,
 					bot->getResponse(tmpTargetUser,
 						language::youre_voiced_by).c_str(),
+					theClient->getNickName().c_str(),
 					theUser->getUserName().c_str());
 				}
 			else 
@@ -208,6 +209,7 @@ while (counter < st2.size())
 				bot->Notice(target,
 					bot->getResponse(theUser,
 						language::youre_voiced_by).c_str(),
+					theClient->getNickName().c_str(),
 					theUser->getUserName().c_str());
 				} 
 			} // Don't send to person who issued.

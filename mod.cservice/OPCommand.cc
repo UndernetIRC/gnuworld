@@ -17,7 +17,7 @@
  *
  * Caveats: None
  *
- * $Id: OPCommand.cc,v 1.18 2001/02/21 01:59:09 dan_karrels Exp $
+ * $Id: OPCommand.cc,v 1.19 2001/02/24 21:49:38 gte Exp $
  */
 
 #include	<string>
@@ -32,7 +32,7 @@
 
 using std::map ;
 
-const char OPCommand_cc_rcsId[] = "$Id: OPCommand.cc,v 1.18 2001/02/21 01:59:09 dan_karrels Exp $" ;
+const char OPCommand_cc_rcsId[] = "$Id: OPCommand.cc,v 1.19 2001/02/24 21:49:38 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -242,6 +242,7 @@ for( ; counter < st2.size() ; ++counter )
 				bot->Notice(target,
 					bot->getResponse(tmpTargetUser,
 					language::youre_opped_by).c_str(),
+					theClient->getNickName().c_str(),
 					theUser->getUserName().c_str());
 				}
 			else 
@@ -249,6 +250,7 @@ for( ; counter < st2.size() ; ++counter )
 				bot->Notice(target,
 					bot->getResponse(theUser,
 					language::youre_opped_by).c_str(),
+					theClient->getNickName().c_str(),
 					theUser->getUserName().c_str());
 				} 
 			} // Don't send to person who issued.

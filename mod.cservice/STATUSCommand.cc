@@ -9,7 +9,7 @@
 #include	"responses.h"
 #include	"Network.h"
  
-const char STATUSCommand_cc_rcsId[] = "$Id: STATUSCommand.cc,v 1.18 2001/02/22 19:13:11 gte Exp $" ;
+const char STATUSCommand_cc_rcsId[] = "$Id: STATUSCommand.cc,v 1.19 2001/02/24 21:48:32 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -266,7 +266,48 @@ bool STATUSCommand::Exec( iClient* theClient, const string& Message )
 			language::status_flags,
 			string("Flags set: %s")).c_str(),flagsSet.c_str()); 
 
-	bot->Notice(theClient, "Auth: TBA");
+	/*
+	 *  Get a list of authenticated users on this channel.
+	 */
+
+	strstream authQuery;
+	strstream authList;
+	authQuery << "SELECT users.user_name,levels.access FROM users,levels WHERE users.id = levels.user_id "
+			 << "AND levels.channel_id = " << theChan->getID() << ends; 
+
+	elog << "sqlQuery> " << authQuery.str() << endl;
+
+	ExecStatusType status = bot->SQLDb->Exec( authQuery.str() ) ; 
+	delete[] authQuery.str();
+
+	/* TODO: Expand to multiline support. */
+
+	if( PGRES_TUPLES_OK == status ) 
+	{ 
+			for (int i = 0 ; i < bot->SQLDb->Tuples(); i++)
+				{
+					/*
+					 *  Look up this username in the cache.
+					 */
+
+					cservice::sqlUserHashType::iterator ptr = bot->sqlUserCache.find(bot->SQLDb->GetValue(i, 0));
+					if(ptr != bot->sqlUserCache.end())
+					{ 
+						iClient* tmpClient = ptr->second->networkClient;
+						if(ptr->second->getFlag(sqlUser::F_LOGGEDIN))
+						{
+							authList << bot->SQLDb->GetValue(i, 0) 
+							<< "/"
+							<< tmpClient->getNickName()
+							<< " (" << bot->SQLDb->GetValue(i, 1) << ") "; 
+						}
+					}
+				}
+	} 
+
+	authList << ends;
+	bot->Notice(theClient, "Auth: %s", authList.str());
+
 	return true ;
 } 
 
