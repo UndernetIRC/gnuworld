@@ -387,11 +387,12 @@ else
 		string silenceMask = "*!*" + theClient->getUserName() + "@" + theClient->getInsecureHost();
 
 		strstream s;
-	 	s << getCharYYXXX() 
-	 	<< " SILENCE " 
-	 	<< theClient->getCharYYXXX() 
-	 	<< " " 
-	 	<< silenceMask << ends; 
+		s	<< getCharYYXXX() 
+			<< " SILENCE " 
+			<< theClient->getCharYYXXX() 
+			<< " " 
+			<< silenceMask
+			<< ends; 
 		Write( s );
 		delete[] s.str();
 
@@ -464,10 +465,18 @@ bool cservice::hasOutputFlooded(iClient* theClient)
 			Notice(theClient, "I think I've sent you a little too much data, I'm going to ignore you for a while."); 
 		
 			// Send a silence numeric target, and mask to ignore messages from this user.
-			string silenceMask = "*!*" + theClient->getUserName() + "@" + theClient->getInsecureHost();
+			string silenceMask = "*!*"
+				+ theClient->getUserName()
+				+ "@"
+				+ theClient->getInsecureHost();
 
 			strstream s;
-			s << getCharYYXXX() << " SILENCE " << theClient->getCharYYXXX() << " " << silenceMask << ends; 
+			s	<< getCharYYXXX()
+				<< " SILENCE "
+				<< theClient->getCharYYXXX()
+				<< " "
+				<< silenceMask
+				<< ends; 
 			Write( s );
 			delete[] s.str();
 
@@ -576,7 +585,7 @@ else if(Command == "VERSION")
 	xClient::DoCTCP(theClient, CTCP,
 		"Undernet P10 Channel Services Version 2 ["
 		__DATE__ " " __TIME__
-		"] ($Id: cservice.cc,v 1.89 2001/02/08 21:56:10 gte Exp $)");
+		"] ($Id: cservice.cc,v 1.90 2001/02/08 23:36:46 dan_karrels Exp $)");
 	}
 else if(Command == "PROBLEM?")
 	{
@@ -729,6 +738,7 @@ elog	<< "cmaster::getBanRecords> There are "
 	<< endl;
 banHits++;
 
+delete[] theQuery.str() ;
 return banList;
 }	
  
@@ -1078,7 +1088,7 @@ if (relname == "channels_u")
 			<< lastChannelRefresh;
 	}
 
-if ( relname == "users_u") 
+if( relname == "users_u" )
 	{
 	updateType = 2;
 
@@ -1234,13 +1244,12 @@ va_start( _list, format ) ;
 vsprintf( buf, format, _list ) ;
 va_end( _list ) ;
 	
-string theMessage = buf;
 strstream s;
 s	<< MyUplink->getCharYY()
 	<< " O "
 	<< theChannel->getName()
 	<< " :"
-	<< theMessage
+	<< buf
 	<< ends;
 
 Write( s );
@@ -1784,75 +1793,87 @@ int cservice::OnWhois( iClient* sourceClient,
 	 *  Return info about 'targetClient' to 'sourceClient'
 	 */
 
-	strstream s;
-	s << getCharYY() << " 311 " 
+strstream s;
+s	<< getCharYY()
+	<< " 311 " 
 	<< sourceClient->getCharYYXXX() 
 	<< " " << targetClient->getNickName()
 	<< " " << targetClient->getUserName()
-	<< " " << targetClient->getInsecureHost() << " * :" << ends; 
-	Write( s );
-	delete[] s.str();
+	<< " " << targetClient->getInsecureHost()
+	<< " * :"
+	<< ends; 
+Write( s );
+delete[] s.str();
 
-	// Lookup server name
+// Lookup server name
+iServer* targetServer = Network->findServer( targetClient->getIntYY() ) ;
 
-	iServer* targetServer = Network->findServer( targetClient->getIntYY() ) ;
-
-	if (targetServer)
+if (targetServer)
 	{
-		strstream s2;
-		s2 << getCharYY() << " 312 " 
+	strstream s2;
+	s2	<< getCharYY()
+		<< " 312 " 
 		<< sourceClient->getCharYYXXX() 
 		<< " " << targetClient->getNickName()
-		<< " " << targetServer->getName() << " :"
+		<< " " << targetServer->getName()
+		<< " :"
 		<< ends;
-		Write( s2 );
-		delete[] s2.str();
-		
+	Write( s2 );
+
+	delete[] s2.str();
 	}
 
-	strstream s4;
-	s4 << getCharYY() << " 317 " 
+strstream s4;
+s4	<< getCharYY()
+	<< " 317 " 
 	<< sourceClient->getCharYYXXX() 
 	<< " " << targetClient->getNickName()
 	<< " 0 " << targetClient->getConnectTime()
-	<< " :seconds idle, signon time" << ends; 
-	Write( s4 );
-	delete[] s4.str(); 
+	<< " :seconds idle, signon time"
+	<< ends;
+Write( s4 );
+delete[] s4.str(); 
 
-	if (targetClient->isOper())
+if (targetClient->isOper())
 	{
-		strstream s5;
-		s5 << getCharYY() << " 313 " 
+	strstream s5;
+	s5	<< getCharYY()
+		<< " 313 " 
 		<< sourceClient->getCharYYXXX() 
 		<< " " << targetClient->getNickName()
-		<< " :is an IRC Operator" << ends; 
-		Write( s5 );
-		delete[] s5.str(); 
+		<< " :is an IRC Operator"
+		<< ends; 
+	Write( s5 );
+	delete[] s5.str(); 
 	}
 
 	sqlUser* theUser = isAuthed(targetClient, false);
 
-	if (theUser)
+if (theUser)
 	{
-		strstream s6;
-		s6 << getCharYY() << " 316 " 
+	strstream s6;
+	s6	<< getCharYY()
+		<< " 316 " 
 		<< sourceClient->getCharYYXXX() 
 		<< " " << targetClient->getNickName()
-		<< " :is Logged in as " << theUser->getUserName() << ends; 
-		Write( s6 );
-		delete[] s6.str(); 
-	} 
+		<< " :is Logged in as "
+		<< theUser->getUserName()
+		<< ends; 
+	Write( s6 );
+	delete[] s6.str(); 
+	}
 
-	strstream s3;
-	s3 << getCharYY() << " 318 " 
+strstream s3;
+s3	<< getCharYY()
+	<< " 318 " 
 	<< sourceClient->getCharYYXXX() 
 	<< " " << targetClient->getNickName()
-	<< " :End of /WHOIS list." << ends; 
-	Write( s3 );
-	delete[] s3.str();
+	<< " :End of /WHOIS list."
+	<< ends; 
+Write( s3 );
+delete[] s3.str();
 
-
-	return 0;
+return 0;
 }
 
 
