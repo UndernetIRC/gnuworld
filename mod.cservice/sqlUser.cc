@@ -4,7 +4,7 @@
  * Storage class for accessing user information either from the backend
  * or internal storage.
  * 
- * $Id: sqlUser.cc,v 1.15 2001/03/11 02:00:23 gte Exp $
+ * $Id: sqlUser.cc,v 1.16 2001/04/28 20:40:27 gte Exp $
  */
  
 #include	<strstream>
@@ -61,6 +61,7 @@ queryString	<< "SELECT "
 		<< " FROM users,users_lastseen WHERE users.id ="
 		<< "users_lastseen.user_id AND id = "
 		<< userID
+		<< " AND users.deleted != 1"
 		<< ends;
 
 #ifdef LOG_SQL
@@ -111,6 +112,7 @@ queryString	<< "SELECT "
 		<< " users_lastseen.user_id AND lower(user_name) = '"
 		<< string_lower(userName) 
 		<< "'"
+		<< " AND users.deleted != 1"
 		<< ends;
 
 #ifdef LOG_SQL

@@ -91,6 +91,11 @@ if (SQLDb->ExecCommandOk("LISTEN channels_u; LISTEN users_u; LISTEN levels_u;"))
 	// Start the cache expire timer rolling.
 	theTime = time(NULL) + cacheInterval;
 	cache_timerID = theServer->RegisterTimer(theTime, this, NULL); 
+
+	// Start the pending chan timer rolling.
+	theTime = time(NULL) + pendingChanPeriod;
+	pending_timerID = theServer->RegisterTimer(theTime, this, NULL); 
+
 	}
 else 
 	{
@@ -239,6 +244,7 @@ input_flood = atoi((cserviceConfig->Require( "input_flood" )->second).c_str());
 output_flood = atoi((cserviceConfig->Require( "output_flood" )->second).c_str());
 flood_duration = atoi((cserviceConfig->Require( "flood_duration" )->second).c_str());
 topic_duration = atoi((cserviceConfig->Require( "topic_duration" )->second).c_str());
+pendingChanPeriod = atoi((cserviceConfig->Require( "pending_duration" )->second).c_str());
 
 userHits = 0;
 userCacheHits = 0;
@@ -252,6 +258,7 @@ dbErrors = 0;
 
 // Load our translation tables.
 loadTranslationTable(); 
+
 }
 
 cservice::~cservice()
@@ -2026,6 +2033,37 @@ if (timer_id == cache_timerID)
 
 	} 
 
+if (timer_id == pending_timerID)
+	{ 
+	/*
+	 * Quickly loop over all pending channels, and do a notification. 
+	 */
+
+	// Load the list of pending channels.
+	loadPendingChannelList();
+
+	pendingChannelListType::iterator ptr = pendingChannelList.begin();
+	
+	while (ptr != pendingChannelList.end())
+		{
+		sqlPendingChannel* pendingChan = ptr->second;
+		Channel* tmpChan = Network->findChannel(ptr->first);
+		if (tmpChan)
+			{
+			serverNotice(tmpChan, "This channel is currently being processed for registration.");
+			serverNotice(tmpChan, "If you wish to view the details of the application to or to object, please visit:");
+			serverNotice(tmpChan, "http://www.cservice.undernet.org/pendingchannel.php?id=%i", pendingChan->channel_id);
+			}
+		++ptr; 
+		} /* while() */
+	
+ 
+	/* Refresh Timers */
+	time_t theTime = time(NULL) +pendingChanPeriod;
+	pending_timerID = MyUplink->RegisterTimer(theTime, this, NULL);
+	} 
+
+
 return 0 ;
 }
  
@@ -2578,8 +2616,48 @@ switch( whichEvent )
 	case EVT_CREATE:
 	case EVT_JOIN: 
 		{
-		/* God help us if we recieve this for a regg'd channel. */
+		/* 
+		 * We should only ever recieve events for registered channels, or those
+		 * that are 'pending'. If we do get past the pending check, there must be
+		 * some kind of database inconsistancy.
+		 */
+
 		theClient = static_cast< iClient* >( data1 ) ;
+
+		pendingChannelListType::iterator ptr = pendingChannelList.find(theChan->getName()); 
+		if(ptr != pendingChannelList.end())
+			{
+			/*
+			 *  Yes, this channel is pending registration, update join count
+			 *  and check out this user joining.
+			 */
+			ptr->second->join_count++;
+			sqlUser* theUser = isAuthed(theClient, false);
+			if (!theUser)
+				{
+				/*
+				 *  If this user isn't authed, he can't possibly be flagged
+				 *  as one of the valid supporters, so we drop out.
+				 */
+				return xClient::OnChannelEvent( whichEvent, theChan,
+					data1, data2, data3, data4 );
+				}
+
+				/*
+				 * Now, if this guy is a supporter, we bump his join count up.
+				 */
+
+				sqlPendingChannel::supporterListType::iterator Supptr = ptr->second->supporterList.find(theUser->getID());
+				if (Supptr != ptr->second->supporterList.end())
+					{ 
+						Supptr->second++;
+						elog << "Supporter " << theUser->getID() << " joined " << theChan->getName() << endl;
+					}
+
+			return xClient::OnChannelEvent( whichEvent, theChan,
+				data1, data2, data3, data4 ); 
+			}
+ 
 		sqlChannel* reggedChan = getChannelRecord(theChan->getName());
 		if(!reggedChan)
 			{
@@ -3125,10 +3203,86 @@ dbErrors++;
 }
 
 void cservice::loadPendingChannelList()
-{
-//	SELECT channels.name, pending.channel_id, user_id, pending.join_count, supporters.join_count from pending,supporters,channels where pending.channel_id = supporters.channel_id and channels.id = pending.channel_id;
-	sqlPendingChannel* newPending = new sqlPendingChannel();
-	pendingChannelList.insert( pendingChannelListType::value_type("#amigachat", newPending)  );
+{ 
+/*
+ *  First thing first, if the list has something in it, we want to dump it
+ *  out to the database.
+ *  Then, clear the list free'ing up memory and finally emptying the list. 
+ */
+
+
+/*
+ * For simplicity, we assume that if a pending channel is in state "1", then it has 10 valid
+ * supporters who have said "Yes" and we're looking at them.
+ */
+
+strstream theQuery;
+theQuery	<<  "SELECT channels.name, pending.channel_id, user_id, pending.join_count, supporters.join_count"
+			<< " FROM pending,supporters,channels"
+			<< " WHERE pending.channel_id = supporters.channel_id"
+			<< " AND channels.id = pending.channel_id"
+			<< " AND pending.status = 1;"
+			<< ends;
+
+#ifdef LOG_SQL
+	elog	<< "cmaster::loadPendingChannelList> "
+		<< theQuery.str()
+		<< endl; 
+#endif
+
+ExecStatusType status = SQLDb->Exec(theQuery.str()) ;
+delete[] theQuery.str() ;
+
+if( PGRES_TUPLES_OK == status )
+	{
+	for (int i = 0 ; i < SQLDb->Tuples(); i++)
+		{ 
+		string chanName = SQLDb->GetValue(i,0);
+		sqlPendingChannel* newPending;
+
+		/*
+		 *  Is this channel already in our pending list? If so, simply
+		 *  lookup and append this supporter to its list.
+		 *  If not, create a new 'pending' channel entry.
+		 */
+
+		pendingChannelListType::iterator ptr = pendingChannelList.find(chanName);
+
+		if(ptr != pendingChannelList.end()) 
+			{
+			// It already exists.
+			newPending = ptr->second;
+			}
+				else 
+			{
+			newPending = new sqlPendingChannel();
+			newPending->channel_id = atoi(SQLDb->GetValue(i,1));
+			newPending->join_count = atoi(SQLDb->GetValue(i,3));
+			pendingChannelList.insert( pendingChannelListType::value_type(chanName, newPending) );
+
+			/*
+			 *  Lets register our interest in listening on JOIN events for this channel.
+			 */
+			MyUplink->RegisterChannelEvent(chanName, this);
+			}
+
+		/*
+		 *  Next, update the internal supporters list.
+		 */
+		newPending->supporterList.insert(  sqlPendingChannel::supporterListType::value_type(
+			atoi(SQLDb->GetValue(i, 2)), atoi(SQLDb->GetValue(i, 4)) )  );
+		}
+	}
+
+	logDebugMessage("Loaded pending channels, there are currently %i channels being notified and recorded.",
+		pendingChannelList.size());
+
+#ifdef LOG_DEBUG
+	elog	<< "Loaded pending channels, there are currently "
+			<< pendingChannelList.size()
+			<< " channels being notified and recorded."
+			<< endl;
+#endif
 }
  
 void Command::Usage( iClient* theClient )
@@ -3137,3 +3291,4 @@ bot->Notice( theClient, string( "SYNTAX: " ) + getInfo() ) ;
 }
  
 } // namespace gnuworld
+

@@ -1,5 +1,5 @@
 #ifndef __CSERVICE_H
-#define __CSERVICE_H "$Id: cservice.h,v 1.63 2001/04/17 02:13:17 gte Exp $"
+#define __CSERVICE_H "$Id: cservice.h,v 1.64 2001/04/28 20:40:27 gte Exp $"
 
 #include	<string>
 #include	<vector>
@@ -246,6 +246,10 @@ public:
 	int idleChannelPeriod;
 	int idleLevelPeriod;
 
+	/* Duration in seconds at which a 'pending' channel should
+	 * be notified that it is so. */
+	int pendingChanPeriod;
+
 	// Input flood rate.
 	unsigned int input_flood;
 	unsigned int output_flood;
@@ -266,6 +270,9 @@ public:
  
 	/* TimerID we recieve every XX hours for expiration of cached entries */
 	xServer::timerID cache_timerID; 
+
+	/* TimerID we recieve every XX hours for the notification of pending channels */
+	xServer::timerID pending_timerID; 
 
 	// Language definitions table (Loaded from Db).
 	typedef map < string, pair <int, string> > languageTableType;
@@ -311,7 +318,7 @@ public:
 	reopQType reopQ;
 
 	/* List of channels in 'pending' registration state. */
-	typedef map < string, sqlPendingChannel* > pendingChannelListType;
+	typedef hash_map < string, sqlPendingChannel*, eHash, eqstr > pendingChannelListType;
 	pendingChannelListType pendingChannelList;
 
 	/*
