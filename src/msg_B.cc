@@ -21,7 +21,7 @@
 #include	"Network.h"
 #include	"iClient.h"
 
-const char msg_B_cc_rcsId[] = "$Id: msg_B.cc,v 1.1 2001/02/02 18:10:30 dan_karrels Exp $" ;
+const char msg_B_cc_rcsId[] = "$Id: msg_B.cc,v 1.2 2001/02/04 19:35:08 dan_karrels Exp $" ;
 
 using std::string ;
 using std::vector ;
@@ -155,6 +155,9 @@ if( '+' == Param[ whichToken ][ 0 ] )
 		} // for( currentPtr != endPtr )
 
 	// Skip over the modes token
+	// whichToken either points to the modes token if no +l/+k
+	// was specified, or it points to the last +l/+k argument;
+	// skip over this token no matter which.
 	whichToken++ ;
 
 	} // if( '+' == Param[ whichToken ][ 0 ]
@@ -354,8 +357,11 @@ void xServer::parseBurstBans( Channel* theChan, const char* theBans )
 // This is a protected method, so the method arguments are
 // guaranteed to be valid
 
-//clog	<< "xServer::parseBurstBans> Found bans for channel "
-//	<< theChan->getName() << ": " << theBans << endl ;
+elog	<< "xServer::parseBurstBans> Found bans for channel "
+	<< theChan->getName()
+	<< ": "
+	<< theBans
+	<< endl ;
 
 // Tokenize the ban string
 StringTokenizer st( theBans ) ;

@@ -47,7 +47,7 @@
 #include	"ServerTimerHandlers.h"
 
 const char xServer_h_rcsId[] = __XSERVER_H ;
-const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.68 2001/02/04 18:02:20 dan_karrels Exp $" ;
+const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.69 2001/02/04 19:35:08 dan_karrels Exp $" ;
 
 using std::string ;
 using std::vector ;
@@ -1360,6 +1360,14 @@ iClient* theIClient = new (nothrow) iClient(
 assert( theIClient != 0 ) ;
 
 Client->setInstance( theIClient ) ;
+
+if( !Network->addClient( theIClient ) )
+	{
+	elog	<< "xServer::AttachClient> Unable to add theIClient "
+		<< "to the Network table"
+		<< endl ;
+	return false ;
+	}
 
 return true ;
 }

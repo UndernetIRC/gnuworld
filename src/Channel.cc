@@ -361,13 +361,14 @@ for( banVectorType::const_iterator newBanPtr = origBans.begin() ;
 			// Update the iterator
 			++currentBanPtr ;
 			}
-
-		// Now set the new ban
-		// Setting this ban will add the ban into
-		// later comparisons, but not this comparison,
-		// which is what we want.
-		setBan( newBanPtr->second ) ;
 		} // inner for()
+
+	// Now set the new ban
+	// Setting this ban will add the ban into
+	// later comparisons, but not this comparison,
+	// which is what we want.
+	setBan( newBanPtr->second ) ;
+
 	} // outer for()
 }
 
