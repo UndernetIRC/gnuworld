@@ -1,0 +1,153 @@
+This file contains any messages produced by compilers while
+running configure, to aid debugging if configure makes a mistake.
+
+configure:584: checking for a BSD compatible install
+configure:637: checking whether build environment is sane
+configure:694: checking whether make sets ${MAKE}
+configure:733: checking for working aclocal
+configure:746: checking for working autoconf
+configure:759: checking for working automake
+configure:772: checking for working autoheader
+configure:785: checking for working makeinfo
+configure:802: checking whether to enable maintainer-specific portions of Makefiles
+configure:828: checking for gcc
+configure:941: checking whether the C compiler (gcc  ) works
+configure:957: gcc -o conftest    conftest.c  1>&5
+configure:983: checking whether the C compiler (gcc  ) is a cross-compiler
+configure:988: checking whether we are using GNU C
+configure:1016: checking whether gcc accepts -g
+configure:1048: checking for working const
+configure:1102: gcc -c -g -O2  conftest.c 1>&5
+configure:1123: checking for inline
+configure:1137: gcc -c -g -O2  conftest.c 1>&5
+configure:1238: checking host system type
+configure:1259: checking build system type
+configure:1279: checking for ranlib
+configure:1318: checking for ld used by GCC
+configure:1380: checking if the linker (/usr/bin/ld) is GNU ld
+configure:1396: checking for BSD-compatible nm
+configure:1432: checking whether ln -s works
+ltconfig:603: checking for object suffix
+ltconfig:604: gcc -c -g -O2  conftest.c 1>&5
+ltconfig:629: checking for executable suffix
+ltconfig:630: gcc -o conftest -g -O2   conftest.c  1>&5
+ltconfig:776: checking if gcc PIC flag -fPIC works
+ltconfig:777: gcc -c -g -O2 -fPIC -DPIC  conftest.c 1>&5
+ltconfig:829: checking if gcc supports -c -o file.o
+ltconfig:830: gcc -c -g -O2 -o out/conftest2.o  conftest.c 1>&5
+ltconfig:862: checking if gcc supports -c -o file.lo
+ltconfig:863: gcc -c -g -O2 -c -o conftest.lo  conftest.c 1>&5
+ltconfig:914: checking if gcc supports -fno-rtti -fno-exceptions
+ltconfig:915: gcc -c -g -O2 -fno-rtti -fno-exceptions -c conftest.c  conftest.c 1>&5
+ltconfig:958: checking if gcc static flag -static works
+ltconfig:959: gcc -o conftest -g -O2   -static conftest.c  1>&5
+GNU ld version 2.9.5 (with BFD 2.9.5.0.22)
+ltconfig:1635: checking if global_symbol_pipe works
+ltconfig:1636: gcc -c -g -O2  conftest.c 1>&5
+ltconfig:1639: eval "/usr/bin/nm -B conftest.o | sed -n -e 's/^.*[ 	]\([ABCDGISTW]\)[ 	][ 	]*\(\)\([_A-Za-z][_A-Za-z0-9]*\)$/\1 \2\3 \3/p' > conftest.nm"
+ltconfig:1691: gcc -o conftest -g -O2 -fno-builtin -fno-rtti -fno-exceptions   conftest.c conftstm.o 1>&5
+configure:1650: checking which extension is used for shared libraries
+configure:1677: checking which variable specifies run-time library path
+configure:1693: checking for objdir
+configure:1708: checking how to run the C preprocessor
+configure:1788: checking for ANSI C header files
+configure:1895: checking for malloc.h
+configure:1905: gcc -E  conftest.c >/dev/null 2>conftest.out
+configure:1895: checking for memory.h
+configure:1905: gcc -E  conftest.c >/dev/null 2>conftest.out
+configure:1895: checking for stdlib.h
+configure:1905: gcc -E  conftest.c >/dev/null 2>conftest.out
+configure:1895: checking for stdio.h
+configure:1905: gcc -E  conftest.c >/dev/null 2>conftest.out
+configure:1895: checking for ctype.h
+configure:1905: gcc -E  conftest.c >/dev/null 2>conftest.out
+configure:1895: checking for dlfcn.h
+configure:1905: gcc -E  conftest.c >/dev/null 2>conftest.out
+configure:1895: checking for dl.h
+configure:1905: gcc -E  conftest.c >/dev/null 2>conftest.out
+configure:1901: dl.h: No such file or directory
+configure: failed program was:
+#line 1900 "configure"
+#include "confdefs.h"
+#include <dl.h>
+configure:1895: checking for dld.h
+configure:1905: gcc -E  conftest.c >/dev/null 2>conftest.out
+configure:1901: dld.h: No such file or directory
+configure: failed program was:
+#line 1900 "configure"
+#include "confdefs.h"
+#include <dld.h>
+configure:1935: checking for string.h
+configure:1945: gcc -E  conftest.c >/dev/null 2>conftest.out
+configure:1974: checking for strchr
+configure:2002: gcc -o conftest -g -O2   conftest.c  1>&5
+configure:2029: checking for strrchr
+configure:2057: gcc -o conftest -g -O2   conftest.c  1>&5
+configure:2083: checking whether libtool supports -dlopen/-dlpreopen
+configure:2105: checking for dlopen in -ldl
+configure:2124: gcc -o conftest -g -O2   conftest.c -ldl   1>&5
+configure:2199: checking for shl_load
+configure:2227: gcc -o conftest -g -O2   conftest.c  1>&5
+/tmp/ccr4d319.o: In function `main':
+/home/dan/gnuworld/libltdl/configure:2221: undefined reference to `shl_load'
+collect2: ld returned 1 exit status
+configure: failed program was:
+#line 2204 "configure"
+#include "confdefs.h"
+/* System header to define __stub macros and hopefully few prototypes,
+    which can conflict with char shl_load(); below.  */
+#include <assert.h>
+/* Override any gcc2 internal prototype to avoid an error.  */
+/* We use char because int might match the return type of a gcc2
+    builtin and then its argument prototype would still apply.  */
+char shl_load();
+
+int main() {
+
+/* The GNU C library defines this for functions which it implements
+    to always fail with ENOSYS.  Some functions are actually named
+    something starting with __ and the normal name is an alias.  */
+#if defined (__stub_shl_load) || defined (__stub___shl_load)
+choke me
+#else
+shl_load();
+#endif
+
+; return 0; }
+configure:2248: checking for shl_load in -ldld
+configure:2267: gcc -o conftest -g -O2   conftest.c -ldld   1>&5
+/usr/bin/ld: cannot find -ldld
+collect2: ld returned 1 exit status
+configure: failed program was:
+#line 2256 "configure"
+#include "confdefs.h"
+/* Override any gcc2 internal prototype to avoid an error.  */
+/* We use char because int might match the return type of a gcc2
+    builtin and then its argument prototype would still apply.  */
+char shl_load();
+
+int main() {
+shl_load()
+; return 0; }
+configure:2293: checking for dld_link in -ldld
+configure:2312: gcc -o conftest -g -O2   conftest.c -ldld   1>&5
+/usr/bin/ld: cannot find -ldld
+collect2: ld returned 1 exit status
+configure: failed program was:
+#line 2301 "configure"
+#include "confdefs.h"
+/* Override any gcc2 internal prototype to avoid an error.  */
+/* We use char because int might match the return type of a gcc2
+    builtin and then its argument prototype would still apply.  */
+char dld_link();
+
+int main() {
+dld_link()
+; return 0; }
+configure:2343: checking for dlerror
+configure:2371: gcc -o conftest -g -O2   conftest.c  -ldl 1>&5
+configure:2400: checking command to parse /usr/bin/nm -B output
+configure:2463: gcc -c -g -O2  conftest.c 1>&5
+configure:2467: /usr/bin/nm -B conftest.o | sed -n -e 's/^.* \([ABCDGISTW]\) *\(\)\([_A-Za-z][_A-Za-z0-9]*\)$/\1 \2\3 \3/p' > conftest.nm
+configure:2519: gcc -o conftest -g -O2 -fno-builtin -fno-rtti -fno-exceptions   conftest.c conftstm.o 1>&5
+configure:2565: checking for _ prefix in compiled symbols

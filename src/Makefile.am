@@ -1,9 +1,11 @@
 ## Process this file with automake to produce Makefile.in
 bin_PROGRAMS = gnuworld
 
-##gnuworld_LDADD = $(bindir)/libgnuworld.la
 gnuworld_LDFLAGS = -rpath $(bindir) -dlopen $(glibdir)/libgnuworld.la \
 	-R$(bindir) -export-dynamic -module
+gnuworld_LDADD = $(LIBLTDL) "-dlopen" self "-dlopen" \
+	$(glibdir)/libgnuworld.la
+gnuworld_DEPENDENCIES = $(LIBLTDL) $(glibdir)/libgnuworld.la
 gnuworld_SOURCES = Channel.cc \
 	ChannelUser.cc \
 	Network.cc \
@@ -46,4 +48,4 @@ gnuworld_SOURCES = Channel.cc \
 	msg_W.cc \
 	msg_WA.cc \
 	server.cc
-INCLUDES = -I../lib
+INCLUDES = $(INCLTDL)

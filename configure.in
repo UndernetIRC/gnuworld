@@ -1,13 +1,20 @@
-dnl $Id: configure.in,v 1.22 2001/05/11 21:43:39 dan_karrels Exp $
+dnl $Id: configure.in,v 1.23 2001/06/02 22:50:54 dan_karrels Exp $
 dnl ----------------------------------------------------------
 
 echo Configuring GNUWorld...
 echo
 
-AC_REVISION($Revision: 1.22 $)
+AC_REVISION($Revision: 1.23 $)
 AC_INIT(src/main.cc)
 AM_INIT_AUTOMAKE(gnuworld,0.0)
 AM_CONFIG_HEADER(include/defs.h)
+
+AC_LIBLTDL_CONVENIENCE
+AC_SUBST(INCLTDL)
+AC_SUBST(LIBLTDL)
+AC_LIBTOOL_DLOPEN
+AM_PROG_LIBTOOL
+AC_CONFIG_SUBDIRS(libltdl)
 
 CFLAGS="-g -Wall -O0 -pipe"
 CXXFLAGS="-g -Wall -O0 -pipe"
@@ -24,15 +31,11 @@ dnl SRC_PATH="`pwd`/src"
 AC_SUBST(glibdir)
 AC_PROG_CC
 AC_PROG_CXX
-AC_PROG_RANLIB
 AC_PROG_CPP
 AC_LANG_CPLUSPLUS
 AC_ISC_POSIX
 
 AC_PROG_MAKE_SET(gmake)
-AC_DISABLE_STATIC
-AC_LIBTOOL_DLOPEN
-AM_PROG_LIBTOOL
 AC_SUBST(LIBTOOL_DEPS)
 
 AC_CHECK_PROG(UNAME,uname,uname)
@@ -170,7 +173,6 @@ dnl ----------------------------------------------------------
 
 AC_CHECK_LIB(socket,socket)
 AC_CHECK_LIB(nsl,gethostbyname)
-AC_CHECK_LIB(dl,dlopen)
 dnl AC_CHECK_LIB(pthread,pthread_create)
 dnl AC_CHECK_LIB(posix4,sem_init)
 

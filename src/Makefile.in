@@ -69,8 +69,10 @@ CXX = @CXX@
 CXXFLAGS = @CXXFLAGS@
 DLLTOOL = @DLLTOOL@
 GREP = @GREP@
+INCLTDL = @INCLTDL@
 LD = @LD@
 LDFLAGS = @LDFLAGS@
+LIBLTDL = @LIBLTDL@
 LIBTOOL = @LIBTOOL@
 LIBTOOL_DEPS = @LIBTOOL_DEPS@
 LIB_PATH = @LIB_PATH@
@@ -95,9 +97,12 @@ bin_PROGRAMS = gnuworld
 
 gnuworld_LDFLAGS = -rpath $(bindir) -dlopen $(glibdir)/libgnuworld.la 	-R$(bindir) -export-dynamic -module
 
+gnuworld_LDADD = $(LIBLTDL) "-dlopen" self "-dlopen" 	$(glibdir)/libgnuworld.la
+
+gnuworld_DEPENDENCIES = $(LIBLTDL) $(glibdir)/libgnuworld.la
 gnuworld_SOURCES = Channel.cc 	ChannelUser.cc 	Network.cc 	ServerTimerHandlers.cc 	client.cc 	iClient.cc 	iServer.cc 	ip.cc 	main.cc 	msg_AD.cc 	msg_B.cc 	msg_C.cc 	msg_CM.cc 	msg_D.cc 	msg_DS.cc 	msg_EA.cc 	msg_EB.cc 	msg_Error.cc 	msg_G.cc 	msg_GL.cc 	msg_I.cc 	msg_J.cc 	msg_JU.cc 	msg_K.cc 	msg_L.cc 	msg_M.cc 	msg_N.cc 	msg_NOOP.cc 	msg_P.cc 	msg_PART.cc 	msg_PASS.cc 	msg_PRIVMSG.cc 	msg_Q.cc 	msg_R.cc 	msg_RemPing.cc 	msg_S.cc 	msg_SQ.cc 	msg_Server.cc 	msg_T.cc 	msg_W.cc 	msg_WA.cc 	server.cc
 
-INCLUDES = -I../lib
+INCLUDES = $(INCLTDL)
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = ../include/defs.h
 CONFIG_CLEAN_FILES = 
@@ -114,8 +119,6 @@ msg_G.o msg_GL.o msg_I.o msg_J.o msg_JU.o msg_K.o msg_L.o msg_M.o \
 msg_N.o msg_NOOP.o msg_P.o msg_PART.o msg_PASS.o msg_PRIVMSG.o msg_Q.o \
 msg_R.o msg_RemPing.o msg_S.o msg_SQ.o msg_Server.o msg_T.o msg_W.o \
 msg_WA.o server.o
-gnuworld_LDADD = $(LDADD)
-gnuworld_DEPENDENCIES = 
 CXXCOMPILE = $(CXX) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
 LTCXXCOMPILE = $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
 CXXLD = $(CXX)
@@ -125,7 +128,7 @@ DIST_COMMON =  Makefile.am Makefile.in
 
 DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
-TAR = tar
+TAR = gtar
 GZIP_ENV = --best
 DEP_FILES =  .deps/Channel.P .deps/ChannelUser.P .deps/Network.P \
 .deps/ServerTimerHandlers.P .deps/client.P .deps/iClient.P \
@@ -259,7 +262,7 @@ distdir: $(DISTFILES)
 	@for file in $(DISTFILES); do \
 	  d=$(srcdir); \
 	  if test -d $$d/$$file; then \
-	    cp -pr $$/$$file $(distdir)/$$file; \
+	    cp -pr $$d/$$file $(distdir)/$$file; \
 	  else \
 	    test -f $(distdir)/$$file \
 	    || ln $$d/$$file $(distdir)/$$file 2> /dev/null \
