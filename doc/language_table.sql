@@ -21,8 +21,8 @@ COPY "translations" FROM stdin;
 1	10	%s: You are not in that channel	31337	0
 1	11	%s is already opped in %s	31337	0
 1	12	%s is already voiced in %s	31337	0
-1	13	You're deopped by %s (%s)	31337	0
-1	14	You're devoiced by %s (%s)	31337	0
+1	13	You're deopped by %s (%s) on %s	31337	0
+1	14	You're devoiced by %s (%s) on %s	31337	0
 1	15	%s is not opped in %s	31337	0
 1	16	%s is not voiced in %s	31337	0
 1	17	AUTHENTICATION FAILED as %s (Invalid Password)	31337	0
