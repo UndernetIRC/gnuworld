@@ -1,0 +1,17 @@
+
+"$Id: TODO,v 1.1 2001/05/26 16:43:18 mrbean_ Exp $"
+
+[ ] - Add flood check for lame users
+
+[ ] - Add update flags for oper (oper<->admin<->coder)
+
+[ ] - Add glinechan / badchan
+
+[ ] - Fix a minor bug in the suspend checking while loging in
+
+[ ] - Fix a bug in lastcom, not showing the commands in the correct order
+
+[ ] - Cleanup ... dont need to say how much its needed in here
+
+
+
