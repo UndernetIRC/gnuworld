@@ -1,10 +1,10 @@
-dnl $Id: configure.in,v 1.60 2002/08/17 02:03:54 reedloden Exp $
+dnl $Id: configure.in,v 1.61 2002/08/17 03:51:14 reedloden Exp $
 dnl ----------------------------------------------------------
 
 echo Configuring GNUWorld...
 echo
 
-AC_REVISION($Revision: 1.60 $)
+AC_REVISION($Revision: 1.61 $)
 AC_INIT
 AC_CONFIG_SRCDIR([src/main.cc])
 AM_INIT_AUTOMAKE(gnuworld,0.0)
@@ -271,6 +271,7 @@ mod.clientExample/Makefile \
 mod.cloner/Makefile \
 mod.cservice/Makefile \
 mod.gnutest/Makefile \
+mod.nickserv/Makefile \
 mod.scanner/Makefile \
 mod.stats/Makefile \
 bin/ccontrol.example.conf \
