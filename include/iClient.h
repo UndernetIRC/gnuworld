@@ -2,7 +2,7 @@
  */
 
 #ifndef __ICLIENT_H
-#define __ICLIENT_H "$Id: iClient.h,v 1.1 2000/06/30 18:46:06 dan_karrels Exp $"
+#define __ICLIENT_H "$Id: iClient.h,v 1.2 2000/07/12 21:54:11 dan_karrels Exp $"
 
 #include	<string>
 #include	<list>
@@ -69,7 +69,7 @@ public:
 	 * Construct a new iClient given a large list of
 	 * parameters for the client's state.
 	 */
-	iClient( const int& _uplink,
+	iClient( const unsigned int& _uplink,
 		const string& _yyxxx,
 		const string& _nickName,
 		const string& _userName,

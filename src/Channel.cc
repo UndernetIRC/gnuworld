@@ -44,8 +44,8 @@ bool Channel::addUser( ChannelUser* newUser )
 if( !userList.insert(
 	userListType::value_type( newUser->getIntYYXXX(), newUser ) ).second )
 	{
-	elog	<< "Channel::addUser> (" << getName() << "): "
-		<< "Unable to add user: " << *newUser << endl ;
+//	elog	<< "Channel::addUser> (" << getName() << "): "
+//		<< "Unable to add user: " << *newUser << endl ;
 	return false ;
 	}
 
@@ -69,8 +69,8 @@ if( ptr != userList.end() )
 	return ptr->second ;
 	}
 
-elog		<< "Channel::removeUser> (" << getName() << ") "
-		<< "Unable to find user: " << intYYXXX << std::endl ;
+//elog		<< "Channel::removeUser> (" << getName() << ") "
+//		<< "Unable to find user: " << intYYXXX << std::endl ;
 
 return 0 ;
 }
@@ -86,8 +86,8 @@ bool Channel::removeUserMode( const ChannelUser::modeType& whichMode,
 ChannelUser* theChanUser = findUser( theClient ) ;
 if( NULL == theChanUser )
 	{
-	elog	<< "Channel::removeUserMode> (" << getName() << ") "
-		<< "Unable to find user\n" ;
+//	elog	<< "Channel::removeUserMode> (" << getName() << ") "
+//		<< "Unable to find user\n" ;
 	return false ;
 	}
 theChanUser->removeMode( whichMode ) ;
@@ -100,8 +100,8 @@ bool Channel::setUserMode( const ChannelUser::modeType& whichMode,
 ChannelUser* theChanUser = findUser( theClient ) ;
 if( NULL == theChanUser )
 	{
-	elog	<< "Channel::setUserMode> (" << getName() << ") "
-		<< "Unable to find user\n" ;
+//	elog	<< "Channel::setUserMode> (" << getName() << ") "
+//		<< "Unable to find user\n" ;
 	return false ;
 	}
 theChanUser->setMode( whichMode ) ;
@@ -114,8 +114,8 @@ bool Channel::getUserMode( const ChannelUser::modeType& whichMode,
 ChannelUser* theChanUser = findUser( theClient ) ;
 if( NULL == theChanUser )
 	{
-	elog	<< "Channel::getUserMode> (" << getName() << ") "
-		<< "Unable to find user\n" ;
+//	elog	<< "Channel::getUserMode> (" << getName() << ") "
+//		<< "Unable to find user\n" ;
 	return false ;
 	}
 return theChanUser->getMode( whichMode ) ;
@@ -213,13 +213,6 @@ for( const char* modePtr = Param[ 2 ] ; *modePtr ; ++modePtr )
 			argPos++ ;
 			break ;
 		case 'l':
-			if( argPos >= Param.size() )
-				{
-				elog	<< "Channel::OnModeChange> Missing "
-					<< "argument (mode b)\n" ;
-				break ;
-				}
-
 			if( plus )
 				{
 				setLimit( atoi( Param[ argPos ] ) ) ;
@@ -236,7 +229,7 @@ for( const char* modePtr = Param[ 2 ] ; *modePtr ; ++modePtr )
 			if( argPos >= Param.size() )
 				{
 				elog	<< "Channel::OnModeChange> Missing "
-					<< "argument (mode b)\n" ;
+					<< "argument (mode k)\n" ;
 				break ;
 				}
 			if( plus )

@@ -20,7 +20,7 @@
 #include	"misc.h"
 
 const char xNetwork_h_rcsId[] = __XNETWORK_H ;
-const char xNetwork_cc_rcsId[] = "$Id: Network.cc,v 1.4 2000/07/09 18:08:11 dan_karrels Exp $" ;
+const char xNetwork_cc_rcsId[] = "$Id: Network.cc,v 1.5 2000/07/12 21:54:12 dan_karrels Exp $" ;
 
 using std::string ;
 using std::endl ;
@@ -176,8 +176,8 @@ iClient* xNetwork::findClient( const unsigned int& YY,
 if( static_cast< serverVectorType::size_type >( YY ) >= servers.size()
 	|| NULL == servers[ YY ] )
 	{
-	elog		<< "xNetwork::findClient> Server not found: "
-			<< YY << endl ;
+//	elog	<< "xNetwork::findClient> Server not found: "
+//		<< YY << endl ;
 	return 0 ;
 	}
 
@@ -185,8 +185,8 @@ if( static_cast< serverVectorType::size_type >( YY ) >= servers.size()
 if( static_cast< networkVectorType::size_type >( XXX ) >= clients[ YY ].size() )
 	{
 	// Client not found
-	elog	<< "xNetwork::findClient> Client not found: "
-		<< "YY: " << YY << ", XXX: " << XXX << endl ;
+//	elog	<< "xNetwork::findClient> Client not found: "
+//		<< "YY: " << YY << ", XXX: " << XXX << endl ;
 	return 0 ;
 	}
 

@@ -4,7 +4,7 @@
  */
 
 #ifndef __ISERVER_H
-#define __ISERVER_H "$Id: iServer.h,v 1.2 2000/07/08 01:41:05 dan_karrels Exp $"
+#define __ISERVER_H "$Id: iServer.h,v 1.3 2000/07/12 21:54:11 dan_karrels Exp $"
 
 #include	<iostream>
 #include	<string>
@@ -155,9 +155,23 @@ public:
 
 	/**
 	 * Nice debugging method for outputting the iServer's
-	 * information to a C++ output stream.
+	 * information to an ELog stream.
 	 */
 	friend ELog& operator<<( ELog& out,
+		const iServer& serv )
+		{
+		out     << "Name: " << serv.name << ' '
+			<< "intYY: " << serv.intYY << ' '
+			<< "uplinkIntYY: " << serv.uplinkIntYY << ' '
+			<< "charYY: " << serv.charYY ;
+		return out ;
+		}
+
+	/**
+	 * Nice debugging method for outputting the iServer's
+	 * information to an ELog stream.
+	 */
+	friend std::ostream& operator<<( std::ostream& out,
 		const iServer& serv )
 		{
 		out     << "Name: " << serv.name << ' '

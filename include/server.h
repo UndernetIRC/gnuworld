@@ -17,7 +17,7 @@
  */
 
 #ifndef __XSERVER_H
-#define __XSERVER_H "$Id: server.h,v 1.3 2000/07/11 19:31:56 dan_karrels Exp $"
+#define __XSERVER_H "$Id: server.h,v 1.4 2000/07/12 21:54:11 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
@@ -654,10 +654,25 @@ protected:
 	// DE(SYNCH) ?
 	DECLARE_MSG(DS);
 
+	// AD(MIN)
+	DECLARE_MSG(AD);
+
 	/// NOOP message.
 	/// Use this handler for any messages that we don't need to handle.
 	/// Included for completeness.
 	DECLARE_MSG(NOOP);
+
+	// Non-tokenized command handlers
+	// Replication of code *sigh*
+
+	/// PART
+	DECLARE_MSG(Part);
+
+	/// JOIN
+	DECLARE_MSG(Join);
+
+	/// MODE
+	DECLARE_MSG(Mode);
 
 	/**
 	 * Bounds checker for events.

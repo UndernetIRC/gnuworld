@@ -10,14 +10,14 @@
 #include	"ip.h"
 
 const char iClient_h_rcsId[] = __ICLIENT_H ;
-const char iClient_cc_rcsId[] = "$Id: iClient.cc,v 1.1 2000/06/30 18:46:07 dan_karrels Exp $" ;
+const char iClient_cc_rcsId[] = "$Id: iClient.cc,v 1.2 2000/07/12 21:54:12 dan_karrels Exp $" ;
 
 using std::string ;
 
 namespace gnuworld
 {
 
-iClient::iClient( const int& _uplink,
+iClient::iClient( const unsigned int& _uplink,
 	const string& _yxx,
 	const string& _nickName,
 	const string& _userName,

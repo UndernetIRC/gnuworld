@@ -37,7 +37,7 @@
 //#include	"moduleLoader.h"
 
 const char xServer_h_rcsId[] = __XSERVER_H ;
-const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.5 2000/07/11 19:31:56 dan_karrels Exp $" ;
+const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.6 2000/07/12 21:54:12 dan_karrels Exp $" ;
 
 using std::string ;
 using std::vector ;
@@ -137,7 +137,7 @@ REGISTER_MSG( "SERVER", Server );
 
 // Nick
 REGISTER_MSG( "N", N );
-REGISTER_MSG( "NICK", Nick );
+REGISTER_MSG( "NICK", N );
 
 // End of Burst
 REGISTER_MSG( "END_OF_BURST", EndOfBurst );
@@ -163,7 +163,6 @@ REGISTER_MSG( "PRIVMSG", P );
 
 // Mode
 REGISTER_MSG( "M", M );
-REGISTER_MSG( "MODE", M );
 
 // Quit
 REGISTER_MSG( "Q", Q );
@@ -173,23 +172,23 @@ REGISTER_MSG( "QUIT", Quit );
 REGISTER_MSG( "B", B );
 REGISTER_MSG( "BURST", B );
 
-// Join, Create
-REGISTER_MSG( "JOIN", J );
-REGISTER_MSG( "J", J );
-REGISTER_MSG( "C", C );
-REGISTER_MSG( "CREATE", C );
+// Join
+REGISTER_MSG( "J", J ) ;
 
-// Part, Leave
-REGISTER_MSG( "L", L );
-REGISTER_MSG( "LEAVE", L );
-REGISTER_MSG( "PART", L );
+// Create
+REGISTER_MSG( "C", C ) ;
+REGISTER_MSG( "CREATE", C ) ;
+
+// Leave
+REGISTER_MSG( "L", L ) ;
 
 // Squit
-REGISTER_MSG( "SQUIT", SQ );
+REGISTER_MSG( "SQUIT", SQ ) ;
 REGISTER_MSG( "SQ", SQ ) ;
 
 // Kill
-REGISTER_MSG( "D", D );
+REGISTER_MSG( "D", D ) ;
+REGISTER_MSG( "KILL", D ) ;
 
 REGISTER_MSG( "WA", WA ) ;
 
@@ -200,21 +199,43 @@ REGISTER_MSG( "PASS", PASS ) ;
 
 // GLINE
 REGISTER_MSG( "GL", GL ) ;
+REGISTER_MSG( "GLINE", GL ) ;
 
 // TOPIC
 REGISTER_MSG( "T", T ) ;
+REGISTER_MSG( "TOPIC", T ) ;
 
 // KICK
 REGISTER_MSG( "K", K ) ;
+REGISTER_MSG( "KICK", K ) ;
 
 // No idea
 REGISTER_MSG( "DS", DS ) ;
+
+// Admin
+REGISTER_MSG( "AD", AD ) ;
+REGISTER_MSG( "ADMIN", AD ) ;
+
+// Non-tokenized command handlers
+
+// Part
+REGISTER_MSG( "PART", Part ) ;
+
+// Join
+REGISTER_MSG( "JOIN", Join ) ;
+
+// Mode
+REGISTER_MSG( "MODE", Mode ) ;
 
 // WHOIS
 REGISTER_MSG( "W", NOOP ) ;
 
 // AWAY
 REGISTER_MSG( "A", NOOP ) ;
+REGISTER_MSG( "AWAY", NOOP ) ;
+
+// SILENCE
+REGISTER_MSG( "SILENCE", NOOP ) ;
 
 /*
  * Load and attach any modules specified in the config.
@@ -1527,6 +1548,7 @@ if( NULL == theChan )
 	catch( std::bad_alloc )
 		{
 		elog	<< "xServer::MSG_B> Memory allocation failure\n" ;
+		return -1 ;
 		}
 	if( !Network->addChannel( theChan ) )
 		{
@@ -1558,7 +1580,7 @@ if( '+' == Param[ whichToken ][ 0 ] )
 	// Skip over the '+'
 	++currentPtr ;
 
-	while( currentPtr && *currentPtr )
+	for( ; currentPtr && *currentPtr ; ++currentPtr )
 		{
 		switch( *currentPtr )
 			{
@@ -1596,11 +1618,11 @@ if( '+' == Param[ whichToken ][ 0 ] )
 				break ;
 			} // switch
 
-		++currentPtr ;
-		} // while( currentPtr != endPtr )
+		} // for( currentPtr != endPtr )
 
 	// Skip over the modes token
 	whichToken++ ;
+
 	} // if( '+' == Param[ whichToken ][ 0 ]
 
 // Have we reached the end of this burst command?
@@ -1676,7 +1698,13 @@ for( StringTokenizer::const_iterator ptr = st.begin() ; ptr != st.end() ;
 	theClient->addChannel( theChan ) ;
 
 	// Add this user to the channel's database.
-	theChan->addUser( chanUser ) ;
+	if( !theChan->addUser( chanUser ) )
+		{
+		elog	<< "xServer::parseBurstUsers> Unable to add user "
+			<< theClient->getNickName() << " to channel "
+			<< theChan->getName() << endl ;
+		continue ;
+		}
 
 	if( string::npos == pos )
 		{
@@ -1756,51 +1784,123 @@ if( Param.size() < 2 )
 	return -1 ;
 	}
 
-if( '+' == Param[ 0 ][ 0 ] )
+if( '+' == Param[ 1 ][ 0 ] )
 	{
 	// Don't care about modeless channels
 	return 0 ;
 	}
 
 // Find the client in question
+// TODO: This could conceivably find a matching client *sigh*
 iClient* theClient = Network->findClient( Param[ 0 ] ) ;
 if( NULL == theClient )
 	{
 	elog	<< "xServer::MSG_L> Unable to find client: "
 		<< Param[ 0 ] << endl ;
 	return -1 ;
+
 	}
 
-// Get the channel that was just parted.
-Channel* theChan = Network->findChannel( Param[ 1 ] ) ;
-if( NULL == theChan )
+StringTokenizer st( Param[ 1 ], ',' ) ;
+for( StringTokenizer::size_type i = 0 ; i < st.size() ; ++i )
 	{
-	elog	<< "xServer::MSG_L> Unable to find channel: "
-		<< Param[ 1 ] << endl ;
+	// Get the channel that was just parted.
+	Channel* theChan = Network->findChannel( st[ i ] ) ;
+	if( NULL == theChan )
+		{
+		elog	<< "xServer::MSG_L> Unable to find channel: "
+			<< st[ i ] << endl ;
+		return -1 ;
+		}
+
+	// Remove and deallocate the ChannelUser instance from this
+	// channel's ChannelUser structure.
+	delete theChan->removeUser( theClient ) ;
+
+	// Remove this channel from this client's channel structure.
+	theClient->removeChannel( theChan ) ;
+
+	// Post the event to the clients listening for events on this
+	// channel, if any.
+	// TODO: Update message posting
+	// TODO: Check if channel is empty, remove if so
+
+	PostChannelEvent( EVT_PART, theChan->getName(),
+		static_cast< void* >( theChan ),
+		static_cast< void* >( theClient ) ) ;
+
+	if( theChan->empty() )
+		{
+		// No users in the channel, remove it.
+		delete Network->removeChannel( theChan->getName() ) ;
+		}
+	} // for
+
+return 0 ;
+}
+
+/**
+ * Non-tokenized command handler.
+ */
+int xServer::MSG_Part( xParameters& Param )
+{
+
+if( Param.size() < 2 )
+	{
+	elog	<< "xServer::MSG_Part> Invalid number of arguments\n" ;
 	return -1 ;
 	}
 
-// Remove and deallocate the ChannelUser instance from this
-// channel's ChannelUser structure.
-delete theChan->removeUser( theClient ) ;
-
-// Remove this channel from this client's channel structure.
-theClient->removeChannel( theChan ) ;
-
-// Post the event to the clients listening for events on this
-// channel, if any.
-// TODO: Update message posting
-// TODO: Check if channel is empty, remove if so
-
-PostChannelEvent( EVT_PART, theChan->getName(),
-	static_cast< void* >( theChan ),
-	static_cast< void* >( theClient ) ) ;
-
-if( theChan->empty() )
+if( '+' == Param[ 1 ][ 0 ] )
 	{
-	// No users in the channel, remove it.
-	delete Network->removeChannel( theChan->getName() ) ;
+	// Don't care about modeless channels
+	return 0 ;
 	}
+
+// Find the client in question
+iClient* theClient = Network->findNick( Param[ 0 ] ) ;
+if( NULL == theClient )
+	{
+	elog	<< "xServer::MSG_Part> Unable to find client: "
+		<< Param[ 0 ] << endl ;
+	return -1 ;
+
+	}
+
+StringTokenizer st( Param[ 1 ], ',' ) ;
+for( StringTokenizer::size_type i = 0 ; i < st.size() ; ++i )
+	{
+	// Get the channel that was just parted.
+	Channel* theChan = Network->findChannel( st[ i ] ) ;
+	if( NULL == theChan )
+		{
+		elog	<< "xServer::MSG_Part> Unable to find channel: "
+			<< st[ i ] << endl ;
+		return -1 ;
+		}
+
+	// Remove and deallocate the ChannelUser instance from this
+	// channel's ChannelUser structure.
+	delete theChan->removeUser( theClient ) ;
+
+	// Remove this channel from this client's channel structure.
+	theClient->removeChannel( theChan ) ;
+
+	// Post the event to the clients listening for events on this
+	// channel, if any.
+	// TODO: Update message posting
+	// TODO: Check if channel is empty, remove if so
+
+	PostChannelEvent( EVT_PART, theChan->getName(),
+		static_cast< void* >( theChan ),
+		static_cast< void* >( theClient ) ) ;
+
+	if( theChan->empty() )
+		{
+		// No users in the channel, remove it.
+		delete Network->removeChannel( theChan->getName() ) ;
+		}
+	} // for
 
 return 0 ;
 }
@@ -1819,7 +1919,7 @@ if( Param.size() < 3 )
 	return -1 ;
 	}
 
-if( '+' == Param[ 2 ][ 0 ] )
+if( '+' == Param[ 1 ][ 0 ] )
 	{
 	// Don't care about modeless channels
 	return 0 ;
@@ -1843,10 +1943,20 @@ if( NULL == theChan )
 	return -1 ;
 	}
 
+theChan->removeUser( theClient ) ;
+theClient->removeChannel( theChan ) ;
+
 // All we really have to do here is post the message.
+// TODO: Send the source of the kick
 PostChannelEvent( EVT_KICK, theChan->getName(),
 	static_cast< void* >( theChan ),
 	static_cast< void* >( theClient ) ) ;
+
+// Any users left in the channel?
+if( theChan->empty() )
+	{
+	delete Network->removeChannel( theChan->getName() ) ;
+	}
 
 return 0 ;
 
@@ -1901,7 +2011,12 @@ for( StringTokenizer::const_iterator ptr = st.begin() ; ptr != st.end() ;
 		// Not sure why this channel is in existence
 		// Oh well, just add this user to the channel
 		// *shrug*
-		theChan->addUser( new ChannelUser( theClient ) ) ;
+		if( !theChan->addUser( new ChannelUser( theClient ) ) )
+			{
+			elog	<< "xServer::MSG_C> Unable to add user "
+				<< theClient->getNickName() << " to channel "
+				<< theChan->getName() << endl ;
+			}
 
 		continue ;
 		}
@@ -1978,6 +2093,12 @@ return 0 ;
 int xServer::MSG_J( xParameters& Param )
 {
 
+if( Param.size() < 2 )
+	{
+	elog	<< "xServer::MSG_J> Invalid number of arguments\n" ;
+	return -1 ;
+	}
+
 // Find the client in question.
 iClient* Target = Network->findClient( Param[ 0 ] ) ;
 if( NULL == Target )
@@ -1987,12 +2108,23 @@ if( NULL == Target )
 	return -1 ;
 	}
 
+if( '0' == Param[ 1 ][ 0 ] )
+	{
+	// Artifact, user is parting all channels
+	for( iClient::channelIterator ptr = Target->channels_begin(),
+		endPtr = Target->channels_end() ; ptr != endPtr ; ++ptr )
+		{
+		delete (*ptr)->removeUser( Target->getIntYY() ) ;
+		}
+	Target->clearChannels() ;
+	return 0 ;
+	}
+
 // Tokenize by ',', as the client may join more than one
 // channel at once.
 StringTokenizer st( Param[ 1 ], ',' ) ;
 for( StringTokenizer::size_type i = 0 ; i < st.size() ; i++ )
 	{
-
 	if( '+' == st[ i ][ 0 ] )
 		{
 		// Don't care about modeless channels
@@ -2009,7 +2141,6 @@ for( StringTokenizer::size_type i = 0 ; i < st.size() ; i++ )
 		// Attempt to keep somewhat close to actual
 		// "global" state.
 		continue ;
-
 		}
 
 	ChannelUser* theUser = 0 ;
@@ -2019,7 +2150,7 @@ for( StringTokenizer::size_type i = 0 ; i < st.size() ; i++ )
 		}
 	catch( std::bad_alloc )
 		{
-		elog	<< "MSG_J> Memory allocation failure\n" ;
+		elog	<< "xServer::MSG_J> Memory allocation failure\n" ;
 		return -1 ;
 		}
 
@@ -2027,7 +2158,103 @@ for( StringTokenizer::size_type i = 0 ; i < st.size() ; i++ )
 	// channel's user structure.
 	if( !theChan->addUser( theUser ) )
 		{
-		elog	<< "xServer::MSG_J> Unable to add user to channel: "
+		elog	<< "xServer::MSG_J> Unable to add user "
+			<< theUser->getNickName() << " to channel: "
+			<< theChan->getName() << endl ;
+
+		// Addition of ChannelUser failed.
+		delete theUser ;
+
+		return -1 ;
+		}
+
+	// Add this channel to this client's channel structure.
+	Target->addChannel( theChan ) ;
+
+	// Post the event to the clients listening for events on this
+	// channel, if any.
+	// TODO: Update message posting.
+	PostChannelEvent( EVT_JOIN, theChan->getName(),
+		static_cast< void* >( theChan ),
+		static_cast< void* >( Target ) ) ;
+
+	} // for()
+
+return 0 ;
+
+}
+
+// Non-tokenized command handler
+int xServer::MSG_Join( xParameters& Param )
+{
+
+if( Param.size() < 2 )
+	{
+	elog	<< "xServer::MSG_Join> Invalid number of arguments\n" ;
+	return -1 ;
+	}
+
+// Find the client in question.
+iClient* Target = Network->findNick( Param[ 0 ] ) ;
+if( NULL == Target )
+	{
+	elog	<< "xServer::MSG_Join> Unable to find user: "
+		<< Param[ 0 ] << endl ;
+	return -1 ;
+	}
+
+if( '0' == Param[ 1 ][ 0 ] )
+	{
+	// Artifact, user is parting all channels
+	for( iClient::channelIterator ptr = Target->channels_begin(),
+		endPtr = Target->channels_end() ; ptr != endPtr ; ++ptr )
+		{
+		delete (*ptr)->removeUser( Target->getIntYY() ) ;
+		}
+	Target->clearChannels() ;
+	return 0 ;
+	}
+
+// Tokenize by ',', as the client may join more than one
+// channel at once.
+StringTokenizer st( Param[ 1 ], ',' ) ;
+for( StringTokenizer::size_type i = 0 ; i < st.size() ; i++ )
+	{
+	if( '+' == st[ i ][ 0 ] )
+		{
+		// Don't care about modeless channels
+		continue ;
+		}
+
+	// On a JOIN command, the channel should already exist.
+	Channel* theChan = Network->findChannel( st[ i ] ) ;
+	if( NULL == theChan )
+		{
+		elog	<< "xServer::MSG_Join> Unable to find channel: "
+			<< st[ i ] << endl ;
+
+		// Attempt to keep somewhat close to actual
+		// "global" state.
+		continue ;
+		}
+
+	ChannelUser* theUser = 0 ;
+	try
+		{
+		theUser = new ChannelUser( Target ) ;
+		}
+	catch( std::bad_alloc )
+		{
+		elog	<< "xServer::MSG_Join> Memory allocation failure\n" ;
+		return -1 ;
+		}
+
+	// Add a new ChannelUser representing this client to this
+	// channel's user structure.
+	if( !theChan->addUser( theUser ) )
+		{
+		elog	<< "xServer::MSG_Join> Unable to add user "
+			<< theUser->getNickName() << " to channel: "
 			<< theChan->getName() << endl ;
 
 		// Addition of ChannelUser failed.
@@ -2094,8 +2321,20 @@ if( NULL != myClient )
 // Otherwise, it's a non-local client.
 iClient* source = Network->findClient( Param[ 0 ] ) ;
 iServer* serverSource = 0 ;
-if( NULL == source )
+
+if( NULL == strchr( Param[ 0 ], '.' ) )
 	{
+	// Not a server, check for nickname
+	source = Network->findNick( Param[ 0 ] ) ;
+	if( NULL == source )
+		{
+		elog	<< "xServer::MSG_D> Unable to find source\n" ;
+		return -1 ;
+		}
+	}
+else
+	{
+	// Server
 	serverSource = Network->findServer( Param[ 0 ] ) ;
 	if( NULL == serverSource )
 		{
@@ -2131,6 +2370,19 @@ else
 		static_cast< void* >( serverSource ),
 		static_cast< void* >( target ),
 		static_cast< void* >( &reason ) ) ;
+	}
+
+// Remove user->channel associations
+for( iClient::channelIterator ptr = target->channels_begin(),
+	endPtr = target->channels_end() ; ptr != endPtr ;
+	++ptr )
+	{
+	delete (*ptr)->removeUser( target ) ;
+	if( (*ptr)->empty() )
+		{
+		// Channel now empty
+		delete Network->removeChannel( (*ptr)->getName() ) ;
+		}
 	}
 
 // Deallocate the memory associated with this iClient.
@@ -2271,6 +2523,9 @@ burstStart = ::time( 0 ) ;
 // 1: It's our uplink
 if( Param[ 1 ][ 0 ] == '1' )
 	{
+
+//	clog	<< "xServer::MSG_Server> Got Uplink: " << Param[ 0 ] << endl ;
+
 	// It's our uplink
 	if( Param.size() < 6 )
 		{
@@ -2348,16 +2603,18 @@ else
 	// of tokenized commands.
 
 //	elog << "MSG_SERVER: Depracated section\n" ;
+//	clog	<< "xServer::MSG_Server> Param[ 3 ]: " << Param[ 3 ] << endl ;
 
 	const char* ServerName = Param[ 1 ] ;
 	time_t StartTime = atoi( Param[ 3 ] ) ;
 	time_t ConnectionTime = atoi( Param[ 4 ] ) ;
 	const char* Version = Param[ 5 ];
 	const char* YXX = Param[ 6 ] ;
+
 	iServer* uplink = Network->findServer( Param[ 0 ] ) ;
 	if( NULL == uplink )
 		{
-		elog	<< "MSG_Server> Unable to find server: "
+		elog	<< "xServer::MSG_Server> Unable to find server: "
 			<< Param[ 0 ] << endl ;
 		return -1 ;
 		}
@@ -2390,6 +2647,7 @@ else
 
 		Network->addServer( newServer ) ;
 		}
+
 	if( !bursting && *Version == 'J' )
 		{
 		iServer* Server = Network->findServer( ServerName ) ;
@@ -2398,7 +2656,6 @@ else
 			{
 			PostEvent( EVT_NETJOIN, Uplink, Server ) ;
 			}
-		// Expand glines
 		}
 	}
 // Not posting message here because this method is only called once
@@ -2880,34 +3137,34 @@ if( Param.size() < 8 )
 iServer* Server = Network->findServer( Param[ 0 ] ) ;
 if( NULL == Server )
 	{
-	elog	<< "xServer::MSG_Nick> Unable to find server\n" ;
-	elog	<< "Y: " << Param[ 0 ] << ", Numeric: "
+	elog	<< "xServer::MSG_Nick> Unable to find server, "
+		<< "Y: " << Param[ 0 ] << ", Numeric: "
 		<< base64toint( Param[ 0 ] ) <<  endl ;
 	return -1 ;
 	}
 
-char		*Nick,
-		*YXX,
-		*CTime,
-		*UserID,
-		*Mode,
-		*Host ;
+const char	*Nick = 0,
+		*YXX = 0,
+		*CTime = 0,
+		*UserID = 0,
+		*Mode = 0,
+		*Host = 0 ;
 
 if( '+' == Param[ 6 ][ 0 ] )
 	{
 	// Mode set
 	Mode = Param[ 6 ] ;
-	YXX = Param[ 8 ] ;
 	Host = Param[ 7 ] ;
+	YXX = Param[ 8 ] ;
 	}
 else
 	{
-	YXX = Param[ 7 ] ;
 	Host = Param[ 6 ] ;
+	YXX = Param[ 7 ] ;
 	Mode = "";
 	}
 
-char* InsecureHostMask = Param[ 5 ] ;
+const char* InsecureHostMask = Param[ 5 ] ;
 Nick = Param[ 1 ] ;
 CTime = Param[ 3 ] ;
 UserID = Param[ 4 ] ;
@@ -3262,20 +3519,13 @@ if( Param.size() < 3 )
 	return -1 ;
 	}
 
-// Param[ 1 ] could be either the nickname or the numeric
-// of a client.
-// At present, the second argument is the nickname, so
-// let's check for that first (it also avoids a numeric
-// translation, a nick lookup is a little bit faster,
-// although both lookups are O(1).
-//
-iClient* theClient = Network->findNick( Param[ 1 ] ) ;
-if( NULL == theClient )
+iClient* source = Network->findClient( Param[ 0 ] ) ;
+if( NULL == source )
 	{
-	theClient = Network->findClient( Param[ 1 ] ) ;
-	if( NULL == theClient )
+	if( NULL == strchr( Param[ 0 ], '.' ) )
 		{
-		elog	<< "xServer::MSG_M> Unable to find client\n" ;
+		elog	<< "xServer::MSG_M> Unable to find source client: "
+			<< Param[ 0 ] << endl ;
 		return -1 ;
 		}
 	}
@@ -3292,7 +3542,7 @@ if( '#' == Param[ 1 ][ 0 ] )
 
 	// This is a bit of a violation of encapsulation.
 	// Not too bad though.
-	theChan->OnModeChange( theClient, Param ) ;
+	theChan->OnModeChange( source, Param ) ;
 
 	string modes( Param[ 2 ] ) ;
 
@@ -3302,11 +3552,121 @@ if( '#' == Param[ 1 ][ 0 ] )
 	return 0 ;
 	}
 
+// Otherwise, it's a user mode change.
+// Since users aren't allowed to change modes for anyone other than
+// themselves, there is no need to lookup the second user argument
+iClient* theClient = source ;
+
 // Local channels are not propogated across the network.
 
-// We're just going to assume that the user is only
-// changing modes for itself, as any decent irc server
-// will only allow that.
+// It's important that the mode '+' be default
+bool plus = true ;
+
+for( const char* modePtr = Param[ 2 ] ; *modePtr ; ++modePtr )
+	{
+	switch( *modePtr )
+		{
+		case '+':
+			plus = true ;
+			break;
+		case '-':
+			plus = false ;
+			break;
+		case 'i':
+			if( plus )
+				theClient->addMode( iClient::MODE_INVISIBLE ) ;
+			else
+				theClient->removeMode( iClient::MODE_INVISIBLE ) ;
+			break ;
+		case 'k':
+			if( plus )
+				theClient->addMode( iClient::MODE_SERVICES ) ;
+			else
+				theClient->removeMode( iClient::MODE_SERVICES ) ;
+			break ;
+		case 'd':
+			if( plus )
+				theClient->addMode( iClient::MODE_DEAF ) ;
+			else
+				theClient->removeMode( iClient::MODE_DEAF ) ;
+			break ;
+		case 'w':
+			if( plus )
+				theClient->addMode( iClient::MODE_WALLOPS ) ;
+			else
+				theClient->removeMode( iClient::MODE_WALLOPS ) ;
+			break ;
+		case 'o':
+			if( plus )
+				{
+				theClient->addMode( iClient::MODE_OPER ) ;
+				PostEvent( EVT_OPER,
+					static_cast< void* >( theClient ) ) ;
+				}
+			else
+				{
+				theClient->removeMode( iClient::MODE_OPER ) ;
+				// TODO: Post message
+				}
+			break ;
+		default:
+			break ;
+		} // close switch
+	} // close for
+
+// No need to post message here, for now, because the only important
+// network event is mode +o/-o
+return 0 ;
+}
+
+int xServer::MSG_Mode( xParameters& Param )
+{
+
+if( Param.size() < 3 )
+	{
+	elog	<< "xServer::MSG_Mode> Invalid number of arguments\n" ;
+	return -1 ;
+	}
+
+iClient* source = Network->findNick( Param[ 0 ] ) ;
+if( NULL == source )
+	{
+	if( NULL == strchr( Param[ 0 ], '.' ) )
+		{
+		elog	<< "xServer::MSG_Mode> Unable to find source client: "
+			<< Param[ 0 ] << endl ;
+		return -1 ;
+		}
+	}
+
+if( '#' == Param[ 1 ][ 0 ] )
+	{
+	Channel* theChan = Network->findChannel( Param[ 1 ] ) ;
+	if( NULL == theChan )
+		{
+		elog	<< "xServer::MSG_Mode> Unable to find channel: "
+			<< Param[ 1 ] << endl ;
+		return -1 ;
+		}
+
+	// This is a bit of a violation of encapsulation.
+	// Not too bad though.
+	theChan->OnModeChange( source, Param ) ;
+
+	string modes( Param[ 2 ] ) ;
+
+	PostChannelEvent( EVT_MODE, theChan->getName(),
+		static_cast< void* >( &modes ) ) ;
+
+	return 0 ;
+	}
+
+// Otherwise, it's a user mode change.
+// Since users aren't allowed to change modes for anyone other than
+// themselves, there is no need to lookup the second user argument
+iClient* theClient = source ;
+
+// Local channels are not propogated across the network.
 
 // It's important that the mode '+' be default
 bool plus = true ;
@@ -3386,6 +3746,11 @@ else
 		static_cast< int >( tv.tv_usec ) ) ;
 	}
 return buf ;
+}
+
+int xServer::MSG_AD( xParameters& )
+{
+return 0 ;
 }
 
 // Remote Ping message
