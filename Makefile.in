@@ -1,4 +1,4 @@
-# $Id: Makefile.in,v 1.2 2000/07/05 19:15:06 dan_karrels Exp $
+# $Id: Makefile.in,v 1.3 2000/07/07 14:20:34 dan_karrels Exp $
 # all		-- gnuworld
 # clean		-- cleanup objects and executable
 # distclean	-- everything =P
@@ -67,7 +67,7 @@ clean:
 	@-if [ -f lib/Makefile ]; then cd lib; $(MAKE2) clean; fi
 	@-if [ -f src/Makefile ]; then cd src; $(MAKE2) clean; fi
 
-distclean cleandir realclean: clean
+distclean cleandir realclean:
 	$(RM) config.status config.cache
 	$(RM) config.log include/defs.h
 	@cd lib; $(MAKE2) distclean
