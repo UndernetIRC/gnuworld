@@ -21,7 +21,7 @@
 #include	"ccontrol.h"
  
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.4 2001/01/12 22:49:24 dan_karrels Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.5 2001/01/28 15:37:31 dan_karrels Exp $" ;
 
 using std::string ;
 using std::vector ;
@@ -46,19 +46,11 @@ extern "C"
 } 
  
 ccontrol::ccontrol( const string& configFileName )
+ : xClient( configFileName )
 {
 
 // Read the config file
 EConfig conf( configFileName ) ;
-
-// Read out critical client information
-nickName = conf.Require( "nickname" )->second ;
-userName = conf.Require( "username" )->second ;
-hostName = conf.Require( "hostname" )->second ;
-userDescription = conf.Require( "userdescription" )->second ;
-
-// Read the bot's modes
-Mode( conf.Find( "mode" )->second ) ;
 
 // operChanReason is the reason used when kicking non-opers from
 // oper-only channels
@@ -313,7 +305,7 @@ if( isOnChannel( chanName ) )
 	// Already on this channel
 	return true ;
 	}
-bool result = xClient::Join( chanName ) ;
+bool result = xClient::Join( chanName, string(), 0, true ) ;
 if( result )
 	{
 	MyUplink->RegisterChannelEvent( chanName, this ) ;
@@ -351,30 +343,19 @@ if( result )
 return result ;
 }
 
-bool ccontrol::Kick( Channel* theChan, iClient* theClient, const string& reason )
+bool ccontrol::Kick( Channel* theChan, iClient* theClient,
+	const string& reason )
 {
 #ifndef NDEBUG
   assert( theChan != NULL ) ;
 #endif
 
-bool doPart = false ;
 if( !isOnChannel( theChan->getName() ) )
 	{
-	// Im not on the channel
-	doPart = true ;
-
-	Join( theChan->getName() ) ;
-	operChans.push_back( theChan->getName() ) ;
+	return false ;
 	}
 
-bool result = xClient::Kick( theChan, theClient, reason ) ;
-
-if( doPart )
-	{
-	Part( theChan->getName() ) ;
-	}
-
-return result ;
+return xClient::Kick( theChan, theClient, reason ) ;
 }
 
 bool ccontrol::addOperChan( const string& chanName )
@@ -389,7 +370,7 @@ if( isOperChan( chanName ) )
 	return false ;
 	}
 
-Join( chanName ) ;
+xClient::Join( chanName, operChanModes, 0, true ) ;
 operChans.push_back( chanName ) ;
 
 Channel* theChan = Network->findChannel( chanName ) ;

@@ -26,7 +26,7 @@
 #include	"events.h"
 
 const char xClient_h_rcsId[] = __XCLIENT_H ;
-const char xClient_cc_rcsId[] = "$Id: client.cc,v 1.24 2001/01/27 04:26:42 gte Exp $" ;
+const char xClient_cc_rcsId[] = "$Id: client.cc,v 1.25 2001/01/28 15:37:31 dan_karrels Exp $" ;
 
 using std::string ;
 using std::strstream ;
@@ -1157,7 +1157,8 @@ MyUplink->onChannelModeB( theChan, 0, banVector ) ;
 return true ;
 }
 
-bool xClient::BanKick( Channel* theChan, iClient* theClient, const string& reason )
+bool xClient::BanKick( Channel* theChan, iClient* theClient,
+	const string& reason )
 {
 #ifndef NDEBUG
   assert( theChan != 0 ) ;
@@ -1209,7 +1210,8 @@ MyUplink->OnPartChannel( theClient, theChan ) ;
 return true ;
 }
 
-bool xClient::Kick( Channel* theChan, iClient* theClient, const string& reason )
+bool xClient::Kick( Channel* theChan, iClient* theClient,
+	const string& reason )
 {
 #ifndef NDEBUG
   assert( theChan != NULL && theClient != NULL ) ;
@@ -1320,7 +1322,7 @@ if( !Connected )
 	}
 
 // Ask the server to join this bot into the given channel.
-MyUplink->JoinChannel( this, chanName, string(), joinTime, getOps ) ;
+MyUplink->JoinChannel( this, chanName, chanModes, joinTime, getOps ) ;
 return true ;
 }
 

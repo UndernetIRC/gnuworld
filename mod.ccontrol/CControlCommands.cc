@@ -18,6 +18,7 @@
 namespace ccontrolns
 {
 
+using std::string ;
 using namespace gnuworld ;
 
 void Command::Usage( iClient* theClient )
