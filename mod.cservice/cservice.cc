@@ -432,7 +432,7 @@ if(!tmpData)
 tmpData->ignored = _ignored;
 }
  
-bool cservice::hasFlooded(iClient* theClient)
+bool cservice::hasFlooded(iClient* theClient, const string& type)
 {
 if( (getLastRecieved(theClient) + flood_duration) <= ::time(NULL) )
 	{
@@ -494,8 +494,9 @@ else
 
 		setIgnored(theClient, true);
 	 
-		logAdminMessage("MSG-FLOOD from %s",
-			theClient->getNickUserHost().c_str());
+		logAdminMessage("MSG-FLOOD from %s (%s)",
+			theClient->getNickUserHost().c_str(),
+			type.c_str());
 		return true;
 		} // if()
 	} // else()
@@ -650,7 +651,7 @@ if( commHandler == commandMap.end() )
 	/* Don't reply to unknown commands, but add to their flood 
 	 * total :)
 	 */
-	if (hasFlooded(theClient))
+	if (hasFlooded(theClient, "PRIVMSG"))
 		{
 		return false;
 		}
@@ -670,7 +671,7 @@ else
 	 *  Check users flood limit, if exceeded..
 	 */
 
-	if (hasFlooded(theClient))
+	if (hasFlooded(theClient, commHandler->first))
 		{
 		return false;
 		}
@@ -700,7 +701,7 @@ int cservice::OnCTCP( iClient* theClient, const string& CTCP,
 
 if (isIgnored(theClient)) return 0;
 
-if (hasFlooded(theClient))
+if (hasFlooded(theClient, "CTCP"))
 	{
 	return false;
 	}

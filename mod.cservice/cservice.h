@@ -1,5 +1,5 @@
 #ifndef __CSERVICE_H
-#define __CSERVICE_H "$Id: cservice.h,v 1.59 2001/03/14 22:49:14 gte Exp $"
+#define __CSERVICE_H "$Id: cservice.h,v 1.60 2001/03/19 22:17:46 gte Exp $"
 
 #include	<string>
 #include	<vector>
@@ -154,7 +154,7 @@ public:
  	void setFloodPoints(iClient*, unsigned short);
 
 	/* Determins if a client is in "Flooded" state, and if so Notice them. */
-	bool hasFlooded(iClient* theClient);
+	bool hasFlooded(iClient*, const string&);
 
 	/* Sets the timestamp for when we first recieved a msg from this client. 
 	 * within the flood period. */
@@ -165,7 +165,7 @@ public:
 
 	void setOutputTotal(const iClient* theClient, unsigned int count);
 	unsigned int getOutputTotal(const iClient* theClient);
-	bool hasOutputFlooded(iClient* theClient);
+	bool hasOutputFlooded(iClient*);
 
 	// Typedef's for user/channel Hashmaps.
 	// User hash, Key is Username.

@@ -13,7 +13,7 @@
  * Shouldn't really happen, as trying to MODINFO a forced access doesn't
  * make sense - adduser and then MODINFO that :)
  *
- * $Id: MODINFOCommand.cc,v 1.15 2001/03/13 22:39:33 gte Exp $
+ * $Id: MODINFOCommand.cc,v 1.16 2001/03/19 22:17:46 gte Exp $
  */
 
 #include	<string>
@@ -23,7 +23,7 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char MODINFOCommand_cc_rcsId[] = "$Id: MODINFOCommand.cc,v 1.15 2001/03/13 22:39:33 gte Exp $" ;
+const char MODINFOCommand_cc_rcsId[] = "$Id: MODINFOCommand.cc,v 1.16 2001/03/19 22:17:46 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -117,10 +117,7 @@ if (targetLevel == 0)
  
 /*
  *  Figure out what they're doing - ACCESS or AUTOOP.
- */
-
-/* Pointer to the requesting user's Level record */
-sqlLevel* tmpLevel = bot->getLevelRecord(theUser, theChan);
+ */ 
 
 if (command == "ACCESS")
 	{ 
