@@ -564,7 +564,7 @@ else if(Command == "VERSION")
 	xClient::DoCTCP(theClient, CTCP,
 		"Undernet P10 Channel Services Version 2 ["
 		__DATE__ " " __TIME__
-		"] ($Id: cservice.cc,v 1.81 2001/02/03 22:12:00 gte Exp $)");
+		"] ($Id: cservice.cc,v 1.82 2001/02/04 03:22:53 gte Exp $)");
 	}
 else if(Command == "PROBLEM?")
 	{
@@ -1642,9 +1642,9 @@ return xClient::OnChannelEvent( whichEvent, theChan,
  * If matched, the ban is applied and the user is kicked.
  * Returns true if matched, false if not.
  * N.B: Called from OnChannelEvent, theClient is guarantee'd to be in the
- * channel.
+ * channel and netChan will exist.
  *--------------------------------------------------------------------------*/ 
-bool cservice::checkBansOnJoin( sqlChannel* theChan, iClient* theClient )
+bool cservice::checkBansOnJoin( Channel* netChan, sqlChannel* theChan, iClient* theClient )
 {
 vector< sqlBan* >* banList = getBanRecords(theChan);
 vector< sqlBan* >::iterator ptr = banList->begin();
@@ -1692,7 +1692,7 @@ while (ptr != banList->end())
 			Write( s );
 			delete[] s.str(); 
 
-			Kick(theChan, theClient,
+			Kick(netChan, theClient,
 				string( "("
 				+ theBan->getSetBy()
 				+ ") "
