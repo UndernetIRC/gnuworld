@@ -1,5 +1,5 @@
 #ifndef __CSERVICE_H
-#define __CSERVICE_H "$Id: cservice.h,v 1.11 2000/12/27 03:15:42 gte Exp $"
+#define __CSERVICE_H "$Id: cservice.h,v 1.12 2000/12/27 20:03:52 gte Exp $"
 
 #include	<string>
 #include	<vector>
@@ -81,6 +81,12 @@ public:
 
 	// Cache of channel records.
 	sqlChannelHashType sqlChannelCache;
+
+	// Some counters for statistical purposes.
+	unsigned int userHits;
+	unsigned int userCacheHits;
+	unsigned int channelHits;
+	unsigned int channelCacheHits; 
 } ;
  
 } // namespace gnuworld

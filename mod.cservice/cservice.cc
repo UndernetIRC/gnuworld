@@ -96,6 +96,7 @@ cservice::cservice(const string& args)
     RegisterCommand(new OPCommand(this, "OP", "#channel [nick][,nick] .."));
     RegisterCommand(new VOICECommand(this, "VOICE", "#channel [nick][,nick] .."));
     RegisterCommand(new ADDUSERCommand(this, "ADDUSER", "#channel <nick> <access>"));
+    RegisterCommand(new REMUSERCommand(this, "REMUSER", "#channel <nick>"));
 
 	//-- Load in our cservice configuration file.
 	cserviceConfig = new EConfig( args ) ;
@@ -133,6 +134,11 @@ cservice::cservice(const string& args)
 	//-- Move this to the configuration file?  This should be fairly static..
 
 	Mode( "+idk" ) ;
+
+	userHits = 0;
+	userCacheHits = 0;
+	channelHits = 0;
+	channelCacheHits = 0;
 }
 
 cservice::~cservice()
@@ -230,6 +236,7 @@ sqlUser* cservice::getUserRecord(const string& id)
 	if(ptr != sqlUserCache.end()) // Found something!
 	{
 		elog << "sqlUserCache> Cache hit for " << id << endl;
+		userCacheHits++;
 		return ptr->second ;
 	}
 
@@ -244,6 +251,7 @@ sqlUser* cservice::getUserRecord(const string& id)
 	{ 
 	 	sqlUserCache.insert(sqlUserHashType::value_type(id, theUser));
 		elog << "sqlUserCache> " << sqlUserCache.size() << " elements in hash." << endl;
+		userHits++;
 		return theUser;
 	}
 
@@ -266,6 +274,7 @@ sqlChannel* cservice::getChannelRecord(const string& id)
 	if(ptr != sqlChannelCache.end()) // Found something!
 	{
 		elog << "sqlChannelCache> Cache hit for " << id << endl;
+		channelCacheHits++;
 		return ptr->second ;
 	} 
 
@@ -279,6 +288,7 @@ sqlChannel* cservice::getChannelRecord(const string& id)
 	if (theChan->loadData(id)) {
 	 	sqlChannelCache.insert(sqlChannelHashType::value_type(id, theChan));
 		elog << "sqlChannelCache> " << sqlChannelCache.size() << " elements in hash." << endl;
+		channelHits++;
 		return theChan;
 	}
 
