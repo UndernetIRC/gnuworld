@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: client.cc,v 1.71 2004/05/19 19:46:36 jeekay Exp $
+ * $Id: client.cc,v 1.72 2004/12/22 22:58:32 denspike Exp $
  */
 
 #include	<new>
@@ -49,7 +49,7 @@
 #include	"ELog.h"
 #include	"events.h"
 
-RCSTAG("$Id: client.cc,v 1.71 2004/05/19 19:46:36 jeekay Exp $" ) ;
+RCSTAG("$Id: client.cc,v 1.72 2004/12/22 22:58:32 denspike Exp $" ) ;
 
 namespace gnuworld
 {
@@ -92,7 +92,10 @@ return true ;
 }
 
 void xClient::OnAttach()
-{}
+{
+//We are connected to an xServer here.
+Connected = true; 
+}
 
 void xClient::OnDetach( const string& Message )
 {
@@ -107,6 +110,9 @@ s	<< getCharYYXXX()
 	<< Message ;
 
 MyUplink->Write( s ) ;
+
+//xClient is no longer connected to the xServer.
+Connected = false;
 }
 
 string xClient::getModes() const
