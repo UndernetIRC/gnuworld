@@ -549,7 +549,7 @@ COPY "translations" FROM stdin;
 6	9	Foi dado voice a você por %s (%s) no %s	31337	0
 6	10	%s: Você não está neste canal	31337	0
 6	11	%s já está com op no %s	31337	0
-6	12	%s já está com op no %s	31337	0
+6	12	%s já está com voice no %s	31337	0
 6	13	Foi retirado o op de você por %s (%s)	31337	0
 6	14	Foi retirado o voice de você por %s (%s)	31337	0
 6	15	%s não está com op no %s	31337	0
