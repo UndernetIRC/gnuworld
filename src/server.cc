@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server.cc,v 1.167 2003/07/03 00:25:48 dan_karrels Exp $
+ * $Id: server.cc,v 1.168 2003/07/04 13:52:29 dan_karrels Exp $
  */
 
 #include	<sys/time.h>
@@ -71,7 +71,7 @@
 #include	"ConnectionHandler.h"
 #include	"Connection.h"
 
-RCSTAG( "$Id: server.cc,v 1.167 2003/07/03 00:25:48 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: server.cc,v 1.168 2003/07/04 13:52:29 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -3918,7 +3918,7 @@ for( xNetwork::localClientIterator clientItr = Network->localClient_begin() ;
 	++count ;
 	DetachClient( *clientItr, "Server shutdown" ) ;
 	}
-elog	<< "Removed "
+elog	<< "xServer::doShutdown> Removed "
 	<< count
 	<< " local clients"
 	<< endl ;
@@ -3934,7 +3934,7 @@ while( Network->clients_begin() != Network->clients_end() )
 	iClient* theClient = Network->clients_begin()->second ;
 	delete Network->removeClient( theClient ) ;
 	}
-elog	<< "Removed "
+elog	<< "xServer::doShutdown> Removed "
 	<< count
 	<< " network clients"
 	<< endl ;
@@ -3954,7 +3954,7 @@ while( Network->channels_begin() != Network->channels_end() )
 
 	delete Network->removeChannel( theChan ) ;
 	}
-elog	<< "Removed "
+elog	<< "xServer::doShutdown> Removed "
 	<< count
 	<< " channels"
 	<< endl ;
@@ -3970,9 +3970,31 @@ while( gline_begin() != gline_end() )
 	delete gline_begin()->second ;
 	eraseGline( gline_begin() ) ;
 	}
-elog	<< "Removed "
+elog	<< "xServer::doShutdown> Removed "
 	<< count
 	<< " glines"
+	<< endl ;
+
+elog	<< "xServer::doShutdown> Removing timers..."
+	<< endl ;
+
+count = 0 ;
+// All of the client timers should be cleared, but let's verify
+// The only timers left should be the server timers
+while( !timerQueue.empty() )
+	{
+	++count ;
+	elog	<< "xServer::doShutdown> Removing a timer"
+		<< endl ;
+
+	// Delete the timerInfo structure, but not the TimerHandler
+	// or void* data.
+	delete timerQueue.top().second ;
+	timerQueue.pop() ;
+	}
+elog	<< "xServer::doShutdown> Removed "
+	<< count
+	<< " timers"
 	<< endl ;
 
 elog	<< "xServer::doShutdown> Disconnecting..."
@@ -3990,56 +4012,6 @@ ConnectionManager::Poll() ;
 
 // Deallocate the serverConnection
 delete serverConnection ; serverConnection = 0 ;
-
-elog	<< "xServer::doShutdown> Removing timers..."
-	<< endl ;
-
-count = 0 ;
-// All of the client timers should be cleared, but let's verify
-// The only timers left should be the server timers
-while( !timerQueue.empty() )
-	{
-	++count ;
-	elog	<< "xServer::doShutdown> Removing a timer"
-		<< endl ;
-
-	delete timerQueue.top().second ;
-	timerQueue.pop() ;
-	}
-elog	<< "Removed "
-	<< count
-	<< " timers"
-	<< endl ;
-
-count = 0 ;
-// Remove command handlers.
-// First, deallocate the handlers and remove them from the commandMap
-while( !commandMap.empty() )
-	{
-	delete commandMap.begin()->second ;
-	commandMap.erase( commandMap.begin() ) ;
-	}
-elog	<< "Removed "
-	<< count
-	<< " commands"
-	<< endl ;
-
-/*
-count = 0 ;
-// Now close and deallocate all command module handles
-// This will also deallocate/invalidate (somehow) the commandHandlers
-while( !commandModuleList.empty() )
-	{
-	++count ;
-	// Deallocating the moduleLoader will close the module
-	// handle.
-	delete *commandModuleList.begin() ;
-	}
-elog	<< "Removed "
-	<< count
-	<< " command modules"
-	<< endl ;
-*/
 }
 
 } // namespace gnuworld
