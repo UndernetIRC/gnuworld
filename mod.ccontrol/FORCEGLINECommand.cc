@@ -18,7 +18,7 @@
 #include	"ELog.h"
 #include	"Constants.h"
 
-const char FORCEGLINECommand_cc_rcsId[] = "$Id: FORCEGLINECommand.cc,v 1.27 2003/03/06 12:34:13 mrbean_ Exp $";
+const char FORCEGLINECommand_cc_rcsId[] = "$Id: FORCEGLINECommand.cc,v 1.28 2003/05/19 08:45:05 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -251,7 +251,7 @@ if(TmpGline)
 	Up =  true;	
 else TmpGline = new ccGline(bot->SQLDb);
 TmpGline->setHost(st [ pos ]);
-TmpGline->setExpires(::time(0) + gLength);
+TmpGline->setExpires(unsigned(::time(0) + gLength));
 TmpGline->setAddedBy(nickUserHost);
 TmpGline->setReason(Reason);
 TmpGline->setAddedOn(::time(0));

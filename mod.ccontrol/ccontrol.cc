@@ -11,7 +11,7 @@
 /* ccontrol.cc
  * Authors: Daniel Karrels dan@karrels.com
  *	    Tomer Cohen    MrBean@toughguy.net
- * $Id: ccontrol.cc,v 1.170 2003/04/28 09:44:21 mrbean_ Exp $
+ * $Id: ccontrol.cc,v 1.171 2003/05/19 08:45:06 mrbean_ Exp $
  */
 
 #define MAJORVER "1"
@@ -56,7 +56,7 @@
 #include	"ip.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.170 2003/04/28 09:44:21 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.171 2003/05/19 08:45:06 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -1737,7 +1737,7 @@ else
 	const iClient* curClient;
 	string Host;
 	Expires = (theGline->getExpires() > (3600*6 + ::time(0)) 
-		    ? 3600*6 +::time(0): theGline->getExpires());
+		    ? 3600*6 : theGline->getExpires() - ::time(0));
 	for(ptr = cList.begin(); ptr != cList.end(); ++ptr)
 		{
 		curClient = *ptr;    
@@ -3279,6 +3279,7 @@ for(unsigned int i = 0; i< (glineQueue.size() > glineBurstCount ? glineBurstCoun
 	us[0] = '\0';
 	sprintf(us,"%d",count);
 	curGline->setReason(string("[") + us + string("] ") + curGline->getReason());
+	curGline->setExpires(curGline->getExpires() + ::time(0));
 	addGlineToUplink(curGline);
 	if(curGlinePtr.second) //Do we need to add it to the db?
 		{

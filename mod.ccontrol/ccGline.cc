@@ -3,7 +3,7 @@
  * 
  * Gline class
  * 
- * $Id: ccGline.cc,v 1.16 2003/03/06 12:34:13 mrbean_ Exp $
+ * $Id: ccGline.cc,v 1.17 2003/05/19 08:45:06 mrbean_ Exp $
  */
  
 #include	<sstream>
@@ -20,7 +20,7 @@
 #include	"ccontrol.h"
 
 const char ccGline_h_rcsId[] = __CCGLINE_H ;
-const char ccGline_cc_rcsId[] = "$Id: ccGline.cc,v 1.16 2003/03/06 12:34:13 mrbean_ Exp $" ;
+const char ccGline_cc_rcsId[] = "$Id: ccGline.cc,v 1.17 2003/05/19 08:45:06 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -194,9 +194,9 @@ if(SQLDb->Tuples() < 6)
 Id = SQLDb->GetValue(0,0);
 Host = SQLDb->GetValue(0,1);
 AddedBy = SQLDb->GetValue(0,2) ;
-AddedOn = static_cast< time_t >( atoi( SQLDb->GetValue(0,3) ) ) ;
-Expires = static_cast< time_t >( atoi( SQLDb->GetValue(0,4) ) ) ;
-LastUpdated = static_cast< time_t >( atoi( SQLDb->GetValue(0,5) ) ) ;
+AddedOn = static_cast< time_t >( unsigned(atoi( SQLDb->GetValue(0,3) ) )) ;
+Expires = static_cast< time_t >( unsigned(atoi( SQLDb->GetValue(0,4) ) )) ;
+LastUpdated = static_cast< time_t >( unsigned(atoi( SQLDb->GetValue(0,5) ) )) ;
 Reason = SQLDb->GetValue(0,6);
 
 return true;

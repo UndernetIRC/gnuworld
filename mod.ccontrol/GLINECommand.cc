@@ -24,7 +24,7 @@
 #include	"ccUser.h"
 #include	"Constants.h"
 
-const char GLINECommand_cc_rcsId[] = "$Id: GLINECommand.cc,v 1.49 2003/03/06 12:34:13 mrbean_ Exp $";
+const char GLINECommand_cc_rcsId[] = "$Id: GLINECommand.cc,v 1.50 2003/05/19 08:45:06 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -252,7 +252,7 @@ if(!isChan)
 		Up =  true;	
 	else TmpGline = new ccGline(bot->SQLDb);
 	TmpGline->setHost(userName + "@" + hostName);
-	TmpGline->setExpires(::time(0) + gLength);
+	TmpGline->setExpires(unsigned(::time(0) + gLength));
 	TmpGline->setAddedBy(nickUserHost);
 	TmpGline->setReason(Reason);
 	TmpGline->setAddedOn(::time(0));
@@ -323,7 +323,7 @@ ptr != theChan->userList_end() ; ++ptr )
 		TmpGline = new ccGline(bot->SQLDb);
 		assert(TmpGline != NULL);
 		TmpGline->setHost("*@"  + curIP);
-		TmpGline->setExpires(::time(0) + gLength);
+		TmpGline->setExpires(unsigned(::time(0) + gLength));
 		TmpGline->setAddedBy(nickUserHost);
 		TmpGline->setReason(st.assemble( pos + ResStart ));
 		TmpGline->setAddedOn(::time(0));
