@@ -8,7 +8,7 @@
  *
  * Caveats: None.
  *
- * $Id: UNSUSPENDCommand.cc,v 1.8 2001/02/21 00:14:43 dan_karrels Exp $
+ * $Id: UNSUSPENDCommand.cc,v 1.9 2001/04/02 17:40:05 gte Exp $
  */
 
 #include	<string>
@@ -20,7 +20,7 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char UNSUSPENDCommand_cc_rcsId[] = "$Id: UNSUSPENDCommand.cc,v 1.8 2001/02/21 00:14:43 dan_karrels Exp $" ;
+const char UNSUSPENDCommand_cc_rcsId[] = "$Id: UNSUSPENDCommand.cc,v 1.9 2001/04/02 17:40:05 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -46,7 +46,7 @@ if(!theUser)
 	bot->Notice(theClient, 
 	bot->getResponse(theUser,
 		language::no_longer_auth,
-		string("Sorry, you are not authorized with me.")));
+		string("Sorry, you are not authorised with me.")));
 	return false;
 	}
 
@@ -83,8 +83,8 @@ if(!Target)
 	return true;
 	}
 
-sqlLevel* usrLevel = bot->getLevelRecord(Target, theChan);
-if(!usrLevel)
+sqlLevel* aLevel = bot->getLevelRecord(Target, theChan);
+if(!aLevel)
 	{
 	bot->Notice(theClient, 
 	bot->getResponse(theUser,
@@ -92,10 +92,7 @@ if(!usrLevel)
 		string("I don't know who %s is")).c_str(), 
     	Target->getUserName().c_str(), theChan->getName().c_str()); 
 	return true;
-	}
-
-sqlLevel* aLevel = bot->getLevelRecord(Target, theChan);
-assert( aLevel != 0 ) ;
+	} 
 
 if (aLevel->getSuspendExpire() == 0)
 	{
@@ -106,7 +103,16 @@ if (aLevel->getSuspendExpire() == 0)
 		Target->getUserName().c_str(), theChan->getName().c_str());
 	return false;
 	}
- 
+
+/*
+ *  Finally, check we have access to perform the unsuspend.
+ */
+
+if ((aLevel->getAccess()) >= level)
+	{
+	bot->Notice(theClient,
+		"Cannot unsuspend a user with equal or higher access than your own.");
+	}
 aLevel->setSuspendExpire(0);
 aLevel->setSuspendBy(string());
 aLevel->setLastModif(bot->currentTime());
