@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: main.cc,v 1.50 2002/11/06 21:29:29 dan_karrels Exp $
+ * $Id: main.cc,v 1.51 2003/06/11 17:46:33 dan_karrels Exp $
  */
 
 #include	<new>
@@ -27,7 +27,6 @@
 #include	<sys/time.h>
 #include	<sys/types.h>
 #include	<unistd.h>
-#include	<getopt.h>
 
 #include	<cstdio>
 #include	<cstdlib>
@@ -35,13 +34,18 @@
 #include	<csignal> 
 
 #include	"config.h"
+
+#ifdef HAVE_GETOPT_H
+#include	<getopt.h>
+#endif
+
 #include	"ELog.h"
 #include	"server.h"
 #include	"moduleLoader.h"
 #include	"md5hash.h"
 
 const char config_h_rcsId[] = __CONFIG_H ;
-const char main_cc_rcsId[] = "$Id: main.cc,v 1.50 2002/11/06 21:29:29 dan_karrels Exp $" ;
+const char main_cc_rcsId[] = "$Id: main.cc,v 1.51 2003/06/11 17:46:33 dan_karrels Exp $" ;
 const char ELog_h_rcsId[] = __ELOG_H ;
 const char server_h_rcsId[] = __SERVER_H ;
 const char moduleLoader_h_rcsId[] = __MODULELOADER_H ;

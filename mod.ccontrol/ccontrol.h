@@ -3,7 +3,7 @@
  */
 
 #ifndef __CCONTROL_H
-#define __CCONTROL_H "$Id: ccontrol.h,v 1.87 2003/04/28 09:44:21 mrbean_ Exp $"
+#define __CCONTROL_H "$Id: ccontrol.h,v 1.88 2003/06/11 17:46:31 dan_karrels Exp $"
 
 //Undef this if you want to log to the database
 #define LOGTOHD 
@@ -236,13 +236,13 @@ public:
 	 * Return true if the given channel name corresponds to a
 	 * channel which is an IRCoperator only channel.
 	 */
-	inline bool isOperChan( const string& chanName ) const ;
+	bool isOperChan( const string& chanName ) const ;
 
 	/**
 	 * Return true if the given channel corresponds to a
 	 * channel which is an IRCoperator only channel.
 	 */
-	inline bool isOperChan( const Channel* theChan ) const ;
+	bool isOperChan( const Channel* theChan ) const ;
 
 	/**
 	 * Return true if this client is on the given channel.

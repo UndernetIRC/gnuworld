@@ -2,6 +2,8 @@
 #include <new>
 #include <iostream>
 
+#include <cassert>
+
 #include "ELog.h"
 #include "sqlManager.h"
 

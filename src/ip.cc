@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ip.cc,v 1.6 2003/06/06 20:03:32 dan_karrels Exp $
+ * $Id: ip.cc,v 1.7 2003/06/11 17:46:33 dan_karrels Exp $
  */
 
 #include	<string>
@@ -35,7 +35,7 @@
 #include	"Numeric.h"
 
 const char xIP_h_rcsId[] = __IP_H ;
-const char xIP_cc_rcsId[] = "$Id: ip.cc,v 1.6 2003/06/06 20:03:32 dan_karrels Exp $" ;
+const char xIP_cc_rcsId[] = "$Id: ip.cc,v 1.7 2003/06/11 17:46:33 dan_karrels Exp $" ;
 const char Numeric_h_rcsId[] = __NUMERIC_H ;
 
 namespace gnuworld
@@ -65,12 +65,12 @@ xIP::xIP( const string& IP, bool Base64 )
 if( Base64 )
 	{
 	// 30 24 18 12 6
-	this->IP = (convert2n[ IP[ 0 ] ] << 30) +
-		  (convert2n[ IP[ 1 ] ] << 24) +
-		  (convert2n[ IP[ 2 ] ] << 18) +
-		  (convert2n[ IP[ 3 ] ] << 12) +
-		  (convert2n[ IP[ 4 ] ] << 6) +
-		  (convert2n[ IP[ 5 ] ] ) ;
+	this->IP = (convert2n[ static_cast< size_t >( IP[ 0 ] ) ] << 30) +
+		  (convert2n[ static_cast< size_t >( IP[ 1 ] ) ] << 24) +
+		  (convert2n[ static_cast< size_t >( IP[ 2 ] ) ] << 18) +
+		  (convert2n[ static_cast< size_t >( IP[ 3 ] ) ] << 12) +
+		  (convert2n[ static_cast< size_t >( IP[ 4 ] ) ] << 6) +
+		  (convert2n[ static_cast< size_t >( IP[ 5 ] ) ] ) ;
 
 	this->IP = ntohl( this->IP ) ;
 	return ;
