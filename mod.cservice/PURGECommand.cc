@@ -8,7 +8,7 @@
  *
  * Caveats: None
  *
- * $Id: PURGECommand.cc,v 1.11 2001/05/11 16:39:13 gte Exp $
+ * $Id: PURGECommand.cc,v 1.12 2001/06/02 22:02:21 gte Exp $
  */
  
 #include	<string>
@@ -22,7 +22,7 @@
 #include	"responses.h"
 #include	"cservice_config.h"
 
-const char PURGECommand_cc_rcsId[] = "$Id: PURGECommand.cc,v 1.11 2001/05/11 16:39:13 gte Exp $" ;
+const char PURGECommand_cc_rcsId[] = "$Id: PURGECommand.cc,v 1.12 2001/06/02 22:02:21 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -96,10 +96,12 @@ managerQuery	<< "SELECT users.user_name,users.email "
 		<< managerQuery.str()
 		<< endl; 
 #endif
-
-
+ 
 ExecStatusType status = bot->SQLDb->Exec(managerQuery.str()) ;
 delete[] managerQuery.str() ;
+
+string manager = "No Manager";
+string managerEmail = "No Email Address";
 
 if( status != PGRES_TUPLES_OK )
 	{
@@ -107,27 +109,23 @@ if( status != PGRES_TUPLES_OK )
 		<< bot->SQLDb->ErrorMessage()
 		<< endl ;
 	return false ;
+	} 
+		else 
+	{
+		if (bot->SQLDb->Tuples() != 0)
+		{
+			manager = bot->SQLDb->GetValue(0,0);
+			managerEmail = bot->SQLDb->GetValue(0,1); 
+		} 
 	}
-
-string manager = "No Manager";
-string managerEmail = "No Email Address";
-
-if (bot->SQLDb->Tuples() != 0)
-{
-	manager = bot->SQLDb->GetValue(0,0);
-	managerEmail = bot->SQLDb->GetValue(0,1); 
-}
  
 /*
- *  We simply flag this channel as 'deleted', and remove from the cache.
- *  Maintainence scripts can manually remove this channel and all related
- *  artifacts (bans/levels, etc).
- *  It also means accidental deletions won't result in the destruction of a
- *  potentially usefull userlist. :)
- */ 
+ *  Set this channel records registered_ts to 0 (ie: not registered).
+ *  The register command, and suitable PHP can re-register this channel.
+ */
 
 strstream theQuery ;
-theQuery	<< "UPDATE channels set deleted = 1 WHERE id = "
+theQuery	<< "UPDATE channels set registered_ts = 0 WHERE id = "
 		<< theChan->getID()
 		<< ends; 
 

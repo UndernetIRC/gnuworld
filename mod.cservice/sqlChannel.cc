@@ -9,7 +9,7 @@
  * 30/12/2000: Moved static SQL data to constants.h --Gte
  * Set loadData up to take data from rows other than 0.
  * 
- * $Id: sqlChannel.cc,v 1.25 2001/03/13 22:39:33 gte Exp $
+ * $Id: sqlChannel.cc,v 1.26 2001/06/02 22:02:21 gte Exp $
  */
  
 #include	<strstream>
@@ -25,7 +25,7 @@
 #include	"cservice_config.h"
  
 const char sqlChannel_h_rcsId[] = __SQLCHANNEL_H ;
-const char sqlChannel_cc_rcsId[] = "$Id: sqlChannel.cc,v 1.25 2001/03/13 22:39:33 gte Exp $" ;
+const char sqlChannel_cc_rcsId[] = "$Id: sqlChannel.cc,v 1.26 2001/06/02 22:02:21 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -72,8 +72,8 @@ bool sqlChannel::loadData(const string& channelName)
 strstream queryString ;
 queryString	<< "SELECT "
 		<< sql::channel_fields
-		<< " FROM channels WHERE registered_ts <> 0 AND deleted "
-		<< "= 0 AND lower(name) = '"
+		<< " FROM channels WHERE registered_ts <> 0"
+		<< " AND lower(name) = '"
 		<< escapeSQLChars(string_lower(channelName))
 		<< "'"
 		<< ends ;
@@ -121,7 +121,7 @@ bool sqlChannel::loadData(int channelID)
 strstream queryString;
 queryString	<< "SELECT "
 		<< sql::channel_fields
-		<< " FROM channels WHERE registered_ts <> 0 AND deleted = 0 AND id = "
+		<< " FROM channels WHERE registered_ts <> 0 AND id = "
 		<< channelID
 		<< ends ;
 

@@ -8,7 +8,7 @@
  *
  * Caveats: None
  *
- * $Id: REGISTERCommand.cc,v 1.14 2001/03/06 00:27:12 gte Exp $
+ * $Id: REGISTERCommand.cc,v 1.15 2001/06/02 22:02:21 gte Exp $
  */
  
 #include	<string>
@@ -21,7 +21,7 @@
 #include	"Network.h"
 #include	"responses.h"
 
-const char REGISTERCommand_cc_rcsId[] = "$Id: REGISTERCommand.cc,v 1.14 2001/03/06 00:27:12 gte Exp $" ;
+const char REGISTERCommand_cc_rcsId[] = "$Id: REGISTERCommand.cc,v 1.15 2001/06/02 22:02:21 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -111,7 +111,6 @@ bool REGISTERCommand::Exec( iClient* theClient, const string& Message )
 	ExecStatusType status; 
 
 	checkQuery 	<< "SELECT name FROM channels WHERE "
-				<< "deleted = 0 AND "
 				<< "registered_ts = 0 AND lower(name) = '"
 				<< escapeSQLChars(string_lower(st[1]))
 				<< "'"

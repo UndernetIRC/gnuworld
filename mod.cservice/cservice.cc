@@ -1,5 +1,12 @@
 /* cservice.cc */
 
+#warning --
+#warning --
+#warning If you have not yet ran "update.delete.sql" in doc/ on your database,
+#warning do so now :)
+#warning --
+#warning --
+
 #include	<vector>
 #include	<iostream>
 #include	<strstream>
@@ -286,7 +293,7 @@ int cservice::BurstChannels()
 strstream theQuery;
 theQuery	<< "SELECT " << sql::channel_fields
 		<< " FROM channels WHERE lower(name) <> '*' AND "
-		<< "registered_ts <> 0 AND deleted = 0"
+		<< "registered_ts <> 0"
 		<< ends;
 
 #ifdef LOG_SQL
