@@ -1,7 +1,7 @@
 /* sqlChannel.h */
 
 #ifndef __SQLCHANNEL_H
-#define __SQLCHANNEL_H "$Id: sqlChannel.h,v 1.18 2001/02/18 19:46:01 dan_karrels Exp $"
+#define __SQLCHANNEL_H "$Id: sqlChannel.h,v 1.19 2001/03/06 01:09:05 gte Exp $"
 
 #include	<string>
 #include	<ctime>
@@ -49,6 +49,7 @@ public:
 	static const unsigned short	EV_OPERJOIN = 4 ;
 	static const unsigned short	EV_OPERPART = 5 ;
 	static const unsigned short	EV_FORCE    = 6 ;
+	static const unsigned short	EV_REGISTER = 7 ;
 
 	/*
 	 *  Methods to get data atrributes.

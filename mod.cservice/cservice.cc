@@ -857,9 +857,9 @@ sqlChannelHashType::iterator ptr = sqlChannelCache.find(id);
 if(ptr != sqlChannelCache.end())
 	{
 	// Found something!
-	elog	<< "cmaster::getChannelRecord> Cache hit for "
-		<< id
-		<< endl;
+//	elog	<< "cmaster::getChannelRecord> Cache hit for "
+//		<< id
+//		<< endl;
 	channelCacheHits++;
 
 	// Return the channel to the caller
@@ -906,9 +906,9 @@ sqlChannelIDHashType::iterator ptr = sqlChannelIDCache.find(id);
 if(ptr != sqlChannelIDCache.end())
 	{
 	// Found something!
-	elog	<< "cmaster::getChannelRecord(ID)> Cache hit for "
-		<< id
-		<< endl; 
+//	elog	<< "cmaster::getChannelRecord(ID)> Cache hit for "
+//		<< id
+//		<< endl; 
 
 	// Return the channel to the caller
 	return ptr->second ;
@@ -949,11 +949,11 @@ sqlLevelHashType::iterator ptr = sqlLevelCache.find(thePair);
 if(ptr != sqlLevelCache.end())
 	{ 
 	// Found something!
-	elog	<< "cmaster::getLevelRecord> Cache hit for "
-		<< "user-id:chan-id "
-		<< theUser->getID() << ":"
-		<< theChan->getID()
-		<< endl;
+//	elog	<< "cmaster::getLevelRecord> Cache hit for "
+//		<< "user-id:chan-id "
+//		<< theUser->getID() << ":"
+//		<< theChan->getID()
+//		<< endl;
 	levelCacheHits++;
 
 	return ptr->second ;
