@@ -37,7 +37,7 @@
 //#include	"moduleLoader.h"
 
 const char xServer_h_rcsId[] = __XSERVER_H ;
-const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.12 2000/08/01 00:11:38 dan_karrels Exp $" ;
+const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.13 2000/08/01 02:10:54 dan_karrels Exp $" ;
 
 using std::string ;
 using std::vector ;
@@ -3733,6 +3733,8 @@ if( '#' == Param[ 1 ][ 0 ] )
 	string modes( Param[ 2 ] ) ;
 
 	PostChannelEvent( EVT_MODE, theChan->getName(),
+		static_cast< void* >( theChan ),
+		static_cast< void* >( clientSource ),
 		static_cast< void* >( &modes ) ) ;
 
 	return 0 ;
@@ -3864,6 +3866,8 @@ if( '#' == Param[ 1 ][ 0 ] )
 	string modes( Param[ 2 ] ) ;
 
 	PostChannelEvent( EVT_MODE, theChan->getName(),
+		static_cast< void* >( theChan ),
+		static_cast< void* >( clientSource ),
 		static_cast< void* >( &modes ) ) ;
 
 	return 0 ;

@@ -5,7 +5,7 @@
  */
 
 #ifndef __EVENTS_H
-#define __EVENTS_H "$Id: events.h,v 1.2 2000/07/08 01:41:05 dan_karrels Exp $"
+#define __EVENTS_H "$Id: events.h,v 1.3 2000/08/01 02:10:54 dan_karrels Exp $"
 
 namespace gnuworld
 {
@@ -105,7 +105,8 @@ typedef int channelEventType ;
  *  2) iClient*
  * EVT_MODE
  *  1) Channel*
- *  2) string* - mode string
+ *  2) iClient* - source of modes
+ *  3) string* - mode string
  */
 
 } // namespace gnuworld
