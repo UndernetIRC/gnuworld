@@ -1,5 +1,5 @@
 # Generated automatically from Makefile.in by configure.
-# $Id: Makefile,v 1.5 2000/07/06 20:47:06 dan_karrels Exp $
+# $Id: Makefile,v 1.6 2000/07/07 15:56:01 dan_karrels Exp $
 # all		-- gnuworld
 # clean		-- cleanup objects and executable
 # distclean	-- everything =P
@@ -68,7 +68,7 @@ clean:
 	@-if [ -f lib/Makefile ]; then cd lib; $(MAKE2) clean; fi
 	@-if [ -f src/Makefile ]; then cd src; $(MAKE2) clean; fi
 
-distclean cleandir realclean: clean
+distclean cleandir realclean:
 	$(RM) config.status config.cache
 	$(RM) config.log include/defs.h
 	@cd lib; $(MAKE2) distclean

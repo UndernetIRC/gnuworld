@@ -37,7 +37,7 @@
 #include	"moduleLoader.h"
 
 const char xServer_h_rcsId[] = __XSERVER_H ;
-const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.1 2000/06/30 18:46:07 dan_karrels Exp $" ;
+const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.2 2000/07/07 15:56:01 dan_karrels Exp $" ;
 
 using std::string ;
 using std::vector ;
@@ -1469,8 +1469,7 @@ return vector< const Gline* >() ;
 const Gline* xServer::findGline( const string& userHost ) const
 {
 for( glineListType::const_iterator ptr = glineList.begin() ;
-	ptr != glineList.end() ;
-	++ptr )
+	ptr != glineList.end() ; ++ptr )
 	{
 	// TODO: Case insensitive search
 	if( *(*ptr) == userHost )
