@@ -22,7 +22,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: SUSPENDCommand.cc,v 1.25 2003/06/28 01:21:20 dan_karrels Exp $
+ * $Id: SUSPENDCommand.cc,v 1.26 2003/08/07 21:31:42 gte Exp $
  */
 
 #include	<string>
@@ -36,7 +36,7 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char SUSPENDCommand_cc_rcsId[] = "$Id: SUSPENDCommand.cc,v 1.25 2003/06/28 01:21:20 dan_karrels Exp $" ;
+const char SUSPENDCommand_cc_rcsId[] = "$Id: SUSPENDCommand.cc,v 1.26 2003/08/07 21:31:42 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -226,15 +226,38 @@ sqlLevel* aLevel = bot->getLevelRecord(Target, theChan);
 
 if( 0 == finalDuration )
 	{
+	/*
+	 * Was this suspension set with a higher suspend level?
+	 */
+	if (aLevel->getSuspendLevel() > level)
+		{
+		bot->Notice(theClient,
+			"Cannot unsuspend a user that was suspended at a higher level than your own access.");
+		return false;
+		}
+
+	aLevel->setSuspendExpire(finalDuration);
+	aLevel->setSuspendBy(string());
+	aLevel->setLastModif(bot->currentTime());
+	aLevel->setLastModifBy( string( "("
+		+ theUser->getUserName()
+		+ ") "
+		+ theClient->getNickUserHost() ) );
+
+	if( !aLevel->commit() )
+		{
+		bot->Notice( theClient,
+			"Error updating channel status." );
+		elog	<< "UNSUSPEND> SQL error"
+			<< endl;
+		return false;
+		}
+
 	bot->Notice(theClient,
 		bot->getResponse(theUser,
 			language::susp_cancelled,
 			string("SUSPENSION for %s is cancelled")).c_str(),
 		Target->getUserName().c_str());
-
-	aLevel->setSuspendExpire(finalDuration);
-	aLevel->setSuspendBy( string() );
-	aLevel->commit();
 
 	return true;
 	}
