@@ -26,7 +26,7 @@
 #include        "server.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.53 2001/06/03 14:02:56 dan_karrels Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.54 2001/06/07 15:59:06 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -230,6 +230,7 @@ RegisterCommand( new REMOVEIGNORECommand( this, "REMIGNORE", "(nick/host)"
 	" Removes a host/nick from the  ignore list",flg_REMIGNORE ) ) ;
 
 loadGlines();
+loadExceptions();
 
 }
 
@@ -440,7 +441,21 @@ switch( theEvent )
 		AuthInfo *TempAuth = IsAuth(tmpUser);
 		if(TempAuth)
 	    	    deAuthUser(tmpUser->getCharYYXXX());
-		
+		ccLogin *tempLogin = findLogin(tmpUser->getCharYYXXX());
+		if(tempLogin)
+			{
+			removeLogin(tempLogin);
+			if(tempLogin->get_IgnoredHost() != "")
+				{
+				tempLogin->set_Numeric("0");
+				tempLogin->resetLogins();
+				}
+			else
+				{
+				delete tempLogin;
+				}		
+			}
+			
 		break ;
 		} // case EVT_KILL/case EVT_QUIT
 	
@@ -1642,7 +1657,6 @@ bool ccontrol::refreshGlines()
 {
 
 // TODO: Rewrite method
-MsgChanLog("Refresh gline - Start\n");
 
 int totalFound = 0;
 inRefresh = true;
@@ -1668,7 +1682,6 @@ for(glineIterator ptr = glineList.begin();ptr != glineList.end();)
 			ptr++;
 	}
 
-MsgChanLog("Refresh gline - Ended , Total glines expired %d\n",totalFound);
 inRefresh = false;
 
 return true;
@@ -1677,7 +1690,6 @@ return true;
 
 bool ccontrol::burstGlines()
 {
-MsgChanLog("[Burst Glines] - Started\n");
 
 ccGline *theGline = 0 ;
 for(glineIterator ptr = glineList.begin(); ptr != glineList.end(); ptr++)
@@ -1689,7 +1701,6 @@ for(glineIterator ptr = glineList.begin(); ptr != glineList.end(); ptr++)
 		theGline->get_Expires() - ::time(0));
 	}
 
-MsgChanLog("[Burst Glines] - Ended\n");
 return true;
 }
 
@@ -1762,101 +1773,53 @@ int ccontrol::getExceptions( const string &Host )
 {
 int Exception = userMaxConnection;
 
-static const char *Main = "SELECT Host,Connections FROM exceptions";
-
-strstream theQuery;
-theQuery	<< Main
-		<< ends;
-
-elog	<< "ccontrol::getExceptions> "
-	<< theQuery.str()
-	<< endl; 
-
-ExecStatusType status = SQLDb->Exec( theQuery.str() ) ;
-delete[] theQuery.str() ;
-
-if( PGRES_TUPLES_OK != status )
+for(exceptionIterator ptr = exception_begin();ptr != exception_end();ptr++)
 	{
-	elog	<< "ccontrol::getExceptions> SQL Failure: "
-		<< SQLDb->ErrorMessage()
-		<< endl ;
-	return Exception;
-	}
-
-for( int i = 0 ; i < SQLDb->Tuples() ; i++ )
-	{
-	if((!match(Host,SQLDb->GetValue(i,0))) ||
-		(Host == SQLDb->GetValue(i,0)))
+	if(*(*ptr) == Host)
 		{
-		if(atoi(SQLDb->GetValue(i,1)) > Exception)
-			Exception = atoi(SQLDb->GetValue(i,1));
-		}
+		MsgChanLog("Found an Exception for %d connections\n",(*ptr)->get_Connections()); 
+		if((*ptr)->get_Connections() > Exception)
+			{
+			Exception = (*ptr)->get_Connections();
+			}
+		} 
 	}
+
 return Exception;
 }
 
 bool ccontrol::listExceptions( iClient *theClient )
 {
 
-static const char *Main = "SELECT * FROM exceptions";
+Notice(theClient,"-= Exceptions list - listing a total of %d exceptions =-"
+	,exceptionList.size());
+	
+for(exceptionIterator ptr = exception_begin();ptr != exception_end();ptr++)
+	Notice(theClient,"Host : %s  Connections : %d AddedBy : %s"
+	       ,(*ptr)->get_Host().c_str()
+	       ,(*ptr)->get_Connections()
+	       ,(*ptr)->get_AddedBy().c_str());
 
-strstream theQuery;
-theQuery	<< Main
-		<< ends;
+Notice(theClient,"-= End of exception list =-");
 
-elog	<< "ccontrol::listExceptions> "
-	<< theQuery.str()
-	<< endl; 
-
-ExecStatusType status = SQLDb->Exec( theQuery.str() ) ;
-delete[] theQuery.str() ;
-
-if( PGRES_TUPLES_OK != status )
-	{
-	elog	<< "ccontrol::listExceptions> SQL Failure: "
-		<< SQLDb->ErrorMessage()
-		<< endl ;
-	return false;
-	}
-
-for( int i = 0 ; i < SQLDb->Tuples() ; i++ )
-	{
-	Notice(theClient,"Host : %s Connections %s Addeded By : %s "
-		"Added On %s",
-		SQLDb->GetValue(i,0),
-		SQLDb->GetValue(i,1),
-		SQLDb->GetValue(i,2),
-		convertToAscTime(atoi(SQLDb->GetValue(i,3))));
-	}
-Notice(theClient,"End of exceptions list");
 return true;
 }
 
+bool ccontrol::isException( const string & Host )
+{
+for(exceptionIterator ptr = exception_begin();ptr != exception_end();ptr++)
+	{
+	if(*(*ptr) == Host)
+		return true;
+	}
+return false;
+}
+
+
 bool ccontrol::insertException( iClient *theClient , const string& Host , int Connections )
 {
-static const char *Main = "SELECT * FROM exceptions where Host = '";
-
-strstream theQuery;
-theQuery	<< Main
-		<< Host << "'"
-		<< ends;
-
-elog	<< "ccontrol::isnertException> "
-	<< theQuery.str()
-	<< endl; 
-
-ExecStatusType status = SQLDb->Exec( theQuery.str() ) ;
-delete[] theQuery.str() ;
-
-if( PGRES_TUPLES_OK != status )
-	{
-	elog	<< "ccontrol::insertException> SQL Failure: "
-		<< SQLDb->ErrorMessage()
-		<< endl ;
-	return false;
-	}
-
-if( SQLDb->Tuples() > 0 )
+//Check if there is already an exception on that host
+if(isException(Host))
 	{
 	Notice(theClient,
 		"There is already an exception for host %s, "
@@ -1865,78 +1828,54 @@ if( SQLDb->Tuples() > 0 )
 	return true;
 	}
 
-static const char *quer = "INSERT into exceptions(host,connections,addedby,addedon) VALUES ('";
-strstream query;
-query		<< quer
-		<< Host << "',"
-		<< Connections
-		<< ",'" << theClient->getNickUserHost()
-		<< "',now()::abstime::int4)"
-		<< ends;
+//Create a new ccException structure 
+ccException* tempException = new (nothrow) ccException(SQLDb);
+assert(tempException != NULL);
 
-elog	<< "ccontrol::insertException> "
-	<< query.str()
-	<< endl; 
+tempException->set_Host(Host);
+tempException->set_Connections(Connections);
+tempException->set_AddedBy(theClient->getNickUserHost());
+tempException->set_AddedOn(::time(0));
 
-status = SQLDb->Exec( query.str() ) ;
-delete[] query.str();
-
-return (PGRES_COMMAND_OK == status) ;
-}
-
-bool ccontrol::delException( iClient *theClient , const string &Host )
-{
-static const char *Main = "SELECT * FROM exceptions where Host = '";
-
-strstream theQuery;
-theQuery	<< Main
-		<< Host << "'"
-		<< ends;
-
-elog	<< "ccontrol::delException> "
-	<< theQuery.str()
-	<< endl; 
-
-ExecStatusType status = SQLDb->Exec( theQuery.str() ) ;
-delete[] theQuery.str() ;
-
-if( PGRES_TUPLES_OK != status )
+//Update the database, and the internal list
+if(!tempException->Insert())
 	{
-	elog	<< "ccontrol::delException> SQL Failure: "
-		<< SQLDb->ErrorMessage()
-		<< endl ;
 	return false;
 	}
 
-if(SQLDb->Tuples() == 0)
-	{
-	Notice(theClient,"There is no exception for host %s",
-		Host.c_str());
-	return true;
-	}
-
-static const char *quer = "DELETE FROM exceptions WHERE host = '";
-strstream query;
-query		<< quer
-		<< Host << "'"
-		<< ends;
-
-elog 		<< "ccontrol::delException> "
-		<< query.str()
-		<< endl ;
-
-status = SQLDb->Exec( query.str() ) ;
-delete[] query.str();
-
-if( PGRES_COMMAND_OK != status )
-	{
-	elog	<< "ccontrol::findException> SQL Failure: "
-		<< SQLDb->ErrorMessage()
-		<< endl ;
-	return false;		    
-	}
+exceptionList.push_back(tempException);
 return true;
 }
+
+
+bool ccontrol::delException( iClient *theClient , const string &Host )
+{
+
+if(!isException(Host))
+	{
+	Notice(theClient,"Cant find exception for host %s",Host.c_str());
+	return true;
+	}
+ccException *tempException = NULL;
+
+for(exceptionIterator ptr = exception_begin();ptr != exception_end();)
+	{
+	tempException = *ptr;
+	if(*tempException == Host)
+		{
+		bool status = tempException->Delete();
+		ptr = exceptionList.erase(ptr);
+		delete tempException;
+		if(!status)
+			return false;
+		}
+	    
+	else
+		ptr++;
+	}
+return true;
+}	
+
 ccLogin *ccontrol::findLogin( const string & Numeric )
 {
 for(loginIterator ptr = login_begin() ; ptr != login_end() ; ++ptr)
@@ -1945,11 +1884,23 @@ for(loginIterator ptr = login_begin() ; ptr != login_end() ; ++ptr)
 		{
 		return *ptr;
 		}
-	ptr++;
 	}
 return NULL;
 }
-	
+
+void ccontrol::removeLogin( ccLogin *tempLogin )
+{
+for(loginIterator ptr = login_begin() ; ptr != login_end() ;)
+	{
+	if((*ptr) == tempLogin)
+		{
+		ptr = loginList.erase(ptr);
+		}
+	else
+		ptr++;
+	}
+}
+
 void ccontrol::addLogin( const string & Numeric)
 {
 ccLogin *LogInfo = findLogin(Numeric);
@@ -1976,7 +1927,7 @@ ccLogin *tempLogin = 0;
 loginIterator tptr;
 int retMe = IGNORE_NOT_FOUND;
 
-for(loginIterator ptr = login_begin();ptr!=login_end();)
+for(loginIterator ptr = ignore_begin();ptr!=ignore_end();)
 	{
 	tempLogin = *ptr;
 	if(tempLogin->get_IgnoredHost() == Host)
@@ -1994,6 +1945,10 @@ for(loginIterator ptr = login_begin();ptr!=login_end();)
 		tempLogin->resetLogins();
 		tptr = ptr++;
 		ignoreList.erase(tptr);
+		if(tempLogin->get_Numeric() == "0")
+			{
+			delete tempLogin;
+			}
 		retMe = IGNORE_REMOVED;
 		}
 	else
@@ -2038,7 +1993,7 @@ s	<< getCharYYXXX()
 Write( s );
 delete[] s.str();
 
-User->set_IgnoreExpires(::time(0)+3600);
+User->set_IgnoreExpires(::time(0)+60);
 User->set_IgnoredHost(silenceMask);
 
 ignoreList.push_back(User);
@@ -2048,7 +2003,7 @@ bool ccontrol::listIgnores( iClient *theClient )
 {
 Notice(theClient,"-= Listing Ignore List =-");			
 ccLogin *tempLogin;
-for(loginIterator ptr = login_begin();ptr!=login_end();ptr++)
+for(loginIterator ptr = ignore_begin();ptr!=ignore_end();ptr++)
 	{
 	tempLogin = *ptr;
 	if(tempLogin->get_IgnoreExpires() > ::time(0))
@@ -2068,7 +2023,7 @@ bool ccontrol::refreshIgnores()
 // TODO: Rewrite this method
 loginIterator tptr;
 ccLogin *tempLogin;
-for(loginIterator ptr = login_begin();ptr!=login_end();)
+for(loginIterator ptr = ignore_begin();ptr!=ignore_end();)
 	{
 	tempLogin = *ptr;
 	if((tempLogin) &&(tempLogin->get_IgnoreExpires() <= ::time(0)))
@@ -2085,6 +2040,10 @@ for(loginIterator ptr = login_begin();ptr!=login_end();)
 		Write( s );
 		delete[] s.str();
 		tempLogin->set_IgnoredHost("");
+		if(tempLogin->get_Numeric() == "0")
+			{
+			delete tempLogin;
+			}
 		tptr = ptr;
 		ptr++;
 		ignoreList.erase(tptr);
@@ -2096,4 +2055,44 @@ for(loginIterator ptr = login_begin();ptr!=login_end();)
 return true;
 
 }
+bool ccontrol::loadExceptions()
+{
+static const char *Main = "SELECT * FROM Exceptions";
+
+strstream theQuery;
+theQuery	<< Main
+		<< ends;
+
+elog	<< "ccontrol::loadExceptions> "
+	<< theQuery.str()
+	<< endl; 
+
+ExecStatusType status = SQLDb->Exec( theQuery.str() ) ;
+delete[] theQuery.str() ;
+
+if( PGRES_TUPLES_OK != status )
+	{
+	elog	<< "ccontrol::loadExceptions> SQL Failure: "
+		<< SQLDb->ErrorMessage()
+		<< endl ;
+
+	return false;
+	}
+
+ccException *tempException = NULL;
+
+for( int i = 0 ; i < SQLDb->Tuples() ; i++ )
+	{
+	tempException =  new (nothrow) ccException(SQLDb);
+	assert( tempException != 0 ) ;
+
+	tempException->set_Host(SQLDb->GetValue(i,0));
+	tempException->set_Connections(atoi(SQLDb->GetValue(i,1)));
+	tempException->set_AddedBy(SQLDb->GetValue(i,2)) ;
+	tempException->set_AddedOn(static_cast< time_t >( atoi( SQLDb->GetValue(i,3) ) )) ;
+	exceptionList.push_back(tempException);
+	}
+return true;	
+} 
+
 } // namespace gnuworld

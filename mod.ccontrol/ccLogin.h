@@ -1,7 +1,7 @@
 /* ccFlood.h */
 
 #ifndef __CCLOGIN_H
-#define __CCLOGIN_H "$Id: ccLogin.h,v 1.3 2001/05/31 18:17:59 mrbean_ Exp $"
+#define __CCLOGIN_H "$Id: ccLogin.h,v 1.4 2001/06/07 15:59:06 mrbean_ Exp $"
 
 #define IGNORE_NOT_FOUND -1
 #define IGNORE_REMOVED -2
@@ -38,6 +38,9 @@ public:
 	
 	//Methods for setting info
 	
+	inline void 		set_Numeric( string _Numeric ) 
+		{ Numeric = _Numeric; }
+
 	inline void 		set_Logins( int _Logins ) 
 		{ Logins = _Logins; }
 

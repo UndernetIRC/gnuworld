@@ -3,7 +3,7 @@
  */
 
 #ifndef __CCONTROL_H
-#define __CCONTROL_H "$Id: ccontrol.h,v 1.32 2001/05/31 18:17:59 mrbean_ Exp $"
+#define __CCONTROL_H "$Id: ccontrol.h,v 1.33 2001/06/07 15:59:06 mrbean_ Exp $"
 
 //Define gline response
 #define GLINE_OK 1;
@@ -34,6 +34,7 @@
 #include        "ccGline.h"
 #include        "ccServer.h"
 #include 	"ccLogin.h"
+#include 	"ccException.h"
 #include        "server.h"
 
 namespace gnuworld
@@ -107,6 +108,10 @@ protected:
 	loginListType			loginList ;
 	
 	loginListType			ignoreList;
+	
+	typedef list< ccException* >    exceptionListType;
+	
+	exceptionListType		exceptionList;
 	
 public:
 
@@ -476,6 +481,8 @@ public:
 
 	int getExceptions( const string & );
 	
+	bool isException( const string & );
+	
 	bool listExceptions( iClient * );
 	
 	bool insertException( iClient * , const string & , int );
@@ -483,7 +490,9 @@ public:
 	bool delException( iClient * , const string & );
 	
 	ccLogin *findLogin( const string & );
-	
+
+	void removeLogin( ccLogin * );
+
 	void addLogin( const string & );
 	
 	int removeIgnore( const string & );
@@ -495,6 +504,8 @@ public:
 	bool listIgnores( iClient * );
 	
 	bool refreshIgnores();
+	
+	bool loadExceptions();
 	
 	/**
 	 * This is a constant iterator type used to perform a read-only
@@ -600,7 +611,21 @@ public:
 
 	loginIterator login_end()
 		{ return loginList.end() ; }
-		
+
+	loginIterator ignore_begin()
+		{ return ignoreList.begin() ; }
+
+	loginIterator ignore_end()
+		{ return ignoreList.end() ; }
+	
+	typedef exceptionListType::iterator exceptionIterator;
+	
+	exceptionIterator exception_begin()
+		{ return exceptionList.begin(); }
+
+	exceptionIterator exception_end()
+		{ return exceptionList.end(); }
+				
 	/**
 	 * Retrieve the default length of time for glines.
 	 */

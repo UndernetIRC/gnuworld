@@ -12,7 +12,7 @@
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 
-const char EXCEPTIONCommand_cc_rcsId[] = "$Id: EXCEPTIONCommand.cc,v 1.1 2001/05/22 20:20:16 mrbean_ Exp $";
+const char EXCEPTIONCommand_cc_rcsId[] = "$Id: EXCEPTIONCommand.cc,v 1.2 2001/06/07 15:59:06 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -48,6 +48,11 @@ else if(!strcasecmp(st[1].c_str(),"add")) //Trying to add an exception?
 			{
 			bot->Notice(theClient,"Error while adding exception\n");
 			}
+		else
+			{
+			bot->Notice(theClient,"Successfully added an axception on host %s for %d connections"
+				    ,st[2].c_str(),atoi(st[3].c_str()));
+			}
 		}
 	}
 else if(!strcasecmp(st[1].c_str(),"del")) //Trying to add an exception?
@@ -63,6 +68,11 @@ else if(!strcasecmp(st[1].c_str(),"del")) //Trying to add an exception?
 			{
 			bot->Notice(theClient,"Error while deleting exception for host %s",st[2].c_str());
 			}
+		else
+			{
+			bot->Notice(theClient,"Successfully deleted exception for host %s",st[2].c_str());
+			}
+		
 		}
 
 	}	
