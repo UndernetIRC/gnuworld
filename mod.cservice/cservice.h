@@ -1,11 +1,11 @@
 /**
  * cservice.h
  * Author: Greg Sikorski
- * $Id: cservice.h,v 1.88 2002/07/15 14:58:16 dan_karrels Exp $
+ * $Id: cservice.h,v 1.89 2002/07/15 15:09:42 dan_karrels Exp $
  */
 
 #ifndef __CSERVICE_H
-#define __CSERVICE_H "$Id: cservice.h,v 1.88 2002/07/15 14:58:16 dan_karrels Exp $"
+#define __CSERVICE_H "$Id: cservice.h,v 1.89 2002/07/15 15:09:42 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
@@ -341,7 +341,7 @@ public:
 	reopQType reopQ;
 
 	/* List of channels in 'pending' registration state. */
-	typedef map < string, sqlPendingChannel*, eqstr >
+	typedef map < string, sqlPendingChannel*, noCaseCompare >
 		pendingChannelListType;
 	pendingChannelListType pendingChannelList;
 
