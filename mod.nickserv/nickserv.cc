@@ -10,7 +10,7 @@
 #include "netData.h"
 #include "nickserv.h"
 
-const char NickServ_cc_rcsId[] = "$Id: nickserv.cc,v 1.16 2002/12/02 19:17:54 jeekay Exp $";
+const char NickServ_cc_rcsId[] = "$Id: nickserv.cc,v 1.17 2002/12/10 19:46:16 jeekay Exp $";
 
 namespace gnuworld
 {
@@ -208,7 +208,7 @@ switch (theEvent) {
     theClient = static_cast< iClient* > ( data1 );
     
     sqlUser* theUser = isAuthed(theClient);
-    if(theUser->getLevel() > 0) Op(theChannel, theClient);
+    if(theUser && theUser->getLevel() > 0) Op(theChannel, theClient);
     
     break;
   } // case EVT_JOIN
@@ -236,7 +236,7 @@ if("DCC" == Command) {
 } else if("PING" == Command) {
   DoCTCP(theClient, CTCP, Message);
 } else if("VERSION" == Command) {
-  DoCTCP(theClient, CTCP, "GNUWorld NickServ v1.0.3");
+  DoCTCP(theClient, CTCP, "GNUWorld NickServ v1.0.4");
 }
 
 return xClient::OnCTCP(theClient, CTCP, Message, Secure);

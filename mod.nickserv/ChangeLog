@@ -1,3 +1,8 @@
+2002-12-10 1.0.4 Jeekay
+* Fixed stupid bug that would cause a crash if a non-authed user entered the
+  console channel.
+* Bumped version to 1.0.4
+
 2002-11-26 1.0.3 Jeekay
 * Added MODUSER to allow admins to change the access levels of other users
 * Added INVITE to allow admins to invite themselves into the console channel
