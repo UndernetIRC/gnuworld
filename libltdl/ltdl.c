@@ -86,8 +86,11 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
 #  include <argz.h>
 #endif
 
-/* I have never seen a system without this:  */
-#include <assert.h>
+#if HAVE_ASSERT_H
+#  include <assert.h>
+#else
+#  define assert(arg)	((void) 0)
+#endif
 
 #include "ltdl.h"
 
@@ -1969,7 +1972,8 @@ tryall_dlopen_module (handle, prefix, dirname, dlname)
      shuffled.  Otherwise, attempt to open FILENAME as a module.  */
   if (prefix)
     {
-      error += tryall_dlopen_module (handle, 0, prefix, filename);
+      error += tryall_dlopen_module (handle,
+				     (const char *) 0, prefix, filename);
     }
   else if (tryall_dlopen (handle, filename) != 0)
     {
@@ -2003,7 +2007,8 @@ find_module (handle, dir, libdir, dlname, old_name, installed)
       /* try to open the installed module */
       if (installed && libdir)
 	{
-	  if (tryall_dlopen_module (handle, 0, libdir, dlname) == 0)
+	  if (tryall_dlopen_module (handle,
+				    (const char *) 0, libdir, dlname) == 0)
 	    return 0;
 	}
 
@@ -2016,7 +2021,8 @@ find_module (handle, dir, libdir, dlname, old_name, installed)
 
       /* maybe it was moved to another directory */
       {
-	  if (tryall_dlopen_module (handle, 0, dir, dlname) == 0)
+	  if (tryall_dlopen_module (handle,
+				    (const char *) 0, dir, dlname) == 0)
 	    return 0;
       }
     }
@@ -2130,13 +2136,13 @@ foreach_dirinpath (search_path, base_name, func, data1, data2)
      lt_ptr data1;
      lt_ptr data2;
 {
-  int	result		= 0;
-  int	filenamesize	= 0;
-  int	lenbase		= LT_STRLEN (base_name);
-  int	argz_len	= 0;
-  char *argz		= 0;
-  char *filename	= 0;
-  char *canonical	= 0;
+  int	 result		= 0;
+  int	 filenamesize	= 0;
+  int	 lenbase	= LT_STRLEN (base_name);
+  size_t argz_len	= 0;
+  char * argz		= 0;
+  char * filename	= 0;
+  char * canonical	= 0;
 
   LT_DLMUTEX_LOCK ();
 
