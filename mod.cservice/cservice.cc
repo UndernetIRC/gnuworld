@@ -2,19 +2,8 @@
  * cservice.cc
  * Author: Greg Sikorski
  * Purpose: Overall control client.
- * $Id: cservice.cc,v 1.218 2002/09/02 18:26:58 gte Exp $
+ * $Id: cservice.cc,v 1.219 2002/09/30 16:55:57 dan_karrels Exp $
  */
-
-#warning *** If you are upgrading from a previous release, please make note of
-#warning *** the following:
-#warning ***
-#warning *** Read RELEASE.NOTES incase there are any database design changes you
-#warning *** need to make, or certain functions of the bot will not work.
-#warning ***
-#warning *** This release changes the behaviour of Database Updates from backend
-#warning *** notifications to periodic updates.
-#warning *** Ensure you set your update_interval to a sane value (Eg: 360)
-#warning *** before starting the service.
 
 #include	<new>
 #include	<vector>
