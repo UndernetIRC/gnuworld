@@ -1,7 +1,7 @@
 /* ccFlood.h */
 
 #ifndef __CCLOGIN_H
-#define __CCLOGIN_H "$Id: ccLogin.h,v 1.1 2001/05/29 22:25:47 mrbean_ Exp $"
+#define __CCLOGIN_H "$Id: ccLogin.h,v 1.2 2001/05/30 21:16:44 mrbean_ Exp $"
 
 #include	<string>
 
@@ -28,8 +28,10 @@ public:
 	inline const int 	get_Logins() const
 		{ return Logins; }
 
-	inline time_t	 	get_ignoredUntil() const
+	inline time_t	 	get_IgnoreExpires() const
 		{ return IgnoreExpires; }
+	inline const string	get_IgnoredHost() const
+		{ return IgnoredHost; }
 	
 	//Methods for setting info
 	

@@ -3,7 +3,7 @@
  */
 
 #ifndef __CCONTROL_H
-#define __CCONTROL_H "$Id: ccontrol.h,v 1.30 2001/05/29 22:25:47 mrbean_ Exp $"
+#define __CCONTROL_H "$Id: ccontrol.h,v 1.31 2001/05/30 21:16:45 mrbean_ Exp $"
 
 //Define gline response
 #define GLINE_OK 1;
@@ -490,6 +490,10 @@ public:
 	
 	void ignoreUser( ccLogin * );
 	
+	bool listIgnores( iClient * );
+	
+	bool refreshIgnores();
+	
 	/**
 	 * This is a constant iterator type used to perform a read-only
 	 * iteration of the operchan structure.
@@ -611,7 +615,10 @@ public:
 
 	/* TimerID = Expired glines interval timer */
 	xServer::timerID expiredGlines;
-	
+
+	/* TimerID = Expired ignores interval timer */
+	xServer::timerID expiredIgnores;
+
 protected:
 
 	/**

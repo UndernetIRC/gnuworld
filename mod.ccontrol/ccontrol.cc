@@ -23,7 +23,7 @@
 #include	"AuthInfo.h"
 #include        "server.h"
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.48 2001/05/30 14:51:50 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.49 2001/05/30 21:16:45 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -310,13 +310,16 @@ for( commandMapType::iterator ptr = commandMap.begin() ;
 	ptr->second->setServer( theServer ) ;
 	}
 
+time_t Exp = ::time(0) + 30;
+expiredGlines = theServer->RegisterTimer(::time(0) + GLInterval,this,NULL);
+expiredIgnores = theServer->RegisterTimer(Exp,this,NULL);
+
 if(SendReport)
 	{
 	struct tm Now = convertToTmTime(::time(0));
 	time_t theTime = ::time(0) + ((24 - Now.tm_hour)*3600 - (Now.tm_min)*60) ; //Set the daily timer to 24:00
 	postDailyLog = theServer->RegisterTimer(theTime, this, NULL); 
 	}
-expiredGlines = theServer->RegisterTimer(::time(0) + GLInterval,this,NULL);
 
 theServer->RegisterEvent( EVT_KILL, this );
 theServer->RegisterEvent( EVT_QUIT, this );
@@ -578,11 +581,17 @@ if (timer_id ==  postDailyLog)
 	time_t theTime = time(NULL) + 24*3600; 
 	postDailyLog = MyUplink->RegisterTimer(theTime, this, NULL); 
 	}
-if (timer_id == expiredGlines)
+else if (timer_id == expiredGlines)
 	{
 	refreshGlines();
 	expiredGlines = MyUplink->RegisterTimer(::time(0) + GLInterval,this,NULL);
 	}
+else if (timer_id == expiredIgnores)
+	{
+	refreshIgnores();
+	expiredIgnores = MyUplink->RegisterTimer(::time(0) + 60,this,NULL);
+	}
+
 return 1;
 }
 
@@ -1330,18 +1339,23 @@ return NULL ;
 ccGline* ccontrol::findGline( const string& HostName )
 {
 ccGline *theGline;
-for(glineIterator ptr = glineList.begin(); ptr != glineList.end(); ptr++)
+glineIterator tptr;
+for(glineIterator ptr = glineList.begin(); ptr != glineList.end();)
 	{
 	theGline = *ptr;
-	if(!strcasecmp(theGline->get_Host().c_str(),HostName.c_str()))
-    		if(theGline->get_Expires() > ::time(0))
+	//if(!strcasecmp(theGline->get_Host().c_str(),HostName.c_str()))
+    	if(theGline->get_Host() == HostName)
+		if(theGline->get_Expires() > ::time(0))
 			return theGline;
 		else
 			{
+			tptr = ptr++;
 			theGline->Delete();
-			glineList.erase(ptr);
+			glineList.erase(tptr);
 			MyUplink->removeGline(theGline->get_Host());
 			}
+	else
+		ptr++;			
 	}
 
 return NULL ;
@@ -1913,9 +1927,49 @@ s	<< getCharYYXXX()
 	<< ends; 
 Write( s );
 delete[] s.str();
-User->set_IgnoreExpires(::time(0)+3600);
+User->set_IgnoreExpires(::time(0)+30);
 User->set_IgnoredHost(silenceMask);
 ignoreList.push_back(User);
+}
+
+bool ccontrol::listIgnores( iClient *theClient )
+{
+}
+bool ccontrol::refreshIgnores()
+{
+loginIterator tptr;
+ccLogin *tempLogin;
+MsgChanLog("[Refreshing Ignores] - Started\n");
+for(loginIterator ptr = login_begin();ptr!=login_end();)
+	{
+	tempLogin = *ptr;
+	MsgChanLog("[Refreshing Ignores] - Checking ignores on %s\n",tempLogin->get_IgnoredHost().c_str());
+	
+	if(tempLogin->get_IgnoreExpires() <= ::time(0))
+		{
+		tempLogin->set_IgnoreExpires(0);
+		strstream s;
+		s	<< getCharYYXXX() 
+			<< " SILENCE " 
+			<< tempLogin->get_Numeric() 
+			<< " -" 
+			<< tempLogin->get_IgnoredHost()
+			<< ends; 
+
+		Write( s );
+		delete[] s.str();
+		MsgChanLog("Removing expired ignore for host %s\n",tempLogin->get_IgnoredHost().c_str());
+		tempLogin->set_IgnoredHost("");
+		tptr = ptr;
+		ptr++;
+		ignoreList.erase(tptr);
+		}
+	else
+		ptr++;
+	}
+MsgChanLog("[Refreshing Ignores] - Ended\n");
+
+return true;
 
 }
 } // namespace gnuworld
