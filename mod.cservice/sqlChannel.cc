@@ -9,7 +9,7 @@
  * 30/12/2000: Moved static SQL data to constants.h --Gte
  * Set loadData up to take data from rows other than 0.
  *
- * $Id: sqlChannel.cc,v 1.32 2001/09/26 01:10:31 gte Exp $
+ * $Id: sqlChannel.cc,v 1.33 2001/09/26 01:18:37 gte Exp $
  */
 
 #include	<strstream>
@@ -23,10 +23,9 @@
 #include	"constants.h"
 #include	"cservice.h"
 #include	"cservice_config.h"
-#include <sys/time.h>
 
 const char sqlChannel_h_rcsId[] = __SQLCHANNEL_H ;
-const char sqlChannel_cc_rcsId[] = "$Id: sqlChannel.cc,v 1.32 2001/09/26 01:10:31 gte Exp $" ;
+const char sqlChannel_cc_rcsId[] = "$Id: sqlChannel.cc,v 1.33 2001/09/26 01:18:37 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -118,28 +117,7 @@ queryString	<< "SELECT "
 		<< endl;
 #endif
 
-
-  struct timeval mytimeval;
-  struct timeval myEndTime;
-  struct timezone mytimezone;
-  mytimezone.tz_minuteswest = 0;
-  mytimezone.tz_dsttime = 0;
-
-  gettimeofday(&mytimeval, &mytimezone);
-  long startTime = mytimeval.tv_usec;
-
-  cout << "Executing Query: " << mytimeval.tv_sec << ":" << mytimeval.tv_usec << endl;
-
-
 ExecStatusType status = SQLDb->Exec(queryString.str()) ;
-
-  gettimeofday(&myEndTime, &mytimezone);
-
-  long endTimeMS = (myEndTime.tv_sec - mytimeval.tv_sec) * 1000000;
-  long finalEndTime = endTimeMS + (myEndTime.tv_usec - mytimeval.tv_usec);
-  float endTime = ((float) finalEndTime / 1000000.0);
-  cout << "end: " << finalEndTime << " Microseconds. (" << endTime << " seconds)" << endl;
-
 
 delete[] queryString.str() ;
 
