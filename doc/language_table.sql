@@ -881,6 +881,7 @@ COPY "translations" FROM stdin;
 
 -- Romanian language definition.
 -- 04/03/01 - Alex Badea <vampire@go.ro>
+-- 10/28/02 - Typo fixes by 'Diaboliq'.
 
 COPY "translations" FROM stdin;
 8	1	Esti deja autentificat ca %s	31337	0
@@ -921,7 +922,7 @@ COPY "translations" FROM stdin;
 8	36	Nivel de acces incorect.	31337	0
 8	37	%s e deja pe lista %s cu acces de %i.	31337	0
 8	38	Am adaugat %s la %s cu acces de %i	31337	0
-8	39	Ceva n-am mers cum trebuie: %s	31337	0
+8	39	Ceva n-a mers cum trebuie: %s	31337	0
 8	40	%s: Sfarsit lista de banuri		31337	0
 8	41	Nu pot da detalii despre user (e invizibil)	31337	0
 8	42	Informatii despre: %s (%i)	31337	0
@@ -943,7 +944,7 @@ COPY "translations" FROM stdin;
 8	58	Accesul pe %s ti-a fost suspendat	31337	0
 8	59	Flagul NOOP e activ pe %s	31337	0
 8	60	Flagul STRICTOP e activ pe %s	31337	0
-8	61	Ai deopat mau mult de %i persoane	31337	0
+8	61	Ai deopat mai mult de %i persoane	31337	0
 8	62	SINTAXA: %s	31337	0
 8	63	Accesul pe %s ti-a fost marit temporar la %i	31337	0
 8	64	%s e inregistrat.	31337	0
@@ -1022,7 +1023,7 @@ COPY "translations" FROM stdin;
 8	137	Durata de suspend incorecta.	31337	0
 8	138	SUSPENDAREA pentru %s anulata	31337	0
 8	139	%s e deja suspendat pe %s	31337	0
-8	140	SUSPENDAREA pentru %s exipra in %s	31337	0
+8	140	SUSPENDAREA pentru %s expira in %s	31337	0
 8	141	EROARE: Topicul nu poate depasi 145 de caractere	31337	0
 8	142	Nu ai destul acces pentru a scoate banul %s de pe %s	31337	0
 8	143	Am scos %i banuri care s-au potrivit cu %s	31337	0
@@ -1038,7 +1039,7 @@ COPY "translations" FROM stdin;
 8	153	Sunt mai mult de %i rezultate care se potrivesc cu [%s]	31337	0
 8	154	Restrictioneaza-ti masca de cautare	31337	0
 8	155	Nu sunt rezultate care sa se potriveasca cu [%s]	31337	0
-8	156	%s: Am curatati modurile de canal.	31337	0
+8	156	%s: Am curatat modurile de canal.	31337	0
 8	158	Optiune incorecta.	31337	0
 8	159	%s este un Bot Oficial al Undernet.	31337	0
 8	160	%s este un Reprezentant Oficial al Coder-Com%s si e logat ca %s	31337	0
