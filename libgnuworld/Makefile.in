@@ -40,7 +40,6 @@ ACLOCAL = @ACLOCAL@
 AMDEP_FALSE = @AMDEP_FALSE@
 AMDEP_TRUE = @AMDEP_TRUE@
 AMTAR = @AMTAR@
-AR = @AR@
 AUTOCONF = @AUTOCONF@
 AUTOHEADER = @AUTOHEADER@
 AUTOMAKE = @AUTOMAKE@
@@ -86,8 +85,6 @@ ECHO_N = @ECHO_N@
 ECHO_T = @ECHO_T@
 EGREP = @EGREP@
 EXEEXT = @EXEEXT@
-F77 = @F77@
-FFLAGS = @FFLAGS@
 INCLTDL = @INCLTDL@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
@@ -121,10 +118,8 @@ SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
 VERSION = @VERSION@
-ac_ct_AR = @ac_ct_AR@
 ac_ct_CC = @ac_ct_CC@
 ac_ct_CXX = @ac_ct_CXX@
-ac_ct_F77 = @ac_ct_F77@
 ac_ct_RANLIB = @ac_ct_RANLIB@
 ac_ct_STRIP = @ac_ct_STRIP@
 am__fastdepCC_FALSE = @am__fastdepCC_FALSE@
@@ -180,6 +175,7 @@ libgnuworld_la_SOURCES = Buffer.cc \
 	misc.cc
 
 libgnuworld_la_LDFLAGS = $(threadLib)
+libgnuworld_la_CXXFLAGS = -I${top_srcdir}/include
 
 EXTRA_DIST = Buffer.h \
 	Connection.h \
@@ -205,23 +201,31 @@ CONFIG_CLEAN_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 
 libgnuworld_la_LIBADD =
-am_libgnuworld_la_OBJECTS = Buffer.lo Connection.lo ConnectionHandler.lo \
-	ConnectionManager.lo EConfig.lo ELog.lo Signal.lo \
-	StringTokenizer.lo gThread.lo match.lo md5hash.lo misc.lo
+am_libgnuworld_la_OBJECTS = libgnuworld_la-Buffer.lo \
+	libgnuworld_la-Connection.lo \
+	libgnuworld_la-ConnectionHandler.lo \
+	libgnuworld_la-ConnectionManager.lo libgnuworld_la-EConfig.lo \
+	libgnuworld_la-ELog.lo libgnuworld_la-Signal.lo \
+	libgnuworld_la-StringTokenizer.lo libgnuworld_la-gThread.lo \
+	libgnuworld_la-match.lo libgnuworld_la-md5hash.lo \
+	libgnuworld_la-misc.lo
 libgnuworld_la_OBJECTS = $(am_libgnuworld_la_OBJECTS)
 
 DEFAULT_INCLUDES =  -I. -I$(srcdir) -I$(top_builddir)/include
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
-@AMDEP_TRUE@DEP_FILES = ./$(DEPDIR)/Buffer.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/Connection.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/ConnectionHandler.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/ConnectionManager.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/EConfig.Plo ./$(DEPDIR)/ELog.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/Signal.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/StringTokenizer.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/gThread.Plo ./$(DEPDIR)/match.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/md5hash.Plo ./$(DEPDIR)/misc.Plo
+@AMDEP_TRUE@DEP_FILES = ./$(DEPDIR)/libgnuworld_la-Buffer.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/libgnuworld_la-Connection.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/libgnuworld_la-ConnectionHandler.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/libgnuworld_la-ConnectionManager.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/libgnuworld_la-EConfig.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/libgnuworld_la-ELog.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/libgnuworld_la-Signal.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/libgnuworld_la-StringTokenizer.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/libgnuworld_la-gThread.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/libgnuworld_la-match.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/libgnuworld_la-md5hash.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/libgnuworld_la-misc.Plo
 CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
 LTCXXCOMPILE = $(LIBTOOL) --mode=compile $(CXX) $(DEFS) \
@@ -261,18 +265,18 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Buffer.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Connection.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ConnectionHandler.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ConnectionManager.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/EConfig.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ELog.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Signal.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/StringTokenizer.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gThread.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/match.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/md5hash.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/misc.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgnuworld_la-Buffer.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgnuworld_la-Connection.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgnuworld_la-ConnectionHandler.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgnuworld_la-ConnectionManager.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgnuworld_la-EConfig.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgnuworld_la-ELog.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgnuworld_la-Signal.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgnuworld_la-StringTokenizer.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgnuworld_la-gThread.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgnuworld_la-match.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgnuworld_la-md5hash.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgnuworld_la-misc.Plo@am__quote@
 
 distclean-depend:
 	-rm -rf ./$(DEPDIR)
@@ -309,6 +313,402 @@ distclean-depend:
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/$*.Plo' tmpdepfile='$(DEPDIR)/$*.TPlo' @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LTCXXCOMPILE) -c -o $@ `test -f '$<' || echo '$(srcdir)/'`$<
+
+libgnuworld_la-Buffer.o: Buffer.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworld_la_CXXFLAGS) $(CXXFLAGS) -MT libgnuworld_la-Buffer.o -MD -MP -MF "$(DEPDIR)/libgnuworld_la-Buffer.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libgnuworld_la-Buffer.o `test -f 'Buffer.cc' || echo '$(srcdir)/'`Buffer.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libgnuworld_la-Buffer.Tpo" "$(DEPDIR)/libgnuworld_la-Buffer.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libgnuworld_la-Buffer.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='Buffer.cc' object='libgnuworld_la-Buffer.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libgnuworld_la-Buffer.Po' tmpdepfile='$(DEPDIR)/libgnuworld_la-Buffer.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworld_la_CXXFLAGS) $(CXXFLAGS) -c -o libgnuworld_la-Buffer.o `test -f 'Buffer.cc' || echo '$(srcdir)/'`Buffer.cc
+
+libgnuworld_la-Buffer.obj: Buffer.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworld_la_CXXFLAGS) $(CXXFLAGS) -MT libgnuworld_la-Buffer.obj -MD -MP -MF "$(DEPDIR)/libgnuworld_la-Buffer.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libgnuworld_la-Buffer.obj `if test -f 'Buffer.cc'; then $(CYGPATH_W) 'Buffer.cc'; else $(CYGPATH_W) '$(srcdir)/Buffer.cc'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libgnuworld_la-Buffer.Tpo" "$(DEPDIR)/libgnuworld_la-Buffer.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libgnuworld_la-Buffer.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='Buffer.cc' object='libgnuworld_la-Buffer.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libgnuworld_la-Buffer.Po' tmpdepfile='$(DEPDIR)/libgnuworld_la-Buffer.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworld_la_CXXFLAGS) $(CXXFLAGS) -c -o libgnuworld_la-Buffer.obj `if test -f 'Buffer.cc'; then $(CYGPATH_W) 'Buffer.cc'; else $(CYGPATH_W) '$(srcdir)/Buffer.cc'; fi`
+
+libgnuworld_la-Buffer.lo: Buffer.cc
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworld_la_CXXFLAGS) $(CXXFLAGS) -MT libgnuworld_la-Buffer.lo -MD -MP -MF "$(DEPDIR)/libgnuworld_la-Buffer.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libgnuworld_la-Buffer.lo `test -f 'Buffer.cc' || echo '$(srcdir)/'`Buffer.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libgnuworld_la-Buffer.Tpo" "$(DEPDIR)/libgnuworld_la-Buffer.Plo"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libgnuworld_la-Buffer.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='Buffer.cc' object='libgnuworld_la-Buffer.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libgnuworld_la-Buffer.Plo' tmpdepfile='$(DEPDIR)/libgnuworld_la-Buffer.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworld_la_CXXFLAGS) $(CXXFLAGS) -c -o libgnuworld_la-Buffer.lo `test -f 'Buffer.cc' || echo '$(srcdir)/'`Buffer.cc
+
+libgnuworld_la-Connection.o: Connection.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworld_la_CXXFLAGS) $(CXXFLAGS) -MT libgnuworld_la-Connection.o -MD -MP -MF "$(DEPDIR)/libgnuworld_la-Connection.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libgnuworld_la-Connection.o `test -f 'Connection.cc' || echo '$(srcdir)/'`Connection.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libgnuworld_la-Connection.Tpo" "$(DEPDIR)/libgnuworld_la-Connection.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libgnuworld_la-Connection.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='Connection.cc' object='libgnuworld_la-Connection.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libgnuworld_la-Connection.Po' tmpdepfile='$(DEPDIR)/libgnuworld_la-Connection.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworld_la_CXXFLAGS) $(CXXFLAGS) -c -o libgnuworld_la-Connection.o `test -f 'Connection.cc' || echo '$(srcdir)/'`Connection.cc
+
+libgnuworld_la-Connection.obj: Connection.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworld_la_CXXFLAGS) $(CXXFLAGS) -MT libgnuworld_la-Connection.obj -MD -MP -MF "$(DEPDIR)/libgnuworld_la-Connection.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libgnuworld_la-Connection.obj `if test -f 'Connection.cc'; then $(CYGPATH_W) 'Connection.cc'; else $(CYGPATH_W) '$(srcdir)/Connection.cc'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libgnuworld_la-Connection.Tpo" "$(DEPDIR)/libgnuworld_la-Connection.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libgnuworld_la-Connection.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='Connection.cc' object='libgnuworld_la-Connection.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libgnuworld_la-Connection.Po' tmpdepfile='$(DEPDIR)/libgnuworld_la-Connection.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworld_la_CXXFLAGS) $(CXXFLAGS) -c -o libgnuworld_la-Connection.obj `if test -f 'Connection.cc'; then $(CYGPATH_W) 'Connection.cc'; else $(CYGPATH_W) '$(srcdir)/Connection.cc'; fi`
+
+libgnuworld_la-Connection.lo: Connection.cc
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworld_la_CXXFLAGS) $(CXXFLAGS) -MT libgnuworld_la-Connection.lo -MD -MP -MF "$(DEPDIR)/libgnuworld_la-Connection.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libgnuworld_la-Connection.lo `test -f 'Connection.cc' || echo '$(srcdir)/'`Connection.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libgnuworld_la-Connection.Tpo" "$(DEPDIR)/libgnuworld_la-Connection.Plo"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libgnuworld_la-Connection.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='Connection.cc' object='libgnuworld_la-Connection.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libgnuworld_la-Connection.Plo' tmpdepfile='$(DEPDIR)/libgnuworld_la-Connection.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworld_la_CXXFLAGS) $(CXXFLAGS) -c -o libgnuworld_la-Connection.lo `test -f 'Connection.cc' || echo '$(srcdir)/'`Connection.cc
+
+libgnuworld_la-ConnectionHandler.o: ConnectionHandler.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworld_la_CXXFLAGS) $(CXXFLAGS) -MT libgnuworld_la-ConnectionHandler.o -MD -MP -MF "$(DEPDIR)/libgnuworld_la-ConnectionHandler.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libgnuworld_la-ConnectionHandler.o `test -f 'ConnectionHandler.cc' || echo '$(srcdir)/'`ConnectionHandler.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libgnuworld_la-ConnectionHandler.Tpo" "$(DEPDIR)/libgnuworld_la-ConnectionHandler.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libgnuworld_la-ConnectionHandler.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='ConnectionHandler.cc' object='libgnuworld_la-ConnectionHandler.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libgnuworld_la-ConnectionHandler.Po' tmpdepfile='$(DEPDIR)/libgnuworld_la-ConnectionHandler.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworld_la_CXXFLAGS) $(CXXFLAGS) -c -o libgnuworld_la-ConnectionHandler.o `test -f 'ConnectionHandler.cc' || echo '$(srcdir)/'`ConnectionHandler.cc
+
+libgnuworld_la-ConnectionHandler.obj: ConnectionHandler.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworld_la_CXXFLAGS) $(CXXFLAGS) -MT libgnuworld_la-ConnectionHandler.obj -MD -MP -MF "$(DEPDIR)/libgnuworld_la-ConnectionHandler.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libgnuworld_la-ConnectionHandler.obj `if test -f 'ConnectionHandler.cc'; then $(CYGPATH_W) 'ConnectionHandler.cc'; else $(CYGPATH_W) '$(srcdir)/ConnectionHandler.cc'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libgnuworld_la-ConnectionHandler.Tpo" "$(DEPDIR)/libgnuworld_la-ConnectionHandler.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libgnuworld_la-ConnectionHandler.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='ConnectionHandler.cc' object='libgnuworld_la-ConnectionHandler.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libgnuworld_la-ConnectionHandler.Po' tmpdepfile='$(DEPDIR)/libgnuworld_la-ConnectionHandler.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworld_la_CXXFLAGS) $(CXXFLAGS) -c -o libgnuworld_la-ConnectionHandler.obj `if test -f 'ConnectionHandler.cc'; then $(CYGPATH_W) 'ConnectionHandler.cc'; else $(CYGPATH_W) '$(srcdir)/ConnectionHandler.cc'; fi`
+
+libgnuworld_la-ConnectionHandler.lo: ConnectionHandler.cc
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworld_la_CXXFLAGS) $(CXXFLAGS) -MT libgnuworld_la-ConnectionHandler.lo -MD -MP -MF "$(DEPDIR)/libgnuworld_la-ConnectionHandler.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libgnuworld_la-ConnectionHandler.lo `test -f 'ConnectionHandler.cc' || echo '$(srcdir)/'`ConnectionHandler.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libgnuworld_la-ConnectionHandler.Tpo" "$(DEPDIR)/libgnuworld_la-ConnectionHandler.Plo"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libgnuworld_la-ConnectionHandler.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='ConnectionHandler.cc' object='libgnuworld_la-ConnectionHandler.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libgnuworld_la-ConnectionHandler.Plo' tmpdepfile='$(DEPDIR)/libgnuworld_la-ConnectionHandler.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworld_la_CXXFLAGS) $(CXXFLAGS) -c -o libgnuworld_la-ConnectionHandler.lo `test -f 'ConnectionHandler.cc' || echo '$(srcdir)/'`ConnectionHandler.cc
+
+libgnuworld_la-ConnectionManager.o: ConnectionManager.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworld_la_CXXFLAGS) $(CXXFLAGS) -MT libgnuworld_la-ConnectionManager.o -MD -MP -MF "$(DEPDIR)/libgnuworld_la-ConnectionManager.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libgnuworld_la-ConnectionManager.o `test -f 'ConnectionManager.cc' || echo '$(srcdir)/'`ConnectionManager.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libgnuworld_la-ConnectionManager.Tpo" "$(DEPDIR)/libgnuworld_la-ConnectionManager.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libgnuworld_la-ConnectionManager.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='ConnectionManager.cc' object='libgnuworld_la-ConnectionManager.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libgnuworld_la-ConnectionManager.Po' tmpdepfile='$(DEPDIR)/libgnuworld_la-ConnectionManager.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworld_la_CXXFLAGS) $(CXXFLAGS) -c -o libgnuworld_la-ConnectionManager.o `test -f 'ConnectionManager.cc' || echo '$(srcdir)/'`ConnectionManager.cc
+
+libgnuworld_la-ConnectionManager.obj: ConnectionManager.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworld_la_CXXFLAGS) $(CXXFLAGS) -MT libgnuworld_la-ConnectionManager.obj -MD -MP -MF "$(DEPDIR)/libgnuworld_la-ConnectionManager.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libgnuworld_la-ConnectionManager.obj `if test -f 'ConnectionManager.cc'; then $(CYGPATH_W) 'ConnectionManager.cc'; else $(CYGPATH_W) '$(srcdir)/ConnectionManager.cc'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libgnuworld_la-ConnectionManager.Tpo" "$(DEPDIR)/libgnuworld_la-ConnectionManager.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libgnuworld_la-ConnectionManager.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='ConnectionManager.cc' object='libgnuworld_la-ConnectionManager.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libgnuworld_la-ConnectionManager.Po' tmpdepfile='$(DEPDIR)/libgnuworld_la-ConnectionManager.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworld_la_CXXFLAGS) $(CXXFLAGS) -c -o libgnuworld_la-ConnectionManager.obj `if test -f 'ConnectionManager.cc'; then $(CYGPATH_W) 'ConnectionManager.cc'; else $(CYGPATH_W) '$(srcdir)/ConnectionManager.cc'; fi`
+
+libgnuworld_la-ConnectionManager.lo: ConnectionManager.cc
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworld_la_CXXFLAGS) $(CXXFLAGS) -MT libgnuworld_la-ConnectionManager.lo -MD -MP -MF "$(DEPDIR)/libgnuworld_la-ConnectionManager.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libgnuworld_la-ConnectionManager.lo `test -f 'ConnectionManager.cc' || echo '$(srcdir)/'`ConnectionManager.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libgnuworld_la-ConnectionManager.Tpo" "$(DEPDIR)/libgnuworld_la-ConnectionManager.Plo"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libgnuworld_la-ConnectionManager.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='ConnectionManager.cc' object='libgnuworld_la-ConnectionManager.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libgnuworld_la-ConnectionManager.Plo' tmpdepfile='$(DEPDIR)/libgnuworld_la-ConnectionManager.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworld_la_CXXFLAGS) $(CXXFLAGS) -c -o libgnuworld_la-ConnectionManager.lo `test -f 'ConnectionManager.cc' || echo '$(srcdir)/'`ConnectionManager.cc
+
+libgnuworld_la-EConfig.o: EConfig.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworld_la_CXXFLAGS) $(CXXFLAGS) -MT libgnuworld_la-EConfig.o -MD -MP -MF "$(DEPDIR)/libgnuworld_la-EConfig.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libgnuworld_la-EConfig.o `test -f 'EConfig.cc' || echo '$(srcdir)/'`EConfig.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libgnuworld_la-EConfig.Tpo" "$(DEPDIR)/libgnuworld_la-EConfig.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libgnuworld_la-EConfig.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='EConfig.cc' object='libgnuworld_la-EConfig.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libgnuworld_la-EConfig.Po' tmpdepfile='$(DEPDIR)/libgnuworld_la-EConfig.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworld_la_CXXFLAGS) $(CXXFLAGS) -c -o libgnuworld_la-EConfig.o `test -f 'EConfig.cc' || echo '$(srcdir)/'`EConfig.cc
+
+libgnuworld_la-EConfig.obj: EConfig.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworld_la_CXXFLAGS) $(CXXFLAGS) -MT libgnuworld_la-EConfig.obj -MD -MP -MF "$(DEPDIR)/libgnuworld_la-EConfig.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libgnuworld_la-EConfig.obj `if test -f 'EConfig.cc'; then $(CYGPATH_W) 'EConfig.cc'; else $(CYGPATH_W) '$(srcdir)/EConfig.cc'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libgnuworld_la-EConfig.Tpo" "$(DEPDIR)/libgnuworld_la-EConfig.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libgnuworld_la-EConfig.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='EConfig.cc' object='libgnuworld_la-EConfig.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libgnuworld_la-EConfig.Po' tmpdepfile='$(DEPDIR)/libgnuworld_la-EConfig.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworld_la_CXXFLAGS) $(CXXFLAGS) -c -o libgnuworld_la-EConfig.obj `if test -f 'EConfig.cc'; then $(CYGPATH_W) 'EConfig.cc'; else $(CYGPATH_W) '$(srcdir)/EConfig.cc'; fi`
+
+libgnuworld_la-EConfig.lo: EConfig.cc
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworld_la_CXXFLAGS) $(CXXFLAGS) -MT libgnuworld_la-EConfig.lo -MD -MP -MF "$(DEPDIR)/libgnuworld_la-EConfig.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libgnuworld_la-EConfig.lo `test -f 'EConfig.cc' || echo '$(srcdir)/'`EConfig.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libgnuworld_la-EConfig.Tpo" "$(DEPDIR)/libgnuworld_la-EConfig.Plo"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libgnuworld_la-EConfig.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='EConfig.cc' object='libgnuworld_la-EConfig.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libgnuworld_la-EConfig.Plo' tmpdepfile='$(DEPDIR)/libgnuworld_la-EConfig.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworld_la_CXXFLAGS) $(CXXFLAGS) -c -o libgnuworld_la-EConfig.lo `test -f 'EConfig.cc' || echo '$(srcdir)/'`EConfig.cc
+
+libgnuworld_la-ELog.o: ELog.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworld_la_CXXFLAGS) $(CXXFLAGS) -MT libgnuworld_la-ELog.o -MD -MP -MF "$(DEPDIR)/libgnuworld_la-ELog.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libgnuworld_la-ELog.o `test -f 'ELog.cc' || echo '$(srcdir)/'`ELog.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libgnuworld_la-ELog.Tpo" "$(DEPDIR)/libgnuworld_la-ELog.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libgnuworld_la-ELog.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='ELog.cc' object='libgnuworld_la-ELog.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libgnuworld_la-ELog.Po' tmpdepfile='$(DEPDIR)/libgnuworld_la-ELog.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworld_la_CXXFLAGS) $(CXXFLAGS) -c -o libgnuworld_la-ELog.o `test -f 'ELog.cc' || echo '$(srcdir)/'`ELog.cc
+
+libgnuworld_la-ELog.obj: ELog.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworld_la_CXXFLAGS) $(CXXFLAGS) -MT libgnuworld_la-ELog.obj -MD -MP -MF "$(DEPDIR)/libgnuworld_la-ELog.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libgnuworld_la-ELog.obj `if test -f 'ELog.cc'; then $(CYGPATH_W) 'ELog.cc'; else $(CYGPATH_W) '$(srcdir)/ELog.cc'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libgnuworld_la-ELog.Tpo" "$(DEPDIR)/libgnuworld_la-ELog.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libgnuworld_la-ELog.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='ELog.cc' object='libgnuworld_la-ELog.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libgnuworld_la-ELog.Po' tmpdepfile='$(DEPDIR)/libgnuworld_la-ELog.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworld_la_CXXFLAGS) $(CXXFLAGS) -c -o libgnuworld_la-ELog.obj `if test -f 'ELog.cc'; then $(CYGPATH_W) 'ELog.cc'; else $(CYGPATH_W) '$(srcdir)/ELog.cc'; fi`
+
+libgnuworld_la-ELog.lo: ELog.cc
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworld_la_CXXFLAGS) $(CXXFLAGS) -MT libgnuworld_la-ELog.lo -MD -MP -MF "$(DEPDIR)/libgnuworld_la-ELog.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libgnuworld_la-ELog.lo `test -f 'ELog.cc' || echo '$(srcdir)/'`ELog.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libgnuworld_la-ELog.Tpo" "$(DEPDIR)/libgnuworld_la-ELog.Plo"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libgnuworld_la-ELog.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='ELog.cc' object='libgnuworld_la-ELog.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libgnuworld_la-ELog.Plo' tmpdepfile='$(DEPDIR)/libgnuworld_la-ELog.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworld_la_CXXFLAGS) $(CXXFLAGS) -c -o libgnuworld_la-ELog.lo `test -f 'ELog.cc' || echo '$(srcdir)/'`ELog.cc
+
+libgnuworld_la-Signal.o: Signal.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworld_la_CXXFLAGS) $(CXXFLAGS) -MT libgnuworld_la-Signal.o -MD -MP -MF "$(DEPDIR)/libgnuworld_la-Signal.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libgnuworld_la-Signal.o `test -f 'Signal.cc' || echo '$(srcdir)/'`Signal.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libgnuworld_la-Signal.Tpo" "$(DEPDIR)/libgnuworld_la-Signal.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libgnuworld_la-Signal.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='Signal.cc' object='libgnuworld_la-Signal.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libgnuworld_la-Signal.Po' tmpdepfile='$(DEPDIR)/libgnuworld_la-Signal.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworld_la_CXXFLAGS) $(CXXFLAGS) -c -o libgnuworld_la-Signal.o `test -f 'Signal.cc' || echo '$(srcdir)/'`Signal.cc
+
+libgnuworld_la-Signal.obj: Signal.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworld_la_CXXFLAGS) $(CXXFLAGS) -MT libgnuworld_la-Signal.obj -MD -MP -MF "$(DEPDIR)/libgnuworld_la-Signal.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libgnuworld_la-Signal.obj `if test -f 'Signal.cc'; then $(CYGPATH_W) 'Signal.cc'; else $(CYGPATH_W) '$(srcdir)/Signal.cc'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libgnuworld_la-Signal.Tpo" "$(DEPDIR)/libgnuworld_la-Signal.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libgnuworld_la-Signal.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='Signal.cc' object='libgnuworld_la-Signal.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libgnuworld_la-Signal.Po' tmpdepfile='$(DEPDIR)/libgnuworld_la-Signal.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworld_la_CXXFLAGS) $(CXXFLAGS) -c -o libgnuworld_la-Signal.obj `if test -f 'Signal.cc'; then $(CYGPATH_W) 'Signal.cc'; else $(CYGPATH_W) '$(srcdir)/Signal.cc'; fi`
+
+libgnuworld_la-Signal.lo: Signal.cc
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworld_la_CXXFLAGS) $(CXXFLAGS) -MT libgnuworld_la-Signal.lo -MD -MP -MF "$(DEPDIR)/libgnuworld_la-Signal.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libgnuworld_la-Signal.lo `test -f 'Signal.cc' || echo '$(srcdir)/'`Signal.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libgnuworld_la-Signal.Tpo" "$(DEPDIR)/libgnuworld_la-Signal.Plo"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libgnuworld_la-Signal.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='Signal.cc' object='libgnuworld_la-Signal.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libgnuworld_la-Signal.Plo' tmpdepfile='$(DEPDIR)/libgnuworld_la-Signal.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworld_la_CXXFLAGS) $(CXXFLAGS) -c -o libgnuworld_la-Signal.lo `test -f 'Signal.cc' || echo '$(srcdir)/'`Signal.cc
+
+libgnuworld_la-StringTokenizer.o: StringTokenizer.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworld_la_CXXFLAGS) $(CXXFLAGS) -MT libgnuworld_la-StringTokenizer.o -MD -MP -MF "$(DEPDIR)/libgnuworld_la-StringTokenizer.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libgnuworld_la-StringTokenizer.o `test -f 'StringTokenizer.cc' || echo '$(srcdir)/'`StringTokenizer.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libgnuworld_la-StringTokenizer.Tpo" "$(DEPDIR)/libgnuworld_la-StringTokenizer.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libgnuworld_la-StringTokenizer.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='StringTokenizer.cc' object='libgnuworld_la-StringTokenizer.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libgnuworld_la-StringTokenizer.Po' tmpdepfile='$(DEPDIR)/libgnuworld_la-StringTokenizer.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworld_la_CXXFLAGS) $(CXXFLAGS) -c -o libgnuworld_la-StringTokenizer.o `test -f 'StringTokenizer.cc' || echo '$(srcdir)/'`StringTokenizer.cc
+
+libgnuworld_la-StringTokenizer.obj: StringTokenizer.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworld_la_CXXFLAGS) $(CXXFLAGS) -MT libgnuworld_la-StringTokenizer.obj -MD -MP -MF "$(DEPDIR)/libgnuworld_la-StringTokenizer.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libgnuworld_la-StringTokenizer.obj `if test -f 'StringTokenizer.cc'; then $(CYGPATH_W) 'StringTokenizer.cc'; else $(CYGPATH_W) '$(srcdir)/StringTokenizer.cc'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libgnuworld_la-StringTokenizer.Tpo" "$(DEPDIR)/libgnuworld_la-StringTokenizer.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libgnuworld_la-StringTokenizer.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='StringTokenizer.cc' object='libgnuworld_la-StringTokenizer.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libgnuworld_la-StringTokenizer.Po' tmpdepfile='$(DEPDIR)/libgnuworld_la-StringTokenizer.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworld_la_CXXFLAGS) $(CXXFLAGS) -c -o libgnuworld_la-StringTokenizer.obj `if test -f 'StringTokenizer.cc'; then $(CYGPATH_W) 'StringTokenizer.cc'; else $(CYGPATH_W) '$(srcdir)/StringTokenizer.cc'; fi`
+
+libgnuworld_la-StringTokenizer.lo: StringTokenizer.cc
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworld_la_CXXFLAGS) $(CXXFLAGS) -MT libgnuworld_la-StringTokenizer.lo -MD -MP -MF "$(DEPDIR)/libgnuworld_la-StringTokenizer.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libgnuworld_la-StringTokenizer.lo `test -f 'StringTokenizer.cc' || echo '$(srcdir)/'`StringTokenizer.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libgnuworld_la-StringTokenizer.Tpo" "$(DEPDIR)/libgnuworld_la-StringTokenizer.Plo"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libgnuworld_la-StringTokenizer.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='StringTokenizer.cc' object='libgnuworld_la-StringTokenizer.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libgnuworld_la-StringTokenizer.Plo' tmpdepfile='$(DEPDIR)/libgnuworld_la-StringTokenizer.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworld_la_CXXFLAGS) $(CXXFLAGS) -c -o libgnuworld_la-StringTokenizer.lo `test -f 'StringTokenizer.cc' || echo '$(srcdir)/'`StringTokenizer.cc
+
+libgnuworld_la-gThread.o: gThread.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworld_la_CXXFLAGS) $(CXXFLAGS) -MT libgnuworld_la-gThread.o -MD -MP -MF "$(DEPDIR)/libgnuworld_la-gThread.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libgnuworld_la-gThread.o `test -f 'gThread.cc' || echo '$(srcdir)/'`gThread.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libgnuworld_la-gThread.Tpo" "$(DEPDIR)/libgnuworld_la-gThread.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libgnuworld_la-gThread.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='gThread.cc' object='libgnuworld_la-gThread.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libgnuworld_la-gThread.Po' tmpdepfile='$(DEPDIR)/libgnuworld_la-gThread.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworld_la_CXXFLAGS) $(CXXFLAGS) -c -o libgnuworld_la-gThread.o `test -f 'gThread.cc' || echo '$(srcdir)/'`gThread.cc
+
+libgnuworld_la-gThread.obj: gThread.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworld_la_CXXFLAGS) $(CXXFLAGS) -MT libgnuworld_la-gThread.obj -MD -MP -MF "$(DEPDIR)/libgnuworld_la-gThread.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libgnuworld_la-gThread.obj `if test -f 'gThread.cc'; then $(CYGPATH_W) 'gThread.cc'; else $(CYGPATH_W) '$(srcdir)/gThread.cc'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libgnuworld_la-gThread.Tpo" "$(DEPDIR)/libgnuworld_la-gThread.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libgnuworld_la-gThread.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='gThread.cc' object='libgnuworld_la-gThread.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libgnuworld_la-gThread.Po' tmpdepfile='$(DEPDIR)/libgnuworld_la-gThread.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworld_la_CXXFLAGS) $(CXXFLAGS) -c -o libgnuworld_la-gThread.obj `if test -f 'gThread.cc'; then $(CYGPATH_W) 'gThread.cc'; else $(CYGPATH_W) '$(srcdir)/gThread.cc'; fi`
+
+libgnuworld_la-gThread.lo: gThread.cc
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworld_la_CXXFLAGS) $(CXXFLAGS) -MT libgnuworld_la-gThread.lo -MD -MP -MF "$(DEPDIR)/libgnuworld_la-gThread.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libgnuworld_la-gThread.lo `test -f 'gThread.cc' || echo '$(srcdir)/'`gThread.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libgnuworld_la-gThread.Tpo" "$(DEPDIR)/libgnuworld_la-gThread.Plo"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libgnuworld_la-gThread.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='gThread.cc' object='libgnuworld_la-gThread.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libgnuworld_la-gThread.Plo' tmpdepfile='$(DEPDIR)/libgnuworld_la-gThread.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworld_la_CXXFLAGS) $(CXXFLAGS) -c -o libgnuworld_la-gThread.lo `test -f 'gThread.cc' || echo '$(srcdir)/'`gThread.cc
+
+libgnuworld_la-match.o: match.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworld_la_CXXFLAGS) $(CXXFLAGS) -MT libgnuworld_la-match.o -MD -MP -MF "$(DEPDIR)/libgnuworld_la-match.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libgnuworld_la-match.o `test -f 'match.cc' || echo '$(srcdir)/'`match.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libgnuworld_la-match.Tpo" "$(DEPDIR)/libgnuworld_la-match.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libgnuworld_la-match.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='match.cc' object='libgnuworld_la-match.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libgnuworld_la-match.Po' tmpdepfile='$(DEPDIR)/libgnuworld_la-match.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworld_la_CXXFLAGS) $(CXXFLAGS) -c -o libgnuworld_la-match.o `test -f 'match.cc' || echo '$(srcdir)/'`match.cc
+
+libgnuworld_la-match.obj: match.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworld_la_CXXFLAGS) $(CXXFLAGS) -MT libgnuworld_la-match.obj -MD -MP -MF "$(DEPDIR)/libgnuworld_la-match.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libgnuworld_la-match.obj `if test -f 'match.cc'; then $(CYGPATH_W) 'match.cc'; else $(CYGPATH_W) '$(srcdir)/match.cc'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libgnuworld_la-match.Tpo" "$(DEPDIR)/libgnuworld_la-match.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libgnuworld_la-match.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='match.cc' object='libgnuworld_la-match.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libgnuworld_la-match.Po' tmpdepfile='$(DEPDIR)/libgnuworld_la-match.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworld_la_CXXFLAGS) $(CXXFLAGS) -c -o libgnuworld_la-match.obj `if test -f 'match.cc'; then $(CYGPATH_W) 'match.cc'; else $(CYGPATH_W) '$(srcdir)/match.cc'; fi`
+
+libgnuworld_la-match.lo: match.cc
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworld_la_CXXFLAGS) $(CXXFLAGS) -MT libgnuworld_la-match.lo -MD -MP -MF "$(DEPDIR)/libgnuworld_la-match.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libgnuworld_la-match.lo `test -f 'match.cc' || echo '$(srcdir)/'`match.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libgnuworld_la-match.Tpo" "$(DEPDIR)/libgnuworld_la-match.Plo"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libgnuworld_la-match.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='match.cc' object='libgnuworld_la-match.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libgnuworld_la-match.Plo' tmpdepfile='$(DEPDIR)/libgnuworld_la-match.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworld_la_CXXFLAGS) $(CXXFLAGS) -c -o libgnuworld_la-match.lo `test -f 'match.cc' || echo '$(srcdir)/'`match.cc
+
+libgnuworld_la-md5hash.o: md5hash.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworld_la_CXXFLAGS) $(CXXFLAGS) -MT libgnuworld_la-md5hash.o -MD -MP -MF "$(DEPDIR)/libgnuworld_la-md5hash.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libgnuworld_la-md5hash.o `test -f 'md5hash.cc' || echo '$(srcdir)/'`md5hash.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libgnuworld_la-md5hash.Tpo" "$(DEPDIR)/libgnuworld_la-md5hash.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libgnuworld_la-md5hash.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='md5hash.cc' object='libgnuworld_la-md5hash.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libgnuworld_la-md5hash.Po' tmpdepfile='$(DEPDIR)/libgnuworld_la-md5hash.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworld_la_CXXFLAGS) $(CXXFLAGS) -c -o libgnuworld_la-md5hash.o `test -f 'md5hash.cc' || echo '$(srcdir)/'`md5hash.cc
+
+libgnuworld_la-md5hash.obj: md5hash.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworld_la_CXXFLAGS) $(CXXFLAGS) -MT libgnuworld_la-md5hash.obj -MD -MP -MF "$(DEPDIR)/libgnuworld_la-md5hash.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libgnuworld_la-md5hash.obj `if test -f 'md5hash.cc'; then $(CYGPATH_W) 'md5hash.cc'; else $(CYGPATH_W) '$(srcdir)/md5hash.cc'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libgnuworld_la-md5hash.Tpo" "$(DEPDIR)/libgnuworld_la-md5hash.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libgnuworld_la-md5hash.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='md5hash.cc' object='libgnuworld_la-md5hash.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libgnuworld_la-md5hash.Po' tmpdepfile='$(DEPDIR)/libgnuworld_la-md5hash.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworld_la_CXXFLAGS) $(CXXFLAGS) -c -o libgnuworld_la-md5hash.obj `if test -f 'md5hash.cc'; then $(CYGPATH_W) 'md5hash.cc'; else $(CYGPATH_W) '$(srcdir)/md5hash.cc'; fi`
+
+libgnuworld_la-md5hash.lo: md5hash.cc
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworld_la_CXXFLAGS) $(CXXFLAGS) -MT libgnuworld_la-md5hash.lo -MD -MP -MF "$(DEPDIR)/libgnuworld_la-md5hash.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libgnuworld_la-md5hash.lo `test -f 'md5hash.cc' || echo '$(srcdir)/'`md5hash.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libgnuworld_la-md5hash.Tpo" "$(DEPDIR)/libgnuworld_la-md5hash.Plo"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libgnuworld_la-md5hash.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='md5hash.cc' object='libgnuworld_la-md5hash.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libgnuworld_la-md5hash.Plo' tmpdepfile='$(DEPDIR)/libgnuworld_la-md5hash.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworld_la_CXXFLAGS) $(CXXFLAGS) -c -o libgnuworld_la-md5hash.lo `test -f 'md5hash.cc' || echo '$(srcdir)/'`md5hash.cc
+
+libgnuworld_la-misc.o: misc.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworld_la_CXXFLAGS) $(CXXFLAGS) -MT libgnuworld_la-misc.o -MD -MP -MF "$(DEPDIR)/libgnuworld_la-misc.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libgnuworld_la-misc.o `test -f 'misc.cc' || echo '$(srcdir)/'`misc.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libgnuworld_la-misc.Tpo" "$(DEPDIR)/libgnuworld_la-misc.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libgnuworld_la-misc.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='misc.cc' object='libgnuworld_la-misc.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libgnuworld_la-misc.Po' tmpdepfile='$(DEPDIR)/libgnuworld_la-misc.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworld_la_CXXFLAGS) $(CXXFLAGS) -c -o libgnuworld_la-misc.o `test -f 'misc.cc' || echo '$(srcdir)/'`misc.cc
+
+libgnuworld_la-misc.obj: misc.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworld_la_CXXFLAGS) $(CXXFLAGS) -MT libgnuworld_la-misc.obj -MD -MP -MF "$(DEPDIR)/libgnuworld_la-misc.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libgnuworld_la-misc.obj `if test -f 'misc.cc'; then $(CYGPATH_W) 'misc.cc'; else $(CYGPATH_W) '$(srcdir)/misc.cc'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libgnuworld_la-misc.Tpo" "$(DEPDIR)/libgnuworld_la-misc.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libgnuworld_la-misc.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='misc.cc' object='libgnuworld_la-misc.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libgnuworld_la-misc.Po' tmpdepfile='$(DEPDIR)/libgnuworld_la-misc.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworld_la_CXXFLAGS) $(CXXFLAGS) -c -o libgnuworld_la-misc.obj `if test -f 'misc.cc'; then $(CYGPATH_W) 'misc.cc'; else $(CYGPATH_W) '$(srcdir)/misc.cc'; fi`
+
+libgnuworld_la-misc.lo: misc.cc
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworld_la_CXXFLAGS) $(CXXFLAGS) -MT libgnuworld_la-misc.lo -MD -MP -MF "$(DEPDIR)/libgnuworld_la-misc.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libgnuworld_la-misc.lo `test -f 'misc.cc' || echo '$(srcdir)/'`misc.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libgnuworld_la-misc.Tpo" "$(DEPDIR)/libgnuworld_la-misc.Plo"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libgnuworld_la-misc.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='misc.cc' object='libgnuworld_la-misc.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libgnuworld_la-misc.Plo' tmpdepfile='$(DEPDIR)/libgnuworld_la-misc.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworld_la_CXXFLAGS) $(CXXFLAGS) -c -o libgnuworld_la-misc.lo `test -f 'misc.cc' || echo '$(srcdir)/'`misc.cc
 
 mostlyclean-libtool:
 	-rm -f *.lo

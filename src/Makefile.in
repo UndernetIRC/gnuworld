@@ -40,7 +40,6 @@ ACLOCAL = @ACLOCAL@
 AMDEP_FALSE = @AMDEP_FALSE@
 AMDEP_TRUE = @AMDEP_TRUE@
 AMTAR = @AMTAR@
-AR = @AR@
 AUTOCONF = @AUTOCONF@
 AUTOHEADER = @AUTOHEADER@
 AUTOMAKE = @AUTOMAKE@
@@ -86,8 +85,6 @@ ECHO_N = @ECHO_N@
 ECHO_T = @ECHO_T@
 EGREP = @EGREP@
 EXEEXT = @EXEEXT@
-F77 = @F77@
-FFLAGS = @FFLAGS@
 INCLTDL = @INCLTDL@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
@@ -121,10 +118,8 @@ SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
 VERSION = @VERSION@
-ac_ct_AR = @ac_ct_AR@
 ac_ct_CC = @ac_ct_CC@
 ac_ct_CXX = @ac_ct_CXX@
-ac_ct_F77 = @ac_ct_F77@
 ac_ct_RANLIB = @ac_ct_RANLIB@
 ac_ct_STRIP = @ac_ct_STRIP@
 am__fastdepCC_FALSE = @am__fastdepCC_FALSE@
@@ -178,21 +173,23 @@ libgnuworldcore_la_SOURCES = Channel.cc \
 	ip.cc \
 	server.cc
 
-libgnuworldcore_la_DEPENDENCIES = $(glibdir)/libgnuworld.la \
+libgnuworldcore_la_CXXFLAGS = -I${top_srcdir}/include -I${top_srcdir}/libgnuworld
+libgnuworldcore_la_DEPENDENCIES = $(top_builddir)/libgnuworld/libgnuworld.la \
 	$(LIBLTDL)
 
-libgnuworldcore_la_LDFLAGS = $(glibdir)/libgnuworld.la \
+libgnuworldcore_la_LDFLAGS = $(top_builddir)/libgnuworld/libgnuworld.la \
 	$(LIBLTDL) -export-dynamic
 
 
 bin_PROGRAMS = gnuworld
 gnuworld_SOURCES = main.cc
 
-gnuworld_LDFLAGS = $(glibdir)/libgnuworld.la \
+gnuworld_CXXFLAGS = -I${top_srcdir}/include -I${top_srcdir}/libgnuworld
+gnuworld_LDFLAGS = $(top_builddir)/libgnuworld/libgnuworld.la \
 	$(LIBLTDL) libgnuworldcore.la -export-dynamic \
 	$(threadLib)
 
-gnuworld_DEPENDENCIES = $(glibdir)/libgnuworld.la \
+gnuworld_DEPENDENCIES = $(top_builddir)/libgnuworld/libgnuworld.la \
 	$(LIBLTDL) libgnuworldcore.la
 
 subdir = src
@@ -203,30 +200,38 @@ CONFIG_CLEAN_FILES =
 LTLIBRARIES = $(lib_LTLIBRARIES)
 
 libgnuworldcore_la_LIBADD =
-am_libgnuworldcore_la_OBJECTS = Channel.lo ChannelUser.lo \
-	LoadClientTimerHandler.lo Network.lo ServerTimerHandlers.lo \
-	UnloadClientTimerHandler.lo client.lo iClient.lo iServer.lo \
-	ip.lo server.lo
+am_libgnuworldcore_la_OBJECTS = libgnuworldcore_la-Channel.lo \
+	libgnuworldcore_la-ChannelUser.lo \
+	libgnuworldcore_la-LoadClientTimerHandler.lo \
+	libgnuworldcore_la-Network.lo \
+	libgnuworldcore_la-ServerTimerHandlers.lo \
+	libgnuworldcore_la-UnloadClientTimerHandler.lo \
+	libgnuworldcore_la-client.lo libgnuworldcore_la-iClient.lo \
+	libgnuworldcore_la-iServer.lo libgnuworldcore_la-ip.lo \
+	libgnuworldcore_la-server.lo
 libgnuworldcore_la_OBJECTS = $(am_libgnuworldcore_la_OBJECTS)
 bin_PROGRAMS = gnuworld$(EXEEXT)
 PROGRAMS = $(bin_PROGRAMS)
 
-am_gnuworld_OBJECTS = main.$(OBJEXT)
+am_gnuworld_OBJECTS = gnuworld-main.$(OBJEXT)
 gnuworld_OBJECTS = $(am_gnuworld_OBJECTS)
 gnuworld_LDADD = $(LDADD)
 
 DEFAULT_INCLUDES =  -I. -I$(srcdir) -I$(top_builddir)/include
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
-@AMDEP_TRUE@DEP_FILES = ./$(DEPDIR)/Channel.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/ChannelUser.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/LoadClientTimerHandler.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/Network.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/ServerTimerHandlers.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/UnloadClientTimerHandler.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/client.Plo ./$(DEPDIR)/iClient.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/iServer.Plo ./$(DEPDIR)/ip.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/main.Po ./$(DEPDIR)/server.Plo
+@AMDEP_TRUE@DEP_FILES = ./$(DEPDIR)/gnuworld-main.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/libgnuworldcore_la-Channel.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/libgnuworldcore_la-ChannelUser.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/libgnuworldcore_la-LoadClientTimerHandler.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/libgnuworldcore_la-Network.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/libgnuworldcore_la-ServerTimerHandlers.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/libgnuworldcore_la-UnloadClientTimerHandler.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/libgnuworldcore_la-client.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/libgnuworldcore_la-iClient.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/libgnuworldcore_la-iServer.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/libgnuworldcore_la-ip.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/libgnuworldcore_la-server.Plo
 CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
 LTCXXCOMPILE = $(LIBTOOL) --mode=compile $(CXX) $(DEFS) \
@@ -317,18 +322,18 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Channel.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ChannelUser.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LoadClientTimerHandler.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Network.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ServerTimerHandlers.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/UnloadClientTimerHandler.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/client.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/iClient.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/iServer.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ip.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/main.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/server.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gnuworld-main.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgnuworldcore_la-Channel.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgnuworldcore_la-ChannelUser.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgnuworldcore_la-LoadClientTimerHandler.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgnuworldcore_la-Network.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgnuworldcore_la-ServerTimerHandlers.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgnuworldcore_la-UnloadClientTimerHandler.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgnuworldcore_la-client.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgnuworldcore_la-iClient.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgnuworldcore_la-iServer.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgnuworldcore_la-ip.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgnuworldcore_la-server.Plo@am__quote@
 
 distclean-depend:
 	-rm -rf ./$(DEPDIR)
@@ -365,6 +370,402 @@ distclean-depend:
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/$*.Plo' tmpdepfile='$(DEPDIR)/$*.TPlo' @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LTCXXCOMPILE) -c -o $@ `test -f '$<' || echo '$(srcdir)/'`$<
+
+libgnuworldcore_la-Channel.o: Channel.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworldcore_la_CXXFLAGS) $(CXXFLAGS) -MT libgnuworldcore_la-Channel.o -MD -MP -MF "$(DEPDIR)/libgnuworldcore_la-Channel.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libgnuworldcore_la-Channel.o `test -f 'Channel.cc' || echo '$(srcdir)/'`Channel.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libgnuworldcore_la-Channel.Tpo" "$(DEPDIR)/libgnuworldcore_la-Channel.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libgnuworldcore_la-Channel.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='Channel.cc' object='libgnuworldcore_la-Channel.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libgnuworldcore_la-Channel.Po' tmpdepfile='$(DEPDIR)/libgnuworldcore_la-Channel.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworldcore_la_CXXFLAGS) $(CXXFLAGS) -c -o libgnuworldcore_la-Channel.o `test -f 'Channel.cc' || echo '$(srcdir)/'`Channel.cc
+
+libgnuworldcore_la-Channel.obj: Channel.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworldcore_la_CXXFLAGS) $(CXXFLAGS) -MT libgnuworldcore_la-Channel.obj -MD -MP -MF "$(DEPDIR)/libgnuworldcore_la-Channel.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libgnuworldcore_la-Channel.obj `if test -f 'Channel.cc'; then $(CYGPATH_W) 'Channel.cc'; else $(CYGPATH_W) '$(srcdir)/Channel.cc'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libgnuworldcore_la-Channel.Tpo" "$(DEPDIR)/libgnuworldcore_la-Channel.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libgnuworldcore_la-Channel.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='Channel.cc' object='libgnuworldcore_la-Channel.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libgnuworldcore_la-Channel.Po' tmpdepfile='$(DEPDIR)/libgnuworldcore_la-Channel.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworldcore_la_CXXFLAGS) $(CXXFLAGS) -c -o libgnuworldcore_la-Channel.obj `if test -f 'Channel.cc'; then $(CYGPATH_W) 'Channel.cc'; else $(CYGPATH_W) '$(srcdir)/Channel.cc'; fi`
+
+libgnuworldcore_la-Channel.lo: Channel.cc
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworldcore_la_CXXFLAGS) $(CXXFLAGS) -MT libgnuworldcore_la-Channel.lo -MD -MP -MF "$(DEPDIR)/libgnuworldcore_la-Channel.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libgnuworldcore_la-Channel.lo `test -f 'Channel.cc' || echo '$(srcdir)/'`Channel.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libgnuworldcore_la-Channel.Tpo" "$(DEPDIR)/libgnuworldcore_la-Channel.Plo"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libgnuworldcore_la-Channel.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='Channel.cc' object='libgnuworldcore_la-Channel.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libgnuworldcore_la-Channel.Plo' tmpdepfile='$(DEPDIR)/libgnuworldcore_la-Channel.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworldcore_la_CXXFLAGS) $(CXXFLAGS) -c -o libgnuworldcore_la-Channel.lo `test -f 'Channel.cc' || echo '$(srcdir)/'`Channel.cc
+
+libgnuworldcore_la-ChannelUser.o: ChannelUser.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworldcore_la_CXXFLAGS) $(CXXFLAGS) -MT libgnuworldcore_la-ChannelUser.o -MD -MP -MF "$(DEPDIR)/libgnuworldcore_la-ChannelUser.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libgnuworldcore_la-ChannelUser.o `test -f 'ChannelUser.cc' || echo '$(srcdir)/'`ChannelUser.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libgnuworldcore_la-ChannelUser.Tpo" "$(DEPDIR)/libgnuworldcore_la-ChannelUser.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libgnuworldcore_la-ChannelUser.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='ChannelUser.cc' object='libgnuworldcore_la-ChannelUser.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libgnuworldcore_la-ChannelUser.Po' tmpdepfile='$(DEPDIR)/libgnuworldcore_la-ChannelUser.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworldcore_la_CXXFLAGS) $(CXXFLAGS) -c -o libgnuworldcore_la-ChannelUser.o `test -f 'ChannelUser.cc' || echo '$(srcdir)/'`ChannelUser.cc
+
+libgnuworldcore_la-ChannelUser.obj: ChannelUser.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworldcore_la_CXXFLAGS) $(CXXFLAGS) -MT libgnuworldcore_la-ChannelUser.obj -MD -MP -MF "$(DEPDIR)/libgnuworldcore_la-ChannelUser.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libgnuworldcore_la-ChannelUser.obj `if test -f 'ChannelUser.cc'; then $(CYGPATH_W) 'ChannelUser.cc'; else $(CYGPATH_W) '$(srcdir)/ChannelUser.cc'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libgnuworldcore_la-ChannelUser.Tpo" "$(DEPDIR)/libgnuworldcore_la-ChannelUser.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libgnuworldcore_la-ChannelUser.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='ChannelUser.cc' object='libgnuworldcore_la-ChannelUser.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libgnuworldcore_la-ChannelUser.Po' tmpdepfile='$(DEPDIR)/libgnuworldcore_la-ChannelUser.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworldcore_la_CXXFLAGS) $(CXXFLAGS) -c -o libgnuworldcore_la-ChannelUser.obj `if test -f 'ChannelUser.cc'; then $(CYGPATH_W) 'ChannelUser.cc'; else $(CYGPATH_W) '$(srcdir)/ChannelUser.cc'; fi`
+
+libgnuworldcore_la-ChannelUser.lo: ChannelUser.cc
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworldcore_la_CXXFLAGS) $(CXXFLAGS) -MT libgnuworldcore_la-ChannelUser.lo -MD -MP -MF "$(DEPDIR)/libgnuworldcore_la-ChannelUser.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libgnuworldcore_la-ChannelUser.lo `test -f 'ChannelUser.cc' || echo '$(srcdir)/'`ChannelUser.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libgnuworldcore_la-ChannelUser.Tpo" "$(DEPDIR)/libgnuworldcore_la-ChannelUser.Plo"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libgnuworldcore_la-ChannelUser.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='ChannelUser.cc' object='libgnuworldcore_la-ChannelUser.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libgnuworldcore_la-ChannelUser.Plo' tmpdepfile='$(DEPDIR)/libgnuworldcore_la-ChannelUser.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworldcore_la_CXXFLAGS) $(CXXFLAGS) -c -o libgnuworldcore_la-ChannelUser.lo `test -f 'ChannelUser.cc' || echo '$(srcdir)/'`ChannelUser.cc
+
+libgnuworldcore_la-LoadClientTimerHandler.o: LoadClientTimerHandler.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworldcore_la_CXXFLAGS) $(CXXFLAGS) -MT libgnuworldcore_la-LoadClientTimerHandler.o -MD -MP -MF "$(DEPDIR)/libgnuworldcore_la-LoadClientTimerHandler.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libgnuworldcore_la-LoadClientTimerHandler.o `test -f 'LoadClientTimerHandler.cc' || echo '$(srcdir)/'`LoadClientTimerHandler.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libgnuworldcore_la-LoadClientTimerHandler.Tpo" "$(DEPDIR)/libgnuworldcore_la-LoadClientTimerHandler.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libgnuworldcore_la-LoadClientTimerHandler.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='LoadClientTimerHandler.cc' object='libgnuworldcore_la-LoadClientTimerHandler.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libgnuworldcore_la-LoadClientTimerHandler.Po' tmpdepfile='$(DEPDIR)/libgnuworldcore_la-LoadClientTimerHandler.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworldcore_la_CXXFLAGS) $(CXXFLAGS) -c -o libgnuworldcore_la-LoadClientTimerHandler.o `test -f 'LoadClientTimerHandler.cc' || echo '$(srcdir)/'`LoadClientTimerHandler.cc
+
+libgnuworldcore_la-LoadClientTimerHandler.obj: LoadClientTimerHandler.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworldcore_la_CXXFLAGS) $(CXXFLAGS) -MT libgnuworldcore_la-LoadClientTimerHandler.obj -MD -MP -MF "$(DEPDIR)/libgnuworldcore_la-LoadClientTimerHandler.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libgnuworldcore_la-LoadClientTimerHandler.obj `if test -f 'LoadClientTimerHandler.cc'; then $(CYGPATH_W) 'LoadClientTimerHandler.cc'; else $(CYGPATH_W) '$(srcdir)/LoadClientTimerHandler.cc'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libgnuworldcore_la-LoadClientTimerHandler.Tpo" "$(DEPDIR)/libgnuworldcore_la-LoadClientTimerHandler.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libgnuworldcore_la-LoadClientTimerHandler.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='LoadClientTimerHandler.cc' object='libgnuworldcore_la-LoadClientTimerHandler.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libgnuworldcore_la-LoadClientTimerHandler.Po' tmpdepfile='$(DEPDIR)/libgnuworldcore_la-LoadClientTimerHandler.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworldcore_la_CXXFLAGS) $(CXXFLAGS) -c -o libgnuworldcore_la-LoadClientTimerHandler.obj `if test -f 'LoadClientTimerHandler.cc'; then $(CYGPATH_W) 'LoadClientTimerHandler.cc'; else $(CYGPATH_W) '$(srcdir)/LoadClientTimerHandler.cc'; fi`
+
+libgnuworldcore_la-LoadClientTimerHandler.lo: LoadClientTimerHandler.cc
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworldcore_la_CXXFLAGS) $(CXXFLAGS) -MT libgnuworldcore_la-LoadClientTimerHandler.lo -MD -MP -MF "$(DEPDIR)/libgnuworldcore_la-LoadClientTimerHandler.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libgnuworldcore_la-LoadClientTimerHandler.lo `test -f 'LoadClientTimerHandler.cc' || echo '$(srcdir)/'`LoadClientTimerHandler.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libgnuworldcore_la-LoadClientTimerHandler.Tpo" "$(DEPDIR)/libgnuworldcore_la-LoadClientTimerHandler.Plo"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libgnuworldcore_la-LoadClientTimerHandler.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='LoadClientTimerHandler.cc' object='libgnuworldcore_la-LoadClientTimerHandler.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libgnuworldcore_la-LoadClientTimerHandler.Plo' tmpdepfile='$(DEPDIR)/libgnuworldcore_la-LoadClientTimerHandler.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworldcore_la_CXXFLAGS) $(CXXFLAGS) -c -o libgnuworldcore_la-LoadClientTimerHandler.lo `test -f 'LoadClientTimerHandler.cc' || echo '$(srcdir)/'`LoadClientTimerHandler.cc
+
+libgnuworldcore_la-Network.o: Network.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworldcore_la_CXXFLAGS) $(CXXFLAGS) -MT libgnuworldcore_la-Network.o -MD -MP -MF "$(DEPDIR)/libgnuworldcore_la-Network.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libgnuworldcore_la-Network.o `test -f 'Network.cc' || echo '$(srcdir)/'`Network.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libgnuworldcore_la-Network.Tpo" "$(DEPDIR)/libgnuworldcore_la-Network.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libgnuworldcore_la-Network.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='Network.cc' object='libgnuworldcore_la-Network.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libgnuworldcore_la-Network.Po' tmpdepfile='$(DEPDIR)/libgnuworldcore_la-Network.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworldcore_la_CXXFLAGS) $(CXXFLAGS) -c -o libgnuworldcore_la-Network.o `test -f 'Network.cc' || echo '$(srcdir)/'`Network.cc
+
+libgnuworldcore_la-Network.obj: Network.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworldcore_la_CXXFLAGS) $(CXXFLAGS) -MT libgnuworldcore_la-Network.obj -MD -MP -MF "$(DEPDIR)/libgnuworldcore_la-Network.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libgnuworldcore_la-Network.obj `if test -f 'Network.cc'; then $(CYGPATH_W) 'Network.cc'; else $(CYGPATH_W) '$(srcdir)/Network.cc'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libgnuworldcore_la-Network.Tpo" "$(DEPDIR)/libgnuworldcore_la-Network.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libgnuworldcore_la-Network.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='Network.cc' object='libgnuworldcore_la-Network.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libgnuworldcore_la-Network.Po' tmpdepfile='$(DEPDIR)/libgnuworldcore_la-Network.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworldcore_la_CXXFLAGS) $(CXXFLAGS) -c -o libgnuworldcore_la-Network.obj `if test -f 'Network.cc'; then $(CYGPATH_W) 'Network.cc'; else $(CYGPATH_W) '$(srcdir)/Network.cc'; fi`
+
+libgnuworldcore_la-Network.lo: Network.cc
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworldcore_la_CXXFLAGS) $(CXXFLAGS) -MT libgnuworldcore_la-Network.lo -MD -MP -MF "$(DEPDIR)/libgnuworldcore_la-Network.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libgnuworldcore_la-Network.lo `test -f 'Network.cc' || echo '$(srcdir)/'`Network.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libgnuworldcore_la-Network.Tpo" "$(DEPDIR)/libgnuworldcore_la-Network.Plo"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libgnuworldcore_la-Network.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='Network.cc' object='libgnuworldcore_la-Network.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libgnuworldcore_la-Network.Plo' tmpdepfile='$(DEPDIR)/libgnuworldcore_la-Network.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworldcore_la_CXXFLAGS) $(CXXFLAGS) -c -o libgnuworldcore_la-Network.lo `test -f 'Network.cc' || echo '$(srcdir)/'`Network.cc
+
+libgnuworldcore_la-ServerTimerHandlers.o: ServerTimerHandlers.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworldcore_la_CXXFLAGS) $(CXXFLAGS) -MT libgnuworldcore_la-ServerTimerHandlers.o -MD -MP -MF "$(DEPDIR)/libgnuworldcore_la-ServerTimerHandlers.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libgnuworldcore_la-ServerTimerHandlers.o `test -f 'ServerTimerHandlers.cc' || echo '$(srcdir)/'`ServerTimerHandlers.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libgnuworldcore_la-ServerTimerHandlers.Tpo" "$(DEPDIR)/libgnuworldcore_la-ServerTimerHandlers.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libgnuworldcore_la-ServerTimerHandlers.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='ServerTimerHandlers.cc' object='libgnuworldcore_la-ServerTimerHandlers.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libgnuworldcore_la-ServerTimerHandlers.Po' tmpdepfile='$(DEPDIR)/libgnuworldcore_la-ServerTimerHandlers.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworldcore_la_CXXFLAGS) $(CXXFLAGS) -c -o libgnuworldcore_la-ServerTimerHandlers.o `test -f 'ServerTimerHandlers.cc' || echo '$(srcdir)/'`ServerTimerHandlers.cc
+
+libgnuworldcore_la-ServerTimerHandlers.obj: ServerTimerHandlers.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworldcore_la_CXXFLAGS) $(CXXFLAGS) -MT libgnuworldcore_la-ServerTimerHandlers.obj -MD -MP -MF "$(DEPDIR)/libgnuworldcore_la-ServerTimerHandlers.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libgnuworldcore_la-ServerTimerHandlers.obj `if test -f 'ServerTimerHandlers.cc'; then $(CYGPATH_W) 'ServerTimerHandlers.cc'; else $(CYGPATH_W) '$(srcdir)/ServerTimerHandlers.cc'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libgnuworldcore_la-ServerTimerHandlers.Tpo" "$(DEPDIR)/libgnuworldcore_la-ServerTimerHandlers.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libgnuworldcore_la-ServerTimerHandlers.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='ServerTimerHandlers.cc' object='libgnuworldcore_la-ServerTimerHandlers.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libgnuworldcore_la-ServerTimerHandlers.Po' tmpdepfile='$(DEPDIR)/libgnuworldcore_la-ServerTimerHandlers.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworldcore_la_CXXFLAGS) $(CXXFLAGS) -c -o libgnuworldcore_la-ServerTimerHandlers.obj `if test -f 'ServerTimerHandlers.cc'; then $(CYGPATH_W) 'ServerTimerHandlers.cc'; else $(CYGPATH_W) '$(srcdir)/ServerTimerHandlers.cc'; fi`
+
+libgnuworldcore_la-ServerTimerHandlers.lo: ServerTimerHandlers.cc
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworldcore_la_CXXFLAGS) $(CXXFLAGS) -MT libgnuworldcore_la-ServerTimerHandlers.lo -MD -MP -MF "$(DEPDIR)/libgnuworldcore_la-ServerTimerHandlers.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libgnuworldcore_la-ServerTimerHandlers.lo `test -f 'ServerTimerHandlers.cc' || echo '$(srcdir)/'`ServerTimerHandlers.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libgnuworldcore_la-ServerTimerHandlers.Tpo" "$(DEPDIR)/libgnuworldcore_la-ServerTimerHandlers.Plo"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libgnuworldcore_la-ServerTimerHandlers.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='ServerTimerHandlers.cc' object='libgnuworldcore_la-ServerTimerHandlers.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libgnuworldcore_la-ServerTimerHandlers.Plo' tmpdepfile='$(DEPDIR)/libgnuworldcore_la-ServerTimerHandlers.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworldcore_la_CXXFLAGS) $(CXXFLAGS) -c -o libgnuworldcore_la-ServerTimerHandlers.lo `test -f 'ServerTimerHandlers.cc' || echo '$(srcdir)/'`ServerTimerHandlers.cc
+
+libgnuworldcore_la-UnloadClientTimerHandler.o: UnloadClientTimerHandler.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworldcore_la_CXXFLAGS) $(CXXFLAGS) -MT libgnuworldcore_la-UnloadClientTimerHandler.o -MD -MP -MF "$(DEPDIR)/libgnuworldcore_la-UnloadClientTimerHandler.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libgnuworldcore_la-UnloadClientTimerHandler.o `test -f 'UnloadClientTimerHandler.cc' || echo '$(srcdir)/'`UnloadClientTimerHandler.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libgnuworldcore_la-UnloadClientTimerHandler.Tpo" "$(DEPDIR)/libgnuworldcore_la-UnloadClientTimerHandler.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libgnuworldcore_la-UnloadClientTimerHandler.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='UnloadClientTimerHandler.cc' object='libgnuworldcore_la-UnloadClientTimerHandler.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libgnuworldcore_la-UnloadClientTimerHandler.Po' tmpdepfile='$(DEPDIR)/libgnuworldcore_la-UnloadClientTimerHandler.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworldcore_la_CXXFLAGS) $(CXXFLAGS) -c -o libgnuworldcore_la-UnloadClientTimerHandler.o `test -f 'UnloadClientTimerHandler.cc' || echo '$(srcdir)/'`UnloadClientTimerHandler.cc
+
+libgnuworldcore_la-UnloadClientTimerHandler.obj: UnloadClientTimerHandler.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworldcore_la_CXXFLAGS) $(CXXFLAGS) -MT libgnuworldcore_la-UnloadClientTimerHandler.obj -MD -MP -MF "$(DEPDIR)/libgnuworldcore_la-UnloadClientTimerHandler.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libgnuworldcore_la-UnloadClientTimerHandler.obj `if test -f 'UnloadClientTimerHandler.cc'; then $(CYGPATH_W) 'UnloadClientTimerHandler.cc'; else $(CYGPATH_W) '$(srcdir)/UnloadClientTimerHandler.cc'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libgnuworldcore_la-UnloadClientTimerHandler.Tpo" "$(DEPDIR)/libgnuworldcore_la-UnloadClientTimerHandler.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libgnuworldcore_la-UnloadClientTimerHandler.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='UnloadClientTimerHandler.cc' object='libgnuworldcore_la-UnloadClientTimerHandler.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libgnuworldcore_la-UnloadClientTimerHandler.Po' tmpdepfile='$(DEPDIR)/libgnuworldcore_la-UnloadClientTimerHandler.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworldcore_la_CXXFLAGS) $(CXXFLAGS) -c -o libgnuworldcore_la-UnloadClientTimerHandler.obj `if test -f 'UnloadClientTimerHandler.cc'; then $(CYGPATH_W) 'UnloadClientTimerHandler.cc'; else $(CYGPATH_W) '$(srcdir)/UnloadClientTimerHandler.cc'; fi`
+
+libgnuworldcore_la-UnloadClientTimerHandler.lo: UnloadClientTimerHandler.cc
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworldcore_la_CXXFLAGS) $(CXXFLAGS) -MT libgnuworldcore_la-UnloadClientTimerHandler.lo -MD -MP -MF "$(DEPDIR)/libgnuworldcore_la-UnloadClientTimerHandler.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libgnuworldcore_la-UnloadClientTimerHandler.lo `test -f 'UnloadClientTimerHandler.cc' || echo '$(srcdir)/'`UnloadClientTimerHandler.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libgnuworldcore_la-UnloadClientTimerHandler.Tpo" "$(DEPDIR)/libgnuworldcore_la-UnloadClientTimerHandler.Plo"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libgnuworldcore_la-UnloadClientTimerHandler.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='UnloadClientTimerHandler.cc' object='libgnuworldcore_la-UnloadClientTimerHandler.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libgnuworldcore_la-UnloadClientTimerHandler.Plo' tmpdepfile='$(DEPDIR)/libgnuworldcore_la-UnloadClientTimerHandler.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworldcore_la_CXXFLAGS) $(CXXFLAGS) -c -o libgnuworldcore_la-UnloadClientTimerHandler.lo `test -f 'UnloadClientTimerHandler.cc' || echo '$(srcdir)/'`UnloadClientTimerHandler.cc
+
+libgnuworldcore_la-client.o: client.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworldcore_la_CXXFLAGS) $(CXXFLAGS) -MT libgnuworldcore_la-client.o -MD -MP -MF "$(DEPDIR)/libgnuworldcore_la-client.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libgnuworldcore_la-client.o `test -f 'client.cc' || echo '$(srcdir)/'`client.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libgnuworldcore_la-client.Tpo" "$(DEPDIR)/libgnuworldcore_la-client.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libgnuworldcore_la-client.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='client.cc' object='libgnuworldcore_la-client.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libgnuworldcore_la-client.Po' tmpdepfile='$(DEPDIR)/libgnuworldcore_la-client.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworldcore_la_CXXFLAGS) $(CXXFLAGS) -c -o libgnuworldcore_la-client.o `test -f 'client.cc' || echo '$(srcdir)/'`client.cc
+
+libgnuworldcore_la-client.obj: client.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworldcore_la_CXXFLAGS) $(CXXFLAGS) -MT libgnuworldcore_la-client.obj -MD -MP -MF "$(DEPDIR)/libgnuworldcore_la-client.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libgnuworldcore_la-client.obj `if test -f 'client.cc'; then $(CYGPATH_W) 'client.cc'; else $(CYGPATH_W) '$(srcdir)/client.cc'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libgnuworldcore_la-client.Tpo" "$(DEPDIR)/libgnuworldcore_la-client.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libgnuworldcore_la-client.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='client.cc' object='libgnuworldcore_la-client.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libgnuworldcore_la-client.Po' tmpdepfile='$(DEPDIR)/libgnuworldcore_la-client.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworldcore_la_CXXFLAGS) $(CXXFLAGS) -c -o libgnuworldcore_la-client.obj `if test -f 'client.cc'; then $(CYGPATH_W) 'client.cc'; else $(CYGPATH_W) '$(srcdir)/client.cc'; fi`
+
+libgnuworldcore_la-client.lo: client.cc
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworldcore_la_CXXFLAGS) $(CXXFLAGS) -MT libgnuworldcore_la-client.lo -MD -MP -MF "$(DEPDIR)/libgnuworldcore_la-client.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libgnuworldcore_la-client.lo `test -f 'client.cc' || echo '$(srcdir)/'`client.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libgnuworldcore_la-client.Tpo" "$(DEPDIR)/libgnuworldcore_la-client.Plo"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libgnuworldcore_la-client.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='client.cc' object='libgnuworldcore_la-client.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libgnuworldcore_la-client.Plo' tmpdepfile='$(DEPDIR)/libgnuworldcore_la-client.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworldcore_la_CXXFLAGS) $(CXXFLAGS) -c -o libgnuworldcore_la-client.lo `test -f 'client.cc' || echo '$(srcdir)/'`client.cc
+
+libgnuworldcore_la-iClient.o: iClient.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworldcore_la_CXXFLAGS) $(CXXFLAGS) -MT libgnuworldcore_la-iClient.o -MD -MP -MF "$(DEPDIR)/libgnuworldcore_la-iClient.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libgnuworldcore_la-iClient.o `test -f 'iClient.cc' || echo '$(srcdir)/'`iClient.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libgnuworldcore_la-iClient.Tpo" "$(DEPDIR)/libgnuworldcore_la-iClient.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libgnuworldcore_la-iClient.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='iClient.cc' object='libgnuworldcore_la-iClient.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libgnuworldcore_la-iClient.Po' tmpdepfile='$(DEPDIR)/libgnuworldcore_la-iClient.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworldcore_la_CXXFLAGS) $(CXXFLAGS) -c -o libgnuworldcore_la-iClient.o `test -f 'iClient.cc' || echo '$(srcdir)/'`iClient.cc
+
+libgnuworldcore_la-iClient.obj: iClient.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworldcore_la_CXXFLAGS) $(CXXFLAGS) -MT libgnuworldcore_la-iClient.obj -MD -MP -MF "$(DEPDIR)/libgnuworldcore_la-iClient.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libgnuworldcore_la-iClient.obj `if test -f 'iClient.cc'; then $(CYGPATH_W) 'iClient.cc'; else $(CYGPATH_W) '$(srcdir)/iClient.cc'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libgnuworldcore_la-iClient.Tpo" "$(DEPDIR)/libgnuworldcore_la-iClient.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libgnuworldcore_la-iClient.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='iClient.cc' object='libgnuworldcore_la-iClient.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libgnuworldcore_la-iClient.Po' tmpdepfile='$(DEPDIR)/libgnuworldcore_la-iClient.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworldcore_la_CXXFLAGS) $(CXXFLAGS) -c -o libgnuworldcore_la-iClient.obj `if test -f 'iClient.cc'; then $(CYGPATH_W) 'iClient.cc'; else $(CYGPATH_W) '$(srcdir)/iClient.cc'; fi`
+
+libgnuworldcore_la-iClient.lo: iClient.cc
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworldcore_la_CXXFLAGS) $(CXXFLAGS) -MT libgnuworldcore_la-iClient.lo -MD -MP -MF "$(DEPDIR)/libgnuworldcore_la-iClient.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libgnuworldcore_la-iClient.lo `test -f 'iClient.cc' || echo '$(srcdir)/'`iClient.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libgnuworldcore_la-iClient.Tpo" "$(DEPDIR)/libgnuworldcore_la-iClient.Plo"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libgnuworldcore_la-iClient.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='iClient.cc' object='libgnuworldcore_la-iClient.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libgnuworldcore_la-iClient.Plo' tmpdepfile='$(DEPDIR)/libgnuworldcore_la-iClient.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworldcore_la_CXXFLAGS) $(CXXFLAGS) -c -o libgnuworldcore_la-iClient.lo `test -f 'iClient.cc' || echo '$(srcdir)/'`iClient.cc
+
+libgnuworldcore_la-iServer.o: iServer.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworldcore_la_CXXFLAGS) $(CXXFLAGS) -MT libgnuworldcore_la-iServer.o -MD -MP -MF "$(DEPDIR)/libgnuworldcore_la-iServer.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libgnuworldcore_la-iServer.o `test -f 'iServer.cc' || echo '$(srcdir)/'`iServer.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libgnuworldcore_la-iServer.Tpo" "$(DEPDIR)/libgnuworldcore_la-iServer.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libgnuworldcore_la-iServer.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='iServer.cc' object='libgnuworldcore_la-iServer.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libgnuworldcore_la-iServer.Po' tmpdepfile='$(DEPDIR)/libgnuworldcore_la-iServer.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworldcore_la_CXXFLAGS) $(CXXFLAGS) -c -o libgnuworldcore_la-iServer.o `test -f 'iServer.cc' || echo '$(srcdir)/'`iServer.cc
+
+libgnuworldcore_la-iServer.obj: iServer.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworldcore_la_CXXFLAGS) $(CXXFLAGS) -MT libgnuworldcore_la-iServer.obj -MD -MP -MF "$(DEPDIR)/libgnuworldcore_la-iServer.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libgnuworldcore_la-iServer.obj `if test -f 'iServer.cc'; then $(CYGPATH_W) 'iServer.cc'; else $(CYGPATH_W) '$(srcdir)/iServer.cc'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libgnuworldcore_la-iServer.Tpo" "$(DEPDIR)/libgnuworldcore_la-iServer.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libgnuworldcore_la-iServer.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='iServer.cc' object='libgnuworldcore_la-iServer.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libgnuworldcore_la-iServer.Po' tmpdepfile='$(DEPDIR)/libgnuworldcore_la-iServer.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworldcore_la_CXXFLAGS) $(CXXFLAGS) -c -o libgnuworldcore_la-iServer.obj `if test -f 'iServer.cc'; then $(CYGPATH_W) 'iServer.cc'; else $(CYGPATH_W) '$(srcdir)/iServer.cc'; fi`
+
+libgnuworldcore_la-iServer.lo: iServer.cc
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworldcore_la_CXXFLAGS) $(CXXFLAGS) -MT libgnuworldcore_la-iServer.lo -MD -MP -MF "$(DEPDIR)/libgnuworldcore_la-iServer.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libgnuworldcore_la-iServer.lo `test -f 'iServer.cc' || echo '$(srcdir)/'`iServer.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libgnuworldcore_la-iServer.Tpo" "$(DEPDIR)/libgnuworldcore_la-iServer.Plo"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libgnuworldcore_la-iServer.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='iServer.cc' object='libgnuworldcore_la-iServer.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libgnuworldcore_la-iServer.Plo' tmpdepfile='$(DEPDIR)/libgnuworldcore_la-iServer.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworldcore_la_CXXFLAGS) $(CXXFLAGS) -c -o libgnuworldcore_la-iServer.lo `test -f 'iServer.cc' || echo '$(srcdir)/'`iServer.cc
+
+libgnuworldcore_la-ip.o: ip.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworldcore_la_CXXFLAGS) $(CXXFLAGS) -MT libgnuworldcore_la-ip.o -MD -MP -MF "$(DEPDIR)/libgnuworldcore_la-ip.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libgnuworldcore_la-ip.o `test -f 'ip.cc' || echo '$(srcdir)/'`ip.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libgnuworldcore_la-ip.Tpo" "$(DEPDIR)/libgnuworldcore_la-ip.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libgnuworldcore_la-ip.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='ip.cc' object='libgnuworldcore_la-ip.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libgnuworldcore_la-ip.Po' tmpdepfile='$(DEPDIR)/libgnuworldcore_la-ip.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworldcore_la_CXXFLAGS) $(CXXFLAGS) -c -o libgnuworldcore_la-ip.o `test -f 'ip.cc' || echo '$(srcdir)/'`ip.cc
+
+libgnuworldcore_la-ip.obj: ip.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworldcore_la_CXXFLAGS) $(CXXFLAGS) -MT libgnuworldcore_la-ip.obj -MD -MP -MF "$(DEPDIR)/libgnuworldcore_la-ip.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libgnuworldcore_la-ip.obj `if test -f 'ip.cc'; then $(CYGPATH_W) 'ip.cc'; else $(CYGPATH_W) '$(srcdir)/ip.cc'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libgnuworldcore_la-ip.Tpo" "$(DEPDIR)/libgnuworldcore_la-ip.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libgnuworldcore_la-ip.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='ip.cc' object='libgnuworldcore_la-ip.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libgnuworldcore_la-ip.Po' tmpdepfile='$(DEPDIR)/libgnuworldcore_la-ip.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworldcore_la_CXXFLAGS) $(CXXFLAGS) -c -o libgnuworldcore_la-ip.obj `if test -f 'ip.cc'; then $(CYGPATH_W) 'ip.cc'; else $(CYGPATH_W) '$(srcdir)/ip.cc'; fi`
+
+libgnuworldcore_la-ip.lo: ip.cc
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworldcore_la_CXXFLAGS) $(CXXFLAGS) -MT libgnuworldcore_la-ip.lo -MD -MP -MF "$(DEPDIR)/libgnuworldcore_la-ip.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libgnuworldcore_la-ip.lo `test -f 'ip.cc' || echo '$(srcdir)/'`ip.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libgnuworldcore_la-ip.Tpo" "$(DEPDIR)/libgnuworldcore_la-ip.Plo"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libgnuworldcore_la-ip.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='ip.cc' object='libgnuworldcore_la-ip.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libgnuworldcore_la-ip.Plo' tmpdepfile='$(DEPDIR)/libgnuworldcore_la-ip.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworldcore_la_CXXFLAGS) $(CXXFLAGS) -c -o libgnuworldcore_la-ip.lo `test -f 'ip.cc' || echo '$(srcdir)/'`ip.cc
+
+libgnuworldcore_la-server.o: server.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworldcore_la_CXXFLAGS) $(CXXFLAGS) -MT libgnuworldcore_la-server.o -MD -MP -MF "$(DEPDIR)/libgnuworldcore_la-server.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libgnuworldcore_la-server.o `test -f 'server.cc' || echo '$(srcdir)/'`server.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libgnuworldcore_la-server.Tpo" "$(DEPDIR)/libgnuworldcore_la-server.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libgnuworldcore_la-server.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='server.cc' object='libgnuworldcore_la-server.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libgnuworldcore_la-server.Po' tmpdepfile='$(DEPDIR)/libgnuworldcore_la-server.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworldcore_la_CXXFLAGS) $(CXXFLAGS) -c -o libgnuworldcore_la-server.o `test -f 'server.cc' || echo '$(srcdir)/'`server.cc
+
+libgnuworldcore_la-server.obj: server.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworldcore_la_CXXFLAGS) $(CXXFLAGS) -MT libgnuworldcore_la-server.obj -MD -MP -MF "$(DEPDIR)/libgnuworldcore_la-server.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libgnuworldcore_la-server.obj `if test -f 'server.cc'; then $(CYGPATH_W) 'server.cc'; else $(CYGPATH_W) '$(srcdir)/server.cc'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libgnuworldcore_la-server.Tpo" "$(DEPDIR)/libgnuworldcore_la-server.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libgnuworldcore_la-server.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='server.cc' object='libgnuworldcore_la-server.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libgnuworldcore_la-server.Po' tmpdepfile='$(DEPDIR)/libgnuworldcore_la-server.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworldcore_la_CXXFLAGS) $(CXXFLAGS) -c -o libgnuworldcore_la-server.obj `if test -f 'server.cc'; then $(CYGPATH_W) 'server.cc'; else $(CYGPATH_W) '$(srcdir)/server.cc'; fi`
+
+libgnuworldcore_la-server.lo: server.cc
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworldcore_la_CXXFLAGS) $(CXXFLAGS) -MT libgnuworldcore_la-server.lo -MD -MP -MF "$(DEPDIR)/libgnuworldcore_la-server.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libgnuworldcore_la-server.lo `test -f 'server.cc' || echo '$(srcdir)/'`server.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libgnuworldcore_la-server.Tpo" "$(DEPDIR)/libgnuworldcore_la-server.Plo"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libgnuworldcore_la-server.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='server.cc' object='libgnuworldcore_la-server.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libgnuworldcore_la-server.Plo' tmpdepfile='$(DEPDIR)/libgnuworldcore_la-server.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworldcore_la_CXXFLAGS) $(CXXFLAGS) -c -o libgnuworldcore_la-server.lo `test -f 'server.cc' || echo '$(srcdir)/'`server.cc
+
+gnuworld-main.o: main.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gnuworld_CXXFLAGS) $(CXXFLAGS) -MT gnuworld-main.o -MD -MP -MF "$(DEPDIR)/gnuworld-main.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o gnuworld-main.o `test -f 'main.cc' || echo '$(srcdir)/'`main.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/gnuworld-main.Tpo" "$(DEPDIR)/gnuworld-main.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/gnuworld-main.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='main.cc' object='gnuworld-main.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/gnuworld-main.Po' tmpdepfile='$(DEPDIR)/gnuworld-main.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gnuworld_CXXFLAGS) $(CXXFLAGS) -c -o gnuworld-main.o `test -f 'main.cc' || echo '$(srcdir)/'`main.cc
+
+gnuworld-main.obj: main.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gnuworld_CXXFLAGS) $(CXXFLAGS) -MT gnuworld-main.obj -MD -MP -MF "$(DEPDIR)/gnuworld-main.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o gnuworld-main.obj `if test -f 'main.cc'; then $(CYGPATH_W) 'main.cc'; else $(CYGPATH_W) '$(srcdir)/main.cc'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/gnuworld-main.Tpo" "$(DEPDIR)/gnuworld-main.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/gnuworld-main.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='main.cc' object='gnuworld-main.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/gnuworld-main.Po' tmpdepfile='$(DEPDIR)/gnuworld-main.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gnuworld_CXXFLAGS) $(CXXFLAGS) -c -o gnuworld-main.obj `if test -f 'main.cc'; then $(CYGPATH_W) 'main.cc'; else $(CYGPATH_W) '$(srcdir)/main.cc'; fi`
+
+gnuworld-main.lo: main.cc
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gnuworld_CXXFLAGS) $(CXXFLAGS) -MT gnuworld-main.lo -MD -MP -MF "$(DEPDIR)/gnuworld-main.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o gnuworld-main.lo `test -f 'main.cc' || echo '$(srcdir)/'`main.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/gnuworld-main.Tpo" "$(DEPDIR)/gnuworld-main.Plo"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/gnuworld-main.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='main.cc' object='gnuworld-main.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/gnuworld-main.Plo' tmpdepfile='$(DEPDIR)/gnuworld-main.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gnuworld_CXXFLAGS) $(CXXFLAGS) -c -o gnuworld-main.lo `test -f 'main.cc' || echo '$(srcdir)/'`main.cc
 
 mostlyclean-libtool:
 	-rm -f *.lo

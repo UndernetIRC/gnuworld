@@ -14,7 +14,7 @@
 
 @SET_MAKE@
 
-# "$Id: Makefile.in,v 1.158 2003/08/09 23:15:35 dan_karrels Exp $"
+# "$Id: Makefile.in,v 1.159 2003/09/02 00:54:58 jeekay Exp $"
 
 srcdir = @srcdir@
 top_srcdir = @top_srcdir@
@@ -42,7 +42,6 @@ ACLOCAL = @ACLOCAL@
 AMDEP_FALSE = @AMDEP_FALSE@
 AMDEP_TRUE = @AMDEP_TRUE@
 AMTAR = @AMTAR@
-AR = @AR@
 AUTOCONF = @AUTOCONF@
 AUTOHEADER = @AUTOHEADER@
 AUTOMAKE = @AUTOMAKE@
@@ -88,8 +87,6 @@ ECHO_N = @ECHO_N@
 ECHO_T = @ECHO_T@
 EGREP = @EGREP@
 EXEEXT = @EXEEXT@
-F77 = @F77@
-FFLAGS = @FFLAGS@
 INCLTDL = @INCLTDL@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
@@ -123,10 +120,8 @@ SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
 VERSION = @VERSION@
-ac_ct_AR = @ac_ct_AR@
 ac_ct_CC = @ac_ct_CC@
 ac_ct_CXX = @ac_ct_CXX@
-ac_ct_F77 = @ac_ct_F77@
 ac_ct_RANLIB = @ac_ct_RANLIB@
 ac_ct_STRIP = @ac_ct_STRIP@
 am__fastdepCC_FALSE = @am__fastdepCC_FALSE@
@@ -169,6 +164,7 @@ threadLib = @threadLib@
 
 lib_LTLIBRARIES = libgnutest.la
 libgnutest_la_SOURCES = gnutest.cc
+libgnutest_la_CXXFLAGS = -I${top_srcdir}/include -I${top_srcdir}/libgnuworld
 libgnutest_la_LDFLAGS = -module -export-dynamic
 
 EXTRA_DIST = gnutest.h
@@ -180,13 +176,13 @@ CONFIG_CLEAN_FILES =
 LTLIBRARIES = $(lib_LTLIBRARIES)
 
 libgnutest_la_LIBADD =
-am_libgnutest_la_OBJECTS = gnutest.lo
+am_libgnutest_la_OBJECTS = libgnutest_la-gnutest.lo
 libgnutest_la_OBJECTS = $(am_libgnutest_la_OBJECTS)
 
 DEFAULT_INCLUDES =  -I. -I$(srcdir) -I$(top_builddir)/include
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
-@AMDEP_TRUE@DEP_FILES = ./$(DEPDIR)/gnutest.Plo
+@AMDEP_TRUE@DEP_FILES = ./$(DEPDIR)/libgnutest_la-gnutest.Plo
 CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
 LTCXXCOMPILE = $(LIBTOOL) --mode=compile $(CXX) $(DEFS) \
@@ -245,7 +241,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gnutest.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgnutest_la-gnutest.Plo@am__quote@
 
 distclean-depend:
 	-rm -rf ./$(DEPDIR)
@@ -282,6 +278,39 @@ distclean-depend:
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/$*.Plo' tmpdepfile='$(DEPDIR)/$*.TPlo' @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LTCXXCOMPILE) -c -o $@ `test -f '$<' || echo '$(srcdir)/'`$<
+
+libgnutest_la-gnutest.o: gnutest.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnutest_la_CXXFLAGS) $(CXXFLAGS) -MT libgnutest_la-gnutest.o -MD -MP -MF "$(DEPDIR)/libgnutest_la-gnutest.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libgnutest_la-gnutest.o `test -f 'gnutest.cc' || echo '$(srcdir)/'`gnutest.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libgnutest_la-gnutest.Tpo" "$(DEPDIR)/libgnutest_la-gnutest.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libgnutest_la-gnutest.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='gnutest.cc' object='libgnutest_la-gnutest.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libgnutest_la-gnutest.Po' tmpdepfile='$(DEPDIR)/libgnutest_la-gnutest.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnutest_la_CXXFLAGS) $(CXXFLAGS) -c -o libgnutest_la-gnutest.o `test -f 'gnutest.cc' || echo '$(srcdir)/'`gnutest.cc
+
+libgnutest_la-gnutest.obj: gnutest.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnutest_la_CXXFLAGS) $(CXXFLAGS) -MT libgnutest_la-gnutest.obj -MD -MP -MF "$(DEPDIR)/libgnutest_la-gnutest.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libgnutest_la-gnutest.obj `if test -f 'gnutest.cc'; then $(CYGPATH_W) 'gnutest.cc'; else $(CYGPATH_W) '$(srcdir)/gnutest.cc'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libgnutest_la-gnutest.Tpo" "$(DEPDIR)/libgnutest_la-gnutest.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libgnutest_la-gnutest.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='gnutest.cc' object='libgnutest_la-gnutest.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libgnutest_la-gnutest.Po' tmpdepfile='$(DEPDIR)/libgnutest_la-gnutest.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnutest_la_CXXFLAGS) $(CXXFLAGS) -c -o libgnutest_la-gnutest.obj `if test -f 'gnutest.cc'; then $(CYGPATH_W) 'gnutest.cc'; else $(CYGPATH_W) '$(srcdir)/gnutest.cc'; fi`
+
+libgnutest_la-gnutest.lo: gnutest.cc
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnutest_la_CXXFLAGS) $(CXXFLAGS) -MT libgnutest_la-gnutest.lo -MD -MP -MF "$(DEPDIR)/libgnutest_la-gnutest.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libgnutest_la-gnutest.lo `test -f 'gnutest.cc' || echo '$(srcdir)/'`gnutest.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libgnutest_la-gnutest.Tpo" "$(DEPDIR)/libgnutest_la-gnutest.Plo"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libgnutest_la-gnutest.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='gnutest.cc' object='libgnutest_la-gnutest.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libgnutest_la-gnutest.Plo' tmpdepfile='$(DEPDIR)/libgnutest_la-gnutest.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnutest_la_CXXFLAGS) $(CXXFLAGS) -c -o libgnutest_la-gnutest.lo `test -f 'gnutest.cc' || echo '$(srcdir)/'`gnutest.cc
 
 mostlyclean-libtool:
 	-rm -f *.lo

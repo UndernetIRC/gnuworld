@@ -40,7 +40,6 @@ ACLOCAL = @ACLOCAL@
 AMDEP_FALSE = @AMDEP_FALSE@
 AMDEP_TRUE = @AMDEP_TRUE@
 AMTAR = @AMTAR@
-AR = @AR@
 AUTOCONF = @AUTOCONF@
 AUTOHEADER = @AUTOHEADER@
 AUTOMAKE = @AUTOMAKE@
@@ -86,8 +85,6 @@ ECHO_N = @ECHO_N@
 ECHO_T = @ECHO_T@
 EGREP = @EGREP@
 EXEEXT = @EXEEXT@
-F77 = @F77@
-FFLAGS = @FFLAGS@
 INCLTDL = @INCLTDL@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
@@ -121,10 +118,8 @@ SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
 VERSION = @VERSION@
-ac_ct_AR = @ac_ct_AR@
 ac_ct_CC = @ac_ct_CC@
 ac_ct_CXX = @ac_ct_CXX@
-ac_ct_F77 = @ac_ct_F77@
 ac_ct_RANLIB = @ac_ct_RANLIB@
 ac_ct_STRIP = @ac_ct_STRIP@
 am__fastdepCC_FALSE = @am__fastdepCC_FALSE@
@@ -308,7 +303,7 @@ subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = $(top_builddir)/include/defs.h
-CONFIG_CLEAN_FILES = bin/ccontrol.example.conf \
+CONFIG_CLEAN_FILES = bin/server_command_map bin/ccontrol.example.conf \
 	bin/clientExample.example.conf bin/cloner.example.conf \
 	bin/cservice.example.conf bin/gnutest.example.conf \
 	bin/GNUWorld.example.conf bin/nickserv.example.conf \
@@ -321,10 +316,10 @@ RECURSIVE_TARGETS = info-recursive dvi-recursive pdf-recursive \
 	all-recursive install-data-recursive install-exec-recursive \
 	installdirs-recursive install-recursive uninstall-recursive \
 	check-recursive installcheck-recursive
-DIST_COMMON = README ././include/defs.h.in ./include/defs.h.in AUTHORS \
-	COPYING ChangeLog INSTALL Makefile.am Makefile.in NEWS TODO \
-	aclocal.m4 config.guess config.sub configure configure.ac \
-	depcomp install-sh ltconfig ltmain.sh missing mkinstalldirs
+DIST_COMMON = README ./include/defs.h.in AUTHORS COPYING ChangeLog \
+	INSTALL Makefile.am Makefile.in NEWS TODO aclocal.m4 \
+	config.guess config.sub configure configure.ac depcomp \
+	install-sh ltconfig ltmain.sh missing mkinstalldirs
 DIST_SUBDIRS = libgnuworld libltdl src @NEW_MODS@ mod.ccontrol \
 	mod.clientExample mod.cloner mod.cservice mod.dronescan \
 	mod.gnutest mod.nickserv mod.scanner mod.stats test db libircu
@@ -364,6 +359,8 @@ $(srcdir)/./include/defs.h.in: @MAINTAINER_MODE_TRUE@ $(top_srcdir)/configure.ac
 
 distclean-hdr:
 	-rm -f include/defs.h include/stamp-h1
+bin/server_command_map: $(top_builddir)/config.status $(top_srcdir)/bin/server_command_map.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
 bin/ccontrol.example.conf: $(top_builddir)/config.status $(top_srcdir)/bin/ccontrol.example.conf.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 bin/clientExample.example.conf: $(top_builddir)/config.status $(top_srcdir)/bin/clientExample.example.conf.in
@@ -535,7 +532,7 @@ distcleancheck_listfiles = find . -type f -print
 distdir: $(DISTFILES)
 	$(am__remove_distdir)
 	mkdir $(distdir)
-	$(mkinstalldirs) $(distdir)/././include $(distdir)/./include $(distdir)/bin $(distdir)/contrib $(distdir)/db $(distdir)/doc $(distdir)/doc/cmaster $(distdir)/doc/cmaster/website $(distdir)/doc/idoc $(distdir)/doc/nickserv $(distdir)/include $(distdir)/libltdl
+	$(mkinstalldirs) $(distdir)/./include $(distdir)/bin $(distdir)/contrib $(distdir)/db $(distdir)/doc $(distdir)/doc/cmaster $(distdir)/doc/cmaster/website $(distdir)/doc/idoc $(distdir)/doc/nickserv $(distdir)/include $(distdir)/libltdl
 	@srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`; \
 	topsrcdirstrip=`echo "$(top_srcdir)" | sed 's|.|.|g'`; \
 	list='$(DISTFILES)'; for file in $$list; do \

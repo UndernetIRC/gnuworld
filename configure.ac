@@ -1,10 +1,10 @@
-dnl $Id: configure.ac,v 1.16 2003/07/20 21:56:28 dan_karrels Exp $
+dnl $Id: configure.ac,v 1.17 2003/09/02 00:54:57 jeekay Exp $
 dnl ----------------------------------------------------------
 
 echo Configuring GNUWorld...
 echo
 
-AC_REVISION($Revision: 1.16 $)
+AC_REVISION($Revision: 1.17 $)
 AC_INIT
 AC_CONFIG_SRCDIR([src/main.cc])
 AM_INIT_AUTOMAKE(gnuworld,2.2)
@@ -18,7 +18,7 @@ AC_LIBLTDL_CONVENIENCE
 dnl Substitute INCLTDL and LIBLTDL in the Makefiles
 dnl For some reason, INCLTDL and LIBLTDL aren't set
 dnl properly on OpenBSD
-INCLTDL="-I`pwd`/libltdl"
+dnl INCLTDL="-I${ac_top_srcdir}/libltdl"
 LIBLTDL="`pwd`/libltdl/libltdlc.la"
 
 AM_MAINTAINER_MODE
@@ -34,7 +34,7 @@ CFLAGS="-W -Wall -pipe $INCLTDL"
 CXXFLAGS="-W -Wall -pipe $INCLTDL"
 
 AC_PREFIX_DEFAULT(`pwd`)
-glibdir="`pwd`/libgnuworld"
+glibdir="${ac_top_srcdir}/libgnuworld"
 
 AC_PROG_CC
 AC_PROG_CXX
@@ -245,7 +245,7 @@ dnl echo "PGSQL_INCLUDE: $PGSQL_INCLUDE"
 dnl echo "PGSQL_LIB: $PGSQL_LIB"
 dnl exit
 
-CXXFLAGS="$CXXFLAGS -I`pwd`/include -I`pwd`/libgnuworld"
+dnl CXXFLAGS="$CXXFLAGS -I${ac_top_srcdir}/include -I${ac_top_srcdir}/libgnuworld"
 
 echo
 echo "Detecting modules..."
@@ -375,6 +375,7 @@ mod.gnutest/Makefile \
 mod.nickserv/Makefile \
 mod.scanner/Makefile \
 mod.stats/Makefile \
+bin/server_command_map \
 bin/ccontrol.example.conf \
 bin/clientExample.example.conf \
 bin/cloner.example.conf \

@@ -40,7 +40,6 @@ ACLOCAL = @ACLOCAL@
 AMDEP_FALSE = @AMDEP_FALSE@
 AMDEP_TRUE = @AMDEP_TRUE@
 AMTAR = @AMTAR@
-AR = @AR@
 AUTOCONF = @AUTOCONF@
 AUTOHEADER = @AUTOHEADER@
 AUTOMAKE = @AUTOMAKE@
@@ -86,8 +85,6 @@ ECHO_N = @ECHO_N@
 ECHO_T = @ECHO_T@
 EGREP = @EGREP@
 EXEEXT = @EXEEXT@
-F77 = @F77@
-FFLAGS = @FFLAGS@
 INCLTDL = @INCLTDL@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
@@ -121,10 +118,8 @@ SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
 VERSION = @VERSION@
-ac_ct_AR = @ac_ct_AR@
 ac_ct_CC = @ac_ct_CC@
 ac_ct_CXX = @ac_ct_CXX@
-ac_ct_F77 = @ac_ct_F77@
 ac_ct_RANLIB = @ac_ct_RANLIB@
 ac_ct_STRIP = @ac_ct_STRIP@
 am__fastdepCC_FALSE = @am__fastdepCC_FALSE@
@@ -200,6 +195,8 @@ libircu_la_SOURCES = msg_AC.cc \
 	msg_W.cc \
 	msg_Y.cc
 
+
+libircu_la_CXXFLAGS = -I${top_srcdir}/include -I${top_srcdir}/libgnuworld
 libircu_la_LDFLAGS = -module -export-dynamic
 subdir = libircu
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -209,34 +206,56 @@ CONFIG_CLEAN_FILES =
 LTLIBRARIES = $(lib_LTLIBRARIES)
 
 libircu_la_LIBADD =
-am_libircu_la_OBJECTS = msg_AC.lo msg_AD.lo msg_B.lo msg_C.lo msg_CM.lo \
-	msg_D.lo msg_DS.lo msg_EA.lo msg_EB.lo msg_G.lo msg_GL.lo \
-	msg_I.lo msg_J.lo msg_JU.lo msg_K.lo msg_L.lo msg_M351.lo \
-	msg_M.lo msg_N.lo msg_NOOP.lo msg_O.lo msg_PA.lo msg_P.lo \
-	msg_Q.lo msg_R.lo msg_S.lo msg_Server.lo msg_SQ.lo msg_T.lo \
-	msg_V.lo msg_WA.lo msg_W.lo msg_Y.lo
+am_libircu_la_OBJECTS = libircu_la-msg_AC.lo libircu_la-msg_AD.lo \
+	libircu_la-msg_B.lo libircu_la-msg_C.lo libircu_la-msg_CM.lo \
+	libircu_la-msg_D.lo libircu_la-msg_DS.lo libircu_la-msg_EA.lo \
+	libircu_la-msg_EB.lo libircu_la-msg_G.lo libircu_la-msg_GL.lo \
+	libircu_la-msg_I.lo libircu_la-msg_J.lo libircu_la-msg_JU.lo \
+	libircu_la-msg_K.lo libircu_la-msg_L.lo libircu_la-msg_M351.lo \
+	libircu_la-msg_M.lo libircu_la-msg_N.lo libircu_la-msg_NOOP.lo \
+	libircu_la-msg_O.lo libircu_la-msg_PA.lo libircu_la-msg_P.lo \
+	libircu_la-msg_Q.lo libircu_la-msg_R.lo libircu_la-msg_S.lo \
+	libircu_la-msg_Server.lo libircu_la-msg_SQ.lo \
+	libircu_la-msg_T.lo libircu_la-msg_V.lo libircu_la-msg_WA.lo \
+	libircu_la-msg_W.lo libircu_la-msg_Y.lo
 libircu_la_OBJECTS = $(am_libircu_la_OBJECTS)
 
 DEFAULT_INCLUDES =  -I. -I$(srcdir) -I$(top_builddir)/include
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
-@AMDEP_TRUE@DEP_FILES = ./$(DEPDIR)/msg_AC.Plo ./$(DEPDIR)/msg_AD.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/msg_B.Plo ./$(DEPDIR)/msg_C.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/msg_CM.Plo ./$(DEPDIR)/msg_D.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/msg_DS.Plo ./$(DEPDIR)/msg_EA.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/msg_EB.Plo ./$(DEPDIR)/msg_G.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/msg_GL.Plo ./$(DEPDIR)/msg_I.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/msg_J.Plo ./$(DEPDIR)/msg_JU.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/msg_K.Plo ./$(DEPDIR)/msg_L.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/msg_M.Plo ./$(DEPDIR)/msg_M351.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/msg_N.Plo ./$(DEPDIR)/msg_NOOP.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/msg_O.Plo ./$(DEPDIR)/msg_P.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/msg_PA.Plo ./$(DEPDIR)/msg_Q.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/msg_R.Plo ./$(DEPDIR)/msg_S.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/msg_SQ.Plo ./$(DEPDIR)/msg_Server.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/msg_T.Plo ./$(DEPDIR)/msg_V.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/msg_W.Plo ./$(DEPDIR)/msg_WA.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/msg_Y.Plo
+@AMDEP_TRUE@DEP_FILES = ./$(DEPDIR)/libircu_la-msg_AC.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/libircu_la-msg_AD.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/libircu_la-msg_B.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/libircu_la-msg_C.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/libircu_la-msg_CM.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/libircu_la-msg_D.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/libircu_la-msg_DS.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/libircu_la-msg_EA.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/libircu_la-msg_EB.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/libircu_la-msg_G.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/libircu_la-msg_GL.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/libircu_la-msg_I.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/libircu_la-msg_J.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/libircu_la-msg_JU.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/libircu_la-msg_K.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/libircu_la-msg_L.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/libircu_la-msg_M.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/libircu_la-msg_M351.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/libircu_la-msg_N.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/libircu_la-msg_NOOP.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/libircu_la-msg_O.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/libircu_la-msg_P.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/libircu_la-msg_PA.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/libircu_la-msg_Q.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/libircu_la-msg_R.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/libircu_la-msg_S.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/libircu_la-msg_SQ.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/libircu_la-msg_Server.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/libircu_la-msg_T.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/libircu_la-msg_V.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/libircu_la-msg_W.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/libircu_la-msg_WA.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/libircu_la-msg_Y.Plo
 CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
 LTCXXCOMPILE = $(LIBTOOL) --mode=compile $(CXX) $(DEFS) \
@@ -295,39 +314,39 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/msg_AC.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/msg_AD.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/msg_B.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/msg_C.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/msg_CM.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/msg_D.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/msg_DS.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/msg_EA.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/msg_EB.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/msg_G.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/msg_GL.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/msg_I.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/msg_J.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/msg_JU.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/msg_K.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/msg_L.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/msg_M.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/msg_M351.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/msg_N.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/msg_NOOP.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/msg_O.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/msg_P.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/msg_PA.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/msg_Q.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/msg_R.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/msg_S.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/msg_SQ.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/msg_Server.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/msg_T.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/msg_V.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/msg_W.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/msg_WA.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/msg_Y.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libircu_la-msg_AC.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libircu_la-msg_AD.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libircu_la-msg_B.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libircu_la-msg_C.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libircu_la-msg_CM.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libircu_la-msg_D.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libircu_la-msg_DS.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libircu_la-msg_EA.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libircu_la-msg_EB.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libircu_la-msg_G.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libircu_la-msg_GL.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libircu_la-msg_I.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libircu_la-msg_J.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libircu_la-msg_JU.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libircu_la-msg_K.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libircu_la-msg_L.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libircu_la-msg_M.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libircu_la-msg_M351.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libircu_la-msg_N.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libircu_la-msg_NOOP.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libircu_la-msg_O.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libircu_la-msg_P.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libircu_la-msg_PA.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libircu_la-msg_Q.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libircu_la-msg_R.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libircu_la-msg_S.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libircu_la-msg_SQ.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libircu_la-msg_Server.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libircu_la-msg_T.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libircu_la-msg_V.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libircu_la-msg_W.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libircu_la-msg_WA.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libircu_la-msg_Y.Plo@am__quote@
 
 distclean-depend:
 	-rm -rf ./$(DEPDIR)
@@ -364,6 +383,1095 @@ distclean-depend:
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/$*.Plo' tmpdepfile='$(DEPDIR)/$*.TPlo' @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LTCXXCOMPILE) -c -o $@ `test -f '$<' || echo '$(srcdir)/'`$<
+
+libircu_la-msg_AC.o: msg_AC.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -MT libircu_la-msg_AC.o -MD -MP -MF "$(DEPDIR)/libircu_la-msg_AC.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libircu_la-msg_AC.o `test -f 'msg_AC.cc' || echo '$(srcdir)/'`msg_AC.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libircu_la-msg_AC.Tpo" "$(DEPDIR)/libircu_la-msg_AC.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libircu_la-msg_AC.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='msg_AC.cc' object='libircu_la-msg_AC.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libircu_la-msg_AC.Po' tmpdepfile='$(DEPDIR)/libircu_la-msg_AC.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -c -o libircu_la-msg_AC.o `test -f 'msg_AC.cc' || echo '$(srcdir)/'`msg_AC.cc
+
+libircu_la-msg_AC.obj: msg_AC.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -MT libircu_la-msg_AC.obj -MD -MP -MF "$(DEPDIR)/libircu_la-msg_AC.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libircu_la-msg_AC.obj `if test -f 'msg_AC.cc'; then $(CYGPATH_W) 'msg_AC.cc'; else $(CYGPATH_W) '$(srcdir)/msg_AC.cc'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libircu_la-msg_AC.Tpo" "$(DEPDIR)/libircu_la-msg_AC.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libircu_la-msg_AC.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='msg_AC.cc' object='libircu_la-msg_AC.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libircu_la-msg_AC.Po' tmpdepfile='$(DEPDIR)/libircu_la-msg_AC.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -c -o libircu_la-msg_AC.obj `if test -f 'msg_AC.cc'; then $(CYGPATH_W) 'msg_AC.cc'; else $(CYGPATH_W) '$(srcdir)/msg_AC.cc'; fi`
+
+libircu_la-msg_AC.lo: msg_AC.cc
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -MT libircu_la-msg_AC.lo -MD -MP -MF "$(DEPDIR)/libircu_la-msg_AC.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libircu_la-msg_AC.lo `test -f 'msg_AC.cc' || echo '$(srcdir)/'`msg_AC.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libircu_la-msg_AC.Tpo" "$(DEPDIR)/libircu_la-msg_AC.Plo"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libircu_la-msg_AC.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='msg_AC.cc' object='libircu_la-msg_AC.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libircu_la-msg_AC.Plo' tmpdepfile='$(DEPDIR)/libircu_la-msg_AC.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -c -o libircu_la-msg_AC.lo `test -f 'msg_AC.cc' || echo '$(srcdir)/'`msg_AC.cc
+
+libircu_la-msg_AD.o: msg_AD.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -MT libircu_la-msg_AD.o -MD -MP -MF "$(DEPDIR)/libircu_la-msg_AD.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libircu_la-msg_AD.o `test -f 'msg_AD.cc' || echo '$(srcdir)/'`msg_AD.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libircu_la-msg_AD.Tpo" "$(DEPDIR)/libircu_la-msg_AD.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libircu_la-msg_AD.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='msg_AD.cc' object='libircu_la-msg_AD.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libircu_la-msg_AD.Po' tmpdepfile='$(DEPDIR)/libircu_la-msg_AD.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -c -o libircu_la-msg_AD.o `test -f 'msg_AD.cc' || echo '$(srcdir)/'`msg_AD.cc
+
+libircu_la-msg_AD.obj: msg_AD.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -MT libircu_la-msg_AD.obj -MD -MP -MF "$(DEPDIR)/libircu_la-msg_AD.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libircu_la-msg_AD.obj `if test -f 'msg_AD.cc'; then $(CYGPATH_W) 'msg_AD.cc'; else $(CYGPATH_W) '$(srcdir)/msg_AD.cc'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libircu_la-msg_AD.Tpo" "$(DEPDIR)/libircu_la-msg_AD.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libircu_la-msg_AD.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='msg_AD.cc' object='libircu_la-msg_AD.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libircu_la-msg_AD.Po' tmpdepfile='$(DEPDIR)/libircu_la-msg_AD.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -c -o libircu_la-msg_AD.obj `if test -f 'msg_AD.cc'; then $(CYGPATH_W) 'msg_AD.cc'; else $(CYGPATH_W) '$(srcdir)/msg_AD.cc'; fi`
+
+libircu_la-msg_AD.lo: msg_AD.cc
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -MT libircu_la-msg_AD.lo -MD -MP -MF "$(DEPDIR)/libircu_la-msg_AD.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libircu_la-msg_AD.lo `test -f 'msg_AD.cc' || echo '$(srcdir)/'`msg_AD.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libircu_la-msg_AD.Tpo" "$(DEPDIR)/libircu_la-msg_AD.Plo"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libircu_la-msg_AD.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='msg_AD.cc' object='libircu_la-msg_AD.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libircu_la-msg_AD.Plo' tmpdepfile='$(DEPDIR)/libircu_la-msg_AD.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -c -o libircu_la-msg_AD.lo `test -f 'msg_AD.cc' || echo '$(srcdir)/'`msg_AD.cc
+
+libircu_la-msg_B.o: msg_B.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -MT libircu_la-msg_B.o -MD -MP -MF "$(DEPDIR)/libircu_la-msg_B.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libircu_la-msg_B.o `test -f 'msg_B.cc' || echo '$(srcdir)/'`msg_B.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libircu_la-msg_B.Tpo" "$(DEPDIR)/libircu_la-msg_B.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libircu_la-msg_B.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='msg_B.cc' object='libircu_la-msg_B.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libircu_la-msg_B.Po' tmpdepfile='$(DEPDIR)/libircu_la-msg_B.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -c -o libircu_la-msg_B.o `test -f 'msg_B.cc' || echo '$(srcdir)/'`msg_B.cc
+
+libircu_la-msg_B.obj: msg_B.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -MT libircu_la-msg_B.obj -MD -MP -MF "$(DEPDIR)/libircu_la-msg_B.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libircu_la-msg_B.obj `if test -f 'msg_B.cc'; then $(CYGPATH_W) 'msg_B.cc'; else $(CYGPATH_W) '$(srcdir)/msg_B.cc'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libircu_la-msg_B.Tpo" "$(DEPDIR)/libircu_la-msg_B.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libircu_la-msg_B.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='msg_B.cc' object='libircu_la-msg_B.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libircu_la-msg_B.Po' tmpdepfile='$(DEPDIR)/libircu_la-msg_B.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -c -o libircu_la-msg_B.obj `if test -f 'msg_B.cc'; then $(CYGPATH_W) 'msg_B.cc'; else $(CYGPATH_W) '$(srcdir)/msg_B.cc'; fi`
+
+libircu_la-msg_B.lo: msg_B.cc
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -MT libircu_la-msg_B.lo -MD -MP -MF "$(DEPDIR)/libircu_la-msg_B.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libircu_la-msg_B.lo `test -f 'msg_B.cc' || echo '$(srcdir)/'`msg_B.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libircu_la-msg_B.Tpo" "$(DEPDIR)/libircu_la-msg_B.Plo"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libircu_la-msg_B.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='msg_B.cc' object='libircu_la-msg_B.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libircu_la-msg_B.Plo' tmpdepfile='$(DEPDIR)/libircu_la-msg_B.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -c -o libircu_la-msg_B.lo `test -f 'msg_B.cc' || echo '$(srcdir)/'`msg_B.cc
+
+libircu_la-msg_C.o: msg_C.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -MT libircu_la-msg_C.o -MD -MP -MF "$(DEPDIR)/libircu_la-msg_C.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libircu_la-msg_C.o `test -f 'msg_C.cc' || echo '$(srcdir)/'`msg_C.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libircu_la-msg_C.Tpo" "$(DEPDIR)/libircu_la-msg_C.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libircu_la-msg_C.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='msg_C.cc' object='libircu_la-msg_C.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libircu_la-msg_C.Po' tmpdepfile='$(DEPDIR)/libircu_la-msg_C.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -c -o libircu_la-msg_C.o `test -f 'msg_C.cc' || echo '$(srcdir)/'`msg_C.cc
+
+libircu_la-msg_C.obj: msg_C.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -MT libircu_la-msg_C.obj -MD -MP -MF "$(DEPDIR)/libircu_la-msg_C.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libircu_la-msg_C.obj `if test -f 'msg_C.cc'; then $(CYGPATH_W) 'msg_C.cc'; else $(CYGPATH_W) '$(srcdir)/msg_C.cc'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libircu_la-msg_C.Tpo" "$(DEPDIR)/libircu_la-msg_C.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libircu_la-msg_C.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='msg_C.cc' object='libircu_la-msg_C.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libircu_la-msg_C.Po' tmpdepfile='$(DEPDIR)/libircu_la-msg_C.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -c -o libircu_la-msg_C.obj `if test -f 'msg_C.cc'; then $(CYGPATH_W) 'msg_C.cc'; else $(CYGPATH_W) '$(srcdir)/msg_C.cc'; fi`
+
+libircu_la-msg_C.lo: msg_C.cc
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -MT libircu_la-msg_C.lo -MD -MP -MF "$(DEPDIR)/libircu_la-msg_C.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libircu_la-msg_C.lo `test -f 'msg_C.cc' || echo '$(srcdir)/'`msg_C.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libircu_la-msg_C.Tpo" "$(DEPDIR)/libircu_la-msg_C.Plo"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libircu_la-msg_C.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='msg_C.cc' object='libircu_la-msg_C.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libircu_la-msg_C.Plo' tmpdepfile='$(DEPDIR)/libircu_la-msg_C.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -c -o libircu_la-msg_C.lo `test -f 'msg_C.cc' || echo '$(srcdir)/'`msg_C.cc
+
+libircu_la-msg_CM.o: msg_CM.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -MT libircu_la-msg_CM.o -MD -MP -MF "$(DEPDIR)/libircu_la-msg_CM.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libircu_la-msg_CM.o `test -f 'msg_CM.cc' || echo '$(srcdir)/'`msg_CM.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libircu_la-msg_CM.Tpo" "$(DEPDIR)/libircu_la-msg_CM.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libircu_la-msg_CM.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='msg_CM.cc' object='libircu_la-msg_CM.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libircu_la-msg_CM.Po' tmpdepfile='$(DEPDIR)/libircu_la-msg_CM.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -c -o libircu_la-msg_CM.o `test -f 'msg_CM.cc' || echo '$(srcdir)/'`msg_CM.cc
+
+libircu_la-msg_CM.obj: msg_CM.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -MT libircu_la-msg_CM.obj -MD -MP -MF "$(DEPDIR)/libircu_la-msg_CM.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libircu_la-msg_CM.obj `if test -f 'msg_CM.cc'; then $(CYGPATH_W) 'msg_CM.cc'; else $(CYGPATH_W) '$(srcdir)/msg_CM.cc'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libircu_la-msg_CM.Tpo" "$(DEPDIR)/libircu_la-msg_CM.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libircu_la-msg_CM.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='msg_CM.cc' object='libircu_la-msg_CM.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libircu_la-msg_CM.Po' tmpdepfile='$(DEPDIR)/libircu_la-msg_CM.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -c -o libircu_la-msg_CM.obj `if test -f 'msg_CM.cc'; then $(CYGPATH_W) 'msg_CM.cc'; else $(CYGPATH_W) '$(srcdir)/msg_CM.cc'; fi`
+
+libircu_la-msg_CM.lo: msg_CM.cc
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -MT libircu_la-msg_CM.lo -MD -MP -MF "$(DEPDIR)/libircu_la-msg_CM.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libircu_la-msg_CM.lo `test -f 'msg_CM.cc' || echo '$(srcdir)/'`msg_CM.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libircu_la-msg_CM.Tpo" "$(DEPDIR)/libircu_la-msg_CM.Plo"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libircu_la-msg_CM.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='msg_CM.cc' object='libircu_la-msg_CM.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libircu_la-msg_CM.Plo' tmpdepfile='$(DEPDIR)/libircu_la-msg_CM.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -c -o libircu_la-msg_CM.lo `test -f 'msg_CM.cc' || echo '$(srcdir)/'`msg_CM.cc
+
+libircu_la-msg_D.o: msg_D.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -MT libircu_la-msg_D.o -MD -MP -MF "$(DEPDIR)/libircu_la-msg_D.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libircu_la-msg_D.o `test -f 'msg_D.cc' || echo '$(srcdir)/'`msg_D.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libircu_la-msg_D.Tpo" "$(DEPDIR)/libircu_la-msg_D.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libircu_la-msg_D.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='msg_D.cc' object='libircu_la-msg_D.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libircu_la-msg_D.Po' tmpdepfile='$(DEPDIR)/libircu_la-msg_D.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -c -o libircu_la-msg_D.o `test -f 'msg_D.cc' || echo '$(srcdir)/'`msg_D.cc
+
+libircu_la-msg_D.obj: msg_D.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -MT libircu_la-msg_D.obj -MD -MP -MF "$(DEPDIR)/libircu_la-msg_D.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libircu_la-msg_D.obj `if test -f 'msg_D.cc'; then $(CYGPATH_W) 'msg_D.cc'; else $(CYGPATH_W) '$(srcdir)/msg_D.cc'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libircu_la-msg_D.Tpo" "$(DEPDIR)/libircu_la-msg_D.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libircu_la-msg_D.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='msg_D.cc' object='libircu_la-msg_D.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libircu_la-msg_D.Po' tmpdepfile='$(DEPDIR)/libircu_la-msg_D.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -c -o libircu_la-msg_D.obj `if test -f 'msg_D.cc'; then $(CYGPATH_W) 'msg_D.cc'; else $(CYGPATH_W) '$(srcdir)/msg_D.cc'; fi`
+
+libircu_la-msg_D.lo: msg_D.cc
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -MT libircu_la-msg_D.lo -MD -MP -MF "$(DEPDIR)/libircu_la-msg_D.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libircu_la-msg_D.lo `test -f 'msg_D.cc' || echo '$(srcdir)/'`msg_D.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libircu_la-msg_D.Tpo" "$(DEPDIR)/libircu_la-msg_D.Plo"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libircu_la-msg_D.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='msg_D.cc' object='libircu_la-msg_D.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libircu_la-msg_D.Plo' tmpdepfile='$(DEPDIR)/libircu_la-msg_D.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -c -o libircu_la-msg_D.lo `test -f 'msg_D.cc' || echo '$(srcdir)/'`msg_D.cc
+
+libircu_la-msg_DS.o: msg_DS.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -MT libircu_la-msg_DS.o -MD -MP -MF "$(DEPDIR)/libircu_la-msg_DS.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libircu_la-msg_DS.o `test -f 'msg_DS.cc' || echo '$(srcdir)/'`msg_DS.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libircu_la-msg_DS.Tpo" "$(DEPDIR)/libircu_la-msg_DS.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libircu_la-msg_DS.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='msg_DS.cc' object='libircu_la-msg_DS.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libircu_la-msg_DS.Po' tmpdepfile='$(DEPDIR)/libircu_la-msg_DS.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -c -o libircu_la-msg_DS.o `test -f 'msg_DS.cc' || echo '$(srcdir)/'`msg_DS.cc
+
+libircu_la-msg_DS.obj: msg_DS.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -MT libircu_la-msg_DS.obj -MD -MP -MF "$(DEPDIR)/libircu_la-msg_DS.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libircu_la-msg_DS.obj `if test -f 'msg_DS.cc'; then $(CYGPATH_W) 'msg_DS.cc'; else $(CYGPATH_W) '$(srcdir)/msg_DS.cc'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libircu_la-msg_DS.Tpo" "$(DEPDIR)/libircu_la-msg_DS.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libircu_la-msg_DS.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='msg_DS.cc' object='libircu_la-msg_DS.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libircu_la-msg_DS.Po' tmpdepfile='$(DEPDIR)/libircu_la-msg_DS.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -c -o libircu_la-msg_DS.obj `if test -f 'msg_DS.cc'; then $(CYGPATH_W) 'msg_DS.cc'; else $(CYGPATH_W) '$(srcdir)/msg_DS.cc'; fi`
+
+libircu_la-msg_DS.lo: msg_DS.cc
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -MT libircu_la-msg_DS.lo -MD -MP -MF "$(DEPDIR)/libircu_la-msg_DS.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libircu_la-msg_DS.lo `test -f 'msg_DS.cc' || echo '$(srcdir)/'`msg_DS.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libircu_la-msg_DS.Tpo" "$(DEPDIR)/libircu_la-msg_DS.Plo"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libircu_la-msg_DS.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='msg_DS.cc' object='libircu_la-msg_DS.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libircu_la-msg_DS.Plo' tmpdepfile='$(DEPDIR)/libircu_la-msg_DS.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -c -o libircu_la-msg_DS.lo `test -f 'msg_DS.cc' || echo '$(srcdir)/'`msg_DS.cc
+
+libircu_la-msg_EA.o: msg_EA.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -MT libircu_la-msg_EA.o -MD -MP -MF "$(DEPDIR)/libircu_la-msg_EA.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libircu_la-msg_EA.o `test -f 'msg_EA.cc' || echo '$(srcdir)/'`msg_EA.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libircu_la-msg_EA.Tpo" "$(DEPDIR)/libircu_la-msg_EA.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libircu_la-msg_EA.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='msg_EA.cc' object='libircu_la-msg_EA.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libircu_la-msg_EA.Po' tmpdepfile='$(DEPDIR)/libircu_la-msg_EA.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -c -o libircu_la-msg_EA.o `test -f 'msg_EA.cc' || echo '$(srcdir)/'`msg_EA.cc
+
+libircu_la-msg_EA.obj: msg_EA.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -MT libircu_la-msg_EA.obj -MD -MP -MF "$(DEPDIR)/libircu_la-msg_EA.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libircu_la-msg_EA.obj `if test -f 'msg_EA.cc'; then $(CYGPATH_W) 'msg_EA.cc'; else $(CYGPATH_W) '$(srcdir)/msg_EA.cc'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libircu_la-msg_EA.Tpo" "$(DEPDIR)/libircu_la-msg_EA.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libircu_la-msg_EA.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='msg_EA.cc' object='libircu_la-msg_EA.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libircu_la-msg_EA.Po' tmpdepfile='$(DEPDIR)/libircu_la-msg_EA.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -c -o libircu_la-msg_EA.obj `if test -f 'msg_EA.cc'; then $(CYGPATH_W) 'msg_EA.cc'; else $(CYGPATH_W) '$(srcdir)/msg_EA.cc'; fi`
+
+libircu_la-msg_EA.lo: msg_EA.cc
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -MT libircu_la-msg_EA.lo -MD -MP -MF "$(DEPDIR)/libircu_la-msg_EA.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libircu_la-msg_EA.lo `test -f 'msg_EA.cc' || echo '$(srcdir)/'`msg_EA.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libircu_la-msg_EA.Tpo" "$(DEPDIR)/libircu_la-msg_EA.Plo"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libircu_la-msg_EA.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='msg_EA.cc' object='libircu_la-msg_EA.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libircu_la-msg_EA.Plo' tmpdepfile='$(DEPDIR)/libircu_la-msg_EA.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -c -o libircu_la-msg_EA.lo `test -f 'msg_EA.cc' || echo '$(srcdir)/'`msg_EA.cc
+
+libircu_la-msg_EB.o: msg_EB.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -MT libircu_la-msg_EB.o -MD -MP -MF "$(DEPDIR)/libircu_la-msg_EB.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libircu_la-msg_EB.o `test -f 'msg_EB.cc' || echo '$(srcdir)/'`msg_EB.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libircu_la-msg_EB.Tpo" "$(DEPDIR)/libircu_la-msg_EB.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libircu_la-msg_EB.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='msg_EB.cc' object='libircu_la-msg_EB.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libircu_la-msg_EB.Po' tmpdepfile='$(DEPDIR)/libircu_la-msg_EB.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -c -o libircu_la-msg_EB.o `test -f 'msg_EB.cc' || echo '$(srcdir)/'`msg_EB.cc
+
+libircu_la-msg_EB.obj: msg_EB.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -MT libircu_la-msg_EB.obj -MD -MP -MF "$(DEPDIR)/libircu_la-msg_EB.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libircu_la-msg_EB.obj `if test -f 'msg_EB.cc'; then $(CYGPATH_W) 'msg_EB.cc'; else $(CYGPATH_W) '$(srcdir)/msg_EB.cc'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libircu_la-msg_EB.Tpo" "$(DEPDIR)/libircu_la-msg_EB.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libircu_la-msg_EB.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='msg_EB.cc' object='libircu_la-msg_EB.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libircu_la-msg_EB.Po' tmpdepfile='$(DEPDIR)/libircu_la-msg_EB.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -c -o libircu_la-msg_EB.obj `if test -f 'msg_EB.cc'; then $(CYGPATH_W) 'msg_EB.cc'; else $(CYGPATH_W) '$(srcdir)/msg_EB.cc'; fi`
+
+libircu_la-msg_EB.lo: msg_EB.cc
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -MT libircu_la-msg_EB.lo -MD -MP -MF "$(DEPDIR)/libircu_la-msg_EB.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libircu_la-msg_EB.lo `test -f 'msg_EB.cc' || echo '$(srcdir)/'`msg_EB.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libircu_la-msg_EB.Tpo" "$(DEPDIR)/libircu_la-msg_EB.Plo"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libircu_la-msg_EB.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='msg_EB.cc' object='libircu_la-msg_EB.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libircu_la-msg_EB.Plo' tmpdepfile='$(DEPDIR)/libircu_la-msg_EB.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -c -o libircu_la-msg_EB.lo `test -f 'msg_EB.cc' || echo '$(srcdir)/'`msg_EB.cc
+
+libircu_la-msg_G.o: msg_G.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -MT libircu_la-msg_G.o -MD -MP -MF "$(DEPDIR)/libircu_la-msg_G.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libircu_la-msg_G.o `test -f 'msg_G.cc' || echo '$(srcdir)/'`msg_G.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libircu_la-msg_G.Tpo" "$(DEPDIR)/libircu_la-msg_G.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libircu_la-msg_G.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='msg_G.cc' object='libircu_la-msg_G.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libircu_la-msg_G.Po' tmpdepfile='$(DEPDIR)/libircu_la-msg_G.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -c -o libircu_la-msg_G.o `test -f 'msg_G.cc' || echo '$(srcdir)/'`msg_G.cc
+
+libircu_la-msg_G.obj: msg_G.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -MT libircu_la-msg_G.obj -MD -MP -MF "$(DEPDIR)/libircu_la-msg_G.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libircu_la-msg_G.obj `if test -f 'msg_G.cc'; then $(CYGPATH_W) 'msg_G.cc'; else $(CYGPATH_W) '$(srcdir)/msg_G.cc'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libircu_la-msg_G.Tpo" "$(DEPDIR)/libircu_la-msg_G.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libircu_la-msg_G.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='msg_G.cc' object='libircu_la-msg_G.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libircu_la-msg_G.Po' tmpdepfile='$(DEPDIR)/libircu_la-msg_G.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -c -o libircu_la-msg_G.obj `if test -f 'msg_G.cc'; then $(CYGPATH_W) 'msg_G.cc'; else $(CYGPATH_W) '$(srcdir)/msg_G.cc'; fi`
+
+libircu_la-msg_G.lo: msg_G.cc
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -MT libircu_la-msg_G.lo -MD -MP -MF "$(DEPDIR)/libircu_la-msg_G.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libircu_la-msg_G.lo `test -f 'msg_G.cc' || echo '$(srcdir)/'`msg_G.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libircu_la-msg_G.Tpo" "$(DEPDIR)/libircu_la-msg_G.Plo"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libircu_la-msg_G.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='msg_G.cc' object='libircu_la-msg_G.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libircu_la-msg_G.Plo' tmpdepfile='$(DEPDIR)/libircu_la-msg_G.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -c -o libircu_la-msg_G.lo `test -f 'msg_G.cc' || echo '$(srcdir)/'`msg_G.cc
+
+libircu_la-msg_GL.o: msg_GL.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -MT libircu_la-msg_GL.o -MD -MP -MF "$(DEPDIR)/libircu_la-msg_GL.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libircu_la-msg_GL.o `test -f 'msg_GL.cc' || echo '$(srcdir)/'`msg_GL.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libircu_la-msg_GL.Tpo" "$(DEPDIR)/libircu_la-msg_GL.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libircu_la-msg_GL.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='msg_GL.cc' object='libircu_la-msg_GL.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libircu_la-msg_GL.Po' tmpdepfile='$(DEPDIR)/libircu_la-msg_GL.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -c -o libircu_la-msg_GL.o `test -f 'msg_GL.cc' || echo '$(srcdir)/'`msg_GL.cc
+
+libircu_la-msg_GL.obj: msg_GL.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -MT libircu_la-msg_GL.obj -MD -MP -MF "$(DEPDIR)/libircu_la-msg_GL.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libircu_la-msg_GL.obj `if test -f 'msg_GL.cc'; then $(CYGPATH_W) 'msg_GL.cc'; else $(CYGPATH_W) '$(srcdir)/msg_GL.cc'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libircu_la-msg_GL.Tpo" "$(DEPDIR)/libircu_la-msg_GL.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libircu_la-msg_GL.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='msg_GL.cc' object='libircu_la-msg_GL.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libircu_la-msg_GL.Po' tmpdepfile='$(DEPDIR)/libircu_la-msg_GL.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -c -o libircu_la-msg_GL.obj `if test -f 'msg_GL.cc'; then $(CYGPATH_W) 'msg_GL.cc'; else $(CYGPATH_W) '$(srcdir)/msg_GL.cc'; fi`
+
+libircu_la-msg_GL.lo: msg_GL.cc
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -MT libircu_la-msg_GL.lo -MD -MP -MF "$(DEPDIR)/libircu_la-msg_GL.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libircu_la-msg_GL.lo `test -f 'msg_GL.cc' || echo '$(srcdir)/'`msg_GL.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libircu_la-msg_GL.Tpo" "$(DEPDIR)/libircu_la-msg_GL.Plo"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libircu_la-msg_GL.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='msg_GL.cc' object='libircu_la-msg_GL.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libircu_la-msg_GL.Plo' tmpdepfile='$(DEPDIR)/libircu_la-msg_GL.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -c -o libircu_la-msg_GL.lo `test -f 'msg_GL.cc' || echo '$(srcdir)/'`msg_GL.cc
+
+libircu_la-msg_I.o: msg_I.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -MT libircu_la-msg_I.o -MD -MP -MF "$(DEPDIR)/libircu_la-msg_I.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libircu_la-msg_I.o `test -f 'msg_I.cc' || echo '$(srcdir)/'`msg_I.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libircu_la-msg_I.Tpo" "$(DEPDIR)/libircu_la-msg_I.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libircu_la-msg_I.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='msg_I.cc' object='libircu_la-msg_I.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libircu_la-msg_I.Po' tmpdepfile='$(DEPDIR)/libircu_la-msg_I.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -c -o libircu_la-msg_I.o `test -f 'msg_I.cc' || echo '$(srcdir)/'`msg_I.cc
+
+libircu_la-msg_I.obj: msg_I.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -MT libircu_la-msg_I.obj -MD -MP -MF "$(DEPDIR)/libircu_la-msg_I.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libircu_la-msg_I.obj `if test -f 'msg_I.cc'; then $(CYGPATH_W) 'msg_I.cc'; else $(CYGPATH_W) '$(srcdir)/msg_I.cc'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libircu_la-msg_I.Tpo" "$(DEPDIR)/libircu_la-msg_I.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libircu_la-msg_I.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='msg_I.cc' object='libircu_la-msg_I.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libircu_la-msg_I.Po' tmpdepfile='$(DEPDIR)/libircu_la-msg_I.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -c -o libircu_la-msg_I.obj `if test -f 'msg_I.cc'; then $(CYGPATH_W) 'msg_I.cc'; else $(CYGPATH_W) '$(srcdir)/msg_I.cc'; fi`
+
+libircu_la-msg_I.lo: msg_I.cc
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -MT libircu_la-msg_I.lo -MD -MP -MF "$(DEPDIR)/libircu_la-msg_I.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libircu_la-msg_I.lo `test -f 'msg_I.cc' || echo '$(srcdir)/'`msg_I.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libircu_la-msg_I.Tpo" "$(DEPDIR)/libircu_la-msg_I.Plo"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libircu_la-msg_I.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='msg_I.cc' object='libircu_la-msg_I.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libircu_la-msg_I.Plo' tmpdepfile='$(DEPDIR)/libircu_la-msg_I.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -c -o libircu_la-msg_I.lo `test -f 'msg_I.cc' || echo '$(srcdir)/'`msg_I.cc
+
+libircu_la-msg_J.o: msg_J.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -MT libircu_la-msg_J.o -MD -MP -MF "$(DEPDIR)/libircu_la-msg_J.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libircu_la-msg_J.o `test -f 'msg_J.cc' || echo '$(srcdir)/'`msg_J.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libircu_la-msg_J.Tpo" "$(DEPDIR)/libircu_la-msg_J.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libircu_la-msg_J.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='msg_J.cc' object='libircu_la-msg_J.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libircu_la-msg_J.Po' tmpdepfile='$(DEPDIR)/libircu_la-msg_J.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -c -o libircu_la-msg_J.o `test -f 'msg_J.cc' || echo '$(srcdir)/'`msg_J.cc
+
+libircu_la-msg_J.obj: msg_J.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -MT libircu_la-msg_J.obj -MD -MP -MF "$(DEPDIR)/libircu_la-msg_J.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libircu_la-msg_J.obj `if test -f 'msg_J.cc'; then $(CYGPATH_W) 'msg_J.cc'; else $(CYGPATH_W) '$(srcdir)/msg_J.cc'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libircu_la-msg_J.Tpo" "$(DEPDIR)/libircu_la-msg_J.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libircu_la-msg_J.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='msg_J.cc' object='libircu_la-msg_J.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libircu_la-msg_J.Po' tmpdepfile='$(DEPDIR)/libircu_la-msg_J.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -c -o libircu_la-msg_J.obj `if test -f 'msg_J.cc'; then $(CYGPATH_W) 'msg_J.cc'; else $(CYGPATH_W) '$(srcdir)/msg_J.cc'; fi`
+
+libircu_la-msg_J.lo: msg_J.cc
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -MT libircu_la-msg_J.lo -MD -MP -MF "$(DEPDIR)/libircu_la-msg_J.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libircu_la-msg_J.lo `test -f 'msg_J.cc' || echo '$(srcdir)/'`msg_J.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libircu_la-msg_J.Tpo" "$(DEPDIR)/libircu_la-msg_J.Plo"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libircu_la-msg_J.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='msg_J.cc' object='libircu_la-msg_J.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libircu_la-msg_J.Plo' tmpdepfile='$(DEPDIR)/libircu_la-msg_J.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -c -o libircu_la-msg_J.lo `test -f 'msg_J.cc' || echo '$(srcdir)/'`msg_J.cc
+
+libircu_la-msg_JU.o: msg_JU.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -MT libircu_la-msg_JU.o -MD -MP -MF "$(DEPDIR)/libircu_la-msg_JU.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libircu_la-msg_JU.o `test -f 'msg_JU.cc' || echo '$(srcdir)/'`msg_JU.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libircu_la-msg_JU.Tpo" "$(DEPDIR)/libircu_la-msg_JU.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libircu_la-msg_JU.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='msg_JU.cc' object='libircu_la-msg_JU.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libircu_la-msg_JU.Po' tmpdepfile='$(DEPDIR)/libircu_la-msg_JU.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -c -o libircu_la-msg_JU.o `test -f 'msg_JU.cc' || echo '$(srcdir)/'`msg_JU.cc
+
+libircu_la-msg_JU.obj: msg_JU.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -MT libircu_la-msg_JU.obj -MD -MP -MF "$(DEPDIR)/libircu_la-msg_JU.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libircu_la-msg_JU.obj `if test -f 'msg_JU.cc'; then $(CYGPATH_W) 'msg_JU.cc'; else $(CYGPATH_W) '$(srcdir)/msg_JU.cc'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libircu_la-msg_JU.Tpo" "$(DEPDIR)/libircu_la-msg_JU.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libircu_la-msg_JU.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='msg_JU.cc' object='libircu_la-msg_JU.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libircu_la-msg_JU.Po' tmpdepfile='$(DEPDIR)/libircu_la-msg_JU.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -c -o libircu_la-msg_JU.obj `if test -f 'msg_JU.cc'; then $(CYGPATH_W) 'msg_JU.cc'; else $(CYGPATH_W) '$(srcdir)/msg_JU.cc'; fi`
+
+libircu_la-msg_JU.lo: msg_JU.cc
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -MT libircu_la-msg_JU.lo -MD -MP -MF "$(DEPDIR)/libircu_la-msg_JU.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libircu_la-msg_JU.lo `test -f 'msg_JU.cc' || echo '$(srcdir)/'`msg_JU.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libircu_la-msg_JU.Tpo" "$(DEPDIR)/libircu_la-msg_JU.Plo"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libircu_la-msg_JU.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='msg_JU.cc' object='libircu_la-msg_JU.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libircu_la-msg_JU.Plo' tmpdepfile='$(DEPDIR)/libircu_la-msg_JU.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -c -o libircu_la-msg_JU.lo `test -f 'msg_JU.cc' || echo '$(srcdir)/'`msg_JU.cc
+
+libircu_la-msg_K.o: msg_K.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -MT libircu_la-msg_K.o -MD -MP -MF "$(DEPDIR)/libircu_la-msg_K.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libircu_la-msg_K.o `test -f 'msg_K.cc' || echo '$(srcdir)/'`msg_K.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libircu_la-msg_K.Tpo" "$(DEPDIR)/libircu_la-msg_K.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libircu_la-msg_K.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='msg_K.cc' object='libircu_la-msg_K.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libircu_la-msg_K.Po' tmpdepfile='$(DEPDIR)/libircu_la-msg_K.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -c -o libircu_la-msg_K.o `test -f 'msg_K.cc' || echo '$(srcdir)/'`msg_K.cc
+
+libircu_la-msg_K.obj: msg_K.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -MT libircu_la-msg_K.obj -MD -MP -MF "$(DEPDIR)/libircu_la-msg_K.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libircu_la-msg_K.obj `if test -f 'msg_K.cc'; then $(CYGPATH_W) 'msg_K.cc'; else $(CYGPATH_W) '$(srcdir)/msg_K.cc'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libircu_la-msg_K.Tpo" "$(DEPDIR)/libircu_la-msg_K.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libircu_la-msg_K.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='msg_K.cc' object='libircu_la-msg_K.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libircu_la-msg_K.Po' tmpdepfile='$(DEPDIR)/libircu_la-msg_K.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -c -o libircu_la-msg_K.obj `if test -f 'msg_K.cc'; then $(CYGPATH_W) 'msg_K.cc'; else $(CYGPATH_W) '$(srcdir)/msg_K.cc'; fi`
+
+libircu_la-msg_K.lo: msg_K.cc
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -MT libircu_la-msg_K.lo -MD -MP -MF "$(DEPDIR)/libircu_la-msg_K.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libircu_la-msg_K.lo `test -f 'msg_K.cc' || echo '$(srcdir)/'`msg_K.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libircu_la-msg_K.Tpo" "$(DEPDIR)/libircu_la-msg_K.Plo"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libircu_la-msg_K.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='msg_K.cc' object='libircu_la-msg_K.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libircu_la-msg_K.Plo' tmpdepfile='$(DEPDIR)/libircu_la-msg_K.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -c -o libircu_la-msg_K.lo `test -f 'msg_K.cc' || echo '$(srcdir)/'`msg_K.cc
+
+libircu_la-msg_L.o: msg_L.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -MT libircu_la-msg_L.o -MD -MP -MF "$(DEPDIR)/libircu_la-msg_L.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libircu_la-msg_L.o `test -f 'msg_L.cc' || echo '$(srcdir)/'`msg_L.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libircu_la-msg_L.Tpo" "$(DEPDIR)/libircu_la-msg_L.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libircu_la-msg_L.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='msg_L.cc' object='libircu_la-msg_L.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libircu_la-msg_L.Po' tmpdepfile='$(DEPDIR)/libircu_la-msg_L.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -c -o libircu_la-msg_L.o `test -f 'msg_L.cc' || echo '$(srcdir)/'`msg_L.cc
+
+libircu_la-msg_L.obj: msg_L.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -MT libircu_la-msg_L.obj -MD -MP -MF "$(DEPDIR)/libircu_la-msg_L.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libircu_la-msg_L.obj `if test -f 'msg_L.cc'; then $(CYGPATH_W) 'msg_L.cc'; else $(CYGPATH_W) '$(srcdir)/msg_L.cc'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libircu_la-msg_L.Tpo" "$(DEPDIR)/libircu_la-msg_L.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libircu_la-msg_L.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='msg_L.cc' object='libircu_la-msg_L.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libircu_la-msg_L.Po' tmpdepfile='$(DEPDIR)/libircu_la-msg_L.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -c -o libircu_la-msg_L.obj `if test -f 'msg_L.cc'; then $(CYGPATH_W) 'msg_L.cc'; else $(CYGPATH_W) '$(srcdir)/msg_L.cc'; fi`
+
+libircu_la-msg_L.lo: msg_L.cc
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -MT libircu_la-msg_L.lo -MD -MP -MF "$(DEPDIR)/libircu_la-msg_L.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libircu_la-msg_L.lo `test -f 'msg_L.cc' || echo '$(srcdir)/'`msg_L.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libircu_la-msg_L.Tpo" "$(DEPDIR)/libircu_la-msg_L.Plo"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libircu_la-msg_L.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='msg_L.cc' object='libircu_la-msg_L.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libircu_la-msg_L.Plo' tmpdepfile='$(DEPDIR)/libircu_la-msg_L.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -c -o libircu_la-msg_L.lo `test -f 'msg_L.cc' || echo '$(srcdir)/'`msg_L.cc
+
+libircu_la-msg_M351.o: msg_M351.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -MT libircu_la-msg_M351.o -MD -MP -MF "$(DEPDIR)/libircu_la-msg_M351.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libircu_la-msg_M351.o `test -f 'msg_M351.cc' || echo '$(srcdir)/'`msg_M351.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libircu_la-msg_M351.Tpo" "$(DEPDIR)/libircu_la-msg_M351.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libircu_la-msg_M351.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='msg_M351.cc' object='libircu_la-msg_M351.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libircu_la-msg_M351.Po' tmpdepfile='$(DEPDIR)/libircu_la-msg_M351.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -c -o libircu_la-msg_M351.o `test -f 'msg_M351.cc' || echo '$(srcdir)/'`msg_M351.cc
+
+libircu_la-msg_M351.obj: msg_M351.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -MT libircu_la-msg_M351.obj -MD -MP -MF "$(DEPDIR)/libircu_la-msg_M351.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libircu_la-msg_M351.obj `if test -f 'msg_M351.cc'; then $(CYGPATH_W) 'msg_M351.cc'; else $(CYGPATH_W) '$(srcdir)/msg_M351.cc'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libircu_la-msg_M351.Tpo" "$(DEPDIR)/libircu_la-msg_M351.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libircu_la-msg_M351.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='msg_M351.cc' object='libircu_la-msg_M351.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libircu_la-msg_M351.Po' tmpdepfile='$(DEPDIR)/libircu_la-msg_M351.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -c -o libircu_la-msg_M351.obj `if test -f 'msg_M351.cc'; then $(CYGPATH_W) 'msg_M351.cc'; else $(CYGPATH_W) '$(srcdir)/msg_M351.cc'; fi`
+
+libircu_la-msg_M351.lo: msg_M351.cc
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -MT libircu_la-msg_M351.lo -MD -MP -MF "$(DEPDIR)/libircu_la-msg_M351.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libircu_la-msg_M351.lo `test -f 'msg_M351.cc' || echo '$(srcdir)/'`msg_M351.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libircu_la-msg_M351.Tpo" "$(DEPDIR)/libircu_la-msg_M351.Plo"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libircu_la-msg_M351.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='msg_M351.cc' object='libircu_la-msg_M351.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libircu_la-msg_M351.Plo' tmpdepfile='$(DEPDIR)/libircu_la-msg_M351.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -c -o libircu_la-msg_M351.lo `test -f 'msg_M351.cc' || echo '$(srcdir)/'`msg_M351.cc
+
+libircu_la-msg_M.o: msg_M.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -MT libircu_la-msg_M.o -MD -MP -MF "$(DEPDIR)/libircu_la-msg_M.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libircu_la-msg_M.o `test -f 'msg_M.cc' || echo '$(srcdir)/'`msg_M.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libircu_la-msg_M.Tpo" "$(DEPDIR)/libircu_la-msg_M.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libircu_la-msg_M.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='msg_M.cc' object='libircu_la-msg_M.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libircu_la-msg_M.Po' tmpdepfile='$(DEPDIR)/libircu_la-msg_M.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -c -o libircu_la-msg_M.o `test -f 'msg_M.cc' || echo '$(srcdir)/'`msg_M.cc
+
+libircu_la-msg_M.obj: msg_M.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -MT libircu_la-msg_M.obj -MD -MP -MF "$(DEPDIR)/libircu_la-msg_M.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libircu_la-msg_M.obj `if test -f 'msg_M.cc'; then $(CYGPATH_W) 'msg_M.cc'; else $(CYGPATH_W) '$(srcdir)/msg_M.cc'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libircu_la-msg_M.Tpo" "$(DEPDIR)/libircu_la-msg_M.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libircu_la-msg_M.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='msg_M.cc' object='libircu_la-msg_M.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libircu_la-msg_M.Po' tmpdepfile='$(DEPDIR)/libircu_la-msg_M.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -c -o libircu_la-msg_M.obj `if test -f 'msg_M.cc'; then $(CYGPATH_W) 'msg_M.cc'; else $(CYGPATH_W) '$(srcdir)/msg_M.cc'; fi`
+
+libircu_la-msg_M.lo: msg_M.cc
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -MT libircu_la-msg_M.lo -MD -MP -MF "$(DEPDIR)/libircu_la-msg_M.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libircu_la-msg_M.lo `test -f 'msg_M.cc' || echo '$(srcdir)/'`msg_M.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libircu_la-msg_M.Tpo" "$(DEPDIR)/libircu_la-msg_M.Plo"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libircu_la-msg_M.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='msg_M.cc' object='libircu_la-msg_M.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libircu_la-msg_M.Plo' tmpdepfile='$(DEPDIR)/libircu_la-msg_M.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -c -o libircu_la-msg_M.lo `test -f 'msg_M.cc' || echo '$(srcdir)/'`msg_M.cc
+
+libircu_la-msg_N.o: msg_N.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -MT libircu_la-msg_N.o -MD -MP -MF "$(DEPDIR)/libircu_la-msg_N.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libircu_la-msg_N.o `test -f 'msg_N.cc' || echo '$(srcdir)/'`msg_N.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libircu_la-msg_N.Tpo" "$(DEPDIR)/libircu_la-msg_N.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libircu_la-msg_N.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='msg_N.cc' object='libircu_la-msg_N.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libircu_la-msg_N.Po' tmpdepfile='$(DEPDIR)/libircu_la-msg_N.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -c -o libircu_la-msg_N.o `test -f 'msg_N.cc' || echo '$(srcdir)/'`msg_N.cc
+
+libircu_la-msg_N.obj: msg_N.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -MT libircu_la-msg_N.obj -MD -MP -MF "$(DEPDIR)/libircu_la-msg_N.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libircu_la-msg_N.obj `if test -f 'msg_N.cc'; then $(CYGPATH_W) 'msg_N.cc'; else $(CYGPATH_W) '$(srcdir)/msg_N.cc'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libircu_la-msg_N.Tpo" "$(DEPDIR)/libircu_la-msg_N.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libircu_la-msg_N.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='msg_N.cc' object='libircu_la-msg_N.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libircu_la-msg_N.Po' tmpdepfile='$(DEPDIR)/libircu_la-msg_N.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -c -o libircu_la-msg_N.obj `if test -f 'msg_N.cc'; then $(CYGPATH_W) 'msg_N.cc'; else $(CYGPATH_W) '$(srcdir)/msg_N.cc'; fi`
+
+libircu_la-msg_N.lo: msg_N.cc
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -MT libircu_la-msg_N.lo -MD -MP -MF "$(DEPDIR)/libircu_la-msg_N.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libircu_la-msg_N.lo `test -f 'msg_N.cc' || echo '$(srcdir)/'`msg_N.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libircu_la-msg_N.Tpo" "$(DEPDIR)/libircu_la-msg_N.Plo"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libircu_la-msg_N.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='msg_N.cc' object='libircu_la-msg_N.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libircu_la-msg_N.Plo' tmpdepfile='$(DEPDIR)/libircu_la-msg_N.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -c -o libircu_la-msg_N.lo `test -f 'msg_N.cc' || echo '$(srcdir)/'`msg_N.cc
+
+libircu_la-msg_NOOP.o: msg_NOOP.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -MT libircu_la-msg_NOOP.o -MD -MP -MF "$(DEPDIR)/libircu_la-msg_NOOP.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libircu_la-msg_NOOP.o `test -f 'msg_NOOP.cc' || echo '$(srcdir)/'`msg_NOOP.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libircu_la-msg_NOOP.Tpo" "$(DEPDIR)/libircu_la-msg_NOOP.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libircu_la-msg_NOOP.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='msg_NOOP.cc' object='libircu_la-msg_NOOP.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libircu_la-msg_NOOP.Po' tmpdepfile='$(DEPDIR)/libircu_la-msg_NOOP.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -c -o libircu_la-msg_NOOP.o `test -f 'msg_NOOP.cc' || echo '$(srcdir)/'`msg_NOOP.cc
+
+libircu_la-msg_NOOP.obj: msg_NOOP.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -MT libircu_la-msg_NOOP.obj -MD -MP -MF "$(DEPDIR)/libircu_la-msg_NOOP.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libircu_la-msg_NOOP.obj `if test -f 'msg_NOOP.cc'; then $(CYGPATH_W) 'msg_NOOP.cc'; else $(CYGPATH_W) '$(srcdir)/msg_NOOP.cc'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libircu_la-msg_NOOP.Tpo" "$(DEPDIR)/libircu_la-msg_NOOP.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libircu_la-msg_NOOP.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='msg_NOOP.cc' object='libircu_la-msg_NOOP.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libircu_la-msg_NOOP.Po' tmpdepfile='$(DEPDIR)/libircu_la-msg_NOOP.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -c -o libircu_la-msg_NOOP.obj `if test -f 'msg_NOOP.cc'; then $(CYGPATH_W) 'msg_NOOP.cc'; else $(CYGPATH_W) '$(srcdir)/msg_NOOP.cc'; fi`
+
+libircu_la-msg_NOOP.lo: msg_NOOP.cc
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -MT libircu_la-msg_NOOP.lo -MD -MP -MF "$(DEPDIR)/libircu_la-msg_NOOP.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libircu_la-msg_NOOP.lo `test -f 'msg_NOOP.cc' || echo '$(srcdir)/'`msg_NOOP.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libircu_la-msg_NOOP.Tpo" "$(DEPDIR)/libircu_la-msg_NOOP.Plo"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libircu_la-msg_NOOP.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='msg_NOOP.cc' object='libircu_la-msg_NOOP.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libircu_la-msg_NOOP.Plo' tmpdepfile='$(DEPDIR)/libircu_la-msg_NOOP.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -c -o libircu_la-msg_NOOP.lo `test -f 'msg_NOOP.cc' || echo '$(srcdir)/'`msg_NOOP.cc
+
+libircu_la-msg_O.o: msg_O.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -MT libircu_la-msg_O.o -MD -MP -MF "$(DEPDIR)/libircu_la-msg_O.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libircu_la-msg_O.o `test -f 'msg_O.cc' || echo '$(srcdir)/'`msg_O.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libircu_la-msg_O.Tpo" "$(DEPDIR)/libircu_la-msg_O.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libircu_la-msg_O.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='msg_O.cc' object='libircu_la-msg_O.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libircu_la-msg_O.Po' tmpdepfile='$(DEPDIR)/libircu_la-msg_O.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -c -o libircu_la-msg_O.o `test -f 'msg_O.cc' || echo '$(srcdir)/'`msg_O.cc
+
+libircu_la-msg_O.obj: msg_O.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -MT libircu_la-msg_O.obj -MD -MP -MF "$(DEPDIR)/libircu_la-msg_O.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libircu_la-msg_O.obj `if test -f 'msg_O.cc'; then $(CYGPATH_W) 'msg_O.cc'; else $(CYGPATH_W) '$(srcdir)/msg_O.cc'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libircu_la-msg_O.Tpo" "$(DEPDIR)/libircu_la-msg_O.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libircu_la-msg_O.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='msg_O.cc' object='libircu_la-msg_O.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libircu_la-msg_O.Po' tmpdepfile='$(DEPDIR)/libircu_la-msg_O.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -c -o libircu_la-msg_O.obj `if test -f 'msg_O.cc'; then $(CYGPATH_W) 'msg_O.cc'; else $(CYGPATH_W) '$(srcdir)/msg_O.cc'; fi`
+
+libircu_la-msg_O.lo: msg_O.cc
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -MT libircu_la-msg_O.lo -MD -MP -MF "$(DEPDIR)/libircu_la-msg_O.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libircu_la-msg_O.lo `test -f 'msg_O.cc' || echo '$(srcdir)/'`msg_O.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libircu_la-msg_O.Tpo" "$(DEPDIR)/libircu_la-msg_O.Plo"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libircu_la-msg_O.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='msg_O.cc' object='libircu_la-msg_O.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libircu_la-msg_O.Plo' tmpdepfile='$(DEPDIR)/libircu_la-msg_O.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -c -o libircu_la-msg_O.lo `test -f 'msg_O.cc' || echo '$(srcdir)/'`msg_O.cc
+
+libircu_la-msg_PA.o: msg_PA.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -MT libircu_la-msg_PA.o -MD -MP -MF "$(DEPDIR)/libircu_la-msg_PA.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libircu_la-msg_PA.o `test -f 'msg_PA.cc' || echo '$(srcdir)/'`msg_PA.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libircu_la-msg_PA.Tpo" "$(DEPDIR)/libircu_la-msg_PA.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libircu_la-msg_PA.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='msg_PA.cc' object='libircu_la-msg_PA.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libircu_la-msg_PA.Po' tmpdepfile='$(DEPDIR)/libircu_la-msg_PA.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -c -o libircu_la-msg_PA.o `test -f 'msg_PA.cc' || echo '$(srcdir)/'`msg_PA.cc
+
+libircu_la-msg_PA.obj: msg_PA.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -MT libircu_la-msg_PA.obj -MD -MP -MF "$(DEPDIR)/libircu_la-msg_PA.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libircu_la-msg_PA.obj `if test -f 'msg_PA.cc'; then $(CYGPATH_W) 'msg_PA.cc'; else $(CYGPATH_W) '$(srcdir)/msg_PA.cc'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libircu_la-msg_PA.Tpo" "$(DEPDIR)/libircu_la-msg_PA.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libircu_la-msg_PA.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='msg_PA.cc' object='libircu_la-msg_PA.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libircu_la-msg_PA.Po' tmpdepfile='$(DEPDIR)/libircu_la-msg_PA.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -c -o libircu_la-msg_PA.obj `if test -f 'msg_PA.cc'; then $(CYGPATH_W) 'msg_PA.cc'; else $(CYGPATH_W) '$(srcdir)/msg_PA.cc'; fi`
+
+libircu_la-msg_PA.lo: msg_PA.cc
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -MT libircu_la-msg_PA.lo -MD -MP -MF "$(DEPDIR)/libircu_la-msg_PA.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libircu_la-msg_PA.lo `test -f 'msg_PA.cc' || echo '$(srcdir)/'`msg_PA.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libircu_la-msg_PA.Tpo" "$(DEPDIR)/libircu_la-msg_PA.Plo"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libircu_la-msg_PA.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='msg_PA.cc' object='libircu_la-msg_PA.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libircu_la-msg_PA.Plo' tmpdepfile='$(DEPDIR)/libircu_la-msg_PA.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -c -o libircu_la-msg_PA.lo `test -f 'msg_PA.cc' || echo '$(srcdir)/'`msg_PA.cc
+
+libircu_la-msg_P.o: msg_P.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -MT libircu_la-msg_P.o -MD -MP -MF "$(DEPDIR)/libircu_la-msg_P.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libircu_la-msg_P.o `test -f 'msg_P.cc' || echo '$(srcdir)/'`msg_P.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libircu_la-msg_P.Tpo" "$(DEPDIR)/libircu_la-msg_P.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libircu_la-msg_P.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='msg_P.cc' object='libircu_la-msg_P.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libircu_la-msg_P.Po' tmpdepfile='$(DEPDIR)/libircu_la-msg_P.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -c -o libircu_la-msg_P.o `test -f 'msg_P.cc' || echo '$(srcdir)/'`msg_P.cc
+
+libircu_la-msg_P.obj: msg_P.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -MT libircu_la-msg_P.obj -MD -MP -MF "$(DEPDIR)/libircu_la-msg_P.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libircu_la-msg_P.obj `if test -f 'msg_P.cc'; then $(CYGPATH_W) 'msg_P.cc'; else $(CYGPATH_W) '$(srcdir)/msg_P.cc'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libircu_la-msg_P.Tpo" "$(DEPDIR)/libircu_la-msg_P.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libircu_la-msg_P.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='msg_P.cc' object='libircu_la-msg_P.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libircu_la-msg_P.Po' tmpdepfile='$(DEPDIR)/libircu_la-msg_P.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -c -o libircu_la-msg_P.obj `if test -f 'msg_P.cc'; then $(CYGPATH_W) 'msg_P.cc'; else $(CYGPATH_W) '$(srcdir)/msg_P.cc'; fi`
+
+libircu_la-msg_P.lo: msg_P.cc
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -MT libircu_la-msg_P.lo -MD -MP -MF "$(DEPDIR)/libircu_la-msg_P.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libircu_la-msg_P.lo `test -f 'msg_P.cc' || echo '$(srcdir)/'`msg_P.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libircu_la-msg_P.Tpo" "$(DEPDIR)/libircu_la-msg_P.Plo"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libircu_la-msg_P.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='msg_P.cc' object='libircu_la-msg_P.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libircu_la-msg_P.Plo' tmpdepfile='$(DEPDIR)/libircu_la-msg_P.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -c -o libircu_la-msg_P.lo `test -f 'msg_P.cc' || echo '$(srcdir)/'`msg_P.cc
+
+libircu_la-msg_Q.o: msg_Q.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -MT libircu_la-msg_Q.o -MD -MP -MF "$(DEPDIR)/libircu_la-msg_Q.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libircu_la-msg_Q.o `test -f 'msg_Q.cc' || echo '$(srcdir)/'`msg_Q.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libircu_la-msg_Q.Tpo" "$(DEPDIR)/libircu_la-msg_Q.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libircu_la-msg_Q.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='msg_Q.cc' object='libircu_la-msg_Q.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libircu_la-msg_Q.Po' tmpdepfile='$(DEPDIR)/libircu_la-msg_Q.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -c -o libircu_la-msg_Q.o `test -f 'msg_Q.cc' || echo '$(srcdir)/'`msg_Q.cc
+
+libircu_la-msg_Q.obj: msg_Q.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -MT libircu_la-msg_Q.obj -MD -MP -MF "$(DEPDIR)/libircu_la-msg_Q.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libircu_la-msg_Q.obj `if test -f 'msg_Q.cc'; then $(CYGPATH_W) 'msg_Q.cc'; else $(CYGPATH_W) '$(srcdir)/msg_Q.cc'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libircu_la-msg_Q.Tpo" "$(DEPDIR)/libircu_la-msg_Q.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libircu_la-msg_Q.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='msg_Q.cc' object='libircu_la-msg_Q.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libircu_la-msg_Q.Po' tmpdepfile='$(DEPDIR)/libircu_la-msg_Q.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -c -o libircu_la-msg_Q.obj `if test -f 'msg_Q.cc'; then $(CYGPATH_W) 'msg_Q.cc'; else $(CYGPATH_W) '$(srcdir)/msg_Q.cc'; fi`
+
+libircu_la-msg_Q.lo: msg_Q.cc
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -MT libircu_la-msg_Q.lo -MD -MP -MF "$(DEPDIR)/libircu_la-msg_Q.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libircu_la-msg_Q.lo `test -f 'msg_Q.cc' || echo '$(srcdir)/'`msg_Q.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libircu_la-msg_Q.Tpo" "$(DEPDIR)/libircu_la-msg_Q.Plo"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libircu_la-msg_Q.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='msg_Q.cc' object='libircu_la-msg_Q.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libircu_la-msg_Q.Plo' tmpdepfile='$(DEPDIR)/libircu_la-msg_Q.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -c -o libircu_la-msg_Q.lo `test -f 'msg_Q.cc' || echo '$(srcdir)/'`msg_Q.cc
+
+libircu_la-msg_R.o: msg_R.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -MT libircu_la-msg_R.o -MD -MP -MF "$(DEPDIR)/libircu_la-msg_R.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libircu_la-msg_R.o `test -f 'msg_R.cc' || echo '$(srcdir)/'`msg_R.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libircu_la-msg_R.Tpo" "$(DEPDIR)/libircu_la-msg_R.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libircu_la-msg_R.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='msg_R.cc' object='libircu_la-msg_R.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libircu_la-msg_R.Po' tmpdepfile='$(DEPDIR)/libircu_la-msg_R.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -c -o libircu_la-msg_R.o `test -f 'msg_R.cc' || echo '$(srcdir)/'`msg_R.cc
+
+libircu_la-msg_R.obj: msg_R.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -MT libircu_la-msg_R.obj -MD -MP -MF "$(DEPDIR)/libircu_la-msg_R.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libircu_la-msg_R.obj `if test -f 'msg_R.cc'; then $(CYGPATH_W) 'msg_R.cc'; else $(CYGPATH_W) '$(srcdir)/msg_R.cc'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libircu_la-msg_R.Tpo" "$(DEPDIR)/libircu_la-msg_R.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libircu_la-msg_R.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='msg_R.cc' object='libircu_la-msg_R.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libircu_la-msg_R.Po' tmpdepfile='$(DEPDIR)/libircu_la-msg_R.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -c -o libircu_la-msg_R.obj `if test -f 'msg_R.cc'; then $(CYGPATH_W) 'msg_R.cc'; else $(CYGPATH_W) '$(srcdir)/msg_R.cc'; fi`
+
+libircu_la-msg_R.lo: msg_R.cc
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -MT libircu_la-msg_R.lo -MD -MP -MF "$(DEPDIR)/libircu_la-msg_R.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libircu_la-msg_R.lo `test -f 'msg_R.cc' || echo '$(srcdir)/'`msg_R.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libircu_la-msg_R.Tpo" "$(DEPDIR)/libircu_la-msg_R.Plo"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libircu_la-msg_R.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='msg_R.cc' object='libircu_la-msg_R.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libircu_la-msg_R.Plo' tmpdepfile='$(DEPDIR)/libircu_la-msg_R.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -c -o libircu_la-msg_R.lo `test -f 'msg_R.cc' || echo '$(srcdir)/'`msg_R.cc
+
+libircu_la-msg_S.o: msg_S.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -MT libircu_la-msg_S.o -MD -MP -MF "$(DEPDIR)/libircu_la-msg_S.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libircu_la-msg_S.o `test -f 'msg_S.cc' || echo '$(srcdir)/'`msg_S.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libircu_la-msg_S.Tpo" "$(DEPDIR)/libircu_la-msg_S.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libircu_la-msg_S.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='msg_S.cc' object='libircu_la-msg_S.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libircu_la-msg_S.Po' tmpdepfile='$(DEPDIR)/libircu_la-msg_S.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -c -o libircu_la-msg_S.o `test -f 'msg_S.cc' || echo '$(srcdir)/'`msg_S.cc
+
+libircu_la-msg_S.obj: msg_S.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -MT libircu_la-msg_S.obj -MD -MP -MF "$(DEPDIR)/libircu_la-msg_S.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libircu_la-msg_S.obj `if test -f 'msg_S.cc'; then $(CYGPATH_W) 'msg_S.cc'; else $(CYGPATH_W) '$(srcdir)/msg_S.cc'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libircu_la-msg_S.Tpo" "$(DEPDIR)/libircu_la-msg_S.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libircu_la-msg_S.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='msg_S.cc' object='libircu_la-msg_S.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libircu_la-msg_S.Po' tmpdepfile='$(DEPDIR)/libircu_la-msg_S.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -c -o libircu_la-msg_S.obj `if test -f 'msg_S.cc'; then $(CYGPATH_W) 'msg_S.cc'; else $(CYGPATH_W) '$(srcdir)/msg_S.cc'; fi`
+
+libircu_la-msg_S.lo: msg_S.cc
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -MT libircu_la-msg_S.lo -MD -MP -MF "$(DEPDIR)/libircu_la-msg_S.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libircu_la-msg_S.lo `test -f 'msg_S.cc' || echo '$(srcdir)/'`msg_S.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libircu_la-msg_S.Tpo" "$(DEPDIR)/libircu_la-msg_S.Plo"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libircu_la-msg_S.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='msg_S.cc' object='libircu_la-msg_S.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libircu_la-msg_S.Plo' tmpdepfile='$(DEPDIR)/libircu_la-msg_S.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -c -o libircu_la-msg_S.lo `test -f 'msg_S.cc' || echo '$(srcdir)/'`msg_S.cc
+
+libircu_la-msg_Server.o: msg_Server.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -MT libircu_la-msg_Server.o -MD -MP -MF "$(DEPDIR)/libircu_la-msg_Server.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libircu_la-msg_Server.o `test -f 'msg_Server.cc' || echo '$(srcdir)/'`msg_Server.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libircu_la-msg_Server.Tpo" "$(DEPDIR)/libircu_la-msg_Server.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libircu_la-msg_Server.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='msg_Server.cc' object='libircu_la-msg_Server.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libircu_la-msg_Server.Po' tmpdepfile='$(DEPDIR)/libircu_la-msg_Server.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -c -o libircu_la-msg_Server.o `test -f 'msg_Server.cc' || echo '$(srcdir)/'`msg_Server.cc
+
+libircu_la-msg_Server.obj: msg_Server.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -MT libircu_la-msg_Server.obj -MD -MP -MF "$(DEPDIR)/libircu_la-msg_Server.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libircu_la-msg_Server.obj `if test -f 'msg_Server.cc'; then $(CYGPATH_W) 'msg_Server.cc'; else $(CYGPATH_W) '$(srcdir)/msg_Server.cc'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libircu_la-msg_Server.Tpo" "$(DEPDIR)/libircu_la-msg_Server.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libircu_la-msg_Server.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='msg_Server.cc' object='libircu_la-msg_Server.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libircu_la-msg_Server.Po' tmpdepfile='$(DEPDIR)/libircu_la-msg_Server.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -c -o libircu_la-msg_Server.obj `if test -f 'msg_Server.cc'; then $(CYGPATH_W) 'msg_Server.cc'; else $(CYGPATH_W) '$(srcdir)/msg_Server.cc'; fi`
+
+libircu_la-msg_Server.lo: msg_Server.cc
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -MT libircu_la-msg_Server.lo -MD -MP -MF "$(DEPDIR)/libircu_la-msg_Server.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libircu_la-msg_Server.lo `test -f 'msg_Server.cc' || echo '$(srcdir)/'`msg_Server.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libircu_la-msg_Server.Tpo" "$(DEPDIR)/libircu_la-msg_Server.Plo"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libircu_la-msg_Server.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='msg_Server.cc' object='libircu_la-msg_Server.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libircu_la-msg_Server.Plo' tmpdepfile='$(DEPDIR)/libircu_la-msg_Server.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -c -o libircu_la-msg_Server.lo `test -f 'msg_Server.cc' || echo '$(srcdir)/'`msg_Server.cc
+
+libircu_la-msg_SQ.o: msg_SQ.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -MT libircu_la-msg_SQ.o -MD -MP -MF "$(DEPDIR)/libircu_la-msg_SQ.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libircu_la-msg_SQ.o `test -f 'msg_SQ.cc' || echo '$(srcdir)/'`msg_SQ.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libircu_la-msg_SQ.Tpo" "$(DEPDIR)/libircu_la-msg_SQ.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libircu_la-msg_SQ.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='msg_SQ.cc' object='libircu_la-msg_SQ.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libircu_la-msg_SQ.Po' tmpdepfile='$(DEPDIR)/libircu_la-msg_SQ.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -c -o libircu_la-msg_SQ.o `test -f 'msg_SQ.cc' || echo '$(srcdir)/'`msg_SQ.cc
+
+libircu_la-msg_SQ.obj: msg_SQ.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -MT libircu_la-msg_SQ.obj -MD -MP -MF "$(DEPDIR)/libircu_la-msg_SQ.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libircu_la-msg_SQ.obj `if test -f 'msg_SQ.cc'; then $(CYGPATH_W) 'msg_SQ.cc'; else $(CYGPATH_W) '$(srcdir)/msg_SQ.cc'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libircu_la-msg_SQ.Tpo" "$(DEPDIR)/libircu_la-msg_SQ.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libircu_la-msg_SQ.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='msg_SQ.cc' object='libircu_la-msg_SQ.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libircu_la-msg_SQ.Po' tmpdepfile='$(DEPDIR)/libircu_la-msg_SQ.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -c -o libircu_la-msg_SQ.obj `if test -f 'msg_SQ.cc'; then $(CYGPATH_W) 'msg_SQ.cc'; else $(CYGPATH_W) '$(srcdir)/msg_SQ.cc'; fi`
+
+libircu_la-msg_SQ.lo: msg_SQ.cc
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -MT libircu_la-msg_SQ.lo -MD -MP -MF "$(DEPDIR)/libircu_la-msg_SQ.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libircu_la-msg_SQ.lo `test -f 'msg_SQ.cc' || echo '$(srcdir)/'`msg_SQ.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libircu_la-msg_SQ.Tpo" "$(DEPDIR)/libircu_la-msg_SQ.Plo"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libircu_la-msg_SQ.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='msg_SQ.cc' object='libircu_la-msg_SQ.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libircu_la-msg_SQ.Plo' tmpdepfile='$(DEPDIR)/libircu_la-msg_SQ.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -c -o libircu_la-msg_SQ.lo `test -f 'msg_SQ.cc' || echo '$(srcdir)/'`msg_SQ.cc
+
+libircu_la-msg_T.o: msg_T.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -MT libircu_la-msg_T.o -MD -MP -MF "$(DEPDIR)/libircu_la-msg_T.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libircu_la-msg_T.o `test -f 'msg_T.cc' || echo '$(srcdir)/'`msg_T.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libircu_la-msg_T.Tpo" "$(DEPDIR)/libircu_la-msg_T.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libircu_la-msg_T.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='msg_T.cc' object='libircu_la-msg_T.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libircu_la-msg_T.Po' tmpdepfile='$(DEPDIR)/libircu_la-msg_T.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -c -o libircu_la-msg_T.o `test -f 'msg_T.cc' || echo '$(srcdir)/'`msg_T.cc
+
+libircu_la-msg_T.obj: msg_T.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -MT libircu_la-msg_T.obj -MD -MP -MF "$(DEPDIR)/libircu_la-msg_T.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libircu_la-msg_T.obj `if test -f 'msg_T.cc'; then $(CYGPATH_W) 'msg_T.cc'; else $(CYGPATH_W) '$(srcdir)/msg_T.cc'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libircu_la-msg_T.Tpo" "$(DEPDIR)/libircu_la-msg_T.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libircu_la-msg_T.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='msg_T.cc' object='libircu_la-msg_T.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libircu_la-msg_T.Po' tmpdepfile='$(DEPDIR)/libircu_la-msg_T.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -c -o libircu_la-msg_T.obj `if test -f 'msg_T.cc'; then $(CYGPATH_W) 'msg_T.cc'; else $(CYGPATH_W) '$(srcdir)/msg_T.cc'; fi`
+
+libircu_la-msg_T.lo: msg_T.cc
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -MT libircu_la-msg_T.lo -MD -MP -MF "$(DEPDIR)/libircu_la-msg_T.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libircu_la-msg_T.lo `test -f 'msg_T.cc' || echo '$(srcdir)/'`msg_T.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libircu_la-msg_T.Tpo" "$(DEPDIR)/libircu_la-msg_T.Plo"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libircu_la-msg_T.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='msg_T.cc' object='libircu_la-msg_T.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libircu_la-msg_T.Plo' tmpdepfile='$(DEPDIR)/libircu_la-msg_T.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -c -o libircu_la-msg_T.lo `test -f 'msg_T.cc' || echo '$(srcdir)/'`msg_T.cc
+
+libircu_la-msg_V.o: msg_V.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -MT libircu_la-msg_V.o -MD -MP -MF "$(DEPDIR)/libircu_la-msg_V.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libircu_la-msg_V.o `test -f 'msg_V.cc' || echo '$(srcdir)/'`msg_V.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libircu_la-msg_V.Tpo" "$(DEPDIR)/libircu_la-msg_V.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libircu_la-msg_V.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='msg_V.cc' object='libircu_la-msg_V.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libircu_la-msg_V.Po' tmpdepfile='$(DEPDIR)/libircu_la-msg_V.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -c -o libircu_la-msg_V.o `test -f 'msg_V.cc' || echo '$(srcdir)/'`msg_V.cc
+
+libircu_la-msg_V.obj: msg_V.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -MT libircu_la-msg_V.obj -MD -MP -MF "$(DEPDIR)/libircu_la-msg_V.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libircu_la-msg_V.obj `if test -f 'msg_V.cc'; then $(CYGPATH_W) 'msg_V.cc'; else $(CYGPATH_W) '$(srcdir)/msg_V.cc'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libircu_la-msg_V.Tpo" "$(DEPDIR)/libircu_la-msg_V.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libircu_la-msg_V.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='msg_V.cc' object='libircu_la-msg_V.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libircu_la-msg_V.Po' tmpdepfile='$(DEPDIR)/libircu_la-msg_V.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -c -o libircu_la-msg_V.obj `if test -f 'msg_V.cc'; then $(CYGPATH_W) 'msg_V.cc'; else $(CYGPATH_W) '$(srcdir)/msg_V.cc'; fi`
+
+libircu_la-msg_V.lo: msg_V.cc
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -MT libircu_la-msg_V.lo -MD -MP -MF "$(DEPDIR)/libircu_la-msg_V.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libircu_la-msg_V.lo `test -f 'msg_V.cc' || echo '$(srcdir)/'`msg_V.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libircu_la-msg_V.Tpo" "$(DEPDIR)/libircu_la-msg_V.Plo"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libircu_la-msg_V.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='msg_V.cc' object='libircu_la-msg_V.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libircu_la-msg_V.Plo' tmpdepfile='$(DEPDIR)/libircu_la-msg_V.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -c -o libircu_la-msg_V.lo `test -f 'msg_V.cc' || echo '$(srcdir)/'`msg_V.cc
+
+libircu_la-msg_WA.o: msg_WA.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -MT libircu_la-msg_WA.o -MD -MP -MF "$(DEPDIR)/libircu_la-msg_WA.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libircu_la-msg_WA.o `test -f 'msg_WA.cc' || echo '$(srcdir)/'`msg_WA.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libircu_la-msg_WA.Tpo" "$(DEPDIR)/libircu_la-msg_WA.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libircu_la-msg_WA.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='msg_WA.cc' object='libircu_la-msg_WA.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libircu_la-msg_WA.Po' tmpdepfile='$(DEPDIR)/libircu_la-msg_WA.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -c -o libircu_la-msg_WA.o `test -f 'msg_WA.cc' || echo '$(srcdir)/'`msg_WA.cc
+
+libircu_la-msg_WA.obj: msg_WA.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -MT libircu_la-msg_WA.obj -MD -MP -MF "$(DEPDIR)/libircu_la-msg_WA.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libircu_la-msg_WA.obj `if test -f 'msg_WA.cc'; then $(CYGPATH_W) 'msg_WA.cc'; else $(CYGPATH_W) '$(srcdir)/msg_WA.cc'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libircu_la-msg_WA.Tpo" "$(DEPDIR)/libircu_la-msg_WA.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libircu_la-msg_WA.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='msg_WA.cc' object='libircu_la-msg_WA.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libircu_la-msg_WA.Po' tmpdepfile='$(DEPDIR)/libircu_la-msg_WA.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -c -o libircu_la-msg_WA.obj `if test -f 'msg_WA.cc'; then $(CYGPATH_W) 'msg_WA.cc'; else $(CYGPATH_W) '$(srcdir)/msg_WA.cc'; fi`
+
+libircu_la-msg_WA.lo: msg_WA.cc
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -MT libircu_la-msg_WA.lo -MD -MP -MF "$(DEPDIR)/libircu_la-msg_WA.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libircu_la-msg_WA.lo `test -f 'msg_WA.cc' || echo '$(srcdir)/'`msg_WA.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libircu_la-msg_WA.Tpo" "$(DEPDIR)/libircu_la-msg_WA.Plo"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libircu_la-msg_WA.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='msg_WA.cc' object='libircu_la-msg_WA.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libircu_la-msg_WA.Plo' tmpdepfile='$(DEPDIR)/libircu_la-msg_WA.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -c -o libircu_la-msg_WA.lo `test -f 'msg_WA.cc' || echo '$(srcdir)/'`msg_WA.cc
+
+libircu_la-msg_W.o: msg_W.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -MT libircu_la-msg_W.o -MD -MP -MF "$(DEPDIR)/libircu_la-msg_W.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libircu_la-msg_W.o `test -f 'msg_W.cc' || echo '$(srcdir)/'`msg_W.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libircu_la-msg_W.Tpo" "$(DEPDIR)/libircu_la-msg_W.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libircu_la-msg_W.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='msg_W.cc' object='libircu_la-msg_W.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libircu_la-msg_W.Po' tmpdepfile='$(DEPDIR)/libircu_la-msg_W.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -c -o libircu_la-msg_W.o `test -f 'msg_W.cc' || echo '$(srcdir)/'`msg_W.cc
+
+libircu_la-msg_W.obj: msg_W.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -MT libircu_la-msg_W.obj -MD -MP -MF "$(DEPDIR)/libircu_la-msg_W.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libircu_la-msg_W.obj `if test -f 'msg_W.cc'; then $(CYGPATH_W) 'msg_W.cc'; else $(CYGPATH_W) '$(srcdir)/msg_W.cc'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libircu_la-msg_W.Tpo" "$(DEPDIR)/libircu_la-msg_W.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libircu_la-msg_W.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='msg_W.cc' object='libircu_la-msg_W.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libircu_la-msg_W.Po' tmpdepfile='$(DEPDIR)/libircu_la-msg_W.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -c -o libircu_la-msg_W.obj `if test -f 'msg_W.cc'; then $(CYGPATH_W) 'msg_W.cc'; else $(CYGPATH_W) '$(srcdir)/msg_W.cc'; fi`
+
+libircu_la-msg_W.lo: msg_W.cc
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -MT libircu_la-msg_W.lo -MD -MP -MF "$(DEPDIR)/libircu_la-msg_W.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libircu_la-msg_W.lo `test -f 'msg_W.cc' || echo '$(srcdir)/'`msg_W.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libircu_la-msg_W.Tpo" "$(DEPDIR)/libircu_la-msg_W.Plo"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libircu_la-msg_W.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='msg_W.cc' object='libircu_la-msg_W.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libircu_la-msg_W.Plo' tmpdepfile='$(DEPDIR)/libircu_la-msg_W.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -c -o libircu_la-msg_W.lo `test -f 'msg_W.cc' || echo '$(srcdir)/'`msg_W.cc
+
+libircu_la-msg_Y.o: msg_Y.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -MT libircu_la-msg_Y.o -MD -MP -MF "$(DEPDIR)/libircu_la-msg_Y.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libircu_la-msg_Y.o `test -f 'msg_Y.cc' || echo '$(srcdir)/'`msg_Y.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libircu_la-msg_Y.Tpo" "$(DEPDIR)/libircu_la-msg_Y.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libircu_la-msg_Y.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='msg_Y.cc' object='libircu_la-msg_Y.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libircu_la-msg_Y.Po' tmpdepfile='$(DEPDIR)/libircu_la-msg_Y.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -c -o libircu_la-msg_Y.o `test -f 'msg_Y.cc' || echo '$(srcdir)/'`msg_Y.cc
+
+libircu_la-msg_Y.obj: msg_Y.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -MT libircu_la-msg_Y.obj -MD -MP -MF "$(DEPDIR)/libircu_la-msg_Y.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libircu_la-msg_Y.obj `if test -f 'msg_Y.cc'; then $(CYGPATH_W) 'msg_Y.cc'; else $(CYGPATH_W) '$(srcdir)/msg_Y.cc'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libircu_la-msg_Y.Tpo" "$(DEPDIR)/libircu_la-msg_Y.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libircu_la-msg_Y.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='msg_Y.cc' object='libircu_la-msg_Y.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libircu_la-msg_Y.Po' tmpdepfile='$(DEPDIR)/libircu_la-msg_Y.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -c -o libircu_la-msg_Y.obj `if test -f 'msg_Y.cc'; then $(CYGPATH_W) 'msg_Y.cc'; else $(CYGPATH_W) '$(srcdir)/msg_Y.cc'; fi`
+
+libircu_la-msg_Y.lo: msg_Y.cc
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -MT libircu_la-msg_Y.lo -MD -MP -MF "$(DEPDIR)/libircu_la-msg_Y.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libircu_la-msg_Y.lo `test -f 'msg_Y.cc' || echo '$(srcdir)/'`msg_Y.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libircu_la-msg_Y.Tpo" "$(DEPDIR)/libircu_la-msg_Y.Plo"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libircu_la-msg_Y.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='msg_Y.cc' object='libircu_la-msg_Y.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libircu_la-msg_Y.Plo' tmpdepfile='$(DEPDIR)/libircu_la-msg_Y.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -c -o libircu_la-msg_Y.lo `test -f 'msg_Y.cc' || echo '$(srcdir)/'`msg_Y.cc
 
 mostlyclean-libtool:
 	-rm -f *.lo

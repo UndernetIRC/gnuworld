@@ -14,7 +14,7 @@
 
 @SET_MAKE@
 
-# "$Id: Makefile.in,v 1.155 2003/08/09 23:15:34 dan_karrels Exp $"
+# "$Id: Makefile.in,v 1.156 2003/09/02 00:54:58 jeekay Exp $"
 
 srcdir = @srcdir@
 top_srcdir = @top_srcdir@
@@ -42,7 +42,6 @@ ACLOCAL = @ACLOCAL@
 AMDEP_FALSE = @AMDEP_FALSE@
 AMDEP_TRUE = @AMDEP_TRUE@
 AMTAR = @AMTAR@
-AR = @AR@
 AUTOCONF = @AUTOCONF@
 AUTOHEADER = @AUTOHEADER@
 AUTOMAKE = @AUTOMAKE@
@@ -88,8 +87,6 @@ ECHO_N = @ECHO_N@
 ECHO_T = @ECHO_T@
 EGREP = @EGREP@
 EXEEXT = @EXEEXT@
-F77 = @F77@
-FFLAGS = @FFLAGS@
 INCLTDL = @INCLTDL@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
@@ -123,10 +120,8 @@ SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
 VERSION = @VERSION@
-ac_ct_AR = @ac_ct_AR@
 ac_ct_CC = @ac_ct_CC@
 ac_ct_CXX = @ac_ct_CXX@
-ac_ct_F77 = @ac_ct_F77@
 ac_ct_RANLIB = @ac_ct_RANLIB@
 ac_ct_STRIP = @ac_ct_STRIP@
 am__fastdepCC_FALSE = @am__fastdepCC_FALSE@
@@ -169,6 +164,7 @@ threadLib = @threadLib@
 
 lib_LTLIBRARIES = libcloner.la
 libcloner_la_SOURCES = cloner.cc
+libcloner_la_CXXFLAGS = -I${top_srcdir}/include -I${top_srcdir}/libgnuworld
 libcloner_la_LDFLAGS = -module -export-dynamic
 
 EXTRA_DIST = cloner.h
@@ -180,13 +176,13 @@ CONFIG_CLEAN_FILES =
 LTLIBRARIES = $(lib_LTLIBRARIES)
 
 libcloner_la_LIBADD =
-am_libcloner_la_OBJECTS = cloner.lo
+am_libcloner_la_OBJECTS = libcloner_la-cloner.lo
 libcloner_la_OBJECTS = $(am_libcloner_la_OBJECTS)
 
 DEFAULT_INCLUDES =  -I. -I$(srcdir) -I$(top_builddir)/include
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
-@AMDEP_TRUE@DEP_FILES = ./$(DEPDIR)/cloner.Plo
+@AMDEP_TRUE@DEP_FILES = ./$(DEPDIR)/libcloner_la-cloner.Plo
 CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
 LTCXXCOMPILE = $(LIBTOOL) --mode=compile $(CXX) $(DEFS) \
@@ -245,7 +241,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cloner.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcloner_la-cloner.Plo@am__quote@
 
 distclean-depend:
 	-rm -rf ./$(DEPDIR)
@@ -282,6 +278,39 @@ distclean-depend:
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/$*.Plo' tmpdepfile='$(DEPDIR)/$*.TPlo' @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LTCXXCOMPILE) -c -o $@ `test -f '$<' || echo '$(srcdir)/'`$<
+
+libcloner_la-cloner.o: cloner.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcloner_la_CXXFLAGS) $(CXXFLAGS) -MT libcloner_la-cloner.o -MD -MP -MF "$(DEPDIR)/libcloner_la-cloner.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libcloner_la-cloner.o `test -f 'cloner.cc' || echo '$(srcdir)/'`cloner.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libcloner_la-cloner.Tpo" "$(DEPDIR)/libcloner_la-cloner.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libcloner_la-cloner.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='cloner.cc' object='libcloner_la-cloner.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libcloner_la-cloner.Po' tmpdepfile='$(DEPDIR)/libcloner_la-cloner.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcloner_la_CXXFLAGS) $(CXXFLAGS) -c -o libcloner_la-cloner.o `test -f 'cloner.cc' || echo '$(srcdir)/'`cloner.cc
+
+libcloner_la-cloner.obj: cloner.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcloner_la_CXXFLAGS) $(CXXFLAGS) -MT libcloner_la-cloner.obj -MD -MP -MF "$(DEPDIR)/libcloner_la-cloner.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libcloner_la-cloner.obj `if test -f 'cloner.cc'; then $(CYGPATH_W) 'cloner.cc'; else $(CYGPATH_W) '$(srcdir)/cloner.cc'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libcloner_la-cloner.Tpo" "$(DEPDIR)/libcloner_la-cloner.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libcloner_la-cloner.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='cloner.cc' object='libcloner_la-cloner.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libcloner_la-cloner.Po' tmpdepfile='$(DEPDIR)/libcloner_la-cloner.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcloner_la_CXXFLAGS) $(CXXFLAGS) -c -o libcloner_la-cloner.obj `if test -f 'cloner.cc'; then $(CYGPATH_W) 'cloner.cc'; else $(CYGPATH_W) '$(srcdir)/cloner.cc'; fi`
+
+libcloner_la-cloner.lo: cloner.cc
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcloner_la_CXXFLAGS) $(CXXFLAGS) -MT libcloner_la-cloner.lo -MD -MP -MF "$(DEPDIR)/libcloner_la-cloner.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libcloner_la-cloner.lo `test -f 'cloner.cc' || echo '$(srcdir)/'`cloner.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libcloner_la-cloner.Tpo" "$(DEPDIR)/libcloner_la-cloner.Plo"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libcloner_la-cloner.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='cloner.cc' object='libcloner_la-cloner.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libcloner_la-cloner.Plo' tmpdepfile='$(DEPDIR)/libcloner_la-cloner.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcloner_la_CXXFLAGS) $(CXXFLAGS) -c -o libcloner_la-cloner.lo `test -f 'cloner.cc' || echo '$(srcdir)/'`cloner.cc
 
 mostlyclean-libtool:
 	-rm -f *.lo

@@ -1,6 +1,7 @@
 lib_LTLIBRARIES = libdronescan.la
 libdronescan_la_LDFLAGS = -module -export-dynamic -L@PGSQL_LIB@ -lpq++
-libdronescan_la_CXXFLAGS = -I@PGSQL_INCLUDE@
+libdronescan_la_CXXFLAGS = -I@PGSQL_INCLUDE@ -I${top_srcdir}/libgnuworld \
+	-I${top_srcdir}/include
 
 libdronescan_la_SOURCES = 	\
 	dronescan.cc		\
