@@ -7,7 +7,7 @@ DROP TABLE to_die;
 SELECT user_id,last_seen INTO TABLE to_die FROM users_lastseen WHERE (last_seen <= now()::abstime::int4 - (86400 * 90));
 -- Remove any who currently have a pending app (Shouldn't happen <g>)
 \qecho [*] Moving those with old channel applications to user "AutoPurged".
-UPDATE pending set manager_id = 279907 where pending.manager_id = to_die.user_id;
+UPDATE pending set manager_id = (select id from users where lower(user_name) = 'autopurged') where pending.manager_id = to_die.user_id;
 -- Output who are are going to kill, log stdout.
 \qecho [*] Listing Final Accounts to be removed:
 SELECT users.user_name,to_die.last_seen from users,to_die where users.id = to_die.user_id;
