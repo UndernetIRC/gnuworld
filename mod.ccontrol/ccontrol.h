@@ -3,7 +3,7 @@
  */
 
 #ifndef __CCONTROL_H
-#define __CCONTROL_H "$Id: ccontrol.h,v 1.77 2002/08/11 01:03:21 reedloden Exp $"
+#define __CCONTROL_H "$Id: ccontrol.h,v 1.78 2002/08/11 01:15:18 reedloden Exp $"
 
 //Undef this if you want to log to the database
 #define LOGTOHD 
@@ -43,6 +43,7 @@
 namespace gnuworld
 {
 
+using std::map ;
 using std::string ;
 using std::vector ;
 
