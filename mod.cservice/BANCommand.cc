@@ -14,7 +14,7 @@
  *
  * Caveats: None.
  *
- * $Id: BANCommand.cc,v 1.14 2001/02/10 17:29:40 gte Exp $
+ * $Id: BANCommand.cc,v 1.15 2001/02/11 23:52:57 plexus Exp $
  */
 
 #include	<string>
@@ -29,7 +29,7 @@
 #include	"responses.h"
 #include	"match.h"
 
-const char BANCommand_cc_rcsId[] = "$Id: BANCommand.cc,v 1.14 2001/02/10 17:29:40 gte Exp $" ;
+const char BANCommand_cc_rcsId[] = "$Id: BANCommand.cc,v 1.15 2001/02/11 23:52:57 plexus Exp $" ;
 
 namespace gnuworld
 {
@@ -153,7 +153,7 @@ if(level < level::ban)
 	return false;
 	}
 
-if(banLevel < 1 || banLevel > level || 500 < level)
+if(banLevel < 1 || banLevel > level || 500 < banLevel)
 	{
 	bot->Notice(theClient, 
 		bot->getResponse(theUser,language::ban_level_range,
