@@ -47,7 +47,7 @@
 #include	"ServerTimerHandlers.h"
 
 const char xServer_h_rcsId[] = __XSERVER_H ;
-const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.74 2001/02/05 20:06:38 dan_karrels Exp $" ;
+const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.75 2001/02/06 00:26:00 dan_karrels Exp $" ;
 
 using std::string ;
 using std::vector ;
@@ -111,6 +111,23 @@ elog << "xServer::charYY> " << charYY << endl ;
 elog << "xServer::charXXX> " << charXXX << endl ;
 elog << "xServer::intYY> " << intYY << endl ;
 elog << "xServer::intXXX> " << intXXX << endl ;
+
+iServer* me = new (nothrow) iServer(
+	0,
+	getCharYYXXX(),
+	ServerName,
+	::time( 0 ),
+	::time( 0 ),
+	Version ) ;
+assert( me != 0 ) ;
+
+if( !Network->addServer( me ) )
+	{
+	elog	<< "xServer::initializeSystem> Failed to add "
+		<< "(me) to the system tables"
+		<< endl ;
+	::exit( 0 ) ;
+	}
 
 loadCommandHandlers() ;
 

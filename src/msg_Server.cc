@@ -14,7 +14,7 @@
 #include	"ELog.h"
 #include	"xparameters.h"
 
-const char msg_Server_cc_rcsId[] = "$Id: msg_Server.cc,v 1.1 2001/02/02 18:10:30 dan_karrels Exp $" ;
+const char msg_Server_cc_rcsId[] = "$Id: msg_Server.cc,v 1.2 2001/02/06 00:26:00 dan_karrels Exp $" ;
 
 using std::endl ;
 
@@ -84,14 +84,18 @@ if( Param[ 1 ][ 0 ] == '1' )
 		atoi( Param[ 4 ] + 1 ) ) ; // version
 	assert( Uplink != 0 ) ;
 
-	iServer* me = new (nothrow) iServer(
-		Uplink->getIntYY(),
-		getCharYYXXX(),
-		ServerName,
-		ConnectionTime,
-		StartTime,
-		Version ) ;
-	assert( me != 0 ) ;
+	iServer* me = Network->findServer( intYY ) ;
+	if( NULL == me )
+		{
+		elog	<< "xServer::MSG_SERVER> Unable to find myself "
+			<< " ("
+			<< intYY
+			<< ")"
+			<< endl ;
+		::exit( 0 ) ;
+		}
+
+	me->setUplinkIntYY( uplinkYY ) ;
 
 	// We now have a pointer to our own uplink
 	// Add it to the tables

@@ -7,7 +7,7 @@
 #include	"ELog.h"
 #include	"xparameters.h"
 
-const char msg_PRIVMSG_cc_rcsId[] = "$Id: msg_PRIVMSG.cc,v 1.1 2001/02/02 18:10:30 dan_karrels Exp $" ;
+const char msg_PRIVMSG_cc_rcsId[] = "$Id: msg_PRIVMSG.cc,v 1.2 2001/02/06 00:26:00 dan_karrels Exp $" ;
 
 using std::endl ;
 
@@ -37,6 +37,7 @@ if( NULL == theClient )
 	return -1 ;
 	}
 
+strcpy( numeric, theClient->getCharYYXXX().c_str() ) ;
 Param.setValue( 0, numeric ) ;
 
 return MSG_P( Param ) ;

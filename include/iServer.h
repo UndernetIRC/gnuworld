@@ -4,7 +4,7 @@
  */
 
 #ifndef __ISERVER_H
-#define __ISERVER_H "$Id: iServer.h,v 1.4 2000/07/31 15:17:25 dan_karrels Exp $"
+#define __ISERVER_H "$Id: iServer.h,v 1.5 2001/02/06 00:26:00 dan_karrels Exp $"
 
 #include	<iostream>
 #include	<string>
@@ -190,7 +190,14 @@ public:
 
 protected:
 
-	// Do not alter the order of these declarations
+	/**
+	 * This method is called by class xServer once the uplink
+	 * of the xServer is known.  This method is only called
+	 * for the single instance of the iServer for the core
+	 * xServer.
+	 */
+	virtual void	setUplinkIntYY( const unsigned int& newYY )
+		{ uplinkIntYY = newYY ; }
 
 	/**
 	 * Integer numeric of this server's uplink.
