@@ -16,18 +16,18 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- * $Id: match.cc,v 1.3 2004/05/18 16:50:57 dan_karrels Exp $
+ * $Id: match.cc,v 1.4 2004/05/18 18:20:23 jeekay Exp $
  */
 #include	"match.h"
 
 #include	<string>
 
-const char rcsId[] = "$Id: match.cc,v 1.3 2004/05/18 16:50:57 dan_karrels Exp $" ;
+const char rcsId[] = "$Id: match.cc,v 1.4 2004/05/18 18:20:23 jeekay Exp $" ;
 
 namespace gnuworld
 {
 
-int match( const std:: string& s1, const std::string& s2 )
+int match( const std::string& s1, const std::string& s2 )
 {
 if( s1.empty() || s2.empty() )
 	{
