@@ -10,7 +10,7 @@
 #include	"responses.h" 
 #include	"networkData.h"
 
-const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.12 2001/02/20 16:24:04 dan_karrels Exp $" ;
+const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.13 2001/03/04 05:57:14 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -45,6 +45,12 @@ if (tmpUser)
  * Find the user record, confirm authorisation and attach the record
  * to this client. 
  */
+
+if(st[1][0] == '#')
+{
+	bot->Notice(theClient, "Sorry, I don't know who %s is.", st[1].c_str());
+	return false;
+}
 
 // TODO: Force a refresh of the user's info from the db 
 sqlUser* theUser = bot->getUserRecord(st[1]);
