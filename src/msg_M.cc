@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_M.cc,v 1.16 2002/10/31 18:52:53 dan_karrels Exp $
+ * $Id: msg_M.cc,v 1.17 2002/11/04 16:36:05 dan_karrels Exp $
  */
 
 #include	<new>
@@ -37,7 +37,7 @@
 #include	"StringTokenizer.h"
 #include	"ServerCommandHandler.h"
 
-const char msg_M_cc_rcsId[] = "$Id: msg_M.cc,v 1.16 2002/10/31 18:52:53 dan_karrels Exp $" ;
+const char msg_M_cc_rcsId[] = "$Id: msg_M.cc,v 1.17 2002/11/04 16:36:05 dan_karrels Exp $" ;
 const char misc_h_rcsId[] = __MISC_H ;
 const char events_h_rcsId[] = __EVENTS_H ;
 const char server_h_rcsId[] = __SERVER_H ;
@@ -115,8 +115,7 @@ if( (NULL == clientSource) && (NULL == serverSource) )
 	elog	<< "msg_M> Unable to find source: "
 		<< Param[ 0 ]
 		<< endl ;
-	// TODO: Why is this commented out?
-	// return -1
+	return false ;
 	}
 
 // Is it a user mode change?
@@ -408,8 +407,11 @@ for( const char* modePtr = Param[ 2 ] ; *modePtr ; ++modePtr )
 			if( plus )	theClient->setModeR() ;
 			else		theClient->removeModeR() ;
 			break ;
+		case 'g':
+			if( plus )	theClient->setModeG() ;
+			else		theClient->removeModeG() ;
+			break ;
 		case 'o':
-		case 'O':
 			if( plus )
 				{
 				theClient->setModeO() ;
@@ -426,6 +428,10 @@ for( const char* modePtr = Param[ 2 ] ; *modePtr ; ++modePtr )
 				}
 			break ;
 		default:
+			elog	<< "msg_M::onUserModeChange> "
+				<< "Unknown mode: "
+				<< *modePtr
+				<< endl ;
 			break ;
 		} // close switch
 	} // close for

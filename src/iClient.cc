@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: iClient.cc,v 1.23 2002/10/31 18:52:53 dan_karrels Exp $
+ * $Id: iClient.cc,v 1.24 2002/11/04 16:36:04 dan_karrels Exp $
  */
 
 #include	<new>
@@ -35,7 +35,7 @@
 #include	"ip.h"
 
 const char iClient_h_rcsId[] = __ICLIENT_H ;
-const char iClient_cc_rcsId[] = "$Id: iClient.cc,v 1.23 2002/10/31 18:52:53 dan_karrels Exp $" ;
+const char iClient_cc_rcsId[] = "$Id: iClient.cc,v 1.24 2002/11/04 16:36:04 dan_karrels Exp $" ;
 const char client_h_rcsId[] = __CLIENT_H ;
 const char Numeric_h_rcsId[] = __NUMERIC_H ;
 const char ip_h_rcsId[] = __IP_H ;
@@ -53,7 +53,7 @@ const iClient::modeType iClient::MODE_DEAF        = 0x08 ;
 const iClient::modeType iClient::MODE_SERVICES    = 0x10 ;
 const iClient::modeType iClient::MODE_REGISTERED  = 0x20 ;
 const iClient::modeType iClient::MODE_HIDDEN_HOST = 0x40 ;
-const iClient::modeType iClient::MODE_AUTH	  = 0x80 ;
+const iClient::modeType iClient::MODE_G		  = 0x80 ;
 
 iClient::iClient( const unsigned int& _uplink,
 	const string& _yxx,
@@ -77,32 +77,18 @@ iClient::iClient( const unsigned int& _uplink,
 	mode( 0 ),
 	account( _account )
 {
-if( 5 == _yxx.size() )
-	{
-	// n2k, yyxxx
-	intXXX = base64toint( _yxx.c_str() + 2, 3 ) ;
-	intYYXXX = base64toint( _yxx.c_str(), 5 ) ;
+// n2k, yyxxx
+intXXX = base64toint( _yxx.c_str() + 2, 3 ) ;
+intYYXXX = base64toint( _yxx.c_str(), 5 ) ;
 
-	charYY[ 0 ] = _yxx[ 0 ] ;
-	charYY[ 1 ] = _yxx[ 1 ] ;
-	charYY[ 2 ] = 0 ;
-	charXXX[ 0 ] = _yxx[ 2 ] ;
-	charXXX[ 1 ] = _yxx[ 3 ] ;
-	charXXX[ 2 ] = _yxx[ 4 ] ;
-	charXXX[ 3 ] = 0 ;
-	}
-else
-	{
-	// yxx
-	intXXX = base64toint( _yxx.c_str() + 1, 2 ) ;
-	intYYXXX = base64toint( _yxx.c_str(), 3 ) ;
+charYY[ 0 ] = _yxx[ 0 ] ;
+charYY[ 1 ] = _yxx[ 1 ] ;
+charYY[ 2 ] = 0 ;
 
-	charYY[ 0 ] = _yxx[ 0 ] ;
-	charYY[ 1 ] = 0 ;
-	charXXX[ 0 ] = _yxx[ 1 ] ;
-	charXXX[ 1 ] = _yxx[ 2 ] ;
-	charXXX[ 2 ] = 0 ;
-	}
+charXXX[ 0 ] = _yxx[ 2 ] ;
+charXXX[ 1 ] = _yxx[ 3 ] ;
+charXXX[ 2 ] = _yxx[ 4 ] ;
+charXXX[ 3 ] = 0 ;
 
 setModes( _mode ) ;
 customDataMap = 0 ;
@@ -122,36 +108,42 @@ for( string::size_type i = 0 ; i < newModes.size() ; i++ )
 		{
 		case 'o':
 		case 'O':
-			mode |= MODE_OPER ;
+			setModeO() ;
 			break ;
 		case 'i':
 		case 'I':
-			mode |= MODE_INVISIBLE ;
+			setModeI() ;
 			break ;
 		case 'w':
 		case 'W':
-			mode |= MODE_WALLOPS ;
+			setModeW() ;
 			break ;
 		case 'k':
 		case 'K':
-			mode |= MODE_SERVICES ;
+			setModeK() ;
 			break ;
 		case 'd':
 		case 'D':
-			mode |= MODE_DEAF ;
+			setModeD() ;
+			break ;
+		case 'g':
+			setModeG() ;
 			break ;
 		case 'r':
 		case 'R':
-			mode |= MODE_REGISTERED ;
+			setModeR() ;
 			if (isModeR() && isModeX()) setHiddenHost();
 			break ;
 		case 'x':
 		case 'X':
-			mode |= MODE_HIDDEN_HOST ;
+			setModeX() ;
 			if (isModeR() && isModeX()) setHiddenHost();
 			break ;
 		default:
 			// Unknown mode
+			elog	<< "iClient> Unknown user mode: "
+				<< newModes[ i ]
+				<< endl ;
 			break ;
 		} // switch
 	} // for
@@ -179,13 +171,14 @@ const string iClient::getCharModes() const
 {
 string retMe( "+" ) ;
 
-if( mode & MODE_OPER )		retMe += 'o' ;
-if( mode & MODE_WALLOPS )	retMe += 'w' ;
-if( mode & MODE_INVISIBLE )	retMe += 'i' ;
-if( mode & MODE_DEAF )		retMe += 'd' ;
-if( mode & MODE_SERVICES )	retMe += 'k' ;
-if( mode & MODE_REGISTERED )	retMe += 'r' ;
-if( mode & MODE_HIDDEN_HOST )	retMe += 'x' ;
+if( isModeR() )		retMe += 'o' ;
+if( isModeW() )		retMe += 'w' ;
+if( isModeI() )		retMe += 'i' ;
+if( isModeD() )		retMe += 'd' ;
+if( isModeK() )		retMe += 'k' ;
+if( isModeR() )		retMe += 'r' ;
+if( isModeK() )	retMe += 'x' ;
+if( isModeG() )		retMe += 'g' ;
 
 return retMe ;
 }

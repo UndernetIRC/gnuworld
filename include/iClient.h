@@ -17,11 +17,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: iClient.h,v 1.31 2002/10/31 18:52:51 dan_karrels Exp $
+ * $Id: iClient.h,v 1.32 2002/11/04 16:36:04 dan_karrels Exp $
  */
 
 #ifndef __ICLIENT_H
-#define __ICLIENT_H "$Id: iClient.h,v 1.31 2002/10/31 18:52:51 dan_karrels Exp $"
+#define __ICLIENT_H "$Id: iClient.h,v 1.32 2002/11/04 16:36:04 dan_karrels Exp $"
 
 #include	<string>
 #include	<list>
@@ -88,8 +88,8 @@ public:
 	/// MODE_HIDDEN_HOST is true if the iClient has HIDDEN_HOST (+x) set.
 	const static modeType	MODE_HIDDEN_HOST ;
 
-	/// MODE_AUTH is true if the user is authenticated
-	const static modeType	MODE_AUTH ;
+	/// MODE_G is true if the iCilent has user mode g set.
+	const static modeType	MODE_G ;
 
 	/// Iterator for channels this user is on.
 	typedef channelListType::iterator channelIterator ;
@@ -186,8 +186,10 @@ public:
 	inline void setAccount( const string& _account )
 		{
 		account = _account ;
-		setMode(MODE_REGISTERED);
-		if (isModeR() && isModeX()) setHiddenHost();
+		setModeR() ;
+
+		// We know that the user is mode R already
+		if (isModeX()) setHiddenHost();
 		}
 
 	/**
@@ -319,6 +321,12 @@ public:
 		{ return getMode( MODE_HIDDEN_HOST ) ; }
 
 	/**
+	 * Return true if this client has the +g mode set, false otherwise.
+	 */
+	inline bool isModeG() const
+		{ return getMode( MODE_G ) ; }
+
+	/**
 	 * Return true if this iClient is an oper, false otherwise.
 	 */
 	inline bool isOper() const
@@ -361,6 +369,12 @@ public:
 		{ setMode( MODE_DEAF ) ; }
 
 	/**
+	 * Set mode +g for this user.
+	 */
+	inline void setModeG()
+		{ setMode( MODE_G ) ; }
+
+	/**
 	 * Set mode +o for this user.
 	 */
 	inline void setModeO()
@@ -379,7 +393,7 @@ public:
 	 * Set mode +r for this user.
 	 */
 	inline void setModeR()
-		{ setMode( MODE_AUTH ) ; }
+		{ setMode( MODE_REGISTERED ) ; }
 
 	/**
 	 * Remove a user mode for this iClient.
@@ -412,6 +426,12 @@ public:
 		{ removeMode( MODE_DEAF ) ; }
 
 	/**
+	 * Remove user mode 'g'.
+	 */
+	inline void removeModeG()
+		{ removeMode( MODE_G ) ; }
+
+	/**
 	 * Remove user mode 'o'.
 	 */
 	inline void removeModeO()
@@ -427,7 +447,7 @@ public:
 	 * Remove user mode 'r'.
 	 */
 	inline void removeModeR()
-		{ removeMode( MODE_AUTH ) ; }
+		{ removeMode( MODE_REGISTERED ) ; }
 
 	/**
 	 * Return a string representation of this iClient's user
