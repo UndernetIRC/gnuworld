@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------------
--- "$Id: cservice.sql,v 1.38 2001/05/20 01:54:42 gte Exp $"
+-- "$Id: cservice.sql,v 1.39 2001/05/21 22:51:35 gte Exp $"
 -- Channel service DB SQL file for PostgreSQL.
 
 -- ChangeLog:
@@ -302,6 +302,7 @@ CREATE TABLE deletion_transactions (
 -- smaller :/
 
 CREATE TABLE noreg (
+	id SERIAL,
 	user_name TEXT,
 	email TEXT,
 	channel_name TEXT,
