@@ -4,7 +4,7 @@
 #include	<string>
 #include	<cstdlib>
 
-#include	<netinet/in.h>
+//#include	<netinet/in.h>
 
 #include	"ccontrol.h"
 #include	"CControlCommands.h"

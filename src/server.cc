@@ -39,7 +39,7 @@
 //#include	"moduleLoader.h"
 
 const char xServer_h_rcsId[] = __XSERVER_H ;
-const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.23 2000/08/05 18:00:27 dan_karrels Exp $" ;
+const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.24 2000/08/05 19:10:44 dan_karrels Exp $" ;
 
 using std::string ;
 using std::vector ;
@@ -675,7 +675,6 @@ else
 	elog	<< "xServer::Process> Unable to find handler for: "
 		<< Command << endl ;
 	}
-
 }
 
 /**
