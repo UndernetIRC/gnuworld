@@ -2,6 +2,8 @@
  * msg_EA.cc
  */
 
+#include	<stack>
+
 #include	<cstring>
 
 #include	"server.h"
@@ -10,16 +12,11 @@
 #include	"ELog.h"
 #include	"iServer.h"
 
-const char msg_EA_cc_rcsId[] = "$Id: msg_EA.cc,v 1.1 2001/02/02 18:10:30 dan_karrels Exp $" ;
+const char msg_EA_cc_rcsId[] = "$Id: msg_EA.cc,v 1.2 2001/02/03 17:43:12 dan_karrels Exp $" ;
 
 using std::string ;
-using std::vector ;
-using std::list ;
 using std::endl ;
-using std::ends ;
-using std::strstream ;
 using std::stack ;
-using std::unary_function ;
 
 namespace gnuworld
 {
