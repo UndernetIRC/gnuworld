@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-## $Id: Makefile.am,v 1.6 2003/06/05 01:38:02 dan_karrels Exp $
+## $Id: Makefile.am,v 1.7 2003/07/10 00:58:24 dan_karrels Exp $
 
 lib_LTLIBRARIES = libircu.la
 libircu_la_SOURCES = msg_AC.cc \
@@ -35,5 +35,4 @@ libircu_la_SOURCES = msg_AC.cc \
 	msg_WA.cc \
 	msg_W.cc \
 	msg_Y.cc
-INCLUDES = $(INCLTDL)
-AM_LDFLAGS = -module -export-dynamic
+libircu_la_LDFLAGS = -module -export-dynamic

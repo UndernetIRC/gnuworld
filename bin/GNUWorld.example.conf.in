@@ -1,4 +1,4 @@
-# $Id: GNUWorld.example.conf.in,v 1.7 2003/06/10 14:20:41 dan_karrels Exp $
+# $Id: GNUWorld.example.conf.in,v 1.8 2003/07/10 00:58:23 dan_karrels Exp $
 # GNUWorld Core Configuration File
 #
 
@@ -25,21 +25,20 @@ hidden_host_suffix = .users.undernet.org
 # You probably will not need to ever change this.
 command_map = server_command_map
 
-# libdir is the full path to the directory containing
-# the gnuworld, this is set automatically on configure.
-# Do NOT change.
-libdir = @libdir@
+# libdir is the path to the directory containing
+# the gnuworld modules
+libdir = ../lib
 
 # To use a certain module, uncomment it below.
-#module = libcservice.la cservice.conf
-#module = libccontrol.la ccontrol.conf
-#module = libcloner.la cloner.conf
-#module = libnickserv.la nickserv.conf
-#module = libstats.la stats.conf
-#module = libscanner.la scanner.conf
-#module = libgnutest.la gnutest.conf
-#module = libclientExample.la clientExample.conf
-#module = libdronescan.la dronescan.example.conf
+#module = libcservice.la cservice.example.conf
+#module = libccontrol.la ccontrol.example.conf
+#module = libcloner.la cloner.example.conf
+#module = libnickserv.la nickserv.example.conf
+#module = libstats.la stats.example.conf
+#module = libscanner.la scanner.example.conf
+#module = libgnutest.la gnutest.example.conf
+#module = libclientExample.la clientExample.example.conf
+#module = libdronescan.la dronescan.example.example.conf
 
 #################################################
 # It is safe to leave the rest of this file alone

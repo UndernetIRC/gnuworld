@@ -14,7 +14,7 @@
 
 @SET_MAKE@
 
-# "$Id: Makefile.in,v 1.55 2003/07/09 18:31:25 dan_karrels Exp $"
+# "$Id: Makefile.in,v 1.56 2003/07/10 00:58:24 dan_karrels Exp $"
 
 srcdir = @srcdir@
 top_srcdir = @top_srcdir@
@@ -188,7 +188,7 @@ libnickserv_la_SOURCES = \
   sqlUser.cc
 
 
-INCLUDES = -I@PGSQL_INCLUDE@ $(INCLTDL)
+libnickserv_la_CXXFLAGS = -I@PGSQL_INCLUDE@
 
 EXTRA_DIST = levels.h \
 	Logger.h \
@@ -212,28 +212,35 @@ CONFIG_CLEAN_FILES =
 LTLIBRARIES = $(lib_LTLIBRARIES)
 
 libnickserv_la_LIBADD =
-am_libnickserv_la_OBJECTS = INFOCommand.lo INVITECommand.lo Logger.lo \
-	MODUSERCommand.lo RECOVERCommand.lo REGISTERCommand.lo \
-	SETCommand.lo SHUTDOWNCommand.lo Stats.lo STATSCommand.lo \
-	WHOAMICommand.lo netData.lo nickserv.lo sqlManager.lo \
-	sqlUser.lo
+am_libnickserv_la_OBJECTS = libnickserv_la-INFOCommand.lo \
+	libnickserv_la-INVITECommand.lo libnickserv_la-Logger.lo \
+	libnickserv_la-MODUSERCommand.lo \
+	libnickserv_la-RECOVERCommand.lo \
+	libnickserv_la-REGISTERCommand.lo libnickserv_la-SETCommand.lo \
+	libnickserv_la-SHUTDOWNCommand.lo libnickserv_la-Stats.lo \
+	libnickserv_la-STATSCommand.lo libnickserv_la-WHOAMICommand.lo \
+	libnickserv_la-netData.lo libnickserv_la-nickserv.lo \
+	libnickserv_la-sqlManager.lo libnickserv_la-sqlUser.lo
 libnickserv_la_OBJECTS = $(am_libnickserv_la_OBJECTS)
 
 DEFAULT_INCLUDES =  -I. -I$(srcdir) -I$(top_builddir)/include
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
-@AMDEP_TRUE@DEP_FILES = ./$(DEPDIR)/INFOCommand.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/INVITECommand.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/Logger.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/MODUSERCommand.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/RECOVERCommand.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/REGISTERCommand.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/SETCommand.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/SHUTDOWNCommand.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/STATSCommand.Plo ./$(DEPDIR)/Stats.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/WHOAMICommand.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/netData.Plo ./$(DEPDIR)/nickserv.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/sqlManager.Plo ./$(DEPDIR)/sqlUser.Plo
+@AMDEP_TRUE@DEP_FILES = ./$(DEPDIR)/libnickserv_la-INFOCommand.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/libnickserv_la-INVITECommand.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/libnickserv_la-Logger.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/libnickserv_la-MODUSERCommand.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/libnickserv_la-RECOVERCommand.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/libnickserv_la-REGISTERCommand.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/libnickserv_la-SETCommand.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/libnickserv_la-SHUTDOWNCommand.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/libnickserv_la-STATSCommand.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/libnickserv_la-Stats.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/libnickserv_la-WHOAMICommand.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/libnickserv_la-netData.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/libnickserv_la-nickserv.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/libnickserv_la-sqlManager.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/libnickserv_la-sqlUser.Plo
 CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
 LTCXXCOMPILE = $(LIBTOOL) --mode=compile $(CXX) $(DEFS) \
@@ -292,21 +299,21 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/INFOCommand.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/INVITECommand.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Logger.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MODUSERCommand.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/RECOVERCommand.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/REGISTERCommand.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SETCommand.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SHUTDOWNCommand.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/STATSCommand.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Stats.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/WHOAMICommand.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/netData.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nickserv.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sqlManager.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sqlUser.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libnickserv_la-INFOCommand.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libnickserv_la-INVITECommand.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libnickserv_la-Logger.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libnickserv_la-MODUSERCommand.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libnickserv_la-RECOVERCommand.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libnickserv_la-REGISTERCommand.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libnickserv_la-SETCommand.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libnickserv_la-SHUTDOWNCommand.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libnickserv_la-STATSCommand.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libnickserv_la-Stats.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libnickserv_la-WHOAMICommand.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libnickserv_la-netData.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libnickserv_la-nickserv.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libnickserv_la-sqlManager.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libnickserv_la-sqlUser.Plo@am__quote@
 
 distclean-depend:
 	-rm -rf ./$(DEPDIR)
@@ -343,6 +350,501 @@ distclean-depend:
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/$*.Plo' tmpdepfile='$(DEPDIR)/$*.TPlo' @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LTCXXCOMPILE) -c -o $@ `test -f '$<' || echo '$(srcdir)/'`$<
+
+libnickserv_la-INFOCommand.o: INFOCommand.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnickserv_la_CXXFLAGS) $(CXXFLAGS) -MT libnickserv_la-INFOCommand.o -MD -MP -MF "$(DEPDIR)/libnickserv_la-INFOCommand.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libnickserv_la-INFOCommand.o `test -f 'INFOCommand.cc' || echo '$(srcdir)/'`INFOCommand.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libnickserv_la-INFOCommand.Tpo" "$(DEPDIR)/libnickserv_la-INFOCommand.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libnickserv_la-INFOCommand.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='INFOCommand.cc' object='libnickserv_la-INFOCommand.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libnickserv_la-INFOCommand.Po' tmpdepfile='$(DEPDIR)/libnickserv_la-INFOCommand.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnickserv_la_CXXFLAGS) $(CXXFLAGS) -c -o libnickserv_la-INFOCommand.o `test -f 'INFOCommand.cc' || echo '$(srcdir)/'`INFOCommand.cc
+
+libnickserv_la-INFOCommand.obj: INFOCommand.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnickserv_la_CXXFLAGS) $(CXXFLAGS) -MT libnickserv_la-INFOCommand.obj -MD -MP -MF "$(DEPDIR)/libnickserv_la-INFOCommand.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libnickserv_la-INFOCommand.obj `if test -f 'INFOCommand.cc'; then $(CYGPATH_W) 'INFOCommand.cc'; else $(CYGPATH_W) '$(srcdir)/INFOCommand.cc'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libnickserv_la-INFOCommand.Tpo" "$(DEPDIR)/libnickserv_la-INFOCommand.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libnickserv_la-INFOCommand.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='INFOCommand.cc' object='libnickserv_la-INFOCommand.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libnickserv_la-INFOCommand.Po' tmpdepfile='$(DEPDIR)/libnickserv_la-INFOCommand.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnickserv_la_CXXFLAGS) $(CXXFLAGS) -c -o libnickserv_la-INFOCommand.obj `if test -f 'INFOCommand.cc'; then $(CYGPATH_W) 'INFOCommand.cc'; else $(CYGPATH_W) '$(srcdir)/INFOCommand.cc'; fi`
+
+libnickserv_la-INFOCommand.lo: INFOCommand.cc
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnickserv_la_CXXFLAGS) $(CXXFLAGS) -MT libnickserv_la-INFOCommand.lo -MD -MP -MF "$(DEPDIR)/libnickserv_la-INFOCommand.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libnickserv_la-INFOCommand.lo `test -f 'INFOCommand.cc' || echo '$(srcdir)/'`INFOCommand.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libnickserv_la-INFOCommand.Tpo" "$(DEPDIR)/libnickserv_la-INFOCommand.Plo"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libnickserv_la-INFOCommand.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='INFOCommand.cc' object='libnickserv_la-INFOCommand.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libnickserv_la-INFOCommand.Plo' tmpdepfile='$(DEPDIR)/libnickserv_la-INFOCommand.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnickserv_la_CXXFLAGS) $(CXXFLAGS) -c -o libnickserv_la-INFOCommand.lo `test -f 'INFOCommand.cc' || echo '$(srcdir)/'`INFOCommand.cc
+
+libnickserv_la-INVITECommand.o: INVITECommand.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnickserv_la_CXXFLAGS) $(CXXFLAGS) -MT libnickserv_la-INVITECommand.o -MD -MP -MF "$(DEPDIR)/libnickserv_la-INVITECommand.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libnickserv_la-INVITECommand.o `test -f 'INVITECommand.cc' || echo '$(srcdir)/'`INVITECommand.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libnickserv_la-INVITECommand.Tpo" "$(DEPDIR)/libnickserv_la-INVITECommand.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libnickserv_la-INVITECommand.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='INVITECommand.cc' object='libnickserv_la-INVITECommand.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libnickserv_la-INVITECommand.Po' tmpdepfile='$(DEPDIR)/libnickserv_la-INVITECommand.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnickserv_la_CXXFLAGS) $(CXXFLAGS) -c -o libnickserv_la-INVITECommand.o `test -f 'INVITECommand.cc' || echo '$(srcdir)/'`INVITECommand.cc
+
+libnickserv_la-INVITECommand.obj: INVITECommand.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnickserv_la_CXXFLAGS) $(CXXFLAGS) -MT libnickserv_la-INVITECommand.obj -MD -MP -MF "$(DEPDIR)/libnickserv_la-INVITECommand.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libnickserv_la-INVITECommand.obj `if test -f 'INVITECommand.cc'; then $(CYGPATH_W) 'INVITECommand.cc'; else $(CYGPATH_W) '$(srcdir)/INVITECommand.cc'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libnickserv_la-INVITECommand.Tpo" "$(DEPDIR)/libnickserv_la-INVITECommand.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libnickserv_la-INVITECommand.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='INVITECommand.cc' object='libnickserv_la-INVITECommand.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libnickserv_la-INVITECommand.Po' tmpdepfile='$(DEPDIR)/libnickserv_la-INVITECommand.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnickserv_la_CXXFLAGS) $(CXXFLAGS) -c -o libnickserv_la-INVITECommand.obj `if test -f 'INVITECommand.cc'; then $(CYGPATH_W) 'INVITECommand.cc'; else $(CYGPATH_W) '$(srcdir)/INVITECommand.cc'; fi`
+
+libnickserv_la-INVITECommand.lo: INVITECommand.cc
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnickserv_la_CXXFLAGS) $(CXXFLAGS) -MT libnickserv_la-INVITECommand.lo -MD -MP -MF "$(DEPDIR)/libnickserv_la-INVITECommand.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libnickserv_la-INVITECommand.lo `test -f 'INVITECommand.cc' || echo '$(srcdir)/'`INVITECommand.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libnickserv_la-INVITECommand.Tpo" "$(DEPDIR)/libnickserv_la-INVITECommand.Plo"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libnickserv_la-INVITECommand.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='INVITECommand.cc' object='libnickserv_la-INVITECommand.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libnickserv_la-INVITECommand.Plo' tmpdepfile='$(DEPDIR)/libnickserv_la-INVITECommand.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnickserv_la_CXXFLAGS) $(CXXFLAGS) -c -o libnickserv_la-INVITECommand.lo `test -f 'INVITECommand.cc' || echo '$(srcdir)/'`INVITECommand.cc
+
+libnickserv_la-Logger.o: Logger.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnickserv_la_CXXFLAGS) $(CXXFLAGS) -MT libnickserv_la-Logger.o -MD -MP -MF "$(DEPDIR)/libnickserv_la-Logger.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libnickserv_la-Logger.o `test -f 'Logger.cc' || echo '$(srcdir)/'`Logger.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libnickserv_la-Logger.Tpo" "$(DEPDIR)/libnickserv_la-Logger.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libnickserv_la-Logger.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='Logger.cc' object='libnickserv_la-Logger.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libnickserv_la-Logger.Po' tmpdepfile='$(DEPDIR)/libnickserv_la-Logger.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnickserv_la_CXXFLAGS) $(CXXFLAGS) -c -o libnickserv_la-Logger.o `test -f 'Logger.cc' || echo '$(srcdir)/'`Logger.cc
+
+libnickserv_la-Logger.obj: Logger.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnickserv_la_CXXFLAGS) $(CXXFLAGS) -MT libnickserv_la-Logger.obj -MD -MP -MF "$(DEPDIR)/libnickserv_la-Logger.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libnickserv_la-Logger.obj `if test -f 'Logger.cc'; then $(CYGPATH_W) 'Logger.cc'; else $(CYGPATH_W) '$(srcdir)/Logger.cc'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libnickserv_la-Logger.Tpo" "$(DEPDIR)/libnickserv_la-Logger.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libnickserv_la-Logger.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='Logger.cc' object='libnickserv_la-Logger.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libnickserv_la-Logger.Po' tmpdepfile='$(DEPDIR)/libnickserv_la-Logger.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnickserv_la_CXXFLAGS) $(CXXFLAGS) -c -o libnickserv_la-Logger.obj `if test -f 'Logger.cc'; then $(CYGPATH_W) 'Logger.cc'; else $(CYGPATH_W) '$(srcdir)/Logger.cc'; fi`
+
+libnickserv_la-Logger.lo: Logger.cc
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnickserv_la_CXXFLAGS) $(CXXFLAGS) -MT libnickserv_la-Logger.lo -MD -MP -MF "$(DEPDIR)/libnickserv_la-Logger.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libnickserv_la-Logger.lo `test -f 'Logger.cc' || echo '$(srcdir)/'`Logger.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libnickserv_la-Logger.Tpo" "$(DEPDIR)/libnickserv_la-Logger.Plo"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libnickserv_la-Logger.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='Logger.cc' object='libnickserv_la-Logger.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libnickserv_la-Logger.Plo' tmpdepfile='$(DEPDIR)/libnickserv_la-Logger.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnickserv_la_CXXFLAGS) $(CXXFLAGS) -c -o libnickserv_la-Logger.lo `test -f 'Logger.cc' || echo '$(srcdir)/'`Logger.cc
+
+libnickserv_la-MODUSERCommand.o: MODUSERCommand.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnickserv_la_CXXFLAGS) $(CXXFLAGS) -MT libnickserv_la-MODUSERCommand.o -MD -MP -MF "$(DEPDIR)/libnickserv_la-MODUSERCommand.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libnickserv_la-MODUSERCommand.o `test -f 'MODUSERCommand.cc' || echo '$(srcdir)/'`MODUSERCommand.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libnickserv_la-MODUSERCommand.Tpo" "$(DEPDIR)/libnickserv_la-MODUSERCommand.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libnickserv_la-MODUSERCommand.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='MODUSERCommand.cc' object='libnickserv_la-MODUSERCommand.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libnickserv_la-MODUSERCommand.Po' tmpdepfile='$(DEPDIR)/libnickserv_la-MODUSERCommand.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnickserv_la_CXXFLAGS) $(CXXFLAGS) -c -o libnickserv_la-MODUSERCommand.o `test -f 'MODUSERCommand.cc' || echo '$(srcdir)/'`MODUSERCommand.cc
+
+libnickserv_la-MODUSERCommand.obj: MODUSERCommand.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnickserv_la_CXXFLAGS) $(CXXFLAGS) -MT libnickserv_la-MODUSERCommand.obj -MD -MP -MF "$(DEPDIR)/libnickserv_la-MODUSERCommand.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libnickserv_la-MODUSERCommand.obj `if test -f 'MODUSERCommand.cc'; then $(CYGPATH_W) 'MODUSERCommand.cc'; else $(CYGPATH_W) '$(srcdir)/MODUSERCommand.cc'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libnickserv_la-MODUSERCommand.Tpo" "$(DEPDIR)/libnickserv_la-MODUSERCommand.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libnickserv_la-MODUSERCommand.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='MODUSERCommand.cc' object='libnickserv_la-MODUSERCommand.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libnickserv_la-MODUSERCommand.Po' tmpdepfile='$(DEPDIR)/libnickserv_la-MODUSERCommand.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnickserv_la_CXXFLAGS) $(CXXFLAGS) -c -o libnickserv_la-MODUSERCommand.obj `if test -f 'MODUSERCommand.cc'; then $(CYGPATH_W) 'MODUSERCommand.cc'; else $(CYGPATH_W) '$(srcdir)/MODUSERCommand.cc'; fi`
+
+libnickserv_la-MODUSERCommand.lo: MODUSERCommand.cc
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnickserv_la_CXXFLAGS) $(CXXFLAGS) -MT libnickserv_la-MODUSERCommand.lo -MD -MP -MF "$(DEPDIR)/libnickserv_la-MODUSERCommand.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libnickserv_la-MODUSERCommand.lo `test -f 'MODUSERCommand.cc' || echo '$(srcdir)/'`MODUSERCommand.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libnickserv_la-MODUSERCommand.Tpo" "$(DEPDIR)/libnickserv_la-MODUSERCommand.Plo"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libnickserv_la-MODUSERCommand.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='MODUSERCommand.cc' object='libnickserv_la-MODUSERCommand.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libnickserv_la-MODUSERCommand.Plo' tmpdepfile='$(DEPDIR)/libnickserv_la-MODUSERCommand.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnickserv_la_CXXFLAGS) $(CXXFLAGS) -c -o libnickserv_la-MODUSERCommand.lo `test -f 'MODUSERCommand.cc' || echo '$(srcdir)/'`MODUSERCommand.cc
+
+libnickserv_la-RECOVERCommand.o: RECOVERCommand.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnickserv_la_CXXFLAGS) $(CXXFLAGS) -MT libnickserv_la-RECOVERCommand.o -MD -MP -MF "$(DEPDIR)/libnickserv_la-RECOVERCommand.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libnickserv_la-RECOVERCommand.o `test -f 'RECOVERCommand.cc' || echo '$(srcdir)/'`RECOVERCommand.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libnickserv_la-RECOVERCommand.Tpo" "$(DEPDIR)/libnickserv_la-RECOVERCommand.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libnickserv_la-RECOVERCommand.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='RECOVERCommand.cc' object='libnickserv_la-RECOVERCommand.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libnickserv_la-RECOVERCommand.Po' tmpdepfile='$(DEPDIR)/libnickserv_la-RECOVERCommand.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnickserv_la_CXXFLAGS) $(CXXFLAGS) -c -o libnickserv_la-RECOVERCommand.o `test -f 'RECOVERCommand.cc' || echo '$(srcdir)/'`RECOVERCommand.cc
+
+libnickserv_la-RECOVERCommand.obj: RECOVERCommand.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnickserv_la_CXXFLAGS) $(CXXFLAGS) -MT libnickserv_la-RECOVERCommand.obj -MD -MP -MF "$(DEPDIR)/libnickserv_la-RECOVERCommand.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libnickserv_la-RECOVERCommand.obj `if test -f 'RECOVERCommand.cc'; then $(CYGPATH_W) 'RECOVERCommand.cc'; else $(CYGPATH_W) '$(srcdir)/RECOVERCommand.cc'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libnickserv_la-RECOVERCommand.Tpo" "$(DEPDIR)/libnickserv_la-RECOVERCommand.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libnickserv_la-RECOVERCommand.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='RECOVERCommand.cc' object='libnickserv_la-RECOVERCommand.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libnickserv_la-RECOVERCommand.Po' tmpdepfile='$(DEPDIR)/libnickserv_la-RECOVERCommand.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnickserv_la_CXXFLAGS) $(CXXFLAGS) -c -o libnickserv_la-RECOVERCommand.obj `if test -f 'RECOVERCommand.cc'; then $(CYGPATH_W) 'RECOVERCommand.cc'; else $(CYGPATH_W) '$(srcdir)/RECOVERCommand.cc'; fi`
+
+libnickserv_la-RECOVERCommand.lo: RECOVERCommand.cc
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnickserv_la_CXXFLAGS) $(CXXFLAGS) -MT libnickserv_la-RECOVERCommand.lo -MD -MP -MF "$(DEPDIR)/libnickserv_la-RECOVERCommand.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libnickserv_la-RECOVERCommand.lo `test -f 'RECOVERCommand.cc' || echo '$(srcdir)/'`RECOVERCommand.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libnickserv_la-RECOVERCommand.Tpo" "$(DEPDIR)/libnickserv_la-RECOVERCommand.Plo"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libnickserv_la-RECOVERCommand.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='RECOVERCommand.cc' object='libnickserv_la-RECOVERCommand.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libnickserv_la-RECOVERCommand.Plo' tmpdepfile='$(DEPDIR)/libnickserv_la-RECOVERCommand.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnickserv_la_CXXFLAGS) $(CXXFLAGS) -c -o libnickserv_la-RECOVERCommand.lo `test -f 'RECOVERCommand.cc' || echo '$(srcdir)/'`RECOVERCommand.cc
+
+libnickserv_la-REGISTERCommand.o: REGISTERCommand.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnickserv_la_CXXFLAGS) $(CXXFLAGS) -MT libnickserv_la-REGISTERCommand.o -MD -MP -MF "$(DEPDIR)/libnickserv_la-REGISTERCommand.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libnickserv_la-REGISTERCommand.o `test -f 'REGISTERCommand.cc' || echo '$(srcdir)/'`REGISTERCommand.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libnickserv_la-REGISTERCommand.Tpo" "$(DEPDIR)/libnickserv_la-REGISTERCommand.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libnickserv_la-REGISTERCommand.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='REGISTERCommand.cc' object='libnickserv_la-REGISTERCommand.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libnickserv_la-REGISTERCommand.Po' tmpdepfile='$(DEPDIR)/libnickserv_la-REGISTERCommand.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnickserv_la_CXXFLAGS) $(CXXFLAGS) -c -o libnickserv_la-REGISTERCommand.o `test -f 'REGISTERCommand.cc' || echo '$(srcdir)/'`REGISTERCommand.cc
+
+libnickserv_la-REGISTERCommand.obj: REGISTERCommand.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnickserv_la_CXXFLAGS) $(CXXFLAGS) -MT libnickserv_la-REGISTERCommand.obj -MD -MP -MF "$(DEPDIR)/libnickserv_la-REGISTERCommand.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libnickserv_la-REGISTERCommand.obj `if test -f 'REGISTERCommand.cc'; then $(CYGPATH_W) 'REGISTERCommand.cc'; else $(CYGPATH_W) '$(srcdir)/REGISTERCommand.cc'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libnickserv_la-REGISTERCommand.Tpo" "$(DEPDIR)/libnickserv_la-REGISTERCommand.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libnickserv_la-REGISTERCommand.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='REGISTERCommand.cc' object='libnickserv_la-REGISTERCommand.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libnickserv_la-REGISTERCommand.Po' tmpdepfile='$(DEPDIR)/libnickserv_la-REGISTERCommand.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnickserv_la_CXXFLAGS) $(CXXFLAGS) -c -o libnickserv_la-REGISTERCommand.obj `if test -f 'REGISTERCommand.cc'; then $(CYGPATH_W) 'REGISTERCommand.cc'; else $(CYGPATH_W) '$(srcdir)/REGISTERCommand.cc'; fi`
+
+libnickserv_la-REGISTERCommand.lo: REGISTERCommand.cc
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnickserv_la_CXXFLAGS) $(CXXFLAGS) -MT libnickserv_la-REGISTERCommand.lo -MD -MP -MF "$(DEPDIR)/libnickserv_la-REGISTERCommand.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libnickserv_la-REGISTERCommand.lo `test -f 'REGISTERCommand.cc' || echo '$(srcdir)/'`REGISTERCommand.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libnickserv_la-REGISTERCommand.Tpo" "$(DEPDIR)/libnickserv_la-REGISTERCommand.Plo"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libnickserv_la-REGISTERCommand.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='REGISTERCommand.cc' object='libnickserv_la-REGISTERCommand.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libnickserv_la-REGISTERCommand.Plo' tmpdepfile='$(DEPDIR)/libnickserv_la-REGISTERCommand.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnickserv_la_CXXFLAGS) $(CXXFLAGS) -c -o libnickserv_la-REGISTERCommand.lo `test -f 'REGISTERCommand.cc' || echo '$(srcdir)/'`REGISTERCommand.cc
+
+libnickserv_la-SETCommand.o: SETCommand.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnickserv_la_CXXFLAGS) $(CXXFLAGS) -MT libnickserv_la-SETCommand.o -MD -MP -MF "$(DEPDIR)/libnickserv_la-SETCommand.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libnickserv_la-SETCommand.o `test -f 'SETCommand.cc' || echo '$(srcdir)/'`SETCommand.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libnickserv_la-SETCommand.Tpo" "$(DEPDIR)/libnickserv_la-SETCommand.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libnickserv_la-SETCommand.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='SETCommand.cc' object='libnickserv_la-SETCommand.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libnickserv_la-SETCommand.Po' tmpdepfile='$(DEPDIR)/libnickserv_la-SETCommand.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnickserv_la_CXXFLAGS) $(CXXFLAGS) -c -o libnickserv_la-SETCommand.o `test -f 'SETCommand.cc' || echo '$(srcdir)/'`SETCommand.cc
+
+libnickserv_la-SETCommand.obj: SETCommand.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnickserv_la_CXXFLAGS) $(CXXFLAGS) -MT libnickserv_la-SETCommand.obj -MD -MP -MF "$(DEPDIR)/libnickserv_la-SETCommand.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libnickserv_la-SETCommand.obj `if test -f 'SETCommand.cc'; then $(CYGPATH_W) 'SETCommand.cc'; else $(CYGPATH_W) '$(srcdir)/SETCommand.cc'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libnickserv_la-SETCommand.Tpo" "$(DEPDIR)/libnickserv_la-SETCommand.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libnickserv_la-SETCommand.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='SETCommand.cc' object='libnickserv_la-SETCommand.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libnickserv_la-SETCommand.Po' tmpdepfile='$(DEPDIR)/libnickserv_la-SETCommand.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnickserv_la_CXXFLAGS) $(CXXFLAGS) -c -o libnickserv_la-SETCommand.obj `if test -f 'SETCommand.cc'; then $(CYGPATH_W) 'SETCommand.cc'; else $(CYGPATH_W) '$(srcdir)/SETCommand.cc'; fi`
+
+libnickserv_la-SETCommand.lo: SETCommand.cc
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnickserv_la_CXXFLAGS) $(CXXFLAGS) -MT libnickserv_la-SETCommand.lo -MD -MP -MF "$(DEPDIR)/libnickserv_la-SETCommand.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libnickserv_la-SETCommand.lo `test -f 'SETCommand.cc' || echo '$(srcdir)/'`SETCommand.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libnickserv_la-SETCommand.Tpo" "$(DEPDIR)/libnickserv_la-SETCommand.Plo"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libnickserv_la-SETCommand.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='SETCommand.cc' object='libnickserv_la-SETCommand.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libnickserv_la-SETCommand.Plo' tmpdepfile='$(DEPDIR)/libnickserv_la-SETCommand.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnickserv_la_CXXFLAGS) $(CXXFLAGS) -c -o libnickserv_la-SETCommand.lo `test -f 'SETCommand.cc' || echo '$(srcdir)/'`SETCommand.cc
+
+libnickserv_la-SHUTDOWNCommand.o: SHUTDOWNCommand.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnickserv_la_CXXFLAGS) $(CXXFLAGS) -MT libnickserv_la-SHUTDOWNCommand.o -MD -MP -MF "$(DEPDIR)/libnickserv_la-SHUTDOWNCommand.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libnickserv_la-SHUTDOWNCommand.o `test -f 'SHUTDOWNCommand.cc' || echo '$(srcdir)/'`SHUTDOWNCommand.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libnickserv_la-SHUTDOWNCommand.Tpo" "$(DEPDIR)/libnickserv_la-SHUTDOWNCommand.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libnickserv_la-SHUTDOWNCommand.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='SHUTDOWNCommand.cc' object='libnickserv_la-SHUTDOWNCommand.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libnickserv_la-SHUTDOWNCommand.Po' tmpdepfile='$(DEPDIR)/libnickserv_la-SHUTDOWNCommand.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnickserv_la_CXXFLAGS) $(CXXFLAGS) -c -o libnickserv_la-SHUTDOWNCommand.o `test -f 'SHUTDOWNCommand.cc' || echo '$(srcdir)/'`SHUTDOWNCommand.cc
+
+libnickserv_la-SHUTDOWNCommand.obj: SHUTDOWNCommand.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnickserv_la_CXXFLAGS) $(CXXFLAGS) -MT libnickserv_la-SHUTDOWNCommand.obj -MD -MP -MF "$(DEPDIR)/libnickserv_la-SHUTDOWNCommand.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libnickserv_la-SHUTDOWNCommand.obj `if test -f 'SHUTDOWNCommand.cc'; then $(CYGPATH_W) 'SHUTDOWNCommand.cc'; else $(CYGPATH_W) '$(srcdir)/SHUTDOWNCommand.cc'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libnickserv_la-SHUTDOWNCommand.Tpo" "$(DEPDIR)/libnickserv_la-SHUTDOWNCommand.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libnickserv_la-SHUTDOWNCommand.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='SHUTDOWNCommand.cc' object='libnickserv_la-SHUTDOWNCommand.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libnickserv_la-SHUTDOWNCommand.Po' tmpdepfile='$(DEPDIR)/libnickserv_la-SHUTDOWNCommand.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnickserv_la_CXXFLAGS) $(CXXFLAGS) -c -o libnickserv_la-SHUTDOWNCommand.obj `if test -f 'SHUTDOWNCommand.cc'; then $(CYGPATH_W) 'SHUTDOWNCommand.cc'; else $(CYGPATH_W) '$(srcdir)/SHUTDOWNCommand.cc'; fi`
+
+libnickserv_la-SHUTDOWNCommand.lo: SHUTDOWNCommand.cc
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnickserv_la_CXXFLAGS) $(CXXFLAGS) -MT libnickserv_la-SHUTDOWNCommand.lo -MD -MP -MF "$(DEPDIR)/libnickserv_la-SHUTDOWNCommand.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libnickserv_la-SHUTDOWNCommand.lo `test -f 'SHUTDOWNCommand.cc' || echo '$(srcdir)/'`SHUTDOWNCommand.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libnickserv_la-SHUTDOWNCommand.Tpo" "$(DEPDIR)/libnickserv_la-SHUTDOWNCommand.Plo"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libnickserv_la-SHUTDOWNCommand.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='SHUTDOWNCommand.cc' object='libnickserv_la-SHUTDOWNCommand.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libnickserv_la-SHUTDOWNCommand.Plo' tmpdepfile='$(DEPDIR)/libnickserv_la-SHUTDOWNCommand.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnickserv_la_CXXFLAGS) $(CXXFLAGS) -c -o libnickserv_la-SHUTDOWNCommand.lo `test -f 'SHUTDOWNCommand.cc' || echo '$(srcdir)/'`SHUTDOWNCommand.cc
+
+libnickserv_la-Stats.o: Stats.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnickserv_la_CXXFLAGS) $(CXXFLAGS) -MT libnickserv_la-Stats.o -MD -MP -MF "$(DEPDIR)/libnickserv_la-Stats.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libnickserv_la-Stats.o `test -f 'Stats.cc' || echo '$(srcdir)/'`Stats.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libnickserv_la-Stats.Tpo" "$(DEPDIR)/libnickserv_la-Stats.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libnickserv_la-Stats.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='Stats.cc' object='libnickserv_la-Stats.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libnickserv_la-Stats.Po' tmpdepfile='$(DEPDIR)/libnickserv_la-Stats.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnickserv_la_CXXFLAGS) $(CXXFLAGS) -c -o libnickserv_la-Stats.o `test -f 'Stats.cc' || echo '$(srcdir)/'`Stats.cc
+
+libnickserv_la-Stats.obj: Stats.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnickserv_la_CXXFLAGS) $(CXXFLAGS) -MT libnickserv_la-Stats.obj -MD -MP -MF "$(DEPDIR)/libnickserv_la-Stats.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libnickserv_la-Stats.obj `if test -f 'Stats.cc'; then $(CYGPATH_W) 'Stats.cc'; else $(CYGPATH_W) '$(srcdir)/Stats.cc'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libnickserv_la-Stats.Tpo" "$(DEPDIR)/libnickserv_la-Stats.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libnickserv_la-Stats.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='Stats.cc' object='libnickserv_la-Stats.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libnickserv_la-Stats.Po' tmpdepfile='$(DEPDIR)/libnickserv_la-Stats.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnickserv_la_CXXFLAGS) $(CXXFLAGS) -c -o libnickserv_la-Stats.obj `if test -f 'Stats.cc'; then $(CYGPATH_W) 'Stats.cc'; else $(CYGPATH_W) '$(srcdir)/Stats.cc'; fi`
+
+libnickserv_la-Stats.lo: Stats.cc
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnickserv_la_CXXFLAGS) $(CXXFLAGS) -MT libnickserv_la-Stats.lo -MD -MP -MF "$(DEPDIR)/libnickserv_la-Stats.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libnickserv_la-Stats.lo `test -f 'Stats.cc' || echo '$(srcdir)/'`Stats.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libnickserv_la-Stats.Tpo" "$(DEPDIR)/libnickserv_la-Stats.Plo"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libnickserv_la-Stats.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='Stats.cc' object='libnickserv_la-Stats.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libnickserv_la-Stats.Plo' tmpdepfile='$(DEPDIR)/libnickserv_la-Stats.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnickserv_la_CXXFLAGS) $(CXXFLAGS) -c -o libnickserv_la-Stats.lo `test -f 'Stats.cc' || echo '$(srcdir)/'`Stats.cc
+
+libnickserv_la-STATSCommand.o: STATSCommand.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnickserv_la_CXXFLAGS) $(CXXFLAGS) -MT libnickserv_la-STATSCommand.o -MD -MP -MF "$(DEPDIR)/libnickserv_la-STATSCommand.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libnickserv_la-STATSCommand.o `test -f 'STATSCommand.cc' || echo '$(srcdir)/'`STATSCommand.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libnickserv_la-STATSCommand.Tpo" "$(DEPDIR)/libnickserv_la-STATSCommand.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libnickserv_la-STATSCommand.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='STATSCommand.cc' object='libnickserv_la-STATSCommand.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libnickserv_la-STATSCommand.Po' tmpdepfile='$(DEPDIR)/libnickserv_la-STATSCommand.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnickserv_la_CXXFLAGS) $(CXXFLAGS) -c -o libnickserv_la-STATSCommand.o `test -f 'STATSCommand.cc' || echo '$(srcdir)/'`STATSCommand.cc
+
+libnickserv_la-STATSCommand.obj: STATSCommand.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnickserv_la_CXXFLAGS) $(CXXFLAGS) -MT libnickserv_la-STATSCommand.obj -MD -MP -MF "$(DEPDIR)/libnickserv_la-STATSCommand.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libnickserv_la-STATSCommand.obj `if test -f 'STATSCommand.cc'; then $(CYGPATH_W) 'STATSCommand.cc'; else $(CYGPATH_W) '$(srcdir)/STATSCommand.cc'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libnickserv_la-STATSCommand.Tpo" "$(DEPDIR)/libnickserv_la-STATSCommand.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libnickserv_la-STATSCommand.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='STATSCommand.cc' object='libnickserv_la-STATSCommand.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libnickserv_la-STATSCommand.Po' tmpdepfile='$(DEPDIR)/libnickserv_la-STATSCommand.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnickserv_la_CXXFLAGS) $(CXXFLAGS) -c -o libnickserv_la-STATSCommand.obj `if test -f 'STATSCommand.cc'; then $(CYGPATH_W) 'STATSCommand.cc'; else $(CYGPATH_W) '$(srcdir)/STATSCommand.cc'; fi`
+
+libnickserv_la-STATSCommand.lo: STATSCommand.cc
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnickserv_la_CXXFLAGS) $(CXXFLAGS) -MT libnickserv_la-STATSCommand.lo -MD -MP -MF "$(DEPDIR)/libnickserv_la-STATSCommand.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libnickserv_la-STATSCommand.lo `test -f 'STATSCommand.cc' || echo '$(srcdir)/'`STATSCommand.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libnickserv_la-STATSCommand.Tpo" "$(DEPDIR)/libnickserv_la-STATSCommand.Plo"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libnickserv_la-STATSCommand.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='STATSCommand.cc' object='libnickserv_la-STATSCommand.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libnickserv_la-STATSCommand.Plo' tmpdepfile='$(DEPDIR)/libnickserv_la-STATSCommand.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnickserv_la_CXXFLAGS) $(CXXFLAGS) -c -o libnickserv_la-STATSCommand.lo `test -f 'STATSCommand.cc' || echo '$(srcdir)/'`STATSCommand.cc
+
+libnickserv_la-WHOAMICommand.o: WHOAMICommand.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnickserv_la_CXXFLAGS) $(CXXFLAGS) -MT libnickserv_la-WHOAMICommand.o -MD -MP -MF "$(DEPDIR)/libnickserv_la-WHOAMICommand.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libnickserv_la-WHOAMICommand.o `test -f 'WHOAMICommand.cc' || echo '$(srcdir)/'`WHOAMICommand.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libnickserv_la-WHOAMICommand.Tpo" "$(DEPDIR)/libnickserv_la-WHOAMICommand.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libnickserv_la-WHOAMICommand.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='WHOAMICommand.cc' object='libnickserv_la-WHOAMICommand.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libnickserv_la-WHOAMICommand.Po' tmpdepfile='$(DEPDIR)/libnickserv_la-WHOAMICommand.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnickserv_la_CXXFLAGS) $(CXXFLAGS) -c -o libnickserv_la-WHOAMICommand.o `test -f 'WHOAMICommand.cc' || echo '$(srcdir)/'`WHOAMICommand.cc
+
+libnickserv_la-WHOAMICommand.obj: WHOAMICommand.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnickserv_la_CXXFLAGS) $(CXXFLAGS) -MT libnickserv_la-WHOAMICommand.obj -MD -MP -MF "$(DEPDIR)/libnickserv_la-WHOAMICommand.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libnickserv_la-WHOAMICommand.obj `if test -f 'WHOAMICommand.cc'; then $(CYGPATH_W) 'WHOAMICommand.cc'; else $(CYGPATH_W) '$(srcdir)/WHOAMICommand.cc'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libnickserv_la-WHOAMICommand.Tpo" "$(DEPDIR)/libnickserv_la-WHOAMICommand.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libnickserv_la-WHOAMICommand.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='WHOAMICommand.cc' object='libnickserv_la-WHOAMICommand.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libnickserv_la-WHOAMICommand.Po' tmpdepfile='$(DEPDIR)/libnickserv_la-WHOAMICommand.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnickserv_la_CXXFLAGS) $(CXXFLAGS) -c -o libnickserv_la-WHOAMICommand.obj `if test -f 'WHOAMICommand.cc'; then $(CYGPATH_W) 'WHOAMICommand.cc'; else $(CYGPATH_W) '$(srcdir)/WHOAMICommand.cc'; fi`
+
+libnickserv_la-WHOAMICommand.lo: WHOAMICommand.cc
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnickserv_la_CXXFLAGS) $(CXXFLAGS) -MT libnickserv_la-WHOAMICommand.lo -MD -MP -MF "$(DEPDIR)/libnickserv_la-WHOAMICommand.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libnickserv_la-WHOAMICommand.lo `test -f 'WHOAMICommand.cc' || echo '$(srcdir)/'`WHOAMICommand.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libnickserv_la-WHOAMICommand.Tpo" "$(DEPDIR)/libnickserv_la-WHOAMICommand.Plo"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libnickserv_la-WHOAMICommand.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='WHOAMICommand.cc' object='libnickserv_la-WHOAMICommand.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libnickserv_la-WHOAMICommand.Plo' tmpdepfile='$(DEPDIR)/libnickserv_la-WHOAMICommand.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnickserv_la_CXXFLAGS) $(CXXFLAGS) -c -o libnickserv_la-WHOAMICommand.lo `test -f 'WHOAMICommand.cc' || echo '$(srcdir)/'`WHOAMICommand.cc
+
+libnickserv_la-netData.o: netData.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnickserv_la_CXXFLAGS) $(CXXFLAGS) -MT libnickserv_la-netData.o -MD -MP -MF "$(DEPDIR)/libnickserv_la-netData.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libnickserv_la-netData.o `test -f 'netData.cc' || echo '$(srcdir)/'`netData.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libnickserv_la-netData.Tpo" "$(DEPDIR)/libnickserv_la-netData.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libnickserv_la-netData.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='netData.cc' object='libnickserv_la-netData.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libnickserv_la-netData.Po' tmpdepfile='$(DEPDIR)/libnickserv_la-netData.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnickserv_la_CXXFLAGS) $(CXXFLAGS) -c -o libnickserv_la-netData.o `test -f 'netData.cc' || echo '$(srcdir)/'`netData.cc
+
+libnickserv_la-netData.obj: netData.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnickserv_la_CXXFLAGS) $(CXXFLAGS) -MT libnickserv_la-netData.obj -MD -MP -MF "$(DEPDIR)/libnickserv_la-netData.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libnickserv_la-netData.obj `if test -f 'netData.cc'; then $(CYGPATH_W) 'netData.cc'; else $(CYGPATH_W) '$(srcdir)/netData.cc'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libnickserv_la-netData.Tpo" "$(DEPDIR)/libnickserv_la-netData.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libnickserv_la-netData.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='netData.cc' object='libnickserv_la-netData.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libnickserv_la-netData.Po' tmpdepfile='$(DEPDIR)/libnickserv_la-netData.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnickserv_la_CXXFLAGS) $(CXXFLAGS) -c -o libnickserv_la-netData.obj `if test -f 'netData.cc'; then $(CYGPATH_W) 'netData.cc'; else $(CYGPATH_W) '$(srcdir)/netData.cc'; fi`
+
+libnickserv_la-netData.lo: netData.cc
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnickserv_la_CXXFLAGS) $(CXXFLAGS) -MT libnickserv_la-netData.lo -MD -MP -MF "$(DEPDIR)/libnickserv_la-netData.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libnickserv_la-netData.lo `test -f 'netData.cc' || echo '$(srcdir)/'`netData.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libnickserv_la-netData.Tpo" "$(DEPDIR)/libnickserv_la-netData.Plo"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libnickserv_la-netData.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='netData.cc' object='libnickserv_la-netData.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libnickserv_la-netData.Plo' tmpdepfile='$(DEPDIR)/libnickserv_la-netData.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnickserv_la_CXXFLAGS) $(CXXFLAGS) -c -o libnickserv_la-netData.lo `test -f 'netData.cc' || echo '$(srcdir)/'`netData.cc
+
+libnickserv_la-nickserv.o: nickserv.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnickserv_la_CXXFLAGS) $(CXXFLAGS) -MT libnickserv_la-nickserv.o -MD -MP -MF "$(DEPDIR)/libnickserv_la-nickserv.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libnickserv_la-nickserv.o `test -f 'nickserv.cc' || echo '$(srcdir)/'`nickserv.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libnickserv_la-nickserv.Tpo" "$(DEPDIR)/libnickserv_la-nickserv.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libnickserv_la-nickserv.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='nickserv.cc' object='libnickserv_la-nickserv.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libnickserv_la-nickserv.Po' tmpdepfile='$(DEPDIR)/libnickserv_la-nickserv.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnickserv_la_CXXFLAGS) $(CXXFLAGS) -c -o libnickserv_la-nickserv.o `test -f 'nickserv.cc' || echo '$(srcdir)/'`nickserv.cc
+
+libnickserv_la-nickserv.obj: nickserv.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnickserv_la_CXXFLAGS) $(CXXFLAGS) -MT libnickserv_la-nickserv.obj -MD -MP -MF "$(DEPDIR)/libnickserv_la-nickserv.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libnickserv_la-nickserv.obj `if test -f 'nickserv.cc'; then $(CYGPATH_W) 'nickserv.cc'; else $(CYGPATH_W) '$(srcdir)/nickserv.cc'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libnickserv_la-nickserv.Tpo" "$(DEPDIR)/libnickserv_la-nickserv.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libnickserv_la-nickserv.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='nickserv.cc' object='libnickserv_la-nickserv.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libnickserv_la-nickserv.Po' tmpdepfile='$(DEPDIR)/libnickserv_la-nickserv.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnickserv_la_CXXFLAGS) $(CXXFLAGS) -c -o libnickserv_la-nickserv.obj `if test -f 'nickserv.cc'; then $(CYGPATH_W) 'nickserv.cc'; else $(CYGPATH_W) '$(srcdir)/nickserv.cc'; fi`
+
+libnickserv_la-nickserv.lo: nickserv.cc
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnickserv_la_CXXFLAGS) $(CXXFLAGS) -MT libnickserv_la-nickserv.lo -MD -MP -MF "$(DEPDIR)/libnickserv_la-nickserv.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libnickserv_la-nickserv.lo `test -f 'nickserv.cc' || echo '$(srcdir)/'`nickserv.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libnickserv_la-nickserv.Tpo" "$(DEPDIR)/libnickserv_la-nickserv.Plo"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libnickserv_la-nickserv.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='nickserv.cc' object='libnickserv_la-nickserv.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libnickserv_la-nickserv.Plo' tmpdepfile='$(DEPDIR)/libnickserv_la-nickserv.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnickserv_la_CXXFLAGS) $(CXXFLAGS) -c -o libnickserv_la-nickserv.lo `test -f 'nickserv.cc' || echo '$(srcdir)/'`nickserv.cc
+
+libnickserv_la-sqlManager.o: sqlManager.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnickserv_la_CXXFLAGS) $(CXXFLAGS) -MT libnickserv_la-sqlManager.o -MD -MP -MF "$(DEPDIR)/libnickserv_la-sqlManager.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libnickserv_la-sqlManager.o `test -f 'sqlManager.cc' || echo '$(srcdir)/'`sqlManager.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libnickserv_la-sqlManager.Tpo" "$(DEPDIR)/libnickserv_la-sqlManager.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libnickserv_la-sqlManager.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='sqlManager.cc' object='libnickserv_la-sqlManager.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libnickserv_la-sqlManager.Po' tmpdepfile='$(DEPDIR)/libnickserv_la-sqlManager.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnickserv_la_CXXFLAGS) $(CXXFLAGS) -c -o libnickserv_la-sqlManager.o `test -f 'sqlManager.cc' || echo '$(srcdir)/'`sqlManager.cc
+
+libnickserv_la-sqlManager.obj: sqlManager.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnickserv_la_CXXFLAGS) $(CXXFLAGS) -MT libnickserv_la-sqlManager.obj -MD -MP -MF "$(DEPDIR)/libnickserv_la-sqlManager.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libnickserv_la-sqlManager.obj `if test -f 'sqlManager.cc'; then $(CYGPATH_W) 'sqlManager.cc'; else $(CYGPATH_W) '$(srcdir)/sqlManager.cc'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libnickserv_la-sqlManager.Tpo" "$(DEPDIR)/libnickserv_la-sqlManager.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libnickserv_la-sqlManager.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='sqlManager.cc' object='libnickserv_la-sqlManager.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libnickserv_la-sqlManager.Po' tmpdepfile='$(DEPDIR)/libnickserv_la-sqlManager.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnickserv_la_CXXFLAGS) $(CXXFLAGS) -c -o libnickserv_la-sqlManager.obj `if test -f 'sqlManager.cc'; then $(CYGPATH_W) 'sqlManager.cc'; else $(CYGPATH_W) '$(srcdir)/sqlManager.cc'; fi`
+
+libnickserv_la-sqlManager.lo: sqlManager.cc
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnickserv_la_CXXFLAGS) $(CXXFLAGS) -MT libnickserv_la-sqlManager.lo -MD -MP -MF "$(DEPDIR)/libnickserv_la-sqlManager.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libnickserv_la-sqlManager.lo `test -f 'sqlManager.cc' || echo '$(srcdir)/'`sqlManager.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libnickserv_la-sqlManager.Tpo" "$(DEPDIR)/libnickserv_la-sqlManager.Plo"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libnickserv_la-sqlManager.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='sqlManager.cc' object='libnickserv_la-sqlManager.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libnickserv_la-sqlManager.Plo' tmpdepfile='$(DEPDIR)/libnickserv_la-sqlManager.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnickserv_la_CXXFLAGS) $(CXXFLAGS) -c -o libnickserv_la-sqlManager.lo `test -f 'sqlManager.cc' || echo '$(srcdir)/'`sqlManager.cc
+
+libnickserv_la-sqlUser.o: sqlUser.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnickserv_la_CXXFLAGS) $(CXXFLAGS) -MT libnickserv_la-sqlUser.o -MD -MP -MF "$(DEPDIR)/libnickserv_la-sqlUser.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libnickserv_la-sqlUser.o `test -f 'sqlUser.cc' || echo '$(srcdir)/'`sqlUser.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libnickserv_la-sqlUser.Tpo" "$(DEPDIR)/libnickserv_la-sqlUser.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libnickserv_la-sqlUser.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='sqlUser.cc' object='libnickserv_la-sqlUser.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libnickserv_la-sqlUser.Po' tmpdepfile='$(DEPDIR)/libnickserv_la-sqlUser.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnickserv_la_CXXFLAGS) $(CXXFLAGS) -c -o libnickserv_la-sqlUser.o `test -f 'sqlUser.cc' || echo '$(srcdir)/'`sqlUser.cc
+
+libnickserv_la-sqlUser.obj: sqlUser.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnickserv_la_CXXFLAGS) $(CXXFLAGS) -MT libnickserv_la-sqlUser.obj -MD -MP -MF "$(DEPDIR)/libnickserv_la-sqlUser.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libnickserv_la-sqlUser.obj `if test -f 'sqlUser.cc'; then $(CYGPATH_W) 'sqlUser.cc'; else $(CYGPATH_W) '$(srcdir)/sqlUser.cc'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libnickserv_la-sqlUser.Tpo" "$(DEPDIR)/libnickserv_la-sqlUser.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libnickserv_la-sqlUser.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='sqlUser.cc' object='libnickserv_la-sqlUser.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libnickserv_la-sqlUser.Po' tmpdepfile='$(DEPDIR)/libnickserv_la-sqlUser.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnickserv_la_CXXFLAGS) $(CXXFLAGS) -c -o libnickserv_la-sqlUser.obj `if test -f 'sqlUser.cc'; then $(CYGPATH_W) 'sqlUser.cc'; else $(CYGPATH_W) '$(srcdir)/sqlUser.cc'; fi`
+
+libnickserv_la-sqlUser.lo: sqlUser.cc
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnickserv_la_CXXFLAGS) $(CXXFLAGS) -MT libnickserv_la-sqlUser.lo -MD -MP -MF "$(DEPDIR)/libnickserv_la-sqlUser.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libnickserv_la-sqlUser.lo `test -f 'sqlUser.cc' || echo '$(srcdir)/'`sqlUser.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libnickserv_la-sqlUser.Tpo" "$(DEPDIR)/libnickserv_la-sqlUser.Plo"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libnickserv_la-sqlUser.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='sqlUser.cc' object='libnickserv_la-sqlUser.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libnickserv_la-sqlUser.Plo' tmpdepfile='$(DEPDIR)/libnickserv_la-sqlUser.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libnickserv_la_CXXFLAGS) $(CXXFLAGS) -c -o libnickserv_la-sqlUser.lo `test -f 'sqlUser.cc' || echo '$(srcdir)/'`sqlUser.cc
 
 mostlyclean-libtool:
 	-rm -f *.lo

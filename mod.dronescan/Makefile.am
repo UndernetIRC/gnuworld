@@ -13,8 +13,6 @@ libdronescan_la_SOURCES = 	\
 	RANGETest.cc		\
 	dronescan.cc
 
-INCLUDES = $(INCLTDL)
-
 EXTRA_DIST = clientData.h \
 	dronescanCommands.h \
 	dronescan.h \

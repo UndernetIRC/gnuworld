@@ -96,7 +96,6 @@ INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
 LDFLAGS = @LDFLAGS@
 LIBLTDL = @LIBLTDL@
 LIBOBJS = @LIBOBJS@
-
 LIBS = @LIBS@
 LIBTOOL = @LIBTOOL@
 LIBTOOL_DEPS = @LIBTOOL_DEPS@
@@ -170,7 +169,7 @@ lib_LTLIBRARIES = libgnuworldDB.la
 libgnuworldDB_la_SOURCES = gnuworldDB.cc \
 	pgsqlDB.cc
 
-INCLUDES = -I@PGSQL_INCLUDE@ $(INCLTDL)
+libgnuworld_la_CXXFLAGS = -I@PGSQL_INCLUDE@
 subdir = db
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs

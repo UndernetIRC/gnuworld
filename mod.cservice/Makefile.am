@@ -1,9 +1,10 @@
 ## Process this file with automake to produce Makefile.in
-# "$Id: Makefile.am,v 1.47 2003/06/28 01:21:20 dan_karrels Exp $"
+# "$Id: Makefile.am,v 1.48 2003/07/10 00:58:24 dan_karrels Exp $"
 
 lib_LTLIBRARIES = libcservice.la
 libcservice_la_LDFLAGS = -module -export-dynamic -L@PGSQL_LIB@ \
 	-lpq++
+libcservice_la_CXXFLAGS = -I@PGSQL_INCLUDE@
 
 libcservice_la_SOURCES = cservice.cc \
 	networkData.cc \
@@ -66,8 +67,6 @@ libcservice_la_SOURCES = cservice.cc \
 	UNSUSPENDCommand.cc \
 	VERIFYCommand.cc \
 	VOICECommand.cc
-
-INCLUDES = -I@PGSQL_INCLUDE@ $(INCLTDL)
 
 EXTRA_DIST = constants.h \
 	cserviceCommands.h \

@@ -200,8 +200,7 @@ libircu_la_SOURCES = msg_AC.cc \
 	msg_W.cc \
 	msg_Y.cc
 
-INCLUDES = $(INCLTDL)
-AM_LDFLAGS = -module -export-dynamic
+libircu_la_LDFLAGS = -module -export-dynamic
 subdir = libircu
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
@@ -209,7 +208,6 @@ CONFIG_HEADER = $(top_builddir)/include/defs.h
 CONFIG_CLEAN_FILES =
 LTLIBRARIES = $(lib_LTLIBRARIES)
 
-libircu_la_LDFLAGS =
 libircu_la_LIBADD =
 am_libircu_la_OBJECTS = msg_AC.lo msg_AD.lo msg_B.lo msg_C.lo msg_CM.lo \
 	msg_D.lo msg_DS.lo msg_EA.lo msg_EB.lo msg_G.lo msg_GL.lo \

@@ -180,8 +180,6 @@ libdronescan_la_SOURCES = \
 	dronescan.cc
 
 
-INCLUDES = $(INCLTDL)
-
 EXTRA_DIST = clientData.h \
 	dronescanCommands.h \
 	dronescan.h \

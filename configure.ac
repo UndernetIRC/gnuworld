@@ -1,10 +1,10 @@
-dnl $Id: configure.ac,v 1.14 2003/07/09 18:31:24 dan_karrels Exp $
+dnl $Id: configure.ac,v 1.15 2003/07/10 00:58:23 dan_karrels Exp $
 dnl ----------------------------------------------------------
 
 echo Configuring GNUWorld...
 echo
 
-AC_REVISION($Revision: 1.14 $)
+AC_REVISION($Revision: 1.15 $)
 AC_INIT
 AC_CONFIG_SRCDIR([src/main.cc])
 AM_INIT_AUTOMAKE(gnuworld,2.2)
@@ -99,7 +99,7 @@ dnl ----------------------------------------------------------
 
 AC_CHECK_LIB(socket,socket)
 AC_CHECK_LIB(nsl,gethostbyname)
-AC_CHECK_LIB(z,inflate)
+dnl AC_CHECK_LIB(z,inflate)
 dnl AC_CHECK_LIB(pthread,pthread_create)
 dnl AC_SEARCH_LIBS(pthread_create,lthread pthread c c_r)
 dnl AC_SEARCH_LIBS(pthread_kill,lthread pthread c c_r)
@@ -296,7 +296,7 @@ dnl	Prepare for conditionals
 	    mod.nickserv)	build_modnickserv=true;;
 	    mod.scanner)	build_modscanner=true;;
 	    mod.stats)		build_modstats=true;;
-	    *)			NEW_MODS="$NEW_MODS $moduleName"
+	    *)			NEW_MODS="$NEW_MODS $moduleName";;
 	  esac
 	done
 fi
@@ -329,7 +329,7 @@ dnl	echo "mod_list: $mod_list"
 		    mod.nickserv)	build_modnickserv=true;;
 		    mod.scanner)	build_modscanner=true;;
 		    mod.stats)		build_modstats=true;;
-		    *)			NEW_MODS="$NEW_MODS $moduleName"
+		    *)			NEW_MODS="$NEW_MODS $file";;
 		  esac
 		fi
 	 done

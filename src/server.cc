@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server.cc,v 1.168 2003/07/04 13:52:29 dan_karrels Exp $
+ * $Id: server.cc,v 1.169 2003/07/10 00:58:25 dan_karrels Exp $
  */
 
 #include	<sys/time.h>
@@ -71,7 +71,7 @@
 #include	"ConnectionHandler.h"
 #include	"Connection.h"
 
-RCSTAG( "$Id: server.cc,v 1.168 2003/07/04 13:52:29 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: server.cc,v 1.169 2003/07/10 00:58:25 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -4011,7 +4011,7 @@ if( serverConnection != 0 )
 ConnectionManager::Poll() ;
 
 // Deallocate the serverConnection
-delete serverConnection ; serverConnection = 0 ;
+// The Connection is deallocated in ConnectionManager::Poll()
 }
 
 } // namespace gnuworld

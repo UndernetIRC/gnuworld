@@ -1,4 +1,4 @@
-# $Id: stats.example.conf.in,v 1.4 2003/06/08 20:26:17 dan_karrels Exp $
+# $Id: stats.example.conf.in,v 1.5 2003/07/10 00:58:23 dan_karrels Exp $
 # conf file for stats bot
 username = ubercow
 nickname = ubercow
@@ -12,7 +12,7 @@ mode = +iok
 logDuringBurst = false
 
 # Path to where you want output files to be placed
-data_path = @bindir@
+data_path = .
 
 part_message = Im too sexy for this channel
 
