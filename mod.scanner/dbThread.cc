@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: dbThread.cc,v 1.1 2002/08/08 21:31:45 dan_karrels Exp $
+ * $Id: dbThread.cc,v 1.2 2002/08/08 21:44:00 dan_karrels Exp $
  */
 
 #include	"gThread.h"
@@ -28,7 +28,6 @@ namespace gnuworld
 {
 
 dbThread::dbThread()
-	: gThread( this )
 {}
 
 dbThread::~dbThread()

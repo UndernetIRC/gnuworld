@@ -17,11 +17,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  * 
- * $Id: gThread.h,v 1.1 2002/08/08 21:31:44 dan_karrels Exp $
+ * $Id: gThread.h,v 1.2 2002/08/08 21:43:59 dan_karrels Exp $
  */
 
 #ifndef __GTHREAD_H
-#define __GTHREAD_H "$Id: gThread.h,v 1.1 2002/08/08 21:31:44 dan_karrels Exp $"
+#define __GTHREAD_H "$Id: gThread.h,v 1.2 2002/08/08 21:43:59 dan_karrels Exp $"
 
 #include	<pthread.h>
 
@@ -46,7 +46,7 @@ protected:
 
 public:
 
-	gThread( gThread* ) ;
+	gThread() ;
 	virtual ~gThread() ;
 
 	virtual bool		Start() ;

@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: scanner.h,v 1.2 2002/08/08 21:31:45 dan_karrels Exp $
+ * $Id: scanner.h,v 1.3 2002/08/08 21:44:00 dan_karrels Exp $
  */
 
 #ifndef __SCANNER_H
@@ -31,10 +31,10 @@
 #include	"dbThread.h"
 #include	"ScannerModule.h"
 
-using std::string ;
-
 namespace gnuworld
 {
+
+using std::string ;
 
 /**
  * A scanner client for gnuworld.  It will attempt to determine if clients
@@ -43,6 +43,8 @@ namespace gnuworld
 class scanner : public xClient
 {
 
+	/// The database interface thread, this thread performs all db
+	/// related processing, including the db communications
 	dbThread		theThread ;
 
 public:

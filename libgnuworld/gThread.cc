@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  * 
- * $Id: gThread.cc,v 1.1 2002/08/08 21:31:44 dan_karrels Exp $
+ * $Id: gThread.cc,v 1.2 2002/08/08 21:43:59 dan_karrels Exp $
  */
 
 #include	<pthread.h>
@@ -51,9 +51,8 @@ theThread->Exec() ;
 return 0 ;
 }
 
-gThread::gThread( gThread* subThread )
+gThread::gThread()
 {
-
 keepRunning = true ;
 isShutdownComplete = false ;
 threadID = 0 ;

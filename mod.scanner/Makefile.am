@@ -1,8 +1,8 @@
 ## Process this file with automake to produce Makefile.in
-# "$Id: Makefile.am,v 1.4 2002/08/08 21:31:45 dan_karrels Exp $"
+# "$Id: Makefile.am,v 1.5 2002/08/08 21:44:00 dan_karrels Exp $"
 
 lib_LTLIBRARIES = libscanner.la
-libscanner_la_SOURCES = ScannerModule.h \
+libscanner_la_SOURCES = ScannerModule.cc \
 	dbThread.cc \
 	scanner.cc \
 	wingateModule.cc

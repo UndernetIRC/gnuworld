@@ -17,11 +17,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ScannerModule.h,v 1.1 2002/08/08 21:31:45 dan_karrels Exp $
+ * $Id: ScannerModule.h,v 1.2 2002/08/08 21:44:00 dan_karrels Exp $
  */
 
 #ifndef __SCANNERMODULE_H
-#define __SCANNERMODULE_H "$Id: ScannerModule.h,v 1.1 2002/08/08 21:31:45 dan_karrels Exp $"
+#define __SCANNERMODULE_H "$Id: ScannerModule.h,v 1.2 2002/08/08 21:44:00 dan_karrels Exp $"
 
 #include	<string>
 
@@ -43,10 +43,6 @@ public:
 	virtual ~ScannerModule() ;
 
 	virtual void	CheckIP( const string& ip ) = 0 ;
-
-	virtual void	OnConnect( Connection* ) ;
-	virtual void	OnConnectFail( Connection* ) ;
-	virtual void	OnRead( Connection*, const string& ) ;
 
 protected:
 
