@@ -1,0 +1,6 @@
+*.la
+*.so
+*.0
+*.log
+gnuworld.pid
+gnuworld
