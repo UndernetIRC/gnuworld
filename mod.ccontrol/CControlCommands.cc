@@ -685,8 +685,8 @@ if( !server->removeGline( st[ 1 ] ) )
 else
 	{
 	// Removal succeeded
-	bot->Notice( theClient, "Removal of gline succeeded" ) ;
-	bot->Wallops( "RemGline: %s", st[ 1 ].c_str() ) ;
+	bot->Notice( theClient, "Removal of gline succeeded\n" ) ;
+	bot->Wallops( "RemGline: %s\n", st[ 1 ].c_str() ) ;
 	}
 
 return true ;
