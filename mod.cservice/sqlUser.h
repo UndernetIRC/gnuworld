@@ -1,7 +1,7 @@
 /* sqlUser.h */
 
 #ifndef __SQLUSER_H
-#define __SQLUSER_H "$Id: sqlUser.h,v 1.4 2000/12/31 05:06:27 gte Exp $"
+#define __SQLUSER_H "$Id: sqlUser.h,v 1.5 2001/01/02 07:55:12 gte Exp $"
 
 #include	<string>
 #include	<ctime>
@@ -66,6 +66,7 @@ protected:
 	flagType	flags ;
 	string		last_update_by ;
 	time_t		last_update ;
+ 
 	PgDatabase*	SQLDb;
 } ;
 

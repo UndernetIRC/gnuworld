@@ -8,7 +8,7 @@
  * Can optionally narrow down selection using a number of switches. (TODO).
  * Can display all channels a user has access on (TODO). 
  *
- * $Id: ACCESSCommand.cc,v 1.5 2000/12/28 21:19:53 gte Exp $
+ * $Id: ACCESSCommand.cc,v 1.6 2001/01/02 07:55:12 gte Exp $
  */
 
 #include	<string>
@@ -18,7 +18,7 @@
 #include	"cservice.h"
 #include	"libpq++.h"
 
-const char ACCESSCommand_cc_rcsId[] = "$Id: ACCESSCommand.cc,v 1.5 2000/12/28 21:19:53 gte Exp $" ;
+const char ACCESSCommand_cc_rcsId[] = "$Id: ACCESSCommand.cc,v 1.6 2001/01/02 07:55:12 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -84,7 +84,7 @@ bool ACCESSCommand::Exec( iClient* theClient, const string& Message )
 		{
 
 			flag = atoi(bot->SQLDb->GetValue(i, 3));
-			duration = ::time(NULL) - atoi(bot->SQLDb->GetValue(i, 4));
+			duration = atoi(bot->SQLDb->GetValue(i, 4));
 			autoOp = (flag & sqlLevel::F_AUTOOP);
 			bot->Notice(theClient, "USER: %s ACCESS: %s", bot->SQLDb->GetValue(i, 1), bot->SQLDb->GetValue(i, 2));
 			bot->Notice(theClient, "CHANNEL: %s -- AUTOOP: %s", bot->SQLDb->GetValue(i, 0), autoOp ? "ON" : "OFF");

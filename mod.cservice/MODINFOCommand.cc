@@ -8,7 +8,7 @@
  *
  * Caveats: None
  *
- * $Id: MODINFOCommand.cc,v 1.1 2000/12/28 05:03:09 gte Exp $
+ * $Id: MODINFOCommand.cc,v 1.2 2001/01/02 07:55:12 gte Exp $
  */
 
 #include	<string>
@@ -18,7 +18,7 @@
 #include	"cservice.h" 
 #include	"levels.h"
 
-const char MODINFOCommand_cc_rcsId[] = "$Id: MODINFOCommand.cc,v 1.1 2000/12/28 05:03:09 gte Exp $" ;
+const char MODINFOCommand_cc_rcsId[] = "$Id: MODINFOCommand.cc,v 1.2 2001/01/02 07:55:12 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -127,7 +127,7 @@ bool MODINFOCommand::Exec( iClient* theClient, const string& Message )
 		if (level <= newAccess)
 		{
 			bot->Notice(theClient, "Cannot give a user higher or equal access to your own.");
-		}
+		} 
 
 	}
  

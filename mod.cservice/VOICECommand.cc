@@ -16,7 +16,7 @@
  *
  * Caveats: None
  *
- * $Id: VOICECommand.cc,v 1.8 2001/01/02 01:27:56 gte Exp $
+ * $Id: VOICECommand.cc,v 1.9 2001/01/02 07:55:12 gte Exp $
  */
 
 #include	<string>
@@ -31,7 +31,7 @@
 
 using std::map ;
 
-const char VOICECommand_cc_rcsId[] = "$Id: VOICECommand.cc,v 1.8 2001/01/02 01:27:56 gte Exp $" ;
+const char VOICECommand_cc_rcsId[] = "$Id: VOICECommand.cc,v 1.9 2001/01/02 07:55:12 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -103,22 +103,29 @@ bool VOICECommand::Exec( iClient* theClient, const string& Message )
 	unsigned short counter = 2; // Offset of first nick in list.
 	unsigned short cont = true;
 	typedef map < iClient*, int > duplicateMapType; 
-	duplicateMapType duplicateMap;
-
-	string::size_type pos = st[2].find_first_of( ',' ) ; 
+	duplicateMapType duplicateMap; 
 	string source;
 	char delim;
 
-	if( string::npos != pos ) // Found a comma?
+	if( st.size() < 3 ) // No nicks provided, assume we op ourself. :)
 	{
-		source = st.assemble(2); // We'll do a comma seperated search then.
-		delim = ',';
-		counter = 0;
-	} else { 
+		voiceList.push_back(theClient);
 		source = Message;
-		delim = ' ';
+		delim = ' '; 
+	} else
+	{
+		string::size_type pos = st[2].find_first_of( ',' ) ; 
+		if( string::npos != pos ) // Found a comma?
+		{
+			source = st.assemble(2); // We'll do a comma seperated search then.
+			delim = ',';
+			counter = 0;
+		} else { 
+			source = Message;
+			delim = ' ';
+		} 
 	}
-
+ 
 	StringTokenizer st2( source, delim ); 
 
 	while (counter < st2.size())

@@ -1,7 +1,7 @@
 /* sqlChannel.h */
 
 #ifndef __SQLCHANNEL_H
-#define __SQLCHANNEL_H "$Id: sqlChannel.h,v 1.8 2001/01/02 01:27:56 gte Exp $"
+#define __SQLCHANNEL_H "$Id: sqlChannel.h,v 1.9 2001/01/02 07:55:12 gte Exp $"
 
 #include	<string>
 #include	<ctime>
@@ -35,6 +35,10 @@ public:
 	static const flagType	F_AUTOTOPIC =	0x8000 ;
 	static const flagType	F_OPONLY =	0x100000 ;
 	static const flagType	F_AUTOJOIN =	0x200000 ;
+
+	/*
+	 *  Methods to get data atrributes.
+	 */ 
 
 	inline const unsigned int&	getID() const
 		{ return id ; }

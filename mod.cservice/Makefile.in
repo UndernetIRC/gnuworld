@@ -10,7 +10,7 @@
 # even the implied warranty of MERCHANTABILITY or FITNESS FOR A
 # PARTICULAR PURPOSE.
 
-# "$Id: Makefile.in,v 1.25 2001/01/01 07:51:58 gte Exp $"
+# "$Id: Makefile.in,v 1.26 2001/01/02 07:55:12 gte Exp $"
 
 
 SHELL = /bin/sh
@@ -118,7 +118,10 @@ libcservice_la_SOURCES = cservice.cc \
 	TOPICCommand.cc \
 	INVITECommand.cc \
 	BANLISTCommand.cc \
-	KICKCommand.cc 
+	KICKCommand.cc \
+	REGISTERCommand.cc \
+	FORCECommand.cc \
+	UNFORCECommand.cc
 INCLUDES = -I/usr/local/pgsql/include
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = ../include/defs.h
@@ -136,7 +139,8 @@ LOGINCommand.lo MOTDCommand.lo RANDOMCommand.lo SEARCHCommand.lo \
 SHOWCOMMANDSCommand.lo SHOWIGNORECommand.lo VERIFYCommand.lo \
 OPCommand.lo DEOPCommand.lo VOICECommand.lo DEVOICECommand.lo \
 ADDUSERCommand.lo REMUSERCommand.lo MODINFOCommand.lo SETCommand.lo \
-TOPICCommand.lo INVITECommand.lo BANLISTCommand.lo KICKCommand.lo
+TOPICCommand.lo INVITECommand.lo BANLISTCommand.lo KICKCommand.lo \
+REGISTERCommand.lo FORCECommand.lo UNFORCECommand.lo
 CXXCOMPILE = $(CXX) $(DEFS) $(INCLUDES) $(CPPFLAGS) $(CXXFLAGS)
 LTCXXCOMPILE = $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(INCLUDES) $(CPPFLAGS) $(CXXFLAGS)
 CXXLINK = $(LIBTOOL) --mode=link $(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@
@@ -149,13 +153,14 @@ TAR = tar
 GZIP = --best
 DEP_FILES =  .deps/ACCESSCommand.P .deps/ADDUSERCommand.P \
 .deps/BANLISTCommand.P .deps/CHANINFOCommand.P .deps/DEOPCommand.P \
-.deps/DEVOICECommand.P .deps/INVITECommand.P .deps/ISREGCommand.P \
-.deps/KICKCommand.P .deps/LOGINCommand.P .deps/MODINFOCommand.P \
-.deps/MOTDCommand.P .deps/OPCommand.P .deps/RANDOMCommand.P \
-.deps/REMUSERCommand.P .deps/SEARCHCommand.P .deps/SETCommand.P \
-.deps/SHOWCOMMANDSCommand.P .deps/SHOWIGNORECommand.P \
-.deps/TOPICCommand.P .deps/VERIFYCommand.P .deps/VOICECommand.P \
-.deps/cservice.P .deps/sqlChannel.P .deps/sqlLevel.P .deps/sqlUser.P
+.deps/DEVOICECommand.P .deps/FORCECommand.P .deps/INVITECommand.P \
+.deps/ISREGCommand.P .deps/KICKCommand.P .deps/LOGINCommand.P \
+.deps/MODINFOCommand.P .deps/MOTDCommand.P .deps/OPCommand.P \
+.deps/RANDOMCommand.P .deps/REGISTERCommand.P .deps/REMUSERCommand.P \
+.deps/SEARCHCommand.P .deps/SETCommand.P .deps/SHOWCOMMANDSCommand.P \
+.deps/SHOWIGNORECommand.P .deps/TOPICCommand.P .deps/UNFORCECommand.P \
+.deps/VERIFYCommand.P .deps/VOICECommand.P .deps/cservice.P \
+.deps/sqlChannel.P .deps/sqlLevel.P .deps/sqlUser.P
 CXXMKDEP = $(CXX) -M $(DEFS) $(INCLUDES) $(CPPFLAGS) $(CXXFLAGS)
 SOURCES = $(libcservice_la_SOURCES)
 OBJECTS = $(libcservice_la_OBJECTS)

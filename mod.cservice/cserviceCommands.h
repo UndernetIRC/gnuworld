@@ -1,5 +1,5 @@
 #ifndef __CSERVICECOMMANDS_H
-#define __CSERVICECOMMANDS_H "$Id: cserviceCommands.h,v 1.11 2001/01/01 07:51:58 gte Exp $"
+#define __CSERVICECOMMANDS_H "$Id: cserviceCommands.h,v 1.12 2001/01/02 07:55:12 gte Exp $"
 
 #include	<string>
 #include	"iClient.h"
@@ -88,6 +88,12 @@ DECLARE_COMMAND( INVITE )
 DECLARE_COMMAND( TOPIC )
 DECLARE_COMMAND( BANLIST )
 DECLARE_COMMAND( KICK )
+
+// Admin level commands.
+
+DECLARE_COMMAND( REGISTER )
+DECLARE_COMMAND( FORCE )
+DECLARE_COMMAND( UNFORCE )
  
 } // namespace gnuworld
 

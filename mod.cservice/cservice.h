@@ -1,5 +1,5 @@
 #ifndef __CSERVICE_H
-#define __CSERVICE_H "$Id: cservice.h,v 1.15 2000/12/30 23:32:34 gte Exp $"
+#define __CSERVICE_H "$Id: cservice.h,v 1.16 2001/01/02 07:55:12 gte Exp $"
 
 #include	<string>
 #include	<vector>
@@ -91,6 +91,9 @@ public:
 
 	// Fetch a channel record for a channel.
 	sqlChannel* getChannelRecord( const string& );
+
+	// Fetch a access level record for a user/channel combo.
+	sqlLevel* getLevelRecord(sqlUser*, sqlChannel*);
 
 	const string& prettyDuration( int );
  

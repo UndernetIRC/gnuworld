@@ -8,7 +8,7 @@
  *
  * Caveats: None
  *
- * $Id: ADDUSERCommand.cc,v 1.2 2000/12/28 01:21:42 gte Exp $
+ * $Id: ADDUSERCommand.cc,v 1.3 2001/01/02 07:55:12 gte Exp $
  */
  
 #include	<string>
@@ -19,7 +19,7 @@
 #include	"levels.h"
 #include	"libpq++.h"
 
-const char ADDUSERCommand_cc_rcsId[] = "$Id: ADDUSERCommand.cc,v 1.2 2000/12/28 01:21:42 gte Exp $" ;
+const char ADDUSERCommand_cc_rcsId[] = "$Id: ADDUSERCommand.cc,v 1.3 2001/01/02 07:55:12 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -41,6 +41,14 @@ bool ADDUSERCommand::Exec( iClient* theClient, const string& Message )
 	ExecStatusType status;
 	int targetAccess = atoi(st[3].c_str());
 
+	/*
+	 *  Fetch the sqlUser record attached to this client. If there isn't one,
+	 *  they aren't logged in - tell them they should be.
+	 */
+
+	sqlUser* theUser = bot->isAuthed(theClient, true);
+	if (!theUser) return false; 
+
  	/*
 	 *  First, check the channel is registered.
 	 */
@@ -50,14 +58,6 @@ bool ADDUSERCommand::Exec( iClient* theClient, const string& Message )
 		bot->Notice(theClient, "Sorry, %s isn't registered with me.", st[1].c_str());
 		return false;
 	} 
-
-	/*
-	 *  Fetch the sqlUser record attached to this client. If there isn't one,
-	 *  they aren't logged in - tell them they should be.
-	 */
-
-	sqlUser* theUser = bot->isAuthed(theClient, true);
-	if (!theUser) return false; 
  
 	/*
 	 *  Check the user has sufficient access on this channel.
@@ -101,11 +101,29 @@ bool ADDUSERCommand::Exec( iClient* theClient, const string& Message )
 	 *  Check this user doesn't already have access on this channel.
 	 */
 
-	level = bot->getAccessLevel(targetUser, theChan);
-	if (level != 0)
+	sqlLevel* newLevel;
+	newLevel = bot->getLevelRecord(targetUser, theChan);
+	int levelTest = newLevel ? newLevel->getAccess() : 0;
+
+	if (levelTest != 0)
 	{
-		bot->Notice(theClient, "%s is already added to %s with access level %i.", targetUser->getUserName().c_str(), theChan->getName().c_str(), level);
-		return false;
+		/*
+		 *  If the current access is Forced via FORCE, then allow the addition anyway..
+		 */
+		
+		if (!newLevel->getForced()) 
+		{ 
+			bot->Notice(theClient, "%s is already added to %s with access level %i.", targetUser->getUserName().c_str(), theChan->getName().c_str(), levelTest);
+			return false;
+		}
+
+		sqlLevel testLevel(bot->SQLDb);
+		if (testLevel.loadData(targetUser->getID(), theChan->getID()))
+		{
+			// If a forced person is trying to add themselves and they are already in the DB..
+			bot->Notice(theClient, "%s is already added to %s with access level %i.", targetUser->getUserName().c_str(), theChan->getName().c_str(), levelTest);
+			return false;
+		}
 	}
  
 	/*

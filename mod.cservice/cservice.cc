@@ -121,6 +121,10 @@ cservice::cservice(const string& args)
     RegisterCommand(new BANLISTCommand(this, "BANLIST", "<#channel>"));
     RegisterCommand(new KICKCommand(this, "KICK", "<#channel> <nick> <reason>"));
 
+    RegisterCommand(new REGISTERCommand(this, "REGISTER", "<#channel>"));
+    RegisterCommand(new FORCECommand(this, "FORCE", "<#channel>"));
+    RegisterCommand(new UNFORCECommand(this, "UNFORCE", "<#channel>"));
+
 	//-- Load in our cservice configuration file. 
 	cserviceConfig = new EConfig( args ) ;
 	string sqlHost = cserviceConfig->Require( "sql_host" )->second;
@@ -269,7 +273,7 @@ int cservice::OnCTCP( iClient* theClient, const string& CTCP,
 
 	if(Command == "VERSION")
 	{
-		xClient::DoCTCP(theClient, CTCP.c_str(), "Undernet Channel Services Version 2 [" __DATE__ " " __TIME__ "] ($Id: cservice.cc,v 1.26 2001/01/02 01:27:56 gte Exp $)");
+		xClient::DoCTCP(theClient, CTCP.c_str(), "Undernet Channel Services Version 2 [" __DATE__ " " __TIME__ "] ($Id: cservice.cc,v 1.27 2001/01/02 07:55:12 gte Exp $)");
 		return true;
 	}
  
@@ -366,6 +370,38 @@ sqlChannel* cservice::getChannelRecord(const string& id)
 	delete theChan;
 	return 0;
 } 
+
+sqlLevel* cservice::getLevelRecord( sqlUser* theUser, sqlChannel* theChan )
+{
+	// Check if the record is already in the cache.
+	pair<int, int> thePair;
+	thePair = make_pair(theUser->getID(), theChan->getID());
+
+	sqlLevelHashType::iterator ptr = sqlLevelCache.find(thePair);
+	if(ptr != sqlLevelCache.end()) // Found something!
+	{ 
+		elog << "cmaster::getAccessLevel> Cache hit for user-id:chan-id " << theUser->getID() << ":" << theChan->getID() << endl;
+		levelCacheHits++;
+		return ptr->second ;
+	} 
+
+	/*
+	 *  We didn't find anything in the cache, fetch the data from
+	 *  the backend and create a new sqlUser object.
+	 */
+
+	sqlLevel* theLevel = new sqlLevel(SQLDb);
+ 
+	if (theLevel->loadData(theUser->getID(), theChan->getID())) {
+	 	sqlLevelCache.insert(sqlLevelHashType::value_type(thePair, theLevel));
+		elog << "cmaster::getLevelRecord> There are " << sqlLevelCache.size() << " elements in the cache." << endl;
+		levelHits++;
+		return theLevel;
+	}
+
+	delete theLevel;
+	return 0;
+}	
  
 short cservice::getAccessLevel( sqlUser* theUser, sqlChannel* theChan )
 {
@@ -374,16 +410,16 @@ short cservice::getAccessLevel( sqlUser* theUser, sqlChannel* theChan )
 	 *  channel.
 	 */
 
-	sqlLevel theLevel(SQLDb);
-	if(theLevel.loadData(theUser->getID(), theChan->getID()))
+	sqlLevel* theLevel = getLevelRecord(theUser, theChan);
+	if(theLevel)
 	{
-		return theLevel.getAccess();
+		return theLevel->getAccess();
 	}
 
 	// By default, users have level 0 access on a channel.
 	return 0;
 }
-
+ 
 const string& cservice::getResponse( sqlUser* theUser, int response_id )
 { 
 	/*
