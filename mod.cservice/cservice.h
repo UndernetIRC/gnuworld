@@ -1,5 +1,5 @@
 #ifndef __CSERVICE_H
-#define __CSERVICE_H "$Id: cservice.h,v 1.21 2001/01/12 22:49:24 dan_karrels Exp $"
+#define __CSERVICE_H "$Id: cservice.h,v 1.22 2001/01/13 14:49:38 gte Exp $"
 
 #include	<string>
 #include	<vector>
@@ -130,6 +130,7 @@ public:
 	typedef hash_map< string, sqlChannel*, eHash, eqstr > sqlChannelHashType ;
 	typedef map < pair <int, int>, sqlLevel* > sqlLevelHashType ;
 
+//	typedef priority_queue < unsigned int vector< string >, less <unsigned int > > silenceListType;
 	// Cache of user records.
 	sqlUserHashType sqlUserCache;
 

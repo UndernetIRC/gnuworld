@@ -8,7 +8,7 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char FORCECommand_cc_rcsId[] = "$Id: FORCECommand.cc,v 1.3 2001/01/03 05:33:02 gte Exp $" ;
+const char FORCECommand_cc_rcsId[] = "$Id: FORCECommand.cc,v 1.4 2001/01/13 14:49:38 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -86,7 +86,8 @@ bool FORCECommand::Exec( iClient* theClient, const string& Message )
 	newLevel->setChannelId(theChan->getID());
 	newLevel->setUserId(theUser->getID());
 	newLevel->setAccess(admLevel); 
-	newLevel->setFlag(sqlLevel::F_FORCED);
+	newLevel->setFlag(sqlLevel::F_FORCED); 
+	newLevel->setSuspendExpire(0);
 
 	/*
 	 *  Add it to the cache.

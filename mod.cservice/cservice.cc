@@ -437,7 +437,7 @@ int cservice::OnCTCP( iClient* theClient, const string& CTCP,
 
 	if(Command == "VERSION")
 	{
-		xClient::DoCTCP(theClient, CTCP.c_str(), "Undernet P10 Channel Services Version 2 [" __DATE__ " " __TIME__ "] ($Id: cservice.cc,v 1.37 2001/01/12 22:49:24 dan_karrels Exp $)");
+		xClient::DoCTCP(theClient, CTCP.c_str(), "Undernet P10 Channel Services Version 2 [" __DATE__ " " __TIME__ "] ($Id: cservice.cc,v 1.38 2001/01/13 14:49:38 gte Exp $)");
 		return true;
 	}
  
@@ -617,6 +617,7 @@ short cservice::getAccessLevel( sqlUser* theUser, sqlChannel* theChan )
 					theChan->getName().c_str());
 			return 0;
 		}
+
 		if (theLevel->getSuspendExpire() != 0)
 		{
 			// Send them a notice.
