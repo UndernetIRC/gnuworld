@@ -17,7 +17,7 @@
  */
 
 #ifndef __XSERVER_H
-#define __XSERVER_H "$Id: server.h,v 1.14 2000/12/09 22:52:42 dan_karrels Exp $"
+#define __XSERVER_H "$Id: server.h,v 1.15 2000/12/13 23:22:22 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
@@ -412,7 +412,7 @@ public:
 	 * channel events.
 	 */
 	virtual void PostChannelEvent( const channelEventType&,
-		const string& chanName,
+		Channel* theChan,
 		void* = 0, void* = 0, void* = 0, void* = 0 ) ;
 
 	/**

@@ -48,22 +48,18 @@ return xClient::BurstChannels() ;
 }
 
 int gnutest::OnChannelEvent( const channelEventType& whichEvent,
-	const string& chanName,
+	Channel* theChan,
 	void* data1, void* data2, void* data3, void* data4 )
 {
 
-if( chanName != operChan )
+if( theChan->getName() != operChan )
 	{
 	elog	<< "gnutest::OnChannelEvent> Got bad channel: "
-		<< chanName << endl ;
+		<< theChan->getName() << endl ;
 	return 0 ;
 	}
 
-//elog	<< "gnutest::OnChannelEvent> Got channel: "
-//	<< chanName << endl ;
-
 iClient* theClient = 0 ;
-Channel* theChan = 0 ;
 
 switch( whichEvent )
 	{
@@ -71,8 +67,7 @@ switch( whichEvent )
 //		elog	<< "gnutest::OnChannelEvent> EVT_CREATE\n" ;
 	case EVT_JOIN:
 //		elog	<< "gnutest::OnChannelEvent> Got EVT_JOIN\n" ;
-		theChan = static_cast< Channel* >( data1 ) ;
-		theClient = static_cast< iClient* >( data2 ) ;
+		theClient = static_cast< iClient* >( data1 ) ;
 
 		if( theClient->isOper() )
 			{
@@ -83,8 +78,8 @@ switch( whichEvent )
 		break ;
 	}
 
-return xClient::OnChannelEvent( whichEvent, chanName, data1, data2,
-	data3, data4 ) ;
+return xClient::OnChannelEvent( whichEvent, theChan,
+	data1, data2, data3, data4 ) ;
 }
 
 int gnutest::OnEvent( const eventType& whichEvent,

@@ -1,13 +1,14 @@
 /* gnutest.h */
 
 #ifndef __GNUTEST_H
-#define __GNUTEST_H "$Id: gnutest.h,v 1.3 2000/08/05 17:23:34 dan_karrels Exp $"
+#define __GNUTEST_H "$Id: gnutest.h,v 1.1 2000/12/13 23:22:23 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
 
 #include	"client.h"
 #include	"iClient.h"
+#include	"Channel.h"
 
 namespace gnuworld
 {
@@ -23,7 +24,7 @@ public:
 	virtual ~gnutest() ;
 
 	virtual int	OnChannelEvent( const channelEventType&,
-		const string&,
+		Channel*,
 		void* data1 = 0, void* data2 = 0,
 		void* data3 = 0, void* data4 = 0 ) ;
 

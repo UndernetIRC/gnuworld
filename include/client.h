@@ -3,7 +3,7 @@
  */
 
 #ifndef __XCLIENT_H
-#define __XCLIENT_H "$Id: client.h,v 1.9 2000/11/02 19:24:29 dan_karrels Exp $"
+#define __XCLIENT_H "$Id: client.h,v 1.10 2000/12/13 23:22:22 dan_karrels Exp $"
 
 #include	<string>
 
@@ -153,7 +153,7 @@ public:
 	 * event occurs.
 	 */
 	virtual int OnChannelEvent( const channelEventType&,
-		const string& chanName,
+		Channel*,
 		void* Data1 = NULL, void* Data2 = NULL,
 		void* Data3 = NULL, void* Data4 = NULL ) ;
 

@@ -21,7 +21,7 @@
 #include	"ccontrol.h"
  
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.2 2000/12/10 04:15:56 gte Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.3 2000/12/13 23:22:22 dan_karrels Exp $" ;
 
 using std::string ;
 using std::vector ;
@@ -253,22 +253,21 @@ return xClient::OnEvent( theEvent, Data1, Data2, Data3, Data4 ) ;
 }
 
 int ccontrol::OnChannelEvent( const channelEventType& theEvent,
-	const string& chanName,
+	Channel* theChan,
 	void* Data1, void* Data2, void* Data3, void* Data4 )
 {
 
 switch( theEvent )
 	{
 	case EVT_JOIN:
-		if( !isOperChan( chanName ) )
+		if( !isOperChan( theChan ) )
 			{
 			// We really don't care otherwise
 			// Note, this shouldn't happen
 			break ;
 			}
 
-		Channel* theChan = static_cast< Channel* >( Data1 ) ;
-		iClient* theClient = static_cast< iClient* >( Data2 ) ;
+		iClient* theClient = static_cast< iClient* >( Data1 ) ;
 		if( theClient->isOper() )
 			{
 			Op( theChan, theClient ) ;
@@ -277,8 +276,8 @@ switch( theEvent )
 	}
 
 // Call the base class OnChannelEvent()
-return xClient::OnChannelEvent( theEvent, chanName, Data1,
-	Data2, Data3, Data4 ) ;
+return xClient::OnChannelEvent( theEvent, theChan,
+	Data1, Data2, Data3, Data4 ) ;
 }
 
 bool ccontrol::isOperChan( const string& theChan ) const
@@ -294,6 +293,15 @@ while( ptr != end )
 	++ptr ;
 	}
 return false ;
+}
+
+bool ccontrol::isOperChan( const Channel* theChan ) const
+{
+#ifndef NDEBUG
+  assert( theChan != 0 ) ;
+#endif
+
+return isOperChan( theChan->getName() ) ;
 }
 
 // This method does NOT add the channel to any internal tables

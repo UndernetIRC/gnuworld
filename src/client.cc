@@ -27,7 +27,7 @@
 #include	"events.h"
 
 const char xClient_h_rcsId[] = __XCLIENT_H ;
-const char xClient_cc_rcsId[] = "$Id: client.cc,v 1.13 2000/11/02 19:24:29 dan_karrels Exp $" ;
+const char xClient_cc_rcsId[] = "$Id: client.cc,v 1.14 2000/12/13 23:22:23 dan_karrels Exp $" ;
 
 using std::string ;
 using std::strstream ;
@@ -377,7 +377,7 @@ int xClient::OnEvent( const eventType&, void*, void*, void*, void* )
 return 0;
 }
 
-int xClient::OnChannelEvent( const channelEventType&, const string&,
+int xClient::OnChannelEvent( const channelEventType&, Channel*,
 	void*, void*, void*, void* )
 {
 return 0 ;

@@ -1,5 +1,5 @@
 /* main.cc
- * $Id: main.cc,v 1.12 2000/12/09 22:01:11 dan_karrels Exp $
+ * $Id: main.cc,v 1.13 2000/12/13 23:22:23 dan_karrels Exp $
  */
 
 #include	<fstream>
@@ -14,11 +14,6 @@
 #include	"config.h"
 #include	"ELog.h"
 #include	"Network.h"
-//#include	"ccontrol.h"
-#include	"cloner.h"
-#include	"clientExample.h"
-#include	"stats.h"
-#include	"gnutest.h"
 #include	"FileSocket.h" 
 #include	"moduleLoader.h"
 
@@ -29,7 +24,7 @@
 using namespace gnuworld ;
 
 const char config_h_rcsId[] = __CONFIG_H ;
-const char main_cc_rcsId[] = "$Id: main.cc,v 1.12 2000/12/09 22:01:11 dan_karrels Exp $" ;
+const char main_cc_rcsId[] = "$Id: main.cc,v 1.13 2000/12/13 23:22:23 dan_karrels Exp $" ;
 
 using std::cerr ;
 using std::clog ;

@@ -43,7 +43,7 @@
 #include	"moduleLoader.h"
 
 const char xServer_h_rcsId[] = __XSERVER_H ;
-const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.31 2000/12/09 22:01:11 dan_karrels Exp $" ;
+const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.32 2000/12/13 23:22:23 dan_karrels Exp $" ;
 
 using std::string ;
 using std::vector ;
@@ -1058,26 +1058,28 @@ for( ; ptr != end ; ++ptr )
  *  particular order.
  */
 void xServer::PostChannelEvent( const channelEventType& theEvent,
-	const string& chanName,
+	Channel* theChan,
 	void* Data1, void* Data2,
 	void* Data3, void* Data4 )
 {
 
 // First deliver this channel event to any listeners for all channel
 // events.
-channelEventMapType::iterator allChanPtr = channelEventMap.find( CHANNEL_ALL ) ;
+channelEventMapType::iterator allChanPtr =
+	channelEventMap.find( CHANNEL_ALL ) ;
 if( allChanPtr != channelEventMap.end() )
 	{
 	for( list< xClient* >::iterator ptr = allChanPtr->second->begin(),
 		endPtr = allChanPtr->second->end() ; ptr != endPtr ; ++ptr )
 		{
-		(*ptr)->OnChannelEvent( theEvent, chanName,
+		(*ptr)->OnChannelEvent( theEvent, theChan,
 			Data1, Data2, Data3, Data4 ) ;
 		}
 	}
 
 // Find listeners for this specific channel
-channelEventMapType::iterator chanPtr = channelEventMap.find( chanName ) ;
+channelEventMapType::iterator chanPtr =
+	channelEventMap.find( theChan->getName() ) ;
 if( chanPtr == channelEventMap.end() )
 	{
 	// No listeners for this channel's events
@@ -1090,7 +1092,7 @@ list< xClient* >* listPtr = chanPtr->second ;
 for( list< xClient* >::iterator ptr = listPtr->begin(), end = listPtr->end() ;
 	ptr != end ; ++ptr )
 	{
-	(*ptr)->OnChannelEvent( theEvent, chanName,
+	(*ptr)->OnChannelEvent( theEvent, theChan,
 		Data1, Data2, Data3, Data4 ) ;
 	}
 }
@@ -1956,8 +1958,7 @@ for( StringTokenizer::size_type i = 0 ; i < st.size() ; ++i )
 	// TODO: Update message posting
 	// TODO: Check if channel is empty, remove if so
 
-	PostChannelEvent( EVT_PART, theChan->getName(),
-		static_cast< void* >( theChan ),
+	PostChannelEvent( EVT_PART, theChan,
 		static_cast< void* >( theClient ) ) ;
 
 	// Is the channel now empty, and no services clients are
@@ -2026,8 +2027,7 @@ for( StringTokenizer::size_type i = 0 ; i < st.size() ; ++i )
 	// TODO: Update message posting
 	// TODO: Check if channel is empty, remove if so
 
-	PostChannelEvent( EVT_PART, theChan->getName(),
-		static_cast< void* >( theChan ),
+	PostChannelEvent( EVT_PART, theChan,
 		static_cast< void* >( theClient ) ) ;
 
 	if( theChan->empty() && !Network->servicesOnChannel( theChan ) )
@@ -2104,8 +2104,7 @@ theClient->removeChannel( theChan ) ;
 
 // All we really have to do here is post the message.
 // TODO: Send the source of the kick
-PostChannelEvent( EVT_KICK, theChan->getName(),
-	static_cast< void* >( theChan ),
+PostChannelEvent( EVT_KICK, theChan,
 	static_cast< void* >( theClient ) ) ;
 
 // Any users or services clients left in the channel?
@@ -2257,8 +2256,7 @@ for( StringTokenizer::const_iterator ptr = st.begin() ; ptr != st.end() ;
 	theClient->addChannel( theChan ) ;
 
 	// Notify all listening xClients of this event
-	PostChannelEvent( EVT_CREATE, theChan->getName(),
-		static_cast< void* >( theChan ),
+	PostChannelEvent( EVT_CREATE, theChan,
 		static_cast< void* >( theClient ) ) ;
 
 	// TODO: Post event that the user joins the channel,
@@ -2276,8 +2274,7 @@ void xServer::userPartAllChannels( iClient* theClient )
 for( iClient::channelIterator ptr = theClient->channels_begin(),
 	endPtr = theClient->channels_end() ; ptr != endPtr ; ++ptr )
 	{
-	PostChannelEvent( EVT_PART, (*ptr)->getName(),
-		static_cast< void* >( *ptr ), // Channel*
+	PostChannelEvent( EVT_PART, *ptr,
 		static_cast< void* >( theClient ) ) ; // iClient*
 		delete (*ptr)->removeUser( theClient->getIntYY() ) ;
 
@@ -2460,8 +2457,7 @@ for( StringTokenizer::size_type i = 0 ; i < st.size() ; i++ )
 
 	// Post the event to the clients listening for events on this
 	// channel, if any.
-	PostChannelEvent( whichEvent, theChan->getName(),
-		static_cast< void* >( theChan ),
+	PostChannelEvent( whichEvent, theChan,
 		static_cast< void* >( Target ) ) ;
 
 	// TODO: Update event posting so that CREATE is also
@@ -2589,8 +2585,7 @@ for( StringTokenizer::size_type i = 0 ; i < st.size() ; i++ )
 
 	// Post the event to the clients listening for events on this
 	// channel, if any.
-	PostChannelEvent( EVT_JOIN, theChan->getName(),
-		static_cast< void* >( theChan ),
+	PostChannelEvent( EVT_JOIN, theChan,
 		static_cast< void* >( Target ) ) ;
 
 	} // for()
@@ -3981,8 +3976,7 @@ if( '#' == Param[ 1 ][ 0 ] )
 
 	string modes( Param[ 2 ] ) ;
 
-	PostChannelEvent( EVT_MODE, theChan->getName(),
-		static_cast< void* >( theChan ),
+	PostChannelEvent( EVT_MODE, theChan,
 		static_cast< void* >( clientSource ),
 		static_cast< void* >( &modes ) ) ;
 
@@ -4114,8 +4108,7 @@ if( '#' == Param[ 1 ][ 0 ] )
 
 	string modes( Param[ 2 ] ) ;
 
-	PostChannelEvent( EVT_MODE, theChan->getName(),
-		static_cast< void* >( theChan ),
+	PostChannelEvent( EVT_MODE, theChan,
 		static_cast< void* >( clientSource ),
 		static_cast< void* >( &modes ) ) ;
 

@@ -3,7 +3,7 @@
  */
 
 #ifndef __CCONTROL_H
-#define __CCONTROL_H "$Id: ccontrol.h,v 1.1 2000/12/09 22:01:11 dan_karrels Exp $"
+#define __CCONTROL_H "$Id: ccontrol.h,v 1.2 2000/12/13 23:22:22 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
@@ -86,7 +86,7 @@ public:
 	 * to receive channel events.
 	 */
 	virtual int OnChannelEvent( const channelEventType&,
-		const string&,
+		Channel*,
 		void* = 0, void* = 0,
 		void* = 0, void* = 0 ) ;
 
@@ -102,7 +102,13 @@ public:
 	 * Return true if the given channel name corresponds to a
 	 * channel which is an IRCoperator only channel.
 	 */
-	inline bool isOperChan( const string& theChan ) const ;
+	inline bool isOperChan( const string& chanName ) const ;
+
+	/**
+	 * Return true if the given channel corresponds to a
+	 * channel which is an IRCoperator only channel.
+	 */
+	inline bool isOperChan( const Channel* theChan ) const ;
 
 	/**
 	 * Return true if this client is on the given channel.
