@@ -11,7 +11,7 @@
  *
  * Caveats: None.
  *
- * $Id: BANLISTCommand.cc,v 1.13 2001/03/19 22:29:24 gte Exp $
+ * $Id: BANLISTCommand.cc,v 1.14 2001/03/19 22:32:46 gte Exp $
  */
 
 #include        <string>
@@ -22,7 +22,7 @@
 #include        "levels.h"
 #include        "responses.h"
 
-const char BANLISTCommand_cc_rcsId[] = "$Id: BANLISTCommand.cc,v 1.13 2001/03/19 22:29:24 gte Exp $" ;
+const char BANLISTCommand_cc_rcsId[] = "$Id: BANLISTCommand.cc,v 1.14 2001/03/19 22:32:46 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -61,7 +61,7 @@ for(iClient::const_channelIterator ptr = theClient->channels_begin();
 	} // for()
 
 /* Do only show the banlist, if the user is in the channel. */
-if( !inChan || (theUser && !(bot->getAdminAccessLevel(theUser)>0) ) )
+if( !inChan )
 	{
 	bot->Notice(theClient, 
 	bot->getResponse(theUser,
