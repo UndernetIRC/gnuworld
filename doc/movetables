@@ -1,0 +1,46 @@
+#!/bin/bash
+
+#------------------------------------------------------------------------------------
+#-- "$Id: movetables,v 1.1 2001/11/24 04:37:43 nighty Exp $"
+#-- WARNING:!!!
+#--                This script shall ONLY be used if you have something else
+#--                than 'exceptions','ips' or 'webcookies' in your local database
+#--                and you want to move all that should be now in 'remote' to its
+#--                destination.
+#--
+#--
+#-- nighty <nighty@undernet.org>
+
+
+#--
+#-- Edit the following 3 variables
+
+PGBINDIR="/usr/local/pgsql/bin"
+SRCDB="dbname@127.0.0.1"
+DSTDB="dbname@127.0.0.1"
+
+#--
+#--
+
+
+
+
+
+echo "TableUpdate 1.0"
+echo "--"
+
+TABLESTOMOVE="pending_pwreset helpmgr_users pending_mgrchange xatadmins"
+
+for i in $TABLESTOMOVE; do
+	TMPFILE="/tmp/tmpmovtable.$$"
+	$PGBINDIR/pg_dump -x -t $i $SRCDB > $TMPFILE
+	$PGBINDIR/psql $DSTDB < $TMPFILE
+	echo "** moved table '$i' from $SRCDB to $DSTDB."
+	rm -f $TMPFILE
+done
+
+echo ">> Job finished !@#."
+echo " "
+
+exit 0
+

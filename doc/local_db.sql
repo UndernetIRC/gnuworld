@@ -1,7 +1,12 @@
 ------------------------------------------------------------------------------------
--- "$Id: local_db.sql,v 1.11 2001/11/24 04:19:46 nighty Exp $"
+-- "$Id: local_db.sql,v 1.12 2001/11/24 04:37:43 nighty Exp $"
 -- Channel service DB SQL file for PostgreSQL.
 --
+-- .. if you wonder why some tables have moved and you have them here when
+-- you set up your dbs, then you may need to have a look in the script 'movetables'
+-- after you modified the parameters in it to fit your configuration, run it to
+-- properly move your tables from the 'local' db to the 'remote' db.
+-- If you use a single db for both cservice*.sql and local_db.sql then just dont run anything.
 --
 -- nighty <nighty@undernet.org>
 
