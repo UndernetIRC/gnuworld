@@ -1,5 +1,5 @@
 #ifndef __CSERVICE_H
-#define __CSERVICE_H "$Id: cservice.h,v 1.45 2001/02/10 23:34:02 gte Exp $"
+#define __CSERVICE_H "$Id: cservice.h,v 1.46 2001/02/12 05:42:55 isomer Exp $"
 
 #include	<string>
 #include	<vector>
@@ -220,7 +220,7 @@ public:
 	// Language translations table (Loaded from Db).
 	typedef map < pair <int, int>, string > translationTableType ;
 	translationTableType translationTable;
-
+	
 	void loadTranslationTable();
 
 	// Method to retrieve a translation string.

@@ -610,7 +610,7 @@ else if(Command == "VERSION")
 	xClient::DoCTCP(theClient, CTCP,
 		"Undernet P10 Channel Services Version 2 ["
 		__DATE__ " " __TIME__
-		"] ($Id: cservice.cc,v 1.96 2001/02/10 23:34:02 gte Exp $)");
+		"] ($Id: cservice.cc,v 1.97 2001/02/12 05:42:55 isomer Exp $)");
 	}
 else if(Command == "PROBLEM?")
 	{
@@ -2060,15 +2060,34 @@ return dbTimeOffset + ::time(NULL);
 
 int cservice::Notice( const iClient* Target, const string& Message )
 {
+int count=0;
 if( Connected && MyUplink )
 	{
 	setOutputTotal( Target, getOutputTotal(Target) + Message.size() );
-	return MyUplink->Write( "%s O %s :%s\r\n",
+	char buffer[512];
+	char *b=buffer;
+	const char *m;
+	for (m=Message.c_str();m!=0;m++) 
+		{
+		if (*m == '\n' || *m == '\r') 
+			{
+			count+=MyUplink->Write( "%s O %s :%s\r\n",
+				getCharYYXXX().c_str(),
+				Target->getCharYYXXX().c_str(),
+				buffer ) ; 
+			*b='\0';
+			b=buffer;
+			}
+		else
+			*(b++)=*m;
+		}
+	count+=MyUplink->Write( "%s O %s :%s\r\n",
 		getCharYYXXX().c_str(),
 		Target->getCharYYXXX().c_str(),
-		Message.c_str() ) ; 
+		buffer ) ; 
 	}
-return -1 ;
+	
+return count ;
 }
 
 int cservice::Notice( const iClient* Target, const char* Message, ... )

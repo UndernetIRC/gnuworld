@@ -9,7 +9,7 @@
 #include	"levels.h"
 
  
-const char VERIFYCommand_cc_rcsId[] = "$Id: VERIFYCommand.cc,v 1.11 2001/01/24 01:13:52 gte Exp $" ;
+const char VERIFYCommand_cc_rcsId[] = "$Id: VERIFYCommand.cc,v 1.12 2001/02/12 05:42:55 isomer Exp $" ;
 
 namespace gnuworld
 {
@@ -32,6 +32,13 @@ bool VERIFYCommand::Exec( iClient* theClient, const string& Message )
 	if(!target) {
 		bot->Notice(theClient, "Sorry, I don't see %s anywhere.", st[1].c_str());
 		return false;
+	}
+        
+        if (target->getMode(iClient::MODE_SERVICES)) {
+   		bot->Notice(theClient, 
+			"%s is an Official Undernet Service Bot.",
+                	target->getNickName().c_str());
+                return false;
 	}
 
 	sqlUser* theUser = bot->isAuthed(target, false);
