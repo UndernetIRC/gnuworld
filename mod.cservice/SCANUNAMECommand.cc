@@ -74,7 +74,7 @@ string uname = string_lower(st[1]);
 
 stringstream scanunameQuery;
 scanunameQuery << "SELECT user_name, signup_ip FROM users WHERE "
-                << "lower(user_name) LIKE '" << escapeSQLChars(searchSQL(uname)) << "'"
+                << "lower(user_name) LIKE '" << escapeSQLChars(searchSQL(uname)) << "' LIMIT 50"
                 << ends;
 
 ExecStatusType status = bot->SQLDb->Exec( scanunameQuery.str().c_str() ) ;
@@ -89,7 +89,7 @@ if( PGRES_TUPLES_OK != status )
 
 bot->Notice(theClient,"Found %i matches", bot->SQLDb->Tuples());
 
-if( bot->SQLDb->Tuples() > 50 )
+if( bot->SQLDb->Tuples() >= 50 )
 	{
 	bot->Notice(theClient, "More then 50 matches were found, please visit the website.");
 	return false;

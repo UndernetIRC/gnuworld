@@ -75,7 +75,7 @@ string host = string_lower(st[1]);
 stringstream scanhostQuery;
 scanhostQuery << "SELECT users.user_name, users_lastseen.last_hostmask FROM users, users_lastseen WHERE "
                 << "users.id = users_lastseen.user_id AND "
-		<< "lower(users_lastseen.last_hostmask) LIKE '" << escapeSQLChars(searchSQL(host)) << "'"
+		<< "lower(users_lastseen.last_hostmask) LIKE '" << escapeSQLChars(searchSQL(host)) << "' LIMIT 50"
                 << ends;
 
 ExecStatusType status = bot->SQLDb->Exec( scanhostQuery.str().c_str() ) ;
@@ -90,7 +90,7 @@ if( PGRES_TUPLES_OK != status )
 
 bot->Notice(theClient,"Found %i matches", bot->SQLDb->Tuples());
 
-if( bot->SQLDb->Tuples() > 50 )
+if( bot->SQLDb->Tuples() >= 50 )
 	{
 	bot->Notice(theClient, "More then 50 matches were found, please visit the website.");
 	return false;
