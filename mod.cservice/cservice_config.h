@@ -1,7 +1,7 @@
 /* cservice_config.h */
 
 #ifndef __CSERVICE_CONFIG_H
-#define __CSERVICE_CONFIG_H "$Id: cservice_config.h,v 1.2 2001/03/07 15:10:53 dan_karrels Exp $"
+#define __CSERVICE_CONFIG_H "$Id: cservice_config.h,v 1.3 2002/02/06 18:56:25 gte Exp $"
 
 /**
  * Define this if you wish for all SQL queries to be sent
@@ -36,5 +36,12 @@
  * The maximum number of search results to return to the user.
  */
 #define MAX_SEARCH_RESULTS 10
+
+/**
+ * Define this if you want your users to be able to login
+ * to the same account more than once at the same time.
+ */
+
+#undef MULTI_AUTH
 
 #endif // __CSERVICE_CONFIG_H

@@ -8,7 +8,7 @@
  *
  * Caveats: None.
  *
- * $Id: UNBANCommand.cc,v 1.12 2001/09/05 03:47:56 gte Exp $
+ * $Id: UNBANCommand.cc,v 1.13 2002/02/06 18:56:25 gte Exp $
  */
 
 #include	<string>
@@ -21,7 +21,7 @@
 #include	"responses.h"
 #include	"match.h"
 
-const char UNBANCommand_cc_rcsId[] = "$Id: UNBANCommand.cc,v 1.12 2001/09/05 03:47:56 gte Exp $" ;
+const char UNBANCommand_cc_rcsId[] = "$Id: UNBANCommand.cc,v 1.13 2002/02/06 18:56:25 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -73,6 +73,29 @@ if (!theChan->getInChan())
 	return false;
 	}
 
+Channel* theChannel = Network->findChannel(theChan->getName());
+if (!theChannel)
+	{
+	bot->Notice(theClient,
+		bot->getResponse(theUser, language::chan_is_empty).c_str(),
+		theChan->getName().c_str());
+	return false;
+	}
+
+/*
+ * Check we're actually opped first..
+ */
+
+ChannelUser* tmpBotUser = theChannel->findUser(bot->getInstance());
+if (!tmpBotUser) return false;
+if(!tmpBotUser->getMode(ChannelUser::MODE_O))
+		{
+		bot->Notice(theClient, bot->getResponse(theUser,
+			language::im_not_opped, "I'm not opped in %s").c_str(),
+			theChan->getName().c_str());
+		return false;
+		}
+
 // Check level.
 
 int level = bot->getEffectiveAccessLevel(theUser, theChan, true);
@@ -83,15 +106,6 @@ if(level < level::unban)
 			language::insuf_access,
 			string("Sorry, you have insufficient access to "
 				"perform that command.")));
-	return false;
-	}
-
-Channel* theChannel = Network->findChannel(theChan->getName());
-if (!theChannel)
-	{
-	bot->Notice(theClient,
-		bot->getResponse(theUser, language::chan_is_empty).c_str(),
-		theChan->getName().c_str());
 	return false;
 	}
 

@@ -8,7 +8,7 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char VERIFYCommand_cc_rcsId[] = "$Id: VERIFYCommand.cc,v 1.20 2002/01/14 18:40:58 gte Exp $" ;
+const char VERIFYCommand_cc_rcsId[] = "$Id: VERIFYCommand.cc,v 1.21 2002/02/06 18:56:25 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -144,6 +144,7 @@ if ((level > level::admin::admin) && (level <= level::admin::coder))
 		theUser->getUserName().c_str());
 	return true;
 	}
+
 /*
 if ((cLevel >= level::coder::base) && (cLevel <= level::coder::contrib))
 	{
@@ -193,6 +194,7 @@ if (cLevel > level::coder::devel)
 	return true;
 	}
 */
+
 return true ;
 }
 

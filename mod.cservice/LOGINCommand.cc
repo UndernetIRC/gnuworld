@@ -12,7 +12,7 @@
 #include	"cservice_config.h"
 #include	"Network.h"
 
-const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.35 2002/02/02 21:56:59 gte Exp $" ;
+const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.36 2002/02/06 18:56:25 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -77,6 +77,18 @@ if( !theUser )
 		st[1].c_str());
 	return false;
 	}
+
+#ifndef MULTI_AUTH
+/*
+ * We only wish to allow one person at a time to login.
+ */
+if(theUser->isAuthed()
+{
+	bot->Notice(theClient, "AUTHENTICATION FAILED as %s. (Already Logged In)",
+	st[1].c_str());
+	return false;
+}
+#endif
 
 /*
  *  Compare password with MD5 hash stored in user record.

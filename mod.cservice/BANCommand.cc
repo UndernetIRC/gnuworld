@@ -18,7 +18,7 @@
  *
  * Caveats: None.
  *
- * $Id: BANCommand.cc,v 1.28 2001/09/05 03:47:56 gte Exp $
+ * $Id: BANCommand.cc,v 1.29 2002/02/06 18:56:25 gte Exp $
  */
 
 #include	<new>
@@ -33,7 +33,7 @@
 #include	"responses.h"
 #include	"match.h"
 
-const char BANCommand_cc_rcsId[] = "$Id: BANCommand.cc,v 1.28 2001/09/05 03:47:56 gte Exp $" ;
+const char BANCommand_cc_rcsId[] = "$Id: BANCommand.cc,v 1.29 2002/02/06 18:56:25 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -93,6 +93,34 @@ if (!theChan->getInChan())
 		);
 	return false;
 	}
+
+/*
+ * Check the channel currently exists on the network, if so - we can
+ * start kicking.
+ */
+
+Channel* theChannel = Network->findChannel(theChan->getName());
+if (!theChannel)
+	{
+	bot->Notice(theClient,
+		bot->getResponse(theUser, language::chan_is_empty).c_str(),
+		theChan->getName().c_str());
+	return false;
+	}
+
+/*
+ * Check we're actually opped first..
+ */
+
+ChannelUser* tmpBotUser = theChannel->findUser(bot->getInstance());
+if (!tmpBotUser) return false;
+if(!tmpBotUser->getMode(ChannelUser::MODE_O))
+		{
+		bot->Notice(theClient, bot->getResponse(theUser,
+			language::im_not_opped, "I'm not opped in %s").c_str(),
+			theChan->getName().c_str());
+		return false;
+		}
 
 int oCount = 0;
 int banTime = 3;
@@ -222,20 +250,6 @@ if( isNick )
 
 	/* Ban and kick this user */
 	banTarget = Channel::createBan(aNick);
-	}
-
-/*
- * Check the channel currently exists on the network, if so - we can
- * start kicking.
- */
-
-Channel* theChannel = Network->findChannel(theChan->getName());
-if (!theChannel)
-	{
-	bot->Notice(theClient,
-		bot->getResponse(theUser, language::chan_is_empty).c_str(),
-		theChan->getName().c_str());
-	return false;
 	}
 
 /*
