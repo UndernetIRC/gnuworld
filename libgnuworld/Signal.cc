@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: Signal.cc,v 1.7 2003/07/06 14:37:41 dan_karrels Exp $
+ * $Id: Signal.cc,v 1.8 2003/07/17 12:57:19 dan_karrels Exp $
  */
 
 #include	<pthread.h>
@@ -35,7 +35,7 @@
 #include	"Signal.h"
 #include	"ELog.h"
 
-const char rcsId[] = "$Id: Signal.cc,v 1.7 2003/07/06 14:37:41 dan_karrels Exp $" ;
+const char rcsId[] = "$Id: Signal.cc,v 1.8 2003/07/17 12:57:19 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -151,7 +151,8 @@ for( size_t i = 0 ; i < 2 ; ++i )
 	if( flags < 0 )
 		{
 		::pthread_mutex_unlock( &pipeMutex ) ;
-		elog	<< "Signal> Failed to get flags for pipe fd: "
+		elog	<< "Signal::openPipes> Failed to get flags "
+			<< "for pipe fd: "
 			<< strerror( errno )
 			<< endl ;
 
@@ -166,7 +167,8 @@ for( size_t i = 0 ; i < 2 ; ++i )
 	if( ::fcntl( rwFD[ i ], F_SETFL, flags ) < 0 )
 		{
 		::pthread_mutex_unlock( &pipeMutex ) ;
-		elog	<< "Signal> Failed to set flags on pipe fd: "
+		elog	<< "Signal::openPipes> Failed to set flags "
+			<< "on pipe fd: "
 			<< strerror( errno )
 			<< endl ;
 
@@ -179,6 +181,42 @@ for( size_t i = 0 ; i < 2 ; ++i )
 readFD = rwFD[ 0 ] ;
 writeFD = rwFD[ 1 ] ;
 ::pthread_mutex_unlock( &pipeMutex ) ;
+
+#ifdef SO_RCVBUF
+int recvBufSize = 0 ;
+if( ::getsockopt( readFD, SOL_SOCKET, SO_RCVBUF
+	reinterpret_cast< char* >( &recvBufSize ), sizeof( int ) ) < 0 )
+	{
+	elog	<< "Signal::openPipes> Failed to retrieve recv buf size: "
+		<< strerror( errno )
+		<< endl ;
+	closePipes() ;
+	signalError = true ;
+	return false ;
+	}
+
+elog	<< "Signal::openPipes> RCVBUF size: "
+	<< recvBufSize
+	<< endl ;
+#endif
+
+#ifdef SO_SNDBUF
+int sendBufSize = 0 ;
+if( ::getsockopt( readFD, SOL_SOCKET, SO_SNBUF
+	reinterpret_cast< char* >( &sendBufSize ), sizeof( int ) ) < 0 )
+	{
+	elog	<< "Signal::openPipes> Failed to retrieve send buf size: "
+		<< strerror( errno )
+		<< endl ;
+	closePipes() ;
+	signalError = true ;
+	return false ;
+	}
+
+elog	<< "Signal::openPipes> SNDBUF size: "
+	<< sendBufSize
+	<< endl ;
+#endif
 
 signalError = false ;
 
