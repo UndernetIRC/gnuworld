@@ -766,7 +766,7 @@ if( string::npos == st[ 1 ].find_first_of( '.' ) )
 	return false ;
 	}
 
-string writeMe( theClient->getNickName() ) ;
+string writeMe( theClient->getCharYYXXX() ) ;
 writeMe += " is asking me to jupe " ;
 writeMe += st[ 1 ] + " because: " + st.assemble( 2 ) ;
 bot->Wallops( writeMe ) ;

@@ -6,7 +6,7 @@
  */
 
 #ifndef __EVENTS_H
-#define __EVENTS_H "$Id: events.h,v 1.9 2001/01/08 18:33:15 dan_karrels Exp $"
+#define __EVENTS_H "$Id: events.h,v 1.10 2001/01/28 19:27:35 dan_karrels Exp $"
 
 namespace gnuworld
 {
@@ -81,7 +81,13 @@ typedef int channelEventType ;
  *  2) iServer* - newly joined server's uplink server
  * EVT_BURST_ACK
  *  1) iServer*
- *
+ * EVT_CHNICK
+ *  1) iClient* (nick updated)
+ *  2) string* (old nick)
+ * EVT_GLINE
+ *  1) Gline*
+ * EVT_REMGLINE
+ *  1) Gline*
  *
  * Channel Events
  * --------------

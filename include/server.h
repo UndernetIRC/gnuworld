@@ -17,7 +17,7 @@
  */
 
 #ifndef __XSERVER_H
-#define __XSERVER_H "$Id: server.h,v 1.25 2001/01/14 18:37:13 dan_karrels Exp $"
+#define __XSERVER_H "$Id: server.h,v 1.26 2001/01/28 19:27:35 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
@@ -42,6 +42,7 @@
 #include	"misc.h"
 #include	"moduleLoader.h"
 #include	"ELog.h"
+#include	"TimerHandler.h"
 
 namespace gnuworld
 {
@@ -370,7 +371,7 @@ public:
 	/**
 	 * The type used to represent client timer events.
 	 */
-	typedef unsigned int timerID ;
+	typedef TimerHandler::timerID timerID ;
 
 	/**
 	 * Register for a timer event.  The first argument is the
@@ -380,7 +381,7 @@ public:
 	 * Returns 0 on failure, a valid timerID otherwise.
 	 */
 	virtual timerID RegisterTimer( const time_t& absoluteTime,
-		xClient* theClient,
+		TimerHandler* theHandler,
 		void* data = 0 ) ;
 
 	/**
@@ -568,6 +569,10 @@ public:
 	 */
 	virtual unsigned int CheckTimers() ;
 
+	/**
+	 * The main loop which runs the server.  This contains
+	 * all of the server essential logic.
+	 */
 	void		mainLoop() ;
 
 	/**
@@ -663,6 +668,12 @@ public:
 	virtual void	onChannelModeB( Channel*, ChannelUser*,
 		const banVectorType& ) ;
 
+	/**
+	 * Check the list of glines for any that are about to
+	 * expire.
+	 */
+	virtual void updateGlines() ;
+
 protected:
 
 	/**
@@ -755,17 +766,17 @@ protected:
 	{
 	timerInfo( const timerID& _ID,
 		const time_t& _absTime,
-		xClient* _theClient,
+		TimerHandler* _theHandler,
 		void* _data = 0 )
 	: ID( _ID ),
 	  absTime( _absTime ),
-	  theClient( _theClient ),
+	  theHandler( _theHandler ),
 	  data( _data )
 	{}
 
 		timerID		ID ;
 		time_t		absTime ;
-		xClient*	theClient ;
+		TimerHandler*	theHandler ;
 		void*		data ;
 	} ;
 
@@ -783,9 +794,14 @@ protected:
 	} ;
 
 	/**
+	 * Register the timers that the server uses.
+	 */
+	virtual void		registerServerTimers() ;
+
+	/**
 	 * Return a unique timerID.
 	 */
-	timerID		getUniqueTimerID() ;
+	virtual timerID		getUniqueTimerID() ;
 
 	/* Network message handlers */
 
@@ -818,6 +834,9 @@ protected:
 
 	/// L(EAVE) message handler.
 	DECLARE_MSG(L);
+
+	/// PART message handler, non-tokenized, bogus
+	DECLARE_MSG(PART);
 
 	/// M(ODE) message handler.
 	DECLARE_MSG(M);

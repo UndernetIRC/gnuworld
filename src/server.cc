@@ -41,9 +41,10 @@
 #include	"Socket.h"
 #include	"StringTokenizer.h"
 #include	"moduleLoader.h"
+#include	"ServerTimerHandlers.h"
 
 const char xServer_h_rcsId[] = __XSERVER_H ;
-const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.58 2001/01/28 16:50:53 dan_karrels Exp $" ;
+const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.59 2001/01/28 19:27:35 dan_karrels Exp $" ;
 
 using std::string ;
 using std::vector ;
@@ -115,6 +116,9 @@ if( !loadModules( configFileName ) )
 	elog	<< "xServer> Failed in loading one or more modules\n" ;
 	::exit( 0 ) ;
 	}
+
+registerServerTimers() ;
+
 }
 
 /**
@@ -124,6 +128,7 @@ xServer::~xServer()
 {
 // TODO: Delete all clients
 // TODO: Delete all commands in command map
+// TODO: Deallocate all timers
 delete commandMap ;
 
 // Deallocate all of the Glines
@@ -229,6 +234,9 @@ REGISTER_MSG( "C", C ) ;
 
 // Leave
 REGISTER_MSG( "L", L ) ;
+
+// Part
+REGISTER_MSG( "PART", PART ) ;
 
 // Squit
 REGISTER_MSG( "SQ", SQ ) ;
@@ -375,6 +383,13 @@ for( ; ptr != conf.end() && ptr->first == "module" ; ++ptr )
 	}
 
 return true ;
+}
+
+void xServer::registerServerTimers()
+{
+RegisterTimer( ::time( 0 ) + 10, // start in 10 seconds
+	new GlineUpdateTimer,
+	static_cast< void* >( this ) ) ;
 }
  
 /**
@@ -1544,8 +1559,11 @@ s	<< charYY << " GL * -" << userHost << ends ;
 Write( s ) ;
 delete[] s.str() ;
 
-delete *ptr ;
 glineList.erase( ptr ) ;
+PostEvent( EVT_REMGLINE,
+	static_cast< void* >( *ptr ) ) ;
+
+delete *ptr ;
 
 return true ;
 
@@ -1577,12 +1595,14 @@ catch( std::bad_alloc )
 strstream s ;
 s	<< charYY << " GL * +"
 	<< userHost << ' '
-	<< duration << " :"
+	<< (::time( 0 ) + duration) << " :"
 	<< reason << ends ;
 Write( s ) ;
 delete[] s.str() ;
 
 glineList.push_back( newGline ) ;
+PostEvent( EVT_GLINE,
+	static_cast< void* >( newGline ) ) ;
 
 return true ;
 }
@@ -2075,8 +2095,93 @@ for( StringTokenizer::size_type i = 0 ; i < st.size() ; ++i )
 	// Post the event to the clients listening for events on this
 	// channel, if any.
 	// TODO: Update message posting
-	// TODO: Check if channel is empty, remove if so
+	PostChannelEvent( EVT_PART, theChan,
+		static_cast< void* >( theClient ) ) ;
 
+	// Is the channel now empty, and no services clients are
+	// on the channel?
+	if( theChan->empty() && !Network->servicesOnChannel( theChan ) )
+		{
+		// No users in the channel, remove it.
+		delete Network->removeChannel( theChan->getName() ) ;
+
+		// TODO: Post event
+		}
+	} // for
+
+return 0 ;
+}
+
+// nick PART #channel,#channel2 <part msg>
+int xServer::MSG_PART( xParameters& Param )
+{
+// Verify that there are at least 2 arguments:
+// client_numeric #channel
+if( Param.size() < 2 )
+	{
+	elog	<< "xServer::MSG_PART> Invalid number of arguments"
+		<< endl ;
+	return -1 ;
+	}
+
+// Find the client in question
+iClient* theClient = Network->findNick( Param[ 0 ] ) ;
+
+// Was the client found?
+if( NULL == theClient )
+	{
+	// Nope, no matching client found
+
+	// Log the error
+	elog	<< "xServer::MSG_PART> (" << Param[ 1 ]
+		<< "): Unable to find client: "
+		<< Param[ 0 ] << endl ;
+
+	// Return error
+	return -1 ;
+	}
+
+// Tokenize the channel string
+// Be sure to take into account the channel parting message
+StringTokenizer _st( Param[ 1 ], ':' ) ;
+StringTokenizer st( _st[ 0 ], ',' ) ;
+
+// Iterate through all channels that this user is parting
+for( StringTokenizer::size_type i = 0 ; i < st.size() ; ++i )
+	{
+
+	// Is this a modeless channel?
+	if( '+' == st[ i ][ 0 ] )
+		{
+		// Ignore modeless channels
+		continue ;
+		}
+
+	// Get the channel that was just parted.
+	Channel* theChan = Network->findChannel( st[ i ] ) ;
+
+	// Was the channel found?
+	if( NULL == theChan )
+		{
+		// Channel not found, log the error
+		elog	<< "xServer::MSG_L> Unable to find channel: "
+			<< st[ i ] << endl ;
+
+		// Continue on to the next channel
+		continue ;
+		}
+
+	// Remove client<->channel associations
+
+	// Remove and deallocate the ChannelUser instance from this
+	// channel's ChannelUser structure.
+	delete theChan->removeUser( theClient ) ;
+
+	// Remove this channel from this client's channel structure.
+	theClient->removeChannel( theChan ) ;
+
+	// Post the event to the clients listening for events on this
+	// channel, if any.
 	PostChannelEvent( EVT_PART, theChan,
 		static_cast< void* >( theClient ) ) ;
 
@@ -3554,8 +3659,60 @@ return 0 ;
  *  (On Mon May 1 22:40:23 2000 GMT from SE5 for 180 seconds: remgline
  *  test.. 	[0])
  */
-int xServer::MSG_GL( xParameters& )
+int xServer::MSG_GL( xParameters& Params )
 {
+if( Params.size() < 5 )
+	{
+	elog	<< "xServer::MSG_GL> Invalid number of arguments"
+		<< endl ;
+	return -1 ;
+	}
+
+if( '-' == Params[ 2 ][ 0 ] )
+	{
+	// Removing a gline
+	glineListType::iterator ptr = glineList.begin(),
+		end = glineList.end() ;
+	for( ; ptr != end ; ++ptr )
+		{
+		if( (*ptr)->getUserHost() == (Params[ 2 ] + 1) )
+			{
+			// Found it
+			break ;
+			}
+		}
+
+	if( ptr == glineList.end() )
+		{
+		// Gline not found
+		elog	<< "xServer::MSG_GL> Unable to find matching "
+			<< "gline for removal: " << Params[ 2 ]
+			<< endl ;
+		return -1 ;
+		}
+
+	glineList.erase( ptr ) ;
+	delete *ptr ;
+	return 0 ;
+	}
+
+// Else, adding a gline
+Gline* newGline = new (nothrow) Gline(
+	Params[ 0 ],
+	Params[ 2 ] + 1,
+	Params[ 4 ],
+	atoi( Params[ 3 ] ) ) ;
+if( NULL == newGline )
+	{
+	elog	<< "xServer::MSG_GL> Memory allocation failure"
+		<< endl ;
+	return -1 ;
+	}
+
+glineList.push_back( newGline ) ;
+PostEvent( EVT_GLINE,
+	static_cast< void* >( newGline ) ) ;
+
 return 0 ;
 }
 
@@ -4009,11 +4166,11 @@ clog	<< "Burst duration: " << (burstEnd - burstStart) << " seconds\n" ;
 }
 
 xServer::timerID xServer::RegisterTimer( const time_t& absTime,
-	xClient* theClient,
+	TimerHandler* theHandler,
 	void* data )
 {
 #ifndef NDEBUG
-  assert( theClient != 0 ) ;
+  assert( theHandler != 0 ) ;
 #endif
 
 // Don't register a timer that has already expired.
@@ -4029,7 +4186,7 @@ timerID ID = getUniqueTimerID() ;
 timerInfo* ti = 0 ;
 try
 	{
-	ti = new timerInfo( ID, absTime, theClient, data ) ;
+	ti = new timerInfo( ID, absTime, theHandler, data ) ;
 	}
 catch( std::bad_alloc )
 	{
@@ -4137,7 +4294,7 @@ while( !timerQueue.empty() && (timerQueue.top().second->absTime <= now) )
 	timerQueue.pop() ;
 
 	// Call the timer handler method for the client
-	info->theClient->OnTimer( info->ID, info->data ) ;
+	info->theHandler->OnTimer( info->ID, info->data ) ;
 
 	// Remove the timerID from the uniqueTimerMap
 	uniqueTimerMap.erase( info->ID ) ;
@@ -4752,5 +4909,28 @@ if( !banVector.empty() )
 	onChannelModeB( theChan, 0, banVector ) ;
 	}
 }
+
+void xServer::updateGlines()
+{
+time_t now = ::time( 0 ) ;
+
+for( glineListType::iterator ptr = glineList.begin(),
+	end = glineList.end() ; ptr != end ; )
+	{
+	if( (*ptr)->getExpiration() <= now )
+		{
+		// Expire the gline
+		PostEvent( EVT_REMGLINE,
+			static_cast< void* >( *ptr ) ) ;
+
+		delete *ptr ;
+		ptr = glineList.erase( ptr ) ;
+		}
+	else
+		{
+		++ptr ;
+		}
+	} // for()
+} // updateGlines()
 
 } // namespace gnuworld

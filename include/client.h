@@ -3,7 +3,7 @@
  */
 
 #ifndef __XCLIENT_H
-#define __XCLIENT_H "$Id: client.h,v 1.20 2001/01/13 21:06:29 dan_karrels Exp $"
+#define __XCLIENT_H "$Id: client.h,v 1.21 2001/01/28 19:27:35 dan_karrels Exp $"
 
 #include	<string>
 
@@ -11,6 +11,7 @@
 #include	"Numeric.h"
 #include	"iClient.h"
 #include	"events.h"
+#include	"TimerHandler.h"
 
 using std::string ;
 
@@ -26,7 +27,7 @@ namespace gnuworld
  * This has proven to be extremely easy: I built a functioning
  * services client in 11 minutes, though it didn't do much :)
  */
-class xClient
+class xClient : public TimerHandler
 {
 
 	/// Let xServer access our protected members.
@@ -294,6 +295,8 @@ public:
 	 * handle for the timer registration, and the second is
 	 * the arguments that were passed when registering the
 	 * timer.
+	 * This method overloads the pure virtual TimerHandler
+	 * base class method declaration.
 	 */
 	virtual int	OnTimer( xServer::timerID, void* ) ;
 

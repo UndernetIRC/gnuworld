@@ -21,7 +21,7 @@
 #include	"ccontrol.h"
  
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.6 2001/01/28 15:49:05 dan_karrels Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.7 2001/01/28 19:27:35 dan_karrels Exp $" ;
 
 using std::string ;
 using std::vector ;
@@ -100,7 +100,7 @@ RegisterCommand( new TRANSLATECommand( this, "TRANSLATE", "<numeric>"
 	"\tTranslate a numeric into user information" ) ) ;
 RegisterCommand( new WHOISCommand( this, "WHOIS", "<nickname>"
 	"\tObtain information on a given nickname" ) ) ;
-RegisterCommand( new KICKCommand( this, "KICK", "<channel> <nick>"
+RegisterCommand( new KICKCommand( this, "KICK", "<channel> <nick> <reason>"
 	"\tKick a user from a channel" ) ) ;
 RegisterCommand( new ADDOPERCHANCommand( this, "ADDOPERCHAN", "<channel>"
 	"\tAdd an oper channel" ) ) ;

@@ -2,6 +2,6 @@
 - handle ban collission stuff, remove conflicting bans
 - timeslices
 - handle off channel opping for xclients
-- complete xServer::JoinChannel
 - finish updating and testing xClient op/voice/ban stuff
+- Add iClient representation of each xClient
 

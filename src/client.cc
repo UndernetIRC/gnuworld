@@ -26,7 +26,7 @@
 #include	"events.h"
 
 const char xClient_h_rcsId[] = __XCLIENT_H ;
-const char xClient_cc_rcsId[] = "$Id: client.cc,v 1.25 2001/01/28 15:37:31 dan_karrels Exp $" ;
+const char xClient_cc_rcsId[] = "$Id: client.cc,v 1.26 2001/01/28 19:27:35 dan_karrels Exp $" ;
 
 using std::string ;
 using std::strstream ;
@@ -1203,10 +1203,6 @@ if( !onChannel )
 // Update the channel's ban list
 theChan->setBan( banMask ) ;
 
-// Let the server know about the departure of the client
-// This will handle posting the message
-MyUplink->OnPartChannel( theClient, theChan ) ;
-
 return true ;
 }
 
@@ -1248,9 +1244,6 @@ if( !onChannel )
 	{
 	Part( theChan ) ;
 	}
-
-// Notify the server
-MyUplink->OnPartChannel( theClient, theChan ) ;
 
 return true ;
 }
@@ -1299,8 +1292,6 @@ for( vector< iClient* >::const_iterator ptr = theClients.begin() ;
 	Write( s ) ;
 	delete[] s.str() ;
 
-	// Notify the server that the user has parted the channel
-	MyUplink->OnPartChannel( *ptr, theChan ) ;
 	}
 
 if( !onChannel )

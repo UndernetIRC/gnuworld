@@ -7,6 +7,7 @@ gnuworld_LDFLAGS = -rpath $(bindir) -dlopen $(glibdir)/libgnuworld.la \
 gnuworld_SOURCES = Channel.cc \
 	ChannelUser.cc \
 	Network.cc \
+	ServerTimerHandlers.cc \
 	client.cc \
 	iClient.cc \
 	iServer.cc \
