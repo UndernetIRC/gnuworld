@@ -1,7 +1,11 @@
 --
--- $Id: autokill.sql,v 1.15 2003/04/28 04:05:27 nighty Exp $
+-- $Id: autokill.sql,v 1.16 2003/09/14 23:57:24 nighty Exp $
 --
 
+--
+-- Start an undoable process...
+\qecho [*] Starting autokill.sql..
+BEGIN WORK;
 --
 -- Clean up the temporary table from last time.
 DROP TABLE to_die;
@@ -60,3 +64,8 @@ DELETE FROM users_lastseen where user_id = to_die.user_id;
 -- Clean up users (Finally!).
 \qecho [*] Removing user accounts..
 DELETE FROM users where id = to_die.user_id;
+--
+-- Commit all the work (if this line is not executed, you can "undo" the done stuff using 'ROLLBACK WORK;'
+\qecho [*] Comitting changes to database..
+COMMIT WORK;
+
