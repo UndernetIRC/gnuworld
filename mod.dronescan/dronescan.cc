@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: dronescan.cc,v 1.34 2003/08/28 19:58:22 jeekay Exp $
+ * $Id: dronescan.cc,v 1.35 2003/08/31 17:17:04 jeekay Exp $
  */
 
 #include	<string>
@@ -39,7 +39,7 @@
 #include "sqlUser.h"
 #include "Timer.h"
 
-RCSTAG("$Id: dronescan.cc,v 1.34 2003/08/28 19:58:22 jeekay Exp $");
+RCSTAG("$Id: dronescan.cc,v 1.35 2003/08/31 17:17:04 jeekay Exp $");
 
 namespace gnuworld {
 
@@ -271,7 +271,7 @@ void dronescan::OnCTCP( iClient* theClient, const string& CTCP,
 	} else if("PING" == Command) {
 		DoCTCP(theClient, CTCP, Message);
 	} else if("VERSION" == Command) {
-		DoCTCP(theClient, CTCP, "GNUWorld DroneScan v0.0.6");
+		DoCTCP(theClient, CTCP, "GNUWorld DroneScan v0.0.7");
 	}
 
 	xClient::OnCTCP(theClient, CTCP, Message, Secure);
@@ -287,7 +287,7 @@ void dronescan::OnEvent( const eventType& theEvent,
 		{
 		case EVT_BURST_CMPLT :
 			{
-			log(DEBUG, "Caught EOB. Resetting frequencies.");
+			log(DBG, "Caught EOB. Resetting frequencies.");
 			changeState(RUN);
 			break;
 			} // EVT_BURST_CMPLT
@@ -558,7 +558,7 @@ void dronescan::OnTimer( xServer::timerID theTimer , void *)
 
 	if(theTimer == tidClearActiveList)
 		{
-		log(DEBUG, "Clearing %u active channels records.",
+		log(DBG, "Clearing %u active channels records.",
 			droneChannels.size()
 			);
 		droneChannels.clear();
@@ -579,7 +579,7 @@ void dronescan::OnTimer( xServer::timerID theTimer , void *)
 					);
 		}
 		
-		log(DEBUG, "Clearing %u records from the join counter.",
+		log(DBG, "Clearing %u records from the join counter.",
 			jcChanMap.size()
 			);
 		jcChanMap.clear();
@@ -687,7 +687,7 @@ void dronescan::calculateEntropy()
 		++totalNicks;
 		}
 	
-	log(DEBUG, "Calculated frequencies in: %u ms", theTimer->stopTimeMS());
+	log(DBG, "Calculated frequencies in: %u ms", theTimer->stopTimeMS());
 	
 	theTimer->Start();
 	
@@ -696,7 +696,7 @@ void dronescan::calculateEntropy()
 	     itr != charMap.end(); ++itr)
 		itr->second /= totalNicks;
 	
-	log(DEBUG, "Normalised frequencies in: %u ms", theTimer->stopTimeMS());
+	log(DBG, "Normalised frequencies in: %u ms", theTimer->stopTimeMS());
 	
 	elog << "dronescan::calculateEntropy> Calculating average entropy." << endl;
 
@@ -711,13 +711,13 @@ void dronescan::calculateEntropy()
 		totalEntropy += calculateEntropy(ptr->second->getNickName());
 		}
 	
-	log(DEBUG, "Total entropy  : %lf", totalEntropy);
-	log(DEBUG, "Total nicks    : %u", totalNicks);
+	log(DBG, "Total entropy  : %lf", totalEntropy);
+	log(DBG, "Total nicks    : %u", totalNicks);
 			
 	averageEntropy = totalEntropy / totalNicks;
-	log(DEBUG, "Average entropy: %lf ", averageEntropy);
+	log(DBG, "Average entropy: %lf ", averageEntropy);
 	
-	log(DEBUG, "Found entropy in: %u ms", theTimer->stopTimeMS());
+	log(DBG, "Found entropy in: %u ms", theTimer->stopTimeMS());
 }
 
 
@@ -746,7 +746,7 @@ void dronescan::setNickStates()
 		setClientState( ptr->second );
 		}
 	
-	log(DEBUG, "Set all nick states in: %u ms",
+	log(DBG, "Set all nick states in: %u ms",
 		theTimer->stopTimeMS()
 		);
 }
@@ -921,17 +921,17 @@ CLIENT_STATE dronescan::setClientState( iClient *theClient )
 
 
 /** Log a message. */
-void dronescan::log(LOG_TYPE logType, char *format, ...)
+void dronescan::log(LOG_TYPE logType, const char *format, ...)
 {
 	if(logType < consoleLevel) return;
 	
 	stringstream newMessage;
 	
 	switch(logType) {
-		case DEBUG	: newMessage << "[D] ";	break;
+		case DBG	: newMessage << "[D] ";	break;
 		case INFO	: newMessage << "[I] ";	break;
 		case WARN	: newMessage << "[W] ";	break;
-		case ERROR	: newMessage << "[E] ";	break;
+		case ERR	: newMessage << "[E] ";	break;
 		default		: newMessage << "[U] ";	break;
 	}
 
@@ -972,7 +972,7 @@ void dronescan::setConsoleTopic()
 
 
 /** Reply to an iClient. */
-void dronescan::Reply(const iClient *theClient, char *format, ...)
+void dronescan::Reply(const iClient *theClient, const char *format, ...)
 {
 	char buffer[512] = {0};
 	va_list _list;

@@ -16,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: dronescan.h,v 1.16 2003/08/05 16:13:23 jeekay Exp $
+ * $Id: dronescan.h,v 1.17 2003/08/31 17:17:04 jeekay Exp $
  */
 
 #ifndef DRONESCAN_H
-#define DRONESCAN_H "$Id: dronescan.h,v 1.16 2003/08/05 16:13:23 jeekay Exp $"
+#define DRONESCAN_H "$Id: dronescan.h,v 1.17 2003/08/31 17:17:04 jeekay Exp $"
 
 #include <map>
 
@@ -47,10 +47,10 @@ enum DS_STATE {
 };
 
 enum LOG_TYPE {
-	DEBUG,
+	DBG,
 	INFO,
 	WARN,
-	ERROR
+	ERR
 };
 
 class dronescan : public xClient {
@@ -140,13 +140,13 @@ public:
 	CLIENT_STATE setClientState( iClient* );
 	
 	/** Log a message. */
-	void log(LOG_TYPE, char*, ...) ;
+	void log(LOG_TYPE, const char*, ...) ;
 	
 	/** Set the topic of the console channel. */
 	void setConsoleTopic() ;
 	
 	/** Reply to a given iClient. */
-	void Reply(const iClient*, char*, ...) ;
+	void Reply(const iClient*, const char*, ...) ;
 	
 	/** Return a users access */
 	sqlUser *getSqlUser( const string& ) ;

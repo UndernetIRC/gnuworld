@@ -1,3 +1,7 @@
+2003-08-31 0.0.7 Jeekay
+* Fixed various bits of code to allow it to compile on dodgy compilers.
+* Bumped version to 0.0.7
+
 2003-08-13 0.0.6 Jeekay
 * Added total channel size to join flood notification
 * Bumped version to 0.0.6
