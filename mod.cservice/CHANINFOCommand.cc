@@ -13,7 +13,7 @@
  *
  * Command is aliased "INFO".
  *
- * $Id: CHANINFOCommand.cc,v 1.9 2001/01/27 20:16:40 dan_karrels Exp $
+ * $Id: CHANINFOCommand.cc,v 1.10 2001/01/28 23:16:33 gte Exp $
  */
 
 #include	<string>
@@ -25,7 +25,7 @@
 #include	"responses.h"
 #include	"libpq++.h"
  
-const char CHANINFOCommand_cc_rcsId[] = "$Id: CHANINFOCommand.cc,v 1.9 2001/01/27 20:16:40 dan_karrels Exp $" ;
+const char CHANINFOCommand_cc_rcsId[] = "$Id: CHANINFOCommand.cc,v 1.10 2001/01/28 23:16:33 gte Exp $" ;
  
 namespace gnuworld
 {
@@ -74,8 +74,8 @@ if( string::npos == st[ 1 ].find_first_of( '#' ) )
 			}
 		}
 
-	bot->Notice(theClient, "Information about: %s",
-		theUser->getUserName().c_str());
+	bot->Notice(theClient, "Information about: %s (%i)",
+		theUser->getUserName().c_str(), theUser->getID());
 
 	iClient* targetClient = theUser->isAuthed();
 	string loggedOn = targetClient ?
@@ -83,14 +83,15 @@ if( string::npos == st[ 1 ].find_first_of( '#' ) )
 
 	bot->Notice(theClient, "Currently logged on via: %s",
 		loggedOn.c_str());
-	bot->Notice(theClient, "URL: %s",
-		theUser->getUrl().c_str());
+	if(theUser->getUrl() != "")
+	{
+		bot->Notice(theClient, "URL: %s",
+			theUser->getUrl().c_str());
+	}
 	bot->Notice(theClient, "Language: %i",
-		theUser->getLanguageId());
-	bot->Notice(theClient, "Flags: TBA");
+		theUser->getLanguageId()); 
 	bot->Notice(theClient, "Last Seen: %s",
-		bot->prettyDuration(theUser->getLastSeen()).c_str());
-	bot->Notice(theClient, "-- End of info.");
+		bot->prettyDuration(theUser->getLastSeen()).c_str()); 
 
 	return true;
 	}

@@ -9,7 +9,7 @@
  * Caveats: None
  * 
  *
- * $Id: REMUSERCommand.cc,v 1.4 2001/01/16 01:31:40 gte Exp $
+ * $Id: REMUSERCommand.cc,v 1.5 2001/01/28 23:16:33 gte Exp $
  */
 
 #include	<string>
@@ -20,7 +20,7 @@
 #include	"levels.h"
 #include	"libpq++.h"
 
-const char REMUSERCommand_cc_rcsId[] = "$Id: REMUSERCommand.cc,v 1.4 2001/01/16 01:31:40 gte Exp $" ;
+const char REMUSERCommand_cc_rcsId[] = "$Id: REMUSERCommand.cc,v 1.5 2001/01/28 23:16:33 gte Exp $" ;
  
 namespace gnuworld
 {
@@ -94,8 +94,10 @@ bool REMUSERCommand::Exec( iClient* theClient, const string& Message )
 	}
 
 	int targetLevel = tmpLevel->getAccess();
+
 	/*
 	 *  Check we aren't trying to remove someone with access higher than ours.
+	 *  Unless they are trying to remove themself.. in which case its ok ;)
 	 */
 
 	if (level <= targetLevel)

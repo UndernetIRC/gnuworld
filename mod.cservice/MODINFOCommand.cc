@@ -13,7 +13,7 @@
  * Shouldn't really happen, as trying to MODINFO a forced access doesn't
  * make sense - adduser and then MODINFO that :)
  *
- * $Id: MODINFOCommand.cc,v 1.6 2001/01/16 01:31:40 gte Exp $
+ * $Id: MODINFOCommand.cc,v 1.7 2001/01/28 23:16:33 gte Exp $
  */
 
 #include	<string>
@@ -23,7 +23,7 @@
 #include	"cservice.h" 
 #include	"levels.h"
 
-const char MODINFOCommand_cc_rcsId[] = "$Id: MODINFOCommand.cc,v 1.6 2001/01/16 01:31:40 gte Exp $" ;
+const char MODINFOCommand_cc_rcsId[] = "$Id: MODINFOCommand.cc,v 1.7 2001/01/28 23:16:33 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -40,7 +40,7 @@ bool MODINFOCommand::Exec( iClient* theClient, const string& Message )
 	}
  
 	const string command = string_upper(st[2]); 
-	if ((command != "ACCESS") && (command != "AUTOOP") && (command != "AUTOVOICE")) 
+	if ((command != "ACCESS") && (command != "AUTOMODE")) 
 	{
 		Usage(theClient);
 		return true;
@@ -153,12 +153,9 @@ bool MODINFOCommand::Exec( iClient* theClient, const string& Message )
 			targetUser->getUserName().c_str(), theChan->getName().c_str(),
 			newAccess);
 	}
+ 
 
- 	int autoType = 0;
-	if (command == "AUTOOP") autoType = 1;
-	if (command == "AUTOVOICE") autoType = 2;
-
-	if (autoType)
+	if (command == "AUTOMODE")
 	{
 		
 		/*
@@ -175,31 +172,45 @@ bool MODINFOCommand::Exec( iClient* theClient, const string& Message )
 		 *  Check for "ON" or "OFF" and act accordingly.
 		 */
 
-		if (string_upper(st[4]) == "ON")
+		if (string_upper(st[4]) == "OP")
 		{
 			sqlLevel* aLevel = bot->getLevelRecord(targetUser, theChan);
-			if (autoType == 1) aLevel->setFlag(sqlLevel::F_AUTOOP);
-			if (autoType == 2) aLevel->setFlag(sqlLevel::F_AUTOVOICE);
+			aLevel->setFlag(sqlLevel::F_AUTOOP); 
 
 			// Only commit changes if this has been loaded from the Db.
 			// (Ie: If its a forced temporary access, this flag won't be set)..
 			if (aLevel->getFlag(sqlLevel::F_ONDB)) aLevel->commit();
-			bot->Notice(theClient, "Enabled %s for %s on channel %s", 
-				(autoType == 1) ? "AUTOOP" : "AUTOVOICE", 
+
+			bot->Notice(theClient, "Set AUTOMODE to OP for %s on channel %s", 
 				targetUser->getUserName().c_str(), theChan->getName().c_str()); 
 			return false;
 		}
 
-		if (string_upper(st[4]) == "OFF")
+		if (string_upper(st[4]) == "VOICE")
 		{
-			sqlLevel* aLevel = bot->getLevelRecord(targetUser, theChan);			
-			if (autoType == 1) aLevel->removeFlag(sqlLevel::F_AUTOOP);
-			if (autoType == 2) aLevel->removeFlag(sqlLevel::F_AUTOVOICE);
+			sqlLevel* aLevel = bot->getLevelRecord(targetUser, theChan);
+			aLevel->setFlag(sqlLevel::F_AUTOVOICE); 
+
 			// Only commit changes if this has been loaded from the Db.
 			// (Ie: If its a forced temporary access, this flag won't be set)..
 			if (aLevel->getFlag(sqlLevel::F_ONDB)) aLevel->commit();
-			bot->Notice(theClient, "Disabled %s for %s on channel %s", 
-				(autoType == 1) ? "AUTOOP" : "AUTOVOICE", 
+
+			bot->Notice(theClient, "Set AUTOMODE to VOICE for %s on channel %s", 
+				targetUser->getUserName().c_str(), theChan->getName().c_str()); 
+			return false;
+		} 
+
+		if (string_upper(st[4]) == "NONE")
+		{
+			sqlLevel* aLevel = bot->getLevelRecord(targetUser, theChan);			
+			aLevel->removeFlag(sqlLevel::F_AUTOOP);
+			aLevel->removeFlag(sqlLevel::F_AUTOVOICE);
+
+			// Only commit changes if this has been loaded from the Db.
+			// (Ie: If its a forced temporary access, this flag won't be set)..
+			if (aLevel->getFlag(sqlLevel::F_ONDB)) aLevel->commit();
+
+			bot->Notice(theClient, "Set AUTOMODE to NONE for %s on channel %s", 
 				targetUser->getUserName().c_str(), theChan->getName().c_str()); 
 			return false;
 		}

@@ -10,7 +10,7 @@
  *
  * Caveats: SET LANG is still under consideration.
  *
- * $Id: SETCommand.cc,v 1.12 2001/01/24 01:13:52 gte Exp $
+ * $Id: SETCommand.cc,v 1.13 2001/01/28 23:16:33 gte Exp $
  */
 
 #include	<string>
@@ -22,7 +22,7 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char SETCommand_cc_rcsId[] = "$Id: SETCommand.cc,v 1.12 2001/01/24 01:13:52 gte Exp $" ;
+const char SETCommand_cc_rcsId[] = "$Id: SETCommand.cc,v 1.13 2001/01/28 23:16:33 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -447,28 +447,27 @@ bool SETCommand::Exec( iClient* theClient, const string& Message )
 	    return true;
 	}
 
-//	if(option == "USERFLAGS")
-//	{
-//	    /* There is no F_USERFLAGS flag? --Plexus */
-//	    
-//	    if(level < level::set::userflag)
-//	    {
-//		bot->Notice(theClient, "USERFLAGS: You do not have enough access!");
-//		return true;
-//	    }
-//	    if(value == "1") theChan->flags |= F_USERFLAGS;
-//	    else if(value == "0") theChan->flags &= ~F_USERFLAGS;
-//	    else
-//	    {
-//		bot->Notice(theClient, "value of USERFLAGS must be 1 or 0");
-//		return true;
-//	    }
-//	    // theChan->commit(); 
-//	    bot->Notice(theClient, "USERFLAGS for %s is %s",
-//			theChan->name.c_str(),
-//			theChan->flags & F_USERFLAGS ? "1" : "0");
-//	    return true;
-//	}
+	if(option == "USERFLAGS")
+	{ 
+	    if(level < level::set::userflag)
+	    {
+			bot->Notice(theClient, "USERFLAGS: You do not have enough access!");
+			return false;
+	    }
+
+		int setting = atoi(value.c_str());
+		if ( (setting < 0) || (setting > 2))
+		{
+			bot->Notice(theClient, "Invalid USERFLAGS setting. Correct values are 0, 1, 2.");
+			return false;
+		}
+
+		theChan->setUserFlags(setting);
+		theChan->commit(); 
+	    bot->Notice(theClient, "USERFLAGS for %s is %i",
+			theChan->getName().c_str(), setting);
+	    return true;
+	}
 
 	if(option == "MASSDEOPPRO")
 	{

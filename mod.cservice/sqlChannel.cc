@@ -9,7 +9,7 @@
  * 30/12/2000: Moved static SQL data to constants.h --Gte
  * Set loadData up to take data from rows other than 0.
  * 
- * $Id: sqlChannel.cc,v 1.19 2001/01/25 00:19:13 gte Exp $
+ * $Id: sqlChannel.cc,v 1.20 2001/01/28 23:16:33 gte Exp $
  */
  
 #include	<strstream>
@@ -25,7 +25,7 @@ using std::string ;
 using std::endl ; 
  
 const char sqlChannel_h_rcsId[] = __SQLCHANNEL_H ;
-const char sqlChannel_cc_rcsId[] = "$Id: sqlChannel.cc,v 1.19 2001/01/25 00:19:13 gte Exp $" ;
+const char sqlChannel_cc_rcsId[] = "$Id: sqlChannel.cc,v 1.20 2001/01/28 23:16:33 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -43,9 +43,8 @@ sqlChannel::sqlChannel(PgDatabase* _SQLDb)
  keywords(""),
  registered_ts(0),
  channel_ts(0),
- channel_mode(""),
- channel_key(""),
- channel_limit(0),
+ channel_mode(""), 
+ userflags(0),
  last_topic(0),
  inChan(false),
  SQLDb( _SQLDb )
@@ -130,10 +129,9 @@ void sqlChannel::setAllMembers(int row)
 	keywords = SQLDb->GetValue(row,7);
 	registered_ts = atoi(SQLDb->GetValue(row,8));
 	channel_ts = atoi(SQLDb->GetValue(row,9));
-	channel_mode = SQLDb->GetValue(row,10);
-	channel_key = SQLDb->GetValue(row,11);
-	channel_limit = atoi(SQLDb->GetValue(row,12));
-	last_updated = atoi(SQLDb->GetValue(row,13));
+	channel_mode = SQLDb->GetValue(row,10); 
+	userflags = atoi(SQLDb->GetValue(row,11));
+	last_updated = atoi(SQLDb->GetValue(row,12));
 }
 
 bool sqlChannel::commit()
@@ -156,9 +154,8 @@ bool sqlChannel::commit()
 	<< "keywords = '" << escapeSQLChars(keywords) << "', "
 	<< "registered_ts = " << registered_ts << ", "
 	<< "channel_ts = " << channel_ts << ", "
-	<< "channel_mode = '" << channel_mode << "', "
-	<< "channel_key = '" << channel_key << "', "
-	<< "channel_limit = " << channel_limit << ", "
+	<< "channel_mode = '" << channel_mode << "', " 
+	<< "userflags = " << userflags << ", "
 	<< "last_updated = now()::abstime::int4, "
 	<< "description = '" << escapeSQLChars(description) << "' "
 	<< queryCondition << id

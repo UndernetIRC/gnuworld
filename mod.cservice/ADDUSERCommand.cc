@@ -8,7 +8,7 @@
  *
  * Caveats: None
  *
- * $Id: ADDUSERCommand.cc,v 1.8 2001/01/27 20:16:40 dan_karrels Exp $
+ * $Id: ADDUSERCommand.cc,v 1.9 2001/01/28 23:16:33 gte Exp $
  */
  
 #include	<string>
@@ -19,7 +19,7 @@
 #include	"levels.h"
 #include	"libpq++.h"
 
-const char ADDUSERCommand_cc_rcsId[] = "$Id: ADDUSERCommand.cc,v 1.8 2001/01/27 20:16:40 dan_karrels Exp $" ;
+const char ADDUSERCommand_cc_rcsId[] = "$Id: ADDUSERCommand.cc,v 1.9 2001/01/28 23:16:33 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -143,7 +143,16 @@ if (levelTest != 0)
 		 newLevel->setAccess(targetAccess);
 		}
 	}
+
+/*
+ *  Work out the flags this user should default to.
+ */
  
+unsigned short targetFlags = 0;
+
+if (theChan->getUserFlags() == 1) targetFlags = sqlLevel::F_AUTOOP;
+if (theChan->getUserFlags() == 2) targetFlags = sqlLevel::F_AUTOVOICE;
+
 /*
  *  Now, build up the SQL query & execute it!
  */
@@ -153,7 +162,7 @@ theQuery << queryHeader << "VALUES ("
 	<< theChan->getID() << ","
 	<< targetUser->getID() << ","
 	<< targetAccess << ","
-	<< "0" << ","
+	<< targetFlags << ","
 	<< ::time(NULL) << ","
 	<< "'" << theClient->getNickUserHost() << "',"
 	<< ::time(NULL) << ","

@@ -1,7 +1,7 @@
 /* sqlChannel.h */
 
 #ifndef __SQLCHANNEL_H
-#define __SQLCHANNEL_H "$Id: sqlChannel.h,v 1.14 2001/01/21 04:29:03 gte Exp $"
+#define __SQLCHANNEL_H "$Id: sqlChannel.h,v 1.15 2001/01/28 23:16:33 gte Exp $"
 
 #include	<string>
 #include	<ctime>
@@ -76,16 +76,13 @@ public:
 
 	inline const string&		getChannelMode() const
 		{ return channel_mode ; }
-	
-	inline const string&		getChannelKey() const
-		{ return channel_key ; }
-	
-	inline const unsigned int&	getChannelLimit() const
-		{ return channel_limit ; }
-	
+
+	inline const unsigned short int& getUserFlags() const
+		{ return userflags ; }
+	 
 	inline const time_t&		getLastUpdated() const
 		{ return last_updated ; }
-
+ 
 	inline const bool& 			getInChan() const
 		{ return inChan; }
 
@@ -136,12 +133,9 @@ public:
 	inline void setChannelMode( const string& _channel_mode )
 		{ channel_mode = _channel_mode; }
 
-	inline void setChannelKey ( const string& _channel_key )
-		{ channel_key = _channel_key; }
-
-	inline void setChannelLimit( const unsigned int& _channel_limit )
-		{ channel_limit = _channel_limit; }
-
+	inline void setUserFlags( const unsigned short int& _userflags )
+		{ userflags = _userflags; }
+		
 	inline void setInChan( const bool& _inChan )
 		{ inChan = _inChan; }
 
@@ -170,9 +164,8 @@ protected:
 	string		keywords  ;
 	time_t		registered_ts ;
 	time_t		channel_ts ;
-	string		channel_mode ;
-	string		channel_key ;
-	unsigned int	channel_limit ;
+	string		channel_mode ; 
+	unsigned short	userflags ;
 	time_t		last_updated ; 
 	time_t		last_topic ;
 	bool		inChan;
