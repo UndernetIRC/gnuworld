@@ -1,5 +1,5 @@
 
--- "$Id: ccontrol.update.sql,v 1.15 2002/03/01 18:27:32 mrbean_ Exp $"
+-- "$Id: ccontrol.update.sql,v 1.16 2002/03/14 20:35:14 mrbean_ Exp $"
 
 -- ccontrol database changes update
 -- this file will add the new features to an old database
@@ -76,12 +76,14 @@
 
 -- 25/02/02 - Add the Misc table
 
-CREATE TABLE Misc (
-	VarName VARCHAR(30) NOT NULL,
-	Value1 INT4,
-	Value2 INT4,
-	Value3 INT4,
-	Value4 VARCHAR(40),
-	Value5 VARCHAR(128)
-	);
+-- CREATE TABLE Misc (
+--	VarName VARCHAR(30) NOT NULL,
+--	Value1 INT4,
+--	Value2 INT4,
+--	Value3 INT4,
+--	Value4 VARCHAR(40),
+--	Value5 VARCHAR(128)
+--	);
+-- 14/03/02 Add Lastcom command for opers
 	
+update opers set saccess = (saccess | 262144);

@@ -50,7 +50,7 @@
 #include	"UnloadClientTimerHandler.h"
 
 const char server_h_rcsId[] = __SERVER_H ;
-const char server_cc_rcsId[] = "$Id: server.cc,v 1.127 2002/02/24 21:36:41 mrbean_ Exp $" ;
+const char server_cc_rcsId[] = "$Id: server.cc,v 1.128 2002/03/14 20:35:19 mrbean_ Exp $" ;
 const char config_h_rcsId[] = __CONFIG_H ;
 const char misc_h_rcsId[] = __MISC_H ;
 const char events_h_rcsId[] = __EVENTS_H ;
@@ -2050,7 +2050,8 @@ bool xServer::setGline(
 	const string& userHost,
 	const string& reason,
 	const time_t& duration,
-	const xClient* setClient )
+	const xClient* setClient,
+	const string& server )
 {
 
 // Remove any old matches
@@ -2062,7 +2063,8 @@ assert( newGline != 0 ) ;
 
 // Notify the rest of the network
 strstream s ;
-s	<< getCharYY() << " GL * +"
+s	<< getCharYY() << " GL "
+	<< server << " +"
 	<< userHost << ' '
 	<< duration << " :"
 	<< reason << ends ;

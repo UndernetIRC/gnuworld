@@ -38,7 +38,7 @@
 #include	"ip.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.133 2002/03/12 22:24:52 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.134 2002/03/14 20:35:19 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -939,12 +939,17 @@ switch( theEvent )
 					}
 				if((tempGline) && (tempGline->getExpires() > ::time(0)))
 					{
-					//addGline(tempGline);
 					glSet = true;
-					//setRemoving(tempGline->getHost());
-					MyUplink->setGline(tempGline->getAddedBy()
-					,tempGline->getHost(),tempGline->getReason()
-					,tempGline->getExpires() - ::time(0),this);
+					if(!inBurst)
+						{
+						MyUplink->setGline(tempGline->getAddedBy()
+						,tempGline->getHost(),tempGline->getReason()
+						,tempGline->getExpires() - ::time(0),this);
+						}
+					else
+						{
+						addBurstGline(tempGline,NewUser->getCharYY());
+						}
 					//unSetRemoving();
 					}
 				}			
@@ -1776,8 +1781,40 @@ bool ccontrol::remGline( ccGline* TempGline)
 glineList.erase( std::find( glineList.begin(),
 	glineList.end(),
 	TempGline ) ) ;
+remBurstGline(TempGline);
 return true;
 }
+
+bool ccontrol::addBurstGline( ccGline* TempGline , const char *SNum)
+{
+bGlineListType::iterator ptr = burstGlineList.begin();
+string Server = SNum;
+for(;ptr != burstGlineList.end();++ptr)
+	{
+	if((ptr->first == TempGline) && (!strcmp(ptr->second.c_str(), Server.c_str())))
+		break;
+	}
+if(ptr == burstGlineList.end())
+	{ //if the gline wasnt found
+	burstGlineList.push_back(bGlineListType::value_type(TempGline,Server));
+	}
+return true;
+}
+
+bool ccontrol::remBurstGline(ccGline* TempGline)
+{
+bGlineListType::iterator ptr = burstGlineList.begin();
+for(;ptr != burstGlineList.end();++ptr)
+	{
+	if(ptr->first == TempGline)
+		break;
+	}
+if(ptr == burstGlineList.end())
+	{ //if the gline wasnt found
+	burstGlineList.erase(ptr);
+	}
+return true;
+} 
 
 ccGline* ccontrol::findMatchingGline( const string& Host )
 {
@@ -2403,8 +2440,8 @@ for(glineIterator ptr = glineList.begin();ptr != glineList.end();)
 	    ((*ptr)->getExpires() != 0)))
 
 		{
-		//remove the gline from the core
-		MyUplink->removeGline((*ptr)->getHost(),this);
+		//remove the gline from the burst list 
+		remBurstGline(*ptr);
 		//remove the gline from ccontrol structure
 		//finally remove the gline from the database
 		ccGline* tGline = *ptr;
@@ -2429,10 +2466,12 @@ bool ccontrol::burstGlines()
 {
 
 ccGline *theGline = 0 ;
+iServer* curServer;
 unsigned int Expires = 0;
-for(glineIterator ptr = glineList.begin(); ptr != glineList.end(); ptr++)
+for(bGlineListType::iterator ptr = burstGlineList.begin()
+    ; ptr != burstGlineList.end(); ++ptr)
 	{
-	theGline = *ptr;
+	theGline = ptr->first;
 	if((theGline->getExpires() == 0) && (theGline->getHost().substr(0,1) == "#"))
 		{
 		Expires =  gline::PERM_TIME;
@@ -2441,14 +2480,15 @@ for(glineIterator ptr = glineList.begin(); ptr != glineList.end(); ptr++)
 		{
 		Expires = theGline->getExpires() - ::time(0);
 		}
-	//setRemoving(theGline->getHost());
-	MyUplink->setGline(theGline->getAddedBy(),
-		theGline->getHost(),
-		theGline->getReason(),
-		Expires,this);
-	//unSetRemoving();
+	curServer = Network->findServer(ptr->second);
+	if(curServer)
+		{
+		MyUplink->setGline(theGline->getAddedBy(),
+				theGline->getHost(),
+				theGline->getReason(),
+			Expires,this,curServer->getName());
+		}
 	}
-
 return true;
 }
 

@@ -15,7 +15,7 @@
 #include	"misc.h"
 #include	"Constants.h"
 
-const char MODUSERCommand_cc_rcsId[] = "$Id: MODUSERCommand.cc,v 1.18 2002/03/01 18:27:36 mrbean_ Exp $";
+const char MODUSERCommand_cc_rcsId[] = "$Id: MODUSERCommand.cc,v 1.19 2002/03/14 20:35:19 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -123,7 +123,7 @@ while(pos < st.size())
 		}			
 	else if(!strcasecmp(st[pos],"-ah")) //Trying to add a new host ?
 		{
-		if(Same)
+		if((Same) && (AdFlag < operLevel::CODERLEVEL))
 			{
 			bot->Notice(theClient,"You cant add yourself another host");
 			pos+=2;
@@ -370,7 +370,7 @@ while(pos < st.size())
 			}
 		if(NewF > 0)
 			{
-			if((AdFlag < operLevel::CODERLEVEL) && (AdFlag >= NewF))
+			if((AdFlag < operLevel::CODERLEVEL) && (AdFlag <= NewF))
 				{
 				bot->Notice(theClient,"You cant update the flags to a higher or equal to your own flags");
 				}

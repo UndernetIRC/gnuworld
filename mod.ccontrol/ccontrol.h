@@ -3,7 +3,7 @@
  */
 
 #ifndef __CCONTROL_H
-#define __CCONTROL_H "$Id: ccontrol.h,v 1.65 2002/03/12 19:08:04 mrbean_ Exp $"
+#define __CCONTROL_H "$Id: ccontrol.h,v 1.66 2002/03/14 20:35:19 mrbean_ Exp $"
 
 //Undef this if you want to log to the database
 #define LOGTOHD 
@@ -118,13 +118,17 @@ protected:
 	
 	
 	typedef list< ccGline* >        glineListType ;
-
+	
+	typedef list< pair<ccGline* , string> > bGlineListType;
+	
 	/**
 	 * Holds the glines
 	 */
 
 	glineListType			glineList ;
 
+	bGlineListType			burstGlineList;
+	
 	typedef list< ccFloodData* >	ignoreListType;
 	
 	ignoreListType			ignoreList;
@@ -457,7 +461,10 @@ public:
 	
 	bool remGline( ccGline* );
 
-
+	bool addBurstGline( ccGline* , const char *);
+	
+	bool remBurstGline( ccGline* );
+	
 	ccGline* findMatchingGline( const string& );
 
 	ccGline* findGline( const string& );

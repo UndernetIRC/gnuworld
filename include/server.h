@@ -17,7 +17,7 @@
  */
 
 #ifndef __SERVER_H
-#define __SERVER_H "$Id: server.h,v 1.55 2002/01/17 20:03:59 mrbean_ Exp $"
+#define __SERVER_H "$Id: server.h,v 1.56 2002/03/14 20:35:19 mrbean_ Exp $"
 
 #include	<string>
 #include	<vector>
@@ -325,7 +325,9 @@ public:
 	virtual bool setGline( const string& setBy,
 		const string& userHost,
 		const string& reason,
-		const time_t& duration, const xClient* setClient = NULL ) ;
+		const time_t& duration, 
+		const xClient* setClient = NULL,  
+		const string& server = "*") ;
 
 	/**
 	 * Remove a network gline and update internal gline table.
