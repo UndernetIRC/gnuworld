@@ -179,7 +179,7 @@ RegisterCommand(new DEVOICECommand(this, "DEVOICE", "<#channel> [nick] [nick] ..
 RegisterCommand(new ADDUSERCommand(this, "ADDUSER", "<#channel> <username> <access>", 8));
 RegisterCommand(new REMUSERCommand(this, "REMUSER", "<#channel> <username>", 4));
 RegisterCommand(new MODINFOCommand(this, "MODINFO", "<#channel> [ACCESS <username> <level>] [AUTOMODE <username> <NONE|OP|VOICE>]", 6));
-RegisterCommand(new SETCommand(this, "SET", "[#channel] <variable> <value> or, SET <invisible> <ON|OFF>", 6));
+RegisterCommand(new SETCommand(this, "SET", "[#channel] <variable> <value> or, SET <invisible> <ON|OFF> or, SET LANG <language> or, SET MAXLOGINS <max-logins>.", 6));
 RegisterCommand(new INVITECommand(this, "INVITE", "<#channel>", 2));
 RegisterCommand(new TOPICCommand(this, "TOPIC", "<#channel> <topic>", 4));
 RegisterCommand(new CHANINFOCommand(this, "CHANINFO", "<#channel>", 3));

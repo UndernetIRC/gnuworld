@@ -10,7 +10,7 @@
 #include	"Network.h"
 #include	"cservice_config.h"
 
-const char STATUSCommand_cc_rcsId[] = "$Id: STATUSCommand.cc,v 1.38 2002/01/08 23:20:43 gte Exp $" ;
+const char STATUSCommand_cc_rcsId[] = "$Id: STATUSCommand.cc,v 1.39 2002/03/04 22:53:50 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -310,6 +310,11 @@ for (int i = 0 ; i < bot->SQLDb->Tuples(); i++)
 			iClient* tmpClient = (*ptr);
 
 			showNick = false;
+
+			/* If we have admin access, always show the nick's of auth'd users. */
+			showNick = admLevel;
+
+			/* Only show the nick of the client if he's actually in the channel */
 			if (tmpChan) showNick = (tmpChan->findUser(tmpClient) || admLevel);
 
 			if (showNick)

@@ -4,9 +4,10 @@
 
 #include	"StringTokenizer.h"
 #include	"ELog.h"
+#include	"Network.h"
 #include	"cservice.h"
 
-const char RANDOMCommand_cc_rcsId[] = "$Id: RANDOMCommand.cc,v 1.4 2001/09/26 01:10:31 gte Exp $" ;
+const char RANDOMCommand_cc_rcsId[] = "$Id: RANDOMCommand.cc,v 1.5 2002/03/04 22:53:50 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -22,9 +23,6 @@ if( st.size() < 2 )
 	Usage(theClient);
 	return true;
 	}
-
-sqlChannel* test = new sqlChannel(bot->SQLDb);
-test->loadData("#coder-com");
 
 return true ;
 }
