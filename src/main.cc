@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: main.cc,v 1.60 2004/01/07 18:33:43 dan_karrels Exp $
+ * $Id: main.cc,v 1.61 2004/01/09 17:01:04 dan_karrels Exp $
  */
 
 #include	<sys/time.h>
@@ -35,9 +35,11 @@
 
 #include	"config.h"
 
+/*
 #ifdef HAVE_GETOPT_H
 #include	<getopt.h>
 #endif
+*/
 
 #include	"ELog.h"
 #include	"server.h"
@@ -45,7 +47,7 @@
 #include	"md5hash.h"
 #include	"Signal.h"
 
-RCSTAG( "$Id: main.cc,v 1.60 2004/01/07 18:33:43 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: main.cc,v 1.61 2004/01/09 17:01:04 dan_karrels Exp $" ) ;
 
 // main() must be in the global namespace
 using namespace gnuworld ;
