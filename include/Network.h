@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: Network.h,v 1.32 2002/07/08 15:47:54 dan_karrels Exp $
+ * $Id: Network.h,v 1.33 2002/10/29 19:38:29 dan_karrels Exp $
  */
 
 #ifndef __NETWORK_H
-#define __NETWORK_H "$Id: Network.h,v 1.32 2002/07/08 15:47:54 dan_karrels Exp $"
+#define __NETWORK_H "$Id: Network.h,v 1.33 2002/10/29 19:38:29 dan_karrels Exp $"
 
 #include	<vector>
 #include	<string>
@@ -327,6 +327,46 @@ public:
 	 * method.
 	 */
 	virtual void		OnSplit( const unsigned int& intYY ) ;
+
+	/**
+	 * An iterator to a network (iClient), which allows mutation.
+	 * This iterator is a pair< const string (nickname), iClient* >.
+	 */
+	typedef nickMapType::iterator	clientIterator ;
+
+	/**
+	 * Return a mutator to the beginning of the network client
+	 * data structure.  The client referenced is mutable.
+	 */
+	inline clientIterator		clients_begin()
+		{ return nickMap.begin() ; }
+
+	/**
+	 * Return a mutator to the end of the network client
+	 * data structure.  The client referenced is mutable.
+	 */
+	inline clientIterator		clients_end()
+		{ return nickMap.end() ; }
+
+	/**
+	 * An iterator to a network (iClient), which disallows mutation.
+	 * This iterator is a pair< const string (nickname), iClient* >.
+	 */
+	typedef nickMapType::const_iterator	const_clientIterator ;
+
+	/**
+	 * Return a mutator to the beginning of the network client
+	 * data structure.  The client referenced is immutable.
+	 */
+	inline const_clientIterator	clients_begin() const
+		{ return nickMap.begin() ; }
+
+	/**
+	 * Return a mutator to the end of the network client
+	 * data structure.  The client referenced is immutable.
+	 */
+	inline const_clientIterator	clients_end() const
+		{ return nickMap.end() ; }
 
 	/**
 	 * Define a non-const iterator for walking through the
