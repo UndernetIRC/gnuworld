@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_GL.cc,v 1.2 2003/05/23 17:28:34 dan_karrels Exp $
+ * $Id: msg_GL.cc,v 1.3 2003/06/03 23:19:07 dan_karrels Exp $
  */
 
 #include	<new>
@@ -37,7 +37,7 @@ const char xparameters_h_rcsId[] = __XPARAMETERS_H ;
 const char ELog_h_rcsId[] = __ELOG_H ;
 const char Gline_h_rcsId[] = __GLINE_H ;
 const char events_h_rcsId[] = __EVENTS_H ;
-const char msg_GL_cc_rcsId[] = "$Id: msg_GL.cc,v 1.2 2003/05/23 17:28:34 dan_karrels Exp $" ;
+const char msg_GL_cc_rcsId[] = "$Id: msg_GL.cc,v 1.3 2003/06/03 23:19:07 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -64,44 +64,23 @@ if( '-' == Params[ 2 ][ 0 ] )
 		return false ;
 		}
 
-	xServer::glineIterator ptr = theServer->gline_begin(),
-		end = theServer->gline_end() ;
-	for( ; ptr != end ; ++ptr )
+	xServer::glineIterator gItr = theServer->findGlineIterator(
+		Params[ 2 ] + 1 ) ;
+	if( gItr == theServer->gline_end() )
 		{
-		if( ptr->second->getUserHost() == (Params[ 2 ] + 1) )
-			{
-			// Found it
-			break ;
-			}
+		// Unable to find the gline to be removed *shrug*
+		return true ;
 		}
 
-	if( ptr == theServer->gline_end() )
-		{
-		// Gline not found
-		elog	<< "msg_GL> Unable to find matching "
-			<< "gline for removal: "
-			<< Params[ 2 ]
-			<< endl ;
+	// Found the gline being removed, remove it
+	theServer->eraseGline( gItr ) ;
 
-		// Construct a faked Gline inorder to post it
-		Gline* oldGline = new (std::nothrow)
-			Gline( string(), Params[ 2 ] + 1,
-				string(), 0 ) ;
-		assert( oldGline != 0 ) ;
-
-		theServer->PostEvent( EVT_REMGLINE,
-			static_cast< void* >( oldGline ) ) ;
-		delete oldGline; oldGline = 0 ;
-
-		return false ;
-		}
-
+	// Let the modules know that it has been removed
 	theServer->PostEvent( EVT_REMGLINE,
-		static_cast< void* >( ptr->second ) ) ;
+		static_cast< void* >( gItr->second ) ) ;
 
-	theServer->eraseGline( ptr ) ;
-	delete ptr->second ;
-
+	// Clean up memory
+	delete gItr->second ;
 	return true ;
 	}
 

@@ -165,7 +165,6 @@ lib_LTLIBRARIES = lib_msg_AC.la \
 	lib_msg_M.la \
 	lib_msg_N.la \
 	lib_msg_NOOP.la \
-	lib_msg_PART.la \
 	lib_msg_PA.la \
 	lib_msg_O.la \
 	lib_msg_P.la \
@@ -316,10 +315,6 @@ lib_msg_PA_la_LDFLAGS =
 lib_msg_PA_la_LIBADD =
 am_lib_msg_PA_la_OBJECTS = msg_PA.lo
 lib_msg_PA_la_OBJECTS = $(am_lib_msg_PA_la_OBJECTS)
-lib_msg_PART_la_LDFLAGS =
-lib_msg_PART_la_LIBADD =
-am_lib_msg_PART_la_OBJECTS = msg_PART.lo
-lib_msg_PART_la_OBJECTS = $(am_lib_msg_PART_la_OBJECTS)
 lib_msg_Q_la_LDFLAGS =
 lib_msg_Q_la_LIBADD =
 am_lib_msg_Q_la_OBJECTS = msg_Q.lo
@@ -375,12 +370,12 @@ am__depfiles_maybe = depfiles
 @AMDEP_TRUE@	./$(DEPDIR)/msg_M.Plo ./$(DEPDIR)/msg_M351.Plo \
 @AMDEP_TRUE@	./$(DEPDIR)/msg_N.Plo ./$(DEPDIR)/msg_NOOP.Plo \
 @AMDEP_TRUE@	./$(DEPDIR)/msg_O.Plo ./$(DEPDIR)/msg_P.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/msg_PA.Plo ./$(DEPDIR)/msg_PART.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/msg_Q.Plo ./$(DEPDIR)/msg_R.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/msg_S.Plo ./$(DEPDIR)/msg_SQ.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/msg_Server.Plo ./$(DEPDIR)/msg_T.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/msg_V.Plo ./$(DEPDIR)/msg_W.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/msg_WA.Plo ./$(DEPDIR)/msg_Y.Plo
+@AMDEP_TRUE@	./$(DEPDIR)/msg_PA.Plo ./$(DEPDIR)/msg_Q.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/msg_R.Plo ./$(DEPDIR)/msg_S.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/msg_SQ.Plo ./$(DEPDIR)/msg_Server.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/msg_T.Plo ./$(DEPDIR)/msg_V.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/msg_W.Plo ./$(DEPDIR)/msg_WA.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/msg_Y.Plo
 CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
 LTCXXCOMPILE = $(LIBTOOL) --mode=compile $(CXX) $(DEFS) \
@@ -400,14 +395,14 @@ DIST_SOURCES = $(lib_msg_AC_la_SOURCES) $(lib_msg_AD_la_SOURCES) \
 	$(lib_msg_M_la_SOURCES) $(lib_msg_M351_la_SOURCES) \
 	$(lib_msg_N_la_SOURCES) $(lib_msg_NOOP_la_SOURCES) \
 	$(lib_msg_O_la_SOURCES) $(lib_msg_P_la_SOURCES) \
-	$(lib_msg_PA_la_SOURCES) $(lib_msg_PART_la_SOURCES) \
-	$(lib_msg_Q_la_SOURCES) $(lib_msg_R_la_SOURCES) \
-	$(lib_msg_S_la_SOURCES) $(lib_msg_SQ_la_SOURCES) \
-	$(lib_msg_Server_la_SOURCES) $(lib_msg_T_la_SOURCES) \
-	$(lib_msg_V_la_SOURCES) $(lib_msg_W_la_SOURCES) \
-	$(lib_msg_WA_la_SOURCES) $(lib_msg_Y_la_SOURCES)
+	$(lib_msg_PA_la_SOURCES) $(lib_msg_Q_la_SOURCES) \
+	$(lib_msg_R_la_SOURCES) $(lib_msg_S_la_SOURCES) \
+	$(lib_msg_SQ_la_SOURCES) $(lib_msg_Server_la_SOURCES) \
+	$(lib_msg_T_la_SOURCES) $(lib_msg_V_la_SOURCES) \
+	$(lib_msg_W_la_SOURCES) $(lib_msg_WA_la_SOURCES) \
+	$(lib_msg_Y_la_SOURCES)
 DIST_COMMON = Makefile.am Makefile.in
-SOURCES = $(lib_msg_AC_la_SOURCES) $(lib_msg_AD_la_SOURCES) $(lib_msg_B_la_SOURCES) $(lib_msg_C_la_SOURCES) $(lib_msg_CM_la_SOURCES) $(lib_msg_D_la_SOURCES) $(lib_msg_DS_la_SOURCES) $(lib_msg_EA_la_SOURCES) $(lib_msg_EB_la_SOURCES) $(lib_msg_G_la_SOURCES) $(lib_msg_GL_la_SOURCES) $(lib_msg_I_la_SOURCES) $(lib_msg_J_la_SOURCES) $(lib_msg_JU_la_SOURCES) $(lib_msg_K_la_SOURCES) $(lib_msg_L_la_SOURCES) $(lib_msg_M_la_SOURCES) $(lib_msg_M351_la_SOURCES) $(lib_msg_N_la_SOURCES) $(lib_msg_NOOP_la_SOURCES) $(lib_msg_O_la_SOURCES) $(lib_msg_P_la_SOURCES) $(lib_msg_PA_la_SOURCES) $(lib_msg_PART_la_SOURCES) $(lib_msg_Q_la_SOURCES) $(lib_msg_R_la_SOURCES) $(lib_msg_S_la_SOURCES) $(lib_msg_SQ_la_SOURCES) $(lib_msg_Server_la_SOURCES) $(lib_msg_T_la_SOURCES) $(lib_msg_V_la_SOURCES) $(lib_msg_W_la_SOURCES) $(lib_msg_WA_la_SOURCES) $(lib_msg_Y_la_SOURCES)
+SOURCES = $(lib_msg_AC_la_SOURCES) $(lib_msg_AD_la_SOURCES) $(lib_msg_B_la_SOURCES) $(lib_msg_C_la_SOURCES) $(lib_msg_CM_la_SOURCES) $(lib_msg_D_la_SOURCES) $(lib_msg_DS_la_SOURCES) $(lib_msg_EA_la_SOURCES) $(lib_msg_EB_la_SOURCES) $(lib_msg_G_la_SOURCES) $(lib_msg_GL_la_SOURCES) $(lib_msg_I_la_SOURCES) $(lib_msg_J_la_SOURCES) $(lib_msg_JU_la_SOURCES) $(lib_msg_K_la_SOURCES) $(lib_msg_L_la_SOURCES) $(lib_msg_M_la_SOURCES) $(lib_msg_M351_la_SOURCES) $(lib_msg_N_la_SOURCES) $(lib_msg_NOOP_la_SOURCES) $(lib_msg_O_la_SOURCES) $(lib_msg_P_la_SOURCES) $(lib_msg_PA_la_SOURCES) $(lib_msg_Q_la_SOURCES) $(lib_msg_R_la_SOURCES) $(lib_msg_S_la_SOURCES) $(lib_msg_SQ_la_SOURCES) $(lib_msg_Server_la_SOURCES) $(lib_msg_T_la_SOURCES) $(lib_msg_V_la_SOURCES) $(lib_msg_W_la_SOURCES) $(lib_msg_WA_la_SOURCES) $(lib_msg_Y_la_SOURCES)
 
 all: all-am
 
@@ -492,8 +487,6 @@ lib_msg_P.la: $(lib_msg_P_la_OBJECTS) $(lib_msg_P_la_DEPENDENCIES)
 	$(CXXLINK) -rpath $(libdir) $(lib_msg_P_la_LDFLAGS) $(lib_msg_P_la_OBJECTS) $(lib_msg_P_la_LIBADD) $(LIBS)
 lib_msg_PA.la: $(lib_msg_PA_la_OBJECTS) $(lib_msg_PA_la_DEPENDENCIES) 
 	$(CXXLINK) -rpath $(libdir) $(lib_msg_PA_la_LDFLAGS) $(lib_msg_PA_la_OBJECTS) $(lib_msg_PA_la_LIBADD) $(LIBS)
-lib_msg_PART.la: $(lib_msg_PART_la_OBJECTS) $(lib_msg_PART_la_DEPENDENCIES) 
-	$(CXXLINK) -rpath $(libdir) $(lib_msg_PART_la_LDFLAGS) $(lib_msg_PART_la_OBJECTS) $(lib_msg_PART_la_LIBADD) $(LIBS)
 lib_msg_Q.la: $(lib_msg_Q_la_OBJECTS) $(lib_msg_Q_la_DEPENDENCIES) 
 	$(CXXLINK) -rpath $(libdir) $(lib_msg_Q_la_LDFLAGS) $(lib_msg_Q_la_OBJECTS) $(lib_msg_Q_la_LIBADD) $(LIBS)
 lib_msg_R.la: $(lib_msg_R_la_OBJECTS) $(lib_msg_R_la_DEPENDENCIES) 
@@ -544,7 +537,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/msg_O.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/msg_P.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/msg_PA.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/msg_PART.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/msg_Q.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/msg_R.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/msg_S.Plo@am__quote@

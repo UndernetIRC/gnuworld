@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_M.cc,v 1.1 2002/11/20 22:16:18 dan_karrels Exp $
+ * $Id: msg_M.cc,v 1.2 2003/06/03 23:19:07 dan_karrels Exp $
  */
 
 #include	<new>
@@ -37,7 +37,7 @@
 #include	"StringTokenizer.h"
 #include	"ServerCommandHandler.h"
 
-const char msg_M_cc_rcsId[] = "$Id: msg_M.cc,v 1.1 2002/11/20 22:16:18 dan_karrels Exp $" ;
+const char msg_M_cc_rcsId[] = "$Id: msg_M.cc,v 1.2 2003/06/03 23:19:07 dan_karrels Exp $" ;
 const char misc_h_rcsId[] = __MISC_H ;
 const char events_h_rcsId[] = __EVENTS_H ;
 const char server_h_rcsId[] = __SERVER_H ;
@@ -347,14 +347,14 @@ if( !banVector.empty() )
 return true ;
 }
 
+// OAD M ripper_ :+owg
 bool msg_M::onUserModeChange( const xParameters& Param )
 {
-
 // Since users aren't allowed to change modes for anyone other than
 // themselves, there is no need to lookup the second user argument
 // For some reason, when a user changes his/her/its modes, it still
 // specifies the second argument to be nickname instaed of numeric.
-iClient* theClient = Network->findNick( Param[ 1 ] ) ;
+iClient* theClient = Network->findClient( Param[ 0 ] ) ;
 if( NULL == theClient )
 	{
 	elog	<< "msg_M::OnUserModeChange> Unable to find target "
@@ -364,7 +364,16 @@ if( NULL == theClient )
 	return false ;
 	}
 
-// Local channels are not propogated across the network.
+if( theClient->getNickName() != Param[ 1 ] )
+	{
+	elog	<< "msg_M::OnUserModeChange> User trying to change "
+		<< "mode for someone other than itself: "
+		<< *theClient
+		<< ", nickname: "
+		<< Param[ 1 ]
+		<< endl ;
+	return false ;
+	}
 
 // It's important that the mode '+' be default
 bool plus = true ;

@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server.cc,v 1.159 2003/06/03 01:01:56 dan_karrels Exp $
+ * $Id: server.cc,v 1.160 2003/06/03 23:19:10 dan_karrels Exp $
  */
 
 #include	<sys/time.h>
@@ -72,7 +72,7 @@
 #include	"Connection.h"
 
 const char server_h_rcsId[] = __SERVER_H ;
-const char server_cc_rcsId[] = "$Id: server.cc,v 1.159 2003/06/03 01:01:56 dan_karrels Exp $" ;
+const char server_cc_rcsId[] = "$Id: server.cc,v 1.160 2003/06/03 23:19:10 dan_karrels Exp $" ;
 const char config_h_rcsId[] = __CONFIG_H ;
 const char misc_h_rcsId[] = __MISC_H ;
 const char events_h_rcsId[] = __EVENTS_H ;
@@ -2552,6 +2552,7 @@ void xServer::dumpStats()
 clog	<< "Number of channels: " << Network->channelList_size() << endl ;
 clog	<< "Number of servers: " << Network->serverList_size() << endl ;
 clog	<< "Number of clients: " << Network->clientList_size() << endl ;
+clog	<< "Number of glines: " << glineList.size() << endl ;
 clog	<< "Last burst duration: " << (burstEnd - burstStart)
 	<< " seconds" << endl ;
 #ifdef EDEBUG

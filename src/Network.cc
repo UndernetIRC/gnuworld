@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: Network.cc,v 1.50 2003/05/26 21:44:32 dan_karrels Exp $
+ * $Id: Network.cc,v 1.51 2003/06/03 23:19:10 dan_karrels Exp $
  */
 
 #include	<new>
@@ -42,7 +42,7 @@
 #include	"ip.h"
 
 const char xNetwork_h_rcsId[] = __NETWORK_H ;
-const char xNetwork_cc_rcsId[] = "$Id: Network.cc,v 1.50 2003/05/26 21:44:32 dan_karrels Exp $" ;
+const char xNetwork_cc_rcsId[] = "$Id: Network.cc,v 1.51 2003/06/03 23:19:10 dan_karrels Exp $" ;
 const char ELog_h_rcsId[] = __ELOG_H ;
 const char iClient_h_rcsId[] = __ICLIENT_H ;
 const char Channel_h_rcsId[] = __CHANNEL_H ;
@@ -196,6 +196,10 @@ return ptr->second ;
 
 iClient* xNetwork::findNick( const string& nick ) const
 {
+elog	<< "xNetwork::findNick> "
+	<< nick
+	<< endl ;
+
 nickMapType::const_iterator ptr = nickMap.find( nick ) ;
 if( ptr == nickMap.end() )
 	{
@@ -548,6 +552,12 @@ return removeChannel( theChan->getName() ) ;
 void xNetwork::rehashNick( const string& yyxxx,
 	const string& newNick )
 {
+//elog	<< "xNetwork::rehashNick> yyxxx: "
+//	<< yyxxx
+//	<< ", newNick: "
+//	<< newNick
+//	<< endl ;
+
 iClient* theClient = findClient( yyxxx ) ;
 if( NULL == theClient )
 	{

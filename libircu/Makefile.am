@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-## $Id: Makefile.am,v 1.4 2003/06/03 01:01:52 dan_karrels Exp $
+## $Id: Makefile.am,v 1.5 2003/06/03 23:19:07 dan_karrels Exp $
 
 lib_LTLIBRARIES = lib_msg_AC.la \
 	lib_msg_AD.la \
@@ -21,7 +21,6 @@ lib_LTLIBRARIES = lib_msg_AC.la \
 	lib_msg_M.la \
 	lib_msg_N.la \
 	lib_msg_NOOP.la \
-	lib_msg_PART.la \
 	lib_msg_PA.la \
 	lib_msg_O.la \
 	lib_msg_P.la \

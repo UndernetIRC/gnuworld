@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_N.cc,v 1.1 2002/11/20 22:16:18 dan_karrels Exp $
+ * $Id: msg_N.cc,v 1.2 2003/06/03 23:19:08 dan_karrels Exp $
  */
 
 #include	<new>
@@ -35,7 +35,7 @@
 #include	"xparameters.h"
 #include	"ServerCommandHandler.h"
 
-const char msg_N_cc_rcsId[] = "$Id: msg_N.cc,v 1.1 2002/11/20 22:16:18 dan_karrels Exp $" ;
+const char msg_N_cc_rcsId[] = "$Id: msg_N.cc,v 1.2 2003/06/03 23:19:08 dan_karrels Exp $" ;
 const char iClient_h_rcsId[] = __ICLIENT_H ;
 const char events_h_rcsId[] = __EVENTS_H ;
 const char ip_h_rcsId[] = __IP_H ;
@@ -80,6 +80,10 @@ bool msg_N::Execute( const xParameters& params )
 if( params.size() < 5 )
 	{
 	// User changing nick
+//	elog	<< "N> Rehashing nickname: "
+//		<< params
+//		<< endl ;
+
 	Network->rehashNick( params[ 0 ], params[ 1 ] ) ;
 	return true ;
 	}
