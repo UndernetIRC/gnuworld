@@ -1,4 +1,4 @@
-# $Id: GNUWorld.example.conf.in,v 1.6 2003/06/05 01:38:01 dan_karrels Exp $
+# $Id: GNUWorld.example.conf.in,v 1.7 2003/06/10 14:20:41 dan_karrels Exp $
 # GNUWorld Core Configuration File
 #
 
@@ -39,6 +39,7 @@ libdir = @libdir@
 #module = libscanner.la scanner.conf
 #module = libgnutest.la gnutest.conf
 #module = libclientExample.la clientExample.conf
+#module = libdronescan.la dronescan.example.conf
 
 #################################################
 # It is safe to leave the rest of this file alone
