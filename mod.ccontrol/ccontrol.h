@@ -3,7 +3,7 @@
  */
 
 #ifndef __CCONTROL_H
-#define __CCONTROL_H "$Id: ccontrol.h,v 1.14 2001/03/04 20:27:41 mrbean_ Exp $"
+#define __CCONTROL_H "$Id: ccontrol.h,v 1.15 2001/03/10 18:33:23 mrbean_ Exp $"
 
 #include	<string>
 #include	<vector>
@@ -248,6 +248,8 @@ public:
         bool AddHost( ccUser* , const string& host );
 
         bool DelHost( ccUser* , const string& host );
+	
+	bool listHosts( ccUser* , iClient* );
 	
 	void UpdateAuth( ccUser* );
 

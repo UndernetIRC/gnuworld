@@ -12,7 +12,7 @@
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 
-const char KICKCommand_cc_rcsId[] = "$Id: KICKCommand.cc,v 1.4 2001/02/26 16:58:05 mrbean_ Exp $";
+const char KICKCommand_cc_rcsId[] = "$Id: KICKCommand.cc,v 1.5 2001/03/10 18:33:23 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -53,6 +53,20 @@ if( NULL == Target )
 	return true ;
 	}
 
+if( NULL == theChan->findUser( Target ) )
+	{
+	bot->Notice( theClient, "User %s was not found "
+	"on channel %s",
+	st[ 1 ].c_str(),
+	theChan->getName().c_str() ) ;
+	return true ;
+	}
+
+if( Target->getMode(iClient::MODE_SERVICES))
+	{
+	bot->Notice(theClient,"Are you trying to get me introuble with %s?",st[ 2 ].c_str());
+	return false;
+	}
 bot->Notice( theClient, "Kicking %s from channel %s because %s",
 	Target->getNickName().c_str(),
 	chanName.c_str(),

@@ -23,7 +23,7 @@
 #include	"AuthInfo.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.19 2001/03/03 18:46:59 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.20 2001/03/10 18:33:23 mrbean_ Exp $" ;
 
 using std::string ;
 using std::vector ;
@@ -169,6 +169,16 @@ RegisterCommand( new UNSUSPENDOPERCommand( this, "UNSUSPEND", "<OPER> "
 	"UnSuspend an oper",flg_UNSUSPEND ) ) ;
 RegisterCommand( new MODOPERCommand( this, "MODOPER", "<OPER> <OPTION> <NEWVALUE>"
 	"Modify an oper",flg_UNSUSPEND ) ) ;
+RegisterCommand( new MODERATECommand( this, "MODERATE", "<#Channel> "
+	"Moderate A Channel",flg_UNSUSPEND ) ) ;
+RegisterCommand( new UNMODERATECommand( this, "UNMODERATE", "<#Channel> "
+	"UNModerate A Channel",flg_UNSUSPEND ) ) ;
+RegisterCommand( new OPCommand( this, "OP", "<#Channel> <nick> [nick] .. "
+	"Op user(s) on a Channel",flg_UNSUSPEND ) ) ;
+RegisterCommand( new DEOPCommand( this, "DEOP", "<#Channel> <nick> [nick] .. "
+	"Deop user(s) on a Channel",flg_UNSUSPEND ) ) ;
+RegisterCommand( new LISTHOSTSCommand( this, "LISTHOSTS", "<oper> "
+	"Shows an oper hosts list",flg_UNSUSPEND ) ) ;
 
 }
 
@@ -515,10 +525,11 @@ if( NULL == theChan )
 
 // Kick any users from the channel that aren't opers
 vector< iClient* > clientsToKick ;
+iClient *tUser = 0;
 for( Channel::const_userIterator ptr = theChan->userList_begin() ;
 	ptr != theChan->userList_end() ; ++ptr )
-	{
-	if( !ptr->second->isOper() )
+	{ //Dont kick opers and +k ppl
+	if(( !ptr->second->isOper() ) && ( !ptr->second->getClient()->getMode(iClient::MODE_SERVICES) ))
 		{
 		clientsToKick.push_back( ptr->second->getClient() ) ;
 		}
@@ -1006,6 +1017,37 @@ else
 	}
 }
 
+bool ccontrol::listHosts( ccUser* User, iClient* theClient )
+{
+static const char* queryHeader
+	= "SELECT host FROM hosts WHERE user_id =  ";
+
+strstream theQuery;
+theQuery	<< queryHeader 
+		<< User->getID()
+		<< ends;
+
+ExecStatusType status = SQLDb->Exec( theQuery.str() ) ;
+delete[] theQuery.str() ;
+
+if( PGRES_TUPLES_OK != status )
+	{
+	elog	<< "LISTHOSTS> SQL Error: "
+		<< SQLDb->ErrorMessage()
+		<< endl ;
+	return false ;
+	}
+
+// SQL Query succeeded
+Notice(theClient,"Host list for %s",User->getUserName().c_str());
+for (int i = 0 ; i < SQLDb->Tuples(); i++)
+	{
+	Notice(theClient,SQLDb->GetValue(i, 0));
+	}
+return true;
+}	
+	    
+
 bool ccontrol::GetHelp( iClient* user, const string& command )
 {
 static const char *Main = "SELECT line,help FROM help WHERE lower(command) = '";
@@ -1126,6 +1168,5 @@ else
 	return NULL;
 	}
 }
-		    
 
 } // namespace gnuworld
