@@ -187,7 +187,11 @@ while( !done )
 		continue ;
 		}
 
-	time_t connectDuration = lh.burstPtr->getConnectTime() - ::time( 0 ) ;
+	time_t connectDuration = ::time( 0 ) - lh.burstPtr->getConnectTime() ;
+	if( 0 == connectDuration )
+		{
+		connectDuration = 1 ;
+		}
 	size_t recvRate = lh.burstPtr->getBytesRead() / connectDuration ;
 	size_t sendRate = lh.burstPtr->getBytesWritten()
 		/ connectDuration ;
