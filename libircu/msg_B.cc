@@ -18,13 +18,14 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_B.cc,v 1.3 2003/07/03 00:25:48 dan_karrels Exp $
+ * $Id: msg_B.cc,v 1.4 2003/11/02 18:43:34 dan_karrels Exp $
  */
 
 #include	<sys/types.h>
 #include	<sys/time.h>
 
 #include	<new>
+#include	<map>
 #include	<string>
 #include	<vector>
 #include	<iostream>
@@ -43,12 +44,13 @@
 #include	"ServerCommandHandler.h"
 #include	"config.h"
 
-RCSTAG( "$Id: msg_B.cc,v 1.3 2003/07/03 00:25:48 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: msg_B.cc,v 1.4 2003/11/02 18:43:34 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
 
 using std::pair ;
+using std::make_pair ;
 using std::string ;
 using std::vector ;
 using std::endl ;
@@ -180,37 +182,39 @@ if( '+' == Param[ whichToken ][ 0 ] )
 	// Skip over the '+'
 	++currentPtr ;
 
+	xServer::modeVectorType modeVector ;
+
 	for( ; currentPtr && *currentPtr ; ++currentPtr )
 		{
 		switch( *currentPtr )
 			{
 			case 't':
-				theServer->OnChannelModeT( theChan, true, 
-					0 ) ;
+				modeVector.push_back( make_pair(
+					true, Channel::MODE_T ) ) ;
 				break ;
 			case 'n':
-				theServer->OnChannelModeN( theChan, true, 
-					0 ) ;
+				modeVector.push_back( make_pair(
+					true, Channel::MODE_N ) ) ;
 				break ;
 			case 'm':
-				theServer->OnChannelModeM( theChan, true, 
-					0 ) ;
+				modeVector.push_back( make_pair(
+					true, Channel::MODE_M ) ) ;
 				break ;
 			case 'p':
-				theServer->OnChannelModeP( theChan, true, 
-					0 ) ;
+				modeVector.push_back( make_pair(
+					true, Channel::MODE_P ) ) ;
 				break ;
 			case 's':
-				theServer->OnChannelModeS( theChan, true, 
-					0 ) ;
+				modeVector.push_back( make_pair(
+					true, Channel::MODE_S ) ) ;
 				break ;
 			case 'i':
-				theServer->OnChannelModeI( theChan, true, 
-					0 ) ;
+				modeVector.push_back( make_pair(
+					true, Channel::MODE_I ) ) ;
 				break ;
 			case 'r':
-				theServer->OnChannelModeR( theChan, true,
-					0 ) ;
+				modeVector.push_back( make_pair(
+					true, Channel::MODE_R ) ) ;
 				break ;
  			case 'l':
 				theServer->OnChannelModeL( theChan, true, 
@@ -229,6 +233,11 @@ if( '+' == Param[ whichToken ][ 0 ] )
 			} // switch
 
 		} // for( currentPtr != endPtr )
+
+	if( !modeVector.empty() )
+		{
+		theServer->OnChannelMode( theChan, 0, modeVector ) ;
+		}
 
 	// Skip over the modes token
 	// whichToken either points to the modes token if no +l/+k
@@ -446,7 +455,6 @@ if( !voiceVector.empty() )
 	{
 	theServer->OnChannelModeV( theChan, 0, voiceVector ) ;
 	}
-
 }
 
 void msg_B::parseBurstBans( Channel* theChan, const string& theBans )

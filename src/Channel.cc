@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: Channel.cc,v 1.42 2003/08/23 21:00:33 dan_karrels Exp $
+ * $Id: Channel.cc,v 1.43 2003/11/02 18:43:34 dan_karrels Exp $
  */
 
 #include	<new>
@@ -37,7 +37,7 @@
 #include	"server.h"
 #include	"ConnectionManager.h"
 
-RCSTAG("$Id: Channel.cc,v 1.42 2003/08/23 21:00:33 dan_karrels Exp $") ;
+RCSTAG("$Id: Channel.cc,v 1.43 2003/11/02 18:43:34 dan_karrels Exp $") ;
 
 namespace gnuworld
 {
@@ -284,46 +284,18 @@ for( banListType::const_iterator ptr = banList.begin(),
 return false ;
 }
 
-void Channel::onModeT( bool polarity )
+void Channel::onMode(
+	const vector< pair< bool, Channel::modeType > >& modeVector )
 {
-if( polarity )	setMode( MODE_T ) ;
-else		removeMode( MODE_T ) ;
-}
+typedef vector< pair< bool, Channel::modeType > > modeVectorType ;
+for( modeVectorType::const_iterator mItr = modeVector.begin() ;
+	mItr != modeVector.end() ; ++mItr )
+	{
+	bool polarity = (*mItr).first ;
 
-void Channel::onModeN( bool polarity )
-{
-if( polarity )	setMode( MODE_N ) ;
-else		removeMode( MODE_N ) ;
-}
-
-void Channel::onModeS( bool polarity )
-{
-if( polarity )	setMode( MODE_S ) ;
-else		removeMode( MODE_S ) ;
-}
-
-void Channel::onModeP( bool polarity )
-{
-if( polarity )	setMode( MODE_P ) ;
-else		removeMode( MODE_P ) ;
-}
-
-void Channel::onModeM( bool polarity )
-{
-if( polarity )	setMode( MODE_M ) ;
-else		removeMode( MODE_M ) ;
-}
-
-void Channel::onModeI( bool polarity )
-{
-if( polarity )	setMode( MODE_I ) ;
-else		removeMode( MODE_I ) ;
-}
-
-void Channel::onModeR( bool polarity )
-{
-if( polarity )	setMode( MODE_R ) ;
-else		removeMode( MODE_R ) ;
+	if( polarity )		setMode( (*mItr).second ) ;
+	else			removeMode( (*mItr).second ) ;
+	} // for()
 }
 
 void Channel::onModeL( bool polarity, const unsigned int& newLimit )

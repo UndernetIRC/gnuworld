@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: client.cc,v 1.60 2003/08/09 23:15:36 dan_karrels Exp $
+ * $Id: client.cc,v 1.61 2003/11/02 18:43:34 dan_karrels Exp $
  */
 
 #include	<new>
@@ -47,7 +47,7 @@
 #include	"ELog.h"
 #include	"events.h"
 
-RCSTAG("$Id: client.cc,v 1.60 2003/08/09 23:15:36 dan_karrels Exp $" ) ;
+RCSTAG("$Id: client.cc,v 1.61 2003/11/02 18:43:34 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -474,40 +474,9 @@ void xClient::OnNetworkKick( Channel*,
 {
 }
 
-void xClient::OnChannelModeM( Channel*,
-	bool, ChannelUser* )
-{
-}
-
-void xClient::OnChannelModeI( Channel*,
-	bool, ChannelUser* )
-{
-}
-
-void xClient::OnChannelModeR( Channel*,
-	bool, ChannelUser* )
-{
-}
-
-void xClient::OnChannelModeP( Channel*,
-	bool, ChannelUser* )
-{
-}
-
-void xClient::OnChannelModeS( Channel*,
-	bool, ChannelUser* )
-{
-}
-
-void xClient::OnChannelModeN( Channel*,
-	bool, ChannelUser* )
-{
-}
-
-void xClient::OnChannelModeT( Channel*,
-	bool, ChannelUser* )
-{
-}
+void xClient::OnChannelMode( Channel*, ChannelUser*,
+	const xServer::modeVectorType& )
+{}
 
 void xClient::OnChannelModeL( Channel*,
 	bool, ChannelUser*, const unsigned int& )

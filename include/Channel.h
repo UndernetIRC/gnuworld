@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: Channel.h,v 1.27 2003/06/14 19:35:26 jeekay Exp $
+ * $Id: Channel.h,v 1.28 2003/11/02 18:43:34 dan_karrels Exp $
  */
 
 #ifndef __CHANNEL_H
-#define __CHANNEL_H "$Id: Channel.h,v 1.27 2003/06/14 19:35:26 jeekay Exp $"
+#define __CHANNEL_H "$Id: Channel.h,v 1.28 2003/11/02 18:43:34 dan_karrels Exp $"
 
 #include	<string>
 #include	<map>
@@ -435,46 +435,9 @@ public:
 protected:
 
 	/**
-	 * This method is called when channel mode 't' is set
-	 * or unset.
+	 * Handle one or more "simple" mode changes.
 	 */
-	virtual void	onModeT( bool ) ;
-
-	/**
-	 * This method is called when channel mode 'n' is set
-	 * or unset.
-	 */
-	virtual void	onModeN( bool ) ;
-
-	/**
-	 * This method is called when channel mode 's' is set
-	 * or unset.
-	 */
-	virtual void	onModeS( bool ) ;
-
-	/**
-	 * This method is called when channel mode 'p' is set
-	 * or unset.
-	 */
-	virtual void	onModeP( bool ) ;
-
-	/**
-	 * This method is called when channel mode 'm' is set
-	 * or unset.
-	 */
-	virtual void	onModeM( bool ) ;
-
-	/**
-	 * This method is called when channel mode 'i' is set
-	 * or unset.
-	 */
-	virtual void	onModeI( bool ) ;
-
-	/**
-	 * This method is called when channel mode 'r' is set
-	 * or unset.
-	 */
-	virtual void	onModeR( bool ) ;
+	virtual void	onMode( const vector< pair< bool, modeType > >& ) ;
 
 	/**
 	 * This method is called when channel mode 'l' is set

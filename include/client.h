@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: client.h,v 1.45 2003/08/09 23:15:33 dan_karrels Exp $
+ * $Id: client.h,v 1.46 2003/11/02 18:43:34 dan_karrels Exp $
  */
 
 #ifndef __CLIENT_H
-#define __CLIENT_H "$Id: client.h,v 1.45 2003/08/09 23:15:33 dan_karrels Exp $"
+#define __CLIENT_H "$Id: client.h,v 1.46 2003/11/02 18:43:34 dan_karrels Exp $"
 
 #include	<sstream>
 #include	<string>
@@ -225,67 +225,13 @@ public:
 			bool authoritative ) ;
 
 	/**
-	 * This method is invoked when a user sets or removes
-	 * channel mode m (moderate).  Keep in mind that the
-	 * source ChannelUser may be NULL if a server is
-	 * setting the mode.
+	 * This method is invoked when one or more "simple" (no argument)
+	 * channel modes are set or unset.
+	 * The ChannelUser* (source) user may be NULL if the modes
+	 * are being changed by a server.
 	 */
-	virtual void OnChannelModeM( Channel*, bool polarity,
-			ChannelUser* ) ;
-
-	/**
-	 * This method is invoked when a user sets or removes
-	 * channel mode i (invite).  Keep in mind that the
-	 * source ChannelUser may be NULL if a server is
-	 * setting the mode.
-	 */
-	virtual void OnChannelModeI( Channel*, bool polarity,
-			ChannelUser* ) ;
-
-	/**
-	 * This method is invoked when a user sets or removes
-	 * channel mode r (authenticate).  Keep in mind that the
-	 * source ChannelUser may be NULL if a server is
-	 * setting the mode.
-	 */
-	virtual void OnChannelModeR( Channel*, bool polarity,
-			ChannelUser* ) ;
-
-	/**
-	 * This method is invoked when a user sets or removes
-	 * channel mode p (private).  Keep in mind that the
-	 * source ChannelUser may be NULL if a server is
-	 * setting the mode.
-	 */
-	virtual void OnChannelModeP( Channel*, bool polarity,
-			ChannelUser* ) ;
-
-	/**
-	 * This method is invoked when a user sets or removes
-	 * channel mode s (secret).  Keep in mind that the
-	 * source ChannelUser may be NULL if a server is
-	 * setting the mode.
-	 */
-	virtual void OnChannelModeS( Channel*, bool polarity,
-			ChannelUser* ) ;
-
-	/**
-	 * This method is invoked when a user sets or removes
-	 * channel mode n (nomessage).  Keep in mind that the
-	 * source ChannelUser may be NULL if a server is
-	 * setting the mode.
-	 */
-	virtual void OnChannelModeN( Channel*, bool polarity,
-			ChannelUser* ) ;
-
-	/**
-	 * This method is invoked when a user sets or removes
-	 * channel mode t (topic).  Keep in mind that the
-	 * source ChannelUser may be NULL if a server is
-	 * setting the mode.
-	 */
-	virtual void OnChannelModeT( Channel*, bool polarity,
-			ChannelUser* ) ;
+	virtual void OnChannelMode( Channel*, ChannelUser*,
+			const xServer::modeVectorType& ) ;
 
 	/**
 	 * This method is invoked when a user sets or removes

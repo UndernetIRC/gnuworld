@@ -17,10 +17,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_M.cc,v 1.7 2003/08/23 21:00:32 dan_karrels Exp $
+ * $Id: msg_M.cc,v 1.8 2003/11/02 18:43:34 dan_karrels Exp $
  */
 
 #include	<new>
+#include	<map>
 #include	<string>
 #include	<vector>
 #include	<iostream>
@@ -38,11 +39,13 @@
 #include	"ServerCommandHandler.h"
 #include	"config.h"
 
-RCSTAG( "$Id: msg_M.cc,v 1.7 2003/08/23 21:00:32 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: msg_M.cc,v 1.8 2003/11/02 18:43:34 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
 
+using std::pair ;
+using std::make_pair ;
 using std::string ;
 using std::vector ;
 using std::endl ;
@@ -150,6 +153,7 @@ xParameters::size_type argPos = 3 ;
 xServer::opVectorType opVector ;
 xServer::voiceVectorType voiceVector ;
 xServer::banVectorType banVector ;
+xServer::modeVectorType modeVector ;
 
 for( const char* modePtr = Param[ 2 ] ; *modePtr ; ++modePtr )
 	{
@@ -162,28 +166,32 @@ for( const char* modePtr = Param[ 2 ] ; *modePtr ; ++modePtr )
 			polarity = false ;
 			break ;
 		case 't':
-			theServer->OnChannelModeT( theChan,
-				polarity, theUser ) ;
+			modeVector.push_back(
+				make_pair( polarity, Channel::MODE_T ) ) ;
 			break ;
 		case 'n':
-			theServer->OnChannelModeN( theChan,
-				polarity, theUser ) ;
+			modeVector.push_back(
+				make_pair( polarity, Channel::MODE_N ) ) ;
 			break ;
 		case 's':
-			theServer->OnChannelModeS( theChan,
-				polarity, theUser ) ;
+			modeVector.push_back(
+				make_pair( polarity, Channel::MODE_S ) ) ;
 			break ;
 		case 'p':
-			theServer->OnChannelModeP( theChan,
-				polarity, theUser ) ;
+			modeVector.push_back(
+				make_pair( polarity, Channel::MODE_P ) ) ;
 			break ;
 		case 'm':
-			theServer->OnChannelModeM( theChan,
-				polarity, theUser ) ;
+			modeVector.push_back(
+				make_pair( polarity, Channel::MODE_M ) ) ;
 			break ;
 		case 'i':
-			theServer->OnChannelModeI( theChan,
-				polarity, theUser ) ;
+			modeVector.push_back(
+				make_pair( polarity, Channel::MODE_I ) ) ;
+			break ;
+		case 'r':
+			modeVector.push_back(
+				make_pair( polarity, Channel::MODE_R ) ) ;
 			break ;
 
 		// Channel mode l only has an argument if
@@ -340,6 +348,10 @@ for( const char* modePtr = Param[ 2 ] ; *modePtr ; ++modePtr )
 		} // switch()
 	} // for()
 
+if( !modeVector.empty() )
+	{
+	theServer->OnChannelMode( theChan, theUser, modeVector ) ;
+	}
 if( !opVector.empty() )
 	{
 	theServer->OnChannelModeO( theChan, theUser, opVector ) ;
