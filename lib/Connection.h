@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: Connection.h,v 1.11 2002/07/23 22:26:36 dan_karrels Exp $
+ * $Id: Connection.h,v 1.12 2002/08/06 18:48:04 dan_karrels Exp $
  */
 
 #ifndef __CONNECTION_H
-#define __CONNECTION_H "$Id: Connection.h,v 1.11 2002/07/23 22:26:36 dan_karrels Exp $"
+#define __CONNECTION_H "$Id: Connection.h,v 1.12 2002/08/06 18:48:04 dan_karrels Exp $"
 
 #include	<sys/types.h>
 #include	<netinet/in.h>
@@ -133,6 +133,14 @@ public:
 	static const flagType		F_LISTEN ;
 
 	/**
+	 * This flag is true when the Connection represents a
+	 * connection to a file, rather than a network connection.
+	 */
+	static const flagType		F_FILE ;
+
+	virtual void		Write( const string& ) ;
+
+	/**
 	 * Return the flags of this connection.
 	 */
 	inline const flagType&		getFlags() const
@@ -178,6 +186,13 @@ public:
 	 */
 	inline bool	isListening() const
 		{ return (flags & F_LISTEN ) ; }
+
+	/**
+	 * Return true if this Connection is a file connection, false
+	 * otherwise.
+	 */
+	inline bool	isFile() const
+		{ return (flags & F_FILE) ; }
 
 	/**
 	 * This friend operator allows for the easy output of a
@@ -244,6 +259,10 @@ protected:
 	/// Mark that this Connection is a listening for connections
 	inline void	setListen()
 		{ setFlag( F_LISTEN ) ; }
+
+	/// Mark that this Connection represents a file
+	inline void	setFile()
+		{ setFlag( F_FILE ) ; }
 
 	/// Set this connection's local port number
 	inline void	setLocalPort(

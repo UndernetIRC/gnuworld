@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ConnectionManager.h,v 1.11 2002/07/23 22:26:36 dan_karrels Exp $
+ * $Id: ConnectionManager.h,v 1.12 2002/08/06 18:48:04 dan_karrels Exp $
  */
 
 #ifndef __CONNECTIONMANAGER_H
-#define __CONNECTIONMANAGER_H "$Id: ConnectionManager.h,v 1.11 2002/07/23 22:26:36 dan_karrels Exp $"
+#define __CONNECTIONMANAGER_H "$Id: ConnectionManager.h,v 1.12 2002/08/06 18:48:04 dan_karrels Exp $"
 
 #include	<sys/types.h>
 
@@ -191,6 +191,9 @@ public:
 				const string& host,
 				const unsigned short int remotePort ) ;
 
+	virtual Connection*	ConnectToFile( ConnectionHandler*,
+					const string& ) ;
+
 	/**
 	 * Attempt to establish a listening Connection on the
 	 * given port number.  If successful, the Connection is
@@ -262,22 +265,6 @@ public:
 	 */
 	virtual bool	Disconnect( ConnectionHandler*,
 				Connection* ) ;
-
-	/**
-	 * Appends data to the given Connection's output buffer,
-	 * to be sent during a call to Poll().
-	 * ConnectionHandler and Connection must be non-NULL.
-	 */
-	virtual void	Write( const ConnectionHandler*,
-				Connection*, const string& ) ;
-
-	/**
-	 * Appends data to the given Connection's output buffer,
-	 * to be sent during a call to Poll().
-	 * ConnectionHandler and Connection must be non-NULL.
-	 */
-	virtual void	Write( const ConnectionHandler*,
-				Connection*, const stringstream& ) ;
 
 	/**
 	 * This method performs the actual read/write calls for all

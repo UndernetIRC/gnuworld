@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: main.cc,v 1.46 2002/08/04 00:40:46 dan_karrels Exp $
+ * $Id: main.cc,v 1.47 2002/08/06 18:48:04 dan_karrels Exp $
  */
 
 #include	<new>
@@ -41,7 +41,7 @@
 #include	"md5hash.h"
 
 const char config_h_rcsId[] = __CONFIG_H ;
-const char main_cc_rcsId[] = "$Id: main.cc,v 1.46 2002/08/04 00:40:46 dan_karrels Exp $" ;
+const char main_cc_rcsId[] = "$Id: main.cc,v 1.47 2002/08/06 18:48:04 dan_karrels Exp $" ;
 const char ELog_h_rcsId[] = __ELOG_H ;
 const char server_h_rcsId[] = __SERVER_H ;
 const char moduleLoader_h_rcsId[] = __MODULELOADER_H ;
@@ -133,9 +133,6 @@ assert( theServer != 0 ) ;
 	pidFile.close() ;
 	}
 
-// Connect to the server
-clog << "*** Connecting..." << endl ;
-
 theServer->run() ;
 delete theServer ;
 return 0 ;
@@ -149,7 +146,6 @@ xServer::xServer( int argc, char** argv )
    configFileName( CONFFILE )
 {
 
-string simFileName ;
 verbose = false ;
 
 int c = EOF ;
@@ -255,12 +251,6 @@ initializeSystem() ;
 
 // Seed the random number generator
 ::srand( ::time( 0 ) ) ;
-
-// Run in simulation mode?
-if( !simFileName.empty() )
-	{
-	// TODO
-	}
 }
 
 void xServer::mainLoop()
@@ -270,8 +260,26 @@ while( keepRunning )
 	{
 	if( NULL == serverConnection )
 		{
+		// Connect to the server
+		clog << "*** Connecting..." ;
+
 		// Not connected
-		serverConnection = Connect( this, UplinkName, Port ) ;
+		if( !simFileName.empty() )
+			{
+			// Run in simulation mode
+			serverConnection = ConnectToFile( this, simFileName ) ;
+			if( NULL == serverConnection )
+				{
+				// Failed to connect to file, quit
+				keepRunning = false ;
+
+				continue ;
+				}
+			}
+		else
+			{
+			serverConnection = Connect( this, UplinkName, Port ) ;
+			}
 		}
 
 	// Check for pending timers before calling Poll(), just for

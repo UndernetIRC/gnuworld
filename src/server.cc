@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server.cc,v 1.144 2002/07/31 20:22:42 reedloden Exp $
+ * $Id: server.cc,v 1.145 2002/08/06 18:48:04 dan_karrels Exp $
  */
 
 #include	<sys/time.h>
@@ -72,7 +72,7 @@
 #include	"Connection.h"
 
 const char server_h_rcsId[] = __SERVER_H ;
-const char server_cc_rcsId[] = "$Id: server.cc,v 1.144 2002/07/31 20:22:42 reedloden Exp $" ;
+const char server_cc_rcsId[] = "$Id: server.cc,v 1.145 2002/08/06 18:48:04 dan_karrels Exp $" ;
 const char config_h_rcsId[] = __CONFIG_H ;
 const char misc_h_rcsId[] = __MISC_H ;
 const char events_h_rcsId[] = __EVENTS_H ;
@@ -517,13 +517,6 @@ void xServer::Shutdown()
 
 void xServer::OnConnect( Connection* theConn )
 {
-if( theConn != serverConnection )
-	{
-	elog	<< "xServer::OnConnect> Unknown connection"
-		<< endl ;
-	return ;
-	}
-
 // Just connected to our uplink
 serverConnection = theConn ;
 
@@ -532,6 +525,9 @@ Version = 10 ;
 
 // Initialize the connection time variable to current time.
 ConnectionTime = ::time( NULL ) ;
+
+clog	<< "Connected!"
+	<< endl ;
 
 elog	<< "*** Connected to "
 	<< serverConnection->getHostname()
@@ -1646,7 +1642,7 @@ if( buf[ buf.size() - 1 ] != '\n' )
 		}
 	else
 		{
-		ConnectionManager::Write( this, serverConnection, buf + '\n' ) ;
+		serverConnection->Write( buf + '\n' ) ;
 		}
 	}
 else
@@ -1657,7 +1653,7 @@ else
 		}
 	else
 		{
-		ConnectionManager::Write( this, serverConnection, buf ) ;
+		serverConnection->Write( buf ) ;
 		}
 	}
 
@@ -1693,11 +1689,11 @@ if( verbose )
 // not already done and append it to
 // the output buffer.
 //
-ConnectionManager::Write( this, serverConnection, buf ) ;
+serverConnection->Write( buf ) ;
 
 if( buf[ buf.size() - 1 ] != '\n' )
 	{
-	ConnectionManager::Write( this, serverConnection, string( "\n" ) ) ;
+	serverConnection->Write( string( "\n" ) ) ;
 	}
 return true ;
 }
@@ -1761,9 +1757,8 @@ if( buffer[ strlen( buffer ) - 1 ] != '\n' )
 		}
 	else
 		{
-		ConnectionManager::Write( this, serverConnection, buffer ) ;
-		ConnectionManager::Write( this, serverConnection,
-			string( "\n" ) ) ;
+		serverConnection->Write( buffer ) ;
+		serverConnection->Write( string( "\n" ) ) ;
 		}
 	}
 else
@@ -1774,7 +1769,7 @@ else
 		}
 	else
 		{
-		ConnectionManager::Write( this, serverConnection, buffer ) ;
+		serverConnection->Write( buffer ) ;
 		}
 	}
 
@@ -1812,10 +1807,10 @@ va_end( _list ) ;
 #endif
 
 // Append the line to the output buffer.
-ConnectionManager::Write( this, serverConnection, buffer ) ;
+serverConnection->Write( buffer ) ;
 if( buffer[ strlen( buffer ) - 1 ] != '\n' )
 	{
-	ConnectionManager::Write( this, serverConnection, string( "\n" ) ) ;
+	serverConnection->Write( string( "\n" ) ) ;
 	}
 
 // Return success
@@ -3645,7 +3640,7 @@ if( !isConnected() )
 	return ;
 	}
 
-ConnectionManager::Write( this, serverConnection, burstHoldBuffer.data() ) ;
+serverConnection->Write( burstHoldBuffer.data() ) ;
 burstHoldBuffer.clear() ;
 }
 

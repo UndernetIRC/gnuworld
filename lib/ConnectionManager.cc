@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ConnectionManager.cc,v 1.19 2002/08/04 00:55:21 dan_karrels Exp $
+ * $Id: ConnectionManager.cc,v 1.20 2002/08/06 18:48:04 dan_karrels Exp $
  */
 
 #include	<unistd.h>
@@ -619,8 +619,8 @@ do
 
 //elog	<< "ConnectionManager::Poll()> seconds: "
 //	<< seconds
-//	<< ", fdCnt: "
-//	<< fdCnt
+//	<< ", selectRet: "
+//	<< selectRet
 //	<< endl ;
 
 if( 0 == selectRet )
@@ -984,7 +984,19 @@ memset( buf, 0, 4096 ) ;
 
 // Attempt the read from the socket
 errno = 0 ;
-int readResult = ::recv( cPtr->getSockFD(), buf, 4096, 0 ) ;
+int readResult = -1 ;
+
+// Check for simulation mode
+if( cPtr->isFile() )
+	{
+	// Connected to file
+	readResult = ::read( cPtr->getSockFD(), buf, 4096 ) ;
+	}
+else
+	{
+	// Network connection
+	readResult = ::recv( cPtr->getSockFD(), buf, 4096, 0 ) ;
+	}
 
 if( EAGAIN == errno )
 	{
@@ -1003,6 +1015,10 @@ if( EAGAIN == errno )
 // Check for error on read()
 if( readResult <= 0 )
 	{
+	elog	<< "ConnectionManager::handleRead> Read error: "
+		<< strerror( errno )
+		<< endl ;
+
 	// Error on read, socket no longer valid
 	// Notify handler
 	hPtr->OnDisconnect( cPtr ) ;
@@ -1049,6 +1065,16 @@ bool ConnectionManager::handleWrite( ConnectionHandler* hPtr,
 // the send(), and the system will send() as much as it can
 // The above applies to NONBLOCKING sockets.
 //
+
+// Does this Connection represent a file?
+if( cPtr->isFile() )
+	{
+	// Just ignore writes to the file
+	cPtr->outputBuffer.clear() ;
+
+	return true ;
+	}
+
 errno = 0 ;
 int writeResult = ::send( cPtr->getSockFD(),
 	cPtr->outputBuffer.data(),
@@ -1314,41 +1340,6 @@ if( optval < 0 )
 return true ;
 }
 
-void ConnectionManager::Write( const ConnectionHandler* hPtr,
-	Connection* cPtr, const string& msg )
-{
-// Public method, check method arguments
-assert( hPtr != 0 ) ;
-assert( cPtr != 0 ) ;
-
-// Do nothing if the output message is empty, or the socket
-// is a listening socket (not connected anyway).
-if( msg.empty() || cPtr->isListening() )
-	{
-	return ;
-	}
-
-// Append the outgoing data onto the Connection's output buffer
-cPtr->outputBuffer += msg ;
-}
-
-void ConnectionManager::Write( const ConnectionHandler* hPtr,
-	Connection* cPtr, const stringstream& msg )
-{
-// Public method, check method arguments
-assert( hPtr != 0 ) ;
-assert( cPtr != 0 ) ;
-
-// Do nothing if the socket is a listening socket (not connected)
-if( cPtr->isListening() )
-	{
-	return ;
-	}
-
-// Append the outgoing data onto the Connection's output buffer
-cPtr->outputBuffer += msg.str() ;
-}
-
 Connection* ConnectionManager::Listen( ConnectionHandler* hPtr,
 	const unsigned short int localPort )
 {
@@ -1503,6 +1494,59 @@ for( ; (eraseItr != eraseMap.end()) && (eraseItr->first == hPtr) ;
 // The connectionItr is not present in the eraseMap, go ahead
 // and add it to the eraseMap to be erased by Poll()
 eraseMap.insert( eraseMapType::value_type( hPtr, connectionItr ) ) ;
+}
+
+Connection* ConnectionManager::ConnectToFile( ConnectionHandler* hPtr,
+	const string& fileName )
+{
+assert( hPtr != 0 ) ;
+
+if( fileName.empty() )
+	{
+	return 0 ;
+	}
+
+elog	<< "Connecting to file: "
+	<< fileName
+	<< endl ;
+
+int fd = ::open( fileName.c_str(), O_CREAT ) ;
+if( fd < 0 )
+	{
+	elog	<< "ConnectToFile> Unable to open file "
+		<< fileName
+		<< ": "
+		<< strerror( errno )
+		<< endl ;
+	return 0 ;
+	}
+
+Connection* newConnect = new (std::nothrow)
+	Connection( fileName, fd, delimiter ) ;
+assert( newConnect != 0 ) ;
+
+newConnect->setConnected() ;
+newConnect->setSockFD( fd ) ;
+newConnect->setFile() ;
+
+bool insertOK = handlerMap[ hPtr ].insert( newConnect ).second ;
+if( !insertOK )
+	{
+	elog	<< "ConnectToFile> Failed to insert new Connection"
+		<< endl ;
+
+	// Don't worry about posting an event, this is simulation only
+	::close( fd ) ;
+
+	delete newConnect ; newConnect = 0 ;
+	}
+
+if( newConnect != 0 )
+	{
+	hPtr->OnConnect( newConnect ) ;
+	}
+
+return newConnect ;
 }
 
 } // namespace gnuworld

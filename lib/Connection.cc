@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: Connection.cc,v 1.11 2002/07/23 22:26:35 dan_karrels Exp $
+ * $Id: Connection.cc,v 1.12 2002/08/06 18:48:04 dan_karrels Exp $
  */
 
 #include	<sys/types.h>
@@ -42,6 +42,7 @@ const Connection::flagType	Connection::F_PENDING = 0x01 ;
 const Connection::flagType	Connection::F_CONNECTED = 0x02 ;
 const Connection::flagType	Connection::F_INCOMING = 0x04 ;
 const Connection::flagType	Connection::F_LISTEN = 0x08 ;
+const Connection::flagType	Connection::F_FILE = 0x10 ;
 
 using std::string ;
 
@@ -75,6 +76,11 @@ memset( &addr, 0, sizeof( struct sockaddr_in ) ) ;
 Connection::~Connection()
 {
 /* No work to be done, no heap space allocated */
+}
+
+void Connection::Write( const string& writeMe )
+{
+outputBuffer += writeMe ;
 }
 
 } // namespace gnuworld

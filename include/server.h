@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server.h,v 1.73 2002/07/27 14:08:21 dan_karrels Exp $
+ * $Id: server.h,v 1.74 2002/08/06 18:48:04 dan_karrels Exp $
  */
 
 #ifndef __SERVER_H
-#define __SERVER_H "$Id: server.h,v 1.73 2002/07/27 14:08:21 dan_karrels Exp $"
+#define __SERVER_H "$Id: server.h,v 1.74 2002/08/06 18:48:04 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
@@ -1331,6 +1331,12 @@ protected:
 	 * The name of the server config file.
 	 */
 	string		configFileName ;
+
+	/**
+	 * The name of the simulation file from which to read all
+	 * simulation data, empty if in real mode.
+	 */
+	string		simFileName ;
 
 	/**
 	 * The char array to be used to read in network data.
