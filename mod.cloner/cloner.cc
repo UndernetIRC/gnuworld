@@ -1,5 +1,25 @@
 /* cloner.cc
- * Author: Daniel Karrels dan@karrels.com
+ * Load fake clones for testing or fun.
+ *
+ * Copyright (C) 2002 Daniel Karrels <dan@karrels.com>
+ *		      Reed Loden <reed@reedloden.com>
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
+ * USA.
+ *
+ * $Id: cloner.cc,v 1.13 2002/07/31 20:01:57 reedloden Exp $
  */
 
 #include	<new>
@@ -52,7 +72,9 @@ cloner::cloner( const string& configFileName )
 EConfig conf( configFileName ) ;
 
 cloneDescription = conf.Require( "clonedescription" )->second ;
+cloneMode = conf.Require( "clonemode" )->second ;
 fakeServerName = conf.Require( "fakeservername" )->second ;
+fakeServerDescription = conf.Require( "fakeserverdescription" )->second ;
 
 cloneBurstCount = atoi( conf.Require( "cloneburstcount" )->second.c_str() ) ;
 if( cloneBurstCount < 1 )
@@ -101,12 +123,6 @@ if( minNickLength < 1 )
 		<< endl ;
 	::exit( 0 );
 	}
-if( maxNickLength > 9 )
-	{
-	elog	<< "cloner> maxNickLength cannot exceed 9"
-		<< endl ;
-	::exit( 0 ) ;
-	}
 if( maxNickLength <= minNickLength )
 	{
 	elog	<< "cloner> minNickLength must be less than maxNickLength"
@@ -127,7 +143,7 @@ fakeServer = new (std::nothrow) iServer(
 	::time( 0 ) ) ;
 assert( fakeServer != 0 ) ;
 
-MyUplink->AttachServer( fakeServer ) ;
+MyUplink->AttachServer( fakeServer, fakeServerDescription ) ;
 
 return xClient::OnConnect() ;
 }
@@ -137,12 +153,10 @@ int cloner::OnPrivateMessage( iClient* theClient, const string& Message,
 {
 //elog << "cloner::OnPrivateMessage> " << Message << endl ;
 
-/*
 if( !theClient->isOper() )
 	{
 	return 0 ;
 	}
-*/
 
 StringTokenizer st( Message ) ;
 if( st.empty() )
@@ -156,7 +170,7 @@ if( command == "LOADCLONES" )
 	{
 	if( st.size() < 2 )
 		{
-		Notice( theClient, "Usage: LOADCLONES <num clones>" ) ;
+		Notice( theClient, "Usage: LOADCLONES <# of clones>" ) ;
 		return 0 ;
 		}
 
@@ -178,7 +192,7 @@ if( command == "LOADCLONES" )
 //		<< makeCloneCount
 //		<< endl ;
 
-	Notice( theClient, "Queuing %d clones", numClones ) ;
+	Notice( theClient, "Queuing %d Clones", numClones ) ;
 
 	}
 else if( command == "JOINALL" )
@@ -233,7 +247,48 @@ else if( command == "PARTALL" )
 		MyUplink->Write( s ) ;
 		}
 	} // PARTALL
+else if( command == "KILLALL" || command == "QUITALL" )
+	{
+        if( st.size() < 1 )
+                {
+                Notice( theClient, "Usage: KILLALL [quit message]" ) ;
+                return 0 ;
+                }
 
+	if( st.size() == 1 )
+		{
+
+		for( list< iClient* >::const_iterator ptr = clones.begin(),
+			endPtr = clones.end() ; ptr != endPtr ; ++ptr )
+			{
+			stringstream s ;
+			s	<< (*ptr)->getCharYYXXX()
+				<< " Q"
+				<< ends ;
+
+			MyUplink->Write( s ) ;
+			}
+		}
+
+	if( st.size() >= 2 )
+		{
+
+		string quitMsg( st[ 1 ] ) ;
+
+		for( list< iClient* >::const_iterator ptr = clones.begin(),
+			endPtr = clones.end() ; ptr != endPtr ; ++ptr )
+			{
+			stringstream s ;
+			s	<< (*ptr)->getCharYYXXX()
+				<< " Q :"
+				<< quitMsg
+				<< ends ;
+
+			MyUplink->Write( s ) ;
+			}
+		}
+
+	} // KILLALL
 return 0 ;
 }
 
@@ -294,9 +349,9 @@ iClient* newClient = new iClient(
 		randomNick( 6, 6 ),
 		randomHost(),
 		randomHost(),
-		randomMode(),
+		cloneMode,
 		"",
-		"I'm a clone.",
+		cloneDescription,
 		::time( 0 ) ) ;
 assert( newClient != 0 );
 
@@ -315,18 +370,13 @@ string cloner::randomHost()
 return hostNames[ rand() % hostNames.size() ] ;
 }
 
-string cloner::randomMode()
-{
-return string( "+d" ) ;
-}
-
 string cloner::randomNick( int minLength, int maxLength )
 {
          
 string retMe ;
 
-// Generate a random number between 1 and 9
-// Will be the length of the nickname
+// Generate a random number between minLength and maxLength
+// This will be the length of the nickname
 int randomLength = minLength + (rand() % (maxLength - minLength + 1) ) ;
 
 for( int i = 0 ; i < randomLength ; i++ )
