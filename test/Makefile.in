@@ -165,7 +165,8 @@ sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 threadLib = @threadLib@
 
-noinst_PROGRAMS = test_mtrie_load \
+noinst_PROGRAMS = test_burst \
+	test_mtrie_load \
 	test_mtrie_perf_summary \
 	test_mtrie_perf \
 	test_mtrie \
@@ -179,6 +180,7 @@ noinst_PROGRAMS = test_mtrie_load \
 
 LDADD = $(glibdir)/libgnuworld.la
 
+test_burst_SOURCES = burst.cc
 test_mtrie_SOURCES = mtrie.cc
 test_mtrie_load_SOURCES = mtrie_load.cc
 test_mtrie_perf_SOURCES = mtrie_perf.cc
@@ -201,7 +203,7 @@ ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = $(top_builddir)/include/defs.h
 CONFIG_CLEAN_FILES =
-noinst_PROGRAMS = test_mtrie_load$(EXEEXT) \
+noinst_PROGRAMS = test_burst$(EXEEXT) test_mtrie_load$(EXEEXT) \
 	test_mtrie_perf_summary$(EXEEXT) test_mtrie_perf$(EXEEXT) \
 	test_mtrie$(EXEEXT) test_stringtokenizer$(EXEEXT) \
 	test_econfig$(EXEEXT) test_gThread$(EXEEXT) \
@@ -214,6 +216,11 @@ test_bot_OBJECTS = $(am_test_bot_OBJECTS)
 test_bot_LDADD = $(LDADD)
 test_bot_DEPENDENCIES = $(glibdir)/libgnuworld.la
 test_bot_LDFLAGS =
+am_test_burst_OBJECTS = burst.$(OBJEXT)
+test_burst_OBJECTS = $(am_test_burst_OBJECTS)
+test_burst_LDADD = $(LDADD)
+test_burst_DEPENDENCIES = $(glibdir)/libgnuworld.la
+test_burst_LDFLAGS =
 am_test_econfig_OBJECTS = econfig.$(OBJEXT)
 test_econfig_OBJECTS = $(am_test_econfig_OBJECTS)
 test_econfig_LDADD = $(LDADD)
@@ -266,9 +273,10 @@ test_stringtokenizer_LDFLAGS =
 DEFAULT_INCLUDES =  -I. -I$(srcdir) -I$(top_builddir)/include
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
-@AMDEP_TRUE@DEP_FILES = ./$(DEPDIR)/econfig.Po ./$(DEPDIR)/gThread.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/match.Po ./$(DEPDIR)/mtrie.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/mtrie_load.Po ./$(DEPDIR)/mtrie_perf.Po \
+@AMDEP_TRUE@DEP_FILES = ./$(DEPDIR)/burst.Po ./$(DEPDIR)/econfig.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/gThread.Po ./$(DEPDIR)/match.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/mtrie.Po ./$(DEPDIR)/mtrie_load.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/mtrie_perf.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/mtrie_perf_summary.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/signal.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/stringtokenizer.Po \
@@ -282,14 +290,14 @@ LTCXXCOMPILE = $(LIBTOOL) --mode=compile $(CXX) $(DEFS) \
 CXXLD = $(CXX)
 CXXLINK = $(LIBTOOL) --mode=link $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) \
 	$(AM_LDFLAGS) $(LDFLAGS) -o $@
-DIST_SOURCES = $(test_bot_SOURCES) $(test_econfig_SOURCES) \
-	$(test_gThread_SOURCES) $(test_kick_transaction_SOURCES) \
-	$(test_match_SOURCES) $(test_mtrie_SOURCES) \
-	$(test_mtrie_load_SOURCES) $(test_mtrie_perf_SOURCES) \
-	$(test_mtrie_perf_summary_SOURCES) $(test_signal_SOURCES) \
-	$(test_stringtokenizer_SOURCES)
+DIST_SOURCES = $(test_bot_SOURCES) $(test_burst_SOURCES) \
+	$(test_econfig_SOURCES) $(test_gThread_SOURCES) \
+	$(test_kick_transaction_SOURCES) $(test_match_SOURCES) \
+	$(test_mtrie_SOURCES) $(test_mtrie_load_SOURCES) \
+	$(test_mtrie_perf_SOURCES) $(test_mtrie_perf_summary_SOURCES) \
+	$(test_signal_SOURCES) $(test_stringtokenizer_SOURCES)
 DIST_COMMON = Makefile.am Makefile.in
-SOURCES = $(test_bot_SOURCES) $(test_econfig_SOURCES) $(test_gThread_SOURCES) $(test_kick_transaction_SOURCES) $(test_match_SOURCES) $(test_mtrie_SOURCES) $(test_mtrie_load_SOURCES) $(test_mtrie_perf_SOURCES) $(test_mtrie_perf_summary_SOURCES) $(test_signal_SOURCES) $(test_stringtokenizer_SOURCES)
+SOURCES = $(test_bot_SOURCES) $(test_burst_SOURCES) $(test_econfig_SOURCES) $(test_gThread_SOURCES) $(test_kick_transaction_SOURCES) $(test_match_SOURCES) $(test_mtrie_SOURCES) $(test_mtrie_load_SOURCES) $(test_mtrie_perf_SOURCES) $(test_mtrie_perf_summary_SOURCES) $(test_signal_SOURCES) $(test_stringtokenizer_SOURCES)
 
 all: all-am
 
@@ -310,6 +318,9 @@ clean-noinstPROGRAMS:
 test_bot$(EXEEXT): $(test_bot_OBJECTS) $(test_bot_DEPENDENCIES) 
 	@rm -f test_bot$(EXEEXT)
 	$(CXXLINK) $(test_bot_LDFLAGS) $(test_bot_OBJECTS) $(test_bot_LDADD) $(LIBS)
+test_burst$(EXEEXT): $(test_burst_OBJECTS) $(test_burst_DEPENDENCIES) 
+	@rm -f test_burst$(EXEEXT)
+	$(CXXLINK) $(test_burst_LDFLAGS) $(test_burst_OBJECTS) $(test_burst_LDADD) $(LIBS)
 test_econfig$(EXEEXT): $(test_econfig_OBJECTS) $(test_econfig_DEPENDENCIES) 
 	@rm -f test_econfig$(EXEEXT)
 	$(CXXLINK) $(test_econfig_LDFLAGS) $(test_econfig_OBJECTS) $(test_econfig_LDADD) $(LIBS)
@@ -347,6 +358,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/burst.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/econfig.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gThread.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/match.Po@am__quote@

@@ -1,0 +1,6 @@
+
+
+This is a simple burst server.  You connect to it with a gnuworld (or 
+other) server, and it will simply dump an entire log file to you.  The log 
+file must be specified on the command line of test_burst, and it has a 
+simple menu driven system accessible by -h.

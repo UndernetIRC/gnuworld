@@ -1,7 +1,8 @@
 ## Process this file with automake to produce Makefile.in
-## $Id: Makefile.am,v 1.13 2003/07/29 04:43:51 dan_karrels Exp $
+## $Id: Makefile.am,v 1.14 2003/08/04 22:57:59 dan_karrels Exp $
 
-noinst_PROGRAMS = test_mtrie_load \
+noinst_PROGRAMS = test_burst \
+	test_mtrie_load \
 	test_mtrie_perf_summary \
 	test_mtrie_perf \
 	test_mtrie \
@@ -14,6 +15,7 @@ noinst_PROGRAMS = test_mtrie_load \
 	test_kick_transaction
 LDADD = $(glibdir)/libgnuworld.la
 
+test_burst_SOURCES = burst.cc
 test_mtrie_SOURCES = mtrie.cc
 test_mtrie_load_SOURCES = mtrie_load.cc
 test_mtrie_perf_SOURCES = mtrie_perf.cc
