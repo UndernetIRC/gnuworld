@@ -3,7 +3,7 @@
  */
 
 #ifndef __CCONTROL_H
-#define __CCONTROL_H "$Id: ccontrol.h,v 1.42 2001/08/16 20:18:38 mrbean_ Exp $"
+#define __CCONTROL_H "$Id: ccontrol.h,v 1.43 2001/09/26 13:58:28 mrbean_ Exp $"
 
 
 #include	<string>
@@ -533,6 +533,8 @@ public:
 	bool UpdateCommandFromDb ( Command* Comm );
 
 
+	bool CleanServers();
+	
 	/**
 	 * This is a constant iterator type used to perform a read-only
 	 * iteration of the operchan structure.

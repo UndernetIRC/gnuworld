@@ -14,8 +14,10 @@
 #include	"Network.h"
 #include        "stdlib.h"
 #include        "server.h"
+#include	"ccUser.h"
+#include	"AuthInfo.h"
 
-const char LEARNNETCommand_cc_rcsId[] = "$Id: LEARNNETCommand.cc,v 1.1 2001/07/26 20:12:40 mrbean_ Exp $";
+const char LEARNNETCommand_cc_rcsId[] = "$Id: LEARNNETCommand.cc,v 1.2 2001/09/26 13:58:28 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -31,6 +33,28 @@ ccServer* NewServer = new ccServer(bot->SQLDb);
 assert(NewServer != NULL);
 unsigned int AddedServers = 0;
 
+StringTokenizer st(Message);
+
+if((st.size() > 1) && (!strcasecmp(st[1],"-r")))
+	{
+	AuthInfo *tmpAuth = bot->IsAuth(theClient->getCharYYXXX());
+	if(!tmpAuth)
+		{ //donno how we got to here .. but what the hell 
+		return false;
+		}
+	if(tmpAuth->getFlags() < operLevel::CODERLEVEL)
+		{
+		bot->Notice(theClient,"Only coders can specify the -r flag");
+		return false;
+		}
+	if(bot->CleanServers())
+		{
+		bot->MsgChanLog("Cleaned the server database at the request of %s\n"
+		,theClient->getNickName().c_str());
+		bot->Notice(theClient,"Successfully cleaned the database");
+		}		
+	}
+			
 bot->MsgChanLog("Learning network status at the request of : %s\n",theClient->getNickName().c_str());
 
 xNetwork::serverIterator ptr = Network->server_begin();
@@ -66,6 +90,7 @@ for( ; ptr != end ; ptr++ )
 	}
 delete NewServer;
 bot->MsgChanLog("Finished learning the network, Learned a total of %d servers\n",AddedServers);
+bot->Notice(theClient,"Finished learning the network, Learned a total of %d servers\n",AddedServers);
 return true;
 }
 

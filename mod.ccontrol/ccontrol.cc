@@ -29,7 +29,7 @@
 #include	"ccFloodData.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.73 2001/09/26 11:42:19 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.74 2001/09/26 13:58:28 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -2492,6 +2492,29 @@ return true;
 
 }
 
+bool ccontrol::CleanServers()
+{
+static const char *Main = "Delete from servers";
+
+strstream theQuery;
+theQuery	<< Main
+		<< ends;
+
+
+ExecStatusType status = SQLDb->Exec( theQuery.str() ) ;
+delete[] theQuery.str() ;
+
+if( PGRES_COMMAND_OK != status )
+	{
+	elog	<< "ccontrol::CleanServers> SQL Failure: "
+		<< SQLDb->ErrorMessage()
+		<< endl ;
+
+	return false;
+	}
+return true;
+
+}
 }
 
 } // namespace gnuworld
