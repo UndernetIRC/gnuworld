@@ -26,10 +26,12 @@
 #include	<queue>
 #include	<iostream>
 
+#include	<cerrno>
+
 #include	"Signal.h"
 
 const char Signal_h_rcsId[] = __SIGNAL_H ;
-const char Signal_cc_rcsId[] = "$Id: Signal.cc,v 1.1 2003/03/10 23:25:15 dan_karrels Exp $" ;
+const char Signal_cc_rcsId[] = "$Id: Signal.cc,v 1.2 2003/03/11 18:03:19 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -50,13 +52,34 @@ Signal::Signal()
 ::pthread_mutex_init( &signals1Mutex, 0 ) ;
 
 // Catch some signals
-::signal( SIGINT, AddSignal ) ;
-::signal( SIGHUP, AddSignal ) ;
-::signal( SIGPIPE, AddSignal ) ;
-::signal( SIGTERM, AddSignal ) ;
-::signal( SIGPOLL, AddSignal ) ;
-::signal( SIGUSR1, AddSignal ) ;
-::signal( SIGUSR2, AddSignal ) ;
+#ifdef SIGINT
+  ::signal( SIGINT, AddSignal ) ;
+#endif
+
+#ifdef SIGHUP
+  ::signal( SIGHUP, AddSignal ) ;
+#endif
+
+#ifdef SIGPIPE
+  ::signal( SIGPIPE, AddSignal ) ;
+#endif
+
+#ifdef SIGTERM
+  ::signal( SIGTERM, AddSignal ) ;
+#endif
+
+#ifdef SIGPOLL
+  ::signal( SIGPOLL, AddSignal ) ;
+#endif
+
+#ifdef SIGUSR1
+  ::signal( SIGUSR1, AddSignal ) ;
+#endif
+
+#ifdef SIGUSR2
+  ::signal( SIGUSR2, AddSignal ) ;
+#endif
+
 }
 
 Signal::~Signal()
