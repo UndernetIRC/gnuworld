@@ -23,7 +23,7 @@
 #include	"AuthInfo.h"
 #include        "server.h"
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.43 2001/05/22 20:20:16 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.44 2001/05/23 20:16:18 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -238,7 +238,7 @@ for( commandMapType::iterator ptr = commandMap.begin() ;
 	}
 commandMap.clear() ;
 // Deallocate each gline entry
-for(glineIterator GLptr = glineList.begin(); GLptr != glineList.end(); GLptr++)
+for(glineIterator GLptr = glineList.begin(); GLptr != glineList.end(); ++GLptr)
 	{
 	glineList.erase(GLptr);
 	}
@@ -495,7 +495,7 @@ switch( theEvent )
 		{
 		iClient* NewUser = static_cast< iClient* >( Data1);
 		int CurConnections = Network->countHost(NewUser->getInsecureHost());		
-		if(CurConnections  > getExceptions(NewUser->getInsecureHost()))
+		if(CurConnections  > getExceptions("*@" + NewUser->getInsecureHost()))
 			{
 			ccGline *tmpGline;
 			tmpGline = findGline("*@" + NewUser->getInsecureHost()); 
@@ -1581,6 +1581,42 @@ bool ccontrol::refreshGlines()
 
 MsgChanLog("Refresh gline - Start\n");
 
+int totalFound = 0;
+inRefresh = true;
+
+glineIterator tPtr;
+
+for(glineIterator ptr = glineList.begin();ptr != glineList.end();) 
+	{
+	if((*ptr)->get_Expires() <= ::time(0))
+		{
+		//remove the gline from the core
+		tPtr = ptr;
+		tPtr++;
+		MyUplink->removeGline((*ptr)->get_Host());
+		//remove the gline from ccontrol structure
+		//finally remove the gline from the database
+		(*ptr)->Delete();
+		glineList.erase(ptr);
+		ptr = tPtr;
+		totalFound++;
+		}
+		else
+			ptr++;
+	}
+
+MsgChanLog("Refresh gline - Ended , Total glines expired %d\n",totalFound);
+inRefresh = false;
+
+return true;
+
+}
+
+/*bool ccontrol::refreshGlines()
+{
+
+MsgChanLog("Refresh gline - Start\n");
+
 static const char *Main = "SELECT Id,Host FROM glines WHERE expiresat <= now()::abstime::int4;";
 
 strstream theQuery;
@@ -1655,7 +1691,7 @@ inRefresh = false;
 
 return true;
 
-}
+}*/
 
 bool ccontrol::burstGlines()
 {
@@ -1677,7 +1713,8 @@ return true;
 
 bool ccontrol::loadGlines()
 {
-static const char *Main = "SELECT * FROM glines where ExpiresAt > now()::abstime::int4";
+//static const char *Main = "SELECT * FROM glines where ExpiresAt > now()::abstime::int4";
+static const char *Main = "SELECT * FROM glines";
 
 strstream theQuery;
 theQuery	<< Main
@@ -1765,7 +1802,7 @@ if( PGRES_TUPLES_OK != status )
 
 for( int i = 0 ; i < SQLDb->Tuples() ; i++ )
 	{
-	if(!match(Host,SQLDb->GetValue(i,0)))
+	if((!match(Host,SQLDb->GetValue(i,0))) || (Host == SQLDb->GetValue(i,0)))
 		{
 		if(atoi(SQLDb->GetValue(i,1)) > Exception)
 			Exception = atoi(SQLDb->GetValue(i,1));
@@ -1845,7 +1882,7 @@ query		<< quer
 		<< Connections
 		<< ",'" << theClient->getNickUserHost()
 		<< "',now()::abstime::int4)"
-		<< endl;
+		<< ends;
 
 elog	<< "ccontrol::addException> "
 	<< query.str()
