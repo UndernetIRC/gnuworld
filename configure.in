@@ -1,10 +1,10 @@
-dnl $Id: configure.in,v 1.63 2002/11/20 22:16:17 dan_karrels Exp $
+dnl $Id: configure.in,v 1.64 2002/11/21 20:51:41 dan_karrels Exp $
 dnl ----------------------------------------------------------
 
 echo Configuring GNUWorld...
 echo
 
-AC_REVISION($Revision: 1.63 $)
+AC_REVISION($Revision: 1.64 $)
 AC_INIT
 AC_CONFIG_SRCDIR([src/main.cc])
 AM_INIT_AUTOMAKE(gnuworld,0.0)
@@ -20,6 +20,7 @@ dnl properly on OpenBSD
 INCLTDL="-I`pwd`/libltdl"
 LIBLTDL="`pwd`/libltdl/libltdlc.la"
 
+AM_MAINTAINER_MODE
 AC_ISC_POSIX
 
 dnl Check for dlopen support
