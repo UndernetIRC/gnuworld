@@ -13,7 +13,7 @@
  *
  * Command is aliased "INFO".
  *
- * $Id: CHANINFOCommand.cc,v 1.6 2001/01/20 22:01:01 gte Exp $
+ * $Id: CHANINFOCommand.cc,v 1.7 2001/01/22 00:22:31 gte Exp $
  */
 
 #include	<string>
@@ -24,7 +24,7 @@
 #include	"levels.h"
 #include	"responses.h"
  
-const char CHANINFOCommand_cc_rcsId[] = "$Id: CHANINFOCommand.cc,v 1.6 2001/01/20 22:01:01 gte Exp $" ;
+const char CHANINFOCommand_cc_rcsId[] = "$Id: CHANINFOCommand.cc,v 1.7 2001/01/22 00:22:31 gte Exp $" ;
  
 namespace gnuworld
 {
@@ -34,8 +34,8 @@ using namespace gnuworld;
 bool CHANINFOCommand::Exec( iClient* theClient, const string& Message )
 { 
     ExecStatusType status;
-    static const char* queryHeader = "SELECT channels.name,users.user_name,levels.access,users.last_seen FROM levels,channels,users ";
-    static const char* queryString = "WHERE levels.channel_id=channels.id AND levels.access = 500 AND levels.user_id = users.id ";
+    static const char* queryHeader = "SELECT channels.name,users.user_name,levels.access,users_lastseen.last_seen FROM levels,channels,users,users_lastseen ";
+    static const char* queryString = "WHERE levels.channel_id=channels.id AND users.id=users_lastseen.user_id AND levels.access = 500 AND levels.user_id = users.id ";
 	 
     StringTokenizer st( Message ) ;
     if( st.size() < 2 )

@@ -455,7 +455,7 @@ int cservice::OnCTCP( iClient* theClient, const string& CTCP,
 
 	if(Command == "VERSION")
 	{
-		xClient::DoCTCP(theClient, CTCP.c_str(), "Undernet P10 Channel Services Version 2 [" __DATE__ " " __TIME__ "] ($Id: cservice.cc,v 1.57 2001/01/21 02:46:11 gte Exp $)");
+		xClient::DoCTCP(theClient, CTCP.c_str(), "Undernet P10 Channel Services Version 2 [" __DATE__ " " __TIME__ "] ($Id: cservice.cc,v 1.58 2001/01/22 00:22:31 gte Exp $)");
 		return true;
 	}
  
@@ -520,7 +520,29 @@ sqlUser* cservice::getUserRecord(const string& id)
 	return 0;
 }	
 
+const vector < sqlBan* >& cservice::getBanRecords(sqlChannel* theChan)
+{
+	/*
+	 *  Returns a vector of sqlBan's for a given channel.
+	 *  If not found in the cache, load from the database.
+	 */
 
+	sqlBanHashType::iterator ptr = sqlBanCache.find(theChan->getID());
+	if(ptr != sqlBanCache.end()) // Found something!
+	{
+		elog << "cmaster::getBanRecords> Cache hit for " << theChan->getID() << endl;
+		banCacheHits++;
+		return ptr->second ;
+	}
+
+	/*
+	 *  We didn't find anything in the cache, fetch the data from
+	 *  the backend and create a new vector<sqlban*> object.
+	 *  If we find no bans.. return a new blank container.
+	 */ 
+ 
+}	
+ 
 sqlChannel* cservice::getChannelRecord(const string& id)
 { 
 	/*
@@ -807,7 +829,7 @@ int cservice::OnTimer(xServer::timerID, void*)
 	{
 		updateType = 2;
 		theQuery << "SELECT " << sql::user_fields
-		<< ",now()::abstime::int4 as db_unixtime FROM users WHERE last_updated >= " << lastUserRefresh;
+		<< ",now()::abstime::int4 as db_unixtime FROM users,users_lastseen WHERE users.id = users_lastseen.user_id AND last_updated >= " << lastUserRefresh;
 		// Fetch updated user information.
 	} 
 

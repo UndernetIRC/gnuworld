@@ -4,7 +4,7 @@
  * Storage class for accessing user information either from the backend
  * or internal storage.
  * 
- * $Id: sqlUser.cc,v 1.10 2001/01/15 00:09:57 gte Exp $
+ * $Id: sqlUser.cc,v 1.11 2001/01/22 00:22:31 gte Exp $
  */
  
 #include	<strstream>
@@ -55,7 +55,7 @@ bool sqlUser::loadData(int userID)
 	
 	strstream queryString;
 	queryString << "SELECT " << sql::user_fields 
-	<< " FROM users WHERE id = " << userID 
+	<< " FROM users,users_lastseen WHERE users.id = users_lastseen.user_id AND id = " << userID 
 	<< ends;
 
 	elog << "sqlUser::loadData> " << queryString.str() << endl;
@@ -90,7 +90,7 @@ bool sqlUser::loadData(const string& userName)
 	
 	strstream queryString;
 	queryString << "SELECT " << sql::user_fields 
-	<< " FROM users WHERE lower(user_name) = '" << string_lower(userName) 
+	<< " FROM users,users_lastseen WHERE users.id = users_lastseen.user_id AND lower(user_name) = '" << string_lower(userName) 
 	<< "'" << ends;
 
 	elog << "sqlUser::loadData> " << queryString.str() << endl;
@@ -123,15 +123,18 @@ void sqlUser::setAllMembers(int row)
 
 	id = atoi(SQLDb->GetValue(row, 0));
 	user_name = SQLDb->GetValue(row, 1);
-	password = SQLDb->GetValue(row, 2);
-	last_seen = atoi(SQLDb->GetValue(row, 3));
-	email = SQLDb->GetValue(row, 4);
-	url = SQLDb->GetValue(row, 5);
-	language_id = atoi(SQLDb->GetValue(row, 6));
-	public_key = SQLDb->GetValue(row, 7); 
-	flags = atoi(SQLDb->GetValue(row, 8));
-	last_updated_by = SQLDb->GetValue(row, 9); 
-	last_updated = atoi(SQLDb->GetValue(row, 10));
+	password = SQLDb->GetValue(row, 2); 
+	email = SQLDb->GetValue(row, 3);
+	url = SQLDb->GetValue(row, 4);
+	language_id = atoi(SQLDb->GetValue(row, 5));
+	public_key = SQLDb->GetValue(row, 6); 
+	flags = atoi(SQLDb->GetValue(row, 7));
+	last_updated_by = SQLDb->GetValue(row, 8); 
+	last_updated = atoi(SQLDb->GetValue(row, 9));
+	last_seen = atoi(SQLDb->GetValue(row, 10));
+
+	/* Fetch the "Last Seen" time from the users_lastseen table. */
+
 }
 
 bool sqlUser::commit()
@@ -148,8 +151,7 @@ bool sqlUser::commit()
 	strstream queryString;
 	queryString << queryHeader 
 	<< "SET flags = " << flags << ", "
-	<< "password = '" << password << "', "
-	<< "last_seen = " << last_seen << ", "
+	<< "password = '" << password << "', " 
 	<< "language_id = " << language_id << ", "
 	<< "last_updated = now()::abstime::int4 "
 	<< queryCondition << id
@@ -166,7 +168,33 @@ bool sqlUser::commit()
  	return true;
 }	
 
+bool sqlUser::commitLastSeen()
+{
+	/*
+	 *  Build an SQL statement to write the last_seen field to a seperate table.
+	 */
 
+	ExecStatusType status;
+	static const char* queryHeader =    "UPDATE users_lastseen ";
+	static const char* queryCondition = "WHERE user_id = "; 
+
+	strstream queryString;
+	queryString << queryHeader 
+	<< "SET last_seen = " << last_seen << " "
+	<< queryCondition << id
+	<< ends;
+
+	elog << "sqlUser::commitLastSeen> " << queryString.str() << endl; 
+
+	if ((status = SQLDb->Exec(queryString.str())) != PGRES_COMMAND_OK)
+	{
+		elog << "sqlUser::commit> Something went wrong: " << SQLDb->ErrorMessage() << endl; // Log to msgchan here.
+		return false;
+ 	} 
+
+ 	return true;
+}	
+ 
 sqlUser::~sqlUser()
 {}
  

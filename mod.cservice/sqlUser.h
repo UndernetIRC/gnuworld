@@ -1,7 +1,7 @@
 /* sqlUser.h */
 
 #ifndef __SQLUSER_H
-#define __SQLUSER_H "$Id: sqlUser.h,v 1.10 2001/01/20 22:01:01 gte Exp $"
+#define __SQLUSER_H "$Id: sqlUser.h,v 1.11 2001/01/22 00:22:31 gte Exp $"
 
 #include	<string>
 #include	<ctime>
@@ -81,7 +81,7 @@ public:
 		{ password = _password; }
 
 	inline void setLastSeen( const time_t& _last_seen )
-		{ last_seen = _last_seen; } 
+		{ last_seen = _last_seen; commitLastSeen(); } 
 
 	inline void setLanguageId( const unsigned int& _language_id )
 		{ language_id = _language_id; }
@@ -95,6 +95,7 @@ public:
 	 */
 
 	bool commit();
+	bool commitLastSeen();
 
 	bool loadData( int );
 	bool loadData( const string& );

@@ -8,7 +8,7 @@
  * Can optionally narrow down selection using a number of switches.
  * Can display all channels a user has access on (TODO). 
  *
- * $Id: ACCESSCommand.cc,v 1.11 2001/01/17 00:01:10 gte Exp $
+ * $Id: ACCESSCommand.cc,v 1.12 2001/01/22 00:22:31 gte Exp $
  */
 
 #include	<string>
@@ -18,7 +18,7 @@
 #include	"cservice.h"
 #include	"libpq++.h"
 
-const char ACCESSCommand_cc_rcsId[] = "$Id: ACCESSCommand.cc,v 1.11 2001/01/17 00:01:10 gte Exp $" ;
+const char ACCESSCommand_cc_rcsId[] = "$Id: ACCESSCommand.cc,v 1.12 2001/01/22 00:22:31 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -43,8 +43,8 @@ bool ACCESSCommand::Exec( iClient* theClient, const string& Message )
  */
 
 	ExecStatusType status;
-	static const char* queryHeader =    "SELECT channels.name,users.user_name,levels.access,levels.flags,users.last_seen,levels.suspend_expires,levels.last_modif,levels.last_modif_by FROM levels,channels,users ";
-	static const char* queryCondition = "WHERE levels.channel_id=channels.id AND levels.user_id=users.id ";
+	static const char* queryHeader =    "SELECT channels.name,users.user_name,levels.access,levels.flags,users_lastseen.last_seen,levels.suspend_expires,levels.last_modif,levels.last_modif_by FROM levels,channels,users,users_lastseen ";
+	static const char* queryCondition = "WHERE levels.channel_id=channels.id AND levels.user_id=users.id AND users.id=users_lastseen.user_id ";
 	static const char* queryFooter =    "ORDER BY levels.access DESC LIMIT 15;";
 
 	StringTokenizer st( Message ) ;

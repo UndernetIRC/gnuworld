@@ -1,5 +1,5 @@
 #ifndef __CSERVICE_H
-#define __CSERVICE_H "$Id: cservice.h,v 1.28 2001/01/19 23:01:56 gte Exp $"
+#define __CSERVICE_H "$Id: cservice.h,v 1.29 2001/01/22 00:22:31 gte Exp $"
 
 #include	<string>
 #include	<vector>
@@ -109,7 +109,7 @@ public:
 	short getAdminAccessLevel( sqlUser* );
 
 	/* Fetch a user record for a user. */
-	sqlUser* getUserRecord( const string& );
+	sqlUser* getUserRecord( const string& ); 
 
 	/* Checks if this client is logged in, returns a sqlUser if true.
 	 * If "bool" is true, send a notice to the client telling them off. */
@@ -159,6 +159,8 @@ public:
 	// Ban cache, key is channel id.
 	typedef map < int, vector < sqlBan* > > sqlBanHashType ;
 
+	const vector < sqlBan* >& getBanRecords(sqlChannel* theChan);
+
 	//typedef priority_queue < unsigned int, vector< string >, less <unsigned int > > silenceListType;
 	// Decided there aren't going to be that many silences anyway + we need iterative/random removal
 	// access for show/remignore.
@@ -174,6 +176,9 @@ public:
 
 	// Cache of Level records.
 	sqlLevelHashType sqlLevelCache;
+
+	// Cache of Ban Records.
+	sqlBanHashType sqlBanCache;
  
 	// Some counters for statistical purposes.
 	unsigned int userHits;
@@ -182,6 +187,9 @@ public:
 	unsigned int channelCacheHits; 			
 	unsigned int levelHits;
 	unsigned int levelCacheHits; 
+	unsigned int banHits;
+	unsigned int banCacheHits; 
+
 
 	// To keep track of how many custom data chunks
 	// we have allocated.
