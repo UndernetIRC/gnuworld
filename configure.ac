@@ -1,10 +1,10 @@
-dnl $Id: configure.ac,v 1.3 2003/06/03 01:01:52 dan_karrels Exp $
+dnl $Id: configure.ac,v 1.4 2003/06/05 01:38:00 dan_karrels Exp $
 dnl ----------------------------------------------------------
 
 echo Configuring GNUWorld...
 echo
 
-AC_REVISION($Revision: 1.3 $)
+AC_REVISION($Revision: 1.4 $)
 AC_INIT
 AC_CONFIG_SRCDIR([src/main.cc])
 AM_INIT_AUTOMAKE(gnuworld,0.0)
@@ -32,7 +32,8 @@ AM_PROG_LIBTOOL
 CFLAGS="$CFLAGS -Wall -pipe"
 CXXFLAGS="-Wall -pipe"
 
-AC_PREFIX_DEFAULT(`pwd`)
+prefix=`pwd`
+bindir=`pwd`
 glibdir="`pwd`/libgnuworld"
 topdir="`pwd`"
 
@@ -303,6 +304,9 @@ AC_SUBST(TEST_DIR)
 AC_SUBST(CXXFLAGS)
 AC_SUBST(INCLTDL)
 AC_SUBST(LIBLTDL)
+AC_SUBST(bindir)
+AC_SUBST(prefix)
+AC_SUBST(libdir)
 AC_SUBST(glibdir)
 AC_SUBST(LIBTOOL_DEPS)
 AC_SUBST(PGSQL_INCLUDE)

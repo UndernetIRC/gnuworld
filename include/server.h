@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server.h,v 1.81 2003/06/03 01:01:52 dan_karrels Exp $
+ * $Id: server.h,v 1.82 2003/06/05 01:38:02 dan_karrels Exp $
  */
 
 #ifndef __SERVER_H
-#define __SERVER_H "$Id: server.h,v 1.81 2003/06/03 01:01:52 dan_karrels Exp $"
+#define __SERVER_H "$Id: server.h,v 1.82 2003/06/05 01:38:02 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
@@ -1435,6 +1435,7 @@ protected:
 	 * (commandKey).
 	 */
 	bool		loadCommandHandler( const string& fileName,
+				const string& symbolName,
 				const string& commandKey ) ;
 
 	/**

@@ -17,13 +17,14 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * "$Id: ServerCommandHandler.h,v 1.1 2002/07/05 01:10:05 dan_karrels Exp $"
+ * "$Id: ServerCommandHandler.h,v 1.2 2003/06/05 01:38:01 dan_karrels Exp $"
  */
 
 #ifndef __SERVERCOMMANDHANDLER_H
-#define __SERVERCOMMANDHANDLER_H "$Id: ServerCommandHandler.h,v 1.1 2002/07/05 01:10:05 dan_karrels Exp $"
+#define __SERVERCOMMANDHANDLER_H "$Id: ServerCommandHandler.h,v 1.2 2003/06/05 01:38:01 dan_karrels Exp $"
 
 #include	"xparameters.h"
+#include	"ELog.h"
 
 namespace gnuworld
 {
@@ -32,7 +33,6 @@ class xServer ;
 
 class ServerCommandHandler
 {
-
 protected:
 	xServer		*theServer ;
 
@@ -45,7 +45,6 @@ public:
 	{}
 
 	virtual bool Execute( const xParameters& ) = 0 ;
-
 } ;
 
 #define CREATE_HANDLER(name) \
@@ -63,7 +62,7 @@ public: \
 \
 extern "C" \
 { \
-  name* _gnuwinit( xServer* theServer ) \
+  name* _gnuwinit_##name( xServer* theServer ) \
     { \
       return new name( theServer ) ; \
     } \
@@ -72,7 +71,7 @@ extern "C" \
 #define CREATE_LOADER(name) \
 extern "C" \
 { \
-  name* _gnuwinit( xServer* theServer ) \
+  name* _gnuwinit_##name( xServer* theServer ) \
     { \
       return new name( theServer ) ; \
     } \

@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: stats.h,v 1.4 2002/08/08 18:32:34 dan_karrels Exp $
+ * $Id: stats.h,v 1.5 2003/06/05 01:38:11 dan_karrels Exp $
  */
 
 #ifndef __STATS_H
-#define __STATS_H "$Id: stats.h,v 1.4 2002/08/08 18:32:34 dan_karrels Exp $"
+#define __STATS_H "$Id: stats.h,v 1.5 2003/06/05 01:38:11 dan_karrels Exp $"
 
 #include	<fstream>
 #include	<string>
@@ -45,6 +45,7 @@ class stats : public xClient
 
 protected:
 	typedef map< string, ofstream*, noCaseCompare > fileTableType ;
+	typedef map< string, long int > memoryCountType ;
 
 public:
 	stats( const string& ) ;
@@ -52,6 +53,8 @@ public:
 
 	typedef fileTableType::iterator fileIterator ;
 	typedef fileTableType::const_iterator constFileIterator ;
+
+	typedef memoryCountType::const_iterator constMemoryCountIterator ;
 
 	virtual void ImplementServer( xServer* ) ;
 	virtual int OnPrivateMessage( iClient*, const string&,
@@ -63,14 +66,25 @@ public:
                 void* Data1 = NULL, void* Data2 = NULL,
                 void* Data3 = NULL, void* Data4 = NULL ) ;
 
+	inline const string&	getPartMessage() const
+		{ return partMessage ; }
+
+	inline void		setPartMessage( const string& newVal )
+		{ partMessage = newVal ; }
+
+	virtual void		dumpStats( iClient* ) ;
+
 protected:
 	void			WriteLog( const string& file,
 					const string& line = string() ) ;
 
-	string			data_path ;
-	fileTableType		fileTable ;
-
 	bool			logDuringBurst ;
+	string			data_path ;
+	string			partMessage ;
+	time_t			startTime ;
+
+	fileTableType		fileTable ;
+	memoryCountType		memoryCount ;
 
 } ;
 

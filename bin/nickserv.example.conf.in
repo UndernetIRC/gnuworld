@@ -1,3 +1,4 @@
+# $Id: nickserv.example.conf.in,v 1.5 2003/06/05 01:38:01 dan_karrels Exp $
 nickname = NS
 
 username = nickserv

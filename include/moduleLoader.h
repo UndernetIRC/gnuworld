@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * "$Id: moduleLoader.h,v 1.14 2003/01/28 22:06:32 jeekay Exp $"
+ * "$Id: moduleLoader.h,v 1.15 2003/06/05 01:38:01 dan_karrels Exp $"
  */
 
 #ifndef __MODULELOADER_H
-#define __MODULELOADER_H "$Id: moduleLoader.h,v 1.14 2003/01/28 22:06:32 jeekay Exp $"
+#define __MODULELOADER_H "$Id: moduleLoader.h,v 1.15 2003/06/05 01:38:01 dan_karrels Exp $"
 
 #include	<iostream>
 #include	<string>
@@ -158,16 +158,15 @@ public:
 	 * This method will execute only once for each instance.
 	 * Each additional call after the initial call to laodObject()
 	 * will return the object previously created.
+	 * The symbolSuffix is used to distinguish between similarly
+	 * named symbols to be loaded from the same module.
 	 */
-	modType loadObject( argType arg )
+	modType loadObject( argType arg,
+		const string& symbolSuffix = string() )
 	{
-	if( modFunc != 0 )
-		{
-		// Already loaded the object
-		return modPtr ;
-		}
-
-	modFunc = (GNUWModuleFunc)lt_dlsym( moduleHandle, "_gnuwinit" ) ;
+	const string symbolName = string( "_gnuwinit" ) + symbolSuffix ;
+	modFunc = (GNUWModuleFunc) lt_dlsym( moduleHandle,
+			symbolName.c_str() ) ;
 	if( 0 == modFunc )
 		{
 		elog	<< "moduleLoader::loadObject> Error: "

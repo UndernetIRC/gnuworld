@@ -1,3 +1,4 @@
+# $Id: stats.example.conf.in,v 1.2 2003/06/05 01:38:01 dan_karrels Exp $
 # conf file for stats bot
 username = Stats
 nickname = Stats
@@ -12,3 +13,6 @@ logDuringBurst = false
 
 # Path to where you want output files to be placed
 data_path = @bindir@
+
+part_message = Im too sexy for this channel
+

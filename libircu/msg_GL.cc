@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_GL.cc,v 1.3 2003/06/03 23:19:07 dan_karrels Exp $
+ * $Id: msg_GL.cc,v 1.4 2003/06/05 01:38:03 dan_karrels Exp $
  */
 
 #include	<new>
@@ -37,7 +37,7 @@ const char xparameters_h_rcsId[] = __XPARAMETERS_H ;
 const char ELog_h_rcsId[] = __ELOG_H ;
 const char Gline_h_rcsId[] = __GLINE_H ;
 const char events_h_rcsId[] = __EVENTS_H ;
-const char msg_GL_cc_rcsId[] = "$Id: msg_GL.cc,v 1.3 2003/06/03 23:19:07 dan_karrels Exp $" ;
+const char msg_GL_cc_rcsId[] = "$Id: msg_GL.cc,v 1.4 2003/06/05 01:38:03 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -72,15 +72,14 @@ if( '-' == Params[ 2 ][ 0 ] )
 		return true ;
 		}
 
-	// Found the gline being removed, remove it
-	theServer->eraseGline( gItr ) ;
-
 	// Let the modules know that it has been removed
 	theServer->PostEvent( EVT_REMGLINE,
 		static_cast< void* >( gItr->second ) ) ;
 
 	// Clean up memory
 	delete gItr->second ;
+	theServer->eraseGline( gItr ) ;
+
 	return true ;
 	}
 

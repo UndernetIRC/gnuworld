@@ -1,47 +1,49 @@
+# $Id: server_command_map,v 1.13 2003/06/05 01:38:01 dan_karrels Exp $
 # The mapping from module to message name for server command handlers
-# format: module_name command_key
-# example: msg_AC AC
-# example: msg_P P
-# example: msg_NOOP Z
-lib_msg_AC AC
-lib_msg_AD AD
-lib_msg_B B
-lib_msg_C C
-lib_msg_CM CM
-lib_msg_D D
-lib_msg_DS DS
-lib_msg_EA EA
-lib_msg_EB EB
-lib_msg_G G
-lib_msg_GL GL
-lib_msg_I I
-lib_msg_J J
-lib_msg_JU JU
-lib_msg_K K
-lib_msg_L L
-lib_msg_M351 351
-lib_msg_M M
-lib_msg_N N
-lib_msg_NOOP NOOP
-lib_msg_M OM
-lib_msg_PA PA
-lib_msg_PA PASS
-lib_msg_O O
-lib_msg_P P
-lib_msg_Q Q
-lib_msg_R R
-lib_msg_S S
-lib_msg_Server SERVER
-lib_msg_SQ SQ
-lib_msg_T T
-lib_msg_V V
-lib_msg_WA WA
-lib_msg_W W
-lib_msg_Y Y
-lib_msg_Y ERROR
-lib_msg_NOOP Z
-lib_msg_NOOP A
-lib_msg_NOOP U
-lib_msg_NOOP WU
-lib_msg_NOOP MO
+# format: module_file_name module_loader_symbol command_key
+# example: libircu msg_AC AC
+# example: libircu msg_P P
+# example: libircu msg_NOOP Z
+
+libircu msg_AC AC
+libircu msg_AD AD
+libircu msg_B B
+libircu msg_C C
+libircu msg_CM CM
+libircu msg_D D
+libircu msg_DS DS
+libircu msg_EA EA
+libircu msg_EB EB
+libircu msg_G G
+libircu msg_GL GL
+libircu msg_I I
+libircu msg_J J
+libircu msg_JU JU
+libircu msg_K K
+libircu msg_L L
+libircu msg_M351 351
+libircu msg_M M
+libircu msg_N N
+libircu msg_NOOP NOOP
+libircu msg_M OM
+libircu msg_PA PA
+libircu msg_PA PASS
+libircu msg_O O
+libircu msg_P P
+libircu msg_Q Q
+libircu msg_R R
+libircu msg_S S
+libircu msg_Server SERVER
+libircu msg_SQ SQ
+libircu msg_T T
+libircu msg_V V
+libircu msg_WA WA
+libircu msg_W W
+libircu msg_Y Y
+libircu msg_Y ERROR
+libircu msg_NOOP Z
+libircu msg_NOOP A
+libircu msg_NOOP U
+libircu msg_NOOP WU
+libircu msg_NOOP MO
 

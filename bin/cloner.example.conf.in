@@ -1,3 +1,4 @@
+# $Id: cloner.example.conf.in,v 1.2 2003/06/05 01:38:01 dan_karrels Exp $
 # Configuration file for Cloner (mod.cloner)
 
 # The following fields pertain to the client that connects and

@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server.cc,v 1.160 2003/06/03 23:19:10 dan_karrels Exp $
+ * $Id: server.cc,v 1.161 2003/06/05 01:38:11 dan_karrels Exp $
  */
 
 #include	<sys/time.h>
@@ -72,7 +72,7 @@
 #include	"Connection.h"
 
 const char server_h_rcsId[] = __SERVER_H ;
-const char server_cc_rcsId[] = "$Id: server.cc,v 1.160 2003/06/03 23:19:10 dan_karrels Exp $" ;
+const char server_cc_rcsId[] = "$Id: server.cc,v 1.161 2003/06/05 01:38:11 dan_karrels Exp $" ;
 const char config_h_rcsId[] = __CONFIG_H ;
 const char misc_h_rcsId[] = __MISC_H ;
 const char events_h_rcsId[] = __EVENTS_H ;
@@ -324,14 +324,15 @@ while( std::getline( commandMapFile, line ) )
 		continue ;
 		}
 
+	// module_file_name module_loader_symbol command_key
 	StringTokenizer st( line ) ;
-	if( st.size() != 2 )
+	if( st.size() != 3 )
 		{
 		elog	<< "xServer::loadCommandHandlers> "
 			<< commandMapFileName
 			<< ":"
 			<< lineNumber
-			<< "> Invalid syntax, 2 tokens expected, "
+			<< "> Invalid syntax, 3 tokens expected, "
 			<< st.size()
 			<< " tokens found"
 			<< endl ;
@@ -339,8 +340,10 @@ while( std::getline( commandMapFile, line ) )
 		break ;
 		}
 
-	// st[ 0 ] is the filename of the module
-	// st[ 1 ] is the command key to which the handler will
+	// st[ 0 ] is the module file name
+	// st[ 1 ] is the symbol name to lookup, minus the preceeding
+	// _gnuwinit_
+	// st[ 2 ] is the command key to which the handler will
 	//  be registered
 
 	// Let's make sure that the filename is correct
@@ -363,18 +366,22 @@ while( std::getline( commandMapFile, line ) )
 		fileName += ".la" ;
 		}
 
-	if( !loadCommandHandler( fileName, st[ 1 ] ) )
+	if( !loadCommandHandler( fileName, st[ 1 ], st[ 2 ] ) )
 		{
-		elog	<< "xSerer::loadCommandHandlers> Failed to load "
-			<< "handler for "
+		elog	<< "xServer::loadCommandHandlers> Failed to load "
+			<< "handler for message token "
+			<< st[ 2 ]
+			<< ", from module file: "
 			<< fileName
+			<< ", with symbol suffic: "
+			<< st[ 1 ]
 			<< endl ;
 		returnVal = false ;
 		break ;
 		}
 
 //	elog	<< "xServer::loadCommandHandlers> Loaded handler for "
-//		<< st[ 1 ]
+//		<< st[ 2 ]
 //		<< endl ;
 
 	} // while()
@@ -390,24 +397,46 @@ return returnVal ;
 }
 
 bool xServer::loadCommandHandler( const string& fileName,
+	const string& symbolName,
 	const string& commandKey )
 {
 // Let's first check to see if the module is already open
 // It is possible that a single module handler may be
 // registered to handle multiple commands (NOOP for example)
+bool foundExistingModule = true ;
 commandModuleType* ml = lookupCommandModule( fileName ) ;
 if( NULL == ml )
 	{
+	foundExistingModule = false ;
 	ml = new (std::nothrow) commandModuleType( fileName ) ;
 	assert( ml != 0 ) ;
 	}
+else
+	{
+//	elog	<< "xServer::loadCommandHandler> Found existing module: "
+//		<< ml->getModuleName()
+//		<< endl ;
+	}
 
-ServerCommandHandler* sch = ml->loadObject( this ) ;
+string symbolSuffix = string( "_" ) + symbolName ;
+//elog	<< "xServer::loadCommandHandler> fileName: "
+//	<< fileName
+//	<< ", symbolSuffix: "
+//	<< symbolSuffix
+//	<< ", commandKey: "
+//	<< commandKey
+//	<< endl ;
+
+ServerCommandHandler* sch = ml->loadObject( this, symbolSuffix ) ;
 if( NULL == sch )
 	{
-	elog	<< "xServer::loadCommandHandler> Error loading "
-		<< "module file "
+	elog	<< "xServer::loadCommandHandler> Failed to load "
+		<< "handler for message token "
+		<< commandKey
+		<< ", from module file: "
 		<< fileName
+		<< ", with symbol suffic: "
+		<< symbolName
 		<< endl ;
 
 	delete( ml ) ; ml = 0 ;
@@ -417,7 +446,11 @@ if( NULL == sch )
 
 // Successfully loaded a module
 // Put it in the list of modules
-commandModuleList.push_back( ml ) ;
+if( !foundExistingModule )
+	{
+	// No sense in adding the same module multiple times
+	commandModuleList.push_back( ml ) ;
+	}
 
 // Add the command handler to the handler map
 if( !commandMap.insert( commandMapType::value_type(

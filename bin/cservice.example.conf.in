@@ -1,3 +1,4 @@
+# $Id: cservice.example.conf.in,v 1.4 2003/06/05 01:38:01 dan_karrels Exp $
 # Channel Services configuration file.
 #
 # sql_host = Hostname/IP of the PostgreSQL server.

@@ -1,3 +1,4 @@
+# $Id: gnutest.example.conf.in,v 1.2 2003/06/05 01:38:01 dan_karrels Exp $
 # conf file for testClient
 username = gnutest
 nickname = gnutest
