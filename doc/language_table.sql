@@ -1856,7 +1856,7 @@ COPY "translations" FROM stdin;
 13	92	Kunne ikke slette %s fra min ignoreliste	31337	0
 13	93	Kan ikke slette en bruker med lik eller høyere aksess enn din egen	31337	0
 13	94	Du kan ikke fjerne deg selv ifra en kanal du eier.	31337	0
-13	95	SLettet bruker %s fra %s	31337	0
+13	95	Slettet bruker %s fra %s	31337	0
 13	96	INVISIBLE(usynlig) er nå ON(på).	31337	0
 13	97	INVISIBLE(usynlig) er nå OFF(av).	31337	0
 13	98	%s for %s er %s	31337	0
