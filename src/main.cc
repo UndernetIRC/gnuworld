@@ -1,5 +1,5 @@
 /* main.cc
- * $Id: main.cc,v 1.20 2001/01/08 18:33:15 dan_karrels Exp $
+ * $Id: main.cc,v 1.21 2001/01/08 19:48:41 dan_karrels Exp $
  */
 
 #include	<fstream>
@@ -24,7 +24,7 @@
 using namespace gnuworld ;
 
 const char config_h_rcsId[] = __CONFIG_H ;
-const char main_cc_rcsId[] = "$Id: main.cc,v 1.20 2001/01/08 18:33:15 dan_karrels Exp $" ;
+const char main_cc_rcsId[] = "$Id: main.cc,v 1.21 2001/01/08 19:48:41 dan_karrels Exp $" ;
 
 using std::cerr ;
 using std::clog ;
@@ -122,8 +122,6 @@ while( (c = getopt( argc, argv, "cd:f:hs:" )) != EOF )
 		} // close switch
 	} // close while
 
-// Sets up the server internals
-initializeSystem() ;
 
 #ifdef EDEBUG
 	elog.openFile( elogFileName.c_str() ) ;
@@ -141,6 +139,9 @@ if( verbose )
 	elog.setStream( &clog ) ;
 	elog	<< "*** Running in verbose mode...\n" ;
 	}
+
+// Sets up the server internals
+initializeSystem() ;
 
 #ifdef LOG_SOCKET
 	socketFile.open( LOG_SOCKET_NAME, std::ios::out ) ;
