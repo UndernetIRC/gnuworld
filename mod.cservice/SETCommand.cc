@@ -18,7 +18,7 @@
  *
  * Caveats: None.
  *
- * $Id: SETCommand.cc,v 1.45 2001/12/27 02:48:08 gte Exp $
+ * $Id: SETCommand.cc,v 1.46 2002/01/05 01:00:49 gte Exp $
  */
 
 #include	<string>
@@ -29,7 +29,7 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char SETCommand_cc_rcsId[] = "$Id: SETCommand.cc,v 1.45 2001/12/27 02:48:08 gte Exp $" ;
+const char SETCommand_cc_rcsId[] = "$Id: SETCommand.cc,v 1.46 2002/01/05 01:00:49 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -711,44 +711,6 @@ else
 	    return true;
 	}
 
-	if(option == "FLOODPRO")
-	{
-	    if(level < level::set::floodpro)
-	    {
-                        bot->Notice(theClient,
-                                        bot->getResponse(theUser,
-                                        language::insuf_access,
-                                        string("You do not have enough access!")));
-			return true;
-	    }
-	    // Temporary MASSDEOPPRO range! 0-7.. is this correct?
-	    if(!IsNumeric(value))
-	    {
-			bot->Notice(theClient,
-				bot->getResponse(theUser,
-					language::floodpro_syntax,
-					string("value of FLOODPRO has to be 0-7")));
-			return true;
-	    }
-		    int numValue = atoi(value.c_str());
-		    if(numValue > 7 || numValue < 0)
-	    {
-		bot->Notice(theClient,
-			bot->getResponse(theUser,
-				language::floodpro_syntax,
-				string("value of FLOODPRO has to be 0-7")));
-		return true;
-	    }
-		theChan->setFloodPro(numValue);
-	    theChan->commit();
-	    bot->Notice(theClient,
-			bot->getResponse(theUser,
-				language::floodpro_status,
-				string("FLOODPRO for %s is set to %d")).c_str(),
-			theChan->getName().c_str(), numValue);
-	    return true;
-	}
-
 	if(option == "DESCRIPTION" || option == "DESC")
 	{
 		string desc = st.assemble(3);
@@ -997,6 +959,12 @@ else
 			return true;
 		}
 
+	if (limit_offset <= theChan->getLimitGrace())
+		{
+			bot->Notice(theClient, "FLOATMARGIN cannot be less than or equal to FLOATGRACE.");
+			return true;
+		}
+
 	theChan->setLimitOffset(limit_offset);
 	theChan->commit();
 
@@ -1004,7 +972,7 @@ else
 	return true;
 	}
 
-	if(option == "FLOATPERIOD")
+	if(option == "FLOATMARGIN")
 	{
 	    if(level < level::set::floatlim)
 	    {
@@ -1015,18 +983,88 @@ else
 		return true;
 	    }
 
-	unsigned int limit_period = atoi(value.c_str());
+	unsigned int limit_offset = atoi(value.c_str());
 
-	if ((limit_period < 20) | (limit_period > 200))
+	if ((limit_offset <= 1) | (limit_offset > 20))
 		{
-			bot->Notice(theClient, "Invalid floating-limit period (20-200 Allowed).");
+			bot->Notice(theClient, "Invalid floating-limit Margin (2-20 Allowed).");
 			return true;
 		}
 
-	theChan->setLimitPeriod(limit_period);
+	if (limit_offset <= theChan->getLimitGrace())
+		{
+			bot->Notice(theClient, "FLOATMARGIN cannot be less than or equal to FLOATGRACE.");
+			return true;
+		}
+
+	theChan->setLimitOffset(limit_offset);
 	theChan->commit();
 
-	bot->Notice(theClient, "Floating-limit period now set to %i", limit_period);
+	bot->Notice(theClient, "Floating-limit Margin now set to %i", limit_offset);
+	return true;
+	}
+
+	if(option == "FLOATGRACE")
+	{
+	    if(level < level::set::floatlim)
+	    {
+		bot->Notice(theClient,
+				bot->getResponse(theUser,
+				language::insuf_access,
+				string("You do not have enough access!")));
+		return true;
+	    }
+
+	unsigned int limit_grace = atoi(value.c_str());
+
+	if ((limit_grace < 0) | (limit_grace > 19))
+		{
+			bot->Notice(theClient, "Invalid floating-grace setting (0-19 Allowed).");
+			return true;
+		}
+
+	if (limit_grace > theChan->getLimitOffset())
+		{
+			bot->Notice(theClient, "FLOATGRACE cannot be greater than FLOATMARGIN.");
+			return true;
+		}
+
+	theChan->setLimitGrace(limit_grace);
+	theChan->commit();
+
+	bot->Notice(theClient, "Floating-limit grace now set to %i", limit_grace);
+	return true;
+	}
+
+	if(option == "FLOATMAX")
+	{
+	    if(level < level::set::floatlim)
+	    {
+		bot->Notice(theClient,
+				bot->getResponse(theUser,
+				language::insuf_access,
+				string("You do not have enough access!")));
+		return true;
+	    }
+
+	unsigned int limit_max = atoi(value.c_str());
+
+	if ((limit_max < 0) | (limit_max > 65536))
+		{
+			bot->Notice(theClient, "Invalid floating-limit max (0-65536 Allowed).");
+			return true;
+		}
+
+
+	theChan->setLimitMax(limit_max);
+	theChan->commit();
+
+	if (!limit_max)
+	{
+		bot->Notice(theClient, "Floating-limit MAX setting has now been disabled.");
+	} else {
+		bot->Notice(theClient, "Floating-limit max now set to %i", limit_max);
+	}
 	return true;
 	}
 

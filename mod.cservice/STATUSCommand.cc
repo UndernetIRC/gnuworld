@@ -10,7 +10,7 @@
 #include	"Network.h"
 #include	"cservice_config.h"
 
-const char STATUSCommand_cc_rcsId[] = "$Id: STATUSCommand.cc,v 1.36 2001/12/27 02:48:08 gte Exp $" ;
+const char STATUSCommand_cc_rcsId[] = "$Id: STATUSCommand.cc,v 1.37 2002/01/05 01:00:49 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -206,9 +206,7 @@ if (tmpChan)
 	}
 
 
-bot->Notice(theClient, "MassDeopPro: %i, FloodPro: %i",
-	theChan->getMassDeopPro(),
-	theChan->getFloodPro());
+bot->Notice(theClient, "MassDeopPro: %i", theChan->getMassDeopPro());
 
 string flagsSet;
 if (theChan->getFlag(sqlChannel::F_NOPURGE)) flagsSet += "NOPURGE ";
@@ -229,10 +227,14 @@ if (theChan->getFlag(sqlChannel::F_FLOATLIM))
 	{
 	strstream floatLim;
 	floatLim
-	<< "FLOATLIM ("
+	<< "FLOATLIM (MGN:"
 	<< theChan->getLimitOffset()
-	<< ":"
+	<< ", PRD:"
 	<< theChan->getLimitPeriod()
+	<< ", GRC:"
+	<< theChan->getLimitGrace()
+	<< ", MAX:"
+	<< theChan->getLimitMax()
 	<< ")"
 	<< ends;
 	flagsSet += floatLim.str();

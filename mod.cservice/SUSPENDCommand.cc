@@ -7,7 +7,7 @@
  * Suspends an user on the specified channel, if suspend duration 0
  * is defined, the user will be unsuspended.
  *
- * $Id: SUSPENDCommand.cc,v 1.21 2001/09/21 23:43:35 gte Exp $
+ * $Id: SUSPENDCommand.cc,v 1.22 2002/01/05 01:00:49 gte Exp $
  */
 
 #include	<string>
@@ -21,7 +21,7 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char SUSPENDCommand_cc_rcsId[] = "$Id: SUSPENDCommand.cc,v 1.21 2001/09/21 23:43:35 gte Exp $" ;
+const char SUSPENDCommand_cc_rcsId[] = "$Id: SUSPENDCommand.cc,v 1.22 2002/01/05 01:00:49 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -175,7 +175,7 @@ time_t finalDuration = (duration * 60); /* Default to minutes. */
 
 if( st.size() >= 5 )
 	{
-	units = st[4];
+	units = string_lower(st[4]);
 	if(units == "m")
 		{
 		finalDuration = duration * 60;

@@ -750,7 +750,7 @@ else if(Command == "VERSION")
 	xClient::DoCTCP(theClient, CTCP,
 		"Undernet P10 Channel Services II ["
 		__DATE__ " " __TIME__
-		"] Release 1.1pl4");
+		"] Release 1.1pl5");
 	}
 else if(Command == "PROBLEM?")
 	{
@@ -2749,10 +2749,11 @@ switch( whichEvent )
 
 						ptr->second->trafficList.insert(sqlPendingChannel::trafficListType::value_type(
 							theClient->getIP(), trafRecord));
-
+#ifdef LOG_DEBUG
 						logDebugMessage("Created a new IP traffic record for IP#%u (%s) on %s",
 							theClient->getIP(), theClient->getNickUserHost().c_str(),
 							theChan->getName().c_str());
+#endif
 						} else
 						{
 						/* Already cached, update and save. */
@@ -2788,9 +2789,11 @@ switch( whichEvent )
 					if (Supptr != ptr->second->supporterList.end())
 						{
 							Supptr->second++;
+#ifdef LOG_DEBUG
 							ptr->second->commitSupporter(Supptr->first, Supptr->second);
 							logDebugMessage("New total for Supporter #%i (%s) on %s is %i.", theUser->getID(),
 								theUser->getUserName().c_str(), theChan->getName().c_str(), Supptr->second);
+#endif
 						}
 
 				return xClient::OnChannelEvent( whichEvent, theChan,
@@ -2826,14 +2829,6 @@ switch( whichEvent )
 			+ topic_duration <= currentTime()))
 			{
 			doAutoTopic(reggedChan);
-			}
-
-		/* Is it time to deal with autolimit's? */
-		if (reggedChan->getFlag(sqlChannel::F_FLOATLIM) &&
-			(reggedChan->getLastLimitCheck()
-			+ reggedChan->getLimitPeriod() <= currentTime()))
-			{
-			doFloatingLimit(reggedChan, theChan);
 			}
 
 		/* Deal with auto-op first - check this users access level. */
@@ -3075,12 +3070,17 @@ void cservice::updateLimits()
 	 	{
 		sqlChannel* theChan = (ptr)->second;
 
+		/*
+		 * Don't have the Floating Limit flag set?
+		 */
 		if (!theChan->getFlag(sqlChannel::F_FLOATLIM))
 			{
 			++ptr;
 			continue;
 			}
-
+		/*
+		 * X isn't even in the channel?
+		 */
 		if (!theChan->getInChan())
 			{
 			++ptr;
@@ -3089,7 +3089,19 @@ void cservice::updateLimits()
 
 		Channel* tmpChan = Network->findChannel(theChan->getName());
 
+		/*
+		 * For some magical reason the channel doesn't even exist?
+		 */
 		if (!tmpChan)
+			{
+			++ptr;
+			continue;
+			}
+
+		/*
+		 * If its not time to update the limit for this channel yet.
+		 */
+		if (theChan->getLastLimitCheck() + theChan->getLimitPeriod() > currentTime())
 			{
 			++ptr;
 			continue;
@@ -3104,16 +3116,27 @@ void cservice::updateLimits()
 void cservice::doFloatingLimit(sqlChannel* reggedChan, Channel* theChan)
 {
 /*
- * This event is triggered when someone has joined the channel and its
- * "Time" to do autolimits, so we'll always want to update the limit.
+ * This event is triggered when its "time" to do autolimits.
  */
  	unsigned int newLimit = theChan->size() + reggedChan->getLimitOffset();
 
  	/* Don't bother if the new limit is the same as the old one. */
  	if (newLimit == theChan->getLimit()) return;
 
+	/* Also don't bother if the difference between the old limit and
+	 * the new limit is < 'grace' */
+	int currentDif = abs((int)theChan->getLimit() - (int)newLimit);
+	if (currentDif <= (int)reggedChan->getLimitGrace()) return;
+
 	/*
- 	 * Check we're actually opped first.
+	 * If the new limit is above our max limit, don't bother
+	 * either.
+	 */
+
+	if (reggedChan->getLimitMax() && (theChan->getLimit() >= reggedChan->getLimitMax())) return;
+
+	/*
+ 	 * Check we're actually opped.
 	 */
 
 	ChannelUser* tmpBotUser = theChan->findUser(getInstance());

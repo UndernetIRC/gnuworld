@@ -1,12 +1,27 @@
 Newest changes at the top of the file:
-$Id: RELEASE.NOTES,v 1.20 2001/12/27 02:48:08 gte Exp $
+$Id: RELEASE.NOTES,v 1.21 2002/01/05 01:00:49 gte Exp $
+
+CMaster 1.1pl5 - 04/12/2001
+* Remove ancient refrences to floodpro.
+* Fix case issue with suspend duration units.
+* Further tweaking to make floating limit less noisey.
+* Added a "grace" value to the floating limits, the limit will
+  not be reset if the increment is smaller than "grace".
+* Added a "max" value to the floating limits, the limit will
+  never pass this setting. Usefull to float the limit around
+  and have it max when a chan gets too full, etc.
+* DB Maintainence Required in this release:
+  ALTER TABLE channels ADD COLUMN limit_grace INT4 DEFAULT '1';
+  ALTER TABLE channels ADD COLUMN limit_max INT4 DEFAULT '0';
+  UPDATE channels SET limit_grace = 1;
+  UPDATE channels SET limit_max = 0;
 
 CMaster 1.1pl4 - 26/12/2001
 * Don't auto-part channels marked as SPECIAL.
 * Add "Floating Limit" support. (Ie: Set the channel +l to X 
   above the total number of people in the channel every Y 
   seconds.
-* Maintainence Required in this release:
+* DB Maintainence Required in this release:
   ALTER TABLE channels ADD COLUMN limit_offset INT4 DEFAULT '3';
   ALTER TABLE channels ADD COLUMN limit_period INT4 DEFAULT '20';
   UPDATE channels SET limit_offset = 3;

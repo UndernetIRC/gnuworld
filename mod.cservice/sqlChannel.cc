@@ -9,7 +9,7 @@
  * 30/12/2000: Moved static SQL data to constants.h --Gte
  * Set loadData up to take data from rows other than 0.
  *
- * $Id: sqlChannel.cc,v 1.34 2001/12/27 02:48:08 gte Exp $
+ * $Id: sqlChannel.cc,v 1.35 2002/01/05 01:00:49 gte Exp $
  */
 
 #include	<strstream>
@@ -25,7 +25,7 @@
 #include	"cservice_config.h"
 
 const char sqlChannel_h_rcsId[] = __SQLCHANNEL_H ;
-const char sqlChannel_cc_rcsId[] = "$Id: sqlChannel.cc,v 1.34 2001/12/27 02:48:08 gte Exp $" ;
+const char sqlChannel_cc_rcsId[] = "$Id: sqlChannel.cc,v 1.35 2002/01/05 01:00:49 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -87,6 +87,8 @@ sqlChannel::sqlChannel(PgDatabase* _SQLDb)
    limit_offset(3),
    limit_period(20),
    last_limit_check(0),
+   limit_grace(2),
+   limit_max(0),
    SQLDb( _SQLDb )
 {
 }
@@ -214,6 +216,8 @@ userflags = atoi(SQLDb->GetValue(row,12));
 last_updated = atoi(SQLDb->GetValue(row,13));
 limit_offset = atoi(SQLDb->GetValue(row,14));
 limit_period = atoi(SQLDb->GetValue(row,15));
+limit_grace = atoi(SQLDb->GetValue(row,16));
+limit_max = atoi(SQLDb->GetValue(row,17));
 }
 
 bool sqlChannel::commit()
@@ -240,6 +244,8 @@ queryString	<< queryHeader
 		<< "last_updated = now()::abstime::int4, "
 		<< "limit_offset = " << limit_offset << ", "
 		<< "limit_period = " << limit_period << ", "
+		<< "limit_grace = " << limit_grace << ", "
+		<< "limit_max = " << limit_max << ", "
 		<< "description = '" << escapeSQLChars(description) << "', "
 		<< "comment = '" << escapeSQLChars(comment) << "' "
 		<< queryCondition << id

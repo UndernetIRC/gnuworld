@@ -1,7 +1,7 @@
 /* sqlChannel.h */
 
 #ifndef __SQLCHANNEL_H
-#define __SQLCHANNEL_H "$Id: sqlChannel.h,v 1.37 2001/12/27 02:48:08 gte Exp $"
+#define __SQLCHANNEL_H "$Id: sqlChannel.h,v 1.38 2002/01/05 01:00:49 gte Exp $"
 
 #include	<string>
 #include	<map>
@@ -128,6 +128,11 @@ public:
 	inline const time_t&	getLimitPeriod() const
 		{ return limit_period ; }
 
+	inline const unsigned int& getLimitGrace() const
+		{ return limit_grace ; }
+
+	inline const unsigned int& getLimitMax() const
+		{ return limit_max ; }
 	/**
 	 * Load channel data from the backend using the channel name as
 	 * a key.
@@ -209,6 +214,12 @@ public:
 	inline void setLimitPeriod( const time_t& _limit_period )
 		{ limit_period = _limit_period; }
 
+	inline void setLimitGrace( const unsigned int& _limit_grace )
+		{ limit_grace = _limit_grace; }
+
+	inline void setLimitMax( const unsigned int& _limit_max )
+		{ limit_max = _limit_max; }
+
 	/**
 	 * Method to perform a SQL 'UPDATE' and commit changes to this
 	 * object back to the database.
@@ -253,6 +264,8 @@ protected:
 	unsigned int limit_offset;
 	time_t limit_period;
 	time_t last_limit_check;
+	unsigned int limit_grace;
+	unsigned int limit_max;
 
 	PgDatabase*	SQLDb;
 
