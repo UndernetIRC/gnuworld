@@ -19,15 +19,17 @@
 #include	"client.h"
 #include	"misc.h"
 #include	"Numeric.h"
+#include	"match.h"
 
 const char xNetwork_h_rcsId[] = __NETWORK_H ;
-const char xNetwork_cc_rcsId[] = "$Id: Network.cc,v 1.24 2001/05/13 00:26:01 dan_karrels Exp $" ;
+const char xNetwork_cc_rcsId[] = "$Id: Network.cc,v 1.25 2001/05/14 16:07:05 dan_karrels Exp $" ;
 const char ELog_h_rcsId[] = __ELOG_H ;
 const char iClient_h_rcsId[] = __ICLIENT_H ;
 const char Channel_h_rcsId[] = __CHANNEL_H ;
 const char client_h_rcsId[] = __CLIENT_H ;
 const char misc_h_rcsId[] = __MISC_H ;
 const char Numeric_h_rcsId[] = __NUMERIC_H ;
+const char match_h_rcsId[] = __MATCH_H ;
 
 namespace gnuworld
 {
@@ -43,7 +45,9 @@ xNetwork::xNetwork()
 {}
 
 xNetwork::~xNetwork()
-{}
+{
+// TODO: Establish protocol here about who deletes all clients/server/etc
+}
 
 bool xNetwork::addClient( iClient* newClient )
 {
@@ -738,22 +742,70 @@ return numClients ;
 
 list< const iClient* > xNetwork::matchHost( const string& wildHost ) const
 {
-return list< const iClient* >() ;
+list< const iClient* > retMe ;
+
+for( networkVectorType::const_iterator sPtr = clients.begin() ;
+	sPtr != clients.end() ; ++sPtr )
+	{
+
+	for( clientVectorType::const_iterator cPtr = (*sPtr).begin() ;
+		cPtr != (*sPtr).end() ; ++cPtr )
+		{
+		if( NULL == *cPtr )
+			{
+			// No client present at this numeric,
+			// no big deal
+			continue ;
+			}
+
+		if( !match( wildHost, (*cPtr)->getInsecureHost() ) )
+			{
+			// Found a match
+			retMe.push_back( *cPtr ) ;
+			}
+		}
+	}
+
+return retMe ;
 }
 
 list< const iClient* > xNetwork::findHost( const string& hostName ) const
 {
-return list< const iClient* >() ;
+list< const iClient* > retMe ;
+
+for( networkVectorType::const_iterator sPtr = clients.begin() ;
+	sPtr != clients.end() ; ++sPtr )
+	{
+
+	for( clientVectorType::const_iterator cPtr = (*sPtr).begin() ;
+		cPtr !=(*sPtr).end() ; ++cPtr )
+		{
+		if( NULL == *cPtr )
+			{
+			// No client present at this numeric,
+			// no big deal
+			continue ;
+			}
+
+		if( !strcasecmp( hostName, (*cPtr)->getInsecureHost() ) )
+			{
+			// Found a match
+			retMe.push_back( *cPtr ) ;
+			}
+		}
+	}
+
+return retMe ;
 }
 
 size_t xNetwork::countMatchingHost( const string& wildHost ) const
 {
-return 0 ;
+return static_cast< size_t >( matchHost( wildHost ).size() ) ;
 }
 
 size_t xNetwork::countHost( const string& hostName ) const
 {
-return 0 ;
+return static_cast< size_t >( findHost( hostName ).size() ) ;
 }
 
 } // namespace gnuworld

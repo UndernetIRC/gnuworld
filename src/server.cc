@@ -48,7 +48,7 @@
 #include	"ServerTimerHandlers.h"
 
 const char server_h_rcsId[] = __SERVER_H ;
-const char server_cc_rcsId[] = "$Id: server.cc,v 1.95 2001/05/13 00:26:01 dan_karrels Exp $" ;
+const char server_cc_rcsId[] = "$Id: server.cc,v 1.96 2001/05/14 16:07:05 dan_karrels Exp $" ;
 const char config_h_rcsId[] = __CONFIG_H ;
 const char misc_h_rcsId[] = __MISC_H ;
 const char events_h_rcsId[] = __EVENTS_H ;
@@ -1751,7 +1751,7 @@ assert( newGline != 0 ) ;
 strstream s ;
 s	<< charYY << " GL * +"
 	<< userHost << ' '
-	<< (::time( 0 ) + duration) << " :"
+	<< duration << " :"
 	<< reason << ends ;
 Write( s ) ;
 delete[] s.str() ;
@@ -1763,7 +1763,6 @@ PostEvent( EVT_GLINE,
 return true ;
 }
 
-// TODO
 vector< const Gline* > xServer::matchGline( const string& userHost ) const
 {
 vector< const Gline* > retMe ;
@@ -1785,8 +1784,7 @@ const Gline* xServer::findGline( const string& userHost ) const
 for( glineListType::const_iterator ptr = glineList.begin() ;
 	ptr != glineList.end() ; ++ptr )
 	{
-	// TODO: Case insensitive search
-	if( *(*ptr) == userHost )
+	if( !strcasecmp( (*ptr)->getUserHost(), userHost ) )
 		{
 		// Found it
 		return *ptr ;
