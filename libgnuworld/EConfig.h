@@ -17,15 +17,16 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: EConfig.h,v 1.2 2003/06/17 15:13:53 dan_karrels Exp $
+ * $Id: EConfig.h,v 1.3 2003/06/18 01:08:48 dan_karrels Exp $
  */
 
 #ifndef __ECONFIG_H
-#define __ECONFIG_H "$Id: EConfig.h,v 1.2 2003/06/17 15:13:53 dan_karrels Exp $"
+#define __ECONFIG_H "$Id: EConfig.h,v 1.3 2003/06/18 01:08:48 dan_karrels Exp $"
 
 #include	<iostream>
-#include	<string>
 #include	<fstream>
+#include	<string>
+#include	<list>
 #include	<map>
 
 #include	"ELog.h"
@@ -34,8 +35,8 @@
 namespace gnuworld 
 {
 
+using std::list ;
 using std::string ;
-using std::fstream ;
 using std::multimap ;
 
 /**
@@ -50,6 +51,7 @@ using std::multimap ;
  * - value may be any number of words, but may
  *   NOT continue onto the next line
  * - value fields may NOT have a '=' character in it
+ *
  */
 class EConfig
 {
@@ -58,6 +60,34 @@ class EConfig
 	 * The type of the map used to store the key/value pairs.
 	 */
 	typedef multimap< string, string, noCaseCompare > mapType ;
+
+	/**
+	 * This struct is used to store information about an entry
+	 * into the physical configuration file.
+	 */
+	struct lineInfo
+	{
+		string			key ;
+		string			value ;
+		mapType::iterator	mapItr ;
+
+	lineInfo() {}
+
+	// This constructor is called when there is a comment
+	// line.  Even though there are no value tokens, be sure
+	// to record whatever comment is present.
+	lineInfo( const string& key )
+	 : key( key ) {}
+	lineInfo( const string& key, const string& value,
+		const mapType::iterator& mapItr )
+	 : key( key ), value( value ), mapItr( mapItr )
+	{}
+	} ;
+
+	/**
+	 * Type used to store configuration file format.
+	 */
+	typedef list< lineInfo >	fileListType ;
 
 public:
 
@@ -119,6 +149,14 @@ public:
 	virtual const_iterator Require( const string& findMe ) const ;
 
 	/**
+	 * Add a key/value pair to the config file.
+	 * Note that this will not delete any existing entry, but
+	 * will add a duplicate, which is supported by the EConfig
+	 * class.
+	 */
+	virtual bool	Add( const string& key, const string& value ) ;
+
+	/**
 	 * Debugging function for outputting the entire map to
 	 * an output stream.
 	 */
@@ -150,11 +188,6 @@ protected:
 	EConfig operator=( const EConfig& ) ;
 
 	/**
-	 * Close the input file.
-	 */
-	virtual void	CloseFile() ;
-
-	/**
 	 * Remove blank spaces from the line of text.
 	 */
 	virtual bool	removeSpaces( string& ) ;
@@ -162,7 +195,12 @@ protected:
 	/**
 	 * Parse the input file.
 	 */
-	virtual bool	ReadFile() ;
+	virtual bool	readFile( std::ifstream& ) ;
+
+	/**
+	 * Write the current memory configuration to disk.
+	 */
+	virtual bool	writeFile() ;
 
 	/**
 	 * The name of the configuration file.
@@ -170,14 +208,15 @@ protected:
 	string		configFileName ;
 
 	/**
-	 * A handle to the input file.
-	 */
-	fstream		configFile ;
-
-	/**
 	 * The map used to store the file's key/value pairs.
 	 */
 	mapType		valueMap ;
+
+	/**
+	 * The DS used to store the actual format of the config
+	 * file.
+	 */
+	fileListType	fileList ;
 
 } ;
 

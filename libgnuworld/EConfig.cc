@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: EConfig.cc,v 1.3 2003/06/17 15:13:53 dan_karrels Exp $
+ * $Id: EConfig.cc,v 1.4 2003/06/18 01:08:48 dan_karrels Exp $
  */
 
 #include	<string>
@@ -27,26 +27,30 @@
 #include	<map>
 
 #include	<cstdlib>
+#include	<cstdio> // rename()
+#include	<cstring> // strerror()
+#include	<cerrno>
 
 #include	"EConfig.h"
 #include	"StringTokenizer.h"
 #include	"ELog.h"
 #include	"misc.h"
 
-const char rcsId[] = "$Id: EConfig.cc,v 1.3 2003/06/17 15:13:53 dan_karrels Exp $" ;
+const char rcsId[] = "$Id: EConfig.cc,v 1.4 2003/06/18 01:08:48 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
 
 using std::ifstream ;
+using std::ofstream ;
 using std::string ;
 using std::endl ;
 using std::map ;
 
 EConfig::EConfig( const string& _configFileName )
- : configFileName( _configFileName ),
-   configFile( configFileName.c_str(), ios::in | ios::out )
+ : configFileName( _configFileName )
 {
+ifstream configFile( configFileName.c_str() ) ;
 if( !configFile.is_open() )
 	{
 	elog	<< "EConfig: Unable to open file: "
@@ -54,23 +58,18 @@ if( !configFile.is_open() )
 		<< endl ;
 	::exit( 0 ) ;
 	}
-if( !ReadFile() )
+if( !readFile( configFile ) )
 	{
 	::exit( 0 ) ;
 	}
+configFile.close() ;
 }
 
 EConfig::~EConfig()
 {
 // No heap space allocated
-CloseFile() ;
-}
-
-void EConfig::CloseFile()
-{
-// configFile is known to be open
-configFile.close() ;
 valueMap.clear() ;
+fileList.clear() ;
 }
 
 EConfig::const_iterator EConfig::Find( const string& findMe ) const
@@ -100,7 +99,7 @@ if( ptr == valueMap.end() )
 return ptr ;
 }
 
-bool EConfig::ReadFile()
+bool EConfig::readFile( ifstream& configFile )
 {
 size_t lineNumber = 0 ;
 string tmp ;
@@ -122,6 +121,8 @@ while( getline( configFile, tmp ) )
 
 	if( tmp.empty() || '#' == tmp[ 0 ] )
 		{
+		fileList.push_back( lineInfo( tmp ) ) ;
+
 		// Ignore this line
 		continue ;
 		}
@@ -140,9 +141,12 @@ while( getline( configFile, tmp ) )
 		}
 
 	// Looks ok
-	valueMap.insert( mapPairType( st[ 0 ],
-		st.assemble( 1 ) ) ) ;
+	mapType::iterator mapItr =
+		valueMap.insert( mapPairType( st[ 0 ],
+			st.assemble( 1 ) ) ) ;
 
+	fileList.push_back( lineInfo( st[ 0 ], st.assemble( 1 ),
+		mapItr ) ) ;
 	}
 
 return true ;
@@ -204,5 +208,111 @@ while( !line.empty()
 
 return true ;
 }
+
+bool EConfig::Add( const string& key, const string& value )
+{
+// TODO: Add timestamp info?
+// Update the valueMap, which is used by clients of this class
+iterator mapItr =
+	valueMap.insert( mapType::value_type( key, value ) ) ;
+
+// Update the fileMap, which is used to keep track of the
+// format of the config file
+lineInfo addMe( key, value, mapItr ) ;
+fileList.push_back( addMe ) ;
+
+return writeFile() ;
+}
+
+bool EConfig::writeFile()
+{
+// Move the old file to the /tmp directory to ensure we have
+// a backup.
+string shortName( configFileName ) ;
+
+// Remove any leading directory path information
+string::size_type slashPos = shortName.find_last_of( '/' ) ;
+if( string::npos != slashPos )
+	{
+	// There is leading path information
+	shortName = shortName.substr( slashPos, string::npos ) ;
+	}
+shortName = string( "/tmp/" ) + shortName ;
+
+//elog	<< "EConfig::writeFile> Renaming "
+//	<< configFileName
+//	<< " to "
+//	<< shortName
+//	<< endl ;
+
+if( ::rename( configFileName.c_str(), shortName.c_str() ) < 0 )
+	{
+	elog	<< "EConfig::writeFile> Unable to rename "
+		<< configFileName
+		<< " to "
+		<< shortName
+		<< " because: "
+		<< strerror( errno )
+		<< endl ;
+
+	// Ok to leave the file open per class conditions.
+	return false ;
+	}
+
+std::ofstream configFile( configFileName.c_str() ) ;
+if( !configFile.is_open() )
+	{
+	elog	<< "EConfig::writeFile> Unable to open file: "
+		<< configFileName
+		<< ", because: "
+		<< strerror( errno )
+		<< endl ;
+
+	if( ::rename( shortName.c_str(), configFileName.c_str() ) < 0 )
+		{
+		elog	<< "EConfig::writeFile> Unable to restore "
+			<< "original file \""
+			<< configFileName
+			<< "\" from backup \""
+			<< shortName
+			<< "\" because: "
+			<< strerror( errno )
+			<< endl ;
+		}
+	return false ;
+	}
+
+for( fileListType::const_iterator fileItr = fileList.begin() ;
+	fileItr != fileList.end() ; ++fileItr )
+	{
+	const lineInfo& theInfo = *fileItr ;
+	if( theInfo.value.empty() )
+		{
+//		elog	<< "EConfig::writeFile> Writing: "
+//			<< theInfo.key
+//			<< endl ;
+
+		// comment line
+		configFile	<< theInfo.key
+				<< endl ;
+
+		continue ;
+		}
+
+//	elog	<< "EConfig::writeFile> Writing: "
+//		<< theInfo.key
+//		<< " = "
+//		<< theInfo.value
+//		<< endl ;
+
+	configFile	<< theInfo.key
+			<< " = "
+			<< theInfo.value
+			<< endl ;
+	} // for()
+
+configFile.close() ;
+return true ;
+} // writeFile()
 
 } // namespace gnuworld
