@@ -73,7 +73,9 @@ const unsigned long int flg_LIST 	 = 0x100;
 const unsigned long int flg_COMMANDS  = 0x200;
 const unsigned long int flg_NOTES = 0x400;
 const unsigned long int flg_GCHAN = 0x800;
-const unsigned long int flg_USERINFO = 0x1000;
+const unsigned long int flg_RGCHAN = 0x1000;
+const unsigned long int flg_USERINFO = 0x2000;
+
 
 /*
  Default commands that are added upon adding a new oper
@@ -96,7 +98,7 @@ const unsigned long int SADMIN = SOPER | flg_LEARNNET| flg_REMSERVER
 const unsigned long int SMT = ADMIN;
 const unsigned long int SSMT = SADMIN;
 const unsigned long int CODER = SMT;
-const unsigned long int SCODER =  SSMT | flg_COMMANDS| flg_GCHAN;
+const unsigned long int SCODER =  SSMT | flg_COMMANDS| flg_GCHAN | flg_RGCHAN;
 
 }
 

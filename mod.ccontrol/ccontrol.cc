@@ -28,7 +28,7 @@
 #include	"commLevels.h"
 //#include	"CommandsDec.h"
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.67 2001/08/14 22:44:47 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.68 2001/08/16 09:01:55 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -241,7 +241,9 @@ RegisterCommand( new LISTCommand( this, "LIST", "(glines)"
 RegisterCommand( new COMMANDSCommand( this, "COMMANDS", "<command> <option> <new value>"
 	" Change commands options",commandLevel::flg_COMMANDS,false,false,false,operLevel::UHSLEVEL,true ) ) ;
 RegisterCommand( new GCHANCommand( this, "GCHAN", "#channel <length/-per> <reason>"
-	" Close down a channel",commandLevel::flg_GCHAN,false,false,false,operLevel::CODERLEVEL,true ) ) ;
+	" Set a BADCHAN gline",commandLevel::flg_GCHAN,false,false,false,operLevel::CODERLEVEL,true ) ) ;
+RegisterCommand( new REMGCHANCommand( this, "REMGCHAN", "#channel "
+	" Removes a BADCHAN gline",commandLevel::flg_GCHAN,false,false,false,operLevel::CODERLEVEL,true ) ) ;
 
 loadGlines();
 loadExceptions();
@@ -539,7 +541,6 @@ switch( theEvent )
 		inBurst = false;
 		refreshGlines();
 		burstGlines();
-		elog << "Bursting glinesssssssss" << endl;
 		break;
 		}	
 	case EVT_NICK:
@@ -1653,7 +1654,7 @@ bool ParseEnded = false;
 int retMe = 0;
 string::size_type pos = Host.find_first_of('@');
 string Hostname = Host.substr(pos+1);
-if(Len > gline::MFGLINE_TIME)  //Check for maximum time
+if(Len > gline::MFU_TIME)  //Check for maximum time
 	retMe |= gline::BAD_TIME;
 if((signed int) Len < 0)
 	retMe |= gline::NEG_TIME;
@@ -1697,8 +1698,10 @@ if((GlineType & isIP) && (Mask < 24))
 	retMe |= gline::HUH_NO_HOST;  //Its too wide
 if(!(GlineType & isIP) && (Dots < 2) && (GlineType & isWildCard))
 	retMe |= gline::HUH_NO_HOST; //Wildcard gline must have atleast 2 dots
-if((Affected > gline::MFGLINE_USERS) && (GlineType & isWildCard))
-	retMe |= gline::FORCE_NEEDED_USERS; //This gline must be set with -fu flag
+if(Affected > gline::MFGLINE_USERS) 
+	retMe |= gline::FU_NEEDED_USERS; //This gline must be set with -fu flag
+if(Len > gline::MFGLINE_TIME)
+	retMe |= gline::FU_NEEDED_TIME;
 if(Len > gline::MGLINE_TIME)
 	retMe |= gline::FORCE_NEEDED_TIME;
 if(GlineType & (isWildCard & (Len > gline::MGLINE_WILD_TIME)))

@@ -21,7 +21,7 @@
 #include	"gline.h"
 #include 	"time.h"
 
-const char GLINECommand_cc_rcsId[] = "$Id: GLINECommand.cc,v 1.18 2001/08/14 22:44:47 mrbean_ Exp $";
+const char GLINECommand_cc_rcsId[] = "$Id: GLINECommand.cc,v 1.19 2001/08/16 09:01:55 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -100,21 +100,11 @@ if(gLength == 0)
 	}
 unsigned int Users;
 int gCheck = bot->checkGline(st[pos],gLength,Users);
-if(gCheck & gline::FORCE_NEEDED_HOST)
-	{	
-	bot->Notice(theClient,"Please use forcegline to gline that host");
-	Ok = false;
-	}
-if(gCheck & gline::FORCE_NEEDED_TIME)
+if(gCheck & gline::NEG_TIME)
 	{
-	bot->Notice(theClient,"Please use forcegline to gline for that amount of time");
+	bot->Notice(theClient,"Hmmz, dont you think that giving a negative time is kinda stupid?");
 	Ok = false;
-	}
-if(gCheck & gline::FORCE_NEEDED_USERS)
-	{
-	bot->Notice(theClient,"This host affects more than %d users, please use forcegline",gline::MFGLINE_USERS);
-	Ok = false;
-	}
+	}	
 if(gCheck & gline::HUH_NO_HOST)
 	{
 	bot->Notice(theClient,"I dont think glining that host is such a good idea, do you?");
@@ -130,16 +120,31 @@ if(gCheck & gline::BAD_TIME)
 	bot->Notice(theClient,"Glining for more than %d seconds is a NoNo",gline::MFGLINE_TIME);
 	Ok = false;
 	}
-if(gCheck & gline::FORCE_NEEDED_WILDTIME)
+if((gCheck & gline::FORCE_NEEDED_HOST) && (Ok))
+	{	
+	bot->Notice(theClient,"Please use forcegline to gline that host");
+	Ok = false;
+	}
+if((gCheck & gline::FORCE_NEEDED_TIME) && (Ok))
+	{
+	bot->Notice(theClient,"Please use forcegline to gline for that amount of time");
+	Ok = false;
+	}
+if((gCheck & gline::FU_NEEDED_USERS) && (Ok))
+	{
+	bot->Notice(theClient,"This host affects more than %d users, please use forcegline",gline::MFGLINE_USERS);
+	Ok = false;
+	}
+if((gCheck & gline::FU_NEEDED_TIME) && (Ok))
+	{
+	bot->Notice(theClient,"Please user forcegline to gline for more than %d second",gline::MFGLINE_TIME);
+	Ok = false;
+	}
+if((gCheck & gline::FORCE_NEEDED_WILDTIME) && (Ok))
 	{
 	bot->Notice(theClient,"Wildcard gline for more than %d seconds, must be set with forcegline",gline::MGLINE_WILD_TIME);
 	Ok = false;
 	}
-if(gCheck & gline::NEG_TIME)
-	{
-	bot->Notice(theClient,"Hmmz, dont you think that giving a negative time is kinda stupid?");
-	Ok = false;
-	}	
 if(!Ok)
 	{
 	bot->Notice(theClient,"Please fix all of the above, and try again");

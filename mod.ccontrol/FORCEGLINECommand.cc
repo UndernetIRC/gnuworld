@@ -19,7 +19,7 @@
 #include	"Gline.h"
 #include	"gline.h"
 
-const char FORCEGLINECommand_cc_rcsId[] = "$Id: FORCEGLINECommand.cc,v 1.9 2001/08/14 22:44:47 mrbean_ Exp $";
+const char FORCEGLINECommand_cc_rcsId[] = "$Id: FORCEGLINECommand.cc,v 1.10 2001/08/16 09:01:55 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -115,6 +115,7 @@ if(!tmpAuth)
 if((Forced) && (tmpAuth->getFlags() < operLevel::SMTLEVEL))
 	{
 	bot->Notice(theClient,"Only smt+ can use the -fu option");
+	return false;
 	}
 	
 unsigned int Users;
@@ -141,11 +142,11 @@ if(gCheck & gline::BAD_TIME)
 	bot->Notice(theClient,"Glining for more than %d seconds is a NoNo",gline::MFGLINE_TIME);
 	Ok = false;
 	}
-if((gCheck & gline::FORCE_NEEDED_USERS) && (Ok))
+if((gCheck & gline::FU_NEEDED_USERS) && (Ok))
 	{
 	if(Forced)
 		{
-		bot->MsgChanLog("%s is using the force flag to gline %d users under the host of (%s@%s)"
+		bot->MsgChanLog("%s is using the force flag to gline %d users under the host of (%s@%s)\n"
 		,theClient->getNickName().c_str()
 		,Users,userName.c_str(),hostName.c_str());
 		}
@@ -165,17 +166,44 @@ if((gCheck & gline::FORCE_NEEDED_USERS) && (Ok))
 		
 		}
 	}
+if((gCheck & gline::FU_NEEDED_TIME) && (Ok))
+	{
+	if(Forced)
+		{
+		bot->MsgChanLog("%s is using the force flag to gline for %d seconds\n"
+		,theClient->getNickName().c_str(),
+		gLength);
+		}
+	else
+		{
+		Ok = false;
+		if(tmpAuth->getFlags() < operLevel::SMTLEVEL)
+			{
+			bot->Notice(theClient,"Sorry but you cant set a gline for more than %d seconds"
+			,gline::MFGLINE_TIME);
+			}
+		else
+			{
+			bot->Notice(theClient,"This gline is for more than %d seconds, please use the -fu flag"
+			,gline::MFGLINE_TIME);
+			}
+		}
+	}
+
 if((gCheck & gline::FORCE_NEEDED_HOST) && (Ok))
 	{	
-	bot->MsgChanLog("%s is using forcegline to gline a forbidden host (%s@%s)"
+	bot->MsgChanLog("%s is using forcegline to gline a wildcard host (%s@%s)"
 	,theClient->getNickName().c_str()
 	,userName.c_str(),hostName.c_str());
 	}
+
+
 if((gCheck & gline::FORCE_NEEDED_TIME) && (Ok))
 	{
-	bot->MsgChanLog("%s is using forcegline to gline for %s seconds"
-	,gLength);
+	bot->MsgChanLog("%s is using forcegline to gline for %d seconds"
+	,theClient->getNickName().c_str(),gLength);
 	}
+
 if(gCheck & gline::FORCE_NEEDED_WILDTIME)
 	{
 	bot->MsgChanLog("%s is using forcegline to gline a wildcard host for more than %d seconds"
@@ -187,8 +215,6 @@ if(!Ok)
 	bot->Notice(theClient,"Please fix all of the above, and try again");
 	return false;
 	}
-
-
 // Avoid passing a reference to a temporary variable.
 string nickUserHost = theClient->getNickUserHost() ;
 string Reason = st.assemble( pos + ResStart );
