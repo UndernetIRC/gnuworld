@@ -12,7 +12,7 @@
  * Displays all "Level" records for a specified channel.
  * Can optionally narrow down selection using a number of switches. 
  *
- * $Id: ACCESSCommand.cc,v 1.39 2001/03/18 01:39:33 gte Exp $
+ * $Id: ACCESSCommand.cc,v 1.40 2001/03/18 01:43:11 gte Exp $
  */
 
 #include	<string>
@@ -26,7 +26,7 @@
 #include	"cservice_config.h"
 #include	"Network.h"
  
-const char ACCESSCommand_cc_rcsId[] = "$Id: ACCESSCommand.cc,v 1.39 2001/03/18 01:39:33 gte Exp $" ;
+const char ACCESSCommand_cc_rcsId[] = "$Id: ACCESSCommand.cc,v 1.40 2001/03/18 01:43:11 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -285,9 +285,7 @@ if (matchString[0] == '=')
 			{ 
 			matchString = tmpUser->getUserName();
 			}
-		}
-
-	return 0;
+		} 
 	}
 
 
