@@ -77,7 +77,7 @@ int cservice::BurstChannels()
 	//   manager.  Various other things must be done, such as setting the topic if AutoTopic
 	//   is on, gaining ops if AlwaysOp is on, and so forth.
 
-	if ((status = SQLDb->Exec( "select channel from channels" )) == PGRES_TUPLES_OK)
+	if ((status = SQLDb->Exec( "select name,flags,channel_ts,channel_mode,channel_key,channel_limit,description from channel" )) == PGRES_TUPLES_OK)
 	{
 		for (int i = 0 ; i < SQLDb->Tuples (); i++)
 		{
