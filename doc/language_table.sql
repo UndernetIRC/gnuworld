@@ -307,7 +307,7 @@ COPY "translations" FROM stdin;
 2	120	-- Fin de la liste de silence/ignore 	31337
 2	121	Statut interne du Service de Canaux CMaster:	31337
 2	122	[          Statistiques du Canal] \002Entrées en cache:\002 %i    \002Requêtes Base:\002 %i    \002# de fois Cache touché:\002 %i    \002Efficacité:\002 %.2f%%	31337
-2	123	[     Statistiques Uutilisateurs] \002Entrées en cache:\002 %i    \002Requêtes Base:\002 %i    \002# de fois Cache touché:\002 %i    \002Efficacité:\002 %.2f%%	31337
+2	123	[     Statistiques Utilisateurs] \002Entrées en cache:\002 %i    \002Requêtes Base:\002 %i    \002# de fois Cache touché:\002 %i    \002Efficacité:\002 %.2f%%	31337
 2	124	[   Statistiques Niveaux d'accès] \002Entrées en cache:\002 %i    \002Requêtes Base:\002 %i    \002# de fois Cache touché:\002 %i    \002Efficacité:\002 %.2f%%	31337
 2	125	[          Statistiques des bans] \002Entrées en cache:\002 %i    \002Requêtes Base:\002 %i    \002# de fois Cache touché:\002 %i    \002Efficacité:\002 %.2f%%	31337
 2	126	Dernier évènement NOTIFY d'utilisateur: %i	31337
