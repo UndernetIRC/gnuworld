@@ -1,5 +1,5 @@
 #ifndef __CSERVICE_H
-#define __CSERVICE_H "$Id: cservice.h,v 1.75 2001/12/27 02:48:08 gte Exp $"
+#define __CSERVICE_H "$Id: cservice.h,v 1.76 2001/12/27 04:40:57 gte Exp $"
 
 #include	<string>
 #include	<vector>
@@ -423,6 +423,7 @@ public:
 	statsMapType statsMap;
 
 	void incStat(const string& name);
+	void incStat(const string& name, unsigned int amount);
 } ;
 
 const string escapeSQLChars(const string& theString);

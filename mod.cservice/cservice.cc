@@ -3063,7 +3063,6 @@ void cservice::updateLimits()
 	 * Forall cached channel records, perform an update of the
 	 * channel limit.
 	 */
-
 	 sqlChannelHashType::iterator ptr = sqlChannelCache.begin();
 	 	while (ptr != sqlChannelCache.end())
 	 	{
@@ -3093,7 +3092,6 @@ void cservice::updateLimits()
 
 		++ptr;
 		}
-
 }
 
 void cservice::doFloatingLimit(sqlChannel* reggedChan, Channel* theChan)
@@ -3130,6 +3128,9 @@ void cservice::doFloatingLimit(sqlChannel* reggedChan, Channel* theChan)
 		<< ends;
 
 	Write( s );
+
+	incStat("CORE.FLOATLIM.ALTER.BYTES", strlen(s.str()));
+
 	delete[] s.str();
 }
 
@@ -3728,6 +3729,21 @@ void cservice::incStat(const string& name)
 			ptr->second++;
 		}
 }
+
+void cservice::incStat(const string& name, unsigned int amount)
+{
+	statsMapType::iterator ptr = statsMap.find( name );
+
+	if( ptr == statsMap.end() )
+        {
+        statsMap.insert(statsMapType::value_type(name, 1));
+        }
+        else
+        {
+			ptr->second += amount;
+		}
+}
+
 
 void Command::Usage( iClient* theClient )
 {
