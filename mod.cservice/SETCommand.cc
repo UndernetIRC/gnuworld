@@ -14,7 +14,7 @@
  *
  * Caveats: None.
  *
- * $Id: SETCommand.cc,v 1.27 2001/02/21 19:05:55 gte Exp $
+ * $Id: SETCommand.cc,v 1.28 2001/02/27 23:10:05 gte Exp $
  */
 
 #include	<string>
@@ -26,7 +26,7 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char SETCommand_cc_rcsId[] = "$Id: SETCommand.cc,v 1.27 2001/02/21 19:05:55 gte Exp $" ;
+const char SETCommand_cc_rcsId[] = "$Id: SETCommand.cc,v 1.28 2001/02/27 23:10:05 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -851,7 +851,7 @@ if(option == "NOREG")
                                         string("You do not have enough access!")));
 			return true;
 	    }
-	    if(strlen(value.c_str()) > 75) // Gator - changed to 75
+	    if(strlen(url.c_str()) > 75) // Gator - changed to 75
 	    {
 			bot->Notice(theClient, 
 				bot->getResponse(theUser,
