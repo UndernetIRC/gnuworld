@@ -1,4 +1,4 @@
-# $Id: dronescan.example.conf.in,v 1.13 2003/10/12 17:21:35 jeekay Exp $
+# $Id: dronescan.example.conf.in,v 1.14 2003/10/12 22:48:54 jeekay Exp $
 # What nickname should the bot use?
 nickname = E
 
@@ -19,7 +19,7 @@ consoleChannel = #ds.console
 consoleChannelModes = +ntsim
 
 # SQL Setup
-sqlHost = 10.1.1.2
+sqlHost = 127.0.0.1
 sqlPort = 5432
 sqlDB   = dronescan
 sqlUser = dronescan
@@ -56,7 +56,7 @@ voteCutoff = 30
 
 # The interval (in seconds) during which a channel won't be reported again
 # This is to stop repeated spamming of the same channel
-dcInterval = 10
+dcInterval = 600
 
 # The interval in seconds for how often we should attempt to refresh any
 # caches from the database. The refreshes typically only trigger if any
