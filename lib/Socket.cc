@@ -35,7 +35,7 @@
 #endif
 
 const char Socket_h_rcsId[] = __SOCKET_H ;
-const char Socket_cc_rcsId[] = "$Id: Socket.cc,v 1.13 2001/01/13 21:06:29 dan_karrels Exp $" ;
+const char Socket_cc_rcsId[] = "$Id: Socket.cc,v 1.14 2001/01/31 21:10:37 dan_karrels Exp $" ;
 
 using gnuworld::elog ;
 using std::endl ;
@@ -484,7 +484,14 @@ do
 	errno = 0 ;
 	nbresult = ::recv( fd, reinterpret_cast< char* >( buf ),
 		nb, 0 ) ;
- 	} while( (--cnt > 0) && (EINTR == errno) ) ;
+ 	} while( (nbresult < 0)
+		&& (--cnt > 0)
+		&& (EINTR == errno) ) ;
+
+if( nbresult > 0 )
+	{
+	buf[ nbresult ] = 0 ;
+	}
 
 return nbresult ;
 }

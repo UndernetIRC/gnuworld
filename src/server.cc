@@ -44,7 +44,7 @@
 #include	"ServerTimerHandlers.h"
 
 const char xServer_h_rcsId[] = __XSERVER_H ;
-const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.59 2001/01/28 19:27:35 dan_karrels Exp $" ;
+const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.60 2001/01/31 21:10:37 dan_karrels Exp $" ;
 
 using std::string ;
 using std::vector ;
@@ -3735,12 +3735,13 @@ if( !strcmp( params[ 0 ], Uplink->getCharYY() ) )
 	// It's my uplink
 	burstEnd = ::time( 0 ) ;
 
+	// Burst our clients
 	BurstClients() ;
 
 	// Burst our channels
 	BurstChannels() ;
 
-	// We are no longer burst
+	// We are no longer bursting
 	bursting = false ;
 
 	// For some silly reason, EB must come before EA
@@ -3752,7 +3753,7 @@ if( !strcmp( params[ 0 ], Uplink->getCharYY() ) )
 	// Acknowledge their end of burst
 	Write( "%s EA\n", charYY ) ;
 
-	clog	<< "*** Completed net burst\n" ;
+	elog	<< "*** Completed net burst\n" ;
 	}
 
 if( !bursting )

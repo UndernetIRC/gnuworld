@@ -1,5 +1,5 @@
 /* main.cc
- * $Id: main.cc,v 1.24 2001/01/12 23:42:06 dan_karrels Exp $
+ * $Id: main.cc,v 1.25 2001/01/31 21:10:37 dan_karrels Exp $
  */
 
 #include	<fstream>
@@ -24,7 +24,7 @@
 using namespace gnuworld ;
 
 const char config_h_rcsId[] = __CONFIG_H ;
-const char main_cc_rcsId[] = "$Id: main.cc,v 1.24 2001/01/12 23:42:06 dan_karrels Exp $" ;
+const char main_cc_rcsId[] = "$Id: main.cc,v 1.25 2001/01/31 21:10:37 dan_karrels Exp $" ;
 
 using std::cerr ;
 using std::clog ;
@@ -55,7 +55,9 @@ clog << endl ;
 
 int main( int argc, char** argv )
 {
-gnuworld::xServer* theServer = new gnuworld::xServer( argc, argv ) ;
+gnuworld::xServer* theServer =
+	new (nothrow) gnuworld::xServer( argc, argv ) ;
+assert( theServer != 0 ) ;
 
 // Connect to the server
 clog << "*** Connecting...\n" ;
@@ -225,6 +227,9 @@ while( keepRunning && _connected )
                 // Yes, set select() timeout to time at which
                 // the nearest timer will expire
                 setTimer = true ;
+
+		// Set tv.tv_sec to the duration (in seconds) until
+		// the first timer will expire.
                 tv.tv_sec = timerQueue.top().second->absTime - now ;
                 }
         else
@@ -326,25 +331,36 @@ bool xServer::setupSignals()
 if( SIG_ERR == ::signal( SIGINT,
 	static_cast< void (*)( int ) >( sigHandler ) ) )
 	{
-	clog	<< "*** Unable to establish signal hander for SIGINT\n" ;
+	clog	<< "*** Unable to establish signal hander for SIGINT"
+		<< endl ;
+	return false ;
+	}
+if( SIG_ERR == ::signal( SIGPIPE,
+	static_cast< void (*)( int ) >( sigHandler ) ) )
+	{
+	clog	<< "*** Unable to establish signal hander for SIGPIPE"
+		<< endl ;
 	return false ;
 	}
 if( SIG_ERR == ::signal( SIGUSR1,
 	static_cast< void (*)( int ) >( sigHandler ) ) )
 	{
-	clog	<< "*** Unable to establish signal hander for SIGUSR1\n" ;
+	clog	<< "*** Unable to establish signal hander for SIGUSR1"
+		<< endl ;
 	return false ;
 	}
 if( SIG_ERR == ::signal( SIGTERM,
 	static_cast< void (*)( int ) >( sigHandler ) ) )
 	{
-	clog	<< "*** Unable to establish signal hander for SIGTERM\n" ;
+	clog	<< "*** Unable to establish signal hander for SIGTERM"
+		<< endl ;
 	return false ;
 	}
 if( SIG_ERR == ::signal( SIGHUP,
 	static_cast< void (*)( int ) >( sigHandler ) ) )
 	{
-	clog	<< "*** Unable to establish signal hander for SIGHUP\n" ;
+	clog	<< "*** Unable to establish signal hander for SIGHUP"
+		<< endl ;
 	return false ;
 	}
 return true ;

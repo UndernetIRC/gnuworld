@@ -1,7 +1,7 @@
 /* networkData.h */
 
 #ifndef __NETWORKDATA_H
-#define __NETWORKDATA_H "$Id: networkData.h,v 1.3 2001/01/30 21:34:16 gte Exp $"
+#define __NETWORKDATA_H "$Id: networkData.h,v 1.4 2001/01/31 21:10:37 dan_karrels Exp $"
 
 #include	<string>
 #include	<ctime>
@@ -11,7 +11,7 @@ class sqlUser;
 using std::string ;
 
 namespace gnuworld
-{ 
+{
  
 class networkData
 {
@@ -33,6 +33,9 @@ public:
 	// Pointer to the sqlUser record of this user (if it exists).
 	// Ie: If they're authed.
 	sqlUser* currentUser; 
+
+	bool ignored ;
+
 } ;
 
 #endif // __NETWORKDATA_H

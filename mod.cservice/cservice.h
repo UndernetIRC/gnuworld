@@ -1,5 +1,5 @@
 #ifndef __CSERVICE_H
-#define __CSERVICE_H "$Id: cservice.h,v 1.35 2001/01/31 00:27:39 gte Exp $"
+#define __CSERVICE_H "$Id: cservice.h,v 1.36 2001/01/31 21:10:37 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
@@ -48,24 +48,24 @@ protected:
  
 	EConfig* cserviceConfig; /* Configfile */
 	typedef map< string, Command*, noCaseCompare > commandMapType ;
-    typedef commandMapType::value_type pairType ;
-    commandMapType          commandMap;
+	typedef commandMapType::value_type pairType ;
+	commandMapType          commandMap;
 
 public:
 
-    cmDatabase* SQLDb; /* PostgreSQL Database */
+	cmDatabase* SQLDb; /* PostgreSQL Database */
 
 	cservice(const string& args);
 	virtual ~cservice();
 
 	virtual int OnConnect();
-    virtual int BurstChannels();
-    virtual int OnPrivateMessage( iClient*, const string&,
+	virtual int BurstChannels();
+	virtual int OnPrivateMessage( iClient*, const string&,
 		bool = false  );
-    virtual void ImplementServer( xServer* ) ;
-    virtual bool isOnChannel( const string& ) const;
-    virtual bool RegisterCommand( Command* ) ;
-    virtual bool UnRegisterCommand( const string& ) ; 
+	virtual void ImplementServer( xServer* ) ;
+	virtual bool isOnChannel( const string& ) const;
+	virtual bool RegisterCommand( Command* ) ;
+	virtual bool UnRegisterCommand( const string& ) ; 
 	virtual void OnChannelModeO( Channel*, ChannelUser*,
 		const xServer::opVectorType& ) ; 
 	virtual int OnChannelEvent( const channelEventType& whichEvent,
@@ -73,7 +73,7 @@ public:
 		void* data1, void* data2, void* data3, void* data4 ); 
 	virtual int OnEvent( const eventType&,
 		void*, void*, void*, void*);
-    virtual int OnCTCP( iClient* Sender,
+	virtual int OnCTCP( iClient* Sender,
                 const string& CTCP,
                 const string& Message,
                 bool Secure = false ) ;
@@ -89,14 +89,14 @@ public:
 	// Log an administrative alert to the relay channel & log.
 	bool logAdminMessage(const char*, ... );
 
-    typedef commandMapType::const_iterator constCommandIterator ; 
-    constCommandIterator command_begin() const
+	typedef commandMapType::const_iterator constCommandIterator ; 
+	constCommandIterator command_begin() const
                 { return commandMap.begin() ; } 
 
-    constCommandIterator command_end() const
+	constCommandIterator command_end() const
                 { return commandMap.end() ; } 
 
-    constCommandIterator findCommand( const string& theComm ) const
+	constCommandIterator findCommand( const string& theComm ) const
                 { return commandMap.find( theComm ) ; } 
  
 	/* Returns the access sqlUser has in channel sqlChan. */
@@ -124,8 +124,12 @@ public:
 	/* Fetch a access level record for a user/channel combo. */
 	sqlLevel* getLevelRecord(sqlUser*, sqlChannel*);
 
+	virtual void setIgnored(iClient* theClient, bool polarity) ;
+
+	virtual bool isIgnored( iClient* ) ;
+
 	/* Formats a timestamp into a "X Days, XX:XX:XX" from 'Now'. */
-	const string& prettyDuration( int );
+	const string prettyDuration( int ) const ;
 
 	/* Returns the current "Flood Points" this iClient has. */ 
  	unsigned short getFloodPoints(iClient*);
@@ -220,11 +224,12 @@ public:
 	translationTableType translationTable;
 
 	void loadTranslationTable();
-	// Function to retrieve a translation string.
-	const string& getResponse( sqlUser*, int );
+
+	// Method to retrieve a translation string.
+	const string getResponse( sqlUser*, int );
 
 	// Check for valid hostmask.
-	virtual bool validUserMask(const string& userMask); 
+	virtual bool validUserMask(const string& userMask) const ;
 
 	// Deop everyone on this channel.
 	void deopAllOnChan(Channel*); 
@@ -235,7 +240,7 @@ public:
 	/* Bans & kicks a specified user with a specific reason */
 	bool doInternalBanAndKick(sqlChannel*, iClient*, const string& theReason);
 
-	time_t currentTime();
+	time_t currentTime() const ;
 
 } ;
 
@@ -244,4 +249,3 @@ const string escapeSQLChars(const string& theString);
 } // namespace gnuworld
 
 #endif // __CSERVICE_H
-
