@@ -1,8 +1,10 @@
 ------------------------------------------------------------------------------------
--- "$Id: cservice.sql,v 1.56 2001/12/02 13:20:42 nighty Exp $"
+-- "$Id: cservice.sql,v 1.57 2001/12/05 23:42:52 nighty Exp $"
 -- Channel service DB SQL file for PostgreSQL.
 
 -- ChangeLog:
+-- 2001-12-06: nighty
+--             Added two fields to 'users' table to take care of an abuse hunting module.
 -- 2001-10-14: nighty
 --             Corrected bogus table entries and added missing fields / tables.
 -- 2001-04-30: Gte
@@ -177,12 +179,16 @@ CREATE TABLE users (
 	last_updated INT4 NOT NULL, 
 	deleted INT2 DEFAULT '0',
 	signup_cookie VARCHAR(255) DEFAULT '',
+	signup_ts INT4,
+	signup_ip VARCHAR(15),
 
 	PRIMARY KEY ( id )
 ) ;
 
 CREATE INDEX users_username_idx ON users( lower(user_name) );
 CREATE INDEX users_email_idx ON users( lower(email) );
+CREATE INDEX users_signup_ts_idx ON users( signup_ts );
+CREATE INDEX users_signup_ip_idx ON users( signup_ip );
  
 -- This table used to store the "Last Seen" informatation previously
 -- routinely updated in the users table.
