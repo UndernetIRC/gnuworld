@@ -13,7 +13,7 @@
 #include	"md5hash.h" 
 #include        "ccUser.h"
 
-const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.7 2001/02/26 16:58:05 mrbean_ Exp $";
+const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.8 2001/05/29 22:25:47 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -55,6 +55,7 @@ else
 		{
 		bot->Notice(theClient,"Sorry but your mask doesnt appear in my access list!");
 		delete theUser;
+		bot->addLogin(theClient->getCharYYXXX());
 		return false;
 		}
 
@@ -88,6 +89,7 @@ else
 		{
 		bot->Notice(theClient, "AUTHENTICATION FAILED as %s (Invalid Password).", theUser->getUserName().c_str());
 		delete theUser;
+		bot->addLogin(theClient->getCharYYXXX());
 		return false;
 		}
 	//Ok the password match , prepare the ccUser data

@@ -3,7 +3,7 @@
  */
 
 #ifndef __CCONTROL_H
-#define __CCONTROL_H "$Id: ccontrol.h,v 1.29 2001/05/22 20:20:16 mrbean_ Exp $"
+#define __CCONTROL_H "$Id: ccontrol.h,v 1.30 2001/05/29 22:25:47 mrbean_ Exp $"
 
 //Define gline response
 #define GLINE_OK 1;
@@ -33,7 +33,9 @@
 #include	"AuthInfo.h"
 #include        "ccGline.h"
 #include        "ccServer.h"
+#include 	"ccLogin.h"
 #include        "server.h"
+
 namespace gnuworld
 {
  
@@ -99,6 +101,13 @@ protected:
 
 	glineListType			glineList ;
 
+	typedef list< ccLogin* >	loginListType;
+	
+	
+	loginListType			loginList ;
+	
+	loginListType			ignoreList;
+	
 public:
 
 	/**
@@ -473,6 +482,14 @@ public:
 
 	bool delException( iClient * , const string & );
 	
+	ccLogin *findLogin( const string & );
+	
+	void addLogin( const string & );
+	
+	void removeIgnore( const string & );
+	
+	void ignoreUser( ccLogin * );
+	
 	/**
 	 * This is a constant iterator type used to perform a read-only
 	 * iteration of the operchan structure.
@@ -569,6 +586,14 @@ public:
 	
 	glineIterator gline_end()
 		{ return glineList.end() ; }
+		
+	typedef loginListType::iterator loginIterator;
+	
+	loginIterator login_begin()
+		{ return loginList.begin() ; }
+
+	loginIterator login_end()
+		{ return loginList.end() ; }
 		
 	/**
 	 * Retrieve the default length of time for glines.

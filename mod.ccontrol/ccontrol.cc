@@ -23,7 +23,7 @@
 #include	"AuthInfo.h"
 #include        "server.h"
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.46 2001/05/29 20:42:09 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.47 2001/05/29 22:25:47 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -1862,5 +1862,56 @@ if( PGRES_COMMAND_OK != status )
 	return false;		    
 	}
 return true;
+}
+ccLogin *ccontrol::findLogin( const string & Numeric )
+{
+for(loginIterator ptr = login_begin();ptr != login_end();ptr++)
+	{
+	if((*ptr)->get_Numeric() == Numeric)
+	    return *ptr;
+	ptr++;
+	}
+return NULL;
+}
+	
+void ccontrol::addLogin( const string & Numeric)
+{
+ccLogin *LogInfo = findLogin(Numeric);
+if(LogInfo == NULL)
+	{
+	LogInfo = new ccLogin(Numeric);
+	Assert(LogInfo != NULL);
+	loginList.push_back(LogInfo);
+	}
+LogInfo->add_Login();
+if(LogInfo->get_Logins() > 5)
+    ignoreUser(LogInfo);
+}	
+void ccontrol::removeIgnore( const string &Numeric )
+{
+}	
+void ccontrol::ignoreUser( ccLogin *User )
+{
+iClient *theClient = Network->findClient(User->get_Numeric());
+assert(theClient != NULL);
+Notice(theClient,"Hmmmz i dont think i like you anymore , consider yourself ignored");
+MsgChanLog("Added %s to my ignore list\n",theClient->getNickUserHost().c_str());
+string silenceMask = string( "*!*" )
+	+ theClient->getUserName()
+	+ "@"
+	+ theClient->getInsecureHost();
+	strstream s;
+s	<< getCharYYXXX() 
+	<< " SILENCE " 
+	<< theClient->getCharYYXXX() 
+	<< " " 
+	<< silenceMask
+	<< ends; 
+Write( s );
+delete[] s.str();
+User->set_IgnoreExpires(::time(0)+3600);
+User->set_IgnoredHost(silenceMask);
+ignoreList.push_back(User);
+
 }
 } // namespace gnuworld
