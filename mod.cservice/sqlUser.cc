@@ -4,7 +4,7 @@
  * Storage class for accessing user information either from the backend
  * or internal storage.
  * 
- * $Id: sqlUser.cc,v 1.19 2001/07/07 22:51:25 gte Exp $
+ * $Id: sqlUser.cc,v 1.20 2001/07/08 19:15:08 gte Exp $
  */
  
 #include	<strstream.h>
@@ -320,6 +320,8 @@ strstream queryString;
 queryString	<< "SELECT message,ts" 
 			<< " FROM userlog WHERE user_id = "
 			<< id 
+			<< " AND event = "
+			<< eventType
 			<< " ORDER BY ts DESC LIMIT 1"
 			<< ends;
 

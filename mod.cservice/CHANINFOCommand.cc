@@ -13,7 +13,7 @@
  *
  * Command is aliased "INFO".
  *
- * $Id: CHANINFOCommand.cc,v 1.26 2001/07/08 02:41:17 gte Exp $
+ * $Id: CHANINFOCommand.cc,v 1.27 2001/07/08 19:15:08 gte Exp $
  */
 
 #include	<string>
@@ -26,7 +26,7 @@
 #include	"libpq++.h"
 #include	"cservice_config.h"
  
-const char CHANINFOCommand_cc_rcsId[] = "$Id: CHANINFOCommand.cc,v 1.26 2001/07/08 02:41:17 gte Exp $" ;
+const char CHANINFOCommand_cc_rcsId[] = "$Id: CHANINFOCommand.cc,v 1.27 2001/07/08 19:15:08 gte Exp $" ;
  
 namespace gnuworld
 {
@@ -112,6 +112,14 @@ if( string::npos == st[ 1 ].find_first_of( '#' ) )
 			language::lang,
 			string("Language: %i")).c_str(),
 		theUser->getLanguageId()); 
+
+	if (theUser->getFlag(sqlUser::F_INVIS))
+		{ 
+		bot->Notice(theClient, "INVISIBLE is On");
+		} else 
+		{
+		bot->Notice(theClient, "INVISIBLE is Off");
+		} 
 
 	bot->Notice(theClient, 
 		bot->getResponse(tmpUser,
