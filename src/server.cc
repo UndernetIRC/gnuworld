@@ -37,7 +37,7 @@
 //#include	"moduleLoader.h"
 
 const char xServer_h_rcsId[] = __XSERVER_H ;
-const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.15 2000/08/02 22:48:10 dan_karrels Exp $" ;
+const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.16 2000/08/02 23:35:11 dan_karrels Exp $" ;
 
 using std::string ;
 using std::vector ;
@@ -242,6 +242,7 @@ REGISTER_MSG( "V", NOOP ) ; // Version
 REGISTER_MSG( "I", NOOP ) ; // Invite
 REGISTER_MSG( "TR", NOOP ) ; // Trace
 REGISTER_MSG( "SETTIME", NOOP ) ;
+REGISTER_MSG( "368", NOOP ) ; // End of channel ban list
 
 // AWAY
 REGISTER_MSG( "A", NOOP ) ;

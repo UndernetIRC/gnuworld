@@ -27,7 +27,7 @@
 #include	"events.h"
 
 const char xClient_h_rcsId[] = __XCLIENT_H ;
-const char xClient_cc_rcsId[] = "$Id: client.cc,v 1.7 2000/08/02 23:15:43 dan_karrels Exp $" ;
+const char xClient_cc_rcsId[] = "$Id: client.cc,v 1.8 2000/08/02 23:35:11 dan_karrels Exp $" ;
 
 using std::string ;
 using std::strstream ;
@@ -567,7 +567,7 @@ if( !onChannel )
 
 string banMask = makeBan( theChan, theClient ) ;
 
-Write( "%s M %s :+b %s",
+Write( "%s M %s +b :%s",
 	getCharYYXXX().c_str(),
 	theChan->getName().c_str(),
 	banMask.c_str() ) ;
@@ -624,7 +624,7 @@ if( !onChannel )
 
 string banMask = makeBan( theChan, theClient ) ;
 
-Write( "%s M %s :+b %s",
+Write( "%s M %s +b :%s",
 	getCharYYXXX().c_str(),
 	theChan->getName().c_str(),
 	banMask.c_str() ) ;
@@ -662,7 +662,10 @@ string xClient::makeBan( Channel* theChan, iClient* theClient )
 string banMask = "*!*" ;
 
 // Add the username
-banMask += theClient->getUserName() ;
+if( !theClient->getUserName().empty() )
+	{
+	banMask += (theClient->getUserName().c_str() + 1) ;
+	}
 
 // Add the @ symbol between user@host
 banMask += "@" ;
