@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: Channel.h,v 1.29 2003/12/29 23:59:36 dan_karrels Exp $
+ * $Id: Channel.h,v 1.30 2003/12/31 23:50:50 dan_karrels Exp $
  */
 
 #ifndef __CHANNEL_H
-#define __CHANNEL_H "$Id: Channel.h,v 1.29 2003/12/29 23:59:36 dan_karrels Exp $"
+#define __CHANNEL_H "$Id: Channel.h,v 1.30 2003/12/31 23:50:50 dan_karrels Exp $"
 
 #include	<string>
 #include	<map>
@@ -207,6 +207,12 @@ public:
 	 */
 	inline void removeAllBans()
 		{ banList.clear(); }
+
+	/**
+	 * Remove all channel modes on users and the channel itself.
+	 * Use with caution.
+	 */
+	void removeAllModes() ;
 
 	/**
 	 * Find a ban in the channel's ban list which lexically matches

@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: Channel.cc,v 1.44 2003/12/29 23:59:38 dan_karrels Exp $
+ * $Id: Channel.cc,v 1.45 2003/12/31 23:50:51 dan_karrels Exp $
  */
 
 #include	<new>
@@ -38,7 +38,7 @@
 #include	"server.h"
 #include	"ConnectionManager.h"
 
-RCSTAG("$Id: Channel.cc,v 1.44 2003/12/29 23:59:38 dan_karrels Exp $") ;
+RCSTAG("$Id: Channel.cc,v 1.45 2003/12/31 23:50:51 dan_karrels Exp $") ;
 
 namespace gnuworld
 {
@@ -510,6 +510,22 @@ else
 	}
 
 return theBan ;
+}
+
+void Channel::removeAllModes()
+{
+for( userIterator uItr = userList_begin() ; uItr != userList_end() ;
+	++uItr )
+	{
+	ChannelUser* theUser = uItr->second ;
+	assert( theUser != 0 ) ;
+
+	theUser->removeModeO() ;
+	theUser->removeModeV() ;
+	}
+modes = 0 ;
+limit = 0 ;
+key.clear() ;
 }
 
 } // namespace gnuworld

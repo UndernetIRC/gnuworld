@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_EB.cc,v 1.3 2003/08/09 23:15:33 dan_karrels Exp $
+ * $Id: msg_EB.cc,v 1.4 2003/12/31 23:50:50 dan_karrels Exp $
  */
 
 #include	<sys/types.h>
@@ -34,7 +34,7 @@
 #include	"ServerCommandHandler.h"
 #include	"config.h"
 
-RCSTAG( "$Id: msg_EB.cc,v 1.3 2003/08/09 23:15:33 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: msg_EB.cc,v 1.4 2003/12/31 23:50:50 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -51,14 +51,17 @@ bool msg_EB::Execute( const xParameters& params )
 {
 if( !strcmp( params[ 0 ], theServer->getUplinkCharYY().c_str() ) )
 	{
-	// It's my uplink
-	theServer->setBurstEnd( ::time( 0 ) ) ;
+	if( theServer->getSendEA() )
+		{
+		// It's my uplink
+		theServer->setBurstEnd( ::time( 0 ) ) ;
 
-	// Our uplink is done bursting
-	// This is done here instead of down below the if/else
-	// structure because some of the methods called here
-	// may depend or use the Uplink's isBursting() method
-	theServer->getUplink()->stopBursting() ;
+		// Our uplink is done bursting
+		// This is done here instead of down below the if/else
+		// structure because some of the methods called here
+		// may depend or use the Uplink's isBursting() method
+		theServer->getUplink()->stopBursting() ;
+		}
 
 	// Signal that all Write()'s should write to the
 	// normal output buffer
@@ -70,8 +73,11 @@ if( !strcmp( params[ 0 ], theServer->getUplinkCharYY().c_str() ) )
 	// Burst our channels
 	theServer->BurstChannels() ;
 
-	// We are no longer bursting
-	theServer->setBursting( false ) ;
+	if( theServer->getSendEA() )
+		{
+		// We are no longer bursting
+		theServer->setBursting( false ) ;
+		}
 
 	// For some silly reason, EB must come before EA
 	// *shrug*
@@ -96,8 +102,11 @@ if( !strcmp( params[ 0 ], theServer->getUplinkCharYY().c_str() ) )
 	// Send our EB
 	theServer->Write( "%s EB\n", theServer->getCharYY().c_str() ) ;
 
-	// Acknowledge their end of burst
-	theServer->Write( "%s EA\n", theServer->getCharYY().c_str() ) ;
+	if( theServer->getSendEA() )
+		{
+		// Acknowledge their end of burst
+		theServer->Write( "%s EA\n", theServer->getCharYY().c_str() ) ;
+		}
 
 	// Is the burstOutputBuffer empty?
 	theServer->WriteBurstBuffer() ;

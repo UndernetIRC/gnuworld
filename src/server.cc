@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server.cc,v 1.187 2003/12/18 18:42:21 dan_karrels Exp $
+ * $Id: server.cc,v 1.188 2003/12/31 23:50:51 dan_karrels Exp $
  */
 
 #include	<sys/time.h>
@@ -71,7 +71,7 @@
 #include	"ConnectionHandler.h"
 #include	"Connection.h"
 
-RCSTAG( "$Id: server.cc,v 1.187 2003/12/18 18:42:21 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: server.cc,v 1.188 2003/12/31 23:50:51 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -187,6 +187,7 @@ void xServer::initializeVariables()
 // Initialize more variables
 keepRunning = true ;
 bursting = false ;
+sendEA = true ;
 useHoldBuffer = false ;
 autoConnect = false ;
 StartTime = ::time( NULL ) ;
@@ -232,6 +233,22 @@ libPrefix = conf.Require( "libdir" )->second ;
 if( libPrefix[ libPrefix.size() - 1 ] != '/' )
 	{
 	libPrefix += '/' ;
+	}
+
+// Load the control nickname(s), if any
+EConfig::const_iterator cnItr = conf.Find( "controlnick" ) ;
+for( ; (cnItr != conf.end()) && (cnItr->second == "controlnick") ;
+	++cnItr )
+	{
+	controlNickSet.insert( cnItr->second ) ;
+	}
+
+// Load the control access list, AC usernames, if any
+EConfig::const_iterator acItr = conf.Find( "allowcontrol" ) ;
+for( ; (acItr != conf.end()) && (acItr->second == "allowcontrol") ;
+	++acItr )
+	{
+	allowControlSet.insert( acItr->second ) ;
 	}
 
 glineUpdateInterval = static_cast< time_t >( atoi(
@@ -2754,8 +2771,7 @@ return foundTimer ;
 
 unsigned int xServer::CheckTimers()
 {
-// Make sure the timerQueue is not empty, and that
-// we are not bursting
+// Make sure the timerQueue is not empty
 if( timerQueue.empty() )
 	{
 	return 0 ;
@@ -3968,6 +3984,161 @@ Write( s ) ;
 
 PostChannelEvent( EVT_PART, theChan,
 	static_cast< void* >( theClient ) ) ;
+}
+
+/// Have the server burst a channel
+bool xServer::BurstChannel( const string& chanName,
+	const string& chanModes,
+	const time_t& burstTime )
+{
+// Only send a B command during bursting
+if( !bursting )
+	{
+	return false ;
+	}
+
+// chanModes cannot contain a '-' mode, but can contain
+// a key that has '-' in it
+StringTokenizer st( chanModes ) ;
+if( st[ 0 ].find( '-' ) != string::npos )
+	{
+	elog	<< "xServer::BurstChannel> Channel modes cannot "
+		<< "contain a \'-\' polarity modifier"
+		<< endl ;
+	return false ;
+	}
+
+// Since we are not bursting a client, the channel must exist
+// already for this to make any sense.
+Channel* theChan = Network->findChannel( chanName ) ;
+if( 0 == theChan )
+	{
+	elog	<< "xServer::BurstChannel> Channel does not exist: "
+		<< chanName
+		<< endl ;
+	return false ;
+	}
+
+if( burstTime >= theChan->getCreationTime() )
+	{
+	elog	<< "xServer::BurstChannel> Channel creation time is "
+		<< "older than the burst time"
+		<< endl ;
+	return false ;
+	}
+
+theChan->removeAllModes() ;
+theChan->removeAllBans() ;
+
+// Need to burst the channel
+stringstream s ;
+s	<< getCharYY()
+	<< " B "
+	<< chanName << ' '
+	<< burstTime << ' '
+	<< chanModes  ;
+
+Write( s ) ;
+
+theChan->setCreationTime( burstTime ) ;
+
+if( chanModes.empty() ||
+	(string::npos == chanModes.find_first_not_of( ' ' )))
+	{
+	// No problem
+	return true ;
+	}
+
+StringTokenizer::size_type argPos = 1 ;
+
+for( string::const_iterator ptr = st[ 0 ].begin() ; ptr != st[ 0 ].end() ; 
+	++ptr )
+	{
+	switch(  *ptr )
+		{
+		case 't':
+			theChan->setMode( Channel::MODE_T ) ;
+			break ;
+		case 'n':
+			theChan->setMode( Channel::MODE_N ) ;
+			break ;
+		case 's':
+			theChan->setMode( Channel::MODE_S ) ;
+			break ;
+		case 'p':
+			theChan->setMode( Channel::MODE_P ) ;
+			break ;
+		case 'm':
+			theChan->setMode( Channel::MODE_M ) ;
+			break ;
+		case 'i':
+			theChan->setMode( Channel::MODE_I ) ;
+			break ;
+		case 'r':
+			theChan->setMode( Channel::MODE_R ) ;
+			break ;
+		case 'k':
+			{
+			if( argPos >= st.size() )
+				{
+				elog	<< "xServer::BurstChannel> Invalid"
+					<< " number of arguments to "
+					<< "chanModes"
+					<< endl ;
+				break ;
+				}
+			theChan->onModeK( true, st[ argPos++ ] ) ;
+			break ;
+			}
+		case 'l':
+			{
+			if( argPos >= st.size() )
+				{
+				elog	<< "xServer::BurstChannel> Invalid"
+					<< " number of arguments to "
+					<< "chanModes"
+					<< endl ;
+				break ;
+				}
+			theChan->onModeL( true,
+				atoi( st[ argPos++ ].c_str() ) ) ;
+			break ;
+			}
+		default:
+			break ;
+		} // switch()
+	} // for()
+
+return true ;
+}
+
+bool xServer::findControlNick( const std::string& nickName ) const
+{
+return (controlNickSet.find( nickName ) != controlNickSet.end()) ;
+}
+
+void xServer::ControlCommand( iClient* srcClient,
+	const string& message )
+{
+assert( srcClient != 0 ) ;
+
+elog	<< "xServer::ControlCommand> Received control message from: "
+	<< *srcClient
+	<< ": "
+	<< message
+	<< endl ;
+
+if( !hasControlAccess( srcClient->getAccount() ) ||
+	!srcClient->isModeO() )
+	{
+	// Silently return
+	return ;
+	}
+}
+
+bool xServer::hasControlAccess( const std::string& userName ) const
+{
+return (allowControlSet.find( userName ) != allowControlSet.end()) ;
 }
 
 } // namespace gnuworld

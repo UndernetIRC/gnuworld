@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server.h,v 1.96 2003/12/29 23:59:36 dan_karrels Exp $
+ * $Id: server.h,v 1.97 2003/12/31 23:50:50 dan_karrels Exp $
  */
 
 #ifndef __SERVER_H
-#define __SERVER_H "$Id: server.h,v 1.96 2003/12/29 23:59:36 dan_karrels Exp $"
+#define __SERVER_H "$Id: server.h,v 1.97 2003/12/31 23:50:50 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
@@ -408,6 +408,19 @@ public:
 		bool getOps = true ) ;
 
 	/**
+	 * Similar to JoinChannel, except that the server will just
+	 * burst the channel, without joining a client.
+	 * - The channel must already exist
+	 * - The burst time must be older than the existing channel's
+	 *   creation time.  All modes will be removed from the channel
+	 *   without generating any events.
+	 * - chanModes cannot contain any '-' polarity modes.
+	 */
+	virtual bool BurstChannel( const std::string& chanName,
+		const std::string& chanModes,
+		const time_t& burstTime ) ;
+
+	/**
 	 * Have a fake (only) client join a channel.
 	 * This will NOT create the channel if it does not already exist.
 	 */
@@ -633,6 +646,25 @@ public:
 	 */
 	inline bool isBursting() const
 		{ return bursting ; }
+
+	/**
+	 * Return true if an EA will be sent after the EB.
+	 * Some modules may want the "endless" burst effect.
+	 * Default value is true.
+	 */
+	inline bool getSendEA() const
+		{ return sendEA ; }
+
+	/**
+	 * Invoke this method with the value 'true' if you want
+	 * the EA token to be sent after the EB.  Setting to
+	 * false will create the endless burst effect, and bursting
+	 * will always be true.
+	 * Default value is true.
+	 * Only modify this variable if you know what youre doing.
+	 */
+	inline void setSendEA( bool newVal = true )
+		{ sendEA = newVal ; }
 
 	/**
 	 * Set the bursting value to the given argument, with default
@@ -878,6 +910,19 @@ public:
 	virtual size_t	getBurstLines() const
 		{ return burstLines ; }
 
+	/**
+	 * Return true if the given nickname corresponds to a
+	 * server control nickname.
+	 * Return false otherwise.
+	 */
+	virtual bool	findControlNick( const std::string& ) const ;
+
+	/**
+	 * Handle a control message.
+	 */
+	virtual void	ControlCommand( iClient* srcClient,
+				const std::string& message ) ;
+
 protected:
 
 	/**
@@ -954,6 +999,12 @@ protected:
 	 * Returns true if the signal was handled.
 	 */
 	virtual bool	OnSignal( int ) ;
+
+	/**
+	 * Return true if the given AC username has access enough to
+	 * issue server control commands.
+	 */
+	virtual bool	hasControlAccess( const std::string& ) const ;
 
 	/**
 	 * The structure type holds information about client timed
@@ -1118,6 +1169,15 @@ protected:
 	 * This variable is true when this server is bursting.
 	 */
 	bool			bursting ;
+
+	/**
+	 * This variable is set to true to indicate that the server
+	 * will send EA after sending EB.  Some modules may want
+	 * the "endless" burst effect.
+	 * Default value is true.
+	 * Only modify this variable if you know what youre doing.
+	 */
+	bool			sendEA ;
 
 	/**
 	 * This variable will be true when the default behavior
@@ -1336,6 +1396,31 @@ protected:
 	/// burstBytes is the total number of bytes that have been
 	/// processed since the beginning of the last burst.
 	size_t		burstBytes ;
+
+	/**
+	 * The type used to store the nicknames of control clients.
+	 */
+	typedef std::set< std::string, noCaseCompare >
+			controlNickSetType ;
+
+	/**
+	 * The structure used to store the nicknames of control clients.
+	 */
+	controlNickSetType		controlNickSet ;
+
+	/**
+	 * The type used to store the AC account usernames allowed to
+	 * issue control commands.
+	 * AC account usernames are case sensitive, so cannot use
+	 * noCaseCompare here.
+	 */
+	typedef std::set< std::string > allowControlSetType ;
+
+	/**
+	 * The structure used to store the AC account usernames allowed to
+	 * issue control commands.
+	 */
+	allowControlSetType		allowControlSet ;
 
 } ;
 

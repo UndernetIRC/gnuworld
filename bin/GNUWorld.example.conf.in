@@ -1,4 +1,4 @@
-# $Id: GNUWorld.example.conf.in,v 1.11 2003/12/06 22:11:36 dan_karrels Exp $
+# $Id: GNUWorld.example.conf.in,v 1.12 2003/12/31 23:50:50 dan_karrels Exp $
 # GNUWorld Core Configuration File
 #
 
@@ -46,6 +46,21 @@ libdir = ../lib
 #module = libclientExample.la clientExample.example.conf
 #module = libdronescan.la dronescan.example.conf
 #module = libsnoop.la snoop.example.conf
+
+# Control nicknames
+# List here the nicknames to which you want the server to respond
+# for control commands.
+# You need not list any, it could be construed as a security
+# risk, but adds very nice functionality.
+# No clients are burst for control, instead control commands
+# must be sent via MSG controlnick@server.name <command>
+controlnick = control
+
+# List the AC account usernames for those users you want to
+# have access to the control commands.
+# Be careful who you choose for this.
+# AC account usernames are case sensitive.
+allowcontrol = reppir
 
 #################################################
 # It is safe to leave the rest of this file alone

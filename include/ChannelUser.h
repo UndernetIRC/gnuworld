@@ -17,11 +17,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ChannelUser.h,v 1.13 2003/12/29 23:59:36 dan_karrels Exp $
+ * $Id: ChannelUser.h,v 1.14 2003/12/31 23:50:50 dan_karrels Exp $
  */
 
 #ifndef __CHANNELUSER_H
-#define __CHANNELUSER_H "$Id: ChannelUser.h,v 1.13 2003/12/29 23:59:36 dan_karrels Exp $"
+#define __CHANNELUSER_H "$Id: ChannelUser.h,v 1.14 2003/12/31 23:50:50 dan_karrels Exp $"
 
 #include	<string>
 
@@ -52,9 +52,6 @@ public:
 
 	/// Bit representing channel user mode +v
 	static const modeType	MODE_V ;
-
-	/// Bit representing channel user zombie state
-//	static const modeType   ZOMBIE ;
 
 	/**
 	 * Construct a ChannelUser given an iClient
@@ -89,13 +86,6 @@ public:
 		{ return getMode( MODE_V ) ; }
 
 	/**
-	 * Return true if this user is currently a zombie in this
-	 * channel, false otherwise.
-	 */
-//	inline bool isZombie() const
-//		{ return getMode( ZOMBIE ) ; }
-
-	/**
 	 * Retrieve this ChannelUser's current modes in
 	 * its channel.
 	 */
@@ -121,12 +111,6 @@ public:
 		{ return setMode( MODE_V ) ; }
 
 	/**
-	 * Set this user's zombie state to true in this channel.
-	 */
-//	inline void setZombie()
-//		{ setMode( ZOMBIE ) ; }
-
-	/**
 	 * Remove a given channel user mode.
 	 */
 	inline void removeMode( const modeType& whichMode )
@@ -143,12 +127,6 @@ public:
 	 */
 	inline void removeModeV()
 		{ removeMode( MODE_V ) ; }
-
-	/**
-	 * Remove the user's zombie state in this channel.
-	 */
-//	inline void removeZombie()
-//		{ removeMode( ZOMBIE ) ; }
 
 	/*
 	 * These are not defined in the header file to avoid
