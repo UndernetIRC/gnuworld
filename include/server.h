@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server.h,v 1.101 2005/01/08 23:33:42 dan_karrels Exp $
+ * $Id: server.h,v 1.102 2005/01/09 20:34:43 dan_karrels Exp $
  */
 
 #ifndef __SERVER_H
-#define __SERVER_H "$Id: server.h,v 1.101 2005/01/08 23:33:42 dan_karrels Exp $"
+#define __SERVER_H "$Id: server.h,v 1.102 2005/01/09 20:34:43 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
@@ -517,7 +517,7 @@ public:
 	 * The first argument is the xClient requesting the mode
 	 * change(s), and cannot be NULL.
 	 */
-	virtual int	Mode( xClient*, Channel*,
+	virtual bool	Mode( xClient*, Channel*,
 				const std::string& modes,
 				const std::string& args ) ;
 
@@ -1019,14 +1019,6 @@ protected:
 	 * older timestamp into a channel.
 	 */
 	virtual void	removeAllChanModes( Channel* ) ;
-
-	/**
-	 * This support method is called by Mode() to parse the modes
-	 * and arguments.
-	 */
-	virtual int	parseModeRequest( const Channel*,
-				const std::string&,
-				const std::string& ) const ;
 
 	/**
 	 * Returns true if the given mask uses the nick!user@host syntax.

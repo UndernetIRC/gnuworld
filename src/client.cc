@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: client.cc,v 1.73 2005/01/08 23:33:43 dan_karrels Exp $
+ * $Id: client.cc,v 1.74 2005/01/09 20:34:49 dan_karrels Exp $
  */
 
 #include	<new>
@@ -47,7 +47,7 @@
 #include	"ELog.h"
 #include	"events.h"
 
-RCSTAG("$Id: client.cc,v 1.73 2005/01/08 23:33:43 dan_karrels Exp $" ) ;
+RCSTAG("$Id: client.cc,v 1.74 2005/01/09 20:34:49 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -90,7 +90,7 @@ return true ;
 
 void xClient::OnAttach()
 {
-//We are connected to an xServer here.
+// We are connected to an xServer here.
 Connected = true; 
 }
 

@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: gnutest.cc,v 1.22 2005/01/08 23:33:43 dan_karrels Exp $
+ * $Id: gnutest.cc,v 1.23 2005/01/09 20:34:48 dan_karrels Exp $
  */
 
 #include	<string>
@@ -30,7 +30,7 @@
 #include	"EConfig.h"
 #include	"Network.h"
 
-RCSTAG("$Id: gnutest.cc,v 1.22 2005/01/08 23:33:43 dan_karrels Exp $");
+RCSTAG("$Id: gnutest.cc,v 1.23 2005/01/09 20:34:48 dan_karrels Exp $");
 
 namespace gnuworld
 {
@@ -142,13 +142,17 @@ void gnutest::OnChannelMessage( iClient* theClient,
 	Channel* theChan,
 	const string& message )
 {
-elog	<< "gnutest::OnChannelMessage> theClient: "
-	<< *theClient
-	<< ", theChan: "
-	<< theChan->getName()
-	<< ", message: "
-	<< message
-	<< endl ;
+(void) theClient ;
+(void) theChan ;
+(void) message ;
+
+//elog	<< "gnutest::OnChannelMessage> theClient: "
+//	<< *theClient
+//	<< ", theChan: "
+//	<< theChan->getName()
+//	<< ", message: "
+//	<< message
+//	<< endl ;
 }
 
 void gnutest::OnPrivateMessage( iClient* theClient,
@@ -343,6 +347,26 @@ else if( st[ 0 ] == "bankick" )
 		}
 
 	BanKick( theChan, theClient, st.assemble( 3 ) ) ;
+	}
+else if( st[ 0 ] == "mode" )
+	{
+	// mode #chan <mode string>
+	if( st.size() < 3 )
+		{
+		Notice( theClient, "Usage: mode <channel> <modes>" ) ;
+		return ;
+		}
+
+	Channel* theChan = Network->findChannel( st[ 1 ] ) ;
+	if( NULL == theChan )
+		{
+		Notice( theClient, "Unable to find channel" ) ;
+		return ;
+		}
+
+	// Note that this only exercises the first argument of
+	// ModeAsServer()
+	ModeAsServer( theChan, st.assemble( 2 ), string() ) ;
 	}
 else if( st[ 0 ] == "op" )
 	{

@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server.cc,v 1.202 2005/01/08 23:33:43 dan_karrels Exp $
+ * $Id: server.cc,v 1.203 2005/01/09 20:34:50 dan_karrels Exp $
  */
 
 #include	<sys/time.h>
@@ -31,6 +31,7 @@
 
 #include	<new>
 #include	<string>
+#include	<map>
 #include	<list>
 #include	<vector>
 #include	<algorithm>
@@ -69,7 +70,7 @@
 #include	"ConnectionHandler.h"
 #include	"Connection.h"
 
-RCSTAG( "$Id: server.cc,v 1.202 2005/01/08 23:33:43 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: server.cc,v 1.203 2005/01/09 20:34:50 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -85,6 +86,7 @@ using std::stack ;
 using std::unary_function ;
 using std::clog ;
 using std::cout ;
+using std::ends ;
 using std::min ;
 
 /// The object containing the network data structures
@@ -1980,7 +1982,7 @@ s	<< getCharYY()
 return Write( s ) ;
 }
 
-int xServer::Mode( xClient* theClient,
+bool xServer::Mode( xClient* theClient,
 	Channel* theChan,
 	const string& modes,
 	const string& args )
@@ -1989,14 +1991,28 @@ assert( theChan != 0 ) ;
 
 if( NULL == theClient )
 	{
-	return -10 ;
+	return false ;
 	}
+
+/*
+elog	<< "xServer::Mode> theClient: "
+	<< *theClient
+	<< ", theChan: "
+	<< *theChan
+	<< ", modes: "
+	<< modes
+	<< ", args: "
+	<< args
+	<< ", MAX_CHAN_MODES: "
+	<< MAX_CHAN_MODES
+	<< endl ;
+*/
 
 // Make sure that the modes string is not empty, it's ok for
 // the args string to be empty
 if( modes.empty() )
 	{
-	return -1 ;
+	return false ;
 	}
 
 // Return the iClient instance for the requesting xClient
@@ -2013,144 +2029,363 @@ ChannelUser* theUser = theChan->findUser( theIClient ) ;
 if( NULL == theIClient )
 	{
 	// Nope, the xClient is not in the channel...silly xClient
-	return -9 ;
+	return false ;
 	}
 
-// Verify that the modes and args are valid for the given channel,
-// this will allow the below loop to work successfully and it
-// will not require to do any validation
-int retMe = parseModeRequest( theChan, modes, args ) ;
-if( retMe < 0 )
-	{
-	// Something was wrong with the modes and/or args mode
-	// change parameters...return the error found from
-	// parseModeRequest()
-	return retMe ;
-	}
+string modesAndArgsString( modes + ' ' + args ) ;
 
-// Tokenize the argument list by ' '
-StringTokenizer argTokens( args ) ;
+//elog	<< "xServer::Mode> modesAndArgsString: "
+//	<< modesAndArgsString
+//	<< endl ;
 
-// The argument iterator
-StringTokenizer::const_iterator argPtr = argTokens.begin() ;
+std::map< char, Channel::modeType > chanModes ;
+chanModes[ 'i' ] = Channel::MODE_I ;
+chanModes[ 'm' ] = Channel::MODE_M ;
+chanModes[ 'n' ] = Channel::MODE_N ;
+chanModes[ 'p' ] = Channel::MODE_P ;
+chanModes[ 'r' ] = Channel::MODE_R ;
+chanModes[ 's' ] = Channel::MODE_S ;
+chanModes[ 't' ] = Channel::MODE_T ;
 
-// This variable holds the polarity of the current mode
-bool polarity = true ;
+// This vector is used for argument-less types that can be passed
+// to OnChannelMode()
+modeVectorType modeVector ;
 
-// These structures will queue all modes to be sent to the channel
-// and all other xClients
 opVectorType opVector ;
 voiceVectorType voiceVector ;
-modeVectorType modeVector ;
 banVectorType banVector ;
 
-for( string::const_iterator modePtr = modes.begin() ;
-	modePtr != modes.end() ; ++modePtr )
+typedef std::vector< std::pair< bool, unsigned int > > limitVectorType ;
+limitVectorType limitVector ;
+
+typedef std::vector< std::pair< bool, std::string > > keyVectorType ;
+keyVectorType keyVector ;
+
+// This vector stores the actual output string for the modes
+typedef std::vector< std::pair< std::string, std::string > >
+	rawModeVectorType ;
+rawModeVectorType rawModeVector ;
+
+// generalModeVector and modeVector are used to ease the invocation
+// of the various OnChannelMode*() methods, and rawModeVector is used
+// to facilitate outputting the actual data to the network.
+
+StringTokenizer st( modesAndArgsString ) ;
+StringTokenizer::size_type tokenIndex = 0 ;
+
+for( ; tokenIndex < st.size() ; )
 	{
-	switch( *modePtr )
+	bool polarityBool = true ;
+	string polarityString( "+" ) ;
+
+	// nextArgIndex is the index to the next mode argument.
+	// This will be used to determine arguments for each mode,
+	// as well as mark tokenIndex for the next loop.
+	StringTokenizer::size_type nextArgIndex = tokenIndex + 1 ;
+
+//	elog	<< "xServer::Mode> Evaluating tokenIndex "
+//		<< tokenIndex
+//		<< ", token: "
+//		<< st[ tokenIndex ]
+//		<< endl ;
+
+	// Iterate this token, it may contain multiple modes
+	for( size_t charIndex = 0 ; charIndex < st[ tokenIndex ].size() ;
+		++charIndex )
 		{
-		case '+':
-			polarity = true ;
-			break ;
-		case '-':
-			polarity = false ;
-			break ;
-		case 't':
-			modeVector.push_back(
-				make_pair( polarity, Channel::MODE_T ) ) ;
-			break ;
-		case 'n':
-			modeVector.push_back(
-				make_pair( polarity, Channel::MODE_N ) ) ;
-			break ;
-		case 's':
-			modeVector.push_back(
-				make_pair( polarity, Channel::MODE_S ) ) ;
-			break ;
-		case 'p':
-			modeVector.push_back(
-				make_pair( polarity, Channel::MODE_P ) ) ;
-			break ;
-		case 'i':
-			modeVector.push_back(
-				make_pair( polarity, Channel::MODE_I ) ) ;
-			break ;
-		case 'm':
-			modeVector.push_back(
-				make_pair( polarity, Channel::MODE_M ) ) ;
-			break ;
-		case 'r':
-			modeVector.push_back(
-				make_pair( polarity, Channel::MODE_R ) ) ;
-			break ;
-		case 'b':
-			banVector.push_back( banVectorType::value_type(
-				polarity, *argPtr ) ) ;
-			++argPtr ;
-			break ;
-		case 'v':
-			{
-			iClient* theClient = Network->findClient(
-				*argPtr ) ;
-			ChannelUser* theUser = theChan->findUser(
-				theClient ) ;
+		char theChar = st[ tokenIndex ][ charIndex ] ;
+//		elog	<< "xServer::Mode> Evaluating charIndex "
+//			<< charIndex
+//			<< ", theChar: "
+//			<< theChar
+//			<< endl ;
 
-			voiceVector.push_back( voiceVectorType::value_type(
-				polarity, theUser ) ) ;
-			++argPtr ;
-			}
-			break ;
-		case 'o':
+		switch( theChar )
 			{
-			iClient* theClient = Network->findClient(
-				*argPtr ) ;
-			ChannelUser* theUser = theChan->findUser(
-				theClient ) ;
-
-			opVector.push_back( opVectorType::value_type(
-				polarity, theUser ) ) ;
-			++argPtr ;
-			}
-			break ;
-		case 'k':
-			// Channel mode 'k' always has an argument
-			OnChannelModeK( theChan, polarity, theUser,
-				*argPtr ) ;
-			++argPtr ;
-			break ;
-		case 'l':
-			// Channel mode 'l' only has an argument if
-			// it's being added, but not removed
-			OnChannelModeL( theChan, polarity, theUser,
-				polarity ? atoi( (*argPtr).c_str() )
-				: 0 ) ;
-			if( polarity )
+			case '+':
+//				elog	<< "xServer::Mode> polarity = "
+//					<< "true"
+//					<< endl ;
+				polarityBool = true ;
+				polarityString = "+" ;
+				break ;
+			case '-':
+//				elog	<< "xServer::Mode> polarity = "
+//					<< "true"
+//					<< endl ;
+				polarityBool = false ;
+				polarityString = "-" ;
+				break ;
+			case 'i':
+			case 'm':
+			case 'n':
+			case 'p':
+			case 'r':
+			case 's':
+			case 't':
+//				elog	<< "xServer::Mode> General mode: "
+//					<< theChar
+//					<< ", polarity: "
+//					<< polarityString
+//					<< endl ;
+				modeVector.push_back( make_pair( 
+					polarityBool,
+					chanModes[ theChar ] ) ) ;
+				rawModeVector.push_back( make_pair(
+					polarityString + theChar,
+					string() ) ) ;
+				break ;
+			case 'k':
 				{
-				++argPtr ;
+//				elog	<< "xServer::Mode> Mode 'k'"
+//					<< ", polarity: "
+//					<< polarityString
+//					<< endl ;
+
+				// Mode -k expects an argument, but it
+				// doesn't matter what it is.
+
+				// Must lookup the key argument
+				if( nextArgIndex >= st.size() )
+					{
+					// No argument supplied
+					return false ;
+					}
+				std::string chanKey = st[ nextArgIndex ] ;
+				++nextArgIndex ;
+
+				if( theChan->getMode( Channel::MODE_K ) )
+					{
+					// +k already set
+					if( polarityBool )
+						{
+						// Must unset key first
+						return false ;
+						}
+					// chanKey already handled
+					}
+				// If the mode is not set, just ignore
+				// a polarity of "-k" (not add it to
+				// to the modeVector)
+				else
+					{
+					if( !polarityBool )
+						{
+						break ;
+						}
+					}
+
+//				elog	<< "xServer::Mode> key: "
+//					<< chanKey
+//					<< endl ;
+
+				keyVector.push_back( make_pair(
+					polarityBool, chanKey ) ) ;
+				rawModeVector.push_back( make_pair(
+					polarityString + theChar,
+					chanKey ) ) ;
 				}
-			break ;
-		} // switch()
-	} // for()
+				break ;
+			case 'l':
+				{
+//				elog	<< "xServer::Mode> Mode 'l'"
+//					<< ", polarity: "
+//					<< polarityString
+//					<< endl ;
 
-// Write the modes to the network before updating tables and notifying
-// other xClients...this will keep the output buffers synched
-// BUG: Will this write more than 6 modes at once?
-stringstream s ;
-s	<< getCharYY()
-	<< " M "
-	<< theChan->getName()
-	<< ' '
-	<< modes ;
+				unsigned int chanLimit = 0 ;
+				if( polarityBool )
+					{
+					// Must lookup the argument
+					if( nextArgIndex >= st.size() )
+						{
+						// No argument supplied
+						return false ;
+						}
+					chanLimit = ::atoi(
+						st[ nextArgIndex ].c_str() ) ;
+					++nextArgIndex ;
+					}
+				// No argument needed for -l
 
-if( !args.empty() )
+				limitVector.push_back( make_pair(
+					polarityBool, chanLimit ) ) ;
+
+				std::string chanLimitString ;
+				if( chanLimit != 0 )
+					{
+					std::stringstream chanLimitSS ;
+					chanLimitSS	<< chanLimit
+							<< ends ;
+					chanLimitSS	>> chanLimitString ;
+					}
+
+//				elog	<< "xServer::Mode> limit: "
+//					<< chanLimit
+//					<< ", chanLimitString: "
+//					<< chanLimitString
+//					<< endl ;
+
+				rawModeVector.push_back( make_pair(
+					polarityString + theChar,
+					chanLimitString ) ) ;
+				}
+				break ;
+			case 'b':
+//				elog	<< "xServer::Mode> Mode 'b'"
+//					<< ", polarity: "
+//					<< polarityString
+//					<< endl ;
+
+				// Must lookup the ban argument
+				if( nextArgIndex >= st.size() )
+					{
+					// No argument supplied
+					return false ;
+					}
+//				elog	<< "xServer::Mode> ban: "
+//					<< st[ nextArgIndex ]
+//					<< endl ;
+
+				banVector.push_back( make_pair(
+					polarityBool, st[ nextArgIndex ]
+					) ) ;
+				rawModeVector.push_back( make_pair(
+					polarityString + theChar,
+					st[ nextArgIndex ] ) ) ;
+				++nextArgIndex ;
+				break ;
+			case 'o':
+			case 'v':
+				{
+//				elog	<< "xServer::Mode> Mode 'v'/'o'"
+//					<< ", polarity: "
+//					<< polarityString
+//					<< endl ;
+
+				// Must lookup the op/voice argument
+				if( nextArgIndex >= st.size() )
+					{
+					// No argument supplied
+					return false ;
+					}
+
+				iClient* targetClient =
+					Network->findNick(
+						st[ nextArgIndex ] ) ;
+				if( 0 == targetClient )
+					{
+					return false ;
+					}
+				++nextArgIndex ;
+
+				// Is the client on the channel?
+				ChannelUser* targetUser =
+					theChan->findUser( targetClient ) ;
+				if( 0 == targetUser )
+					{
+					return false ;
+					}
+
+				opVectorType::value_type thePair(
+					polarityBool, targetUser ) ;
+				if( 'v' == theChar )
+					{
+					voiceVector.push_back( thePair ) ;
+					}
+				else
+					{
+					opVector.push_back( thePair ) ;
+					}
+
+//				elog	<< "xServer::Mode> targetUser: "
+//					<< *targetUser
+//					<< endl ;
+
+				rawModeVector.push_back(
+					make_pair( polarityString + theChar,
+					targetClient->getCharYYXXX() ) ) ;
+				}
+				break ; // 'o', 'v'
+			} // switch()
+		} // for( char )
+
+	tokenIndex = nextArgIndex ;
+	} // for( token )
+
+size_t modeOutputCount = 0 ;
+string outputModes ;
+string outputArgs ;
+
+// So now modeVector contains all of the modes, with arguments where
+// appropriate, that need to be set.
+for( rawModeVectorType::size_type modeIndex = 0 ;
+	modeIndex < rawModeVector.size() ; )
 	{
-	s	<< ' '
-		<< args ;
-	}
+//	elog	<< "xServer::Mode> Iterating rawModeVector, modeIndex: "
+//		<< modeIndex
+//		<< ", outputModes: "
+//		<< outputModes
+//		<< ", outputArgs: "
+//		<< outputArgs
+//		<< endl ;
 
-retMe = Write( s ) ;
+	// Each element in the rawModeVector is a <mode,arg> pair.
+	// The for loop (directly) below is responsible for incrementing
+	// modeIndex.
+	for( ; (modeOutputCount < MAX_CHAN_MODES)
+		&& (modeIndex < rawModeVector.size()) ;
+		++modeOutputCount, ++modeIndex )
+		{
+		std::string polarityAndMode(
+			rawModeVector[ modeIndex ].first ) ;
+		std::string args = rawModeVector[ modeIndex ].second ;
 
-// Update internal tables and notify all xClients of mode change(s)
+/*
+		elog	<< "xServer::Mode> modeOutputCount: "
+			<< modeOutputCount
+			<< ", modeIndex: "
+			<< modeIndex
+			<< ", polarityAndMode: "
+			<< polarityAndMode
+			<< ", args: "
+			<< args
+			<< endl ;
+*/
+
+		outputModes += polarityAndMode ;
+		outputArgs += args + " " ;
+
+//		elog	<< "xServer::Mode> outputModes: "
+//			<< outputModes
+//			<< ", outputArgs: "
+//			<< outputArgs
+//			<< endl ;
+		} // modeOutputCount
+
+	// In either of the cases which breaks out of the above for
+	// loop, write the mode string.
+	std::stringstream outputSS ;
+	outputSS	<< getCharYY()
+			<< " M "
+			<< theChan->getName()
+			<< " "
+			<< outputModes
+			<< " "
+			<< outputArgs
+			<< ends ;
+	elog	<< "xServer::Mode> output: "
+		<< outputSS.str()
+		<< endl ;
+	Write( outputSS ) ;
+
+	modeOutputCount = 0 ;
+	outputModes.clear() ;
+	outputArgs.clear() ;
+
+	} // for( modeItr )
+
+// Distribute events for the argument-less modes
 if( !modeVector.empty() )
 	{
 	OnChannelMode( theChan, theUser, modeVector ) ;
@@ -2168,128 +2403,7 @@ if( !banVector.empty() )
 	OnChannelModeB( theChan, theUser, banVector ) ;
 	}
 
-return retMe ;
-}
-
-int xServer::parseModeRequest( const Channel* theChan,
-	const string& modes,
-	const string& args ) const
-{
-// Tokenize the argument list by ' '
-StringTokenizer argTokens( args ) ;
-
-// The argument iterator
-StringTokenizer::const_iterator argPtr = argTokens.begin() ;
-
-// This variable holds the polarity of the current mode
-bool polarity = true ;
-
-for( string::const_iterator modePtr = modes.begin() ;
-	modePtr != modes.end() ; ++modePtr )
-	{
-	switch( *modePtr )
-		{
-		case '+':
-			polarity = true ;
-			break ;
-		case '-':
-			polarity = false ;
-			break ;
-		case 'b':
-			{
-			if( argPtr == argTokens.end() )
-				{
-				// Insufficient arguments
-				return -2 ;
-				}
-			if( !banSyntax( *argPtr ) )
-				{
-				// Bad ban syntax
-				return -3 ;
-				}
-			if( !polarity )
-				{
-				// Removing a ban, make sure it
-				// exists
-				if( !theChan->findBan( *argPtr ) )
-					{
-					// Ban mask not found
-					return -4 ;
-					}
-				}
-			// All checks ok, increment argument iterator
-			++argPtr ;
-
-			} // case 'b'
-			break ;
-		case 'o':
-		case 'v':
-			{
-			if( argPtr == argTokens.end() )
-				{
-				// Insufficient arguments
-				return -2 ;
-				}
-			iClient* theClient = Network->findClient(
-				*argPtr ) ;
-			if( NULL == theClient )
-				{
-				// Client not found
-				return -4 ;
-				}
-
-			if( NULL == theChan->findUser( theClient ) )
-				{
-				// ChannelUser not found
-				return -4 ;
-				}
-
-			// All is well
-			++argPtr ;
-
-			} // case 'o'/case 'v'
-			break ;
-		case 'l':
-			// Only has an argument if it's being added
-			if( polarity )
-				{
-				if( argPtr == argTokens.end() )
-					{
-					// Insufficient arguments
-					return -2 ;
-					}
-				++argPtr ;
-				}
-			break ;
-		case 'k':
-			// Mode 'k' always has an argument
-			if( argPtr == argTokens.end() )
-				{
-				// Insufficient arguments
-				return -2 ;
-				}
-			++argPtr ;
-
-			break ;
-		case 't':
-		case 'n':
-		case 'i':
-		case 'm':
-		case 'p':
-		case 's':
-			// No big deal, let the network deal with any
-			// problems
-			break ;
-		default:
-			// Unknown mode
-			return -5 ;
-			break ;
-
-		} // switch()
-	} // for()
-
-// All is well
-return 0 ;
+return true ;
 }
 
 // Make sure the banMask is of the form nick!user@host
