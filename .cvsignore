@@ -2,3 +2,6 @@ config.log
 config.cache
 config.status
 Makefile
+libtool
+opts
+autom4te.cache
