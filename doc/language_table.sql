@@ -133,10 +133,10 @@ COPY "translations" FROM stdin;
 1	123	[        User Record Stats] \002Cached Entries:\002 %i    \002DB Requests:\002 %i    \002Cache Hits:\002 %i    \002Efficiency:\002 %.2f%%	31337
 1	124	[Access Level Record Stats] \002Cached Entries:\002 %i    \002DB Requests:\002 %i    \002Cache Hits:\002 %i    \002Efficiency:\002 %.2f%%	31337
 1	125	[         Ban Record Stats] \002Cached Entries:\002 %i    \002DB Requests:\002 %i    \002Cache Hits:\002 %i    \002Efficiency:\002 %.2f%%	31337
-1	126	Last recieved User NOTIFY: %i	31337
-1	127	Last recieved Channel NOTIFY: %i	31337
-1	128	Last recieved Level NOTIFY: %i	31337
-1	129	Last recieved Ban NOTIFY: %i	31337
+1	126	Last received User NOTIFY: %i	31337
+1	127	Last received Channel NOTIFY: %i	31337
+1	128	Last received Level NOTIFY: %i	31337
+1	129	Last received Ban NOTIFY: %i	31337
 1	130	Custom data containers allocated: %i	31337
 1	131	\002Uptime:\002 %s	31337
 1	132	Channel %s has %d users (%i operators)	31337
