@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------------
--- "$Id: local_db.sql,v 1.9 2001/11/06 04:00:59 nighty Exp $"
+-- "$Id: local_db.sql,v 1.10 2001/11/16 18:08:42 nighty Exp $"
 -- Channel service DB SQL file for PostgreSQL.
 --
 --
@@ -96,7 +96,7 @@ CREATE INDEX pending_mgrchange_confirmed_idx ON pending_mgrchange(confirmed);
 
 CREATE TABLE xatadmins (
 	admin_id INT4 NOT NULL,
-	type INT2 DEFAULT 0
+	admin_type INT2 DEFAULT 0
 );
 
 CREATE INDEX xatadmins_admin_id_idx ON xatadmins(admin_id);
