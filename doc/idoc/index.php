@@ -2,7 +2,7 @@
 /*
  *
  * Undernet GNUworld Interactive Installation Guide (aka UGIIG)
- * $Id: index.php,v 1.14 2003/08/16 03:00:55 nighty Exp $
+ * $Id: index.php,v 1.15 2003/08/17 06:42:23 nighty Exp $
  *
  * Released under the GNU Public License : http://www.gnu.org/licenses/gpl.txt
  * by nighty <nighty@undernet.org>
@@ -50,7 +50,7 @@ function footer($prev,$next) {
 	//echo "<address>maintained by <b>&lt;</b><a href=\"mailto:" . $coder_email . "\">" . $coder_email . "</a><b>&gt;</b> - Last modified : <b>" . date("M-d-Y H:i:s",   (  filemtime("index.php")+( date("Z",filemtime("index.php"))/3600 )   )   ) . " UTC/GMT</b> - <b>[</b><a href=\"./\">Home</a><b>]</b></address>";
 	echo "<address>maintained by <b>&lt;</b><a href=\"mailto:" . $coder_email . "\">" . $coder_email . "</a><b>&gt;</b> - <b>[</b><a href=\"./\">Home</a><b>]</b>";
 	echo "&nbsp;<br><font size=-2><b>";
-?>$Id: index.php,v 1.14 2003/08/16 03:00:55 nighty Exp $<?
+?>$Id: index.php,v 1.15 2003/08/17 06:42:23 nighty Exp $<?
 	echo "</b></font></address>\n";
 	echo "</body>\n";
 	echo "</html>\n";
@@ -75,7 +75,7 @@ $coder_email = "nighty@undernet.org";
 $coder_name = "nighty";
 
 ?>
-<!-- $Id: index.php,v 1.14 2003/08/16 03:00:55 nighty Exp $ //-->
+<!-- $Id: index.php,v 1.15 2003/08/17 06:42:23 nighty Exp $ //-->
 <html>
 <head>
 <title>Undernet GNUworld Interactive Installation Guide</title>
@@ -1616,7 +1616,7 @@ if ($subset=="C-1") {
 To get the latest Apache server, go to <a href="http://mir2.ovh.net/ftp.apache.org/dist/httpd/" target=_blank>http://mir2.ovh.net/ftp.apache.org/dist/httpd/</a>,
 and take the latest <b>1.3.x</b>.
 
-Recommended version <a href="http://mir2.ovh.net/ftp.apache.org/dist/httpd/apache_1.3.26.tar.gz">apache_1.3.26.tar.gz</a>.
+Recommended version <a href="http://mir2.ovh.net/ftp.apache.org/dist/httpd/apache_1.3.27.tar.gz">apache_1.3.27.tar.gz</a>.
 
 Put that, as <b>root</b> in your <b>/root</b> home directory.
 
@@ -1631,12 +1631,40 @@ if ($subset=="C-2") {
 
 To get the latest version of PHP, go to <a href="http://www.php.net/downloads.php" target=_blank>http://www.php.net/downloads.php</a>.
 
-Recommended version <a href="http://www.php.net/do_download.php?download_file=php-4.2.3.tar.gz">php-4.2.3.tar.gz</a>.
-CERT Security Advisory, you should upgrade to <b>php-4.2.3</b> for security reasons :
-	<a href="http://www.cert.org/advisories/CA-2002-05.html" target=_blank>http://www.cert.org/advisories/CA-2002-05.html</a>
+Recommended version <a href="http://static.php.net/www.php.net/distributions/php-4.3.2.tar.gz">php-4.3.2.tar.gz</a>.
 
-
-Put that, as <b>root</b> in your <b>/root</b> home directory.
+<b>PHP also requires these programs if you plan to use the Graphical code check on 'New users' :
+( compiling with libGD support )</b>
+</pre>
+<table border=1 cellspacing=0 cellpadding=3>
+  <tr>
+    <td><b>Program</font></b></td>
+    <td><b>Version</font></b></td>
+    <td><b>Main Site</font></b></td>
+  </tr>
+  <tr>
+    <td><a href="http://www.libpng.org/pub/png/src/libpng-1.0.15.tar.gz">libPNG</a></td>
+    <td>1.0.15</td>
+    <td><a target=_blank href="http://www.libpng.org">http://www.libpng.org</a></td>
+  </tr>
+  <tr>
+    <td><a href="http://www.ijg.org/files/jpegsrc.v6b.tar.gz">libJPEG</a></td>
+    <td>6b</td>
+    <td><a target=_blank href="http://www.ijg.org">http://www.ijg.org</a></td>
+  </tr>
+  <tr>
+    <td><a href="http://umn.dl.sourceforge.net/sourceforge/freetype/freetype-2.1.4.tar.gz">FreeType2</a></td>
+    <td>2.1.4</td>
+    <td><a target=_blank href="http://freetype.sourceforge.net">http://freetype.sourceforge.net</a></td>
+  </tr>
+  <tr>
+    <td><a href="http://www.libpng.org/pub/png/src/zlib-1.1.4.tar.gz">zlib</a></td>
+    <td>1.1.4</td>
+    <td><a target=_blank href="http://www.gzip.org/zlib/">http://www.gzip.org/zlib/</a></td>
+  </tr>
+</table>
+<pre>
+Put these, as <b>root</b> in your <b>/root</b> home directory.
 
 </pre>
 <?
@@ -1648,32 +1676,66 @@ if ($subset=="C-3") {
 <pre>
 
 <i>Side note: of course it's always best to be up to date with php and apache version
-if you have apache_1.3.27 or php-4.2.4 .. don't hesitate, take it ;)</i>
+if you have apache_1.3.28 or php-4.3.3 .. don't hesitate, take it ;)</i>
 
 I will be a bit short on it because :
 	- It should'nt need to be long ;)
 	- Apache and PHP documentations are way more complete than that one.
 
+	<?=$os?>:/root# <b>tar -xzf apache_1.3.27.tar.gz</b>
+	<?=$os?>:/root# <b>tar -xzf php-4.3.2.tar.gz</b>
 
-	<?=$os?>:/root# <b>tar -xzf apache_1.3.26.tar.gz</b>
-	<?=$os?>:/root# <b>tar -xzf php-4.2.3.tar.gz</b>
-	<?=$os?>:/root# <b>cd apache_1.3.26/</b>
-	<?=$os?>:/root/apache_1.3.26# <b>./configure --prefix=/usr/local/apache</b>
-	<?=$os?>:/root/apache_1.3.26# <b>cd ../php-4.2.3/</b>
-	<?=$os?>:/root/php-4.2.3# <b>./configure --with-pgsql=/usr/local/pgsql --enable-track-vars --with-apache=../apache_1.3.26</b>
-	<?=$os?>:/root/php-4.2.3# <b>make</b>
-	<?=$os?>:/root/php-4.2.3# <b>make install</b>
-	<?=$os?>:/root/php-4.2.3# <b>cd ../apache_1.3.26/</b>
-	<?=$os?>:/root/apache_1.3.26# <b>./configure --prefix=/usr/local/apache --activate-module=src/modules/php4/libphp4.a</b>
-	<?=$os?>:/root/apache_1.3.26# <b>make</b>
-	<?=$os?>:/root/apache_1.3.26# <b>make install</b>
-	<?=$os?>:/root/apache_1.3.26# <b>cd ../php-4.2.3/</b>
-	<?=$os?>:/root/php-4.2.3# <b>cp php.ini-dist /usr/local/lib/php.ini</b>
+	<u>* EITHER YOU COMPILE IT <b>WITH LIBGD SUPPORT</b> (for the Graphical code for new users)</u>
+		<?=$os?>:/root# <b>tar -xzf libpng-1.0.15.tar.gz</b>
+		<?=$os?>:/root# <b>tar -xzf jpegsrc.v6b.tar.gz</b>
+		<?=$os?>:/root# <b>tar -xzf freetype-2.1.4.tar.gz</b>
+		<?=$os?>:/root# <b>tar -xzf zlib-1.1.4.tar.gz</b>
+		<?=$os?>:/root# <b>cd apache_1.3.27/</b>
+		<?=$os?>:/root/apache_1.3.27# <b>./configure --prefix=/usr/local/apache</b>
+		<?=$os?>:/root/apache_1.3.27# <b>cd ../zlib-1.1.4/</b>
+		<?=$os?>:/root/zlib-1.1.4# <b>./configure --prefix=/usr</b>
+		<?=$os?>:/root/zlib-1.1.4# <b>make</b>
+		<?=$os?>:/root/zlib-1.1.4# <b>make install</b>
+		<?=$os?>:/root/zlib-1.1.4# <b>cd ../freetype-2.1.4/</b>
+		<?=$os?>:/root/freetype-2.1.4# <b>gmake</b>
+		<?=$os?>:/root/freetype-2.1.4# <b>gmake</b>		(yes twice)
+		<?=$os?>:/root/freetype-2.1.4# <b>gmake install</b>
+		<?=$os?>:/root/freetype-2.1.4# <b>cd ../libpng-1.0.15/</b>
+		<?=$os?>:/root/libpng-1.0.15# <b>cd scripts</b>
+		<?=$os?>:/root/libpng-1.0.15# <b>cp makefile.<?=$os?> ../Makefile</b>
+		<?=$os?>:/root/libpng-1.0.15# <b>cd ..</b>
+		<?=$os?>:/root/libpng-1.0.15# <b>make</b>
+		<?=$os?>:/root/libpng-1.0.15# <b>make install</b>
+		<?=$os?>:/root/libpng-1.0.15# <b>cd ../jpeg-6b/</b>
+		<?=$os?>:/root/jpeg-6b# <b>./configure</b>
+		<?=$os?>:/root/jpeg-6b# <b>make</b>
+		<?=$os?>:/root/jpeg-6b# <b>make install</b>
+		<?=$os?>:/root/jpeg-6b# <b>cd ../php-4.3.2/</b>
+		<?=$os?>:/root/php-4.3.2# <b>./configure --with-pgsql=/usr/local/pgsql --enable-track-vars --with-apache=../apache_1.3.27 \
+					  --with-zlib --with-gd --enable-gd-native-ttf --with-ttf --enable-gd-imgstrttf \
+					  --with-jpeg-dir=../jpeg-6b --with-png-dir=../libpng-1.0.15 \
+					  --with-freetype-dir=/usr/include/freetype2/freetype</b>
 
-You can possibly edit the file <b>/usr/local/lib/php.ini</b> if you want to tweak anything,
-actually this should not be needed here.
+	<u>* OR YOU COMPILE IT <b>WITHOUT LIBGD SUPPORT</b> (NO Graphical code for new users, simplier)</u>
+		<?=$os?>:/root# <b>cd apache_1.3.27/</b>
+		<?=$os?>:/root/apache_1.3.27# <b>./configure --prefix=/usr/local/apache</b>
+		<?=$os?>:/root/php-4.3.2# <b>./configure --with-pgsql=/usr/local/pgsql --enable-track-vars --with-apache=../apache_1.3.27</b>
 
-	<?=$os?>:/root/php-4.2.3# <b>cd /usr/local/apache/htdocs/</b>
+	Then you continue with ...
+
+	<?=$os?>:/root/php-4.3.2# <b>make</b>
+	<?=$os?>:/root/php-4.3.2# <b>make install</b>
+	<?=$os?>:/root/php-4.3.2# <b>cd ../apache_1.3.27/</b>
+	<?=$os?>:/root/apache_1.3.27# <b>./configure --prefix=/usr/local/apache --activate-module=src/modules/php4/libphp4.a</b>
+	<?=$os?>:/root/apache_1.3.27# <b>make</b>
+	<?=$os?>:/root/apache_1.3.27# <b>make install</b>
+	<?=$os?>:/root/apache_1.3.27# <b>cd ../php-4.3.2</b>
+	<?=$os?>:/root/php-4.3.2# <b>cp php.ini-dist /usr/local/lib/php.ini</b>
+
+Make sure you edit <b>/usr/local/lib/php.ini</b> to set &quot;<b>register_globals</b>&quot; to &quot;<b>On</b>&quot;
+otherwise the interface wont work. (before starting apache or you will have to restart)
+
+	<?=$os?>:/root/php-4.3.2# <b>cd /usr/local/apache/htdocs/</b>
 	<?=$os?>:/usr/local/apache/htdocs# <b>chmod 711 ~gnuworld</b>
 	<?=$os?>:/usr/local/apache/htdocs# <b>chmod 711 ~gnuworld/website</b>
 	<?=$os?>:/usr/local/apache/htdocs# <b>chmod 755 ~gnuworld/website/php_includes</b>
