@@ -1,5 +1,9 @@
 Newest changes at the top of the file:
-$Id: RELEASE.NOTES,v 1.27 2002/12/08 19:41:53 gte Exp $
+$Id: RELEASE.NOTES,v 1.28 2002/12/23 22:12:12 gte Exp $
+
+CMaster 1.1pl11 - 23/12/2002
+* Add some more stats.
+* Try and update user.last-seen every 12 hours if they're logged in.
 
 CMaster 1.1pl10 - 08/12/2002
 * Added some contributed patches:

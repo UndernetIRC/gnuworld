@@ -2,7 +2,7 @@
  * cservice.cc
  * Author: Greg Sikorski
  * Purpose: Overall control client.
- * $Id: cservice.cc,v 1.225 2002/12/23 22:10:22 gte Exp $
+ * $Id: cservice.cc,v 1.226 2002/12/23 22:12:12 gte Exp $
  */
 
 #include	<new>
@@ -758,7 +758,7 @@ else if(Command == "VERSION")
 	xClient::DoCTCP(theClient, CTCP,
 		"Undernet P10 Channel Services II ["
 		__DATE__ " " __TIME__
-		"] Release 1.1pl10");
+		"] Release 1.1pl11");
 	}
 else if(Command == "PROBLEM?")
 	{
