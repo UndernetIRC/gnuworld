@@ -8,7 +8,7 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char SHOWCOMMANDSCommand_cc_rcsId[] = "$Id: SHOWCOMMANDSCommand.cc,v 1.8 2001/01/24 01:13:52 gte Exp $" ;
+const char SHOWCOMMANDSCommand_cc_rcsId[] = "$Id: SHOWCOMMANDSCommand.cc,v 1.9 2001/02/10 02:47:44 isomer Exp $" ;
 
 namespace gnuworld
 {
@@ -50,20 +50,26 @@ bool SHOWCOMMANDSCommand::Exec( iClient* theClient, const string& Message )
 	 */
 
 	int level = bot->getEffectiveAccessLevel(theUser, theChan, true);
+	int admin = bot->getEffectiveAccessLevel(theUser, bot->getChannelRecord("*"), true); 
 
-	if (level >= 900) bot->Notice(theClient, "\002Level  900\002: shutdown");
+	if (theClient->isOper()) 
+		           bot->Notice(theClient,"\002Level Oper\002: operjoin* operpart*");
+	if (level >= 1000) bot->Notice(theClient,"\002Level 1000\002: anything");
+	if (level >= 900) bot->Notice(theClient, "\002Level  900\002: say shutdown");
 	if (level >= 750) bot->Notice(theClient, "\002Level  750\002: purge");
-	if (level >= 600) bot->Notice(theClient, "\002Level  600\002: register remignore*");
-	if (level >= 500) bot->Notice(theClient, "\002Level  500\002: set*"); 
+	if (level >= 600) bot->Notice(theClient, "\002Level  600\002: register remignore");
+	if (level >= 450) bot->Notice(theClient, "\002Level  450\002: join* part* set%s*",(level>=500) ? "+" : ""); 
 	if (level >= 400) bot->Notice(theClient, "\002Level  400\002: adduser clearmode* modinfo remuser"); 
 	if (level >= 100) bot->Notice(theClient, "\002Level  100\002: op deop invite suspend unsuspend");
 	if (level >= 75) bot->Notice(theClient,  "\002Level   75\002: ban* unban*"); 
-	if (level >= 50) bot->Notice(theClient,  "\002Level   50\002: kick topic");
+	if (level >= 50) bot->Notice(theClient,  "\002Level   50\002: kick%s topic",(level>=200) ? "+" : "");
+	if (level == 42) bot->Notice(theClient,  "\002Level   42\002: PANIC");
 	if (level >= 25) bot->Notice(theClient,  "\002Level   25\002: voice devoice");
-	if (level >= 1) bot->Notice(theClient,   "\002Level    1\002: status"); 
-	if (level >= 0) bot->Notice(theClient,   "\002Level    0\002: access banlist chaninfo info help* lbanlist* login motd* newpass showcommands showignore* verify"); 
+	if (level >= 1) bot->Notice(theClient,   "\002Level    1\002: status%s",(level>=400||admin>0||theClient->isOper()) ? "+" : ""); 
+	if (level >= 0) bot->Notice(theClient,   "\002Level    0\002: access banlist chaninfo info help* lbanlist login motd* newpass showcommands showignore verify"); 
 	bot->Notice(theClient, "Commands marked * are semi-complete :)");
- 
+	if (admin >= level::force) 
+			bot->Notice(theClient,   "\002Level    *\002: force unforce");
 	return true ;
 } 
 

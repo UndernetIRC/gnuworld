@@ -598,7 +598,7 @@ else if(Command == "VERSION")
 	xClient::DoCTCP(theClient, CTCP,
 		"Undernet P10 Channel Services Version 2 ["
 		__DATE__ " " __TIME__
-		"] ($Id: cservice.cc,v 1.92 2001/02/10 00:19:37 gte Exp $)");
+		"] ($Id: cservice.cc,v 1.93 2001/02/10 02:47:44 isomer Exp $)");
 	}
 else if(Command == "PROBLEM?")
 	{
@@ -963,7 +963,8 @@ return 0;
  * Returns response id "response_id" for this user's prefered
  * language. 
  */
-const string cservice::getResponse( sqlUser* theUser, int response_id )
+const string cservice::getResponse( sqlUser* theUser, int response_id,
+	string msg = "")
 { 
 
 // Language defaults to English
@@ -990,9 +991,19 @@ if(ptr != translationTable.end())
  * can't find an english variant. (Carrying on here could corrupt
  * numerous varg lists, and will most likely segfault anyway).
  */
+if (lang_id != 1)
+	{
+	return getResponse(theUser,1);
+	}
+
+if (msg != "")
+	{
+	return msg;
+	}
 
 string result = "Unable to retrieve response. Please contact a cservice "
 	"administrator.";
+
 return result;
 }
 

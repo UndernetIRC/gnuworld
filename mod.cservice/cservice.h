@@ -1,5 +1,5 @@
 #ifndef __CSERVICE_H
-#define __CSERVICE_H "$Id: cservice.h,v 1.42 2001/02/09 23:57:00 gte Exp $"
+#define __CSERVICE_H "$Id: cservice.h,v 1.43 2001/02/10 02:47:44 isomer Exp $"
 
 #include	<string>
 #include	<vector>
@@ -224,7 +224,7 @@ public:
 	void loadTranslationTable();
 
 	// Method to retrieve a translation string.
-	const string getResponse( sqlUser*, int );
+	const string getResponse( sqlUser*, int , string = "");
 
 	// Check for valid hostmask.
 	virtual bool validUserMask(const string& userMask) const ;

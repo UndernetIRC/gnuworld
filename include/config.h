@@ -1,9 +1,9 @@
 /* config.h
- * $Id: config.h,v 1.7 2001/01/13 21:06:29 dan_karrels Exp $
+ * $Id: config.h,v 1.8 2001/02/10 02:47:44 isomer Exp $
  */
 
 #ifndef __CONFIG_H
-#define __CONFIG_H "$Id: config.h,v 1.7 2001/01/13 21:06:29 dan_karrels Exp $"
+#define __CONFIG_H "$Id: config.h,v 1.8 2001/02/10 02:47:44 isomer Exp $"
 
 /* config.h */
 /* GNUWorld main configuration file */
@@ -79,6 +79,6 @@
  * MAX_CHAN_MODES
  * The maximum number of channel modes per command.
  */
-#define MAX_CHAN_MODES 6
+#define MAX_CHAN_MODES 10
 
 #endif /* __CONFIG_H */
