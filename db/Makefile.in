@@ -55,6 +55,7 @@ CXXCPP = @CXXCPP@
 CXXDEPMODE = @CXXDEPMODE@
 CXXFLAGS = @CXXFLAGS@
 CYGPATH_W = @CYGPATH_W@
+DB = @DB@
 DEFS = @DEFS@
 DEPDIR = @DEPDIR@
 ECHO = @ECHO@
@@ -73,6 +74,7 @@ INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
 LDFLAGS = @LDFLAGS@
 LIBLTDL = @LIBLTDL@
 LIBOBJS = @LIBOBJS@
+
 LIBS = @LIBS@
 LIBTOOL = @LIBTOOL@
 LIBTOOL_DEPS = @LIBTOOL_DEPS@
@@ -144,13 +146,10 @@ target_alias = @target_alias@
 threadLib = @threadLib@
 topdir = @topdir@
 
-lib_LTLIBRARIES = libgnuworld_db.la
-libgnuworld_db_la_SOURCES = gnuworldDB.cc pgsqlDB.cc
+lib_LTLIBRARIES = libgnuworldDB.la
+libgnuworldDB_la_SOURCES = gnuworldDB.cc \
+	pgsqlDB.cc
 
-libgnuworld_db_la_LDFLAGS = -version-info 0:0:0 -rpath $(bindir) \
-	-L@PGSQL_LIB@ -lpq++
-
-INCLUDES = -I@PGSQL_INCLUDE@
 subdir = db
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
@@ -158,9 +157,10 @@ CONFIG_HEADER = $(top_builddir)/include/defs.h
 CONFIG_CLEAN_FILES =
 LTLIBRARIES = $(lib_LTLIBRARIES)
 
-libgnuworld_db_la_LIBADD =
-am_libgnuworld_db_la_OBJECTS = gnuworldDB.lo pgsqlDB.lo
-libgnuworld_db_la_OBJECTS = $(am_libgnuworld_db_la_OBJECTS)
+libgnuworldDB_la_LDFLAGS =
+libgnuworldDB_la_LIBADD =
+am_libgnuworldDB_la_OBJECTS = gnuworldDB.lo pgsqlDB.lo
+libgnuworldDB_la_OBJECTS = $(am_libgnuworldDB_la_OBJECTS)
 
 DEFAULT_INCLUDES =  -I. -I$(srcdir) -I$(top_builddir)/include
 depcomp = $(SHELL) $(top_srcdir)/depcomp
@@ -175,9 +175,9 @@ LTCXXCOMPILE = $(LIBTOOL) --mode=compile $(CXX) $(DEFS) \
 CXXLD = $(CXX)
 CXXLINK = $(LIBTOOL) --mode=link $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) \
 	$(AM_LDFLAGS) $(LDFLAGS) -o $@
-DIST_SOURCES = $(libgnuworld_db_la_SOURCES)
+DIST_SOURCES = $(libgnuworldDB_la_SOURCES)
 DIST_COMMON = Makefile.am Makefile.in
-SOURCES = $(libgnuworld_db_la_SOURCES)
+SOURCES = $(libgnuworldDB_la_SOURCES)
 
 all: all-am
 
@@ -216,8 +216,8 @@ clean-libLTLIBRARIES:
 	  echo "rm -f \"$${dir}/so_locations\""; \
 	  rm -f "$${dir}/so_locations"; \
 	done
-libgnuworld_db.la: $(libgnuworld_db_la_OBJECTS) $(libgnuworld_db_la_DEPENDENCIES) 
-	$(CXXLINK) -rpath $(libdir) $(libgnuworld_db_la_LDFLAGS) $(libgnuworld_db_la_OBJECTS) $(libgnuworld_db_la_LIBADD) $(LIBS)
+libgnuworldDB.la: $(libgnuworldDB_la_OBJECTS) $(libgnuworldDB_la_DEPENDENCIES) 
+	$(CXXLINK) -rpath $(libdir) $(libgnuworldDB_la_LDFLAGS) $(libgnuworldDB_la_OBJECTS) $(libgnuworldDB_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT) core *.core

@@ -1,4 +1,4 @@
-# $Id: dronescan.example.conf.in,v 1.7 2003/06/11 15:23:36 dan_karrels Exp $
+# $Id: dronescan.example.conf.in,v 1.8 2003/06/11 20:28:11 dan_karrels Exp $
 # What nickname should the bot use?
 nickname = E
 
@@ -45,7 +45,7 @@ nickMargin = 0.1
 
 # The channel cutoff is the minimum amount of members a channel must have before
 # it can be considered a drone channel.
-channelCutoff = 10
+channelCutoff = 20
 
 # The minimum level of information shown in the console channels. Available
 # levels are as follows:
@@ -62,7 +62,7 @@ consoleLevel = 1
 # If you enabled test 2 in enabledTests, you must give these values:
 
 # The interval over which join counter checks for joins. This is in seconds.
-jcInterval = 60
+jcInterval = 10
 
 # The trigger level for which join counter warns. Note that the total join
 # count must be OVER this level to trigger.

@@ -1,10 +1,10 @@
-dnl $Id: configure.ac,v 1.6 2003/06/08 20:06:39 dan_karrels Exp $
+dnl $Id: configure.ac,v 1.7 2003/06/11 20:28:10 dan_karrels Exp $
 dnl ----------------------------------------------------------
 
 echo Configuring GNUWorld...
 echo
 
-AC_REVISION($Revision: 1.6 $)
+AC_REVISION($Revision: 1.7 $)
 AC_INIT
 AC_CONFIG_SRCDIR([src/main.cc])
 AM_INIT_AUTOMAKE(gnuworld,0.0)
@@ -198,7 +198,9 @@ AC_ARG_WITH(pgsql-include,
 )
 dnl echo PGSQL_INCLUDE: $PGSQL_INCLUDE
 
+DB=""
 if [test $check_pgsql = "yes" ]; then
+	DB="db"
 	AC_MSG_CHECKING(for libpq++.h)
 	if [test -f "$PGSQL_INCLUDE/libpq++.h"]; then
 		/bin/true
@@ -297,6 +299,7 @@ fi
 dnl echo "MOD_DIRS = $MOD_DIRS"
 AC_SUBST(MOD_DIRS)
 
+AC_SUBST(DB)
 AC_SUBST(TEST_DIR)
 AC_SUBST(CXXFLAGS)
 AC_SUBST(INCLTDL)

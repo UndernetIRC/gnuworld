@@ -55,6 +55,7 @@ CXXCPP = @CXXCPP@
 CXXDEPMODE = @CXXDEPMODE@
 CXXFLAGS = @CXXFLAGS@
 CYGPATH_W = @CYGPATH_W@
+DB = @DB@
 DEFS = @DEFS@
 DEPDIR = @DEPDIR@
 ECHO = @ECHO@
@@ -143,7 +144,9 @@ sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 threadLib = @threadLib@
 topdir = @topdir@
-SUBDIRS = libgnuworld libltdl src @MOD_DIRS@ @TEST_DIR@ libircu
+SUBDIRS = libgnuworld libltdl src libircu \
+	@DB@ @MOD_DIRS@ @TEST_DIR@
+
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
