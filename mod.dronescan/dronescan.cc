@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: dronescan.cc,v 1.46 2004/01/16 00:57:37 dan_karrels Exp $
+ * $Id: dronescan.cc,v 1.47 2004/05/15 11:17:10 jeekay Exp $
  */
 
 #include	<string>
@@ -45,7 +45,7 @@
 #include "sqlUser.h"
 #include "Timer.h"
 
-RCSTAG("$Id: dronescan.cc,v 1.46 2004/01/16 00:57:37 dan_karrels Exp $");
+RCSTAG("$Id: dronescan.cc,v 1.47 2004/05/15 11:17:10 jeekay Exp $");
 
 namespace gnuworld {
 
@@ -151,14 +151,14 @@ for( testVarsType::const_iterator itr = testVars.begin() ;
 string sqlHost(dronescanConfig->Require("sqlHost")->second);
 string sqlPort(dronescanConfig->Require("sqlPort")->second);
 string sqlDB(dronescanConfig->Require("sqlDB")->second);
-string sqlUser(dronescanConfig->Require("sqlUser")->second);
+string sqlUsername(dronescanConfig->Require("sqlUser")->second);
 string sqlPass(dronescanConfig->Require("sqlPass")->second);
 
 std::stringstream connectString;
 connectString	<< "host=" << sqlHost << " "
 		<< "port=" << sqlPort << " "
 		<< "dbname=" << sqlDB << " "
-		<< "user=" << sqlUser << " "
+		<< "user=" << sqlUsername << " "
 		<< "password=" << sqlPass
 		;
 elog << "dronescan::dronescan> Connecting to SQL Server." << std::endl;
@@ -179,6 +179,19 @@ preloadUserCache();
 
 /* Initialise statistics */
 customDataCounter = 0;
+
+/* Setup fake oper record if necessary */
+unsigned short fakeOperLevel = atoi(dronescanConfig->Require("fakeOperLevel")->second.c_str());
+if( fakeOperLevel > 0 ) {
+	/* Create a fake record for opers to use */
+	fakeOperUser = new sqlUser(0);
+	fakeOperUser->setAccess(fakeOperLevel);
+	fakeOperUser->setFlags(0);
+	fakeOperUser->setLastUpdated(::time(0));
+	fakeOperUser->setLastUpdatedBy("Internal");
+} else {
+	fakeOperUser = 0;
+}
 
 /* Set up our timer. */
 theTimer = new Timer();
@@ -284,7 +297,7 @@ void dronescan::OnCTCP( iClient* theClient, const string& CTCP,
 	} else if("PING" == Command) {
 		DoCTCP(theClient, CTCP, Message);
 	} else if("VERSION" == Command) {
-		DoCTCP(theClient, CTCP, "GNUWorld DroneScan v0.0.9");
+		DoCTCP(theClient, CTCP, "GNUWorld DroneScan v0.0.9.1");
 	}
 
 	xClient::OnCTCP(theClient, CTCP, Message, Secure);
@@ -393,6 +406,15 @@ void dronescan::OnPrivateMessage( iClient* theClient,
 	const string& Message, bool )
 {
 	sqlUser *theUser = getSqlUser(theClient->getAccount());
+	
+	/* If the client is opered, we might have a fake account */
+	if( !theUser && theClient->isOper() && fakeOperUser ) {
+		theUser = fakeOperUser;
+		
+		fakeOperUser->setUserName(theClient->getNickName());
+		fakeOperUser->setCreated(::time(0));
+		fakeOperUser->setLastSeen(::time(0));
+	}
 
 	if(!theUser) return ;
 

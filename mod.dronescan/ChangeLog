@@ -1,3 +1,7 @@
+2004-05-15 0.0.9.1 Jeekay
+* Added ability to set a default access level for opers
+* Bumped version to 0.0.9.1
+
 2003-10-10 0.0.9 Jeekay
 * Removed return value from commands
 * Added automatic cache refresh

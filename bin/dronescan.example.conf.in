@@ -1,4 +1,4 @@
-# $Id: dronescan.example.conf.in,v 1.14 2003/10/12 22:48:54 jeekay Exp $
+# $Id: dronescan.example.conf.in,v 1.15 2004/05/15 11:17:09 jeekay Exp $
 # What nickname should the bot use?
 nickname = E
 
@@ -62,6 +62,11 @@ dcInterval = 600
 # caches from the database. The refreshes typically only trigger if any
 # data has actually changed.
 rcInterval = 300
+
+# The level that an opered client without an account should be assumed
+# to have.
+# If you wish this functionality to be disabled, set the level to 0.
+fakeOperLevel = 300
 
 ################
 # JOIN COUNTER #

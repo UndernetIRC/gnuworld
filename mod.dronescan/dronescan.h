@@ -16,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: dronescan.h,v 1.22 2003/12/29 23:59:38 dan_karrels Exp $
+ * $Id: dronescan.h,v 1.23 2004/05/15 11:17:10 jeekay Exp $
  */
 
 #ifndef DRONESCAN_H
-#define DRONESCAN_H "$Id: dronescan.h,v 1.22 2003/12/29 23:59:38 dan_karrels Exp $"
+#define DRONESCAN_H "$Id: dronescan.h,v 1.23 2004/05/15 11:17:10 jeekay Exp $"
 
 #include <map>
 
@@ -257,6 +257,9 @@ protected:
 	
 	/** How often to refresh caches. */
 	unsigned int rcInterval;
+	
+	/** Fake sqlUser record for opered clients without accounts. */
+	sqlUser *fakeOperUser;
 }; // class dronescan
 
 } // namespace ds

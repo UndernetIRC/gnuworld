@@ -43,6 +43,11 @@ created = atoi(SQLDb->GetValue(row, 6));
 bool sqlUser::commit()
 {
 
+/* Special case if we have no SQLDb
+ * ie if we are a fake user
+ */
+if( !SQLDb ) { return true; }
+
 stringstream queryString;
 queryString	<< "UPDATE users SET "
 		<< "last_seen = " << last_seen << ", "
