@@ -17,7 +17,7 @@
  */
 
 #ifndef __SERVER_H
-#define __SERVER_H "$Id: server.h,v 1.61 2002/05/23 19:41:32 dan_karrels Exp $"
+#define __SERVER_H "$Id: server.h,v 1.62 2002/05/23 20:32:06 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
@@ -46,17 +46,15 @@
 
 #ifdef GNU_EXTENSIONS
  #include       <ext/hash_map>
- using __gnu_cxx::hash_map ;
- using __gnu_cxx::hash ;
 #else
  #include       <hash_map>
- using std::hash_map ;
- using std::hash ;
 #endif
 
 namespace gnuworld
 {
 
+using HASHMAPNS::hash ;
+using HASHMAPNS::hash_map ;
 using std::string ;
 using std::list ;
 using std::vector ;

@@ -1,10 +1,10 @@
 /* Network.h
  * Author: Daniel Karrels (dan@karrels.com)
- * $Id: Network.h,v 1.28 2002/05/23 19:41:32 dan_karrels Exp $
+ * $Id: Network.h,v 1.29 2002/05/23 20:32:06 dan_karrels Exp $
  */
 
 #ifndef __NETWORK_H
-#define __NETWORK_H "$Id: Network.h,v 1.28 2002/05/23 19:41:32 dan_karrels Exp $"
+#define __NETWORK_H "$Id: Network.h,v 1.29 2002/05/23 20:32:06 dan_karrels Exp $"
 
 #include	<vector>
 #include	<string>
@@ -23,17 +23,15 @@
 
 #ifdef GNU_EXTENSIONS
  #include	<ext/hash_map>
- using __gnu_cxx::hash_map ;
- using __gnu_cxx::hash ;
 #else
  #include	<hash_map>
- using std::hash_map ;
- using std::hash ;
 #endif
 
 namespace gnuworld
 {
 
+using HASHMAPNS::hash_map ;
+using HASHMAPNS::hash ;
 using std::string ;
 using std::vector ;
 using std::map ;

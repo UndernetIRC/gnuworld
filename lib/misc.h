@@ -1,11 +1,11 @@
 /* misc.h
  * Author: Daniel Karrels (dan@karrels.com
- * $Id: misc.h,v 1.17 2002/05/23 19:41:32 dan_karrels Exp $
+ * $Id: misc.h,v 1.18 2002/05/23 20:32:06 dan_karrels Exp $
  * Purpose: This file contains a few miscellaneous methods.
  */
 
 #ifndef __MISC_H
-#define __MISC_H "$Id: misc.h,v 1.17 2002/05/23 19:41:32 dan_karrels Exp $"
+#define __MISC_H "$Id: misc.h,v 1.18 2002/05/23 20:32:06 dan_karrels Exp $"
 
 #include	<string>
 
@@ -28,6 +28,8 @@
 namespace gnuworld
 {
 
+using HASHMAPNS::hash ;
+using HASHMAPNS::hash_map ;
 using std::string ;
 
 /**

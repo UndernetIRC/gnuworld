@@ -10646,14 +10646,45 @@ echo "${ECHO_T}yes" >&6
 
 CXXFLAGS="$CXXFLAGS -I`pwd`/include -I`pwd`/lib"
 
+hashMapFile=
+
 if test -f "/usr/include/g++/ext/hash_map" ; then
+	hashMapFile="/usr/include/g++/ext/hash_map"
 	cat >>confdefs.h <<\_ACEOF
 #define GNU_EXTENSIONS 1
 _ACEOF
 
 elif test -f "/usr/local/include/g++/ext/hash_map"; then
+	hashMapFile="usr/local/include/g++/ext/hash_map";
 	cat >>confdefs.h <<\_ACEOF
 #define GNU_EXTENSIONS 1
+_ACEOF
+
+fi
+
+gccVersion=`\gcc -v 2>&1 | \tail -1 | \cut -d" " -f3`
+
+gccMajor=`echo $gccVersion | \cut -d"." -f1`
+
+if test "$gccMajor" = "3"; then
+	# 3.0.x have ext/hash_map, but std namespace
+	gccMid=`echo $gccVersion | \cut -d"." -f2`
+
+	if test "$gccMid" = "0"; then
+		cat >>confdefs.h <<\_ACEOF
+#define HASHMAPNS std
+_ACEOF
+
+	else
+		# 3.1 or above
+		cat >>confdefs.h <<\_ACEOF
+#define HASHMAPNS __gnu_cxx
+_ACEOF
+
+	fi
+else
+	cat >>confdefs.h <<\_ACEOF
+#define HASHMAPNS std
 _ACEOF
 
 fi

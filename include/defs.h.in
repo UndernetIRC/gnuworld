@@ -1,6 +1,6 @@
 /* include/defs.h.in.  Generated automatically from configure.in by autoheader.  */
 #ifndef __DEFS_H
-#define __DEFS_H "$Id: defs.h.in,v 1.4 2002/05/23 19:41:32 dan_karrels Exp $"
+#define __DEFS_H "$Id: defs.h.in,v 1.5 2002/05/23 20:32:06 dan_karrels Exp $"
 
 /* Define to `unsigned int' if <sys/types.h> doesn't define.  */
 #undef size_t
@@ -13,5 +13,6 @@
 #undef HAVE_SYS_FILIO_H
 
 #undef GNU_EXTENSIONS
+#undef HASHMAPNS
 
 #endif // __DEFS_H
