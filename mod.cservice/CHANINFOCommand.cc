@@ -13,7 +13,7 @@
  *
  * Command is aliased "INFO".
  *
- * $Id: CHANINFOCommand.cc,v 1.41 2002/03/13 22:21:43 gte Exp $
+ * $Id: CHANINFOCommand.cc,v 1.42 2002/03/17 00:22:57 gte Exp $
  */
 
 #include	<string>
@@ -26,7 +26,7 @@
 #include	"libpq++.h"
 #include	"cservice_config.h"
 
-const char CHANINFOCommand_cc_rcsId[] = "$Id: CHANINFOCommand.cc,v 1.41 2002/03/13 22:21:43 gte Exp $" ;
+const char CHANINFOCommand_cc_rcsId[] = "$Id: CHANINFOCommand.cc,v 1.42 2002/03/17 00:22:57 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -335,6 +335,8 @@ if( PGRES_TUPLES_OK == status )
 			bot->prettyDuration(atoi(bot->SQLDb->GetValue(i, 3))).c_str());
 		} // for()
 	}
+
+if(theChan->getFlag(sqlChannel::F_SPECIAL)) return true;
 
 if( !theChan->getDescription().empty() )
 	{
