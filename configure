@@ -11020,6 +11020,8 @@ elif test -f "/usr/include/postgresql/libpq++.h"; then
 	PGSQL_INCLUDE=/usr/include/postgresql
 elif test -f "/usr/include/pgsql/libpq++.h"; then
 	PGSQL_INCLUDE=/usr/include/pgsql
+elif test -f "/usr/include/libpq++.h"; then
+	PGSQL_INCLUDE=/usr/include
 else
         { { echo "$as_me:$LINENO: error: Unable to find libpq++.h " >&5
 echo "$as_me: error: Unable to find libpq++.h " >&2;}
