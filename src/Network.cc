@@ -6,7 +6,7 @@
 #include	<iostream>
 #include	<string>
 #include	<list>
-#include	<hash_map>
+#include	<hash_map.h>
 #include	<algorithm>
 
 #include	<cassert>
@@ -23,7 +23,7 @@
 #include	"StringTokenizer.h"
 
 const char xNetwork_h_rcsId[] = __NETWORK_H ;
-const char xNetwork_cc_rcsId[] = "$Id: Network.cc,v 1.29 2001/08/12 02:11:55 dan_karrels Exp $" ;
+const char xNetwork_cc_rcsId[] = "$Id: Network.cc,v 1.30 2001/09/23 02:38:37 gte Exp $" ;
 const char ELog_h_rcsId[] = __ELOG_H ;
 const char iClient_h_rcsId[] = __ICLIENT_H ;
 const char Channel_h_rcsId[] = __CHANNEL_H ;
@@ -90,7 +90,7 @@ while( XXX >= clients[ YY ].size() )
 if( clients[ YY ][ XXX ] != NULL )
 	{
 	// Numeric collission
-	elog	<< "xNetwork::addClient> Numeric collision: " 
+	elog	<< "xNetwork::addClient> Numeric collision: "
 		<< newClient->getCharYYXXX()
 		<< endl ;
 
@@ -541,7 +541,7 @@ for( clientVectorType::size_type i = 0 ; i < clients[ YY ].size() ; i++ )
 	removeNick( theClient->getNickName() ) ;
 	delete theClient ;
 	clients[ YY ][ i ] = NULL ;
-	}	
+	}
 
 // Clear the client vector associated with this server
 clients[ YY ].clear() ;
@@ -625,7 +625,7 @@ theServer->PostEvent( EVT_CHNICK,
 
 void xNetwork::addNick( iClient* theClient )
 {
-// This is a protected method, theClient is guaranteed to 
+// This is a protected method, theClient is guaranteed to
 // be non-NULL
 if( !nickMap.insert( nickMapType::value_type(
 	theClient->getNickName(), theClient ) ).second )

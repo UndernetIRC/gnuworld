@@ -4,10 +4,10 @@
  */
 
 #ifndef __MISC_H
-#define __MISC_H "$Id: misc.h,v 1.12 2001/06/11 21:40:07 dan_karrels Exp $"
+#define __MISC_H "$Id: misc.h,v 1.13 2001/09/23 02:42:38 gte Exp $"
 
-#include	<string>
-#include	<hash_map>
+#include	<string.h>
+#include	<hash_map.h>
 
 #include	<unistd.h>
 
