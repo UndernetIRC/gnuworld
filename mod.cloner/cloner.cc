@@ -52,6 +52,15 @@ cloner::cloner( const string& configFileName )
 EConfig conf( configFileName ) ;
 
 cloneDescription = conf.Require( "clonedescription" )->second ;
+fakeServerName = conf.Require( "fakeservername" )->second ;
+
+cloneBurstCount = atoi( conf.Require( "cloneburstcount" )->second.c_str() ) ;
+if( cloneBurstCount < 1 )
+	{
+	elog	<< "cloner> cloneBurstCount must be at least 1"
+		<< endl ;
+	::exit( 0 ) ;
+	}
 
 EConfig::const_iterator ptr = conf.Find( "fakehost" ) ;
 while( ptr != conf.end() && ptr->first == "fakehost" )
@@ -64,7 +73,7 @@ if( hostNames.empty() )
 	{
 	elog	<< "cloner> Must specify at least one hostname"
 		<< endl ;
-	exit( 0 ) ;
+	::exit( 0 ) ;
 	}
 
 ptr = conf.Find( "fakeuser" ) ;
@@ -78,10 +87,32 @@ if( userNames.empty() )
 	{
 	elog	<< "cloner> Must specify at least one username"
 		<< endl ;
-	exit( 0 ) ;
+	::exit( 0 ) ;
 	}
 
-fakeServerName = conf.Require( "fakeservername" )->second ;
+makeCloneCount = 0 ;
+
+minNickLength = atoi( conf.Require( "minnicklength" )->second.c_str() ) ;
+maxNickLength = atoi( conf.Require( "maxnicklength" )->second.c_str() ) ;
+
+if( minNickLength < 1 )
+	{
+	elog	<< "cloner> minNickLength must be at least 1"
+		<< endl ;
+	::exit( 0 );
+	}
+if( maxNickLength > 9 )
+	{
+	elog	<< "cloner> maxNickLength cannot exceed 9"
+		<< endl ;
+	::exit( 0 ) ;
+	}
+if( maxNickLength <= minNickLength )
+	{
+	elog	<< "cloner> minNickLength must be less than maxNickLength"
+		<< endl ;
+	::exit( 0 ) ;
+	}
 }
 
 cloner::~cloner()
@@ -130,13 +161,20 @@ if( command == "LOADCLONES" )
 		}
 
 	int numClones = atoi( st[ 1 ].c_str() ) ;
-
-	for( int i = 0 ; i < numClones ; i++ )
+	if( numClones < 1 )
 		{
-		addClone() ;
+		Notice( theClient,
+			"LOADCLONES: Invalid number of clones" ) ;
+		return 0 ;
 		}
 
-	Notice( theClient, "Added %d clones", numClones ) ;
+	if( 0 == makeCloneCount )
+		{
+		MyUplink->RegisterTimer( ::time( 0 ), this, 0 ) ;
+		}
+
+	makeCloneCount += static_cast< size_t >( numClones ) ;
+	Notice( theClient, "Queuing %d clones", numClones ) ;
 
 	}
 else if( command == "JOINALL" )
@@ -197,6 +235,35 @@ else if( command == "PARTALL" )
 return 0 ;
 }
 
+int cloner::OnTimer( xServer::timerID, void* )
+{
+if( 0 == makeCloneCount )
+	{
+	return -1 ;
+	}
+
+size_t cloneCount = makeCloneCount ;
+if( cloneCount > cloneBurstCount )
+	{
+	// Too many
+	cloneCount = cloneBurstCount ;
+	}
+
+makeCloneCount -= cloneCount ;
+
+for( size_t i = 0 ; i < cloneCount ; ++i )
+	{
+	addClone() ;
+	}
+
+if( makeCloneCount > 0 )
+	{
+	MyUplink->RegisterTimer( ::time( 0 ) + 1, this, 0 ) ;
+	}
+
+return 0 ;
+}
+
 void cloner::addClone()
 {
 
@@ -212,7 +279,7 @@ yyxxx += buf ;
 iClient* newClient = new iClient(
 		fakeServer->getIntYY(),
 		yyxxx,
-		randomNick( 5 ),
+		randomNick( minNickLength, maxNickLength ),
 		randomUser(),
 		randomNick( 6, 6 ),
 		randomHost(),
