@@ -4,6 +4,7 @@
  * Jupitur a  server
  */
 
+#include	<new>
 #include	<string>
 #include        <iomanip>
 
@@ -14,7 +15,7 @@
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 
-const char JUPECommand_cc_rcsId[] = "$Id: JUPECommand.cc,v 1.9 2001/07/23 10:28:51 mrbean_ Exp $";
+const char JUPECommand_cc_rcsId[] = "$Id: JUPECommand.cc,v 1.10 2001/07/29 22:44:06 dan_karrels Exp $";
 
 namespace gnuworld
 {
@@ -47,7 +48,7 @@ bot->MsgChanLog("%s is asking me to jupe %s because : %s\n",theClient->getCharYY
 // already juped.
 //server->SquitServer( st[ 1 ], "Prepare to be juped" ) ;
 
-iServer* jupeServer = new (nothrow) iServer(
+iServer* jupeServer = new (std::nothrow) iServer(
 	0, // uplinkIntYY
 	"", // charYYXXX
 	st[ 1 ],

@@ -11,15 +11,17 @@
 #warning --
 #warning --
 
-#include	<vector.h>
-#include	<iostream.h>
-#include	<strstream.h>
-#include	<string.h>
+#include	<new>
+#include	<vector>
+#include	<iostream>
+#include	<strstream>
+#include	<string>
 
 #include	<ctime>
 #include	<cstdlib>
-
-#include	"client.h"
+#include	<cstring>
+ 
+#include	"client.h" 
 #include  	"cservice.h"
 #include	"EConfig.h"
 #include	"events.h"
@@ -211,9 +213,8 @@ RegisterCommand(new SERVNOTICECommand(this, "SERVNOTICE", "<#channel> <text>", 5
 RegisterCommand(new SAYCommand(this, "SAY", "<#channel> <text>", 5));
 RegisterCommand(new QUOTECommand(this, "QUOTE", "<text>", 5));
 RegisterCommand(new REHASHCommand(this, "REHASH", "[translations]", 5));
-
-//-- Load in our cservice configuration file.
-cserviceConfig = new (nothrow) EConfig( args ) ;
+ 
+cserviceConfig = new (std::nothrow) EConfig( args ) ;
 assert( cserviceConfig != 0 ) ;
 
 confSqlHost = cserviceConfig->Require( "sql_host" )->second;
@@ -228,8 +229,8 @@ elog	<< "cmaster::cmaster> Attempting to connect to "
 	<< "; Database: "
 	<< confSqlDb
 	<< endl;
-
-SQLDb = new (nothrow) cmDatabase( Query.c_str() ) ;
+ 
+SQLDb = new (std::nothrow) cmDatabase( Query.c_str() ) ;
 assert( SQLDb != 0 ) ;
 
 //-- Make sure we connected to the SQL database; if we didn't we exit entirely.
@@ -324,7 +325,8 @@ if( PGRES_TUPLES_OK == status )
 		{
  		/* Add this information to the channel cache. */
 
-		sqlChannel* newChan = new (nothrow) sqlChannel(SQLDb);
+		sqlChannel* newChan = new (std::nothrow)
+			sqlChannel(SQLDb);
 		assert( newChan != 0 ) ;
 
 		newChan->setAllMembers(i);
@@ -907,7 +909,7 @@ if(ptr != sqlUserCache.end())
  *  the backend and create a new sqlUser object.
  */
 
-sqlUser* theUser = new (nothrow) sqlUser(SQLDb);
+sqlUser* theUser = new (std::nothrow) sqlUser(SQLDb);
 assert( theUser != 0 ) ;
 
 if (theUser->loadData(id))
@@ -962,7 +964,7 @@ if(ptr != sqlBanCache.end())
  *  If we find no bans.. return a new blank container.
  */
 
-vector<sqlBan*>* banList = new (nothrow) vector<sqlBan*>;
+vector<sqlBan*>* banList = new (std::nothrow) vector<sqlBan*>;
 assert( banList != 0 ) ;
 
 /*
@@ -987,8 +989,8 @@ delete[] theQuery.str() ;
 if( PGRES_TUPLES_OK == status )
 	{
 	for (int i = 0 ; i < SQLDb->Tuples(); i++)
-		{
-		sqlBan* newBan = new (nothrow) sqlBan(SQLDb);
+		{ 
+		sqlBan* newBan = new (std::nothrow) sqlBan(SQLDb);
 		assert( newBan != 0 ) ;
 
 		newBan->setAllMembers(i);
@@ -1047,7 +1049,7 @@ if(ptr != sqlChannelCache.end())
  *  the backend and create a new sqlUser object.
  */
 
-sqlChannel* theChan = new (nothrow) sqlChannel(SQLDb);
+sqlChannel* theChan = new (std::nothrow) sqlChannel(SQLDb);
 assert( theChan != 0 ) ;
 
 if (theChan->loadData(id))
@@ -1101,7 +1103,7 @@ if(ptr != sqlChannelIDCache.end())
  *  the backend and create a new sqlUser object.
  */
 
-sqlChannel* theChan = new (nothrow) sqlChannel(SQLDb);
+sqlChannel* theChan = new (std::nothrow) sqlChannel(SQLDb);
 assert( theChan != 0 ) ;
 
 if (theChan->loadData(id))
@@ -1151,7 +1153,7 @@ if(ptr != sqlLevelCache.end())
  *  the backend and create a new sqlUser object.
  */
 
-sqlLevel* theLevel = new (nothrow) sqlLevel(SQLDb);
+sqlLevel* theLevel = new (std::nothrow) sqlLevel(SQLDb);
 assert( theLevel != 0 ) ;
 
 if (theLevel->loadData(theUser->getID(), theChan->getID()))
@@ -1999,7 +2001,7 @@ switch(updateType)
 				/* Not in the cache.. must be a new channel. */
 				/* Create new channel record, insert in cache. */
 				sqlChannel* newChan =
-					new (nothrow) sqlChannel(SQLDb);
+					new (std::nothrow) sqlChannel(SQLDb);
 				assert( newChan != 0 ) ;
 
 				newChan->setAllMembers(i);
@@ -2563,7 +2565,7 @@ switch( theEvent )
 
 		iClient* tmpUser =
 			static_cast< iClient* >( data1 );
-		networkData* newData = new (nothrow) networkData();
+		networkData* newData = new (std::nothrow) networkData(); 
 		assert( newData != 0 ) ;
 
 		customDataAlloc++;
@@ -3150,7 +3152,7 @@ vector< sqlBan* >* banList = getBanRecords(theChan);
  */
 
 /* Create a new Ban record */
-sqlBan* newBan = new (nothrow) sqlBan(SQLDb);
+sqlBan* newBan = new (std::nothrow) sqlBan(SQLDb);
 assert( newBan != 0 ) ;
 
 string banTarget = Channel::createBan(theClient);
@@ -3510,11 +3512,10 @@ void cservice::checkDbConnectionStatus()
 
 		/* Remove the old database connection object. */
 		delete(SQLDb);
-
-		string Query = "host=" + confSqlHost + " dbname=" + confSqlDb + " port=" + confSqlPort + " user=" + confSqlUser;
-
-		SQLDb = new (nothrow) cmDatabase( Query.c_str() ) ;
-
+	
+		string Query = "host=" + confSqlHost + " dbname=" + confSqlDb + " port=" + confSqlPort + " user=" + confSqlUser; 
+	
+		SQLDb = new (std::nothrow) cmDatabase( Query.c_str() ) ;
 		assert( SQLDb != 0 ) ;
 
 		if (SQLDb->ConnectionBad())

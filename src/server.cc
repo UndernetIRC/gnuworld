@@ -14,7 +14,7 @@
 #include	<algorithm>
 #include	<strstream>
 #include	<stack>
-#include	<pair.h>
+#include	<iostream>
 
 #include	<sys/time.h>
 #include	<unistd.h>
@@ -47,9 +47,10 @@
 #include	"ServerTimerHandlers.h"
 #include	"LoadClientTimerHandler.h"
 #include	"UnloadClientTimerHandler.h"
+#include	"pair.h"
 
 const char server_h_rcsId[] = __SERVER_H ;
-const char server_cc_rcsId[] = "$Id: server.cc,v 1.113 2001/07/21 15:06:24 isomer Exp $" ;
+const char server_cc_rcsId[] = "$Id: server.cc,v 1.114 2001/07/29 22:44:06 dan_karrels Exp $" ;
 const char config_h_rcsId[] = __CONFIG_H ;
 const char misc_h_rcsId[] = __MISC_H ;
 const char events_h_rcsId[] = __EVENTS_H ;
@@ -80,6 +81,9 @@ using std::ends ;
 using std::strstream ;
 using std::stack ;
 using std::unary_function ;
+using std::clog ;
+using std::cout ;
+using std::min ;
 
 // The object containing the network data structures
 xNetwork*	Network = 0 ;
@@ -134,7 +138,7 @@ elog << "xServer::charXXX> " << charXXX << endl ;
 elog << "xServer::intYY> " << intYY << endl ;
 elog << "xServer::intXXX> " << intXXX << endl ;
 
-iServer* me = new (nothrow) iServer(
+iServer* me = new (std::nothrow) iServer(
 	0,
 	getCharYYXXX(),
 	ServerName,
@@ -210,7 +214,7 @@ void xServer::loadCommandHandlers()
 {
 
 // Allocate the command map
-commandMap = new (nothrow) commandMapType ;
+commandMap = new (std::nothrow) commandMapType ;
 assert( commandMap != 0 ) ;
 
 // Register messages
@@ -384,7 +388,7 @@ glineUpdateInterval = pingUpdateInterval = 0 ;
 ::memset( charYY, 0, sizeof( charYY ) ) ;
 ::memset( charXXX, 0, sizeof( charXXX ) ) ;
 
-Network = new (nothrow) xNetwork ;
+Network = new (std::nothrow) xNetwork ;
 assert( Network != 0 ) ;
 
 Network->setServer( this ) ;
@@ -541,7 +545,7 @@ if( static_cast< int >( outputWriteSize ) < 0 )
 	return -1 ;
 	}
 
-inputCharBuffer = new (nothrow) char[ inputReadSize + 1 ] ;
+inputCharBuffer = new (std::nothrow) char[ inputReadSize + 1 ] ;
 assert( inputCharBuffer != 0 ) ;
 
 // Notify the curious user of the TCP window sizes.
@@ -1480,7 +1484,7 @@ Client->ImplementServer( this ) ;
 // TODO: Remove any existing iClient from the xClient
 
 // Create a new iClient representation for this xClient
-iClient* theIClient = new (nothrow) iClient(
+iClient* theIClient = new (std::nothrow) iClient(
 	getIntYY(),
 	Client->getCharYYXXX(),
 	Client->getNickName(),
@@ -1532,7 +1536,7 @@ bool xServer::AttachClient( const string& moduleName,
 
 // Create a moduleLoader instance, based on the given moduleName
 moduleLoader< xClient* >* ml =
-	new (nothrow) moduleLoader< xClient* >( moduleName ) ;
+	new (std::nothrow) moduleLoader< xClient* >( moduleName ) ;
 assert( ml != 0 ) ;
 
 // Attempt to instantiate an xClient instance from the module
@@ -1662,7 +1666,7 @@ elog	<< "xServer::LoadClient("
 //UnloadClient( moduleName ) ;
 
 // Next, queue the load request
-LoadClientTimerHandler* handler = new (nothrow)
+LoadClientTimerHandler* handler = new (std::nothrow)
 	LoadClientTimerHandler( this, moduleName, configFileName ) ;
 assert( handler != 0 ) ;
 
@@ -1675,7 +1679,7 @@ elog	<< "xServer::UnloadClient(const string&)> "
 	<< moduleName
 	<< endl ;
 
-UnloadClientTimerHandler* handler = new (nothrow)
+UnloadClientTimerHandler* handler = new (std::nothrow)
 	UnloadClientTimerHandler( this, moduleName ) ;
 assert( handler != 0 ) ;
 
@@ -2031,7 +2035,7 @@ bool xServer::setGline(
 removeMatchingGlines( userHost ) ;
 
 Gline* newGline =
-	new (nothrow) Gline( setBy, userHost, reason, duration ) ;
+	new (std::nothrow) Gline( setBy, userHost, reason, duration ) ;
 assert( newGline != 0 ) ;
 
 // Notify the rest of the network
@@ -2279,7 +2283,7 @@ if( (NULL == theChan) && bursting )
 	delete[] s.str() ;
 
 	// Instantiate the new channel
-	theChan = new (nothrow) Channel( chanName, time( 0 ) ) ;
+	theChan = new (std::nothrow) Channel( chanName, time( 0 ) ) ;
 	assert( theChan != 0 ) ;
 
 	// Add it to the network channel table
@@ -2335,7 +2339,7 @@ else if( NULL == theChan )
 		}
 
 	// Instantiate the new channel
-	theChan = new (nothrow) Channel( chanName, time( 0 ) ) ;
+	theChan = new (std::nothrow) Channel( chanName, time( 0 ) ) ;
 	assert( theChan != 0 ) ;
 
 	// Add it to the network channel table
@@ -2547,7 +2551,7 @@ iClient* theIClient = theClient->getInstance() ;
 theIClient->addChannel( theChan ) ;
 
 // Create a new ChannelUser instance for the channel's records
-ChannelUser* theChanUser = new (nothrow) ChannelUser( theIClient ) ;
+ChannelUser* theChanUser = new (std::nothrow) ChannelUser( theIClient ) ;
 
 // Make sure the allocation was successful
 assert( theChanUser != 0 ) ;
@@ -2666,7 +2670,7 @@ timerID ID = getUniqueTimerID() ;
 
 // Allocate a timerInfo structure to represent this timer
 timerInfo* ti =
-	new (nothrow) timerInfo( ID, absTime, theHandler, data ) ;
+	new (std::nothrow) timerInfo( ID, absTime, theHandler, data ) ;
 assert( ti != 0 ) ;
 
 // Add this timerInfo structure to the timerQueue

@@ -14,7 +14,7 @@
 #include	"Network.h"
 #include	"ELog.h"
 
-const char msg_N_cc_rcsId[] = "$Id: msg_N.cc,v 1.2 2001/05/21 16:35:34 dan_karrels Exp $" ;
+const char msg_N_cc_rcsId[] = "$Id: msg_N.cc,v 1.3 2001/07/29 22:44:06 dan_karrels Exp $" ;
 const char iClient_h_rcsId[] = __ICLIENT_H ;
 const char events_h_rcsId[] = __EVENTS_H ;
 const char ip_h_rcsId[] = __IP_H ;
@@ -86,7 +86,7 @@ if( params.size() > 9 )
 	description = params[ 9 ];
 	}
 
-iClient* newClient = new (nothrow) iClient(
+iClient* newClient = new (std::nothrow) iClient(
 		nickUplink->getIntYY(),
 		yyxxx,
 		params[ 1 ], // nickname

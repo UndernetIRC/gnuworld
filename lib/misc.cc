@@ -7,11 +7,12 @@
 #include	<cstdio>
 #include	<cstdlib>
 #include	<cstdarg>
+#include	<cstring>
 
 #include	"misc.h"
 
 const char Misc_h_rcsId[] = __MISC_H ;
-const char Misc_cc_rcsId[] = "$Id: misc.cc,v 1.7 2001/06/11 21:40:07 dan_karrels Exp $" ;
+const char Misc_cc_rcsId[] = "$Id: misc.cc,v 1.8 2001/07/29 22:44:06 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -112,7 +113,7 @@ return true ;
 
 int strcasecmp( const string& s1, const string& s2 )
 {
-return std::strcasecmp( s1.c_str(), s2.c_str() ) ;
+return ::strcasecmp( s1.c_str(), s2.c_str() ) ;
 }
 
 size_t countChar( const string& s, const char& findMe )

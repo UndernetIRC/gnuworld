@@ -5,10 +5,13 @@
  */
 
 #ifndef __BUFFER_H
-#define __BUFFER_H "$Id: Buffer.h,v 1.2 2001/01/06 19:46:35 dan_karrels Exp $"
+#define __BUFFER_H "$Id: Buffer.h,v 1.3 2001/07/29 22:44:06 dan_karrels Exp $"
 
 #include	<iostream>
 #include	<string>
+
+namespace gnuworld
+{
 
 using std::basic_string ;
 
@@ -102,7 +105,7 @@ public:
 	 * This method is const, and therefore does not alter the
 	 * Buffer.
 	 */
-	inline string	substr( const size_type& index,
+	inline basic_string< charType >	substr( const size_type& index,
 				const size_type& len ) const
 		{ return buf.substr( index, len ) ; }
 
@@ -194,6 +197,8 @@ protected:
 	charType			delim ;
 
 } ;
+
+} // namespace gnuworld
 
 #include	"Buffer.cc"
 

@@ -1,7 +1,7 @@
 /* ELog.h */
 
 #ifndef __ELOG_H
-#define __ELOG_H "$Id: ELog.h,v 1.3 2001/03/29 21:54:32 dan_karrels Exp $"
+#define __ELOG_H "$Id: ELog.h,v 1.4 2001/07/29 22:44:06 dan_karrels Exp $"
 
 #include	<strstream>
 #include	<iostream>
@@ -91,8 +91,9 @@ public:
 
 	/**
 	 * Return true if an output log file is open, false otherwise.
+	 * For some reason, std::fstream::is_open() is not const.
 	 */
-	inline bool isOpen() const
+	inline bool isOpen()
 		{ return outFile.is_open() ; }
 #endif
 

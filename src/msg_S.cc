@@ -14,7 +14,7 @@
 #include	"ELog.h"
 #include	"xparameters.h"
 
-const char msg_S_cc_rcsId[] = "$Id: msg_S.cc,v 1.3 2001/05/18 15:27:10 dan_karrels Exp $" ;
+const char msg_S_cc_rcsId[] = "$Id: msg_S.cc,v 1.4 2001/07/29 22:44:06 dan_karrels Exp $" ;
 const char server_h_rcsId[] = __SERVER_H ;
 const char events_h_rcsId[] = __EVENTS_H ;
 const char Network_h_rcsId[] = __NETWORK_H ;
@@ -103,7 +103,7 @@ if( NULL != Network->findServer( serverIntYY ) )
 
 // Dun really care about the server description
 
-iServer* newServer = new (nothrow) iServer( uplinkIntYY,
+iServer* newServer = new (std::nothrow) iServer( uplinkIntYY,
 		params[ 6 ], // yxx
 		serverName,
 		connectTime ) ;

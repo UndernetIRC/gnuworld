@@ -8,13 +8,14 @@
 #include	"ELog.h"
 
 const char ELog_h_rcsId[] = __ELOG_H ;
-const char ELog_cc_rcsId[] = "$Id: ELog.cc,v 1.3 2001/03/31 01:26:10 dan_karrels Exp $" ;
+const char ELog_cc_rcsId[] = "$Id: ELog.cc,v 1.4 2001/07/29 22:44:06 dan_karrels Exp $" ;
 const char config_h_rcsId[] = __CONFIG_H ;
 
 namespace gnuworld
 {
 
 using std::string ;
+using std::endl ;
 
 ELog::ELog()
  : outStream( 0 )

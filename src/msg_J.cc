@@ -17,7 +17,7 @@
 #include	"ELog.h"
 #include	"StringTokenizer.h"
 
-const char msg_J_cc_rcsId[] = "$Id: msg_J.cc,v 1.10 2001/06/23 16:27:52 dan_karrels Exp $" ;
+const char msg_J_cc_rcsId[] = "$Id: msg_J.cc,v 1.11 2001/07/29 22:44:06 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -91,7 +91,7 @@ for( StringTokenizer::size_type i = 0 ; i < st.size() ; i++ )
 	// Attempt to allocate a ChannelUser structure for this
 	// user<->channel association
 	ChannelUser* theUser =
-		new (nothrow) ChannelUser( Target ) ;
+		new (std::nothrow) ChannelUser( Target ) ;
 	assert( theUser != 0 ) ;
 
 	// This variable represents which event actually occurs
@@ -106,7 +106,8 @@ for( StringTokenizer::size_type i = 0 ; i < st.size() ; i++ )
 		// Nope, this transmutes to a CREATE
 		// Create a new Channel to represent this
 		// network channel
-		theChan = new (nothrow) Channel( st[ i ], ::time( 0 ) ) ;
+		theChan = new (std::nothrow)
+			Channel( st[ i ], ::time( 0 ) ) ;
 		assert( theChan != 0 ) ;
 
 		// Add the channel to the network tables

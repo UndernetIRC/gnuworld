@@ -12,7 +12,7 @@
 #include	"ELog.h"
 #include	"xparameters.h"
 
-const char msg_GL_cc_rcsId[] = "$Id: msg_GL.cc,v 1.2 2001/05/13 00:26:01 dan_karrels Exp $" ;
+const char msg_GL_cc_rcsId[] = "$Id: msg_GL.cc,v 1.3 2001/07/29 22:44:06 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -64,7 +64,7 @@ if( '-' == Params[ 2 ][ 0 ] )
 	}
 
 // Else, adding a gline
-Gline* newGline = new (nothrow) Gline(
+Gline* newGline = new (std::nothrow) Gline(
 	Params[ 0 ],
 	Params[ 2 ] + 1,
 	Params[ 4 ],

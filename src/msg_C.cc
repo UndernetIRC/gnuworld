@@ -4,7 +4,6 @@
 
 #include	<new>
 #include	<string>
-#include	<pair.h>
 
 #include	<cassert>
 
@@ -19,8 +18,9 @@
 #include	"iClient.h"
 #include	"Channel.h"
 #include	"ChannelUser.h"
+#include	"pair.h"
 
-const char msg_C_cc_rcsId[] = "$Id: msg_C.cc,v 1.4 2001/06/23 16:27:52 dan_karrels Exp $" ;
+const char msg_C_cc_rcsId[] = "$Id: msg_C.cc,v 1.5 2001/07/29 22:44:06 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -92,7 +92,8 @@ for( StringTokenizer::const_iterator ptr = st.begin() ; ptr != st.end() ;
 	if( NULL == theChan )
 		{
 		// Channel doesn't exist..this transmutes to a create
-		theChan = new (nothrow) Channel( *ptr, creationTime ) ;
+		theChan = new (std::nothrow)
+			Channel( *ptr, creationTime ) ;
 		assert( theChan != 0 ) ;
 
 		// Add this channel to the network channel table
@@ -127,7 +128,7 @@ for( StringTokenizer::const_iterator ptr = st.begin() ; ptr != st.end() ;
 	// Create a new ChannelUser to represent this iClient's
 	// membership in this channel.
 	ChannelUser* theUser =
-		new (nothrow) ChannelUser( theClient ) ;
+		new (std::nothrow) ChannelUser( theClient ) ;
 	assert( theUser != 0 ) ;
 
 	// The user who creates a channel is automatically +o

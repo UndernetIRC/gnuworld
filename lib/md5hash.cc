@@ -1,6 +1,6 @@
 /*************************************************************************
  * $Workfile: MD5.CPP $
- * $Revision: 1.1 $
+ * $Revision: 1.2 $
  *  $Modtime: 1/08/97 6:35p $
  *
  * PURPOSE:
@@ -52,8 +52,8 @@
  * 
  * So there! 
  ************************************************************************/
-#include <string.h>     // Needed for memcpy() and memset().
-#include <iostream.h>   // Needed for ostream and istream.
+#include <iostream>   // Needed for ostream and istream.
+#include <cstring>     // Needed for memcpy() and memset().
 #include "md5hash.h"
 
 namespace gnuworld {
@@ -162,20 +162,22 @@ operator!=( const md5Digest &lhs, const md5Digest &rhs )
    return !( lhs == rhs );
 }
 
-istream& 
-operator>>( istream& stream, md5Digest& digest )
+std::istream& 
+operator>>( std::istream& stream, md5Digest& digest )
 {
-   stream.read( digest.m_data, MD5_DIGEST_LENGTH );
+   stream.read( reinterpret_cast< char* >( digest.m_data ),
+	MD5_DIGEST_LENGTH );
 //   for( int ii = 0; ii < MD5_DIGEST_LENGTH; ii++ ) {
 //      stream >> digest.m_data[ii];
 //   }
    return stream;
 }
 
-ostream& 
-operator<<( ostream& stream, const md5Digest& digest )
+std::ostream& 
+operator<<( std::ostream& stream, const md5Digest& digest )
 {
-   stream.write( digest.m_data, MD5_DIGEST_LENGTH );
+   stream.write( reinterpret_cast< const char* >( digest.m_data ),
+	MD5_DIGEST_LENGTH );
 //   for( int ii = 0; ii < MD5_DIGEST_LENGTH; ii++ ) {
 //      stream << digest.m_data[ii];
 //   }

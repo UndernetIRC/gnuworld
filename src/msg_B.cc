@@ -9,7 +9,6 @@
 #include	<string>
 #include	<vector>
 #include	<iostream>
-#include	<pair.h>
 
 #include	<cassert>
 
@@ -21,8 +20,9 @@
 #include	"ChannelUser.h"
 #include	"Network.h"
 #include	"iClient.h"
+#include	"pair.h"
 
-const char msg_B_cc_rcsId[] = "$Id: msg_B.cc,v 1.6 2001/03/24 16:00:56 dan_karrels Exp $" ;
+const char msg_B_cc_rcsId[] = "$Id: msg_B.cc,v 1.7 2001/07/29 22:44:06 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -72,7 +72,7 @@ Channel* theChan = Network->findChannel( Param[ 1 ] ) ;
 if( NULL == theChan )
 	{
 	// The channel does not yet exist, go ahead and create it.
-	theChan = new (nothrow)
+	theChan = new (std::nothrow)
 		Channel( Param[ 1 ], atoi( Param[ 2 ] ) ) ;
 	assert( theChan != 0 ) ;
 
@@ -263,7 +263,7 @@ for( StringTokenizer::const_iterator ptr = st.begin() ; ptr != st.end() ;
 	// Create a ChannelUser object to represent this user's presence
 	// in this channel
 	ChannelUser* chanUser =
-		new (nothrow) ChannelUser( theClient ) ;
+		new (std::nothrow) ChannelUser( theClient ) ;
 	assert( chanUser != 0 ) ;
 
 	// Add this user to the channel's database.

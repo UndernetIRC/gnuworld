@@ -14,7 +14,7 @@
 #include	"ELog.h"
 #include	"xparameters.h"
 
-const char msg_Server_cc_rcsId[] = "$Id: msg_Server.cc,v 1.5 2001/05/18 15:27:10 dan_karrels Exp $" ;
+const char msg_Server_cc_rcsId[] = "$Id: msg_Server.cc,v 1.6 2001/07/29 22:44:06 dan_karrels Exp $" ;
 const char server_h_rcsId[] = __SERVER_H ;
 const char events_h_rcsId[] = __EVENTS_H ;
 const char Network_h_rcsId[] = __NETWORK_H ;
@@ -81,7 +81,7 @@ if( Param[ 1 ][ 0 ] == '1' )
 		}
 
 	// Our uplink has its own numeric as its uplinkIntYY.
-	Uplink = new (nothrow) iServer( 
+	Uplink = new (std::nothrow) iServer( 
 		uplinkYY,
 		Param[ 5 ], // yyxxx
 		Param[ 0 ], // name

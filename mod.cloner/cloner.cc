@@ -120,7 +120,7 @@ cloner::~cloner()
 
 int cloner::OnConnect()
 {
-fakeServer = new (nothrow) iServer(
+fakeServer = new (std::nothrow) iServer(
 	MyUplink->getIntYY(), // uplinkIntYY
 	string(), // charYYXXX
 	fakeServerName,

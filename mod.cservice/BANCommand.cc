@@ -18,9 +18,10 @@
  *
  * Caveats: None.
  *
- * $Id: BANCommand.cc,v 1.25 2001/03/18 22:01:02 gte Exp $
+ * $Id: BANCommand.cc,v 1.26 2001/07/29 22:44:06 dan_karrels Exp $
  */
 
+#include	<new>
 #include	<string>
 #include	<cassert>
  
@@ -32,7 +33,7 @@
 #include	"responses.h"
 #include	"match.h"
 
-const char BANCommand_cc_rcsId[] = "$Id: BANCommand.cc,v 1.25 2001/03/18 22:01:02 gte Exp $" ;
+const char BANCommand_cc_rcsId[] = "$Id: BANCommand.cc,v 1.26 2001/07/29 22:44:06 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -360,7 +361,7 @@ else
  *  Fill out new ban details.
  */
 
-sqlBan* newBan = new (nothrow) sqlBan(bot->SQLDb);
+sqlBan* newBan = new (std::nothrow) sqlBan(bot->SQLDb);
 assert( newBan != 0 ) ;
 
 // TODO: Use a decent constructor for this

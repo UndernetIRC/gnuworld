@@ -8,7 +8,10 @@
 #include	"Buffer.h"
 
 const char Buffer_h_rcsId[] = __BUFFER_H ;
-const char Buffer_cc_rcsId[] = "$Id: Buffer.cc,v 1.4 2001/01/06 19:46:35 dan_karrels Exp $" ;
+const char Buffer_cc_rcsId[] = "$Id: Buffer.cc,v 1.5 2001/07/29 22:44:06 dan_karrels Exp $" ;
+
+namespace gnuworld
+{
 
 using std::basic_string ;
 
@@ -76,3 +79,5 @@ if( numBytes >= size() )
 // Else just erase the number of bytes given
 buf.erase( 0, numBytes ) ;
 }
+
+} // namespace gnuworld

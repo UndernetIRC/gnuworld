@@ -16,7 +16,7 @@
 #include	"ip.h"
 
 const char iClient_h_rcsId[] = __ICLIENT_H ;
-const char iClient_cc_rcsId[] = "$Id: iClient.cc,v 1.16 2001/07/17 16:58:27 dan_karrels Exp $" ;
+const char iClient_cc_rcsId[] = "$Id: iClient.cc,v 1.17 2001/07/29 22:44:06 dan_karrels Exp $" ;
 const char client_h_rcsId[] = __CLIENT_H ;
 const char Numeric_h_rcsId[] = __NUMERIC_H ;
 const char ip_h_rcsId[] = __IP_H ;
@@ -162,7 +162,7 @@ assert( theClient != 0 ) ;
 if( NULL == customDataMap )
 	{
 	// Yes, go ahead and allocate it
-	customDataMap = new (nothrow) customDataMapType ;
+	customDataMap = new (std::nothrow) customDataMapType ;
 	assert( customDataMap != 0 ) ;
 	}
 

@@ -16,7 +16,7 @@
 #include	"server.h"
 
 const char Channel_h_rcsId[] = __CHANNEL_H ;
-const char Channel_cc_rcsId[] = "$Id: Channel.cc,v 1.27 2001/07/17 16:58:27 dan_karrels Exp $" ;
+const char Channel_cc_rcsId[] = "$Id: Channel.cc,v 1.28 2001/07/29 22:44:06 dan_karrels Exp $" ;
 const char iClient_h_rcsId[] = __ICLIENT_H ;
 const char ChannelUser_h_rcsId[] = __CHANNELUSER_H ;
 const char Network_h_rcsId[] = __NETWORK_H ;
@@ -32,6 +32,7 @@ namespace gnuworld
 using std::string ;
 using std::endl ;
 using std::strstream ;
+using std::ends ;
 
 const Channel::modeType Channel::MODE_T = 0x01 ;
 const Channel::modeType Channel::MODE_N = 0x02 ;
@@ -92,7 +93,7 @@ return true ;
 
 bool Channel::addUser( iClient* theClient )
 {
-ChannelUser* addMe = new (nothrow) ChannelUser( theClient ) ;
+ChannelUser* addMe = new (std::nothrow) ChannelUser( theClient ) ;
 
 // The signature of addUser() here will verify the pointer
 return addUser( addMe ) ;
@@ -356,7 +357,7 @@ for( opVectorType::const_iterator ptr = opVector.begin() ;
 void Channel::onModeV( const vector< pair< bool, ChannelUser* > >&
 	voiceVector )
 {
-typedef vector< const pair< bool, ChannelUser* > > voiceVectorType ;
+typedef vector< pair< bool, ChannelUser* > > voiceVectorType ;
 for( voiceVectorType::const_iterator ptr = voiceVector.begin() ;
 	ptr != voiceVector.end() ; ++ptr )
 	{

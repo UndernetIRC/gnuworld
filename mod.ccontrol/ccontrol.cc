@@ -28,7 +28,7 @@
 #include	"commLevels.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.64 2001/07/29 13:33:20 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.65 2001/07/29 22:44:06 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -81,7 +81,7 @@ elog	<< "ccontrol::ccontrol> Attempting to connect to "
 	<< sqlDb
 	<< endl;
  
-SQLDb = new (nothrow) cmDatabase( Query.c_str() ) ;
+SQLDb = new (std::nothrow) cmDatabase( Query.c_str() ) ;
 assert( SQLDb != 0 ) ;
 
 //-- Make sure we connected to the SQL database; if
@@ -493,7 +493,7 @@ switch( theEvent )
 		 */
 		iServer* NewServer = static_cast< iServer* >( Data1);
 		iServer* UplinkServer = static_cast< iServer* >( Data2);
-		ccServer* CheckServer = new (nothrow) ccServer(SQLDb);
+		ccServer* CheckServer = new (std::nothrow) ccServer(SQLDb);
 		assert(CheckServer != NULL);
 		if(CheckServer->loadNumericData(NewServer->getCharYY()))
 			{
@@ -965,7 +965,7 @@ return -1 ;
 
 bool ccontrol::AuthUser( ccUser* TempUser)
 {
-AuthInfo *TempAuth = new (nothrow) AuthInfo;
+AuthInfo *TempAuth = new (std::nothrow) AuthInfo;
 assert( TempAuth != 0 ) ;
 
 TempAuth->setId(TempUser->getID());
@@ -1348,7 +1348,7 @@ return retMe ;
 
 ccUser* ccontrol::GetOper( const string Name)
 {
-ccUser* tmpUser = new (nothrow) ccUser(SQLDb);
+ccUser* tmpUser = new (std::nothrow) ccUser(SQLDb);
 assert( tmpUser != 0 ) ;
 
 if( !tmpUser->loadData(Name) )
@@ -1361,7 +1361,7 @@ return tmpUser ;
 
 ccUser* ccontrol::GetOper( unsigned int ID)
 {
-ccUser* tmpUser = new (nothrow) ccUser(SQLDb);
+ccUser* tmpUser = new (std::nothrow) ccUser(SQLDb);
 assert( tmpUser != 0 ) ;
 
 if( !tmpUser->loadData(ID) )
@@ -1854,7 +1854,7 @@ inRefresh = true;
 
 for( int i = 0 ; i < SQLDb->Tuples() ; i++ )
 	{
-	tempGline =  new (nothrow) ccGline(SQLDb);
+	tempGline =  new (std::nothrow) ccGline(SQLDb);
 	assert( tempGline != NULL ) ;
 
 	tempGline->setId(SQLDb->GetValue(i,0));
@@ -1945,7 +1945,7 @@ if(isException(Host))
 	}
 
 //Create a new ccException structure 
-ccException* tempException = new (nothrow) ccException(SQLDb);
+ccException* tempException = new (std::nothrow) ccException(SQLDb);
 assert(tempException != NULL);
 
 tempException->setHost(Host);
@@ -2022,7 +2022,7 @@ void ccontrol::addLogin( const string & Numeric)
 ccLogin *LogInfo = findLogin(Numeric);
 if(LogInfo == NULL)
 	{
-	LogInfo = new (nothrow) ccLogin(Numeric);
+	LogInfo = new (std::nothrow) ccLogin(Numeric);
 	assert(LogInfo != NULL);
 
 	loginList.push_back(LogInfo);
@@ -2192,7 +2192,7 @@ ccException *tempException = NULL;
 
 for( int i = 0 ; i < SQLDb->Tuples() ; i++ )
 	{
-	tempException =  new (nothrow) ccException(SQLDb);
+	tempException =  new (std::nothrow) ccException(SQLDb);
 	assert( tempException != 0 ) ;
 
 	tempException->setHost(SQLDb->GetValue(i,0));

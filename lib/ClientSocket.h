@@ -2,7 +2,9 @@
  */
 
 #ifndef __CLIENTSOCKET_H
-#define __CLIENTSOCKET_H "$Id: ClientSocket.h,v 1.3 2001/03/31 01:26:10 dan_karrels Exp $"
+#define __CLIENTSOCKET_H "$Id: ClientSocket.h,v 1.4 2001/07/29 22:44:06 dan_karrels Exp $"
+
+#include	<string>
 
 #include	"Socket.h" // inherit send, recv, status methods
 #include	"cstring"
@@ -48,7 +50,7 @@ public:
 	 * connection was successful, or -1 on error.
 	 * This function blocks.
 	 */
-	virtual int connect( const string& host,
+	virtual int connect( const std::string& host,
 		unsigned short int portNo ) ;
 
 protected:
@@ -57,13 +59,13 @@ protected:
 	 * The hostname of the machine to which this ClientSocket is
 	 * connected, empty if not connected.
 	 */
-	string		_host ;
+	std::string		_host ;
 
 	/**
 	 * The IP address, in dotted decimal form, to which this
 	 * ClientSocket is connected, empty if not connected.
 	 */
-	string		_ipAddr ;
+	std::string		_ipAddr ;
 
 } ;
 

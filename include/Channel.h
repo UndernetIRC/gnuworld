@@ -1,7 +1,7 @@
 /* Channel.h */
 
 #ifndef __CHANNEL_H
-#define __CHANNEL_H "$Id: Channel.h,v 1.16 2001/07/17 16:58:26 dan_karrels Exp $"
+#define __CHANNEL_H "$Id: Channel.h,v 1.17 2001/07/29 22:44:06 dan_karrels Exp $"
 
 #include	<string>
 #include	<map>
@@ -14,6 +14,7 @@
 #include	"ChannelUser.h"
 #include	"xparameters.h"
 #include	"ELog.h"
+#include	"pair.h"
 
 namespace gnuworld
 {
@@ -21,6 +22,9 @@ namespace gnuworld
 using std::string ;
 using std::map ;
 using std::list ;
+using std::vector ;
+using std::endl ;
+
 
 /// Forward declaration of class iClient.
 class iClient ;

@@ -2,7 +2,7 @@
  */
 
 #ifndef __SOCKET_H
-#define __SOCKET_H "$Id: Socket.h,v 1.6 2001/03/31 01:26:10 dan_karrels Exp $"
+#define __SOCKET_H "$Id: Socket.h,v 1.7 2001/07/29 22:44:06 dan_karrels Exp $"
 
 #include	<new>
 #include	<iostream>
@@ -102,7 +102,7 @@ public:
 	 * socket connection as possible.
 	 * Returns number of bytes written, or -1 on error.
 	 */
-	virtual int send( const string& val, const size_t ) ;
+	virtual int send( const std::string& val, const size_t ) ;
 
 	/**
 	 * Receive no more than (nb) bytes into the unsigned
@@ -114,7 +114,7 @@ public:
 	/**
 	 * Attempt to read numBytes bytes from the connection.
 	 */
-	virtual int recv( string&, size_t numBytes ) ;
+	virtual int recv( std::string&, size_t numBytes ) ;
 
 	/**
 	 * Return this Socket's file descriptor.
@@ -127,26 +127,26 @@ public:
 	 * If an IP is not found, an empty string is
 	 * returned.
 	 */
-	static string ipAddrOf( const string& host ) ;
+	static std::string ipAddrOf( const std::string& host ) ;
 
 	/**
 	 * Return the hostname of the local machine.
 	 */
-	static string hostname() ;
+	static std::string hostname() ;
 
 	/**
 	 * Returns true if the C++ string is a dotted decimal
 	 * IP address.  This does not check that it is an existing
 	 * IP address, just that it is in the proper format.
 	 */
-	static bool isIPAddress( const string& h ) ;
+	static bool isIPAddress( const std::string& h ) ;
 
 	/**
 	 * This method returns the port number and IP
 	 * address of the remote connection in C++ string
 	 * format.
 	 */
-	virtual string description() const ;
+	virtual std::string description() const ;
 
 	/**
 	 * Return the number of bytes available for immediate
