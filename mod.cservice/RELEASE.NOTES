@@ -1,5 +1,5 @@
 Newest changes at the top of the file:
-$Id: RELEASE.NOTES,v 1.13 2001/06/12 22:13:46 gte Exp $
+$Id: RELEASE.NOTES,v 1.14 2001/06/24 15:57:04 gte Exp $
 
 CMaster 1.0pl6 - Current
 * Disallow globally suspended users op's in registered 
@@ -13,6 +13,9 @@ CMaster 1.0pl6 - Current
   ALTER TABLE channels ADD COLUMN comment VARCHAR (300); 
   ALTER TABLE pending ADD COLUMN unique_join_count INT4 DEFAULT '0';
   ALTER TABLE pending ADD COLUMN managername VARCHAR (80);
+
+* Global user SUSPEND must now take a reason, in the form:
+  /msg x suspend Plexus You have been assimilated.
 
 CMaster 1.0pl5 - 20/05/2001
 * Add Vampire's (Alex Badea <vampire@go.ro>) code to make
