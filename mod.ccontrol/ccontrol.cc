@@ -11,12 +11,12 @@
 /* ccontrol.cc
  * Authors: Daniel Karrels dan@karrels.com
  *	    Tomer Cohen    MrBean@toughguy.net
- * $Id: ccontrol.cc,v 1.171 2003/05/19 08:45:06 mrbean_ Exp $
+ * $Id: ccontrol.cc,v 1.172 2003/05/19 22:19:45 mrbean_ Exp $
  */
 
 #define MAJORVER "1"
-#define MINORVER "1pl6"
-#define RELDATE "05 March, 2003"
+#define MINORVER "1pl7"
+#define RELDATE "20 May, 2003"
 
 #include        <sys/types.h> 
 #include        <sys/socket.h>
@@ -56,7 +56,7 @@
 #include	"ip.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.171 2003/05/19 08:45:06 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.172 2003/05/19 22:19:45 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -1700,7 +1700,7 @@ if(dbConnected)
 			ccGline * theGline = new (std::nothrow) ccGline(SQLDb);
 			theGline->setHost(string("*@") + tIP);
 			theGline->setAddedBy(tempGline->getAddedBy());
-			theGline->setExpires((tempGline->getExpires() > 3600 + ::time(0)) ? 3600 + ::time(0) : tempGline->getExpires());
+			theGline->setExpires((tempGline->getExpires() > 3600 + ::time(0)) ? 3600 : tempGline->getExpires() - time(0));
 			theGline->setAddedOn(tempGline->getAddedOn());
 			theGline->setLastUpdated(tempGline->getLastUpdated());
 			theGline->setReason(tempGline->getReason());
