@@ -17,11 +17,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: stats.h,v 1.14 2003/08/11 17:45:05 dan_karrels Exp $
+ * $Id: stats.h,v 1.15 2003/08/20 00:22:28 dan_karrels Exp $
  */
 
 #ifndef __STATS_H
-#define __STATS_H "$Id: stats.h,v 1.14 2003/08/11 17:45:05 dan_karrels Exp $"
+#define __STATS_H "$Id: stats.h,v 1.15 2003/08/20 00:22:28 dan_karrels Exp $"
 
 #include	<fstream>
 #include	<string>
@@ -197,6 +197,13 @@ protected:
 	/// log files.
 	ofstream		fileTable[ EVT_CREATE + 1 ] ;
 
+	/// The name of the file to which channel information will
+	/// be written.
+	string			channelInfoFileName ;
+
+	/// The name of the file to which user information will be
+	// written.
+	string			userInfoFileName ;
 } ;
 
 } // namespace gnuworld

@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: stats.cc,v 1.23 2003/08/11 17:45:04 dan_karrels Exp $
+ * $Id: stats.cc,v 1.24 2003/08/20 00:22:28 dan_karrels Exp $
  */
 
 #include	<string>
@@ -39,15 +39,15 @@
 #include	"config.h"
 #include	"misc.h"
 
-RCSTAG( "$Id: stats.cc,v 1.23 2003/08/11 17:45:04 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: stats.cc,v 1.24 2003/08/20 00:22:28 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
 
+using std::cout ;
 using std::cerr ;
 using std::string ;
 using std::stringstream ;
-using std::ends ;
 using std::endl ;
 
 /*
@@ -112,6 +112,9 @@ else
 
 partMessage = conf.Require( "part_message" )->second ;
 startTime = 0 ;
+
+channelInfoFileName = "users_per_channel" ;
+userInfoFileName = "channels_per_user" ;
 
 openLogFiles() ;
 
@@ -520,10 +523,23 @@ Notice( theClient, "Total Network Users: %d, Total Network Channels: %d",
 	Network->clientList_size(),
 	Network->channelList_size() ) ;
 
+typedef map< size_t, size_t > channelUserInfoMap ;
+channelUserInfoMap usersPerChannelMap ;
+
+ofstream usersPerChannelFile( channelInfoFileName.c_str() ) ;
+if( !usersPerChannelFile )
+	{
+	cout	<< "stats::dumpStats> Failed to open channel info file: "
+		<< channelInfoFileName
+		<< endl ;
+	}
+
 Channel* largestChan = 0 ;
 for( xNetwork::const_channelIterator chanItr = Network->channels_begin() ;
 	chanItr != Network->channels_end() ; ++chanItr )
 	{
+	usersPerChannelMap[ chanItr->second->size() ]++ ;
+
 	if( 0 == largestChan )
 		{
 		largestChan = chanItr->second ;
@@ -532,6 +548,15 @@ for( xNetwork::const_channelIterator chanItr = Network->channels_begin() ;
 		{
 		largestChan = chanItr->second ;
 		}
+	if( usersPerChannelFile )
+		{
+		usersPerChannelFile	<< chanItr->second->size()
+					<< endl ;
+		}
+	}
+if( usersPerChannelFile )
+	{
+	usersPerChannelFile.close() ;
 	}
 
 if( largestChan != 0 )
@@ -548,6 +573,45 @@ if( largestChan != 0 )
 		MyUplink->getLastBurstDuration(),
 		MyUplink->getBurstBytes() ) ;
 #endif
+
+channelUserInfoMap channelsPerUserMap ;
+size_t maxChannels = 0 ;
+
+ofstream channelsPerUserFile( userInfoFileName.c_str() ) ;
+if( !channelsPerUserFile )
+	{
+	cout	<< "stats::dumpStats> Unable to open user info file: "
+		<< userInfoFileName.c_str()
+		<< endl ;
+	}
+
+for( xNetwork::const_clientIterator cItr = Network->clients_begin() ;
+	cItr != Network->clients_end() ; ++cItr )
+	{
+	if( !cItr->second->isModeK() )
+		{
+		channelsPerUserMap[ cItr->second->channels_size() ]++ ;
+
+		if( cItr->second->channels_size() > maxChannels )
+			{
+			maxChannels = cItr->second->channels_size() ;
+			}
+
+		if( channelsPerUserFile )
+			{
+			channelsPerUserFile	<< cItr->second->channels_size()
+						<< endl ;
+			}
+		}
+	} // for( cItr )
+
+if( channelsPerUserFile )
+	{
+	channelsPerUserFile.close() ;
+	}
+
+Notice( theClient, "Maximum channels joined by a user: %u",
+	maxChannels ) ;
 
 	{
 	stringstream ss ;
