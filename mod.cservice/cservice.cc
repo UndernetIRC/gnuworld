@@ -2106,7 +2106,7 @@ if (timer_id == pending_timerID)
 	 */
 
 	strstream theQuery;
-	theQuery	<<  "SELECT channels.name,channels.id,channels.created_ts"
+	theQuery	<<  "SELECT channels.name,channels.id,channels.channel_ts"
 				<< " FROM pending,channels" 
 				<< " WHERE channels.id = pending.channel_id"
 				<< " AND pending.status = 2;"
