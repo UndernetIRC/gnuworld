@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: Network.h,v 1.40 2004/01/25 14:35:31 dan_karrels Exp $
+ * $Id: Network.h,v 1.41 2004/06/05 14:49:14 mrbean_ Exp $
  */
 
 #ifndef __NETWORK_H
-#define __NETWORK_H "$Id: Network.h,v 1.40 2004/01/25 14:35:31 dan_karrels Exp $"
+#define __NETWORK_H "$Id: Network.h,v 1.41 2004/06/05 14:49:14 mrbean_ Exp $"
 
 #include	<vector>
 #include	<string>
@@ -839,6 +839,13 @@ public:
 	virtual std::list< const iClient* >	matchRealName(
 			const std::string& ) const ;
 
+	/**
+	 * Find a new server (iServer) numeric.
+	 * The new numeric is assigned to intYY.
+	 * On success, true is returned, false otherwise.
+	 */
+	virtual bool	allocateServerNumeric( unsigned int& intYY ) ;
+
 protected:
 
 	/**
@@ -866,12 +873,6 @@ protected:
 	 */
 	virtual bool	freeClientNumeric( unsigned int intYYXXX ) ;
 
-	/**
-	 * Find a new server (iServer) numeric.
-	 * The new numeric is assigned to intYY.
-	 * On success, true is returned, false otherwise.
-	 */
-	virtual bool	allocateServerNumeric( unsigned int& intYY ) ;
 
 	/**
 	 * Free a reserved server (iServer) numeric.
