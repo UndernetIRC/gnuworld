@@ -8,42 +8,42 @@
  *
  * Caveats: None.
  *
- * $Id: UNSUSPENDCommand.cc,v 1.12 2001/07/07 22:51:25 gte Exp $
+ * $Id: UNSUSPENDCommand.cc,v 1.13 2001/07/29 20:37:57 gte Exp $
  */
 
 #include	<string>
- 
+
 #include	"StringTokenizer.h"
-#include	"ELog.h" 
+#include	"ELog.h"
 #include	"cservice.h"
 #include	"Network.h"
 #include	"levels.h"
 #include	"responses.h"
 
-const char UNSUSPENDCommand_cc_rcsId[] = "$Id: UNSUSPENDCommand.cc,v 1.12 2001/07/07 22:51:25 gte Exp $" ;
+const char UNSUSPENDCommand_cc_rcsId[] = "$Id: UNSUSPENDCommand.cc,v 1.13 2001/07/29 20:37:57 gte Exp $" ;
 
 namespace gnuworld
 {
 
 using std::string ;
 using namespace level;
- 
+
 bool UNSUSPENDCommand::Exec( iClient* theClient, const string& Message )
-{ 
+{
 StringTokenizer st( Message ) ;
- 
+
 if( st.size() < 2 )
 	{
 	Usage(theClient);
 	return true;
 	}
- 
+
 // Is the user authorized?
-	 
+
 sqlUser* theUser = bot->isAuthed(theClient, true);
 if(!theUser)
 	{
-	bot->Notice(theClient, 
+	bot->Notice(theClient,
 	bot->getResponse(theUser,
 		language::no_longer_auth,
 		string("Sorry, you are not authorised with me.")));
@@ -65,20 +65,20 @@ if (st[1][0] != '#')
 	{
 		Usage(theClient);
 		return true;
-	} 
- 
+	}
+
 	// Does this user account even exist?
 	sqlUser* targetUser = bot->getUserRecord(st[1]);
 	if (!targetUser)
 		{
-		bot->Notice(theClient, 
+		bot->Notice(theClient,
 			bot->getResponse(theUser, language::not_registered,
 				string("I don't know who %s is")).c_str(),
 		    	st[1].c_str());
 		return true;
 		}
 
-	if (!targetUser->getFlag(sqlUser::F_GLOBAL_SUSPEND)) 
+	if (!targetUser->getFlag(sqlUser::F_GLOBAL_SUSPEND))
 	{
 		bot->Notice(theClient, "%s isn't suspended.", targetUser->getUserName().c_str());
 		return true;
@@ -94,7 +94,7 @@ if (st[1][0] != '#')
 
 	bot->logAdminMessage("%s (%s) has unsuspended %s's user account.",
 	theClient->getNickName().c_str(), theUser->getUserName().c_str(),
-	targetUser->getUserName().c_str()); 
+	targetUser->getUserName().c_str());
 
 	return true;
 }
@@ -112,19 +112,19 @@ sqlChannel* theChan = bot->getChannelRecord(st[1]);
 
 if(!theChan)
 	{
-	bot->Notice(theClient, 
+	bot->Notice(theClient,
 		bot->getResponse(theUser,
 			language::chan_not_reg,
-			string("Sorry, %s isn't registered with me.")).c_str(), 
+			string("Sorry, %s isn't registered with me.")).c_str(),
 		st[1].c_str());
 	return false;
-	} 
+	}
 
 // Check level.
 int level = bot->getEffectiveAccessLevel(theUser, theChan, true);
 if(level < level::unsuspend)
 	{
-	bot->Notice(theClient, 
+	bot->Notice(theClient,
 		bot->getResponse(theUser,
 			language::insuf_access,
 			string("Sorry, you have insufficient access to perform that command.")));
@@ -136,24 +136,24 @@ sqlUser* Target = bot->getUserRecord(st[2]);
 if(!Target)
 	{
 	bot->Notice(theClient, "I don't know who %s is",
-    	st[2].c_str()); 
+    	st[2].c_str());
 	return true;
 	}
 
 sqlLevel* aLevel = bot->getLevelRecord(Target, theChan);
 if(!aLevel)
 	{
-	bot->Notice(theClient, 
+	bot->Notice(theClient,
 	bot->getResponse(theUser,
 		language::not_registered,
-		string("I don't know who %s is")).c_str(), 
-    	Target->getUserName().c_str(), theChan->getName().c_str()); 
+		string("I don't know who %s is")).c_str(),
+    	Target->getUserName().c_str(), theChan->getName().c_str());
 	return true;
-	} 
+	}
 
 if (aLevel->getSuspendExpire() == 0)
 	{
-	bot->Notice(theClient, 
+	bot->Notice(theClient,
 		bot->getResponse(theUser,
 			language::isnt_suspended,
 			string("%s isn't suspended on %s")).c_str(),
@@ -172,13 +172,24 @@ if ((aLevel->getAccess()) >= level)
 	return false;
 	}
 
+/*
+ * Was this suspension set with a higher suspend level?
+ */
+
+if (aLevel->getSuspendLevel() > level)
+	{
+	bot->Notice(theClient,
+		"Cannot unsuspend a user that was suspended at a higher level than your own access.");
+	return false;
+	}
+
 aLevel->setSuspendExpire(0);
 aLevel->setSuspendBy(string());
 aLevel->setLastModif(bot->currentTime());
 aLevel->setLastModifBy( string( "("
 	+ theUser->getUserName()
 	+ ") "
-	+ theClient->getNickUserHost() ) ); 
+	+ theClient->getNickUserHost() ) );
 
 if( !aLevel->commit() )
 	{
@@ -189,14 +200,14 @@ if( !aLevel->commit() )
 	return false ;
 	}
 
-bot->Notice(theClient, 
+bot->Notice(theClient,
 	bot->getResponse(theUser,
 		language::susp_cancelled,
 		string("SUSPENSION for %s is cancelled")).c_str(),
 	Target->getUserName().c_str());
- 
+
 return true;
-} 
+}
 
 } // namespace gnuworld.
 
