@@ -8,7 +8,7 @@
  *
  * Caveats: None
  *
- * $Id: PARTCommand.cc,v 1.2 2001/02/10 21:49:09 gte Exp $
+ * $Id: PARTCommand.cc,v 1.3 2001/02/10 23:34:02 gte Exp $
  */
 
 
@@ -21,7 +21,7 @@
 #include	"responses.h"
 #include	"Network.h"
 
-const char PARTCommand_cc_rcsId[] = "$Id: PARTCommand.cc,v 1.2 2001/02/10 21:49:09 gte Exp $" ;
+const char PARTCommand_cc_rcsId[] = "$Id: PARTCommand.cc,v 1.3 2001/02/10 23:34:02 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -58,6 +58,13 @@ bool PARTCommand::Exec( iClient* theClient, const string& Message )
 		return false;
 	} 
 
+	/* Check the bot is in the channel. */
+ 
+	if (!theChan->getInChan()) {
+		bot->Notice(theClient, "I'm not in that channel!");
+		return false;
+	}
+ 
 	/*
 	 *  Check the user has sufficient access on this channel.
 	 */

@@ -163,6 +163,8 @@ RegisterCommand(new LBANLISTCommand(this, "LBANLIST", "<#channel> <banmask>", 5)
 RegisterCommand(new NEWPASSCommand(this, "NEWPASS", "<new passphrase>", 8)); 
 RegisterCommand(new JOINCommand(this, "JOIN", "<#channel>", 8));
 RegisterCommand(new PARTCommand(this, "PART", "<#channel>", 8));
+RegisterCommand(new OPERJOINCommand(this, "OPERJOIN", "<#channel>", 8));
+RegisterCommand(new OPERPARTCommand(this, "OPERPART", "<#channel>", 8));
 
 RegisterCommand(new REMIGNORECommand(this, "REMIGNORE", "<mask>", 5));
 RegisterCommand(new REGISTERCommand(this, "REGISTER", "<#channel>", 8));
@@ -608,7 +610,7 @@ else if(Command == "VERSION")
 	xClient::DoCTCP(theClient, CTCP,
 		"Undernet P10 Channel Services Version 2 ["
 		__DATE__ " " __TIME__
-		"] ($Id: cservice.cc,v 1.95 2001/02/10 21:49:09 gte Exp $)");
+		"] ($Id: cservice.cc,v 1.96 2001/02/10 23:34:02 gte Exp $)");
 	}
 else if(Command == "PROBLEM?")
 	{
@@ -1068,6 +1070,33 @@ int cservice::OnTimer(xServer::timerID, void*)
 time_t theTime = time(NULL) + updateInterval;
 MyUplink->RegisterTimer(theTime, this, NULL);
 
+/*
+ *  Any pending reop's?
+ */
+if (!reopQ.empty())
+{
+	if (reopQ.front().first <= currentTime())
+		{
+		Channel* tmpChan = Network->findChannel(reopQ.front().second);
+		if (tmpChan) 
+			{ 
+			/* Move to xServer::Op? */
+			strstream s;
+			s	<< MyUplink->getCharYY()
+				<< " M "
+				<< tmpChan->getName()
+				<< " +o "
+				<< getCharYYXXX()
+				<< ends;
+			
+			Write( s );
+		delete[] s.str();
+			elog << "cservice::OnTimer> REOP " << tmpChan->getName() << endl;
+			}
+		reopQ.pop();
+		}
+}	
+ 
 PGnotify* notify = SQLDb->Notifies();
 
 /*
@@ -1468,8 +1497,8 @@ for( xServer::opVectorType::const_iterator ptr = theTargets.begin() ;
 			{ 
 			logAdminMessage("I've been deopped on %s!",
 				reggedChan->getName().c_str());
-			/* Add this chan to the reop queue, ready to op itself in 30 seconds. */
-			 reopQ.push(reopQType::value_type(currentTime(), reggedChan->getName()) );
+			/* Add this chan to the reop queue, ready to op itself in 15 seconds. */
+			 reopQ.push(reopQType::value_type(currentTime() + 15, reggedChan->getName()) );
 			}
 		}
 	} // for()
