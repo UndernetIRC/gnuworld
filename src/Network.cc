@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: Network.cc,v 1.47 2002/08/07 20:28:07 dan_karrels Exp $
+ * $Id: Network.cc,v 1.48 2002/10/09 12:56:56 mrbean_ Exp $
  */
 
 #include	<new>
@@ -42,7 +42,7 @@
 #include	"ip.h"
 
 const char xNetwork_h_rcsId[] = __NETWORK_H ;
-const char xNetwork_cc_rcsId[] = "$Id: Network.cc,v 1.47 2002/08/07 20:28:07 dan_karrels Exp $" ;
+const char xNetwork_cc_rcsId[] = "$Id: Network.cc,v 1.48 2002/10/09 12:56:56 mrbean_ Exp $" ;
 const char ELog_h_rcsId[] = __ELOG_H ;
 const char iClient_h_rcsId[] = __ICLIENT_H ;
 const char Channel_h_rcsId[] = __CHANNEL_H ;
@@ -655,7 +655,15 @@ for( yyVectorType::const_iterator yyIterator = yyVector.begin() ;
 
 	// Remove the server, its clients, any empty channels,
 	// and post events for all of the above.
-	delete removeServer( removeMe->getIntYY(), true ) ;
+	iServer* tmpServer =  removeServer( removeMe->getIntYY(), true ) ;
+	string Reason = "Uplink Splited";
+	
+	theServer->PostEvent(EVT_NETBREAK,
+		  static_cast<void *>(tmpServer),
+		  static_cast<void*>(findServer(intYY)),
+		  static_cast<void*>(&Reason));
+	
+	delete tmpServer;		  
 	}
 }
 

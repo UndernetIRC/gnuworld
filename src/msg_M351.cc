@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_M351.cc,v 1.6 2002/07/05 01:10:06 dan_karrels Exp $
+ * $Id: msg_M351.cc,v 1.7 2002/10/09 12:56:56 mrbean_ Exp $
  */
 
 #include	<iostream>
@@ -29,7 +29,7 @@
 #include	"xparameters.h"
 #include	"ServerCommandHandler.h"
 
-const char msg_M351_cc_rcsId[] = "$Id: msg_M351.cc,v 1.6 2002/07/05 01:10:06 dan_karrels Exp $" ;
+const char msg_M351_cc_rcsId[] = "$Id: msg_M351.cc,v 1.7 2002/10/09 12:56:56 mrbean_ Exp $" ;
 const char server_h_rcsId[] = __SERVER_H ;
 const char Network_h_rcsId[] = __NETWORK_H ;
 const char ELog_h_rcsId[] = __ELOG_H ;
@@ -53,7 +53,7 @@ if( Param.empty() )
 	return false ;
 	}
 
-xClient* theClient = Network->findLocalNick( Param[ 1 ] ) ;
+xClient* theClient = Network->findLocalClient( Param[ 1 ] ) ;
 if( NULL == theClient )
 	{
 	elog	<< "msg_M351> Unable to find nick: "
@@ -62,7 +62,7 @@ if( NULL == theClient )
 	return false ;
 	}
 
-iServer* tmpServer = Network->findServerName(Param[0]);
+iServer* tmpServer = Network->findServer(Param[0]);
 if( NULL == tmpServer )
 	{
 	elog	<< "msg_M351> Unable to find server: "

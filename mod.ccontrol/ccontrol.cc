@@ -11,12 +11,12 @@
 /* ccontrol.cc
  * Authors: Daniel Karrels dan@karrels.com
  *	    Tomer Cohen    MrBean@toughguy.net
- * $Id: ccontrol.cc,v 1.151 2002/09/24 12:18:54 mrbean_ Exp $
+ * $Id: ccontrol.cc,v 1.152 2002/10/09 12:56:55 mrbean_ Exp $
  */
 
 #define MAJORVER "1"
-#define MINORVER "1"
-#define RELDATE "27 August, 2002"
+#define MINORVER "1pl1"
+#define RELDATE "09 October, 2002"
 
 #include        <sys/types.h> 
 #include        <sys/socket.h>
@@ -56,7 +56,7 @@
 #include	"ip.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.151 2002/09/24 12:18:54 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.152 2002/10/09 12:56:55 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -1193,7 +1193,6 @@ switch( theEvent )
 				{
 				CheckServer->Update();
 				}
-			Write("%s V :%s\n",getCharYYXXX().c_str(),NewServer->getCharYY());
 			}
 		break;
 		}
@@ -1224,6 +1223,7 @@ switch( theEvent )
 		refreshGlines();
 		burstGlines();
 		checkMaxUsers();
+		refreshVersions();
 		break;
 		}	
 	case EVT_GLINE:
@@ -2825,6 +2825,7 @@ if( (theUser) && (theUser->getIsSuspended()))
 return false;
 }
 
+
 bool ccontrol::refreshSuspention()
 {
 
@@ -2868,6 +2869,25 @@ if(totalCount > 0)
 	MsgChanLog("[Refresh Suspend] - %d expired\n",totalCount);		
 
 return true;
+}
+
+bool ccontrol::refreshVersions()
+{
+ccServer* curServer;
+const iServer* curNetServer; 
+for(serversConstIterator ptr = serversMap_begin();
+    ptr != serversMap_end(); ++ptr)
+	{
+	curServer = ptr->second;
+	curNetServer = curServer->getNetServer();
+	if(curNetServer)
+		{
+		elog << "Getting version of : " << curServer->getName() << endl;
+		Write("%s V :%s\n",getCharYYXXX().c_str(),curNetServer->getCharYY());		
+		}
+		
+	}
+return true;    
 }
 
 bool ccontrol::refreshGlines()
