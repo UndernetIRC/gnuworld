@@ -5,5 +5,4 @@ Makefile
 libtool
 opts
 autom4te.cache
-Makefile.am
 
