@@ -37,4 +37,5 @@ Channel_Create
 Burst_Complete
 Burst_Acknowledge
 Account_Login
+server_command_map
 
