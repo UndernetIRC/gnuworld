@@ -94,6 +94,7 @@ cservice::cservice(const string& args)
     RegisterCommand(new RANDOMCommand(this, "RANDOM", "TBA"));
 
     RegisterCommand(new OPCommand(this, "OP", "#channel [nick][,nick] .."));
+    RegisterCommand(new VOICECommand(this, "VOICE", "#channel [nick][,nick] .."));
 
 	//-- Load in our cservice configuration file.
 	cserviceConfig = new EConfig( args ) ;
