@@ -37,7 +37,7 @@
 #include	"ip.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.84 2001/11/11 22:44:41 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.85 2001/11/13 18:28:07 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -2254,10 +2254,10 @@ for(loginIterator ptr = ignore_begin();ptr!=ignore_end();)
 		tempLogin->resetIgnore();
 		tempLogin->resetLogins();
 		ptr = ignoreList.erase(ptr);
-		//if(tempLogin->getNumeric() == "0")
-		//	{
+		if(tempLogin->getNumeric() == "0")
+			{
 		delete tempLogin;
-		//	}
+			}
 		retMe = IGNORE_REMOVED;
 		}
 	else
@@ -2345,10 +2345,10 @@ for(loginIterator ptr = ignore_begin();ptr!=ignore_end();)
 		Write( s );
 		delete[] s.str();
 		tempLogin->setIgnoredHost("");
-		//if(tempLogin->getNumeric() == "0")
-		//	{
+		if(tempLogin->getNumeric() == "0")
+			{
 		delete tempLogin;
-		//	}
+			}
 		ptr = ignoreList.erase(ptr);
 		}
 	else
