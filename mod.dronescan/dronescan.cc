@@ -2,9 +2,8 @@
  * dronescan.cc
  */
 
-#include <stdio.h>	/* *printf */
 #include <stdarg.h>	/* va_list */
-#include <sys/time.h>	/* gettimeofday() */
+#include <stdio.h>	/* *printf() */
 
 #include "EConfig.h"
 #include "Network.h"
@@ -109,11 +108,19 @@ int dronescan::BurstChannels()
 
 	MyUplink->RegisterChannelEvent(consoleChannel, this);
 
-	/* We need to assign ourselves a clientData */
-	clientData *ourData = new clientData();
-	ourData->setState(NORMAL);
-	this->getInstance()->setCustomData(this, ourData);
-	customDataCounter++;
+	/* We need to assign a clientData to all xClients on this xServer */
+	xNetwork::const_localClientIterator itr = Network->localClient_begin();
+	for( ; itr != Network->localClient_end(); ++itr )
+		{
+		xClient *theXClient = *itr;
+		iClient *theClient = theXClient->getInstance();
+		
+		clientData *newData = new clientData();
+		newData->setState(NORMAL);
+		
+		theClient->setCustomData(this, newData);
+		customDataCounter++;
+		}
 
 	/* Set the topic */
 	setConsoleTopic();
