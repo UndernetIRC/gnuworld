@@ -15,7 +15,7 @@
 #include	"StringTokenizer.h"
 #include	"ip.h"
 
-const char WHOISCommand_cc_rcsId[] = "$Id: WHOISCommand.cc,v 1.16 2002/06/07 17:58:24 mrbean_ Exp $";
+const char WHOISCommand_cc_rcsId[] = "$Id: WHOISCommand.cc,v 1.17 2002/11/02 00:18:49 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -82,6 +82,8 @@ string curChannel ;
 string::size_type curPlace;
 string tChannel;
 char curChar[10];
+gnuworld::Channel* theChannel;
+gnuworld::ChannelUser* theChannelUser;
 bool hasCC; //Channel has control codes
 
 for( iClient::const_channelIterator ptr = Target->channels_begin() ;
@@ -89,6 +91,12 @@ for( iClient::const_channelIterator ptr = Target->channels_begin() ;
 	{
 	curChannel = "";
 	tChannel = (*ptr)->getName();
+        theChannel = (*ptr);
+        theChannelUser = theChannel->findUser(Target);
+        tChannel = theChannel->getName();
+        if(theChannelUser->getMode(gnuworld::ChannelUser::MODE_V)) tChannel = "+" + tChannel;
+        if(theChannelUser->getMode(gnuworld::ChannelUser::MODE_O)) tChannel = "@" + tChannel;
+
 	hasCC = false;
 	for(curPlace = 0; curPlace < tChannel.size();++curPlace)
 		{
