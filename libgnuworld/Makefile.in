@@ -244,6 +244,8 @@ EXTRA_DIST = Buffer.h \
 	match_table.h \
 	md5hash.h \
 	misc.h \
+	MTrie.h \
+	MTrie.cc \
 	Signal.h \
 	StringTokenizer.h \
 	xparameters.h
