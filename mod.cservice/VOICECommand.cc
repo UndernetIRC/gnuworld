@@ -16,7 +16,7 @@
  *
  * Caveats: None
  *
- * $Id: VOICECommand.cc,v 1.13 2001/02/18 19:46:01 dan_karrels Exp $
+ * $Id: VOICECommand.cc,v 1.14 2001/02/20 15:37:21 dan_karrels Exp $
  */
 
 #include	<string>
@@ -33,7 +33,7 @@
 using std::map ;
 using std::vector ;
 
-const char VOICECommand_cc_rcsId[] = "$Id: VOICECommand.cc,v 1.13 2001/02/18 19:46:01 dan_karrels Exp $" ;
+const char VOICECommand_cc_rcsId[] = "$Id: VOICECommand.cc,v 1.14 2001/02/20 15:37:21 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -112,7 +112,6 @@ vector< iClient* > voiceList; // List of clients to Voice.
 
 char delim = 0;
 unsigned short counter = 2; // Offset of first nick in list.
-unsigned short cont = true;
 
 string source;
 iClient* target = 0;
