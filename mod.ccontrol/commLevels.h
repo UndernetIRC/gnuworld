@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: commLevels.h,v 1.17 2003/06/28 01:21:19 dan_karrels Exp $
+ * $Id: commLevels.h,v 1.18 2004/03/09 11:50:43 mrbean_ Exp $
  */
 
 #ifndef __COMMANDLEVELS_H
@@ -45,7 +45,7 @@ namespace commandLevel
  
 */
 
-const unsigned long int flg_NOLOGIN = 0x1;
+const unsigned long int flg_NOLOGIN = 0x0;
 const unsigned long int flg_HELP     = 0x02 | flg_NOLOGIN;
 const unsigned long int flg_LOGIN    = 0x0; 
 const unsigned long int flg_DEAUTH    = 0x04;

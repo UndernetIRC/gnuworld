@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: SGLINECommand.cc,v 1.8 2003/11/01 00:49:34 isomer Exp $
+ * $Id: SGLINECommand.cc,v 1.9 2004/03/09 11:50:43 mrbean_ Exp $
  */
 
 #include	<string>
@@ -36,7 +36,7 @@
 #include	"Constants.h"
 #include	"config.h"
 
-RCSTAG( "$Id: SGLINECommand.cc,v 1.8 2003/11/01 00:49:34 isomer Exp $" ) ;
+RCSTAG( "$Id: SGLINECommand.cc,v 1.9 2004/03/09 11:50:43 mrbean_ Exp $" ) ;
 
 namespace gnuworld
 {
@@ -107,18 +107,7 @@ else //RealName Gline
 	{
 	++pos;
 	bool hostOk = false;
-	//Do alittle sanity check
-	for(string::size_type p =0; p< st[pos].size() && !hostOk;++p)
-		{
-		if(st[pos][p] != '$' && st[pos][p] != '*' && st[pos][p] != '?')
-			hostOk = true;
-		}
-	if(!hostOk)
-		{
-		bot->Notice(theClient,"You must specify atleast one char other than *?$ as the realname!");
-		return true;
-		}
-	if(st[pos].substr(0,1) != "$")
+	if(st[pos].substr(0,2) != "$R")
 		{
 		RealHost = "$R" + st[pos];
 		}
@@ -126,8 +115,19 @@ else //RealName Gline
 		{
 		RealHost = st[pos];
 		}
-	}
-	
+	//Do alittle sanity check
+	for(string::size_type p =2; p< st[pos].size() && !hostOk;++p)
+		{
+		if(RealHost[p] != '$' && RealHost[p] != '*' && RealHost[p] != '?')
+			hostOk = true;
+		}
+	if(!hostOk)
+		{
+		bot->Notice(theClient,"You must specify atleast one char other than *?$ as the realname!");
+		return true;
+		}
+    }
+    	
 string Length;
 Length.assign(st[pos+1]);
 unsigned int Units = 1; //Defualt for seconds

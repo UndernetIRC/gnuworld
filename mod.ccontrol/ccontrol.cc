@@ -20,12 +20,12 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccontrol.cc,v 1.176 2003/11/26 23:30:21 dan_karrels Exp $
+ * $Id: ccontrol.cc,v 1.177 2004/03/09 11:50:43 mrbean_ Exp $
 */
 
 #define MAJORVER "1"
-#define MINORVER "1pl7"
-#define RELDATE "20 May, 2003"
+#define MINORVER "1pl8"
+#define RELDATE "9 Mar, 2004"
 
 #include        <sys/types.h> 
 #include        <sys/socket.h>
@@ -65,7 +65,7 @@
 #include	"ip.h"
 #include	"config.h"
 
-RCSTAG( "$Id: ccontrol.cc,v 1.176 2003/11/26 23:30:21 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: ccontrol.cc,v 1.177 2004/03/09 11:50:43 mrbean_ Exp $" ) ;
 
 namespace gnuworld
 {
@@ -1324,10 +1324,10 @@ switch( theEvent )
 		
 		    	}
 		checkMaxUsers();
-		if(!inBurst)
-			{
+//		if(!inBurst)
+//			{
 			refreshVersions();
-			}
+//			}
 		break;
 		}	
 	case EVT_GLINE:
@@ -1728,7 +1728,7 @@ if(dbConnected)
 void ccontrol::addGlineToUplink(ccGline* theGline)
 {
 int Expires;
-if(theGline->getHost().substr(0,1) != "$")
+if(theGline->getHost().substr(0,2) != "$R")
 	{
 	if((theGline->getHost().substr(0,1) == "#")
 	   && (theGline->getExpires() == 0))
@@ -1746,14 +1746,16 @@ if(theGline->getHost().substr(0,1) != "$")
 else 
 	{ // Its a realname gline, match all the users and gline their hosts
 	ccGline* tmpGline;
-	string RealName = theGline->getHost().substr(1,theGline->getHost().size()-1);
+	string RealName = theGline->getHost().substr(2,theGline->getHost().size()-2);
+	MyUplink->setGline(theGline->getAddedBy(),theGline->getHost(),
+	theGline->getReason(),theGline->getExpires() - ::time(0),theGline->getLastUpdated(),this);
 	list<const iClient*> cList = Network->matchRealName(RealName);
 	list<const iClient*>::iterator ptr;
 	const iClient* curClient;
 	string Host;
 	Expires = (theGline->getExpires() > (3600*6 + ::time(0)) 
 		    ? 3600*6 : theGline->getExpires() - ::time(0));
-	for(ptr = cList.begin(); ptr != cList.end(); ++ptr)
+	/*for(ptr = cList.begin(); ptr != cList.end(); ++ptr)
 		{
 		curClient = *ptr;    
 		Host = string("*@") + xIP(curClient->getIP()).GetNumericIP();
@@ -1765,7 +1767,7 @@ else
 		tmpGline->setLastUpdated(theGline->getLastUpdated());
 		tmpGline->setReason(theGline->getReason());
 		queueGline(tmpGline,false);				    
-		}
+		}*/
 			
 	}
 }
