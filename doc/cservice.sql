@@ -1,8 +1,10 @@
 ------------------------------------------------------------------------------------
--- "$Id: cservice.sql,v 1.60 2002/01/05 04:20:59 nighty Exp $"
+-- "$Id: cservice.sql,v 1.61 2002/02/16 06:14:01 nighty Exp $"
 -- Channel service DB SQL file for PostgreSQL.
 
 -- ChangeLog:
+-- 2002-02-16: nighty
+--             Added one field to 'users' for TimeZone.
 -- 2001-12-29: nighty
 --             Added two fields to 'channels' to reflect changes on FLOATING LIMIT in mod.cservice
 -- 2001-12-06: nighty
@@ -187,6 +189,7 @@ CREATE TABLE users (
 	last_updated_by VARCHAR (128),		-- nick!user@host
 	last_updated INT4 NOT NULL, 
 	deleted INT2 DEFAULT '0',
+	tz_setting VARCHAR(255) DEFAULT '',
 	signup_cookie VARCHAR(255) DEFAULT '',
 	signup_ts INT4,
 	signup_ip VARCHAR(15),

@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------------
--- "$Id: local_db.sql,v 1.14 2002/01/05 04:20:59 nighty Exp $"
+-- "$Id: local_db.sql,v 1.15 2002/02/16 06:14:01 nighty Exp $"
 -- Channel service DB SQL file for PostgreSQL.
 --
 -- .. if you wonder why some tables have moved and you have them here when
@@ -13,7 +13,9 @@
 CREATE TABLE webcookies (
         user_id INT4,
         cookie VARCHAR(32) UNIQUE,
-        expire INT4
+        expire INT4,
+	tz_setting VARCHAR(255) DEFAULT '',
+	is_admin INT2 DEFAULT 0
 );
 
 CREATE INDEX webcookies_user_id_idx ON webcookies(user_id);

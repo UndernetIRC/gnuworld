@@ -1,11 +1,42 @@
 ------------------------------------------------------------------------------------
--- "$Id: cservice.web.sql,v 1.22 2002/01/13 13:59:23 nighty Exp $"
+-- "$Id: cservice.web.sql,v 1.23 2002/02/16 06:14:01 nighty Exp $"
 -- Channel service DB SQL file for PostgreSQL.
 --
 -- Tables specific to webbased registration process.
 --
 -- Perry Lorier <perry@coders.net>
 -- nighty <nighty@undernet.org> - Corrected tables and added missing fields
+
+
+
+CREATE TABLE acl (
+	acl_id SERIAL,
+	user_id INT4 NOT NULL,
+	isstaff INT2 NOT NULL,
+	flags INT4 DEFAULT '0' NOT NULL,
+-- 0x0001 - ACL_XCHGMGR_REVIEW	
+-- 0x0002 - ACL_XCHGMGR_ADMIN
+-- 0x0004 - ACL_XMAILCH_REVIEW
+-- 0x0008 - ACL_XMAILCH_ADMIN
+-- 0x0016 - ACL_XHELP
+-- 0x0032 - ACL_XHELP_CAN_ADD
+-- 0x0064 - ACL_XHELP_CAN_EDIT
+-- 0x0128 - ACL_WEBAXS_2
+-- 0x0256 - ACL_WEBAXS_3
+-- .. to be completed in the future ..
+	xtra INT4 NOT NULL,
+-- may vary, for example if 0x0016 is set in 'flags',
+-- 'xtra' will contain the 'language_id' the user have power over (or '0' for *all*)
+--
+	last_updated INT4 NOT NULL,
+	last_updated_by INT4 NOT NULL,
+	suspend_expire INT4 DEFAULT '0' NOT NULL,
+	suspend_by INT4 DEFAULT '0' NOT NULL,
+	deleted INT2 DEFAULT '0' NOT NULL
+);
+	
+	
+
 
 
 CREATE TABLE pending_pwreset (
