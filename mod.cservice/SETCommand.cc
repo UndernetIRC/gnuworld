@@ -12,7 +12,7 @@
  *
  * Caveats: SET LANG is still under consideration.
  *
- * $Id: SETCommand.cc,v 1.20 2001/02/10 22:06:36 gte Exp $
+ * $Id: SETCommand.cc,v 1.21 2001/02/12 01:57:39 plexus Exp $
  */
 
 #include	<string>
@@ -24,7 +24,7 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char SETCommand_cc_rcsId[] = "$Id: SETCommand.cc,v 1.20 2001/02/10 22:06:36 gte Exp $" ;
+const char SETCommand_cc_rcsId[] = "$Id: SETCommand.cc,v 1.21 2001/02/12 01:57:39 plexus Exp $" ;
 
 namespace gnuworld
 {
@@ -609,6 +609,7 @@ bool SETCommand::Exec( iClient* theClient, const string& Message )
 	if(option == "KEYWORDS")
 	{
 	    /* Keywords are being processed as a long string. */
+	    string keywords = st.assemble(3);
 	    if(level < level::set::keywords)
 	    {
 		bot->Notice(theClient, "KEYWORDS: You do not have enough access!");
@@ -619,11 +620,11 @@ bool SETCommand::Exec( iClient* theClient, const string& Message )
 		bot->Notice(theClient, "The string of keywords cannot exceed 80 chars!");
 		return true;
 	    }
-		theChan->setKeywords(value);
+	    theChan->setKeywords(keywords);
 	    theChan->commit(); 
 	    bot->Notice(theClient, "KEYWORDS for %s are: %s",
 			theChan->getName().c_str(),
-			value.c_str());
+			keywords.c_str());
 	    return true;
 	}
 
