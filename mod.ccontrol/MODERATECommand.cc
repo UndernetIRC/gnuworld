@@ -14,7 +14,7 @@
 #include	"Network.h"
 #include	"Constants.h"
 
-const char MODERATECommand_cc_rcsId[] = "$Id: MODERATECommand.cc,v 1.7 2001/12/23 09:07:57 mrbean_ Exp $";
+const char MODERATECommand_cc_rcsId[] = "$Id: MODERATECommand.cc,v 1.8 2002/01/25 17:31:11 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -50,6 +50,10 @@ ccUser* tmpUser = bot->IsAuth(theClient);
 if(tmpUser)
         bot->MsgChanLog("(%s) - %s : MODERATE %s\n",tmpUser->getUserName().c_str()
                         ,theClient->getNickUserHost().c_str(),st.assemble(1).c_str());
+else
+        bot->MsgChanLog("(Unknown) - %s : MODERATE %s\n"
+                        ,theClient->getNickUserHost().c_str(),st.assemble(1).c_str());
+
 if(theChan->getMode(Channel::MODE_M))
 	{
 	bot->Notice( theClient,"Channel %s is already moderated",st[ 1 ].c_str());
