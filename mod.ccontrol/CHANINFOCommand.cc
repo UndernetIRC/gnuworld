@@ -12,7 +12,7 @@
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 
-const char CHANINFOCommand_cc_rcsId[] = "$Id: CHANINFOCommand.cc,v 1.6 2001/07/23 10:28:51 mrbean_ Exp $";
+const char CHANINFOCommand_cc_rcsId[] = "$Id: CHANINFOCommand.cc,v 1.7 2001/07/30 16:58:39 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -29,6 +29,12 @@ if( st.size() < 2 )
 	{
 	Usage( theClient ) ;
 	return true ;
+	}
+
+if(st[1].size() > 200)
+	{
+	bot->Notice(theClient,"Channel name can't be more than 200 chars");
+	return false;
 	}
 
 Channel* theChan = Network->findChannel( st[ 1 ] ) ;

@@ -12,7 +12,7 @@
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 
-const char EXCEPTIONCommand_cc_rcsId[] = "$Id: EXCEPTIONCommand.cc,v 1.4 2001/07/23 10:28:51 mrbean_ Exp $";
+const char EXCEPTIONCommand_cc_rcsId[] = "$Id: EXCEPTIONCommand.cc,v 1.5 2001/07/30 16:58:39 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -44,6 +44,11 @@ else if(!strcasecmp(st[1].c_str(),"add")) //Trying to add an exception?
 		bot->Notice(theClient,"you must specify the host you want to add and the connection count\n");
 		return false;
 		}
+	if(st[2].size() > 128)
+	{
+		bot->Notice(theClient,"Hostname can't be more than 128 chars");
+		return false;
+	}
 	else
 		{
 		if(!bot->insertException(theClient,st[2],atoi(st[3].c_str())))
@@ -62,6 +67,11 @@ else if(!strcasecmp(st[1].c_str(),"del")) //Trying to add an exception?
 	if(st.size() < 3) 
 		{
 		bot->Notice(theClient,"you must specify the host you want to delete");
+		return false;
+		}
+	if(st[2].size() > 128)
+		{
+		bot->Notice(theClient,"Hostname can't be more than 128 chars");
 		return false;
 		}
 	else

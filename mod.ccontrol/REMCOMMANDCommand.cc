@@ -15,7 +15,7 @@
 #include 	"ccUser.h"
 #include	"misc.h"
 
-const char REMCOMMANDCommand_cc_rcsId[] = "$Id: REMCOMMANDCommand.cc,v 1.2 2001/07/29 13:33:20 mrbean_ Exp $";
+const char REMCOMMANDCommand_cc_rcsId[] = "$Id: REMCOMMANDCommand.cc,v 1.3 2001/07/30 16:58:39 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -35,6 +35,11 @@ if( st.size() < 3 )
 	return true;
 	}
 
+if(st[1].size() > 64)
+	{
+	bot->Notice(theClient,"Oper name can't be more than 64 chars");
+	return false;
+	}
 //Fetch the user record from the database
 //ccUser* theUser = bot->GetUser(st[1]);
 ccUser* theUser = bot->GetOper(st[1]);
@@ -45,6 +50,11 @@ if(!theUser)
 	return false;
 	}
 	
+if(st[2].size() > 128)
+	{
+	bot->Notice(theClient,"Command name can't be more than 128 chars");
+	return false;
+	}
 Command* Comm = bot->findCommandInMem(st[2]);
 if(!Comm)
 	{

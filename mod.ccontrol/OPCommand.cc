@@ -14,7 +14,7 @@
 #include	"StringTokenizer.h"
 #include	"Network.h"
 
-const char OPCommand_cc_rcsId[] = "$Id: OPCommand.cc,v 1.3 2001/07/23 10:28:51 mrbean_ Exp $";
+const char OPCommand_cc_rcsId[] = "$Id: OPCommand.cc,v 1.4 2001/07/30 16:58:39 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -34,6 +34,11 @@ if( st.size() < 3 )
 	return true ;
 	}
 
+if(st[1].size() > 200)
+	{
+	bot->Notice(theClient,"Channel name can't be more than 200 chars");
+	return false;
+	}
 Channel* theChan = Network->findChannel( st[ 1 ] ) ;
 if( NULL == theChan )
 	{

@@ -21,7 +21,7 @@
 #include	"misc.h"
 #include	"commLevels.h"
 
-const char ADDUSERCommand_cc_rcsId[] = "$Id: ADDUSERCommand.cc,v 1.2 2001/07/29 13:33:20 mrbean_ Exp $";
+const char ADDUSERCommand_cc_rcsId[] = "$Id: ADDUSERCommand.cc,v 1.3 2001/07/30 16:58:39 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -39,6 +39,12 @@ if( st.size() < 4 )
 	{
 	Usage(theClient);
 	return true;
+	}
+
+if(st[1].size() > 64)
+	{
+	bot->Notice(theClient,"Oper name can't be more than 64 chars");
+	return false;
 	}
 
 // Try fetching the user data from the database, note this is

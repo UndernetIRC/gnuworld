@@ -13,7 +13,7 @@
 #include	"StringTokenizer.h"
 #include	"Network.h"
 
-const char ADDSERVERCommand_cc_rcsId[] = "$Id: ADDSERVERCommand.cc,v 1.1 2001/07/26 20:12:40 mrbean_ Exp $";
+const char ADDSERVERCommand_cc_rcsId[] = "$Id: ADDSERVERCommand.cc,v 1.2 2001/07/30 16:58:39 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -33,6 +33,11 @@ if( st.size() < 2 )
 	return true ;
 	}
 
+if(st[1].size() > 128)
+	{
+	bot->Notice(theClient,"Server name can't be more than 128 chars");
+	return false;
+	}
 ccServer* NewServer = new ccServer(bot->SQLDb);
 if(NewServer->loadData(st [ 1 ]))
 	{

@@ -19,7 +19,7 @@
 #include	"Gline.h"
 #include	"gline.h"
 
-const char FORCEGLINECommand_cc_rcsId[] = "$Id: FORCEGLINECommand.cc,v 1.6 2001/07/23 10:28:51 mrbean_ Exp $";
+const char FORCEGLINECommand_cc_rcsId[] = "$Id: FORCEGLINECommand.cc,v 1.7 2001/07/30 16:58:39 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -116,7 +116,12 @@ switch(bot->checkGline(hostName,gLength,&Users))
 
 // Avoid passing a reference to a temporary variable.
 string nickUserHost = theClient->getNickUserHost() ;
-
+string Reason = st.assemble( pos + ResStart );
+if(Reason.size() > 255)
+	{
+	bot->Notice(theClient,"Gline reason can't be more than 255 chars");
+	return false;
+	}
 server->setGline( nickUserHost,
 	st[ pos ],
 	st.assemble( pos + ResStart ),

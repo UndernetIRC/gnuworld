@@ -16,7 +16,7 @@
 #include	"AuthInfo.h"
 #include	"misc.h"
 
-const char ADDCOMMANDCommand_cc_rcsId[] = "$Id: ADDCOMMANDCommand.cc,v 1.14 2001/07/29 13:33:20 mrbean_ Exp $";
+const char ADDCOMMANDCommand_cc_rcsId[] = "$Id: ADDCOMMANDCommand.cc,v 1.15 2001/07/30 16:58:39 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -49,6 +49,12 @@ if(!strcasecmp(st[pos],"-fr"))
 	}
 
 // Fetch the oper record from the db
+if(st[pos].size() > 64)
+	{
+	bot->Notice(theClient,"Oper name can't be more than 64 chars");
+	return false;
+	}
+
 ccUser* theUser = bot->GetOper(st[pos]);
 	
 if( !theUser )
@@ -60,6 +66,11 @@ if( !theUser )
 	}
 pos++;	
 //int CommandLevel = bot->getCommandLevel(st[pos]);
+if(st[1].size() > 128)
+	{
+	bot->Notice(theClient,"Command name can't be more than 128 chars");
+	return false;
+	}
 Command* Comm = bot->findCommandInMem(st[pos]);
 if( !Comm )
 	{

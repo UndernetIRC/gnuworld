@@ -13,7 +13,7 @@
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 
-const char LASTCOMCommand_cc_rcsId[] = "$Id: LASTCOMCommand.cc,v 1.3 2001/07/23 10:28:51 mrbean_ Exp $";
+const char LASTCOMCommand_cc_rcsId[] = "$Id: LASTCOMCommand.cc,v 1.4 2001/07/30 16:58:39 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -47,11 +47,16 @@ else
 	if(st.size() > 2)
 		{
 		Days = atoi(st[2].c_str());
+		if(Days > 365)
+			{
+			bot->Notice(theClient,"You can't see the log for more than a year ago");
+			return false;
+			}
 		static const char* queryHeader
 		    = "SELECT * FROM comlog where ts >";
 		theQuery 	<< queryHeader 
 				<< (::time(0) - Days * 24 * 3600)
-				<< " ORDER BY ts DESC"
+				<< " ORDER BY ts ASC"
 				<< " LIMIT " << NumOfCom
 				<< ends;
 		}

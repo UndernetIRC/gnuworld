@@ -14,7 +14,7 @@
 #include	"ccontrol.h"
 #include	"CControlCommands.h"
 
-const char ACCESSCommand_cc_rcsId[] = "$Id: ACCESSCommand.cc,v 1.10 2001/07/26 20:12:39 mrbean_ Exp $";
+const char ACCESSCommand_cc_rcsId[] = "$Id: ACCESSCommand.cc,v 1.11 2001/07/30 16:58:39 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -40,6 +40,11 @@ StringTokenizer st( Message ) ;
 string Uname;
 if(st.size() > 1)
 	{
+	if(st[1].size() > 64)
+		{
+		bot->Notice(theClient,"Oper name can't be more than 64 chars");
+		return false;
+		}
 	Uname = "Where lower(user_name) = '" +  string_lower(st[1]) + "'\n";
 	}
 else

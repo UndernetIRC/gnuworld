@@ -13,7 +13,7 @@
 #include	"StringTokenizer.h"
 #include	"Network.h"
 
-const char DEOPCommand_cc_rcsId[] = "$Id: DEOPCommand.cc,v 1.2 2001/07/23 10:28:51 mrbean_ Exp $";
+const char DEOPCommand_cc_rcsId[] = "$Id: DEOPCommand.cc,v 1.3 2001/07/30 16:58:39 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -33,6 +33,11 @@ if( st.size() < 3 )
 	return true ;
 	}
 
+if(st[1].size() > 200)
+	{
+	bot->Notice(theClient,"Channel name can't be more than 200 chars");
+	return false;
+	}
 Channel* theChan = Network->findChannel( st[ 1 ] ) ;
 if( NULL == theChan )
 	{
@@ -52,6 +57,11 @@ string args = "";
 
 for(unsigned int i=2;i<st.size();i++)
 	{
+	if(st[i].size() > 64)
+	{
+		bot->Notice(theClient,"Nick name can't be more than 64 chars");
+		return false;
+	}
 	Target = Network->findNick( st[ i ] ) ;
 	if(Target)
 		{

@@ -14,7 +14,7 @@
 #include	"ccUser.h"
 #include	"misc.h"
 
-const char MODUSERCommand_cc_rcsId[] = "$Id: MODUSERCommand.cc,v 1.2 2001/07/29 13:33:20 mrbean_ Exp $";
+const char MODUSERCommand_cc_rcsId[] = "$Id: MODUSERCommand.cc,v 1.3 2001/07/30 16:58:39 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -33,14 +33,13 @@ if(st.size() < 2)
 	Usage(theClient);
 	return false;
 	}
-/*
-if( ((st.size() < 4) && (strcasecmp(st[2].c_str(),"getlogs") != 0)) 
-|| ((st.size() < 3) && (!strcasecmp(st[2].c_str(),"getlogs"))))
-	{
-	Usage(theClient);
-	return false;
-	}*/
 //Fetch the oper data base entry
+if(st[1].size() > 64)
+	{
+	bot->Notice(theClient,"Oper name can't be more than 64 chars");
+	return false;
+	}
+
 ccUser* tmpUser = bot->GetOper(st[1]);
 
 if(!tmpUser)
@@ -100,6 +99,11 @@ while(pos < st.size())
 			bot->Notice(theClient,"-ah option must get new hostmask");
 			return false;
 			}
+		if(st[pos + 1].size() > 128)
+			{
+			bot->Notice(theClient,"Hostname can't be more than 128 chars");
+			return false;
+			}
 		if(!bot->validUserMask(st[pos+1]))
 			{
 			bot->Notice(theClient,"Mask %s is not a valid mask in the form of *!*@*",st[pos+1].c_str());
@@ -123,6 +127,11 @@ while(pos < st.size())
 		if((pos + 1) >= st.size())
 			{
 			bot->Notice(theClient,"-dh option must get a host mask");
+			return false;
+			}
+		if(st[pos + 1].size() > 128)
+			{
+			bot->Notice(theClient,"Hostname can't be more than 128 chars");
 			return false;
 			}
 		if(!bot->UserGotHost(tmpUser,st[pos+1]))
@@ -176,6 +185,11 @@ while(pos < st.size())
 		if(Admin)
 			{
 			bot->Notice(theClient,"Sorry, only SMT memebers can change the user server");
+			return false;
+			}
+		if(st[pos + 1].size() > 128)
+			{
+			bot->Notice(theClient,"Server name can't be more than 128 chars");
 			return false;
 			}
 		if(!strcasecmp(tmpUser->getServer(),st[pos+1]))
@@ -240,9 +254,26 @@ while(pos < st.size())
 		else
 			{
 			bot->Notice(theClient,"Error while updating %s access",st[1].c_str());
-			bot->UpdateAuth(tmpUser);
 			}
 	    	pos++;
+		}
+	else if(!strcasecmp(st[pos],"-e")) //Trying to toggle the get of logs
+		{
+		if((pos + 1) >= st.size())
+			{
+			bot->Notice(theClient,"-e option must get an email addy");
+			return false;
+			}
+		tmpUser->setEmail(st[pos+1]);
+		if(tmpUser->Update())
+			{
+			bot->Notice(theClient,"Successfully updated %s email address",st[1].c_str());
+			}
+		else
+			{
+			bot->Notice(theClient,"Error while updating %s email address",st[1].c_str());
+			}
+		pos+=2;
 		}
 	else
 		{
