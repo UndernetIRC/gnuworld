@@ -23,7 +23,7 @@
 #include 	"time.h"
 #include	"ccUser.h"
 
-const char GLINECommand_cc_rcsId[] = "$Id: GLINECommand.cc,v 1.21 2001/08/16 20:47:19 mrbean_ Exp $";
+const char GLINECommand_cc_rcsId[] = "$Id: GLINECommand.cc,v 1.22 2001/08/17 18:23:42 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -229,27 +229,44 @@ if( NULL == theChan )
 	return true ;
 	}
 ccGline *TmpGline;
-
+iClient *TmpClient;
 for( Channel::const_userIterator ptr = theChan->userList_begin();
 ptr != theChan->userList_end() ; ++ptr )
 	{
-	GlineMapType::iterator gptr = glineList.find(ptr->second->getClient()->getInsecureHost());
-	if((gptr == glineList.end()) && (!ptr->second->getClient()->getMode(iClient::MODE_SERVICES))) 
+	TmpClient = ptr->second->getClient();
+	GlineMapType::iterator gptr = glineList.find("*@" + TmpClient->getInsecureHost());
+	if(gptr != glineList.end())
+		{
+		continue;
+		}
+	gptr = glineList.find("* " +TmpClient->getUserName() + "@" + TmpClient->getInsecureHost());		
+	if(gptr != glineList.end())
+		{
+		continue;
+		}
+	if((!TmpClient->getMode(iClient::MODE_SERVICES)) && (TmpClient != theClient)) 
 		{
 		TmpGline = new ccGline(bot->SQLDb);
 		assert(TmpGline != NULL);
-		TmpGline->setHost("*@" + ptr->second->getClient()->getInsecureHost());
+		if(TmpClient->getUserName().substr(0,1) == "~")
+			TmpGline->setHost("*@" + TmpClient->getInsecureHost());
+		else
+			TmpGline->setHost("*" + TmpClient->getUserName() + "@" + TmpClient->getInsecureHost());
 		TmpGline->setExpires(::time(0) + gLength);
 		TmpGline->setAddedBy(nickUserHost);
+		unsigned int Affected = Network->countMatchingUserHost(TmpGline->getHost()); 
+		char Us[20];
+		sprintf(Us,"%d",Affected);
 		TmpGline->setReason(st.assemble( pos + ResStart ));
 		TmpGline->setAddedOn(::time(0));
+		TmpGline->Insert();
 		TmpGline->loadData(TmpGline->getHost());
 		bot->addGline(TmpGline);
 		server->setGline( nickUserHost,
 			    TmpGline->getHost(),
-			    st.assemble( pos + ResStart) ,
+			    TmpGline->getReason() + "[" + Us +"]" ,
 			    gLength ) ;
-		glineList.insert(GlineMapType::value_type(ptr->second->getClient()->getInsecureHost(),0));
+		glineList.insert(GlineMapType::value_type(TmpGline->getHost(),0));
 		}
 	}
 			

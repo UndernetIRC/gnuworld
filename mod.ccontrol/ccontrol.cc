@@ -29,7 +29,7 @@
 #include	"ccFloodData.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.70 2001/08/16 20:47:19 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.71 2001/08/17 18:23:42 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -1665,32 +1665,6 @@ system(SendMail);
 return true;
 }
 
-// TODO: This method should be in C++, not C!
-/*int ccontrol::CheckGline(const char * GlineHost,unsigned int Len)
-{
-
-char *User;
-char *Host;
-char *TPos;
-TPos = strchr(GlineHost,'@');
-User = new char[(TPos - GlineHost) + 1];			
-Host = new char[(GlineHost + strlen(GlineHost)) - TPos +1];
-strncpy(User,GlineHost,TPos - GlineHost);
-User[TPos - GlineHost] = '\0';
-strcpy(Host,TPos+1);
-if((countCinS(Host,'*') > 1) || (!strcasecmp(Host,"*")))
-    return HUH_NO_HOST;
-int TotalHost = Network->countMatchingUserHost(GlineHost);
-if(TotalHost > 256)
-    return HUH_NO_USERS;
-else if(TotalHost > 32)
-    return FORCE_NEEDED_USERS;
-if(Len > 24*3600*2) //Longer than 2 days ? 
-	return FORCE_NEEDED_TIME;
-if(strchr(Host,'*') == NULL)
-	return GLINE_OK;
-return FORCE_NEEDED_HOST;
-}*/
 
 int ccontrol::checkGline(const string Host,unsigned int Len,unsigned int &Affected)
 {
