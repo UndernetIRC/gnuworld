@@ -21,7 +21,7 @@
 #include	"ccontrol.h"
  
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.8 2001/01/31 23:15:26 dan_karrels Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.9 2001/02/10 20:50:45 dan_karrels Exp $" ;
 
 using std::string ;
 using std::vector ;
@@ -312,6 +312,7 @@ if( result )
 	MyUplink->RegisterChannelEvent( chanName, this ) ;
 	}
 
+operChans.push_back( chanName ) ;
 return result ;
 }
 

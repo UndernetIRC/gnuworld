@@ -740,10 +740,10 @@ bot->Join( chanName, string(), 0, true ) ;
 bot->QuoteAsServer( buf ) ;
 
 // Part
-bot->Part( st[ 1 ] ) ;
+bot->Part( chanName ) ;
 
 // Wallops
-if( !bot->isOperChan( st[ 1 ] ) )
+if( !bot->isOperChan( chanName ) )
 	{
 	string wallopMe = theClient->getCharYYXXX() ;
 	wallopMe += " is cordially invited to channel "
