@@ -6,7 +6,7 @@
  */
 
 #ifndef __EVENTS_H
-#define __EVENTS_H "$Id: events.h,v 1.7 2000/12/23 00:56:49 dan_karrels Exp $"
+#define __EVENTS_H "$Id: events.h,v 1.8 2001/01/06 15:04:42 dan_karrels Exp $"
 
 namespace gnuworld
 {
@@ -21,22 +21,16 @@ enum
 	EVT_OPER,
 	EVT_NETBREAK,
 	EVT_NETJOIN,
-	EVT_CLONES,
-	EVT_TSC,
 	EVT_BURST_CMPLT,
 	EVT_BURST_ACK,
 	EVT_GLINE,
-	EVT_AUTOGLINE,
 	EVT_REMGLINE,
 	EVT_JUPE,
 	EVT_UNJUPE,
-	EVT_NICK_JUPE,
-	EVT_NICK_UNJUPE,
-	EVT_AUTO_JUPE,
 	EVT_QUIT,
 	EVT_KILL,
-	EVT_SIGNAL,
 	EVT_NICK,
+	EVT_CHNICK,
 
 	// EVT_NOOP must always be last
 	EVT_NOOP

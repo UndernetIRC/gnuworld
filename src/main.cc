@@ -1,5 +1,5 @@
 /* main.cc
- * $Id: main.cc,v 1.13 2000/12/13 23:22:23 dan_karrels Exp $
+ * $Id: main.cc,v 1.14 2001/01/06 15:04:42 dan_karrels Exp $
  */
 
 #include	<fstream>
@@ -24,7 +24,7 @@
 using namespace gnuworld ;
 
 const char config_h_rcsId[] = __CONFIG_H ;
-const char main_cc_rcsId[] = "$Id: main.cc,v 1.13 2000/12/13 23:22:23 dan_karrels Exp $" ;
+const char main_cc_rcsId[] = "$Id: main.cc,v 1.14 2001/01/06 15:04:42 dan_karrels Exp $" ;
 
 using std::cerr ;
 using std::clog ;
@@ -181,6 +181,9 @@ try
 
 	// Instantiate the server object
 	Server = new xServer( confFileName ) ;
+
+	// TODO: Find a way to reduce this coupling
+	Network->setServer( Server ) ;
 
 	// Run in simulation mode?
 	if( !simFileName.empty() )

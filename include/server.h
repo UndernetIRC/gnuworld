@@ -17,7 +17,7 @@
  */
 
 #ifndef __XSERVER_H
-#define __XSERVER_H "$Id: server.h,v 1.18 2000/12/23 15:57:02 dan_karrels Exp $"
+#define __XSERVER_H "$Id: server.h,v 1.19 2001/01/06 15:04:42 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
@@ -138,8 +138,22 @@ public:
 	 */
 	virtual ~xServer() ;
 
+	/**
+	 * This type is used for passing information to handler
+	 * methods for channel op mode changes.
+	 */
 	typedef vector< pair< bool, ChannelUser* > > opVectorType ;
+
+	/**
+	 * This type is used for passing information to handler
+	 * methods for channel voice mode changes.
+	 */
 	typedef opVectorType voiceVectorType ;
+
+	/**
+	 * This type is used for passing information to handler
+	 * methods for channel ban changes.
+	 */
 	typedef vector< pair< bool, string > > banVectorType ;
 
 	/**
@@ -910,8 +924,8 @@ protected:
 	 * the bound offset of the command handler methods
 	 * are stored in this structure.
 	 */
-	typedef hash_map< string, int (xServer::*)( xParameters& ), eHash, eqstr >
-		commandMapType ;
+	typedef hash_map< string, int (xServer::*)( xParameters& ),
+		eHash, eqstr > commandMapType ;
 
 	/**
 	 * A pointer to the server command handler.

@@ -21,7 +21,7 @@
 #include	"misc.h"
 
 const char xNetwork_h_rcsId[] = __XNETWORK_H ;
-const char xNetwork_cc_rcsId[] = "$Id: Network.cc,v 1.14 2000/12/09 15:38:30 dan_karrels Exp $" ;
+const char xNetwork_cc_rcsId[] = "$Id: Network.cc,v 1.15 2001/01/06 15:04:42 dan_karrels Exp $" ;
 
 using std::string ;
 using std::endl ;
@@ -429,7 +429,8 @@ nickMap.erase( nick ) ;
  * by this method, so it's up to the caller to deallocate
  * any heap memory.
  */
-iServer* xNetwork::removeServer( const unsigned int& YY )
+iServer* xNetwork::removeServer( const unsigned int& YY,
+	bool postEvent )
 {
 
 // Make sure the server numeric (YY) is valid.
@@ -475,6 +476,14 @@ for( clientVectorType::size_type i = 0 ; i < clients[ YY ].size() ; i++ )
 		// from the channel table, this increment here is still
 		// safe.
 		++chanPtr ;
+		}
+
+	// Should we post this as an EVT_QUIT event?
+	if( postEvent )
+		{
+		// Yes, post the event
+		theServer->PostEvent( EVT_QUIT,
+			static_cast< void* >( theClient ) ) ;
 		}
 
 	removeNick( theClient->getNickName() ) ;
@@ -565,6 +574,8 @@ if( NULL == theClient )
 // we already have it.
 removeNick( theClient->getNickName() ) ;
 
+string oldNick = theClient->getNickName() ;
+
 // Change the client's nickname
 theClient->setNickName( newNick ) ;
 
@@ -573,6 +584,11 @@ addNick( theClient ) ;
 
 // Note that the user's numeric never changes,
 // so no need to rehash numeric
+
+// Go ahead and post this event
+theServer->PostEvent( EVT_CHNICK,
+	static_cast< void* >( theClient ),
+	static_cast< void* >( &oldNick ) ) ;
 
 }
 
@@ -616,7 +632,7 @@ for( serverVectorType::size_type i = 0 ; i < servers.size() ; ++i )
 		const unsigned int removeIntYY = servers[ i ]->getIntYY() ;
 
 		// Remove servers[ i ].
-		delete removeServer( servers[ i ]->getIntYY() ) ;
+		delete removeServer( servers[ i ]->getIntYY(), true ) ;
 
 		// Remove servers[ i ]'s leaf servers.
 		OnSplit( removeIntYY ) ;

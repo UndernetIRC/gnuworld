@@ -63,16 +63,38 @@ Change into the gnuworld directory, and run the configuration script:
 cd gnuworld
 ./configure
 
+When you run configure, you may specify which clients to build.  Use
+the --enable-modules option to specify a comma separated list of
+modules to build (each client is now a dynamically loadable module).
+Here is an example of how to configure for only the cservice client:
+
+./configure --enable-modules=cservice
+
+This example will build both the cservice and ccontrol (oper services)
+modules:
+
+./configure --enable-modules=cservice,ccontrol
+
+Not specifying the --enable-modules option at all will build all
+available modules.
+
+Note also that all of the usual configure options are supported, and
+may be viewed by:
+
+./configure --help
+
 This will build the Makefiles that GNUWorld will use to compile its source
 code.  Compile gnuworld with the command:
 
 make
 
-This should build the executable binary into the directory gnuworld/bin
-(./bin from your current directory).
+This command will build all of the libraries and binaries.  To install
+the binaries and library modules into bin/, type:
+
+make install
 
 Configuring GNUWorld
--------------------
+--------------------
 
 Change into the bin directory:
 
@@ -83,15 +105,36 @@ GNUWorld uses to configure itself and its bots.  The file "localhost.conf"
 contains sufficient information for GNUWorld to connect to an IRC uplink
 server located on the local (127.0.0.1) machine.
 
+In order to run any services clients, each of those modules must be
+built and installed into the bin/ directory (see above).  To have a
+client loaded, add a line like this to the .conf of your choice:
+
+module = libcservice.so cservice.conf
+
+The "module" keyword tells gnuworld to attempt to load the given
+module.
+
+The "libcservice.so" is the actual name of the module, which you
+will be able to see in the current directory.  Note that some systems may
+name modules a bit differently.  For example, OpenBSD uses names like
+libcservice.so.0.0.0, etc.
+
+The "cservice.conf" is the name of the configuration file for this client
+module.
+
 The format of the configuration files should be fairly straightforward.
 GNUWorld also supports several command line options obtained by running the
 command:
 
 GNUWorld -h
 
+Running GNUWorld
+----------------
+
 In order to run GNUWorld, all you need to pass it is the name of the
 configuration file.  To have GNUWorld run and connect to the IRC server
-located at localhost:6667, issue the following command:
+located at localhost:6667, using the configuration file
+localhost.conf, issue the following command:
 
 GNUWorld -f localhost.conf
 

@@ -3,7 +3,7 @@
  */
 
 #ifndef __XNETWORK_H
-#define __XNETWORK_H "$Id: Network.h,v 1.8 2000/11/02 19:24:29 dan_karrels Exp $"
+#define __XNETWORK_H "$Id: Network.h,v 1.9 2001/01/06 15:04:42 dan_karrels Exp $"
 
 #include	<vector>
 #include	<string>
@@ -29,6 +29,8 @@ using std::unary_function ;
 
 namespace gnuworld
 {
+
+class xServer ;
 
 /**
  * This class is responsible for storing the network's iClient's,
@@ -231,9 +233,12 @@ public:
 	 * the clients added to the network table (this) are
 	 * allocated on the heap, and that there are no
 	 * other stale pointers to any clients.
+	 * If postEvent is true, then an EVT_QUIT will be generated
+	 * for each client removal.
 	 * Returns NULL if not found.
 	 */
-	virtual iServer*	removeServer( const unsigned int& YY ) ;
+	virtual iServer*	removeServer( const unsigned int& YY,
+					bool postEvent = false ) ;
 
 	/**
 	 * Remove a remote server by its character numeric, and
@@ -415,6 +420,14 @@ public:
 	 */
 	virtual void	foreach_xClient( fe_xClientBase  ) ;
 
+	/**
+	 * This method is used to set the xServer used for
+	 * backwards communication.  This is bad, and I would like
+	 * very much to get rid of it.
+	 */
+	virtual void	setServer( xServer* _theServer )
+		{ theServer = _theServer ; }
+
 protected:
 
 	/**
@@ -465,6 +478,10 @@ protected:
 	 */
 	nickMapType			nickMap ;
 
+	/**
+	 * This variable is used backwards calls to the main server.
+	 */
+	xServer				*theServer ;
 } ;
 
 /**
