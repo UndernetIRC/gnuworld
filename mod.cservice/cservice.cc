@@ -219,6 +219,8 @@ int cservice::BurstChannels()
 	theQuery << "SELECT " << sql::channel_fields << " FROM channels WHERE lower(name) <> '*' AND registered_ts <> ''" << ends;
 	elog << "cmaster::BurstChannels> " << theQuery.str() << endl;
 	string id;
+	time_t regTime;
+
 	if ((status = SQLDb->Exec(theQuery.str())) == PGRES_TUPLES_OK)
 	{
 		for (int i = 0 ; i < SQLDb->Tuples (); i++)
@@ -228,8 +230,9 @@ int cservice::BurstChannels()
 			 */ 
 
 			id = SQLDb->GetValue(i, 1);
+			regTime = atoi(SQLDb->GetValue(i, 8));
 
-			MyUplink->JoinChannel( this, id, SQLDb->GetValue( i,  10) );
+			MyUplink->JoinChannel( this, id, SQLDb->GetValue( i,  10), regTime, true );
 			MyUplink->RegisterChannelEvent( id, this ) ;
 
 			// Add this information to the channel cache.
@@ -441,7 +444,7 @@ int cservice::OnCTCP( iClient* theClient, const string& CTCP,
 
 	if(Command == "VERSION")
 	{
-		xClient::DoCTCP(theClient, CTCP.c_str(), "Undernet P10 Channel Services Version 2 [" __DATE__ " " __TIME__ "] ($Id: cservice.cc,v 1.39 2001/01/13 20:49:46 gte Exp $)");
+		xClient::DoCTCP(theClient, CTCP.c_str(), "Undernet P10 Channel Services Version 2 [" __DATE__ " " __TIME__ "] ($Id: cservice.cc,v 1.40 2001/01/13 22:08:25 gte Exp $)");
 		return true;
 	}
  
