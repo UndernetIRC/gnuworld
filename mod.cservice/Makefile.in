@@ -10,7 +10,7 @@
 # even the implied warranty of MERCHANTABILITY or FITNESS FOR A
 # PARTICULAR PURPOSE.
 
-# "$Id: Makefile.in,v 1.105 2002/03/04 22:53:50 gte Exp $"
+# "$Id: Makefile.in,v 1.106 2002/04/01 22:02:22 gte Exp $"
 
 
 SHELL = @SHELL@
@@ -96,7 +96,7 @@ lib_LTLIBRARIES = libcservice.la
 libcservice_la_LDFLAGS = -module -export-dynamic -L@PGSQL_LIB@ 	-lpq++
 
 
-libcservice_la_SOURCES = cservice.cc 	networkData.cc 	sqlChannel.cc 	sqlUser.cc 	sqlLevel.cc 	sqlBan.cc 	sqlPendingChannel.cc 	sqlPendingTraffic.cc 	ACCESSCommand.cc 	ADDCOMMENTCommand.cc 	ADDUSERCommand.cc 	BANCommand.cc 	BANLISTCommand.cc 	CHANINFOCommand.cc 	CLEARMODECommand.cc 	DEOPCommand.cc 	DEVOICECommand.cc 	FORCECommand.cc 	HELPCommand.cc 	INVITECommand.cc 	ISREGCommand.cc 	JOINCommand.cc 	KICKCommand.cc 	LBANLISTCommand.cc 	LOGINCommand.cc 	MODINFOCommand.cc 	MOTDCommand.cc 	NEWPASSCommand.cc 	OPCommand.cc 	OPERJOINCommand.cc 	OPERPARTCommand.cc 	PARTCommand.cc 	PURGECommand.cc 	QUOTECommand.cc 	RANDOMCommand.cc 	REGISTERCommand.cc 	REHASHCommand.cc 	REMIGNORECommand.cc 	REMOVEALLCommand.cc 	REMUSERCommand.cc 	SAYCommand.cc 	SEARCHCommand.cc 	SERVNOTICECommand.cc 	SETCommand.cc 	SHOWCOMMANDSCommand.cc 	SHOWIGNORECommand.cc 	SHUTDOWNCommand.cc 	STATSCommand.cc 	STATUSCommand.cc 	SUPPORTCommand.cc 	SUSPENDCommand.cc 	SUSPENDMECommand.cc 	TOPICCommand.cc 	UNBANCommand.cc 	UNFORCECommand.cc 	UNSUSPENDCommand.cc 	VERIFYCommand.cc 	VOICECommand.cc
+libcservice_la_SOURCES = cservice.cc 	networkData.cc 	sqlChannel.cc 	sqlUser.cc 	sqlLevel.cc 	sqlBan.cc 	sqlPendingChannel.cc 	sqlPendingTraffic.cc 	ACCESSCommand.cc 	ADDCOMMENTCommand.cc 	ADDUSERCommand.cc 	BANCommand.cc 	BANLISTCommand.cc 	CHANINFOCommand.cc 	CLEARMODECommand.cc 	DEOPCommand.cc 	DEVOICECommand.cc 	FORCECommand.cc 	HELPCommand.cc 	INVITECommand.cc 	ISREGCommand.cc 	JOINCommand.cc 	KICKCommand.cc 	LBANLISTCommand.cc 	LOGINCommand.cc 	MODINFOCommand.cc 	MOTDCommand.cc 	NEWPASSCommand.cc 	NOTECommand.cc 	OPCommand.cc 	OPERJOINCommand.cc 	OPERPARTCommand.cc 	PARTCommand.cc 	PURGECommand.cc 	QUOTECommand.cc 	RANDOMCommand.cc 	REGISTERCommand.cc 	REHASHCommand.cc 	REMIGNORECommand.cc 	REMOVEALLCommand.cc 	REMUSERCommand.cc 	SAYCommand.cc 	SEARCHCommand.cc 	SERVNOTICECommand.cc 	SETCommand.cc 	SHOWCOMMANDSCommand.cc 	SHOWIGNORECommand.cc 	SHUTDOWNCommand.cc 	STATSCommand.cc 	STATUSCommand.cc 	SUPPORTCommand.cc 	SUSPENDCommand.cc 	SUSPENDMECommand.cc 	TOPICCommand.cc 	UNBANCommand.cc 	UNFORCECommand.cc 	UNSUSPENDCommand.cc 	VERIFYCommand.cc 	VOICECommand.cc
 
 
 INCLUDES = -I@PGSQL_INCLUDE@ $(INCLTDL)
@@ -117,9 +117,9 @@ ADDUSERCommand.lo BANCommand.lo BANLISTCommand.lo CHANINFOCommand.lo \
 CLEARMODECommand.lo DEOPCommand.lo DEVOICECommand.lo FORCECommand.lo \
 HELPCommand.lo INVITECommand.lo ISREGCommand.lo JOINCommand.lo \
 KICKCommand.lo LBANLISTCommand.lo LOGINCommand.lo MODINFOCommand.lo \
-MOTDCommand.lo NEWPASSCommand.lo OPCommand.lo OPERJOINCommand.lo \
-OPERPARTCommand.lo PARTCommand.lo PURGECommand.lo QUOTECommand.lo \
-RANDOMCommand.lo REGISTERCommand.lo REHASHCommand.lo \
+MOTDCommand.lo NEWPASSCommand.lo NOTECommand.lo OPCommand.lo \
+OPERJOINCommand.lo OPERPARTCommand.lo PARTCommand.lo PURGECommand.lo \
+QUOTECommand.lo RANDOMCommand.lo REGISTERCommand.lo REHASHCommand.lo \
 REMIGNORECommand.lo REMOVEALLCommand.lo REMUSERCommand.lo SAYCommand.lo \
 SEARCHCommand.lo SERVNOTICECommand.lo SETCommand.lo \
 SHOWCOMMANDSCommand.lo SHOWIGNORECommand.lo SHUTDOWNCommand.lo \
@@ -144,10 +144,10 @@ DEP_FILES =  .deps/ACCESSCommand.P .deps/ADDCOMMENTCommand.P \
 .deps/INVITECommand.P .deps/ISREGCommand.P .deps/JOINCommand.P \
 .deps/KICKCommand.P .deps/LBANLISTCommand.P .deps/LOGINCommand.P \
 .deps/MODINFOCommand.P .deps/MOTDCommand.P .deps/NEWPASSCommand.P \
-.deps/OPCommand.P .deps/OPERJOINCommand.P .deps/OPERPARTCommand.P \
-.deps/PARTCommand.P .deps/PURGECommand.P .deps/QUOTECommand.P \
-.deps/RANDOMCommand.P .deps/REGISTERCommand.P .deps/REHASHCommand.P \
-.deps/REMIGNORECommand.P .deps/REMOVEALLCommand.P \
+.deps/NOTECommand.P .deps/OPCommand.P .deps/OPERJOINCommand.P \
+.deps/OPERPARTCommand.P .deps/PARTCommand.P .deps/PURGECommand.P \
+.deps/QUOTECommand.P .deps/RANDOMCommand.P .deps/REGISTERCommand.P \
+.deps/REHASHCommand.P .deps/REMIGNORECommand.P .deps/REMOVEALLCommand.P \
 .deps/REMUSERCommand.P .deps/SAYCommand.P .deps/SEARCHCommand.P \
 .deps/SERVNOTICECommand.P .deps/SETCommand.P \
 .deps/SHOWCOMMANDSCommand.P .deps/SHOWIGNORECommand.P \

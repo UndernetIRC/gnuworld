@@ -1,7 +1,7 @@
 /* cservice_config.h */
 
 #ifndef __CSERVICE_CONFIG_H
-#define __CSERVICE_CONFIG_H "$Id: cservice_config.h,v 1.5 2002/03/10 03:23:55 gte Exp $"
+#define __CSERVICE_CONFIG_H "$Id: cservice_config.h,v 1.6 2002/04/01 22:02:22 gte Exp $"
 
 /**
  * Define this if you wish for all SQL queries to be sent
@@ -42,5 +42,11 @@
  */
 
 #define USE_NEWPASS
+
+/**
+ * Do you want to use the Noteserv functionality?
+ */
+
+#define USE_NOTES
 
 #endif // __CSERVICE_CONFIG_H

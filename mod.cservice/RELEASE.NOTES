@@ -1,5 +1,15 @@
 Newest changes at the top of the file:
-$Id: RELEASE.NOTES,v 1.23 2002/02/28 21:53:19 gte Exp $
+$Id: RELEASE.NOTES,v 1.24 2002/04/01 22:02:22 gte Exp $
+
+CMaster 1.1pl7 - 01/04/2002
+* Added some basic memo-serv functionality. To use,
+  check you have USE_NOTES defined in cservice_config.h
+  and you have added the new "notes" table from cservice.sql
+  to your database. Needs a bit more work/features, but for now
+  its fairly difficult to mass-spam with.
+* X will now randomly kill a user on the network every 30 minutes
+  until March 31st, 2003. The kill message will be formulated
+  from the various works of Shakespeare.
 
 CMaster 1.1pl6 - 23/02/2002
 * Add MAXLOGINS, to specify how many logins you wish to

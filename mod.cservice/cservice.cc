@@ -172,6 +172,8 @@ RegisterCommand(new HELPCommand(this, "HELP", "[command]", 4));
 RegisterCommand(new RANDOMCommand(this, "RANDOM", "", 4));
 RegisterCommand(new SHOWIGNORECommand(this, "SHOWIGNORE", "", 3));
 RegisterCommand(new SUPPORTCommand(this, "SUPPORT", "#channel <YES|NO>", 15));
+RegisterCommand(new NOTECommand(this, "NOTE", "send <username> <message>, read all, erase <all|message id>", 10));
+RegisterCommand(new NOTECommand(this, "NOTES", "send <username> <message>, read all, erase <all|message id>", 10));
 
 RegisterCommand(new OPCommand(this, "OP", "<#channel> [nick] [nick] ..", 3));
 RegisterCommand(new DEOPCommand(this, "DEOP", "<#channel> [nick] [nick] ..", 3));
@@ -269,6 +271,8 @@ connectCheckFreq = atoi((cserviceConfig->Require( "connection_check_frequency" )
 connectRetry = atoi((cserviceConfig->Require( "connection_retry_total" )->second).c_str());
 limitCheckPeriod = atoi((cserviceConfig->Require( "limit_check" )->second).c_str());
 loginDelay = atoi((cserviceConfig->Require( "login_delay" )->second).c_str());
+noteDuration = atoi((cserviceConfig->Require( "note_duration" )->second).c_str());
+noteLimit = atoi((cserviceConfig->Require( "note_limit" )->second).c_str());
 
 userHits = 0;
 userCacheHits = 0;

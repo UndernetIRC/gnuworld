@@ -11,7 +11,7 @@
 #include	"cservice_config.h"
 #include	"Network.h"
 
-const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.43 2002/03/23 18:53:34 gte Exp $" ;
+const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.44 2002/04/01 22:02:22 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -401,6 +401,32 @@ for(int i = 0; i < bot->SQLDb->Tuples(); i++)
 			" for %s. You may visit the website to register your support or to make an objection. Alternatively, you can"
 			" type '\002/msg X support %s YES\002' or '\002/msg X support %s NO\002' to confirm or deny your support.",
 			channelName.c_str(), channelName.c_str(), channelName.c_str());
+	}
+
+/*
+ * See if they have any notes.
+ */
+
+if(!theUser->getFlag(sqlUser::F_NONOTES))
+	{
+	strstream noteQuery;
+	noteQuery	<< "SELECT message_id FROM notes "
+				<< "WHERE user_id = "
+				<< theUser->getID()
+				<< ends;
+
+#ifdef LOG_SQL
+	elog	<< "LOGIN::sqlQuery> "
+		<< noteQuery.str()
+		<< endl;
+#endif
+
+	status = bot->SQLDb->Exec(noteQuery.str()) ;
+	delete[] noteQuery.str() ;
+
+	unsigned int count = bot->SQLDb->Tuples();
+	if(count) bot->Notice(theClient, "You have %i note(s). To read them type /msg %s notes read all",
+		count, bot->getNickName().c_str());
 	}
 
 return true;

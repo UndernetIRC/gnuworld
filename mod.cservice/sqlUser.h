@@ -1,7 +1,7 @@
 /* sqlUser.h */
 
 #ifndef __SQLUSER_H
-#define __SQLUSER_H "$Id: sqlUser.h,v 1.27 2002/02/24 01:04:06 gte Exp $"
+#define __SQLUSER_H "$Id: sqlUser.h,v 1.28 2002/04/01 22:02:22 gte Exp $"
 
 #include	<string>
 #include	<ctime>
@@ -27,6 +27,7 @@ public:
 	static const flagType F_LOGGEDIN; // Deprecated.
 	static const flagType F_INVIS;
 	static const flagType F_FRAUD;
+	static const flagType F_NONOTES;
 
 	/*
 	 *   User 'Event' Flags, used in the userlog table.
@@ -100,6 +101,12 @@ public:
 	inline const unsigned int& getMaxLogins() const
 		{ return maxlogins ; }
 
+	inline const time_t& getLastNote() const
+		{ return last_note ; }
+
+	inline const unsigned int& getNotesSent() const
+		{ return notes_sent ; }
+
 	/*
 	 *  Methods to set data atrributes.
 	 */
@@ -127,6 +134,12 @@ public:
 
 	inline void setMaxLogins( const unsigned int& _maxlogins )
 		{ maxlogins = _maxlogins; }
+
+	inline void setLastNote( const time_t& _last_note )
+		{ last_note = _last_note; }
+
+	inline void setNotesSent( const unsigned int& _notes_sent )
+		{ notes_sent = _notes_sent; }
 
 	/*
 	 * Method to perform a SQL 'UPDATE' and commit changes to this
@@ -165,6 +178,8 @@ protected:
 	string		email ;
 	string		last_hostmask ;
 	unsigned int maxlogins;
+	time_t		last_note;
+	unsigned int	notes_sent;
 
 	PgDatabase*	SQLDb;
 } ;

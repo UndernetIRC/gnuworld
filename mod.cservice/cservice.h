@@ -1,5 +1,5 @@
 #ifndef __CSERVICE_H
-#define __CSERVICE_H "$Id: cservice.h,v 1.81 2002/03/17 22:14:04 gte Exp $"
+#define __CSERVICE_H "$Id: cservice.h,v 1.82 2002/04/01 22:02:22 gte Exp $"
 
 #include	<string>
 #include	<vector>
@@ -428,6 +428,9 @@ public:
 	unsigned int totalCommands;
 
 	unsigned int loginDelay;
+
+	unsigned int noteDuration;
+	unsigned int noteLimit;
 } ;
 
 const string escapeSQLChars(const string& theString);

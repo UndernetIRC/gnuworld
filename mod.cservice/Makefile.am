@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-# "$Id: Makefile.am,v 1.42 2002/02/24 01:04:06 gte Exp $"
+# "$Id: Makefile.am,v 1.43 2002/04/01 22:02:22 gte Exp $"
 
 lib_LTLIBRARIES = libcservice.la
 libcservice_la_LDFLAGS = -module -export-dynamic -L@PGSQL_LIB@ \
@@ -33,6 +33,7 @@ libcservice_la_SOURCES = cservice.cc \
 	MODINFOCommand.cc \
 	MOTDCommand.cc \
 	NEWPASSCommand.cc \
+	NOTECommand.cc \
 	OPCommand.cc \
 	OPERJOINCommand.cc \
 	OPERPARTCommand.cc \

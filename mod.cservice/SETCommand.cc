@@ -18,7 +18,7 @@
  *
  * Caveats: None.
  *
- * $Id: SETCommand.cc,v 1.48 2002/02/24 01:04:06 gte Exp $
+ * $Id: SETCommand.cc,v 1.49 2002/04/01 22:02:22 gte Exp $
  */
 
 #include	<string>
@@ -29,7 +29,7 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char SETCommand_cc_rcsId[] = "$Id: SETCommand.cc,v 1.48 2002/02/24 01:04:06 gte Exp $" ;
+const char SETCommand_cc_rcsId[] = "$Id: SETCommand.cc,v 1.49 2002/04/01 22:02:22 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -85,6 +85,32 @@ if( st[1][0] != '#' ) // Didn't find a hash?
 				bot->getResponse(theUser,
 					language::invis_off,
 					string("Your INVISIBLE setting is now OFF.")));
+			return true;
+		}
+
+		bot->Notice(theClient,
+			bot->getResponse(theUser,
+				language::set_cmd_syntax_on_off,
+				string("value of %s must be ON or OFF")).c_str(),
+			option.c_str());
+	        return true;
+	}
+
+	if (option == "NONOTES")
+	{
+		if (value == "ON")
+		{
+			theUser->setFlag(sqlUser::F_NONOTES);
+			theUser->commit();
+			bot->Notice(theClient,"You are no longer able to receive notes from anyone.");
+			return true;
+		}
+
+		if (value == "OFF")
+		{
+			theUser->removeFlag(sqlUser::F_NONOTES);
+			theUser->commit();
+			bot->Notice(theClient,"You are now able to receive notes.");
 			return true;
 		}
 
