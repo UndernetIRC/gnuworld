@@ -10,7 +10,7 @@
  *
  * Caveats: None
  *
- * $Id: OPCommand.cc,v 1.7 2000/12/28 21:19:53 gte Exp $
+ * $Id: OPCommand.cc,v 1.8 2000/12/31 05:06:27 gte Exp $
  */
 
 #include	<string>
@@ -22,7 +22,7 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char OPCommand_cc_rcsId[] = "$Id: OPCommand.cc,v 1.7 2000/12/28 21:19:53 gte Exp $" ;
+const char OPCommand_cc_rcsId[] = "$Id: OPCommand.cc,v 1.8 2000/12/31 05:06:27 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -104,17 +104,24 @@ bool OPCommand::Exec( iClient* theClient, const string& Message )
 			bot->Notice(theClient, bot->getResponse(theUser, language::dont_see_them).c_str(),
 				st[counter].c_str());
 			cont = false;
-		} else 
-		{ 
-			ChannelUser* tmpChanUser = tmpChan->findUser(target) ; 
-			if (!tmpChanUser) 
-			{
-				bot->Notice(theClient, bot->getResponse(theUser, language::cant_find_on_chan).c_str(), 
-					target->getNickName().c_str(), theChan->getName().c_str()); 
-				cont = false;
-			}
+		} 
+
+		ChannelUser* tmpChanUser;
+		if (cont) tmpChanUser = tmpChan->findUser(target) ;
+		if (cont && !tmpChanUser) // User isn't on the channel?
+		{
+			bot->Notice(theClient, bot->getResponse(theUser, language::cant_find_on_chan).c_str(), 
+				target->getNickName().c_str(), theChan->getName().c_str()); 
+			cont = false;
 		}
-		
+
+		if(cont && tmpChanUser->getMode(ChannelUser::MODE_O)) // User is already opped?
+		{
+			bot->Notice(theClient, bot->getResponse(theUser, language::already_opped).c_str(), 
+				target->getNickName().c_str(), theChan->getName().c_str());
+				cont = false;
+		} 
+ 
 	 	if (cont) 
 	 	{
 			opList.push_back(target); 

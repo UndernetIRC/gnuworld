@@ -3,8 +3,13 @@
  * 
  * Storage class for accessing user information either from the backend
  * or internal storage.
+ *
+ * 20/12/2000: Greg Sikorski <gte@atomicrevs.demon.co.uk>
+ * Initial Version.
+ * 30/12/2000: Moved static SQL data to constants.h --Gte
+ * Set loadData up to take data from rows other than 0.
  * 
- * $Id: sqlChannel.cc,v 1.8 2000/12/30 23:28:34 gte Exp $
+ * $Id: sqlChannel.cc,v 1.9 2000/12/31 05:06:27 gte Exp $
  */
  
 #include	<strstream>
@@ -12,13 +17,14 @@
 #include	<cstring> 
 #include	"ELog.h"
 #include	"misc.h"
-#include	"sqlChannel.h" 
+#include	"sqlChannel.h"
+#include	"constants.h"
 
 using std::string ; 
 using std::endl ; 
  
 const char sqlChannel_h_rcsId[] = __SQLCHANNEL_H ;
-const char sqlChannel_cc_rcsId[] = "$Id: sqlChannel.cc,v 1.8 2000/12/30 23:28:34 gte Exp $" ;
+const char sqlChannel_cc_rcsId[] = "$Id: sqlChannel.cc,v 1.9 2000/12/31 05:06:27 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -43,10 +49,10 @@ bool sqlChannel::loadData(const string& channelName)
 	 */ 
 
 	ExecStatusType status;
-	elog << "sqlChannel> Attempting to load data for channel-name: " << channelName << endl;
+	elog << "sqlChannel::loadData> Attempting to load data for channel-name: " << channelName << endl;
 
-    string queryString = "SELECT id,name,flags,mass_deop_pro,flood_pro,url,description,keywords,registered_ts,channel_ts,channel_mode,channel_key,channel_limit FROM channels WHERE registered_ts <> '' AND lower(name) = '" + string_lower(channelName) + "'";
-	elog << "sqlQuery> " << queryString << endl;
+    string queryString = "SELECT " + sql::channel_fields + " FROM channels WHERE registered_ts <> '' AND lower(name) = '" + string_lower(channelName) + "'";
+	elog << "sqlChannel::loadData> " << queryString << endl;
 
 	if ((status = SQLDb->Exec(queryString.c_str())) == PGRES_TUPLES_OK)
 	{ 
@@ -57,7 +63,7 @@ bool sqlChannel::loadData(const string& channelName)
 		if(SQLDb->Tuples() < 1) { 
 			return (false);
 		} 
-		setAllMembers(); 
+		setAllMembers(0); 
 		return (true);
 	} 
 	return (false); 
@@ -71,12 +77,12 @@ bool sqlChannel::loadData(int channelID)
 	 */ 
 
 	ExecStatusType status;
-	elog << "sqlChannel> Attempting to load data for channel-id: " << channelID << endl;
+	elog << "sqlChannel::loadData> Attempting to load data for channel-id: " << channelID << endl;
 	
 	strstream queryString;
-	queryString << "SELECT id,name,flags,mass_deop_pro,flood_pro,url,description,keywords,registered_ts,channel_ts,channel_mode,channel_key,channel_limit FROM channels WHERE registered_ts <> '' AND id = " << channelID; 
+	queryString << "SELECT " + sql::channel_fields + " FROM channels WHERE registered_ts <> '' AND id = " << channelID; 
 
-	elog << "sqlQuery> " << queryString.str() << endl;
+	elog << "sqlChannel::loadData> " << queryString.str() << endl;
 
 	if ((status = SQLDb->Exec(queryString.str())) == PGRES_TUPLES_OK)
 	{ 
@@ -87,7 +93,7 @@ bool sqlChannel::loadData(int channelID)
 		if(SQLDb->Tuples() < 1) { 
 			return (false);
 		} 
-		setAllMembers(); 
+		setAllMembers(0); 
 		return (true);
 	} 
 
@@ -95,26 +101,26 @@ bool sqlChannel::loadData(int channelID)
 } 
 
 
-void sqlChannel::setAllMembers()
+void sqlChannel::setAllMembers(int row)
 {
 	/*
 	 *  Support function for both loadData's.
 	 *  Assumes SQLDb contains a valid results set for all channel information.
 	 */
 
-	id = atoi(SQLDb->GetValue(0, 0));
-	name = SQLDb->GetValue(0, 1);
-	flags = atoi(SQLDb->GetValue(0, 2));
-	mass_deop_pro = atoi(SQLDb->GetValue(0,3));
-	flood_pro = atoi(SQLDb->GetValue(0,4));
-	url = SQLDb->GetValue(0,5);
-	description = SQLDb->GetValue(0,6);
-	keywords = SQLDb->GetValue(0,7);
-	registered_ts = atoi(SQLDb->GetValue(0,8));
-	channel_ts = atoi(SQLDb->GetValue(0,9));
-	channel_mode = SQLDb->GetValue(0,10);
-	channel_key = SQLDb->GetValue(0,11);
-	channel_limit = atoi(SQLDb->GetValue(0,12)); 
+	id = atoi(SQLDb->GetValue(row, 0));
+	name = SQLDb->GetValue(row, 1);
+	flags = atoi(SQLDb->GetValue(row, 2));
+	mass_deop_pro = atoi(SQLDb->GetValue(row,3));
+	flood_pro = atoi(SQLDb->GetValue(row,4));
+	url = SQLDb->GetValue(row,5);
+	description = SQLDb->GetValue(row,6);
+	keywords = SQLDb->GetValue(row,7);
+	registered_ts = atoi(SQLDb->GetValue(row,8));
+	channel_ts = atoi(SQLDb->GetValue(row,9));
+	channel_mode = SQLDb->GetValue(row,10);
+	channel_key = SQLDb->GetValue(row,11);
+	channel_limit = atoi(SQLDb->GetValue(row,12));
 }
 
 bool sqlChannel::commit()
@@ -146,11 +152,11 @@ bool sqlChannel::commit()
 	<< queryCondition << id
 	<< ends;
 
-	elog << "sqlQuery> " << queryString.str() << endl; 
+	elog << "sqlChannel::commit> " << queryString.str() << endl; 
 
 	if ((status = SQLDb->Exec(queryString.str())) != PGRES_COMMAND_OK)
 	{
-		elog << "sqlQuery> Something went wrong: " << SQLDb->ErrorMessage() << endl; // Log to msgchan here.
+		elog << "sqlChannel::commit> Something went wrong: " << SQLDb->ErrorMessage() << endl; // Log to msgchan here.
 		return false;
  	} 
 

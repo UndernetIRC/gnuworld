@@ -1,7 +1,7 @@
 /* sqlLevel.h */
 
 #ifndef __SQLLEVEL_H
-#define __SQLLEVEL_H "$Id: sqlLevel.h,v 1.2 2000/12/27 01:11:08 gte Exp $"
+#define __SQLLEVEL_H "$Id: sqlLevel.h,v 1.3 2000/12/31 05:06:27 gte Exp $"
 
 #include	<string>
 #include	<ctime>
@@ -52,7 +52,7 @@ public:
 
 protected:
 
-    void setAllMembers();
+    void setAllMembers(int);
 
 	unsigned int	channel_id ;
 	unsigned int	user_id ;

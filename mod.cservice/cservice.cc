@@ -76,13 +76,13 @@ void cservice::ImplementServer( xServer* theServer )
 
  	// Attempt to register our interest in recieving NOTIFY events.
 	if (SQLDb->ExecCommandOk("LISTEN channels_u; LISTEN bans_u; LISTEN users_u; LISTEN levels_u;")) {
-		elog << "DbUpdate1> Successfully registered LISTEN event for Db updates." << endl;
+		elog << "cmaster::ImplementServer> Successfully registered LISTEN event for Db updates." << endl;
 		// Start the Db update timer rolling.
 		time_t theTime = time(NULL) + updateInterval;
 		theServer->RegisterTimer(theTime, this, NULL); 
 	} else 
 	{
-		elog << "DbUpdate> PostgreSQL error while attempting to register LISTEN event: " << SQLDb->ErrorMessage() << endl;
+		elog << "cmaster::ImplementServer> PostgreSQL error while attempting to register LISTEN event: " << SQLDb->ErrorMessage() << endl;
 	}
 
 
@@ -116,6 +116,8 @@ cservice::cservice(const string& args)
     RegisterCommand(new TOPICCommand(this, "TOPIC", "<#channel> <topic>"));
     RegisterCommand(new CHANINFOCommand(this, "CHANINFO", "<#channel>"));
     RegisterCommand(new CHANINFOCommand(this, "INFO", "<#channel>"));
+    RegisterCommand(new BANLISTCommand(this, "BANLIST", "<#channel>"));
+    RegisterCommand(new KICKCommand(this, "KICK", "<#channel> <nick> <reason>"));
 
 	//-- Load in our cservice configuration file. 
 	cserviceConfig = new EConfig( args ) ;
@@ -124,7 +126,7 @@ cservice::cservice(const string& args)
 	
 	string Query = "host=" + sqlHost + " dbname=" + sqlDb ;
 
-	elog << "[SQL]: Attempting to connect to " << sqlHost << "; Database: " << sqlDb << endl;
+	elog << "cmaster::cmaster> Attempting to connect to " << sqlHost << "; Database: " << sqlDb << endl;
  
 	SQLDb = new cmDatabase( Query.c_str() ) ;
 
@@ -132,14 +134,14 @@ cservice::cservice(const string& args)
 
 	if (SQLDb->ConnectionBad ())
 	{
-		elog << "[SQL]: Unable to connect to SQL server." << endl 
-		     << "[SQL]: PostgreSQL error message: " << SQLDb->ErrorMessage () << endl ;
+		elog << "cmaster::cmaster> Unable to connect to SQL server." << endl 
+		     << "cmaster::cmaster> PostgreSQL error message: " << SQLDb->ErrorMessage () << endl ;
 
 		::exit( 0 ) ;
 	}
 	else
 	{
-		elog << "[SQL]: Connection established to SQL server. Backend PID: " << SQLDb->getPID() << endl ;
+		elog << "cmaster::cmaster> Connection established to SQL server. Backend PID: " << SQLDb->getPID() << endl ;
 	}
 
 	//-- Retrieve user, nick, host, and description from the configuration file -- these are all REQUIRED
@@ -265,7 +267,7 @@ int cservice::OnCTCP( iClient* theClient, const string& CTCP,
 
 	if(Command == "VERSION")
 	{
-		xClient::DoCTCP(theClient, CTCP.c_str(), "Undernet Channel Services Version 2 [" __DATE__ " " __TIME__ "] ($Id: cservice.cc,v 1.23 2000/12/30 23:32:34 gte Exp $)");
+		xClient::DoCTCP(theClient, CTCP.c_str(), "Undernet Channel Services Version 2 [" __DATE__ " " __TIME__ "] ($Id: cservice.cc,v 1.24 2000/12/31 05:06:27 gte Exp $)");
 		return true;
 	}
  
@@ -302,7 +304,7 @@ sqlUser* cservice::getUserRecord(const string& id)
 	sqlUserHashType::iterator ptr = sqlUserCache.find(id);
 	if(ptr != sqlUserCache.end()) // Found something!
 	{
-		elog << "sqlUserCache> Cache hit for " << id << endl;
+		elog << "cmaster::getUserRecord> Cache hit for " << id << endl;
 		userCacheHits++;
 		return ptr->second ;
 	}
@@ -317,7 +319,7 @@ sqlUser* cservice::getUserRecord(const string& id)
 	if (theUser->loadData(id)) 
 	{ 
 	 	sqlUserCache.insert(sqlUserHashType::value_type(id, theUser));
-		elog << "sqlUserCache> " << sqlUserCache.size() << " elements in hash." << endl;
+		elog << "cmaster::getUserRecord> There are " << sqlUserCache.size() << " elements in the cache." << endl;
 		userHits++;
 		return theUser;
 	}
@@ -340,7 +342,7 @@ sqlChannel* cservice::getChannelRecord(const string& id)
 	sqlChannelHashType::iterator ptr = sqlChannelCache.find(id);
 	if(ptr != sqlChannelCache.end()) // Found something!
 	{
-		elog << "sqlChannelCache> Cache hit for " << id << endl;
+		elog << "cmaster::getChannelRecord> Cache hit for " << id << endl;
 		channelCacheHits++;
 		return ptr->second ;
 	} 
@@ -354,7 +356,7 @@ sqlChannel* cservice::getChannelRecord(const string& id)
  
 	if (theChan->loadData(id)) {
 	 	sqlChannelCache.insert(sqlChannelHashType::value_type(id, theChan));
-		elog << "sqlChannelCache> " << sqlChannelCache.size() << " elements in hash." << endl;
+		elog << "cmaster::getChannelRecord> There are " << sqlChannelCache.size() << " elements in the cache." << endl;
 		channelHits++;
 		return theChan;
 	}
@@ -436,7 +438,7 @@ void cservice::loadTranslationTable()
 		}
 	}
 
-	elog << "sqlTranslations> Loaded " << translationTable.size() << " entries." << endl;
+	elog << "cmaster::loadTranslationTable> Loaded " << translationTable.size() << " entries." << endl;
 }
  
 bool cservice::isOnChannel( const string& chanName ) const
@@ -450,7 +452,7 @@ int cservice::OnTimer(xServer::timerID, void*)
     *  Time to see if anyone updated the database while we weren't looking. :)
     */
 
-    elog << "DbUpdate> Checking for updates.." << endl;
+    elog << "cmaster::OnTimer> Checking for updates.." << endl;
 	time_t theTime = time(NULL) + updateInterval;
 	MyUplink->RegisterTimer(theTime, this, NULL);
  
@@ -467,7 +469,7 @@ int cservice::OnTimer(xServer::timerID, void*)
 		return true;
 	}
 
-	elog << "DbUpdate> Recieved a notification event for '" << notify->relname 
+	elog << "cmaster::OnTimer> Recieved a notification event for '" << notify->relname 
 	<< "' from Backend PID '" << notify->be_pid << "'"
 	<< endl;
 
@@ -491,19 +493,19 @@ int cservice::OnTimer(xServer::timerID, void*)
  
 		if (status == PGRES_TUPLES_OK)
 		{
-			elog << "DbUpdate> Found " << SQLDb->Tuples() << " updated channel records." << endl;
+			elog << "cmaster::OnTimer> Found " << SQLDb->Tuples() << " updated channel records." << endl;
 			/*
 			 *  Now, update the cache with information in this results set.
 			 */
 
 		}  else 
 		{
-			elog << "Something went wrong: " << SQLDb->ErrorMessage() << endl; // Log to msgchan here.
+			elog << "cmaster::OnTimer> Something went wrong: " << SQLDb->ErrorMessage() << endl; // Log to msgchan here.
 		}
 
 	} else // Our own notification.
 	{
-		elog << "DbUpdate> Notification from our Backend PID, ignoring update." << endl;
+		elog << "cmaster::OnTimer> Notification from our Backend PID, ignoring update." << endl;
 	} 
 
 	free(notify);

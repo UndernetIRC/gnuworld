@@ -10,7 +10,7 @@
 # even the implied warranty of MERCHANTABILITY or FITNESS FOR A
 # PARTICULAR PURPOSE.
 
-# "$Id: Makefile.in,v 1.23 2000/12/30 05:47:29 gte Exp $"
+# "$Id: Makefile.in,v 1.24 2000/12/31 05:06:27 gte Exp $"
 
 
 SHELL = /bin/sh
@@ -114,7 +114,9 @@ libcservice_la_SOURCES = cservice.cc \
 	MODINFOCommand.cc \
 	SETCommand.cc \
 	TOPICCommand.cc \
-	INVITECommand.cc
+	INVITECommand.cc \
+	BANLISTCommand.cc \
+	KICKCommand.cc 
 INCLUDES = -I/usr/local/pgsql/include
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = ../include/defs.h
@@ -131,11 +133,12 @@ sqlLevel.lo ACCESSCommand.lo CHANINFOCommand.lo ISREGCommand.lo \
 LOGINCommand.lo MOTDCommand.lo RANDOMCommand.lo SEARCHCommand.lo \
 SHOWCOMMANDSCommand.lo SHOWIGNORECommand.lo VERIFYCommand.lo \
 OPCommand.lo VOICECommand.lo ADDUSERCommand.lo REMUSERCommand.lo \
-MODINFOCommand.lo SETCommand.lo TOPICCommand.lo INVITECommand.lo
+MODINFOCommand.lo SETCommand.lo TOPICCommand.lo INVITECommand.lo \
+BANLISTCommand.lo KICKCommand.lo
 CXXCOMPILE = $(CXX) $(DEFS) $(INCLUDES) $(CPPFLAGS) $(CXXFLAGS)
 LTCXXCOMPILE = $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(INCLUDES) $(CPPFLAGS) $(CXXFLAGS)
 CXXLINK = $(LIBTOOL) --mode=link $(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@
-DIST_COMMON =  Makefile.am Makefile.in
+DIST_COMMON =  README Makefile.am Makefile.in
 
 
 DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
@@ -143,10 +146,11 @@ DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 TAR = tar
 GZIP = --best
 DEP_FILES =  .deps/ACCESSCommand.P .deps/ADDUSERCommand.P \
-.deps/CHANINFOCommand.P .deps/INVITECommand.P .deps/ISREGCommand.P \
-.deps/LOGINCommand.P .deps/MODINFOCommand.P .deps/MOTDCommand.P \
-.deps/OPCommand.P .deps/RANDOMCommand.P .deps/REMUSERCommand.P \
-.deps/SEARCHCommand.P .deps/SETCommand.P .deps/SHOWCOMMANDSCommand.P \
+.deps/BANLISTCommand.P .deps/CHANINFOCommand.P .deps/INVITECommand.P \
+.deps/ISREGCommand.P .deps/KICKCommand.P .deps/LOGINCommand.P \
+.deps/MODINFOCommand.P .deps/MOTDCommand.P .deps/OPCommand.P \
+.deps/RANDOMCommand.P .deps/REMUSERCommand.P .deps/SEARCHCommand.P \
+.deps/SETCommand.P .deps/SHOWCOMMANDSCommand.P \
 .deps/SHOWIGNORECommand.P .deps/TOPICCommand.P .deps/VERIFYCommand.P \
 .deps/VOICECommand.P .deps/cservice.P .deps/sqlChannel.P \
 .deps/sqlLevel.P .deps/sqlUser.P

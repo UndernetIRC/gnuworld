@@ -1,7 +1,7 @@
 /* sqlChannel.h */
 
 #ifndef __SQLCHANNEL_H
-#define __SQLCHANNEL_H "$Id: sqlChannel.h,v 1.5 2000/12/30 00:32:37 gte Exp $"
+#define __SQLCHANNEL_H "$Id: sqlChannel.h,v 1.6 2000/12/31 05:06:27 gte Exp $"
 
 #include	<string>
 #include	<ctime>
@@ -138,7 +138,7 @@ public:
 
 protected:
 
-    void setAllMembers();
+    void setAllMembers(int);
 
 	unsigned int	id ;
 	string		name ;

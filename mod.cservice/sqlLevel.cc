@@ -4,7 +4,7 @@
  * Storage class for accessing channel user/level information either from the backend
  * or internal storage.
  * 
- * $Id: sqlLevel.cc,v 1.1 2000/12/22 00:29:32 gte Exp $
+ * $Id: sqlLevel.cc,v 1.2 2000/12/31 05:06:27 gte Exp $
  */
  
 #include	<strstream>
@@ -15,12 +15,13 @@
 #include	"sqlLevel.h"
 #include	"sqlUser.h"
 #include	"sqlChannel.h"
+#include	"constants.h"
 
 using std::string ; 
 using std::endl ; 
  
 const char sqlLevel_h_rcsId[] = __SQLLEVEL_H ;
-const char sqlLevel_cc_rcsId[] = "$Id: sqlLevel.cc,v 1.1 2000/12/22 00:29:32 gte Exp $" ;
+const char sqlLevel_cc_rcsId[] = "$Id: sqlLevel.cc,v 1.2 2000/12/31 05:06:27 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -43,12 +44,15 @@ bool sqlLevel::loadData(unsigned int userID, unsigned int channelID)
 	 */ 
 
 	ExecStatusType status;
-	elog << "sqlLevel> Attempting to load level data for channel-id: " << channelID << " and user-id: " << userID << endl;
+	elog << "sqlLevel::loadData> Attempting to load level data for channel-id: " << channelID << " and user-id: " << userID << endl;
 	
 	strstream queryString;
-	queryString << "SELECT channel_id,user_id,access,flags,suspend_expires,suspend_by,added,added_by,last_Modif,last_Modif_By,last_Updated FROM levels WHERE channel_id = " << channelID << " AND user_id = " << userID << ends;
+	queryString << "SELECT " << sql::level_fields 
+		<< " FROM levels WHERE channel_id = " << channelID 
+		<< " AND user_id = " << userID 
+		<< ends;
 
-	elog << "sqlQuery> " << queryString.str() << endl;
+	elog << "sqlLevel::loadData> " << queryString.str() << endl;
 
 	if ((status = SQLDb->Exec(queryString.str())) == PGRES_TUPLES_OK)
 	{ 
@@ -59,7 +63,7 @@ bool sqlLevel::loadData(unsigned int userID, unsigned int channelID)
 	if(SQLDb->Tuples() < 1) { 
 			return (false);
 		} 
-		setAllMembers(); 
+		setAllMembers(0); // Fetch dat from row '0'
 		delete[] queryString.str() ;
 		return (true);
 	} 
@@ -69,24 +73,24 @@ bool sqlLevel::loadData(unsigned int userID, unsigned int channelID)
 } 
 
 
-void sqlLevel::setAllMembers()
+void sqlLevel::setAllMembers(int row)
 {
 	/*
 	 *  Support function for both loadData's.
 	 *  Assumes SQLDb contains a valid results set for all Level information.
 	 */
 
-	channel_id = atoi(SQLDb->GetValue(0, 0));
-	user_id = atoi(SQLDb->GetValue(0, 1));
-	access = atoi(SQLDb->GetValue(0, 2));
-	flags = atoi(SQLDb->GetValue(0, 3));
-	suspend_expires = atoi(SQLDb->GetValue(0, 4));
-	suspend_by = SQLDb->GetValue(0, 5);
-	added = atoi(SQLDb->GetValue(0, 6));
-	added_by = SQLDb->GetValue(0, 7);
-	last_modif = atoi(SQLDb->GetValue(0, 8));
-	last_modif_by = SQLDb->GetValue(0, 9);
-	last_update = atoi(SQLDb->GetValue(0, 10)); 
+	channel_id = atoi(SQLDb->GetValue(row, 0));
+	user_id = atoi(SQLDb->GetValue(row, 1));
+	access = atoi(SQLDb->GetValue(row, 2));
+	flags = atoi(SQLDb->GetValue(row, 3));
+	suspend_expires = atoi(SQLDb->GetValue(row, 4));
+	suspend_by = SQLDb->GetValue(row, 5);
+	added = atoi(SQLDb->GetValue(row, 6));
+	added_by = SQLDb->GetValue(row, 7);
+	last_modif = atoi(SQLDb->GetValue(row, 8));
+	last_modif_by = SQLDb->GetValue(row, 9);
+	last_update = atoi(SQLDb->GetValue(row, 10)); 
 }
 
 sqlLevel::~sqlLevel()
