@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------------
--- "$Id: local_db.sql,v 1.8 2001/11/05 01:04:56 nighty Exp $"
+-- "$Id: local_db.sql,v 1.9 2001/11/06 04:00:59 nighty Exp $"
 -- Channel service DB SQL file for PostgreSQL.
 --
 --
@@ -77,6 +77,8 @@ CREATE TABLE pending_mgrchange (
 -- change_type : 1 : permanent
 	opt_duration INT4,
 -- duration in seconds if temporary, 0 if permanent.
+	reason TEXT,
+	expiration INT4 DEFAULT 0,
 	crc VARCHAR(128),
 	confirmed INT2 DEFAULT 0,
 	from_host VARCHAR(15) DEFAULT '0.0.0.0'
@@ -88,11 +90,13 @@ CREATE INDEX pending_mgrchange_manager_id_idx ON pending_mgrchange(manager_id);
 CREATE INDEX pending_mgrchange_new_manager_id_idx ON pending_mgrchange(new_manager_id);
 CREATE INDEX pending_mgrchange_change_type_idx ON pending_mgrchange(change_type);
 CREATE INDEX pending_mgrchange_opt_duration_idx ON pending_mgrchange(opt_duration);
+CREATE INDEX pending_mgrchange_expiration_idx ON pending_mgrchange(expiration);
 CREATE INDEX pending_mgrchange_crc_idx ON pending_mgrchange(crc);
 CREATE INDEX pending_mgrchange_confirmed_idx ON pending_mgrchange(confirmed);
 
 CREATE TABLE xatadmins (
-	admin_id INT4 NOT NULL
+	admin_id INT4 NOT NULL,
+	type INT2 DEFAULT 0
 );
 
 CREATE INDEX xatadmins_admin_id_idx ON xatadmins(admin_id);

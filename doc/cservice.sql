@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------------
--- "$Id: cservice.sql,v 1.54 2001/10/22 14:54:53 nighty Exp $"
+-- "$Id: cservice.sql,v 1.55 2001/11/06 04:00:59 nighty Exp $"
 -- Channel service DB SQL file for PostgreSQL.
 
 -- ChangeLog:
@@ -238,6 +238,7 @@ CREATE TABLE channellog (
 -- 9  -- EV_COMMENT - Generic comments.
 -- 10 -- EV_REMOVEALL - When REMOVEALL command is used.
 -- 11 -- EV_IDLE - When a channel is idle for > 48 hours.
+-- 12 -- EV_MGRCHANGE - When a channel switched managers either temporarily or permanently
 	message TEXT,
 	last_updated INT4 NOT NULL,
 	deleted INT2 DEFAULT '0'
@@ -255,6 +256,7 @@ CREATE TABLE userlog (
 -- 3 -- EV_MODIF - Modification of user record by an admin.
 -- 4 -- EV_MISC - Uncategorised event.
 -- 5 -- EV_COMMENT - Admin comment on username.
+-- 6 -- EV_MGRCHANGE - When a user status is to swith manager with another user (also logged) on a channel
 	message TEXT,
 	last_updated INT4 NOT NULL 
 );
