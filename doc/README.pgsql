@@ -1,4 +1,4 @@
--- "$Id: README.pgsql,v 1.6 2001/10/15 21:10:51 nighty Exp $"
+-- "$Id: README.pgsql,v 1.7 2001/10/16 01:20:52 nighty Exp $"
 --
 -- Building PostgreSQL for GNUworld
 --
@@ -29,18 +29,7 @@ in order to build postgres you need :
 		--with-tcl --without-tk	: needed to compile pgtclsh (TCL interpreter)
 					  which is needed for the script gnuworld/doc/cmaster/regproc/appjudge
 					  and this script is the one making the applications advance in registration process.
-		
-
-					  To install this properly do the following :
-						- copy regproc/ and its subdirs to /usr/local/pgsql
-						- make it owned by your gnuworld user (the one running the postgres) :
-							chown -R gnuworld /usr/local/pgsql/regproc
-						- edit the file /usr/local/pgsql/regproc/appjudge-config and set your preferences.
-						- crontab the content of /usr/local/pgsql/regproc/cron-judge.in :
-							as root :  crontab -u gnuworld /usr/local/pgsql/regproc/cron-judge.in
-							or, as gnuworld : crontab /usr/local/pgsql/regproc/cron-judge.in
-
-						- you're done!
+					  To install this properly, see the included README.appjudge file. 
 
 	- build pgsql
 		root:# ./configure --with-CXX --with-tcl --without-tk
