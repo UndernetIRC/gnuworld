@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: client.h,v 1.43 2003/07/03 00:25:48 dan_karrels Exp $
+ * $Id: client.h,v 1.44 2003/08/03 18:57:44 dan_karrels Exp $
  */
 
 #ifndef __CLIENT_H
-#define __CLIENT_H "$Id: client.h,v 1.43 2003/07/03 00:25:48 dan_karrels Exp $"
+#define __CLIENT_H "$Id: client.h,v 1.44 2003/08/03 18:57:44 dan_karrels Exp $"
 
 #include	<sstream>
 #include	<string>
@@ -584,6 +584,13 @@ public:
 	 */
 	virtual bool Message( const string& Channel,
 		const char* Message, ... ) ;
+
+	/**
+	 * This format of Message will write a string of data
+	 * to a channel.
+	 */
+	virtual bool Message( const string& Channel,
+		const string& Message ) ;
 
 	/**
 	 * This format of Message will write a string of data

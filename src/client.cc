@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: client.cc,v 1.58 2003/07/03 00:25:48 dan_karrels Exp $
+ * $Id: client.cc,v 1.59 2003/08/03 18:57:44 dan_karrels Exp $
  */
 
 #include	<new>
@@ -47,7 +47,7 @@
 #include	"ELog.h"
 #include	"events.h"
 
-RCSTAG("$Id: client.cc,v 1.58 2003/07/03 00:25:48 dan_karrels Exp $" ) ;
+RCSTAG("$Id: client.cc,v 1.59 2003/08/03 18:57:44 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -374,6 +374,23 @@ if( Connected && MyUplink )
 	return MyUplink->Write( "%s P %s :%s",
 		getCharYYXXX().c_str(),
 		theChan->getName().c_str(),
+		Message.c_str() ) ;
+	}
+return false ;
+}
+
+bool xClient::Message( const string& chanName, const string& Message )
+{
+if( chanName.empty() || Message.empty() )
+	{
+	return false ;
+	}
+
+if( Connected && MyUplink )
+	{
+	return MyUplink->Write( "%s P %s :%s",
+		getCharYYXXX().c_str(),
+		chanName.c_str(),
 		Message.c_str() ) ;
 	}
 return false ;
