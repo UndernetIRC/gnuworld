@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------------
--- "$Id: cservice.sql,v 1.9 2000/12/27 16:50:16 gte Exp $"
+-- "$Id: cservice.sql,v 1.10 2000/12/28 05:10:01 gte Exp $"
 -- Channel service DB SQL file for PostgreSQL.
 
 -- ChangeLog:
@@ -44,7 +44,7 @@ CREATE TABLE languages (
 
 CREATE TABLE translations (
 
-	language_id INT4 CONSTRAINT translations_language_id_ref REFERENCES languages (languageID),
+	language_id INT4 CONSTRAINT translations_language_id_ref REFERENCES languages ( id ),
 	response_id INT4 NOT NULL DEFAULT '0',
 	text TEXT,
 	last_update INT4 NOT NULL,
