@@ -1,4 +1,4 @@
--- $Id: language_greek.sql,v 1.3 2002/10/31 14:04:51 nighty Exp $
+-- $Id: language_greek.sql,v 1.4 2002/10/31 14:17:29 nighty Exp $
 -- Greek	 language definition.
 -- 04/05/02 - Marios Solomou <hawk@undernet.org>.
 -- 04/05/02 - deop <d30pma@cytanet.com.cy>.
@@ -177,5 +177,6 @@ COPY "translations" FROM stdin;
 19	168	Auti i entoli einai periorismeni mono gia IRC Operators	31337	0
 19	169	Den eimai opped sto %s	31337	0
 19	170	%s gia %i lepta	31337	0
+19	9998	Na thimase: Kanenas apo tin CService den tha sou zitisei na tou pis to password sou, MIN to doseis se kanena pou ipostirizei oti einai apo tin CService.	31337	0
 \.
 
