@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server.cc,v 1.153 2002/11/21 21:13:14 dan_karrels Exp $
+ * $Id: server.cc,v 1.154 2002/12/28 22:44:58 mrbean_ Exp $
  */
 
 #include	<sys/time.h>
@@ -72,7 +72,7 @@
 #include	"Connection.h"
 
 const char server_h_rcsId[] = __SERVER_H ;
-const char server_cc_rcsId[] = "$Id: server.cc,v 1.153 2002/11/21 21:13:14 dan_karrels Exp $" ;
+const char server_cc_rcsId[] = "$Id: server.cc,v 1.154 2002/12/28 22:44:58 mrbean_ Exp $" ;
 const char config_h_rcsId[] = __CONFIG_H ;
 const char misc_h_rcsId[] = __MISC_H ;
 const char events_h_rcsId[] = __EVENTS_H ;
@@ -1372,6 +1372,7 @@ if( doBurst )
 	{
 	BurstClient( Client ) ;
 	Client->BurstChannels() ;
+	Client->BurstGlines() ;
 	}
 
 // Success
@@ -1901,6 +1902,7 @@ bool xServer::setGline(
 	const string& userHost,
 	const string& reason,
 	const time_t& duration,
+	const time_t& lastmod,
 	const xClient* setClient,
 	const string& server )
 {
@@ -1908,7 +1910,7 @@ bool xServer::setGline(
 removeMatchingGlines( userHost ) ;
 
 Gline* newGline =
-	new (std::nothrow) Gline( setBy, userHost, reason, duration ) ;
+	new (std::nothrow) Gline( setBy, userHost, reason, duration , lastmod) ;
 assert( newGline != 0 ) ;
 
 // Notify the rest of the network
@@ -1916,7 +1918,8 @@ stringstream s ;
 s	<< getCharYY() << " GL "
 	<< server << " +"
 	<< userHost << ' '
-	<< duration << " :"
+	<< duration << ' '
+	<< lastmod << " :"
 	<< reason << ends ;
 Write( s ) ;
 
@@ -1975,7 +1978,8 @@ for( const_glineIterator ptr = gline_begin() ;
 	stringstream s ;
 	s	<< getCharYY() << " GL * +"
 		<< (*ptr)->getUserHost() << ' '
-		<< ((*ptr)->getExpiration() - now) << " :"
+		<< ((*ptr)->getExpiration() - now) << ' '
+		<< (*ptr)->getLastmod() << " :"
 		<< (*ptr)->getReason() << ends ;
 
 	Write( s ) ;
@@ -2485,6 +2489,16 @@ xNetwork::localClientIterator ptr = Network->localClient_begin() ;
 while( ptr != Network->localClient_end() )
 	{
 	(*ptr)->BurstChannels() ;
+	++ptr ;
+	}
+}
+
+void xServer::BurstGlines()
+{
+xNetwork::localClientIterator ptr = Network->localClient_begin() ;
+while( ptr != Network->localClient_end() )
+	{
+	(*ptr)->BurstGlines() ;
 	++ptr ;
 	}
 }

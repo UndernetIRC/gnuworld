@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server.h,v 1.77 2002/11/21 21:13:13 dan_karrels Exp $
+ * $Id: server.h,v 1.78 2002/12/28 22:44:55 mrbean_ Exp $
  */
 
 #ifndef __SERVER_H
-#define __SERVER_H "$Id: server.h,v 1.77 2002/11/21 21:13:13 dan_karrels Exp $"
+#define __SERVER_H "$Id: server.h,v 1.78 2002/12/28 22:44:55 mrbean_ Exp $"
 
 #include	<string>
 #include	<vector>
@@ -282,6 +282,7 @@ public:
 		const string& userHost,
 		const string& reason,
 		const time_t& duration, 
+		const time_t& lastmod = ::time(0),
 		const xClient* setClient = NULL,  
 		const string& server = "*") ;
 
@@ -930,6 +931,11 @@ public:
 	 * Output channel information for each client on this server.
 	 */
 	virtual void	BurstChannels() ;
+
+	/**
+	 * Output glines information for each client on this server.
+	 */
+	virtual void	BurstGlines() ;
 
 	/**
 	 * Deletes a juped server from the juped server list.

@@ -18,7 +18,7 @@
 #include	"ELog.h"
 #include	"Constants.h"
 
-const char SGLINECommand_cc_rcsId[] = "$Id: SGLINECommand.cc,v 1.1 2002/11/20 17:56:17 mrbean_ Exp $";
+const char SGLINECommand_cc_rcsId[] = "$Id: SGLINECommand.cc,v 1.2 2002/12/28 22:44:55 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -44,16 +44,17 @@ if(!dbConnected)
         bot->Notice(theClient,"Sorry, but the db connection is down now, please try again alittle later");
         return false;
         }
+StringTokenizer::size_type pos = 1 ;
+bool RealName = (!strcasecmp(st[pos],"-rn"));
+string RealHost;
 
-if( st.size() < 3 )
+if( (st.size() < 3) || (RealName && (st.size() < 4)))
 	{
 	Usage( theClient ) ;
 	return true ;
 	}
 
-StringTokenizer::size_type pos = 1 ;
 
-bool Forced = false;
 
 ccUser* tmpUser = bot->IsAuth(theClient);
 bot->MsgChanLog("SGLINE %s\n",st.assemble(1).c_str());
@@ -62,17 +63,45 @@ time_t gLength = bot->getDefaultGlineLength() ;
 
 // (pos) is the index of the next token, the user@host mask.
 
-string::size_type atPos = st[ pos ].find_first_of( '@' ) ;
-if( string::npos == atPos )
+if(!RealName)
 	{
-	// User has only specified hostname, not a user name
-	bot->Notice( theClient, "GLINE: Please specify gline mask in the "
-		"format: user@host" ) ;
-	return true ;
-	}
+	string::size_type atPos = st[ pos ].find_first_of( '@' ) ;
+	if( string::npos == atPos )
+		{
+		// User has only specified hostname, not a user name
+		bot->Notice( theClient, "GLINE: Please specify gline mask in the "
+			"format: user@host" ) ;
+		return true ;
+		}
 
-string userName = st[ pos ].substr( 0, pos ) ;
-string hostName = st[ pos ].substr( pos + 1 ) ;
+	string userName = st[ pos ].substr( 0, pos ) ;
+	string hostName = st[ pos ].substr( pos + 1 ) ;
+	}
+else //RealName Gline
+	{
+	++pos;
+	bool hostOk = false;
+	//Do alittle sanity check
+	for(string::size_type p =0; p< st[pos].size() && !hostOk;++p)
+		{
+		if(st[pos][p] != '$' && st[pos][p] != '*' && st[pos][p] != '?')
+			hostOk = true;
+		}
+	if(!hostOk)
+		{
+		bot->Notice(theClient,"You must specify atleast one char other than *?$ as the realname!");
+		return true;
+		}
+	if(st[pos].substr(0,1) != "$")
+		{
+		RealHost = "$" + st[pos];
+		}
+	else
+		{
+		RealHost = st[pos];
+		}
+	}
+	
 string Length;
 Length.assign(st[pos+1]);
 unsigned int Units = 1; //Defualt for seconds
@@ -111,60 +140,68 @@ if(!tmpUser)
 	}
 	
 unsigned int Users;
-int gCheck = bot->checkSGline(st[pos],gLength,Users);
-
-if(gCheck & gline::NEG_TIME)
-	{
-	bot->Notice(theClient,"Hmmz, dont you think that giving a negative time is kinda stupid?");
-	Ok = false;
-	}	
-
-if(gCheck & gline::HUH_NO_HOST)
-	{
-	bot->Notice(theClient,"I dont think glining that host is such a good idea, do you?");
-	Ok = false;
-	}
-if(gCheck & gline::BAD_HOST)
-	{
-	bot->Notice(theClient,"illegal host");
-	Ok = false;
-	}
-if(!Ok)
-	{
-	bot->Notice(theClient,"Please fix all of the above, and try again");
-	return false;
-
-	}
-
-// Avoid passing a reference to a temporary variable.
 string nickUserHost = bot->removeSqlChars(theClient->getRealNickUserHost()) ;
 string Reason = st.assemble( pos + ResStart );
-char Us[100];
-Us[0] = '\0';
-sprintf(Us,"%d",Users);
+
+if(!RealName)
+	{
+	int gCheck = bot->checkSGline(st[pos],gLength,Users);
+
+	if(gCheck & gline::NEG_TIME)
+		{
+		bot->Notice(theClient,"Hmmz, dont you think that giving a negative time is kinda stupid?");
+		Ok = false;
+		}	
+
+	if(gCheck & gline::HUH_NO_HOST)
+		{
+		bot->Notice(theClient,"I dont think glining that host is such a good idea, do you?");
+		Ok = false;
+		}
+	if(gCheck & gline::BAD_HOST)
+		{
+		bot->Notice(theClient,"illegal host");
+		Ok = false;
+		}
+	if(!Ok)
+		{
+		bot->Notice(theClient,"Please fix all of the above, and try again");
+		return false;
+
+		}
+
+	char Us[100];
+	Us[0] = '\0';
+	sprintf(Us,"%d",Users);
+	Reason = string("[") + Us + string("]") + Reason;
+	} //RealName Gline
 if(Reason.size() > gline::MAX_REASON_LENGTH)
 	{
 	bot->Notice(theClient,"Gline reason can't be more than %d chars",
 		    gline::MAX_REASON_LENGTH);
 	return false;
 	}
-server->setGline( nickUserHost,
+/*server->setGline( nickUserHost,
 	st[ pos ],
 	string("[") + Us + "] " + Reason,
 	//st.assemble( pos + ResStart ) + "[" + Us + "]",
-	gLength , bot) ;
+	gLength , bot) ;*/
 ccGline *TmpGline = bot->findGline(st[pos]);
 bool Up = false;
 
 if(TmpGline)
 	Up =  true;	
 else TmpGline = new ccGline(bot->SQLDb);
-TmpGline->setHost(bot->removeSqlChars(st [ pos ]));
+if(!RealName)
+	TmpGline->setHost(bot->removeSqlChars(st [ pos ]));
+else
+	TmpGline->setHost(RealHost);
 TmpGline->setExpires(::time(0) + gLength);
 TmpGline->setAddedBy(nickUserHost);
 TmpGline->setReason(bot->removeSqlChars(st.assemble( pos + ResStart )));
 TmpGline->setAddedOn(::time(0));
-
+TmpGline->setLastUpdated(::time(0));
+bot->addGlineToUplink(TmpGline);
 if(Up)
 	{	
 	TmpGline->Update();

@@ -22,7 +22,7 @@
 #include 	"time.h"
 #include	"Constants.h"
 
-const char GCHANCommand_cc_rcsId[] = "$Id: GCHANCommand.cc,v 1.11 2002/11/20 17:56:17 mrbean_ Exp $";
+const char GCHANCommand_cc_rcsId[] = "$Id: GCHANCommand.cc,v 1.12 2002/12/28 22:44:55 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -130,12 +130,10 @@ if(Reason.size() > 255)
 	return false;
 	}
 
-//bot->setRemoving(st[pos]);
-server->setGline( nickUserHost,
+/*server->setGline( nickUserHost,
 	st[ pos ],
 	Reason ,
-	gLength , bot) ;
-//bot->unSetRemoving();
+	gLength , bot) ;*/
 ccGline *TmpGline = bot->findGline(bot->removeSqlChars(st[pos]));
 bool Up = false;
 if(TmpGline)
@@ -149,6 +147,8 @@ else
 TmpGline->setAddedBy(nickUserHost);
 TmpGline->setReason(bot->removeSqlChars(st.assemble( pos + ResStart )));
 TmpGline->setAddedOn(::time(0));
+TmpGline->setLastUpdated(::time(0));
+bot->addGlineToUplink(TmpGline);
 if(Up)
 	{	
 	TmpGline->Update();

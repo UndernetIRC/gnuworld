@@ -3,7 +3,7 @@
  */
 
 #ifndef __CCONTROL_H
-#define __CCONTROL_H "$Id: ccontrol.h,v 1.81 2002/11/20 17:56:17 mrbean_ Exp $"
+#define __CCONTROL_H "$Id: ccontrol.h,v 1.82 2002/12/28 22:44:56 mrbean_ Exp $"
 
 //Undef this if you want to log to the database
 #define LOGTOHD 
@@ -116,7 +116,6 @@ protected:
 
 	typedef serversMapType::iterator     serversIterator;
 	
-	
 	typedef list< ccGline* >        glineListType ;
 	
 	/**
@@ -125,6 +124,8 @@ protected:
 
 	glineListType			glineList ;
 
+	glineListType			rnGlineList;
+	
 	typedef list< ccFloodData* >	ignoreListType;
 	
 	ignoreListType			ignoreList;
@@ -169,6 +170,12 @@ public:
 	 */
 	virtual int BurstChannels() ;
 
+	/**
+	 * This method is called by the xServer when it wants information
+	 * about the glines this client has in its database;
+	 */
+	virtual int BurstGlines() ;
+	
 	/**
 	 * This method is invoked each time the client is sent a
 	 * PRIVMSG.
@@ -300,6 +307,10 @@ public:
 	 */
 	virtual bool removeOperChan( const string& ) ;
 
+	void handleNewClient( iClient* );
+	
+	void addGlineToUplink( ccGline* );
+	
 	/**
 	 * This method will check if a client is authenticated 
 	 * based on the iClient structure
@@ -453,10 +464,11 @@ public:
 	
 	bool remGline( ccGline* );
 
-	ccGline* findMatchingGline( const string& );
+	ccGline* findMatchingGline( const iClient* );
 
 	ccGline* findGline( const string& );
 
+	ccGline* findRealGline( const string& );
 	/**
 	 * This method logs the bot commands to the message channel
 	 */
@@ -515,8 +527,6 @@ public:
 	bool refreshSuspention();
 	
 	bool refreshGlines();
-	
-	bool burstGlines();
 	
 	bool loadGlines();
 
@@ -761,6 +771,13 @@ public:
 	glineIterator gline_end()
 		{ return glineList.end() ; }
 		
+
+	glineIterator rngline_begin()
+		{ return rnGlineList.begin() ; }
+	
+	glineIterator rngline_end()
+		{ return rnGlineList.end() ; }
+
 	typedef ignoreListType::iterator ignoreIterator;
 	
 	ignoreIterator ignore_begin()

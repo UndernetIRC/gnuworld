@@ -84,7 +84,7 @@ const unsigned long int flg_SAY = 0x100000;
 const unsigned long int flg_NOMODE = 0x200000;
 const unsigned long int flg_REOP = 0x400000;
 const unsigned long int flg_SGLINE = 0x800000;
-
+const unsigned long int flg_REMSGLINE = 0x1000000;
 /*
  Default commands that are added upon adding a new oper
 */
@@ -107,7 +107,7 @@ const unsigned long int SSMT = SADMIN | flg_REMSERVER | flg_NOMODE;
 const unsigned long int CODER = SMT;
 const unsigned long int SCODER =  SSMT | flg_COMMANDS| flg_GCHAN | flg_RGCHAN
 			| flg_EXCEPTIONS | flg_STATUS | flg_SHUTDOWN 
-			| flg_CONFIG | flg_SAY | flg_SGLINE;
+			| flg_CONFIG | flg_SAY | flg_SGLINE | flg_REMSGLINE;
 }
 
 }

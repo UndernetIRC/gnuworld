@@ -17,11 +17,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: Gline.h,v 1.5 2002/05/27 17:18:12 dan_karrels Exp $
+ * $Id: Gline.h,v 1.6 2002/12/28 22:44:54 mrbean_ Exp $
  */
 
 #ifndef __GLINE_H
-#define __GLINE_H "$Id: Gline.h,v 1.5 2002/05/27 17:18:12 dan_karrels Exp $"
+#define __GLINE_H "$Id: Gline.h,v 1.6 2002/12/28 22:44:54 mrbean_ Exp $"
 
 #include	<string>
 #include	<iostream>
@@ -52,11 +52,13 @@ public:
 	Gline( const string& _setBy,
 		const string& _userHost,
 		const string& _reason,
-		const time_t& _duration )
+		const time_t& _duration ,
+		const time_t& _lastmod = ::time( 0 ))
 	: setBy( _setBy ),
 	  userHost( _userHost ),
 	  reason( _reason ),
-	  expiration( _duration + ::time( 0 ) )
+	  expiration( _duration + ::time( 0 ) ),
+	  lastmod( _lastmod )
 	{}
 
 	/**
@@ -67,7 +69,8 @@ public:
 	: setBy( rhs.setBy ),
 	  userHost( rhs.userHost ),
 	  reason( rhs.reason ),
-	  expiration( rhs.expiration )
+	  expiration( rhs.expiration ),
+	  lastmod (rhs.lastmod) 
 	{}
 
 	/**
@@ -109,6 +112,12 @@ public:
 		{ return expiration ; }
 
 	/**
+	 * Retrieve the time at which the gline was last modified
+	 */
+	inline const time_t& getLastmod() const
+		{ return lastmod ; }
+
+	/**
 	 * Retrieve the user/server who set this gline.
 	 */
 	inline void setSetBy( const string& _setBy )
@@ -133,6 +142,12 @@ public:
 		{ expiration = _expiration; }
 
 	/**
+	 * Set the lastmod time
+	 */
+	inline void setLastmod( const time_t _lastmod )
+		{ lastmod = _lastmod; }
+
+	/**
 	 * Convenience operator method which allows the output
 	 * of a Gline instance to a C++ standard output stream.
 	 */
@@ -141,7 +156,8 @@ public:
 	out	<< "Mask: " << rhs.userHost << ' '
 		<< "Reason: " << rhs.reason << ' '
 		<< "Set by: " << rhs.setBy << ' '
-		<< "Expires: " << rhs.expiration ;
+		<< "Expires: " << rhs.expiration << ' '
+		<< "Last modified: " << rhs.lastmod ;
 	return out ;
 	}
 	
@@ -166,6 +182,11 @@ protected:
 	 * The time at which this gline expires.
 	 */
 	time_t		expiration ;
+
+	/**
+	 * The time at which this gline was last modified
+	 */
+	time_t		lastmod ;
 
 } ;
 

@@ -24,7 +24,7 @@
 #include	"ccUser.h"
 #include	"Constants.h"
 
-const char GLINECommand_cc_rcsId[] = "$Id: GLINECommand.cc,v 1.44 2002/11/20 17:56:17 mrbean_ Exp $";
+const char GLINECommand_cc_rcsId[] = "$Id: GLINECommand.cc,v 1.45 2002/12/28 22:44:55 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -76,9 +76,15 @@ string userName;
 string hostName;
 if(!isChan)
 	{
+	if(st[pos].substr(0,1) == "$")
+		{
+		bot->Notice(theClient,"Please use sgline to set this gline");
+		return true;
+		}
 	string::size_type atPos = st[ pos ].find_first_of( '@' ) ;
 	if( string::npos == atPos )
 		{
+			
 		if((atPos = st [ pos ].find_first_of('.')) == string::npos) 
 			{
 			// user has probably specified a nickname (asked by isomer:P)
@@ -158,7 +164,7 @@ if(!isChan)
 			bot->Notice(theClient,"You must login to issue this gline!");
 			return true;
 			}
-		Users = Network->countMatchingUserHost(string(userName + "@" + hostName));
+		Users = Network->countMatchingRealUserHost(string(userName + "@" + hostName));
 		}
 	else
 		{
@@ -228,14 +234,12 @@ if(!isChan)
 			    gline::MAX_REASON_LENGTH);
 		return false;
 		}
-
-	//bot->setRemoving(userName + "@" +hostName);
-	server->setGline( nickUserHost,
+	Reason = string("[") + Us + string("]") + Reason;
+/*	server->setGline( nickUserHost,
 		userName + "@" +hostName,
 		string("[") + Us + "] " + Reason,
 		//Reason + "[" + Us + "]",
-		gLength ,bot) ;
-	//bot->unSetRemoving();
+		gLength ,::time(0),bot) ;*/
 	ccGline *TmpGline = bot->findGline(userName + "@" + hostName);
 	bool Up = false;
 	
@@ -247,6 +251,8 @@ if(!isChan)
 	TmpGline->setAddedBy(nickUserHost);
 	TmpGline->setReason(bot->removeSqlChars(st.assemble( pos + ResStart )));
 	TmpGline->setAddedOn(::time(0));
+	TmpGline->setLastUpdated(::time(0));
+	bot->addGlineToUplink(TmpGline);
 	if(Up)
 		{	
 		TmpGline->Update();
@@ -319,21 +325,21 @@ ptr != theChan->userList_end() ; ++ptr )
 			TmpGline->setHost("*" + TmpClient->getUserName() + "@" + TmpClient->getRealInsecureHost());
 		TmpGline->setExpires(::time(0) + gLength);
 		TmpGline->setAddedBy(nickUserHost);
-		unsigned int Affected = Network->countMatchingUserHost(TmpGline->getHost()); 
+		unsigned int Affected = Network->countMatchingRealUserHost(TmpGline->getHost()); 
 		char Us[20];
 		sprintf(Us,"%d",Affected);
 		TmpGline->setReason(st.assemble( pos + ResStart ));
 		TmpGline->setAddedOn(::time(0));
+		TmpGline->setLastUpdated(::time(0));
 		TmpGline->Insert();
 		TmpGline->loadData(TmpGline->getHost());
 		bot->addGline(TmpGline);
-//		bot->setRemoving(TmpGline->getHost());
-		server->setGline( nickUserHost,
+		bot->addGlineToUplink(TmpGline);
+/*		server->setGline( nickUserHost,
 			    TmpGline->getHost(),
 			    string("[") + Us + string("] ") +
 			    TmpGline->getReason(),
-			    gLength ,bot) ;
-//		bot->unSetRemoving();
+			    gLength ,::time(0),bot) ;*/
 		glineList.insert(GlineMapType::value_type(TmpGline->getHost(),0));
 		}
 	}

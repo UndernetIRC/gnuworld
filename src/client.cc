@@ -1,6 +1,6 @@
 /*
  * client.cc
- * $Id: client.cc,v 1.48 2002/12/02 19:15:37 jeekay Exp $
+ * $Id: client.cc,v 1.49 2002/12/28 22:44:58 mrbean_ Exp $
  */
 
 #include	<new>
@@ -30,7 +30,7 @@
 #include	"events.h"
 
 const char xClient_h_rcsId[] = __CLIENT_H ;
-const char xClient_cc_rcsId[] = "$Id: client.cc,v 1.48 2002/12/02 19:15:37 jeekay Exp $" ;
+const char xClient_cc_rcsId[] = "$Id: client.cc,v 1.49 2002/12/28 22:44:58 mrbean_ Exp $" ;
 const char config_h_rcsId[] = __CONFIG_H ;
 const char misc_h_rcsId[] = __MISC_H ;
 const char Numeric_h_rcsId[] = __NUMERIC_H ;
@@ -112,6 +112,12 @@ int xClient::BurstChannels()
 {
 return 0 ;
 }
+
+int xClient::BurstGlines()
+{
+return 0;
+}
+
 
 int xClient::Connect( int ForceTime )
 {

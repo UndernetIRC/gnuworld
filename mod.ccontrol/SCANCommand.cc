@@ -18,7 +18,7 @@
 #include	"Network.h"
 #include	"Constants.h"
 
-const char SCANCommand_cc_rcsId[] = "$Id: SCANCommand.cc,v 1.8 2002/11/20 17:56:17 mrbean_ Exp $";
+const char SCANCommand_cc_rcsId[] = "$Id: SCANCommand.cc,v 1.9 2002/12/28 22:44:55 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -141,7 +141,7 @@ else
 	bot->Notice(theClient,"You didnt specify a search type (-h/-fh/-n) please try again");
 	return true;
 	}
-if(((unsigned)cList.size() > scan::MAX_SHOW) && (showUsers))	
+if((unsigned(cList.size()) > scan::MAX_SHOW) && (showUsers))	
 	{
 	bot->Notice(theClient,"There were %d users matching this search, only 15 will be shown"
 		    ,cList.size());

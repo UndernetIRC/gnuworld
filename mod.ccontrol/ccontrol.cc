@@ -11,12 +11,12 @@
 /* ccontrol.cc
  * Authors: Daniel Karrels dan@karrels.com
  *	    Tomer Cohen    MrBean@toughguy.net
- * $Id: ccontrol.cc,v 1.153 2002/11/20 17:56:17 mrbean_ Exp $
+ * $Id: ccontrol.cc,v 1.154 2002/12/28 22:44:56 mrbean_ Exp $
  */
 
 #define MAJORVER "1"
-#define MINORVER "1pl2"
-#define RELDATE "18 November, 2002"
+#define MINORVER "1pl3"
+#define RELDATE "28 December, 2002"
 
 #include        <sys/types.h> 
 #include        <sys/socket.h>
@@ -56,7 +56,7 @@
 #include	"ip.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.153 2002/11/20 17:56:17 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.154 2002/12/28 22:44:56 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -537,6 +537,15 @@ RegisterCommand( new SGLINECommand( this, "SGLINE",
 	operLevel::CODERLEVEL,
 	true ) ) ;
 
+RegisterCommand( new REMSGLINECommand( this, "REMSGLINE",
+	"<user@host> Removes a gline on a given host",
+	commandLevel::flg_REMSGLINE,
+	false,
+	false,
+	false,
+	operLevel::CODERLEVEL,
+	true ) ) ;
+
 RegisterCommand( new EXCEPTIONCommand( this, "EXCEPTIONS",
 	"(list / add / del) [host mask]"
 	"Add connection exceptions on hosts",
@@ -811,6 +820,27 @@ for( vector< string >::size_type i = 0 ; i < operChans.size() ; i++ )
 // Don't forget to call the base class BurstChannels() method
 return xClient::BurstChannels() ;
 
+}
+
+int ccontrol::BurstGlines()
+{
+ccGline *theGline = 0 ;
+for(glineListType::iterator ptr = glineList.begin()
+    ; ptr != glineList.end(); ++ptr)
+	{
+	theGline = *ptr;
+	addGlineToUplink(theGline);
+	}
+
+for(glineListType::iterator ptr = rnGlineList.begin()
+    ; ptr != rnGlineList.end(); ++ptr)
+	{
+	theGline = *ptr;
+	addGlineToUplink(theGline);
+	}
+
+	
+return xClient::BurstGlines();
 }
 
 // I don't really like doing this.
@@ -1231,7 +1261,7 @@ switch( theEvent )
 		{
 		inBurst = false;
 		refreshGlines();
-		burstGlines();
+//		burstGlines();
 		checkMaxUsers();
 		refreshVersions();
 		break;
@@ -1286,111 +1316,8 @@ switch( theEvent )
 		}
 	case EVT_NICK:
 		{
-		bool glSet = false;
 		iClient* NewUser = static_cast< iClient* >( Data1);
-		curUsers++;
-		if(!inBurst)
-			{
-			checkMaxUsers();
-			}
-		//Create our flood data for this user
-		ccFloodData* floodData = new (std::nothrow) ccFloodData(NewUser->getCharYYXXX());
-		assert( floodData != 0 ) ;
-		ccUserData* UserData = new (std::nothrow) ccUserData(floodData);
-		NewUser->setCustomData(this,
-			static_cast< void* >( UserData ) );
-		if(dbConnected)
-			{
-			if(checkClones)
-				{
-				string tIP = xIP( NewUser->getIP()).GetNumericIP();
-				if(strcasecmp(tIP,"0.0.0.0"))			
-					{
-					int CurConnections = ++clientsIpMap[tIP];
-					if((CurConnections  > getExceptions("*@" + tIP)) 
-					    && (CurConnections > getExceptions("*@"+NewUser->getRealInsecureHost())))
-						{
-						MsgChanLog("Glining %s , total  connections : %d\n"
-						,tIP.c_str(),CurConnections);
-						MsgChanLog(" IP Exception : %d , HOST Exception %d\n"						
-						,getExceptions("*@" + tIP),getExceptions("*@" + NewUser->getRealInsecureHost()));
-
-						glSet = true;
-						ccGline *tmpGline;
-						tmpGline = findGline("*@" + tIP); 
-						if(!tmpGline)
-							tmpGline = findGline("*@" + NewUser->getRealInsecureHost());
-						if(!tmpGline)
-							{
-							tmpGline = new ccGline(SQLDb);
-							tmpGline->setHost("*@" + tIP);
-							tmpGline->setExpires(::time(0) + maxGlineLen);
-							string Reason = "Automatically banned for excessive connections [- ";
-							Reason += CurConnections;
-							Reason += " -]";
-							tmpGline->setReason("Automatically banned for excessive connections ");
-							tmpGline->setAddedOn(::time(0));
-							tmpGline->setAddedBy("Auto Gline");
-							tmpGline->Insert();
-							tmpGline->loadData(tmpGline->getHost());
-							addGline(tmpGline);
-							}
-						MyUplink->setGline( nickName,
-								tmpGline->getHost(),
-								tmpGline->getReason(),
-								tmpGline->getExpires() - ::time(0) , this) ;
-						}	
-					else
-						{
-						int dots = 0;
-						string ipClass = "";
-						for(string::size_type ptr = 0;ptr < tIP.size(),dots < 3;++ptr)
-							{
-							if(tIP[ptr] == '.')
-								{
-								++dots;
-								}
-							ipClass += tIP[ptr];
-							}
-						ipClass += '*';
-						CurConnections = ++virtualClientsMap[NewUser->getDescription() + "@" + ipClass];
-						if(CurConnections > getExceptions("*@"+ipClass))
-							{
-							MsgChanLog("Virtual clones for real name %s on %s, total connections %d\n",
-							    NewUser->getDescription().c_str()
-							    ,ipClass.c_str()
-							    ,CurConnections);
-							}
-						}
-					}
-				}
-			if(!glSet) 
-				{	
-				ccGline * tempGline = findMatchingGline(NewUser->getUserName() + '@' + NewUser->getRealInsecureHost());
-				if(!tempGline)
-					{
-					string tIP = xIP( NewUser->getIP()).GetNumericIP();
-					tempGline = findMatchingGline(NewUser->getUserName() + '@' + tIP);
-					}
-				if((tempGline) && (tempGline->getExpires() > ::time(0)))
-					{
-					glSet = true;
-					if(!inBurst)
-						{
-						MyUplink->setGline(tempGline->getAddedBy()
-						,tempGline->getHost(),tempGline->getReason()
-						,tempGline->getExpires() - ::time(0),this);
-						}
-					else
-						{
-						string* tServer = new (std::nothrow) string(NewUser->getCharYY());
-						assert(tServer != NULL);
-						tempGline->addBurst(tServer);
-						}
-					//unSetRemoving();
-					}
-				}			
-			}
+		handleNewClient(NewUser);
 		break;
 		}
 	} // switch()
@@ -1607,6 +1534,149 @@ bool ccontrol::removeOperChan( const string& chanName )
 Part( chanName ) ;
 
 return true ;
+}
+
+void ccontrol::handleNewClient( iClient* NewUser)
+{
+bool glSet = false;
+curUsers++;
+if(!inBurst)
+	{
+	checkMaxUsers();
+	}
+//Create our flood data for this user
+ccFloodData* floodData = new (std::nothrow) ccFloodData(NewUser->getCharYYXXX());
+assert( floodData != 0 ) ;
+ccUserData* UserData = new (std::nothrow) ccUserData(floodData);
+NewUser->setCustomData(this,
+	static_cast< void* >( UserData ) );
+if(dbConnected)
+	{
+	if(checkClones)
+		{
+		string tIP = xIP( NewUser->getIP()).GetNumericIP();
+		if(strcasecmp(tIP,"0.0.0.0"))			
+			{
+			int CurConnections = ++clientsIpMap[tIP];
+			if((CurConnections  > getExceptions("*@" + tIP)) 
+			    && (CurConnections > getExceptions("*@"+NewUser->getRealInsecureHost())))
+				{
+				MsgChanLog("Glining %s , total  connections : %d\n"
+				,tIP.c_str(),CurConnections);
+				MsgChanLog(" IP Exception : %d , HOST Exception %d\n"						
+				,getExceptions("*@" + tIP),getExceptions("*@" + NewUser->getRealInsecureHost()));
+				glSet = true;
+				ccGline *tmpGline;
+				tmpGline = findGline("*@" + tIP); 
+				if(!tmpGline)
+					tmpGline = findGline("*@" + NewUser->getRealInsecureHost());
+				if(!tmpGline)
+					{
+					tmpGline = new ccGline(SQLDb);
+					tmpGline->setHost("*@" + tIP);
+					tmpGline->setExpires(::time(0) + maxGlineLen);
+					string Reason = "Automatically banned for excessive connections [- ";
+					Reason += CurConnections;
+					Reason += " -]";
+					tmpGline->setReason("Automatically banned for excessive connections ");
+					tmpGline->setAddedOn(::time(0));
+					tmpGline->setAddedBy(nickName);
+					tmpGline->setLastUpdated(::time(0));
+					tmpGline->Insert();
+					tmpGline->loadData(tmpGline->getHost());
+					addGline(tmpGline);
+					}
+				addGlineToUplink(tmpGline);
+				}	
+			else
+				{
+				int dots = 0;
+				string ipClass = "";
+				for(string::size_type ptr = 0;ptr < tIP.size(),dots < 3;++ptr)
+					{
+					if(tIP[ptr] == '.')
+						{
+						++dots;
+						}
+					ipClass += tIP[ptr];
+					}
+				ipClass += '*';
+				CurConnections = ++virtualClientsMap[NewUser->getDescription() + "@" + ipClass];
+				if(CurConnections > getExceptions("*@"+ipClass))
+					{
+					MsgChanLog("Virtual clones for real name %s on %s, total connections %d\n",
+					    NewUser->getDescription().c_str()
+					    ,ipClass.c_str()
+					    ,CurConnections);
+					}
+				}
+			}
+		}
+	if(!glSet) 
+		{	
+		ccGline * tempGline = findMatchingGline(NewUser);
+		if((tempGline) && (tempGline->getExpires() > ::time(0)))
+			{
+			glSet = true;
+			if(!inBurst)
+				{
+				addGlineToUplink(tempGline);
+				}
+			else
+				{
+				string* tServer = new (std::nothrow) string(NewUser->getCharYY());
+				assert(tServer != NULL);
+				tempGline->addBurst(tServer);
+				}
+			}
+		}			
+	}
+}
+
+void ccontrol::addGlineToUplink(ccGline* theGline)
+{
+int Expires;
+if(theGline->getHost().substr(0,1) != "$")
+	{
+	if((theGline->getHost().substr(0,1) == "#")
+	   && (theGline->getExpires() == 0))
+	        {
+	        Expires = gline::PERM_TIME;
+	        }
+	else
+		{
+		Expires = theGline->getExpires() - time(0);
+		}
+	MyUplink->setGline(theGline->getAddedBy()
+	    ,theGline->getHost(),theGline->getReason()
+	    ,Expires,theGline->getLastUpdated(),this);
+	}
+else 
+	{ // Its a realname gline, match all the users and gline their hosts
+	string RealName = theGline->getHost().substr(1,theGline->getHost().size()-1);
+	list<const iClient*> cList = Network->matchRealName(RealName);
+	list<const iClient*>::iterator ptr;
+	const iClient* curClient;
+	string Host;
+	Expires = (theGline->getExpires()-::time(0) > 3600*24 
+		    ? 3600*24 : theGline->getExpires() - ::time(0));
+	for(ptr = cList.begin(); ptr != cList.end(); ++ptr)
+		{
+		curClient = *ptr;    
+		if(curClient->getUserName().substr(0,1) == "~")
+			{
+			Host = string("~*@") + curClient->getRealInsecureHost();
+			}
+		else
+			{
+			Host = curClient->getUserName() + "@" + curClient->getRealInsecureHost();
+			} 
+		MyUplink->setGline(theGline->getAddedBy(),
+				    Host,theGline->getReason(),
+				    Expires,theGline->getLastUpdated(),this);
+		}
+			
+	}
 }
 
 ccUser* ccontrol::IsAuth( const iClient* theClient ) 
@@ -2213,45 +2283,108 @@ bool ccontrol::addGline( ccGline* TempGline)
 
 ccGline *theGline = 0;
 bool addedAlready = false;
-for(glineIterator ptr = glineList.begin(); ptr != glineList.end();)
-	{
-	theGline = *ptr;
-	if(theGline->getHost() == TempGline->getHost()) 
+glineIterator ptr;
+glineIterator endlist;
+if(TempGline->getHost().substr(0,1) == "$") //check if its a realname gline
+	{	
+	ptr = rnGlineList.begin();
+	endlist = rnGlineList.end();
+
+	for(; ptr != endlist;)
 		{
-		if(TempGline != theGline)  //Make sure we are not deleting the one we need to add
+		theGline = *ptr;
+		if(theGline->getHost() == TempGline->getHost()) 
 			{
-			ptr = glineList.erase(ptr);
-			delete theGline;
+			if(TempGline != theGline)  //Make sure we are not deleting the one we need to add
+				{
+				ptr = rnGlineList.erase(ptr);
+				delete theGline;
+				}
+			else 
+				{
+				addedAlready = true;
+				++ptr;
+				}		
 			}
-		else 
-			{
-			addedAlready = true;
+		else
 			++ptr;
-			}		
 		}
-	else
-		++ptr;
+	if(!addedAlready) //if we found the gline we need to add, no need to add it			
+	        rnGlineList.push_back( TempGline ) ;
+
 	}
-if(!addedAlready) //if we found the gline we need to add, no need to add it			
-    glineList.push_back( TempGline ) ;
+else
+	{
+	ptr = glineList.begin();
+	endlist = glineList.end();
+
+	for(; ptr != endlist;)
+		{
+		theGline = *ptr;
+		if(theGline->getHost() == TempGline->getHost()) 
+			{
+			if(TempGline != theGline)  //Make sure we are not deleting the one we need to add
+				{
+				ptr = glineList.erase(ptr);
+				delete theGline;
+				}
+			else 
+				{
+				addedAlready = true;
+				++ptr;
+				}		
+			}
+		else
+			++ptr;
+		}
+	if(!addedAlready) //if we found the gline we need to add, no need to add it			
+	        glineList.push_back( TempGline ) ;
+	}
 return true;
 }    
 
 bool ccontrol::remGline( ccGline* TempGline)
 {
-glineList.erase( std::find( glineList.begin(),
-	glineList.end(),
-	TempGline ) ) ;
+if(TempGline->getHost().substr(0,1) == "$")
+	{
+	rnGlineList.erase( std::find( rnGlineList.begin(),
+		rnGlineList.end(),
+		TempGline ) ) ;
+	}
+else
+	{	
+	glineList.erase( std::find( glineList.begin(),
+		glineList.end(),
+		TempGline ) ) ;
+	}
 return true;
 }
 
-ccGline* ccontrol::findMatchingGline( const string& Host )
+ccGline* ccontrol::findMatchingGline( const iClient* theClient )
 {
 ccGline *theGline = 0;
+string Host = theClient->getUserName() + '@' + theClient->getRealInsecureHost();
+string IP = theClient->getUserName() + '@' + xIP( theClient->getIP()).GetNumericIP();
+string RealName = theClient->getDescription();
+string glineHost;
 for(glineIterator ptr = glineList.begin(); ptr != glineList.end(); ++ptr)
 	{
 	theGline = *ptr;
-	if(match(theGline->getHost(),Host) == 0) 
+	if((match(theGline->getHost(),Host) == 0) || 
+	    ((match(theGline->getHost(),IP) == 0)))
+		{
+    		if(theGline->getExpires() > ::time(0))
+			{
+			return theGline;
+			}
+		}
+	}
+
+for(glineIterator ptr = rnGlineList.begin(); ptr != rnGlineList.end(); ++ptr)
+	{
+	theGline = *ptr;
+	glineHost = theGline->getHost().substr(1,theGline->getHost().size() - 1);
+	if(match(glineHost,RealName) == 0)
 		{
     		if(theGline->getExpires() > ::time(0))
 			{
@@ -2267,6 +2400,20 @@ ccGline* ccontrol::findGline( const string& HostName )
 {
 ccGline *theGline;
 for(glineIterator ptr = glineList.begin(); ptr != glineList.end();++ptr)
+	{
+	theGline = *ptr;
+    	if(!strcasecmp(theGline->getHost(),HostName))
+		if(theGline->getExpires() > ::time(0))
+			return theGline;
+	}
+
+return NULL ;
+}
+
+ccGline* ccontrol::findRealGline( const string& HostName )
+{
+ccGline *theGline;
+for(glineIterator ptr = rnGlineList.begin(); ptr != rnGlineList.end();++ptr)
 	{
 	theGline = *ptr;
     	if(!strcasecmp(theGline->getHost(),HostName))
@@ -2778,7 +2925,7 @@ for(string::size_type pos = 0; pos < Hostname.size();++pos)
 	}
 
 
-Affected = Network->countMatchingUserHost(Host); //Calculate the number of affected
+Affected = Network->countMatchingRealUserHost(Host); //Calculate the number of affected
 if((Dots > 3) && (GlineType & isIP)) //IP addy cant have more than 3 dots
 	retMe |=  gline::BAD_HOST;
 if((GlineType & (isIP || isWildCard) == isIP) && !(ParseEnded))
@@ -3013,48 +3160,6 @@ return true;
 
 }
 
-bool ccontrol::burstGlines()
-{
-
-ccGline *theGline = 0 ;
-iServer* curServer;
-unsigned int Expires = 0;
-for(glineListType::iterator ptr = glineList.begin()
-    ; ptr != glineList.end(); ++ptr)
-	{
-	theGline = *ptr;
-	if((theGline->getExpires() == 0) && (theGline->getHost().substr(0,1) == "#"))
-		{
-		Expires =  gline::PERM_TIME;
-		}
-	else
-		{
-		Expires = theGline->getExpires() - ::time(0);
-		}
-	for(ccGline::burstIterator bPtr = theGline->getBurstBegin();
-	    bPtr != theGline->getBurstEnd();++bPtr)
-		{
-		curServer = Network->findServer((**bPtr));
-		if(curServer)
-			{
-			MyUplink->setGline(theGline->getAddedBy(),
-				theGline->getHost(),
-				theGline->getReason(),
-			Expires,this,curServer->getName());
-			}
-		}
-	theGline->clearBurst();
-	if(theGline->getHost().substr(0,1) == "#") //is this a gchan 
-		{
-		MyUplink->setGline(theGline->getAddedBy(),
-			    theGline->getHost(),
-			    theGline->getReason(), Expires , this);
-			    
-		}
-	}
-return true;
-}
-
 bool ccontrol::loadGlines()
 {
 //static const char *Main = "SELECT * FROM glines where ExpiresAt > now()::abstime::int4";
@@ -3064,7 +3169,7 @@ if(!dbConnected)
 	return false;
 	}
 
-static const char *Main = "SELECT * FROM glines";
+static const char *Main = "SELECT Id,Host,AddedBy,AddedOn,ExpiresAt,LastUpdated,Reason FROM glines";
 
 stringstream theQuery;
 theQuery	<< Main
@@ -3100,7 +3205,8 @@ for( int i = 0 ; i < SQLDb->Tuples() ; i++ )
 	tempGline->setAddedBy(SQLDb->GetValue(i,2)) ;
 	tempGline->setAddedOn(static_cast< time_t >( atoi( SQLDb->GetValue(i,3) ) )) ;
 	tempGline->setExpires(static_cast< time_t >( atoi( SQLDb->GetValue(i,4) ) )) ;
-	tempGline->setReason(SQLDb->GetValue(i,5));
+	tempGline->setLastUpdated(static_cast< time_t >( atoi( SQLDb->GetValue(i,5) ) )) ;
+	tempGline->setReason(SQLDb->GetValue(i,6));
 	addGline(tempGline);
 	}
 return true;	
@@ -3698,6 +3804,21 @@ void ccontrol::listGlines( iClient *theClient, string Mask )
 ccGline* tempGline;
 Notice(theClient,"-= Gline List =-");
 for(glineIterator ptr = gline_begin();ptr != gline_end();++ptr)
+	{
+	tempGline =*ptr;
+	if((tempGline ->getExpires() > ::time(0)) 
+	    && (!match(Mask,tempGline->getHost())))
+		{
+		Notice(theClient,"Host : %s , Expires At : %s[%d] , AddedBy %s"
+			,tempGline->getHost().c_str()
+			,convertToAscTime(tempGline->getExpires())
+			,tempGline->getExpires()
+			,tempGline->getAddedBy().c_str());
+		}
+	}
+
+Notice(theClient,"-= RealName Gline List =-");
+for(glineIterator ptr = rnGlineList.begin();ptr != rnGlineList.end();++ptr)
 	{
 	tempGline =*ptr;
 	if((tempGline ->getExpires() > ::time(0)) 

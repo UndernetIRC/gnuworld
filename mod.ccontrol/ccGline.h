@@ -1,7 +1,7 @@
 /* ccGline.h */
 
 #ifndef __CCGLINE_H
-#define __CCGLINE_H "$Id: ccGline.h,v 1.10 2002/03/15 06:53:48 mrbean_ Exp $"
+#define __CCGLINE_H "$Id: ccGline.h,v 1.11 2002/12/28 22:44:56 mrbean_ Exp $"
 
 #include	<string>
 #include	<list>
@@ -45,6 +45,9 @@ public:
 	inline const time_t&	getExpires() const
 		{ return Expires; }
 
+	inline const time_t&	getLastUpdated() const
+		{ return LastUpdated; }
+
 	inline const string&	getReason() const
 		{ return Reason; }
 
@@ -65,6 +68,9 @@ public:
 	    
 	inline void		setExpires( const time_t& _Expires ) 
 		{ Expires = _Expires; }
+
+	inline void		setLastUpdated( const time_t& _LastUpdated ) 
+		{ LastUpdated = _LastUpdated; }
 
 	inline void 		setReason( const string& _Reason ) 
 		{ Reason = _Reason; }
@@ -102,6 +108,7 @@ protected:
 	string AddedBy;
 	time_t AddedOn;
 	time_t Expires;
+	time_t LastUpdated;
 	string Reason;
 	burstServersType	burstServers;
 	PgDatabase* SQLDb;

@@ -3,7 +3,7 @@
  * 
  * Gline class
  * 
- * $Id: ccGline.cc,v 1.13 2002/05/23 17:43:11 dan_karrels Exp $
+ * $Id: ccGline.cc,v 1.14 2002/12/28 22:44:55 mrbean_ Exp $
  */
  
 #include	<sstream>
@@ -20,7 +20,7 @@
 #include	"ccontrol.h"
 
 const char ccGline_h_rcsId[] = __CCGLINE_H ;
-const char ccGline_cc_rcsId[] = "$Id: ccGline.cc,v 1.13 2002/05/23 17:43:11 dan_karrels Exp $" ;
+const char ccGline_cc_rcsId[] = "$Id: ccGline.cc,v 1.14 2002/12/28 22:44:55 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -40,6 +40,7 @@ ccGline::ccGline(PgDatabase* _SQLDb)
    AddedBy(),
    AddedOn( 0 ),
    Expires( 0 ),
+   LastUpdated( 0 ),
    Reason(),
    SQLDb( _SQLDb )
 {
@@ -78,14 +79,15 @@ if( PGRES_COMMAND_OK != status )
 	return false ;
 	}
 //Now insert the new one
-static const char *Main = "INSERT into Glines (Host,AddedBy,AddedOn,ExpiresAt,Reason) VALUES ('";
+static const char *Main = "INSERT into Glines (Host,AddedBy,AddedOn,ExpiresAt,LastUpdated,Reason) VALUES ('";
 
 stringstream theQuery;
 theQuery	<< Main
 		<< Host << "','"
 		<< AddedBy << "',"
 		<< AddedOn << ","
-		<< Expires << ",'"
+		<< Expires << ","
+		<< LastUpdated << ",'"
 		<< Reason << "')"
 		<< ends;
 
@@ -129,6 +131,8 @@ theQuery	<< Main
 		<< AddedOn
 		<< ",ExpiresAt = "
 		<< Expires
+		<< ",LastUpdated = "
+		<< LastUpdated
 		<<  ",Reason = '"
 		<< Reason << "'"
 		<< " WHERE Id = " << Id
@@ -155,7 +159,7 @@ else
 
 bool ccGline::loadData(int GlineId)
 {
-static const char *Main = "SELECT * FROM glines WHERE Id = ";
+static const char *Main = "SELECT Id,Host,AddedBy,AddedOn,ExpiresAt,LastUpdated,Reason FROM glines WHERE Id = ";
 
 if(!dbConnected)
 	{
@@ -189,14 +193,15 @@ Host = SQLDb->GetValue(0,1);
 AddedBy = SQLDb->GetValue(0,2) ;
 AddedOn = static_cast< time_t >( atoi( SQLDb->GetValue(0,3) ) ) ;
 Expires = static_cast< time_t >( atoi( SQLDb->GetValue(0,4) ) ) ;
-Reason = SQLDb->GetValue(0,5);
+LastUpdated = static_cast< time_t >( atoi( SQLDb->GetValue(0,5) ) ) ;
+Reason = SQLDb->GetValue(0,6);
 
 return true;
 }
 
 bool ccGline::loadData( const string & HostName)
 {
-static const char *Main = "SELECT * FROM glines WHERE Host = '";
+static const char *Main = "SELECT Id,Host,AddedBy,AddedOn,ExpiresAt,LastUpdated,Reason FROM glines WHERE Host = '";
 
 if(!dbConnected)
 	{
@@ -230,7 +235,8 @@ Host = SQLDb->GetValue(0,1);
 AddedBy = SQLDb->GetValue(0,2) ;
 AddedOn = static_cast< time_t >( atoi( SQLDb->GetValue(0,3) ) ) ;
 Expires = static_cast< time_t >( atoi( SQLDb->GetValue(0,4) ) ) ;
-Reason = SQLDb->GetValue(0,5);
+LastUpdated = static_cast< time_t >( atoi( SQLDb->GetValue(0,5) ) ) ;
+Reason = SQLDb->GetValue(0,6);
 
 return true;
 }

@@ -21,7 +21,7 @@
  */
 
 #ifndef __CLIENT_H
-#define __CLIENT_H "$Id: client.h,v 1.36 2002/10/31 18:52:51 dan_karrels Exp $"
+#define __CLIENT_H "$Id: client.h,v 1.37 2002/12/28 22:44:55 mrbean_ Exp $"
 
 #include	<sstream>
 #include	<string>
@@ -93,6 +93,12 @@ public:
 	 * channel modes for any channel it wishes to own.
 	 */
 	virtual int BurstChannels() ;
+
+	/**
+	 * BurstGlines is called before eob, for the client to burst
+	 * all of its glines
+	 */
+	virtual int BurstGlines() ;
 
 	/**
 	 * Exit is called by xServer::DetachClient().

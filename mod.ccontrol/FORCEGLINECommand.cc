@@ -18,7 +18,7 @@
 #include	"ELog.h"
 #include	"Constants.h"
 
-const char FORCEGLINECommand_cc_rcsId[] = "$Id: FORCEGLINECommand.cc,v 1.24 2002/11/20 17:56:17 mrbean_ Exp $";
+const char FORCEGLINECommand_cc_rcsId[] = "$Id: FORCEGLINECommand.cc,v 1.25 2002/12/28 22:44:55 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -71,6 +71,11 @@ time_t gLength = bot->getDefaultGlineLength() ;
 
 // (pos) is the index of the next token, the user@host mask.
 
+if(st[pos].substr(0,1) == "$")
+	{
+	bot->Notice(theClient,"Please use sgline to set that gline");
+	return true;
+	}
 string::size_type atPos = st[ pos ].find_first_of( '@' ) ;
 if( string::npos == atPos )
 	{
@@ -228,13 +233,12 @@ if(Reason.size() > gline::MAX_REASON_LENGTH)
 		    gline::MAX_REASON_LENGTH);
 	return false;
 	}
-//bot->setRemoving(st[pos]);
-server->setGline( nickUserHost,
+/*server->setGline( nickUserHost,
 	st[ pos ],
 	string("[") + Us + "] " + Reason,
 	//st.assemble( pos + ResStart ) + "[" + Us + "]",
-	gLength , bot) ;
-//bot->unSetRemoving();
+	gLength , bot) ;*/
+
 ccGline *TmpGline = bot->findGline(st[pos]);
 bool Up = false;
 
@@ -246,7 +250,8 @@ TmpGline->setExpires(::time(0) + gLength);
 TmpGline->setAddedBy(nickUserHost);
 TmpGline->setReason(bot->removeSqlChars(st.assemble( pos + ResStart )));
 TmpGline->setAddedOn(::time(0));
-
+TmpGline->setLastUpdated(::time(0));
+bot->addGlineToUplink(TmpGline);
 if(Up)
 	{	
 	TmpGline->Update();
