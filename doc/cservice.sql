@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------------
--- "$Id: cservice.sql,v 1.16 2001/01/20 19:34:11 gte Exp $"
+-- "$Id: cservice.sql,v 1.17 2001/01/21 16:12:56 gte Exp $"
 -- Channel service DB SQL file for PostgreSQL.
 
 -- ChangeLog:
@@ -135,10 +135,9 @@ CREATE TABLE users (
 
 	id SERIAL,
 	user_name TEXT NOT NULL,
-	password VARCHAR (40) NOT NULL,
-	last_seen INT4,
+	password VARCHAR (40) NOT NULL, 
 	email VARCHAR (128),
-        url  VARCHAR(128),
+	url  VARCHAR(128),
 	language_id INT4 CONSTRAINT language_channel_id_ref REFERENCES languages (id),
 	public_key TEXT,
 	flags INT2 NOT NULL DEFAULT '0',
@@ -153,7 +152,15 @@ CREATE TABLE users (
 ) ;
 
 CREATE INDEX users_username_idx ON users( lower(user_name) );
-
+ 
+-- This table used to store the "Last Seen" informatation previously
+-- routinely updated in the users table.
+ 
+CREATE TABLE users_lastseen (
+	user_id INT4 CONSTRAINT lastseen_users_id_ref REFERENCES users ( id ),
+	last_seen INT4,
+	PRIMARY KEY (user_id)
+);
 
 CREATE TABLE levels (
 
