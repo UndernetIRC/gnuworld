@@ -10,7 +10,7 @@
  *
  * Caveats: SET LANG is still under consideration.
  *
- * $Id: SETCommand.cc,v 1.16 2001/02/04 04:09:20 gte Exp $
+ * $Id: SETCommand.cc,v 1.17 2001/02/05 00:55:17 gte Exp $
  */
 
 #include	<string>
@@ -22,7 +22,7 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char SETCommand_cc_rcsId[] = "$Id: SETCommand.cc,v 1.16 2001/02/04 04:09:20 gte Exp $" ;
+const char SETCommand_cc_rcsId[] = "$Id: SETCommand.cc,v 1.17 2001/02/05 00:55:17 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -374,7 +374,11 @@ bool SETCommand::Exec( iClient* theClient, const string& Message )
 		bot->Notice(theClient, "STRICTOP: You do not have enough access!");
 		return true;
 	    }
-	    if(value == "ON") theChan->setFlag(sqlChannel::F_STRICTOP);
+	    if(value == "ON") 
+	    { 
+	    	theChan->setFlag(sqlChannel::F_STRICTOP);
+			if (tmpChan) bot->deopAllUnAuthedOnChan(tmpChan);
+		}
 	    else if(value == "OFF") theChan->removeFlag(sqlChannel::F_STRICTOP);
 	    else
 	    {
