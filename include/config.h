@@ -17,16 +17,18 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: config.h,v 1.14 2002/05/27 17:18:12 dan_karrels Exp $
+ * $Id: config.h,v 1.15 2002/08/17 02:03:54 reedloden Exp $
  */
 
 #ifndef __CONFIG_H
-#define __CONFIG_H "$Id: config.h,v 1.14 2002/05/27 17:18:12 dan_karrels Exp $"
+#define __CONFIG_H "$Id: config.h,v 1.15 2002/08/17 02:03:54 reedloden Exp $"
 
 /* config.h */
 /* GNUWorld main configuration file */
-/* blah blah blah goes here, but who cares,
- * Damnit Jim! Im a programmer not an author!
+/* All core settings are set/defined here.
+ * Make sure to change HIDDEN_HOST to your
+ * network's hidden host or it will say
+ * .users.undernet.org in X/etc. ;)
  */
 
 /**

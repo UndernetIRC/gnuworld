@@ -52,7 +52,7 @@ gzip -cd gnuworld.xxx.tar.gz | tar xf -
 
 where xxx is the version of GNUWorld you have obtained.
 
-Building GNUWorld-
+Building GNUWorld
 ----------------
 
 In order to build GNUWorld, you will need a compiler which supports the

@@ -14,7 +14,7 @@
 
 @SET_MAKE@
 
-# "$Id: Makefile.in,v 1.5 2002/08/08 21:44:00 dan_karrels Exp $"
+# "$Id: Makefile.in,v 1.6 2002/08/17 02:03:55 reedloden Exp $"
 SHELL = @SHELL@
 
 srcdir = @srcdir@
