@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------------
--- "$Id: cservice.sql,v 1.78 2004/02/26 01:08:27 nighty Exp $"
+-- "$Id: cservice.sql,v 1.79 2004/07/24 23:43:54 nighty Exp $"
 -- Channel service DB SQL file for PostgreSQL.
 
 -- ChangeLog:
@@ -193,6 +193,9 @@ CREATE TABLE users (
 -- 0x00 10 -- "No-Notes" - We don't want to be sent notes.
 -- 0x00 20 -- "No Purge" - Don't remove the username for being idle.
 -- 0x00 40 -- "No Admin" - Any * authentication is disabled (verify/commands) (its the DISABLEAUTH ON/OFF setting online)
+-- 0x00 80 -- "Alumni" - Any * privileged is gone, *excepted* the verify; more like an honorary position
+-- 0x01 60 -- IRC Operator - User is flagged as being 'supposed' to be an official operator, as for allowing them
+	   --                special accesses such as posting complaints even when system is closed to public.
 	last_updated_by VARCHAR (128),		-- nick!user@host
 	last_updated INT4 NOT NULL, 
 	deleted INT2 DEFAULT '0',
