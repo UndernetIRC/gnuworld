@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server.cc,v 1.150 2002/11/06 21:29:30 dan_karrels Exp $
+ * $Id: server.cc,v 1.151 2002/11/07 20:13:56 dan_karrels Exp $
  */
 
 #include	<sys/time.h>
@@ -72,7 +72,7 @@
 #include	"Connection.h"
 
 const char server_h_rcsId[] = __SERVER_H ;
-const char server_cc_rcsId[] = "$Id: server.cc,v 1.150 2002/11/06 21:29:30 dan_karrels Exp $" ;
+const char server_cc_rcsId[] = "$Id: server.cc,v 1.151 2002/11/07 20:13:56 dan_karrels Exp $" ;
 const char config_h_rcsId[] = __CONFIG_H ;
 const char misc_h_rcsId[] = __MISC_H ;
 const char events_h_rcsId[] = __EVENTS_H ;
@@ -833,9 +833,11 @@ if( pairPtr != commandMap.end() )
 	// Go ahead and call the handler method
 	if( !pairPtr->second->Execute( Param ) )
 		{
-		elog	<< "xServer::Process> Handler failed for message: "
-			<< Param
-			<< endl ;
+//		elog	<< "xServer::Process> Handler failed for command: "
+//			<< Command
+//			<< ", args: "
+//			<< Param
+//			<< endl ;
 		}
 
 	}

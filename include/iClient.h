@@ -17,11 +17,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: iClient.h,v 1.33 2002/11/06 21:29:29 dan_karrels Exp $
+ * $Id: iClient.h,v 1.34 2002/11/07 20:13:56 dan_karrels Exp $
  */
 
 #ifndef __ICLIENT_H
-#define __ICLIENT_H "$Id: iClient.h,v 1.33 2002/11/06 21:29:29 dan_karrels Exp $"
+#define __ICLIENT_H "$Id: iClient.h,v 1.34 2002/11/07 20:13:56 dan_karrels Exp $"
 
 #include	<string>
 #include	<list>
@@ -194,8 +194,8 @@ public:
 		{ return hiddenHostSuffix ; }
 
 	/**
-	 * I really have no idea what this is...someone wanna pass me
-	 * a bone here people?
+	 * This method sets user mode +r and records the account
+	 * domain for this network client.
 	 */
 	inline void setAccount( const string& _account )
 		{

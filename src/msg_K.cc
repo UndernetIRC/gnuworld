@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_K.cc,v 1.10 2002/07/31 03:14:05 dan_karrels Exp $
+ * $Id: msg_K.cc,v 1.11 2002/11/07 20:13:56 dan_karrels Exp $
  */
 
 #include	<new>
@@ -37,7 +37,7 @@
 #include	"StringTokenizer.h"
 #include	"ServerCommandHandler.h"
 
-const char msg_K_cc_rcsId[] = "$Id: msg_K.cc,v 1.10 2002/07/31 03:14:05 dan_karrels Exp $" ;
+const char msg_K_cc_rcsId[] = "$Id: msg_K.cc,v 1.11 2002/11/07 20:13:56 dan_karrels Exp $" ;
 const char server_h_rcsId[] = __SERVER_H ;
 const char iClient_h_rcsId[] = __ICLIENT_H ;
 const char Channel_h_rcsId[] = __CHANNEL_H ;
@@ -114,7 +114,7 @@ if( NULL == destClient )
 	// Nope, log the error
 	elog	<< "msg_K> ("
 		<< Param[ 1 ]
-		<< ") Unable to find client: "
+		<< ") Unable to find target client: "
 		<< Param[ 2 ]
 		<< endl ;
 
@@ -140,12 +140,15 @@ if( NULL == theChan )
 ChannelUser* destChanUser = theChan->findUser( destClient ) ;
 if( NULL == destChanUser )
 	{
-	elog	<< "msg_K> Unable to find ChannelUser "
-		<< "for channel "
-		<< theChan->getName()
-		<< ", iClient: "
-		<< *destClient
-		<< endl ;
+// This is commented out due to lag kicks happening quite a bit
+// on production networks, especially in channels with fasting
+// banning bots.
+//	elog	<< "msg_K> Unable to find target ChannelUser "
+//		<< "for channel "
+//		<< theChan->getName()
+//		<< ", iClient: "
+//		<< *destClient
+//		<< endl ;
 
 	// Return error
 	return false ;
