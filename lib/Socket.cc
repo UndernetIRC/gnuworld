@@ -34,7 +34,7 @@
 #endif
 
 const char Socket_h_rcsId[] = __SOCKET_H ;
-const char Socket_cc_rcsId[] = "$Id: Socket.cc,v 1.7 2000/12/15 00:13:44 dan_karrels Exp $" ;
+const char Socket_cc_rcsId[] = "$Id: Socket.cc,v 1.8 2000/12/30 17:40:21 dan_karrels Exp $" ;
 
 using gnuworld::elog ;
 using std::endl ;
@@ -414,6 +414,10 @@ return FD_ISSET( fd, &readfds ) +
 
 int Socket::send( const unsigned char* buf, size_t nb )
 {
+#ifndef NDEBUG
+  assert( buf != 0 ) ;
+#endif
+
 if( fd < 0 )
 	{
 	errno = EBADF ;
@@ -434,9 +438,6 @@ return result ;
 
 int Socket::send( const char* s )
 {
-#ifndef DEBUG
-  assert( s != 0 ) ;
-#endif
 return send( reinterpret_cast< const unsigned char* >( s ), strlen( s ) ) ;
 }
 
@@ -470,6 +471,10 @@ return recv( buf, numBytes ) ;
 
 int Socket::recv( unsigned char* buf, size_t nb )
 {
+#ifndef NDEBUG
+  assert( buf != 0 ) ;
+#endif 
+
 if( fd < 0 )
 	{
 	errno = EBADF ;
