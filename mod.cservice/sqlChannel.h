@@ -1,7 +1,7 @@
 /* sqlChannel.h */
 
 #ifndef __SQLCHANNEL_H
-#define __SQLCHANNEL_H "$Id: sqlChannel.h,v 1.29 2001/07/16 19:31:18 gte Exp $"
+#define __SQLCHANNEL_H "$Id: sqlChannel.h,v 1.30 2001/08/10 20:11:16 gte Exp $"
 
 #include	<string>
 #include	<map>
@@ -11,8 +11,8 @@
 using std::string ;
 
 namespace gnuworld
-{ 
- 
+{
+
 class sqlChannel
 {
 
@@ -29,7 +29,7 @@ public:
 	static const flagType	F_SUSPEND  = 0x00000010 ;
 	static const flagType	F_TEMP     = 0x00000020 ;
 	static const flagType	F_CAUTION  = 0x00000040 ;
-	static const flagType	F_VACATION = 0x00000080 ; 
+	static const flagType	F_VACATION = 0x00000080 ;
 	static const flagType   F_LOCKED   = 0x00000100 ;
 
 	static const flagType	F_ALWAYSOP  = 0x00010000 ;
@@ -57,64 +57,65 @@ public:
 	/* Manually added Comment */
 	static const unsigned short	EV_COMMENT  = 9 ;
 	static const unsigned short	EV_REMOVEALL= 10 ;
+	static const unsigned short	EV_IDLE		= 11 ;
 
 	/*
 	 *  Methods to get data atrributes.
-	 */ 
+	 */
 
 	inline const unsigned int&	getID() const
 		{ return id ; }
 
 	inline const string&		getName() const
 		{ return name ; }
-	
+
 	inline const flagType&		getFlags() const
 		{ return flags ; }
-	
+
 	inline bool  getFlag( const flagType& whichFlag ) const
 		{ return (flags & whichFlag) ; }
-	
+
 	inline const unsigned short int& getMassDeopPro() const
 		{ return mass_deop_pro ; }
-	
+
 	inline const unsigned short int& getFloodPro() const
 		{ return flood_pro ; }
-	
+
 	inline const string&		getURL() const
 		{ return url ; }
-	
+
 	inline const string&		getDescription() const
 		{ return description ; }
 
 	inline const string&		getComment() const
 		{ return comment ; }
- 
+
 	inline const string&		getKeywords() const
 		{ return keywords ; }
-	
+
 	inline const time_t&		getRegisteredTS() const
 		{ return registered_ts ; }
 
 	inline const time_t&		getChannelTS() const
-		{ return channel_ts ; } 
+		{ return channel_ts ; }
 
 	inline const string&		getChannelMode() const
 		{ return channel_mode ; }
 
 	inline const unsigned short int& getUserFlags() const
 		{ return userflags ; }
-	 
+
 	inline const time_t&		getLastUpdated() const
 		{ return last_updated ; }
- 
+
 	inline const bool& 			getInChan() const
 		{ return inChan; }
 
 	inline const time_t&		getLastTopic() const
-		{ return last_topic ; } 
+		{ return last_topic ; }
 
 	inline const time_t&		getLastUsed() const
-		{ return last_used ; } 
+		{ return last_used ; }
 
 	/**
 	 * Load channel data from the backend using the channel name as
@@ -126,7 +127,7 @@ public:
 	 * Load channel data from the backend using the channel_id as a
 	 * key.
 	 */
-	bool loadData( int ); 
+	bool loadData( int );
 
 	/*
 	 *  Methods to set data atrributes.
@@ -134,7 +135,7 @@ public:
 
 	// 'ID' is a primary key and cannot be altered.
 	// We aren't going to let people change channel names here either.
- 
+
 	inline void setFlag( const flagType& whichFlag )
 		{ flags |= whichFlag; }
 
@@ -147,7 +148,7 @@ public:
 	inline void setFloodPro( const unsigned short int& _flood_pro )
 		{ flood_pro = _flood_pro; }
 
-	inline void setURL( const string& _url ) 
+	inline void setURL( const string& _url )
 		{ url = _url; }
 
 	inline void setDescription( const string& _description )
@@ -163,14 +164,14 @@ public:
 		{ registered_ts = _registered_ts; }
 
 	inline void setChannelTS( const time_t& _channel_ts )
-		{ channel_ts = _channel_ts; } 
+		{ channel_ts = _channel_ts; }
 
 	inline void setChannelMode( const string& _channel_mode )
 		{ channel_mode = _channel_mode; }
 
 	inline void setUserFlags( const unsigned short int& _userflags )
 		{ userflags = _userflags; }
-		
+
 	inline void setInChan( const bool& _inChan )
 		{ inChan = _inChan; }
 
@@ -178,8 +179,8 @@ public:
 		{ last_topic = _last_topic; }
 
 	inline void setLastUsed( const time_t& _last_used )
-		{ last_used = _last_used; } 
- 
+		{ last_used = _last_used; }
+
 	/**
 	 * Method to perform a SQL 'UPDATE' and commit changes to this
 	 * object back to the database.
@@ -189,17 +190,17 @@ public:
 	void setAllMembers(int);
 
 public:
-	/* 
+	/*
 	 * Map with key user-id, contents level and username for
-	 * easy access 
+	 * easy access
 	 * Stores UID's of admin users with forced accessse
-	 * on this channel 
+	 * on this channel
 	 */
 
 	typedef map< unsigned int, pair < unsigned short, string > > forceMapType ;
-	forceMapType forceMap; 
+	forceMapType forceMap;
 
-protected: 
+protected:
 
 	unsigned int	id ;
 	string		name ;
@@ -212,17 +213,17 @@ protected:
 	string		keywords  ;
 	time_t		registered_ts ;
 	time_t		channel_ts ;
-	string		channel_mode ; 
+	string		channel_mode ;
 	unsigned short	userflags ;
-	time_t		last_updated ; 
+	time_t		last_updated ;
 	time_t		last_topic ;
 	bool		inChan;
 	time_t		last_used;
 
-	PgDatabase*	SQLDb; 
- 
+	PgDatabase*	SQLDb;
+
  } ;
 
-} 
+}
 
 #endif // __SQLCHANNEL_H

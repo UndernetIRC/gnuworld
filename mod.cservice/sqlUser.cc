@@ -1,40 +1,41 @@
-/* 
+/*
  * sqlUser.cc
- * 
+ *
  * Storage class for accessing user information either from the backend
  * or internal storage.
- * 
- * $Id: sqlUser.cc,v 1.20 2001/07/08 19:15:08 gte Exp $
+ *
+ * $Id: sqlUser.cc,v 1.21 2001/08/10 20:11:16 gte Exp $
  */
- 
+
 #include	<strstream.h>
 #include	<string.h>
 
-#include	<cstring> 
+#include	<cstring>
 
 #include	"ELog.h"
-#include	"misc.h" 
-#include	"sqlUser.h" 
+#include	"misc.h"
+#include	"sqlUser.h"
 #include	"constants.h"
 #include	"cservice.h"
 #include	"cservice_config.h"
 
 namespace gnuworld
 {
- 
-using std::string ; 
-using std::endl ; 
+
+using std::string ;
+using std::endl ;
 
 sqlUser::sqlUser(PgDatabase* _SQLDb)
  : networkClient(0),
    id( 0 ),
    user_name(),
    password(),
-   last_seen( 0 ), 
+   last_seen( 0 ),
    url(),
-   language_id( 0 ), 
-   flags( 0 ), 
+   language_id( 0 ),
+   flags( 0 ),
    last_used( 0 ),
+   email(),
    SQLDb( _SQLDb )
 {
 }
@@ -48,7 +49,7 @@ bool sqlUser::loadData(int userID)
 /*
  *  With the open database handle 'SQLDb', retrieve information about
  *  'userID' and fill our member variables.
- */ 
+ */
 
 #ifdef LOG_DEBUG
 	elog	<< "sqlUser::loadData> Attempting to load data for user-id: "
@@ -58,9 +59,9 @@ bool sqlUser::loadData(int userID)
 
 strstream queryString;
 queryString	<< "SELECT "
-		<< sql::user_fields 
+		<< sql::user_fields
 		<< " FROM users WHERE id = "
-		<< userID 
+		<< userID
 		<< ends;
 
 #ifdef LOG_SQL
@@ -73,43 +74,43 @@ ExecStatusType status = SQLDb->Exec(queryString.str()) ;
 delete[] queryString.str() ;
 
 if( PGRES_TUPLES_OK == status )
-	{ 
+	{
 	/*
 	 *  If the user doesn't exist, we won't get any rows back.
-	 */ 
+	 */
 
 	if(SQLDb->Tuples() < 1)
 		{
 		return (false);
-		} 
+		}
 
-	setAllMembers(0); 
+	setAllMembers(0);
 
 	return (true);
-	} 
+	}
 
-return (false); 
-} 
+return (false);
+}
 
 bool sqlUser::loadData(const string& userName)
 {
 /*
  *  With the open database handle 'SQLDb', retrieve information about
  *  'userID' and fill our member variables.
- */ 
+ */
 
 #ifdef LOG_DEBUG
 	elog	<< "sqlUser::loadData> Attempting to load data for user-name: "
 		<< userName
 		<< endl;
 #endif
-	
+
 strstream queryString;
 queryString	<< "SELECT "
-		<< sql::user_fields 
+		<< sql::user_fields
 		<< " FROM users WHERE lower(user_name) = '"
-		<< string_lower(userName) 
-		<< "'" 
+		<< string_lower(userName)
+		<< "'"
 		<< ends;
 
 #ifdef LOG_SQL
@@ -122,23 +123,23 @@ ExecStatusType status = SQLDb->Exec(queryString.str()) ;
 delete[] queryString.str() ;
 
 if( PGRES_TUPLES_OK == status )
-	{ 
+	{
 	/*
 	 *  If the user doesn't exist, we won't get any rows back.
-	 */ 
+	 */
 
 	if(SQLDb->Tuples() < 1)
 		{
 		return (false);
-		} 
+		}
 
-	setAllMembers(0); 
+	setAllMembers(0);
 
 	return (true);
-	} 
+	}
 
-return (false); 
-} 
+return (false);
+}
 
 
 void sqlUser::setAllMembers(int row)
@@ -150,12 +151,13 @@ void sqlUser::setAllMembers(int row)
 
 id = atoi(SQLDb->GetValue(row, 0));
 user_name = SQLDb->GetValue(row, 1);
-password = SQLDb->GetValue(row, 2); 
+password = SQLDb->GetValue(row, 2);
 url = SQLDb->GetValue(row, 3);
-language_id = atoi(SQLDb->GetValue(row, 4)); 
+language_id = atoi(SQLDb->GetValue(row, 4));
 flags = atoi(SQLDb->GetValue(row, 5));
-last_updated_by = SQLDb->GetValue(row, 6); 
-last_updated = atoi(SQLDb->GetValue(row, 7)); 
+last_updated_by = SQLDb->GetValue(row, 6);
+last_updated = atoi(SQLDb->GetValue(row, 7));
+email = SQLDb->GetValue(row, 8);
 
 /* Fetch the "Last Seen" time from the users_lastseen table. */
 
@@ -169,12 +171,12 @@ bool sqlUser::commit()
  */
 
 static const char* queryHeader =    "UPDATE users ";
-static const char* queryCondition = "WHERE id = "; 
+static const char* queryCondition = "WHERE id = ";
 
 strstream queryString;
-queryString	<< queryHeader 
+queryString	<< queryHeader
 		<< "SET flags = " << flags << ", "
-		<< "password = '" << password << "', " 
+		<< "password = '" << password << "', "
 		<< "language_id = " << language_id << ", "
 		<< "last_updated = now()::abstime::int4 "
 		<< queryCondition << id
@@ -183,7 +185,7 @@ queryString	<< queryHeader
 #ifdef LOG_SQL
 	elog	<< "sqlUser::commit> "
 		<< queryString.str()
-		<< endl; 
+		<< endl;
 #endif
 
 ExecStatusType status = SQLDb->Exec(queryString.str()) ;
@@ -197,10 +199,10 @@ if( PGRES_COMMAND_OK != status )
 		<< endl;
 
 	return false;
- 	} 
+ 	}
 
 return true;
-}	
+}
 
 bool sqlUser::commitLastSeen()
 {
@@ -209,10 +211,10 @@ bool sqlUser::commitLastSeen()
  */
 
 static const char* queryHeader =    "UPDATE users_lastseen ";
-static const char* queryCondition = "WHERE user_id = "; 
+static const char* queryCondition = "WHERE user_id = ";
 
 strstream queryString;
-queryString	<< queryHeader 
+queryString	<< queryHeader
 		<< "SET last_seen = "
 		<< last_seen
 		<< ", "
@@ -224,7 +226,7 @@ queryString	<< queryHeader
 #ifdef LOG_SQL
 	elog	<< "sqlUser::commitLastSeen> "
 		<< queryString.str()
-		<< endl; 
+		<< endl;
 #endif
 
 ExecStatusType status = SQLDb->Exec(queryString.str()) ;
@@ -238,17 +240,17 @@ if( PGRES_COMMAND_OK != status )
 		<< endl;
 
 	return false;
- 	} 
+ 	}
 
 return true;
-}	
+}
 
 time_t sqlUser::getLastSeen()
 {
 strstream queryString;
-queryString	<< "SELECT last_seen" 
+queryString	<< "SELECT last_seen"
 		<< " FROM users_lastseen WHERE user_id = "
-		<< id 
+		<< id
 		<< ends;
 
 #ifdef LOG_SQL
@@ -261,20 +263,20 @@ ExecStatusType status = SQLDb->Exec(queryString.str()) ;
 delete[] queryString.str() ;
 
 if( PGRES_TUPLES_OK == status )
-	{ 
+	{
 	/*
 	 *  If the user doesn't exist, we won't get any rows back.
-	 */ 
+	 */
 
 	if(SQLDb->Tuples() < 1)
 		{
 		return (false);
-		} 
+		}
 
 	last_seen = atoi(SQLDb->GetValue(0, 0));
 
 	return (last_seen);
-	} 
+	}
 
 return (false);
 
@@ -282,7 +284,7 @@ return (false);
 
 
 void sqlUser::writeEvent(unsigned short eventType, sqlUser* theUser, const string& theMessage)
-{ 
+{
 string userExtra = theUser ? theUser->getUserName() : "Not Logged In";
 
 strstream theLog;
@@ -295,10 +297,10 @@ theLog	<< "INSERT INTO userlog (ts, user_id, event, message, "
 	<< ", "
 	<< eventType
 	<< ", "
- 	<< "'" 
+ 	<< "'"
 	<< escapeSQLChars(theMessage)
 	<< " (By " << userExtra << ")"
-	<< "', now()::abstime::int4)" 
+	<< "', now()::abstime::int4)"
 	<< ends;
 
 #ifdef LOG_SQL
@@ -306,7 +308,7 @@ theLog	<< "INSERT INTO userlog (ts, user_id, event, message, "
 		<< theLog.str()
 		<< endl;
 #endif
- 
+
 SQLDb->ExecCommandOk(theLog.str());
 
 delete[] theLog.str();
@@ -317,9 +319,9 @@ const string sqlUser::getLastEvent(unsigned short eventType, unsigned int& event
 {
 strstream queryString;
 
-queryString	<< "SELECT message,ts" 
+queryString	<< "SELECT message,ts"
 			<< " FROM userlog WHERE user_id = "
-			<< id 
+			<< id
 			<< " AND event = "
 			<< eventType
 			<< " ORDER BY ts DESC LIMIT 1"
@@ -335,27 +337,27 @@ ExecStatusType status = SQLDb->Exec(queryString.str()) ;
 delete[] queryString.str() ;
 
 if( PGRES_TUPLES_OK == status )
-	{ 
+	{
 
 	if(SQLDb->Tuples() < 1)
 		{
 		return("");
-		} 
+		}
 
 	string reason = SQLDb->GetValue(0, 0);
 	eventTime = atoi(SQLDb->GetValue(0, 1));
 
 	return (reason);
-	} 
+	}
 
 return ("");
- 
+
 }
- 
+
 sqlUser::~sqlUser()
 {
 // No heap space allocated
 }
 
- 
+
 } // namespace gnuworld.

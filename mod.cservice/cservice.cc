@@ -1757,6 +1757,28 @@ void cservice::cacheExpireLevels()
 						theChan->forceMap.size(), theChan->getName().c_str());
 			theChan->forceMap.clear();
 		}
+		/*
+		 * While we're here, lets see if this channel has been idle for a while.
+		 * If so, we might want to part and turn off autojoin.. etc.
+		 */
+
+		/* 2 Days for now, move to config.. (172800) */
+		if ( ((currentTime() - theChan->getLastUsed()) >= 3600) && theChan->getInChan() )
+		{
+			/*
+			 * So long! and thanks for all the fish.
+			 */
+
+			theChan->setInChan(false);
+			MyUplink->UnRegisterChannelEvent(theChan->getName(), this);
+			theChan->removeFlag(sqlChannel::F_AUTOJOIN);
+			theChan->commit();
+			joinCount--;
+			writeChannelLog(theChan, me, sqlChannel::EV_IDLE, "");
+			logDebugMessage("I've just left %s because its too quiet.",
+					theChan->getName().c_str());
+			Part(theChan->getName(), "So long! (And thanks for all the fish)");
+		}
 
 		++ptr;
 	}
