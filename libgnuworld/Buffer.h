@@ -19,11 +19,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, 
  * USA.
  *
- * $Id: Buffer.h,v 1.3 2003/06/28 01:21:18 dan_karrels Exp $
+ * $Id: Buffer.h,v 1.4 2003/07/21 15:07:26 dan_karrels Exp $
  */
 
 #ifndef __BUFFER_H
-#define __BUFFER_H "$Id: Buffer.h,v 1.3 2003/06/28 01:21:18 dan_karrels Exp $"
+#define __BUFFER_H "$Id: Buffer.h,v 1.4 2003/07/21 15:07:26 dan_karrels Exp $"
 
 #include	<iostream>
 #include	<string>
@@ -100,7 +100,7 @@ public:
 	 * include clear(), do it the old fashion way here.
 	 */
 	virtual void			clear()
-		{ buf.clear() ; }
+		{ buf.erase() ; }
 
 	/**
 	 * Remove the given number of bytes from the
