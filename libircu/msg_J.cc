@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_J.cc,v 1.1 2002/11/20 22:16:18 dan_karrels Exp $
+ * $Id: msg_J.cc,v 1.2 2003/06/11 11:46:59 dan_karrels Exp $
  */
 
 #include	<new>
@@ -44,7 +44,7 @@ const char ELog_h_rcsId[] = __ELOG_H ;
 const char Channel_h_rcsId[] = __CHANNEL_H ;
 const char iClient_h_rcsId[] = __ICLIENT_H ;
 const char ChannelUser_h_rcsId[] = __CHANNELUSER_H ;
-const char msg_J_cc_rcsId[] = "$Id: msg_J.cc,v 1.1 2002/11/20 22:16:18 dan_karrels Exp $" ;
+const char msg_J_cc_rcsId[] = "$Id: msg_J.cc,v 1.2 2003/06/11 11:46:59 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -200,12 +200,15 @@ for( StringTokenizer::size_type i = 0 ; i < st.size() ; i++ )
 		else
 			{
 			// User was found in channel, no reason apparent
-			elog	<< "msg_J> Unexpectedly found "
-				<< "user "
-				<< *Target
-				<< " in channel "
-				<< theChan->getName()
-				<< endl ;
+			// This message can happen a lot due
+			// to lag....it's not too important tho it
+			// bugs me so.
+//			elog	<< "msg_J> Unexpectedly found "
+//				<< "user "
+//				<< *Target
+//				<< " in channel "
+//				<< theChan->getName()
+//				<< endl ;
 			}
 
 		// In either case, there is no need to add the newly
