@@ -2,7 +2,7 @@
  */
 
 #ifndef __ICLIENT_H
-#define __ICLIENT_H "$Id: iClient.h,v 1.2 2000/07/12 21:54:11 dan_karrels Exp $"
+#define __ICLIENT_H "$Id: iClient.h,v 1.3 2000/07/31 15:17:25 dan_karrels Exp $"
 
 #include	<string>
 #include	<list>
@@ -235,7 +235,7 @@ public:
 	/**
 	 * Return this clients integer network numeric.
 	 */
-	inline const unsigned int getIntYYXXX() const
+	inline const unsigned int& getIntYYXXX() const
 		{ return intYYXXX ; }
 
 	/**

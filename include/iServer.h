@@ -4,7 +4,7 @@
  */
 
 #ifndef __ISERVER_H
-#define __ISERVER_H "$Id: iServer.h,v 1.3 2000/07/12 21:54:11 dan_karrels Exp $"
+#define __ISERVER_H "$Id: iServer.h,v 1.4 2000/07/31 15:17:25 dan_karrels Exp $"
 
 #include	<iostream>
 #include	<string>
@@ -64,6 +64,13 @@ public:
 	 */
 	inline const unsigned int& getIntYY() const
 		{ return intYY ; }
+
+	/**
+	 * Return the integer representation of this iServer's network
+	 * max client numeric.
+	 */
+	inline const unsigned int& getIntXXX() const
+		{ return intXXX ; }
 
 	/**
 	 * Return the character array representation of this iServer's
@@ -229,6 +236,11 @@ protected:
 	 * This server's integer numeric.
 	 */
 	unsigned int	intYY ;
+
+	/**
+	 * This server's integer max number of clients.
+	 */
+	unsigned int	intXXX ;
 
 	/**
 	 * This server's character array numeric.

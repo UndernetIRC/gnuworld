@@ -20,7 +20,7 @@
 #include	"misc.h"
 
 const char xNetwork_h_rcsId[] = __XNETWORK_H ;
-const char xNetwork_cc_rcsId[] = "$Id: Network.cc,v 1.6 2000/07/16 17:48:18 dan_karrels Exp $" ;
+const char xNetwork_cc_rcsId[] = "$Id: Network.cc,v 1.7 2000/07/31 15:17:25 dan_karrels Exp $" ;
 
 using std::string ;
 using std::endl ;
@@ -147,10 +147,15 @@ if( NULL != servers[ YY ] )
 
 	// The show must go on!
 	delete servers[ YY ] ;
+	// TODO: Clear the clients for this particular server
 
 	}
 
 servers[ YY ] = newServer ;
+clients[ YY ].clear() ;
+
+// Optimize a bit
+clients[ YY ].reserve( newServer->getIntXXX() ) ;
 
 //elog << "addServer> " << *newServer << endl ;
 

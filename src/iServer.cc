@@ -8,7 +8,7 @@
 #include	"Numeric.h"
 
 const char iServer_h_rcsId[] = __ISERVER_H ;
-const char iServer_cc_rcsId[] = "$Id: iServer.cc,v 1.1 2000/06/30 18:46:07 dan_karrels Exp $" ;
+const char iServer_cc_rcsId[] = "$Id: iServer.cc,v 1.2 2000/07/31 15:17:25 dan_karrels Exp $" ;
 
 using std::string ;
 
@@ -30,15 +30,21 @@ iServer::iServer( const int& _uplink,
 
 if( _yxx.size() == 5 )
 	{
+	// yyxxx, n2k
 	intYY = base64toint( _yxx.c_str(), 2 ) ;
 	inttobase64( charYY, intYY, 2 ) ;
+
+	intXXX = base64toint( _yxx.c_str() + 2, 3 ) ;
 	}
 else
 	{
+	// yxx
 	intYY = convert2n[ _yxx[ 0 ] ] ;
 	charYY[ 0 ] = _yxx[ 0 ] ;
 	charYY[ 1 ] = 0 ;
 	charYY[ 2 ] = 0 ;
+
+	intXXX = base64toint( _yxx.c_str() + 1, 2 ) ;
 	}
 
 clients = servers = 0 ;
