@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-# "$Id: Makefile.am,v 1.51 2004/06/04 14:30:51 mrbean_ Exp $"
+# "$Id: Makefile.am,v 1.52 2005/03/18 16:19:59 mrbean_ Exp $"
 
 lib_LTLIBRARIES = libccontrol.la
 libccontrol_la_SOURCES = ccontrol.cc \
@@ -68,7 +68,7 @@ libccontrol_la_SOURCES = ccontrol.cc \
 	WHOISCommand.cc
 
 libccontrol_la_CXXFLAGS = -I$(PGSQL_INCLUDE) -I${top_srcdir}/include \
-	-I${top_srcdir}/libgnuworld
+	-I${top_srcdir}/libgnuworld  -DHAVE_NAMESPACE_STD -DHAVE_CXX_STRING_HEADER -DDLLIMPORT=""
 libccontrol_la_LDFLAGS = -module -export-dynamic -L$(PGSQL_LIB) -lpq++ 
 
 EXTRA_DIST = ccBadChannel.h \

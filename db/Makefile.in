@@ -215,7 +215,7 @@ lib_LTLIBRARIES = libgnuworldDB.la
 libgnuworldDB_la_SOURCES = gnuworldDB.cc \
 	pgsqlDB.cc
 
-libgnuworldDB_la_CXXFLAGS = -I$(PGSQL_INCLUDE)
+libgnuworldDB_la_CXXFLAGS = -I$(PGSQL_INCLUDE)  -DHAVE_NAMESPACE_STD -DHAVE_CXX_STRING_HEADER -DDLLIMPORT=""
 EXTRA_DIST = gnuworldDB.h \
 	pgsqlDB.h
 

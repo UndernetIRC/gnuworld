@@ -14,7 +14,7 @@
 
 @SET_MAKE@
 
-# "$Id: Makefile.in,v 1.236 2005/01/22 18:13:09 dan_karrels Exp $"
+# "$Id: Makefile.in,v 1.237 2005/03/18 16:20:03 mrbean_ Exp $"
 
 SOURCES = $(libcservice_la_SOURCES)
 
@@ -260,7 +260,7 @@ libcservice_la_LDFLAGS = -module -export-dynamic -L$(PGSQL_LIB) \
 	-lpq++
 
 libcservice_la_CXXFLAGS = -I$(PGSQL_INCLUDE) -I${top_srcdir}/include \
-	-I${top_srcdir}/libgnuworld
+	-I${top_srcdir}/libgnuworld  -DHAVE_NAMESPACE_STD -DHAVE_CXX_STRING_HEADER -DDLLIMPORT=""
 
 libcservice_la_SOURCES = cservice.cc \
 	networkData.cc \
