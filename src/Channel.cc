@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: Channel.cc,v 1.34 2002/10/16 00:49:38 gte Exp $
+ * $Id: Channel.cc,v 1.35 2002/10/19 20:08:06 gte Exp $
  */
 
 #include	<new>
@@ -38,7 +38,7 @@
 #include	"ConnectionManager.h"
 
 const char Channel_h_rcsId[] = __CHANNEL_H ;
-const char Channel_cc_rcsId[] = "$Id: Channel.cc,v 1.34 2002/10/16 00:49:38 gte Exp $" ;
+const char Channel_cc_rcsId[] = "$Id: Channel.cc,v 1.35 2002/10/19 20:08:06 gte Exp $" ;
 const char iClient_h_rcsId[] = __ICLIENT_H ;
 const char ChannelUser_h_rcsId[] = __CHANNELUSER_H ;
 const char Network_h_rcsId[] = __NETWORK_H ;
@@ -504,15 +504,19 @@ assert( theClient != 0 ) ;
 
 string theBan = "*!*" ;
 
-// Don't include the '~'
-if( (theClient->getUserName().size() >= 2) &&
-	('~' == theClient->getUserName()[ 0 ]) )
+// If we're +x, don't bother with the user name either.
+if(!theClient->isModeX())
 	{
-	theBan += theClient->getUserName().c_str() + 1 ;
-	}
-else if( !theClient->getUserName().empty() )
-	{
-	theBan += theClient->getUserName() ;
+	// Don't include the '~'
+	if( (theClient->getUserName().size() >= 2) &&
+		('~' == theClient->getUserName()[ 0 ]) )
+		{
+		theBan += theClient->getUserName().c_str() + 1 ;
+		}
+	else if( !theClient->getUserName().empty() )
+		{
+		theBan += theClient->getUserName() ;
+		}
 	}
 
 theBan += '@' ;

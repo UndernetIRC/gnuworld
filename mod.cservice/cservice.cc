@@ -2,7 +2,7 @@
  * cservice.cc
  * Author: Greg Sikorski
  * Purpose: Overall control client.
- * $Id: cservice.cc,v 1.222 2002/10/19 19:53:59 gte Exp $
+ * $Id: cservice.cc,v 1.223 2002/10/19 20:08:06 gte Exp $
  */
 
 #include	<new>
@@ -3816,7 +3816,7 @@ void cservice::preloadUserCache()
 				<< preloadUserDays
 				<< " days : "
 				<< endl;
-	elog << theQuery << endl;
+
 	ExecStatusType status = SQLDb->Exec(theQuery.str().c_str()) ;
 
 	if( PGRES_TUPLES_OK == status )
