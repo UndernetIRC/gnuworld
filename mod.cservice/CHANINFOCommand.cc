@@ -13,7 +13,7 @@
  *
  * Command is aliased "INFO".
  *
- * $Id: CHANINFOCommand.cc,v 1.18 2001/03/05 21:41:30 gte Exp $
+ * $Id: CHANINFOCommand.cc,v 1.19 2001/03/06 02:34:32 dan_karrels Exp $
  */
 
 #include	<string>
@@ -24,8 +24,9 @@
 #include	"levels.h"
 #include	"responses.h"
 #include	"libpq++.h"
+#include	"cservice_config.h"
  
-const char CHANINFOCommand_cc_rcsId[] = "$Id: CHANINFOCommand.cc,v 1.18 2001/03/05 21:41:30 gte Exp $" ;
+const char CHANINFOCommand_cc_rcsId[] = "$Id: CHANINFOCommand.cc,v 1.19 2001/03/06 02:34:32 dan_karrels Exp $" ;
  
 namespace gnuworld
 {
@@ -50,7 +51,7 @@ if( st.size() < 2 )
 
 // Did we find a '#' ?
 if( string::npos == st[ 1 ].find_first_of( '#' ) )
-{
+	{
 	// Nope, look by user then.
 	sqlUser* tmpUser = bot->isAuthed(theClient, false);
 	sqlUser* theUser = bot->getUserRecord(st[1]);
@@ -81,15 +82,15 @@ if( string::npos == st[ 1 ].find_first_of( '#' ) )
 			}
 		}
 
-		bot->Notice(theClient, 
-			bot->getResponse(tmpUser,
-				language::info_about,
-				string("Information about: %s (%i)")).c_str(),
+	bot->Notice(theClient, 
+		bot->getResponse(tmpUser,
+			language::info_about,
+			string("Information about: %s (%i)")).c_str(),
 		theUser->getUserName().c_str(), theUser->getID());
 
 	iClient* targetClient = theUser->isAuthed();
 	string loggedOn = targetClient ?
-	targetClient->getNickUserHost() : "Offline";
+		targetClient->getNickUserHost() : "Offline";
 
 	bot->Notice(theClient, 
 		bot->getResponse(tmpUser,
@@ -97,19 +98,21 @@ if( string::npos == st[ 1 ].find_first_of( '#' ) )
 			string("Currently logged on via: %s")).c_str(),
 		loggedOn.c_str());
 
-	if(theUser->getUrl() != "")
-	{
+	if( !theUser->getUrl().empty() )
+		{
 		bot->Notice(theClient,
 			bot->getResponse(tmpUser,
 				language::url,
 				string("URL: %s")).c_str(),
 			theUser->getUrl().c_str());
-	}
+		}
+
 	bot->Notice(theClient, 
 		bot->getResponse(tmpUser,
 			language::lang,
 			string("Language: %i")).c_str(),
 		theUser->getLanguageId()); 
+
 	bot->Notice(theClient, 
 		bot->getResponse(tmpUser,
 			language::last_seen,
@@ -121,60 +124,86 @@ if( string::npos == st[ 1 ].find_first_of( '#' ) )
 	 * Only show to those with admin access, or the actual user.
 	 */
 
-	if( ((tmpUser) && bot->getAdminAccessLevel(tmpUser)) || (tmpUser == theUser) )
-	{
+	if( ((tmpUser) && bot->getAdminAccessLevel(tmpUser)) ||
+		(tmpUser == theUser) )
+		{
 		strstream channelsQuery;
-		string channelList = ""; 
+		string channelList ;
 	
-		channelsQuery << "SELECT channels.name,levels.access FROM levels,channels "
+		channelsQuery	<< "SELECT channels.name,levels.access FROM levels,channels "
 				<< "WHERE levels.channel_id = channels.id AND channels.deleted = 0 AND levels.user_id = "
-				<< theUser->getID() << " ORDER BY levels.access DESC"
+				<< theUser->getID()
+				<< " ORDER BY levels.access DESC"
 				<< ends;
-		
-		elog << "CHANINFO::sqlQuery> " << channelsQuery.str() << endl;
-	
-		string chanName = "";
-		string chanAccess ="";
-		if( PGRES_TUPLES_OK == bot->SQLDb->Exec(channelsQuery.str()) )
+
+		#ifdef LOG_SQL
+			elog	<< "CHANINFO::sqlQuery> "
+				<< channelsQuery.str()
+				<< endl;
+		#endif
+
+		string chanName ;
+		string chanAccess ;
+
+		ExecStatusType status = 
+			bot->SQLDb->Exec(channelsQuery.str()) ;
+		delete[] channelsQuery.str() ;
+
+		if( PGRES_TUPLES_OK != status )
 			{
-			for(int i = 0; i < bot->SQLDb->Tuples(); i++)
-				{ 
-					chanName = bot->SQLDb->GetValue(i,0);
-					chanAccess = bot->SQLDb->GetValue(i,1);
-					// 4 for 2 spaces, 2 brackets + comma.
-					if ((channelList.size() + chanName.size() + chanAccess.size() +5) >= 500)
-					{
-						bot->Notice(theClient, 
-							bot->getResponse(tmpUser,
-								language::channels,
-								string("Channels: %s")).c_str(), 
-							channelList.c_str());
-						channelList = "";
-					}
-						
-					if (channelList.size() != 0) channelList += ", ";
-					channelList += chanName; 
-					channelList += " (";
-					channelList += chanAccess;
-					channelList +=  ")";
-				} // for()
+			bot->Notice( theClient,
+				"Internal error: SQL failed" ) ;
+
+			elog	<< "CHANINFO> SQL Error: "
+				<< bot->SQLDb->ErrorMessage()
+				<< endl ;
+			return false ;
 			}
+
+		for(int i = 0; i < bot->SQLDb->Tuples(); i++)
+			{ 
+			chanName = bot->SQLDb->GetValue(i,0);
+			chanAccess = bot->SQLDb->GetValue(i,1);
+			// 4 for 2 spaces, 2 brackets + comma.
+			if ((channelList.size() + chanName.size() + chanAccess.size() +5) >= 500)
+				{
+				bot->Notice(theClient, 
+					bot->getResponse(tmpUser,
+						language::channels,
+						string("Channels: %s")).c_str(), 
+					channelList.c_str());
+				channelList.erase( channelList.begin(),
+					channelList.end() ) ;
+				}
+
+			if (channelList.size() != 0)
+					{
+					channelList += ", ";
+					}
+			channelList += chanName; 
+			channelList += " (";
+			channelList += chanAccess;
+			channelList +=  ")";
+			} // for()
 	 
 		bot->Notice(theClient, 
 			bot->getResponse(tmpUser,
 				language::channels,
 				string("Channels: %s")).c_str(), 
 			channelList.c_str());	 
-		delete[] channelsQuery.str() ; 
-	}
+		}
 
 	/*
 	 *  Debug info:
 	 */
 
+	// TODO: Violation of rule of numbers
 	if( ((tmpUser) && (bot->getAdminAccessLevel(tmpUser) == 1000)) )
-	{
-		if (!targetClient) return true;
+		{
+		if (!targetClient)
+			{
+			return true;
+			}
 		bot->Notice(theClient, 
 			bot->getResponse(tmpUser,
 				language::inp_flood,
@@ -185,11 +214,10 @@ if( string::npos == st[ 1 ].find_first_of( '#' ) )
 				language::out_flood,
 				string("Ouput Flood (Bytes): %i")).c_str(), 
 			bot->getOutputTotal(targetClient));
-	}
+		}
 
 	return true;
 } 
-
 
 sqlUser* theUser = bot->isAuthed(theClient, false);
 sqlChannel* theChan = bot->getChannelRecord(st[1]);
@@ -209,12 +237,17 @@ if( !theChan )
  */
 
 strstream theQuery;
-theQuery	<< queryHeader << queryString
+theQuery	<< queryHeader
+		<< queryString
 		<< "AND levels.channel_id = "
 		<< theChan->getID()
 		<< ends;
 
-elog << "CHANINFO::sqlQuery> " << theQuery.str() << endl;
+#ifdef LOG_SQL
+	elog	<< "CHANINFO::sqlQuery> "
+		<< theQuery.str()
+		<< endl;
+#endif
         
 bot->Notice(theClient, 
 	bot->getResponse(theUser,
@@ -223,6 +256,8 @@ bot->Notice(theClient,
 	st[1].c_str());
 
 ExecStatusType status = bot->SQLDb->Exec(theQuery.str()) ;
+delete[] theQuery.str() ;
+
 if( PGRES_TUPLES_OK == status )
 	{
 	for(int i = 0; i < bot->SQLDb->Tuples(); i++)
@@ -254,7 +289,6 @@ if( !theChan->getURL().empty() )
 		theChan->getURL().c_str());
 	}
 
-delete[] theQuery.str() ;
 return true ; 
 } 
 

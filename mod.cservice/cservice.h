@@ -1,5 +1,5 @@
 #ifndef __CSERVICE_H
-#define __CSERVICE_H "$Id: cservice.h,v 1.54 2001/03/05 03:06:30 gte Exp $"
+#define __CSERVICE_H "$Id: cservice.h,v 1.55 2001/03/06 02:34:32 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
@@ -262,7 +262,7 @@ public:
 	/**
 	 * Count channel ops.
 	 */
-	size_t countChanOps(const Channel*);
+	static size_t countChanOps(const Channel*);
 	
 	// Deop everyone on this channel.
 	void deopAllOnChan(Channel*); 

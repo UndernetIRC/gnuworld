@@ -4,27 +4,31 @@
  * Storage class for accessing channel user/level information either from the backend
  * or internal storage.
  * 
- * $Id: sqlLevel.cc,v 1.8 2001/02/18 19:46:01 dan_karrels Exp $
+ * $Id: sqlLevel.cc,v 1.9 2001/03/06 02:34:33 dan_karrels Exp $
  */
  
 #include	<strstream>
 #include	<string> 
+
 #include	<cstring> 
+#include	<ctime>
+
 #include	"ELog.h"
 #include	"misc.h"
 #include	"sqlLevel.h"
 #include	"sqlUser.h"
 #include	"sqlChannel.h"
 #include	"constants.h"
-
-using std::string ; 
-using std::endl ; 
+#include	"cservice_config.h"
  
 const char sqlLevel_h_rcsId[] = __SQLLEVEL_H ;
-const char sqlLevel_cc_rcsId[] = "$Id: sqlLevel.cc,v 1.8 2001/02/18 19:46:01 dan_karrels Exp $" ;
+const char sqlLevel_cc_rcsId[] = "$Id: sqlLevel.cc,v 1.9 2001/03/06 02:34:33 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
+
+using std::string ; 
+using std::endl ; 
 
 sqlLevel::sqlLevel(PgDatabase* _SQLDb)
  :channel_id(0),
@@ -48,12 +52,14 @@ bool sqlLevel::loadData(unsigned int userID, unsigned int channelID)
  * Fetch a matching Level record for this channel and user ID combo.
  */ 
 
-elog	<< "sqlLevel::loadData> Attempting to load level data for "
-	<< "channel-id: "
-	<< channelID
-	<< " and user-id: "
-	<< userID
-	<< endl;
+#ifdef LOG_DEBUG
+	elog	<< "sqlLevel::loadData> Attempting to load level data for "
+		<< "channel-id: "
+		<< channelID
+		<< " and user-id: "
+		<< userID
+		<< endl;
+#endif
 
 strstream queryString;
 queryString	<< "SELECT "
@@ -64,11 +70,15 @@ queryString	<< "SELECT "
 		<< userID 
 		<< ends;
 
-elog 	<< "sqlLevel::loadData> "
-	<< queryString.str()
-	<< endl;
+#ifdef LOG_SQL
+	elog 	<< "sqlLevel::loadData> "
+		<< queryString.str()
+		<< endl;
+#endif
 
 ExecStatusType status = SQLDb->Exec(queryString.str()) ;
+delete[] queryString.str() ;
+
 if( PGRES_TUPLES_OK == status )
 	{
 	/*
@@ -83,11 +93,9 @@ if( PGRES_TUPLES_OK == status )
 	// Fetch dat from row 0
 	setAllMembers(0);
 
-	delete[] queryString.str() ;
 	return (true);
 	} 
 
-delete[] queryString.str() ;
 return (false); 
 } 
 
@@ -136,11 +144,15 @@ queryString	<< queryHeader
 		<< " AND user_id = " << user_id
 		<< ends;
 
-elog	<< "sqlLevel::commit> "
-	<< queryString.str()
-	<< endl; 
+#ifdef LOG_SQL
+	elog	<< "sqlLevel::commit> "
+		<< queryString.str()
+		<< endl; 
+#endif
 
 ExecStatusType status = SQLDb->Exec(queryString.str()) ;
+delete[] queryString.str() ;
+
 if( PGRES_COMMAND_OK != status )
 	{
 	// TODO: Log to msgchan here.
@@ -148,11 +160,9 @@ if( PGRES_COMMAND_OK != status )
 		<< SQLDb->ErrorMessage()
 		<< endl;
 
-	delete[] queryString.str() ;
 	return false;
  	} 
 
-delete[] queryString.str() ;
 return true;
 }	
 

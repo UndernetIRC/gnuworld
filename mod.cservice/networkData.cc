@@ -11,18 +11,21 @@
  
 #include	<strstream>
 #include	<string> 
+
 #include	<cstring> 
+
 #include	"ELog.h"
 #include	"misc.h"
 #include	"networkData.h" 
 
-using std::string ;
-using std::endl ;
+const char networkData_h_rcsId[] = __NETWORKDATA_H ;
+const char networkData_cc_rcsId[] = "$Id: networkData.cc,v 1.4 2001/03/06 02:34:33 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
 
-using namespace gnuworld ;
+using std::string ;
+using std::endl ;
  
 networkData::networkData()
  : messageTime( 0 ),

@@ -11,7 +11,7 @@
  *
  * Caveats: None
  *
- * $Id: ADDUSERCommand.cc,v 1.15 2001/03/03 01:51:55 gte Exp $
+ * $Id: ADDUSERCommand.cc,v 1.16 2001/03/06 02:34:32 dan_karrels Exp $
  */
  
 #include	<string>
@@ -22,8 +22,9 @@
 #include	"levels.h"
 #include	"libpq++.h"
 #include	"responses.h"
+#include	"cservice_config.h"
 
-const char ADDUSERCommand_cc_rcsId[] = "$Id: ADDUSERCommand.cc,v 1.15 2001/03/03 01:51:55 gte Exp $" ;
+const char ADDUSERCommand_cc_rcsId[] = "$Id: ADDUSERCommand.cc,v 1.16 2001/03/06 02:34:32 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -183,22 +184,29 @@ if (theChan->getUserFlags() == 2) targetFlags = sqlLevel::F_AUTOVOICE;
  */
 
 strstream theQuery; 
-theQuery << queryHeader << "VALUES (" 
-	<< theChan->getID() << ","
-	<< targetUser->getID() << ","
-	<< targetAccess << ","
-	<< targetFlags << ","
-	<< bot->currentTime() << ","
-	<< "'" << theClient->getNickUserHost() << "',"
-	<< bot->currentTime() << ","
-	<< "'" << theClient->getNickUserHost() << "'," 
-	<< bot->currentTime()
-	<< ");"
-	<< ends; 
- 
-elog << "ADDUSER::sqlQuery> " << theQuery.str() << endl; 
+theQuery	<< queryHeader
+		<< "VALUES (" 
+		<< theChan->getID() << ","
+		<< targetUser->getID() << ","
+		<< targetAccess << ","
+		<< targetFlags << ","
+		<< bot->currentTime() << ","
+		<< "'" << theClient->getNickUserHost() << "',"
+		<< bot->currentTime() << ","
+		<< "'" << theClient->getNickUserHost() << "'," 
+		<< bot->currentTime()
+		<< ");"
+		<< ends; 
+
+#ifdef LOG_SQL 	
+	elog	<< "ADDUSER::sqlQuery> "
+		<< theQuery.str()
+		<< endl;
+#endif
 
 ExecStatusType status = bot->SQLDb->Exec(theQuery.str()) ;
+delete[] theQuery.str() ;
+
 if( PGRES_COMMAND_OK == status )
 	{
 	bot->Notice(theClient, 
@@ -208,23 +216,19 @@ if( PGRES_COMMAND_OK == status )
 		theChan->getName().c_str(),
 		targetAccess);
 
-
-		/*
-		 *  "If they where added to *, set their invisible flag" (Ace).
-		 */
-
-		if (theChan->getName() == "*")
+	/*
+	 *  "If they where added to *, set their invisible flag" (Ace).
+	 */
+	if (theChan->getName() == "*")
 		{
-			targetUser->setFlag(sqlUser::F_INVIS);
-			targetUser->commit();
+		targetUser->setFlag(sqlUser::F_INVIS);
+		targetUser->commit();
 		}
 	}
 else
 	{
-		bot->dbErrorMessage(theClient);
+	bot->dbErrorMessage(theClient);
 	}
-
-delete[] theQuery.str() ;
 
 return true ;
 } 

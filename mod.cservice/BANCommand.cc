@@ -16,14 +16,13 @@
  *
  * Caveats: None.
  *
- * $Id: BANCommand.cc,v 1.21 2001/03/05 21:41:30 gte Exp $
+ * $Id: BANCommand.cc,v 1.22 2001/03/06 02:34:32 dan_karrels Exp $
  */
 
 #include	<string>
 #include	<cassert>
  
 #include	"StringTokenizer.h"
-#include	"ELog.h" 
 #include	"cservice.h"
 #include	"Network.h"
 #include	"levels.h"
@@ -31,7 +30,7 @@
 #include	"responses.h"
 #include	"match.h"
 
-const char BANCommand_cc_rcsId[] = "$Id: BANCommand.cc,v 1.21 2001/03/05 21:41:30 gte Exp $" ;
+const char BANCommand_cc_rcsId[] = "$Id: BANCommand.cc,v 1.22 2001/03/06 02:34:32 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -51,7 +50,10 @@ if( st.size() < 3 )
  
 /* Is the user authorised? */
 sqlUser* theUser = bot->isAuthed(theClient, true);
-if(!theUser) return false;
+if(!theUser)
+	{
+	return false;
+	}
 
 /* Do not allow bans on * channel */
 
@@ -153,6 +155,7 @@ if(level < level::ban)
 	return false;
 	}
 
+// TODO: Violation of the rule of numbers
 if(banLevel < 1 || banLevel > level || 500 < banLevel)
 	{
 	bot->Notice(theClient, 
@@ -161,6 +164,7 @@ if(banLevel < 1 || banLevel > level || 500 < banLevel)
 	return true;
 	}
 
+// TODO: Violation of the rule of numbers
 if(banTime < 1 || banTime > 336)
 	{
 	bot->Notice(theClient, 
@@ -170,6 +174,7 @@ if(banTime < 1 || banTime > 336)
 	return true;
 	}
 
+// TODO: Violation of the rule of numbers
 if(banReason.size() > 128)
 	{
 	bot->Notice(theClient, 
@@ -209,8 +214,9 @@ if( isNick )
 Channel* theChannel = Network->findChannel(theChan->getName()); 
 if (!theChannel) 
 	{
-	bot->Notice(theClient, bot->getResponse(theUser, language::chan_is_empty).c_str(), 
-	theChan->getName().c_str());
+	bot->Notice(theClient,
+		bot->getResponse(theUser, language::chan_is_empty).c_str(), 
+		theChan->getName().c_str());
 	return false;
 	} 
  
@@ -241,35 +247,42 @@ while (ptr != banList->end())
 	 * bans.
 	 */
 
-	if(match(banTarget, theBan->getBanMask()) == 0) // Matched overlapping ban.
+	// Matched overlapping ban.
+	if(match(banTarget, theBan->getBanMask()) == 0)
 		{ 
-			if (theBan->getLevel() <= level) // If we have access to remove the overlapper..
+		// If we have access to remove the overlapper..
+		if (theBan->getLevel() <= level)
 			{ 
-				theChannel->removeBan(theBan->getBanMask()); // Update GNUWorld.
-				ptr = banList->erase(ptr);
-				theBan->deleteRecord();
-				delete(theBan);
-			} else
+			// Update GNUWorld.
+			theChannel->removeBan(theBan->getBanMask());
+			ptr = banList->erase(ptr);
+			theBan->deleteRecord();
+			delete(theBan);
+			}
+		else
 			{
-				++ptr;				
+			++ptr;				
 			} 
 		}
-	else if ( match(theBan->getBanMask(), banTarget) == 0) // More specific ban?
+	// More specific ban?
+	else if ( match(theBan->getBanMask(), banTarget) == 0)
 		{
-			bot->Notice(theClient, 
-				bot->getResponse(theUser,
-				language::ban_covered).c_str(),
-				banTarget.c_str(), theBan->getBanMask().c_str());
-			return true;
+		bot->Notice(theClient, 
+			bot->getResponse(theUser,
+			language::ban_covered).c_str(),
+			banTarget.c_str(), theBan->getBanMask().c_str());
+		return true;
 		} 
-			else // Carry on regardless.
+	// Carry on regardless.
+	else
 		{
 		++ptr;
 		} 
 	} // while()
  
 vector< iClient* > clientsToKick ; 
-for(Channel::userIterator chanUsers = theChannel->userList_begin(); chanUsers != theChannel->userList_end(); ++chanUsers)
+for(Channel::userIterator chanUsers = theChannel->userList_begin();
+	chanUsers != theChannel->userList_end(); ++chanUsers)
 	{
 	ChannelUser* tmpUser = chanUsers->second; 
 	/*
@@ -278,24 +291,31 @@ for(Channel::userIterator chanUsers = theChannel->userList_begin(); chanUsers !=
 
 	if(match(banTarget, tmpUser->getClient()->getNickUserHost()) == 0)
 		{ 
-			/* Don't kick +k things */
-			if( !tmpUser->getClient()->getMode(iClient::MODE_SERVICES) )
+		/* Don't kick +k things */
+		if( !tmpUser->getClient()->getMode(iClient::MODE_SERVICES) )
 			{
-				clientsToKick.push_back(tmpUser->getClient());
+			clientsToKick.push_back(tmpUser->getClient());
 			}
 		}
 	} // for()
 
-if (banLevel == 42) banReason = "..I'll have a pan-galactic gargleblaster please!";
- 
+// TODO: Violation of rule of numbers
+if (banLevel == 42)
+	{
+	// TODO: Perhaps put this into the .conf
+	banReason = "..I'll have a pan-galactic gargleblaster please!";
+ 	}
+
 /*
  * If this ban level is < 75, we don't kick the user, we simply don't
  * allow any of the matching hosts to be opped anymore.
  */ 
+// TODO: Violation of rule of numbers
 if (banLevel < 75)
 	{
-		bot->DeOp(theChannel, clientsToKick);
-	} else
+	bot->DeOp(theChannel, clientsToKick);
+	}
+else
 	{ 
 	/*
 	 *  Otherwise, > 100 bans result in the user being kicked out
@@ -327,6 +347,7 @@ if (banLevel < 75)
 sqlBan* newBan = new (nothrow) sqlBan(bot->SQLDb);
 assert( newBan != 0 ) ;
 
+// TODO: Use a decent constructor for this
 newBan->setChannelID(theChan->getID());
 newBan->setBanMask(banTarget);
 newBan->setSetBy(theUser->getUserName());
@@ -343,7 +364,9 @@ newBan->insertRecord();
 
 bot->Notice(theClient,
 	bot->getResponse(theUser, language::ban_added, "Added ban %s to %s at level %i").c_str(),
-	newBan->getBanMask().c_str(), theChannel->getName().c_str(), newBan->getLevel());
+	newBan->getBanMask().c_str(),
+	theChannel->getName().c_str(),
+	newBan->getLevel());
 
 return true ;
 }

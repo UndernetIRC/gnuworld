@@ -9,28 +9,31 @@
  * 30/12/2000: Moved static SQL data to constants.h --Gte
  * Set loadData up to take data from rows other than 0.
  * 
- * $Id: sqlChannel.cc,v 1.23 2001/03/02 19:30:41 gte Exp $
+ * $Id: sqlChannel.cc,v 1.24 2001/03/06 02:34:33 dan_karrels Exp $
  */
  
 #include	<strstream>
 #include	<string> 
+
 #include	<cstring> 
+
 #include	"ELog.h"
 #include	"misc.h"
 #include	"sqlChannel.h"
 #include	"constants.h"
 #include	"cservice.h"
+#include	"cservice_config.h"
+ 
+const char sqlChannel_h_rcsId[] = __SQLCHANNEL_H ;
+const char sqlChannel_cc_rcsId[] = "$Id: sqlChannel.cc,v 1.24 2001/03/06 02:34:33 dan_karrels Exp $" ;
+
+namespace gnuworld
+{
 
 using std::string ; 
 using std::endl ; 
 using std::strstream ;
 using std::ends ;
- 
-const char sqlChannel_h_rcsId[] = __SQLCHANNEL_H ;
-const char sqlChannel_cc_rcsId[] = "$Id: sqlChannel.cc,v 1.23 2001/03/02 19:30:41 gte Exp $" ;
-
-namespace gnuworld
-{
 
 sqlChannel::sqlChannel(PgDatabase* _SQLDb)
  : id(0),
@@ -58,10 +61,12 @@ bool sqlChannel::loadData(const string& channelName)
  *  'channelName' and fill our member variables.
  */ 
 
-elog	<< "sqlChannel::loadData> Attempting to load data for"
-	<< " channel-name: "
-	<< channelName
-	<< endl;
+#ifdef LOG_DEBUG
+	elog	<< "sqlChannel::loadData> Attempting to load data for"
+		<< " channel-name: "
+		<< channelName
+		<< endl;
+#endif
 
 strstream queryString ;
 queryString	<< "SELECT "
@@ -72,9 +77,11 @@ queryString	<< "SELECT "
 		<< "'"
 		<< ends ;
 
-elog	<< "sqlChannel::loadData> "
-	<< queryString.str()
-	<< endl;
+#ifdef LOG_SQL
+	elog	<< "sqlChannel::loadData> "
+		<< queryString.str()
+		<< endl;
+#endif
 
 ExecStatusType status = SQLDb->Exec(queryString.str()) ;
 delete[] queryString.str() ;
@@ -103,10 +110,12 @@ bool sqlChannel::loadData(int channelID)
  *  'channelID' and fill our member variables.
  */ 
 
-elog	<< "sqlChannel::loadData> Attempting to load data for "
-	<< "channel-id: "
-	<< channelID
-	<< endl;
+#ifdef LOG_DEBUG
+	elog	<< "sqlChannel::loadData> Attempting to load data for "
+		<< "channel-id: "
+		<< channelID
+		<< endl;
+#endif
 
 strstream queryString;
 queryString	<< "SELECT "
@@ -115,9 +124,11 @@ queryString	<< "SELECT "
 		<< channelID
 		<< ends ;
 
-elog	<< "sqlChannel::loadData> "
-	<< queryString.str()
-	<< endl;
+#ifdef LOG_SQL
+	elog	<< "sqlChannel::loadData> "
+		<< queryString.str()
+		<< endl;
+#endif
 
 ExecStatusType status = SQLDb->Exec(queryString.str()) ;
 delete[] queryString.str() ;
@@ -189,9 +200,11 @@ queryString	<< queryHeader
 		<< queryCondition << id
 		<< ends;
 
-elog	<< "sqlChannel::commit> "
-	<< queryString.str()
-	<< endl; 
+#ifdef LOG_SQL
+	elog	<< "sqlChannel::commit> "
+		<< queryString.str()
+		<< endl; 
+#endif
 
 ExecStatusType status = SQLDb->Exec(queryString.str()) ;
 delete[] queryString.str() ;

@@ -4,26 +4,29 @@
  * Storage class for accessing Ban information either from the backend
  * or internal storage.
  * 
- * $Id: sqlBan.cc,v 1.3 2001/02/18 19:46:01 dan_karrels Exp $
+ * $Id: sqlBan.cc,v 1.4 2001/03/06 02:34:33 dan_karrels Exp $
  */
  
 #include	<strstream>
 #include	<string> 
+
 #include	<cstring> 
+
 #include	"ELog.h"
 #include	"misc.h"
 #include	"sqlBan.h"
 #include	"constants.h"
 #include	"cservice.h"
-
-using std::string ; 
-using std::endl ; 
+#include	"cservice_config.h"
  
 const char sqlBan_h_rcsId[] = __SQLBAN_H ;
-const char sqlBan_cc_rcsId[] = "$Id: sqlBan.cc,v 1.3 2001/02/18 19:46:01 dan_karrels Exp $" ;
+const char sqlBan_cc_rcsId[] = "$Id: sqlBan.cc,v 1.4 2001/03/06 02:34:33 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
+
+using std::string ; 
+using std::endl ; 
 
 sqlBan::sqlBan(PgDatabase* _SQLDb)
   : id(0),
@@ -79,13 +82,15 @@ queryString	<< queryHeader
 		<< " WHERE id = " << id
 		<< ends;
 
-elog	<< "sqlBan::commit> "
-	<< queryString.str()
-	<< endl; 
-
-bool retMe = true ;
+#ifdef LOG_SQL
+	elog	<< "sqlBan::commit> "
+		<< queryString.str()
+		<< endl; 
+#endif
 
 ExecStatusType status = SQLDb->Exec(queryString.str()) ;
+delete[] queryString.str() ;
+
 if( PGRES_COMMAND_OK != status )
 	{
 	// TODO: Log to msgchan here.
@@ -93,11 +98,10 @@ if( PGRES_COMMAND_OK != status )
 		<< SQLDb->ErrorMessage()
 		<< endl;
 
-	retMe = false ;
+	return false ;
  	} 
 
-delete[] queryString.str() ;
-return retMe ;
+return true ;
 }	
 
 bool sqlBan::insertRecord()
@@ -120,13 +124,15 @@ queryString	<< queryHeader
 		<< "now()::abstime::int4); SELECT currval('bans_id_seq')" 
 		<< ends;
 
-elog	<< "sqlBan::insertRecord> "
-	<< queryString.str()
-	<< endl; 
-
-bool retMe = true ;
+#ifdef LOG_SQL
+	elog	<< "sqlBan::insertRecord> "
+		<< queryString.str()
+		<< endl; 
+#endif
 
 ExecStatusType status = SQLDb->Exec(queryString.str()) ;
+delete[] queryString.str() ;
+
 if( PGRES_TUPLES_OK != status ) 
 	{
 	// TODO: Log to msgchan here.
@@ -134,15 +140,11 @@ if( PGRES_TUPLES_OK != status )
 		<< SQLDb->ErrorMessage()
 		<< endl;
 
-	retMe = false ;
+	return false ;
  	}
-else
-	{
-	id = atoi(SQLDb->GetValue(0,0)); 
-	}
 
-delete[] queryString.str() ;
-return retMe ;
+id = atoi(SQLDb->GetValue(0,0)); 
+return true ;
 } 
 
 bool sqlBan::deleteRecord()
@@ -158,13 +160,15 @@ queryString	<< queryHeader
 		<< id
 		<< ends;
 
-elog	<< "sqlBan::delete> "
-	<< queryString.str()
-	<< endl; 
-
-bool retMe = true ;
+#ifdef LOG_SQL
+	elog	<< "sqlBan::delete> "
+		<< queryString.str()
+		<< endl; 
+#endif
 
 ExecStatusType status = SQLDb->Exec(queryString.str()) ;
+delete[] queryString.str() ;
+
 if( PGRES_COMMAND_OK != status )
 	{
 	// TODO: Log to msgchan here.
@@ -172,11 +176,10 @@ if( PGRES_COMMAND_OK != status )
 		<< SQLDb->ErrorMessage()
 		<< endl;
 
-	retMe = false ;
+	return false ;
  	} 
 
-delete[] queryString.str() ;
-return retMe ;
+return true ;
 }	
 
 sqlBan::~sqlBan()

@@ -4,23 +4,26 @@
  * Storage class for accessing user information either from the backend
  * or internal storage.
  * 
- * $Id: sqlUser.cc,v 1.13 2001/02/18 19:46:01 dan_karrels Exp $
+ * $Id: sqlUser.cc,v 1.14 2001/03/06 02:34:33 dan_karrels Exp $
  */
  
 #include	<strstream>
 #include	<string> 
+
 #include	<cstring> 
+
 #include	"ELog.h"
 #include	"misc.h"
 #include	"sqlUser.h" 
 #include	"constants.h"
-
-using std::string ; 
-using std::endl ; 
+#include	"cservice_config.h"
 
 namespace gnuworld
 {
  
+using std::string ; 
+using std::endl ; 
+
 sqlUser::sqlUser(PgDatabase* _SQLDb)
  : networkClient(0),
    id( 0 ),
@@ -47,9 +50,11 @@ bool sqlUser::loadData(int userID)
  *  'userID' and fill our member variables.
  */ 
 
-elog	<< "sqlUser::loadData> Attempting to load data for user-id: "
-	<< userID
-	<< endl;
+#ifdef LOG_DEBUG
+	elog	<< "sqlUser::loadData> Attempting to load data for user-id: "
+		<< userID
+		<< endl;
+#endif
 
 strstream queryString;
 queryString	<< "SELECT "
@@ -59,11 +64,15 @@ queryString	<< "SELECT "
 		<< userID
 		<< ends;
 
-elog	<< "sqlUser::loadData> "
-	<< queryString.str()
-	<< endl;
+#ifdef LOG_SQL
+	elog	<< "sqlUser::loadData> "
+		<< queryString.str()
+		<< endl;
+#endif
 
 ExecStatusType status = SQLDb->Exec(queryString.str()) ;
+delete[] queryString.str() ;
+
 if( PGRES_TUPLES_OK == status )
 	{ 
 	/*
@@ -76,12 +85,10 @@ if( PGRES_TUPLES_OK == status )
 		} 
 
 	setAllMembers(0); 
-	delete[] queryString.str() ;
 
 	return (true);
 	} 
 
-delete[] queryString.str() ;
 return (false); 
 } 
 
@@ -92,9 +99,11 @@ bool sqlUser::loadData(const string& userName)
  *  'userID' and fill our member variables.
  */ 
 
-elog	<< "sqlUser::loadData> Attempting to load data for user-name: "
-	<< userName
-	<< endl;
+#ifdef LOG_DEBUG
+	elog	<< "sqlUser::loadData> Attempting to load data for user-name: "
+		<< userName
+		<< endl;
+#endif
 	
 strstream queryString;
 queryString	<< "SELECT "
@@ -105,11 +114,15 @@ queryString	<< "SELECT "
 		<< "'"
 		<< ends;
 
-elog	<< "sqlUser::loadData> "
-	<< queryString.str()
-	<< endl;
+#ifdef LOG_SQL
+	elog	<< "sqlUser::loadData> "
+		<< queryString.str()
+		<< endl;
+#endif
 
 ExecStatusType status = SQLDb->Exec(queryString.str()) ;
+delete[] queryString.str() ;
+
 if( PGRES_TUPLES_OK == status )
 	{ 
 	/*
@@ -122,12 +135,10 @@ if( PGRES_TUPLES_OK == status )
 		} 
 
 	setAllMembers(0); 
-	delete[] queryString.str() ;
 
 	return (true);
 	} 
 
-delete[] queryString.str() ;
 return (false); 
 } 
 
@@ -174,11 +185,15 @@ queryString	<< queryHeader
 		<< queryCondition << id
 		<< ends;
 
-elog	<< "sqlUser::commit> "
-	<< queryString.str()
-	<< endl; 
+#ifdef LOG_SQL
+	elog	<< "sqlUser::commit> "
+		<< queryString.str()
+		<< endl; 
+#endif
 
 ExecStatusType status = SQLDb->Exec(queryString.str()) ;
+delete[] queryString.str() ;
+
 if( PGRES_COMMAND_OK != status )
 	{
 	// TODO: Log to msgchan here.
@@ -186,11 +201,9 @@ if( PGRES_COMMAND_OK != status )
 		<< SQLDb->ErrorMessage()
 		<< endl;
 
-	delete[] queryString.str() ;
 	return false;
  	} 
 
-delete[] queryString.str() ;
 return true;
 }	
 
@@ -213,11 +226,15 @@ queryString	<< queryHeader
 		<< id
 		<< ends;
 
-elog	<< "sqlUser::commitLastSeen> "
-	<< queryString.str()
-	<< endl; 
+#ifdef LOG_SQL
+	elog	<< "sqlUser::commitLastSeen> "
+		<< queryString.str()
+		<< endl; 
+#endif
 
 ExecStatusType status = SQLDb->Exec(queryString.str()) ;
+delete[] queryString.str() ;
+
 if( PGRES_COMMAND_OK != status )
 	{
 	// TODO: Log to msgchan here.
@@ -225,11 +242,9 @@ if( PGRES_COMMAND_OK != status )
 		<< SQLDb->ErrorMessage()
 		<< endl;
 
-	delete[] queryString.str() ;
 	return false;
  	} 
 
-delete[] queryString.str() ;
 return true;
 }	
  
@@ -237,5 +252,5 @@ sqlUser::~sqlUser()
 {
 // No heap space allocated
 }
- 
-} // Namespace gnuworld.
+
+} // namespace gnuworld.

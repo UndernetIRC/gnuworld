@@ -11,19 +11,18 @@
  *
  * Caveats: None.
  *
- * $Id: BANLISTCommand.cc,v 1.7 2001/03/05 12:46:50 isomer Exp $
+ * $Id: BANLISTCommand.cc,v 1.8 2001/03/06 02:34:32 dan_karrels Exp $
  */
 
 #include        <string>
 
 #include        "StringTokenizer.h"
-#include        "ELog.h" 
 #include        "cservice.h" 
 #include        "Network.h"
 #include        "levels.h"
 #include        "responses.h"
 
-const char BANLISTCommand_cc_rcsId[] = "$Id: BANLISTCommand.cc,v 1.7 2001/03/05 12:46:50 isomer Exp $" ;
+const char BANLISTCommand_cc_rcsId[] = "$Id: BANLISTCommand.cc,v 1.8 2001/03/06 02:34:32 dan_karrels Exp $" ;
 
 namespace gnuworld
 {

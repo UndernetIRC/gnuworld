@@ -12,7 +12,7 @@
  * Displays all "Level" records for a specified channel.
  * Can optionally narrow down selection using a number of switches. 
  *
- * $Id: ACCESSCommand.cc,v 1.36 2001/03/02 19:30:41 gte Exp $
+ * $Id: ACCESSCommand.cc,v 1.37 2001/03/06 02:34:32 dan_karrels Exp $
  */
 
 #include	<string>
@@ -23,9 +23,9 @@
 #include	"libpq++.h"
 #include	"match.h"
 #include	"responses.h"
-#define MAX_RESULTS 15
+#include	"cservice_config.h"
  
-const char ACCESSCommand_cc_rcsId[] = "$Id: ACCESSCommand.cc,v 1.36 2001/03/02 19:30:41 gte Exp $" ;
+const char ACCESSCommand_cc_rcsId[] = "$Id: ACCESSCommand.cc,v 1.37 2001/03/06 02:34:32 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -52,38 +52,38 @@ sqlUser* theUser = bot->isAuthed(theClient, false);
 sqlChannel* theChan = bot->getChannelRecord(st[1]);
 if (!theChan) 
 	{
-		bot->Notice(theClient, 
-			bot->getResponse(theUser,
-				language::chan_not_reg).c_str(),
-			st[1].c_str()
+	bot->Notice(theClient, 
+		bot->getResponse(theUser,
+			language::chan_not_reg).c_str(),
+		st[1].c_str()
 		);
-		return false;
+	return false;
 	} 
 
 /* Don't let ordinary people view * accesses */
 if (theChan->getName() == "*") 
-{
+	{
 	sqlUser* theUser = bot->isAuthed(theClient, false);
 	if (!theUser) 
-	{
+		{
 		bot->Notice(theClient, 
 			bot->getResponse(theUser,
 				language::chan_not_reg).c_str(),
 			st[1].c_str()
 		);		
 		return false;
-	}
+		}
 
 	if (theUser && !bot->getAdminAccessLevel(theUser))
-	{
+		{
 		bot->Notice(theClient, 
 			bot->getResponse(theUser,
 				language::chan_not_reg).c_str(),
 			st[1].c_str()
 		);		
 		return false; 
+		}
 	}
-}
  
 /*
  *  Figure out the switches and append to the SQL statement accordingly.
@@ -148,7 +148,10 @@ for( StringTokenizer::const_iterator ptr = st.begin() ; ptr != st.end() ;
 	if (string_lower(*ptr) == "-all")
 		{ 
 		sqlUser* tmpUser = bot->isAuthed(theClient, false);
-		if ((tmpUser) && (bot->getAdminAccessLevel(tmpUser))) showAll = true; 
+		if( tmpUser  && bot->getAdminAccessLevel(tmpUser) )
+			{
+			showAll = true; 
+			}
 		continue;
 		}
 
@@ -206,136 +209,159 @@ for( StringTokenizer::const_iterator ptr = st.begin() ; ptr != st.end() ;
 /* Sort out the additional conditions */
 
 strstream extraCond;
-if (minAmount) extraCond << "AND levels.access >= " << minAmount << " ";
-if (maxAmount) extraCond << "AND levels.access <= " << maxAmount << " ";
+if (minAmount)
+	{
+	extraCond << "AND levels.access >= " << minAmount << " ";
+	}
+if (maxAmount)
+	{
+	extraCond << "AND levels.access <= " << maxAmount << " ";
+	}
 extraCond << ends; 
 
 strstream theQuery;
-theQuery	<< queryHeader << queryCondition << extraCond.str()
-		<< "AND levels.channel_id = " << theChan->getID()
-		<< " " << queryFooter << ends;
+theQuery	<< queryHeader
+		<< queryCondition
+		<< extraCond.str()
+		<< "AND levels.channel_id = "
+		<< theChan->getID()
+		<< " "
+		<< queryFooter
+		<< ends;
 
-elog << "ACCESS::sqlQuery> " << theQuery.str() << endl; 
+#ifdef LOG_SQL
+	elog	<< "ACCESS::sqlQuery> "
+		<< theQuery.str()
+		<< endl; 
+#endif
 
 /*
  *  All done, display the output. (Only fetch 15 results).
  */
 
 ExecStatusType status = bot->SQLDb->Exec( theQuery.str() ) ;
-if( PGRES_TUPLES_OK == status )
+delete[] theQuery.str() ;
+delete[] extraCond.str() ;
+
+if( PGRES_TUPLES_OK != status )
 	{
-	sqlLevel::flagType flag = 0 ; 
+	elog	<< "ACCESS> SQL Error: "
+		<< bot->SQLDb->ErrorMessage()
+		<< endl ;
+	return false ;
+	}
 
-	string autoMode;
-	int duration = 0;
-	int suspend_expires = 0;
-	int suspend_expires_d = 0;
-	int suspend_expires_f = 0;
-	int results = 0;
-	string matchString = st[2];
+sqlLevel::flagType flag = 0 ; 
+
+string autoMode;
+int duration = 0;
+int suspend_expires = 0;
+int suspend_expires_d = 0;
+int suspend_expires_f = 0;
+int results = 0;
+string matchString = st[2];
 	
-	if(matchString[0] == '-') matchString = "*";
-	
-	for (int i = 0 ; i < bot->SQLDb->Tuples(); i++)
-		{
+if(matchString[0] == '-')
+	{
+	matchString = "*";
+	}
 
-		autoMode = "None";
-		/* Does the username match the query? */ 
-		if (match(matchString, bot->SQLDb->GetValue(i, 1)) == 0)
-		{
-			flag = atoi(bot->SQLDb->GetValue(i, 3));
-			duration = atoi(bot->SQLDb->GetValue(i, 4));
-			suspend_expires = atoi(bot->SQLDb->GetValue(i, 5));
-			suspend_expires_d = suspend_expires - bot->currentTime();
-			suspend_expires_f = bot->currentTime() - suspend_expires_d;
-	 
-			if (flag & sqlLevel::F_AUTOOP) autoMode = "OP";
-			if (flag & sqlLevel::F_AUTOVOICE) autoMode = "VOICE"; 
+for (int i = 0 ; i < bot->SQLDb->Tuples(); i++)
+	{
+	autoMode = "None";
 
-			if(aVoice == true || aOp == true || aNone == true)
+	/* Does the username match the query? */ 
+	if (match(matchString, bot->SQLDb->GetValue(i, 1)) == 0)
+		{
+		flag = atoi(bot->SQLDb->GetValue(i, 3));
+		duration = atoi(bot->SQLDb->GetValue(i, 4));
+		suspend_expires = atoi(bot->SQLDb->GetValue(i, 5));
+		suspend_expires_d = suspend_expires - bot->currentTime();
+		suspend_expires_f = bot->currentTime() - suspend_expires_d;
+
+		if (flag & sqlLevel::F_AUTOOP) autoMode = "OP";
+		if (flag & sqlLevel::F_AUTOVOICE) autoMode = "VOICE"; 
+
+		if(aVoice == true || aOp == true || aNone == true)
+			{
+			if(aNone == true)
 				{
-				if(aNone == true)
-					{
-					if(!aVoice && (flag & sqlLevel::F_AUTOVOICE)) continue;
-					if(!aOp && (flag & sqlLevel::F_AUTOOP)) continue;
-					}
-				else
-					{
-					if(!(flag & sqlLevel::F_AUTOVOICE) &&
-				           !(flag & sqlLevel::F_AUTOOP)) continue;
-					if(!aVoice && (flag & sqlLevel::F_AUTOVOICE)) continue;
-					if(!aOp && (flag & sqlLevel::F_AUTOOP)) continue; 
-					}
+				if(!aVoice && (flag & sqlLevel::F_AUTOVOICE)) continue;
+				if(!aOp && (flag & sqlLevel::F_AUTOOP)) continue;
 				}
+			else
+				{
+				if(!(flag & sqlLevel::F_AUTOVOICE) &&
+			           !(flag & sqlLevel::F_AUTOOP)) continue;
+				if(!aVoice && (flag & sqlLevel::F_AUTOVOICE)) continue;
+				if(!aOp && (flag & sqlLevel::F_AUTOOP)) continue; 
+				}
+			}
 
-			results++;			
+		results++;			
 				
-			bot->Notice(theClient,
-				bot->getResponse(theUser, language::user_access_is).c_str(),
-				bot->SQLDb->GetValue(i, 1),
-				bot->SQLDb->GetValue(i, 2),
-				bot->userStatusFlags(bot->SQLDb->GetValue(i, 1)).c_str()
-			);	
-	
-			bot->Notice(theClient, 
-				bot->getResponse(theUser, language::channel_automode_is).c_str(),
-				bot->SQLDb->GetValue(i, 0), 
-				autoMode.c_str()
-			);
+		bot->Notice(theClient,
+			bot->getResponse(theUser, language::user_access_is).c_str(),
+			bot->SQLDb->GetValue(i, 1),
+			bot->SQLDb->GetValue(i, 2),
+			bot->userStatusFlags(bot->SQLDb->GetValue(i, 1)).c_str()
+		);	
 
-			if(suspend_expires != 0)
-				{
-				bot->Notice(theClient,
-					bot->getResponse(theUser,
-						language::suspend_expires_in).c_str(),
-					bot->prettyDuration(suspend_expires_f).c_str()
-				);
-				}
+		bot->Notice(theClient, 
+			bot->getResponse(theUser, language::channel_automode_is).c_str(),
+			bot->SQLDb->GetValue(i, 0), 
+			autoMode.c_str()
+		);
+
+		if(suspend_expires != 0)
+			{
 			bot->Notice(theClient,
 				bot->getResponse(theUser,
-						language::last_seen).c_str(),
-				bot->prettyDuration(duration).c_str()
+					language::suspend_expires_in).c_str(),
+				bot->prettyDuration(suspend_expires_f).c_str()
 			);
+			}
+		bot->Notice(theClient,
+			bot->getResponse(theUser,
+					language::last_seen).c_str(),
+			bot->prettyDuration(duration).c_str()
+		);
 
-			if(modif)
-				{
-				bot->Notice(theClient, 
-					bot->getResponse(theUser,
-						language::last_mod).c_str(),
-					bot->SQLDb->GetValue(i, 7),
-					bot->prettyDuration(atoi(bot->SQLDb->GetValue(i,6))).c_str()
-				);	
-				} 
+		if(modif)
+			{
+			bot->Notice(theClient, 
+				bot->getResponse(theUser,
+					language::last_mod).c_str(),
+				bot->SQLDb->GetValue(i, 7),
+				bot->prettyDuration(atoi(bot->SQLDb->GetValue(i,6))).c_str()
+			);	
+			} 
 		}
-		if ((results >= MAX_RESULTS) && !showAll) break;
+	if ((results >= MAX_RESULTS) && !showAll) break;
 
 	} // for()
 	 
-	if ((results >= MAX_RESULTS) && !showAll)
-		{
-			bot->Notice(theClient, 
-				bot->getResponse(theUser, language::more_than_max).c_str()
-			);
-			bot->Notice(theClient,
-				bot->getResponse(theUser, language::restrict_query).c_str()
-			);
-		} else if (results > 0)
-		{
-			bot->Notice(theClient,
-				bot->getResponse(theUser, language::end_access_list).c_str()
-			);
-		} 
-			else
-		{
-			bot->Notice(theClient,
-				bot->getResponse(theUser, language::no_match).c_str()
-			);
-		}
-
+if ((results >= MAX_RESULTS) && !showAll)
+	{
+	bot->Notice(theClient, 
+		bot->getResponse(theUser, language::more_than_max).c_str()
+	);
+	bot->Notice(theClient,
+		bot->getResponse(theUser, language::restrict_query).c_str()
+		);
+	}
+else if (results > 0)
+	{
+	bot->Notice(theClient,
+		bot->getResponse(theUser, language::end_access_list).c_str()
+		);
 	} 
-
-delete[] theQuery.str() ;
-delete[] extraCond.str() ;
+else
+	{
+	bot->Notice(theClient,
+		bot->getResponse(theUser, language::no_match).c_str()
+		);
+	}
  
 return true ;
 } 
