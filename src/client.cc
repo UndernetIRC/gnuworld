@@ -1,6 +1,6 @@
 /*
  * client.cc
- * $Id: client.cc,v 1.49 2002/12/28 22:44:58 mrbean_ Exp $
+ * $Id: client.cc,v 1.50 2003/05/26 21:44:32 dan_karrels Exp $
  */
 
 #include	<new>
@@ -30,7 +30,7 @@
 #include	"events.h"
 
 const char xClient_h_rcsId[] = __CLIENT_H ;
-const char xClient_cc_rcsId[] = "$Id: client.cc,v 1.49 2002/12/28 22:44:58 mrbean_ Exp $" ;
+const char xClient_cc_rcsId[] = "$Id: client.cc,v 1.50 2003/05/26 21:44:32 dan_karrels Exp $" ;
 const char config_h_rcsId[] = __CONFIG_H ;
 const char misc_h_rcsId[] = __MISC_H ;
 const char Numeric_h_rcsId[] = __NUMERIC_H ;
@@ -515,6 +515,11 @@ void xClient::OnChannelModeB( Channel*, ChannelUser*,
 }
 
 int xClient::OnPrivateMessage( iClient*, const string&, bool )
+{
+return 0;
+}
+
+int xClient::OnNotice( iClient*, const string&, bool )
 {
 return 0;
 }

@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ServerTimerHandlers.cc,v 1.5 2002/05/27 17:18:12 dan_karrels Exp $
+ * $Id: ServerTimerHandlers.cc,v 1.6 2003/05/26 21:44:32 dan_karrels Exp $
  */
 
 #include	"ServerTimerHandlers.h"
@@ -27,7 +27,7 @@
 #include	<ctime>
 
 const char ServerTimerHandlers_h_rcsId[] = __SERVERTIMERHANDLERS_H ;
-const char ServerTimerHandlers_cc_rcsId[] = "$Id: ServerTimerHandlers.cc,v 1.5 2002/05/27 17:18:12 dan_karrels Exp $" ;
+const char ServerTimerHandlers_cc_rcsId[] = "$Id: ServerTimerHandlers.cc,v 1.6 2003/05/26 21:44:32 dan_karrels Exp $" ;
 const char server_h_rcsId[] = __SERVER_H ;
 const char ELog_h_rcsId[] = __ELOG_H ;
 
@@ -48,7 +48,6 @@ return 0 ;
 
 int PINGTimer::OnTimer( timerID, void* )
 {
-
 string writeMe( theServer->getCharYY() ) ;
 writeMe += " G " ;
 writeMe += ":I am the King, bow before me!\n" ;
@@ -57,7 +56,6 @@ theServer->RegisterTimer( ::time( 0 ) + updateInterval, this, 0 ) ;
 
 // Write to the network, even during bursting
 return theServer->WriteDuringBurst( writeMe ) ;
-
 }
 
 } // namespace gnuworld

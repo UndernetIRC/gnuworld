@@ -154,7 +154,6 @@ lib_LTLIBRARIES = lib_msg_AC.la \
 	lib_msg_DS.la \
 	lib_msg_EA.la \
 	lib_msg_EB.la \
-	lib_msg_Error.la \
 	lib_msg_G.la \
 	lib_msg_GL.la \
 	lib_msg_I.la \
@@ -167,7 +166,8 @@ lib_LTLIBRARIES = lib_msg_AC.la \
 	lib_msg_N.la \
 	lib_msg_NOOP.la \
 	lib_msg_PART.la \
-	lib_msg_PASS.la \
+	lib_msg_PA.la \
+	lib_msg_O.la \
 	lib_msg_P.la \
 	lib_msg_Q.la \
 	lib_msg_R.la \
@@ -177,7 +177,8 @@ lib_LTLIBRARIES = lib_msg_AC.la \
 	lib_msg_T.la \
 	lib_msg_V.la \
 	lib_msg_WA.la \
-	lib_msg_W.la
+	lib_msg_W.la \
+	lib_msg_Y.la
 
 INCLUDES = $(INCLTDL)
 
@@ -207,9 +208,6 @@ lib_msg_EA_la_SOURCES = msg_EA.cc
 
 lib_msg_EB_la_LDFLAGS = -module -export-dynamic
 lib_msg_EB_la_SOURCES = msg_EB.cc
-
-lib_msg_Error_la_LDFLAGS = -module -export-dynamic
-lib_msg_Error_la_SOURCES = msg_Error.cc
 
 lib_msg_G_la_LDFLAGS = -module -export-dynamic
 lib_msg_G_la_SOURCES = msg_G.cc
@@ -247,8 +245,11 @@ lib_msg_NOOP_la_SOURCES = msg_NOOP.cc
 lib_msg_PART_la_LDFLAGS = -module -export-dynamic
 lib_msg_PART_la_SOURCES = msg_PART.cc
 
-lib_msg_PASS_la_LDFLAGS = -module -export-dynamic
-lib_msg_PASS_la_SOURCES = msg_PASS.cc
+lib_msg_PA_la_LDFLAGS = -module -export-dynamic
+lib_msg_PA_la_SOURCES = msg_PA.cc
+
+lib_msg_O_la_LDFLAGS = -module -export-dynamic
+lib_msg_O_la_SOURCES = msg_O.cc
 
 lib_msg_P_la_LDFLAGS = -module -export-dynamic
 lib_msg_P_la_SOURCES = msg_P.cc
@@ -279,6 +280,9 @@ lib_msg_WA_la_SOURCES = msg_WA.cc
 
 lib_msg_W_la_LDFLAGS = -module -export-dynamic
 lib_msg_W_la_SOURCES = msg_W.cc
+
+lib_msg_Y_la_LDFLAGS = -module -export-dynamic
+lib_msg_Y_la_SOURCES = msg_Y.cc
 subdir = libircu
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
@@ -313,9 +317,6 @@ lib_msg_EA_la_OBJECTS = $(am_lib_msg_EA_la_OBJECTS)
 lib_msg_EB_la_LIBADD =
 am_lib_msg_EB_la_OBJECTS = msg_EB.lo
 lib_msg_EB_la_OBJECTS = $(am_lib_msg_EB_la_OBJECTS)
-lib_msg_Error_la_LIBADD =
-am_lib_msg_Error_la_OBJECTS = msg_Error.lo
-lib_msg_Error_la_OBJECTS = $(am_lib_msg_Error_la_OBJECTS)
 lib_msg_G_la_LIBADD =
 am_lib_msg_G_la_OBJECTS = msg_G.lo
 lib_msg_G_la_OBJECTS = $(am_lib_msg_G_la_OBJECTS)
@@ -349,15 +350,18 @@ lib_msg_N_la_OBJECTS = $(am_lib_msg_N_la_OBJECTS)
 lib_msg_NOOP_la_LIBADD =
 am_lib_msg_NOOP_la_OBJECTS = msg_NOOP.lo
 lib_msg_NOOP_la_OBJECTS = $(am_lib_msg_NOOP_la_OBJECTS)
+lib_msg_O_la_LIBADD =
+am_lib_msg_O_la_OBJECTS = msg_O.lo
+lib_msg_O_la_OBJECTS = $(am_lib_msg_O_la_OBJECTS)
 lib_msg_P_la_LIBADD =
 am_lib_msg_P_la_OBJECTS = msg_P.lo
 lib_msg_P_la_OBJECTS = $(am_lib_msg_P_la_OBJECTS)
+lib_msg_PA_la_LIBADD =
+am_lib_msg_PA_la_OBJECTS = msg_PA.lo
+lib_msg_PA_la_OBJECTS = $(am_lib_msg_PA_la_OBJECTS)
 lib_msg_PART_la_LIBADD =
 am_lib_msg_PART_la_OBJECTS = msg_PART.lo
 lib_msg_PART_la_OBJECTS = $(am_lib_msg_PART_la_OBJECTS)
-lib_msg_PASS_la_LIBADD =
-am_lib_msg_PASS_la_OBJECTS = msg_PASS.lo
-lib_msg_PASS_la_OBJECTS = $(am_lib_msg_PASS_la_OBJECTS)
 lib_msg_Q_la_LIBADD =
 am_lib_msg_Q_la_OBJECTS = msg_Q.lo
 lib_msg_Q_la_OBJECTS = $(am_lib_msg_Q_la_OBJECTS)
@@ -385,6 +389,9 @@ lib_msg_W_la_OBJECTS = $(am_lib_msg_W_la_OBJECTS)
 lib_msg_WA_la_LIBADD =
 am_lib_msg_WA_la_OBJECTS = msg_WA.lo
 lib_msg_WA_la_OBJECTS = $(am_lib_msg_WA_la_OBJECTS)
+lib_msg_Y_la_LIBADD =
+am_lib_msg_Y_la_OBJECTS = msg_Y.lo
+lib_msg_Y_la_OBJECTS = $(am_lib_msg_Y_la_OBJECTS)
 
 DEFAULT_INCLUDES =  -I. -I$(srcdir) -I$(top_builddir)/include
 depcomp = $(SHELL) $(top_srcdir)/depcomp
@@ -393,19 +400,19 @@ am__depfiles_maybe = depfiles
 @AMDEP_TRUE@	./$(DEPDIR)/msg_B.Plo ./$(DEPDIR)/msg_C.Plo \
 @AMDEP_TRUE@	./$(DEPDIR)/msg_CM.Plo ./$(DEPDIR)/msg_D.Plo \
 @AMDEP_TRUE@	./$(DEPDIR)/msg_DS.Plo ./$(DEPDIR)/msg_EA.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/msg_EB.Plo ./$(DEPDIR)/msg_Error.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/msg_G.Plo ./$(DEPDIR)/msg_GL.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/msg_I.Plo ./$(DEPDIR)/msg_J.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/msg_JU.Plo ./$(DEPDIR)/msg_K.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/msg_L.Plo ./$(DEPDIR)/msg_M.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/msg_M351.Plo ./$(DEPDIR)/msg_N.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/msg_NOOP.Plo ./$(DEPDIR)/msg_P.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/msg_PART.Plo ./$(DEPDIR)/msg_PASS.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/msg_EB.Plo ./$(DEPDIR)/msg_G.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/msg_GL.Plo ./$(DEPDIR)/msg_I.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/msg_J.Plo ./$(DEPDIR)/msg_JU.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/msg_K.Plo ./$(DEPDIR)/msg_L.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/msg_M.Plo ./$(DEPDIR)/msg_M351.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/msg_N.Plo ./$(DEPDIR)/msg_NOOP.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/msg_O.Plo ./$(DEPDIR)/msg_P.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/msg_PA.Plo ./$(DEPDIR)/msg_PART.Plo \
 @AMDEP_TRUE@	./$(DEPDIR)/msg_Q.Plo ./$(DEPDIR)/msg_R.Plo \
 @AMDEP_TRUE@	./$(DEPDIR)/msg_S.Plo ./$(DEPDIR)/msg_SQ.Plo \
 @AMDEP_TRUE@	./$(DEPDIR)/msg_Server.Plo ./$(DEPDIR)/msg_T.Plo \
 @AMDEP_TRUE@	./$(DEPDIR)/msg_V.Plo ./$(DEPDIR)/msg_W.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/msg_WA.Plo
+@AMDEP_TRUE@	./$(DEPDIR)/msg_WA.Plo ./$(DEPDIR)/msg_Y.Plo
 CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
 LTCXXCOMPILE = $(LIBTOOL) --mode=compile $(CXX) $(DEFS) \
@@ -418,21 +425,21 @@ DIST_SOURCES = $(lib_msg_AC_la_SOURCES) $(lib_msg_AD_la_SOURCES) \
 	$(lib_msg_B_la_SOURCES) $(lib_msg_C_la_SOURCES) \
 	$(lib_msg_CM_la_SOURCES) $(lib_msg_D_la_SOURCES) \
 	$(lib_msg_DS_la_SOURCES) $(lib_msg_EA_la_SOURCES) \
-	$(lib_msg_EB_la_SOURCES) $(lib_msg_Error_la_SOURCES) \
-	$(lib_msg_G_la_SOURCES) $(lib_msg_GL_la_SOURCES) \
-	$(lib_msg_I_la_SOURCES) $(lib_msg_J_la_SOURCES) \
-	$(lib_msg_JU_la_SOURCES) $(lib_msg_K_la_SOURCES) \
-	$(lib_msg_L_la_SOURCES) $(lib_msg_M_la_SOURCES) \
-	$(lib_msg_M351_la_SOURCES) $(lib_msg_N_la_SOURCES) \
-	$(lib_msg_NOOP_la_SOURCES) $(lib_msg_P_la_SOURCES) \
-	$(lib_msg_PART_la_SOURCES) $(lib_msg_PASS_la_SOURCES) \
+	$(lib_msg_EB_la_SOURCES) $(lib_msg_G_la_SOURCES) \
+	$(lib_msg_GL_la_SOURCES) $(lib_msg_I_la_SOURCES) \
+	$(lib_msg_J_la_SOURCES) $(lib_msg_JU_la_SOURCES) \
+	$(lib_msg_K_la_SOURCES) $(lib_msg_L_la_SOURCES) \
+	$(lib_msg_M_la_SOURCES) $(lib_msg_M351_la_SOURCES) \
+	$(lib_msg_N_la_SOURCES) $(lib_msg_NOOP_la_SOURCES) \
+	$(lib_msg_O_la_SOURCES) $(lib_msg_P_la_SOURCES) \
+	$(lib_msg_PA_la_SOURCES) $(lib_msg_PART_la_SOURCES) \
 	$(lib_msg_Q_la_SOURCES) $(lib_msg_R_la_SOURCES) \
 	$(lib_msg_S_la_SOURCES) $(lib_msg_SQ_la_SOURCES) \
 	$(lib_msg_Server_la_SOURCES) $(lib_msg_T_la_SOURCES) \
 	$(lib_msg_V_la_SOURCES) $(lib_msg_W_la_SOURCES) \
-	$(lib_msg_WA_la_SOURCES)
+	$(lib_msg_WA_la_SOURCES) $(lib_msg_Y_la_SOURCES)
 DIST_COMMON = Makefile.am Makefile.in
-SOURCES = $(lib_msg_AC_la_SOURCES) $(lib_msg_AD_la_SOURCES) $(lib_msg_B_la_SOURCES) $(lib_msg_C_la_SOURCES) $(lib_msg_CM_la_SOURCES) $(lib_msg_D_la_SOURCES) $(lib_msg_DS_la_SOURCES) $(lib_msg_EA_la_SOURCES) $(lib_msg_EB_la_SOURCES) $(lib_msg_Error_la_SOURCES) $(lib_msg_G_la_SOURCES) $(lib_msg_GL_la_SOURCES) $(lib_msg_I_la_SOURCES) $(lib_msg_J_la_SOURCES) $(lib_msg_JU_la_SOURCES) $(lib_msg_K_la_SOURCES) $(lib_msg_L_la_SOURCES) $(lib_msg_M_la_SOURCES) $(lib_msg_M351_la_SOURCES) $(lib_msg_N_la_SOURCES) $(lib_msg_NOOP_la_SOURCES) $(lib_msg_P_la_SOURCES) $(lib_msg_PART_la_SOURCES) $(lib_msg_PASS_la_SOURCES) $(lib_msg_Q_la_SOURCES) $(lib_msg_R_la_SOURCES) $(lib_msg_S_la_SOURCES) $(lib_msg_SQ_la_SOURCES) $(lib_msg_Server_la_SOURCES) $(lib_msg_T_la_SOURCES) $(lib_msg_V_la_SOURCES) $(lib_msg_W_la_SOURCES) $(lib_msg_WA_la_SOURCES)
+SOURCES = $(lib_msg_AC_la_SOURCES) $(lib_msg_AD_la_SOURCES) $(lib_msg_B_la_SOURCES) $(lib_msg_C_la_SOURCES) $(lib_msg_CM_la_SOURCES) $(lib_msg_D_la_SOURCES) $(lib_msg_DS_la_SOURCES) $(lib_msg_EA_la_SOURCES) $(lib_msg_EB_la_SOURCES) $(lib_msg_G_la_SOURCES) $(lib_msg_GL_la_SOURCES) $(lib_msg_I_la_SOURCES) $(lib_msg_J_la_SOURCES) $(lib_msg_JU_la_SOURCES) $(lib_msg_K_la_SOURCES) $(lib_msg_L_la_SOURCES) $(lib_msg_M_la_SOURCES) $(lib_msg_M351_la_SOURCES) $(lib_msg_N_la_SOURCES) $(lib_msg_NOOP_la_SOURCES) $(lib_msg_O_la_SOURCES) $(lib_msg_P_la_SOURCES) $(lib_msg_PA_la_SOURCES) $(lib_msg_PART_la_SOURCES) $(lib_msg_Q_la_SOURCES) $(lib_msg_R_la_SOURCES) $(lib_msg_S_la_SOURCES) $(lib_msg_SQ_la_SOURCES) $(lib_msg_Server_la_SOURCES) $(lib_msg_T_la_SOURCES) $(lib_msg_V_la_SOURCES) $(lib_msg_W_la_SOURCES) $(lib_msg_WA_la_SOURCES) $(lib_msg_Y_la_SOURCES)
 
 all: all-am
 
@@ -489,8 +496,6 @@ lib_msg_EA.la: $(lib_msg_EA_la_OBJECTS) $(lib_msg_EA_la_DEPENDENCIES)
 	$(CXXLINK) -rpath $(libdir) $(lib_msg_EA_la_LDFLAGS) $(lib_msg_EA_la_OBJECTS) $(lib_msg_EA_la_LIBADD) $(LIBS)
 lib_msg_EB.la: $(lib_msg_EB_la_OBJECTS) $(lib_msg_EB_la_DEPENDENCIES) 
 	$(CXXLINK) -rpath $(libdir) $(lib_msg_EB_la_LDFLAGS) $(lib_msg_EB_la_OBJECTS) $(lib_msg_EB_la_LIBADD) $(LIBS)
-lib_msg_Error.la: $(lib_msg_Error_la_OBJECTS) $(lib_msg_Error_la_DEPENDENCIES) 
-	$(CXXLINK) -rpath $(libdir) $(lib_msg_Error_la_LDFLAGS) $(lib_msg_Error_la_OBJECTS) $(lib_msg_Error_la_LIBADD) $(LIBS)
 lib_msg_G.la: $(lib_msg_G_la_OBJECTS) $(lib_msg_G_la_DEPENDENCIES) 
 	$(CXXLINK) -rpath $(libdir) $(lib_msg_G_la_LDFLAGS) $(lib_msg_G_la_OBJECTS) $(lib_msg_G_la_LIBADD) $(LIBS)
 lib_msg_GL.la: $(lib_msg_GL_la_OBJECTS) $(lib_msg_GL_la_DEPENDENCIES) 
@@ -513,12 +518,14 @@ lib_msg_N.la: $(lib_msg_N_la_OBJECTS) $(lib_msg_N_la_DEPENDENCIES)
 	$(CXXLINK) -rpath $(libdir) $(lib_msg_N_la_LDFLAGS) $(lib_msg_N_la_OBJECTS) $(lib_msg_N_la_LIBADD) $(LIBS)
 lib_msg_NOOP.la: $(lib_msg_NOOP_la_OBJECTS) $(lib_msg_NOOP_la_DEPENDENCIES) 
 	$(CXXLINK) -rpath $(libdir) $(lib_msg_NOOP_la_LDFLAGS) $(lib_msg_NOOP_la_OBJECTS) $(lib_msg_NOOP_la_LIBADD) $(LIBS)
+lib_msg_O.la: $(lib_msg_O_la_OBJECTS) $(lib_msg_O_la_DEPENDENCIES) 
+	$(CXXLINK) -rpath $(libdir) $(lib_msg_O_la_LDFLAGS) $(lib_msg_O_la_OBJECTS) $(lib_msg_O_la_LIBADD) $(LIBS)
 lib_msg_P.la: $(lib_msg_P_la_OBJECTS) $(lib_msg_P_la_DEPENDENCIES) 
 	$(CXXLINK) -rpath $(libdir) $(lib_msg_P_la_LDFLAGS) $(lib_msg_P_la_OBJECTS) $(lib_msg_P_la_LIBADD) $(LIBS)
+lib_msg_PA.la: $(lib_msg_PA_la_OBJECTS) $(lib_msg_PA_la_DEPENDENCIES) 
+	$(CXXLINK) -rpath $(libdir) $(lib_msg_PA_la_LDFLAGS) $(lib_msg_PA_la_OBJECTS) $(lib_msg_PA_la_LIBADD) $(LIBS)
 lib_msg_PART.la: $(lib_msg_PART_la_OBJECTS) $(lib_msg_PART_la_DEPENDENCIES) 
 	$(CXXLINK) -rpath $(libdir) $(lib_msg_PART_la_LDFLAGS) $(lib_msg_PART_la_OBJECTS) $(lib_msg_PART_la_LIBADD) $(LIBS)
-lib_msg_PASS.la: $(lib_msg_PASS_la_OBJECTS) $(lib_msg_PASS_la_DEPENDENCIES) 
-	$(CXXLINK) -rpath $(libdir) $(lib_msg_PASS_la_LDFLAGS) $(lib_msg_PASS_la_OBJECTS) $(lib_msg_PASS_la_LIBADD) $(LIBS)
 lib_msg_Q.la: $(lib_msg_Q_la_OBJECTS) $(lib_msg_Q_la_DEPENDENCIES) 
 	$(CXXLINK) -rpath $(libdir) $(lib_msg_Q_la_LDFLAGS) $(lib_msg_Q_la_OBJECTS) $(lib_msg_Q_la_LIBADD) $(LIBS)
 lib_msg_R.la: $(lib_msg_R_la_OBJECTS) $(lib_msg_R_la_DEPENDENCIES) 
@@ -537,6 +544,8 @@ lib_msg_W.la: $(lib_msg_W_la_OBJECTS) $(lib_msg_W_la_DEPENDENCIES)
 	$(CXXLINK) -rpath $(libdir) $(lib_msg_W_la_LDFLAGS) $(lib_msg_W_la_OBJECTS) $(lib_msg_W_la_LIBADD) $(LIBS)
 lib_msg_WA.la: $(lib_msg_WA_la_OBJECTS) $(lib_msg_WA_la_DEPENDENCIES) 
 	$(CXXLINK) -rpath $(libdir) $(lib_msg_WA_la_LDFLAGS) $(lib_msg_WA_la_OBJECTS) $(lib_msg_WA_la_LIBADD) $(LIBS)
+lib_msg_Y.la: $(lib_msg_Y_la_OBJECTS) $(lib_msg_Y_la_DEPENDENCIES) 
+	$(CXXLINK) -rpath $(libdir) $(lib_msg_Y_la_LDFLAGS) $(lib_msg_Y_la_OBJECTS) $(lib_msg_Y_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT) core *.core
@@ -553,7 +562,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/msg_DS.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/msg_EA.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/msg_EB.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/msg_Error.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/msg_G.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/msg_GL.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/msg_I.Plo@am__quote@
@@ -565,9 +573,10 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/msg_M351.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/msg_N.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/msg_NOOP.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/msg_O.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/msg_P.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/msg_PA.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/msg_PART.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/msg_PASS.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/msg_Q.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/msg_R.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/msg_S.Plo@am__quote@
@@ -577,6 +586,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/msg_V.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/msg_W.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/msg_WA.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/msg_Y.Plo@am__quote@
 
 distclean-depend:
 	-rm -rf ./$(DEPDIR)

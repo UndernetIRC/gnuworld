@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-## $Id: Makefile.am,v 1.2 2002/11/24 17:04:33 dan_karrels Exp $
+## $Id: Makefile.am,v 1.3 2003/05/26 21:44:30 dan_karrels Exp $
 
 lib_LTLIBRARIES = lib_msg_AC.la \
 	lib_msg_AD.la \
@@ -10,7 +10,6 @@ lib_LTLIBRARIES = lib_msg_AC.la \
 	lib_msg_DS.la \
 	lib_msg_EA.la \
 	lib_msg_EB.la \
-	lib_msg_Error.la \
 	lib_msg_G.la \
 	lib_msg_GL.la \
 	lib_msg_I.la \
@@ -23,7 +22,8 @@ lib_LTLIBRARIES = lib_msg_AC.la \
 	lib_msg_N.la \
 	lib_msg_NOOP.la \
 	lib_msg_PART.la \
-	lib_msg_PASS.la \
+	lib_msg_PA.la \
+	lib_msg_O.la \
 	lib_msg_P.la \
 	lib_msg_Q.la \
 	lib_msg_R.la \
@@ -33,7 +33,8 @@ lib_LTLIBRARIES = lib_msg_AC.la \
 	lib_msg_T.la \
 	lib_msg_V.la \
 	lib_msg_WA.la \
-	lib_msg_W.la
+	lib_msg_W.la \
+	lib_msg_Y.la
 INCLUDES = $(INCLTDL)
 
 lib_msg_AC_la_LDFLAGS = -module -export-dynamic
@@ -62,9 +63,6 @@ lib_msg_EA_la_SOURCES = msg_EA.cc
 
 lib_msg_EB_la_LDFLAGS = -module -export-dynamic
 lib_msg_EB_la_SOURCES = msg_EB.cc
-
-lib_msg_Error_la_LDFLAGS = -module -export-dynamic
-lib_msg_Error_la_SOURCES = msg_Error.cc
 
 lib_msg_G_la_LDFLAGS = -module -export-dynamic
 lib_msg_G_la_SOURCES = msg_G.cc
@@ -102,8 +100,11 @@ lib_msg_NOOP_la_SOURCES = msg_NOOP.cc
 lib_msg_PART_la_LDFLAGS = -module -export-dynamic
 lib_msg_PART_la_SOURCES = msg_PART.cc
 
-lib_msg_PASS_la_LDFLAGS = -module -export-dynamic
-lib_msg_PASS_la_SOURCES = msg_PASS.cc
+lib_msg_PA_la_LDFLAGS = -module -export-dynamic
+lib_msg_PA_la_SOURCES = msg_PA.cc
+
+lib_msg_O_la_LDFLAGS = -module -export-dynamic
+lib_msg_O_la_SOURCES = msg_O.cc
 
 lib_msg_P_la_LDFLAGS = -module -export-dynamic
 lib_msg_P_la_SOURCES = msg_P.cc
@@ -134,3 +135,7 @@ lib_msg_WA_la_SOURCES = msg_WA.cc
 
 lib_msg_W_la_LDFLAGS = -module -export-dynamic
 lib_msg_W_la_SOURCES = msg_W.cc
+
+lib_msg_Y_la_LDFLAGS = -module -export-dynamic
+lib_msg_Y_la_SOURCES = msg_Y.cc
+

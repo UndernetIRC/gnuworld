@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server.cc,v 1.155 2003/05/23 17:28:34 dan_karrels Exp $
+ * $Id: server.cc,v 1.156 2003/05/26 21:44:32 dan_karrels Exp $
  */
 
 #include	<sys/time.h>
@@ -72,7 +72,7 @@
 #include	"Connection.h"
 
 const char server_h_rcsId[] = __SERVER_H ;
-const char server_cc_rcsId[] = "$Id: server.cc,v 1.155 2003/05/23 17:28:34 dan_karrels Exp $" ;
+const char server_cc_rcsId[] = "$Id: server.cc,v 1.156 2003/05/26 21:44:32 dan_karrels Exp $" ;
 const char config_h_rcsId[] = __CONFIG_H ;
 const char misc_h_rcsId[] = __MISC_H ;
 const char events_h_rcsId[] = __EVENTS_H ;
@@ -609,6 +609,11 @@ if( theConn != serverConnection )
 		<< endl ;
 	return ;
 	}
+
+#ifdef EDEBUG
+  burstLines++ ;
+  burstBytes += line.size() ;
+#endif
 
 size_t len = line.size() - 1 ;
 while( ('\n' == line[ len ]) || ('\r' == line[ len ]) )
@@ -2536,8 +2541,14 @@ void xServer::dumpStats()
 clog	<< "Number of channels: " << Network->channelList_size() << endl ;
 clog	<< "Number of servers: " << Network->serverList_size() << endl ;
 clog	<< "Number of clients: " << Network->clientList_size() << endl ;
-clog	<< "Burst duration: " << (burstEnd - burstStart)
+clog	<< "Last burst duration: " << (burstEnd - burstStart)
 	<< " seconds" << endl ;
+clog	<< "Read " << burstBytes
+	<< " bytes and processed " << burstLines
+	<< " commands over the last "
+	<< (::time( 0 ) - burstStart)
+	<< " seconds."
+	<< endl ;
 }
 
 xServer::timerID xServer::RegisterTimer( const time_t& absTime,
@@ -3748,6 +3759,31 @@ PostEvent( EVT_ACCOUNT,
 	static_cast< void* >( destClient ), 0, 0, 0,
 	sourceClient ) ;
 
+}
+
+void xServer::setBursting( bool newVal )
+{
+bursting = newVal ;
+
+#ifdef EDEBUG
+if( newVal )
+	{
+	// Starting bursting
+	burstBytes = burstLines = 0 ;
+	}
+else
+	{
+	// Completed bursting
+	elog	<< "Completed net burst in "
+		<< (burstEnd - burstStart)
+		<< " seconds, read "
+		<< burstBytes
+		<< " bytes and processed "
+		<< burstLines
+		<< " commands"
+		<< endl ;
+	}
+#endif
 }
 
 } // namespace gnuworld

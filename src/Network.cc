@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: Network.cc,v 1.49 2002/11/20 17:56:17 mrbean_ Exp $
+ * $Id: Network.cc,v 1.50 2003/05/26 21:44:32 dan_karrels Exp $
  */
 
 #include	<new>
@@ -42,7 +42,7 @@
 #include	"ip.h"
 
 const char xNetwork_h_rcsId[] = __NETWORK_H ;
-const char xNetwork_cc_rcsId[] = "$Id: Network.cc,v 1.49 2002/11/20 17:56:17 mrbean_ Exp $" ;
+const char xNetwork_cc_rcsId[] = "$Id: Network.cc,v 1.50 2003/05/26 21:44:32 dan_karrels Exp $" ;
 const char ELog_h_rcsId[] = __ELOG_H ;
 const char iClient_h_rcsId[] = __ICLIENT_H ;
 const char Channel_h_rcsId[] = __CHANNEL_H ;
@@ -135,6 +135,10 @@ return true ;
 bool xNetwork::addServer( iServer* newServer )
 {
 assert( newServer != NULL ) ;
+
+//elog	<< "xNetwork::addServer> Adding server: "
+//	<< *newServer
+//	<< endl ;
 
 if( !serverMap.insert( serverMapType::value_type(
 	newServer->getIntYY(), newServer ) ).second )

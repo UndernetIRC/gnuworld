@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server.h,v 1.79 2003/05/23 17:28:34 dan_karrels Exp $
+ * $Id: server.h,v 1.80 2003/05/26 21:44:29 dan_karrels Exp $
  */
 
 #ifndef __SERVER_H
-#define __SERVER_H "$Id: server.h,v 1.79 2003/05/23 17:28:34 dan_karrels Exp $"
+#define __SERVER_H "$Id: server.h,v 1.80 2003/05/26 21:44:29 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
@@ -647,8 +647,7 @@ public:
 	 * This method should NOT be called by anything other than the
 	 * server command handlers.
 	 */
-	inline void setBursting( bool newVal = true )
-		{ bursting = newVal ; }
+	virtual void setBursting( bool newVal = true ) ;
 
 	/**
 	 * Return true if the server has a valid connection to
@@ -1420,6 +1419,13 @@ protected:
 	 * This method maps all relevant signals to sigHandler().
 	 */
 	bool		setupSignals() ;
+
+#ifdef EDEBUG
+	/// Some debugging information, just a curiosity
+	size_t		burstLines ;
+	size_t		burstBytes ;
+#endif
+
 } ;
 
 } // namespace gnuworld

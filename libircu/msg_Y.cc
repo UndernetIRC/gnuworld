@@ -1,5 +1,5 @@
 /**
- * msg_Error.cc
+ * msg_Y.cc
  * Copyright (C) 2002 Daniel Karrels <dan@karrels.com>
  *
  * This program is free software; you can redistribute it and/or
@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_Error.cc,v 1.1 2002/11/20 22:16:18 dan_karrels Exp $
+ * $Id: msg_Y.cc,v 1.1 2003/05/26 21:44:30 dan_karrels Exp $
  */
 
 #include	"server.h"
@@ -26,14 +26,14 @@
 
 const char server_h_rcsId[] = __SERVER_H ;
 const char xparameters_h_rcsId[] = __XPARAMETERS_H ;
-const char msg_Error_cc_rcsId[] = "$Id: msg_Error.cc,v 1.1 2002/11/20 22:16:18 dan_karrels Exp $" ;
+const char msg_Y_cc_rcsId[] = "$Id: msg_Y.cc,v 1.1 2003/05/26 21:44:30 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
 
-CREATE_HANDLER(msg_Error)
+CREATE_HANDLER(msg_Y)
 
-bool msg_Error::Execute( const xParameters& )
+bool msg_Y::Execute( const xParameters& )
 {
 return true ;
 }

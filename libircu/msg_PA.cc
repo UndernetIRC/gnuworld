@@ -1,5 +1,5 @@
 /**
- * msg_PASS.cc
+ * msg_PA.cc
  * Copyright (C) 2002 Daniel Karrels <dan@karrels.com>
  *
  * This program is free software; you can redistribute it and/or
@@ -17,23 +17,23 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_PASS.cc,v 1.1 2002/11/20 22:16:18 dan_karrels Exp $
+ * $Id: msg_PA.cc,v 1.1 2003/05/26 21:44:30 dan_karrels Exp $
  */
 
 #include	"server.h"
 #include	"xparameters.h"
 #include	"ServerCommandHandler.h"
 
-const char msg_PASS_cc_rcsId[] = "$Id: msg_PASS.cc,v 1.1 2002/11/20 22:16:18 dan_karrels Exp $" ;
+const char msg_PA_cc_rcsId[] = "$Id: msg_PA.cc,v 1.1 2003/05/26 21:44:30 dan_karrels Exp $" ;
 const char server_h_rcsId[] = __SERVER_H ;
 const char xParameters_h_rcsId[] = __XPARAMETERS_H ;
 
 namespace gnuworld
 {
 
-CREATE_HANDLER(msg_PASS)
+CREATE_HANDLER(msg_PA)
 
-bool msg_PASS::Execute( const xParameters& )
+bool msg_PA::Execute( const xParameters& )
 {
 theServer->setBursting( true ) ;
 theServer->setUseHoldBuffer( true ) ;

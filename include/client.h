@@ -21,7 +21,7 @@
  */
 
 #ifndef __CLIENT_H
-#define __CLIENT_H "$Id: client.h,v 1.37 2002/12/28 22:44:55 mrbean_ Exp $"
+#define __CLIENT_H "$Id: client.h,v 1.38 2003/05/26 21:44:29 dan_karrels Exp $"
 
 #include	<sstream>
 #include	<string>
@@ -356,6 +356,13 @@ public:
 	 * is issued to the client.
 	 */
 	virtual int OnPrivateMessage( iClient* Sender,
+		const string& Message, bool secure = false ) ;
+
+	/**
+	 * OnNotice is called when a NOTICE command
+	 * is issued to the client.
+	 */
+	virtual int OnNotice( iClient* Sender,
 		const string& Message, bool secure = false ) ;
 
 	/**

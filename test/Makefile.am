@@ -1,7 +1,7 @@
 ## Process this file with automake to produce Makefile.in
-## $Id: Makefile.am,v 1.5 2003/05/24 16:47:53 dan_karrels Exp $
+## $Id: Makefile.am,v 1.6 2003/05/26 21:44:32 dan_karrels Exp $
 
-bin_PROGRAMS = stringtokenizer econfig gThread signal match
+noinst_PROGRAMS = stringtokenizer econfig gThread signal match
 
 stringtokenizer_SOURCES = stringtokenizer.cc
 stringtokenizer_LDFLAGS = $(glibdir)/libgnuworld.la

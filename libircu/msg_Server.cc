@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_Server.cc,v 1.1 2002/11/20 22:16:18 dan_karrels Exp $
+ * $Id: msg_Server.cc,v 1.2 2003/05/26 21:44:30 dan_karrels Exp $
  */
 
 #include	<new>
@@ -34,7 +34,7 @@
 #include	"xparameters.h"
 #include	"ServerCommandHandler.h"
 
-const char msg_Server_cc_rcsId[] = "$Id: msg_Server.cc,v 1.1 2002/11/20 22:16:18 dan_karrels Exp $" ;
+const char msg_Server_cc_rcsId[] = "$Id: msg_Server.cc,v 1.2 2003/05/26 21:44:30 dan_karrels Exp $" ;
 const char server_h_rcsId[] = __SERVER_H ;
 const char events_h_rcsId[] = __EVENTS_H ;
 const char Network_h_rcsId[] = __NETWORK_H ;
@@ -68,7 +68,6 @@ CREATE_HANDLER(msg_Server)
  */
 bool msg_Server::Execute( const xParameters& Param )
 {
-
 theServer->setBurstEnd( 0 ) ;
 theServer->setBurstStart( ::time( 0 ) ) ;
 
