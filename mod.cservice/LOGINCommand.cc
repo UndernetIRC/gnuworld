@@ -12,11 +12,17 @@
 #include	"cservice_config.h"
 #include	"Network.h"
 
-const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.21 2001/06/21 23:33:55 gte Exp $" ;
+const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.22 2001/07/08 17:49:25 gte Exp $" ;
 
 namespace gnuworld
 {
-
+ 
+struct autoOpData {
+	unsigned int channel_id;
+	unsigned int flags;
+	unsigned int suspend_expires;
+} aOp;
+ 
 using namespace gnuworld;
  
 bool LOGINCommand::Exec( iClient* theClient, const string& Message )
@@ -191,7 +197,7 @@ if (theUser->getFlag(sqlUser::F_GLOBAL_SUSPEND))
  */ 
 
 strstream theQuery;
-theQuery	<< "SELECT channel_id,flags FROM "
+theQuery	<< "SELECT channel_id,flags,suspend_expires FROM "
 			<< "levels WHERE user_id = "
 			<< theUser->getID()
 			<< ends;
@@ -212,17 +218,19 @@ if( PGRES_TUPLES_OK != status )
 		<< endl ;
 	return false ; 
 	}
- 
-typedef vector < pair < int, int > > autoOpVectorType;
+
+typedef vector < autoOpData > autoOpVectorType;
 autoOpVectorType autoOpVector;
 
 for(int i = 0; i < bot->SQLDb->Tuples(); i++)
 	{ 
-		int channel_id = atoi(bot->SQLDb->GetValue(i, 0));
-		int flags = atoi(bot->SQLDb->GetValue(i, 1)); 
+		autoOpData current;
 
-		autoOpVector.push_back(autoOpVectorType::value_type(
-			make_pair(channel_id, flags)));
+		current.channel_id = atoi(bot->SQLDb->GetValue(i, 0));
+		current.flags = atoi(bot->SQLDb->GetValue(i, 1));
+		current.suspend_expires = atoi(bot->SQLDb->GetValue(i, 2));
+
+		autoOpVector.push_back( autoOpVectorType::value_type(current) );
 	}
  
 for (autoOpVectorType::const_iterator resultPtr = autoOpVector.begin();
@@ -230,13 +238,13 @@ for (autoOpVectorType::const_iterator resultPtr = autoOpVector.begin();
 	{
  
 	/* If the autoop flag isn't set in this record */
-	if (!(resultPtr->second & sqlLevel::F_AUTOOP) &&
-		!(resultPtr->second & sqlLevel::F_AUTOVOICE))
+	if (!(resultPtr->flags & sqlLevel::F_AUTOOP) &&
+		!(resultPtr->flags & sqlLevel::F_AUTOVOICE))
 		{
 		continue;
 		}
  
-	sqlChannel* theChan = bot->getChannelRecord(resultPtr->first);
+	sqlChannel* theChan = bot->getChannelRecord(resultPtr->channel_id);
 	if (!theChan)
 		{ 
 		continue;
@@ -293,13 +301,23 @@ for (autoOpVectorType::const_iterator resultPtr = autoOpVector.begin();
 		{ 
 		continue;
 		}
+ 
+	/*
+	 *  Would probably be wise to check they're not suspended too :)
+	 *  (*smack* Ace)
+	 */
+
+	if(resultPtr->suspend_expires > 0)
+	{
+		continue;
+	}		
 
 	/*
  	 *  If its AUTOOP, check for op's and do the deed.
 	 *  Otherwise, its just AUTOVOICE :)
 	 */
 
-	if (resultPtr->second & sqlLevel::F_AUTOOP)
+	if (resultPtr->flags & sqlLevel::F_AUTOOP)
 		{
 		if(!tmpChanUser->getMode(ChannelUser::MODE_O))
 			{
@@ -363,3 +381,4 @@ return true;
 } 
 
 } // namespace gnuworld.
+
