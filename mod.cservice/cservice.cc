@@ -88,7 +88,7 @@ cservice::cservice(const string& args)
     RegisterCommand(new ACCESSCommand(this, "ACCESS", "[access_option] #channel [access_option] [(userid|nick|hostmask)] [access_option]"));
     RegisterCommand(new CHANINFOCommand(this, "CHANINFO", "TBA"));
     RegisterCommand(new MOTDCommand(this, "MOTD", "TBA"));
-    RegisterCommand(new ISREGCommand(this, "ISREG", "TBA"));
+    RegisterCommand(new ISREGCommand(this, "ISREG", "#channel"));
     RegisterCommand(new SHOWIGNORECommand(this, "SHOWIGNORE", "TBA"));
     RegisterCommand(new VERIFYCommand(this, "VERIFY", "TBA"));
     RegisterCommand(new RANDOMCommand(this, "RANDOM", "TBA"));
@@ -144,11 +144,15 @@ int cservice::BurstChannels()
 	//   manager.  Various other things must be done, such as setting the topic if AutoTopic
 	//   is on, gaining ops if AlwaysOp is on, and so forth.
 
-	if ((status = SQLDb->Exec( "select name,flags,channel_ts,channel_mode,channel_key,channel_limit,description from channels" )) == PGRES_TUPLES_OK)
+	if ((status = SQLDb->Exec( "select name,flags,channel_ts,channel_mode,channel_key,channel_limit from channels" )) == PGRES_TUPLES_OK)
 	{
 		for (int i = 0 ; i < SQLDb->Tuples (); i++)
 		{
 			StringTokenizer data( SQLDb->GetValue( i, 0 ) ) ;
+			/*
+			 *  Check the auto-join flag is set, if so - join. :)
+			 */ 
+
 			MyUplink->JoinChannel( this, data[ 0 ], "+tn" ) ;
 		}
 	}

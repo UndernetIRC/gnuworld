@@ -1,5 +1,5 @@
 #ifndef __CSERVICE_H
-#define __CSERVICE_H "$Id: cservice.h,v 1.4 2000/12/11 00:46:31 gte Exp $"
+#define __CSERVICE_H "$Id: cservice.h,v 1.5 2000/12/11 21:36:09 gte Exp $"
 
 #include	<string>
 #include	<vector>
@@ -10,7 +10,8 @@
 #include	"iClient.h"
 #include	"iServer.h"
 #include	"EConfig.h"
-#include	"cserviceCommands.h"
+#include	"cserviceCommands.h" 
+#include	"sqlChannel.h"
  
 #define STMT_ALLCHANS "SELECT channel from channels" // Provide a result set with 1 column, 'Channel Name'.
 
@@ -27,14 +28,15 @@ class Command;
 class cservice : public xClient
 {
 protected:
-
-    PgDatabase* SQLDb; /* PostgreSQL Database */
+ 
 	EConfig* cserviceConfig; /* Configfile */
 	typedef map< string, Command*, noCaseCompare > commandMapType ;
     typedef commandMapType::value_type pairType ;
     commandMapType          commandMap;
 
 public:
+    PgDatabase* SQLDb; /* PostgreSQL Database */
+
 	cservice(const string& args);
 	virtual ~cservice();
 

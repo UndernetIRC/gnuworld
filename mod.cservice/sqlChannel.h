@@ -1,7 +1,7 @@
 /* sqlChannel.h */
 
 #ifndef __SQLCHANNEL_H
-#define __SQLCHANNEL_H "$Id: sqlChannel.h,v 1.2 2000/12/11 00:46:31 gte Exp $"
+#define __SQLCHANNEL_H "$Id: sqlChannel.h,v 1.3 2000/12/11 21:36:09 gte Exp $"
 
 #include	<string>
 
@@ -10,11 +10,14 @@
 
 using std::string ;
 
+namespace gnuworld
+{ 
+ 
 class sqlChannel
 {
 
 public:
-	sqlChannel(PgDatabase* SQLDb, const string& channelName) ;
+	sqlChannel(PgDatabase* SQLDb) ;
 	virtual ~sqlChannel() ;
 
 	typedef unsigned int	flagType ;
@@ -63,7 +66,13 @@ public:
 	inline const time_t&		getLastUpdate() const
 		{ return last_update ; }
 
+	bool loadData( const string& );
+	bool loadData( int );
+	bool exists( const string& );
+
 protected:
+
+    void setAllMembers();
 
 	unsigned int	id ;
 	string		name ;
@@ -74,11 +83,13 @@ protected:
 	string		description ;
 	string		keywords  ;
 	time_t		registered_ts ;
+	time_t		channel_ts ;
 	string		channel_mode ;
 	string		channel_key ;
 	unsigned int	channel_limit ;
-	time_t		last_update ;
-
+	time_t		last_update ; 
+	PgDatabase*	SQLDb;
 } ;
 
+} 
 #endif // __SQLCHANNEL_H
