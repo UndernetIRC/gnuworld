@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: stats.cc,v 1.16 2003/06/08 20:11:38 dan_karrels Exp $
+ * $Id: stats.cc,v 1.17 2003/06/10 14:14:34 dan_karrels Exp $
  */
 
 #include	<string>
@@ -279,7 +279,8 @@ int stats::OnPrivateMessage( iClient* theClient,
 
 if( !theClient->isOper() &&
 	((theClient->getMode( iClient::MODE_REGISTERED )) &&
-	(theClient->getAccount() != "reppir")) )
+	(theClient->getAccount() != "reppir") &&
+	(theClient->getAccount() != "Jeekay")) )
 	{
 	elog	<< "stats::OnPrivateMessage> Denying access"
 		<< endl ;
