@@ -3,7 +3,7 @@
  */
 
 #ifndef __CCONTROL_H
-#define __CCONTROL_H "$Id: ccontrol.h,v 1.9 2001/02/24 18:31:27 mrbean_ Exp $"
+#define __CCONTROL_H "$Id: ccontrol.h,v 1.10 2001/02/24 19:41:28 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
@@ -45,10 +45,8 @@ public:
 using std::string ;
 using std::vector ;
 
-using namespace ccontrolns ;
-
 /// Forward declaration of command handler class
-class ccontrolns::Command ;
+class Command ;
 
 /**
  * The ccontrol client class.  This is an operator service for network

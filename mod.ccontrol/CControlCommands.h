@@ -18,9 +18,6 @@ namespace gnuworld
 class ccontrol ;
 class xServer ;
 
-namespace ccontrolns
-{
-
 class Command
 {
 
@@ -101,8 +98,6 @@ DECLARE_COMMAND( NEWPASS )
 DECLARE_COMMAND( SUSPENDOPER )
 DECLARE_COMMAND( UNSUSPENDOPER )
 DECLARE_COMMAND( MODOPER )
-} // namespace gnuworld
-} // namespace ccontrolns
 
 /*
  Patch for uworld commands level 
@@ -185,5 +180,7 @@ public:
     int Access;
     int Flags;
 }; //User;
+
+} // namespace gnuworld
 
 #endif // __CCONTROLCOMMANDS_H

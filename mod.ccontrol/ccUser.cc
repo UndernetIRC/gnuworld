@@ -3,35 +3,41 @@
  * 
  * Storage class for accessing user information 
  * 
- * $Id: ccUser.cc,v 1.2 2001/02/24 19:22:08 mrbean_ Exp $
+ * $Id: ccUser.cc,v 1.3 2001/02/24 19:41:28 dan_karrels Exp $
  */
  
 #include	<strstream>
 #include	<string> 
+
 #include	<cstring> 
+
+#include	"libpq++.h"
 #include	"ELog.h"
 #include	"misc.h"
 #include	"ccUser.h" 
 
-using std::string ; 
-using std::endl ; 
+const char ccUser_h_rcsId[] = __CCUSER_H ;
+const char ccUser_cc_rcsId[] = "$Id: ccUser.cc,v 1.3 2001/02/24 19:41:28 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
 
+using std::string ; 
+using std::endl ; 
+using std::strstream ;
+using std::ends ;
+
 ccUser::ccUser(PgDatabase* _SQLDb)
  : Id( 0 ),
-   UserName(""),
-   Password(""),
-   last_updated_by(""),
-   Numeric(""),
    SuspendExpires(0),
-   SuspendedBy(""),
    Access( 0 ),
    Flags( 0 ), 
    SQLDb( _SQLDb )
 {
 }
+
+ccUser::~ccUser()
+{}
 
 bool ccUser::loadData(const string& Name)
 {
@@ -44,7 +50,7 @@ theQuery	<< Main
 		<< "'"
 		<< ends;
 
-elog	<< "ACCESS::sqlQuery> "
+elog	<< "ccUser::loadData> "
 	<< theQuery.str()
 	<< endl; 
 
@@ -57,7 +63,7 @@ if( (PGRES_TUPLES_OK == status) && (SQLDb->Tuples() > 0) )
 	return true;
 	}
 
-return NULL;
+return false;
 }
 
 bool ccUser::loadData( const unsigned int Id)
@@ -71,7 +77,7 @@ theQuery	<< Main
 		<< ';'
 		<< ends;
 
-elog	<< "ACCESS::sqlQuery> "
+elog	<< "ccontrol::loadData> "
 	<< theQuery.str()
 	<< endl; 
 
@@ -81,10 +87,10 @@ delete[] theQuery.str() ;
 if( (PGRES_TUPLES_OK == status) && (SQLDb->Tuples() > 0) )
 	{
 	GetParm();
-	return false;
+	return true;
 	}
 
-return NULL;
+return false;
 }
 
 void ccUser::GetParm()
@@ -139,4 +145,4 @@ else
 	}
 }
 
-}
+} //  namespace gnuworld

@@ -1,20 +1,19 @@
+/* ccUser.h */
 
 #ifndef __CCUSER_H
-#define __CCUSER_H "$Id: ccUser.h,v 1.2 2001/02/24 19:22:08 mrbean_ Exp $"
+#define __CCUSER_H "$Id: ccUser.h,v 1.3 2001/02/24 19:41:28 dan_karrels Exp $"
 
 #include	<string>
+
 #include	<ctime>
+
 #include	"libpq++.h"
  
-
-
 namespace gnuworld
 { 
 
 using std::string ;
 
-class iClient;
- 
 class ccUser
 {
 
@@ -27,31 +26,31 @@ public:
 	 *  Methods to get data atrributes.
 	 */ 
 
-	const unsigned int&	getID() const
+	inline const unsigned int&	getID() const
 		{ return Id ; }
 
-	const string&		getUserName() const
+	inline const string&		getUserName() const
 		{ return UserName ; }
 
-	const string&		getPassword() const
+	inline const string&		getPassword() const
 		{ return Password ; }
 
-	const string&		getLast_Updated_by() const
+	inline const string&		getLast_Updated_by() const
 		{ return last_updated_by ; }
 
-	const string&		getNumeric() const
+	inline const string&		getNumeric() const
 		{ return Numeric ; }
         
-	const unsigned int&	getSuspendExpires() const
+	inline const unsigned int&	getSuspendExpires() const
 		{ return SuspendExpires ; }
 
-	const string&		getSuspendedBy() const
+	inline const string&		getSuspendedBy() const
 		{ return SuspendedBy ; }
 
-	const unsigned int&	getAccess() const
+	inline const unsigned int&	getAccess() const
 		{ return Access ; }
 
-	const unsigned int&	getFlags() const
+	inline const unsigned int&	getFlags() const
 		{ return Flags ; }
 
 	/*
@@ -104,19 +103,19 @@ public:
 protected:
 	unsigned int Id;
 	string UserName;
-        string Password;
+	string Password;
 	string last_updated_by;
-        string Numeric;
-        unsigned int SuspendExpires;
-        string SuspendedBy;
-        unsigned int Access;
-        unsigned int Flags;
+	string Numeric;
+	time_t SuspendExpires;
+	string SuspendedBy;
+	unsigned int Access;
+	unsigned int Flags;
 	PgDatabase* SQLDb;
 
-} ; 
+} ; // class ccUser
 
+} // namespace gnuworld
 
-}
 #endif // __CCUSER_H
 
 
