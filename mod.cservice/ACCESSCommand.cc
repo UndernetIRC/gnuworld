@@ -8,7 +8,7 @@
  * Can optionally narrow down selection using a number of switches. (TODO).
  * Can display all channels a user has access on (TODO). 
  *
- * $Id: ACCESSCommand.cc,v 1.8 2001/01/14 23:12:09 gte Exp $
+ * $Id: ACCESSCommand.cc,v 1.9 2001/01/16 23:20:10 gte Exp $
  */
 
 #include	<string>
@@ -18,7 +18,7 @@
 #include	"cservice.h"
 #include	"libpq++.h"
 
-const char ACCESSCommand_cc_rcsId[] = "$Id: ACCESSCommand.cc,v 1.8 2001/01/14 23:12:09 gte Exp $" ;
+const char ACCESSCommand_cc_rcsId[] = "$Id: ACCESSCommand.cc,v 1.9 2001/01/16 23:20:10 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -43,7 +43,7 @@ bool ACCESSCommand::Exec( iClient* theClient, const string& Message )
  */
 
 	ExecStatusType status;
-	static const char* queryHeader =    "SELECT channels.name,users.user_name,levels.access,levels.flags,users.last_seen,levels.suspend_expires FROM levels,channels,users ";
+	static const char* queryHeader =    "SELECT channels.name,users.user_name,levels.access,levels.flags,users.last_seen,levels.suspend_expires,levels.last_modif,levels.last_modif_by FROM levels,channels,users ";
 	static const char* queryCondition = "WHERE levels.channel_id=channels.id AND levels.user_id=users.id ";
 	static const char* queryFooter =    "ORDER BY levels.access DESC LIMIT 15;";
 
@@ -53,7 +53,7 @@ bool ACCESSCommand::Exec( iClient* theClient, const string& Message )
 		Usage(theClient);
 		return true;
 	}
-
+ 
 	sqlChannel* theChan = bot->getChannelRecord(st[1]);
 	if (!theChan) 
 	{
@@ -61,12 +61,83 @@ bool ACCESSCommand::Exec( iClient* theClient, const string& Message )
 		return false;
 	} 
 
+
+
 	/*
 	 *  Figure out the switches and append to the SQL statement accordingly.
-	 */
+	 */ 
+
+	unsigned short currentType = 0; /* 0 = None, 1 = min, 2 = max, 3 = modif. */
+	unsigned short autoOp = 0; /* 0 = any, 1 = just autoop, 2 = not autoop */
+	unsigned short minAmount = 0;
+	unsigned short maxAmount = 0;
+	bool modif = false;
+	string modifMask;
+
+	for( StringTokenizer::const_iterator ptr = st.begin() ; ptr != st.end() ;
+	++ptr )
+	{
+		if (string_lower(*ptr) == "-min")
+		{
+			currentType = 1;
+			continue;
+		}
+
+		if (string_lower(*ptr) == "-max")
+		{
+			currentType = 2;
+			continue;
+		}
+
+		if (string_lower(*ptr) == "-modif")
+		{
+			currentType = 3;
+			modif = true;
+			continue;
+		}
+
+		switch(currentType)
+		{
+			case 1: /* Min */
+			{
+				minAmount = atoi( (*ptr).c_str() );
+				if ((minAmount > 1000) || (minAmount < 0))
+				{											  
+					bot->Notice(theClient, "Invalid minimum level.");
+					return false;
+				}
+				currentType = 0;
+				break;
+			}
+			case 2: /* Max */ 
+			{ 
+				maxAmount = atoi( (*ptr).c_str() );
+				if ((maxAmount > 1000) || (maxAmount < 0))
+				{											  
+					bot->Notice(theClient, "Invalid maximum level.");
+					return false;
+				}
+
+				currentType = 0;
+				break;
+			}
+			case 3: /* Modif */ 
+			{ 
+				// [22:13] <DrCkTaiL> backburner 
+				break;
+			} 
+		} 
+	}
+
+	/* Sort out the additional conditions */
+
+	strstream extraCond;
+	if (minAmount) extraCond << "AND levels.access >= " << minAmount << " ";
+	if (maxAmount) extraCond << "AND levels.access <= " << maxAmount << " ";
+	extraCond << ends;
 
  	strstream theQuery;
-	theQuery << queryHeader << queryCondition << "AND levels.channel_id = " << theChan->getID() << " " << queryFooter << ends;
+	theQuery << queryHeader << queryCondition << extraCond.str() << "AND levels.channel_id = " << theChan->getID() << " " << queryFooter << ends;
 
 	elog << "sqlQuery> " << theQuery.str() << endl; 
 
@@ -100,6 +171,13 @@ bool ACCESSCommand::Exec( iClient* theClient, const string& Message )
 			bot->Notice(theClient, "USER: %s ACCESS: %s", bot->SQLDb->GetValue(i, 1), bot->SQLDb->GetValue(i, 2));
 			bot->Notice(theClient, "CHANNEL: %s -- AUTOOP: %s -- AUTOVOICE: %s", bot->SQLDb->GetValue(i, 0), 
 				autoOp ? "ON" : "OFF", autoVoice ? "ON" : "OFF");
+
+			if(modif)
+			{
+				bot->Notice(theClient, "LAST MODIFIED: %s (%s ago)", 
+					bot->SQLDb->GetValue(i, 7), bot->prettyDuration(atoi(bot->SQLDb->GetValue(i,6))).c_str() );
+			}
+
 			if(suspend_expires != 0)
 			{
 				bot->Notice(theClient, "** SUSPENDED ** - Expires in %s", bot->prettyDuration(suspend_expires_f).c_str());
