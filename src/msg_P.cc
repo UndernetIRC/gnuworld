@@ -3,6 +3,7 @@
  */
 
 #include	<string>
+#include	<iostream>
 
 #include	"server.h"
 #include	"Network.h"
@@ -11,7 +12,7 @@
 #include	"ELog.h"
 #include	"xparameters.h"
 
-const char msg_P_cc_rcsId[] = "$Id: msg_P.cc,v 1.3 2001/05/18 15:27:10 dan_karrels Exp $" ;
+const char msg_P_cc_rcsId[] = "$Id: msg_P.cc,v 1.4 2001/06/17 16:40:43 dan_karrels Exp $" ;
 const char server_h_rcsId[] = __SERVER_H ;
 const char Network_h_rcsId[] = __NETWORK_H ;
 const char iClient_h_rcsId[] = __ICLIENT_H ;
@@ -41,7 +42,8 @@ int xServer::MSG_P( xParameters& Param )
 
 if( Param.size() < 3 )
 	{
-	elog	<< "xServer::MSG_P> Invalid number of arguments\n" ;
+	elog	<< "xServer::MSG_P> Invalid number of arguments"
+		<< endl ;
 	return -1 ;
 	}
 
@@ -116,12 +118,13 @@ if( Message[ 0 ] == 1 && Message[ strlen( Message ) - 1 ] == 1 )
 
 // :Sender PRIVMSG YXX :Message
 // :Sender PRIVMSG YXX :\001Command\001
-// :Sender PRIVMSG YXX :\001\Command\001 Message
+// :Sender PRIVMSG YXX :\001Command\001 Message
 
 if( NULL == Client )
 	{
-	elog	<< "xServer::MSG_P: Local client not found: "
-		<< Receiver << endl ;
+	elog	<< "xServer::MSG_P> Local client not found: "
+		<< Receiver
+		<< endl ;
 	return -1 ;
 	}
 
@@ -129,7 +132,8 @@ iClient* Target = Network->findClient( Sender ) ;
 if( NULL == Target )
 	{
 	elog	<< "xServer::MSG_P> Unable to find Sender: "
-		<< Sender << endl ;
+		<< Sender
+		<< endl ;
 	return -1 ;
 	}
 
