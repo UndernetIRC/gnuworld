@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ConnectionManager.cc,v 1.16 2004/05/18 16:50:57 dan_karrels Exp $
+ * $Id: ConnectionManager.cc,v 1.17 2005/01/07 00:10:21 dan_karrels Exp $
  */
 
 #include	<unistd.h>
@@ -52,7 +52,7 @@
 #include	"Buffer.h"
 #include	"ELog.h"
 
-const char rcsId[] = "$Id: ConnectionManager.cc,v 1.16 2004/05/18 16:50:57 dan_karrels Exp $" ;
+const char rcsId[] = "$Id: ConnectionManager.cc,v 1.17 2005/01/07 00:10:21 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -644,23 +644,15 @@ for( constHandlerMapIterator handlerItr = handlerMap.begin(),
 		} // for( connectionItr )
 	} // for( handlerItr )
 
+//elog	<< "ConnectionManager::Poll> select()"
+//	<< endl ;
+
 int selectRet = 0 ;
-unsigned short int loopCount = 0 ;
-do
-	{
-//	elog	<< "ConnectionManager::Poll> select()"
-//		<< endl ;
+struct timeval to = { seconds, milliseconds * 1000 } ;
 
-	// timeval may be modified by select() on some systems,
-	// so recreate it each time
-	struct timeval to = { seconds, milliseconds * 1000 } ;
-
-	// Call select()
-	// Block indefinitely if seconds is -1
-	errno = 0 ;
-	selectRet = ::select( 1 + highestFD, &readfds, &writefds, 0,
-			(-1 == seconds) ? NULL : &to ) ;
-	} while ((EINTR == errno) && (++loopCount <= 10)) ;
+// Call select()
+selectRet = ::select( 1 + highestFD, &readfds, &writefds, 0,
+		(-1 == seconds) ? NULL : &to ) ;
 
 //elog	<< "ConnectionManager::Poll()> seconds: "
 //	<< seconds

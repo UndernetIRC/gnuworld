@@ -25,7 +25,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: CLEARMODECommand.cc,v 1.8 2003/06/28 01:21:20 dan_karrels Exp $
+ * $Id: CLEARMODECommand.cc,v 1.9 2005/01/07 00:10:25 dan_karrels Exp $
  */
 
 #include	<string>
@@ -38,7 +38,7 @@
 #include	"responses.h"
 #include	"Network.h"
 
-const char CLEARMODECommand_cc_rcsId[] = "$Id: CLEARMODECommand.cc,v 1.8 2003/06/28 01:21:20 dan_karrels Exp $" ;
+const char CLEARMODECommand_cc_rcsId[] = "$Id: CLEARMODECommand.cc,v 1.9 2005/01/07 00:10:25 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -111,14 +111,15 @@ s	<< bot->getCharYYXXX()
 	<< " -mnstipkl *"
 	<< ends;
 
-tmpChan->removeMode( Channel::MODE_M );
-tmpChan->removeMode( Channel::MODE_N );
-tmpChan->removeMode( Channel::MODE_S );
-tmpChan->removeMode( Channel::MODE_T );
-tmpChan->removeMode( Channel::MODE_P );
+tmpChan->removeMode( Channel::MODE_I );
 tmpChan->removeMode( Channel::MODE_K );
 tmpChan->removeMode( Channel::MODE_L );
-tmpChan->removeMode( Channel::MODE_I );
+tmpChan->removeMode( Channel::MODE_M );
+tmpChan->removeMode( Channel::MODE_N );
+tmpChan->removeMode( Channel::MODE_P );
+tmpChan->removeMode( Channel::MODE_R );
+tmpChan->removeMode( Channel::MODE_S );
+tmpChan->removeMode( Channel::MODE_T );
 tmpChan->setLimit( 0 );
 tmpChan->setKey( "" );
 

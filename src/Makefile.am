@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-## $Id: Makefile.am,v 1.28 2003/10/10 23:46:34 dan_karrels Exp $
+## $Id: Makefile.am,v 1.29 2005/01/07 00:10:45 dan_karrels Exp $
 
 lib_LTLIBRARIES = libgnuworldcore.la
 libgnuworldcore_la_SOURCES = Channel.cc \
@@ -12,7 +12,11 @@ libgnuworldcore_la_SOURCES = Channel.cc \
 	iClient.cc \
 	iServer.cc \
 	ip.cc \
-	server.cc
+	server.cc \
+	server_connection.cc \
+	server_events.cc \
+	server_glines.cc \
+	server_timers.cc
 libgnuworldcore_la_CXXFLAGS = -I${top_srcdir}/include \
 	-I${top_srcdir}/libgnuworld
 libgnuworldcore_la_DEPENDENCIES = $(LIBGNUWORLD) $(LIBLTDL)

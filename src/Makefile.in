@@ -67,7 +67,11 @@ am_libgnuworldcore_la_OBJECTS = libgnuworldcore_la-Channel.lo \
 	libgnuworldcore_la-UnloadClientTimerHandler.lo \
 	libgnuworldcore_la-client.lo libgnuworldcore_la-iClient.lo \
 	libgnuworldcore_la-iServer.lo libgnuworldcore_la-ip.lo \
-	libgnuworldcore_la-server.lo
+	libgnuworldcore_la-server.lo \
+	libgnuworldcore_la-server_connection.lo \
+	libgnuworldcore_la-server_events.lo \
+	libgnuworldcore_la-server_glines.lo \
+	libgnuworldcore_la-server_timers.lo
 libgnuworldcore_la_OBJECTS = $(am_libgnuworldcore_la_OBJECTS)
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
@@ -236,7 +240,11 @@ libgnuworldcore_la_SOURCES = Channel.cc \
 	iClient.cc \
 	iServer.cc \
 	ip.cc \
-	server.cc
+	server.cc \
+	server_connection.cc \
+	server_events.cc \
+	server_glines.cc \
+	server_timers.cc
 
 libgnuworldcore_la_CXXFLAGS = -I${top_srcdir}/include \
 	-I${top_srcdir}/libgnuworld
@@ -361,6 +369,10 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgnuworldcore_la-iServer.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgnuworldcore_la-ip.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgnuworldcore_la-server.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgnuworldcore_la-server_connection.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgnuworldcore_la-server_events.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgnuworldcore_la-server_glines.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgnuworldcore_la-server_timers.Plo@am__quote@
 
 .cc.o:
 @am__fastdepCXX_TRUE@	if $(CXXCOMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \
@@ -459,6 +471,34 @@ libgnuworldcore_la-server.lo: server.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='server.cc' object='libgnuworldcore_la-server.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworldcore_la_CXXFLAGS) $(CXXFLAGS) -c -o libgnuworldcore_la-server.lo `test -f 'server.cc' || echo '$(srcdir)/'`server.cc
+
+libgnuworldcore_la-server_connection.lo: server_connection.cc
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworldcore_la_CXXFLAGS) $(CXXFLAGS) -MT libgnuworldcore_la-server_connection.lo -MD -MP -MF "$(DEPDIR)/libgnuworldcore_la-server_connection.Tpo" -c -o libgnuworldcore_la-server_connection.lo `test -f 'server_connection.cc' || echo '$(srcdir)/'`server_connection.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libgnuworldcore_la-server_connection.Tpo" "$(DEPDIR)/libgnuworldcore_la-server_connection.Plo"; else rm -f "$(DEPDIR)/libgnuworldcore_la-server_connection.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='server_connection.cc' object='libgnuworldcore_la-server_connection.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworldcore_la_CXXFLAGS) $(CXXFLAGS) -c -o libgnuworldcore_la-server_connection.lo `test -f 'server_connection.cc' || echo '$(srcdir)/'`server_connection.cc
+
+libgnuworldcore_la-server_events.lo: server_events.cc
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworldcore_la_CXXFLAGS) $(CXXFLAGS) -MT libgnuworldcore_la-server_events.lo -MD -MP -MF "$(DEPDIR)/libgnuworldcore_la-server_events.Tpo" -c -o libgnuworldcore_la-server_events.lo `test -f 'server_events.cc' || echo '$(srcdir)/'`server_events.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libgnuworldcore_la-server_events.Tpo" "$(DEPDIR)/libgnuworldcore_la-server_events.Plo"; else rm -f "$(DEPDIR)/libgnuworldcore_la-server_events.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='server_events.cc' object='libgnuworldcore_la-server_events.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworldcore_la_CXXFLAGS) $(CXXFLAGS) -c -o libgnuworldcore_la-server_events.lo `test -f 'server_events.cc' || echo '$(srcdir)/'`server_events.cc
+
+libgnuworldcore_la-server_glines.lo: server_glines.cc
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworldcore_la_CXXFLAGS) $(CXXFLAGS) -MT libgnuworldcore_la-server_glines.lo -MD -MP -MF "$(DEPDIR)/libgnuworldcore_la-server_glines.Tpo" -c -o libgnuworldcore_la-server_glines.lo `test -f 'server_glines.cc' || echo '$(srcdir)/'`server_glines.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libgnuworldcore_la-server_glines.Tpo" "$(DEPDIR)/libgnuworldcore_la-server_glines.Plo"; else rm -f "$(DEPDIR)/libgnuworldcore_la-server_glines.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='server_glines.cc' object='libgnuworldcore_la-server_glines.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworldcore_la_CXXFLAGS) $(CXXFLAGS) -c -o libgnuworldcore_la-server_glines.lo `test -f 'server_glines.cc' || echo '$(srcdir)/'`server_glines.cc
+
+libgnuworldcore_la-server_timers.lo: server_timers.cc
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworldcore_la_CXXFLAGS) $(CXXFLAGS) -MT libgnuworldcore_la-server_timers.lo -MD -MP -MF "$(DEPDIR)/libgnuworldcore_la-server_timers.Tpo" -c -o libgnuworldcore_la-server_timers.lo `test -f 'server_timers.cc' || echo '$(srcdir)/'`server_timers.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libgnuworldcore_la-server_timers.Tpo" "$(DEPDIR)/libgnuworldcore_la-server_timers.Plo"; else rm -f "$(DEPDIR)/libgnuworldcore_la-server_timers.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='server_timers.cc' object='libgnuworldcore_la-server_timers.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworldcore_la_CXXFLAGS) $(CXXFLAGS) -c -o libgnuworldcore_la-server_timers.lo `test -f 'server_timers.cc' || echo '$(srcdir)/'`server_timers.cc
 
 gnuworld-main.o: main.cc
 @am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gnuworld_CXXFLAGS) $(CXXFLAGS) -MT gnuworld-main.o -MD -MP -MF "$(DEPDIR)/gnuworld-main.Tpo" -c -o gnuworld-main.o `test -f 'main.cc' || echo '$(srcdir)/'`main.cc; \
