@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: Network.cc,v 1.54 2003/06/08 20:06:43 dan_karrels Exp $
+ * $Id: Network.cc,v 1.55 2003/06/10 15:37:04 dan_karrels Exp $
  */
 
 #include	<new>
@@ -42,7 +42,7 @@
 #include	"ip.h"
 
 const char xNetwork_h_rcsId[] = __NETWORK_H ;
-const char xNetwork_cc_rcsId[] = "$Id: Network.cc,v 1.54 2003/06/08 20:06:43 dan_karrels Exp $" ;
+const char xNetwork_cc_rcsId[] = "$Id: Network.cc,v 1.55 2003/06/10 15:37:04 dan_karrels Exp $" ;
 const char ELog_h_rcsId[] = __ELOG_H ;
 const char iClient_h_rcsId[] = __ICLIENT_H ;
 const char Channel_h_rcsId[] = __CHANNEL_H ;
@@ -339,8 +339,8 @@ iClient* retMe = ptr->second ;
 removeNick( retMe->getNickName() ) ;
 
 // Remove all associations between client->channel
-iClient::channelIterator chanPtr = retMe->channels_begin() ;
-while( chanPtr != retMe->channels_end() )
+for( iClient::channelIterator chanPtr = retMe->channels_begin() ;
+	chanPtr != retMe->channels_end() ; ++chanPtr )
 	{
 //	elog	<< "xNetwork::removeClient> Removing user "
 //		<< retMe->getCharYYXXX()
@@ -368,7 +368,6 @@ while( chanPtr != retMe->channels_end() )
 
 		delete removeChannel( (*chanPtr)->getName() ) ;
 		}
-	++chanPtr ;
 	}
 
 retMe->clearChannels() ;
@@ -622,9 +621,9 @@ findLeaves( yyVector, intYY ) ;
 for( yyVectorType::const_iterator yyIterator = yyVector.begin() ;
 	yyIterator != yyVector.end() ; ++yyIterator )
 	{
-	// Obtain a pointer to the server in question for convenience
-	// and readability
-	iServer* removeMe = findServer( *yyIterator ) ;
+	// Remove the server, its clients, any empty channels,
+	// and post events for all of the above.
+	iServer* removeMe = removeServer( *yyIterator, true ) ;
 	assert( removeMe != 0 ) ;
 
 	// Generate some debugging information
@@ -632,24 +631,20 @@ for( yyVectorType::const_iterator yyIterator = yyVector.begin() ;
 //		<< *removeMe
 //		<< endl ;
 
-	// Remove the server, its clients, any empty channels,
-	// and post events for all of the above.
-	iServer* tmpServer = removeServer( removeMe->getIntYY(), true ) ;
-
 	// Dont post an event for the actual server that is being
 	// squit, let the msg_SQ handle that.
-	if( (intYY != tmpServer->getIntYY()) && (tmpServer != 0) )
+	if( intYY != removeMe->getIntYY() )
 		{
 		string Reason = "Uplink Squit";
 	
-		theServer->PostEvent(EVT_NETBREAK,
-			  static_cast<void *>(tmpServer),
-			  static_cast<void*>(findServer(intYY)),
-			  static_cast<void*>(&Reason));
+		theServer->PostEvent( EVT_NETBREAK,
+			  static_cast<void *>( removeMe ),
+			  static_cast<void*>( findServer( intYY ) ),
+			  static_cast<void*>( &Reason ) );
 		}
 	
-	delete tmpServer;		  
-	}
+	delete removeMe ;
+	} // for()
 }
 
 /**
