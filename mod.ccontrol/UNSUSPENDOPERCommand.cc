@@ -5,7 +5,7 @@
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 
-const char UNSUSPENDOPERCommand_cc_rcsId[] = "$Id $";
+const char UNSUSPENDOPERCommand_cc_rcsId[] = "$Id: UNSUSPENDOPERCommand.cc,v 1.3 2001/02/23 20:19:43 mrbean_ Exp $";
 
 namespace gnuworld
 {

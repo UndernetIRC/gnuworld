@@ -6,7 +6,7 @@
 #include	"StringTokenizer.h"
 #include	"md5hash.h" 
 
-const char LOGINCommand_cc_rcsId[] = "$Id $";
+const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.3 2001/02/23 20:19:43 mrbean_ Exp $";
 
 namespace gnuworld
 {

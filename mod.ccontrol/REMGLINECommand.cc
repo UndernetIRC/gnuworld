@@ -5,7 +5,7 @@
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 
-const char REMGLINECommand_cc_rcsId[] = "$Id $";
+const char REMGLINECommand_cc_rcsId[] = "$Id: REMGLINECommand.cc,v 1.3 2001/02/23 20:19:43 mrbean_ Exp $";
 
 namespace gnuworld
 {

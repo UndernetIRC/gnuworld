@@ -1,4 +1,4 @@
--- "$Id $"
+-- "$Id: ccontrol.sql,v 1.3 2001/02/23 20:19:43 mrbean_ Exp $"
 -- 2001-13-02  : |MrBean|
 -- Added level patch for ccontrol module
 

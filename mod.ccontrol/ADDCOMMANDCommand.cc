@@ -6,7 +6,7 @@
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 
-const char ADDCOMMANDCommand_cc_rcsId[] = "$Id $";
+const char ADDCOMMANDCommand_cc_rcsId[] = "$Id: ADDCOMMANDCommand.cc,v 1.3 2001/02/23 20:19:43 mrbean_ Exp $";
 
 namespace gnuworld
 {

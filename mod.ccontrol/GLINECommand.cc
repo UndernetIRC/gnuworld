@@ -12,7 +12,7 @@
 #include	"ELog.h"
 #include	"Gline.h"
 
-const char GLINECommand_cc_rcsId[] = "$Id $";
+const char GLINECommand_cc_rcsId[] = "$Id: GLINECommand.cc,v 1.3 2001/02/23 20:19:43 mrbean_ Exp $";
 
 namespace gnuworld
 {

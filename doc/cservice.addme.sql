@@ -1,4 +1,4 @@
--- "$Id $"
+-- "$Id: cservice.addme.sql,v 1.3 2001/02/23 20:19:43 mrbean_ Exp $"
 -- 2001-02-23 : |MrBean|
 -- This script will reigster the admin channel * 
 -- And will create an admin by the name of Admin  

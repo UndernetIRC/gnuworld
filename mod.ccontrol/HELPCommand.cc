@@ -7,7 +7,7 @@
 #include	"StringTokenizer.h"
 
 
-const char HELPCommand_cc_rcsId[] = "$Id $";
+const char HELPCommand_cc_rcsId[] = "$Id: HELPCommand.cc,v 1.3 2001/02/23 20:19:43 mrbean_ Exp $";
 
 namespace gnuworld
 {
