@@ -1,11 +1,12 @@
 #ifndef DRONESCAN_H
-#define DRONESCAN_H "$Id: dronescan.h,v 1.1 2003/05/02 11:54:54 jeekay Exp $"
+#define DRONESCAN_H "$Id: dronescan.h,v 1.2 2003/05/04 12:41:14 jeekay Exp $"
 
 #include <map>
 
 #include "client.h"
 
 #include "clientData.h"
+#include "Timer.h"
 
 namespace gnuworld {
 
@@ -14,9 +15,15 @@ class EConfig;
 namespace ds {
 
 enum DS_STATE {
-	LEARN,
-	START,
+	BURST,
 	RUN
+};
+
+enum LOG_TYPE {
+	DEBUG,
+	INFO,
+	WARN,
+	ERROR
 };
 
 class dronescan : public xClient {
@@ -40,6 +47,10 @@ public:
 	/** Receive network events. */
 	virtual int OnEvent( const eventType&, void*, void*, void*, void* ) ;
 	
+	/** Receive channel events. */
+	virtual int OnChannelEvent( const channelEventType&, Channel*,
+		void*, void*, void*, void* ) ;
+	
 	/** Receive private messages. */
 	virtual int OnPrivateMessage( iClient*, const string&, bool ) ;
 	
@@ -54,7 +65,20 @@ public:
 	/** This function handles new clients as they connect. */
 	void handleNewClient( iClient* ) ;
 	
-	/** Calculate the entropy of a given string */
+	/** Calculate global entropy and store it. */
+	void calculateEntropy() ;
+	
+	/** Set states on global nicks. */
+	void setNickStates() ;
+	
+	/** Convenience function to reset states and check channels. */
+	inline void resetAndCheck()
+		{ setConsoleTopic(); setNickStates(); checkChannels(); }
+	
+	/** Check global channels for drones. */
+	void checkChannels() ;
+	
+	/** Calculate the entropy of a given string. */
 	double calculateEntropy( const string& ) ;
 	
 	/** Check if a channel is normal. */
@@ -66,6 +90,16 @@ public:
 	
 	/** Set a clientData's state depending on the iClient. */
 	CLIENT_STATE setClientState( iClient* );
+	
+	/** Log a message. */
+	void log(LOG_TYPE, char*, ...) ;
+	
+	/** Set the topic of the console channel. */
+	void setConsoleTopic() ;
+	
+	/** Reply to a given iClient. */
+	void Reply(iClient*, char*, ...);
+	
 	 
 protected:
 	/** Configuration file. */
@@ -93,6 +127,9 @@ protected:
 	
 	/** Stats. */
 	unsigned int customDataCounter;
+	
+	/** Internally used timer. */
+	Timer *theTimer;
 }; // class dronescan
 
 } // namespace ds
