@@ -8,4 +8,4 @@ libgnuworld_la_SOURCES = Buffer.cc \
 	Socket.cc \
 	StringTokenizer.cc \
 	misc.cc
-libgnuworld_la_LDFLAGS = -version-info 0:0:0 -rpath $(bindir)
+libgnuworld_la_LDFLAGS = -version-info 0:0:0 -rpath $(bindir) -static

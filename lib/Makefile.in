@@ -87,11 +87,12 @@ SRC_PATH = @SRC_PATH@
 UNAME = @UNAME@
 VERSION = @VERSION@
 bindir = @bindir@
+glibdir = @glibdir@
 
 lib_LTLIBRARIES = libgnuworld.la
 libgnuworld_la_SOURCES = Buffer.cc 	ClientSocket.cc 	EConfig.cc 	ELog.cc 	FileSocket.cc 	Socket.cc 	StringTokenizer.cc 	misc.cc
 
-libgnuworld_la_LDFLAGS = -version-info 0:0:0 -rpath $(bindir)
+libgnuworld_la_LDFLAGS = -version-info 0:0:0 -rpath $(bindir) -static
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = ../include/defs.h
 CONFIG_CLEAN_FILES = 
@@ -113,7 +114,7 @@ DIST_COMMON =  Makefile.am Makefile.in
 
 DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
-TAR = tar
+TAR = gtar
 GZIP_ENV = --best
 DEP_FILES =  .deps/Buffer.P .deps/ClientSocket.P .deps/EConfig.P \
 .deps/ELog.P .deps/FileSocket.P .deps/Socket.P .deps/StringTokenizer.P \
@@ -238,7 +239,7 @@ distdir: $(DISTFILES)
 	@for file in $(DISTFILES); do \
 	  d=$(srcdir); \
 	  if test -d $$d/$$file; then \
-	    cp -pr $$/$$file $(distdir)/$$file; \
+	    cp -pr $$d/$$file $(distdir)/$$file; \
 	  else \
 	    test -f $(distdir)/$$file \
 	    || ln $$d/$$file $(distdir)/$$file 2> /dev/null \

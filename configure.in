@@ -1,10 +1,10 @@
-dnl $Id: configure.in,v 1.12 2000/12/16 23:23:21 dan_karrels Exp $
+dnl $Id: configure.in,v 1.13 2000/12/17 19:52:32 dan_karrels Exp $
 dnl ----------------------------------------------------------
 
 echo Configuring GNUWorld...
 echo
 
-AC_REVISION($Revision: 1.12 $)
+AC_REVISION($Revision: 1.13 $)
 AC_INIT(src/main.cc)
 AM_INIT_AUTOMAKE(gnuworld,0.0)
 AM_CONFIG_HEADER(include/defs.h)
@@ -18,10 +18,12 @@ LIBS=""
 
 libdir="`pwd`/bin"
 bindir="`pwd`/bin"
+glibdir="`pwd`/lib"
 LIB_PATH="`pwd`/lib"
 BIN_PATH="`pwd`/bin"
 SRC_PATH="`pwd`/src"
 
+AC_SUBST(glibdir)
 AC_PROG_CC
 AC_PROG_CXX
 AC_PROG_RANLIB

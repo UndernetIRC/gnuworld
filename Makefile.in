@@ -87,6 +87,7 @@ SRC_PATH = @SRC_PATH@
 UNAME = @UNAME@
 VERSION = @VERSION@
 bindir = @bindir@
+glibdir = @glibdir@
 
 SUBDIRS = lib src @MOD_DIRS@
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -101,7 +102,7 @@ ltmain.sh missing mkinstalldirs
 
 DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
-TAR = tar
+TAR = gtar
 GZIP_ENV = --best
 all: all-redirect
 .SUFFIXES:
@@ -283,7 +284,7 @@ distdir: $(DISTFILES)
 	@for file in $(DISTFILES); do \
 	  d=$(srcdir); \
 	  if test -d $$d/$$file; then \
-	    cp -pr $$/$$file $(distdir)/$$file; \
+	    cp -pr $$d/$$file $(distdir)/$$file; \
 	  else \
 	    test -f $(distdir)/$$file \
 	    || ln $$d/$$file $(distdir)/$$file 2> /dev/null \
