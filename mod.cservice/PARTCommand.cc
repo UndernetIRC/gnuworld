@@ -8,7 +8,7 @@
  *
  * Caveats: None
  *
- * $Id: PARTCommand.cc,v 1.11 2001/03/13 22:41:05 gte Exp $
+ * $Id: PARTCommand.cc,v 1.12 2001/03/14 18:17:31 gte Exp $
  */
 
 
@@ -20,7 +20,7 @@
 #include	"responses.h"
 #include	"Network.h"
 
-const char PARTCommand_cc_rcsId[] = "$Id: PARTCommand.cc,v 1.11 2001/03/13 22:41:05 gte Exp $" ;
+const char PARTCommand_cc_rcsId[] = "$Id: PARTCommand.cc,v 1.12 2001/03/14 18:17:31 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -89,7 +89,7 @@ theChan->setInChan(false);
 bot->getUplink()->UnRegisterChannelEvent(theChan->getName(), bot);
 
 /* Forced access. */  
-if (!bot->isForced(theChan, theUser)) 
+if (bot->isForced(theChan, theUser)) 
 	{ 
 	bot->Part(theChan->getName(), "At the request of a CService Administrator"); 
 	bot->writeChannelLog(theChan, theClient, sqlChannel::EV_PART, "[CS-ADMIN]");
