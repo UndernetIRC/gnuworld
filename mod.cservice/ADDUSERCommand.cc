@@ -11,7 +11,7 @@
  *
  * Caveats: None
  *
- * $Id: ADDUSERCommand.cc,v 1.17 2001/03/13 22:39:33 gte Exp $
+ * $Id: ADDUSERCommand.cc,v 1.18 2001/03/24 11:00:11 isomer Exp $
  */
  
 #include	<string>
@@ -24,7 +24,7 @@
 #include	"responses.h"
 #include	"cservice_config.h"
 
-const char ADDUSERCommand_cc_rcsId[] = "$Id: ADDUSERCommand.cc,v 1.17 2001/03/13 22:39:33 gte Exp $" ;
+const char ADDUSERCommand_cc_rcsId[] = "$Id: ADDUSERCommand.cc,v 1.18 2001/03/24 11:00:11 isomer Exp $" ;
 
 namespace gnuworld
 {
@@ -161,9 +161,11 @@ theQuery	<< queryHeader
 		<< targetAccess << ","
 		<< targetFlags << ","
 		<< bot->currentTime() << ","
-		<< "'" << theClient->getNickUserHost() << "',"
+		<< "'(" << theUser->getUserName() << ") " 
+                   << theClient->getNickUserHost() << "',"
 		<< bot->currentTime() << ","
-		<< "'" << theClient->getNickUserHost() << "'," 
+		<< "'(" << theUser->getUserName() << ") "
+                   << theClient->getNickUserHost() << "'," 
 		<< bot->currentTime()
 		<< ");"
 		<< ends; 
