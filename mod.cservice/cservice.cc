@@ -2805,17 +2805,11 @@ switch( whichEvent )
 			doAutoTopic(reggedChan);
 			}
 
-		/* Check noop isn't set */
-		if (reggedChan->getFlag(sqlChannel::F_NOOP))
-			{
-			break;
-			}
-
 		/* Deal with auto-op first - check this users access level. */
 		sqlUser* theUser = isAuthed(theClient, false);
 		if (!theUser)
 			{
-			/* If not authed.. */
+			/* If not authed, bye. */
 			break;
 			}
 
@@ -2833,6 +2827,19 @@ switch( whichEvent )
 			break;
 			}
 
+		/* Auto voice? */
+		if (theLevel->getFlag(sqlLevel::F_AUTOVOICE))
+			{
+			Voice(theChan, theClient);
+			break;
+			}
+
+		/* Check noop isn't set */
+		if (reggedChan->getFlag(sqlChannel::F_NOOP))
+			{
+			break;
+			}
+
 		/* Check strictop isn't on, and this user is < 100 */
 		if (reggedChan->getFlag(sqlChannel::F_STRICTOP))
 			{
@@ -2845,23 +2852,8 @@ switch( whichEvent )
 		/* Next, see if they have auto op set. */
 		if (theLevel->getFlag(sqlLevel::F_AUTOOP))
 			{
-			/* If they are suspended, or somehow have less than 100, don't op them */
-			if (accessLevel)
-				{
-				Op(theChan, theClient);
-				break;
-				}
-			}
-
-		/* Or auto voice? */
-		if (theLevel->getFlag(sqlLevel::F_AUTOVOICE))
-			{
-			/* If they are suspended, or somehow have less than 75, don't voice them */
-			if (accessLevel)
-				{
-				Voice(theChan, theClient);
-				break;
-				}
+			Op(theChan, theClient);
+			break;
 			}
 
 		break;
