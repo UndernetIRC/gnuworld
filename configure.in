@@ -1,10 +1,10 @@
-dnl $Id: configure.in,v 1.50 2002/06/06 23:09:05 dan_karrels Exp $
+dnl $Id: configure.in,v 1.51 2002/06/07 01:22:17 dan_karrels Exp $
 dnl ----------------------------------------------------------
 
 echo Configuring GNUWorld...
 echo
 
-AC_REVISION($Revision: 1.50 $)
+AC_REVISION($Revision: 1.51 $)
 AC_INIT
 AC_CONFIG_SRCDIR([src/main.cc])
 AM_INIT_AUTOMAKE(gnuworld,0.0)
@@ -19,8 +19,6 @@ dnl For some reason, INCLTDL and LIBLTDL aren't set
 dnl properly on OpenBSD
 INCLTDL="-I`pwd`/libltdl"
 LIBLTDL="`pwd`/libltdl/libltdlc.la"
-AC_SUBST(INCLTDL)
-AC_SUBST(LIBLTDL)
 
 AC_ISC_POSIX
 
@@ -32,23 +30,21 @@ AM_PROG_LIBTOOL
 
 CFLAGS="-Wall -pipe"
 CXXFLAGS="-Wall -pipe"
+
 prefix="`pwd`"
 libdir="`pwd`/bin"
 glibdir="`pwd`/lib"
 
-AC_SUBST(glibdir)
 AC_PROG_CC
 AC_PROG_CXX
 AC_PROG_CPP
 AC_LANG([C++])
 
 AC_PROG_MAKE_SET(gmake)
-AC_SUBST(LIBTOOL_DEPS)
 
 dnl Configure libltdl
 AC_CONFIG_SUBDIRS(libltdl)
 
-AC_SUBST(threadLib)
 threadLib=no
 
 dnl AC_CHECK_LIB(lthread, pthread_create, threadLib=-llthread)
@@ -119,67 +115,52 @@ else
   AC_CHECK_TYPE(socklen_t,int)
 fi
 
-useDebug=yes
-AC_ARG_WITH(debug, \
-[  --without-debug          Disable debugging in the executables],
-[useDebug=no]
+AC_ARG_WITH(debug,
+	AC_HELP_STRING([--without-debug],
+		       [Disable debugging in the executables]),
+	[dummy=true],
+	[CXXFLAGS="$CXXFLAGS -g"]
 )
 
-if test $useDebug = yes ; then
-	CXXFLAGS="$CXXFLAGS -g"
-fi
-
-usePedantic=no
-AC_ARG_WITH(pedantic, \
-[  --with-pedantic	    Add -pedantic to compile options],
-[usePedantic=yes]
-}
-
-if test $usePedantic = yes ; then
-	CXXFLAGS="$CXXFLAGS -pedantic"
-fi
-
-useOptimization=no
-AC_ARG_WITH(optimization, \
-[  --with-optimization      Optimize the executables],
-[useOptimization=yes]
+AC_ARG_WITH(pedantic,
+	AC_HELP_STRING([--with-pedantic],
+			[Add -pedantic to compile options])
+	[CXXFLAGS="$CXXFLAGS -pedantic"]
 )
 
-if test $useOptimization = yes ; then
-	CXXFLAGS="$CXXFLAGS -O"
-else
-	CXXFLAGS="$CXXFLAGS -O0"
-fi
-
-useProf=no
-AC_ARG_WITH(prof, \
-[  --with-prof		    Generate profiling information],
-[useProf=yes]
+AC_ARG_WITH(optimization,
+	AC_HELP_STRING([--with-optimization],
+			[Optimize the executables])
+	[CXXFLAGS="$CXXFLAGS -O"],
+	[CXXFLAGS="$CXXFLAGS -O0"]
 )
 
-if test $useProf = yes ; then
-	CXXFLAGS="$CXXFLAGS -pg"
-fi
+AC_ARG_WITH(prof,
+	AC_HELP_STRING([--with-prof],
+			[Generate profiling information])
+	[CXXFLAGS="$CXXFLAGS -pg"]
+)
 
 PGSQL_PREFIX=/usr/local/pgsql
 
-AC_ARG_WITH(pgsql, \
-[  --with-pgsql=PGSQLDIR   Specify location to find pgsql
-                          Default path is \"/usr/local/pgsql\"],
-[PGSQL_PREFIX=$withval]
+AC_ARG_WITH(pgsql,
+	AC_HELP_STRING([--with-pgsql=PGSQLDIR],
+			[Specify location to find pgsql, default is \
+\"/usr/local/pgsql\"])
+	[PGSQL_PREFIX=$withval]
 )
 
 AC_MSG_CHECKING(for libpq++.h)
-if test -f "$PGSQL_PREFIX/include/libpq++.h"; then
-	PGSQL_INCLUDE="/usr/local/pgsql/include"
-	PGSQL_LIB="/usr/local/pgsql/lib"
-elif test -f "/usr/local/include/libpq++.h"; then
+if [test -f "$PGSQL_PREFIX/include/libpq++.h"]; then
+	PGSQL_INCLUDE="$PGSQL_PREFIX/include"
+	PGSQL_LIB="$PGSQL_PREFIX/lib"
+elif [test -f "/usr/local/include/libpq++.h"]; then
 	PGSQL_INCLUDE=/usr/local/include
 	PGSQL_LIB=/usr/local/lib
-elif test -f "/usr/include/postgresql/libpq++.h"; then
+elif [test -f "/usr/include/postgresql/libpq++.h"]; then
 	PGSQL_INCLUDE=/usr/include/postgresql
 	PGSQL_LIB=/usr/lib/pgsql
-elif test -f "/usr/include/pgsql/libpq++.h"; then
+elif [test -f "/usr/include/pgsql/libpq++.h"]; then
 	PGSQL_INCLUDE=/usr/include/pgsql
 	PGSQL_LIB=/usr/lib/pgsql
 else
@@ -187,25 +168,19 @@ else
 fi
 AC_MSG_RESULT(yes)
 
-AC_SUBST(PGSQL_INCLUDE)
-AC_SUBST(PGSQL_LIB)
-
 dnl echo "PGSQL_PREFIX: $PGSQL_PREFIX"
 dnl echo "PGSQL_INCLUDE: $PGSQL_INCLUDE"
 dnl echo "PGSQL_LIB: $PGSQL_LIB"
 dnl exit
 
-AC_SUBST(LDFLAGS)
-AC_SUBST(bindir)
-
 CXXFLAGS="$CXXFLAGS -I`pwd`/include -I`pwd`/lib"
 
 hashMapFile=
 
-if test -f "/usr/include/g++/ext/hash_map" ; then
+if [test -f "/usr/include/g++/ext/hash_map"]; then
 	hashMapFile="/usr/include/g++/ext/hash_map"
 	AC_DEFINE(GNU_EXTENSIONS)
-elif test -f "/usr/local/include/g++/ext/hash_map"; then
+elif [test -f "/usr/local/include/g++/ext/hash_map"]; then
 	hashMapFile="usr/local/include/g++/ext/hash_map";
 	AC_DEFINE(GNU_EXTENSIONS)
 fi
@@ -216,12 +191,12 @@ dnl echo gccVersion: $gccVersion
 gccMajor=`echo $gccVersion | \cut -d"." -f1`
 dnl echo gccMajor: $gccMajor
 
-if test "$gccMajor" = "3"; then
+if [test "$gccMajor" = "3"]; then
 	# 3.0.x have ext/hash_map, but std namespace
 	gccMid=`echo $gccVersion | \cut -d"." -f2`
 dnl	echo gccMid: $gccMid
 
-	if test "$gccMid" = "0"; then
+	if [test "$gccMid" = "0"]; then
 		AC_DEFINE(HASHMAPNS, std)
 	else
 		# 3.1 or above
@@ -230,11 +205,6 @@ dnl	echo gccMid: $gccMid
 else
 	AC_DEFINE(HASHMAPNS, std)
 fi
-
-AC_SUBST(CXXFLAGS)
-AC_SUBST(LIB_PATH)
-AC_SUBST(BIN_PATH)
-AC_SUBST(SRC_PATH)
 
 echo
 echo "Detecting modules..."
@@ -250,9 +220,9 @@ AC_ARG_ENABLE(modules, \
                           to build server only],
 [
 dnl echo "enableval: $enableval"
-if test $enableval = "yes" ; then
+if [test $enableval = "yes"]; then
 	searchForMods=yes
-elif test $enableval = "no" ; then
+elif [test $enableval = "no"]; then
 	searchForMods=no
 else
 	tmp="mod.$enableval"
@@ -269,7 +239,7 @@ searchForMods=yes
 ]) dnl AC_ARG_ENABLE
 
 dnl echo "searchForMods: $searchForMods"
-if test $searchForMods = yes ; then
+if [test $searchForMods = yes]; then
 	mod_list=`\ls | \grep "mod."`
 dnl	echo "mod_list: $mod_list"
 
@@ -289,6 +259,15 @@ fi
 dnl echo "MOD_DIRS = $MOD_DIRS"
 AC_SUBST(MOD_DIRS)
 
+AC_SUBST(CXXFLAGS)
+AC_SUBST(INCLTDL)
+AC_SUBST(LIBLTDL)
+AC_SUBST(glibdir)
+AC_SUBST(LIBTOOL_DEPS)
+AC_SUBST(PGSQL_INCLUDE)
+AC_SUBST(PGSQL_LIB)
+AC_SUBST(bindir)
+
 AC_CONFIG_FILES([Makefile db/Makefile lib/Makefile src/Makefile \
 mod.ccontrol/Makefile \
 mod.clientExample/Makefile \
@@ -296,6 +275,7 @@ mod.cloner/Makefile \
 mod.cservice/Makefile \
 mod.gnutest/Makefile \
 mod.stats/Makefile])
+
 AC_OUTPUT
 
 echo
