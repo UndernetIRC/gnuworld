@@ -8,7 +8,7 @@
  *
  * Caveats: None
  *
- * $Id: OPERPARTCommand.cc,v 1.8 2001/03/07 15:10:53 dan_karrels Exp $
+ * $Id: OPERPARTCommand.cc,v 1.9 2001/05/11 16:39:13 gte Exp $
  */
 
 
@@ -21,7 +21,7 @@
 #include	"responses.h"
 #include	"Network.h"
 
-const char OPERPARTCommand_cc_rcsId[] = "$Id: OPERPARTCommand.cc,v 1.8 2001/03/07 15:10:53 dan_karrels Exp $" ;
+const char OPERPARTCommand_cc_rcsId[] = "$Id: OPERPARTCommand.cc,v 1.9 2001/05/11 16:39:13 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -96,6 +96,7 @@ bot->logAdminMessage("%s is asking me to leave channel %s",
 
 theChan->setInChan(false);
 bot->getUplink()->UnRegisterChannelEvent(theChan->getName(), bot);
+bot->joinCount--;
 	
 bot->Part(theChan->getName(), "At the request of an IRC Operator");
 	

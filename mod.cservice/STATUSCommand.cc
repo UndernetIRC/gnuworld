@@ -10,7 +10,7 @@
 #include	"Network.h"
 #include	"cservice_config.h"
  
-const char STATUSCommand_cc_rcsId[] = "$Id: STATUSCommand.cc,v 1.26 2001/03/13 22:39:33 gte Exp $" ;
+const char STATUSCommand_cc_rcsId[] = "$Id: STATUSCommand.cc,v 1.27 2001/05/11 16:39:13 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -117,32 +117,27 @@ if (st[1] == "*")
 		bot->banCacheHits,
 		banEf);
 
-	bot->Notice(theClient, 
-		bot->getResponse(theUser,
-			language::status_last_chan_not,
-			string("Last recieved Channel NOTIFY: %i")).c_str(),
-			bot->lastChannelRefresh);
-	bot->Notice(theClient, 
-		bot->getResponse(theUser,
-			language::status_last_user_not,
-			string("Last recieved User NOTIFY: %i")).c_str(),
-			bot->lastUserRefresh);
-	bot->Notice(theClient, 
-		bot->getResponse(theUser,
-			language::status_last_lvl_not,
-			string("Last recieved Level NOTIFY: %i")).c_str(),
-			bot->lastLevelRefresh);
-	bot->Notice(theClient, 
-		bot->getResponse(theUser,
-			language::status_last_ban_not,
-			string("Last recieved Ban NOTIFY: %i")).c_str(),
-			bot->lastBanRefresh);
+	bot->Notice(theClient,"Last recieved Channel NOTIFY: %s",
+			bot->prettyDuration(bot->lastChannelRefresh).c_str());
+
+	bot->Notice(theClient, "Last recieved User NOTIFY: %s",
+			bot->prettyDuration(bot->lastUserRefresh).c_str());
+
+	bot->Notice(theClient, "Last recieved Level NOTIFY: %s",
+			bot->prettyDuration(bot->lastLevelRefresh).c_str());
+
+	bot->Notice(theClient, "Last recieved Ban NOTIFY: %s",
+			bot->prettyDuration(bot->lastBanRefresh).c_str());
 
 	bot->Notice(theClient, 
 		bot->getResponse(theUser,
 			language::status_data_alloc,
 			string("Custom data containers allocated: %i")).c_str(),
 			bot->customDataAlloc);
+
+	float joinTotal = ((float)bot->joinCount / (float)Network->channelList_size()) * 100;
+	bot->Notice(theClient, "I am in %i channels out of %i on the network. (%.2f%%)", 
+		bot->joinCount, Network->channelList_size(), joinTotal);
 
 	bot->Notice(theClient, 
 		bot->getResponse(theUser,

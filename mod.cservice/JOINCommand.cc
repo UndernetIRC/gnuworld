@@ -8,7 +8,7 @@
  *
  * Caveats: None
  *
- * $Id: JOINCommand.cc,v 1.10 2001/03/07 15:10:53 dan_karrels Exp $
+ * $Id: JOINCommand.cc,v 1.11 2001/05/11 16:39:13 gte Exp $
  */
 
 
@@ -21,7 +21,7 @@
 #include	"responses.h"
 #include	"Network.h"
 
-const char JOINCommand_cc_rcsId[] = "$Id: JOINCommand.cc,v 1.10 2001/03/07 15:10:53 dan_karrels Exp $" ;
+const char JOINCommand_cc_rcsId[] = "$Id: JOINCommand.cc,v 1.11 2001/05/11 16:39:13 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -89,6 +89,7 @@ bot->Join(theChan->getName(),
 	theChan->getChannelMode(),
 	theChan->getChannelTS(),
 	false);
+bot->joinCount++;
 
 /* Whack this reop on the Q */ 
 bot->reopQ.insert(cservice::reopQType::value_type(theChan->getName(),

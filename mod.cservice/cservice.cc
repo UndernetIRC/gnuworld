@@ -256,6 +256,7 @@ levelCacheHits = 0;
 banHits = 0;
 banCacheHits = 0; 
 dbErrors = 0;
+joinCount = 0;
 
 // Load our translation tables.
 loadTranslationTable(); 
@@ -324,6 +325,7 @@ if( PGRES_TUPLES_OK == status )
 			MyUplink->RegisterChannelEvent( newChan->getName(),
 				this ) ;
 			newChan->setInChan(true);
+			joinCount++;
 
 			/* If neccessary, set the auto topic. */
 			if (newChan->getFlag(sqlChannel::F_AUTOTOPIC))

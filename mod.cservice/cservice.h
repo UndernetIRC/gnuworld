@@ -1,5 +1,5 @@
 #ifndef __CSERVICE_H
-#define __CSERVICE_H "$Id: cservice.h,v 1.64 2001/04/28 20:40:27 gte Exp $"
+#define __CSERVICE_H "$Id: cservice.h,v 1.65 2001/05/11 16:39:13 gte Exp $"
 
 #include	<string>
 #include	<vector>
@@ -185,8 +185,7 @@ public:
 
 	vector<sqlBan*>* getBanRecords(sqlChannel* theChan);
 
- 	/* Silence List */
-//	typedef vector < pair < time_t, string > > silenceListType ;
+ 	/* Silence List */ 
 	typedef map < string, pair < time_t, string > > silenceListType;
 	silenceListType silenceList;
 
@@ -218,6 +217,7 @@ public:
 	unsigned int banHits;
 	unsigned int banCacheHits; 
 	unsigned int dbErrors;
+	unsigned int joinCount;
 
 	/* No of seconds offset our local time is from server time. */
 	int dbTimeOffset;
