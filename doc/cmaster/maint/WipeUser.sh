@@ -1,7 +1,7 @@
 #!/bin/bash
 # You can change the above to the good path to your "bash" binary if needed
 #
-# $Id: WipeUser.sh,v 1.3 2002/07/20 05:59:59 nighty Exp $
+# $Id: WipeUser.sh,v 1.4 2002/07/20 06:04:40 nighty Exp $
 #
 
 # some default script values
@@ -92,7 +92,7 @@ echo "*                                                                     *"
 echo "* Warning: This program stops on any input error.                     *"
 echo "*                                                                     *"
 echo "***********************************************************************"
-echo "\$Id: WipeUser.sh,v 1.3 2002/07/20 05:59:59 nighty Exp $"
+echo "\$Id: WipeUser.sh,v 1.4 2002/07/20 06:04:40 nighty Exp $"
 echo "***********************************************************************"
 echo "* Released under the GNU Public License                               *"
 echo "***********************************************************************"
@@ -189,8 +189,8 @@ echo "--> 	$CNT09	pending verif q/a reset entries"
 echo "--> 	$CNT10	ACL entry"
 echo "--> 	$CNT11	pending manager changes (user is old manager, channel will be PURGED)"
 echo "--> 	$CNT12	pending manager changes (user is temp manager, channel will be PURGED)"
-echo "-->	$CNT13  mailq entries"
-echo "-->	$CNT14  notes sent/received"
+echo "-->	$CNT13	mailq entries"
+echo "-->	$CNT14	notes sent/received"
 echo "-->	1	user entry"
 echo "-->"
 echo -n "<-- Are you sure you want to totally and definetively remove those entries from your databse [y/N] ? [N] "
