@@ -37,7 +37,7 @@
 #include	"ip.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.113 2002/01/03 19:26:30 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.114 2002/01/05 14:02:59 isomer Exp $" ;
 
 namespace gnuworld
 {
@@ -1499,7 +1499,7 @@ if( PGRES_TUPLES_OK != status )
 Notice(theClient,"Host list for %s",User->getUserName().c_str());
 for (int i = 0 ; i < SQLDb->Tuples(); i++)
 	{
-	Notice(theClient,SQLDb->GetValue(i, 0));
+	Notice(theClient,"%s",SQLDb->GetValue(i, 0));
 	}
 return true;
 }	
@@ -1606,7 +1606,7 @@ for( int i = 0 ; i < SQLDb->Tuples() ; i++ )
 		SQLDb->GetValue( i, 1 ),
 		"$BOT$",
 		nickName ) ;
-	Notice(theClient,commInfo);
+	Notice(theClient,"%s",commInfo);
 	} // for()
 }
 	

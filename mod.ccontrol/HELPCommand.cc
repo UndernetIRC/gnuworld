@@ -14,7 +14,7 @@
 #include	"StringTokenizer.h"
 
 
-const char HELPCommand_cc_rcsId[] = "$Id: HELPCommand.cc,v 1.14 2002/01/03 19:26:30 mrbean_ Exp $";
+const char HELPCommand_cc_rcsId[] = "$Id: HELPCommand.cc,v 1.15 2002/01/05 14:02:59 isomer Exp $";
 
 namespace gnuworld
 {
@@ -42,7 +42,7 @@ if(!tmpAuth)
 string banner = "--- Help Menu for " ;
 banner += bot->getNickName() + " --- (Showing commands which are available for you)" ;
 
-bot->Notice( theClient, banner ) ;
+bot->Notice( theClient, "%s", banner ) ;
 
 int ComLevel;
 // Check if the user didnt supply a command 
@@ -62,14 +62,14 @@ if( 1 == st.size() )
 			++Num;
 			if(Show.size() > 80)
 				{
-				bot->Notice( theClient, Show) ;
+				bot->Notice( theClient, "%s", Show) ;
 				Num = 0;
 				Show.assign("");
 				}
 			}
 		}
 	if(!Show.empty())
-		bot->Notice( theClient, Show) ;
+		bot->Notice( theClient, "%s", Show) ;
 	bot->Notice(theClient,"End of command list");
 	}
 else //Supplied a command, show only the help for that command (if it exists)

@@ -13,7 +13,7 @@
 #include	"StringTokenizer.h"
 #include	"ccServer.h"
 
-const char CHECKNETCommand_cc_rcsId[] = "$Id: CHECKNETCommand.cc,v 1.7 2001/12/30 00:06:10 mrbean_ Exp $";
+const char CHECKNETCommand_cc_rcsId[] = "$Id: CHECKNETCommand.cc,v 1.8 2002/01/05 14:02:59 isomer Exp $";
 
 namespace gnuworld
 {
@@ -65,7 +65,7 @@ for (ccontrol::serversConstIterator ptr = bot->serversMap_begin() ;
 			}
 		else
 			Msg += " unknown ";
-		bot->Notice(theClient,Msg);
+		bot->Notice(theClient,"%s",Msg);
 		TServers++;
 		}
 	}
