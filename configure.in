@@ -1,10 +1,10 @@
-dnl $Id: configure.in,v 1.14 2000/12/19 21:56:17 dan_karrels Exp $
+dnl $Id: configure.in,v 1.15 2000/12/20 23:19:53 dan_karrels Exp $
 dnl ----------------------------------------------------------
 
 echo Configuring GNUWorld...
 echo
 
-AC_REVISION($Revision: 1.14 $)
+AC_REVISION($Revision: 1.15 $)
 AC_INIT(src/main.cc)
 AM_INIT_AUTOMAKE(gnuworld,0.0)
 AM_CONFIG_HEADER(include/defs.h)
@@ -412,43 +412,68 @@ echo
 echo "Detecting modules..."
 echo
 
-dnl makefiles=""
-dnl mod_list=`\ls | \grep "mod."`
-dnl MOD_DIRS=""
+MOD_DIRS=""
+searchForMods=yes
 
-dnl echo "mod_list: $mod_list"
+AC_ARG_ENABLE(modules, \
+[  --enable-modules=[mods] Enable one or more modules; all modules
+                          found in the current directory are on
+                          default],
+[
+dnl echo "enableval: $enableval"
+if test $enableval = "yes" ; then
+	searchForMods=yes
+elif test $enableval = "no" ; then
+	searchForMods=yes
+else
+	tmp="mod.$enableval"
+dnl 	echo "tmp: $tmp"
+	tmp=`echo $tmp | sed 's/,/ mod./g'`
+dnl	echo "tmp: $tmp"
+	MOD_DIRS="$MOD_DIRS $tmp"
+	searchForMods=no
+fi
+],
+[
+dnl echo "running later"
+searchForMods=yes
+]) dnl AC_ARG_ENABLE
 
-dnl for file in $mod_list; do
-dnl	if [ ! test -d $file ]; then
-dnl		echo "$file is not a directory!"
-dnl		continue
-dnl	fi
+dnl echo "searchForMods: $searchForMods"
+if test $searchForMods = yes ; then
+	mod_list=`\ls | \grep "mod."`
+dnl	echo "mod_list: $mod_list"
 
-dnl	if [ test -f $file/configure ]; then
-dnl		echo "Found configure in $file"
-dnl		cd $file
-dnl		./configure
-dnl		cd ..
-dnl		MOD_DIRS="$MOD_DIRS $file"
-dnl	elif [ test -f $file/Makefile.in ]; then
-dnl		echo Adding module `echo $file | \cut -f2 -d"."`
-dnl		makefiles="$makefiles $file/Makefile"
-dnl		MOD_DIRS="$MOD_DIRS $file"
-dnl	fi
-dnl done
+	for file in $mod_list; do
+		if [ ! test -d $file ]; then
+			echo "$file is not a directory!"
+			continue
+		fi
 
-echo
+		if [ test -f $file/configure ]; then
+			echo "Found configure in $file"
+			cd $file
+			./configure
+			cd ..
+			MOD_DIRS="$MOD_DIRS $file"
+		elif [ test -f $file/Makefile.in ]; then
+			echo Adding module `echo $file | \cut -f2 -d"."`
+			makefiles="$makefiles $file/Makefile"
+			MOD_DIRS="$MOD_DIRS $file"
+		fi
+	 done
+fi
 
-MOD_DIRS="mod.gnutest mod.cservice mod.stats mod.clientExample"
-MOD_DIRS="$MOD_DIRS mod.ccontrol mod.cloner"
-
+dnl echo "MOD_DIRS = $MOD_DIRS"
 AC_SUBST(MOD_DIRS)
 
-dnl Create the standard Makefiles
-AC_OUTPUT(Makefile lib/Makefile src/Makefile \
-mod.gnutest/Makefile mod.cservice/Makefile \
-mod.stats/Makefile mod.clientExample/Makefile \
-mod.ccontrol/Makefile mod.cloner/Makefile)
+AC_OUTPUT(lib/Makefile src/Makefile \
+mod.ccontrol/Makefile \
+mod.clientExample/Makefile \
+mod.cloner/Makefile \
+mod.cservice/Makefile \
+mod.gnutest/Makefile \
+mod.stats/Makefile)
 
 echo
 echo Configuration has been finished, and everything seems to be allright
