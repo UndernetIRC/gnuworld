@@ -13,7 +13,7 @@
  *
  * Command is aliased "INFO".
  *
- * $Id: CHANINFOCommand.cc,v 1.40 2002/03/04 22:53:50 gte Exp $
+ * $Id: CHANINFOCommand.cc,v 1.41 2002/03/13 22:21:43 gte Exp $
  */
 
 #include	<string>
@@ -26,7 +26,7 @@
 #include	"libpq++.h"
 #include	"cservice_config.h"
 
-const char CHANINFOCommand_cc_rcsId[] = "$Id: CHANINFOCommand.cc,v 1.40 2002/03/04 22:53:50 gte Exp $" ;
+const char CHANINFOCommand_cc_rcsId[] = "$Id: CHANINFOCommand.cc,v 1.41 2002/03/13 22:21:43 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -372,7 +372,12 @@ if( !theChan->getURL().empty() )
 		theChan->getURL().c_str());
 	}
 
-return true ;
+if (theChan->getFlag(sqlChannel::F_TEMP))
+	{
+	bot->Notice(theClient, "\002This channel has a temporary manager.\002");
+	}
+
+return true;
 }
 
 } // namespace gnuworld.

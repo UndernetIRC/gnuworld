@@ -1,7 +1,7 @@
 /*
  * SUSPENDMECommand.cc
  *
- * $Id: SUSPENDMECommand.cc,v 1.1 2002/02/24 01:04:06 gte Exp $
+ * $Id: SUSPENDMECommand.cc,v 1.2 2002/03/13 22:21:44 gte Exp $
  */
 
 #include	<string>
@@ -14,7 +14,7 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char SUSPENDMECommand_cc_rcsId[] = "$Id: SUSPENDMECommand.cc,v 1.1 2002/02/24 01:04:06 gte Exp $" ;
+const char SUSPENDMECommand_cc_rcsId[] = "$Id: SUSPENDMECommand.cc,v 1.2 2002/03/13 22:21:44 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -23,6 +23,7 @@ using namespace level;
 
 bool SUSPENDMECommand::Exec( iClient* theClient, const string& Message )
 {
+bot->incStat("COMMANDS.SUSPENDME");
 
 StringTokenizer st( Message ) ;
 if( st.size() < 2 )

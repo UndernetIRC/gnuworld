@@ -279,6 +279,7 @@ banCacheHits = 0;
 dbErrors = 0;
 joinCount = 0;
 connectRetries = 0;
+totalCommands = 0;
 
 /* Load our translation tables. */
 loadTranslationTable();
@@ -707,6 +708,7 @@ else
 	setFloodPoints(theClient, getFloodPoints(theClient)
 		+ commHandler->second->getFloodPoints() );
 
+	totalCommands++;
 	commHandler->second->Exec( theClient, Message ) ;
 	}
 
