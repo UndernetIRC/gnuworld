@@ -4,7 +4,7 @@
  */
 
 #ifndef __MISC_H
-#define __MISC_H "$Id: misc.h,v 1.5 2000/08/04 23:39:09 dan_karrels Exp $"
+#define __MISC_H "$Id: misc.h,v 1.6 2000/10/31 00:58:37 dan_karrels Exp $"
 
 #include	<string>
 #include	<hash_map>
@@ -79,13 +79,5 @@ void string_tolower( string& ) ;
  * all numeric characters, return false otherwise.
  */
 bool IsNumeric( const string& ) ;
-
-/**
- * Return a pointer to a const array of space characters.
- */
-const char* Spaces( int ) ;
-
-/// A type used for MD5.	
-typedef int long128[4];
 
 #endif /* __MISC__ */
