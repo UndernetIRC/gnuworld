@@ -54,6 +54,9 @@ currentState = BURST;
 averageEntropy = 0;
 totalNicks = 0;
 
+/* What tests do we enable? */
+enabledTests = atoi(dronescanConfig->Require("enabledTests")->second.c_str());
+
 /*
  * Set up initial margins.
  * These, particularly nickMargin,  will require tweaking to make them work well.
@@ -64,6 +67,13 @@ totalNicks = 0;
 channelMargin = atof(dronescanConfig->Require("channelMargin")->second.c_str());
 nickMargin = atof(dronescanConfig->Require("nickMargin")->second.c_str());
 channelCutoff = atoi(dronescanConfig->Require("channelCutoff")->second.c_str());
+
+if(testEnabled(TST_JOINCOUNT))
+	{
+	/* Set up join counter config options. */
+	jcInterval = atoi(dronescanConfig->Require("jcInterval")->second.c_str());
+	jcCutoff = atoi(dronescanConfig->Require("jcCutoff")->second.c_str());
+	}
 
 /* Initialise statistics */
 customDataCounter = 0;
@@ -84,13 +94,22 @@ theTimer = new Timer();
  */
 void dronescan::ImplementServer( xServer* theServer )
 {
+	/* Register for global network events */
 	theServer->RegisterEvent( EVT_BURST_CMPLT, this );
 	theServer->RegisterEvent( EVT_NETJOIN, this );
 	theServer->RegisterEvent( EVT_NICK, this );
 	theServer->RegisterEvent( EVT_KILL, this );
 	theServer->RegisterEvent( EVT_QUIT, this );
 	
+	/* Register for all channel events */
 	theServer->RegisterChannelEvent( xServer::CHANNEL_ALL, this );
+
+	/* Set up our JC counter if needed */
+	if(testEnabled(TST_JOINCOUNT))
+		{
+		time_t theTime = time(NULL) + jcInterval;
+		tidClearJoinCounter = theServer->RegisterTimer(theTime, this, 0);
+		}
 
 	xClient::ImplementServer( theServer );
 } // dronescan::ImplementServer(xServer*)
@@ -189,6 +208,34 @@ int dronescan::OnChannelEvent( const channelEventType& theEvent,
 	/* For a ChannelEvent, Data1 is always the target iClient */
 	iClient *theClient = static_cast < iClient* > ( Data1 );
 	
+	
+	/*****************************
+	 ** J O I N   C O U N T E R **
+	 *****************************/
+	
+	if(testEnabled(TST_JOINCOUNT))
+		{
+		string chanName = theChannel->getName();
+		jcChanMap[chanName]++;
+		
+		unsigned int joinCount = jcChanMap[chanName];
+		
+		log(DEBUG, "Caught join to %s. Total count now %d.",
+			chanName.c_str(),
+			joinCount
+			);
+		
+		if(joinCount > jcCutoff)
+			{
+			log(WARN, "%s has had %d joins within the last %ds.",
+				chanName.c_str(),
+				joinCount,
+				jcInterval
+				);
+			}
+		}
+	
+	
 	/*
 	 * If the client is normal, we don't care as they cannot cause a
 	 * channel to be marked abnormal. This also prevents spurious warning
@@ -280,6 +327,24 @@ int dronescan::OnPrivateMessage( iClient* theClient, const string& message, bool
 			nickMargin = newNM;
 			resetAndCheck();
 			}
+		}
+	
+	return 0;
+}
+
+
+/** Receive our own timed events. */
+int dronescan::OnTimer( xServer::timerID theTimer , void *)
+{
+	if(theTimer == tidClearJoinCounter)
+		{
+		log(DEBUG, "Clearing %d records from the join counter.",
+			jcChanMap.size()
+			);
+		jcChanMap.clear();
+		
+		time_t theTime = time(0) + jcInterval;
+		tidClearJoinCounter = MyUplink->RegisterTimer(theTime, this, 0);
 		}
 	
 	return 0;
@@ -581,16 +646,28 @@ CLIENT_STATE dronescan::setClientState( iClient *theClient )
 /** Log a message. */
 void dronescan::log(LOG_TYPE logType, char *format, ...)
 {
-	if(logType < INFO) return;
+//	if(logType < INFO) return;
+	
+	stringstream newMessage;
+	
+	switch(logType) {
+		case DEBUG	: newMessage << "[D] ";	break;
+		case INFO	: newMessage << "[I] ";	break;
+		case WARN	: newMessage << "[W] ";	break;
+		case ERROR	: newMessage << "[E] ";	break;
+		default		: newMessage << "[U] ";	break;
+	}
 
-	char buffer[1024] = {0};
+	char buffer[512] = {0};
 	va_list _list;
 	
 	va_start(_list, format);
-	vsnprintf(buffer, 1024, format, _list);
+	vsnprintf(buffer, 512, format, _list);
 	va_end(_list);
 	
-	Message(consoleChannel, buffer);
+	newMessage << buffer;
+	
+	Message(consoleChannel, newMessage.str().c_str());
 }
 
 
@@ -600,10 +677,26 @@ void dronescan::setConsoleTopic()
 	stringstream setTopic;
 	setTopic	<< getCharYYXXX() << " T "
 			<< consoleChannel << " :"
-			<< "channelMargin: " << channelMargin
-			<< "  nickMargin: " << nickMargin
-			<< "  channelCutoff: " << channelCutoff
+			<< "enabledTests: " << enabledTests
 			;
+	
+	if(1)
+		{
+		setTopic	<< "  ||"
+				<< "  channelMargin: " << channelMargin
+				<< "  nickMargin: " << nickMargin
+				<< "  channelCutoff: " << channelCutoff
+				;
+		}
+	
+	if(testEnabled(TST_JOINCOUNT))
+		{
+		setTopic	<< "  ||"
+				<< "  jcInterval: " << jcInterval
+				<< "  jcCutoff: " << jcCutoff
+				;
+		}
+	
 	Write(setTopic);
 }
 

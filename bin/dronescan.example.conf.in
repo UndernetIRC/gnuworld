@@ -13,6 +13,15 @@ userdescription = Drone Scanner
 # What user modes should the bot use?
 mode = +idk
 
+
+# What tests should we perform?
+# This is a simple bitfield. Just add up the numbers of the options
+# you want enabled and enter it here.
+# Note that the entropy tests are always enabled.
+# 1 - Entropy (don't unset)
+# 2 - Join Count (see below)
+enabledTests = 3
+
 # Console channel name and initial modes
 consoleChannel = #ds.console
 consoleChannelModes = +ntsim
@@ -34,3 +43,17 @@ nickMargin = 0.1
 # The channel cutoff is the minimum amount of members a channel must have before
 # it can be considered a drone channel.
 channelCutoff = 10
+
+
+################
+# JOIN COUNTER #
+################
+
+# If you enabled test 2 in enabledTests, you must give these values:
+
+# The interval over which join counter checks for joins. This is in seconds.
+jcInterval = 60
+
+# The trigger level for which join counter warns. Note that the total join
+# count must be OVER this level to trigger.
+jcCutoff = 10

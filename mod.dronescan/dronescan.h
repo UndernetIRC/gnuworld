@@ -1,5 +1,5 @@
 #ifndef DRONESCAN_H
-#define DRONESCAN_H "$Id: dronescan.h,v 1.2 2003/05/04 12:41:14 jeekay Exp $"
+#define DRONESCAN_H "$Id: dronescan.h,v 1.3 2003/05/04 21:01:12 jeekay Exp $"
 
 #include <map>
 
@@ -25,6 +25,9 @@ enum LOG_TYPE {
 	WARN,
 	ERROR
 };
+
+/* The bit field values of the enabled tests */
+#define TST_JOINCOUNT 0x0002
 
 class dronescan : public xClient {
 public:
@@ -53,6 +56,16 @@ public:
 	
 	/** Receive private messages. */
 	virtual int OnPrivateMessage( iClient*, const string&, bool ) ;
+	
+	/** Receive our own timed events. */
+	virtual int OnTimer( xServer::timerID , void* ) ;
+	
+	
+	/*****************************************
+	 ** D R O N E S C A N   T Y P E D E F S **
+	 *****************************************/
+	
+	typedef unsigned short int testEnabledType;
 	
 	
 	/*******************************************
@@ -100,6 +113,10 @@ public:
 	/** Reply to a given iClient. */
 	void Reply(iClient*, char*, ...);
 	
+	/** See if a given test is enabled. */
+	inline bool testEnabled(testEnabledType theTest)
+		{ return ((enabledTests & theTest) != 0); }
+	
 	 
 protected:
 	/** Configuration file. */
@@ -120,16 +137,28 @@ protected:
 	double averageEntropy;
 	unsigned int totalNicks;
 	
+	/** What tests to enable. */
+	testEnabledType enabledTests;
+	
 	/** Margins. */
 	double channelMargin;
 	double nickMargin;
 	unsigned int channelCutoff;
+	
+	/** Join counter config options */
+	unsigned int jcInterval;
+	unsigned int jcCutoff;
+	typedef map< string , unsigned int , noCaseCompare > jcChanMapType;
+	jcChanMapType jcChanMap;
 	
 	/** Stats. */
 	unsigned int customDataCounter;
 	
 	/** Internally used timer. */
 	Timer *theTimer;
+	
+	/** Timers for GNUWorld triggered events. */
+	xServer::timerID tidClearJoinCounter;
 }; // class dronescan
 
 } // namespace ds
