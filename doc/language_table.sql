@@ -193,8 +193,8 @@ COPY "translations" FROM stdin;
 2	5	Je suis incapable de trouver %s	31337	0
 2	6	Je ne vois pas %s sur le canal %s	31337	0
 2	7	Le canal %s ne semble pas être enregistré	31337	0
-2	8	Vous avez été op par %s (%s)	31337	0
-2	9	Vous avez été voice par %s (%s)	31337	0
+2	8	Vous avez été op par %s (%s) sur %s	31337	0
+2	9	Vous avez été voice par %s (%s) sur %s	31337	0
 2	10	%s: Vous n'êtes pas dans ce canal	31337	0
 2	11	%s est déjà op sur %s	31337	0
 2	12	%s est déjà voice sur %s	31337	0
@@ -368,8 +368,8 @@ COPY "translations" FROM stdin;
 3	5	Jeg kan ikke se %s nogen steder	31337	0
 3	6	Jeg kan ikke finde %s på kanalen %s	31337	0
 3	7	Kanelen %s ser ikke ud til at være registreret	31337	0
-3	8	Du er op'et af %s (%s)	31337	0
-3	9	Du er voice'et af %s (%s)	31337	0
+3	8	Du er op'et af %s (%s) i %s	31337	0
+3	9	Du er voice'et af %s (%s) i %s	31337	0
 3	10	%s: Du er ikke i denne kanal	31337	0
 3	11	%s er allerede op'et i %s	31337	0
 3	12	%s er allerede voice'et i %s	31337	0
@@ -543,8 +543,8 @@ COPY "translations" FROM stdin;
 6	5	I don't see %s anywhere	31337	0
 6	6	I can't find %s on channel %s	31337	0
 6	7	The channel %s doesn't appear to be registered	31337	0
-6	8	You're opped by %s (%s)	31337	0
-6	9	You're voiced by %s (%s)	31337	0
+6	8	You're opped by %s (%s) on %s	31337	0
+6	9	You're voiced by %s (%s) on %s	31337	0
 6	10	%s: You are not in that channel	31337	0
 6	11	%s is already opped in %s	31337	0
 6	12	%s is already voiced in %s	31337	0
@@ -719,8 +719,8 @@ COPY "translations" FROM stdin;
 7	5	Non vedo nessun %s	31337	0
 7	6	Non trovo %s nel canale %s	31337	0
 7	7	Il canale %s non risulta essere registrato	31337	0
-7	8	Ti è stato dato l'op da %s (%s)	31337	0
-7	9	Ti è stato dato il voice da %s (%s)	31337	0
+7	8	Ti è stato dato l'op da %s (%s) in %s	31337	0
+7	9	Ti è stato dato il voice da %s (%s) in %s	31337	0
 7	10	%s: Non sei in quel canale	31337	0
 7	11	%s ha già l'op in %s	31337	0
 7	12	%s ha già il voice in %s	31337	0
@@ -890,8 +890,8 @@ COPY "translations" FROM stdin;
 8	5	Nu-l vad pe %s nicaieri	31337	0
 8	6	Nu-l gasesc pe %s pe canalul %s	31337	0
 8	7	Canalul %s nu pare sa fie inregistrat	31337	0
-8	8	Ai primit op de la %s (%s)	31337	0
-8	9	Ai primit voce de la %s (%s)	31337	0
+8	8	Ai primit op de la %s (%s) pe %s	31337	0
+8	9	Ai primit voce de la %s (%s) pe %s	31337	0
 8	10	%s: Nu esti pe canal	31337	0
 8	11	%s are deja op pe %s	31337	0
 8	12	%s are deja voce pe %s	31337	0
@@ -1065,8 +1065,8 @@ COPY "translations" FROM stdin;
 9	5	No veig cap %s enlloc.	31337	0
 9	6	No trobo cap %s al canal %s	31337	0
 9	7	El canal %s no consta com a enregistrat.	31337	0
-9	8	Has rebut op de %s (%s).	31337	0
-9	9	Has rebut veu de %s (%s).	31337	0
+9	8	Has rebut op de %s (%s) a %s.	31337	0
+9	9	Has rebut veu de %s (%s) a %s.	31337	0
 9	10	%s: No ets a aquest canal.	31337	0
 9	11	%s ja té op a %s	31337	0
 9	12	%s ja té veu a %s	31337	0
@@ -1240,8 +1240,8 @@ COPY "translations" FROM stdin;
 10	5	No veo a %s en ningún sitio.	31337	0
 10	6	No encuentro a %s en el canal %s	31337	0
 10	7	El canal %s no consta como registrado.	31337	0
-10	8	Has recibido op de %s (%s)	31337	0
-10	9	Has recibido voz de %s (%s)	31337	0
+10	8	Has recibido op de %s (%s) en %s	31337	0
+10	9	Has recibido voz de %s (%s) en %s	31337	0
 10	10	%s: No estás en ese canal.	31337	0
 10	11	%s ya tiene op en %s	31337	0
 10	12	%s ya tiene voz en %s	31337	0
@@ -1415,8 +1415,8 @@ COPY "translations" FROM stdin;
 11	5	Nem latok %s nevet sehol	31337	0
 11	6	Nem kapok %s nevet a(z) %s csatin	31337	0
 11	7	A(z) %s csatorna nincs meg regisztralva	31337	0
-11	8	%s Operatori jogot adott neked (%s)	31337	0
-11	9	%s beszelesi jogot adott neked (%s)	31337	0
+11	8	%s Operatori jogot adott neked (%s) / %s	31337	0
+11	9	%s beszelesi jogot adott neked (%s) / %s	31337	0
 11	10	%s: Nem tartozkodsz ezen a csatornan	31337	0
 11	11	%s mar jenelneg is Operator a(z) %s csatornan	31337	0
 11	12	%s mar jelenleg is voice-olva van a(z) %s csatornan	31337	0
@@ -1591,8 +1591,8 @@ COPY "translations" FROM stdin;
 12	5	%s hiçbir yerde görünmüyor	31337	0
 12	6	%s rumuzunu %s kanalýnda göremiyorum	31337	0
 12	7	%s kanalý kayýtlý olarak gözükmüyor	31337	0
-12	8	%s size operatörlük yetkisi verdi (%s)	31337	0
-12	9	%s size konuþma yetkisi verdi (%s)	31337	0
+12	8	%s size operatörlük yetkisi verdi (%s) / %s	31337	0
+12	9	%s size konuþma yetkisi verdi (%s) / %s	31337	0
 12	10	%s: Siz kanalda deðilsiniz	31337	0
 12	11	%s zaten %s kanalýnda operatör durumunda	31337	0
 12	12	%s zaten %s kanalýnda konuþma durumunda	31337	0
@@ -1769,8 +1769,8 @@ COPY "translations" FROM stdin;
 13	5	Jeg kan ikke finne %s noen steder	31337	0
 13	6	Jeg kan ikke finne %s på %s 	31337	0
 13	7	Kanalen %s ser ikke ut til å være registrert.	31337	0
-13	8	Du har fått operatør status av %s (%s)	31337	0
-13	9	Du har fått voice status av %s (%s)	31337	0
+13	8	Du har fått operatør status av %s (%s) i %s	31337	0
+13	9	Du har fått voice status av %s (%s) i %s	31337	0
 13	10	%s: Du er ikke i den kanalen	31337	0
 13	11	%s er allerede operatør i %s	31337	0
 13	12	%s har allerede voice i %s	31337	0
@@ -1945,8 +1945,8 @@ COPY "translations" FROM stdin;
 14	5	lam yatamakan li woujoud  %s	31337	0
 14	6	Lam ajid %s fi 9anate %s	31337	0
 14	7	al9anatou %s laysate mousajala	31337	0
-14	8	la9ade asbahta op min tarafe %s (%s)	31337	0
-14	9	la9ade asbahta voice min tarafe %s (%s)	31337	0
+14	8	la9ade asbahta op min tarafe %s (%s) fi %s	31337	0
+14	9	la9ade asbahta voice min tarafe %s (%s) fi %s	31337	0
 14	10	%s: anta lasta dakhila hadihi al9anate	31337	0
 14	11	%s lahou sabi9ane op fi  %s	31337	0
 14	12	%s lahou sabi9ane voice fi %s	31337	0

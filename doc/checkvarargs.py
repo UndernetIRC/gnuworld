@@ -34,7 +34,7 @@ def read_language_table(fname):
 		if line[0][:1] == "\.": continue
 
 		toks = split(line, '\t')
-		if len(toks) < 3: continue
+		if len(toks) < 4: continue
 		if toks[0] == "DELETE": continue
 		if toks[0] == "COPY": continue
 
@@ -44,8 +44,10 @@ def read_language_table(fname):
 			print "* Non-numeric IDs, line: %s" % `toks`
 			continue
 		
-		if toks[len(toks)-1] != "31337":
+		if toks[len(toks)-2] != "31337":
 			print "* Translation ID (%d,%d) doesn't have a '31337' timestamp" % pk
+		if toks[len(toks)-1] != "0":
+			print "* Translation ID (%d,%d) doesn't have a '0' deleted flag" % pk
 		if trans.has_key(pk):
 			print "* Duplicate translation ID (%d,%d) Text: '%s' conflicts with '%s'" % (pk[0], pk[1], toks[2], trans[toks[1]])
 		trans[pk] = toks[2]
