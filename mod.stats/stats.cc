@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: stats.cc,v 1.15 2003/06/08 20:06:43 dan_karrels Exp $
+ * $Id: stats.cc,v 1.16 2003/06/08 20:11:38 dan_karrels Exp $
  */
 
 #include	<string>
@@ -564,7 +564,7 @@ for( eventType whichEvent = 0 ; whichEvent <= EVT_CREATE ; ++whichEvent )
 	ss.width( 15 ) ;
 	ss.setf( ios::left ) ;
 	ss	<< ((double) eventTotal[ whichEvent ] /
-			(double) totalEvents) ;
+			(double) countingTime) ;
 	writeMe += ss.str() ;
 
 	Notice( theClient, "%s", writeMe.c_str() ) ;
