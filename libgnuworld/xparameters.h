@@ -1,4 +1,5 @@
-/* xparameters.h
+/**
+ * xparameters.h
  * This class originally written by Orlando Bassotto.
  *
  * This program is free software; you can redistribute it and/or
@@ -16,11 +17,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: xparameters.h,v 1.2 2003/06/06 20:03:31 dan_karrels Exp $
+ * $Id: xparameters.h,v 1.3 2003/06/17 15:13:53 dan_karrels Exp $
  */
 
 #ifndef __XPARAMETERS_H
-#define __XPARAMETERS_H "$Id: xparameters.h,v 1.2 2003/06/06 20:03:31 dan_karrels Exp $"
+#define __XPARAMETERS_H "$Id: xparameters.h,v 1.3 2003/06/17 15:13:53 dan_karrels Exp $"
 
 #include        <vector>
 #include	<cassert>

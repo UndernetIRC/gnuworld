@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server.cc,v 1.164 2003/06/12 12:02:22 jeekay Exp $
+ * $Id: server.cc,v 1.165 2003/06/17 15:13:54 dan_karrels Exp $
  */
 
 #include	<sys/time.h>
@@ -71,27 +71,7 @@
 #include	"ConnectionHandler.h"
 #include	"Connection.h"
 
-const char server_h_rcsId[] = __SERVER_H ;
-const char server_cc_rcsId[] = "$Id: server.cc,v 1.164 2003/06/12 12:02:22 jeekay Exp $" ;
-const char config_h_rcsId[] = __CONFIG_H ;
-const char misc_h_rcsId[] = __MISC_H ;
-const char events_h_rcsId[] = __EVENTS_H ;
-const char ip_h_rcsId[] = __IP_H ;
-const char Network_h_rcsId[] = __NETWORK_H ;
-const char iServer_h_rcsId[] = __ISERVER_H ;
-const char iClient_h_rcsId[] = __ICLIENT_H ;
-const char EConfig_h_rcsId[] = __ECONFIG_H ;
-const char Gline_h_rcsId[] = __GLINE_H ;
-const char match_h_rcsId[] = __MATCH_H ;
-const char ELog_h_rcsId[] = __ELOG_H ;
-const char StringTokenizer_h_rcsId[] = __STRINGTOKENIZER_H ;
-const char xParameters_h_rcsId[] = __XPARAMETERS_H ;
-const char moduleLoader_h_rcsId[] = __MODULELOADER_H ;
-const char ServerTimerHandler_h_rcsId[] = __SERVERTIMERHANDLERS_H ;
-const char LoadClientTimerHandler_h_rcsId[] = __LOADCLIENTTIMERHANDLER_H ;
-const char UnloadClientTimerHandler_h_rcsId[] = __UNLOADCLIENTTIMERHANDLER_H ;
-const char ConnectionManager_h_rcsId[] = __CONNECTIONMANAGER_H ;
-const char Connection_h_rcsId[] = __CONNECTION_H ;
+RCSTAG( "$Id: server.cc,v 1.165 2003/06/17 15:13:54 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {

@@ -1,6 +1,6 @@
-/* Buffer.cc
+/**
+ * Buffer.cc
  * Author: Daniel Karrels dan@karrels.com
- * History: Mon Jan 25 23:29:47 EST 1999 -- beginning
  * Copyright (C) 2002 Daniel Karrels <dan@karrels.com>    
  * 
  * This program is free software; you can redistribute it and/or
@@ -18,14 +18,14 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *  
+ * $Id: Buffer.cc,v 1.4 2003/06/17 15:13:53 dan_karrels Exp $
  */
 
 #include	<string>
 
 #include	"Buffer.h"
 
-const char Buffer_h_rcsId[] = __BUFFER_H ;
-const char Buffer_cc_rcsId[] = "$Id: Buffer.cc,v 1.3 2002/11/29 20:54:03 dan_karrels Exp $" ;
+const char rcsId[] = "$Id: Buffer.cc,v 1.4 2003/06/17 15:13:53 dan_karrels Exp $" ;
 
 namespace gnuworld
 {

@@ -16,16 +16,17 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_V.cc,v 1.2 2003/06/07 00:26:23 dan_karrels Exp $
+ * $Id: msg_V.cc,v 1.3 2003/06/17 15:13:53 dan_karrels Exp $
  */
 
 #include <sstream>
 
-#include "server.h"
-#include "ServerCommandHandler.h"
-#include "xparameters.h"
+#include	"server.h"
+#include	"ServerCommandHandler.h"
+#include	"xparameters.h"
+#include	"config.h"
 
-const char msg_V_cc_rcsId[] = "$Id: msg_V.cc,v 1.2 2003/06/07 00:26:23 dan_karrels Exp $";
+RCSTAG( "$Id: msg_V.cc,v 1.3 2003/06/17 15:13:53 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -50,18 +51,20 @@ bool msg_V::Execute( const xParameters& Param )
 {
 
 /* We should have exactly two parameters - source and destination */
-if( Param.size() != 2) {
-  elog << "msg_V> Invalid number of parameters received."
-       << endl;
-  return false;
-}
+if( Param.size() != 2)
+	{
+	elog	<< "msg_V> Invalid number of parameters received."
+		<< endl;
+	return false;
+	}
 
 /* The destination numeric should always match us exactly */
-if(strncmp(Param[1], theServer->getCharYY(), 2) != 0) {
-  elog << "msg_V> Target server is not me!"
-       << endl;
-  return false;
-}
+if(strncmp(Param[1], theServer->getCharYY(), 2) != 0)
+	{
+	elog	<< "msg_V> Target server is not me!"
+		<< endl;
+	return false;
+	}
 
 /* 
  * Should we check if the client exists here?
@@ -78,7 +81,6 @@ if(strncmp(Param[1], theServer->getCharYY(), 2) != 0) {
  * AyAAA - Target (requester)
  * 'the rest' - Reply.
  */
-
 stringstream versionReply;
 versionReply << theServer->getCharYY()
              << " 351 "

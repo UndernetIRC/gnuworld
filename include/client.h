@@ -18,10 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
+ * $Id: client.h,v 1.41 2003/06/17 15:13:52 dan_karrels Exp $
  */
 
 #ifndef __CLIENT_H
-#define __CLIENT_H "$Id: client.h,v 1.40 2003/06/07 00:26:23 dan_karrels Exp $"
+#define __CLIENT_H "$Id: client.h,v 1.41 2003/06/17 15:13:52 dan_karrels Exp $"
 
 #include	<sstream>
 #include	<string>

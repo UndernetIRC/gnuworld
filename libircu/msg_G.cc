@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_G.cc,v 1.2 2003/06/07 00:26:23 dan_karrels Exp $
+ * $Id: msg_G.cc,v 1.3 2003/06/17 15:13:53 dan_karrels Exp $
  */
 
 #include	<sys/time.h>
@@ -35,11 +35,9 @@
 #include	"ELog.h"
 #include	"ServerCommandHandler.h"
 #include	"StringTokenizer.h"
+#include	"config.h"
 
-const char server_h_rcsId[] = __SERVER_H ;
-const char xparameters_h_rcsId[] = __XPARAMETERS_H ;
-const char ELog_h_rcsId[] = __ELOG_H ;
-const char msg_G_cc_rcsId[] = "$Id:" ;
+RCSTAG( "$Id: msg_G.cc,v 1.3 2003/06/17 15:13:53 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {

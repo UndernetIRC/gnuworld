@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: main.cc,v 1.51 2003/06/11 17:46:33 dan_karrels Exp $
+ * $Id: main.cc,v 1.52 2003/06/17 15:13:54 dan_karrels Exp $
  */
 
 #include	<new>
@@ -44,11 +44,7 @@
 #include	"moduleLoader.h"
 #include	"md5hash.h"
 
-const char config_h_rcsId[] = __CONFIG_H ;
-const char main_cc_rcsId[] = "$Id: main.cc,v 1.51 2003/06/11 17:46:33 dan_karrels Exp $" ;
-const char ELog_h_rcsId[] = __ELOG_H ;
-const char server_h_rcsId[] = __SERVER_H ;
-const char moduleLoader_h_rcsId[] = __MODULELOADER_H ;
+RCSTAG( "$Id: main.cc,v 1.52 2003/06/17 15:13:54 dan_karrels Exp $" ) ;
 
 // main() must be in the global namespace
 using namespace gnuworld ;

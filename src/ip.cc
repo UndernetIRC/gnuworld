@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ip.cc,v 1.7 2003/06/11 17:46:33 dan_karrels Exp $
+ * $Id: ip.cc,v 1.8 2003/06/17 15:13:54 dan_karrels Exp $
  */
 
 #include	<string>
@@ -33,10 +33,9 @@
 
 #include	"ip.h"
 #include	"Numeric.h"
+#include	"config.h"
 
-const char xIP_h_rcsId[] = __IP_H ;
-const char xIP_cc_rcsId[] = "$Id: ip.cc,v 1.7 2003/06/11 17:46:33 dan_karrels Exp $" ;
-const char Numeric_h_rcsId[] = __NUMERIC_H ;
+RCSTAG( "$Id: ip.cc,v 1.8 2003/06/17 15:13:54 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {

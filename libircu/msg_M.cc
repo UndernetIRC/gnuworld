@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_M.cc,v 1.3 2003/06/07 00:26:23 dan_karrels Exp $
+ * $Id: msg_M.cc,v 1.4 2003/06/17 15:13:53 dan_karrels Exp $
  */
 
 #include	<new>
@@ -36,17 +36,9 @@
 #include	"ELog.h"
 #include	"StringTokenizer.h"
 #include	"ServerCommandHandler.h"
+#include	"config.h"
 
-const char msg_M_cc_rcsId[] = "$Id: msg_M.cc,v 1.3 2003/06/07 00:26:23 dan_karrels Exp $" ;
-const char misc_h_rcsId[] = __MISC_H ;
-const char events_h_rcsId[] = __EVENTS_H ;
-const char server_h_rcsId[] = __SERVER_H ;
-const char iClient_h_rcsId[] = __ICLIENT_H ;
-const char Channel_h_rcsId[] = __CHANNEL_H ;
-const char ChannelUser_h_rcsId[] = __CHANNELUSER_H ;
-const char Network_h_rcsId[] = __NETWORK_H ;
-const char ELog_h_rcsId[] = __ELOG_H ;
-const char StringTokenizer_h_rcsId[] = __STRINGTOKENIZER_H ;
+RCSTAG( "$Id: msg_M.cc,v 1.4 2003/06/17 15:13:53 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {

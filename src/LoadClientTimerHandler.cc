@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: LoadClientTimerHandler.cc,v 1.6 2003/06/06 13:14:16 dan_karrels Exp $
+ * $Id: LoadClientTimerHandler.cc,v 1.7 2003/06/17 15:13:54 dan_karrels Exp $
  */
 
 #include	<iostream>
@@ -25,11 +25,9 @@
 #include	"LoadClientTimerHandler.h"
 #include	"server.h"
 #include	"ELog.h"
+#include	"config.h"
 
-const char LoadClientTimerHandler_h_rcsId[] = __LOADCLIENTTIMERHANDLER_H ;
-const char LoadClientTimerHandler_cc_rcsId[] = "$Id: LoadClientTimerHandler.cc,v 1.6 2003/06/06 13:14:16 dan_karrels Exp $" ;
-const char ELog_h_rcsId[] = __ELOG_H ;
-const char server_h_rcsId[] = __SERVER_H ;
+RCSTAG( "$Id: LoadClientTimerHandler.cc,v 1.7 2003/06/17 15:13:54 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {

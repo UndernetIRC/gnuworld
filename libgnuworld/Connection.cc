@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: Connection.cc,v 1.1 2002/08/07 20:28:06 dan_karrels Exp $
+ * $Id: Connection.cc,v 1.2 2003/06/17 15:13:53 dan_karrels Exp $
  */
 
 #include	<sys/types.h>
@@ -33,6 +33,8 @@
 
 #include	"Connection.h"
 #include	"Buffer.h"
+
+const char rcsId[] = "$Id: Connection.cc,v 1.2 2003/06/17 15:13:53 dan_karrels Exp $" ;
 
 namespace gnuworld
 {

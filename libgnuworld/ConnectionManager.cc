@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ConnectionManager.cc,v 1.4 2003/06/03 01:01:52 dan_karrels Exp $
+ * $Id: ConnectionManager.cc,v 1.5 2003/06/17 15:13:53 dan_karrels Exp $
  */
 
 #include	<unistd.h>
@@ -52,15 +52,17 @@
 #include	"Buffer.h"
 #include	"ELog.h"
 
+const char rcsId[] = "$Id: ConnectionManager.cc,v 1.5 2003/06/17 15:13:53 dan_karrels Exp $" ;
+
+namespace gnuworld
+{
+
 using std::cout ;
 using std::endl ;
 using std::string ;
 using std::map ;
 using std::nothrow ;
 using std::stringstream ;
-
-namespace gnuworld
-{
 
 ConnectionManager::ConnectionManager( const time_t defaultTimeoutDuration,
 	const char defaultDelimiter )

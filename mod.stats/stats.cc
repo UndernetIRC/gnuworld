@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: stats.cc,v 1.17 2003/06/10 14:14:34 dan_karrels Exp $
+ * $Id: stats.cc,v 1.18 2003/06/17 15:13:53 dan_karrels Exp $
  */
 
 #include	<string>
@@ -36,6 +36,9 @@
 #include	"ELog.h"
 #include	"StringTokenizer.h"
 #include	"Network.h"
+#include	"config.h"
+
+RCSTAG( "$Id: stats.cc,v 1.18 2003/06/17 15:13:53 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -104,6 +107,10 @@ stats::~stats()
 {
 for( eventType whichEvent = 0 ; whichEvent <= EVT_CREATE ; ++whichEvent )
 	{
+	if( EVT_RAW == whichEvent )
+		{
+		continue ;
+		}
 	fileTable[ whichEvent ].flush() ;
 	fileTable[ whichEvent ].close() ;
 	}
@@ -117,6 +124,11 @@ void stats::openLogFiles()
 // array, and spaces (' ') will be substituted with underscore ('_').
 for( eventType whichEvent = 0 ; whichEvent <= EVT_CREATE ; ++whichEvent )
 	{
+	if( EVT_RAW == whichEvent )
+		{
+		continue ;
+		}
+
 	string fileName( eventNames[ whichEvent ] ) ;
 
 	// Substitute ' ' for '_'
@@ -158,6 +170,8 @@ for( eventType whichEvent = 0 ; whichEvent != EVT_NOOP ; ++whichEvent )
 	{
 	switch( whichEvent )
 		{
+		case EVT_RAW:
+			break ;
 		default:
 			theServer->RegisterEvent( whichEvent, this ) ;
 			break ;
@@ -381,6 +395,11 @@ struct tm* nowTM = gmtime( &now ) ;
 
 for( eventType whichEvent = 0 ; whichEvent <= EVT_CREATE ; ++whichEvent )
 	{
+	if( EVT_RAW == whichEvent )
+		{
+		continue ;
+		}
+
 	ofstream& outFile = fileTable[ whichEvent ] ;
 
 	outFile		<< nowTM->tm_hour << ":"
@@ -526,6 +545,10 @@ unsigned long int totalEvents = 0 ;
 // First, find the total number of events to occur
 for( eventType whichEvent = 0 ; whichEvent <= EVT_CREATE ; ++whichEvent )
 	{
+	if( EVT_RAW == whichEvent )
+		{
+		continue ;
+		}
 	totalEvents += eventTotal[ whichEvent ] ;
 	}
 
@@ -533,6 +556,11 @@ for( eventType whichEvent = 0 ; whichEvent <= EVT_CREATE ; ++whichEvent )
 // event to the total events received
 for( eventType whichEvent = 0 ; whichEvent <= EVT_CREATE ; ++whichEvent )
 	{
+	if( EVT_RAW == whichEvent )
+		{
+		continue ;
+		}
+
 	string writeMe ;
 	stringstream ss ;
 

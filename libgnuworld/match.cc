@@ -16,11 +16,13 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- * $Id: match.cc,v 1.1 2002/08/07 20:28:06 dan_karrels Exp $
+ * $Id: match.cc,v 1.2 2003/06/17 15:13:53 dan_karrels Exp $
  */
 #include	"match.h"
 
 #include	<string>
+
+const char rcsId[] = "$Id: match.cc,v 1.2 2003/06/17 15:13:53 dan_karrels Exp $" ;
 
 namespace gnuworld
 {

@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: iServer.cc,v 1.6 2003/06/12 18:37:39 dan_karrels Exp $
+ * $Id: iServer.cc,v 1.7 2003/06/17 15:13:54 dan_karrels Exp $
  */
 
 #include	<string>
@@ -25,14 +25,14 @@
 
 #include	"iServer.h"
 #include	"Numeric.h"
+#include	"config.h"
 
-const char iServer_h_rcsId[] = __ISERVER_H ;
-const char iServer_cc_rcsId[] = "$Id: iServer.cc,v 1.6 2003/06/12 18:37:39 dan_karrels Exp $" ;
-
-using std::string ;
+RCSTAG( "$Id: iServer.cc,v 1.7 2003/06/17 15:13:54 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
+
+using std::string ;
 
 iServer::iServer( const unsigned int& _uplink,
 	const string& _yxx,

@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_CM.cc,v 1.1 2002/11/20 22:16:18 dan_karrels Exp $
+ * $Id: msg_CM.cc,v 1.2 2003/06/17 15:13:53 dan_karrels Exp $
  */
 
 #include	<iostream>
@@ -30,8 +30,9 @@
 #include	"xparameters.h"
 #include	"ELog.h"
 #include	"ServerCommandHandler.h"
+#include	"config.h"
 
-const char msg_CM_cc_rcsId[] = "$Id: msg_CM.cc,v 1.1 2002/11/20 22:16:18 dan_karrels Exp $" ;
+RCSTAG( "$Id: msg_CM.cc,v 1.2 2003/06/17 15:13:53 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {

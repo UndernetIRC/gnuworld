@@ -1,4 +1,5 @@
 /**
+ * msg_AC.cc
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -15,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * "$Id: msg_AC.cc,v 1.1 2002/11/20 22:16:18 dan_karrels Exp $"
+ * "$Id: msg_AC.cc,v 1.2 2003/06/17 15:13:53 dan_karrels Exp $"
  */
 
 #include	"ServerCommandHandler.h"
@@ -25,14 +26,9 @@
 #include	"Network.h"
 #include	"iClient.h"
 #include	"ELog.h"
+#include	"config.h"
 
-const char ServerCommandHandler_cc_rcsId[] = __SERVERCOMMANDHANDLER_H ;
-const char server_h_rcsId[] = __SERVER_H ;
-const char xparameters_h_rcsId[] = __XPARAMETERS_H ;
-const char Channel_h_rcsId[] = __CHANNEL_H ;
-const char Network_h_rcsId[] = __NETWORK_H ;
-const char msg_AC_cc_rcsId[] = "$Id: msg_AC.cc,v 1.1 2002/11/20 22:16:18 dan_karrels Exp $" ;
-const char ELog_h_rcsId[] = __ELOG_H ;
+RCSTAG( "$Id: msg_AC.cc,v 1.2 2003/06/17 15:13:53 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {

@@ -17,22 +17,24 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ServerTimerHandlers.cc,v 1.6 2003/05/26 21:44:32 dan_karrels Exp $
+ * $Id: ServerTimerHandlers.cc,v 1.7 2003/06/17 15:13:54 dan_karrels Exp $
  */
+
+#include	<string>
+
+#include	<ctime>
 
 #include	"ServerTimerHandlers.h"
 #include	"server.h"
 #include	"ELog.h"
+#include	"config.h"
 
-#include	<ctime>
-
-const char ServerTimerHandlers_h_rcsId[] = __SERVERTIMERHANDLERS_H ;
-const char ServerTimerHandlers_cc_rcsId[] = "$Id: ServerTimerHandlers.cc,v 1.6 2003/05/26 21:44:32 dan_karrels Exp $" ;
-const char server_h_rcsId[] = __SERVER_H ;
-const char ELog_h_rcsId[] = __ELOG_H ;
+RCSTAG( "$Id: ServerTimerHandlers.cc,v 1.7 2003/06/17 15:13:54 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
+
+using std::string ;
 
 int GlineUpdateTimer::OnTimer( timerID, void* )
 {

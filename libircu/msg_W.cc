@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_W.cc,v 1.1 2002/11/20 22:16:18 dan_karrels Exp $
+ * $Id: msg_W.cc,v 1.2 2003/06/17 15:13:53 dan_karrels Exp $
  */
 
 #include	<iostream>
@@ -29,14 +29,9 @@
 #include	"iClient.h"
 #include	"client.h"
 #include	"ServerCommandHandler.h"
+#include	"config.h"
 
-const char msg_W_cc_rcsId[] = "$Id: msg_W.cc,v 1.1 2002/11/20 22:16:18 dan_karrels Exp $" ;
-const char server_h_rcsId[] = __SERVER_H ;
-const char xParameters_h_rcsId[] = __XPARAMETERS_H ;
-const char ELog_h_rcsId[] = __ELOG_H ;
-const char Network_h_rcsId[] = __NETWORK_H ;
-const char iClient_h_rcsId[] = __ICLIENT_H ;
-const char client_h_rcsId[] = __CLIENT_H ;
+RCSTAG( "$Id: msg_W.cc,v 1.2 2003/06/17 15:13:53 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {

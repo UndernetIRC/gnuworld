@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_O.cc,v 1.4 2003/06/07 14:38:59 dan_karrels Exp $
+ * $Id: msg_O.cc,v 1.5 2003/06/17 15:13:53 dan_karrels Exp $
  */
 
 #include	<string>
@@ -31,15 +31,9 @@
 #include	"xparameters.h"
 #include	"ServerCommandHandler.h"
 #include	"StringTokenizer.h"
+#include	"config.h"
 
-const char msg_P_cc_rcsId[] = "$Id: msg_O.cc,v 1.4 2003/06/07 14:38:59 dan_karrels Exp $" ;
-const char server_h_rcsId[] = __SERVER_H ;
-const char Network_h_rcsId[] = __NETWORK_H ;
-const char iClient_h_rcsId[] = __ICLIENT_H ;
-const char client_h_rcsId[] = __CLIENT_H ;
-const char ELog_h_rcsId[] = __ELOG_H ;
-const char xParameters_h_rcsId[] = __XPARAMETERS_H ;
-const char StringTokenizer_h_rcsId[] = __STRINGTOKENIZER_H ;
+RCSTAG( "$Id: msg_O.cc,v 1.5 2003/06/17 15:13:53 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {

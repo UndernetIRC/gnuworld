@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  * 
- * $Id: gThread.cc,v 1.3 2003/03/10 21:51:17 dan_karrels Exp $
+ * $Id: gThread.cc,v 1.4 2003/06/17 15:13:53 dan_karrels Exp $
  */
 
 #include	<pthread.h>
@@ -32,6 +32,8 @@
 
 #include	"gThread.h"
 #include	"ELog.h"
+
+const char rcsId[] = "$Id: gThread.cc,v 1.4 2003/06/17 15:13:53 dan_karrels Exp $" ;
 
 namespace gnuworld
 {

@@ -1,7 +1,6 @@
 /**
  * stats.h
  * Copyright (C) 2002 Daniel Karrels <dan@karrels.com>
- *                    Orlando Bassotto
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,11 +17,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: stats.h,v 1.9 2003/06/08 20:06:43 dan_karrels Exp $
+ * $Id: stats.h,v 1.10 2003/06/17 15:13:53 dan_karrels Exp $
  */
 
 #ifndef __STATS_H
-#define __STATS_H "$Id: stats.h,v 1.9 2003/06/08 20:06:43 dan_karrels Exp $"
+#define __STATS_H "$Id: stats.h,v 1.10 2003/06/17 15:13:53 dan_karrels Exp $"
 
 #include	<fstream>
 #include	<string>

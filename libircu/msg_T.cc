@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_T.cc,v 1.2 2003/06/07 14:38:59 dan_karrels Exp $
+ * $Id: msg_T.cc,v 1.3 2003/06/17 15:13:53 dan_karrels Exp $
  */
 
 #include	<iostream>
@@ -30,13 +30,7 @@
 #include	"Channel.h"
 #include	"ServerCommandHandler.h"
 
-const char msg_T_cc_rcsId[] = "$Id: msg_T.cc,v 1.2 2003/06/07 14:38:59 dan_karrels Exp $" ;
-const char xParameters_h_rcsId[] = __XPARAMETERS_H ;
-const char server_h_rcsId[] = __SERVER_H ;
-const char ELog_h_rcsId[] = __ELOG_H ;
-const char Channel_h_rcsId[] = __CHANNEL_H ;
-const char Network_h_rcsId[] = __NETWORK_H ;
-const char config_h_rcsId[] = __CONFIG_H ;
+RCSTAG( "$Id: msg_T.cc,v 1.3 2003/06/17 15:13:53 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {

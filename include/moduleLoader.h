@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * "$Id: moduleLoader.h,v 1.15 2003/06/05 01:38:01 dan_karrels Exp $"
+ * $Id: moduleLoader.h,v 1.16 2003/06/17 15:13:52 dan_karrels Exp $
  */
 
 #ifndef __MODULELOADER_H
-#define __MODULELOADER_H "$Id: moduleLoader.h,v 1.15 2003/06/05 01:38:01 dan_karrels Exp $"
+#define __MODULELOADER_H "$Id: moduleLoader.h,v 1.16 2003/06/17 15:13:52 dan_karrels Exp $"
 
 #include	<iostream>
 #include	<string>

@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: Network.cc,v 1.58 2003/06/14 17:34:29 jeekay Exp $
+ * $Id: Network.cc,v 1.59 2003/06/17 15:13:54 dan_karrels Exp $
  */
 
 #include	<new>
@@ -40,17 +40,9 @@
 #include	"match.h"
 #include	"StringTokenizer.h"
 #include	"ip.h"
+#include	"config.h"
 
-const char xNetwork_h_rcsId[] = __NETWORK_H ;
-const char xNetwork_cc_rcsId[] = "$Id: Network.cc,v 1.58 2003/06/14 17:34:29 jeekay Exp $" ;
-const char ELog_h_rcsId[] = __ELOG_H ;
-const char iClient_h_rcsId[] = __ICLIENT_H ;
-const char Channel_h_rcsId[] = __CHANNEL_H ;
-const char client_h_rcsId[] = __CLIENT_H ;
-const char misc_h_rcsId[] = __MISC_H ;
-const char Numeric_h_rcsId[] = __NUMERIC_H ;
-const char match_h_rcsId[] = __MATCH_H ;
-const char StringTokenizer_cc_rcsId[] = __STRINGTOKENIZER_H ;
+RCSTAG( "$Id: Network.cc,v 1.59 2003/06/17 15:13:54 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {

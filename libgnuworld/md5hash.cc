@@ -1,6 +1,6 @@
 /*************************************************************************
  * $Workfile: MD5.CPP $
- * $Revision: 1.1 $
+ * $Revision: 1.2 $
  *  $Modtime: 1/08/97 6:35p $
  *
  * PURPOSE:
@@ -52,11 +52,14 @@
  * 
  * So there! 
  ************************************************************************/
-#include <iostream>   // Needed for ostream and istream.
-#include <cstring>     // Needed for memcpy() and memset().
-#include "md5hash.h"
+#include	<iostream>   // Needed for ostream and istream.
+#include	<cstring>     // Needed for memcpy() and memset().
+#include	"md5hash.h"
 
-namespace gnuworld {
+const char rcsId[] = "$Id: md5hash.cc,v 1.2 2003/06/17 15:13:53 dan_karrels Exp $" ;
+
+namespace gnuworld
+{
 
 // F, G, H and I are basic MD5 functions.
 inline unsigned long F( unsigned long xx, unsigned long yy, unsigned long zz ) 

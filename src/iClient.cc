@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: iClient.cc,v 1.28 2003/06/07 00:26:24 dan_karrels Exp $
+ * $Id: iClient.cc,v 1.29 2003/06/17 15:13:54 dan_karrels Exp $
  */
 
 #include	<new>
@@ -33,12 +33,9 @@
 #include	"client.h"
 #include	"Numeric.h"
 #include	"ip.h"
+#include	"config.h"
 
-const char iClient_h_rcsId[] = __ICLIENT_H ;
-const char iClient_cc_rcsId[] = "$Id: iClient.cc,v 1.28 2003/06/07 00:26:24 dan_karrels Exp $" ;
-const char client_h_rcsId[] = __CLIENT_H ;
-const char Numeric_h_rcsId[] = __NUMERIC_H ;
-const char ip_h_rcsId[] = __IP_H ;
+RCSTAG( "$Id: iClient.cc,v 1.29 2003/06/17 15:13:54 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {

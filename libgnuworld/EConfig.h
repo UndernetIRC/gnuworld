@@ -1,4 +1,5 @@
-/* EConfig.h
+/**
+ * EConfig.h
  * Copyright (C) 2002 Daniel Karrels <dan@karrels.com>
  *
  * This program is free software; you can redistribute it and/or
@@ -16,11 +17,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: EConfig.h,v 1.1 2002/08/07 20:28:06 dan_karrels Exp $
+ * $Id: EConfig.h,v 1.2 2003/06/17 15:13:53 dan_karrels Exp $
  */
 
 #ifndef __ECONFIG_H
-#define __ECONFIG_H "$Id: EConfig.h,v 1.1 2002/08/07 20:28:06 dan_karrels Exp $"
+#define __ECONFIG_H "$Id: EConfig.h,v 1.2 2003/06/17 15:13:53 dan_karrels Exp $"
 
 #include	<iostream>
 #include	<string>

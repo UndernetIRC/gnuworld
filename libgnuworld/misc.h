@@ -1,4 +1,4 @@
-/*
+/**
  * misc.h
  * Author: Daniel Karrels (dan@karrels.com
  * Purpose: This file contains a few miscellaneous methods.
@@ -19,11 +19,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: misc.h,v 1.1 2002/08/07 20:28:06 dan_karrels Exp $
+ * $Id: misc.h,v 1.2 2003/06/17 15:13:53 dan_karrels Exp $
  */
 
 #ifndef __MISC_H
-#define __MISC_H "$Id: misc.h,v 1.1 2002/08/07 20:28:06 dan_karrels Exp $"
+#define __MISC_H "$Id: misc.h,v 1.2 2003/06/17 15:13:53 dan_karrels Exp $"
 
 #include	<string>
 

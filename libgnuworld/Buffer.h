@@ -1,7 +1,6 @@
-/* Buffer.h
+/**
+ * Buffer.h
  * Author: Daniel Karrels dan@karrels.com
- * Synapsis:
- * History: Mon Jan 25 23:29:47 EST 1999 -- beginning
  *
  * Copyright (C) 2002 Daniel Karrels <dan@karrels.com>
  *
@@ -20,10 +19,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, 
  * USA.
  *
+ * $Id: Buffer.h,v 1.2 2003/06/17 15:13:53 dan_karrels Exp $
  */
 
 #ifndef __BUFFER_H
-#define __BUFFER_H "$Id: Buffer.h,v 1.1 2002/08/07 20:28:06 dan_karrels Exp $"
+#define __BUFFER_H "$Id: Buffer.h,v 1.2 2003/06/17 15:13:53 dan_karrels Exp $"
 
 #include	<iostream>
 #include	<string>
