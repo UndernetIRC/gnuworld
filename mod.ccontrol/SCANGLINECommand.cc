@@ -7,18 +7,17 @@
 
 #include	<string>
 #include	<cstdlib>
-#include        <iomanip.h>
+
 #include	"ccontrol.h"
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 
-const char SCANGLINECommand_cc_rcsId[] = "$Id: SCANGLINECommand.cc,v 1.4 2001/02/26 16:58:06 mrbean_ Exp $";
+const char SCANGLINECommand_cc_rcsId[] = "$Id: SCANGLINECommand.cc,v 1.5 2001/07/17 16:58:27 dan_karrels Exp $";
 
 namespace gnuworld
 {
 
 using std::string ;
-
 
 bool SCANGLINECommand::Exec( iClient* theClient, const string& Message )
 {
@@ -51,4 +50,6 @@ for( vector< const Gline* >::const_iterator ptr = glines.begin() ;
 
 return true ;
 }
-}
+
+} // namespace gnuworld
+

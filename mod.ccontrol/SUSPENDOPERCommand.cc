@@ -7,18 +7,17 @@
 
 #include	<string>
 #include	<cstdlib>
-#include        <iomanip.h>
+
 #include	"ccontrol.h"
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 
-const char SUSPENDOPERCommand_cc_rcsId[] = "$Id: SUSPENDOPERCommand.cc,v 1.6 2001/05/14 21:26:37 mrbean_ Exp $";
+const char SUSPENDOPERCommand_cc_rcsId[] = "$Id: SUSPENDOPERCommand.cc,v 1.7 2001/07/17 16:58:27 dan_karrels Exp $";
 
 namespace gnuworld
 {
 
 using std::string ;
-
 
 bool SUSPENDOPERCommand::Exec( iClient* theClient, const string& Message)
 {
@@ -79,4 +78,6 @@ else
 	}
 
 }
-}
+
+} // namespace gnuworld
+

@@ -28,7 +28,7 @@
 #include	"events.h"
 
 const char xClient_h_rcsId[] = __CLIENT_H ;
-const char xClient_cc_rcsId[] = "$Id: client.cc,v 1.39 2001/06/23 16:27:52 dan_karrels Exp $" ;
+const char xClient_cc_rcsId[] = "$Id: client.cc,v 1.40 2001/07/17 16:58:27 dan_karrels Exp $" ;
 const char config_h_rcsId[] = __CONFIG_H ;
 const char misc_h_rcsId[] = __MISC_H ;
 const char Numeric_h_rcsId[] = __NUMERIC_H ;
@@ -229,7 +229,7 @@ int xClient::Wallops( const char* Format, ... )
 {
 if( Connected && MyUplink && Format && Format[ 0 ] != 0 )
 	{
-	char buffer[ 512 ] = { 0 } ;
+	char buffer[ 1024 ] = { 0 } ;
 	va_list list;
 
 	va_start( list, Format ) ;
@@ -256,7 +256,7 @@ int xClient::WallopsAsServer( const char* Format, ... )
 {
 if( Connected && MyUplink && Format && Format[ 0 ] != 0 )
 	{
-	char buffer[ 512 ] = { 0 } ;
+	char buffer[ 1024 ] = { 0 } ;
 	va_list list;
 
 	va_start( list, Format ) ;
@@ -320,7 +320,7 @@ int xClient::Message( const iClient* Target, const char* Message, ... )
 {
 if( Connected && MyUplink && Message && Message[ 0 ] !=0 )
 	{
-	char buffer[ 512 ] = { 0 } ;
+	char buffer[ 1024 ] = { 0 } ;
 	va_list list;
 
 	va_start( list, Message ) ;
@@ -339,7 +339,7 @@ int xClient::Message( const string& Channel, const char* Message, ... )
 {
 if( Connected && MyUplink && Message && Message[ 0 ] != 0 )
 	{
-	char buffer[ 512 ] = { 0 } ;
+	char buffer[ 1024 ] = { 0 } ;
 	va_list list ;
 
 	va_start( list, Message ) ;
@@ -385,7 +385,7 @@ int xClient::Notice( const iClient* Target, const char* Message, ... )
 {
 if( Connected && MyUplink && Message && Message[ 0 ] != 0 )
 	{
-	char buffer[ 512 ] = { 0 } ;
+	char buffer[ 1024 ] = { 0 } ;
 	va_list list;
 
 	va_start(list, Message);
@@ -405,7 +405,7 @@ int xClient::Notice( const string& Channel, const char* Message, ... )
 {
 if( Connected && MyUplink && Message && Message[ 0 ] != 0 )
 	{
-	char buffer[ 512 ] = { 0 } ;
+	char buffer[ 1024 ] = { 0 } ;
 	va_list list;
 
 	va_start(list, Message);
@@ -1855,7 +1855,7 @@ return isOnChannel( theChan->getName() ) ;
 
 int xClient::Write( const char* format, ... )
 {
-char buf[ 1024 ] = { 0 } ;
+char buf[ 4096 ] = { 0 } ;
 va_list _list ;
 
 va_start( _list, format ) ;

@@ -18,7 +18,7 @@
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 
-const char ADDNEWOPERCommand_cc_rcsId[] = "$Id: ADDNEWOPERCommand.cc,v 1.10 2001/06/11 21:08:31 mrbean_ Exp $";
+const char ADDNEWOPERCommand_cc_rcsId[] = "$Id: ADDNEWOPERCommand.cc,v 1.11 2001/07/17 16:58:27 dan_karrels Exp $";
 
 namespace gnuworld
 {
@@ -52,6 +52,7 @@ if (theUser)
 unsigned int NewAccess = 0 ;
 unsigned int NewFlags = 0 ;
 
+// TODO: use std::string::operator=(const char*) const
 if(!strcasecmp(st[2].c_str(),"coder"))
 	{
 	NewAccess = CODER;

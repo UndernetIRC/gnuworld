@@ -6,8 +6,7 @@
  */
 
 #include	<string>
-//#include	<cstdlib>
-//#include        <iomanip.h>
+
 #include	"ccontrol.h"
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
@@ -16,13 +15,12 @@
 #include        "stdlib.h"
 #include        "server.h"
 
-const char LEARNNETWORKCommand_cc_rcsId[] = "$Id: LEARNNETWORKCommand.cc,v 1.6 2001/07/17 07:24:13 mrbean_ Exp $";
+const char LEARNNETWORKCommand_cc_rcsId[] = "$Id: LEARNNETWORKCommand.cc,v 1.7 2001/07/17 16:58:27 dan_karrels Exp $";
 
 namespace gnuworld
 {
 
 using std::string ;
-
 
 bool LEARNNETWORKCommand::Exec( iClient* theClient, const string& Message )
 {
@@ -67,4 +65,6 @@ delete NewServer;
 bot->MsgChanLog("Finished learning the network, Learned a total of %d servers\n",AddedServers);
 return true;
 }
-}
+
+} // namespace gnuworld
+

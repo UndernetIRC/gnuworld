@@ -1,13 +1,13 @@
 /* moduleLoader.h */
 
 #ifndef __MODULELOADER_H
-#define __MODULELOADER_H "$Id: moduleLoader.h,v 1.10 2001/07/17 13:42:51 dan_karrels Exp $"
+#define __MODULELOADER_H "$Id: moduleLoader.h,v 1.11 2001/07/17 16:58:26 dan_karrels Exp $"
 
 #include	<iostream>
 #include	<string>
 
 #include	<cstdlib> // exit()
-#include	<ltdl.h>
+#include	"ltdl.h"
 
 #include	"ELog.h"
 

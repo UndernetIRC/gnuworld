@@ -16,7 +16,7 @@
 #include	"ip.h"
 
 const char iClient_h_rcsId[] = __ICLIENT_H ;
-const char iClient_cc_rcsId[] = "$Id: iClient.cc,v 1.15 2001/06/14 22:14:13 dan_karrels Exp $" ;
+const char iClient_cc_rcsId[] = "$Id: iClient.cc,v 1.16 2001/07/17 16:58:27 dan_karrels Exp $" ;
 const char client_h_rcsId[] = __CLIENT_H ;
 const char Numeric_h_rcsId[] = __NUMERIC_H ;
 const char ip_h_rcsId[] = __IP_H ;
@@ -26,6 +26,12 @@ namespace gnuworld
 
 using std::string ;
 using std::map ;
+
+const iClient::modeType iClient::MODE_OPER = 0x01 ;
+const iClient::modeType iClient::MODE_WALLOPS = 0x02 ;
+const iClient::modeType iClient::MODE_INVISIBLE = 0x04 ;
+const iClient::modeType iClient::MODE_DEAF = 0x08 ;
+const iClient::modeType iClient::MODE_SERVICES = 0x10 ;
 
 iClient::iClient( const unsigned int& _uplink,
 	const string& _yxx,

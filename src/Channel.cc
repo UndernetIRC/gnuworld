@@ -16,7 +16,7 @@
 #include	"server.h"
 
 const char Channel_h_rcsId[] = __CHANNEL_H ;
-const char Channel_cc_rcsId[] = "$Id: Channel.cc,v 1.26 2001/07/17 13:42:51 dan_karrels Exp $" ;
+const char Channel_cc_rcsId[] = "$Id: Channel.cc,v 1.27 2001/07/17 16:58:27 dan_karrels Exp $" ;
 const char iClient_h_rcsId[] = __ICLIENT_H ;
 const char ChannelUser_h_rcsId[] = __CHANNELUSER_H ;
 const char Network_h_rcsId[] = __NETWORK_H ;
@@ -32,6 +32,15 @@ namespace gnuworld
 using std::string ;
 using std::endl ;
 using std::strstream ;
+
+const Channel::modeType Channel::MODE_T = 0x01 ;
+const Channel::modeType Channel::MODE_N = 0x02 ;
+const Channel::modeType Channel::MODE_S = 0x04 ;
+const Channel::modeType Channel::MODE_P = 0x08 ;
+const Channel::modeType Channel::MODE_K = 0x10 ;
+const Channel::modeType Channel::MODE_L = 0x20 ;
+const Channel::modeType Channel::MODE_M = 0x40 ;
+const Channel::modeType Channel::MODE_I = 0x80 ;
 
 Channel::Channel( const string& _name,
 	const time_t& _creationTime )

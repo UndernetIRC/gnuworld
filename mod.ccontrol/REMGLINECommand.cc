@@ -12,13 +12,12 @@
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 
-const char REMGLINECommand_cc_rcsId[] = "$Id: REMGLINECommand.cc,v 1.10 2001/07/17 07:24:13 mrbean_ Exp $";
+const char REMGLINECommand_cc_rcsId[] = "$Id: REMGLINECommand.cc,v 1.11 2001/07/17 16:58:27 dan_karrels Exp $";
 
 namespace gnuworld
 {
 
 using std::string ;
-
 
 // remgline user@host
 bool REMGLINECommand::Exec( iClient* theClient, const string& Message )
@@ -52,4 +51,6 @@ else
 
 return true ;
 }
-}
+
+} // namespace gnuworld
+

@@ -6,20 +6,19 @@
 
 #include	<string>
 #include	<cstdlib>
-#include        <iomanip>
+
 #include	"ccontrol.h"
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 #include	"md5hash.h" 
 #include        "ccUser.h"
 
-const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.8 2001/05/29 22:25:47 mrbean_ Exp $";
+const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.9 2001/07/17 16:58:27 dan_karrels Exp $";
 
 namespace gnuworld
 {
 
 using std::string ;
-
 
 bool LOGINCommand::Exec( iClient* theClient, const string& Message)
 {
@@ -109,4 +108,6 @@ else
 
 return true; 
 } 
-}
+
+} // namespace gnuworld
+

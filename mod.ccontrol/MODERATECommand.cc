@@ -7,19 +7,18 @@
 
 #include	<string>
 #include	<cstdlib>
-#include        <iomanip.h>
+
 #include	"ccontrol.h"
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 #include	"Network.h"
 
-const char MODERATECommand_cc_rcsId[] = "$Id: MODERATECommand.cc,v 1.2 2001/03/11 21:40:11 mrbean_ Exp $";
+const char MODERATECommand_cc_rcsId[] = "$Id: MODERATECommand.cc,v 1.3 2001/07/17 16:58:27 dan_karrels Exp $";
 
 namespace gnuworld
 {
 
 using std::string ;
-
 
 bool MODERATECommand::Exec( iClient* theClient, const string& Message )
 {
@@ -49,4 +48,5 @@ theChan->setMode(Channel::MODE_M);
 bot->ModeAsServer( theChan, "+m");
 return true;
 }
-}
+
+} // namespace gnuworld

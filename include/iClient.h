@@ -2,7 +2,7 @@
  */
 
 #ifndef __ICLIENT_H
-#define __ICLIENT_H "$Id: iClient.h,v 1.17 2001/06/23 16:27:52 dan_karrels Exp $"
+#define __ICLIENT_H "$Id: iClient.h,v 1.18 2001/07/17 16:58:26 dan_karrels Exp $"
 
 #include	<string>
 #include	<list>
@@ -49,19 +49,19 @@ public:
 	typedef unsigned int modeType ;
 
 	/// MODE_OPER is true if the iClient is an IRC operator.
-	const static modeType	MODE_OPER	= 0x01 ;
+	const static modeType	MODE_OPER ;
 
 	/// MODE_WALLOPS is true if the iClient is receiving wallops.
-	const static modeType	MODE_WALLOPS	= 0x02 ;
+	const static modeType	MODE_WALLOPS ;
 
 	/// MODE_INVISIBLE is true if the iClient is user mode invisible.
-	const static modeType	MODE_INVISIBLE	= 0x04 ;
+	const static modeType	MODE_INVISIBLE ;
 
 	/// MODE_DEAF is true if the iClient is not receiving messages.
-	const static modeType	MODE_DEAF	= 0x10 ;
+	const static modeType	MODE_DEAF ;
 
 	/// MODE_SERVICES is true if the iClient is a service agent.
-	const static modeType	MODE_SERVICES	= 0x20 ;
+	const static modeType	MODE_SERVICES ;
 
 	/// Iterator for channels this user is on.
 	typedef channelListType::iterator channelIterator ;

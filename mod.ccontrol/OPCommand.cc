@@ -8,19 +8,18 @@
 
 #include	<string>
 #include	<cstdlib>
-#include        <iomanip.h>
+
 #include	"ccontrol.h"
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 #include	"Network.h"
 
-const char OPCommand_cc_rcsId[] = "$Id: OPCommand.cc,v 1.1 2001/03/10 18:33:23 mrbean_ Exp $";
+const char OPCommand_cc_rcsId[] = "$Id: OPCommand.cc,v 1.2 2001/07/17 16:58:27 dan_karrels Exp $";
 
 namespace gnuworld
 {
 
 using std::string ;
-
 
 bool OPCommand::Exec( iClient* theClient, const string& Message )
 {
@@ -74,5 +73,6 @@ if(!args.empty())
 	bot->ModeAsServer( theChan, mode + ' ' + args ) ;
 return true;
 }
-}			
-	
+
+} // namespace gnuworld
+

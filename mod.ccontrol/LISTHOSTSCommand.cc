@@ -7,19 +7,17 @@
 
 #include	<string>
 #include	<cstdlib>
-#include        <iomanip.h>
+
 #include	"ccontrol.h"
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 
-const char LISTHOSTSCommand_cc_rcsId[] = "$Id: LISTHOSTSCommand.cc,v 1.2 2001/05/14 21:26:37 mrbean_ Exp $";
+const char LISTHOSTSCommand_cc_rcsId[] = "$Id: LISTHOSTSCommand.cc,v 1.3 2001/07/17 16:58:27 dan_karrels Exp $";
 
 namespace gnuworld
 {
 
 using std::string ;
-
-
 
 bool LISTHOSTSCommand::Exec( iClient* theClient, const string& Message)
 {	 
@@ -52,4 +50,6 @@ else
 delete tmpUser;
 return true;
 }
-}
+
+} // namespace gnuworld
+

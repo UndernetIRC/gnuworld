@@ -50,7 +50,7 @@
 #include	"UnloadClientTimerHandler.h"
 
 const char server_h_rcsId[] = __SERVER_H ;
-const char server_cc_rcsId[] = "$Id: server.cc,v 1.110 2001/06/28 19:10:17 dan_karrels Exp $" ;
+const char server_cc_rcsId[] = "$Id: server.cc,v 1.111 2001/07/17 16:58:27 dan_karrels Exp $" ;
 const char config_h_rcsId[] = __CONFIG_H ;
 const char misc_h_rcsId[] = __MISC_H ;
 const char events_h_rcsId[] = __EVENTS_H ;
@@ -680,7 +680,8 @@ else
 
 if( NULL == Sender )
 	{
-	elog	<< "xServer::Process> NULL == Sender... *shrug*\n" ;
+	elog	<< "xServer::Process> NULL == Sender... *shrug*"
+		<< endl ;
 	Command = strtok( s, " " ) ;
 	}
 

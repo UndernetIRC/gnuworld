@@ -1,7 +1,7 @@
 /* ChannelUser.h */
 
 #ifndef __CHANNELUSER_H
-#define __CHANNELUSER_H "$Id: ChannelUser.h,v 1.5 2001/06/23 16:27:52 dan_karrels Exp $"
+#define __CHANNELUSER_H "$Id: ChannelUser.h,v 1.6 2001/07/17 16:58:26 dan_karrels Exp $"
 
 #include	<string>
 
@@ -31,13 +31,13 @@ public:
 	typedef unsigned char modeType ;
 
 	/// Bit representing channel user mode +o
-	static const modeType	MODE_O		= 0x01 ;
+	static const modeType	MODE_O ;
 
 	/// Bit representing channel user mode +v
-	static const modeType	MODE_V		= 0x02 ;
+	static const modeType	MODE_V ;
 
 	/// ZOMBIE is true if the iClient is in the zombie state
-	const static modeType   ZOMBIE          = 0x04 ;
+	const static modeType   ZOMBIE ;
 
 	/**
 	 * Construct a ChannelUser given an iClient

@@ -12,13 +12,12 @@
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 
-const char CHANINFOCommand_cc_rcsId[] = "$Id: CHANINFOCommand.cc,v 1.4 2001/02/26 16:58:05 mrbean_ Exp $";
+const char CHANINFOCommand_cc_rcsId[] = "$Id: CHANINFOCommand.cc,v 1.5 2001/07/17 16:58:27 dan_karrels Exp $";
 
 namespace gnuworld
 {
 
 using std::string ;
-
 
 bool CHANINFOCommand::Exec( iClient* theClient, const string& Message )
 {
@@ -47,4 +46,5 @@ bot->Notice( theClient, "Number of channel users: %d",
 
 return true ;
 }
-}
+
+} // namespace gnuworld

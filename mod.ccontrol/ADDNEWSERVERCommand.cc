@@ -7,19 +7,18 @@
 
 #include	<string>
 #include	<cstdlib>
-#include        <iomanip.h>
+
 #include	"ccontrol.h"
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 #include	"Network.h"
 
-const char ADDNEWSERVERCommand_cc_rcsId[] = "$Id: ADDNEWSERVERCommand.cc,v 1.2 2001/05/01 18:44:39 mrbean_ Exp $";
+const char ADDNEWSERVERCommand_cc_rcsId[] = "$Id: ADDNEWSERVERCommand.cc,v 1.3 2001/07/17 16:58:27 dan_karrels Exp $";
 
 namespace gnuworld
 {
 
 using std::string ;
-
 
 bool ADDNEWSERVERCommand::Exec( iClient* theClient, const string& Message )
 {
@@ -34,7 +33,8 @@ if( st.size() < 2 )
 ccServer* NewServer = new ccServer(bot->SQLDb);
 if(NewServer->loadData(st [ 1 ]))
 	{
-	bot->Notice(theClient, "Server %s is already in my database!\n",st [ 1 ].c_str());
+	bot->Notice(theClient, "Server %s is already in my database!",
+		st [ 1 ].c_str());
 	delete NewServer;
 	return false;
 	}
@@ -55,4 +55,5 @@ else
 
 return true;
 }
-}
+
+} // namespace gnuworld

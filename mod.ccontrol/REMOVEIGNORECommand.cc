@@ -15,7 +15,7 @@
 #include	"Network.h"
 #include        "ccLogin.h"
 
-const char REMOVEIGNORECommand_cc_rcsId[] = "$Id: REMOVEIGNORECommand.cc,v 1.1 2001/05/31 18:17:59 mrbean_ Exp $";
+const char REMOVEIGNORECommand_cc_rcsId[] = "$Id: REMOVEIGNORECommand.cc,v 1.2 2001/07/17 16:58:27 dan_karrels Exp $";
 
 namespace gnuworld
 {
@@ -62,5 +62,6 @@ else
 
 return true;
 }
-}
-	
+
+} // namespace gnuworld
+

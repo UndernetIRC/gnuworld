@@ -8,13 +8,17 @@
 #include	"ChannelUser.h"
 
 const char ChannelUser_h_rcsId[] = __CHANNELUSER_H ;
-const char ChannelUser_cc_rcsId[] = "$Id: ChannelUser.cc,v 1.4 2001/03/31 01:26:10 dan_karrels Exp $" ;
+const char ChannelUser_cc_rcsId[] = "$Id: ChannelUser.cc,v 1.5 2001/07/17 16:58:27 dan_karrels Exp $" ;
 const char iClient_h_rcsId[] = __ICLIENT_H ;
 
 namespace gnuworld
 {
 
 using std::string ;
+
+const ChannelUser::modeType ChannelUser::MODE_O = 0x01 ;
+const ChannelUser::modeType ChannelUser::MODE_V = 0x02 ;
+const ChannelUser::modeType ChannelUser::ZOMBIE = 0x04 ;
 
 ChannelUser::ChannelUser( iClient* _theClient )
  : theClient( _theClient ),
