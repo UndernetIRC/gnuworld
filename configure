@@ -1010,6 +1010,8 @@ Optional Features:
   --enable-static=PKGS  build static libraries default=yes
   --enable-fast-install=PKGS  optimize for fast installation default=yes
   --disable-libtool-lock  avoid locking (might break parallel builds)
+  --disable-threads       disable the linking of the pthread library (default
+                          = no)
   --enable-modules=mods   Enable one or more modules; all modules found in the
                           current directory are enabled by default. Specify
                           "no" (without quotes) to build server only
@@ -4266,7 +4268,7 @@ test "x$enable_libtool_lock" != xno && enable_libtool_lock=yes
 case $host in
 *-*-irix6*)
   # Find out which ABI we are using.
-  echo '#line 4269 "configure"' > conftest.$ac_ext
+  echo '#line 4271 "configure"' > conftest.$ac_ext
   if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -4802,7 +4804,7 @@ chmod -w .
 save_CFLAGS="$CFLAGS"
 CFLAGS="$CFLAGS -o out/conftest2.$ac_objext"
 compiler_c_o=no
-if { (eval echo configure:4805: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>out/conftest.err; } && test -s out/conftest2.$ac_objext; then
+if { (eval echo configure:4807: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>out/conftest.err; } && test -s out/conftest2.$ac_objext; then
   # The compiler can only warn and ignore the option if not recognized
   # So say no if there are warnings
   if test -s out/conftest.err; then
@@ -6595,7 +6597,7 @@ else
     lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 6598 "configure"
+#line 6600 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -6693,7 +6695,7 @@ else
     lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 6696 "configure"
+#line 6698 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -8702,10 +8704,27 @@ fi
 subdirs="$subdirs libltdl"
 
 
-threadLib=no
+
+echo "$as_me:$LINENO: checking whether to detect pthread libraries" >&5
+echo $ECHO_N "checking whether to detect pthread libraries... $ECHO_C" >&6
+
+# Check whether --enable-threads or --disable-threads was given.
+if test "${enable_threads+set}" = set; then
+  enableval="$enable_threads"
+  check_threadLib=$enable_threads
+else
+  check_threadLib=yes
+fi;
+
+echo "$as_me:$LINENO: result: $check_threadLib" >&5
+echo "${ECHO_T}$check_threadLib" >&6
 
 
-if test "$threadLib" = no; then
+
+if test "$check_threadLib" = yes; then
+
+    threadLib=no
+
 
 echo "$as_me:$LINENO: checking for pthread_create in -lpthread" >&5
 echo $ECHO_N "checking for pthread_create in -lpthread... $ECHO_C" >&6
@@ -8766,9 +8785,8 @@ if test $ac_cv_lib_pthread_pthread_create = yes; then
   threadLib=-lpthread
 fi
 
-fi
 
-if test "$threadLib" = no; then
+    if test "$threadLib" = no; then
 	echo "$as_me:$LINENO: checking for pthread_create in -lc" >&5
 echo $ECHO_N "checking for pthread_create in -lc... $ECHO_C" >&6
 if test "${ac_cv_lib_c_pthread_create+set}" = set; then
@@ -8828,9 +8846,9 @@ if test $ac_cv_lib_c_pthread_create = yes; then
   threadLib=-lc
 fi
 
-fi
+    fi
 
-if test "$threadLib" = no; then
+    if test "$threadLib" = no; then
 	echo "$as_me:$LINENO: checking for pthread_create in -lc_r" >&5
 echo $ECHO_N "checking for pthread_create in -lc_r... $ECHO_C" >&6
 if test "${ac_cv_lib_c_r_pthread_create+set}" = set; then
@@ -8890,11 +8908,15 @@ if test $ac_cv_lib_c_r_pthread_create = yes; then
   threadLib=-lc_r
 fi
 
-fi
+    fi
 
-if test "$threadLib" = no; then
+    if test "$threadLib" = no; then
 	echo "$as_me:$LINENO: result: Unable to locate pthread_create in any library" >&5
 echo "${ECHO_T}Unable to locate pthread_create in any library" >&6
+    else
+ 	LIBS="$LIBS $threadLib"
+    fi
+
 fi
 
 
@@ -10303,7 +10325,6 @@ fi
 
 
 
-
 ac_config_files="$ac_config_files Makefile db/Makefile libgnuworld/Makefile src/Makefile mod.ccontrol/Makefile mod.clientExample/Makefile mod.cloner/Makefile mod.cservice/Makefile mod.gnutest/Makefile mod.nickserv/Makefile mod.scanner/Makefile mod.stats/Makefile bin/ccontrol.example.conf bin/clientExample.example.conf bin/cloner.example.conf bin/cservice.example.conf bin/gnutest.example.conf bin/GNUWorld.example.conf bin/nickserv.example.conf bin/scanner.example.conf bin/stats.example.conf"
 
 
@@ -10958,7 +10979,6 @@ s,@glibdir@,$glibdir,;t t
 s,@LIBTOOL_DEPS@,$LIBTOOL_DEPS,;t t
 s,@PGSQL_INCLUDE@,$PGSQL_INCLUDE,;t t
 s,@PGSQL_LIB@,$PGSQL_LIB,;t t
-s,@threadLib@,$threadLib,;t t
 CEOF
 
 _ACEOF
