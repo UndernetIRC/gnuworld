@@ -1,4 +1,4 @@
--- "$Id: README.cservice,v 1.17 2003/02/07 19:25:57 gte Exp $"
+-- "$Id: README.cservice,v 1.18 2003/02/11 18:04:06 jeekay Exp $"
 --
 -- For more detailed information about setting up GNUworld, visit :
 --      http://coder-com.undernet.org/gnuworld-setup/
@@ -16,7 +16,7 @@ Create the database
 -------------------
 > createdb cservice
 
-Note that this assumes that the ccontrol database does not already exist.
+Note that this assumes that the cservice database does not already exist.
 
 Install the pl language
 -----------------------

@@ -5,6 +5,7 @@
 -- Zap everything! 
 DELETE FROM translations;
 
+
 -- English language definition.
 -- 27/12/00 - Greg Sikorski <gte@atomicrevs.demon.co.uk>.
 -- 01/03/01 - Daniel Simard <svr@undernet.org>.
@@ -90,7 +91,7 @@ COPY "translations" FROM stdin;
 1	78	Modified %s's access level on channel %s to %i	31337	0
 1	79	Set AUTOMODE to OP for %s on channel %s	31337	0
 1	80	Set AUTOMODE to VOICE for %s on channel %s	31337	0
-1	81	Set AUTOMODE to NONE for %s on channel %s	31337	0	
+1	81	Set AUTOMODE to NONE for %s on channel %s	31337	0
 1	82	Your passphrase cannot be your username or current nick - syntax is: NEWPASS <new passphrase>	31337	0
 1	83	Password successfully changed.	31337	0
 1	84	The NOOP flag is set on %s	31337	0
@@ -174,7 +175,7 @@ COPY "translations" FROM stdin;
 1	163	%s is an Official Coder-Com Senior%s and logged in as %s	31337	0
 1	164	 and an IRC operator	31337	0
 1	165	Added ban %s to %s at level %i	31337	0
-1	166	%s: ban list is empty.		31337	0
+1	166	%s: ban list is empty.	31337	0
 1	167	I'm already in that channel!	31337	0
 1	168	This command is reserved to IRC Operators	31337	0
 1	169	I'm not opped on %s	31337	0
@@ -226,7 +227,7 @@ COPY "translations" FROM stdin;
 2	37	%s a dיjא יtי ajoutי sur %s au niveau %i.	31337	0
 2	38	Utilisateur %s ajoutי sur %s au niveau %i	31337	0
 2	39	Quelque chose semble incorrect: %s	31337	0
-2	40	%s: fin de la liste des bans		31337	0
+2	40	%s: fin de la liste des bans	31337	0
 2	41	Impossible de voir les dיtails de l'utilisateur (Invisible).	31337	0
 2	42	Informations sur: %s (%i)	31337	0
 2	43	Connectי en ce moment via: %s	31337	0
@@ -267,7 +268,7 @@ COPY "translations" FROM stdin;
 2	78	Modification du niveau de %s sur le canal %s א %i effectuיe.	31337	0
 2	79	Activation du MODE Automatique (OP) pour %s sur le canal %s	31337	0
 2	80	Activation du MODE Automatique (VOICE) pour %s sur le canal %s	31337	0
-2	81	Dיsactivation des MODES Automatiques pour %s sur le canal %s	31337	0	
+2	81	Dיsactivation des MODES Automatiques pour %s sur le canal %s	31337	0
 2	82	Votre mot de passe ne peut ךtre ni votre nom d'utilisateur ni votre nick - La Syntaxe est: NEWPASS <nouveau mot de passe>	31337	0
 2	83	Votre mot de passe a יtי changי avec succטs.	31337	0
 2	84	Le mode NOOP est actif sur %s	31337	0
@@ -351,7 +352,7 @@ COPY "translations" FROM stdin;
 2	163	%s est un Sיnior Officiel de Coder-Com%s et authentifiי sous le nom d'utilisateur %s	31337	0
 2	164	 et un Opיrateur IRC	31337	0
 2	165	Ban sur %s ajoutי א %s au niveau %i	31337	0
-2	166	%s: La liste des bans est vide.		31337	0
+2	166	%s: La liste des bans est vide.	31337	0
 2	167	Je suis dיjא dans ce canal!	31337	0
 2	168	Cette commande est rיservיe aux Opיrateurs IRC	31337	0
 2	169	Je ne suis pas op sur %s	31337	0
@@ -384,7 +385,7 @@ COPY "translations" FROM stdin;
 3	20	Ugyldigt ban varighed. Din ban varighed kan max bestו af 336 timer.	31337	0
 3	21	Ban grund kan ikke overtrזde 128 karaktere	31337	0
 3	22	Specifiseret ban er allerede i min banliste!	31337	0
-3	23	Ban'et %s er allerede dזkket af %s		31337	0
+3	23	Ban'et %s er allerede dזkket af %s	31337	0
 3	24	Ugyldigt minimums level.	31337	0
 3	25	Ugyldigt maximums level.	31337	0
 3	26	BRUGER: %s ADGANG: %s %s	31337	0
@@ -576,7 +577,7 @@ COPY "translations" FROM stdin;
 6	37	%s jב estב adicionado no %s com nםvel de acesso %i.	31337	0
 6	38	Adicionado usuבrio %s no %s com nםvel de acesso %i	31337	0
 6	39	Alguma coisa errada: %s	31337	0
-6	40	%s: Final da lista de ban		31337	0
+6	40	%s: Final da lista de ban	31337	0
 6	41	Incapaz de ver os detalhes do usuבrio (Invisםvel)	31337	0
 6	42	Informaחדo sobre: %s (%i)	31337	0
 6	43	Atualmente logado sobre: %s	31337	0
@@ -617,7 +618,7 @@ COPY "translations" FROM stdin;
 6	78	Acesso modificado de %s's no canal %s para %i	31337	0
 6	79	Ajustado AUTOMODE em OP para %s no canal %s	31337	0
 6	80	Ajustado AUTOMODE em VOICE para %s no canal %s	31337	0
-6	81	Ajustado AUTOMODE em NONE para %s no canal %s	31337	0	
+6	81	Ajustado AUTOMODE em NONE para %s no canal %s	31337	0
 6	82	Sua senha nדo poder seu username ou nick - sintaxe י: NEWPASS <nova senha>	31337	0
 6	83	Senha modificada com sucesso.	31337	0
 6	84	Funחדo NOOP estב ligada no %s	31337	0
@@ -701,7 +702,7 @@ COPY "translations" FROM stdin;
 6	163	%s י um Sךnior Oficial Coder-Com%s e estב logado como %s	31337	0
 6	164	 e י IRC operator	31337	0
 6	165	Adicionado ban %s no %s com nםvel %i	31337	0
-6	166	%s: lista de ban vazia.		31337	0
+6	166	%s: lista de ban vazia.	31337	0
 6	167	Eu jב estou neste canal!	31337	0
 6	168	Este comando י reservado para IRC Operators	31337	0
 6	169	Eu nדo tenho op no %s	31337	0
@@ -793,7 +794,7 @@ COPY "translations" FROM stdin;
 7	78	Modificato il livello di accesso per %s sul canale %s a %i	31337	0
 7	79	Impostato AUTOMODE a OP per %s sul canale %s	31337	0
 7	80	Impostato AUTOMODE a VOICE per %s sul canale %s	31337	0
-7	81	Impostato AUTOMODE a NONE per %s sul canale %s	31337	0	
+7	81	Impostato AUTOMODE a NONE per %s sul canale %s	31337	0
 7	82	La tua password non puע essere il tuo username o il tuo attuale nick - la sintassi ט: NEWPASS <nuova password>	31337	0
 7	83	La password ט stata cambiata con successo.	31337	0
 7	84	Il flag NOOP ט impostato su %s	31337	0
@@ -876,7 +877,7 @@ COPY "translations" FROM stdin;
 7	162	%s is an Official Coder-Com Developer%s and logged in as %s	31337	0
 7	163	%s is an Official Coder-Com Senior%s and logged in as %s	31337	0
 7	165	Aggiunto il ban %s a %s con livello %i	31337	0
-7	166	%s: lista dei ban vuota.		31337	0
+7	166	%s: lista dei ban vuota.	31337	0
 7	167	Sono giא in quel canale!	31337	0
 \.
 
@@ -925,7 +926,7 @@ COPY "translations" FROM stdin;
 8	37	%s e deja pe lista %s cu acces de %i.	31337	0
 8	38	Am adaugat %s la %s cu acces de %i	31337	0
 8	39	Ceva n-a mers cum trebuie: %s	31337	0
-8	40	%s: Sfarsit lista de banuri		31337	0
+8	40	%s: Sfarsit lista de banuri	31337	0
 8	41	Nu pot da detalii despre user (e invizibil)	31337	0
 8	42	Informatii despre: %s (%i)	31337	0
 8	43	In prezent logat cu: %s	31337	0
@@ -966,7 +967,7 @@ COPY "translations" FROM stdin;
 8	78	Am modificat nivelul lui %s pe %s la %i	31337	0
 8	79	Am setat AUTOMODE la OP pentru %s pe %s	31337	0
 8	80	Am setat AUTOMODE la VOICE pentru %s pe %s	31337	0
-8	81	Am setat AUTOMODE la NONE pentru %s pe %s	31337	0	
+8	81	Am setat AUTOMODE la NONE pentru %s pe %s	31337	0
 8	82	Parola nu poate fi username-ul sau nick-ul tau. - sintaxa e: NEWPASS <parola noua>	31337	0
 8	83	Parola a fost schimbata.	31337	0
 8	84	Flag-ul NOOP e activ pe %s	31337	0
@@ -1050,7 +1051,7 @@ COPY "translations" FROM stdin;
 8	163	%s este un Reprezentant Senior al Coder-Com%s si e logat ca %s	31337	0
 8	164	 si un IRCop	31337	0
 8	165	Am adaugat ban pe %s pe %s la nivelul %i	31337	0
-8	166	%s: lista de banuri e goala		31337	0
+8	166	%s: lista de banuri e goala	31337	0
 8	167	Sunt deja pe canal!	31337	0
 8	168	Aceasta comanda este rezervata pentru IRCopi	31337	0
 8	169	Nu sunt operator pe %s	31337	0
@@ -1141,7 +1142,7 @@ COPY "translations" FROM stdin;
 9	78	El nivell d'accיs de %s al canal %s s'ha canviat a %i.	31337	0
 9	79	AUTOMODE canviat a OP per a %s al canal %s	31337	0
 9	80	AUTOMODE canviat a VOICE pera %s al canal %s	31337	0
-9	81	AUTOMODE canviat a NONE per a %s al canal %s	31337	0	
+9	81	AUTOMODE canviat a NONE per a %s al canal %s	31337	0
 9	82	La teva contrasenya no pot pas ser el teu nom d'usuari/a ni el teu nick actual - la sintaxi יs: NEWPASS <nova contrasenya>	31337	0
 9	83	Contrasenya canviada correctament.	31337	0
 9	84	L'opciף NOOP estא activada a %s	31337	0
@@ -1225,7 +1226,7 @@ COPY "translations" FROM stdin;
 9	163	%s יs un/a Senior Oficial de Coder-Com%s i estא autenticat/da com a %s	31337	0
 9	164	 i un/a Operador/a d'IRC.	31337	0
 9	165	S'ha afegit el bandeig %s a %s amb nivell %i	31337	0
-9	166	%s: la llista de bandeigs יs buida.		31337	0
+9	166	%s: la llista de bandeigs יs buida.	31337	0
 9	167	Ja sףc a aquest canal!	31337	0
 9	168	Aquesta comanda יs reservada per a Operador/es d'IRC.	31337	0
 9	169	No tinc pas op a %s	31337	0
@@ -1316,7 +1317,7 @@ COPY "translations" FROM stdin;
 10	78	Se ha cambiado el nivel de acceso de %s en el canal %s a %i.	31337	0
 10	79	AUTOMODE cambiado a OP para %s en el canal %s	31337	0
 10	80	AUTOMODE cambiado a VOICE para %s en el canal %s	31337	0
-10	81	AUTOMODE cambiado a NONE para %s en el canal %s	31337	0	
+10	81	AUTOMODE cambiado a NONE para %s en el canal %s	31337	0
 10	82	Tu contraseסa no puede ser tu nombre de usuario/a ni tu nick actual - la sintaxis es: NEWPASS <nueva contraseסa>	31337	0
 10	83	Contraseסa cambiada con יxito.	31337	0
 10	84	La opciףn NOOP estב acitavada en %s	31337	0
@@ -1400,7 +1401,7 @@ COPY "translations" FROM stdin;
 10	163	%s es un/a Senior Oficial de Coder-Com%s y estב autentificado/a como %s	31337	0
 10	164	 y un/a Operador/a de IRC.	31337	0
 10	165	Se ha aסadido el ban %s a %s con nivel %i.	31337	0
-10	166	%s: la lista de bans estב vacםa.		31337	0
+10	166	%s: la lista de bans estב vacםa.	31337	0
 10	167	Ya estoy en ese canal!	31337	0
 10	168	Esta orden estב reservada para Operadores/as de IRC.	31337	0
 10	169	No tengo op en %s	31337	0
@@ -1491,7 +1492,7 @@ COPY "translations" FROM stdin;
 11	78	%s joga %s lett a(z) %i csatornan.	31337	0
 11	79	%s AUTOMODE erteke most OP a(z) %s csatornan	31337	0
 11	80	%s AUTOMODE erteke most VOICE a(z) %s csatornan	31337	0
-11	81	%s AUTOMODE erteke most NONE a(z) %s csatornan	31337	0	
+11	81	%s AUTOMODE erteke most NONE a(z) %s csatornan	31337	0
 11	82	A jelszo nem egyezhet meg a userneveddel sem a nickneveddel - szintaxis : NEWPASS <uj jelszo>	31337	0
 11	83	Sikeresen megvaltoztattam a jelszavad.	31337	0
 11	84	A NOOP opcio erteke: %s	31337	0
@@ -1575,7 +1576,7 @@ COPY "translations" FROM stdin;
 11	163	%s egy Official Coder-Com Senior%s es %s a userneve	31337	0
 11	164	 es egy IRC operator	31337	0
 11	165	Feltettem a(z) %s bant a(z) %s csatornara %i szintre.	31337	0
-11	166	%s: Ures a ban lista.		31337	0
+11	166	%s: Ures a ban lista.	31337	0
 11	167	Mar jelenleg is bennt vagyok azon a csatornan!	31337	0
 11	168	Ezt a parancsot csak IRC Operatorok hasznalhatjak.	31337	0
 11	169	Nem vagyok op a(z) %s csatornan	31337	0
@@ -1667,7 +1668,7 @@ COPY "translations" FROM stdin;
 12	78	%s iחin eri‏im seviyesi %s kanal‎nda %i olarak deנi‏tirildi	31337	0
 12	79	%s kullan‎c‎ ad‎ iחin %s kanal‎nda otomatik operatצrlük verildi	31337	0
 12	80	%s kullan‎c‎ ad‎ iחin %s kanal‎nda otomatik konu‏ma verildi	31337	0
-12	81	%s kullan‎c‎ ad‎ iחin %s kanal‎nda otomatik seחeneנi kald‎r‎ld‎	31337	0	
+12	81	%s kullan‎c‎ ad‎ iחin %s kanal‎nda otomatik seחeneנi kald‎r‎ld‎	31337	0
 12	82	Þifre ibareniz kullan‎c‎ ad‎n‎z ya da ‏uanki rumuzunuz olamaz - sצzdizimi: NEWPASS <yeni ibare>	31337	0
 12	83	Þifre deנi‏imi ba‏ar‎l‎.	31337	0
 12	84	%s kanal‎nda NOOP צzelliנi aktif hale getirilmi‏tir	31337	0
@@ -1751,7 +1752,7 @@ COPY "translations" FROM stdin;
 12	163	%s Resmi bir Coder-Com Uzman‎%s ve %s olarak tan‎ml‎	31337	0
 12	164	 ve bir IRC operatצrü	31337	0
 12	165	%s yasaklamas‎ %s kanal‎nda %i seviye ile eklendi	31337	0
-12	166	%s: yasakl‎lar listesi bo‏.		31337	0
+12	166	%s: yasakl‎lar listesi bo‏.	31337	0
 12	167	Ben zaten o kanalday‎m!	31337	0
 12	168	Bu komut IRC operatצrlere ait	31337	0
 12	169	%s kanal‎nda operatצrlük yetkim yok	31337	0
@@ -1845,7 +1846,7 @@ COPY "translations" FROM stdin;
 13	78	Modifisert %s sin aksess pו kanal %s til %i	31337	0
 13	79	Satt AUTOMODE til OP for %s pו kanal %s	31337	0
 13	80	Satt AUTOMODE til VOICE for %s pו kanal %s	31337	0
-13	81	Satt AUTOMODE til IKKENOE for %s pוp kanal %s	31337	0	
+13	81	Satt AUTOMODE til IKKENOE for %s pוp kanal %s	31337	0
 13	82	Ditt passord kan ikke vזre ditt brukernavn eller ditt nוvזrende nick - syntaks er: NEWPASS <nytt passord>	31337	0
 13	83	Passordet er byttet.	31337	0
 13	84	NOOP flagget er satt pו %s	31337	0
@@ -1929,7 +1930,7 @@ COPY "translations" FROM stdin;
 13	163	%s er en offisiell Coder-Com Senior%s og er logget inn som %s	31337	0
 13	164	 og en IRC operatרr	31337	0
 13	165	Lagt til ban %s til %s med level %i	31337	0
-13	166	%s: banlisten er tom.		31337	0
+13	166	%s: banlisten er tom.	31337	0
 13	167	Jeg er allerede pו den kanalen!	31337	0
 13	168	Denne kommandoen er reservert for IRC operatרrer	31337	0
 13	169	Jeg er ikke operatרr pו %s	31337	0
@@ -1980,7 +1981,7 @@ COPY "translations" FROM stdin;
 14	37	%s oudifa moussaba9ane %s fi mousstawa %i.	31337	0
 14	38	ziyadatou moussta3mile %s ala %s fi mousstawa %i	31337	0
 14	39	Youjado ghalate: %s	31337	0
-14	40	%s: nihayatou lai7ati al ban		31337	0
+14	40	%s: nihayatou lai7ati al ban	31337	0
 14	41	la youmkinou idharou tafassile al moussta3mile.	31337	0
 14	42	Ma3loumate 3ala: %s (%i)	31337	0
 14	43	alane moutassile 3abra: %s	31337	0
@@ -2097,7 +2098,7 @@ COPY "translations" FROM stdin;
 14	163	%s is an Official Coder-Com Senior%s wa mou3arafe bi %s	31337	0
 14	164	 wa IRC operator	31337	0
 14	165	Tamate idafato ban %s li %s fi darajati %i	31337	0
-14	166	%s: Lai7ato l ban farigha .		31337	0
+14	166	%s: Lai7ato l ban farigha .	31337	0
 14	167	Ana sabi9ane fi hadihi al 9anate!	31337	0
 14	168	hada al amre moukhassasse li IRC Operators	31337	0
 14	169	Ana lastou op fi %s	31337	0
@@ -2123,7 +2124,7 @@ COPY "translations" FROM stdin;
 15	12	%s כבר קול ב %s	31337	0
 15	13	הוריד לך את האופ %s (%s) on %s	31337	0
 15	14	הוריד לך את הקול %s (%s) on %s	31337	0
-15	15	%s אינו  אופ ב: %s		31337	0
+15	15	%s אינו  אופ ב: %s	31337	0
 15	16	%s אינו  קול ב: %s	31337	0
 15	17	אינו אושר %sהמשתמש   	31337	0
 15	18	אני לא נמצא בערוץ !	31337	0
@@ -2131,7 +2132,7 @@ COPY "translations" FROM stdin;
 15	20	משך זמן הבאן לא חוקי, הזמן המירבי הוא 336 שעות.	31337	0
 15	21	.סיבת הבאן לא יכולה להיות מעבר ל 128 תווים	31337	0
 15	22	.באן זה כבר נמצא ברשימה	31337	0
-15	23	%s מכוסה ע"י הבאן %s הבאן		31337	0
+15	23	%s מכוסה ע"י הבאן %s הבאן	31337	0
 15	24	הרמה המינימלית מזערית.	31337	0
 15	25	הרמה המקסימלית מירבית.	31337	0
 15	26	%s %s :גישה %sשם משתמש: 	31337	0
@@ -2145,7 +2146,7 @@ COPY "translations" FROM stdin;
 15	34	אין התאמות !	31337	0
 15	35	לא ניתן להוסיף משתמש בעל גישה שווה או גבוהה מזו שלך.	31337	0
 15	36	רמת הגישה לא חוקית.	31337	0
-15	37	%s הוסף ל %s עם גישה ברמה של %i 		31337	0
+15	37	%s הוסף ל %s עם גישה ברמה של %i 	31337	0
 15	38	%s עם רמת גישה של  %s  הוסף כבר ל %i	31337	0
 15	39	משהו שגוי %s	31337	0
 15	40	%s: סוף רשימת הבאנים	31337	0
@@ -2189,7 +2190,7 @@ COPY "translations" FROM stdin;
 15	78	%s למשתמש %s בערוץ %i שונתה רמת הגישה ל	31337	0
 15	79	%s ב %sבוצע, מצב אופ אוטומטי ל  	31337	0
 15	80	%s ב %s בוצע, מצב פלוס אוטומטי ל 	31337	0
-15	81	%s בערוץ %sהוגדר מצב אוטומטי של אף אחד 	31337	0	
+15	81	%s בערוץ %sהוגדר מצב אוטומטי של אף אחד 	31337	0
 15	82	לשינוי NEWPASS <new password>הסיסמה איננה יכולה להיות השם משתמש שלך או הכינוי הנוכחי, בצע: 	31337	0
 15	83	הסיסמה שונתה בהצלחה.	31337	0
 15	84	%s הוגדר ב NOOP flag  	31337	0
@@ -2220,14 +2221,14 @@ COPY "translations" FROM stdin;
 15	109	הכתובת אינה יכולה להיות מעבר ל 75 תווים!	31337	0
 15	110	נמחקה %s הכתובת ל	31337	0
 15	111	%s הכתובת ל %s	31337	0
-15	112	מחרוזת האותיות איננה יכולה להיות מעבר ל 80 תווים!		31337	0
+15	112	מחרוזת האותיות איננה יכולה להיות מעבר ל 80 תווים!	31337	0
 15	113	%s הן %s מילות המפתח ל	31337	0
 15	114	%s הגדרת השפה הנבחרת היא 	31337	0
 15	115	שגיאה: בחירת השפה איננה אפשרית.	31337	0
 15	116	על הרשת %s לא ניתן למצוא את הערוץ 	31337	0
 15	117	שגיאה: הגדרות הערוץ שגויות.	31337	0
 15	118	רשימת התעלמויות:	31337	0
-15	119	רשימת ההתעלמויות ריקה.		31337	0
+15	119	רשימת ההתעלמויות ריקה.	31337	0
 15	120	-- סוף רשימת ההתעלמויות	31337	0
 15	121	CMaster Channel Services internal status:	31337	0
 15	122	[     Channel Record Stats] \002Cached Entries:\002 %i    \002DB Requests:\002 %i    \002Cache Hits:\002 %i    \002Efficiency:\002 %.2f%%	31337	0
@@ -2245,7 +2246,7 @@ COPY "translations" FROM stdin;
 15	134	Flags set: %s	31337	0
 15	135	אין אפשרות להשעות משתמש בעל גישה שווה או גבוהה מזו שלך.	31337	0
 15	136	הזמן שגוי.	31337	0
-15	137	משך זמן ההשעיה אינו חוקי.		31337	0
+15	137	משך זמן ההשעיה אינו חוקי.	31337	0
 15	138	מבוטלת %s ההשעיה של	31337	0
 15	139	%s כבר מושעה ב %s	31337	0
 15	140	%s תיגמר תוך %s ההשעיה של	31337	0
