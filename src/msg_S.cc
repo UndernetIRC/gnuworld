@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_S.cc,v 1.7 2002/07/05 01:10:06 dan_karrels Exp $
+ * $Id: msg_S.cc,v 1.8 2002/07/10 14:40:48 dan_karrels Exp $
  */
 
 #include	<new>
@@ -34,7 +34,7 @@
 #include	"xparameters.h"
 #include	"ServerCommandHandler.h"
 
-const char msg_S_cc_rcsId[] = "$Id: msg_S.cc,v 1.7 2002/07/05 01:10:06 dan_karrels Exp $" ;
+const char msg_S_cc_rcsId[] = "$Id: msg_S.cc,v 1.8 2002/07/10 14:40:48 dan_karrels Exp $" ;
 const char server_h_rcsId[] = __SERVER_H ;
 const char events_h_rcsId[] = __EVENTS_H ;
 const char Network_h_rcsId[] = __NETWORK_H ;
@@ -73,7 +73,6 @@ CREATE_HANDLER(msg_S)
  */
 bool msg_S::Execute( const xParameters& params )
 {
-
 // We need at least 9 tokens
 if( params.size() < 9 )
 	{

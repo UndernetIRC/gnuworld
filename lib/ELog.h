@@ -17,11 +17,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ELog.h,v 1.7 2002/05/27 17:18:12 dan_karrels Exp $
+ * $Id: ELog.h,v 1.8 2002/07/10 14:40:46 dan_karrels Exp $
  */
 
 #ifndef __ELOG_H
-#define __ELOG_H "$Id: ELog.h,v 1.7 2002/05/27 17:18:12 dan_karrels Exp $"
+#define __ELOG_H "$Id: ELog.h,v 1.8 2002/07/10 14:40:46 dan_karrels Exp $"
 
 #include	<sstream>
 #include	<iostream>
@@ -137,6 +137,7 @@ public:
 	ELog& operator<<( const short int& ) ;
 	ELog& operator<<( const unsigned short int& ) ;
 	ELog& operator<<( stringstream& s ) ;
+	ELog& operator<<( const double& ) ;
 
 } ;
 

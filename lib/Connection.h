@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: Connection.h,v 1.8 2002/06/06 02:29:00 dan_karrels Exp $
+ * $Id: Connection.h,v 1.9 2002/07/10 14:40:46 dan_karrels Exp $
  */
 
 #ifndef __CONNECTION_H
-#define __CONNECTION_H "$Id: Connection.h,v 1.8 2002/06/06 02:29:00 dan_karrels Exp $"
+#define __CONNECTION_H "$Id: Connection.h,v 1.9 2002/07/10 14:40:46 dan_karrels Exp $"
 
 #include	<sys/types.h>
 #include	<netinet/in.h>
@@ -35,9 +35,6 @@
 
 #include	"Buffer.h"
 
-namespace gnuworld
-{
-
 /// Import the C++ standard string class
 using std::string ;
 
@@ -48,9 +45,6 @@ using gnuworld::Buffer ;
 
 /// Forward declaration of the manager class
 class ConnectionManager ;
-
-/// Forward declaration of the handler class
-class ConnectionHandler ;
 
 /**
  * This class represents an individual connection to be used with
@@ -63,10 +57,6 @@ class Connection
 	/// Allow the manager class to have access to this class's
 	/// protected members
 	friend class ConnectionManager ;
-
-	/// Allow the handler class to have access to this class's
-	/// protected members (outputBuffer)
-	friend class ConnectionHandler ;
 
 public:
 
@@ -105,6 +95,18 @@ public:
 	 */
 	inline unsigned short int	getRemotePort() const
 		{ return remotePort ; }
+
+	/**
+	 * Return true if this connection is TCP, false if UDP.
+	 */
+	inline bool		isTCP() const
+		{ return TCP ; }
+
+	/**
+	 * Return true if this connection is UDP, false if TCP.
+	 */
+	inline bool		isUDP() const
+		{ return !isTCP() ; }
 
 	/**
 	 * This type is used to represent flags of this connection,
@@ -216,10 +218,12 @@ protected:
 
 	/**
 	 * Create a new instance of this class given the remote
-	 * host (may be empty), the IP, remote port number.
+	 * host (may be empty), the IP, remote port number, and TCP/UDP
+	 * flag (true if TCP).
 	 */
 	Connection( const string& host,
 			const unsigned short int remotePort,
+			const bool TCP,
 			const char delimiter ) ;
 
 	/**
@@ -264,6 +268,10 @@ protected:
 				const unsigned short int newRemotePort )
 		{ remotePort = newRemotePort ; }
 
+	/// Set the TCP variable, default value is true
+	inline void	setTCP( bool newVal = true )
+		{ TCP = newVal ; }
+
 	/// Return the socket (file) descriptor for this connection
 	inline int	getSockFD() const
 		{ return sockFD ; }
@@ -303,6 +311,9 @@ protected:
 	/// The remote port number of this connection
 	unsigned short int	remotePort ;
 
+	/// True if TCP connection, false if UDP
+	bool			TCP ;
+
 	/// The input buffer for this connection
 	Buffer			inputBuffer ;
 
@@ -327,7 +338,5 @@ protected:
 	time_t			absTimeout ;
 
 } ;
-
-} // namespace gnuworld
 
 #endif // __CONNECTION_H

@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server.cc,v 1.137 2002/07/08 15:47:58 dan_karrels Exp $
+ * $Id: server.cc,v 1.138 2002/07/10 14:40:48 dan_karrels Exp $
  */
 
 #include	<sys/time.h>
@@ -72,7 +72,7 @@
 #include	"Connection.h"
 
 const char server_h_rcsId[] = __SERVER_H ;
-const char server_cc_rcsId[] = "$Id: server.cc,v 1.137 2002/07/08 15:47:58 dan_karrels Exp $" ;
+const char server_cc_rcsId[] = "$Id: server.cc,v 1.138 2002/07/10 14:40:48 dan_karrels Exp $" ;
 const char config_h_rcsId[] = __CONFIG_H ;
 const char misc_h_rcsId[] = __MISC_H ;
 const char events_h_rcsId[] = __EVENTS_H ;
@@ -241,156 +241,6 @@ delete[] inputCharBuffer ; inputCharBuffer = 0 ;
 
 } // ~xServer()
 
-/*
-void xServer::loadCommandHandlers()
-{
-
-// Allocate the command map
-commandMap = new (std::nothrow) commandMapType ;
-assert( commandMap != 0 ) ;
-
-// Register messages
-// This basically adds command handler into
-// the commandMap for each of the messages listed below.
-// The format of REGISTER_MSG is:
-// REGISTER_MSG(textCommand, handler)
-// textCommand is the quotation delimited string
-// associated with the incoming network command.
-// handler is the name of the xServer non-static
-// class handler method to be called for handling
-// that particular command, prepended with MSG_
-
-REGISTER_MSG( "RPING", RemPing );
-
-// Server
-REGISTER_MSG( "S", S );
-REGISTER_MSG( "SERVER", Server );
-
-// Nick
-REGISTER_MSG( "N", N );
-
-// End of Burst
-REGISTER_MSG( "EB", EB );
-
-// End of Burst Acknowledge
-REGISTER_MSG( "EA", EA );
-
-// Ping
-REGISTER_MSG( "G", G );
-
-// Privmsg
-// Also register NOTICE to
-// be handled by the privmsg
-// command handler.
-//
-REGISTER_MSG( "O", P );
-REGISTER_MSG( "P", P );
-REGISTER_MSG( "PRIVMSG", PRIVMSG );
-
-REGISTER_MSG( "351", M351 );
-
-// Mode
-REGISTER_MSG( "M", M );
-
-// OPMODE
-// Use same handler as MODE
-REGISTER_MSG( "OM", M ) ;
-
-// CLEARMODE
-REGISTER_MSG( "CM", CM ) ;
-
-// Quit
-REGISTER_MSG( "Q", Q );
-
-// Join
-REGISTER_MSG( "J", J ) ;
-
-// Create
-REGISTER_MSG( "C", C ) ;
-
-// Leave
-REGISTER_MSG( "L", L ) ;
-
-// Part
-REGISTER_MSG( "PART", PART ) ;
-
-// Squit
-REGISTER_MSG( "SQ", SQ ) ;
-REGISTER_MSG( "SQUIT", SQ ) ;
-
-// Kill
-REGISTER_MSG( "D", D ) ;
-
-// Invite
-REGISTER_MSG( "I", I ) ;
-
-// Wallops
-REGISTER_MSG( "WA", WA ) ;
-
-// Whois
-REGISTER_MSG( "W", W ) ;
-
-REGISTER_MSG( "R", R ) ;
-
-// PASS
-REGISTER_MSG( "PASS", PASS ) ;
-
-// GLINE
-REGISTER_MSG( "GL", GL ) ;
-
-// TOPIC
-REGISTER_MSG( "T", T ) ;
-
-// KICK
-REGISTER_MSG( "K", K ) ;
-
-// No idea
-REGISTER_MSG( "DS", DS ) ;
-
-// Non-tokenized command handlers
-
-// NOOP handlers.
-// These messages aren't currently used.
-
-// PING Reply
-REGISTER_MSG( "Z", NOOP ) ;
-
-// MOTD
-// REGISTER_MSG( "MOTD", NOOP ) ;
-REGISTER_MSG( "MO", NOOP ) ;
-
-// STATS
-REGISTER_MSG( "STATS", NOOP ) ;
-
-// Version
-REGISTER_MSG( "V", NOOP ) ;
-
-// Trace
-REGISTER_MSG( "TR", NOOP ) ;
-
-// SETTIME
-REGISTER_MSG( "SETTIME", NOOP ) ;
-
-// End of channel ban list
-REGISTER_MSG( "368", NOOP ) ;
-
-// AWAY
-REGISTER_MSG( "A", NOOP ) ;
-
-// *shrug*
-REGISTER_MSG( "441", NOOP ) ;
-
-REGISTER_MSG( "F", NOOP ) ;
-
-// SILENCE
-REGISTER_MSG( "U", NOOP ) ;
-
-// *shrug*
-REGISTER_MSG( "WU", NOOP ) ;
-
-}
-*/
-
 void xServer::initializeVariables()
 {
 
@@ -526,11 +376,16 @@ while( std::getline( commandMapFile, line ) )
 		break ;
 		}
 
-	elog	<< "xServer::loadCommandHandlers> Loaded handler for "
-		<< st[ 1 ]
-		<< endl ;
+//	elog	<< "xServer::loadCommandHandlers> Loaded handler for "
+//		<< st[ 1 ]
+//		<< endl ;
 
 	} // while()
+
+elog	<< "xServer> Loaded "
+	<< commandMap.size()
+	<< " command handlers"
+	<< endl ;
 
 commandMapFile.close() ;
 return returnVal ;
@@ -862,7 +717,6 @@ else
 
 	// Extract the command
 	Command = strtok( NULL, " " ) ;
-
 	}
 
 if( NULL == Sender )
@@ -893,6 +747,7 @@ if( !isNumeric )
 // elog << "Sender: " << Sender << endl ;
 // elog << "Command: " << Command << endl ;
 // elog << "strlen( Command ): " << strlen( Command ) << endl ;
+// elog << "isNumeric: " << isNumeric << endl ;
 
 // Lookup the handler for this command
 commandMapType::iterator pairPtr = commandMap.find( Command ) ;
@@ -972,7 +827,6 @@ if( pairPtr != commandMap.end() )
 
 	// Arguments are set.
 	// Go ahead and call the handler method
-//	(this->*(pairPtr->second))( Param ) ;
 	if( !pairPtr->second->Execute( Param ) )
 		{
 		elog	<< "xServer::Process> Handler failed for message: "
