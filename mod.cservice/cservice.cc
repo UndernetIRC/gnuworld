@@ -149,8 +149,9 @@ cservice::cservice(const string& args)
 	cserviceConfig = new EConfig( args ) ;
 	string sqlHost = cserviceConfig->Require( "sql_host" )->second;
 	string sqlDb = cserviceConfig->Require( "sql_db" )->second;
+	string sqlPort = cserviceConfig->Require( "sql_port" )->second;
 	
-	string Query = "host=" + sqlHost + " dbname=" + sqlDb ;
+	string Query = "host=" + sqlHost + " dbname=" + sqlDb + " port=" + sqlPort;
 
 	elog << "cmaster::cmaster> Attempting to connect to " << sqlHost << "; Database: " << sqlDb << endl;
  
@@ -435,7 +436,7 @@ int cservice::OnCTCP( iClient* theClient, const string& CTCP,
 
 	if(Command == "VERSION")
 	{
-		xClient::DoCTCP(theClient, CTCP.c_str(), "Undernet P10 Channel Services Version 2 [" __DATE__ " " __TIME__ "] ($Id: cservice.cc,v 1.35 2001/01/12 19:56:08 gte Exp $)");
+		xClient::DoCTCP(theClient, CTCP.c_str(), "Undernet P10 Channel Services Version 2 [" __DATE__ " " __TIME__ "] ($Id: cservice.cc,v 1.36 2001/01/12 21:36:38 gte Exp $)");
 		return true;
 	}
  
@@ -714,7 +715,7 @@ int cservice::OnTimer(xServer::timerID, void*)
     *  Time to see if anyone updated the database while we weren't looking. :)
     */
 
-    elog << "cmaster::OnTimer> Checking for updates.." << endl;
+//    elog << "cmaster::OnTimer> Checking for updates.." << endl;
 	time_t theTime = time(NULL) + updateInterval;
 	MyUplink->RegisterTimer(theTime, this, NULL);
  
