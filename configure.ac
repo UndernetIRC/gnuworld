@@ -1,10 +1,10 @@
-dnl $Id: configure.ac,v 1.4 2003/06/05 01:38:00 dan_karrels Exp $
+dnl $Id: configure.ac,v 1.5 2003/06/06 12:38:01 dan_karrels Exp $
 dnl ----------------------------------------------------------
 
 echo Configuring GNUWorld...
 echo
 
-AC_REVISION($Revision: 1.4 $)
+AC_REVISION($Revision: 1.5 $)
 AC_INIT
 AC_CONFIG_SRCDIR([src/main.cc])
 AM_INIT_AUTOMAKE(gnuworld,0.0)
@@ -32,8 +32,9 @@ AM_PROG_LIBTOOL
 CFLAGS="$CFLAGS -Wall -pipe"
 CXXFLAGS="-Wall -pipe"
 
-prefix=`pwd`
-bindir=`pwd`
+prefix="`pwd`"
+bindir="`pwd`/bin"
+libdir="`pwd`/lib"
 glibdir="`pwd`/libgnuworld"
 topdir="`pwd`"
 
@@ -171,21 +172,6 @@ AC_ARG_WITH(prof,
 	[CXXFLAGS="$CXXFLAGS -pg"]
 )
 
-network=""
-AC_ARG_WITH(protocol,
-	AC_HELP_STRING([--with-protocol],
-			[Choose which network protocol to support
-			 Default is ircu]),
-	[network="$withval"],
-	[network=ircu]
-)
-
-if [ ! test -d "lib$network" ]; then
-	AC_MSG_ERROR( "Unable to find network protocol directory: $network" )
-fi
-
-NETWORK_DIR="lib$network"
-
 PGSQL_LIB=/usr/local/pgsql/lib
 AC_ARG_WITH(pgsql-lib,
 	AC_HELP_STRING([--with-pgsql-lib=PGSQLLIBDIR],
@@ -299,7 +285,6 @@ fi
 dnl echo "MOD_DIRS = $MOD_DIRS"
 AC_SUBST(MOD_DIRS)
 
-AC_SUBST(NETWORK_DIR)
 AC_SUBST(TEST_DIR)
 AC_SUBST(CXXFLAGS)
 AC_SUBST(INCLTDL)
