@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------------
--- "$Id: cservice.sql,v 1.36 2001/05/06 21:38:40 gte Exp $"
+-- "$Id: cservice.sql,v 1.37 2001/05/19 21:33:04 gte Exp $"
 -- Channel service DB SQL file for PostgreSQL.
 
 -- ChangeLog:
@@ -293,6 +293,35 @@ CREATE TABLE deletion_transactions (
 	last_updated INT4 NOT NULL
 );
 
+-- Table to deal with the whole no-reg schema.
+-- We use username and channelname instead of id's because these records may 
+-- exist past the lifetime of particular user accounts, and we'll want
+-- to make sure certain email address's remain unable to register, etc.
+-- Specific flags are INT4's becuase postgres does not want to index on anything
+-- smaller :/
+
+CREATE TABLE noreg (
+	user_name TEXT,
+	email TEXT,
+	channel_name TEXT,
+	type INT4 NOT NULL,
+	-- 1 - Non-support registered against this channel/manager application.
+	-- 2 - Abuse.
+	-- 3 - Elective.
+	never_reg INT4 NOT NULL DEFAULT '0',
+	-- Never, ever register this channel, or user or pair.
+	for_review INT4 NOT NULL DEFAULT '0',
+	-- Don't automatically expire this, post for review.
+	expire_time INT4,
+	created_ts INT4,
+ 	set_by TEXT,
+	reason TEXT
+);
+
+CREATE INDEX noreg_user_name_idx ON noreg (lower(user_name));
+CREATE INDEX noreg_email_idx ON noreg (lower(email));
+CREATE INDEX noreg_channel_name_idx ON noreg (lower(channel_name));
+CREATE INDEX noreg_expire_time_idx ON noreg (expire_time);
 
 -- Update notification rules.
 --
