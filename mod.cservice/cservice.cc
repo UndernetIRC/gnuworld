@@ -151,14 +151,17 @@ cservice::cservice(const string& args)
     RegisterCommand(new BANCommand(this, "BAN", "<#channel> <nick | *!*user@*.host> [duration] [level] [reason]", 5));
     RegisterCommand(new UNBANCommand(this, "UNBAN", "<#channel> <*!*user@*.host>", 5));
     RegisterCommand(new LBANLISTCommand(this, "LBANLIST", "<#channel>", 5));
-    RegisterCommand(new NEWPASSCommand(this, "NEWPASS", "<new passphrase>", 5));
+    RegisterCommand(new NEWPASSCommand(this, "NEWPASS", "<new passphrase>", 8));
+    RegisterCommand(new JOINCommand(this, "JOIN", "<#channel>", 8));
+    RegisterCommand(new PARTCommand(this, "PART", "<#channel>", 8));
 
-    RegisterCommand(new REGISTERCommand(this, "REGISTER", "<#channel>", 0));
-    RegisterCommand(new PURGECommand(this, "PURGE", "<#channel> <reason>", 0));
-    RegisterCommand(new FORCECommand(this, "FORCE", "<#channel>", 0));
-    RegisterCommand(new UNFORCECommand(this, "UNFORCE", "<#channel>", 0));
-    RegisterCommand(new SERVNOTICECommand(this, "SERVNOTICE", "<#channel> <text>", 0));
-    RegisterCommand(new SAYCommand(this, "SAY", "<#channel> <text>", 0));
+    RegisterCommand(new REMIGNORECommand(this, "REMIGNORE", "<mask>", 5));
+    RegisterCommand(new REGISTERCommand(this, "REGISTER", "<#channel>", 8));
+    RegisterCommand(new PURGECommand(this, "PURGE", "<#channel> <reason>", 8));
+    RegisterCommand(new FORCECommand(this, "FORCE", "<#channel>", 8));
+    RegisterCommand(new UNFORCECommand(this, "UNFORCE", "<#channel>", 8));
+    RegisterCommand(new SERVNOTICECommand(this, "SERVNOTICE", "<#channel> <text>", 5));
+    RegisterCommand(new SAYCommand(this, "SAY", "<#channel> <text>", 5));
 
 	//-- Load in our cservice configuration file. 
 	cserviceConfig = new EConfig( args ) ;
@@ -469,7 +472,7 @@ int cservice::OnCTCP( iClient* theClient, const string& CTCP,
 
 	if(Command == "VERSION")
 	{
-		xClient::DoCTCP(theClient, CTCP.c_str(), "Undernet P10 Channel Services Version 2 [" __DATE__ " " __TIME__ "] ($Id: cservice.cc,v 1.66 2001/01/29 01:08:28 gte Exp $)");
+		xClient::DoCTCP(theClient, CTCP.c_str(), "Undernet P10 Channel Services Version 2 [" __DATE__ " " __TIME__ "] ($Id: cservice.cc,v 1.67 2001/01/29 02:16:27 gte Exp $)");
 		return true;
 	}
  
@@ -786,7 +789,7 @@ const string& cservice::getResponse( sqlUser* theUser, int response_id )
 	 * will most likely segfault anyway).
 	 */
 
-	result = "Unable to retrieve response. Please contact a cservice administrator.";
+	result = "Unable to retrieve response for this language. Please contact a cservice administrator.";
 	return result;
 }
 
