@@ -8,7 +8,7 @@
  *
  * Caveats: None
  *
- * $Id: OPERPARTCommand.cc,v 1.1 2001/02/10 23:34:02 gte Exp $
+ * $Id: OPERPARTCommand.cc,v 1.2 2001/02/12 14:07:05 plexus Exp $
  */
 
 
@@ -21,7 +21,7 @@
 #include	"responses.h"
 #include	"Network.h"
 
-const char OPERPARTCommand_cc_rcsId[] = "$Id: OPERPARTCommand.cc,v 1.1 2001/02/10 23:34:02 gte Exp $" ;
+const char OPERPARTCommand_cc_rcsId[] = "$Id: OPERPARTCommand.cc,v 1.2 2001/02/12 14:07:05 plexus Exp $" ;
 
 namespace gnuworld
 {
@@ -30,6 +30,16 @@ using namespace gnuworld;
  
 bool OPERPARTCommand::Exec( iClient* theClient, const string& Message )
 { 
+	/*
+	 *  Check if the user is an oper.
+	 */
+
+        if(!theClient->isOper())
+        {
+        	bot->Notice(theClient, "This command is reserved to IRC Operators");
+        	return true;
+        }
+
 	StringTokenizer st( Message ) ;
 	if( st.size() < 2 )
 	{
@@ -48,35 +58,31 @@ bool OPERPARTCommand::Exec( iClient* theClient, const string& Message )
 		return false;
 	} 
 
-	/*
-	 *  Check if the user is an oper.
-	 */
-
-    if(!theClient->isOper())
-            {
-            bot->Notice(theClient, "This command is reserved to IRC Operators");
-            return true;
-            }
-
 	/* Check the bot is in the channel. */
  
 	if (!theChan->getInChan()) {
 		bot->Notice(theClient, "I'm not in that channel!");
 		return false;
 	}
- 
-    strstream s;
 
-    s       << server->getCharYY() << " WA :"
-            << theClient->getNickUserHost() << " is asking me to leave "
-            << theChan->getName() << ends;
-    bot->Write(s);
-    delete[] s.str();
+	// Tell the world.
+ 
+	strstream s;
+
+	s       << server->getCharYY() << " WA :"
+    	        << "An IRC Operator is asking me to leave channel "
+        	<< theChan->getName() << ends;
+	bot->Write(s);
+	delete[] s.str();
+	
+	bot->logAdminMessage("%s is asking me to leave channel %s",
+			theClient->getNickUserHost().c_str(),
+			theChan->getName().c_str());
 	 
 	theChan->setInChan(false);
 	bot->getUplink()->UnRegisterChannelEvent(theChan->getName(), bot);
 	
-	bot->Part(theChan->getName());
+	bot->Part(theChan->getName(), "At the request of an IRC Operator");
 	
 	return true;
 } 

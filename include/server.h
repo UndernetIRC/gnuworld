@@ -17,7 +17,7 @@
  */
 
 #ifndef __XSERVER_H
-#define __XSERVER_H "$Id: server.h,v 1.32 2001/02/05 20:06:38 dan_karrels Exp $"
+#define __XSERVER_H "$Id: server.h,v 1.33 2001/02/12 14:06:03 plexus Exp $"
 
 #include	<string>
 #include	<vector>
@@ -321,13 +321,13 @@ public:
 	 * Notify the network that one of the services clients has
 	 * parted a channel.
 	 */
-	virtual void PartChannel( xClient* theClient, const string& chanName ) ;
+	virtual void PartChannel( xClient* theClient, const string& chanName, const string& reason = "" ) ;
 
 	/**
 	 * Notify the network that one of the services clients has
 	 * parted a channel.
 	 */
-	virtual void PartChannel( xClient* theClient, Channel* theChan ) ;
+	virtual void PartChannel( xClient* theClient, Channel* theChan, const string& reason = "" ) ;
 
 	/**
  	 * Handle the parting of a services client from a channel.  This

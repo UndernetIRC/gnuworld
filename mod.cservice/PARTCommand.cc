@@ -8,7 +8,7 @@
  *
  * Caveats: None
  *
- * $Id: PARTCommand.cc,v 1.3 2001/02/10 23:34:02 gte Exp $
+ * $Id: PARTCommand.cc,v 1.4 2001/02/12 14:07:30 plexus Exp $
  */
 
 
@@ -21,7 +21,7 @@
 #include	"responses.h"
 #include	"Network.h"
 
-const char PARTCommand_cc_rcsId[] = "$Id: PARTCommand.cc,v 1.3 2001/02/10 23:34:02 gte Exp $" ;
+const char PARTCommand_cc_rcsId[] = "$Id: PARTCommand.cc,v 1.4 2001/02/12 14:07:30 plexus Exp $" ;
 
 namespace gnuworld
 {
@@ -75,12 +75,22 @@ bool PARTCommand::Exec( iClient* theClient, const string& Message )
 		bot->Notice(theClient, bot->getResponse(theUser, language::insuf_access).c_str());
 		return false;
 	} 
+
+	sqlLevel* aLevel = bot->getLevelRecord(theUser, theChan);
  
 	theChan->setInChan(false); 
 	bot->getUplink()->UnRegisterChannelEvent(theChan->getName(), bot);
 	
-	bot->Part(theChan->getName());
-	
+	if(aLevel)
+		{
+		if(aLevel->getFlag(sqlLevel::F_FORCED))
+			{
+			bot->Part(theChan->getName(), "At the request of a CService Administrator");
+			return true;
+			}
+		}
+	string partReason = "At the request of " + theUser->getUserName();
+	bot->Part(theChan->getName(), partReason);	
 	return true;
 } 
 

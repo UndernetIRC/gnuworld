@@ -8,7 +8,7 @@
  *
  * Caveats: None
  *
- * $Id: OPERJOINCommand.cc,v 1.1 2001/02/10 23:34:02 gte Exp $
+ * $Id: OPERJOINCommand.cc,v 1.2 2001/02/12 14:06:37 plexus Exp $
  */
 
 
@@ -21,7 +21,7 @@
 #include	"responses.h"
 #include	"Network.h"
 
-const char OPERJOINCommand_cc_rcsId[] = "$Id: OPERJOINCommand.cc,v 1.1 2001/02/10 23:34:02 gte Exp $" ;
+const char OPERJOINCommand_cc_rcsId[] = "$Id: OPERJOINCommand.cc,v 1.2 2001/02/12 14:06:37 plexus Exp $" ;
 
 namespace gnuworld
 {
@@ -30,6 +30,16 @@ using namespace gnuworld;
  
 bool OPERJOINCommand::Exec( iClient* theClient, const string& Message )
 { 
+	/*
+	 *  Check the user is an oper.
+	 */
+
+	if(!theClient->isOper())
+	{
+		bot->Notice(theClient, "This command is reserved to IRC Operators");
+		return true;
+	}
+
 	StringTokenizer st( Message ) ;
 	if( st.size() < 2 )
 	{
@@ -49,29 +59,25 @@ bool OPERJOINCommand::Exec( iClient* theClient, const string& Message )
 		return false;
 	} 
 
-	/*
-	 *  Check the user is an oper.
-	 */
-
-	if(!theClient->isOper())
-		{
-		bot->Notice(theClient, "This command is reserved to IRC Operators");
-		return true;
-		}
-
  	/* Check the bot isn't in the channel. */ 
 	if (theChan->getInChan()) {
 		bot->Notice(theClient, "I'm already in that channel!");
 		return false;
 	}
  
+        // Tell the world.
+ 
 	strstream s;
 	
 	s	<< server->getCharYY() << " WA :"
-		<< theClient->getNickUserHost() << " is asking me to join "
+		<< "An IRC Operator is asking me to join channel "
 		<< theChan->getName() << ends;
 	bot->Write(s);
 	delete[] s.str();
+
+	bot->logAdminMessage("%s is asking me to join channel %s",
+			theClient->getNickUserHost().c_str(),
+			theChan->getName().c_str());
  
 	theChan->setInChan(true);
 	bot->getUplink()->RegisterChannelEvent( theChan->getName(), bot);

@@ -47,7 +47,7 @@
 #include	"ServerTimerHandlers.h"
 
 const char xServer_h_rcsId[] = __XSERVER_H ;
-const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.75 2001/02/06 00:26:00 dan_karrels Exp $" ;
+const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.76 2001/02/12 14:09:07 plexus Exp $" ;
 
 using std::string ;
 using std::vector ;
@@ -1770,7 +1770,7 @@ return 0 ;
  * Write an xClient channel part to the network, and update
  * network tables.
  */
-void xServer::PartChannel( xClient* theClient, const string& chanName )
+void xServer::PartChannel( xClient* theClient, const string& chanName, const string& reason )
 {
 #ifndef NDEBUG
   assert( theClient != NULL ) ;
@@ -1784,14 +1784,14 @@ if( NULL == theChan )
 	return ;
 	}
 
-PartChannel( theClient, theChan ) ;
+PartChannel( theClient, theChan, reason ) ;
 }
 
 /**
  * Write an xClient channel part to the network, and update
  * network tables.
  */
-void xServer::PartChannel( xClient* theClient, Channel* theChan )
+void xServer::PartChannel( xClient* theClient, Channel* theChan, const string& reason )
 {
 #ifndef NDEBUG
   assert( theClient != NULL && theChan != NULL ) ;
@@ -1799,7 +1799,7 @@ void xServer::PartChannel( xClient* theClient, Channel* theChan )
 
 strstream s ;
 s	<< theClient->getCharYYXXX() << " L "
-	<< theChan->getName() << ends ;
+	<< theChan->getName() << " :" << reason << ends ;
 
 Write( s ) ;
 delete[] s.str() ;

@@ -9,7 +9,7 @@
  *
  * Caveats: None.
  *
- * $Id: SEARCHCommand.cc,v 1.2 2001/02/12 01:51:05 plexus Exp $
+ * $Id: SEARCHCommand.cc,v 1.3 2001/02/12 14:07:52 plexus Exp $
  */
 
 #include	<string>
@@ -20,7 +20,7 @@
 #include	"libpq++.h"
 #define MAX_RESULTS 10
 
-const char SEARCHCommand_cc_rcsId[] = "$Id: SEARCHCommand.cc,v 1.2 2001/02/12 01:51:05 plexus Exp $" ;
+const char SEARCHCommand_cc_rcsId[] = "$Id: SEARCHCommand.cc,v 1.3 2001/02/12 14:07:52 plexus Exp $" ;
 
 namespace gnuworld
 {
@@ -45,7 +45,7 @@ bool SEARCHCommand::Exec( iClient* theClient, const string& Message )
 	unsigned int results = 0;
 	
 	strstream extraCond;
-	extraCond	<< "'" << matchString << "' " << ends;
+	extraCond	<< "'" << escapeSQLChars(matchString) << "' " << ends;
 	
 	strstream theQuery;
 	theQuery	<< queryHeader << queryCondition << extraCond.str()

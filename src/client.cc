@@ -26,7 +26,7 @@
 #include	"events.h"
 
 const char xClient_h_rcsId[] = __XCLIENT_H ;
-const char xClient_cc_rcsId[] = "$Id: client.cc,v 1.31 2001/02/05 20:06:38 dan_karrels Exp $" ;
+const char xClient_cc_rcsId[] = "$Id: client.cc,v 1.32 2001/02/12 14:08:13 plexus Exp $" ;
 
 using std::string ;
 using std::strstream ;
@@ -1340,7 +1340,7 @@ bool xClient::Join( Channel* theChan,
 return Join( theChan->getName(), string(), joinTime, getOps ) ;
 }
 
-bool xClient::Part( const string& chanName )
+bool xClient::Part( const string& chanName, const string& reason )
 {
 
 if( !Connected )
@@ -1349,7 +1349,7 @@ if( !Connected )
 	}
 
 // Ask the server to part us from the channel.
-MyUplink->PartChannel( this, chanName ) ;
+MyUplink->PartChannel( this, chanName, reason ) ;
 
 return true ;
 }
