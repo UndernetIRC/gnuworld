@@ -23,7 +23,7 @@
 #include	"AuthInfo.h"
 #include        "server.h"
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.33 2001/05/07 19:02:15 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.34 2001/05/08 16:01:12 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -200,6 +200,8 @@ RegisterCommand( new CHECKNETWORKCommand( this, "CHECKNET", ""
 	"Checks if all known servers are in place",flg_CHECKNET ) ) ;
 RegisterCommand( new LASTCOMCommand( this, "LASTCOM", "[number of lines to show]"
 	"Post you the bot logs",flg_LASTCOM ) ) ;
+RegisterCommand( new FORCEGLINECommand( this, "FORCEGLINE", "[duration (sec)] <user@host> <reason> "
+	"Gline a given user@host for the given reason",flg_GLINE ) ) ;
 
 }
 
@@ -1529,30 +1531,27 @@ system(SendMail);
 return true;
 }
 
-int ccontrol::CheckGline(const char * GlineHost)
+int ccontrol::CheckGline(const char * GlineHost,unsigned int Len)
 {
 
 
-if(!strcasecmp(GlineHost,"*@*"))
-	return HUH_NO;
 
 char *User;
 char *Host;
 char *TPos;
 
-if(!strcasecmp(GlineHost,"*@*"))
-	return HUH_NO;
 TPos = strchr(GlineHost,'@');
 User = new char[(TPos - GlineHost) + 1];			
 Host = new char[(GlineHost + strlen(GlineHost)) - TPos +1];
 strncpy(User,GlineHost,TPos - GlineHost);
 strcpy(Host,TPos+1);
 if(!strcasecmp(Host,"*"))
-	return HUH_NO;
+	return HUH_NO_HOST;
+if(Len > 24*3600*2) //Longer than 2 days ? 
+	return FORCE_NEEDED_TIME;
 if(strchr(Host,'*') == NULL)
 	return GLINE_OK;
-return FORCE_NEEDED;
+return FORCE_NEEDED_HOST;
 }
-
 
 } // namespace gnuworld

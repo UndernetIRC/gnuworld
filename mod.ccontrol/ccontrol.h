@@ -3,12 +3,14 @@
  */
 
 #ifndef __CCONTROL_H
-#define __CCONTROL_H "$Id: ccontrol.h,v 1.23 2001/05/07 19:02:15 mrbean_ Exp $"
+#define __CCONTROL_H "$Id: ccontrol.h,v 1.24 2001/05/08 16:01:12 mrbean_ Exp $"
 
-#define HUH_NO 3
-#define FORCE_NEEDED 2
 #define GLINE_OK 1;
-
+#define FORCE_NEEDED_HOST 2
+#define FORCE_NEEDED_TIME 3
+#define FORCE_NEEDED_USERS 4
+#define HUH_NO_HOST 5
+#define HUH_NO_USERS 6 
 
 #include	<string>
 #include	<vector>
@@ -304,7 +306,7 @@ public:
 
 	bool MailReport(const char *, char *);
 
-	int CheckGline(const char *);
+	int CheckGline(const char *, unsigned int);
 
 	/**
 	 * This is a constant iterator type used to perform a read-only

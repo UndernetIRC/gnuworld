@@ -13,7 +13,7 @@
 #include	"StringTokenizer.h"
 #include	"Network.h"
 
-const char CHECKNETWORKCommand_cc_rcsId[] = "$Id: CHECKNETWORKCommand.cc,v 1.1 2001/05/01 18:44:39 mrbean_ Exp $";
+const char CHECKNETWORKCommand_cc_rcsId[] = "$Id: CHECKNETWORKCommand.cc,v 1.2 2001/05/08 16:01:12 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -46,7 +46,9 @@ if( PGRES_TUPLES_OK != status )
 
 char Msg[512];
 iServer* CurServer;
+unsigned int TServers = 0;
 
+bot->Notice(theClient,"Checking network status as for %d\n",::time(NULL));
 
 for (int i = 0 ; i < bot->SQLDb->Tuples(); i++)
 	{ //For each server on the database check if its connected
@@ -69,8 +71,12 @@ for (int i = 0 ; i < bot->SQLDb->Tuples(); i++)
 		else
 			strcat(Msg," unknown ");
 		bot->Notice(theClient,Msg);
+		TServers++;
 		}
 	}
 return true;
+
+bot->Notice(theClient,"Finished checking the network status\n");
+bot->Notice(theClient,"Found a total of %d missing servers\n,TServers");
 }
 }
