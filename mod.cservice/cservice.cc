@@ -24,6 +24,7 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<iomanip.h>
+#include	<stdarg.h>
 
 #include	"client.h"
 #include  	"cservice.h"
