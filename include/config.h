@@ -1,9 +1,9 @@
 /* config.h
- * $Id: config.h,v 1.10 2002/02/02 18:18:18 gte Exp $
+ * $Id: config.h,v 1.11 2002/02/24 21:36:38 mrbean_ Exp $
  */
 
 #ifndef __CONFIG_H
-#define __CONFIG_H "$Id: config.h,v 1.10 2002/02/02 18:18:18 gte Exp $"
+#define __CONFIG_H "$Id: config.h,v 1.11 2002/02/24 21:36:38 mrbean_ Exp $"
 
 /* config.h */
 /* GNUWorld main configuration file */
@@ -87,5 +87,12 @@
  * to form the hidden host-mask when a user sets +x.
  */
 #define HIDDEN_HOST ".users.undernet.org"
+
+/**
+ * TOPIC_TRACK
+ * Set if you want gnuworld to track topics sets 
+ */
+
+#undef TOPIC_TRACK
 
 #endif /* __CONFIG_H */

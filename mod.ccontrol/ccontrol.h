@@ -3,7 +3,7 @@
  */
 
 #ifndef __CCONTROL_H
-#define __CCONTROL_H "$Id: ccontrol.h,v 1.60 2002/01/25 14:11:31 mrbean_ Exp $"
+#define __CCONTROL_H "$Id: ccontrol.h,v 1.61 2002/02/24 21:36:41 mrbean_ Exp $"
 
 //Undef this if you want to log to the database
 #define LOGTOHD 
@@ -602,6 +602,13 @@ public:
 	void    showLogs(iClient* , unsigned int = 20);
 
 #endif
+	
+		
+	int OnSignal(int sig); 
+	
+	void saveServersInfo();
+	
+	void saveChannelsInfo();
 	
 	/**
 	 * This is a constant iterator type used to perform a read-only

@@ -1,5 +1,5 @@
 /* main.cc
- * $Id: main.cc,v 1.33 2001/07/29 22:44:06 dan_karrels Exp $
+ * $Id: main.cc,v 1.34 2002/02/24 21:36:41 mrbean_ Exp $
  */
 
 #include	<new>
@@ -22,7 +22,7 @@
 #include	"md5hash.h"
 
 const char config_h_rcsId[] = __CONFIG_H ;
-const char main_cc_rcsId[] = "$Id: main.cc,v 1.33 2001/07/29 22:44:06 dan_karrels Exp $" ;
+const char main_cc_rcsId[] = "$Id: main.cc,v 1.34 2002/02/24 21:36:41 mrbean_ Exp $" ;
 const char ELog_h_rcsId[] = __ELOG_H ;
 const char FileSocket_h_rcsId[] = __FILESOCKET_H ;
 const char server_h_rcsId[] = __SERVER_H ;
@@ -169,6 +169,8 @@ if( verbose )
 	elog.setStream( &clog ) ;
 	elog	<< "*** Running in verbose mode...\n" ;
 	}
+
+setupSignals();
 
 // Sets up the server internals
 initializeSystem() ;
@@ -378,6 +380,14 @@ if( SIG_ERR == ::signal( SIGUSR1,
 		<< endl ;
 	return false ;
 	}
+if( SIG_ERR == ::signal( SIGUSR2,
+	static_cast< void (*)( int ) >( sigHandler ) ) )
+	{
+	clog	<< "*** Unable to establish signal hander for SIGUSR2"
+		<< endl ;
+	return false ;
+	}
+
 if( SIG_ERR == ::signal( SIGTERM,
 	static_cast< void (*)( int ) >( sigHandler ) ) )
 	{

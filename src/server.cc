@@ -50,7 +50,7 @@
 #include	"UnloadClientTimerHandler.h"
 
 const char server_h_rcsId[] = __SERVER_H ;
-const char server_cc_rcsId[] = "$Id: server.cc,v 1.126 2002/02/12 19:49:35 mrbean_ Exp $" ;
+const char server_cc_rcsId[] = "$Id: server.cc,v 1.127 2002/02/24 21:36:41 mrbean_ Exp $" ;
 const char config_h_rcsId[] = __CONFIG_H ;
 const char misc_h_rcsId[] = __MISC_H ;
 const char events_h_rcsId[] = __EVENTS_H ;
@@ -2835,9 +2835,11 @@ bool xServer::PostSignal( int whichSig )
 // First, notify the server signal handler
 bool handledSignal = OnSignal( whichSig ) ;
 
-Network->foreach_xClient( handleSignal( whichSig ) ) ;
+//TODO: figure out why foreach_xClient doesnt work
 
-/*
+//Network->foreach_xClient( handleSignal( whichSig ) ) ;
+
+
 // Pass this signal on to each xClient.
 xNetwork::localClientIterator ptr = Network->localClient_begin() ;
 for( ; ptr != Network->localClient_end() ; ++ptr )
@@ -2848,7 +2850,7 @@ for( ; ptr != Network->localClient_end() ; ++ptr )
 		}
 	(*ptr)->OnSignal( whichSig ) ;
 	}
-*/
+
 
 return handledSignal ;
 }
@@ -2864,6 +2866,9 @@ switch( whichSig )
 		break ;
 	case SIGHUP:
 		retMe = true ;
+		break ;
+	case SIGUSR2:
+		retMe = true;
 		break ;
 	default:
 		break ;

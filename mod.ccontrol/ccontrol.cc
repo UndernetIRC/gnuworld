@@ -10,6 +10,7 @@
 #include	<algorithm>
 #include 	<fstream>
 #include	<cstring>
+#include	<csignal>
 
 #include        <sys/types.h> 
 #include        <sys/socket.h>
@@ -37,7 +38,7 @@
 #include	"ip.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.127 2002/02/12 19:49:21 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.128 2002/02/24 21:36:40 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -208,6 +209,7 @@ RegisterCommand( new WHOISCommand( this, "WHOIS", "<nickname>"
 	"Obtain information on a given nickname",commandLevel::flg_WHOIS,false,false,false,operLevel::OPERLEVEL,false ) ) ;
 RegisterCommand( new KICKCommand( this, "KICK", "<channel> <nick> <reason>"
 	"Kick a user from a channel",commandLevel::flg_KICK,false,false,false,operLevel::OPERLEVEL,false ) ) ;
+
 //The following commands deals with operchans, if you want operchans just uncomment them
 /*
 
@@ -308,6 +310,7 @@ connectRetry = 5;
 #ifdef LOGTOHD
 	initLogs();
 #endif
+
 }
 
 
@@ -2182,7 +2185,7 @@ if(!tLogFile)
 	return false;
 	}
 
-LogFile	<< "ccontrol log for command issued between "
+tLogFile << "ccontrol log for command issued between "
 	<< convertToAscTime(From)
 	<< " and up til "
 	<< convertToAscTime(Til)
@@ -2364,11 +2367,11 @@ static const char *DelMain = "update opers set isSuspended = 'n',Suspend_Expires
 strstream DelQuery;
 DelQuery	<< DelMain
 		<< ends;
-
+#ifdef LOG_SQL
 elog	<< "ccontrol::RefreshSuspention> "
 	<< DelQuery.str()
 	<< endl; 
-
+#endif
 ExecStatusType status = SQLDb->Exec( DelQuery.str() ) ;
 delete[] DelQuery.str() ;
 
@@ -3178,10 +3181,17 @@ return true;
 const string ccontrol::expandDbServer(const string& Name)
 {
 
-ccServer* tmpServer = getServer(Name);
+serversMapType::iterator serverIt;
+for(serverIt = serversMap.begin();serverIt != serversMap.end();++serverIt)
+	{
+	if(!match(Name,serverIt->first))
+		return serverIt->first;
+	}
+return "";
+/*ccServer* tmpServer = getServer(Name);
 if(tmpServer)
 	return tmpServer->getName();
-return "";
+return "";*/
 
 }
 
@@ -3381,11 +3391,20 @@ return password::PASS_OK;
 
 ccServer* ccontrol::getServer(const string& Name)
 {
-ccServer* tempServer = serversMap[Name];
+
+serversMapType::iterator serverIt;
+serverIt = serversMap.find(Name);
+if(serverIt != serversMap.end())
+	{
+	return serverIt->second;
+	}
+return NULL;
+
+/*ccServer* tempServer = serversMap[Name];
 if(tempServer)
 	return tempServer;
 serversMap.erase(serversMap.find(Name));
-return NULL;
+return NULL;*/
 
 }
 
@@ -3538,6 +3557,67 @@ while(Left > 0)
 
 #endif
 
+int ccontrol::OnSignal(int sig)
+{ 
+if(sig == SIGUSR1)
+	saveServersInfo();
+else
+if(sig == SIGUSR2)
+	saveChannelsInfo();
+
+return xClient::OnSignal(sig);
+}
+
+void ccontrol::saveServersInfo()
+{
+ofstream servFile("ServerList.txt",ios::out);
+if(!servFile)
+	{
+	elog << "Error while opening server list file!\n";
+	return;
+	}
+gnuworld::xNetwork::const_serverIterator sIterator = Network->server_begin();
+iServer* curServer;
+for(;sIterator != Network->server_end();++sIterator)
+	{
+	curServer = *sIterator;
+	if(!curServer)
+		continue;
+	servFile << curServer->getName().c_str()
+		 << " " << curServer->getConnectTime()
+		 << " " << Network->countClients(curServer)
+		 << endl;
+	}
+servFile.close();
+}
+
+void ccontrol::saveChannelsInfo()
+{
+ofstream chanFile("ChannelsList.txt",ios::out);
+if(!chanFile)
+	{
+	elog << "Error while opening server list file!\n";
+	return;
+	}
+gnuworld::xNetwork::constChannelIterator cIterator = Network->channels_begin();
+Channel* curChannel;
+for(;cIterator != Network->channels_end();++cIterator)
+	{
+	curChannel = cIterator->second;
+	if(!curChannel)
+		continue;
+	chanFile << curChannel->getName()
+		 << " " << curChannel->getCreationTime()
+		 << " " << curChannel->getModeString()
+		 << " " << curChannel->size()
+#ifdef TOPIC_TRACK
+		 << " " << curChannel->getTopic()
+#endif
+		 << endl;
+	}
+chanFile.close();
+}
+
 void *initGate(void* arg)
 {
 
@@ -3652,6 +3732,7 @@ tmpGate->setStatus(ccGate::statDone);
 pthread_exit(NULL);
 return NULL;
 }
+
 
 }
 

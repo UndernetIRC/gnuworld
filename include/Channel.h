@@ -1,7 +1,7 @@
 /* Channel.h */
 
 #ifndef __CHANNEL_H
-#define __CHANNEL_H "$Id: Channel.h,v 1.19 2002/01/12 20:20:39 gte Exp $"
+#define __CHANNEL_H "$Id: Channel.h,v 1.20 2002/02/24 21:36:38 mrbean_ Exp $"
 
 #include	<string>
 #include	<map>
@@ -369,6 +369,19 @@ public:
 	 */
 	ChannelUser* findUser( iClient* theClient ) const ;
 
+#ifdef TOPIC_TRACK	
+	
+	/**
+	 * Returns the channel topic (if TOPIC_TRACK is defined)
+	 */
+    	const string& getTopic() const
+	{ return topic; }
+
+	void setTopic(const string& _Topic)
+	{ topic = _Topic; }
+	
+#endif	
+	
 	/**
 	 * Convenience operator for outputting Channel information
 	 * to a C++ output stream.
@@ -504,7 +517,10 @@ protected:
 	 * The structure used to store the channel bans.
 	 */
 	banListType	banList ;
-
+	
+#ifdef TOPIC_TRACK
+	string		topic;
+#endif
 } ;
 
 } // namespace gnuworld

@@ -15,7 +15,7 @@
 #include	"misc.h"
 #include	"Constants.h"
 
-const char MODUSERCommand_cc_rcsId[] = "$Id: MODUSERCommand.cc,v 1.16 2002/02/12 19:49:21 mrbean_ Exp $";
+const char MODUSERCommand_cc_rcsId[] = "$Id: MODUSERCommand.cc,v 1.17 2002/02/24 21:36:40 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -88,12 +88,6 @@ while(pos < st.size())
 	{
 	if(!strcasecmp(st[pos],"-p")) //Trying to change the password ?
 		{
-/*		if((Admin) && !(Same) && (AdFlag = OpFlag))
-			{
-			bot->Notice(theClient,"You cant change a password, for someone with the same level");
-			pos+=2;
-			continue;
-			}			*/
 		if((pos + 1) >= st.size())
 			{
 			bot->Notice(theClient,"-p option must get new password");
@@ -129,7 +123,6 @@ while(pos < st.size())
 		}			
 	else if(!strcasecmp(st[pos],"-ah")) //Trying to add a new host ?
 		{
-//		if((Admin) && (AdFlag = OpFlag))
 		if(Same)
 			{
 			bot->Notice(theClient,"You cant add yourself another host");

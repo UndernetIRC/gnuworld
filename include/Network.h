@@ -3,7 +3,7 @@
  */
 
 #ifndef __NETWORK_H
-#define __NETWORK_H "$Id: Network.h,v 1.22 2002/01/02 20:59:59 mrbean_ Exp $"
+#define __NETWORK_H "$Id: Network.h,v 1.23 2002/02/24 21:36:38 mrbean_ Exp $"
 
 #include	<vector>
 #include	<string>
@@ -389,6 +389,27 @@ public:
 		{ return localClients.end() ; }
 
 	/**
+	 * Define a non-const iterator for walking through the 
+	 * channels structure
+	 */
+
+	typedef channelMapType::const_iterator	constChannelIterator;
+	
+	/**
+	 * Returns an iterator to the begining of the channels structure
+	 */
+
+	inline constChannelIterator		channels_begin() const
+	{ return channelMap.begin(); }
+	
+	/**
+	 * Returns an iterator to the end of the channels structure
+	 */
+
+	inline constChannelIterator		channels_end() const
+	{ return channelMap.end(); }
+
+	/**
 	 * Return the number of channels currently stored in the
 	 * the channel table.
 	 */
@@ -411,6 +432,7 @@ public:
 	 * Retrieve the number of clients on the given server.
 	 */
 	size_t		countClients( const iServer* theServer ) const ;
+
 
 	/**
 	 * A base class unary function used in foreach_xClient.
