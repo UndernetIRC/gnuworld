@@ -1,9 +1,10 @@
-dnl $Id: configure.in,v 1.9 2000/12/15 00:13:39 dan_karrels Exp $
+dnl $Id: configure.in,v 1.10 2000/12/16 22:43:44 dan_karrels Exp $
 dnl ----------------------------------------------------------
 
-AC_REVISION($Revision: 1.9 $)
+AC_REVISION($Revision: 1.10 $)
 AC_INIT(src/main.cc)
-AC_CONFIG_HEADER(include/defs.h)
+AM_INIT_AUTOMAKE(gnuworld,0.0)
+AM_CONFIG_HEADER(include/defs.h)
 
 echo Configuring GNUWorld...
 echo
@@ -11,8 +12,15 @@ echo
 CFLAGS="-g -Wall -O0 -pipe"
 CXXFLAGS="-g -Wall -O0 -pipe"
 CXX="g++"
+SHLIB_CXX="g++"
+SHLIB_LD="g++"
 LIBS=""
-prefix="."
+
+libdir="`pwd`/bin"
+bindir="`pwd`/bin"
+LIB_PATH="`pwd`/lib"
+BIN_PATH="`pwd`/bin"
+SRC_PATH="`pwd`/src"
 
 AC_PROG_CC
 AC_PROG_CXX
@@ -20,6 +28,11 @@ AC_PROG_RANLIB
 AC_PROG_CPP
 AC_LANG_CPLUSPLUS
 AC_ISC_POSIX
+
+AC_LIBTOOL_DLOPEN
+AM_PROG_LIBTOOL
+AC_SUBST(LIBTOOL_DEPS)
+
 AC_CHECK_PROG(UNAME,uname,uname)
 AC_CHECK_PROG(LN,ln,ln)
 AC_CHECK_PROG(RM,rm,rm)
@@ -28,8 +41,6 @@ AC_CHECK_PROG(MV,mv,mv)
 AC_CHECK_PROG(CP,cp,cp)
 AC_CHECK_PROG(GREP,grep,grep)
 AC_CHECK_PROG(AR,ar,ar)
-
-GNUWORLD_CHECK_OS
 
 AC_MSG_CHECKING(if C++ compiler uses std namespace )
 AC_TRY_COMPILE(
@@ -388,9 +399,6 @@ AC_SUBST(LDFLAGS)
 AC_SUBST(bindir)
 
 CXXFLAGS="$CXXFLAGS -I`pwd`/include -I`pwd`/lib"
-LIB_PATH="`pwd`/lib"
-BIN_PATH="`pwd`/bin"
-SRC_PATH="`pwd`/src"
 
 AC_SUBST(CXXFLAGS)
 AC_SUBST(LIB_PATH)
@@ -401,37 +409,40 @@ echo
 echo "Detecting modules..."
 echo
 
-makefiles="Makefile src/Makefile lib/Makefile"
-mod_list=`\ls | \grep "mod."`
-MOD_DIRS=""
+dnl makefiles=""
+dnl mod_list=`\ls | \grep "mod."`
+dnl MOD_DIRS=""
 
 dnl echo "mod_list: $mod_list"
 
-for file in $mod_list; do
-	if [ ! test -d $file ]; then
-		echo "$file is not a directory!"
-		continue
-	fi
+dnl for file in $mod_list; do
+dnl	if [ ! test -d $file ]; then
+dnl		echo "$file is not a directory!"
+dnl		continue
+dnl	fi
 
-	if [ test -f $file/configure ]; then
-		echo "Found configure in $file"
-		cd $file
-		./configure
-		cd ..
-		MOD_DIRS="$MOD_DIRS $file"
-	elif [ test -f $file/Makefile.in ]; then
-		echo Adding module `echo $file | \cut -f2 -d"."`
-		makefiles="$makefiles $file/Makefile"
-		MOD_DIRS="$MOD_DIRS $file"
-	fi
-done
+dnl	if [ test -f $file/configure ]; then
+dnl		echo "Found configure in $file"
+dnl		cd $file
+dnl		./configure
+dnl		cd ..
+dnl		MOD_DIRS="$MOD_DIRS $file"
+dnl	elif [ test -f $file/Makefile.in ]; then
+dnl		echo Adding module `echo $file | \cut -f2 -d"."`
+dnl		makefiles="$makefiles $file/Makefile"
+dnl		MOD_DIRS="$MOD_DIRS $file"
+dnl	fi
+dnl done
 
 echo
 
 AC_SUBST(MOD_DIRS)
 
 dnl Create the standard Makefiles
-AC_OUTPUT($makefiles)
+AC_OUTPUT(Makefile lib/Makefile src/Makefile)
+AC_OUTPUT(mod.gnutest/Makefile mod.cservice/Makefile)
+AC_OUTPUT(mod.stats/Makefile mod.clientExample/Makefile)
+AC_OUTPUT(mod.ccontrol/Makefile)
 
 echo
 echo Configuration has been finished, and everything seems to be allright

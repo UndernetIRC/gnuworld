@@ -1,12 +1,12 @@
 # Default paths (system-wide installs)
-# $Id: Makefile.in,v 1.3 2000/12/15 01:04:53 dan_karrels Exp $
+# $Id: Makefile.in,v 1.4 2000/12/16 22:43:44 dan_karrels Exp $
 #
 
 # Standard defines
-CXX = @CXX@
+CXX = libtool @CXX@
 
-SHLIB_CXX = @SHLIB_CXX@
-SHLIB_LD = @SHLIB_LD@
+SHLIB_CXX = libtool @SHLIB_CXX@
+SHLIB_LD = libtool @SHLIB_LD@
 
 DEFS = @DEFS@
 
@@ -14,7 +14,7 @@ CXXFLAGS = @CXXFLAGS@
 
 BIN_PATH = @BIN_PATH@
 LIB_PATH = @LIB_PATH@
-LIBS = -L$(BIN_PATH) -lgnuworld
+LIBS = -L$(BIN_PATH)/.libs -lgnuworld
 
 RM = @RM@
 CP = @CP@
@@ -29,7 +29,8 @@ SHELL = /bin/sh
 
 SRCS = gnutest.cc
 OBJS = $(patsubst %.cc, %.o, $(SRCS))
-LIB = $(BIN_PATH)/libgnutest.so
+OBJLIB = $(patsubst %.cc, %.lo, $(SRCS))
+LIB = libgnutest.la
 
 all: $(OBJS) $(LIB)
 everything: all
@@ -39,7 +40,9 @@ make: all
 	$(SHLIB_CXX) $(CXXFLAGS) -c $< -o $@
 
 $(LIB): $(OBJS)
-	$(SHLIB_LD) -o $(LIB) $(OBJS) $(LIBS)
+	$(SHLIB_CXX) -module -export-dynamic -o $(LIB) $(OBJLIB) \
+	-rpath $(BIN_PATH) $(LIBS)
+	libtool install -c libgnutest.la $(BIN_PATH)/libgnutest.la
 
 clean:
 	$(RM) -f $(OBJS) $(LIB)
