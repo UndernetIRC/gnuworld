@@ -1,5 +1,5 @@
 /* main.cc
- * $Id: main.cc,v 1.18 2001/01/08 00:01:07 dan_karrels Exp $
+ * $Id: main.cc,v 1.19 2001/01/08 00:18:49 dan_karrels Exp $
  */
 
 #include	<fstream>
@@ -24,7 +24,7 @@
 using namespace gnuworld ;
 
 const char config_h_rcsId[] = __CONFIG_H ;
-const char main_cc_rcsId[] = "$Id: main.cc,v 1.18 2001/01/08 00:01:07 dan_karrels Exp $" ;
+const char main_cc_rcsId[] = "$Id: main.cc,v 1.19 2001/01/08 00:18:49 dan_karrels Exp $" ;
 
 using std::cerr ;
 using std::clog ;
@@ -199,6 +199,8 @@ while( keepRunning && isConnected() )
         FD_ZERO( &readSet ) ;
         FD_ZERO( &writeSet ) ;
 
+	FD_SET( sockFD, &readSet ) ;
+
         // Does the output buffer have any data?
         if( !outputBuffer.empty() )
                 {
@@ -208,6 +210,9 @@ while( keepRunning && isConnected() )
 
         // Run any timers before calling select()
         CheckTimers() ;
+
+	tv.tv_sec = 0 ;
+	tv.tv_usec = 0 ;
                  
         // Are there are any timers remaining to run?
         if( !timerQueue.empty() )
