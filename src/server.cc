@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server.cc,v 1.165 2003/06/17 15:13:54 dan_karrels Exp $
+ * $Id: server.cc,v 1.166 2003/06/21 22:41:04 dan_karrels Exp $
  */
 
 #include	<sys/time.h>
@@ -71,7 +71,7 @@
 #include	"ConnectionHandler.h"
 #include	"Connection.h"
 
-RCSTAG( "$Id: server.cc,v 1.165 2003/06/17 15:13:54 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: server.cc,v 1.166 2003/06/21 22:41:04 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -1658,7 +1658,6 @@ for( clientModuleListType::iterator modPtr = clientModuleList.begin() ;
  */
 bool xServer::Write( const string& buf )
 {
-
 // Is there a valid connection?
 if( !isConnected() )
 	{
@@ -1698,7 +1697,7 @@ else
 	{
 	if( useHoldBuffer )
 		{
-		burstHoldBuffer += buf + '\n' ;
+		burstHoldBuffer += buf ;
 		}
 	else
 		{
@@ -1769,7 +1768,6 @@ return WriteDuringBurst( string( s.str() ) ) ;
  */
 bool xServer::Write( const char* format, ... )
 {
-
 // Is there a valid connection?
 if( !isConnected() )
 	{
