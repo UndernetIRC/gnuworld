@@ -14,7 +14,7 @@
 
 @SET_MAKE@
 
-SOURCES = $(test_bot_SOURCES) $(test_burst_SOURCES) $(test_econfig_SOURCES) $(test_gThread_SOURCES) $(test_kick_transaction_SOURCES) $(test_match_SOURCES) $(test_mtrie_SOURCES) $(test_mtrie_load_SOURCES) $(test_mtrie_perf_SOURCES) $(test_mtrie_perf_summary_SOURCES) $(test_signal_SOURCES) $(test_stringtokenizer_SOURCES)
+SOURCES = $(test_bot_SOURCES) $(test_burst_SOURCES) $(test_econfig_SOURCES) $(test_gThread_SOURCES) $(test_kick_transaction_SOURCES) $(test_match_SOURCES) $(test_mtrie_SOURCES) $(test_mtrie_load_SOURCES) $(test_mtrie_perf_SOURCES) $(test_mtrie_perf_summary_SOURCES) $(test_regex_SOURCES) $(test_signal_SOURCES) $(test_stringtokenizer_SOURCES)
 
 srcdir = @srcdir@
 top_srcdir = @top_srcdir@
@@ -42,7 +42,7 @@ noinst_PROGRAMS = test_burst$(EXEEXT) test_mtrie_load$(EXEEXT) \
 	test_mtrie$(EXEEXT) test_stringtokenizer$(EXEEXT) \
 	test_econfig$(EXEEXT) test_gThread$(EXEEXT) \
 	test_signal$(EXEEXT) test_match$(EXEEXT) test_bot$(EXEEXT) \
-	test_kick_transaction$(EXEEXT)
+	test_kick_transaction$(EXEEXT) test_regex$(EXEEXT)
 subdir = test
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -97,6 +97,10 @@ test_mtrie_perf_summary_OBJECTS =  \
 	$(am_test_mtrie_perf_summary_OBJECTS)
 test_mtrie_perf_summary_LDADD = $(LDADD)
 test_mtrie_perf_summary_DEPENDENCIES = $(am__DEPENDENCIES_1)
+am_test_regex_OBJECTS = test_regex.$(OBJEXT)
+test_regex_OBJECTS = $(am_test_regex_OBJECTS)
+test_regex_LDADD = $(LDADD)
+test_regex_DEPENDENCIES = $(am__DEPENDENCIES_1)
 am_test_signal_OBJECTS = test_signal-signal.$(OBJEXT)
 test_signal_OBJECTS = $(am_test_signal_OBJECTS)
 test_signal_LDADD = $(LDADD)
@@ -119,6 +123,7 @@ am__depfiles_maybe = depfiles
 @AMDEP_TRUE@	./$(DEPDIR)/test_mtrie_load-mtrie_load.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/test_mtrie_perf-mtrie_perf.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/test_mtrie_perf_summary-mtrie_perf_summary.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/test_regex.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/test_signal-signal.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/test_stringtokenizer-stringtokenizer.Po
 CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
@@ -134,13 +139,15 @@ SOURCES = $(test_bot_SOURCES) $(test_burst_SOURCES) \
 	$(test_kick_transaction_SOURCES) $(test_match_SOURCES) \
 	$(test_mtrie_SOURCES) $(test_mtrie_load_SOURCES) \
 	$(test_mtrie_perf_SOURCES) $(test_mtrie_perf_summary_SOURCES) \
-	$(test_signal_SOURCES) $(test_stringtokenizer_SOURCES)
+	$(test_regex_SOURCES) $(test_signal_SOURCES) \
+	$(test_stringtokenizer_SOURCES)
 DIST_SOURCES = $(test_bot_SOURCES) $(test_burst_SOURCES) \
 	$(test_econfig_SOURCES) $(test_gThread_SOURCES) \
 	$(test_kick_transaction_SOURCES) $(test_match_SOURCES) \
 	$(test_mtrie_SOURCES) $(test_mtrie_load_SOURCES) \
 	$(test_mtrie_perf_SOURCES) $(test_mtrie_perf_summary_SOURCES) \
-	$(test_signal_SOURCES) $(test_stringtokenizer_SOURCES)
+	$(test_regex_SOURCES) $(test_signal_SOURCES) \
+	$(test_stringtokenizer_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -302,6 +309,8 @@ test_kick_transaction_SOURCES = test_kick_transaction.cc
 test_kick_transaction_CXXFLAGS = -I${top_srcdir}/include \
 	-I${top_srcdir}/libgnuworld
 
+test_regex_SOURCES = test_regex.cc
+test_regex_LDFLAGS = -lpcre
 test_gThread_SOURCES = gThread.cc
 test_gThread_LDFLAGS = $(top_builddir)/libgnuworld/libgnuworld.la \
 	$(threadLib)
@@ -391,6 +400,9 @@ test_mtrie_perf$(EXEEXT): $(test_mtrie_perf_OBJECTS) $(test_mtrie_perf_DEPENDENC
 test_mtrie_perf_summary$(EXEEXT): $(test_mtrie_perf_summary_OBJECTS) $(test_mtrie_perf_summary_DEPENDENCIES) 
 	@rm -f test_mtrie_perf_summary$(EXEEXT)
 	$(CXXLINK) $(test_mtrie_perf_summary_LDFLAGS) $(test_mtrie_perf_summary_OBJECTS) $(test_mtrie_perf_summary_LDADD) $(LIBS)
+test_regex$(EXEEXT): $(test_regex_OBJECTS) $(test_regex_DEPENDENCIES) 
+	@rm -f test_regex$(EXEEXT)
+	$(CXXLINK) $(test_regex_LDFLAGS) $(test_regex_OBJECTS) $(test_regex_LDADD) $(LIBS)
 test_signal$(EXEEXT): $(test_signal_OBJECTS) $(test_signal_DEPENDENCIES) 
 	@rm -f test_signal$(EXEEXT)
 	$(CXXLINK) $(test_signal_LDFLAGS) $(test_signal_OBJECTS) $(test_signal_LDADD) $(LIBS)
@@ -414,6 +426,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_mtrie_load-mtrie_load.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_mtrie_perf-mtrie_perf.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_mtrie_perf_summary-mtrie_perf_summary.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_regex.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_signal-signal.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_stringtokenizer-stringtokenizer.Po@am__quote@
 

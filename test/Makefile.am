@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-## $Id: Makefile.am,v 1.17 2003/11/27 18:29:32 dan_karrels Exp $
+## $Id: Makefile.am,v 1.18 2004/01/03 23:16:24 dan_karrels Exp $
 
 noinst_PROGRAMS = test_burst \
 	test_mtrie_load \
@@ -12,7 +12,8 @@ noinst_PROGRAMS = test_burst \
 	test_signal \
 	test_match \
 	test_bot \
-	test_kick_transaction
+	test_kick_transaction \
+	test_regex
 LDADD = $(LIBGNUWORLD)
 
 test_burst_SOURCES = burst.cc
@@ -47,6 +48,9 @@ test_bot_CXXFLAGS = -I${top_srcdir}/include -I${top_srcdir}/libgnuworld
 test_kick_transaction_SOURCES = test_kick_transaction.cc
 test_kick_transaction_CXXFLAGS = -I${top_srcdir}/include \
 	-I${top_srcdir}/libgnuworld
+
+test_regex_SOURCES = test_regex.cc
+test_regex_LDFLAGS = -lpcre
 
 test_gThread_SOURCES = gThread.cc
 test_gThread_LDFLAGS = $(top_builddir)/libgnuworld/libgnuworld.la \
