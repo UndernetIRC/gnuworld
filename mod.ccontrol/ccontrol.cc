@@ -37,7 +37,7 @@
 #include	"ip.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.91 2001/12/05 21:50:11 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.92 2001/12/05 22:21:50 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -2960,7 +2960,7 @@ for(exceptionIterator ptr = exception_begin();ptr != exception_end();++ptr)
 
 void ccontrol::showStatus(iClient* tmpClient)
 {
-int uptime = getUplink()->getStartTime();
+int uptime = getUplink()->getStartTime() - ::time(0);
 int days;
 int hours;
 int mins;
