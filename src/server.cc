@@ -48,7 +48,7 @@
 #include	"ServerTimerHandlers.h"
 
 const char server_h_rcsId[] = __SERVER_H ;
-const char server_cc_rcsId[] = "$Id: server.cc,v 1.102 2001/05/26 00:18:42 dan_karrels Exp $" ;
+const char server_cc_rcsId[] = "$Id: server.cc,v 1.103 2001/05/28 20:55:50 dan_karrels Exp $" ;
 const char config_h_rcsId[] = __CONFIG_H ;
 const char misc_h_rcsId[] = __MISC_H ;
 const char events_h_rcsId[] = __EVENTS_H ;
@@ -3328,7 +3328,9 @@ for( string::const_iterator modePtr = modes.begin() ;
 // Write the modes to the network before updating tables and notifying
 // other xClients...this will keep the output buffers synched
 strstream s ;
-s	<< theChan->getName()
+s	<< getCharYY()
+	<< ' '
+	<< theChan->getName()
 	<< ' '
 	<< modes ;
 
