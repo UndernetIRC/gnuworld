@@ -3,17 +3,25 @@
  *
  * 20/12/2000 - Greg Sikorski <gte@atomicrevs.demon.co.uk>
  * Initial Version.
+ *
  * 28/12/2000 - Greg Sikorski <gte@atomicrevs.demon.co.uk>
  * Added multilingual support.
+ *
+ * 01/01/2001 - Greg Sikorski <gte@atomicrevs.demon.co.uk>
+ * Woo! First change of 2001. :)
+ * Added duplicate checking to avoid people doing:
+ * /msg e op #coder-com Gte Gte Gte Gte Gte Gte Gte {etc}
+ * And flooding the target with notices.
  *
  * OP's one or more users on a channel the user as access on.
  *
  * Caveats: None
  *
- * $Id: OPCommand.cc,v 1.8 2000/12/31 05:06:27 gte Exp $
+ * $Id: OPCommand.cc,v 1.9 2001/01/01 07:51:58 gte Exp $
  */
 
 #include	<string>
+#include	<map>
  
 #include	"StringTokenizer.h"
 #include	"ELog.h" 
@@ -22,13 +30,14 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char OPCommand_cc_rcsId[] = "$Id: OPCommand.cc,v 1.8 2000/12/31 05:06:27 gte Exp $" ;
+using std::map ;
+
+const char OPCommand_cc_rcsId[] = "$Id: OPCommand.cc,v 1.9 2001/01/01 07:51:58 gte Exp $" ;
 
 namespace gnuworld
 {
 
 using namespace gnuworld;
-using namespace level;
  
 bool OPCommand::Exec( iClient* theClient, const string& Message )
 { 
@@ -94,6 +103,8 @@ bool OPCommand::Exec( iClient* theClient, const string& Message )
 	iClient* target;
 	unsigned short counter = 2; // Offset of first nick in list.
 	unsigned short cont = true;
+	typedef map < iClient*, int > duplicateMapType; 
+	duplicateMapType duplicateMap;
 
 	while (counter < st.size())
 	{ 
@@ -124,20 +135,26 @@ bool OPCommand::Exec( iClient* theClient, const string& Message )
  
 	 	if (cont) 
 	 	{
-			opList.push_back(target); 
-			if(target != theClient) // Don't send a notice to the person who issued the command.
+			duplicateMapType::iterator ptr = duplicateMap.find(target); // Check for duplicates.
+			if(ptr == duplicateMap.end()) // Not a duplicate.
 			{ 
-				sqlUser* tmpTargetUser = bot->isAuthed(target, false);
-				if (tmpTargetUser)
-				{
-					bot->Notice(target, bot->getResponse(tmpTargetUser, language::youre_opped_by).c_str(),
-						theUser->getUserName().c_str());
-				} else 
-				{
-					bot->Notice(target, bot->getResponse(theUser, language::youre_opped_by).c_str(),
-						theUser->getUserName().c_str());
-				} 
-			}
+				opList.push_back(target);
+				duplicateMap.insert(duplicateMapType::value_type(target, 0)); 
+
+				if(target != theClient) // Don't send a notice to the person who issued the command.
+				{ 
+					sqlUser* tmpTargetUser = bot->isAuthed(target, false);
+					if (tmpTargetUser)
+					{
+						bot->Notice(target, bot->getResponse(tmpTargetUser, language::youre_opped_by).c_str(),
+							theUser->getUserName().c_str());
+					} else 
+					{
+						bot->Notice(target, bot->getResponse(theUser, language::youre_opped_by).c_str(),
+							theUser->getUserName().c_str());
+					} 
+				} // Don't send to person who issued.
+		   	} // Not a duplicate.
 		}
 
 		cont = true;

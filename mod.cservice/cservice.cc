@@ -106,8 +106,10 @@ cservice::cservice(const string& args)
     RegisterCommand(new RANDOMCommand(this, "RANDOM", ""));
     RegisterCommand(new SHOWIGNORECommand(this, "SHOWIGNORE", ""));
 
-    RegisterCommand(new OPCommand(this, "OP", "<#channel> [nick][,nick] .."));
-    RegisterCommand(new VOICECommand(this, "VOICE", "<#channel> [nick][,nick] .."));
+    RegisterCommand(new OPCommand(this, "OP", "<#channel> [nick] [nick] .."));
+    RegisterCommand(new DEOPCommand(this, "DEOP", "<#channel> [nick] [nick] .."));
+    RegisterCommand(new VOICECommand(this, "VOICE", "<#channel> [nick] [nick] .."));
+    RegisterCommand(new DEVOICECommand(this, "DEVOICE", "<#channel> [nick] [nick] .."));
     RegisterCommand(new ADDUSERCommand(this, "ADDUSER", "<#channel> <nick> <access>"));
     RegisterCommand(new REMUSERCommand(this, "REMUSER", "<#channel> <nick>"));
     RegisterCommand(new MODINFOCommand(this, "MODINFO", "<#channel> [ACCESS <nick> <level>] [AUTOOP <nick> <on|off>]"));
@@ -267,7 +269,7 @@ int cservice::OnCTCP( iClient* theClient, const string& CTCP,
 
 	if(Command == "VERSION")
 	{
-		xClient::DoCTCP(theClient, CTCP.c_str(), "Undernet Channel Services Version 2 [" __DATE__ " " __TIME__ "] ($Id: cservice.cc,v 1.24 2000/12/31 05:06:27 gte Exp $)");
+		xClient::DoCTCP(theClient, CTCP.c_str(), "Undernet Channel Services Version 2 [" __DATE__ " " __TIME__ "] ($Id: cservice.cc,v 1.25 2001/01/01 07:51:58 gte Exp $)");
 		return true;
 	}
  

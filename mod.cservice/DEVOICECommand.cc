@@ -1,22 +1,14 @@
 /* 
- * VOICECommand.cc 
- *
- * 20/12/2000 - Perry Lorier <perry@coders.net>
- * Initial Version.
- *
+ * DEVOICECommand.cc 
+ * 
  * 28/12/2000 - Greg Sikorski <gte@atomicrevs.demon.co.uk>
- * Added multilingual support.
+ * Initial Version. 
  *
- * 01/01/2001 - Greg Sikorski <gte@atomicrevs.demon.co.uk> 
- * Added duplicate checking to avoid people doing:
- * /msg e voice #coder-com Gte Gte Gte Gte Gte Gte Gte {etc}
- * And flooding the target with notices.
- *
- * Voice's one or more users on a channel the user as access on.
+ * Devoice's one or more users on a channel the user as access on.
  *
  * Caveats: None
  *
- * $Id: VOICECommand.cc,v 1.7 2001/01/01 07:51:58 gte Exp $
+ * $Id: DEVOICECommand.cc,v 1.1 2001/01/01 07:51:58 gte Exp $
  */
 
 #include	<string>
@@ -31,16 +23,16 @@
 
 using std::map ;
 
-const char VOICECommand_cc_rcsId[] = "$Id: VOICECommand.cc,v 1.7 2001/01/01 07:51:58 gte Exp $" ;
+const char DEVOICECommand_cc_rcsId[] = "$Id: DEVOICECommand.cc,v 1.1 2001/01/01 07:51:58 gte Exp $" ;
 
 namespace gnuworld
 {
 
 using namespace gnuworld;
  
-bool VOICECommand::Exec( iClient* theClient, const string& Message )
+bool DEVOICECommand::Exec( iClient* theClient, const string& Message )
 { 
-	vector< iClient* > voiceList; // List of clients to Voice.
+	vector< iClient* > devoiceList; // List of clients to devoice.
 	StringTokenizer st( Message ) ;
  
 	if( st.size() < 2 )
@@ -75,7 +67,7 @@ bool VOICECommand::Exec( iClient* theClient, const string& Message )
 	 */
 
 	int level = bot->getAccessLevel(theUser, theChan);
-	if (level < level::voice)
+	if (level < level::devoice)
 	{
 		bot->Notice(theClient, bot->getResponse(theUser, language::insuf_access).c_str());
 		return false;
@@ -90,13 +82,13 @@ bool VOICECommand::Exec( iClient* theClient, const string& Message )
 	}
  
 
-	if( st.size() < 3 ) // No nicks provided, assume we voice ourself. :)
+	if( st.size() < 3 ) // No nicks provided, assume we devoice ourself. :)
 	{
-		voiceList.push_back(theClient);
+		devoiceList.push_back(theClient);
 	}
 
 	/*
-	 *  Loop over the remaining 'nick' parameters, voicing them all.
+	 *  Loop over the remaining 'nick' parameters, opping them all.
 	 */
 
 	iClient* target;
@@ -125,9 +117,9 @@ bool VOICECommand::Exec( iClient* theClient, const string& Message )
 			cont = false;
 		}
 
-		if(cont && tmpChanUser->getMode(ChannelUser::MODE_V)) // User is already voiced?
+		if(cont && !tmpChanUser->getMode(ChannelUser::MODE_V)) // User isn't voiced?
 		{
-			bot->Notice(theClient, bot->getResponse(theUser, language::already_voiced).c_str(), 
+			bot->Notice(theClient, bot->getResponse(theUser, language::not_voiced).c_str(), 
 				target->getNickName().c_str(), theChan->getName().c_str());
 				cont = false;
 		} 
@@ -137,7 +129,7 @@ bool VOICECommand::Exec( iClient* theClient, const string& Message )
 			duplicateMapType::iterator ptr = duplicateMap.find(target); // Check for duplicates.
 			if(ptr == duplicateMap.end()) // Not a duplicate.
 			{ 
-				voiceList.push_back(target);
+				devoiceList.push_back(target);
 				duplicateMap.insert(duplicateMapType::value_type(target, 0)); 
 
 				if(target != theClient) // Don't send a notice to the person who issued the command.
@@ -145,11 +137,11 @@ bool VOICECommand::Exec( iClient* theClient, const string& Message )
 					sqlUser* tmpTargetUser = bot->isAuthed(target, false);
 					if (tmpTargetUser)
 					{
-						bot->Notice(target, bot->getResponse(tmpTargetUser, language::youre_voiced_by).c_str(),
+						bot->Notice(target, bot->getResponse(tmpTargetUser, language::youre_devoiced_by).c_str(),
 							theUser->getUserName().c_str());
 					} else 
 					{
-						bot->Notice(target, bot->getResponse(theUser, language::youre_voiced_by).c_str(),
+						bot->Notice(target, bot->getResponse(theUser, language::youre_devoiced_by).c_str(),
 							theUser->getUserName().c_str());
 					} 
 				} // Don't send to person who issued.
@@ -160,8 +152,8 @@ bool VOICECommand::Exec( iClient* theClient, const string& Message )
 		counter++;
 	}
 
-	// Voice them. 
-	bot->Voice(tmpChan, voiceList);
+	// devoice them. 
+	bot->DeVoice(tmpChan, devoiceList);
 	return true ;
 } 
 

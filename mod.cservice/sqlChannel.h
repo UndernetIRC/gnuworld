@@ -1,7 +1,7 @@
 /* sqlChannel.h */
 
 #ifndef __SQLCHANNEL_H
-#define __SQLCHANNEL_H "$Id: sqlChannel.h,v 1.6 2000/12/31 05:06:27 gte Exp $"
+#define __SQLCHANNEL_H "$Id: sqlChannel.h,v 1.7 2001/01/01 07:51:58 gte Exp $"
 
 #include	<string>
 #include	<ctime>
@@ -90,10 +90,8 @@ public:
 	 */
 
 	// 'ID' is a primary key and cannot be altered.
-
-	inline void setName(const string& _name)
-		{ name = _name; }
-
+	// We aren't going to let people change channel names here either.
+ 
 	inline void setFlag( const flagType& whichFlag )
 		{ flags |= whichFlag; }
 
