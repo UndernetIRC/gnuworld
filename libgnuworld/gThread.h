@@ -17,11 +17,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  * 
- * $Id: gThread.h,v 1.2 2002/08/08 21:43:59 dan_karrels Exp $
+ * $Id: gThread.h,v 1.3 2003/03/10 21:51:17 dan_karrels Exp $
  */
 
 #ifndef __GTHREAD_H
-#define __GTHREAD_H "$Id: gThread.h,v 1.2 2002/08/08 21:43:59 dan_karrels Exp $"
+#define __GTHREAD_H "$Id: gThread.h,v 1.3 2003/03/10 21:51:17 dan_karrels Exp $"
 
 #include	<pthread.h>
 
@@ -54,7 +54,7 @@ public:
 	virtual bool		isRunning() const
 		{ return (keepRunning && (threadID != 0)) ; }
 
-	virtual void		shutDown()
+	virtual void		Stop()
 		{ keepRunning = false ; }
 
 	virtual void		Join() ;
@@ -75,7 +75,7 @@ public:
 	 */
 	virtual void		UnLockMutex( const string& mutexName ) ;
 
-	virtual void		Exec() = 0 ;
+	virtual void		Exec() {}
 
 protected:
 

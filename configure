@@ -9349,23 +9349,6 @@ echo "$as_me:$LINENO: result: $check_threadLib" >&5
 echo "${ECHO_T}$check_threadLib" >&6
 
 gcc_support_pthread=no
-if test "$check_threadLib" = yes; then
-
-	echo "$as_me:$LINENO: checking whether gcc accepts the -pthread option" >&5
-echo $ECHO_N "checking whether gcc accepts the -pthread option... $ECHO_C" >&6
-	pthreadtest=`$CXX -pthread 2>&1 | grep -c unrecognized`
-
-	if  test "x$pthreadtest" = "x0" ; then
-		gcc_support_pthread=yes
-
-		threadLib=-pthread
-	else
-		gcc_support_pthread=no
-	fi
-	echo "$as_me:$LINENO: result: $gcc_support_pthread" >&5
-echo "${ECHO_T}$gcc_support_pthread" >&6
-fi
-
 if  test x"$gcc_support_pthread" = xno ; then
 	pthread_found=no
 
@@ -9489,8 +9472,7 @@ if test $ac_cv_lib_c_r_pthread_create = yes; then
   pthread_found=yes
 fi
 
-
-echo "$as_me:$LINENO: checking for main in -lgcc_r" >&5
+		echo "$as_me:$LINENO: checking for main in -lgcc_r" >&5
 echo $ECHO_N "checking for main in -lgcc_r... $ECHO_C" >&6
 if test "${ac_cv_lib_gcc_r_main+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
@@ -9539,16 +9521,14 @@ fi
 echo "$as_me:$LINENO: result: $ac_cv_lib_gcc_r_main" >&5
 echo "${ECHO_T}$ac_cv_lib_gcc_r_main" >&6
 if test $ac_cv_lib_gcc_r_main = yes; then
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_LIBGCC_R 1
-_ACEOF
-
-  LIBS="-lgcc_r $LIBS"
-
+  pthread_found=yes
 fi
 
 	fi
 fi
+
+
+
 
 
 

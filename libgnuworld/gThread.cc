@@ -17,12 +17,14 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  * 
- * $Id: gThread.cc,v 1.2 2002/08/08 21:43:59 dan_karrels Exp $
+ * $Id: gThread.cc,v 1.3 2003/03/10 21:51:17 dan_karrels Exp $
  */
 
 #include	<pthread.h>
 
+#include	<new>
 #include	<string>
+#include	<iostream>
 
 #include	<cstring>
 #include	<cerrno>
@@ -35,6 +37,7 @@ namespace gnuworld
 {
 
 using std::string ;
+using std::cout ;
 using std::endl ;
 
 /**
@@ -43,9 +46,9 @@ using std::endl ;
  */
 void* stub( void* arg )
 {
-gThread* theThread = (gThread*) arg ;
 assert( arg != 0 ) ;
 
+gThread* theThread = reinterpret_cast< gThread* >( arg ) ;
 theThread->Exec() ;
 
 return 0 ;
@@ -180,7 +183,8 @@ if( mItr == mutexMap.end() )
 
 bool gThread::Start()
 {
-if( ::pthread_create( &threadID, 0, stub, (void*) this ) != 0 )
+if( ::pthread_create( &threadID, 0, stub,
+	reinterpret_cast< void* >( this ) ) != 0 )
 	{
 	elog	<< "gThread::Start> pthread_create() failed: "
 		<< strerror( errno )

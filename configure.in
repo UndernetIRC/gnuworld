@@ -1,10 +1,10 @@
-dnl $Id: configure.in,v 1.67 2003/02/05 21:31:04 jeekay Exp $
+dnl $Id: configure.in,v 1.68 2003/03/10 21:51:09 dan_karrels Exp $
 dnl ----------------------------------------------------------
 
 echo Configuring GNUWorld...
 echo
 
-AC_REVISION($Revision: 1.67 $)
+AC_REVISION($Revision: 1.68 $)
 AC_INIT
 AC_CONFIG_SRCDIR([src/main.cc])
 AM_INIT_AUTOMAKE(gnuworld,0.0)
@@ -59,24 +59,8 @@ AC_ARG_ENABLE([threads],
 
 AC_MSG_RESULT([$check_threadLib])
 
-gcc_support_pthread=no
-if test "$check_threadLib" = yes; then
-	dnl usually, gcc needs -pthread
-
-	AC_MSG_CHECKING([whether gcc accepts the -pthread option])
-	pthreadtest=`$CXX -pthread 2>&1 | grep -c unrecognized`
-
-	if [ test "x$pthreadtest" = "x0" ]; then
-		gcc_support_pthread=yes
-		AC_SUBST(threadLib)
-		threadLib=-pthread
-	else
-		gcc_support_pthread=no
-	fi
-	AC_MSG_RESULT([$gcc_support_pthread])
-fi
-
 dnl Do we need an explicit lib for the pthreads?
+gcc_support_pthread=no
 if [ test x"$gcc_support_pthread" = xno ]; then   
 	pthread_found=no
 	AC_CHECK_LIB(pthread, pthread_create, pthread_found=yes)
@@ -85,9 +69,27 @@ if [ test x"$gcc_support_pthread" = xno ]; then
 		threadLib=-lpthread
 	else
 		AC_CHECK_LIB(c_r, pthread_create, pthread_found=yes)
-		AC_CHECK_LIB(gcc_r, main)
+		AC_CHECK_LIB(gcc_r, main, pthread_found=yes)
 	fi
 fi
+
+dnl The below algorithm is incorrect because gcc is given no
+dnl input files
+dnl if test "$check_threadLib" = yes; then
+dnl	dnl usually, gcc needs -pthread
+
+dnl	AC_MSG_CHECKING([whether gcc accepts the -pthread option])
+dnl	pthreadtest=`$CXX -pthread 2>&1 | grep -c unrecognized`
+
+dnl	if [ test "x$pthreadtest" = "x0" ]; then
+dnl		gcc_support_pthread=yes
+dnl		AC_SUBST(threadLib)
+dnl		threadLib=-pthread
+dnl	else
+dnl		gcc_support_pthread=no
+dnl	fi
+dnl	AC_MSG_RESULT([$gcc_support_pthread])
+dnl fi
 
 dnl ----------------------------------------------------------
 dnl ----------------------------------------------------------
