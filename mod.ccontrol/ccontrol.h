@@ -3,7 +3,7 @@
  */
 
 #ifndef __CCONTROL_H
-#define __CCONTROL_H "$Id: ccontrol.h,v 1.75 2002/06/07 17:58:24 mrbean_ Exp $"
+#define __CCONTROL_H "$Id: ccontrol.h,v 1.76 2002/08/11 00:58:07 reedloden Exp $"
 
 //Undef this if you want to log to the database
 #define LOGTOHD 
@@ -40,17 +40,9 @@
     #include "ccLog.h"
 #endif
 
-#ifdef GNU_EXTENSIONS
- #include       <ext/hash_map>
-#else
- #include       <hash_map>
-#endif
-
 namespace gnuworld
 {
 
-using HASHMAPNS::hash ;
-using HASHMAPNS::hash_map ;
 using std::string ;
 using std::vector ;
 
