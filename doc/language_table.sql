@@ -369,6 +369,166 @@ COPY "translations" FROM stdin;
 3	7	Kanelen %s ser ikke ud til at være registreret	31337
 3	8	Du er op'et af %s (%s)	31337
 3	9	Du er voice'et af %s (%s)	31337
+3	10	%s: Du er ikke i denne kanal	31337
+3	11	%s er allerede op'et i %s	31337
+3	12	%s er allerede voice'et i %s	31337
+3	13	Du er deop'et af %s (%s)	31337
+3	14	Du er devoice'et af %s (%s)	31337
+3	15	%s er ikke op'et i %s	31337
+3	16	%s er ikke voice'et i %s	31337
+3	17	AUTORISATION MISLYKKEDES som %s (Ugyldigt Kodeord)	31337
+3	18	Jeg er ikke i den kanal!	31337
+3	19	Ugyldigt banlevel område. Gyldigt område er 1-%i.	31337
+3	20	Ugyldigt ban varighed. Din ban varighed kan max bestå af 336 timer.	31337
+3	21	Ban grund kan ikke overtræde 128 karaktere	31337
+3	22	Specifiseret ban er allerede i min banliste!	31337
+3	23	Ban'et %s er allerede dækket af %s		31337
+3	24	Ugyldigt minimums level.	31337
+3	25	Ugyldigt maximums level.	31337
+3	26	BRUGER: %s ADGANG: %s %s	31337
+3	27	KANAL: %s - AUTOMODE: %s	31337
+3	28	SIDST ÆNDRET: %s (%s siden)	31337
+3	29	** SUSPENDERET ** - Udløber om %s	31337
+3	30	SIDST SET: %s siden.	31337
+3	31	Der er mere end 15 matchende indtastninger.	31337
+3	32	Forkort venligst din forspørgelse.	31337
+3	33	Slut på adgangsliste.	31337
+3	34	Ingen match!	31337
+3	35	Kan ikke tilføje en bruger med ens eller højere adgang end din egen.	31337
+3	36	Ugyldigt adgangs level.	31337
+3	37	%s er allerede tilføjet til %s med adgangs level %i.	31337
+3	38	Tilføjet bruget %s til %s med adgangs level %i	31337
+3	39	Noget gik galt: %s	31337
+3	40	%s: Slut af ban liste	31337
+3	41	Kan ikke vise bruger detaljer (Usynlig)	31337
+3	42	Information omkring: %s (%i)	31337
+3	43	Nuværende logget på via: %s	31337
+3	44	URL: %s	31337
+3	45	Sprog: %i	31337
+3	46	Kanaler: %s	31337
+3	47	Input Flood Antal: %i	31337
+3	48	Output Flood (Bytes): %i	31337
+3	49	%s er registreret af:	31337
+3	50	%s - sidst set: %s siden	31337
+3	51	Desc: %s	31337
+3	52	Floode mig vil du? Jeg vil ikke høre mere på dig	31337
+3	53	Jeg tror jeg har sendt dig en lille smule for meget data, jeg vil ignorere dig i et stykke tid.	31337
+3	54	Ukomplet kommando	31337
+3	55	For at bruge %s, skal du /msg %s@%s	31337
+3	56	Sorry, Du skal være logget ind for at bruge denne kommando.	31337
+3	57	Kanalen %s er blevet suspenderet af en cservice administrator.	31337
+3	58	Din adgang på %s er blevet suspenderet.	31337
+3	59	NOOP flaget er sat på %s	31337
+3	60	STRICTOP flaget flaget er sat på %s	31337
+3	61	Du har lige deop'et flere end %i folk	31337
+3	62	SYNTAKS: %s	31337
+3	63	Midlertidigt forhøjet din adgang på kanal %s til %i	31337
+3	64	%s er registreret.	31337
+3	65	%s er ikke registreret.	31337
+3	66	Jeg tror ikke %s ville værtsætte det.	31337
+3	67	\002*** Ban Liste for kanal %s ***\002	31337
+3	68	%s %s Level: %i	31337
+3	69	TILFØJET AF: %s (%s)	31337
+3	70	SIDEN: %i	31337
+3	71	UDL: %s	31337
+3	72	\002*** SLUT ***\002	31337
+3	73	Sorry, Jeg ved ikke hvem %s er.	31337
+3	74	Sorry, du er ikke længere autoriseret med mig.	31337
+3	75	Ser ikke ud til at have adgang i %s.	31337
+3	76	Kan ikke ændre en bruger med ens eller højere adgang end din egen.	31337
+3	77	Kan ikke give en bruger højere eller ens adgang end din egen.	31337
+3	78	Ændrede %s's adgangs level på kanal %s til %i	31337
+3	79	Satte Automatisk MODE til OP for %s på kanal %s	31337
+3	80	Satte Automatisk MODE til VOICE for %s på kanal %s	31337
+3	81	Automatisk MODE for %s på kanal %s er nu slået fra	31337
+3	82	Dit kodeord kan ikke være dit brugernavn eller nuværende nick - syntaks er: NEWPASS <nyt kodeord>	31337
+3	83	Kodeordet er ændret med succes. 31337
+3	84	NOOP flaget er sat på %s	31337
+3	85	STRICTOP flaget er sat på %s (og %s er ikke autoriseret)	31337
+3	86	STRICTOP flaget er sat på %s (og %s har ikke tilstrækkelig adgang)	31337
+3	87	Slettet kanal %s	31337
+3	88	%s er allerede registeret med mig.	31337
+3	89	Ugyldigt kanal navn.	31337
+3	90	Registrerede kanal %s	31337
+3	91	Har fjernet %s fra min ignorerings liste	31337
+3	92	Kunne ikke finde %s i min ignorerings liste	31337
+3	93	Kan ikke fjerne en bruger med ens eller højere adgang end din egen	31337
+3	94	Du kan ikke fjerne dig selv fra en kanal du ejer	31337
+3	95	Har fjernet bruger %s fra %s	31337
+3	96	Din USYNLIG indstilling er nu sat til ON.	31337
+3	97	Din USYNLIG indstilling er nu sat til OFF.	31337
+3	98	%s for %s er %s	31337
+3	99	Værdig af %s skal være ON eller OFF	31337
+3	100	Ugyldig USERFLAGS indstilling. Korrekte værdiger er 0, 1, 2.	31337
+3	101	USERFLAGS for %s er %i	31337
+3	102	Værdi af MASSDEOPPRO skal være 0-7	31337
+3	103	MASSDEOPPRO for %s er sat til %d	31337
+3	104	Værdi af FLOODPRO skal være 0-7	31337
+3	105	FLOODPRO for %s er sat til %d	31337
+3	106	DESKRIPTION kan max have 80 karaktere!	31337
+3	107	DESKRIPTION for %s er fjernet.	31337
+3	108	DESKRIPTION for %s er: %s	31337
+3	109	URL'en kan max have 75 karaktere!	31337
+3	110	URL for %s er fjernet.	31337
+3	111	URL for %s er: %s	31337
+3	112	Strengen af nøgleord kan ikke overtræde 80 karaktere!	31337
+3	113	NØGLEORD for %s er: %s	31337
+3	114	Sprog er sat til %s.	31337
+3	115	FEJL: Ugyldigt sprogvalg.	31337
+3	116	Kan ikke finde kanal %s på netværket!	31337
+3	117	FEJL: Ugyldig kanal indstilling.	31337
+3	118	Ignore liste:	31337
+3	119	Ignore listen er tom	31337
+3	120	-- Slut på Ignore Liste	31337
+3	121	CMaster Kanal Services intern status:	31337
+3	122	[        Kanal Statistik] \002Cached Indtastninger:\002 %i    \002DB Forespørgsler:\002 %i    \002Cache Hits:\002 %i    \002Udnyttelse:\002 %.2f%%	31337
+3	123	[       Bruger Statistik] \002Cached Indtastninger:\002 %i    \002DB Forespørgsler:\002 %i    \002Cache Hits:\002 %i    \002Udnyttelse:\002 %.2f%%	31337
+3	124	[Adgangs Level Statistik] \002Cached Indtastninger:\002 %i    \002DB Forespørgsler:\002 %i    \002Cache Hits:\002 %i    \002Udnyttelse:\002 %.2f%%	31337
+3	125	[          Ban Statistik] \002Cached Indtastninger:\002 %i    \002DB Forespørgsler:\002 %i    \002Cache Hits:\002 %i    \002Udnyttelse:\002 %.2f%%	31337
+3	126	Sidst modtaget Bruger NOTIFY: %i	31337
+3	127	Sidst modtaget Kanal NOTIFY: %i	31337
+3	128	Sidst modtaget Level NOTIFY: %i	31337
+3	129	Sidst modtaget Ban NOTIFY: %i	31337
+3	130	Custom data beholdere allokeret: %i	31337
+3	131	\002Uptime:\002 %s	31337
+3	132	Kanal %s har %d brugere (%i operatører)	31337
+3	133	Mode er: %s	31337
+3	134	Flag sat: %s	31337
+3	135	Kan ikke suspendere en bruger med ens eller højere adgang end din egen.	31337
+3	136	Ugyldige tids enheder.	31337
+3	137	Ugyldig suspenderings periode.	31337
+3	138	SUSPENDERING for %s er slået fra.	31337
+3	139	%s er allerede suspenderet på %s	31337
+3	140	SUSPENDERING for %s vil udløbe i %s	31337
+3	141	FEJL: Topic kan ikke overtræde 145 karaktere	31337
+3	142	Du har utilstrækkelig adgang til at fjerne ban'et %s fra %s's database	31337
+3	143	Fjernet %i bans der matcher %s	31337
+3	144	Fjernet din midlertidige adgang af %i fra kanal %s	31337
+3	145	Du ser ikke ud til at have en tvunget adgang i %s, måske er den udløbet?	31337
+3	146	%s er ikke suspenderet på %s	31337
+3	147	%s er en IRC operatør	31337
+3	148	%s er IKKE logget ind.	31337
+3	149	%s er logget ind som %s%s	31337
+3	150	%s er en Officiel CService Repræsentativ%s og logget ind som %s	31337
+3	151	%s er en Officiel CService Administrator%s og logget ind som %s	31337
+3	152	%s er en Officiel CService Udvikler%s og logget ind som %s	31337
+3	153	Der er flere end %i indtastninger der matcher [%s]	31337
+3	154	Forkort venligst din søge maske	31337
+3	155	Ingen matchende indtastninger for [%s]	31337
+3	156	%s: Kanal modes fjernet.	31337
+3	158	Ugyldig indstilling.	31337
+3	159	%s er en Officiel Undernet Service ot.	31337
+3	160	%s er en Officiel Coder-Com Repræsentativ%s og logget ind som %s	31337
+3	161	%s er en Officiel Coder-Com Medhjælper%s og logget ind som %s	31337
+3	162	%s er en Officiel Coder-Com Udvikler%s og logget ind som %s	31337
+3	163	%s er en Officiel Coder-Com Senior%s og logget ind som %s	31337
+3	164	 og en IRC operatør	31337
+3	165	Tilføjede ban %s til %s på level %i	31337
+3	166	%s: ban liste er tom.	31337
+3	167	Jeg er allerede i den kanal!	31337
+3	168	Denne kommando er reserveeret til IRC Operatører	31337
+3	169	Jeg er ikke op'et på %s	31337
+3	170	%s for %i minuter	31337
 \.
 
 -- Dutch language definition.
