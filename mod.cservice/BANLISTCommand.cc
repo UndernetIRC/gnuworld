@@ -11,7 +11,7 @@
  *
  * Caveats: None.
  *
- * $Id: BANLISTCommand.cc,v 1.3 2001/01/27 20:16:40 dan_karrels Exp $
+ * $Id: BANLISTCommand.cc,v 1.4 2001/02/12 00:02:09 plexus Exp $
  */
 
 #include        <string>
@@ -23,7 +23,7 @@
 #include        "levels.h"
 #include        "responses.h"
 
-const char BANLISTCommand_cc_rcsId[] = "$Id: BANLISTCommand.cc,v 1.3 2001/01/27 20:16:40 dan_karrels Exp $" ;
+const char BANLISTCommand_cc_rcsId[] = "$Id: BANLISTCommand.cc,v 1.4 2001/02/12 00:02:09 plexus Exp $" ;
 
 namespace gnuworld
 {
@@ -40,22 +40,10 @@ if( st.size() < 2 )
 	return true;
 	}
 	
-/*
- *  Fetch the sqlUser record attached to this client. If there isn't one,
- *  they aren't logged in - tell them they should be.
- */
-	
-sqlUser* theUser = bot->isAuthed(theClient, true);
-if (!theUser)
-	{
-	return false;
-	}
- 
 Channel* tmpChan = Network->findChannel(st[1]); 
 if (!tmpChan) 
 	{
-	bot->Notice(theClient, bot->getResponse(theUser, language::chan_is_empty).c_str(), 
-		st[1].c_str());
+	bot->Notice(theClient, "Sorry, the channel %s is empty",st[1].c_str());
 	return false;
 	}
 	
