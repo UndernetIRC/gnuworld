@@ -49,7 +49,7 @@
 #include	"UnloadClientTimerHandler.h"
 
 const char server_h_rcsId[] = __SERVER_H ;
-const char server_cc_rcsId[] = "$Id: server.cc,v 1.112 2001/07/17 22:06:15 dan_karrels Exp $" ;
+const char server_cc_rcsId[] = "$Id: server.cc,v 1.113 2001/07/21 15:06:24 isomer Exp $" ;
 const char config_h_rcsId[] = __CONFIG_H ;
 const char misc_h_rcsId[] = __MISC_H ;
 const char events_h_rcsId[] = __EVENTS_H ;
@@ -942,8 +942,13 @@ string charYYXXX( fakeServer->getCharYY() ) ;
 // for this server.
 charYYXXX += "]]]" ;
 
-// Burst the new server's info.
-Write( "%s S %s %d %d %d P%02d %s 0 :Juped Server\n",
+// Burst the new server's info./
+// IRCu checks for "JUPE " as being the beginning of the 
+// reason as a jupe server.  This was because before servers
+// couldn't link without [ip] being added to their realname
+// field unless they were juped by uworld.  Now anyone can
+// link with that name, oh well.
+Write( "%s S %s %d %d %d P%02d %s 0 :JUPE Reason: %s\n",
 		getCharYY(),
 		fakeServer->getName().c_str(),
 		2,
@@ -1895,7 +1900,7 @@ char buffer[ 4096 ] = { 0 } ;
 va_list _list ;
 
 va_start( _list, format ) ;
-vsprintf( buffer, format, _list ) ;
+vsnprintf( buffer, 4096, format, _list ) ;
 va_end( _list ) ;
 
 #ifdef EDEBUG
@@ -1940,7 +1945,7 @@ char buffer[ 4096 ] = { 0 } ;
 va_list _list ;
 
 va_start( _list, format ) ;
-vsprintf( buffer, format, _list ) ;
+vsnprintf( buffer, 4096, format, _list ) ;
 va_end( _list ) ;
 
 #ifdef EDEBUG

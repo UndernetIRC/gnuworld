@@ -1,10 +1,10 @@
-dnl $Id: configure.in,v 1.27 2001/07/17 15:30:45 dan_karrels Exp $
+dnl $Id: configure.in,v 1.28 2001/07/21 15:06:23 isomer Exp $
 dnl ----------------------------------------------------------
 
 echo Configuring GNUWorld...
 echo
 
-AC_REVISION($Revision: 1.27 $)
+AC_REVISION($Revision: 1.28 $)
 AC_INIT(src/main.cc)
 AM_INIT_AUTOMAKE(gnuworld,0.0)
 AM_CONFIG_HEADER(include/defs.h)
@@ -294,17 +294,19 @@ AC_ARG_WITH(pgsql, \
 )
 
 AC_MSG_CHECKING(for libpq++.h)
-if test -f "$PGSQL_PREFIX/include/libpq++.h"; then
-	PGSQL_PREFIX=$PGSQL_PREFIX
-elif test -f "/usr/local/pgsql/include/libpq++.h"; then
-	PGSQL_PREFIX=/usr/local/pgsql
+if test -f "/usr/local/include/libpq++.h"; then
+  PGSQL_INCLUDE=/usr/local/include
+  PGSQL_LIB=/usr/local/lib
+elif test -f "/usr/include/postgresql/libpq++.h"; then
+	PGSQL_INCLUDE=/usr/include/postgresql
+	PGSQL_LIB=/usr/lib/pgsql
+elif test -f "/usr/include/pgsql/libpq++.h"; then
+	PGSQL_INCLUDE=/usr/include/pgsql
+	PGSQL_LIB=/usr/lib/pgsql
 else
         AC_MSG_ERROR( Unable to find PostGreSQL )
 fi
 AC_MSG_RESULT(yes)
-
-PGSQL_INCLUDE=$PGSQL_PREFIX/include
-PGSQL_LIB=$PGSQL_PREFIX/lib
 
 AC_SUBST(PGSQL_INCLUDE)
 AC_SUBST(PGSQL_LIB)

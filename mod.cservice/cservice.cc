@@ -2181,7 +2181,7 @@ char buf[ 1024 ] = { 0 } ;
 va_list _list ;
 	
 va_start( _list, format ) ;
-vsprintf( buf, format, _list ) ;
+vsnprintf( buf, 1024, format, _list ) ;
 va_end( _list ) ;
 	
 strstream s;
@@ -2229,7 +2229,7 @@ char buf[ 1024 ] = { 0 } ;
 va_list _list ;
 	
 va_start( _list, format ) ;
-vsprintf( buf, format, _list ) ;
+vsnprintf( buf, 1024, format, _list ) ;
 va_end( _list ) ;
 	
 // Try and locate the relay channel.
@@ -2254,7 +2254,7 @@ char buf[ 1024 ] = { 0 } ;
 va_list _list ;
 	
 va_start( _list, format ) ;
-vsprintf( buf, format, _list ) ;
+vsnprintf( buf, 1024, format, _list ) ;
 va_end( _list ) ;
 	
 // Try and locate the debug channel.
@@ -3309,6 +3309,7 @@ if( Connected && MyUplink )
 	const char *m = 0 ;
 
 	// TODO: wtf is this bs?
+	// A walking timebomb.
 	for (m=Message.c_str();*m!=0;m++) 
 		{
 		if (*m == '\n' || *m == '\r') 
@@ -3321,7 +3322,15 @@ if( Connected && MyUplink )
 			b=buffer;
 			}
 		else
+			{
 			*(b++)=*m;
+			if (b>=buffer+509) {
+			  while (b>=buffer+509 && !(*m || *m=='\n' || *m=='\r'))
+				m++;
+			  }
+			  m--;
+			}
+			
 		}
         *b='\0';
 	count+=MyUplink->Write( "%s O %s :%s\r\n",
@@ -3341,7 +3350,7 @@ if( Connected && MyUplink && Message && Message[ 0 ] != 0 )
 	va_list list;
 
 	va_start(list, Message);
-	vsprintf(buffer, Message, list);
+	vsnprintf(buffer, 512, Message, list);
 	va_end(list);
  
 	setOutputTotal( Target, getOutputTotal(Target) + strlen(buffer) );

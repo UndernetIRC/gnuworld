@@ -28,7 +28,7 @@
 #include	"events.h"
 
 const char xClient_h_rcsId[] = __CLIENT_H ;
-const char xClient_cc_rcsId[] = "$Id: client.cc,v 1.40 2001/07/17 16:58:27 dan_karrels Exp $" ;
+const char xClient_cc_rcsId[] = "$Id: client.cc,v 1.41 2001/07/21 15:06:24 isomer Exp $" ;
 const char config_h_rcsId[] = __CONFIG_H ;
 const char misc_h_rcsId[] = __MISC_H ;
 const char Numeric_h_rcsId[] = __NUMERIC_H ;
@@ -233,7 +233,7 @@ if( Connected && MyUplink && Format && Format[ 0 ] != 0 )
 	va_list list;
 
 	va_start( list, Format ) ;
-	vsprintf( buffer, Format, list ) ;
+	vsnprintf( buffer, 1024, Format, list ) ;
 	va_end( list ) ;
 
 	return MyUplink->Write( "%s WA :%s",
@@ -260,7 +260,7 @@ if( Connected && MyUplink && Format && Format[ 0 ] != 0 )
 	va_list list;
 
 	va_start( list, Format ) ;
-	vsprintf( buffer, Format, list ) ;
+	vsnprintf( buffer, 1024, Format, list ) ;
 	va_end( list ) ;
 
 	return MyUplink->Wallops( buffer ) ;
@@ -324,7 +324,7 @@ if( Connected && MyUplink && Message && Message[ 0 ] !=0 )
 	va_list list;
 
 	va_start( list, Message ) ;
-	vsprintf( buffer, Message, list ) ;
+	vsnprintf( buffer, 1024, Message, list ) ;
 	va_end( list ) ;
 
 	return MyUplink->Write( "%s P %s :%s\r\n",
@@ -343,7 +343,7 @@ if( Connected && MyUplink && Message && Message[ 0 ] != 0 )
 	va_list list ;
 
 	va_start( list, Message ) ;
-	vsprintf( buffer, Message, list ) ;
+	vsnprintf( buffer, 1024, Message, list ) ;
 	va_end( list ) ;
 
 	return MyUplink->Write( "%s P #%s :%s\r\n",
@@ -389,7 +389,7 @@ if( Connected && MyUplink && Message && Message[ 0 ] != 0 )
 	va_list list;
 
 	va_start(list, Message);
-	vsprintf(buffer, Message, list);
+	vsnprintf(buffer, 1024, Message, list);
 	va_end(list);
 
 	// O is the token for NOTICE, *shrug*
@@ -409,7 +409,7 @@ if( Connected && MyUplink && Message && Message[ 0 ] != 0 )
 	va_list list;
 
 	va_start(list, Message);
-	vsprintf(buffer, Message, list);
+	vsnprintf(buffer, 1024, Message, list);
 	va_end(list);
 
 	return MyUplink->Write("%s O #%s :%s\r\n",
@@ -1859,7 +1859,7 @@ char buf[ 4096 ] = { 0 } ;
 va_list _list ;
 
 va_start( _list, format ) ;
-vsprintf( buf, format, _list ) ;
+vsnprintf( buf, 4096, format, _list ) ;
 va_end( _list ) ;
 
 return Write( string( buf ) ) ;
