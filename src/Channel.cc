@@ -353,6 +353,11 @@ for( banVectorType::const_iterator newBanPtr = origBans.begin() ;
 			banVector.push_back( banVectorType::value_type(
 				false, *currentBanPtr ) ) ;
 
+//			elog	<< "Channel::onModeB> Removing "
+//				<< "overlapping ban: "
+//				<< *currentBanPtr
+//				<< endl ;
+
 			// Overlap, remove the old ban
 			currentBanPtr = banList.erase( currentBanPtr ) ;
 
