@@ -1,10 +1,10 @@
-dnl $Id: configure.in,v 1.16 2000/12/21 13:59:52 dan_karrels Exp $
+dnl $Id: configure.in,v 1.17 2000/12/23 00:56:49 dan_karrels Exp $
 dnl ----------------------------------------------------------
 
 echo Configuring GNUWorld...
 echo
 
-AC_REVISION($Revision: 1.16 $)
+AC_REVISION($Revision: 1.17 $)
 AC_INIT(src/main.cc)
 AM_INIT_AUTOMAKE(gnuworld,0.0)
 AM_CONFIG_HEADER(include/defs.h)
@@ -424,7 +424,7 @@ dnl echo "enableval: $enableval"
 if test $enableval = "yes" ; then
 	searchForMods=yes
 elif test $enableval = "no" ; then
-	searchForMods=yes
+	searchForMods=no
 else
 	tmp="mod.$enableval"
 dnl 	echo "tmp: $tmp"

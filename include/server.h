@@ -17,7 +17,7 @@
  */
 
 #ifndef __XSERVER_H
-#define __XSERVER_H "$Id: server.h,v 1.16 2000/12/20 00:49:30 dan_karrels Exp $"
+#define __XSERVER_H "$Id: server.h,v 1.17 2000/12/23 00:56:49 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
@@ -137,6 +137,10 @@ public:
 	 * from network.
 	 */
 	virtual ~xServer() ;
+
+	typedef vector< pair< bool, ChannelUser* > > opVectorType ;
+	typedef opVectorType voiceVectorType ;
+	typedef vector< pair< bool, string > > banVectorType ;
 
 	/**
 	 * Connect to a network uplink of the given address
@@ -626,6 +630,27 @@ protected:
 	 */
 	virtual bool	OnSignal( int ) ;
 
+	virtual void	onUserModeChange( xParameters& ) ;
+
+	virtual void	onChannelModeT( Channel*, bool, ChannelUser* ) ;
+	virtual void	onChannelModeN( Channel*, bool, ChannelUser* ) ;
+	virtual void	onChannelModeS( Channel*, bool, ChannelUser* ) ;
+	virtual void	onChannelModeP( Channel*, bool, ChannelUser* ) ;
+	virtual void	onChannelModeM( Channel*, bool, ChannelUser* ) ;
+	virtual void	onChannelModeI( Channel*, bool, ChannelUser* ) ;
+
+	virtual void	onChannelModeL( Channel*, bool,
+				ChannelUser*, unsigned int ) ;
+	virtual void	onChannelModeK( Channel*, bool,
+				ChannelUser*, const string& ) ;
+
+	virtual void	onChannelModeO( Channel*, ChannelUser*,
+		const opVectorType& ) ;
+	virtual void	onChannelModeV( Channel*, ChannelUser*,
+		const voiceVectorType& ) ;
+	virtual void	onChannelModeB( Channel*, ChannelUser*,
+		const banVectorType& ) ;
+
 	unsigned int	maxLoopCount ;
 
 	/**
@@ -769,9 +794,6 @@ protected:
 
 	/// JOIN
 	DECLARE_MSG(Join);
-
-	/// MODE
-	DECLARE_MSG(Mode);
 
 	/// DESYNCH
 	DECLARE_MSG(Desynch);

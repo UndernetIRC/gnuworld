@@ -3606,7 +3606,7 @@ if test "${enable_modules+set}" = set; then
 if test $enableval = "yes" ; then
 	searchForMods=yes
 elif test $enableval = "no" ; then
-	searchForMods=yes
+	searchForMods=no
 else
 	tmp="mod.$enableval"
 	tmp=`echo $tmp | sed 's/,/ mod./g'`

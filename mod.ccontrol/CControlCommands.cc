@@ -547,7 +547,9 @@ bot->ModeAsServer( theChan, modeString + ' ' + argString ) ;
 
 // Update internal tables.
 // This is a cheat, but it makes things so much easier :)
-theChan->OnModeChange( theClient->getCharYYXXX(), modeString, argString ) ;
+// TODO
+//theChan->OnModeChange( theClient->getCharYYXXX(), modeString, argString
+//) ;
 
 return true ;
 

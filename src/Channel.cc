@@ -166,275 +166,106 @@ bool Channel::matchBan( const string& banMask ) const
 return findBan( banMask ) ;
 }
 
-// The iClient pointer here could possible be NULL
-// ABCDE M #channel <modes>
-//
-void Channel::OnModeChange( iClient*, const xParameters& Param )
+void Channel::onModeT( bool polarity )
 {
-if( Param.size() < 3 )
-	{
-	elog	<< "Channel::OnModeChange> Invalid number of arguments\n" ;
-	return ;
-	}
-
-bool plus = true ;
-xParameters::size_type argPos = 3 ;
-
-iClient* theClient = 0 ;
-ChannelUser* theUser = 0 ;
-
-for( const char* modePtr = Param[ 2 ] ; *modePtr ; ++modePtr )
-	{
-	switch( *modePtr )
-		{
-		case '+':
-			plus = true ;
-			break ;
-		case '-':
-			plus = false ;
-			break ;
-		case 'i':
-			if( plus )	setMode( MODE_I ) ;
-			else		removeMode( MODE_I ) ;
-			break ;
-		case 't':
-			if( plus )	setMode( MODE_T ) ;
-			else		removeMode( MODE_T ) ;
-			break ;
-		case 'n':
-			if( plus )	setMode( MODE_N ) ;
-			else		removeMode( MODE_N ) ;
-			break ;
-		case 's':
-			if( plus )	setMode( MODE_S ) ;
-			else		removeMode( MODE_S ) ;
-			break ;
-		case 'p':
-			if( plus )	setMode( MODE_P ) ;
-			else		removeMode( MODE_P ) ;
-			break ;
-		case 'm':
-			if( plus )	setMode( MODE_M ) ;
-			else		removeMode( MODE_M ) ;
-			break ;
-		case 'b':
-			if( argPos >= Param.size() )
-				{
-				elog	<< "Channel::OnModeChange> ("
-					<< getName() << "): Missing "
-					<< "argument (mode b)\n" ;
-				break ;
-				}
-			if( plus )	setBan( Param[ argPos ] ) ;
-			else		removeBan( Param[ argPos ] ) ;
-			argPos++ ;
-			break ;
-		case 'l':
-			if( plus )
-				{
-				setLimit( atoi( Param[ argPos ] ) ) ;
-				// argument only needed for +l
-				argPos++ ;
-				}
-			else
-				{
-				removeMode( MODE_L ) ;
-				// no arg needed for -l
-				}
-			break ;
-		case 'k':
-			if( argPos >= Param.size() )
-				{
-				elog	<< "Channel::OnModeChange> ("
-					<< getName() << "): Missing "
-					<< "argument (mode k)\n" ;
-				break ;
-				}
-			if( plus )
-				{
-				setKey( Param[ argPos ] ) ;
-				}
-			else
-				{
-				removeMode( MODE_K ) ;
-				}
-			argPos++ ;
-			break ;
-		case 'v':
-			if( argPos >= Param.size() )
-				{
-				elog	<< "Channel::OnModeChange> ("
-					<< getName() << "): Missing "
-					<< "argument (mode v)\n" ;
-				break ;
-				}
-			theClient = Network->findClient( Param[ argPos++ ] ) ;
-			if( NULL == theClient )
-				{
-//				elog	<< "Channel::OnModeChange> ("
-//					<< getName() << "): Unable to find "
-//					<< "client: " << Param[ argPos ]
-//					<< endl ;
-				break ;
-				}
-			theUser = findUser( theClient ) ;
-			if( NULL == theUser )
-				{
-//				elog	<< "Channel::OnModeChange> ("
-//					<< getName() << ") (mode v): Unable "
-//					<< "to find ChannelUser: "
-//					<< theClient->getNickName() << endl ;
-				break ;
-				}
-			if( plus )	theUser->setMode( ChannelUser::MODE_V ) ;
-			else		theUser->removeMode( ChannelUser::MODE_V ) ;
-
-			break ;
-		case 'o':
-			if( argPos >= Param.size() )
-				{
-				elog	<< "Channel::OnModeChange> ("
-					<< getName() << "): Missing "
-					<< "argument (mode o)\n" ;
-				break ;
-				}
-			theClient = Network->findClient( Param[ argPos++ ] ) ;
-			if( NULL == theClient )
-				{
-//				elog	<< "Channel:OnModeChange> ("
-//					<< getName() << "): Unable to find "
-//					<< "client: " << Param[ argPos ]
-//					<< endl ;
-				break ;
-				}
-			theUser = findUser( theClient ) ;
-			if( NULL == theUser )
-				{
-//				elog	<< "Channel::OnModeChange> ("
-//					<< getName() << ") (mode o): Unable "
-//					<< "to find ChannelUser: "
-//					<< theClient->getNickName() << endl ;
-				break ;
-				}
-			if( plus )	theUser->setMode( ChannelUser::MODE_O ) ;
-			else		theUser->removeMode( ChannelUser::MODE_O ) ;
-
-			break ;
-
-		default:
-			elog	<< "Channel::OnModeChange> ("
-				<< getName() << "): Found unexpected mode: "
-				<< *modePtr << endl ;
-			break ;
-
-		} // switch()
-
-	} // for()
-
+if( polarity )	setMode( MODE_T ) ;
+else		removeMode( MODE_T ) ;
 }
 
-// NOTE: No error checking is done in this method, the mode/arg strings
-// are assumed to be in proper order, and all clients are assumed to
-// exist.
-void Channel::OnModeChange( const string yyxxx,
-	const string& modes, const string& argString )
+void Channel::onModeN( bool polarity )
 {
+if( polarity )	setMode( MODE_N ) ;
+else		removeMode( MODE_N ) ;
+}
 
-StringTokenizer args( argString ) ;
+void Channel::onModeS( bool polarity )
+{
+if( polarity )	setMode( MODE_S ) ;
+else		removeMode( MODE_S ) ;
+}
 
-bool plus = true ;
-StringTokenizer::size_type	argPos = 0 ;
+void Channel::onModeP( bool polarity )
+{
+if( polarity )	setMode( MODE_P ) ;
+else		removeMode( MODE_P ) ;
+}
 
-iClient* theClient = 0 ;
-ChannelUser* theUser = 0 ;
+void Channel::onModeM( bool polarity )
+{
+if( polarity )	setMode( MODE_M ) ;
+else		removeMode( MODE_M ) ;
+}
 
-for( string::size_type modePos = 0 ; modePos < modes.size() ; modePos++ )
+void Channel::onModeI( bool polarity )
+{
+if( polarity )	setMode( MODE_I ) ;
+else		removeMode( MODE_I ) ;
+}
+
+void Channel::onModeL( bool polarity, const unsigned int& newLimit )
+{
+if( polarity )
 	{
-	switch( modes[ modePos ] )
-		{
-		case '+':
-			plus = true ;
-			break ;
-		case '-':
-			plus = false ;
-			break ;
-		case 'i':
-			if( plus )		setMode( MODE_I ) ;
-			else			removeMode( MODE_I ) ;
-			break ;
-		case 'n':
-			if( plus )		setMode( MODE_N ) ;
-			else			removeMode( MODE_N ) ;
-			break ;
-		case 'm':
-			if( plus )		setMode( MODE_M ) ;
-			else			removeMode( MODE_M ) ;
-			break ;
-		case 's':
-			if( plus )		setMode( MODE_S ) ;
-			else			removeMode( MODE_S ) ;
-			break ;
-		case 'p':
-			if( plus )		setMode( MODE_P ) ;
-			else			removeMode( MODE_P ) ;
-			break ;
-		case 't':
-			if( plus )		setMode( MODE_T ) ;
-			else			removeMode( MODE_T ) ;
-			break ;
-		case 'l':
-			if( !plus )
-				{
-				removeMode( MODE_L ) ;
-				break ;
-				}
+	setMode( MODE_L ) ;
+	setLimit( newLimit ) ;
+	}
+else
+	{
+	removeMode( MODE_L ) ;
+	setLimit( 0 ) ;
+	}
+}
 
-			setLimit( atoi( args[ argPos++ ].c_str() ) ) ;
-			break ;
-		case 'k':
-			if( plus )		setKey( args[ argPos ] ) ;
-			else			removeMode( MODE_K ) ;
-			argPos++ ;
-			break ;
-		case 'b':
-			if( plus )		setBan( args[ argPos ] ) ;
-			else			removeBan( args[ argPos ] ) ;
-			argPos++ ;
-			break ;
-		case 'o':
-			theClient = Network->findClient( args[ argPos ] ) ;
-			argPos++ ;
-			theUser = findUser( theClient ) ;
-			if( NULL == theUser )
-				{
-				elog	<< "Channel::OnModeChange (o)> Unable "
-					<< "to find client: " << args[ argPos - 1 ]
-					<< endl ;
-				continue ;
-				}
-			if( plus )	theUser->setMode( ChannelUser::MODE_O ) ;
-			else		theUser->removeMode( ChannelUser::MODE_O ) ;
-			break ;
-		case 'v':
-			theClient = Network->findClient( args[ argPos ] ) ;
-			argPos++ ;
-			theUser = findUser( theClient ) ;
-			if( NULL == theUser )
-				{
-				elog	<< "Channel::OnModeChange(v)> Unable "
-					<< "to find client: " << args[ argPos - 1 ]
-					<< endl ;
-				continue ;
-				}
-			if( plus )	theUser->setMode( ChannelUser::MODE_V ) ;
-			else		theUser->removeMode( ChannelUser::MODE_V ) ;
-			break ;
-		default:
-			elog	<< "Channel::OnModeChange> Found unexpected mode: "
-				<< modes[ modePos ] << endl ;
-		} // switch()
-	} // for()
+void Channel::onModeK( bool polarity, const string& newKey )
+{
+if( polarity )
+	{
+	setMode( MODE_K ) ;
+	setKey( newKey ) ;
+	}
+else
+	{
+	removeMode( MODE_K ) ;
+	setKey( "" ) ;
+	}
+}
 
+void Channel::onModeO( const vector< pair< bool, ChannelUser* > >&
+	opVector )
+{
+typedef vector< pair< bool, ChannelUser* > > opVectorType ;
+for( opVectorType::const_iterator ptr = opVector.begin() ;
+	ptr != opVector.end() ; ++ptr )
+	{
+	if( ptr->first )	ptr->second->setMode(
+					ChannelUser::MODE_O ) ;
+	else	ptr->second->removeMode( ChannelUser::MODE_O ) ;
+	}
+}
+
+void Channel::onModeV( const vector< pair< bool, ChannelUser* > >&
+	voiceVector )
+{
+typedef vector< const pair< bool, ChannelUser* > > voiceVectorType ;
+for( voiceVectorType::const_iterator ptr = voiceVector.begin() ;
+	ptr != voiceVector.end() ; ++ptr )
+	{
+	if( ptr->first )	ptr->second->setMode(
+					ChannelUser::MODE_V ) ;
+	else	ptr->second->removeMode( ChannelUser::MODE_V  ) ;
+	}
+}
+
+void Channel::onModeB( const vector< pair< bool, string > >&
+	banVector )
+{
+typedef vector< const pair< bool, string > > banVectorType ;
+for( banVectorType::const_iterator ptr = banVector.begin() ;
+	ptr != banVector.end() ; ++ptr )
+	{
+	if( ptr->first )	setBan( ptr->second ) ;
+	else			removeBan( ptr->second ) ;
+	}
 }
 
 const string Channel::getModeString() const

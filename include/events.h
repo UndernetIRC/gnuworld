@@ -6,7 +6,7 @@
  */
 
 #ifndef __EVENTS_H
-#define __EVENTS_H "$Id: events.h,v 1.6 2000/12/13 23:37:13 dan_karrels Exp $"
+#define __EVENTS_H "$Id: events.h,v 1.7 2000/12/23 00:56:49 dan_karrels Exp $"
 
 namespace gnuworld
 {
@@ -56,7 +56,6 @@ enum
 {
 	EVT_JOIN = EVT_NOOP,
 	EVT_PART,
-	EVT_MODE,
 	EVT_TOPIC,
 	EVT_KICK,
 	EVT_CREATE
@@ -100,9 +99,6 @@ typedef int channelEventType ;
  *  1) iClient*
  * EVT_JOIN
  *  1) iClient*
- * EVT_MODE
- *  1) iClient* - source of modes
- *  2) string* - mode string
  */
 
 } // namespace gnuworld

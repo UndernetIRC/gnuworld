@@ -292,13 +292,6 @@ public:
 	inline ChannelUser* findUser( iClient* theClient ) const ;
 
 	/**
-	 * This method handles one or more channel mode changes.
-	 * It is public here because it may be called from client space.
-	 */
-	virtual void	OnModeChange( const string yyxxx,
-				const string& modes, const string& args ) ;
-
-	/**
 	 * Convenience operator for outputting Channel information
 	 * to a C++ output stream.
 	 */
@@ -311,12 +304,20 @@ public:
 
 protected:
 
-	/**
-	 * This method handles one or more channel mode changes.
-	 * It is protected here because it is formatted as an xServer
-	 * MSG handler method, and will be called by xServer.
-	 */
-	virtual void	OnModeChange( iClient*, const xParameters& ) ;
+	virtual void	onModeT( bool ) ;
+	virtual void	onModeN( bool ) ;
+	virtual void	onModeS( bool ) ;
+	virtual void	onModeP( bool ) ;
+	virtual void	onModeM( bool ) ;
+	virtual void	onModeI( bool ) ;
+	virtual void	onModeL( bool, const unsigned int& ) ;
+	virtual void	onModeK( bool, const string& ) ;
+	virtual void	onModeO( const vector<
+				pair< bool, ChannelUser* > >& ) ;
+	virtual void	onModeV( const vector<
+				pair< bool, ChannelUser* > >& ) ;
+	virtual void	onModeB( const vector<
+				pair< bool, string > >& ) ;
 
 	/**
 	 * Set the creation time of this channel.  This is protected

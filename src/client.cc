@@ -27,7 +27,7 @@
 #include	"events.h"
 
 const char xClient_h_rcsId[] = __XCLIENT_H ;
-const char xClient_cc_rcsId[] = "$Id: client.cc,v 1.14 2000/12/13 23:22:23 dan_karrels Exp $" ;
+const char xClient_cc_rcsId[] = "$Id: client.cc,v 1.15 2000/12/23 00:56:50 dan_karrels Exp $" ;
 
 using std::string ;
 using std::strstream ;
@@ -381,6 +381,61 @@ int xClient::OnChannelEvent( const channelEventType&, Channel*,
 	void*, void*, void*, void* )
 {
 return 0 ;
+}
+
+void xClient::OnChannelModeM( Channel*,
+	bool, ChannelUser* )
+{
+}
+
+void xClient::OnChannelModeI( Channel*,
+	bool, ChannelUser* )
+{
+}
+
+void xClient::OnChannelModeP( Channel*,
+	bool, ChannelUser* )
+{
+}
+
+void xClient::OnChannelModeS( Channel*,
+	bool, ChannelUser* )
+{
+}
+
+void xClient::OnChannelModeN( Channel*,
+	bool, ChannelUser* )
+{
+}
+
+void xClient::OnChannelModeT( Channel*,
+	bool, ChannelUser* )
+{
+}
+
+void xClient::OnChannelModeL( Channel*,
+	bool, ChannelUser*, const unsigned int& )
+{
+}
+
+void xClient::OnChannelModeK( Channel*,
+	bool, ChannelUser*, const string& )
+{
+}
+
+void xClient::OnChannelModeO( Channel*, ChannelUser*,
+	const xServer::opVectorType& )
+{
+}
+
+void xClient::OnChannelModeV( Channel*, ChannelUser*,
+	const xServer::voiceVectorType& )
+{
+}
+
+void xClient::OnChannelModeB( Channel*, ChannelUser*,
+	const xServer::banVectorType& )
+{
 }
 
 int xClient::OnPrivateMessage( iClient*, const string& )

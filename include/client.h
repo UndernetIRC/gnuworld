@@ -3,7 +3,7 @@
  */
 
 #ifndef __XCLIENT_H
-#define __XCLIENT_H "$Id: client.h,v 1.10 2000/12/13 23:22:22 dan_karrels Exp $"
+#define __XCLIENT_H "$Id: client.h,v 1.11 2000/12/23 00:56:49 dan_karrels Exp $"
 
 #include	<string>
 
@@ -156,6 +156,45 @@ public:
 		Channel*,
 		void* Data1 = NULL, void* Data2 = NULL,
 		void* Data3 = NULL, void* Data4 = NULL ) ;
+
+	/**
+	 * This method is invoked when a user sets or removes
+	 * channel mode m (moderate).  Keep in mind that the
+	 * source ChannelUser may be NULL if a server is
+	 * setting the mode.
+	 */
+	virtual void OnChannelModeM( Channel*, bool polarity,
+		ChannelUser* ) ;
+
+	virtual void OnChannelModeI( Channel*, bool polarity,
+		ChannelUser* ) ;
+
+	virtual void OnChannelModeP( Channel*, bool polarity,
+		ChannelUser* ) ;
+
+	virtual void OnChannelModeS( Channel*, bool polarity,
+		ChannelUser* ) ;
+
+	virtual void OnChannelModeN( Channel*, bool polarity,
+		ChannelUser* ) ;
+
+	virtual void OnChannelModeT( Channel*, bool polarity,
+		ChannelUser* ) ;
+
+	virtual void OnChannelModeL( Channel*, bool polarity,
+		ChannelUser*, const unsigned int& ) ;
+
+	virtual void OnChannelModeK( Channel*, bool polarity,
+		ChannelUser*, const string& ) ;
+
+	virtual void OnChannelModeO( Channel*, ChannelUser*,
+		const xServer::opVectorType& ) ;
+
+	virtual void OnChannelModeV( Channel*, ChannelUser*,
+		const xServer::voiceVectorType& ) ;
+
+	virtual void OnChannelModeB( Channel*, ChannelUser*,
+		const xServer::banVectorType& ) ;
 
 	/**
 	 * This method is called for each signal that occurs
