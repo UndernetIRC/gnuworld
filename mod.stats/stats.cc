@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: stats.cc,v 1.7 2002/08/08 18:32:34 dan_karrels Exp $
+ * $Id: stats.cc,v 1.8 2002/08/08 18:50:05 dan_karrels Exp $
  */
 
 #include	<string>
@@ -144,7 +144,7 @@ void stats::WriteLog( const string& fileName, const string& line )
 //	<< endl ;
 
 // Should we log during a net burst
-if( !logDuringBurst && theServer->isBursting() )
+if( !logDuringBurst && MyUplink->isBursting() )
 	{
 	// Don't log
 	return ;
