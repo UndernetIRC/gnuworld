@@ -37,7 +37,7 @@
 //#include	"moduleLoader.h"
 
 const char xServer_h_rcsId[] = __XSERVER_H ;
-const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.6 2000/07/12 21:54:12 dan_karrels Exp $" ;
+const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.7 2000/07/16 17:48:18 dan_karrels Exp $" ;
 
 using std::string ;
 using std::vector ;
@@ -188,7 +188,6 @@ REGISTER_MSG( "SQ", SQ ) ;
 
 // Kill
 REGISTER_MSG( "D", D ) ;
-REGISTER_MSG( "KILL", D ) ;
 
 REGISTER_MSG( "WA", WA ) ;
 
@@ -227,8 +226,15 @@ REGISTER_MSG( "JOIN", Join ) ;
 // Mode
 REGISTER_MSG( "MODE", Mode ) ;
 
+// Kill
+REGISTER_MSG( "KILL", Kill ) ;
+
 // WHOIS
 REGISTER_MSG( "W", NOOP ) ;
+REGISTER_MSG( "WHOIS", NOOP ) ;
+REGISTER_MSG( "MOTD", NOOP ) ;
+REGISTER_MSG( "STATS", NOOP ) ;
+
 
 // AWAY
 REGISTER_MSG( "A", NOOP ) ;
@@ -236,6 +242,9 @@ REGISTER_MSG( "AWAY", NOOP ) ;
 
 // SILENCE
 REGISTER_MSG( "SILENCE", NOOP ) ;
+
+// DESYNCH
+REGISTER_MSG( "DESYNCH", Desynch ) ;
 
 /*
  * Load and attach any modules specified in the config.
@@ -1203,7 +1212,7 @@ bool xServer::GetString( char* buf, const size_t& size )
 
 // Is there a valid connection and data to
 // be read?
-if( !_connected || 0 == inputBuffer.size() )
+if( !_connected || inputBuffer.empty() )
 	{
 	// Nope, return false
 	return false ;
@@ -1672,7 +1681,9 @@ for( StringTokenizer::const_iterator ptr = st.begin() ; ptr != st.end() ;
 	iClient* theClient = Network->findClient( (*ptr).substr( 0, pos ) ) ;
 	if( NULL == theClient )
 		{
-		elog	<< "xServer::parseBurstUsers> Unable to find client: "
+		elog	<< "xServer::parseBurstUsers> ("
+			<< theChan->getName() << ")"
+			<< ": Unable to find client: "
 			<< (*ptr).substr( 0, pos ) << endl ;
 		continue ;
 		}
@@ -1795,7 +1806,8 @@ if( '+' == Param[ 1 ][ 0 ] )
 iClient* theClient = Network->findClient( Param[ 0 ] ) ;
 if( NULL == theClient )
 	{
-	elog	<< "xServer::MSG_L> Unable to find client: "
+	elog	<< "xServer::MSG_L> (" << Param[ 1 ]
+		<< "): Unable to find client: "
 		<< Param[ 0 ] << endl ;
 	return -1 ;
 
@@ -1861,7 +1873,8 @@ if( '+' == Param[ 1 ][ 0 ] )
 iClient* theClient = Network->findNick( Param[ 0 ] ) ;
 if( NULL == theClient )
 	{
-	elog	<< "xServer::MSG_Part> Unable to find client: "
+	elog	<< "xServer::MSG_Part> ("
+		<< Param[ 1 ] << ") Unable to find client: "
 		<< Param[ 0 ] << endl ;
 	return -1 ;
 
@@ -1929,7 +1942,8 @@ if( '+' == Param[ 1 ][ 0 ] )
 iClient* theClient = Network->findClient( Param[ 2 ] ) ;
 if( NULL == theClient )
 	{
-	elog	<< "xServer::MSG_K> Unable to find client: "
+	elog	<< "xServer::MSG_K> ("
+		<< Param[ 1 ] << ") Unable to find client: "
 		<< Param[ 2 ] << endl ;
 	return -1 ;
 	}
@@ -1943,7 +1957,7 @@ if( NULL == theChan )
 	return -1 ;
 	}
 
-theChan->removeUser( theClient ) ;
+delete theChan->removeUser( theClient ) ;
 theClient->removeChannel( theChan ) ;
 
 // All we really have to do here is post the message.
@@ -1986,7 +2000,8 @@ if( '+' == Param[ 0 ][ 0 ] )
 iClient* theClient = Network->findClient( Param[ 0 ] ) ;
 if( NULL == theClient )
 	{
-	elog	<< "xServer::MSG_C> Unable to find client: "
+	elog	<< "xServer::MSG_C> ("
+		<< Param[ 1 ] << ") Unable to find client: "
 		<< Param[ 0 ] << endl ;
 	return -1 ;
 	}
@@ -2003,59 +2018,41 @@ for( StringTokenizer::const_iterator ptr = st.begin() ; ptr != st.end() ;
 
 	// Find the channel in question.
 	Channel* theChan = Network->findChannel( *ptr ) ;
-	if( NULL != theChan )
+	if( NULL == theChan )
 		{
-		elog	<< "xServer::MSG_C> Found channel for some reason: "
-			<< *ptr << endl ;
-
-		// Not sure why this channel is in existence
-		// Oh well, just add this user to the channel
-		// *shrug*
-		if( !theChan->addUser( new ChannelUser( theClient ) ) )
+		// Channel doesn't exist, allocate it
+		try
 			{
-			elog	<< "xServer::MSG_C> Unable to add user "
-				<< theClient->getNickName() << " to channel "
-				<< theChan->getName() << endl ;
+			theChan = new Channel( *ptr, creationTime ) ;
+			}
+		catch( std::bad_alloc )
+			{
+			elog	<< "xServer::MSG_C> Memory allocation failure\n" ;
+			return -1 ;
 			}
 
-		continue ;
+		// Add it to the network table
+		if( !Network->addChannel( theChan ) )
+			{
+			elog	<< "xServer::MSG_C> Failed to add channel: "
+				<< *theChan << endl ;
+			delete theChan ;
+			return -1 ;
+			}
 		}
-
-//	elog	<< "xServer::MSG_C> Created channel: " << *ptr << endl ;
 
 	// Create a new ChannelUser to represent this iClient's
 	// membership in this channel.
 	ChannelUser* theUser = 0 ;
 	try
 		{
-
-		// This is MSG_C, so theChan is NULL.
-		theChan = new Channel( *ptr, creationTime ) ;
-
 		// Allocate the ChannelUser.
 		theUser = new ChannelUser( theClient ) ;
 		}
 	catch( std::bad_alloc )
 		{
-		if( theChan != 0 )
-			{
-			// Prevent a memory leak
-			delete theChan ;
-			}
 		elog	<< "xServer::MSG_C> Memory allocation failure\n" ;
 		exit( 0 ) ;
-		}
-
-	// Add this channel to the network data structure.
-	if( !Network->addChannel( theChan ) )
-		{
-		elog	<< "xServer::MSG_C> Failed to add channel to Network "
-			<< "table: " << theChan->getName() << endl ;
-
-		// Deallocate the channel
-		delete theUser ;
-		delete theChan ;
-		return -1 ;
 		}
 
 	// The user who creates a channel is automatically +o
@@ -2064,7 +2061,8 @@ for( StringTokenizer::const_iterator ptr = st.begin() ; ptr != st.end() ;
 	// Build associations
 	if( !theChan->addUser( theUser ) )
 		{
-		elog	<< "xServer::MSG_C> Unable to add user to channel: "
+		elog	<< "xServer::MSG_C> Unable to add user "
+			<< theUser->getNickName() << " to channel "
 			<< theChan->getName() << endl ;
 
 		delete theUser ;
@@ -2103,7 +2101,8 @@ if( Param.size() < 2 )
 iClient* Target = Network->findClient( Param[ 0 ] ) ;
 if( NULL == Target )
 	{
-	elog	<< "xServer::MSG_J> Unable to find user: "
+	elog	<< "xServer::MSG_J> ("
+		<< Param[ 1 ] << ") Unable to find user: "
 		<< Param[ 0 ] << endl ;
 	return -1 ;
 	}
@@ -2115,6 +2114,10 @@ if( '0' == Param[ 1 ][ 0 ] )
 		endPtr = Target->channels_end() ; ptr != endPtr ; ++ptr )
 		{
 		delete (*ptr)->removeUser( Target->getIntYY() ) ;
+		if( (*ptr)->empty() )
+			{
+			delete Network->removeChannel( (*ptr)->getName() ) ;
+			}
 		}
 	Target->clearChannels() ;
 	return 0 ;
@@ -2125,24 +2128,14 @@ if( '0' == Param[ 1 ][ 0 ] )
 StringTokenizer st( Param[ 1 ], ',' ) ;
 for( StringTokenizer::size_type i = 0 ; i < st.size() ; i++ )
 	{
+
 	if( '+' == st[ i ][ 0 ] )
 		{
 		// Don't care about modeless channels
 		continue ;
 		}
 
-	// On a JOIN command, the channel should already exist.
-	Channel* theChan = Network->findChannel( st[ i ] ) ;
-	if( NULL == theChan )
-		{
-		elog	<< "xServer::MSG_J> Unable to find channel: "
-			<< st[ i ] << endl ;
-
-		// Attempt to keep somewhat close to actual
-		// "global" state.
-		continue ;
-		}
-
+	Channel* theChan = 0 ;
 	ChannelUser* theUser = 0 ;
 	try
 		{
@@ -2154,17 +2147,52 @@ for( StringTokenizer::size_type i = 0 ; i < st.size() ; i++ )
 		return -1 ;
 		}
 
+	// On a JOIN command, the channel should already exist.
+	theChan = Network->findChannel( st[ i ] ) ;
+	if( NULL == theChan )
+		{
+		// This transmutes to a CREATE
+		try
+			{
+			theChan = new Channel( st[ i ], ::time( 0 ) ) ;
+			}
+		catch( std::bad_alloc )
+			{
+			elog	<< "xServer::MSG_J> Memory allocation "
+				<< "failure\n" ;
+			delete theChan ;
+			delete theUser ;
+			return -1 ;
+			}
+
+		// Add the channel to the network tables
+		if( !Network->addChannel( theChan ) )
+			{
+			elog	<< "xServer::MSG_J> Unable to add channel: "
+				<< theChan->getName() << endl ;
+			delete theChan ;
+			delete theUser ;
+			continue ;
+			}
+
+		// Since this is equivalent to a CREATE, set the user
+		// as operator.
+		theUser->setMode( ChannelUser::MODE_O ) ;
+
+		} // if( NULL == theChan )
+
+	// Otherwise, the channel was found just fine :)
+
 	// Add a new ChannelUser representing this client to this
 	// channel's user structure.
 	if( !theChan->addUser( theUser ) )
 		{
-		elog	<< "xServer::MSG_J> Unable to add user "
-			<< theUser->getNickName() << " to channel: "
-			<< theChan->getName() << endl ;
+//		elog	<< "xServer::MSG_J> Unable to add user "
+//			<< theUser->getNickName() << " to channel: "
+//			<< theChan->getName() << endl ;
 
 		// Addition of ChannelUser failed.
 		delete theUser ;
-
 		return -1 ;
 		}
 
@@ -2185,6 +2213,8 @@ return 0 ;
 }
 
 // Non-tokenized command handler
+//
+// nickname JOIN #channel timestamp
 int xServer::MSG_Join( xParameters& Param )
 {
 
@@ -2198,7 +2228,8 @@ if( Param.size() < 2 )
 iClient* Target = Network->findNick( Param[ 0 ] ) ;
 if( NULL == Target )
 	{
-	elog	<< "xServer::MSG_Join> Unable to find user: "
+	elog	<< "xServer::MSG_Join> ("
+		<< Param[ 1 ] << ") Unable to find user: "
 		<< Param[ 0 ] << endl ;
 	return -1 ;
 	}
@@ -2210,6 +2241,10 @@ if( '0' == Param[ 1 ][ 0 ] )
 		endPtr = Target->channels_end() ; ptr != endPtr ; ++ptr )
 		{
 		delete (*ptr)->removeUser( Target->getIntYY() ) ;
+		if( (*ptr)->empty() )
+			{
+			delete Network->removeChannel( (*ptr)->getName() ) ;
+			}
 		}
 	Target->clearChannels() ;
 	return 0 ;
@@ -2220,24 +2255,14 @@ if( '0' == Param[ 1 ][ 0 ] )
 StringTokenizer st( Param[ 1 ], ',' ) ;
 for( StringTokenizer::size_type i = 0 ; i < st.size() ; i++ )
 	{
+
 	if( '+' == st[ i ][ 0 ] )
 		{
 		// Don't care about modeless channels
 		continue ;
 		}
 
-	// On a JOIN command, the channel should already exist.
-	Channel* theChan = Network->findChannel( st[ i ] ) ;
-	if( NULL == theChan )
-		{
-		elog	<< "xServer::MSG_Join> Unable to find channel: "
-			<< st[ i ] << endl ;
-
-		// Attempt to keep somewhat close to actual
-		// "global" state.
-		continue ;
-		}
-
+	Channel* theChan = 0 ;
 	ChannelUser* theUser = 0 ;
 	try
 		{
@@ -2249,17 +2274,52 @@ for( StringTokenizer::size_type i = 0 ; i < st.size() ; i++ )
 		return -1 ;
 		}
 
+	// On a JOIN command, the channel should already exist.
+	theChan = Network->findChannel( st[ i ] ) ;
+	if( NULL == theChan )
+		{
+		// This transmutes to a CREATE
+		try
+			{
+			theChan = new Channel( st[ i ], ::time( 0 ) ) ;
+			}
+		catch( std::bad_alloc )
+			{
+			elog	<< "xServer::MSG_Join> Memory allocation "
+				<< "failure\n" ;
+			delete theChan ;
+			delete theUser ;
+			return -1 ;
+			}
+
+		// Add the channel to the network tables
+		if( !Network->addChannel( theChan ) )
+			{
+			elog	<< "xServer::MSG_Join> Unable to add channel: "
+				<< theChan->getName() << endl ;
+			delete theChan ;
+			delete theUser ;
+			continue ;
+			}
+
+		// Since this is equivalent to a CREATE, set the user
+		// as operator.
+		theUser->setMode( ChannelUser::MODE_O ) ;
+
+		} // if( NULL == theChan )
+
+	// Otherwise, the channel was found just fine :)
+
 	// Add a new ChannelUser representing this client to this
 	// channel's user structure.
 	if( !theChan->addUser( theUser ) )
 		{
-		elog	<< "xServer::MSG_Join> Unable to add user "
-			<< theUser->getNickName() << " to channel: "
-			<< theChan->getName() << endl ;
+//		elog	<< "xServer::MSG_Join> User "
+//			<< theUser->getNickName() << " already on channel "
+//			<< theChan->getName() << endl ;
 
 		// Addition of ChannelUser failed.
 		delete theUser ;
-
 		return -1 ;
 		}
 
@@ -2319,38 +2379,37 @@ if( NULL != myClient )
 	}
 
 // Otherwise, it's a non-local client.
-iClient* source = Network->findClient( Param[ 0 ] ) ;
+iClient* source = 0 ;
 iServer* serverSource = 0 ;
 
-if( NULL == strchr( Param[ 0 ], '.' ) )
+if( strchr( Param[ 0 ], '.' ) != NULL )
 	{
-	// Not a server, check for nickname
-	source = Network->findNick( Param[ 0 ] ) ;
-	if( NULL == source )
-		{
-		elog	<< "xServer::MSG_D> Unable to find source\n" ;
-		return -1 ;
-		}
+	// Server, by name
+	serverSource = Network->findServerName( Param[ 0 ] ) ;
 	}
 else
 	{
-	// Server
-	serverSource = Network->findServer( Param[ 0 ] ) ;
-	if( NULL == serverSource )
-		{
-		elog	<< "xServer::MSG_D> Unable to find source\n" ;
-		return -1 ;
-		}
+	// Client, by numeric
+	source = Network->findClient( Param[ 0 ] ) ;
+	}
+
+if( (NULL == serverSource) && (NULL == source) )
+	{
+	elog	<< "xServer::MSG_D> Unable to find source: "
+		<< Param[ 0 ] << endl ;
+	return -1 ;
 	}
 
 // Find and remove the client that was just killed.
+// xNetwork::removeClient will remove user<->channel associations
 iClient* target = Network->removeClient( Param[ 1 ] ) ;
 
 // Make sure we have valid pointers to both source
 // and target.
 if( NULL == target )
 	{
-	elog	<< "xServer::MSG_D> Unable to find target client\n" ;
+	elog	<< "xServer::MSG_D> Unable to find target client: "
+		<< Param[ 1 ] << endl ;
 	return -1 ;
 	}
 
@@ -2372,17 +2431,92 @@ else
 		static_cast< void* >( &reason ) ) ;
 	}
 
-// Remove user->channel associations
-for( iClient::channelIterator ptr = target->channels_begin(),
-	endPtr = target->channels_end() ; ptr != endPtr ;
-	++ptr )
+// Deallocate the memory associated with this iClient.
+delete target ;
+
+return 0 ;
+
+}
+
+// :pokebonk KILL LG[
+// :NewYork-R.NY.US.Undernet.org!SantaClara.CA.US.Undernet.Org!dallas.tx.us.undernet.org
+// !iago.nac.net!pokebonk (not here you don't)
+//
+// z KILL R[t :Baltimore-R.MD.US.Undernet.Org (NewYork-R.NY.US.Undernet.org <-
+// austin.tx.us.undernet.org (Nick collision))
+//
+int xServer::MSG_Kill( xParameters& Param )
+{
+
+// See if the client being killed is one of my own.
+xClient* myClient = Network->findLocalClient( Param[ 1 ] ) ;
+
+// Is the user being killed on this server?
+if( NULL != myClient )
 	{
-	delete (*ptr)->removeUser( target ) ;
-	if( (*ptr)->empty() )
-		{
-		// Channel now empty
-		delete Network->removeChannel( (*ptr)->getName() ) ;
-		}
+	// doh, yes it is :(
+	myClient->OnKill() ;
+
+	// Don't detach the client until it requests so.
+	// TODO: Work on this system.
+
+	// Note that the client is still attached to the
+	// server.
+	return 0 ;
+	}
+
+// Otherwise, it's a non-local client.
+iClient* source = 0 ;
+iServer* serverSource = 0 ;
+
+if( strchr( Param[ 0 ], '.' ) != NULL )
+	{
+	// Server, by name
+	serverSource = Network->findServerName( Param[ 0 ] ) ;
+	}
+else
+	{
+	// Nickname
+	source = Network->findNick( Param[ 0 ] ) ;
+	}
+
+if( (NULL == source) && (NULL == serverSource) )
+	{
+	elog	<< "xServer::MSG_Kill> Unable to find source: "
+		<< Param[ 0 ] << endl ;
+//	The source isn't all that important
+//	return -1 ;
+	}
+
+// Find and remove the client that was just killed.
+// xNetwork::removeClient will remove user<->channel associations
+iClient* target = Network->removeClient( Param[ 1 ] ) ;
+
+// Make sure we have valid pointers to both source
+// and target.
+if( NULL == target )
+	{
+	elog	<< "xServer::MSG_D> Unable to find target client: "
+		<< Param[ 1 ] << endl ;
+	return -1 ;
+	}
+
+// Notify all listeners of the EVT_KILL event.
+string reason( Param[ 2 ] ) ;
+
+if( source != NULL )
+	{
+	PostEvent( EVT_KILL,
+		static_cast< void* >( source ),
+		static_cast< void* >( target ),
+		static_cast< void* >( &reason ) ) ;
+	}
+else
+	{
+	PostEvent( EVT_KILL,
+		static_cast< void* >( serverSource ),
+		static_cast< void* >( target ),
+		static_cast< void* >( &reason ) ) ;
 	}
 
 // Deallocate the memory associated with this iClient.
@@ -2670,6 +2804,7 @@ return 0 ;
 int xServer::MSG_Q( xParameters& Param )
 {
 
+// xNetwork::removeClient will remove user<->channel associations
 iClient* theClient = Network->removeClient( Param[ 0 ] ) ;
 if( NULL == theClient )
 	{
@@ -3057,17 +3192,6 @@ while( ptr != end )
 
 }
 
-void xServer::EndOfBurst()
-{
-if( theSock != NULL )
-	{
-	elog	<< "Burst complete on this side\n" ;
-	Write( "%s EB\n", charYY ) ;
-	bursting = false ;
-	ProcessMessageQueue() ;	
-	}
-}
-
 void xServer::ProcessMessageQueue() 
 {
 // TODO: Who's to say that the clients are in
@@ -3098,6 +3222,8 @@ if( NULL == theSock )
 if( !strcmp( Param[ 0 ], Uplink->getCharYY() ) )
 	{
 	// It's my uplink
+	burstEnd = ::time( 0 ) ;
+	Write( "%s END_OF_BURST\n", charYY ) ;
 	Write( "%s EOB_ACK\n", charYY ) ;
 	}
 if( !bursting )
@@ -3459,7 +3585,7 @@ if( !bursting )
 	iServer* theServer = Network->findServer( Param[ 0 ] ) ;
 	if( NULL == theServer )
 		{
-		elog	<< "xServer::MSG_EndOfBrust_ack> Unable to find server: "
+		elog	<< "xServer::MSG_EA> Unable to find server: "
 			<< Param[ 0 ] << endl ;
 		return -1 ;
 		}
@@ -3504,6 +3630,13 @@ return Write( s ) ;
 int xServer::MSG_DS( xParameters& )
 {
 // TODO
+return 0 ;
+}
+
+// :Baltimore-R.MD.US.Undernet.Org DESYNCH :HACK: SanDiego.CA.US.Undernet.org MODE #f21
+// +o EmMaNuElL <000000000>
+int xServer::MSG_Desynch( xParameters& )
+{
 return 0 ;
 }
 
@@ -3619,6 +3752,10 @@ for( const char* modePtr = Param[ 2 ] ; *modePtr ; ++modePtr )
 return 0 ;
 }
 
+// z MODE #channel -l
+// server.name MODE #channel -l
+// nickname MODE #channel -l
+//
 int xServer::MSG_Mode( xParameters& Param )
 {
 
@@ -3628,15 +3765,25 @@ if( Param.size() < 3 )
 	return -1 ;
 	}
 
-iClient* source = Network->findNick( Param[ 0 ] ) ;
-if( NULL == source )
+iClient* clientSource = 0 ;
+iServer* serverSource = 0 ;
+
+if( strchr( Param[ 0 ], '.' ) != NULL )
 	{
-	if( NULL == strchr( Param[ 0 ], '.' ) )
-		{
-		elog	<< "xServer::MSG_Mode> Unable to find source client: "
-			<< Param[ 0 ] << endl ;
-		return -1 ;
-		}
+	// Server, by server name
+	serverSource = Network->findServerName( Param[ 0 ] ) ;
+	}
+else
+	{
+	// Client, by nickname
+	clientSource = Network->findNick( Param[ 0 ] ) ;
+	}
+
+if( (NULL == clientSource) && (NULL == serverSource) )
+	{
+	elog	<< "xServer::MSG_Mode> Unable to find source: "
+		<< Param[ 0 ] << endl ;
+	return -1 ;
 	}
 
 if( '#' == Param[ 1 ][ 0 ] )
@@ -3651,7 +3798,7 @@ if( '#' == Param[ 1 ][ 0 ] )
 
 	// This is a bit of a violation of encapsulation.
 	// Not too bad though.
-	theChan->OnModeChange( source, Param ) ;
+	theChan->OnModeChange( clientSource, Param ) ;
 
 	string modes( Param[ 2 ] ) ;
 
@@ -3664,7 +3811,7 @@ if( '#' == Param[ 1 ][ 0 ] )
 // Otherwise, it's a user mode change.
 // Since users aren't allowed to change modes for anyone other than
 // themselves, there is no need to lookup the second user argument
-iClient* theClient = source ;
+iClient* theClient = clientSource ;
 
 // Local channels are not propogated across the network.
 

@@ -1,5 +1,5 @@
 /* main.cc
- * $Id: main.cc,v 1.3 2000/07/09 18:08:11 dan_karrels Exp $
+ * $Id: main.cc,v 1.4 2000/07/16 17:48:18 dan_karrels Exp $
  */
 
 #include	<fstream>
@@ -27,7 +27,7 @@
 using namespace gnuworld ;
 
 const char config_h_rcsId[] = __CONFIG_H ;
-const char main_cc_rcsId[] = "$Id: main.cc,v 1.3 2000/07/09 18:08:11 dan_karrels Exp $" ;
+const char main_cc_rcsId[] = "$Id: main.cc,v 1.4 2000/07/16 17:48:18 dan_karrels Exp $" ;
 
 using std::cerr ;
 using std::clog ;
@@ -227,6 +227,7 @@ while( keepRunning )
 			{
 			elog << "*** Read error!\n" ;
 			keepRunning = false ;
+			continue ;
 			}
 		}
 
@@ -264,7 +265,9 @@ while( keepRunning )
 
 	if( Server->GetMessage() != SRV_SUCCESS )
 		{
-		elog	<< "*** Received message, shutting down...\n" ;
+		elog	<< "*** Received message "
+			<< Server->GetMessage()
+			<< ", shutting down...\n" ;
 		keepRunning = false ;
 		continue ;
 		}
@@ -281,8 +284,8 @@ while( keepRunning )
 
 	} // close while( keepRunning )
 
-delete Server ;
-delete Network ;
+//delete Server ;
+//delete Network ;
 
 #ifdef EDEBUG
 	elog.closeFile() ;

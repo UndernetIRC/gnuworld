@@ -17,7 +17,7 @@
  */
 
 #ifndef __XSERVER_H
-#define __XSERVER_H "$Id: server.h,v 1.4 2000/07/12 21:54:11 dan_karrels Exp $"
+#define __XSERVER_H "$Id: server.h,v 1.5 2000/07/16 17:48:18 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
@@ -674,6 +674,12 @@ protected:
 	/// MODE
 	DECLARE_MSG(Mode);
 
+	/// DESYNCH
+	DECLARE_MSG(Desynch);
+
+	// KILL
+	DECLARE_MSG(Kill);
+
 	/**
 	 * Bounds checker for events.
 	 */
@@ -874,13 +880,6 @@ protected:
 	 * when bursting its information.
 	 */
 	void 			Burst() ;
-
-	/**
-	 * EndOfBurst() is called once Burst() has completed.
-	 * It basically appends the END_OF_BURST token onto
-	 * the output buffer.
-	 */
-	void 			EndOfBurst() ;
 
 	/**
 	 * List used to store runtime modules.

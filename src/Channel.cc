@@ -123,7 +123,7 @@ return theChanUser->getMode( whichMode ) ;
 
 void Channel::setBan( const string& banMask )
 {
-banList.push_back( banMask ) ;
+banList.push_front( banMask ) ;
 }
 
 void Channel::removeBan( const string& banMask )
@@ -152,7 +152,9 @@ bool Channel::matchBan( const string& banMask ) const
 return findBan( banMask ) ;
 }
 
+// The iClient pointer here could possible be NULL
 // ABCDE M #channel <modes>
+//
 void Channel::OnModeChange( iClient*, const xParameters& Param )
 {
 if( Param.size() < 3 )
@@ -204,7 +206,8 @@ for( const char* modePtr = Param[ 2 ] ; *modePtr ; ++modePtr )
 		case 'b':
 			if( argPos >= Param.size() )
 				{
-				elog	<< "Channel::OnModeChange> Missing "
+				elog	<< "Channel::OnModeChange> ("
+					<< getName() << "): Missing "
 					<< "argument (mode b)\n" ;
 				break ;
 				}
@@ -228,7 +231,8 @@ for( const char* modePtr = Param[ 2 ] ; *modePtr ; ++modePtr )
 		case 'k':
 			if( argPos >= Param.size() )
 				{
-				elog	<< "Channel::OnModeChange> Missing "
+				elog	<< "Channel::OnModeChange> ("
+					<< getName() << "): Missing "
 					<< "argument (mode k)\n" ;
 				break ;
 				}
@@ -245,60 +249,67 @@ for( const char* modePtr = Param[ 2 ] ; *modePtr ; ++modePtr )
 		case 'v':
 			if( argPos >= Param.size() )
 				{
-				elog	<< "Channel::OnModeChange> Missing "
+				elog	<< "Channel::OnModeChange> ("
+					<< getName() << "): Missing "
 					<< "argument (mode v)\n" ;
 				break ;
 				}
-			theClient = Network->findClient( Param[ argPos ] ) ;
+			theClient = Network->findClient( Param[ argPos++ ] ) ;
 			if( NULL == theClient )
 				{
-				elog	<< "Channel::OnModeChange> Unable to find "
-					<< "client: " << Param[ argPos ]
-					<< endl ;
+//				elog	<< "Channel::OnModeChange> ("
+//					<< getName() << "): Unable to find "
+//					<< "client: " << Param[ argPos ]
+//					<< endl ;
 				break ;
 				}
 			theUser = findUser( theClient ) ;
 			if( NULL == theUser )
 				{
-				elog	<< "Channel::OnModeChange> (mode v) Unable "
-					<< "to find ChannelUser\n" ;
+//				elog	<< "Channel::OnModeChange> ("
+//					<< getName() << ") (mode v): Unable "
+//					<< "to find ChannelUser: "
+//					<< theClient->getNickName() << endl ;
 				break ;
 				}
 			if( plus )	theUser->setMode( ChannelUser::MODE_V ) ;
 			else		theUser->removeMode( ChannelUser::MODE_V ) ;
 
-			argPos++ ;
 			break ;
 		case 'o':
 			if( argPos >= Param.size() )
 				{
-				elog	<< "Channel::OnModeChange> Missing "
+				elog	<< "Channel::OnModeChange> ("
+					<< getName() << "): Missing "
 					<< "argument (mode o)\n" ;
 				break ;
 				}
-			theClient = Network->findClient( Param[ argPos ] ) ;
+			theClient = Network->findClient( Param[ argPos++ ] ) ;
 			if( NULL == theClient )
 				{
-				elog	<< "Channel:OnModeChange> Unable to find "
-					<< "client: " << Param[ argPos ]
-					<< endl ;
+//				elog	<< "Channel:OnModeChange> ("
+//					<< getName() << "): Unable to find "
+//					<< "client: " << Param[ argPos ]
+//					<< endl ;
 				break ;
 				}
 			theUser = findUser( theClient ) ;
 			if( NULL == theUser )
 				{
-				elog	<< "Channel::OnModeChange> (mode o) Unable "
-					<< "to find ChannelUser\n" ;
+//				elog	<< "Channel::OnModeChange> ("
+//					<< getName() << ") (mode o): Unable "
+//					<< "to find ChannelUser: "
+//					<< theClient->getNickName() << endl ;
 				break ;
 				}
 			if( plus )	theUser->setMode( ChannelUser::MODE_O ) ;
 			else		theUser->removeMode( ChannelUser::MODE_O ) ;
 
-			argPos++ ;
 			break ;
 
 		default:
-			elog	<< "Channel::OnModeChange> Found unexpected mode: "
+			elog	<< "Channel::OnModeChange> ("
+				<< getName() << "): Found unexpected mode: "
 				<< *modePtr << endl ;
 			break ;
 

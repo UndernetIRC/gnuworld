@@ -13,7 +13,7 @@
 #include	"Buffer.h"
 
 const char Buffer_h_rcsId[] = __BUFFER_H ;
-const char Buffer_cc_rcsId[] = "$Id: Buffer.cc,v 1.1 2000/06/30 18:46:06 dan_karrels Exp $" ;
+const char Buffer_cc_rcsId[] = "$Id: Buffer.cc,v 1.2 2000/07/16 17:48:18 dan_karrels Exp $" ;
 
 using namespace std ;
 
@@ -28,7 +28,7 @@ bool Buffer::ReadLine( string& retMe )
 {
 
 /* remove any leading new line characters */
-while( 0 != length() && '\n' == buf[ 0 ] )
+while( !empty() && ('\n' == buf[ 0 ]) )
 	{
 	/* just remove the first char */
 	buf.erase( buf.begin() ) ;
@@ -41,11 +41,13 @@ if( empty() )
 	}
 
 /* find() returns the index of the character, or 
- * npos if it was not found */
-size_type pos = buf.find( delim ) ;
+ * npos if it was not found
+ */
+string::size_type pos = buf.find( delim ) ;
 
 if( string::npos == pos )
 	{
+	// Unable to find the delimiter
 	return false ;
 	}
 
@@ -62,7 +64,6 @@ return true ;
 // of the Buffer
 void Buffer::Delete( const size_type& numBytes )
 {
-
 if( numBytes >= size() )
 	{
 	// Clear the entire Buffer
@@ -74,5 +75,4 @@ if( numBytes >= size() )
 
 // Else just erase the number of bytes given
 buf.erase( 0, numBytes ) ;
-
 }

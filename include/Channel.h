@@ -7,6 +7,7 @@
 #include	<map>
 #include	<iostream>
 #include	<vector>
+#include	<list>
 
 #include	<ctime>
 
@@ -16,7 +17,7 @@
 
 using std::string ;
 using std::map ;
-using std::vector ;
+using std::list ;
 
 namespace gnuworld
 {
@@ -41,7 +42,7 @@ protected:
 	/**
 	 * The type to be used to store channel bans.
 	 */
-	typedef vector< string > banListType ;
+	typedef list< string > banListType ;
 
 	/// Make class xServer a friend of this class.
 	friend class xServer ;
