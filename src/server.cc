@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server.cc,v 1.173 2003/08/04 20:49:24 dan_karrels Exp $
+ * $Id: server.cc,v 1.174 2003/08/05 16:53:46 dan_karrels Exp $
  */
 
 #include	<sys/time.h>
@@ -71,7 +71,7 @@
 #include	"ConnectionHandler.h"
 #include	"Connection.h"
 
-RCSTAG( "$Id: server.cc,v 1.173 2003/08/04 20:49:24 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: server.cc,v 1.174 2003/08/05 16:53:46 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -1349,6 +1349,8 @@ if( !Network->addClient( theIClient ) )
 	// Failed to complete the procedure
 	return false ;
 	}
+
+PostEvent( EVT_NICK, static_cast< void* >( theIClient ) ) ;
 
 if( doBurst )
 	{
