@@ -18,11 +18,12 @@ mode = +idk
 # This is a simple bitfield. Just add up the numbers of the options
 # you want enabled and enter it here.
 # Note that the entropy tests are always enabled.
-# 1 - Entropy (don't unset)
-# 2 - Join Count (see below)
-# 4 - Channel Range (see below)
-# 8 - Has Ops
-enabledTests = 15
+#  1 - Entropy (don't unset)
+#  2 - Join Count (see below)
+#  4 - Channel Range (see below)
+#  8 - Has Ops
+# 16 - MaxChans (see below)
+enabledTests = 31
 
 # Console channel name and initial modes
 consoleChannel = #ds.console
@@ -46,6 +47,13 @@ nickMargin = 0.1
 # it can be considered a drone channel.
 channelCutoff = 10
 
+# The minimum level of information shown in the console channels. Available
+# levels are as follows:
+# 0 - DEBUG	Random debug things that you very probably are not interested in
+# 1 - INFO	Informational things - this is usually worth seeing
+# 2 - WARN	Warnings about drone channels and serious events.
+# 3 - ERROR	DroneScan core errors.
+consoleLevel = 1
 
 ################
 # JOIN COUNTER #
@@ -69,3 +77,14 @@ jcCutoff = 10
 
 # The total range of entropy in a channel before it is considered abnormal
 channelRange = 0.2
+
+
+############
+# MAXCHANS #
+############
+
+# If you enabled test 16 in enabledTests, you must give these values:
+
+# The minimum channel membership before a client in a channel is considered
+# normal:
+maxChans = 2
