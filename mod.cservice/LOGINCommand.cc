@@ -12,7 +12,7 @@
 #include	"cservice_config.h"
 #include	"Network.h"
 
-const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.15 2001/03/18 00:19:16 gte Exp $" ;
+const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.16 2001/03/18 22:01:02 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -225,6 +225,27 @@ for (autoOpVectorType::const_iterator resultPtr = autoOpVector.begin();
 	sqlChannel* theChan = bot->getChannelRecord(resultPtr->first);
 	if (!theChan)
 		{ 
+		continue;
+		}
+
+	/*
+	 * Check if the channel is NOOP.
+	 * N.B: If the channel is strictop, we op them.
+	 * They've just logged in! :P
+	 */
+
+	if(theChan->getFlag(sqlChannel::F_NOOP))
+		{
+		continue;
+		}
+
+	/*
+	 * Check they aren't banned < 75 in the chan.
+	 */
+
+	sqlBan* tmpBan = bot->isBannedOnChan(theChan, theClient); 
+	if( tmpBan && (tmpBan->getLevel() < 75) ) 
+		{
 		continue;
 		}
 

@@ -8,7 +8,7 @@
  *
  * Caveats: None.
  *
- * $Id: LBANLISTCommand.cc,v 1.7 2001/03/07 15:10:53 dan_karrels Exp $
+ * $Id: LBANLISTCommand.cc,v 1.8 2001/03/18 22:01:02 gte Exp $
  */
 
 #include	<string>
@@ -21,8 +21,9 @@
 #include	"match.h"
 #include	"responses.h"
 #include	"cservice_config.h"
+#include	"time.h"
 
-const char LBANLISTCommand_cc_rcsId[] = "$Id: LBANLISTCommand.cc,v 1.7 2001/03/07 15:10:53 dan_karrels Exp $" ;
+const char LBANLISTCommand_cc_rcsId[] = "$Id: LBANLISTCommand.cc,v 1.8 2001/03/18 22:01:02 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -113,8 +114,8 @@ for( vector< sqlBan* >::const_iterator ptr = banList->begin() ; ptr != banList->
 			bot->Notice(theClient, 
 				bot->getResponse(theUser,
 					language::lban_since,
-					string("SINCE: %i")).c_str(), 
-				theBan->getSetTS());
+					string("SINCE: %s")).c_str(), 
+				ctime(&theBan->getSetTS()));
 			bot->Notice(theClient, 
 				bot->getResponse(theUser,
 					language::lban_exp,

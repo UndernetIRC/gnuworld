@@ -18,7 +18,7 @@
  *
  * Caveats: None.
  *
- * $Id: BANCommand.cc,v 1.24 2001/03/16 11:50:59 isomer Exp $
+ * $Id: BANCommand.cc,v 1.25 2001/03/18 22:01:02 gte Exp $
  */
 
 #include	<string>
@@ -32,7 +32,7 @@
 #include	"responses.h"
 #include	"match.h"
 
-const char BANCommand_cc_rcsId[] = "$Id: BANCommand.cc,v 1.24 2001/03/16 11:50:59 isomer Exp $" ;
+const char BANCommand_cc_rcsId[] = "$Id: BANCommand.cc,v 1.25 2001/03/18 22:01:02 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -105,7 +105,19 @@ switch(oCount)
 	{       
 	case 1:
 	 	{
- 		if(!IsNumeric(st[3])) banReason = st.assemble(3);
+		/*
+		 *  Just one parameter supplied, its either a duration,
+		 *  or we'll also accept a reason and set defaults.
+		 */
+
+ 		if(!IsNumeric(st[3])) 
+ 			{
+			banReason = st.assemble(3);
+ 			}
+			else
+			{
+			banTime = atoi(st[3].c_str());
+			}
 		break;
 		}	
 	case 2: 
@@ -121,8 +133,9 @@ switch(oCount)
 			banReason = st.assemble(4);
 			banTime = atoi(st[3].c_str());
 			}
+
 		banTime = atoi(st[3].c_str());
-		banLevel = atoi(st[3].c_str());
+		banLevel = atoi(st[4].c_str());
 		break;
 		}
 	case 3:
