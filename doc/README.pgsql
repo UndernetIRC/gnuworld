@@ -1,6 +1,9 @@
--- "$Id: README.pgsql,v 1.7 2001/10/16 01:20:52 nighty Exp $"
+-- "$Id: README.pgsql,v 1.8 2002/01/28 04:33:59 nighty Exp $"
 --
 -- Building PostgreSQL for GNUworld
+--
+-- For more detailed information about setting up GNUworld, visit :
+--	http://coder-com.undernet.org/gnuworld-setup/
 --
 --
 -- 2001-10-14 : nighty <nighty@undernet.org>
