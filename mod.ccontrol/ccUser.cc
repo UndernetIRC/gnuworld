@@ -1,9 +1,9 @@
 /* 
- * cclUser.cc
+ * ccUser.cc
  * 
  * Storage class for accessing user information 
  * 
- * $Id: ccUser.cc,v 1.1 2001/02/24 18:31:27 mrbean_ Exp $
+ * $Id: ccUser.cc,v 1.2 2001/02/24 19:22:08 mrbean_ Exp $
  */
  
 #include	<strstream>
@@ -12,7 +12,6 @@
 #include	"ELog.h"
 #include	"misc.h"
 #include	"ccUser.h" 
-//#include	"constants.h"
 
 using std::string ; 
 using std::endl ; 
@@ -20,9 +19,6 @@ using std::endl ;
 namespace gnuworld
 {
 
-using namespace gnuworld ;
-
- 
 ccUser::ccUser(PgDatabase* _SQLDb)
  : Id( 0 ),
    UserName(""),
@@ -32,7 +28,7 @@ ccUser::ccUser(PgDatabase* _SQLDb)
    SuspendExpires(0),
    SuspendedBy(""),
    Access( 0 ),
-   flags( 0 ), 
+   Flags( 0 ), 
    SQLDb( _SQLDb )
 {
 }
@@ -64,7 +60,7 @@ if( (PGRES_TUPLES_OK == status) && (SQLDb->Tuples() > 0) )
 return NULL;
 }
 
-ccUser::loadData( const unsigned int Id)
+bool ccUser::loadData( const unsigned int Id)
 {
 static const char Main[] = "SELECT user_id,user_name,password,access,flags,suspend_expires,suspended_by FROM opers WHERE user_id = ";
 

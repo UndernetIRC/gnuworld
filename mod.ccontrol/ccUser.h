@@ -1,16 +1,19 @@
 
 #ifndef __CCUSER_H
-#define __CCUSER_H "$Id: ccUser.h,v 1.1 2001/02/24 18:31:27 mrbean_ Exp $"
+#define __CCUSER_H "$Id: ccUser.h,v 1.2 2001/02/24 19:22:08 mrbean_ Exp $"
 
 #include	<string>
 #include	<ctime>
 #include	"libpq++.h"
  
-using std::string ;
 
 
 namespace gnuworld
 { 
+
+using std::string ;
+
+class iClient;
  
 class ccUser
 {
@@ -108,6 +111,8 @@ protected:
         string SuspendedBy;
         unsigned int Access;
         unsigned int Flags;
+	PgDatabase* SQLDb;
+
 } ; 
 
 

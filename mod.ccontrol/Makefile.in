@@ -10,7 +10,7 @@
 # even the implied warranty of MERCHANTABILITY or FITNESS FOR A
 # PARTICULAR PURPOSE.
 
-# "$Id: Makefile.in,v 1.35 2001/02/23 16:16:58 dan_karrels Exp $"
+# "$Id: Makefile.in,v 1.36 2001/02/24 19:22:08 mrbean_ Exp $"
 
 
 SHELL = @SHELL@
@@ -94,7 +94,7 @@ bindir = @bindir@
 glibdir = @glibdir@
 
 lib_LTLIBRARIES = libccontrol.la
-libccontrol_la_SOURCES = ccontrol.cc 	CControlCommands.cc 	ACCESSCommand.cc 	ADDCOMMANDCommand.cc 	ADDNEWOPERCommand.cc 	ADDOPERCHANCommand.cc 	CHANINFOCommand.cc 	DEAUTHCommand.cc 	GLINECommand.cc 	HELPCommand.cc 	INVITECommand.cc 	JUPECommand.cc 	KICKCommand.cc 	LISTOPERCHANSCommand.cc 	LOGINCommand.cc 	MODECommand.cc 	MODOPERCommand.cc 	NEWPASSCommand.cc 	REMGLINECommand.cc 	REMOPERCHANCommand.cc 	REMOVECOMMANDCommand.cc 	REMOVEOPERCommand.cc 	SCANGLINECommand.cc 	SUSPENDOPERCommand.cc 	TRANSLATECommand.cc 	UNSUSPENDOPERCommand.cc 	WHOISCommand.cc
+libccontrol_la_SOURCES = ccontrol.cc 	CControlCommands.cc 	ACCESSCommand.cc 	ADDCOMMANDCommand.cc 	ADDNEWOPERCommand.cc 	ADDOPERCHANCommand.cc 	ccUser.cc 	CHANINFOCommand.cc 	DEAUTHCommand.cc 	GLINECommand.cc 	HELPCommand.cc 	INVITECommand.cc 	JUPECommand.cc 	KICKCommand.cc 	LISTOPERCHANSCommand.cc 	LOGINCommand.cc 	MODECommand.cc 	MODOPERCommand.cc 	NEWPASSCommand.cc 	REMGLINECommand.cc 	REMOPERCHANCommand.cc 	REMOVECOMMANDCommand.cc 	REMOVEOPERCommand.cc 	SCANGLINECommand.cc 	SUSPENDOPERCommand.cc 	TRANSLATECommand.cc 	UNSUSPENDOPERCommand.cc 	WHOISCommand.cc
 
 
 libccontrol_la_LDFLAGS = -module -export-dynamic -L@PGSQL_LIB@ -lpq++
@@ -111,7 +111,7 @@ LIBS = @LIBS@
 libccontrol_la_LIBADD = 
 libccontrol_la_OBJECTS =  ccontrol.lo CControlCommands.lo \
 ACCESSCommand.lo ADDCOMMANDCommand.lo ADDNEWOPERCommand.lo \
-ADDOPERCHANCommand.lo CHANINFOCommand.lo DEAUTHCommand.lo \
+ADDOPERCHANCommand.lo ccUser.lo CHANINFOCommand.lo DEAUTHCommand.lo \
 GLINECommand.lo HELPCommand.lo INVITECommand.lo JUPECommand.lo \
 KICKCommand.lo LISTOPERCHANSCommand.lo LOGINCommand.lo MODECommand.lo \
 MODOPERCommand.lo NEWPASSCommand.lo REMGLINECommand.lo \
@@ -127,7 +127,7 @@ DIST_COMMON =  Makefile.am Makefile.in
 
 DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
-TAR = tar
+TAR = gtar
 GZIP_ENV = --best
 DEP_FILES =  .deps/ACCESSCommand.P .deps/ADDCOMMANDCommand.P \
 .deps/ADDNEWOPERCommand.P .deps/ADDOPERCHANCommand.P \
@@ -139,7 +139,8 @@ DEP_FILES =  .deps/ACCESSCommand.P .deps/ADDCOMMANDCommand.P \
 .deps/REMOPERCHANCommand.P .deps/REMOVECOMMANDCommand.P \
 .deps/REMOVEOPERCommand.P .deps/SCANGLINECommand.P \
 .deps/SUSPENDOPERCommand.P .deps/TRANSLATECommand.P \
-.deps/UNSUSPENDOPERCommand.P .deps/WHOISCommand.P .deps/ccontrol.P
+.deps/UNSUSPENDOPERCommand.P .deps/WHOISCommand.P .deps/ccUser.P \
+.deps/ccontrol.P
 SOURCES = $(libccontrol_la_SOURCES)
 OBJECTS = $(libccontrol_la_OBJECTS)
 
@@ -260,7 +261,7 @@ distdir: $(DISTFILES)
 	@for file in $(DISTFILES); do \
 	  d=$(srcdir); \
 	  if test -d $$d/$$file; then \
-	    cp -pr $$/$$file $(distdir)/$$file; \
+	    cp -pr $$d/$$file $(distdir)/$$file; \
 	  else \
 	    test -f $(distdir)/$$file \
 	    || ln $$d/$$file $(distdir)/$$file 2> /dev/null \
