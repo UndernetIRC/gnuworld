@@ -37,7 +37,7 @@
 //#include	"moduleLoader.h"
 
 const char xServer_h_rcsId[] = __XSERVER_H ;
-const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.11 2000/08/01 00:02:34 dan_karrels Exp $" ;
+const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.12 2000/08/01 00:11:38 dan_karrels Exp $" ;
 
 using std::string ;
 using std::vector ;
@@ -239,6 +239,7 @@ REGISTER_MSG( "MOTD", NOOP ) ;
 REGISTER_MSG( "MO", NOOP ) ;
 REGISTER_MSG( "STATS", NOOP ) ;
 REGISTER_MSG( "V", NOOP ) ;
+REGISTER_MSG( "I", NOOP ) ; // Invite
 
 // AWAY
 REGISTER_MSG( "A", NOOP ) ;
