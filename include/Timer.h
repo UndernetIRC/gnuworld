@@ -21,6 +21,7 @@
 #define TIMER_H
 
 #include <sys/time.h>
+#include <time.h>
 
 namespace gnuworld {
 
@@ -36,8 +37,13 @@ public:
 	inline unsigned int getTimeMS()
 		{ return	(stopTime.tv_sec - startTime.tv_sec) * 1000 +
 				(stopTime.tv_usec - startTime.tv_usec) / 1000; }
+	inline unsigned long getTimeUS()
+		{ return	(stopTime.tv_sec - startTime.tv_sec) * 1000000 +
+				(stopTime.tv_usec - startTime.tv_usec); }
 	inline unsigned int stopTimeMS()
 		{ Stop(); return getTimeMS(); }
+	inline unsigned long stopTimeUS()
+		{ Stop(); return getTimeUS(); }
 protected:
 	struct timeval startTime, stopTime;
 }; // class Timer
