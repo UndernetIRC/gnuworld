@@ -1,11 +1,13 @@
 ------------------------------------------------------------------------------------
--- "$Id: cservice.sql,v 1.8 2000/12/12 01:45:19 gte Exp $"
+-- "$Id: cservice.sql,v 1.9 2000/12/27 16:50:16 gte Exp $"
 -- Channel service DB SQL file for PostgreSQL.
 
 -- ChangeLog:
+-- 2000-12-22: Gte
+--             Fixed invalid UserID reference in userlog table.
+--
 -- 2000-12-10: Gte
---             Fixed a few typo's.
--- 2000-10-22: Isomer
+--             Fixed a few typo's, changed TIMESTAMP's to INT4's.
 --	       
 -- 2000-10-22: Isomer
 --             Removed 'ChannelManager' information from channels table
@@ -169,7 +171,7 @@ CREATE TABLE channellog (
 
 CREATE TABLE userlog (
 	ts INT4,
-	userID INT4 CONSTRAINT user_log_ref REFERENCES users ( userID ),
+	user_id INT4 CONSTRAINT user_log_ref REFERENCES users ( id ),
 	message TEXT,
 	last_updated INT4 NOT NULL
 );
