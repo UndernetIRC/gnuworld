@@ -43,7 +43,7 @@
 #include	"moduleLoader.h"
 
 const char xServer_h_rcsId[] = __XSERVER_H ;
-const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.51 2001/01/13 23:31:12 gte Exp $" ;
+const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.52 2001/01/14 18:37:13 dan_karrels Exp $" ;
 
 using std::string ;
 using std::vector ;
@@ -232,6 +232,7 @@ REGISTER_MSG( "L", L ) ;
 
 // Squit
 REGISTER_MSG( "SQ", SQ ) ;
+REGISTER_MSG( "SQUIT", SQ ) ;
 
 // Kill
 REGISTER_MSG( "D", D ) ;
@@ -3134,6 +3135,17 @@ else if( bursting )
 	{
 	// Channel exists, still bursting
 	// 0 B #coder-com 000031337 +tn 0AT,EAA:o,KAB,0AA
+
+	// Is the timestamp we are bursting older than the current
+	// timestamp?
+	if( joinTime < theChan->getCreationTime() )
+		{
+		// We are bursting an older timestamp
+		// Remove all modes
+		removeAllChanModes( theChan ) ;
+		}
+
+
 	// TODO: If the timestamp we are bursting is less than the existing one,
 	// we need to set the our Network channel state to match that supplied
 	// in this line. (Because we are authoritive in this channel, any existing
@@ -3177,6 +3189,10 @@ else
 		}
 	}
 
+if( joinTime < theChan->getCreationTime() )
+	{
+	theChan->setCreationTime( joinTime ) ;
+	}
 }
 
 void xServer::SetChannelMode( Channel* theChan, const string& theModes )
@@ -4576,6 +4592,83 @@ for( list< xClient* >::iterator ptr = listPtr->begin(), end = listPtr->end() ;
 	ptr != end ; ++ptr )
 	{
 	(*ptr)->OnChannelModeB( theChan, sourceUser, banVector ) ;
+	}
+}
+
+void xServer::removeAllChanModes( Channel* theChan )
+{
+// This is a protected method, theChan is non-NULL
+if( theChan->getMode( Channel::MODE_T ) )
+	{
+	onChannelModeT( theChan, false, 0 ) ;
+	}
+if( theChan->getMode( Channel::MODE_N ) )
+	{
+	onChannelModeN( theChan, false, 0 ) ;
+	}
+if( theChan->getMode( Channel::MODE_S ) )
+	{
+	onChannelModeS( theChan, false, 0 ) ;
+	}
+if( theChan->getMode( Channel::MODE_P ) )
+	{
+	onChannelModeP( theChan, false, 0 ) ;
+	}
+if( theChan->getMode( Channel::MODE_M ) )
+	{
+	onChannelModeM( theChan, false, 0 ) ;
+	}
+if( theChan->getMode( Channel::MODE_I ) )
+	{
+	onChannelModeI( theChan, false, 0 ) ;
+	}
+if( theChan->getMode( Channel::MODE_L ) )
+	{
+	onChannelModeL( theChan, false, 0, 0 ) ;
+	}
+if( theChan->getMode( Channel::MODE_K ) )
+	{
+	onChannelModeK( theChan, false, 0, string() ) ;
+	}
+
+opVectorType opVector ;
+voiceVectorType voiceVector ;
+
+for( Channel::userIterator ptr = theChan->userList_begin(),
+	end = theChan->userList_end() ; ptr != end ; ++ptr )
+	{
+	if( ptr->second->getMode( ChannelUser::MODE_O ) )
+		{
+		opVector.push_back( opVectorType::value_type(
+			false, ptr->second ) ) ;
+		}
+	if( ptr->second->getMode( ChannelUser::MODE_V ) )
+		{
+		voiceVector.push_back( voiceVectorType::value_type(
+			false, ptr->second ) ) ;
+		}
+	}
+
+banVectorType banVector ;
+
+for( Channel::banIterator ptr = theChan->banList_begin(),
+	end = theChan->banList_end() ; ptr != end ; ++ptr )
+	{
+	banVector.push_back( banVectorType::value_type(
+		false, *ptr ) ) ;
+	}
+
+if( !opVector.empty() )
+	{
+	onChannelModeO( theChan, 0, opVector ) ;
+	}
+if( !voiceVector.empty() )
+	{
+	onChannelModeV( theChan, 0, voiceVector ) ;
+	}
+if( !banVector.empty() )
+	{
+	onChannelModeB( theChan, 0, banVector ) ;
 	}
 }
 

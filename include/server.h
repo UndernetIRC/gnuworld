@@ -17,7 +17,7 @@
  */
 
 #ifndef __XSERVER_H
-#define __XSERVER_H "$Id: server.h,v 1.24 2001/01/13 21:06:29 dan_karrels Exp $"
+#define __XSERVER_H "$Id: server.h,v 1.25 2001/01/14 18:37:13 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
@@ -690,6 +690,12 @@ protected:
 	 * Output channel information for each client on this server.
 	 */
 	virtual void BurstChannels() ;
+
+	/**
+	 * Remove all modes from a channel, used when bursting an
+	 * older timestamp into a channel.
+	 */
+	virtual void	removeAllChanModes( Channel* ) ;
 
 	/**
 	 * Parse a burst line for channel bans.

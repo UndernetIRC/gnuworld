@@ -11,7 +11,7 @@
  *
  * Caveats: None.
  *
- * $Id: BANLISTCommand.cc,v 1.1 2000/12/31 05:06:27 gte Exp $
+ * $Id: BANLISTCommand.cc,v 1.2 2001/01/14 18:37:13 dan_karrels Exp $
  */
 
 #include        <string>
@@ -23,7 +23,7 @@
 #include        "levels.h"
 #include        "responses.h"
 
-const char BANLISTCommand_cc_rcsId[] = "$Id: BANLISTCommand.cc,v 1.1 2000/12/31 05:06:27 gte Exp $" ;
+const char BANLISTCommand_cc_rcsId[] = "$Id: BANLISTCommand.cc,v 1.2 2001/01/14 18:37:13 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -82,7 +82,7 @@ bool BANLISTCommand::Exec( iClient* theClient, const string& Message )
 		return true;
 	}
 	
-	for(Channel::banListConstIterator ptr = tmpChan->banList_begin();
+	for(Channel::const_banIterator ptr = tmpChan->banList_begin();
 	ptr != tmpChan->banList_end(); ++ptr)
 	{
 		i++;

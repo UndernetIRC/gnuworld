@@ -95,6 +95,18 @@ public:
 	typedef userListType::const_iterator const_userIterator ;
 
 	/**
+	 * The type used for immutable iteration through this
+	 * channel's ban structure.
+	 */
+	typedef banListType::const_iterator const_banIterator ;
+
+	/**
+	 * The type used for mutable iteration through this
+	 * channel's ban structure.
+	 */
+	typedef banListType::iterator banIterator ;
+
+	/**
 	 * Construct a channel of the given name, constructed at the
 	 * given creation time.
 	 */
@@ -158,24 +170,6 @@ public:
  	 */
 	inline void setKey( const string& newKey )
 		{ key = newKey ; }
-
-	/**
-	 * The const_iterator type used to perform a read-only traversal
-	 * of the channel ban list.
-	 */
-	typedef banListType::const_iterator banListConstIterator ;
-
-	/**
-	 * Retrieve a const_iterator to the beginning of the ban list.
-	 */
-	inline banListConstIterator banList_begin() const
-		{ return banList.begin() ; }
-
-	/**
-	 * Retrieve a const_iterator to the end of the channel ban list.
-	 */
-	inline banListConstIterator banList_end() const
-		{ return banList.end() ; }
 
 	/**
 	 * Add a ban to this Channel's ban list.
@@ -258,6 +252,44 @@ public:
 	 */
 	inline size_type size() const
 		{ return userList.size() ; }
+
+	/**
+	 * Retrieve a const_iterator to the beginning of the ban list.
+	 */
+	inline const_banIterator banList_begin() const
+		{ return banList.begin() ; }
+
+	/**
+	 * Retrieve a const_iterator to the end of the channel ban list.
+	 */
+	inline const_banIterator banList_end() const
+		{ return banList.end() ; }
+
+	/**
+	 * Retrieve an iterator to the beginning of the ban list.
+	 */
+	inline banIterator banList_begin()
+		{ return banList.begin() ; }
+
+	/**
+	 * Retrieve an iterator to the end of the channel ban list.
+	 */
+	inline banIterator banList_end()
+		{ return banList.end() ; }
+
+	/**
+	 * Retrieve an iterator to the beginning of
+	 * this channel's user structure.
+	 */
+	inline userIterator userList_begin()
+		{ return userList.begin() ; }
+
+	/**
+	 * Retrieve an iterator to the end of
+	 * this channel's user structure.
+	 */
+	inline userIterator userList_end()
+		{ return userList.end() ; }
 
 	/**
 	 * Retrieve a const iterator to the beginning of
