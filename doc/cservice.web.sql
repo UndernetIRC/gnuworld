@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------------
--- "$Id: cservice.web.sql,v 1.33 2004/03/08 01:43:34 nighty Exp $"
+-- "$Id: cservice.web.sql,v 1.34 2004/03/11 02:35:59 nighty Exp $"
 -- Channel service DB SQL file for PostgreSQL.
 --
 -- Tables specific to website
@@ -272,3 +272,18 @@ CREATE TABLE default_msgs (
 );
 
 CREATE INDEX default_msgs_idx ON default_msgs(type);
+
+
+CREATE TABLE ip_restrict (
+	id 	SERIAL,
+	user_id	int4 NOT NULL,
+	allowmask 	varchar(255) NOT NULL,
+	allowrange1 	int4 NOT NULL,
+	allowrange2 	int4 NOT NULL,
+	added 	int4 NOT NULL,
+	added_by 	int4 NOT NULL,
+	type 	int4 NOT NULL
+);
+
+CREATE INDEX ip_restrict_idx ON ip_restrict(user_id,type);
+
