@@ -6,8 +6,9 @@
 #include	"ELog.h" 
 #include	"cservice.h" 
 #include	"Network.h"
+#include	"levels.h"
  
-const char VERIFYCommand_cc_rcsId[] = "$Id: VERIFYCommand.cc,v 1.2 2000/12/26 03:33:35 gte Exp $" ;
+const char VERIFYCommand_cc_rcsId[] = "$Id: VERIFYCommand.cc,v 1.3 2000/12/27 01:11:08 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -67,31 +68,31 @@ bool VERIFYCommand::Exec( iClient* theClient, const string& Message )
 		return false;
 	}
 
- 	if ((level >= 1) && (level <= 500)) 
+ 	if ((level >= level::admin::base) && (level <= level::admin::helper)) 
 	{
-		bot->Notice(theClient, "%s is an Official Cservice helper%s", target->getNickName().c_str(), extra.c_str());
+		bot->Notice(theClient, "%s is an Official Cservice Helper%s", target->getNickName().c_str(), extra.c_str());
 		return true;
 	}
  
-	if ((level >= 501) && (level <= 899)) 
+	if ((level > level::admin::helper) && (level <= level::admin::admin)) 
 	{
-		bot->Notice(theClient, "%s is an Official Cservice admin%s", target->getNickName().c_str(), extra.c_str());
+		bot->Notice(theClient, "%s is an Official Cservice Admin%s", target->getNickName().c_str(), extra.c_str());
 		return true;
 	}
 
-	if (level == 900) 
+	if (level == level::admin::hbic) 
 	{
 		bot->Notice(theClient, "%s is the Cservice HBIC%s", target->getNickName().c_str(), extra.c_str());
 		return true;
 	}
 
-	if ((level >= 901) && (level <= 999)) 
+	if ((level > level::admin::hbic) && (level <= level::admin::coder)) 
 	{
-		bot->Notice(theClient, "%s is an Official Cservice coder%s", target->getNickName().c_str(), extra.c_str());
+		bot->Notice(theClient, "%s is an Official Cservice Coder%s", target->getNickName().c_str(), extra.c_str());
 		return true;
 	}
 
-	if (level == 1000) 
+	if (level == level::admin::daddy) 
 	{
 		bot->Notice(theClient, "%s is my daddy%s", target->getNickName().c_str(), extra.c_str());
 		return true;

@@ -1,5 +1,5 @@
 #ifndef __CSERVICE_H
-#define __CSERVICE_H "$Id: cservice.h,v 1.9 2000/12/26 03:33:35 gte Exp $"
+#define __CSERVICE_H "$Id: cservice.h,v 1.10 2000/12/27 01:11:08 gte Exp $"
 
 #include	<string>
 #include	<vector>
@@ -68,7 +68,9 @@ public:
 	sqlUser* isAuthed(iClient*, bool );
 
 	// Fetch a channel record for a channel.
-	sqlChannel* getChannelRecord(const string& );
+	sqlChannel* getChannelRecord( const string& );
+
+	const string& prettyDuration( int );
 
 	// Typedef's for user/channel Hashmaps.
 	typedef hash_map< string, sqlUser*, eHash, eqstr > sqlUserHashType ;

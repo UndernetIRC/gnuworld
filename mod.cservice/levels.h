@@ -1,5 +1,5 @@
 #ifndef __LEVELS_H
-#define __LEVELS_H "$Id: levels.h,v 1.1 2000/12/22 22:22:49 gte Exp $"
+#define __LEVELS_H "$Id: levels.h,v 1.2 2000/12/27 01:11:08 gte Exp $"
 
 namespace gnuworld {
 
@@ -72,11 +72,22 @@ namespace gnuworld {
     const int caution = 501;
     const int vacation = 501;
   }
+
   namespace immune {
     const int massdeop = 450;
     const int suspendop = 450; // Immune from op'ing a suspended user.
     const int floodpro = 501;
   }
+ 
+  namespace admin {
+	const int base = 1;
+  	const int helper = 500;
+	const int admin = 899;
+	const int hbic = 900;
+	const int coder = 999;
+	const int daddy = 1000;
+  }
+
  }
 }
 

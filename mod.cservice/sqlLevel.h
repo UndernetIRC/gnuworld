@@ -1,7 +1,7 @@
 /* sqlLevel.h */
 
 #ifndef __SQLLEVEL_H
-#define __SQLLEVEL_H "$Id: sqlLevel.h,v 1.1 2000/12/22 00:29:32 gte Exp $"
+#define __SQLLEVEL_H "$Id: sqlLevel.h,v 1.2 2000/12/27 01:11:08 gte Exp $"
 
 #include	<string>
 #include	<ctime>
@@ -20,7 +20,8 @@ public:
 	virtual ~sqlLevel() ;
 
 	typedef unsigned int	flagType ; 
-	static const flagType	F_AUTOOP =	0x01 ;
+	static const flagType	F_LOGGEDIN =	0x01 ;
+	static const flagType	F_AUTOOP =	0x02 ;
  
 	inline const unsigned int&	getChannelId() const
 		{ return channel_id ; } 

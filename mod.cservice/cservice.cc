@@ -85,7 +85,7 @@ cservice::cservice(const string& args)
     RegisterCommand(new SHOWCOMMANDSCommand(this, "SHOWCOMMANDS", "TBA")); 
     RegisterCommand(new LOGINCommand(this, "LOGIN", "<usernamne | userid> <password>"));
     RegisterCommand(new SEARCHCommand(this, "SEARCH", "TBA"));
-    RegisterCommand(new ACCESSCommand(this, "ACCESS", "[access_option] #channel [access_option] [(userid|nick|hostmask)] [access_option]"));
+    RegisterCommand(new ACCESSCommand(this, "ACCESS", "[channel] [nick] [-min n] [-max n] [-autoop] [-noautoop] [-modif [mask]]"));
     RegisterCommand(new CHANINFOCommand(this, "CHANINFO", "TBA"));
     RegisterCommand(new MOTDCommand(this, "MOTD", "TBA"));
     RegisterCommand(new ISREGCommand(this, "ISREG", "#channel"));
@@ -268,6 +268,11 @@ sqlChannel* cservice::getChannelRecord(const string& id)
 		return ptr->second ;
 	} 
 
+	/*
+	 *  We didn't find anything in the cache, fetch the data from
+	 *  the backend and create a new sqlUser object.
+	 */
+
 	sqlChannel* theChan = new sqlChannel(SQLDb);
  
 	if (theChan->loadData(id)) {
@@ -301,6 +306,15 @@ bool cservice::isOnChannel( const string& chanName ) const
 {
 	return true;
 }
+
+const string& cservice::prettyDuration( int duration )
+{ 
+	// Pretty format a 'duration' in seconds to
+	// x days, xx:xx:xx.
+	static string result;
+	result = "TBA";
+	return result;
+}	
 	
 void Command::Usage( iClient* theClient )
 {
