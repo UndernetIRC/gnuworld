@@ -1,5 +1,5 @@
 --
--- $Id: autokill.sql,v 1.12 2002/09/15 01:40:32 nighty Exp $
+-- $Id: autokill.sql,v 1.13 2003/01/05 21:08:39 gte Exp $
 --
 
 --
@@ -12,6 +12,8 @@ SELECT users_lastseen.user_id,users_lastseen.last_seen,users.user_name INTO TABL
 -- Remove any who currently have a pending app (Shouldn't happen <g>)
 \qecho [*] Moving those with old channel applications to user "AutoPurged".
 UPDATE pending set manager_id = (select id from users where lower(user_name) = 'autopurged') where pending.manager_id = to_die.user_id;
+\qecho [*] Not deleting those users who have the NoPurge flag.
+DELETE FROM to_die WHERE (users.id = to_die.user_id) AND ((users.flags::int4 & 32) = 1 );
 -- Output who are are going to kill, log stdout.
 \qecho [*] Listing Final Accounts to be removed:
 SELECT users.user_name,to_die.last_seen from users,to_die where users.id = to_die.user_id;
