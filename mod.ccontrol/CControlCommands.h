@@ -124,48 +124,50 @@ DECLARE_COMMAND( FORCEGLINE )
 */
 
 const int flg_NOLOG = 0x80000000; //causes the bot not to log this command
-const int flg_ACCESS   = 0x00 | flg_NOLOG; 
-const int flg_HELP     = 0x00| flg_NOLOG;
-const int flg_LOGIN    = 0x00| flg_NOLOG;
-const int flg_NEWPASS  = 0x00| flg_NOLOG;
-const int flg_MODE     = 0x01;
-const int flg_INVITE   = 0x02;
-const int flg_JUPE     = 0x04;
-const int flg_GLINE    = 0x08;
-const int flg_SGLINE   = 0x08;
-const int flg_REMGLINE = 0x08;
-const int flg_REMOPCHN = 0x10;
-const int flg_ADDOPCHN = 0x10;
-const int flg_LOPCHN   = 0x10;
-const int flg_CHINFO   = 0x20;
-const int flg_WHOIS    = 0x40;
-const int flg_ADDNOP   = 0x80;
-const int flg_REMOP    = 0x80;
-const int flg_MODOP    = 0x80;
-const int flg_TRANS    = 0x100;
-const int flg_KICK     = 0x200;
-const int flg_ADDCMD   = 0x400; 
-const int flg_DELCMD   = 0x400;
-const int flg_SUSPEND  = 0x800;
-const int flg_UNSUSPEND  = 0x800;
-const int flg_CLEARCHAN = 0x1000;
-const int flg_OP = 0x01;
-const int flg_DEOP = 0x01;
-const int flg_MODERATE = 0x01;
-const int flg_UNMODERATE = 0x01;
-const int flg_LISTHOSTS = 0x80;
-const int flg_ADDSERVER = 0x2000;
-const int flg_LEARNNET = 0x2000;
-const int flg_REMSERVER = 0x2000;
-const int flg_CHECKNET = 0x2000;
-const int flg_LASTCOM = 0x2000 | flg_NOLOG;
+const int flg_ACCESS   = 0x01 | flg_NOLOG; 
+const int flg_HELP     = 0x01 | flg_NOLOG;
+const int flg_LOGIN    = 0x00 | flg_NOLOG;
+const int flg_NEWPASS  = 0x01 | flg_NOLOG;
+const int flg_MODE     = 0x02;
+const int flg_OP = 0x02;
+const int flg_DEOP = 0x02;
+const int flg_MODERATE = 0x02;
+const int flg_UNMODERATE = 0x02;
+const int flg_INVITE   = 0x04;
+const int flg_JUPE     = 0x08;
+const int flg_GLINE    = 0x10;
+const int flg_SGLINE   = 0x10;
+const int flg_REMGLINE = 0x10;
+const int flg_REMOPCHN = 0x20;
+const int flg_ADDOPCHN = 0x20;
+const int flg_LOPCHN   = 0x20;
+const int flg_CHINFO   = 0x40;
+const int flg_WHOIS    = 0x80;
+const int flg_ADDNOP   = 0x100;
+const int flg_REMOP    = 0x100;
+const int flg_MODOP    = 0x100;
+const int flg_TRANS    = 0x200;
+const int flg_KICK     = 0x400;
+const int flg_ADDCMD   = 0x800; 
+const int flg_DELCMD   = 0x800;
+const int flg_SUSPEND  = 0x1000;
+const int flg_UNSUSPEND  = 0x1000;
+const int flg_CLEARCHAN = 0x2000;
+
+const int flg_LISTHOSTS = 0x100;
+const int flg_ADDSERVER = 0x4000;
+const int flg_LEARNNET = 0x4000;
+const int flg_REMSERVER = 0x4000;
+const int flg_CHECKNET = 0x4000;
+const int flg_LASTCOM = 0x4000 | flg_NOLOG;
+const int flg_FGLINE = 0x8000;
 
 /*
  Default commands that are added upon adding a new oper
 */
 
 const int OPER = flg_MODE | flg_INVITE | flg_GLINE | flg_CHINFO | flg_WHOIS | flg_TRANS | flg_KICK | flg_CLEARCHAN;
-const int ADMIN = OPER | flg_ADDOPCHN | flg_ADDNOP | flg_ADDCMD | flg_SUSPEND | flg_JUPE | flg_ADDSERVER;
+const int ADMIN = OPER | flg_ADDOPCHN | flg_ADDNOP | flg_ADDCMD | flg_SUSPEND | flg_JUPE | flg_ADDSERVER | flg_FGLINE;
 const int CODER = ADMIN;
 
 //Oper flags 

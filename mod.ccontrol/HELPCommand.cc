@@ -14,7 +14,7 @@
 #include	"StringTokenizer.h"
 
 
-const char HELPCommand_cc_rcsId[] = "$Id: HELPCommand.cc,v 1.5 2001/03/03 18:46:59 mrbean_ Exp $";
+const char HELPCommand_cc_rcsId[] = "$Id: HELPCommand.cc,v 1.6 2001/05/15 20:43:15 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -27,11 +27,15 @@ bool HELPCommand::Exec( iClient* theClient, const string& Message )
 {
 StringTokenizer st( Message ) ;
 
+AuthInfo *tmpAuth = bot->IsAuth(theClient->getCharYYXXX());
+if(!tmpAuth)
+	return false;
 string banner = "--- Help Menu for " ;
-banner += bot->getNickName() + " ---" ;
+banner += bot->getNickName() + " --- (Showing commands which are available for you)" ;
 
 bot->Notice( theClient, banner ) ;
 
+int ComLevel;
 // Check if the user didnt supply a command 
 if( 1 == st.size() )
 	{
@@ -39,7 +43,10 @@ if( 1 == st.size() )
 	for( ccontrol::constCommandIterator ptr = bot->command_begin() ;
 		ptr != bot->command_end() ; ++ptr )
 		{
-		bot->Notice( theClient, ptr->second->getName() ) ;
+		ComLevel = ptr->second->getFlags();
+		ComLevel &= ~flg_NOLOG; 
+		if((ComLevel == 0) || (ComLevel & tmpAuth->Access) )
+			bot->Notice( theClient, ptr->second->getName() ) ;
 		}
 	}
 else //Supplied a command, show only the help for that command (if it exists)

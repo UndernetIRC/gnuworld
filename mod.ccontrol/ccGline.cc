@@ -3,7 +3,7 @@
  * 
  * Gline class
  * 
- * $Id: ccGline.cc,v 1.4 2001/05/14 21:26:37 mrbean_ Exp $
+ * $Id: ccGline.cc,v 1.5 2001/05/15 20:43:15 mrbean_ Exp $
  */
  
 #include	<strstream>
@@ -19,7 +19,7 @@
 #include	"ccGline.h" 
 
 const char ccGline_h_rcsId[] = __CCGLINE_H ;
-const char ccGline_cc_rcsId[] = "$Id: ccGline.cc,v 1.4 2001/05/14 21:26:37 mrbean_ Exp $" ;
+const char ccGline_cc_rcsId[] = "$Id: ccGline.cc,v 1.5 2001/05/15 20:43:15 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -125,6 +125,42 @@ theQuery	<< Main
 		<< GlineId
 		<< ends;
 
+elog	<< "ccontrol::glineload> "
+	<< theQuery.str()
+	<< endl; 
+
+ExecStatusType status = SQLDb->Exec( theQuery.str() ) ;
+delete[] theQuery.str() ;
+
+if( PGRES_TUPLES_OK != status )
+	{
+	elog	<< "ccGline::load> SQL Failure: "
+		<< SQLDb->ErrorMessage()
+		<< endl ;
+
+	return false ;
+	}
+
+
+Id = SQLDb->GetValue(0,0);
+Host = SQLDb->GetValue(0,1);
+AddedBy = SQLDb->GetValue(0,2) ;
+AddedOn = static_cast< time_t >( atoi( SQLDb->GetValue(0,3) ) ) ;
+Expires = static_cast< time_t >( atoi( SQLDb->GetValue(0,4) ) ) ;
+Reason = SQLDb->GetValue(0,5);
+
+return true;
+}
+
+bool ccGline::loadData( const string & HostName)
+{
+static const char *Main = "SELECT * FROM glines WHERE Host = '";
+
+strstream theQuery;
+theQuery	<< Main
+		<< HostName.c_str()
+		<< "'" << ends;
+
 elog	<< "ccontrol::glineConstructor> "
 	<< theQuery.str()
 	<< endl; 
@@ -151,39 +187,31 @@ Reason = SQLDb->GetValue(0,5);
 
 return true;
 }
-bool ccGline::loadData( string & Host)
+
+bool ccGline::Delete()
 {
-static const char *Main = "SELECT * FROM glines WHERE Host = ";
+static const char *Main = "DELETE FROM glines WHERE Id = ";
 
 strstream theQuery;
 theQuery	<< Main
-		<< Host.c_str()
+		<< Id
 		<< ends;
 
-elog	<< "ccontrol::glineConstructor> "
+elog	<< "ccontrol::glineDelete> "
 	<< theQuery.str()
 	<< endl; 
 
 ExecStatusType status = SQLDb->Exec( theQuery.str() ) ;
 delete[] theQuery.str() ;
 
-if( PGRES_TUPLES_OK != status )
+if( PGRES_COMMAND_OK != status )
 	{
-	elog	<< "ccGline::ccGline> SQL Failure: "
+	elog	<< "ccGline::ccDelete> SQL Failure: "
 		<< SQLDb->ErrorMessage()
 		<< endl ;
 
 	return false ;
 	}
-
-
-Id = SQLDb->GetValue(0,0);
-Host = SQLDb->GetValue(0,1);
-AddedBy = SQLDb->GetValue(0,2) ;
-AddedOn = static_cast< time_t >( atoi( SQLDb->GetValue(0,3) ) ) ;
-Expires = static_cast< time_t >( atoi( SQLDb->GetValue(0,4) ) ) ;
-Reason = SQLDb->GetValue(0,5);
-
 return true;
 }
 

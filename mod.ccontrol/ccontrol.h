@@ -3,7 +3,7 @@
  */
 
 #ifndef __CCONTROL_H
-#define __CCONTROL_H "$Id: ccontrol.h,v 1.25 2001/05/14 21:26:38 mrbean_ Exp $"
+#define __CCONTROL_H "$Id: ccontrol.h,v 1.26 2001/05/15 20:43:15 mrbean_ Exp $"
 
 //Define gline response
 #define GLINE_OK 1;
@@ -455,6 +455,12 @@ public:
 	
 	int countCinS( char * , char );
 
+	bool refreshGlines();
+	
+	bool burstGlines();
+	
+	bool loadGlines();
+	
 	/**
 	 * This is a constant iterator type used to perform a read-only
 	 * iteration of the operchan structure.
@@ -543,6 +549,15 @@ public:
 	commandIterator findCommand( const string& theComm )
 		{ return commandMap.find( theComm ) ; }
 
+	
+	typedef glineListType::iterator  glineIterator;
+	
+	glineIterator gline_begin()
+		{ return glineList.begin() ; }
+	
+	glineIterator gline_end()
+		{ return glineList.end() ; }
+		
 	/**
 	 * Retrieve the default length of time for glines.
 	 */
@@ -557,6 +572,9 @@ public:
 	/* TimerID - Posts the daily log to the abuse team  */
 	xServer::timerID postDailyLog;
 
+	/* TimerID = Expired glines interval timer */
+	xServer::timerID expiredGlines;
+	
 protected:
 
 	/**
@@ -614,8 +632,17 @@ protected:
 	/**
 	 * Burst flag
 	 */
-	 bool inBurst;
+	 bool 			inBurst;
+	
+	/**
+	 * Refresh gline flag
+	 */
+	bool			inRefresh;
+	/**
+	 * Refresh gline interval
+	 */
 
+	 int 			GLInterval;
 } ; 
  
 } // namespace gnuworld

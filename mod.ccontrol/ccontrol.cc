@@ -23,7 +23,7 @@
 #include	"AuthInfo.h"
 #include        "server.h"
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.36 2001/05/15 05:56:07 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.37 2001/05/15 20:43:15 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -59,9 +59,8 @@ string sqlHost = conf.Find("sql_host" )->second;
 string sqlDb = conf.Find( "sql_db" )->second;
 string sqlPort = conf.Find( "sql_port" )->second;
 
-CCEmail = conf.Require( "ccemail" )->second;
-AbuseMail = conf.Require( "abuse_mail" )->second;
 inBurst = true;
+inRefresh = false;
 
 string Query = "host=" + sqlHost + " dbname=" + sqlDb + " port=" + sqlPort;
 
@@ -105,6 +104,21 @@ operChanModes = conf.Find( "operchanmodes" )->second ;
 // gLength is the length of time (in seconds) for default glines
 gLength = atoi( conf.Find( "glength" )->second.c_str() ) ;
 
+// CCEmail is the email ccontrol will post the last com report under
+CCEmail = conf.Require( "ccemail" )->second;
+
+//AbuseMail is the mail that the lastcom report will be post to
+AbuseMail = conf.Require( "abuse_mail" )->second;
+
+//GLInterval is the inteval in which ccontrol will check for expired glines
+GLInterval = atoi( conf.Require( "gline_interval" )->second.c_str() );
+
+//Sendmail  is the full path of the sendmail program
+Sendmail_Path = conf.Require("SendMail")->second;
+
+//SendReport flag that tells ccontrol if the user want the report to be mailed
+SendReport = atoi(conf.Require("mail_report")->second.c_str());
+
 // Set up the oper channels
 EConfig::const_iterator ptr = conf.Find( "operchan" ) ;
 while( ptr != conf.end() && ptr->first == "operchan" )
@@ -116,8 +130,6 @@ while( ptr != conf.end() && ptr->first == "operchan" )
 // Read out the client's message channel
 msgChan = conf.Find( "msgchan" )->second ;
 
-Sendmail_Path = conf.Require("SendMail")->second;
-SendReport = atoi(conf.Require("mail_report")->second.c_str());
 
 // Make sure that the msgChan is in the list of operchans
 if( operChans.end() == find( operChans.begin(), operChans.end(), msgChan ) )
@@ -194,7 +206,7 @@ RegisterCommand( new CLEARCHANCommand( this, "CLEARCHAN", "<#chan> "
 RegisterCommand( new ADDNEWSERVERCommand( this, "ADDSERVER", "<Server> "
 	"Add a new server to the bot database",flg_ADDSERVER ) ) ;
 RegisterCommand( new LEARNNETWORKCommand( this, "LEARNNET", ""
-	"Update the servers database according to the current situation",flg_ADDSERVER ) ) ;
+	"Update the servers database according to the current situation",flg_LEARNNET ) ) ;
 RegisterCommand( new REMOVESERVERCommand( this, "REMSERVER", "<Server name>"
 	"Removes a server from the bot database",flg_REMSERVER ) ) ;
 RegisterCommand( new CHECKNETWORKCommand( this, "CHECKNET", ""
@@ -202,7 +214,9 @@ RegisterCommand( new CHECKNETWORKCommand( this, "CHECKNET", ""
 RegisterCommand( new LASTCOMCommand( this, "LASTCOM", "[number of lines to show]"
 	"Post you the bot logs",flg_LASTCOM ) ) ;
 RegisterCommand( new FORCEGLINECommand( this, "FORCEGLINE", "[duration (sec)] <user@host> <reason> "
-	"Gline a given user@host for the given reason",flg_GLINE ) ) ;
+	"Gline a given user@host for the given reason",flg_FGLINE ) ) ;
+
+loadGlines();
 
 }
 
@@ -217,6 +231,12 @@ for( commandMapType::iterator ptr = commandMap.begin() ;
 	ptr->second = 0 ;
 	}
 commandMap.clear() ;
+// Deallocate each gline entry
+for(glineIterator GLptr = glineList.begin(); GLptr != glineList.end(); GLptr++)
+	{
+	glineList.erase(GLptr);
+	}
+
 }
 
 // Register a command handler
@@ -290,11 +310,14 @@ if(SendReport)
 	time_t theTime = ::time(0) + ((24 - Now.tm_hour)*3600 - (Now.tm_min)*60) ; //Set the daily timer to 24:00
 	postDailyLog = theServer->RegisterTimer(theTime, this, NULL); 
 	}
+expiredGlines = theServer->RegisterTimer(::time(0) + GLInterval,this,NULL);
 
 theServer->RegisterEvent( EVT_KILL, this );
 theServer->RegisterEvent( EVT_QUIT, this );
 theServer->RegisterEvent( EVT_NETJOIN, this );
 theServer->RegisterEvent( EVT_BURST_CMPLT, this );
+theServer->RegisterEvent( EVT_GLINE , this );
+
 //theServer->RegisterEvent( EVT_NETBREAK, this );
 
 xClient::ImplementServer( theServer ) ;
@@ -454,7 +477,9 @@ switch( theEvent )
 		}
 	case EVT_BURST_CMPLT:
 		{
-		inBurst = true;
+		inBurst = false;
+		refreshGlines();
+		burstGlines();
 		}	
 	} // switch()
 
@@ -501,6 +526,11 @@ if (timer_id ==  postDailyLog)
 	/* Refresh Timers */			
 	time_t theTime = time(NULL) + 24*3600; 
 	postDailyLog = MyUplink->RegisterTimer(theTime, this, NULL); 
+	}
+if (timer_id == expiredGlines)
+	{
+	refreshGlines();
+	expiredGlines = MyUplink->RegisterTimer(::time(0) + GLInterval,this,NULL);
 	}
 return 1;
 }
@@ -787,46 +817,6 @@ else
 	}
 }
 
-/*bool ccontrol::UpdateOper (User* Oper)
-{
-static const char *Main = "UPDATE opers SET password = '";
-
-strstream theQuery;
-theQuery	<< Main
-		<< Oper->Password
-		<< "', Access = "
-		<< Oper->Access
-		<< ", last_updated_by = '"
-		<< Oper->last_updated_by
-		<< "',last_updated = now()::abstime::int4,flags = "
-		<< Oper->Flags
-		<<  ",suspend_expires = "
-		<< Oper->SuspendExpires
-		<< " ,suspended_by = '"
-		<< Oper->SuspendedBy
-		<< "' WHERE lower(user_name) = '" 
-		<< string_lower(Oper->UserName) << "'"
-		<<  ends;
-
-elog	<< "ccontrol::UpdateOper> "
-	<< theQuery.str()
-	<< endl; 
-
-ExecStatusType status = SQLDb->Exec( theQuery.str() ) ;
-delete[] theQuery.str() ;
-
-if( PGRES_COMMAND_OK == status ) 
-	{
-	return true;
-	}
-else
-	{
-	elog	<< "ccontrol::UpdateOper> SQL Failure: "
-		<< SQLDb->ErrorMessage()
-		<< endl ;
-	return false;
-	}
-}*/
 
 int ccontrol::getCommandLevel( const string& Command)
 {
@@ -1259,7 +1249,6 @@ bool ccontrol::remGline( ccGline* TempGline)
 glineList.erase( std::find( glineList.begin(),
 glineList.end(),
 TempGline ) ) ;
-delete TempGline ; 
 return true;
 }
 
@@ -1533,5 +1522,148 @@ for(CurC = St;*CurC != '\0';CurC++)
 	count++;
 return count;
 }
- 
+
+bool ccontrol::refreshGlines()
+{
+
+MsgChanLog("Refresh gline - Start\n");
+
+static const char *Main = "SELECT Id,Host FROM glines WHERE expiresat <= now()::abstime::int4;";
+
+strstream theQuery;
+theQuery	<< Main
+		<< ends;
+
+elog	<< "ccontrol::glineRefresh> "
+	<< theQuery.str()
+	<< endl; 
+
+ExecStatusType status = SQLDb->Exec( theQuery.str() ) ;
+delete[] theQuery.str() ;
+
+
+if( PGRES_TUPLES_OK != status )
+	{
+	elog	<< "ccontrol::refreshGline> SQL Failure: "
+		<< SQLDb->ErrorMessage()
+		<< endl ;
+
+	MsgChanLog("Refresh gline - DB error while finding expired glines\n");
+	return false;
+	}
+
+ccGline *tempGline = new (nothrow) ccGline(SQLDb);
+assert(tempGline != NULL);
+
+int totalFound;
+totalFound = SQLDb->Tuples();
+inRefresh = true;
+
+for( int i = 0 ; i < SQLDb->Tuples() ; i++ )
+	{
+	if(!tempGline->loadData(atoi(SQLDb->GetValue(i,0))))
+		{
+		//there has been a weird error while loading
+		//not handled yet
+		continue;
+		}
+	//remove the gline from the core
+	MyUplink->removeGline(tempGline->get_Host());
+	
+	//remove the gline from ccontrol structure
+	remGline(tempGline);
+	}
+//we have removed all expired glines from memory
+//now remove it from the database
+strstream delQuery;
+static const char *D = "DELETE FROM glines WHERE expiresat <= now()::abstime::int4;";
+delQuery        << D
+		<< ends;
+
+elog	<< "ccontrol::glineRefresh> "
+	<< delQuery.str()
+	<< endl; 
+
+status = SQLDb->Exec( delQuery.str() ) ;
+delete[] delQuery.str() ;
+delete tempGline;
+
+if( PGRES_COMMAND_OK != status )
+	{
+	elog	<< "ccontrol::refreshGline> SQL Failure: "
+		<< SQLDb->ErrorMessage()
+		<< endl ;
+	MsgChanLog("Refresh gline - DB error while removing expired glines\n");
+	inRefresh = false;
+	return false;
+	}
+MsgChanLog("Refresh gline - Ended , Total glines expired %d\n",totalFound);
+inRefresh = false;
+
+return true;
+
+}
+
+bool ccontrol::burstGlines()
+{
+
+MsgChanLog("[Burst Glines] - Started\n");
+ccGline *theGline;
+for(glineIterator ptr = glineList.begin(); ptr != glineList.end(); ptr++)
+	{
+	theGline = *ptr;
+	MyUplink->setGline(theGline->get_AddedBy()
+	,theGline->get_Host(),theGline->get_Reason()
+	,theGline->get_Expires() - ::time(0));
+	}
+MsgChanLog("[Burst Glines] - Ended\n");
+
+return true;
+
+}
+
+bool ccontrol::loadGlines()
+{
+static const char *Main = "SELECT Id FROM glines;";
+
+strstream theQuery;
+theQuery	<< Main
+		<< ends;
+
+elog	<< "ccontrol::loadGlines> "
+	<< theQuery.str()
+	<< endl; 
+
+ExecStatusType status = SQLDb->Exec( theQuery.str() ) ;
+delete[] theQuery.str() ;
+
+
+if( PGRES_TUPLES_OK != status )
+	{
+	elog	<< "ccontrol::loadGlines> SQL Failure: "
+		<< SQLDb->ErrorMessage()
+		<< endl ;
+
+	return false;
+	}
+
+ccGline *tempGline = new (nothrow) ccGline(SQLDb);
+assert(tempGline != NULL);
+
+int totalFound;
+totalFound = SQLDb->Tuples();
+inRefresh = true;
+
+for( int i = 0 ; i < SQLDb->Tuples() ; i++ )
+	{
+	if(!tempGline->loadData(atoi(SQLDb->GetValue(i,0))))
+		{
+		//there has been a weird error while loading
+		//not handled yet
+		continue;
+		}
+	addGline(tempGline);
+	}
+return true;	
+} 
 } // namespace gnuworld
