@@ -18,7 +18,7 @@
  *
  * Caveats: None.
  *
- * $Id: SETCommand.cc,v 1.40 2001/07/08 17:49:25 gte Exp $
+ * $Id: SETCommand.cc,v 1.41 2001/07/16 19:31:18 gte Exp $
  */
 
 #include	<string>
@@ -29,7 +29,7 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char SETCommand_cc_rcsId[] = "$Id: SETCommand.cc,v 1.40 2001/07/08 17:49:25 gte Exp $" ;
+const char SETCommand_cc_rcsId[] = "$Id: SETCommand.cc,v 1.41 2001/07/16 19:31:18 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -155,7 +155,60 @@ else
  	value = string_upper(st[3]);
 	}
 
-if(option == "CAUTION")
+	/*
+	 * Check the "Locked" status first, so admin's can bypas to turn it OFF :)
+	 */
+
+	if(option == "LOCKED")
+	{
+	    // Check for admin access
+	    sqlChannel* admChan = bot->getChannelRecord("*");
+	    int admLevel = bot->getAccessLevel(theUser, admChan);
+	    if(admLevel < level::set::locked)
+	    {
+			// No need to tell users about admin commands.
+			Usage(theClient);
+			return true;
+	    }
+	    if(value == "ON") theChan->setFlag(sqlChannel::F_LOCKED);
+	    else if(value == "OFF") theChan->removeFlag(sqlChannel::F_LOCKED);
+	    else
+	    {
+		bot->Notice(theClient, 
+			bot->getResponse(theUser,
+				language::set_cmd_syntax_on_off,
+				string("value of %s must be ON or OFF")).c_str(),
+			option.c_str());
+		return true;
+	    }
+	    theChan->commit(); 
+	    bot->Notice(theClient, 
+			bot->getResponse(theUser,
+				language::set_cmd_status,
+				string("%s for %s is %s")).c_str(),
+			option.c_str(),
+			theChan->getName().c_str(),
+			theChan->getFlag(sqlChannel::F_LOCKED) ? "ON" : "OFF");
+
+	    return true;
+	}
+
+	/*
+	 *  Check if the channel is "Locked", if so, only allow admins to change settings.
+	 */
+
+	if(theChan->getFlag(sqlChannel::F_LOCKED))
+	{
+		int admLevel = bot->getAdminAccessLevel(theUser);
+		if (admLevel <= level::set::locked)
+			{
+			bot->Notice(theClient, "The channel settings for %s have been locked by a cservice"
+				" administrator and cannot be changed.", theChan->getName().c_str());
+			return(true); 
+			}
+	}
+
+	if(option == "CAUTION")
 	{
     /* Check for admin access */ 
     if(bot->getAdminAccessLevel(theUser) < level::set::caution)
@@ -188,7 +241,7 @@ if(option == "CAUTION")
 	return true;
 	}
 
-if(option == "NOREG")
+	if(option == "NOREG")
 	{
 	// Check for admin access
 	sqlChannel* admChan = bot->getChannelRecord("*");
@@ -256,6 +309,7 @@ if(option == "NOREG")
 	    return true;
 	}
 
+ 
 	if(option == "NEVERREG")
 	{
 	    // Check for admin access

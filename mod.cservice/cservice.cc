@@ -801,6 +801,10 @@ else if(Command == "USERINFO")
 	{
 	xClient::DoCTCP(theClient, CTCP.c_str(), "I'm a user, not an abuser");
 	}
+else if(Command == "TIME")
+	{
+	xClient::DoCTCP(theClient, CTCP.c_str(), "Time you got a watch?");
+	}
 else 
 	{
 	xClient::DoCTCP(theClient, "ERRMSG", CTCP.c_str());

@@ -1,7 +1,7 @@
 /* sqlChannel.h */
 
 #ifndef __SQLCHANNEL_H
-#define __SQLCHANNEL_H "$Id: sqlChannel.h,v 1.28 2001/07/16 18:04:43 gte Exp $"
+#define __SQLCHANNEL_H "$Id: sqlChannel.h,v 1.29 2001/07/16 19:31:18 gte Exp $"
 
 #include	<string>
 #include	<map>
@@ -29,9 +29,8 @@ public:
 	static const flagType	F_SUSPEND  = 0x00000010 ;
 	static const flagType	F_TEMP     = 0x00000020 ;
 	static const flagType	F_CAUTION  = 0x00000040 ;
-	static const flagType	F_VACATION = 0x00000080 ;
-
-	static const flagType   F_FLOATLIM = 0x00000100 ;
+	static const flagType	F_VACATION = 0x00000080 ; 
+	static const flagType   F_LOCKED   = 0x00000100 ;
 
 	static const flagType	F_ALWAYSOP  = 0x00010000 ;
 	static const flagType	F_STRICTOP  = 0x00020000 ;

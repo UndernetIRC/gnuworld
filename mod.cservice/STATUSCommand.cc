@@ -10,7 +10,7 @@
 #include	"Network.h"
 #include	"cservice_config.h"
  
-const char STATUSCommand_cc_rcsId[] = "$Id: STATUSCommand.cc,v 1.30 2001/07/16 18:04:43 gte Exp $" ;
+const char STATUSCommand_cc_rcsId[] = "$Id: STATUSCommand.cc,v 1.31 2001/07/16 19:31:18 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -321,6 +321,7 @@ if (theChan->getFlag(sqlChannel::F_STRICTOP)) flagsSet += "STRICTOP ";
 if (theChan->getFlag(sqlChannel::F_NOOP)) flagsSet += "NOOP ";
 if (theChan->getFlag(sqlChannel::F_AUTOTOPIC)) flagsSet += "AUTOTOPIC "; 
 if (theChan->getFlag(sqlChannel::F_AUTOJOIN)) flagsSet += "AUTOJOIN ";
+if (theChan->getFlag(sqlChannel::F_LOCKED)) flagsSet += "LOCKED ";
 
 bot->Notice(theClient, 
 	bot->getResponse(theUser, language::status_flags,

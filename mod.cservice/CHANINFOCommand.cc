@@ -13,7 +13,7 @@
  *
  * Command is aliased "INFO".
  *
- * $Id: CHANINFOCommand.cc,v 1.27 2001/07/08 19:15:08 gte Exp $
+ * $Id: CHANINFOCommand.cc,v 1.28 2001/07/16 19:31:18 gte Exp $
  */
 
 #include	<string>
@@ -26,7 +26,7 @@
 #include	"libpq++.h"
 #include	"cservice_config.h"
  
-const char CHANINFOCommand_cc_rcsId[] = "$Id: CHANINFOCommand.cc,v 1.27 2001/07/08 19:15:08 gte Exp $" ;
+const char CHANINFOCommand_cc_rcsId[] = "$Id: CHANINFOCommand.cc,v 1.28 2001/07/16 19:31:18 gte Exp $" ;
  
 namespace gnuworld
 {
@@ -87,6 +87,17 @@ if( string::npos == st[ 1 ].find_first_of( '#' ) )
 			language::info_about,
 			string("Information about: %s (%i)")).c_str(),
 		theUser->getUserName().c_str(), theUser->getID());
+
+	if (theUser->getID() == 1)
+	{
+		bot->Notice(theClient," - The one that was, the one that is, the one that will be.");
+	}
+
+	if (theUser->getID() == 42)
+	{
+		bot->Notice(theClient," - What do you mean you want to demolish the Undernet to make way for a new"
+		" hyperspace expressway?");
+	}
 
 	iClient* targetClient = theUser->isAuthed();
 	string loggedOn = targetClient ?

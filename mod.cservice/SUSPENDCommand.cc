@@ -12,7 +12,7 @@
  * TODO: /msg x suspend #channel *, suspends all users below your access
  * level.
  *
- * $Id: SUSPENDCommand.cc,v 1.17 2001/07/07 22:51:25 gte Exp $
+ * $Id: SUSPENDCommand.cc,v 1.18 2001/07/16 19:31:18 gte Exp $
  */
 
 #include	<string>
@@ -26,7 +26,7 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char SUSPENDCommand_cc_rcsId[] = "$Id: SUSPENDCommand.cc,v 1.17 2001/07/07 22:51:25 gte Exp $" ;
+const char SUSPENDCommand_cc_rcsId[] = "$Id: SUSPENDCommand.cc,v 1.18 2001/07/16 19:31:18 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -176,15 +176,12 @@ if (level <= usrLevel)
 
 string units;
 time_t duration = atoi(st[3].c_str());
-time_t finalDuration = duration;
+time_t finalDuration = (duration * 60); // Default to minutes.
  
 if( st.size() >= 5 )
 	{
 	units = st[4];
-	if(units == "s")
-		{ /* mm'kay */
-		}
-	else if(units == "m")
+	if(units == "m")
 		{
 		finalDuration = duration * 60;
 		}
