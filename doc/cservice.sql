@@ -1,8 +1,11 @@
 ------------------------------------------------------------------------------------
--- "$Id: cservice.sql,v 1.34 2001/04/17 02:05:14 gte Exp $"
+-- "$Id: cservice.sql,v 1.35 2001/04/30 18:51:25 gte Exp $"
 -- Channel service DB SQL file for PostgreSQL.
 
 -- ChangeLog:
+-- 2001-04-30: Gte
+--             Redesigned deletion system, new table called deletion_transactions
+--             to store deletion details for CMaster's to clear cached values.
 -- 2001-01-04: Gte
 --             Added 'deleted' flag, to flag records as deleted
 --             (To enable CMaster to see deletions - can be *really* deleted during
@@ -24,12 +27,12 @@
 --             Defined the flags
 --             added channellog/userlog for combined ilc databases etc.
 --             Changed many strings to 'TEXT'.
---	       removed nick_flood_pro.
---	       added defaults for flood_pro's.
+--             removed nick_flood_pro.
+--             added defaults for flood_pro's.
 --             changed the key type on the bans table.
---	       added supporters table.
+--             added supporters table.
 --             lotsa misc things
---	       added 'added_by' and 'added_by_ts' to access table
+--             added 'added_by' and 'added_by_ts' to access table
 --             users now have language, not channels
 --             checked current CS sources in case we missed something.
 --
@@ -37,8 +40,7 @@
 --             Added last_updated timestamps
 --
 -- Prior: Maintained by moof.           
-
-
+ 
 -- The service supports multiple languages, defined in language
 -- files.
 
@@ -46,8 +48,7 @@ CREATE TABLE languages (
 	id SERIAL,
 	code VARCHAR( 16 ) UNIQUE,
 	name VARCHAR( 16 ),
-	last_updated INT4 NOT NULL,
-	deleted INT2 DEFAULT '0'
+	last_updated INT4 NOT NULL 
 --	PRIMARY KEY(id)
 );
 
@@ -57,8 +58,7 @@ CREATE TABLE translations (
 	language_id INT4 CONSTRAINT translations_language_id_ref REFERENCES languages ( id ),
 	response_id INT4 NOT NULL DEFAULT '0',
 	text TEXT,
-	last_updated INT4 NOT NULL,
-	deleted INT2 DEFAULT '0',
+	last_updated INT4 NOT NULL, 
 
 	PRIMARY KEY (language_id, response_id)
 );
@@ -113,8 +113,7 @@ CREATE TABLE channels (
 -- 2: AutoVOICE
 
 	userflags INT2 DEFAULT '0',
-	last_updated INT4 NOT NULL,
-	deleted INT2 DEFAULT '0',
+	last_updated INT4 NOT NULL, 
 
 	PRIMARY KEY (id)
 );
@@ -135,8 +134,7 @@ CREATE TABLE bans (
 	level INT2,
 	expires INT4,					-- Expiration timestamp.
 	reason VARCHAR (128), 
-	last_updated INT4 NOT NULL,
-	deleted INT2 DEFAULT '0',
+	last_updated INT4 NOT NULL, 
 
 	PRIMARY KEY (banmask,channel_id)
 );
@@ -163,8 +161,7 @@ CREATE TABLE users (
 -- 0x00 02 -- Logged in
 -- 0x00 04 -- Invisible
 	last_updated_by VARCHAR (128),		-- nick!user@host
-	last_updated INT4 NOT NULL,
-	deleted INT2 DEFAULT '0',
+	last_updated INT4 NOT NULL, 
 
 	PRIMARY KEY ( id )
 ) ;
@@ -198,8 +195,7 @@ CREATE TABLE levels (
 	added_By VARCHAR( 128 ),
 	last_Modif INT4,
 	last_Modif_By VARCHAR( 128 ),
-	last_Updated INT4 NOT NULL,
-	deleted INT2 DEFAULT '0',
+	last_Updated INT4 NOT NULL, 
 
 	PRIMARY KEY( channel_id, user_id )
 );
@@ -220,8 +216,7 @@ CREATE TABLE channellog (
 -- 5 -- EV_OPERPART - When an oper 'PART's the bot. 
 -- 6 -- EV_FORCE - When someone FORCE's access in a channel.
 	message TEXT,
-	last_updated INT4 NOT NULL,
-	deleted INT2 DEFAULT '0'
+	last_updated INT4 NOT NULL 
 );
 
 CREATE INDEX channellog_channelID_idx ON channellog(channelID);
@@ -231,8 +226,7 @@ CREATE TABLE userlog (
 	ts INT4,
 	user_id INT4 CONSTRAINT user_log_ref REFERENCES users ( id ),
 	message TEXT,
-	last_updated INT4 NOT NULL,
-	deleted INT2 DEFAULT '0'
+	last_updated INT4 NOT NULL 
 );
 
 CREATE TABLE supporters (
@@ -247,8 +241,7 @@ CREATE TABLE supporters (
 	join_count INT4 DEFAULT '0',
 -- Number of times this 'supporter' has joined the channel.
 -- Field updated by CMaster to reflect channel 'traffic'.
-	last_updated INT4 NOT NULL,
-	deleted INT2 DEFAULT '0',
+	last_updated INT4 NOT NULL, 
 	PRIMARY KEY(channel_id,user_id)
 );
 
@@ -266,8 +259,7 @@ CREATE TABLE pending (
 	decision_ts INT4,
 	decision VARCHAR (80), 
 	comments TEXT,
-	last_updated INT4 NOT NULL,
-	deleted INT2 DEFAULT '0',
+	last_updated INT4 NOT NULL, 
 	PRIMARY KEY(channel_id)
 );
 
@@ -279,12 +271,28 @@ CREATE TABLE domain (
 -- 0x00 01 - Bad Domain.
 -- 0x00 02 - Good Domain.
 -- 0x00 04 - Pending Domain.
-	last_updated INT4 NOT NULL,
-	deleted INT2 DEFAULT '0',
+	last_updated INT4 NOT NULL, 
 	PRIMARY KEY(id)
 ); 
 
 CREATE INDEX domain_domain_idx ON domain(domain);
+
+CREATE TABLE deletion_transactions (
+	tableID INT4,
+-- Table Types:
+-- 1 = users
+-- 2 = channels
+-- 3 = levels
+-- 4 = bans
+	key1 INT4,
+	key2 INT4,
+	key3 INT4,
+-- Up to 3 key's that uniquely identify the data
+-- being deleted in this table. See CMaster source
+-- to determine how this is interpretted.
+	last_updated INT4 NOT NULL
+);
+
 
 -- Update notification rules.
 --
@@ -315,23 +323,68 @@ END;
 -- Trigger to call the function upon insert to users.
 
 CREATE TRIGGER t_new_user AFTER INSERT ON users FOR EACH ROW EXECUTE PROCEDURE new_user(); 
- 
+
+-- Functions to automatically generate "Deletion Stubs" for removed records, so CMaster
+-- can pick up on these and clear its cache.
+
+CREATE FUNCTION delete_user() RETURNS OPAQUE AS '
+BEGIN
+	INSERT INTO deletion_transactions (tableID, key1, key2, key3, last_updated)
+	VALUES(1, OLD.id, 0, 0, now()::abstime::int4);
+	DELETE FROM levels WHERE user_id = OLD.id;
+	DELETE FROM userlog WHERE user_id = OLD.id; 
+	-- TODO: Removing users who have pending channels?
+	RETURN OLD;
+END;
+' LANGUAGE 'plpgsql';
+
+CREATE TRIGGER t_delete_user AFTER DELETE ON users FOR EACH ROW EXECUTE PROCEDURE delete_user();
+
+-- Channel table Deletion Stubs
+--
+
+CREATE FUNCTION delete_channel() RETURNS OPAQUE AS '
+BEGIN
+	INSERT INTO deletion_transactions (tableID, key1, key2, key3, last_updated)
+	VALUES(2, OLD.id, 0, 0, now()::abstime::int4);
+ 	-- Clean up trailing records that are referentially linked to this channel record.
+	DELETE FROM channellog WHERE channelid = OLD.id;
+	DELETE FROM bans WHERE channel_id = OLD.id;
+	DELETE FROM levels where channel_id = OLD.id;
+	DELETE FROM supporters where channel_id = OLD.id;
+	DELETE FROM pending where channel_id = OLD.id;
+	RETURN OLD;
+END;
+' LANGUAGE 'plpgsql';
+
+CREATE TRIGGER t_delete_channel AFTER DELETE ON channels FOR EACH ROW EXECUTE PROCEDURE delete_channel(); 
+
+-- Level table Deletion Stubs
+--
+
+CREATE FUNCTION delete_level() RETURNS OPAQUE AS '
+BEGIN
+	INSERT INTO deletion_transactions (tableID, key1, key2, key3, last_updated)
+	VALUES(3, OLD.channel_id, OLD.user_id, 0, now()::abstime::int4);
+	RETURN OLD;
+END;
+' LANGUAGE 'plpgsql';
+
+CREATE TRIGGER t_delete_level AFTER DELETE ON levels FOR EACH ROW EXECUTE PROCEDURE delete_level();
+
+-- Ban table Deletion Stubs
+--
+
+CREATE FUNCTION delete_ban() RETURNS OPAQUE AS '
+BEGIN
+	INSERT INTO deletion_transactions (tableID, key1, key2, key3, last_updated)
+	VALUES(4, OLD.id, 0, 0, now()::abstime::int4);
+	RETURN OLD;
+END;
+' LANGUAGE 'plpgsql';
+
+CREATE TRIGGER t_delete_ban AFTER DELETE ON bans FOR EACH ROW EXECUTE PROCEDURE delete_ban();
+
+
 -----------------------------------------------------------------------------------------
 
---Notes:
--- * During registration:
---   - Check to see if at least 10 different hostmasks join the channel.
---   - Check to see if the actual listed supporters join the channel
---    (Add a field to supporters that flags if they've been spotted on the channel?)
-
---  <DrCkTaiL> like - 11 total different clients, 6 of which should be on the
---  supporter list, in 3 days
-  
---  <DrCkTaiL> but all three values should be soft so we could change them
-
--- * Registered channel.
---   If The owner hasn't logged in for 21 days.
---     If noone else has logged in for 21 days:
---	Possible Purge Candidate.
---     Else 
---      Time to organise a new maintainer
