@@ -1,19 +1,20 @@
 #ifndef _NICKSERVCOMMANDS_H
-#define _NICKSERVCOMMANDS_H "$Id: nickservCommands.h,v 1.1 2002/08/11 22:34:13 jeekay Exp $"
+#define _NICKSERVCOMMANDS_H "$Id: nickservCommands.h,v 1.2 2002/08/15 20:46:45 jeekay Exp $"
 
 /**
- * All this code is stolen straight from mod.cservice, which possible had
+ * All this code is stolen straight from mod.cservice, which possibly had
  * stolen it from somewhere else. I'm increasingly convinced that only
  * ripper knows how any of this works.
  */
 
-//#include "iClient.h"
+#include "iClient.h"
+#include "server.h"
 
 namespace gnuworld
 {
 
-class iClient;
-class xServer;
+//class iClient;
+//class xServer;
 
 namespace ns
 {

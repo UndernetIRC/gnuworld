@@ -14,7 +14,7 @@
 
 @SET_MAKE@
 
-# "$Id: Makefile.in,v 1.2 2002/08/10 15:41:02 jeekay Exp $"
+# "$Id: Makefile.in,v 1.3 2002/08/15 20:46:44 jeekay Exp $"
 SHELL = @SHELL@
 
 srcdir = @srcdir@
@@ -106,6 +106,7 @@ libnickserv_la_SOURCES = \
   sqlUser.cc
 
 
+#  WHOAMICommand.cc
 INCLUDES = -I@PGSQL_INCLUDE@ $(INCLTDL)
 subdir = mod.nickserv
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs

@@ -4,13 +4,12 @@
 
 #include "libpq++.h"
 
-#include "client.h"
-#include "server.h"
+#include "StringTokenizer.h"
 
 #include "netData.h"
 #include "nickserv.h"
 
-const char NickServ_cc_rcsId[] = "$Id: nickserv.cc,v 1.2 2002/08/10 19:54:51 jeekay Exp $";
+const char NickServ_cc_rcsId[] = "$Id: nickserv.cc,v 1.3 2002/08/15 20:46:45 jeekay Exp $";
 
 namespace gnuworld
 {
@@ -92,6 +91,9 @@ return xClient::BurstChannels() ;
  */
 void nickserv::ImplementServer( xServer* theServer )
 {
+/* Register the commands we want to use */
+//RegisterCommand(new WHOAMICommand(this, "WHOAMI", ""));
+
 /* Register for all the events we want to see */
 theServer->RegisterEvent(EVT_ACCOUNT, this);
 theServer->RegisterEvent(EVT_CHNICK, this);
@@ -115,18 +117,23 @@ xClient::ImplementServer( theServer );
 /**
  * Here we deal with any network events that we have asked to listen for.
  * The main jobs done are:
- *  EVT_NICK  : Instantiate a netData object and assign it to the iClient.
- *              Add the iClient to the process queue.
- *  EVT_CHNICK: If the iClient isnt in the process queue, readd it.
- *              We do NOT zero the warning count. This is to prevent someone
- *                jumping between registered nicks to avoid getting killed.
- *  EVT_KILL  : Delete the netData instance
- *              Remove the iClient from the process queue
- *  EVT_QUIT  : Delete the netData instance
- *              Remove the iClient from the process queue
+ *  EVT_ACCOUNT : If the account is the same as the nick, we remove it from
+                  the warnQueue should it be there.
+ *  EVT_NICK    : Instantiate a netData object and assign it to the iClient.
+ *                Add the iClient to the process queue.
+ *  EVT_CHNICK  : If the new nick is the current account, do nothing.
+ *                If the iClient isnt in the process queue, readd it.
+ *                We do NOT zero the warning count. This is to prevent someone
+ *                  jumping between registered nicks to avoid getting killed.
+ *  EVT_KILL    : Delete the netData instance
+ *                Remove the iClient from the process queue
+ *  EVT_QUIT    : Delete the netData instance
+ *                Remove the iClient from the process queue
  */
 int nickserv::OnEvent( const eventType& event, void* Data1, void* Data2, void* Data3, void* Data4)
 {
+
+elog << "Got an Event!" << endl;
 
 /* The target user of the event */
 iClient* theClient = static_cast< iClient* >( Data1 );
@@ -145,6 +152,10 @@ switch( event ) {
   case EVT_NICK: {
     netData* theData = new netData();
     theClient->setCustomData(this, theData);
+    if(theClient->isModeR() && (string_lower(theClient->getNickName()) == string_lower(theClient->getAccount()))) {
+      return 1;
+      break;
+    }
     addToQueue(theClient);
     
     return 1;
@@ -152,11 +163,26 @@ switch( event ) {
   } // case EVT_NICK
   
   case EVT_CHNICK: {
-    addToQueue(theClient);
+    if(string_lower(theClient->getNickName()) == string_lower(theClient->getAccount())) {
+      removeFromQueue(theClient);
+    } else {
+      addToQueue(theClient);
+    }
     
     return 1;
     break;
-  }
+  } // case EVT_CHNICK
+  
+  case EVT_ACCOUNT: {
+    elog << "Got account. iClient nick: " << theClient->getNickName() << ", AC: "
+      << theClient->getAccount() << endl;
+    if(string_lower(theClient->getNickName()) == string_lower(theClient->getAccount())) {
+      removeFromQueue(theClient);
+    }
+    
+    return 1;
+    break;
+  } // case EVT_ACCOUNT
 } // switch( event )
 
 return 0;
@@ -167,12 +193,30 @@ return 0;
  * Here we deal with incoming communications from network clients.
  */
 int nickserv::OnPrivateMessage( iClient* theClient,
-	const string& message, bool )
+	const string& Message, bool )
 {
-Notice( theClient, "Howdy :)" ) ;
-return 0 ;
+if(!theClient->isModeR()) {
+  Notice(theClient, "You must be logged in before attempting to use any commands.");
+  return 1;
 }
 
+StringTokenizer st(Message);
+if(st.empty()) {
+  Notice(theClient, "Incomplete command");
+  return 1;
+}
+
+string Command = string_upper(st[0]);
+commandMapType::iterator commHandler = commandMap.find(Command);
+
+if(commHandler == commandMap.end()) {
+  return 1;
+}
+
+commHandler->second->Exec(theClient, Message);
+
+return 1 ;
+}
 
 
 /**
@@ -192,6 +236,16 @@ if(theTimer == processQueue_timerID) {
 return 0;
 } // nickserv::OnTimer(xServer::timerID, void*)
 
+
+
+/**
+ * This is where we register a command so that users can interact
+ * with the module.
+ */
+bool nickserv::RegisterCommand( Command* theCommand )
+{
+//return commandMap.insert( commandPairType(theCommand->getName(), theCommand)).second;
+}
 
 
 /**

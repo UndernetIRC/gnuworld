@@ -1,8 +1,11 @@
 #ifndef _NICKSERV_H
-#define _NICKSERV_H "$Id: nickserv.h,v 1.2 2002/08/10 19:54:51 jeekay Exp $"
+#define _NICKSERV_H "$Id: nickserv.h,v 1.3 2002/08/15 20:46:45 jeekay Exp $"
 
+#include "client.h"
 #include "EConfig.h"
+#include "server.h"
 
+#include "nickservCommands.h"
 #include "sqlManager.h"
 #include "sqlUser.h"
 
@@ -36,21 +39,27 @@ class nickserv : public xClient {
     virtual int OnPrivateMessage( iClient*, const string&, bool secure = false ) ;
     
     /** This method is called when a timer expires */
-    virtual int OnTimer(xServer::timerID, void*);
+    virtual int OnTimer(gnuworld::xServer::timerID, void*);
     
   
     /*********************************
      ** N I C K S E R V   T Y P E S **
      *********************************/
     
-    typedef map< string, sqlUser*, noCaseCompare > sqlUserHashType;
-    
+    typedef map< string, Command*, noCaseCompare > commandMapType;
+    typedef commandMapType::value_type commandPairType;
+
     typedef vector< iClient* > QueueType;
+    
+    typedef map< string, sqlUser*, noCaseCompare > sqlUserHashType;
     
   
     /*************************************
      ** N I C K S E R V   M E T H O D S **
      *************************************/
+
+    /** Register a command */
+    virtual bool RegisterCommand(Command*);
 
     /** Load all users into the user cache */
     void precacheUsers();
@@ -73,6 +82,12 @@ class nickserv : public xClient {
     sqlManager* theManager;
 
   protected:
+    /*********************************************
+     ** I N T E R N A L   M A I N T E N A N C E **
+     *********************************************/
+    
+    commandMapType commandMap;
+
     /*************************************
      ** C O N F I G   V A R I A B L E S **
      *************************************/
@@ -106,7 +121,7 @@ class nickserv : public xClient {
      ***********************/
      
      /** TimerID for processing the queue */
-     xServer::timerID processQueue_timerID;
+     gnuworld::xServer::timerID processQueue_timerID;
      
      
      /*************************
