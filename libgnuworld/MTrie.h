@@ -1,7 +1,7 @@
 /**
  * MTrie.h
  *
- * $Id: MTrie.h,v 1.6 2003/07/27 22:26:45 dan_karrels Exp $
+ * $Id: MTrie.h,v 1.7 2003/07/29 04:43:50 dan_karrels Exp $
  */
 
 #ifndef __MTRIE_H
@@ -12,10 +12,13 @@
 #include	<string>
 #include	<iostream>
 
+#include	"StringTokenizer.h"
+
 using std::map ;
 using std::list ;
 using std::pair ;
 using std::string ;
+using gnuworld::StringTokenizer ;
 
 /**
  * This class is used to store elements keyed by a decimalized string,
@@ -93,10 +96,14 @@ protected:
 	 * matching across multiple levels.
 	 */
 	virtual void	find( const MTrie< data_type >*,
-				list< value_type >&,
-				list< string >&,
+//				list< value_type >&,
+//				list< string >&,
 				const string& origKey,
-				const string& key ) const ;
+				const StringTokenizer&,
+				StringTokenizer::const_reverse_iterator )
+				const ;
+
+//				const string& key ) const ;
 
 	/**
 	 * Recursive erase method that handles all the hard work
@@ -118,8 +125,8 @@ protected:
 	 * strings.
 	 */
 	virtual void	recursiveFind( const MTrie< data_type >*,
-				list< string >& base,
-				list< value_type >& returnMe,
+//				list< string >& base,
+//				list< value_type >& returnMe,
 				const string& key ) const ;
 
 	/**
@@ -166,6 +173,9 @@ protected:
 
 	/// The structure used to store levels in the trie
 	nodesMapType		nodesMap ;
+
+	mutable list< string >	base ;
+	mutable list< value_type >	returnMe ;
 } ;
 
 // This is a template class, cannot compile, so include the source

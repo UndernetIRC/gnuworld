@@ -1,7 +1,7 @@
 /**
  * mtrie.cc
  *
- * $Id: mtrie.cc,v 1.3 2003/07/24 04:03:19 dan_karrels Exp $
+ * $Id: mtrie.cc,v 1.4 2003/07/29 04:43:51 dan_karrels Exp $
  */
 
 #include	<string>
@@ -64,6 +64,11 @@ while( getline( inFile, line ) )
 
 //Ay N tealie- 2 1053874792 ~tealie 7-11.sbg.org +i BCXaYv AyADd :Tealie
 	StringTokenizer spaceTokens( line ) ;
+	if( spaceTokens[ 1 ] == "EB" )
+		{
+		break ;
+		}
+
 	if( spaceTokens.size() < 8 )
 		{
 		continue ;
@@ -111,6 +116,10 @@ do
 		}
 
 	StringTokenizer st( line ) ;
+	if( st.empty() )
+		{
+		continue ;
+		}
 
 	if( st[ 0 ] == "help" )
 		{
@@ -170,12 +179,6 @@ if( st.size() != 2 )
 typedef list< MTrie< string >::value_type > valuesListType ;
 valuesListType values = hostTrie.find( st[ 1 ] ) ;
 
-cout	<< "Search found "
-	<< values.size()
-	<< " match"
-	<< ((values.size() != 1) ? "es" : "")
-	<< endl ;
-
 for( valuesListType::const_iterator vItr = values.begin() ;
 	vItr != values.end() ; ++vItr )
 	{
@@ -183,6 +186,11 @@ for( valuesListType::const_iterator vItr = values.begin() ;
 		<< vItr->second
 		<< endl ;
 	}
+cout	<< "Search found "
+	<< values.size()
+	<< " match"
+	<< ((values.size() != 1) ? "es" : "")
+	<< endl ;
 }
 
 void handleErase( const string& line )

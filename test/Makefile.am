@@ -1,7 +1,8 @@
 ## Process this file with automake to produce Makefile.in
-## $Id: Makefile.am,v 1.12 2003/07/27 22:26:47 dan_karrels Exp $
+## $Id: Makefile.am,v 1.13 2003/07/29 04:43:51 dan_karrels Exp $
 
-noinst_PROGRAMS = test_mtrie_perf_summary \
+noinst_PROGRAMS = test_mtrie_load \
+	test_mtrie_perf_summary \
 	test_mtrie_perf \
 	test_mtrie \
 	test_stringtokenizer \
@@ -14,6 +15,7 @@ noinst_PROGRAMS = test_mtrie_perf_summary \
 LDADD = $(glibdir)/libgnuworld.la
 
 test_mtrie_SOURCES = mtrie.cc
+test_mtrie_load_SOURCES = mtrie_load.cc
 test_mtrie_perf_SOURCES = mtrie_perf.cc
 test_mtrie_perf_summary_SOURCES = mtrie_perf_summary.cc
 test_stringtokenizer_SOURCES = stringtokenizer.cc
