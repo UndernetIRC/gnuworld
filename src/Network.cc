@@ -23,7 +23,7 @@
 #include	"StringTokenizer.h"
 
 const char xNetwork_h_rcsId[] = __NETWORK_H ;
-const char xNetwork_cc_rcsId[] = "$Id: Network.cc,v 1.26 2001/05/17 20:04:24 dan_karrels Exp $" ;
+const char xNetwork_cc_rcsId[] = "$Id: Network.cc,v 1.27 2001/05/21 16:11:24 dan_karrels Exp $" ;
 const char ELog_h_rcsId[] = __ELOG_H ;
 const char iClient_h_rcsId[] = __ICLIENT_H ;
 const char Channel_h_rcsId[] = __CHANNEL_H ;
@@ -814,6 +814,11 @@ for( list< const iClient* >::const_iterator ptr = matchingHosts.begin() ;
 
 // Return the list of matching username and hostnames
 return retMe ;
+}
+
+size_t xNetwork::countMatchingUserHost( const string& wildUserHost ) const
+{
+return matchUserHost( wildUserHost ).size() ;
 }
 
 list< const iClient* > xNetwork::findHost( const string& hostName ) const

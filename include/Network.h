@@ -3,7 +3,7 @@
  */
 
 #ifndef __NETWORK_H
-#define __NETWORK_H "$Id: Network.h,v 1.16 2001/05/17 20:04:24 dan_karrels Exp $"
+#define __NETWORK_H "$Id: Network.h,v 1.17 2001/05/21 16:11:23 dan_karrels Exp $"
 
 #include	<vector>
 #include	<string>
@@ -454,6 +454,12 @@ public:
 	 */
 	virtual size_t	countMatchingHost( const string& wildHost ) const ;
 
+	/**
+	 * Perform a similar match as to matchUserHost(), except return
+	 * only the number of matches found.
+	 */
+	virtual size_t	countMatchingUserHost( const string& wildUserHost )
+				const ;
 	/**
 	 * Perform a similar operation as to findHost(), except return
 	 * only the number of hosts found.
