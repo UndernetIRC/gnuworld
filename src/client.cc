@@ -27,7 +27,7 @@
 #include	"events.h"
 
 const char xClient_h_rcsId[] = __XCLIENT_H ;
-const char xClient_cc_rcsId[] = "$Id: client.cc,v 1.2 2000/08/01 00:02:34 dan_karrels Exp $" ;
+const char xClient_cc_rcsId[] = "$Id: client.cc,v 1.3 2000/08/01 00:11:21 dan_karrels Exp $" ;
 
 using std::string ;
 using std::strstream ;
@@ -638,7 +638,9 @@ if( !onChannel )
 	Join( theChan ) ;
 	}
 
-Write( "%s I %s %s", getCharYYXXX().c_str(), theClient->getCharYYXXX().c_str(),
+Write( "%s I %s %s",
+	getCharYYXXX().c_str(),
+	theClient->getNickName().c_str(),
 	theChan->getName().c_str() ) ;
 
 if( !onChannel )
@@ -662,8 +664,9 @@ if( !onChannel )
 	Join( theChan ) ;
 	}
 
-Write( "%s I %s %s", getCharYYXXX().c_str(),
-	theClient->getCharYYXXX().c_str(),
+Write( "%s I %s %s",
+	getCharYYXXX().c_str(),
+	theClient->getNickName().c_str(),
 	theChan->getName().c_str() ) ;
 
 if( !onChannel )
