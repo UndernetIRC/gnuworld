@@ -20,7 +20,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
  * USA.
  *
- * $Id: cloner.cc,v 1.15 2002/08/01 13:27:35 reedloden Exp $
+ * $Id: cloner.cc,v 1.16 2002/08/01 18:59:32 reedloden Exp $
  */
 
 #include	<new>
@@ -45,7 +45,7 @@
 
 const char client_h_rcsId[] = __CLIENT_H ;
 const char cloner_h_rcsId[] = __CLONER_H ;
-const char cloner_cc_rcsId[] = "$Id: cloner.cc,v 1.15 2002/08/01 13:27:35 reedloden Exp $" ;
+const char cloner_cc_rcsId[] = "$Id: cloner.cc,v 1.16 2002/08/01 18:59:32 reedloden Exp $" ;
 const char iClient_h_rcsId[] = __ICLIENT_H ;
 const char EConfig_h_rcsId[] = __ECONFIG_H ;
 const char ELog_h_rcsId[] = __ELOG_H ;
@@ -178,7 +178,29 @@ if( st.empty() )
 
 string command( string_upper( st[ 0 ] ) ) ;
 
-if( command == "LOADCLONES" )
+if( command == "SHOWCOMMANDS" || command == "HELP" )
+	{
+	if( st.size() < 1 )
+		{
+		Notice( theClient, "Usage: %s", command ) ;
+		return 0 ;
+		}
+	if( st.size() >= 1 )
+		{
+		Notice( theClient, "_-=[Cloner Help]=-_" ) ;
+		Notice( theClient, "LOADCLONES <# of clones> - Queue
+			creation of clone(s)" ) ;
+		Notice( theClient, "JOINALL <#channel> - Make all clones
+			/join a #channel" ) ;
+		Notice( theClient, "PARTALL <#channel> [reason] - Make
+			all clones /part a #channel with an optional
+			reason" ) ;
+		Notice( theClient, "KILLALL/QUITALL [reason] - Make all
+			clones /quit with an optional reason" ) ;
+		Notice( theClient, "_-=[End of Cloner Help]=-_" ) ;
+		}
+	}
+else if( command == "LOADCLONES" )
 	{
 	if( st.size() < 2 )
 		{
@@ -211,7 +233,7 @@ else if( command == "JOINALL" )
 	{
 	if( st.size() < 2 )
 		{
-		Notice( theClient, "Usage: JOINALL <channel>" ) ;
+		Notice( theClient, "Usage: JOINALL <#channel>" ) ;
 		return 0 ;
 		}
 
@@ -237,26 +259,54 @@ else if( command == "PARTALL" )
 	{
 	if( st.size() < 2 )
 		{
-		Notice( theClient, "Usage: PARTALL <channel>" ) ;
+		Notice( theClient, "Usage: PARTALL <#channel> [reason]" ) ;
 		return 0 ;
 		}
 
-	string chanName( st[ 1 ] ) ;
-	if( chanName[ 0 ] != '#' )
+	if { st.size() == 2 )
 		{
-		chanName.insert( chanName.begin(), '#' ) ;
+		string chanName( st[ 1 ] ) ;
+		if( chanName[ 0 ] != '#' )
+			{
+			chanName.insert( chanName.begin(), '#' ) ;
+			}
+
+		for( list< iClient* >::const_iterator ptr = clones.begin(),
+			endPtr = clones.end() ; ptr != endPtr ; ++ptr )
+			{
+			stringstream s ;
+			s	<< (*ptr)->getCharYYXXX()
+				<< " L "
+				<< chanName
+				<< ends ;
+
+			MyUplink->Write( s ) ;
+			}
 		}
-
-	for( list< iClient* >::const_iterator ptr = clones.begin(),
-		endPtr = clones.end() ; ptr != endPtr ; ++ptr )
+	if (st.size() >= 2 )
 		{
-		stringstream s ;
-		s	<< (*ptr)->getCharYYXXX()
-			<< " L "
-			<< chanName
-			<< ends ;
+		string chanName( st[ 1 ] ) ;
+		if( chanName[ 0 ] != '#' )
+			{
+			chanName.insert( chanName.begin(), '#' ) ;
+			}
 
-		MyUplink->Write( s ) ;
+		// This needs to be changed to >= 2 and not just 2. -reed
+		string partReason( st[ 2 ] ) ;
+
+		for( list< iClient* >::const_iterator ptr = clones.begin(),
+			endPtr = clones.end() ; ptr != endPtr ; ++ptr )
+			{
+			stringstream s ;
+			s	<< (*ptr)->getCharYYXXX()
+				<< " L "
+				<< chanName
+				<< " :"
+				<< partReason
+				<< ends ;
+
+			MyUplink->Write( s ) ;
+			}
 		}
 	} // PARTALL
 else if( command == "KILLALL" || command == "QUITALL" )
@@ -285,6 +335,7 @@ else if( command == "KILLALL" || command == "QUITALL" )
 	if( st.size() >= 2 )
 		{
 
+		// This needs to be changed to >= 1 and not just 1. -reed
 		string quitMsg( st[ 1 ] ) ;
 
 		for( list< iClient* >::const_iterator ptr = clones.begin(),

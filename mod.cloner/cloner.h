@@ -1,4 +1,5 @@
-/* cloner.h
+/**
+ * cloner.h
  * Load fake clones for testing or fun.
  *
  * Copyright (C) 2002 Daniel Karrels <dan@karrels.com>
@@ -19,11 +20,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
  * USA.
  *
- * $Id: cloner.h,v 1.5 2002/08/01 13:27:35 reedloden Exp $
+ * $Id: cloner.h,v 1.6 2002/08/01 18:59:32 reedloden Exp $
  */
 
 #ifndef __CLONER_H
-#define __CLONER_H "$Id: cloner.h,v 1.5 2002/08/01 13:27:35 reedloden Exp $"
+#define __CLONER_H "$Id: cloner.h,v 1.6 2002/08/01 18:59:32 reedloden Exp $"
 
 #include	<string>
 #include	<vector>
