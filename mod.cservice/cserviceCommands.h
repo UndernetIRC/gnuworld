@@ -1,5 +1,5 @@
 #ifndef __CSERVICECOMMANDS_H
-#define __CSERVICECOMMANDS_H "$Id: cserviceCommands.h,v 1.19 2001/01/24 01:13:52 gte Exp $"
+#define __CSERVICECOMMANDS_H "$Id: cserviceCommands.h,v 1.20 2001/01/27 19:26:21 dan_karrels Exp $"
 
 #include	<string>
 #include	"iClient.h"
@@ -22,7 +22,7 @@ public:
            server( 0 ),
            commName( _commName ),
            help( _help ),
-		   flood_points( _flood_points )
+	   flood_points( _flood_points )
         {}
         virtual ~Command() {}
 
