@@ -12,7 +12,7 @@
  * Displays all "Level" records for a specified channel.
  * Can optionally narrow down selection using a number of switches.
  *
- * $Id: ACCESSCommand.cc,v 1.43 2002/05/23 17:43:12 dan_karrels Exp $
+ * $Id: ACCESSCommand.cc,v 1.44 2002/12/08 19:41:53 gte Exp $
  */
 
 #include	<string>
@@ -28,7 +28,7 @@
 #include	"cservice_config.h"
 #include	"Network.h"
 
-const char ACCESSCommand_cc_rcsId[] = "$Id: ACCESSCommand.cc,v 1.43 2002/05/23 17:43:12 dan_karrels Exp $" ;
+const char ACCESSCommand_cc_rcsId[] = "$Id: ACCESSCommand.cc,v 1.44 2002/12/08 19:41:53 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -342,7 +342,7 @@ for (int i = 0 ; i < bot->SQLDb->Tuples(); i++)
 			autoMode.c_str()
 		);
 
-		if(suspend_expires != 0)
+		if( suspend_expires > bot->currentTime() )
 			{
 			unsigned int suspendLevel = atoi(bot->SQLDb->GetValue(i, 8));
 

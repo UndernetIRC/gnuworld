@@ -13,7 +13,7 @@
 #include	"cservice_config.h"
 #include	"Network.h"
 
-const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.47 2002/11/25 03:53:16 jeekay Exp $" ;
+const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.48 2002/12/08 19:41:53 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -327,7 +327,7 @@ for (autoOpVectorType::const_iterator resultPtr = autoOpVector.begin();
 	 *  (*smack* Ace)
 	 */
 
-	if(resultPtr->suspend_expires > 0)
+	if(resultPtr->suspend_expires > bot->currentTime() )
 	{
 		continue;
 	}

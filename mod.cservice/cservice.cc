@@ -2,7 +2,7 @@
  * cservice.cc
  * Author: Greg Sikorski
  * Purpose: Overall control client.
- * $Id: cservice.cc,v 1.223 2002/10/19 20:08:06 gte Exp $
+ * $Id: cservice.cc,v 1.224 2002/12/08 19:41:53 gte Exp $
  */
 
 #include	<new>
@@ -758,15 +758,19 @@ else if(Command == "VERSION")
 	xClient::DoCTCP(theClient, CTCP,
 		"Undernet P10 Channel Services II ["
 		__DATE__ " " __TIME__
-		"] Release 1.1pl8");
+		"] Release 1.1pl10");
 	}
 else if(Command == "PROBLEM?")
 	{
-	xClient::DoCTCP(theClient, CTCP.c_str(), "Blame Gte!");
+	xClient::DoCTCP(theClient, CTCP.c_str(), "Blame Bleep!");
 	}
-else if(Command == "WHAT_YOU_SAY?")
+else if(Command == "PUSHER")
 	{
-	xClient::DoCTCP(theClient, CTCP.c_str(), "Move 'Zig'!");
+	xClient::DoCTCP(theClient, CTCP.c_str(), "Pak, Chooie, Unf.");
+	}
+else if(Command == "OPEN_THE_POD_BAY_DOORS")
+	{
+	xClient::DoCTCP(theClient, CTCP.c_str(), "Daisey.. Daisey, give me your ans--");
 	}
 else if(Command == "SOUND")
 	{
@@ -1131,7 +1135,7 @@ if (theChan->getFlag(sqlChannel::F_SUSPEND))
  *  suspended too.
  */
 
-if (theLevel->getSuspendExpire() != 0)
+if (theLevel->getSuspendExpire() > currentTime())
 	{
 	// Send them a notice.
 	if (theUser->isAuthed() && notify)
@@ -1243,8 +1247,10 @@ if(ptr != translationTable.end())
  */
 if (lang_id != 1)
 	{
-	// TODO: Set the language for this user to english.
-	// return getResponse(theUser,1);
+	pair<int, int> thePair( 1, response_id );
+	translationTableType::iterator ptr = translationTable.find(thePair);
+	if(ptr != translationTable.end())
+		return ptr->second ;
 	}
 
 if( !msg.empty() )
@@ -3292,15 +3298,18 @@ newBan->insertRecord();
 
 sqlUser* theUser = isAuthed(theClient, false);
 if (theUser)
-	{
-	sqlLevel* accessRec = getLevelRecord(theUser, theChan);
-	if (accessRec)
-		{
-		accessRec->setSuspendExpire(currentTime() + 300);
-		accessRec->setSuspendBy(nickName);
-		accessRec->commit();
-		}
-	}
+{
+  sqlLevel* accessRec = getLevelRecord(theUser, theChan);
+  if (accessRec && (accessRec->getSuspendExpire() < (currentTime() + 300)))
+  {
+    int susLev = accessRec->getAccess() + 1;
+    if (accessRec->getSuspendLevel() < susLev)
+      accessRec->setSuspendLevel(susLev);
+    accessRec->setSuspendExpire(currentTime() + 300);
+    accessRec->setSuspendBy(nickName);
+    accessRec->commit();
+  }
+}
 
 Channel* netChan = Network->findChannel(theChan->getName());
 

@@ -7,7 +7,7 @@
  * Suspends an user on the specified channel, if suspend duration 0
  * is defined, the user will be unsuspended.
  *
- * $Id: SUSPENDCommand.cc,v 1.22 2002/01/05 01:00:49 gte Exp $
+ * $Id: SUSPENDCommand.cc,v 1.23 2002/12/08 19:41:53 gte Exp $
  */
 
 #include	<string>
@@ -21,7 +21,7 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char SUSPENDCommand_cc_rcsId[] = "$Id: SUSPENDCommand.cc,v 1.22 2002/01/05 01:00:49 gte Exp $" ;
+const char SUSPENDCommand_cc_rcsId[] = "$Id: SUSPENDCommand.cc,v 1.23 2002/12/08 19:41:53 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -224,7 +224,7 @@ if( 0 == finalDuration )
 	return true;
 	}
 
-if (aLevel->getSuspendExpire() != 0)
+if (aLevel->getSuspendExpire() > bot->currentTime())
 	{
 	bot->Notice(theClient,
 		bot->getResponse(theUser,
