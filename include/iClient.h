@@ -2,11 +2,12 @@
  */
 
 #ifndef __ICLIENT_H
-#define __ICLIENT_H "$Id: iClient.h,v 1.7 2000/12/15 00:13:44 dan_karrels Exp $"
+#define __ICLIENT_H "$Id: iClient.h,v 1.8 2000/12/23 02:05:14 dan_karrels Exp $"
 
 #include	<string>
 #include	<list>
 #include	<iostream>
+#include	<map>
 
 #include	<ctime>
 
@@ -15,9 +16,12 @@
 
 using std::string ;
 using std::list ;
+using std::map ;
 
 namespace gnuworld
 {
+
+class xClient ;
 
 /**
  * iClient objects represent network users.  This class provides
@@ -273,6 +277,10 @@ public:
 	inline const string getCharYYXXX() const
 		{ return( string( charYY ) + charXXX ) ; }
 
+	bool		setCustomData( xClient*, void* ) ;
+	void*		getCustomData( xClient* ) const ;
+	void*		removeCustomData( xClient* ) ;
+
 	/**
 	 * operator<< is overloaded for debugging purposes,
 	 * this makes it extremely easy to output this client's
@@ -379,6 +387,9 @@ protected:
 	 * The structure used to store which channels this user is in.
 	 */
 	channelListType	channelList ;
+
+	typedef map< xClient*, void* >	customDataMapType ;
+	customDataMapType		customDataMap ;
 
 } ;
 

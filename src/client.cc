@@ -27,7 +27,7 @@
 #include	"events.h"
 
 const char xClient_h_rcsId[] = __XCLIENT_H ;
-const char xClient_cc_rcsId[] = "$Id: client.cc,v 1.15 2000/12/23 00:56:50 dan_karrels Exp $" ;
+const char xClient_cc_rcsId[] = "$Id: client.cc,v 1.16 2000/12/23 02:05:14 dan_karrels Exp $" ;
 
 using std::string ;
 using std::strstream ;
@@ -1090,6 +1090,10 @@ return 0 ;
 int xClient::OnSignal( int whichSig )
 {
 return 0 ;
+}
+
+void xClient::deleteCustomData( void* )
+{
 }
 
 } // namespace gnuworld

@@ -4,15 +4,20 @@
 #include	<string>
 #include	<iostream>
 #include	<ctime>
+#include	<map>
+
+#include	<cassert>
 
 #include	"iClient.h"
+#include	"client.h"
 #include	"Numeric.h"
 #include	"ip.h"
 
 const char iClient_h_rcsId[] = __ICLIENT_H ;
-const char iClient_cc_rcsId[] = "$Id: iClient.cc,v 1.4 2000/12/15 00:13:45 dan_karrels Exp $" ;
+const char iClient_cc_rcsId[] = "$Id: iClient.cc,v 1.5 2000/12/23 02:05:14 dan_karrels Exp $" ;
 
 using std::string ;
+using std::map ;
 
 namespace gnuworld
 {
@@ -68,7 +73,13 @@ setModes( _mode ) ;
 }
 
 iClient::~iClient()
-{}
+{
+for( customDataMapType::iterator ptr = customDataMap.begin() ;
+	ptr != customDataMap.end() ; ++ptr )
+	{
+	ptr->first->deleteCustomData( ptr->second ) ;
+	}
+}
 
 void iClient::setModes( const string& newModes )
 {
@@ -127,6 +138,50 @@ if( mode & MODE_DEAF )		retMe += 'd' ;
 if( mode & MODE_SERVICES )	retMe += 'k' ;
 
 return retMe ;
+}
+
+bool iClient::setCustomData( xClient* theClient, void* data )
+{
+#ifndef NDEBUG
+  assert( theClient != 0 ) ;
+#endif
+
+if( customDataMap.find( theClient ) != customDataMap.end() )
+	{
+	return false ;
+	}
+
+return customDataMap.insert( customDataMapType::value_type(
+	theClient, data ) ).second ;
+}
+
+void* iClient::getCustomData( xClient* theClient ) const
+{
+#ifndef NDEBUG
+  assert( theClient != 0 ) ;
+#endif
+
+customDataMapType::const_iterator ptr = customDataMap.find( theClient ) ;
+if( ptr == customDataMap.end() )
+	{
+	return 0 ;
+	}
+return ptr->second ;
+}
+
+void* iClient::removeCustomData( xClient* theClient )
+{
+#ifndef NDEBUG
+  assert( theClient != 0 ) ;
+#endif
+
+customDataMapType::iterator ptr = customDataMap.find( theClient ) ;
+if( ptr == customDataMap.end() )
+	{
+	return 0 ;
+	}
+customDataMap.erase( ptr ) ;
+return ptr->second ;
 }
 
 } // namespace gnuworld
