@@ -1,7 +1,7 @@
 /* sqlChannel.h */
 
 #ifndef __SQLCHANNEL_H
-#define __SQLCHANNEL_H "$Id: sqlChannel.h,v 1.32 2001/09/05 03:47:56 gte Exp $"
+#define __SQLCHANNEL_H "$Id: sqlChannel.h,v 1.33 2001/09/09 21:54:22 gte Exp $"
 
 #include	<string>
 #include	<map>
@@ -23,22 +23,22 @@ public:
 
 	typedef unsigned int	flagType ;
 
-	static const flagType	F_NOPURGE  = 0x00000001 ;
-	static const flagType	F_SPECIAL  = 0x00000002 ;
-	static const flagType	F_NOREG    = 0x00000004 ;
-	static const flagType	F_NEVREG   = 0x00000008 ;
-	static const flagType	F_SUSPEND  = 0x00000010 ;
-	static const flagType	F_TEMP     = 0x00000020 ;
-	static const flagType	F_CAUTION  = 0x00000040 ;
-	static const flagType	F_VACATION = 0x00000080 ;
-	static const flagType   F_LOCKED   = 0x00000100 ;
+	static const flagType	F_NOPURGE;
+	static const flagType	F_SPECIAL;
+	static const flagType	F_NOREG;
+	static const flagType	F_NEVREG;
+	static const flagType	F_SUSPEND;
+	static const flagType	F_TEMP;
+	static const flagType	F_CAUTION;
+	static const flagType	F_VACATION;
+	static const flagType   F_LOCKED;
 
-	static const flagType	F_ALWAYSOP  = 0x00010000 ;
-	static const flagType	F_STRICTOP  = 0x00020000 ;
-	static const flagType	F_NOOP      = 0x00040000 ;
-	static const flagType	F_AUTOTOPIC = 0x00080000 ;
-	static const flagType	F_OPONLY    = 0x00100000 ; // Deprecated
-	static const flagType	F_AUTOJOIN  = 0x00200000 ;
+	static const flagType	F_ALWAYSOP;
+	static const flagType	F_STRICTOP;
+	static const flagType	F_NOOP;
+	static const flagType	F_AUTOTOPIC;
+	static const flagType	F_OPONLY; 	// Deprecated.
+	static const flagType	F_AUTOJOIN;
 
 	/*
 	 *   Channel 'Event' Flags, used in the channelog table.
@@ -46,19 +46,19 @@ public:
 	 *   in reports.
 	 */
 
-	static const unsigned short	EV_MISC     = 1 ;
-	static const unsigned short	EV_JOIN     = 2 ;
-	static const unsigned short	EV_PART     = 3 ;
-	static const unsigned short	EV_OPERJOIN = 4 ;
-	static const unsigned short	EV_OPERPART = 5 ;
-	static const unsigned short	EV_FORCE    = 6 ;
-	static const unsigned short	EV_REGISTER = 7 ;
-	static const unsigned short	EV_PURGE    = 8 ;
+	static const unsigned short	EV_MISC;
+	static const unsigned short	EV_JOIN;
+	static const unsigned short	EV_PART;
+	static const unsigned short	EV_OPERJOIN;
+	static const unsigned short	EV_OPERPART;
+	static const unsigned short	EV_FORCE;
+	static const unsigned short	EV_REGISTER ;
+	static const unsigned short	EV_PURGE;
 
 	/* Manually added Comment */
-	static const unsigned short	EV_COMMENT  = 9 ;
-	static const unsigned short	EV_REMOVEALL= 10 ;
-	static const unsigned short	EV_IDLE		= 11 ;
+	static const unsigned short	EV_COMMENT;
+	static const unsigned short	EV_REMOVEALL;
+	static const unsigned short	EV_IDLE;
 
 	/*
 	 *  Methods to get data atrributes.

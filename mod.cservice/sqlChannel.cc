@@ -9,7 +9,7 @@
  * 30/12/2000: Moved static SQL data to constants.h --Gte
  * Set loadData up to take data from rows other than 0.
  *
- * $Id: sqlChannel.cc,v 1.28 2001/09/05 03:47:56 gte Exp $
+ * $Id: sqlChannel.cc,v 1.29 2001/09/09 21:54:22 gte Exp $
  */
 
 #include	<strstream>
@@ -25,7 +25,7 @@
 #include	"cservice_config.h"
 
 const char sqlChannel_h_rcsId[] = __SQLCHANNEL_H ;
-const char sqlChannel_cc_rcsId[] = "$Id: sqlChannel.cc,v 1.28 2001/09/05 03:47:56 gte Exp $" ;
+const char sqlChannel_cc_rcsId[] = "$Id: sqlChannel.cc,v 1.29 2001/09/09 21:54:22 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -34,6 +34,37 @@ using std::string ;
 using std::endl ;
 using std::strstream ;
 using std::ends ;
+
+const sqlChannel::flagType sqlChannel::F_NOPURGE  = 0x00000001 ;
+const sqlChannel::flagType sqlChannel::F_SPECIAL  = 0x00000002 ;
+const sqlChannel::flagType sqlChannel::F_NOREG    = 0x00000004 ;
+const sqlChannel::flagType sqlChannel::F_NEVREG   = 0x00000008 ;
+const sqlChannel::flagType sqlChannel::F_SUSPEND  = 0x00000010 ;
+const sqlChannel::flagType sqlChannel::F_TEMP     = 0x00000020 ;
+const sqlChannel::flagType sqlChannel::F_CAUTION  = 0x00000040 ;
+const sqlChannel::flagType sqlChannel::F_VACATION = 0x00000080 ;
+const sqlChannel::flagType sqlChannel::F_LOCKED   = 0x00000100 ;
+
+const sqlChannel::flagType sqlChannel::F_ALWAYSOP  = 0x00010000 ;
+const sqlChannel::flagType sqlChannel::F_STRICTOP  = 0x00020000 ;
+const sqlChannel::flagType sqlChannel::F_NOOP      = 0x00040000 ;
+const sqlChannel::flagType sqlChannel::F_AUTOTOPIC = 0x00080000 ;
+const sqlChannel::flagType sqlChannel::F_OPONLY    = 0x00100000 ; // Deprecated
+const sqlChannel::flagType sqlChannel::F_AUTOJOIN  = 0x00200000 ;
+
+const unsigned short sqlChannel::EV_MISC     = 1 ;
+const unsigned short sqlChannel::EV_JOIN     = 2 ;
+const unsigned short sqlChannel::EV_PART     = 3 ;
+const unsigned short sqlChannel::EV_OPERJOIN = 4 ;
+const unsigned short sqlChannel::EV_OPERPART = 5 ;
+const unsigned short sqlChannel::EV_FORCE    = 6 ;
+const unsigned short sqlChannel::EV_REGISTER = 7 ;
+const unsigned short sqlChannel::EV_PURGE    = 8 ;
+
+/* Manually added Comment */
+const unsigned short sqlChannel::EV_COMMENT 	= 9  ;
+const unsigned short sqlChannel::EV_REMOVEALL	= 10 ;
+const unsigned short sqlChannel::EV_IDLE		= 11 ;
 
 sqlChannel::sqlChannel(PgDatabase* _SQLDb)
  : id(0),

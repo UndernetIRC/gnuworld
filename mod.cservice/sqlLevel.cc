@@ -4,7 +4,7 @@
  * Storage class for accessing channel user/level information either from the backend
  * or internal storage.
  *
- * $Id: sqlLevel.cc,v 1.12 2001/09/05 03:47:56 gte Exp $
+ * $Id: sqlLevel.cc,v 1.13 2001/09/09 21:54:22 gte Exp $
  */
 
 #include	<strstream>
@@ -23,13 +23,19 @@
 #include	"cservice_config.h"
 
 const char sqlLevel_h_rcsId[] = __SQLLEVEL_H ;
-const char sqlLevel_cc_rcsId[] = "$Id: sqlLevel.cc,v 1.12 2001/09/05 03:47:56 gte Exp $" ;
+const char sqlLevel_cc_rcsId[] = "$Id: sqlLevel.cc,v 1.13 2001/09/09 21:54:22 gte Exp $" ;
 
 namespace gnuworld
 {
 
 using std::string ;
 using std::endl ;
+
+const sqlLevel::flagType sqlLevel::F_AUTOOP =	0x01 ;
+const sqlLevel::flagType sqlLevel::F_PROTECT =	0x02 ;
+const sqlLevel::flagType sqlLevel::F_FORCED =	0x04 ;
+const sqlLevel::flagType sqlLevel::F_AUTOVOICE =0x08 ;
+const sqlLevel::flagType sqlLevel::F_ONDB =		0x10 ;
 
 sqlLevel::sqlLevel(PgDatabase* _SQLDb)
  :channel_id(0),
