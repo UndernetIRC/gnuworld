@@ -14,7 +14,7 @@
 #include	"ELog.h"
 #include	"xparameters.h"
 
-const char msg_SQ_cc_rcsId[] = "$Id: msg_SQ.cc,v 1.7 2002/05/19 22:24:49 dan_karrels Exp $" ;
+const char msg_SQ_cc_rcsId[] = "$Id: msg_SQ.cc,v 1.8 2002/05/19 23:12:02 dan_karrels Exp $" ;
 const char server_h_rcsId[] = __SERVER_H ;
 const char events_h_rcsId[] = __EVENTS_H ;
 const char Network_h_rcsId[] = __NETWORK_H ;
@@ -85,23 +85,22 @@ else
 //	elog	<< "xServer::MSG_SQ> " << squitServer->getName()
 //		<< " has been squit\n" ;
 
+	string source( Param[ 0 ] ) ;
+	string reason( Param[ 3 ] ) ;
+
+	PostEvent( EVT_NETBREAK,
+		static_cast< void* >( squitServer ),
+		static_cast< void* >( &source ),
+		static_cast< void* >( &reason ) ) ;
+
 	// Otherwise, it's just some server.
+	// xNetwork::OnSplit() will deallocate all servers
+	// which are split
 	Network->OnSplit( squitServer->getIntYY() ) ;
 
 	// Remove this server from the juped list (if its there)
 	RemoveJupe(squitServer);
 	}
-
-string source( Param[ 0 ] ) ;
-string reason( Param[ 3 ] ) ;
-
-PostEvent( EVT_NETBREAK,
-	static_cast< void* >( squitServer ),
-	static_cast< void* >( &source ),
-	static_cast< void* >( &reason ) ) ;
-
-// Deallocate
-delete squitServer ;
 
 return 0 ;
 }

@@ -24,7 +24,7 @@
 #include	"ip.h"
 
 const char xNetwork_h_rcsId[] = __NETWORK_H ;
-const char xNetwork_cc_rcsId[] = "$Id: Network.cc,v 1.38 2002/05/19 22:24:49 dan_karrels Exp $" ;
+const char xNetwork_cc_rcsId[] = "$Id: Network.cc,v 1.39 2002/05/19 23:12:02 dan_karrels Exp $" ;
 const char ELog_h_rcsId[] = __ELOG_H ;
 const char iClient_h_rcsId[] = __ICLIENT_H ;
 const char Channel_h_rcsId[] = __CHANNEL_H ;
@@ -577,6 +577,8 @@ if( !nickMap.insert( nickMapType::value_type(
  * server numerics which need to be removed, and then perform the
  * removals in an iterative manner.
  * (intYY) is the server numeric of the server to be removed.
+ * The caller of this method is responsible for posting the
+ * EVT_NETBREAK event.
  */
 void xNetwork::OnSplit( const unsigned int& intYY )
 {
@@ -598,39 +600,7 @@ findLeaves( yyVector, intYY ) ;
 
 // yyVector should now have all leaf servers (if any) of intYY,
 // each of which must be removed.
-// First, let's leave them in place, and send events to all
-// handlers of the EVT_NETBREAK event.
 
-// Iterate through the vector of server numerics to be removed
-for( yyVectorType::const_iterator yyIterator = yyVector.begin() ;
-	yyIterator != yyVector.end() ; ++yyIterator )
-	{
-
-	// Obtain a pointer to the server being removed.
-	// Since findLeaves() presumably encountered this iServer*
-	// it sure better not be NULL here.
-	iServer* serverPtr = findServer( *yyIterator ) ;
-	assert( serverPtr != 0 ) ;
-
-	// Obtain serverPtr's uplink here, also for posting to
-	// event handlers
-	iServer* uplinkPtr = findServer( serverPtr->getUplinkIntYY() ) ;
-	assert( uplinkPtr != 0 ) ;
-
-	// (reason) is the reason that the netsplit is occuring
-	// TODO: get the real from from msg_SQ
-	string reason("Uplink Splitted");
-
-	// Post the event to the core xServer class for distribution
-	// to xClient event handlers
-	theServer->PostEvent( EVT_NETBREAK,
-		   static_cast< void * >( serverPtr ),
-		   static_cast< void * >( uplinkPtr ),
-		   static_cast< void * >( &reason ) ) ;
-	}
-
-// All xClients (who care) have been notified of the various servers
-// that are splitting
 // Now iterate through the server numeric vector once more and
 // remove the servers from the network data tables.
 // Note that this will call removeServer() for each server,
@@ -647,6 +617,11 @@ for( yyVectorType::const_iterator yyIterator = yyVector.begin() ;
 	// and readability
 	iServer* removeMe = findServer( *yyIterator ) ;
 	assert( removeMe != 0 ) ;
+
+	// Generate some debugging information
+//	elog	<< "xNetwork::OnSplit> Removing server: "
+//		<< *removeMe
+//		<< endl ;
 
 	// Remove the server, its clients, any empty channels,
 	// and post events for all of the above.
