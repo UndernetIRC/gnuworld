@@ -166,7 +166,7 @@ RegisterCommand(new ACCESSCommand(this, "ACCESS", "[channel] [username] [-min n]
 RegisterCommand(new CHANINFOCommand(this, "CHANINFO", "<#channel>", 3));
 RegisterCommand(new ISREGCommand(this, "ISREG", "<#channel>", 4));
 RegisterCommand(new VERIFYCommand(this, "VERIFY", "<nick>", 3));
-RegisterCommand(new SEARCHCommand(this, "SEARCH", "<keywords>", 5));
+RegisterCommand(new SEARCHCommand(this, "SEARCH", "[-minusers <amount>] <keywords>", 5));
 RegisterCommand(new MOTDCommand(this, "MOTD", "", 4));
 RegisterCommand(new HELPCommand(this, "HELP", "[command]", 4));
 RegisterCommand(new RANDOMCommand(this, "RANDOM", "", 4));

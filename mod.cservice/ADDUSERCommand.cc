@@ -11,7 +11,7 @@
  *
  * Caveats: None
  *
- * $Id: ADDUSERCommand.cc,v 1.20 2001/09/05 03:47:56 gte Exp $
+ * $Id: ADDUSERCommand.cc,v 1.21 2002/04/28 16:02:26 gte Exp $
  */
 
 #include	<string>
@@ -24,7 +24,7 @@
 #include	"responses.h"
 #include	"cservice_config.h"
 
-const char ADDUSERCommand_cc_rcsId[] = "$Id: ADDUSERCommand.cc,v 1.20 2001/09/05 03:47:56 gte Exp $" ;
+const char ADDUSERCommand_cc_rcsId[] = "$Id: ADDUSERCommand.cc,v 1.21 2002/04/28 16:02:26 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -155,6 +155,8 @@ if (theChan->getUserFlags() == 2) targetFlags = sqlLevel::F_AUTOVOICE;
  *  Now, build up the SQL query & execute it!
  */
 
+string lastModifMask = "(" + theUser->getUserName() + ") " + theClient->getNickUserHost();
+
 strstream theQuery;
 theQuery	<< queryHeader
 		<< "VALUES ("
@@ -163,11 +165,9 @@ theQuery	<< queryHeader
 		<< targetAccess << ","
 		<< targetFlags << ","
 		<< bot->currentTime() << ","
-		<< "'(" << theUser->getUserName() << ") "
-                   << theClient->getNickUserHost() << "',"
+		<< "'" << escapeSQLChars(lastModifMask) << "',"
 		<< bot->currentTime() << ","
-		<< "'(" << theUser->getUserName() << ") "
-                   << theClient->getNickUserHost() << "',"
+		<< "'" << escapeSQLChars(lastModifMask) << "',"
 		<< bot->currentTime()
 		<< ");"
 		<< ends;

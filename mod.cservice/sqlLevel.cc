@@ -4,7 +4,7 @@
  * Storage class for accessing channel user/level information either from the backend
  * or internal storage.
  *
- * $Id: sqlLevel.cc,v 1.13 2001/09/09 21:54:22 gte Exp $
+ * $Id: sqlLevel.cc,v 1.14 2002/04/28 16:02:26 gte Exp $
  */
 
 #include	<strstream>
@@ -23,7 +23,7 @@
 #include	"cservice_config.h"
 
 const char sqlLevel_h_rcsId[] = __SQLLEVEL_H ;
-const char sqlLevel_cc_rcsId[] = "$Id: sqlLevel.cc,v 1.13 2001/09/09 21:54:22 gte Exp $" ;
+const char sqlLevel_cc_rcsId[] = "$Id: sqlLevel.cc,v 1.14 2002/04/28 16:02:26 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -145,11 +145,11 @@ queryString	<< queryHeader
 		<< "access = " << access << ", "
 		<< "suspend_expires = " << suspend_expires << ", "
 		<< "suspend_level = " << suspend_level << ", "
-		<< "suspend_by = '" << suspend_by << "', "
+		<< "suspend_by = '" << escapeSQLChars(suspend_by) << "', "
 		<< "added = " << added << ", "
-		<< "added_by = '" << added_by << "', "
+		<< "added_by = '" << escapeSQLChars(added_by) << "', "
 		<< "last_modif = " << last_modif << ", "
-		<< "last_modif_by = '" << last_modif_by << "', "
+		<< "last_modif_by = '" << escapeSQLChars(last_modif_by) << "', "
 		<< "last_updated = now()::abstime::int4 "
 		<< " WHERE channel_id = " << channel_id
 		<< " AND user_id = " << user_id
