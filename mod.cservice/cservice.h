@@ -1,9 +1,9 @@
 #ifndef __CSERVICE_H
-#define __CSERVICE_H "$Id: cservice.h,v 1.8 2000/12/23 20:03:57 gte Exp $"
+#define __CSERVICE_H "$Id: cservice.h,v 1.9 2000/12/26 03:33:35 gte Exp $"
 
 #include	<string>
 #include	<vector>
-
+#include	<hash_map>
 #include	<ctime>
 
 #include	"client.h"
@@ -42,8 +42,9 @@ public:
 
 	virtual int OnConnect();
     virtual int BurstChannels();
-	virtual int OnPrivateMessage( iClient*, const string& );
+    virtual int OnPrivateMessage( iClient*, const string& );
     virtual void ImplementServer( xServer* ) ;
+    virtual bool isOnChannel( const string& ) const;
     virtual bool RegisterCommand( Command* ) ;
     virtual bool UnRegisterCommand( const string& ) ; 
     typedef commandMapType::const_iterator constCommandIterator ; 
@@ -57,7 +58,7 @@ public:
                 { return commandMap.find( theComm ) ; } 
  
 	// Return what access theUser has in channel theChan.
-	unsigned short getAccessLevel( sqlUser* theUser, sqlChannel* theChan );
+	short getAccessLevel( sqlUser* theUser, sqlChannel* theChan );
 
 	// Fetch a user record for a user.
 	sqlUser* getUserRecord( const string& );
@@ -68,6 +69,16 @@ public:
 
 	// Fetch a channel record for a channel.
 	sqlChannel* getChannelRecord(const string& );
+
+	// Typedef's for user/channel Hashmaps.
+	typedef hash_map< string, sqlUser*, eHash, eqstr > sqlUserHashType ;
+	typedef hash_map< string, sqlChannel*, eHash, eqstr > sqlChannelHashType ;
+
+	// Cache of user records.
+	sqlUserHashType sqlUserCache;
+
+	// Cache of channel records.
+	sqlChannelHashType sqlChannelCache;
 } ;
  
 } // namespace gnuworld

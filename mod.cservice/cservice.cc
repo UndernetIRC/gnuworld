@@ -90,7 +90,7 @@ cservice::cservice(const string& args)
     RegisterCommand(new MOTDCommand(this, "MOTD", "TBA"));
     RegisterCommand(new ISREGCommand(this, "ISREG", "#channel"));
     RegisterCommand(new SHOWIGNORECommand(this, "SHOWIGNORE", "TBA"));
-    RegisterCommand(new VERIFYCommand(this, "VERIFY", "TBA"));
+    RegisterCommand(new VERIFYCommand(this, "VERIFY", "<nick>"));
     RegisterCommand(new RANDOMCommand(this, "RANDOM", "TBA"));
 
     RegisterCommand(new OPCommand(this, "OP", "#channel [nick][,nick] .."));
@@ -218,23 +218,31 @@ sqlUser* cservice::isAuthed(iClient* theClient, bool alert)
 sqlUser* cservice::getUserRecord(const string& id)
 {
 	/*
-	 *  Locates a cservice user record by 'id', which may be a username string
-	 *  or a unique ID number.
-	 *  TODO: Look up in a cache hash to see if this user record has already been
-	 *  loaded - if so, return a ptr to that. If not, create a new sqlUser and
-	 *  fetch the data from the database.
-	 *
-	 *  This will become essential to avoid contention (Ie: if 2 people login to 
-	 *  an account).
+	 *  Locates a cservice user record by 'id', the username of this user. 
+	 */
+
+	/*
+	 *  Check if this record is already in the cache.
+	 */
+ 
+	sqlUserHashType::iterator ptr = sqlUserCache.find(id);
+	if(ptr != sqlUserCache.end()) // Found something!
+	{
+		elog << "sqlUserCache> Cache hit for " << id << endl;
+		return ptr->second ;
+	}
+
+	/*
+	 *  We didn't find anything in the cache, fetch the data from
+	 *  the backend and create a new sqlUser object.
 	 */
 
 	sqlUser* theUser = new sqlUser(SQLDb);
 
-	/*
-	 * Todo: Determine username or userid and send appropiate arguments.
-	 */
-
-	if (theUser->loadData(id)) { 
+	if (theUser->loadData(id)) 
+	{ 
+	 	sqlUserCache.insert(sqlUserHashType::value_type(id, theUser));
+		elog << "sqlUserCache> " << sqlUserCache.size() << " elements in hash." << endl;
 		return theUser;
 	}
 
@@ -242,17 +250,29 @@ sqlUser* cservice::getUserRecord(const string& id)
 	return 0;
 }	
 
+
 sqlChannel* cservice::getChannelRecord(const string& id)
 { 
 	/*
-	 *  Locates a cservice user record by 'id', which may be a username string
-	 *  or a unique ID number.
-	 *  Same TODO as applies to getUserRecord really. :)
+	 *  Locates a cservice user record by 'id', the channel name. 
 	 */
+
+	/*
+	 *  Check if this record is already in the cache.
+	 */
+ 
+	sqlChannelHashType::iterator ptr = sqlChannelCache.find(id);
+	if(ptr != sqlChannelCache.end()) // Found something!
+	{
+		elog << "sqlChannelCache> Cache hit for " << id << endl;
+		return ptr->second ;
+	} 
 
 	sqlChannel* theChan = new sqlChannel(SQLDb);
  
 	if (theChan->loadData(id)) {
+	 	sqlChannelCache.insert(sqlChannelHashType::value_type(id, theChan));
+		elog << "sqlChannelCache> " << sqlChannelCache.size() << " elements in hash." << endl;
 		return theChan;
 	}
 
@@ -260,7 +280,7 @@ sqlChannel* cservice::getChannelRecord(const string& id)
 	return 0;
 } 
  
-unsigned short cservice::getAccessLevel( sqlUser* theUser, sqlChannel* theChan )
+short cservice::getAccessLevel( sqlUser* theUser, sqlChannel* theChan )
 {
 	/*
 	 *  Returns the access level a particular user has on a particular
@@ -277,6 +297,11 @@ unsigned short cservice::getAccessLevel( sqlUser* theUser, sqlChannel* theChan )
 	return 0;
 }
  
+bool cservice::isOnChannel( const string& chanName ) const
+{
+	return true;
+}
+	
 void Command::Usage( iClient* theClient )
 {
 	bot->Notice( theClient, string( "Usage:" ) + ' ' + getInfo() ) ;
