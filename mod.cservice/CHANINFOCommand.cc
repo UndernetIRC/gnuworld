@@ -2,13 +2,18 @@
  * CHANINFOCommand.cc 
  *
  * 29/12/2000 - Greg Sikorski <gte@atomicrevs.demon.co.uk>
- * Initial Version.
+ * Initial Template.
  *
- * Displays information about a channel.
+ * 30/12/2000 - David Henriksen <david@itwebnet.dk>
+ * Started and finished the command. Showing all owners by a
+ * SQL Query which returns all the level 500s of the channel. 
  *
- * Caveats: None
+ * Caveats: Need to determine if the query is aimed at a #
+ * or a user. :)
  *
- * $Id: CHANINFOCommand.cc,v 1.2 2000/12/30 05:47:29 gte Exp $
+ * Command is aliased "INFO".
+ *
+ * $Id: CHANINFOCommand.cc,v 1.3 2000/12/30 23:32:34 gte Exp $
  */
 
 #include	<string>
@@ -19,14 +24,8 @@
 #include	"levels.h"
 #include	"responses.h"
  
-const char CHANINFOCommand_cc_rcsId[] = "$Id: CHANINFOCommand.cc,v 1.2 2000/12/30 05:47:29 gte Exp $" ;
-
-//[04:21] -W- #coder-com is registered by:
-//[04:21] -W- Special last seen: 103 days, 01:01:58 ago
-//[04:21] -W- Isoper last seen: 12 days, 17:03:57 ago
-//[04:21] -W- Desc: Required: 2.10.07.1.(12)  Recommended: 2.10.10.pl12  Development: 2.10.10.alpha
-//[04:21] -W- URL: http://coder-com.undernet.org
-
+const char CHANINFOCommand_cc_rcsId[] = "$Id: CHANINFOCommand.cc,v 1.3 2000/12/30 23:32:34 gte Exp $" ;
+ 
 namespace gnuworld
 {
 
@@ -34,14 +33,61 @@ using namespace gnuworld;
  
 bool CHANINFOCommand::Exec( iClient* theClient, const string& Message )
 { 
-	StringTokenizer st( Message ) ;
-	if( st.size() < 2 )
-	{
-		Usage(theClient);
-		return true;
-	}
+    ExecStatusType status;
+    static const char* queryHeader = "SELECT channels.name,users.user_name,levels.access,users.last_seen FROM levels,channels,users ";
+    static const char* queryString = "WHERE levels.channel_id=channels.id AND levels.access=500 AND levels.user_id=user_id ";
+	 
+    StringTokenizer st( Message ) ;
+    if( st.size() < 2 )
+    {
+	    Usage(theClient);
+	    return true;
+    }
  
-	return true ;
+	sqlChannel* theChan = bot->getChannelRecord(st[1]);
+        
+	if(!theChan)
+	{
+	        bot->Notice(theClient, "%s is not registered",
+	                st[1].c_str());
+	        return true;
+	}
+
+	/*
+	 * Receiving all the level 500's of the channel through a sql query.
+	 * The description and url, are received from the cache. --Plexus
+	 */
+         
+	strstream theQuery;
+	theQuery << queryHeader << queryString << "AND levels.channel_id = " << theChan->getID() << ends;
+
+	elog << "sqlQuery> " << theQuery.str() << endl;
+        
+	bot->Notice(theClient, "%s is registered by:", st[1].c_str());
+
+
+	if((status = bot->SQLDb->Exec(theQuery.str())) == PGRES_TUPLES_OK)
+	{
+		for(int i = 0; i < bot->SQLDb->Tuples(); i++)
+		{ 
+
+			bot->Notice(theClient, "%s - last seen: %s ago",
+				bot->SQLDb->GetValue(i, 1),
+				bot->prettyDuration(atoi(bot->SQLDb->GetValue(i, 3))).c_str());
+		}
+	}
+
+	if(theChan->getDescription() != "")
+	{
+		bot->Notice(theClient, "Desc: %s", theChan->getDescription().c_str());
+	}
+
+	if(theChan->getURL() != "")
+	{
+		bot->Notice(theClient, "URL: %s", theChan->getURL().c_str());
+	}
+        
+	return true ; 
 } 
 
 } // namespace gnuworld.

@@ -1,5 +1,5 @@
 #ifndef __CSERVICE_H
-#define __CSERVICE_H "$Id: cservice.h,v 1.14 2000/12/28 05:03:09 gte Exp $"
+#define __CSERVICE_H "$Id: cservice.h,v 1.15 2000/12/30 23:32:34 gte Exp $"
 
 #include	<string>
 #include	<vector>
@@ -15,6 +15,7 @@
 #include	"sqlChannel.h"
 #include	"sqlUser.h"
 #include	"sqlLevel.h"
+#include	"libpq-int.h"
  
 using std::string ;
 using std::vector ;
@@ -22,10 +23,22 @@ using std::hash_map ;
 using std::map ;
 
 class PgDatabase; 
- 
+
+/*
+ *  Sublcass the postgres API to create our own accessor
+ *  to get at the PID information.
+ */
+
+class cmDatabase : public PgDatabase {
+public:
+	cmDatabase(const char* conninfo) : PgDatabase(conninfo) {}
+	inline int getPID()
+		{ return pgConn->be_pid; }
+};
+
 namespace gnuworld
 { 
-
+ 
 class Command;
  
 class cservice : public xClient
@@ -38,7 +51,8 @@ protected:
     commandMapType          commandMap;
 
 public:
-    PgDatabase* SQLDb; /* PostgreSQL Database */
+
+    cmDatabase* SQLDb; /* PostgreSQL Database */
 
 	cservice(const string& args);
 	virtual ~cservice();
@@ -54,6 +68,7 @@ public:
                 const string& CTCP,
                 const string& Message,
                 bool Secure = false ) ;
+	virtual int OnTimer(xServer::timerID, void*);
     typedef commandMapType::const_iterator constCommandIterator ; 
     constCommandIterator command_begin() const
                 { return commandMap.begin() ; } 
@@ -101,6 +116,19 @@ public:
 	unsigned int levelHits;
 	unsigned int levelCacheHits; 
 
+	// Flood/Notice relay channel - Loaded via config.
+	string relayChan;
+
+	// Internal at which we pick up updates from the Db.
+	// Loaded via config.
+	int updateInterval;
+
+	// Timestamp's of when we last checked the database for updates.
+	time_t lastChannelRefresh;
+	time_t lastUserRefresh;
+	time_t lastLevelRefresh;
+	time_t lastBanRefresh;
+
 	// Language translations table (Loaded from Db).
 	typedef map < pair <int, int>, string > translationTableType ;
 	translationTableType translationTable;
@@ -108,6 +136,9 @@ public:
 	void loadTranslationTable();
 	// Function to retrieve a translation string.
 	const string& getResponse( sqlUser*, int );
+
+	// Check for valid hostmask.
+	virtual bool validUserMask(iClient* theClient, const string& userMask); 
 } ;
  
 } // namespace gnuworld

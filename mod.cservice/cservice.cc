@@ -16,6 +16,7 @@
 #include	"misc.h"
 #include	"ELog.h" 
 #include	"libpq++.h"
+#include	"constants.h"
 
 using std::vector ;
 using std::endl ;
@@ -62,16 +63,28 @@ return true ;
 void cservice::ImplementServer( xServer* theServer )
 {
 
-for( commandMapType::iterator ptr = commandMap.begin() ; ptr != commandMap.end() ;
-        ++ptr )
-        {
-        ptr->second->setServer( theServer ) ;
-        }
+	for( commandMapType::iterator ptr = commandMap.begin() ; ptr != commandMap.end() ;
+	        ++ptr )
+	        {
+	        ptr->second->setServer( theServer ) ;
+	        }
+	
+	for( eventType i = 0 ; i != EVT_NOOP ; ++i )
+	{
+	  theServer->RegisterEvent( i, this );
+	} 
 
-for( eventType i = 0 ; i != EVT_NOOP ; ++i )
-{
-  theServer->RegisterEvent( i, this );
-} 
+ 	// Attempt to register our interest in recieving NOTIFY events.
+	if (SQLDb->ExecCommandOk("LISTEN channels_u; LISTEN bans_u; LISTEN users_u; LISTEN levels_u;")) {
+		elog << "DbUpdate1> Successfully registered LISTEN event for Db updates." << endl;
+		// Start the Db update timer rolling.
+		time_t theTime = time(NULL) + updateInterval;
+		theServer->RegisterTimer(theTime, this, NULL); 
+	} else 
+	{
+		elog << "DbUpdate> PostgreSQL error while attempting to register LISTEN event: " << SQLDb->ErrorMessage() << endl;
+	}
+
 
 xClient::ImplementServer( theServer ) ;
 }
@@ -102,6 +115,7 @@ cservice::cservice(const string& args)
     RegisterCommand(new INVITECommand(this, "INVITE", "<#channel>"));
     RegisterCommand(new TOPICCommand(this, "TOPIC", "<#channel> <topic>"));
     RegisterCommand(new CHANINFOCommand(this, "CHANINFO", "<#channel>"));
+    RegisterCommand(new CHANINFOCommand(this, "INFO", "<#channel>"));
 
 	//-- Load in our cservice configuration file. 
 	cserviceConfig = new EConfig( args ) ;
@@ -111,8 +125,8 @@ cservice::cservice(const string& args)
 	string Query = "host=" + sqlHost + " dbname=" + sqlDb ;
 
 	elog << "[SQL]: Attempting to connect to " << sqlHost << "; Database: " << sqlDb << endl;
-
-	SQLDb = new PgDatabase( Query.c_str() ) ;
+ 
+	SQLDb = new cmDatabase( Query.c_str() ) ;
 
 	//-- Make sure we connected to the SQL database; if we didn't we exit entirely.
 
@@ -125,7 +139,7 @@ cservice::cservice(const string& args)
 	}
 	else
 	{
-		elog << "[SQL]: Connection established to SQL server." << endl ;
+		elog << "[SQL]: Connection established to SQL server. Backend PID: " << SQLDb->getPID() << endl ;
 	}
 
 	//-- Retrieve user, nick, host, and description from the configuration file -- these are all REQUIRED
@@ -134,7 +148,9 @@ cservice::cservice(const string& args)
 	nickName = cserviceConfig->Require( "nick" )->second ;
 	userName = cserviceConfig->Require( "user" )->second ;
 	hostName = cserviceConfig->Require( "host" )->second ;
-	userDescription = cserviceConfig->Require( "description" )->second ;
+	userDescription = cserviceConfig->Require( "description" )->second ; 
+	relayChan = cserviceConfig->Require( "relay_channel" )->second ; 
+	updateInterval = atoi((cserviceConfig->Require( "update_interval" )->second).c_str());
 
 	//-- Move this to the configuration file?  This should be fairly static..
 
@@ -144,9 +160,13 @@ cservice::cservice(const string& args)
 	userCacheHits = 0;
 	channelHits = 0;
 	channelCacheHits = 0;
+	lastChannelRefresh = time(NULL);
+	lastUserRefresh = time(NULL);
+	lastLevelRefresh = time(NULL);
+	lastBanRefresh = time(NULL);
 
 	// Load our translation tables.
-	loadTranslationTable();
+	loadTranslationTable(); 
 }
 
 cservice::~cservice()
@@ -162,9 +182,9 @@ int cservice::BurstChannels()
 	 *   Need to join every channel with AUTOJOIN set. (But not * ;))
 	 *   Various other things must be done, such as setting the topic if AutoTopic
 	 *   is on, gaining ops if AlwaysOp is on, and so forth.
-	 */
+	 */ 
 
-	if ((status = SQLDb->Exec( "SELECT name,flags,channel_ts,channel_mode,channel_key,channel_limit FROM channels WHERE name <> '*'" )) == PGRES_TUPLES_OK)
+	if ((status = SQLDb->Exec( "SELECT name,flags,channel_ts,channel_mode,channel_key,channel_limit FROM channels WHERE name <> '*' AND registered_ts <> ''" )) == PGRES_TUPLES_OK)
 	{
 		for (int i = 0 ; i < SQLDb->Tuples (); i++)
 		{
@@ -245,7 +265,7 @@ int cservice::OnCTCP( iClient* theClient, const string& CTCP,
 
 	if(Command == "VERSION")
 	{
-		xClient::DoCTCP(theClient, CTCP.c_str(), "Undernet Channel Services Version 2 [" __DATE__ " " __TIME__ "] ($Id: cservice.cc,v 1.22 2000/12/30 06:34:03 gte Exp $)");
+		xClient::DoCTCP(theClient, CTCP.c_str(), "Undernet Channel Services Version 2 [" __DATE__ " " __TIME__ "] ($Id: cservice.cc,v 1.23 2000/12/30 23:32:34 gte Exp $)");
 		return true;
 	}
  
@@ -424,14 +444,130 @@ bool cservice::isOnChannel( const string& chanName ) const
 	return true;
 }
 
+int cservice::OnTimer(xServer::timerID, void*)
+{
+   /*
+    *  Time to see if anyone updated the database while we weren't looking. :)
+    */
+
+    elog << "DbUpdate> Checking for updates.." << endl;
+	time_t theTime = time(NULL) + updateInterval;
+	MyUplink->RegisterTimer(theTime, this, NULL);
+ 
+	ExecStatusType status;
+	strstream theQuery;
+	unsigned short updateType = 0; // 1 = channel, 2 = user, 3 = level, 4 = ban. 
+
+	PGnotify* notify = SQLDb->Notifies();
+
+	/*
+	 *  We got a notification event..
+	 */
+	if (!notify) {
+		return true;
+	}
+
+	elog << "DbUpdate> Recieved a notification event for '" << notify->relname 
+	<< "' from Backend PID '" << notify->be_pid << "'"
+	<< endl;
+
+	// Check we aren't getting our own updates.
+	if (notify->be_pid != SQLDb->getPID())
+	{ 
+		theQuery << "SELECT * FROM ";
+
+		if (string(notify->relname) == "channels_u") 
+		{
+			updateType = 1;
+			theQuery << "channels WHERE last_update > " << lastChannelRefresh;
+			// Fetch updated channel information.
+		}
+ 
+		theQuery << ends;
+		elog << "sqlQuery> " << theQuery.str() << endl;
+
+		// Execute query, parse results.
+		status = SQLDb->Exec(theQuery.str());
+ 
+		if (status == PGRES_TUPLES_OK)
+		{
+			elog << "DbUpdate> Found " << SQLDb->Tuples() << " updated channel records." << endl;
+			/*
+			 *  Now, update the cache with information in this results set.
+			 */
+
+		}  else 
+		{
+			elog << "Something went wrong: " << SQLDb->ErrorMessage() << endl; // Log to msgchan here.
+		}
+
+	} else // Our own notification.
+	{
+		elog << "DbUpdate> Notification from our Backend PID, ignoring update." << endl;
+	} 
+
+	free(notify);
+	return(0);
+}
+ 
 const string& cservice::prettyDuration( int duration )
 { 
-	// Pretty format a 'duration' in seconds to
-	// x days, xx:xx:xx.
-	static string result;
-	result = "TBA";
-	return result;
-}	
+        // Pretty format a 'duration' in seconds to
+        // x day(s), xx:xx:xx.
+        static string result;
+
+		char tmp[63] = {0};
+        int days = 0, hours = 0, mins = 0, secs = 0, res = 0;
+        res = time(NULL) - duration;
+        secs = res % 60;
+        mins = (res / 60) % 60;
+        hours = (res / 3600) % 24;
+        days = (res / 86400);
+        sprintf(tmp, "%i day%s, %02d:%02d:%02d",
+                days,
+                (days == 1 ? "" : "s"),
+                hours,
+                mins,
+                secs);
+        result = tmp; 
+        return result;
+}  
+
+bool cservice::validUserMask(iClient* theClient, const string& userMask)
+{
+        char tmpmask[512], *n, *u, *h;
+        
+        strncpy(tmpmask, userMask.c_str(), 511);
+        tmpmask[511] = '\0';
+        
+        n = strtok(tmpmask, "!");
+        u = strtok(NULL, "@");
+        h = strtok(NULL, " ");
+        
+        if(!n || !*n || !u || !*u || !h || !*h)
+        {
+                Notice(theClient, "ERROR: Invalid hostmask, use n!u@h.");
+                return false;
+        }
+        if(strlen(n) > 9)
+        {
+                Notice(theClient, "ERROR: The specified nick!*@* is too long, max 9 chars allowed.");
+                return false;
+        }
+        if(strlen(u) > 12)
+        {
+                Notice(theClient, "ERROR: The specified *!user@* is too long, max 12 chars allowed.");
+                return false;
+
+        }
+        if(strlen(h) > 128)
+        {
+                Notice(theClient, "ERROR: The specified *!*@host is too long, max 128 chars allowed.");
+                return false;
+        }
+
+        return true;
+}
  
 void Command::Usage( iClient* theClient )
 {

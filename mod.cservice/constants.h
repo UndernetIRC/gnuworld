@@ -1,5 +1,5 @@
 #ifndef __CONSTANTS_H
-#define __CONSTANTS_H "$Id: constants.h,v 1.1 2000/12/28 01:21:42 gte Exp $"
+#define __CONSTANTS_H "$Id: constants.h,v 1.2 2000/12/30 23:32:34 gte Exp $"
 
 /* 
  * constants.h
@@ -9,10 +9,11 @@
  * 
  * Defines constants used throughout the application.
  *
- * $Id: constants.h,v 1.1 2000/12/28 01:21:42 gte Exp $
+ * $Id: constants.h,v 1.2 2000/12/30 23:32:34 gte Exp $
  */
 
-namespace gnuworld { 
+namespace gnuworld 
+{ 
 
 }
 
