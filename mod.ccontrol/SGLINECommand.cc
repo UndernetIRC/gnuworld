@@ -18,7 +18,7 @@
 #include	"ELog.h"
 #include	"Constants.h"
 
-const char SGLINECommand_cc_rcsId[] = "$Id: SGLINECommand.cc,v 1.2 2002/12/28 22:44:55 mrbean_ Exp $";
+const char SGLINECommand_cc_rcsId[] = "$Id: SGLINECommand.cc,v 1.3 2002/12/29 19:08:56 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -44,16 +44,20 @@ if(!dbConnected)
         bot->Notice(theClient,"Sorry, but the db connection is down now, please try again alittle later");
         return false;
         }
+if(st.size() < 3)
+        {
+        Usage( theClient ) ;
+        return true ;
+        }
 StringTokenizer::size_type pos = 1 ;
 bool RealName = (!strcasecmp(st[pos],"-rn"));
-string RealHost;
-
-if( (st.size() < 3) || (RealName && (st.size() < 4)))
+if(RealName && (st.size() < 4))
 	{
-	Usage( theClient ) ;
-	return true ;
+	Usage(theClient);
+	return true;
 	}
 
+string RealHost;
 
 
 ccUser* tmpUser = bot->IsAuth(theClient);
