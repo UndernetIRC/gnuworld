@@ -23,14 +23,14 @@ namespace commandLevel
  To enable a command for an oper he must have the command 
  flag set in his access 
  
- **NOTE** Commands with access NOLOGIN can be accessed without loginin first  
+ **NOTE** Commands with access NOLOGIN/0 can be accessed without loginin first  
  
 */
 
 const unsigned long int flg_NOLOGIN = 0x1;
 const unsigned long int flg_ACCESS   = 0x01;
 const unsigned long int flg_HELP     = 0x02 | flg_NOLOGIN;
-//const unsigned long int flg_LOGIN    = 0x0; 
+const unsigned long int flg_LOGIN    = 0x0; 
 const unsigned long int flg_DEAUTH    = 0x04;
 const unsigned long int flg_NEWPASS  = 0x08;
 const unsigned long int flg_MODE     = 0x10 | flg_NOLOGIN;

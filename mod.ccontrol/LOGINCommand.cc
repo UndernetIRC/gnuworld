@@ -14,7 +14,7 @@
 #include        "ccUser.h"
 #include	"ip.h"
 
-const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.21 2001/12/23 09:34:24 mrbean_ Exp $";
+const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.22 2002/02/01 11:14:04 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -56,20 +56,18 @@ theUser = bot->GetOper(st[1]);
 if (!theUser) 
 	{
 	bot->MsgChanLog("[FAILED LOGIN] %s - Bad Username\n",theClient->getNickUserHost().c_str());
-	
-	bot->Notice(theClient, "FALSE LOGIN, DENIED");
+	if(theClient->isOper())
+		bot->Notice(theClient, "FALSE LOGIN, DENIED");
 	bot->addLogin(theClient);
 	return false;
 	}
 else
 	{ 
 	//Check if the user need to be operd to login
-//	if((!theClient->isOper()) && (flg_LOGIN & flg_NEEDOP) && (theUser->getNeedOp()))
-	if((!theClient->isOper()) && (getNeedOp()) && (theUser->getNeedOp()))
+	if((!theClient->isOper()) && (theUser->getNeedOp()))
 
 		{
 		bot->MsgChanLog("[FAILED LOGIN] %s - Not Operd\n",theClient->getNickUserHost().c_str());
-		bot->Notice(theClient, "FALSE LOGIN, DENIED");
 		bot->addLogin(theClient);
 		return false;
 		}

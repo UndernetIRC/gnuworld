@@ -8,7 +8,7 @@
 #include	<vector>
 #include	<iostream>
 #include	<algorithm>
-
+#include 	<fstream>
 #include	<cstring>
 
 #include        <sys/types.h> 
@@ -37,7 +37,7 @@
 #include	"ip.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.122 2002/01/25 14:11:31 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.123 2002/02/01 11:14:04 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -224,7 +224,7 @@ RegisterCommand( new CHANINFOCommand( this, "CHANINFO", "<channel>"
 RegisterCommand( new ACCESSCommand( this, "ACCESS",
 	"Obtain the access list",commandLevel::flg_ACCESS,false,false,true,operLevel::OPERLEVEL,false ) ) ;
 RegisterCommand( new LOGINCommand( this, "LOGIN", "<USER> <PASS> "
-	"Authenticate with the bot",commandLevel::flg_NOLOGIN,false,true,true,operLevel::OPERLEVEL,false ) ) ;
+	"Authenticate with the bot",commandLevel::flg_LOGIN,false,true,true,operLevel::OPERLEVEL,false ) ) ;
 RegisterCommand( new DEAUTHCommand( this, "DEAUTH", ""
 	"Deauthenticate with the bot",commandLevel::flg_DEAUTH,false,false,true,operLevel::OPERLEVEL,false ) ) ;
 RegisterCommand( new ADDUSERCommand( this, "ADDUSER", "<USER> <OPERTYPE> [SERVER*] <PASS> "
@@ -461,7 +461,7 @@ if((!theUser) && !(theClient->isOper()))
 			,theClient->getNickName().c_str());
 		}
 	
-	return xClient::OnPrivateMessage( theClient, Message ) ;
+	//return xClient::OnPrivateMessage( theClient, Message ) ;
 	}
 
 
@@ -482,15 +482,19 @@ if( commHandler == command_end() )
 
 int ComAccess = commHandler->second->getFlags();
 
-if((!theUser) && !(ComAccess & commandLevel::flg_NOLOGIN))
+if((!theUser) && (ComAccess) && !(theClient->isOper()))
+	{
+	return xClient::OnPrivateMessage( theClient, Message ) ;	
+	}
+if((!theUser) && !(ComAccess & commandLevel::flg_NOLOGIN) && (ComAccess))
 	{//The user isnt authenticated, 
 	 //and he must be to run this command
-	 Notice(theClient,"Sorry, but you must be authenticated to run this command");
+	if(theClient->isOper())
+		Notice(theClient,"Sorry, but you must be authenticated to run this command");
 	 return xClient::OnPrivateMessage( theClient, Message ) ;
 	}	 	 
 
-if((theUser) && (!theClient->isOper()) 
-    && (commHandler->second->getNeedOp()) && (theUser->getNeedOp()))
+if((theUser) && (!theClient->isOper()) && (theUser->getNeedOp()))
 	{
 	Notice(theClient,
 		"You must be operd up to use this command");
@@ -548,7 +552,8 @@ if(st.size() < 2)
     return xClient::OnServerMessage(Server,Message);
     }
 
-//This is kinda lame, TODO : add a server message parser
+//This is kinda lame 
+//TODO : add a server message parser
 if(!strcasecmp(st[1],"351"))
 	{
 	if(st.size() < 5)
@@ -2059,7 +2064,6 @@ return true;
 #else
 bool ccontrol::DailyLog(ccLog* newLog)
 {
-
 commandIterator tCommand = findCommand(newLog->CommandName);
 string log;
 StringTokenizer st(newLog->Desc);
@@ -2112,23 +2116,24 @@ else
 	}
 
 newLog->Desc = log;
-if(!LogFile)
-	{
+if(!LogFile.is_open())
 	LogFile.open(LogFileName.c_str(),ios::binary|ios::in|ios::out);
-	}
-if(!LogFile)
+if(LogFile.bad())
 	{//There was a problem in opening the log file
-	MsgChanLog("Error while logging to the logs file!\n");
+	MsgChanLog("Error while logging to the logs file %s!\n",LogFileName.c_str());
 	return true;
 	}
 
 LogFile.seekg(0,ios::beg);
 LogFile.read((char*)&NumOfLogs,sizeof(NumOfLogs));
-LogFile.seekp(0,ios::beg);
+LogFile.seekg(0,ios::beg);
 ++NumOfLogs;
 LogFile.write((char*)&NumOfLogs,sizeof(NumOfLogs));
 LogFile.seekp(0,ios::end);
-newLog->Save(LogFile);
+if(!newLog->Save(LogFile))
+	{
+	MsgChanLog("Error while logging to the log file!\n");
+	}
 return true;
 }
 
@@ -2167,9 +2172,9 @@ if( PGRES_TUPLES_OK != status )
 	}
 
 // SQL Query succeeded
-ofstream LogFile;
-LogFile.open("Report.log",ios::out);
-if(!LogFile)
+ofstream tLogFile;
+tLogFile.open("Report.log",ios::out);
+if(!tLogFile)
 	{
 	return false;
 	}
@@ -2182,7 +2187,7 @@ LogFile	<< "ccontrol log for command issued between "
 
 for (int i = 0 ; i < SQLDb->Tuples(); i++)
 	{
-	LogFile	<< "[ "
+	tLogFile	<< "[ "
 		<< convertToAscTime(atoi(SQLDb->GetValue(i, 0)))
 		<< " - "
 		<< SQLDb->GetValue(i,1)
@@ -2191,10 +2196,10 @@ for (int i = 0 ; i < SQLDb->Tuples(); i++)
 		<< endl;
 	}
 
-LogFile << "End of debug log"
+tLogFile << "End of debug log"
 	<< endl ;
 
-LogFile.close();
+tLogFile.close();
 return true;
 }
 
@@ -3406,22 +3411,21 @@ LogsToSave = 100;
 
 LogFile.open(LogFileName.c_str(),ios::binary|ios::in|ios::out);
 
-if(!LogFile)
+if(LogFile.bad())
 	{//There was a problem in opening the log file
 	elog << "Error while initilizing the logs file!\n";
 	return ;
 	}
-
-if(LogFile.eof()) //If the file is empty, save the number of logs
+LogFile.setbuf(NULL,0);
+LogFile.seekg(0,ios::end);
+if(LogFile.tellg() == 0) //If the file is empty, save the number of logs
 	{
+	LogFile.seekp(0,ios::beg);
 	LogFile.write((char*)&NumOfLogs,sizeof(NumOfLogs));
 	return;
 	}
-//The file is opened, and not empty, load the number of logs
 LogFile.seekg(0,ios::beg);
 LogFile.read((char*)&NumOfLogs,sizeof(NumOfLogs));
-LogFile.seekp(0,ios::end);
-	
 }
 
 void ccontrol::addLog(ccLog* newLog)
@@ -3453,32 +3457,36 @@ if(Amount > LogsToSave)
 		,LogsToSave);
 	Amount = LogsToSave;
 	}
-
-LogFile.seekg(0,ios::beg);
-LogFile.read((char*)&NumOfLogs,sizeof(NumOfLogs));
+	
 
 unsigned long int Left = NumOfLogs;
 if(LogList.size() < Amount) 
 	{
-	if((!LogFile) || (LogFile.bad()))
+	if((LogFile.bad()) || !(LogFile.is_open()))
 		{
 		LogFile.close();
 		LogFile.open(LogFileName.c_str(),ios::binary|ios::in|ios::out);
 
-		if(!LogFile)
+		if(LogFile.bad())
 			{
 			Notice(theClient,"Error while reading the lastcom report");
 			MsgChanLog("Error while reading from the lastcom file!\n");
 			return;
 			}
 		}
-	LogFile.seekg(sizeof(NumOfLogs),ios::beg);
+	LogFile.seekg(0,ios::beg);
+	LogFile.read((char*)&NumOfLogs,sizeof(NumOfLogs));
 	ccLog* tmpLog = new ccLog();
-	LogList.erase(LogList.begin(),LogList.end()); //Clean the list first
+	//Clean the list first
+	for(ccLogIterator ptr= LogList.begin(); ptr != LogList.end();)
+		{
+		delete *ptr;
+		ptr = LogList.erase(ptr);
+		}
 	/*
 	    since every record has its own size, there is no way of knowing
 	    where in the file the last X records are, so we start reading
-	    from the begging of the file, this saves hd space but may 
+	    from the begining of the file, this saves hd space but may 
 	    cost some time.
 	    
 	    this is done only once if at all per restart, so its

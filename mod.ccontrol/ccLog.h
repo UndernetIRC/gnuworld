@@ -1,6 +1,6 @@
 
 /*
- $Id: ccLog.h,v 1.1 2002/01/25 14:33:03 mrbean_ Exp $
+ $Id: ccLog.h,v 1.2 2002/02/01 11:14:04 mrbean_ Exp $
  */
  
 #ifndef __CCLOG_H_
@@ -50,6 +50,25 @@ public:
 	bool Load(fstream& in);
 
 	const static char sep = '\t';
+
+	const static short foundGood = 0;
+	
+	const static short foundEOF = 1;
+	
+	const static short foundBad = 2;
+	
+	static short findGood(ifstream& in);
+	
+	static short calcLen(short len)
+		{ return ((((len & 0x3F80) << 2) 
+		           | ((len & 0x7F) << 1)) | 0x101); }
+
+	static short getLen(short len)
+		{ return ((( len & 0xFE) >> 1) 
+		  | ((len & 0xFE00) >> 2)); }
+	
+	static const char Seperator = '\0';
+	
 };	
 
 }
