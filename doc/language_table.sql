@@ -337,7 +337,7 @@ COPY "translations" FROM stdin;
 2	147	%s est un Opérateur IRC	31337	0
 2	148	%s n'est pas authentifié.	31337	0
 2	149	%s est authentifié sous le nom d'utilisateur %s%s	31337	0
-2	150	%s est un représentant Officiel de CService%s et authentifié sour le nom d'utilisateur %s	31337	0
+2	150	%s est un représentant Officiel de CService%s et authentifié sous le nom d'utilisateur %s	31337	0
 2	151	%s est un Administrateur Officiel de CService%s et authentifié sous le nom d'utilisateur %s	31337	0
 2	152	%s est un Développeur Officiel de CService%s et authentifié sous le nom d'utilisateur %s	31337	0
 2	153	Il y a plus de %i entrées correspondantes [%s]	31337	0
