@@ -10,7 +10,7 @@
 #include "netData.h"
 #include "nickserv.h"
 
-const char NickServ_cc_rcsId[] = "$Id: nickserv.cc,v 1.17 2002/12/10 19:46:16 jeekay Exp $";
+const char NickServ_cc_rcsId[] = "$Id: nickserv.cc,v 1.18 2003/02/11 18:22:50 jeekay Exp $";
 
 namespace gnuworld
 {
@@ -543,16 +543,16 @@ for(QueueType::iterator queuePos = warnQueue.begin(); queuePos != warnQueue.end(
   } // if(theData->warned)
 } // iterate over warnQueue
 
-if(killQueue.size() == 0) { return; }
+if(killQueue.empty()) { return; }
 
 for(QueueType::iterator queuePos = killQueue.begin(); queuePos != killQueue.end(); queuePos++) {
   iClient* theClient = *queuePos;
   netData* theData = static_cast<netData*>(theClient->removeCustomData(this));
   delete(theData);
-  Kill(theClient, "[NickServ] AutoKill");
   theStats->incStat("NS.KILL");
   theLogger->log(logging::events::E_INFO, "Killed: (" + 
     theClient->getCharYYXXX() + ") " + theClient->getNickName());
+  Kill(theClient, "[NickServ] AutoKill");
 } // iterate over killQueue
 
 // No need to clear killQueue as it's a locally scoped variable
