@@ -1,7 +1,7 @@
 /* sqlChannel.h */
 
 #ifndef __SQLCHANNEL_H
-#define __SQLCHANNEL_H "$Id: sqlChannel.h,v 1.12 2001/01/19 23:01:56 gte Exp $"
+#define __SQLCHANNEL_H "$Id: sqlChannel.h,v 1.13 2001/01/21 04:17:41 gte Exp $"
 
 #include	<string>
 #include	<ctime>
@@ -21,20 +21,21 @@ public:
 
 	typedef unsigned int	flagType ;
 
-	static const flagType	F_NOPURGE =	0x01 ;
-	static const flagType	F_SPECIAL =	0x02 ;
-	static const flagType	F_NOREG =	0x04 ;
-	static const flagType	F_NEVREG =	0x08 ;
-	static const flagType	F_SUSPEND =	0x10 ;
-	static const flagType	F_TEMP =	0x20 ;
-	static const flagType	F_CAUTION =	0x40 ;
-	static const flagType	F_VACATION =	0x80 ;
-	static const flagType	F_ALWAYSOP =	0x1000 ;
-	static const flagType	F_STRICTOP =	0x2000 ;
-	static const flagType	F_NOOP =	0x4000 ;
-	static const flagType	F_AUTOTOPIC =	0x8000 ;
-	static const flagType	F_OPONLY =	0x100000 ;
-	static const flagType	F_AUTOJOIN =	0x200000 ;
+	static const flagType	F_NOPURGE  = 0x00000001 ;
+	static const flagType	F_SPECIAL  = 0x00000002 ;
+	static const flagType	F_NOREG    = 0x00000004 ;
+	static const flagType	F_NEVREG   = 0x00000008 ;
+	static const flagType	F_SUSPEND  = 0x00000010 ;
+	static const flagType	F_TEMP     = 0x00000020 ;
+	static const flagType	F_CAUTION  = 0x00000040 ;
+	static const flagType	F_VACATION = 0x00000080 ;
+
+	static const flagType	F_ALWAYSOP  = 0x00010000 ;
+	static const flagType	F_STRICTOP  = 0x00020000 ;
+	static const flagType	F_NOOP      = 0x00080000 ;
+	static const flagType	F_AUTOTOPIC = 0x00100000 ;
+	static const flagType	F_OPONLY    = 0x00100000 ;
+	static const flagType	F_AUTOJOIN  = 0x00200000 ;
 
 	/*
 	 *  Methods to get data atrributes.
