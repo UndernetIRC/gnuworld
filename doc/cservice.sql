@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------------
--- "$Id: cservice.sql,v 1.47 2001/08/06 18:00:09 gte Exp $"
+-- "$Id: cservice.sql,v 1.48 2001/08/06 20:26:23 gte Exp $"
 -- Channel service DB SQL file for PostgreSQL.
 
 -- ChangeLog:
@@ -359,6 +359,27 @@ CREATE INDEX noreg_user_name_idx ON noreg (lower(user_name));
 CREATE INDEX noreg_email_idx ON noreg (lower(email));
 CREATE INDEX noreg_channel_name_idx ON noreg (lower(channel_name));
 CREATE INDEX noreg_expire_time_idx ON noreg (expire_time);
+
+CREATE TABLE mailq (	
+	user_id INT4 CONSTRAINT mailq_users_ref REFERENCES users(id),
+	channel_id INT4 CONSTRAINT mailq_channels_ref REFERENCES channels(id),
+	created_ts INT4,
+	template INT4,
+	var1 CHAR(128),
+	var2 CHAR(128),
+	var3 CHAR(128),
+	var4 CHAR(128),
+	var5 CHAR(128)
+);
+
+-- Values of Templates:
+-- MT_SUPPORTER		1
+-- MT_REJECTED		2
+-- MT_REGISTERED	3
+
+-- Template arguments:
+-- MT_REJECTED
+-- var1		Reject Reason
 
 -- Update notification rules.
 -- (N.B: Disabled, aparently conditional RULES are no longer
