@@ -1,8 +1,10 @@
 ------------------------------------------------------------------------------------
--- "$Id: cservice.sql,v 1.63 2002/03/07 12:28:33 nighty Exp $"
+-- "$Id: cservice.sql,v 1.64 2002/03/09 03:14:37 nighty Exp $"
 -- Channel service DB SQL file for PostgreSQL.
 
 -- ChangeLog:
+-- 2002-03-09: nighty
+--             Added 'maxlogins' column in 'users' table.
 -- 2002-03-07: nighty
 --             Updated channel_log/user_log events types.
 -- 2002-02-16: nighty
@@ -195,6 +197,7 @@ CREATE TABLE users (
 	signup_cookie VARCHAR(255) DEFAULT '',
 	signup_ts INT4,
 	signup_ip VARCHAR(15),
+	maxlogins INT4 DEFAULT 1,
 
 	PRIMARY KEY ( id )
 ) ;
