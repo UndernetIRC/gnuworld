@@ -1,4 +1,4 @@
-# Makefile.in generated automatically by automake 1.4-p5a from Makefile.am
+# Makefile.in generated automatically by automake 1.4-p5 from Makefile.am
 
 # Copyright (C) 1994, 1995-8, 1999, 2001 Free Software Foundation, Inc.
 # This Makefile.in is free software; the Free Software Foundation
@@ -59,16 +59,14 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 host_alias = @host_alias@
 host_triplet = @host@
-AMTAR = @AMTAR@
 AS = @AS@
-AWK = @AWK@
 CC = @CC@
-DEPDIR = @DEPDIR@
 DLLTOOL = @DLLTOOL@
 ECHO = @ECHO@
 EXEEXT = @EXEEXT@
-INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
+INCLTDL = @INCLTDL@
 LIBADD_DL = @LIBADD_DL@
+LIBLTDL = @LIBLTDL@
 LIBTOOL = @LIBTOOL@
 LIBTOOL_DEPS = @LIBTOOL_DEPS@
 LN_S = @LN_S@
@@ -80,17 +78,14 @@ PACKAGE = @PACKAGE@
 RANLIB = @RANLIB@
 STRIP = @STRIP@
 VERSION = @VERSION@
-am__include = @am__include@
-am__quote = @am__quote@
-install_sh = @install_sh@
 
 AUTOMAKE_OPTIONS = no-dependencies foreign
 
-@INSTALL_LTDL_TRUE@include_HEADERS = ltdl.h
-@INSTALL_LTDL_TRUE@lib_LTLIBRARIES = libltdl.la
-@INSTALL_LTDL_FALSE@noinst_HEADERS = ltdl.h
+@INSTALL_LTDL_TRUE@include_HEADERS = @INSTALL_LTDL_TRUE@ltdl.h
+@INSTALL_LTDL_TRUE@lib_LTLIBRARIES = @INSTALL_LTDL_TRUE@libltdl.la
+@INSTALL_LTDL_FALSE@noinst_HEADERS = @INSTALL_LTDL_FALSE@ltdl.h
 
-@CONVENIENCE_LTDL_TRUE@noinst_LTLIBRARIES = libltdlc.la
+@CONVENIENCE_LTDL_TRUE@noinst_LTLIBRARIES = @CONVENIENCE_LTDL_TRUE@libltdlc.la
 
 CLEANFILES = libltdl.la libltdlc.la
 
@@ -450,7 +445,7 @@ maintainer-clean-generic clean mostlyclean distclean maintainer-clean
 
 ltdl.lo: ltdl.h config.h
 
-$(OBJECTS): libtool
+$(OBJECTS) $(libltdl_la_OBJECTS) $(libltdlc_la_OBJECTS): libtool
 libtool: $(LIBTOOL_DEPS)
 	$(SHELL) ./config.status --recheck
 

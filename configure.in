@@ -1,10 +1,10 @@
-dnl $Id: configure.in,v 1.62 2002/09/23 15:56:34 mrbean_ Exp $
+dnl $Id: configure.in,v 1.63 2002/11/20 22:16:17 dan_karrels Exp $
 dnl ----------------------------------------------------------
 
 echo Configuring GNUWorld...
 echo
 
-AC_REVISION($Revision: 1.62 $)
+AC_REVISION($Revision: 1.63 $)
 AC_INIT
 AC_CONFIG_SRCDIR([src/main.cc])
 AM_INIT_AUTOMAKE(gnuworld,0.0)
@@ -29,12 +29,14 @@ dnl Configure libtool
 AM_PROG_LIBTOOL
 
 CFLAGS="$CFLAGS -Wall -pipe"
-CXXFLAGS="$CXXFLAGS -Wall -pipe"
+CXXFLAGS="-Wall -pipe"
 
-prefix="`pwd`"
+AC_PREFIX_DEFAULT("`pwd`")
+dnl prefix="`pwd`"
 libdir="`pwd`/lib"
 bindir="`pwd`/bin"
 glibdir="`pwd`/libgnuworld"
+topdir="`pwd`"
 
 AC_PROG_CC
 AC_PROG_CXX
@@ -46,7 +48,6 @@ AC_PROG_MAKE_SET(gmake)
 dnl Configure libltdl
 AC_CONFIG_SUBDIRS(libltdl)
 
-
 AC_MSG_CHECKING([whether to detect pthread libraries])
 
 AC_ARG_ENABLE([threads],
@@ -57,11 +58,8 @@ AC_ARG_ENABLE([threads],
 
 AC_MSG_RESULT([$check_threadLib])
 
-
-
 if test "$check_threadLib" = yes; then
-    
-    threadLib=no
+	threadLib=no
 
     AC_CHECK_LIB(pthread, pthread_create, threadLib=-lpthread)
 
@@ -78,7 +76,6 @@ if test "$check_threadLib" = yes; then
     else
  	LIBS="$LIBS $threadLib"
     fi
-
 fi
 
 dnl ----------------------------------------------------------
@@ -152,6 +149,21 @@ AC_ARG_WITH(prof,
 			[Generate profiling information]),
 	[CXXFLAGS="$CXXFLAGS -pg"]
 )
+
+network=""
+AC_ARG_WITH(protocol,
+	AC_HELP_STRING([--with-protocol],
+			[Choose which network protocol to support
+			 Default is ircu]),
+	[network="$withval"],
+	[network=ircu]
+)
+
+if [ ! test -d "lib$network" ]; then
+	AC_MSG_ERROR( "Unable to find network protocol directory: $network" )
+fi
+
+NETWORK_DIR="lib$network"
 
 PGSQL_LIB=/usr/local/pgsql/lib
 AC_ARG_WITH(pgsql-lib,
@@ -264,6 +276,7 @@ fi
 dnl echo "MOD_DIRS = $MOD_DIRS"
 AC_SUBST(MOD_DIRS)
 
+AC_SUBST(NETWORK_DIR)
 AC_SUBST(CXXFLAGS)
 AC_SUBST(INCLTDL)
 AC_SUBST(LIBLTDL)
@@ -272,10 +285,12 @@ AC_SUBST(LIBTOOL_DEPS)
 AC_SUBST(PGSQL_INCLUDE)
 AC_SUBST(PGSQL_LIB)
 AC_SUBST(bindir)
+AC_SUBST(topdir)
 
 AC_CONFIG_FILES([Makefile \
 db/Makefile \
 libgnuworld/Makefile \
+libircu/Makefile \
 src/Makefile \
 mod.ccontrol/Makefile \
 mod.clientExample/Makefile \

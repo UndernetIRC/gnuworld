@@ -25,7 +25,7 @@ hidden_host_suffix = .users.undernet.org
 command_map = server_command_map
 
 # libdir is the full path to the directory containing
-# the command handlers, this is set automatically on configure.
+# the gnuworld, this is set automatically on configure.
 # Do NOT change.
 libdir = @libdir@
 
