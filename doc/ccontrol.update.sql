@@ -1,5 +1,5 @@
 
--- "$Id: ccontrol.update.sql,v 1.24 2003/04/28 09:44:18 mrbean_ Exp $"
+-- "$Id: ccontrol.update.sql,v 1.25 2004/03/25 20:58:06 mrbean_ Exp $"
 
 -- ccontrol database changes update
 -- this file will add the new features to an old database
@@ -108,6 +108,11 @@
 --  alter table glines add LastUpdated INT4 NOT NULL DEFAULT now()::abstime::int4;
 
 -- 28/04/02 Add reason to the exceptions table
-   alter table exceptions add Reason VARCHAR(450);
-   
-  
+--   alter table exceptions add Reason VARCHAR(450);
+
+-- 13/03/04 Add is deleted fields
+     alter table opers add is_deleted BOOLEAN NOT NULL DEFAULT 'n';   
+
+-- 25/03/04 Add ReportMissing to servers
+    alter table servers add ReportMissing boolean no null default 't';
+      
