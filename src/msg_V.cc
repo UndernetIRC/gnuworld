@@ -16,22 +16,29 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_V.cc,v 1.1 2002/11/08 14:04:44 jeekay Exp $
+ * $Id: msg_V.cc,v 1.2 2002/11/09 16:28:27 jeekay Exp $
  */
 
+#include <sstream>
+
+#include "server.h"
 #include "ServerCommandHandler.h"
 #include "xparameters.h"
 
-const char msg_V_cc_rcsId[] = "$Id: msg_V.cc,v 1.1 2002/11/08 14:04:44 jeekay Exp $";
+const char msg_V_cc_rcsId[] = "$Id: msg_V.cc,v 1.2 2002/11/09 16:28:27 jeekay Exp $";
 
 namespace gnuworld
 {
 
+using std::endl ;
+using std::ends ;
+using std::stringstream ;
+
 CREATE_HANDLER(msg_V)
 
 /**
- * VERSION message handler.
- * AHkav V :Ay
+ * VERSION message handler:
+ *  AHkav V :Ay
  *
  * AHkav - Requesting user numeric
  * V     - VERSION token (duh)
@@ -43,13 +50,47 @@ CREATE_HANDLER(msg_V)
 bool msg_V::Execute( const xParameters& Param )
 {
 
-if( Param.size() < 2) {
+/* We should have exactly two parameters - source and destination */
+if( Param.size() != 2) {
   elog << "msg_V> Invalid number of parameters received."
        << endl;
   return false;
 }
 
+/* The destination numeric should always match us exactly */
+if(strncmp(Param[1], theServer->getCharYY(), 2) != 0) {
+  elog << "msg_V> Target server is not me!"
+       << endl;
+  return false;
+}
 
+/* 
+ * Should we check if the client exists here?
+ * If the version request got to us, presumably it has to exist
+ * on the network, even if we don't know about it.
+ */
+
+/*
+ * Reply looks like:
+ *  A8 351 AyAAA u2.10.11.01. devlink.netgamers.org :B27AeEFfIKMpSU
+ *
+ * A8    - Answering server
+ * 351   - Numeric for version reply
+ * AyAAA - Target (requester)
+ * 'the rest' - Reply.
+ */
+
+stringstream versionReply;
+versionReply << theServer->getCharYY()
+             << " 351 "
+             << Param[0]
+             << " :" __DATE__ " " __TIME__
+             << " GNUworld Services Core"
+             << ends;
+
+theServer->Write(versionReply);
+
+return true;
 
 } // bool msg_V::Execute()
 

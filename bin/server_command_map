@@ -34,9 +34,9 @@ lib_msg_S S
 lib_msg_Server SERVER
 lib_msg_SQ SQ
 lib_msg_T T
+lib_msg_V V
 lib_msg_WA WA
 lib_msg_W W
 lib_msg_NOOP Z
 lib_msg_NOOP A
 lib_msg_NOOP U
-lib_msg_NOOP V

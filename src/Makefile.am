@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-## $Id: Makefile.am,v 1.17 2002/07/05 01:10:05 dan_karrels Exp $
+## $Id: Makefile.am,v 1.18 2002/11/09 16:28:27 jeekay Exp $
 
 bin_PROGRAMS = gnuworld
 
@@ -50,6 +50,7 @@ lib_LTLIBRARIES = lib_msg_AC.la \
 	lib_msg_Server.la \
 	lib_msg_SQ.la \
 	lib_msg_T.la \
+	lib_msg_V.la \
 	lib_msg_WA.la \
 	lib_msg_W.la
 
@@ -142,6 +143,9 @@ lib_msg_SQ_la_SOURCES = msg_SQ.cc
 
 lib_msg_T_la_LDFLAGS = -module -export-dynamic
 lib_msg_T_la_SOURCES = msg_T.cc
+
+lib_msg_V_la_LDFLAGS = -module -export-dynamic
+lib_msg_V_la_SOURCES = msg_V.cc
 
 lib_msg_WA_la_LDFLAGS = -module -export-dynamic
 lib_msg_WA_la_SOURCES = msg_WA.cc
