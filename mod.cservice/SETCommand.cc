@@ -10,7 +10,7 @@
  *
  * Caveats: SET LANG is still under consideration.
  *
- * $Id: SETCommand.cc,v 1.10 2001/01/20 22:01:01 gte Exp $
+ * $Id: SETCommand.cc,v 1.11 2001/01/20 22:19:15 gte Exp $
  */
 
 #include	<string>
@@ -22,7 +22,7 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char SETCommand_cc_rcsId[] = "$Id: SETCommand.cc,v 1.10 2001/01/20 22:01:01 gte Exp $" ;
+const char SETCommand_cc_rcsId[] = "$Id: SETCommand.cc,v 1.11 2001/01/20 22:19:15 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -538,10 +538,19 @@ bool SETCommand::Exec( iClient* theClient, const string& Message )
 			return true;
 	    }
 		theChan->setDescription(desc);
-	    theChan->commit(); 
-	    bot->Notice(theClient, "DESCRIPTION for %s is: %s",
-			theChan->getName().c_str(),
-			desc.c_str());
+	    theChan->commit();
+
+		if(desc == "")
+		{
+			bot->Notice(theClient, "DESCRIPTION for %s is cleared.",
+				theChan->getName().c_str());
+		} else
+		{
+	    	bot->Notice(theClient, "DESCRIPTION for %s is: %s",
+				theChan->getName().c_str(),
+				desc.c_str());
+		}
+
 		if (theChan->getFlag(sqlChannel::F_AUTOTOPIC))
 		{
 			bot->doAutoTopic(theChan);
@@ -552,7 +561,7 @@ bool SETCommand::Exec( iClient* theClient, const string& Message )
 
 	if(option == "URL")
 	{
-		string url = st[3];
+		string url = st.assemble(3);
 	    if(level < level::set::url)
 	    {
 			bot->Notice(theClient, "URL: You do not have enough access!");
@@ -565,9 +574,18 @@ bool SETCommand::Exec( iClient* theClient, const string& Message )
 	    }
 		theChan->setURL(url);
 	    theChan->commit(); 
-	    bot->Notice(theClient, "URL for %s is: %s",
-			theChan->getName().c_str(),
-			url.c_str());
+
+		if(url == "")
+		{
+			bot->Notice(theClient, "URL for %s is cleared.",
+				theChan->getName().c_str());
+		} else
+		{
+	    	bot->Notice(theClient, "URL for %s is: %s",
+				theChan->getName().c_str(),
+				url.c_str());
+		}
+
 		if (theChan->getFlag(sqlChannel::F_AUTOTOPIC))
 		{
 			bot->doAutoTopic(theChan);
