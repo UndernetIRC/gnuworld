@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------------
--- "$Id: cservice.web.sql,v 1.9 2001/07/13 19:15:47 gte Exp $"
+-- "$Id: cservice.web.sql,v 1.10 2001/09/13 16:13:06 nighty Exp $"
 -- Channel service DB SQL file for PostgreSQL.
 --
 -- Tables specific to webbased registration process.
@@ -69,3 +69,4 @@ CREATE TABLE variables (
 	contents text,
 	PRIMARY KEY(var_name)
 )
+
