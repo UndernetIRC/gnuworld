@@ -3,7 +3,7 @@
  */
 
 #ifndef __XCLIENT_H
-#define __XCLIENT_H "$Id: client.h,v 1.15 2000/12/23 23:54:38 dan_karrels Exp $"
+#define __XCLIENT_H "$Id: client.h,v 1.16 2001/01/01 07:45:22 gte Exp $"
 
 #include	<string>
 
@@ -308,10 +308,20 @@ public:
 	virtual bool	Op( Channel*, iClient* ) ;
 
 	/**
-	 * Op a user on a channel, join/part the channel if necessary.
+	 * Op one or more users on a channel, join/part the channel if necessary.
 	 */
 	virtual bool	Op( Channel*, const vector< iClient* >& ) ;
 
+	/**
+	 * Voice a user on a channel, join/part the channel if necessary.
+	 */
+	virtual bool	Voice( Channel*, iClient* ) ;
+
+	/**
+	 * Voice one or more users on a channel, join/part the channel if necessary.
+	 */
+	virtual bool	Voice( Channel*, const vector< iClient* >& ) ;
+ 
 	/**
 	 * Deop a user on a channel, join/part the channel if necessary.
 	 */
@@ -321,6 +331,16 @@ public:
 	 * Deop a user on a channel, join/part the channel if necessary.
 	 */
 	virtual bool	DeOp( Channel*, const vector< iClient* >& ) ;
+
+	/**
+	 * Devoice a user on a channel, join/part the channel if necessary.
+	 */
+	virtual bool	DeVoice( Channel*, iClient* ) ;
+
+	/**
+	 * Devoice one or more users on a channel, join/part the channel if necessary.
+	 */
+	virtual bool	DeVoice( Channel*, const vector< iClient* >& ) ; 
 
 	/**
 	 * Set a ban on a channel, join/part the channel if necessary.
