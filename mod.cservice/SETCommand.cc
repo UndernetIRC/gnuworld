@@ -18,7 +18,7 @@
  *
  * Caveats: None.
  *
- * $Id: SETCommand.cc,v 1.50 2002/04/09 15:46:22 gte Exp $
+ * $Id: SETCommand.cc,v 1.51 2002/12/30 03:43:39 gte Exp $
  */
 
 #include	<string>
@@ -30,7 +30,7 @@
 #include	"responses.h"
 #include	"cservice_config.h"
 
-const char SETCommand_cc_rcsId[] = "$Id: SETCommand.cc,v 1.50 2002/04/09 15:46:22 gte Exp $" ;
+const char SETCommand_cc_rcsId[] = "$Id: SETCommand.cc,v 1.51 2002/12/30 03:43:39 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -125,6 +125,7 @@ if( st[1][0] != '#' ) // Didn't find a hash?
 	}
 #endif
 
+#ifdef USE_SETMAXLOGINS
 	if (option == "MAXLOGINS")
 		{
 		unsigned int maxlogins = atoi(value.c_str());
@@ -140,6 +141,7 @@ if( st[1][0] != '#' ) // Didn't find a hash?
 		bot->Notice(theClient, "Max Logins now set to %i", maxlogins);
 		return true;
 		}
+#endif
 
 	if (option == "LANG")
 	{

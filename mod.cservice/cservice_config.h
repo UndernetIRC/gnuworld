@@ -1,7 +1,7 @@
 /* cservice_config.h */
 
 #ifndef __CSERVICE_CONFIG_H
-#define __CSERVICE_CONFIG_H "$Id: cservice_config.h,v 1.7 2002/10/09 21:04:24 gte Exp $"
+#define __CSERVICE_CONFIG_H "$Id: cservice_config.h,v 1.8 2002/12/30 03:43:39 gte Exp $"
 
 /**
  * Define this if you wish for all SQL queries to be sent
@@ -54,5 +54,11 @@
  */
 
 #define USE_OPERPARTJOIN
+
+/**
+ * Do you want users to have the ability to set their own MAXLOGINS setting?
+ */
+
+#define USE_SETMAXLOGINS
 
 #endif // __CSERVICE_CONFIG_H
