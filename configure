@@ -5729,8 +5729,8 @@ shlibpath_var=
 shlibpath_overrides_runpath=unknown
 version_type=none
 dynamic_linker="$host_os ld.so"
-sys_lib_dlsearch_path_spec="/lib /usr/lib"
-sys_lib_search_path_spec="/lib /usr/lib /usr/local/lib"
+sys_lib_dlsearch_path_spec="/lib /usr/lib /usr/X11R6/lib"
+sys_lib_search_path_spec="/lib /usr/lib /usr/local/lib /usr/X11R6/lib"
 
 case $host_os in
 aix3*)

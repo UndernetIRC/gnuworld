@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ConnectionManager.cc,v 1.8 2002/06/06 02:29:00 dan_karrels Exp $
+ * $Id: ConnectionManager.cc,v 1.9 2002/06/06 14:34:36 dan_karrels Exp $
  */
 
 #include	<unistd.h>
@@ -38,6 +38,7 @@
 #include	<string>
 #include	<sstream>
 #include	<iostream>
+#include	<algorithm>
 
 #include	<ctime>
 #include	<cctype>
@@ -52,7 +53,7 @@
 #include	"Buffer.h"
 
 const char ConnectionManager_h_rcsId[] = __CONNECTIONMANAGER_H ;
-const char ConnectionManager_cc_rcsId[] = "$Id: ConnectionManager.cc,v 1.8 2002/06/06 02:29:00 dan_karrels Exp $" ;
+const char ConnectionManager_cc_rcsId[] = "$Id: ConnectionManager.cc,v 1.9 2002/06/06 14:34:36 dan_karrels Exp $" ;
 const char Connection_h_rcsId[] = __CONNECTION_H ;
 const char Buffer_h_rcsId[] = __BUFFER_H ;
 
