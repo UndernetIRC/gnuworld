@@ -9,7 +9,7 @@
  * Caveats: None
  * 
  *
- * $Id: REMUSERCommand.cc,v 1.5 2001/01/28 23:16:33 gte Exp $
+ * $Id: REMUSERCommand.cc,v 1.6 2001/01/30 01:01:49 gte Exp $
  */
 
 #include	<string>
@@ -20,7 +20,7 @@
 #include	"levels.h"
 #include	"libpq++.h"
 
-const char REMUSERCommand_cc_rcsId[] = "$Id: REMUSERCommand.cc,v 1.5 2001/01/28 23:16:33 gte Exp $" ;
+const char REMUSERCommand_cc_rcsId[] = "$Id: REMUSERCommand.cc,v 1.6 2001/01/30 01:01:49 gte Exp $" ;
  
 namespace gnuworld
 {
@@ -100,9 +100,15 @@ bool REMUSERCommand::Exec( iClient* theClient, const string& Message )
 	 *  Unless they are trying to remove themself.. in which case its ok ;)
 	 */
 
-	if (level <= targetLevel)
+	if ((level <= targetLevel) && (targetUser != theUser))
 	{
-		bot->Notice(theClient, "Cannot remove a user with equal or higher access than your own.");
+		bot->Notice(theClient, "Cannot remove a user with equal or higher access than your own");
+		return false;
+	} 
+
+	if ((targetLevel == 500) && (targetUser == theUser))
+	{
+		bot->Notice(theClient, "You can't remove yourself from a channel you own");
 		return false;
 	} 
 
