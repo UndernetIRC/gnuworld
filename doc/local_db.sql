@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------------
--- "$Id: local_db.sql,v 1.3 2001/10/21 02:40:43 nighty Exp $"
+-- "$Id: local_db.sql,v 1.4 2001/10/21 02:41:17 nighty Exp $"
 -- Channel service DB SQL file for PostgreSQL.
 --
 -- Tables specific to webcookies (needs to be LOCAL).
@@ -36,6 +36,8 @@ CREATE TABLE helpmgr_users (
 	user_id INT4 NOT NULL,
 	language_id INT2,
 	flags INT2 DEFAULT '1'
+-- CAN_EDIT	: 0x01
+-- CAN_ADD	: 0x02
 );
 
 CREATE INDEX helpmgr_users_user_id_idx ON helpmgr_users(user_id);
