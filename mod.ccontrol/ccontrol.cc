@@ -37,7 +37,7 @@
 #include	"ip.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.124 2002/02/01 11:30:14 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.125 2002/02/01 14:04:48 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -526,10 +526,10 @@ else
 #else
 		ccLog* newLog = new (std::nothrow) ccLog();
 		newLog->Time = ::time(0);
-		newLog->Desc = Message;
-		newLog->Host = theClient->getNickUserHost();
+		newLog->Desc = Message.c_str();
+		newLog->Host = theClient->getNickUserHost().c_str();
 		if(theUser)
-			newLog->User = theUser->getUserName();
+			newLog->User = theUser->getUserName().c_str();
 		else
 			newLog->User = "Unknown";			
 		newLog->CommandName = Command;
@@ -2117,23 +2117,22 @@ else
 
 newLog->Desc = log;
 if(!LogFile.is_open())
-	LogFile.open(LogFileName.c_str(),ios::binary|ios::in|ios::out);
+	LogFile.open(LogFileName.c_str(),ios::in|ios::out);
 if(LogFile.bad())
 	{//There was a problem in opening the log file
 	MsgChanLog("Error while logging to the logs file %s!\n",LogFileName.c_str());
 	return true;
 	}
 
-LogFile.seekg(0,ios::beg);
-LogFile.read((char*)&NumOfLogs,sizeof(NumOfLogs));
-LogFile.seekg(0,ios::beg);
-++NumOfLogs;
-LogFile.write((char*)&NumOfLogs,sizeof(NumOfLogs));
 LogFile.seekp(0,ios::end);
 if(!newLog->Save(LogFile))
 	{
 	MsgChanLog("Error while logging to the log file!\n");
 	}
+addLog(newLog);
+
+if(NumOfLogs > 0)
+	NumOfLogs++;
 return true;
 }
 
@@ -3405,11 +3404,10 @@ void ccontrol::initLogs()
 {
 //TODO: Get this from the conf file
 LogFileName = "CommandsLog.Log";
-NumOfLogs = 0;
 //TODO: Get this from the conf file
 LogsToSave = 100;
-
-LogFile.open(LogFileName.c_str(),ios::binary|ios::in|ios::out);
+NumOfLogs = 0;
+LogFile.open(LogFileName.c_str(),ios::in|ios::out);
 
 if(LogFile.bad())
 	{//There was a problem in opening the log file
@@ -3417,15 +3415,6 @@ if(LogFile.bad())
 	return ;
 	}
 LogFile.setbuf(NULL,0);
-LogFile.seekg(0,ios::end);
-if(LogFile.tellg() == 0) //If the file is empty, save the number of logs
-	{
-	LogFile.seekp(0,ios::beg);
-	LogFile.write((char*)&NumOfLogs,sizeof(NumOfLogs));
-	return;
-	}
-LogFile.seekg(0,ios::beg);
-LogFile.read((char*)&NumOfLogs,sizeof(NumOfLogs));
 }
 
 void ccontrol::addLog(ccLog* newLog)
@@ -3459,14 +3448,14 @@ if(Amount > LogsToSave)
 	}
 	
 
-unsigned long int Left = NumOfLogs;
-if(LogList.size() < Amount) 
+if((LogList.size() < Amount) 
+	&& ((NumOfLogs > LogList.size()) || (NumOfLogs == 0)))
 	{
-	if((LogFile.bad()) || !(LogFile.is_open()))
+	if((!LogFile.eof() && LogFile.bad()) || !(LogFile.is_open()))
 		{
 		LogFile.close();
-		LogFile.open(LogFileName.c_str(),ios::binary|ios::in|ios::out);
-
+		LogFile.open(LogFileName.c_str(),ios::in|ios::out);
+		LogFile.setbuf(NULL,0);
 		if(LogFile.bad())
 			{
 			Notice(theClient,"Error while reading the lastcom report");
@@ -3474,9 +3463,6 @@ if(LogList.size() < Amount)
 			return;
 			}
 		}
-	LogFile.seekg(0,ios::beg);
-	LogFile.read((char*)&NumOfLogs,sizeof(NumOfLogs));
-	ccLog* tmpLog = new ccLog();
 	//Clean the list first
 	for(ccLogIterator ptr= LogList.begin(); ptr != LogList.end();)
 		{
@@ -3492,31 +3478,35 @@ if(LogList.size() < Amount)
 	    this is done only once if at all per restart, so its
 	    not a big deal *g*
 	*/
-	while(Left > Amount)
-		{
-		if(!tmpLog->Load(LogFile))
-			{
-			Notice(theClient,"Error while reading the lastcom report");
-			return;
-			}
-		--Left;
-		}
-	delete tmpLog;
-	while(Left)
+	ccLog* tmpLog;
+	bool cont = true;
+	LogFile.seekg(0,ios::beg);
+	NumOfLogs = 0;
+	while(!LogFile.eof())
 		{
 		tmpLog = new (std::nothrow) ccLog();
 		if(!tmpLog->Load(LogFile))
 			{
-			Notice(theClient,"Error while reading the lastcom report");
-			return;
+			if(!LogFile.eof())
+				{
+				Notice(theClient,"Error while reading the lastcom report");
+				return;
+				}
 			}
-		--Left;
-		addLog(tmpLog); 
+		else
+			{
+			++NumOfLogs;
+			addLog(tmpLog); 
+			}
 		}
+	LogFile.close();
+	LogFile.open(LogFileName.c_str(),ios::in|ios::out);
+	LogFile.setbuf(NULL,0);
+	delete tmpLog;
 	}
 //At this point, we should have the log list full of the last LogsToSave
 //commands, and we need to show only Amount of them
-Left = LogList.size();
+unsigned int Left = LogList.size();
 if(Left == 0)
 	return;
 ccLogIterator curLog = LogList.end();
