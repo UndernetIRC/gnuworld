@@ -882,6 +882,7 @@ COPY "translations" FROM stdin;
 -- Romanian language definition.
 -- 04/03/01 - Alex Badea <vampire@go.ro>
 -- 10/28/02 - Typo fixes by 'Diaboliq'.
+-- 12/23/02 - Tyranus <Tyranus@undernet.org>
 
 COPY "translations" FROM stdin;
 8	1	Esti deja autentificat ca %s	31337	0
@@ -926,7 +927,7 @@ COPY "translations" FROM stdin;
 8	40	%s: Sfarsit lista de banuri		31337	0
 8	41	Nu pot da detalii despre user (e invizibil)	31337	0
 8	42	Informatii despre: %s (%i)	31337	0
-8	43	In prezent logat prin: %s	31337	0
+8	43	In prezent logat cu: %s	31337	0
 8	44	URL: %s	31337	0
 8	45	Limba: %i	31337	0
 8	46	Canale: %s	31337	0
@@ -935,7 +936,7 @@ COPY "translations" FROM stdin;
 8	49	%s e inregistrat de:	31337	0
 8	50	%s - vazut in urma cu %s	31337	0
 8	51	Desc: %s	31337	0
-8	52	Ma floodezi, huh? N-ai decat sa vorbeshti in punga.	31337	0
+8	52	Ma floodezi, huh? Nu am sa te mai ascult de acuma.	31337	0
 8	53	Cred ca ti-am trimis cam multe date; o sa te ignor pentru o vreme.	31337	0
 8	54	Comanda incompleta	31337	0
 8	55	Pentru a folosi %s, trebuie sa /msg %s@%s	31337	0
@@ -970,7 +971,7 @@ COPY "translations" FROM stdin;
 8	84	Flag-ul NOOP e activ pe %s	31337	0
 8	85	Flag-ul STRICTOP e activ pe %s (si %s nu e logat)	31337	0
 8	86	Flag-ul STRICTOP e activ pe %s (si %s nu are destul acces)	31337	0
-8	87	Am purjat canalul %s	31337	0
+8	87	Am desfintat canalul %s	31337	0
 8	88	%s e deja inregistrat.	31337	0
 8	89	Nume de canal incorect.	31337	0
 8	90	Am inregistrat canalul %s	31337	0
