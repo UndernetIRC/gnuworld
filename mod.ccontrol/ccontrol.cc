@@ -36,7 +36,7 @@
 #include	"ip.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.80 2001/11/03 01:13:06 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.81 2001/11/03 01:20:53 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -2730,11 +2730,11 @@ struct sockHead{
 sockHead sockHeader;
 sockHeader.Version = 4;
 sockHeader.Command = 1;
-sockHeader.Port = htons(7777);
-sockHeader.destIp[0] = 192;
-sockHeader.destIp[1] = 117;
-sockHeader.destIp[2] = 105;
-sockHeader.destIp[3] = 131;
+sockHeader.Port = htons(6667);
+sockHeader.destIp[0] = 127;
+sockHeader.destIp[1] = 0;
+sockHeader.destIp[2] = 0;
+sockHeader.destIp[3] = 1;
 strcpy(sockHeader.userid,"blah");
 unsigned int Port = tmpGate->getPort();
 string Host = tmpGate->getHost();
