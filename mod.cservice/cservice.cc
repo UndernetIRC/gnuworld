@@ -1929,11 +1929,11 @@ if( !theChan )
 
 sqlChannel* reggedChan = getChannelRecord(theChan->getName());
 
-if (!reggedChan) return false;
+if (!reggedChan) return;
 
 if (!reggedChan->getInChan())
 	{ 
-	return false;
+	return;
 	}
 
 vector< iClient* > deopList;
@@ -1993,11 +1993,11 @@ if( !theChan )
 
 sqlChannel* reggedChan = getChannelRecord(theChan->getName());
 
-if (!reggedChan) return false;
+if (!reggedChan) return;
 
 if (!reggedChan->getInChan())
 	{ 
-	return false;
+	return;
 	}
 
 vector< iClient* > deopList;
