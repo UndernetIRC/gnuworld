@@ -3,7 +3,7 @@
  */
 
 #ifndef __XCLIENT_H
-#define __XCLIENT_H "$Id: client.h,v 1.26 2001/02/05 20:06:38 dan_karrels Exp $"
+#define __XCLIENT_H "$Id: client.h,v 1.27 2001/02/12 13:59:26 plexus Exp $"
 
 #include	<string>
 
@@ -416,7 +416,7 @@ public:
 	/**
 	 * Part will cause the client to part a channel.
 	 */
-	virtual bool	Part( const string& ) ;
+	virtual bool	Part( const string&, const string& = "" ) ;
 
 	/**
 	 * Part the given channel.
