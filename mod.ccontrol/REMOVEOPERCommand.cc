@@ -13,7 +13,7 @@
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 
-const char REMOVEOPERCommand_cc_rcsId[] = "$Id: REMOVEOPERCommand.cc,v 1.6 2001/05/14 21:26:37 mrbean_ Exp $";
+const char REMOVEOPERCommand_cc_rcsId[] = "$Id: REMOVEOPERCommand.cc,v 1.7 2001/06/11 21:08:31 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -30,14 +30,19 @@ if( st.size() < 2 )
 	}
 //Fetch the user record from the database
 ccUser* theUser = bot->GetOper(st[1]);
-//ccUser* theUser = bot->GetUser(st[1]);
 if (!theUser) 
 	{ 
 	bot->Notice(theClient,"Oper %s does not exists db," 
 	"check your handle and try again",st[1].c_str());
 	return false;
 	}	    
+AuthInfo* tempAuth = bot->IsAuth(theClient->getCharYYXXX());
 	
+if((tempAuth->get_Flags() & (OPER | ADMIN | CODER)) < theUser->getFlags())
+	{
+	bot->Notice(theClient,"You cant remove an oper who got higer access than yours");
+	return false;
+	}
 if(bot->DeleteOper(string_lower(st[1])))     
 	{    
 	bot->Notice(theClient,"Successfully Deleted Oper %s ",st[1].c_str());
@@ -47,11 +52,11 @@ if(bot->DeleteOper(string_lower(st[1])))
 	if(TDeauth)
 		{
 		//Get hte user iClient entry from the network , and notify him that he was deleted
-		iClient *TClient = Network->findClient(TDeauth->Numeric); 
+		iClient *TClient = Network->findClient(TDeauth->get_Numeric()); 
 		if(TClient)
 			bot->Notice(TClient,"You have been removed from my access list");
 		//Remove the user authenticate entry
-		bot->deAuthUser(TDeauth->Numeric);
+		bot->deAuthUser(TDeauth->get_Numeric());
 		}	
 	delete theUser;
 	return true;	

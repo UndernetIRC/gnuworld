@@ -26,7 +26,7 @@
 #include        "server.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.54 2001/06/07 15:59:06 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.55 2001/06/11 21:08:31 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -229,6 +229,9 @@ RegisterCommand( new LISTIGNORESCommand( this, "LISTIGNORES", ""
 RegisterCommand( new REMOVEIGNORECommand( this, "REMIGNORE", "(nick/host)"
 	" Removes a host/nick from the  ignore list",flg_REMIGNORE ) ) ;
 
+RegisterCommand( new LISTCommand( this, "LIST", "(glines)"
+	" Get all kinds of lists from the bot",flg_LIST ) ) ;
+
 loadGlines();
 loadExceptions();
 
@@ -393,7 +396,7 @@ if((!theUser) && (ComAccess))
 	Notice( theClient,
 		"You must be logged in to issue that command" ) ;
 	}
-else if( (ComAccess) && !(ComAccess & theUser->Access))
+else if( (ComAccess) && !(ComAccess & theUser->get_Access()))
 	{
 	Notice( theClient, "You dont have access to that command" ) ;
 	}
@@ -769,8 +772,7 @@ AuthInfo* ccontrol::IsAuth( const string& Numeric ) const
 for( authListType::const_iterator ptr = authList.begin() ;
 	ptr != authList.end() ; ++ptr )
 	{
-	// TODO: Violation of encapsulation, use an accessor here
-	if( !strcasecmp( (*ptr)->Numeric, Numeric ) )
+	if( !strcasecmp( (*ptr)->get_Numeric(), Numeric ) )
 		{
 		return *ptr ;
 		}
@@ -789,7 +791,7 @@ AuthInfo* ccontrol::IsAuth( const unsigned int UserId ) const
 for( authListType::const_iterator ptr = authList.begin() ;
 	ptr != authList.end() ; ++ptr )
 	{
-	if( (*ptr)->Id == UserId )
+	if( (*ptr)->get_Id() == UserId )
 		{
 		return *ptr ;
 		}
@@ -804,12 +806,12 @@ AuthInfo* TempAuth = IsAuth(TempUser);
 if(TempAuth)
 	{
 	//ccUser* TempUser = GetUser(Id);
-	TempAuth->Id = TempUser->getID();
-        TempAuth->Name = TempUser->getUserName();
-        TempAuth->Access = TempUser->getAccess();
-        TempAuth->Flags = TempUser->getFlags();
-        TempAuth->SuspendExpires = TempUser->getSuspendExpires();
-        TempAuth->SuspendedBy = TempUser->getSuspendedBy();
+	TempAuth->set_Id(TempUser->getID());
+        TempAuth->set_Name(TempUser->getUserName());
+        TempAuth->set_Access(TempUser->getAccess());
+        TempAuth->set_Flags(TempUser->getFlags());
+        TempAuth->set_SuspendExpires(TempUser->getSuspendExpires());
+        TempAuth->set_SuspendedBy(TempUser->getSuspendedBy());
 	}
 }
 
@@ -923,13 +925,13 @@ bool ccontrol::AuthUser( ccUser* TempUser)
 AuthInfo *TempAuth = new (nothrow) AuthInfo;
 assert( TempAuth != 0 ) ;
 
-TempAuth->Id = TempUser->getID();
-TempAuth->Name = TempUser->getUserName();
-TempAuth->Access = TempUser->getAccess();
-TempAuth->Flags = TempUser->getFlags();
-TempAuth->Numeric = TempUser->getNumeric();
-TempAuth->SuspendExpires = TempUser->getSuspendExpires();
-TempAuth->SuspendedBy = TempUser->getSuspendedBy();
+TempAuth->set_Id(TempUser->getID());
+TempAuth->set_Name(TempUser->getUserName());
+TempAuth->set_Access(TempUser->getAccess());
+TempAuth->set_Flags(TempUser->getFlags());
+TempAuth->set_Numeric(TempUser->getNumeric());
+TempAuth->set_SuspendExpires(TempUser->getSuspendExpires());
+TempAuth->set_SuspendedBy(TempUser->getSuspendedBy());
 
 authList.push_back( TempAuth ) ;
 return true;
@@ -1339,9 +1341,7 @@ return true;
 
 ccGline* ccontrol::findMatchingGline( const string& Host )
 {
-// TODO: This method needs to be rewritten
 ccGline *theGline = 0;
-glineIterator tptr;
 for(glineIterator ptr = glineList.begin(); ptr != glineList.end(); ++ptr)
 	{
 	theGline = *ptr;
@@ -1351,15 +1351,6 @@ for(glineIterator ptr = glineList.begin(); ptr != glineList.end(); ++ptr)
 			{
 			return theGline;
 			}
-		else
-			{
-			tptr = ptr++;
-			theGline->Delete();
-			glineList.erase(tptr);
-			MyUplink->removeGline(theGline->get_Host());
-			wallopsAsServer("Removing gline for host %s\n",theGline->get_Host().c_str());
-			delete theGline;
-			}
 		}
 	}
 
@@ -1368,26 +1359,13 @@ return NULL ;
 
 ccGline* ccontrol::findGline( const string& HostName )
 {
-// TODO: How does a method with "find" in its name mutate anything?
-// TODO: This method needs to be rewritten
 ccGline *theGline;
-glineIterator tptr;
-for(glineIterator ptr = glineList.begin(); ptr != glineList.end();)
+for(glineIterator ptr = glineList.begin(); ptr != glineList.end();ptr++)
 	{
 	theGline = *ptr;
-	//if(!strcasecmp(theGline->get_Host().c_str(),HostName.c_str()))
     	if(theGline->get_Host() == HostName)
 		if(theGline->get_Expires() > ::time(0))
 			return theGline;
-		else
-			{
-			tptr = ptr++;
-			theGline->Delete();
-			glineList.erase(tptr);
-			MyUplink->removeGline(theGline->get_Host());
-			}
-	else
-		ptr++;			
 	}
 
 return NULL ;
@@ -1395,10 +1373,7 @@ return NULL ;
 
 struct tm ccontrol::convertToTmTime(time_t NOW)
 {
-// TODO: why not just "return gmtime( &NOW ) ;" ?
-time_t *tNow = &NOW;
-struct tm* Now = gmtime(tNow);
-return *Now;
+return *gmtime(&NOW);
 }
 
 // TODO: This method should never exist
@@ -1425,17 +1400,14 @@ va_start( list, Msg ) ;
 vsprintf( buffer, Msg, list ) ;
 va_end( list ) ;
 
-// TODO: Statement with no affect
-if(Message(Network->findChannel(msgChan),buffer));
+Message(Network->findChannel(msgChan),buffer);
 
 for( authListType::const_iterator ptr = authList.begin() ;
         ptr != authList.end() ; ++ptr )
         {
-	// TODO: This should use an accessor
-        if((*ptr)->Flags & getLOGS )
+        if((*ptr)->get_Flags() & getLOGS )
                 { 
-		// TODO: Statement with no affect
-                if(Message(Network->findClient((*ptr)->Numeric),buffer));
+                Message(Network->findClient((*ptr)->get_Numeric()),buffer);
                 }
 	}
 return true;
@@ -1450,14 +1422,13 @@ va_list list;
 va_start( list, Log ) ;
 vsprintf( buffer, Log, list ) ;
 va_end( list ) ;
-iClient *theClient = Network->findClient(Oper->Numeric);
+iClient *theClient = Network->findClient(Oper->get_Numeric());
 
 static const char *Main = "INSERT into comlog (ts,oper,command) VALUES (now()::abstime::int4,'";
 
 strstream theQuery;
 theQuery	<< Main
-		// TODO: Violation of encapsulation
-		<< Oper->Name 
+		<< Oper->get_Name() 
 		<< " (" << theClient->getNickUserHost() <<")','"
 		<< buffer << "')"
 		<< ends;
@@ -1622,21 +1593,12 @@ return FORCE_NEEDED_HOST;
 
 bool ccontrol::isSuspended(AuthInfo *theUser)
 {
-if( (theUser) && (theUser->Flags & isSUSPENDED))
+if( (theUser) && (theUser->get_Flags() & isSUSPENDED))
 	{
-	if(::time( 0 ) - theUser->SuspendExpires < 0)
+	//Check if the suspend hadnt already expired
+	if(::time( 0 ) - theUser->get_SuspendExpires() < 0)
 		{
 		return true;
-		}
-	else 
-		{ //if the suspend expired, unsuspend the user and execute the command
-		MsgChanLog("unsuspending %s\n",theUser->Name.c_str());
-		ccUser* tmpUser = GetOper(theUser->Name);
-		tmpUser->setSuspendExpires(0);
-		tmpUser->removeFlag(isSUSPENDED);
-		tmpUser->setSuspendedBy("");
-		tmpUser->Update();
-		delete tmpUser;
 		}
 	}
 return false;
@@ -1656,30 +1618,23 @@ return count;
 bool ccontrol::refreshGlines()
 {
 
-// TODO: Rewrite method
-
 int totalFound = 0;
 inRefresh = true;
-
-glineIterator tPtr;
 
 for(glineIterator ptr = glineList.begin();ptr != glineList.end();) 
 	{
 	if((*ptr)->get_Expires() <= ::time(0))
 		{
 		//remove the gline from the core
-		tPtr = ptr;
-		tPtr++;
 		MyUplink->removeGline((*ptr)->get_Host());
 		//remove the gline from ccontrol structure
 		//finally remove the gline from the database
 		(*ptr)->Delete();
-		glineList.erase(ptr);
-		ptr = tPtr;
+		ptr = glineList.erase(ptr);
 		totalFound++;
 		}
-		else
-			ptr++;
+	else
+		ptr++;
 	}
 
 inRefresh = false;
@@ -1731,15 +1686,14 @@ if( PGRES_TUPLES_OK != status )
 
 // BUG: This should crash, if only this variable was initialized
 // as it should be!
-ccGline *tempGline;
-assert(tempGline != NULL);
+ccGline *tempGline = NULL;
 
 inRefresh = true;
 
 for( int i = 0 ; i < SQLDb->Tuples() ; i++ )
 	{
 	tempGline =  new (nothrow) ccGline(SQLDb);
-	assert( tempGline != 0 ) ;
+	assert( tempGline != NULL ) ;
 
 	tempGline->set_Id(SQLDb->GetValue(i,0));
 	tempGline->set_Host(SQLDb->GetValue(i,1));
@@ -1922,9 +1876,7 @@ if(LogInfo->get_Logins() > 5)
 int ccontrol::removeIgnore( const string &Host )
 {
 
-// TODO: Rewrite this method
 ccLogin *tempLogin = 0;
-loginIterator tptr;
 int retMe = IGNORE_NOT_FOUND;
 
 for(loginIterator ptr = ignore_begin();ptr!=ignore_end();)
@@ -1943,8 +1895,7 @@ for(loginIterator ptr = ignore_begin();ptr!=ignore_end();)
 		delete[] s.str();
 		tempLogin->resetIgnore();
 		tempLogin->resetLogins();
-		tptr = ptr++;
-		ignoreList.erase(tptr);
+		ptr = ignoreList.erase(ptr);
 		if(tempLogin->get_Numeric() == "0")
 			{
 			delete tempLogin;
@@ -2020,8 +1971,6 @@ return true ;
 
 bool ccontrol::refreshIgnores()
 {
-// TODO: Rewrite this method
-loginIterator tptr;
 ccLogin *tempLogin;
 for(loginIterator ptr = ignore_begin();ptr!=ignore_end();)
 	{
@@ -2044,9 +1993,7 @@ for(loginIterator ptr = ignore_begin();ptr!=ignore_end();)
 			{
 			delete tempLogin;
 			}
-		tptr = ptr;
-		ptr++;
-		ignoreList.erase(tptr);
+		ptr = ignoreList.erase(ptr);
 		}
 	else
 		ptr++;
@@ -2094,5 +2041,32 @@ for( int i = 0 ; i < SQLDb->Tuples() ; i++ )
 	}
 return true;	
 } 
+
+void ccontrol::listGlines( iClient *theClient )
+{
+
+ccGline* tempGline;
+Notice(theClient,"-= Gline List =-");
+for(glineIterator ptr = gline_begin();ptr != gline_end();ptr++)
+	{
+	tempGline =*ptr;
+	if(tempGline ->get_Expires() > ::time(0))
+		{
+		Notice(theClient,"Host : %s , Expires At : %s[%d] , AddedBy %s"
+			,tempGline->get_Host().c_str()
+			,convertToAscTime(tempGline->get_Expires())
+			,tempGline->get_Expires()
+			,tempGline->get_AddedBy().c_str());
+		}
+	}
+Notice(theClient,"-= End Of Gline List =-");
+
+}
+			
+	
+void ccontrol::listServers( iClient * )
+{
+
+}
 
 } // namespace gnuworld

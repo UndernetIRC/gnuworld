@@ -12,7 +12,7 @@
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 
-const char MODOPERCommand_cc_rcsId[] = "$Id: MODOPERCommand.cc,v 1.9 2001/05/23 21:16:47 mrbean_ Exp $";
+const char MODOPERCommand_cc_rcsId[] = "$Id: MODOPERCommand.cc,v 1.10 2001/06/11 21:08:31 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -46,7 +46,7 @@ if(!tmpUser)
 	}
 //Check if the user got a higher or equal flags than the one he's trying to edit	
 AuthInfo* tmpAuth = bot->IsAuth(theClient->getCharYYXXX());
-if((tmpAuth->Flags & ~getLOGS) < (tmpUser->getFlags() & ~getLOGS))
+if((tmpAuth->get_Flags() & ~getLOGS) < (tmpUser->getFlags() & ~getLOGS))
 	{
 	bot->Notice(theClient,"You cant modify a user who got higher level than yours");
 	delete tmpUser;

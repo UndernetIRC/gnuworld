@@ -12,7 +12,7 @@
 #include	"StringTokenizer.h"
 #include	"Network.h"
 
-const char NEWPASSCommand_cc_rcsId[] = "$Id: NEWPASSCommand.cc,v 1.7 2001/05/14 21:26:37 mrbean_ Exp $";
+const char NEWPASSCommand_cc_rcsId[] = "$Id: NEWPASSCommand.cc,v 1.8 2001/06/11 21:08:31 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -40,8 +40,7 @@ if(!tmpUser)
 	}
 
 //Fetch the user record from the database	
-//ccUser* theUser = bot->GetUser(tmpUser->Name);
-ccUser* theUser = bot->GetOper(tmpUser->Name);
+ccUser* theUser = bot->GetOper(tmpUser->get_Name());
 
 theUser->setPassword(bot->CryptPass(st[1]));
 if(theUser->Update())

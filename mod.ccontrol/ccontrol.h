@@ -3,7 +3,7 @@
  */
 
 #ifndef __CCONTROL_H
-#define __CCONTROL_H "$Id: ccontrol.h,v 1.33 2001/06/07 15:59:06 mrbean_ Exp $"
+#define __CCONTROL_H "$Id: ccontrol.h,v 1.34 2001/06/11 21:08:31 mrbean_ Exp $"
 
 //Define gline response
 #define GLINE_OK 1;
@@ -416,9 +416,6 @@ public:
 	
 	bool remGline( ccGline* );
 
-	/**
-	 * This method tries to load a gline from the database
-	 */
 
 	ccGline* findMatchingGline( const string& );
 
@@ -506,6 +503,10 @@ public:
 	bool refreshIgnores();
 	
 	bool loadExceptions();
+	
+	void listGlines( iClient * );
+	
+	void listServers( iClient * );
 	
 	/**
 	 * This is a constant iterator type used to perform a read-only
