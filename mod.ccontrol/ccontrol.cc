@@ -11,7 +11,7 @@
 /* ccontrol.cc
  * Authors: Daniel Karrels dan@karrels.com
  *	    Tomer Cohen    MrBean@toughguy.net
- * $Id: ccontrol.cc,v 1.158 2003/02/16 12:25:25 mrbean_ Exp $
+ * $Id: ccontrol.cc,v 1.159 2003/02/16 15:52:20 mrbean_ Exp $
  */
 
 #define MAJORVER "1"
@@ -56,7 +56,7 @@
 #include	"ip.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.158 2003/02/16 12:25:25 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.159 2003/02/16 15:52:20 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -1576,7 +1576,7 @@ if(dbConnected)
 		if(strcasecmp(tIP,"0.0.0.0"))			
 			{
 			int CurConnections = ++clientsIpMap[tIP];
-			if((CurConnections  > getExceptions("*@" + tIP)) 
+			if((CurConnections > maxClones) && (CurConnections  > getExceptions("*@" + tIP)) 
 			    && (CurConnections > getExceptions("*@"+NewUser->getRealInsecureHost())))
 				{
 				MsgChanLog("Excessive connections (%d) from host *@%s\n"
@@ -1624,7 +1624,8 @@ if(dbConnected)
 					}
 				ipClass += '*';
 				CurConnections = ++virtualClientsMap[NewUser->getDescription() + "@" + ipClass];
-				if(CurConnections > maxVClones)
+				if((CurConnections > maxVClones) &&
+				     (CurConnections > getExceptions("*@" + ipClass)))
 					{
 					MsgChanLog("Virtual clones for real name %s on %s, total connections %d\n",
 					    NewUser->getDescription().c_str()
@@ -3635,7 +3636,7 @@ MyUplink->Wallops( buffer ) ;
 
 int ccontrol::getExceptions( const string &Host )
 {
-int Exception = maxClones;
+int Exception = 0;
 
 for(exceptionIterator ptr = exception_begin();ptr != exception_end();ptr++)
 	{
