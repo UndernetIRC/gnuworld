@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# $Id: enc_pass.sh,v 1.1 2002/08/09 01:10:45 reedloden Exp $
+# $Id: enc_pass.sh,v 1.3 2002/08/30 10:28:42 nighty Exp $
 #
 # Just for the fun of it ;)
 #

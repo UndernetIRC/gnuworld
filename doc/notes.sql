@@ -1,5 +1,5 @@
 --
--- $Id: notes.sql,v 1.1 2002/08/09 01:10:46 reedloden Exp $
+-- $Id: notes.sql,v 1.3 2002/08/30 10:28:42 nighty Exp $
 --
 -- Referenced from config.inc,
 -- creates the proper "notes" table when needed (e.g. when it's not present on you database already ;P)
