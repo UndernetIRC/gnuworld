@@ -6,7 +6,7 @@
 #include	"ELog.h" 
 #include	"cservice.h" 
 
-const char SHOWIGNORECommand_cc_rcsId[] = "$Id: SHOWIGNORECommand.cc,v 1.5 2001/02/10 01:25:25 gte Exp $" ;
+const char SHOWIGNORECommand_cc_rcsId[] = "$Id: SHOWIGNORECommand.cc,v 1.6 2001/02/10 23:41:49 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -28,10 +28,11 @@ bool SHOWIGNORECommand::Exec( iClient* theClient, const string& Message )
 
 	for( cservice::silenceListType::const_iterator ptr = bot->silenceList.begin() ;
 		ptr != bot->silenceList.end() ; ++ptr )
-	{
-		bot->Notice(theClient, "%s", ptr->second.c_str());
+		{
+		bot->Notice(theClient, "%s for %i minutes", ptr->second.c_str(),
+			(((ptr->first - bot->currentTime()) / 60) % 60));
 		count++;
-	}
+		}
 
 	if (!count)
 		{ 
