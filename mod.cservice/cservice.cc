@@ -446,7 +446,7 @@ int cservice::OnCTCP( iClient* theClient, const string& CTCP,
 
 	if(Command == "VERSION")
 	{
-		xClient::DoCTCP(theClient, CTCP.c_str(), "Undernet P10 Channel Services Version 2 [" __DATE__ " " __TIME__ "] ($Id: cservice.cc,v 1.49 2001/01/18 22:39:39 gte Exp $)");
+		xClient::DoCTCP(theClient, CTCP.c_str(), "Undernet P10 Channel Services Version 2 [" __DATE__ " " __TIME__ "] ($Id: cservice.cc,v 1.50 2001/01/19 00:01:11 gte Exp $)");
 		return true;
 	}
  
@@ -1234,7 +1234,7 @@ return xClient::OnChannelEvent( whichEvent, theChan, data1, data2, data3, data4 
  * Global function to replace ' with \' in strings for safe placement in
  * SQL statements.
  *--------------------------------------------------------------------------*/ 
-const string& gnuworld::escapeSQLChars(const string& theString)
+const string gnuworld::escapeSQLChars(const string& theString)
 { 
 	static string result;
 	result = theString;

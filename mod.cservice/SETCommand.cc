@@ -8,7 +8,7 @@
  *
  * Caveats: SET LANG is still under consideration.
  *
- * $Id: SETCommand.cc,v 1.6 2001/01/18 22:39:39 gte Exp $
+ * $Id: SETCommand.cc,v 1.7 2001/01/19 00:01:11 gte Exp $
  */
 
 #include	<string>
@@ -20,7 +20,7 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char SETCommand_cc_rcsId[] = "$Id: SETCommand.cc,v 1.6 2001/01/18 22:39:39 gte Exp $" ;
+const char SETCommand_cc_rcsId[] = "$Id: SETCommand.cc,v 1.7 2001/01/19 00:01:11 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -505,6 +505,7 @@ bool SETCommand::Exec( iClient* theClient, const string& Message )
 
 	if(option == "URL")
 	{
+		string url = st[3];
 	    if(level < level::set::url)
 	    {
 			bot->Notice(theClient, "URL: You do not have enough access!");
@@ -515,11 +516,11 @@ bool SETCommand::Exec( iClient* theClient, const string& Message )
 			bot->Notice(theClient, "The URL can max be 80 chars long!");
 			return true;
 	    }
-		theChan->setURL(value);
+		theChan->setURL(url);
 	    theChan->commit(); 
 	    bot->Notice(theClient, "URL for %s is: %s",
 			theChan->getName().c_str(),
-			value.c_str());
+			url.c_str());
 	    return true;
 	}
 

@@ -1,5 +1,5 @@
 #ifndef __CSERVICE_H
-#define __CSERVICE_H "$Id: cservice.h,v 1.26 2001/01/18 22:39:39 gte Exp $"
+#define __CSERVICE_H "$Id: cservice.h,v 1.27 2001/01/19 00:01:11 gte Exp $"
 
 #include	<string>
 #include	<vector>
@@ -220,7 +220,7 @@ public:
 	void cservice::deopAllOnChan(Channel*); 
 } ;
 
-const string& escapeSQLChars(const string& theString);
+const string escapeSQLChars(const string& theString);
  
 } // namespace gnuworld
 
