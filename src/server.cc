@@ -44,7 +44,7 @@
 #include	"moduleLoader.h"
 
 const char xServer_h_rcsId[] = __XSERVER_H ;
-const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.38 2001/01/03 07:22:48 gte Exp $" ;
+const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.39 2001/01/03 23:06:49 dan_karrels Exp $" ;
 
 using std::string ;
 using std::vector ;
@@ -1716,10 +1716,12 @@ if( '+' == Param[ whichToken ][ 0 ] )
 			// TODO: fix this, not difficult
 			case 'l':
 				theChan->setLimit( ::atoi( Param[ whichToken + 1 ] ) ) ;
+				theChan->setMode( Channel::MODE_L ) ;
 				whichToken++ ;
 				break ;
 			case 'k':
 				theChan->setKey( Param[ whichToken + 1 ] ) ;
+				theChan->setMode( Channel::MODE_K ) ;
 				whichToken++ ;
 				break ;
 			default:

@@ -150,14 +150,14 @@ public:
 	 * channel mode and set the limit.
 	 */
 	inline void setLimit( const unsigned int& newLimit )
-		{ limit = newLimit ; setMode( MODE_L ) ; }
+		{ limit = newLimit ; }
 
 	/**
 	 * Set a key on the channel.  This method will set the
 	 * channel mode and the key as well.
  	 */
 	inline void setKey( const string& newKey )
-		{ key = newKey ; setMode( MODE_K ) ; }
+		{ key = newKey ; }
 
 	/**
 	 * The const_iterator type used to perform a read-only traversal
