@@ -38,7 +38,7 @@
 #include	"ip.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.138 2002/03/25 23:40:25 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.139 2002/04/06 21:40:58 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -3451,6 +3451,9 @@ int days;
 int hours;
 int mins;
 int secs;
+unsigned long  totalRecv = getUplink()->getTotalReceived() / uptime;
+unsigned long totalSent = getUplink()->getTotalSent() / uptime;
+
 days = uptime/(24*3600);
 uptime %= 24*3600;
 hours = uptime / 3600;
@@ -3474,6 +3477,30 @@ Notice(tmpClient,"ccGline: %d",ccGline::numAllocated);
 Notice(tmpClient,"ccException: %d",ccException::numAllocated);
 Notice(tmpClient,"ccUser: %d",ccUser::numAllocated);
 Notice(tmpClient,"Total of %d users in the map",usersMap.size()); 
+
+if(totalRecv > 1024*1024)
+	{
+	Notice(tmpClient,"Received a total of %ld (average of %ld MB/Sec)",
+		getUplink()->getTotalReceived(),double(totalRecv)/1024*1024);
+	}
+else
+	{
+	Notice(tmpClient,"Received a total of %ld bytes (average of %ld Bytes/Sec)",
+		getUplink()->getTotalReceived(),totalRecv);	
+	}
+	
+if(totalSent > 1024*1024)
+	{
+	Notice(tmpClient,"Sent a total of %ld bytes (average of %ld MB/Sec)",
+		getUplink()->getTotalSent(),double(totalSent)/1024*1024);
+	}
+else
+	{
+	Notice(tmpClient,"Sent a total of %ld bytes (average of %ld Bytes/Sec)",
+		getUplink()->getTotalSent(),totalSent);	
+	}
+
+//Notice(tmpClient,"Received a total of %ld bytes",getUplink()->getTotalReceived());
 }
 
 unsigned int ccontrol::checkPassword(string NewPass , ccUser* tmpUser)

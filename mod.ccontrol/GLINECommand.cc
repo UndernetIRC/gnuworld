@@ -24,7 +24,7 @@
 #include	"ccUser.h"
 #include	"Constants.h"
 
-const char GLINECommand_cc_rcsId[] = "$Id: GLINECommand.cc,v 1.38 2002/03/01 21:31:57 mrbean_ Exp $";
+const char GLINECommand_cc_rcsId[] = "$Id: GLINECommand.cc,v 1.39 2002/04/06 21:40:58 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -291,7 +291,7 @@ ptr != theChan->userList_end() ; ++ptr )
 		continue;
 		}
 	if((!TmpClient->getMode(iClient::MODE_SERVICES)) 
-	&& !(bot->IsAuth(theClient)) && !(TmpClient->isOper())) 
+	&& !(bot->IsAuth(TmpClient)) && !(TmpClient->isOper())) 
 		{
 		TmpGline = new ccGline(bot->SQLDb);
 		assert(TmpGline != NULL);
