@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: EConfig.cc,v 1.6 2004/01/16 00:59:47 dan_karrels Exp $
+ * $Id: EConfig.cc,v 1.7 2004/01/21 19:42:07 dan_karrels Exp $
  */
 
 #include	<unistd.h> // unlink()
@@ -38,7 +38,7 @@
 #include	"ELog.h"
 #include	"misc.h"
 
-const char rcsId[] = "$Id: EConfig.cc,v 1.6 2004/01/16 00:59:47 dan_karrels Exp $" ;
+const char rcsId[] = "$Id: EConfig.cc,v 1.7 2004/01/21 19:42:07 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -53,18 +53,35 @@ EConfig::EConfig( const string& _configFileName )
  : configFileName( _configFileName ),
    error( false )
 {
+//elog	<< "EConfig> Opening configFile: "
+//	<< configFileName
+//	<< ", hasError(): "
+//	<< hasError()
+//	<< endl ;
+
 ifstream configFile( configFileName.c_str() ) ;
 if( !configFile.is_open() )
 	{
-	elog	<< "EConfig: Unable to open file: "
+	elog	<< "EConfig> Unable to open file: "
 		<< configFileName
 		<< endl ;
 	setError() ;
 	}
+//else
+//	{
+//	elog	<< "EConfig> Successfully opened"
+//		<< endl ;
+//	}
+
 if( !readFile( configFile ) )
 	{
 	setError() ;
 	}
+//else
+//	{
+//	elog	<< "EConfig> Successfully parsed"
+//		<< endl ;
+//	}
 configFile.close() ;
 }
 
@@ -159,7 +176,6 @@ while( getline( configFile, tmp ) )
 	}
 
 return true ;
-
 }
 
 bool EConfig::removeSpaces( string& line )
