@@ -16,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: dronescan.h,v 1.11 2003/06/19 23:47:43 jeekay Exp $
+ * $Id: dronescan.h,v 1.12 2003/06/20 00:33:28 jeekay Exp $
  */
 
 #ifndef DRONESCAN_H
-#define DRONESCAN_H "$Id: dronescan.h,v 1.11 2003/06/19 23:47:43 jeekay Exp $"
+#define DRONESCAN_H "$Id: dronescan.h,v 1.12 2003/06/20 00:33:28 jeekay Exp $"
 
 #include <map>
 
@@ -148,6 +148,12 @@ public:
 	typedef vector< string > droneChannelsType;
 	droneChannelsType droneChannels;
 	
+	/** Join counter config options */
+	unsigned int jcInterval;
+	unsigned int jcCutoff;
+	typedef map< string , unsigned int , noCaseCompare > jcChanMapType;
+	jcChanMapType jcChanMap;
+	
 	/* Test control */
 	/** Test map type. */
 	typedef map< string, Test* > testMapType;
@@ -192,12 +198,6 @@ protected:
 	/** Margins. */
 	double nickMargin;
 	unsigned int channelCutoff;
-	
-	/** Join counter config options */
-	unsigned int jcInterval;
-	unsigned int jcCutoff;
-	typedef map< string , unsigned int , noCaseCompare > jcChanMapType;
-	jcChanMapType jcChanMap;
 	
 	
 	/** How often to show drone channels on join test */

@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: dronescan.cc,v 1.19 2003/06/20 00:12:23 jeekay Exp $
+ * $Id: dronescan.cc,v 1.20 2003/06/20 00:33:27 jeekay Exp $
  */
 
 #include <cstdarg>	/* va_list */
@@ -34,7 +34,7 @@
 #include "dronescanTests.h"
 #include "Timer.h"
 
-RCSTAG("$Id: dronescan.cc,v 1.19 2003/06/20 00:12:23 jeekay Exp $");
+RCSTAG("$Id: dronescan.cc,v 1.20 2003/06/20 00:33:27 jeekay Exp $");
 
 namespace gnuworld {
 
@@ -285,7 +285,7 @@ int dronescan::OnCTCP( iClient* theClient, const string& CTCP,
 	} else if("PING" == Command) {
 		DoCTCP(theClient, CTCP, Message);
 	} else if("VERSION" == Command) {
-		DoCTCP(theClient, CTCP, "GNUWorld DroneScan v0.0.2");
+		DoCTCP(theClient, CTCP, "GNUWorld DroneScan v0.0.3");
 	}
 
 	return xClient::OnCTCP(theClient, CTCP, Message, Secure);
@@ -366,12 +366,10 @@ int dronescan::OnChannelEvent( const channelEventType& theEvent,
 
 	unsigned int joinCount = jcChanMap[channelName];
 
-	if((joinCount >= jcCutoff) && (joinCount % jcCutoff == 0))
+	if(joinCount == jcCutoff)
 		{
-		log(WARN, "%s has had %u joins within the last %us.",
-			channelName.c_str(),
-			joinCount,
-			jcInterval
+		log(WARN, "%s is being join flooded.",
+			channelName.c_str()
 			);
 		}
 
@@ -538,6 +536,14 @@ int dronescan::OnTimer( xServer::timerID theTimer , void *)
 
 	if(theTimer == tidClearJoinCounter)
 		{
+		for(jcChanMapType::const_iterator itr = jcChanMap.begin() ;
+		    itr != jcChanMap.end() ; ++itr) {
+			log(WARN, "Join flood over in %s. Total joins: %u",
+				itr->first.c_str(),
+				itr->second
+				);
+		}
+		
 		log(DEBUG, "Clearing %u records from the join counter.",
 			jcChanMap.size()
 			);

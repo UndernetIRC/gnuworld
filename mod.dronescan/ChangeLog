@@ -1,3 +1,8 @@
+2003-06-20 0.0.3 Jeekay
+* Added throttling of join flood to the console.
+* Added LIST JOINFLOOD command to show channels currently being flooded.
+* Bumped version to 0.0.3
+
 2003-06-20 0.0.2 Jeekay
 * Added throttling of EVT_JOIN spam to console.
 * Added LIST ACTIVE to show channels that are currently being throttled
