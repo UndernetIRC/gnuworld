@@ -9,7 +9,7 @@
 #include	"responses.h"
 #include	"Network.h"
  
-const char STATUSCommand_cc_rcsId[] = "$Id: STATUSCommand.cc,v 1.8 2001/01/22 20:25:16 gte Exp $" ;
+const char STATUSCommand_cc_rcsId[] = "$Id: STATUSCommand.cc,v 1.9 2001/01/29 01:08:28 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -120,7 +120,7 @@ bool STATUSCommand::Exec( iClient* theClient, const string& Message )
 
 	if (tmpChan)
 	{
-		if ((level) || (admLevel >= 600)) // If the person has access, or is a 600+ admin.
+		if ((level >= 400) || (admLevel >= 600)) // If the person has access >400, or is a 600+ admin.
 		{
 			bot->Notice(theClient, "Channel %s has %d users (TBA operators)",
 				tmpChan->getName().c_str(), tmpChan->size() ) ;

@@ -137,7 +137,7 @@ cservice::cservice(const string& args)
     RegisterCommand(new DEVOICECommand(this, "DEVOICE", "<#channel> [nick] [nick] ..", 3));
     RegisterCommand(new ADDUSERCommand(this, "ADDUSER", "<#channel> <nick> <access>", 8));
     RegisterCommand(new REMUSERCommand(this, "REMUSER", "<#channel> <nick>", 4));
-    RegisterCommand(new MODINFOCommand(this, "MODINFO", "<#channel> [ACCESS <nick> <level>] [AUTOMODE <NONE|OP|VOICE>]", 6));
+    RegisterCommand(new MODINFOCommand(this, "MODINFO", "<#channel> [ACCESS <username> <level>] [AUTOMODE <usename> <NONE|OP|VOICE>]", 6));
     RegisterCommand(new SETCommand(this, "SET", "[#channel] <variable> <value> or, SET <invisible> <ON|OFF>", 6));
     RegisterCommand(new INVITECommand(this, "INVITE", "<#channel>", 2));
     RegisterCommand(new TOPICCommand(this, "TOPIC", "<#channel> <topic>", 4));
@@ -469,7 +469,7 @@ int cservice::OnCTCP( iClient* theClient, const string& CTCP,
 
 	if(Command == "VERSION")
 	{
-		xClient::DoCTCP(theClient, CTCP.c_str(), "Undernet P10 Channel Services Version 2 [" __DATE__ " " __TIME__ "] ($Id: cservice.cc,v 1.65 2001/01/28 23:16:33 gte Exp $)");
+		xClient::DoCTCP(theClient, CTCP.c_str(), "Undernet P10 Channel Services Version 2 [" __DATE__ " " __TIME__ "] ($Id: cservice.cc,v 1.66 2001/01/29 01:08:28 gte Exp $)");
 		return true;
 	}
  

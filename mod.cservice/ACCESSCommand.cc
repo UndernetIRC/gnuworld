@@ -8,7 +8,7 @@
  * Can optionally narrow down selection using a number of switches.
  * Can display all channels a user has access on (TODO). 
  *
- * $Id: ACCESSCommand.cc,v 1.18 2001/01/29 00:02:39 gte Exp $
+ * $Id: ACCESSCommand.cc,v 1.19 2001/01/29 01:08:28 gte Exp $
  */
 
 #include	<string>
@@ -20,7 +20,9 @@
 #include	"match.h"
 #define MAX_RESULTS 15
 
-const char ACCESSCommand_cc_rcsId[] = "$Id: ACCESSCommand.cc,v 1.18 2001/01/29 00:02:39 gte Exp $" ;
+// Todo: NO limit for * access 600+!
+
+const char ACCESSCommand_cc_rcsId[] = "$Id: ACCESSCommand.cc,v 1.19 2001/01/29 01:08:28 gte Exp $" ;
 
 namespace gnuworld
 {
