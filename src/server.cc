@@ -44,7 +44,7 @@
 #include	"moduleLoader.h"
 
 const char xServer_h_rcsId[] = __XSERVER_H ;
-const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.36 2000/12/23 15:57:02 dan_karrels Exp $" ;
+const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.37 2001/01/01 07:40:06 gte Exp $" ;
 
 using std::string ;
 using std::vector ;
@@ -1758,7 +1758,12 @@ for( ; whichToken < Param.size() ; ++whichToken )
 return 0 ;
 }
 
-// PIs,OfK,OAu,PZl:o,eAA
+// dA1,jBN:ov,C3K:v,jGZ:o,CkU
+// ':' indicates a mode state. Eg: ':ov' indicates this and
+// all the following numerics are opped and voiced up to the next
+// mode state.
+// Mode states will always be in the order ov, v, o if present
+// at all.
 void xServer::parseBurstUsers( Channel* theChan, const char* theUsers )
 {
 // This is a protected method, so the method arguments are
@@ -1770,13 +1775,17 @@ void xServer::parseBurstUsers( Channel* theChan, const char* theUsers )
 // Parse out users and their modes
 StringTokenizer st( theUsers, ',' ) ;
 
+// Used to track op/voice/opvoice mode state switches.
+// 1 = op, 2 = voice, 3 = opvoice.
+unsigned short mode_state = 0;
+
 for( StringTokenizer::const_iterator ptr = st.begin() ; ptr != st.end() ;
 	++ptr )
 	{
 	// Each token is of the form:
 	// abc or abc:modes
 	string::size_type pos = (*ptr).find_first_of( ':' ) ;
-
+ 
 	// Find the client in the client table
 	iClient* theClient = Network->findClient( (*ptr).substr( 0, pos ) ) ;
 
@@ -1837,10 +1846,26 @@ for( StringTokenizer::const_iterator ptr = st.begin() ; ptr != st.end() ;
 	// Is there a ':' in this client's info?
 	if( string::npos == pos )
 		{
-		// no ':' in this string, just add the user
+		// no ':' in this string, add the user with the current
+		// MODE state.
+		switch(mode_state)
+			{
+			case 1:
+				chanUser->setMode( ChannelUser::MODE_O ) ;
+				break;
+			case 2:
+				chanUser->setMode( ChannelUser::MODE_V ) ;
+				break;
+			case 3:
+				chanUser->setMode( ChannelUser::MODE_O ) ;
+				chanUser->setMode( ChannelUser::MODE_V ) ; 
+				break;
+			}
+ 
+		// mode_state still 0, not opped or voiced.
 		continue ;
 		}
-
+ 
 	// Otherwise, user modes have been specified.
 	for( pos++ ; pos < (*ptr).size() ; ++pos )
 		{
@@ -1848,9 +1873,11 @@ for( StringTokenizer::const_iterator ptr = st.begin() ; ptr != st.end() ;
 			{
 			case 'o':
 				chanUser->setMode( ChannelUser::MODE_O ) ;
+				mode_state = 1;
 				break ;
 			case 'v':
 				chanUser->setMode( ChannelUser::MODE_V ) ;
+				mode_state = (mode_state == 1) ? 3 : 2;
 				break ;
 			default:
 				// TOOD: log
@@ -1858,6 +1885,7 @@ for( StringTokenizer::const_iterator ptr = st.begin() ; ptr != st.end() ;
 			} // switch
 		// for()
 		}
+
 	} // while( ptr != st.end() )
 }
 
