@@ -29,7 +29,7 @@
 #include	"ccFloodData.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.72 2001/08/19 15:58:28 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.73 2001/09/26 11:42:19 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -177,12 +177,17 @@ RegisterCommand( new WHOISCommand( this, "WHOIS", "<nickname>"
 	"Obtain information on a given nickname",commandLevel::flg_WHOIS,false,false,false,operLevel::UHSLEVEL,false ) ) ;
 RegisterCommand( new KICKCommand( this, "KICK", "<channel> <nick> <reason>"
 	"Kick a user from a channel",commandLevel::flg_KICK,false,false,false,operLevel::UHSLEVEL,false ) ) ;
+//The following commands deals with operchans, if you want operchans just uncomment them
+/*
+
 RegisterCommand( new ADDOPERCHANCommand( this, "ADDOPERCHAN", "<channel>"
 	"Add an oper channel",commandLevel::flg_ADDOPCHN,false,false,false,operLevel::UHSLEVEL,false ) ) ;
 RegisterCommand( new REMOPERCHANCommand( this, "REMOPERCHAN", "<channel>"
 	"Remove an oper channel",commandLevel::flg_REMOPCHN,false,false,false,operLevel::UHSLEVEL,false ) ) ;
 RegisterCommand( new LISTOPERCHANSCommand( this, "LISTOPERCHANS",
 	"List current IRCoperator only channels",commandLevel::flg_LOPCHN,false,false,false,operLevel::UHSLEVEL,false ) ) ;
+*/	
+
 RegisterCommand( new CHANINFOCommand( this, "CHANINFO", "<channel>"
 	"Obtain information about a given channel",commandLevel::flg_CHINFO,false,false,false,operLevel::UHSLEVEL,false ) ) ;
 RegisterCommand( new ACCESSCommand( this, "ACCESS",
@@ -515,7 +520,11 @@ switch( theEvent )
 		
 		AuthInfo *TempAuth = IsAuth(tmpUser);
 		if(TempAuth)
-	    		deAuthUser(tmpUser->getCharYYXXX());
+	    		{
+			elog << "Deauth " << TempAuth->getName().c_str()
+			     << "because he quited / killed!\n";
+			deAuthUser(tmpUser->getCharYYXXX());
+			}
 		ccLogin *tempLogin = findLogin(tmpUser->getCharYYXXX());
 		if(tempLogin)
 			{
@@ -1045,6 +1054,8 @@ bool ccontrol::deAuthUser( const string& Numeric)
 AuthInfo *TempAuth = IsAuth(Numeric);
 if(TempAuth)
 	{
+	elog 	<< "Removed authentication for " 
+		<< TempAuth->getName().c_str() << "\n";
 	authList.erase( std::find( authList.begin(),
 		authList.end(),
 		TempAuth ) ) ;
@@ -1430,6 +1441,18 @@ return tmpUser ;
 
 bool ccontrol::addGline( ccGline* TempGline)
 {
+ccGline *theGline = 0;
+for(glineIterator ptr = glineList.begin(); ptr != glineList.end();)
+	{
+	theGline = *ptr;
+	if(theGline->getHost() == TempGline->getHost()) 
+		{
+		ptr = glineList.erase(ptr);
+		}
+	else
+		++ptr;
+	}
+			
 glineList.push_back( TempGline ) ;
 return true;
 }    

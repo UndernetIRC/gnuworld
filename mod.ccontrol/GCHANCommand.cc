@@ -21,7 +21,7 @@
 #include	"gline.h"
 #include 	"time.h"
 
-const char GCHANCommand_cc_rcsId[] = "$Id: GCHANCommand.cc,v 1.1 2001/08/14 22:57:57 mrbean_ Exp $";
+const char GCHANCommand_cc_rcsId[] = "$Id: GCHANCommand.cc,v 1.2 2001/09/26 11:42:19 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -150,7 +150,6 @@ else
 	TmpGline->loadData(TmpGline->getHost());
 	bot->addGline(TmpGline);
 	}
-
 
 return true ;
 }

@@ -14,7 +14,7 @@
 #include	"StringTokenizer.h"
 #include	"ip.h"
 
-const char WHOISCommand_cc_rcsId[] = "$Id: WHOISCommand.cc,v 1.6 2001/07/23 10:28:51 mrbean_ Exp $";
+const char WHOISCommand_cc_rcsId[] = "$Id: WHOISCommand.cc,v 1.7 2001/09/26 11:42:19 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -54,7 +54,7 @@ bot->Notice( theClient, "%s is %s!%s@%s [%s]",
 	Target->getNickName().c_str(),
 	Target->getUserName().c_str(),
 	Target->getInsecureHost().c_str(),
-	xIP( htonl( Target->getIP() ) ).GetNumericIP()
+	xIP(Target->getIP() ).GetNumericIP()
 	) ;
 
 bot->Notice( theClient, "Numeric: %s, UserModes: %s, Server Numeric: %s (%s)",

@@ -23,7 +23,7 @@
 #include 	"time.h"
 #include	"ccUser.h"
 
-const char GLINECommand_cc_rcsId[] = "$Id: GLINECommand.cc,v 1.23 2001/08/19 15:58:28 mrbean_ Exp $";
+const char GLINECommand_cc_rcsId[] = "$Id: GLINECommand.cc,v 1.24 2001/09/26 11:42:19 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -199,7 +199,7 @@ if(!isChan)
 		bot->addGline(TmpGline);
 		}
 
-return true;
+	return true;
 	} //end of regular gline
 
 //Its a channel gline
@@ -211,6 +211,7 @@ if(tmpAuth->getFlags() < operLevel::SMTLEVEL)
 	bot->Notice(theClient,"Only smt+ can use the gline #channel command");
 	return false;
 	}
+
 typedef map<string , int> GlineMapType;
 GlineMapType glineList;
 

@@ -13,7 +13,7 @@
 #include	"md5hash.h" 
 #include        "ccUser.h"
 
-const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.14 2001/07/30 17:16:39 mrbean_ Exp $";
+const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.15 2001/09/26 11:42:19 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -110,7 +110,7 @@ else
 		{
 		iClient *tClient = Network->findClient(TempAuth->getNumeric());
 		bot->Notice(tClient,"You have just been deauthenticated");
-		bot->MsgChanLog("Login conflict for user %s from %s and %s"
+		bot->MsgChanLog("Login conflict for user %s from %s and %s\n"
 				,st[1].c_str(),theClient->getNickName().c_str()
 				,tClient->getNickName().c_str());
 		bot->deAuthUser(tClient->getCharYYXXX());

@@ -1,7 +1,7 @@
 /* ccUser.h */
 
 #ifndef __CCUSER_H
-#define __CCUSER_H "$Id: ccUser.h,v 1.10 2001/07/29 13:33:20 mrbean_ Exp $"
+#define __CCUSER_H "$Id: ccUser.h,v 1.11 2001/09/26 11:42:19 mrbean_ Exp $"
 
 #include	<string>
 
@@ -197,6 +197,7 @@ public:
 	void updateAccessFromFlags();
 
 	void updateAccess(unsigned int Type);
+	
 		
 protected:
 	unsigned int Id;

@@ -19,7 +19,7 @@
 #include	"Gline.h"
 #include	"gline.h"
 
-const char FORCEGLINECommand_cc_rcsId[] = "$Id: FORCEGLINECommand.cc,v 1.10 2001/08/16 09:01:55 mrbean_ Exp $";
+const char FORCEGLINECommand_cc_rcsId[] = "$Id: FORCEGLINECommand.cc,v 1.11 2001/09/26 11:42:19 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -242,6 +242,7 @@ TmpGline->setExpires(::time(0) + gLength);
 TmpGline->setAddedBy(nickUserHost);
 TmpGline->setReason(st.assemble( pos + ResStart ));
 TmpGline->setAddedOn(::time(0));
+
 if(Up)
 	{	
 	TmpGline->Update();
@@ -251,9 +252,9 @@ else
 	TmpGline->Insert();
 	//We need to update the Id
 	TmpGline->loadData(TmpGline->getHost());
-	}
-if(!Up)
 	bot->addGline(TmpGline);
+	}
+
 return true ;
 }
 

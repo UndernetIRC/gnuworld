@@ -14,7 +14,7 @@
 #include	"ccUser.h"
 #include	"misc.h"
 
-const char MODUSERCommand_cc_rcsId[] = "$Id: MODUSERCommand.cc,v 1.3 2001/07/30 16:58:39 mrbean_ Exp $";
+const char MODUSERCommand_cc_rcsId[] = "$Id: MODUSERCommand.cc,v 1.4 2001/09/26 11:42:19 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -242,21 +242,81 @@ while(pos < st.size())
 		bot->UpdateAuth(tmpUser);
 		pos += 2;
 		}	
-	else if(!strcasecmp(st[pos],"-ua")) //Trying to toggle the get of logs
+	else if(!strcasecmp(st[pos],"-ua")) //Trying to update the access?
 		{
-		tmpUser->updateAccessFromFlags();
-		tmpUser->setLast_Updated_By(theClient->getNickUserHost());
-		if(tmpUser->Update())
+		if((AdFlag < operLevel::CODERLEVEL) && (AdFlag >= OpFlag))
 			{
-			bot->Notice(theClient,"Successfully updated %s access",st[1].c_str());
-			bot->UpdateAuth(tmpUser);
+			bot->Notice(theClient,"You cant update an access of a user who has higher or equal level as yours");
 			}
 		else
 			{
-			bot->Notice(theClient,"Error while updating %s access",st[1].c_str());
-			}
-	    	pos++;
+			tmpUser->updateAccessFromFlags();
+			tmpUser->setLast_Updated_By(theClient->getNickUserHost());
+			if(tmpUser->Update())
+				{
+				bot->Notice(theClient,"Successfully updated %s access",st[1].c_str());
+				bot->UpdateAuth(tmpUser);
+				}
+			else
+				{
+				bot->Notice(theClient,"Error while updating %s access",st[1].c_str());
+				}
+	    		}
+		pos++;
 		}
+	else if(!strcasecmp(st[pos],"-uf")) //Trying to update the user flags
+		{
+		if((pos + 1) >= st.size())
+			{
+			bot->Notice(theClient,"-uf option must get anew flags");
+			return false;
+			}
+		unsigned int NewF;
+		if(!strcasecmp(st[pos+1],"CODER"))
+			{
+			NewF = operLevel::CODERLEVEL;
+			}
+		else if(!strcasecmp(st[pos+1],"SMT"))
+			{
+			NewF = operLevel::SMTLEVEL;
+			}
+		else if(!strcasecmp(st[pos+1],"ADMIN"))
+			{
+			NewF = operLevel::ADMINLEVEL;
+			}
+		else if(!strcasecmp(st[pos+1],"OPER"))
+			{
+			NewF = operLevel::OPERLEVEL;
+			}
+		else
+			{
+			bot->Notice(theClient,"Bad option for -uf , must be CODER/SMT/ADMIN/OPER");
+			NewF = 0;
+			}
+		if(NewF > 0)
+			{
+			if((AdFlag < operLevel::CODERLEVEL) && (AdFlag >= NewF))
+				{
+				bot->Notice(theClient,"You cant update the flags to a higher or equal to your own flags");
+				}
+			else
+				{
+				tmpUser->setType(NewF);
+				tmpUser->setLast_Updated_By(theClient->getNickUserHost());
+				if(tmpUser->Update())
+					{
+					bot->Notice(theClient,"Successfully updated %s flags",st[1].c_str());
+					bot->UpdateAuth(tmpUser);
+					}
+				else
+					{
+					bot->Notice(theClient,"Error while updating %s flags",st[1].c_str());
+					}
+				}
+			}
+		pos+=2;
+		}
+		
 	else if(!strcasecmp(st[pos],"-e")) //Trying to toggle the get of logs
 		{
 		if((pos + 1) >= st.size())

@@ -3,7 +3,7 @@
  * 
  * Server class
  * 
- * $Id: ccServer.cc,v 1.3 2001/07/23 10:28:51 mrbean_ Exp $
+ * $Id: ccServer.cc,v 1.4 2001/09/26 11:42:19 mrbean_ Exp $
  */
  
 #include	<strstream>
@@ -19,7 +19,7 @@
 #include	"ccServer.h" 
 
 const char ccServer_h_rcsId[] = __CCSERVER_H ;
-const char ccServer_cc_rcsId[] = "$Id: ccServer.cc,v 1.3 2001/07/23 10:28:51 mrbean_ Exp $" ;
+const char ccServer_cc_rcsId[] = "$Id: ccServer.cc,v 1.4 2001/09/26 11:42:19 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -155,11 +155,11 @@ return true;
 
 bool ccServer::loadNumericData(string ServNumeric)
 {
-static const char *Main = "SELECT name,lastuplink,lastconnected,splitedon,lastnumeric FROM servers WHERE lower(LastNumeric) = '";
+static const char *Main = "SELECT name,lastuplink,lastconnected,splitedon,lastnumeric FROM servers WHERE LastNumeric = '";
 
 strstream theQuery;
 theQuery	<< Main
-		<< string_lower(ServNumeric)
+		<< ServNumeric
 		<< "'" << ends;
 
 elog	<< "ccontrol::Server::LoadNumericData> "
