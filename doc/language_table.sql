@@ -10,6 +10,7 @@ COPY "languages" FROM stdin;
 3	Danish	31337
 4	Dutch	31337
 5	German	31337
+6	Portuguese	31337
 \.
 
 DELETE FROM translations;
@@ -48,17 +49,133 @@ COPY "translations" FROM stdin;
 1	32	Please restrict your query.	31337
 1	33	End of access list	31337
 1	34	No Match!	31337
-1	35	Cannot add a user with equal or higher access than your own. 	31337
+1	35	Cannot add a user with equal or higher access than your own.	31337
 1	36	Invalid access level.	31337
 1	37	%s is already added to %s with access level %i.	31337
 1	38	Added user %s to %s with access level %i	31337
 1	39	Something went wrong: %s	31337
-
-
+1	40	%s: End of ban list	31337
+1	41	Unable to view user details (Invisible)	31337
+1	42	Information about: %s (%i)	31337
+1	43	Currently logged on via: %s	31337
+1	44	URL: %s	31337
+1	45	Language: %i	31337
+1	46	Channels: %s	31337
+1	47	Input Flood Points: %i	31337
+1	48	Ouput Flood (Bytes): %i	31337
+1	49	%s is registered by:	31337
+1	50	%s - last seen: %s ago	31337
+1	51	Desc: %s	31337
+1	52	Flood me will you? I'm not going to listen to you anymore	31337
+1	53	I think I've sent you a little too much data, I'm going to ignore you for a while.	31337
+1	54	Incomplete command	31337
+1	55	To use %s, you must /msg %s@%s	31337
+1	56	Sorry, You must be logged in to use this command.	31337
+1	57	The channel %s has been suspended by a cservice administrator.	31337
+1	58	Your access on %s has been suspended.	31337
+1	59	The NOOP flag is set on %s	31337
+1	60	The STRICTOP flag is set on %s	31337
+1	61	You just deopped more than %i people	31337
+1	62	SYNTAX: %s	31337
+1	63	Temporarily increased your access on channel %s to %i	31337
+1	64	%s is registered.	31337
+1	65	%s is not registered.	31337
+1	66	I don't think %s would appreciate that.	31337
+1	67	\002*** Ban List for channel %s ***\002	31337
+1	68	%s %s Level: %i	31337
+1	69	ADDED BY: %s (%s)	31337
+1	70	SINCE: %i	31337
+1	71	EXP: %s	31337
+1	72	\002*** END ***\002	31337
 1	73	Sorry, I don't know who %s is.	31337
-
+1	74	Sorry, you are not authorized with me anymore.	31337
+1	75	doesn't appear to have access in %s.	31337
+1	76	Cannot modify a user with equal or higher access than your own.	31337
+1	77	Cannot give a user higher or equal access to your own.	31337
+1	78	Modified %s's access level on channel %s to %i	31337
+1	79	Set AUTOMODE to OP for %s on channel %s	31337
+1	80	Set AUTOMODE to VOICE for %s on channel %s	31337
+1	81	Set AUTOMODE to NONE for %s on channel %s	31337	
+1	82	Your passphrase cannot be your username or current nick - syntax is: NEWPASS <new passphrase>	31337
+1	83	Password successfully changed.	31337
+1	84	The NOOP flag is set on %s	31337
+1	85	The STRICTOP flag is set on %s (and %s isn't authenticated)	31337
+1	86	The STRICTOP flag is set on %s (and %s has insufficient access)	31337
+1	87	Purged channel %s	31337
+1	88	%s is already registered with me.	31337
 1	89	Invalid channel name.	31337
-
+1	90	Registered channel %s	31337
+1	91	Removed %s from my silence list	31337
+1	92	Couldn't find %s in my silence list	31337
+1	93	Cannot remove a user with equal or higher access than your own	31337
+1	94	You can't remove yourself from a channel you own	31337
+1	95	Removed user %s from %s	31337
+1	96	Your INVISIBLE setting is now ON.	31337
+1	97	Your INVISIBLE setting is now OFF.	31337
+1	98	%s for %s is %s	31337
+1	99	value of %s must be ON or OFF	31337
+1	100	Invalid USERFLAGS setting. Correct values are 0, 1, 2.	31337
+1	101	USERFLAGS for %s is %i	31337
+1	102	value of MASSDEOPPRO has to be 0-7	31337
+1	103	MASSDEOPPRO for %s is set to %d	31337
+1	104	value of FLOODPRO has to be 0-7	31337
+1	105	FLOODPRO for %s is set to %d	31337
+1	106	The DESCRIPTION can be a maximum of 80 chars!	31337
+1	107	DESCRIPTION for %s is cleared.	31337
+1	108	DESCRIPTION for %s is: %s	31337
+1	109	The URL can be a maximum of 75 chars!	31337
+1	110	URL for %s is cleared.	31337
+1	111	URL for %s is: %s	31337
+1	112	The string of keywords cannot exceed 80 chars!	31337
+1	113	KEYWORDS for %s are: %s	31337
+1	114	Language is set to %s.	31337
+1	115	ERROR: Invalid language selection.	31337
+1	116	Can't locate channel %s on the network!	31337
+1	117	ERROR: Invalid channel setting.	31337
+1	118	Ignore list:	31337
+1	119	Ignore list is empty	31337
+1	120	-- End of Ignore List	31337
+1	121	CMaster Channel Services internal status:	31337
+1	122	[     Channel Record Stats] \002Cached Entries:\002 %i    \002DB Requests:\002 %i    \002Cache Hits:\002 %i    \002Efficiency:\002 %.2f%%	31337
+1	123	[        User Record Stats] \002Cached Entries:\002 %i    \002DB Requests:\002 %i    \002Cache Hits:\002 %i    \002Efficiency:\002 %.2f%%	31337
+1	124	[Access Level Record Stats] \002Cached Entries:\002 %i    \002DB Requests:\002 %i    \002Cache Hits:\002 %i    \002Efficiency:\002 %.2f%%	31337
+1	125	[         Ban Record Stats] \002Cached Entries:\002 %i    \002DB Requests:\002 %i    \002Cache Hits:\002 %i    \002Efficiency:\002 %.2f%%	31337
+1	126	Last recieved User NOTIFY: %i	31337
+1	127	Last recieved Channel NOTIFY: %i	31337
+1	128	Last recieved Level NOTIFY: %i	31337
+1	129	Last recieved Ban NOTIFY: %i	31337
+1	130	Custom data containers allocated: %i	31337
+1	131	\002Uptime:\002 %s	31337
+1	132	Channel %s has %d users (%i operators)	31337
+1	133	Mode is: %s	31337
+1	134	Flags set: %s	31337
+1	135	Cannot suspend a user with equal or higher access than your own.	31337
+1	136	bogus time units	31337
+1	137	Invalid suspend duration.	31337
+1	138	SUSPENSION for %s is cancelled	31337
+1	139	%s is already suspended on %s	31337
+1	140	SUSPENSION for %s will expire in %s	31337
+1	141	ERROR: Topic cannot exceed 145 chars	31337
+1	142	You have insufficient access to remove the ban %s from %s's database	31337
+1	143	Removed %i bans that matched %s	31337
+1	144	Removed your temporary access of %i from channel %s	31337
+1	145	You don't appear to have a forced access in %s, perhaps it expired?	31337
+1	146	%s isn't suspended on %s	31337
+1	147	%s is an IRC operator	31337
+1	148	%s is NOT logged in.	31337
+1	149	%s is logged in as %s%s	31337
+1	150	%s is an Official CService Representative%s and logged in as %s	31337
+1	151	%s is an Official CService Administrator%s and logged in as %s	31337
+1	152	%s is an Official CService Developer%s and logged in as %s	31337
+1	153	There are more than %i entries matching [%s]	31337
+1	154	Please restrict your search mask	31337
+1	155	No matching entries for [%s]	31337
+1	156	%s: Cleared channel modes.	31337
+1	158	Invalid option.	31337
+1	159	%s is an Official Undernet Service Bot.	31337
+1	160	Added ban %s to %s at level %i	31337
+1	161	%s: ban list is empty.		31337
+1	162	I'm already in that channel!	31337
 \.
 
 -- French language definition.
@@ -105,7 +222,128 @@ COPY "translations" FROM stdin;
 2	37	%s a déjà été ajouté sur %s au niveau %i.	31337
 2	38	Addition de l'usager %s sur %s au niveau %i	31337
 2	39	Quelque chose semble incorrecte: %s	31337
-
+2	40	%s: fin de la liste de ban		31337
+2	41	Impossible de visualiser les détails de l'usager (Invisible).	31337
+2	42	Information à propos de: %s (%i)	31337
+2	43	Présentement connecté via: %s	31337
+2	44	URL: %s	31337
+2	45	Langue: %i	31337
+2	46	Canaux: %s	31337
+2	47	Entrée Flood: %i	31337
+2	48	Sortie Flood (Bytes): %i	31337
+2	49	%s a été enregistré par:	31337
+2	50	%s - vu pour la dernière fois: %s avant	31337
+2	51	Desc: %s	31337
+2	52	Floodez moi voulez-vous? Je ne vais plus vous répondre dorénavant.	31337
+2	53	Je crois que je vous ai envoyé beaucoup trop d'informations. Je vais vous ignorer un peu.	31337
+2	54	Commande incomplète	31337
+2	55	Pour utiliser %s, Vous devez /msg %s@%s	31337
+2	56	Désolé. Vous devez être authentifié pour utiliser cette commande.	31337
+2	57	Le canal %s a été suspendu par un administrateur de cservice.	31337
+2	58	Votre access sur %s a été suspendu.	31337
+2	59	Le mode NOOP est actif sur %s	31337
+2	60	Le mode STRICTOP est actif sur %s	31337
+2	61	Vous venez de deop plus de %i personnes	31337
+2	62	SYNTAXE: %s	31337
+2	63	Temporairement authentifié sur %s au niveau %i	31337
+2	64	%s est enregistré.	31337
+2	65	%s n'est pas enregistré.	31337
+2	66	Je ne crois pas que %s apprécierait ça.	31337
+2	67	\002*** Liste de Ban pour le canal %s ***\002	31337
+2	68	%s %s Niveau: %i	31337
+2	69	AJOUTÉ PAR: %s (%s)	31337
+2	70	DEPUIS: %i	31337
+2	71	EXP: %s	31337
+2	72	\002*** FIN ***\002	31337
+2	73	Désolé, Je ne sais pas qui est %s.	31337
+2	74	Désolé, Vous n'êtes plus authentifié.	31337
+2	75	Aucune accès correspondant sur %s.	31337
+2	76	Vous ne pouvez pas modifier un usager au même niveau ou supérieur à vous.	31337
+2	77	Vous ne pouvez pas donner un accès à un usager au même niveau ou supérieur à vous.	31337
+2	78	Modification du niveau de %s sur le canal %s à %i	31337
+2	79	Activation du MODE Automatique (OP) pour %s sur le canal %s	31337
+2	80	Activation du MODE Automatique (VOICE) pour %s sur le canal %s	31337
+2	81	Désactivation des MODES Automatiques pour %s sur le canal %s	31337	
+2	82	Votre mot de passe ne peut être votre nom d'usager ni votre nick - La Syntaxe est: NEWPASS <nouveau mot-de-passe>	31337
+2	83	Votre mot de passe a été changé avec succès.	31337
+2	84	Le mode NOOP est actif sur %s	31337
+2	85	Le mode STRICTOP est actif sur %s (et %s n'est pas authentifié)	31337
+2	86	Le mode STRICTOP est actif sur %s (et l'accès de %s est insuffisant)	31337
+2	87	%s a été purgé	31337
+2	88	%s est déjà enregistré avec moi.	31337
+2	89	Nom de canal invalide.	31337
+2	90	%s a été enregistré	31337
+2	91	Enlevé %s de ma liste silence/ignore	31337
+2	92	Incapable de trouver %s dans ma liste silence/ignore	31337
+2	93	Vous ne pouvez pas effacer un accès donc le niveau est égal ou plus élevé que le votre.	31337
+2	94	Vous ne pouvez pas effacer votre accès sur un canal que vous possédez.	31337
+2	95	L'accès de l'usager %s a été effacé sur %s	31337
+2	96	Le mode INVISIBLE pour vos options confidentiels est maintenant à ON.	31337
+2	97	Le mode INVISIBLE pour vos options confidentiels est maintenant à OFF.	31337
+2	98	%s pour %s est %s	31337
+2	99	La valeur de %s doit être ON ou OFF	31337
+2	100	Configuration USERFLAGS invalide! Les valeurs correctes sont 0, 1, 2.	31337
+2	101	Le USERFLAGS de %s est %i	31337
+2	102	La valeur de MASSDEOPPRO doit être entre 0-7	31337
+2	103	MASSDEOPPRO de %s a été configuré à %d	31337
+2	104	La valeur de FLOODPRO doit être entre 0-7	31337
+2	105	FLOODPRO de %s a été configuré à %d	31337
+2	106	La DESCRIPTION ne doit pas dépasser 80 caractères.	31337
+2	107	La DESCRIPTION de %s a été éffacé.	31337
+2	108	La DESCRIPTION de %s est: %s	31337
+2	109	L'URL ne doit pas dépasser 75 caractères.	31337
+2	110	L'URL de %s a été effacé.	31337
+2	111	L'URL de %s est: %s	31337
+2	112	Les KEYWORDS (MotsClés) ne doivent pas dépasser 80 caractères.	31337
+2	113	KEYWORDS de %s sont: %s	31337
+2	114	Langue activé: %s.	31337
+2	115	ERREUR: Sélection d'une langue invalide.	31337
+2	116	Le canal %s est introuvable sur le réseau!	31337
+2	117	ERREUR: Configuration de canal invalide.	31337
+2	118	Liste d'Ignoré(s):	31337
+2	119	La liste d'ignore est vide	31337
+2	120	-- Fin de la liste d'ignore 	31337
+2	121	Status interne du Service de Canaux CMaster:	31337
+2	122	[          Statistiques du Canal] \002Entrées en cache:\002 %i    \002Requêtes BaseD:\002 %i    \002# de fois Cache touché:\002 %i    \002Efficacité:\002 %.2f%%	31337
+2	123	[           Statistiques Usagers] \002Entrées en cache:\002 %i    \002Requêtes BaseD:\002 %i    \002# de fois Cache touché:\002 %i    \002Efficacité:\002 %.2f%%	31337
+2	124	[   Statistiques niveaux d'accès] \002Entrées en cache:\002 %i    \002Requêtes BaseD:\002 %i    \002# de fois Cache touché:\002 %i    \002Efficacité:\002 %.2f%%	31337
+2	125	[          Statistiques des bans] \002Entrées en cache:\002 %i    \002Requêtes BaseD:\002 %i    \002# de fois Cache touché:\002 %i    \002Efficacité:\002 %.2f%%	31337
+2	126	Dernière réception NOTIFY d'usager: %i	31337
+2	127	Dernière réception NOTIFY de canal: %i	31337
+2	128	Dernière réception NOTIFY de niveau: %i	31337
+2	129	Dernière réception NOTIFY de ban: %i	31337
+2	130	Données assignées: %i	31337
+2	131	\002En fonction depuis (uptime):\002 %s	31337
+2	132	Le canal %s a %d usager(s) (%i opérateurs)	31337
+2	133	Le(s) Mode(s) du canal: %s	31337
+2	134	Flags activés: %s	31337
+2	135	Vous ne pouvez pas suspendre un usager au même niveau que vous ni supérieur.	31337
+2	136	Unité de temps invalide.	31337
+2	137	Durée de suspension invalide.	31337
+2	138	La SUSPENSION pour %s a été annulé.	31337
+2	139	%s est déjà suspendu sur %s	31337
+2	140	La SUSPENSION pour %s va expirer dans %s	31337
+2	141	ERREUR: Le topic ne peut dépasser 145 caractères.	31337
+2	142	votre accès est insuffisant pour enlever le ban %s de la base de données de %s	31337
+2	143	Supprimé %i ban(s) qui figuraient %s	31337
+2	144	Supprimé votre accès temporaire de niveau %i du canal %s	31337
+2	145	Vous ne semblez pas d'avoir forcer l'accès à %s, Serait-elle expirée?	31337
+2	146	%s n'est pas suspendu sur %s	31337
+2	147	%s est un Opérateur IRC	31337
+2	148	%s n'est pas authentifié.	31337
+2	149	%s est authentifié via le userid %s%s	31337
+2	150	%s est un représentant Officiel de CService%s et authentificé via le userid %s	31337
+2	151	%s est un Administrateur Officiel de CService%s et authentificé via le userid %s	31337
+2	152	%s est un Programmeur Officiel de CService%s et authentificé via le userid %s	31337
+2	153	Il y a plus de %i entrées figurants [%s]	31337
+2	154	Veuillez svp restreindre votre requête.	31337
+2	155	Aucune entrée figurante pour votre requête. [%s]	31337
+2	156	%s: Les modes du canal on été effacés.	31337
+2	158	Option invalide.	31337
+2	159	%s est un Service Officiel du réseau Undernet.	31337
+2	160	Addition du ban %s sur %s au niveau %i	31337
+2	161	%s: la liste des bans est vide.		31337
+2	162	Je suis déjà sur ce canal!	31337
 \.
 
 -- Danish language definition.
@@ -137,7 +375,6 @@ COPY "translations" FROM stdin;
 4	8	Je bent geopt door %s (%s)	31337
 4	9	Je bent gevoiced door %s (%s)	31337
 4	10	%s: Je bent niet in dat kanaal	31337
-4	11	%s is reeds geopt op %s	31337
 \.
 
 -- German language definition.
@@ -155,4 +392,172 @@ COPY "translations" FROM stdin;
 5	9	%s (%s) hat dich gevoiced	31337
 5	10	%s: Du bist nicht im Channel	31337
 5	11	%s wurde bereits von %s geopt	31337
+\.
+
+
+-- Portuguese language definition.
+-- 02/03/01 - Ed Cattuci <maniac@undernet.org>
+
+COPY "translations" FROM stdin;
+6	1	Sorry, You are already authenticated as %s	31337
+6	2	AUTHENTICATION SUCCESSFUL as %s	31337
+6	3	Sorry, you have insufficient access to perform that command	31337
+6	4	Sorry, the channel %s is empty	31337
+6	5	I don't see %s anywhere	31337
+6	6	I can't find %s on channel %s	31337
+6	7	The channel %s doesn't appear to be registered	31337
+6	8	You're opped by %s (%s)	31337
+6	9	You're voiced by %s (%s)	31337
+6	10	%s: You are not in that channel	31337
+6	11	%s is already opped in %s	31337
+6	12	%s is already voiced in %s	31337
+6	13	You're deopped by %s (%s)	31337
+6	14	You're devoiced by %s (%s)	31337
+6	15	%s is not opped in %s	31337
+6	16	%s is not voiced in %s	31337
+6	17	AUTHENTICATION FAILED as %s (Invalid Password)	31337
+6	18	I'm not in that channel!	31337
+6	19	Invalid banlevel range. Valid range is 1-%i.	31337
+6	20	Invalid ban duration. Your ban duration can be a maximum of 336 hours.	31337
+6	21	Ban reason cannot exceed 128 chars	31337
+6	22	Specified ban is already in my banlist!	31337
+6	23	The ban %s is already covered by %s	31337
+6	24	Invalid minimum level.	31337
+6	25	Invalid maximum level.	31337
+6	26	USER: %s ACCESS: %s %s	31337
+6	27	CHANNEL: %s -- AUTOMODE: %s	31337
+6	28	LAST MODIFIED: %s (%s ago)	31337
+6	29	** SUSPENDED ** - Expires in %s	31337
+6	30	LAST SEEN: %s ago.	31337
+6	31	There are more than 15 matching entries.	31337
+6	32	Please restrict your query.	31337
+6	33	End of access list	31337
+6	34	No Match!	31337
+6	35	Cannot add a user with equal or higher access than your own. 	31337
+6	36	Invalid access level.	31337
+6	37	%s is already added to %s with access level %i.	31337
+6	38	Added user %s to %s with access level %i	31337
+6	39	Something went wrong: %s	31337
+6	40	%s: End of ban list		31337
+6	41	Unable to view user details (Invisible)	31337
+6	42	Information about: %s (%i)	31337
+6	43	Currently logged on via: %s	31337
+6	44	URL: %s	31337
+6	45	Language: %i	31337
+6	46	Channels: %s	31337
+6	47	Input Flood Points: %i	31337
+6	48	Ouput Flood (Bytes): %i	31337
+6	49	%s is registered by:	31337
+6	50	%s - last seen: %s ago	31337
+6	51	Desc: %s	31337
+6	52	Flood me will you? I'm not going to listen to you anymore	31337
+6	53	I think I've sent you a little too much data, I'm going to ignore you for a while.	31337
+6	54	Incomplete command	31337
+6	55	To use %s, you must /msg %s@%s	31337
+6	56	Sorry, You must be logged in to use this command.	31337
+6	57	The channel %s has been suspended by a cservice administrator.	31337
+6	58	Your access on %s has been suspended.	31337
+6	59	The NOOP flag is set on %s	31337
+6	60	The STRICTOP flag is set on %s	31337
+6	61	You just deopped more than %i people	31337
+6	62	SYNTAX: %s	31337
+6	63	Temporarily increased your access on channel %s to %i	31337
+6	64	%s is registered.	31337
+6	65	%s is not registered.	31337
+6	66	I don't think %s would appreciate that.	31337
+6	67	\002*** Ban List for channel %s ***\002	31337
+6	68	%s %s Level: %i	31337
+6	69	ADDED BY: %s (%s)	31337
+6	70	SINCE: %i	31337
+6	71	EXP: %s	31337
+6	72	\002*** END ***\002	31337
+6	73	Sorry, I don't know who %s is.	31337
+6	74	Sorry, you are not authorized with me anymore.	31337
+6	75	doesn't appear to have access in %s.	31337
+6	76	Cannot modify a user with equal or higher access than your own.	31337
+6	77	Cannot give a user higher or equal access to your own.	31337
+6	78	Modified %s's access level on channel %s to %i	31337
+6	79	Set AUTOMODE to OP for %s on channel %s	31337
+6	80	Set AUTOMODE to VOICE for %s on channel %s	31337
+6	81	Set AUTOMODE to NONE for %s on channel %s	31337	
+6	82	Your passphrase cannot be your username or current nick - syntax is: NEWPASS <new passphrase>	31337
+6	83	Password successfully changed.	31337
+6	84	The NOOP flag is set on %s	31337
+6	85	The STRICTOP flag is set on %s (and %s isn't authenticated)	31337
+6	86	The STRICTOP flag is set on %s (and %s has insufficient access)	31337
+6	87	Purged channel %s	31337
+6	88	%s is already registered with me.	31337
+6	89	Invalid channel name.	31337
+6	90	Registered channel %s	31337
+6	91	Removed %s from my silence list	31337
+6	92	Couldn't find %s in my silence list	31337
+6	93	Cannot remove a user with equal or higher access than your own	31337
+6	94	You can't remove yourself from a channel you own	31337
+6	95	Removed user %s from %s	31337
+6	96	Your INVISIBLE setting is now ON.	31337
+6	97	Your INVISIBLE setting is now OFF.	31337
+6	98	%s for %s is %s	31337
+6	99	value of %s must be ON or OFF	31337
+6	100	Invalid USERFLAGS setting. Correct values are 0, 1, 2.	31337
+6	101	USERFLAGS for %s is %i	31337
+6	102	value of MASSDEOPPRO has to be 0-7	31337
+6	103	MASSDEOPPRO for %s is set to %d	31337
+6	104	value of FLOODPRO has to be 0-7	31337
+6	105	FLOODPRO for %s is set to %d	31337
+6	106	The DESCRIPTION can be a maximum of 80 chars!	31337
+6	107	DESCRIPTION for %s is cleared.	31337
+6	108	DESCRIPTION for %s is: %s	31337
+6	109	The URL can be a maximum of 75 chars!	31337
+6	110	URL for %s is cleared.	31337
+6	111	URL for %s is: %s	31337
+6	112	The string of keywords cannot exceed 80 chars!	31337
+6	113	KEYWORDS for %s are: %s	31337
+6	114	Language is set to %s.	31337
+6	115	ERROR: Invalid language selection.	31337
+6	116	Can't locate channel %s on the network!	31337
+6	117	ERROR: Invalid channel setting.	31337
+6	118	Ignore list:	31337
+6	119	Ignore list is empty	31337
+6	120	-- End of Ignore List	31337
+6	121	CMaster Channel Services internal status:	31337
+6	122	[     Channel Record Stats] \002Cached Entries:\002 %i    \002DB Requests:\002 %i    \002Cache Hits:\002 %i    \002Efficiency:\002 %.2f%%	31337
+6	123	[        User Record Stats] \002Cached Entries:\002 %i    \002DB Requests:\002 %i    \002Cache Hits:\002 %i    \002Efficiency:\002 %.2f%%	31337
+6	124	[Access Level Record Stats] \002Cached Entries:\002 %i    \002DB Requests:\002 %i    \002Cache Hits:\002 %i    \002Efficiency:\002 %.2f%%	31337
+6	125	[         Ban Record Stats] \002Cached Entries:\002 %i    \002DB Requests:\002 %i    \002Cache Hits:\002 %i    \002Efficiency:\002 %.2f%%	31337
+6	126	Last recieved User NOTIFY: %i	31337
+6	127	Last recieved Channel NOTIFY: %i	31337
+6	128	Last recieved Level NOTIFY: %i	31337
+6	129	Last recieved Ban NOTIFY: %i	31337
+6	130	Custom data containers allocated: %i	31337
+6	131	\002Uptime:\002 %s	31337
+6	132	Channel %s has %d users (%i operators)	31337
+6	133	Mode is: %s	31337
+6	134	Flags set: %s	31337
+6	135	Cannot suspend a user with equal or higher access than your own.	31337
+6	136	bogus time units	31337
+6	137	Invalid suspend duration.	31337
+6	138	SUSPENSION for %s is cancelled	31337
+6	139	%s is already suspended on %s	31337
+6	140	SUSPENSION for %s will expire in %s	31337
+6	141	ERROR: Topic cannot exceed 145 chars	31337
+6	142	You have insufficient access to remove the ban %s from %s's database	31337
+6	143	Removed %i bans that matched %s	31337
+6	144	Removed your temporary access of %i from channel %s	31337
+6	145	You don't appear to have a forced access in %s, perhaps it expired?	31337
+6	146	%s isn't suspended on %s	31337
+6	147	%s is an IRC operator	31337
+6	148	%s is NOT logged in.	31337
+6	149	%s is logged in as %s%s	31337
+6	150	%s is an Official CService Representative%s and logged in as %s	31337
+6	151	%s is an Official CService Administrator%s and logged in as %s	31337
+6	152	%s is an Official CService Developer%s and logged in as %s	31337
+6	153	There are more than %i entries matching [%s]	31337
+6	154	Please restrict your search mask	31337
+6	155	No matching entries for [%s]	31337
+6	156	%s: Cleared channel modes.	31337
+6	158	Invalid option.	31337
+6	159	%s is an Official Undernet Service Bot.	31337
+6	160	Added ban %s to %s at level %i	31337
+6	161	%s: ban list is empty.		31337
+6	162	I'm already in that channel!	31337
 \.
