@@ -1,18 +1,11 @@
 ------------------------------------------------------------------------------------
--- "$Id: cservice.web.sql,v 1.11 2001/09/14 01:17:51 nighty Exp $"
+-- "$Id: cservice.web.sql,v 1.12 2001/10/14 05:04:46 nighty Exp $"
 -- Channel service DB SQL file for PostgreSQL.
 --
 -- Tables specific to webbased registration process.
 --
 -- Perry Lorier <perry@coders.net>
-
-CREATE TABLE webcookies (
-	user_id INT4 CONSTRAINT users_supporters_ref REFERENCES users( id ),
-	cookie VARCHAR(32) UNIQUE,
-	expire INT4
-);
-
-CREATE INDEX webcookies_user_id_idx ON webcookies(user_id);
+-- nighty <nighty@undernet.org>
 
 CREATE TABLE pendingusers (
 	user_name VARCHAR(63),

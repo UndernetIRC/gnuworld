@@ -32,3 +32,13 @@ Note: the script add the user Admin , with all commands enabled .
       which is temPass , for more help /msg bot help modoper.
       
       
+then you should
+
+> psql ccontrol < ccontrol.commands.sql
+> psql ccontrol < ccontrol.update.sql
+
+
+NOTE: in the default GNUworld.conf use rather 'ccontrol.conf' as a default for CControl
+than the 'gnuworld3.conf' file (it's not complete).
+
+

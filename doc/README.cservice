@@ -19,10 +19,26 @@ Load the schema
 ---------------
 Make sure you are in the gnuworld/doc directory.
 
-> psql cservice <cservice.sql
-> psql cservice <languages.sql
-> psql cservice <language_table.sql
-> psql cservice <cservice.web.sql
+> psql cservice < cservice.sql
+> psql cservice < languages.sql
+> psql cservice < language_table.sql
+> psql cservice < cservice.web.sql
+
+Create a local (for the www) Database called 'cmaster' for webcookies
+(without this local db the website will NOT work)
+---------------------------------------------------------------------
+
+> createdb cmaster
+> psql cmaster < webcookies.sql
+
+
+If you want to use anti-bruteforce code that checks IP and denies
+access after too many failed attempts, you need to create
+this database :
+
+> createdb ipcheck
+> psql ipcheck < ipcheck.sql
+
 
 Add administrator account
 -------------------------
