@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: main.cc,v 1.63 2004/06/04 14:30:52 mrbean_ Exp $
+ * $Id: main.cc,v 1.64 2004/06/04 15:15:00 mrbean_ Exp $
  */
 
 #include	<sys/time.h>
@@ -47,7 +47,7 @@
 #include	"md5hash.h"
 #include	"Signal.h"
 
-RCSTAG( "$Id: main.cc,v 1.63 2004/06/04 14:30:52 mrbean_ Exp $" ) ;
+RCSTAG( "$Id: main.cc,v 1.64 2004/06/04 15:15:00 mrbean_ Exp $" ) ;
 
 // main() must be in the global namespace
 using namespace gnuworld ;
@@ -214,18 +214,14 @@ bool doDebug = true ;
 string socketFileName( "socket.log" ) ;
 
 optind = 0 ;
-//int c = EOF ;
-int c;
-clog << "Checking args ... " << argc << "\n";
+int c = EOF ;
 while( (c = getopt( argc, argv, "cd:Df:l:Lhs:")) != -1 )
 	{
-	clog << "parsing " << c <<"\n";
 	switch( c )
 		{
 		case 0:
 		case 'c':
 			verbose = true ;
-			clog << "verbose!!\n";
 			break ;
 		case 1:
 		case 'd':
