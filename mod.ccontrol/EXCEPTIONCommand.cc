@@ -12,7 +12,7 @@
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 
-const char EXCEPTIONCommand_cc_rcsId[] = "$Id: EXCEPTIONCommand.cc,v 1.7 2001/11/08 23:13:29 mrbean_ Exp $";
+const char EXCEPTIONCommand_cc_rcsId[] = "$Id: EXCEPTIONCommand.cc,v 1.8 2001/11/20 19:49:45 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -31,6 +31,12 @@ if(st.size() < 2)
 	Usage(theClient);
 	return true;
 	}
+
+if(!dbConnected)
+        {
+        bot->Notice(theClient,"Sorry, but the db connection is down now, please try again alittle later");
+        return false;
+        }
 
 if(!strcasecmp(st[1].c_str(),"list")) //Trying to list all exceptions?
 	{

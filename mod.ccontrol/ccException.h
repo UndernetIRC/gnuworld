@@ -1,7 +1,7 @@
 /* ccException.h */
 
 #ifndef __CCEXCEPTION_H
-#define __CCEXCEPTION_H "$Id: ccException.h,v 1.4 2001/08/16 20:18:38 mrbean_ Exp $"
+#define __CCEXCEPTION_H "$Id: ccException.h,v 1.5 2001/11/20 19:49:45 mrbean_ Exp $"
 
 #include	<string>
 
@@ -54,6 +54,9 @@ public:
 	inline void		setAddedOn( const time_t _AddedOn )
 		{ AddedOn = _AddedOn; }
 	
+	inline void		setSqldb(PgDatabase* _SQLDb)
+		{ SQLDb = _SQLDb; }
+		
 	int		loadData(const string& Host);
 	
 	int		updateData();
@@ -62,6 +65,8 @@ public:
 	
 	bool		Delete();
 	
+	//static unsigned int numAllocated;
+		
 protected:
 	
 	string 		Host;

@@ -21,7 +21,7 @@
 #include	"gline.h"
 #include 	"time.h"
 
-const char GCHANCommand_cc_rcsId[] = "$Id: GCHANCommand.cc,v 1.3 2001/11/08 23:13:29 mrbean_ Exp $";
+const char GCHANCommand_cc_rcsId[] = "$Id: GCHANCommand.cc,v 1.4 2001/11/20 19:49:45 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -36,6 +36,13 @@ namespace uworld
 bool GCHANCommand::Exec( iClient* theClient, const string& Message )
 {
 StringTokenizer st( Message ) ;
+
+if(!dbConnected)
+        {
+        bot->Notice(theClient,"Sorry, but the db connection is down now, please try again alittle later");
+        return false;
+        }
+
 if( st.size() < 4 )
 	{
 	Usage( theClient ) ;

@@ -12,7 +12,7 @@
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 
-const char LISTHOSTSCommand_cc_rcsId[] = "$Id: LISTHOSTSCommand.cc,v 1.5 2001/11/08 23:13:29 mrbean_ Exp $";
+const char LISTHOSTSCommand_cc_rcsId[] = "$Id: LISTHOSTSCommand.cc,v 1.6 2001/11/20 19:49:45 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -25,6 +25,13 @@ namespace uworld
 bool LISTHOSTSCommand::Exec( iClient* theClient, const string& Message)
 {	 
 StringTokenizer st( Message ) ;
+
+
+if(!dbConnected)
+        {
+        bot->Notice(theClient,"Sorry, but the db connection is down now, please try again alittle later");
+        return false;
+        }
 	
 if( st.size() < 2 )
 	{

@@ -14,7 +14,7 @@
 #include	"StringTokenizer.h"
 
 
-const char HELPCommand_cc_rcsId[] = "$Id: HELPCommand.cc,v 1.11 2001/10/28 10:12:38 mrbean_ Exp $";
+const char HELPCommand_cc_rcsId[] = "$Id: HELPCommand.cc,v 1.12 2001/11/20 19:49:45 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -29,6 +29,12 @@ namespace uworld
 bool HELPCommand::Exec( iClient* theClient, const string& Message )
 {
 StringTokenizer st( Message ) ;
+
+if(!dbConnected)
+        {
+        bot->Notice(theClient,"Sorry, but the db connection is down now, please try again alittle later");
+        return false;
+        }
 
 AuthInfo *tmpAuth = bot->IsAuth(theClient->getCharYYXXX());
 if(!tmpAuth)

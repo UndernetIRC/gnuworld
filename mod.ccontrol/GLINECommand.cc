@@ -23,7 +23,7 @@
 #include 	"time.h"
 #include	"ccUser.h"
 
-const char GLINECommand_cc_rcsId[] = "$Id: GLINECommand.cc,v 1.25 2001/11/08 23:13:29 mrbean_ Exp $";
+const char GLINECommand_cc_rcsId[] = "$Id: GLINECommand.cc,v 1.26 2001/11/20 19:49:45 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -44,6 +44,13 @@ bool GLINECommand::Exec( iClient* theClient, const string& Message )
 {
 bool Ok = true;
 StringTokenizer st( Message ) ;
+
+if(!dbConnected)
+        {
+        bot->Notice(theClient,"Sorry, but the db connection is down now, please try again alittle later");
+        return false;
+        }
+
 if( st.size() < 4 )
 	{
 	Usage( theClient ) ;
@@ -51,6 +58,7 @@ if( st.size() < 4 )
 	}
 
 StringTokenizer::size_type pos = 1 ;
+
 
 time_t gLength = bot->getDefaultGlineLength() ;
 

@@ -3,7 +3,7 @@
  * 
  * Server class
  * 
- * $Id: ccServer.cc,v 1.5 2001/10/17 21:39:11 mrbean_ Exp $
+ * $Id: ccServer.cc,v 1.6 2001/11/20 19:49:46 mrbean_ Exp $
  */
  
 #include	<strstream>
@@ -17,9 +17,10 @@
 #include	"ELog.h"
 #include	"misc.h"
 #include	"ccServer.h" 
+#include	"ccontrol.h"
 
 const char ccServer_h_rcsId[] = __CCSERVER_H ;
-const char ccServer_cc_rcsId[] = "$Id: ccServer.cc,v 1.5 2001/10/17 21:39:11 mrbean_ Exp $" ;
+const char ccServer_cc_rcsId[] = "$Id: ccServer.cc,v 1.6 2001/11/20 19:49:46 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -50,6 +51,10 @@ bool ccServer::Insert()
 {
 static const char *Main = "INSERT into servers (Name,LastUplink,LastNumeric,LastConnected,SplitedOn,SplitReason) VALUES ('";
 
+if(!dbConnected)
+	{
+	return false;
+	}
 strstream theQuery;
 theQuery	<< Main
 		<< Name <<"','"
@@ -84,6 +89,11 @@ else
 bool ccServer::Update()
 {
 static const char *Main = "UPDATE servers SET Name = '";
+
+if(!dbConnected)
+	{
+	return false;
+	}
 
 strstream theQuery;
 theQuery	<< Main
@@ -126,6 +136,11 @@ bool ccServer::loadData(string ServerName)
 static const char *Main = "SELECT name,lastuplink,lastconnected,splitedon,lastnumeric,splitreason FROM servers WHERE 
 lower(Name) = '";
 
+if(!dbConnected)
+	{
+	return false;
+	}
+
 strstream theQuery;
 theQuery	<< Main
 		<< string_lower(ServerName)
@@ -163,6 +178,11 @@ bool ccServer::loadNumericData(string ServNumeric)
 static const char *Main = "SELECT name,lastuplink,lastconnected,splitedon,lastnumeric,SplitReason FROM servers WHERE 
 LastNumeric = '";
 
+if(!dbConnected)
+	{
+	return false;
+	}
+
 strstream theQuery;
 theQuery	<< Main
 		<< ServNumeric
@@ -198,6 +218,11 @@ return true;
 bool ccServer::Delete()
 {
 static const char *Main = "DELETE FROM servers WHERE lower(Name) = '";
+
+if(!dbConnected)
+	{
+	return false;
+	}
 
 strstream theQuery;
 theQuery	<< Main

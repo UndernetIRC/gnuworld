@@ -18,7 +18,7 @@
 #include	"AuthInfo.h"
 #include	"Network.h"
 
-const char USERINFOCommand_cc_rcsId[] = "$Id: USERINFOCommand.cc,v 1.2 2001/09/30 20:26:44 mrbean_ Exp $";
+const char USERINFOCommand_cc_rcsId[] = "$Id: USERINFOCommand.cc,v 1.3 2001/11/20 19:49:45 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -33,6 +33,12 @@ bool USERINFOCommand::Exec( iClient* theClient, const string& Message )
 
 StringTokenizer st( Message ) ;
 	
+if(!dbConnected)
+        {
+        bot->Notice(theClient,"Sorry, but the db connection is down now, please try again alittle later");
+        return false;
+        }
+
 if( st.size() < 2 )
 	{
 	Usage(theClient);

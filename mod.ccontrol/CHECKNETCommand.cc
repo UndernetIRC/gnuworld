@@ -13,7 +13,7 @@
 #include	"StringTokenizer.h"
 #include	"Network.h"
 
-const char CHECKNETCommand_cc_rcsId[] = "$Id: CHECKNETCommand.cc,v 1.2 2001/10/17 21:39:11 mrbean_ Exp $";
+const char CHECKNETCommand_cc_rcsId[] = "$Id: CHECKNETCommand.cc,v 1.3 2001/11/20 19:49:45 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -28,6 +28,12 @@ bool CHECKNETCommand::Exec( iClient* theClient, const string& Message )
 
 static const char* queryHeader
 	= "SELECT * FROM servers";
+
+if(!dbConnected)
+        {
+        bot->Notice(theClient,"Sorry, but the db connection is down now, please try again alittle later");
+        return false;
+        }
 
 strstream theQuery;
 theQuery	<< queryHeader 

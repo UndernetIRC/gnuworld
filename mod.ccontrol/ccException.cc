@@ -3,7 +3,7 @@
  * 
  * Exception class
  * 
- * $Id: ccException.cc,v 1.3 2001/08/16 20:18:38 mrbean_ Exp $
+ * $Id: ccException.cc,v 1.4 2001/11/20 19:49:45 mrbean_ Exp $
  */
  
 #include	<strstream>
@@ -16,11 +16,11 @@
 #include	"ELog.h"
 #include	"misc.h"
 #include	"match.h"
-
 #include	"ccException.h" 
+#include	"ccontrol.h"
 
 const char ccException_h_rcsId[] = __CCEXCEPTION_H ;
-const char ccException_cc_rcsId[] = "$Id: ccException.cc,v 1.3 2001/08/16 20:18:38 mrbean_ Exp $" ;
+const char ccException_cc_rcsId[] = "$Id: ccException.cc,v 1.4 2001/11/20 19:49:45 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -33,6 +33,8 @@ using std::ends ;
 namespace uworld
 {
 
+extern unsigned int dbConnected;
+
 ccException::ccException(PgDatabase* _SQLDb)
  : Host(""),
    Connections(0),
@@ -40,10 +42,13 @@ ccException::ccException(PgDatabase* _SQLDb)
    AddedOn(0),
    SQLDb(_SQLDb)
 {
+//++numAllocated;
 }
 
 ccException::~ccException()
-{}
+{
+//--numAllocated;
+}
 
 
 int ccException::loadData(const string& HostName)
@@ -51,6 +56,11 @@ int ccException::loadData(const string& HostName)
 
 static const char Main[] = "SELECT * FROM Exceptions WHERE lower(Host) = '";
 
+if((!dbConnected) || !(SQLDb))
+	{
+	return false;
+	}
+	
 strstream theQuery;
 theQuery	<< Main
 		<< string_lower(HostName)
@@ -81,6 +91,11 @@ return true;
 int ccException::updateData()
 {
 static const char *Main = "UPDATE Exceptions SET AddedBy = '";
+
+if(!dbConnected)	
+	{
+	return false;
+	}
 
 strstream theQuery;
 theQuery	<< Main
@@ -117,6 +132,12 @@ else
 bool ccException::Insert()
 {
 static const char *quer = "INSERT into exceptions(host,connections,addedby,addedon) VALUES ('";
+
+if(!dbConnected)
+	{
+	return false;
+	}
+
 strstream query;
 query		<< quer
 		<< Host << "',"
@@ -143,6 +164,11 @@ bool ccException::Delete()
 {
 
 static const char *quer = "DELETE FROM exceptions WHERE host = '";
+
+if(!dbConnected)
+	{
+	return false;
+	}
 
 strstream query;
 query		<< quer

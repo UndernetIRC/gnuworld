@@ -1,7 +1,7 @@
 /* ccGline.h */
 
 #ifndef __CCGLINE_H
-#define __CCGLINE_H "$Id: ccGline.h,v 1.7 2001/07/23 10:28:51 mrbean_ Exp $"
+#define __CCGLINE_H "$Id: ccGline.h,v 1.8 2001/11/20 19:49:46 mrbean_ Exp $"
 
 #include	<string>
 
@@ -63,6 +63,9 @@ public:
 	inline void 		setReason( const string& _Reason ) 
 		{ Reason = _Reason; }
 	    
+	inline void 		setSqldb(PgDatabase* _SQLDb)
+		{ SQLDb = _SQLDb; } 
+		
 	//Methods for updating 
 
 	bool Insert();
@@ -74,6 +77,8 @@ public:
 	bool loadData( const string & );
 	
 	bool Delete();
+	
+	//static unsigned int numAllocated;
 	
 protected:
 	string Id;

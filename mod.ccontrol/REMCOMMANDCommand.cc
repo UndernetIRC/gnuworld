@@ -15,7 +15,7 @@
 #include 	"ccUser.h"
 #include	"misc.h"
 
-const char REMCOMMANDCommand_cc_rcsId[] = "$Id: REMCOMMANDCommand.cc,v 1.5 2001/11/11 16:05:51 mrbean_ Exp $";
+const char REMCOMMANDCommand_cc_rcsId[] = "$Id: REMCOMMANDCommand.cc,v 1.6 2001/11/20 19:49:45 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -28,6 +28,12 @@ namespace uworld
 bool REMCOMMANDCommand::Exec( iClient* theClient, const string& Message)
 {
 StringTokenizer st( Message ) ;
+
+if(!dbConnected)
+        {
+        bot->Notice(theClient,"Sorry, but the db connection is down now, please try again alittle later");
+        return false;
+        }
 
 if( st.size() < 3 )
 	{

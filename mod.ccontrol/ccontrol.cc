@@ -37,7 +37,7 @@
 #include	"ip.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.85 2001/11/13 18:28:07 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.86 2001/11/20 19:49:46 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -67,6 +67,8 @@ extern "C"
   }
 
 } 
+
+unsigned int dbConnected = false;
  
 ccontrol::ccontrol( const string& configFileName )
  : xClient( configFileName )
@@ -75,11 +77,11 @@ ccontrol::ccontrol( const string& configFileName )
 // Read the config file
 EConfig conf( configFileName ) ;
 
-string sqlHost = conf.Find("sql_host" )->second;
-string sqlDb = conf.Find( "sql_db" )->second;
-string sqlPort = conf.Find( "sql_port" )->second;
-string sqlPass = conf.Require( "sql_pass" )->second;
-string sqlUser = conf.Require( "sql_user" )->second;
+sqlHost = conf.Find("sql_host" )->second;
+sqlDb = conf.Find( "sql_db" )->second;
+sqlPort = conf.Find( "sql_port" )->second;
+sqlPass = conf.Require( "sql_pass" )->second;
+sqlUser = conf.Require( "sql_user" )->second;
 
 inBurst = true;
 inRefresh = false;
@@ -124,6 +126,7 @@ else
 		<< SQLDb->getPID()
 		<< endl ;
 	}
+dbConnected = true;
 
 // operChanReason is the reason used when kicking non-opers from
 // oper-only channels
@@ -158,6 +161,8 @@ maxGlineLen = atoi(conf.Require("max_GLen")->second.c_str());
 maxThreads = atoi(conf.Require("max_threads")->second.c_str());
 
 checkGates = atoi(conf.Require("check_gates")->second.c_str());
+
+dbConnectionTimer = atoi(conf.Require("dbinterval")->second.c_str());
 
 // Set up the oper channels
 EConfig::const_iterator ptr = conf.Find( "operchan" ) ;
@@ -280,6 +285,9 @@ RegisterCommand( new USERINFOCommand( this, "USERINFO", "<usermask/servermask> "
 loadGlines();
 loadExceptions();
 
+connectCount = 0;
+connectRetry = 5;
+
 }
 
 
@@ -376,6 +384,7 @@ for( commandMapType::iterator ptr = commandMap.begin() ;
 expiredGlines = theServer->RegisterTimer(::time(0) + GLInterval,this,NULL);
 expiredIgnores = theServer->RegisterTimer(::time(0) + 60,this,NULL);
 expiredSuspends = theServer->RegisterTimer(::time(0) + 60,this,NULL);
+dbConnectionCheck = theServer->RegisterTimer(::time(0) + dbConnectionTimer,this,NULL);
 
 if(SendReport)
 	{
@@ -580,53 +589,59 @@ switch( theEvent )
 		 * server , and check if we know it
 		 *
 		 */
-		iServer* NewServer = static_cast< iServer* >( Data1);
-		iServer* UplinkServer = static_cast< iServer* >( Data2);
-		ccServer* CheckServer = new (std::nothrow) ccServer(SQLDb);
-		assert(CheckServer != NULL);
-		if(CheckServer->loadNumericData(NewServer->getCharYY()))
+		if(dbConnected)
 			{
-			if(strcasecmp(NewServer->getName(),CheckServer->getName()))
+			iServer* NewServer = static_cast< iServer* >( Data1);
+			iServer* UplinkServer = static_cast< iServer* >( Data2);
+			ccServer* CheckServer = new (std::nothrow) ccServer(SQLDb);
+			assert(CheckServer != NULL);
+			if(CheckServer->loadNumericData(NewServer->getCharYY()))
 				{
-				strstream s ;
-				s	<< getCharYY() << " WA :"
-    					<< "\002Database numeric collision warnning!\002 - "
-					<< NewServer->getName()
-					<< " != "
-					<< CheckServer->getName()
-					<< ends ;
-				Write( s ) ;
-				delete[] s.str();
+				if(strcasecmp(NewServer->getName(),CheckServer->getName()))
+					{
+					strstream s ;
+					s	<< getCharYY() << " WA :"
+    						<< "\002Database numeric collision warnning!\002 - "
+						<< NewServer->getName()
+						<< " != "
+						<< CheckServer->getName()
+						<< ends ;
+					Write( s ) ;
+					delete[] s.str();
+					}
+				}				
+			if(!CheckServer->loadData(NewServer->getName()))
+				{    	
+				MsgChanLog("Unknown server connected : %s Uplink : %s\n"
+					    ,NewServer->getName().c_str(),UplinkServer->getName().c_str());
 				}
-			}				
-		if(!CheckServer->loadData(NewServer->getName()))
-			{    	
-			MsgChanLog("Unknown server connected : %s Uplink : %s\n"
-				    ,NewServer->getName().c_str(),UplinkServer->getName().c_str());
+			else
+				{
+				CheckServer->setLastConnected(::time (0));
+				CheckServer->setUplink(UplinkServer->getName());
+				CheckServer->setLastNumeric(NewServer->getCharYY());
+				CheckServer->Update();
+				}
+			delete CheckServer;
 			}
-		else
-			{
-			CheckServer->setLastConnected(::time (0));
-			CheckServer->setUplink(UplinkServer->getName());
-			CheckServer->setLastNumeric(NewServer->getCharYY());
-			CheckServer->Update();
-			}
-		delete CheckServer;
 		break;
 		}
 	case EVT_NETBREAK:
 		{
-		iServer* NewServer = static_cast< iServer* >( Data1);
-		string Reason = *(static_cast<string *>(Data3));
-		ccServer* CheckServer = new (std::nothrow) ccServer(SQLDb);
-                assert(CheckServer != NULL);
-                if(CheckServer->loadNumericData(NewServer->getCharYY()))
-                        {
-			CheckServer->setSplitReason(Reason);
-			CheckServer->setLastSplitted(::time(NULL));
-			CheckServer->Update();
+		if(dbConnected)
+			{
+			iServer* NewServer = static_cast< iServer* >( Data1);
+			string Reason = *(static_cast<string *>(Data3));
+			ccServer* CheckServer = new (std::nothrow) ccServer(SQLDb);
+        	        assert(CheckServer != NULL);
+	                if(CheckServer->loadNumericData(NewServer->getCharYY()))
+    		                {
+				CheckServer->setSplitReason(Reason);
+				CheckServer->setLastSplitted(::time(NULL));
+				CheckServer->Update();
+				}
+			delete CheckServer;			     
 			}
-		delete CheckServer;			     
 		break;
 		}
 	case EVT_BURST_CMPLT:
@@ -669,7 +684,7 @@ switch( theEvent )
 					gatesWaitingQueue.push_front(tempGate);			
 				}			
 			}
-		if(!inBurst)
+		if((!inBurst) && (dbConnected))
 			{
 			int CurConnections = Network->countHost(NewUser->getInsecureHost());		
 			if(CurConnections  > getExceptions("*@" + NewUser->getInsecureHost()))
@@ -705,7 +720,7 @@ switch( theEvent )
 					}
 				}			
 			}
-		else
+		else if(dbConnected)
 			{
 			addClone(NewUser->getInsecureHost());
 			}
@@ -784,7 +799,8 @@ else if(timer_id == clonesCheck)
 		{
 		if(!clonesQueue.empty())
 			{
-			checkClones(100);
+			if(dbConnected)
+				checkClones(100);
 			clonesCheck = MyUplink->RegisterTimer(::time(0) + 2,this,NULL);
 			}
 		else
@@ -802,6 +818,12 @@ else if(timer_id == gatesStatusCheck)
 		gatesStatusCheck = MyUplink->RegisterTimer(::time(0) + 2,this,NULL);
 		}
 	}
+else if(timer_id == dbConnectionCheck)
+	{
+	checkDbConnection();
+	dbConnectionCheck = MyUplink->RegisterTimer(::time(0) + dbConnectionTimer,this,NULL);
+	}
+	
 return true;
 }
 
@@ -1006,6 +1028,10 @@ bool ccontrol::AddOper (ccUser* Oper)
 {
 static const char *Main = "INSERT into opers (user_name,password,access,saccess,last_updated_by,last_updated,flags,server,isSuspended,suspend_expires,suspended_by,suspend_level,suspend_reason,isUhs,isOper,isAdmin,isSmt,isCoder,GetLogs,NeedOp) VALUES ('";
 
+if(!dbConnected)
+	{
+	return false;
+	}
 strstream theQuery;
 theQuery	<< Main
 		<< Oper->getUserName() <<"','"
@@ -1052,8 +1078,12 @@ return false;
 
 bool ccontrol::DeleteOper (const string& Name)
 {
-//    strstream Condition;
-//    Condition << "WHERE user_id = " << Id << ';';
+
+if(!dbConnected)
+	{
+	return false;
+	}
+
 ExecStatusType status;
 ccUser* tUser = GetOper(removeSqlChars(Name.c_str()));
 //Delete the user hosts
@@ -1165,6 +1195,11 @@ bool ccontrol::UserGotMask( ccUser* user, const string& Host )
 {
 static const char *Main = "SELECT host FROM hosts WHERE user_id = ";
 
+if(!dbConnected)
+	{
+	return false;
+	}
+
 strstream theQuery;
 theQuery	<< Main
 		<< user->getID()
@@ -1201,6 +1236,11 @@ return false ;
 bool ccontrol::UserGotHost( ccUser* user, const string& Host )
 {
 static const char *Main = "SELECT host FROM hosts WHERE user_id = ";
+
+if(!dbConnected)
+	{
+	return false;
+	}
 
 strstream theQuery;
 theQuery	<< Main
@@ -1305,6 +1345,11 @@ return true ;
 bool ccontrol::AddHost( ccUser* user, const string& host )
 {
 
+if(!dbConnected)
+	{
+	return false;
+	}
+
 static const char *Main = "INSERT into hosts (user_id,host) VALUES (";
 
 strstream theQuery;
@@ -1335,6 +1380,11 @@ else
 
 bool ccontrol::DelHost( ccUser* user, const string& host )
 {
+
+if(!dbConnected)
+	{
+	return false;
+	}
 
 static const char *Main = "DELETE FROM hosts WHERE user_id = ";
 
@@ -1370,6 +1420,11 @@ bool ccontrol::listHosts( ccUser* User, iClient* theClient )
 static const char* queryHeader
 	= "SELECT host FROM hosts WHERE user_id =  ";
 
+if(!dbConnected)
+	{
+	return false;
+	}
+
 strstream theQuery;
 theQuery	<< queryHeader 
 		<< User->getID()
@@ -1399,6 +1454,11 @@ return true;
 bool ccontrol::GetHelp( iClient* user, const string& command )
 {
 static const char *Main = "SELECT line,help FROM help WHERE lower(command) = '";
+
+if(!dbConnected)
+	{
+	return false;
+	}
 
 strstream theQuery;
 theQuery	<< Main
@@ -1441,6 +1501,11 @@ else
 bool ccontrol::GetHelp( iClient* user, const string& command , const string& subcommand)
 {
 static const char *Main = "SELECT line,help FROM help WHERE lower(command) = '";
+
+if(!dbConnected)
+	{
+	return false;
+	}
 
 strstream theQuery;
 theQuery	<< Main
@@ -1511,6 +1576,13 @@ return retMe ;
 
 ccUser* ccontrol::GetOper( const string Name)
 {
+
+if(!dbConnected)
+	{
+	return NULL;
+	}
+
+
 ccUser* tmpUser = new (std::nothrow) ccUser(SQLDb);
 assert( tmpUser != 0 ) ;
 
@@ -1537,6 +1609,7 @@ return tmpUser ;
 
 bool ccontrol::addGline( ccGline* TempGline)
 {
+
 ccGline *theGline = 0;
 for(glineIterator ptr = glineList.begin(); ptr != glineList.end();)
 	{
@@ -1544,6 +1617,7 @@ for(glineIterator ptr = glineList.begin(); ptr != glineList.end();)
 	if(theGline->getHost() == TempGline->getHost()) 
 		{
 		ptr = glineList.erase(ptr);
+		delete theGline;
 		}
 	else
 		++ptr;
@@ -1638,6 +1712,11 @@ return true;
 bool ccontrol::DailyLog(AuthInfo* Oper, const char *Log, ... )
 {
 
+if(!dbConnected)
+	{
+	return false;
+	}
+
 char buffer[ 1024 ] = { 0 } ;
 va_list list;
 
@@ -1679,6 +1758,11 @@ return true;
 
 bool ccontrol::CreateReport(time_t From, time_t Til)
 {
+
+if(!dbConnected)
+	{
+	return false;
+	}
 
 static const char* queryHeader = "SELECT * FROM comlog where ts >";
 strstream theQuery;
@@ -1886,6 +1970,11 @@ bool ccontrol::refreshSuspention()
 {
 static const char *Main = "SELECT user_id FROM opers WHERE isSuspended = 't' AND suspend_expires < now()::abstime::int4";
 
+if(!dbConnected)
+	{
+	return false;
+	}
+
 strstream theQuery;
 theQuery	<< Main
 		<< ends;
@@ -1947,6 +2036,11 @@ return true;
 
 bool ccontrol::refreshGlines()
 {
+
+if(!dbConnected)
+	{
+	return false;
+	}
 
 int totalFound = 0;
 inRefresh = true;
@@ -2023,6 +2117,12 @@ return true;
 bool ccontrol::loadGlines()
 {
 //static const char *Main = "SELECT * FROM glines where ExpiresAt > now()::abstime::int4";
+
+if(!dbConnected)
+	{
+	return false;
+	}
+
 static const char *Main = "SELECT * FROM glines";
 
 strstream theQuery;
@@ -2131,6 +2231,12 @@ return false;
 bool ccontrol::insertException( iClient *theClient , const string& Host , int Connections )
 {
 //Check if there is already an exception on that host
+
+if(!dbConnected)
+	{
+	return false;
+	}
+
 if(isException(Host))
 	{
 	Notice(theClient,
@@ -2162,6 +2268,11 @@ return true;
 
 bool ccontrol::delException( iClient *theClient , const string &Host )
 {
+
+if(!dbConnected)
+	{
+	return false;
+	}
 
 if(!isException(removeSqlChars(Host)))
 	{
@@ -2362,6 +2473,11 @@ bool ccontrol::loadExceptions()
 {
 static const char *Main = "SELECT * FROM Exceptions";
 
+if(!dbConnected)
+	{
+	return false;
+	}
+
 strstream theQuery;
 theQuery	<< Main
 		<< ends;
@@ -2436,6 +2552,11 @@ void ccontrol::loadCommands()
 
 static const char *Main = "SELECT * FROM Commands";
 
+if(!dbConnected)
+	{
+	return;
+	}
+
 strstream theQuery;
 theQuery	<< Main
 		<< ends;
@@ -2486,6 +2607,11 @@ for( int i = 0 ; i < SQLDb->Tuples() ; i++ )
 bool ccontrol::updateCommand ( Command* Comm)
 {
 static const char *Main = "UPDATE Commands set name = '";
+
+if(!dbConnected)
+	{
+	return false;
+	}
 
 strstream theQuery;
 theQuery	<< Main
@@ -2547,6 +2673,11 @@ bool ccontrol::UpdateCommandFromDb ( Command* Comm )
 {
 static const char *Main = "SELECT * From Commands where lower(RealName) = '";
 
+if(!dbConnected)
+	{
+	return false;
+	}
+
 strstream theQuery;
 theQuery	<< Main
 		<< string_lower(Comm->getRealName())
@@ -2582,6 +2713,11 @@ return true;
 bool ccontrol::CleanServers()
 {
 static const char *Main = "Delete from servers";
+
+if(!dbConnected)
+	{
+	return false;
+	}
 
 strstream theQuery;
 theQuery	<< Main
@@ -2632,6 +2768,12 @@ for(clonesIterator ptr = clonesQueue.begin(); ptr != clonesQueue.end();)
 
 void ccontrol::checkClones(const int Amount)
 {
+
+if(!dbConnected)
+	{
+	return;
+	}
+
 int CurConnections;
 if(Amount < 0)
 	return;
@@ -2692,10 +2834,6 @@ return NewString;
 
 }
 
-		
-
-
-
 void ccontrol::GatesCheck()
 {
 gateIterator ptr;
@@ -2743,6 +2881,73 @@ for(;(!(gatesWaitingQueue.empty()) && (LeftThreads > 0));--LeftThreads)
 	}
 
 }	
+
+void ccontrol::checkDbConnection()
+{
+
+if(SQLDb->Status() == CONNECTION_BAD) //Check if the connection had died
+	{
+	delete(SQLDb);
+	dbConnected = false;
+	updateSqldb(NULL);
+	MsgChanLog("PANIC! - The Connection With The Db Was Lost\n");
+	MsgChanLog("Attempting to reconnect, Attempt %d out of %d\n"
+		    ,connectCount+1,connectRetry+1);
+	string Query = "host=" + sqlHost + " dbname=" + sqlDb + " port=" + sqlPort;
+	if (strcasecmp(sqlUser,"''"))
+		{
+		Query += (" user=" + sqlUser);
+		}
+
+	if (strcasecmp(sqlPass,"''"))
+		{
+		Query += (" password=" + sqlPass);
+		}
+	SQLDb = new (std::nothrow) cmDatabase(Query.c_str());
+	assert(SQLDb != NULL);
+	
+	if(SQLDb->ConnectionBad())
+		{
+		++connectCount;
+		if(connectCount > connectRetry)
+			{
+			MsgChanLog("Cant connect to the database, quiting\n");
+			::exit(1);
+			}
+		else
+			{
+			MsgChanLog("Attempt was failed\n");
+			}
+		}
+	else
+		{
+		dbConnected = true;
+		MsgChanLog("The PANIC is over, db connection restored\n");
+		updateSqldb(SQLDb);
+		connectCount = 0;
+		}
+	}
+	
+	
+}
+
+void ccontrol::updateSqldb(PgDatabase* _SQLDb)
+{
+
+for(glineIterator ptr = glineList.begin();ptr != glineList.end();++ptr) 
+	{
+	(*ptr)->setSqldb(_SQLDb);
+	}
+
+for(exceptionIterator ptr = exception_begin();ptr != exception_end();++ptr)
+	{
+	(*ptr)->setSqldb(_SQLDb);
+	}
+}
+
+void ccontrol::showStatus(iClient* tmpClient)
+{
+}
 
 void *initGate(void* arg)
 {

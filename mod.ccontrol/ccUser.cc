@@ -3,7 +3,7 @@
  * 
  * Storage class for accessing user information 
  * 
- * $Id: ccUser.cc,v 1.10 2001/09/30 20:26:44 mrbean_ Exp $
+ * $Id: ccUser.cc,v 1.11 2001/11/20 19:49:46 mrbean_ Exp $
  */
  
 #include	<strstream>
@@ -16,9 +16,10 @@
 #include	"misc.h"
 #include	"ccUser.h" 
 #include	"commLevels.h"
+#include	"ccontrol.h"
 
 const char ccUser_h_rcsId[] = __CCUSER_H ;
-const char ccUser_cc_rcsId[] = "$Id: ccUser.cc,v 1.10 2001/09/30 20:26:44 mrbean_ Exp $" ;
+const char ccUser_cc_rcsId[] = "$Id: ccUser.cc,v 1.11 2001/11/20 19:49:46 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -60,6 +61,11 @@ bool ccUser::loadData(const string& Name)
 
 static const char Main[] = "SELECT user_id,user_name,password,access,saccess,flags,suspend_expires,suspended_by,server,isSuspended,IsUhs,IsOper,IsAdmin,IsSmt,IsCoder,GetLogs,NeedOp,Email,Suspend_Level,Suspend_Reason FROM opers WHERE lower(user_name) = '";
 
+if(!dbConnected)
+	{
+	return false;
+	}
+
 strstream theQuery;
 theQuery	<< Main
 		<< string_lower(Name)
@@ -86,6 +92,11 @@ bool ccUser::loadData( const unsigned int Id)
 {
 static const char Main[] = "SELECT user_id,user_name,password,access,saccess,flags,suspend_expires,suspended_by,server,isSuspended,IsUhs,IsOper,IsAdmin,IsSmt,IsCoder,GetLogs,NeedOp,Email,Suspend_Level,Suspend_Reason FROM opers WHERE user_id = ";
 strstream theQuery;
+
+if(!dbConnected)
+	{
+	return false;
+	}
 
 theQuery	<< Main
 		<< Id
@@ -135,6 +146,11 @@ SuspendReason = SQLDb->GetValue(0,19);
 bool ccUser::Update()
 {
 static const char *Main = "UPDATE opers SET password = '";
+
+if(!dbConnected)
+	{
+	return false;
+	}
 
 strstream theQuery;
 theQuery	<< Main

@@ -13,7 +13,7 @@
 #include	"StringTokenizer.h"
 #include	"ccUser.h"
 
-const char SUSPENDCommand_cc_rcsId[] = "$Id: SUSPENDCommand.cc,v 1.5 2001/11/11 16:05:51 mrbean_ Exp $";
+const char SUSPENDCommand_cc_rcsId[] = "$Id: SUSPENDCommand.cc,v 1.6 2001/11/20 19:49:45 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -27,6 +27,12 @@ bool SUSPENDCommand::Exec( iClient* theClient, const string& Message)
 {
 StringTokenizer st( Message ) ;
 	
+if(!dbConnected)
+        {
+        bot->Notice(theClient,"Sorry, but the db connection is down now, please try again alittle later");
+        return false;
+        }
+
 if( st.size() < 4 )
 	{
 	Usage(theClient);

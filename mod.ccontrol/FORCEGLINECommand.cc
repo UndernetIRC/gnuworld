@@ -19,7 +19,7 @@
 #include	"Gline.h"
 #include	"gline.h"
 
-const char FORCEGLINECommand_cc_rcsId[] = "$Id: FORCEGLINECommand.cc,v 1.12 2001/11/08 23:13:29 mrbean_ Exp $";
+const char FORCEGLINECommand_cc_rcsId[] = "$Id: FORCEGLINECommand.cc,v 1.13 2001/11/20 19:49:45 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -39,6 +39,13 @@ bool FORCEGLINECommand::Exec( iClient* theClient, const string& Message )
 {
 
 StringTokenizer st( Message ) ;
+
+if(!dbConnected)
+        {
+        bot->Notice(theClient,"Sorry, but the db connection is down now, please try again alittle later");
+        return false;
+        }
+
 if( st.size() < 3 )
 	{
 	Usage( theClient ) ;

@@ -12,7 +12,7 @@
 #include	"StringTokenizer.h"
 #include	"Network.h"
 
-const char NEWPASSCommand_cc_rcsId[] = "$Id: NEWPASSCommand.cc,v 1.11 2001/07/29 13:33:20 mrbean_ Exp $";
+const char NEWPASSCommand_cc_rcsId[] = "$Id: NEWPASSCommand.cc,v 1.12 2001/11/20 19:49:45 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -26,6 +26,12 @@ bool NEWPASSCommand::Exec( iClient* theClient, const string& Message)
 {
 StringTokenizer st( Message ) ;
 	
+if(!dbConnected)
+        {
+        bot->Notice(theClient,"Sorry, but the db connection is down now, please try again alittle later");
+        return false;
+        }
+
 if( st.size() < 2 )
 	{
 	Usage(theClient);

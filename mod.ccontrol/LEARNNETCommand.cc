@@ -17,7 +17,7 @@
 #include	"ccUser.h"
 #include	"AuthInfo.h"
 
-const char LEARNNETCommand_cc_rcsId[] = "$Id: LEARNNETCommand.cc,v 1.3 2001/11/11 16:05:51 mrbean_ Exp $";
+const char LEARNNETCommand_cc_rcsId[] = "$Id: LEARNNETCommand.cc,v 1.4 2001/11/20 19:49:45 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -29,6 +29,13 @@ namespace uworld
 
 bool LEARNNETCommand::Exec( iClient* theClient, const string& Message )
 {
+
+if(!dbConnected)
+        {
+        bot->Notice(theClient,"Sorry, but the db connection is down now, please try again alittle later");
+        return false;
+        }
+
 ccServer* NewServer = new ccServer(bot->SQLDb);
 assert(NewServer != NULL);
 unsigned int AddedServers = 0;

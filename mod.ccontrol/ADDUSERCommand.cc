@@ -21,7 +21,7 @@
 #include	"misc.h"
 #include	"commLevels.h"
 
-const char ADDUSERCommand_cc_rcsId[] = "$Id: ADDUSERCommand.cc,v 1.5 2001/11/08 23:13:29 mrbean_ Exp $";
+const char ADDUSERCommand_cc_rcsId[] = "$Id: ADDUSERCommand.cc,v 1.6 2001/11/20 19:49:45 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -40,6 +40,12 @@ if( st.size() < 4 )
 	Usage(theClient);
 	return true;
 	}
+
+if(!dbConnected)
+        {
+        bot->Notice(theClient,"Sorry, but the db connection is down now, please try again alittle later");
+        return false;
+        }
 
 if(st[1].size() > 64)
 	{

@@ -12,7 +12,7 @@
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 
-const char REMGCHANCommand_cc_rcsId[] = "$Id: REMGCHANCommand.cc,v 1.2 2001/11/08 23:13:29 mrbean_ Exp $";
+const char REMGCHANCommand_cc_rcsId[] = "$Id: REMGCHANCommand.cc,v 1.3 2001/11/20 19:49:45 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -26,6 +26,13 @@ namespace uworld
 bool REMGCHANCommand::Exec( iClient* theClient, const string& Message )
 {
 StringTokenizer st( Message ) ;
+
+if(!dbConnected)
+        {
+        bot->Notice(theClient,"Sorry, but the db connection is down now, please try again alittle later");
+        return false;
+        }
+
 if( st.size() < 2 )
 	{
 	Usage( theClient ) ;

@@ -3,7 +3,7 @@
  */
 
 #ifndef __CCONTROL_H
-#define __CCONTROL_H "$Id: ccontrol.h,v 1.47 2001/11/11 16:05:51 mrbean_ Exp $"
+#define __CCONTROL_H "$Id: ccontrol.h,v 1.48 2001/11/20 19:49:46 mrbean_ Exp $"
 
 
 #include	<string>
@@ -533,7 +533,6 @@ public:
 	
 	void listServers( iClient * );
 	
-	
 	void loadCommands();
 	
 	bool updateCommand ( Command* );
@@ -558,7 +557,12 @@ public:
 	
 	const string removeSqlChars(const string&);
 	
-//	void *initGate(void *);
+	void checkDbConnection();
+	
+	void updateSqldb(PgDatabase*);
+	
+	void showStatus(iClient*);
+	
 	
 	/**
 	 * This is a constant iterator type used to perform a read-only
@@ -705,6 +709,8 @@ public:
 		
 	xServer::timerID gatesStatusCheck;
 	
+	xServer::timerID dbConnectionCheck;
+	
 protected:
 
 	/**
@@ -772,20 +778,38 @@ protected:
 	 * Refresh gline interval
 	 */
 
-	 int 			GLInterval;
+	int 			GLInterval;
 
-	 int			userMaxConnection;
+	int			userMaxConnection;
 	 
-	 int			maxGlineLen;
+	int			maxGlineLen;
 	
-	 int			maxThreads;
+	int			maxThreads;
 
-	 bool			checkGates;	 
+	bool			checkGates;	 
 	
+
+	
+	time_t			dbConnectionTimer;
+	
+	string			sqlHost;
+	
+	string			sqlPort;
+	
+	string			sqlUser;
+	
+	string			sqlPass;
+
+	string			sqlDb;		 	
+	
+	unsigned int		connectCount;
+	
+	unsigned int		connectRetry;
 } ; 
 
 void* initGate( void * );
- 
+
+extern unsigned int dbConnected;
 } //namespace uworld
 
 } // namespace gnuworld

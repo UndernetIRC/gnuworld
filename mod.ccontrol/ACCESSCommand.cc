@@ -14,7 +14,7 @@
 #include	"ccontrol.h"
 #include	"CControlCommands.h"
 
-const char ACCESSCommand_cc_rcsId[] = "$Id: ACCESSCommand.cc,v 1.12 2001/11/08 23:13:29 mrbean_ Exp $";
+const char ACCESSCommand_cc_rcsId[] = "$Id: ACCESSCommand.cc,v 1.13 2001/11/20 19:49:45 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -35,6 +35,11 @@ bool ACCESSCommand::Exec( iClient* theClient, const string& Message)
 
 StringTokenizer st( Message ) ;
 
+if(!dbConnected)
+	{
+	bot->Notice(theClient,"Sorry, but the db connection is down now, please try again alittle later");
+	return false;
+	}
 
 
 string Uname;

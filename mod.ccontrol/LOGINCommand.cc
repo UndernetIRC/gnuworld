@@ -13,7 +13,7 @@
 #include	"md5hash.h" 
 #include        "ccUser.h"
 
-const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.16 2001/11/08 23:13:29 mrbean_ Exp $";
+const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.17 2001/11/20 19:49:45 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -26,6 +26,13 @@ namespace uworld
 bool LOGINCommand::Exec( iClient* theClient, const string& Message)
 {
 StringTokenizer st( Message ) ;
+
+if(!dbConnected)
+        {
+        bot->Notice(theClient,"Sorry, but the db connection is down now, please try again alittle later");
+        return false;
+        }
+
 if( st.size() < 3 )
 	{
 	Usage(theClient);

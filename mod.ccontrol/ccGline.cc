@@ -3,7 +3,7 @@
  * 
  * Gline class
  * 
- * $Id: ccGline.cc,v 1.8 2001/08/13 15:10:53 mrbean_ Exp $
+ * $Id: ccGline.cc,v 1.9 2001/11/20 19:49:45 mrbean_ Exp $
  */
  
 #include	<strstream>
@@ -17,9 +17,10 @@
 #include	"ELog.h"
 #include	"misc.h"
 #include	"ccGline.h" 
+#include	"ccontrol.h"
 
 const char ccGline_h_rcsId[] = __CCGLINE_H ;
-const char ccGline_cc_rcsId[] = "$Id: ccGline.cc,v 1.8 2001/08/13 15:10:53 mrbean_ Exp $" ;
+const char ccGline_cc_rcsId[] = "$Id: ccGline.cc,v 1.9 2001/11/20 19:49:45 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -40,16 +41,23 @@ ccGline::ccGline(PgDatabase* _SQLDb)
    Reason(),
    SQLDb( _SQLDb )
 {
+//++numAllocated;
 }
 
 ccGline::~ccGline()
-{}
+{
+//--numAllocated;
+}
 
 bool ccGline::Insert()
 {
 //First we gotta make sure, there is no old gline in the database
 static const char *Del = "DELETE FROM glines WHERE host = '";
 
+if(!dbConnected)
+	{
+	return false;
+	}
 strstream delQuery;
 delQuery	<< Del
 		<< Host << "'"
@@ -104,6 +112,11 @@ bool ccGline::Update()
 {
 static const char *Main = "UPDATE Glines SET Id = '";
 
+if(!dbConnected)
+	{
+	return false;
+	}
+
 strstream theQuery;
 theQuery	<< Main
 		<< Id
@@ -144,6 +157,11 @@ bool ccGline::loadData(int GlineId)
 {
 static const char *Main = "SELECT * FROM glines WHERE Id = ";
 
+if(!dbConnected)
+	{
+	return false;
+	}
+
 strstream theQuery;
 theQuery	<< Main
 		<< GlineId
@@ -181,6 +199,11 @@ bool ccGline::loadData( const string & HostName)
 {
 static const char *Main = "SELECT * FROM glines WHERE Host = '";
 
+if(!dbConnected)
+	{
+	return false;
+	}
+
 strstream theQuery;
 theQuery	<< Main
 		<< HostName.c_str()
@@ -217,6 +240,11 @@ return true;
 bool ccGline::Delete()
 {
 static const char *Main = "DELETE FROM glines WHERE Id = ";
+
+if(!dbConnected)
+	{
+	return false;
+	}
 
 strstream theQuery;
 theQuery	<< Main

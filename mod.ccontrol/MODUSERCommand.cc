@@ -14,7 +14,7 @@
 #include	"ccUser.h"
 #include	"misc.h"
 
-const char MODUSERCommand_cc_rcsId[] = "$Id: MODUSERCommand.cc,v 1.6 2001/11/11 16:05:51 mrbean_ Exp $";
+const char MODUSERCommand_cc_rcsId[] = "$Id: MODUSERCommand.cc,v 1.7 2001/11/20 19:49:45 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -28,6 +28,13 @@ namespace uworld
 bool MODUSERCommand::Exec( iClient* theClient, const string& Message)
 {	 
 StringTokenizer st( Message ) ;
+
+if(!dbConnected)
+        {
+        bot->Notice(theClient,"Sorry, but the db connection is down now, please try again alittle later");
+        return false;
+        }
+
 if(st.size() < 2)
 	{
 	Usage(theClient);
