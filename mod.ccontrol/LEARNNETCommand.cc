@@ -15,9 +15,8 @@
 #include        "stdlib.h"
 #include        "server.h"
 #include	"ccUser.h"
-#include	"AuthInfo.h"
 
-const char LEARNNETCommand_cc_rcsId[] = "$Id: LEARNNETCommand.cc,v 1.6 2001/12/13 08:50:00 mrbean_ Exp $";
+const char LEARNNETCommand_cc_rcsId[] = "$Id: LEARNNETCommand.cc,v 1.7 2001/12/14 08:22:28 mrbean_ Exp $";
 
 namespace gnuworld
 {

@@ -13,7 +13,7 @@
 #include	"Network.h"
 #include	"Constants.h"
 
-const char NEWPASSCommand_cc_rcsId[] = "$Id: NEWPASSCommand.cc,v 1.14 2001/12/13 09:10:35 mrbean_ Exp $";
+const char NEWPASSCommand_cc_rcsId[] = "$Id: NEWPASSCommand.cc,v 1.15 2001/12/14 08:22:28 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -47,7 +47,7 @@ if(!theUser)
         bot->Notice(theClient,"You have to be logged in to use this command");
 	return false;
 	}
-unsigned int passRet = bot->checkPasswprd(st[1],theUser);
+unsigned int passRet = bot->checkPassword(st[1],theUser);
 switch(passRet)
 	{
 	case password::TOO_SHORT:
