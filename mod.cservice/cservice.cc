@@ -666,7 +666,7 @@ if(Command == "PING")
 else if(Command == "GENDER")
 	{
 	xClient::DoCTCP(theClient, CTCP,
-		"I am Bender; please insert girder.");
+		"Tried to be a man again - there was a slip - now I am an IT");
 	}
 else if(Command == "VERSION")
 	{
