@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: client.h,v 1.52 2004/01/07 18:33:42 dan_karrels Exp $
+ * $Id: client.h,v 1.53 2004/01/08 18:32:36 dan_karrels Exp $
  */
 
 #ifndef __CLIENT_H
-#define __CLIENT_H "$Id: client.h,v 1.52 2004/01/07 18:33:42 dan_karrels Exp $"
+#define __CLIENT_H "$Id: client.h,v 1.53 2004/01/08 18:32:36 dan_karrels Exp $"
 
 #include	<sstream>
 #include	<string>
@@ -168,7 +168,7 @@ public:
 	 * Timers will be executed after this method is invoked, once,
 	 * depending upon target time of course :)
 	 */
-	virtual void	OnShutdown() ;
+	virtual void	OnShutdown( const std::string& reason ) ;
 
 	/**
 	 * Invoked after the client has been loaded, perform

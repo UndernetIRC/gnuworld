@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server.cc,v 1.193 2004/01/07 18:33:43 dan_karrels Exp $
+ * $Id: server.cc,v 1.194 2004/01/08 18:32:37 dan_karrels Exp $
  */
 
 #include	<sys/time.h>
@@ -71,7 +71,7 @@
 #include	"ConnectionHandler.h"
 #include	"Connection.h"
 
-RCSTAG( "$Id: server.cc,v 1.193 2004/01/07 18:33:43 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: server.cc,v 1.194 2004/01/08 18:32:37 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -530,22 +530,18 @@ RegisterTimer( ::time( 0 ) + pingUpdateInterval,
 void xServer::Shutdown( const string& reason )
 {
 lastLoop = true ;
-//keepRunning = false ;
 autoConnect = false ;
+
+// Set the shutdown reason before notifying clients, so each
+// client can access the reason
+setShutDownReason( reason ) ;
 
 // Notify all xClients that a shutdown is being processed
 for( xNetwork::localClientIterator itr = Network->localClient_begin() ;
 	itr != Network->localClient_end() ; ++itr )
 	{
-	itr->second->OnShutdown() ;
+	itr->second->OnShutdown( reason ) ;
 	}
-
-setShutDownReason( reason ) ;
-
-//Write( "%s SQ %s :%s",
-//	getCharYY().c_str(),
-//	getCharYY().c_str(),
-//	reason.c_str() ) ;
 
 // Can't call removeClients() here because it is likely one of the
 // clients that has invoked this call, that would be bad.
