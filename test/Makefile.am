@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-## $Id: Makefile.am,v 1.9 2003/06/11 11:29:03 dan_karrels Exp $
+## $Id: Makefile.am,v 1.10 2003/06/28 01:47:11 dan_karrels Exp $
 
 noinst_PROGRAMS = test_stringtokenizer \
 	test_econfig \
@@ -32,4 +32,6 @@ test_bot_DEPENDENCIES = $(glibdir)/libgnuworld.la
 
 test_kick_transaction_SOURCES = test_kick_transaction.cc
 test_kick_transaction_DEPENDENCIES = $(glibdir)/libgnuworld.la
+
+EXTRA_DIST = testbot.h
 

@@ -198,6 +198,8 @@ test_bot_DEPENDENCIES = $(glibdir)/libgnuworld.la
 
 test_kick_transaction_SOURCES = test_kick_transaction.cc
 test_kick_transaction_DEPENDENCIES = $(glibdir)/libgnuworld.la
+
+EXTRA_DIST = testbot.h
 subdir = test
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
