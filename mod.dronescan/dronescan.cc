@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: dronescan.cc,v 1.33 2003/08/13 22:32:16 jeekay Exp $
+ * $Id: dronescan.cc,v 1.34 2003/08/28 19:58:22 jeekay Exp $
  */
 
 #include	<string>
@@ -39,7 +39,7 @@
 #include "sqlUser.h"
 #include "Timer.h"
 
-RCSTAG("$Id: dronescan.cc,v 1.33 2003/08/13 22:32:16 jeekay Exp $");
+RCSTAG("$Id: dronescan.cc,v 1.34 2003/08/28 19:58:22 jeekay Exp $");
 
 namespace gnuworld {
 
@@ -372,6 +372,12 @@ void dronescan::OnPrivateMessage( iClient* theClient,
 	/* We have now seen this user! */
 	theUser->setLastSeen(::time(0));
 	theUser->commit();
+
+	/* If we are currently in BURST, we don't accept commands */
+	if(BURST == currentState) {
+		Reply(theClient, "Sorry, I do not accept commands during a burst.");
+		return ;
+	}
 
 	StringTokenizer st(Message);
 
