@@ -1,5 +1,5 @@
 
--- "$Id: ccontrol.update.sql,v 1.1 2001/07/23 10:28:50 mrbean_ Exp $"
+-- "$Id: ccontrol.update.sql,v 1.2 2001/07/23 12:09:08 mrbean_ Exp $"
 
 -- ccontrol database changes update
 -- this file will add the new features to an old database
@@ -7,16 +7,16 @@
 -- because of misfunctionality of postgresql
 
 -- Add missing columns 
-ALTER TABLE opers ADD isSuspended BOOLEAN NOT NULL DEFAULT 0;
+ALTER TABLE opers ADD isSuspended BOOLEAN NOT NULL DEFAULT 'n';
 ALTER TABLE opers ADD suspendReason VARCHAR(256);
 ALTER TABLE opers ADD email VARCHAR(128);
-ALTER TABLE opers ADD isUHS BOOLEAN NOT NULL DEFAULT 0;
-ALTER TABLE opers ADD isOPER BOOLEAN NOT NULL DEFAULT 0;
-ALTER TABLE opers ADD isADMIN BOOLEAN NOT NULL DEFAULT 0;
-ALTER TABLE opers ADD isSMT BOOLEAN NOT NULL DEFAULT 0;
-ALTER TABLE opers ADD isCODER BOOLEAN NOT NULL DEFAULT 0;
-ALTER TABLE opers ADD getLOGS BOOLEAN NOT NULL DEFAULT 0;
-ALTER TABLE opers ADD needOP BOOLEAN NOT NULL DEFAULT 0;
+ALTER TABLE opers ADD isUHS BOOLEAN NOT NULL DEFAULT 'n';
+ALTER TABLE opers ADD isOPER BOOLEAN NOT NULL DEFAULT 'n';
+ALTER TABLE opers ADD isADMIN BOOLEAN NOT NULL DEFAULT 'n';
+ALTER TABLE opers ADD isSMT BOOLEAN NOT NULL DEFAULT 'n';
+ALTER TABLE opers ADD isCODER BOOLEAN NOT NULL DEFAULT 'n';
+ALTER TABLE opers ADD getLOGS BOOLEAN NOT NULL DEFAULT 'n';
+ALTER TABLE opers ADD needOP BOOLEAN NOT NULL DEFAULT 'n';
 
 -- Update all the other opers to the new settings
 
