@@ -13,8 +13,9 @@
 #include	"StringTokenizer.h"
 #include	"ccUser.h"
 #include	"misc.h"
+#include	"Constants.h"
 
-const char MODUSERCommand_cc_rcsId[] = "$Id: MODUSERCommand.cc,v 1.8 2001/12/06 20:02:40 mrbean_ Exp $";
+const char MODUSERCommand_cc_rcsId[] = "$Id: MODUSERCommand.cc,v 1.9 2001/12/09 20:43:08 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -203,29 +204,37 @@ while(pos < st.size())
 			delete tmpUser;
 			return false;
 			}
-		if(st[pos + 1].size() > 128)
+		if(st[pos + 1].size() > server::MaxName)
 			{
 			bot->Notice(theClient,"Server name can't be more than 128 chars");
 			delete tmpUser;
 			return false;
 			}
-		if(!strcasecmp(tmpUser->getServer(),st[pos+1]))
+		string SName = bot->expandDbServer(st[pos+1]);
+		if(!strcasecmp(SName,""))
 			{
-			bot->Notice(theClient,"%s already is associated with %s",st[1].c_str(),st[pos+1].c_str());
+			bot->Notice(theClient,"I cant see a server in the db that matches %s"
+				    ,st[pos+1].c_str());
+			delete tmpUser;
+			return false;
+			}
+		if(!strcasecmp(tmpUser->getServer(),SName))
+			{
+			bot->Notice(theClient,"%s already is associated with %s",SName.c_str(),SName.c_str());
 			pos+=2;
 			}
 		else
 			{
-			tmpUser->setServer(bot->removeSqlChars(st[pos+1]));
+			tmpUser->setServer(bot->removeSqlChars(SName));
 			tmpUser->setLast_Updated_By(theClient->getNickUserHost());
 			if(tmpUser->Update())
 				{
-				bot->Notice(theClient,"%s has been associated with %s",st[1].c_str(),st[pos+1].c_str());
+				bot->Notice(theClient,"%s has been associated with %s",st[1].c_str(),SName.c_str());
 				bot->UpdateAuth(tmpUser);
 				}
 			else
 				{
-				bot->Notice(theClient,"Error while associating %s with %s",st[1].c_str(),st[pos+1].c_str());
+				bot->Notice(theClient,"Error while associating %s with %s",st[1].c_str(),SName.c_str());
 				delete tmpUser;
 				return false;
 				}

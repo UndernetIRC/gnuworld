@@ -12,8 +12,9 @@
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 #include	"Network.h"
+#include	"Constants.h"
 
-const char ADDSERVERCommand_cc_rcsId[] = "$Id: ADDSERVERCommand.cc,v 1.5 2001/11/20 19:49:45 mrbean_ Exp $";
+const char ADDSERVERCommand_cc_rcsId[] = "$Id: ADDSERVERCommand.cc,v 1.6 2001/12/09 20:43:08 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -39,24 +40,43 @@ if(!dbConnected)
         return false;
         }
 
-if(st[1].size() > 128)
+if(st[1].size() > server::MaxName)
 	{
-	bot->Notice(theClient,"Server name can't be more than 128 chars");
+	bot->Notice(theClient,"Server name can't be more than %d chars",server::MaxName);
 	return false;
 	}
+string SName;
+if(string::npos != st[1].find_first_of('*'))
+	{
+	iServer* tServer =  Network->findExpandedServerName(st[1]);
 
+	if(!tServer)
+		{
+		bot->Notice(theClient,"I cant find a linked server that matches %s"
+			    ,st[1].c_str());
+		return false;
+		}
+	else
+		{
+		SName = tServer->getName();
+		}
+	}
+else
+	{
+	SName = st[1];
+	}
 ccServer* NewServer = new ccServer(bot->SQLDb);
-if(NewServer->loadData(bot->removeSqlChars(st [ 1 ])))
+if(NewServer->loadData(bot->removeSqlChars(SName)))
 	{
 	bot->Notice(theClient, "Server %s is already in my database!",
-		st [ 1 ].c_str());
+		SName.c_str());
 	delete NewServer;
 	return false;
 	}
-NewServer->setName(bot->removeSqlChars(st[1]));
+NewServer->setName(bot->removeSqlChars(SName));
 //We need to check if the server is currently connected , 
 //if so update all the data
-iServer* CurServer = Network->findServerName(st[1]);
+iServer* CurServer = Network->findServerName(SName);
 if(CurServer)
 	{
 	NewServer->setLastNumeric(CurServer->getCharYY());
@@ -64,9 +84,9 @@ if(CurServer)
 	NewServer->setUplink((Network->findServer(CurServer->getIntYY()))->getName());
 	}
 if(NewServer->Insert())
-	bot->Notice(theClient,"Server %s added successfully\n",st[1].c_str());
+	bot->Notice(theClient,"Server %s added successfully\n",SName.c_str());
 else
-	bot->Notice(theClient,"Database error while adding server %s\n",st[1].c_str());
+	bot->Notice(theClient,"Database error while adding server %s\n",SName.c_str());
 delete NewServer;
 return true;
 }

@@ -10,14 +10,14 @@ namespace uworld
 namespace channel
 {
 
-const unsigned int MaxName = 200;
+const unsigned int MaxName = 300;
 
 }
 
 namespace server
 {
 
-	const unsigned int MaxName = 53;
+	const unsigned int MaxName = 63;
         static const char Query[] = "SELECT name,lastuplink,lastconnected,splitedon,lastnumeric,splitreason FROM servers";
 
 }

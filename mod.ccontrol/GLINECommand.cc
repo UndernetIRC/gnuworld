@@ -24,7 +24,7 @@
 #include	"ccUser.h"
 #include	"Constants.h"
 
-const char GLINECommand_cc_rcsId[] = "$Id: GLINECommand.cc,v 1.28 2001/12/08 17:17:29 mrbean_ Exp $";
+const char GLINECommand_cc_rcsId[] = "$Id: GLINECommand.cc,v 1.29 2001/12/09 20:43:08 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -68,19 +68,32 @@ if(st[pos].substr(0,1) == "#")
         isChan = true;
 else
 	isChan = false; 
+string userName;
+string hostName;
 if(!isChan)
 	{
 	string::size_type atPos = st[ pos ].find_first_of( '@' ) ;
 	if( string::npos == atPos )
 		{
-		// User has only specified hostname, not a user name
-		bot->Notice( theClient, "GLINE: Please specify gline mask in the "
-			"format: user@host" ) ;
-		return true ;
+		// user has probably specified a nickname (asked by isomer:P)
+		iClient* tClient = Network->findNick(st[pos]);
+		if(!tClient)
+			{
+			bot->Notice( theClient, "i can't find %s online, "
+				    "please specify a host instead",st[pos].c_str() ) ;
+			return true ;
+			}
+		else
+			{
+			userName = tClient->getUserName();
+			hostName = tClient->getInsecureHost();
+			}
 		}
-
-	string userName = st[ pos ].substr( 0, atPos ) ;
-	string hostName = st[ pos ].substr( atPos + 1 ) ;
+	else
+		{
+		userName = st[ pos ].substr( 0, atPos ) ;
+		hostName = st[ pos ].substr( atPos + 1 ) ;
+		}
 	}
 string Length;
 
@@ -181,17 +194,17 @@ if(!isChan)
 		}
 
 	server->setGline( nickUserHost,
-		st[ pos ],
+		"*" + userName + "@" +hostName,
 		Reason + "[" + Us + "]",
 		gLength ) ;
 	
-	ccGline *TmpGline = bot->findGline(st[pos]);
+	ccGline *TmpGline = bot->findGline(userName + "@" + hostName);
 	bool Up = false;
 	
 	if(TmpGline)
 		Up =  true;	
 	else TmpGline = new ccGline(bot->SQLDb);
-	TmpGline->setHost(bot->removeSqlChars(st [ pos ]));
+	TmpGline->setHost(bot->removeSqlChars(userName + "@" + hostName));
 	TmpGline->setExpires(::time(0) + gLength);
 	TmpGline->setAddedBy(nickUserHost);
 	TmpGline->setReason(bot->removeSqlChars(st.assemble( pos + ResStart )));

@@ -37,7 +37,7 @@
 #include	"ip.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.100 2001/12/09 14:36:35 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.101 2001/12/09 20:43:08 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -733,6 +733,11 @@ switch( theEvent )
 			if(!glSet) 
 				{	
 				ccGline * tempGline = findMatchingGline(NewUser->getUserName() + '@' + NewUser->getInsecureHost());
+				if(!tempGline)
+					{
+					string tIP = xIP( NewUser->getIP()).GetNumericIP();
+					tempGline = findMatchingGline(NewUser->getUserName() + '@' + tIP);
+					}
 				if((tempGline) && (tempGline->getExpires() > ::time(0)))
 					{
 					//addGline(tempGline);
