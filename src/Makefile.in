@@ -90,7 +90,6 @@ bindir = @bindir@
 
 bin_PROGRAMS = gnuworld
 
-gnuworld_LDADD = $(bindir)/libgnuworld.la
 gnuworld_LDFLAGS = -dlopen $(bindir)/libgnuworld.la
 gnuworld_SOURCES = Channel.cc 	ChannelUser.cc 	Network.cc 	client.cc 	iClient.cc 	iServer.cc 	ip.cc 	main.cc 	server.cc
 
@@ -106,7 +105,8 @@ CPPFLAGS = @CPPFLAGS@
 LIBS = @LIBS@
 gnuworld_OBJECTS =  Channel.o ChannelUser.o Network.o client.o iClient.o \
 iServer.o ip.o main.o server.o
-gnuworld_DEPENDENCIES =  $(bindir)/libgnuworld.la
+gnuworld_LDADD = $(LDADD)
+gnuworld_DEPENDENCIES = 
 CXXCOMPILE = $(CXX) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
 LTCXXCOMPILE = $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
 CXXLD = $(CXX)
