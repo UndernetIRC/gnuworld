@@ -18,7 +18,7 @@
  *
  * Caveats: None.
  *
- * $Id: SETCommand.cc,v 1.53 2003/05/07 20:13:02 gte Exp $
+ * $Id: SETCommand.cc,v 1.54 2003/05/07 22:56:32 gte Exp $
  */
 
 #include	<string>
@@ -30,7 +30,7 @@
 #include	"responses.h"
 #include	"cservice_config.h"
 
-const char SETCommand_cc_rcsId[] = "$Id: SETCommand.cc,v 1.53 2003/05/07 20:13:02 gte Exp $" ;
+const char SETCommand_cc_rcsId[] = "$Id: SETCommand.cc,v 1.54 2003/05/07 22:56:32 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -126,13 +126,16 @@ if( st[1][0] != '#' ) // Didn't find a hash?
 #endif
 
 
-	if (option == "NOADMIN")
+	if (option == "DISABLEAUTH")
 	{
 		if (value == "ON")
 		{
 			theUser->setFlag(sqlUser::F_NOADMIN);
 			theUser->commit(theClient);
 			bot->Notice(theClient,"You have lost the force :(");
+			bot->logAdminMessage("%s (%s) set DISABLEAUTH on!",
+				theClient->getNickName().c_str(), theUser->getUserName().c_str());
+
 			return true;
 		}
 
@@ -141,6 +144,8 @@ if( st[1][0] != '#' ) // Didn't find a hash?
 			theUser->removeFlag(sqlUser::F_NOADMIN);
 			theUser->commit(theClient);
 			bot->Notice(theClient,"Welcome back, brave Jedi.");
+			bot->logAdminMessage("%s (%s) set DISABLEAUTH off!",
+				theClient->getNickName().c_str(), theUser->getUserName().c_str());
 			return true;
 		}
 
