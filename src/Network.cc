@@ -5,6 +5,7 @@
 #include	<new>
 #include	<iostream>
 #include	<string>
+#include	<list>
 #include	<hash_map>
 #include	<algorithm>
 
@@ -20,7 +21,7 @@
 #include	"Numeric.h"
 
 const char xNetwork_h_rcsId[] = __NETWORK_H ;
-const char xNetwork_cc_rcsId[] = "$Id: Network.cc,v 1.23 2001/05/07 19:02:15 mrbean_ Exp $" ;
+const char xNetwork_cc_rcsId[] = "$Id: Network.cc,v 1.24 2001/05/13 00:26:01 dan_karrels Exp $" ;
 const char ELog_h_rcsId[] = __ELOG_H ;
 const char iClient_h_rcsId[] = __ICLIENT_H ;
 const char Channel_h_rcsId[] = __CHANNEL_H ;
@@ -33,6 +34,7 @@ namespace gnuworld
 
 using std::string ;
 using std::endl ;
+using std::list ;
 using std::hash_map ;
 using std::hash ;
 using std::unary_function ;
@@ -734,5 +736,24 @@ for( clientVectorType::size_type clientID = 0 ;
 return numClients ;
 }
 
+list< const iClient* > xNetwork::matchHost( const string& wildHost ) const
+{
+return list< const iClient* >() ;
+}
+
+list< const iClient* > xNetwork::findHost( const string& hostName ) const
+{
+return list< const iClient* >() ;
+}
+
+size_t xNetwork::countMatchingHost( const string& wildHost ) const
+{
+return 0 ;
+}
+
+size_t xNetwork::countHost( const string& hostName ) const
+{
+return 0 ;
+}
 
 } // namespace gnuworld

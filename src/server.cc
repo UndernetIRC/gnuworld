@@ -48,7 +48,7 @@
 #include	"ServerTimerHandlers.h"
 
 const char server_h_rcsId[] = __SERVER_H ;
-const char server_cc_rcsId[] = "$Id: server.cc,v 1.94 2001/05/07 19:02:15 mrbean_ Exp $" ;
+const char server_cc_rcsId[] = "$Id: server.cc,v 1.95 2001/05/13 00:26:01 dan_karrels Exp $" ;
 const char config_h_rcsId[] = __CONFIG_H ;
 const char misc_h_rcsId[] = __MISC_H ;
 const char events_h_rcsId[] = __EVENTS_H ;
@@ -3078,7 +3078,7 @@ for( ; ptr != end ; )
 	} // for()
 } // updateGlines()
 
-void xServer::RemoveJupe(iServer * theServer)
+bool xServer::RemoveJupe( const iServer* theServer )
 {
 for( jupedServerListType::iterator ptr = jupedServers.begin() ;
 	ptr != jupedServers.end() ; ++ptr )
@@ -3086,11 +3086,15 @@ for( jupedServerListType::iterator ptr = jupedServers.begin() ;
 	if( *ptr== theServer->getIntYY() )
 		{
 		// Found the server in the list of jupes
-		//elog	<< "xServer::SquitServer> Found " << serverName
+		//elog	<< "xServer::RemoveJupe> Found "
+		//	<< serverName
 		//	<< " in list of juped servers\n" ;
+
 		jupedServers.erase( ptr ) ;
-		break ;
+
+		return true ;
 		}
 	}
+return false ;
 }
 } // namespace gnuworld

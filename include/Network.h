@@ -3,11 +3,12 @@
  */
 
 #ifndef __NETWORK_H
-#define __NETWORK_H "$Id: Network.h,v 1.14 2001/05/07 19:02:14 mrbean_ Exp $"
+#define __NETWORK_H "$Id: Network.h,v 1.15 2001/05/13 00:26:01 dan_karrels Exp $"
 
 #include	<vector>
 #include	<string>
 #include	<map>
+#include	<list>
 #include	<hash_map>
 #include	<algorithm>
 
@@ -25,6 +26,7 @@ namespace gnuworld
 using std::string ;
 using std::vector ;
 using std::map ;
+using std::list ;
 using std::hash ;
 using std::hash_map ;
 using std::unary_function ;
@@ -421,6 +423,16 @@ public:
 	 */
 	virtual void	setServer( xServer* _theServer )
 		{ theServer = _theServer ; }
+
+	virtual list< const iClient* > matchHost( const string& wildHost ) 
+			const ;
+
+	virtual list< const iClient* > findHost( const string& hostName ) 
+			const ;
+
+	virtual size_t	countMatchingHost( const string& wildHost ) const ;
+
+	virtual size_t	countHost( const string& hostName ) const ;
 
 protected:
 

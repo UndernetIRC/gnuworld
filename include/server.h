@@ -17,7 +17,7 @@
  */
 
 #ifndef __SERVER_H
-#define __SERVER_H "$Id: server.h,v 1.38 2001/05/07 19:02:15 mrbean_ Exp $"
+#define __SERVER_H "$Id: server.h,v 1.39 2001/05/13 00:26:01 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
@@ -104,9 +104,18 @@ protected:
 	 * servers.
 	 */
 	typedef vector< unsigned int > jupedServerListType ;
+
+	/**
+	 * The type of the structure to hold Gline's internally.
+	 */
+	typedef list< Gline* >	glineListType ;
  
 public:
 
+	/**
+	 * The xServer constructor.  It takes the arguments
+	 * from the command line.
+	 */
 	xServer( int, char** ) ;
 
 	/**
@@ -115,6 +124,9 @@ public:
 	 */
 	virtual ~xServer() ;
 
+	/**
+	 * The actual run method.
+	 */
 	void		run() ;
 
 	/**
@@ -134,6 +146,27 @@ public:
 	 * methods for channel ban changes.
 	 */
 	typedef vector< pair< bool, string > > banVectorType ;
+
+	typedef jupedServerListType::iterator jupedServerIterator ;
+
+	typedef jupedServerListType::const_iterator
+		const_jupedServerIterator ;
+
+	inline const_jupedServerIterator jupedServers_begin() const
+		{ return jupedServers.begin() ; }
+
+	inline const_jupedServerIterator jupedServers_end() const
+		{ return jupedServers.end() ; }
+
+	typedef glineListType::iterator glineIterator ;
+
+	typedef glineListType::const_iterator const_glineIterator ;
+
+	inline const_glineIterator gline_begin() const
+		{ return glineList.begin() ; }
+
+	inline const_glineIterator gline_end() const
+		{ return glineList.end() ; }
 
 	/**
 	 * Connect to a network uplink of the given address
@@ -709,11 +742,6 @@ public:
 	 */
 	virtual void updateGlines() ;
 
-	/**
-	 * Deletes a juped server from the juped server list
-	 */
-	void RemoveJupe(iServer *);
-
 protected:
 
 	/**
@@ -731,6 +759,12 @@ protected:
 	 * Disable assignment, this method is declared but NOT defined.
 	 */
 	xServer operator=( const xServer& ) ;
+
+	/**
+	 * Deletes a juped server from the juped server list.
+	 * This does not alter the server itself.
+	 */
+	virtual bool	RemoveJupe( const iServer* );
 
 	/**
 	 * Burst out information about all xClients on this server.
@@ -1034,11 +1068,6 @@ protected:
 	 * Any volunteers? :)
 	 */
 	channelEventMapType	channelEventMap ;
-
-	/**
-	 * The type of the structure to hold Gline's internally.
-	 */
-	typedef list< Gline* >	glineListType ;
 
 	/**
 	 * This structure holds the current network glines.

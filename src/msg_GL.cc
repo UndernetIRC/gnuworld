@@ -12,12 +12,12 @@
 #include	"ELog.h"
 #include	"xparameters.h"
 
-const char msg_GL_cc_rcsId[] = "$Id: msg_GL.cc,v 1.1 2001/02/02 18:10:30 dan_karrels Exp $" ;
-
-using std::endl ;
+const char msg_GL_cc_rcsId[] = "$Id: msg_GL.cc,v 1.2 2001/05/13 00:26:01 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
+
+using std::endl ;
 
 /**
  * GLine message handler.
