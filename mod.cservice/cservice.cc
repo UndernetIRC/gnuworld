@@ -446,7 +446,7 @@ int cservice::OnCTCP( iClient* theClient, const string& CTCP,
 
 	if(Command == "VERSION")
 	{
-		xClient::DoCTCP(theClient, CTCP.c_str(), "Undernet P10 Channel Services Version 2 [" __DATE__ " " __TIME__ "] ($Id: cservice.cc,v 1.47 2001/01/17 19:50:54 gte Exp $)");
+		xClient::DoCTCP(theClient, CTCP.c_str(), "Undernet P10 Channel Services Version 2 [" __DATE__ " " __TIME__ "] ($Id: cservice.cc,v 1.48 2001/01/17 21:27:59 gte Exp $)");
 		return true;
 	}
  
@@ -1183,7 +1183,10 @@ int cservice::OnChannelEvent( const channelEventType& whichEvent,
 					<< " for registered channel event: " << theChan->getName() << endl;
 				return 0;
 			}
-	
+
+			/* Check noop isn't set */ 
+			if (reggedChan->getFlag(sqlChannel::F_NOOP)) break;
+
 			/* Deal with auto-op first - check this users access level. */
 			sqlUser* theUser = isAuthed(theClient, false);
 			if (!theUser) break; /* If not authed.. */
