@@ -43,7 +43,7 @@
 #include	"moduleLoader.h"
 
 const char xServer_h_rcsId[] = __XSERVER_H ;
-const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.41 2001/01/07 22:59:32 dan_karrels Exp $" ;
+const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.42 2001/01/07 23:20:34 dan_karrels Exp $" ;
 
 using std::string ;
 using std::vector ;
@@ -85,7 +85,7 @@ initializeVariables() ;
 
 if( !readConfigFile( configFileName ) )
 	{
-	elog	<< "Error reading config file: "
+	clog	<< "Error reading config file: "
 		<< configFileName << endl ;
 	::exit( 0 ) ;
 	}
@@ -1217,11 +1217,11 @@ if( bytesWritten <= 0 )
 	{
 	// Write error
 	_connected = false ;
-	return ;
 	}
-
-outputBuffer.Delete( bytesWritten ) ;
-
+else
+	{
+	outputBuffer.Delete( bytesWritten ) ;
+	}
 }
 
 /**

@@ -1,5 +1,5 @@
 /* main.cc
- * $Id: main.cc,v 1.15 2001/01/07 22:59:32 dan_karrels Exp $
+ * $Id: main.cc,v 1.16 2001/01/07 23:20:34 dan_karrels Exp $
  */
 
 #include	<fstream>
@@ -25,7 +25,7 @@
 using namespace gnuworld ;
 
 const char config_h_rcsId[] = __CONFIG_H ;
-const char main_cc_rcsId[] = "$Id: main.cc,v 1.15 2001/01/07 22:59:32 dan_karrels Exp $" ;
+const char main_cc_rcsId[] = "$Id: main.cc,v 1.16 2001/01/07 23:20:34 dan_karrels Exp $" ;
 
 using std::cerr ;
 using std::clog ;
@@ -77,11 +77,10 @@ return 0 ;
 }
 
 xServer::xServer( int argc, char** argv )
- : eventList( EVT_NOOP )
+ : eventList( EVT_NOOP ), configFileName( CONFFILE )
 {
 
 string simFileName ;
-string configFileName( CONFFILE ) ;
 
 verbose = false ;
 
