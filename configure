@@ -3156,7 +3156,7 @@ irix5* | irix6*)
 # This must be Linux ELF.
 linux-gnu*)
   case $host_cpu in
-  alpha* | hppa* | i*86 | powerpc* | sparc* | ia64* | s390* )
+  alpha* | hppa* | i*86 | powerpc* | sparc* | ia64* )
     lt_cv_deplibs_check_method=pass_all ;;
   *)
     # glibc up to 2.1.1 does not perform some relocations on ARM
@@ -10685,6 +10685,14 @@ else
 #define HASHMAPNS std
 _ACEOF
 
+fi
+
+if test -d "/usr/include/"; then
+	CXXFLAGS="$CXXFLAGS -I/usr/include"
+fi
+
+if test -d "/usr/local/include/"; then
+	CXXFLAGS="$CXXFLAGS -I/usr/local/include"
 fi
 
 
