@@ -5,3 +5,4 @@
 *.so
 *.0
 Makefile
+.arch-ids

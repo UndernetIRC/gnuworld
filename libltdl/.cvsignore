@@ -9,3 +9,4 @@ config.status
 libtool
 stamp-h*
 autom4te.cache
+.arch-ids

@@ -7,3 +7,5 @@ opts
 autom4te.cache
 libltdl/autom4te.cache
 
+.arch-ids
+{arch}

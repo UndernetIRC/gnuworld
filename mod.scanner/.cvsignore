@@ -4,3 +4,4 @@
 *.lo
 Makefile
 
+.arch-ids
