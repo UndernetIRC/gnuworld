@@ -3,7 +3,7 @@
  */
 
 #ifndef __XCLIENT_H
-#define __XCLIENT_H "$Id: client.h,v 1.3 2000/08/01 16:44:09 dan_karrels Exp $"
+#define __XCLIENT_H "$Id: client.h,v 1.4 2000/08/02 22:48:10 dan_karrels Exp $"
 
 #include	<string>
 
@@ -175,16 +175,44 @@ public:
 
 	/* Utility methods */
 
+	/**
+	 * Op a user on a channel, join/part the channel if necessary.
+	 */
 	virtual bool	Op( Channel*, iClient* ) ;
+
+	/**
+	 * Op a user on a channel, join/part the channel if necessary.
+	 */
 	virtual bool	Op( Channel*, const vector< iClient* >& ) ;
 
+	/**
+	 * Deop a user on a channel, join/part the channel if necessary.
+	 */
 	virtual bool	DeOp( Channel*, iClient* ) ;
+
+	/**
+	 * Deop a user on a channel, join/part the channel if necessary.
+	 */
 	virtual bool	DeOp( Channel*, const vector< iClient* >& ) ;
 
+	/**
+	 * Set a ban on a channel, join/part the channel if necessary.
+	 */
 	virtual bool	Ban( Channel*, iClient* ) ;
+
+	/**
+	 * Set a ban on a channel, join/part the channel if necessary.
+	 */
 	virtual bool	Ban( Channel*, const vector< iClient* >& ) ;
 
+	/**
+	 * Kick a user from a channel, join/part if necessary.
+	 */
 	virtual bool	Kick( Channel*, iClient*, const string& ) ;
+
+	/**
+	 * Kick several users from a channel, join/part if necessary.
+	 */
 	virtual bool	Kick( Channel*, const vector< iClient* >&,
 				const string& ) ;
 
@@ -193,6 +221,9 @@ public:
 	 */
 	virtual bool	Join( const string& ) ;
 
+	/**
+	 * Join the given channel.
+	 */
 	virtual bool	Join( Channel* ) ;
 
 	/**
@@ -200,12 +231,31 @@ public:
 	 */
 	virtual bool	Part( const string& ) ;
 
+	/**
+	 * Part the given channel.
+	 */
 	virtual bool	Part( Channel* ) ;
 
+	/**
+	 * Invite a user to a channel.  Join the channel if necessary
+	 * (and then part).
+	 */
 	virtual bool	Invite( iClient*, const string& ) ;
+
+	/**
+	 * Invite a user to a channel.  Join the channel if necessary
+	 * (and then part).
+	 */
 	virtual bool	Invite( iClient*, Channel* ) ;
 
+	/**
+	 * Return true if the bot is on the given channel.
+	 */
 	virtual bool	isOnChannel( const string& chanName ) const ;
+
+	/**
+	 * Return true if the bot is on the given channel.
+	 */
 	virtual bool	isOnChannel( const Channel* theChan ) const ;
 
 	/**

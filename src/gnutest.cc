@@ -99,7 +99,6 @@ if( st[ 0 ] == "invite" || st[ 0 ] == "INVITE" )
 	{
 	Invite( theClient, st[ 1 ] ) ;
 	}
-/*
 else if( st[ 0 ] == "moo" )
 	{
 	if( st.size() < 2 )
@@ -110,7 +109,24 @@ else if( st[ 0 ] == "moo" )
 	string raw = st.assemble( 1 ) ;
 	Write( raw ) ;
 	}
-*/
+else if( st[ 0 ] == "join" )
+	{
+	if( st.size() < 2 )
+		{
+		Notice( theClient, "Did you forget something?" ) ;
+		return 0 ;
+		}
+	Join( st[ 1 ] ) ;
+	}
+else if( st[ 0 ] == "part" )
+	{
+	if( st.size() < 2 )
+		{
+		Notice( theClient, "Did you forget something?" ) ;
+		return 0 ;
+		}
+	Part( st[ 1 ] ) ;
+	}
 
 return xClient::OnPrivateMessage( theClient, message ) ;
 }

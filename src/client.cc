@@ -26,7 +26,7 @@
 #include	"events.h"
 
 const char xClient_h_rcsId[] = __XCLIENT_H ;
-const char xClient_cc_rcsId[] = "$Id: client.cc,v 1.4 2000/08/01 16:44:09 dan_karrels Exp $" ;
+const char xClient_cc_rcsId[] = "$Id: client.cc,v 1.5 2000/08/02 22:48:10 dan_karrels Exp $" ;
 
 using std::string ;
 using std::strstream ;
@@ -389,8 +389,27 @@ Connected = false ;
 return 0 ;
 }
 
-int xClient::Kill( iClient*, const string& )
+int xClient::Kill( iClient* theClient, const string& reason )
 {
+#ifndef NDEBUG
+  assert( theClient != 0 ) ;
+#endif
+
+Write( "%s D %s :%s",
+	MyUplink->getCharYY(),
+	theClient->getCharYYXXX().c_str(),
+	reason.c_str() ) ;
+
+// Do NOT cast away constness
+string localReason( reason ) ;
+
+MyUplink->PostEvent( EVT_KILL,
+	static_cast< void* >( theClient ),
+	static_cast< void* >( &localReason ) ) ;
+
+// Remove the user
+delete Network->removeClient( theClient ) ;
+
 return 0 ;
 }
 
@@ -452,10 +471,6 @@ if( !Connected )
 	{
 	return false ;
 	}
-
-// Do 6 at a time, as per unet protocol
-string modes = "+" ;
-string args ;
 
 return true ;
 }
@@ -569,6 +584,12 @@ if( NULL == theChan->findUser( theClient ) )
 	return false ;
 	}
 
+bool onChannel = isOnChannel( theChan ) ;
+if( !onChannel )
+	{
+	Join( theChan ) ;
+	}
+
 strstream s ;
 s	<< getCharYYXXX() << " K "
 	<< theChan->getName() << ' '
@@ -577,6 +598,11 @@ s	<< getCharYYXXX() << " K "
 
 Write( s ) ;
 delete[] s.str() ;
+
+if( !onChannel )
+	{
+	Part( theChan ) ;
+	}
 
 // Notify the server
 MyUplink->OnPartChannel( theClient, theChan ) ;
@@ -594,6 +620,17 @@ bool xClient::Kick( Channel* theChan, const vector< iClient* >& theClients,
 if( !Connected )
 	{
 	return false ;
+	}
+
+if( theClients.empty() )
+	{
+	return true ;
+	}
+
+bool onChannel = isOnChannel( theChan ) ;
+if( !onChannel )
+	{
+	Join( theChan ) ;
 	}
 
 // We will assume that this client is on the channel pointed to by theChan
@@ -619,6 +656,11 @@ for( vector< iClient* >::const_iterator ptr = theClients.begin() ;
 
 	// Notify the server that the user has parted the channel
 	MyUplink->OnPartChannel( *ptr, theChan ) ;
+	}
+
+if( !onChannel )
+	{
+	Part( theChan ) ;
 	}
 
 return true ;

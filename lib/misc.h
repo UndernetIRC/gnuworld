@@ -4,7 +4,7 @@
  */
 
 #ifndef __MISC_H
-#define __MISC_H "$Id: misc.h,v 1.3 2000/07/06 20:47:06 dan_karrels Exp $"
+#define __MISC_H "$Id: misc.h,v 1.4 2000/08/02 22:48:10 dan_karrels Exp $"
 
 #include	<string>
 #include	<hash_map>
@@ -48,7 +48,6 @@ inline size_t operator()( const string& s ) const
 	return __h ;
 	}
 } ;
-
 
 /**
  * Return a copy of a given C++ string, whose characters

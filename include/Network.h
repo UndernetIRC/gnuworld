@@ -3,7 +3,7 @@
  */
 
 #ifndef __XNETWORK_H
-#define __XNETWORK_H "$Id: Network.h,v 1.6 2000/08/01 16:44:09 dan_karrels Exp $"
+#define __XNETWORK_H "$Id: Network.h,v 1.7 2000/08/02 22:48:10 dan_karrels Exp $"
 
 #include	<vector>
 #include	<string>
@@ -205,6 +205,12 @@ public:
 	 * Returns NULL if not found.
 	 */
 	virtual iClient*	removeClient( const string& yyxxx ) ;
+
+	/**
+	 * Remove a remote client by its pointer.
+	 * This will NOT deallocate the iClient instance.
+	 */
+	virtual iClient*	removeClient( iClient* ) ;
 
 	/**
 	 * Remove a nick name from the internal nick name table.

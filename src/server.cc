@@ -37,7 +37,7 @@
 //#include	"moduleLoader.h"
 
 const char xServer_h_rcsId[] = __XSERVER_H ;
-const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.14 2000/08/01 16:44:09 dan_karrels Exp $" ;
+const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.15 2000/08/02 22:48:10 dan_karrels Exp $" ;
 
 using std::string ;
 using std::vector ;
@@ -241,6 +241,7 @@ REGISTER_MSG( "STATS", NOOP ) ;
 REGISTER_MSG( "V", NOOP ) ; // Version
 REGISTER_MSG( "I", NOOP ) ; // Invite
 REGISTER_MSG( "TR", NOOP ) ; // Trace
+REGISTER_MSG( "SETTIME", NOOP ) ;
 
 // AWAY
 REGISTER_MSG( "A", NOOP ) ;
@@ -1837,6 +1838,12 @@ if( NULL == theClient )
 StringTokenizer st( Param[ 1 ], ',' ) ;
 for( StringTokenizer::size_type i = 0 ; i < st.size() ; ++i )
 	{
+	if( '+' == st[ i ][ 0 ] )
+		{
+		// Ignore modeless channels
+		continue ;
+		}
+
 	// Get the channel that was just parted.
 	Channel* theChan = Network->findChannel( st[ i ] ) ;
 	if( NULL == theChan )

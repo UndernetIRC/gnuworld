@@ -20,7 +20,7 @@
 #include	"misc.h"
 
 const char xNetwork_h_rcsId[] = __XNETWORK_H ;
-const char xNetwork_cc_rcsId[] = "$Id: Network.cc,v 1.9 2000/08/01 16:44:09 dan_karrels Exp $" ;
+const char xNetwork_cc_rcsId[] = "$Id: Network.cc,v 1.10 2000/08/02 22:48:10 dan_karrels Exp $" ;
 
 using std::string ;
 using std::endl ;
@@ -403,6 +403,15 @@ else
 	xxx = base64toint( yyxxx.c_str() + 1, 2 ) ;
 	}
 return removeClient( yy, xxx ) ;
+}
+
+iClient* xNetwork::removeClient( iClient* theClient )
+{
+#ifndef NDEBUG
+  assert( theClient != 0 ) ;
+#endif
+
+return removeClient( theClient->getIntYY(), theClient->getIntXXX() ) ;
 }
 
 void xNetwork::removeNick( const string& nick )
