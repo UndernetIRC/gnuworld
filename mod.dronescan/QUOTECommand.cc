@@ -17,15 +17,15 @@ namespace gnuworld {
 
 namespace ds {
 
-bool QUOTECommand::Exec( const iClient *theClient, const string& Message, const sqlUser* theUser )
+void QUOTECommand::Exec( const iClient *theClient, const string& Message, const sqlUser* theUser )
 {
-	if(theUser->getAccess() < level::quote) return false;
+	if(theUser->getAccess() < level::quote) return ;
 	
 	StringTokenizer st(Message);
 	
 	if(st.size() < 2) {
 		Usage(theClient);
-		return true;
+		return ;
 	}
 
 	bot->log(INFO, "%s (%s) is quoting: %s",
@@ -36,7 +36,7 @@ bool QUOTECommand::Exec( const iClient *theClient, const string& Message, const 
 	
 	bot->Write(st.assemble(1));
 
-	return true;
+	return ;
 }
 
 } // namespace ds

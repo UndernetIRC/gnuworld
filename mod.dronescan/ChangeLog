@@ -1,10 +1,11 @@
 2003-10-10 0.0.9 Jeekay
+* Removed return value from commands
 * Added automatic cache refresh
 * Added ability to add fake clients
 * Bumped version to 0.0.9
 
 2003-09-04 0.0.8 Jeekay
-* Maded reporting of active channels less spammy. They now only are displayed if
+* Made reporting of active channels less spammy. They now only are displayed if
   there has not been a join inside the dcInterval, rather than once every
   dcInterval.
 * Bumped version to 0.0.8

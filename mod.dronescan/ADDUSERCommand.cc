@@ -18,7 +18,7 @@
  *
  * 2003-08-02	Jeekay	Initial writing
  *
- * $Id: ADDUSERCommand.cc,v 1.1 2003/08/02 18:17:21 jeekay Exp $
+ * $Id: ADDUSERCommand.cc,v 1.2 2003/10/19 20:17:11 jeekay Exp $
  */
 
 #include "StringTokenizer.h"
@@ -28,15 +28,15 @@
 #include "dronescanCommands.h"
 #include "sqlUser.h"
 
-RCSTAG("$Id: ADDUSERCommand.cc,v 1.1 2003/08/02 18:17:21 jeekay Exp $");
+RCSTAG("$Id: ADDUSERCommand.cc,v 1.2 2003/10/19 20:17:11 jeekay Exp $");
 
 namespace gnuworld {
 
 namespace ds {
 
-bool ADDUSERCommand::Exec( const iClient *theClient, const string& Message, const sqlUser* theUser )
+void ADDUSERCommand::Exec( const iClient *theClient, const string& Message, const sqlUser* theUser )
 {
-	if(theUser->getAccess() < level::adduser) return false;
+	if(theUser->getAccess() < level::adduser) return ;
 
 	StringTokenizer st(Message);
 	
@@ -46,7 +46,7 @@ bool ADDUSERCommand::Exec( const iClient *theClient, const string& Message, cons
 	
 	if(st.size() != 3) {
 		Usage(theClient);
-		return false;
+		return ;
 	}
 	
 	/* Conditions:
@@ -62,14 +62,14 @@ bool ADDUSERCommand::Exec( const iClient *theClient, const string& Message, cons
 		bot->Reply(theClient, "The user %s has already been added.",
 			targetUser->getUserName().c_str()
 			);
-		return true;
+		return ;
 	}
 	
 	/* Check the new level is not >= the user adding them */
 	unsigned int newAccess = atoi(st[2].c_str());
 	if(newAccess <= 0 || newAccess >= theUser->getAccess()) {
 		bot->Reply(theClient, "Please choose a sensible access level.");
-		return true;
+		return ;
 	}
 	
 	/* User doesn't exist, access level is sane. */
@@ -98,7 +98,7 @@ bool ADDUSERCommand::Exec( const iClient *theClient, const string& Message, cons
 	/* Flush the cache */
 	bot->preloadUserCache();
 	
-	return true;
+	return ;
 	
 	
 } // ADDUSERCommand::Exec(iClient*, const string&, const sqlUser*)

@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: CHECKCommand.cc,v 1.5 2003/08/09 23:15:35 dan_karrels Exp $
+ * $Id: CHECKCommand.cc,v 1.6 2003/10/19 20:17:11 jeekay Exp $
  *
  * Display information about a given channel or user.
  */
@@ -28,19 +28,19 @@
 #include "dronescan.h"
 #include "dronescanCommands.h"
 
-RCSTAG("$Id: CHECKCommand.cc,v 1.5 2003/08/09 23:15:35 dan_karrels Exp $");
+RCSTAG("$Id: CHECKCommand.cc,v 1.6 2003/10/19 20:17:11 jeekay Exp $");
 
 namespace gnuworld {
 
 namespace ds {
 
-bool CHECKCommand::Exec( const iClient *theClient, const string& Message, const sqlUser* )
+void CHECKCommand::Exec( const iClient *theClient, const string& Message, const sqlUser* )
 {
 	StringTokenizer st(Message);
 	
 	if(st.size() < 2) {
 		Usage(theClient);
-		return true;
+		return ;
 	}
 	
 	if(st[1][0] == '#')
@@ -51,7 +51,7 @@ bool CHECKCommand::Exec( const iClient *theClient, const string& Message, const 
 		if(!theChannel) {
 			bot->Reply(theClient, "Unable to find channel %s.",
 				st[1].c_str());
-			return true;
+			return ;
 		}
 		
 		bot->Reply(theClient, "Checking channel %s:",
@@ -109,7 +109,7 @@ bool CHECKCommand::Exec( const iClient *theClient, const string& Message, const 
 		
 		bot->checkChannel(theChannel, theClient);
 		
-		return true;
+		return ;
 		}
 	else
 		{
@@ -119,7 +119,7 @@ bool CHECKCommand::Exec( const iClient *theClient, const string& Message, const 
 		if(!targetClient) {
 			bot->Reply(theClient, "Unable to find user %s.",
 				st[1].c_str());
-			return true;
+			return ;
 		}
 		
 		bot->Reply(theClient, "Checking user %s:",
@@ -130,10 +130,10 @@ bool CHECKCommand::Exec( const iClient *theClient, const string& Message, const 
 			bot->isNormal(targetClient) ? "Normal" : "Abnormal"
 			);
 		
-		return true;
+		return ;
 		}
 	
-	return true;
+	return ;
 } // CHECKCommand::Exec(iClient*, const string&)
 
 } // namespace ds

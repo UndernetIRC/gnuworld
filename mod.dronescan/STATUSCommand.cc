@@ -18,7 +18,7 @@
  *
  * 2003-07-07	GK@NG	Initial writing
  *
- * $Id: STATUSCommand.cc,v 1.2 2003/08/02 18:17:21 jeekay Exp $
+ * $Id: STATUSCommand.cc,v 1.3 2003/10/19 20:17:11 jeekay Exp $
  */
 
 #include "Convert.h"
@@ -30,15 +30,15 @@
 #include "dronescanTests.h"
 #include "sqlUser.h"
 
-RCSTAG("$Id: STATUSCommand.cc,v 1.2 2003/08/02 18:17:21 jeekay Exp $");
+RCSTAG("$Id: STATUSCommand.cc,v 1.3 2003/10/19 20:17:11 jeekay Exp $");
 
 namespace gnuworld {
 
 namespace ds {
 
-bool STATUSCommand::Exec( const iClient *theClient, const string& Message, const sqlUser* theUser )
+void STATUSCommand::Exec( const iClient *theClient, const string& Message, const sqlUser* theUser )
 {
-	if(theUser->getAccess() < level::status) return false;
+	if(theUser->getAccess() < level::status) return ;
 
 	StringTokenizer st(Message);
 	
@@ -48,7 +48,7 @@ bool STATUSCommand::Exec( const iClient *theClient, const string& Message, const
 	
 	if(st.size() != 1) {
 		Usage(theClient);
-		return false;
+		return ;
 	}
 	
 	time_t uptime = ::time(0) - bot->getUplink()->getStartTime();
@@ -66,7 +66,7 @@ bool STATUSCommand::Exec( const iClient *theClient, const string& Message, const
 			);
 	}
 	
-	return true;
+	return ;
 	
 	
 } // STATUSCommand::Exec(iClient*, const string&)

@@ -16,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: dronescanCommands.h,v 1.8 2003/10/12 22:21:25 jeekay Exp $
+ * $Id: dronescanCommands.h,v 1.9 2003/10/19 20:17:11 jeekay Exp $
  */
 
 #ifndef DRONESCANCOMMANDS_H
-#define DRONESCANCOMMANDS_H "$Id: dronescanCommands.h,v 1.8 2003/10/12 22:21:25 jeekay Exp $"
+#define DRONESCANCOMMANDS_H "$Id: dronescanCommands.h,v 1.9 2003/10/19 20:17:11 jeekay Exp $"
 
 namespace gnuworld {
 
@@ -37,7 +37,7 @@ public:
 
 	virtual ~Command() { } ;
 	
-	virtual bool Exec(const iClient*, const string&, const sqlUser*) = 0;
+	virtual void Exec(const iClient*, const string&, const sqlUser*) = 0;
 	
 	void setServer(xServer *_server)
 		{ server = _server; }
@@ -71,7 +71,7 @@ class commandName##Command : public Command \
       const string& _help) : \
         Command(_bot, _commandName, _help) {} \
     virtual ~commandName##Command() {} \
-    virtual bool Exec(const iClient*, const string&, const sqlUser*); \
+    virtual void Exec(const iClient*, const string&, const sqlUser*); \
 };
 
 /* Admin commands */

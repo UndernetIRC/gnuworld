@@ -18,9 +18,9 @@ namespace gnuworld {
 
 namespace ds {
 
-bool FAKECommand::Exec( const iClient *theClient, const string& Message, const sqlUser* theUser )
+void FAKECommand::Exec( const iClient *theClient, const string& Message, const sqlUser* theUser )
 {
-	if(theUser->getAccess() < level::fake) return false;
+	if(theUser->getAccess() < level::fake) return ;
 	
 	StringTokenizer st(Message);
 	
@@ -30,7 +30,7 @@ bool FAKECommand::Exec( const iClient *theClient, const string& Message, const s
 	
 	if(st.size() < 3) {
 		Usage(theClient);
-		return true;
+		return ;
 	}
 
 	string Command = string_upper(st[1]);
@@ -45,7 +45,7 @@ bool FAKECommand::Exec( const iClient *theClient, const string& Message, const s
 			bot->Reply(theClient, "No client found for id: %u",
 				atoi(st[2].c_str())
 				);
-			return false;
+			return ;
 		}
 		
 		sqlFakeClient *theFake = itr->second;
@@ -89,10 +89,10 @@ bool FAKECommand::Exec( const iClient *theClient, const string& Message, const s
 		}
 */
 	
-		return true;
+		return ;
 	}
 
-	return true;
+	return ;
 }
 
 } // namespace ds

@@ -18,7 +18,7 @@
  *
  * 2003-08-02	Jeekay	Initial writing
  *
- * $Id: MODUSERCommand.cc,v 1.1 2003/08/02 18:17:21 jeekay Exp $
+ * $Id: MODUSERCommand.cc,v 1.2 2003/10/19 20:17:11 jeekay Exp $
  */
 
 #include "StringTokenizer.h"
@@ -28,15 +28,15 @@
 #include "dronescanCommands.h"
 #include "sqlUser.h"
 
-RCSTAG("$Id: MODUSERCommand.cc,v 1.1 2003/08/02 18:17:21 jeekay Exp $");
+RCSTAG("$Id: MODUSERCommand.cc,v 1.2 2003/10/19 20:17:11 jeekay Exp $");
 
 namespace gnuworld {
 
 namespace ds {
 
-bool MODUSERCommand::Exec( const iClient *theClient, const string& Message, const sqlUser* theUser )
+void MODUSERCommand::Exec( const iClient *theClient, const string& Message, const sqlUser* theUser )
 {
-	if(theUser->getAccess() < level::moduser) return false;
+	if(theUser->getAccess() < level::moduser) return ;
 
 	StringTokenizer st(Message);
 	
@@ -46,7 +46,7 @@ bool MODUSERCommand::Exec( const iClient *theClient, const string& Message, cons
 	
 	if(st.size() < 2) {
 		Usage(theClient);
-		return false;
+		return ;
 	}
 	
 	string Command = string_upper(st[1]);
@@ -57,7 +57,7 @@ bool MODUSERCommand::Exec( const iClient *theClient, const string& Message, cons
 		 */
 		if(st.size() != 4) {
 			Usage(theClient);
-			return false;
+			return ;
 		}
 		
 		/* Conditions:
@@ -70,14 +70,14 @@ bool MODUSERCommand::Exec( const iClient *theClient, const string& Message, cons
 		sqlUser *targetUser = bot->getSqlUser(st[2]);
 		if(!targetUser) {
 			bot->Reply(theClient, "No such user.");
-			return true;
+			return ;
 		}
 		
 		/* Is the level less than the modifiers? */
 		unsigned int newLevel = atoi(st[3].c_str());
 		if(newLevel < 1 || newLevel >= theUser->getAccess()) {
 			bot->Reply(theClient, "You cannot grant a user equal or higher access than yourself.");
-			return true;
+			return ;
 		}
 		
 		/* Conditions passed. Modify, update. */
@@ -87,14 +87,14 @@ bool MODUSERCommand::Exec( const iClient *theClient, const string& Message, cons
 				targetUser->getUserName().c_str(),
 				newLevel
 				);
-			return true;
+			return ;
 		} else {
 			bot->Reply(theClient, "There was a problem changing the access level.");
-			return true;
+			return ;
 		}
 	}
 	
-	return true;
+	return ;
 	
 } // MODUSERCommand::Exec(iClient*, const string&, const sqlUser*)
 

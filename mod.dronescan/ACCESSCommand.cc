@@ -20,7 +20,7 @@
  *
  * 2003-06-15	GK@NG	Initial writing
  *
- * $Id: ACCESSCommand.cc,v 1.3 2003/07/26 16:47:18 jeekay Exp $
+ * $Id: ACCESSCommand.cc,v 1.4 2003/10/19 20:17:11 jeekay Exp $
  */
 
 #include <time.h>
@@ -33,15 +33,15 @@
 #include "dronescanCommands.h"
 #include "sqlUser.h"
 
-RCSTAG("$Id: ACCESSCommand.cc,v 1.3 2003/07/26 16:47:18 jeekay Exp $");
+RCSTAG("$Id: ACCESSCommand.cc,v 1.4 2003/10/19 20:17:11 jeekay Exp $");
 
 namespace gnuworld {
 
 namespace ds {
 
-bool ACCESSCommand::Exec( const iClient *theClient, const string& Message, const sqlUser* theUser )
+void ACCESSCommand::Exec( const iClient *theClient, const string& Message, const sqlUser* theUser )
 {
-	if(theUser->getAccess() < level::access) return false;
+	if(theUser->getAccess() < level::access) return ;
 
 	StringTokenizer st(Message);
 	
@@ -58,7 +58,7 @@ bool ACCESSCommand::Exec( const iClient *theClient, const string& Message, const
 			bot->Reply(theClient, "No such user %s",
 				st[1].c_str()
 				);
-			return true;
+			return ;
 		}
 	}
 	
@@ -84,7 +84,7 @@ bool ACCESSCommand::Exec( const iClient *theClient, const string& Message, const
 		targetUser->getLastUpdatedBy().c_str()
 		);		
 	
-	return true;
+	return ;
 } // ACCESSCommand::Exec(iClient*, const string&)
 
 } // namespace ds

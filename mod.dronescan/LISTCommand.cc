@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: LISTCommand.cc,v 1.9 2003/10/12 22:21:24 jeekay Exp $
+ * $Id: LISTCommand.cc,v 1.10 2003/10/19 20:17:11 jeekay Exp $
  *
  * Display information about things.
  *
@@ -36,7 +36,7 @@ namespace gnuworld {
 
 namespace ds {
 
-bool LISTCommand::Exec( const iClient *theClient, const string& Message , const sqlUser* )
+void LISTCommand::Exec( const iClient *theClient, const string& Message , const sqlUser* )
 {
 	/* Usage: LIST <name> */
 
@@ -44,7 +44,7 @@ bool LISTCommand::Exec( const iClient *theClient, const string& Message , const 
 	
 	if(st.size() < 2) {
 		Usage(theClient);
-		return true;
+		return ;
 	}
 	
 	string Name = string_upper(st[1]);
@@ -52,7 +52,7 @@ bool LISTCommand::Exec( const iClient *theClient, const string& Message , const 
 	if("ACTIVE" == Name) {
 		if(bot->droneChannels.empty()) {
 			bot->Reply(theClient, "There are currently no active drone channels.");
-			return true;
+			return ;
 		}
 	
 		bot->Reply(theClient, "Active drone channels:");
@@ -81,7 +81,7 @@ bool LISTCommand::Exec( const iClient *theClient, const string& Message , const 
 	if("FAKECLIENTS" == Name) {
 		if(bot->fakeClients.empty()) {
 			bot->Reply(theClient, "There are currently no fake clients.");
-			return true;
+			return ;
 		}
 		
 		bot->Reply(theClient, "Fake clients:");
@@ -103,7 +103,7 @@ bool LISTCommand::Exec( const iClient *theClient, const string& Message , const 
 	if("JOINFLOOD" == Name) {
 		if(bot->jcChanMap.empty()) {
 			bot->Reply(theClient, "There are currently no channels being join flooded.");
-			return true;
+			return ;
 		}
 	
 		bot->Reply(theClient, "Currently joinflooded channels:");
@@ -130,7 +130,7 @@ bool LISTCommand::Exec( const iClient *theClient, const string& Message , const 
 		}
 	}
 	
-	return true;
+	return ;
 } // LISTCommand::Exec(iClient*, const string&)
 
 } // namespace ds

@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: dronescan.cc,v 1.41 2003/10/12 22:21:24 jeekay Exp $
+ * $Id: dronescan.cc,v 1.42 2003/10/19 20:17:11 jeekay Exp $
  */
 
 #include	<string>
@@ -34,6 +34,7 @@
 
 #include "activeChannel.h"
 #include "clientData.h"
+#include "constants.h"
 #include "dronescan.h"
 #include "dronescanCommands.h"
 #include "dronescanTests.h"
@@ -41,7 +42,7 @@
 #include "sqlUser.h"
 #include "Timer.h"
 
-RCSTAG("$Id: dronescan.cc,v 1.41 2003/10/12 22:21:24 jeekay Exp $");
+RCSTAG("$Id: dronescan.cc,v 1.42 2003/10/19 20:17:11 jeekay Exp $");
 
 namespace gnuworld {
 
@@ -185,7 +186,7 @@ RegisterCommand(new ADDUSERCommand(this, "ADDUSER", "<user> <access>"));
 RegisterCommand(new ANALYSECommand(this, "ANALYSE", "<#channel>"));
 RegisterCommand(new CHECKCommand(this, "CHECK", "(<#channel>) (<user>)"));
 RegisterCommand(new FAKECommand(this, "FAKE", "(activate)"));
-RegisterCommand(new LISTCommand(this, "LIST", "(active)"));
+RegisterCommand(new LISTCommand(this, "LIST", "(active|fakeclients|joinflood|users)"));
 RegisterCommand(new MODUSERCommand(this, "MODUSER", "(ACCESS <user> <level>"));
 RegisterCommand(new QUOTECommand(this, "QUOTE", "<string>"));
 RegisterCommand(new REMUSERCommand(this, "REMUSER", "<user>"));
@@ -1094,9 +1095,7 @@ void dronescan::preloadFakeClientCache()
 	if(!updateDue("FAKECLIENTS")) return;
 	
 	stringstream theQuery;
-	theQuery	<< "SELECT fc.id, fc.nickname, fc.username, fc.hostname, fc.realname, u.user_name, fc.created_by, fc.created_on, fc.last_updated "
-			<< "FROM fakeclients AS fc JOIN users AS u ON fc.created_by=u.id"
-			;
+	theQuery	<< sql::fakeclients ;
 	
 	if(!SQLDb->ExecTuplesOk(theQuery.str().c_str())) {
 		doSqlError(theQuery.str(), SQLDb->ErrorMessage());

@@ -18,7 +18,7 @@
  *
  * 2003-08-02	Jeekay	Initial writing
  *
- * $Id: REMUSERCommand.cc,v 1.1 2003/08/02 18:17:21 jeekay Exp $
+ * $Id: REMUSERCommand.cc,v 1.2 2003/10/19 20:17:11 jeekay Exp $
  */
 
 #include "StringTokenizer.h"
@@ -28,15 +28,15 @@
 #include "dronescanCommands.h"
 #include "sqlUser.h"
 
-RCSTAG("$Id: REMUSERCommand.cc,v 1.1 2003/08/02 18:17:21 jeekay Exp $");
+RCSTAG("$Id: REMUSERCommand.cc,v 1.2 2003/10/19 20:17:11 jeekay Exp $");
 
 namespace gnuworld {
 
 namespace ds {
 
-bool REMUSERCommand::Exec( const iClient *theClient, const string& Message, const sqlUser* theUser )
+void REMUSERCommand::Exec( const iClient *theClient, const string& Message, const sqlUser* theUser )
 {
-	if(theUser->getAccess() < level::remuser) return false;
+	if(theUser->getAccess() < level::remuser) return ;
 
 	StringTokenizer st(Message);
 	
@@ -46,7 +46,7 @@ bool REMUSERCommand::Exec( const iClient *theClient, const string& Message, cons
 	
 	if(st.size() != 2) {
 		Usage(theClient);
-		return false;
+		return ;
 	}
 
 	/* Conditions:
@@ -60,13 +60,13 @@ bool REMUSERCommand::Exec( const iClient *theClient, const string& Message, cons
 		bot->Reply(theClient, "The user %s does not exist.",
 			st[1].c_str()
 			);
-		return true;
+		return ;
 	}
 	
 	/* Is the removees access lower than the removers? */
 	if(targetUser->getAccess() >= theUser->getAccess()) {
 		bot->Reply(theClient, "You cannot remove someone with higher or equal access.");
-		return true;
+		return ;
 	}
 	
 	/* Conditions satisfied.
@@ -85,7 +85,7 @@ bool REMUSERCommand::Exec( const iClient *theClient, const string& Message, cons
 	/* Flush the cache */
 	bot->preloadUserCache();
 	
-	return true;
+	return ;
 	
 } // REMUSERCommand::Exec(iClient*, const string&, const sqlUser*)
 

@@ -4,6 +4,7 @@
 
 #include "ELog.h"
 
+#include "constants.h"
 #include "sqlFakeClient.h"
 
 namespace gnuworld {
@@ -55,6 +56,7 @@ createdBy_s = SQLDb->GetValue(row, 5);
 createdBy_i = atoi(SQLDb->GetValue(row, 6));
 createdOn = atoi(SQLDb->GetValue(row, 7));
 lastUpdated = atoi(SQLDb->GetValue(row, 8));
+flags = atoi(SQLDb->GetValue(row, 9));
 }
 
 bool sqlFakeClient::insert()
@@ -69,7 +71,7 @@ fakeInsert	<< "INSERT INTO fakeclients VALUES ("
 		<< "'" << realname << "', "
 		<< createdBy_i << ", "
 		<< "now()::abstime::int4, "
-		<< "now()::abstime::int4"
+		<< "now()::abstime::int4, 0"
 		<< ")"
 		;
 
@@ -81,9 +83,7 @@ if(!SQLDb->ExecCommandOk(fakeInsert.str().c_str())) {
  * This is so we pull back the new ID from the database. */
 
 stringstream selectFake;
-selectFake	<< "SELECT fc.id, fc.nickname, fc.username, fc.hostname, fc.realname, u.user_name, fc.created_by, fc.created_on, fc.last_updated "
-		<< "FROM fakeclients AS fc JOIN users AS u ON fc.created_by=u.id"
-		;
+selectFake	<< sql::fakeclients;
 
 ExecStatusType status = SQLDb->Exec(selectFake.str().c_str());
 

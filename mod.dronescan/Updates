@@ -30,6 +30,7 @@ CREATE TABLE fakeclients (
 	created_by int4 NOT NULL, 
 	created_on int4 NOT NULL, 
 	last_updated int4 NOT NULL,
+	flags int4 DEFAULT 0 NOT NULL,
 	PRIMARY KEY (id), 
 	FOREIGN KEY (created_by) REFERENCES users (id) ON UPDATE RESTRICT ON DELETE CASCADE,
 	UNIQUE (nickname)
