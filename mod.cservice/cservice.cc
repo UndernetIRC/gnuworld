@@ -1644,7 +1644,9 @@ void cservice::cacheExpireLevels()
 		 */
 
 		/* 2 Days for now, move to config.. (172800) */
-		if ( ((currentTime() - theChan->getLastUsed()) >= 172800) && theChan->getInChan() )
+		if ( ((currentTime() - theChan->getLastUsed()) >= 172800)
+			&& theChan->getInChan()
+			&& !theChan->getFlag(sqlChannel::F_SPECIAL) )
 		{
 			/*
 			 * So long! and thanks for all the fish.
