@@ -2923,6 +2923,7 @@ while (ptr != banList->end())
 			 */
 			return true;
 		}
+	++ptr;
 	}
  
 banList->push_back(newBan);
