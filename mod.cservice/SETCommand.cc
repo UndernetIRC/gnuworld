@@ -8,7 +8,7 @@
  *
  * Caveats: SET LANG is still under consideration.
  *
- * $Id: SETCommand.cc,v 1.4 2001/01/17 19:50:54 gte Exp $
+ * $Id: SETCommand.cc,v 1.5 2001/01/17 21:17:33 gte Exp $
  */
 
 #include	<string>
@@ -20,7 +20,7 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char SETCommand_cc_rcsId[] = "$Id: SETCommand.cc,v 1.4 2001/01/17 19:50:54 gte Exp $" ;
+const char SETCommand_cc_rcsId[] = "$Id: SETCommand.cc,v 1.5 2001/01/17 21:17:33 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -382,13 +382,15 @@ bool SETCommand::Exec( iClient* theClient, const string& Message )
 	    { 
 	    	theChan->setFlag(sqlChannel::F_AUTOJOIN);
 			theChan->setInChan(true);
+			bot->getUplink()->RegisterChannelEvent( theChan->getName(), bot ) ;
 			bot->Join(theChan->getName(), theChan->getChannelMode(), 
-				theChan->getChannelTS(), true); 
+				theChan->getChannelTS(), true);
 		}
 	    else if(value == "OFF") 
 	    { 
 	    	theChan->removeFlag(sqlChannel::F_AUTOJOIN);
 			theChan->setInChan(false);
+			bot->getUplink()->UnRegisterChannelEvent( theChan->getName(), bot ) ;
 			bot->Part(theChan->getName());
 		}
 	    else
