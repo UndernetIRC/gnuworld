@@ -522,39 +522,6 @@ COPY "translations" FROM stdin;
 3	170	%s for %i minuter	31337
 \.
 
--- Dutch language definition.
--- 30/12/2000 - Sebastian Serruys <sebastian.serruys@pandora.be>.
-
-COPY "translations" FROM stdin;
-4	1	Sorry, Je bent reeds geautoriseerd als %s	31337
-4	2	AUTORISATIE SUCCESVOL als %s	31337
-4	3	Sorry, je hebt onvoldoende toegang om dat commando uit te voeren	31337
-4	4	Sorry, het kanaal %s is leeg	31337
-4	5	Ik zie nergens %s	31337
-4	6	Ik kan %s niet vinden op het kanaal %s	31337
-4	7	Het kanaal %s ziet er niet geregistreerd uit	31337
-4	8	Je bent geopt door %s (%s)	31337
-4	9	Je bent gevoiced door %s (%s)	31337
-4	10	%s: Je bent niet in dat kanaal	31337
-\.
-
--- German language definition.
--- 03/01/2001 - Alexander Maassen <outsider@key2peace.org>.
-
-COPY "translations" FROM stdin;
-5	1	Sorry, Du bist schon authorisiert als %s	31337
-5	2	AUTHORISATION als %s ACCEPTIERT	31337
-5	3	Sorry, du hast zu wenig access fr dieses commando	31337
-5	4	Sorry, Channel %s ist lehr	31337
-5	5	Ich kann %s nirgendwo sehen	31337
-5	6	Ich kann %s nicht im Channel %s sehen	31337
-5	7	Channel %s is nicht registriert	31337
-5	8	%s (%s) hat dich geopt	31337
-5	9	%s (%s) hat dich gevoiced	31337
-5	10	%s: Du bist nicht im Channel	31337
-5	11	%s wurde bereits von %s geopt	31337
-\.
- 
 -- Portuguese language definition.
 -- 02/03/01 - Ed Cattuci <maniac@undernet.org>
 
@@ -991,7 +958,7 @@ COPY "translations" FROM stdin;
 8	95	Am sters user-ul %s de pe %s	31337
 8	96	Acum INVISIBLE este ON	31337
 8	97	Acum INVISIBLE este OFF	31337
-8	98	%s pentru %s e %s	31337
+y8	98	%s pentru %s e %s	31337
 8	99	valoarea lui %s trebuie sa fie ON sau OFF	31337
 8	100	Valoarea pentru USERFLAGS e incorecta. Valorile admise sunt 0, 1, 2.	31337
 8	101	USERFLAGS pentru %s este %i	31337
@@ -1414,4 +1381,3 @@ COPY "translations" FROM stdin;
 10	169	No tengo op en %s	31337
 10	170	%s durante %i minutos.	31337
 \.
-
