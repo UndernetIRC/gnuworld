@@ -1,4 +1,8 @@
 --
+-- $Id: autokill.sql,v 1.7 2002/07/20 06:01:39 nighty Exp $
+--
+
+--
 -- Clean up the temporary table from last time.
 DROP TABLE to_die;
 -- Select all user_id's idle > 90 days into a temp table.
@@ -28,8 +32,12 @@ DELETE FROM supporters where user_id = to_die.user_id;
 \qecho [*] Removing Objection records..
 DELETE FROM objections where user_id = to_die.user_id;
 -- Clean up mailq records.
---\qecho [*] Removing mailq records..
---DELETE FROM mailq where user_id = to_die.user_id;
+\qecho [*] Removing mailq records..
+DELETE FROM mailq where user_id = to_die.user_id;
+--
+-- Clean up notes records.
+\qecho [*] Removing notes received and/or sent..
+DELETE FROM notes where user_id= to_die.user_id OR from_user_id = to_die.user_id;
 --
 -- Clean up webaccessteam records..
 \qecho [*] Removing webaccessteam records..
