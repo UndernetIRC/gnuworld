@@ -1,5 +1,5 @@
 #ifndef __CSERVICE_H
-#define __CSERVICE_H "$Id: cservice.h,v 1.78 2002/02/24 01:04:06 gte Exp $"
+#define __CSERVICE_H "$Id: cservice.h,v 1.79 2002/03/07 00:08:23 gte Exp $"
 
 #include	<string>
 #include	<vector>
@@ -16,7 +16,6 @@
 #include	"sqlUser.h"
 #include	"sqlLevel.h"
 #include	"sqlBan.h"
-#include	"libpq-int.h"
 #include	"sqlPendingChannel.h"
 
 using std::string ;
@@ -41,9 +40,6 @@ public:
 	cmDatabase(const char* conninfo)
 	  : PgDatabase(conninfo) {}
 	virtual ~cmDatabase() {}
-
-	inline int getPID() const
-		{ return pgConn->be_pid; }
 };
 
 class Command;

@@ -248,7 +248,6 @@ if (SQLDb->ConnectionBad ())
 else
 	{
 	elog	<< "*** [CMaster]: Connection established to SQL server. "
-			<< "Backend PID: " << SQLDb->getPID()
 			<< endl ;
 	}
 
