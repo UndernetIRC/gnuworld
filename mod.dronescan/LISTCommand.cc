@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: LISTCommand.cc,v 1.10 2003/10/19 20:17:11 jeekay Exp $
+ * $Id: LISTCommand.cc,v 1.11 2004/06/04 22:17:25 jeekay Exp $
  *
  * Display information about things.
  *
@@ -71,8 +71,8 @@ void LISTCommand::Exec( const iClient *theClient, const string& Message , const 
 					);
 			} else {
 				bot->Reply(theClient, "  [   0] (%u) %s",
-					itr->first.c_str(),
-					itr->second->getLastJoin()
+					itr->second->getLastJoin(),
+					itr->first.c_str()
 					);
 			}
 		}
