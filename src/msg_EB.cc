@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_EB.cc,v 1.8 2002/07/16 13:51:12 dan_karrels Exp $
+ * $Id: msg_EB.cc,v 1.9 2002/08/07 20:28:07 dan_karrels Exp $
  */
 
 #include	<sys/types.h>
@@ -33,7 +33,7 @@
 #include	"xparameters.h"
 #include	"ServerCommandHandler.h"
 
-const char msg_EB_cc_rcsId[] = "$Id: msg_EB.cc,v 1.8 2002/07/16 13:51:12 dan_karrels Exp $" ;
+const char msg_EB_cc_rcsId[] = "$Id: msg_EB.cc,v 1.9 2002/08/07 20:28:07 dan_karrels Exp $" ;
 const char server_h_rcsId[] = __SERVER_H ;
 const char iServer_h_rcsId[] = __ISERVER_H ;
 const char events_h_rcsId[] = __EVENTS_H ;
@@ -44,6 +44,7 @@ const char xParameters_h_rcsId[] = __XPARAMETERS_H ;
 namespace gnuworld
 {
 
+using std::clog ;
 using std::endl ;
 
 CREATE_HANDLER(msg_EB)
@@ -88,6 +89,15 @@ if( !strcmp( params[ 0 ], theServer->getUplinkCharYY().c_str() ) )
 	theServer->PostEvent( EVT_BURST_CMPLT,
 		static_cast< void* >( theServer->getUplink() ) ) ;
 
+	if( theServer->isVerbose() )
+		{
+		clog	<< "*** Completed net burst"
+			<< endl ;
+		}
+
+	elog	<< "*** Completed net burst"
+		<< endl ;
+
 	// Send our EB
 	theServer->Write( "%s EB\n", theServer->getCharYY() ) ;
 
@@ -96,9 +106,6 @@ if( !strcmp( params[ 0 ], theServer->getUplinkCharYY().c_str() ) )
 
 	// Is the burstOutputBuffer empty?
 	theServer->WriteBurstBuffer() ;
-
-	elog	<< "*** Completed net burst"
-		<< endl ;
 	}
 else
 	{

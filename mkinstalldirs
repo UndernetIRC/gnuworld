@@ -4,8 +4,6 @@
 # Created: 1993-05-16
 # Public domain
 
-# $Id: mkinstalldirs,v 1.30 2002/07/31 03:14:02 dan_karrels Exp $
-
 errstatus=0
 dirmode=""
 

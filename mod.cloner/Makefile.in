@@ -14,7 +14,7 @@
 
 @SET_MAKE@
 
-# "$Id: Makefile.in,v 1.94 2002/07/31 23:25:48 reedloden Exp $"
+# "$Id: Makefile.in,v 1.95 2002/08/07 20:28:07 dan_karrels Exp $"
 SHELL = @SHELL@
 
 srcdir = @srcdir@
@@ -128,7 +128,7 @@ CXXLD = $(CXX)
 CXXLINK = $(LIBTOOL) --mode=link $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) \
 	$(AM_LDFLAGS) $(LDFLAGS) -o $@
 DIST_SOURCES = $(libcloner_la_SOURCES)
-DIST_COMMON = Makefile.am Makefile.in
+DIST_COMMON = Makefile.am Makefile.in TODO
 SOURCES = $(libcloner_la_SOURCES)
 
 all: all-am

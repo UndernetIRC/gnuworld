@@ -17,11 +17,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ELog.h,v 1.8 2002/07/10 14:40:46 dan_karrels Exp $
+ * $Id: ELog.h,v 1.1 2002/08/07 20:28:06 dan_karrels Exp $
  */
 
 #ifndef __ELOG_H
-#define __ELOG_H "$Id: ELog.h,v 1.8 2002/07/10 14:40:46 dan_karrels Exp $"
+#define __ELOG_H "$Id: ELog.h,v 1.1 2002/08/07 20:28:06 dan_karrels Exp $"
 
 #include	<sstream>
 #include	<iostream>

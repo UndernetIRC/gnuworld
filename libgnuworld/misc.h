@@ -19,11 +19,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: misc.h,v 1.22 2002/07/08 15:47:57 dan_karrels Exp $
+ * $Id: misc.h,v 1.1 2002/08/07 20:28:06 dan_karrels Exp $
  */
 
 #ifndef __MISC_H
-#define __MISC_H "$Id: misc.h,v 1.22 2002/07/08 15:47:57 dan_karrels Exp $"
+#define __MISC_H "$Id: misc.h,v 1.1 2002/08/07 20:28:06 dan_karrels Exp $"
 
 #include	<string>
 

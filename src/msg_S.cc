@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_S.cc,v 1.8 2002/07/10 14:40:48 dan_karrels Exp $
+ * $Id: msg_S.cc,v 1.9 2002/08/07 20:28:07 dan_karrels Exp $
  */
 
 #include	<new>
@@ -34,7 +34,7 @@
 #include	"xparameters.h"
 #include	"ServerCommandHandler.h"
 
-const char msg_S_cc_rcsId[] = "$Id: msg_S.cc,v 1.8 2002/07/10 14:40:48 dan_karrels Exp $" ;
+const char msg_S_cc_rcsId[] = "$Id: msg_S.cc,v 1.9 2002/08/07 20:28:07 dan_karrels Exp $" ;
 const char server_h_rcsId[] = __SERVER_H ;
 const char events_h_rcsId[] = __EVENTS_H ;
 const char Network_h_rcsId[] = __NETWORK_H ;
@@ -113,7 +113,6 @@ if( NULL != Network->findServer( serverIntYY ) )
 	}
 
 // Dun really care about the server description
-
 iServer* newServer = new (std::nothrow) iServer( uplinkIntYY,
 		params[ 6 ], // yxx
 		serverName,
@@ -128,7 +127,9 @@ if( !theServer->isBursting() )
 	}
 
 Network->addServer( newServer ) ;
-//elog << "Added server: " << *newServer << endl ;
+//elog	<< "msg_S> Added server: "
+//	<< *newServer
+//	<< endl ;
 
 theServer->PostEvent( EVT_NETJOIN,
 	static_cast< void* >( newServer ),

@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-## $Id: Makefile.am,v 1.15 2002/07/31 03:14:04 dan_karrels Exp $
+## $Id: Makefile.am,v 1.1 2002/08/07 20:28:06 dan_karrels Exp $
 
 noinst_LTLIBRARIES = libgnuworld.la
 libgnuworld_la_SOURCES = Buffer.cc \

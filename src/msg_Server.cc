@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_Server.cc,v 1.8 2002/07/05 01:10:06 dan_karrels Exp $
+ * $Id: msg_Server.cc,v 1.9 2002/08/07 20:28:07 dan_karrels Exp $
  */
 
 #include	<new>
@@ -34,7 +34,7 @@
 #include	"xparameters.h"
 #include	"ServerCommandHandler.h"
 
-const char msg_Server_cc_rcsId[] = "$Id: msg_Server.cc,v 1.8 2002/07/05 01:10:06 dan_karrels Exp $" ;
+const char msg_Server_cc_rcsId[] = "$Id: msg_Server.cc,v 1.9 2002/08/07 20:28:07 dan_karrels Exp $" ;
 const char server_h_rcsId[] = __SERVER_H ;
 const char events_h_rcsId[] = __EVENTS_H ;
 const char Network_h_rcsId[] = __NETWORK_H ;
@@ -96,18 +96,11 @@ if( Param[ 1 ][ 0 ] == '1' )
 	// We need to add our uplink to network tables.
 
 	// Assume 3 character numerics
-	unsigned int uplinkYY = convert2n[ Param[ 5 ][ 0 ] ] ;
-
-	// Check for n2k, 5 character numerics
-	if( strlen( Param[ 5 ] ) == 5 )
-		{
-		// n2k
-		uplinkYY = base64toint( Param[ 5 ], 2 ) ;
-		}
+	unsigned int uplinkIntYY = base64toint( Param[ 5 ], 2 ) ;
 
 	// Our uplink has its own numeric as its uplinkIntYY.
 	iServer* tmpUplink = new (std::nothrow) iServer( 
-		uplinkYY,
+		uplinkIntYY,
 		Param[ 5 ], // yyxxx
 		Param[ 0 ], // name
 		atoi( Param[ 3 ] ) ) ; // connect time
@@ -129,17 +122,16 @@ if( Param[ 1 ][ 0 ] == '1' )
 
 	// Now that I know my uplink, I can set its numeric
 	// in my own iServer info
-	me->setUplinkIntYY( uplinkYY ) ;
+	me->setUplinkIntYY( uplinkIntYY ) ;
 
 	// We now have a pointer to our own uplink
 	// Add it to the tables
 	// We maintain a local pointer just for speed reasons
 	Network->addServer( theServer->getUplink() ) ;
 
-//	elog	<< "Added server: "
+//	elog	<< "msg_Server> Added server: "
 //		<< *(theServer->getUplink())
 //		<< endl ;
-
 	}
 
 // Not posting message here because this method is only called once

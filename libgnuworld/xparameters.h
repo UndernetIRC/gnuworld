@@ -16,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: xparameters.h,v 1.6 2002/07/05 01:10:05 dan_karrels Exp $
+ * $Id: xparameters.h,v 1.1 2002/08/07 20:28:06 dan_karrels Exp $
  */
 
 #ifndef __XPARAMETERS_H
-#define __XPARAMETERS_H "$Id: xparameters.h,v 1.6 2002/07/05 01:10:05 dan_karrels Exp $"
+#define __XPARAMETERS_H "$Id: xparameters.h,v 1.1 2002/08/07 20:28:06 dan_karrels Exp $"
 
 #include        <vector>
 #include	<cassert>

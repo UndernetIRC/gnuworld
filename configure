@@ -7422,8 +7422,7 @@ CFLAGS="$CFLAGS -Wall -pipe"
 CXXFLAGS="$CXXFLAGS -Wall -pipe"
 
 prefix="`pwd`"
-libdir="`pwd`/bin"
-glibdir="`pwd`/lib"
+glibdir="`pwd`/libgnuworld"
 
 ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
@@ -10540,50 +10539,7 @@ echo "$as_me:$LINENO: result: yes" >&5
 echo "${ECHO_T}yes" >&6
 
 
-CXXFLAGS="$CXXFLAGS -I`pwd`/include -I`pwd`/lib"
-
-hashMapFile=
-
-if test -f "/usr/include/g++/ext/hash_map"; then
-	hashMapFile="/usr/include/g++/ext/hash_map"
-	cat >>confdefs.h <<\_ACEOF
-#define GNU_EXTENSIONS 1
-_ACEOF
-
-elif test -f "/usr/local/include/g++/ext/hash_map"; then
-	hashMapFile="usr/local/include/g++/ext/hash_map";
-	cat >>confdefs.h <<\_ACEOF
-#define GNU_EXTENSIONS 1
-_ACEOF
-
-fi
-
-gccVersion=`\gcc -v 2>&1 | \tail -1 | \cut -d" " -f3`
-
-gccMajor=`echo $gccVersion | \cut -d"." -f1`
-
-if test "$gccMajor" = "3"; then
-	# 3.0.x have ext/hash_map, but std namespace
-	gccMid=`echo $gccVersion | \cut -d"." -f2`
-
-	if test "$gccMid" = "0"; then
-		cat >>confdefs.h <<\_ACEOF
-#define HASHMAPNS std
-_ACEOF
-
-	else
-		# 3.1 or above
-		cat >>confdefs.h <<\_ACEOF
-#define HASHMAPNS __gnu_cxx
-_ACEOF
-
-	fi
-else
-	cat >>confdefs.h <<\_ACEOF
-#define HASHMAPNS std
-_ACEOF
-
-fi
+CXXFLAGS="$CXXFLAGS -I`pwd`/include -I`pwd`/libgnuworld"
 
 echo
 echo "Detecting modules..."
@@ -10639,7 +10595,7 @@ fi
 
 
 
-ac_config_files="$ac_config_files Makefile db/Makefile lib/Makefile src/Makefile mod.ccontrol/Makefile mod.clientExample/Makefile mod.cloner/Makefile mod.cservice/Makefile mod.gnutest/Makefile mod.stats/Makefile"
+ac_config_files="$ac_config_files Makefile db/Makefile libgnuworld/Makefile src/Makefile mod.ccontrol/Makefile mod.clientExample/Makefile mod.cloner/Makefile mod.cservice/Makefile mod.gnutest/Makefile mod.scanner/Makefile mod.stats/Makefile"
 
 
 cat >confcache <<\_ACEOF
@@ -11132,13 +11088,14 @@ do
   # Handling of arguments.
   "Makefile" ) CONFIG_FILES="$CONFIG_FILES Makefile" ;;
   "db/Makefile" ) CONFIG_FILES="$CONFIG_FILES db/Makefile" ;;
-  "lib/Makefile" ) CONFIG_FILES="$CONFIG_FILES lib/Makefile" ;;
+  "libgnuworld/Makefile" ) CONFIG_FILES="$CONFIG_FILES libgnuworld/Makefile" ;;
   "src/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/Makefile" ;;
   "mod.ccontrol/Makefile" ) CONFIG_FILES="$CONFIG_FILES mod.ccontrol/Makefile" ;;
   "mod.clientExample/Makefile" ) CONFIG_FILES="$CONFIG_FILES mod.clientExample/Makefile" ;;
   "mod.cloner/Makefile" ) CONFIG_FILES="$CONFIG_FILES mod.cloner/Makefile" ;;
   "mod.cservice/Makefile" ) CONFIG_FILES="$CONFIG_FILES mod.cservice/Makefile" ;;
   "mod.gnutest/Makefile" ) CONFIG_FILES="$CONFIG_FILES mod.gnutest/Makefile" ;;
+  "mod.scanner/Makefile" ) CONFIG_FILES="$CONFIG_FILES mod.scanner/Makefile" ;;
   "mod.stats/Makefile" ) CONFIG_FILES="$CONFIG_FILES mod.stats/Makefile" ;;
   "depfiles" ) CONFIG_COMMANDS="$CONFIG_COMMANDS depfiles" ;;
   "include/defs.h" ) CONFIG_HEADERS="$CONFIG_HEADERS include/defs.h" ;;

@@ -25,7 +25,7 @@
 #include	"Buffer.h"
 
 const char Buffer_h_rcsId[] = __BUFFER_H ;
-const char Buffer_cc_rcsId[] = "$Id: Buffer.cc,v 1.9 2002/07/16 15:30:49 dan_karrels Exp $" ;
+const char Buffer_cc_rcsId[] = "$Id: Buffer.cc,v 1.1 2002/08/07 20:28:06 dan_karrels Exp $" ;
 
 namespace gnuworld
 {

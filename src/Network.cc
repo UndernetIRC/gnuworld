@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: Network.cc,v 1.46 2002/07/10 14:40:48 dan_karrels Exp $
+ * $Id: Network.cc,v 1.47 2002/08/07 20:28:07 dan_karrels Exp $
  */
 
 #include	<new>
@@ -40,18 +40,9 @@
 #include	"match.h"
 #include	"StringTokenizer.h"
 #include	"ip.h"
-#include	"defs.h"
-
-/*
-#ifdef GNU_EXTENSIONS
- #include       <ext/hash_map>
-#else
- #include       <hash_map>
-#endif
-*/
 
 const char xNetwork_h_rcsId[] = __NETWORK_H ;
-const char xNetwork_cc_rcsId[] = "$Id: Network.cc,v 1.46 2002/07/10 14:40:48 dan_karrels Exp $" ;
+const char xNetwork_cc_rcsId[] = "$Id: Network.cc,v 1.47 2002/08/07 20:28:07 dan_karrels Exp $" ;
 const char ELog_h_rcsId[] = __ELOG_H ;
 const char iClient_h_rcsId[] = __ICLIENT_H ;
 const char Channel_h_rcsId[] = __CHANNEL_H ;
@@ -65,8 +56,6 @@ namespace gnuworld
 {
 
 using std::map ;
-//using HASHMAPNS::hash ;
-//using HASHMAPNS::hash_map ;
 using std::string ;
 using std::endl ;
 using std::list ;
@@ -151,9 +140,16 @@ if( !serverMap.insert( serverMapType::value_type(
 	newServer->getIntYY(), newServer ) ).second )
 	{
 	elog	<< "xNetwork::addServer> Insert into serverMap failed"
+		<< " for server: "
+		<< *newServer
 		<< endl ;
 	return false ;
 	}
+
+//elog	<< "xNetwork::addServer> Added server: "
+//	<< *newServer
+//	<< endl ;
+
 return true ;
 }
 

@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server.cc,v 1.145 2002/08/06 18:48:04 dan_karrels Exp $
+ * $Id: server.cc,v 1.146 2002/08/07 20:28:07 dan_karrels Exp $
  */
 
 #include	<sys/time.h>
@@ -72,7 +72,7 @@
 #include	"Connection.h"
 
 const char server_h_rcsId[] = __SERVER_H ;
-const char server_cc_rcsId[] = "$Id: server.cc,v 1.145 2002/08/06 18:48:04 dan_karrels Exp $" ;
+const char server_cc_rcsId[] = "$Id: server.cc,v 1.146 2002/08/07 20:28:07 dan_karrels Exp $" ;
 const char config_h_rcsId[] = __CONFIG_H ;
 const char misc_h_rcsId[] = __MISC_H ;
 const char events_h_rcsId[] = __EVENTS_H ;
@@ -282,10 +282,10 @@ intYY = atoi( conf.Require( "numeric" )->second.c_str() ) ;
 intXXX = atoi( conf.Require( "maxclients" )->second.c_str() ) ;
 commandMapFileName = conf.Require( "command_map" )->second ;
 
-commandHandlerPrefix = conf.Require( "command_handler_path" )->second ;
-if( commandHandlerPrefix[ commandHandlerPrefix.size() - 1 ] != '/' )
+libPrefix = conf.Require( "libdir" )->second ;
+if( libPrefix[ libPrefix.size() - 1 ] != '/' )
 	{
-	commandHandlerPrefix += '/' ;
+	libPrefix += '/' ;
 	}
 
 glineUpdateInterval = static_cast< time_t >( atoi(
@@ -345,12 +345,12 @@ while( std::getline( commandMapFile, line ) )
 
 	// We need the entire path to the command handler in the
 	// fileName.
-	if( string::npos == fileName.find( commandHandlerPrefix ) )
+	if( string::npos == fileName.find( libPrefix ) )
 		{
 		// Need to put the command handler path prefix in
 		// the filename
-		// commandHandlerPrefix has a trailing '/'
-		fileName = commandHandlerPrefix + fileName ;
+		// libPrefix has a trailing '/'
+		fileName = libPrefix + fileName ;
 		}
 
 	// All module names end with ".la" for libtool libraries
@@ -481,13 +481,22 @@ for( ; ptr != conf.end() && ptr->first == "module" ; ++ptr )
 		<< ")"
 		<< endl;
 
+	string fileName = modInfo[ 0 ] ;
+	if( '/' != fileName[ 0 ] )
+		{
+		// Relative path, prepend the libPrefix to the fileName
+		// libPrefix is guaranteed to end with '/'
+		fileName = libPrefix + modInfo[ 0 ] ;
+		}
+
 	// The AttachClient method will load the client from the
 	// file.
-	if( !AttachClient( modInfo[ 0 ], modInfo[ 1 ] ) )
+	if( !AttachClient( fileName, modInfo[ 1 ] ) )
 		{
 		// No need for error output here because AttachClient()
 		// will do that for us
-		elog	<< "xServer::loadClients> Failed to attach client"
+		elog	<< "xServer::loadClients> Failed to attach client: "
+			<< fileName
 			<< endl ;
 
 		return false ;
@@ -526,7 +535,7 @@ Version = 10 ;
 // Initialize the connection time variable to current time.
 ConnectionTime = ::time( NULL ) ;
 
-clog	<< "Connected!"
+clog	<< "  Connected!"
 	<< endl ;
 
 elog	<< "*** Connected to "
@@ -1738,8 +1747,11 @@ vsnprintf( buffer, 4096, format, _list ) ;
 va_end( _list ) ;
 
 #ifdef EDEBUG
+if( verbose )
+	{
 	// Output the string to the console.
 	cout << "[OUT]: " << buffer  ;
+	}
 
 	// Do we need to newline terminate it?
 	if( buffer[ strlen( buffer ) - 1 ] != '\n' )
@@ -1796,8 +1808,11 @@ vsnprintf( buffer, 4096, format, _list ) ;
 va_end( _list ) ;
 
 #ifdef EDEBUG
+if( verbose )
+	{
 	// Output the string to the console.
 	cout << "[OUT]: " << buffer  ;
+	}
 
 	// Do we need to newline terminate it?
 	if( buffer[ strlen( buffer ) - 1 ] != '\n' )

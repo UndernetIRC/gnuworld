@@ -1,10 +1,10 @@
-dnl $Id: configure.in,v 1.57 2002/07/31 22:09:00 reedloden Exp $
+dnl $Id: configure.in,v 1.58 2002/08/07 20:28:04 dan_karrels Exp $
 dnl ----------------------------------------------------------
 
 echo Configuring GNUWorld...
 echo
 
-AC_REVISION($Revision: 1.57 $)
+AC_REVISION($Revision: 1.58 $)
 AC_INIT
 AC_CONFIG_SRCDIR([src/main.cc])
 AM_INIT_AUTOMAKE(gnuworld,0.0)
@@ -32,8 +32,7 @@ CFLAGS="$CFLAGS -Wall -pipe"
 CXXFLAGS="$CXXFLAGS -Wall -pipe"
 
 prefix="`pwd`"
-libdir="`pwd`/bin"
-glibdir="`pwd`/lib"
+glibdir="`pwd`/libgnuworld"
 
 AC_PROG_CC
 AC_PROG_CXX
@@ -196,38 +195,7 @@ dnl echo "PGSQL_INCLUDE: $PGSQL_INCLUDE"
 dnl echo "PGSQL_LIB: $PGSQL_LIB"
 dnl exit
 
-CXXFLAGS="$CXXFLAGS -I`pwd`/include -I`pwd`/lib"
-
-hashMapFile=
-
-if [test -f "/usr/include/g++/ext/hash_map"]; then
-	hashMapFile="/usr/include/g++/ext/hash_map"
-	AC_DEFINE(GNU_EXTENSIONS)
-elif [test -f "/usr/local/include/g++/ext/hash_map"]; then
-	hashMapFile="usr/local/include/g++/ext/hash_map";
-	AC_DEFINE(GNU_EXTENSIONS)
-fi
-
-gccVersion=`\gcc -v 2>&1 | \tail -1 | \cut -d" " -f3`
-dnl echo gccVersion: $gccVersion
-
-gccMajor=`echo $gccVersion | \cut -d"." -f1`
-dnl echo gccMajor: $gccMajor
-
-if [test "$gccMajor" = "3"]; then
-	# 3.0.x have ext/hash_map, but std namespace
-	gccMid=`echo $gccVersion | \cut -d"." -f2`
-dnl	echo gccMid: $gccMid
-
-	if [test "$gccMid" = "0"]; then
-		AC_DEFINE(HASHMAPNS, std)
-	else
-		# 3.1 or above
-		AC_DEFINE(HASHMAPNS, __gnu_cxx)
-	fi
-else
-	AC_DEFINE(HASHMAPNS, std)
-fi
+CXXFLAGS="$CXXFLAGS -I`pwd`/include -I`pwd`/libgnuworld"
 
 echo
 echo "Detecting modules..."
@@ -291,12 +259,16 @@ AC_SUBST(PGSQL_INCLUDE)
 AC_SUBST(PGSQL_LIB)
 AC_SUBST(bindir)
 
-AC_CONFIG_FILES([Makefile db/Makefile lib/Makefile src/Makefile \
+AC_CONFIG_FILES([Makefile \
+db/Makefile \
+libgnuworld/Makefile \
+src/Makefile \
 mod.ccontrol/Makefile \
 mod.clientExample/Makefile \
 mod.cloner/Makefile \
 mod.cservice/Makefile \
 mod.gnutest/Makefile \
+mod.scanner/Makefile \
 mod.stats/Makefile])
 
 AC_OUTPUT

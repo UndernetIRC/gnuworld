@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server.h,v 1.74 2002/08/06 18:48:04 dan_karrels Exp $
+ * $Id: server.h,v 1.75 2002/08/07 20:28:05 dan_karrels Exp $
  */
 
 #ifndef __SERVER_H
-#define __SERVER_H "$Id: server.h,v 1.74 2002/08/06 18:48:04 dan_karrels Exp $"
+#define __SERVER_H "$Id: server.h,v 1.75 2002/08/07 20:28:05 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
@@ -641,6 +641,12 @@ public:
 	virtual bool isConnected() const
 		{ return (serverConnection != 0) ; }
 
+	/**
+	 * Return true if verbosity is enabled.
+	 */
+	virtual bool isVerbose() const
+		{ return verbose ; }
+
 	/* Numeric utility methods */
 
 	/**
@@ -1217,10 +1223,10 @@ protected:
 	string			commandMapFileName ;
 
 	/**
-	 * The path prefix to the command handler, of the form
-	 * "/path/to/command/map/file"
+	 * The path prefix to the gnuworld libraries, of the form
+	 * "/path/to/lib/dir"
 	 */
-	string			commandHandlerPrefix ;
+	string			libPrefix ;
 
 	/**
 	 * Burst() is called when the network connection is

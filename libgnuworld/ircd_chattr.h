@@ -16,7 +16,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- * $Id: ircd_chattr.h,v 1.1 2001/01/12 22:16:21 dan_karrels Exp $
+ * $Id: ircd_chattr.h,v 1.1 2002/08/07 20:28:06 dan_karrels Exp $
  *
  */
 /*

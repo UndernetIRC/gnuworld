@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ELog.cc,v 1.7 2002/07/10 14:40:46 dan_karrels Exp $
+ * $Id: ELog.cc,v 1.1 2002/08/07 20:28:06 dan_karrels Exp $
  */
 
 #include	<iostream>
@@ -30,7 +30,7 @@
 #include	"ELog.h"
 
 const char ELog_h_rcsId[] = __ELOG_H ;
-const char ELog_cc_rcsId[] = "$Id: ELog.cc,v 1.7 2002/07/10 14:40:46 dan_karrels Exp $" ;
+const char ELog_cc_rcsId[] = "$Id: ELog.cc,v 1.1 2002/08/07 20:28:06 dan_karrels Exp $" ;
 const char config_h_rcsId[] = __CONFIG_H ;
 
 namespace gnuworld

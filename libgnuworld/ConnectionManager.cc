@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ConnectionManager.cc,v 1.20 2002/08/06 18:48:04 dan_karrels Exp $
+ * $Id: ConnectionManager.cc,v 1.1 2002/08/07 20:28:06 dan_karrels Exp $
  */
 
 #include	<unistd.h>
@@ -116,11 +116,11 @@ if( host.empty() )
 	return 0 ;
 	}
 
-cout	<< "Connect> "
-	<< host
-	<< ":"
-	<< remotePort
-	<< endl ;
+//cout	<< "Connect> "
+//	<< host
+//	<< ":"
+//	<< remotePort
+//	<< endl ;
 
 // Allocate a new Connection object
 Connection* newConnection = new (nothrow)
@@ -1506,9 +1506,9 @@ if( fileName.empty() )
 	return 0 ;
 	}
 
-elog	<< "Connecting to file: "
-	<< fileName
-	<< endl ;
+//elog	<< "Connecting to file: "
+//	<< fileName
+//	<< endl ;
 
 int fd = ::open( fileName.c_str(), O_CREAT ) ;
 if( fd < 0 )

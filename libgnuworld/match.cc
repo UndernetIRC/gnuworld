@@ -16,7 +16,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- * $Id: match.cc,v 1.5 2001/07/17 13:42:51 dan_karrels Exp $
+ * $Id: match.cc,v 1.1 2002/08/07 20:28:06 dan_karrels Exp $
  */
 #include	"match.h"
 

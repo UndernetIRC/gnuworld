@@ -12,7 +12,7 @@ lib_msg_D D
 lib_msg_DS DS
 lib_msg_EA EA
 lib_msg_EB EB
-lib_msg_Error Error
+lib_msg_Error ERROR
 lib_msg_G G
 lib_msg_GL GL
 lib_msg_I I
@@ -30,7 +30,7 @@ lib_msg_P P
 lib_msg_Q Q
 lib_msg_R R
 lib_msg_S S
-lib_msg_Server Server
+lib_msg_Server SERVER
 lib_msg_SQ SQ
 lib_msg_T T
 lib_msg_WA WA

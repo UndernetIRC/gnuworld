@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: Connection.h,v 1.12 2002/08/06 18:48:04 dan_karrels Exp $
+ * $Id: Connection.h,v 1.1 2002/08/07 20:28:06 dan_karrels Exp $
  */
 
 #ifndef __CONNECTION_H
-#define __CONNECTION_H "$Id: Connection.h,v 1.12 2002/08/06 18:48:04 dan_karrels Exp $"
+#define __CONNECTION_H "$Id: Connection.h,v 1.1 2002/08/07 20:28:06 dan_karrels Exp $"
 
 #include	<sys/types.h>
 #include	<netinet/in.h>

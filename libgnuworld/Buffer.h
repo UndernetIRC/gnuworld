@@ -23,7 +23,7 @@
  */
 
 #ifndef __BUFFER_H
-#define __BUFFER_H "$Id: Buffer.h,v 1.6 2002/07/16 13:51:12 dan_karrels Exp $"
+#define __BUFFER_H "$Id: Buffer.h,v 1.1 2002/08/07 20:28:06 dan_karrels Exp $"
 
 #include	<iostream>
 #include	<string>

@@ -1,6 +1,6 @@
 /**********************************************************************
  * $Workfile: MD5.H $
- * $Revision: 1.3 $
+ * $Revision: 1.1 $
  *  $Modtime: 1/08/97 6:35p $
  *
  * PURPOSE:
@@ -59,7 +59,7 @@
  * So there! 
  **********************************************************************/
 #ifndef MD5_H
-#define MD5_H "$Id: md5hash.h,v 1.3 2001/07/29 22:44:06 dan_karrels Exp $"
+#define MD5_H "$Id: md5hash.h,v 1.1 2002/08/07 20:28:06 dan_karrels Exp $"
 
 #include <iostream>
  

@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: EConfig.cc,v 1.8 2002/05/27 17:18:12 dan_karrels Exp $
+ * $Id: EConfig.cc,v 1.1 2002/08/07 20:28:06 dan_karrels Exp $
  */
 
 #include	<string>
@@ -33,7 +33,7 @@
 #include	"misc.h"
 
 const char EConfig_h_rcsId[] = __ECONFIG_H ;
-const char EConfig_cc_rcsId[] = "$Id: EConfig.cc,v 1.8 2002/05/27 17:18:12 dan_karrels Exp $" ;
+const char EConfig_cc_rcsId[] = "$Id: EConfig.cc,v 1.1 2002/08/07 20:28:06 dan_karrels Exp $" ;
 const char StringTokenizer_h_rcsId[] = __STRINGTOKENIZER_H ;
 const char ELog_h_rcsId[] = __ELOG_H ;
 const char misc_h_rcsId[] = __MISC_H ;
