@@ -23,7 +23,7 @@
 #include	"AuthInfo.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.27 2001/05/01 18:44:39 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.28 2001/05/01 19:52:50 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -771,6 +771,31 @@ bool ccontrol::DeleteOper (const string& Name)
 {
 //    strstream Condition;
 //    Condition << "WHERE user_id = " << Id << ';';
+ExecStatusType status;
+ccUser* tUser = GetUser(Name.c_str());
+//Delete the user hosts
+if(tUser)
+    {
+    static const char *tMain = "DELETE FROM hosts WHERE User_Id = ";    
+    strstream HostQ;
+    HostQ << tMain;
+    HostQ << tUser->getID();
+    HostQ << ends;
+    status = SQLDb->Exec( HostQ.str() ) ;
+elog	<< "ccontrol::DeleteOper> "
+	<< HostQ.str()
+	<< endl; 
+
+    delete[] HostQ.str();
+if( PGRES_COMMAND_OK != status ) 
+	{
+	elog	<< "ccontrol::DeleteOper> SQL Failure: "
+		<< SQLDb->ErrorMessage()
+		<< endl ;
+	return false;
+	}
+	delete tUser;
+    }    
 
 static const char *Main = "DELETE FROM opers WHERE lower(user_name) = '";
 
@@ -784,7 +809,7 @@ elog	<< "ccontrol::DeleteOper> "
 	<< theQuery.str()
 	<< endl; 
 
-ExecStatusType status = SQLDb->Exec( theQuery.str() ) ;
+status = SQLDb->Exec( theQuery.str() ) ;
 delete[] theQuery.str() ;
 
 if( PGRES_COMMAND_OK == status ) 
