@@ -44,7 +44,7 @@
 #include	"ServerTimerHandlers.h"
 
 const char xServer_h_rcsId[] = __XSERVER_H ;
-const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.60 2001/01/31 21:10:37 dan_karrels Exp $" ;
+const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.61 2001/01/31 21:31:26 dan_karrels Exp $" ;
 
 using std::string ;
 using std::vector ;
@@ -3179,8 +3179,10 @@ if( 0 == postJoinTime )
 	}
 
 Channel* theChan = Network->findChannel( chanName ) ;
-if( theChan != NULL )
+if( theChan && (0 == joinTime) )
 	{
+	// If the channel exists, and 0 is passed as our join
+	// time, then just use the channel's creation time
 	postJoinTime = theChan->getCreationTime() ;
 	}
 
@@ -3259,11 +3261,10 @@ else if( bursting )
 		removeAllChanModes( theChan ) ;
 		}
 
-
-	// TODO: If the timestamp we are bursting is less than the existing one,
-	// we need to set the our Network channel state to match that supplied
-	// in this line. (Because we are authoritive in this channel, any existing
-	// modes will be removed by ircu).
+	// TODO: If the timestamp we are bursting is less than the
+	// existing one, we need to set the our Network channel state to
+	// match that supplied in this line. (Because we are authoritive
+	// in this channel, any existing modes will be removed by ircu).
 	strstream s ;
 	s	<< getCharYY() << " B " << chanName << ' '
 		<< postJoinTime << ' '
