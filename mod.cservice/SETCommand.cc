@@ -14,7 +14,7 @@
  *
  * Caveats: None.
  *
- * $Id: SETCommand.cc,v 1.26 2001/02/20 23:40:45 gte Exp $
+ * $Id: SETCommand.cc,v 1.27 2001/02/21 19:05:55 gte Exp $
  */
 
 #include	<string>
@@ -26,7 +26,7 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char SETCommand_cc_rcsId[] = "$Id: SETCommand.cc,v 1.26 2001/02/20 23:40:45 gte Exp $" ;
+const char SETCommand_cc_rcsId[] = "$Id: SETCommand.cc,v 1.27 2001/02/21 19:05:55 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -851,12 +851,12 @@ if(option == "NOREG")
                                         string("You do not have enough access!")));
 			return true;
 	    }
-	    if(strlen(value.c_str()) > 80) // is 80 ok as an max url length?
+	    if(strlen(value.c_str()) > 75) // Gator - changed to 75
 	    {
 			bot->Notice(theClient, 
 				bot->getResponse(theUser,
 					language::url_max_len,
-					string("The URL can be a maximum of 80 chars!")));
+					string("The URL can be a maximum of 75 chars!")));
 			return true;
 	    }
 		theChan->setURL(url);
