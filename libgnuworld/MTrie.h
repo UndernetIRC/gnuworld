@@ -1,7 +1,7 @@
 /**
  * MTrie.h
  *
- * $Id: MTrie.h,v 1.3 2003/07/21 16:05:21 dan_karrels Exp $
+ * $Id: MTrie.h,v 1.4 2003/07/22 16:20:24 dan_karrels Exp $
  */
 
 #ifndef __MTRIE_H
@@ -38,7 +38,7 @@ public:
 	 * memory, but will not touch data stored here on behalf
 	 * the client.
 	 */
-	~MTrie() ;
+	virtual ~MTrie() ;
 
 	typedef _valueT		data_type ;
 
@@ -66,16 +66,23 @@ public:
 
 protected:
 
-	list< value_type >	wildCardFind( const string& key ) const ;
+	virtual void	wildCardFind( list< value_type >&,
+				const string& key ) const ;
+
 	string			getBase( const list< string >& ) const ;
 
-/*
-	void		recursiveFind( MTrie< value_type >*,
+	// wild card
+	virtual void	recursiveFind( const MTrie< data_type >*,
 				list< string >& base,
 				list< value_type >& returnMe,
-				string& searchPrefix,
-				list< string >& remainingTokens ) const ;
-*/
+				const string& key ) const ;
+
+	// question mark
+	virtual void	recursiveFind( const MTrie< data_type >*,
+				list< string >& base,
+				list< value_type >& returnMe,
+				list< string >& ) const ;
+
 	/// The number of elements stored in this MTrie
 	size_type		numElements ;
 
