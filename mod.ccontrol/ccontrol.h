@@ -3,7 +3,7 @@
  */
 
 #ifndef __CCONTROL_H
-#define __CCONTROL_H "$Id: ccontrol.h,v 1.4 2001/01/31 23:15:26 dan_karrels Exp $"
+#define __CCONTROL_H "$Id: ccontrol.h,v 1.5 2001/02/20 22:26:58 mrbean_ Exp $"
 
 #include	<string>
 #include	<vector>
@@ -16,6 +16,25 @@
 #include	"server.h"
 #include	"CControlCommands.h"
 #include	"Channel.h"
+#include	"libpq++.h"
+#include	"libpq-int.h"
+#include        "match.h"
+#include	"md5hash.h" 
+#include        <iomanip.h>
+
+class PgDatabase; 
+
+/*
+ *  Sublcass the postgres API to create our own accessor
+ *  to get at the PID information.
+ */
+
+class cmDatabase : public PgDatabase {
+public:
+	cmDatabase(const char* conninfo) : PgDatabase(conninfo) {}
+	inline int getPID()
+		{ return pgConn->be_pid; }
+};
 
 using std::string ;
 using std::vector ;
@@ -50,6 +69,10 @@ protected:
 	typedef commandMapType::value_type pairType ;
 
 public:
+	cmDatabase* SQLDb; /* PostgreSQL Database */
+	AuthInfo *AuthList; //Holds the authenticated user list
+        AuthInfo *AuthEnd;	
+
 	/**
 	 * Default, and only constructor, receives the name
 	 * of the configuration file for this client.
@@ -180,6 +203,42 @@ public:
 	 * is already in the channel.
 	 */
 	virtual bool removeOperChan( const string& ) ;
+
+        AuthInfo *IsAuth( const string& );
+	
+	AuthInfo *IsAuth( const int );
+       
+        User *GetUser( const string& );
+	
+	User *GetUser( const int );
+	
+	User *GetParm();
+        
+	bool AddOper( User* );
+	
+	bool DeleteOper( const string& );
+	
+	bool UpdateOper( User* );
+	
+	bool AuthUser( User* );
+	
+	int getCommandLevel( const string& );
+	
+	bool deAuthUser( const string& );
+
+	bool UserGotMask( User* , string );
+
+	bool UserGotHost( User* , string );
+	
+	string CryptPass( string );
+
+	virtual bool validUserMask(const string& userMask) const ;
+
+        bool AddHost( User* , string host );
+
+        bool DelHost( User* , string host );
+	
+	void UpdateAuth( int );
 
 	/**
 	 * This is a constant iterator type used to perform a read-only

@@ -25,17 +25,18 @@ class Command
 
 public:
 	Command( ccontrol* _bot, const string& _commName,
-		const string& _help )
+		const string& _help, const int _flags)
 	 : bot( _bot ),
 	   server( 0 ),
 	   commName( _commName ),
-	   help( _help )
+	   help( _help ),
+	   Flags ( _flags )
 	{}
 	virtual ~Command() {}
 
 	/// Exec returns true if the command was successfully
 	/// executed, false otherwise.
-	virtual bool Exec( iClient*, const string& ) = 0 ;
+	virtual bool Exec( iClient*, const string&) = 0 ;
 
 	void	setServer( xServer* _server )
 		{ server = _server ; }
@@ -47,12 +48,15 @@ public:
 		{ return commName ; }
 	inline const string& getHelp() const
 		{ return help ; }
+        inline const int getFlags() const
+	        { return Flags ; }	
 
 protected:
 	ccontrol*	bot ;
 	xServer*	server ;
 	string		commName ;
 	string		help ;
+	int             Flags;
 
 } ;
 
@@ -62,10 +66,11 @@ class commName##Command : public Command \
 public: \
 	commName##Command( ccontrol* _bot, \
 		const string& _commName, \
-		const string& _help ) \
-	: Command( _bot, _commName, _help ) \
+		const string& _help,  \
+	        int _flags ) \
+	: Command( _bot, _commName, _help,_flags) \
 	{} \
-	virtual bool Exec( iClient*, const string& ) ; \
+	virtual bool Exec( iClient*, const string&) ; \
 	virtual ~commName##Command() {} \
 } ;
 
@@ -83,8 +88,96 @@ DECLARE_COMMAND( ADDOPERCHAN )
 DECLARE_COMMAND( REMOPERCHAN )
 DECLARE_COMMAND( LISTOPERCHANS )
 DECLARE_COMMAND( CHANINFO )
-
+// Added for levels
+DECLARE_COMMAND( ACCESS )
+DECLARE_COMMAND( LOGIN )
+DECLARE_COMMAND( DEAUTH )
+DECLARE_COMMAND( ADDNEWOPER )
+DECLARE_COMMAND( REMOVEOPER )
+DECLARE_COMMAND( ADDCOMMAND )
+DECLARE_COMMAND( REMOVECOMMAND )
+DECLARE_COMMAND( NEWPASS )
+DECLARE_COMMAND( SUSPENDOPER )
+DECLARE_COMMAND( UNSUSPENDOPER )
+DECLARE_COMMAND( MODOPER )
 } // namespace gnuworld
 } // namespace ccontrolns
+
+/*
+ Patch for uworld commands level 
+ Added by : |MrBean| (MrBean@toughguy.net)
+
+ These are the commands flags 
+ To enable a command for an oper he must have the command 
+ flag set in his access 
+ 
+ **NOTE** Commands with access 0 can be accessed without loginin first  
+ 
+
+*/
+
+const int flg_ACCESS   = 0x00; 
+const int flg_HELP     = 0x00;
+const int flg_LOGIN    = 0x00;
+const int flg_NEWPASS  = 0x00;
+const int flg_MODE     = 0x01;
+const int flg_INVITE   = 0x02;
+const int flg_JUPE     = 0x04;
+const int flg_GLINE    = 0x08;
+const int flg_SGLINE   = 0x08;
+const int flg_REMGLINE = 0x08;
+const int flg_REMOPCHN = 0x10;
+const int flg_ADDOPCHN = 0x10;
+const int flg_LOPCHN   = 0x10;
+const int flg_CHINFO   = 0x20;
+const int flg_WHOIS    = 0x40;
+const int flg_ADDNOP   = 0x80;
+const int flg_REMOP    = 0x80;
+const int flg_MODOP    = 0x80;
+const int flg_TRANS    = 0x100;
+const int flg_KICK     = 0x200;
+const int flg_ADDCMD   = 0x400; 
+const int flg_DELCMD   = 0x400;
+const int flg_SUSPEND  = 0x800;
+const int flg_UNSUSPEND  = 0x800;
+
+/*
+ Default commands that are added upon adding a new oper
+*/
+
+const int OPER = flg_MODE | flg_INVITE | flg_GLINE | flg_CHINFO | flg_WHOIS | flg_TRANS | flg_KICK;
+const int ADMIN = OPER | flg_ADDOPCHN | flg_ADDNOP | flg_ADDCMD | flg_SUSPEND;
+const int CODER = ADMIN;
+
+//Oper flags 
+
+const int isSUSPENDED = 0x01;
+const int isOPER      = 0x02;
+const int isADMIN     = 0x04;
+const int isCODER     = 0x08;
+
+
+typedef struct AuthStruct {
+    string Name;
+    int Id;
+    int Access;
+    int Flags;
+    string Numeric;
+    int SuspendExpires;
+    string SuspendedBy;
+    struct AuthStruct *Next,*Prev;
+} AuthInfo;
+
+typedef struct UserInfo {
+    int Id;
+    string UserName;
+    string Password;
+    string last_updated_by;
+    string Numeric;
+    int SuspendExpires;
+    string SuspendedBy;
+    int Access;
+    int Flags;
+} User;
 
 #endif // __CCONTROLCOMMANDS_H
