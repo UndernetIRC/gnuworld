@@ -1,4 +1,4 @@
-# Makefile.in generated automatically by automake 1.4 from Makefile.am
+# Makefile.in generated automatically by automake 1.4-p2 from Makefile.am
 
 # Copyright (C) 1994, 1995-8, 1999 Free Software Foundation, Inc.
 # This Makefile.in is free software; the Free Software Foundation
@@ -10,7 +10,7 @@
 # even the implied warranty of MERCHANTABILITY or FITNESS FOR A
 # PARTICULAR PURPOSE.
 
-# "$Id: Makefile.in,v 1.42 2001/07/21 15:06:24 isomer Exp $"
+# "$Id: Makefile.in,v 1.43 2001/07/28 20:12:01 dan_karrels Exp $"
 
 
 SHELL = @SHELL@
@@ -68,6 +68,8 @@ CPP = @CPP@
 CXX = @CXX@
 CXXFLAGS = @CXXFLAGS@
 DLLTOOL = @DLLTOOL@
+ECHO = @ECHO@
+EXEEXT = @EXEEXT@
 INCLTDL = @INCLTDL@
 LDFLAGS = @LDFLAGS@
 LIBLTDL = @LIBLTDL@
@@ -78,11 +80,13 @@ LN_S = @LN_S@
 MAKEINFO = @MAKEINFO@
 MOD_DIRS = @MOD_DIRS@
 OBJDUMP = @OBJDUMP@
+OBJEXT = @OBJEXT@
 PACKAGE = @PACKAGE@
 PGSQL_INCLUDE = @PGSQL_INCLUDE@
 PGSQL_LIB = @PGSQL_LIB@
 RANLIB = @RANLIB@
 SRC_PATH = @SRC_PATH@
+STRIP = @STRIP@
 VERSION = @VERSION@
 bindir = @bindir@
 glibdir = @glibdir@
@@ -112,7 +116,7 @@ DIST_COMMON =  Makefile.am Makefile.in
 
 DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
-TAR = tar
+TAR = gtar
 GZIP_ENV = --best
 DEP_FILES =  .deps/cloner.P
 SOURCES = $(libcloner_la_SOURCES)
@@ -120,7 +124,7 @@ OBJECTS = $(libcloner_la_OBJECTS)
 
 all: all-redirect
 .SUFFIXES:
-.SUFFIXES: .S .c .cc .lo .o .s
+.SUFFIXES: .S .c .cc .lo .o .obj .s
 $(srcdir)/Makefile.in: Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4) 
 	cd $(top_srcdir) && $(AUTOMAKE) --gnu mod.cloner/Makefile
 
@@ -154,6 +158,11 @@ uninstall-libLTLIBRARIES:
 	  $(LIBTOOL)  --mode=uninstall rm -f $(DESTDIR)$(libdir)/$$p; \
 	done
 
+# FIXME: We should only use cygpath when building on Windows,
+# and only if it is available.
+.c.obj:
+	$(COMPILE) -c `cygpath -w $<`
+
 .s.o:
 	$(COMPILE) -c $<
 
@@ -162,6 +171,7 @@ uninstall-libLTLIBRARIES:
 
 mostlyclean-compile:
 	-rm -f *.o core *.core
+	-rm -f *.$(OBJEXT)
 
 clean-compile:
 
@@ -190,6 +200,8 @@ libcloner.la: $(libcloner_la_OBJECTS) $(libcloner_la_DEPENDENCIES)
 	$(CXXLINK) -rpath $(libdir) $(libcloner_la_LDFLAGS) $(libcloner_la_OBJECTS) $(libcloner_la_LIBADD) $(LIBS)
 .cc.o:
 	$(CXXCOMPILE) -c $<
+.cc.obj:
+	$(CXXCOMPILE) -c `cygpath -w $<`
 .cc.lo:
 	$(LTCXXCOMPILE) -c $<
 

@@ -1,4 +1,4 @@
-# Makefile.in generated automatically by automake 1.4 from Makefile.am
+# Makefile.in generated automatically by automake 1.4-p2 from Makefile.am
 
 # Copyright (C) 1994, 1995-8, 1999 Free Software Foundation, Inc.
 # This Makefile.in is free software; the Free Software Foundation
@@ -10,7 +10,7 @@
 # even the implied warranty of MERCHANTABILITY or FITNESS FOR A
 # PARTICULAR PURPOSE.
 
-# "$Id: Makefile.in,v 1.61 2001/07/26 20:12:40 mrbean_ Exp $"
+# "$Id: Makefile.in,v 1.62 2001/07/28 20:12:01 dan_karrels Exp $"
 
 
 SHELL = @SHELL@
@@ -68,6 +68,8 @@ CPP = @CPP@
 CXX = @CXX@
 CXXFLAGS = @CXXFLAGS@
 DLLTOOL = @DLLTOOL@
+ECHO = @ECHO@
+EXEEXT = @EXEEXT@
 INCLTDL = @INCLTDL@
 LDFLAGS = @LDFLAGS@
 LIBLTDL = @LIBLTDL@
@@ -78,11 +80,13 @@ LN_S = @LN_S@
 MAKEINFO = @MAKEINFO@
 MOD_DIRS = @MOD_DIRS@
 OBJDUMP = @OBJDUMP@
+OBJEXT = @OBJEXT@
 PACKAGE = @PACKAGE@
 PGSQL_INCLUDE = @PGSQL_INCLUDE@
 PGSQL_LIB = @PGSQL_LIB@
 RANLIB = @RANLIB@
 SRC_PATH = @SRC_PATH@
+STRIP = @STRIP@
 VERSION = @VERSION@
 bindir = @bindir@
 glibdir = @glibdir@
@@ -153,7 +157,7 @@ OBJECTS = $(libccontrol_la_OBJECTS)
 
 all: all-redirect
 .SUFFIXES:
-.SUFFIXES: .S .c .cc .lo .o .s
+.SUFFIXES: .S .c .cc .lo .o .obj .s
 $(srcdir)/Makefile.in: Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4) 
 	cd $(top_srcdir) && $(AUTOMAKE) --gnu mod.ccontrol/Makefile
 
@@ -187,6 +191,11 @@ uninstall-libLTLIBRARIES:
 	  $(LIBTOOL)  --mode=uninstall rm -f $(DESTDIR)$(libdir)/$$p; \
 	done
 
+# FIXME: We should only use cygpath when building on Windows,
+# and only if it is available.
+.c.obj:
+	$(COMPILE) -c `cygpath -w $<`
+
 .s.o:
 	$(COMPILE) -c $<
 
@@ -195,6 +204,7 @@ uninstall-libLTLIBRARIES:
 
 mostlyclean-compile:
 	-rm -f *.o core *.core
+	-rm -f *.$(OBJEXT)
 
 clean-compile:
 
@@ -223,6 +233,8 @@ libccontrol.la: $(libccontrol_la_OBJECTS) $(libccontrol_la_DEPENDENCIES)
 	$(CXXLINK) -rpath $(libdir) $(libccontrol_la_LDFLAGS) $(libccontrol_la_OBJECTS) $(libccontrol_la_LIBADD) $(LIBS)
 .cc.o:
 	$(CXXCOMPILE) -c $<
+.cc.obj:
+	$(CXXCOMPILE) -c `cygpath -w $<`
 .cc.lo:
 	$(LTCXXCOMPILE) -c $<
 
@@ -268,7 +280,7 @@ distdir: $(DISTFILES)
 	@for file in $(DISTFILES); do \
 	  d=$(srcdir); \
 	  if test -d $$d/$$file; then \
-	    cp -pr $$/$$file $(distdir)/$$file; \
+	    cp -pr $$d/$$file $(distdir)/$$file; \
 	  else \
 	    test -f $(distdir)/$$file \
 	    || ln $$d/$$file $(distdir)/$$file 2> /dev/null \

@@ -1,10 +1,10 @@
-dnl $Id: configure.in,v 1.28 2001/07/21 15:06:23 isomer Exp $
+dnl $Id: configure.in,v 1.29 2001/07/28 20:12:01 dan_karrels Exp $
 dnl ----------------------------------------------------------
 
 echo Configuring GNUWorld...
 echo
 
-AC_REVISION($Revision: 1.28 $)
+AC_REVISION($Revision: 1.29 $)
 AC_INIT(src/main.cc)
 AM_INIT_AUTOMAKE(gnuworld,0.0)
 AM_CONFIG_HEADER(include/defs.h)
@@ -50,122 +50,6 @@ AC_LANG_CPLUSPLUS
 AC_PROG_MAKE_SET(gmake)
 AC_SUBST(LIBTOOL_DEPS)
 
-AC_MSG_CHECKING(if C++ compiler supports bool)
-AC_TRY_COMPILE(
-[
-],[
-   bool b=true;
-   bool b1=false;
-],[
-  ac_bool=yes
-  AC_MSG_RESULT([$ac_bool])
-],[
-  config_error=yes
-  AC_MSG_RESULT([$ac_bool])
-  AC_WARN(bool type is not supported by your compiler)   
-])
-
-AC_MSG_CHECKING([if C++ compiler supports static_cast<>])
-AC_TRY_COMPILE(
-[ 
-   class foo;
-],[
-   foo* c1 = 0 ;
-   void* c2 = static_cast< void* >( c1 ) ;
-],[
-  ac_static_cast=yes
-  AC_MSG_RESULT([$ac_static_cast])
-],[
-  AC_MSG_RESULT([$ac_static_cast])
-  AC_WARN(C++ compiler static_cast<> does not work)
-  config_error=yes
-])
-
-AC_MSG_CHECKING([if C++ compiler supports reinterpret_cast<>])
-AC_TRY_COMPILE(
-[ 
-   class foo;
-],[
-   char* blah = 0 ;
-   unsigned char* blah2 = reinterpret_cast< unsigned char* >( blah ) ;
-],[
-  ac_reinterpret_cast=yes
-  AC_MSG_RESULT([$ac_reinterpret_cast])
-],[
-  AC_MSG_RESULT([$ac_reinterpret_cast])
-  AC_WARN(C++ compiler reinterpret_cast<> does not work)
-  config_error=yes
-])
-
-# Member class templates   
-AC_MSG_CHECKING(if C++ compiler supports member class templates)   
-AC_TRY_COMPILE(
-[  
-struct S 
-{
-  template <class T> struct A {};
-  template <class T> struct B {};
-};
-],[
-],[
-   ac_member_class_templates=yes
-   AC_DEFINE(SIGC_CXX_MEMBER_CLASS_TEMPLATES)
-   AC_MSG_RESULT([$ac_member_class_templates])
-],[
-  ac_member_class_templates=no
-  AC_MSG_RESULT([$ac_member_class_templates])
-  AC_MSG_WARN([Test for member templates failed.])
-])
-
-# Partial Specialization
-AC_MSG_CHECKING([if C++ compiler supports partial specialization])
-AC_TRY_COMPILE(
-[ 
-template<class T, class K>
-class k {
-public:  
-};
-template<class T> class k<void,T> { };
-],[
-  k<float, float> b;
-  k<void,void> a;
-],[
-  ac_cxx_partial_specialization=yes
-  AC_MSG_RESULT([$ac_cxx_partial_specialization])
-  AC_DEFINE(SIGC_CXX_PARTIAL_SPEC)
-],[
-  config_error=yes  
-  ac_cxx_partial_specialization=no
-  AC_MSG_RESULT([$ac_cxx_partial_specialization])
-  AC_MSG_WARN([Partial specialization is needed for signal templates.])
-])
-
-AC_MSG_CHECKING(if C++ compiler supports name spaces)
-AC_TRY_COMPILE(
-[
-namespace Check
-  {
-   int i;
-  }
-],[
-  Check::i=1;
-],[
-  ac_cxx_namespaces=yes
-  AC_MSG_RESULT([$ac_cxx_namespaces])
-  AC_DEFINE(SIGC_CXX_NAMESPACES)
-],[
-  ac_cxx_namespaces=no
-  AC_MSG_RESULT([$ac_cxx_namespaces])
-  AC_MSG_WARN([Without namespaces all classes will be global.])
-]) 
-
-AC_MSG_CHECKING(if C++ environment provides all required features)
-if test "x$config_error" = xyes ; then
-  AC_MSG_RESULT([no])
-  AC_MSG_ERROR([Your compiler is not powerful enough to compile GNUWorld.])
-fi
-AC_MSG_RESULT([yes])
-
 dnl ----------------------------------------------------------
 dnl ----------------------------------------------------------
 dnl
@@ -187,55 +71,6 @@ dnl
 AC_CHECK_HEADERS(sys/file.h unistd.h sys/stat.h sys/ioctl.h sys/resource.h )
 AC_CHECK_HEADERS(sys/time.h asm/ioctls.h xti_inet.h sys/filio.h)
 AC_CHECK_HEADERS(sys/types.h sys/socket.h netinet/in.h sys/un.h pthread.h)
-
-echo "Checking for C++ standard header files..."
-
-AC_MSG_CHECKING(for new)
-AC_TRY_CPP(new, AC_MSG_RESULT([yes]), AC_MSG_ERROR([no]))
-
-AC_MSG_CHECKING(for string)
-AC_TRY_CPP(string, AC_MSG_RESULT([yes]), AC_MSG_ERROR([no]))
-
-AC_MSG_CHECKING(for iostream)
-AC_TRY_CPP(iostream, AC_MSG_RESULT([yes]), AC_MSG_ERROR([no]))
-
-AC_MSG_CHECKING(for fstream)
-AC_TRY_CPP(fstream, AC_MSG_RESULT([yes]), AC_MSG_ERROR([no]))
-
-AC_MSG_CHECKING(for vector)
-AC_TRY_CPP(vector, AC_MSG_RESULT([yes]), AC_MSG_ERROR([no]))
-
-AC_MSG_CHECKING(for list)
-AC_TRY_CPP(list, AC_MSG_RESULT([yes]), AC_MSG_ERROR([no]))
-
-AC_MSG_CHECKING(for map)
-AC_TRY_CPP(map, AC_MSG_RESULT([yes]), AC_MSG_ERROR([no]))
-
-AC_MSG_CHECKING(for queue)
-AC_TRY_CPP(queue, AC_MSG_RESULT([yes]), AC_MSG_ERROR([no]))
-
-AC_MSG_CHECKING(for strstream)
-AC_TRY_CPP(strstream, AC_MSG_RESULT([yes]), AC_MSG_ERROR([no]))
-
-echo "Checking for C header files..."
-
-AC_MSG_CHECKING(for cstring)
-AC_TRY_CPP(cstring, AC_MSG_RESULT([yes]), AC_MSG_ERROR([no]))
-
-AC_MSG_CHECKING(for cstdlib)
-AC_TRY_CPP(iostream, AC_MSG_RESULT([yes]), AC_MSG_ERROR([no]))
-
-AC_MSG_CHECKING(for cerrno)
-AC_TRY_CPP(iostream, AC_MSG_RESULT([yes]), AC_MSG_ERROR([no]))
-
-AC_MSG_CHECKING(for cassert)
-AC_TRY_CPP(iostream, AC_MSG_RESULT([yes]), AC_MSG_ERROR([no]))
-
-AC_MSG_CHECKING(for cstdarg)
-AC_TRY_CPP(iostream, AC_MSG_RESULT([yes]), AC_MSG_ERROR([no]))
-
-AC_MSG_CHECKING(for ctime)
-AC_TRY_CPP(iostream, AC_MSG_RESULT([yes]), AC_MSG_ERROR([no]))
 
 AC_HEADER_STDC
 AC_HEADER_TIME
@@ -294,9 +129,11 @@ AC_ARG_WITH(pgsql, \
 )
 
 AC_MSG_CHECKING(for libpq++.h)
-if test -f "/usr/local/include/libpq++.h"; then
-  PGSQL_INCLUDE=/usr/local/include
-  PGSQL_LIB=/usr/local/lib
+if test -f "$PGSQL_PREFIX/include/libpq++.h"; then
+	true
+elif test -f "/usr/local/include/libpq++.h"; then
+	PGSQL_INCLUDE=/usr/local/include
+	PGSQL_LIB=/usr/local/lib
 elif test -f "/usr/include/postgresql/libpq++.h"; then
 	PGSQL_INCLUDE=/usr/include/postgresql
 	PGSQL_LIB=/usr/lib/pgsql
