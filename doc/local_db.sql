@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------------
--- "$Id: local_db.sql,v 1.18 2002/08/30 10:38:17 nighty Exp $"
+-- "$Id: local_db.sql,v 1.19 2002/12/27 00:51:39 nighty Exp $"
 -- Channel service DB SQL file for PostgreSQL.
 --
 -- .. if you wonder why some tables have moved and you have them here when
@@ -61,6 +61,15 @@ CREATE TABLE newu_ipcheck (
 CREATE INDEX newu_ipcheck_ts ON newu_ipcheck (ts);
 CREATE INDEX newu_ipcheck_ip ON newu_ipcheck (ip);
 CREATE INDEX newu_ipcheck_expiration ON newu_ipcheck (expiration);
+
+
+CREATE TABLE gfxcodes (
+	code	VARCHAR(25) NOT NULL,
+	crc	VARCHAR(128) NOT NULL,
+	expire	INT NOT NULL
+);
+CREATE INDEX gfxcodes_idx ON gfxcodes(code,crc,expire);
+
 
 CREATE TABLE themes (
 	id	SERIAL,
@@ -155,35 +164,35 @@ INSERT INTO themes VALUES (
 'default',
 
 -- left
-'d0e5ff',
+'60659c',
 '',
 '000000',
 'aaaaaa',
-'0000ff',
+'ffffff',
 
 'aaaaaa',
 '000000',
-'0000ff',
+'ffff00',
 
 -- top
-'d0e5ff',
+'60659c',
 '',
-'top_logo.jpg',
+'default_logo.jpg',
 
 -- bottom (footer)
-'d0e5ff',
+'60659c',
 '',
-'4c4c4c',
-'000033',
-'0000aa',
+'000000',
+'aaaaaa',
+'ffffff',
 
 -- main
-'dddddd',
+'aaafe4',
 '',
 '000000',
 '505050',
-'004400',
-'0000ff',
+'60659c',
+'ff7700',
 'ff0000',
 
 '990000',
@@ -199,12 +208,12 @@ INSERT INTO themes VALUES (
 '990099',
 'ff0000',
 
-'ff1111',
+'60659c',
 
 '00ff00',
 'ff0000',
 'ffffff',
-'ee1166',
+'ffeeff',
 
 '00ffff',
 'eeeeee',
@@ -217,13 +226,14 @@ INSERT INTO themes VALUES (
 -- tables
 'ffffff',
 '',
-'003366',
+'60659c',
 'ffffff',
-'006633',
-'ffffff',
+'dddddd',
+'4c4c4c',
 'ffff00',
 '777777',
-'ffdddd',
+'60659c',
 ''
 
 );
+

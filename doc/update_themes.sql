@@ -1,5 +1,5 @@
 --
--- $Id: update_themes.sql,v 1.4 2002/11/01 15:09:21 nighty Exp $
+-- $Id: update_themes.sql,v 1.5 2002/12/27 00:51:39 nighty Exp $
 -- Use this file to update your db structure if you dont have "themes" enabled.
 -- run /usr/local/pgsql/bin/psql local_db < update_themes.sql
 -- ** run this only ONCE **
@@ -9,7 +9,7 @@
 --
 -- The default theme logo was done by SiRVulcaN <sirvulcan@xtra.co.nz>.
 --
--- 05/21/2002 : <nighty@undernet.org>
+-- 12/27/2002 : <nighty@undernet.org>
 --
 
 CREATE TABLE themes (
