@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: UNBANCommand.cc,v 1.17 2005/01/08 23:33:42 dan_karrels Exp $
+ * $Id: UNBANCommand.cc,v 1.18 2005/03/25 03:07:29 dan_karrels Exp $
  */
 
 #include	<string>
@@ -38,7 +38,7 @@
 #include	"responses.h"
 #include	"match.h"
 
-const char UNBANCommand_cc_rcsId[] = "$Id: UNBANCommand.cc,v 1.17 2005/01/08 23:33:42 dan_karrels Exp $" ;
+const char UNBANCommand_cc_rcsId[] = "$Id: UNBANCommand.cc,v 1.18 2005/03/25 03:07:29 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -130,15 +130,13 @@ if(level < level::unban)
 	return false;
 	}
 
-std::map< int,sqlBan* >::iterator ptr = theChan->banList.begin();
-string banTarget ;
-
 /*
  *  Are they trying to unban by nick or hostmask?
  */
 bool isNick = bot->validUserMask( st[2] ) ? false : true ;
 
 /* Try by nickname first, remove any bans that match this users host */
+string banTarget ;
 
 if( isNick )
 	{
@@ -164,6 +162,7 @@ else
 /*
  *  Loop over all bans, removing any that match our target
  */
+std::map< int,sqlBan* >::iterator ptr = theChan->banList.begin();
 
 size_t banCount = 0;
 unsigned short comparison = 0;
@@ -211,16 +210,29 @@ while (ptr != theChan->banList.end())
  */
  
 vector<sqlBan*>::iterator banIterator = oldBans.begin();
-sqlBan* theBan;
-while(banIterator != oldBans.end())
+for( ; banIterator != oldBans.end() ; ++banIterator )
 	{
-	theBan = *banIterator;
+	sqlBan* theBan = *banIterator ;
+
 	bot->UnBan(theChannel, theBan->getBanMask());
-	theChan->banList.erase(theChan->banList.find(theBan->getID()));
+
+	sqlChannel::sqlBanMapType::iterator sqlBanIterator =
+		theChan->banList.find( theBan->getID() ) ;
+	if( sqlBanIterator == theChan->banList.end() )
+		{
+		elog	<< "cservice::UNBAN> Unable to locate sqlBan, "
+			<< "id: "
+			<< theBan->getID()
+			<< "mask: "
+			<< theBan->getBanMask()
+			<< endl ;
+		continue ;
+		}
+
+	theChan->banList.erase( sqlBanIterator );
 	theBan->deleteRecord();
 	delete(theBan);
 	banCount++;
-	banIterator = oldBans.erase(banIterator);
 	}
 	
 /*
@@ -230,7 +242,6 @@ while(banIterator != oldBans.end())
 Channel::const_banIterator cPtr = theChannel->banList_begin();
 while (cPtr != theChannel->banList_end())
 	{
-
 	if ( isNick )
 		{
 		comparison = match((*cPtr), banTarget);

@@ -33,7 +33,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: BANCommand.cc,v 1.34 2005/01/08 23:33:42 dan_karrels Exp $
+ * $Id: BANCommand.cc,v 1.35 2005/03/25 03:07:29 dan_karrels Exp $
  */
 
 #include	<new>
@@ -51,7 +51,7 @@
 #include	"responses.h"
 #include	"match.h"
 
-const char BANCommand_cc_rcsId[] = "$Id: BANCommand.cc,v 1.34 2005/01/08 23:33:42 dan_karrels Exp $" ;
+const char BANCommand_cc_rcsId[] = "$Id: BANCommand.cc,v 1.35 2005/03/25 03:07:29 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -332,15 +332,42 @@ while (ptr != theChan->banList.end())
  */
  
 vector<sqlBan*>::iterator banIterator = oldBans.begin();
-sqlBan* theBan;
-while(banIterator != oldBans.end())
+for( ; banIterator != oldBans.end() ; ++banIterator )
 	{
-	theBan = *banIterator;
-	theChannel->removeBan(theBan->getBanMask());
-	theChan->banList.erase(theChan->banList.find(theBan->getID()));
+	sqlBan* theBan = *banIterator;
+
+	// First, remove the ban from the gnuworld::Channel
+	if( !theChannel->removeBan(theBan->getBanMask()) )
+		{
+		elog	<< "cservice::BANCommand> Unable to find "
+			<< "ban: "
+			<< theBan->getBanMask()
+			<< endl ;
+		continue ;
+		}
+
+	// Lookup the ban in the sqlBan table in mod.cservice
+	sqlChannel::sqlBanMapType::iterator sqlBanIterator =
+		theChan->banList.find( theBan->getID() ) ;
+	if( sqlBanIterator == theChan->banList.end() )
+		{
+		elog	<< "cservice::BANCommand> Unable to find "
+			<< "ban in sqlChannel, id "
+			<< theBan->getID()
+			<< ", mask: "
+			<< theBan->getBanMask()
+			<< endl ;
+		continue ;
+		}
+
+	// Erase the sqlBan from the cservice ban table
+	theChan->banList.erase( sqlBanIterator );
+
+	// Erase the ban from the database
 	theBan->deleteRecord();
-	delete(theBan);
-	banIterator = oldBans.erase(banIterator);
+
+	// Free allocated memory
+	delete(theBan); theBan = 0 ;
 	}
 
 vector< iClient* > clientsToKick ;

@@ -17,21 +17,21 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_T.cc,v 1.6 2005/01/12 04:36:44 dan_karrels Exp $
+ * $Id: msg_T.cc,v 1.7 2005/03/25 03:07:29 dan_karrels Exp $
  */
 
 #include	<string>
 #include	<iostream>
 
+#include	"gnuworld_config.h"
 #include	"server.h"
 #include	"xparameters.h"
 #include	"Network.h"
 #include	"ELog.h"
-#include	"gnuworld_config.h"
 #include	"Channel.h"
 #include	"ServerCommandHandler.h"
 
-RCSTAG( "$Id: msg_T.cc,v 1.6 2005/01/12 04:36:44 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: msg_T.cc,v 1.7 2005/03/25 03:07:29 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {

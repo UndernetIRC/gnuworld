@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: Channel.h,v 1.31 2005/01/12 04:36:42 dan_karrels Exp $
+ * $Id: Channel.h,v 1.32 2005/03/25 03:07:28 dan_karrels Exp $
  */
 
 #ifndef __CHANNEL_H
-#define __CHANNEL_H "$Id: Channel.h,v 1.31 2005/01/12 04:36:42 dan_karrels Exp $"
+#define __CHANNEL_H "$Id: Channel.h,v 1.32 2005/03/25 03:07:28 dan_karrels Exp $"
 
 #include	<string>
 #include	<map>
@@ -199,8 +199,10 @@ public:
 	/**
 	 * Remove a ban from this channel's ban list.  This does a lexical
 	 * comparison, not a wildcard match.
+	 * Returns true if ban found (and removed), false if not
+	 * found.
 	 */
-	void removeBan( const std::string& banMask ) ;
+	bool removeBan( const std::string& banMask ) ;
 
 	/**
 	 * Remove all the bans in the channels ban list.

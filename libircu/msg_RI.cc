@@ -32,9 +32,8 @@
 #include	"ELog.h"
 #include	"xparameters.h"
 #include	"ServerCommandHandler.h"
-#include	"gnuworld_config.h"
 
-RCSTAG( "$Id: msg_RI.cc,v 1.2 2005/01/12 03:50:28 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: msg_RI.cc,v 1.3 2005/03/25 03:07:29 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {

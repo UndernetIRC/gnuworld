@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: cservice.cc,v 1.244 2005/03/16 20:29:55 dan_karrels Exp $
+ * $Id: cservice.cc,v 1.245 2005/03/25 03:07:29 dan_karrels Exp $
  */
 
 #include	<new>
@@ -665,7 +665,8 @@ else
 
 		setIgnored(theClient, true);
 
-		logAdminMessage("OUTPUT-FLOOD from %s", theClient->getNickUserHost().c_str());
+		logAdminMessage("OUTPUT-FLOOD from %s",
+			theClient->getNickUserHost().c_str());
 		return true;
 		}
 	}
@@ -705,7 +706,9 @@ const string Command = string_upper( st[ 0 ] ) ;
 if (!secure && ((Command == "LOGIN") || (Command == "NEWPASS") || (Command == "SUSPENDME")) )
 	{
 	Notice(theClient, "To use %s, you must /msg %s@%s",
-		Command.c_str(), nickName.c_str(), getUplinkName().c_str());
+		Command.c_str(),
+		nickName.c_str(),
+		getUplinkName().c_str());
 	return ;
 	}
 
@@ -1108,7 +1111,7 @@ if (!theChan)
 	{
 	elog	<< "cservice::getAdminAccessLevel> Unable to "
 		<< "locate channel '"
-		<< coderChan.c_str()
+		<< coderChan
 		<< "'! Sorry, I can't continue.."
 		<< endl;
 	::exit(0);
@@ -1389,7 +1392,7 @@ expireQuery	<< "SELECT user_id,channel_id FROM levels "
 
 #ifdef LOG_SQL
 	elog	<< "expireSuspends::sqlQuery> "
-		<< expireQuery.str().c_str()
+		<< expireQuery.str()
 		<< endl;
 #endif
 
@@ -1546,7 +1549,7 @@ expireQuery	<< "SELECT channel_id,id FROM bans "
 
 #ifdef LOG_SQL
 	elog	<< "sqlQuery> "
-		<< expireQuery.str().c_str()
+		<< expireQuery.str()
 		<< endl;
 #endif
 
@@ -1632,6 +1635,8 @@ for (expireVectorType::const_iterator resultPtr = expireVector.begin();
 		}
 	else
 		{
+		// BUG: Correct me if Im wrong, but this will crash, 
+		// right?
 		sqlBan* theBan = ptr->second;
 		elog << "Unable to find ban "
 		     << theBan->getBanMask()
@@ -1649,7 +1654,7 @@ deleteQuery	<< "DELETE FROM bans "
 
 #ifdef LOG_SQL
 	elog	<< "sqlQuery> "
-		<< deleteQuery.str().c_str()
+		<< deleteQuery.str()
 		<< endl;
 #endif
 
@@ -1897,7 +1902,7 @@ theQuery	<< "SELECT "
 
 #ifdef LOG_SQL
 elog	<< "*** [CMaster::processDBUpdates]:sqlQuery: "
-		<< theQuery.str().c_str()
+		<< theQuery.str()
 		<< endl;
 #endif
 
@@ -1976,7 +1981,7 @@ theQuery	<< "SELECT "
 
 #ifdef LOG_SQL
 elog	<< "*** [CMaster::updateLevels]: sqlQuery: "
-		<< theQuery.str().c_str()
+		<< theQuery.str()
 		<< endl;
 #endif
 
@@ -2059,7 +2064,7 @@ void cservice::updateUsers()
 
 	#ifdef LOG_SQL
 	elog	<< "*** [CMaster::updateUsers]: sqlQuery: "
-			<< theQuery.str().c_str()
+			<< theQuery.str()
 			<< endl;
 	#endif
 
@@ -2186,7 +2191,7 @@ if (timer_id == pending_timerID)
 
 #ifdef LOG_SQL
 		elog	<< "cmaster::loadPendingChannelList> "
-			<< theQuery.str().c_str()
+			<< theQuery.str()
 			<< endl;
 #endif
 
@@ -3364,10 +3369,10 @@ newBan->setReason(theReason);
  *  add to internal list and commit to the db.
  */
 
-map< int,sqlBan* >::iterator ptr = theChan->banList.begin();
+map< int,sqlBan* >::const_iterator ptr = theChan->banList.begin();
 while (ptr != theChan->banList.end())
 	{
-	sqlBan* theBan = ptr->second;
+	const sqlBan* theBan = ptr->second;
 
 	if(string_lower(banTarget) == string_lower(theBan->getBanMask()))
 		{
@@ -3451,7 +3456,7 @@ theLog	<< "INSERT INTO channellog (ts, channelID, event, message, "
 
 #ifdef LOG_SQL
 	elog	<< "cservice::writeChannelLog> "
-		<< theLog.str().c_str()
+		<< theLog.str()
 		<< endl;
 #endif
 
@@ -3524,7 +3529,7 @@ if( Connected && MyUplink )
 	char *b = buffer ;
 	const char *m = 0 ;
 
-	// TODO: wtf is this bs?
+	// TODO: This should be fixed.
 	// A walking timebomb.
 	for (m=Message.c_str();*m!=0;m++)
 		{
@@ -3643,8 +3648,8 @@ theQuery	<<  "SELECT channels.name, pending.channel_id, user_id, pending.join_co
 
 #ifdef LOG_SQL
 elog	<< "*** [CMaster::loadPendingChannelList]: Loading pending channel details."
-		<< theQuery.str().c_str()
-		<< endl;
+	<< theQuery.str()
+	<< endl;
 #endif
 
 ExecStatusType status = SQLDb->Exec(theQuery.str().c_str()) ;
@@ -3806,11 +3811,11 @@ void cservice::preloadBanCache()
 
 stringstream theQuery;
 theQuery	<< "SELECT " << sql::ban_fields
-			<< " FROM bans;"
-			<< ends;
+		<< " FROM bans;"
+		<< ends;
 
-elog		<< "*** [CMaster::preloadBanCache]: Precaching Bans table: "
-			<< endl;
+elog	<< "*** [CMaster::preloadBanCache]: Precaching Bans table: "
+	<< endl;
 
 ExecStatusType status = SQLDb->Exec(theQuery.str().c_str()) ;
 
@@ -3834,16 +3839,17 @@ if( PGRES_TUPLES_OK == status )
 
 		sqlBan* newBan = new (std::nothrow) sqlBan(SQLDb);
 		newBan->setAllMembers(i);
-		theChan->banList.insert(map<int,sqlBan*>::value_type(newBan->getID(),newBan));
+		theChan->banList.insert(
+			std::make_pair( newBan->getID(), newBan ) ) ;
 //		theChan->banList[newBan->getID()] = newBan;
 
 		} // for()
 	} // if()
 
 elog	<< "*** [CMaster::preloadBanCache]: Done. Loaded "
-		<< SQLDb->Tuples()
-		<< " bans."
-		<< endl;
+	<< SQLDb->Tuples()
+	<< " bans."
+	<< endl;
 }
 
 void cservice::preloadLevelsCache()
@@ -4211,7 +4217,7 @@ void cservice::outputChannelAccesses(iClient* theClient, sqlUser* theUser, sqlUs
 
 	#ifdef LOG_SQL
 		elog	<< "CHANINFO::sqlQuery> "
-			<< channelsQuery.str().c_str()
+			<< channelsQuery.str()
 			<< endl;
 	#endif
 

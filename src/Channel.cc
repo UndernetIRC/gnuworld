@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: Channel.cc,v 1.48 2005/03/23 09:09:39 isomer Exp $
+ * $Id: Channel.cc,v 1.49 2005/03/25 03:07:30 dan_karrels Exp $
  */
 
 #include	<new>
@@ -38,7 +38,7 @@
 #include	"server.h"
 #include	"ConnectionManager.h"
 
-RCSTAG("$Id: Channel.cc,v 1.48 2005/03/23 09:09:39 isomer Exp $") ;
+RCSTAG("$Id: Channel.cc,v 1.49 2005/03/25 03:07:30 dan_karrels Exp $") ;
 
 namespace gnuworld
 {
@@ -231,7 +231,7 @@ void Channel::setBan( const string& newBan )
 banList.push_front( newBan ) ;
 }
 
-void Channel::removeBan( const string& banMask )
+bool Channel::removeBan( const string& banMask )
 {
 for( banIterator ptr = banList_begin(), end = banList_end() ;
 	ptr != end ; ++ptr )
@@ -239,9 +239,12 @@ for( banIterator ptr = banList_begin(), end = banList_end() ;
 	if( !strcasecmp( *ptr, banMask ) )
 		{
 		banList.erase( ptr ) ;
-		return ;
+		// Ban found, return true
+		return true ;
 		}
 	}
+// Ban not found
+return false ;
 }
 
 bool Channel::findBan( const string& banMask ) const

@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server_connection.cc,v 1.2 2005/01/12 03:50:38 dan_karrels Exp $
+ * $Id: server_connection.cc,v 1.3 2005/03/25 03:07:30 dan_karrels Exp $
  */
 
 #include	<new>
@@ -38,14 +38,14 @@
 //#include	<utility>
 
 //#include	<cstdlib>
-//#include	<cstdio>
+#include	<cstdio>
 #include	<cstdarg>
 //#include	<cstring>
 //#include	<cassert>
 //#include	<cerrno>
 //#include	<csignal>
 
-//#include	"gnuworld_config.h"
+#include	"gnuworld_config.h"
 //#include	"misc.h"
 //#include	"events.h"
 //#include	"ip.h"
@@ -67,7 +67,7 @@
 #include	"ConnectionHandler.h"
 #include	"Connection.h"
 
-RCSTAG( "$Id: server_connection.cc,v 1.2 2005/01/12 03:50:38 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: server_connection.cc,v 1.3 2005/03/25 03:07:30 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {

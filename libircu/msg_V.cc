@@ -8,6 +8,7 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
@@ -16,17 +17,17 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_V.cc,v 1.6 2005/01/12 03:50:28 dan_karrels Exp $
+ * $Id: msg_V.cc,v 1.7 2005/03/25 03:07:29 dan_karrels Exp $
  */
 
 #include	<sstream>
 
+#include	"gnuworld_config.h"
 #include	"server.h"
 #include	"ServerCommandHandler.h"
 #include	"xparameters.h"
-#include	"gnuworld_config.h"
 
-RCSTAG( "$Id: msg_V.cc,v 1.6 2005/01/12 03:50:28 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: msg_V.cc,v 1.7 2005/03/25 03:07:29 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {

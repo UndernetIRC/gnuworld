@@ -19,7 +19,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: sqlBan.cc,v 1.8 2003/06/28 01:21:20 dan_karrels Exp $
+ * $Id: sqlBan.cc,v 1.9 2005/03/25 03:07:30 dan_karrels Exp $
  */
 
 #include	<sstream>
@@ -36,7 +36,7 @@
 #include	"cservice_config.h"
 
 const char sqlBan_h_rcsId[] = __SQLBAN_H ;
-const char sqlBan_cc_rcsId[] = "$Id: sqlBan.cc,v 1.8 2003/06/28 01:21:20 dan_karrels Exp $" ;
+const char sqlBan_cc_rcsId[] = "$Id: sqlBan.cc,v 1.9 2005/03/25 03:07:30 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -178,7 +178,7 @@ queryString	<< queryHeader
 
 #ifdef LOG_SQL
 	elog	<< "sqlBan::delete> "
-		<< queryString.str().c_str()
+		<< queryString.str()
 		<< endl;
 #endif
 
