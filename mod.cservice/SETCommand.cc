@@ -8,11 +8,13 @@
  * 10/02/2001 - David Henriksen <david@itwebnet.dk>
  * Minor bug fixes.
  *
+ * 20/02/2001 - Gator Robert White <gator@cajun-gator.net>
+ * removed AlwaysOp 
  * Sets channel options on the specified channel.
  *
  * Caveats: None.
  *
- * $Id: SETCommand.cc,v 1.25 2001/02/18 19:46:01 dan_karrels Exp $
+ * $Id: SETCommand.cc,v 1.26 2001/02/20 23:40:45 gte Exp $
  */
 
 #include	<string>
@@ -24,7 +26,7 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char SETCommand_cc_rcsId[] = "$Id: SETCommand.cc,v 1.25 2001/02/18 19:46:01 dan_karrels Exp $" ;
+const char SETCommand_cc_rcsId[] = "$Id: SETCommand.cc,v 1.26 2001/02/20 23:40:45 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -498,7 +500,7 @@ if(option == "NOREG")
 	    return true;
 	}
 
-	if(option == "ALWAYSOP")
+/*	if(option == "ALWAYSOP")
 	{
 	    if(level < level::set::alwaysop)
 	    {
@@ -529,7 +531,7 @@ if(option == "NOREG")
 			theChan->getFlag(sqlChannel::F_ALWAYSOP) ? "ON" : "OFF");
 	    return true;
 	}
-
+*/
 	if(option == "OPONLY")
 	{
 	    if(level < level::set::oponly)
