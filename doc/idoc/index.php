@@ -2,7 +2,7 @@
 /*
  *
  * Undernet GNUworld Interactive Installation Guide (aka UGIIG)
- * $Id: index.php,v 1.12 2002/10/20 10:21:45 nighty Exp $
+ * $Id: index.php,v 1.13 2003/02/17 13:57:43 nighty Exp $
  *
  * Released under the GNU Public License : http://www.gnu.org/licenses/gpl.txt
  * by nighty <nighty@undernet.org>
@@ -50,7 +50,7 @@ function footer($prev,$next) {
 	//echo "<address>maintained by <b>&lt;</b><a href=\"mailto:" . $coder_email . "\">" . $coder_email . "</a><b>&gt;</b> - Last modified : <b>" . date("M-d-Y H:i:s",   (  filemtime("index.php")+( date("Z",filemtime("index.php"))/3600 )   )   ) . " UTC/GMT</b> - <b>[</b><a href=\"./\">Home</a><b>]</b></address>";
 	echo "<address>maintained by <b>&lt;</b><a href=\"mailto:" . $coder_email . "\">" . $coder_email . "</a><b>&gt;</b> - <b>[</b><a href=\"./\">Home</a><b>]</b>";
 	echo "&nbsp;<br><font size=-2><b>";
-?>$Id: index.php,v 1.12 2002/10/20 10:21:45 nighty Exp $<?
+?>$Id: index.php,v 1.13 2003/02/17 13:57:43 nighty Exp $<?
 	echo "</b></font></address>\n";
 	echo "</body>\n";
 	echo "</html>\n";
@@ -75,7 +75,7 @@ $coder_email = "nighty@undernet.org";
 $coder_name = "nighty";
 
 ?>
-<!-- $Id: index.php,v 1.12 2002/10/20 10:21:45 nighty Exp $ //-->
+<!-- $Id: index.php,v 1.13 2003/02/17 13:57:43 nighty Exp $ //-->
 <html>
 <head>
 <title>Undernet GNUworld Interactive Installation Guide</title>
@@ -922,7 +922,7 @@ Install the <b>PL</b> language :
 (if you skip this step or do it AFTER anything has been put in the database,
 this will <b>NOT</b> work and you will not be able to login properly to the bot on IRC)
 
-	<?=$os?>:/home/gnuworld/gnuworld/doc$ <b>/usr/local/pgsql/bin/createlang plpgsql cservice -L /usr/local/pgsql/lib</b>
+	<?=$os?>:/home/gnuworld/gnuworld/doc$ <b>/usr/local/pgsql/bin/createlang -L /usr/local/pgsql/lib plpgsql cservice</b>
 
 Load the CService schema :
 
