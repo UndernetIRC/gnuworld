@@ -136,7 +136,7 @@ cservice::cservice(const string& args)
  
 RegisterCommand(new SHOWCOMMANDSCommand(this, "SHOWCOMMANDS", "[#channel]", 3));
 RegisterCommand(new LOGINCommand(this, "LOGIN", "<username> <password>", 10)); 
-RegisterCommand(new ACCESSCommand(this, "ACCESS", "[channel] [nick] [-min n] [-max n] [-op] [-voice] [-none] [-modif [mask]]", 5));
+RegisterCommand(new ACCESSCommand(this, "ACCESS", "[channel] [username] [-min n] [-max n] [-op] [-voice] [-none] [-modif [mask]]", 5));
 RegisterCommand(new CHANINFOCommand(this, "CHANINFO", "<#channel>", 3)); 
 RegisterCommand(new ISREGCommand(this, "ISREG", "<#channel>", 4)); 
 RegisterCommand(new VERIFYCommand(this, "VERIFY", "<nick>", 3));
@@ -302,14 +302,16 @@ if( PGRES_TUPLES_OK == status )
 			MyUplink->RegisterChannelEvent( newChan->getName(),
 				this ) ;
 			newChan->setInChan(true);
-			}
 
-		/* If neccessary, set the auto topic. */
-		if (newChan->getFlag(sqlChannel::F_AUTOTOPIC))
+			/* If neccessary, set the auto topic. */
+			if (newChan->getFlag(sqlChannel::F_AUTOTOPIC))
 			{
 			doAutoTopic(newChan);
 			}
+ 
+			}
 
+ 
 		} // for()
 	} // if()
 
