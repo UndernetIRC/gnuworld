@@ -11,7 +11,7 @@
 /* ccontrol.cc
  * Authors: Daniel Karrels dan@karrels.com
  *	    Tomer Cohen    MrBean@toughguy.net
- * $Id: ccontrol.cc,v 1.166 2003/03/06 15:37:50 mrbean_ Exp $
+ * $Id: ccontrol.cc,v 1.167 2003/03/06 15:41:47 mrbean_ Exp $
  */
 
 #define MAJORVER "1"
@@ -56,7 +56,7 @@
 #include	"ip.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.166 2003/03/06 15:37:50 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.167 2003/03/06 15:41:47 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -1289,6 +1289,10 @@ switch( theEvent )
 			return 0;
 			}
 
+		if(!saveGlines)
+			{
+			return 0;
+			}
 		Gline* newG = static_cast< Gline* >(Data1);
 
 		ccGline* newGline = findGline(newG->getUserHost());
