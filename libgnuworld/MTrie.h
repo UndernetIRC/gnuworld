@@ -1,7 +1,7 @@
 /**
  * MTrie.h
  *
- * $Id: MTrie.h,v 1.9 2003/08/19 20:32:32 dan_karrels Exp $
+ * $Id: MTrie.h,v 1.10 2003/08/19 21:48:39 dan_karrels Exp $
  */
 
 #ifndef __MTRIE_H
@@ -146,7 +146,7 @@ protected:
 	 * Convenience method that puts together a list of
 	 * string tokens into a single string.
 	 */
-	string			getBase( const list< string >& ) const ;
+	string			getBase() const ;
 
 	/**
 	 * Recursive method used only for searching for '*' matched
@@ -223,6 +223,11 @@ protected:
 	 * find/erase.
 	 */
 	mutable string		origKey ;
+
+	/**
+	 * The tokens object used in find() and erase().
+	 */
+	StringTokenizer		tokens ;
 
 } ;
 

@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: StringTokenizer.h,v 1.4 2003/07/20 21:56:28 dan_karrels Exp $
+ * $Id: StringTokenizer.h,v 1.5 2003/08/19 21:48:39 dan_karrels Exp $
  */
 
 #ifndef __STRINGTOKENIZER_H
-#define __STRINGTOKENIZER_H "$Id: StringTokenizer.h,v 1.4 2003/07/20 21:56:28 dan_karrels Exp $"
+#define __STRINGTOKENIZER_H "$Id: StringTokenizer.h,v 1.5 2003/08/19 21:48:39 dan_karrels Exp $"
 
 #include	<vector>
 #include	<string>
@@ -198,13 +198,6 @@ public:
 		}
 
 protected:
-
-	/**
-	 * Disable the copy constructor.  This method is declared
-	 * but NOT defined.
-	 */
-	StringTokenizer( const StringTokenizer& ) ;
-
 	/**
 	 * Protected method called internally by the constructor once
 	 * at object instantiation to tokenize the given C++ string.
@@ -214,13 +207,12 @@ protected:
 	/**
 	 * The delimiter by which the (original) string is tokenized.
 	 */
-	const char		delimiter ;
+	char			delimiter ;
 
 	/**
 	 * The structure for holding the tokens.
 	 */
 	vectorType		array ;
-
 } ;
 
 } // namespace gnuworld

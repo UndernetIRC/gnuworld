@@ -1,7 +1,7 @@
 /**
  * mtrie_load.cc
  *
- * $Id: mtrie_load.cc,v 1.2 2003/08/02 01:40:16 dan_karrels Exp $
+ * $Id: mtrie_load.cc,v 1.3 2003/08/19 21:48:39 dan_karrels Exp $
  */
 
 #include	<map>
@@ -160,7 +160,10 @@ cout	<< endl
 	<< endl ;
 
 cout	<< endl
-	<< "Reading match file..." ;
+	<< "Reading match file "
+	<< matchFileName
+	<< "..." ;
+cout.flush() ;
 
 size_t numFound = 0 ;
 string line ;
@@ -176,12 +179,14 @@ while( getline( matchFile, line ) )
 	}
 matchFile.close() ;
 
-cout	<< "Read "
-	<< numFound
+cout	<< numFound
 	<< " match strings"
 	<< endl ;
 
-cout	<< "Reading socket file..." ;
+cout	<< "Reading socket file "
+	<< socketFileName
+	<< "..." ;
+cout.flush() ;
 
 numFound = 0 ;
 while( getline( socketFile, line ) )

@@ -1,7 +1,7 @@
 /**
  * MTrie.cc
  *
- * $Id: MTrie.cc,v 1.12 2003/08/19 20:32:32 dan_karrels Exp $
+ * $Id: MTrie.cc,v 1.13 2003/08/19 21:48:39 dan_karrels Exp $
  */
 
 #include	<map>
@@ -157,7 +157,7 @@ if( tokenItr == tokens.rend() )
 		vEndItr = currentNode->valuesList.end() ;
 		vItr != vEndItr ; ++vItr )
 		{
-		returnMe.push_back( value_type( getBase( base ), *vItr ) ) ;
+		returnMe.push_back( value_type( getBase(), *vItr ) ) ;
 		}
 	return ;
 	}
@@ -214,7 +214,7 @@ if( tokenItr == tokens.rend() )
 		vEndItr = currentNode->valuesList.end() ;
 		vItr != vEndItr ; ++vItr )
 		{
-		returnMe.push_back( value_type( getBase( base ), *vItr ) ) ;
+		returnMe.push_back( value_type( getBase(), *vItr ) ) ;
 		}
 	return ;
 	}
@@ -241,6 +241,39 @@ string localKey( *tokenItr ) ;
 
 // Move to the next token for calls to find()
 ++tokenItr ;
+
+// This variable is true if the localKey determined below
+// is '*' alone.
+bool loneStar = false ;
+
+// Prepare localKey if a '*' was found
+if( !foundQuestionMark )
+	{
+	// '*' was found in localKey
+
+	// localKey starts out as "n*ws"
+	// Setup localKey to "*ws"
+	// In the case of a key like "*adsl*", there is no
+	// sense in trimming down localKey just to perform
+	// a match(), since all nodes match.
+
+	// starPos is the index of the right-most '*'
+	const string::size_type starPos = localKey.rfind( '*' ) ;
+
+	if( starPos == (localKey.size() - 1) )
+		{
+		// The '*' is the right-most character, "*adsl*"
+//		cout	<< "find> Found lonestar"
+//			<< endl ;
+		loneStar = true ;
+		}
+	else
+		{
+		// Not a generic '*' search, it's the case of "n*ws"
+		// Trim localKey to look like "*ws"
+		localKey.erase( 0, starPos ) ;
+		}
+	} // if( !foundQuestionMark )
 
 // Everything is set, begin recursion
 // Match localKey against all nodes
@@ -276,22 +309,13 @@ for( const_nodes_iterator nItr = currentNode->nodesMap.begin(),
 		}
 
 	// '*'
-
-	// starPos is the index of the '*'
-	string::size_type starPos = localKey.rfind( '*' ) ;
-
-	// Here we must:
-	// setup localKey to be the star and everything to its right
-	// setup the rest of the string to be everything left of
-	//  and including the star
-
-	// localKey starts out as "n*ws"
-	// Setup localKey to "*ws"
-	localKey.erase( 0, starPos ) ;
-
-	if( match( localKey, nItr->first ) )
+	if( loneStar )
 		{
-//		clog	<< "false" << endl ;
+		/* NO-OP, fall through, all nodes match */
+		}
+	else if( match( localKey, nItr->first ) )
+		{
+		// Not a match, do not recursiveFind() on this node
 		continue ;
 		}
 
@@ -308,10 +332,17 @@ void MTrie< _valueT >::recursiveFind(
 	const MTrie< _valueT >* currentNode,
 	bool blindRecursion ) const
 {
+// blindRecursion:
+// If we encounter a '*' as the first character of origKey (the original
+// search string), and the current node matches that key, then by
+// definition all nodes under the current node must also match.
+// In this case, use a "blind recursion," simply adding all values
+// under this node without performing a match() on any of them.
+
 //clog	<< "MTrie::recursiveFind> key: "
 //	<< origKey
 //	<< ", base: "
-//	<< getBase( base )
+//	<< getBase()
 //	<< endl ;
 
 // '*'
@@ -320,7 +351,7 @@ void MTrie< _valueT >::recursiveFind(
 if( !currentNode->valuesList.empty() )
 	{
 	// We need the stringBase either way
-	string stringBase = getBase( base ) ;
+	string stringBase = getBase() ;
 
 	if( blindRecursion || !match( origKey, stringBase ) )
 		{
@@ -361,13 +392,14 @@ for( const_nodes_iterator nItr = currentNode->nodesMap.begin(),
 }
 
 template< typename _valueT >
-string MTrie< _valueT >::getBase( const list< string >& base ) const
+string MTrie< _valueT >::getBase() const
 {
 string retMe ;
+retMe.reserve( 128 ) ;
 bool doneALoop = false ;
 
-for( list< string >::const_iterator rtItr = base.begin() ;
-	rtItr != base.end() ; ++rtItr )
+for( list< string >::const_iterator rtItr = base.begin(),
+	rtEndItr = base.end() ; rtItr != rtEndItr ; ++rtItr )
 	{
 	if( doneALoop )
 		{
@@ -503,7 +535,7 @@ if( !foundQuestionMark )
 //	<< ", localKey: "
 //	<< localKey
 //	<< ", base: "
-//	<< getBase( base )
+//	<< getBase()
 //	<< endl ;
 
 // Everything is set, begin recursion
@@ -582,7 +614,7 @@ MTrie< _valueT >::recursiveErase(
 	const string& key )
 {
 //clog	<< "MTrie::recursiveErase(*)> base: "
-//	<< getBase( base )
+//	<< getBase()
 //	<< ", key: "
 //	<< key
 //	<< endl ;
@@ -590,7 +622,7 @@ MTrie< _valueT >::recursiveErase(
 size_type eraseCount = 0 ;
 
 // '*'
-string stringBase = getBase( base ) ;
+string stringBase = getBase() ;
 if( !match( key, stringBase ) )
 	{
 	// This node matches
@@ -719,7 +751,7 @@ if( (base.size() >= minLength) && !currentNode->valuesList.empty() )
 	// We are at or past the min length, and this node
 	// has at least one value to add
 	// Only one entry into returnMe is necessary
-	retMe.push_back( getBase( base ) ) ;
+	retMe.push_back( getBase() ) ;
 	}
 else
 	{

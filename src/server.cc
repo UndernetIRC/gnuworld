@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server.cc,v 1.177 2003/08/12 18:17:12 dan_karrels Exp $
+ * $Id: server.cc,v 1.178 2003/08/19 21:48:39 dan_karrels Exp $
  */
 
 #include	<sys/time.h>
@@ -71,7 +71,7 @@
 #include	"ConnectionHandler.h"
 #include	"Connection.h"
 
-RCSTAG( "$Id: server.cc,v 1.177 2003/08/12 18:17:12 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: server.cc,v 1.178 2003/08/19 21:48:39 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -3922,7 +3922,7 @@ for( xNetwork::serverIterator sItr = Network->servers_begin() ;
 	delete Network->removeServer( tmpServer->getIntYY() ) ;
 	}
 
-elog	<< "xServer::doShutdown> Removing "
+elog	<< "xServer::doShutdown> Removed "
 	<< count
 	<< " servers..."
 	<< endl ;
