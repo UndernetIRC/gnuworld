@@ -150,6 +150,7 @@ lib_LTLIBRARIES = libgnuworldDB.la
 libgnuworldDB_la_SOURCES = gnuworldDB.cc \
 	pgsqlDB.cc
 
+INCLUDES = -I@PGSQL_INCLUDE@ $(INCLTDL)
 subdir = db
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
