@@ -14,7 +14,7 @@
 #include	"StringTokenizer.h"
 
 
-const char HELPCommand_cc_rcsId[] = "$Id: HELPCommand.cc,v 1.4 2001/02/26 16:58:05 mrbean_ Exp $";
+const char HELPCommand_cc_rcsId[] = "$Id: HELPCommand.cc,v 1.5 2001/03/03 18:46:59 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -52,8 +52,10 @@ else //Supplied a command, show only the help for that command (if it exists)
 		}
 	else
 		{
-		//bot->GetHelp(theClient,st[1]);
-		bot->Notice( theClient, ptr->second->getInfo() ) ;
+		if(2 == st.size())
+			bot->GetHelp(theClient,st[1]);
+		else
+			bot->GetHelp(theClient,st[1],st[2]);
 		}
 	}
 

@@ -23,7 +23,7 @@
 #include	"AuthInfo.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.18 2001/03/02 02:02:00 dan_karrels Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.19 2001/03/03 18:46:59 mrbean_ Exp $" ;
 
 using std::string ;
 using std::vector ;
@@ -976,8 +976,6 @@ else
 
 bool ccontrol::DelHost( ccUser* user, const string& host )
 {
-//    strstream Condition;
-//    Condition << "WHERE user_id = " << Id << ';';
 
 static const char *Main = "DELETE FROM hosts WHERE user_id = ";
 
@@ -1015,7 +1013,9 @@ static const char *Main = "SELECT line,help FROM help WHERE lower(command) = '";
 strstream theQuery;
 theQuery	<< Main
 		<< string_lower(command)
-		<< "' ORDER BY line"
+		<< "' and lower(subcommand) = "
+		<< "NULL"
+		<< " ORDER BY line"
 		<< ends;
 
 elog	<< "ccontrol::GetHelp> "
@@ -1028,31 +1028,7 @@ delete[] theQuery.str() ;
 if( PGRES_TUPLES_OK == status )
 	{
 	if(SQLDb->Tuples() > 0 )
-		{
-		for( int i = 0 ; i < SQLDb->Tuples() ; i++ )
-			{
-			string commInfo = replace(
-				SQLDb->GetValue( i, 1 ),
-				"$BOT$",
-				nickName ) ;
-
-			if( commInfo.empty() )
-				{
-				elog	<< "ccontrol::GetHelp> Unable "
-					<< "find $BOT$ in: "
-					<< SQLDb->GetValue( i, 1 )
-					<< ", when searching for "
-					<< "help on command: "
-					<< command
-					<< endl ;
-				}
-			else
-				{
-				// All is well
-				Notice( user, commInfo ) ;
-				}
-			} // for()
-		} // if( SQLDb->Tuples() > 0 )
+		DoHelp(user);
 	else
 		{
 		Notice( user,
@@ -1070,19 +1046,68 @@ else
 	}
 }
 
+bool ccontrol::GetHelp( iClient* user, const string& command , const string& subcommand)
+{
+static const char *Main = "SELECT line,help FROM help WHERE lower(command) = '";
+
+strstream theQuery;
+theQuery	<< Main
+		<< string_lower(command)
+		<< "' and lower(subcommand) = '"
+		<< string_lower(subcommand)
+		<< "' ORDER BY line"
+		<< ends;
+
+elog	<< "ccontrol::GetHelp> "
+	<< theQuery.str()
+	<< endl; 
+
+ExecStatusType status = SQLDb->Exec( theQuery.str() ) ;
+delete[] theQuery.str() ;
+
+if( PGRES_TUPLES_OK == status )
+	{
+	if(SQLDb->Tuples() > 0 )
+		DoHelp(user);
+	else
+		{
+		Notice( user,
+			"Couldnt find help for %s",
+			command.c_str());
+		}
+	return true;
+	}
+else
+	{
+	elog	<< "ccontrol::GetHelp> SQL Error: "
+		<< SQLDb->ErrorMessage()
+		<< endl ;
+	return false;	    
+	}
+}
+
+
+void ccontrol::DoHelp(iClient* theClient)
+{
+for( int i = 0 ; i < SQLDb->Tuples() ; i++ )
+	{
+	string commInfo = replace(
+	SQLDb->GetValue( i, 1 ),
+	"$BOT$",
+	nickName ) ;
+	Notice(theClient,commInfo);
+	} // for()
+}
+	
 string ccontrol::replace( const string& srcString,
 	const string& from,
 	const string& to )
 {
-string::size_type beginPos = srcString.find( from ) ;
-if( string::npos == beginPos )
-	{
-	return string() ;
-	}
+unsigned int beginPos;
+string retMe = srcString;
 
-string retMe( srcString.substr( 0, beginPos ) ) ;
-retMe += to ;
-retMe += srcString.substr( beginPos + from.size() ) ;
+while((beginPos = retMe.find(from)) <= retMe.size())
+	retMe.replace(beginPos,from.size(),to);
 
 return retMe ;
 
