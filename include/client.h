@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: client.h,v 1.53 2004/01/08 18:32:36 dan_karrels Exp $
+ * $Id: client.h,v 1.54 2004/02/04 14:47:25 denspike Exp $
  */
 
 #ifndef __CLIENT_H
-#define __CLIENT_H "$Id: client.h,v 1.53 2004/01/08 18:32:36 dan_karrels Exp $"
+#define __CLIENT_H "$Id: client.h,v 1.54 2004/02/04 14:47:25 denspike Exp $"
 
 #include	<sstream>
 #include	<string>
@@ -584,6 +584,15 @@ public:
 	 * DoCTCP will issue a CTCP (reply) to the given iClient.
 	 */
 	virtual bool DoCTCP( iClient* Target,
+		const std::string& CTCP,
+		const std::string& Message ) ;
+
+	/**
+	 * DoFakeCTCP will issue a CTCP (reply) to the given
+	 * iClient with a fake client interface.
+	 */
+	virtual bool DoFakeCTCP( const iClient* Target,
+		const iClient* srcClient,
 		const std::string& CTCP,
 		const std::string& Message ) ;
 

@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: client.cc,v 1.69 2004/01/08 18:32:37 dan_karrels Exp $
+ * $Id: client.cc,v 1.70 2004/02/04 14:47:26 denspike Exp $
  */
 
 #include	<new>
@@ -49,7 +49,7 @@
 #include	"ELog.h"
 #include	"events.h"
 
-RCSTAG("$Id: client.cc,v 1.69 2004/01/08 18:32:37 dan_karrels Exp $" ) ;
+RCSTAG("$Id: client.cc,v 1.70 2004/02/04 14:47:26 denspike Exp $" ) ;
 
 namespace gnuworld
 {
@@ -278,6 +278,36 @@ ctcpReply += "\001" ;
 return MyUplink->Write( "%s O %s :%s\r\n",
 	getCharYYXXX().c_str(),
 	Target->getCharYYXXX().c_str(),
+	ctcpReply.c_str() ) ;
+}
+
+bool xClient::DoFakeCTCP( const iClient* destClient,
+	const iClient* srcClient,
+	const string& CTCP,
+	const string& Message )
+{
+assert( destClient != 0 ) ;
+assert( srcClient != 0 ) ;
+
+if( !isConnected() )
+	{
+	return false ;
+	}
+
+string ctcpReply( "\001" ) ;
+ctcpReply += CTCP ;
+
+// Be careful not to include an extra space inside of the CTCP reply
+// if Message is empty
+if( !Message.empty() )
+	{
+	ctcpReply += string( " " ) + Message ;
+	}
+ctcpReply += "\001" ;
+
+return MyUplink->Write( "%s O %s :%s\r\n",
+	srcClient->getCharYYXXX().c_str(),
+	destClient->getCharYYXXX().c_str(),
 	ctcpReply.c_str() ) ;
 }
 
