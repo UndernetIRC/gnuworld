@@ -325,7 +325,7 @@ banVector.clear() ;
 
 // Walk through the list of bans being removed/added
 for( banVectorType::const_iterator newBanPtr = origBans.begin() ;
-	newBanPtr != banVector.end() ; ++newBanPtr )
+	newBanPtr != origBans.end() ; ++newBanPtr )
 	{
 	banVector.push_back( *newBanPtr ) ;
 
@@ -415,7 +415,18 @@ string Channel::createBan( const iClient* theClient )
 
 string theBan = "*!*" ;
 
-theBan += theClient->getUserName() + '@' ;
+// Don't include the '~'
+if( (theClient->getUserName().size() >= 2) &&
+	('~' == theClient->getUserName()[ 0 ]) )
+	{
+	theBan += theClient->getUserName().c_str() + 1 ;
+	}
+else if( !theClient->getUserName().empty() )
+	{
+	theBan += theClient->getUserName() ;
+	}
+
+theBan += '@' ;
 
 StringTokenizer st( theClient->getInsecureHost(), '.' ) ;
 if( Socket::isIPAddress( theClient->getInsecureHost() ) )
