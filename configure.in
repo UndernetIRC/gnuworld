@@ -1,10 +1,10 @@
-dnl $Id: configure.in,v 1.24 2001/06/02 23:44:42 dan_karrels Exp $
+dnl $Id: configure.in,v 1.25 2001/06/19 23:25:40 dan_karrels Exp $
 dnl ----------------------------------------------------------
 
 echo Configuring GNUWorld...
 echo
 
-AC_REVISION($Revision: 1.24 $)
+AC_REVISION($Revision: 1.25 $)
 AC_INIT(src/main.cc)
 AM_INIT_AUTOMAKE(gnuworld,0.0)
 AM_CONFIG_HEADER(include/defs.h)
@@ -293,24 +293,34 @@ dnl
 dnl AC_CHECK_FUNC(getpgid, AC_DEFINE(HAVE_GETPGID),)
 dnl AC_CHECK_FUNC(getpgrp, AC_FUNC_GETPGRP,)
 
-PGSQL_INCLUDE=""
-PGSQL_LIB=""
+PGSQL_PREFIX=/usr/local/pgsql
+
+AC_ARG_WITH(pgsql, \
+[  --with-pgsql=PGSQLDIR   Specify location to find pgsql
+                          Default path is \"/usr/local/pgsql\"],
+[PGSQL_PREFIX=$withval]
+)
 
 AC_MSG_CHECKING(for libpq++.h)
-if test -f "/usr/local/pgsql/include/libpq++.h"; then
-	PGSQL_INCLUDE=/usr/local/pgsql/include
-	PGSQL_LIB=/usr/local/pgsql/lib
-elif test -f "/usr/include/pgsql/libpq++.h"; then
-	PGSQL_INCLUDE=/usr/include/pgsql
-	PGSQL_LIB=/usr/lib/pgsql
+if test -f "$PGSQL_PREFIX/include/libpq++.h"; then
+	PGSQL_PREFIX=$PGSQL_PREFIX
+elif test -f "/usr/local/pgsql/include/libpq++.h"; then
+	PGSQL_PREFIX=/usr/local/pgsql
 else
         AC_MSG_ERROR( Unable to find PostGreSQL )
 fi
-
 AC_MSG_RESULT(yes)
+
+PGSQL_INCLUDE=$PGSQL_PREFIX/include
+PGSQL_LIB=$PGSQL_PREFIX/lib
 
 AC_SUBST(PGSQL_INCLUDE)
 AC_SUBST(PGSQL_LIB)
+
+dnl echo "PGSQL_PREFIX: $PGSQL_PREFIX"
+dnl echo "PGSQL_INCLUDE: $PGSQL_INCLUDE"
+dnl echo "PGSQL_LIB: $PGSQL_LIB"
+dnl exit
 
 AC_SUBST(LDFLAGS)
 AC_SUBST(bindir)
@@ -331,8 +341,9 @@ searchForMods=yes
 
 AC_ARG_ENABLE(modules, \
 [  --enable-modules=[mods] Enable one or more modules; all modules
-                          found in the current directory are on
-                          default],
+                          found in the current directory are enabled
+                          by default.  Specify \"no\" (without quotes)
+                          to build server only],
 [
 dnl echo "enableval: $enableval"
 if test $enableval = "yes" ; then

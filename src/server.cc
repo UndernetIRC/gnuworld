@@ -50,7 +50,7 @@
 #include	"UnloadClientTimerHandler.h"
 
 const char server_h_rcsId[] = __SERVER_H ;
-const char server_cc_rcsId[] = "$Id: server.cc,v 1.106 2001/06/14 22:14:13 dan_karrels Exp $" ;
+const char server_cc_rcsId[] = "$Id: server.cc,v 1.107 2001/06/19 23:25:40 dan_karrels Exp $" ;
 const char config_h_rcsId[] = __CONFIG_H ;
 const char misc_h_rcsId[] = __MISC_H ;
 const char events_h_rcsId[] = __EVENTS_H ;
@@ -322,14 +322,11 @@ REGISTER_MSG( "AD", AD ) ;
 // NOOP handlers.
 // These messages aren't currently used.
 
-// WHOIS
-REGISTER_MSG( "WHOIS", NOOP ) ;
-
 // PING Reply
 REGISTER_MSG( "Z", NOOP ) ;
 
 // MOTD
-REGISTER_MSG( "MOTD", NOOP ) ;
+// REGISTER_MSG( "MOTD", NOOP ) ;
 REGISTER_MSG( "MO", NOOP ) ;
 
 // STATS
@@ -352,6 +349,8 @@ REGISTER_MSG( "A", NOOP ) ;
 
 // *shrug*
 REGISTER_MSG( "441", NOOP ) ;
+
+REGISTER_MSG( "F", NOOP ) ;
 
 }
 
