@@ -20,7 +20,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
  * USA.
  *
- * $Id: cloner.cc,v 1.19 2002/08/01 23:39:13 reedloden Exp $
+ * $Id: cloner.cc,v 1.20 2002/08/01 23:46:23 reedloden Exp $
  */
 
 #include	<new>
@@ -45,7 +45,7 @@
 
 const char client_h_rcsId[] = __CLIENT_H ;
 const char cloner_h_rcsId[] = __CLONER_H ;
-const char cloner_cc_rcsId[] = "$Id: cloner.cc,v 1.19 2002/08/01 23:39:13 reedloden Exp $" ;
+const char cloner_cc_rcsId[] = "$Id: cloner.cc,v 1.20 2002/08/01 23:46:23 reedloden Exp $" ;
 const char iClient_h_rcsId[] = __ICLIENT_H ;
 const char EConfig_h_rcsId[] = __ECONFIG_H ;
 const char ELog_h_rcsId[] = __ELOG_H ;
@@ -182,7 +182,7 @@ if( command == "SHOWCOMMANDS" || command == "HELP" )
 	{
 	if( st.size() < 1 )
 		{
-		Notice( theClient, "Usage: %s", string_upper( st[ 0 ) ;
+		Notice( theClient, "Usage: %s", command.c_str() ) ;
 		return 0 ;
 		}
 	if( st.size() >= 1 )
@@ -321,7 +321,7 @@ else if( command == "KILLALL" || command == "QUITALL" )
 	{
         if( st.size() < 1 )
                 {
-                Notice( theClient, "Usage: %s [reason]", command ) ;
+                Notice( theClient, "Usage: %s [reason]", command.c_str() ) ;
                 return 0 ;
                 }
 
@@ -364,7 +364,7 @@ else if( command == "SAYALL" || command == "MSGALL" )
 	if( st.size() < 3 )
 		{
 		Notice( theClient, "Usage: %s <#channel/nickname>
-			<message>", command ) ;
+			<message>", command.c_str() ) ;
 		return 0 ;
 		}
 
@@ -391,7 +391,7 @@ else if( command == "ACTALL" || command == "DOALL" || command ==
 	if( st.size() < 3 )
 		{
 		Notice( theClient, "Usage: %s <#channel/nickname>
-			<action>", command ) ;
+			<action>", command.c_str() ) ;
 		return 0 ;
 		}
 
@@ -418,7 +418,7 @@ else if( command == "NOTICEALL" )
 	if( st.size() < 3 )
 		{
 		Notice( theClient, "Usage: %s <#channel/nickname>
-			<notice>", command ) ;
+			<notice>", command.c_str() ) ;
 		return 0 ;
 		}
 
