@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server.h,v 1.82 2003/06/05 01:38:02 dan_karrels Exp $
+ * $Id: server.h,v 1.83 2003/06/06 13:14:15 dan_karrels Exp $
  */
 
 #ifndef __SERVER_H
-#define __SERVER_H "$Id: server.h,v 1.82 2003/06/05 01:38:02 dan_karrels Exp $"
+#define __SERVER_H "$Id: server.h,v 1.83 2003/06/06 13:14:15 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
@@ -364,6 +364,9 @@ public:
 
 	/**
 	 * Attempt to unload a client given its module name.
+	 * Be sure that you have the proper fully qualified
+	 * moduleName.  If uncertain, use the other form of
+	 * the UnloadClient() method.
 	 */
 	virtual void	UnloadClient( const string& moduleName,
 				const string& reason ) ;

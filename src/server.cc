@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server.cc,v 1.161 2003/06/05 01:38:11 dan_karrels Exp $
+ * $Id: server.cc,v 1.162 2003/06/06 13:14:16 dan_karrels Exp $
  */
 
 #include	<sys/time.h>
@@ -72,7 +72,7 @@
 #include	"Connection.h"
 
 const char server_h_rcsId[] = __SERVER_H ;
-const char server_cc_rcsId[] = "$Id: server.cc,v 1.161 2003/06/05 01:38:11 dan_karrels Exp $" ;
+const char server_cc_rcsId[] = "$Id: server.cc,v 1.162 2003/06/06 13:14:16 dan_karrels Exp $" ;
 const char config_h_rcsId[] = __CONFIG_H ;
 const char misc_h_rcsId[] = __MISC_H ;
 const char events_h_rcsId[] = __EVENTS_H ;
@@ -511,7 +511,7 @@ for( ; ptr != conf.end() && ptr->first == "module" ; ++ptr )
 		return false ;
 		}
 
-	elog	<< "xServer> Found module: "
+	elog	<< "xServer::loadClients> Found module: "
 		<< modInfo[0]
 		<< " (Config: "
 		<< modInfo[1]
@@ -1536,26 +1536,39 @@ for( clientModuleListType::const_iterator ptr = clientModuleList.begin() ;
 		return DetachClient( (*ptr)->getObject(), reason ) ;
 		}
 	}
+
+elog	<< "xServer::DetachClient> Unable to find client moduleName: "
+	<< moduleName
+	<< endl ;
+
 return false ;
 }
 
 void xServer::LoadClient( const string& moduleName,
 	const string& configFileName )
 {
-elog	<< "xServer::LoadClient("
-	<< moduleName
-	<< ", "
-	<< configFileName
-	<< ")"
-	<< endl ;
+//elog	<< "xServer::LoadClient("
+//	<< moduleName
+//	<< ", "
+//	<< configFileName
+//	<< ")"
+//	<< endl ;
 
 // First, unload the client.
 // This will queue the request.
 //UnloadClient( moduleName ) ;
 
+string fileName = moduleName ;
+if( '/' != fileName[ 0 ] )
+	{
+	// Relative path, prepend the libPrefix to the fileName
+	// libPrefix is guaranteed to end with '/'
+	fileName = libPrefix + moduleName ;
+	}
+
 // Next, queue the load request
 LoadClientTimerHandler* handler = new (std::nothrow)
-	LoadClientTimerHandler( this, moduleName, configFileName ) ;
+	LoadClientTimerHandler( this, fileName, configFileName ) ;
 assert( handler != 0 ) ;
 
 RegisterTimer( ::time( 0 ), handler, 0 ) ;
@@ -1564,9 +1577,13 @@ RegisterTimer( ::time( 0 ), handler, 0 ) ;
 void xServer::UnloadClient( const string& moduleName,
 	const string& reason )
 {
-elog	<< "xServer::UnloadClient(const string&)> "
-	<< moduleName
-	<< endl ;
+//elog	<< "xServer::UnloadClient("
+//	<< moduleName
+//	<< ","
+//	<< reason
+//	<< ")> "
+//	<< moduleName
+//	<< endl ;
 
 UnloadClientTimerHandler* handler = new (std::nothrow)
 	UnloadClientTimerHandler( this, moduleName, reason ) ;

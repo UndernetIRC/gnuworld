@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: stats.cc,v 1.10 2003/06/06 00:44:11 dan_karrels Exp $
+ * $Id: stats.cc,v 1.11 2003/06/06 13:14:16 dan_karrels Exp $
  */
 
 #include	<string>
@@ -92,7 +92,7 @@ else
 	}
 
 partMessage = conf.Require( "part_message" )->second ;
-startTime = 0 ;
+startTime = ::time( 0 ) ;
 }
 
 stats::~stats()
@@ -149,7 +149,7 @@ if( st[ 0 ] == "reload" )
 	elog	<< "stats::OnPrivateMessage> Reloading"
 		<< endl ;
 
-	getUplink()->UnloadClient( "libstats.la",
+	getUplink()->UnloadClient( this,
 		"Keep smiling, I'm reloading..." ) ;
 	getUplink()->LoadClient( "libstats.la",
 		getConfigFileName() ) ;
@@ -267,6 +267,11 @@ if( fileItr == fileTable.end() )
 */
 
 memoryCount[ fileName ]++ ;
+//elog	<< "stats::WriteLog> memoryCount[ "
+//	<< fileName
+//	<< " ]: "
+//	<< memoryCount[ fileName ]
+//	<< endl ;
 
 /*
 // Get the current time
@@ -388,7 +393,7 @@ Notice( theClient, "EventType   EventCount  Average" ) ;
 unsigned long int totalEvents = 0 ;
 
 for( constMemoryCountIterator countItr = memoryCount.begin() ;
-	countItr != memoryCount.begin() ; ++countItr )
+	countItr != memoryCount.end() ; ++countItr )
 	{
 	totalEvents += countItr->second ;
 	Notice( theClient, "%s  %d  %f/second",

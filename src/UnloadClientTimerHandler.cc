@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: UnloadClientTimerHandler.cc,v 1.4 2002/05/27 17:18:12 dan_karrels Exp $
+ * $Id: UnloadClientTimerHandler.cc,v 1.5 2003/06/06 13:14:16 dan_karrels Exp $
  */
 
 #include	<iostream>
@@ -27,7 +27,7 @@
 #include	"ELog.h"
 
 const char UnloadClientTimerHandler_h_rcsId[] = __UNLOADCLIENTTIMERHANDLER_H ;
-const char UnloadClientTimerHandler_cc_rcsId[] = "$Id: UnloadClientTimerHandler.cc,v 1.4 2002/05/27 17:18:12 dan_karrels Exp $" ;
+const char UnloadClientTimerHandler_cc_rcsId[] = "$Id: UnloadClientTimerHandler.cc,v 1.5 2003/06/06 13:14:16 dan_karrels Exp $" ;
 const char ELog_h_rcsId[] = __ELOG_H ;
 
 namespace gnuworld
@@ -35,10 +35,10 @@ namespace gnuworld
 
 int UnloadClientTimerHandler::OnTimer( timerID, void* )
 {
-elog	<< "UnloadClientTimerHandler::OnTimer("
-	<< moduleName
-	<< ")"
-	<< std::endl ;
+//elog	<< "UnloadClientTimerHandler::OnTimer("
+//	<< moduleName
+//	<< ")"
+//	<< std::endl ;
 
 theServer->DetachClient( moduleName, reason ) ;
 
