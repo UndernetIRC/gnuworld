@@ -137,6 +137,8 @@ cservice::cservice(const string& args)
     RegisterCommand(new BANLISTCommand(this, "BANLIST", "<#channel>", 3));
     RegisterCommand(new KICKCommand(this, "KICK", "<#channel> <nick> <reason>", 4));
     RegisterCommand(new STATUSCommand(this, "STATUS", "<#channel>", 4));
+    RegisterCommand(new SUSPENDCommand(this, "SUSPEND", "<#channel> <nick> [duration]", 5));
+    RegisterCommand(new UNSUSPENDCommand(this, "UNSUSPEND", "<#channel> <nick>", 5));
 
     RegisterCommand(new REGISTERCommand(this, "REGISTER", "<#channel>", 0));
     RegisterCommand(new FORCECommand(this, "FORCE", "<#channel>", 0));
@@ -222,7 +224,7 @@ int cservice::BurstChannels()
 
 			id = SQLDb->GetValue(i, 1);
 
-			MyUplink->JoinChannel( this, id, SQLDb->GetValue( i, 9 ) );
+			MyUplink->JoinChannel( this, id, SQLDb->GetValue( i,  10) );
 			MyUplink->RegisterChannelEvent( id, this ) ;
 
 			// Add this information to the channel cache.
@@ -407,7 +409,7 @@ int cservice::OnCTCP( iClient* theClient, const string& CTCP,
 
 	if(Command == "VERSION")
 	{
-		xClient::DoCTCP(theClient, CTCP.c_str(), "Undernet P10 Channel Services Version 2 [" __DATE__ " " __TIME__ "] ($Id: cservice.cc,v 1.33 2001/01/10 01:46:10 gte Exp $)");
+		xClient::DoCTCP(theClient, CTCP.c_str(), "Undernet P10 Channel Services Version 2 [" __DATE__ " " __TIME__ "] ($Id: cservice.cc,v 1.34 2001/01/11 01:51:56 gte Exp $)");
 		return true;
 	}
  
@@ -714,8 +716,9 @@ int cservice::OnTimer(xServer::timerID, void*)
 	{
 		updateType = 2;
 		theQuery << "SELECT " << sql::user_fields
-		<< ",now()::abstime::int4 as db_unixtime FROM users WHERE last_updated >= " << lastUserRefresh;
-		// Fetch updated user information.
+		<< ",now()::abstime::int4 as db_unixtime FROM users WHERE flags <> 2 AND last_updated >= " << lastUserRefresh;
+		// Fetch updated user information. (We only pick up people who are't authed, or
+		// we'll end up fetching back the same info from people we've authed later on).
 	} 
 
 	if (string(notify->relname) == "levels_u") 
@@ -1009,6 +1012,8 @@ int cservice::OnEvent( const eventType& theEvent,
 			if (tmpSqlUser)
 			{
 				tmpSqlUser->networkClient = NULL;
+				tmpSqlUser->removeFlag(sqlUser::F_LOGGEDIN);
+				tmpSqlUser->commit();
 				elog << "cservice::OnEvent> Deauthenticated user " << tmpSqlUser->getUserName() << endl;
 			}
 			// Clear up the custom data structure we appended to this iClient.

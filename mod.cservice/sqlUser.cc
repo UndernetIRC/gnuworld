@@ -4,7 +4,7 @@
  * Storage class for accessing user information either from the backend
  * or internal storage.
  * 
- * $Id: sqlUser.cc,v 1.7 2001/01/08 04:13:04 gte Exp $
+ * $Id: sqlUser.cc,v 1.8 2001/01/11 01:51:56 gte Exp $
  */
  
 #include	<strstream>
@@ -145,7 +145,8 @@ bool sqlUser::commit()
 	<< "SET flags = " << flags << ", "
 	<< "password = '" << password << "', "
 	<< "last_seen = " << last_seen << ", "
-	<< "language_id = " << language_id << " "
+	<< "language_id = " << language_id << ", "
+	<< "last_updated = now()::abstime::int4 "
 	<< queryCondition << id
 	<< ends;
 
