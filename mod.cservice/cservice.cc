@@ -455,7 +455,7 @@ int cservice::OnCTCP( iClient* theClient, const string& CTCP,
 
 	if(Command == "VERSION")
 	{
-		xClient::DoCTCP(theClient, CTCP.c_str(), "Undernet P10 Channel Services Version 2 [" __DATE__ " " __TIME__ "] ($Id: cservice.cc,v 1.56 2001/01/20 22:01:01 gte Exp $)");
+		xClient::DoCTCP(theClient, CTCP.c_str(), "Undernet P10 Channel Services Version 2 [" __DATE__ " " __TIME__ "] ($Id: cservice.cc,v 1.57 2001/01/21 02:46:11 gte Exp $)");
 		return true;
 	}
  
@@ -807,9 +807,8 @@ int cservice::OnTimer(xServer::timerID, void*)
 	{
 		updateType = 2;
 		theQuery << "SELECT " << sql::user_fields
-		<< ",now()::abstime::int4 as db_unixtime FROM users WHERE flags <> 2 AND last_updated >= " << lastUserRefresh;
-		// Fetch updated user information. (We only pick up people who are't authed, or
-		// we'll end up fetching back the same info from people we've authed later on).
+		<< ",now()::abstime::int4 as db_unixtime FROM users WHERE last_updated >= " << lastUserRefresh;
+		// Fetch updated user information.
 	} 
 
 	if (string(notify->relname) == "levels_u")
@@ -1140,14 +1139,14 @@ int cservice::OnEvent( const eventType& theEvent,
  
 	return 0;
 }
- 
-void cservice::deopAllOnChan(Channel* theChan)
-{
-	/*
-	 *  Support function to deop all opped users on a channel.
-	 */
 
-	if (!theChan) return;
+/*--deopAllOnChan-------------------------------------------------------------
+ *
+ * Support function to deop all opped users on a channel.
+ *--------------------------------------------------------------------------*/
+void cservice::deopAllOnChan(Channel* theChan)
+{ 
+	if (!theChan) return; /* Don't try this on a null channel. */
 
 	vector< iClient* > deopList;
 
