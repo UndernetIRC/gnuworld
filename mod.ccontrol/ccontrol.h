@@ -3,7 +3,7 @@
  */
 
 #ifndef __CCONTROL_H
-#define __CCONTROL_H "$Id: ccontrol.h,v 1.44 2001/10/28 10:12:39 mrbean_ Exp $"
+#define __CCONTROL_H "$Id: ccontrol.h,v 1.45 2001/11/03 01:13:06 mrbean_ Exp $"
 
 
 #include	<string>
@@ -30,7 +30,8 @@
 #include 	"ccException.h"
 #include        "server.h"
 #include	"CommandsDec.h"
-
+#include	"ccGate.h"
+#include	<pthread.h>
 namespace gnuworld
 {
  
@@ -118,6 +119,14 @@ protected:
 	
 	typedef clonesQueueType::iterator clonesIterator;
 				
+	typedef list< ccGate* >		gateQueueType;
+	
+	gateQueueType			gatesWaitingQueue;
+	
+	gateQueueType			gatesCheckingQueue;
+	
+	typedef gateQueueType::iterator gateIterator;
+	
 public:
 
 	/**
@@ -524,9 +533,6 @@ public:
 	
 	void listServers( iClient * );
 	
-//	unsigned int getTrueAccess( unsigned int Access );
-	
-//	unsigned int getTrueFlags( unsigned int Flags );
 	
 	void loadCommands();
 	
@@ -538,7 +544,6 @@ public:
 
 	bool UpdateCommandFromDb ( Command* Comm );
 
-
 	bool CleanServers();
 	
 	const string expandDbServer(const string);
@@ -548,6 +553,10 @@ public:
 	void delClone(const string);
 	
 	void checkClones(const int);
+	
+	void GatesCheck();
+	
+//	void *initGate(void *);
 	
 	/**
 	 * This is a constant iterator type used to perform a read-only
@@ -692,6 +701,8 @@ public:
 
 	xServer::timerID clonesCheck;
 		
+	xServer::timerID gatesStatusCheck;
+	
 protected:
 
 	/**
@@ -764,7 +775,14 @@ protected:
 	 int			userMaxConnection;
 	 
 	 int			maxGlineLen;
+	
+	 int			maxThreads;
+
+	 bool			checkGates;	 
+	
 } ; 
+
+void* initGate( void * );
  
 } //namespace uworld
 

@@ -11,6 +11,11 @@
 
 #include	<cstring>
 
+#include        <sys/types.h> 
+#include        <sys/socket.h>
+#include        <netinet/in.h>
+#include        <netdb.h>
+
 #include	"client.h"
 #include	"iClient.h"
 #include	"EConfig.h"
@@ -27,9 +32,11 @@
 #include 	"gline.h"
 #include	"commLevels.h"
 #include	"ccFloodData.h"
+#include	"ccGate.h"
+#include	"ip.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.79 2001/10/28 14:17:56 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.80 2001/11/03 01:13:06 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -146,6 +153,10 @@ SendReport = atoi(conf.Require("mail_report")->second.c_str());
 userMaxConnection = atoi(conf.Require("max_connection")->second.c_str());
 
 maxGlineLen = atoi(conf.Require("max_GLen")->second.c_str());
+
+maxThreads = atoi(conf.Require("max_threads")->second.c_str());
+
+checkGates = atoi(conf.Require("check_gates")->second.c_str());
 
 // Set up the oper channels
 EConfig::const_iterator ptr = conf.Find( "operchan" ) ;
@@ -372,6 +383,11 @@ if(SendReport)
 	postDailyLog = theServer->RegisterTimer(theTime, this, NULL); 
 	}
 
+if(checkGates)
+	{
+	gatesStatusCheck = theServer->RegisterTimer(::time(0) + 1,this,NULL);
+	}
+	
 theServer->RegisterEvent( EVT_KILL, this );
 theServer->RegisterEvent( EVT_QUIT, this );
 theServer->RegisterEvent( EVT_NETJOIN, this );
@@ -634,6 +650,18 @@ switch( theEvent )
 		assert( floodData != 0 ) ;
 		NewUser->setCustomData(this,
 			static_cast< void* >( floodData ) );
+		if(checkGates)
+			{
+			string tIP = xIP( NewUser->getIP()).GetNumericIP();
+			if(strcasecmp(tIP,"0.0.0.0"))			
+				{
+				ccGate* tempGate = new (nothrow) ccGate(tIP,1080);
+				gatesWaitingQueue.push_back(tempGate);			
+				tempGate = new (nothrow) ccGate(tIP,23);
+				assert(tempGate != NULL);
+				gatesWaitingQueue.push_back(tempGate);
+				}			
+			}
 		if(!inBurst)
 			{
 			int CurConnections = Network->countHost(NewUser->getInsecureHost());		
@@ -756,6 +784,15 @@ else if(timer_id == clonesCheck)
 			{
 			MsgChanLog("Finished checking the clones queue\n");
 			}			
+		}
+	}
+
+else if(timer_id == gatesStatusCheck)
+	{
+	if(checkGates)
+		{
+		GatesCheck();
+		gatesStatusCheck = MyUplink->RegisterTimer(::time(0) + 2,this,NULL);
 		}
 	}
 return true;
@@ -2626,6 +2663,130 @@ for(clonesIterator ptr = clonesQueue.begin();((ptr != clonesQueue.end()) && (Num
 	ptr = clonesQueue.erase(ptr);
 	}
 	
+}
+
+
+void ccontrol::GatesCheck()
+{
+gateIterator ptr;
+ccGate* tmpGate;
+for(ptr = gatesCheckingQueue.begin();ptr!=gatesCheckingQueue.end();)
+	{
+	tmpGate = *ptr;
+	if(tmpGate->getStatus() == ccGate::statDone)
+		{
+		if(tmpGate->getFound())
+			{
+			MsgChanLog("Found socks proxy in %s\n",tmpGate->getHost().c_str());
+			}			
+		ptr = gatesCheckingQueue.erase(ptr);
+		delete tmpGate;
+		}
+	else
+		{
+		++ptr;
+		}
+	}
+
+int LeftThreads = maxThreads - gatesCheckingQueue.size();
+
+ptr = gatesWaitingQueue.begin();
+int er;
+pthread_t tId; 
+for(;(!(gatesWaitingQueue.empty()) && (LeftThreads));--LeftThreads)
+	{
+	tmpGate = gatesWaitingQueue.front();
+	gatesWaitingQueue.pop_front();
+	gatesCheckingQueue.push_back(tmpGate);
+	if((er = pthread_create(&tId,NULL,initGate,(void *)tmpGate)) < 0)
+		{
+		MsgChanLog("Error(%d) while creating thread\n",errno);
+		gatesCheckingQueue.pop_front();
+		delete tmpGate;
+		}
+	else
+		{
+		tmpGate->setThreadId(tId);
+		}
+	}
+
+}	
+
+void *initGate(void* arg)
+{
+
+ccGate * tmpGate = (ccGate*) arg;
+
+int sockFd;
+fd_set ReadSet;
+char Buf[512] = {0};
+struct sockHead{
+    char Version; //Socks version number
+    char Command; //Connect command = 1
+    short int Port; //Destination port
+    char destIp[4]; //Destination ip 
+    char userid[5]; //Userid
+    };
+sockHead sockHeader;
+sockHeader.Version = 4;
+sockHeader.Command = 1;
+sockHeader.Port = htons(7777);
+sockHeader.destIp[0] = 192;
+sockHeader.destIp[1] = 117;
+sockHeader.destIp[2] = 105;
+sockHeader.destIp[3] = 131;
+strcpy(sockHeader.userid,"blah");
+unsigned int Port = tmpGate->getPort();
+string Host = tmpGate->getHost();
+struct sockaddr_in MyAddr;
+MyAddr.sin_family = AF_INET;
+MyAddr.sin_port = htons(Port);
+MyAddr.sin_addr.s_addr = inet_addr(Host.c_str());
+sockFd = socket(AF_INET,SOCK_STREAM,0);
+if(::connect(sockFd,(struct sockaddr*) &MyAddr,sizeof(MyAddr))>= 0)
+	{
+	tmpGate->setStatus(ccGate::statConnected);
+	int Res = 0;
+	if(tmpGate->getPort() == 1080)
+		{
+		int trys = 10;
+		do
+			{
+			errno =0;
+			Res = ::send(sockFd,(void *) &sockHeader,sizeof(sockHeader)-1,0);
+			}while((--trys) && (errno == EINTR));
+		}
+	if(Res >= 0)
+		{
+		FD_ZERO(&ReadSet);
+		FD_SET(sockFd,&ReadSet);
+		Res = ::select(sockFd+1,&ReadSet,NULL,NULL,NULL);
+		if(Res >= 0)
+			{
+			if(FD_ISSET(sockFd,&ReadSet))
+				{
+				Res = ::recv(sockFd,Buf,sizeof(Buf),0);
+				if(Res >= 0)
+					{
+					if(tmpGate->getPort() == 1080)
+						{
+						if(Buf[1] == 90) //Found a socks! 
+							tmpGate->setFound(true);
+						}
+					else if(tmpGate->getPort() == 23)
+						{
+						if(strstr(Buf,"wingate>") != NULL)
+							tmpGate->setFound(true);
+						}
+						
+		    			}
+				}
+			}
+		}
+	}
+tmpGate->setStatus(ccGate::statDone);
+
+return NULL;
 }
 
 }

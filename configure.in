@@ -1,10 +1,10 @@
-dnl $Id: configure.in,v 1.33 2001/09/02 17:13:14 dan_karrels Exp $
+dnl $Id: configure.in,v 1.34 2001/11/03 01:13:05 mrbean_ Exp $
 dnl ----------------------------------------------------------
 
 echo Configuring GNUWorld...
 echo
 
-AC_REVISION($Revision: 1.33 $)
+AC_REVISION($Revision: 1.34 $)
 AC_INIT(src/main.cc)
 AM_INIT_AUTOMAKE(gnuworld,0.0)
 AM_CONFIG_HEADER(include/defs.h)
@@ -32,8 +32,23 @@ AM_PROG_LIBTOOL
 dnl Configure libltdl
 AC_CONFIG_SUBDIRS(libltdl)
 
-CFLAGS="-Wall -pipe"
-CXXFLAGS="-Wall -pipe"
+pthread_found=no
+AC_CHECK_LIB(lthread, pthread_create, pthread_found=yes)
+
+if test $pthread_found = no; then
+AC_CHECK_LIB(pthread, pthread_create, pthread_found=yes)
+fi
+
+if test $pthread_found = no; then
+AC_CHECK_LIB(c, pthread_create, pthread_found=yes)
+fi
+
+if test $pthread_found = no; then
+AC_CHECK_LIB(c_r, pthread_create)
+fi
+
+CFLAGS="-Wall -pipe -pthread"
+CXXFLAGS="-Wall -pipe -pthread"
 CXX="g++"
 LIBS=""
 
@@ -62,7 +77,9 @@ AC_CHECK_LIB(socket,socket)
 AC_CHECK_LIB(nsl,gethostbyname)
 dnl AC_CHECK_LIB(pthread,pthread_create)
 dnl AC_CHECK_LIB(posix4,sem_init)
-
+AC_SEARCH_LIBS(pthread_create,lthread pthread c c_r)
+AC_SEARCH_LIBS(pthread_kill,lthread pthread c c_r)
+AC_CHECK_FUNCS(pthread_create)
 dnl ----------------------------------------------------------
 dnl
 dnl Checking for headers, functions, and a type declarations
