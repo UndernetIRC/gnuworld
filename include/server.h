@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server.h,v 1.75 2002/08/07 20:28:05 dan_karrels Exp $
+ * $Id: server.h,v 1.76 2002/10/31 18:52:51 dan_karrels Exp $
  */
 
 #ifndef __SERVER_H
-#define __SERVER_H "$Id: server.h,v 1.75 2002/08/07 20:28:05 dan_karrels Exp $"
+#define __SERVER_H "$Id: server.h,v 1.76 2002/10/31 18:52:51 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
@@ -844,6 +844,14 @@ public:
 	 * if the mode is being set/unset by a server.
 	 */
 	virtual void	OnChannelModeI( Channel*, bool, ChannelUser* ) ;
+
+	/**
+	 * This method is called when a channel mode 'r' change is
+	 * detected.
+	 * Keep in mind that the source ChannelUser may be NULL
+	 * if the mode is being set/unset by a server.
+	 */
+	virtual void	OnChannelModeR( Channel*, bool, ChannelUser* ) ;
 
 	/**
 	 * This method is called when a channel mode 'l' change is

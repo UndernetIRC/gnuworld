@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: Channel.h,v 1.24 2002/07/05 01:10:05 dan_karrels Exp $
+ * $Id: Channel.h,v 1.25 2002/10/31 18:52:50 dan_karrels Exp $
  */
 
 #ifndef __CHANNEL_H
-#define __CHANNEL_H "$Id: Channel.h,v 1.24 2002/07/05 01:10:05 dan_karrels Exp $"
+#define __CHANNEL_H "$Id: Channel.h,v 1.25 2002/10/31 18:52:50 dan_karrels Exp $"
 
 #include	<string>
 #include	<map>
@@ -103,6 +103,9 @@ public:
 
 	/// Bit representing channel mode +i
 	static const modeType	MODE_I ;
+
+	/// Bit representing channel mode +r
+	static const modeType	MODE_R ;
 
 	/// Type used to store number of clients in channel
 	typedef userListType::size_type size_type ;
@@ -466,6 +469,12 @@ protected:
 	 * or unset.
 	 */
 	virtual void	onModeI( bool ) ;
+
+	/**
+	 * This method is called when channel mode 'r' is set
+	 * or unset.
+	 */
+	virtual void	onModeR( bool ) ;
 
 	/**
 	 * This method is called when channel mode 'l' is set

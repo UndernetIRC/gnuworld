@@ -21,7 +21,7 @@
  */
 
 #ifndef __CLIENT_H
-#define __CLIENT_H "$Id: client.h,v 1.35 2002/06/06 02:41:24 dan_karrels Exp $"
+#define __CLIENT_H "$Id: client.h,v 1.36 2002/10/31 18:52:51 dan_karrels Exp $"
 
 #include	<sstream>
 #include	<string>
@@ -231,6 +231,15 @@ public:
 	 * setting the mode.
 	 */
 	virtual void OnChannelModeI( Channel*, bool polarity,
+			ChannelUser* ) ;
+
+	/**
+	 * This method is invoked when a user sets or removes
+	 * channel mode r (authenticate).  Keep in mind that the
+	 * source ChannelUser may be NULL if a server is
+	 * setting the mode.
+	 */
+	virtual void OnChannelModeR( Channel*, bool polarity,
 			ChannelUser* ) ;
 
 	/**

@@ -17,11 +17,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: iClient.h,v 1.30 2002/10/15 23:32:11 gte Exp $
+ * $Id: iClient.h,v 1.31 2002/10/31 18:52:51 dan_karrels Exp $
  */
 
 #ifndef __ICLIENT_H
-#define __ICLIENT_H "$Id: iClient.h,v 1.30 2002/10/15 23:32:11 gte Exp $"
+#define __ICLIENT_H "$Id: iClient.h,v 1.31 2002/10/31 18:52:51 dan_karrels Exp $"
 
 #include	<string>
 #include	<list>
@@ -87,6 +87,9 @@ public:
 
 	/// MODE_HIDDEN_HOST is true if the iClient has HIDDEN_HOST (+x) set.
 	const static modeType	MODE_HIDDEN_HOST ;
+
+	/// MODE_AUTH is true if the user is authenticated
+	const static modeType	MODE_AUTH ;
 
 	/// Iterator for channels this user is on.
 	typedef channelListType::iterator channelIterator ;
@@ -373,6 +376,12 @@ public:
 		}
 
 	/**
+	 * Set mode +r for this user.
+	 */
+	inline void setModeR()
+		{ setMode( MODE_AUTH ) ; }
+
+	/**
 	 * Remove a user mode for this iClient.
 	 */
 	inline void removeMode( const modeType& theMode )
@@ -413,6 +422,12 @@ public:
 	 */
 	inline void removeModeX()
 		{ removeMode( MODE_HIDDEN_HOST ) ; }
+
+	/**
+	 * Remove user mode 'r'.
+	 */
+	inline void removeModeR()
+		{ removeMode( MODE_AUTH ) ; }
 
 	/**
 	 * Return a string representation of this iClient's user

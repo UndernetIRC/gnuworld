@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server.cc,v 1.148 2002/10/29 19:38:32 dan_karrels Exp $
+ * $Id: server.cc,v 1.149 2002/10/31 18:52:53 dan_karrels Exp $
  */
 
 #include	<sys/time.h>
@@ -72,7 +72,7 @@
 #include	"Connection.h"
 
 const char server_h_rcsId[] = __SERVER_H ;
-const char server_cc_rcsId[] = "$Id: server.cc,v 1.148 2002/10/29 19:38:32 dan_karrels Exp $" ;
+const char server_cc_rcsId[] = "$Id: server.cc,v 1.149 2002/10/31 18:52:53 dan_karrels Exp $" ;
 const char config_h_rcsId[] = __CONFIG_H ;
 const char misc_h_rcsId[] = __MISC_H ;
 const char events_h_rcsId[] = __EVENTS_H ;
@@ -2957,6 +2957,48 @@ for( list< xClient* >::iterator ptr = listPtr->begin(), end = listPtr->end() ;
 	ptr != end ; ++ptr )
 	{
 	(*ptr)->OnChannelModeI( theChan, polarity, sourceUser ) ;
+	}
+}
+
+// Handle a channel mode change
+// theChan is the channel on which the mode change occured
+// polarity is true if the mode is being set, false otherwise
+// sourceUser is the source of the mode change; this variable
+// may be NULL if a server is setting the mode
+void xServer::OnChannelModeR( Channel* theChan, bool polarity,
+	ChannelUser* sourceUser )
+{
+theChan->onModeR( polarity ) ;
+
+// First deliver this channel event to any listeners for all channel
+// events.
+channelEventMapType::iterator allChanPtr =
+	channelEventMap.find( CHANNEL_ALL ) ;
+if( allChanPtr != channelEventMap.end() )
+	{
+	for( list< xClient* >::iterator ptr = allChanPtr->second->begin(),
+		endPtr = allChanPtr->second->end() ; ptr != endPtr ; ++ptr )
+		{
+		(*ptr)->OnChannelModeR( theChan, polarity, sourceUser ) ;
+		}
+	}
+
+// Find listeners for this specific channel
+channelEventMapType::iterator chanPtr =
+	channelEventMap.find( theChan->getName() ) ;
+if( chanPtr == channelEventMap.end() )
+	{
+	// No listeners for this channel's events
+	return ;
+	}
+
+// Iterate through the listeners for this channel's events
+// and notify each listener of the event
+list< xClient* >* listPtr = chanPtr->second ;
+for( list< xClient* >::iterator ptr = listPtr->begin(), end = listPtr->end() ;
+	ptr != end ; ++ptr )
+	{
+	(*ptr)->OnChannelModeR( theChan, polarity, sourceUser ) ;
 	}
 }
 

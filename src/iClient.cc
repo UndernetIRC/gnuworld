@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: iClient.cc,v 1.22 2002/05/27 17:18:12 dan_karrels Exp $
+ * $Id: iClient.cc,v 1.23 2002/10/31 18:52:53 dan_karrels Exp $
  */
 
 #include	<new>
@@ -35,7 +35,7 @@
 #include	"ip.h"
 
 const char iClient_h_rcsId[] = __ICLIENT_H ;
-const char iClient_cc_rcsId[] = "$Id: iClient.cc,v 1.22 2002/05/27 17:18:12 dan_karrels Exp $" ;
+const char iClient_cc_rcsId[] = "$Id: iClient.cc,v 1.23 2002/10/31 18:52:53 dan_karrels Exp $" ;
 const char client_h_rcsId[] = __CLIENT_H ;
 const char Numeric_h_rcsId[] = __NUMERIC_H ;
 const char ip_h_rcsId[] = __IP_H ;
@@ -53,6 +53,7 @@ const iClient::modeType iClient::MODE_DEAF        = 0x08 ;
 const iClient::modeType iClient::MODE_SERVICES    = 0x10 ;
 const iClient::modeType iClient::MODE_REGISTERED  = 0x20 ;
 const iClient::modeType iClient::MODE_HIDDEN_HOST = 0x40 ;
+const iClient::modeType iClient::MODE_AUTH	  = 0x80 ;
 
 iClient::iClient( const unsigned int& _uplink,
 	const string& _yxx,

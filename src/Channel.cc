@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: Channel.cc,v 1.35 2002/10/19 20:08:06 gte Exp $
+ * $Id: Channel.cc,v 1.36 2002/10/31 18:52:52 dan_karrels Exp $
  */
 
 #include	<new>
@@ -38,7 +38,7 @@
 #include	"ConnectionManager.h"
 
 const char Channel_h_rcsId[] = __CHANNEL_H ;
-const char Channel_cc_rcsId[] = "$Id: Channel.cc,v 1.35 2002/10/19 20:08:06 gte Exp $" ;
+const char Channel_cc_rcsId[] = "$Id: Channel.cc,v 1.36 2002/10/31 18:52:52 dan_karrels Exp $" ;
 const char iClient_h_rcsId[] = __ICLIENT_H ;
 const char ChannelUser_h_rcsId[] = __CHANNELUSER_H ;
 const char Network_h_rcsId[] = __NETWORK_H ;
@@ -64,6 +64,7 @@ const Channel::modeType Channel::MODE_K = 0x10 ;
 const Channel::modeType Channel::MODE_L = 0x20 ;
 const Channel::modeType Channel::MODE_M = 0x40 ;
 const Channel::modeType Channel::MODE_I = 0x80 ;
+const Channel::modeType Channel::MODE_R = 0x100 ;
 
 Channel::Channel( const string& _name,
 	const time_t& _creationTime )
@@ -328,6 +329,12 @@ void Channel::onModeI( bool polarity )
 {
 if( polarity )	setMode( MODE_I ) ;
 else		removeMode( MODE_I ) ;
+}
+
+void Channel::onModeR( bool polarity )
+{
+if( polarity )	setMode( MODE_R ) ;
+else		removeMode( MODE_R ) ;
 }
 
 void Channel::onModeL( bool polarity, const unsigned int& newLimit )
