@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------------
--- "$Id: webcookies.sql,v 1.3 2001/10/15 12:44:26 nighty Exp $"
+-- "$Id: local_db.sql,v 1.1 2001/10/16 00:31:46 nighty Exp $"
 -- Channel service DB SQL file for PostgreSQL.
 --
 -- Tables specific to webcookies (needs to be LOCAL).
@@ -18,4 +18,18 @@ CREATE TABLE webcookies (
 );
 
 CREATE INDEX webcookies_user_id_idx ON webcookies(user_id);
+
+
+CREATE TABLE pending_pwreset (
+        cookie VARCHAR(128) NOT NULL,
+        user_id INT4 NOT NULL,
+        question_id INT2 NOT NULL,
+        verificationdata VARCHAR(30) NOT NULL,
+        expiration INT4 NOT NULL
+);
+
+CREATE INDEX pending_pwreset_cookie_idx ON pending_pwreset(cookie);
+CREATE INDEX pending_pwreset_user_id_idx ON pending_pwreset(user_id);
+CREATE INDEX pending_pwreset_expiration_idx ON pending_pwreset(expiration);
+
 
