@@ -1,8 +1,10 @@
 ------------------------------------------------------------------------------------
--- "$Id: cservice.sql,v 1.3 2000/12/10 01:40:52 isomer Exp $"
+-- "$Id: cservice.sql,v 1.4 2000/12/10 17:57:42 gte Exp $"
 -- Channel service DB SQL file for PostgreSQL.
 
 -- ChangeLog:
+-- 2000-12-10: Gte
+--             Fixed a few typo's.
 -- 2000-10-22: Isomer
 --	       
 -- 2000-10-22: Isomer
@@ -30,7 +32,7 @@
 -- files.
 
 CREATE TABLE languages (
-	id SERIAL PRIMARY KEY,
+	id SERIAL,
 	name VARCHAR( 16 ),
 	last_update TIMESTAMP NOT NULL DEFAULT now(),
 	PRIMARY KEY(id)
@@ -82,9 +84,10 @@ CREATE TABLE channel (
 	description VARCHAR (128),
 	keywords VARCHAR(128),
 	registered_ts TIMESTAMP,
-	channel_ts INT4 NOT NULL DEFAULT now(),
+	channel_ts TIMESTAMP NOT NULL DEFAULT now(),
 	channel_mode VARCHAR(26),
 	-- does anyone actually read these schemas?
+	-- Yes :)
 	channel_key VARCHAR(24),
 	channel_limit INT4,
 	last_update TIMESTAMP NOT NULL DEFAULT now(),
@@ -107,7 +110,7 @@ CREATE TABLE bans (
 	level INT2,
 	duration INT4,				-- In seconds
 	reason VARCHAR (128),
-	channel_id INT4 CONSTRAINT bans_channel_id_ref REFERENCES channels (id),
+	channel_id INT4 CONSTRAINT bans_channel_id_ref REFERENCES channel (id),
 	last_update TIMESTAMP NOT NULL DEFAULT now(),
 
 	PRIMARY KEY (banmask,channel_id)
@@ -123,7 +126,7 @@ CREATE TABLE users (
 	last_seen TIMESTAMP,
 	email VARCHAR (128),
         url  VARCHAR(128),
-	language_id INT4 CONSTRAINT language_channel_id_ref REFERENCES language (id),
+	language_id INT4 CONSTRAINT language_channel_id_ref REFERENCES languages (id),
 	public_key TEXT,
 	flags INT2 NOT NULL DEFAULT '0',
 -- 0x00 01 -- Suspended globally
@@ -137,7 +140,7 @@ CREATE INDEX users_username_idx ON users( user_name );
 
 CREATE TABLE levels (
 
-	channel_id INT4 CONSTRAINT levels_channel_id_ref REFERENCES channels( id ),
+	channel_id INT4 CONSTRAINT levels_channel_id_ref REFERENCES channel( id ),
 	user_id INT4 CONSTRAINT levels_users_id_ref REFERENCES users( id ),
 	access INT4 NOT NULL DEFAULT '0',
 	flags INT2 NOT NULL DEFAULT '0',
@@ -159,7 +162,7 @@ CREATE INDEX levels_access_idx ON levels( access ) ;
 
 CREATE TABLE channellog (
 	ts TIMESTAMP,
-	channelID INT4 CONSTRAINT channel_log_ref REFERENCES channels( channelID ),
+	channelID INT4 CONSTRAINT channel_log_ref REFERENCES channel( channelID ),
 	message TEXT,
 	last_updated TIMESTAMP NOT NULL DEFAULT now()
 );
@@ -172,7 +175,7 @@ CREATE TABLE userlog (
 );
 
 CREATE TABLE supporters (
-	channel_id INT4 CONSTRAINT channel_supporters_ref REFERENCES channels ( id ),
+	channel_id INT4 CONSTRAINT channel_supporters_ref REFERENCES channel ( id ),
 	user_id INT4 CONSTRAINT users_supporters_ref REFERENCES users( id ),
 	support CHAR,
 -- NULL - not answered yet
@@ -185,14 +188,14 @@ CREATE TABLE supporters (
 );
 
 CREATE TABLE pending (
-	channel_id INT4 CONSTRAINT pending_channel_ref REFERENCES channels (id),
-	manager_id INT4 CONSTRAINT pending_manager_ref REFERENCES users(id),
+	channel_id INT4 CONSTRAINT pending_channel_ref REFERENCES channel (id),
+	manager_id INT4 CONSTRAINT pending_manager_ref REFERENCES users (id),
 	created_ts TIMESTAMP NOT NULL DEFAULT now(),
 	decision_ts TIMESTAMP,
 	decision VARCHAR (80),
 	comments TEXT,
 	last_updated TIMESTAMP NOT NULL DEFAULT now(),
-	PRIMARY_KEY(channel_id)
+	PRIMARY KEY(channel_id)
 );
 
 CREATE TABLE baddomain (
@@ -204,7 +207,7 @@ CREATE TABLE baddomain (
 
 	
 
-#-----------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------
 
 --Notes:
 -- * During registration:

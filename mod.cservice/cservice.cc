@@ -45,9 +45,12 @@ cservice::cservice(const string& args)
 { 
 	//-- Load in our cservice configuration file.
 	cserviceConfig = new EConfig( args ) ;
+	string sqlHost = cserviceConfig->Require( "sql_host" )->second;
+	string sqlDb = cserviceConfig->Require( "sql_db" )->second;
 	
-	string Query = "host=" + cserviceConfig->Require( "sql_host" )->second +
-		      " dbname=" + cserviceConfig->Require( "sql_db" )->second ;
+	string Query = "host=" + sqlHost + " dbname=" + sqlDb ;
+
+	elog << "[SQL]: Attempting to connect to " << sqlHost << "; Database: " << sqlDb << endl;
 
 	SQLDb = new PgDatabase( Query.c_str() ) ;
 
