@@ -17,7 +17,7 @@
  */
 
 #ifndef __XSERVER_H
-#define __XSERVER_H "$Id: server.h,v 1.19 2001/01/06 15:04:42 dan_karrels Exp $"
+#define __XSERVER_H "$Id: server.h,v 1.20 2001/01/06 19:46:35 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
@@ -1079,19 +1079,19 @@ protected:
 	 * This is a pointer into the network table to our uplink
 	 * server.  It is kept here for convenience.
 	 */
-	iServer* 		Uplink;
+	iServer* 		Uplink ;
 
 	/**
 	 * This is the buffer into which network commands are read
 	 * and from which they are later processed.
 	 */
-	Buffer			inputBuffer ;
+	Buffer< char >		inputBuffer ;
 
 	/**
 	 * This is the output buffer from which data is written to
 	 * the network.
 	 */
-	Buffer			outputBuffer ;
+	Buffer< char >		outputBuffer ;
 
 	/**
 	 * This is the size of the TCP input window.

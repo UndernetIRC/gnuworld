@@ -5,12 +5,12 @@
  */
 
 #ifndef __BUFFER_H
-#define __BUFFER_H "$Id: Buffer.h,v 1.1 2000/06/30 18:46:06 dan_karrels Exp $"
+#define __BUFFER_H "$Id: Buffer.h,v 1.2 2001/01/06 19:46:35 dan_karrels Exp $"
 
 #include	<iostream>
 #include	<string>
 
-using std::string ;
+using std::basic_string ;
 
 /**
  * This class represents a dynamic buffer capable or parsing out
@@ -20,16 +20,20 @@ using std::string ;
  * because it is unlimited in size and provides a Delete() method
  * to delete an arbitrary number of bytes.
  */
+template< class charType = char >
 class Buffer
 {
 
 public:
 
+	typedef basic_string< charType > stringType ;
+
 	/**
 	 * Initialize the Buffer with the given string and
 	 * delimiting character
 	 */
-	Buffer( const string& = string(), char = '\n' ) ;
+	Buffer( const basic_string< charType >& =
+		basic_string< charType >(), charType = '\n' ) ;
 
 	/**
 	 * Destroy this Buffer object.  No internal allocation
@@ -43,13 +47,13 @@ public:
 	 * passed as argument, erasing the line from
 	 * the Buffer once complete.
 	 */
-	virtual bool		ReadLine( string& ) ;
+	virtual bool		ReadLine( basic_string< charType >& ) ;
 
 	/**
 	 * Define the type of the variable used to maintain
 	 * size (number of bytes) of Buffer.
 	 */
-	typedef string::size_type size_type ;
+	typedef basic_string< charType >::size_type size_type ;
 
 	/**
 	 * Return the the number of characters currently in
@@ -98,21 +102,22 @@ public:
 	 * This method is const, and therefore does not alter the
 	 * Buffer.
 	 */
-	inline string	substr( const size_type& index, const size_type& len ) const
+	inline string	substr( const size_type& index,
+				const size_type& len ) const
 		{ return buf.substr( index, len ) ; }
 
 	/**
 	 * Return a const reference to a C++ string
 	 * representation of this Buffer.
 	 */
-	inline const string&		toString() const
+	inline const basic_string< charType >&	toString() const
 		{ return buf ; }
 
 	/**
 	 * Return a const reference to a C++ string representation
 	 * of this Buffer.
 	 */
-	inline const string&	operator*() const
+	inline const basic_string< charType >&	operator*() const
 		{ return buf ; }
 
 	/**
@@ -121,21 +126,22 @@ public:
 	 * data is const, and thus cannot be altered by the
 	 * pointer returned by this method.
 	 */
-	inline const char*	c_str() const
+	inline const charType*	c_str() const
 		{ return buf.c_str() ; }
 
 	/**
 	 * Concatenate the given character array onto the end of
 	 * the Buffer.
 	 */
-	inline Buffer&		operator+=( const char* addMe )
+	inline Buffer&		operator+=( const charType* addMe )
 		{ buf += addMe ; return *this ; }
 
 	/**
 	 * Concatenate the given C++ string to the end of the
 	 * Buffer.
 	 */
-	inline Buffer&		operator+=( const string& addMe )
+	inline Buffer&		operator+=(
+			const basic_string< charType >& addMe )
 		{ buf += addMe ; return *this ; }
 
 	/**
@@ -149,14 +155,15 @@ public:
 	 * Assign to this Buffer the contents of the character
 	 * array passed as argument.
 	 */
-	inline Buffer&		operator=( const char* replaceWithMe )
+	inline Buffer&		operator=( const charType* replaceWithMe )
 		{ buf = replaceWithMe ; return *this ; }
 
 	/**
 	 * Assign to this Buffer the contents of the C++ string
 	 * passed as argument.
 	 */
-	inline Buffer&		operator=( const string& addMe )
+	inline Buffer&		operator=(
+			const basic_string< charType >& addMe )
 		{ buf = addMe ; return *this ; }
 
 	/**
@@ -170,7 +177,8 @@ public:
 	 * Debugging function for output of this Buffer to a C++
 	 * output stream.
 	 */
-	inline friend std::ostream& operator<<( std::ostream& o, const Buffer& b )
+	inline friend std::ostream& operator<<( std::ostream& o,
+			const Buffer& b )
 		{ o << b.buf ; return o ; }
 
 protected:
@@ -178,13 +186,15 @@ protected:
 	/**
 	 * This is the internal representation of this Buffer.
 	 */
-	string			buf ;
+	basic_string< charType >	buf ;
 
 	/**
 	 * This is the delimiting character.
 	 */
-	char			delim ;
+	charType			delim ;
 
 } ;
+
+#include	"Buffer.cc"
 
 #endif /* __BUFFER_H */
