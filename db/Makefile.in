@@ -169,7 +169,7 @@ lib_LTLIBRARIES = libgnuworldDB.la
 libgnuworldDB_la_SOURCES = gnuworldDB.cc \
 	pgsqlDB.cc
 
-libgnuworld_la_CXXFLAGS = -I@PGSQL_INCLUDE@
+libgnuworldDB_la_CXXFLAGS = -I@PGSQL_INCLUDE@
 subdir = db
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
@@ -179,14 +179,15 @@ LTLIBRARIES = $(lib_LTLIBRARIES)
 
 libgnuworldDB_la_LDFLAGS =
 libgnuworldDB_la_LIBADD =
-am_libgnuworldDB_la_OBJECTS = gnuworldDB.lo pgsqlDB.lo
+am_libgnuworldDB_la_OBJECTS = libgnuworldDB_la-gnuworldDB.lo \
+	libgnuworldDB_la-pgsqlDB.lo
 libgnuworldDB_la_OBJECTS = $(am_libgnuworldDB_la_OBJECTS)
 
 DEFAULT_INCLUDES =  -I. -I$(srcdir) -I$(top_builddir)/include
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
-@AMDEP_TRUE@DEP_FILES = ./$(DEPDIR)/gnuworldDB.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/pgsqlDB.Plo
+@AMDEP_TRUE@DEP_FILES = ./$(DEPDIR)/libgnuworldDB_la-gnuworldDB.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/libgnuworldDB_la-pgsqlDB.Plo
 CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
 LTCXXCOMPILE = $(LIBTOOL) --mode=compile $(CXX) $(DEFS) \
@@ -245,8 +246,8 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gnuworldDB.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pgsqlDB.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgnuworldDB_la-gnuworldDB.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgnuworldDB_la-pgsqlDB.Plo@am__quote@
 
 distclean-depend:
 	-rm -rf ./$(DEPDIR)
@@ -283,6 +284,72 @@ distclean-depend:
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/$*.Plo' tmpdepfile='$(DEPDIR)/$*.TPlo' @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LTCXXCOMPILE) -c -o $@ `test -f '$<' || echo '$(srcdir)/'`$<
+
+libgnuworldDB_la-gnuworldDB.o: gnuworldDB.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworldDB_la_CXXFLAGS) $(CXXFLAGS) -MT libgnuworldDB_la-gnuworldDB.o -MD -MP -MF "$(DEPDIR)/libgnuworldDB_la-gnuworldDB.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libgnuworldDB_la-gnuworldDB.o `test -f 'gnuworldDB.cc' || echo '$(srcdir)/'`gnuworldDB.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libgnuworldDB_la-gnuworldDB.Tpo" "$(DEPDIR)/libgnuworldDB_la-gnuworldDB.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libgnuworldDB_la-gnuworldDB.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='gnuworldDB.cc' object='libgnuworldDB_la-gnuworldDB.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libgnuworldDB_la-gnuworldDB.Po' tmpdepfile='$(DEPDIR)/libgnuworldDB_la-gnuworldDB.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworldDB_la_CXXFLAGS) $(CXXFLAGS) -c -o libgnuworldDB_la-gnuworldDB.o `test -f 'gnuworldDB.cc' || echo '$(srcdir)/'`gnuworldDB.cc
+
+libgnuworldDB_la-gnuworldDB.obj: gnuworldDB.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworldDB_la_CXXFLAGS) $(CXXFLAGS) -MT libgnuworldDB_la-gnuworldDB.obj -MD -MP -MF "$(DEPDIR)/libgnuworldDB_la-gnuworldDB.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libgnuworldDB_la-gnuworldDB.obj `if test -f 'gnuworldDB.cc'; then $(CYGPATH_W) 'gnuworldDB.cc'; else $(CYGPATH_W) '$(srcdir)/gnuworldDB.cc'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libgnuworldDB_la-gnuworldDB.Tpo" "$(DEPDIR)/libgnuworldDB_la-gnuworldDB.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libgnuworldDB_la-gnuworldDB.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='gnuworldDB.cc' object='libgnuworldDB_la-gnuworldDB.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libgnuworldDB_la-gnuworldDB.Po' tmpdepfile='$(DEPDIR)/libgnuworldDB_la-gnuworldDB.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworldDB_la_CXXFLAGS) $(CXXFLAGS) -c -o libgnuworldDB_la-gnuworldDB.obj `if test -f 'gnuworldDB.cc'; then $(CYGPATH_W) 'gnuworldDB.cc'; else $(CYGPATH_W) '$(srcdir)/gnuworldDB.cc'; fi`
+
+libgnuworldDB_la-gnuworldDB.lo: gnuworldDB.cc
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworldDB_la_CXXFLAGS) $(CXXFLAGS) -MT libgnuworldDB_la-gnuworldDB.lo -MD -MP -MF "$(DEPDIR)/libgnuworldDB_la-gnuworldDB.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libgnuworldDB_la-gnuworldDB.lo `test -f 'gnuworldDB.cc' || echo '$(srcdir)/'`gnuworldDB.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libgnuworldDB_la-gnuworldDB.Tpo" "$(DEPDIR)/libgnuworldDB_la-gnuworldDB.Plo"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libgnuworldDB_la-gnuworldDB.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='gnuworldDB.cc' object='libgnuworldDB_la-gnuworldDB.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libgnuworldDB_la-gnuworldDB.Plo' tmpdepfile='$(DEPDIR)/libgnuworldDB_la-gnuworldDB.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworldDB_la_CXXFLAGS) $(CXXFLAGS) -c -o libgnuworldDB_la-gnuworldDB.lo `test -f 'gnuworldDB.cc' || echo '$(srcdir)/'`gnuworldDB.cc
+
+libgnuworldDB_la-pgsqlDB.o: pgsqlDB.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworldDB_la_CXXFLAGS) $(CXXFLAGS) -MT libgnuworldDB_la-pgsqlDB.o -MD -MP -MF "$(DEPDIR)/libgnuworldDB_la-pgsqlDB.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libgnuworldDB_la-pgsqlDB.o `test -f 'pgsqlDB.cc' || echo '$(srcdir)/'`pgsqlDB.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libgnuworldDB_la-pgsqlDB.Tpo" "$(DEPDIR)/libgnuworldDB_la-pgsqlDB.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libgnuworldDB_la-pgsqlDB.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='pgsqlDB.cc' object='libgnuworldDB_la-pgsqlDB.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libgnuworldDB_la-pgsqlDB.Po' tmpdepfile='$(DEPDIR)/libgnuworldDB_la-pgsqlDB.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworldDB_la_CXXFLAGS) $(CXXFLAGS) -c -o libgnuworldDB_la-pgsqlDB.o `test -f 'pgsqlDB.cc' || echo '$(srcdir)/'`pgsqlDB.cc
+
+libgnuworldDB_la-pgsqlDB.obj: pgsqlDB.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworldDB_la_CXXFLAGS) $(CXXFLAGS) -MT libgnuworldDB_la-pgsqlDB.obj -MD -MP -MF "$(DEPDIR)/libgnuworldDB_la-pgsqlDB.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libgnuworldDB_la-pgsqlDB.obj `if test -f 'pgsqlDB.cc'; then $(CYGPATH_W) 'pgsqlDB.cc'; else $(CYGPATH_W) '$(srcdir)/pgsqlDB.cc'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libgnuworldDB_la-pgsqlDB.Tpo" "$(DEPDIR)/libgnuworldDB_la-pgsqlDB.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libgnuworldDB_la-pgsqlDB.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='pgsqlDB.cc' object='libgnuworldDB_la-pgsqlDB.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libgnuworldDB_la-pgsqlDB.Po' tmpdepfile='$(DEPDIR)/libgnuworldDB_la-pgsqlDB.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworldDB_la_CXXFLAGS) $(CXXFLAGS) -c -o libgnuworldDB_la-pgsqlDB.obj `if test -f 'pgsqlDB.cc'; then $(CYGPATH_W) 'pgsqlDB.cc'; else $(CYGPATH_W) '$(srcdir)/pgsqlDB.cc'; fi`
+
+libgnuworldDB_la-pgsqlDB.lo: pgsqlDB.cc
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworldDB_la_CXXFLAGS) $(CXXFLAGS) -MT libgnuworldDB_la-pgsqlDB.lo -MD -MP -MF "$(DEPDIR)/libgnuworldDB_la-pgsqlDB.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libgnuworldDB_la-pgsqlDB.lo `test -f 'pgsqlDB.cc' || echo '$(srcdir)/'`pgsqlDB.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libgnuworldDB_la-pgsqlDB.Tpo" "$(DEPDIR)/libgnuworldDB_la-pgsqlDB.Plo"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libgnuworldDB_la-pgsqlDB.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='pgsqlDB.cc' object='libgnuworldDB_la-pgsqlDB.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libgnuworldDB_la-pgsqlDB.Plo' tmpdepfile='$(DEPDIR)/libgnuworldDB_la-pgsqlDB.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworldDB_la_CXXFLAGS) $(CXXFLAGS) -c -o libgnuworldDB_la-pgsqlDB.lo `test -f 'pgsqlDB.cc' || echo '$(srcdir)/'`pgsqlDB.cc
 
 mostlyclean-libtool:
 	-rm -f *.lo
