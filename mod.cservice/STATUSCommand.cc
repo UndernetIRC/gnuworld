@@ -10,7 +10,7 @@
 #include	"Network.h"
 #include	"cservice_config.h"
  
-const char STATUSCommand_cc_rcsId[] = "$Id: STATUSCommand.cc,v 1.24 2001/03/07 15:10:53 dan_karrels Exp $" ;
+const char STATUSCommand_cc_rcsId[] = "$Id: STATUSCommand.cc,v 1.25 2001/03/08 19:42:37 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -333,9 +333,7 @@ authQuery	<< "SELECT users.user_name,levels.access FROM "
 #endif
 
 ExecStatusType status = bot->SQLDb->Exec( authQuery.str() ) ; 
-delete[] authQuery.str();
-
-/* TODO: Expand to multiline support. */
+delete[] authQuery.str(); 
 
 if( PGRES_TUPLES_OK != status ) 
 	{ 
@@ -345,7 +343,8 @@ if( PGRES_TUPLES_OK != status )
 	return false ;
 	}
 
-strstream authList;
+string authList;
+string nextPerson;
 
 for (int i = 0 ; i < bot->SQLDb->Tuples(); i++)
 	{
@@ -360,24 +359,40 @@ for (int i = 0 ; i < bot->SQLDb->Tuples(); i++)
 		{
 		iClient* tmpClient = ptr->second->isAuthed();
 		if( !tmpClient )
-			{
+			{ 
 			continue ;
 			}
 
-		authList	<< bot->SQLDb->GetValue(i, 0) 
-				<< "/"
-				<< tmpClient->getNickName()
-				<< " ("
-				<< bot->SQLDb->GetValue(i, 1)
-				<< ") "; 
+		nextPerson += bot->SQLDb->GetValue(i, 0);
+		nextPerson += "/";
+		nextPerson += tmpClient->getNickName();
+		nextPerson += " (";
+		nextPerson += bot->SQLDb->GetValue(i, 1);
+		nextPerson += ") ";
+
+		/*
+		 *  Will this string overflow our Notice buffer?
+		 *  If so, dump it now..
+		 */
+		if(nextPerson.size() + authList.size() > 400)
+			{
+			bot->Notice(theClient, "Auth: %s", authList.c_str());
+			authList.erase( authList.begin(), authList.end() ); 
+			} 
+
+		/*
+		 * Add it on to our list.
+		 */
+
+		authList += nextPerson; 
+		nextPerson.erase( nextPerson.begin(), nextPerson.end() );	
 		}
+
+
 	} // for()
-
-authList << ends;
-bot->Notice(theClient, "Auth: %s", authList.str());
-
-delete[] authList.str() ;
-
+ 
+bot->Notice(theClient, "Auth: %s", authList.c_str());
+ 
 return true ;
 } 
 
