@@ -10,7 +10,7 @@
 #include	"ip.h"
 
 const char iClient_h_rcsId[] = __ICLIENT_H ;
-const char iClient_cc_rcsId[] = "$Id: iClient.cc,v 1.2 2000/07/12 21:54:12 dan_karrels Exp $" ;
+const char iClient_cc_rcsId[] = "$Id: iClient.cc,v 1.3 2000/08/06 22:45:21 gte Exp $" ;
 
 using std::string ;
 
@@ -24,12 +24,14 @@ iClient::iClient( const unsigned int& _uplink,
 	const string& _hostBase64,
 	const string& _insecureHost,
 	const string& _mode,
+    const string& _description,
 	const time_t& _connectTime )
 : intYY( _uplink ),
 	nickName( _nickName ),
 	userName( _userName ),
 	IP( xIP( _hostBase64, true ).GetLongIP() ),
 	insecureHost( _insecureHost ),
+    description( _description),
 	connectTime( _connectTime )
 {
 if( 5 == _yxx.size() )

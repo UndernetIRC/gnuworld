@@ -17,7 +17,7 @@
  */
 
 #ifndef __XSERVER_H
-#define __XSERVER_H "$Id: server.h,v 1.9 2000/08/05 00:06:27 dan_karrels Exp $"
+#define __XSERVER_H "$Id: server.h,v 1.10 2000/08/06 22:45:21 gte Exp $"
 
 #include	<string>
 #include	<vector>
@@ -981,6 +981,7 @@ void AddUser( const unsigned int& Uplink,
 	const string& UserID,
 	const string& HostBase64,
 	const string& InsecureHost,
+	const string& description,
 	const string& Mode,
 	const time_t& ConnectionTime,
 	bool IncrementClients = true ) ;

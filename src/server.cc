@@ -39,7 +39,7 @@
 //#include	"moduleLoader.h"
 
 const char xServer_h_rcsId[] = __XSERVER_H ;
-const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.24 2000/08/05 19:10:44 dan_karrels Exp $" ;
+const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.25 2000/08/06 22:45:21 gte Exp $" ;
 
 using std::string ;
 using std::vector ;
@@ -3325,7 +3325,8 @@ const char	*Nick = 0,
 		*CTime = 0,
 		*UserID = 0,
 		*Mode = 0,
-		*Host = 0 ;
+		*Host = 0,
+		*description = 0;
 
 if( '+' == Param[ 6 ][ 0 ] )
 	{
@@ -3333,11 +3334,13 @@ if( '+' == Param[ 6 ][ 0 ] )
 	Mode = Param[ 6 ] ;
 	Host = Param[ 7 ] ;
 	YXX = Param[ 8 ] ;
+	description = Param[ 9 ] ;
 	}
 else
 	{
 	Host = Param[ 6 ] ;
 	YXX = Param[ 7 ] ;
+	description = Param[ 8 ] ;
 	Mode = "";
 	}
 
@@ -3352,6 +3355,7 @@ AddUser( Server->getIntYY(),
 	UserID,
 	Host,
 	InsecureHostMask,
+	description,
 	Mode,
 	atoi( CTime ) ) ;
 
@@ -3405,6 +3409,7 @@ if( NULL == nickUplink )
 const char* modes = "+" ;
 const char* host = params[ 6 ] ;
 const char* yyxxx = params[ 7 ] ;
+const char* description = params [ 8 ] ;
 
 // Are modes specified?
 if( params.size() > 9 )
@@ -3414,6 +3419,7 @@ if( params.size() > 9 )
 	modes = params[ 6 ] ;
 	host = params[ 7 ] ;
 	yyxxx = params[ 8 ] ;
+	description = params[ 9 ];
 	}
 
 iClient* newClient = 0 ;
@@ -3427,6 +3433,7 @@ try
 		host, // base 64 host
 		params[ 5 ], // insecurehost
 		modes,
+		description,
 		atoi( params[ 3 ] ) // connection time
 		) ;
 	}
@@ -3447,7 +3454,7 @@ if( !Network->addClient( newClient ) )
 	return -1 ;
 	}
 
-// TODO: Should this be posted?
+// TODO: Should this be posted? 
 PostEvent( EVT_NICK, static_cast< void* >( newClient ) ) ;
 
 return 0 ;
@@ -4023,7 +4030,8 @@ void AddUser( const unsigned int& Uplink,
 	const string& UserID,
 	const string& HostBase64,
 	const string& InsecureHost,
-	const string& Mode, 
+	const string& Mode,
+	const string& description,
 	const time_t& ConnectionTime,
 	bool IncrementClients = true )
 {
@@ -4051,6 +4059,7 @@ try
 		HostBase64,
 		InsecureHost,
 		Mode,
+		description,
 		ConnectionTime ) ;
 	}
 catch( std::bad_alloc )

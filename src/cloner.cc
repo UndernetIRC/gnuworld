@@ -172,7 +172,8 @@ MyUplink->AttachClient( new iClient(
 	randomUser(),
 	randomNick( 6, 6 ),
 	randomHost(),
-	randomMode(),
+	randomMode(), 
+	"I'm a clone.",
 	time( 0 ) ) ) ;
 
 }
