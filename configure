@@ -1023,10 +1023,10 @@ Optional Packages:
   --with-pedantic         Add -pedantic to compile options
   --with-optimization     Optimize the executables
   --with-prof             Generate profiling information
-  --with-pgsqllib=PGSQLLIBDIR
+  --with-pgsql-lib=PGSQLLIBDIR
                           Specify location to find libpq++.so, default is
                           /usr/local/pgsql/lib
-  --with-pgsqlinclude=PGSQLINCLUDEDIR
+  --with-pgsql-include=PGSQLINCLUDEDIR
                           Specify location to find libpq++.h, default is
                           /usr/local/pgsql/include
 
@@ -10480,72 +10480,64 @@ if test "${with_prof+set}" = set; then
 fi;
 
 PGSQL_LIB=/usr/local/pgsql/lib
-searchForLib=yes
 
 # Check whether --with-pgsql-lib or --without-pgsql-lib was given.
 if test "${with_pgsql_lib+set}" = set; then
   withval="$with_pgsql_lib"
   PGSQL_LIB=$withval
-	 searchForLib=no
 
 fi;
 
 PGSQL_INCLUDE=/usr/local/pgsql/include
-searchForInclude=yes
 
 # Check whether --with-pgsql-include or --without-pgsql-include was given.
 if test "${with_pgsql_include+set}" = set; then
   withval="$with_pgsql_include"
   PGSQL_INCLUDE=$withval
-	 searchForInclude=no
 
 fi;
 
-if test $searchForInclude = yes; then
-	echo "$as_me:$LINENO: checking for libpq++.h" >&5
+echo "$as_me:$LINENO: checking for libpq++.h" >&5
 echo $ECHO_N "checking for libpq++.h... $ECHO_C" >&6
-	if test -f "$PGSQL_INCLUDE/libpq++.h"; then
-		/bin/true
-	elif test -f "/usr/local/include/libpq++.h"; then
-		PGSQL_INCLUDE=/usr/local/include
-	elif test -f "/usr/include/postgresql/libpq++.h"; then
-		PGSQL_INCLUDE=/usr/include/postgresql
-	elif test -f "/usr/include/pgsql/libpq++.h"; then
-		PGSQL_INCLUDE=/usr/include/pgsql
-	else
-	        { { echo "$as_me:$LINENO: error: Unable to find libpq++.h " >&5
+if test -f "$PGSQL_INCLUDE/libpq++.h"; then
+	/bin/true
+elif test -f "/usr/local/include/libpq++.h"; then
+	PGSQL_INCLUDE=/usr/local/include
+elif test -f "/usr/include/postgresql/libpq++.h"; then
+	PGSQL_INCLUDE=/usr/include/postgresql
+elif test -f "/usr/include/pgsql/libpq++.h"; then
+	PGSQL_INCLUDE=/usr/include/pgsql
+else
+        { { echo "$as_me:$LINENO: error: Unable to find libpq++.h " >&5
 echo "$as_me: error: Unable to find libpq++.h " >&2;}
    { (exit 1); exit 1; }; }
-	fi
-	echo "$as_me:$LINENO: result: yes" >&5
-echo "${ECHO_T}yes" >&6
 fi
+echo "$as_me:$LINENO: result: yes" >&5
+echo "${ECHO_T}yes" >&6
 
-if test $searchForLib = yes; then
-	echo "$as_me:$LINENO: checking for libpq++.so" >&5
+echo "$as_me:$LINENO: checking for libpq++.so" >&5
 echo $ECHO_N "checking for libpq++.so... $ECHO_C" >&6
-	if test -f "$PGSQL_LIB/libpq++.so"; then
-		/bin/true
-	elif test -f "/usr/local/lib/libpq++.so"; then
-		PGSQL_LIB=/usr/local/lib
-	elif test -f "/usr/lib/libpq++.so"; then
-		PGSQL_LIB=/usr/lib
-	elif test -f "/usr/lib/postgresql/libpq++.so"; then
-		PGSQL_LIB=/usr/lib/postgresql
-	elif test -f "/usr/lib/pgsql/libpq++.so"; then
-		PGSQL_LIB=/usr/lib/pgsql
-	elif test -f "/usr/local/pgsql/lib/libpq++.so"; then
-		PGSQL_LIB=/usr/local/pgsql/lib
-	elif test -f "/usr/local/postgresql/lib/libpq++.so"; then
-		PGSQL_LIB=/usr/local/postgresql/lib
-	else
-	        { { echo "$as_me:$LINENO: error: Unable to find libpq++.so" >&5
+if test -f "$PGSQL_LIB/libpq++.so"; then
+	/bin/true
+elif test -f "/usr/local/lib/libpq++.so"; then
+	PGSQL_LIB=/usr/local/lib
+elif test -f "/usr/lib/libpq++.so"; then
+	PGSQL_LIB=/usr/lib
+elif test -f "/usr/lib/postgresql/libpq++.so"; then
+	PGSQL_LIB=/usr/lib/postgresql
+elif test -f "/usr/lib/pgsql/libpq++.so"; then
+	PGSQL_LIB=/usr/lib/pgsql
+elif test -f "/usr/local/pgsql/lib/libpq++.so"; then
+	PGSQL_LIB=/usr/local/pgsql/lib
+elif test -f "/usr/local/postgresql/lib/libpq++.so"; then
+	PGSQL_LIB=/usr/local/postgresql/lib
+else
+        { { echo "$as_me:$LINENO: error: Unable to find libpq++.so" >&5
 echo "$as_me: error: Unable to find libpq++.so" >&2;}
    { (exit 1); exit 1; }; }
-	fi
-	echo "$as_me:$LINENO: result: yes" >&5
-echo "${ECHO_T}yes" >&6
 fi
+echo "$as_me:$LINENO: result: yes" >&5
+echo "${ECHO_T}yes" >&6
 
 
 CXXFLAGS="$CXXFLAGS -I`pwd`/include -I`pwd`/lib"
