@@ -28,7 +28,7 @@
 #include	"events.h"
 
 const char xClient_h_rcsId[] = __CLIENT_H ;
-const char xClient_cc_rcsId[] = "$Id: client.cc,v 1.38 2001/06/14 22:14:13 dan_karrels Exp $" ;
+const char xClient_cc_rcsId[] = "$Id: client.cc,v 1.39 2001/06/23 16:27:52 dan_karrels Exp $" ;
 const char config_h_rcsId[] = __CONFIG_H ;
 const char misc_h_rcsId[] = __MISC_H ;
 const char Numeric_h_rcsId[] = __NUMERIC_H ;
@@ -436,6 +436,14 @@ int xClient::OnChannelEvent( const channelEventType&, Channel*,
 	void*, void*, void*, void* )
 {
 return 0 ;
+}
+
+void xClient::OnNetworkKick( Channel*,
+	iClient*, // srcClient, may be NULL
+	iClient*, // destClient
+	const string&, // kickMessage,
+	bool ) // authoritative
+{
 }
 
 void xClient::OnChannelModeM( Channel*,

@@ -1,7 +1,7 @@
 /* ChannelUser.h */
 
 #ifndef __CHANNELUSER_H
-#define __CHANNELUSER_H "$Id: ChannelUser.h,v 1.4 2001/03/31 01:26:10 dan_karrels Exp $"
+#define __CHANNELUSER_H "$Id: ChannelUser.h,v 1.5 2001/06/23 16:27:52 dan_karrels Exp $"
 
 #include	<string>
 
@@ -31,10 +31,13 @@ public:
 	typedef unsigned char modeType ;
 
 	/// Bit representing channel user mode +o
-	static const modeType	MODE_O = 0x01 ;
+	static const modeType	MODE_O		= 0x01 ;
 
 	/// Bit representing channel user mode +v
-	static const modeType	MODE_V = 0x02 ;
+	static const modeType	MODE_V		= 0x02 ;
+
+	/// ZOMBIE is true if the iClient is in the zombie state
+	const static modeType   ZOMBIE          = 0x04 ;
 
 	/**
 	 * Construct a ChannelUser given an iClient
@@ -54,6 +57,15 @@ public:
 	inline bool getMode( const modeType& whichMode ) const
 		{ return (whichMode == (modes & whichMode)) ; }
 
+	inline bool isModeO() const
+		{ return getMode( MODE_O ) ; }
+
+	inline bool isModeV() const
+		{ return getMode( MODE_V ) ; }
+
+	inline bool isZombie() const
+		{ return getMode( ZOMBIE ) ; }
+
 	/**
 	 * Retrieve this ChannelUser's current modes in
 	 * its channel.
@@ -67,11 +79,29 @@ public:
 	inline void setMode( const modeType& whichMode )
 		{ modes |= whichMode ; }
 
+	inline void setModeO()
+		{ setMode( MODE_O ) ; }
+
+	inline void setModeV()
+		{ return setMode( MODE_V ) ; }
+
+	inline void setZombie()
+		{ setMode( ZOMBIE ) ; }
+
 	/**
 	 * Remove a given channel user mode.
 	 */
 	inline void removeMode( const modeType& whichMode )
 		{ modes &= ~whichMode ; }
+
+	inline void removeModeO()
+		{ removeMode( MODE_O ) ; }
+
+	inline void removeModeV()
+		{ removeMode( MODE_V ) ; }
+
+	inline void removeZombie()
+		{ removeMode( ZOMBIE ) ; }
 
 	/*
 	 * These are not defined in the header file to avoid

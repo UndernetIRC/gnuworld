@@ -2,7 +2,7 @@
  */
 
 #ifndef __ICLIENT_H
-#define __ICLIENT_H "$Id: iClient.h,v 1.16 2001/03/31 01:26:10 dan_karrels Exp $"
+#define __ICLIENT_H "$Id: iClient.h,v 1.17 2001/06/23 16:27:52 dan_karrels Exp $"
 
 #include	<string>
 #include	<list>
@@ -213,6 +213,21 @@ public:
 	inline bool getMode( const modeType& theMode ) const
 		{ return (theMode == (mode & theMode)) ; }
 
+	inline bool isModeI() const
+		{ return getMode( MODE_INVISIBLE ) ; }
+
+	inline bool isModeW() const
+		{ return getMode( MODE_WALLOPS ) ; }
+
+	inline bool isModeK() const
+		{ return getMode( MODE_SERVICES ) ; }
+
+	inline bool isModeO() const
+		{ return getMode( MODE_OPER ) ; }
+
+	inline bool isModeD() const
+		{ return getMode( MODE_DEAF ) ; }
+
 	/**
 	 * Return true if this iClient is an oper, false otherwise.
 	 */
@@ -228,14 +243,44 @@ public:
 	/**
 	 * Set a user mode for this iClient.
 	 */
-	inline void addMode( const modeType& newMode )
+	inline void setMode( const modeType& newMode )
 		{ mode |= newMode ; }
+
+	inline void setModeI()
+		{ setMode( MODE_INVISIBLE ) ; }
+
+	inline void setModeW()
+		{ setMode( MODE_WALLOPS ) ; }
+
+	inline void setModeK()
+		{ setMode( MODE_SERVICES ) ; }
+
+	inline void setModeD()
+		{ setMode( MODE_DEAF ) ; }
+
+	inline void setModeO()
+		{ setMode( MODE_OPER ) ; }
 
 	/**
 	 * Remove a user mode for this iClient.
 	 */
 	inline void removeMode( const modeType& theMode )
 		{ mode &= ~theMode ; }
+
+	inline void removeModeI()
+		{ removeMode( MODE_INVISIBLE ) ; }
+
+	inline void removeModeW()
+		{ removeMode( MODE_WALLOPS ) ; }
+
+	inline void removeModeK()
+		{ removeMode( MODE_SERVICES ) ; }
+
+	inline void removeModeD()
+		{ removeMode( MODE_DEAF ) ; }
+
+	inline void removeModeO()
+		{ removeMode( MODE_OPER ) ; }
 
 	/**
 	 * Return a string representation of this iClient's user

@@ -12,7 +12,7 @@
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 
-const char LISTCommand_cc_rcsId[] = "$Id: LISTCommand.cc,v 1.1 2001/06/11 21:08:31 mrbean_ Exp $";
+const char LISTCommand_cc_rcsId[] = "$Id: LISTCommand.cc,v 1.2 2001/06/23 16:27:52 dan_karrels Exp $";
 
 namespace gnuworld
 {
@@ -36,6 +36,8 @@ else
 	{
 	bot->Notice(theClient,"Unknown list");
 	}
+
+return true ;
 }
 
 }

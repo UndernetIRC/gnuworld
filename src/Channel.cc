@@ -15,7 +15,7 @@
 #include	"server.h"
 
 const char Channel_h_rcsId[] = __CHANNEL_H ;
-const char Channel_cc_rcsId[] = "$Id: Channel.cc,v 1.24 2001/03/31 01:26:10 dan_karrels Exp $" ;
+const char Channel_cc_rcsId[] = "$Id: Channel.cc,v 1.25 2001/06/23 16:27:52 dan_karrels Exp $" ;
 const char iClient_h_rcsId[] = __ICLIENT_H ;
 const char ChannelUser_h_rcsId[] = __CHANNELUSER_H ;
 const char Network_h_rcsId[] = __NETWORK_H ;
@@ -334,11 +334,11 @@ for( opVectorType::const_iterator ptr = opVector.begin() ;
 	{
 	if( ptr->first )
 		{
-		ptr->second->setMode( ChannelUser::MODE_O ) ;
+		ptr->second->setModeO() ;
 		}
 	else
 		{
-		ptr->second->removeMode( ChannelUser::MODE_O ) ;
+		ptr->second->removeModeO() ;
 		}
 	}
 }
@@ -352,11 +352,11 @@ for( voiceVectorType::const_iterator ptr = voiceVector.begin() ;
 	{
 	if( ptr->first )
 		{
-		ptr->second->setMode( ChannelUser::MODE_V ) ;
+		ptr->second->setModeV() ;
 		}
 	else
 		{
-		ptr->second->removeMode( ChannelUser::MODE_V  ) ;
+		ptr->second->removeModeV() ;
 		}
 	}
 }

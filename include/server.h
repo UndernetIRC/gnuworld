@@ -17,7 +17,7 @@
  */
 
 #ifndef __SERVER_H
-#define __SERVER_H "$Id: server.h,v 1.45 2001/06/14 22:14:12 dan_karrels Exp $"
+#define __SERVER_H "$Id: server.h,v 1.46 2001/06/23 16:27:52 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
@@ -562,6 +562,21 @@ public:
 		Channel* theChan,
 		void* = 0, void* = 0, void* = 0, void* = 0 ) ;
 
+	/**
+	 * This method is called when a kick occurs on a channel
+	 * for which this client is registered to receive events.
+	 * The srcClient may be NULL, as the ircu protocol still
+	 * allows servers to issue KICK commands.
+	 * The authoritative variable is true if the kick
+	 * transaction is complete, false otherwise.  If it is false,
+	 * then the destClient is still on the channel pending
+	 * a PART from its server, and it is in the ZOMBIE state.
+	 */
+	virtual void PostChannelKick( Channel* theChan,
+			iClient* srcClient, // may be NULL
+			iClient* destClient,
+			const string& kickMessage,
+			bool authoritative ) ;
 	/**
 	 * This variable represents "all channels."  Clients may
 	 * register for events of this channel, and each will receive

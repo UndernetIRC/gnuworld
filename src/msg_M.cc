@@ -18,7 +18,7 @@
 #include	"ELog.h"
 #include	"StringTokenizer.h"
 
-const char msg_M_cc_rcsId[] = "$Id: msg_M.cc,v 1.7 2001/05/26 00:18:42 dan_karrels Exp $" ;
+const char msg_M_cc_rcsId[] = "$Id: msg_M.cc,v 1.8 2001/06/23 16:27:52 dan_karrels Exp $" ;
 const char misc_h_rcsId[] = __MISC_H ;
 const char events_h_rcsId[] = __EVENTS_H ;
 const char server_h_rcsId[] = __SERVER_H ;
@@ -202,6 +202,13 @@ for( const char* modePtr = Param[ 2 ] ; *modePtr ; ++modePtr )
 			opVector.push_back(
 				pair< bool, ChannelUser* >(
 				polarity, targetUser ) ) ;
+
+			// If the op mode is +o, remove the ZOMBIE
+			// state from this user.
+			if( polarity )
+				{
+				targetUser->removeZombie() ;
+				}
 			break ;
 			}
 		case 'v':
@@ -291,34 +298,26 @@ for( const char* modePtr = Param[ 2 ] ; *modePtr ; ++modePtr )
 			plus = false ;
 			break;
 		case 'i':
-			if( plus )
-				theClient->addMode( iClient::MODE_INVISIBLE ) ;
-			else
-				theClient->removeMode( iClient::MODE_INVISIBLE ) ;
+			if( plus )	theClient->setModeI() ;
+			else		theClient->removeModeI() ;
 			break ;
 		case 'k':
-			if( plus )
-				theClient->addMode( iClient::MODE_SERVICES ) ;
-			else
-				theClient->removeMode( iClient::MODE_SERVICES ) ;
+			if( plus )	theClient->setModeK() ;
+			else		theClient->removeModeK() ;
 			break ;
 		case 'd':
-			if( plus )
-				theClient->addMode( iClient::MODE_DEAF ) ;
-			else
-				theClient->removeMode( iClient::MODE_DEAF ) ;
+			if( plus )	theClient->setModeD() ;
+			else		theClient->removeModeD() ;
 			break ;
 		case 'w':
-			if( plus )
-				theClient->addMode( iClient::MODE_WALLOPS ) ;
-			else
-				theClient->removeMode( iClient::MODE_WALLOPS ) ;
+			if( plus )	theClient->setModeW() ;
+			else		theClient->removeModeW() ;
 			break ;
 		case 'o':
 		case 'O':
 			if( plus )
 				{
-				theClient->addMode( iClient::MODE_OPER ) ;
+				theClient->setModeO() ;
 				PostEvent( EVT_OPER,
 					static_cast< void* >( theClient ) ) ;
 				}
@@ -328,8 +327,7 @@ for( const char* modePtr = Param[ 2 ] ; *modePtr ; ++modePtr )
 //					<< "Caught -o for user: "
 //					<< *theClient
 //					<< endl ;
-				theClient->removeMode( iClient::MODE_OPER ) ;
-				// TODO: Post message
+				theClient->removeModeO() ;
 				}
 			break ;
 		default:

@@ -20,7 +20,7 @@
 #include	"Channel.h"
 #include	"ChannelUser.h"
 
-const char msg_C_cc_rcsId[] = "$Id: msg_C.cc,v 1.3 2001/03/24 16:00:56 dan_karrels Exp $" ;
+const char msg_C_cc_rcsId[] = "$Id: msg_C.cc,v 1.4 2001/06/23 16:27:52 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -131,7 +131,7 @@ for( StringTokenizer::const_iterator ptr = st.begin() ; ptr != st.end() ;
 	assert( theUser != 0 ) ;
 
 	// The user who creates a channel is automatically +o
-	theUser->setMode( ChannelUser::MODE_O ) ;
+	theUser->setModeO() ;
 
 	// Build associations
 

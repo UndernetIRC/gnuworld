@@ -17,7 +17,7 @@
 #include	"ELog.h"
 #include	"StringTokenizer.h"
 
-const char msg_J_cc_rcsId[] = "$Id: msg_J.cc,v 1.9 2001/03/24 16:00:56 dan_karrels Exp $" ;
+const char msg_J_cc_rcsId[] = "$Id: msg_J.cc,v 1.10 2001/06/23 16:27:52 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -129,14 +129,50 @@ for( StringTokenizer::size_type i = 0 ; i < st.size() ; i++ )
 
 		// Since this is equivalent to a CREATE, set the user
 		// as operator.
-		theUser->setMode( ChannelUser::MODE_O ) ;
+		theUser->setModeO() ;
 
 		// Update the event type
 		whichEvent = EVT_CREATE ;
 
 		} // if( NULL == theChan )
+	else if( theChan->findUser( Target ) != 0 )
+		{
+		// The user is already in the channel...check for
+		// zombie state
+		ChannelUser* oldUser = theChan->findUser( Target ) ;
+		if( oldUser->getMode( ChannelUser::ZOMBIE ) )
+			{
+			// The user was in the zombie state
+			// Remove the zombie state, and continue
+			// to the next channel
+			oldUser->removeMode( ChannelUser::ZOMBIE ) ;
 
-	// Otherwise, the channel was found just fine :)
+			// TODO: Should this post an event?
+			elog	<< "xServer::msg_J> Removed zombie: "
+				<< *oldUser
+				<< " on channel "
+				<< theChan->getName()
+				<< endl ;
+			}
+		else
+			{
+			// User was found in channel, no reason apparent
+			elog	<< "xServer::MSG_J> Unexpectadly found "
+				<< "user "
+				<< *Target
+				<< " in channel "
+				<< theChan->getName()
+				<< endl ;
+			}
+
+		// In either case, there is no need to add the newly
+		// created ChannelUser to the channel, because it
+		// is already there.
+		delete theUser ; theUser = 0 ;
+
+		// Continue, nothing more to do here
+		continue ;
+		}
 
 	// Add a new ChannelUser representing this client to this
 	// channel's user structure.
@@ -161,6 +197,7 @@ for( StringTokenizer::size_type i = 0 ; i < st.size() ; i++ )
 			// remove it
 			Network->removeChannel( theChan->getName() ) ;
 
+			// Do some cleanup
 			delete theChan ; theChan = 0 ;
 			}
 

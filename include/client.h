@@ -3,7 +3,7 @@
  */
 
 #ifndef __CLIENT_H
-#define __CLIENT_H "$Id: client.h,v 1.30 2001/06/14 22:14:12 dan_karrels Exp $"
+#define __CLIENT_H "$Id: client.h,v 1.31 2001/06/23 16:27:52 dan_karrels Exp $"
 
 #include	<string>
 
@@ -180,13 +180,29 @@ public:
 		void* Data3 = NULL, void* Data4 = NULL ) ;
 
 	/**
+	 * This method is called when a kick occurs on a channel
+	 * for which this client is registered to receive events.
+	 * The srcClient may be NULL, as the ircu protocol still
+	 * allows servers to issue KICK commands.
+	 * The authoritative variable is true if the kick
+	 * transaction is complete, false otherwise.  If it is false,
+	 * then the destClient is still on the channel pending
+	 * a PART from its server, and it is in the ZOMBIE state.
+	 */
+	virtual void OnNetworkKick( Channel* theChan,
+			iClient* srcClient, // may be NULL
+			iClient* destClient,
+			const string& kickMessage,
+			bool authoritative ) ;
+
+	/**
 	 * This method is invoked when a user sets or removes
 	 * channel mode m (moderate).  Keep in mind that the
 	 * source ChannelUser may be NULL if a server is
 	 * setting the mode.
 	 */
 	virtual void OnChannelModeM( Channel*, bool polarity,
-		ChannelUser* ) ;
+			ChannelUser* ) ;
 
 	/**
 	 * This method is invoked when a user sets or removes
@@ -195,7 +211,7 @@ public:
 	 * setting the mode.
 	 */
 	virtual void OnChannelModeI( Channel*, bool polarity,
-		ChannelUser* ) ;
+			ChannelUser* ) ;
 
 	/**
 	 * This method is invoked when a user sets or removes
@@ -204,7 +220,7 @@ public:
 	 * setting the mode.
 	 */
 	virtual void OnChannelModeP( Channel*, bool polarity,
-		ChannelUser* ) ;
+			ChannelUser* ) ;
 
 	/**
 	 * This method is invoked when a user sets or removes
@@ -213,7 +229,7 @@ public:
 	 * setting the mode.
 	 */
 	virtual void OnChannelModeS( Channel*, bool polarity,
-		ChannelUser* ) ;
+			ChannelUser* ) ;
 
 	/**
 	 * This method is invoked when a user sets or removes
@@ -222,7 +238,7 @@ public:
 	 * setting the mode.
 	 */
 	virtual void OnChannelModeN( Channel*, bool polarity,
-		ChannelUser* ) ;
+			ChannelUser* ) ;
 
 	/**
 	 * This method is invoked when a user sets or removes
@@ -231,7 +247,7 @@ public:
 	 * setting the mode.
 	 */
 	virtual void OnChannelModeT( Channel*, bool polarity,
-		ChannelUser* ) ;
+			ChannelUser* ) ;
 
 	/**
 	 * This method is invoked when a user sets or removes
@@ -242,7 +258,7 @@ public:
 	 * will be 0.
 	 */
 	virtual void OnChannelModeL( Channel*, bool polarity,
-		ChannelUser*, const unsigned int& ) ;
+			ChannelUser*, const unsigned int& ) ;
 
 	/**
 	 * This method is invoked when a user sets or removes
@@ -253,7 +269,7 @@ public:
 	 * be empty.
 	 */
 	virtual void OnChannelModeK( Channel*, bool polarity,
-		ChannelUser*, const string& ) ;
+			ChannelUser*, const string& ) ;
 
 	/**
 	 * This method is invoked when a user sets or removes
@@ -262,7 +278,7 @@ public:
 	 * setting the mode.
 	 */
 	virtual void OnChannelModeO( Channel*, ChannelUser*,
-		const xServer::opVectorType& ) ;
+			const xServer::opVectorType& ) ;
 
 	/**
 	 * This method is invoked when a user sets or removes
@@ -271,7 +287,7 @@ public:
 	 * setting the mode.
 	 */
 	virtual void OnChannelModeV( Channel*, ChannelUser*,
-		const xServer::voiceVectorType& ) ;
+			const xServer::voiceVectorType& ) ;
 
 	/**
 	 * This method is invoked when a user sets or removes
@@ -280,7 +296,7 @@ public:
 	 * setting the mode.
 	 */
 	virtual void OnChannelModeB( Channel*, ChannelUser*,
-		const xServer::banVectorType& ) ;
+			const xServer::banVectorType& ) ;
 
 	/**
 	 * This method is called for each signal that occurs

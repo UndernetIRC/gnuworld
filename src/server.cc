@@ -50,7 +50,7 @@
 #include	"UnloadClientTimerHandler.h"
 
 const char server_h_rcsId[] = __SERVER_H ;
-const char server_cc_rcsId[] = "$Id: server.cc,v 1.107 2001/06/19 23:25:40 dan_karrels Exp $" ;
+const char server_cc_rcsId[] = "$Id: server.cc,v 1.108 2001/06/23 16:27:52 dan_karrels Exp $" ;
 const char config_h_rcsId[] = __CONFIG_H ;
 const char misc_h_rcsId[] = __MISC_H ;
 const char events_h_rcsId[] = __EVENTS_H ;
@@ -1190,6 +1190,58 @@ for( list< xClient* >::iterator ptr = listPtr->begin(), end = listPtr->end() ;
 	(*ptr)->OnChannelEvent( theEvent, theChan,
 		Data1, Data2, Data3, Data4 ) ;
 	}
+}
+
+void xServer::PostChannelKick( Channel* theChan,
+	iClient* srcClient,
+	iClient* destClient,
+	const string& kickMessage,
+	bool authoritative )
+{
+// Public method, verify arguments
+assert( theChan != 0 ) ;
+assert( srcClient != 0 ) ;
+assert( destClient != 0 ) ;
+
+// First deliver this channel event to any listeners for all channel
+// events.
+channelEventMapType::iterator allChanPtr =
+	channelEventMap.find( CHANNEL_ALL ) ;
+if( allChanPtr != channelEventMap.end() )
+	{
+	for( list< xClient* >::iterator ptr = allChanPtr->second->begin(),
+		endPtr = allChanPtr->second->end() ; ptr != endPtr ; ++ptr )
+		{
+		(*ptr)->OnNetworkKick( theChan,
+			srcClient,
+			destClient,
+			kickMessage,
+			authoritative ) ;
+		}
+	}
+
+// Find listeners for this specific channel
+channelEventMapType::iterator chanPtr =
+	channelEventMap.find( theChan->getName() ) ;
+if( chanPtr == channelEventMap.end() )
+	{
+	// No listeners for this channel's events
+	return ;
+	}
+
+// Iterate through the listeners for this channel's events
+// and notify each listener of the event
+list< xClient* >* listPtr = chanPtr->second ;
+for( list< xClient* >::iterator ptr = listPtr->begin(), end = listPtr->end() ;
+	ptr != end ; ++ptr )
+	{
+	(*ptr)->OnNetworkKick( theChan,
+		srcClient,
+		destClient,
+		kickMessage,
+		authoritative ) ;
+	}
+
 }
 
 // Attempt a read from the network connection.
@@ -2494,7 +2546,7 @@ if( getOps )
 	{
 	// Yes, update the ChannelUser's info to reflect its
 	// operator state
-	theChanUser->setMode( ChannelUser::MODE_O ) ;
+	theChanUser->setModeO() ;
 	}
 
 // Add the ChannelUser to the channel
