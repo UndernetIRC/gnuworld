@@ -47,7 +47,7 @@
 #include	"ServerTimerHandlers.h"
 
 const char xServer_h_rcsId[] = __XSERVER_H ;
-const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.84 2001/03/03 15:07:34 dan_karrels Exp $" ;
+const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.85 2001/03/03 15:45:36 dan_karrels Exp $" ;
 
 using std::string ;
 using std::vector ;
@@ -2103,60 +2103,64 @@ if( postJoinTime < theChan->getCreationTime() )
 if( !chanModes.empty() )
 	{
 	StringTokenizer st( chanModes ) ;
-	StringTokenizer::size_type argPos = 1 ;
 
-	for( string::const_iterator ptr = st[ 0 ].begin() ;
-		ptr != st[ 0 ].end() ; ++ptr )
+	if( !st.empty() && !st[ 0 ].empty() )
 		{
-		switch(  *ptr )
+		StringTokenizer::size_type argPos = 1 ;
+
+		for( string::const_iterator ptr = st[ 0 ].begin() ;
+			ptr != st[ 0 ].end() ; ++ptr )
 			{
-			case 't':
-				theChan->onModeT( true ) ;
-				break ;
-			case 'n':
-				theChan->onModeN( true ) ;
-				break ;
-			case 's':
-				theChan->onModeS( true ) ;
-				break ;
-			case 'p':
-				theChan->onModeP( true ) ;
-				break ;
-			case 'm':
-				theChan->onModeM( true ) ;
-				break ;
-			case 'i':
-				theChan->onModeI( true ) ;
-				break ;
-			case 'k':
+			switch(  *ptr )
 				{
-				if( argPos >= st.size() )
+				case 't':
+					theChan->onModeT( true ) ;
+					break ;
+				case 'n':
+					theChan->onModeN( true ) ;
+					break ;
+				case 's':
+					theChan->onModeS( true ) ;
+					break ;
+				case 'p':
+					theChan->onModeP( true ) ;
+					break ;
+				case 'm':
+					theChan->onModeM( true ) ;
+					break ;
+				case 'i':
+					theChan->onModeI( true ) ;
+					break ;
+				case 'k':
 					{
-					elog	<< "xServer::JoinChannel> Invalid"
-						<< " number of arguments to "
-						<< "chanModes"
-						<< endl ;
+					if( argPos >= st.size() )
+						{
+						elog	<< "xServer::JoinChannel> Invalid"
+							<< " number of arguments to "
+							<< "chanModes"
+							<< endl ;
+						break ;
+						}
+					theChan->onModeK( true, st[ argPos++ ] ) ;
 					break ;
 					}
-				theChan->onModeK( true, st[ argPos++ ] ) ;
-				break ;
-				}
-			case 'l':
-				{
-				if( argPos >= st.size() )
+				case 'l':
 					{
-					elog	<< "xServer::JoinChannel> Invalid"
-						<< " number of arguments to "
-						<< "chanModes"
-						<< endl ;
+					if( argPos >= st.size() )
+						{
+						elog	<< "xServer::JoinChannel> Invalid"
+							<< " number of arguments to "
+							<< "chanModes"
+							<< endl ;
+						break ;
+						}
+					theChan->onModeL( true,
+						atoi( st[ argPos++ ].c_str() ) ) ;
 					break ;
 					}
-				theChan->onModeL( true,
-					atoi( st[ argPos++ ].c_str() ) ) ;
-				break ;
-				}
-			} // switch()
-		} // for()
+				} // switch()
+			} // for()
+		} // if( !st.empty() && !st[ 0 ].empty() )
 	} // if( !chanModes.empty() )
 
 // An xClient has joined a channel, update its iClient instance
