@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------------
--- "$Id: cservice.sql,v 1.58 2001/12/29 20:38:00 nighty Exp $"
+-- "$Id: cservice.sql,v 1.59 2002/01/05 03:55:58 gte Exp $"
 -- Channel service DB SQL file for PostgreSQL.
 
 -- ChangeLog:
@@ -129,7 +129,9 @@ CREATE TABLE channels (
 
 	limit_offset INT4 DEFAULT '3',
 	limit_period INT4 DEFAULT '20',
-
+	limit_grace INT4 DEFAULT '1',
+	limit_max INT4 DEFAULT '0',
+	
 	last_updated INT4 NOT NULL, 
 	deleted INT2 DEFAULT '0',
 
