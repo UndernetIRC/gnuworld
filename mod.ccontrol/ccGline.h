@@ -1,7 +1,7 @@
 /* ccGline.h */
 
 #ifndef __CCGLINE_H
-#define __CCGLINE_H "$Id: ccGline.h,v 1.2 2001/03/29 20:57:42 mrbean_ Exp $"
+#define __CCGLINE_H "$Id: ccGline.h,v 1.3 2001/03/29 21:54:32 dan_karrels Exp $"
 
 #include	<string>
 
@@ -76,8 +76,9 @@ protected:
 	time_t Expires;
 	string Reason;
 	PgDatabase* SQLDb;
-}; //Class ccGline
 
-} //Namespace Gnuworld
+}; // class ccGline
 
-#endif // __CCGline_H
+} // namespace gnuworld
+
+#endif // __CCGLINE_H

@@ -23,15 +23,15 @@
 #include	"AuthInfo.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.24 2001/03/29 20:57:42 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.25 2001/03/29 21:54:32 dan_karrels Exp $" ;
+
+namespace gnuworld
+{
 
 using std::string ;
 using std::vector ;
 using std::cout ;
 using std::endl ; 
-
-namespace gnuworld
-{
 
 /*
  *  Exported function used by moduleLoader to gain an
@@ -60,7 +60,7 @@ string sqlPort = conf.Find( "sql_port" )->second;
 
 string Query = "host=" + sqlHost + " dbname=" + sqlDb + " port=" + sqlPort;
 
-elog	<< "cmaster::cmaster> Attempting to connect to "
+elog	<< "ccontrol::ccontrol> Attempting to connect to "
 	<< sqlHost
 	<< "; Database: "
 	<< sqlDb
@@ -73,9 +73,9 @@ assert( SQLDb != 0 ) ;
 // we didn't we exit entirely.
 if (SQLDb->ConnectionBad ())
 	{
-	elog	<< "cmaster::cmaster> Unable to connect to SQL server."
+	elog	<< "ccontrol::ccontrol> Unable to connect to SQL server."
 		<< endl 
-		<< "cmaster::cmaster> PostgreSQL error message: "
+		<< "ccontrol::ccontrol> PostgreSQL error message: "
 		<< SQLDb->ErrorMessage()
 		<< endl ;
 
@@ -83,8 +83,9 @@ if (SQLDb->ConnectionBad ())
 	}
 else
 	{
-	elog	<< "cmaster::cmaster> Connection established to SQL server. "
-		<< "Backend PID: " << SQLDb->getPID()
+	elog	<< "ccontrol::ccontrol> Connection established to SQL "
+		<< "server. Backend PID: "
+		<< SQLDb->getPID()
 		<< endl ;
 	}
 

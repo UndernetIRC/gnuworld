@@ -8,7 +8,7 @@
 #include	"ELog.h"
 
 const char ELog_h_rcsId[] = __ELOG_H ;
-const char ELog_cc_rcsId[] = "$Id: ELog.cc,v 1.1 2000/11/06 16:08:33 dan_karrels Exp $" ;
+const char ELog_cc_rcsId[] = "$Id: ELog.cc,v 1.2 2001/03/29 21:54:32 dan_karrels Exp $" ;
 
 using std::string ;
 
@@ -142,6 +142,15 @@ ELog& ELog::operator<<( const unsigned short int& var )
   outFile << var ;
 #endif
 if( outStream ) *outStream << var ;
+return *this ;
+}
+
+ELog& ELog::operator<<( strstream& s )
+{
+#ifdef EDEBUG
+  outFile<< s ;
+#endif
+if( outStream ) *outStream << s ;
 return *this ;
 }
 

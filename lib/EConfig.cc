@@ -3,9 +3,10 @@
 
 #include	<string>
 #include	<fstream>
-#include	<map>
 #include	<stdexcept>
 #include	<iostream>
+#include	<map>
+
 #include	<cstdlib>
 
 #include	"EConfig.h"
@@ -14,16 +15,15 @@
 #include	"misc.h"
 
 const char EConfig_h_rcsId[] = __ECONFIG_H ;
-const char EConfig_cc_rcsId[] = "$Id: EConfig.cc,v 1.5 2001/02/22 20:27:32 dan_karrels Exp $" ;
-
-using std::string ;
-using std::fstream ;
-using std::map ;
-using std::clog ;
-using std::endl ;
+const char EConfig_cc_rcsId[] = "$Id: EConfig.cc,v 1.6 2001/03/29 21:54:32 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
+
+using std::ifstream ;
+using std::string ;
+using std::endl ;
+using std::map ;
 
 EConfig::EConfig( const string& _configFileName )
  : configFileName( _configFileName ),
@@ -32,7 +32,8 @@ EConfig::EConfig( const string& _configFileName )
 if( !configFile.is_open() )
 	{
 	elog	<< "EConfig: Unable to open file: "
-		<< configFileName << endl ;
+		<< configFileName
+		<< endl ;
 	::exit( 0 ) ;
 	}
 if( !ReadFile() )
@@ -70,8 +71,10 @@ if( ptr == valueMap.end() )
 	// Nope, this method is intended to "require" the config file
 	// to have a certain key/value pair.  Since this is not the
 	// case, print out an error and quit.
-	clog	<< "EConfig::Require> Configuration requires value "
-		<< "for key \"" << key << "\"\n" ;
+	elog	<< "EConfig::Require> Configuration requires value "
+		<< "for key \""
+		<< key << "\""
+		<< endl ;
 	::exit( 0 ) ;
 	}
 
@@ -94,7 +97,8 @@ while( getline( configFile, tmp ) )
 		{
 		// Parse error
 		elog	<< "EConfig: Parse error at line: "
-			<< lineNumber << std::endl ;
+			<< lineNumber
+			<< endl ;
 		return false ;
 		}
 
@@ -111,7 +115,9 @@ while( getline( configFile, tmp ) )
 	if( st.size() != 2 )
 		{
 		elog	<< "EConfig: Improper number of fields "
-			<< "at line: " << lineNumber << std::endl ;
+			<< "at line: "
+			<< lineNumber
+			<< std::endl ;
 		return false ;
 		}
 
@@ -128,7 +134,7 @@ bool EConfig::removeSpaces( string& line )
 {
 
 // If the first character is '#', just return true
-if( !line.empty() && '#' == line[ 0 ] )
+if( !line.empty() && ('#' == line[ 0 ]) )
 	{
 	return true ;
 	}

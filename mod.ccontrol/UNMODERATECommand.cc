@@ -6,20 +6,21 @@
  */
 
 #include	<string>
+#include        <iomanip>
+
 #include	<cstdlib>
-#include        <iomanip.h>
+
 #include	"ccontrol.h"
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 #include	"Network.h"
 
-const char UNMODERATECommand_cc_rcsId[] = "$Id: UNMODERATECommand.cc,v 1.1 2001/03/10 18:33:23 mrbean_ Exp $";
+const char UNMODERATECommand_cc_rcsId[] = "$Id: UNMODERATECommand.cc,v 1.2 2001/03/29 21:54:32 dan_karrels Exp $";
 
 namespace gnuworld
 {
 
 using std::string ;
-
 
 bool UNMODERATECommand::Exec( iClient* theClient, const string& Message )
 {
@@ -41,11 +42,15 @@ if( NULL == theChan )
 
 if(!theChan->getMode(Channel::MODE_M))
 	{
-	bot->Notice( theClient,"Channel %s is not moderated",st[ 1 ].c_str());
+	bot->Notice( theClient,"Channel %s is not moderated",
+		st[ 1 ].c_str());
 	return false;
 	}
 
 theChan->removeMode(Channel::MODE_M);
 bot->ModeAsServer( theChan, "-m");
+
+return true ;
+
 }
 }

@@ -1,8 +1,10 @@
 /* client.cc
  */
 
+#include	<new>
 #include	<string>
 #include	<strstream>
+#include	<iostream>
 
 #include	<cstdio>
 #include	<cctype>
@@ -26,13 +28,15 @@
 #include	"events.h"
 
 const char xClient_h_rcsId[] = __XCLIENT_H ;
-const char xClient_cc_rcsId[] = "$Id: client.cc,v 1.34 2001/03/04 00:07:25 dan_karrels Exp $" ;
+const char xClient_cc_rcsId[] = "$Id: client.cc,v 1.35 2001/03/29 21:54:32 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
 
 using std::string ;
 using std::strstream ;
+using std::ends ;
+using std::endl ;
 
 xClient::xClient()
 {
@@ -48,14 +52,6 @@ memset( charXXX, 0, sizeof( charXXX ) ) ;
 
 xClient::xClient( const string& fileName )
 {
-EConfig conf( fileName ) ;
-nickName = conf.Require( "nickname" )->second ;
-userName = conf.Require( "username" )->second ;
-hostName = conf.Require( "hostname" )->second ;
-userDescription = conf.Require( "userdescription" )->second ;
-
-Mode( conf.Require( "mode" )->second ) ;
-
 MyUplink = 0 ;
 Connected = false ;
 
@@ -63,6 +59,14 @@ intYY = intXXX = 0 ;
 
 memset( charYY, 0, sizeof( charYY ) ) ;
 memset( charXXX, 0, sizeof( charXXX ) ) ;
+
+EConfig conf( fileName ) ;
+nickName = conf.Require( "nickname" )->second ;
+userName = conf.Require( "username" )->second ;
+hostName = conf.Require( "hostname" )->second ;
+userDescription = conf.Require( "userdescription" )->second ;
+
+Mode( conf.Require( "mode" )->second ) ;
 
 }
 
@@ -141,6 +145,10 @@ return Mode ;
 int xClient::Mode( const string& Value )
 {
 
+//elog	<< "xClient::Mode> Value: "
+//	<< Value
+//	<< endl ;
+
 // Set the bot's modes, and output to
 // the network if we are connected
 
@@ -156,23 +164,36 @@ for( ; ptr != end ; ++ptr )
 	{
 	switch( *ptr )
 		{
+		case '+': break ;
 		case 'd': mode |= iClient::MODE_DEAF ; break;
 		case 'k': mode |= iClient::MODE_SERVICES ; break;
 		case 'o': mode |= iClient::MODE_OPER ; break;
 		case 'w': mode |= iClient::MODE_WALLOPS ; break;
 		case 'i': mode |= iClient::MODE_INVISIBLE ; break;
-		}
+
+		default:
+			elog	<< "xClient::Mode> Unknown mode: "
+				<< *ptr
+				<< endl ;
+			break ;
+		} // switch()
 	} // close while
 
 // Output to the network if we are connected
-if( MyUplink != NULL && MyUplink->isConnected() && !Value.empty() )
+if( (MyUplink != NULL) && MyUplink->isConnected() && !Value.empty() )
 	{
-	char buf[ 512 ] = { 0 } ;
-	sprintf( buf, "%s MODE %s %s\r\n",
-		getCharYYXXX().c_str(),
-		getCharYYXXX().c_str(),
-		Value.c_str() ) ;
-	return QuoteAsServer( buf ) ;
+	strstream s ;
+	s	<< getCharYYXXX()
+		<< " M "
+		<< getCharYYXXX()
+		<< " "
+		<< Value
+		<< ends ;
+
+	int retMe = MyUplink->Write( s ) ;
+	delete[] s.str() ;
+
+	return retMe ;
 	}
 
 return( 1 ) ;

@@ -1,21 +1,23 @@
 /* ELog.h */
 
 #ifndef __ELOG_H
-#define __ELOG_H "$Id: ELog.h,v 1.2 2000/11/12 17:20:45 dan_karrels Exp $"
+#define __ELOG_H "$Id: ELog.h,v 1.3 2001/03/29 21:54:32 dan_karrels Exp $"
 
+#include	<strstream>
 #include	<iostream>
 #include	<fstream>
 #include	<string>
 
 #include	"config.h"
 
+namespace gnuworld
+{
+
+using std::strstream ;
 using std::ofstream ;
 using std::ostream ;
 using std::string ;
 using std::ios ;
-
-namespace gnuworld
-{
 
 /**
  * This class handles logging for GNUWorld.  It maintains a pointer
@@ -113,6 +115,7 @@ public:
 	inline ELog& operator<<( const unsigned long int& ) ;
 	inline ELog& operator<<( const short int& ) ;
 	inline ELog& operator<<( const unsigned short int& ) ;
+	inline ELog& operator<<( strstream& s ) ;
 
 } ;
 
