@@ -2528,6 +2528,18 @@ switch( theEvent )
 		tmpUser->setCustomData(this,
 			static_cast< void* >( newData ) );
 
+		/*
+		 * Well.. they might be already auth'd.
+		 * In which case, we'll receieve mode r and accountname for
+		 * this person.
+		 */
+		if (tmpUser->isModeR())
+			{
+				/* Lookup this user account, if its not there.. trouble */
+				sqlUser* theUser = getUserRecord(tmpUser->getAccount());
+				if (theUser) newData->currentUser = theUser;
+			}
+
 		break;
 		} // case EVT_NICK
 	} // switch()
