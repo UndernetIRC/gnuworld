@@ -1057,6 +1057,21 @@ short int cservice::getEffectiveAccessLevel( sqlUser* theUser,
 {
 
 /*
+ *  First thing, check if this ACCOUNT has been globally
+ *  suspended.
+ */
+
+if (theUser->getFlag(sqlUser::F_GLOBAL_SUSPEND))
+	{
+	iClient* theClient = theUser->isAuthed();
+	if (theClient && notify)
+		{
+		Notice(theClient, "Your account has been suspended.");
+		}
+	return 0;
+	}
+
+/*
  *  Have a look to see if this user has forced some access.
  */
 
@@ -1070,21 +1085,6 @@ sqlLevel* theLevel = getLevelRecord(theUser, theChan);
 if( !theLevel )
 	{
 	return 0 ;
-	}
-
-/*
- *  First thing, check if this ACCOUNT has been globally
- *  suspended.
- */
-
-if (theUser->getFlag(sqlUser::F_GLOBAL_SUSPEND))
-	{
-	iClient* theClient = theUser->isAuthed();
-	if (theClient && notify)
-		{
-		Notice(theClient, "Your account has been suspended.");
-		}
-	return 0;
 	}
 
 /* Then, check to see if the channel has been suspended. */

@@ -6,7 +6,7 @@
 #include	"ELog.h"
 #include	"cservice.h"
 
-const char RANDOMCommand_cc_rcsId[] = "$Id: RANDOMCommand.cc,v 1.3 2001/09/05 03:47:56 gte Exp $" ;
+const char RANDOMCommand_cc_rcsId[] = "$Id: RANDOMCommand.cc,v 1.4 2001/09/26 01:10:31 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -22,6 +22,9 @@ if( st.size() < 2 )
 	Usage(theClient);
 	return true;
 	}
+
+sqlChannel* test = new sqlChannel(bot->SQLDb);
+test->loadData("#coder-com");
 
 return true ;
 }

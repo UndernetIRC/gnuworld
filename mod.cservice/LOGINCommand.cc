@@ -12,7 +12,7 @@
 #include	"cservice_config.h"
 #include	"Network.h"
 
-const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.26 2001/09/05 03:47:56 gte Exp $" ;
+const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.27 2001/09/26 01:10:31 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -155,7 +155,7 @@ if (authTestUser)
 	tmpData->currentUser = NULL;
 	}
 
-theUser->setLastSeen(bot->currentTime());
+theUser->setLastSeen(bot->currentTime(), theClient->getNickUserHost());
 theUser->setFlag(sqlUser::F_LOGGEDIN);
 theUser->networkClient = theClient; // Who is authed as this user.
 

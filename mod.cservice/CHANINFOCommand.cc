@@ -13,7 +13,7 @@
  *
  * Command is aliased "INFO".
  *
- * $Id: CHANINFOCommand.cc,v 1.31 2001/09/05 03:47:56 gte Exp $
+ * $Id: CHANINFOCommand.cc,v 1.32 2001/09/26 01:10:31 gte Exp $
  */
 
 #include	<string>
@@ -26,7 +26,7 @@
 #include	"libpq++.h"
 #include	"cservice_config.h"
 
-const char CHANINFOCommand_cc_rcsId[] = "$Id: CHANINFOCommand.cc,v 1.31 2001/09/05 03:47:56 gte Exp $" ;
+const char CHANINFOCommand_cc_rcsId[] = "$Id: CHANINFOCommand.cc,v 1.32 2001/09/26 01:10:31 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -189,6 +189,9 @@ if( string::npos == st[ 1 ].find_first_of( '#' ) )
 		{
 		bot->Notice(theClient, "EMail: %s",
 			theUser->getEmail().c_str());
+
+		bot->Notice(theClient, "Last Hostmask: %s",
+			theUser->getLastHostMask().c_str());
 
 		strstream channelsQuery;
 		string channelList ;

@@ -1,7 +1,7 @@
 /* sqlUser.h */
 
 #ifndef __SQLUSER_H
-#define __SQLUSER_H "$Id: sqlUser.h,v 1.21 2001/09/09 23:29:13 gte Exp $"
+#define __SQLUSER_H "$Id: sqlUser.h,v 1.22 2001/09/26 01:10:31 gte Exp $"
 
 #include	<string>
 #include	<ctime>
@@ -87,8 +87,8 @@ public:
 	inline void setPassword( const string& _password )
 		{ password = _password; }
 
-	inline void setLastSeen( const time_t& _last_seen )
-		{ last_seen = _last_seen; commitLastSeen(); }
+	inline void setLastSeen( const time_t& _last_seen, const string& _last_hostmask )
+		{ last_seen = _last_seen; last_hostmask = _last_hostmask ; commitLastSeen(); }
 
 	inline void setLanguageId( const unsigned int& _language_id )
 		{ language_id = _language_id; }
@@ -107,6 +107,7 @@ public:
 	bool commit();
 	bool commitLastSeen();
 	time_t	getLastSeen();
+	const string getLastHostMask();
 
 	bool loadData( int );
 	bool loadData( const string& );
@@ -128,6 +129,7 @@ protected:
 	time_t		last_updated ;
 	time_t		last_used;
 	string		email ;
+	string		last_hostmask ;
 
 	PgDatabase*	SQLDb;
 } ;

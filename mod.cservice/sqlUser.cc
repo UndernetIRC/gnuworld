@@ -4,7 +4,7 @@
  * Storage class for accessing user information either from the backend
  * or internal storage.
  *
- * $Id: sqlUser.cc,v 1.25 2001/09/09 23:29:13 gte Exp $
+ * $Id: sqlUser.cc,v 1.26 2001/09/26 01:10:31 gte Exp $
  */
 
 #include	<strstream.h>
@@ -43,6 +43,7 @@ sqlUser::sqlUser(PgDatabase* _SQLDb)
    flags( 0 ),
    last_used( 0 ),
    email(),
+   last_hostmask(),
    SQLDb( _SQLDb )
 {
 }
@@ -225,6 +226,9 @@ queryString	<< queryHeader
 		<< "SET last_seen = "
 		<< last_seen
 		<< ", "
+		<< "last_hostmask = '"
+		<< escapeSQLChars(last_hostmask)
+		<< "', "
 		<< "last_updated = now()::abstime::int4 "
 		<< queryCondition
 		<< id
@@ -286,6 +290,43 @@ if( PGRES_TUPLES_OK == status )
 	}
 
 return (false);
+
+}
+
+const string sqlUser::getLastHostMask()
+{
+strstream queryString;
+queryString	<< "SELECT last_hostmask"
+		<< " FROM users_lastseen WHERE user_id = "
+		<< id
+		<< ends;
+
+#ifdef LOG_SQL
+	elog	<< "sqlUser::getLastHostMask> "
+		<< queryString.str()
+		<< endl;
+#endif
+
+ExecStatusType status = SQLDb->Exec(queryString.str()) ;
+delete[] queryString.str() ;
+
+if( PGRES_TUPLES_OK == status )
+	{
+	/*
+	 *  If the user doesn't exist, we won't get any rows back.
+	 */
+
+	if(SQLDb->Tuples() < 1)
+		{
+		return (false);
+		}
+
+	last_hostmask = SQLDb->GetValue(0, 0);
+
+	return (last_hostmask);
+	}
+
+return ("");
 
 }
 
