@@ -37,7 +37,7 @@
 #include	"ip.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.114 2002/01/05 14:02:59 isomer Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.115 2002/01/05 15:34:54 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -1606,7 +1606,7 @@ for( int i = 0 ; i < SQLDb->Tuples() ; i++ )
 		SQLDb->GetValue( i, 1 ),
 		"$BOT$",
 		nickName ) ;
-	Notice(theClient,"%s",commInfo);
+	Notice(theClient,"%s",commInfo.c_str());
 	} // for()
 }
 	

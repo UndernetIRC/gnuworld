@@ -14,7 +14,7 @@
 #include	"StringTokenizer.h"
 #include	"ip.h"
 
-const char WHOISCommand_cc_rcsId[] = "$Id: WHOISCommand.cc,v 1.8 2001/12/23 09:07:57 mrbean_ Exp $";
+const char WHOISCommand_cc_rcsId[] = "$Id: WHOISCommand.cc,v 1.9 2002/01/05 15:34:54 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -79,10 +79,33 @@ if(Target->getMode(iClient::MODE_SERVICES))
 	}
 	
 vector< string > channels ;
+string curChannel ;
+string::size_type curPlace;
+string tChannel;
+char curChar[10];
 for( iClient::const_channelIterator ptr = Target->channels_begin() ;
 	ptr != Target->channels_end() ; ++ptr )
 	{
-	channels.push_back( (*ptr)->getName() ) ;
+	curChannel = "";
+	tChannel = (*ptr)->getName();
+	for(curPlace = 0; curPlace < tChannel.size();++curPlace)
+		{
+		if(((tChannel[curPlace] > 1) && (tChannel[curPlace] < 4))
+			|| (tChannel[curPlace] == 15) 
+			|| ((tChannel[curPlace] > 27) && (tChannel[curPlace] < 33))
+			|| (tChannel[curPlace] == 22)
+			|| (tChannel[curPlace] == 160)
+			|| ((tChannel[curPlace] > 252) 	&& (tChannel[curPlace] <= 254)))
+			{
+			sprintf(curChar,"%d",tChannel[curPlace]);
+			curChannel += string("^") + curChar;
+			}
+		else
+			{
+			curChannel += tChannel[curPlace];
+			}
+		}
+	channels.push_back( curChannel) ;
 	}
 
 if( channels.empty() )

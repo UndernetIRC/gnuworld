@@ -17,7 +17,7 @@
 #include	"match.h"
 #include	"Network.h"
 
-const char SCANCommand_cc_rcsId[] = "$Id: SCANCommand.cc,v 1.4 2002/01/05 14:02:59 isomer Exp $";
+const char SCANCommand_cc_rcsId[] = "$Id: SCANCommand.cc,v 1.5 2002/01/05 15:34:54 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -157,7 +157,7 @@ if(showUsers)
 				}
 			++shown;
 			}
-		bot->Notice(theClient,"%s",ClientInfo);
+		bot->Notice(theClient,"%s",ClientInfo.c_str());
 		}
 	}
 		
