@@ -15,5 +15,5 @@ COPY "languages" FROM stdin;
 10	ES	Spanish	31337
 11	HU	Hungary	31337
 12	TR	Turkish	31337
-13	NO	Norwegian	31337
+13	NO	Norsk	31337
 \.

@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------------
--- "$Id: cservice.sql,v 1.49 2001/08/13 02:18:04 gte Exp $"
+-- "$Id: cservice.sql,v 1.50 2001/08/31 19:39:46 gte Exp $"
 -- Channel service DB SQL file for PostgreSQL.
 
 -- ChangeLog:
@@ -124,7 +124,7 @@ CREATE TABLE channels (
 
 -- A channel is inactive if the manager hasn't logged in for 21 days
 
-CREATE INDEX channel_name_idx ON channels (lower(name));
+CREATE UNIQUE INDEX channels_name_idx ON channels(LOWER(name));
 
 -- Table for bans; channel_id references the channel entry this ban belongs to.
 
@@ -144,6 +144,7 @@ CREATE TABLE bans (
 );
 
 CREATE INDEX bans_expires_idx ON bans(expires);
+CREATE INDEX bans_channelkey_idx ON bans(channel_id);
 
 -- Access entries; admin access kept on channel '*'.
 
@@ -160,6 +161,7 @@ CREATE TABLE users (
 	verificationdata VARCHAR(30), 
 	language_id INT4 CONSTRAINT language_channel_id_ref REFERENCES languages (id),
 	public_key TEXT,
+	post_forms int4 DEFAULT 0 NOT NULL,
 	flags INT2 NOT NULL DEFAULT '0',
 -- 0x00 01 -- Suspended globally.
 -- 0x00 02 -- Logged in (Depricated).
@@ -225,6 +227,7 @@ CREATE TABLE channellog (
 -- 8  -- EV_PURGE - When this channle is purged.
 -- 9  -- EV_COMMENT - Generic comments.
 -- 10 -- EV_REMOVEALL - When REMOVEALL command is used.
+-- 11 -- EV_IDLE - When a channel is idle for > 48 hours.
 	message TEXT,
 	last_updated INT4 NOT NULL 
 );
@@ -236,7 +239,8 @@ CREATE TABLE userlog (
 	ts INT4,
 	user_id INT4 CONSTRAINT user_log_ref REFERENCES users ( id ),
 	event INT4 DEFAULT '0',
--- 1 -- EV_SUSPEND - Notification/Reason for suspension. 
+-- 1 -- EV_SUSPEND - Notification/Reason for suspension.
+-- 2 -- EV_UNSUSPEND - Notification of an unsuspend.
 	message TEXT,
 	last_updated INT4 NOT NULL 
 );
