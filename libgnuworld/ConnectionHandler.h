@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ConnectionHandler.h,v 1.1 2002/08/07 20:28:06 dan_karrels Exp $
+ * $Id: ConnectionHandler.h,v 1.2 2003/07/03 00:25:48 dan_karrels Exp $
  */
 
 #ifndef __CONNECTIONHANDLER_H
-#define __CONNECTIONHANDLER_H "$Id: ConnectionHandler.h,v 1.1 2002/08/07 20:28:06 dan_karrels Exp $"
+#define __CONNECTIONHANDLER_H "$Id: ConnectionHandler.h,v 1.2 2003/07/03 00:25:48 dan_karrels Exp $"
 
 #include	<sys/types.h>
 
@@ -102,7 +102,9 @@ public:
 	 * This is a handler method called when a connection is
 	 * established but is then closed by the remote end.  Note
 	 * that connections terminated with Disconnect() are NOT
-	 * reflected by calling OnDisconnect().
+	 * reflected by calling OnDisconnect().  Connections closed
+	 * using Disconnect() are closed without notification to
+	 * the handler.
 	 * This method is also called when a listening (incoming)
 	 * socket is no longer valid.  If this occurs, the Connection
 	 * flags will have F_INCOMING set, and that further listening

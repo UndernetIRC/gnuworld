@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server.cc,v 1.166 2003/06/21 22:41:04 dan_karrels Exp $
+ * $Id: server.cc,v 1.167 2003/07/03 00:25:48 dan_karrels Exp $
  */
 
 #include	<sys/time.h>
@@ -71,7 +71,7 @@
 #include	"ConnectionHandler.h"
 #include	"Connection.h"
 
-RCSTAG( "$Id: server.cc,v 1.166 2003/06/21 22:41:04 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: server.cc,v 1.167 2003/07/03 00:25:48 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -90,10 +90,6 @@ using std::min ;
 
 /// The object containing the network data structures
 xNetwork*	Network = 0 ;
-
-// Some static xServer variables for tracking signals
-int xServer::whichSig = 0 ;
-bool xServer::caughtSignal = false ;
 
 // Allocate the static std::string in xServer representing
 // all channels.
@@ -227,11 +223,8 @@ useHoldBuffer = false ;
 StartTime = ::time( NULL ) ;
 
 serverConnection = 0 ;
-caughtSignal = false ;
-whichSig = 0 ;
 burstStart = burstEnd = 0 ;
 Uplink = NULL ;
-Message = SRV_SUCCESS ;
 lastTimerID = 1 ;
 glineUpdateInterval = pingUpdateInterval = 0 ;
 
@@ -537,7 +530,12 @@ RegisterTimer( ::time( 0 ) + pingUpdateInterval,
  */
 void xServer::Shutdown()
 {
-// TODO
+keepRunning = false ;
+
+// Can't call removeClients() here because it is likely one of the
+// clients that has invoked this call, that would be bad.
+// Instead, the code that will halt the system is located in the
+// main for() loop, which simply calls doShutdown() (private method).
 }
 
 void xServer::OnConnect( Connection* theConn )
@@ -583,7 +581,6 @@ elog	<< "xServer::OnConnectFail> Failed to establish connection "
 	<< theConn->getRemotePort()
 	<< endl ;
 
-Message = SRV_DISCONNECT ;
 keepRunning = false ;
 }
 
@@ -608,9 +605,10 @@ serverConnection = 0 ;
 elog	<< "xServer::OnDisconnect> Disconnected :("
 	<< endl ;
 
-Message = SRV_DISCONNECT ;
 keepRunning = false ;
-// TODO: Unload clients
+
+// doShutdown() will be called at the bottom of the main for loop,
+// which will perform a proper shutdown.
 }
 
 void xServer::OnRead( Connection* theConn, const string& line )
@@ -1599,12 +1597,53 @@ void xServer::removeClient( xClient* theClient )
 // Precondition: theClient != 0
 
 // Remove this xClient's iClient instance
-delete Network->removeClient( theClient->getInstance() ) ;
+iClient* iClientPtr = Network->removeClient( theClient->getInstance() ) ;
+
+// Notify each channel that the iClient has parted.
+for( iClient::channelIterator chanItr = iClientPtr->channels_begin() ;
+	chanItr != iClientPtr->channels_end() ; ++chanItr )
+	{
+	delete (*chanItr)->removeUser( iClientPtr ) ;
+
+	if( (*chanItr)->empty() )
+		{
+		// The client was the last one in the channel
+		delete Network->removeChannel( (*chanItr) ) ;
+		}
+	} // for()
+
+// This is not strictly necessary, but serves to illustrate the
+// internal client<->channel relationships.
+iClientPtr->clearChannels() ;
+
+// By this point, the xClient should have removed all of its
+// custom data from each iClient in the network.
+// Verify this.
+void* customData = 0 ;
+for( xNetwork::clientIterator clientItr = Network->clients_begin() ;
+	clientItr != Network->clients_end() ; ++clientItr )
+	{
+	customData = clientItr->second->removeCustomData( theClient ) ;
+
+	if( customData != 0 )
+		{
+		elog	<< "xServer::removeClient> xClient "
+			<< *theClient
+			<< " forgot to remove customData for client "
+			<< *(clientItr->second)
+			<< endl ;
+		}
+	} // for()
+
+// Deallocate the iClient instance of the xClient
+delete iClientPtr ;
+
+// Reset the iClient instance for good measure
 theClient->resetInstance() ;
 
 // Walk the channelEventMap, and remove the xClient from all
 // channel's in which it is registered.
-// This is an O(n) operation
+// This will include channel "*"
 for( channelEventMapType::iterator chPtr = channelEventMap.begin(),
 	chEndPtr = channelEventMap.end() ;
 	chPtr != chEndPtr ;
@@ -1621,6 +1660,17 @@ for( eventListType::iterator evPtr = eventList.begin(),
 	{
 	(*evPtr).remove( theClient ) ;
 	}
+
+// Remove all remaining timers for this xClient
+removeAllTimers( theClient ) ;
+
+// Close all Connections the xClient may have open/pending
+ConnectionManager::Disconnect(
+	reinterpret_cast< ConnectionHandler* >( theClient ), 0 ) ;
+
+// ConnectionManager::Poll() must be called to perform the action
+// that actually closes the above connections, but it is guaranteed
+// to be called eventually, even if in doShutdown().
 
 // Remove the client from the network data structures.
 // Be sure to do this before closing the client's module,
@@ -3809,6 +3859,187 @@ else
 		<< endl ;
 	}
 #endif
+}
+
+void xServer::removeAllTimers( TimerHandler* theHandler )
+{
+// Stack all timerInfo structures that do not correspond
+// to the given TimerHandler.
+std::stack< pair< time_t, timerInfo* > > theStack ;
+
+while( !timerQueue.empty() )
+	{
+	pair< time_t, timerInfo* > thePair = timerQueue.top() ;
+	timerQueue.pop() ;
+
+	if( thePair.second->theHandler == theHandler )
+		{
+		// This timerInfo belongs to the TimerHandler in
+		// question.
+		elog	<< "xServer::removeAllTimers> Found "
+			<< "a timer that was not unregistered"
+			<< endl ;
+
+		// Since the TimerHandler has little or no access
+		// to the timer system internals here, it is safe
+		// to simply call its OnTimerDestroy() method, even
+		// though that method may call other xServer methods.
+		theHandler->OnTimerDestroy( thePair.first, thePair.second ) ;
+
+		delete thePair.second ;
+		}
+	else
+		{
+		// Add it to the stack
+		theStack.push( thePair ) ;
+		}
+	 } // while( !empty )
+
+// All done, now put the timers back into the timerQueue
+while( !theStack.empty() )
+	{
+	timerQueue.push( theStack.top() ) ;
+	theStack.pop() ;
+	}
+}
+
+void xServer::doShutdown()
+{
+elog	<< "xServer::doShutdown> Removing modules..."
+	<< endl ;
+
+size_t count = 0 ;
+
+// First, remove all clients
+for( xNetwork::localClientIterator clientItr = Network->localClient_begin() ;
+	clientItr != Network->localClient_end() ;
+	++clientItr )
+	{
+	++count ;
+	DetachClient( *clientItr, "Server shutdown" ) ;
+	}
+elog	<< "Removed "
+	<< count
+	<< " local clients"
+	<< endl ;
+
+elog	<< "xServer::doShutdown> Removing network clients..."
+	<< endl ;
+
+count = 0 ;
+// Clear the channels
+while( Network->clients_begin() != Network->clients_end() )
+	{
+	++count ;
+	iClient* theClient = Network->clients_begin()->second ;
+	delete Network->removeClient( theClient ) ;
+	}
+elog	<< "Removed "
+	<< count
+	<< " network clients"
+	<< endl ;
+
+elog	<< "xServer::doShutdown> Removing channels..."
+	<< endl ;
+
+count = 0 ;
+while( Network->channels_begin() != Network->channels_end() )
+	{
+	++count ;
+	Channel* theChan = Network->channels_begin()->second ;
+
+	elog	<< "xServer::doShutdown> Found channel: "
+		<< *theChan
+		<< endl ;
+
+	delete Network->removeChannel( theChan ) ;
+	}
+elog	<< "Removed "
+	<< count
+	<< " channels"
+	<< endl ;
+
+elog	<< "xServer::doShutdown> Removing glines..."
+	<< endl ;
+
+count = 0 ;
+// Remove glines
+while( gline_begin() != gline_end() )
+	{
+	++count ;
+	delete gline_begin()->second ;
+	eraseGline( gline_begin() ) ;
+	}
+elog	<< "Removed "
+	<< count
+	<< " glines"
+	<< endl ;
+
+elog	<< "xServer::doShutdown> Disconnecting..."
+	<< endl ;
+
+// Close the connection
+if( serverConnection != 0 )
+	{
+	ConnectionManager::Disconnect( this, serverConnection ) ;
+	}
+
+// Perform the optional disconnect above.
+// This will also commit the disconnects by any clients.
+ConnectionManager::Poll() ;
+
+// Deallocate the serverConnection
+delete serverConnection ; serverConnection = 0 ;
+
+elog	<< "xServer::doShutdown> Removing timers..."
+	<< endl ;
+
+count = 0 ;
+// All of the client timers should be cleared, but let's verify
+// The only timers left should be the server timers
+while( !timerQueue.empty() )
+	{
+	++count ;
+	elog	<< "xServer::doShutdown> Removing a timer"
+		<< endl ;
+
+	delete timerQueue.top().second ;
+	timerQueue.pop() ;
+	}
+elog	<< "Removed "
+	<< count
+	<< " timers"
+	<< endl ;
+
+count = 0 ;
+// Remove command handlers.
+// First, deallocate the handlers and remove them from the commandMap
+while( !commandMap.empty() )
+	{
+	delete commandMap.begin()->second ;
+	commandMap.erase( commandMap.begin() ) ;
+	}
+elog	<< "Removed "
+	<< count
+	<< " commands"
+	<< endl ;
+
+/*
+count = 0 ;
+// Now close and deallocate all command module handles
+// This will also deallocate/invalidate (somehow) the commandHandlers
+while( !commandModuleList.empty() )
+	{
+	++count ;
+	// Deallocating the moduleLoader will close the module
+	// handle.
+	delete *commandModuleList.begin() ;
+	}
+elog	<< "Removed "
+	<< count
+	<< " command modules"
+	<< endl ;
+*/
 }
 
 } // namespace gnuworld

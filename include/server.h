@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server.h,v 1.87 2003/06/20 18:58:50 dan_karrels Exp $
+ * $Id: server.h,v 1.88 2003/07/03 00:25:48 dan_karrels Exp $
  */
 
 #ifndef __SERVER_H
-#define __SERVER_H "$Id: server.h,v 1.87 2003/06/20 18:58:50 dan_karrels Exp $"
+#define __SERVER_H "$Id: server.h,v 1.88 2003/07/03 00:25:48 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
@@ -66,16 +66,6 @@ class xClient ;
 
 /// Forward declaration of Channel
 class Channel ;
-
-/// The type used to store messages for delivery to clients of
-/// class xServer
-enum MessageType
-	{
-	SRV_SUCCESS, // all ok
-	SRV_RELOAD, // reload request
-	SRV_QUIT, // server shutdown
-	SRV_DISCONNECT // server disconnected
-	} ;
 
 /**
  * This class is the server proper; it is responsible for the connection
@@ -309,12 +299,14 @@ public:
 	 * Remove a network gline and update internal gline table.
 	 */
 	virtual bool removeGline( const string& userHost,
-		const  xClient* remClient = NULL) ;
+		const xClient* remClient = NULL) ;
 
 	/**
 	 * Erase a gline from the internal data structures.  This does
 	 * NOT send a message to the network; for that functionality,
 	 * use RemoveGline() instead.
+	 * The caller of this method must also be sure to deallocate
+	 * the internal Gline associated with the iterator.
 	 */
 	virtual void eraseGline( glineIterator removeMe )
 		{ glineList.erase( removeMe ) ; }
@@ -615,38 +607,6 @@ public:
 	 * otherwise.
 	 */
 	virtual bool	PostSignal( int ) ;
-
-	/*
-	 * Server message system
-	 * The message system is used for communicating with
-	 * main() any server critical messages, such as a
-	 * disconnect on error.
-	 */
-
-	/**
-	 * Post a server message for the world to see.
-	 */
-	virtual void PostMessage( MessageType Msg )
-		{ Message = Msg ; }
-
-	/**
-	 * Return true if a message has been posted.
-	 */
-	virtual bool MessageReady() const
-		{ return (Message != SRV_SUCCESS) ; }
-
-	/**
-	 * Retrieve a message.  Returns -1 if no message ready.
-	 */
-	virtual MessageType GetMessage() const
-		{ return Message ; }
-
-	/**
-	 * Once a message has been received, call this method to
-	 * make sure that the internal state is updated.
-	 */
-	virtual void ResetMessage()
-		{ Message = SRV_SUCCESS ; }
 
 	/* Utility methods */
 
@@ -1010,6 +970,13 @@ protected:
 	xServer operator=( const xServer& ) ;
 
 	/**
+	 * This will remove all clients and clear the internal
+	 * tables nicely, and do all functions necessary
+	 * shutdown the server.
+	 */
+	virtual void	doShutdown() ;
+
+	/**
 	 * Remove glines which match the given userHost, post event.
 	 */
 	virtual void	removeMatchingGlines( const string& ) ;
@@ -1057,20 +1024,6 @@ protected:
 	 * Returns true if the signal was handled.
 	 */
 	virtual bool	OnSignal( int ) ;
-
-	/**
-	 * This variable is false when no signal has occured, true
-	 * otherwise.  This variable is checked each iteration of
-	 * the main server loop.
-	 */
-	static bool	caughtSignal ;
-
-	/**
-	 * This variable holds the signal identifier for the most
-	 * recently issued software signal, or 0 if no signal
-	 * is currently pending.
-	 */
-	static int	whichSig ;
 
 	/**
 	 * The structure type holds information about client timed
@@ -1124,6 +1077,15 @@ protected:
 	 * Return a unique timerID.
 	 */
 	virtual timerID		getUniqueTimerID() ;
+
+	/**
+	 * Remove all timers registered by the given xClient.
+	 * Note that this does not attempt to deallocate any
+	 * heap space allocated to the argument.
+	 * Instead, that data is returned to the xClient in question
+	 * by calling its OnTimerDestroy() method.
+	 */
+	virtual void	removeAllTimers( TimerHandler* ) ;
 
 	/**
 	 * Bounds checker for events.
@@ -1246,12 +1208,6 @@ protected:
 	 * signals.
 	 */
 	bool			keepRunning ;
-
-	/**
-	 * This is the current message error number, or -1 if no
-	 * error exists.
-	 */
-	MessageType		Message ;
 
 	/**
 	 * This is the port number to which we connect on our uplink.
@@ -1436,11 +1392,6 @@ protected:
 	bool		verbose ;
 
 	/**
-	 * The signal handler method for the system.
-	 */
-	static void	sigHandler( int ) ;
-
-	/**
 	 * This method initializes the entire server.
 	 */
 	void		initializeSystem() ;
@@ -1463,11 +1414,6 @@ protected:
 	bool		loadCommandHandler( const string& fileName,
 				const string& symbolName,
 				const string& commandKey ) ;
-
-	/**
-	 * This method maps all relevant signals to sigHandler().
-	 */
-	bool		setupSignals() ;
 
 #ifdef EDEBUG
 	/// Some debugging information, just a curiosity

@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ConnectionManager.cc,v 1.6 2003/06/28 01:21:18 dan_karrels Exp $
+ * $Id: ConnectionManager.cc,v 1.7 2003/07/03 00:25:48 dan_karrels Exp $
  */
 
 #include	<unistd.h>
@@ -52,7 +52,7 @@
 #include	"Buffer.h"
 #include	"ELog.h"
 
-const char rcsId[] = "$Id: ConnectionManager.cc,v 1.6 2003/06/28 01:21:18 dan_karrels Exp $" ;
+const char rcsId[] = "$Id: ConnectionManager.cc,v 1.7 2003/07/03 00:25:48 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -482,12 +482,44 @@ for( connectionMapIterator connectionItr = handlerItr->second.begin(),
 return false ;
 }
 
+bool ConnectionManager::disconnectAll( ConnectionHandler* hPtr )
+{
+// Precondition: hPtr != 0
+handlerMapType::iterator hmItr = handlerMap.find( hPtr ) ;
+if( handlerMap.end() == hmItr )
+	{
+	// No Connections owned by the ConnectionHandler
+	return true ;
+	}
+
+bool returnMe = true ;
+
+// This is safe because Disconnect() calls scheduleErasure()
+// which modifies only the eraseMap.
+for( connectionMapIterator connItr = hmItr->second.begin() ;
+	connItr != hmItr->second.end() ; ++connItr )
+	{
+	// Track if any of the Disconnect()'s fail
+	bool disReturn = Disconnect( hPtr, *connItr ) ;
+	if( !disReturn )
+		{
+		returnMe = false ;
+		}
+	}
+return returnMe ;
+}
+
 bool ConnectionManager::Disconnect( ConnectionHandler* hPtr,
 	Connection* cPtr )
 {
 // Public method, verify method arguments
 assert( hPtr != 0 ) ;
-assert( cPtr != 0 ) ;
+
+if( 0 == cPtr )
+	{
+	// Disconnect all Connections held by the ConnectionHandler
+	return disconnectAll( hPtr ) ;
+	}
 
 // Attempt to locate the handler in the handler map
 handlerMapIterator handlerItr = handlerMap.find( hPtr ) ;

@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: client.h,v 1.42 2003/06/28 16:26:45 dan_karrels Exp $
+ * $Id: client.h,v 1.43 2003/07/03 00:25:48 dan_karrels Exp $
  */
 
 #ifndef __CLIENT_H
-#define __CLIENT_H "$Id: client.h,v 1.42 2003/06/28 16:26:45 dan_karrels Exp $"
+#define __CLIENT_H "$Id: client.h,v 1.43 2003/07/03 00:25:48 dan_karrels Exp $"
 
 #include	<sstream>
 #include	<string>
@@ -167,6 +167,8 @@ public:
 
 	/**
 	 * OnQuit is called by Exit().
+	 * This method will be invoked when the server is unloading
+	 * the client for whatever reason.
 	 */
 	virtual void OnQuit() ;
 
@@ -410,6 +412,8 @@ public:
 	 * base class method declaration.
 	 */
 	virtual void	OnTimer( xServer::timerID, void* ) ;
+
+	virtual void	OnTimerDestroy( xServer::timerID, void* ) ;
 
 	/* Utility methods */
 
@@ -772,6 +776,19 @@ public:
 	 */
 	inline const string& getConfigFileName() const
 		{ return configFileName ; }
+
+	friend ELog& operator<<( ELog& out,
+		const xClient& theClient )
+		{
+		out     << theClient.nickName << '!'
+			<< theClient.userName << '@'
+			<< theClient.hostName
+			<< " Numeric: " << theClient.getCharYYXXX()
+			<< ", int YY/XXX/YYXXX: "
+			<< theClient.getIntYY() << '/'
+			<< theClient.getIntXXX() ;
+		return out ;
+		}
 
 protected:
 

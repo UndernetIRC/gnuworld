@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ConnectionManager.h,v 1.2 2002/08/08 21:31:44 dan_karrels Exp $
+ * $Id: ConnectionManager.h,v 1.3 2003/07/03 00:25:48 dan_karrels Exp $
  */
 
 #ifndef __CONNECTIONMANAGER_H
-#define __CONNECTIONMANAGER_H "$Id: ConnectionManager.h,v 1.2 2002/08/08 21:31:44 dan_karrels Exp $"
+#define __CONNECTIONMANAGER_H "$Id: ConnectionManager.h,v 1.3 2003/07/03 00:25:48 dan_karrels Exp $"
 
 #include	<sys/types.h>
 
@@ -273,6 +273,8 @@ public:
 	 * be non-NULL.
 	 * This method schedules the given Connection to be disconnected
 	 * in the next call to Poll().
+	 * Passing NULL as the Connection* will remove ALL connections
+	 * belonging to the ConnectionHandler.
 	 */
 	virtual bool	Disconnect( ConnectionHandler*,
 				Connection* ) ;
@@ -321,15 +323,15 @@ protected:
 
 	/// Open a socket.
 	/// Return -1 on error
-	int		openSocket() ;
+	virtual int	openSocket() ;
 
 	/// Close a socket
-	void		closeSocket( int ) ;
+	virtual void	closeSocket( int ) ;
 
 	/// Set the options for a socket
 	/// Return true is all options were set properly, false
 	/// otherwise.
-	bool		setSocketOptions( int ) ;
+	virtual bool	setSocketOptions( int ) ;
 
 	/**
 	 * Attempt to read()/recv() from the given Connection.
@@ -337,7 +339,7 @@ protected:
 	 * Return true if the read was successful, false if
 	 * connection is no longer valid.
 	 */
-	bool		handleRead( ConnectionHandler*, Connection* ) ;
+	virtual bool	handleRead( ConnectionHandler*, Connection* ) ;
 
 	/**
 	 * Attempt to write()/send() to the given Connection.
@@ -345,7 +347,7 @@ protected:
 	 * Return true if the write was successful, false if
 	 * the connection is no longer valid.
 	 */
-	bool		handleWrite( ConnectionHandler*, Connection* ) ;
+	virtual bool	handleWrite( ConnectionHandler*, Connection* ) ;
 
 	/**
 	 * Attempt to complete the connection to the given Connection.
@@ -353,7 +355,7 @@ protected:
 	 * Return true if connect was successful, false if Connection
 	 * is invalid.
 	 */
-	bool		finishConnect( ConnectionHandler*, Connection* ) ;
+	virtual bool	finishConnect( ConnectionHandler*, Connection* ) ;
 
 	/**
 	 * Attempt to complete an incoming connection creation.
@@ -364,7 +366,7 @@ protected:
 	 * Return true if connection attempt was successful, false
 	 * otherwise.
 	 */
-	bool		finishAccept( ConnectionHandler*, Connection* ) ;
+	virtual bool	finishAccept( ConnectionHandler*, Connection* ) ;
 
 	/**
 	 * Because the eraseMap is a multimap, it is possible to insert
@@ -382,8 +384,14 @@ protected:
 	 * removed, and this will occur in Poll().  Otherwise, add
 	 * the connection to be erased to the eraseMap.
 	 */
-	void		scheduleErasure( ConnectionHandler*,
+	virtual void	scheduleErasure( ConnectionHandler*,
 				connectionMapType::iterator ) ;
+
+	/**
+	 * Call Disconnect() for each Connection owned by the
+	 * given ConnectionHandler.
+	 */
+	virtual bool	disconnectAll( ConnectionHandler* ) ;
 
 } ;
 

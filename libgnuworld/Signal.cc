@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: Signal.cc,v 1.5 2003/06/30 14:49:59 dan_karrels Exp $
+ * $Id: Signal.cc,v 1.6 2003/07/03 00:25:48 dan_karrels Exp $
  */
 
 #include	<pthread.h>
@@ -34,7 +34,7 @@
 #include	"Signal.h"
 #include	"ELog.h"
 
-const char rcsId[] = "$Id: Signal.cc,v 1.5 2003/06/30 14:49:59 dan_karrels Exp $" ;
+const char rcsId[] = "$Id: Signal.cc,v 1.6 2003/07/03 00:25:48 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -52,6 +52,7 @@ int Signal::writeFD		= -1 ;
 Signal*	Signal::theInstance	= 0 ;
 
 pthread_mutex_t Signal::singletonMutex = PTHREAD_MUTEX_INITIALIZER ;
+pthread_mutex_t Signal::pipeMutex = PTHREAD_MUTEX_INITIALIZER ;
 
 Signal::Signal()
 {
@@ -101,7 +102,8 @@ Signal::~Signal()
 {
 delete theInstance ; theInstance = 0 ;
 closePipes() ;
-pthread_mutex_destroy( &singletonMutex ) ;
+::pthread_mutex_destroy( &singletonMutex ) ;
+::pthread_mutex_destroy( &pipeMutex ) ;
 }
 
 bool Signal::isError()
@@ -111,8 +113,11 @@ return ((-1 == readFD) || (-1 == writeFD) || signalError) ;
 
 void Signal::closePipes()
 {
+::pthread_mutex_lock( &pipeMutex ) ;
 ::close( readFD ) ;
 ::close( writeFD ) ;
+::pthread_mutex_unlock( &pipeMutex ) ;
+
 signalError = true ;
 }
 
@@ -121,7 +126,11 @@ bool Signal::openPipes()
 int rwFD[ 2 ] = { 0, 0 } ;
 
 // Create the pipe
-if( ::pipe( rwFD ) < 0 )
+::pthread_mutex_lock( &pipeMutex ) ;
+int pipeRet = ::pipe( rwFD ) ;
+::pthread_mutex_unlock( &pipeMutex ) ;
+
+if( pipeRet < 0 )
 	{
 	elog	<< "Signal::openPipes> pipe() failed: "
 		<< strerror( errno )
@@ -132,12 +141,15 @@ if( ::pipe( rwFD ) < 0 )
 	}
 
 // Set the fd's to non-blocking
+::pthread_mutex_lock( &pipeMutex ) ;
+
 for( size_t i = 0 ; i < 2 ; ++i )
 	{
 	// Get current flags
 	int flags = ::fcntl( rwFD[ i ], F_GETFL ) ;
 	if( flags < 0 )
 		{
+		::pthread_mutex_unlock( &pipeMutex ) ;
 		elog	<< "Signal> Failed to get flags for pipe fd: "
 			<< strerror( errno )
 			<< endl ;
@@ -152,6 +164,7 @@ for( size_t i = 0 ; i < 2 ; ++i )
 	// Set new flags
 	if( ::fcntl( rwFD[ i ], F_SETFL, flags ) < 0 )
 		{
+		::pthread_mutex_unlock( &pipeMutex ) ;
 		elog	<< "Signal> Failed to set flags on pipe fd: "
 			<< strerror( errno )
 			<< endl ;
@@ -164,6 +177,8 @@ for( size_t i = 0 ; i < 2 ; ++i )
 // All is well
 readFD = rwFD[ 0 ] ;
 writeFD = rwFD[ 1 ] ;
+::pthread_mutex_unlock( &pipeMutex ) ;
+
 signalError = false ;
 
 return true ;
@@ -218,7 +233,10 @@ bool Signal::getSignal( int& theSignal )
 errno = 0 ;
 
 // Attempt to read the next signal from the pipe
+::pthread_mutex_lock( &pipeMutex ) ;
 int readResult = ::read( readFD, &theSignal, sizeof( int ) ) ;
+::pthread_mutex_unlock( &pipeMutex ) ;
+
 if( readResult < 0 )
 	{
 	// Check for non-blocking type errors.

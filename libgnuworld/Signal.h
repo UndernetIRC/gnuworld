@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: Signal.h,v 1.3 2003/06/30 14:49:59 dan_karrels Exp $
+ * $Id: Signal.h,v 1.4 2003/07/03 00:25:48 dan_karrels Exp $
  */
 
 #ifndef __SIGNAL_H
-#define __SIGNAL_H "$Id: Signal.h,v 1.3 2003/06/30 14:49:59 dan_karrels Exp $"
+#define __SIGNAL_H "$Id: Signal.h,v 1.4 2003/07/03 00:25:48 dan_karrels Exp $"
 
 #include	<pthread.h>
 
@@ -48,6 +48,9 @@ protected:
 
 	/// The Singleton instance.
 	static Signal*		theInstance ;
+
+	/// This mutex guards from multiple threads performing a get()
+	static pthread_mutex_t	pipeMutex ;
 
 public:
 	/**

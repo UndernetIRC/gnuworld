@@ -17,11 +17,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: TimerHandler.h,v 1.4 2003/06/28 16:26:45 dan_karrels Exp $
+ * $Id: TimerHandler.h,v 1.5 2003/07/03 00:25:48 dan_karrels Exp $
  */
 
 #ifndef __TIMERHANDLER_H
-#define __TIMERHANDLER_H "$Id: TimerHandler.h,v 1.4 2003/06/28 16:26:45 dan_karrels Exp $"
+#define __TIMERHANDLER_H "$Id: TimerHandler.h,v 1.5 2003/07/03 00:25:48 dan_karrels Exp $"
 
 namespace gnuworld
 {
@@ -59,6 +59,14 @@ public:
 	 * timer.
 	 */
 	virtual void OnTimer( timerID, void* ) = 0 ;
+
+	/**
+	 * This method is invoked when the server removes a
+	 * timed event without being requested by the TimerHandler.
+	 * This can happen when the TimerHandler is being destroyed,
+	 * but has not removed all of its timers yet.
+	 */
+	virtual void OnTimerDestroy( timerID, void * ) {}
 
 } ;
 

@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: main.cc,v 1.53 2003/06/28 01:21:21 dan_karrels Exp $
+ * $Id: main.cc,v 1.54 2003/07/03 00:25:48 dan_karrels Exp $
  */
 
 #include	<new>
@@ -31,7 +31,6 @@
 #include	<cstdio>
 #include	<cstdlib>
 #include	<cstring>
-#include	<csignal> 
 
 #include	"config.h"
 
@@ -43,8 +42,9 @@
 #include	"server.h"
 #include	"moduleLoader.h"
 #include	"md5hash.h"
+#include	"Signal.h"
 
-RCSTAG( "$Id: main.cc,v 1.53 2003/06/28 01:21:21 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: main.cc,v 1.54 2003/07/03 00:25:48 dan_karrels Exp $" ) ;
 
 // main() must be in the global namespace
 using namespace gnuworld ;
@@ -59,13 +59,6 @@ void		gnu() ;
 
 // Instantiate the logging stream
 gnuworld::ELog		gnuworld::elog ;
-
-/// This method is called when a registered system signal occurs
-void xServer::sigHandler( int whichSig )
-{
-xServer::caughtSignal = true ;
-xServer::whichSig = whichSig ;
-}
 
 /// Output the command line arguments for gnuworld
 void usage( const string& progName )
@@ -107,6 +100,18 @@ gnu() ;
 
 // This is done to intialize the hasher
 md5 dummy ;
+
+// Load signal handlers.  This need only be done once
+// for the entire system, no matter if the xServer is reloaded.
+if( 0 == Signal::getInstance() )
+	{
+	clog	<< "Unable to initialize signal handlers"
+		<< endl ;
+	return -1 ;
+	}
+
+// Seed the random number generator
+::srand( ::time( 0 ) ) ;
 
 // Allocate a new instance of the xServer
 gnuworld::xServer* theServer =
@@ -227,13 +232,6 @@ if( verbose )
 		<< endl ;
 	}
 
-if( !setupSignals() )
-	{
-	clog	<< "Failed to establish signal handlers"
-		<< endl ;
-	::exit( -1 ) ;
-	}
-
 // Sets up the server internals
 initializeSystem() ;
 
@@ -247,13 +245,15 @@ initializeSystem() ;
 		::exit( -1 ) ;
 		}
 #endif
-
-// Seed the random number generator
-::srand( ::time( 0 ) ) ;
 }
 
 void xServer::mainLoop()
 {
+// If this variable is true, check for a signal
+// Otherwise, there was a critical failure in the signal
+// subsystem, and do not check for new signals.
+bool checkSignals = true ;
+
 // When this method is first invoked, the server is not connected
 while( keepRunning )
 	{
@@ -290,8 +290,7 @@ while( keepRunning )
 
 			serverConnection = Connect( this, UplinkName, Port ) ;
 			}
-
-		}
+		} // if( NULL == serverConnection )
 
 	// Check for pending timers before calling Poll(), just for
 	// If timers are pending, then set the duration until the next
@@ -326,7 +325,7 @@ while( keepRunning )
 			// which is exactly opposite of what is needed here
 			seconds = 0 ;
 			}
-                }
+                } // if( !timerQueue.empty() )
 
 	// Process all available data
 	ConnectionManager::Poll( seconds ) ;
@@ -335,65 +334,43 @@ while( keepRunning )
 	// Check the timers
 	CheckTimers() ;
 
+	if( !checkSignals )
+		{
+		// There was a critical failure in the Signal handling
+		// system, do not check for new signals.
+		continue ;
+		}
+
         // Did we catch a signal?
-        if( caughtSignal )
-                {
-		if( !PostSignal( whichSig ) )
+	int theSignal = -1 ;
+	while( Signal::getSignal( theSignal ) )
+		{
+		if( -1 == theSignal )
+			{
+			elog	<< "xServer::mainLoop> Criticial failure "
+				<< "in the signal handling system"
+				<< endl ;
+			checkSignals = false ;
+			break ;
+			}
+
+		elog	<< "xServer::mainLoop> Received signal: "
+			<< theSignal
+			<< endl ;
+
+		if( !PostSignal( theSignal ) )
 			{
 			keepRunning = false ;
-			continue ;
+			// No need to set checkSignals to false here,
+			// since this big while() loop will not be
+			// executed again.
+			break ;
 			}
-		caughtSignal = false ;
-		whichSig = 0 ;
-                }
+                } // while( Signal::getSignal() )
 
 	} // while( keepRunning )
+
+// We are shutting down
+doShutdown() ;
+
 } // mainLoop()
-
-bool xServer::setupSignals()
-{
-if( SIG_ERR == ::signal( SIGINT,
-	static_cast< void (*)( int ) >( sigHandler ) ) )
-	{
-	clog	<< "*** Unable to establish signal hander for SIGINT"
-		<< endl ;
-	return false ;
-	}
-if( SIG_ERR == ::signal( SIGPIPE,
-	static_cast< void (*)( int ) >( sigHandler ) ) )
-	{
-	clog	<< "*** Unable to establish signal hander for SIGPIPE"
-		<< endl ;
-	return false ;
-	}
-if( SIG_ERR == ::signal( SIGUSR1,
-	static_cast< void (*)( int ) >( sigHandler ) ) )
-	{
-	clog	<< "*** Unable to establish signal hander for SIGUSR1"
-		<< endl ;
-	return false ;
-	}
-if( SIG_ERR == ::signal( SIGUSR2,
-	static_cast< void (*)( int ) >( sigHandler ) ) )
-	{
-	clog	<< "*** Unable to establish signal hander for SIGUSR2"
-		<< endl ;
-	return false ;
-	}
-
-if( SIG_ERR == ::signal( SIGTERM,
-	static_cast< void (*)( int ) >( sigHandler ) ) )
-	{
-	clog	<< "*** Unable to establish signal hander for SIGTERM"
-		<< endl ;
-	return false ;
-	}
-if( SIG_ERR == ::signal( SIGHUP,
-	static_cast< void (*)( int ) >( sigHandler ) ) )
-	{
-	clog	<< "*** Unable to establish signal hander for SIGHUP"
-		<< endl ;
-	return false ;
-	}
-return true ;
-}

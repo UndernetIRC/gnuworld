@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_B.cc,v 1.2 2003/06/17 15:13:53 dan_karrels Exp $
+ * $Id: msg_B.cc,v 1.3 2003/07/03 00:25:48 dan_karrels Exp $
  */
 
 #include	<sys/types.h>
@@ -43,7 +43,7 @@
 #include	"ServerCommandHandler.h"
 #include	"config.h"
 
-RCSTAG( "$Id: msg_B.cc,v 1.2 2003/06/17 15:13:53 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: msg_B.cc,v 1.3 2003/07/03 00:25:48 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -97,10 +97,10 @@ CREATE_LOADER(msg_B)
 // Here is a special case, when the only occupant of the channel
 // is a zombie:
 // BG B #nails 1036089823
+// We ignore this case.
 //
 bool msg_B::Execute( const xParameters& Param )
 {
-
 // Make sure there are at least four arguments supplied:
 // servernumeric #channel time_stamp arguments
 if( Param.size() < 3 )
@@ -109,6 +109,15 @@ if( Param.size() < 3 )
 		<< Param
 		<< endl ;
 	return false ;
+	}
+
+if( 3 == Param.size() )
+	{
+	// Zombie in channel.
+	// If the user is dezombified, the client will be shown
+	// to issue a "J", and the channel will be created anyway.
+	// Only difference is the timestamp difference.
+	return true ;
 	}
 
 // Attempt to find the channel in the network channel table
