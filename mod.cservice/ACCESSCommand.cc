@@ -1,20 +1,12 @@
-/* ACCESSCOmmand.cc */
+/* ACCESSCommand.cc */
 
-#include        <string>
-#include        <cstdlib>
-#include        <netinet/in.h>
+#include	<string>
+ 
+#include	"StringTokenizer.h"
+#include	"ELog.h" 
+#include	"cservice.h" 
 
-#include		"cserviceCommands.h"
-#include        "server.h"
-#include        "StringTokenizer.h"
-#include        "Network.h"
-#include        "misc.h"
-#include        "ip.h"
-#include        "ELog.h" 
-#include        "ip.h"
-#include        "cservice.h" 
-
-const char ACCESSCommand_cc_rcsId[] = "$Id: ACCESSCommand.cc,v 1.1 2000/12/11 00:49:31 gte Exp $" ;
+const char ACCESSCommand_cc_rcsId[] = "$Id: ACCESSCommand.cc,v 1.2 2000/12/11 02:04:28 gte Exp $" ;
 
 namespace gnuworld
 {

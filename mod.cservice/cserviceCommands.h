@@ -1,5 +1,5 @@
 #ifndef __CSERVICECOMMANDS_H
-#define __CSERVICECOMMANDS_H "$Id: cserviceCommands.h,v 1.1 2000/12/11 00:49:31 gte Exp $"
+#define __CSERVICECOMMANDS_H "$Id: cserviceCommands.h,v 1.2 2000/12/11 02:04:28 gte Exp $"
 
 #include	<string>
 #include	"iClient.h"
@@ -61,7 +61,20 @@ public: \
         virtual ~commName##Command() {} \
 } ;
 
+// Level 0 commands.
+ 
+DECLARE_COMMAND( SHOWCOMMANDS )
+DECLARE_COMMAND( LOGIN )
+DECLARE_COMMAND( SEARCH )
 DECLARE_COMMAND( ACCESS )
+DECLARE_COMMAND( CHANINFO )
+DECLARE_COMMAND( MOTD )
+DECLARE_COMMAND( ISREG )
+DECLARE_COMMAND( SHOWIGNORE )
+DECLARE_COMMAND( VERIFY )
+DECLARE_COMMAND( RANDOM )
+
+// Channel user level commands.
  
 } // namespace gnuworld
 

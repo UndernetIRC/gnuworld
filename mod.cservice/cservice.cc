@@ -39,8 +39,6 @@ extern "C"
   }
 
 } 
-
-//-- Connect to the PG SQL database and load the configuration file.
  
 bool cservice::RegisterCommand( Command* newComm )
 { 
@@ -80,12 +78,20 @@ xClient::ImplementServer( theServer ) ;
 
 cservice::cservice(const string& args)
 { 
-
     /*
 	 *  Register command handlers.
 	 */
  
+    RegisterCommand(new SHOWCOMMANDSCommand(this, "SHOWCOMMANDS", "TBA")); 
+    RegisterCommand(new LOGINCommand(this, "LOGIN", "TBA"));
+    RegisterCommand(new SEARCHCommand(this, "SEARCH", "TBA"));
     RegisterCommand(new ACCESSCommand(this, "ACCESS", "[access_option] #channel [access_option] [(userid|nick|hostmask)] [access_option]"));
+    RegisterCommand(new CHANINFOCommand(this, "CHANINFO", "TBA"));
+    RegisterCommand(new MOTDCommand(this, "MOTD", "TBA"));
+    RegisterCommand(new ISREGCommand(this, "ISREG", "TBA"));
+    RegisterCommand(new SHOWIGNORECommand(this, "SHOWIGNORE", "TBA"));
+    RegisterCommand(new VERIFYCommand(this, "VERIFY", "TBA"));
+    RegisterCommand(new RANDOMCommand(this, "RANDOM", "TBA"));
 
 	//-- Load in our cservice configuration file.
 	cserviceConfig = new EConfig( args ) ;
