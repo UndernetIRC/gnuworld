@@ -1,10 +1,10 @@
-dnl $Id: configure.in,v 1.53 2002/06/21 20:58:06 dan_karrels Exp $
+dnl $Id: configure.in,v 1.54 2002/06/21 21:19:41 dan_karrels Exp $
 dnl ----------------------------------------------------------
 
 echo Configuring GNUWorld...
 echo
 
-AC_REVISION($Revision: 1.53 $)
+AC_REVISION($Revision: 1.54 $)
 AC_INIT
 AC_CONFIG_SRCDIR([src/main.cc])
 AM_INIT_AUTOMAKE(gnuworld,0.0)
@@ -156,7 +156,7 @@ AC_ARG_WITH(pgsql-include,
 	AC_HELP_STRING([--with-pgsqlinclude=PGSQLINCLUDEDIR],
 			[Specify location to find libpq++.h, default is \
 /usr/local/pgsql/include]),
-	[PGSQLINCLUDE=$withval
+	[PGSQL_INCLUDE=$withval
 	 searchForInclude=no]
 )
 
