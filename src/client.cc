@@ -23,11 +23,10 @@
 #include	"StringTokenizer.h"
 
 #include	"ELog.h"
-#include	"MessageNode.h"
 #include	"events.h"
 
 const char xClient_h_rcsId[] = __XCLIENT_H ;
-const char xClient_cc_rcsId[] = "$Id: client.cc,v 1.20 2001/01/06 15:31:53 dan_karrels Exp $" ;
+const char xClient_cc_rcsId[] = "$Id: client.cc,v 1.21 2001/01/06 15:46:31 dan_karrels Exp $" ;
 
 using std::string ;
 using std::strstream ;

@@ -3,14 +3,13 @@
  */
 
 #ifndef __XCLIENT_H
-#define __XCLIENT_H "$Id: client.h,v 1.17 2001/01/06 15:31:52 dan_karrels Exp $"
+#define __XCLIENT_H "$Id: client.h,v 1.18 2001/01/06 15:46:30 dan_karrels Exp $"
 
 #include	<string>
 
 #include	"server.h"
 #include	"Numeric.h"
 #include	"iClient.h"
-#include	"MessageNode.h"
 #include	"events.h"
 
 using std::string ;

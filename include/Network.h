@@ -3,7 +3,7 @@
  */
 
 #ifndef __XNETWORK_H
-#define __XNETWORK_H "$Id: Network.h,v 1.9 2001/01/06 15:04:42 dan_karrels Exp $"
+#define __XNETWORK_H "$Id: Network.h,v 1.10 2001/01/06 15:46:30 dan_karrels Exp $"
 
 #include	<vector>
 #include	<string>
@@ -17,7 +17,6 @@
 #include	"iClient.h"
 #include	"Channel.h"
 #include	"client.h"
-#include	"VectorTrie.h"
 #include	"misc.h" // struct noCaseCompare
 
 using std::string ;

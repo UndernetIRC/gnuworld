@@ -38,13 +38,12 @@
 #include	"Gline.h"
 
 #include	"ELog.h"
-#include	"MessageNode.h"
 #include	"Socket.h"
 #include	"StringTokenizer.h"
 #include	"moduleLoader.h"
 
 const char xServer_h_rcsId[] = __XSERVER_H ;
-const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.39 2001/01/03 23:06:49 dan_karrels Exp $" ;
+const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.40 2001/01/06 15:46:31 dan_karrels Exp $" ;
 
 using std::string ;
 using std::vector ;
