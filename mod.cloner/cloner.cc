@@ -20,7 +20,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
  * USA.
  *
- * $Id: cloner.cc,v 1.18 2002/08/01 21:44:26 reedloden Exp $
+ * $Id: cloner.cc,v 1.19 2002/08/01 23:39:13 reedloden Exp $
  */
 
 #include	<new>
@@ -45,7 +45,7 @@
 
 const char client_h_rcsId[] = __CLIENT_H ;
 const char cloner_h_rcsId[] = __CLONER_H ;
-const char cloner_cc_rcsId[] = "$Id: cloner.cc,v 1.18 2002/08/01 21:44:26 reedloden Exp $" ;
+const char cloner_cc_rcsId[] = "$Id: cloner.cc,v 1.19 2002/08/01 23:39:13 reedloden Exp $" ;
 const char iClient_h_rcsId[] = __ICLIENT_H ;
 const char EConfig_h_rcsId[] = __ECONFIG_H ;
 const char ELog_h_rcsId[] = __ELOG_H ;
@@ -182,7 +182,7 @@ if( command == "SHOWCOMMANDS" || command == "HELP" )
 	{
 	if( st.size() < 1 )
 		{
-		Notice( theClient, "Usage: %s", command ) ;
+		Notice( theClient, "Usage: %s", string_upper( st[ 0 ) ;
 		return 0 ;
 		}
 	if( st.size() >= 1 )
@@ -272,7 +272,7 @@ else if( command == "PARTALL" )
 		return 0 ;
 		}
 
-	if { st.size() == 2 )
+	if( st.size() == 2 )
 		{
 		string chanName( st[ 1 ] ) ;
 		if( chanName[ 0 ] != '#' )
@@ -292,7 +292,7 @@ else if( command == "PARTALL" )
 			MyUplink->Write( s ) ;
 			}
 		}
-	if (st.size() >= 2 )
+	if( st.size() >= 2 )
 		{
 		string chanName( st[ 1 ] ) ;
 		if( chanName[ 0 ] != '#' )
@@ -381,7 +381,8 @@ else if( command == "SAYALL" || command == "MSGALL" )
 			<< " :"
 			<< privMsg
 			<< ends ;
-		MyUplink->Write( s ) ;
+
+			MyUplink->Write( s ) ;
 		}
 	} // SAYALL/MSGALL
 else if( command == "ACTALL" || command == "DOALL" || command ==
@@ -408,6 +409,7 @@ else if( command == "ACTALL" || command == "DOALL" || command ==
 			<< action
 			<< "\001"
 			<< ends ;
+
 			MyUplink->Write( s ) ;
 		}
 	} // ACTALL/DOALL/DESCRIBEALL
@@ -433,6 +435,7 @@ else if( command == "NOTICEALL" )
 			<< " :"
 			<< notice
 			<< ends ;
+
 			MyUplink->Write( s ) ;
 		}
 	} // NOTICEALL
