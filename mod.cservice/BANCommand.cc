@@ -12,7 +12,7 @@
  *
  * Caveats: None.
  *
- * $Id: BANCommand.cc,v 1.7 2001/01/29 20:48:10 gte Exp $
+ * $Id: BANCommand.cc,v 1.8 2001/01/30 21:34:16 gte Exp $
  */
 
 #include	<string>
@@ -27,7 +27,7 @@
 #include	"responses.h"
 #include	"match.h"
 
-const char BANCommand_cc_rcsId[] = "$Id: BANCommand.cc,v 1.7 2001/01/29 20:48:10 gte Exp $" ;
+const char BANCommand_cc_rcsId[] = "$Id: BANCommand.cc,v 1.8 2001/01/30 21:34:16 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -139,6 +139,12 @@ if(banTime < 1 || banTime > 336)
 	return true;
 	}
 
+if(banReason.size() > 128)
+	{
+	bot->Notice(theClient, "Ban reason cannot exceed 128 chars");
+	return true;
+	}
+ 
 int banDuration = banTime * 3600;
 string banTarget = st[2];
 

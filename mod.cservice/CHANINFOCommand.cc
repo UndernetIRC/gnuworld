@@ -13,7 +13,7 @@
  *
  * Command is aliased "INFO".
  *
- * $Id: CHANINFOCommand.cc,v 1.11 2001/01/30 00:12:16 gte Exp $
+ * $Id: CHANINFOCommand.cc,v 1.12 2001/01/30 21:34:16 gte Exp $
  */
 
 #include	<string>
@@ -25,7 +25,7 @@
 #include	"responses.h"
 #include	"libpq++.h"
  
-const char CHANINFOCommand_cc_rcsId[] = "$Id: CHANINFOCommand.cc,v 1.11 2001/01/30 00:12:16 gte Exp $" ;
+const char CHANINFOCommand_cc_rcsId[] = "$Id: CHANINFOCommand.cc,v 1.12 2001/01/30 21:34:16 gte Exp $" ;
  
 namespace gnuworld
 {
@@ -136,8 +136,19 @@ if( string::npos == st[ 1 ].find_first_of( '#' ) )
 		bot->Notice(theClient, "Channels: %s", channelList.c_str());
 	 
 		delete[] channelsQuery.str() ; 
-
 	}
+
+	/*
+	 *  Debug info:
+	 */
+
+	if( ((tmpUser) && (bot->getAdminAccessLevel(tmpUser) == 1000)) )
+	{
+		if (!targetClient) return true;
+		bot->Notice(theClient, "Input Flood Points: %i", bot->getFloodPoints(targetClient));
+		bot->Notice(theClient, "Ouput Flood (Bytes): %i", bot->getOutputTotal(targetClient));
+	}
+
 	return true;
 } 
 

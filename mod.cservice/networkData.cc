@@ -28,8 +28,7 @@ networkData::networkData()
  : messageTime( 0 ),
    outputCount( 0 ),
    flood_points( 0 ),
-   currentUser( 0 ),
-   ignored( false) 
+   currentUser( 0 ) 
 {
 }
  

@@ -1,5 +1,5 @@
 #ifndef __CSERVICE_H
-#define __CSERVICE_H "$Id: cservice.h,v 1.33 2001/01/29 04:07:51 gte Exp $"
+#define __CSERVICE_H "$Id: cservice.h,v 1.34 2001/01/30 21:34:16 gte Exp $"
 
 #include	<string>
 #include	<vector>
@@ -78,6 +78,9 @@ public:
                 const string& Message,
                 bool Secure = false ) ;
 	virtual int OnTimer(xServer::timerID, void*);
+	virtual int Notice( const iClient* Target,
+		const char* Message, ... ) ; 
+	virtual int Notice( const iClient* Target, const string& ) ;
 
 	// Sends a notice to a channel from the server.
 	bool serverNotice( Channel*, const char*, ... );
@@ -137,14 +140,12 @@ public:
 	 * within the flood period. */
 	void setLastRecieved(iClient*, time_t);
 
-	/* Find out when we first heard from this chap. */
+	/* Find out when we first heard from this chap. */ 
 	time_t getLastRecieved(iClient*);
 
-	/* Ignore someone, or don't. Up to you. */
-	void setIgnored(iClient*, bool);
-
-	/* Is this guy ignored? */
-	bool isIgnored(iClient*);
+	void setOutputTotal(const iClient* theClient, unsigned int count);
+	unsigned int getOutputTotal(const iClient* theClient);
+	bool hasOutputFlooded(iClient* theClient);
 
 	// Typedef's for user/channel Hashmaps.
 	// User hash, Key is Username.

@@ -122,7 +122,7 @@ cservice::cservice(const string& args)
  
     RegisterCommand(new SHOWCOMMANDSCommand(this, "SHOWCOMMANDS", "<#channel>", 3));
     RegisterCommand(new LOGINCommand(this, "LOGIN", "<username> <password>", 10)); 
-    RegisterCommand(new ACCESSCommand(this, "ACCESS", "[channel] [nick] [-min n] [-max n] [-autoop] [-noautoop] [-modif [mask]]", 5));
+    RegisterCommand(new ACCESSCommand(this, "ACCESS", "[channel] [nick] [-min n] [-max n] [-autoop] [-noautoop] [-modif [mask]]", 1));
     RegisterCommand(new CHANINFOCommand(this, "CHANINFO", "<#channel>", 3)); 
     RegisterCommand(new ISREGCommand(this, "ISREG", "<#channel>", 4)); 
     RegisterCommand(new VERIFYCommand(this, "VERIFY", "<nick>", 3));
@@ -290,23 +290,7 @@ unsigned short cservice::getFloodPoints(iClient* theClient)
  
 	return tmpData->flood_points;
 }	
-
-void cservice::setIgnored(iClient* theClient, bool polarity)
-{
-	networkData* tmpData = (networkData*)theClient->getCustomData(this);
-	assert(tmpData != NULL);
-	
-	tmpData->ignored = polarity;
-}
-
-bool cservice::isIgnored(iClient* theClient)
-{
-	networkData* tmpData = (networkData*)theClient->getCustomData(this);
-	assert(tmpData != NULL);
-	
-	return tmpData->ignored;
-}	
-
+ 
 void cservice::setFloodPoints(iClient* theClient, unsigned short amount)
 { 
 	networkData* tmpData = (networkData*)theClient->getCustomData(this);
@@ -340,7 +324,7 @@ time_t cservice::getLastRecieved(iClient* theClient)
 
 	return tmpData->messageTime;
 }	
-
+ 
 bool cservice::hasFlooded(iClient* theClient)
 {
 	if( (getLastRecieved(theClient) + flood_duration) <= ::time(NULL) )
@@ -368,7 +352,6 @@ bool cservice::hasFlooded(iClient* theClient)
 			sqlUser* theUser = isAuthed(theClient, false);
 			if (theUser && getAdminAccessLevel(theUser)) return false;
  
-//			setIgnored(theClient, true);  TODO: remove, we use silence :)
 			setFloodPoints(theClient, 0);
 			setLastRecieved(theClient, ::time(NULL)); 
 			Notice(theClient, "Flood me will you? I'm not going to listen to you anymore."); 
@@ -392,16 +375,86 @@ bool cservice::hasFlooded(iClient* theClient)
 	return false;
 } 
 
+void cservice::setOutputTotal(const iClient* theClient, unsigned int count)
+{
+	/*
+	 * This function sets the current output total in bytes
+	 * for this client.
+	 */
+
+	networkData* tmpData = (networkData*)theClient->getCustomData(this);
+	assert(tmpData != NULL);
+
+	tmpData->outputCount = count;
+} 
+
+unsigned int cservice::getOutputTotal(const iClient* theClient)
+{
+	networkData* tmpData = (networkData*)theClient->getCustomData(this);
+	assert(tmpData != NULL);
+
+	return tmpData->outputCount;
+
+}	
+
+bool cservice::hasOutputFlooded(iClient* theClient)
+{
+	if( (getLastRecieved(theClient) + flood_duration) <= ::time(NULL) )
+	{
+	/*
+	 *  Reset a few things, they're out of the flood period now.
+	 *  Or, this is the first message from them.
+	 */
+
+	setOutputTotal(theClient, 0);
+	setLastRecieved(theClient, ::time(NULL));
+	} else 
+	{
+		/*
+		 *  Inside the flood period, check their output count.
+		 */
+
+		if(getOutputTotal(theClient) > output_flood)
+		{
+			/*
+			 *  Check admin access, if present then
+			 *  don't trigger.
+			 */
+
+			sqlUser* theUser = isAuthed(theClient, false);
+			if (theUser && getAdminAccessLevel(theUser)) return false;
+ 
+			setOutputTotal(theClient, 0);
+			setLastRecieved(theClient, ::time(NULL)); 
+			Notice(theClient, "I think I've sent you a little too much data, I'm going to ignore you for a while."); 
+		
+			// Send a silence numeric target, and mask to ignore messages from this user.
+			string silenceMask = "*!*" + theClient->getUserName() + "@" + theClient->getInsecureHost();
+
+			strstream s;
+			s << getCharYYXXX() << " SILENCE " << theClient->getCharYYXXX() << " " << silenceMask << ends; 
+			Write( s );
+			delete[] s.str();
+
+			time_t expireTime = currentTime() + 3600;
+			silenceList.push_back(make_pair(expireTime, silenceMask));
+
+			logAdminMessage("OUTPUT-FLOOD from %s", theClient->getNickUserHost().c_str());
+			return true;
+		}
+	}
+
+	return false;
+
+}	
+ 
 int cservice::OnPrivateMessage( iClient* theClient, const string& Message,
 	bool secure )
 { 
 	/*
 	 *	Private message handler. Pass off the command to the relevant
 	 *  handler.
-	 */
-
-	/* Don't talk to naughty people. */
-	if (isIgnored(theClient)) return false; 
+	 */ 
 
 	StringTokenizer st( Message ) ;
 	if( st.empty() )
@@ -424,7 +477,9 @@ int cservice::OnPrivateMessage( iClient* theClient, const string& Message,
 	{
 		/* Don't reply to unknown commands, but add to their flood 
 		 * total :) */
-		if (hasFlooded(theClient)) return false;
+
+		if (hasOutputFlooded(theClient)) return false;
+		if (hasFlooded(theClient)) return false; 
 		setFloodPoints(theClient, getFloodPoints(theClient) + 3); 
 	}
 	else
@@ -433,6 +488,7 @@ int cservice::OnPrivateMessage( iClient* theClient, const string& Message,
 		 *  Check users flood limit, if exceeded..
 		 */
 
+		if (hasOutputFlooded(theClient)) return false;
  		if (hasFlooded(theClient)) return false;
 
 		setFloodPoints(theClient, getFloodPoints(theClient) + commHandler->second->getFloodPoints() );
@@ -476,7 +532,7 @@ int cservice::OnCTCP( iClient* theClient, const string& CTCP,
 
 	if(Command == "VERSION")
 	{
-		xClient::DoCTCP(theClient, CTCP.c_str(), "Undernet P10 Channel Services Version 2 [" __DATE__ " " __TIME__ "] ($Id: cservice.cc,v 1.72 2001/01/30 03:02:46 gte Exp $)");
+		xClient::DoCTCP(theClient, CTCP.c_str(), "Undernet P10 Channel Services Version 2 [" __DATE__ " " __TIME__ "] ($Id: cservice.cc,v 1.73 2001/01/30 21:34:16 gte Exp $)");
 		return true;
 	}
 
@@ -1443,6 +1499,39 @@ time_t cservice::currentTime()
 
 	 return dbTimeOffset + ::time(NULL);
 } 
+
+int cservice::Notice( const iClient* Target, const string& Message )
+{
+if( Connected && MyUplink )
+	{
+	setOutputTotal( Target, getOutputTotal(Target) + Message.size() );
+	return MyUplink->Write( "%s O %s :%s\r\n",
+		getCharYYXXX().c_str(),
+		Target->getCharYYXXX().c_str(),
+		Message.c_str() ) ; 
+	}
+return -1 ;
+}
+
+int cservice::Notice( const iClient* Target, const char* Message, ... )
+{
+if( Connected && MyUplink && Message && Message[ 0 ] != 0 )
+	{
+	char buffer[ 512 ] = { 0 } ;
+	va_list list;
+
+	va_start(list, Message);
+	vsprintf(buffer, Message, list);
+	va_end(list);
+ 
+	setOutputTotal( Target, getOutputTotal(Target) + strlen(buffer) );
+	return MyUplink->Write("%s O %s :%s\r\n",
+		getCharYYXXX().c_str(),
+		Target->getCharYYXXX().c_str(),
+		buffer ) ; 
+	}
+return -1 ;
+}
  
 void Command::Usage( iClient* theClient )
 {
