@@ -18,7 +18,7 @@
  *
  * Caveats: None.
  *
- * $Id: SETCommand.cc,v 1.41 2001/07/16 19:31:18 gte Exp $
+ * $Id: SETCommand.cc,v 1.42 2001/07/16 20:25:52 gte Exp $
  */
 
 #include	<string>
@@ -29,7 +29,7 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char SETCommand_cc_rcsId[] = "$Id: SETCommand.cc,v 1.41 2001/07/16 19:31:18 gte Exp $" ;
+const char SETCommand_cc_rcsId[] = "$Id: SETCommand.cc,v 1.42 2001/07/16 20:25:52 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -200,7 +200,7 @@ else
 	if(theChan->getFlag(sqlChannel::F_LOCKED))
 	{
 		int admLevel = bot->getAdminAccessLevel(theUser);
-		if (admLevel <= level::set::locked)
+		if (admLevel < level::set::locked)
 			{
 			bot->Notice(theClient, "The channel settings for %s have been locked by a cservice"
 				" administrator and cannot be changed.", theChan->getName().c_str());
