@@ -47,7 +47,7 @@
 #include	"ServerTimerHandlers.h"
 
 const char xServer_h_rcsId[] = __XSERVER_H ;
-const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.88 2001/03/04 00:07:25 dan_karrels Exp $" ;
+const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.89 2001/03/20 13:32:44 isomer Exp $" ;
 
 using std::string ;
 using std::vector ;
@@ -1975,7 +1975,8 @@ else if( NULL == theChan )
 		<< " C "
 		<< chanName
 		<< ' '
-		<< postJoinTime ;
+		<< postJoinTime 
+		<< ends ;
 	Write( s ) ;
 	delete[] s.str() ;
 	}
