@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ConnectionManager.cc,v 1.18 2002/08/04 00:17:51 dan_karrels Exp $
+ * $Id: ConnectionManager.cc,v 1.19 2002/08/04 00:55:21 dan_karrels Exp $
  */
 
 #include	<unistd.h>
@@ -556,9 +556,9 @@ for( constHandlerMapIterator handlerItr = handlerMap.begin() ;
 		const Connection* connectionPtr = *connectionItr ;
 		int tempFD = connectionPtr->getSockFD() ;
 
-		elog	<< "Poll> Before select(), tempFD: "
-			<< tempFD
-			<< endl ;
+//		elog	<< "Poll> Before select(), tempFD: "
+//			<< tempFD
+//			<< endl ;
 
 		assert( tempFD >= 0 ) ;
 
@@ -674,9 +674,9 @@ for( constHandlerMapIterator handlerItr = handlerMap.begin() ;
 		// Connection's socket (file) descriptor
 		int tempFD = connectionPtr->getSockFD() ;
 
-		elog	<< "Poll> Before select(), tempFD: "
-			<< tempFD
-			<< endl ;
+//		elog	<< "Poll> Before select(), tempFD: "
+//			<< tempFD
+//			<< endl ;
 
 		assert( tempFD >= 0 ) ;
 
