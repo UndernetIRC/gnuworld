@@ -14,12 +14,15 @@ namespace ds {
 
 bool MAXCHANSTest::isNormal( const Channel *theChannel )
 {
+	unsigned int normals = 0;
+
 	Channel::const_userIterator chanItr = theChannel->userList_begin();
 	
 	for( ; chanItr != theChannel->userList_end() ; ++chanItr )
 		{
 		iClient *theClient = chanItr->second->getClient();
-		if(theClient->channels_size() >= bot->maxChans) return true;
+		if(theClient->channels_size() >= bot->maxChans) ++normals;
+		if(normals >= 3) return true;
 		}
 	
 	return false;

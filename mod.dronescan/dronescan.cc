@@ -402,7 +402,6 @@ int dronescan::OnTimer( xServer::timerID theTimer , void *)
 /** This function allows us to change our current state. */
 void dronescan::changeState(DS_STATE newState)
 {
-	elog << BURST << " " << RUN << " - " << currentState << " " << newState << endl;
 	if(currentState == newState) return;
 	
 	/* Instantiate our own timer so we don't interfere with anyone elses */
@@ -566,6 +565,7 @@ void dronescan::checkChannels()
 	log(INFO, "Checking channels for drones:");
 
 	unsigned int noChannels = 0;
+	unsigned int noDrones = 0;
 	unsigned int failure = 0;
 
 	theTimer->Start();
@@ -578,12 +578,16 @@ void dronescan::checkChannels()
 		
 		if(ptr->second->size() < channelCutoff) continue;
 		
-		if(!checkChannel( ptr->second )) ++failure;
+		if(!checkChannel( ptr->second )) {
+			++failure;
+			noDrones += ptr->second->size();
+		}
 		}
 	
-	log(INFO, "Finished checking %u channels. %u possibles. Duration: %u ms",
+	log(INFO, "Finished checking %u channels. %u/%u total possible channels/clients. Duration: %u ms",
 		noChannels,
 		failure,
+		noDrones,
 		theTimer->stopTimeMS()
 		);
 }
@@ -626,8 +630,25 @@ bool dronescan::checkChannel( const Channel *theChannel , const iClient *theClie
 	else
 		{
 		/* This channel is voted abnormal. */
-		log(WARN, "  AC: %20s - %u/%u tests failed - %u users",
+		stringstream chanStat, chanParams;
+		chanStat << "+";
+		if(theChannel->getMode(Channel::MODE_I)) chanStat << "i";
+		if(theChannel->getMode(Channel::MODE_R)) chanStat << "r";
+		
+		if(theChannel->getMode(Channel::MODE_K)) {
+			chanStat << "k";
+			chanParams << theChannel->getKey();
+		}
+		if(theChannel->getMode(Channel::MODE_L)) {
+			chanStat << "l";
+			if(theChannel->getMode(Channel::MODE_K)) chanParams << " ";
+			chanParams << theChannel->getLimit();
+		}
+		
+		log(WARN, "  AC: %20s - %-5s %-15s - %u/%u tests failed - %u users",
 			theChannel->getName().c_str(),
+			chanStat.str().c_str(),
+			chanParams.str().c_str(),
 			(testVector.size() - normal),
 			testVector.size(),
 			theChannel->size()

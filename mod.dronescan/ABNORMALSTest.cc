@@ -29,7 +29,7 @@ bool ABNORMALSTest::isNormal( const Channel *theChannel )
 		return false;
 	else
 		return true;
-}
+} // bool ABNORMALSTest::isNormal( const Channel* )
 
 } // namespace ds
 

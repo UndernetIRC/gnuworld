@@ -1,5 +1,5 @@
 lib_LTLIBRARIES = libdronescan.la
-libdronescan_la_LDFLAGS = -module -export-dynamic -L@PGSQL_LIB@ -lpq++
+libdronescan_la_LDFLAGS = -module -export-dynamic
 
 libdronescan_la_SOURCES = 	\
 	dronescan.cc		\
@@ -9,4 +9,4 @@ libdronescan_la_SOURCES = 	\
 	MAXCHANSTest.cc		\
 	RANGETest.cc
 
-INCLUDES = -I@PGSQL_INCLUDE@ $(INCLTDL)
+INCLUDES = $(INCLTDL)
