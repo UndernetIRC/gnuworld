@@ -3,13 +3,13 @@
  */
 
 #ifndef __NETWORK_H
-#define __NETWORK_H "$Id: Network.h,v 1.19 2001/08/26 22:22:55 dan_karrels Exp $"
+#define __NETWORK_H "$Id: Network.h,v 1.20 2001/09/23 02:27:19 gte Exp $"
 
 #include	<vector>
 #include	<string>
 #include	<map>
 #include	<list>
-#include	<hash_map>
+#include	<hash_map.h>
 #include	<algorithm>
 
 #include	<ctime>
@@ -434,7 +434,7 @@ public:
 	 * characters, with any clients on the network.  Return a
 	 * list of pointers to const iClient's which match.
 	 */
-	virtual list< const iClient* > matchHost( const string& wildHost ) 
+	virtual list< const iClient* > matchHost( const string& wildHost )
 			const ;
 	/**
 	 * Match the given user@host string, which may include
@@ -450,7 +450,7 @@ public:
 	 * Return a list of pointers to const iClient's which are
 	 * found.
 	 */
-	virtual list< const iClient* > findHost( const string& hostName ) 
+	virtual list< const iClient* > findHost( const string& hostName )
 			const ;
 
 	/**

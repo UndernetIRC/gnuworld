@@ -17,14 +17,14 @@
  */
 
 #ifndef __SERVER_H
-#define __SERVER_H "$Id: server.h,v 1.49 2001/08/18 15:03:20 dan_karrels Exp $"
+#define __SERVER_H "$Id: server.h,v 1.50 2001/09/23 02:27:19 gte Exp $"
 
 #include	<string>
 #include	<vector>
 #include	<list>
 #include	<strstream>
 #include	<map>
-#include	<hash_map>
+#include	<hash_map.h>
 #include	<queue>
 #include	<algorithm>
 
@@ -81,7 +81,7 @@ class xClient ;
 
 /// Forward declaration of Channel
 class Channel ;
- 
+
 enum MessageType
 	{
 	SRV_SUCCESS, // all ok
@@ -109,7 +109,7 @@ protected:
 	 * The type of the structure to hold Gline's internally.
 	 */
 	typedef list< Gline* >	glineListType ;
- 
+
 public:
 
 	/**
@@ -1161,7 +1161,7 @@ protected:
 	/**
 	 * A pointer to the server command handler.
 	 */
-	commandMapType		*commandMap ;	
+	commandMapType		*commandMap ;
 
 	/**
 	 * This points to the input/output stream to be used for
