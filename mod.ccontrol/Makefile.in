@@ -1,5 +1,5 @@
 # Default paths (system-wide installs)
-# $Id: Makefile.in,v 1.1 2000/12/09 22:01:11 dan_karrels Exp $
+# $Id: Makefile.in,v 1.2 2000/12/09 22:29:25 dan_karrels Exp $
 #
 
 # Standard defines
@@ -40,7 +40,7 @@ make: all
 	$(SHLIB_CXX) $(CXXFLAGS) -c $< -o $@
 
 $(LIB): $(OBJS)
-	$(SHLIB_LD) $(CXXFLAGS) -o $(LIB) $(OBJS) $(LIBS)
+	$(SHLIB_LD) -o $(LIB) $(OBJS) $(LIBS)
 
 clean:
 	$(RM) -f $(OBJS) $(LIB)
