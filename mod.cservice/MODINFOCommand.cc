@@ -13,7 +13,7 @@
  * Shouldn't really happen, as trying to MODINFO a forced access doesn't
  * make sense - adduser and then MODINFO that :)
  *
- * $Id: MODINFOCommand.cc,v 1.17 2001/09/05 03:47:56 gte Exp $
+ * $Id: MODINFOCommand.cc,v 1.18 2001/11/24 22:46:11 gte Exp $
  */
 
 #include	<string>
@@ -23,7 +23,7 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char MODINFOCommand_cc_rcsId[] = "$Id: MODINFOCommand.cc,v 1.17 2001/09/05 03:47:56 gte Exp $" ;
+const char MODINFOCommand_cc_rcsId[] = "$Id: MODINFOCommand.cc,v 1.18 2001/11/24 22:46:11 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -192,10 +192,11 @@ if (command == "AUTOMODE")
 	{
 	/*
 	 * Check we aren't trying to change someone with access higher
-	 * than ours (or equal).
+	 * than ours. Also, make sure we can't change someone else's MODINFO
+	 * if they have the same access as we do.
 	 */
 
-	if (level < targetLevel)
+	if ( (level < targetLevel) || ((level == targetLevel) && (targetUser != theUser)) )
 		{
 		bot->Notice(theClient,
 			bot->getResponse(theUser,
@@ -203,6 +204,7 @@ if (command == "AUTOMODE")
 				string("Cannot modify a user with higher access than your own.")));
 		return false;
 		}
+
 
 	/*
 	 *  Check for "ON" or "OFF" and act accordingly.
