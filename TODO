@@ -1,1 +1,5 @@
 - ****** DOCUMENTATION!!!! ******
+- Added xClient::opMyself( Channel* ), and include that option to all of 
+the usual channel methods (Kick, Ban, Mode, Topic, ...) as a default 
+parameter
+

@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: client.cc,v 1.76 2005/01/17 23:10:15 dan_karrels Exp $
+ * $Id: client.cc,v 1.77 2005/01/25 02:57:52 dan_karrels Exp $
  */
 
 #include	<new>
@@ -47,7 +47,7 @@
 #include	"ELog.h"
 #include	"events.h"
 
-RCSTAG("$Id: client.cc,v 1.76 2005/01/17 23:10:15 dan_karrels Exp $" ) ;
+RCSTAG("$Id: client.cc,v 1.77 2005/01/25 02:57:52 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -1812,16 +1812,73 @@ theChan->setBan( banMask ) ;
 return true ;
 }
 
-bool xClient::Kick( Channel* theChan, iClient* theClient,
-	const string& reason )
+bool xClient::Topic( Channel* theChan, const std::string& newTopic )
 {
-assert( theChan != NULL ) ;
-assert( theClient != NULL ) ;
+assert( theChan != 0 ) ;
+// Empty newTopic is ok
 
 if( !isConnected() )
 	{
 	return false ;
 	}
+
+bool OnChannel = isOnChannel( theChan ) ;
+if( !OnChannel )
+	{
+	// Join, giving ourselves ops
+	Join( theChan, string(), 0, true ) ;
+	}
+
+// Now joined the channel
+// If the channel is mode +t, and the bot -o, op the bot before
+// trying to set the topic.
+ChannelUser* theUser = theChan->findUser( getInstance() ) ;
+
+// By definition (of the above Join()), this client is on the
+// channel, but check to be sure.
+assert( theUser != 0 ) ;
+
+if( theChan->getMode( Channel::MODE_T ) && !theUser->isModeO() )
+	{
+	// Mode +t, and bot is mode -o
+	// Op the bot
+	theUser->setMode( ChannelUser::MODE_O ) ;
+
+	stringstream s ;
+	s	<< getUplink()->getCharYY()
+		<< " M "
+		<< theChan->getName()
+		<< " +o "
+		<< getCharYYXXX() ;
+	Write( s ) ;
+	}
+
+// Bot is on channel, and has privileges to change the topic
+stringstream s ;
+s	<< getCharYYXXX()
+	<< " T "
+	<< theChan->getName()
+	<< " :"
+	<< newTopic ;
+Write( s ) ;
+
+#ifdef TOPIC_TRACK
+  theChan->setTopic( newTopic ) ;
+#endif
+
+if( !OnChannel )
+	{
+	Part( theChan ) ;
+	}
+
+return true ;
+}
+
+bool xClient::Kick( Channel* theChan, iClient* theClient,
+	const string& reason )
+{
+assert( theChan != NULL ) ;
+assert( theClient != NULL ) ;
 
 if( theClient->isModeK() )
 	{
@@ -1846,18 +1903,11 @@ if( !OnChannel )
 	}
 else
 	{
-	// Bot is already on the channel
-	ChannelUser* meUser = theChan->findUser( me ) ;
-	if( NULL == meUser )
-		{
-		elog	<< "xClient::Kick> Unable to find myself in "
-			<< "channel: "
-			<< theChan->getName()
-			<< endl ;
-		return false ;
-		}
-
+	// Bot already on channel
 	// Make sure we have ops
+	ChannelUser* meUser = theChan->findUser( getInstance() ) ;
+	assert( meUser != 0 ) ;
+
 	if( !meUser->getMode( ChannelUser::MODE_O ) )
 		{
 		// The bot does NOT have ops
@@ -1909,14 +1959,7 @@ else
 	{
 	// Bot is already on the channel
 	ChannelUser* meUser = theChan->findUser( me ) ;
-	if( NULL == meUser )
-		{
-		elog	<< "xClient::Kick> Unable to find myself in "
-			<< "channel: "
-			<< theChan->getName()
-			<< endl ;
-		return false ;
-		}
+	assert( meUser != 0 ) ;
 
 	// Make sure we have ops
 	if( !meUser->getMode( ChannelUser::MODE_O ) )
@@ -2073,7 +2116,7 @@ assert( theChan != NULL ) ;
 
 ChannelUser* meUser = theChan->findUser( me ) ;
 
-return (meUser) ? true : false ;
+return (meUser != NULL) ;
 }
 
 bool xClient::Write( const char* format, ... )

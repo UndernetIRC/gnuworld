@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: client.h,v 1.57 2005/01/17 23:08:57 dan_karrels Exp $
+ * $Id: client.h,v 1.58 2005/01/25 02:57:51 dan_karrels Exp $
  */
 
 #ifndef __CLIENT_H
-#define __CLIENT_H "$Id: client.h,v 1.57 2005/01/17 23:08:57 dan_karrels Exp $"
+#define __CLIENT_H "$Id: client.h,v 1.58 2005/01/25 02:57:51 dan_karrels Exp $"
 
 #include	<map>
 #include	<sstream>
@@ -528,6 +528,12 @@ public:
 	 */
 	virtual bool	Kick( Channel*, const std::vector< iClient* >&,
 				const std::string& ) ;
+
+	/**
+	 * Set the topic in a channel, joining, opping, and parting
+	 * the client if necessary.
+	 */
+	virtual bool	Topic( Channel*, const std::string& ) ;
 
 	/**
 	 * Join will cause the client to join a channel.
