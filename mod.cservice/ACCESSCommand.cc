@@ -12,7 +12,7 @@
  * Displays all "Level" records for a specified channel.
  * Can optionally narrow down selection using a number of switches. 
  *
- * $Id: ACCESSCommand.cc,v 1.38 2001/03/07 15:10:53 dan_karrels Exp $
+ * $Id: ACCESSCommand.cc,v 1.39 2001/03/18 01:39:33 gte Exp $
  */
 
 #include	<string>
@@ -24,8 +24,9 @@
 #include	"match.h"
 #include	"responses.h"
 #include	"cservice_config.h"
+#include	"Network.h"
  
-const char ACCESSCommand_cc_rcsId[] = "$Id: ACCESSCommand.cc,v 1.38 2001/03/07 15:10:53 dan_karrels Exp $" ;
+const char ACCESSCommand_cc_rcsId[] = "$Id: ACCESSCommand.cc,v 1.39 2001/03/18 01:39:33 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -265,6 +266,30 @@ if(matchString[0] == '-')
 	{
 	matchString = "*";
 	}
+
+/*
+ * Convert =nick to username.
+ */
+
+if (matchString[0] == '=') 
+	{
+	const char* theNick = matchString.c_str();
+	// Skip the '=' 
+	++theNick; 
+
+	iClient *theClient = Network->findNick(theNick);
+	if (theClient)
+		{
+		sqlUser* tmpUser = bot->isAuthed(theClient,false);
+		if (tmpUser)
+			{ 
+			matchString = tmpUser->getUserName();
+			}
+		}
+
+	return 0;
+	}
+
 
 for (int i = 0 ; i < bot->SQLDb->Tuples(); i++)
 	{
