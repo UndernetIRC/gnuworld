@@ -44,7 +44,7 @@
 #include	"ServerTimerHandlers.h"
 
 const char xServer_h_rcsId[] = __XSERVER_H ;
-const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.63 2001/01/31 22:34:52 dan_karrels Exp $" ;
+const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.64 2001/01/31 23:15:26 dan_karrels Exp $" ;
 
 using std::string ;
 using std::vector ;
@@ -2646,7 +2646,6 @@ Param.setValue( 0, numeric ) ;
 
 return MSG_P( Param ) ;
 }
-
 
 /**
  * A nick has sent a private message

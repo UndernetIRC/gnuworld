@@ -3,7 +3,7 @@
  */
 
 #ifndef __CCONTROL_H
-#define __CCONTROL_H "$Id: ccontrol.h,v 1.3 2001/01/12 22:49:24 dan_karrels Exp $"
+#define __CCONTROL_H "$Id: ccontrol.h,v 1.4 2001/01/31 23:15:26 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
@@ -134,7 +134,8 @@ public:
 	 * the given name, if the client is not already on that
 	 * channel.
 	 */
-	virtual bool Join( const string& ) ;
+	virtual bool Join( const string&, const string& = string(),
+		time_t = 0, bool = false) ;
 
 	/**
 	 * This method will cause this client to part the given channel,

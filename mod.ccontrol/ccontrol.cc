@@ -21,7 +21,7 @@
 #include	"ccontrol.h"
  
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.7 2001/01/28 19:27:35 dan_karrels Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.8 2001/01/31 23:15:26 dan_karrels Exp $" ;
 
 using std::string ;
 using std::vector ;
@@ -298,14 +298,15 @@ return isOperChan( theChan->getName() ) ;
 }
 
 // This method does NOT add the channel to any internal tables
-bool ccontrol::Join( const string& chanName )
+bool ccontrol::Join( const string& chanName, const string& chanModes,
+	time_t joinTime, bool getOps )
 {
 if( isOnChannel( chanName ) )
 	{
 	// Already on this channel
 	return true ;
 	}
-bool result = xClient::Join( chanName, string(), 0, true ) ;
+bool result = xClient::Join( chanName, chanModes, joinTime, getOps ) ;
 if( result )
 	{
 	MyUplink->RegisterChannelEvent( chanName, this ) ;

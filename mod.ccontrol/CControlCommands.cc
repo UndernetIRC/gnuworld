@@ -194,11 +194,17 @@ if( st.size() < 4 )
 	return true ;
 	}
 
-Channel* theChan = Network->findChannel( st[ 1 ] ) ;
+string chanName = st[ 1 ] ;
+if( chanName[ 0 ] != '#' )
+	{
+	chanName.insert( chanName.begin(), '#' ) ;
+	}
+
+Channel* theChan = Network->findChannel( chanName ) ;
 if( NULL == theChan )
 	{
 	bot->Notice( theClient, "Unable to find channel: %s",
-		st[ 1 ].c_str() ) ;
+		chanName.c_str() ) ;
 	return true ;
 	}
 
@@ -212,7 +218,7 @@ if( NULL == Target )
 
 bot->Notice( theClient, "Kicking %s from channel %s because %s",
 	Target->getNickName().c_str(),
-	theChan->getName().c_str(),
+	chanName.c_str(),
 	st.assemble( 3 ).c_str() ) ;
 
 bot->Kick( theChan, Target, st.assemble( 3 ) ) ;
@@ -615,7 +621,9 @@ server->setGline( nickUserHost,
 	gLength ) ;
 
 strstream s ;
-s	<< server->getCharYY() << " WA :Adding gline for: "
+s	<< server->getCharYY() << " WA :"
+	<< theClient->getCharYYXXX()
+	<< " is adding gline for: "
 	<< st[ pos ]
 	<< ", expires at " << (time( 0 ) + gLength)
 	<< " because: " << st.assemble( pos + 1 )
@@ -697,15 +705,21 @@ if( st.size() == 1 )
 	return false ;
 	}
 
+string chanName = st[ 1 ] ;
+if( chanName[ 0 ] != '#' )
+	{
+	chanName.insert( chanName.begin(), '#' ) ;
+	}
+
 char buf[ 512 ] = { 0 } ;
 
 // Invite buffer
 sprintf( buf, "%s I %s :%s\n",
 	bot->getCharYYXXX().c_str(),
 	theClient->getNickName().c_str(),
-	st[ 1 ].c_str() ) ;
+	chanName.c_str() ) ;
 
-if( bot->isOperChan( st[ 1 ] ) )
+if( bot->isOperChan( chanName ) )
 	{
 	// No problem
 
@@ -720,15 +734,7 @@ if( bot->isOperChan( st[ 1 ] ) )
 // channels.
 
 // Join
-bot->Join( st[ 1 ] ) ;
-
-// Get ops
-char buf2[ 128 ] ;
-sprintf( buf2, "%s M %s +o %s\n",
-	bot->getCharYYXXX().c_str(),
-	st[ 1 ].c_str(),
-	bot->getCharYYXXX().c_str() ) ;
-bot->QuoteAsServer( buf2 ) ;
+bot->Join( chanName, string(), 0, true ) ;
 
 // Invite
 bot->QuoteAsServer( buf ) ;
@@ -739,13 +745,13 @@ bot->Part( st[ 1 ] ) ;
 // Wallops
 if( !bot->isOperChan( st[ 1 ] ) )
 	{
-	string wallopMe = theClient->getNickName() ;
-	wallopMe += " is cordially invited to channel " + st[ 1 ] ;
+	string wallopMe = theClient->getCharYYXXX() ;
+	wallopMe += " is cordially invited to channel "
+		+ chanName ;
 	bot->Wallops( wallopMe ) ;
 	}
 
 return true ;
-
 }
 
 // jupe servername reason
