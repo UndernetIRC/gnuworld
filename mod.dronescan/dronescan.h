@@ -16,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: dronescan.h,v 1.10 2003/06/19 22:58:30 dan_karrels Exp $
+ * $Id: dronescan.h,v 1.11 2003/06/19 23:47:43 jeekay Exp $
  */
 
 #ifndef DRONESCAN_H
-#define DRONESCAN_H "$Id: dronescan.h,v 1.10 2003/06/19 22:58:30 dan_karrels Exp $"
+#define DRONESCAN_H "$Id: dronescan.h,v 1.11 2003/06/19 23:47:43 jeekay Exp $"
 
 #include <map>
 
@@ -144,6 +144,9 @@ public:
 	/** Return a users access */
 	unsigned short getAccess( const iClient* );
 	
+	/** Typedef of currently seen drone channels */
+	typedef vector< string > droneChannelsType;
+	droneChannelsType droneChannels;
 	
 	/* Test control */
 	/** Test map type. */
@@ -196,6 +199,10 @@ protected:
 	typedef map< string , unsigned int , noCaseCompare > jcChanMapType;
 	jcChanMapType jcChanMap;
 	
+	
+	/** How often to show drone channels on join test */
+	unsigned int dcInterval;
+	xServer::timerID tidClearActiveList;
 	
 	/** What level to log to the console. */
 	int consoleLevel;

@@ -5,6 +5,7 @@ libdronescan_la_SOURCES = 	\
 	dronescan.cc		\
 	ACCESSCommand.cc	\
 	CHECKCommand.cc		\
+	LISTCommand.cc		\
 	ABNORMALSTest.cc	\
 	COMMONREALTest.cc	\
 	HASALLOPTest.cc		\

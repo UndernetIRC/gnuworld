@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: dronescan.cc,v 1.17 2003/06/19 22:58:30 dan_karrels Exp $
+ * $Id: dronescan.cc,v 1.18 2003/06/19 23:47:43 jeekay Exp $
  */
 
 #include <cstdarg>	/* va_list */
@@ -34,7 +34,7 @@
 #include "dronescanTests.h"
 #include "Timer.h"
 
-RCSTAG("$Id: dronescan.cc,v 1.17 2003/06/19 22:58:30 dan_karrels Exp $");
+RCSTAG("$Id: dronescan.cc,v 1.18 2003/06/19 23:47:43 jeekay Exp $");
 
 namespace gnuworld {
 
@@ -132,6 +132,9 @@ for( testVarsType::const_iterator itr = testVars.begin() ;
 	}
 }
 
+/* Set up active drone channels clearance */
+dcInterval = atoi(dronescanConfig->Require("dcInterval")->second.c_str());
+
 /* Set up console logging level. */
 consoleLevel = atoi(dronescanConfig->Require("consoleLevel")->second.c_str());
 
@@ -144,6 +147,7 @@ theTimer = new Timer();
 /* Register commands available to users */
 RegisterCommand(new ACCESSCommand(this, "ACCESS", "() (<user>)"));
 RegisterCommand(new CHECKCommand(this, "CHECK", "(<#channel>) (<user>)"));
+RegisterCommand(new LISTCommand(this, "LIST", "(active)"));
 } // dronescan::dronescan(const string&)
 
 
@@ -224,8 +228,12 @@ void dronescan::ImplementServer( xServer* theServer )
 	/* Register for all channel events */
 	theServer->RegisterChannelEvent( xServer::CHANNEL_ALL, this );
 
+	/* Set up clearing active channels */
+	time_t theTime = time(0) + dcInterval;
+	tidClearActiveList = theServer->RegisterTimer(theTime, this, 0);
+
 	/* Set up our JC counter */
-	time_t theTime = time(NULL) + jcInterval;
+	theTime = time(0) + jcInterval;
 	tidClearJoinCounter = theServer->RegisterTimer(theTime, this, 0);
 
 	xClient::ImplementServer( theServer );
@@ -343,7 +351,13 @@ int dronescan::OnChannelEvent( const channelEventType& theEvent,
 	if(theChannel->size() < channelCutoff) return 0;
 
 	/* Iterate over our available tests, checking this channel */
-	checkChannel( theChannel );
+	if(find(droneChannels.begin(), droneChannels.end(), theChannel->getName()) == droneChannels.end()) {
+		/* This channel is not currently listed as active */
+		checkChannel( theChannel );
+		droneChannels.push_back(theChannel->getName());
+	}
+	
+	
 	
 	/* Do join count processing if applicable */
 	string channelName = theChannel->getName();
@@ -509,6 +523,19 @@ int dronescan::OnPrivateMessage( iClient* theClient, const string& Message, bool
 /** Receive our own timed events. */
 int dronescan::OnTimer( xServer::timerID theTimer , void *)
 {
+	time_t theTime;
+
+	if(theTimer == tidClearActiveList)
+		{
+		log(DEBUG, "Clearing %u active channels records.",
+			droneChannels.size()
+			);
+		droneChannels.clear();
+		
+		theTime = time(0) + dcInterval;
+		tidClearActiveList = MyUplink->RegisterTimer(theTime, this, 0);
+		}
+
 	if(theTimer == tidClearJoinCounter)
 		{
 		log(DEBUG, "Clearing %u records from the join counter.",
@@ -516,7 +543,7 @@ int dronescan::OnTimer( xServer::timerID theTimer , void *)
 			);
 		jcChanMap.clear();
 		
-		time_t theTime = time(0) + jcInterval;
+		theTime = time(0) + jcInterval;
 		tidClearJoinCounter = MyUplink->RegisterTimer(theTime, this, 0);
 		}
 	
