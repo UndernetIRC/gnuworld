@@ -83,7 +83,7 @@ cservice::cservice(const string& args)
 	 */
  
     RegisterCommand(new SHOWCOMMANDSCommand(this, "SHOWCOMMANDS", "TBA")); 
-    RegisterCommand(new LOGINCommand(this, "LOGIN", "TBA"));
+    RegisterCommand(new LOGINCommand(this, "LOGIN", "<usernamne | userid> <password>"));
     RegisterCommand(new SEARCHCommand(this, "SEARCH", "TBA"));
     RegisterCommand(new ACCESSCommand(this, "ACCESS", "[access_option] #channel [access_option] [(userid|nick|hostmask)] [access_option]"));
     RegisterCommand(new CHANINFOCommand(this, "CHANINFO", "TBA"));
@@ -197,7 +197,69 @@ int cservice::OnPrivateMessage( iClient* theClient, const string& Message )
 
 return xClient::OnPrivateMessage( theClient, Message ) ;
 }
+ 
+sqlUser* cservice::isAuthed(iClient* theClient, bool alert)
+{
+	/*
+	 *  Confirms a user is logged in by returning a pointer to
+	 *  the sqlUser record. 
+	 *  If 'alert' is true, send a notice to the user informing
+	 *  them that they must be logged in.
+	 */
+	sqlUser* theUser = (sqlUser*)theClient->getCustomData(this);
+	if(theUser) {
+		return theUser;
+	}
 
+	if (alert) Notice(theClient, "Sorry, You must be logged in to use this command.");
+	return 0;
+}
+	
+sqlUser* cservice::getUserRecord(const string& id)
+{
+	/*
+	 *  Locates a cservice user record by 'id', which may be a username string
+	 *  or a unique ID number.
+	 *  TODO: Look up in a cache hash to see if this user record has already been
+	 *  loaded - if so, return a ptr to that. If not, create a new sqlUser and
+	 *  fetch the data from the database.
+	 *
+	 *  This will become essential to avoid contention (Ie: if 2 people login to 
+	 *  an account).
+	 */
+
+	sqlUser* theUser = new sqlUser(SQLDb);
+
+	/*
+	 * Todo: Determine username or userid and send appropiate arguments.
+	 */
+
+	if (theUser->loadData(id)) { 
+		return theUser;
+	}
+
+	delete theUser;
+	return 0;
+}	
+
+sqlChannel* cservice::getChannelRecord(const string& id)
+{ 
+	/*
+	 *  Locates a cservice user record by 'id', which may be a username string
+	 *  or a unique ID number.
+	 *  Same TODO as applies to getUserRecord really. :)
+	 */
+
+	sqlChannel* theChan = new sqlChannel(SQLDb);
+ 
+	if (theChan->loadData(id)) {
+		return theChan;
+	}
+
+	delete theChan;
+	return 0;
+} 
+ 
 unsigned short cservice::getAccessLevel( sqlUser* theUser, sqlChannel* theChan )
 {
 	/*
@@ -205,11 +267,13 @@ unsigned short cservice::getAccessLevel( sqlUser* theUser, sqlChannel* theChan )
 	 *  channel.
 	 */
 
-	sqlLevel* theLevel = new sqlLevel(SQLDb);
-	if(theLevel->loadData(theUser->getID(), theChan->getID()))
+	sqlLevel theLevel(SQLDb);
+	if(theLevel.loadData(theUser->getID(), theChan->getID()))
 	{
-		return theLevel->getAccess();
+		return theLevel.getAccess();
 	}
+
+	// By default, users have level 0 access on a channel.
 	return 0;
 }
  

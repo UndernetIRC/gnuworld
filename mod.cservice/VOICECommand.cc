@@ -8,7 +8,7 @@
 #include	"Network.h"
 #include	"levels.h"
 
-const char VOICECommand_cc_rcsId[] = "$Id: VOICECommand.cc,v 1.2 2000/12/23 00:03:58 gte Exp $" ;
+const char VOICECommand_cc_rcsId[] = "$Id: VOICECommand.cc,v 1.3 2000/12/23 20:03:57 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -25,47 +25,53 @@ bool VOICECommand::Exec( iClient* theClient, const string& Message )
 		return true;
 	}
  
-	sqlChannel* theChan = new sqlChannel(bot->SQLDb);
-
 	/* 
 	 *  Check the channel exists.
 	 */
-	if (theChan->loadData(st[1])) {
-		sqlUser* theUser = new sqlUser(bot->SQLDb);
+
+	sqlChannel* theChan = bot->getChannelRecord(st[1]);
+
+	if (theChan) {
 
 		/*
-		 *  TODO: theUser comes from the sqlUser theClient is logged in as.
+		 *  Fetch the sqlUser record attached to this client. If there isn't one,
+		 *  they aren't logged in.
 		 */
-		if (theUser->loadData(theClient->getNickName())) { 
-			// Check this user has access.
-			int level = bot->getAccessLevel(theUser, theChan);
-			if (level > level::voice) {
-				iClient* target = Network->findNick(st[2]);
-				if( target == NULL )
-				{
-					bot->Notice( theClient, "I don't see %s anywhere.", st[2].c_str());
-					return true;
-				}
 
-				// TODO: Update gnuworld internal state - or write a gnuw voice function. :)
-				strstream tmp ;
-				tmp << bot->getCharYYXXX() << " M " << theChan->getName() << " +v "
-					<< target->getCharYYXXX() << ends ;
-	
-				bot->Write( tmp ) ;
-				delete[] tmp.str() ;
-	
-				bot->Notice(theClient, "Username: %s, Email: %s (Level %i).", theUser->getUserName().c_str(), theUser->getEmail().c_str(), level);
+		sqlUser* theUser = bot->isAuthed(theClient, true);
+		if (!theUser) {
+			return false;
+		}
+ 
+		// Check this user has access.
+		int level = bot->getAccessLevel(theUser, theChan);
+		if (level > level::voice) 
+		{
+			iClient* target = Network->findNick(st[2]);
+			if( target == NULL )
+			{
+				bot->Notice( theClient, "I don't see %s anywhere.", st[2].c_str());
+				return true;
 			}
+
+			// TODO: Update gnuworld internal state - or write a gnuw op function. :)
+			strstream tmp ;
+			tmp << bot->getCharYYXXX() << " M " << theChan->getName() << " +v "
+				<< target->getCharYYXXX() << ends ;
+
+			bot->Write( tmp ) ;
+			delete[] tmp.str() ; 
+			bot->Notice(theClient, "Username: %s, Email: %s (Level %i).", theUser->getUserName().c_str(), theUser->getEmail().c_str(), level); 
 		} else {
-			bot->Notice(theClient, "I would.. but.. one teensy problem.  You're not in %s's database.", st[1].c_str());
-		} 
+			bot->Notice(theClient, "Sorry, you have insufficient access to perform that command.");
+		}
+
 	} else {
-		bot->Notice(theClient, "I am not on that channel!");
+		bot->Notice(theClient, "Sorry, %s isn't registered with me.", st[1].c_str());
 	}
 
 	return true ;
 } 
 
 } // namespace gnuworld.
-
+ 

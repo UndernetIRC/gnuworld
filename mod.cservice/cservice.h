@@ -1,5 +1,5 @@
 #ifndef __CSERVICE_H
-#define __CSERVICE_H "$Id: cservice.h,v 1.7 2000/12/22 00:29:32 gte Exp $"
+#define __CSERVICE_H "$Id: cservice.h,v 1.8 2000/12/23 20:03:57 gte Exp $"
 
 #include	<string>
 #include	<vector>
@@ -58,6 +58,16 @@ public:
  
 	// Return what access theUser has in channel theChan.
 	unsigned short getAccessLevel( sqlUser* theUser, sqlChannel* theChan );
+
+	// Fetch a user record for a user.
+	sqlUser* getUserRecord( const string& );
+
+	// Checks if this client is logged in, returns a sqlUser if true.
+	// If bool, send a notice to the client telling them off.
+	sqlUser* isAuthed(iClient*, bool );
+
+	// Fetch a channel record for a channel.
+	sqlChannel* getChannelRecord(const string& );
 } ;
  
 } // namespace gnuworld
