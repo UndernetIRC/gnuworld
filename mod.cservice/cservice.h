@@ -1,5 +1,5 @@
 #ifndef __CSERVICE_H
-#define __CSERVICE_H "$Id: cservice.h,v 1.5 2000/12/11 21:36:09 gte Exp $"
+#define __CSERVICE_H "$Id: cservice.h,v 1.6 2000/12/21 22:20:57 gte Exp $"
 
 #include	<string>
 #include	<vector>
@@ -12,9 +12,8 @@
 #include	"EConfig.h"
 #include	"cserviceCommands.h" 
 #include	"sqlChannel.h"
+#include	"sqlUser.h"
  
-#define STMT_ALLCHANS "SELECT channel from channels" // Provide a result set with 1 column, 'Channel Name'.
-
 using std::string ;
 using std::vector ;
 
@@ -55,7 +54,9 @@ public:
 
     constCommandIterator findCommand( const string& theComm ) const
                 { return commandMap.find( theComm ) ; } 
-
+ 
+	// Return what access theUser has in channel theChan.
+	int getAccessLevel( sqlUser* theUser, sqlChannel* theChan );
 } ;
  
 } // namespace gnuworld

@@ -5,9 +5,8 @@
 #include	"StringTokenizer.h"
 #include	"ELog.h" 
 #include	"cservice.h" 
-#include	"sqlChannel.h"
-
-const char ISREGCommand_cc_rcsId[] = "$Id: ISREGCommand.cc,v 1.2 2000/12/11 21:36:09 gte Exp $" ;
+ 
+const char ISREGCommand_cc_rcsId[] = "$Id: ISREGCommand.cc,v 1.3 2000/12/21 22:20:57 gte Exp $" ;
 
 namespace gnuworld
 {

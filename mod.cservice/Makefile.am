@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-# "$Id: Makefile.am,v 1.3 2000/12/20 01:10:52 dan_karrels Exp $"
+# "$Id: Makefile.am,v 1.4 2000/12/21 22:20:57 gte Exp $"
 
 lib_LTLIBRARIES = libcservice.la
 libcservice_la_LDFLAGS = -module -export-dynamic -L/usr/local/pgsql/lib \
@@ -17,5 +17,6 @@ libcservice_la_SOURCES = cservice.cc \
 	SEARCHCommand.cc \
 	SHOWCOMMANDSCommand.cc \
 	SHOWIGNORECommand.cc \
-	VERIFYCommand.cc
+	VERIFYCommand.cc \
+	OPCommand.cc
 INCLUDES = -I/usr/local/pgsql/include

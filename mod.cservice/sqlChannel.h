@@ -1,10 +1,9 @@
 /* sqlChannel.h */
 
 #ifndef __SQLCHANNEL_H
-#define __SQLCHANNEL_H "$Id: sqlChannel.h,v 1.3 2000/12/11 21:36:09 gte Exp $"
+#define __SQLCHANNEL_H "$Id: sqlChannel.h,v 1.4 2000/12/21 22:20:57 gte Exp $"
 
 #include	<string>
-
 #include	<ctime>
 #include	"libpq++.h"
 
@@ -17,7 +16,7 @@ class sqlChannel
 {
 
 public:
-	sqlChannel(PgDatabase* SQLDb) ;
+	sqlChannel(PgDatabase*) ;
 	virtual ~sqlChannel() ;
 
 	typedef unsigned int	flagType ;
@@ -67,8 +66,7 @@ public:
 		{ return last_update ; }
 
 	bool loadData( const string& );
-	bool loadData( int );
-	bool exists( const string& );
+	bool loadData( int ); 
 
 protected:
 

@@ -1,5 +1,5 @@
 #ifndef __CSERVICECOMMANDS_H
-#define __CSERVICECOMMANDS_H "$Id: cserviceCommands.h,v 1.2 2000/12/11 02:04:28 gte Exp $"
+#define __CSERVICECOMMANDS_H "$Id: cserviceCommands.h,v 1.3 2000/12/21 22:20:57 gte Exp $"
 
 #include	<string>
 #include	"iClient.h"
@@ -75,6 +75,8 @@ DECLARE_COMMAND( VERIFY )
 DECLARE_COMMAND( RANDOM )
 
 // Channel user level commands.
+
+DECLARE_COMMAND( OP )
  
 } // namespace gnuworld
 

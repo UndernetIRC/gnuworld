@@ -93,6 +93,8 @@ cservice::cservice(const string& args)
     RegisterCommand(new VERIFYCommand(this, "VERIFY", "TBA"));
     RegisterCommand(new RANDOMCommand(this, "RANDOM", "TBA"));
 
+    RegisterCommand(new OPCommand(this, "OP", "#channel [nick][,nick] .."));
+
 	//-- Load in our cservice configuration file.
 	cserviceConfig = new EConfig( args ) ;
 	string sqlHost = cserviceConfig->Require( "sql_host" )->second;
@@ -153,7 +155,7 @@ int cservice::BurstChannels()
 			 *  Check the auto-join flag is set, if so - join. :)
 			 */ 
 
-			MyUplink->JoinChannel( this, data[ 0 ], "+tn" ) ;
+			MyUplink->JoinChannel( this, data[ 0 ], "+tn" ) ; 
 		}
 	}
 
@@ -194,10 +196,15 @@ int cservice::OnPrivateMessage( iClient* theClient, const string& Message )
 
 return xClient::OnPrivateMessage( theClient, Message ) ;
 }
+
+int cservice::getAccessLevel( sqlUser* theUser, sqlChannel* theChan )
+{
+	return 500;
+}
  
 void Command::Usage( iClient* theClient )
 {
-bot->Notice( theClient, string( "Usage:" ) + ' ' + getInfo() ) ;
+	bot->Notice( theClient, string( "Usage:" ) + ' ' + getInfo() ) ;
 }
  
 } // namespace gnuworld

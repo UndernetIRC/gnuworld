@@ -1,20 +1,23 @@
 /* sqlUser.h */
 
 #ifndef __SQLUSER_H
-#define __SQLUSER_H "$Id: sqlUser.h,v 1.1 2000/12/09 22:01:11 dan_karrels Exp $"
+#define __SQLUSER_H "$Id: sqlUser.h,v 1.2 2000/12/21 22:20:57 gte Exp $"
 
 #include	<string>
-
 #include	<ctime>
+#include	"libpq++.h"
 
 using std::string ;
 
+namespace gnuworld
+{ 
+ 
 class sqlUser
 {
 
 public:
 
-	sqlUser() ;
+	sqlUser(PgDatabase*) ;
 	virtual ~sqlUser() ;
 
 	typedef unsigned short int	flagType ;
@@ -45,7 +48,12 @@ public:
 	const time_t&		getLastUpdate() const
 		{ return last_update ; }
 
+	bool loadData( int );
+	bool loadData( const string& );
+
 protected:
+
+    void setAllMembers();
 
 	unsigned int	id ;
 	string		user_name ;
@@ -58,7 +66,9 @@ protected:
 	flagType	flags ;
 	string		last_update_by ;
 	time_t		last_update ;
-
+	PgDatabase*	SQLDb;
 } ;
 
 #endif // __SQLUSER_H
+
+} // Namespace gnuworld

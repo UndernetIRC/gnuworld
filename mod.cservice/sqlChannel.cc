@@ -1,5 +1,12 @@
-/* sqlChannel.cc */
-
+/* 
+ * sqlChannel.cc
+ * 
+ * Storage class for accessing user information either from the backend
+ * or internal storage.
+ * 
+ * $Id: sqlChannel.cc,v 1.6 2000/12/21 22:20:57 gte Exp $
+ */
+ 
 #include	<strstream>
 #include	<string> 
 #include	<cstring> 
@@ -11,7 +18,7 @@ using std::string ;
 using std::endl ; 
  
 const char sqlChannel_h_rcsId[] = __SQLCHANNEL_H ;
-const char sqlChannel_cc_rcsId[] = "$Id: sqlChannel.cc,v 1.5 2000/12/12 01:45:20 gte Exp $" ;
+const char sqlChannel_cc_rcsId[] = "$Id: sqlChannel.cc,v 1.6 2000/12/21 22:20:57 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -24,7 +31,7 @@ sqlChannel::sqlChannel(PgDatabase* _SQLDb)
 	/*
 	 *  Constructor, sets the database handle.
 	 */
-	SQLDb = _SQLDb; 
+	SQLDb = _SQLDb;
 }
 
 
