@@ -538,6 +538,11 @@ if( commHandler == commandMap.end() )
 		return false;
 		}
 
+	if (hasOutputFlooded(theClient))
+		{
+		return false;
+		}
+ 
 	// Why use 3 here?  Should be in config file
 	// (Violation of "rule of numbers")
 	setFloodPoints(theClient, getFloodPoints(theClient) + 3); 
@@ -549,6 +554,11 @@ else
 	 */
 
 	if (hasFlooded(theClient))
+		{
+		return false;
+		}
+
+	if (hasOutputFlooded(theClient))
 		{
 		return false;
 		}
@@ -598,7 +608,7 @@ else if(Command == "VERSION")
 	xClient::DoCTCP(theClient, CTCP,
 		"Undernet P10 Channel Services Version 2 ["
 		__DATE__ " " __TIME__
-		"] ($Id: cservice.cc,v 1.93 2001/02/10 02:47:44 isomer Exp $)");
+		"] ($Id: cservice.cc,v 1.94 2001/02/10 03:12:07 gte Exp $)");
 	}
 else if(Command == "PROBLEM?")
 	{
