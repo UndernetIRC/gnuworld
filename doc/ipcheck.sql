@@ -8,7 +8,7 @@
 -- to reduce the load on the db host.
 --
 --
--- you must import this file using : /path/to/pgsql/bin/pgsql ipcheck < ipcheck.sql
+-- you must import this file using : /path/to/pgsql/bin/psql ipcheck < ipcheck.sql
 -- after you created the "ipcheck" database.
 --
 --
