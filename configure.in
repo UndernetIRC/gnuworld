@@ -1,10 +1,10 @@
-dnl $Id: configure.in,v 1.37 2002/04/26 15:47:26 dan_karrels Exp $
+dnl $Id: configure.in,v 1.38 2002/04/26 18:23:39 dan_karrels Exp $
 dnl ----------------------------------------------------------
 
 echo Configuring GNUWorld...
 echo
 
-AC_REVISION($Revision: 1.37 $)
+AC_REVISION($Revision: 1.38 $)
 AC_INIT(src/main.cc)
 AM_INIT_AUTOMAKE(gnuworld,0.0)
 AM_CONFIG_HEADER(include/defs.h)
@@ -35,25 +35,25 @@ AC_CONFIG_SUBDIRS(libltdl)
 AC_SUBST(threadLib)
 threadLib=no
 
-AC_CHECK_LIB(lthread, pthread_create, threadLib=-lpthread)
+dnl AC_CHECK_LIB(lthread, pthread_create, threadLib=-llthread)
 
 if [test "$threadLib" = no]; then
-AC_CHECK_LIB(pthread, pthread_create, threadLib=-lpthread)
+	AC_CHECK_LIB(pthread, pthread_create, threadLib=-lpthread)
 fi
 
 if [test "$threadLib" = no]; then
-AC_CHECK_LIB(c, pthread_create, threadLib=-lpthread)
+	AC_CHECK_LIB(c, pthread_create, threadLib=-lc)
 fi
 
 if [test "$threadLib" = no]; then
-AC_CHECK_LIB(c_r, pthread_create, threadLib=-lpthread)
+	AC_CHECK_LIB(c_r, pthread_create, threadLib=-lc_r)
 fi
 
 if [test "$threadLib" = no]; then
-AC_MSG_RESULT([Unable to locate pthread_create in any library])
+	AC_MSG_RESULT([Unable to locate pthread_create in any library])
 else
-AC_MSG_RESULT([Found pthread_create in $threadLib adding to libs])
-LIBS=$threadLib
+	AC_MSG_RESULT([Found pthread_create in $threadLib adding to libs])
+	LIBS=$threadLib
 fi
 
 CFLAGS="-Wall -pipe"
