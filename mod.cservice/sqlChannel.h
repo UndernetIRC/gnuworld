@@ -1,7 +1,7 @@
 /* sqlChannel.h */
 
 #ifndef __SQLCHANNEL_H
-#define __SQLCHANNEL_H "$Id: sqlChannel.h,v 1.38 2002/01/05 01:00:49 gte Exp $"
+#define __SQLCHANNEL_H "$Id: sqlChannel.h,v 1.39 2002/02/01 21:13:09 gte Exp $"
 
 #include	<string>
 #include	<map>
@@ -40,6 +40,7 @@ public:
 	static const flagType	F_OPONLY; 	// Deprecated.
 	static const flagType	F_AUTOJOIN;
 	static const flagType	F_FLOATLIM;
+	static const flagType	F_NOFORCE; // Reserved for use by Planetarion.
 
 	/*
 	 *   Channel 'Event' Flags, used in the channelog table.

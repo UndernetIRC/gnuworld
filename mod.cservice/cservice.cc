@@ -2817,8 +2817,8 @@ switch( whichEvent )
 					if (Supptr != ptr->second->supporterList.end())
 						{
 							Supptr->second++;
-#ifdef LOG_DEBUG
 							ptr->second->commitSupporter(Supptr->first, Supptr->second);
+#ifdef LOG_DEBUG
 							logDebugMessage("New total for Supporter #%i (%s) on %s is %i.", theUser->getID(),
 								theUser->getUserName().c_str(), theChan->getName().c_str(), Supptr->second);
 #endif
