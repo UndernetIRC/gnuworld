@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: Channel.cc,v 1.46 2005/01/08 23:33:43 dan_karrels Exp $
+ * $Id: Channel.cc,v 1.47 2005/03/17 00:05:01 isomer Exp $
  */
 
 #include	<new>
@@ -38,7 +38,7 @@
 #include	"server.h"
 #include	"ConnectionManager.h"
 
-RCSTAG("$Id: Channel.cc,v 1.46 2005/01/08 23:33:43 dan_karrels Exp $") ;
+RCSTAG("$Id: Channel.cc,v 1.47 2005/03/17 00:05:01 isomer Exp $") ;
 
 namespace gnuworld
 {
@@ -525,7 +525,7 @@ for( userIterator uItr = userList_begin() ; uItr != userList_end() ;
 	}
 modes = 0 ;
 limit = 0 ;
-key.clear() ;
+key = "";
 }
 
 } // namespace gnuworld
