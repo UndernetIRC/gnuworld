@@ -12,7 +12,7 @@
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 
-const char SUSPENDCommand_cc_rcsId[] = "$Id: SUSPENDCommand.cc,v 1.1 2001/07/26 20:12:40 mrbean_ Exp $";
+const char SUSPENDCommand_cc_rcsId[] = "$Id: SUSPENDCommand.cc,v 1.2 2001/08/19 15:58:28 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -39,6 +39,29 @@ if(!tmpUser)
 	bot->Notice(theClient,"%s isnt on my access list",st[1].c_str());
 	return false;
 	}
+AuthInfo* tmpAuth = bot->IsAuth(theClient->getCharYYXXX());
+unsigned int AdFlag = tmpAuth->getFlags(); //Get the admin flag
+unsigned int OpFlag = tmpUser->getType(); //Get the oper flag
+bool Admin = AdFlag < operLevel::SMTLEVEL;
+
+if((Admin) && (AdFlag <= OpFlag))
+	{
+	bot->Notice(theClient,"You cant suspend a user who got higher/equal level than yours");
+	delete tmpUser;
+	return false;
+	}
+else if(AdFlag < OpFlag)
+	{
+	bot->Notice(theClient,"You cant suspend a user who got higher level than yours");
+	delete tmpUser;
+	return false;
+	}
+if((Admin) && (strcasecmp(tmpAuth->getServer().c_str(),tmpUser->getServer().c_str())))
+	{
+	bot->Notice(theClient,"You can only suspend a user who's associated to the same server as you");
+	return false;
+	}
+
 if(bot->isSuspended(tmpUser))
 	{
 	bot->Notice(theClient,"%s is already suspended",st[1].c_str());

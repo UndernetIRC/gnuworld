@@ -29,7 +29,7 @@
 #include	"ccFloodData.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.71 2001/08/17 18:23:42 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.72 2001/08/19 15:58:28 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -245,6 +245,8 @@ RegisterCommand( new GCHANCommand( this, "GCHAN", "#channel <length/-per> <reaso
 	" Set a BADCHAN gline",commandLevel::flg_GCHAN,false,false,false,operLevel::CODERLEVEL,true ) ) ;
 RegisterCommand( new REMGCHANCommand( this, "REMGCHAN", "#channel "
 	" Removes a BADCHAN gline",commandLevel::flg_GCHAN,false,false,false,operLevel::CODERLEVEL,true ) ) ;
+RegisterCommand( new USERINFOCommand( this, "USERINFO", "<usermask/servermask> "
+	" Get information about opers",commandLevel::flg_USERINFO,false,false,false,operLevel::OPERLEVEL,true ) ) ;
 
 loadGlines();
 loadExceptions();

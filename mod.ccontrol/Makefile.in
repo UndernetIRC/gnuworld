@@ -1,6 +1,6 @@
-# Makefile.in generated automatically by automake 1.4-p5 from Makefile.am
+# Makefile.in generated automatically by automake 1.4 from Makefile.am
 
-# Copyright (C) 1994, 1995-8, 1999, 2001 Free Software Foundation, Inc.
+# Copyright (C) 1994, 1995-8, 1999 Free Software Foundation, Inc.
 # This Makefile.in is free software; the Free Software Foundation
 # gives unlimited permission to copy and/or distribute it,
 # with or without modifications, as long as this notice is preserved.
@@ -10,7 +10,7 @@
 # even the implied warranty of MERCHANTABILITY or FITNESS FOR A
 # PARTICULAR PURPOSE.
 
-# "$Id: Makefile.in,v 1.69 2001/08/18 15:03:20 dan_karrels Exp $"
+# "$Id: Makefile.in,v 1.70 2001/08/19 15:58:28 mrbean_ Exp $"
 
 
 SHELL = @SHELL@
@@ -92,7 +92,7 @@ bindir = @bindir@
 glibdir = @glibdir@
 
 lib_LTLIBRARIES = libccontrol.la
-libccontrol_la_SOURCES = ccontrol.cc 	CControlCommands.cc 	ACCESSCommand.cc 	ADDCOMMANDCommand.cc 	ADDOPERCHANCommand.cc 	ADDSERVERCommand.cc 	ADDUSERCommand.cc 	AuthInfo.cc 	ccException.cc 	ccFloodData.cc 	ccLogin.cc 	ccGline.cc 	ccServer.cc 	ccUser.cc 	CHANINFOCommand.cc 	CHECKNETCommand.cc 	CLEARCHANCommand.cc 	COMMANDSCommand.cc 	DEAUTHCommand.cc 	DEOPCommand.cc 	EXCEPTIONCommand.cc 	FORCEGLINECommand.cc 	GCHANCommand.cc 	GLINECommand.cc 	HELPCommand.cc 	INVITECommand.cc 	JUPECommand.cc 	KICKCommand.cc 	LASTCOMCommand.cc 	LEARNNETCommand.cc 	LISTCommand.cc 	LISTHOSTSCommand.cc 	LISTIGNORESCommand.cc 	LISTOPERCHANSCommand.cc 	LOGINCommand.cc 	MODECommand.cc 	MODERATECommand.cc 	MODUSERCommand.cc 	NEWPASSCommand.cc 	OPCommand.cc 	REMGCHANCommand.cc 	REMGLINECommand.cc 	REMOPERCHANCommand.cc 	REMCOMMANDCommand.cc 	REMOVEIGNORECommand.cc 	REMSERVERCommand.cc 	REMUSERCommand.cc 	SCANGLINECommand.cc 	SUSPENDCommand.cc 	TRANSLATECommand.cc 	UNMODERATECommand.cc 	UNSUSPENDCommand.cc 	WHOISCommand.cc
+libccontrol_la_SOURCES = ccontrol.cc 	CControlCommands.cc 	ACCESSCommand.cc 	ADDCOMMANDCommand.cc 	ADDOPERCHANCommand.cc 	ADDSERVERCommand.cc 	ADDUSERCommand.cc 	AuthInfo.cc 	ccException.cc 	ccFloodData.cc 	ccLogin.cc 	ccGline.cc 	ccServer.cc 	ccUser.cc 	CHANINFOCommand.cc 	CHECKNETCommand.cc 	CLEARCHANCommand.cc 	COMMANDSCommand.cc 	DEAUTHCommand.cc 	DEOPCommand.cc 	EXCEPTIONCommand.cc 	FORCEGLINECommand.cc 	GCHANCommand.cc 	GLINECommand.cc 	HELPCommand.cc 	INVITECommand.cc 	JUPECommand.cc 	KICKCommand.cc 	LASTCOMCommand.cc 	LEARNNETCommand.cc 	LISTCommand.cc 	LISTHOSTSCommand.cc 	LISTIGNORESCommand.cc 	LISTOPERCHANSCommand.cc 	LOGINCommand.cc 	MODECommand.cc 	MODERATECommand.cc 	MODUSERCommand.cc 	NEWPASSCommand.cc 	OPCommand.cc 	REMGCHANCommand.cc 	REMGLINECommand.cc 	REMOPERCHANCommand.cc 	REMCOMMANDCommand.cc 	REMOVEIGNORECommand.cc 	REMSERVERCommand.cc 	REMUSERCommand.cc 	SCANGLINECommand.cc 	SUSPENDCommand.cc 	TRANSLATECommand.cc 	UNMODERATECommand.cc 	UNSUSPENDCommand.cc 	USERINFOCommand.cc 	WHOISCommand.cc
 
 
 libccontrol_la_LDFLAGS = -module -export-dynamic -L@PGSQL_LIB@ -lpq++
@@ -122,7 +122,7 @@ OPCommand.lo REMGCHANCommand.lo REMGLINECommand.lo \
 REMOPERCHANCommand.lo REMCOMMANDCommand.lo REMOVEIGNORECommand.lo \
 REMSERVERCommand.lo REMUSERCommand.lo SCANGLINECommand.lo \
 SUSPENDCommand.lo TRANSLATECommand.lo UNMODERATECommand.lo \
-UNSUSPENDCommand.lo WHOISCommand.lo
+UNSUSPENDCommand.lo USERINFOCommand.lo WHOISCommand.lo
 CXXCOMPILE = $(CXX) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
 LTCXXCOMPILE = $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
 CXXLD = $(CXX)
@@ -151,9 +151,9 @@ DEP_FILES =  .deps/ACCESSCommand.P .deps/ADDCOMMANDCommand.P \
 .deps/REMOVEIGNORECommand.P .deps/REMSERVERCommand.P \
 .deps/REMUSERCommand.P .deps/SCANGLINECommand.P .deps/SUSPENDCommand.P \
 .deps/TRANSLATECommand.P .deps/UNMODERATECommand.P \
-.deps/UNSUSPENDCommand.P .deps/WHOISCommand.P .deps/ccException.P \
-.deps/ccFloodData.P .deps/ccGline.P .deps/ccLogin.P .deps/ccServer.P \
-.deps/ccUser.P .deps/ccontrol.P
+.deps/UNSUSPENDCommand.P .deps/USERINFOCommand.P .deps/WHOISCommand.P \
+.deps/ccException.P .deps/ccFloodData.P .deps/ccGline.P .deps/ccLogin.P \
+.deps/ccServer.P .deps/ccUser.P .deps/ccontrol.P
 SOURCES = $(libccontrol_la_SOURCES)
 OBJECTS = $(libccontrol_la_OBJECTS)
 
@@ -282,7 +282,7 @@ distdir: $(DISTFILES)
 	@for file in $(DISTFILES); do \
 	  d=$(srcdir); \
 	  if test -d $$d/$$file; then \
-	    cp -pr $$d/$$file $(distdir)/$$file; \
+	    cp -pr $$/$$file $(distdir)/$$file; \
 	  else \
 	    test -f $(distdir)/$$file \
 	    || ln $$d/$$file $(distdir)/$$file 2> /dev/null \
