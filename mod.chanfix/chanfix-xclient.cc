@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: chanfix-xclient.cc,v 1.2 2004/05/18 23:13:12 jeekay Exp $
+ * $Id: chanfix-xclient.cc,v 1.3 2004/05/25 21:17:53 jeekay Exp $
  */
 
 #include "chanfix.h"
@@ -48,16 +48,16 @@ void chanfix::BurstChannels()
 void chanfix::OnTimer( const TimerHandler::timerID& theTimer , void* _data )
 {
 	xClient::OnTimer( theTimer , _data );
-	
+
 	time_t next = ::time(0);
-	
+
 	if( theTimer == timerCount ) {
 		log(logging::DEBUG, "Entering count cycle");
-		
+
 		doCountUpdate();
-		
+
 		next += confPeriod;
-		
+
 		timerCount = MyUplink->RegisterTimer(next, this, 0);
 	} else {
 		assert(0);

@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: cfChannel.cc,v 1.1 2004/05/18 23:13:12 jeekay Exp $
+ * $Id: cfChannel.cc,v 1.2 2004/05/25 21:17:53 jeekay Exp $
  */
 
 #include <string>
@@ -50,13 +50,13 @@ for( mapUsers::iterator itr = users.begin() ;
 cfChannelUser* cfChannel::getUser(const string& username)
 {
 	mapUsers::iterator itr = users.find(username);
-	
+
 	if( itr != users.end() ) { return itr->second; }
-	
+
 	cfChannelUser *tmpUser = new cfChannelUser(username);
-	
+
 	users[username] = tmpUser;
-	
+
 	return tmpUser;
 }
 

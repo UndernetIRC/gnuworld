@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: cfChannelUser.h,v 1.1 2004/05/18 23:13:12 jeekay Exp $
+ * $Id: cfChannelUser.h,v 1.2 2004/05/25 21:17:53 jeekay Exp $
  */
 
 #ifndef CF_CFCHANNELUSER_H
@@ -32,13 +32,13 @@ class cfChannelUser {
 public:
 	cfChannelUser(const std::string&);
 	virtual ~cfChannelUser();
-	
+
 	void addPoints(unsigned int);
-	
-	
+
+
 protected:
 	std::string name;
-	
+
 	unsigned int points;
 }; // class cfChannelUser;
 

@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: chanfix-misc.cc,v 1.2 2004/05/18 23:13:12 jeekay Exp $
+ * $Id: chanfix-misc.cc,v 1.3 2004/05/25 21:17:53 jeekay Exp $
  */
 
 #include <sstream>
@@ -39,11 +39,11 @@ void chanfix::log(const logging::loglevel& level, const char* format, ... )
 {
 	char buf[1024] = {0};
 	va_list list;
-	
+
 	va_start(list, format);
 	vsnprintf(buf, 1024, format, list);
 	va_end(list);
-	
+
 	log(level, string(buf));
 }
 
@@ -54,13 +54,13 @@ void chanfix::log(const logging::loglevel& level, const string& message)
 
 	/* Check our logging channel exists */
 	Channel *logChannel = Network->findChannel(confConsoleChannel);
-	
+
 	if( !logChannel ) {
 		elog	<< "chanfix> ERROR: Unable to locate logging channel."
 			<< endl;
 		return;
 	}
-	
+
 	Message(logChannel, message);
 }
 
@@ -72,7 +72,7 @@ void chanfix::setConsoleTopic()
 		confPointsAuth,
 		confPeriod
 		);
-	
+
 	stringstream newTopic;
 	newTopic	<< this->getCharYYXXX()
 			<< " T "
@@ -80,7 +80,7 @@ void chanfix::setConsoleTopic()
 			<< " :"
 			<< buffer
 			<< endl;
-	
+
 	this->Write(newTopic.str());
 }
 

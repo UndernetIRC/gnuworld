@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: chanfix-core.cc,v 1.1 2004/05/18 23:13:12 jeekay Exp $
+ * $Id: chanfix-core.cc,v 1.2 2004/05/25 21:17:53 jeekay Exp $
  */
 
 #include <string>
@@ -38,13 +38,13 @@ using std::string;
 cfChannel* chanfix::getChannel(const string& channel)
 {
 	mapChannels::iterator itr = channels.find(channel);
-	
+
 	if( itr != channels.end() ) { return itr->second; }
-	
+
 	cfChannel* newChan = new cfChannel(channel);
-	
+
 	channels[channel] = newChan;
-	
+
 	return newChan;
 }
 
@@ -53,35 +53,35 @@ void chanfix::doCountUpdate()
 {
 	/* Iterator over all available channels */
 	log(logging::DEBUG, "Starting count cycle");
-	
+
 	for( xNetwork::const_channelIterator itr = Network->channels_begin() ;
 	     itr != Network->channels_end() ;
 	     ++itr ) {
 		Channel *tmpChannel = itr->second;
 		log(logging::DEBUG, "Found channel %s",
 			tmpChannel->getName().c_str());
-		
+
 		cfChannel *cfChan = 0;
-		
+
 		for( Channel::userIterator citr = tmpChannel->userList_begin() ;
 		     citr != tmpChannel->userList_end() ;
 		     ++citr ) {
 			ChannelUser *chanUser = citr->second;
-			
+
 			log(logging::DEBUG, "  Found client: %s",
 				chanUser->getNickName().c_str()
 				);
-			
+
 			if( ! chanUser->isModeO() ) { continue ; }
 			if( ! chanUser->getClient()->isModeR() ) { continue ; }
 			if( chanUser->getClient()->isModeK() ) { continue ; }
-			
+
 			if( ! cfChan ) { cfChan = getChannel(tmpChannel->getName()); }
-			
+
 			cfChannelUser *user = cfChan->getUser(chanUser->getClient()->getAccount());
-			
+
 			user->addPoints(confPointsAuth);
-			
+
 			log(logging::DEBUG, "  Found opped client: %s",
 				chanUser->getNickName().c_str()
 				);
