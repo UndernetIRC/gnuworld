@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: scanner.cc,v 1.1 2002/08/07 20:28:07 dan_karrels Exp $
+ * $Id: scanner.cc,v 1.2 2002/08/07 20:55:22 dan_karrels Exp $
  */
 
 #include	"client.h"
@@ -85,7 +85,7 @@ int scanner::OnEvent( const eventType& whichEvent,
 	void* arg3,
 	void* arg4 )
 {
-switch( theEvent )
+switch( whichEvent )
 	{
 	case EVT_NICK:
 		handleNewClient( static_cast< iClient* >( arg1 ) ) ;

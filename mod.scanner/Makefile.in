@@ -14,7 +14,7 @@
 
 @SET_MAKE@
 
-# "$Id: Makefile.in,v 1.1 2002/08/07 20:28:07 dan_karrels Exp $"
+# "$Id: Makefile.in,v 1.2 2002/08/07 20:55:22 dan_karrels Exp $"
 SHELL = @SHELL@
 
 srcdir = @srcdir@
@@ -96,9 +96,9 @@ am__quote = @am__quote@
 glibdir = @glibdir@
 install_sh = @install_sh@
 
-lib_LTLIBRARIES = libclientExample.la
-libclientExample_la_SOURCES = clientExample.cc
-libclientExample_la_LDFLAGS = -module -export-dynamic
+lib_LTLIBRARIES = libscanner.la
+libscanner_la_SOURCES = scanner.cc
+libscanner_la_LDFLAGS = -module -export-dynamic
 
 INCLUDES = $(INCLTDL)
 subdir = mod.scanner
@@ -107,9 +107,9 @@ CONFIG_HEADER = $(top_builddir)/include/defs.h
 CONFIG_CLEAN_FILES =
 LTLIBRARIES = $(lib_LTLIBRARIES)
 
-libclientExample_la_LIBADD =
-am_libclientExample_la_OBJECTS = clientExample.lo
-libclientExample_la_OBJECTS = $(am_libclientExample_la_OBJECTS)
+libscanner_la_LIBADD =
+am_libscanner_la_OBJECTS = scanner.lo
+libscanner_la_OBJECTS = $(am_libscanner_la_OBJECTS)
 
 DEFS = @DEFS@
 DEFAULT_INCLUDES =  -I. -I$(srcdir) -I$(top_builddir)/include
@@ -118,7 +118,7 @@ LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
-@AMDEP_TRUE@DEP_FILES = ./$(DEPDIR)/clientExample.Plo
+@AMDEP_TRUE@DEP_FILES = ./$(DEPDIR)/scanner.Plo
 CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
 LTCXXCOMPILE = $(LIBTOOL) --mode=compile $(CXX) $(DEFS) \
@@ -127,9 +127,9 @@ LTCXXCOMPILE = $(LIBTOOL) --mode=compile $(CXX) $(DEFS) \
 CXXLD = $(CXX)
 CXXLINK = $(LIBTOOL) --mode=link $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) \
 	$(AM_LDFLAGS) $(LDFLAGS) -o $@
-DIST_SOURCES = $(libclientExample_la_SOURCES)
+DIST_SOURCES = $(libscanner_la_SOURCES)
 DIST_COMMON = Makefile.am Makefile.in
-SOURCES = $(libclientExample_la_SOURCES)
+SOURCES = $(libscanner_la_SOURCES)
 
 all: all-am
 
@@ -168,8 +168,8 @@ clean-libLTLIBRARIES:
 	  echo "rm -f \"$${dir}/so_locations\""; \
 	  rm -f "$${dir}/so_locations"; \
 	done
-libclientExample.la: $(libclientExample_la_OBJECTS) $(libclientExample_la_DEPENDENCIES) 
-	$(CXXLINK) -rpath $(libdir) $(libclientExample_la_LDFLAGS) $(libclientExample_la_OBJECTS) $(libclientExample_la_LIBADD) $(LIBS)
+libscanner.la: $(libscanner_la_OBJECTS) $(libscanner_la_DEPENDENCIES) 
+	$(CXXLINK) -rpath $(libdir) $(libscanner_la_LDFLAGS) $(libscanner_la_OBJECTS) $(libscanner_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT) core *.core
@@ -177,7 +177,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/clientExample.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/scanner.Plo@am__quote@
 
 distclean-depend:
 	-rm -rf ./$(DEPDIR)
