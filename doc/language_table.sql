@@ -738,7 +738,7 @@ COPY "translations" FROM stdin;
 7	26	UTENTE: %s ACCESSO: %s %s	31337
 7	27	CANALE: %s -- AUTOMODE: %s	31337
 7	28	ULTIMA MODIFICA: %s (%s fà)	31337
-7	29	** SOSPESO ** - Scade il %s	31337
+7	29	** SOSPESO ** - Scade il %s (Level %i)	31337
 7	30	VISTO L'ULTIMA VOLTA: %s.	31337
 7	31	Sono presenti più di 15 corrispondenze.	31337
 7	32	Per favore, restringi il campo di ricerca dell'interrogazione.	31337
@@ -1434,7 +1434,7 @@ COPY "translations" FROM stdin;
 11	26	FELHASZNALO: %s JOG(ACCESS): %s %s	31337
 11	27	CSATRONA: %s -- AUTOMODE: %s	31337
 11	28	UTOLJARA MODOSITVA: %s (%s -el ezelott)	31337
-11	29	** FELFUGGESZTETT ** - Veget er %s utan	31337
+11	29	** FELFUGGESZTETT ** - Veget er %s utan (Level %i)	31337
 11	30	UTOLJARA VOLT: %s -el ezelott..	31337
 11	31	15-nel tobb hasonlo adat van.	31337
 11	32	Legyszives korlatold a keresed.	31337
@@ -1726,7 +1726,7 @@ COPY "translations" FROM stdin;
 12	142	%s yasaklamasýný %s kanalýnýn veri tabanýndan kaldýrmak için yetersiz eriþiminiz var	31337
 12	143	%i tane %s ile eþleþen yasaklama silindi	31337
 12	144	%i olan geçici eriþiminiz %s kanalýndan silindi	31337
-12	145	Güçlendirilmiþ eriþimin yok gibi görünüyor, belki süresi dolmuþtur?	31337
+12	145	%s kanalýnda güçlendirilmiþ eriþimin yok gibi görünüyor, belki süresi dolmuþtur?	31337
 12	146	%s %s kanalýnda askýya alýnmamýþ	31337
 12	147	%s bir IRC operatörü	31337
 12	148	%s tanýmlanmamýþ durumda.	31337
@@ -1745,7 +1745,7 @@ COPY "translations" FROM stdin;
 12	162	%s Resmi bir Coder-Com Geliþtiricisi%s ve %s olarak tanýmlý	31337
 12	163	%s Resmi bir Coder-Com Uzmaný%s ve %s olarak tanýmlý	31337
 12	164	 ve bir IRC operatörü	31337
-12	165	%z yasaklamasý %s kanalýnda %i seviye ile eklendi	31337
+12	165	%s yasaklamasý %s kanalýnda %i seviye ile eklendi	31337
 12	166	%s: yasaklýlar listesi boþ.		31337
 12	167	Ben zaten o kanaldayým!	31337
 12	168	Bu komut IRC operatörlere ait	31337
@@ -1847,7 +1847,7 @@ COPY "translations" FROM stdin;
 13	88	%s er allerede registrert.	31337
 13	89	Ugyldig kanal navn.	31337
 13	90	Registrert kanal %s	31337
-13	91	% er ikke lenger ignorert.	31337
+13	91	%s er ikke lenger ignorert.	31337
 13	92	Kunne ikke finne %s i min ignorerings liste	31337
 13	93	Kan ikke fjerne en bruker med lik eller høyere tilgang enn deg selv	31337
 13	94	Du kan ikke fjerne deg selv fra din egen kanal.	31337
