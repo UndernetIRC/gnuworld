@@ -122,7 +122,7 @@ public:
 	 * Test if a given channel mode is set.
 	 */
 	inline bool getMode( const modeType& whichMode ) const
-		{ return (modes & whichMode) ; }
+		{ return (whichMode == (modes & whichMode)) ; }
 
 	/**
 	 * Set the given channel mode.

@@ -14,7 +14,7 @@
 #include	"ELog.h"
 #include	"xparameters.h"
 
-const char msg_Server_cc_rcsId[] = "$Id: msg_Server.cc,v 1.2 2001/02/06 00:26:00 dan_karrels Exp $" ;
+const char msg_Server_cc_rcsId[] = "$Id: msg_Server.cc,v 1.3 2001/02/06 01:46:06 dan_karrels Exp $" ;
 
 using std::endl ;
 
@@ -84,6 +84,7 @@ if( Param[ 1 ][ 0 ] == '1' )
 		atoi( Param[ 4 ] + 1 ) ) ; // version
 	assert( Uplink != 0 ) ;
 
+	// Find this server (me)
 	iServer* me = Network->findServer( intYY ) ;
 	if( NULL == me )
 		{
@@ -95,19 +96,16 @@ if( Param[ 1 ][ 0 ] == '1' )
 		::exit( 0 ) ;
 		}
 
+	// Now that I know my uplink, I can set its numeric
+	// in my own iServer info
 	me->setUplinkIntYY( uplinkYY ) ;
 
 	// We now have a pointer to our own uplink
 	// Add it to the tables
 	// We maintain a local pointer just for speed reasons
 	Network->addServer( Uplink ) ;
-	Network->addServer( me ) ;
 
 //	elog << "Added server: " << *Uplink ;
-//	elog << "Added server: " << *me ;
-
-	// We just connected, begin our BURST
-//	Burst() ;
 
 	}
 

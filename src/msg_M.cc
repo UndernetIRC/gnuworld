@@ -17,7 +17,7 @@
 #include	"ELog.h"
 #include	"StringTokenizer.h"
 
-const char msg_M_cc_rcsId[] = "$Id: msg_M.cc,v 1.1 2001/02/02 18:10:30 dan_karrels Exp $" ;
+const char msg_M_cc_rcsId[] = "$Id: msg_M.cc,v 1.2 2001/02/06 01:46:06 dan_karrels Exp $" ;
 
 using std::string ;
 using std::vector ;
@@ -293,6 +293,10 @@ for( const char* modePtr = Param[ 2 ] ; *modePtr ; ++modePtr )
 				}
 			else
 				{
+				elog	<< "xServer::onUserModeChange> "
+					<< "Caught -o for user: "
+					<< *theClient
+					<< endl ;
 				theClient->removeMode( iClient::MODE_OPER ) ;
 				// TODO: Post message
 				}

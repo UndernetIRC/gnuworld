@@ -52,7 +52,7 @@ public:
 	 * Retrieve a given channel user mode.
 	 */
 	inline bool getMode( const modeType& whichMode ) const
-		{ return (modes & whichMode) ; }
+		{ return (whichMode == (modes & whichMode)) ; }
 
 	/**
 	 * Retrieve this ChannelUser's current modes in
