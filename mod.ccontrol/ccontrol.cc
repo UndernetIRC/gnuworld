@@ -38,7 +38,7 @@
 #include	"ip.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.134 2002/03/14 20:35:19 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.135 2002/03/14 21:27:44 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -1809,7 +1809,7 @@ for(;ptr != burstGlineList.end();++ptr)
 	if(ptr->first == TempGline)
 		break;
 	}
-if(ptr == burstGlineList.end())
+if(ptr != burstGlineList.end())
 	{ //if the gline wasnt found
 	burstGlineList.erase(ptr);
 	}
