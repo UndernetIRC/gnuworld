@@ -209,7 +209,7 @@ confSqlPort = cserviceConfig->Require( "sql_port" )->second;
 confSqlUser = cserviceConfig->Require( "sql_user" )->second;
 
 string Query = "host=" + confSqlHost + " dbname=" + confSqlDb + " port=" + confSqlPort + " user=" + confSqlUser
-			   + " pass=" + confSqlPass;
+			   + " password=" + confSqlPass;
 
 elog	<< "*** [CMaster]: Attempting to make PostgreSQL connection to: "
 		<< confSqlHost
@@ -3450,7 +3450,7 @@ void cservice::checkDbConnectionStatus()
 		delete(SQLDb);
 
 		string Query = "host=" + confSqlHost + " dbname=" + confSqlDb + " port=" + confSqlPort + " user=" + confSqlUser
-					 + " pass=" + confSqlPass;
+					 + " password=" + confSqlPass;
 
 		SQLDb = new (std::nothrow) cmDatabase( Query.c_str() ) ;
 		assert( SQLDb != 0 ) ;
