@@ -146,12 +146,12 @@ RegisterCommand(new VOICECommand(this, "VOICE", "<#channel> [nick] [nick] ..", 3
 RegisterCommand(new DEVOICECommand(this, "DEVOICE", "<#channel> [nick] [nick] ..", 3));
 RegisterCommand(new ADDUSERCommand(this, "ADDUSER", "<#channel> <nick> <access>", 8));
 RegisterCommand(new REMUSERCommand(this, "REMUSER", "<#channel> <nick>", 4));
-RegisterCommand(new MODINFOCommand(this, "MODINFO", "<#channel> [ACCESS <nick> <level>] [AUTOOP <nick> <on|off>]", 6));
+RegisterCommand(new MODINFOCommand(this, "MODINFO", "<#channel> [ACCESS <username> <level>] [AUTOMODE <username> <NONE|OP|VOICE>]", 6));
 RegisterCommand(new SETCommand(this, "SET", "[#channel] <variable> <value> or, SET <invisible> <ON|OFF>", 6));
 RegisterCommand(new INVITECommand(this, "INVITE", "<#channel>", 2));
 RegisterCommand(new TOPICCommand(this, "TOPIC", "<#channel> <topic>", 4));
 RegisterCommand(new CHANINFOCommand(this, "CHANINFO", "<#channel>", 3));
-RegisterCommand(new CHANINFOCommand(this, "INFO", "<#channel>", 3));
+RegisterCommand(new CHANINFOCommand(this, "INFO", "<username>", 3));
 RegisterCommand(new BANLISTCommand(this, "BANLIST", "<#channel>", 3));
 RegisterCommand(new KICKCommand(this, "KICK", "<#channel> <nick> <reason>", 4));
 RegisterCommand(new STATUSCommand(this, "STATUS", "<#channel>", 4));
@@ -159,16 +159,20 @@ RegisterCommand(new SUSPENDCommand(this, "SUSPEND", "<#channel> <nick> [duration
 RegisterCommand(new UNSUSPENDCommand(this, "UNSUSPEND", "<#channel> <nick>", 5));
 RegisterCommand(new BANCommand(this, "BAN", "<#channel> <nick | *!*user@*.host> [duration] [level] [reason]", 5));
 RegisterCommand(new UNBANCommand(this, "UNBAN", "<#channel> <*!*user@*.host>", 5));
-RegisterCommand(new LBANLISTCommand(this, "LBANLIST", "<#channel>", 5));
-RegisterCommand(new NEWPASSCommand(this, "NEWPASS", "<new passphrase>", 5));
+RegisterCommand(new LBANLISTCommand(this, "LBANLIST", "<#channel> <banmask>", 5));
+RegisterCommand(new NEWPASSCommand(this, "NEWPASS", "<new passphrase>", 8)); 
+RegisterCommand(new JOINCommand(this, "JOIN", "<#channel>", 8));
+RegisterCommand(new PARTCommand(this, "PART", "<#channel>", 8));
 
-RegisterCommand(new REGISTERCommand(this, "REGISTER", "<#channel>", 0));
-RegisterCommand(new PURGECommand(this, "PURGE", "<#channel> <reason>", 0));
-RegisterCommand(new FORCECommand(this, "FORCE", "<#channel>", 0));
-RegisterCommand(new UNFORCECommand(this, "UNFORCE", "<#channel>", 0));
-RegisterCommand(new SERVNOTICECommand(this, "SERVNOTICE", "<#channel> <text>", 0));
-RegisterCommand(new SAYCommand(this, "SAY", "<#channel> <text>", 0));
-
+RegisterCommand(new REMIGNORECommand(this, "REMIGNORE", "<mask>", 5));
+RegisterCommand(new REGISTERCommand(this, "REGISTER", "<#channel>", 8));
+RegisterCommand(new PURGECommand(this, "PURGE", "<#channel> <reason>", 8));
+RegisterCommand(new FORCECommand(this, "FORCE", "<#channel>", 8));
+RegisterCommand(new UNFORCECommand(this, "UNFORCE", "<#channel>", 8));
+RegisterCommand(new SERVNOTICECommand(this, "SERVNOTICE", "<#channel> <text>", 5));
+RegisterCommand(new SAYCommand(this, "SAY", "<#channel> <text>", 5));
+RegisterCommand(new QUOTECommand(this, "QUOTE", "<text>", 5));
+ 
 //-- Load in our cservice configuration file. 
 cserviceConfig = new (nothrow) EConfig( args ) ;
 assert( cserviceConfig != 0 ) ;
@@ -560,7 +564,7 @@ else if(Command == "VERSION")
 	xClient::DoCTCP(theClient, CTCP,
 		"Undernet P10 Channel Services Version 2 ["
 		__DATE__ " " __TIME__
-		"] ($Id: cservice.cc,v 1.79 2001/02/02 18:10:29 dan_karrels Exp $)");
+		"] ($Id: cservice.cc,v 1.80 2001/02/03 17:06:35 gte Exp $)");
 	}
 else if(Command == "PROBLEM?")
 	{
