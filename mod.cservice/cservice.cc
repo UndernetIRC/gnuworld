@@ -129,14 +129,15 @@ cservice::cservice(const string& args)
  *  Register command handlers.
  */
  
-RegisterCommand(new SHOWCOMMANDSCommand(this, "SHOWCOMMANDS", "<#channel>", 3));
+RegisterCommand(new SHOWCOMMANDSCommand(this, "SHOWCOMMANDS", "[#channel]", 3));
 RegisterCommand(new LOGINCommand(this, "LOGIN", "<username> <password>", 10)); 
-RegisterCommand(new ACCESSCommand(this, "ACCESS", "[channel] [nick] [-min n] [-max n] [-autoop] [-noautoop] [-modif [mask]]", 5));
+RegisterCommand(new ACCESSCommand(this, "ACCESS", "[channel] [nick] [-min n] [-max n] [-op] [-voice] [-none] [-modif [mask]]", 5));
 RegisterCommand(new CHANINFOCommand(this, "CHANINFO", "<#channel>", 3)); 
 RegisterCommand(new ISREGCommand(this, "ISREG", "<#channel>", 4)); 
 RegisterCommand(new VERIFYCommand(this, "VERIFY", "<nick>", 3));
 RegisterCommand(new SEARCHCommand(this, "SEARCH", "<keywords>", 5));
 RegisterCommand(new MOTDCommand(this, "MOTD", "", 4));
+RegisterCommand(new HELPCommand(this, "HELP", "[command]", 4));
 RegisterCommand(new RANDOMCommand(this, "RANDOM", "", 4));
 RegisterCommand(new SHOWIGNORECommand(this, "SHOWIGNORE", "", 3));
 
@@ -609,7 +610,7 @@ else if(Command == "VERSION")
 	xClient::DoCTCP(theClient, CTCP,
 		"Undernet P10 Channel Services Version 2 ["
 		__DATE__ " " __TIME__
-		"] ($Id: cservice.cc,v 1.108 2001/02/17 18:04:27 gte Exp $)");
+		"] ($Id: cservice.cc,v 1.109 2001/02/18 14:47:24 plexus Exp $)");
 	}
 else if(Command == "PROBLEM?")
 	{
@@ -1640,6 +1641,29 @@ if( !deopList.empty() )
 	}
 
 }
+
+int cservice::countChanOps(Channel* theChan)
+{ 
+if( !theChan )
+	{
+	/* Don't try this on a null channel. */
+	return 0;
+	}
+
+int i = 0;
+
+for( Channel::const_userIterator ptr = theChan->userList_begin();
+	ptr != theChan->userList_end() ; ++ptr )
+	{
+	if( ptr->second->getMode(ChannelUser::MODE_O))
+		{
+		i++;			
+		} // If opped.
+	}
+
+return i;
+}
+
 
 /**
  * Support function to deop all non authed opped users on a channel.

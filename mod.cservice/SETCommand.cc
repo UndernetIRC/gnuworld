@@ -12,7 +12,7 @@
  *
  * Caveats: None.
  *
- * $Id: SETCommand.cc,v 1.23 2001/02/16 20:20:26 plexus Exp $
+ * $Id: SETCommand.cc,v 1.24 2001/02/18 14:47:24 plexus Exp $
  */
 
 #include	<string>
@@ -24,7 +24,7 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char SETCommand_cc_rcsId[] = "$Id: SETCommand.cc,v 1.23 2001/02/16 20:20:26 plexus Exp $" ;
+const char SETCommand_cc_rcsId[] = "$Id: SETCommand.cc,v 1.24 2001/02/18 14:47:24 plexus Exp $" ;
 
 namespace gnuworld
 {
@@ -904,7 +904,7 @@ bool SETCommand::Exec( iClient* theClient, const string& Message )
 			bot->getResponse(theUser,
 				language::keywords_status,
 				string("KEYWORDS for %s are: %s")).c_str(),
-			theChan->getName().c_str(), value.c_str());
+			theChan->getName().c_str(), keywords.c_str()));
 	    return true;
 	}
 
@@ -927,8 +927,9 @@ bool SETCommand::Exec( iClient* theClient, const string& Message )
 				st[1].c_str());
 			return false;
 		}
-		theChan->setChannelMode(tmpChan->getModeString());
-		theChan->commit(); 
+	    
+	    theChan->setChannelMode(tmpChan->getModeString());
+	    theChan->commit(); 
 
 	    bot->Notice(theClient, 
 			bot->getResponse(theUser,

@@ -1,5 +1,5 @@
 #ifndef __CSERVICE_H
-#define __CSERVICE_H "$Id: cservice.h,v 1.48 2001/02/15 23:31:33 gte Exp $"
+#define __CSERVICE_H "$Id: cservice.h,v 1.49 2001/02/18 14:47:24 plexus Exp $"
 
 #include	<string>
 #include	<vector>
@@ -232,6 +232,9 @@ public:
 	// Check for valid hostmask.
 	virtual bool validUserMask(const string& userMask) const ;
 
+	// Count channel ops.
+	int countChanOps(Channel*);
+	
 	// Deop everyone on this channel.
 	void deopAllOnChan(Channel*); 
 	void deopAllUnAuthedOnChan(Channel*);

@@ -9,7 +9,7 @@
 #include	"responses.h"
 #include	"Network.h"
  
-const char STATUSCommand_cc_rcsId[] = "$Id: STATUSCommand.cc,v 1.15 2001/02/16 20:20:26 plexus Exp $" ;
+const char STATUSCommand_cc_rcsId[] = "$Id: STATUSCommand.cc,v 1.16 2001/02/18 14:47:24 plexus Exp $" ;
 
 namespace gnuworld
 {
@@ -161,8 +161,8 @@ bool STATUSCommand::Exec( iClient* theClient, const string& Message )
 			bot->Notice(theClient, 
 				bot->getResponse(theUser,
 					language::status_chan_info,
-					string("Channel %s has %d users (TBA operators)")).c_str(),
-				tmpChan->getName().c_str(), tmpChan->size() ) ;
+					string("Channel %s has %d users (%i operators)")).c_str(),
+				tmpChan->getName().c_str(), tmpChan->size(), bot->countChanOps(tmpChan) ) ;
 	 
 			bot->Notice(theClient, 
 				bot->getResponse(theUser,

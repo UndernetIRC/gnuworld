@@ -9,7 +9,7 @@
  * Displays all "Level" records for a specified channel.
  * Can optionally narrow down selection using a number of switches. 
  *
- * $Id: ACCESSCommand.cc,v 1.29 2001/02/16 23:42:54 plexus Exp $
+ * $Id: ACCESSCommand.cc,v 1.30 2001/02/18 14:47:23 plexus Exp $
  */
 
 #include	<string>
@@ -22,7 +22,7 @@
 #include	"responses.h"
 #define MAX_RESULTS 15
  
-const char ACCESSCommand_cc_rcsId[] = "$Id: ACCESSCommand.cc,v 1.29 2001/02/16 23:42:54 plexus Exp $" ;
+const char ACCESSCommand_cc_rcsId[] = "$Id: ACCESSCommand.cc,v 1.30 2001/02/18 14:47:23 plexus Exp $" ;
 
 namespace gnuworld
 {
@@ -254,20 +254,20 @@ if( PGRES_TUPLES_OK == status )
 	 
 			if (flag & sqlLevel::F_AUTOOP) autoMode = "OP";
 			if (flag & sqlLevel::F_AUTOVOICE) autoMode = "VOICE"; 
-			
-			if(aNone == true)
-				{
-				if ((flag & sqlLevel::F_AUTOVOICE) ||
-				    (flag & sqlLevel::F_AUTOOP)) continue;
-				}
-			if(aVoice == true)
-				{
-				if (!(flag & sqlLevel::F_AUTOVOICE)) continue;
-				}
-			if(aOp == true)
-				{
-				if (!(flag & sqlLevel::F_AUTOOP)) continue;
-				}
+
+			// Process the -op / -voice / -none flags.
+
+			if(
+			    (aNone == true &&
+			     (((flag & sqlLevel::F_AUTOVOICE) ||
+			       (flag & sqlLevel::F_AUTOOP))   &&
+			      (aVoice == false && aOp == false))) ||
+			    ((aVoice == true && aOp == false && aNone == false) &&
+			     (!(flag & sqlLevel::F_AUTOVOICE)))   ||
+			    (aOp == true &&
+			     (!(flag & sqlLevel::F_AUTOOP)))
+			  )
+				continue;
 
 			bot->Notice(theClient,
 				bot->getResponse(theUser,
