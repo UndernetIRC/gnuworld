@@ -48,7 +48,7 @@
 #include	"ServerTimerHandlers.h"
 
 const char server_h_rcsId[] = __SERVER_H ;
-const char server_cc_rcsId[] = "$Id: server.cc,v 1.103 2001/05/28 20:55:50 dan_karrels Exp $" ;
+const char server_cc_rcsId[] = "$Id: server.cc,v 1.104 2001/06/11 00:35:42 gte Exp $" ;
 const char config_h_rcsId[] = __CONFIG_H ;
 const char misc_h_rcsId[] = __MISC_H ;
 const char events_h_rcsId[] = __EVENTS_H ;
@@ -2103,6 +2103,15 @@ else if( bursting )
 		// We are bursting an older timestamp
 		// Remove all modes
 		removeAllChanModes( theChan ) ;
+		}
+
+	if( postJoinTime > theChan->getCreationTime() )
+		{
+		// We are bursting into a channel that has an
+		// older timestamp than the one we where supplied with.
+		// We use the existing timestamp to remain in sync
+		// (And get op'd if needs be).
+		postJoinTime = theChan->getCreationTime();
 		}
 
 	// TODO: If the timestamp we are bursting is less than the
