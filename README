@@ -40,7 +40,7 @@ create a directory under your current directory named "gnuworld" in which
 all of GNUWorld's files will be placed.
 
 Installing GNUWorld
-------------------
+-------------------
 
 If you used the CVS method above, you may proceed directly to the
 Building GNUWorld section below.  Otherwise you downloaded a tar gzipped
@@ -52,7 +52,7 @@ gzip -cd gnuworld.xxx.tar.gz | tar xf -
 
 where xxx is the version of GNUWorld you have obtained.
 
-Building GNUWorld
+Building GNUWorld-
 ----------------
 
 In order to build GNUWorld, you will need a compiler which supports the
@@ -78,6 +78,12 @@ modules:
 Not specifying the --enable-modules option at all will build all
 available modules.
 
+If you should choose to build no modules at all (which isn't very
+useful), you can give the "no" (without the quotes) argument to the 
+--enable-modules option:
+
+./configure --enable-modules=no
+
 Note also that all of the usual configure options are supported, and
 may be viewed by:
 
@@ -89,7 +95,7 @@ code.  Compile gnuworld with the command:
 make
 
 This command will build all of the libraries and binaries.  To install
-the binaries and library modules into bin/, type:
+the binaries and library modules into ./bin/, type:
 
 make install
 
@@ -109,29 +115,28 @@ In order to run any services clients, each of those modules must be
 built and installed into the bin/ directory (see above).  To have a
 client loaded, add a line like this to the .conf of your choice:
 
-module = libcservice.so cservice.conf
+module = libcservice.la cservice.conf
 
 The "module" keyword tells gnuworld to attempt to load the given
 module.
 
 NOTE: Individual modules may require additional configuration.  Such is
 the case with modules libcservice (channel service) and ccontrol (oper
-services).  Please read the README files in each of them module
+services).  Please read the README files in each of those modules'
 subdirectories for more information.
 
-The "libcservice.so" is the actual name of the module, which you
-will be able to see in the current directory.  Note that some systems may
-name modules a bit differently.  For example, OpenBSD uses names like
-libcservice.so.0.0.0, etc.
-
-The "cservice.conf" is the name of the configuration file for this client
-module.
+All modules will be built with a ".la" extension.  This is a libtool 
+archive.  LibTool is used to build dynamically loadable modules on many 
+architectures, including those which do not support shared objects.  
+Therefore, your system may require static archives to be built.  In either 
+case, libtool will figure out the proper build commands, and create a 
+".la" archive for each client which isb uilt.
 
 The format of the configuration files should be fairly straightforward.
 GNUWorld also supports several command line options obtained by running the
 command:
 
-GNUWorld -h
+gnuworld -h
 
 Running GNUWorld
 ----------------
@@ -141,7 +146,7 @@ configuration file.  To have GNUWorld run and connect to the IRC server
 located at localhost:6667, using the configuration file
 localhost.conf, issue the following command:
 
-GNUWorld -f localhost.conf
+gnuworld -f localhost.conf
 
 That's it!  You will now have GNUWorld running!
 
