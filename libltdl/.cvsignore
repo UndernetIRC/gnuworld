@@ -8,3 +8,4 @@ config.log
 config.status
 libtool
 stamp-h*
+autom4te.cache
