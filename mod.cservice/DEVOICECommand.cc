@@ -8,7 +8,7 @@
  *
  * Caveats: None
  *
- * $Id: DEVOICECommand.cc,v 1.8 2001/09/05 03:47:56 gte Exp $
+ * $Id: DEVOICECommand.cc,v 1.9 2002/03/17 20:29:47 gte Exp $
  */
 
 #include	<string>
@@ -23,7 +23,7 @@
 
 using std::map ;
 
-const char DEVOICECommand_cc_rcsId[] = "$Id: DEVOICECommand.cc,v 1.8 2001/09/05 03:47:56 gte Exp $" ;
+const char DEVOICECommand_cc_rcsId[] = "$Id: DEVOICECommand.cc,v 1.9 2002/03/17 20:29:47 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -174,12 +174,14 @@ bool DEVOICECommand::Exec( iClient* theClient, const string& Message )
 					{
 						bot->Notice(target, bot->getResponse(tmpTargetUser, language::youre_devoiced_by).c_str(),
 							theClient->getNickName().c_str(),
-							theUser->getUserName().c_str());
+							theUser->getUserName().c_str(),
+							theChan->getName().c_str());
 					} else
 					{
 						bot->Notice(target, bot->getResponse(theUser, language::youre_devoiced_by).c_str(),
 							theClient->getNickName().c_str(),
-							theUser->getUserName().c_str());
+							theUser->getUserName().c_str(),
+							theChan->getName().c_str());
 					}
 				} // Don't send to person who issued.
 		   	} // Not a duplicate.

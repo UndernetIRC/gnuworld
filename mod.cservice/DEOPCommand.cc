@@ -8,7 +8,7 @@
  *
  * Caveats: None
  *
- * $Id: DEOPCommand.cc,v 1.11 2001/09/05 03:47:56 gte Exp $
+ * $Id: DEOPCommand.cc,v 1.12 2002/03/17 20:29:47 gte Exp $
  */
 
 #include	<string>
@@ -21,7 +21,7 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char DEOPCommand_cc_rcsId[] = "$Id: DEOPCommand.cc,v 1.11 2001/09/05 03:47:56 gte Exp $" ;
+const char DEOPCommand_cc_rcsId[] = "$Id: DEOPCommand.cc,v 1.12 2002/03/17 20:29:47 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -228,14 +228,16 @@ while( counter < st2.size())
 			bot->Notice(target,
 				bot->getResponse(tmpTargetUser, language::youre_deopped_by).c_str(),
 				theClient->getNickName().c_str(),
-				theUser->getUserName().c_str());
+				theUser->getUserName().c_str(),
+				theChan->getName().c_str());
 			}
 		else
 			{
 			bot->Notice(target,
 				bot->getResponse(theUser, language::youre_deopped_by).c_str(),
 				theClient->getNickName().c_str(),
-				theUser->getUserName().c_str());
+				theUser->getUserName().c_str(),
+				theChan->getName().c_str());
 			}
 		} // Don't send to person who issued.
 
