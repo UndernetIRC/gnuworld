@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server.h,v 1.72 2002/07/20 00:58:25 dan_karrels Exp $
+ * $Id: server.h,v 1.73 2002/07/27 14:08:21 dan_karrels Exp $
  */
 
 #ifndef __SERVER_H
-#define __SERVER_H "$Id: server.h,v 1.72 2002/07/20 00:58:25 dan_karrels Exp $"
+#define __SERVER_H "$Id: server.h,v 1.73 2002/07/27 14:08:21 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
@@ -1098,7 +1098,8 @@ protected:
 	/**
 	 * Type used to store the channel event map.
 	 */
-	typedef map< string, list< xClient* >* > channelEventMapType ;
+	typedef map< string, list< xClient* >*, noCaseCompare >
+		channelEventMapType ;
 
 	/**
 	 * The structure used to maintain xClient registrations for
