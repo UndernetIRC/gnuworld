@@ -43,7 +43,7 @@
 #include	"moduleLoader.h"
 
 const char xServer_h_rcsId[] = __XSERVER_H ;
-const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.45 2001/01/08 00:11:58 dan_karrels Exp $" ;
+const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.46 2001/01/08 18:33:15 dan_karrels Exp $" ;
 
 using std::string ;
 using std::vector ;
@@ -1735,38 +1735,31 @@ if( '+' == Param[ whichToken ][ 0 ] )
 		switch( *currentPtr )
 			{
 			case 't':
-				theChan->setMode( Channel::MODE_T ) ;
+				onChannelModeT( theChan, true, 0 ) ;
 				break ;
 			case 'n':
-				theChan->setMode( Channel::MODE_N ) ;
+				onChannelModeN( theChan, true, 0 ) ;
 				break ;
 			case 'm':
-				theChan->setMode( Channel::MODE_M ) ;
+				onChannelModeM( theChan, true, 0 ) ;
 				break ;
 			case 'p':
-				theChan->setMode( Channel::MODE_P ) ;
+				onChannelModeP( theChan, true, 0 ) ;
 				break ;
 			case 's':
-				theChan->setMode( Channel::MODE_S ) ;
+				onChannelModeS( theChan, true, 0 ) ;
 				break ;
 			case 'i':
-				theChan->setMode( Channel::MODE_I ) ;
+				onChannelModeI( theChan, true, 0 ) ;
 				break ;
- 
-			// With these next two, Im assuming that ircu has properly
-			// formatted the bursts.
-			// This could cause a seg fault or miss a user
-			// that's on this channel if the mode l/k is without
-			// argument.
-			// TODO: fix this, not difficult
-			case 'l':
-				theChan->setLimit( ::atoi( Param[ whichToken + 1 ] ) ) ;
-				theChan->setMode( Channel::MODE_L ) ;
+ 			case 'l':
+				onChannelModeL( theChan, true, 0,
+					::atoi( Param[ whichToken + 1 ] ) ) ;
 				whichToken++ ;
 				break ;
 			case 'k':
-				theChan->setKey( Param[ whichToken + 1 ] ) ;
-				theChan->setMode( Channel::MODE_K ) ;
+				onChannelModeK( theChan, true, 0,
+					Param[ whichToken + 1 ] ) ;
 				whichToken++ ;
 				break ;
 			default:
@@ -1827,7 +1820,10 @@ StringTokenizer st( theUsers, ',' ) ;
 
 // Used to track op/voice/opvoice mode state switches.
 // 1 = op, 2 = voice, 3 = opvoice.
-unsigned short mode_state = 0;
+unsigned short int mode_state = 0;
+
+vector< pair< bool, ChannelUser* > > opVector ;
+vector< pair< bool, ChannelUser* > > voiceVector ;
 
 for( StringTokenizer::const_iterator ptr = st.begin() ; ptr != st.end() ;
 	++ptr )
@@ -1893,22 +1889,36 @@ for( StringTokenizer::const_iterator ptr = st.begin() ; ptr != st.end() ;
 		continue ;
 		}
 
+	// Notify the services clients that a user has
+	// joined the channel
+	PostChannelEvent( EVT_JOIN, theChan,
+		static_cast< void* >( theClient ),
+		static_cast< void* >( chanUser ) ) ;
+
 	// Is there a ':' in this client's info?
 	if( string::npos == pos )
 		{
 		// no ':' in this string, add the user with the current
 		// MODE state.
-		switch(mode_state)
+		switch( mode_state )
 			{
 			case 1:
-				chanUser->setMode( ChannelUser::MODE_O ) ;
+				opVector.push_back(
+					opVectorType::value_type(
+						true, chanUser ) ) ;
 				break;
 			case 2:
-				chanUser->setMode( ChannelUser::MODE_V ) ;
+				voiceVector.push_back(
+					voiceVectorType::value_type(
+						true, chanUser ) ) ;
 				break;
 			case 3:
-				chanUser->setMode( ChannelUser::MODE_O ) ;
-				chanUser->setMode( ChannelUser::MODE_V ) ; 
+				opVector.push_back(
+					opVectorType::value_type(
+						true, chanUser ) ) ;
+				voiceVector.push_back(
+					voiceVectorType::value_type(
+						true, chanUser ) ) ;
 				break;
 			}
  
@@ -1922,21 +1932,47 @@ for( StringTokenizer::const_iterator ptr = st.begin() ; ptr != st.end() ;
 		switch( (*ptr)[ pos ] )
 			{
 			case 'o':
-				chanUser->setMode( ChannelUser::MODE_O ) ;
+				opVector.push_back(
+					opVectorType::value_type(
+						true, chanUser ) ) ;
 				mode_state = 1;
 				break ;
 			case 'v':
-				chanUser->setMode( ChannelUser::MODE_V ) ;
+				// Does the user already
+				// have mode 'o'?
+				if( 1 == mode_state )
+					{
+					// User has 'o' mode already
+					opVector.push_back(
+						opVectorType::value_type(
+							true, chanUser ) ) ;
+					}
+				voiceVector.push_back(
+					voiceVectorType::value_type(
+						true, chanUser ) ) ;
 				mode_state = (mode_state == 1) ? 3 : 2;
 				break ;
 			default:
-				// TOOD: log
+				elog	<< "xServer::parseBurstUsers> "
+					<< "Unknown mode: "
+					<< (*ptr)[ pos ] << endl ;
 				break ;
 			} // switch
-		// for()
-		}
+		} // for()
 
 	} // while( ptr != st.end() )
+
+// Commit the user modes to the internal tables, and notify
+// all listening clients
+if( !opVector.empty() )
+	{
+	onChannelModeO( theChan, 0, opVector ) ;
+	}
+if( !voiceVector.empty() )
+	{
+	onChannelModeV( theChan, 0, voiceVector ) ;
+	}
+
 }
 
 void xServer::parseBurstBans( Channel* theChan, const char* theBans )
@@ -1950,10 +1986,18 @@ void xServer::parseBurstBans( Channel* theChan, const char* theBans )
 // Tokenize the ban string
 StringTokenizer st( theBans ) ;
 
+banVectorType banVector ;
+
 // Move through each token and add the ban
 for( StringTokenizer::size_type i = 0 ; i < st.size() ; ++i )
 	{
-	theChan->setBan( st[ i ] ) ;
+	banVector.push_back(
+		banVectorType::value_type( true, st[ i ] ) ) ;
+	}
+
+if( !banVector.empty() )
+	{
+	onChannelModeB( theChan, 0, banVector ) ;
 	}
 }
 
@@ -2560,7 +2604,8 @@ for( StringTokenizer::size_type i = 0 ; i < st.size() ; i++ )
 	// Post the event to the clients listening for events on this
 	// channel, if any.
 	PostChannelEvent( whichEvent, theChan,
-		static_cast< void* >( Target ) ) ;
+		static_cast< void* >( Target ),
+		static_cast< void* >( theUser ) ) ;
 
 	// TODO: Update event posting so that CREATE is also
 	// passed the client who created the channel

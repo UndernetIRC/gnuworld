@@ -237,9 +237,14 @@ typedef vector< pair< bool, ChannelUser* > > opVectorType ;
 for( opVectorType::const_iterator ptr = opVector.begin() ;
 	ptr != opVector.end() ; ++ptr )
 	{
-	if( ptr->first )	ptr->second->setMode(
-					ChannelUser::MODE_O ) ;
-	else	ptr->second->removeMode( ChannelUser::MODE_O ) ;
+	if( ptr->first )
+		{
+		ptr->second->setMode( ChannelUser::MODE_O ) ;
+		}
+	else
+		{
+		ptr->second->removeMode( ChannelUser::MODE_O ) ;
+		}
 	}
 }
 
@@ -250,9 +255,14 @@ typedef vector< const pair< bool, ChannelUser* > > voiceVectorType ;
 for( voiceVectorType::const_iterator ptr = voiceVector.begin() ;
 	ptr != voiceVector.end() ; ++ptr )
 	{
-	if( ptr->first )	ptr->second->setMode(
-					ChannelUser::MODE_V ) ;
-	else	ptr->second->removeMode( ChannelUser::MODE_V  ) ;
+	if( ptr->first )
+		{
+		ptr->second->setMode( ChannelUser::MODE_V ) ;
+		}
+	else
+		{
+		ptr->second->removeMode( ChannelUser::MODE_V  ) ;
+		}
 	}
 }
 

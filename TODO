@@ -1,7 +1,6 @@
 - ****** DOCUMENTATION!!!! ******
-- handle off channel opping for xclients
-- handle ban collission stuff, remove conflicting bans
-- when an xClient is removed, make sure to remove all of its customData
-  members in all of the iClient's
 - match()
-
+- post channel events on burst
+- handle ban collission stuff, remove conflicting bans
+- timeslices
+- handle off channel opping for xclients
