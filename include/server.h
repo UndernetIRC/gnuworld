@@ -17,7 +17,7 @@
  */
 
 #ifndef __SERVER_H
-#define __SERVER_H "$Id: server.h,v 1.39 2001/05/13 00:26:01 dan_karrels Exp $"
+#define __SERVER_H "$Id: server.h,v 1.40 2001/05/17 00:34:11 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
@@ -147,24 +147,56 @@ public:
 	 */
 	typedef vector< pair< bool, string > > banVectorType ;
 
+	/**
+	 * The iterator type used to iterate through the structure
+	 * of juped servers.
+	 */
 	typedef jupedServerListType::iterator jupedServerIterator ;
 
+	/**
+	 * The const iterator type used to iterate through the
+	 * structure of juped servers.
+	 */
 	typedef jupedServerListType::const_iterator
 		const_jupedServerIterator ;
 
+	/**
+	 * Return a const iterator to the beginning of the juped
+	 * servers structure.
+	 */
 	inline const_jupedServerIterator jupedServers_begin() const
 		{ return jupedServers.begin() ; }
 
+	/**
+	 * Return a const iterator to the end of the juped
+	 * servers structure.
+	 */
 	inline const_jupedServerIterator jupedServers_end() const
 		{ return jupedServers.end() ; }
 
+	/**
+	 * The iterator type used to iterate through the
+	 * structure of glines.
+	 */
 	typedef glineListType::iterator glineIterator ;
 
+	/**
+	 * The const iterator type used to iterate through the
+	 * structure of glines.
+	 */
 	typedef glineListType::const_iterator const_glineIterator ;
 
+	/**
+	 * Return a const iterator to the beginning of the gline
+	 * structure.
+	 */
 	inline const_glineIterator gline_begin() const
 		{ return glineList.begin() ; }
 
+	/**
+	 * Return a const iterator to the end of the gline
+	 * structure.
+	 */
 	inline const_glineIterator gline_end() const
 		{ return glineList.end() ; }
 
@@ -309,6 +341,11 @@ public:
 	 * Find one or more glines matching a given userHost string.
 	 */
 	virtual vector< const Gline* > matchGline( const string& userHost ) const ;
+
+	/**
+	 * Send all glines to the network.
+	 */
+	virtual void	sendGlinesToNetwork() ;
 
 	/* Client stuff */
 

@@ -48,7 +48,7 @@
 #include	"ServerTimerHandlers.h"
 
 const char server_h_rcsId[] = __SERVER_H ;
-const char server_cc_rcsId[] = "$Id: server.cc,v 1.96 2001/05/14 16:07:05 dan_karrels Exp $" ;
+const char server_cc_rcsId[] = "$Id: server.cc,v 1.97 2001/05/17 00:34:11 dan_karrels Exp $" ;
 const char config_h_rcsId[] = __CONFIG_H ;
 const char misc_h_rcsId[] = __MISC_H ;
 const char events_h_rcsId[] = __EVENTS_H ;
@@ -1791,6 +1791,24 @@ for( glineListType::const_iterator ptr = glineList.begin() ;
 		}
 	}
 return 0 ;
+}
+
+void xServer::sendGlinesToNetwork()
+{
+time_t now = ::time( 0 ) ;
+
+for( glineListType::const_iterator ptr = glineList.begin() ;
+	ptr != glineList.end() ; ++ptr )
+	{
+	strstream s ;
+	s	<< getCharYY() << " GL * +"
+		<< (*ptr)->getUserHost() << ' '
+		<< ((*ptr)->getExpiration() - now) << " :"
+		<< (*ptr)->getReason() << ends ;
+
+	Write( s ) ;
+	delete[] s.str() ;
+	}
 }
 
 /**
