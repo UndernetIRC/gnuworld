@@ -43,7 +43,7 @@
 #include	"moduleLoader.h"
 
 const char xServer_h_rcsId[] = __XSERVER_H ;
-const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.55 2001/01/28 16:01:01 dan_karrels Exp $" ;
+const char xServer_cc_rcsId[] = "$Id: server.cc,v 1.56 2001/01/28 16:18:48 dan_karrels Exp $" ;
 
 using std::string ;
 using std::vector ;
@@ -3188,12 +3188,83 @@ else
 		Write( s ) ;
 		delete[] s.str() ;
 		}
+
+	if( !chanModes.empty() )
+		{
+		// Set the channel modes
+		strstream s ;
+		s	<< theClient->getCharYYXXX() << " M "
+			<< chanName << ' '
+			<< chanModes << ends ;
+
+		Write( s ) ;
+		delete[] s.str() ;
+		}
 	}
 
 if( joinTime < theChan->getCreationTime() )
 	{
 	theChan->setCreationTime( joinTime ) ;
 	}
+
+if( !chanModes.empty() )
+	{
+	StringTokenizer st( chanModes ) ;
+	StringTokenizer::size_type argPos = 1 ;
+
+	for( string::const_iterator ptr = chanModes.begin() ;
+		ptr != chanModes.end() ; ++ptr )
+		{
+		switch(  *ptr )
+			{
+			case 't':
+				theChan->onModeT( true ) ;
+				break ;
+			case 'n':
+				theChan->onModeN( true ) ;
+				break ;
+			case 's':
+				theChan->onModeS( true ) ;
+				break ;
+			case 'p':
+				theChan->onModeP( true ) ;
+				break ;
+			case 'm':
+				theChan->onModeM( true ) ;
+				break ;
+			case 'i':
+				theChan->onModeI( true ) ;
+				break ;
+			case 'k':
+				{
+				if( argPos >= st.size() )
+					{
+					elog	<< "xServer::JoinChannel> Invalid"
+						<< " number of arguments to "
+						<< "chanModes"
+						<< endl ;
+					break ;
+					}
+				theChan->onModeK( true, st[ argPos++ ] ) ;
+				break ;
+				}
+			case 'l':
+				{
+				if( argPos >= st.size() )
+					{
+					elog	<< "xServer::JoinChannel> Invalid"
+						<< " number of arguments to "
+						<< "chanModes"
+						<< endl ;
+					break ;
+					}
+				theChan->onModeL( true,
+					atoi( st[ argPos++ ].c_str() ) ) ;
+				break ;
+				}
+			} // switch()
+		} // for()
+	} // if( !chanModes.empty() )
 }
 
 void xServer::SetChannelMode( Channel* theChan, const string& theModes )
