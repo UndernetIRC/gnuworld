@@ -1631,11 +1631,11 @@ void cservice::cacheExpireUsers()
 #endif
 			purgeCount++;
 			removeKey = ptr->first;
+			delete(ptr->second);
 			/* Advance the iterator past the soon to be
 			 * removed element. */
 			++ptr; 
-			sqlUserCache.erase(removeKey);
-
+			sqlUserCache.erase(removeKey); 
 		}  
 			else
 		{ 

@@ -1,5 +1,5 @@
 #ifndef __CSERVICE_H
-#define __CSERVICE_H "$Id: cservice.h,v 1.60 2001/03/19 22:17:46 gte Exp $"
+#define __CSERVICE_H "$Id: cservice.h,v 1.61 2001/04/15 22:12:36 gte Exp $"
 
 #include	<string>
 #include	<vector>
@@ -17,6 +17,7 @@
 #include	"sqlLevel.h"
 #include	"sqlBan.h"
 #include	"libpq-int.h"
+#include	"sqlPendingChannel.h"
  
 using std::string ;
 using std::vector ;
@@ -304,6 +305,10 @@ public:
 	/* Queue to hold pending reops */ 
 	typedef map < string, time_t > reopQType;
 	reopQType reopQ;
+
+	/* List of channels in 'pending' registration state. */
+	typedef map < string, sqlPendingChannel* > pendingChannelListType;
+	pendingChannelListType pendingChannelList;
 
 	/*
 	 *  Timer Functions.
