@@ -12,7 +12,7 @@
 #include	"cservice_config.h"
 #include	"Network.h"
 
-const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.36 2002/02/06 18:56:25 gte Exp $" ;
+const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.37 2002/02/06 19:08:20 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -82,9 +82,9 @@ if( !theUser )
 /*
  * We only wish to allow one person at a time to login.
  */
-if(theUser->isAuthed()
+if(theUser->isAuthed())
 {
-	bot->Notice(theClient, "AUTHENTICATION FAILED as %s. (Already Logged In)",
+	bot->Notice(theClient, "AUTHENTICATION FAILED as %s. (Account already logged-in)",
 	st[1].c_str());
 	return false;
 }
