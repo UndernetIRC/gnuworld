@@ -20,7 +20,7 @@
  *
  * Caveats: None
  *
- * $Id: OPCommand.cc,v 1.25 2001/06/03 18:35:30 gte Exp $
+ * $Id: OPCommand.cc,v 1.26 2001/06/04 18:16:57 gte Exp $
  */
 
 #include	<string>
@@ -35,7 +35,7 @@
 
 using std::map ;
 
-const char OPCommand_cc_rcsId[] = "$Id: OPCommand.cc,v 1.25 2001/06/03 18:35:30 gte Exp $" ;
+const char OPCommand_cc_rcsId[] = "$Id: OPCommand.cc,v 1.26 2001/06/04 18:16:57 gte Exp $" ;
 
 namespace gnuworld
 {
@@ -239,7 +239,7 @@ for( ; counter < st2.size() ; ++counter )
 			continue ;
 			/* Authed but no access? Tough. :) */
 			}
-		else if (!(bot->getEffectiveAccessLevel(authUser,theChan, false) >= level::op)) 
+		else if (!(bot->getEffectiveAccessLevel(authUser, theChan, false) >= level::op)) 
 			{
 			bot->Notice(theClient, 
 				bot->getResponse(theUser,

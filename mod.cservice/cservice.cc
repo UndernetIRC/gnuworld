@@ -2411,7 +2411,7 @@ for( xServer::opVectorType::const_iterator ptr = theTargets.begin() ;
  *  Send notices and perform the deop's.
  */
 
-if (sourceHasBeenBad)
+if (theChanUser && sourceHasBeenBad)
 	deopList.push_back(theChanUser->getClient());
 
 if( !deopList.empty() )
