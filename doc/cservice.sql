@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------------
--- "$Id: cservice.sql,v 1.5 2000/12/10 18:41:48 isomer Exp $"
+-- "$Id: cservice.sql,v 1.6 2000/12/10 19:10:28 gte Exp $"
 -- Channel service DB SQL file for PostgreSQL.
 
 -- ChangeLog:
@@ -54,7 +54,7 @@ CREATE TABLE translations (
 -- Create the channel table first since we'll be referring back to it
 -- frequently.
 
-CREATE TABLE channel (
+CREATE TABLE channels (
 	id SERIAL,
 	name VARCHAR (200) NOT NULL UNIQUE,
 	flags INT4 NOT NULL DEFAULT '0',
@@ -97,7 +97,7 @@ CREATE TABLE channel (
 
 -- A channel is inactive if the manager hasn't logged in for 21 days
 
-CREATE INDEX channel_name_idx ON channel (name);
+CREATE INDEX channel_name_idx ON channels (name);
 
 -- Table for bans; channel_id references the channel entry this ban belongs to.
 
@@ -110,7 +110,7 @@ CREATE TABLE bans (
 	level INT2,
 	duration INT4,				-- In seconds
 	reason VARCHAR (128),
-	channel_id INT4 CONSTRAINT bans_channel_id_ref REFERENCES channel (id),
+	channel_id INT4 CONSTRAINT bans_channel_id_ref REFERENCES channels (id),
 	last_update TIMESTAMP NOT NULL DEFAULT now(),
 
 	PRIMARY KEY (banmask,channel_id)
@@ -140,8 +140,8 @@ CREATE INDEX users_username_idx ON users( user_name );
 
 CREATE TABLE levels (
 
-	channel_id INT4 CONSTRAINT levels_channel_id_ref REFERENCES channel( id ),
-	user_id INT4 CONSTRAINT levels_users_id_ref REFERENCES users( id ),
+	channel_id INT4 CONSTRAINT levels_channel_id_ref REFERENCES channels ( id ),
+	user_id INT4 CONSTRAINT levels_users_id_ref REFERENCES users ( id ),
 	access INT4 NOT NULL DEFAULT '0',
 	flags INT2 NOT NULL DEFAULT '0',
 -- 0x00 01 -- Logged in
@@ -162,7 +162,7 @@ CREATE INDEX levels_access_idx ON levels( access ) ;
 
 CREATE TABLE channellog (
 	ts TIMESTAMP,
-	channelID INT4 CONSTRAINT channel_log_ref REFERENCES channel( channelID ),
+	channelID INT4 CONSTRAINT channel_log_ref REFERENCES channels ( channelID ),
 	message TEXT,
 	last_updated TIMESTAMP NOT NULL DEFAULT now()
 );
@@ -175,7 +175,7 @@ CREATE TABLE userlog (
 );
 
 CREATE TABLE supporters (
-	channel_id INT4 CONSTRAINT channel_supporters_ref REFERENCES channel ( id ),
+	channel_id INT4 CONSTRAINT channel_supporters_ref REFERENCES channels ( id ),
 	user_id INT4 CONSTRAINT users_supporters_ref REFERENCES users( id ),
 	support CHAR,
 -- NULL - not answered yet
@@ -188,7 +188,7 @@ CREATE TABLE supporters (
 );
 
 CREATE TABLE pending (
-	channel_id INT4 CONSTRAINT pending_channel_ref REFERENCES channel (id),
+	channel_id INT4 CONSTRAINT pending_channel_ref REFERENCES channels (id),
 	manager_id INT4 CONSTRAINT pending_manager_ref REFERENCES users (id),
 	created_ts TIMESTAMP NOT NULL DEFAULT now(),
 	decision_ts TIMESTAMP,

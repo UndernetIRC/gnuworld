@@ -1,5 +1,5 @@
 #ifndef __CSERVICE_H
-#define __CSERVICE_H "$Id: cservice.h,v 1.2 2000/12/10 04:15:56 gte Exp $"
+#define __CSERVICE_H "$Id: cservice.h,v 1.3 2000/12/10 19:10:28 gte Exp $"
 
 #include	<string>
 #include	<vector>
@@ -10,8 +10,7 @@
 #include	"iClient.h"
 #include	"iServer.h"
 #include	"EConfig.h"
-
-//#define STMT_ALLCHANS "INSERT INTO channels (channel) values ('#ripperõò÷ûïëÚÓ«¥')" // Provide a result set with 1 column, 'Channel Name'.
+ 
 #define STMT_ALLCHANS "SELECT channel from channels" // Provide a result set with 1 column, 'Channel Name'.
 
 using std::string ;
