@@ -37,7 +37,7 @@
 #include	"ip.h"
 
 const char CControl_h_rcsId[] = __CCONTROL_H ;
-const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.93 2001/12/06 20:02:40 mrbean_ Exp $" ;
+const char CControl_cc_rcsId[] = "$Id: ccontrol.cc,v 1.94 2001/12/07 13:00:20 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -322,11 +322,11 @@ assert( newComm != NULL ) ;
 // Unregister the command handler first; prevent memory leaks
 UnRegisterCommand( newComm->getName() ) ;
 
-if(!UpdateCommandFromDb(newComm))
+/*if(!UpdateCommandFromDb(newComm))
 	elog << "Error cant find command "
 	     << newComm->getName() 
 	     << " In database"
-	     << ends;
+	     << ends;*/
 
 
 // Insert the new handler
@@ -555,6 +555,9 @@ switch( theEvent )
 		iClient* tmpUser = (theEvent == EVT_QUIT) ?
 			static_cast< iClient* >( Data1 ) :
 			static_cast< iClient* >( Data2 ) ;
+		MsgChanLog("There are %d clones for address %s\n"
+		,--clientsIpMap[xIP( tmpUser->getIP()).GetNumericIP()]
+		,xIP( tmpUser->getIP()).GetNumericIP());
 
 		ccFloodData* floodData = static_cast< ccFloodData* >(
 		tmpUser->getCustomData(this) ) ;
@@ -672,6 +675,7 @@ switch( theEvent )
 		assert( floodData != 0 ) ;
 		NewUser->setCustomData(this,
 			static_cast< void* >( floodData ) );
+				
 		if(checkGates)
 			{
 			string tIP = xIP( NewUser->getIP()).GetNumericIP();
@@ -694,7 +698,37 @@ switch( theEvent )
 			{
 			if(checkClones)
 				{
-				if(!inBurst)
+				string tIP = xIP( NewUser->getIP()).GetNumericIP();
+				if(strcasecmp(tIP,"0.0.0.0"))			
+					{
+					int CurConnections = ++clientsIpMap[tIP];
+					if((CurConnections  > getExceptions("*@" + tIP)) 
+					    && (CurConnections > getExceptions("*@"+NewUser->getInsecureHost())))
+						{
+						glSet = true;
+						ccGline *tmpGline;
+						tmpGline = findGline("*@" + tIP); 
+						if(!tmpGline)
+							tmpGline = findGline("*@" + NewUser->getInsecureHost());
+						if(!tmpGline)
+							{
+							tmpGline = new ccGline(SQLDb);
+							tmpGline->setHost("*@" + tIP);
+							tmpGline->setExpires(::time(0) + maxGlineLen);
+							tmpGline->setReason("Automatically banned for excessive connections");
+							tmpGline->setAddedOn(::time(0));
+							tmpGline->Insert();
+							tmpGline->loadData(tmpGline->getHost());
+						//addGline(tmpGline);
+							}
+						MyUplink->setGline( nickName,
+								tmpGline->getHost(),
+								tmpGline->getReason(),
+								tmpGline->getExpires() - ::time(0) ) ;
+						}	
+					}
+				}
+				/*if(!inBurst)
 					{
 					int CurConnections = Network->countHost(NewUser->getInsecureHost());		
 					if(CurConnections  > getExceptions("*@" + NewUser->getInsecureHost()))
@@ -723,7 +757,7 @@ switch( theEvent )
 					{
 					addClone(NewUser->getInsecureHost());
 					}
-				}
+				}*/
 			if(!glSet) 
 				{	
 				ccGline * tempGline = findMatchingGline(NewUser->getUserName() + '@' + NewUser->getInsecureHost());

@@ -3,7 +3,7 @@
  */
 
 #ifndef __CCONTROL_H
-#define __CCONTROL_H "$Id: ccontrol.h,v 1.49 2001/12/05 21:03:57 mrbean_ Exp $"
+#define __CCONTROL_H "$Id: ccontrol.h,v 1.50 2001/12/07 13:00:20 mrbean_ Exp $"
 
 
 #include	<string>
@@ -126,6 +126,10 @@ protected:
 	gateQueueType			gatesCheckingQueue;
 	
 	typedef gateQueueType::iterator gateIterator;
+	
+	typedef map<string,int> 	clientsIpMapType;
+	
+	typedef clientsIpMapType::iterator clientsIpIterator;
 	
 public:
 
@@ -677,12 +681,20 @@ public:
 	
 	typedef exceptionListType::iterator exceptionIterator;
 	
-	exceptionIterator exception_begin()
+	exceptionIterator exception_begin() 
 		{ return exceptionList.begin(); }
 
 	exceptionIterator exception_end()
 		{ return exceptionList.end(); }
-				
+	
+	clientsIpMapType		clientsIpMap;
+	
+	clientsIpIterator clientsIp_begin()
+		{ return clientsIpMap.begin(); }
+					
+	clientsIpIterator clientsIp_end()
+		{ return clientsIpMap.end(); }
+
 	/**
 	 * Retrieve the default length of time for glines.
 	 */
