@@ -1,5 +1,5 @@
 
--- "$Id: ccontrol.update.sql,v 1.12 2002/01/01 12:42:13 mrbean_ Exp $"
+-- "$Id: ccontrol.update.sql,v 1.13 2002/01/02 21:29:56 mrbean_ Exp $"
 
 -- ccontrol database changes update
 -- this file will add the new features to an old database
@@ -65,3 +65,7 @@ alter TABLE servers add LastUpdated INT4 NOT NULL;
 
 alter TABLE opers add Notice BOOLEAN NOT NULL DEFAULT 't';
 update opers set notice = 't';
+
+-- 02/01/02 - update all opers so that they'll have access for scan
+
+update opers set saccess = (saccess | 65536);
