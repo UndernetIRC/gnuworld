@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------------
--- "$Id: cservice.web.sql,v 1.20 2001/12/12 01:42:30 nighty Exp $"
+-- "$Id: cservice.web.sql,v 1.21 2001/12/16 06:49:55 nighty Exp $"
 -- Channel service DB SQL file for PostgreSQL.
 --
 -- Tables specific to webbased registration process.
@@ -19,11 +19,6 @@ CREATE TABLE pending_pwreset (
 CREATE INDEX pending_pwreset_cookie_idx ON pending_pwreset(cookie);
 CREATE INDEX pending_pwreset_user_id_idx ON pending_pwreset(user_id);
 CREATE INDEX pending_pwreset_expiration_idx ON pending_pwreset(expiration);
-
-CREATE TABLE newusers (
-	count INT4,
-	since INT4
-);
 
 CREATE TABLE locks (
 	section INT2,
