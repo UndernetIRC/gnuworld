@@ -18,7 +18,7 @@
 #include	"ELog.h"
 #include	"Constants.h"
 
-const char FORCEGLINECommand_cc_rcsId[] = "$Id: FORCEGLINECommand.cc,v 1.19 2002/03/01 18:27:36 mrbean_ Exp $";
+const char FORCEGLINECommand_cc_rcsId[] = "$Id: FORCEGLINECommand.cc,v 1.20 2002/03/01 21:31:57 mrbean_ Exp $";
 
 namespace gnuworld
 {
@@ -224,7 +224,7 @@ if(Reason.size() > 255)
 //bot->setRemoving(st[pos]);
 server->setGline( nickUserHost,
 	st[ pos ],
-	string(" [") + Us + "] " + Reason,
+	string("[") + Us + "] " + Reason,
 	//st.assemble( pos + ResStart ) + "[" + Us + "]",
 	gLength , bot) ;
 //bot->unSetRemoving();
