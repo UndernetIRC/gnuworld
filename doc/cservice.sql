@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------------
-
+-- "$Id: cservice.sql,v 1.2 2000/11/19 00:51:38 dan_karrels Exp $"
 -- Channel service DB SQL file for PostgreSQL.
 
 -- ChangeLog:
@@ -49,7 +49,8 @@ CREATE TABLE translations (
 );
 
 
--- Create the channel table first since we'll be referring back to it -- frequently.
+-- Create the channel table first since we'll be referring back to it
+-- frequently.
 
 CREATE TABLE channel (
 	id SERIAL,

@@ -1,5 +1,5 @@
 # Default paths (system-wide installs)
-# $Id: Makefile.in,v 1.9 2000/11/12 17:28:44 dan_karrels Exp $
+# $Id: Makefile.in,v 1.10 2000/11/19 00:51:38 dan_karrels Exp $
 #
 
 # Standard defines
@@ -53,7 +53,8 @@ SRCS = ccontrol.cc \
 	iServer.cc \
 	main.cc \
 	Network.cc \
-	server.cc
+	server.cc \
+	sqlChannel.cc
 OBJS = $(patsubst %.cc, %.o, $(SRCS))
 
 all: gnuworld

@@ -33,7 +33,7 @@
 #endif
 
 const char Socket_h_rcsId[] = __SOCKET_H ;
-const char Socket_cc_rcsId[] = "$Id: Socket.cc,v 1.4 2000/11/05 23:16:52 dan_karrels Exp $" ;
+const char Socket_cc_rcsId[] = "$Id: Socket.cc,v 1.5 2000/11/19 00:51:38 dan_karrels Exp $" ;
 
 using namespace std ;
 using gnuworld::elog ;
@@ -118,7 +118,7 @@ if( NULL == hostEntry )
 	{
 	elog	<< "Socket::ipAddrOf> Unable to find host name: "
 		<< host << endl ;
-	return host ;
+	return string() ;
 	}
 
 struct in_addr in ;
