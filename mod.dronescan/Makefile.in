@@ -173,11 +173,13 @@ libdronescan_la_CXXFLAGS = -I$(PGSQL_INCLUDE) -I${top_srcdir}/libgnuworld \
 libdronescan_la_SOURCES = \
 	dronescan.cc		\
 	Convert.cc		\
+	sqlFakeClient.cc	\
 	sqlUser.cc		\
 	ACCESSCommand.cc	\
 	ADDUSERCommand.cc	\
 	ANALYSECommand.cc	\
 	CHECKCommand.cc		\
+	FAKECommand.cc		\
 	LISTCommand.cc		\
 	MODUSERCommand.cc	\
 	QUOTECommand.cc		\
@@ -208,11 +210,12 @@ LTLIBRARIES = $(lib_LTLIBRARIES)
 
 libdronescan_la_LIBADD =
 am_libdronescan_la_OBJECTS = libdronescan_la-dronescan.lo \
-	libdronescan_la-Convert.lo libdronescan_la-sqlUser.lo \
-	libdronescan_la-ACCESSCommand.lo \
+	libdronescan_la-Convert.lo libdronescan_la-sqlFakeClient.lo \
+	libdronescan_la-sqlUser.lo libdronescan_la-ACCESSCommand.lo \
 	libdronescan_la-ADDUSERCommand.lo \
 	libdronescan_la-ANALYSECommand.lo \
-	libdronescan_la-CHECKCommand.lo libdronescan_la-LISTCommand.lo \
+	libdronescan_la-CHECKCommand.lo libdronescan_la-FAKECommand.lo \
+	libdronescan_la-LISTCommand.lo \
 	libdronescan_la-MODUSERCommand.lo \
 	libdronescan_la-QUOTECommand.lo \
 	libdronescan_la-REMUSERCommand.lo \
@@ -233,6 +236,7 @@ am__depfiles_maybe = depfiles
 @AMDEP_TRUE@	./$(DEPDIR)/libdronescan_la-CHECKCommand.Plo \
 @AMDEP_TRUE@	./$(DEPDIR)/libdronescan_la-COMMONREALTest.Plo \
 @AMDEP_TRUE@	./$(DEPDIR)/libdronescan_la-Convert.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/libdronescan_la-FAKECommand.Plo \
 @AMDEP_TRUE@	./$(DEPDIR)/libdronescan_la-HASALLOPTest.Plo \
 @AMDEP_TRUE@	./$(DEPDIR)/libdronescan_la-HASOPTest.Plo \
 @AMDEP_TRUE@	./$(DEPDIR)/libdronescan_la-LISTCommand.Plo \
@@ -243,6 +247,7 @@ am__depfiles_maybe = depfiles
 @AMDEP_TRUE@	./$(DEPDIR)/libdronescan_la-REMUSERCommand.Plo \
 @AMDEP_TRUE@	./$(DEPDIR)/libdronescan_la-STATUSCommand.Plo \
 @AMDEP_TRUE@	./$(DEPDIR)/libdronescan_la-dronescan.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/libdronescan_la-sqlFakeClient.Plo \
 @AMDEP_TRUE@	./$(DEPDIR)/libdronescan_la-sqlUser.Plo
 CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
@@ -309,6 +314,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdronescan_la-CHECKCommand.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdronescan_la-COMMONREALTest.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdronescan_la-Convert.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdronescan_la-FAKECommand.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdronescan_la-HASALLOPTest.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdronescan_la-HASOPTest.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdronescan_la-LISTCommand.Plo@am__quote@
@@ -319,6 +325,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdronescan_la-REMUSERCommand.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdronescan_la-STATUSCommand.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdronescan_la-dronescan.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdronescan_la-sqlFakeClient.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdronescan_la-sqlUser.Plo@am__quote@
 
 distclean-depend:
@@ -422,6 +429,39 @@ libdronescan_la-Convert.lo: Convert.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libdronescan_la-Convert.Plo' tmpdepfile='$(DEPDIR)/libdronescan_la-Convert.TPlo' @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdronescan_la_CXXFLAGS) $(CXXFLAGS) -c -o libdronescan_la-Convert.lo `test -f 'Convert.cc' || echo '$(srcdir)/'`Convert.cc
+
+libdronescan_la-sqlFakeClient.o: sqlFakeClient.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdronescan_la_CXXFLAGS) $(CXXFLAGS) -MT libdronescan_la-sqlFakeClient.o -MD -MP -MF "$(DEPDIR)/libdronescan_la-sqlFakeClient.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libdronescan_la-sqlFakeClient.o `test -f 'sqlFakeClient.cc' || echo '$(srcdir)/'`sqlFakeClient.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libdronescan_la-sqlFakeClient.Tpo" "$(DEPDIR)/libdronescan_la-sqlFakeClient.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libdronescan_la-sqlFakeClient.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='sqlFakeClient.cc' object='libdronescan_la-sqlFakeClient.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libdronescan_la-sqlFakeClient.Po' tmpdepfile='$(DEPDIR)/libdronescan_la-sqlFakeClient.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdronescan_la_CXXFLAGS) $(CXXFLAGS) -c -o libdronescan_la-sqlFakeClient.o `test -f 'sqlFakeClient.cc' || echo '$(srcdir)/'`sqlFakeClient.cc
+
+libdronescan_la-sqlFakeClient.obj: sqlFakeClient.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdronescan_la_CXXFLAGS) $(CXXFLAGS) -MT libdronescan_la-sqlFakeClient.obj -MD -MP -MF "$(DEPDIR)/libdronescan_la-sqlFakeClient.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libdronescan_la-sqlFakeClient.obj `if test -f 'sqlFakeClient.cc'; then $(CYGPATH_W) 'sqlFakeClient.cc'; else $(CYGPATH_W) '$(srcdir)/sqlFakeClient.cc'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libdronescan_la-sqlFakeClient.Tpo" "$(DEPDIR)/libdronescan_la-sqlFakeClient.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libdronescan_la-sqlFakeClient.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='sqlFakeClient.cc' object='libdronescan_la-sqlFakeClient.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libdronescan_la-sqlFakeClient.Po' tmpdepfile='$(DEPDIR)/libdronescan_la-sqlFakeClient.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdronescan_la_CXXFLAGS) $(CXXFLAGS) -c -o libdronescan_la-sqlFakeClient.obj `if test -f 'sqlFakeClient.cc'; then $(CYGPATH_W) 'sqlFakeClient.cc'; else $(CYGPATH_W) '$(srcdir)/sqlFakeClient.cc'; fi`
+
+libdronescan_la-sqlFakeClient.lo: sqlFakeClient.cc
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdronescan_la_CXXFLAGS) $(CXXFLAGS) -MT libdronescan_la-sqlFakeClient.lo -MD -MP -MF "$(DEPDIR)/libdronescan_la-sqlFakeClient.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libdronescan_la-sqlFakeClient.lo `test -f 'sqlFakeClient.cc' || echo '$(srcdir)/'`sqlFakeClient.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libdronescan_la-sqlFakeClient.Tpo" "$(DEPDIR)/libdronescan_la-sqlFakeClient.Plo"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libdronescan_la-sqlFakeClient.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='sqlFakeClient.cc' object='libdronescan_la-sqlFakeClient.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libdronescan_la-sqlFakeClient.Plo' tmpdepfile='$(DEPDIR)/libdronescan_la-sqlFakeClient.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdronescan_la_CXXFLAGS) $(CXXFLAGS) -c -o libdronescan_la-sqlFakeClient.lo `test -f 'sqlFakeClient.cc' || echo '$(srcdir)/'`sqlFakeClient.cc
 
 libdronescan_la-sqlUser.o: sqlUser.cc
 @am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdronescan_la_CXXFLAGS) $(CXXFLAGS) -MT libdronescan_la-sqlUser.o -MD -MP -MF "$(DEPDIR)/libdronescan_la-sqlUser.Tpo" \
@@ -587,6 +627,39 @@ libdronescan_la-CHECKCommand.lo: CHECKCommand.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libdronescan_la-CHECKCommand.Plo' tmpdepfile='$(DEPDIR)/libdronescan_la-CHECKCommand.TPlo' @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdronescan_la_CXXFLAGS) $(CXXFLAGS) -c -o libdronescan_la-CHECKCommand.lo `test -f 'CHECKCommand.cc' || echo '$(srcdir)/'`CHECKCommand.cc
+
+libdronescan_la-FAKECommand.o: FAKECommand.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdronescan_la_CXXFLAGS) $(CXXFLAGS) -MT libdronescan_la-FAKECommand.o -MD -MP -MF "$(DEPDIR)/libdronescan_la-FAKECommand.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libdronescan_la-FAKECommand.o `test -f 'FAKECommand.cc' || echo '$(srcdir)/'`FAKECommand.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libdronescan_la-FAKECommand.Tpo" "$(DEPDIR)/libdronescan_la-FAKECommand.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libdronescan_la-FAKECommand.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='FAKECommand.cc' object='libdronescan_la-FAKECommand.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libdronescan_la-FAKECommand.Po' tmpdepfile='$(DEPDIR)/libdronescan_la-FAKECommand.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdronescan_la_CXXFLAGS) $(CXXFLAGS) -c -o libdronescan_la-FAKECommand.o `test -f 'FAKECommand.cc' || echo '$(srcdir)/'`FAKECommand.cc
+
+libdronescan_la-FAKECommand.obj: FAKECommand.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdronescan_la_CXXFLAGS) $(CXXFLAGS) -MT libdronescan_la-FAKECommand.obj -MD -MP -MF "$(DEPDIR)/libdronescan_la-FAKECommand.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libdronescan_la-FAKECommand.obj `if test -f 'FAKECommand.cc'; then $(CYGPATH_W) 'FAKECommand.cc'; else $(CYGPATH_W) '$(srcdir)/FAKECommand.cc'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libdronescan_la-FAKECommand.Tpo" "$(DEPDIR)/libdronescan_la-FAKECommand.Po"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libdronescan_la-FAKECommand.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='FAKECommand.cc' object='libdronescan_la-FAKECommand.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libdronescan_la-FAKECommand.Po' tmpdepfile='$(DEPDIR)/libdronescan_la-FAKECommand.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdronescan_la_CXXFLAGS) $(CXXFLAGS) -c -o libdronescan_la-FAKECommand.obj `if test -f 'FAKECommand.cc'; then $(CYGPATH_W) 'FAKECommand.cc'; else $(CYGPATH_W) '$(srcdir)/FAKECommand.cc'; fi`
+
+libdronescan_la-FAKECommand.lo: FAKECommand.cc
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdronescan_la_CXXFLAGS) $(CXXFLAGS) -MT libdronescan_la-FAKECommand.lo -MD -MP -MF "$(DEPDIR)/libdronescan_la-FAKECommand.Tpo" \
+@am__fastdepCXX_TRUE@	  -c -o libdronescan_la-FAKECommand.lo `test -f 'FAKECommand.cc' || echo '$(srcdir)/'`FAKECommand.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libdronescan_la-FAKECommand.Tpo" "$(DEPDIR)/libdronescan_la-FAKECommand.Plo"; \
+@am__fastdepCXX_TRUE@	else rm -f "$(DEPDIR)/libdronescan_la-FAKECommand.Tpo"; exit 1; \
+@am__fastdepCXX_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='FAKECommand.cc' object='libdronescan_la-FAKECommand.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/libdronescan_la-FAKECommand.Plo' tmpdepfile='$(DEPDIR)/libdronescan_la-FAKECommand.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdronescan_la_CXXFLAGS) $(CXXFLAGS) -c -o libdronescan_la-FAKECommand.lo `test -f 'FAKECommand.cc' || echo '$(srcdir)/'`FAKECommand.cc
 
 libdronescan_la-LISTCommand.o: LISTCommand.cc
 @am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdronescan_la_CXXFLAGS) $(CXXFLAGS) -MT libdronescan_la-LISTCommand.o -MD -MP -MF "$(DEPDIR)/libdronescan_la-LISTCommand.Tpo" \

@@ -16,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: dronescan.h,v 1.19 2003/10/12 17:21:19 jeekay Exp $
+ * $Id: dronescan.h,v 1.20 2003/10/12 22:21:24 jeekay Exp $
  */
 
 #ifndef DRONESCAN_H
-#define DRONESCAN_H "$Id: dronescan.h,v 1.19 2003/10/12 17:21:19 jeekay Exp $"
+#define DRONESCAN_H "$Id: dronescan.h,v 1.20 2003/10/12 22:21:24 jeekay Exp $"
 
 #include <map>
 
@@ -39,6 +39,7 @@ namespace ds {
 
 class activeChannel;
 class Command;
+class sqlFakeClient;
 class sqlUser;
 class Test;
 
@@ -98,11 +99,15 @@ public:
 	typedef unsigned short int testEnabledType;
 	
 	typedef map< string , sqlUser* , noCaseCompare > userMapType;
+	typedef map< unsigned int , sqlFakeClient* > fcMapType;
 	
 	
 	/*******************************************
 	 ** D R O N E S C A N   F U N C T I O N S **
 	 *******************************************/
+	
+	/** Report a SQL error to the appropriate places. */
+	void doSqlError(const string&, const string&);
 	
 	/** Change the current state. */
 	void changeState(DS_STATE) ;
@@ -153,6 +158,8 @@ public:
 	sqlUser *getSqlUser( const string& ) ;
 	
 	/* Preloaders */
+	bool updateDue(string);
+	void preloadFakeClientCache();
 	void preloadUserCache();
 	
 	/* Allow commands access to the database pointer */
@@ -161,6 +168,7 @@ public:
 	
 	/** Internal variables */
 	userMapType userMap;
+	fcMapType fakeClients;
 	
 	/** Typedef of currently seen drone channels */
 	typedef map< string , activeChannel* > droneChannelsType;

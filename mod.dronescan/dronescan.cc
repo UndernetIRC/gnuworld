@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: dronescan.cc,v 1.40 2003/10/12 17:21:19 jeekay Exp $
+ * $Id: dronescan.cc,v 1.41 2003/10/12 22:21:24 jeekay Exp $
  */
 
 #include	<string>
@@ -37,10 +37,11 @@
 #include "dronescan.h"
 #include "dronescanCommands.h"
 #include "dronescanTests.h"
+#include "sqlFakeClient.h"
 #include "sqlUser.h"
 #include "Timer.h"
 
-RCSTAG("$Id: dronescan.cc,v 1.40 2003/10/12 17:21:19 jeekay Exp $");
+RCSTAG("$Id: dronescan.cc,v 1.41 2003/10/12 22:21:24 jeekay Exp $");
 
 namespace gnuworld {
 
@@ -168,7 +169,8 @@ if(SQLDb->ConnectionBad()) {
 
 elog << "dronescan> Established connection to SQL server." << endl;
 
-/* Preload users */
+/* Preload caches */
+preloadFakeClientCache();
 preloadUserCache();
 
 /* Initialise statistics */
@@ -182,6 +184,7 @@ RegisterCommand(new ACCESSCommand(this, "ACCESS", "() (<user>)"));
 RegisterCommand(new ADDUSERCommand(this, "ADDUSER", "<user> <access>"));
 RegisterCommand(new ANALYSECommand(this, "ANALYSE", "<#channel>"));
 RegisterCommand(new CHECKCommand(this, "CHECK", "(<#channel>) (<user>)"));
+RegisterCommand(new FAKECommand(this, "FAKE", "(activate)"));
 RegisterCommand(new LISTCommand(this, "LIST", "(active)"));
 RegisterCommand(new MODUSERCommand(this, "MODUSER", "(ACCESS <user> <level>"));
 RegisterCommand(new QUOTECommand(this, "QUOTE", "<string>"));
@@ -278,7 +281,7 @@ void dronescan::OnCTCP( iClient* theClient, const string& CTCP,
 	} else if("PING" == Command) {
 		DoCTCP(theClient, CTCP, Message);
 	} else if("VERSION" == Command) {
-		DoCTCP(theClient, CTCP, "GNUWorld DroneScan v0.0.8");
+		DoCTCP(theClient, CTCP, "GNUWorld DroneScan v0.0.9");
 	}
 
 	xClient::OnCTCP(theClient, CTCP, Message, Secure);
@@ -646,6 +649,18 @@ void dronescan::OnTimer( xServer::timerID theTimer , void *)
 /*******************************************
  ** D R O N E S C A N   F U N C T I O N S **
  *******************************************/
+ 
+/** Report a SQL error as necessary. */
+void dronescan::doSqlError(const string& theQuery, const string& theError)
+{
+	/* First, log it to error out */
+	elog	<< "SQL> Whilst executing: "
+		<< theQuery
+		<< endl;
+	elog	<< "SQL> "
+		<< theError
+		<< endl;
+}
  
 /** This function allows us to change our current state. */
 void dronescan::changeState(DS_STATE newState)
@@ -1051,34 +1066,102 @@ sqlUser *dronescan::getSqlUser(const string& theNick)
 }
 
 
+/** Are we due an update? */
+bool dronescan::updateDue(string _table)
+{
+	stringstream check;
+	check	<< "SELECT max(last_updated) FROM " << _table;
+	
+	ExecStatusType status = SQLDb->Exec(check.str().c_str());
+	
+	if( PGRES_TUPLES_OK != status ) {
+		doSqlError(check.str(), SQLDb->ErrorMessage());
+		return false;
+	}
+	
+	time_t maxUpdated = atoi(SQLDb->GetValue(0, 0));
+	
+	if( maxUpdated > lastUpdated[_table] ) return true;
+	
+	return false;
+}
+
+
+/** Preload the fake clients cache */
+void dronescan::preloadFakeClientCache()
+{
+	/* Are we due to update? */
+	if(!updateDue("FAKECLIENTS")) return;
+	
+	stringstream theQuery;
+	theQuery	<< "SELECT fc.id, fc.nickname, fc.username, fc.hostname, fc.realname, u.user_name, fc.created_by, fc.created_on, fc.last_updated "
+			<< "FROM fakeclients AS fc JOIN users AS u ON fc.created_by=u.id"
+			;
+	
+	if(!SQLDb->ExecTuplesOk(theQuery.str().c_str())) {
+		doSqlError(theQuery.str(), SQLDb->ErrorMessage());
+		return;
+	}
+	
+	for(fcMapType::iterator itr = fakeClients.begin() ;
+	    itr != fakeClients.end(); ++itr) {
+		delete itr->second;
+	}
+	
+	fakeClients.clear();
+
+/*	
+	string yyxxx( MyUplink->getCharYY() + "]]]" );
+*/
+	
+	for(int i = 0; i < SQLDb->Tuples(); ++i) {
+		sqlFakeClient *newFake = new sqlFakeClient(SQLDb);
+		assert(newFake != 0);
+		
+		newFake->setAllMembers(i);
+		fakeClients.insert(fcMapType::value_type(newFake->getId(), newFake));
+
+/*		
+		iClient *fakeClient = new iClient(
+			MyUplink->getIntYY(),
+			yyxxx,
+			newFake->getNickName(),
+			newFake->getUserName(),
+			"AKAQEK",
+			newFake->getHostName(),
+			newFake->getHostName(),
+			"+i",
+			"",
+			newFake->getRealName(),
+			::time(0)
+			);
+		
+		assert( fakeClient != 0 );
+		
+		MyUplink->AttachClient( fakeClient );
+*/
+	}
+	
+	elog	<< "dronescan::preloadFakeClientCache> Loaded "
+		<< fakeClients.size()
+		<< " fake clients."
+		<< endl;
+	log(INFO, "Loaded %u fake clients.", fakeClients.size());
+}
+
+
 /** Preload the users cache */
 void dronescan::preloadUserCache()
 {
 	/* Are we due to update? */
-	stringstream checkTime;
-	checkTime	<< "SELECT max(last_updated) FROM users";
-	
-	ExecStatusType status = SQLDb->Exec(checkTime.str().c_str());
-	
-	if(PGRES_TUPLES_OK == status) {
-		time_t maxUpdated = atoi(SQLDb->GetValue(0, 0));
-		
-		/* If noone has been updated, don't bother reloading. */
-		if( maxUpdated <= lastUpdated["USERS"] ) return;
-		
-		log(INFO, "Reloading users cache.");
-		lastUpdated["USERS"] = maxUpdated;
-	} else {
-		elog	<< "dronescan::preloadUserCache> "
-			<< SQLDb->ErrorMessage();
-	}
+	if(!updateDue("USERS")) return;
 
 	stringstream theQuery;
 	theQuery	<< "SELECT user_name,last_seen,last_updated_by,last_updated,flags,access,created "
 			<< "FROM users"
 			;
 	
-	status = SQLDb->Exec(theQuery.str().c_str());
+	ExecStatusType status = SQLDb->Exec(theQuery.str().c_str());
 	
 	if(PGRES_TUPLES_OK == status) {
 		/* First we need to clear the current cache. */

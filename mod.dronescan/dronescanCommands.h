@@ -16,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: dronescanCommands.h,v 1.7 2003/10/12 16:06:44 jeekay Exp $
+ * $Id: dronescanCommands.h,v 1.8 2003/10/12 22:21:25 jeekay Exp $
  */
 
 #ifndef DRONESCANCOMMANDS_H
-#define DRONESCANCOMMANDS_H "$Id: dronescanCommands.h,v 1.7 2003/10/12 16:06:44 jeekay Exp $"
+#define DRONESCANCOMMANDS_H "$Id: dronescanCommands.h,v 1.8 2003/10/12 22:21:25 jeekay Exp $"
 
 namespace gnuworld {
 
@@ -77,6 +77,7 @@ class commandName##Command : public Command \
 /* Admin commands */
 DECLARE_COMMAND( ACCESS )
 DECLARE_COMMAND( CHECK )
+DECLARE_COMMAND( FAKE )
 DECLARE_COMMAND( LIST )
 DECLARE_COMMAND( STATUS )
 

@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: LISTCommand.cc,v 1.8 2003/09/04 18:58:15 jeekay Exp $
+ * $Id: LISTCommand.cc,v 1.9 2003/10/12 22:21:24 jeekay Exp $
  *
  * Display information about things.
  *
@@ -29,6 +29,7 @@
 #include "activeChannel.h"
 #include "dronescan.h"
 #include "dronescanCommands.h"
+#include "sqlFakeClient.h"
 #include "sqlUser.h"
 
 namespace gnuworld {
@@ -74,6 +75,28 @@ bool LISTCommand::Exec( const iClient *theClient, const string& Message , const 
 					itr->second->getLastJoin()
 					);
 			}
+		}
+	}
+	
+	if("FAKECLIENTS" == Name) {
+		if(bot->fakeClients.empty()) {
+			bot->Reply(theClient, "There are currently no fake clients.");
+			return true;
+		}
+		
+		bot->Reply(theClient, "Fake clients:");
+		
+		for(dronescan::fcMapType::const_iterator itr =
+		    bot->fakeClients.begin() ; itr != bot->fakeClients.end() ;
+		    ++itr ) {
+			/* List the fake clients back to the user */
+			sqlFakeClient *theFake = itr->second;
+			
+			bot->Reply(theClient, "  (%02u %1s) %s",
+				theFake->getId(),
+				theFake->getFlagsString().c_str(),
+				theFake->getNickUserHost().c_str()
+				);
 		}
 	}
 	
