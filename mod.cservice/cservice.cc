@@ -560,7 +560,7 @@ else if(Command == "VERSION")
 	xClient::DoCTCP(theClient, CTCP,
 		"Undernet P10 Channel Services Version 2 ["
 		__DATE__ " " __TIME__
-		"] ($Id: cservice.cc,v 1.78 2001/02/01 23:22:51 gte Exp $)");
+		"] ($Id: cservice.cc,v 1.79 2001/02/02 18:10:29 dan_karrels Exp $)");
 	}
 else if(Command == "PROBLEM?")
 	{
@@ -1744,14 +1744,13 @@ return false ;
 /**
  * Global method to replace ' with \' in strings for safe placement in
  * SQL statements.
- * TODO: Use std::replace_if()
  */
 const string gnuworld::escapeSQLChars(const string& theString)
 { 
-/*string retMe ;
+string retMe ;
 
-for( string::const_reverse_iterator ptr = theString.rbegin() ;
-	ptr != theString.rend() ; ++ptr )
+for( string::const_iterator ptr = theString.begin() ;
+	ptr != theString.end() ; ++ptr )
 	{
 	if( *ptr == '\'' )
 		{
@@ -1762,8 +1761,8 @@ for( string::const_reverse_iterator ptr = theString.rbegin() ;
 		retMe += *ptr ;
 		}
 	}
-return retMe ;*/
-
+return retMe ;
+/*
         string result;
         result = theString;
  
@@ -1789,6 +1788,7 @@ return retMe ;*/
         }
 
         return result; 
+*/
 }
 
 time_t cservice::currentTime() const

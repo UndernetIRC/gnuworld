@@ -2,17 +2,13 @@
  */
 
 #ifndef __FILESOCKET_H
-#define __FILESOCKET_H "$Id: FileSocket.h,v 1.2 2000/12/15 00:13:44 dan_karrels Exp $"
+#define __FILESOCKET_H "$Id: FileSocket.h,v 1.3 2001/02/02 18:10:29 dan_karrels Exp $"
 
 #include	<string>
-#include	<queue>
-#include	<fstream>
 
 #include	"ClientSocket.h"
 
 using std::string ;
-using std::queue ;
-using std::ifstream ;
 
 /**
  * This class subclasses from ClientSocket so that it may be seemlessly
@@ -20,17 +16,15 @@ using std::ifstream ;
  * of a ClientSocket, but reads from a file.  The purpose of this class
  * is for debugging purposes: clients of ClientSocket may read information
  * from a log file while offline instead of an actual network connection.
+ * Because a socket (file) descriptor to the input file is given here,
+ * and the caller may use select() on that descriptor, we must open
+ * the input file for RW.  The send() method will not write to the file,
+ * but select() must function properly for write tests.
  */
 class FileSocket : public ClientSocket
 {
 
 public:
-
-	/**
-	 * The maximum number of lines from the input file to
-	 * buffer.
-	 */
-	static const queue< string >::size_type maxLines = 100 ;
 
 	/**
 	 * Construct a FileSocket object that reads from a file.
@@ -72,34 +66,13 @@ public:
 		{ return 50000 ; }
 
 	/**
-	 * Return the number of bytes ready for immediate
-	 * (non blocking) read.
-	 */
-	virtual int available() const ;
-
-	/**
-	 * Return 1 if there is data left to be read from the
-	 * input file, 0 otherwise.  This may in the future
-	 * return error condition for reliable testing of
-	 * clients of this class.
-	 */
-	virtual int readable() const ;
-
-	/**
-	 * Return 1 if data may be written to the FileSocket,
-	 * 0 if data cannot be written, or -1 on error.
-	 * Currently, this method always returns 1.
-	 */
-	virtual int writable() const ;
-
-	/**
 	 * Write a line of text to the FileSocket.
 	 * Return the number of bytes written, 0 if no bytes
 	 * written, or -1 on error.
 	 * Currently, this method always returns immediately
 	 * with the size of the string to be written.
 	 */
-	virtual int send( const string& ) ;
+	virtual int send( const string&, const size_t ) ;
 
 	/**
 	 * Read into the given unsigned character array
@@ -123,18 +96,6 @@ protected:
 	 * This method is declared but NOT defined.
 	 */
 	FileSocket operator=( const FileSocket& ) ;
-
-	/**
-	 * This vector of strings representing the input file.
-	 * For now, the entire file is read into the vector
-	 * at instantiation time.
-	 */
-	queue< string >	theFile ;
-
-	/**
-	 * The file from which to read the fake input data.
-	 */
-	ifstream	inFile ;
 
 } ;
 

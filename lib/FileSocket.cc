@@ -1,112 +1,85 @@
 /* FileSocket.cc
  */
 
+#include	<sys/types.h>
+#include	<sys/stat.h>
+#include	<fcntl.h>
+#include	<unistd.h>
+
 #include	<string>
-#include	<fstream>
 #include	<iostream>
-#include	<vector>
 
 #include	<cstdlib>
+#include	<cstring>
+#include	<cerrno>
 
 #include	"FileSocket.h"
 #include	"ELog.h"
 
 const char FileSocket_h_rcsId[] = __FILESOCKET_H ;
-const char FileSocket_cc_rcsId[] = "$Id: FileSocket.cc,v 1.3 2000/12/15 00:13:44 dan_karrels Exp $" ;
+const char FileSocket_cc_rcsId[] = "$Id: FileSocket.cc,v 1.4 2001/02/02 18:10:29 dan_karrels Exp $" ;
 
 using std::string ;
-using std::ifstream ;
-using std::vector ;
 using gnuworld::elog ;
 
 FileSocket::FileSocket( const string& fileName )
 {
-inFile.open( fileName.c_str() ) ;
-if( !inFile.is_open() )
+fd = ::open( fileName.c_str(), O_RDWR ) ;
+if( fd < 0 )
 	{
-	elog	<< "FileSocket> Unable to open socket input file: "
-		<< fileName << endl ;
-	exit( 0 ) ;
-	}
-string line ;
-while( (theFile.size() <= maxLines) && std::getline( inFile, line ) )
-	{
-	theFile.push( line ) ;
+	elog	<< "FileSocket> Error opening input file "
+		<< fileName << ": "
+		<< strerror( errno )
+		<< endl ;
+	::exit( 0 ) ;
 	}
 }
 
 FileSocket::~FileSocket()
 {
-inFile.close() ;
+close() ;
 }
 
 int FileSocket::close()
 {
-return 0 ;
+int retMe = ::close( fd ) ;
+fd = -1 ;
+return retMe ;
 }
 
 int FileSocket::connect( const string& uplink,
 	unsigned short int port )
 {
-return theFile.size() ;
+return fd ;
 }
 
-int FileSocket::available() const
-{
-return theFile.size() ;
-}
-
-int FileSocket::readable() const
-{
-if( theFile.empty() )
-	{
-	return -1 ;
-	}
-return theFile.front().size() ;
-}
-
-int FileSocket::writable() const
-{
-// Always writable
-return 1 ;
-}
-
-int FileSocket::send( const string& theString )
+int FileSocket::send( const string& theString, const size_t numBytes )
 {
 //elog << "send( const string& ): " << theString ;
-return theString.size() ;
+return numBytes ;
 }
 
 int FileSocket::recv( unsigned char* buf, size_t nb )
 {
-if( theFile.empty() )
+assert( buf != 0 ) ;
+
+if( fd < 0 )
 	{
-	return -1 ;
+	return fd ;
 	}
 
-string line ;
-
-if( !inFile.eof() )
+int readReturn = ::read( fd, buf, nb ) ;
+if( readReturn < 0 )
 	{
-	getline( inFile, line ) ;
-	theFile.push( line ) ;
+	// EOF
+	fd = -1 ;
+	return readReturn ;
 	}
 
-// Get a line from the input buffer
-line = theFile.front() ;
+// Need to append a \n here?
+// Sure, let's give it a try.
+buf[ readReturn++ ] = '\n' ;
+buf[ readReturn ] = 0 ;
 
-// Remove the line from the input buffer
-theFile.pop() ;
-
-// Append a new line terminator
-line += '\n' ;
-
-// Copy this line into the return buffer.
-// This could possibly overflow the buffer, but oh well.
-strcpy( reinterpret_cast< char* >( buf ), line.c_str() ) ;
-
-//elog	<< "FileSocket::recv> Returning: " << line ;
-
-return line.size() ;
-
+return readReturn ;
 }
