@@ -1,6 +1,12 @@
 Newest changes at the top of the file:
-$Id: RELEASE.NOTES,v 1.5 2001/03/24 11:00:11 isomer Exp $
+$Id: RELEASE.NOTES,v 1.6 2001/04/02 18:35:57 gte Exp $
 
+CMaster 1.0pl3 - 03/04/2001
+
+* Fixed a bug in unsuspend that allowed users to unsuspend
+  people above their access level.
+* Fixed a bug in suspend that set the duration to seconds
+  when a user attempted to supply a reason. 
 * Added (username) to the levels record when adding a user
 
 CMaster 1.0pl2 - 18/03/2001
