@@ -1,0 +1,25 @@
+// $Id: ChangeLog,v 1.5 2005/06/18 22:08:45 kewlio Exp $ //
+
+2005-06-18	Dan-m00 <daniel@undernet.org>
+		* src/Channel.cc: fixed problem that stopped compilation on FreeBSD/gcc 2.95
+
+		* src/server.cc: fixed problem that stopped compilation on FreeBSD/gcc 2.95
+
+		* include/Channel.h: gnuworld_config.h was not included, so topic_track did not work.
+
+		* mod.ccontrol/REOPCommand.cc: fixed a few things here.
+			- check that the user to be reop'd is actually in the channel.
+			- dont join channel, op, part channel - get server to do it in 1 mode.
+
+		* mod.ccontrol/ccontrol.h: added new variables for CIDR clone detection
+
+		* mod.ccontrol/ccontrol.cc: added CIDR support.  also fixed gline bug
+			- glines cannot start with a "."
+			- glines cannot contain consecutive "."'s
+
+		* libgnuworld/match.cc: added CIDR support to match() function.
+
+		* mod.ccontrol/CONFIGCommand.cc: added CIDR options (see seperate commit)
+
+		* mod.ccontrol/Constants.h: defined new return codes for CIDR matches
+
