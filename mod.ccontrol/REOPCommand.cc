@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: REOPCommand.cc,v 1.5 2005/01/12 03:50:29 dan_karrels Exp $
+ * $Id: REOPCommand.cc,v 1.6 2005/06/18 20:32:14 kewlio Exp $
  */
 
 #include	<string>
@@ -32,7 +32,7 @@
 #include	"ccBadChannel.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: REOPCommand.cc,v 1.5 2005/01/12 03:50:29 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: REOPCommand.cc,v 1.6 2005/06/18 20:32:14 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -91,11 +91,20 @@ if(Chan)
         return false;
         }
 
+/* check if the user to be opped is actually in the channel! */
+ChannelUser* tmpChanUser = theChan->findUser(reopClient);
+if (0 == tmpChanUser)
+{
+	bot->Notice(theClient, "Sorry, but that user is not in the channel.");
+	return false;
+}
+
 // First, clear all ops
 bot->ClearMode( theChan, string( "o" ), true ) ;
 
-// Now, op the proper user
-bot->Op( theChan, reopClient ) ;
+/* Now, op the proper user - use mode instead of op so the ccontrol user
+   doesnt have to enter the channel first */
+bot->Mode(theChan,"+o",st[2],true);
 
 return true;	
 }
