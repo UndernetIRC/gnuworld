@@ -16,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccontrol.h,v 1.93 2004/06/04 20:17:22 jeekay Exp $
+ * $Id: ccontrol.h,v 1.94 2005/06/18 22:06:40 kewlio Exp $
  */
 
 #ifndef __CCONTROL_H
-#define __CCONTROL_H "$Id: ccontrol.h,v 1.93 2004/06/04 20:17:22 jeekay Exp $"
+#define __CCONTROL_H "$Id: ccontrol.h,v 1.94 2005/06/18 22:06:40 kewlio Exp $"
 
 //Undef this if you want to log to the database
 #define LOGTOHD 
@@ -803,6 +803,14 @@ public:
 	clientsIpIterator clientsIp_end()
 		{ return clientsIpMap.end(); }
 
+	clientsIpMapType		clientsIp24Map;
+
+	clientsIpIterator clientsIp24_begin()
+		{ return clientsIp24Map.begin(); }
+
+	clientsIpIterator clientsIp24_end()
+		{ return clientsIp24Map.end(); }
+
 	clientsIpMapType		virtualClientsMap;
 	
 	clientsIpIterator virtualClientsMap_begin()
@@ -944,6 +952,12 @@ protected:
 	int			maxClones;
 	 
 	int			maxVClones;
+
+	int			maxCClones;
+
+	int			CClonesCIDR;
+
+	bool			CClonesGline;
 
 	int			maxGlineLen;
 	
