@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: Constants.h,v 1.11 2004/03/25 20:55:40 mrbean_ Exp $
+ * $Id: Constants.h,v 1.12 2005/06/18 22:05:35 kewlio Exp $
  */
 
 #ifndef __CONSTANTS_H_
@@ -62,6 +62,9 @@ const unsigned int BAD_TIME = 0x80;
 const unsigned int FORCE_NEEDED_WILDTIME = 0x100;
 const unsigned int FU_NEEDED_TIME = 0x200;
 const unsigned int NEG_TIME = 0x400;
+const unsigned int BAD_CIDRLEN = 0x800;
+const unsigned int BAD_CIDRMASK = 0x1000;
+const unsigned int BAD_CIDROVERRIDE = 0x2000;
 const unsigned int MGLINE_TIME = 3*24*3600;
 const unsigned int MGLINE_WILD_NOID_TIME = 7200;
 const unsigned int MGLINE_WILD_TIME = 24*3600;
