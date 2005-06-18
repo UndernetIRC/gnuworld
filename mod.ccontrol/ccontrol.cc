@@ -20,12 +20,12 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccontrol.cc,v 1.184 2005/03/05 03:34:01 dan_karrels Exp $
+ * $Id: ccontrol.cc,v 1.185 2005/06/18 22:07:32 kewlio Exp $
 */
 
 #define MAJORVER "1"
-#define MINORVER "1pl10"
-#define RELDATE "4 June, 2004"
+#define MINORVER "2pl2"
+#define RELDATE "18th June, 2005"
 
 #include        <sys/types.h> 
 #include        <sys/socket.h>
@@ -65,7 +65,7 @@
 #include	"ip.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: ccontrol.cc,v 1.184 2005/03/05 03:34:01 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: ccontrol.cc,v 1.185 2005/06/18 22:07:32 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -652,7 +652,8 @@ RegisterCommand( new MAXUSERSCommand( this, "MAXUSERS",
 	true ) ) ;
 
 RegisterCommand( new CONFIGCommand( this, "CONFIG",
-	" -GTime <duration in secs> / -VClones <amount> -Clones <amount> "
+	" -GTime <duration in secs> / -VClones <amount> -Clones <amount>"
+	" -CClones <amount> -CClonesCIDR <size> -CClonesGline <Yea/No>"
 	" -GBCount <count> / -GBInterval <interval in secs> "
 	" -SGline <Yes/No> "
 	"Manages all kinds of configuration related values ",
@@ -1180,6 +1181,10 @@ else
 void ccontrol::OnEvent( const eventType& theEvent,
 	void* Data1, void* Data2, void* Data3, void* Data4 )
 {
+int i=0;
+int client_addr[4] = { 0 };
+unsigned long mask_ip;
+const char *client_ip;
 switch( theEvent )
 	{
 	case EVT_QUIT:
@@ -1197,7 +1202,30 @@ switch( theEvent )
 		--curUsers;
 		if(checkClones)
 			{
-			string tIP = xIP( tmpUser->getIP()).GetNumericIP();
+				string tIP = xIP( tmpUser->getIP()).GetNumericIP();
+	                        /* CIDR checks */
+	                        /* convert ip to longip */
+	                        i = sscanf(tIP.c_str(), "%d.%d.%d.%d", &client_addr[0], &client_addr[1], &client_addr[2], &client_addr[3]);
+	                        mask_ip = ntohl((client_addr[0]) | (client_addr[1] << 8) | (client_addr[2] << 16) | (client_addr[3] << 24));
+	                        /* bitshift ip to strip the last (32-cidrmask) bits (leaving a mask for the ip) */
+	                        for (i = 0; i < (32-CClonesCIDR); i++)
+	                        {
+	                                /* right shift */
+	                                mask_ip >>= 1;
+	                        }
+	                        for (i = 0; i < (32-CClonesCIDR); i++)
+	                        {
+	                                /* left shift */
+	                                mask_ip <<= 1;
+	                        }
+	                        /* convert longip back to ip */
+	                        mask_ip = htonl(mask_ip);
+	                        client_ip = inet_ntoa((const in_addr&) mask_ip);
+	                        if(--clientsIp24Map[client_ip] < 1)
+	                        {
+	                                clientsIp24Map.erase(clientsIp24Map.find(client_ip));
+	                        }
+
 			if(--clientsIpMap[tIP] < 1)
 				{
 				clientsIpMap.erase(clientsIpMap.find(tIP));
@@ -1637,6 +1665,13 @@ return true ;
 void ccontrol::handleNewClient( iClient* NewUser)
 {
 bool glSet = false;
+bool DoGline = false;
+int i=0, AffectedUsers = 0;
+int client_addr[4] = { 0 };
+unsigned long mask_ip;
+const char *client_ip;
+char Log[200], GlineMask[250];
+
 curUsers++;
 if(!inBurst)
 	{
@@ -1655,16 +1690,59 @@ if(dbConnected)
 		string tIP = xIP( NewUser->getIP()).GetNumericIP();
 		if(strcasecmp(tIP,"0.0.0.0"))			
 			{
-			int CurConnections = ++clientsIpMap[tIP];
-			if((CurConnections > maxClones) && (CurConnections  > getExceptions("*@" + tIP)) 
-			    && (CurConnections > getExceptions("*@"+NewUser->getRealInsecureHost())))
+                                /* CIDR checks */
+                                /* convert ip to longip */
+                                i = sscanf(tIP.c_str(), "%d.%d.%d.%d", &client_addr[0], &client_addr[1], &client_addr[2], &client_addr[3]);
+                                mask_ip = ntohl((client_addr[0]) | (client_addr[1] << 8) | (client_addr[2] << 16) | (client_addr[3] << 24));
+                                /* bitshift ip to strip the last (32-cidrmask) bits (leaving a mask for the ip) */
+                                for (i = 0; i < (32-CClonesCIDR); i++)
+                                {
+                                        /* right shift */
+                                        mask_ip >>= 1;
+                                }
+                                for (i = 0; i < (32-CClonesCIDR); i++)
+                                {
+                                        /* left shift */
+                                        mask_ip <<= 1;
+                                }
+                                /* convert longip back to ip */
+                                mask_ip = htonl(mask_ip);
+                                client_ip = inet_ntoa((const in_addr&) mask_ip);
+                                int CurCIDRConnections = ++clientsIp24Map[client_ip];
+                                sprintf(Log,"*@%s/%d", client_ip, CClonesCIDR);
+  
+                                if ((CurCIDRConnections > maxCClones) && (CurCIDRConnections > getExceptions(NewUser->getUserName()+"@" + tIP)) &&
+                                        (CurCIDRConnections > getExceptions(NewUser->getUserName()+"@"+NewUser->getRealInsecureHost())))
 				{
-				MsgChanLog("Excessive connections (%d) from host *@%s\n"
-					    ,CurConnections,NewUser->getRealInsecureHost().c_str());
-				char Log[200];
-				sprintf(Log,"Glining *@%s for excessive connections (%d)"
-					,tIP.c_str(),CurConnections);
-			        iClient* theClient = Network->findClient(this->getCharYYXXX());
+
+                                        MsgChanLog("Excessive connections (%d) from subnet *@%s/%d (will%s GLINE)\n",
+                                                CurCIDRConnections, client_ip, CClonesCIDR, CClonesGline ? "" : " _NOT_");
+                                        sprintf(Log,"Glining *@%s/%d for excessive connections (%d)",
+                                                client_ip, CClonesCIDR, CurCIDRConnections);
+                                        sprintf(GlineMask,"*@%s/%d", client_ip, CClonesCIDR);
+                                        AffectedUsers = CurCIDRConnections;
+                                        if (CClonesGline)
+                                                DoGline = true;
+                                }
+  
+                                int CurConnections = ++clientsIpMap[tIP];
+  
+                                if (((CurConnections > maxClones)) && (CurConnections  > getExceptions(NewUser->getUserName()+"@" + tIP)) &&
+                                        (CurConnections > getExceptions(NewUser->getUserName()+"@"+NewUser->getRealInsecureHost())) && (!DoGline))
+                                {
+                                        sprintf(Log,"*@%s", NewUser->getRealInsecureHost().c_str());
+                                        MsgChanLog("Excessive connections (%d) from host *@%s\n",
+                                                CurConnections,NewUser->getRealInsecureHost().c_str());
+                                        sprintf(Log,"Glining *@%s/32 for excessive connections (%d)",
+                                                tIP.c_str(),CurConnections);
+                                        sprintf(GlineMask,"*@%s/32",tIP.c_str());
+                                        AffectedUsers = CurConnections;
+                                        DoGline = true;
+                                }
+  
+                                if (DoGline)
+                                {
+                                        iClient* theClient = Network->findClient(this->getCharYYXXX());
 #ifndef LOGTOHD
 				DailyLog(theClient,"%s",Log);
 #else
@@ -1679,11 +1757,11 @@ if(dbConnected)
 				glSet = true;
 				ccGline *tmpGline;
 				tmpGline = new ccGline(SQLDb);
-				tmpGline->setHost("*@" + tIP);
+				tmpGline->setHost(GlineMask);
 				tmpGline->setExpires(::time(0) + maxGlineLen);
 				char us[100];
 				us[0] = '\0';
-				sprintf(us,"[%d] Automatically banned for excessive connections",CurConnections);
+				sprintf(us,"[%d] Automatically banned for excessive connections",AffectedUsers);
 				tmpGline->setReason(us);
 				tmpGline->setAddedOn(::time(0));
 				tmpGline->setAddedBy(nickName);
@@ -2946,7 +3024,11 @@ unsigned int Mask = 0;
 unsigned int Dots = 0;
 unsigned int GlineType = isIP;
 bool ParseEnded = false;
-int retMe = 0;
+bool isCIDR = false;
+int retMe = 0, i = 0;
+char CIDRip[16];
+int client_addr[4] = { 0 };
+unsigned long mask_ip, orig_mask_ip;
 string::size_type pos = Host.find_first_of('@');
 string Ident = Host.substr(0,pos);
 string Hostname = Host.substr(pos+1);
@@ -2954,7 +3036,8 @@ if(Len >  gline::MFU_TIME)  //Check for maximum time
 	retMe |=  gline::BAD_TIME;
 if((signed int) Len < 0)
 	retMe |=  gline::NEG_TIME;
-
+if (Hostname[0] == '.')
+	retMe |= gline::BAD_HOST;
 for(string::size_type pos = 0; pos < Hostname.size();++pos)
 	{
 	if(Hostname[pos] =='.')
@@ -2962,28 +3045,62 @@ for(string::size_type pos = 0; pos < Hostname.size();++pos)
 		Dots++;
 		if((GlineType & (isWildCard | isIP)) == isIP)
 			Mask+=8; //Keep track of the mask
+			if (Hostname[pos+1] == '.')
+				retMe |= gline::BAD_HOST;
 		}
 	else if((Hostname[pos] =='*') || (Hostname[pos] == '?'))
 		GlineType |= isWildCard;
 	else if(Hostname[pos] == '/')
 		{
-		//For now not handled, return a bad host
-		retMe |=  gline::BAD_HOST;
-		/*if(!(GlineType & isIP)) //must be an ip to specify 
-			return  gline::BAD_HOST;
-		 Mask = atol((Host.substr(++pos)).c_str());
-		 if(!(Mask) || (Mask > 32))
-			return  gline::BAD_HOST;
-		 if(Mask < 32)
-			GlineType |= isWildCard;
-		 ParseEnded = true;			
-		 break;*/
-		 
+                        if (!(GlineType & isIP))        // must be an ip to specify 
+                                return  gline::BAD_HOST;
+  
+                        if (GlineType & isWildCard)     // cidr may not contain wildcards
+                                return  gline::BAD_HOST;
+  
+                        /* copy the mask to CIDRip */
+                        if (pos > 15)
+                                pos = 15;
+                        for (i=0; i<(int) pos; i++)
+                                CIDRip[i] = Hostname[i];
+                        CIDRip[i++] = '\0';
+  
+                        Mask = atol((Hostname.substr(++pos)).c_str());
+                        isCIDR = true;
+                        retMe |= gline::FORCE_NEEDED_HOST;
+                        /* check if the mask matches the cidr size */
+                        i = sscanf(CIDRip, "%d.%d.%d.%d", &client_addr[0], &client_addr[1], &client_addr[2], &client_addr[3]);
+                        mask_ip = ntohl((client_addr[0]) | (client_addr[1] << 8) | (client_addr[2] << 16) | (client_addr[3] << 24));
+                        orig_mask_ip = mask_ip;
+                        for (i = 0; i < (32 - (int) Mask); i++)
+                        {
+                                /* right shift */
+                                mask_ip >>= 1;
+                        }
+                        for (i = 0; i < (32 - (int) Mask); i++)
+                        {
+                                /* left shift */
+                                mask_ip <<= 1;
+                        }
+                        if (mask_ip != orig_mask_ip)
+                        {
+                                /* mask no longer matches the original mask - ip was not on the bit boundary */
+                                retMe |= gline::BAD_CIDRMASK;
+                        }
+                        if (!(Mask) || (Mask > 32))
+                                retMe |= gline::BAD_HOST;
+                        if (Mask < 16)
+                                retMe |= gline::BAD_CIDRLEN;
+                        if (Mask < 32)
+                                GlineType |= isWildCard;
+                        if ((GlineType & isIP) && (isCIDR) && (Dots != 3))
+                                retMe |= gline::BAD_CIDROVERRIDE;
+                        ParseEnded = true;                      
+                        break;
 		 }
 	else if((Hostname[pos] > '9') || (Hostname[pos] < '0')) 
 		GlineType &= ~isIP;
 	}
-
 
 Affected = Network->countMatchingRealUserHost(Host); //Calculate the number of affected
 if((Dots > 3) && (GlineType & isIP)) //IP addy cant have more than 3 dots
@@ -3038,7 +3155,12 @@ unsigned int Mask = 0;
 unsigned int Dots = 0;
 unsigned int GlineType = isIP;
 bool ParseEnded = false;
-int retMe = 0;
+bool hasId = false;
+bool isCIDR = false;
+int retMe = 0, i = 0;
+char CIDRip[16];
+int client_addr[4] = { 0 };
+unsigned long mask_ip, orig_mask_ip;
 string::size_type pos = Host.find_first_of('@');
 string Ident = Host.substr(0,pos);
 string Hostname = Host.substr(pos+1);
@@ -3046,7 +3168,6 @@ if((signed int)Len < 0)
 	retMe |=  gline::NEG_TIME;
 //Check the ident first, if its valid then the gline is ok 
 Affected = Network->countMatchingUserHost(Host); //Calculate the number of affected
-bool hasId = false;
 for(string::size_type pos = 0; pos < Ident.size();++pos)
 	{
 	if((Ident[pos] == '*') || (Ident[pos] == '?'))
@@ -3061,6 +3182,9 @@ for(string::size_type pos = 0; pos < Ident.size();++pos)
 	}
 if(hasId)
 	return gline::GLINE_OK;
+
+if (Hostname[0]=='.')
+	retMe |= gline::BAD_HOST;
 for(string::size_type pos = 0; pos < Hostname.size();++pos)
 	{
 	if(Hostname[pos] =='.')
@@ -3068,24 +3192,55 @@ for(string::size_type pos = 0; pos < Hostname.size();++pos)
 		Dots++;
 		if((GlineType & (isWildCard | isIP)) == isIP)
 			Mask+=8; //Keep track of the mask
+			if (Hostname[pos+1] == '.')
+				retMe |= gline::BAD_HOST;
 		}
 	else if((Hostname[pos] =='*') || (Hostname[pos] == '?'))
 		GlineType |= isWildCard;
 	else if(Hostname[pos] == '/')
 		{
-		//For now not handled, return a bad host
-		retMe |=  gline::BAD_HOST;
-		/*if(!(GlineType & isIP)) //must be an ip to specify 
-			return  gline::BAD_HOST;
-		 Mask = atol((Host.substr(++pos)).c_str());
-		 if(!(Mask) || (Mask > 32))
-			return  gline::BAD_HOST;
-		 if(Mask < 32)
-			GlineType |= isWildCard;
-		 ParseEnded = true;			
-		 break;*/
-		 
-		 }
+                       if (!(GlineType & isIP))        // must be an ip to specify CIDR mask
+                               return  gline::BAD_HOST;
+                       if (GlineType & isWildCard)     // cidr can't contain wildcards
+                               return  gline::BAD_HOST;
+                       /* copy the mask to CIDRip */
+                       if (pos > 15)
+                               pos = 15;
+                       for (i=0; i<(int) pos; i++)
+                               CIDRip[i] = Hostname[i];
+                       CIDRip[i++] = '\0';
+ 
+                       Mask = atol((Hostname.substr(++pos)).c_str());
+                       isCIDR = true;
+ 
+                       /* check if the mask matches the cidr size */
+                       i = sscanf(CIDRip, "%d.%d.%d.%d", &client_addr[0], &client_addr[1], &client_addr[2], &client_addr[3]);
+                       mask_ip = ntohl((client_addr[0]) | (client_addr[1] << 8) | (client_addr[2] << 16) | (client_addr[3] << 24));
+                       orig_mask_ip = mask_ip;
+                       for (i = 0; i < (32 - (int) Mask); i++)
+                       {
+                               /* right shift */
+                               mask_ip >>= 1;
+                       }
+                       for (i = 0; i < (32 - (int) Mask); i++)
+                       {
+                               /* left shift */
+                               mask_ip <<= 1;
+                       }
+                       if (mask_ip != orig_mask_ip)
+                       {
+                               /* mask no longer matches the original mask - ip was not on the bit boundary */
+                               retMe |= gline::BAD_CIDRMASK;
+                       }
+                       if(!(Mask) || (Mask > 32))      // must be under a /32 to be valid
+                               retMe |= gline::BAD_HOST;
+                       if(Mask < 8)                    // must be a /8 or more specific
+                               retMe |= gline::BAD_CIDRLEN;
+                       if(Mask < 32)
+                               GlineType |= isWildCard;
+                       ParseEnded = true;                      
+                       break;
+		}
 	else if((Hostname[pos] > '9') || (Hostname[pos] < '0')) 
 		GlineType &= ~isIP;
 	}
@@ -3094,6 +3249,8 @@ for(string::size_type pos = 0; pos < Hostname.size();++pos)
 
 if((Dots > 3) && (GlineType & isIP)) //IP addy cant have more than 3 dots
 	retMe |=  gline::BAD_HOST;
+if((GlineType & isIP) && (isCIDR) && (Dots != 3))
+	retMe |= gline::BAD_CIDROVERRIDE;
 if((GlineType & (isIP || isWildCard) == isIP) && !(ParseEnded))
 	Mask +=8; //Add the last mask count if needed
 if((GlineType & isIP) && (Mask < 8))
@@ -3599,6 +3756,9 @@ bool gotInterval= false;
 bool gotCount = false;
 bool gotVClones = false;
 bool gotClones = false;
+bool gotCClones = false;
+bool gotCClonesCIDR = false;
+bool gotCClonesGline = false;
 bool gotGLen = false;
 bool gotSave = false;
  
@@ -3647,7 +3807,21 @@ for(int i=0; i< SQLDb->Tuples();++i)
 		gotClones = true;
 		maxClones = atoi(SQLDb->GetValue(i,1));
 		}
-
+        else if(!strcasecmp(SQLDb->GetValue(i,0),"CClones"))
+                {
+                gotCClones = true;
+                maxCClones = atoi(SQLDb->GetValue(i,1));
+                }
+        else if(!strcasecmp(SQLDb->GetValue(i,0),"CClonesCIDR"))
+                {
+                gotCClonesCIDR = true;
+                CClonesCIDR = atoi(SQLDb->GetValue(i,1));
+                }
+        else if(!strcasecmp(SQLDb->GetValue(i,0),"CClonesGline"))
+                {
+                gotCClonesGline = true;
+                CClonesGline = (atoi(SQLDb->GetValue(i,1)) == 1);
+                }
 	else if(!strcasecmp(SQLDb->GetValue(i,0),"GTime"))
 		{
 		gotGLen = true;
@@ -3681,6 +3855,21 @@ if(!gotVClones)
 	maxVClones = 32;
 	updateMisc("VClones",maxVClones);
 	}
+if(!gotCClones)
+        {
+        maxCClones = 275;
+        updateMisc("CClones",maxCClones);
+        }
+if(!gotCClonesCIDR)
+        {
+        CClonesCIDR = 24;
+        updateMisc("CClonesCIDR",CClonesCIDR);
+        }
+if(!gotCClonesGline)
+        {
+        CClonesGline = false;
+        updateMisc("CClonesGline",CClonesGline);
+        }
 if(!gotGLen)
 	{
 	maxGlineLen = 3600;
@@ -3714,14 +3903,25 @@ MyUplink->Wallops( buffer ) ;
 int ccontrol::getExceptions( const string &Host )
 {
 int Exception = 0;
+string::size_type pos = Host.find_first_of('@');
+string::size_type Maskpos;
+string Ident = Host.substr(0,pos);
+string Hostname = Host.substr(pos+1);
+string MaskHostname, MaskIdent;
 
 for(exceptionIterator ptr = exception_begin();ptr != exception_end();ptr++)
 	{
-	if((*(*ptr) == Host) || !(match((*ptr)->getHost(),Host)))
+        /* move the exception host into MaskHostname and strip off the user */
+        MaskHostname = (*ptr)->getHost().c_str();
+        Maskpos = MaskHostname.find_first_of('@');
+        MaskIdent = MaskHostname.substr(0,Maskpos);
+        if((*(*ptr) == Hostname) || !(match(MaskHostname.substr(Maskpos+1),Hostname)))
 		{
-		if((*ptr)->getConnections() > Exception)
+                /* ok, we matched hostname(ip) - check if we match ident too */
+                if (!match(MaskIdent, Ident))
+			if((*ptr)->getConnections() > Exception)
 			{
-			Exception = (*ptr)->getConnections();
+				Exception = (*ptr)->getConnections();
 			}
 		} 
 	}
@@ -4443,6 +4643,7 @@ Notice(tmpClient,"ccUser: %d",ccUser::numAllocated);
 Notice(tmpClient,"Total of %d users in the map",usersMap.size()); 
 Notice(tmpClient,"GBCount : %d , GBInterval : %d",glineBurstCount,glineBurstInterval);
 Notice(tmpClient,"Max Clones : %d , Max Virtual Clones : %d",maxClones,maxVClones);
+Notice(tmpClient,"Max CIDR Clones: %d per /%d - Auto-Gline: %s",maxCClones,CClonesCIDR,CClonesGline ? "True" : "False");
 Notice(tmpClient,"Save gline is : %s",saveGlines ? "True" : "False"); 
 Notice(tmpClient,"Bursting : %s",inBurst ? "True" : "False");
 }
@@ -4465,6 +4666,18 @@ else if(!strcasecmp(varName,"Clones"))
 else if(!strcasecmp(varName,"VClones"))
 	{
 	maxVClones = Value;
+	}
+else if(!strcasecmp(varName,"CClones"))
+        {
+        maxCClones = Value;
+        }
+else if(!strcasecmp(varName,"CClonesCIDR"))
+        {
+        CClonesCIDR = Value;
+        }
+else if(!strcasecmp(varName,"CClonesGline"))
+        {
+        CClonesGline = (Value == 1);
 	}
 else if(!strcasecmp(varName,"GTime"))
 	{
