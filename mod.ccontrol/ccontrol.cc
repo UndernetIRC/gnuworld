@@ -20,7 +20,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccontrol.cc,v 1.185 2005/06/18 22:07:32 kewlio Exp $
+ * $Id: ccontrol.cc,v 1.186 2005/06/18 23:46:05 kewlio Exp $
 */
 
 #define MAJORVER "1"
@@ -65,7 +65,7 @@
 #include	"ip.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: ccontrol.cc,v 1.185 2005/06/18 22:07:32 kewlio Exp $" ) ;
+RCSTAG( "$Id: ccontrol.cc,v 1.186 2005/06/18 23:46:05 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -1731,8 +1731,8 @@ if(dbConnected)
                                         (CurConnections > getExceptions(NewUser->getUserName()+"@"+NewUser->getRealInsecureHost())) && (!DoGline))
                                 {
                                         sprintf(Log,"*@%s", NewUser->getRealInsecureHost().c_str());
-                                        MsgChanLog("Excessive connections (%d) from host *@%s\n",
-                                                CurConnections,NewUser->getRealInsecureHost().c_str());
+                                        MsgChanLog("Excessive connections [%d] from host *@%s [%s]\n",
+                                                CurConnections,NewUser->getRealInsecureHost().c_str(), tIP.c_str());
                                         sprintf(Log,"Glining *@%s/32 for excessive connections (%d)",
                                                 tIP.c_str(),CurConnections);
                                         sprintf(GlineMask,"*@%s/32",tIP.c_str());
