@@ -16,13 +16,14 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- * $Id: match.cc,v 1.4 2004/05/18 18:20:23 jeekay Exp $
+ * $Id: match.cc,v 1.5 2005/06/18 22:08:02 kewlio Exp $
  */
 #include	"match.h"
-
+#include	"ConnectionManager.h"
 #include	<string>
+#include	<stdio.h>
 
-const char rcsId[] = "$Id: match.cc,v 1.4 2004/05/18 18:20:23 jeekay Exp $" ;
+const char rcsId[] = "$Id: match.cc,v 1.5 2005/06/18 22:08:02 kewlio Exp $" ;
 
 namespace gnuworld
 {
@@ -59,6 +60,67 @@ int match(const char *mask, const char *string)
   const char *m = mask, *s = string;
   char ch;
   const char *bm, *bs;          /* Will be reg anyway on a decent CPU/compiler */
+  bool isCIDR = false;
+  char CIDRip[16];
+  int i = 0, CIDRmask = 0;
+  int client_addr[4] = { 0 };
+  unsigned long mask_ip, client_ip;
+
+  /* check if the mask is a CIDR mask */
+  while ((ch = *m++))
+  {
+     if (ch == '/')
+     {
+        isCIDR = true;
+        break;			/* break, preserving location of the slash in m */
+     }
+     if (i <= 15)
+     {
+        CIDRip[i] = ch;
+        i++;
+     }
+  }
+ 
+  if (isCIDR)
+  {
+     /* we have a CIDR mask, deal with it as such */
+     /* we can only match CIDR masks against IPs - check for an IP */
+     if (ConnectionManager::isIpAddress(string))
+     {
+        /* ok, it's an IP - compute masks etc */
+        CIDRip[i] = '\0';
+        CIDRmask = atoi(m);
+        /* convert IP into integer */
+        i = sscanf(CIDRip, "%d.%d.%d.%d", &client_addr[0], &client_addr[1], &client_addr[2], &client_addr[3]);
+        mask_ip = ntohl((client_addr[0]) | (client_addr[1] << 8) | (client_addr[2] << 16) | (client_addr[3] << 24));
+        i = sscanf(string, "%d.%d.%d.%d", &client_addr[0], &client_addr[1], &client_addr[2], &client_addr[3]);
+        client_ip = ntohl((client_addr[0]) | (client_addr[1] << 8) | (client_addr[2] << 16) | (client_addr[3] << 24));
+        /* time to compare them */
+        for (i = 0; i < (32 - CIDRmask); i++)
+        {
+           /* right shift  to drop off the insignificant bits */
+           mask_ip >>= 1;
+           client_ip >>= 1;
+        }
+        for (i = 0; i < (32 - CIDRmask); i++)
+        {
+           /* left shift to restore the ip, but with insignificant bits = 0 */
+           mask_ip <<= 1;
+           client_ip <<= 1;
+        }
+        if (client_ip == mask_ip)
+        {
+           /* cidr matches */
+           return 0;
+        } else {
+           /* cidr doesnt match */
+           return 1;
+        }
+        return 1;
+     }
+  }
+
+  m = mask;
 
   /* Process the "head" of the mask, if any */
   while ((ch = *m++) && (ch != '*'))
