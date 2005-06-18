@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: CONFIGCommand.cc,v 1.9 2005/01/12 03:50:29 dan_karrels Exp $
+ * $Id: CONFIGCommand.cc,v 1.10 2005/06/18 22:06:05 kewlio Exp $
  */
 
 #include	<string>
@@ -26,7 +26,7 @@
 #include	"CControlCommands.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: CONFIGCommand.cc,v 1.9 2005/01/12 03:50:29 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: CONFIGCommand.cc,v 1.10 2005/06/18 22:06:05 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -70,6 +70,49 @@ for(unsigned int  pos =1; pos < st.size() ;)
 			}
 		pos+=2;
 		}
+        else if(!strcasecmp(st[pos],"-CClonesCIDR"))
+                {
+                if(st.size() < pos +2)
+                        {
+                        bot->Notice(theClient,"-CClonesCIDR must get the CIDR Size");
+                        return true;
+                        }
+                if((atoi(st[pos+1].c_str())<16) || (atoi(st[pos+1].c_str())>31))
+                        {
+                        bot->Notice(theClient,"-CClonesCIDR must have a CIDR Size in the range 16-32");
+                        return true;
+                        }
+                if(!bot->updateMisc("CClonesCIDR",atoi(st[pos+1].c_str())))
+                        {
+                        bot->MsgChanLog("Error while updating the CIDR size for clones in the db!\n");
+                        }
+                else
+                        {
+                        bot->Notice(theClient,"%s was successfully updated to %s",
+                                st[pos].c_str(),st[pos+1].c_str());
+                        bot->Notice(theClient,"This change requires you to restart the service IMMEDIATELY or "
+                                "unexpected results will occur!");
+                        }
+                pos+=2;
+                }
+        else if(!strcasecmp(st[pos],"-CClones"))
+                {
+                if(st.size() < pos +2)
+                        {
+                        bot->Notice(theClient,"-CClones must be the number of CIDR clones");
+                        return true;
+                        }
+                if(!bot->updateMisc("CClones",atoi(st[pos+1].c_str())))
+                        {
+                        bot->MsgChanLog("Error while updated the max CIDR clones in the db!\n");
+                        }
+                else
+                        {
+                        bot->Notice(theClient,"%s was successfully updated to %s",
+                                st[pos].c_str(),st[pos+1].c_str());
+                        }
+                pos+=2;
+                }
 	else if(!strcasecmp(st[pos],"-Clones"))
 		{
 		if(st.size() < pos +2)
@@ -162,7 +205,24 @@ for(unsigned int  pos =1; pos < st.size() ;)
 			}
 		pos+=2;			
 		}
-
+        else if(!strcasecmp(st[pos],"-CClonesGline"))
+                {
+                if(st.size() < pos +2)
+                        {
+                        bot->Notice(theClient,"-CClonesGline must get a yes/no answer indicating whether or not to auto-gline");
+                        return true;
+                        }
+                if(!bot->updateMisc("CClonesGline",(strcasecmp(st[pos+1],"YES") == 0) ? 1 : 0))
+                        {
+                        bot->MsgChanLog("Error while updating the CIDR auto-gline flag in the db\n");
+                        }
+                else
+                        {
+                        bot->Notice(theClient,"%s was successfully updated to %s",
+                                st[pos].c_str(),st[pos+1].c_str());
+                        }
+                pos+=2;
+		}
 	else
 		{
 		bot->Notice(theClient,"Sorry, i am not familiar with option %s",st[pos].c_str());
