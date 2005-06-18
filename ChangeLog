@@ -1,4 +1,11 @@
-// $Id: ChangeLog,v 1.5 2005/06/18 22:08:45 kewlio Exp $ //
+// $Id: ChangeLog,v 1.6 2005/06/18 23:12:14 kewlio Exp $ //
+
+2005-06-18	Dan-m00 <daniel@undernet.org>
+		* mod.ccontrol/FORCEGLINECommand.cc: CIDR reply info added for forceglines
+
+		* mod.ccontrol/GLINECommand.cc: CIDR reply info added for glines
+
+		* mod.ccontrol/SGLINECommand.cc: CIDR reply info added for sglines
 
 2005-06-18	Dan-m00 <daniel@undernet.org>
 		* src/Channel.cc: fixed problem that stopped compilation on FreeBSD/gcc 2.95
