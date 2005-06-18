@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: Channel.h,v 1.32 2005/03/25 03:07:28 dan_karrels Exp $
+ * $Id: Channel.h,v 1.33 2005/06/18 20:11:21 kewlio Exp $
  */
 
 #ifndef __CHANNEL_H
-#define __CHANNEL_H "$Id: Channel.h,v 1.32 2005/03/25 03:07:28 dan_karrels Exp $"
+#define __CHANNEL_H "$Id: Channel.h,v 1.33 2005/06/18 20:11:21 kewlio Exp $"
 
 #include	<string>
 #include	<map>
@@ -35,6 +35,7 @@
 #include	"ChannelUser.h"
 #include	"xparameters.h"
 #include	"ELog.h"
+#include	"gnuworld_config.h"
 
 namespace gnuworld
 {
