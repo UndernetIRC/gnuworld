@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: FORCEGLINECommand.cc,v 1.31 2005/01/12 03:50:29 dan_karrels Exp $
+ * $Id: FORCEGLINECommand.cc,v 1.32 2005/06/18 22:51:47 kewlio Exp $
  */
 
 #include	<string>
@@ -35,7 +35,7 @@
 #include	"Constants.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: FORCEGLINECommand.cc,v 1.31 2005/01/12 03:50:29 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: FORCEGLINECommand.cc,v 1.32 2005/06/18 22:51:47 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -170,6 +170,21 @@ if(gCheck & gline::BAD_HOST)
 	bot->Notice(theClient,"illegal host");
 	Ok = false;
 	}
+if(gCheck & gline::BAD_CIDRMASK)
+        {
+        bot->Notice(theClient,"The IP listed is not on a bit boundary for the CIDR mask specified.");
+        Ok = false;
+        }
+if(gCheck & gline::BAD_CIDRLEN)
+        {
+        bot->Notice(theClient,"Bad CIDR length - try something more specific.");
+        Ok = false;
+        }
+if(gCheck & gline::BAD_CIDROVERRIDE)
+        {
+        bot->Notice(theClient,"For CIDR glines, you must enter all 4 parts of the IP.");
+        Ok = false;
+        }
 if(gCheck & gline::BAD_TIME)
 	{
 	bot->Notice(theClient,"Glining for more than %d seconds is a NoNo",gline::MFGLINE_TIME);
