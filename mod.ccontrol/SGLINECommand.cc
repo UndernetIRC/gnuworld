@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: SGLINECommand.cc,v 1.11 2005/01/12 03:50:29 dan_karrels Exp $
+ * $Id: SGLINECommand.cc,v 1.12 2005/06/18 23:06:02 kewlio Exp $
  */
 
 #include	<string>
@@ -36,7 +36,7 @@
 #include	"Constants.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: SGLINECommand.cc,v 1.11 2005/01/12 03:50:29 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: SGLINECommand.cc,v 1.12 2005/06/18 23:06:02 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -184,6 +184,21 @@ if(!RealName)
 		bot->Notice(theClient,"I dont think glining that host is such a good idea, do you?");
 		Ok = false;
 		}
+        if(gCheck & gline::BAD_CIDRMASK)
+                {
+                bot->Notice(theClient,"The IP listed is not on a bit boundary for the CIDR mask specified.");
+                Ok = false;
+                }
+        if(gCheck & gline::BAD_CIDRLEN)
+                {
+                bot->Notice(theClient,"Bad CIDR length - try something more specific.");
+                Ok = false;
+                }
+        if(gCheck & gline::BAD_CIDROVERRIDE)
+                {
+                bot->Notice(theClient,"For CIDR sglines, you must enter all 4 parts of the IP.");
+                Ok = false;
+ 		}
 	if(gCheck & gline::BAD_HOST)
 		{
 		bot->Notice(theClient,"illegal host");
