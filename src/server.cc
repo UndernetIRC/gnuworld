@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server.cc,v 1.210 2005/06/19 00:43:06 kewlio Exp $
+ * $Id: server.cc,v 1.211 2005/06/19 00:48:30 kewlio Exp $
  */
 
 #include	<sys/time.h>
@@ -70,7 +70,7 @@
 #include	"ConnectionHandler.h"
 #include	"Connection.h"
 
-RCSTAG( "$Id: server.cc,v 1.210 2005/06/19 00:43:06 kewlio Exp $" ) ;
+RCSTAG( "$Id: server.cc,v 1.211 2005/06/19 00:48:30 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -2446,8 +2446,8 @@ for( rawModeVectorType::size_type modeIndex = 0 ;
 	outputModes = "";
 	outputArgs = "";
 #else
-	outputModes = "";
-	outputArgs = "";
+	outputModes.clear();
+	outputArgs.clear();
 #endif
 	} // for( modeItr )
 
