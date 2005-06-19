@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: DEOPCommand.cc,v 1.14 2005/03/17 18:35:20 mrbean_ Exp $
+ * $Id: DEOPCommand.cc,v 1.15 2005/06/19 15:16:53 kewlio Exp $
  */
 
 #include	<set>
@@ -34,7 +34,7 @@
 #include	"ccBadChannel.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: DEOPCommand.cc,v 1.14 2005/03/17 18:35:20 mrbean_ Exp $" ) ;
+RCSTAG( "$Id: DEOPCommand.cc,v 1.15 2005/06/19 15:16:53 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -46,6 +46,7 @@ namespace uworld
 
 bool DEOPCommand::Exec( iClient* theClient, const string& Message )
 {
+bool foundUser = false;
 
 StringTokenizer st( Message ) ;
 if( st.size() < 3 )
@@ -109,10 +110,18 @@ for( StringTokenizer::size_type i = 2 ; i < st.size() ; ++i )
 		// Don't op services clients, they can op themselves.
 		continue ;
 		}
-
+	/* ok, the user is in the channel, flag it */
+	foundUser = true;
 	modes += "o";
 	args += st[i] + " ";
 	} // for
+
+if (!foundUser)
+{
+	bot->Notice(theClient, "I couldn't find anyone to deop in %s!",
+		st[1].c_str());
+	return false;
+}
 
 if(  !args.empty() )
 	{
