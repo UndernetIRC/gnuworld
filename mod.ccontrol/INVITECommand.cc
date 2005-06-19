@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: INVITECommand.cc,v 1.19 2005/01/12 03:50:29 dan_karrels Exp $
+ * $Id: INVITECommand.cc,v 1.20 2005/06/19 15:08:46 kewlio Exp $
  */
 
 #include	<string>
@@ -32,7 +32,7 @@
 #include	"Network.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: INVITECommand.cc,v 1.19 2005/01/12 03:50:29 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: INVITECommand.cc,v 1.20 2005/06/19 15:08:46 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -90,6 +90,13 @@ else
 	// Invite the requesting user
 	inviteClient = theClient ;
 	}
+
+Channel* theChan = Network->findChannel(st[1]);
+if (theChan == NULL)
+{
+	bot->Notice(theClient, "Channel %s does not exist!", st[1].c_str());
+	return true;
+}
 
 // xClient::Invite() will Join/Part the channel if necessary.
 return bot->Invite( inviteClient, chanName ) ;
