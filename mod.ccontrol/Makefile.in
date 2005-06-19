@@ -14,7 +14,7 @@
 
 @SET_MAKE@
 
-# "$Id: Makefile.in,v 1.222 2005/04/03 22:11:33 dan_karrels Exp $"
+# "$Id: Makefile.in,v 1.223 2005/06/19 01:08:13 kewlio Exp $"
 
 SOURCES = $(libccontrol_la_SOURCES)
 
@@ -69,6 +69,7 @@ am_libccontrol_la_OBJECTS = libccontrol_la-ccontrol.lo \
 	libccontrol_la-ccFloodData.lo libccontrol_la-ccGline.lo \
 	libccontrol_la-ccLog.lo libccontrol_la-ccServer.lo \
 	libccontrol_la-ccUser.lo libccontrol_la-CHANINFOCommand.lo \
+	libccontrol_la-ccontrol_generic.lo \
 	libccontrol_la-CHECKNETCommand.lo \
 	libccontrol_la-CLEARCHANCommand.lo \
 	libccontrol_la-COMMANDSCommand.lo \
@@ -278,6 +279,7 @@ libccontrol_la_SOURCES = ccontrol.cc \
 	ccLog.cc \
 	ccServer.cc \
 	ccUser.cc \
+	ccontrol_generic.cc \
 	CHANINFOCommand.cc \
 	CHECKNETCommand.cc \
 	CLEARCHANCommand.cc \
@@ -344,6 +346,7 @@ EXTRA_DIST = ccBadChannel.h \
 	ccServer.h \
 	ccUserData.h \
 	ccUser.h \
+	ccontrol_generic.h \
 	CommandsDec.h \
 	commLevels.h \
 	Constants.h \
@@ -481,6 +484,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libccontrol_la-ccLog.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libccontrol_la-ccServer.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libccontrol_la-ccUser.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libccontrol_la-ccontrol_generic.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libccontrol_la-ccontrol.Plo@am__quote@
 
 .cc.o:
@@ -594,6 +598,13 @@ libccontrol_la-ccUser.lo: ccUser.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='ccUser.cc' object='libccontrol_la-ccUser.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libccontrol_la_CXXFLAGS) $(CXXFLAGS) -c -o libccontrol_la-ccUser.lo `test -f 'ccUser.cc' || echo '$(srcdir)/'`ccUser.cc
+
+libccontrol_la-ccontrol_generic.lo: ccontrol_generic.cc
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libccontrol_la_CXXFLAGS) $(CXXFLAGS) -MT libccontrol_la-ccontrol_generic.lo -MD -MP -MF "$(DEPDIR)/libccontrol_la-ccontrol_generic.Tpo" -c -o libccontrol_la-ccontrol_generic.lo `test -f 'ccontrol_generic.cc' || echo '$(srcdir)/'`ccontrol_generic.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libccontrol_la-ccontrol_generic.Tpo" "$(DEPDIR)/libccontrol_la-ccontrol_generic.Plo"; else rm -f "$(DEPDIR)/libccontrol_la-ccontrol_generic.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='ccontrol_generic.cc' object='libccontrol_la-ccontrol_generic.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libccontrol_la_CXXFLAGS) $(CXXFLAGS) -c -o libccontrol_la-ccontrol_generic.lo `test -f 'ccontrol_generic.cc' || echo '$(srcdir)/'`ccontrol_generic.cc
 
 libccontrol_la-CHANINFOCommand.lo: CHANINFOCommand.cc
 @am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libccontrol_la_CXXFLAGS) $(CXXFLAGS) -MT libccontrol_la-CHANINFOCommand.lo -MD -MP -MF "$(DEPDIR)/libccontrol_la-CHANINFOCommand.Tpo" -c -o libccontrol_la-CHANINFOCommand.lo `test -f 'CHANINFOCommand.cc' || echo '$(srcdir)/'`CHANINFOCommand.cc; \
