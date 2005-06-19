@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: WHOISCommand.cc,v 1.23 2005/06/19 01:55:00 kewlio Exp $
+ * $Id: WHOISCommand.cc,v 1.24 2005/06/19 14:39:42 kewlio Exp $
  */
 
 #include	<string>
@@ -33,7 +33,7 @@
 #include	"ccontrol_generic.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: WHOISCommand.cc,v 1.23 2005/06/19 01:55:00 kewlio Exp $" ) ;
+RCSTAG( "$Id: WHOISCommand.cc,v 1.24 2005/06/19 14:39:42 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -87,6 +87,15 @@ else
 		xIP(Target->getIP() ).GetNumericIP().c_str()
 		) ;
 	}
+
+if (Target->getConnectTime() > 0)
+{
+	/* we have a client connection timestamp, display it */
+	bot->Notice(theClient, "%s has been connected for %s [since %ld]",
+		st[1].c_str(),
+		Ago(Target->getConnectTime()),
+		Target->getConnectTime());
+}
 
 if (Target->isModeR())
 {
