@@ -16,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccUser.h,v 1.17 2003/06/28 01:21:19 dan_karrels Exp $
+ * $Id: ccUser.h,v 1.18 2005/06/19 02:38:51 kewlio Exp $
  */
 
 #ifndef __CCUSER_H
-#define __CCUSER_H "$Id: ccUser.h,v 1.17 2003/06/28 01:21:19 dan_karrels Exp $"
+#define __CCUSER_H "$Id: ccUser.h,v 1.18 2005/06/19 02:38:51 kewlio Exp $"
 
 #include	<string>
 
@@ -96,6 +96,12 @@ public:
 	
 	inline const time_t&		getSuspendExpires() const
 		    { return SuspendExpires ; }
+
+	inline const time_t&		getLastAuthTS() const
+		    { return LastAuthTS; }
+
+	inline const string&		getLastAuthNumeric() const
+		    { return LastAuthNumeric; }
 
 	inline const unsigned int	getSuspendLevel() const
 		{ return SuspendLevel; }
@@ -175,6 +181,12 @@ public:
 		
 	inline void 			setSuspendExpires( const unsigned int _expire )
 		    { SuspendExpires = _expire; }
+
+	inline void			setLastAuthTS(const unsigned int _lastauth)
+		    { LastAuthTS = _lastauth; }
+
+	inline void			setLastAuthNumeric(const string& _numeric)
+		    { LastAuthNumeric = _numeric; }
 
 	inline void 			setSuspendLevel( const unsigned int _level )
 		    { SuspendLevel = _level; }
@@ -283,6 +295,8 @@ protected:
 	bool Notice;
 	iClient* Client;
 	PgDatabase* SQLDb;
+	time_t LastAuthTS;
+	string LastAuthNumeric;
 
 } ; // class ccUser
 
