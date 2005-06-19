@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: CONFIGCommand.cc,v 1.10 2005/06/18 22:06:05 kewlio Exp $
+ * $Id: CONFIGCommand.cc,v 1.11 2005/06/19 01:39:24 kewlio Exp $
  */
 
 #include	<string>
@@ -26,7 +26,7 @@
 #include	"CControlCommands.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: CONFIGCommand.cc,v 1.10 2005/06/18 22:06:05 kewlio Exp $" ) ;
+RCSTAG( "$Id: CONFIGCommand.cc,v 1.11 2005/06/19 01:39:24 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -95,6 +95,29 @@ for(unsigned int  pos =1; pos < st.size() ;)
                         }
                 pos+=2;
                 }
+        else if(!strcasecmp(st[pos],"-CClonesTime"))
+  	        {
+  	        if(st.size() < pos +2)
+  	                 {
+  	                 bot->Notice(theClient,"-CClonesTime must get the duration in seconds between announcements per netblock.");
+  	                 return true;
+  	                 }
+  	        if((atoi(st[pos+1].c_str())<0) || (atoi(st[pos+1].c_str())>300))
+  	                 {
+  	                 bot->Notice(theClient,"-CClonesTime value must be between 0 and 300 seconds.");
+  	                 return true;
+  	                 }
+  	        if(!bot->updateMisc("CClonesTime",atoi(st[pos+1].c_str())))
+  	                 {
+  	                 bot->MsgChanLog("Error while updating the Duration time.\n");
+  	                 }
+  	        else
+  	                 {
+  	                 bot->Notice(theClient,"%s was successfully updated to %s",
+  	                 st[pos].c_str(),st[pos+1].c_str());
+  	                 }
+                 pos+=2;
+                 }
         else if(!strcasecmp(st[pos],"-CClones"))
                 {
                 if(st.size() < pos +2)
