@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: client.cc,v 1.79 2005/03/17 18:35:10 mrbean_ Exp $
+ * $Id: client.cc,v 1.80 2005/06/19 15:08:22 kewlio Exp $
  */
 
 #include	<new>
@@ -47,7 +47,7 @@
 #include	"ELog.h"
 #include	"events.h"
 
-RCSTAG("$Id: client.cc,v 1.79 2005/03/17 18:35:10 mrbean_ Exp $" ) ;
+RCSTAG("$Id: client.cc,v 1.80 2005/06/19 15:08:22 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -2081,21 +2081,21 @@ if( !isConnected() )
 	return false ;
 	}
 
-bool OnChannel = isOnChannel( theChan ) ;
+/* bool OnChannel = isOnChannel( theChan ) ;
 if( !OnChannel )
 	{
 	Join( theChan ) ;
-	}
+	} */
 
 Write( "%s I %s %s",
 	getCharYYXXX().c_str(),
 	theClient->getNickName().c_str(),
 	theChan->getName().c_str() ) ;
 
-if( !OnChannel )
+/* if( !OnChannel )
 	{
 	Part( theChan ) ;
-	}
+	} */
 
 return true ; 
 }
