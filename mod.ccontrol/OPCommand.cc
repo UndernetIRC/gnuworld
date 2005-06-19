@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: OPCommand.cc,v 1.14 2005/03/17 18:35:14 mrbean_ Exp $
+ * $Id: OPCommand.cc,v 1.15 2005/06/19 14:54:51 kewlio Exp $
  */
 
 #include	<set>
@@ -32,7 +32,7 @@
 #include	"ccBadChannel.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: OPCommand.cc,v 1.14 2005/03/17 18:35:14 mrbean_ Exp $" ) ;
+RCSTAG( "$Id: OPCommand.cc,v 1.15 2005/06/19 14:54:51 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -44,6 +44,8 @@ namespace uworld
 
 bool OPCommand::Exec( iClient* theClient, const string& Message )
 {
+bool foundUser = false;
+
 StringTokenizer st( Message ) ;
 if( st.size() < 3 )
 	{
@@ -97,11 +99,19 @@ for( StringTokenizer::size_type i = 2 ; i < st.size() ; ++i )
 		{
 		continue ;
 		}
+	/* ok, the user is on the channel - flag it */
+	foundUser = true;
 	modes +="o";
 	args +=st[i]+ " ";
 	
 	} // for
 
+if (!foundUser)
+{
+	bot->Notice(theClient, "I'm sorry, I couldn't find anyone to op in %s!",
+		st[1].c_str());
+	return false;
+}
 if( !args.empty() )
 	{
 	bot->Mode(theChan,modes,args,true);
