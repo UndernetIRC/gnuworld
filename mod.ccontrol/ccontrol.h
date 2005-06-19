@@ -16,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccontrol.h,v 1.94 2005/06/18 22:06:40 kewlio Exp $
+ * $Id: ccontrol.h,v 1.95 2005/06/19 01:38:27 kewlio Exp $
  */
 
 #ifndef __CCONTROL_H
-#define __CCONTROL_H "$Id: ccontrol.h,v 1.94 2005/06/18 22:06:40 kewlio Exp $"
+#define __CCONTROL_H "$Id: ccontrol.h,v 1.95 2005/06/19 01:38:27 kewlio Exp $"
 
 //Undef this if you want to log to the database
 #define LOGTOHD 
@@ -165,7 +165,7 @@ protected:
 	exceptionListType		exceptionList;
 	
 	
-	typedef map<string,int> 	clientsIpMapType;
+	typedef map<string,long> 	clientsIpMapType;
 	
 	typedef clientsIpMapType::iterator clientsIpIterator;
 	
@@ -805,6 +805,8 @@ public:
 
 	clientsIpMapType		clientsIp24Map;
 
+	clientsIpMapType		clientsIp24MapLastWarn;
+
 	clientsIpIterator clientsIp24_begin()
 		{ return clientsIp24Map.begin(); }
 
@@ -956,6 +958,8 @@ protected:
 	int			maxCClones;
 
 	int			CClonesCIDR;
+
+	int			CClonesTime;
 
 	bool			CClonesGline;
 
