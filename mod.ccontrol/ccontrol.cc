@@ -20,11 +20,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccontrol.cc,v 1.188 2005/06/19 02:39:43 kewlio Exp $
+ * $Id: ccontrol.cc,v 1.189 2005/06/19 12:10:44 kewlio Exp $
 */
 
 #define MAJORVER "1"
-#define MINORVER "2pl2"
+#define MINORVER "2pl3"
 #define RELDATE "18th June, 2005"
 
 #include        <sys/types.h> 
@@ -63,9 +63,10 @@
 #include	"ccFloodData.h"
 #include	"ccUserData.h"
 #include	"ip.h"
+#include	"ccontrol_generic.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: ccontrol.cc,v 1.188 2005/06/19 02:39:43 kewlio Exp $" ) ;
+RCSTAG( "$Id: ccontrol.cc,v 1.189 2005/06/19 12:10:44 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -4311,10 +4312,10 @@ for(glineIterator ptr = gline_begin();ptr != gline_end();++ptr)
 	if((tempGline ->getExpires() > ::time(0)) 
 	    && (!match(Mask,tempGline->getHost())))
 		{
-		Notice(theClient,"Host : %s , Expires At : %s[%d] , AddedBy %s"
+		Notice(theClient,"Host: %s, Expires: [%ld] %s, Added By %s"
 			,tempGline->getHost().c_str()
-			,convertToAscTime(tempGline->getExpires())
 			,tempGline->getExpires()
+			,Duration(tempGline->getExpires() - time(NULL))
 			,tempGline->getAddedBy().c_str());
 		}
 	}
@@ -4326,10 +4327,10 @@ for(glineIterator ptr = rnGlineList.begin();ptr != rnGlineList.end();++ptr)
 	if((tempGline ->getExpires() > ::time(0)) 
 	    && (!match(Mask,tempGline->getHost())))
 		{
-		Notice(theClient,"Host : %s , Expires At : %s[%d] , AddedBy %s"
+		Notice(theClient,"Host: %s, Expires: [%ld] %s, Added By %s"
 			,tempGline->getHost().c_str()
-			,convertToAscTime(tempGline->getExpires())
 			,tempGline->getExpires()
+			,Duration(tempGline->getExpires() - time(NULL))
 			,tempGline->getAddedBy().c_str());
 		}
 	}
@@ -4351,21 +4352,26 @@ for(serversConstIterator ptr = serversMap_begin();ptr != serversMap_end();++ptr)
 	tmpServer = ptr->second;
 	if(tmpServer->getNetServer())
 		{
-		Notice(theClient,"%s (%d) - Name : %s",tmpServer->getLastNumeric().c_str()
-		,base64toint(tmpServer->getLastNumeric().c_str()),
-		tmpServer->getName().c_str());
+		Notice(theClient,"%3s (%3d) Name: %s Version: %s",
+			tmpServer->getLastNumeric().c_str(),
+			base64toint(tmpServer->getLastNumeric().c_str()),
+			tmpServer->getName().c_str(),
+			tmpServer->getVersion().c_str());
 		}
 	else if(tmpServer->getReportMissing())
 		{
-		Notice(theClient,"%s (%d) - Name : %s *MISSING*",tmpServer->getLastNumeric().c_str()
-		,base64toint(tmpServer->getLastNumeric().c_str()),
-		tmpServer->getName().c_str());
+		Notice(theClient,"%3s (%3d) Name: %s Version: %s (\002*MISSING*\002)",
+			tmpServer->getLastNumeric().c_str(),
+			base64toint(tmpServer->getLastNumeric().c_str()),
+			tmpServer->getName().c_str(),
+			tmpServer->getVersion().c_str());
 		}
 	else
 		{
-		Notice(theClient,"Name : %s",tmpServer->getName().c_str());
+		Notice(theClient,"Name: %s Version: %s",
+			tmpServer->getName().c_str(),
+			tmpServer->getVersion().c_str());
 		}		
-	Notice(theClient,"Version : %s" ,tmpServer->getVersion().c_str());
 	}
 	 
 }
