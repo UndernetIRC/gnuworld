@@ -17,13 +17,15 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: SCANCommand.cc,v 1.12 2005/01/12 03:50:29 dan_karrels Exp $
+ * $Id: SCANCommand.cc,v 1.13 2005/06/19 20:48:10 kewlio Exp $
  */
 
 #include	<string>
 #include        <iomanip>
 
 #include	<cstdlib>
+
+#include	<map>
 
 #include	"ccontrol.h"
 #include	"CControlCommands.h"
@@ -34,7 +36,7 @@
 #include	"Constants.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: SCANCommand.cc,v 1.12 2005/01/12 03:50:29 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: SCANCommand.cc,v 1.13 2005/06/19 20:48:10 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -61,13 +63,18 @@ bot->MsgChanLog("SCAN %s\n",st.assemble(1).c_str());
 typedef list<const iClient*> clientsList;
 
 bool showUsers = false;
+bool showIdentReport = false;
 bool realHostLook = false;
 bool fakeHostLook  = false;
 bool nameLook = false;
 unsigned int pos = 1;
+string userName;
 string hostName;
 string realName;
-
+string ClientInfo;
+const iClient* curClient;
+typedef map<string,int> identMapType;
+identMapType identMap;
 clientsList cList;
 
 for(pos = 1; pos < st.size() ; )
@@ -75,6 +82,11 @@ for(pos = 1; pos < st.size() ; )
 	if(!strcasecmp(st[pos],"-v"))
 		{
 		showUsers = true;
+		++pos;
+		}
+	else if(!strcasecmp(st[pos],"-i"))
+		{
+		showIdentReport = true;
 		++pos;
 		}
 	else if(!strcasecmp(st[pos],"-h"))
@@ -168,10 +180,11 @@ else
 	}
 
 unsigned int shown = 0;
+unsigned int ident_nonidented = 0;
+unsigned int ident_count = 0;
 	
 if(showUsers)
 	{				
-	const iClient* curClient;
 	const ChannelUser* curChannel;
 	string ClientInfo;
 	for(clientsList::iterator cptr = cList.begin();((cptr!=cList.end()) && (shown < 15));++cptr)
@@ -200,6 +213,31 @@ if(showUsers)
 		bot->Notice(theClient,"%s",ClientInfo.c_str());
 		}
 	}
+
+/* do ident report here (if selected) */
+if(showIdentReport)
+{
+	/* ok, show the report */
+	for (clientsList::iterator cptr = cList.begin(); (cptr!=cList.end()); ++cptr)
+	{
+		/* cycle the userlist and gather stats */
+		curClient = *cptr;
+		ClientInfo = curClient->getNickUserHost();
+		userName = curClient->getUserName();
+		if (userName[0]=='~')
+		{
+			/* unidented client */
+			ident_nonidented++;
+		} else {
+			/* idented client */
+			identMap[userName]++;
+			if (identMap[userName] == 1)
+				ident_count++;
+		}
+	}
+	bot->Notice(theClient, "Ident report: %d unidented clients, %d unique idents",
+		ident_nonidented, ident_count);
+}
 		
 return true;
 }
