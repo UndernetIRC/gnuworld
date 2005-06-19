@@ -1,4 +1,22 @@
-// $Id: ChangeLog,v 1.6 2005/06/18 23:12:14 kewlio Exp $ //
+// $Id: ChangeLog,v 1.7 2005/06/19 01:09:54 kewlio Exp $ //
+
+2005-06-19	Dan-m00 <daniel@undernet.org>
+		* mod.ccontrol/ccontrol.cc: added IP after host in excessive clients msg
+			also, changed affected users count to square brackets.
+
+		* mod.ccontrol/ccontrol_generic.h: function prototypes (new file)
+
+		* mod.ccontrol/ccontrol_generic.cc: new human readable generic functions.
+
+		* mod.ccontrol/Makefile.am: Updated makefile for new files
+
+		* mod.ccontrol/Makefile.in: Updated makefile for new files
+
+		* mod.ccontrol/CHECKNETCommand.cc: made output more human readable.
+
+		* mod.ccontrol/CHANINFOCommand.cc: made output more human readable.
+
+		* mod.ccontrol/MAXUSERSCommand.cc: made output more human readable.
 
 2005-06-18	Dan-m00 <daniel@undernet.org>
 		* mod.ccontrol/FORCEGLINECommand.cc: CIDR reply info added for forceglines
