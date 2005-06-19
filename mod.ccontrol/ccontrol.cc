@@ -20,7 +20,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccontrol.cc,v 1.187 2005/06/19 01:38:52 kewlio Exp $
+ * $Id: ccontrol.cc,v 1.188 2005/06/19 02:39:43 kewlio Exp $
 */
 
 #define MAJORVER "1"
@@ -65,7 +65,7 @@
 #include	"ip.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: ccontrol.cc,v 1.187 2005/06/19 01:38:52 kewlio Exp $" ) ;
+RCSTAG( "$Id: ccontrol.cc,v 1.188 2005/06/19 02:39:43 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -1820,6 +1820,43 @@ if(dbConnected)
 			}
 		}			
 	}
+        /* check if they are already logged into us */
+        usersIterator tIterator = usersMap.begin();
+        while (tIterator != usersMap.end())
+        {
+                ccUser* tUser = tIterator->second;
+                if ((tUser->getLastAuthTS() == NewUser->getConnectTime()) &&
+                        (tUser->getLastAuthNumeric() == NewUser->getCharYYXXX()))
+                {
+                        /* it seems they are! authenticate them */
+                        /* check if someone else is already authed as them */
+                        if (tUser->getClient())
+                        {
+                                const iClient *tClient = tUser->getClient();
+                                Notice(tClient, "You have just been deauthenticated");
+                                MsgChanLog("Login conflict for user %s from %s and %s\n",
+                                        tUser->getUserName().c_str(), NewUser->getNickName().c_str(),
+                                        tClient->getNickName().c_str());
+                                deAuthUser(tUser);
+                        }
+//                      tUser->setUserName(tUser->getUserName);         // not required as we're already set
+                        tUser->setNumeric(NewUser->getCharYYXXX());
+                        // Try creating an authentication entry for the user
+                        if (AuthUser(tUser, NewUser))
+                                if (!(isSuspended(tUser)))
+                                        Notice(NewUser, "Automatic authentication after netsplit successful!", tUser->getUserName().c_str());
+                                else
+                                        Notice(NewUser, "Automatic authentication after netsplit successful, however you are suspended", tUser->getUserName().c_str());
+                        else
+                                Notice(NewUser, "Error in authentication", tUser->getUserName().c_str());
+                        MsgChanLog("(%s) - %s : AUTO-AUTHENTICATED\n", tUser->getUserName().c_str(),
+                                NewUser->getRealNickUserHost().c_str());
+                        /* had enough checking, break out of the loop */
+                        break;
+                }
+                ++tIterator;
+        }
+        /* if we get here, there's no matching user */
 }
 
 void ccontrol::addGlineToUplink(ccGline* theGline)
