@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: CHANINFOCommand.cc,v 1.16 2005/01/12 03:50:29 dan_karrels Exp $
+ * $Id: CHANINFOCommand.cc,v 1.17 2005/06/19 01:09:14 kewlio Exp $
  */
 
 #include	<string>
@@ -27,9 +27,10 @@
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 #include	"Constants.h"
+#include	"ccontrol_generic.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: CHANINFOCommand.cc,v 1.16 2005/01/12 03:50:29 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: CHANINFOCommand.cc,v 1.17 2005/06/19 01:09:14 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -68,8 +69,8 @@ if( NULL == theChan )
 bot->Notice( theClient, "Channel %s is mode %s",
 	st[ 1 ].c_str(),
 	theChan->getModeString().c_str() ) ;
-bot->Notice( theClient, "Created at time: %d",
-	theChan->getCreationTime() ) ;
+bot->Notice( theClient, "Created at time: %d (%s ago)",
+	theChan->getCreationTime(), Ago(theChan->getCreationTime()));
 bot->Notice( theClient, "Number of channel users: %d",
 	theChan->size() ) ;
 

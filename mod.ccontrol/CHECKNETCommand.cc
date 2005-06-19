@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: CHECKNETCommand.cc,v 1.16 2005/01/12 03:50:29 dan_karrels Exp $
+ * $Id: CHECKNETCommand.cc,v 1.17 2005/06/19 01:09:14 kewlio Exp $
  */
 
 #include	<string>
@@ -26,9 +26,10 @@
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 #include	"ccServer.h"
+#include	"ccontrol_generic.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: CHECKNETCommand.cc,v 1.16 2005/01/12 03:50:29 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: CHECKNETCommand.cc,v 1.17 2005/06/19 01:09:14 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -61,23 +62,30 @@ for (ccontrol::serversConstIterator ptr = bot->serversMap_begin() ;
 		Msg = "Server \002";
 		Msg += CurServer->getName(); 
 		Msg +="\002 Is missing, ";
-		Msg += "Last split time : ";
+		Msg += "Last split: ";
 		if(CurServer->getLastSplitted() != 0)
 			{
-			sprintf(tNum,"%li",CurServer->getLastSplitted());
+			sprintf(tNum, "%li", CurServer->getLastSplitted());
+			Msg += "[";
 			Msg += tNum;
-			Msg += " Split Reason:";
+			Msg += "] ";
+			Msg += Ago(CurServer->getLastSplitted());
+			Msg += " ago, Split Reason:";
 			Msg += CurServer->getSplitReason();
 			}
 		else
 			Msg += " unknown ";
 			
-		Msg += " Last connection time : ";
+		Msg += " Last connected: ";
 		
 		if(CurServer->getLastConnected() != 0)
 			{
-			sprintf(tNum,"%li",CurServer->getLastConnected());
+			sprintf(tNum, "%li", CurServer->getLastConnected());
+			Msg += "[";
 			Msg += tNum;
+			Msg += "] ";
+			Msg += Ago(CurServer->getLastConnected());
+			Msg += " ago";
 			}
 		else
 			Msg += " unknown ";

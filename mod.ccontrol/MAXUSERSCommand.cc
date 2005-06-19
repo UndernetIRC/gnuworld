@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: MAXUSERSCommand.cc,v 1.5 2005/01/12 03:50:29 dan_karrels Exp $
+ * $Id: MAXUSERSCommand.cc,v 1.6 2005/06/19 01:09:14 kewlio Exp $
  */
 
 #include	<string>
@@ -25,9 +25,10 @@
 #include	"StringTokenizer.h"
 #include	"ccontrol.h"
 #include	"CControlCommands.h"
+#include	"ccontrol_generic.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: MAXUSERSCommand.cc,v 1.5 2005/01/12 03:50:29 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: MAXUSERSCommand.cc,v 1.6 2005/06/19 01:09:14 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -39,7 +40,8 @@ bool MAXUSERSCommand::Exec( iClient* theClient, const string& )
 {
 bot->Notice(theClient,"Current number of users is : %d",bot->getCurUsers());
 bot->Notice(theClient,"Maximum number of users ever recorded is : %d",bot->getMaxUsers());
-bot->Notice(theClient,"Recorded on %s",bot->convertToAscTime(bot->getDateMax()));
+bot->Notice(theClient,"Recorded on %s (%s ago)",bot->convertToAscTime(bot->getDateMax()),
+	Ago(bot->getDateMax()));
 
 return true;
 }
