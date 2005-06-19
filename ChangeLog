@@ -1,4 +1,23 @@
-// $Id: ChangeLog,v 1.10 2005/06/19 13:43:19 kewlio Exp $ //
+// $Id: ChangeLog,v 1.11 2005/06/19 20:55:09 kewlio Exp $ //
+
+2005-06-19	Dan-m00 <daniel@undernet.org>
+		* mod.ccontrol/WHOISCommand.cc: added connection time to 'whois' command in
+			human readable format - also listed unix ts for those that like to convert.
+
+		* mod.ccontrol/OPCommand.cc: check that at least 1 user to op is in the
+			channel to op!  If not, tell the user.
+
+		* src/client.cc: don't require ccontrol user to join channel in order to invite.
+
+		* mod.ccontrol/INVITECommand.cc: check that the channel exists before issuing an invite.
+
+		* mod.ccontrol/DEOPCommand.cc: check that at least 1 user to deop is in the
+			channel!  If not, tell the user.
+
+		* mod.ccontrol/SCANCommand.cc: add extra option "-i" to SCAN command.
+			- shows an ident report (number of unique idents etc to assist clone hunters)
+
+		* mod.ccontrol/ccontrol.cc: update syntax in 'SCAN' command.
 
 2005-06-19	Dan-m00 <daniel@undernet.org>
 		* mod.ccontrol/ccontrol_generic.h: added Duration() function similar to Ago()
