@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: WHOISCommand.cc,v 1.22 2005/01/12 03:50:29 dan_karrels Exp $
+ * $Id: WHOISCommand.cc,v 1.23 2005/06/19 01:55:00 kewlio Exp $
  */
 
 #include	<string>
@@ -30,9 +30,10 @@
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 #include	"ip.h"
+#include	"ccontrol_generic.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: WHOISCommand.cc,v 1.22 2005/01/12 03:50:29 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: WHOISCommand.cc,v 1.23 2005/06/19 01:55:00 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -86,6 +87,14 @@ else
 		xIP(Target->getIP() ).GetNumericIP().c_str()
 		) ;
 	}
+
+if (Target->isModeR())
+{
+	/* client is authed - show it here */
+	bot->Notice(theClient, "%s is authed as [%s]",
+		st[1].c_str(),
+		Target->getAccount().c_str());
+}
 
 bot->Notice( theClient, "Numeric: %s, UserModes: %s, Server Numeric: %s (%s)",
 	Target->getCharYYXXX().c_str(),
