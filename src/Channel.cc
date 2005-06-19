@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: Channel.cc,v 1.50 2005/06/18 19:36:11 kewlio Exp $
+ * $Id: Channel.cc,v 1.51 2005/06/19 00:43:06 kewlio Exp $
  */
 
 #include	<new>
@@ -38,7 +38,7 @@
 #include	"server.h"
 #include	"ConnectionManager.h"
 
-RCSTAG("$Id: Channel.cc,v 1.50 2005/06/18 19:36:11 kewlio Exp $") ;
+RCSTAG("$Id: Channel.cc,v 1.51 2005/06/19 00:43:06 kewlio Exp $") ;
 
 namespace gnuworld
 {
@@ -528,7 +528,11 @@ for( userIterator uItr = userList_begin() ; uItr != userList_end() ;
 	}
 modes = 0 ;
 limit = 0 ;
+#if __GNUC__ == 2
 key = "";
+#else
+key.clear();
+#endif
 }
 
 } // namespace gnuworld
