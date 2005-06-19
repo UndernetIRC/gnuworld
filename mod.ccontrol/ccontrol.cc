@@ -20,7 +20,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccontrol.cc,v 1.186 2005/06/18 23:46:05 kewlio Exp $
+ * $Id: ccontrol.cc,v 1.187 2005/06/19 01:38:52 kewlio Exp $
 */
 
 #define MAJORVER "1"
@@ -65,7 +65,7 @@
 #include	"ip.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: ccontrol.cc,v 1.186 2005/06/18 23:46:05 kewlio Exp $" ) ;
+RCSTAG( "$Id: ccontrol.cc,v 1.187 2005/06/19 01:38:52 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -654,7 +654,7 @@ RegisterCommand( new MAXUSERSCommand( this, "MAXUSERS",
 RegisterCommand( new CONFIGCommand( this, "CONFIG",
 	" -GTime <duration in secs> / -VClones <amount> -Clones <amount>"
 	" -CClones <amount> -CClonesCIDR <size> -CClonesGline <Yea/No>"
-	" -GBCount <count> / -GBInterval <interval in secs> "
+	" -CClonesTime <seconds> / -GBCount <count> / -GBInterval <interval in secs> "
 	" -SGline <Yes/No> "
 	"Manages all kinds of configuration related values ",
 	commandLevel::flg_CONFIG,
@@ -1224,6 +1224,8 @@ switch( theEvent )
 	                        if(--clientsIp24Map[client_ip] < 1)
 	                        {
 	                                clientsIp24Map.erase(clientsIp24Map.find(client_ip));
+					if (clientsIp24MapLastWarn[client_ip] > 0)
+						clientsIp24MapLastWarn.erase(clientsIp24MapLastWarn.find(client_ip));
 	                        }
 
 			if(--clientsIpMap[tIP] < 1)
@@ -1714,9 +1716,12 @@ if(dbConnected)
                                 if ((CurCIDRConnections > maxCClones) && (CurCIDRConnections > getExceptions(NewUser->getUserName()+"@" + tIP)) &&
                                         (CurCIDRConnections > getExceptions(NewUser->getUserName()+"@"+NewUser->getRealInsecureHost())))
 				{
-
+					if ((clientsIp24MapLastWarn[client_ip] + CClonesTime) <= time(NULL))
+					{
                                         MsgChanLog("Excessive connections (%d) from subnet *@%s/%d (will%s GLINE)\n",
                                                 CurCIDRConnections, client_ip, CClonesCIDR, CClonesGline ? "" : " _NOT_");
+					clientsIp24MapLastWarn[client_ip] = time(NULL);
+					}
                                         sprintf(Log,"Glining *@%s/%d for excessive connections (%d)",
                                                 client_ip, CClonesCIDR, CurCIDRConnections);
                                         sprintf(GlineMask,"*@%s/%d", client_ip, CClonesCIDR);
@@ -3758,6 +3763,7 @@ bool gotVClones = false;
 bool gotClones = false;
 bool gotCClones = false;
 bool gotCClonesCIDR = false;
+bool gotCClonesTime = false;
 bool gotCClonesGline = false;
 bool gotGLen = false;
 bool gotSave = false;
@@ -3817,6 +3823,11 @@ for(int i=0; i< SQLDb->Tuples();++i)
                 gotCClonesCIDR = true;
                 CClonesCIDR = atoi(SQLDb->GetValue(i,1));
                 }
+	else if(!strcasecmp(SQLDb->GetValue(i,0),"CClonesTime"))
+		{
+		gotCClonesTime = true;
+		CClonesTime = atoi(SQLDb->GetValue(i,1));
+		}
         else if(!strcasecmp(SQLDb->GetValue(i,0),"CClonesGline"))
                 {
                 gotCClonesGline = true;
@@ -3865,6 +3876,11 @@ if(!gotCClonesCIDR)
         CClonesCIDR = 24;
         updateMisc("CClonesCIDR",CClonesCIDR);
         }
+if(!gotCClonesTime)
+	{
+	CClonesTime = 60;
+	updateMisc("CClonesTime",CClonesTime);
+	}
 if(!gotCClonesGline)
         {
         CClonesGline = false;
@@ -4644,6 +4660,7 @@ Notice(tmpClient,"Total of %d users in the map",usersMap.size());
 Notice(tmpClient,"GBCount : %d , GBInterval : %d",glineBurstCount,glineBurstInterval);
 Notice(tmpClient,"Max Clones : %d , Max Virtual Clones : %d",maxClones,maxVClones);
 Notice(tmpClient,"Max CIDR Clones: %d per /%d - Auto-Gline: %s",maxCClones,CClonesCIDR,CClonesGline ? "True" : "False");
+Notice(tmpClient,"  (%d seconds between announcements per block)", CClonesTime);
 Notice(tmpClient,"Save gline is : %s",saveGlines ? "True" : "False"); 
 Notice(tmpClient,"Bursting : %s",inBurst ? "True" : "False");
 }
@@ -4675,6 +4692,10 @@ else if(!strcasecmp(varName,"CClonesCIDR"))
         {
         CClonesCIDR = Value;
         }
+else if(!strcasecmp(varName,"CClonesTime"))
+	{
+	CClonesTime = Value;
+	}
 else if(!strcasecmp(varName,"CClonesGline"))
         {
         CClonesGline = (Value == 1);
