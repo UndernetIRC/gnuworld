@@ -1,4 +1,14 @@
-// $Id: ChangeLog,v 1.7 2005/06/19 01:09:54 kewlio Exp $ //
+// $Id: ChangeLog,v 1.8 2005/06/19 01:58:48 kewlio Exp $ //
+
+2005-06-19	Dan-m00 <daniel@undernet.org>
+		* mod.ccontrol/ccontrol.h: added new global variable (CClonesTime) for below.
+			- changed format of client ip maps from int to long (to hold timestamps)
+
+		* mod.ccontrol/ccontrol.cc: added configurable time between cidr clones announcements.
+
+		* mod.ccontrol/CONFIGCommand.cc: as above.
+
+		* mod.ccontrol/WHOISCommand.cc: added 'account' status in 'whois' command
 
 2005-06-19	Dan-m00 <daniel@undernet.org>
 		* mod.ccontrol/ccontrol.cc: added IP after host in excessive clients msg
