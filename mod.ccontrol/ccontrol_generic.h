@@ -16,8 +16,9 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccontrol_generic.h,v 1.1 2005/06/19 01:07:25 kewlio Exp $
+ * $Id: ccontrol_generic.h,v 1.2 2005/06/19 12:09:56 kewlio Exp $
  */
 
 char *Ago(long ts);
+char *Duration(long ts);
 
