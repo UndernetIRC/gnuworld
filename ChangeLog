@@ -1,4 +1,15 @@
-// $Id: ChangeLog,v 1.9 2005/06/19 02:51:15 kewlio Exp $ //
+// $Id: ChangeLog,v 1.10 2005/06/19 13:43:19 kewlio Exp $ //
+
+2005-06-19	Dan-m00 <daniel@undernet.org>
+		* mod.ccontrol/ccontrol_generic.h: added Duration() function similar to Ago()
+
+		* mod.ccontrol/ccontrol_generic.cc: added Duration() function similar to Ago()
+
+		* mod.ccontrol/ccontrol.cc: changed output of 'list' commands to be more readable
+			- made output of 'list glines' more human readable
+			- made output of 'list servers' more human readable
+
+		* mod.ccontrol/DEAUTHCommand.cc: stop auto-authentication after netsplit if deauth'd
 
 2005-06-19	Dan-m00 <daniel@undernet.org>
 		* mod.ccontrol/ccUser.h: added LastAuthTS + LastAuthNumeric to users class
