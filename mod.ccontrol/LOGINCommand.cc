@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: LOGINCommand.cc,v 1.29 2005/01/12 03:50:29 dan_karrels Exp $
+ * $Id: LOGINCommand.cc,v 1.30 2005/06/19 02:39:14 kewlio Exp $
  */
 
 #include	<string>
@@ -35,7 +35,7 @@
 #include	"ip.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: LOGINCommand.cc,v 1.29 2005/01/12 03:50:29 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: LOGINCommand.cc,v 1.30 2005/06/19 02:39:14 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -164,6 +164,9 @@ else
 	        bot->Notice(theClient, "Error in authentication ",theUser->getUserName().c_str()); 
         bot->MsgChanLog("(%s) - %s : AUTHENTICATED\n",theUser->getUserName().c_str()
                         ,theClient->getRealNickUserHost().c_str());
+	/* record their connection timestamp + numeric */
+	theUser->setLastAuthTS(theClient->getConnectTime());
+	theUser->setLastAuthNumeric(theClient->getCharYYXXX());
 	} 
 
 return true; 
