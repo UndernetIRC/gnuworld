@@ -20,7 +20,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccontrol.cc,v 1.189 2005/06/19 12:10:44 kewlio Exp $
+ * $Id: ccontrol.cc,v 1.190 2005/06/19 20:47:39 kewlio Exp $
 */
 
 #define MAJORVER "1"
@@ -66,7 +66,7 @@
 #include	"ccontrol_generic.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: ccontrol.cc,v 1.189 2005/06/19 12:10:44 kewlio Exp $" ) ;
+RCSTAG( "$Id: ccontrol.cc,v 1.190 2005/06/19 20:47:39 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -635,7 +635,7 @@ RegisterCommand( new SHUTDOWNCommand( this, "SHUTDOWN",
 	operLevel::CODERLEVEL,
 	true ) ) ;
 RegisterCommand( new SCANCommand( this, "SCAN",
-	" -h <host> / -n <real name> [-v]"
+	" -h <host> / -n <real name> [-v] [-i]"
 	" Scans for all users which much a certain host / real name ",
 	commandLevel::flg_SCAN,
 	false,
