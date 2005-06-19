@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: DEAUTHCommand.cc,v 1.12 2005/01/12 03:50:29 dan_karrels Exp $
+ * $Id: DEAUTHCommand.cc,v 1.13 2005/06/19 12:17:50 kewlio Exp $
  */
 
 #include	<string>
@@ -29,7 +29,7 @@
 #include	"StringTokenizer.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: DEAUTHCommand.cc,v 1.12 2005/01/12 03:50:29 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: DEAUTHCommand.cc,v 1.13 2005/06/19 12:17:50 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -53,6 +53,9 @@ if(bot->deAuthUser(tmpUser))
 	bot->Notice(theClient,"DeAuthentication successfull");
 	bot->MsgChanLog("(%s) - %s : Deauthenticated\n",tmpUser->getUserName().c_str()
 			,theClient->getRealNickUserHost().c_str());
+	/* forget their details to stop them getting auto-authenticated after netsplit */
+	tmpUser->setLastAuthTS(1);		/* if uninitialised, this would be 0 - so 1 should be a safe figure! */
+	tmpUser->setLastAuthNumeric("");
 	return true;
 	}
 else
