@@ -1,4 +1,18 @@
-// $Id: ChangeLog,v 1.11 2005/06/19 20:55:09 kewlio Exp $ //
+// $Id: ChangeLog,v 1.12 2005/06/20 23:14:57 kewlio Exp $ //
+
+2005-06-20	Dan-m00 <daniel@undernet.org>
+		* include/Channel.h: added new variables to channel structure;
+			topic_ts (timestamp topic was set)
+			topic_whoset (who set the topic in "nick!user@host [ip]" format
+			added get/setTopicTS(), get/setTopicWhoSet() functions
+
+		* libircu/msg_T.cc: update topic timestamp + who set when we receive topics
+			also fixed a bug that stopped topic_track working in u2.10.12
+
+		* src/iClient.cc: when new channel is created (and topic_track enabled), initialise
+			new variables to 0/blank.
+
+		* mod.ccontrol/CHANINFOCommand.cc: add new topic ts+set info into 'chaninfo' command
 
 2005-06-19	Dan-m00 <daniel@undernet.org>
 		* mod.ccontrol/WHOISCommand.cc: added connection time to 'whois' command in
