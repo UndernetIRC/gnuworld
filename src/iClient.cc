@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: iClient.cc,v 1.35 2005/01/12 03:50:38 dan_karrels Exp $
+ * $Id: iClient.cc,v 1.36 2005/06/20 11:25:30 kewlio Exp $
  */
 
 #include	<new>
@@ -34,7 +34,7 @@
 #include	"ip.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: iClient.cc,v 1.35 2005/01/12 03:50:38 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: iClient.cc,v 1.36 2005/06/20 11:25:30 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -319,7 +319,12 @@ if( std::find( channelList.begin(), channelList.end(), theChan )
 
 // Add the channel to the channelList
 channelList.push_front( theChan ) ;
-
+#ifdef TOPIC_TRACK
+	/* initialise the topic data if topic_track is enabled */
+	theChan->setTopicTS(0);
+	theChan->setTopicWhoSet("");
+	theChan->setTopic("");
+#endif
 return true ;
 }
 
