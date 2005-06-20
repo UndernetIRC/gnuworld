@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: Channel.h,v 1.33 2005/06/18 20:11:21 kewlio Exp $
+ * $Id: Channel.h,v 1.34 2005/06/20 11:24:15 kewlio Exp $
  */
 
 #ifndef __CHANNEL_H
-#define __CHANNEL_H "$Id: Channel.h,v 1.33 2005/06/18 20:11:21 kewlio Exp $"
+#define __CHANNEL_H "$Id: Channel.h,v 1.34 2005/06/20 11:24:15 kewlio Exp $"
 
 #include	<string>
 #include	<map>
@@ -408,12 +408,24 @@ public:
     	const std::string& getTopic() const
 		{ return topic; }
 
+	const std::string& getTopicWhoSet() const
+		{ return topic_whoset; }
+
+	const long& getTopicTS() const
+		{ return topic_ts; }
+
 	/**
 	 * Sets this channel's topic value to the value passed in.
 	 * This method exists only if TOPIC_TRACK is defined.
 	 */
 	void setTopic( const std::string& _Topic )
 		{ topic = _Topic; }
+
+	void setTopicWhoSet( const std::string& _TopicWhoSet )
+		{ topic_whoset = _TopicWhoSet; }
+
+	void setTopicTS( const long& _TopicTS )
+		{ topic_ts = _TopicTS; }
 	
 #endif	
 	
@@ -522,6 +534,10 @@ protected:
 	 * This channel's topic, only if TOPIC_TRACK is defined.
 	 */
 	std::string	topic;
+
+	std::string	topic_whoset;
+
+	long		topic_ts;
 #endif
 
 } ;
