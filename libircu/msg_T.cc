@@ -17,13 +17,14 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_T.cc,v 1.7 2005/03/25 03:07:29 dan_karrels Exp $
+ * $Id: msg_T.cc,v 1.8 2005/06/20 11:26:33 kewlio Exp $
  */
 
 #include	<string>
 #include	<iostream>
 
 #include	"gnuworld_config.h"
+#include	"ip.h"
 #include	"server.h"
 #include	"xparameters.h"
 #include	"Network.h"
@@ -31,7 +32,7 @@
 #include	"Channel.h"
 #include	"ServerCommandHandler.h"
 
-RCSTAG( "$Id: msg_T.cc,v 1.7 2005/03/25 03:07:29 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: msg_T.cc,v 1.8 2005/06/20 11:26:33 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -61,16 +62,33 @@ if( 0 == theChan )
 	return false ;
 	}
 
-#ifdef TOPIC_TRACK
-
-theChan->setTopic( Param[ 2 ] ) ;
-
-#endif // TOPIC_TRACK
-
 // srcClient may be NULL if a server is setting the topic
 iClient* srcClient = Network->findClient( Param[ 0 ] ) ;
 
-std::string newTopic( Param[ 2 ] ) ;
+#ifdef TOPIC_TRACK
+if (Param.size() == 5)
+{
+	/* this is a .12 hub! */
+	/* params = numeric, channel, channel creation ts, topic ts, topic */
+	theChan->setTopic(Param[4]);
+	theChan->setTopicTS(atoi(Param[3]));
+} else {
+	/* this is a .11 hub! (3 arguments) */
+	/* params = numeric, channel, topic */
+	theChan->setTopic(Param[2]);
+	theChan->setTopicTS(::time(NULL));
+}
+if (srcClient == NULL)
+{
+	theChan->setTopicWhoSet("unknown");
+} else {
+	std::string client_ip;
+	client_ip = xIP(srcClient->getIP()).GetNumericIP();
+	theChan->setTopicWhoSet(srcClient->getNickUserHost() + " [" + client_ip + "]");
+}
+#endif // TOPIC_TRACK
+
+std::string newTopic(Param[ 2 ] ) ;
 
 // No need to pass the new topic, it has already been stored
 // in the theChan
