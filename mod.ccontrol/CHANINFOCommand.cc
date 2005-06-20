@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: CHANINFOCommand.cc,v 1.17 2005/06/19 01:09:14 kewlio Exp $
+ * $Id: CHANINFOCommand.cc,v 1.18 2005/06/20 11:27:02 kewlio Exp $
  */
 
 #include	<string>
@@ -30,7 +30,7 @@
 #include	"ccontrol_generic.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: CHANINFOCommand.cc,v 1.17 2005/06/19 01:09:14 kewlio Exp $" ) ;
+RCSTAG( "$Id: CHANINFOCommand.cc,v 1.18 2005/06/20 11:27:02 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -77,6 +77,13 @@ bot->Notice( theClient, "Number of channel users: %d",
 #ifdef TOPIC_TRACK
 bot->Notice(theClient,"Topic: %s",
 	theChan->getTopic().c_str());
+if (theChan->getTopicTS() != 0)
+{
+	bot->Notice(theClient, "Topic set %s ago [%ld] by %s",
+		Ago(theChan->getTopicTS()),
+		theChan->getTopicTS(),
+		theChan->getTopicWhoSet().c_str());
+}
 #endif
 return true ;
 }
