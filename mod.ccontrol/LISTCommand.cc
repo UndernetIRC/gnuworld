@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: LISTCommand.cc,v 1.14 2005/06/24 00:20:45 kewlio Exp $
+ * $Id: LISTCommand.cc,v 1.15 2005/06/24 13:23:15 kewlio Exp $
  */
 
 #include	<string>
@@ -32,7 +32,7 @@
 #include	"StringTokenizer.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: LISTCommand.cc,v 1.14 2005/06/24 00:20:45 kewlio Exp $" ) ;
+RCSTAG( "$Id: LISTCommand.cc,v 1.15 2005/06/24 13:23:15 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -83,7 +83,7 @@ else if(!strcasecmp(st[1].c_str(),"channels"))
 		/* new "list channels" command */
 		if (!strcasecmp(st[2].c_str(),"key"))
 		{
-			if (st.size() < 3)
+			if (st.size() < 4)
 			{
 				bot->Notice(theClient, "for 'list channels key', you must supply the key to search for!");
 				return false;
