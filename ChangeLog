@@ -1,4 +1,26 @@
-// $Id: ChangeLog,v 1.14 2005/06/24 15:34:06 kewlio Exp $ //
+// $Id: ChangeLog,v 1.15 2005/06/24 22:50:19 kewlio Exp $ //
+
+2005-06-24	Dan-m00 <daniel@undernet.org>
+		* include/Channel.h: added support for new u2.10.12 "+D" channel mode.
+
+		* libircu/msg_B.cc: as above.
+
+		* libircu/msg_CM.cc: as above.
+
+		* libircu/msg_M.cc: as above.
+
+		* src/Channel.cc: as above.
+
+		* src/client.cc: as above.
+
+		* src/server.cc: as above.
+
+		* include/Network.h: added function prototype for GetChannelsWithModes()
+
+		* src/Network.cc: added function for GetChannelsWithModes()
+
+		* mod.ccontrol/LISTCommand.cc: updated 'list' command to include the following:
+			'list channels modes X'
 
 2005-06-24	Dan-m00 <daniel@undernet.org>
 		* include/Network.h: added function prototype for the following functions:
