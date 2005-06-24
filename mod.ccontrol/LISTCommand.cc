@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: LISTCommand.cc,v 1.16 2005/06/24 14:41:29 kewlio Exp $
+ * $Id: LISTCommand.cc,v 1.17 2005/06/24 15:20:39 kewlio Exp $
  */
 
 #include	<string>
@@ -32,7 +32,7 @@
 #include	"StringTokenizer.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: LISTCommand.cc,v 1.16 2005/06/24 14:41:29 kewlio Exp $" ) ;
+RCSTAG( "$Id: LISTCommand.cc,v 1.17 2005/06/24 15:20:39 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -82,6 +82,16 @@ else if(!strcasecmp(st[1].c_str(),"exceptions"))
 else if(!strcasecmp(st[1].c_str(),"channels"))
 	{
 		/* new "list channels" command */
+		if (st.size() < 3)
+		{
+			/* not enough parameters */
+#ifdef TOPIC_TRACK
+			bot->Notice(theClient, "'list channels' requires 'key', 'topic' or 'topicby'");
+#else
+			bot->Notice(theClient, "'list channels' requires 'key'");
+#endif
+			return false;
+		}
 		if (!strcasecmp(st[2].c_str(),"key"))
 		{
 			if (st.size() < 4)
@@ -110,6 +120,7 @@ else if(!strcasecmp(st[1].c_str(),"channels"))
 			bot->Notice(theClient, "--==[ End of 'list channels key %s' - %d found ]==--",
 				st[3].c_str(), channelList.size());
 		}
+#ifdef TOPIC_TRACK
 		else if (!strcasecmp(st[2].c_str(),"topic"))
 		{
 			if (st.size() < 4)
@@ -199,6 +210,11 @@ else if(!strcasecmp(st[1].c_str(),"channels"))
 		} else {
 			bot->Notice(theClient,"'list channels' requires 'key', 'topic' or 'topicby'");
 			return false;
+#else
+		} else {
+			bot->Notice(theClient,"'list channels' requires 'key'");
+			return false;
+#endif
 		}
 	}
 else
