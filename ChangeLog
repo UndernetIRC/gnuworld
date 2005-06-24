@@ -1,11 +1,28 @@
-// $Id: ChangeLog,v 1.13 2005/06/24 00:35:34 kewlio Exp $ //
+// $Id: ChangeLog,v 1.14 2005/06/24 15:34:06 kewlio Exp $ //
+
+2005-06-24	Dan-m00 <daniel@undernet.org>
+		* include/Network.h: added function prototype for the following functions:
+			GetChannelsWithTopic()
+			GetChannelsWithTopicBy()
+
+		* src/Network.cc: added functions (above)
+
+		* mod.ccontrol/LISTCommand.cc: updated 'list' command to include the following:
+			'list channels topic X'
+			'list channels topicby nick!user@host'
+
+		* mod.ccontrol/ccontrol.cc: updated usage syntax for 'list' command to include 'channels'
+
+2005-06-24	Dan-m00 <daniel@undernet.org>
+		* mod.ccontrol/LISTCommand.cc: fixed a bug which causes an assertion failure if
+			a channel key is not given in 'list channels key...' command.
 
 2005-06-23	Dan-m00 <daniel@undernet.org>
-		include/Network.h: added function prototype for GetChannelsWithKey() function
+		* include/Network.h: added function prototype for GetChannelsWithKey() function
 
-		src/Network.cc: added function GetChannelsWithKey()
+		* src/Network.cc: added function GetChannelsWithKey()
 
-		mod.ccontrol/LISTCommand.cc: updated 'list' command to include 'list channels key X'
+		* mod.ccontrol/LISTCommand.cc: updated 'list' command to include 'list channels key X'
 			to return a list of channels matching a key.
 
 2005-06-20	Dan-m00 <daniel@undernet.org>

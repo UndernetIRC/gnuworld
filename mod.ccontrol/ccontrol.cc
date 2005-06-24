@@ -20,7 +20,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccontrol.cc,v 1.190 2005/06/19 20:47:39 kewlio Exp $
+ * $Id: ccontrol.cc,v 1.191 2005/06/24 15:34:18 kewlio Exp $
 */
 
 #define MAJORVER "1"
@@ -66,7 +66,7 @@
 #include	"ccontrol_generic.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: ccontrol.cc,v 1.190 2005/06/19 20:47:39 kewlio Exp $" ) ;
+RCSTAG( "$Id: ccontrol.cc,v 1.191 2005/06/24 15:34:18 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -577,7 +577,7 @@ RegisterCommand( new REMOVEIGNORECommand( this, "REMIGNORE", "(nick/host)"
 	false,
 	operLevel::OPERLEVEL,
 	true ) ) ;
-RegisterCommand( new LISTCommand( this, "LIST", "(glines/servers/badchannels/exceptions)"
+RegisterCommand( new LISTCommand( this, "LIST", "(glines/servers/badchannels/exceptions/channels)"
 	" Get all kinds of lists from the bot",
 	commandLevel::flg_LIST,
 	false,
