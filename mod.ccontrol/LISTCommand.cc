@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: LISTCommand.cc,v 1.15 2005/06/24 13:23:15 kewlio Exp $
+ * $Id: LISTCommand.cc,v 1.16 2005/06/24 14:41:29 kewlio Exp $
  */
 
 #include	<string>
@@ -32,7 +32,7 @@
 #include	"StringTokenizer.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: LISTCommand.cc,v 1.15 2005/06/24 13:23:15 kewlio Exp $" ) ;
+RCSTAG( "$Id: LISTCommand.cc,v 1.16 2005/06/24 14:41:29 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -48,6 +48,7 @@ typedef list<const Channel*> channelListT;
 const Channel* curChannel;
 channelListT channelList;
 unsigned int count = 0;
+string Mask;
 
 StringTokenizer st( Message ) ;
 if(st.size() < 2)
@@ -108,8 +109,95 @@ else if(!strcasecmp(st[1].c_str(),"channels"))
 			}
 			bot->Notice(theClient, "--==[ End of 'list channels key %s' - %d found ]==--",
 				st[3].c_str(), channelList.size());
+		}
+		else if (!strcasecmp(st[2].c_str(),"topic"))
+		{
+			if (st.size() < 4)
+			{
+				bot->Notice(theClient, "for 'list channels topic', you must supply the topic to search for!");
+				return false;
+			}
+			/* ok, we have the topic to search for in st[3] */
+			channelList = Network->getChannelsWithTopic(st[3]);
+
+			if (channelList.empty())
+			{
+				bot->Notice(theClient, "I'm sorry, no channels have a topic matching '%s'", st[3].c_str());
+				return false;
+			}
+
+			bot->Notice(theClient, "--==[ Channels matching topic '%s' %s]==--", st[3].c_str(),
+				(channelList.size() > 15)?"- showing first 15 only":"");
+
+			for (channelListT::iterator cptr = channelList.begin(); (cptr != channelList.end()) && (count < 15); cptr++)
+			{
+				curChannel = *cptr;
+				bot->Notice(theClient, "Channel: %s", curChannel->getName().c_str());
+				count++;
+			}
+			bot->Notice(theClient, "--==[ End of 'list channels topic '%s' - %d found ]==--",
+				st[3].c_str(), channelList.size());
+		}
+		else if (!strcasecmp(st[2].c_str(),"topicby"))
+		{
+			if (st.size() < 4)
+			{
+				bot->Notice(theClient, "for 'list channels topicby', you must supply the nick!user@host mask to search for!");
+				return false;
+			}
+			/* validate the nick!user@host */
+			string::size_type atPos = st[3].find_first_of('!');
+			if (string::npos == atPos)
+			{
+				/* not in nick!user@host format */
+				/* assume they want to check nick only, but tell them just in case */
+				Mask = "";
+				Mask += st[3].c_str();
+				Mask += "!*@*";
+				bot->Notice(theClient, "Mask was not in nick!user@host format, re-writing mask to '%s'.  This may not be what you want!",
+					Mask.c_str());
+			} else {
+				/* we have nick!..., check for user@host! */
+				string::size_type atPos2 = st[3].find_first_of('@');
+				if ((string::npos == atPos2) || (atPos2 < atPos))
+				{
+					/* either no '@' or it's before the first '!' */
+					/* assume they want to check nick!user only, but tell them just in case */
+					Mask = "";
+					Mask += st[3].c_str();
+					/* if the '!' is at the end of the line, we need to add a * */
+					if (atPos == (st[3].length()-1))
+						Mask += "*";
+					Mask += "@*";
+					bot->Notice(theClient, "Mask was not in nick!user@host format, re-writing mask to '%s'.  This may not be what you want!",
+						Mask.c_str());
+				} else {
+					/* we have a full nick!user@host - we dont need to alter it */
+					Mask = st[3].c_str();
+				}
+			}
+			/* ok, we have a valid topicby to search for in Mask */
+			channelList = Network->getChannelsWithTopicBy(Mask);
+
+			if (channelList.empty())
+			{
+				bot->Notice(theClient, "I'm sorry, no channels have a topic matching '%s'", Mask.c_str());
+				return false;
+			}
+
+			bot->Notice(theClient, "--==[ Channels with topics set by '%s' %s]==--", Mask.c_str(),
+				(channelList.size() > 15)?"- showing first 15 only":"");
+
+			for (channelListT::iterator cptr = channelList.begin(); (cptr != channelList.end()) && (count < 15); cptr++)
+			{
+				curChannel = *cptr;
+				bot->Notice(theClient, "Channel: %s", curChannel->getName().c_str());
+				count++;
+			}
+			bot->Notice(theClient, "--==[ End of 'list channels topicby '%s' - %d found ]==--",
+				Mask.c_str(), channelList.size());
 		} else {
-			bot->Notice(theClient,"'list channels' requires 'key'");
+			bot->Notice(theClient,"'list channels' requires 'key', 'topic' or 'topicby'");
 			return false;
 		}
 	}
