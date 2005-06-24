@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: Network.h,v 1.43 2005/06/24 14:40:14 kewlio Exp $
+ * $Id: Network.h,v 1.44 2005/06/24 15:19:56 kewlio Exp $
  */
 
 #ifndef __NETWORK_H
-#define __NETWORK_H "$Id: Network.h,v 1.43 2005/06/24 14:40:14 kewlio Exp $"
+#define __NETWORK_H "$Id: Network.h,v 1.44 2005/06/24 15:19:56 kewlio Exp $"
 
 #include	<vector>
 #include	<string>
@@ -37,6 +37,7 @@
 #include	"Channel.h"
 #include	"client.h"
 #include	"misc.h" // struct noCaseCompare
+#include	"gnuworld_config.h"
 
 namespace gnuworld
 {
@@ -767,6 +768,7 @@ public:
 	virtual std::list<const Channel::Channel*> getChannelsWithKey(
 			const string& key) const;
 
+#ifdef TOPIC_TRACK
 	/**
 	 * Match the given channel topic, which may include wildcards,
 	 * to each channel on the network.  Return a list of pointers
@@ -782,7 +784,7 @@ public:
 	 */
 	virtual std::list<const Channel::Channel*> getChannelsWithTopicBy(
 			const string& topicby) const;
-
+#endif
 	/**
 	 * Attempt to find hostnames which are equivalent to the given
 	 * hostname, found using a case insensitive search.

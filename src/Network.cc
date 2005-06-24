@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: Network.cc,v 1.68 2005/06/24 14:40:15 kewlio Exp $
+ * $Id: Network.cc,v 1.69 2005/06/24 15:20:00 kewlio Exp $
  */
 
 #include	<new>
@@ -45,7 +45,7 @@
 #include	"ip.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: Network.cc,v 1.68 2005/06/24 14:40:15 kewlio Exp $" ) ;
+RCSTAG( "$Id: Network.cc,v 1.69 2005/06/24 15:20:00 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -1602,6 +1602,7 @@ list<const Channel*> xNetwork::getChannelsWithKey(const string& key) const
 	return retMe;
 }
 
+#ifdef TOPIC_TRACK
 /* function to search channels for a certain topic */
 list<const Channel*> xNetwork::getChannelsWithTopic(const string& topic) const
 {
@@ -1627,5 +1628,5 @@ list<const Channel*> xNetwork::getChannelsWithTopicBy(const string& topicby) con
 	}
 	return retMe;
 }
-
+#endif
 } // namespace gnuworld
