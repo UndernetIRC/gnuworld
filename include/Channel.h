@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: Channel.h,v 1.34 2005/06/20 11:24:15 kewlio Exp $
+ * $Id: Channel.h,v 1.35 2005/06/24 22:48:59 kewlio Exp $
  */
 
 #ifndef __CHANNEL_H
-#define __CHANNEL_H "$Id: Channel.h,v 1.34 2005/06/20 11:24:15 kewlio Exp $"
+#define __CHANNEL_H "$Id: Channel.h,v 1.35 2005/06/24 22:48:59 kewlio Exp $"
 
 #include	<string>
 #include	<map>
@@ -99,6 +99,9 @@ public:
 
 	/// Bit representing channel mode +r
 	static const modeType	MODE_R ;
+
+	/// Bit representing channel mode +D
+	static const modeType	MODE_D ;
 
 	/// Type used to store number of clients in channel
 	typedef userListType::size_type size_type ;

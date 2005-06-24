@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_CM.cc,v 1.8 2005/03/25 03:07:29 dan_karrels Exp $
+ * $Id: msg_CM.cc,v 1.9 2005/06/24 22:48:59 kewlio Exp $
  */
 
 #include	<map>
@@ -34,7 +34,7 @@
 #include	"ELog.h"
 #include	"ServerCommandHandler.h"
 
-RCSTAG( "$Id: msg_CM.cc,v 1.8 2005/03/25 03:07:29 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: msg_CM.cc,v 1.9 2005/06/24 22:48:59 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -111,6 +111,13 @@ for( std::string::size_type i = 0 ; i < Modes.size() ; i++ )
 				false, Channel::MODE_R ) ) ;
 //			elog	<< tmpChan->getName()
 //				<< "msg_CM> Doing CLEAR_REGISTER"
+//				<< endl;
+			break ;
+		case 'D':
+			modeVector.push_back( make_pair(
+				false, Channel::MODE_D ) ) ;
+//			elog	<< tmpChan->getName()
+//				<< "msg_CM> Doing CLEAR_MODED"
 //				<< endl;
 			break ;
 		case 'm':

@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server.cc,v 1.211 2005/06/19 00:48:30 kewlio Exp $
+ * $Id: server.cc,v 1.212 2005/06/24 22:48:59 kewlio Exp $
  */
 
 #include	<sys/time.h>
@@ -70,7 +70,7 @@
 #include	"ConnectionHandler.h"
 #include	"Connection.h"
 
-RCSTAG( "$Id: server.cc,v 1.211 2005/06/19 00:48:30 kewlio Exp $" ) ;
+RCSTAG( "$Id: server.cc,v 1.212 2005/06/24 22:48:59 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -1715,6 +1715,11 @@ if( !chanModes.empty() &&
 				else
 					theChan->removeMode( Channel::MODE_R ) ;
 				break ;
+			case 'D':
+				if( plus )
+					theChan->setMode( Channel::MODE_D ) ;
+				else
+					theChan->removeMode( Channel::MODE_D ) ;
 
 			// TODO: Finish with polarity
 			// TODO: Add in support for modes b,v,o
@@ -1908,6 +1913,10 @@ if( theChan->getMode( Channel::MODE_R ) )
 	{
 	modeVector.push_back( make_pair( false, Channel::MODE_R ) ) ;
 	}
+if( theChan->getMode( Channel::MODE_D ) )
+	{
+	modeVector.push_back( make_pair( false, Channel::MODE_D ) ) ;
+	}
 if( theChan->getMode( Channel::MODE_L ) )
 	{
 	OnChannelModeL( theChan, false, 0, 0 ) ;
@@ -2058,6 +2067,7 @@ chanModes[ 'p' ] = Channel::MODE_P ;
 chanModes[ 'r' ] = Channel::MODE_R ;
 chanModes[ 's' ] = Channel::MODE_S ;
 chanModes[ 't' ] = Channel::MODE_T ;
+chanModes[ 'D' ] = Channel::MODE_D ;
 
 // This vector is used for argument-less types that can be passed
 // to OnChannelMode()
@@ -2943,6 +2953,9 @@ for( string::const_iterator ptr = st[ 0 ].begin() ; ptr != st[ 0 ].end() ;
 			break ;
 		case 'r':
 			theChan->setMode( Channel::MODE_R ) ;
+			break ;
+		case 'D':
+			theChan->setMode( Channel::MODE_D ) ;
 			break ;
 		case 'k':
 			{

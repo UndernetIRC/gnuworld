@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_M.cc,v 1.10 2005/03/25 03:07:29 dan_karrels Exp $
+ * $Id: msg_M.cc,v 1.11 2005/06/24 22:48:59 kewlio Exp $
  */
 
 #include	<new>
@@ -39,7 +39,7 @@
 #include	"StringTokenizer.h"
 #include	"ServerCommandHandler.h"
 
-RCSTAG( "$Id: msg_M.cc,v 1.10 2005/03/25 03:07:29 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: msg_M.cc,v 1.11 2005/06/24 22:48:59 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -193,6 +193,10 @@ for( const char* modePtr = Param[ 2 ] ; *modePtr ; ++modePtr )
 			modeVector.push_back(
 				make_pair( polarity, Channel::MODE_R ) ) ;
 			break ;
+		case 'D':
+			modeVector.push_back(
+				make_pair( polarity, Channel::MODE_D ) ) ;
+			break;
 
 		// Channel mode l only has an argument if
 		// it is being added, but not removed

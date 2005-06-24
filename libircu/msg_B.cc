@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_B.cc,v 1.7 2005/03/25 03:07:29 dan_karrels Exp $
+ * $Id: msg_B.cc,v 1.8 2005/06/24 22:48:59 kewlio Exp $
  */
 
 #include	<sys/types.h>
@@ -44,7 +44,7 @@
 #include	"iClient.h"
 #include	"ServerCommandHandler.h"
 
-RCSTAG( "$Id: msg_B.cc,v 1.7 2005/03/25 03:07:29 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: msg_B.cc,v 1.8 2005/06/24 22:48:59 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -209,6 +209,10 @@ if( '+' == Param[ whichToken ][ 0 ] )
 			case 'r':
 				modeVector.push_back( make_pair(
 					true, Channel::MODE_R ) ) ;
+				break ;
+			case 'D':
+				modeVector.push_back( make_pair(
+					true, Channel::MODE_D ) ) ;
 				break ;
  			case 'l':
 				theServer->OnChannelModeL( theChan, true, 
