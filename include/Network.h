@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: Network.h,v 1.45 2005/06/24 16:44:29 kewlio Exp $
+ * $Id: Network.h,v 1.46 2005/06/24 16:48:54 kewlio Exp $
  */
 
 #ifndef __NETWORK_H
-#define __NETWORK_H "$Id: Network.h,v 1.45 2005/06/24 16:44:29 kewlio Exp $"
+#define __NETWORK_H "$Id: Network.h,v 1.46 2005/06/24 16:48:54 kewlio Exp $"
 
 #include	<vector>
 #include	<string>
@@ -766,7 +766,7 @@ public:
 	 * to const Channel's which match.
 	 */
 	virtual std::list<const Channel::Channel*> getChannelsWithKey(
-			const std::string& channelkey) const;
+			const std::string& key) const;
 
 #ifdef TOPIC_TRACK
 	/**
