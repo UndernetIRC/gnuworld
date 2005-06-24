@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: Network.h,v 1.42 2005/06/24 00:19:10 kewlio Exp $
+ * $Id: Network.h,v 1.43 2005/06/24 14:40:14 kewlio Exp $
  */
 
 #ifndef __NETWORK_H
-#define __NETWORK_H "$Id: Network.h,v 1.42 2005/06/24 00:19:10 kewlio Exp $"
+#define __NETWORK_H "$Id: Network.h,v 1.43 2005/06/24 14:40:14 kewlio Exp $"
 
 #include	<vector>
 #include	<string>
@@ -766,6 +766,22 @@ public:
 	 */
 	virtual std::list<const Channel::Channel*> getChannelsWithKey(
 			const string& key) const;
+
+	/**
+	 * Match the given channel topic, which may include wildcards,
+	 * to each channel on the network.  Return a list of pointers
+	 * to const Channel's which match.
+	 */
+	virtual std::list<const Channel::Channel*> getChannelsWithTopic(
+			const string& topic) const;
+
+	/**
+	 * Match the given channel topic setter, which may include wildcards,
+	 * to each channel on the network.  Return a list of pointers
+	 * to const Channel's which match.
+	 */
+	virtual std::list<const Channel::Channel*> getChannelsWithTopicBy(
+			const string& topicby) const;
 
 	/**
 	 * Attempt to find hostnames which are equivalent to the given

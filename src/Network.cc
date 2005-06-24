@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: Network.cc,v 1.67 2005/06/24 00:19:12 kewlio Exp $
+ * $Id: Network.cc,v 1.68 2005/06/24 14:40:15 kewlio Exp $
  */
 
 #include	<new>
@@ -45,7 +45,7 @@
 #include	"ip.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: Network.cc,v 1.67 2005/06/24 00:19:12 kewlio Exp $" ) ;
+RCSTAG( "$Id: Network.cc,v 1.68 2005/06/24 14:40:15 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -1602,5 +1602,30 @@ list<const Channel*> xNetwork::getChannelsWithKey(const string& key) const
 	return retMe;
 }
 
+/* function to search channels for a certain topic */
+list<const Channel*> xNetwork::getChannelsWithTopic(const string& topic) const
+{
+	list<const Channel*> retMe;
+
+	for (const_channelIterator cptr = channels_begin(); (cptr != channels_end()); cptr++)
+	{
+		if (!match(topic, cptr->second->getTopic()))
+			retMe.push_back(cptr->second);
+	}
+	return retMe;
+}
+
+/* function to search channels with a certain topic setter */
+list<const Channel*> xNetwork::getChannelsWithTopicBy(const string& topicby) const
+{
+	list<const Channel*> retMe;
+
+	for (const_channelIterator cptr = channels_begin(); (cptr != channels_end()); cptr++)
+	{
+		if (!match(topicby, cptr->second->getTopicWhoSet()))
+			retMe.push_back(cptr->second);
+	}
+	return retMe;
+}
 
 } // namespace gnuworld
