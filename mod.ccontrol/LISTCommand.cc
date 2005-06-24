@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: LISTCommand.cc,v 1.19 2005/06/24 22:49:39 kewlio Exp $
+ * $Id: LISTCommand.cc,v 1.20 2005/06/24 23:05:45 kewlio Exp $
  */
 
 #include	<string>
@@ -32,7 +32,7 @@
 #include	"StringTokenizer.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: LISTCommand.cc,v 1.19 2005/06/24 22:49:39 kewlio Exp $" ) ;
+RCSTAG( "$Id: LISTCommand.cc,v 1.20 2005/06/24 23:05:45 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -117,7 +117,9 @@ else if(!strcasecmp(st[1].c_str(),"channels"))
 			for (channelListT::iterator cptr = channelList.begin(); (cptr != channelList.end()) && (count < 15); cptr++)
 			{
 				curChannel = *cptr;
-				bot->Notice(theClient, "Channel: %s", curChannel->getName().c_str());
+				bot->Notice(theClient, "Channel: [%4d] %s", 
+					curChannel->size(),
+					curChannel->getName().c_str());
 				count++;
 			}
 			bot->Notice(theClient, "--==[ End of 'list channels key %s' - %d found ]==--",
@@ -187,7 +189,9 @@ else if(!strcasecmp(st[1].c_str(),"channels"))
 			for (channelListT::iterator cptr = channelList.begin(); (cptr != channelList.end()) && (count < 16); cptr++)
 			{
 				curChannel = *cptr;
-				bot->Notice(theClient, "Channel: %s", curChannel->getName().c_str());
+				bot->Notice(theClient, "Channel: [%4d] %s",
+					curChannel->size(),
+					curChannel->getName().c_str());
 				count++;
 			}
 			bot->Notice(theClient, "--==[ End of 'list channels modes %s' - %d found ]==--",
@@ -216,7 +220,9 @@ else if(!strcasecmp(st[1].c_str(),"channels"))
 			for (channelListT::iterator cptr = channelList.begin(); (cptr != channelList.end()) && (count < 15); cptr++)
 			{
 				curChannel = *cptr;
-				bot->Notice(theClient, "Channel: %s", curChannel->getName().c_str());
+				bot->Notice(theClient, "Channel: [%4d] %s",
+					curChannel->size(),
+					curChannel->getName().c_str());
 				count++;
 			}
 			bot->Notice(theClient, "--==[ End of 'list channels topic '%s' - %d found ]==--",
@@ -275,7 +281,9 @@ else if(!strcasecmp(st[1].c_str(),"channels"))
 			for (channelListT::iterator cptr = channelList.begin(); (cptr != channelList.end()) && (count < 15); cptr++)
 			{
 				curChannel = *cptr;
-				bot->Notice(theClient, "Channel: %s", curChannel->getName().c_str());
+				bot->Notice(theClient, "Channel: [%4d] %s",
+					curChannel->size(),
+					curChannel->getName().c_str());
 				count++;
 			}
 			bot->Notice(theClient, "--==[ End of 'list channels topicby '%s' - %d found ]==--",

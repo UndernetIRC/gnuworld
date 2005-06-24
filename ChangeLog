@@ -1,4 +1,7 @@
-// $Id: ChangeLog,v 1.15 2005/06/24 22:50:19 kewlio Exp $ //
+// $Id: ChangeLog,v 1.16 2005/06/24 23:05:44 kewlio Exp $ //
+
+2005-06-25	Dan-m00 <daniel@undernet.org>
+		* mod.ccontrol/LISTCommand.cc: added channel usercount to 'list channels' output
 
 2005-06-24	Dan-m00 <daniel@undernet.org>
 		* include/Channel.h: added support for new u2.10.12 "+D" channel mode.
