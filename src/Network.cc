@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: Network.cc,v 1.69 2005/06/24 15:20:00 kewlio Exp $
+ * $Id: Network.cc,v 1.70 2005/06/24 22:49:39 kewlio Exp $
  */
 
 #include	<new>
@@ -45,7 +45,7 @@
 #include	"ip.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: Network.cc,v 1.69 2005/06/24 15:20:00 kewlio Exp $" ) ;
+RCSTAG( "$Id: Network.cc,v 1.70 2005/06/24 22:49:39 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -1597,6 +1597,115 @@ list<const Channel*> xNetwork::getChannelsWithKey(const string& key) const
 	for (const_channelIterator cptr = channels_begin(); (cptr != channels_end()); cptr++)
 	{
 		if ((cptr->second->getMode(Channel::MODE_K)) && (!match(key,cptr->second->getKey())))
+			retMe.push_back(cptr->second);
+	}
+	return retMe;
+}
+
+/* function to search channels for matching modes */
+list<const Channel*> xNetwork::getChannelsWithModes(const string& modes) const
+{
+	bool modeflag, foundMatch;
+	const char *c;
+	char ch;
+	list<const Channel*> retMe;
+
+	for (const_channelIterator cptr = channels_begin(); (cptr != channels_end()); cptr++)
+	{
+		/* parse the modes and check against the channel modes */
+		/* don't need to initialise modeflag, as we know 'modes' starts with + or - */
+		foundMatch = true;
+		c = modes.c_str();
+		while (ch = *c++)
+		{
+			/* handle change of flags (+/-) */
+			if (ch == '+')
+			{
+				modeflag = true;
+				continue;
+			}
+			if (ch == '-')
+			{
+				modeflag = false;
+				continue;
+			}
+			/* check modes */
+			switch (ch) {
+				case 'k':	/* keyed */
+						if ((!modeflag && cptr->second->getMode(Channel::MODE_K))
+							|| (modeflag && !cptr->second->getMode(Channel::MODE_K)))
+						{
+							foundMatch = false;
+						}
+						break;
+				case 'l':	/* limit */
+						if ((!modeflag && cptr->second->getMode(Channel::MODE_L))
+							|| (modeflag && !cptr->second->getMode(Channel::MODE_L)))
+						{
+							foundMatch = false;
+						}
+						break;
+				case 'i':	/* invite */
+						if ((!modeflag && cptr->second->getMode(Channel::MODE_I))
+							|| (modeflag && !cptr->second->getMode(Channel::MODE_I)))
+						{
+							foundMatch = false;
+						}
+						break;
+				case 'm':	/* moderated */
+						if ((!modeflag && cptr->second->getMode(Channel::MODE_M))
+							|| (modeflag && !cptr->second->getMode(Channel::MODE_M)))
+						{
+							foundMatch = false;
+						}
+						break;
+				case 'n':	/* no outside messages */
+						if ((!modeflag && cptr->second->getMode(Channel::MODE_N))
+							|| (modeflag && !cptr->second->getMode(Channel::MODE_N)))
+						{
+							foundMatch = false;
+						}
+						break;
+				case 'p':	/* private */
+						if ((!modeflag && cptr->second->getMode(Channel::MODE_P))
+							|| (modeflag && !cptr->second->getMode(Channel::MODE_P)))
+						{
+							foundMatch = false;
+						}
+						break;
+				case 's':	/* secret */
+						if ((!modeflag && cptr->second->getMode(Channel::MODE_S))
+							|| (modeflag && !cptr->second->getMode(Channel::MODE_S)))
+						{
+							foundMatch = false;
+						}
+						break;
+				case 't':	/* no outside topics */
+						if ((!modeflag && cptr->second->getMode(Channel::MODE_T))
+							|| (modeflag && !cptr->second->getMode(Channel::MODE_T)))
+						{
+							foundMatch = false;
+						}
+						break;
+				case 'r':	/* registered users only */
+						if ((!modeflag && cptr->second->getMode(Channel::MODE_R))
+							|| (modeflag && !cptr->second->getMode(Channel::MODE_R)))
+						{
+							foundMatch = false;
+						}
+						break;
+				case 'D':	/* new .12 mode for large channels */
+						if ((!modeflag && cptr->second->getMode(Channel::MODE_D))
+							|| (modeflag && !cptr->second->getMode(Channel::MODE_D)))
+						{
+							foundMatch = false;
+						}
+						break;
+				default:	/* other - should never happen */
+						break;
+			}
+		}
+		if (foundMatch)
 			retMe.push_back(cptr->second);
 	}
 	return retMe;

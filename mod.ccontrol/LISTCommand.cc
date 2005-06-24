@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: LISTCommand.cc,v 1.18 2005/06/24 17:26:06 kewlio Exp $
+ * $Id: LISTCommand.cc,v 1.19 2005/06/24 22:49:39 kewlio Exp $
  */
 
 #include	<string>
@@ -32,7 +32,7 @@
 #include	"StringTokenizer.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: LISTCommand.cc,v 1.18 2005/06/24 17:26:06 kewlio Exp $" ) ;
+RCSTAG( "$Id: LISTCommand.cc,v 1.19 2005/06/24 22:49:39 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -48,7 +48,10 @@ typedef list<const Channel*> channelListT;
 const Channel* curChannel;
 channelListT channelList;
 unsigned int count = 0;
+const char *c;
+char ch;
 string Mask;
+bool isValid = false;
 
 StringTokenizer st( Message ) ;
 if(st.size() < 2)
@@ -86,9 +89,9 @@ else if(!strcasecmp(st[1].c_str(),"channels"))
 		{
 			/* not enough parameters */
 #ifdef TOPIC_TRACK
-			bot->Notice(theClient, "'list channels' requires 'key', 'topic' or 'topicby'");
+			bot->Notice(theClient, "'list channels' requires 'key', 'modes', 'topic' or 'topicby'");
 #else
-			bot->Notice(theClient, "'list channels' requires 'key'");
+			bot->Notice(theClient, "'list channels' requires 'key' or 'modes'");
 #endif
 			return false;
 		}
@@ -118,6 +121,76 @@ else if(!strcasecmp(st[1].c_str(),"channels"))
 				count++;
 			}
 			bot->Notice(theClient, "--==[ End of 'list channels key %s' - %d found ]==--",
+				st[3].c_str(), channelList.size());
+		}
+		else if (!strcasecmp(st[2].c_str(),"modes"))
+		{
+			if (st.size() < 4)
+			{
+				bot->Notice(theClient, "for 'list channels modes', you must supply the modes to match against!");
+				bot->Notice(theClient, "e.g. 'list channels modes +tns-m' to require +tns and require not to have +s");
+				bot->Notice(theClient, "(other modes may be set unless explicitly not required as above)");
+				return false;
+			}
+			if (st.size() > 4)
+			{
+				bot->Notice(theClient, "You supplied too many arguments.  arguments such as +k or +l here may not contain the key or limit!");
+				return false;
+			}
+			/* ok, we have the modes to search for in st[3] - validate them */
+			if ((!match("+", st[3].substr(0,1))) && (!match("-", st[3].substr(0,1))))
+			{
+				bot->Notice(theClient, "The modes must start with + or - (e.g. +tns or -s)");
+				return false;
+			}
+			isValid = true;
+			c = st[3].c_str();
+			while (ch = *c++)
+			{
+				switch (ch) {
+					case '+':
+					case '-':
+					case 'k':
+					case 'l':
+					case 'i':
+					case 'm':
+					case 'n':
+					case 'p':
+					case 's':
+					case 't':
+					case 'r':
+					case 'D':	/* acceptable modes */
+							break;
+					default:	/* unacceptable modes */
+							isValid = false;
+							break;
+				}
+			}
+			if (!isValid)
+			{
+				bot->Notice(theClient, "The modes given are invalid (you supplied '%s', valid modes are klimnpstrD)",
+					st[3].c_str());
+				return false;
+			}
+			/* ok, validated them */
+			channelList = Network->getChannelsWithModes(st[3]);
+
+			if (channelList.empty())
+			{
+				bot->Notice(theClient, "I'm sorry, no channels have modes matching '%s'", st[3].c_str());
+				return false;
+			}
+
+			bot->Notice(theClient, "--==[ Channels matching modes '%s' %s]==--", st[3].c_str(),
+				(channelList.size() > 15)?"- showing first 15 only":"");
+
+			for (channelListT::iterator cptr = channelList.begin(); (cptr != channelList.end()) && (count < 16); cptr++)
+			{
+				curChannel = *cptr;
+				bot->Notice(theClient, "Channel: %s", curChannel->getName().c_str());
+				count++;
+			}
+			bot->Notice(theClient, "--==[ End of 'list channels modes %s' - %d found ]==--",
 				st[3].c_str(), channelList.size());
 		}
 #ifdef TOPIC_TRACK
@@ -208,11 +281,11 @@ else if(!strcasecmp(st[1].c_str(),"channels"))
 			bot->Notice(theClient, "--==[ End of 'list channels topicby '%s' - %d found ]==--",
 				Mask.c_str(), channelList.size());
 		} else {
-			bot->Notice(theClient,"'list channels' requires 'key', 'topic' or 'topicby'");
+			bot->Notice(theClient,"'list channels' requires 'key', 'modes', 'topic' or 'topicby'");
 			return false;
 #else
 		else {
-			bot->Notice(theClient,"'list channels' requires 'key'");
+			bot->Notice(theClient,"'list channels' requires 'key' or 'modes'");
 			return false;
 #endif
 		}

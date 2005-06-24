@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: Network.h,v 1.46 2005/06/24 16:48:54 kewlio Exp $
+ * $Id: Network.h,v 1.47 2005/06/24 22:49:39 kewlio Exp $
  */
 
 #ifndef __NETWORK_H
-#define __NETWORK_H "$Id: Network.h,v 1.46 2005/06/24 16:48:54 kewlio Exp $"
+#define __NETWORK_H "$Id: Network.h,v 1.47 2005/06/24 22:49:39 kewlio Exp $"
 
 #include	<vector>
 #include	<string>
@@ -767,6 +767,14 @@ public:
 	 */
 	virtual std::list<const Channel::Channel*> getChannelsWithKey(
 			const std::string& key) const;
+
+	/**
+	 * Match the given channel modes, which may NOT include wildcards,
+	 * to each channel on the network.  Return a list of pointers
+	 * to const Channel's which match.
+	 */
+	virtual std::list<const Channel::Channel*> getChannelsWithModes(
+			const std::string& modes) const;
 
 #ifdef TOPIC_TRACK
 	/**
