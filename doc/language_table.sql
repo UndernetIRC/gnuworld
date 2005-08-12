@@ -319,7 +319,7 @@ COPY "translations" FROM stdin;
 2	129	Dernier évènement NOTIFY de ban: %i	31337	0
 2	130	Données assignées: %i	31337	0
 2	131	\002En fonction depuis (uptime):\002 %s	31337	0
-2	132	Le canal %s à %d utilisateur(s) (%i opérateur(s))	31337	0
+2	132	Le canal %s a %d utilisateur(s) (%i opérateur(s))	31337	0
 2	133	Les Modes du canal sont: %s	31337	0
 2	134	Flags actifs: %s	31337	0
 2	135	Vous ne pouvez pas suspendre un utilisateur ayant un niveau égal ou supérieur au votre.	31337	0
