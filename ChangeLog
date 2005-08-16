@@ -1,4 +1,8 @@
-// $Id: ChangeLog,v 1.17 2005/08/16 15:38:11 kewlio Exp $ //
+// $Id: ChangeLog,v 1.18 2005/08/16 21:37:38 kewlio Exp $ //
+
+2005-08-16	Dan-m00 <daniel@undernet.org>
+		* mod.ccontrol/EXCEPTIONCommand.cc: generate a warning if an unknown subcommand
+			is used to 'exceptions' (e.g. 'exceptions delete')
 
 2005-08-16	Dan-m00 <daniel@undernet.org>
 		* mod.ccontrol/SGLINECommand.cc: disallow '/' character in sglines (bugfix) as

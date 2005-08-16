@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: EXCEPTIONCommand.cc,v 1.16 2005/01/12 03:50:29 dan_karrels Exp $
+ * $Id: EXCEPTIONCommand.cc,v 1.17 2005/08/16 21:37:38 kewlio Exp $
  */
 
 #include	<string>
@@ -31,7 +31,7 @@
 #include 	"Constants.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: EXCEPTIONCommand.cc,v 1.16 2005/01/12 03:50:29 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: EXCEPTIONCommand.cc,v 1.17 2005/08/16 21:37:38 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -118,7 +118,11 @@ else if(!strcasecmp(st[1].c_str(),"del")) //Trying to add an exception?
 		
 		}
 
-	}	
+	} else {
+		/* unknown command */
+		bot->Notice(theClient, "You must use 'add', 'del' or 'list'!");
+		return false;
+	}
 return true;
 }
 
