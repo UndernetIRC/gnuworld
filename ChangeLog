@@ -1,4 +1,8 @@
-// $Id: ChangeLog,v 1.16 2005/06/24 23:05:44 kewlio Exp $ //
+// $Id: ChangeLog,v 1.17 2005/08/16 15:38:11 kewlio Exp $ //
+
+2005-08-16	Dan-m00 <daniel@undernet.org>
+		* mod.ccontrol/SGLINECommand.cc: disallow '/' character in sglines (bugfix) as
+			ircu handles these differently to ccontrol.
 
 2005-06-25	Dan-m00 <daniel@undernet.org>
 		* mod.ccontrol/LISTCommand.cc: added channel usercount to 'list channels' output

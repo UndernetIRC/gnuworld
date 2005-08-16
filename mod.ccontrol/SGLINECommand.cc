@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: SGLINECommand.cc,v 1.12 2005/06/18 23:06:02 kewlio Exp $
+ * $Id: SGLINECommand.cc,v 1.13 2005/08/16 15:38:11 kewlio Exp $
  */
 
 #include	<string>
@@ -36,7 +36,7 @@
 #include	"Constants.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: SGLINECommand.cc,v 1.12 2005/06/18 23:06:02 kewlio Exp $" ) ;
+RCSTAG( "$Id: SGLINECommand.cc,v 1.13 2005/08/16 15:38:11 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -107,6 +107,7 @@ else //RealName Gline
 	{
 	++pos;
 	bool hostOk = false;
+	bool hasSlash = false;
 	if(st[pos].substr(0,2) != "$R")
 		{
 		RealHost = "$R" + st[pos];
@@ -116,16 +117,23 @@ else //RealName Gline
 		RealHost = st[pos];
 		}
 	//Do alittle sanity check
-	for(string::size_type p =2; p< st[pos].size() && !hostOk;++p)
+	for(string::size_type p =2; p< st[pos].size();++p)
 		{
 		if(RealHost[p] != '$' && RealHost[p] != '*' && RealHost[p] != '?')
 			hostOk = true;
+		if (RealHost[p] == '/')
+			hasSlash = true;
 		}
 	if(!hostOk)
 		{
 		bot->Notice(theClient,"You must specify atleast one char other than *?$ as the realname!");
 		return true;
 		}
+	if(hasSlash)
+	{
+		bot->Notice(theClient, "You can't use a '/' in a realname gline, consider switching it to a '?'");
+		return true;
+	}
     }
     	
 string Length;
