@@ -1,4 +1,9 @@
-// $Id: ChangeLog,v 1.18 2005/08/16 21:37:38 kewlio Exp $ //
+// $Id: ChangeLog,v 1.19 2005/08/24 13:36:32 kewlio Exp $ //
+
+2005-08-24	Dan-m00 <daniel@undernet.org>
+		* mod.ccontrol/WHOISCommand.cc: split channel output to multiple lines if the
+			user is in multiple long channels.
+			Thanks to coekie + compy for spotting this bug.
 
 2005-08-16	Dan-m00 <daniel@undernet.org>
 		* mod.ccontrol/EXCEPTIONCommand.cc: generate a warning if an unknown subcommand

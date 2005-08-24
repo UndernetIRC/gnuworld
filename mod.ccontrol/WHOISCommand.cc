@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: WHOISCommand.cc,v 1.24 2005/06/19 14:39:42 kewlio Exp $
+ * $Id: WHOISCommand.cc,v 1.25 2005/08/24 13:36:32 kewlio Exp $
  */
 
 #include	<string>
@@ -33,7 +33,7 @@
 #include	"ccontrol_generic.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: WHOISCommand.cc,v 1.24 2005/06/19 14:39:42 kewlio Exp $" ) ;
+RCSTAG( "$Id: WHOISCommand.cc,v 1.25 2005/08/24 13:36:32 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -180,6 +180,12 @@ if( channels.empty() )
 string chanNames ;
 for( vector< string >::size_type i = 0 ; i < channels.size() ; i++ )
 	{
+	if ((chanNames.size() + channels[i].size()) > 410)
+	{
+		/* need to split lines up */
+		bot->Notice(theClient, "On channels: %s", chanNames.c_str());
+		chanNames = "";
+	}
 	chanNames += channels[ i ] ;
 	if( (i + 1) < channels.size() )
 		{
