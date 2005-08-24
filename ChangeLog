@@ -1,4 +1,8 @@
-// $Id: ChangeLog,v 1.19 2005/08/24 13:36:32 kewlio Exp $ //
+// $Id: ChangeLog,v 1.20 2005/08/24 23:01:09 kewlio Exp $ //
+
+2005-08-24	Dan-m00 <daniel@undernet.org>
+		* mod.ccontrol/JUPECommand.cc: remove the 'currently connected' check when
+			juping a server as ircu will automatically /squit it for you.
 
 2005-08-24	Dan-m00 <daniel@undernet.org>
 		* mod.ccontrol/WHOISCommand.cc: split channel output to multiple lines if the

@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: JUPECommand.cc,v 1.21 2005/01/12 03:50:29 dan_karrels Exp $
+ * $Id: JUPECommand.cc,v 1.22 2005/08/24 23:01:09 kewlio Exp $
  */
 
 #include	<new>
@@ -34,7 +34,7 @@
 #include	"Constants.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: JUPECommand.cc,v 1.21 2005/01/12 03:50:29 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: JUPECommand.cc,v 1.22 2005/08/24 23:01:09 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -80,9 +80,8 @@ Server = Network->findServerName(st[1]);
 if(Server)
 	{
 	bot->Notice(theClient,"%s is currently linked to the network"
-		    ", please squit it first"
+		    ", it will be automatically squit."
 		    ,st[1].c_str());
-		    return false;
 	}
 SName = st[1];
 contime = ::time(0);
