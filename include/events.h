@@ -22,11 +22,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: events.h,v 1.18 2005/01/08 23:33:42 dan_karrels Exp $
+ * $Id: events.h,v 1.19 2005/09/29 17:40:06 kewlio Exp $
  */
 
 #ifndef __EVENTS_H
-#define __EVENTS_H "$Id: events.h,v 1.18 2005/01/08 23:33:42 dan_karrels Exp $"
+#define __EVENTS_H "$Id: events.h,v 1.19 2005/09/29 17:40:06 kewlio Exp $"
 
 #include	<string>
 
@@ -134,6 +134,7 @@ const std::string eventNames[] = {
 	"Net Join", /* EVT_NETJOIN */
 	"Burst Complete", /* EVT_BURST_CMPLT */
 	"Burst Acknowledge", /* EVT_BURST_ACK */
+	"Burst Acknowledge Sent", /* EVT_EA_SENT */
 	"Gline Add", /* EVT_GLINE */
 	"Gline Remove", /* EVT_REMGLINE */
 	"Server Jupe", /* EVT_JUPE */

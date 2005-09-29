@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_M.cc,v 1.11 2005/06/24 22:48:59 kewlio Exp $
+ * $Id: msg_M.cc,v 1.12 2005/09/29 17:40:06 kewlio Exp $
  */
 
 #include	<new>
@@ -39,7 +39,7 @@
 #include	"StringTokenizer.h"
 #include	"ServerCommandHandler.h"
 
-RCSTAG( "$Id: msg_M.cc,v 1.11 2005/06/24 22:48:59 kewlio Exp $" ) ;
+RCSTAG( "$Id: msg_M.cc,v 1.12 2005/09/29 17:40:06 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -462,6 +462,7 @@ for( const char* modePtr = Param[ 2 ] ; *modePtr ; ++modePtr )
 		case 'h':
 		case 'X':
 		case 'R':
+		case 'f':
 			// Unsupported but used on networks that
 			// GNUWorld runs on.
 			// TODO?

@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: Channel.h,v 1.35 2005/06/24 22:48:59 kewlio Exp $
+ * $Id: Channel.h,v 1.36 2005/09/29 17:40:06 kewlio Exp $
  */
 
 #ifndef __CHANNEL_H
-#define __CHANNEL_H "$Id: Channel.h,v 1.35 2005/06/24 22:48:59 kewlio Exp $"
+#define __CHANNEL_H "$Id: Channel.h,v 1.36 2005/09/29 17:40:06 kewlio Exp $"
 
 #include	<string>
 #include	<map>
@@ -102,6 +102,12 @@ public:
 
 	/// Bit representing channel mode +D
 	static const modeType	MODE_D ;
+
+	/// Bit representing channel mode +A
+	static const modeType	MODE_A ;
+
+	/// Bit representing channel mode +U
+	static const modeType	MODE_U ;
 
 	/// Type used to store number of clients in channel
 	typedef userListType::size_type size_type ;
@@ -194,6 +200,20 @@ public:
  	 */
 	inline void setKey( const std::string& newKey )
 		{ key = newKey ; }
+
+	/**
+	 * Set an Apass on the channel.  This method will set the
+	 * channel mode and the Apass as well.
+	 */
+	inline void setApass( const std::string& newApass )
+		{ Apass = newApass ; }
+
+	/**
+	 * Set an Upass on the channel.  This method will set the
+	 * channel mode and the Upass as well.
+	 */
+	inline void setUpass( const std::string& newUpass )
+		{ Upass = newUpass ; }
 
 	/**
 	 * Add a ban to this Channel's ban list.
@@ -290,6 +310,22 @@ public:
 	 */
 	inline const std::string& getKey() const
 		{ return key ; }
+
+	/**
+	 * Retrieve this channel's Apass.  Note that the
+	 * existence of an Apass does not mean that channel
+	 * mode +A is set.
+	 */
+	inline const std::string& getApass() const
+		{ return Apass ; }
+
+	/**
+	 * Retrieve this channel's Upass.  Note that the
+	 * existence of an Upass does not mean that channel
+	 * mode +U is set.
+	 */
+	inline const std::string& getUpass() const
+		{ return Upass ; }
 
 	/**
 	 * Retrieve this channel's limit.  Note that the
@@ -469,6 +505,18 @@ protected:
 	virtual void	onModeK( bool, const std::string& ) ;
 
 	/**
+	 * This method is called when channel mode 'A' is set
+	 * or unset.
+	 */
+	virtual void	onModeA( bool, const std::string& ) ;
+
+	/**
+	 * This method is called when channel mode 'U' is set
+	 * or unset.
+	 */
+	virtual void	onModeU( bool, const std::string& ) ;
+
+	/**
 	 * This method is called when one or more channel
 	 * mode (t)'s is/are set or unset.
 	 */
@@ -520,6 +568,20 @@ protected:
 	 * even when channel mode +k is NOT set.
 	 */
 	std::string	key ;
+
+	/**
+	 * The Apass associated with this channel.
+	 * Note that this variable may hold values
+	 * even when channel mode +A is NOT set.
+	 */
+	std::string	Apass ;
+
+	/**
+	 * The Upass associated with this channel.
+	 * Note that this variable may hold values
+	 * even when channel mode +U is NOT set.
+	 */
+	std::string	Upass ;
 
 	/**
 	 * The structure used to hold the ChannelUser

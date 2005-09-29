@@ -1,4 +1,21 @@
-// $Id: ChangeLog,v 1.22 2005/09/29 15:58:40 kewlio Exp $ //
+// $Id: ChangeLog,v 1.23 2005/09/29 17:40:06 kewlio Exp $ //
+
+2005-09-29	Dan-m00 <daniel@undernet.org>
+		* include/Channel.h:
+		* include/client.h:
+		* include/events.h:
+		* include/server.h:
+		* libircu/msg_B.cc:
+		* libircu/msg_M.cc:
+		* src/Channel.cc:
+		* src/Network.cc:
+		* src/client.cc:
+		* src/server.cc:
+		* src/server_events.cc:
+			Add basic support for oplevels from u2.10.12
+			Thanks to reed for the initial diff
+
+		* mod.cservice/cservice.cc: fix a ban bug - thanks to reed for this diff
 
 2005-09-29	Dan-m00 <daniel@undernet.org>
 		* configure.ac: config.h hasnt existed in... years! update to gnuworld_config.h

@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: cservice.cc,v 1.247 2005/09/29 15:21:56 kewlio Exp $
+ * $Id: cservice.cc,v 1.248 2005/09/29 17:40:06 kewlio Exp $
  */
 
 #include	<new>
@@ -3447,10 +3447,13 @@ while (ptr != theChan->banList.end())
 	++ptr;
 	}
 
-theChan->banList[newBan->getID()] = newBan;
+//theChan->banList[newBan->getID()] = newBan;
 
 /* Insert this new record into the database. */
 newBan->insertRecord();
+
+/* Insert to our internal List. */
+theChan->banList.insert(std::map<int,sqlBan*>::value_type(newBan->getID(),newBan));
 
 /*
  * Finally, if this guy is auth'd.. suspend his account.

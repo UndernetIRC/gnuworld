@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server.cc,v 1.212 2005/06/24 22:48:59 kewlio Exp $
+ * $Id: server.cc,v 1.213 2005/09/29 17:40:06 kewlio Exp $
  */
 
 #include	<sys/time.h>
@@ -70,7 +70,7 @@
 #include	"ConnectionHandler.h"
 #include	"Connection.h"
 
-RCSTAG( "$Id: server.cc,v 1.212 2005/06/24 22:48:59 kewlio Exp $" ) ;
+RCSTAG( "$Id: server.cc,v 1.213 2005/09/29 17:40:06 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -1736,6 +1736,32 @@ if( !chanModes.empty() &&
 				theChan->onModeK( true, st[ argPos++ ] ) ;
 				break ;
 				}
+			case 'A':
+				{
+				if( argPos >= st.size() )
+					{
+					elog	<< "xServer::JoinChannel> Invalid"
+						<< " number of arguments to "
+						<< "chanModes"
+						<< endl ;
+					break ;
+					}
+				theChan->onModeA( true, st[ argPos++ ] ) ;
+				break ;
+				}
+			case 'U':
+				{
+				if( argPos >= st.size() )
+					{
+					elog	<< "xServer::JoinChannel> Invalid"
+						<< " number of arguments to "
+						<< "chanModes"
+						<< endl ;
+					break ;
+					}
+				theChan->onModeU( true, st[ argPos++ ] ) ;
+				break ;
+				}
 			case 'l':
 				{
 				if( argPos >= st.size() )
@@ -1925,6 +1951,14 @@ if( theChan->getMode( Channel::MODE_K ) )
 	{
 	OnChannelModeK( theChan, false, 0, string() ) ;
 	}
+if( theChan->getMode( Channel::MODE_A ) )
+	{
+	OnChannelModeA( theChan, false, 0, string() ) ;
+	}
+if( theChan->getMode( Channel::MODE_U ) )
+	{
+	OnChannelModeU( theChan, false, 0, string() ) ;
+	}
 
 if( !modeVector.empty() )
 	{
@@ -2083,6 +2117,12 @@ limitVectorType limitVector ;
 typedef std::vector< std::pair< bool, std::string > > keyVectorType ;
 keyVectorType keyVector ;
 
+typedef std::vector< std::pair< bool, std::string> > apassVectorType ;
+apassVectorType apassVector ;
+
+typedef std::vector< std::pair< bool, std::string> > upassVectorType ;
+upassVectorType upassVector ;
+
 // This vector stores the actual output string for the modes
 typedef std::vector< std::pair< std::string, std::string > >
 	rawModeVectorType ;
@@ -2145,6 +2185,7 @@ for( ; tokenIndex < st.size() ; )
 			case 'r':
 			case 's':
 			case 't':
+			case 'D':
 //				elog	<< "xServer::Mode> General mode: "
 //					<< theChar
 //					<< ", polarity: "
@@ -2208,6 +2249,110 @@ for( ; tokenIndex < st.size() ; )
 					chanKey ) ) ;
 				}
 				break ;
+			case 'A':
+				{
+//				elog	<< "xServer::Mode> Mode 'A'"
+//					<< ", polarity: "
+//					<< polarityString
+//					<< end1 ;
+
+				// Mode -A expects an argument, and it
+				// matters what it is.
+				// FIXFIX - TODO - XXX
+
+				// Must lookup the Apass argument
+				if( nextArgIndex >= st.size() )
+					{
+					// No argument supplied
+					return false ;
+					}
+				std::string Apass = st[ nextArgIndex ] ;
+				++nextArgIndex;
+
+				if( theChan->getMode( Channel::MODE_A ) )
+					{
+					// +A already set
+					if( polarityBool )
+						{
+						// Must unset Apass first
+						return false ;
+						}
+					// Apass already handled
+					}
+				// If the mode is not set, just ignore
+				// a polarity of "-A" (not add it to
+				// the modeVector)
+				else
+				{
+					if( !polarityBool )
+						{
+						break ;
+						}
+					}
+
+//				elog	<< "xServer::Mode> Apass: "
+//					<< Apass
+//					<< endl ;
+
+				apassVector.push_back( make_pair(
+					polarityBool, Apass ) ) ;
+				rawModeVector.push_back( make_pair(
+					polarityString + theChar,
+					Apass ) ) ;
+				}
+				break ;
+			case 'U':
+				{
+//				elog	<< "xServer::Mode> Mode 'U'"
+//					<< ", polarity: "
+//					<< polarityString
+//					<< endl ;
+
+				// Mode -U expects an argument, and it
+				// matters what it is.
+				// FIXFIX - TODO - XXX
+
+				// Must lookup the Upass argument
+				if( nextArgIndex >= st.size() )
+					{
+					// No argument supplied
+					return false ;
+					}
+				std::string Upass = st[ nextArgIndex ] ;
+				++nextArgIndex ;
+
+				if( theChan->getMode( Channel::MODE_U ) )
+					{
+					// +U already set
+					if( polarityBool )
+						{
+						// Must unset Upass first
+						return false ;
+						}
+					// Upass already handled
+					}
+				// If the mode is not set, just ignore
+				// a polarity of "-U" (not add it to
+				// the modeVector)
+				else
+					{
+					if( !polarityBool )
+						{
+						break ;
+						}
+					}
+
+//				elog	<< "xServer::Mode> Upass: "
+//					<< Upass
+//					<< endl ;
+
+				upassVector.push_back( make_pair(
+					polarityBool, Upass ) ) ;
+				rawModeVector.push_back( make_pair(
+					polarityString + theChar,
+					Upass ) ) ;
+				}
+				break;
 			case 'l':
 				{
 //				elog	<< "xServer::Mode> Mode 'l'"
@@ -2968,6 +3113,32 @@ for( string::const_iterator ptr = st[ 0 ].begin() ; ptr != st[ 0 ].end() ;
 				break ;
 				}
 			theChan->onModeK( true, st[ argPos++ ] ) ;
+			break ;
+			}
+		case 'A':
+			{
+			if( argPos >= st.size() )
+				{
+				elog	<< "xServer::BurstChannel> Invalid"
+					<< " number of arguments to "
+					<< "chanModes"
+					<< endl ;
+				break ;
+				}
+			theChan->onModeA( true, st[ argPos++ ] ) ;
+			break ;
+			}
+		case 'U':
+			{
+			if( argPos >= st.size() )
+				{
+				elog	<< "xServer::BurstChannel> Invalid"
+					<< " number of arguments to "
+					<< "chanModes"
+					<< endl ;
+				break ;
+				}
+			theChan->onModeU( true, st[ argPos++ ] ) ;
 			break ;
 			}
 		case 'l':

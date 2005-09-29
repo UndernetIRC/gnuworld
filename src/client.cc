@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: client.cc,v 1.81 2005/06/24 22:48:59 kewlio Exp $
+ * $Id: client.cc,v 1.82 2005/09/29 17:40:06 kewlio Exp $
  */
 
 #include	<new>
@@ -47,7 +47,7 @@
 #include	"ELog.h"
 #include	"events.h"
 
-RCSTAG("$Id: client.cc,v 1.81 2005/06/24 22:48:59 kewlio Exp $" ) ;
+RCSTAG("$Id: client.cc,v 1.82 2005/09/29 17:40:06 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -664,6 +664,14 @@ void xClient::OnChannelModeL( Channel*,
 {}
 
 void xClient::OnChannelModeK( Channel*,
+	bool, ChannelUser*, const string& )
+{}
+
+void xClient::OnChannelModeA( Channel*,
+	bool, ChannelUser*, const string& )
+{}
+
+void xClient::OnChannelModeU( Channel*,
 	bool, ChannelUser*, const string& )
 {}
 
@@ -2324,6 +2332,24 @@ for( string::size_type modePos = 0 ; modePos < modes.size() ; ++modePos )
 			theChan->removeMode(Channel::MODE_D);
 			modeVector.push_back( make_pair( false,
 				Channel::MODE_D ) ) ;
+			break;
+		case 'A':  // Apass for oplevels
+			if (theChan->getMode(Channel::MODE_A))
+				{
+				theChan->removeMode(Channel::MODE_A);
+				theChan->setApass( "" );
+				MyUplink->OnChannelModeA( theChan,
+					false, 0, string() ) ;
+				}
+			break;
+		case 'U':  // Upass for oplevels
+			if (theChan->getMode(Channel::MODE_U))
+				{
+				theChan->removeMode(Channel::MODE_U);
+				theChan->setUpass( "" );
+				MyUplink->OnChannelModeU( theChan,
+					false, 0, string() ) ;
+				}
 			break;
 		default:
 			break;

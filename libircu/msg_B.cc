@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_B.cc,v 1.8 2005/06/24 22:48:59 kewlio Exp $
+ * $Id: msg_B.cc,v 1.9 2005/09/29 17:40:06 kewlio Exp $
  */
 
 #include	<sys/types.h>
@@ -44,7 +44,7 @@
 #include	"iClient.h"
 #include	"ServerCommandHandler.h"
 
-RCSTAG( "$Id: msg_B.cc,v 1.8 2005/06/24 22:48:59 kewlio Exp $" ) ;
+RCSTAG( "$Id: msg_B.cc,v 1.9 2005/09/29 17:40:06 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -226,6 +226,18 @@ if( '+' == Param[ whichToken ][ 0 ] )
 					Param[ whichToken + 1 ] ) ;
 				whichToken++ ;
 				break ;
+			case 'A':
+				theServer->OnChannelModeA( theChan, true,
+					0,
+					Param[ whichToken + 1 ] ) ;
+				whichToken++ ;
+				break ;
+			case 'U':
+				theServer->OnChannelModeU( theChan, true,
+					0,
+					Param[ whichToken + 1 ] ) ;
+				whichToken++ ;
+				break ;
 			default:
 				break ;
 			} // switch
@@ -258,7 +270,13 @@ for( ; whichToken < Param.size() ; ++whichToken )
 	// will be burst afterwards.  This is useful because xParameters
 	// will only delimit tokens by ':', so the ban string is guaranteed
 	// to be caught.
-	if( '%' == Param[ whichToken ][ 0 ] )
+	if( '~' == Param[ whichToken ][ 0 ] )
+		{
+		// Channel ban exceptions
+		// Be sure to skip over the '%'
+		//parseBurstExcepts( theChan, Param[ whichToken ] + 1 ) ;
+		}
+	else if( '%' == Param[ whichToken ][ 0 ] )
 		{
 		// Channel bans
 		// Be sure to skip over the '%'

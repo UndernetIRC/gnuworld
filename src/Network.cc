@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: Network.cc,v 1.70 2005/06/24 22:49:39 kewlio Exp $
+ * $Id: Network.cc,v 1.71 2005/09/29 17:40:06 kewlio Exp $
  */
 
 #include	<new>
@@ -45,7 +45,7 @@
 #include	"ip.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: Network.cc,v 1.70 2005/06/24 22:49:39 kewlio Exp $" ) ;
+RCSTAG( "$Id: Network.cc,v 1.71 2005/09/29 17:40:06 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -1616,7 +1616,7 @@ list<const Channel*> xNetwork::getChannelsWithModes(const string& modes) const
 		/* don't need to initialise modeflag, as we know 'modes' starts with + or - */
 		foundMatch = true;
 		c = modes.c_str();
-		while (ch = *c++)
+		while ((ch = *c++))
 		{
 			/* handle change of flags (+/-) */
 			if (ch == '+')
@@ -1697,6 +1697,20 @@ list<const Channel*> xNetwork::getChannelsWithModes(const string& modes) const
 				case 'D':	/* new .12 mode for large channels */
 						if ((!modeflag && cptr->second->getMode(Channel::MODE_D))
 							|| (modeflag && !cptr->second->getMode(Channel::MODE_D)))
+						{
+							foundMatch = false;
+						}
+						break;
+				case 'A':	/* Apass for oplevels */
+						if ((!modeflag && cptr->second->getMode(Channel::MODE_A))
+							|| (modeflag && !cptr->second->getMode(Channel::MODE_A)))
+						{
+							foundMatch = false;
+						}
+						break;
+				case 'U':	/* Upass for oplevels */
+						if ((!modeflag && cptr->second->getMode(Channel::MODE_U))
+							|| (modeflag && !cptr->second->getMode(Channel::MODE_U)))
 						{
 							foundMatch = false;
 						}

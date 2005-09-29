@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: Channel.cc,v 1.52 2005/06/24 22:48:59 kewlio Exp $
+ * $Id: Channel.cc,v 1.53 2005/09/29 17:40:06 kewlio Exp $
  */
 
 #include	<new>
@@ -38,7 +38,7 @@
 #include	"server.h"
 #include	"ConnectionManager.h"
 
-RCSTAG("$Id: Channel.cc,v 1.52 2005/06/24 22:48:59 kewlio Exp $") ;
+RCSTAG("$Id: Channel.cc,v 1.53 2005/09/29 17:40:06 kewlio Exp $") ;
 
 namespace gnuworld
 {
@@ -58,6 +58,8 @@ const Channel::modeType Channel::MODE_M = 0x40 ;
 const Channel::modeType Channel::MODE_I = 0x80 ;
 const Channel::modeType Channel::MODE_R = 0x100 ;
 const Channel::modeType Channel::MODE_D = 0x200 ;
+const Channel::modeType Channel::MODE_A = 0x400 ;
+const Channel::modeType Channel::MODE_U = 0x800 ;
 
 Channel::Channel( const string& _name,
 	const time_t& _creationTime )
@@ -332,6 +334,34 @@ else
 	}
 }
 
+void Channel::onModeA( bool polarity, const string& newApass )
+{
+if( polarity )
+	{
+	setMode( MODE_A ) ;
+	setApass( newApass ) ;
+	}
+else
+	{
+	removeMode( MODE_K ) ;
+	setApass( string() ) ;
+	}
+}
+
+void Channel::onModeU( bool polarity, const string& newUpass )
+{
+if( polarity )
+	{
+	setMode( MODE_U ) ;
+	setUpass( newUpass ) ;
+	}
+else
+	{
+	removeMode( MODE_U ) ;
+	setUpass( string() ) ;
+	}
+}
+
 void Channel::onModeO( const vector< std::pair< bool, ChannelUser* > >&
 	opVector )
 {
@@ -469,6 +499,19 @@ if( modes & MODE_L )
 	argString += s.str() ;
 	}
 
+if( modes & MODE_A )
+	{
+	modeString += 'A' ;
+	argString += getApass() + ' ' ;
+	}
+
+if( modes & MODE_U )
+	{
+	modeString += 'U' ;
+	argString += getUpass() + ' ' ;
+	}
+
+
 return (modeString + ' ' + argString) ;
 }
 
@@ -532,8 +575,12 @@ modes = 0 ;
 limit = 0 ;
 #if __GNUC__ == 2
 key = "";
+Apass = "";
+Upass = "";
 #else
 key.clear();
+Apass.clear();
+Upass.clear();
 #endif
 }
 

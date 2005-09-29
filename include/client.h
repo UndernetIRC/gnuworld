@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: client.h,v 1.58 2005/01/25 02:57:51 dan_karrels Exp $
+ * $Id: client.h,v 1.59 2005/09/29 17:40:06 kewlio Exp $
  */
 
 #ifndef __CLIENT_H
-#define __CLIENT_H "$Id: client.h,v 1.58 2005/01/25 02:57:51 dan_karrels Exp $"
+#define __CLIENT_H "$Id: client.h,v 1.59 2005/09/29 17:40:06 kewlio Exp $"
 
 #include	<map>
 #include	<sstream>
@@ -283,6 +283,28 @@ public:
 	 * be empty.
 	 */
 	virtual void OnChannelModeK( Channel*, bool polarity,
+			ChannelUser*, const std::string& ) ;
+
+	/**
+	 * This method is invoked when a user sets or removes
+	 * channel mode A (Apass).  Keep in mind that the
+	 * source ChannelUser may be NULL if a server is
+	 * setting the mode.
+	 * If the mode is being removed, the Apass argument will
+	 * be empty.
+	 */
+	virtual void OnChannelModeA( Channel*, bool polarity,
+			ChannelUser*, const std::string& ) ;
+
+	/**
+	 * This method is invoked when a user sets or removes
+	 * channel mode U (Upass).  Keep in mind that the
+	 * source ChannelUser may be NULL if a server is
+	 * setting the mode.
+	 * If the mode is being removed, the Upass argument will
+	 * be empty.
+	 */
+	virtual void OnChannelModeU( Channel*, bool polarity,
 			ChannelUser*, const std::string& ) ;
 
 	/**
