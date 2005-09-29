@@ -28,7 +28,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: CHANINFOCommand.cc,v 1.48 2003/06/28 01:21:20 dan_karrels Exp $
+ * $Id: CHANINFOCommand.cc,v 1.49 2005/09/29 15:21:56 kewlio Exp $
  */
 
 #include	<string>
@@ -43,7 +43,7 @@
 #include	"libpq++.h"
 #include	"cservice_config.h"
 
-const char CHANINFOCommand_cc_rcsId[] = "$Id: CHANINFOCommand.cc,v 1.48 2003/06/28 01:21:20 dan_karrels Exp $" ;
+const char CHANINFOCommand_cc_rcsId[] = "$Id: CHANINFOCommand.cc,v 1.49 2005/09/29 15:21:56 kewlio Exp $" ;
 
 namespace gnuworld
 {
@@ -66,7 +66,11 @@ if( st.size() < 2 )
 	return true;
 	}
 
-sqlUser* tmpUser = bot->isAuthed(theClient, false);
+sqlUser* tmpUser = bot->isAuthed(theClient, true);
+if (!tmpUser)
+{
+	return false;
+}
 
 int adminAccess = 0;
 if (tmpUser) adminAccess = bot->getAdminAccessLevel(tmpUser);

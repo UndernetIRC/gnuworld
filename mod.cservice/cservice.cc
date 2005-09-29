@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: cservice.cc,v 1.246 2005/04/03 22:11:44 dan_karrels Exp $
+ * $Id: cservice.cc,v 1.247 2005/09/29 15:21:56 kewlio Exp $
  */
 
 #include	<new>
@@ -168,17 +168,19 @@ xClient::OnAttach() ;
 cservice::cservice(const string& args)
  : xClient( args )
 {
+
+commandLog.open("cs.log");
 /*
  *  Register command handlers.
  */
 
 RegisterCommand(new SHOWCOMMANDSCommand(this, "SHOWCOMMANDS", "[#channel]", 3));
-RegisterCommand(new LOGINCommand(this, "LOGIN", "<username> <password>", 10));
+RegisterCommand(new LOGINCommand(this, "LOGIN", "<username> <password>", 30));
 RegisterCommand(new ACCESSCommand(this, "ACCESS", "[channel] [username] [-min n] [-max n] [-op] [-voice] [-none] [-modif]", 5));
 RegisterCommand(new CHANINFOCommand(this, "CHANINFO", "<#channel>", 3));
 RegisterCommand(new ISREGCommand(this, "ISREG", "<#channel>", 4));
 RegisterCommand(new VERIFYCommand(this, "VERIFY", "<nick>", 3));
-RegisterCommand(new SEARCHCommand(this, "SEARCH", "[-min <amount>] <keywords>", 5));
+//RegisterCommand(new SEARCHCommand(this, "SEARCH", "[-min <amount>] <keywords>", 5));
 RegisterCommand(new MOTDCommand(this, "MOTD", "", 4));
 RegisterCommand(new HELPCommand(this, "HELP", "[command]", 4));
 RegisterCommand(new RANDOMCommand(this, "RANDOM", "", 4));
@@ -511,6 +513,7 @@ if( (getLastRecieved(theClient) + flood_duration) <= ::time(NULL) )
 	setFloodPoints(theClient, 0);
 	setOutputTotal(theClient, 0);
 	setLastRecieved(theClient, ::time(NULL));
+	ipFloodMap[theClient->getIP()]=0;
 	}
 else
 	{
@@ -575,6 +578,50 @@ else
 			floodComment.c_str());
 		return true;
 		} // if()
+
+		if (ipFloodMap[theClient->getIP()]>input_flood*5)
+		{
+			setLastRecieved(theClient, ::time(NULL));
+
+			string silenceMask = string( "*!*" )
+				+ theClient->getUserName()
+				+ "@"
+				+ theClient->getInsecureHost();
+
+			stringstream s;
+			s	<< getCharYYXXX()
+				<< " SILENCE "
+				<< theClient->getCharYYXXX()
+				<< " "
+				<< silenceMask
+				<< ends;
+			Write( s );
+
+			Notice(theClient,
+				"Flood me will you? I'm not going to listen to "
+				"you or your friends anymore.");
+
+			time_t expireTime = currentTime() + 3600;
+			silenceList.insert(silenceListType::value_type(silenceMask,
+				std::make_pair(expireTime, theClient->getCharYYXXX())));
+
+			setIgnored(theClient, true);
+
+			string floodComment;
+			StringTokenizer st(type);
+
+			if (st.size() >= 2)
+			{
+				floodComment = st[0] + ' ' + st[1];
+			} else {
+				floodComment = st[0];
+			}
+
+			logAdminMessage("IP-FLOOD from %s (%s)",
+				theClient->getNickUserHost().c_str(),
+				floodComment.c_str());
+			return true;
+		}
 	} // else()
 
 return false;
@@ -702,6 +749,8 @@ if( st.empty() )
 	return ;
 	}
 
+commandLog << (secure ? "[" : "<") << theClient->getNickUserHost() << (secure ? "] " : "> ")  << Message << endl;
+
 /*
  * Do flood checking - admins at 750 or above are excempt.
  * N.B: Only check that *after* someone has flooded ;)
@@ -753,6 +802,7 @@ if( commHandler == commandMap.end() )
 	// Why use 3 here?  Should be in config file
 	// (Violation of "rule of numbers")
 	setFloodPoints(theClient, getFloodPoints(theClient) + 3);
+	ipFloodMap[theClient->getIP()] += 3;
 	}
 else
 	{
@@ -772,6 +822,7 @@ else
 
 	setFloodPoints(theClient, getFloodPoints(theClient)
 		+ commHandler->second->getFloodPoints() );
+	ipFloodMap[theClient->getIP()] += commHandler->second->getFloodPoints();
 
 	totalCommands++;
 	commHandler->second->Exec( theClient, Message ) ;
@@ -799,6 +850,7 @@ if (hasFlooded(theClient, "CTCP"))
 	}
 
 setFloodPoints(theClient, getFloodPoints(theClient) + 5 );
+ipFloodMap[theClient->getIP()]+=5;
 
 StringTokenizer st( CTCP ) ;
 if( st.empty() )
@@ -1121,7 +1173,7 @@ if (!theChan)
 	{
 	elog	<< "cservice::getAdminAccessLevel> Unable to "
 		<< "locate channel '"
-		<< coderChan
+		<< coderChan.c_str()
 		<< "'! Sorry, I can't continue.."
 		<< endl;
 	::exit(0);
@@ -1402,7 +1454,7 @@ expireQuery	<< "SELECT user_id,channel_id FROM levels "
 
 #ifdef LOG_SQL
 	elog	<< "expireSuspends::sqlQuery> "
-		<< expireQuery.str()
+		<< expireQuery.str().c_str()
 		<< endl;
 #endif
 
@@ -1559,7 +1611,7 @@ expireQuery	<< "SELECT channel_id,id FROM bans "
 
 #ifdef LOG_SQL
 	elog	<< "sqlQuery> "
-		<< expireQuery.str()
+		<< expireQuery.str().c_str()
 		<< endl;
 #endif
 
@@ -1912,7 +1964,7 @@ theQuery	<< "SELECT "
 
 #ifdef LOG_SQL
 elog	<< "*** [CMaster::processDBUpdates]:sqlQuery: "
-		<< theQuery.str()
+		<< theQuery.str().c_str()
 		<< endl;
 #endif
 
@@ -1991,7 +2043,7 @@ theQuery	<< "SELECT "
 
 #ifdef LOG_SQL
 elog	<< "*** [CMaster::updateLevels]: sqlQuery: "
-		<< theQuery.str()
+		<< theQuery.str().c_str()
 		<< endl;
 #endif
 
@@ -2074,7 +2126,7 @@ void cservice::updateUsers()
 
 	#ifdef LOG_SQL
 	elog	<< "*** [CMaster::updateUsers]: sqlQuery: "
-			<< theQuery.str()
+			<< theQuery.str().c_str()
 			<< endl;
 	#endif
 
@@ -2201,7 +2253,7 @@ if (timer_id == pending_timerID)
 
 #ifdef LOG_SQL
 		elog	<< "cmaster::loadPendingChannelList> "
-			<< theQuery.str()
+			<< theQuery.str().c_str()
 			<< endl;
 #endif
 
@@ -3466,7 +3518,7 @@ theLog	<< "INSERT INTO channellog (ts, channelID, event, message, "
 
 #ifdef LOG_SQL
 	elog	<< "cservice::writeChannelLog> "
-		<< theLog.str()
+		<< theLog.str().c_str()
 		<< endl;
 #endif
 
@@ -3658,7 +3710,7 @@ theQuery	<<  "SELECT channels.name, pending.channel_id, user_id, pending.join_co
 
 #ifdef LOG_SQL
 elog	<< "*** [CMaster::loadPendingChannelList]: Loading pending channel details."
-	<< theQuery.str()
+	<< theQuery.str().c_str()
 	<< endl;
 #endif
 
@@ -4227,7 +4279,7 @@ void cservice::outputChannelAccesses(iClient* theClient, sqlUser* theUser, sqlUs
 
 	#ifdef LOG_SQL
 		elog	<< "CHANINFO::sqlQuery> "
-			<< channelsQuery.str()
+			<< channelsQuery.str().c_str()
 			<< endl;
 	#endif
 

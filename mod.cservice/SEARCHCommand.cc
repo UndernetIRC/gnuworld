@@ -24,7 +24,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: SEARCHCommand.cc,v 1.9 2003/06/28 01:21:20 dan_karrels Exp $
+ * $Id: SEARCHCommand.cc,v 1.10 2005/09/29 15:21:56 kewlio Exp $
  */
 
 #include	<string>
@@ -40,7 +40,7 @@
 #include	"Network.h"
 #include	<iostream>
 
-const char SEARCHCommand_cc_rcsId[] = "$Id: SEARCHCommand.cc,v 1.9 2003/06/28 01:21:20 dan_karrels Exp $" ;
+const char SEARCHCommand_cc_rcsId[] = "$Id: SEARCHCommand.cc,v 1.10 2005/09/29 15:21:56 kewlio Exp $" ;
 
 namespace gnuworld
 {
@@ -88,7 +88,11 @@ for( StringTokenizer::const_iterator ptr = st.begin() ; ptr != st.end() ;
 		}
 }
 
-sqlUser* theUser = bot->isAuthed(theClient, false);
+sqlUser* theUser = bot->isAuthed(theClient, true);
+if (!theUser)
+{
+	return false;
+}
 
 string matchString = st.assemble(posOfSearch);
 

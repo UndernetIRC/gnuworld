@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: LBANLISTCommand.cc,v 1.13 2005/03/25 03:07:29 dan_karrels Exp $
+ * $Id: LBANLISTCommand.cc,v 1.14 2005/09/29 15:21:56 kewlio Exp $
  */
 
 #include	<string>
@@ -38,7 +38,7 @@
 #include	"cservice_config.h"
 #include	"time.h"
 
-const char LBANLISTCommand_cc_rcsId[] = "$Id: LBANLISTCommand.cc,v 1.13 2005/03/25 03:07:29 dan_karrels Exp $" ;
+const char LBANLISTCommand_cc_rcsId[] = "$Id: LBANLISTCommand.cc,v 1.14 2005/09/29 15:21:56 kewlio Exp $" ;
 
 namespace gnuworld
 {
@@ -58,7 +58,10 @@ if( st.size() < 3 )
 
 // Is the channel registered?
 
-sqlUser* theUser = bot->isAuthed(theClient, false);
+sqlUser* theUser = bot->isAuthed(theClient, true);
+if (!theUser)
+	return false;
+
 sqlChannel* theChan = bot->getChannelRecord(st[1]);
 if(!theChan)
 	{

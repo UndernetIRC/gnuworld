@@ -5,7 +5,7 @@ Makefile
 libtool
 opts
 autom4te.cache
-libltdl/autom4te.cache
+configure.lineno
 
 .arch-ids
 {arch}

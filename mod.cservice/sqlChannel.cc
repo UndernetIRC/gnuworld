@@ -24,7 +24,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: sqlChannel.cc,v 1.38 2003/06/28 01:21:20 dan_karrels Exp $
+ * $Id: sqlChannel.cc,v 1.39 2005/09/29 15:21:56 kewlio Exp $
  */
 
 #include	<sstream>
@@ -41,7 +41,7 @@
 #include	"cservice_config.h"
 
 const char sqlChannel_h_rcsId[] = __SQLCHANNEL_H ;
-const char sqlChannel_cc_rcsId[] = "$Id: sqlChannel.cc,v 1.38 2003/06/28 01:21:20 dan_karrels Exp $" ;
+const char sqlChannel_cc_rcsId[] = "$Id: sqlChannel.cc,v 1.39 2005/09/29 15:21:56 kewlio Exp $" ;
 
 namespace gnuworld
 {
@@ -253,7 +253,7 @@ queryString	<< queryHeader
 		<< "keywords = '" << escapeSQLChars(keywords) << "', "
 		<< "registered_ts = " << registered_ts << ", "
 		<< "channel_ts = " << channel_ts << ", "
-		<< "channel_mode = '" << channel_mode << "', "
+		<< "channel_mode = '" << escapeSQLChars(channel_mode) << "', "
 		<< "userflags = " << userflags << ", "
 		<< "last_updated = now()::abstime::int4, "
 		<< "limit_offset = " << limit_offset << ", "

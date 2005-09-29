@@ -17,11 +17,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: cservice.h,v 1.103 2005/04/03 22:11:45 dan_karrels Exp $
+ * $Id: cservice.h,v 1.104 2005/09/29 15:21:56 kewlio Exp $
  */
 
 #ifndef __CSERVICE_H
-#define __CSERVICE_H "$Id: cservice.h,v 1.103 2005/04/03 22:11:45 dan_karrels Exp $"
+#define __CSERVICE_H "$Id: cservice.h,v 1.104 2005/09/29 15:21:56 kewlio Exp $"
 
 #include	<iostream>
 #include	<string>
@@ -94,7 +94,10 @@ protected:
 	EConfig* cserviceConfig; /* Configfile */
 	typedef map< string, Command*, noCaseCompare > commandMapType ;
 	typedef commandMapType::value_type pairType ;
+	typedef map< unsigned int, unsigned int > ipMapType ;
+	ipMapType		ipFloodMap;
 	commandMapType          commandMap;
+	std::ofstream		commandLog;
 
 public:
 

@@ -21,11 +21,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: levels.h,v 1.29 2003/06/28 01:21:20 dan_karrels Exp $
+ * $Id: levels.h,v 1.30 2005/09/29 15:21:56 kewlio Exp $
  */
 
 #ifndef __LEVELS_H
-#define __LEVELS_H "$Id: levels.h,v 1.29 2003/06/28 01:21:20 dan_karrels Exp $"
+#define __LEVELS_H "$Id: levels.h,v 1.30 2005/09/29 15:21:56 kewlio Exp $"
 
 namespace gnuworld {
 
@@ -114,7 +114,7 @@ namespace gnuworld {
     const int special = 750;
     const int noreg = 750;
     const int neverreg = 750;
-    const int suspend = 501;
+    const int suspend = 600;
     const int tempman = 501;
     const int caution = 501;
     const int vacation = 501;

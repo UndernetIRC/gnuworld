@@ -25,7 +25,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: CLEARMODECommand.cc,v 1.10 2005/01/08 23:33:42 dan_karrels Exp $
+ * $Id: CLEARMODECommand.cc,v 1.11 2005/09/29 15:21:56 kewlio Exp $
  */
 
 #include	<string>
@@ -38,7 +38,7 @@
 #include	"responses.h"
 #include	"Network.h"
 
-const char CLEARMODECommand_cc_rcsId[] = "$Id: CLEARMODECommand.cc,v 1.10 2005/01/08 23:33:42 dan_karrels Exp $" ;
+const char CLEARMODECommand_cc_rcsId[] = "$Id: CLEARMODECommand.cc,v 1.11 2005/09/29 15:21:56 kewlio Exp $" ;
 
 namespace gnuworld
 {
@@ -104,7 +104,7 @@ if(!tmpChan)
 	return false;
 	}
 
-bot->ClearMode( tmpChan, string( "bmstnipklr" ), true ) ;
+bot->ClearMode( tmpChan, string( "mstnipklr" ), true ) ;
 
 bot->Notice(theClient,
     bot->getResponse(theUser,
