@@ -1,10 +1,10 @@
-dnl $Id: configure.ac,v 1.31 2005/01/17 23:08:53 dan_karrels Exp $
+dnl $Id: configure.ac,v 1.32 2005/09/29 15:58:40 kewlio Exp $
 dnl ----------------------------------------------------------
 
 echo Configuring GNUWorld...
 echo
 
-AC_REVISION($Revision: 1.31 $)
+AC_REVISION($Revision: 1.32 $)
 AC_INIT
 AC_CONFIG_SRCDIR([src/main.cc])
 AM_INIT_AUTOMAKE(gnuworld,2.7)
@@ -407,6 +407,6 @@ AC_OUTPUT
 
 echo
 echo Configuration has been finished, and everything seems to be all right.
-echo Now you have the chance to modify include/config.h to set your
+echo Now, you have the chance to modify include/gnuworld_config.h to set your
 echo preferred options...
 echo

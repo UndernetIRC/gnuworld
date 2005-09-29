@@ -1,4 +1,9 @@
-// $Id: ChangeLog,v 1.21 2005/09/29 15:23:02 kewlio Exp $ //
+// $Id: ChangeLog,v 1.22 2005/09/29 15:58:40 kewlio Exp $ //
+
+2005-09-29	Dan-m00 <daniel@undernet.org>
+		* configure.ac: config.h hasnt existed in... years! update to gnuworld_config.h
+
+		* configure: rebuilt configure with autoconf
 
 2005-09-28	Dan-m00 <daniel@undernet.org>
 		* .cvsignore: ignore configure.lineno, tidy up
