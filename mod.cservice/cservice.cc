@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: cservice.cc,v 1.248 2005/09/29 17:40:06 kewlio Exp $
+ * $Id: cservice.cc,v 1.249 2005/09/30 02:26:14 kewlio Exp $
  */
 
 #include	<new>
@@ -874,7 +874,7 @@ else if(Command == "VERSION")
 	xClient::DoCTCP(theClient, CTCP,
 		"Undernet P10 Channel Services II ["
 		__DATE__ " " __TIME__
-		"] Release 1.1pl13");
+		"] Release 1.2pl1");
 	}
 else if(Command == "PROBLEM?")
 	{
@@ -3532,7 +3532,7 @@ SQLDb->ExecCommandOk(theLog.str().c_str());
  * Global method to replace ' with \' in strings for safe placement in
  * SQL statements.
  */
-const string gnuworld::escapeSQLChars(const string& theString)
+const string escapeSQLChars(const string& theString)
 {
 string retMe ;
 
@@ -3555,7 +3555,7 @@ for( string::const_iterator ptr = theString.begin() ;
 return retMe ;
 }
 
-const string gnuworld::searchSQL(const string& theString)
+const string searchSQL(const string& theString)
 {
 string retMe ;
 
