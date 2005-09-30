@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_B.cc,v 1.9 2005/09/29 17:40:06 kewlio Exp $
+ * $Id: msg_B.cc,v 1.10 2005/09/30 00:47:06 kewlio Exp $
  */
 
 #include	<sys/types.h>
@@ -44,7 +44,7 @@
 #include	"iClient.h"
 #include	"ServerCommandHandler.h"
 
-RCSTAG( "$Id: msg_B.cc,v 1.9 2005/09/29 17:40:06 kewlio Exp $" ) ;
+RCSTAG( "$Id: msg_B.cc,v 1.10 2005/09/30 00:47:06 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -100,6 +100,10 @@ CREATE_LOADER(msg_B)
 // is a zombie:
 // BG B #nails 1036089823
 // We ignore this case.
+//
+// With u2.10.12's oplevels, we have to deal with an extra case:
+// <numeric> B <channel> <ts> <modes...> <numnick>:<oplevel>
+// Ck B #test 1128024142 +tnAU apass upass BBAAA:999
 //
 bool msg_B::Execute( const xParameters& Param )
 {
@@ -451,6 +455,20 @@ for( StringTokenizer::const_iterator ptr = st.begin() ; ptr != st.end() ;
 						true, chanUser ) ) ;
 				mode_state = (mode_state == 1) ? 3 : 2;
 				break ;
+			case '0':
+			case '1':
+			case '2':
+			case '3':
+			case '4':
+			case '5':
+			case '6':
+			case '7':
+			case '8':
+			case '9':
+				/* This is an oplevel, which we are not (currently) interested in.
+				 * However, we also don't want it to cause an error!
+				 */
+				break;
 			default:
 				elog	<< "msg_B::parseBurstUsers> "
 					<< "Unknown mode: "
