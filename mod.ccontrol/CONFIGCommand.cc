@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: CONFIGCommand.cc,v 1.11 2005/06/19 01:39:24 kewlio Exp $
+ * $Id: CONFIGCommand.cc,v 1.12 2005/09/30 21:03:07 kewlio Exp $
  */
 
 #include	<string>
@@ -26,7 +26,7 @@
 #include	"CControlCommands.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: CONFIGCommand.cc,v 1.11 2005/06/19 01:39:24 kewlio Exp $" ) ;
+RCSTAG( "$Id: CONFIGCommand.cc,v 1.12 2005/09/30 21:03:07 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -67,6 +67,24 @@ for(unsigned int  pos =1; pos < st.size() ;)
 			{
 			bot->Notice(theClient,"%s was successfully updated to %s",
 				    st[pos].c_str(),st[pos+1].c_str());
+			}
+		pos+=2;
+		}
+	else if(!strcasecmp(st[pos],"-IClones"))
+		{
+		if(st.size() < pos +2)
+			{
+			bot->Notice(theClient,"-IClones must get the number of ident clones");
+			return true;
+			}
+		if(!bot->updateMisc("IClones",atoi(st[pos+1].c_str())))
+			{
+			bot->MsgChanLog("Error while updating the max ident clones in the db!\n");
+			}
+		else
+			{
+			bot->Notice(theClient,"%s was successfully updated to %s",
+				st[pos].c_str(),st[pos+1].c_str());
 			}
 		pos+=2;
 		}

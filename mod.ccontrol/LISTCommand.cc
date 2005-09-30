@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: LISTCommand.cc,v 1.20 2005/06/24 23:05:45 kewlio Exp $
+ * $Id: LISTCommand.cc,v 1.21 2005/09/30 21:03:07 kewlio Exp $
  */
 
 #include	<string>
@@ -32,7 +32,7 @@
 #include	"StringTokenizer.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: LISTCommand.cc,v 1.20 2005/06/24 23:05:45 kewlio Exp $" ) ;
+RCSTAG( "$Id: LISTCommand.cc,v 1.21 2005/09/30 21:03:07 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -147,7 +147,7 @@ else if(!strcasecmp(st[1].c_str(),"channels"))
 			}
 			isValid = true;
 			c = st[3].c_str();
-			while (ch = *c++)
+			while ((ch = *c++))
 			{
 				switch (ch) {
 					case '+':

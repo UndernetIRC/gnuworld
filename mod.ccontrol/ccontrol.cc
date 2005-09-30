@@ -20,7 +20,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccontrol.cc,v 1.191 2005/06/24 15:34:18 kewlio Exp $
+ * $Id: ccontrol.cc,v 1.192 2005/09/30 21:03:07 kewlio Exp $
 */
 
 #define MAJORVER "1"
@@ -66,7 +66,7 @@
 #include	"ccontrol_generic.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: ccontrol.cc,v 1.191 2005/06/24 15:34:18 kewlio Exp $" ) ;
+RCSTAG( "$Id: ccontrol.cc,v 1.192 2005/09/30 21:03:07 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -654,7 +654,8 @@ RegisterCommand( new MAXUSERSCommand( this, "MAXUSERS",
 
 RegisterCommand( new CONFIGCommand( this, "CONFIG",
 	" -GTime <duration in secs> / -VClones <amount> -Clones <amount>"
-	" -CClones <amount> -CClonesCIDR <size> -CClonesGline <Yea/No>"
+	" -CClones <amount> -CClonesCIDR <size> -CClonesGline <Yes/No>"
+	" -IClones <amount>"
 	" -CClonesTime <seconds> / -GBCount <count> / -GBInterval <interval in secs> "
 	" -SGline <Yes/No> "
 	"Manages all kinds of configuration related values ",
@@ -1186,6 +1187,7 @@ int i=0;
 int client_addr[4] = { 0 };
 unsigned long mask_ip;
 const char *client_ip;
+char Log[200];
 switch( theEvent )
 	{
 	case EVT_QUIT:
@@ -1228,6 +1230,15 @@ switch( theEvent )
 					if (clientsIp24MapLastWarn[client_ip] > 0)
 						clientsIp24MapLastWarn.erase(clientsIp24MapLastWarn.find(client_ip));
 	                        }
+
+				/* ident clones */
+				sprintf(Log, "%s/%d-%s", client_ip, CClonesCIDR, tmpUser->getUserName().c_str());
+				if(--clientsIp24IdentMap[Log] < 1)
+				{
+					clientsIp24IdentMap.erase(clientsIp24IdentMap.find(Log));
+					if (clientsIp24IdentMapLastWarn[Log] > 0)
+						clientsIp24IdentMapLastWarn.erase(clientsIp24IdentMapLastWarn.find(Log));
+				}
 
 			if(--clientsIpMap[tIP] < 1)
 				{
@@ -1711,8 +1722,23 @@ if(dbConnected)
                                 /* convert longip back to ip */
                                 mask_ip = htonl(mask_ip);
                                 client_ip = inet_ntoa((const in_addr&) mask_ip);
+				sprintf(Log, "%s/%d-%s", client_ip, CClonesCIDR, NewUser->getUserName().c_str());
+				int CurIdentConnections = ++clientsIp24IdentMap[Log];
                                 int CurCIDRConnections = ++clientsIp24Map[client_ip];
                                 sprintf(Log,"*@%s/%d", client_ip, CClonesCIDR);
+
+				/* check idents to see if we have too many */
+				if (CurIdentConnections > maxIClones)
+				{
+					/* too many - send a warning to the chanlog if within warning range */
+					if ((clientsIp24IdentMapLastWarn[Log] + CClonesTime) <= time(NULL))
+					{
+						MsgChanLog("CIDR Ident clones for ident %s on %s/%d, total clones %d\n",
+							NewUser->getUserName().c_str(), client_ip, CClonesCIDR, CurIdentConnections);
+						clientsIp24IdentMapLastWarn[Log] = time(NULL);
+					}
+					/* TODO: possible auto-gline feature? */
+				}
   
                                 if ((CurCIDRConnections > maxCClones) && (CurCIDRConnections > getExceptions(NewUser->getUserName()+"@" + tIP)) &&
                                         (CurCIDRConnections > getExceptions(NewUser->getUserName()+"@"+NewUser->getRealInsecureHost())))
@@ -3803,6 +3829,7 @@ bool gotCClones = false;
 bool gotCClonesCIDR = false;
 bool gotCClonesTime = false;
 bool gotCClonesGline = false;
+bool gotIClones = false;
 bool gotGLen = false;
 bool gotSave = false;
  
@@ -3871,6 +3898,11 @@ for(int i=0; i< SQLDb->Tuples();++i)
                 gotCClonesGline = true;
                 CClonesGline = (atoi(SQLDb->GetValue(i,1)) == 1);
                 }
+	else if(!strcasecmp(SQLDb->GetValue(i,0),"IClones"))
+		{
+		gotIClones = true;
+		maxIClones = atoi(SQLDb->GetValue(i,1));
+		}
 	else if(!strcasecmp(SQLDb->GetValue(i,0),"GTime"))
 		{
 		gotGLen = true;
@@ -3924,6 +3956,11 @@ if(!gotCClonesGline)
         CClonesGline = false;
         updateMisc("CClonesGline",CClonesGline);
         }
+if(!gotIClones)
+	{
+	maxIClones = 20;
+	updateMisc("IClones",maxIClones);
+	}
 if(!gotGLen)
 	{
 	maxGlineLen = 3600;
@@ -4702,6 +4739,7 @@ Notice(tmpClient,"ccUser: %d",ccUser::numAllocated);
 Notice(tmpClient,"Total of %d users in the map",usersMap.size()); 
 Notice(tmpClient,"GBCount : %d , GBInterval : %d",glineBurstCount,glineBurstInterval);
 Notice(tmpClient,"Max Clones : %d , Max Virtual Clones : %d",maxClones,maxVClones);
+Notice(tmpClient,"Max Ident Clones : %d",maxIClones);
 Notice(tmpClient,"Max CIDR Clones: %d per /%d - Auto-Gline: %s",maxCClones,CClonesCIDR,CClonesGline ? "True" : "False");
 Notice(tmpClient,"  (%d seconds between announcements per block)", CClonesTime);
 Notice(tmpClient,"Save gline is : %s",saveGlines ? "True" : "False"); 
@@ -4742,6 +4780,10 @@ else if(!strcasecmp(varName,"CClonesTime"))
 else if(!strcasecmp(varName,"CClonesGline"))
         {
         CClonesGline = (Value == 1);
+	}
+else if(!strcasecmp(varName,"IClones"))
+	{
+	maxIClones = Value;
 	}
 else if(!strcasecmp(varName,"GTime"))
 	{

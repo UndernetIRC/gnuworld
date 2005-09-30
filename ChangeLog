@@ -1,4 +1,15 @@
-// $Id: ChangeLog,v 1.25 2005/09/30 02:26:14 kewlio Exp $ //
+// $Id: ChangeLog,v 1.26 2005/09/30 21:03:06 kewlio Exp $ //
+
+2005-09-30	Dan-m00 <daniel@undernet.org>
+		* src/server.cc: swap function that handles 'regular' channel modes.
+
+		* mod.ccontrol/LISTCommand.cc: fix compiler warning.
+
+		* mod.ccontrol/ccontrol.h: add structures for ident clones warnings
+
+		* mod.ccontrol/ccontrol.cc: add 'CIDR-based ident clones' warnings
+
+		* mod.ccontrol/CONFIGCommand.cc: add config for the above feature (-IClones)
 
 2005-09-30	Dan-m00 <daniel@undernet.org>
 		* mod.cservice/cservice.cc: bumped version number up.
