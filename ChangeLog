@@ -1,4 +1,10 @@
-// $Id: ChangeLog,v 1.26 2005/09/30 21:03:06 kewlio Exp $ //
+// $Id: ChangeLog,v 1.27 2005/09/30 22:07:28 kewlio Exp $ //
+
+2005-09-30	Dan-m00 <daniel@undernet.org>
+		* mod.ccontrol/ccontrol.h: add structures for virtual clones rate limiting
+
+		* mod.ccontrol/ccontrol.cc: add virtual clones rate limiting
+			alter the output format of CIDR-based ident clones warnings
 
 2005-09-30	Dan-m00 <daniel@undernet.org>
 		* src/server.cc: swap function that handles 'regular' channel modes.

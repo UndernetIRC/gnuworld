@@ -16,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccontrol.h,v 1.96 2005/09/30 21:03:07 kewlio Exp $
+ * $Id: ccontrol.h,v 1.97 2005/09/30 22:07:28 kewlio Exp $
  */
 
 #ifndef __CCONTROL_H
-#define __CCONTROL_H "$Id: ccontrol.h,v 1.96 2005/09/30 21:03:07 kewlio Exp $"
+#define __CCONTROL_H "$Id: ccontrol.h,v 1.97 2005/09/30 22:07:28 kewlio Exp $"
 
 //Undef this if you want to log to the database
 #define LOGTOHD 
@@ -830,6 +830,14 @@ public:
 					
 	clientsIpIterator virtualClientsMap_end()
 		{ return virtualClientsMap.end(); }
+
+	clientsIpMapType		virtualClientsMapLastWarn;
+
+	clientsIpIterator virtualClientsMapLastWarn_begin()
+		{ return virtualClientsMapLastWarn.begin(); }
+
+	clientsIpIterator virtualClientsMapLastWarn_end()
+		{ return virtualClientsMapLastWarn.end(); }
 	
 	typedef  usersMapType::const_iterator	usersConstIterator;
 	

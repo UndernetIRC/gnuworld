@@ -20,7 +20,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccontrol.cc,v 1.192 2005/09/30 21:03:07 kewlio Exp $
+ * $Id: ccontrol.cc,v 1.193 2005/09/30 22:07:28 kewlio Exp $
 */
 
 #define MAJORVER "1"
@@ -66,7 +66,7 @@
 #include	"ccontrol_generic.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: ccontrol.cc,v 1.192 2005/09/30 21:03:07 kewlio Exp $" ) ;
+RCSTAG( "$Id: ccontrol.cc,v 1.193 2005/09/30 22:07:28 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -1258,6 +1258,8 @@ switch( theEvent )
 			if(--virtualClientsMap[virtualHost] < 1)
 				{
 				virtualClientsMap.erase(virtualClientsMap.find(virtualHost));
+				if (virtualClientsMapLastWarn[virtualHost] > 0)
+					virtualClientsMapLastWarn.erase(virtualClientsMapLastWarn.find(virtualHost));
 				}
 			}
 		ccUserData* UserData = static_cast< ccUserData* >(
@@ -1733,8 +1735,8 @@ if(dbConnected)
 					/* too many - send a warning to the chanlog if within warning range */
 					if ((clientsIp24IdentMapLastWarn[Log] + CClonesTime) <= time(NULL))
 					{
-						MsgChanLog("CIDR Ident clones for ident %s on %s/%d, total clones %d\n",
-							NewUser->getUserName().c_str(), client_ip, CClonesCIDR, CurIdentConnections);
+						MsgChanLog("CIDR Ident clones (%d total) for %s@%s/%d\n",
+							CurIdentConnections, NewUser->getUserName().c_str(), client_ip, CClonesCIDR);
 						clientsIp24IdentMapLastWarn[Log] = time(NULL);
 					}
 					/* TODO: possible auto-gline feature? */
@@ -1821,10 +1823,16 @@ if(dbConnected)
 				if((CurConnections > maxVClones) &&
 				     (CurConnections > getExceptions("*@" + ipClass)))
 					{
-					MsgChanLog("Virtual clones for real name %s on %s, total connections %d\n",
-					    NewUser->getDescription().c_str()
-					    ,ipClass.c_str()
-					    ,CurConnections);
+						/* check for rate limiting */
+						if ((virtualClientsMapLastWarn[NewUser->getDescription() + "@" + ipClass] + CClonesTime) <= time(NULL))
+						{
+							/* send the chanlog message and dont warn for another CClonesTime seconds */
+							MsgChanLog("Virtual clones for real name %s on %s, total connections %d\n",
+							    NewUser->getDescription().c_str()
+							    ,ipClass.c_str()
+							    ,CurConnections);
+							virtualClientsMapLastWarn[NewUser->getDescription() + "@" + ipClass] = time(NULL);
+						}
 					}
 				}
 			}
@@ -4727,8 +4735,10 @@ Notice(tmpClient,"CControl version %s.%s [%s]",MAJORVER,MINORVER,RELDATE);
 Notice(tmpClient,"Uptime : %dD %dH %dM %dS",days,hours,mins,secs);
 if(checkClones)
 	{
-	Notice(tmpClient,"Monitoring %d diffrent clones hosts\n",clientsIpMap.size());
-	Notice(tmpClient,"and %d diffrent virtual clones hosts\n",virtualClientsMap.size());
+	Notice(tmpClient,"Monitoring %d different clones hosts\n",clientsIpMap.size());
+	Notice(tmpClient,"and %d different CIDR clones hosts\n", clientsIp24Map.size());
+	Notice(tmpClient,"and %d different CIDR ident clones hosts\n", clientsIp24IdentMap.size());
+	Notice(tmpClient,"and %d different virtual clones hosts\n",virtualClientsMap.size());
 	}	
 Notice(tmpClient,"%d glines are waiting in the gline queue",glineQueue.size());
 Notice(tmpClient,"Allocated Structures:");
