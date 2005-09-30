@@ -1,4 +1,4 @@
--- "$Id: README.cservice,v 1.18 2003/02/11 18:04:06 jeekay Exp $"
+-- "$Id: README.cservice,v 1.19 2005/09/30 00:48:43 kewlio Exp $"
 --
 -- For more detailed information about setting up GNUworld, visit :
 --      http://coder-com.undernet.org/gnuworld-setup/
@@ -34,6 +34,8 @@ Make sure you are in the gnuworld/doc directory.
 > psql cservice < language_table.sql
 > psql cservice < cservice.help.sql
 > psql cservice < cservice.web.sql
+> psql cservice < cservice.config.sql
+> psql cservice < greeting.sql
 
 Create a local (for the www) Database called 'local_db' for webcookies
 (without this local db the website will NOT work)

@@ -1,4 +1,19 @@
-// $Id: ChangeLog,v 1.23 2005/09/29 17:40:06 kewlio Exp $ //
+// $Id: ChangeLog,v 1.24 2005/09/30 00:48:43 kewlio Exp $ //
+
+2005-09-29	Dan-m00 <daniel@undernet.org>
+		* mod.cservice/CLEARMODECommand.cc: add "D" to the modes cleared.
+			Don't clear oplevel modes as they should never be touched by cservice.
+
+		* doc/cservice.config.sql: remove old, unused variables
+			Add new 'MAX_BANS' config entry for BAN command.
+
+		* doc/README.cservice: add references to cservice.config.sql and
+			greeting.sql as these are not already listed.
+
+		* mod.cservice/BANCommand.cc: add a maximum limit of bans per channel.
+			This is set via the config command (variables SQL table)
+
+		* libircu/msg_B.cc: fixed parsing of oplevels in burst (ignore them)
 
 2005-09-29	Dan-m00 <daniel@undernet.org>
 		* include/Channel.h:

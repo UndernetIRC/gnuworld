@@ -33,7 +33,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: BANCommand.cc,v 1.35 2005/03/25 03:07:29 dan_karrels Exp $
+ * $Id: BANCommand.cc,v 1.36 2005/09/30 00:48:43 kewlio Exp $
  */
 
 #include	<new>
@@ -51,7 +51,7 @@
 #include	"responses.h"
 #include	"match.h"
 
-const char BANCommand_cc_rcsId[] = "$Id: BANCommand.cc,v 1.35 2005/03/25 03:07:29 dan_karrels Exp $" ;
+const char BANCommand_cc_rcsId[] = "$Id: BANCommand.cc,v 1.36 2005/09/30 00:48:43 kewlio Exp $" ;
 
 namespace gnuworld
 {
@@ -250,6 +250,31 @@ if(banReason.size() > 128)
 	);
 	return true;
 	}
+
+/* check if the banlist is full */
+int max_bans = bot->getConfigVar("MAX_BANS")->asInt();
+int ban_count = 0;
+
+if (max_bans > 0)
+{
+	/* if we have a max ban limit, get a count of the bans */
+	std::map < int,sqlBan* >::iterator ptr = theChan->banList.begin();
+
+	while (ptr != theChan->banList.end())
+	{
+		ban_count++;	/* increment ban counter */
+		++ptr;
+	}
+
+	if (ban_count >= max_bans)
+	{
+		/* banlist is full */
+		bot->Notice(theClient, "Sorry, The channel banlist is full (%i bans)",
+			ban_count);
+		return true;
+
+	}
+}
 
 int banDuration = banTime * 3600;
 string banTarget = st[2];
