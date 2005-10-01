@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: EConfig.cc,v 1.8 2004/01/25 14:35:31 dan_karrels Exp $
+ * $Id: EConfig.cc,v 1.9 2005/10/01 13:13:55 kewlio Exp $
  */
 
 #include	<unistd.h> // unlink()
@@ -38,7 +38,7 @@
 #include	"ELog.h"
 #include	"misc.h"
 
-const char rcsId[] = "$Id: EConfig.cc,v 1.8 2004/01/25 14:35:31 dan_karrels Exp $" ;
+const char rcsId[] = "$Id: EConfig.cc,v 1.9 2005/10/01 13:13:55 kewlio Exp $" ;
 
 namespace gnuworld
 {
@@ -162,6 +162,9 @@ while( getline( configFile, tmp ) )
 		elog	<< "EConfig: Improper number of fields "
 			<< "at line: "
 			<< lineNumber
+			<< std::endl ;
+		elog	<< "EConfig: Perhaps you meant for an empty "
+			<< "value? Use: key = '' to specify empty values"
 			<< std::endl ;
 		return false ;
 		}
