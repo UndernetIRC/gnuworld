@@ -1,4 +1,11 @@
-// $Id: ChangeLog,v 1.29 2005/10/01 13:13:55 kewlio Exp $ //
+// $Id: ChangeLog,v 1.30 2005/10/01 14:31:43 kewlio Exp $ //
+
+2005-10-01	Dan-m00 <daniel@undernet.org>
+		* mod.cservice/BANCommand.cc:
+		* mod.cservice/cservice.cc: when a user sets a hidden host ban, match
+			users that are logged in, but not hidden against it.
+			e.g. *!*@test.users.undernet.org will match a regular user that
+				is authed under 'test', but not set mode +x
 
 2005-10-01	Dan-m00 <daniel@undernet.org>
 		* libgnuworld/EConfig.cc: Add an extra warning when a "key=value" pair

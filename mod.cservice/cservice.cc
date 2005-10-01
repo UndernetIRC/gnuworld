@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: cservice.cc,v 1.249 2005/09/30 02:26:14 kewlio Exp $
+ * $Id: cservice.cc,v 1.250 2005/10/01 14:31:43 kewlio Exp $
  */
 
 #include	<new>
@@ -3101,6 +3101,14 @@ xClient::OnChannelEvent( whichEvent, theChan,
 sqlBan* cservice::isBannedOnChan(sqlChannel* theChan, iClient* theClient)
 {
 map < int,sqlBan* >::const_iterator ptr = theChan->banList.begin();
+std::string authbanmask = "";
+
+if (theClient->isModeR() && !theClient->isModeX())
+{
+	/* client it authed (but not +x'd), construct a hidden host to match against */
+	authbanmask += theClient->getNickName() + "!" + theClient->getUserName();
+	authbanmask += "@" + theClient->getAccount() + theClient->getHiddenHostSuffix();
+}
 
 for( ; ptr != theChan->banList.end() ; ++ptr )
 	{
@@ -3113,6 +3121,14 @@ for( ; ptr != theChan->banList.end() ; ++ptr )
 			<< endl ;
 		continue ;
 		}
+
+	/* client may be logged in, but not mode +x - check them as if they were */
+	if (theClient->isModeR() && !theClient->isModeX())
+	{
+		/* client is authed, check our constructed hidden host against them */
+		if ((match(theBan->getBanMask(), authbanmask)) == 0)
+			return theBan;
+	}
 
 	if( (match(theBan->getBanMask(),
 		theClient->getNickUserHost()) == 0) ||

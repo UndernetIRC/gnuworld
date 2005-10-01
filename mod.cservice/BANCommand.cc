@@ -33,7 +33,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: BANCommand.cc,v 1.36 2005/09/30 00:48:43 kewlio Exp $
+ * $Id: BANCommand.cc,v 1.37 2005/10/01 14:31:43 kewlio Exp $
  */
 
 #include	<new>
@@ -51,7 +51,7 @@
 #include	"responses.h"
 #include	"match.h"
 
-const char BANCommand_cc_rcsId[] = "$Id: BANCommand.cc,v 1.36 2005/09/30 00:48:43 kewlio Exp $" ;
+const char BANCommand_cc_rcsId[] = "$Id: BANCommand.cc,v 1.37 2005/10/01 14:31:43 kewlio Exp $" ;
 
 namespace gnuworld
 {
@@ -396,6 +396,8 @@ for( ; banIterator != oldBans.end() ; ++banIterator )
 	}
 
 vector< iClient* > clientsToKick ;
+std::string authbanmask;
+
 for(Channel::userIterator chanUsers = theChannel->userList_begin();
 	chanUsers != theChannel->userList_end(); ++chanUsers)
 	{
@@ -404,6 +406,18 @@ for(Channel::userIterator chanUsers = theChannel->userList_begin();
 	 *  Iterate over channel members, find a match and boot them..
 	 */
 
+	if (tmpUser->getClient()->isModeR() && !tmpUser->getClient()->isModeX())
+	{
+		/* User is logged in, but not +x'd - construct a hidden host mask to check against */
+		authbanmask = tmpUser->getClient()->getNickName() + "!" + tmpUser->getClient()->getUserName();
+		authbanmask += "@" + tmpUser->getClient()->getAccount() + tmpUser->getClient()->getHiddenHostSuffix();
+		if ((match(banTarget, authbanmask)) == 0)
+		{
+			/* don't kick channel services (+k users) */
+			if (!tmpUser->getClient()->getMode(iClient::MODE_SERVICES))
+				clientsToKick.push_back(tmpUser->getClient());
+		}
+	}
 	if( (match(banTarget, tmpUser->getClient()->getNickUserHost()) == 0) ||
 		(match(banTarget, tmpUser->getClient()->getRealNickUserHost()) == 0) )
 		{
