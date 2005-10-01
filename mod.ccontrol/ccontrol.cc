@@ -20,7 +20,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccontrol.cc,v 1.193 2005/09/30 22:07:28 kewlio Exp $
+ * $Id: ccontrol.cc,v 1.194 2005/10/01 15:56:02 kewlio Exp $
 */
 
 #define MAJORVER "1"
@@ -66,7 +66,7 @@
 #include	"ccontrol_generic.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: ccontrol.cc,v 1.193 2005/09/30 22:07:28 kewlio Exp $" ) ;
+RCSTAG( "$Id: ccontrol.cc,v 1.194 2005/10/01 15:56:02 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -4397,7 +4397,7 @@ for(serversConstIterator ptr = serversMap_begin();ptr != serversMap_end();++ptr)
 	tmpServer = ptr->second;
 	if(tmpServer->getNetServer())
 		{
-		Notice(theClient,"%3s (%3d) Name: %s Version: %s",
+		Notice(theClient,"%3s (%4d) Name: %s Version: %s",
 			tmpServer->getLastNumeric().c_str(),
 			base64toint(tmpServer->getLastNumeric().c_str()),
 			tmpServer->getName().c_str(),
@@ -4405,7 +4405,7 @@ for(serversConstIterator ptr = serversMap_begin();ptr != serversMap_end();++ptr)
 		}
 	else if(tmpServer->getReportMissing())
 		{
-		Notice(theClient,"%3s (%3d) Name: %s Version: %s (\002*MISSING*\002)",
+		Notice(theClient,"%3s (%4d) Name: %s Version: %s (\002*MISSING*\002)",
 			tmpServer->getLastNumeric().c_str(),
 			base64toint(tmpServer->getLastNumeric().c_str()),
 			tmpServer->getName().c_str(),
@@ -4413,7 +4413,7 @@ for(serversConstIterator ptr = serversMap_begin();ptr != serversMap_end();++ptr)
 		}
 	else
 		{
-		Notice(theClient,"Name: %s Version: %s",
+		Notice(theClient,"           Name: %s Version: %s",
 			tmpServer->getName().c_str(),
 			tmpServer->getVersion().c_str());
 		}		

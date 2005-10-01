@@ -1,4 +1,8 @@
-// $Id: ChangeLog,v 1.30 2005/10/01 14:31:43 kewlio Exp $ //
+// $Id: ChangeLog,v 1.31 2005/10/01 15:56:01 kewlio Exp $ //
+
+2005-10-01	Dan-m00 <daniel@undernet.org>
+		* mod.ccontrol/ccontrol.cc: increase size of numeric column to 4 in
+			'LIST servers' command.  Fix fake servers to align in output.
 
 2005-10-01	Dan-m00 <daniel@undernet.org>
 		* mod.cservice/BANCommand.cc:
