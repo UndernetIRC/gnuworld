@@ -1,4 +1,7 @@
-// $Id: ChangeLog,v 1.27 2005/09/30 22:07:28 kewlio Exp $ //
+// $Id: ChangeLog,v 1.28 2005/10/01 01:06:33 kewlio Exp $ //
+
+2005-09-30	Dan-m00 <daniel@undernet.org>
+		* libgnuworld/ConnectionManager.cc: remove redundant and pointless cast.
 
 2005-09-30	Dan-m00 <daniel@undernet.org>
 		* mod.ccontrol/ccontrol.h: add structures for virtual clones rate limiting

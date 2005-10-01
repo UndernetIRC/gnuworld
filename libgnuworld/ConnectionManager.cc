@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ConnectionManager.cc,v 1.17 2005/01/07 00:10:21 dan_karrels Exp $
+ * $Id: ConnectionManager.cc,v 1.18 2005/10/01 01:06:34 kewlio Exp $
  */
 
 #include	<unistd.h>
@@ -52,7 +52,7 @@
 #include	"Buffer.h"
 #include	"ELog.h"
 
-const char rcsId[] = "$Id: ConnectionManager.cc,v 1.17 2005/01/07 00:10:21 dan_karrels Exp $" ;
+const char rcsId[] = "$Id: ConnectionManager.cc,v 1.18 2005/10/01 01:06:34 kewlio Exp $" ;
 
 namespace gnuworld
 {
@@ -1318,7 +1318,7 @@ newConnection->setIncoming() ;
 newConnection->setPending() ;
 
 // len is the size of a sockaddr structure, for use by accept()
-size_t len = sizeof( struct sockaddr ) ;
+socklen_t len = sizeof( struct sockaddr ) ;
 
 // Attempt to receive a pending connection.
 // The socket descriptor passed in is that of the listening socket.
@@ -1328,7 +1328,7 @@ size_t len = sizeof( struct sockaddr ) ;
 // the same options as the server socket, or -1 on error.
 int newFD = ::accept( cPtr->getSockFD(),
 	reinterpret_cast< sockaddr* >( newConnection->getAddr() ),
-	static_cast< socklen_t* >( &len ) ) ;
+	&len ) ;
 
 /*
  * From man page:
