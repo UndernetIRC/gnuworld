@@ -1,4 +1,12 @@
-// $Id: ChangeLog,v 1.32 2005/10/03 00:39:24 kewlio Exp $ //
+// $Id: ChangeLog,v 1.33 2005/10/03 19:45:17 kewlio Exp $ //
+
+2005-10-03	Dan-m00 <daniel@undernet.org>
+		* mod.cservice/BANCommand.cc: BAN command now matches IPs as well as
+			hosts.
+
+		* mod.cservice/cservice.cc: match IPs as well as hosts when a client
+			joins a channel.
+			Also check userlist against internal banlist on channel burst.
 
 2005-10-02	Dan-m00 <daniel@undernet.org>
 		* libgnuworld/match.cc: fix CIDR handling.  Only match CIDR if the

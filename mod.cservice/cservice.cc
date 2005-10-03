@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: cservice.cc,v 1.250 2005/10/01 14:31:43 kewlio Exp $
+ * $Id: cservice.cc,v 1.251 2005/10/03 19:45:17 kewlio Exp $
  */
 
 #include	<new>
@@ -390,6 +390,16 @@ void cservice::BurstChannels()
 
 		theChan->setInChan(true);
 		joinCount++;
+
+			/* check current inhabitants of the channel against our banlist */
+			Channel* tmpChan = Network->findChannel(theChan->getName());
+			for (Channel::userIterator chanUsers = tmpChan->userList_begin();
+				chanUsers != tmpChan->userList_end(); ++chanUsers)
+			{
+				ChannelUser* tmpUser = chanUsers->second;
+				/* check if this user is banned */
+				(void)checkBansOnJoin(tmpChan, theChan, tmpUser->getClient());
+			}
 		}
 	++ptr;
 	}
@@ -3102,6 +3112,7 @@ sqlBan* cservice::isBannedOnChan(sqlChannel* theChan, iClient* theClient)
 {
 map < int,sqlBan* >::const_iterator ptr = theChan->banList.begin();
 std::string authbanmask = "";
+std::string nickuserip = "";
 
 if (theClient->isModeR() && !theClient->isModeX())
 {
@@ -3109,6 +3120,10 @@ if (theClient->isModeR() && !theClient->isModeX())
 	authbanmask += theClient->getNickName() + "!" + theClient->getUserName();
 	authbanmask += "@" + theClient->getAccount() + theClient->getHiddenHostSuffix();
 }
+
+/* construct a nick!user@ip mask to match against (below) */
+nickuserip = theClient->getNickName() + "!" + theClient->getUserName();
+nickuserip += "@" + xIP(theClient->getIP()).GetNumericIP();
 
 for( ; ptr != theChan->banList.end() ; ++ptr )
 	{
@@ -3133,7 +3148,8 @@ for( ; ptr != theChan->banList.end() ; ++ptr )
 	if( (match(theBan->getBanMask(),
 		theClient->getNickUserHost()) == 0) ||
 		(0 == match( theBan->getBanMask(),
-			theClient->getRealNickUserHost())) )
+			theClient->getRealNickUserHost())) ||
+		(0 == match( theBan->getBanMask(), nickuserip)) )
 			{
 			return theBan;
 			}

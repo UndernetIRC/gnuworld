@@ -33,7 +33,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: BANCommand.cc,v 1.37 2005/10/01 14:31:43 kewlio Exp $
+ * $Id: BANCommand.cc,v 1.38 2005/10/03 19:45:17 kewlio Exp $
  */
 
 #include	<new>
@@ -50,8 +50,9 @@
 #include	"misc.h"
 #include	"responses.h"
 #include	"match.h"
+#include	"ip.h"
 
-const char BANCommand_cc_rcsId[] = "$Id: BANCommand.cc,v 1.37 2005/10/01 14:31:43 kewlio Exp $" ;
+const char BANCommand_cc_rcsId[] = "$Id: BANCommand.cc,v 1.38 2005/10/03 19:45:17 kewlio Exp $" ;
 
 namespace gnuworld
 {
@@ -418,8 +419,14 @@ for(Channel::userIterator chanUsers = theChannel->userList_begin();
 				clientsToKick.push_back(tmpUser->getClient());
 		}
 	}
+
+	/* re-use authbanmask to construct a nick!user@ip mask to match against (below) */
+	authbanmask = tmpUser->getClient()->getNickName() + "!" + tmpUser->getClient()->getUserName();
+	authbanmask += "@" + xIP(tmpUser->getClient()->getIP()).GetNumericIP();
+
 	if( (match(banTarget, tmpUser->getClient()->getNickUserHost()) == 0) ||
-		(match(banTarget, tmpUser->getClient()->getRealNickUserHost()) == 0) )
+		(match(banTarget, tmpUser->getClient()->getRealNickUserHost()) == 0) ||
+		(match(banTarget, authbanmask) == 0) )
 		{
 		/* Don't kick +k things */
 		if( !tmpUser->getClient()->getMode(iClient::MODE_SERVICES) )
