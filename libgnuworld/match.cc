@@ -16,14 +16,14 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- * $Id: match.cc,v 1.5 2005/06/18 22:08:02 kewlio Exp $
+ * $Id: match.cc,v 1.6 2005/10/03 00:39:25 kewlio Exp $
  */
 #include	"match.h"
 #include	"ConnectionManager.h"
 #include	<string>
 #include	<stdio.h>
 
-const char rcsId[] = "$Id: match.cc,v 1.5 2005/06/18 22:08:02 kewlio Exp $" ;
+const char rcsId[] = "$Id: match.cc,v 1.6 2005/10/03 00:39:25 kewlio Exp $" ;
 
 namespace gnuworld
 {
@@ -60,15 +60,24 @@ int match(const char *mask, const char *string)
   const char *m = mask, *s = string;
   char ch;
   const char *bm, *bs;          /* Will be reg anyway on a decent CPU/compiler */
-  bool isCIDR = false;
+  bool isIP = true, isCIDR = false;
   char CIDRip[16];
-  int i = 0, CIDRmask = 0;
+  int i = 0, CIDRmask = 0, dots = 0;
   int client_addr[4] = { 0 };
   unsigned long mask_ip, client_ip;
 
-  /* check if the mask is a CIDR mask */
+  /* check if the mask is a CIDR mask (also if it's an IP) */
   while ((ch = *m++))
   {
+     if (ch == '.')
+     {
+	dots++;
+	if (dots > 3)
+	{
+		isIP = false;	/* more than 3 dots, can't be an IP */
+		break;		/* no point continuing the check as we have the info we want */
+	}
+     }
      if (ch == '/')
      {
         isCIDR = true;
@@ -79,7 +88,15 @@ int match(const char *mask, const char *string)
         CIDRip[i] = ch;
         i++;
      }
+     if (isIP && ((ch > '9') || (ch < '0')) && (ch != '/'))
+     {
+	/* not an IP */
+	isIP = false;
+     }
   }
+
+  if (!isIP)
+    isCIDR = false;		/* if it's not an IP, it can't be a CIDR mask! */
  
   if (isCIDR)
   {

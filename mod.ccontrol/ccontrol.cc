@@ -20,7 +20,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccontrol.cc,v 1.194 2005/10/01 15:56:02 kewlio Exp $
+ * $Id: ccontrol.cc,v 1.195 2005/10/03 00:39:25 kewlio Exp $
 */
 
 #define MAJORVER "1"
@@ -66,7 +66,7 @@
 #include	"ccontrol_generic.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: ccontrol.cc,v 1.194 2005/10/01 15:56:02 kewlio Exp $" ) ;
+RCSTAG( "$Id: ccontrol.cc,v 1.195 2005/10/03 00:39:25 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -3131,6 +3131,9 @@ for(string::size_type pos = 0; pos < Hostname.size();++pos)
 		{
                         if (!(GlineType & isIP))        // must be an ip to specify 
                                 return  gline::BAD_HOST;
+
+			if (Dots>3)			// can't have more than 3 dots
+				return	gline::BAD_HOST;
   
                         if (GlineType & isWildCard)     // cidr may not contain wildcards
                                 return  gline::BAD_HOST;

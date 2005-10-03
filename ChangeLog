@@ -1,4 +1,10 @@
-// $Id: ChangeLog,v 1.31 2005/10/01 15:56:01 kewlio Exp $ //
+// $Id: ChangeLog,v 1.32 2005/10/03 00:39:24 kewlio Exp $ //
+
+2005-10-02	Dan-m00 <daniel@undernet.org>
+		* libgnuworld/match.cc: fix CIDR handling.  Only match CIDR if the
+			text before the '/' is an IP address.
+
+		* mod.ccontrol/ccontrol.cc: apply the same logic to gline check
 
 2005-10-01	Dan-m00 <daniel@undernet.org>
 		* mod.ccontrol/ccontrol.cc: increase size of numeric column to 4 in
