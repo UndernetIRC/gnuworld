@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ConnectionManager.cc,v 1.18 2005/10/01 01:06:34 kewlio Exp $
+ * $Id: ConnectionManager.cc,v 1.19 2005/10/03 23:55:07 kewlio Exp $
  */
 
 #include	<unistd.h>
@@ -52,7 +52,7 @@
 #include	"Buffer.h"
 #include	"ELog.h"
 
-const char rcsId[] = "$Id: ConnectionManager.cc,v 1.18 2005/10/01 01:06:34 kewlio Exp $" ;
+const char rcsId[] = "$Id: ConnectionManager.cc,v 1.19 2005/10/03 23:55:07 kewlio Exp $" ;
 
 namespace gnuworld
 {
@@ -903,6 +903,8 @@ for( handlerMapIterator handlerItr = handlerMap.begin() ;
 		// Erase it
 		handlerMap.erase( handlerItr ) ;
 		}
+	if (handlerMap.begin() == handlerMap.end())
+		break;
 	} // for()
 
 //elog	<< "Poll> End"

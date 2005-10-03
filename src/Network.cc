@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: Network.cc,v 1.71 2005/09/29 17:40:06 kewlio Exp $
+ * $Id: Network.cc,v 1.72 2005/10/03 23:55:07 kewlio Exp $
  */
 
 #include	<new>
@@ -45,7 +45,7 @@
 #include	"ip.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: Network.cc,v 1.71 2005/09/29 17:40:06 kewlio Exp $" ) ;
+RCSTAG( "$Id: Network.cc,v 1.72 2005/10/03 23:55:07 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -372,9 +372,10 @@ if( ptr == numericMap.end() )
 //	<< *(ptr->second)
 //	<< endl ;
 
+iClient* retMe = ptr->second ;
+
 numericMap.erase( ptr ) ;
 
-iClient* retMe = ptr->second ;
 removeNick( retMe->getNickName() ) ;
 
 if( findFakeClient( retMe ) != 0 )
@@ -582,6 +583,8 @@ return removeServer( serverPtr->getIntYY() ) ;
 
 Channel* xNetwork::removeChannel( const string& name )
 {
+Channel* tmpChan;
+
 channelIterator ptr = channelMap.find( name ) ;
 if( ptr == channels_end() )
 	{
@@ -590,8 +593,9 @@ if( ptr == channels_end() )
 		<< endl ;
 	return 0 ;
 	}
+tmpChan = ptr->second;
 channelMap.erase( ptr ) ;
-return ptr->second ;
+return tmpChan;
 }
 
 Channel* xNetwork::removeChannel( const Channel* theChan )

@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: Channel.cc,v 1.53 2005/09/29 17:40:06 kewlio Exp $
+ * $Id: Channel.cc,v 1.54 2005/10/03 23:55:07 kewlio Exp $
  */
 
 #include	<new>
@@ -38,7 +38,7 @@
 #include	"server.h"
 #include	"ConnectionManager.h"
 
-RCSTAG("$Id: Channel.cc,v 1.53 2005/09/29 17:40:06 kewlio Exp $") ;
+RCSTAG("$Id: Channel.cc,v 1.54 2005/10/03 23:55:07 kewlio Exp $") ;
 
 namespace gnuworld
 {
@@ -134,6 +134,8 @@ return removeUser( theClient->getIntYYXXX() ) ;
 
 ChannelUser* Channel::removeUser( const unsigned int& intYYXXX )
 {
+ChannelUser* tmpUser;
+
 // Attempt to find the user in question
 userIterator ptr = userList.find( intYYXXX ) ;
 
@@ -141,10 +143,12 @@ userIterator ptr = userList.find( intYYXXX ) ;
 if( ptr != userList.end() )
 	{
 	// Yup, go ahead and remove the user from the userList
+	tmpUser = ptr->second;
+
 	userList.erase( ptr ) ;
 
 	// Return a pointer to the ChannelUser
-	return ptr->second ;
+	return tmpUser;
 	}
 
 // Otherwise, the user was NOT found

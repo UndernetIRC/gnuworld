@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server.cc,v 1.214 2005/09/30 21:03:07 kewlio Exp $
+ * $Id: server.cc,v 1.215 2005/10/03 23:55:07 kewlio Exp $
  */
 
 #include	<sys/time.h>
@@ -70,7 +70,7 @@
 #include	"ConnectionHandler.h"
 #include	"Connection.h"
 
-RCSTAG( "$Id: server.cc,v 1.214 2005/09/30 21:03:07 kewlio Exp $" ) ;
+RCSTAG( "$Id: server.cc,v 1.215 2005/10/03 23:55:07 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -2702,11 +2702,13 @@ size_t count = 0 ;
 
 // First, remove all clients
 for( xNetwork::localClientIterator clientItr = Network->localClient_begin() ;
-	clientItr != Network->localClient_end() ;
-	++clientItr )
+	clientItr != Network->localClient_end() ; ++clientItr )
 	{
 	++count ;
 	DetachClient( clientItr->second, "Server shutdown" ) ;
+	/* as DetachClient() can alter the local client map, we MUST make this check! */
+	if (Network->localClient_begin() == Network->localClient_end())
+		break;
 	}
 
 elog	<< "xServer::doShutdown> Removed "
@@ -2725,6 +2727,9 @@ for( xNetwork::clientIterator cItr = Network->clients_begin() ;
 	++count ;
 	iClient* theClient = cItr->second ;
 	delete Network->removeClient( theClient ) ;
+	/* as removeClient() can alter clients map, we MUST make this check! */
+	if (Network->clients_begin() == Network->clients_end())
+		break;
 	}
 elog	<< "xServer::doShutdown> Removed "
 	<< count
@@ -2746,6 +2751,9 @@ for( xNetwork::channelIterator cItr = Network->channels_begin() ;
 		<< endl ;
 
 	delete Network->removeChannel( theChan ) ;
+	/* as removeChannel() can alter channels map, we MUST make this check! */
+	if (Network->channels_begin() == Network->channels_end())
+		break;
 	}
 elog	<< "xServer::doShutdown> Removed "
 	<< count
@@ -2754,13 +2762,14 @@ elog	<< "xServer::doShutdown> Removed "
 
 // Remove servers
 count = 0 ;
-for( xNetwork::serverIterator sItr = Network->servers_begin() ;
-	sItr != Network->servers_end() ; ++sItr )
-	{
-	++count ;
+while (Network->serverList_size() > 0)
+{
+	xNetwork::serverIterator sItr = Network->servers_begin();
+	++count;
+
 	iServer* tmpServer = sItr->second ;
 	delete Network->removeServer( tmpServer->getIntYY() ) ;
-	}
+}
 
 elog	<< "xServer::doShutdown> Removed "
 	<< count
@@ -2778,6 +2787,9 @@ for( glineIterator gItr = glines_begin() ; gItr != glines_end() ;
 	++count ;
 	delete gItr->second ;
 	eraseGline( gItr ) ;
+	/* as eraseGline() can alter glines map, we MUST make this check! */
+	if (glines_begin() == glines_end())
+		break;
 	}
 elog	<< "xServer::doShutdown> Removed "
 	<< count
