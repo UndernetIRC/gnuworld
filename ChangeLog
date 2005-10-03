@@ -1,4 +1,10 @@
-// $Id: ChangeLog,v 1.33 2005/10/03 19:45:17 kewlio Exp $ //
+// $Id: ChangeLog,v 1.34 2005/10/03 19:58:05 kewlio Exp $ //
+
+2005-10-03	Dan-m00 <daniel@undernet.org>
+		* doc/cservice.config.sql: add BAN_CHECK_ON_BURST tunable variable
+			to check users against bans during burst.
+
+		* mod.cservice/cservice.cc: use the above variable.
 
 2005-10-03	Dan-m00 <daniel@undernet.org>
 		* mod.cservice/BANCommand.cc: BAN command now matches IPs as well as

@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: cservice.cc,v 1.251 2005/10/03 19:45:17 kewlio Exp $
+ * $Id: cservice.cc,v 1.252 2005/10/03 19:58:05 kewlio Exp $
  */
 
 #include	<new>
@@ -391,14 +391,17 @@ void cservice::BurstChannels()
 		theChan->setInChan(true);
 		joinCount++;
 
-			/* check current inhabitants of the channel against our banlist */
-			Channel* tmpChan = Network->findChannel(theChan->getName());
-			for (Channel::userIterator chanUsers = tmpChan->userList_begin();
-				chanUsers != tmpChan->userList_end(); ++chanUsers)
+			if (getConfigVar("BAN_CHECK_ON_BURST")->asInt() == 1)
 			{
-				ChannelUser* tmpUser = chanUsers->second;
-				/* check if this user is banned */
-				(void)checkBansOnJoin(tmpChan, theChan, tmpUser->getClient());
+				/* check current inhabitants of the channel against our banlist */
+				Channel* tmpChan = Network->findChannel(theChan->getName());
+				for (Channel::userIterator chanUsers = tmpChan->userList_begin();
+					chanUsers != tmpChan->userList_end(); ++chanUsers)
+				{
+					ChannelUser* tmpUser = chanUsers->second;
+					/* check if this user is banned */
+					(void)checkBansOnJoin(tmpChan, theChan, tmpUser->getClient());
+				}
 			}
 		}
 	++ptr;
