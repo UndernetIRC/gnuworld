@@ -1,4 +1,4 @@
--- 2001-03-02 |MrBean| "$Id: ccontrol.help.sql,v 1.11 2005/10/04 19:58:35 kewlio Exp $"
+-- 2001-03-02 |MrBean| "$Id: ccontrol.help.sql,v 1.12 2005/10/04 20:07:59 kewlio Exp $"
 -- Created the file and added all help topics to the database
 
 -- 2201-03-11 |MrBean|
@@ -198,7 +198,7 @@ MODUSER		14	[-e email] - updates the user's email
 MODUSER		15	[-mt m|n] - change the way the bot communicates to the user (m=message,n=notice)
 NEWPASS		1	****** NEWPASS COMMAND ******
 NEWPASS		2	Changes your password for the bot
-NEWPASS		3 	Syntax: /msg $BOT$ newpass <newpass>
+NEWPASS		3	Syntax: /msg $BOT$ newpass <newpass>
 NOMODE		1	****** NOMODE COMMAND ******
 NOMODE		2	Managed the nomode list
 NOMODE		3	Syntax: /msg $BOT$ nomode <#channel> <reason>
