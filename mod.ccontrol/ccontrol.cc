@@ -20,7 +20,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccontrol.cc,v 1.197 2005/10/04 15:08:40 kewlio Exp $
+ * $Id: ccontrol.cc,v 1.198 2005/10/04 17:45:01 kewlio Exp $
 */
 
 #define MAJORVER "1"
@@ -66,7 +66,7 @@
 #include	"ccontrol_generic.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: ccontrol.cc,v 1.197 2005/10/04 15:08:40 kewlio Exp $" ) ;
+RCSTAG( "$Id: ccontrol.cc,v 1.198 2005/10/04 17:45:01 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -3540,11 +3540,7 @@ for(unsigned int i = 0; i< (glineQueue.size() > glineBurstCount ? glineBurstCoun
 			}
 		addGline(curGline);			
 		}
-	else
-		{
-		delete curGline;
-		}
-		
+	delete curGline;
 	}
 		
 return true;	

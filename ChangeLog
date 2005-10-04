@@ -1,4 +1,14 @@
-// $Id: ChangeLog,v 1.37 2005/10/04 15:08:40 kewlio Exp $ //
+// $Id: ChangeLog,v 1.38 2005/10/04 17:45:01 kewlio Exp $ //
+
+2005-10-04	Dan-m00 <daniel@undernet.org>
+		* mod.ccontrol/ccontrol.cc: fix a possible memory leak in the
+			handling of queued glines.
+
+		* libgnuworld/match.cc: fix CIDR matching incorrectly broken in
+			an earlier commit.
+
+		* src/Network.cc: optimise user@host matching code (used for glines
+			and various other core tasks)
 
 2005-10-04	Dan-m00 <daniel@undernet.org>
 		* mod.ccontrol/USERINFOCommand.cc: add "-cl" option to userinfo

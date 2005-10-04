@@ -16,14 +16,14 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- * $Id: match.cc,v 1.6 2005/10/03 00:39:25 kewlio Exp $
+ * $Id: match.cc,v 1.7 2005/10/04 17:45:01 kewlio Exp $
  */
 #include	"match.h"
 #include	"ConnectionManager.h"
 #include	<string>
 #include	<stdio.h>
 
-const char rcsId[] = "$Id: match.cc,v 1.6 2005/10/03 00:39:25 kewlio Exp $" ;
+const char rcsId[] = "$Id: match.cc,v 1.7 2005/10/04 17:45:01 kewlio Exp $" ;
 
 namespace gnuworld
 {
@@ -88,10 +88,12 @@ int match(const char *mask, const char *string)
         CIDRip[i] = ch;
         i++;
      }
-     if (isIP && ((ch > '9') || (ch < '0')) && (ch != '/'))
+     if (isIP && ((ch > '9') || (ch < '0')) && (ch != '.'))
      {
 	/* not an IP */
 	isIP = false;
+	isCIDR = false;
+	break;
      }
   }
 

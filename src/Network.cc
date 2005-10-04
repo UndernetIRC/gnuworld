@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: Network.cc,v 1.72 2005/10/03 23:55:07 kewlio Exp $
+ * $Id: Network.cc,v 1.73 2005/10/04 17:45:01 kewlio Exp $
  */
 
 #include	<new>
@@ -45,7 +45,7 @@
 #include	"ip.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: Network.cc,v 1.72 2005/10/03 23:55:07 kewlio Exp $" ) ;
+RCSTAG( "$Id: Network.cc,v 1.73 2005/10/04 17:45:01 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -953,32 +953,33 @@ if( st.size() != 2 )
 	return list< const iClient* >() ;
 	}
 
-// Get a list of matching hosts to that of wildUserHost
-list< const iClient* > matchingHosts = matchRealHost( st[ 1 ] ) ;
+/* iterate through all users and try to match ident + host */
+list< const iClient* > retMe;
+bool host_is_ip = false;
 
-// Were any found?
-if( matchingHosts.empty() )
+for (numericMapType::const_iterator ptr = numericMap.begin();
+	ptr != numericMap.end(); ++ptr)
+{
+	const iClient* clientPtr = ptr->second;
+
+	/* match ident first */
+	if (!match(st[0], clientPtr->getUserName()))
 	{
-	// No matching hosts found, return the empty list
-	return matchingHosts ;
-	}
+		/* ident matches, check if host/ip matches */
+		/* to attempt to minimise cpu, if ip==host only check once */
+		if (!strcmp(xIP(clientPtr->getIP()).GetNumericIP().c_str(), clientPtr->getRealInsecureHost().c_str()))
+			host_is_ip = true;
+		else
+			host_is_ip = false;
 
-// Create a list to return to the caller, create matchingHosts.size()
-// empty slots to speed up memory allocation
-list< const iClient* > retMe ;
-
-// Iterate through the list of matching hostnames
-for( list< const iClient* >::const_iterator ptr = matchingHosts.begin() ;
-	ptr != matchingHosts.end() ; ++ptr )
-	{
-	// Does this iClient's username also match that of the
-	// wildUserHost username?
-	if( !match( st[ 0 ], (*ptr)->getUserName() ) )
+		if (!match(st[1], xIP(clientPtr->getIP()).GetNumericIP()) ||
+			(!host_is_ip && (!match(st[1], clientPtr->getRealInsecureHost()))))
 		{
-		// Found a matching username
-		retMe.push_back( *ptr ) ;
+			/* match - push it back */
+			retMe.push_back(clientPtr);
 		}
 	}
+}
 
 // Return the list of matching username and hostnames
 return retMe ;
