@@ -1,4 +1,8 @@
-// $Id: ChangeLog,v 1.39 2005/10/04 19:58:34 kewlio Exp $ //
+// $Id: ChangeLog,v 1.40 2005/10/04 20:16:50 kewlio Exp $ //
+
+2005-10-04	Dan-m00 <daniel@undernet.org>
+		* mod.ccontrol/HELPCommand.cc: fix HELP command to work the way it
+			was intended (to support subcommands properly)
 
 2005-10-04	Dan-m00 <daniel@undernet.org>
 		* doc/ccontrol.help.sql: completely updated help files for ccontrol

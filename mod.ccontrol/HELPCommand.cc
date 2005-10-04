@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: HELPCommand.cc,v 1.21 2005/01/12 03:50:29 dan_karrels Exp $
+ * $Id: HELPCommand.cc,v 1.22 2005/10/04 20:16:52 kewlio Exp $
  */
 
 #include	<string>
@@ -31,7 +31,7 @@
 #include	"commLevels.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: HELPCommand.cc,v 1.21 2005/01/12 03:50:29 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: HELPCommand.cc,v 1.22 2005/10/04 20:16:52 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -99,7 +99,10 @@ else //Supplied a command, show only the help for that command (if it exists)
 		}
 	else
 		{
-			bot->GetHelp(theClient,st[1]);
+			if (st.size()==2)
+				bot->GetHelp(theClient,st[1],static_cast<std::string>(""));
+			else
+				bot->GetHelp(theClient,st[1],st[2]);
 		}
 	}
 
