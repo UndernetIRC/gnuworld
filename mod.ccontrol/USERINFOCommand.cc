@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: USERINFOCommand.cc,v 1.10 2005/01/12 03:50:29 dan_karrels Exp $
+ * $Id: USERINFOCommand.cc,v 1.11 2005/10/04 15:08:40 kewlio Exp $
  */
 
 #include	<string>
@@ -28,12 +28,13 @@
 #include	"ccontrol.h"
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
+#include	"commLevels.h"
 #include	"misc.h"
 #include	"match.h"
 #include	"Network.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: USERINFOCommand.cc,v 1.10 2005/01/12 03:50:29 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: USERINFOCommand.cc,v 1.11 2005/10/04 15:08:40 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -165,6 +166,28 @@ for(ptr = bot->usersMap_begin();ptr != bot->usersMap_end();++ptr)
 			}
 		bot->Notice(theClient,"User Flags : GetLogs \002%s\002 NeedOp \002%s\002"
 			    ,GetLogs,NeedOp);
+		if ((st.size() > 2) && (!strcasecmp(st[2],"-cl")))
+		{
+			/* commands list requested */
+			bot->Notice(theClient,"Commands available to this user:");
+			string cmdList = "";
+			for (ccontrol::constCommandIterator cmdptr = bot->command_begin();
+				cmdptr != bot->command_end(); ++cmdptr)
+			{
+				int ComLevel = cmdptr->second->getFlags();
+				if ((ComLevel & commandLevel::flg_NOLOGIN) || ((tempUser) && (tempUser->gotAccess(cmdptr->second))))
+				{
+					cmdList += (cmdptr->second->getName() + " ");
+					if (cmdList.size() > 80)
+					{
+						bot->Notice(theClient, "%s", cmdList.c_str());
+						cmdList.assign("");
+					}
+				}
+			}
+			if (!cmdList.empty())
+				bot->Notice(theClient, "%s", cmdList.c_str());
+		}
 		bot->Notice(theClient,"-----===== End of userinfo for %s =====-----",Name.c_str());
 		}
 	}

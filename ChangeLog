@@ -1,4 +1,10 @@
-// $Id: ChangeLog,v 1.36 2005/10/04 01:45:30 kewlio Exp $ //
+// $Id: ChangeLog,v 1.37 2005/10/04 15:08:40 kewlio Exp $ //
+
+2005-10-04	Dan-m00 <daniel@undernet.org>
+		* mod.ccontrol/USERINFOCommand.cc: add "-cl" option to userinfo
+			to show Command List available to the user.
+
+		* mod.ccontrol/ccontrol.cc: update syntax for userinfo command
 
 2005-10-04	Dan-m00 <daniel@undernet.org>
 		* aclocal.m4:

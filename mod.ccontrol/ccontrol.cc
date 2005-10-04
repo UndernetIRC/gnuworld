@@ -20,7 +20,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccontrol.cc,v 1.196 2005/10/04 01:45:30 kewlio Exp $
+ * $Id: ccontrol.cc,v 1.197 2005/10/04 15:08:40 kewlio Exp $
 */
 
 #define MAJORVER "1"
@@ -66,7 +66,7 @@
 #include	"ccontrol_generic.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: ccontrol.cc,v 1.196 2005/10/04 01:45:30 kewlio Exp $" ) ;
+RCSTAG( "$Id: ccontrol.cc,v 1.197 2005/10/04 15:08:40 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -621,7 +621,7 @@ RegisterCommand( new REMGCHANCommand( this, "REMGCHAN", "#channel "
 	operLevel::CODERLEVEL,
 	true ) ) ;
 RegisterCommand( new USERINFOCommand( this, "USERINFO",
-	"<usermask/servermask> Get information about opers",
+	"<usermask/servermask> [-cl] Get information about opers (with optional command listing)",
 	commandLevel::flg_USERINFO,
 	false,
 	false,
