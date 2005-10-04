@@ -16,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: CommandsDec.h,v 1.14 2004/06/04 14:30:51 mrbean_ Exp $
+ * $Id: CommandsDec.h,v 1.15 2005/10/04 01:45:30 kewlio Exp $
  */
 
 #ifndef __COMMANDSDEC_H
-#define __COMMANDSDEC_H "$Id: CommandsDec.h,v 1.14 2004/06/04 14:30:51 mrbean_ Exp $"
+#define __COMMANDSDEC_H "$Id: CommandsDec.h,v 1.15 2005/10/04 01:45:30 kewlio Exp $"
 
 namespace gnuworld
 {
@@ -52,6 +52,7 @@ DECLARE_COMMAND( HELP )
 DECLARE_COMMAND( JUPE )
 DECLARE_COMMAND( MODE )
 DECLARE_COMMAND( GLINE )
+DECLARE_COMMAND( CHANGLINE )
 DECLARE_COMMAND( SCANGLINE )
 DECLARE_COMMAND( REMGLINE )
 DECLARE_COMMAND( TRANSLATE )

@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: GLINECommand.cc,v 1.55 2005/06/18 23:01:55 kewlio Exp $
+ * $Id: GLINECommand.cc,v 1.56 2005/10/04 01:45:30 kewlio Exp $
  */
 
 #include	<string>
@@ -40,7 +40,7 @@
 #include	"Constants.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: GLINECommand.cc,v 1.55 2005/06/18 23:01:55 kewlio Exp $" ) ;
+RCSTAG( "$Id: GLINECommand.cc,v 1.56 2005/10/04 01:45:30 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -82,20 +82,19 @@ ccUser* tmpUser = bot->IsAuth(theClient);
 
 bot->MsgChanLog("GLINE %s\n",st.assemble(1).c_str());
 
-bool isChan;
 if(st[pos].substr(0,1) == "#")
-        isChan = true;
-else if(st[pos].find_first_of('#') != string::npos)
+{
+	bot->Notice(theClient, "Please use the CHANGLINE command to gline channels");
+	return true;
+}
+
+if(st[pos].find_first_of('#') != string::npos)
 	{
 	bot->Notice(theClient,"Nice try, but i dont think glining that host is such a good idea");
 	return true;
 	}
-else
-	isChan = false; 
 string userName;
 string hostName;
-if(!isChan)
-	{
 	if(st[pos].substr(0,1) == "$")
 		{
 		bot->Notice(theClient,"Please use sgline to set this gline");
@@ -137,7 +136,6 @@ if(!isChan)
 		userName = st[ pos ].substr( 0, atPos ) ;
 		hostName = st[ pos ].substr( atPos + 1 ) ;
 		}
-	}
 string Length;
 
 Length.assign(st[2]);
@@ -172,8 +170,6 @@ if(gLength == 0)
 	}
 string nickUserHost = theClient->getRealNickUserHost() ;
 	
-if(!isChan)
-	{
 	unsigned int Users;
 	if(!tmpUser)
 		{
@@ -301,68 +297,7 @@ if(!isChan)
 		}
 
 	return true;
-	} //end of regular gline
 
-//Its a channel gline
-//ccUser *tmpAuth = bot->IsAuth(theClient);
-if(!tmpUser)
-	{
-	bot->Notice(theClient,"You must login to issue this gline!");
-	return false;
-	}
-if(tmpUser->getType() < operLevel::SMTLEVEL)
-	{
-	bot->Notice(theClient,"Only smt+ can use the gline #channel command");
-	return false;
-	}
-
-typedef map<string , int> GlineMapType;
-GlineMapType glineList;
-
-
-if(st[1].size() > channel::MaxName)
-	{
-	bot->Notice(theClient,"Channel name can't be more than %d chars",channel::MaxName);
-	return false;
-	}
-
-Channel* theChan = Network->findChannel( st[ 1 ] ) ;
-if( NULL == theChan )
-	{
-	bot->Notice( theClient, "Unable to find channel %s",
-		st[ 1 ].c_str() ) ;
-	return true ;
-	}
-ccGline *TmpGline;
-iClient *TmpClient;
-string curIP;
-GlineMapType::iterator gptr;
-for( Channel::const_userIterator ptr = theChan->userList_begin();
-ptr != theChan->userList_end() ; ++ptr )
-	{
-	TmpClient = ptr->second->getClient();
-	curIP = xIP(TmpClient->getIP()).GetNumericIP();
-	gptr = glineList.find("*@" + curIP);
-	if(gptr != glineList.end())
-		{
-		continue;
-		}
-	if((!TmpClient->getMode(iClient::MODE_SERVICES)) 
-	&& !(bot->IsAuth(TmpClient)) && !(TmpClient->isOper())) 
-		{
-		TmpGline = new ccGline(bot->SQLDb);
-		assert(TmpGline != NULL);
-		TmpGline->setHost("*@"  + curIP);
-		TmpGline->setExpires(unsigned(gLength));
-		TmpGline->setAddedBy(nickUserHost);
-		TmpGline->setReason(st.assemble( pos + ResStart ));
-		TmpGline->setAddedOn(::time(0));
-		TmpGline->setLastUpdated(::time(0));
-		bot->queueGline(TmpGline);
-		}
-	}
-			
-return true ;
 }
 
 }

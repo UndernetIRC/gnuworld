@@ -1,4 +1,20 @@
-// $Id: ChangeLog,v 1.35 2005/10/03 23:55:07 kewlio Exp $ //
+// $Id: ChangeLog,v 1.36 2005/10/04 01:45:30 kewlio Exp $ //
+
+2005-10-04	Dan-m00 <daniel@undernet.org>
+		* aclocal.m4:
+		* mod.ccontrol/Makefile.am:
+		* mod.ccontrol/Makefile.in: update Makefiles for new file
+
+		* mod.ccontrol/CHANGLINECommand.cc: new channel gline command
+
+		* mod.ccontrol/CommandsDec.h: register new changline command
+
+		* mod.ccontrol/commLevels.h: add a new level for changline command
+
+		* mod.ccontrol/ccontrol.cc: bump version number and add new changline
+			command
+
+		* mod.ccontrol/GLINECommand.cc: no longer handle channel glines.
 
 2005-10-03	Dan-m00 <daniel@undernet.org>
 		* libgnuworld/ConnectionManager.cc:

@@ -20,12 +20,12 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccontrol.cc,v 1.195 2005/10/03 00:39:25 kewlio Exp $
+ * $Id: ccontrol.cc,v 1.196 2005/10/04 01:45:30 kewlio Exp $
 */
 
 #define MAJORVER "1"
-#define MINORVER "2pl3"
-#define RELDATE "18th June, 2005"
+#define MINORVER "2pl4"
+#define RELDATE "4th October, 2005"
 
 #include        <sys/types.h> 
 #include        <sys/socket.h>
@@ -66,7 +66,7 @@
 #include	"ccontrol_generic.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: ccontrol.cc,v 1.195 2005/10/03 00:39:25 kewlio Exp $" ) ;
+RCSTAG( "$Id: ccontrol.cc,v 1.196 2005/10/04 01:45:30 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -245,6 +245,15 @@ RegisterCommand( new MODECommand( this, "MODE", "<channel> <modes> "
 	false,
 	operLevel::OPERLEVEL,
 	false ) ) ;
+RegisterCommand( new CHANGLINECommand( this, "CHANGLINE",
+	"<#channel> <duration>[time units (s,d,h)] <reason> "
+	"Gline a given channel for the given reason",
+	commandLevel::flg_CHANGLINE,
+	false,
+	false,
+	false,
+	operLevel::CODERLEVEL,
+	true ) ) ;
 RegisterCommand( new GLINECommand( this, "GLINE",
 	"<user@host> <duration>[time units (s,d,h)] <reason> "
 	"Gline a given user@host for the given reason",
