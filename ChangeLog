@@ -1,4 +1,7 @@
-// $Id: ChangeLog,v 1.38 2005/10/04 17:45:01 kewlio Exp $ //
+// $Id: ChangeLog,v 1.39 2005/10/04 19:58:34 kewlio Exp $ //
+
+2005-10-04	Dan-m00 <daniel@undernet.org>
+		* doc/ccontrol.help.sql: completely updated help files for ccontrol
 
 2005-10-04	Dan-m00 <daniel@undernet.org>
 		* mod.ccontrol/ccontrol.cc: fix a possible memory leak in the
