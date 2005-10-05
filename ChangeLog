@@ -1,4 +1,7 @@
-// $Id: ChangeLog,v 1.40 2005/10/04 20:16:50 kewlio Exp $ //
+// $Id: ChangeLog,v 1.41 2005/10/05 09:05:17 kewlio Exp $ //
+
+2005-10-05	Dan-m00 <daniel@undernet.org>
+		* mod.ccontrol/ccontrol.cc: rollback previous memory leak fix
 
 2005-10-04	Dan-m00 <daniel@undernet.org>
 		* mod.ccontrol/HELPCommand.cc: fix HELP command to work the way it
