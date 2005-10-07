@@ -1,4 +1,10 @@
-// $Id: ChangeLog,v 1.41 2005/10/05 09:05:17 kewlio Exp $ //
+// $Id: ChangeLog,v 1.42 2005/10/07 20:41:17 kewlio Exp $ //
+
+2005-10-07	Dan-m00 <daniel@undernet.org>
+		* mod.ccontrol/ccontrol.cc: add extra memory/stats output into
+			'status' command (show rate-limit entries)
+
+			Fixed memory leak within rate limiting and clone warnings.
 
 2005-10-05	Dan-m00 <daniel@undernet.org>
 		* mod.ccontrol/ccontrol.cc: rollback previous memory leak fix

@@ -20,7 +20,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccontrol.cc,v 1.199 2005/10/05 09:05:18 kewlio Exp $
+ * $Id: ccontrol.cc,v 1.200 2005/10/07 20:41:17 kewlio Exp $
 */
 
 #define MAJORVER "1"
@@ -66,7 +66,7 @@
 #include	"ccontrol_generic.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: ccontrol.cc,v 1.199 2005/10/05 09:05:18 kewlio Exp $" ) ;
+RCSTAG( "$Id: ccontrol.cc,v 1.200 2005/10/07 20:41:17 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -1233,23 +1233,27 @@ switch( theEvent )
 	                        /* convert longip back to ip */
 	                        mask_ip = htonl(mask_ip);
 	                        client_ip = inet_ntoa((const in_addr&) mask_ip);
-	                        if(--clientsIp24Map[client_ip] < 1)
+				if ((clientsIp24Map.find(client_ip) != clientsIp24Map.end()) && 
+					(--clientsIp24Map[client_ip] < 1))
 	                        {
 	                                clientsIp24Map.erase(clientsIp24Map.find(client_ip));
-					if (clientsIp24MapLastWarn[client_ip] > 0)
-						clientsIp24MapLastWarn.erase(clientsIp24MapLastWarn.find(client_ip));
+					if ((clientsIp24MapLastWarn.find(client_ip) != clientsIp24MapLastWarn.end()) &&
+						(clientsIp24MapLastWarn[client_ip] > 0))
+							clientsIp24MapLastWarn.erase(clientsIp24MapLastWarn.find(client_ip));
 	                        }
 
 				/* ident clones */
 				sprintf(Log, "%s/%d-%s", client_ip, CClonesCIDR, tmpUser->getUserName().c_str());
-				if(--clientsIp24IdentMap[Log] < 1)
+				if ((clientsIp24IdentMap.find(Log) != clientsIp24IdentMap.end()) &&
+					(--clientsIp24IdentMap[Log] < 1))
 				{
 					clientsIp24IdentMap.erase(clientsIp24IdentMap.find(Log));
-					if (clientsIp24IdentMapLastWarn[Log] > 0)
-						clientsIp24IdentMapLastWarn.erase(clientsIp24IdentMapLastWarn.find(Log));
+					if ((clientsIp24IdentMapLastWarn.find(Log) != clientsIp24IdentMapLastWarn.end()) &&
+						(clientsIp24IdentMapLastWarn[Log] > 0))
+							clientsIp24IdentMapLastWarn.erase(clientsIp24IdentMapLastWarn.find(Log));
 				}
 
-			if(--clientsIpMap[tIP] < 1)
+			if ((clientsIpMap.find(tIP) != clientsIpMap.end()) && (--clientsIpMap[tIP] < 1))
 				{
 				clientsIpMap.erase(clientsIpMap.find(tIP));
 				}
@@ -1264,11 +1268,13 @@ switch( theEvent )
 					virtualHost += tIP[ptr];
 					}
 				virtualHost += '*';
-			if(--virtualClientsMap[virtualHost] < 1)
+			if ((virtualClientsMap.find(virtualHost) != virtualClientsMap.end()) &&
+				(--virtualClientsMap[virtualHost] < 1))
 				{
 				virtualClientsMap.erase(virtualClientsMap.find(virtualHost));
-				if (virtualClientsMapLastWarn[virtualHost] > 0)
-					virtualClientsMapLastWarn.erase(virtualClientsMapLastWarn.find(virtualHost));
+				if ((virtualClientsMapLastWarn.find(virtualHost) != virtualClientsMapLastWarn.end()) &&
+					(virtualClientsMapLastWarn[virtualHost] > 0))
+						virtualClientsMapLastWarn.erase(virtualClientsMapLastWarn.find(virtualHost));
 				}
 			}
 		ccUserData* UserData = static_cast< ccUserData* >(
@@ -4745,9 +4751,12 @@ Notice(tmpClient,"Uptime : %dD %dH %dM %dS",days,hours,mins,secs);
 if(checkClones)
 	{
 	Notice(tmpClient,"Monitoring %d different clones hosts\n",clientsIpMap.size());
-	Notice(tmpClient,"and %d different CIDR clones hosts\n", clientsIp24Map.size());
-	Notice(tmpClient,"and %d different CIDR ident clones hosts\n", clientsIp24IdentMap.size());
-	Notice(tmpClient,"and %d different virtual clones hosts\n",virtualClientsMap.size());
+	Notice(tmpClient,"and %d different CIDR clones hosts (%d rate-limit entries)\n",
+		clientsIp24Map.size(), clientsIp24MapLastWarn.size());
+	Notice(tmpClient,"and %d different CIDR ident clones hosts (%d rate-limit entries)\n",
+		clientsIp24IdentMap.size(), clientsIp24IdentMapLastWarn.size());
+	Notice(tmpClient,"and %d different virtual clones hosts (%d rate-limit entries)\n",
+		virtualClientsMap.size(), virtualClientsMapLastWarn.size());
 	}	
 Notice(tmpClient,"%d glines are waiting in the gline queue",glineQueue.size());
 Notice(tmpClient,"Allocated Structures:");
