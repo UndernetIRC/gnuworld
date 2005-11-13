@@ -1,4 +1,11 @@
-// $Id: ChangeLog,v 1.42 2005/10/07 20:41:17 kewlio Exp $ //
+// $Id: ChangeLog,v 1.43 2005/11/13 22:21:29 kewlio Exp $ //
+
+2005-11-13	LordLuke
+		* mod.cservice/cservice.cc: update logging from flat file to SQL
+			for admin log.
+
+		* doc/cservice.sql: add adminlog table at the bottom of the file
+			for the above.
 
 2005-10-07	Dan-m00 <daniel@undernet.org>
 		* mod.ccontrol/ccontrol.cc: add extra memory/stats output into

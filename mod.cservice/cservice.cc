@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: cservice.cc,v 1.252 2005/10/03 19:58:05 kewlio Exp $
+ * $Id: cservice.cc,v 1.253 2005/11/13 22:21:29 kewlio Exp $
  */
 
 #include	<new>
@@ -296,7 +296,7 @@ loginDelay = atoi((cserviceConfig->Require( "login_delay" )->second).c_str());
 noteDuration = atoi((cserviceConfig->Require( "note_duration" )->second).c_str());
 noteLimit = atoi((cserviceConfig->Require( "note_limit" )->second).c_str());
 preloadUserDays = atoi((cserviceConfig->Require( "preload_user_days" )->second).c_str());
-adminlogPath = cserviceConfig->Require( "admin_logfile" )->second ;
+/* adminlogPath = cserviceConfig->Require( "admin_logfile" )->second ; */
 
 #ifdef ALLOW_HELLO
   helloBlockPeriod = atoi( cserviceConfig->Require( 
@@ -340,14 +340,14 @@ preloadUserCache();
  * Init the admin log.
  */
 
-adminLog.open( adminlogPath.c_str() ) ;
+/* adminLog.open( adminlogPath.c_str() ) ;
 if( !adminLog.is_open() )
 	{
 	clog	<< "*** Unable to open CMaster admin log file: "
 			<< adminlogPath
 			<< endl ;
 	::exit( 0 ) ;
-	}
+	} */
 
 }
 
@@ -787,12 +787,16 @@ if (!secure && ((Command == "LOGIN") || (Command == "NEWPASS") || (Command == "S
 /*
  * If the person issuing this command is an authenticated admin, we need to log
  * it to the admin log for accountability purposes.
- */
+ *
+ * Moved this logging further down the function (to SQL) so that only recognised
+ * commands are logged.  This stops logging of passwords etc
+ *
 		sqlUser* theUser = isAuthed(theClient, false);
 		if (theUser && getAdminAccessLevel(theUser))
 			{
 			adminLog << ::time(NULL) << " " << theClient->getRealNickUserHost() << " " << st.assemble() << endl;
  			}
+ */
 
 /* Attempt to find a handler for this method. */
 
@@ -838,6 +842,36 @@ else
 	ipFloodMap[theClient->getIP()] += commHandler->second->getFloodPoints();
 
 	totalCommands++;
+	/* Log command to SQL here, if Admin */
+	sqlUser* theUser = isAuthed(theClient, false);
+	if (theUser && getAdminAccessLevel(theUser) && (Command != "LOGIN") && (Command != "NEWPASS") && (Command != "SUSPENDME"))
+	{
+		stringstream theLog;
+		theLog  << "INSERT INTO adminlog (user_id,cmd,args,timestamp,issue_by)"
+			<< " VALUES("
+			<< theUser ->getID()
+			<< ","
+			<< "'" << escapeSQLChars(Command) << "'"
+			<< ","
+			<< "'" << escapeSQLChars(st.assemble(1)) << "'"
+			<< ","
+			<< currentTime()
+			<< ","
+			<< "'" << escapeSQLChars(theClient->getRealNickUserHost()) << "'"
+			<< ")"
+			<< ends;
+
+		ExecStatusType status = SQLDb->Exec(theLog.str().c_str()) ;
+		if( PGRES_COMMAND_OK != status )
+		{
+			elog    << "cservice::adminlog> Something went wrong: "
+				<< theLog.str().c_str()
+				<< " "
+				<< SQLDb->ErrorMessage()
+				<< endl;
+		}
+	}
+
 	commHandler->second->Exec( theClient, Message ) ;
 	}
 

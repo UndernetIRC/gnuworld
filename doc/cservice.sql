@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------------
--- "$Id: cservice.sql,v 1.80 2004/07/24 23:44:46 nighty Exp $"
+-- "$Id: cservice.sql,v 1.81 2005/11/13 22:21:29 kewlio Exp $"
 -- Channel service DB SQL file for PostgreSQL.
 
 -- ChangeLog:
@@ -590,6 +590,18 @@ CREATE TABLE variables (
 	hint text,
 	last_updated INT4,
 	PRIMARY KEY(var_name)
+);
+
+-- Table used to store the admin log (converted from file to db).
+
+CREATE TABLE adminlog (
+	id SERIAL,
+	user_id INT4 NOT NULL,
+	cmd VARCHAR(100),
+	args VARCHAR(255),
+	timestamp INT4 NOT NULL,
+	issue_by VARCHAR(255),
+	PRIMARY KEY(id)
 );
 
 -----------------------------------------------------------------------------------------
