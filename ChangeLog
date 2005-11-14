@@ -1,4 +1,8 @@
-// $Id: ChangeLog,v 1.45 2005/11/14 16:32:29 kewlio Exp $ //
+// $Id: ChangeLog,v 1.46 2005/11/14 18:07:27 kewlio Exp $ //
+
+2005-11-14	Dan-m00 <daniel@undernet.org>
+		* bin/server_command_map.in: handle DE (destruct) protocol as
+			noop command - may be used later, but for now not needed.
 
 2005-11-14	Dan-m00 <daniel@undernet.org>
 		* mod.cservice/cservice.cc: (validUserMask) change maximum nick

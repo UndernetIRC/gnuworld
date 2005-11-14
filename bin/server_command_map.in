@@ -1,4 +1,4 @@
-# $Id: server_command_map.in,v 1.3 2005/01/22 18:13:07 dan_karrels Exp $
+# $Id: server_command_map.in,v 1.4 2005/11/14 18:07:27 kewlio Exp $
 # The mapping from module to message name for server command handlers
 # format: module_file_name module_loader_symbol command_key
 # example: libircu msg_AC AC
@@ -11,6 +11,7 @@ libircu msg_B B
 libircu msg_C C
 libircu msg_CM CM
 libircu msg_D D
+libircu msg_NOOP DE
 libircu msg_DS DS
 libircu msg_EA EA
 libircu msg_EB EB
