@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: iClient.cc,v 1.36 2005/06/20 11:25:30 kewlio Exp $
+ * $Id: iClient.cc,v 1.37 2005/11/14 04:13:21 kewlio Exp $
  */
 
 #include	<new>
@@ -34,7 +34,7 @@
 #include	"ip.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: iClient.cc,v 1.36 2005/06/20 11:25:30 kewlio Exp $" ) ;
+RCSTAG( "$Id: iClient.cc,v 1.37 2005/11/14 04:13:21 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -107,12 +107,12 @@ iClient::iClient( const unsigned int& /* _uplink */,
 	connectTime( _connectTime ),
 	mode( 0 ),
 	account( _account ),
-	account_ts( _account_ts ),
+	account_ts( _account_ts )
 #ifdef ASUKA
-	setHost( _setHost ),
+	,setHost( _setHost )
 #endif
 #ifdef SRVX
-	fakeHost( _fakeHost )
+	,fakeHost( _fakeHost )
 #endif
 {
 #ifndef ASUKA

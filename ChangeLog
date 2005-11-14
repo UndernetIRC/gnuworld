@@ -1,4 +1,11 @@
-// $Id: ChangeLog,v 1.43 2005/11/13 22:21:29 kewlio Exp $ //
+// $Id: ChangeLog,v 1.44 2005/11/14 04:13:20 kewlio Exp $ //
+
+2005-11-14	Dan-m00 <daniel@undernet.org> / Isomer
+		* mod.cservice/BANCommand.cc: fix some (possibly?) GCC compiler
+			optimisation bugs that caused an infinite loop somehow!
+
+		* src/iClient.cc: make things compile when both ASUKA and SRVX
+			are not defined.
 
 2005-11-13	LordLuke
 		* mod.cservice/cservice.cc: update logging from flat file to SQL

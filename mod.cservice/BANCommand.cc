@@ -33,7 +33,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: BANCommand.cc,v 1.38 2005/10/03 19:45:17 kewlio Exp $
+ * $Id: BANCommand.cc,v 1.39 2005/11/14 04:13:21 kewlio Exp $
  */
 
 #include	<new>
@@ -52,7 +52,7 @@
 #include	"match.h"
 #include	"ip.h"
 
-const char BANCommand_cc_rcsId[] = "$Id: BANCommand.cc,v 1.38 2005/10/03 19:45:17 kewlio Exp $" ;
+const char BANCommand_cc_rcsId[] = "$Id: BANCommand.cc,v 1.39 2005/11/14 04:13:21 kewlio Exp $" ;
 
 namespace gnuworld
 {
@@ -334,7 +334,6 @@ while (ptr != theChan->banList.end())
 			{
 			// Update GNUWorld.
 			oldBans.push_back(theBan);
-			++ptr;
 			}
 		}
 	// More specific ban?
@@ -347,10 +346,7 @@ while (ptr != theChan->banList.end())
 		return true;
 		}
 	// Carry on regardless.
-	else
-		{
-		++ptr;
-		}
+	++ptr;
 	} // while()
 /*
  Go over the bans that needs to be removed
