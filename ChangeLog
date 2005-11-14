@@ -1,4 +1,9 @@
-// $Id: ChangeLog,v 1.44 2005/11/14 04:13:20 kewlio Exp $ //
+// $Id: ChangeLog,v 1.45 2005/11/14 16:32:29 kewlio Exp $ //
+
+2005-11-14	Dan-m00 <daniel@undernet.org>
+		* mod.cservice/cservice.cc: (validUserMask) change maximum nick
+			length allowed from 9 to 15 characters in-line with
+			current undernet policies.
 
 2005-11-14	Dan-m00 <daniel@undernet.org> / Isomer
 		* mod.cservice/BANCommand.cc: fix some (possibly?) GCC compiler

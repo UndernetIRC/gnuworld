@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: cservice.cc,v 1.253 2005/11/13 22:21:29 kewlio Exp $
+ * $Id: cservice.cc,v 1.254 2005/11/14 16:32:29 kewlio Exp $
  */
 
 #include	<new>
@@ -2483,9 +2483,9 @@ bool cservice::validUserMask(const string& userMask) const
 {
 
 // Check that a '!' exists, and that the nickname
-// is no more than 9 characters
+// is no more than 15 characters
 StringTokenizer st1( userMask, '!' ) ;
-if( (st1.size() != 2) || (st1[ 0 ].size() > 9) )
+if( (st1.size() != 2) || (st1[ 0 ].size() > 15) )
 	{
 	return false ;
 	}
