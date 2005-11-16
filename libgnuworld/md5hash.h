@@ -1,6 +1,6 @@
 /**********************************************************************
  * $Workfile: MD5.H $
- * $Revision: 1.3 $
+ * $Revision: 1.4 $
  *  $Modtime: 1/08/97 6:35p $
  *
  * PURPOSE:
@@ -12,7 +12,7 @@
  *
  * NOTE:
  * Currently the md5::update length is limited to unsigned int, which may
- * be less than unsigned long.
+ * be less than unit32_t.
  * 
  * COPYRIGHT:
  * Copyright (c) 1995, 1996, 1997 Tree Frog Software, All rights reserved.
@@ -59,7 +59,7 @@
  * So there! 
  **********************************************************************/
 #ifndef MD5_H
-#define MD5_H "$Id: md5hash.h,v 1.3 2004/05/18 16:50:57 dan_karrels Exp $"
+#define MD5_H "$Id: md5hash.h,v 1.4 2005/11/16 21:40:37 kewlio Exp $"
 
 #include <iostream>
  
@@ -79,13 +79,13 @@ public:
    void init(  void );                 // Used for reinitialization.
    void clear( void );                 // Used to wipe clean interal data.
 protected:
-   unsigned long  m_state[4];         // State (ABCD)
-   unsigned long  m_count[2];         // Number of bits, modulo 2^64 (lsb first).
+   uint32_t  m_state[4];              // State (ABCD)
+   uint32_t  m_count[2];              // Number of bits, modulo 2^64 (lsb first).
    unsigned char  m_buffer[64];       // Input buffer.
    void transform( const unsigned char block[64] );
-   void encode( unsigned char  *output, const unsigned long  *input, int len );
+   void encode( unsigned char  *output, const uint32_t  *input, int32_t len );
    void encode( md5Digest &digest );
-   void decode( unsigned long  *output, const unsigned char  *input, int len );
+   void decode( uint32_t  *output, const unsigned char  *input, int32_t len );
 };
 
 class md5Digest {
@@ -100,8 +100,8 @@ public:
 private:
    unsigned char m_data[ MD5_DIGEST_LENGTH ];
 
-   friend int      operator==( const md5Digest &lhs, const md5Digest &rhs );
-   friend int      operator!=( const md5Digest &lhs, const md5Digest &rhs );
+   friend int32_t      operator==( const md5Digest &lhs, const md5Digest &rhs );
+   friend int32_t      operator!=( const md5Digest &lhs, const md5Digest &rhs );
    friend std::istream& operator>>( std::istream& stream,
 				md5Digest& digest );
    friend std::ostream& operator<<( std::ostream& stream,

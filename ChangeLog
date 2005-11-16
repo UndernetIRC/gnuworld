@@ -1,4 +1,12 @@
-// $Id: ChangeLog,v 1.48 2005/11/16 21:06:36 kewlio Exp $ //
+// $Id: ChangeLog,v 1.49 2005/11/16 21:40:37 kewlio Exp $ //
+
+2005-11-16	Dan-m00 <daniel@undernet.org>
+		* libgnuworld/md5hash.h:
+		* libgnuworld/md5hash.cc: include inttypes.h and convert md5
+			functions to 64bit safe.  GNUworld now compiles and
+			runs on 64bit operating systems.
+
+			Tested on FreeBSD/amd64 6.0-STABLE/gcc3
 
 2005-11-15	Dan-m00 <daniel@undernet.org>
 		* include/gnuworld_config.h: update defines and comment to the

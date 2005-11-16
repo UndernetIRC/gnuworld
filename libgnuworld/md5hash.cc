@@ -1,6 +1,6 @@
 /*************************************************************************
  * $Workfile: MD5.CPP $
- * $Revision: 1.2 $
+ * $Revision: 1.3 $
  *  $Modtime: 1/08/97 6:35p $
  *
  * PURPOSE:
@@ -54,34 +54,35 @@
  ************************************************************************/
 #include	<iostream>   // Needed for ostream and istream.
 #include	<cstring>     // Needed for memcpy() and memset().
+#include	<inttypes.h>
 #include	"md5hash.h"
 
-const char rcsId[] = "$Id: md5hash.cc,v 1.2 2003/06/17 15:13:53 dan_karrels Exp $" ;
+const char rcsId[] = "$Id: md5hash.cc,v 1.3 2005/11/16 21:40:37 kewlio Exp $" ;
 
 namespace gnuworld
 {
 
 // F, G, H and I are basic MD5 functions.
-inline unsigned long F( unsigned long xx, unsigned long yy, unsigned long zz ) 
+inline uint32_t F( uint32_t xx, uint32_t yy, uint32_t zz ) 
 {  return (( xx & yy ) | (~xx & zz ));  }
 
-inline unsigned long G( unsigned long xx, unsigned long yy, unsigned long zz ) 
+inline uint32_t G( uint32_t xx, uint32_t yy, uint32_t zz ) 
 {  return (( xx & zz ) | ( yy & ~zz )); }
 
-inline unsigned long H( unsigned long xx, unsigned long yy, unsigned long zz )
+inline uint32_t H( uint32_t xx, uint32_t yy, uint32_t zz )
 {  return xx ^ yy ^ zz; }
 
-inline unsigned long I( unsigned long xx, unsigned long yy, unsigned long zz ) 
+inline uint32_t I( uint32_t xx, uint32_t yy, uint32_t zz ) 
 {  return yy ^ ( xx | ~zz ); }
 
 // ROTATE_LEFT rotates x left n bits.
-inline unsigned long ROTATE_LEFT( unsigned long xx, int nn )
+inline uint32_t ROTATE_LEFT( uint32_t xx, int32_t nn )
 {  return ( xx << nn ) | ( xx >> (32-nn )); }
 
 // FF, GG, HH, and II transformations for rounds 1, 2, 3, and 4.
 // Rotation is separate from addition to prevent recomputation.
 inline void 
-FF(unsigned long &aa, unsigned long bb, unsigned long cc, unsigned long dd, unsigned long xx, int ss, unsigned long ac){ 
+FF(uint32_t &aa, uint32_t bb, uint32_t cc, uint32_t dd, uint32_t xx, int32_t ss, uint32_t ac){ 
    aa += F( bb, cc, dd ) + xx + ac;
    aa = ROTATE_LEFT( aa, ss );
    aa += bb;
@@ -89,7 +90,7 @@ FF(unsigned long &aa, unsigned long bb, unsigned long cc, unsigned long dd, unsi
 }
 
 inline void
-GG(unsigned long &aa, unsigned long bb, unsigned long cc, unsigned long dd, unsigned long xx, int ss, unsigned long ac){ 
+GG(uint32_t &aa, uint32_t bb, uint32_t cc, uint32_t dd, uint32_t xx, int32_t ss, uint32_t ac){ 
    aa += G( bb, cc, dd ) + xx + ac;
    aa = ROTATE_LEFT( aa, ss );
    aa += bb;
@@ -97,7 +98,7 @@ GG(unsigned long &aa, unsigned long bb, unsigned long cc, unsigned long dd, unsi
 }
 
 inline void 
-HH(unsigned long &aa, unsigned long bb, unsigned long cc, unsigned long dd, unsigned long xx, int ss, unsigned long ac){ 
+HH(uint32_t &aa, uint32_t bb, uint32_t cc, uint32_t dd, uint32_t xx, int32_t ss, uint32_t ac){ 
    aa += H( bb, cc, dd ) + xx + ac;
    aa = ROTATE_LEFT( aa, ss );
    aa += bb;
@@ -105,7 +106,7 @@ HH(unsigned long &aa, unsigned long bb, unsigned long cc, unsigned long dd, unsi
 }
 
 inline void
-II(unsigned long &aa, unsigned long bb, unsigned long cc, unsigned long dd, unsigned long xx, int ss, unsigned long ac){ 
+II(uint32_t &aa, uint32_t bb, uint32_t cc, uint32_t dd, uint32_t xx, int32_t ss, uint32_t ac){ 
    aa += I( bb, cc, dd ) + xx + ac;
    aa = ROTATE_LEFT( aa, ss );
    aa += bb;
@@ -149,17 +150,17 @@ md5Digest::operator[]( size_t ii ) const  // rvalue operator[].
    return m_data[ ii ];
 }
 
-int 
+int32_t 
 operator==( const md5Digest &lhs, const md5Digest &rhs )
 {
-   int result = 1;   // Assume true to begin with.
-   for( int ii = 0; result && ii < MD5_DIGEST_LENGTH; ii++ ) {
+   int32_t result = 1;   // Assume true to begin with.
+   for( int32_t ii = 0; result && ii < MD5_DIGEST_LENGTH; ii++ ) {
       result = lhs.m_data[ii] == rhs.m_data[ii];
    }
    return result;
 }
 
-int
+int32_t
 operator!=( const md5Digest &lhs, const md5Digest &rhs )
 {
    return !( lhs == rhs );
@@ -170,7 +171,7 @@ operator>>( std::istream& stream, md5Digest& digest )
 {
    stream.read( reinterpret_cast< char* >( digest.m_data ),
 	MD5_DIGEST_LENGTH );
-//   for( int ii = 0; ii < MD5_DIGEST_LENGTH; ii++ ) {
+//   for( int32_t ii = 0; ii < MD5_DIGEST_LENGTH; ii++ ) {
 //      stream >> digest.m_data[ii];
 //   }
    return stream;
@@ -181,7 +182,7 @@ operator<<( std::ostream& stream, const md5Digest& digest )
 {
    stream.write( reinterpret_cast< const char* >( digest.m_data ),
 	MD5_DIGEST_LENGTH );
-//   for( int ii = 0; ii < MD5_DIGEST_LENGTH; ii++ ) {
+//   for( int32_t ii = 0; ii < MD5_DIGEST_LENGTH; ii++ ) {
 //      stream << digest.m_data[ii];
 //   }
    return stream;
@@ -228,10 +229,10 @@ md5::update( const unsigned char *input, size_t inputLen )
    size_t index = (size_t)((m_count[0] >> 3) & 0x3F);
 
    // Update number of bits.
-   if(( m_count[0] += ((unsigned long)inputLen << 3)) < ((unsigned long)inputLen << 3)) {
+   if(( m_count[0] += ((uint32_t)inputLen << 3)) < ((uint32_t)inputLen << 3)) {
       m_count[1]++;
    }
-   m_count[1] += ((unsigned long)inputLen >> 29);
+   m_count[1] += ((uint32_t)inputLen >> 29);
 
    size_t partLen = 64 - index;
 
@@ -280,25 +281,25 @@ md5::report( md5Digest &digest )
 void
 md5::transform( const unsigned char block[64] )
 {  // MD5 basic transformation. Transforms state based on block.
-   const int S11 =  7;
-   const int S12 = 12;
-   const int S13 = 17;
-   const int S14 = 22;
-   const int S21 =  5;
-   const int S22 =  9;
-   const int S23 = 14;
-   const int S24 = 20;
-   const int S31 =  4;
-   const int S32 = 11;
-   const int S33 = 16;
-   const int S34 = 23;
-   const int S41 =  6;
-   const int S42 = 10;
-   const int S43 = 15;
-   const int S44 = 21;
+   const int32_t S11 =  7;
+   const int32_t S12 = 12;
+   const int32_t S13 = 17;
+   const int32_t S14 = 22;
+   const int32_t S21 =  5;
+   const int32_t S22 =  9;
+   const int32_t S23 = 14;
+   const int32_t S24 = 20;
+   const int32_t S31 =  4;
+   const int32_t S32 = 11;
+   const int32_t S33 = 16;
+   const int32_t S34 = 23;
+   const int32_t S41 =  6;
+   const int32_t S42 = 10;
+   const int32_t S43 = 15;
+   const int32_t S44 = 21;
 
-   unsigned long aa = m_state[0], bb = m_state[1], cc = m_state[2], dd = m_state[3];
-   unsigned long xx[16];
+   uint32_t aa = m_state[0], bb = m_state[1], cc = m_state[2], dd = m_state[3];
+   uint32_t xx[16];
 
    decode( xx, block, 64 );
 
@@ -384,10 +385,10 @@ md5::transform( const unsigned char block[64] )
 }
 
 void
-md5::encode( unsigned char  *output, const unsigned long *input, int len )
-{  // Encodes input (unsigned long) into output (unsigned char).
+md5::encode( unsigned char  *output, const uint32_t *input, int32_t len )
+{  // Encodes input (uint32_t) into output (unsigned char).
    // Assumes len is a multiple of 4.
-  int ii, jj;
+  int32_t ii, jj;
   for( ii = 0, jj = 0; jj < len; ii++, jj += 4 ) {
      output[jj]   = (unsigned char)(  input[ii]         & 0xFF );
      output[jj+1] = (unsigned char)(( input[ii] >>  8 ) & 0xFF );
@@ -400,7 +401,7 @@ md5::encode( unsigned char  *output, const unsigned long *input, int len )
 void
 md5::encode( md5Digest &digest )
 {  // Encodes m_state into digest.
-  int ii, jj;
+  int32_t ii, jj;
   for( ii = 0, jj = 0; jj < MD5_DIGEST_LENGTH; ii++, jj += 4 ) {
      digest.m_data[jj]   = (unsigned char)(  m_state[ii]         & 0xFF );
      digest.m_data[jj+1] = (unsigned char)(( m_state[ii] >>  8 ) & 0xFF );
@@ -411,15 +412,15 @@ md5::encode( md5Digest &digest )
 }
 
 void
-md5::decode( unsigned long *output, const unsigned char  *input, int len )
-{  // Decodes input (unsigned char) into output (unsigned long). 
+md5::decode( uint32_t *output, const unsigned char  *input, int32_t len )
+{  // Decodes input (unsigned char) into output (uint32_t). 
    // Assumes len is a multiple of 4.
-  int ii, jj;
+  int32_t ii, jj;
   for( ii = 0, jj = 0; jj < len; ii++, jj += 4 ) {
-     output[ii] = ((unsigned long)input[jj]) | 
-                 (((unsigned long)input[jj+1]) <<  8 ) |
-                 (((unsigned long)input[jj+2]) << 16 ) | 
-                 (((unsigned long)input[jj+3]) << 24 );
+     output[ii] = ((uint32_t)input[jj]) | 
+                 (((uint32_t)input[jj+1]) <<  8 ) |
+                 (((uint32_t)input[jj+2]) << 16 ) | 
+                 (((uint32_t)input[jj+3]) << 24 );
   }
   return;
 }
