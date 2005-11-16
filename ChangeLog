@@ -1,4 +1,8 @@
-// $Id: ChangeLog,v 1.47 2005/11/14 19:38:23 kewlio Exp $ //
+// $Id: ChangeLog,v 1.48 2005/11/16 21:06:36 kewlio Exp $ //
+
+2005-11-15	Dan-m00 <daniel@undernet.org>
+		* include/gnuworld_config.h: update defines and comment to the
+			new filename.
 
 2005-11-14	Dan-m00 <daniel@undernet.org>
 		* mod.cservice/BANCommand.cc: fix a bug when banning a hostmask.

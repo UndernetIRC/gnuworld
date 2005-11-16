@@ -1,5 +1,5 @@
 /**
- * config.h
+ * gnuworld_config.h
  * Copyright (C) 2002 Daniel Karrels <dan@karrels.com>
  *
  * This program is free software; you can redistribute it and/or
@@ -17,11 +17,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: gnuworld_config.h,v 1.2 2005/01/12 04:36:42 dan_karrels Exp $
+ * $Id: gnuworld_config.h,v 1.3 2005/11/16 21:06:37 kewlio Exp $
  */
 
-#ifndef __CONFIG_H
-#define __CONFIG_H "$Id: gnuworld_config.h,v 1.2 2005/01/12 04:36:42 dan_karrels Exp $"
+#ifndef __GNUWORLD_CONFIG_H
+#define __GNUWORLD_CONFIG_H "$Id: gnuworld_config.h,v 1.3 2005/11/16 21:06:37 kewlio Exp $"
 
 /* GNUWorld main configuration file */
 /* All core settings are set/defined here.
@@ -67,4 +67,4 @@
 #define RCSTAG(tag) static const char rcsId[] = tag
 #endif
 
-#endif /* __CONFIG_H */
+#endif /* __GNUWORLD_CONFIG_H */
