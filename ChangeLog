@@ -1,4 +1,10 @@
-// $Id: ChangeLog,v 1.51 2005/11/17 19:08:08 kewlio Exp $ //
+// $Id: ChangeLog,v 1.52 2005/11/17 20:07:53 kewlio Exp $ //
+
+2005-11-17	Dan-m00 <daniel@undernet.org>
+		* src/server.cc: update JoinChannel() function to handle channel
+			keys that change when X has a channel key stored.
+			X will now restore the saved channel key and gnuworld's
+			internal database will not be out of sync.
 
 2005-11-17	Dan-m00 <daniel@undernet.org>
 		* src/client.cc: update clearmode function to allow a manual

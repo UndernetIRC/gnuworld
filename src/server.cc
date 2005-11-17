@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server.cc,v 1.215 2005/10/03 23:55:07 kewlio Exp $
+ * $Id: server.cc,v 1.216 2005/11/17 20:07:54 kewlio Exp $
  */
 
 #include	<sys/time.h>
@@ -70,7 +70,7 @@
 #include	"ConnectionHandler.h"
 #include	"Connection.h"
 
-RCSTAG( "$Id: server.cc,v 1.215 2005/10/03 23:55:07 kewlio Exp $" ) ;
+RCSTAG( "$Id: server.cc,v 1.216 2005/11/17 20:07:54 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -1733,6 +1733,23 @@ if( !chanModes.empty() &&
 						<< endl ;
 					break ;
 					}
+				/* if there is already a key, update it */
+				if (theChan->getMode(Channel::MODE_K))
+				{
+					/* only update it if it is different! */
+					if (strcmp(theChan->getKey().c_str(), st[argPos].c_str()))
+					{
+						Write("%s M %s -k %s\r\n",
+							theClient->getCharYYXXX().c_str(),
+							theChan->getName().c_str(),
+							theChan->getKey().c_str());
+
+						Write("%s M %s +k %s\r\n",
+							theClient->getCharYYXXX().c_str(),
+							theChan->getName().c_str(),
+							st[argPos].c_str());
+					}
+				}
 				theChan->onModeK( true, st[ argPos++ ] ) ;
 				break ;
 				}
