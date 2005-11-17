@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: VERIFYCommand.cc,v 1.23 2003/06/28 01:21:20 dan_karrels Exp $
+ * $Id: VERIFYCommand.cc,v 1.24 2005/11/17 01:37:13 kewlio Exp $
  */
 
 #include	<string>
@@ -27,7 +27,7 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char VERIFYCommand_cc_rcsId[] = "$Id: VERIFYCommand.cc,v 1.23 2003/06/28 01:21:20 dan_karrels Exp $" ;
+const char VERIFYCommand_cc_rcsId[] = "$Id: VERIFYCommand.cc,v 1.24 2005/11/17 01:37:13 kewlio Exp $" ;
 
 namespace gnuworld
 {
@@ -108,7 +108,7 @@ if (!theChan)
 
 // TODO: Move all the levels to constants in levels.h
 
-int level = bot->getAdminAccessLevel(theUser);
+int level = bot->getAdminAccessLevel(theUser, true);
 int cLevel;
 if (!theChan)
 	cLevel = 0;

@@ -1,4 +1,16 @@
-// $Id: ChangeLog,v 1.49 2005/11/16 21:40:37 kewlio Exp $ //
+// $Id: ChangeLog,v 1.50 2005/11/17 01:37:13 kewlio Exp $ //
+
+2005-11-17	Dan-m00 <daniel@undernet.org>
+		* mod.cservice/sqlUser.h:
+		* mod.cservice/sqlUser.cc: add F_ALUMNI flag (0x80)
+
+		* mod.cservice/cservice.h: update getAdminAccessLevel() to
+			accept a boolean "verify" (used to disable the alumni
+			check explicitly in the 'verify' command)
+
+		* mod.cservice/cservice.cc: implement the above check.
+
+		* mod.cservice/VERIFYCommand.cc: implement the above check.
 
 2005-11-16	Dan-m00 <daniel@undernet.org>
 		* libgnuworld/md5hash.h:

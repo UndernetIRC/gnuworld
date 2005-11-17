@@ -16,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: sqlUser.h,v 1.35 2005/04/03 22:11:45 dan_karrels Exp $
+ * $Id: sqlUser.h,v 1.36 2005/11/17 01:37:13 kewlio Exp $
  */
 
 #ifndef __SQLUSER_H
-#define __SQLUSER_H "$Id: sqlUser.h,v 1.35 2005/04/03 22:11:45 dan_karrels Exp $"
+#define __SQLUSER_H "$Id: sqlUser.h,v 1.36 2005/11/17 01:37:13 kewlio Exp $"
 
 #include	<string>
 #include	<vector>
@@ -51,6 +51,7 @@ public:
 	static const flagType F_NONOTES;
 	static const flagType F_NOPURGE;
 	static const flagType F_NOADMIN;
+	static const flagType F_ALUMNI;
 
 	/*
 	 *   User 'Event' Flags, used in the userlog table.

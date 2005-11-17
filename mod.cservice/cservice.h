@@ -17,11 +17,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: cservice.h,v 1.104 2005/09/29 15:21:56 kewlio Exp $
+ * $Id: cservice.h,v 1.105 2005/11/17 01:37:13 kewlio Exp $
  */
 
 #ifndef __CSERVICE_H
-#define __CSERVICE_H "$Id: cservice.h,v 1.104 2005/09/29 15:21:56 kewlio Exp $"
+#define __CSERVICE_H "$Id: cservice.h,v 1.105 2005/11/17 01:37:13 kewlio Exp $"
 
 #include	<iostream>
 #include	<string>
@@ -178,7 +178,7 @@ public:
 	short getEffectiveAccessLevel( sqlUser*, sqlChannel*, bool );
 
 	/* Returns what admin access a user has. */
-	short getAdminAccessLevel( sqlUser* );
+	short getAdminAccessLevel( sqlUser*, bool = false);
 
 	/* Returns what access a user has in the coder channel */
 	short getCoderAccessLevel( sqlUser* );

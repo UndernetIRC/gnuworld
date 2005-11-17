@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: cservice.cc,v 1.254 2005/11/14 16:32:29 kewlio Exp $
+ * $Id: cservice.cc,v 1.255 2005/11/17 01:37:13 kewlio Exp $
  */
 
 #include	<new>
@@ -1168,7 +1168,7 @@ return 0;
 /**
  *  Returns the admin access level a particular user has.
  */
-short int cservice::getAdminAccessLevel( sqlUser* theUser )
+short int cservice::getAdminAccessLevel( sqlUser* theUser, bool verify )
 {
 
 /*
@@ -1185,6 +1185,10 @@ if (theUser->getFlag(sqlUser::F_NOADMIN))
 	{
 	return 0;
 	}
+
+/* Are they an alumni (check except for 'verify' command) ? */
+if (!verify && (theUser->getFlag(sqlUser::F_ALUMNI)))
+	return 0;
 
 sqlChannel* theChan = getChannelRecord("*");
 if (!theChan)
