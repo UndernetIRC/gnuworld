@@ -1,4 +1,11 @@
-// $Id: ChangeLog,v 1.50 2005/11/17 01:37:13 kewlio Exp $ //
+// $Id: ChangeLog,v 1.51 2005/11/17 19:08:08 kewlio Exp $ //
+
+2005-11-17	Dan-m00 <daniel@undernet.org>
+		* src/client.cc: update clearmode function to allow a manual
+			clearmode (i.e. using "M" instead of "CM") for non-opers.
+
+		* mod.cservice/CLEARMODECommand.cc: set "clearmode as server"
+			flag to "no" to force the bot to use a manual mode.
 
 2005-11-17	Dan-m00 <daniel@undernet.org>
 		* mod.cservice/sqlUser.h:

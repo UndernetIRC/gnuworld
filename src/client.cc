@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: client.cc,v 1.82 2005/09/29 17:40:06 kewlio Exp $
+ * $Id: client.cc,v 1.83 2005/11/17 19:08:08 kewlio Exp $
  */
 
 #include	<new>
@@ -47,7 +47,7 @@
 #include	"ELog.h"
 #include	"events.h"
 
-RCSTAG("$Id: client.cc,v 1.82 2005/09/29 17:40:06 kewlio Exp $" ) ;
+RCSTAG("$Id: client.cc,v 1.83 2005/11/17 19:08:08 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -2217,15 +2217,13 @@ if( !Connected || modes.empty() )
 	return false ;
 	}
 
-if( !modeAsServer && !me->isOper() )
-	{
-	return false ;
-	}
-
 xServer::opVectorType opVector ;
 xServer::voiceVectorType voiceVector ;
 xServer::banVectorType banVector ;
 xServer::modeVectorType modeVector ;
+
+string chanKey = "";
+
 for( string::size_type modePos = 0 ; modePos < modes.size() ; ++modePos )
 	{
 	switch( modes[ modePos ] ) 
@@ -2278,6 +2276,8 @@ for( string::size_type modePos = 0 ; modePos < modes.size() ; ++modePos )
 		case 'k':  //Key?
 			if(theChan->getMode(Channel::MODE_K))
 				{
+				chanKey = " ";
+				chanKey += theChan->getKey();
 				theChan->removeMode(Channel::MODE_K);
 				theChan->setKey( "" );
 				MyUplink->OnChannelModeK( theChan,
@@ -2372,11 +2372,31 @@ if( !banVector.empty() )
 	{
 	MyUplink->OnChannelModeB( theChan, 0, banVector ) ;
 	}
-return Write( "%s CM %s :%s\r\n",
-	(modeAsServer) ? MyUplink->getCharYY().c_str() : 
-		getCharYYXXX().c_str(),
-	theChan->getName().c_str(),
-	modes.c_str()) ;
+
+	if (modeAsServer)
+	{
+		return Write( "%s CM %s :%s\r\n",
+			MyUplink->getCharYY().c_str(),
+			theChan->getName().c_str(),
+			modes.c_str()) ;
+	} else {
+		/* perform the mode as the bot instead */
+		if (me->isOper())
+		{
+			/* bot is an oper, can use CM */
+			return Write( "%s CM %s :%s\r\n",
+				getCharYYXXX().c_str(),
+				theChan->getName().c_str(),
+				modes.c_str()) ;
+		} else {
+			/* bot is not an oper, use M */
+			return Write( "%s M %s -%s%s\r\n",
+				getCharYYXXX().c_str(),
+				theChan->getName().c_str(),
+				modes.c_str(),
+				chanKey.c_str()) ;
+		}
+	}
 }
 
 } // namespace gnuworld
