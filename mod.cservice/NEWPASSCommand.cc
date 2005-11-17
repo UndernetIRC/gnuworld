@@ -16,13 +16,14 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: NEWPASSCommand.cc,v 1.16 2003/06/28 01:21:20 dan_karrels Exp $
+ * $Id: NEWPASSCommand.cc,v 1.17 2005/11/17 22:20:57 kewlio Exp $
  */
 
 #include	<string>
 #include	<sstream>
 #include	<iostream>
 #include	<iomanip>
+#include	<inttypes.h>
 
 #include	"md5hash.h"
 #include	"StringTokenizer.h"
@@ -32,7 +33,7 @@
 #include	"networkData.h"
 #include	"cservice_config.h"
 
-const char NEWPASSCommand_cc_rcsId[] = "$Id: NEWPASSCommand.cc,v 1.16 2003/06/28 01:21:20 dan_karrels Exp $" ;
+const char NEWPASSCommand_cc_rcsId[] = "$Id: NEWPASSCommand.cc,v 1.17 2005/11/17 22:20:57 kewlio Exp $" ;
 
 namespace gnuworld
 {

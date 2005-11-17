@@ -1,4 +1,9 @@
-// $Id: ChangeLog,v 1.52 2005/11/17 20:07:53 kewlio Exp $ //
+// $Id: ChangeLog,v 1.53 2005/11/17 22:20:57 kewlio Exp $ //
+
+2005-11-17	Reed Loden <reed@reedloden.com>
+		* mod.cservice/NEWPASSCommand.cc: Due to the 64-bit
+		changes of the md5 hashing code, we now need to
+		#include <inttypes.h> in order to compile NEWPASS.
 
 2005-11-17	Dan-m00 <daniel@undernet.org>
 		* src/server.cc: update JoinChannel() function to handle channel
