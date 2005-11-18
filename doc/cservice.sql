@@ -1,8 +1,12 @@
 ------------------------------------------------------------------------------------
--- "$Id: cservice.sql,v 1.81 2005/11/13 22:21:29 kewlio Exp $"
+-- "$Id: cservice.sql,v 1.82 2005/11/18 04:14:34 nighty Exp $"
 -- Channel service DB SQL file for PostgreSQL.
 
 -- ChangeLog:
+-- 2005-11-17: nighty
+--             Moved table 'ip_restrict' from cservice.web.sql to cservice.sql
+--             Added indexes to table 'adminlog'
+--             Added a new table for X to process notices to info channel from the website
 -- 2002-03-09: nighty
 --             Added 'maxlogins' column in 'users' table.
 -- 2002-03-07: nighty
@@ -32,7 +36,7 @@
 --
 -- 2000-12-10: Gte
 --             Fixed a few typo's, changed TIMESTAMP's to INT4's.
---	       
+--
 -- 2000-10-22: Isomer
 --             Removed 'ChannelManager' information from channels table
 --             Added email/url/public_key to users table
@@ -51,8 +55,8 @@
 -- 2000-09-21: Bleep
 --             Added last_updated timestamps
 --
--- Prior: Maintained by moof.           
- 
+-- Prior: Maintained by moof.
+
 -- The service supports multiple languages, defined in language
 -- files.
 
@@ -67,11 +71,11 @@ CREATE TABLE languages (
 
 -- Translations for multi-lingual support.
 
-CREATE TABLE translations ( 
+CREATE TABLE translations (
 	language_id INT4 CONSTRAINT translations_language_id_ref REFERENCES languages ( id ),
 	response_id INT4 NOT NULL DEFAULT '0',
 	text TEXT,
-	last_updated INT4 NOT NULL, 
+	last_updated INT4 NOT NULL,
 	deleted INT2 DEFAULT '0',
 
 	PRIMARY KEY (language_id, response_id)
@@ -79,13 +83,13 @@ CREATE TABLE translations (
 
 CREATE TABLE help (
 	topic VARCHAR(20) NOT NULL,
-	language_id INT4 CONSTRAINT help_language_id_ref REFERENCES languages ( id ),	
+	language_id INT4 CONSTRAINT help_language_id_ref REFERENCES languages ( id ),
 	contents TEXT
 );
 
 CREATE INDEX help_topic_idx ON help (topic);
 CREATE INDEX help_language_id_idx ON help (language_id);
- 
+
 -- Create the channel table first since we'll be referring back to it
 -- frequently.
 
@@ -111,7 +115,7 @@ CREATE TABLE channels (
 -- 0x0008 0000 - AutoTopic
 -- 0x0010 0000 - OpOnly (Depricated).
 -- 0x0020 0000 - AutoJoin
-		
+
 	-- Do we want to keep either or both of these?
 	-- nb: removed nickflood pro.  not useful.
 	mass_deop_pro INT2 NOT NULL DEFAULT 3,
@@ -124,7 +128,7 @@ CREATE TABLE channels (
 	keywords VARCHAR(128),
 	registered_ts INT4,
 	channel_ts INT4 NOT NULL,
-	channel_mode VARCHAR(26), 
+	channel_mode VARCHAR(26),
 
 -- USERFLAGS: Defaults new access records to:
 -- 0: No Default
@@ -137,8 +141,8 @@ CREATE TABLE channels (
 	limit_period INT4 DEFAULT '20',
 	limit_grace INT4 DEFAULT '1',
 	limit_max INT4 DEFAULT '0',
-	
-	last_updated INT4 NOT NULL, 
+
+	last_updated INT4 NOT NULL,
 	deleted INT2 DEFAULT '0',
 
 	PRIMARY KEY (id)
@@ -159,8 +163,8 @@ CREATE TABLE bans (
 	set_ts INT4,
 	level INT2,
 	expires INT4,					-- Expiration timestamp.
-	reason VARCHAR (128), 
-	last_updated INT4 NOT NULL, 
+	reason VARCHAR (128),
+	last_updated INT4 NOT NULL,
 	deleted INT2 DEFAULT '0',
 
 	PRIMARY KEY (banmask,channel_id)
@@ -175,13 +179,13 @@ CREATE TABLE users (
 
 	id SERIAL,
 	user_name TEXT NOT NULL,
-	password VARCHAR (40) NOT NULL, 
+	password VARCHAR (40) NOT NULL,
 	email TEXT,
 	url  VARCHAR(128),
 -- Which question the user provided the answer too from the signup page.
 	question_id INT2,
 -- The answer to the question. 42?
-	verificationdata VARCHAR(30), 
+	verificationdata VARCHAR(30),
 	language_id INT4 CONSTRAINT language_channel_id_ref REFERENCES languages (id),
 	public_key TEXT,
 	post_forms int4 DEFAULT 0 NOT NULL,
@@ -197,7 +201,7 @@ CREATE TABLE users (
 -- 0x01 00 -- IRC Operator - User is flagged as being 'supposed' to be an official operator, as for allowing them
 	   --                special accesses such as posting complaints even when system is closed to public.
 	last_updated_by VARCHAR (128),		-- nick!user@host
-	last_updated INT4 NOT NULL, 
+	last_updated INT4 NOT NULL,
 	deleted INT2 DEFAULT '0',
 	tz_setting VARCHAR(255) DEFAULT '',
 	signup_cookie VARCHAR(255) DEFAULT '',
@@ -212,15 +216,15 @@ CREATE INDEX users_username_idx ON users( lower(user_name) );
 CREATE INDEX users_email_idx ON users( lower(email) );
 CREATE INDEX users_signup_ts_idx ON users( signup_ts );
 CREATE INDEX users_signup_ip_idx ON users( signup_ip );
- 
+
 -- This table used to store the "Last Seen" informatation previously
 -- routinely updated in the users table.
- 
+
 CREATE TABLE users_lastseen (
 	user_id INT4 CONSTRAINT lastseen_users_id_ref REFERENCES users ( id ),
 	last_seen INT4,
 	last_hostmask VARCHAR( 256 ),
-	last_updated INT4 NOT NULL, 
+	last_updated INT4 NOT NULL,
 	PRIMARY KEY (user_id)
 );
 
@@ -236,17 +240,17 @@ CREATE TABLE levels (
 -- 0x00 08 -- AutoVoice
 	suspend_expires INT4 DEFAULT '0',
 	suspend_level INT4 DEFAULT '0',
-	suspend_by VARCHAR( 128 ), 
+	suspend_by VARCHAR( 128 ),
 	added INT4,
 	added_By VARCHAR( 128 ),
 	last_Modif INT4,
 	last_Modif_By VARCHAR( 128 ),
-	last_Updated INT4 NOT NULL, 
+	last_Updated INT4 NOT NULL,
 	deleted INT2 DEFAULT '0',
 
 	PRIMARY KEY( channel_id, user_id )
 );
- 
+
 CREATE INDEX levels_access_idx ON levels( access ) ;
 CREATE INDEX levels_userid_idx ON levels( user_id ) ;
 
@@ -263,9 +267,9 @@ CREATE TABLE channellog (
 	-- Defines the message event type, so we can filter nice reports.
 -- 1  -- EV_MISC - Uncategorised event.
 -- 2  -- EV_JOIN - When someone 'JOIN's the bot.
--- 3  -- EV_PART - When someone 'PART's the bot. 
+-- 3  -- EV_PART - When someone 'PART's the bot.
 -- 4  -- EV_OPERJOIN - When an oper 'JOIN's the bot.
--- 5  -- EV_OPERPART - When an oper 'PART's the bot. 
+-- 5  -- EV_OPERPART - When an oper 'PART's the bot.
 -- 6  -- EV_FORCE - When someone FORCE's access in a channel.
 -- 7  -- EV_REGISTER - When this channel is (re)registered.
 -- 8  -- EV_PURGE - When this channle is purged.
@@ -306,7 +310,7 @@ CREATE TABLE userlog (
 -- 11-- EV_POSTCOMPLAINT - When a user identified posts a complaint on the web
 -- 12-- EV_POSTCLOSE - When a Ticket/Complaint is closed or resolved.
 	message TEXT,
-	last_updated INT4 NOT NULL 
+	last_updated INT4 NOT NULL
 );
 
 CREATE INDEX userlog_channelID_idx ON userlog(user_id);
@@ -324,7 +328,7 @@ CREATE TABLE supporters (
 	join_count INT4 DEFAULT '0',
 -- Number of times this 'supporter' has joined the channel.
 -- Field updated by CMaster to reflect channel 'traffic'.
-	last_updated INT4 NOT NULL, 
+	last_updated INT4 NOT NULL,
 	deleted INT2 DEFAULT '0',
 
 	PRIMARY KEY(channel_id,user_id)
@@ -381,11 +385,11 @@ CREATE TABLE domain (
 -- 0x00 01 - Bad Domain.
 -- 0x00 02 - Good Domain.
 -- 0x00 04 - Pending Domain.
-	last_updated INT4 NOT NULL, 
+	last_updated INT4 NOT NULL,
 	deleted INT2 DEFAULT '0',
 
 	PRIMARY KEY(id)
-); 
+);
 
 CREATE INDEX domain_domain_idx ON domain(domain);
 
@@ -406,7 +410,7 @@ CREATE TABLE deletion_transactions (
 );
 
 -- Table to deal with the whole no-reg schema.
--- We use username and channelname instead of id's because these records may 
+-- We use username and channelname instead of id's because these records may
 -- exist past the lifetime of particular user accounts, and we'll want
 -- to make sure certain email address's remain unable to register, etc.
 -- Specific flags are INT4's becuase postgres does not want to index on anything
@@ -450,7 +454,7 @@ CREATE TABLE notes (
 );
 
 
---CREATE TABLE mailq (	
+--CREATE TABLE mailq (
 --	user_id INT4 CONSTRAINT mailq_users_ref REFERENCES users(id),
 --	channel_id INT4 CONSTRAINT mailq_channels_ref REFERENCES channels(id),
 --	created_ts INT4,
@@ -475,17 +479,17 @@ CREATE TABLE notes (
 -- (N.B: Disabled, aparently conditional RULES are no longer
 -- supported in postgres 7.1.x).
 
---CREATE RULE cm1 AS ON UPDATE TO channels DO NOTIFY channels_u; 
---CREATE RULE cm2 AS ON UPDATE TO bans DO NOTIFY bans_u; 
---CREATE RULE cm3 AS ON UPDATE TO users DO NOTIFY users_u; 
---CREATE RULE cm4 AS ON UPDATE TO levels DO NOTIFY levels_u; 
- 
+--CREATE RULE cm1 AS ON UPDATE TO channels DO NOTIFY channels_u;
+--CREATE RULE cm2 AS ON UPDATE TO bans DO NOTIFY bans_u;
+--CREATE RULE cm3 AS ON UPDATE TO users DO NOTIFY users_u;
+--CREATE RULE cm4 AS ON UPDATE TO levels DO NOTIFY levels_u;
+
 CREATE FUNCTION update_users() RETURNS OPAQUE AS '
 BEGIN
 	NOTIFY users_u;
 	RETURN NEW;
 END;
-' LANGUAGE 'plpgsql'; 
+' LANGUAGE 'plpgsql';
 
 CREATE FUNCTION update_channels() RETURNS OPAQUE AS '
 BEGIN
@@ -502,7 +506,7 @@ END;
 ' LANGUAGE 'plpgsql';
 
 CREATE FUNCTION update_bans() RETURNS OPAQUE AS '
-BEGIN 
+BEGIN
 	NOTIFY bans_u;
 	RETURN NEW;
 END;
@@ -512,12 +516,12 @@ CREATE TRIGGER t_update_users AFTER UPDATE ON users FOR EACH ROW EXECUTE PROCEDU
 CREATE TRIGGER t_update_bans AFTER UPDATE ON bans FOR EACH ROW EXECUTE PROCEDURE update_bans();
 CREATE TRIGGER t_update_channels AFTER UPDATE ON channels FOR EACH ROW EXECUTE PROCEDURE update_channels();
 CREATE TRIGGER t_update_levels AFTER UPDATE ON levels FOR EACH ROW EXECUTE PROCEDURE update_levels();
- 
+
 -- Function to create a new users_lastseen record for each new user added.
 -- If the function fails, you may need to add the plpgsql scripting language support
 -- to your database:
 -- /usr/local/pgsql/bin/createlang plpgsql dbname -L /usr/local/pgsql/lib/
- 
+
 CREATE FUNCTION new_user() RETURNS OPAQUE AS '
 -- creates the users associated last_seen record
 BEGIN
@@ -528,7 +532,7 @@ END;
 
 -- Trigger to call the function upon insert to users.
 
-CREATE TRIGGER t_new_user AFTER INSERT ON users FOR EACH ROW EXECUTE PROCEDURE new_user(); 
+CREATE TRIGGER t_new_user AFTER INSERT ON users FOR EACH ROW EXECUTE PROCEDURE new_user();
 
 -- Functions to automatically generate "Deletion Stubs" for removed records, so CMaster
 -- can pick up on these and clear its cache.
@@ -554,7 +558,7 @@ BEGIN
 END;
 ' LANGUAGE 'plpgsql';
 
-CREATE TRIGGER t_delete_channel AFTER DELETE ON channels FOR EACH ROW EXECUTE PROCEDURE delete_channel(); 
+CREATE TRIGGER t_delete_channel AFTER DELETE ON channels FOR EACH ROW EXECUTE PROCEDURE delete_channel();
 
 -- Level table Deletion Stubs
 --
@@ -603,5 +607,32 @@ CREATE TABLE adminlog (
 	issue_by VARCHAR(255),
 	PRIMARY KEY(id)
 );
+
+CREATE INDEX adminlog_c_idx ON adminlog(cmd,timestamp);
+CREATE INDEX adminlog_u_idx ON adminlog(user_id,timestamp);
+CREATE INDEX adminlog_a_idx ON adminlog(args);
+CREATE INDEX adminlog_i_idx ON adminlog(issue_by);
+
+
+CREATE TABLE ip_restrict (
+	id 	SERIAL,
+	user_id	int4 NOT NULL,
+	allowmask 	varchar(255) NOT NULL,
+	allowrange1 	int4 NOT NULL,
+	allowrange2 	int4 NOT NULL,
+	added 	int4 NOT NULL,
+	added_by 	int4 NOT NULL,
+	type 	int4 NOT NULL
+);
+
+CREATE INDEX ip_restrict_idx ON ip_restrict(user_id,type);
+
+CREATE TABLE webnotices (
+	id 	SERIAL,
+	created_ts 	int4 NOT NULL,
+	contents 	VARCHAR(255) NOT NULL,
+	PRIMARY KEY(id)
+);
+
 
 -----------------------------------------------------------------------------------------

@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------------
--- "$Id: cservice.web.sql,v 1.34 2004/03/11 02:35:59 nighty Exp $"
+-- "$Id: cservice.web.sql,v 1.35 2005/11/18 04:14:34 nighty Exp $"
 -- Channel service DB SQL file for PostgreSQL.
 --
 -- Tables specific to website
@@ -159,6 +159,15 @@ CREATE INDEX pending_emailchanges_cookie_idx ON pending_emailchanges(cookie);
 CREATE INDEX pending_emailchanges_user_id_idx ON pending_emailchanges(user_id);
 CREATE INDEX pending_emailchanges_expiration_idx ON pending_emailchanges(expiration);
 
+CREATE TABLE pending_passwordchanges (
+	cookie VARCHAR(128) NOT NULL,
+	user_id INT4 NOT NULL,
+	old_crypt VARCHAR(40) NOT NULL,
+	new_crypt VARCHAR(40) NOT NULL,
+	new_clrpass VARCHAR(255) NOT NULL,
+	created_ts INT4 NOT NULL
+);
+
 -- This table stores the timestamp of the last request
 -- from a particular IP.
 -- Used to block abuse, such as requesting a password 50,000
@@ -273,17 +282,4 @@ CREATE TABLE default_msgs (
 
 CREATE INDEX default_msgs_idx ON default_msgs(type);
 
-
-CREATE TABLE ip_restrict (
-	id 	SERIAL,
-	user_id	int4 NOT NULL,
-	allowmask 	varchar(255) NOT NULL,
-	allowrange1 	int4 NOT NULL,
-	allowrange2 	int4 NOT NULL,
-	added 	int4 NOT NULL,
-	added_by 	int4 NOT NULL,
-	type 	int4 NOT NULL
-);
-
-CREATE INDEX ip_restrict_idx ON ip_restrict(user_id,type);
 
