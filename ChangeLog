@@ -1,4 +1,8 @@
-// $Id: ChangeLog,v 1.53 2005/11/17 22:20:57 kewlio Exp $ //
+// $Id: ChangeLog,v 1.54 2005/11/25 19:33:02 kewlio Exp $ //
+
+2005-11-25	Dan-m00 <daniel@undernet.org>
+		* mod.cservice/cservice.cc: Fix coredump when the DB saved pass
+			was an invalid MD5 hash.
 
 2005-11-17	Reed Loden <reed@reedloden.com>
 		* mod.cservice/NEWPASSCommand.cc: Due to the 64-bit

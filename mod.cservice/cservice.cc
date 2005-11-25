@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: cservice.cc,v 1.255 2005/11/17 01:37:13 kewlio Exp $
+ * $Id: cservice.cc,v 1.256 2005/11/25 19:33:02 kewlio Exp $
  */
 
 #include	<new>
@@ -4162,6 +4162,18 @@ md5	hash;
 
 /* MD5Digest algorithm object.*/
 md5Digest digest;
+
+/* check that we have a valid md5 hash to prevent coredumps */
+
+if (theUser->getPassword().size() < 9)
+{
+	/* salt is 8 characters and there must be a password
+	 * of some kind, so 9 is a 'safe' value.
+	 *
+	 * return a standard 'invalid password' to user
+	 */
+	return false;
+}
 
 string salt = theUser->getPassword().substr(0, 8);
 string md5Part = theUser->getPassword().substr(8);
