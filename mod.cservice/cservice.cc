@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: cservice.cc,v 1.259 2005/11/28 06:47:07 kewlio Exp $
+ * $Id: cservice.cc,v 1.260 2005/11/28 07:53:37 kewlio Exp $
  */
 
 #include	<new>
@@ -938,7 +938,7 @@ else if(Command == "VERSION")
 	xClient::DoCTCP(theClient, CTCP,
 		"Undernet P10 Channel Services II ["
 		__DATE__ " " __TIME__
-		"] Release 1.2pl1");
+		"] Release 1.3");
 	}
 else if(Command == "PROBLEM?")
 	{
