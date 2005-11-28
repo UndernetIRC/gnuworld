@@ -3,7 +3,7 @@
 -- Its not particularly in any nice order, but you can use the web interface
 -- to change it all anyway.
 --
--- $Id: cservice.help.sql,v 1.3 2002/08/30 10:18:44 nighty Exp $
+-- $Id: cservice.help.sql,v 1.4 2005/11/28 07:50:33 kewlio Exp $
 
 DELETE FROM help;
 
@@ -24,6 +24,7 @@ REGISTER	2	/msg X register <#canal> <utilisateur>\r\nCette commande est réservée
 REHASH	2	/msg X rehash <table>\r\nCette commande est réservée aux Développeurs CService.
 SET INVISIBLE	2	
 UNBAN	2	/msg X unban <#canal> <nickname | *!*user@*.host>\r\nSupprime le *!*user@*.host spécifié de la liste interne de X pour votre canal ainsi que du canal le cas échéant.\r\nVous ne pouvez supprimer des bans de la liste interne de X que si vous avec un niveau supérieur ou égal au niveau de ce ban.\r\nPour chercher dans cette liste interne, voyez la commande LBANLIST (niveau 0).
+SET NOADDUSER	1	/msg X set NOADDUSER ON|OFF\nToggle noadduser on or off for your username. \nWhen this setting is on, another user cannot add you to any channels.
 SET DESCRIPTION	1	/msg X set <#channel> DESCRIPTION <description here>\nSets the channel description. This value can be seen in the CHANINFO reply.
 SET INVISIBLE	1	/msg X set INVISIBLE ON|OFF\nToggle invisible on or off for your username. \nWhen this setting is on, another user cannot see wether you are online or not.
 SET KEYWORDS	1	/msg X set <#channel> <keywords here>\nSets keywords for your channel. You can use SEARCH to find channels with a certain keyword set.

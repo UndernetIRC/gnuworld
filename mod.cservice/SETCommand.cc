@@ -33,7 +33,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: SETCommand.cc,v 1.57 2005/09/29 15:21:56 kewlio Exp $
+ * $Id: SETCommand.cc,v 1.58 2005/11/28 07:50:33 kewlio Exp $
  */
 
 #include	<string>
@@ -45,7 +45,7 @@
 #include	"responses.h"
 #include	"cservice_config.h"
 
-const char SETCommand_cc_rcsId[] = "$Id: SETCommand.cc,v 1.57 2005/09/29 15:21:56 kewlio Exp $" ;
+const char SETCommand_cc_rcsId[] = "$Id: SETCommand.cc,v 1.58 2005/11/28 07:50:33 kewlio Exp $" ;
 
 namespace gnuworld
 {
@@ -110,6 +110,38 @@ if( st[1][0] != '#' ) // Didn't find a hash?
 				string("value of %s must be ON or OFF")).c_str(),
 			option.c_str());
 	        return true;
+	}
+
+	if (option == "NOADDUSER")
+	{
+		if (value == "ON")
+		{
+			theUser->setFlag(sqlUser::F_NOADDUSER);
+			theUser->commit(theClient);
+			bot->Notice(theClient,
+				bot->getResponse(theUser,
+					language::noadduser_on,
+					string("Your NOADDUSER setting is now ON.")));
+			return true;
+		}
+
+		if (value == "OFF")
+		{
+			theUser->removeFlag(sqlUser::F_NOADDUSER);
+			theUser->commit(theClient);
+			bot->Notice(theClient,
+				bot->getResponse(theUser,
+					language::noadduser_off,
+					string("Your NOADDUSER setting is now OFF.")));
+			return true;
+		}
+
+		bot->Notice(theClient,
+			bot->getResponse(theUser,
+				language::set_cmd_syntax_on_off,
+				string("value of %s must be ON or OFF")).c_str(),
+			option.c_str());
+		return true;
 	}
 
 #ifdef USE_NOTES

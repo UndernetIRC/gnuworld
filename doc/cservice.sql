@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------------
--- "$Id: cservice.sql,v 1.82 2005/11/18 04:14:34 nighty Exp $"
+-- "$Id: cservice.sql,v 1.83 2005/11/28 07:50:33 kewlio Exp $"
 -- Channel service DB SQL file for PostgreSQL.
 
 -- ChangeLog:
@@ -200,6 +200,7 @@ CREATE TABLE users (
 -- 0x00 80 -- "Alumni" - Any * privileged is gone, *excepted* the verify; more like an honorary position
 -- 0x01 00 -- IRC Operator - User is flagged as being 'supposed' to be an official operator, as for allowing them
 	   --                special accesses such as posting complaints even when system is closed to public.
+-- 0x02 00 -- "No ADDUSER" - prevent anyone adding username to channels (user-set flag, default disabled)
 	last_updated_by VARCHAR (128),		-- nick!user@host
 	last_updated INT4 NOT NULL,
 	deleted INT2 DEFAULT '0',

@@ -22,11 +22,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: responses.h,v 1.17 2003/06/28 01:21:20 dan_karrels Exp $
+ * $Id: responses.h,v 1.18 2005/11/28 07:50:33 kewlio Exp $
  */
 
 #ifndef __RESPONSES_H
-#define __RESPONSES_H "$Id: responses.h,v 1.17 2003/06/28 01:21:20 dan_karrels Exp $"
+#define __RESPONSES_H "$Id: responses.h,v 1.18 2005/11/28 07:50:33 kewlio Exp $"
 
 namespace gnuworld
 	{
@@ -208,6 +208,9 @@ namespace gnuworld
 		const int rpl_ignorelist = 			170;
 		const int im_not_opped = 			171;
 		const int keywords = 				172;
+		const int no_adduser =				173;
+		const int noadduser_on =			174;
+		const int noadduser_off =			175;
 		const int greeting = 				9998;
 		const int motd =					9999;
 	}

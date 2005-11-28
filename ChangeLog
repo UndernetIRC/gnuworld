@@ -1,4 +1,22 @@
-// $Id: ChangeLog,v 1.57 2005/11/28 06:47:07 kewlio Exp $ //
+// $Id: ChangeLog,v 1.58 2005/11/28 07:50:33 kewlio Exp $ //
+
+2005-11-28	Dan-m00 <daniel@undernet.org>
+		* doc/cservice.sql: define (in a comment) the flag for the new
+			"no adduser" flag.  (note: no schema change)
+
+		* mod.cservice/sqlUser.cc:
+		* mod.cservice/sqlUser.h: define new flag (as above)
+
+		* mod.cservice/SETCommand.cc: add toggle for the above flag.
+
+		* mod.cservice/ADDUSERCommand.cc: check the user's flag before
+			adding them to a channel.
+
+		* mod.cservice/responses.h: add response codes for the above.
+
+		* doc/language_table.sql: add english output for response codes.
+
+		* doc/cservice.help.sql: add help topics for SET NOADDUSER.
 
 2005-11-28	Dan-m00 <daniel@undernet.org>
 		* mod.cservice/cservice.cc: make IP restriction check work with
