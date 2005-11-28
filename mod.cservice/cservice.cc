@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: cservice.cc,v 1.260 2005/11/28 07:53:37 kewlio Exp $
+ * $Id: cservice.cc,v 1.261 2005/11/28 22:57:12 kewlio Exp $
  */
 
 #include	<new>
@@ -1210,8 +1210,13 @@ bool cservice::checkIPR( iClient* theClient, sqlUser* theUser )
         }
 	if (SQLDb->Tuples() < 1)
 	{
+#ifdef IPR_DEFAULT_REJECT
 		/* no entries, fail them */
 		return false;
+#else
+		/* no entries, allow them */
+		return true;
+#endif
 	}
 	/* cycle through results to find a match */
 	bool ipr_match = false;
