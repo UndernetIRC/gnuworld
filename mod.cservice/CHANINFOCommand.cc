@@ -28,7 +28,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: CHANINFOCommand.cc,v 1.49 2005/09/29 15:21:56 kewlio Exp $
+ * $Id: CHANINFOCommand.cc,v 1.50 2005/11/28 03:32:15 kewlio Exp $
  */
 
 #include	<string>
@@ -43,7 +43,7 @@
 #include	"libpq++.h"
 #include	"cservice_config.h"
 
-const char CHANINFOCommand_cc_rcsId[] = "$Id: CHANINFOCommand.cc,v 1.49 2005/09/29 15:21:56 kewlio Exp $" ;
+const char CHANINFOCommand_cc_rcsId[] = "$Id: CHANINFOCommand.cc,v 1.50 2005/11/28 03:32:15 kewlio Exp $" ;
 
 namespace gnuworld
 {
@@ -94,6 +94,26 @@ if( string::npos == st[ 1 ].find_first_of( '#' ) )
 			st[1].c_str());
 		return true;
 		}
+
+	/* fetch admin access level (manually to avoid various checks) for use for IP hiding ONLY */
+	unsigned short tmpadminLevel;
+	sqlChannel* adminChan = bot->getChannelRecord("*");
+	if (!adminChan)
+	{
+		/* cant find admin channel for some reason, assume no access of course */
+		tmpadminLevel = 0;
+	} else {
+		/* found admin channel, try to get the level record */
+		sqlLevel* adminLev = bot->getLevelRecord(theUser, adminChan);
+		if (!adminLev)
+		{
+			/* no level record, assume no access */
+			tmpadminLevel = 0;
+		} else {
+			/* found it, set it */
+			tmpadminLevel = adminLev->getAccess();
+		}
+	}
 
 	/* Keep details private. */
 
@@ -148,7 +168,14 @@ if( string::npos == st[ 1 ].find_first_of( '#' ) )
 	for( sqlUser::networkClientListType::iterator ptr = theUser->networkClientList.begin() ;
 		ptr != theUser->networkClientList.end() ; ++ptr )
 		{
-			bot->Notice(theClient, "  " + (*ptr)->getNickUserHost());
+			if (tmpadminLevel > 0)
+			{
+				bot->Notice(theClient, "  " + (*ptr)->getNickName() + "!" +
+					(*ptr)->getUserName() + "@" +
+					(*ptr)->getAccount() + (*ptr)->getHiddenHostSuffix());
+			} else {
+				bot->Notice(theClient, "  " + (*ptr)->getNickUserHost());
+			}
 			aCount++;
 		}
 
@@ -243,8 +270,13 @@ if( string::npos == st[ 1 ].find_first_of( '#' ) )
 		bot->Notice(theClient, "EMail: %s",
 			theUser->getEmail().c_str());
 
-		bot->Notice(theClient, "Last Hostmask: %s",
-			theUser->getLastHostMask().c_str());
+		if ((tmpUser != theUser) && (tmpadminLevel > 0))
+		{
+			bot->Notice(theClient, "Last Hostmask: Not Available");
+		} else {
+			bot->Notice(theClient, "Last Hostmask: %s",
+				theUser->getLastHostMask().c_str());
+		}
 
 		bot->Notice(theClient, "Max Logins: %i",
 			theUser->getMaxLogins());

@@ -1,4 +1,9 @@
-// $Id: ChangeLog,v 1.54 2005/11/25 19:33:02 kewlio Exp $ //
+// $Id: ChangeLog,v 1.55 2005/11/28 03:32:15 kewlio Exp $ //
+
+2005-11-27	Dan-m00 <daniel@undernet.org>
+		* mod.cservice/SCANUNAMECommand.cc:
+		* mod.cservice/CHANINFOCommand.cc: remove IPs from output if
+			target user(s) have admin access
 
 2005-11-25	Dan-m00 <daniel@undernet.org>
 		* mod.cservice/cservice.cc: Fix coredump when the DB saved pass

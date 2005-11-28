@@ -22,7 +22,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: SCANUNAMECommand.cc,v 1.3 2003/06/28 01:21:20 dan_karrels Exp $
+ * $Id: SCANUNAMECommand.cc,v 1.4 2005/11/28 03:32:15 kewlio Exp $
  */
 
 
@@ -117,12 +117,59 @@ if((bot->SQLDb->Tuples() > 15) && (!showAll))
 	return false;
 	}
 
-for(int i = 0; i < bot->SQLDb->Tuples(); i++)
-        {
+/* use this to store the SQL result set (querying later would overwrite the results */
+typedef std::map< std::string, std::string > scanResultsType;
+scanResultsType scanResults;
+
+/* store the results in the map defined above */
+for (int i = 0; i < bot->SQLDb->Tuples(); i++)
+{
         string username = bot->SQLDb->GetValue(i, 0);
         string signupip = bot->SQLDb->GetValue(i, 1);
-        bot->Notice(theClient, "Username: %s -- Signup ip: %s", username.c_str(), signupip.c_str());
-        }
+
+	scanResults.insert( std::make_pair(username, signupip));
+}
+
+/* use this for each user record (below) */
+unsigned short tmpadminLevel;
+
+/* iterate through the results, fetching user records for each */
+for (scanResultsType::const_iterator Itr = scanResults.begin();
+	Itr != scanResults.end(); ++Itr)
+{
+	string username = Itr->first;
+	string signupip = Itr->second;
+
+	/* check each user's access for purposes of IP hiding ONLY */
+	sqlUser* tmpUser = bot->getUserRecord(username);
+	if (tmpUser)
+	{
+		/* found user, fetch admin access level */
+		sqlChannel* adminChan = bot->getChannelRecord("*");
+		if (!adminChan)
+		{
+			/* cant find admin channel, assume no access */
+			tmpadminLevel = 0;
+		} else {
+			/* found admin channel, try to get the level record */
+			sqlLevel* adminLev = bot->getLevelRecord(tmpUser, adminChan);
+			if (!adminLev)
+			{
+				/* no level record, assume no access */
+				tmpadminLevel = 0;
+			} else {
+				/* found level record, set it */
+				tmpadminLevel = adminLev->getAccess();
+			}
+		}
+		bot->Notice(theClient, "Username: %s -- Signup ip: %s", username.c_str(),
+			(tmpadminLevel>0)?"Not Available":signupip.c_str());
+	}
+}
+
+/* clean up */
+scanResults.clear();
+
 return true;
 }
 }
