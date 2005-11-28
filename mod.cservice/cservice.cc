@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: cservice.cc,v 1.258 2005/11/28 06:39:45 kewlio Exp $
+ * $Id: cservice.cc,v 1.259 2005/11/28 06:47:07 kewlio Exp $
  */
 
 #include	<new>
@@ -1249,7 +1249,8 @@ bool cservice::checkIPR( iClient* theClient, sqlUser* theUser )
 				if (ipr_allowmask.size() > 0)
 				{
 					/* yes it is, does it match our hostname? */
-					if (!match(ipr_allowmask, theClient->getRealInsecureHost()))
+					if (!match(ipr_allowmask, theClient->getRealInsecureHost()) ||
+						!match(ipr_allowmask, xIP(theClient->getIP()).GetNumericIP()))
 					{
 						ipr_match = true;
 						break;

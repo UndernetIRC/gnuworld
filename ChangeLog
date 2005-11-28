@@ -1,4 +1,8 @@
-// $Id: ChangeLog,v 1.56 2005/11/28 06:31:20 kewlio Exp $ //
+// $Id: ChangeLog,v 1.57 2005/11/28 06:47:07 kewlio Exp $ //
+
+2005-11-28	Dan-m00 <daniel@undernet.org>
+		* mod.cservice/cservice.cc: make IP restriction check work with
+			IP masks as well as host masks.
 
 2005-11-28	Dan-m00 <daniel@undernet.org>
 		* include/iClient.h: Add IP restriction timestamp so that we
