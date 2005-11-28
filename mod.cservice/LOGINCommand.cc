@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: LOGINCommand.cc,v 1.52 2005/11/28 06:31:21 kewlio Exp $
+ * $Id: LOGINCommand.cc,v 1.53 2005/11/28 06:39:45 kewlio Exp $
  */
 
 #include	<string>
@@ -31,9 +31,8 @@
 #include	"networkData.h"
 #include	"cservice_config.h"
 #include	"Network.h"
-#include	"ip.h"
 
-const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.52 2005/11/28 06:31:21 kewlio Exp $" ;
+const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.53 2005/11/28 06:39:45 kewlio Exp $" ;
 
 namespace gnuworld
 {
