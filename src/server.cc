@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server.cc,v 1.216 2005/11/17 20:07:54 kewlio Exp $
+ * $Id: server.cc,v 1.217 2005/11/28 06:31:20 kewlio Exp $
  */
 
 #include	<sys/time.h>
@@ -70,7 +70,7 @@
 #include	"ConnectionHandler.h"
 #include	"Connection.h"
 
-RCSTAG( "$Id: server.cc,v 1.216 2005/11/17 20:07:54 kewlio Exp $" ) ;
+RCSTAG( "$Id: server.cc,v 1.217 2005/11/28 06:31:20 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -937,6 +937,9 @@ iClient* theIClient = new (std::nothrow) iClient(
 	Client->getDescription(),
 	::time( 0 ) ) ;
 assert( theIClient != 0 ) ;
+
+/* set IPR timestamp for good measure */
+theIClient->setIPRts(0);
 
 // Notify the xClient of its iClient instance
 Client->setInstance( theIClient ) ;

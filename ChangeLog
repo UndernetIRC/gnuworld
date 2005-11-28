@@ -1,4 +1,20 @@
-// $Id: ChangeLog,v 1.55 2005/11/28 03:32:15 kewlio Exp $ //
+// $Id: ChangeLog,v 1.56 2005/11/28 06:31:20 kewlio Exp $ //
+
+2005-11-28	Dan-m00 <daniel@undernet.org>
+		* include/iClient.h: Add IP restriction timestamp so that we
+			can track when users have passed IP restriction checks.
+
+		* src/server.cc:
+		* libircu/msg_N.cc: Initialise IP restriction timestamp when a
+			new client is introduced.
+
+		* mod.cservice/cservice.h:
+		* mod.cservice/cservice.cc: Add new function checkIPR() to
+			check IP restrictions.  Also, check IPR for all "*"
+			accounts upon command use (except 'LOGIN')
+
+		* mod.cservice/LOGINCommand.cc: Add call to checkIPR() to check
+			against IP restrictions for "*" accounts during login.
 
 2005-11-27	Dan-m00 <daniel@undernet.org>
 		* mod.cservice/SCANUNAMECommand.cc:

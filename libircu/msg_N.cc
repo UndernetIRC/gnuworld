@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_N.cc,v 1.9 2005/03/25 03:07:29 dan_karrels Exp $
+ * $Id: msg_N.cc,v 1.10 2005/11/28 06:31:20 kewlio Exp $
  */
 
 #include	<new>
@@ -37,7 +37,7 @@
 #include	"ServerCommandHandler.h"
 #include	"StringTokenizer.h"
 
-RCSTAG( "$Id: msg_N.cc,v 1.9 2005/03/25 03:07:29 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: msg_N.cc,v 1.10 2005/11/28 06:31:20 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -221,6 +221,9 @@ iClient* newClient = new (std::nothrow) iClient(
 		atoi( params[ 3 ] ) // connection time
 		) ;
 assert( newClient != 0 ) ;
+
+/* set them as non-IPR */
+newClient->setIPRts(0);
 
 if( !Network->addClient( newClient ) )
 	{

@@ -17,11 +17,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: cservice.h,v 1.105 2005/11/17 01:37:13 kewlio Exp $
+ * $Id: cservice.h,v 1.106 2005/11/28 06:31:20 kewlio Exp $
  */
 
 #ifndef __CSERVICE_H
-#define __CSERVICE_H "$Id: cservice.h,v 1.105 2005/11/17 01:37:13 kewlio Exp $"
+#define __CSERVICE_H "$Id: cservice.h,v 1.106 2005/11/28 06:31:20 kewlio Exp $"
 
 #include	<iostream>
 #include	<string>
@@ -176,6 +176,9 @@ public:
 	 * If "bool" is true, then send sqlUser a notice about why they don't
 	 * have a particular access. */
 	short getEffectiveAccessLevel( sqlUser*, sqlChannel*, bool );
+
+	/* Checks a user against IP restrictions */
+	bool checkIPR( iClient*, sqlUser* );
 
 	/* Returns what admin access a user has. */
 	short getAdminAccessLevel( sqlUser*, bool = false);

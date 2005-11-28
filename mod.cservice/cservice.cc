@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: cservice.cc,v 1.256 2005/11/25 19:33:02 kewlio Exp $
+ * $Id: cservice.cc,v 1.257 2005/11/28 06:31:20 kewlio Exp $
  */
 
 #include	<new>
@@ -842,8 +842,25 @@ else
 	ipFloodMap[theClient->getIP()] += commHandler->second->getFloodPoints();
 
 	totalCommands++;
-	/* Log command to SQL here, if Admin */
+
 	sqlUser* theUser = isAuthed(theClient, false);
+
+	/* Check IP restriction (if admin level) - this is in case you get added as admin AFTER logging in */
+	if (theUser && (getAdminAccessLevel(theUser,true) > 0) && (Command != "LOGIN"))
+	{
+		/* ok, they have a valid user and are listed as admin (and this is not a login request) */
+		if (theClient->getIPRts() == 0)
+		{
+			/* not passed IPR yet, do it */
+			if (!checkIPR(theClient, theUser))
+			{
+				/* failed IPR! */
+				Notice(theClient, "Insufficient access for this command. (IPR)");
+				return;
+			}
+		}
+	}
+	/* Log command to SQL here, if Admin */
 	if (theUser && getAdminAccessLevel(theUser) && (Command != "LOGIN") && (Command != "NEWPASS") && (Command != "SUSPENDME"))
 	{
 		stringstream theLog;
@@ -1163,6 +1180,102 @@ if(ptr != sqlLevelCache.end())
  */
 
 return 0;
+}
+
+/**
+ *  Check a user against IP restrictions
+ */
+bool cservice::checkIPR( iClient* theClient, sqlUser* theUser )
+{
+	stringstream theQuery;
+	theQuery	<< "SELECT allowmask,allowrange1,allowrange2,added FROM "
+			<< "ip_restrict WHERE user_id = "
+			<< theUser->getID()
+			<< ends;
+#ifdef LOG_SQL
+	elog	<< "LOGIN::sqlQuery> "
+		<< theQuery.str().c_str()
+		<< endl;
+#endif
+
+	ExecStatusType status = SQLDb->Exec(theQuery.str().c_str());
+
+	if (PGRES_TUPLES_OK != status)
+	{
+		/* SQL error, fail them */
+		elog    << "LOGIN> SQL Error: "
+			<< SQLDb->ErrorMessage()
+			<< endl;
+		return false;
+        }
+	if (SQLDb->Tuples() < 1)
+	{
+		/* no entries, fail them */
+		return false;
+	}
+	/* cycle through results to find a match */
+	bool ipr_match = false;
+	unsigned int ipr_ts = 0;
+	unsigned int tmpIP = xIP(theClient->getIP()).GetLongIP();
+	for (int i=0; i < SQLDb->Tuples(); i++)
+	{
+		/* get some variables out of the db row */
+		std::string ipr_allowmask = SQLDb->GetValue(i, 0);
+		unsigned int ipr_allowrange1 = atoi(SQLDb->GetValue(i, 1));
+		unsigned int ipr_allowrange2 = atoi(SQLDb->GetValue(i, 2));
+		ipr_ts = atoi(SQLDb->GetValue(i, 3));
+
+		/* is this an IP range? */
+		if (ipr_allowrange2 > 0)
+		{
+			/* yes it is, is the client IP between range1 and range2? */
+			if ((tmpIP >= ipr_allowrange1) && (tmpIP <= ipr_allowrange2))
+			{
+				ipr_match = true;
+				break;
+			}
+		} else {
+			/* no, is it a single IP? */
+			if (ipr_allowrange1 > 0)
+			{
+				/* yes it is, does the IP match range1? */
+				if (tmpIP == ipr_allowrange1)
+				{
+					ipr_match = true;
+					break;
+				}
+			} else {
+				/* no, is it a hostmask? */
+				if (ipr_allowmask.size() > 0)
+				{
+					/* yes it is, does it match our hostname? */
+					elog	<< "IPR> running match("
+						<< ipr_allowmask.c_str()
+						<< ", "
+						<< theClient->getRealInsecureHost().c_str()
+						<< ")"
+						<< endl;
+					if (!match(ipr_allowmask, theClient->getRealInsecureHost()))
+					{
+						ipr_match = true;
+						break;
+					}
+				} else {
+					/* no, fail */
+				}
+			}
+		}
+	}
+	/* check if we found a match yet */
+	if (!ipr_match)
+	{
+		/* no match, fail them */
+		return false;
+	} else {
+		/* IP restriction check passed - mark it against this user */
+		theClient->setIPRts(ipr_ts);
+		return true;
+	}
 }
 
 /**

@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: LOGINCommand.cc,v 1.51 2005/01/08 23:33:42 dan_karrels Exp $
+ * $Id: LOGINCommand.cc,v 1.52 2005/11/28 06:31:21 kewlio Exp $
  */
 
 #include	<string>
@@ -31,8 +31,9 @@
 #include	"networkData.h"
 #include	"cservice_config.h"
 #include	"Network.h"
+#include	"ip.h"
 
-const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.51 2005/01/08 23:33:42 dan_karrels Exp $" ;
+const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.52 2005/11/28 06:31:21 kewlio Exp $" ;
 
 namespace gnuworld
 {
@@ -115,6 +116,20 @@ if (theUser->getFlag(sqlUser::F_GLOBAL_SUSPEND))
 	st[1].c_str());
 	return false;
 	}
+
+/*
+ * Check if this is a privileged user, if so check against IP restrictions
+ */
+if (bot->getAdminAccessLevel(theUser, true) > 0)
+{
+	/* ok, they have "*" access (including alumni's) */
+	if (!bot->checkIPR(theClient, theUser))
+	{
+		bot->Notice(theClient, "AUTHENTICATION FAILED as %s. (IPR)",
+			st[1].c_str());
+		return false;
+	}
+}
 
 /*
  * Check password, if its wrong, bye bye.
