@@ -19,7 +19,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: sqlUser.cc,v 1.42 2005/11/28 07:50:33 kewlio Exp $
+ * $Id: sqlUser.cc,v 1.43 2005/11/28 11:10:07 kewlio Exp $
  */
 
 #include	<sstream>
@@ -51,7 +51,7 @@ const sqlUser::flagType sqlUser::F_NONOTES =		0x10 ;
 const sqlUser::flagType sqlUser::F_NOPURGE =		0x20 ;
 const sqlUser::flagType sqlUser::F_NOADMIN =		0x40 ;
 const sqlUser::flagType sqlUser::F_ALUMNI =		0x80 ;
-
+const sqlUser::flagType sqlUser::F_OPER =		0x100 ;
 const sqlUser::flagType sqlUser::F_NOADDUSER =		0x200 ;
 
 const unsigned int sqlUser::EV_SUSPEND		= 1;

@@ -1,4 +1,12 @@
-// $Id: ChangeLog,v 1.60 2005/11/28 08:26:14 kewlio Exp $ //
+// $Id: ChangeLog,v 1.61 2005/11/28 11:10:07 kewlio Exp $ //
+
+2005-11-28	Dan-m00 <daniel@undernet.org>
+		* mod.cservice/sqlUser.cc:
+		* mod.cservice/sqlUser.h: define new flag for "oper status"
+
+		* mod.cservice/SCANUNAMECommand.cc:
+		* mod.cservice/CHANINFOCommand.cc: update logic to treat people
+			with 'oper status' as a * user.
 
 2005-11-28	Dan-m00 <daniel@undernet.org>
 		* mod.cservice/CHANINFOCommand.cc:

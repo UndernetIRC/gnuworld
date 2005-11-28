@@ -28,7 +28,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: CHANINFOCommand.cc,v 1.51 2005/11/28 08:26:16 kewlio Exp $
+ * $Id: CHANINFOCommand.cc,v 1.52 2005/11/28 11:10:07 kewlio Exp $
  */
 
 #include	<string>
@@ -43,7 +43,7 @@
 #include	"libpq++.h"
 #include	"cservice_config.h"
 
-const char CHANINFOCommand_cc_rcsId[] = "$Id: CHANINFOCommand.cc,v 1.51 2005/11/28 08:26:16 kewlio Exp $" ;
+const char CHANINFOCommand_cc_rcsId[] = "$Id: CHANINFOCommand.cc,v 1.52 2005/11/28 11:10:07 kewlio Exp $" ;
 
 namespace gnuworld
 {
@@ -168,7 +168,7 @@ if( string::npos == st[ 1 ].find_first_of( '#' ) )
 	for( sqlUser::networkClientListType::iterator ptr = theUser->networkClientList.begin() ;
 		ptr != theUser->networkClientList.end() ; ++ptr )
 		{
-			if (tmpadminLevel > 0 && adminAccess < 800)
+			if ((tmpadminLevel > 0 || theUser->getFlag(sqlUser::F_OPER)) && adminAccess < 800)
 			{
 				bot->Notice(theClient, "  " + (*ptr)->getNickName() + "!" +
 					(*ptr)->getUserName() + "@" +
@@ -270,7 +270,7 @@ if( string::npos == st[ 1 ].find_first_of( '#' ) )
 		bot->Notice(theClient, "EMail: %s",
 			theUser->getEmail().c_str());
 
-		if ((tmpUser != theUser) && (tmpadminLevel > 0) && (adminAccess < 800))
+		if ((tmpUser != theUser) && ((tmpadminLevel > 0 || theUser->getFlag(sqlUser::F_OPER))) && (adminAccess < 800))
 		{
 			bot->Notice(theClient, "Last Hostmask: Not Available");
 		} else {

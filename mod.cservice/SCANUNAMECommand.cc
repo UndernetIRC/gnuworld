@@ -22,7 +22,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: SCANUNAMECommand.cc,v 1.5 2005/11/28 08:26:16 kewlio Exp $
+ * $Id: SCANUNAMECommand.cc,v 1.6 2005/11/28 11:10:07 kewlio Exp $
  */
 
 
@@ -163,7 +163,7 @@ for (scanResultsType::const_iterator Itr = scanResults.begin();
 			}
 		}
 		bot->Notice(theClient, "Username: %s -- Signup ip: %s", username.c_str(),
-			(tmpadminLevel>0 && level<800)?"Not Available":signupip.c_str());
+			((tmpadminLevel>0 || tmpUser->getFlag(sqlUser::F_OPER)) && level<800)?"Not Available":signupip.c_str());
 	}
 }
 

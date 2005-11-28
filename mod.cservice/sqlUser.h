@@ -16,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: sqlUser.h,v 1.37 2005/11/28 07:50:33 kewlio Exp $
+ * $Id: sqlUser.h,v 1.38 2005/11/28 11:10:07 kewlio Exp $
  */
 
 #ifndef __SQLUSER_H
-#define __SQLUSER_H "$Id: sqlUser.h,v 1.37 2005/11/28 07:50:33 kewlio Exp $"
+#define __SQLUSER_H "$Id: sqlUser.h,v 1.38 2005/11/28 11:10:07 kewlio Exp $"
 
 #include	<string>
 #include	<vector>
@@ -52,6 +52,7 @@ public:
 	static const flagType F_NOPURGE;
 	static const flagType F_NOADMIN;
 	static const flagType F_ALUMNI;
+	static const flagType F_OPER;
 	static const flagType F_NOADDUSER;
 
 	/*
