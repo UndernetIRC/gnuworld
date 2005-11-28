@@ -26,7 +26,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ADDUSERCommand.cc,v 1.26 2005/11/28 07:50:33 kewlio Exp $
+ * $Id: ADDUSERCommand.cc,v 1.27 2005/11/28 07:57:49 kewlio Exp $
  */
 
 #include	<map>
@@ -42,7 +42,7 @@
 #include	"responses.h"
 #include	"cservice_config.h"
 
-const char ADDUSERCommand_cc_rcsId[] = "$Id: ADDUSERCommand.cc,v 1.26 2005/11/28 07:50:33 kewlio Exp $" ;
+const char ADDUSERCommand_cc_rcsId[] = "$Id: ADDUSERCommand.cc,v 1.27 2005/11/28 07:57:49 kewlio Exp $" ;
 
 namespace gnuworld
 {
@@ -157,8 +157,7 @@ if (levelTest != 0)
 	{
 	bot->Notice(theClient,
 		bot->getResponse(theUser,
-			language::already_in_list,
-			string("%s does not wish to be added to channels at this time.")).c_str(),
+			language::already_in_list).c_str(),
 		targetUser->getUserName().c_str(),
 		theChan->getName().c_str(),
 		levelTest);
@@ -171,7 +170,8 @@ if (targetUser->getFlag(sqlUser::F_NOADDUSER))
 	/* this user has elected not to be added to channels at this time */
 	bot->Notice(theClient,
 		bot->getResponse(theUser,
-			language::no_adduser).c_str(),
+			language::no_adduser,
+			string("%s does not wish to be added to channels at this time.")).c_str(),
 		targetUser->getUserName().c_str());
 	return false;
 }
