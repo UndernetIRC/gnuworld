@@ -1453,7 +1453,7 @@ COPY "translations" FROM stdin;
 11	35	Nem rakhatsz fel naladnal nagyobb- vagy a te jogoddal egyenlo erteku felhasznalokat.	31337	0
 11	36	Ervenytelen access szint.	31337	0
 11	37	%s nevu felhasznalo mar jelen van a(z) %s csatorna felhasznaloi listajaban, %i joggal.	31337	0
-11	38	%s nevu felhasznalot sikeresen hozzaadtam a(z) %s csatronahoz, %i joggal	31337	0
+11	38	%s nevu felhasznalot sikeresen hozzaadtam a(z) %s csatornahoz, %i joggal	31337	0
 11	39	Valamit nem sikerult befejeznem: %s	31337	0
 11	40	%s: Vege a banlistanak	31337	0
 11	41	Nem lehet latni a felhasznalo adatait (Lathatatlan)	31337	0
