@@ -1,4 +1,8 @@
-// $Id: ChangeLog,v 1.63 2005/11/29 16:24:03 kewlio Exp $ //
+// $Id: ChangeLog,v 1.64 2005/11/29 17:38:57 kewlio Exp $ //
+
+2005-11-29	Dan-m00 <daniel@undernet.org>
+		* mod.cservice/CHANINFOCommand.cc: strip out hostnames/ips from
+			INFO output where a username is suspended/unsuspended.
 
 2005-11-29	Dan-m00 <daniel@undernet.org>
 		* mod.cservice/LOGINCommand.cc: notify relay channel when a
