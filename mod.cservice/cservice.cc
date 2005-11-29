@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: cservice.cc,v 1.262 2005/11/29 19:44:07 kewlio Exp $
+ * $Id: cservice.cc,v 1.263 2005/11/29 20:29:51 kewlio Exp $
  */
 
 #include	<new>
@@ -1631,8 +1631,10 @@ return true;
  */
 void cservice::expireSuspends()
 {
+#ifdef LOG_DEBUG
 elog	<< "cservice::expireSuspends> Checking for expired Suspensions.."
 	<< endl;
+#endif
 time_t expiredTime = currentTime();
 stringstream expireQuery;
 expireQuery	<< "SELECT user_id,channel_id FROM levels "
@@ -1700,12 +1702,14 @@ for (expireVectorType::const_iterator resultPtr = expireVector.begin();
 		if(Lptr != sqlLevelCache.end())
 			{
 			/* Found it in the cache, remove suspend. */
+#ifdef LOG_CACHE_HITS
 			elog	<< "cservice::expireSuspends> "
 				<< "Found level record in cache: "
 				<< resultPtr->first
 				<< ":"
 				<< resultPtr->second
 				<< endl;
+#endif
 			(Lptr->second)->setSuspendExpire(0);
 			(Lptr->second)->setSuspendBy(string());
 			}
@@ -1789,8 +1793,10 @@ while (ptr != silenceList.end())
  */
 void cservice::expireBans()
 {
+#ifdef LOG_DEBUG
 elog	<< "cservice::expireBans> Checking for expired bans.."
 	<< endl;
+#endif
 time_t expiredTime = currentTime();
 stringstream expireQuery;
 expireQuery	<< "SELECT channel_id,id FROM bans "
@@ -2919,11 +2925,13 @@ switch( theEvent )
 			{
 			tmpSqlUser->removeAuthedClient(tmpUser);
 			tmpSqlUser->removeFlag(sqlUser::F_LOGGEDIN);
+#ifdef LOG_DEBUG
 			elog	<< "cservice::OnEvent> Deauthenticated "
 				<< "client: " << tmpUser << " from "
 				<< "user: "
 				<< tmpSqlUser->getUserName()
 				<< endl;
+#endif
 			}
 
 		// Clear up the custom data structure we appended to

@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: REMUSERCommand.cc,v 1.16 2003/12/29 23:59:37 dan_karrels Exp $
+ * $Id: REMUSERCommand.cc,v 1.17 2005/11/29 20:29:51 kewlio Exp $
  */
 
 #include	<map>
@@ -39,7 +39,7 @@
 #include	"libpq++.h"
 #include	"responses.h"
 
-const char REMUSERCommand_cc_rcsId[] = "$Id: REMUSERCommand.cc,v 1.16 2003/12/29 23:59:37 dan_karrels Exp $" ;
+const char REMUSERCommand_cc_rcsId[] = "$Id: REMUSERCommand.cc,v 1.17 2005/11/29 20:29:51 kewlio Exp $" ;
 
 namespace gnuworld
 {
@@ -179,9 +179,11 @@ bool REMUSERCommand::Exec( iClient* theClient, const string& Message )
 		<< " AND user_id = " << targetUser->getID()
 		<< ";" << ends;
 
+#ifdef LOG_SQL
 	elog	<< "sqlQuery> "
 		<< theQuery.str()
 		<< endl;
+#endif
 
 	if ((status = bot->SQLDb->Exec(theQuery.str().c_str())) == PGRES_COMMAND_OK)
 	{

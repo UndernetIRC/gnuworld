@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: SUPPORTCommand.cc,v 1.7 2003/06/28 01:21:20 dan_karrels Exp $
+ * $Id: SUPPORTCommand.cc,v 1.8 2005/11/29 20:29:51 kewlio Exp $
  */
 
 #include	<string>
@@ -27,7 +27,7 @@
 #include	"ELog.h"
 #include	"cservice.h"
 
-const char SUPPORTCommand_cc_rcsId[] = "$Id: SUPPORTCommand.cc,v 1.7 2003/06/28 01:21:20 dan_karrels Exp $" ;
+const char SUPPORTCommand_cc_rcsId[] = "$Id: SUPPORTCommand.cc,v 1.8 2005/11/29 20:29:51 kewlio Exp $" ;
 
 namespace gnuworld
 {
@@ -89,9 +89,11 @@ theQuery	<< "SELECT channels.id FROM pending,channels"
 			<< " AND pending.status = 0"
 			<< ends;
 
+#ifdef LOG_SQL
 elog	<< "SUPPORTCommand::sqlQuery> "
 		<< theQuery.str().c_str()
 		<< endl;
+#endif
 
 ExecStatusType status = bot->SQLDb->Exec( theQuery.str().c_str() ) ;
 
@@ -125,9 +127,11 @@ supQuery 	<< "SELECT support FROM supporters"
 			<< theUser->getID()
 			<< ends;
 
+#ifdef LOG_SQL
 elog	<< "SUPPORTCommand::sqlQuery> "
 		<< supQuery.str().c_str()
 		<< endl;
+#endif
 
 status = bot->SQLDb->Exec( supQuery.str().c_str() ) ;
 
@@ -172,9 +176,11 @@ updateQuery	<< "UPDATE supporters SET support = '"
 			<< theUser->getID()
 			<< ends;
 
+#ifdef LOG_SQL
 elog	<< "SUPPORTCommand::sqlQuery> "
 		<< updateQuery.str().c_str()
 		<< endl;
+#endif
 
 status = bot->SQLDb->Exec( updateQuery.str().c_str() ) ;
 
@@ -211,9 +217,11 @@ if (supportChar == 'Y')
 				<< channel_id
 				<< ends;
 
+#ifdef LOG_SQL
 	elog	<< "SUPPORTCommand::sqlQuery> "
 			<< tenQuery.str().c_str()
 			<< endl;
+#endif
 
 	status = bot->SQLDb->Exec( tenQuery.str().c_str() ) ;
 
@@ -253,9 +261,11 @@ if (supportChar == 'Y')
 							<< " AND status = '0'"
 							<< ends;
 
+#ifdef LOG_SQL
 		elog	<< "SUPPORTCommand::sqlQuery> "
 				<< updatePendingQuery.str().c_str()
 				<< endl;
+#endif
 
 		bot->SQLDb->Exec( updatePendingQuery.str().c_str() ) ;
 		bot->logDebugMessage("%s has just made it to traffic check phase with %i supporters.",
@@ -286,9 +296,11 @@ if (supportChar == 'N')
 						<< " AND status = '0'"
 						<< ends;
 
+#ifdef LOG_SQL
 	elog	<< "SUPPORTCommand::sqlQuery> "
 			<< updatePendingQuery.str().c_str()
 			<< endl;
+#endif
 
 	bot->SQLDb->Exec( updatePendingQuery.str().c_str() ) ;
 	bot->logDebugMessage("%s has just been declined due to non-support.",
@@ -307,9 +319,11 @@ if (supportChar == 'N')
 				<< " AND pending.status = '9'"
 				<< ends;
 
+#ifdef LOG_SQL
 	elog	<< "SUPPORTCommand::sqlQuery> "
 			<< mgrQuery.str().c_str()
 			<< endl;
+#endif
 
 	status = bot->SQLDb->Exec( mgrQuery.str().c_str() ) ;
 
@@ -334,9 +348,11 @@ if (supportChar == 'N')
 					<< "1, (now()::abstime::int4 + (86400*3)), now()::abstime::int4, '* REGPROC', '-NON SUPPORT-'"
 					<< ")" << ends;
 
+#ifdef LOG_SQL
 		elog	<< "SUPPORTCommand::sqlQuery> "
 				<< noregQuery.str().c_str()
 				<< endl;
+#endif
 
 		bot->SQLDb->Exec( noregQuery.str().c_str() ) ;
 
@@ -353,9 +369,11 @@ if (supportChar == 'N')
 					<< "1, (now()::abstime::int4 + (86400*3)), now()::abstime::int4, '* REGPROC', '-NON SUPPORT-'"
 					<< ")" << ends;
 
+#ifdef LOG_SQL
 		elog	<< "SUPPORTCommand::sqlQuery> "
 				<< usernoregQuery.str().c_str()
 				<< endl;
+#endif
 
 		bot->SQLDb->Exec( usernoregQuery.str().c_str() ) ;
 
@@ -372,9 +390,11 @@ if (supportChar == 'N')
 					<< "now()::abstime::int4)"
 					<< ends;
 
+#ifdef LOG_SQL
 		elog	<< "SUPPORTCommand::sqlQuery> "
 				<< clogQuery.str().c_str()
 				<< endl;
+#endif
 
 		bot->SQLDb->Exec( clogQuery.str().c_str() ) ;
 	}

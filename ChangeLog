@@ -1,4 +1,15 @@
-// $Id: ChangeLog,v 1.65 2005/11/29 19:44:06 kewlio Exp $ //
+// $Id: ChangeLog,v 1.66 2005/11/29 20:29:51 kewlio Exp $ //
+
+2005-11-29	Dan-m00 <daniel@undernet.org>
+		* mod.cservice/REMUSERCommand.cc:
+		* mod.cservice/SUPPORTCommand.cc:
+			make sql query logs only log during LOG_SQL
+
+		* mod.cservice/cservice.cc:
+			(cservice::OnEvent):
+			(cservice::expireBans):
+			(cservice::expireSuspends):
+				make debug messages debug only.
 
 2005-11-29	Dan-m00 <daniel@undernet.org>
 		* bin/cservice.example.conf.in: add new 'webrelay_interval'
