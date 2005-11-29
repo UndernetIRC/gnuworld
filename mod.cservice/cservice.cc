@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: cservice.cc,v 1.261 2005/11/28 22:57:12 kewlio Exp $
+ * $Id: cservice.cc,v 1.262 2005/11/29 19:44:07 kewlio Exp $
  */
 
 #include	<new>
@@ -127,6 +127,30 @@ pending_timerID = MyUplink->RegisterTimer(theTime, this, NULL);
 // Start the floating Limit timer rolling.
 theTime = time(NULL) + limitCheckPeriod;
 limit_timerID = MyUplink->RegisterTimer(theTime, this, NULL);
+
+/* Start the web relay timer rolling.
+ * First, empty out any old notices that may be present.
+ */
+#ifdef LOG_SQL
+	elog	<< "cservice::OnAttach::sqlQuery> DELETE FROM "
+		<< "webnotices WHERE created_ts < "
+		<< "now()::abstime::int4 - 600)"
+		<< endl;
+#endif
+if (SQLDb->Exec("DELETE FROM webnotices WHERE created_ts < (now()::abstime::int4 - 600)") == PGRES_COMMAND_OK)
+{
+	/* only register the timer if the query is ok.
+	 * if the query fails, we most likely don't have
+	 * the table setup, so pointless checking it.
+	 */
+	theTime = time(NULL) + webrelayPeriod;
+	webrelay_timerID = MyUplink->RegisterTimer(theTime, this, NULL);
+} else {
+	/* log the error */
+	elog	<< "cservice::OnAttach> Unable to empty webnotices "
+		<< "table, not checking webnotices."
+		<< endl;
+}
 
 if (SQLDb->Exec("SELECT now()::abstime::int4;") == PGRES_TUPLES_OK)
 	{
@@ -284,6 +308,7 @@ pendingPageURL = cserviceConfig->Require( "pending_page_url" )->second ;
 updateInterval = atoi((cserviceConfig->Require( "update_interval" )->second).c_str());
 expireInterval = atoi((cserviceConfig->Require( "expire_interval" )->second).c_str());
 cacheInterval = atoi((cserviceConfig->Require( "cache_interval" )->second).c_str());
+webrelayPeriod = atoi((cserviceConfig->Require( "webrelay_interval" )->second).c_str());
 input_flood = atoi((cserviceConfig->Require( "input_flood" )->second).c_str());
 output_flood = atoi((cserviceConfig->Require( "output_flood" )->second).c_str());
 flood_duration = atoi((cserviceConfig->Require( "flood_duration" )->second).c_str());
@@ -2394,6 +2419,63 @@ if (timer_id == cache_timerID)
 	time_t theTime = time(NULL) + cacheInterval;
 	cache_timerID = MyUplink->RegisterTimer(theTime, this, NULL);
 	}
+
+if (timer_id == webrelay_timerID)
+{
+	/* Check for new webrelay messages */
+	string webrelayQuery;
+
+	webrelayQuery = "SELECT created_ts,contents FROM webnotices WHERE ";
+	webrelayQuery += "created_ts <= now()::abstime::int4 ";
+	webrelayQuery += "ORDER BY created_ts";
+#ifdef LOG_SQL
+	elog	<< "cservice::OnTimer::sqlQuery> "
+		<< webrelayQuery.c_str()
+		<< endl;
+#endif
+	ExecStatusType status = SQLDb->Exec(webrelayQuery.c_str());
+
+	int webrelay_messagecount = 0;
+
+	if (PGRES_TUPLES_OK == status)
+	{
+		/* process messages */
+		webrelay_messagecount = SQLDb->Tuples();
+		string webrelay_msg;
+		unsigned long webrelay_ts = 0;
+		for (int i=0; i < webrelay_messagecount; i++)
+		{
+			webrelay_ts = atoi(SQLDb->GetValue(i,0));
+			webrelay_msg = SQLDb->GetValue(i,1);
+
+			logAdminMessage("%s", webrelay_msg.c_str());
+		}
+		/* delete old messages */
+		if (webrelay_messagecount > 0)
+		{
+			char web_ts[15];
+			sprintf(web_ts, "%li", webrelay_ts);
+			webrelayQuery = "DELETE FROM webnotices WHERE created_ts <= ";
+			webrelayQuery += web_ts;
+#ifdef LOG_SQL
+			elog	<< "cservice::OnTimer::sqlQuery> "
+				<< webrelayQuery.c_str()
+				<< endl;
+#endif
+			if (SQLDb->Exec(webrelayQuery.c_str()) != PGRES_COMMAND_OK)
+			{
+				/* log error */
+				elog	<< "cservice::webrelay> SQL Query Error: "
+					<< SQLDb->ErrorMessage()
+					<< endl;
+			}
+		}
+	}
+
+	/* Refresh Timer */
+	time_t theTime = time(NULL) + webrelayPeriod;
+	webrelay_timerID = MyUplink->RegisterTimer(theTime, this, NULL);
+}
 
 if (timer_id == pending_timerID)
 	{

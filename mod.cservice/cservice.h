@@ -17,11 +17,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: cservice.h,v 1.106 2005/11/28 06:31:20 kewlio Exp $
+ * $Id: cservice.h,v 1.107 2005/11/29 19:44:07 kewlio Exp $
  */
 
 #ifndef __CSERVICE_H
-#define __CSERVICE_H "$Id: cservice.h,v 1.106 2005/11/28 06:31:20 kewlio Exp $"
+#define __CSERVICE_H "$Id: cservice.h,v 1.107 2005/11/29 19:44:07 kewlio Exp $"
 
 #include	<iostream>
 #include	<string>
@@ -294,6 +294,9 @@ public:
 	// Interval at which we attempt to purge the cache(s).
 	int cacheInterval;
 
+	/* Interval at which we check for new webrelay messages. */
+	int webrelayPeriod;
+
 	/* Duration in seconds at which an idle user/chan/level/ban
 	 * record should be purged from the cache. */
 	int idleUserPeriod;
@@ -333,6 +336,9 @@ public:
 
 	/* TimerID we recieve every seconds when we should check if a channel limit needs changing */
 	xServer::timerID limit_timerID;
+
+	/* TimerID for checking for web-relay messages */
+	xServer::timerID webrelay_timerID;
 
 	// Language definitions table (Loaded from Db).
 	typedef map < string, std::pair <int, string> > languageTableType;

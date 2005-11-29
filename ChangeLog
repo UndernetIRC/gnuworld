@@ -1,4 +1,14 @@
-// $Id: ChangeLog,v 1.64 2005/11/29 17:38:57 kewlio Exp $ //
+// $Id: ChangeLog,v 1.65 2005/11/29 19:44:06 kewlio Exp $ //
+
+2005-11-29	Dan-m00 <daniel@undernet.org>
+		* bin/cservice.example.conf.in: add new 'webrelay_interval'
+			configuration entry.  This is the number of seconds
+			between webrelay checks.
+
+		* mod.cservice/cservice.h: Add new timer for the above feature.
+
+		* mod.cservice/cservice.cc: Implement the new timer for the
+			above feature.
 
 2005-11-29	Dan-m00 <daniel@undernet.org>
 		* mod.cservice/CHANINFOCommand.cc: strip out hostnames/ips from

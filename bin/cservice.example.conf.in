@@ -1,4 +1,4 @@
-# $Id: cservice.example.conf.in,v 1.6 2005/04/03 22:11:12 dan_karrels Exp $
+# $Id: cservice.example.conf.in,v 1.7 2005/11/29 19:44:07 kewlio Exp $
 # Channel Services configuration file.
 #
 # sql_host = Hostname/IP of the PostgreSQL server.
@@ -166,3 +166,11 @@ admin_logfile = admin.log
 # hello commands, in seconds.
 #
 hello_block_period = 3600
+
+#
+# What is the period (in seconds) in which we will check for
+# new webrelay messages
+#
+
+webrelay_interval = 10;
+
