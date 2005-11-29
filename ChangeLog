@@ -1,4 +1,8 @@
-// $Id: ChangeLog,v 1.62 2005/11/28 22:57:12 kewlio Exp $ //
+// $Id: ChangeLog,v 1.63 2005/11/29 16:24:03 kewlio Exp $ //
+
+2005-11-29	Dan-m00 <daniel@undernet.org>
+		* mod.cservice/LOGINCommand.cc: notify relay channel when a
+			privileged user logs in.
 
 2005-11-28	Dan-m00 <daniel@undernet.or>
 		* mod.cservice/cservice_config.h: define IP restriction default

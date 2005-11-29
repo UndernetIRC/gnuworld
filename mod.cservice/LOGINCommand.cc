@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: LOGINCommand.cc,v 1.53 2005/11/28 06:39:45 kewlio Exp $
+ * $Id: LOGINCommand.cc,v 1.54 2005/11/29 16:24:03 kewlio Exp $
  */
 
 #include	<string>
@@ -32,7 +32,7 @@
 #include	"cservice_config.h"
 #include	"Network.h"
 
-const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.53 2005/11/28 06:39:45 kewlio Exp $" ;
+const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.54 2005/11/29 16:24:03 kewlio Exp $" ;
 
 namespace gnuworld
 {
@@ -213,8 +213,15 @@ bot->Notice(theClient,
 	bot->getResponse(theUser, language::auth_success).c_str(),
 	theUser->getUserName().c_str());
 
-if(!bot->getAdminAccessLevel(theUser))
+int tmpLevel = bot->getAdminAccessLevel(theUser);
+if (tmpLevel > 0)
 	{
+		/* this is a privileged user, send a notice to _info */
+		bot->logAdminMessage("%s (%s) has authenticated (level %d)",
+			theClient->getNickName().c_str(),
+			theUser->getUserName().c_str(),
+			tmpLevel);
+	} else {
 	string greeting = bot->getResponse(theUser, language::greeting);
 	if (!greeting.empty())
 		{
