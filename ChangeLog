@@ -1,4 +1,12 @@
-// $Id: ChangeLog,v 1.66 2005/11/29 20:29:51 kewlio Exp $ //
+// $Id: ChangeLog,v 1.67 2005/11/30 13:01:19 kewlio Exp $ //
+
+2005-11-30	Dan-m00 <daniel@undernet.org>
+		* mod.cservice/LOGINCommand.cc: move IP restriction check to
+			after password check, also no longer apply logic to
+			alumni accounts.
+
+		* mod.cservice/cservice.cc: no longer apply IP restriction to
+			alumni accounts.
 
 2005-11-29	Dan-m00 <daniel@undernet.org>
 		* mod.cservice/REMUSERCommand.cc:

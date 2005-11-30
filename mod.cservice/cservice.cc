@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: cservice.cc,v 1.263 2005/11/29 20:29:51 kewlio Exp $
+ * $Id: cservice.cc,v 1.264 2005/11/30 13:01:19 kewlio Exp $
  */
 
 #include	<new>
@@ -871,7 +871,8 @@ else
 	sqlUser* theUser = isAuthed(theClient, false);
 
 	/* Check IP restriction (if admin level) - this is in case you get added as admin AFTER logging in */
-	if (theUser && (getAdminAccessLevel(theUser,true) > 0) && (Command != "LOGIN"))
+	if (theUser && (getAdminAccessLevel(theUser,true) > 0) && (!theUser->getFlag(sqlUser::F_ALUMNI)) &&
+		(Command != "LOGIN"))
 	{
 		/* ok, they have a valid user and are listed as admin (and this is not a login request) */
 		if (theClient->getIPRts() == 0)

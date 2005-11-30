@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: LOGINCommand.cc,v 1.54 2005/11/29 16:24:03 kewlio Exp $
+ * $Id: LOGINCommand.cc,v 1.55 2005/11/30 13:01:19 kewlio Exp $
  */
 
 #include	<string>
@@ -32,7 +32,7 @@
 #include	"cservice_config.h"
 #include	"Network.h"
 
-const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.54 2005/11/29 16:24:03 kewlio Exp $" ;
+const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.55 2005/11/30 13:01:19 kewlio Exp $" ;
 
 namespace gnuworld
 {
@@ -117,20 +117,6 @@ if (theUser->getFlag(sqlUser::F_GLOBAL_SUSPEND))
 	}
 
 /*
- * Check if this is a privileged user, if so check against IP restrictions
- */
-if (bot->getAdminAccessLevel(theUser, true) > 0)
-{
-	/* ok, they have "*" access (including alumni's) */
-	if (!bot->checkIPR(theClient, theUser))
-	{
-		bot->Notice(theClient, "AUTHENTICATION FAILED as %s. (IPR)",
-			st[1].c_str());
-		return false;
-	}
-}
-
-/*
  * Check password, if its wrong, bye bye.
  */
 
@@ -143,6 +129,20 @@ if (!bot->isPasswordRight(theUser, st.assemble(2)))
 		theUser->getUserName().c_str());
 	return false;
 	}
+
+/*
+ * Check if this is a privileged user, if so check against IP restrictions
+ */
+if ((bot->getAdminAccessLevel(theUser, true) > 0) && (!theUser->getFlag(sqlUser::F_ALUMNI)))
+{
+	/* ok, they have "*" access (excluding alumni's) */
+	if (!bot->checkIPR(theClient, theUser))
+	{
+		bot->Notice(theClient, "AUTHENTICATION FAILED as %s. (IPR)",  
+			st[1].c_str());
+		return false;
+	}
+}
 
 /*
  * Don't exceed MAXLOGINS.
