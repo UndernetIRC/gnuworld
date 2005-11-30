@@ -1,4 +1,18 @@
-// $Id: ChangeLog,v 1.69 2005/11/30 19:37:34 kewlio Exp $ //
+// $Id: ChangeLog,v 1.70 2005/11/30 21:33:33 kewlio Exp $ //
+
+2005-11-30	Dan-m00 <daniel@undernet.org>
+		* bin/cservice.example.conf.in: added command log config var.
+
+		* mod.cservice/cservice_config.h: added USE_COMMAND_LOG option
+			to turn command log on and off.
+
+		* mod.cservice/cservice.h: Define command log path variable.
+
+		* mod.cservice/cservice.cc: Use command log path variable from
+			above.  Also fixed an SQL query output.
+
+		* mod.cservice/SCANHOSTCommand.cc:
+		* mod.cservice/SCANUNAMECommand.cc: Updated SQL query output.
 
 2005-11-30	Dan-m00 <daniel@undernet.org> / Reed Loden <reed@reedloden.com>
 

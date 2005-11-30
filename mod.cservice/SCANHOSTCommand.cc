@@ -22,7 +22,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: SCANHOSTCommand.cc,v 1.4 2005/11/30 17:10:35 kewlio Exp $
+ * $Id: SCANHOSTCommand.cc,v 1.5 2005/11/30 21:33:34 kewlio Exp $
  */
 
 
@@ -96,7 +96,7 @@ scanhostQuery << "SELECT users.user_name, users_lastseen.last_hostmask FROM user
 
 #ifdef LOG_SQL
 	elog	<< "SCANHOST::sqlQuery> "
-		<< scanhostQuery.c_str()
+		<< scanhostQuery.str()
 		<< endl;
 #endif
 

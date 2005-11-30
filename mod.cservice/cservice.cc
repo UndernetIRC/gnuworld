@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: cservice.cc,v 1.265 2005/11/30 19:37:34 kewlio Exp $
+ * $Id: cservice.cc,v 1.266 2005/11/30 21:33:34 kewlio Exp $
  */
 
 #include	<new>
@@ -193,7 +193,9 @@ cservice::cservice(const string& args)
  : xClient( args )
 {
 
-commandLog.open("cs.log");
+#ifdef USE_COMMAND_LOG
+commandLog.open(commandlogPath.c_str());
+#endif
 /*
  *  Register command handlers.
  */
@@ -321,6 +323,9 @@ loginDelay = atoi((cserviceConfig->Require( "login_delay" )->second).c_str());
 noteDuration = atoi((cserviceConfig->Require( "note_duration" )->second).c_str());
 noteLimit = atoi((cserviceConfig->Require( "note_limit" )->second).c_str());
 preloadUserDays = atoi((cserviceConfig->Require( "preload_user_days" )->second).c_str());
+#ifdef USE_COMMAND_LOG
+commandlogPath = cserviceConfig->Require( "command_logfile" )->second ;
+#endif
 /* adminlogPath = cserviceConfig->Require( "admin_logfile" )->second ; */
 
 #ifdef ALLOW_HELLO
@@ -787,7 +792,9 @@ if( st.empty() )
 	return ;
 	}
 
+#ifdef USE_COMMAND_LOG
 commandLog << (secure ? "[" : "<") << theClient->getNickUserHost() << (secure ? "] " : "> ")  << Message << endl;
+#endif
 
 /*
  * Do flood checking - admins at 750 or above are excempt.
@@ -1680,7 +1687,7 @@ expireQuery	<< "SELECT user_id,channel_id FROM levels "
 
 #ifdef LOG_SQL
 	elog	<< "expireSuspends::sqlQuery> "
-		<< expireQuery.str().c_str()
+		<< expireQuery
 		<< endl;
 #endif
 

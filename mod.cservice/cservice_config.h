@@ -16,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: cservice_config.h,v 1.11 2005/11/28 22:57:12 kewlio Exp $
+ * $Id: cservice_config.h,v 1.12 2005/11/30 21:33:34 kewlio Exp $
  */
 
 #ifndef __CSERVICE_CONFIG_H
-#define __CSERVICE_CONFIG_H "$Id: cservice_config.h,v 1.11 2005/11/28 22:57:12 kewlio Exp $"
+#define __CSERVICE_CONFIG_H "$Id: cservice_config.h,v 1.12 2005/11/30 21:33:34 kewlio Exp $"
 
 /**
  * Define this if you wish for all SQL queries to be sent
@@ -86,8 +86,17 @@
 #undef ALLOW_HELLO
 
 /**
- * Define this if you want the IP restriction to default to REJECT when no entries.
+ * Define this if you want the IP restriction to default to REJECT when no
+ * entries are in the SQL table.  Default setting allows login from any IP
+ * if there are no entries for the username in the SQL table.
  */
 #undef IPR_DEFAULT_REJECT
+
+/**
+ * Define this if you want to enable the 'cs.log' file (log of all commands
+ * including login) - Default is to NOT enable the log as it poses a security
+ * risk (it contains passwords)
+ */
+#undef USE_COMMAND_LOG
 
 #endif // __CSERVICE_CONFIG_H

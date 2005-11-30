@@ -22,7 +22,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: SCANUNAMECommand.cc,v 1.7 2005/11/30 17:10:34 kewlio Exp $
+ * $Id: SCANUNAMECommand.cc,v 1.8 2005/11/30 21:33:34 kewlio Exp $
  */
 
 
@@ -95,7 +95,7 @@ scanunameQuery << "SELECT user_name, signup_ip FROM users WHERE "
 
 #ifdef LOG_SQL
 	elog	<< "SCANUNAME::sqlQuery> "
-		<< scanunameQuery.c_str()
+		<< scanunameQuery.str()
 		<< endl;
 #endif
 
