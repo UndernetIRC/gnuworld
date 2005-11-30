@@ -1,4 +1,10 @@
-// $Id: ChangeLog,v 1.67 2005/11/30 13:01:19 kewlio Exp $ //
+// $Id: ChangeLog,v 1.68 2005/11/30 17:10:31 kewlio Exp $ //
+
+2005-11-30	Dan-m00 <daniel@undernet.org>
+		* mod.cservice/SCANUNAMECommand.cc: add SQL query logging.
+
+		* mod.cservice/SCANHOSTCommand.cc: hide IP output for users.
+			Also, add SQL query logging option.
 
 2005-11-30	Dan-m00 <daniel@undernet.org>
 		* mod.cservice/LOGINCommand.cc: move IP restriction check to

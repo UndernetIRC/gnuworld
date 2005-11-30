@@ -22,7 +22,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: SCANHOSTCommand.cc,v 1.3 2003/06/28 01:21:20 dan_karrels Exp $
+ * $Id: SCANHOSTCommand.cc,v 1.4 2005/11/30 17:10:35 kewlio Exp $
  */
 
 
@@ -94,6 +94,12 @@ scanhostQuery << "SELECT users.user_name, users_lastseen.last_hostmask FROM user
 		<< "lower(users_lastseen.last_hostmask) LIKE '" << escapeSQLChars(searchSQL(host)) << "' LIMIT 50"
                 << ends;
 
+#ifdef LOG_SQL
+	elog	<< "SCANHOST::sqlQuery> "
+		<< scanhostQuery.c_str()
+		<< endl;
+#endif
+
 ExecStatusType status = bot->SQLDb->Exec( scanhostQuery.str().c_str() ) ;
 
 if( PGRES_TUPLES_OK != status )
@@ -118,12 +124,74 @@ if((bot->SQLDb->Tuples() > 15) && (!showAll))
 	return false;
 	}
 
-for(int i = 0; i < bot->SQLDb->Tuples(); i++)
-        {
-        string username = bot->SQLDb->GetValue(i, 0);
-        string lasthost = bot->SQLDb->GetValue(i, 1);
-        bot->Notice(theClient, "Username: %s -- Last hostmask: %s", username.c_str(), lasthost.c_str());
+/* use this to store the SQL result set (querying later would overwrite the results */
+typedef std::map< std::string, std::string > scanResultsType;
+scanResultsType scanResults;
+/* counter for matches not displayed */
+int matchCount = 0;
+
+/* store the results in the map defined above */
+for (int i = 0; i < bot->SQLDb->Tuples(); i++)
+{
+	string username = bot->SQLDb->GetValue(i, 0);
+	string lasthost = bot->SQLDb->GetValue(i, 1);
+	scanResults.insert( std::make_pair(username, lasthost));
+}
+
+/* use this for each user record (below) */
+unsigned short tmpadminLevel;
+/* iterate through the results, fetching user records for each */
+for (scanResultsType::const_iterator Itr = scanResults.begin();
+	Itr != scanResults.end(); ++Itr)
+{
+	string username = Itr->first;
+	string lasthost = Itr->second;
+
+	/* check each user's access for purposes of IP hiding ONLY */
+	sqlUser* tmpUser = bot->getUserRecord(username);
+	if (tmpUser)
+	{
+		/* found user, fetch admin access level */
+		sqlChannel* adminChan = bot->getChannelRecord("*");
+		if (!adminChan)
+		{
+			/* cant find admin channel, assume no access */
+			tmpadminLevel = 0;
+		} else {
+			/* found admin channel, try to get the level record */
+			sqlLevel* adminLev = bot->getLevelRecord(tmpUser, adminChan);
+			if (!adminLev)
+			{
+				/* no level record, assume no access */
+				tmpadminLevel = 0;
+			} else {
+				/* found level record, set it */
+				tmpadminLevel = adminLev->getAccess();
+			}
+		}
+
+		if ((tmpadminLevel>0 || tmpUser->getFlag(sqlUser::F_OPER)) && level<800)
+		{
+			/* increment counter of items not listed */
+			matchCount++;
+		} else {
+			/* display entry */
+			bot->Notice(theClient, "Username: %s -- Last hostmask: %s",
+				username.c_str(), lasthost.c_str());
+		}
         }
+}
+
+/* if we have not displayed any users due to IP hiding, explain here */
+if (matchCount > 0)
+{
+	bot->Notice(theClient, "-- %d staff accounts matched this search, but were not listed",
+		matchCount);
+}
+
+/* clean up */
+scanResults.clear();
+
 return true;
 }
 }

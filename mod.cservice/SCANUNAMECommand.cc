@@ -22,7 +22,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: SCANUNAMECommand.cc,v 1.6 2005/11/28 11:10:07 kewlio Exp $
+ * $Id: SCANUNAMECommand.cc,v 1.7 2005/11/30 17:10:34 kewlio Exp $
  */
 
 
@@ -92,6 +92,12 @@ stringstream scanunameQuery;
 scanunameQuery << "SELECT user_name, signup_ip FROM users WHERE "
                 << "lower(user_name) LIKE '" << escapeSQLChars(searchSQL(uname)) << "' LIMIT 50"
                 << ends;
+
+#ifdef LOG_SQL
+	elog	<< "SCANUNAME::sqlQuery> "
+		<< scanunameQuery.c_str()
+		<< endl;
+#endif
 
 ExecStatusType status = bot->SQLDb->Exec( scanunameQuery.str().c_str() ) ;
 
