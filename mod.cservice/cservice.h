@@ -17,11 +17,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: cservice.h,v 1.107 2005/11/29 19:44:07 kewlio Exp $
+ * $Id: cservice.h,v 1.108 2005/11/30 19:37:34 kewlio Exp $
  */
 
 #ifndef __CSERVICE_H
-#define __CSERVICE_H "$Id: cservice.h,v 1.107 2005/11/29 19:44:07 kewlio Exp $"
+#define __CSERVICE_H "$Id: cservice.h,v 1.108 2005/11/30 19:37:34 kewlio Exp $"
 
 #include	<iostream>
 #include	<string>
@@ -176,6 +176,12 @@ public:
 	 * If "bool" is true, then send sqlUser a notice about why they don't
 	 * have a particular access. */
 	short getEffectiveAccessLevel( sqlUser*, sqlChannel*, bool );
+
+	/* Check if a client has passed IP restriction checks */
+	bool passedIPR( iClient* );
+
+	/* Set (or clear) a client's IP restriction timestamp */
+	void setIPRts( iClient*, unsigned int );
 
 	/* Checks a user against IP restrictions */
 	bool checkIPR( iClient*, sqlUser* );

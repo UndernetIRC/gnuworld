@@ -1,4 +1,20 @@
-// $Id: ChangeLog,v 1.68 2005/11/30 17:10:31 kewlio Exp $ //
+// $Id: ChangeLog,v 1.69 2005/11/30 19:37:34 kewlio Exp $ //
+
+2005-11-30	Dan-m00 <daniel@undernet.org> / Reed Loden <reed@reedloden.com>
+
+		This patch is based on a patch provided by Reed Loden.
+
+		* include/iClient.h:
+		* libircu/msg_N.cc:
+		* src/server.cc: Remove IP restriction code from the core.
+
+		* mod.cservice/cservice.h:
+		* mod.cservice/cservice.cc: Add new IP restriction functions
+			to use iClient network data rather than core.
+
+		* mod.cservice/networkData.h:
+		* mod.cservice/networkData.cc: define the IP restriction ts
+			in cservice data here.
 
 2005-11-30	Dan-m00 <daniel@undernet.org>
 		* mod.cservice/SCANUNAMECommand.cc: add SQL query logging.

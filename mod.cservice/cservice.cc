@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: cservice.cc,v 1.264 2005/11/30 13:01:19 kewlio Exp $
+ * $Id: cservice.cc,v 1.265 2005/11/30 19:37:34 kewlio Exp $
  */
 
 #include	<new>
@@ -875,7 +875,7 @@ else
 		(Command != "LOGIN"))
 	{
 		/* ok, they have a valid user and are listed as admin (and this is not a login request) */
-		if (theClient->getIPRts() == 0)
+		if (!passedIPR(theClient))
 		{
 			/* not passed IPR yet, do it */
 			if (!checkIPR(theClient, theUser))
@@ -1209,6 +1209,40 @@ return 0;
 }
 
 /**
+ * Check if a user has already passed IPR checks
+ */
+bool cservice::passedIPR(iClient* theClient)
+{
+	networkData* tmpData = static_cast< networkData* >(theClient->getCustomData(this));
+
+	/* if the user has no network data, the haven't passed IPR */
+	if (!tmpData)
+		return false;
+
+	if (tmpData->ipr_ts > 0)
+		return true;
+
+	return false;
+}
+
+/**
+ * Set the client's IPR timestamp (can also be used to clear it)
+ */
+
+void cservice::setIPRts(iClient* theClient, unsigned int _ipr_ts)
+{
+	networkData* tmpData = static_cast< networkData* >(theClient->getCustomData(this));
+
+	if (!tmpData)
+		return;
+
+	/* set the timestamp */
+	tmpData->ipr_ts = _ipr_ts;
+
+	return;
+}
+
+/**
  *  Check a user against IP restrictions
  */
 bool cservice::checkIPR( iClient* theClient, sqlUser* theUser )
@@ -1219,7 +1253,7 @@ bool cservice::checkIPR( iClient* theClient, sqlUser* theUser )
 			<< theUser->getID()
 			<< ends;
 #ifdef LOG_SQL
-	elog	<< "LOGIN::sqlQuery> "
+	elog	<< "cservice::checkIPR::sqlQuery> "
 		<< theQuery.str().c_str()
 		<< endl;
 #endif
@@ -1229,7 +1263,7 @@ bool cservice::checkIPR( iClient* theClient, sqlUser* theUser )
 	if (PGRES_TUPLES_OK != status)
 	{
 		/* SQL error, fail them */
-		elog    << "LOGIN> SQL Error: "
+		elog    << "cservice::checkIPR> SQL Error: "
 			<< SQLDb->ErrorMessage()
 			<< endl;
 		return false;
@@ -1299,7 +1333,7 @@ bool cservice::checkIPR( iClient* theClient, sqlUser* theUser )
 		return false;
 	} else {
 		/* IP restriction check passed - mark it against this user */
-		theClient->setIPRts(ipr_ts);
+		setIPRts(theClient, ipr_ts);
 		return true;
 	}
 }

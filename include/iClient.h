@@ -17,11 +17,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: iClient.h,v 1.46 2005/11/28 06:31:20 kewlio Exp $
+ * $Id: iClient.h,v 1.47 2005/11/30 19:37:34 kewlio Exp $
  */
 
 #ifndef __ICLIENT_H
-#define __ICLIENT_H "$Id: iClient.h,v 1.46 2005/11/28 06:31:20 kewlio Exp $"
+#define __ICLIENT_H "$Id: iClient.h,v 1.47 2005/11/30 19:37:34 kewlio Exp $"
 
 #include	<string>
 #include	<list>
@@ -283,12 +283,6 @@ public:
 		{ return IP ; }
 
 	/**
-	 * Retrieve the iClient's IPR check timestamp.
-	 */
-	inline const unsigned int& getIPRts() const
-		{ return ipr_ts ; }
-
-	/**
 	 * Obtain const iterator to beginning of this user's channel
 	 * membership structure.
 	 */
@@ -353,12 +347,6 @@ public:
 	 */
 	inline void setNickName( const std::string& newNick )
 		{ nickName = newNick ; }
-
-	/**
-	 * Set this iClient's IPR check timestamp.
-	 */
-	inline void setIPRts( const unsigned int& newIPRts )
-		{ ipr_ts = newIPRts ; }
 
 	// The following methods are used to access and mutate
 	// the client's modes.
@@ -640,11 +628,6 @@ protected:
 	 * network (bigendian) byte order.
 	 */
 	unsigned int	IP ;
-
-	/**
-	 * timestamp of when this client passed IP restriction checks
-	 */
-	unsigned int	ipr_ts ;
 
 	/**
 	 * This client's hostname as it appears to network users.

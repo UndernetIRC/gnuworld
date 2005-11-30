@@ -22,7 +22,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: networkData.cc,v 1.7 2003/06/28 01:21:20 dan_karrels Exp $
+ * $Id: networkData.cc,v 1.8 2005/11/30 19:37:34 kewlio Exp $
  */
  
 #include	<sstream>
@@ -35,7 +35,7 @@
 #include	"networkData.h" 
 
 const char networkData_h_rcsId[] = __NETWORKDATA_H ;
-const char networkData_cc_rcsId[] = "$Id: networkData.cc,v 1.7 2003/06/28 01:21:20 dan_karrels Exp $" ;
+const char networkData_cc_rcsId[] = "$Id: networkData.cc,v 1.8 2005/11/30 19:37:34 kewlio Exp $" ;
 
 namespace gnuworld
 {
@@ -48,7 +48,8 @@ networkData::networkData()
    outputCount( 0 ),
    flood_points( 0 ),
    currentUser( 0 ), 
-   ignored( false )
+   ignored( false ),
+   ipr_ts( 0 )
 {
 }
  
