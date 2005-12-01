@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: SAYCommand.cc,v 1.8 2003/06/28 01:21:20 dan_karrels Exp $
+ * $Id: SAYCommand.cc,v 1.9 2005/12/01 04:04:59 kewlio Exp $
  */
 
 #include	<string>
@@ -34,7 +34,7 @@
 #include	"Network.h"
 #include	"responses.h"
 
-const char SAYCommand_cc_rcsId[] = "$Id: SAYCommand.cc,v 1.8 2003/06/28 01:21:20 dan_karrels Exp $" ;
+const char SAYCommand_cc_rcsId[] = "$Id: SAYCommand.cc,v 1.9 2005/12/01 04:04:59 kewlio Exp $" ;
 
 namespace gnuworld
 {
@@ -92,7 +92,15 @@ if (!theChan)
 	}
 
 Channel* tmpChan = Network->findChannel(theChan->getName());
-if(tmpChan) bot->Message(tmpChan, st.assemble(2));
+/* is this a "say" or "do" command? */
+if (tmpChan)
+{
+	if (!match("SAY", st[0]))
+		bot->Message(tmpChan, st.assemble(2));
+	else
+		bot->Message(tmpChan, "%cACTION %s%c",
+			1, st.assemble(2).c_str(), 1);
+}
 
 return true;
 }

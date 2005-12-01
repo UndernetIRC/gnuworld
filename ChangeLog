@@ -1,4 +1,9 @@
-// $Id: ChangeLog,v 1.70 2005/11/30 21:33:33 kewlio Exp $ //
+// $Id: ChangeLog,v 1.71 2005/12/01 04:04:59 kewlio Exp $ //
+
+2005-12-01	Dan-m00 <daniel@undernet.org>
+		* mod.cservice/SAYCommand.cc:
+		* mod.cservice/cservice.cc: Modify 'say' command to accept 'do'
+			for /me's
 
 2005-11-30	Dan-m00 <daniel@undernet.org>
 		* bin/cservice.example.conf.in: added command log config var.

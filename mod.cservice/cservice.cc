@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: cservice.cc,v 1.266 2005/11/30 21:33:34 kewlio Exp $
+ * $Id: cservice.cc,v 1.267 2005/12/01 04:04:59 kewlio Exp $
  */
 
 #include	<new>
@@ -253,6 +253,7 @@ RegisterCommand(new FORCECommand(this, "FORCE", "<#channel>", 8));
 RegisterCommand(new UNFORCECommand(this, "UNFORCE", "<#channel>", 8));
 RegisterCommand(new SERVNOTICECommand(this, "SERVNOTICE", "<#channel> <text>", 5));
 RegisterCommand(new SAYCommand(this, "SAY", "<#channel> <text>", 5));
+RegisterCommand(new SAYCommand(this, "DO", "<#channel> <text>", 5));
 RegisterCommand(new QUOTECommand(this, "QUOTE", "<text>", 5));
 RegisterCommand(new REHASHCommand(this, "REHASH", "[translations | help]]", 5));
 RegisterCommand(new STATSCommand(this, "STATS", "", 8));
