@@ -20,7 +20,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccontrol.cc,v 1.200 2005/10/07 20:41:17 kewlio Exp $
+ * $Id: ccontrol.cc,v 1.201 2005/12/01 04:11:39 kewlio Exp $
 */
 
 #define MAJORVER "1"
@@ -66,7 +66,7 @@
 #include	"ccontrol_generic.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: ccontrol.cc,v 1.200 2005/10/07 20:41:17 kewlio Exp $" ) ;
+RCSTAG( "$Id: ccontrol.cc,v 1.201 2005/12/01 04:11:39 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -692,6 +692,14 @@ RegisterCommand( new SAYCommand( this, "SAY",
 	false,
 	operLevel::CODERLEVEL,
 	true ) ) ;
+RegisterCommand( new SAYCommand( this, "DO",
+        "<-s/-b> <#chan/nick> Forces the bot to \"/me\" as the uplink or the bot",
+        commandLevel::flg_SAY,
+        false,
+        false,
+        false,
+        operLevel::CODERLEVEL,
+        true ) ) ;  
 RegisterCommand( new REOPCommand( this, "REOP", "<#chan> <nick> "
 	"Removes all channel ops, and reops the specified nick",
 	commandLevel::flg_REOP,

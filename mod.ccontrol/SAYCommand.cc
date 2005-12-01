@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: SAYCommand.cc,v 1.6 2005/01/12 03:50:29 dan_karrels Exp $
+ * $Id: SAYCommand.cc,v 1.7 2005/12/01 04:11:39 kewlio Exp $
  */
 
 #include	<string>
@@ -28,7 +28,7 @@
 #include	"Network.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: SAYCommand.cc,v 1.6 2005/01/12 03:50:29 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: SAYCommand.cc,v 1.7 2005/12/01 04:11:39 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -50,7 +50,7 @@ if(st.size() < 4)
 	return true;
 	}
 
-bot->MsgChanLog("SAY %s\n",st.assemble(1).c_str());
+bot->MsgChanLog("%s\n",st.assemble(0).c_str());
 if(!strcasecmp(st[1].c_str(),"-s"))
 	{
 	Numeric = bot->getUplink()->getCharYY();
@@ -93,7 +93,18 @@ else
 		}
 	}
 
-bot->Write("%s P %s :%s",Numeric.c_str(),Target.c_str(),st.assemble(3).c_str());
+if (!match("SAY",st[0]))
+{
+	bot->Write("%s P %s :%s",
+		Numeric.c_str(),
+		Target.c_str(),
+		st.assemble(3).c_str());
+} else {
+	bot->Write("%s P %s :%cACTION %s%c",
+		Numeric.c_str(),
+		Target.c_str(),
+		1, st.assemble(3).c_str(), 1);
+}
 return true ;
 }
 

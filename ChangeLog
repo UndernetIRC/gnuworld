@@ -1,4 +1,9 @@
-// $Id: ChangeLog,v 1.71 2005/12/01 04:04:59 kewlio Exp $ //
+// $Id: ChangeLog,v 1.72 2005/12/01 04:11:39 kewlio Exp $ //
+
+2005-12-01	Dan-m00 <daniel@undernet.org>
+		* mod.ccontrol/SAYCommand.cc:
+		* mod.ccontrol/ccontrol.cc: Modify 'say' command to accept 'do'
+			for /me's
 
 2005-12-01	Dan-m00 <daniel@undernet.org>
 		* mod.cservice/SAYCommand.cc:
