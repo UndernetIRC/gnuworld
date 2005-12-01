@@ -28,7 +28,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: CHANINFOCommand.cc,v 1.53 2005/11/29 17:38:58 kewlio Exp $
+ * $Id: CHANINFOCommand.cc,v 1.54 2005/12/01 16:38:09 kewlio Exp $
  */
 
 #include	<string>
@@ -43,7 +43,7 @@
 #include	"libpq++.h"
 #include	"cservice_config.h"
 
-const char CHANINFOCommand_cc_rcsId[] = "$Id: CHANINFOCommand.cc,v 1.53 2005/11/29 17:38:58 kewlio Exp $" ;
+const char CHANINFOCommand_cc_rcsId[] = "$Id: CHANINFOCommand.cc,v 1.54 2005/12/01 16:38:09 kewlio Exp $" ;
 
 namespace gnuworld
 {
@@ -268,8 +268,22 @@ if( string::npos == st[ 1 ].find_first_of( '#' ) )
 		string reason = theUser->getLastEvent(sqlUser::EV_UNSUSPEND, theTime);
 		if (!reason.empty())
 			{
-			bot->Notice(theClient, "Account was unsuspended %s ago%s", bot->prettyDuration(theTime).c_str(),
-				reason.c_str());
+				/* alter the reason for web-based suspensions */
+				if (adminAccess < 800)
+				{
+					/* check if this is a web-based suspension */
+					if ((reason.size() > 7) && (reason.substr(0,7)=="[Web]: "))
+					{
+						/* tokenize the string and reconstruct it without 2nd token */
+						StringTokenizer rst(reason);
+						reason = rst[0];
+						reason += " ";
+						reason += rst.assemble(2);
+					}
+				}
+				bot->Notice(theClient, "Account was unsuspended %s ago %s",
+					bot->prettyDuration(theTime).c_str(),
+					reason.c_str());
 			}
 		}
 	}

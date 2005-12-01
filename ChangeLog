@@ -1,4 +1,8 @@
-// $Id: ChangeLog,v 1.72 2005/12/01 04:11:39 kewlio Exp $ //
+// $Id: ChangeLog,v 1.73 2005/12/01 16:38:09 kewlio Exp $ //
+
+2005-12-01	Dan-m00 <daniel@undernet.org>
+		* mod.cservice/CHANINFOCommand.cc: apply logic to UNSUSPEND
+			which was previously missed during changes to SUSPEND.
 
 2005-12-01	Dan-m00 <daniel@undernet.org>
 		* mod.ccontrol/SAYCommand.cc:
