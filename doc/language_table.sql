@@ -180,9 +180,12 @@ COPY "translations" FROM stdin;
 1	168	This command is reserved to IRC Operators	31337	0
 1	169	I'm not opped on %s	31337	0
 1	170	%s for %i minutes	31337	0
+1	171	I'm not opped in %s	31337	0
+1	172	Keywords: %s	31337	0
 1	173	%s does not wish to be added to channels at this time.	31337	0
 1	174	Your NOADDUSER setting is now ON.	31337	0
 1	175	Your NOADDUSER setting is now OFF.	31337	0
+1	176	There were %d failed login attempts since your last successful login.	31337	0
 \.
 
 -- French language definition.

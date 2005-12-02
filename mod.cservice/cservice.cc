@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: cservice.cc,v 1.267 2005/12/01 04:04:59 kewlio Exp $
+ * $Id: cservice.cc,v 1.268 2005/12/02 22:28:13 kewlio Exp $
  */
 
 #include	<new>
@@ -617,9 +617,12 @@ else
 			floodComment = st[0];
 		}
 
-		logAdminMessage("MSG-FLOOD from %s (%s)",
-			theClient->getNickUserHost().c_str(),
-			floodComment.c_str());
+		if (getConfigVar("FLOOD_MESSAGES")->asInt()==1)
+		{
+			logAdminMessage("MSG-FLOOD from %s (%s)",
+				theClient->getNickUserHost().c_str(),
+				floodComment.c_str());
+		}
 		return true;
 		} // if()
 
@@ -661,9 +664,12 @@ else
 				floodComment = st[0];
 			}
 
-			logAdminMessage("IP-FLOOD from %s (%s)",
-				theClient->getNickUserHost().c_str(),
-				floodComment.c_str());
+			if (getConfigVar("FLOOD_MESSAGES")->asInt()==1)
+			{
+				logAdminMessage("IP-FLOOD from %s (%s)",
+					theClient->getNickUserHost().c_str(),
+					floodComment.c_str());
+			}
 			return true;
 		}
 	} // else()
@@ -766,8 +772,11 @@ else
 
 		setIgnored(theClient, true);
 
-		logAdminMessage("OUTPUT-FLOOD from %s",
-			theClient->getNickUserHost().c_str());
+		if (getConfigVar("FLOOD_MESSAGES")->asInt()==1)
+		{
+			logAdminMessage("OUTPUT-FLOOD from %s",
+				theClient->getNickUserHost().c_str());
+		}
 		return true;
 		}
 	}

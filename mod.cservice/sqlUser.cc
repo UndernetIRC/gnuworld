@@ -19,7 +19,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: sqlUser.cc,v 1.43 2005/11/28 11:10:07 kewlio Exp $
+ * $Id: sqlUser.cc,v 1.44 2005/12/02 22:28:13 kewlio Exp $
  */
 
 #include	<sstream>
@@ -75,6 +75,7 @@ sqlUser::sqlUser(PgDatabase* _SQLDb)
    maxlogins(0),
    last_note(0),
    notes_sent(0),
+   failed_logins(0),
    SQLDb( _SQLDb )
 {
 }
@@ -196,6 +197,7 @@ last_updated_by = SQLDb->GetValue(row, 6);
 last_updated = atoi(SQLDb->GetValue(row, 7));
 email = SQLDb->GetValue(row, 8);
 maxlogins = atoi(SQLDb->GetValue(row, 9));
+failed_logins = 0;
 
 /* Fetch the "Last Seen" time from the users_lastseen table. */
 

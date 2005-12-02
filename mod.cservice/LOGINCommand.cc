@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: LOGINCommand.cc,v 1.55 2005/11/30 13:01:19 kewlio Exp $
+ * $Id: LOGINCommand.cc,v 1.56 2005/12/02 22:28:13 kewlio Exp $
  */
 
 #include	<string>
@@ -32,7 +32,7 @@
 #include	"cservice_config.h"
 #include	"Network.h"
 
-const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.55 2005/11/30 13:01:19 kewlio Exp $" ;
+const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.56 2005/12/02 22:28:13 kewlio Exp $" ;
 
 namespace gnuworld
 {
@@ -120,6 +120,8 @@ if (theUser->getFlag(sqlUser::F_GLOBAL_SUSPEND))
  * Check password, if its wrong, bye bye.
  */
 
+unsigned int max_failed_logins = bot->getConfigVar("FAILED_LOGINS")->asInt();
+
 if (!bot->isPasswordRight(theUser, st.assemble(2)))
 	{
 	bot->Notice(theClient,
@@ -127,6 +129,14 @@ if (!bot->isPasswordRight(theUser, st.assemble(2)))
 			language::auth_failed,
 			string("AUTHENTICATION FAILED as %s.")).c_str(),
 		theUser->getUserName().c_str());
+	/* increment failed logins counter */
+	theUser->incFailedLogins();
+	if ((max_failed_logins > 0) && (theUser->getFailedLogins() > max_failed_logins))
+	{
+		/* we have exceeded our maximum - alert relay channel */
+		bot->logAdminMessage("%d failed logins for %s.",
+			theUser->getFailedLogins(), theUser->getUserName().c_str());
+	}
 	return false;
 	}
 
@@ -140,6 +150,18 @@ if ((bot->getAdminAccessLevel(theUser, true) > 0) && (!theUser->getFlag(sqlUser:
 	{
 		bot->Notice(theClient, "AUTHENTICATION FAILED as %s. (IPR)",  
 			st[1].c_str());
+		/* notify the relay channel */
+		bot->logAdminMessage("%s (%s) failed IPR check.",
+			theClient->getNickName().c_str(),
+			st[1].c_str());
+		/* increment failed logins counter */
+		theUser->incFailedLogins();
+		if ((max_failed_logins > 0) && (theUser->getFailedLogins() > max_failed_logins))
+		{
+			/* we have exceeded our maximum - alert relay channel */
+			bot->logAdminMessage("%d failed logins for %s.",
+				theUser->getFailedLogins(), theUser->getUserName().c_str());
+		}
 		return false;
 	}
 }
@@ -212,6 +234,19 @@ newData->currentUser = theUser;
 bot->Notice(theClient,
 	bot->getResponse(theUser, language::auth_success).c_str(),
 	theUser->getUserName().c_str());
+
+/* set failed logins counter back to zero after alerting the user (if required) */
+if (bot->getConfigVar("ALERT_FAILED_LOGINS")->asInt()==1 &&
+	theUser->getFailedLogins() > 0)
+{
+	/* ok, alert the user */
+	bot->Notice(theClient,
+		bot->getResponse(theUser,
+			language::auth_failed_logins,
+			string("There were %d failed login attempts since your last successful login.")).c_str(),
+			theUser->getFailedLogins());
+}
+theUser->setFailedLogins(0);
 
 int tmpLevel = bot->getAdminAccessLevel(theUser);
 if (tmpLevel > 0)

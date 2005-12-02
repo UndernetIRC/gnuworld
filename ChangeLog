@@ -1,4 +1,42 @@
-// $Id: ChangeLog,v 1.73 2005/12/01 16:38:09 kewlio Exp $ //
+// $Id: ChangeLog,v 1.74 2005/12/02 22:28:12 kewlio Exp $ //
+
+2005-12-02	Dan-m00 <daniel@undernet.org>
+		* doc/cservice.config.sql: New config variable to enable or
+			disable flood messages.
+
+			New config variable to set the level at which we alert
+			the relay channel for failed logins on a user.  Set
+			this is '0' (ZERO) to disable the alerts.
+
+			New config variable to enable or disable the notice to
+			users when they successfully login to report failed
+			logins.
+
+			Also, added the required_supporters config var back
+			in (required by the web)
+
+		* mod.cservice/cservice.cc: Implement the above config var.
+
+		* mod.cservice/sqlUser.h: define failed_logins variable for
+			the number of failed logins since last successful.
+
+		* mod.cservice/sqlUser.cc: set failed_logins in zero upon
+			creation of sqlUser record.
+
+		* mod.cservice/responses.h: define new failed login response.
+
+		* doc/language_table.sql: define the new failed login response.
+
+			Also, include some responses that were missing (171-172)
+
+		* mod.cservice/LOGINCommand.cc: log failed IP restrictions to
+			the relay channel.
+
+			Report to the user upon successful login about the
+			number of failed logins since they last logged in.
+
+			Also, log failed logins when they reach a configurable
+			limit. (see above)
 
 2005-12-01	Dan-m00 <daniel@undernet.org>
 		* mod.cservice/CHANINFOCommand.cc: apply logic to UNSUSPEND
