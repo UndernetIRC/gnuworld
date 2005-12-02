@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: LOGINCommand.cc,v 1.56 2005/12/02 22:28:13 kewlio Exp $
+ * $Id: LOGINCommand.cc,v 1.57 2005/12/02 23:20:28 kewlio Exp $
  */
 
 #include	<string>
@@ -32,7 +32,7 @@
 #include	"cservice_config.h"
 #include	"Network.h"
 
-const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.56 2005/12/02 22:28:13 kewlio Exp $" ;
+const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.57 2005/12/02 23:20:28 kewlio Exp $" ;
 
 namespace gnuworld
 {
@@ -121,6 +121,11 @@ if (theUser->getFlag(sqlUser::F_GLOBAL_SUSPEND))
  */
 
 unsigned int max_failed_logins = bot->getConfigVar("FAILED_LOGINS")->asInt();
+unsigned int failed_login_rate = bot->getConfigVar("FAILED_LOGINS_RATE")->asInt();
+
+/* if it's not configured, default to every 15 minutes */
+if (failed_login_rate==0)
+	failed_login_rate = 900;
 
 if (!bot->isPasswordRight(theUser, st.assemble(2)))
 	{
@@ -131,9 +136,11 @@ if (!bot->isPasswordRight(theUser, st.assemble(2)))
 		theUser->getUserName().c_str());
 	/* increment failed logins counter */
 	theUser->incFailedLogins();
-	if ((max_failed_logins > 0) && (theUser->getFailedLogins() > max_failed_logins))
+	if ((max_failed_logins > 0) && (theUser->getFailedLogins() > max_failed_logins) &&
+		(theUser->getLastFailedLoginTS() < (time(NULL) - failed_login_rate)))
 	{
 		/* we have exceeded our maximum - alert relay channel */
+		theUser->setLastFailedLoginTS(time(NULL));
 		bot->logAdminMessage("%d failed logins for %s.",
 			theUser->getFailedLogins(), theUser->getUserName().c_str());
 	}
@@ -156,9 +163,11 @@ if ((bot->getAdminAccessLevel(theUser, true) > 0) && (!theUser->getFlag(sqlUser:
 			st[1].c_str());
 		/* increment failed logins counter */
 		theUser->incFailedLogins();
-		if ((max_failed_logins > 0) && (theUser->getFailedLogins() > max_failed_logins))
+		if ((max_failed_logins > 0) && (theUser->getFailedLogins() > max_failed_logins) &&
+			(theUser->getLastFailedLoginTS() < (time(NULL) - failed_login_rate)))
 		{
 			/* we have exceeded our maximum - alert relay channel */
+			theUser->setLastFailedLoginTS(time(NULL));
 			bot->logAdminMessage("%d failed logins for %s.",
 				theUser->getFailedLogins(), theUser->getUserName().c_str());
 		}
@@ -247,6 +256,7 @@ if (bot->getConfigVar("ALERT_FAILED_LOGINS")->asInt()==1 &&
 			theUser->getFailedLogins());
 }
 theUser->setFailedLogins(0);
+theUser->setLastFailedLoginTS(0);
 
 int tmpLevel = bot->getAdminAccessLevel(theUser);
 if (tmpLevel > 0)

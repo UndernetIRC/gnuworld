@@ -16,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: sqlUser.h,v 1.39 2005/12/02 22:28:13 kewlio Exp $
+ * $Id: sqlUser.h,v 1.40 2005/12/02 23:20:28 kewlio Exp $
  */
 
 #ifndef __SQLUSER_H
-#define __SQLUSER_H "$Id: sqlUser.h,v 1.39 2005/12/02 22:28:13 kewlio Exp $"
+#define __SQLUSER_H "$Id: sqlUser.h,v 1.40 2005/12/02 23:20:28 kewlio Exp $"
 
 #include	<string>
 #include	<vector>
@@ -139,6 +139,9 @@ public:
 	inline const unsigned int& getFailedLogins() const
 		{ return failed_logins ; }
 
+	inline const unsigned int& getLastFailedLoginTS() const
+		{ return failed_login_ts ; }
+
 	/*
 	 *  Methods to set data atrributes.
 	 */
@@ -194,6 +197,9 @@ public:
 	inline void setFailedLogins( const unsigned int& _failed_logins )
 		{ failed_logins = _failed_logins ; }
 
+	inline void setLastFailedLoginTS( const unsigned int& _ts )
+		{ failed_login_ts = _ts ; }
+
 	/*
 	 * Method to perform a SQL 'UPDATE' and commit changes to this
 	 * object back to the database.
@@ -233,10 +239,11 @@ protected:
 	time_t		instantiated_ts;
 	std::string	email ;
 	std::string	last_hostmask ;
-	unsigned int maxlogins;
+	unsigned int	maxlogins;
 	time_t		last_note;
 	unsigned int	notes_sent;
 	unsigned int	failed_logins;
+	unsigned int	failed_login_ts;
 
 	PgDatabase*	SQLDb;
 } ;

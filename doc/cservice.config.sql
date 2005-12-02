@@ -1,4 +1,4 @@
--- "$Id: cservice.config.sql,v 1.4 2005/12/02 22:28:13 kewlio Exp $"
+-- "$Id: cservice.config.sql,v 1.5 2005/12/02 23:20:28 kewlio Exp $"
 -- Default configuration entries for CMaster bot.
 
 INSERT INTO variables (var_name,contents,last_updated,hint)
@@ -13,4 +13,6 @@ INSERT INTO variables (var_name,contents,last_updated,hint)
 VALUES ('FAILED_LOGINS', '50', now()::abstime::int4, 'Number of concurrent failed logins before reporting');
 INSERT INTO variables (var_name,contents,last_updated,hint)
 VALUES ('ALERT_FAILED_LOGINS', '1', now()::abstime::int4, 'Tell users the number of failed logins?');
+INSERT INTO variables (var_name,contents,last_updated,hint)
+VALUES ('FAILED_LOGINS_RATE', '900', now()::abstime::int4, 'Time between alerts about failed logins per user');
 
