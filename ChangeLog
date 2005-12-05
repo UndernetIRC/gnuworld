@@ -1,4 +1,15 @@
-// $Id: ChangeLog,v 1.74 2005/12/02 22:28:12 kewlio Exp $ //
+// $Id: ChangeLog,v 1.75 2005/12/05 17:24:11 kewlio Exp $ //
+
+2005-12-02	Dan-m00 <daniel@undernet.org>
+		* doc/cservice.config.sql: New config variable to set the time
+			between alerts (per user) for failed login alerts.
+
+		* mod.cservice/sqlUser.h: define a timestamp of the last alert
+
+		* mod.cservice/sqlUser.cc: set the default timestamp on create.
+
+		* mod.cservice/LOGINCommand.cc: Alter login to only alert when
+			the time between alerts has been reached.
 
 2005-12-02	Dan-m00 <daniel@undernet.org>
 		* doc/cservice.config.sql: New config variable to enable or
