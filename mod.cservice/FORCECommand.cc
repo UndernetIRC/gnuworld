@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: FORCECommand.cc,v 1.15 2003/06/28 01:21:20 dan_karrels Exp $
+ * $Id: FORCECommand.cc,v 1.16 2005/12/05 17:32:15 kewlio Exp $
  */
 
 #include	<string>
@@ -28,7 +28,7 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char FORCECommand_cc_rcsId[] = "$Id: FORCECommand.cc,v 1.15 2003/06/28 01:21:20 dan_karrels Exp $" ;
+const char FORCECommand_cc_rcsId[] = "$Id: FORCECommand.cc,v 1.16 2005/12/05 17:32:15 kewlio Exp $" ;
 
 namespace gnuworld
 {
@@ -53,9 +53,7 @@ bool FORCECommand::Exec( iClient* theClient, const string& Message )
 	sqlUser* theUser = bot->isAuthed(theClient, true);
 	if (!theUser) return false;
 
-	sqlChannel* admChan = bot->getChannelRecord("*");
-
-	int admLevel = bot->getAccessLevel(theUser, admChan);
+	int admLevel = bot->getAdminAccessLevel(theUser);
 	if (admLevel < level::force)
 	{
 		bot->Notice(theClient,

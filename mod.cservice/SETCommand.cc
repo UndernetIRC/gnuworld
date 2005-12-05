@@ -33,7 +33,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: SETCommand.cc,v 1.58 2005/11/28 07:50:33 kewlio Exp $
+ * $Id: SETCommand.cc,v 1.59 2005/12/05 17:32:15 kewlio Exp $
  */
 
 #include	<string>
@@ -45,7 +45,7 @@
 #include	"responses.h"
 #include	"cservice_config.h"
 
-const char SETCommand_cc_rcsId[] = "$Id: SETCommand.cc,v 1.58 2005/11/28 07:50:33 kewlio Exp $" ;
+const char SETCommand_cc_rcsId[] = "$Id: SETCommand.cc,v 1.59 2005/12/05 17:32:15 kewlio Exp $" ;
 
 namespace gnuworld
 {
@@ -177,22 +177,42 @@ if( st[1][0] != '#' ) // Didn't find a hash?
 	{
 		if (value == "ON")
 		{
-			theUser->setFlag(sqlUser::F_NOADMIN);
-			theUser->commit(theClient);
-			bot->Notice(theClient,"You have lost the force :(");
-			bot->logAdminMessage("%s (%s) set DISABLEAUTH on!",
-				theClient->getNickName().c_str(), theUser->getUserName().c_str());
-
+			/* only admins can use this command */
+			int admLevel = bot->getAdminAccessLevel(theUser);
+			if (admLevel > 0)
+			{
+				theUser->setFlag(sqlUser::F_NOADMIN);
+				theUser->commit(theClient);
+				bot->Notice(theClient,"You have lost the force :(");
+				bot->logAdminMessage("%s (%s) set DISABLEAUTH on!",
+					theClient->getNickName().c_str(), theUser->getUserName().c_str());
+			} else {
+				/* not an admin, return unknown command */
+				bot->Notice(theClient,
+					bot->getResponse(theUser,
+					language::invalid_option,
+					string("Invalid option."))); 
+			}
 			return true;
 		}
 
 		if (value == "OFF")
 		{
-			theUser->removeFlag(sqlUser::F_NOADMIN);
-			theUser->commit(theClient);
-			bot->Notice(theClient,"Welcome back, brave Jedi.");
-			bot->logAdminMessage("%s (%s) set DISABLEAUTH off!",
-				theClient->getNickName().c_str(), theUser->getUserName().c_str());
+			/* only allow removal if it is set! */
+			if (theUser->getFlag(sqlUser::F_NOADMIN))
+			{
+				theUser->removeFlag(sqlUser::F_NOADMIN);
+				theUser->commit(theClient);
+				bot->Notice(theClient,"Welcome back, brave Jedi.");
+				bot->logAdminMessage("%s (%s) set DISABLEAUTH off!",
+					theClient->getNickName().c_str(), theUser->getUserName().c_str());
+			} else {
+				/* not set?  pretend it's an unknown command */
+				bot->Notice(theClient,
+					bot->getResponse(theUser,
+					language::invalid_option,
+					string("Invalid option.")));
+			}
 			return true;
 		}
 
@@ -286,8 +306,7 @@ else
 	if(option == "LOCKED")
 	{
 	    // Check for admin access
-	    sqlChannel* admChan = bot->getChannelRecord("*");
-	    int admLevel = bot->getAccessLevel(theUser, admChan);
+	    int admLevel = bot->getAdminAccessLevel(theUser);
 	    if(admLevel < level::set::locked)
 	    {
 			// No need to tell users about admin commands.
@@ -368,8 +387,7 @@ else
 	if(option == "NOREG")
 	{
 	// Check for admin access
-	sqlChannel* admChan = bot->getChannelRecord("*");
-	int admLevel = bot->getAccessLevel(theUser, admChan);
+	int admLevel = bot->getAdminAccessLevel(theUser);
 	if(admLevel < level::set::noreg)
 		{
 		// No need to tell users about admin commands.
@@ -402,8 +420,7 @@ else
 	if(option == "SPECIAL")
 	{
 	    // Check for admin access
-	    sqlChannel* admChan = bot->getChannelRecord("*");
-	    int admLevel = bot->getAccessLevel(theUser, admChan);
+	    int admLevel = bot->getAdminAccessLevel(theUser);
 	    if(admLevel < level::set::special)
 	    {
 			// No need to tell users about admin commands.
@@ -437,8 +454,7 @@ else
 	if(option == "NEVERREG")
 	{
 	    // Check for admin access
-	    sqlChannel* admChan = bot->getChannelRecord("*");
-	    int admLevel = bot->getAccessLevel(theUser, admChan);
+	    int admLevel = bot->getAdminAccessLevel(theUser);
 	    if(admLevel < level::set::neverreg)
 	    {
 			// No need to tell users about admin commands.
@@ -471,8 +487,7 @@ else
 	if(option == "NOPURGE")
 	{
 	    // Check for admin access
-	    sqlChannel* admChan = bot->getChannelRecord("*");
-	    int admLevel = bot->getAccessLevel(theUser, admChan);
+	    int admLevel = bot->getAdminAccessLevel(theUser);
 	    if(admLevel < level::set::nopurge)
 	    {
 			// No need to tell users about admin commands.
@@ -504,8 +519,7 @@ else
 	if(option == "SUSPEND")
 	{
 	    // Check for admin access
-	    sqlChannel* admChan = bot->getChannelRecord("*");
-	    int admLevel = bot->getAccessLevel(theUser, admChan);
+	    int admLevel = bot->getAdminAccessLevel(theUser);
 	    if(admLevel < level::set::suspend)
 	    {
 			// No need to tell users about admin commands.
@@ -537,8 +551,7 @@ else
 	if(option == "TEMPMAN")
 	{
 	    // Check for admin access
-	    sqlChannel* admChan = bot->getChannelRecord("*");
-	    int admLevel = bot->getAccessLevel(theUser, admChan);
+	    int admLevel = bot->getAdminAccessLevel(theUser);
 	    if(admLevel < level::set::tempman)
 	    {
 			// No need to tell users about admin commands.
@@ -571,8 +584,7 @@ else
 	if(option == "VACATION")
 	{
 	    // Check for admin access
-	    sqlChannel* admChan = bot->getChannelRecord("*");
-	    int admLevel = bot->getAccessLevel(theUser, admChan);
+	    int admLevel = bot->getAdminAccessLevel(theUser);
 	    if(admLevel < level::set::vacation)
 	    {
 			// No need to tell users about admin commands.

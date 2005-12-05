@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: UNFORCECommand.cc,v 1.9 2003/06/28 01:21:20 dan_karrels Exp $
+ * $Id: UNFORCECommand.cc,v 1.10 2005/12/05 17:32:15 kewlio Exp $
  */
 
 #include	<string>
@@ -27,7 +27,7 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char UNFORCECommand_cc_rcsId[] = "$Id: UNFORCECommand.cc,v 1.9 2003/06/28 01:21:20 dan_karrels Exp $" ;
+const char UNFORCECommand_cc_rcsId[] = "$Id: UNFORCECommand.cc,v 1.10 2005/12/05 17:32:15 kewlio Exp $" ;
 
 namespace gnuworld
 {
@@ -55,9 +55,7 @@ if (!theUser)
 	return false;
  	}
 
-sqlChannel* admChan = bot->getChannelRecord("*");
-
-int admLevel = bot->getAccessLevel(theUser, admChan);
+int admLevel = bot->getAdminAccessLevel(theUser);
 if (admLevel < level::force)
 	{
 	bot->Notice(theClient,

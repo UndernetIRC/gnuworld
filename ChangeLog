@@ -1,4 +1,16 @@
-// $Id: ChangeLog,v 1.75 2005/12/05 17:24:11 kewlio Exp $ //
+// $Id: ChangeLog,v 1.76 2005/12/05 17:32:15 kewlio Exp $ //
+
+2005-12-05	Dan-m00 <daniel@undernet.org>
+		* mod.cservice/FORCECommand.cc:
+		* mod.cservice/SHOWCOMMANDSCommand.cc:
+		* mod.cservice/UNFORCECommand.cc: Alter login used to determine
+			if the user is an admin or not (use the common function
+			which takes into accounts alumni's etc)
+
+		* mod.cservice/SETCommand.cc: As above, also make 'SET
+			DISABLEAUTH ON' command only available to admins.
+			make 'SET DISABLEAUTH OFF' command only available to
+			people who have it currently set.
 
 2005-12-02	Dan-m00 <daniel@undernet.org>
 		* doc/cservice.config.sql: New config variable to set the time

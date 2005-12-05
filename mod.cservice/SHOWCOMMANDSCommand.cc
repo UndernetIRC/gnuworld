@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: SHOWCOMMANDSCommand.cc,v 1.28 2003/06/28 01:21:20 dan_karrels Exp $
+ * $Id: SHOWCOMMANDSCommand.cc,v 1.29 2005/12/05 17:32:15 kewlio Exp $
  */
 
 #include	<string>
@@ -27,7 +27,7 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char SHOWCOMMANDSCommand_cc_rcsId[] = "$Id: SHOWCOMMANDSCommand.cc,v 1.28 2003/06/28 01:21:20 dan_karrels Exp $" ;
+const char SHOWCOMMANDSCommand_cc_rcsId[] = "$Id: SHOWCOMMANDSCommand.cc,v 1.29 2005/12/05 17:32:15 kewlio Exp $" ;
 
 namespace gnuworld
 {
@@ -108,8 +108,7 @@ if (!theChan)
  */
 
 int level = bot->getEffectiveAccessLevel(theUser, theChan, true);
-int admin = bot->getEffectiveAccessLevel(theUser,
-	bot->getChannelRecord("*"), true);
+int admin = bot->getAdminAccessLevel(theUser);
 
 if (level >= 1000) bot->Notice(theClient, lvl_1000_cmds);
 if (level >= 900) bot->Notice(theClient, lvl_900_cmds);
