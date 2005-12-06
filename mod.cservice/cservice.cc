@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: cservice.cc,v 1.268 2005/12/02 22:28:13 kewlio Exp $
+ * $Id: cservice.cc,v 1.269 2005/12/06 18:12:44 kewlio Exp $
  */
 
 #include	<new>
@@ -305,6 +305,7 @@ else
 // The program will exit if these variables are not defined in the
 // configuration file.
 relayChan = cserviceConfig->Require( "relay_channel" )->second ;
+privrelayChan = cserviceConfig->Require( "priv_relay_channel" )->second ;
 debugChan = cserviceConfig->Require( "debug_channel" )->second ;
 coderChan = cserviceConfig->Require( "coder_channel" )->second ;
 pendingPageURL = cserviceConfig->Require( "pending_page_url" )->second ;
@@ -2666,6 +2667,33 @@ if (!tmpChan)
 string message = string( "[" ) + nickName + "] " + buf ;
 serverNotice(tmpChan, message);
 return true;
+}
+
+/**
+ * Log a privileged admin channel message
+ */
+bool cservice::logPrivAdminMessage(const char* format, ... )
+{
+	char buf[1024] = { 0 };
+	va_list _list ;
+
+	va_start(_list, format);
+	vsnprintf(buf, 1024, format, _list);
+	va_end(_list);
+
+	/* try to locate the privileged relay channel */
+	Channel* tmpChan = Network->findChannel(privrelayChan);
+	if (!tmpChan)
+	{
+		elog	<< "cservice::logPrivAdminMessage> Unable to locate "
+			<< "prileved relay channel on network!"
+			<< endl;
+		return false;
+	}
+
+	string message = string("[") + nickName + "] " + buf;
+	serverNotice(tmpChan, message);
+	return true;
 }
 
 bool cservice::logDebugMessage(const char* format, ... )

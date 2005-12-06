@@ -1,4 +1,19 @@
-// $Id: ChangeLog,v 1.76 2005/12/05 17:32:15 kewlio Exp $ //
+// $Id: ChangeLog,v 1.77 2005/12/06 18:12:42 kewlio Exp $ //
+
+2005-12-06	Dan-m00 <daniel@undernet.org>
+		* bin/cservice.example.conf.in: Added privileged relay channel
+			(priv_relay_channel) for privileged output.
+
+		* mod.cservice/cservice.h: Added channel variable and function
+			prototype for priveleged relay channel.
+
+		* mod.cservice/cservice.cc: Added function for output of the
+			above.  Also, load the config for the channel.
+
+		* mod.cservice/LOGINCommand.cc: Modify failed login messages to
+			output to the priveleged relay channel.
+
+			Also, report 900+ logins to privileged relay channel.
 
 2005-12-05	Dan-m00 <daniel@undernet.org>
 		* mod.cservice/FORCECommand.cc:

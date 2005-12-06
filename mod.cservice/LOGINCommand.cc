@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: LOGINCommand.cc,v 1.57 2005/12/02 23:20:28 kewlio Exp $
+ * $Id: LOGINCommand.cc,v 1.58 2005/12/06 18:12:44 kewlio Exp $
  */
 
 #include	<string>
@@ -32,7 +32,7 @@
 #include	"cservice_config.h"
 #include	"Network.h"
 
-const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.57 2005/12/02 23:20:28 kewlio Exp $" ;
+const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.58 2005/12/06 18:12:44 kewlio Exp $" ;
 
 namespace gnuworld
 {
@@ -141,8 +141,10 @@ if (!bot->isPasswordRight(theUser, st.assemble(2)))
 	{
 		/* we have exceeded our maximum - alert relay channel */
 		theUser->setLastFailedLoginTS(time(NULL));
-		bot->logAdminMessage("%d failed logins for %s.",
-			theUser->getFailedLogins(), theUser->getUserName().c_str());
+		bot->logPrivAdminMessage("%d failed logins for %s (last attempt by %s).",
+			theUser->getFailedLogins(),
+			theUser->getUserName().c_str(),
+			theClient->getRealNickUserHost().c_str());
 	}
 	return false;
 	}
@@ -168,8 +170,10 @@ if ((bot->getAdminAccessLevel(theUser, true) > 0) && (!theUser->getFlag(sqlUser:
 		{
 			/* we have exceeded our maximum - alert relay channel */
 			theUser->setLastFailedLoginTS(time(NULL));
-			bot->logAdminMessage("%d failed logins for %s.",
-				theUser->getFailedLogins(), theUser->getUserName().c_str());
+			bot->logPrivAdminMessage("%d failed logins for %s (last attempt by %s).",
+				theUser->getFailedLogins(),
+				theUser->getUserName().c_str(),
+				theClient->getRealNickUserHost().c_str());
 		}
 		return false;
 	}
@@ -262,10 +266,20 @@ int tmpLevel = bot->getAdminAccessLevel(theUser);
 if (tmpLevel > 0)
 	{
 		/* this is a privileged user, send a notice to _info */
-		bot->logAdminMessage("%s (%s) has authenticated (level %d)",
-			theClient->getNickName().c_str(),
-			theUser->getUserName().c_str(),
-			tmpLevel);
+		if (tmpLevel < 900)
+		{
+			/* regular admin, report to normal relay channel */
+			bot->logAdminMessage("%s (%s) has authenticated (level %d)",
+				theClient->getNickName().c_str(),
+				theUser->getUserName().c_str(),
+				tmpLevel);
+		} else {
+			/* if this is a high level admin, report to privileged relay channel */
+			bot->logPrivAdminMessage("%s (%s) has authenticated (level %d)",
+				theClient->getNickName().c_str(),
+				theUser->getUserName().c_str(),
+				tmpLevel);
+		}
 	} else {
 	string greeting = bot->getResponse(theUser, language::greeting);
 	if (!greeting.empty())

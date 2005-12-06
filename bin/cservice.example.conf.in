@@ -1,4 +1,4 @@
-# $Id: cservice.example.conf.in,v 1.8 2005/11/30 21:33:34 kewlio Exp $
+# $Id: cservice.example.conf.in,v 1.9 2005/12/06 18:12:44 kewlio Exp $
 # Channel Services configuration file.
 #
 # sql_host = Hostname/IP of the PostgreSQL server.
@@ -33,6 +33,13 @@ mode = +idk
 pending_page_url = http://www.yoursite.com/live/view_app.php
 
 relay_channel = #coder-com
+
+#
+# Channel to relay useful information, but not quite as annoying
+# as the debug_channel ! (a.k.a privileged user relay channel)
+# 
+
+priv_relay_channel = #coder-com
 
 #
 # Channel to relay useful debug information that otherwise

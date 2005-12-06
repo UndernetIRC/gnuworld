@@ -17,11 +17,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: cservice.h,v 1.109 2005/11/30 21:33:34 kewlio Exp $
+ * $Id: cservice.h,v 1.110 2005/12/06 18:12:44 kewlio Exp $
  */
 
 #ifndef __CSERVICE_H
-#define __CSERVICE_H "$Id: cservice.h,v 1.109 2005/11/30 21:33:34 kewlio Exp $"
+#define __CSERVICE_H "$Id: cservice.h,v 1.110 2005/12/06 18:12:44 kewlio Exp $"
 
 #include	<iostream>
 #include	<string>
@@ -154,6 +154,9 @@ public:
 
 	/* Log an administrative alert to the relay channel & log. */
 	bool logAdminMessage(const char*, ... );
+
+	/* Log a priveleged administrative alert to the priv relay channel */
+	bool logPrivAdminMessage(const char*, ... );
 
 	/* Log an debug message to the debug channel */
 	bool logDebugMessage(const char*, ... );
@@ -290,6 +293,7 @@ public:
 	// Flood/Notice relay channel - Loaded via config.
 	// Added coderChan - Loaded via config.
 	string relayChan;
+	string privrelayChan;
 	string debugChan;
 	string coderChan;
 
