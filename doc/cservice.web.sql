@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------------
--- "$Id: cservice.web.sql,v 1.35 2005/11/18 04:14:34 nighty Exp $"
+-- "$Id: cservice.web.sql,v 1.36 2005/12/12 17:45:38 kewlio Exp $"
 -- Channel service DB SQL file for PostgreSQL.
 --
 -- Tables specific to website
@@ -282,4 +282,10 @@ CREATE TABLE default_msgs (
 
 CREATE INDEX default_msgs_idx ON default_msgs(type);
 
+CREATE TABLE webnotices (
+        id      SERIAL,
+        created_ts      int4 NOT NULL,
+        contents        VARCHAR(255) NOT NULL,
+        PRIMARY KEY(id)
+);
 
