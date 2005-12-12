@@ -1,4 +1,8 @@
-// $Id: ChangeLog,v 1.78 2005/12/12 17:45:37 kewlio Exp $ //
+// $Id: ChangeLog,v 1.79 2005/12/12 18:01:23 kewlio Exp $ //
+
+2005-12-12	Dan-m00 <daniel@undernet.org>
+		* doc/cservice.web.sql: roll-back previous commit after
+			replacing glasses.
 
 2005-12-12	Dan-m00 <daniel@undernet.org>
 		* doc/cservice.web.sql: forgot the table for web relay msgs ;)
