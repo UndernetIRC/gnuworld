@@ -16,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccontrol.h,v 1.97 2005/09/30 22:07:28 kewlio Exp $
+ * $Id: ccontrol.h,v 1.98 2005/12/27 20:53:31 kewlio Exp $
  */
 
 #ifndef __CCONTROL_H
-#define __CCONTROL_H "$Id: ccontrol.h,v 1.97 2005/09/30 22:07:28 kewlio Exp $"
+#define __CCONTROL_H "$Id: ccontrol.h,v 1.98 2005/12/27 20:53:31 kewlio Exp $"
 
 //Undef this if you want to log to the database
 #define LOGTOHD 
@@ -68,7 +68,6 @@ using std::vector ;
 namespace uworld
 {
 
-using gnuworld::xServer;
 using namespace std;
 /*
  *  Sublcass the postgres API to create our own accessor
@@ -242,7 +241,7 @@ public:
 		void* = 0, void* = 0,
 		void* = 0, void* = 0 ) ;
 
-	virtual void OnTimer(const xServer::timerID&, void*);
+	virtual void OnTimer(const gnuworld::xServer::timerID&, void*);
 	
 	virtual void OnConnect();
 	
@@ -877,14 +876,14 @@ public:
 	cmDatabase* SQLDb;
 
 	/* TimerID - Posts the daily log to the abuse team  */
-	xServer::timerID postDailyLog;
+	gnuworld::xServer::timerID postDailyLog;
 
 	/* TimerID = Expired glines/ignores/suspends/... interval timer */
-	xServer::timerID expiredTimer;
+	gnuworld::xServer::timerID expiredTimer;
 
-	xServer::timerID dbConnectionCheck;
+	gnuworld::xServer::timerID dbConnectionCheck;
 	
-	xServer::timerID glineQueueCheck;
+	gnuworld::xServer::timerID glineQueueCheck;
 	
 protected:
 

@@ -16,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: CControlCommands.h,v 1.31 2003/06/28 01:21:19 dan_karrels Exp $
+ * $Id: CControlCommands.h,v 1.32 2005/12/27 20:53:31 kewlio Exp $
  */
 
 #ifndef __CCONTROLCOMMANDS_H
-#define __CCONTROLCOMMANDS_H "$Id: CControlCommands.h,v 1.31 2003/06/28 01:21:19 dan_karrels Exp $"
+#define __CCONTROLCOMMANDS_H "$Id: CControlCommands.h,v 1.32 2005/12/27 20:53:31 kewlio Exp $"
 
 #include	<string>
 
@@ -31,13 +31,12 @@ using std::string ;
 namespace gnuworld
 {
 
+class xServer ;
+
 namespace uworld
 {
 
-using gnuworld::xServer;
-
 class ccontrol ;
-class xServer ;
 
 class Command
 {

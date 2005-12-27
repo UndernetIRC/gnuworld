@@ -1,4 +1,35 @@
-// $Id: ChangeLog,v 1.81 2005/12/27 13:27:58 kewlio Exp $ //
+// $Id: ChangeLog,v 1.82 2005/12/27 20:53:31 kewlio Exp $ //
+
+2005-12-27	Entrope <mdpoole@troilus.org>
+		* configure.ac: Fix VPATH builds.
+
+		* configure: rebuild from configure.ac with autoconf
+
+		* mod.ccontrol/CControlCommands.h: Properly declare class
+			gnuworld::xServer.
+
+		* mod.ccontrol/CommandsDec.h: No need to say "using
+			gnuworld::xServer" due to Koenig lookup.
+			Remove it since it is invalid C++.
+
+		* mod.ccontrol/ccontrol.h: Likewise it.  We must also properly
+			qualify types qualify types that come from inside
+			xServer.
+
+		* mod.ccontrol/ccontrol.cc: Fix erroneous loop termination
+			conditions.
+
+		This patch makes GNUWorld compile with gcc4.  Tested on the
+		following FreeBSD/gcc versions:
+			FreeBSD/amd64 6.0-STABLE: gcc3.4.4
+			FreeBSD/i386 4.11-STABLE: gcc2.95
+			FreeBSD/i386 7.0-CURRENT: gcc3.4.4
+			FreeBSD/i386 7.0-CURRENT: gcc4.0.2
+			FreeBSD/i386 7.0-CURRENT: gcc4.2.0
+			Redhat Enterprise Linux WS release 3/2.4: gcc 3.2.3
+
+		NOTE: GNUWorld does NOT compile on FreeBSD/amd64 gcc4 at the
+		current time (but works with gcc3.4.4)
 
 2005-12-27	Dan-m00 <daniel@undernet.org>
 		* mod.cservice/networkData.h:

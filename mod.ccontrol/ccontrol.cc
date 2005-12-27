@@ -20,7 +20,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccontrol.cc,v 1.201 2005/12/01 04:11:39 kewlio Exp $
+ * $Id: ccontrol.cc,v 1.202 2005/12/27 20:53:31 kewlio Exp $
 */
 
 #define MAJORVER "1"
@@ -66,7 +66,7 @@
 #include	"ccontrol_generic.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: ccontrol.cc,v 1.201 2005/12/01 04:11:39 kewlio Exp $" ) ;
+RCSTAG( "$Id: ccontrol.cc,v 1.202 2005/12/27 20:53:31 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -82,7 +82,6 @@ using std::count ;
 namespace uworld
 {
 
-using gnuworld::xServer;
 using namespace std;
 
 /**
@@ -1267,7 +1266,7 @@ switch( theEvent )
 				}
 				string virtualHost = tmpUser->getDescription() + "@";
 				int dots = 0;
-				for(string::size_type ptr = 0;ptr < tIP.size(),dots < 3;++ptr)
+				for(string::size_type ptr = 0;ptr < tIP.size() && dots < 3;++ptr)
 					{
 					if(tIP[ptr] == '.')
 						{
@@ -1833,7 +1832,7 @@ if(dbConnected)
 				{
 				int dots = 0;
 				string ipClass = "";
-				for(string::size_type ptr = 0;ptr < tIP.size(),dots < 3;++ptr)
+				for(string::size_type ptr = 0;ptr < tIP.size() && dots < 3;++ptr)
 					{
 					if(tIP[ptr] == '.')
 						{

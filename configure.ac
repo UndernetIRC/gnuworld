@@ -1,10 +1,10 @@
-dnl $Id: configure.ac,v 1.32 2005/09/29 15:58:40 kewlio Exp $
+dnl $Id: configure.ac,v 1.33 2005/12/27 20:53:31 kewlio Exp $
 dnl ----------------------------------------------------------
 
 echo Configuring GNUWorld...
 echo
 
-AC_REVISION($Revision: 1.32 $)
+AC_REVISION($Revision: 1.33 $)
 AC_INIT
 AC_CONFIG_SRCDIR([src/main.cc])
 AM_INIT_AUTOMAKE(gnuworld,2.7)
@@ -315,16 +315,16 @@ searchForMods=yes
 
 dnl echo "searchForMods: $searchForMods"
 if [test $searchForMods = yes]; then
-	mod_list=`\ls | \grep "mod."`
+	mod_list=`\ls $srcdir | \grep "mod."`
 dnl	echo "mod_list: $mod_list"
 
 	for file in $mod_list; do
-		if [ ! test -d $file ]; then
-			echo "$file is not a directory!"
+		if [ ! test -d $srcdir/$file ]; then
+			echo "$srcdir/$file is not a directory!"
 			continue
 		fi
 
-		if [ test -f $file/Makefile.in ]; then
+		if [ test -f $srcdir/$file/Makefile.in ]; then
 		  echo Adding module `echo $file | \cut -f2 -d"."`
 		  case "$file" in
 		    mod.ccontrol)	build_modccontrol=true;;

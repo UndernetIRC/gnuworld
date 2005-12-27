@@ -16,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: CommandsDec.h,v 1.15 2005/10/04 01:45:30 kewlio Exp $
+ * $Id: CommandsDec.h,v 1.16 2005/12/27 20:53:31 kewlio Exp $
  */
 
 #ifndef __COMMANDSDEC_H
-#define __COMMANDSDEC_H "$Id: CommandsDec.h,v 1.15 2005/10/04 01:45:30 kewlio Exp $"
+#define __COMMANDSDEC_H "$Id: CommandsDec.h,v 1.16 2005/12/27 20:53:31 kewlio Exp $"
 
 namespace gnuworld
 {
@@ -28,7 +28,6 @@ namespace gnuworld
 namespace uworld
 {
 class Command;
-using gnuworld::xServer;
 
 #define DECLARE_COMMAND(commName) \
 class commName##Command : public Command \
