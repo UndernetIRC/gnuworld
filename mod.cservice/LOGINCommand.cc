@@ -16,23 +16,25 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: LOGINCommand.cc,v 1.58 2005/12/06 18:12:44 kewlio Exp $
+ * $Id: LOGINCommand.cc,v 1.59 2005/12/27 12:33:03 kewlio Exp $
  */
 
 #include	<string>
 #include	<sstream>
 #include	<iostream>
 #include	<iomanip>
+#include	<inttypes.h>
 
 #include	"StringTokenizer.h"
 #include	"ELog.h"
 #include	"cservice.h"
+#include	"md5hash.h"
 #include	"responses.h"
 #include	"networkData.h"
 #include	"cservice_config.h"
 #include	"Network.h"
 
-const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.58 2005/12/06 18:12:44 kewlio Exp $" ;
+const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.59 2005/12/27 12:33:03 kewlio Exp $" ;
 
 namespace gnuworld
 {
@@ -140,11 +142,38 @@ if (!bot->isPasswordRight(theUser, st.assemble(2)))
 		(theUser->getLastFailedLoginTS() < (time(NULL) - failed_login_rate)))
 	{
 		/* we have exceeded our maximum - alert relay channel */
+		/* work out a checksum for the password.  Yes, I could have
+		 * just used a checksum of the original password, but this
+		 * means it's harder to 'fool' the check digit with a real
+		 * password - create MD5 from original salt stored */
+		unsigned char	checksum;
+		md5		hash;
+		md5Digest	digest;
+
+		if (theUser->getPassword().size() < 9)
+		{
+			checksum = 0;
+		} else {
+			string salt = theUser->getPassword().substr(0, 8);
+			string guess = salt + st.assemble(2);
+
+			hash.update( (const unsigned char *)guess.c_str(), guess.size() );
+			hash.report( digest );
+
+			checksum = 0;
+			for (size_t i = 0; i < MD5_DIGEST_LENGTH; i++)
+			{
+				/* add ascii value to check digit */
+				checksum += digest[i];
+			}
+		}
+
 		theUser->setLastFailedLoginTS(time(NULL));
-		bot->logPrivAdminMessage("%d failed logins for %s (last attempt by %s).",
+		bot->logPrivAdminMessage("%d failed logins for %s (last attempt by %s, checksum %d).",
 			theUser->getFailedLogins(),
 			theUser->getUserName().c_str(),
-			theClient->getRealNickUserHost().c_str());
+			theClient->getRealNickUserHost().c_str(),
+			checksum);
 	}
 	return false;
 	}

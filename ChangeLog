@@ -1,4 +1,11 @@
-// $Id: ChangeLog,v 1.79 2005/12/12 18:01:23 kewlio Exp $ //
+// $Id: ChangeLog,v 1.80 2005/12/27 12:33:03 kewlio Exp $ //
+
+2005-12-27	Dan-m00 <daniel@undernet.org>
+		* mod.cservice/LOGINCommand.cc: add a checksum to the failed
+			login messages to identify if it's the same or a
+			different password being used each time.
+			Generate the checksum from the MD5 hash rather than
+			the plaintext password to make it harder to fool.
 
 2005-12-12	Dan-m00 <daniel@undernet.org>
 		* doc/cservice.web.sql: roll-back previous commit after
