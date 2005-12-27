@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: LOGINCommand.cc,v 1.59 2005/12/27 12:33:03 kewlio Exp $
+ * $Id: LOGINCommand.cc,v 1.60 2005/12/27 13:27:59 kewlio Exp $
  */
 
 #include	<string>
@@ -34,7 +34,7 @@
 #include	"cservice_config.h"
 #include	"Network.h"
 
-const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.59 2005/12/27 12:33:03 kewlio Exp $" ;
+const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.60 2005/12/27 13:27:59 kewlio Exp $" ;
 
 namespace gnuworld
 {
@@ -89,12 +89,30 @@ if (tmpUser)
 	}
 
 /*
+ * Check if this client has exceeded their max logins
+ */
+
+unsigned int maxFailedLogins = bot->getConfigVar("MAX_FAILED_LOGINS")->asInt();
+unsigned int failedLogins = bot->getFailedLogins(theClient);
+if ((maxFailedLogins > 0) && (failedLogins >= maxFailedLogins))
+{
+	/* exceeded maximum failed logins */
+	bot->Notice(theClient,
+		bot->getResponse(tmpUser,
+		language::max_failed_logins,
+		string("AUTHENTICATION FAILED as %s (Exceeded maximum login failures for this session)")).c_str(),
+		st[1].c_str());
+	return false;
+}
+
+/*
  * Find the user record, confirm authorisation and attach the record
  * to this client.
  */
 
 if(st[1][0] == '#')
 	{
+	bot->setFailedLogins(theClient, failedLogins+1);
 	bot->Notice(theClient, "AUTHENTICATION FAILED as %s.", st[1].c_str());
 	return false;
 	}
@@ -103,6 +121,7 @@ if(st[1][0] == '#')
 sqlUser* theUser = bot->getUserRecord(st[1]);
 if( !theUser )
 	{
+	bot->setFailedLogins(theClient, failedLogins+1);
 	bot->Notice(theClient,
 		bot->getResponse(tmpUser,
 			language::not_registered,
@@ -113,6 +132,7 @@ if( !theUser )
 
 if (theUser->getFlag(sqlUser::F_GLOBAL_SUSPEND))
 	{
+	bot->setFailedLogins(theClient, failedLogins+1);
 	bot->Notice(theClient, "AUTHENTICATION FAILED as %s. (Suspended)",
 	st[1].c_str());
 	return false;
@@ -131,6 +151,7 @@ if (failed_login_rate==0)
 
 if (!bot->isPasswordRight(theUser, st.assemble(2)))
 	{
+	bot->setFailedLogins(theClient, failedLogins+1);
 	bot->Notice(theClient,
 		bot->getResponse(theUser,
 			language::auth_failed,
@@ -186,6 +207,7 @@ if ((bot->getAdminAccessLevel(theUser, true) > 0) && (!theUser->getFlag(sqlUser:
 	/* ok, they have "*" access (excluding alumni's) */
 	if (!bot->checkIPR(theClient, theUser))
 	{
+		bot->setFailedLogins(theClient, failedLogins+1);
 		bot->Notice(theClient, "AUTHENTICATION FAILED as %s. (IPR)",  
 			st[1].c_str());
 		/* notify the relay channel */
@@ -214,6 +236,7 @@ if ((bot->getAdminAccessLevel(theUser, true) > 0) && (!theUser->getFlag(sqlUser:
 
 if(theUser->networkClientList.size() + 1 > theUser->getMaxLogins())
 	{
+	bot->setFailedLogins(theClient, failedLogins+1);
 	bot->Notice(theClient, "AUTHENTICATION FAILED as %s. (Maximum "
 		"concurrent logins exceeded).",
 		theUser->getUserName().c_str());

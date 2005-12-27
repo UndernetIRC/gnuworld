@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: cservice.cc,v 1.269 2005/12/06 18:12:44 kewlio Exp $
+ * $Id: cservice.cc,v 1.270 2005/12/27 13:27:59 kewlio Exp $
  */
 
 #include	<new>
@@ -1354,6 +1354,37 @@ bool cservice::checkIPR( iClient* theClient, sqlUser* theUser )
 		setIPRts(theClient, ipr_ts);
 		return true;
 	}
+}
+
+/**
+ * Fetch the number of failed logins for a client
+ */
+unsigned int cservice::getFailedLogins(iClient* theClient)
+{
+	networkData* tmpData = static_cast< networkData* >(theClient->getCustomData(this));
+
+	/* if the user has no network data, they have zero failed logins */
+	if (!tmpData)
+		return 0;
+
+	return tmpData->failed_logins;
+}
+
+/**
+ * Set the number of failed logins for a client
+ */
+void cservice::setFailedLogins(iClient* theClient, unsigned int _failed_logins)
+{
+	networkData* tmpData = static_cast< networkData* >(theClient->getCustomData(this));
+
+	/* if the user has no network data, we cant set it */
+	if (!tmpData)
+		return;
+
+	/* set the failed login counter */
+	tmpData->failed_logins = _failed_logins;
+
+	return;
 }
 
 /**

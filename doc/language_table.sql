@@ -186,6 +186,7 @@ COPY "translations" FROM stdin;
 1	174	Your NOADDUSER setting is now ON.	31337	0
 1	175	Your NOADDUSER setting is now OFF.	31337	0
 1	176	There were %d failed login attempts since your last successful login.	31337	0
+1	177	AUTHENTICATION FAILED as %s (Exceeded maximum login failures for this session)	31337	0
 \.
 
 -- French language definition.

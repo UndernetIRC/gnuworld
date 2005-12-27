@@ -1,4 +1,26 @@
-// $Id: ChangeLog,v 1.80 2005/12/27 12:33:03 kewlio Exp $ //
+// $Id: ChangeLog,v 1.81 2005/12/27 13:27:58 kewlio Exp $ //
+
+2005-12-27	Dan-m00 <daniel@undernet.org>
+		* mod.cservice/networkData.h:
+		* mod.cservice/networkData.cc: add failed logins info for a
+			client to track the number of failed logins per client
+			rather than per username.
+
+		* doc/cservice.config.sql: add configuration variable for the
+			maximum failed login count per client.
+			Set to 0 (ZERO) to disable the check.
+
+		* mod.cservice/responses.h: add max failed login failure msg.
+
+		* doc/language_table.sql: add message for the above response.
+
+		* mod.cservice/cservice.h:
+		* mod.cservice/cservice.cc: add functions to get/set the failed
+			login counter for clients.
+
+		* mod.cservice/LOGINCommand.cc: add maximum failed login
+			checks.  If they exceed them, they will have to
+			reconnect to the network.
 
 2005-12-27	Dan-m00 <daniel@undernet.org>
 		* mod.cservice/LOGINCommand.cc: add a checksum to the failed

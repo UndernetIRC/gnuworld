@@ -16,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: networkData.h,v 1.8 2005/11/30 19:37:34 kewlio Exp $
+ * $Id: networkData.h,v 1.9 2005/12/27 13:27:59 kewlio Exp $
  */
 
 #ifndef __NETWORKDATA_H
-#define __NETWORKDATA_H "$Id: networkData.h,v 1.8 2005/11/30 19:37:34 kewlio Exp $"
+#define __NETWORKDATA_H "$Id: networkData.h,v 1.9 2005/12/27 13:27:59 kewlio Exp $"
 
 #include	<string>
 #include	<ctime>
@@ -58,6 +58,9 @@ public:
 
 	/* timestamp of the IP restriction that this client matched */
 	unsigned int ipr_ts;
+
+	/* number of failed login attempts by this client */
+	unsigned int failed_logins;
 } ;
 
 #endif // __NETWORKDATA_H
