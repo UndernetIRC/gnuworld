@@ -1,10 +1,10 @@
-dnl $Id: configure.ac,v 1.33 2005/12/27 20:53:31 kewlio Exp $
+dnl $Id: configure.ac,v 1.34 2005/12/28 14:55:12 kewlio Exp $
 dnl ----------------------------------------------------------
 
 echo Configuring GNUWorld...
 echo
 
-AC_REVISION($Revision: 1.33 $)
+AC_REVISION($Revision: 1.34 $)
 AC_INIT
 AC_CONFIG_SRCDIR([src/main.cc])
 AM_INIT_AUTOMAKE(gnuworld,2.7)
@@ -35,7 +35,7 @@ dnl Check for dlopen support
 AC_LIBTOOL_DLOPEN
 
 dnl Configure libtool
-AM_PROG_LIBTOOL
+AC_PROG_LIBTOOL
 
 CXXFLAGS="-W -Wall -pipe -I\$(top_srcdir)/libltdl"
 CFLAGS="$CFLAGS"

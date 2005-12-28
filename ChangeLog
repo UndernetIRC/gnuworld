@@ -1,4 +1,11 @@
-// $Id: ChangeLog,v 1.82 2005/12/27 20:53:31 kewlio Exp $ //
+// $Id: ChangeLog,v 1.83 2005/12/28 14:55:06 kewlio Exp $ //
+
+2005-12-28	Dan-m00 <daniel@undernet.org>
+		* autogen.sh: (new file) script to rebuild using auto-tools.
+
+		* Makefile.in, aclocal.m4, config.guess, config.sub, configure,
+		  configure.ac, ltmail.sh, */Makefile.in:
+		* libltdl/*: Updated build system including latest libtool.
 
 2005-12-27	Entrope <mdpoole@troilus.org>
 		* configure.ac: Fix VPATH builds.
