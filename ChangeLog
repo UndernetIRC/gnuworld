@@ -1,4 +1,10 @@
-// $Id: ChangeLog,v 1.83 2005/12/28 14:55:06 kewlio Exp $ //
+// $Id: ChangeLog,v 1.84 2006/01/02 16:15:30 kewlio Exp $ //
+
+2006-01-02	Dan-m00 <daniel@undernet.org>
+		* mod.ccontrol/ccontrol.cc: Update logging to HD.  This patch
+			disables buffering, and opens files for appending.
+			This resolves a problem in new versions of GCC where
+			the logfile is not recreated if opened without append.
 
 2005-12-28	Dan-m00 <daniel@undernet.org>
 		* autogen.sh: (new file) script to rebuild using auto-tools.

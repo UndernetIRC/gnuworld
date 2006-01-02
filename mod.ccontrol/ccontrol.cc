@@ -20,7 +20,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccontrol.cc,v 1.202 2005/12/27 20:53:31 kewlio Exp $
+ * $Id: ccontrol.cc,v 1.203 2006/01/02 16:15:31 kewlio Exp $
 */
 
 #define MAJORVER "1"
@@ -66,7 +66,7 @@
 #include	"ccontrol_generic.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: ccontrol.cc,v 1.202 2005/12/27 20:53:31 kewlio Exp $" ) ;
+RCSTAG( "$Id: ccontrol.cc,v 1.203 2006/01/02 16:15:31 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -2974,7 +2974,7 @@ else
 newLog->Desc = log;
 if(!LogFile.is_open())
 	{
-	LogFile.open(LogFileName.c_str(),ios::in|ios::out);
+	LogFile.open(LogFileName.c_str(),ios::out|ios::app);
 	//LogFile.setbuf(NULL,0);
 	}
 if(LogFile.bad())
@@ -4935,12 +4935,17 @@ LogFileName = "CommandsLog.Log";
 //TODO: Get this from the conf file
 LogsToSave = 100;
 NumOfLogs = 0;
-LogFile.open(LogFileName.c_str(),ios::in|ios::out);
+/* disable buffering */
+LogFile.rdbuf()->pubsetbuf(0,0);
+/* open file for writing and append */
+LogFile.open(LogFileName.c_str(),ios::out|ios::app);
 
 if(LogFile.bad())
 	{//There was a problem in opening the log file
 	elog << "Error while initilizing the logs file!\n";
 	return ;
+	} else {
+	LogFile	<< "** GNUWorld mod.ccontrol restarted **\n";
 	}
 //LogFile.setbuf(NULL,0);
 LogFile.close();
