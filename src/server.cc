@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server.cc,v 1.218 2005/11/30 19:37:34 kewlio Exp $
+ * $Id: server.cc,v 1.219 2006/01/02 22:29:33 kewlio Exp $
  */
 
 #include	<sys/time.h>
@@ -70,7 +70,7 @@
 #include	"ConnectionHandler.h"
 #include	"Connection.h"
 
-RCSTAG( "$Id: server.cc,v 1.218 2005/11/30 19:37:34 kewlio Exp $" ) ;
+RCSTAG( "$Id: server.cc,v 1.219 2006/01/02 22:29:33 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -2128,18 +2128,6 @@ opVectorType opVector ;
 voiceVectorType voiceVector ;
 banVectorType banVector ;
 
-typedef std::vector< std::pair< bool, unsigned int > > limitVectorType ;
-limitVectorType limitVector ;
-
-typedef std::vector< std::pair< bool, std::string > > keyVectorType ;
-keyVectorType keyVector ;
-
-typedef std::vector< std::pair< bool, std::string> > apassVectorType ;
-apassVectorType apassVector ;
-
-typedef std::vector< std::pair< bool, std::string> > upassVectorType ;
-upassVectorType upassVector ;
-
 // This vector stores the actual output string for the modes
 typedef std::vector< std::pair< std::string, std::string > >
 	rawModeVectorType ;
@@ -2259,8 +2247,8 @@ for( ; tokenIndex < st.size() ; )
 //					<< chanKey
 //					<< endl ;
 
-				keyVector.push_back( make_pair(
-					polarityBool, chanKey ) ) ;
+				OnChannelModeK(theChan, polarityBool,
+					theUser, chanKey);
 				rawModeVector.push_back( make_pair(
 					polarityString + theChar,
 					chanKey ) ) ;
@@ -2311,8 +2299,8 @@ for( ; tokenIndex < st.size() ; )
 //					<< Apass
 //					<< endl ;
 
-				apassVector.push_back( make_pair(
-					polarityBool, Apass ) ) ;
+				OnChannelModeA(theChan, polarityBool,
+					theUser, Apass);
 				rawModeVector.push_back( make_pair(
 					polarityString + theChar,
 					Apass ) ) ;
@@ -2363,8 +2351,8 @@ for( ; tokenIndex < st.size() ; )
 //					<< Upass
 //					<< endl ;
 
-				upassVector.push_back( make_pair(
-					polarityBool, Upass ) ) ;
+				OnChannelModeU(theChan, polarityBool,
+					theUser, Upass);
 				rawModeVector.push_back( make_pair(
 					polarityString + theChar,
 					Upass ) ) ;
@@ -2392,8 +2380,8 @@ for( ; tokenIndex < st.size() ; )
 					}
 				// No argument needed for -l
 
-				limitVector.push_back( make_pair(
-					polarityBool, chanLimit ) ) ;
+				OnChannelModeL(theChan, polarityBool,
+					theUser, chanLimit);
 
 				std::string chanLimitString ;
 				if( chanLimit != 0 )

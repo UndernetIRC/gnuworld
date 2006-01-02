@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_B.cc,v 1.10 2005/09/30 00:47:06 kewlio Exp $
+ * $Id: msg_B.cc,v 1.11 2006/01/02 22:29:33 kewlio Exp $
  */
 
 #include	<sys/types.h>
@@ -44,7 +44,7 @@
 #include	"iClient.h"
 #include	"ServerCommandHandler.h"
 
-RCSTAG( "$Id: msg_B.cc,v 1.10 2005/09/30 00:47:06 kewlio Exp $" ) ;
+RCSTAG( "$Id: msg_B.cc,v 1.11 2006/01/02 22:29:33 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -150,12 +150,13 @@ else
 	time_t newCreationTime =
 		static_cast< time_t >( ::atoi( Param[ 2 ] ) ) ;
 
-	// Do the old TS and the new TS match?
-	if( newCreationTime != theChan->getCreationTime() )
+	// Is the old TS greater than the new TS?
+	if( theChan->getCreationTime() > newCreationTime )
 		{
 		// Nope, update the timestamp
 		theChan->setCreationTime( newCreationTime ) ;
-		// TODO: Clear channel modes etc?
+		theChan->removeAllModes() ;
+		theChan->removeAllBans() ;
 		}
 	}
 
