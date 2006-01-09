@@ -1,4 +1,10 @@
-// $Id: ChangeLog,v 1.85 2006/01/02 22:29:32 kewlio Exp $ //
+// $Id: ChangeLog,v 1.86 2006/01/09 00:32:19 kewlio Exp $ //
+
+2006-01-09	Dan-m00 <daniel@undernet.org>
+		* mod.cservice/cservice.cc: Remove a ban before setting it
+			during checkbansonjoin() - if the ban doesnt exist, it
+			will return false anyway.  Stops duplication if a user
+			is invited into a channel where they are banned.
 
 2005-11-16	Reed Loden <reed@reedloden.com>
 		* libircu/msg_B.cc: Fix two problems when bursting:

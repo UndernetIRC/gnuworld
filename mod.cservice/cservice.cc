@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: cservice.cc,v 1.270 2005/12/27 13:27:59 kewlio Exp $
+ * $Id: cservice.cc,v 1.271 2006/01/09 00:32:20 kewlio Exp $
  */
 
 #include	<new>
@@ -3543,6 +3543,9 @@ if( theBan && (theBan->getLevel() >= 75) )
 
 	Write( s );
 
+	/* remove the ban (even if it doesnt exist, it will return false anyway) */
+	netChan->removeBan( theBan->getBanMask() ) ;
+	/* set the ban */
 	netChan->setBan( theBan->getBanMask() ) ;
 
 	/* Don't kick banned +k bots */
