@@ -1,4 +1,8 @@
-// $Id: ChangeLog,v 1.86 2006/01/09 00:32:19 kewlio Exp $ //
+// $Id: ChangeLog,v 1.87 2006/01/09 03:02:55 kewlio Exp $ //
+
+2006-01-09	Dan-m00 <daniel@undernet.org>
+		* mod.ccontrol/ccontrol.cc: add timestamp and human readable
+			time to 'list glines' command for when a gline was set.
 
 2006-01-09	Dan-m00 <daniel@undernet.org>
 		* mod.cservice/cservice.cc: Remove a ban before setting it

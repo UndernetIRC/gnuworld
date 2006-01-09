@@ -20,7 +20,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccontrol.cc,v 1.203 2006/01/02 16:15:31 kewlio Exp $
+ * $Id: ccontrol.cc,v 1.204 2006/01/09 03:02:55 kewlio Exp $
 */
 
 #define MAJORVER "1"
@@ -66,7 +66,7 @@
 #include	"ccontrol_generic.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: ccontrol.cc,v 1.203 2006/01/02 16:15:31 kewlio Exp $" ) ;
+RCSTAG( "$Id: ccontrol.cc,v 1.204 2006/01/09 03:02:55 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -4372,6 +4372,8 @@ void ccontrol::listGlines( iClient *theClient, string Mask )
 {
 
 ccGline* tempGline;
+char gline_set[256];
+
 Notice(theClient,"-= Gline List =-");
 for(glineIterator ptr = gline_begin();ptr != gline_end();++ptr)
 	{
@@ -4379,11 +4381,14 @@ for(glineIterator ptr = gline_begin();ptr != gline_end();++ptr)
 	if((tempGline ->getExpires() > ::time(0)) 
 	    && (!match(Mask,tempGline->getHost())))
 		{
-		Notice(theClient,"Host: %s, Expires: [%ld] %s, Added By %s"
+		sprintf(gline_set, "%s", Duration(time(NULL) - tempGline->getAddedOn()));
+		Notice(theClient,"Host: %s, Expires: [%ld] %s, Added By %s at [%ld] %s ago"
 			,tempGline->getHost().c_str()
 			,tempGline->getExpires()
 			,Duration(tempGline->getExpires() - time(NULL))
-			,tempGline->getAddedBy().c_str());
+			,tempGline->getAddedBy().c_str()
+			,tempGline->getAddedOn()
+			,gline_set);
 		}
 	}
 
@@ -4394,11 +4399,14 @@ for(glineIterator ptr = rnGlineList.begin();ptr != rnGlineList.end();++ptr)
 	if((tempGline ->getExpires() > ::time(0)) 
 	    && (!match(Mask,tempGline->getHost())))
 		{
-		Notice(theClient,"Host: %s, Expires: [%ld] %s, Added By %s"
+		sprintf(gline_set, "%s", Duration(time(NULL) - tempGline->getAddedOn()));
+		Notice(theClient,"Host: %s, Expires: [%ld] %s, Added By %s at [%ld] %s ago."
 			,tempGline->getHost().c_str()
 			,tempGline->getExpires()
 			,Duration(tempGline->getExpires() - time(NULL))
-			,tempGline->getAddedBy().c_str());
+			,tempGline->getAddedBy().c_str()
+			,tempGline->getAddedOn()
+			,gline_set);
 		}
 	}
 Notice(theClient,"-= End Of Gline List =-");
