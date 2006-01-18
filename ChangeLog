@@ -1,4 +1,9 @@
-// $Id: ChangeLog,v 1.87 2006/01/09 03:02:55 kewlio Exp $ //
+// $Id: ChangeLog,v 1.88 2006/01/18 17:07:55 kewlio Exp $ //
+
+2006-01-18	Dan-m00 <daniel@undernet.org>
+		* mod.ccontrol/ccontrol.cc: Update automated gline to prefix
+			'AUTO ' before '[xxx] Automatically...' to match other
+			automated gline notices.
 
 2006-01-09	Dan-m00 <daniel@undernet.org>
 		* mod.ccontrol/ccontrol.cc: add timestamp and human readable

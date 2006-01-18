@@ -20,7 +20,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccontrol.cc,v 1.204 2006/01/09 03:02:55 kewlio Exp $
+ * $Id: ccontrol.cc,v 1.205 2006/01/18 17:07:55 kewlio Exp $
 */
 
 #define MAJORVER "1"
@@ -66,7 +66,7 @@
 #include	"ccontrol_generic.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: ccontrol.cc,v 1.204 2006/01/09 03:02:55 kewlio Exp $" ) ;
+RCSTAG( "$Id: ccontrol.cc,v 1.205 2006/01/18 17:07:55 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -1817,7 +1817,7 @@ if(dbConnected)
 				tmpGline->setExpires(::time(0) + maxGlineLen);
 				char us[100];
 				us[0] = '\0';
-				sprintf(us,"[%d] Automatically banned for excessive connections",AffectedUsers);
+				sprintf(us,"AUTO [%d] Automatically banned for excessive connections",AffectedUsers);
 				tmpGline->setReason(us);
 				tmpGline->setAddedOn(::time(0));
 				tmpGline->setAddedBy(nickName);
