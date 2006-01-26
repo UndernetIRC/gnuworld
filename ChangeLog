@@ -1,4 +1,11 @@
-// $Id: ChangeLog,v 1.88 2006/01/18 17:07:55 kewlio Exp $ //
+// $Id: ChangeLog,v 1.89 2006/01/26 22:43:06 kewlio Exp $ //
+
+2006-01-26	Dan-m00 <daniel@undernet.org>
+		* doc/cservice.config.sql: add new 'max_ban_duration' config
+			option for the maximum length a ban can be set.
+
+		* mod.cservice/BANCommand.cc: implement the above config var,
+			this replaces the hardcoded default of 14 days.
 
 2006-01-18	Dan-m00 <daniel@undernet.org>
 		* mod.ccontrol/ccontrol.cc: Update automated gline to prefix
