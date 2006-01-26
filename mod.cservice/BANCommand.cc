@@ -33,7 +33,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: BANCommand.cc,v 1.41 2006/01/26 22:43:07 kewlio Exp $
+ * $Id: BANCommand.cc,v 1.42 2006/01/26 22:44:02 kewlio Exp $
  */
 
 #include	<new>
@@ -52,7 +52,7 @@
 #include	"match.h"
 #include	"ip.h"
 
-const char BANCommand_cc_rcsId[] = "$Id: BANCommand.cc,v 1.41 2006/01/26 22:43:07 kewlio Exp $" ;
+const char BANCommand_cc_rcsId[] = "$Id: BANCommand.cc,v 1.42 2006/01/26 22:44:02 kewlio Exp $" ;
 
 namespace gnuworld
 {
@@ -232,7 +232,7 @@ if(banLevel < 1 || banLevel > level || 500 < banLevel)
 	return true;
 	}
 
-if(banTime < 1 || banTime > bot->getConfigVar("MAX_BAN_DURATION")->asInt();)
+if(banTime < 1 || banTime > bot->getConfigVar("MAX_BAN_DURATION")->asInt())
 	{
 	bot->Notice(theClient,
 		bot->getResponse(theUser,
