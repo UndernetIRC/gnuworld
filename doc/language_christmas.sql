@@ -31,7 +31,7 @@ INSERT INTO translations VALUES (16,16,'%s is not voiced in %s',31337,0);
 INSERT INTO translations VALUES (16,17,'%s is snowed out of the Winter Wonderland (Invalid Ornament)',31337,0);
 INSERT INTO translations VALUES (16,18,'I\'m not in that tree!',31337,0);
 INSERT INTO translations VALUES (16,19,'Invalid curse-level range. Valid range is 1-%i.',31337,0);
-INSERT INTO translations VALUES (16,20,'Invalid curse duration. Your curse duration can be a maximum of 336 hours.',31337,0);
+INSERT INTO translations VALUES (16,20,'Invalid curse duration. Your curse duration can be a maximum of %d hours.',31337,0);
 INSERT INTO translations VALUES (16,21,'Curse reason cannot exceed 128 chars',31337,0);
 INSERT INTO translations VALUES (16,22,'Specified curse is already in my curse-list!',31337,0);
 INSERT INTO translations VALUES (16,23,'The curse %s is already covered by %s',31337,0);

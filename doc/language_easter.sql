@@ -21,7 +21,7 @@ COPY "translations" FROM stdin;
 1	17	AUTHENTICATION FAILED as %s (Invalid Password)	31337
 1	18	I'm not in that basket!	31337
 1	19	Invalid banlevel range. Valid range is 1-%i.	31337
-1	20	Invalid ban duration. Your ban duration can be a maximum of 336 hours.	31337
+1	20	Invalid ban duration. Your ban duration can be a maximum of %d hours.	31337
 1	21	Ban reason cannot exceed 128 chars	31337
 1	22	Specified ban is already in my banlist!	31337
 1	23	The ban %s is already covered by %s	31337

@@ -1,4 +1,4 @@
--- $Id: language_dutch.sql,v 1.3 2002/08/30 10:38:16 nighty Exp $ --
+-- $Id: language_dutch.sql,v 1.4 2006/01/31 00:25:13 kewlio Exp $ --
 -- Dutch language definition.
 -- 9/2/02 - Eagle-One (Ken Geboers) <Eagle-One@pandora.be>.
 
@@ -27,7 +27,7 @@ INSERT INTO translations VALUES (4,16,'%s heeft geen voice status in %s',31337,0
 INSERT INTO translations VALUES (4,17,'VERIFICATIE MISLUKT als %s (ongeldig wachtwoord)',31337,0);
 INSERT INTO translations VALUES (4,18,'Ik ben niet in dat kanaal!',31337,0);
 INSERT INTO translations VALUES (4,19,'Ongeldig banniveau. Geldige breedte is 1-%i.',31337,0);
-INSERT INTO translations VALUES (4,20,'Ongeldige banlengte. Je banlengte kan maximum 336 uur bedragen.',31337,0);
+INSERT INTO translations VALUES (4,20,'Ongeldige banlengte. Je banlengte kan maximum %d uur bedragen.',31337,0);
 INSERT INTO translations VALUES (4,21,'Banreden kan de 128 karakters niet overschrijden',31337,0);
 INSERT INTO translations VALUES (4,22,'Gespecifiëerde ban staat reeds in mijn banlijst!',31337,0);
 INSERT INTO translations VALUES (4,23,'De ban %s wordt reeds gedekt door %s',31337,0);

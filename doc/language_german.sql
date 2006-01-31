@@ -1,4 +1,4 @@
--- $Id: language_german.sql,v 1.1 2002/10/31 13:49:25 nighty Exp $
+-- $Id: language_german.sql,v 1.2 2006/01/31 00:25:13 kewlio Exp $
 -- Language Definition Table for German
 -- 16/8/2002 volta <volta2@gmx.de>
 -- beta readers: Tha_Funk
@@ -26,7 +26,7 @@ COPY translations FROM stdin;
 5	17	AUTHENTIFIKATION FEHLGESCHLAGEN als %s (Falsches Passwort)	31337	0
 5	18	Ich bin nicht in diesem Channel!	31337	0
 5	19	Ungültiges Banlevel. Gültig ist 1-%i.	31337	0
-5	20	Ungültige Banzeit. Deine Bandauer kann maximal 336 Stunden sein.	31337	0
+5	20	Ungültige Banzeit. Deine Bandauer kann maximal %d Stunden sein.	31337	0
 5	21	Bangrund darf nicht 128 Zeichen überschreiten	31337	0
 5	22	Spezifizierter Ban ist bereits in der Banliste!	31337	0
 5	23	Der Ban %s ist bereits eingedeckt von %s	31337	0

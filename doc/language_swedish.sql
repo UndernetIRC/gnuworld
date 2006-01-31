@@ -1,4 +1,4 @@
--- $Id: language_swedish.sql,v 1.4 2002/11/06 17:12:03 nighty Exp $
+-- $Id: language_swedish.sql,v 1.5 2006/01/31 00:25:13 kewlio Exp $
 -- Swedish language definition.
 -- 06/24/2002 - Ponte <tpin@telia.com>.
 -- 11/06/2002 - Comet <Comet@irc-solution.net>
@@ -29,7 +29,7 @@ COPY "translations" FROM stdin;
 20	17	INLOGGNINGEN MISSLYCKADES som %s (Felaktigt lösenord)	31337	0
 20	18	Jag är inte i den kanalen!	31337	0
 20	19	Ogiltig ban nivå. Giltig nivå är 1-%i.	31337	0
-20	20	Ogiltig ban varaktighet. Din ban varaktighet kan max vara 336 timmar.	31337	0
+20	20	Ogiltig ban varaktighet. Din ban varaktighet kan max vara %d timmar.	31337	0
 20	21	Ban anledning kan max vara 128 bokstäver	31337	0
 20	22	Den specifika banen finns redan i min banlista!	31337	0
 20	23	Banen %s är redan täckt av %s	31337	0

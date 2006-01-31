@@ -30,7 +30,7 @@ COPY "translations" FROM stdin;
 1	17	AUTHENTICATION FAILED as %s (Invalid Password)	31337	0
 1	18	I'm not in that channel!	31337	0
 1	19	Invalid banlevel range. Valid range is 1-%i.	31337	0
-1	20	Invalid ban duration. Your ban duration can be a maximum of 336 hours.	31337	0
+1	20	Invalid ban duration. Your ban duration can be a maximum of %d hours.	31337	0
 1	21	Ban reason cannot exceed 128 chars	31337	0
 1	22	Specified ban is already in my banlist!	31337	0
 1	23	The ban %s is already covered by %s	31337	0
@@ -214,7 +214,7 @@ COPY "translations" FROM stdin;
 2	17	AUTHENTIFICATION REFUSÉE pour %s (Mot de passe Invalide)	31337	0
 2	18	Je ne suis pas dans ce canal!!	31337	0
 2	19	Niveau de ban invalide. Niveau valide: entre 1 et %i.	31337	0
-2	20	Durée du ban invalide. La durée maximale est de 336 heures.	31337	0
+2	20	Durée du ban invalide. La durée maximale est de %d heures.	31337	0
 2	21	La raison d'un ban ne peut dépasser 128 caractères.	31337	0
 2	22	Ce ban est déjà dans ma liste!	31337	0
 2	23	Le ban %s est dejà couvert par %s	31337	0
@@ -389,7 +389,7 @@ COPY "translations" FROM stdin;
 3	17	AUTORISATION MISLYKKEDES som %s (Ugyldigt Kodeord)	31337	0
 3	18	Jeg er ikke i den kanal!	31337	0
 3	19	Ugyldigt banlevel område. Gyldigt område er 1-%i.	31337	0
-3	20	Ugyldigt ban varighed. Din ban varighed kan max bestå af 336 timer.	31337	0
+3	20	Ugyldigt ban varighed. Din ban varighed kan max bestå af %d timer.	31337	0
 3	21	Ban grund kan ikke overtræde 128 karaktere	31337	0
 3	22	Specifiseret ban er allerede i min banliste!	31337	0
 3	23	Ban'et %s er allerede dækket af %s	31337	0
@@ -564,7 +564,7 @@ COPY "translations" FROM stdin;
 6	17	FALHA NA AUTENTICAÇÃO como %s (Senha inválida)	31337	0
 6	18	Eu não estou neste canal!	31337	0
 6	19	Escala inválida de nívelban. Escala válida é 1-%i.	31337	0
-6	20	Duração de ban inválida. Sua duração de ban aplicada pode ser de no máximo 336 horas.	31337	0
+6	20	Duração de ban inválida. Sua duração de ban aplicada pode ser de no máximo %d horas.	31337	0
 6	21	Motivo do ban não exceder 128 characteres	31337	0
 6	22	O ban especificado já está na banlist!	31337	0
 6	23	O ban %s já está coberto por %s	31337	0
@@ -740,7 +740,7 @@ COPY "translations" FROM stdin;
 7	17	AUTENTICAZIONE FALLITA come %s (Password non valida)	31337	0
 7	18	Non mi trovo in quel canale!	31337	0
 7	19	Range del livello del ban non valido. Il range valido è compreso tra 1 e %i.	31337	0
-7	20	Durata del ban non valida. La durata massima di un ban può essere di 336 ore.	31337	0
+7	20	Durata del ban non valida. La durata massima di un ban può essere di %d ore.	31337	0
 7	21	Il motivo del ban non può superare i 128 caratteri	31337	0
 7	22	Il ban specificato è già presente nella mia lista dei ban!	31337	0
 7	23	Il ban %s è già coperto da %s	31337	0
@@ -913,7 +913,7 @@ COPY "translations" FROM stdin;
 8	17	AUTENTIFICARE ESUATA ca %s (parola incorecta)	31337	0
 8	18	Nu sunt pe canal!	31337	0
 8	19	Nivelul de ban e incorect. Domeniul admis este 1-%i.	31337	0
-8	20	Durata banului e incorecta. Poti da ban pe o durata maxima de 336 de ore.	31337	0
+8	20	Durata banului e incorecta. Poti da ban pe o durata maxima de %d de ore.	31337	0
 8	21	Motivul banului nu poate depasi 128 de caractere.	31337	0
 8	22	Respectivul ban e deja pe lista!	31337	0
 8	23	Banul pe %s e deja sub incidenta banului pe %s	31337	0
@@ -1088,7 +1088,7 @@ COPY "translations" FROM stdin;
 9	17	AUTENTICACIÓ FALLIDA com a %s (Contrasenya no vàlida).	31337	0
 9	18	No sóc pas a aquest canal!	31337	0
 9	19	Nivell de bandeig no vàlid. Els nivells vàlids són entre 1-%i.	31337	0
-9	20	Durada de bandeig no vàlida . La durada màxima del bandeig és de 336 hores.	31337	0
+9	20	Durada de bandeig no vàlida . La durada màxima del bandeig és de %d hores.	31337	0
 9	21	La raó del ban no pot excedir de 128 caràcters.	31337	0
 9	22	El bandeig especificat ja és a la meva llista!	31337	0
 9	23	El bandeig %s ja queda cobert per %s	31337	0
@@ -1263,7 +1263,7 @@ COPY "translations" FROM stdin;
 10	17	AUTENTIFICACIÓN FALLIDA como %s (Contraseña no válida).	31337	0
 10	18	No estoy en ese canal!	31337	0
 10	19	Nivel de ban no válido. El intervalo válido es 1-%i.	31337	0
-10	20	Duración de ban no válida. La duración de ban máxima es de 336 horas.	31337	0
+10	20	Duración de ban no válida. La duración de ban máxima es de %d horas.	31337	0
 10	21	El motivo del ban no puede superar los 128 caracteres.	31337	0
 10	22	El ban especificado ya está en mi lista de bans!	31337	0
 10	23	El ban %s ya está cubierto por %s	31337	0
@@ -1439,7 +1439,7 @@ COPY "translations" FROM stdin;
 11	17	AZONOSITAS SIKERTELEN a(z) %s felhasznaloi nev alatt (Hibas Jelszo)	31337	0
 11	18	Nem vagyok azon a csatornan!	31337	0
 11	19	Ervenytelen ban szint, 1-%i kozott valaszthatsz.	31337	0
-11	20	Ervenytelen ban idotartalom. Maximum 336 orat hasznalhatsz.	31337	0
+11	20	Ervenytelen ban idotartalom. Maximum %d orat hasznalhatsz.	31337	0
 11	21	A Ban indokban maximum csak 128 betut addhatsz meg.	31337	0
 11	22	A megjelolt ban mar benne van a banlistaban!	31337	0
 11	23	A(z) %s bant mar a letezo %s ban magaba vonja!	31337	0
@@ -1615,7 +1615,7 @@ COPY "translations" FROM stdin;
 12	17	%s kanalında TANIMLAMA BAŞARISIZ (Geçersiz Şifre)	31337	0
 12	18	Ben o kanalda değilim!	31337	0
 12	19	Geçersiz yasaklama-seviye dizisi. Geçerli dizi 1-%i olmalı.	31337	0
-12	20	Geçersiz yasaklama süresi. Sizin yasaklama süreniz en fazla 336 saat olabilir.	31337	0
+12	20	Geçersiz yasaklama süresi. Sizin yasaklama süreniz en fazla %d saat olabilir.	31337	0
 12	21	Yasaklama sebebi 128 karakteri aşmamalıdır	31337	0
 12	22	Belirtilen yasaklama zaten benim yasaklılar listemde!	31337	0
 12	23	%s yasaklaması zaten %s ile kapsanmış durumda	31337	0
@@ -1793,7 +1793,7 @@ COPY "translations" FROM stdin;
 13	17	INNLOGGING FEILET som %s (Feil passord)	31337	0
 13	18	Jeg er ikke i den kanalen!	31337	0
 13	19	Ugyldig banlevel. Må være 1-%i.	31337	0
-13	20	Ugyldig ban varighet. Den kan maksimum være 336 timer.	31337	0
+13	20	Ugyldig ban varighet. Den kan maksimum være %d timer.	31337	0
 13	21	Ban grunn kan ikke overstige 128 tegn	31337	0
 13	22	Den spesifiserte bannen er allerede i min banliste!	31337	0
 13	23	Bannen %s er allerede dekket av %s	31337	0
@@ -1969,7 +1969,7 @@ COPY "translations" FROM stdin;
 14	17	TA3AROUFE GHAYR NAJI7 %s (KALIMATO ASIRE KHATI2A)	31337	0
 14	18	Ana lastou dakhila hadidi al9anate!!	31337	0
 14	19	Moustawa ban GHAYROU sahihe. Moustawa sahihe: bayna 1-%i.	31337	0
-14	20	Moudatou ban ghayrou sahiha. Almoudatou alkouswa Hia 336 heures.	31337	0
+14	20	Moudatou ban ghayrou sahiha. Almoudatou alkouswa Hia %d heures.	31337	0
 14	21	Sababou al ban layomkino an yata3adda 128 7arfe .	31337	0
 14	22	Hada al ban Youjadou sabi9ane fe la2i7a!	31337	0
 14	23	Al ban %s youjado sabi9ane %s	31337	0
@@ -2137,7 +2137,7 @@ COPY "translations" FROM stdin;
 15	17	àéğå àåùø %säîùúîù   	31337	0
 15	18	àğé ìà ğîöà áòøåõ !	31337	0
 15	19	1 øîú äáàï ìà çå÷éú,äèååç äåà áéï -%i	31337	0
-15	20	îùê æîï äáàï ìà çå÷é, äæîï äîéøáé äåà 336 ùòåú.	31337	0
+15	20	îùê æîï äáàï ìà çå÷é, äæîï äîéøáé äåà %d ùòåú.	31337	0
 15	21	.ñéáú äáàï ìà éëåìä ìäéåú îòáø ì 128 úååéí	31337	0
 15	22	.áàï æä ëáø ğîöà áøùéîä	31337	0
 15	23	%s îëåñä ò"é äáàï %s äáàï	31337	0
@@ -2312,7 +2312,7 @@ COPY "translations" FROM stdin;
 16	17	NEUSPESHNO LOGIRANJE kako %s (Pogreshna Lozinka)	31337	0
 16	18	Ne sum na toj kanal!	31337	0
 16	19	Pogreshen ban dostrel. Dozvoleniot dostrel e 1-%i.	31337	0
-16	20	Pogreshno vremetraenje na banot. Vashiot ban moze da bide najmnogu 336 chasa.	31337	0
+16	20	Pogreshno vremetraenje na banot. Vashiot ban moze da bide najmnogu %d chasa.	31337	0
 16	21	Ban porakata nemoze da bide poveke od 128 bukvi	31337	0
 16	22	Odbraniot ban e veke na mojata lista!	31337	0
 16	23	Banot %s e veke pokrien so %s	31337	0

@@ -1,4 +1,30 @@
-// $Id: ChangeLog,v 1.89 2006/01/26 22:43:06 kewlio Exp $ //
+// $Id: ChangeLog,v 1.90 2006/01/31 00:25:12 kewlio Exp $ //
+
+2006-01-31	Dan-m00 <daniel@undernet.org>
+		* doc/cservice.help.sql:
+		* doc/language_christmas.sql:
+		* doc/language_dutch.sql:
+		* doc/language_easter.sql:
+		* doc/language_german.sql:
+		* doc/language_greek.sql:
+		* doc/language_halloween.sql:
+		* doc/language_swedish.sql:
+		* doc/language_table.sql: Update response code 20 (ban command)
+			to utilise a dynamic max ban duration figure.
+
+		* mod.cservice/BANCommand.cc: implement the change of output
+			for the above changed files.
+
+		* doc/update_languages_20060131_20.sql (new file):
+			Perform an upgrade of existing SQL tables to have the
+			new data for response code 20.
+
+		NOTE: if you upgrade this code without either re-importing all
+		language data OR running the contents of the update sql file,
+		mod.cservice will operate with unknown results, possibly even
+		causing a segmentation fault.  YOU HAVE BEEN WARNED.
+
+		psql cservice < doc/update_languages_20060131_20.sql
 
 2006-01-26	Dan-m00 <daniel@undernet.org>
 		* doc/cservice.config.sql: add new 'max_ban_duration' config

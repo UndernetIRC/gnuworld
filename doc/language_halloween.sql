@@ -1,4 +1,4 @@
--- $Id: language_halloween.sql,v 1.4 2002/11/01 04:35:17 nighty Exp $
+-- $Id: language_halloween.sql,v 1.5 2006/01/31 00:25:13 kewlio Exp $
 -- Muhauahuuahha.
 -- Halloween language definition.
 -- 30/10/01 - Gte (Greg Sikorski) <gte@atomicrevs.demon.co.uk>.
@@ -29,7 +29,7 @@ COPY "translations" FROM stdin;
 15	17	%s is denied entry into the Spooky UnderWorld	31337	0
 15	18	I'm not in that casket!	31337	0
 15	19	Invalid pitchfork-level range. Valid range is 1-%i.	31337	0
-15	20	Invalid pitchfork duration. Your pitchfork duration can be a maximum of 336 hours.	31337	0
+15	20	Invalid pitchfork duration. Your pitchfork duration can be a maximum of %d hours.	31337	0
 15	21	Pitchfork reason cannot exceed 128 chars	31337	0
 15	22	Specified pitchfork is already in my pitchfork-list!	31337	0
 15	23	The pitchfork %s is already covered by %s	31337	0

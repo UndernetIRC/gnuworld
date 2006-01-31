@@ -1,4 +1,4 @@
--- $Id: language_greek.sql,v 1.5 2002/11/17 01:24:24 nighty Exp $
+-- $Id: language_greek.sql,v 1.6 2006/01/31 00:25:13 kewlio Exp $
 -- Greek	 language definition.
 -- 04/05/02 - Marios Solomou <hawk@undernet.org>.
 -- 04/05/02 - deop <d30pma@cytanet.com.cy>.
@@ -26,7 +26,7 @@ COPY "translations" FROM stdin;
 19	17	ANAGNWRISI ANEPITIXHS san %s (Lathos Kwdikos)	31337	0
 19	18	Den eimai s`ekeino to kanali!	31337	0
 19	19	Avasimo banlevel range. Vasiko range einai apo 1-%i.	31337	0
-19	20	Avasimi diarkeia gia ban. H diarkeia tou ban den mporei na einai pano apo to anwtato orio twn 336 hours.	31337	0
+19	20	Avasimi diarkeia gia ban. H diarkeia tou ban den mporei na einai pano apo to anwtato orio twn %d hours.	31337	0
 19	21	O logos tou Ban den mporei na Xeperasei tous 128 charaktires	31337	0
 19	22	To Sikgekrimeno ban einai eidi stin lista twn bans mou!	31337	0
 19	23	To ban %s einai eidi kalimeno apo ton/tin %s	31337	0
