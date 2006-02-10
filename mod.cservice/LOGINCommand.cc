@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: LOGINCommand.cc,v 1.60 2005/12/27 13:27:59 kewlio Exp $
+ * $Id: LOGINCommand.cc,v 1.61 2006/02/10 14:06:14 kewlio Exp $
  */
 
 #include	<string>
@@ -34,7 +34,7 @@
 #include	"cservice_config.h"
 #include	"Network.h"
 
-const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.60 2005/12/27 13:27:59 kewlio Exp $" ;
+const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.61 2006/02/10 14:06:14 kewlio Exp $" ;
 
 namespace gnuworld
 {
@@ -277,6 +277,42 @@ if(theUser->isAuthed())
 		bot-> getUplinkName().c_str());
 	}
 
+/* check to see if we have a last seen time (bug workaround) - if not, make one */
+
+stringstream queryString;
+queryString	<< "SELECT last_seen FROM users_lastseen WHERE user_id="
+		<< theUser->getID()
+		<< ends;
+#ifdef LOG_SQL
+	elog	<< "LOGIN::sqlQuery> "
+		<< queryString.str().c_str()
+		<< endl;
+#endif
+
+ExecStatusType status = bot->SQLDb->Exec(queryString.str().c_str());
+if (PGRES_TUPLES_OK == status)
+{
+	if (bot->SQLDb->Tuples() < 1)
+	{
+		/* no rows returned - create a dummy record that will be updated
+		 * by setLastSeen after this loop
+		 */
+		stringstream updateQuery;
+		updateQuery	<< "INSERT INTO users_lastseen (user_id,"
+				<< "last_seen,last_updated) VALUES("
+				<< theUser->getID()
+				<< ",now()::abstime::int4,now()::abstime::int4)"
+				<< ends;
+
+#ifdef LOG_SQL
+		elog	<< "LOGIN::sqlQuery> "
+			<< updateQuery.str().c_str()
+			<< endl;
+#endif
+		status = bot->SQLDb->Exec(updateQuery.str().c_str());
+	}
+}
+/* update their details */
 theUser->setLastSeen(bot->currentTime(), theClient->getNickUserHost());
 theUser->setFlag(sqlUser::F_LOGGEDIN);
 theUser->addAuthedClient(theClient);
@@ -381,7 +417,7 @@ theQuery	<< "SELECT channel_id,flags,suspend_expires FROM "
 		<< endl;
 #endif
 
-ExecStatusType status = bot->SQLDb->Exec(theQuery.str().c_str()) ;
+status = bot->SQLDb->Exec(theQuery.str().c_str()) ;
 
 if( PGRES_TUPLES_OK != status )
 	{

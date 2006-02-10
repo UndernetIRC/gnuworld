@@ -1,4 +1,14 @@
-// $Id: ChangeLog,v 1.90 2006/01/31 00:25:12 kewlio Exp $ //
+// $Id: ChangeLog,v 1.91 2006/02/10 14:06:14 kewlio Exp $ //
+
+2006-02-10	Dan-m00 <daniel@undernet.org>
+		* mod.cservice/CHANINFOCommand.cc: Stop outputting two sets of
+			"Channels: " info for opers who 'info' themselves.
+
+		* mod.cservice/LOGINCommand.cc:
+		* mod.cservice/cservice.cc: (Bug workaround) re-create a users'
+			users_lastseen table entry if it does not exist.  This
+			resolves an issue with some entries that have no last
+			seen time.
 
 2006-01-31	Dan-m00 <daniel@undernet.org>
 		* doc/cservice.help.sql:

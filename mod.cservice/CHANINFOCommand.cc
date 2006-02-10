@@ -28,7 +28,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: CHANINFOCommand.cc,v 1.54 2005/12/01 16:38:09 kewlio Exp $
+ * $Id: CHANINFOCommand.cc,v 1.55 2006/02/10 14:06:14 kewlio Exp $
  */
 
 #include	<string>
@@ -43,7 +43,7 @@
 #include	"libpq++.h"
 #include	"cservice_config.h"
 
-const char CHANINFOCommand_cc_rcsId[] = "$Id: CHANINFOCommand.cc,v 1.54 2005/12/01 16:38:09 kewlio Exp $" ;
+const char CHANINFOCommand_cc_rcsId[] = "$Id: CHANINFOCommand.cc,v 1.55 2006/02/10 14:06:14 kewlio Exp $" ;
 
 namespace gnuworld
 {
@@ -327,7 +327,7 @@ if( string::npos == st[ 1 ].find_first_of( '#' ) )
 	 * Show the channels this guy owns to opers.
 	 */
 
-	if (theClient->isOper() && !adminAccess)
+	if (theClient->isOper() && !adminAccess && (tmpUser != theUser))
 	{
 		bot->outputChannelAccesses(theClient, theUser, tmpUser, 500);
 	}

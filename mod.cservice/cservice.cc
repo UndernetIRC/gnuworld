@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: cservice.cc,v 1.271 2006/01/09 00:32:20 kewlio Exp $
+ * $Id: cservice.cc,v 1.272 2006/02/10 14:06:14 kewlio Exp $
  */
 
 #include	<new>
@@ -2037,6 +2037,42 @@ void cservice::cacheExpireUsers()
 		 */
 		if ( tmpUser->isAuthed() && ((tmpUser->getInstantiatedTS() + 86400) < ::time(NULL))  )
 		{
+			/* check to see if we have a last seen time (bug workaround) - if not, make one */
+       
+			stringstream queryString;
+			queryString	<< "SELECT last_seen FROM users_lastseen WHERE user_id="
+					<< tmpUser->getID()
+					<< ends;
+#ifdef LOG_SQL
+			elog	<< "cservice::cacheExpireUsers::sqlQuery> "
+				<< queryString.str().c_str()
+				<< endl; 
+#endif
+
+			ExecStatusType status = SQLDb->Exec(queryString.str().c_str());
+			if (PGRES_TUPLES_OK == status)
+			{
+				if (SQLDb->Tuples() < 1)
+				{
+					/* no rows returned - create a dummy record that will be updated
+					 * by setLastSeen after this loop
+					 */
+					stringstream updateQuery;
+					updateQuery	<< "INSERT INTO users_lastseen (user_id,"
+							<< "last_seen,last_updated) VALUES("
+							<< tmpUser->getID()
+							<< ",now()::abstime::int4,now()::abstime::int4)"
+							<< ends;
+
+#ifdef LOG_SQL
+					elog	<< "cservice::cacheExpireUsers::sqlQuery> "
+						<< updateQuery.str().c_str()
+						<< endl;
+#endif
+					status = SQLDb->Exec(updateQuery.str().c_str());
+				}
+			}
+			/* update their details */
 			tmpUser->setLastSeen(currentTime());
 			tmpUser->setInstantiatedTS(::time(NULL));
 			updateCount++;
