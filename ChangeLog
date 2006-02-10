@@ -1,4 +1,12 @@
-// $Id: ChangeLog,v 1.92 2006/02/10 20:18:28 kewlio Exp $ //
+// $Id: ChangeLog,v 1.93 2006/02/10 20:29:55 kewlio Exp $ //
+
+2006-02-05	clsk <alan.alvarez@us.army.mil>
+		* mod.ccontrol/ccontrol.cc: get UplinkServer from global
+			Network instance. Data2 is not filled by AttachServer
+			and was causing this to dereference a NULL pointer.
+
+		<Dan-m00> AttachServer was sending an iClient object, instead
+			of an iServer object, which caused the invalid ref.
 
 2006-02-10	Dan-m00 <daniel@undernet.org>
 		* mod.ccontrol/ccontrol.cc:

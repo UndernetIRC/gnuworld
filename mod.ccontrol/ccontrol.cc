@@ -20,7 +20,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccontrol.cc,v 1.206 2006/02/10 20:18:28 kewlio Exp $
+ * $Id: ccontrol.cc,v 1.207 2006/02/10 20:29:55 kewlio Exp $
 */
 
 #define MAJORVER "1"
@@ -66,7 +66,7 @@
 #include	"ccontrol_generic.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: ccontrol.cc,v 1.206 2006/02/10 20:18:28 kewlio Exp $" ) ;
+RCSTAG( "$Id: ccontrol.cc,v 1.207 2006/02/10 20:29:55 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -1328,7 +1328,10 @@ switch( theEvent )
 			{
 			break;
 			}
-		iServer* UplinkServer = static_cast< iServer* >( Data2);
+		/* use Network->findServer as AttachServer sends an iClient rather
+		 * than an iServer object as Data2.  Either way should work fine.
+		 */
+		iServer* UplinkServer = Network->findServer(NewServer->getUplinkIntYY());
 		ccServer* CheckServer = getServer(NewServer->getName());
 		inBurst = true;
 		if(!CheckServer)
