@@ -20,7 +20,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccontrol.cc,v 1.205 2006/01/18 17:07:55 kewlio Exp $
+ * $Id: ccontrol.cc,v 1.206 2006/02/10 20:18:28 kewlio Exp $
 */
 
 #define MAJORVER "1"
@@ -66,7 +66,7 @@
 #include	"ccontrol_generic.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: ccontrol.cc,v 1.205 2006/01/18 17:07:55 kewlio Exp $" ) ;
+RCSTAG( "$Id: ccontrol.cc,v 1.206 2006/02/10 20:18:28 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -4454,13 +4454,14 @@ for(serversConstIterator ptr = serversMap_begin();ptr != serversMap_end();++ptr)
 void ccontrol::listBadChannels( iClient* theClient)
 {
 ccBadChannel* tempBadChan;
+Notice(theClient, "-= Bad Channels (NOMODE) List =-");
 for(badChannelsIterator ptr = badChannels_begin();ptr != badChannels_end();++ptr)
         {
         tempBadChan = ptr->second;
-        Notice(theClient,"Channel : %s - Reason : %s - AddedBy : %s",tempBadChan->getName().c_str(),
+        Notice(theClient,"Channel: %s - Reason: %s - AddedBy: %s",tempBadChan->getName().c_str(),
                 tempBadChan->getReason().c_str(),tempBadChan->getAddedBy().c_str());
         }
-
+Notice(theClient, "-= End of Bad Channels (NOMODE) List =-");
 }
 
 

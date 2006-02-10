@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: NOMODECommand.cc,v 1.6 2005/01/12 03:50:29 dan_karrels Exp $
+ * $Id: NOMODECommand.cc,v 1.7 2006/02/10 20:18:28 kewlio Exp $
  */
 
 #include	<string>
@@ -29,7 +29,7 @@
 #include	"ccBadChannel.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: NOMODECommand.cc,v 1.6 2005/01/12 03:50:29 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: NOMODECommand.cc,v 1.7 2006/02/10 20:18:28 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -81,6 +81,7 @@ if(!strcasecmp(st[1],"ADD"))
 		return false;
 		}
 	bot->addBadChannel(NewChannel);
+	bot->Notice(theClient,"NOMODE for %s added successfully.", st[2].c_str());
 	}
 else if(!strcasecmp(st[1],"REM"))
 	{
@@ -98,6 +99,7 @@ else if(!strcasecmp(st[1],"REM"))
 		return false;
 		}
 	delete OldChannel;
+	bot->Notice(theClient,"NOMODE for %s removed successfully.", st[2].c_str());
 	}
 else
 	{

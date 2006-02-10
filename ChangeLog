@@ -1,4 +1,9 @@
-// $Id: ChangeLog,v 1.91 2006/02/10 14:06:14 kewlio Exp $ //
+// $Id: ChangeLog,v 1.92 2006/02/10 20:18:28 kewlio Exp $ //
+
+2006-02-10	Dan-m00 <daniel@undernet.org>
+		* mod.ccontrol/ccontrol.cc:
+		* mod.ccontrol/NOMODECommand.cc: Actually give some output from
+			NOMODE command if the command is successful!
 
 2006-02-10	Dan-m00 <daniel@undernet.org>
 		* mod.cservice/CHANINFOCommand.cc: Stop outputting two sets of
