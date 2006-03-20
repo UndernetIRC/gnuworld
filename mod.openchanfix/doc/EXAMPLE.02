@@ -1,0 +1,40 @@
+Example:
+
+Users on #mod.Chanfix:
+
+[@Beige ] [as4 ] [cryogen ] [Garion] [sabre2th]
+[+cfgaar] [cfan] [Domilijn] [morfie] [smurf   ]
+#mod.Chanfix: Total of 10 nicks [1 ops, 1 voices, 8 normal]
+
+Beige's connection has some problems:
+
+* Beige (beige@oper.suid.sh) has quit [Connection reset by peer]
+* Beige (beige@oper.suid.sh) has joined #mod.Chanfix
+
+The situation is now like this:
+Users on #mod.Chanfix:
+
+[+cfgaar] [as4 ] [cryogen ] [Garion] [sabre2th]
+[ Beige ] [cfan] [Domilijn] [morfie] [smurf   ]
+#mod.Chanfix: Total of 10 nicks [0 ops, 1 voices, 9 normal]
+
+mod.Chanfix will detect that #mod.Chanfix has become opless. Then it will look
+in the database if there are scores known for #mod.Chanfix, and it will check
+if there are currently clients with high enough scores present in the channel.
+If that is the case, and here that certainly is, C will join the channel and op
+a few clients:
+
+* C (chanfix@open.chanfix) has joined #mod.Chanfix
+* irc.open.chanfix sets mode #mod.Chanfix: +o C
+* C sets mode #mod.Chanfix: +oooo cfgaar Beige Domilijn Garion
+* <C> 4 clients should have been opped.
+* C (chanfix@open.chanfix) has left #mod.Chanfix []
+
+After the fix, the channel looks like this:
+Users on #mod.Chanfix:
+
+[@Beige ] [@Domilijn] [as4 ] [cryogen] [sabre2th]
+[@cfgaar] [@Garion  ] [cfan] [morfie ] [smurf   ]
+#mod.Chanfix: Total of 10 nicks [4 ops, 0 voices, 6 normal]
+
+In OPLOGIC you can find out why these 4 clients have been opped and not any others.

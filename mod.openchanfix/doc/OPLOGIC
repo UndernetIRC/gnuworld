@@ -1,0 +1,75 @@
+Opping logic
+--------------------------------------------------------------------------------------
+
+* Automatic fix
+
+If a channel becomes opless, and there are scores in mod.Chanfix's database for this
+channel, mod.Chanfix will try to fix this channel. In other words, it will give ops
+to the clients it thinks deserve it the most.
+
+For each automatic opless channel fix (autofix), a time window of 60 minutes is
+reserved. During this window, mod.Chanfix will join zero or more times, opping at
+least one client each time.
+
+There are, of course, requirements to the minimum score that you need to have before
+mod.Chanfix will op you. This minimum score is determined both from the absolute
+maximum score that can be obtained, and from the maximum score available in the
+channel that is being fixed.
+
+The first time that mod.Chanfix joins, it will only op clients with:
+
+- at least 90% of channel_max_score (variable)
+- and at least 40% of max_score (default: 0.4 * 4032 = 1613)
+
+The last time that mod.Chanfix can possibly join (which is after the
+autofix_time_maximum has passed), it will only op clients with:
+
+- at least 30% of channel_max_score (variable)
+- and at least min_score (default: 0.04 * 4032 = 162)
+
+In between, mod.Chanfix will use a linear formula to determine the decrease of
+these values over time.
+
+Channel #a has a maximum score of 2400. The last opped client leaves.
+
+When mod.Chanfix first joins, only clients with at least 0.9 * 2400 = 2160 and
+at least 0.4 * 4032 = 1613 will be opped, so only clients with more than 2159
+points will be opped.
+
+If mod.Chanfix would join a last time at the end of the 60 minutes, it would op
+clients with at least 0.33 * 2400 = 800 points. Lower scores will never be opped.
+
+When mod.Chanfix joins after 20 minutes (which is 1/3rd of the total window for
+fixing), it will only op clients with
+
+at least 2160 - 0.33 * (0.9-0.3) * 2160 = 1728
+and at least 1613 - 0.33 * (1613-100) = 1109
+points, i.e. at least 1728 points.
+
+* Determining the end of a fix
+
+As soon as autofix_num_opped clients are opped in the channel, either by mod.Chanfix
+or by the clients which were opped earlier, the fix is considered complete.
+
+If the channel has fewer than autofix_num_opped clients, then the fix is considered 
+complete as soon as all clients are opped.
+
+As soon as mod.Chanfix can see that there is at least 1 opped client and no more 
+clients have a score that is high enough to get opped, the fix is considered complete.
+
+Under no circumstances will mod.Chanfix give ops if that would result in having
+more than autofix_num_opped opped clients (mod.Chanfix itself excluded).
+
+Under no circumstances will mod.Chanfix give ops to any client with a score lower than
+min_score.
+
+Under no circumstances will mod.Chanfix give ops to any client with a score lower than
+0.3 * channel_max_score.
+
+* Manual fix
+
+Now, for a manual mod.Chanfix the procedure is as follows:
+
+- First, C joins with TS-1 and removes all modes and bans.
+- Then, C waits chanfix_initial_interval minutes.
+- After that, autofixing starts with exactly the same algorithms as described above.

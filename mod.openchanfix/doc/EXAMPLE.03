@@ -1,0 +1,77 @@
+Example:
+
+Someone has taken over #mod.Chanfix, set it invite-only and kicked and banned
+almost all the regulars. The situation:
+
+Users on #mod.Chanfix:
+[@IHateC ] [@takebot2] [as4     ] [henkje]
+[@takebot] [@v       ] [Domilijn] [p33n  ]
+#mod.Chanfix: Total of 8 nicks [4 ops, 0 voices, 4 normal]
+
+The modes on the channel are as follows:
+
++iknmst closed
++b *!chanfix@open.chanfix
++b *!beige@oper.suid.sh
++b *!garion@*
+
+Asking mod.Chanfix about the scores gives the following result:
+
+<Garion> score #mod.Chanfix
+<C> Top 10 scores for channel "#mod.Chanfix" in the database:
+<C> 3651, 3548, 3498, 3289, 3176, 3006, 1252, 7, 6, 6.
+<C> Top 10 scores for ops in channel "#mod.Chanfix" in the database:
+<C> 7, 6, 6, 3.
+<C> Top 10 scores for non-ops in channel "#mod.Chanfix" in the database:
+<C> 3498.
+
+From these scores, it is clear that the channel has been taken over. Nobody
+with high scores is currently opped. So, time for a manual chanfix:
+
+<Garion> chanfix #mod.Chanfix
+<C> Manual chanfix acknowledged for channel "#mod.Chanfix".
+
+This manual chanfix occurs in two stages. First, all modes of the channel are
+cleared:
+
+* TS for #mod.Chanfix changed from 1029226431 to 1029226430
+* irc.open.chanfix sets mode #mod.Chanfix: -ik
+* irc.open.chanfix sets mode #mod.Chanfix: -oooo IHateC takebot takebot2 v
+* C (chanfix@open.chanfix) has joined #mod.Chanfix
+* irc.open.chanfix sets mode #mod.Chanfix: +o C
+<C> Channel fix in progress, please stand by.
+* C sets mode #mod.Chanfix: -bbb *!chanfix@open.chanfix *!beige@oper.suid.sh
+*!garion@*
+* C (chanfix@open.chanfix) has left #mod.Chanfix
+
+The channel is clear and open again:
+
+Users on #mod.Chanfix:
+[as4     ] [henkje] [p33n   ] [takebot2]
+[Domilijn] [IHateC] [takebot] [v       ]
+#mod.Chanfix: Total of 8 nicks [0 ops, 0 voices, 8 normal]
+
+Now, mod.Chanfix will wait a while to allow the channel regulars to rejoin the
+channel:
+
+* Beige (beige@oper.suid.sh) has joined #mod.Chanfix
+* Garion (garion@hub.nl) has joined #mod.Chanfix
+* cfgaar (garion@open.chanfix) has joined #mod.Chanfix
+* cryogen (~cryogen@bin.bash.sh) has joined #mod.Chanfix
+* sabre2th (sabre2th@feed.your.supermind) has joined #mod.Chanfix
+* henkje (henk@i.aml33t.cx) has parted #mod.Chanfix
+And after that pause, C will enter to give ops to the people who deserve it:
+* C (chanfix@open.chanfix) has joined #mod.Chanfix
+* irc.open.chanfix sets mode #mod.Chanfix: +o C
+* C sets mode #mod.Chanfix: +oooo cfgaar Beige Domilijn Garion
+* <C> 4 clients should have been opped.
+* C (chanfix@open.chanfix) has left #mod.Chanfix []
+
+This leaves the channel in the following state:
+
+Users on #mod.Chanfix:
+[@Beige ] [@Domilijn] [as4    ] [IHateC] [sabre2th] [takebot2]
+[@cfgaar] [@Garion  ] [cryogen] [p33n  ] [takebot ] [v       ]
+#mod.Chanfix: Total of 12 nicks [4 ops, 0 voices, 8 normal]
+
+Back with its rightful owners.

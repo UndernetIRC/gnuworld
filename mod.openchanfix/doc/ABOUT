@@ -1,0 +1,48 @@
+Introduction
+--------------------------------------------------------------------------------------
+
+* What is mod.Chanfix exactly?
+
+mod.ChanFix is an open source port of OpenChanfix for IRCu 2.10.11.X+ oompatible networks.
+Designed as a module for GNUWorld. The service creates a continuous dynamic database of
+channel operators, automatically reopping channels which lose channel ops. Furthermore,
+the service can be manually invoked by mod.Chanfix administrators to reverse recent
+channel takeovers.
+
+By default, mod.Chanfix observes channels with at least 4 clients, and retains channel
+op score records for 2 weeks.
+
+* How does it keep track of which people have been opped?
+
+mod.Chanfix makes a temporary list of all unique AC accounts in a given channel.
+Thereafter, the account is registered in the database as channel operators. For every
+scored round, a given account will receive one point. Channel ops are scored whenever
+the IRC network is judged to be intact (i.e. not split), and by default every channel
+is scored once every 5 minutes. Thus, assuming no large network splits, a given account
+can achieve a maximum of 288 points per 24 hour period.
+
+* When does mod.Chanfix take action?
+
+There are two cases in which mod.Chanfix will take action.
+
+The first is whenever a channel with scores in the database becomes opless. mod.Chanfix
+will look at the scores in the database and match those against the clients currently
+present on the channel, and give ops to the clients with the highest scores.
+
+This is called an automatic fix; whenever a channel becomes opless, mod.Chanfix will
+attempt to fix it automatically.
+
+The second is when a channel has been taken over. An IRC Operator with an account on
+mod.Chanfix with the right flag can issue a manual fix. If this is issued, all clients
+on the channel are deopped, and mod.Chanfix  will join the channel and remove all bans
+and modes. This allows the channel regulars to rejoin the channel. Then, after a short
+while, mod.Chanfix will join the channel again and will reop the channel using the same
+autofix logic.
+
+For more information about the exact algorithm used, see the opping logic section.
+
+* How does one interface with mod.Chanfix?
+
+When loading the mod.Chanfix module into your GNUWorld, a client is connected. By default,
+its nickname is C. All oper <-> mod.Chanfix interaction goes via NOTICE to C, this can be
+changed to PRIVMSG's if desired.
