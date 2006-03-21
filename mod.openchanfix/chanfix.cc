@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: chanfix.cc,v 1.1 2006/03/15 02:50:37 buzlip01 Exp $
+ * $Id: chanfix.cc,v 1.2 2006/03/21 22:49:14 buzlip01 Exp $
  */
 
 #include	<cstdarg>
@@ -36,7 +36,6 @@
 #include	<string>
 #include	<utility>
 #include	<vector>
-#include	<boost/thread/thread.hpp>
 
 #include	"libpq++.h"
 
@@ -56,7 +55,11 @@
 #include	"sqlChannel.h"
 #include	"sqlUser.h"
 
-RCSTAG("$Id: chanfix.cc,v 1.1 2006/03/15 02:50:37 buzlip01 Exp $");
+#ifdef CHANFIX_HAVE_BOOST_THREAD
+#include	<boost/thread/thread.hpp>
+#endif /* CHANFIX_HAVE_BOOST_THREAD */
+
+RCSTAG("$Id: chanfix.cc,v 1.2 2006/03/21 22:49:14 buzlip01 Exp $");
 
 namespace gnuworld
 {
@@ -394,6 +397,12 @@ commandMap.erase( ptr ) ;
 return true ;
 }
 
+/* OnShutdown */
+void chanfix::OnShutdown(const std::string& reason)
+{
+MyUplink->UnloadClient(this, reason);
+}
+
 /* OnAttach */
 void chanfix::OnAttach()
 {
@@ -431,6 +440,7 @@ xClient::OnAttach() ;
 /**
  * Thread class only used for score updates, updates on reload and shutdown are not threaded
  */
+#ifdef CHANFIX_HAVE_BOOST_THREAD
 class ClassUpdateDB {
   public:
     ClassUpdateDB(chanfix& cf) : cf_(cf) {}
@@ -442,6 +452,7 @@ class ClassUpdateDB {
 private:
         chanfix& cf_;
 };
+#endif /* CHANFIX_HAVE_BOOST_THREAD */
 
 /* OnTimer */
 void chanfix::OnTimer(const gnuworld::xServer::timerID& theTimer, void*)
@@ -497,6 +508,9 @@ else if (theTimer == tidUpdateDB) {
 /* OnDetach */
 void chanfix::OnDetach( const std::string& reason )
 {
+/* Save our database */
+prepareUpdate(false);
+
 /* Delete our config */
 delete chanfixConfig; chanfixConfig = 0;
 
@@ -1747,17 +1761,29 @@ if (numClientsToOp + currentOps >= netChan->size() ||
 return false;
 }
 
-
-chanfix::acctListType chanfix::findAccount(Channel* theChan, const std::string& Account)
+chanfix::acctListType chanfix::findAccount(Channel* theChan, const std::string& account)
 {
 acctListType chanAccts;
 for (Channel::userIterator ptr = theChan->userList_begin();
      ptr != theChan->userList_end(); ptr++) {
-  if (Account == ptr->second->getClient()->getAccount())
+  if (account == ptr->second->getClient()->getAccount())
     chanAccts.push_back(ptr->second->getClient());
 }
 
 return chanAccts;
+}
+
+bool chanfix::accountIsOnChan(const std::string& channel, const std::string& account)
+{
+Channel* tmpChan = Network->findChannel(channel);
+if (!tmpChan) return false;
+
+for (Channel::userIterator ptr = tmpChan->userList_begin();
+     ptr != tmpChan->userList_end(); ptr++) {
+  if (account == ptr->second->getClient()->getAccount())
+    return true;
+}
+return false;
 }
 
 sqlChannel* chanfix::getChannelRecord(const std::string& Channel)
@@ -1793,17 +1819,6 @@ return newChan;
 sqlChannel* chanfix::newChannelRecord(Channel* theChan)
 {
 return newChannelRecord(theChan->getName());
-}
-
-bool chanfix::accountIsOnChan(const std::string& theChan, const std::string& Account)
-{
-Channel* tmpChan = Network->findChannel(theChan);
-if (!tmpChan) return false;
-for (Channel::userIterator ptr = tmpChan->userList_begin();
-     ptr != tmpChan->userList_end(); ptr++) {
-  if (Account == ptr->second->getClient()->getAccount()) return true;
-}
-return false;
 }
 
 bool chanfix::deleteChannelRecord(sqlChannel* sqlChan)
@@ -2065,7 +2080,11 @@ elog	<< "chanfix::startTimers> Started all timers."
 /**
  * prepareUpdate - Copies the sqlChanOp map to a temporary multimap
  */
+#ifdef CHANFIX_HAVE_BOOST_THREAD
 void chanfix::prepareUpdate(bool threaded)
+#else
+void chanfix::prepareUpdate(bool)
+#endif /* CHANFIX_HAVE_BOOST_THREAD */ 
 {
   if (updateInProgress) {
     elog	<< "*** [chanfix::prepareUpdate] Update already in progress; not starting."
@@ -2074,7 +2093,11 @@ void chanfix::prepareUpdate(bool threaded)
   }
 
   elog	<< "*** [chanfix::prepareUpdate] Updating the SQL database "
+#ifdef CHANFIX_HAVE_BOOST_THREAD
 	<< (threaded ? "(threaded)." : "(unthreaded).")
+#else
+	<< "(unthreaded [no boost])."
+#endif /* CHANFIX_HAVE_BOOST_THREAD */
 	<< std::endl;
   logDebugMessage("Starting to update the SQL database.");
 
@@ -2121,13 +2144,14 @@ void chanfix::prepareUpdate(bool threaded)
 
   logDebugMessage("Created snapshot map in %u ms.",
 		  snapShotTimer.stopTimeMS());
-  
+
+#ifdef CHANFIX_HAVE_BOOST_THREAD
   if (threaded) {
     ClassUpdateDB updateDB(*this);
     boost::thread pthrd(updateDB);
-  } else {
+  } else
+#endif /* CHANFIX_HAVE_BOOST_THREAD */
     updateDB();
-  }
 
   return;
 }

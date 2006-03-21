@@ -16,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: chanfix.h,v 1.1 2006/03/15 02:50:37 buzlip01 Exp $
+ * $Id: chanfix.h,v 1.2 2006/03/21 22:49:14 buzlip01 Exp $
  */
 
 #ifndef __CHANFIX_H
-#define __CHANFIX_H "$Id: chanfix.h,v 1.1 2006/03/15 02:50:37 buzlip01 Exp $"
+#define __CHANFIX_H "$Id: chanfix.h,v 1.2 2006/03/21 22:49:14 buzlip01 Exp $"
 
 #include	<string>
 #include	<vector>
@@ -384,6 +384,7 @@ public:
 	unsigned int	numTopScores;
 	unsigned int	minClients;
 	bool		clientNeedsIdent;
+	bool		allowNonOpers;
 	unsigned int	connectCheckFreq;
 	std::string	adminLogFile;
 	std::string	debugLogFile;
@@ -442,6 +443,7 @@ public:
 	 */
 	bool doAutoFix() { return enableAutoFix; }
 	bool doChanFix() { return enableChanFix; }
+	bool needOper() { return allowNonOpers; }
 	bool doChanBlocking() { return enableChannelBlocking; }
 	STATE getState() { return currentState; }
 	bool isChanServLinked() { return chanServLinked; }

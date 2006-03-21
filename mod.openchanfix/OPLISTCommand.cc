@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: OPLISTCommand.cc,v 1.1 2006/03/15 02:50:37 buzlip01 Exp $
+ * $Id: OPLISTCommand.cc,v 1.2 2006/03/21 22:49:14 buzlip01 Exp $
  */
 
 #include "gnuworld_config.h"
@@ -33,7 +33,7 @@
 #include "sqlChannel.h"
 #include "sqlChanOp.h"
 
-RCSTAG("$Id: OPLISTCommand.cc,v 1.1 2006/03/15 02:50:37 buzlip01 Exp $");
+RCSTAG("$Id: OPLISTCommand.cc,v 1.2 2006/03/21 22:49:14 buzlip01 Exp $");
 
 namespace gnuworld
 {
@@ -112,13 +112,6 @@ for (chanfix::chanOpsType::iterator opPtr = myOps.begin();
 		curOp->getPoints(), curOp->getAccount().c_str(),
 		firstop.c_str(), lastop.c_str());
 }
-
-/* Log command */
-bot->logAdminMessage("%s (%s) has requested OPLIST%s for %s",
-		     theUser ? theUser->getUserName().c_str() : "[NOT-LOGGED-IN]",
-		     theClient->getRealNickUserHost().c_str(),
-		     (all ? " (all)" : ""),
-		     st[1].c_str());
 
 return;
 }

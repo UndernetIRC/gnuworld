@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-# "$Id: Makefile.am,v 1.1 2006/03/15 02:50:37 buzlip01 Exp $"
+# "$Id: Makefile.am,v 1.2 2006/03/21 22:49:14 buzlip01 Exp $"
 
 lib_LTLIBRARIES = libchanfix.la
 
@@ -50,7 +50,7 @@ libchanfix_la_CXXFLAGS = -I$(PGSQL_INCLUDE) -I${top_srcdir}/include \
 	$(threadLib)
 
 libchanfix_la_LDFLAGS = -module -export-dynamic -L@PGSQL_LIB@ -lpq++ \
-	-l@BOOST_THREAD_LIB@
+	@BOOST_THREAD_LIB@
 
 EXTRA_DIST = chanfix.h \
 	chanfix.example.conf.in \

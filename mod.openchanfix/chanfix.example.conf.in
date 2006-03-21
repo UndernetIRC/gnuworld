@@ -1,4 +1,4 @@
-# $Id: chanfix.example.conf.in,v 1.1 2006/03/15 02:50:37 buzlip01 Exp $
+# $Id: chanfix.example.conf.in,v 1.2 2006/03/21 22:49:14 buzlip01 Exp $
 # chanfix configuration file
 
 # ---------------------------------------------------------------------
@@ -116,6 +116,10 @@ adminLogFile = chanfix-admin.log
 
 # File where all debug information sent to backchan is logged and saved
 debugLogFile = chanfix-debug.log
+
+# Should people that are not opers have the possibility of using the
+# chanfix service?
+allowNonOpers = true
 
 # End of config file.
 # ---------------------------------------------------------------------
