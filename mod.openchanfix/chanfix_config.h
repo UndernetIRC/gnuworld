@@ -16,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
  * USA.
  *
- * $Id: chanfix_config.h,v 1.2 2006/03/21 22:49:14 buzlip01 Exp $
+ * $Id: chanfix_config.h,v 1.3 2006/03/21 23:12:37 buzlip01 Exp $
  */
 
 #ifndef __CHANFIX_CONFIG_H
-#define __CHANFIX_CONFIG_H "$Id: chanfix_config.h,v 1.2 2006/03/21 22:49:14 buzlip01 Exp $"
+#define __CHANFIX_CONFIG_H "$Id: chanfix_config.h,v 1.3 2006/03/21 23:12:37 buzlip01 Exp $"
 
 /**
  * Defines that deal with fixing channels, both manually and
@@ -41,11 +41,6 @@
  * The max number of clients opped by chanfix during an autofix.
  */
 #define AUTOFIX_NUM_OPPED	5
-
-/**
- * Should we allow locops to use the service (define if so)
- */
-#undef CHANFIX_ALLOW_LOCOPS
 
 /**
  * The time to wait between the removal of modes and the first

@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: CHANFIXCommand.cc,v 1.1 2006/03/15 02:50:37 buzlip01 Exp $
+ * $Id: CHANFIXCommand.cc,v 1.2 2006/03/21 23:12:37 buzlip01 Exp $
  */
 
 #include "gnuworld_config.h"
@@ -31,7 +31,7 @@
 #include "responses.h"
 #include "StringTokenizer.h"
 
-RCSTAG("$Id: CHANFIXCommand.cc,v 1.1 2006/03/15 02:50:37 buzlip01 Exp $");
+RCSTAG("$Id: CHANFIXCommand.cc,v 1.2 2006/03/21 23:12:37 buzlip01 Exp $");
 
 namespace gnuworld
 {

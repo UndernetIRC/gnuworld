@@ -3,7 +3,7 @@
 -- Language: English (1)
 -- Author: evilnet development <http://evilnet.sourceforge.net>
 --
--- $Id: chanfix.language.english.sql,v 1.1 2006/03/20 02:07:43 buzlip01 Exp $
+-- $Id: chanfix.language.english.sql,v 1.2 2006/03/21 23:12:38 buzlip01 Exp $
 
 			
 DELETE FROM translations;
@@ -54,7 +54,7 @@ COPY "translations" FROM stdin;
 1	43	You cannot remove a serveradmin flag.	31337	0
 1	44	User %s does not have flag '%c'.	31337	0
 1	45	Deleted flag '%c' from user %s.	31337	0
-1	46	You cannot delete a host on a user in a different group.	31337	0
+1	46	You cannot delete a host from a user in a different group.	31337	0
 1	47	User %s doesn't have hostmask %s.	31337	0
 1	48	Failed deleting hostmask %s from user %s.	31337	0
 1	49	Deleted hostmask %s from user %s.	31337	0
@@ -66,8 +66,8 @@ COPY "translations" FROM stdin;
 1	55	Note #%d for channel %s was not added by you. You can only delete notes that you added.	31337	0
 1	56	Note #%d for channel %s is not a manually added note. You can only delete notes that were manually added.	31337	0
 1	57	Note #%d for channel %s deleted.	31337	0
-1	58	You cannot delete an owner.	31337	0
-1	59	You cannot delete a user manager.	31337	0
+1	58	You cannot delete an owner unless you're an owner.	31337	0
+1	59	You cannot delete a user manager unless you're an owner.	31337	0
 1	60	You cannot delete a user in a different group.	31337	0
 1	61	Deleted user %s.	31337	0
 1	62	Error deleting user %s.	31337	0
@@ -184,4 +184,12 @@ COPY "translations" FROM stdin;
 1	177	Last used the service: Never	31337	0
 1	178	WARNING: Channel %s is being manually fixed; aborting fix as per BLOCK.	31337	0
 1	179	WARNING: Channel %s is being automatically fixed; aborting fix as per BLOCK.	31337	0
+1	180	You cannot suspend an owner unless you're an owner.	31337	0
+1	181	You cannot suspend a user manager unless you're an owner.	31337	0
+1	182	You cannot unsuspend an owner unless you're an owner.	31337	0
+1	183	You cannot unsuspend a user manager unless you're an owner.	31337	0
+1	184	You cannot delete a host from an owner unless you're an owner.	31337	0
+1	185	You cannot delete a host from a user manager unless you're an owner.	31337	0
+1	186	You cannot add a host to an owner unless you're an owner.	31337	0
+1	187	You cannot add a host to a user manager unless you're an owner.	31337	0
 \.

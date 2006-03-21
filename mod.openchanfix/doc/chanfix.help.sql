@@ -1,6 +1,6 @@
 -- Help information.
 --
--- $Id: chanfix.help.sql,v 1.1 2006/03/20 02:07:43 buzlip01 Exp $
+-- $Id: chanfix.help.sql,v 1.2 2006/03/21 23:12:38 buzlip01 Exp $
 
 DELETE FROM help;
 

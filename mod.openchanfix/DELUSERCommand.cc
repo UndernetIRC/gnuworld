@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: DELUSERCommand.cc,v 1.1 2006/03/15 02:50:37 buzlip01 Exp $
+ * $Id: DELUSERCommand.cc,v 1.2 2006/03/21 23:12:37 buzlip01 Exp $
  */
 
 #include "gnuworld_config.h"
@@ -31,7 +31,7 @@
 #include "StringTokenizer.h"
 #include "sqlUser.h"
 
-RCSTAG("$Id: DELUSERCommand.cc,v 1.1 2006/03/15 02:50:37 buzlip01 Exp $");
+RCSTAG("$Id: DELUSERCommand.cc,v 1.2 2006/03/21 23:12:37 buzlip01 Exp $");
 
 namespace gnuworld
 {
@@ -43,25 +43,27 @@ StringTokenizer st(Message);
 sqlUser* targetUser = bot->isAuthed(st[1]);
 if (!targetUser) {
   bot->SendTo(theClient,
-              bot->getResponse(theUser,
-                              language::no_such_user,
-                              std::string("No such user %s.")).c_str(), st[1].c_str());
+	      bot->getResponse(theUser,
+			language::no_such_user,
+			std::string("No such user %s.")).c_str(), st[1].c_str());
   return;
 }
 
-if (targetUser->getFlag(sqlUser::F_OWNER)) {
+/* Can't delete an owner unless you're an owner. */
+if (targetUser->getFlag(sqlUser::F_OWNER) && !theUser->getFlag(sqlUser::F_OWNER)) {
   bot->SendTo(theClient,
-              bot->getResponse(theUser,
-                              language::cant_delete_an_owner,
-                              std::string("You cannot delete an owner.")).c_str());
+	      bot->getResponse(theUser,
+			language::cant_delete_an_owner,
+			std::string("You cannot delete an owner unless you're an owner.")).c_str());
   return;
 }
 
+/* Can only delete a user manager if you're an owner. */
 if (targetUser->getFlag(sqlUser::F_USERMANAGER) && !theUser->getFlag(sqlUser::F_OWNER)) {
   bot->SendTo(theClient,
-              bot->getResponse(theUser,
-                              language::cant_delete_manager,
-                              std::string("You cannot delete a user manager.")).c_str());
+	      bot->getResponse(theUser,
+			language::cant_delete_manager,
+			std::string("You cannot delete a user manager unless you're an owner.")).c_str());
   return;
 }
 
@@ -70,9 +72,9 @@ if (theUser->getFlag(sqlUser::F_SERVERADMIN) &&
     !theUser->getFlag(sqlUser::F_USERMANAGER)) {
   if (targetUser->getGroup() != theUser->getGroup()) {
     bot->SendTo(theClient,
-                bot->getResponse(theUser,
-                                language::cant_delete_from_diff_group,
-                                std::string("You cannot delete a user in a different group.")).c_str());
+		bot->getResponse(theUser,
+			language::cant_delete_from_diff_group,
+			std::string("You cannot delete a user in a different group.")).c_str());
     return;
   }
 }

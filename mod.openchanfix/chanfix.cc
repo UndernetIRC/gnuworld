@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: chanfix.cc,v 1.2 2006/03/21 22:49:14 buzlip01 Exp $
+ * $Id: chanfix.cc,v 1.3 2006/03/21 23:12:37 buzlip01 Exp $
  */
 
 #include	<cstdarg>
@@ -59,7 +59,7 @@
 #include	<boost/thread/thread.hpp>
 #endif /* CHANFIX_HAVE_BOOST_THREAD */
 
-RCSTAG("$Id: chanfix.cc,v 1.2 2006/03/21 22:49:14 buzlip01 Exp $");
+RCSTAG("$Id: chanfix.cc,v 1.3 2006/03/21 23:12:37 buzlip01 Exp $");
 
 namespace gnuworld
 {

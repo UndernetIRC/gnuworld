@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
  * USA.
  *
- * $Id: SHUTDOWNCommand.cc,v 1.1 2006/03/15 02:50:37 buzlip01 Exp $
+ * $Id: SHUTDOWNCommand.cc,v 1.2 2006/03/21 23:12:37 buzlip01 Exp $
  */
 
 #include	<string>
@@ -32,7 +32,7 @@
 #include	"chanfix.h"
 #include	"responses.h"
 
-RCSTAG("$Id: SHUTDOWNCommand.cc,v 1.1 2006/03/15 02:50:37 buzlip01 Exp $");
+RCSTAG("$Id: SHUTDOWNCommand.cc,v 1.2 2006/03/21 23:12:37 buzlip01 Exp $");
 
 namespace gnuworld
 {
@@ -57,16 +57,10 @@ bot->logDebugMessage("%s (%s) is shutting me down.",
 		     theUser->getUserName().c_str(),
 		     theClient->getRealNickUserHost().c_str());
 
-/* Let's save our chanops database. */
-bot->prepareUpdate(false);
-
-if (st.size() < 2) {
-  server->UnloadClient(bot, "Quit");
+if (st.size() < 2)
   server->Shutdown();
-} else {
-  server->UnloadClient(bot, st.assemble(1));
+else
   server->Shutdown( st.assemble(1) );
-}
 
 return;
 }

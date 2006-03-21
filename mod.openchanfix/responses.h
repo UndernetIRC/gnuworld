@@ -16,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: responses.h,v 1.1 2006/03/15 02:50:37 buzlip01 Exp $
+ * $Id: responses.h,v 1.2 2006/03/21 23:12:37 buzlip01 Exp $
  */
 
 #ifndef __RESPONSES_H
-#define __RESPONSES_H "$Id: responses.h,v 1.1 2006/03/15 02:50:37 buzlip01 Exp $"
+#define __RESPONSES_H "$Id: responses.h,v 1.2 2006/03/21 23:12:37 buzlip01 Exp $"
 
 namespace gnuworld
 	{
@@ -39,6 +39,8 @@ namespace gnuworld
 		const int norm_user_add_owner_only	= 155;
 
 		/* ADDHOST */
+		const int cant_add_host_an_owner	= 186;
+		const int cant_add_host_manager		= 187;
 		const int cant_add_host_diff_group	= 10;
 		const int already_has_hostmask		= 11;
 		const int failed_adding_hostmask	= 12;
@@ -94,6 +96,8 @@ namespace gnuworld
 		const int only_owner_del_norm_flag	= 156;
 
 		/* DELHOST */
+		const int cant_del_host_an_owner	= 184;
+		const int cant_del_host_manager		= 185;
 		const int cant_del_host_diff_group	= 46;
 		const int user_doesnt_have_host		= 47;
 		const int failed_deleting_host		= 48;
@@ -211,6 +215,8 @@ namespace gnuworld
 		const int status_total_channels_with_extra	= 175;
 
 		/* SUSPEND */
+		const int cant_suspend_an_owner		= 180;
+		const int cant_suspend_manager		= 181;
 		const int cant_suspend_diff_group	= 118;
 		const int user_already_suspended	= 119;
 		const int user_suspended		= 120;
@@ -225,6 +231,8 @@ namespace gnuworld
 		const int channel_unblocked		= 124;
 
 		/* UNSUSPEND */
+		const int cant_unsuspend_an_owner	= 182;
+		const int cant_unsuspend_manager	= 183;
 		const int cant_unsuspend_diff_group	= 125;
 		const int user_not_suspended		= 126;
 		const int user_unsuspended		= 127;

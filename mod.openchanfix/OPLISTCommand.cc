@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: OPLISTCommand.cc,v 1.2 2006/03/21 22:49:14 buzlip01 Exp $
+ * $Id: OPLISTCommand.cc,v 1.3 2006/03/21 23:12:37 buzlip01 Exp $
  */
 
 #include "gnuworld_config.h"
@@ -33,7 +33,7 @@
 #include "sqlChannel.h"
 #include "sqlChanOp.h"
 
-RCSTAG("$Id: OPLISTCommand.cc,v 1.2 2006/03/21 22:49:14 buzlip01 Exp $");
+RCSTAG("$Id: OPLISTCommand.cc,v 1.3 2006/03/21 23:12:37 buzlip01 Exp $");
 
 namespace gnuworld
 {
@@ -95,6 +95,7 @@ bot->SendTo(theClient,
                             std::string("Rank Score Account -- Time first opped / Time last opped")).c_str());
 
 unsigned int opCount = 0;
+bool inChan = false;
 std::string firstop;
 std::string lastop;
 for (chanfix::chanOpsType::iterator opPtr = myOps.begin();
@@ -103,14 +104,11 @@ for (chanfix::chanOpsType::iterator opPtr = myOps.begin();
   opCount++;
   firstop = bot->tsToDateTime(curOp->getTimeFirstOpped(), false);
   lastop = bot->tsToDateTime(curOp->getTimeLastOpped(), true);
-  if (bot->accountIsOnChan(st[1],curOp->getAccount()))
-    bot->SendTo(theClient, "%3d. \002%4d  %s -- %s / %s\002", opCount,
-		curOp->getPoints(), curOp->getAccount().c_str(),
-		firstop.c_str(), lastop.c_str());
-  else
-    bot->SendTo(theClient, "%3d. %4d  %s -- %s / %s", opCount,
-		curOp->getPoints(), curOp->getAccount().c_str(),
-		firstop.c_str(), lastop.c_str());
+  inChan = bot->accountIsOnChan(st[1], curOp->getAccount());
+  bot->SendTo(theClient, "%3d. %s%4d  %s -- %s / %s%s", opCount,
+	      inChan ? "\002" : "", curOp->getPoints(),
+	      curOp->getAccount().c_str(), firstop.c_str(),
+	      lastop.c_str(), inChan ? "\002" : "");
 }
 
 return;

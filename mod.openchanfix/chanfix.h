@@ -16,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: chanfix.h,v 1.2 2006/03/21 22:49:14 buzlip01 Exp $
+ * $Id: chanfix.h,v 1.3 2006/03/21 23:12:37 buzlip01 Exp $
  */
 
 #ifndef __CHANFIX_H
-#define __CHANFIX_H "$Id: chanfix.h,v 1.2 2006/03/21 22:49:14 buzlip01 Exp $"
+#define __CHANFIX_H "$Id: chanfix.h,v 1.3 2006/03/21 23:12:37 buzlip01 Exp $"
 
 #include	<string>
 #include	<vector>
@@ -93,6 +93,18 @@ public:
 	 * the xServer of the channels this client wishes to burst.
 	 */
 	virtual void BurstChannels() ;
+
+	/**
+	 * This method is invoked when the server has been requested
+	 * to shutdown.  If currently connected to the network, this
+	 * method gives xClient's a chance to gracefully QUIT from
+	 * the network, or whatever other processing is useful.
+	 * To force data to be written before final shutdown (again,
+	 * if connected), set xServer::FlushData().
+	 * Timers will be executed after this method is invoked, once,
+	 * depending upon target time of course :)
+	 */
+	virtual void OnShutdown( const std::string& reason ) ;
 
 	/**
 	 * This method is invoked when this module is first loaded.
@@ -209,6 +221,8 @@ public:
 
 	bool fixChan(sqlChannel*, bool);
 
+	bool accountIsOnChan(const std::string&, const std::string&);
+
 	sqlChannel* getChannelRecord(const std::string&);
 	sqlChannel* getChannelRecord(Channel*);
 
@@ -220,8 +234,6 @@ public:
 	static size_t countChanOps(const Channel*);
 
 	bool needsModesRemoved(Channel*);
-	
-	bool accountIsOnChan(const std::string&, const std::string&);
 
 	bool canScoreChan(Channel*);
 
@@ -384,7 +396,6 @@ public:
 	unsigned int	numTopScores;
 	unsigned int	minClients;
 	bool		clientNeedsIdent;
-	bool		allowNonOpers;
 	unsigned int	connectCheckFreq;
 	std::string	adminLogFile;
 	std::string	debugLogFile;
@@ -443,7 +454,6 @@ public:
 	 */
 	bool doAutoFix() { return enableAutoFix; }
 	bool doChanFix() { return enableChanFix; }
-	bool needOper() { return allowNonOpers; }
 	bool doChanBlocking() { return enableChannelBlocking; }
 	STATE getState() { return currentState; }
 	bool isChanServLinked() { return chanServLinked; }

@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: SUSPENDCommand.cc,v 1.1 2006/03/15 02:50:37 buzlip01 Exp $
+ * $Id: SUSPENDCommand.cc,v 1.2 2006/03/21 23:12:37 buzlip01 Exp $
  */
 
 #include "gnuworld_config.h"
@@ -31,7 +31,7 @@
 #include "StringTokenizer.h"
 #include "sqlUser.h"
 
-RCSTAG("$Id: SUSPENDCommand.cc,v 1.1 2006/03/15 02:50:37 buzlip01 Exp $");
+RCSTAG("$Id: SUSPENDCommand.cc,v 1.2 2006/03/21 23:12:37 buzlip01 Exp $");
 
 namespace gnuworld
 {
@@ -49,33 +49,51 @@ if (!targetUser) {
   return;
 }
 
-/* TODO: This needs a language reply. */
 if (theUser == targetUser) {
   bot->SendTo(theClient,
-              bot->getResponse(theUser,
-                              language::user_cant_suspend_self,
-                              std::string("Suspending yourself is not a very wise thing to do.")).c_str());
+	      bot->getResponse(theUser,
+			language::user_cant_suspend_self,
+			std::string("Suspending yourself is not a very wise thing to do.")).c_str());
   return;
 }
+
+/* Can't suspend an owner unless you're an owner. */
+if (targetUser->getFlag(sqlUser::F_OWNER) && !theUser->getFlag(sqlUser::F_OWNER)) {
+  bot->SendTo(theClient,
+	      bot->getResponse(theUser,
+			language::cant_suspend_an_owner,
+			std::string("You cannot suspend an owner unless you're an owner.")).c_str());
+  return;
+}
+
+/* Can only suspend a user manager if you're an owner. */
+if (targetUser->getFlag(sqlUser::F_USERMANAGER) && !theUser->getFlag(sqlUser::F_OWNER)) {
+  bot->SendTo(theClient,
+	      bot->getResponse(theUser,
+			language::cant_suspend_manager,
+			std::string("You cannot suspend a user manager unless you're an owner.")).c_str());
+  return;
+}
+
 
 /* A serveradmin can only suspend users in his/her own group. */
 if (theUser->getFlag(sqlUser::F_SERVERADMIN) &&
     !theUser->getFlag(sqlUser::F_USERMANAGER)) {
   if (targetUser->getGroup() != theUser->getGroup()) {
     bot->SendTo(theClient,
-                bot->getResponse(theUser,
-                                language::cant_suspend_diff_group,
-                                std::string("You cannot suspend a user in a different group.")).c_str());
+		bot->getResponse(theUser,
+			language::cant_suspend_diff_group,
+			std::string("You cannot suspend a user in a different group.")).c_str());
     return;
   }
 }
 
 if (targetUser->getIsSuspended()) {
   bot->SendTo(theClient,
-              bot->getResponse(theUser,
-                              language::user_already_suspended,
-                              std::string("User %s is already suspended.")).c_str(),
-                                          targetUser->getUserName().c_str());
+	      bot->getResponse(theUser,
+			language::user_already_suspended,
+			std::string("User %s is already suspended.")).c_str(),
+				targetUser->getUserName().c_str());
   return;
 }
 

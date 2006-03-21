@@ -1,7 +1,7 @@
 echo Configuring evilnet development's mod.chanfix...
 echo
 
-AC_REVISION($Revision: 1.2 $)
+AC_REVISION($Revision: 1.3 $)
 AC_INIT([chanfix],[v1.0.1],[evilnet-devel@lists.sourceforge.net])
 AC_CONFIG_SRCDIR([chanfix.cc])
 AM_INIT_AUTOMAKE

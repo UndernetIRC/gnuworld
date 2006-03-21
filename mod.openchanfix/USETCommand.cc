@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
  * USA.
  *
- * $Id: USETCommand.cc,v 1.2 2006/03/21 22:49:14 buzlip01 Exp $
+ * $Id: USETCommand.cc,v 1.3 2006/03/21 23:12:37 buzlip01 Exp $
  */
 
 #include	<string>
@@ -33,7 +33,7 @@
 #include	"responses.h"
 #include	"sqlUser.h"
 
-RCSTAG("$Id: USETCommand.cc,v 1.2 2006/03/21 22:49:14 buzlip01 Exp $");
+RCSTAG("$Id: USETCommand.cc,v 1.3 2006/03/21 23:12:37 buzlip01 Exp $");
 
 namespace gnuworld
 {
@@ -51,7 +51,7 @@ if (st.size() == 4) {
   value = string_upper(st[3]);
   sqlUser::flagType requiredFlags;
 
-  if (option == "NEEDOPER" && bot->needOper()) {
+  if (option == "NEEDOPER") {
     requiredFlags = sqlUser::F_USERMANAGER;
     if (!theUser->getFlag(requiredFlags)) {
       bot->SendTo(theClient,

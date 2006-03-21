@@ -21,11 +21,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: chanfix_misc.h,v 1.1 2006/03/15 02:50:37 buzlip01 Exp $
+ * $Id: chanfix_misc.h,v 1.2 2006/03/21 23:12:37 buzlip01 Exp $
  */
 
 #ifndef __CHANFIX_MISC_H
-#define __CHANFIX_MISC_H "$Id: chanfix_misc.h,v 1.1 2006/03/15 02:50:37 buzlip01 Exp $"
+#define __CHANFIX_MISC_H "$Id: chanfix_misc.h,v 1.2 2006/03/21 23:12:37 buzlip01 Exp $"
 
 namespace gnuworld
 {

@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
  * USA.
  *
- * $Id: sqlChanOp.h,v 1.1 2006/03/15 02:50:37 buzlip01 Exp $
+ * $Id: sqlChanOp.h,v 1.2 2006/03/21 23:12:37 buzlip01 Exp $
  */
 
 #ifndef __SQLCHANOP_H
-#define __SQLCHANOP_H "$Id: sqlChanOp.h,v 1.1 2006/03/15 02:50:37 buzlip01 Exp $"
+#define __SQLCHANOP_H "$Id: sqlChanOp.h,v 1.2 2006/03/21 23:12:37 buzlip01 Exp $"
 
 #include	<string>
 #include	"libpq++.h"

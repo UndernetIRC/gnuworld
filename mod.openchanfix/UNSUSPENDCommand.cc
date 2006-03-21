@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: UNSUSPENDCommand.cc,v 1.1 2006/03/15 02:50:37 buzlip01 Exp $
+ * $Id: UNSUSPENDCommand.cc,v 1.2 2006/03/21 23:12:37 buzlip01 Exp $
  */
 
 #include "gnuworld_config.h"
@@ -31,7 +31,7 @@
 #include "StringTokenizer.h"
 #include "sqlUser.h"
 
-RCSTAG("$Id: UNSUSPENDCommand.cc,v 1.1 2006/03/15 02:50:37 buzlip01 Exp $");
+RCSTAG("$Id: UNSUSPENDCommand.cc,v 1.2 2006/03/21 23:12:37 buzlip01 Exp $");
 
 namespace gnuworld
 {
@@ -43,9 +43,27 @@ StringTokenizer st(Message);
 sqlUser* targetUser = bot->isAuthed(st[1]);
 if (!targetUser) {
   bot->SendTo(theClient,
-              bot->getResponse(theUser,
-                              language::no_such_user,
-                              std::string("No such user %s.")).c_str(), st[1].c_str());
+	      bot->getResponse(theUser,
+			language::no_such_user,
+			std::string("No such user %s.")).c_str(), st[1].c_str());
+  return;
+}
+
+/* Can't unsuspend an owner unless you're an owner. */
+if (targetUser->getFlag(sqlUser::F_OWNER) && !theUser->getFlag(sqlUser::F_OWNER)) {
+  bot->SendTo(theClient,
+	      bot->getResponse(theUser,
+			language::cant_unsuspend_an_owner,
+			std::string("You cannot unsuspend an owner unless you're an owner.")).c_str());
+  return;
+}
+
+/* Can only unsuspend a user manager if you're an owner. */
+if (targetUser->getFlag(sqlUser::F_USERMANAGER) && !theUser->getFlag(sqlUser::F_OWNER)) {
+  bot->SendTo(theClient,
+	      bot->getResponse(theUser,
+			language::cant_unsuspend_manager,
+			std::string("You cannot unsuspend a user manager unless you're an owner.")).c_str());
   return;
 }
 
@@ -54,19 +72,19 @@ if (theUser->getFlag(sqlUser::F_SERVERADMIN) &&
     !theUser->getFlag(sqlUser::F_USERMANAGER)) {
   if (targetUser->getGroup() != theUser->getGroup()) {
     bot->SendTo(theClient,
-                bot->getResponse(theUser,
-                                language::cant_unsuspend_diff_group,
-                                std::string("You cannot unsuspend a user in a different group.")).c_str());
+		bot->getResponse(theUser,
+			language::cant_unsuspend_diff_group,
+			std::string("You cannot unsuspend a user in a different group.")).c_str());
     return;
   }
 }
 
 if (!targetUser->getIsSuspended()) {
   bot->SendTo(theClient,
-              bot->getResponse(theUser,
-                              language::user_not_suspended,
-                              std::string("User %s is not currently suspended.")).c_str(),
-                                          targetUser->getUserName().c_str());
+	      bot->getResponse(theUser,
+			language::user_not_suspended,
+			std::string("User %s is not currently suspended.")).c_str(),
+				targetUser->getUserName().c_str());
   return;
 }
 
@@ -79,10 +97,10 @@ targetUser->setLastUpdatedBy( std::string( "("
 targetUser->commit();
 
 bot->SendTo(theClient,
-            bot->getResponse(theUser,
-                            language::user_unsuspended,
-                            std::string("Unsuspended user %s.")).c_str(),
-                                        targetUser->getUserName().c_str());
+	    bot->getResponse(theUser,
+			language::user_unsuspended,
+			std::string("Unsuspended user %s.")).c_str(),
+				targetUser->getUserName().c_str());
 bot->logAdminMessage("%s (%s) unsuspended user %s.",
 	    theUser->getUserName().c_str(),
 	    theClient->getRealNickUserHost().c_str(),
