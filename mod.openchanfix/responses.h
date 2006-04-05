@@ -16,16 +16,18 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: responses.h,v 1.2 2006/03/21 23:12:37 buzlip01 Exp $
+ * $Id: responses.h,v 1.3 2006/04/05 02:37:35 buzlip01 Exp $
  */
 
 #ifndef __RESPONSES_H
-#define __RESPONSES_H "$Id: responses.h,v 1.2 2006/03/21 23:12:37 buzlip01 Exp $"
+#define __RESPONSES_H "$Id: responses.h,v 1.3 2006/04/05 02:37:35 buzlip01 Exp $"
 
 namespace gnuworld
 	{
-	namespace language
+namespace cf
 	{
+	namespace language
+		{
 		/* ADDFLAG */
 		const int one_flag_per_addflag		= 1;
 		const int no_such_user			= 2;
@@ -80,6 +82,7 @@ namespace gnuworld
 		const int channel_blocked		= 34;
 		const int channel_has_notes		= 35;
 		const int manual_chanfix_ack		= 36;
+		const int temporarily_blocked_override	= 189;
 
 		/* CHECK */
 		const int check_results			= 37;
@@ -124,7 +127,6 @@ namespace gnuworld
 		const int chan_no_manual_fixes		= 63;
 		const int error_occured_notes		= 64;
 		const int chan_manually_fix		= 65;
-		const int chan_manual_fix		= 66;
 		const int end_of_list			= 67;
 
 		/* INFO */
@@ -137,11 +139,18 @@ namespace gnuworld
 		const int end_of_information		= 74;
 		const int info_chan_alerted		= 75;
 		const int info_notes			= 76;
+		const int temporarily_blocked		= 188;
+		const int info_fix_started		= 192;
+		const int info_fix_waiting		= 193;
 
 		/* INVITE */
 		const int cant_find_channel		= 77;
 		const int chanfix_not_in_chan		= 78;
 		const int already_in_channel		= 79;
+		
+		/* LISTBLOCKED */
+		const int listblocks_blocked_chans	= 190;
+		const int listblocked_total_blocked	= 191;
 
 		/* LISTHOSTS */
 		const int cant_view_hosts_diff_group	= 163;
@@ -237,6 +246,10 @@ namespace gnuworld
 		const int user_not_suspended		= 126;
 		const int user_unsuspended		= 127;
 
+		/* USERSCORES */
+		const int userscores_header 		= 194;
+		const int userscores_noscore		= 195;
+		
 		/* USET */
 		const int lang_set_to			= 128;
 		const int send_notices			= 129;
@@ -275,7 +288,8 @@ namespace gnuworld
 		const int requires_auth_and_flag	= 152;
 		const int requires_auth_and_flags	= 153;
 		const int syntax			= 154;
-	}
-}
+	} // namespace language
+} // namespace cf
+} // namespace gnuworld
 
 #endif /* __RESPONSES_H */

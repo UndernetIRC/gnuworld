@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
  * USA.
  *
- * $Id: sqlChanOp.cc,v 1.2 2006/03/21 23:12:37 buzlip01 Exp $
+ * $Id: sqlChanOp.cc,v 1.3 2006/04/05 02:37:35 buzlip01 Exp $
  */
 
 #include	<sstream>
@@ -33,6 +33,9 @@
 #include	"sqlChanOp.h"
 
 namespace gnuworld
+{
+
+namespace cf
 {
 
 sqlChanOp::sqlChanOp(sqlManager* _myManager) :
@@ -84,5 +87,7 @@ sqlChanOp::~sqlChanOp()
 {
 // No heap space allocated
 }
+
+} // namespace cf
 
 } // namespace gnuworld

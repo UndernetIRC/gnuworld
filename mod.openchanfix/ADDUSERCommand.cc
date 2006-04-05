@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ADDUSERCommand.cc,v 1.2 2006/03/21 23:12:37 buzlip01 Exp $
+ * $Id: ADDUSERCommand.cc,v 1.3 2006/04/05 02:37:34 buzlip01 Exp $
  */
 
 #include "gnuworld_config.h"
@@ -32,11 +32,12 @@
 #include "StringTokenizer.h"
 #include "sqlUser.h"
 
-RCSTAG("$Id: ADDUSERCommand.cc,v 1.2 2006/03/21 23:12:37 buzlip01 Exp $");
+RCSTAG("$Id: ADDUSERCommand.cc,v 1.3 2006/04/05 02:37:34 buzlip01 Exp $");
 
 namespace gnuworld
 {
-
+namespace cf
+{
 void ADDUSERCommand::Exec(iClient* theClient, sqlUser* theUser, const std::string& Message)
 {
 StringTokenizer st(Message);
@@ -87,7 +88,7 @@ if (st.size() > 2) {
 				 language::created_user_w_host,
 				 std::string("Created user %s (%s).")).c_str(),
 				 st[1].c_str(), st[2].c_str());
-    bot->logAdminMessage("%s (%s) added user %s (%s).",
+    bot->logAdminMessage("%s (%s) ADDUSER %s %s",
 			 theUser->getUserName().c_str(), 
 			 theClient->getRealNickUserHost().c_str(),
 			 st[1].c_str(), st[2].c_str());
@@ -104,7 +105,7 @@ if (st.size() > 2) {
 		bot->getResponse(theUser,
 				language::created_user_wo_host,
 				std::string("Created user %s.")).c_str(), st[1].c_str());
-  bot->logAdminMessage("%s (%s) added user %s.",
+  bot->logAdminMessage("%s (%s) ADDUSER %s",
 		       theUser->getUserName().c_str(), 
 		       theClient->getRealNickUserHost().c_str(),
 		       st[1].c_str());
@@ -112,4 +113,5 @@ if (st.size() > 2) {
 
 return;
 } //ADDUSERCommand::Exec
+} //namespace cf
 } //namespace gnuworld

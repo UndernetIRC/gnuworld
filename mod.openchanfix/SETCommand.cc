@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
  * USA.
  *
- * $Id: SETCommand.cc,v 1.2 2006/03/21 23:12:37 buzlip01 Exp $
+ * $Id: SETCommand.cc,v 1.3 2006/04/05 02:37:35 buzlip01 Exp $
  */
 
 #include	<string>
@@ -33,9 +33,11 @@
 #include	"responses.h"
 #include	"Network.h"
 
-RCSTAG("$Id: SETCommand.cc,v 1.2 2006/03/21 23:12:37 buzlip01 Exp $");
+RCSTAG("$Id: SETCommand.cc,v 1.3 2006/04/05 02:37:35 buzlip01 Exp $");
 
 namespace gnuworld
+{
+namespace cf
 {
 
 void SETCommand::Exec(iClient* theClient, sqlUser* theUser, const std::string& Message)
@@ -53,6 +55,11 @@ std::string value = string_upper(st[2]);
 std::string::size_type pos;
 while ((pos = option.find('_', 0)) != std::string::npos)
   option.erase(pos, 1);
+
+bot->logAdminMessage("%s (%s) SET %s %s",
+		     theUser->getUserName().c_str(),
+		     theClient->getRealNickUserHost().c_str(),
+		     option.c_str(), value.c_str());
 
 if (option == "NUMSERVERS") {
   int setting = atoi(value.c_str());
@@ -175,4 +182,5 @@ bot->SendTo(theClient,
 return;
 }
 
+} // namespace cf
 } // namespace gnuworld

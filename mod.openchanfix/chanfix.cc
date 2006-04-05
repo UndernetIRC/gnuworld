@@ -23,9 +23,10 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: chanfix.cc,v 1.3 2006/03/21 23:12:37 buzlip01 Exp $
+ * $Id: chanfix.cc,v 1.4 2006/04/05 02:37:35 buzlip01 Exp $
  */
 
+#include	<csignal>
 #include	<cstdarg>
 #include	<ctime>
 #include	<iomanip>
@@ -59,9 +60,12 @@
 #include	<boost/thread/thread.hpp>
 #endif /* CHANFIX_HAVE_BOOST_THREAD */
 
-RCSTAG("$Id: chanfix.cc,v 1.3 2006/03/21 23:12:37 buzlip01 Exp $");
+RCSTAG("$Id: chanfix.cc,v 1.4 2006/04/05 02:37:35 buzlip01 Exp $");
 
 namespace gnuworld
+{
+
+namespace cf
 {
 
 short currentDay;
@@ -198,13 +202,18 @@ RegisterCommand(new INVITECommand(this, "INVITE",
 	1,
 	sqlUser::F_OWNER
 	));
+RegisterCommand(new LISTBLOCKEDCommand(this, "LISTBLOCKED",
+	"",
+	1,
+	sqlUser::F_BLOCK
+	));
 RegisterCommand(new LISTHOSTSCommand(this, "LISTHOSTS",
 	"[username]",
 	1,
 	sqlUser::F_LOGGEDIN
 	));
 RegisterCommand(new OPLISTCommand(this, "OPLIST",
-	"<#channel> [all]",
+	"<#channel> [-all] [-days]",
 	2,
 	0
 	));
@@ -280,6 +289,11 @@ RegisterCommand(new UNSUSPENDCommand(this, "UNSUSPEND",
 	2,
 	sqlUser::F_USERMANAGER | sqlUser::F_SERVERADMIN
 	));
+RegisterCommand(new USERSCORESCommand(this, "USERSCORES",
+	"<account>",
+	2,
+	sqlUser::F_LOGGEDIN
+	));
 RegisterCommand(new USETCommand(this, "USET",
 	"[username] <option> <value>",
 	3,
@@ -337,6 +351,8 @@ joinChanModes = chanfixConfig->Require("joinChanModes")->second ;
 enableAutoFix = atob(chanfixConfig->Require("enableAutoFix")->second) ;
 enableChanFix = atob(chanfixConfig->Require("enableChanFix")->second) ;
 enableChannelBlocking = atob(chanfixConfig->Require("enableChannelBlocking")->second) ;
+stopAutoFixOnOp = atob(chanfixConfig->Require("stopAutoFixOnOp")->second) ;
+stopChanFixOnOp =  atob(chanfixConfig->Require("stopChanFixOnOp")->second) ;
 version = atoi((chanfixConfig->Require("version")->second).c_str()) ;
 useBurstToFix = atob(chanfixConfig->Require("useBurstToFix")->second) ;
 numServers = atoi((chanfixConfig->Require("numServers")->second).c_str()) ;
@@ -403,6 +419,21 @@ void chanfix::OnShutdown(const std::string& reason)
 MyUplink->UnloadClient(this, reason);
 }
 
+/* OnSignal */
+void chanfix::OnSignal(int sig)
+{
+if (sig == SIGHUP) {
+  /* Close/reopen log files */
+  logAdminMessage("---------- End of log file. Rotating... ----------");
+  if (adminLog.is_open())
+    adminLog.close();
+
+  adminLog.open(adminLogFile.c_str(), std::ios::out | std::ios::app);
+}
+
+xClient::OnSignal(sig);
+}
+
 /* OnAttach */
 void chanfix::OnAttach()
 {
@@ -455,7 +486,7 @@ private:
 #endif /* CHANFIX_HAVE_BOOST_THREAD */
 
 /* OnTimer */
-void chanfix::OnTimer(const gnuworld::xServer::timerID& theTimer, void*)
+void chanfix::OnTimer(const xServer::timerID& theTimer, void*)
 {
 time_t theTime;
 if (theTimer == tidGivePoints) {
@@ -502,6 +533,14 @@ else if (theTimer == tidUpdateDB) {
   /* Refresh Timer */
   theTime = time(NULL) + SQL_UPDATE_TIME;
   tidUpdateDB = MyUplink->RegisterTimer(theTime, this, NULL);
+}
+else if (theTimer == tidTempBlocks) {
+  /* Remove expired temporary blocks */
+  expireTempBlocks();
+	
+  /* Refresh Timer */
+  theTime = time(NULL) + TEMPBLOCKS_CHECK_TIME;
+  tidTempBlocks = MyUplink->RegisterTimer(theTime, this, NULL);
 }
 }
 
@@ -735,11 +774,24 @@ xClient::OnChannelEvent( whichEvent, theChan,
 	data1, data2, data3, data4 ) ;
 }
 
-void chanfix::OnChannelModeO( Channel* theChan, ChannelUser*,
+void chanfix::OnChannelModeO( Channel* theChan, ChannelUser* theUser,
 			const xServer::opVectorType& theTargets)
 {
 /* if (currentState != RUN) return; */
 
+/* COMMENTED OUT DUE TO isService() NOT IN CORE YET
+ * if (theUser) {
+ *	// Let's see what server did the mode
+ *	iServer* theServer = Network->findServer(theUser->getClient()->getIntYY());
+ *	// If it was a service, then add the channel to the block list.
+ *	if (theServer && theServer != MyUplink->getUplink() && theServer->isService()) {
+ *	  // Check if it isn't already in the block list. If not, add it.
+ *	  if (!isTempBlocked(theChan->getName()))
+ *	    tempBlockList.insert(tempBlockType::value_type(theChan->getName(), currentTime()));
+ *	}
+ * }
+ */
+	
 if (theChan->size() < minClients)
   return;
 
@@ -757,6 +809,11 @@ for (xServer::opVectorType::const_iterator ptr = theTargets.begin();
   if (polarity) {
     // Someone is opped
     gotOpped(theChan, tmpUser->getClient());
+
+    // If the channel is being fixed and the op is done by a user,
+    // cancel the fix, as there is an awake op
+    if (theUser)
+      stopFixingChan(theChan, false);
   } else {
     // Someone is deopped
     lostOp(theChan->getName(), tmpUser->getClient(), NULL);
@@ -1517,11 +1574,17 @@ autoFixTimer.Start();
 Channel* thisChan;
 ChannelUser* curUser;
 int numOpLess = 0;
+tempBlockType::iterator tbPtr;
 for (xNetwork::channelIterator ptr = Network->channels_begin(); ptr != Network->channels_end(); ptr++) {
    thisChan = ptr->second;
    bool opLess = true;
    bool hasService = false;
    if (thisChan->size() >= minClients && !isBeingFixed(thisChan)) {
+     /* Don't autofix if the chan is temp blocked */
+     tbPtr = tempBlockList.find(thisChan->getName());
+     if (tbPtr != tempBlockList.end()) continue;
+
+     /* Loop through the channel list to check users for op and umode +k */
      for (Channel::userIterator ptr = thisChan->userList_begin(); ptr != thisChan->userList_end(); ptr++) {
 	curUser = ptr->second;
 	if (curUser->getClient()->getMode(iClient::MODE_SERVICES)) {
@@ -1651,7 +1714,8 @@ int max_time = (autofix ? AUTOFIX_MAXIMUM : CHANFIX_MAXIMUM);
  * at time t between 0 and max_time. */
 int min_score_abs = static_cast<int>((MAX_SCORE *
 		static_cast<float>(FIX_MIN_ABS_SCORE_BEGIN)) -
-		time_since_start / max_time *
+		static_cast<float>(time_since_start) /
+		static_cast<float>(max_time) *
 		(MAX_SCORE * static_cast<float>(FIX_MIN_ABS_SCORE_BEGIN)
 		 - static_cast<float>(FIX_MIN_ABS_SCORE_END) * MAX_SCORE));
 
@@ -1666,7 +1730,8 @@ elog << "chanfix::fixChan> [" << netChan->getName() << "] max "
  * at time t between 0 and max_time. */
 int min_score_rel = static_cast<int>((maxScore *
 		static_cast<float>(FIX_MIN_REL_SCORE_BEGIN)) -
-		time_since_start / max_time *
+		static_cast<float>(time_since_start) /
+		static_cast<float>(max_time) *
 		(maxScore * static_cast<float>(FIX_MIN_REL_SCORE_BEGIN)
 		 - static_cast<float>(FIX_MIN_REL_SCORE_END) * maxScore));
 
@@ -1761,6 +1826,33 @@ if (numClientsToOp + currentOps >= netChan->size() ||
 return false;
 }
 
+void chanfix::stopFixingChan(Channel* theChan, bool force)
+{
+/* If the channel doesn't exist (anymore), don't try to end the fix. */
+if (!theChan) return;
+
+bool inFix = false;
+
+if ((stopAutoFixOnOp || force) && isBeingAutoFixed(theChan)) {
+  inFix = true;
+  removeFromAutoQ(theChan);
+}
+if ((stopChanFixOnOp || force) && isBeingChanFixed(theChan)) {
+  inFix = true;
+  removeFromManQ(theChan);
+}
+
+if (inFix) {
+  sqlChannel* sqlChan = getChannelRecord(theChan);
+  if (sqlChan) {
+    sqlChan->setFixStart(0);
+    sqlChan->setLastAttempt(0);
+  }
+}
+
+return;
+}
+
 chanfix::acctListType chanfix::findAccount(Channel* theChan, const std::string& account)
 {
 acctListType chanAccts;
@@ -1784,6 +1876,34 @@ for (Channel::userIterator ptr = tmpChan->userList_begin();
     return true;
 }
 return false;
+}
+
+const std::string chanfix::getChanNickName(const std::string& channel, const std::string& account)
+{
+std::string theNick = "";
+Channel* tmpChan = Network->findChannel(channel);
+if (!tmpChan) return "";
+
+for (Channel::userIterator ptr = tmpChan->userList_begin();
+     ptr != tmpChan->userList_end(); ptr++) {
+  if (account == ptr->second->getClient()->getAccount()) {
+    if (ptr->second->isModeO()) {
+      theNick = "@";
+      theNick += ptr->second->getClient()->getNickName();
+      return theNick;
+    }
+    else if (ptr->second->isModeV()) {
+      theNick = "+";
+      theNick += ptr->second->getClient()->getNickName();
+      return theNick;
+    }
+    else {
+      theNick = ptr->second->getClient()->getNickName();
+      return theNick;
+    }
+  }
+}
+return theNick;
 }
 
 sqlChannel* chanfix::getChannelRecord(const std::string& Channel)
@@ -2073,6 +2193,8 @@ theTime = time(NULL) + getSecsTilMidnight();
 tidRotateDB = MyUplink->RegisterTimer(theTime, this, NULL);
 theTime = time(NULL) + SQL_UPDATE_TIME;
 tidUpdateDB = MyUplink->RegisterTimer(theTime, this, NULL);
+theTime = time(NULL) + TEMPBLOCKS_CHECK_TIME;
+tidTempBlocks = MyUplink->RegisterTimer(theTime, this, NULL);
 elog	<< "chanfix::startTimers> Started all timers."
 	<< std::endl;
 }
@@ -2299,6 +2421,34 @@ void chanfix::updateDB()
   return;
 }
 
+bool chanfix::isTempBlocked(const std::string& theChan)
+{
+  tempBlockType::iterator ptr = tempBlockList.find(theChan);
+  if (ptr == tempBlockList.end())
+    return false;
+  
+  return true;
+}
+
+void chanfix::expireTempBlocks()
+{
+  time_t unixTime = currentTime();
+  std::list<std::string> remList;
+  std::list<std::string>::iterator remIterator;
+
+  for (tempBlockType::iterator ptr = tempBlockList.begin();
+       ptr != tempBlockList.end(); ptr++) {
+    if ((unixTime - ptr->second) >= TEMPBLOCK_DURATION_TIME)
+      remList.push_back(ptr->first);
+  }
+  
+  for(remIterator = remList.begin();remIterator != remList.end();)
+  {
+    tempBlockList.erase(*remIterator);
+    remIterator = remList.erase(remIterator);
+  }
+}
+
 void chanfix::rotateDB()
 {
 /* 
@@ -2329,6 +2479,7 @@ else
  * check it against the time that he/she was first opped.
  */
 time_t maxFirstOppedTS = currentTime() - (POINTS_UPDATE_TIME + 10);
+time_t maxLastOppedTS = currentTime() - (DAYSAMPLES * 86400);
 sqlChanOp* curOp;
 std::string curChan;
 
@@ -2339,7 +2490,9 @@ for (sqlChanOpsType::iterator ptr = sqlChanOps.begin();
     curOp = chanOp->second;
     curOp->setDay(nextDay, 0);
     curOp->calcTotalPoints();
-    if (curOp->getPoints() <= 0 && maxFirstOppedTS > curOp->getTimeFirstOpped()) {
+    if (((curOp->getPoints() <= 0) &&
+	 (maxFirstOppedTS > curOp->getTimeFirstOpped()))
+	|| (maxLastOppedTS > curOp->getTimeLastOpped())) {
       ptr->second.erase(chanOp);
       delete curOp; curOp = 0;
     }
@@ -2704,4 +2857,7 @@ bot->SendTo(theClient,
                              std::string("SYNTAX: ")).c_str() + getInfo() );
 }
 
+} // namespace cf
+
 } // namespace gnuworld
+

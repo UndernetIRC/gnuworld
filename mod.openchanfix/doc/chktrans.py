@@ -4,7 +4,7 @@
 # (C) 2001 Alex Badea <vampire@go.ro>
 # (C) 2005 Neil Spierling <sirvulcan@gmail.com> (mod.chanfix modifications)
 #
-# $Id: chktrans.py,v 1.2 2006/03/21 23:12:38 buzlip01 Exp $
+# $Id: chktrans.py,v 1.3 2006/04/05 02:37:35 buzlip01 Exp $
 
 # Change this to suit your system
 gnuworld_home = "../../"

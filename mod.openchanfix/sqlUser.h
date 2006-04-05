@@ -16,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
  * USA.
  *
- * $Id: sqlUser.h,v 1.2 2006/03/21 23:12:37 buzlip01 Exp $
+ * $Id: sqlUser.h,v 1.3 2006/04/05 02:37:35 buzlip01 Exp $
  */
 
 #ifndef __SQLUSER_H
-#define __SQLUSER_H "$Id: sqlUser.h,v 1.2 2006/03/21 23:12:37 buzlip01 Exp $"
+#define __SQLUSER_H "$Id: sqlUser.h,v 1.3 2006/04/05 02:37:35 buzlip01 Exp $"
 
 #include	<string>
 #include	<vector>
@@ -31,6 +31,10 @@ namespace gnuworld
 {
 
 class iClient;
+
+namespace cf
+{
+
 class sqlManager;
 
 class sqlUser
@@ -167,6 +171,8 @@ private:
 
 	sqlManager*	myManager;
 }; // class sqlUser
+
+} // namespace cf
 
 } // namespace gnuworld
 

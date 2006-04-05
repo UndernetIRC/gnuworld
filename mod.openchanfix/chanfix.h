@@ -16,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: chanfix.h,v 1.3 2006/03/21 23:12:37 buzlip01 Exp $
+ * $Id: chanfix.h,v 1.4 2006/04/05 02:37:35 buzlip01 Exp $
  */
 
 #ifndef __CHANFIX_H
-#define __CHANFIX_H "$Id: chanfix.h,v 1.3 2006/03/21 23:12:37 buzlip01 Exp $"
+#define __CHANFIX_H "$Id: chanfix.h,v 1.4 2006/04/05 02:37:35 buzlip01 Exp $"
 
 #include	<string>
 #include	<vector>
@@ -30,25 +30,31 @@
 #include	"client.h"
 #include	"EConfig.h"
 #include	"ELog.h"
+#include	"Timer.h"
 
 #include	"chanfixCommands.h"
 #include	"chanfix_config.h"
 #include	"sqlChannel.h"
-#include	"Timer.h"
 
 /* This must be declared before sqlChanOp.h is #include'd */
 namespace gnuworld
 {
+namespace cf
+{
 extern short currentDay;
+}
 }
 
 #include	"sqlChanOp.h"
 #include	"sqlManager.h"
 #include	"sqlUser.h"
 
+namespace gnuworld
+{
+
 class Timer;
 
-namespace gnuworld
+namespace cf
 {
 
 class chanfix : public xClient {
@@ -177,6 +183,8 @@ public:
 
 	virtual void OnCTCP( iClient*, const std::string&, const std::string&, bool ) ;
 
+	virtual void OnSignal( int sig ) ;
+
 	/**
 	 * Our functions.
 	 */
@@ -220,6 +228,7 @@ public:
 	void manualFix(Channel*);
 
 	bool fixChan(sqlChannel*, bool);
+	void stopFixingChan(Channel*, bool);
 
 	bool accountIsOnChan(const std::string&, const std::string&);
 
@@ -242,12 +251,17 @@ public:
 	void processQueue();
 	
 	void rotateDB();
+	
+	void expireTempBlocks();
+	
 	void prepareUpdate(bool);
 	void updateDB();
 
 	bool isBeingFixed(Channel*);
 	bool isBeingAutoFixed(Channel*);
 	bool isBeingChanFixed(Channel*);
+
+	bool isTempBlocked(const std::string&);
 
 	bool removeFromAutoQ(Channel*);
 	bool removeFromManQ(Channel*);
@@ -263,6 +277,8 @@ public:
 	const std::string tsToDateTime(time_t, bool);
 
 	const std::string getHostList( sqlUser* );
+	
+	const std::string getChanNickName(const std::string&, const std::string&);
 	
 	const int getCurrentGMTHour(); /* returns the current hour in GMT (00-23) */
 
@@ -313,6 +329,9 @@ public:
 	typedef std::list <sqlChanOp*> chanOpsType;
 	chanOpsType		getMyOps(Channel*);
 	chanOpsType		getMyOps(const std::string&);
+	
+	typedef std::map <std::string, time_t, noCaseCompare> tempBlockType;
+	tempBlockType		tempBlockList;
 	
 	/**
 	 * The snapshot map for updating the SQL database
@@ -388,6 +407,8 @@ public:
 	bool		enableAutoFix;
 	bool		enableChanFix;
 	bool		enableChannelBlocking;
+	bool		stopAutoFixOnOp;
+	bool		stopChanFixOnOp;
 	unsigned int	version;
 	bool		useBurstToFix;
 	unsigned int	numServers;
@@ -435,6 +456,7 @@ protected:
 	xServer::timerID tidGivePoints;
 	xServer::timerID tidRotateDB;
 	xServer::timerID tidUpdateDB;
+	xServer::timerID tidTempBlocks;
 
 	/**
 	 * Internal timer
@@ -482,6 +504,8 @@ public:
 
 const std::string escapeSQLChars(const std::string&);
 bool atob(std::string);
+
+} // namespace cf
 
 } // namespace gnuworld
 

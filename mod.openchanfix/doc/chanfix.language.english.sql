@@ -3,7 +3,7 @@
 -- Language: English (1)
 -- Author: evilnet development <http://evilnet.sourceforge.net>
 --
--- $Id: chanfix.language.english.sql,v 1.2 2006/03/21 23:12:38 buzlip01 Exp $
+-- $Id: chanfix.language.english.sql,v 1.3 2006/04/05 02:37:35 buzlip01 Exp $
 
 			
 DELETE FROM translations;
@@ -74,7 +74,6 @@ COPY "translations" FROM stdin;
 1	63	Channel %s has never been manually fixed.	31337	0
 1	64	An unknown error occurred while reading this channel's notes.	31337	0
 1	65	Channel %s has been manually fixed on:	31337	0
-1	66	%s	31337	0
 1	67	End of list.	31337	0
 1	68	No information on %s in the database.	31337	0
 1	69	Information on %s:	31337	0
@@ -90,7 +89,7 @@ COPY "translations" FROM stdin;
 1	79	You are already in %s!	31337	0
 1	80	Top %d unique op accounts in channel %s:	31337	0
 1	81	Found %d unique op accounts in channel %s:	31337	0
-1	82	Rank Score Account -- Time first opped / Time last opped	31337	0
+1	82	Rank Score Account -- Time first opped / Time last opped / Nick	31337	0
 1	83	Opped clients on channel %s:	31337	0
 1	84	I see 1 opped client in %s.	31337	0
 1	85	I see %u opped clients in %s.	31337	0
@@ -192,4 +191,12 @@ COPY "translations" FROM stdin;
 1	185	You cannot delete a host from a user manager unless you're an owner.	31337	0
 1	186	You cannot add a host to an owner unless you're an owner.	31337	0
 1	187	You cannot add a host to a user manager unless you're an owner.	31337	0
+1	188	%s is temporarily blocked.	31337	0
+1	189	%s is temporarily blocked due to oper intervention via EUWorld within the last hour. Please append the OVERRIDE flag to force a manual fix.	31337	0
+1	190	List of all blocked channels:	31337	0
+1	191	%d channels blocked.	31337	0
+1	192	Current fix has been running for %s	31337	0
+1	193	Current fix is on hold (waiting for ops to join)	31337	0
+1	194	Channel Score -- Time first opped / Time last opped	31337	0
+1	195	Account %s doesn't have any scores in the database.	31337	0
 \.

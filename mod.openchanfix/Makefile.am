@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-# "$Id: Makefile.am,v 1.3 2006/03/21 23:12:37 buzlip01 Exp $"
+# "$Id: Makefile.am,v 1.4 2006/04/05 02:37:35 buzlip01 Exp $"
 
 lib_LTLIBRARIES = libchanfix.la
 
@@ -21,6 +21,7 @@ libchanfix_la_SOURCES = chanfix.cc \
 	HISTORYCommand.cc \
 	INFOCommand.cc \
 	INVITECommand.cc \
+	LISTBLOCKEDCommand.cc \
 	LISTHOSTSCommand.cc \
 	OPLISTCommand.cc \
 	OPNICKSCommand.cc \
@@ -36,6 +37,7 @@ libchanfix_la_SOURCES = chanfix.cc \
 	UNALERTCommand.cc \
 	UNBLOCKCommand.cc \
 	UNSUSPENDCommand.cc \
+	USERSCORESCommand.cc \
 	USETCommand.cc \
 	WHOGROUPCommand.cc \
 	WHOISCommand.cc \
@@ -62,7 +64,6 @@ EXTRA_DIST = chanfix.h \
 	sqlChannel.h \
 	sqlManager.h \
 	sqlUser.h \
-	Timer.h \
         $(COMMAND_CONF)
 
 confdir=${prefix}/bin

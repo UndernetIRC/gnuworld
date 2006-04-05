@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: BLOCKCommand.cc,v 1.2 2006/03/21 23:12:37 buzlip01 Exp $
+ * $Id: BLOCKCommand.cc,v 1.3 2006/04/05 02:37:34 buzlip01 Exp $
  */
 
 #include "gnuworld_config.h"
@@ -33,9 +33,11 @@
 #include "sqlChannel.h"
 #include "sqlUser.h"
 
-RCSTAG("$Id: BLOCKCommand.cc,v 1.2 2006/03/21 23:12:37 buzlip01 Exp $");
+RCSTAG("$Id: BLOCKCommand.cc,v 1.3 2006/04/05 02:37:34 buzlip01 Exp $");
 
 namespace gnuworld
+{
+namespace cf
 {
 
 void BLOCKCommand::Exec(iClient* theClient, sqlUser* theUser, const std::string& Message)
@@ -98,8 +100,8 @@ if (netChan) {
 			language::aborting_manual_fix,
 			std::string("WARNING: Channel %s is being manually fixed; aborting fix as per BLOCK.")).c_str(),
 				    theChan->getChannel().c_str());
-    bot->removeFromManQ(netChan);
-    extraLog = ", which aborted a manual fix";
+    bot->stopFixingChan(netChan, true);
+    extraLog = " (current manual fix aborted)";
   }
   if (bot->isBeingAutoFixed(netChan)) {
     bot->SendTo(theClient,
@@ -107,13 +109,13 @@ if (netChan) {
 			language::aborting_auto_fix,
 			std::string("WARNING: Channel %s is being automatically fixed; aborting fix as per BLOCK.")).c_str(),
 				    theChan->getChannel().c_str());
-    bot->removeFromAutoQ(netChan);
-    extraLog = ", which aborted an automatic fix";
+    bot->stopFixingChan(netChan, true);
+    extraLog = " (current autofix aborted)";
   }
 }
 
 /* Log command */
-bot->logAdminMessage("%s (%s) has added the BLOCK flag to %s%s",
+bot->logAdminMessage("%s (%s) BLOCK %s%s",
 		     theUser->getUserName().c_str(),
 		     theClient->getRealNickUserHost().c_str(),
 		     theChan->getChannel().c_str(),
@@ -121,4 +123,5 @@ bot->logAdminMessage("%s (%s) has added the BLOCK flag to %s%s",
 
 return;
 }
+} // namespace cf
 } // namespace gnuworld

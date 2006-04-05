@@ -1,4 +1,4 @@
-# $Id: chanfix.example.conf.in,v 1.3 2006/03/21 23:12:37 buzlip01 Exp $
+# $Id: chanfix.example.conf.in,v 1.4 2006/04/05 02:37:35 buzlip01 Exp $
 # chanfix configuration file
 
 # ---------------------------------------------------------------------
@@ -60,6 +60,12 @@ enableChanFix = true
 
 # Can channels be blocked by admins?
 enableChannelBlocking = true
+
+# Should auto fixes stop if an already reopped user ops another user?
+stopAutoFixOnOp = true
+
+# Should manual fixes stop if an already reopped user ops another user?
+stopChanFixOnOp = true
 
 # ---------------------------------------------------------------------
 # Network settings

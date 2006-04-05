@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
  * USA.
  *
- * $Id: QUOTECommand.cc,v 1.2 2006/03/21 23:12:37 buzlip01 Exp $
+ * $Id: QUOTECommand.cc,v 1.3 2006/04/05 02:37:35 buzlip01 Exp $
  */
 
 #include	<string>
@@ -32,9 +32,11 @@
 #include	"chanfix.h"
 #include	"responses.h"
 
-RCSTAG("$Id: QUOTECommand.cc,v 1.2 2006/03/21 23:12:37 buzlip01 Exp $");
+RCSTAG("$Id: QUOTECommand.cc,v 1.3 2006/04/05 02:37:35 buzlip01 Exp $");
 
 namespace gnuworld
+{
+namespace cf
 {
 
 void QUOTECommand::Exec(iClient* theClient, sqlUser* theUser, const std::string& Message)
@@ -55,7 +57,13 @@ StringTokenizer st(Message);
 
 bot->Write( st.assemble(1) );
 
+bot->logAdminMessage("%s (%s) QUOTE %s",
+		     theUser->getUserName().c_str(),
+		     theClient->getRealNickUserHost().c_str(),
+		     st.assemble(1).c_str());
+
 return;
 }
 
+} // namespace cf
 } // namespace gnuworld

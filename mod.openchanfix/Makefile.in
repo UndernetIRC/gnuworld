@@ -14,7 +14,7 @@
 
 @SET_MAKE@
 
-# "$Id: Makefile.in,v 1.3 2006/03/21 23:12:37 buzlip01 Exp $"
+# "$Id: Makefile.in,v 1.4 2006/04/05 02:37:35 buzlip01 Exp $"
 
 
 SOURCES = $(libchanfix_la_SOURCES)
@@ -81,6 +81,7 @@ am_libchanfix_la_OBJECTS = libchanfix_la-chanfix.lo \
 	libchanfix_la-DELUSERCommand.lo libchanfix_la-HELPCommand.lo \
 	libchanfix_la-HISTORYCommand.lo libchanfix_la-INFOCommand.lo \
 	libchanfix_la-INVITECommand.lo \
+	libchanfix_la-LISTBLOCKEDCommand.lo \
 	libchanfix_la-LISTHOSTSCommand.lo \
 	libchanfix_la-OPLISTCommand.lo libchanfix_la-OPNICKSCommand.lo \
 	libchanfix_la-QUOTECommand.lo libchanfix_la-REHASHCommand.lo \
@@ -90,10 +91,12 @@ am_libchanfix_la_OBJECTS = libchanfix_la-chanfix.lo \
 	libchanfix_la-STATUSCommand.lo libchanfix_la-SUSPENDCommand.lo \
 	libchanfix_la-UNALERTCommand.lo \
 	libchanfix_la-UNBLOCKCommand.lo \
-	libchanfix_la-UNSUSPENDCommand.lo libchanfix_la-USETCommand.lo \
-	libchanfix_la-WHOGROUPCommand.lo libchanfix_la-WHOISCommand.lo \
-	libchanfix_la-sqlChanOp.lo libchanfix_la-sqlChannel.lo \
-	libchanfix_la-sqlManager.lo libchanfix_la-sqlUser.lo
+	libchanfix_la-UNSUSPENDCommand.lo \
+	libchanfix_la-USERSCORESCommand.lo \
+	libchanfix_la-USETCommand.lo libchanfix_la-WHOGROUPCommand.lo \
+	libchanfix_la-WHOISCommand.lo libchanfix_la-sqlChanOp.lo \
+	libchanfix_la-sqlChannel.lo libchanfix_la-sqlManager.lo \
+	libchanfix_la-sqlUser.lo
 libchanfix_la_OBJECTS = $(am_libchanfix_la_OBJECTS)
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I.
 depcomp = $(SHELL) $(top_srcdir)/depcomp
@@ -248,6 +251,7 @@ libchanfix_la_SOURCES = chanfix.cc \
 	HISTORYCommand.cc \
 	INFOCommand.cc \
 	INVITECommand.cc \
+	LISTBLOCKEDCommand.cc \
 	LISTHOSTSCommand.cc \
 	OPLISTCommand.cc \
 	OPNICKSCommand.cc \
@@ -263,6 +267,7 @@ libchanfix_la_SOURCES = chanfix.cc \
 	UNALERTCommand.cc \
 	UNBLOCKCommand.cc \
 	UNSUSPENDCommand.cc \
+	USERSCORESCommand.cc \
 	USETCommand.cc \
 	WHOGROUPCommand.cc \
 	WHOISCommand.cc \
@@ -289,7 +294,6 @@ EXTRA_DIST = chanfix.h \
 	sqlChannel.h \
 	sqlManager.h \
 	sqlUser.h \
-	Timer.h \
         $(COMMAND_CONF)
 
 confdir = ${prefix}/bin
@@ -406,6 +410,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libchanfix_la-HISTORYCommand.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libchanfix_la-INFOCommand.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libchanfix_la-INVITECommand.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libchanfix_la-LISTBLOCKEDCommand.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libchanfix_la-LISTHOSTSCommand.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libchanfix_la-OPLISTCommand.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libchanfix_la-OPNICKSCommand.Plo@am__quote@
@@ -421,6 +426,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libchanfix_la-UNALERTCommand.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libchanfix_la-UNBLOCKCommand.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libchanfix_la-UNSUSPENDCommand.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libchanfix_la-USERSCORESCommand.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libchanfix_la-USETCommand.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libchanfix_la-WHOGROUPCommand.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libchanfix_la-WHOISCommand.Plo@am__quote@
@@ -577,6 +583,13 @@ libchanfix_la-INVITECommand.lo: INVITECommand.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libchanfix_la_CXXFLAGS) $(CXXFLAGS) -c -o libchanfix_la-INVITECommand.lo `test -f 'INVITECommand.cc' || echo '$(srcdir)/'`INVITECommand.cc
 
+libchanfix_la-LISTBLOCKEDCommand.lo: LISTBLOCKEDCommand.cc
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libchanfix_la_CXXFLAGS) $(CXXFLAGS) -MT libchanfix_la-LISTBLOCKEDCommand.lo -MD -MP -MF "$(DEPDIR)/libchanfix_la-LISTBLOCKEDCommand.Tpo" -c -o libchanfix_la-LISTBLOCKEDCommand.lo `test -f 'LISTBLOCKEDCommand.cc' || echo '$(srcdir)/'`LISTBLOCKEDCommand.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libchanfix_la-LISTBLOCKEDCommand.Tpo" "$(DEPDIR)/libchanfix_la-LISTBLOCKEDCommand.Plo"; else rm -f "$(DEPDIR)/libchanfix_la-LISTBLOCKEDCommand.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='LISTBLOCKEDCommand.cc' object='libchanfix_la-LISTBLOCKEDCommand.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libchanfix_la_CXXFLAGS) $(CXXFLAGS) -c -o libchanfix_la-LISTBLOCKEDCommand.lo `test -f 'LISTBLOCKEDCommand.cc' || echo '$(srcdir)/'`LISTBLOCKEDCommand.cc
+
 libchanfix_la-LISTHOSTSCommand.lo: LISTHOSTSCommand.cc
 @am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libchanfix_la_CXXFLAGS) $(CXXFLAGS) -MT libchanfix_la-LISTHOSTSCommand.lo -MD -MP -MF "$(DEPDIR)/libchanfix_la-LISTHOSTSCommand.Tpo" -c -o libchanfix_la-LISTHOSTSCommand.lo `test -f 'LISTHOSTSCommand.cc' || echo '$(srcdir)/'`LISTHOSTSCommand.cc; \
 @am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libchanfix_la-LISTHOSTSCommand.Tpo" "$(DEPDIR)/libchanfix_la-LISTHOSTSCommand.Plo"; else rm -f "$(DEPDIR)/libchanfix_la-LISTHOSTSCommand.Tpo"; exit 1; fi
@@ -681,6 +694,13 @@ libchanfix_la-UNSUSPENDCommand.lo: UNSUSPENDCommand.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='UNSUSPENDCommand.cc' object='libchanfix_la-UNSUSPENDCommand.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libchanfix_la_CXXFLAGS) $(CXXFLAGS) -c -o libchanfix_la-UNSUSPENDCommand.lo `test -f 'UNSUSPENDCommand.cc' || echo '$(srcdir)/'`UNSUSPENDCommand.cc
+
+libchanfix_la-USERSCORESCommand.lo: USERSCORESCommand.cc
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libchanfix_la_CXXFLAGS) $(CXXFLAGS) -MT libchanfix_la-USERSCORESCommand.lo -MD -MP -MF "$(DEPDIR)/libchanfix_la-USERSCORESCommand.Tpo" -c -o libchanfix_la-USERSCORESCommand.lo `test -f 'USERSCORESCommand.cc' || echo '$(srcdir)/'`USERSCORESCommand.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libchanfix_la-USERSCORESCommand.Tpo" "$(DEPDIR)/libchanfix_la-USERSCORESCommand.Plo"; else rm -f "$(DEPDIR)/libchanfix_la-USERSCORESCommand.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='USERSCORESCommand.cc' object='libchanfix_la-USERSCORESCommand.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libchanfix_la_CXXFLAGS) $(CXXFLAGS) -c -o libchanfix_la-USERSCORESCommand.lo `test -f 'USERSCORESCommand.cc' || echo '$(srcdir)/'`USERSCORESCommand.cc
 
 libchanfix_la-USETCommand.lo: USETCommand.cc
 @am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libchanfix_la_CXXFLAGS) $(CXXFLAGS) -MT libchanfix_la-USETCommand.lo -MD -MP -MF "$(DEPDIR)/libchanfix_la-USETCommand.Tpo" -c -o libchanfix_la-USETCommand.lo `test -f 'USETCommand.cc' || echo '$(srcdir)/'`USETCommand.cc; \

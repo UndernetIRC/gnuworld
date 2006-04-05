@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: DELNOTECommand.cc,v 1.2 2006/03/21 23:12:37 buzlip01 Exp $
+ * $Id: DELNOTECommand.cc,v 1.3 2006/04/05 02:37:34 buzlip01 Exp $
  */
 
 #include "gnuworld_config.h"
@@ -32,9 +32,11 @@
 #include "sqlChannel.h"
 #include "sqlUser.h"
 
-RCSTAG("$Id: DELNOTECommand.cc,v 1.2 2006/03/21 23:12:37 buzlip01 Exp $");
+RCSTAG("$Id: DELNOTECommand.cc,v 1.3 2006/04/05 02:37:34 buzlip01 Exp $");
 
 namespace gnuworld
+{
+namespace cf
 {
 
 void DELNOTECommand::Exec(iClient* theClient, sqlUser* theUser, const std::string& Message)
@@ -139,6 +141,13 @@ bot->SendTo(theClient,
                             std::string("Note #%d for channel %s deleted.")).c_str(),
                                         messageId, theChan->getChannel().c_str());
 
+bot->logAdminMessage("%s (%s) DELNOTE %s %d",
+		     theUser->getUserName().c_str(),
+		     theClient->getRealNickUserHost().c_str(),
+		     theChan->getChannel().c_str(), messageId);
+
 return;
 }
+
+} // namespace cf
 } // namespace gnuworld

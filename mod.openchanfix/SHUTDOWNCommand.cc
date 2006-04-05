@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
  * USA.
  *
- * $Id: SHUTDOWNCommand.cc,v 1.2 2006/03/21 23:12:37 buzlip01 Exp $
+ * $Id: SHUTDOWNCommand.cc,v 1.3 2006/04/05 02:37:35 buzlip01 Exp $
  */
 
 #include	<string>
@@ -32,9 +32,11 @@
 #include	"chanfix.h"
 #include	"responses.h"
 
-RCSTAG("$Id: SHUTDOWNCommand.cc,v 1.2 2006/03/21 23:12:37 buzlip01 Exp $");
+RCSTAG("$Id: SHUTDOWNCommand.cc,v 1.3 2006/04/05 02:37:35 buzlip01 Exp $");
 
 namespace gnuworld
+{
+namespace cf
 {
 
 void SHUTDOWNCommand::Exec(iClient* theClient, sqlUser* theUser, const std::string& Message)
@@ -53,9 +55,15 @@ bot->SendTo(theClient,
             bot->getResponse(theUser,
                             language::shutting_down,
                             std::string("Shutting down the server as per your request.")).c_str());
+
 bot->logDebugMessage("%s (%s) is shutting me down.",
 		     theUser->getUserName().c_str(),
 		     theClient->getRealNickUserHost().c_str());
+
+bot->logAdminMessage("%s (%s) SHUTDOWN %s",
+		     theUser->getUserName().c_str(),
+		     theClient->getRealNickUserHost().c_str(),
+		     (st.size() < 2) ? "" : st.assemble(1).c_str());
 
 if (st.size() < 2)
   server->Shutdown();
@@ -65,4 +73,5 @@ else
 return;
 }
 
+} // namespace cf
 } // namespace gnuworld

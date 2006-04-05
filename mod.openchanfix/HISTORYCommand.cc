@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: HISTORYCommand.cc,v 1.2 2006/03/21 23:12:37 buzlip01 Exp $
+ * $Id: HISTORYCommand.cc,v 1.3 2006/04/05 02:37:34 buzlip01 Exp $
  */
 
 #include "gnuworld_config.h"
@@ -32,9 +32,11 @@
 #include "sqlChannel.h"
 #include "sqlUser.h"
 
-RCSTAG("$Id: HISTORYCommand.cc,v 1.2 2006/03/21 23:12:37 buzlip01 Exp $");
+RCSTAG("$Id: HISTORYCommand.cc,v 1.3 2006/04/05 02:37:34 buzlip01 Exp $");
 
 namespace gnuworld
+{
+namespace cf
 {
 
 void HISTORYCommand::Exec(iClient* theClient, sqlUser* theUser, const std::string& Message)
@@ -101,10 +103,7 @@ bot->SendTo(theClient,
                                         theChan->getChannel().c_str());
 
 for (unsigned int i = 0; i < noteCount; i++)
-  bot->SendTo(theClient,
-              bot->getResponse(theUser,
-                              language::chan_manual_fix,
-                              std::string("%s")).c_str(), bot->tsToDateTime(atoi(cacheCon->GetValue(i,0)), true).c_str());
+  bot->SendTo(theClient, "%s", bot->tsToDateTime(atoi(cacheCon->GetValue(i,0)), true).c_str());
 
 bot->SendTo(theClient,
             bot->getResponse(theUser,
@@ -114,6 +113,13 @@ bot->SendTo(theClient,
 /* Dispose of our connection instance */
 bot->theManager->removeConnection(cacheCon);
 
+bot->logAdminMessage("%s (%s) HISTORY %s",
+		     theUser ? theUser->getUserName().c_str() : "!NOT-LOGGED-IN!",
+		     theClient->getRealNickUserHost().c_str(),
+		     theChan->getChannel().c_str());
+
 return;
 }
+
+} // namespace cf
 } // namespace gnuworld

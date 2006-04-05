@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: HELPCommand.cc,v 1.2 2006/03/21 23:12:37 buzlip01 Exp $
+ * $Id: HELPCommand.cc,v 1.3 2006/04/05 02:37:34 buzlip01 Exp $
  */
 
 #include "gnuworld_config.h"
@@ -32,9 +32,11 @@
 #include "StringTokenizer.h"
 #include "sqlUser.h"
 
-RCSTAG("$Id: HELPCommand.cc,v 1.2 2006/03/21 23:12:37 buzlip01 Exp $");
+RCSTAG("$Id: HELPCommand.cc,v 1.3 2006/04/05 02:37:34 buzlip01 Exp $");
 
 namespace gnuworld
+{
+namespace cf
 {
 
 void HELPCommand::Exec(iClient* theClient, sqlUser* theUser, const std::string& Message)
@@ -110,4 +112,6 @@ if (st.size() < 2) {
 }
 
 } //HELPCommand::Exec
+
+} //namespace cf
 } //namespace gnuworld

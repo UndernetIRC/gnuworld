@@ -16,13 +16,15 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: chanfixCommands.h,v 1.2 2006/03/21 23:12:37 buzlip01 Exp $
+ * $Id: chanfixCommands.h,v 1.3 2006/04/05 02:37:35 buzlip01 Exp $
  */
 
 #ifndef __CHANFIXCOMMANDS_H
-#define __CHANFIXCOMMANDS_H "$Id: chanfixCommands.h,v 1.2 2006/03/21 23:12:37 buzlip01 Exp $"
+#define __CHANFIXCOMMANDS_H "$Id: chanfixCommands.h,v 1.3 2006/04/05 02:37:35 buzlip01 Exp $"
 
 namespace gnuworld {
+
+namespace cf {
 
 class chanfix;
 class sqlUser;
@@ -92,6 +94,7 @@ DECLARE_COMMAND( STATUS )
 /* Logged-in commands */
 DECLARE_COMMAND( CHECK )
 DECLARE_COMMAND( LISTHOSTS )
+DECLARE_COMMAND( USERSCORES )
 DECLARE_COMMAND( USET )
 DECLARE_COMMAND( WHOIS )
 
@@ -110,6 +113,7 @@ DECLARE_COMMAND( WHOGROUP )
 /* Block commands */
 DECLARE_COMMAND( BLOCK )
 DECLARE_COMMAND( UNBLOCK )
+DECLARE_COMMAND( LISTBLOCKED )
 
 /* Comment commands */
 DECLARE_COMMAND( ADDNOTE )
@@ -130,6 +134,8 @@ DECLARE_COMMAND( REHASH )
 DECLARE_COMMAND( RELOAD )
 DECLARE_COMMAND( SET )
 DECLARE_COMMAND( SHUTDOWN )
+
+} // namespace cf
 
 } // namespace gnuworld
 

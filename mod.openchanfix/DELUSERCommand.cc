@@ -4,7 +4,7 @@
  * 08/08/2005 - Jimmy Lipham <music0m@alltel.net>
  * Initial Version
  *
- * Deletes this user
+ * Deletes a user
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: DELUSERCommand.cc,v 1.2 2006/03/21 23:12:37 buzlip01 Exp $
+ * $Id: DELUSERCommand.cc,v 1.3 2006/04/05 02:37:34 buzlip01 Exp $
  */
 
 #include "gnuworld_config.h"
@@ -31,9 +31,11 @@
 #include "StringTokenizer.h"
 #include "sqlUser.h"
 
-RCSTAG("$Id: DELUSERCommand.cc,v 1.2 2006/03/21 23:12:37 buzlip01 Exp $");
+RCSTAG("$Id: DELUSERCommand.cc,v 1.3 2006/04/05 02:37:34 buzlip01 Exp $");
 
 namespace gnuworld
+{
+namespace cf
 {
 
 void DELUSERCommand::Exec(iClient* theClient, sqlUser* theUser, const std::string& Message)
@@ -85,7 +87,7 @@ if (targetUser->Delete()) {
 	      bot->getResponse(theUser,
 			language::deleted_user,
 			std::string("Deleted user %s.")).c_str(), targetUser->getUserName().c_str());
-  bot->logAdminMessage("%s (%s) deleted user %s.",
+  bot->logAdminMessage("%s (%s) DELUSER %s",
 		       theClient->getAccount().c_str(),
 		       theClient->getRealNickUserHost().c_str(),
 		       targetUser->getUserName().c_str());
@@ -99,4 +101,6 @@ if (targetUser->Delete()) {
 
 return;
 } //DELUSERCommand::Exec
+
+} //namespace cf
 } //namespace gnuworld

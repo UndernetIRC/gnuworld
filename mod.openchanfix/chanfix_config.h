@@ -16,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
  * USA.
  *
- * $Id: chanfix_config.h,v 1.3 2006/03/21 23:12:37 buzlip01 Exp $
+ * $Id: chanfix_config.h,v 1.4 2006/04/05 02:37:35 buzlip01 Exp $
  */
 
 #ifndef __CHANFIX_CONFIG_H
-#define __CHANFIX_CONFIG_H "$Id: chanfix_config.h,v 1.3 2006/03/21 23:12:37 buzlip01 Exp $"
+#define __CHANFIX_CONFIG_H "$Id: chanfix_config.h,v 1.4 2006/04/05 02:37:35 buzlip01 Exp $"
 
 /**
  * Defines that deal with fixing channels, both manually and
@@ -130,6 +130,17 @@
  * Interval between two consecutive processing of the queues.
  */
 #define PROCESS_QUEUE_TIME	30
+
+/**
+ * Interval between checks for expired tempblocks
+ */
+#define TEMPBLOCKS_CHECK_TIME	30
+
+/**
+ * Duration that temp blocks should last
+ * (Default is 1hr 3600)
+ */
+#define TEMPBLOCK_DURATION_TIME	3600
 
 /**
  * Maximum score a client can obtain.

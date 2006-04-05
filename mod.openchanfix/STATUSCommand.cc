@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
  * USA.
  *
- * $Id: STATUSCommand.cc,v 1.2 2006/03/21 23:12:37 buzlip01 Exp $
+ * $Id: STATUSCommand.cc,v 1.3 2006/04/05 02:37:35 buzlip01 Exp $
  */
 
 #include	<string>
@@ -34,9 +34,11 @@
 #include	"responses.h"
 #include	"Network.h"
 
-RCSTAG("$Id: STATUSCommand.cc,v 1.2 2006/03/21 23:12:37 buzlip01 Exp $");
+RCSTAG("$Id: STATUSCommand.cc,v 1.3 2006/04/05 02:37:35 buzlip01 Exp $");
 
 namespace gnuworld
+{
+namespace cf
 {
 
 void STATUSCommand::Exec(iClient* theClient, sqlUser* theUser, const std::string&)
@@ -93,7 +95,13 @@ else
 			language::status_channel_service_not_linked,
 			std::string("Channel service not linked. New channels will not be scored.")).c_str());
 
+bot->logAdminMessage("%s (%s) STATUS",
+		     theUser ? theUser->getUserName().c_str() : "!NOT-LOGGED-IN!",
+		     theClient->getRealNickUserHost().c_str());
+
+
 return;
 }
 
+} // namespace cf
 } // namespace gnuworld

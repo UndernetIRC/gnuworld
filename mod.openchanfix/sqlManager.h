@@ -18,18 +18,22 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: sqlManager.h,v 1.2 2006/03/21 23:12:37 buzlip01 Exp $
+ * $Id: sqlManager.h,v 1.3 2006/04/05 02:37:35 buzlip01 Exp $
  */
 
 #ifndef __SQLMANAGER_H
-#define __SQLMANAGER_H "$Id: sqlManager.h,v 1.2 2006/03/21 23:12:37 buzlip01 Exp $"
+#define __SQLMANAGER_H "$Id: sqlManager.h,v 1.3 2006/04/05 02:37:35 buzlip01 Exp $"
 
 #include <string>
 #include <vector>
 
 #include "libpq++.h"
 
-namespace gnuworld {
+namespace gnuworld
+{
+
+namespace cf
+{
 
 class sqlManager {
   public:
@@ -72,6 +76,8 @@ class sqlManager {
     static sqlManager* theManager;
 
 }; // class sqlManager
+
+} // namespace cf
 
 } // namespace gnuworld
 

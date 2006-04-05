@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: UNALERTCommand.cc,v 1.2 2006/03/21 23:12:37 buzlip01 Exp $
+ * $Id: UNALERTCommand.cc,v 1.3 2006/04/05 02:37:35 buzlip01 Exp $
  */
 
 #include "gnuworld_config.h"
@@ -32,9 +32,11 @@
 #include "sqlChannel.h"
 #include "sqlUser.h"
 
-RCSTAG("$Id: UNALERTCommand.cc,v 1.2 2006/03/21 23:12:37 buzlip01 Exp $");
+RCSTAG("$Id: UNALERTCommand.cc,v 1.3 2006/04/05 02:37:35 buzlip01 Exp $");
 
 namespace gnuworld
+{
+namespace cf
 {
 
 void UNALERTCommand::Exec(iClient* theClient, sqlUser* theUser, const std::string& Message)
@@ -77,11 +79,12 @@ bot->SendTo(theClient,
                                         theChan->getChannel().c_str());
 
 /* Log command */
-bot->logAdminMessage("%s (%s) has removed the ALERT flag from %s",
+bot->logAdminMessage("%s (%s) UNALERT %s",
 		     theUser->getUserName().c_str(),
 		     theClient->getRealNickUserHost().c_str(),
 		     theChan->getChannel().c_str());
 
 return;
 }
+} // namespace cf
 } // namespace gnuworld

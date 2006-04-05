@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: OPLISTCommand.cc,v 1.3 2006/03/21 23:12:37 buzlip01 Exp $
+ * $Id: OPLISTCommand.cc,v 1.4 2006/04/05 02:37:35 buzlip01 Exp $
  */
 
 #include "gnuworld_config.h"
@@ -33,9 +33,11 @@
 #include "sqlChannel.h"
 #include "sqlChanOp.h"
 
-RCSTAG("$Id: OPLISTCommand.cc,v 1.3 2006/03/21 23:12:37 buzlip01 Exp $");
+RCSTAG("$Id: OPLISTCommand.cc,v 1.4 2006/04/05 02:37:35 buzlip01 Exp $");
 
 namespace gnuworld
+{
+namespace cf
 {
 
 void OPLISTCommand::Exec(iClient* theClient, sqlUser* theUser, const std::string& Message)
@@ -43,13 +45,24 @@ void OPLISTCommand::Exec(iClient* theClient, sqlUser* theUser, const std::string
 StringTokenizer st(Message);
 
 bool all = false;
-if (st.size() > 2) {
-  const std::string flag = string_upper(st[2]);
-  if ((flag == "ALL") || (flag == "-ALL") || (flag == "!"))
-    all = true;
-}
+bool days = false;
 
-sqlChanOp* curOp = 0;
+unsigned int pos = 2;
+while (pos < st.size()) {
+  if (!strcasecmp(st[pos],"-all"))
+    all = true;
+
+  if (!strcasecmp(st[pos],"all"))
+    all = true;
+
+  if (!strcasecmp(st[pos],"!"))
+    all = true;
+
+  if (!strcasecmp(st[pos],"-days"))
+    days = true;
+
+  pos++;
+}
 
 chanfix::chanOpsType myOps = bot->getMyOps(st[1]);
 if (myOps.empty()) {
@@ -92,12 +105,17 @@ else
 bot->SendTo(theClient,
             bot->getResponse(theUser,
                             language::rank_score_acc_header,
-                            std::string("Rank Score Account -- Time first opped / Time last opped")).c_str());
+			     std::string("Rank Score Account -- Time first opped / Time last opped / Nick")).c_str());
 
+sqlChanOp* curOp = 0;
 unsigned int opCount = 0;
+unsigned int percent = 0;
+int cScore;
 bool inChan = false;
 std::string firstop;
 std::string lastop;
+std::string nickName;
+std::stringstream dayString;
 for (chanfix::chanOpsType::iterator opPtr = myOps.begin();
      opPtr != myOps.end() && (all || opCount < OPCOUNT); opPtr++) {
   curOp = *opPtr;
@@ -105,13 +123,60 @@ for (chanfix::chanOpsType::iterator opPtr = myOps.begin();
   firstop = bot->tsToDateTime(curOp->getTimeFirstOpped(), false);
   lastop = bot->tsToDateTime(curOp->getTimeLastOpped(), true);
   inChan = bot->accountIsOnChan(st[1], curOp->getAccount());
-  bot->SendTo(theClient, "%3d. %s%4d  %s -- %s / %s%s", opCount,
-	      inChan ? "\002" : "", curOp->getPoints(),
+  if (inChan)
+    nickName = bot->getChanNickName(st[1], curOp->getAccount());
+
+  if (days) {
+    dayString.str("");
+
+    for (int i = 1; i <= DAYSAMPLES; i++) {
+      cScore = curOp->getDay((currentDay + i) % DAYSAMPLES);
+      percent = static_cast<unsigned int>(((static_cast<float>(cScore) / static_cast<float>(86400 / POINTS_UPDATE_TIME)) * 100) + 0.5);
+
+      if (!cScore)
+	dayString << "."; // no score (.)
+      else if (percent <= 10)
+	dayString << "0"; // 0%-10% (0)
+      else if ((percent >= 11) && (percent <= 20))
+	dayString << "1"; // 11%-20% (1)
+      else if ((percent >= 21) && (percent <= 30))
+	dayString << "2"; // 21%-30% (2)
+      else if ((percent >= 31) && (percent <= 40))
+	dayString << "3"; // 31%-40% (3)
+      else if ((percent >= 41) && (percent <= 50))
+	dayString << "4"; // 41%-50% (4)
+      else if ((percent >= 51) && (percent <= 60))
+	dayString << "5"; // 51%-60% (5)
+      else if ((percent >= 61) && (percent <= 70))
+	dayString << "6"; // 61%-70% (6)
+      else if ((percent >= 71) && (percent <= 80))
+	dayString << "7"; // 71%-80% (7)
+      else if ((percent >= 81) && (percent <= 90))
+	dayString << "8"; // 81%-90% (8)
+      else if ((percent >= 91))
+	dayString << "9"; // 91%-100% (9)
+    }
+    dayString << std::ends;
+  }
+
+  bot->SendTo(theClient, "%3d. %4d  %s -- %s / %s%s%s%s%s%s",
+	      opCount, curOp->getPoints(),
 	      curOp->getAccount().c_str(), firstop.c_str(),
-	      lastop.c_str(), inChan ? "\002" : "");
+	      lastop.c_str(), inChan ? " / " : "",
+	      inChan ? nickName.c_str() : "",
+	      (days) ? " [" : "",
+	      (days) ? dayString.str().c_str() : "",
+	      (days) ? "]" : "");
 }
+
+bot->logAdminMessage("%s (%s) OPLIST %s %s",
+		     theUser ? theUser->getUserName().c_str() : "!NOT-LOGGED-IN!",
+		     theClient->getRealNickUserHost().c_str(),
+		     st[1].c_str(),
+		     (st.size() > 2) ? st.assemble(2).c_str() : "");
 
 return;
 }
 
-}
+} //namespace cf
+} //namespace gnuworld

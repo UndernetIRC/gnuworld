@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: WHOGROUPCommand.cc,v 1.2 2006/03/21 23:12:37 buzlip01 Exp $
+ * $Id: WHOGROUPCommand.cc,v 1.3 2006/04/05 02:37:35 buzlip01 Exp $
  */
 
 #include "gnuworld_config.h"
@@ -31,14 +31,21 @@
 #include "StringTokenizer.h"
 #include "sqlUser.h"
 
-RCSTAG("$Id: WHOGROUPCommand.cc,v 1.2 2006/03/21 23:12:37 buzlip01 Exp $");
+RCSTAG("$Id: WHOGROUPCommand.cc,v 1.3 2006/04/05 02:37:35 buzlip01 Exp $");
 
 namespace gnuworld
+{
+namespace cf
 {
 
 void WHOGROUPCommand::Exec(iClient* theClient, sqlUser* theUser, const std::string& Message)
 {
 StringTokenizer st(Message);
+
+bot->logAdminMessage("%s (%s) WHOGROUP %s",
+		     theUser->getUserName().c_str(),
+		     theClient->getRealNickUserHost().c_str(),
+		     (st.size() > 1) ? st[1].c_str() : "");
 
 if (st.size() == 1) {
   /* No parameter supplied, so list all groups */
@@ -127,4 +134,5 @@ bot->SendTo(theClient,
 
 return;
 } //WHOGROUPCommand::Exec
+} //namespace cf
 } //namespace gnuworld

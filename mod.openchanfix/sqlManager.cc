@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: sqlManager.cc,v 1.2 2006/03/21 23:12:37 buzlip01 Exp $
+ * $Id: sqlManager.cc,v 1.3 2006/04/05 02:37:35 buzlip01 Exp $
  */
 
 #include <new>
@@ -30,7 +30,11 @@
 #include "ELog.h"
 #include "sqlManager.h"
 
-namespace gnuworld {
+namespace gnuworld
+{
+
+namespace cf
+{
 
 /* Initialize our static data members */
 sqlManager* sqlManager::theManager = 0;
@@ -133,5 +137,7 @@ sqlManager::~sqlManager()
 {
 } // sqlManager::~sqlManager()
 
+
+} // namespace cf
 
 } // namespace gnuworld

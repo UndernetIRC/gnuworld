@@ -18,17 +18,20 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
  * USA.
  *
- * $Id: sqlChanOp.h,v 1.2 2006/03/21 23:12:37 buzlip01 Exp $
+ * $Id: sqlChanOp.h,v 1.3 2006/04/05 02:37:35 buzlip01 Exp $
  */
 
 #ifndef __SQLCHANOP_H
-#define __SQLCHANOP_H "$Id: sqlChanOp.h,v 1.2 2006/03/21 23:12:37 buzlip01 Exp $"
+#define __SQLCHANOP_H "$Id: sqlChanOp.h,v 1.3 2006/04/05 02:37:35 buzlip01 Exp $"
 
 #include	<string>
 #include	"libpq++.h"
 #include	"chanfix_config.h"
 
 namespace gnuworld
+{
+
+namespace cf
 {
 
 class sqlManager;
@@ -108,6 +111,8 @@ private:
 
 	sqlManager*	myManager;
 }; // class
+
+} // namespace cf
 
 } // namespace gnuworld
 

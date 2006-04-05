@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: SCORECommand.cc,v 1.2 2006/03/21 23:12:37 buzlip01 Exp $
+ * $Id: SCORECommand.cc,v 1.3 2006/04/05 02:37:35 buzlip01 Exp $
  */
 
 #include <sstream>
@@ -37,9 +37,11 @@
 #include "sqlChanOp.h"
 #include "sqlUser.h"
 
-RCSTAG("$Id: SCORECommand.cc,v 1.2 2006/03/21 23:12:37 buzlip01 Exp $");
+RCSTAG("$Id: SCORECommand.cc,v 1.3 2006/04/05 02:37:35 buzlip01 Exp $");
 
 namespace gnuworld
+{
+namespace cf
 {
 
 void SCORECommand::Exec(iClient* theClient, sqlUser* theUser, const std::string& Message)
@@ -78,6 +80,12 @@ if (myOps.empty()) {
 }
 
 if (st.size() > 2) {
+  bot->logAdminMessage("%s (%s) %s %s",
+		       theUser ? theUser->getUserName().c_str() : "!NOT-LOGGED-IN!",
+		       theClient->getRealNickUserHost().c_str(),
+		       compact ? "CSCORE" : "SCORE",
+		       st.assemble(1).c_str());
+
   const char* scUser = st[2].c_str();
   if (st[2][0] == '=') {
     /* Nickname */
@@ -170,7 +178,7 @@ if (st.size() > 2) {
       bot->SendTo(theClient,
 		  bot->getResponse(theUser,
 				   language::no_score_for_account,
-				   std::string("No score for account %s on %s.")).c_str(),
+				   std::string("No score for account %s on channel %s.")).c_str(),
 					scUser,
 					st[1].c_str());
     return;
@@ -248,6 +256,13 @@ if (!compact) {
   strScoresNOP << ".";
 }
 
+bot->logAdminMessage("%s (%s) %s %s",
+                     theUser ? theUser->getUserName().c_str() : "!NOT-LOGGED-IN!",
+                     theClient->getRealNickUserHost().c_str(),
+                     compact ? "CSCORE" : "SCORE",
+                     st.assemble(1).c_str());
+
+
 if (compact) {
   bot->SendTo(theClient, "~S %s %s", st[1].c_str(), strScoresDB.str().c_str());
   if (!netChan) {
@@ -306,6 +321,9 @@ if (compact) {
     bot->SendTo(theClient, strScoresNOP.str());
 }
 
+
 return;
 }
+
+} // namespace cf
 } // namespace gnuworld

@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: INFOCommand.cc,v 1.2 2006/03/21 23:12:37 buzlip01 Exp $
+ * $Id: INFOCommand.cc,v 1.3 2006/04/05 02:37:34 buzlip01 Exp $
  */
 
 #include "gnuworld_config.h"
@@ -33,17 +33,31 @@
 #include "sqlChannel.h"
 #include "sqlUser.h"
 
-RCSTAG("$Id: INFOCommand.cc,v 1.2 2006/03/21 23:12:37 buzlip01 Exp $");
+RCSTAG("$Id: INFOCommand.cc,v 1.3 2006/04/05 02:37:34 buzlip01 Exp $");
 
 namespace gnuworld
+{
+namespace cf
 {
 
 void INFOCommand::Exec(iClient* theClient, sqlUser* theUser, const std::string& Message)
 {
 StringTokenizer st(Message);
 
+bool isBlocked = bot->isTempBlocked(st[1]);
+
 sqlChannel* theChan = bot->getChannelRecord(st[1]);
+	
 if (!theChan) {
+  if (isBlocked) {
+    bot->SendTo(theClient,
+		bot->getResponse(theUser,
+			    language::temporarily_blocked,
+			    std::string("%s is temporarily blocked.")).c_str(),
+			    st[1].c_str());
+    return;
+  }
+	
   bot->SendTo(theClient,
               bot->getResponse(theUser,
                               language::no_info_for_chan,
@@ -57,6 +71,13 @@ bot->SendTo(theClient,
                             language::information_on,
                             std::string("Information on %s:")).c_str(),
                                         theChan->getChannel().c_str());
+
+if (isBlocked)
+  bot->SendTo(theClient,
+	    bot->getResponse(theUser,
+			    language::temporarily_blocked,
+			    std::string("%s is temporarily blocked.")).c_str(),
+			    st[1].c_str());
 
 if (theChan->getFlag(sqlChannel::F_BLOCKED))
   bot->SendTo(theClient,
@@ -72,7 +93,7 @@ else if (theChan->getFlag(sqlChannel::F_ALERT))
                                           theChan->getChannel().c_str());
 
 Channel* netChan = Network->findChannel(st[1]);
-if (netChan) {
+if (netChan && bot->isBeingFixed(netChan)) {
   if (bot->isBeingChanFixed(netChan))
     bot->SendTo(theClient,
                 bot->getResponse(theUser,
@@ -85,9 +106,25 @@ if (netChan) {
                                 language::info_chan_being_autofixed,
                                 std::string("%s is being autofixed.")).c_str(),
                                             theChan->getChannel().c_str());
+  
+  if (theChan->getFixStart() > 0)
+    bot->SendTo(theClient,
+		bot->getResponse(theUser,
+				language::info_fix_started,
+				std::string("Current fix has been running for %s")).c_str(),
+				bot->prettyDuration(theChan->getFixStart()).c_str());
+  else
+    bot->SendTo(theClient,
+		bot->getResponse(theUser,
+				language::info_fix_waiting,
+				std::string("Current fix is on hold (waiting for ops to join)")).c_str());
 }
 
 if (!theChan->useSQL()) {
+  bot->logAdminMessage("%s (%s) INFO %s",
+		       theUser ? theUser->getUserName().c_str() : "!NOT-LOGGED-IN!",
+		       theClient->getRealNickUserHost().c_str(),
+		       theChan->getChannel().c_str());
   bot->SendTo(theClient,
 	      bot->getResponse(theUser,
 			       language::end_of_information,
@@ -160,6 +197,13 @@ bot->SendTo(theClient,
 /* Dispose of our connection instance */
 bot->theManager->removeConnection(cacheCon);
 
+bot->logAdminMessage("%s (%s) INFO %s",
+		     theUser ? theUser->getUserName().c_str() : "!NOT-LOGGED-IN!",
+		     theClient->getRealNickUserHost().c_str(),
+		     theChan->getChannel().c_str());
+
 return;
 }
+
+} // namespace cf
 } // namespace gnuworld

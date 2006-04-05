@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: CHECKCommand.cc,v 1.2 2006/03/21 23:12:37 buzlip01 Exp $
+ * $Id: CHECKCommand.cc,v 1.3 2006/04/05 02:37:34 buzlip01 Exp $
  */
 
 #include "gnuworld_config.h"
@@ -31,9 +31,11 @@
 #include "responses.h"
 #include "StringTokenizer.h"
 
-RCSTAG("$Id: CHECKCommand.cc,v 1.2 2006/03/21 23:12:37 buzlip01 Exp $");
+RCSTAG("$Id: CHECKCommand.cc,v 1.3 2006/04/05 02:37:34 buzlip01 Exp $");
 
 namespace gnuworld
+{
+namespace cf
 {
 
 void CHECKCommand::Exec(iClient* theClient, sqlUser* theUser, const std::string& Message)
@@ -58,7 +60,13 @@ bot->SendTo(theClient,
                                         bot->countChanOps(netChan), netChan->size(),
                                         netChan->getName().c_str());
 
+bot->logAdminMessage("%s (%s) CHECK %s",
+		     theUser ? theUser->getUserName().c_str() : "!NOT-LOGGED-IN!",
+		     theClient->getRealNickUserHost().c_str(),
+		     netChan->getName().c_str());
+
 return;
 }
 
+} // namespace cf
 } // namespace gnuworld

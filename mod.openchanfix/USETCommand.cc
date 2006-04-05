@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
  * USA.
  *
- * $Id: USETCommand.cc,v 1.3 2006/03/21 23:12:37 buzlip01 Exp $
+ * $Id: USETCommand.cc,v 1.4 2006/04/05 02:37:35 buzlip01 Exp $
  */
 
 #include	<string>
@@ -33,9 +33,11 @@
 #include	"responses.h"
 #include	"sqlUser.h"
 
-RCSTAG("$Id: USETCommand.cc,v 1.3 2006/03/21 23:12:37 buzlip01 Exp $");
+RCSTAG("$Id: USETCommand.cc,v 1.4 2006/04/05 02:37:35 buzlip01 Exp $");
 
 namespace gnuworld
+{
+namespace cf
 {
 
 void USETCommand::Exec(iClient* theClient, sqlUser* theUser, const std::string& Message)
@@ -82,6 +84,11 @@ if (st.size() == 4) {
 
 option = string_upper(st[1]);
 value = string_upper(st[2]);
+
+bot->logAdminMessage("%s (%s) USET %s %s",
+		     theUser->getUserName().c_str(),
+		     theClient->getRealNickUserHost().c_str(),
+		     option.c_str(), value.c_str());
 
 if (option == "NOTICE") {
   if (value == "ON" || value == "YES" || value == "1") {
@@ -135,4 +142,5 @@ bot->SendTo(theClient,
 return;
 }
 
+} // namespace cf
 } // namespace gnuworld
