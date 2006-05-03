@@ -1,4 +1,4 @@
--- 2001-03-02 |MrBean| "$Id: ccontrol.help.sql,v 1.12 2005/10/04 20:07:59 kewlio Exp $"
+-- 2001-03-02 |MrBean| "$Id: ccontrol.help.sql,v 1.13 2006/05/03 08:33:15 kewlio Exp $"
 -- Created the file and added all help topics to the database
 
 -- 2201-03-11 |MrBean|
@@ -75,10 +75,11 @@ CONFIG		8	-CClones <amount> - threshold for CIDR clones (see below)
 CONFIG		9	-CClonesCIDR <size> - CIDR bit length for clones (0-32)
 CONFIG		10	-CClonesGline <Yes|No> - auto-gline for CIDR clones flag
 CONFIG		11	-IClones <amount> - threshold for CIDR ident clones
-CONFIG		12	-CClonesTime <duration> - time (in seconds) between clone warnings to msglog
-CONFIG		13	-GBCount <count> - number of glines to set at once
-CONFIG		14	-GBInterval <duration> - time between setting glines (in seconds)
-CONFIG		15	-SGline <Yes|No> - Save glines flag
+CONFIG		12	-IClonesGline <Yes|No> - auto-gline for CIDR ident clones flag
+CONFIG		13	-CClonesTime <duration> - time (in seconds) between clone warnings to msglog
+CONFIG		14	-GBCount <count> - number of glines to set at once
+CONFIG		15	-GBInterval <duration> - time between setting glines (in seconds)
+CONFIG		16	-SGline <Yes|No> - Save glines flag
 DEAUTH		1	****** DEAUTH COMMAND ******
 DEAUTH		2	Deauthenticates you from the bot
 DEAUTH		3	Syntax: /msg $BOT$ deauth

@@ -1,4 +1,16 @@
-// $Id: ChangeLog,v 1.93 2006/02/10 20:29:55 kewlio Exp $ //
+// $Id: ChangeLog,v 1.94 2006/05/03 08:33:15 kewlio Exp $ //
+
+2006-05-03	Dan-m00 <daniel@undernet.org>
+		* mod.ccontrol/ccontrol.h: addition of IClonesGline variable
+
+		* mod.ccontrol/ccontrol.cc: addition of auto-gline function for
+			CIDR ident clones (including a slight output change)
+
+		* mod.ccontrol/CONFIGCommand.cc: add config for the above.
+			(CONFIG -IClonesGline Yes/No) - default to 'no'.
+
+		* doc/ccontrol.help.sql: updated help for CONFIG command to
+			reflect new configuration option.
 
 2006-02-05	clsk <alan.alvarez@us.army.mil>
 		* mod.ccontrol/ccontrol.cc: get UplinkServer from global

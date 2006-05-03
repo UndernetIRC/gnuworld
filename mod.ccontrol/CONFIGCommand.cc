@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: CONFIGCommand.cc,v 1.12 2005/09/30 21:03:07 kewlio Exp $
+ * $Id: CONFIGCommand.cc,v 1.13 2006/05/03 08:33:15 kewlio Exp $
  */
 
 #include	<string>
@@ -26,7 +26,7 @@
 #include	"CControlCommands.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: CONFIGCommand.cc,v 1.12 2005/09/30 21:03:07 kewlio Exp $" ) ;
+RCSTAG( "$Id: CONFIGCommand.cc,v 1.13 2006/05/03 08:33:15 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -263,6 +263,24 @@ for(unsigned int  pos =1; pos < st.size() ;)
                                 st[pos].c_str(),st[pos+1].c_str());
                         }
                 pos+=2;
+		}
+	else if(!strcasecmp(st[pos],"-IClonesGline"))
+		{
+		if(st.size() < pos +2)
+			{
+			bot->Notice(theClient,"-IClonesGline must get a yes/no answer indicating whether or not to auto-gline");
+			return true;
+			}
+		if(!bot->updateMisc("IClonesGline",(strcasecmp(st[pos+1],"YES") == 0) ? 1 : 0))
+			{
+			bot->MsgChanLog("Error while updating the CIDR ident auto-gline flag in the db\n");
+			}
+		else
+			{
+			bot->Notice(theClient,"%s was successfully updated to %s",
+				st[pos].c_str(),st[pos+1].c_str());
+			}
+		pos+=2;
 		}
 	else
 		{

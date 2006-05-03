@@ -16,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccontrol.h,v 1.98 2005/12/27 20:53:31 kewlio Exp $
+ * $Id: ccontrol.h,v 1.99 2006/05/03 08:33:15 kewlio Exp $
  */
 
 #ifndef __CCONTROL_H
-#define __CCONTROL_H "$Id: ccontrol.h,v 1.98 2005/12/27 20:53:31 kewlio Exp $"
+#define __CCONTROL_H "$Id: ccontrol.h,v 1.99 2006/05/03 08:33:15 kewlio Exp $"
 
 //Undef this if you want to log to the database
 #define LOGTOHD 
@@ -979,6 +979,8 @@ protected:
 	int			CClonesTime;
 
 	bool			CClonesGline;
+
+	bool			IClonesGline;
 
 	int			maxIClones;
 
