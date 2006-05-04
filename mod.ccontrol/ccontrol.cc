@@ -20,7 +20,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccontrol.cc,v 1.208 2006/05/03 08:33:15 kewlio Exp $
+ * $Id: ccontrol.cc,v 1.209 2006/05/04 15:22:23 kewlio Exp $
 */
 
 #define MAJORVER "1"
@@ -66,7 +66,7 @@
 #include	"ccontrol_generic.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: ccontrol.cc,v 1.208 2006/05/03 08:33:15 kewlio Exp $" ) ;
+RCSTAG( "$Id: ccontrol.cc,v 1.209 2006/05/04 15:22:23 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -1711,8 +1711,9 @@ int i=0, AffectedUsers = 0;
 int client_addr[4] = { 0 };
 unsigned long mask_ip;
 const char *client_ip;
-char Log[200], GlineMask[250];
+char Log[200], GlineMask[250], GlineReason[250];
 
+GlineReason[0] = '\0';
 curUsers++;
 if(!inBurst)
 	{
@@ -1765,13 +1766,17 @@ if(dbConnected)
 							CClonesCIDR, IClonesGline ? "" : " _NOT_");
 						clientsIp24IdentMapLastWarn[Log] = time(NULL);
 					}
-					/* TODO: possible auto-gline feature? */
-					sprintf(Log,"Glining %s@%s/%d for excessive connections (%d)",
-						NewUser->getUserName().c_str(), client_ip, CClonesCIDR, CurIdentConnections);
-					sprintf(GlineMask,"%s@%s/%d", NewUser->getUserName().c_str(), client_ip, CClonesCIDR);
-					AffectedUsers = CurIdentConnections;
+					/* check for auto-gline feature */
 					if (IClonesGline)
+					{
+						sprintf(Log,"Glining %s@%s/%d for excessive CIDR ident connections (%d)",
+							NewUser->getUserName().c_str(), client_ip, CClonesCIDR, CurIdentConnections);
+						sprintf(GlineMask,"%s@%s/%d", NewUser->getUserName().c_str(), client_ip, CClonesCIDR);
+						AffectedUsers = CurIdentConnections;
+						/* set the gline reason */
+						sprintf(GlineReason,"AUTO [%d] Automatically banned for excessive CIDR ident connections",AffectedUsers);
 						DoGline = true;
+					}
 				}
   
                                 if ((CurCIDRConnections > maxCClones) && (CurCIDRConnections > getExceptions(NewUser->getUserName()+"@" + tIP)) &&
@@ -1783,12 +1788,17 @@ if(dbConnected)
                                                 CurCIDRConnections, client_ip, CClonesCIDR, CClonesGline ? "" : " _NOT_");
 					clientsIp24MapLastWarn[client_ip] = time(NULL);
 					}
-                                        sprintf(Log,"Glining *@%s/%d for excessive connections (%d)",
-                                                client_ip, CClonesCIDR, CurCIDRConnections);
-                                        sprintf(GlineMask,"*@%s/%d", client_ip, CClonesCIDR);
-                                        AffectedUsers = CurCIDRConnections;
-                                        if (CClonesGline)
+					/* check for auto-gline feature */
+					if (CClonesGline)
+					{
+	                                        sprintf(Log,"Glining *@%s/%d for excessive connections (%d)",
+	                                                client_ip, CClonesCIDR, CurCIDRConnections);
+	                                        sprintf(GlineMask,"*@%s/%d", client_ip, CClonesCIDR);
+	                                        AffectedUsers = CurCIDRConnections;
+						/* set the gline reason */
+						sprintf(GlineReason,"AUTO [%d] Automatically banned for excessive CIDR connections",AffectedUsers);
                                                 DoGline = true;
+					}
                                 }
   
                                 int CurConnections = ++clientsIpMap[tIP];
@@ -1803,6 +1813,8 @@ if(dbConnected)
                                                 tIP.c_str(),CurConnections);
                                         sprintf(GlineMask,"*@%s/32",tIP.c_str());
                                         AffectedUsers = CurConnections;
+					/* set the gline reason */
+					sprintf(GlineReason,"AUTO [%d] Automatically banned for excessive connections",AffectedUsers);
                                         DoGline = true;
                                 }
   
@@ -1825,10 +1837,7 @@ if(dbConnected)
 				tmpGline = new ccGline(SQLDb);
 				tmpGline->setHost(GlineMask);
 				tmpGline->setExpires(::time(0) + maxGlineLen);
-				char us[100];
-				us[0] = '\0';
-				sprintf(us,"AUTO [%d] Automatically banned for excessive connections",AffectedUsers);
-				tmpGline->setReason(us);
+				tmpGline->setReason(GlineReason);
 				tmpGline->setAddedOn(::time(0));
 				tmpGline->setAddedBy(nickName);
 				tmpGline->setLastUpdated(::time(0));

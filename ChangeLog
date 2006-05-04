@@ -1,4 +1,10 @@
-// $Id: ChangeLog,v 1.94 2006/05/03 08:33:15 kewlio Exp $ //
+// $Id: ChangeLog,v 1.95 2006/05/04 15:22:23 kewlio Exp $ //
+
+2006-05-04	Dan-m00 <daniel@undernet.org>
+		* mod.ccontrol/ccontrol.cc: set gline reason for each kind of
+			gline seperately - makes for easier log parsing.
+			ALSO: fix a big bug that made cidr glining work even
+			if disabled (if an earlier gline was triggered)
 
 2006-05-03	Dan-m00 <daniel@undernet.org>
 		* mod.ccontrol/ccontrol.h: addition of IClonesGline variable
