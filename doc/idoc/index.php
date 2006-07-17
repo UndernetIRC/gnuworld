@@ -2,11 +2,11 @@
 /*
  *
  * Undernet GNUworld Interactive Installation Guide (aka UGIIG)
- * $Id: index.php,v 1.20 2004/07/25 02:55:00 nighty Exp $
+ * $Id: index.php,v 1.21 2006/07/17 01:24:02 nighty Exp $
  *
  * Released under the GNU Public License : http://www.gnu.org/licenses/gpl.txt
  * by nighty <nighty@undernet.org>
- * Last modified: 12/03/2003
+ * Last modified: 17/07/2006
  *
  *
  */
@@ -50,7 +50,7 @@ function footer($prev,$next) {
 	//echo "<address>maintained by <b>&lt;</b><a href=\"mailto:" . $coder_email . "\">" . $coder_email . "</a><b>&gt;</b> - Last modified : <b>" . date("M-d-Y H:i:s",   (  filemtime("index.php")+( date("Z",filemtime("index.php"))/3600 )   )   ) . " UTC/GMT</b> - <b>[</b><a href=\"./\">Home</a><b>]</b></address>";
 	echo "<address>maintained by <b>&lt;</b><a href=\"mailto:" . $coder_email . "\">" . $coder_email . "</a><b>&gt;</b> - <b>[</b><a href=\"./\">Home</a><b>]</b>";
 	echo "&nbsp;<br><font size=-2><b>";
-?>$Id: index.php,v 1.20 2004/07/25 02:55:00 nighty Exp $<?
+?>$Id: index.php,v 1.21 2006/07/17 01:24:02 nighty Exp $<?
 	echo "</b></font></address>\n";
 	echo "</body>\n";
 	echo "</html>\n";
@@ -74,31 +74,31 @@ function ugig_err($err_code) {
 $coder_email = "nighty@undernet.org";
 $coder_name = "nighty";
 
-define(PG_SQL_FTP_SOURCE,"ftp://ftp8.us.postgresql.org/postgresql/source/");
-define(PG_SQL_FTP_SOURCE_FILE,"ftp://ftp8.us.postgresql.org/postgresql/source/v7.2.4/postgresql-7.2.4.tar.gz");
-define(PG_SQL_RECOM_VERSION,"7.2.4");
+define(PG_SQL_FTP_SOURCE,"ftp://ftp.nl.postgresql.org:21/pub/mirror/postgresql/source/");
+define(PG_SQL_FTP_SOURCE_FILE,"ftp://ftp.nl.postgresql.org:21/pub/mirror/postgresql/source/v8.1.4/postgresql-8.1.4.tar.gz");
+define(PG_SQL_RECOM_VERSION,"8.1.4");
 
-define(TCL_83_PORT_SOURCE,"http://www.freebsd.org/cgi/cvsweb.cgi/ports/lang/tcl83/");
-define(TCL_83_PORT_SOURCE_FILE,"http://www.freebsd.org/cgi/cvsweb.cgi/ports/lang/tcl83/tcl83.tar.gz?tarball=1");
+define(TCL_83_PORT_SOURCE,"http://www.freebsd.org/cgi/cvsweb.cgi/ports/lang/tcl84/");
+define(TCL_83_PORT_SOURCE_FILE,"http://www.freebsd.org/cgi/cvsweb.cgi/ports/lang/tcl84/tcl84.tar.gz?tarball=1");
 define(TCL_83_LINUX_SOURCE,"http://sourceforge.net/project/showfiles.php?group_id=10894");
-define(TCL_83_LINUX_SOURCE_FILE,"http://umn.dl.sourceforge.net/sourceforge/tcl/tcl8.3.5-src.tar.gz");
-define(TCL_83_LINUX_FILE_NAME,"tcl8.3.5-src.tar.gz");
-define(TCL_83_RECOM_VERSION,"8.3.5");
+define(TCL_83_LINUX_SOURCE_FILE,"http://belnet.dl.sourceforge.net/sourceforge/tcl/tcl8.4.13-src.tar.gz");
+define(TCL_83_LINUX_FILE_NAME,"tcl8.4.13-src.tar.gz");
+define(TCL_83_RECOM_VERSION,"8.4.13");
 
 define(APACHE_FTP_SOURCE,"http://mir2.ovh.net/ftp.apache.org/dist/httpd/");
-define(APACHE_FTP_SOURCE_FILE,"http://mir2.ovh.net/ftp.apache.org/dist/httpd/apache_1.3.31.tar.gz");
-define(APACHE_FILE_NAME,"apache_1.3.31.tar.gz");
-define(APACHE_RECOM_VERSION,"1.3.31");
+define(APACHE_FTP_SOURCE_FILE,"http://mir2.ovh.net/ftp.apache.org/dist/httpd/apache_1.3.36.tar.gz");
+define(APACHE_FILE_NAME,"apache_1.3.36.tar.gz");
+define(APACHE_RECOM_VERSION,"1.3.36");
 
 define(PHP_FTP_SOURCE,"http://www.php.net/downloads.php");
-define(PHP_FTP_SOURCE_FILE,"http://static.php.net/www.php.net/distributions/php-4.3.8.tar.gz");
-define(PHP_FILE_NAME,"php-4.3.8.tar.gz");
-define(PHP_RECOM_VERSION,"4.3.8");
+define(PHP_FTP_SOURCE_FILE,"http://nl2.php.net:80/distributions/php-4.4.2.tar.gz");
+define(PHP_FILE_NAME,"php-4.4.2.tar.gz");
+define(PHP_RECOM_VERSION,"4.4.2");
 
 define(LIBPNG_URL,"http://www.libpng.org/");
-define(LIBPNG_URL_FILE,"http://download.sourceforge.net/libpng/libpng-1.0.15.tar.gz");
-define(LIBPNG_VERSION,"1.0.15");
-define(LIBPNG_FILE_NAME,"libpng-1.0.15.tar.gz");
+define(LIBPNG_URL_FILE,"http://belnet.dl.sourceforge.net/sourceforge/libpng/libpng-1.2.12.tar.gz");
+define(LIBPNG_VERSION,"1.2.12");
+define(LIBPNG_FILE_NAME,"libpng-1.2.12.tar.gz");
 
 define(LIBJPEG_URL,"http://www.ijg.org/");
 define(LIBJPEG_URL_FILE,"http://www.ijg.org/files/jpegsrc.v6b.tar.gz");
@@ -106,18 +106,18 @@ define(LIBJPEG_VERSION,"6b");
 define(LIBJPEG_FILE_NAME,"jpegsrc.v6b.tar.gz");
 
 define(FREETYPE2_URL,"http://freetype.sourceforge.net");
-define(FREETYPE2_URL_FILE,"http://umn.dl.sourceforge.net/sourceforge/freetype/freetype-2.1.4.tar.gz");
-define(FREETYPE2_VERSION,"2.1.4");
-define(FREETYPE2_FILE_NAME,"freetype-2.1.4.tar.gz");
+define(FREETYPE2_URL_FILE,"http://download.savannah.gnu.org/releases/freetype/freetype-2.2.1.tar.gz");
+define(FREETYPE2_VERSION,"2.2.1");
+define(FREETYPE2_FILE_NAME,"freetype-2.2.1.tar.gz");
 
 define(ZLIB_URL,"http://www.gzip.org/zlib/");
-define(ZLIB_URL_FILE,"http://www.libpng.org/pub/png/src/zlib-1.1.4.tar.gz");
-define(ZLIB_VERSION,"1.1.4");
-define(ZLIB_FILE_NAME,"zlib-1.1.4.tar.gz");
+define(ZLIB_URL_FILE,"http://www.gzip.org/zlib/zlib-1.2.3.tar.gz");
+define(ZLIB_VERSION,"1.2.3");
+define(ZLIB_FILE_NAME,"zlib-1.2.3.tar.gz");
 
 
 ?>
-<!-- $Id: index.php,v 1.20 2004/07/25 02:55:00 nighty Exp $ //-->
+<!-- $Id: index.php,v 1.21 2006/07/17 01:24:02 nighty Exp $ //-->
 <html>
 <head>
 <title>Undernet GNUworld Interactive Installation Guide</title>
@@ -440,6 +440,8 @@ For the whole HOWTO here, we will assume PostreSQL is configured that way :
 		<?=$os?>:/home/gnuworld$ <b>/usr/local/pgsql/bin/psql --version</b>
 
 	  the first lines should return a version number above or equal to <b>7.2.1</b> like this :
+	  (preferrably above <b>8.0.0</b>, version 7.2.x while compatible is not supported anymore
+	   by PostgreSQL team)
 
 	  	<font color=#888888>psql (PostgreSQL) 7.2.1
 	  	contains readline, history support
@@ -565,14 +567,14 @@ if you run into trouble, additional information can be found <a href="http://www
 <? } ?>
 <? if ($os=="freebsd") { ?>
 
-Check if you have the recommended <b>TCL 8.3.x</b> ports for your <?=$OSNAME?>,
-if the directory <b>/usr/ports/lang/tcl83</b> doesn't exist on your system,
+Check if you have the recommended <b>TCL 8.4.x</b> ports for your <?=$OSNAME?>,
+if the directory <b>/usr/ports/lang/tcl84</b> doesn't exist on your system,
 then download the corresponding FreeBSD ports <a href="<?=TCL_83_PORT_SOURCE_FILE?>" target=_blank>here</a> (needs FreeBSD port installation knowledge).
 
-<b>cd</b> to the directory, and build TCL 8.3.x :
+<b>cd</b> to the directory, and build TCL 8.4.x :
 
-	<?=$os?>:/root# <b>cd /usr/ports/lang/tcl83/</b>
-	<?=$os?>:/usr/ports/lang/tcl83# <b>make</b>
+	<?=$os?>:/root# <b>cd /usr/ports/lang/tcl84/</b>
+	<?=$os?>:/usr/ports/lang/tcl84# <b>make</b>
 
 FreeBSD should take care of the full installation.
 
@@ -585,6 +587,9 @@ if ($subset=="A-3") {
 ?>
 <h2>Building PostgreSQL</h2>
 <pre>
+<font color=#ff1111><b>If you have trouble installing, and prior to asking PostgreSQL team about it,
+please ensure you have a recent version of PostgreSQL, old 7.x series are not supported anymore !</b></font>
+
 Get the <b>postgresql-<?=PG_SQL_RECOM_VERSION?>.tar.gz</b> file you downloaded into step 1.
 Unpack it :
 
@@ -594,9 +599,9 @@ Unpack it :
 		--enable-multibyte \
 <? if ($os=="freebsd") { ?>
 		--with-tcl --without-tk \
-		--with-tclconfig=/usr/local/lib/tcl8.3  \
-		--with-includes=/usr/local/include/tcl8.3 \
-		--with-libraries=/usr/local/lib/tcl8.3</b>
+		--with-tclconfig=/usr/local/lib/tcl8.4  \
+		--with-includes=/usr/local/include/tcl8.4 \
+		--with-libraries=/usr/local/lib/tcl8.4</b>
 <? } ?>
 <? if ($os=="linux") { ?>
 		--with-tcl --without-tk</b>
@@ -631,8 +636,8 @@ Note: You will also need <b>automake 1.6</b> or above in order to build GNUworld
 
 	Report bugs to &lt;bug-make@gnu.org&gt;.	</font>
 
-If you don't have <b>gmake</b>, you can get it <a href="ftp://ftp.grolier.fr/mirrors/ftp.gnu.org/gnu/make/make-3.79.1.tar.gz">here</a>.
-If you don't have <b>automake 1.6</b>, you can get it <a href="ftp://ftp.grolier.fr/mirrors/ftp.gnu.org/gnu/automake/automake-1.6.1.tar.gz">here</a>.
+If you don't have <b>gmake</b>, you can get it <a href="ftp://ftp.grolier.fr/mirrors/ftp.gnu.org/gnu/make/make-3.80.tar.gz">here</a>.
+If you don't have <b>automake 1.6+</b>, you can get 1.7.9 <a href="ftp://ftp.grolier.fr/mirrors/ftp.gnu.org/gnu/automake/automake-1.7.9.tar.gz">here</a>.
 If that's ok, you can go on and build PostgreSQL for real, then install it...
 
 	<?=$os?>:/root/postgresql-<?=PG_SQL_RECOM_VERSION?># <b>gmake</b>
@@ -882,13 +887,13 @@ if (ereg("cservice",$modules)) {
 	<?=$os?>:/root# <b>su - gnuworld</b>
 <? } ?>
 	<?=$os?>:/home/gnuworld$ <b>touch .cvspass</b>
-	<?=$os?>:/home/gnuworld$ <b>cvs -d:pserver:anonymous@cvs.sourceforge.net:/cvsroot/gnuworld login</b>
+	<?=$os?>:/home/gnuworld$ <b>cvs -d:pserver:anonymous@gnuworld.cvs.sourceforge.net:/cvsroot/gnuworld login</b>
 
 Just hit the <b>[</b>ENTER<b>]</b> key as the password.
 
-	<?=$os?>:/home/gnuworld$ <b>cvs -z3 -d :pserver:anonymous@cvs.sourceforge.net:/cvsroot/gnuworld co gnuworld</b>
+	<?=$os?>:/home/gnuworld$ <b>cvs -z3 -d :pserver:anonymous@gnuworld.cvs.sourceforge.net:/cvsroot/gnuworld co gnuworld</b>
 <? if (ereg("cservice",$modules)) { ?>
-	<?=$os?>:/home/gnuworld$ <b>cvs -z3 -d :pserver:anonymous@cvs.sourceforge.net:/cvsroot/gnuworld co website</b>
+	<?=$os?>:/home/gnuworld$ <b>cvs -z3 -d :pserver:anonymous@gnuworld.cvs.sourceforge.net:/cvsroot/gnuworld co website</b>
 
 You should now have two directories in <b>/home/gnuworld</b> called <b>gnuworld/</b> and <b>website/</b>;
 they contain the CVS latest distributions of both c++ program and website.
@@ -1144,10 +1149,10 @@ if ($subset=="B-5") {
 Running GNUworld needs an IRC (P10 Protocol compliant) server ready to welcome it.
 We recommend the use of the latest <b>ircu2.10.x</b> from Undernet's Coder-comittee.
 
-Latest known STABLE version is <b>ircu2.10.10.pl18</b>, please visit <a href="http://coder-com.undernet.org/" target=_blank>http://coder-com.undernet.org/</a>
+Latest known STABLE version is <b>ircu2.10.12.08</b>, please visit <a href="http://coder-com.undernet.org/" target=_blank>http://coder-com.undernet.org/</a>
 to get information on how to download and install it.
 
-We will assume you have set up an <b>ircu2.10.10.pl18</b> server for the example.
+We will assume you have set up an <b>ircu2.10.12.08</b> server for the example.
 
 Edit the file <b>GNUworld.conf</b> in the <b>/home/gnuworld/gnuworld/bin/</b> directory,
 and define the properties of the GNUWorld Oper Service server here.
@@ -1182,19 +1187,26 @@ At this step you should have finished editing <b>GNUworld.conf</b>, save it.
 Now, right before trying to run GNUworld, you need to setup your C:Lines, H:Lines and U:Lines on
 your IRC server(s) in order for GNUworld to be able to operate normally.
 
-You will need to add the following <b>U:Line</b> in <b>*ALL*</b> servers on your network
+You will need to add the following <b>U:Line/U Block</b> in <b>*ALL*</b> servers on your network
 (or Uworld will not be able to do modes, and X won't be able to op itself in channels)
 
+U:Line (for ircd versions up to ircu2.10.11.x series)
 	<b>U:services.undernet.org:<?=str_replace(" ",",",str_replace("cservice","X",str_replace("ccontrol","Uworld",$modules)))?>:*</b>
 
+U Block (for ircd versions from ircu2.10.12.x series)
+	[N/A]
 
-You need to add the following lines only to the <b>ircd.conf</b> of the <b>uplink</b> server :
+You need to add the following lines/blocks only to the <b>ircd.conf</b> of the <b>uplink</b> server :
 
+Lines to add (for ircd versions up to ircu2.10.11.x series)
 	<b>H:*:*:services.undernet.org</b>
 	<b>C:192.168.0.1:testlink:services.undernet.org::90</b>
 
+Block additions (for ircd versions from ircu2.10.12.x series)
+	[N/A]
+
 <i>this assumes <b>90</b> is a valid Y:Line in your config and is of type <b>Server Class</b>,
-replace, if neededpropriate number.</i>
+replace, if needed by the apropriate number.</i>
 
 
 Do not forget to either <b>kill -HUP &lt;your ircd PID&gt;</b> or <b>/rehash</b> as an Oper on it
