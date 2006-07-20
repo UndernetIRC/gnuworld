@@ -117,6 +117,9 @@ public:
 	/** This function handles new clients as they connect. */
 	void handleNewClient( iClient* ) ;
 
+	/** This function handles nick changes. */
+	void handleNickChange( iClient* ) ;
+
 	/** Calculate global entropy and store it. */
 	void calculateEntropy() ;
 
@@ -179,9 +182,14 @@ public:
 	/** Join counter config options */
 	unsigned int jcInterval;
 	unsigned int jcCutoff;
+	unsigned int ncInterval;
+	unsigned int ncCutoff;
 	typedef std::map< std::string , unsigned int , noCaseCompare >
 		jcChanMapType;
 	jcChanMapType jcChanMap;
+	typedef std::map< std::string , unsigned int , noCaseCompare >
+		ncChanMapType;
+	ncChanMapType ncChanMap;
 
 	/* Test control */
 	/** Test map type. */
@@ -245,6 +253,7 @@ protected:
 
 	/** Timers for GNUWorld triggered events. */
 	xServer::timerID tidClearJoinCounter;
+	xServer::timerID tidClearNickCounter;
 	xServer::timerID tidRefreshCaches;
 
 	/** Command map type. */

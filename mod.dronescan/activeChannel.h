@@ -35,9 +35,10 @@ public:
 	 * @param _name		the name of the active channel
 	 * @param _lastjoin	the time of the last join to this channel
 	 */
-	inline activeChannel( const std::string& _name, const time_t& _lastjoin ) :
+	inline activeChannel( const std::string& _name, const time_t& _lastjoin, const time_t& _lastnick=0 ) :
 		name(_name),
-		lastjoin(_lastjoin)
+		lastjoin(_lastjoin),
+		lastnick(_lastnick)
 		{ }
 
 	/** Empty destructor as we allocate no memory. */
@@ -53,6 +54,9 @@ public:
 	inline const time_t& getLastJoin() const
 		{ return lastjoin; }
 
+	inline const time_t& getLastNick() const
+		{ return lastnick; }
+
 	/*********************
 	 ** M U T A T O R S **
 	 *********************/
@@ -60,9 +64,12 @@ public:
 	inline void setLastJoin( const time_t& _lastjoin )
 		{ lastjoin = _lastjoin; }
 
+	inline void setLastNick( const time_t& _lastnick )
+		{ lastjoin = _lastnick; }
 protected:
 	std::string	name;
 	time_t		lastjoin;
+	time_t		lastnick;
 
 }; // class activeChannel
 

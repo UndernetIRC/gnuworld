@@ -112,6 +112,8 @@ dcInterval = atoi(dronescanConfig->Require("dcInterval")->second.c_str());
 consoleLevel = atoi(dronescanConfig->Require("consoleLevel")->second.c_str());
 jcInterval = atoi(dronescanConfig->Require("jcInterval")->second.c_str());
 jcCutoff = atoi(dronescanConfig->Require("jcCutoff")->second.c_str());
+ncInterval = atoi(dronescanConfig->Require("ncInterval")->second.c_str());
+ncCutoff = atoi(dronescanConfig->Require("ncCutoff")->second.c_str());
 rcInterval = atoi(dronescanConfig->Require("rcInterval")->second.c_str());
 
 /* Set up variables that our tests will need */
@@ -246,6 +248,9 @@ void dronescan::OnAttach()
 	theTime = time(0) + rcInterval;
 	tidRefreshCaches = MyUplink->RegisterTimer(theTime, this, 0);
 
+	theTime = time(0) + ncInterval;
+	tidClearNickCounter = MyUplink->RegisterTimer(theTime, this, 0);
+
 	xClient::OnAttach() ;
 } // dronescan::OnAttach()
 
@@ -323,6 +328,10 @@ void dronescan::OnEvent( const eventType& theEvent,
 			handleNewClient( static_cast< iClient* >( Data1 ) );
 			break;
 			} // EVT_NICK
+		case EVT_CHNICK:
+			{
+			handleNickChange( static_cast< iClient* >( Data1 ) );
+			}
 
 		case EVT_KILL : /* Intentional drop through */
 		case EVT_QUIT :
@@ -464,6 +473,10 @@ void dronescan::OnPrivateMessage( iClient* theClient,
 		Reply(theClient, "jcI/jcC : %u/%u",
 			jcInterval,
 			jcCutoff
+			);
+		Reply(theClient, "ncI/ncC : %u/%u",
+			ncInterval,
+			ncCutoff
 			);
 		return ;
 		}
@@ -657,6 +670,38 @@ void dronescan::OnTimer( const xServer::timerID& theTimer , void *)
 		tidClearJoinCounter = MyUplink->RegisterTimer(theTime, this, 0);
 		}
 
+	if(theTimer == tidClearNickCounter)
+		{
+		for(ncChanMapType::const_iterator itr = ncChanMap.begin() ;
+		    itr != ncChanMap.end() ; ++itr) {
+			Channel* theChan = Network->findChannel(
+				itr->first ) ;
+			if( 0 == theChan )
+				{
+				elog	<< "dronescan::OnTimer> Unable "
+					<< "to find channel: "
+					<< itr->first
+					<< std::endl ;
+				continue ;
+				}
+
+			if(itr->second >= ncCutoff)
+				log(WARN, "Nick flood over in %s. Total joins: %u. Total size: %d",
+					itr->first.c_str(),
+					itr->second,
+					theChan->size()
+					);
+		}
+
+		log(DBG, "Clearing %u records from the join counter.",
+			ncChanMap.size()
+			);
+		ncChanMap.clear();
+
+		theTime = time(0) + ncInterval;
+		tidClearJoinCounter = MyUplink->RegisterTimer(theTime, this, 0);
+		}
+
 	if(theTimer == tidRefreshCaches) {
 		log(DBG, "Refreshing caches");
 
@@ -752,6 +797,52 @@ void dronescan::handleNewClient( iClient* theClient )
 		{
 		setClientState(theClient);
 		}
+}
+
+void dronescan::handleNickChange( iClient* theClient )
+{
+	for(iClient::const_channelIterator it=theClient->channels_begin();
+			it!=theClient->channels_end();
+			++it) {
+		Channel *theChannel=*it;
+		/* If this channel is too small, don't test it. */
+		if(theChannel->size() < channelCutoff) return ;
+
+		/* Iterate over our available tests, checking this channel */
+		if(droneChannels.find(theChannel->getName()) == droneChannels.end()) {
+			/* This channel is not currently listed as active */
+			// Check the channel for abnormalities, if enough
+			// are found then it will be added to the
+			// droneChannels structure by checkChannel()
+			checkChannel( theChannel );
+		}
+
+		/* Reset lastnick on the active channel */
+		droneChannelsType::iterator droneChanItr =
+			droneChannels.find( theChannel->getName() ) ;
+
+		// If the channel is still not in the droneChannels
+		// structure then it is a "normal" channel
+		if( droneChanItr != droneChannels.end() )
+			{
+			droneChanItr->second->setLastNick( ::time( 0 ) ) ;
+			}
+
+		/* Do nick count processing if applicable */
+		const string& channelName = theChannel->getName();
+
+		ncChanMap[channelName]++;
+
+		unsigned int nickCount = ncChanMap[channelName];
+
+		if(nickCount == ncCutoff)
+			{
+			log(WARN, "%s is being nick flooded.",
+				channelName.c_str()
+				);
+			}
+	}
+
 }
 
 /** Calculate the global entropy. */
@@ -1059,6 +1150,8 @@ void dronescan::setConsoleTopic()
 	setTopic	<< "  ||"
 			<< "  jcInterval: " << jcInterval
 			<< "  jcCutoff: " << jcCutoff
+			<< "  ncInterval: " << ncInterval
+			<< "  ncCutoff: " << ncCutoff
 			;
 
 	Write(setTopic);
