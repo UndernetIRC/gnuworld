@@ -1,4 +1,4 @@
-# $Id: dronescan.example.conf.in,v 1.15 2004/05/15 11:17:09 jeekay Exp $
+# $Id: dronescan.example.conf.in,v 1.16 2006/07/25 01:51:18 isomer Exp $
 # What nickname should the bot use?
 nickname = E
 
@@ -78,6 +78,19 @@ jcInterval = 10
 # The trigger level for which join counter warns. Note that the total join
 # count must be OVER this level to trigger.
 jcCutoff = 10
+
+
+################
+# NICK COUNTER #
+################
+
+# The interval over which nick counter checks for nicks changes. This is in 
+# seconds.
+ncInterval = 10
+
+# The trigger level for which nick counter warns. Note that the total nick
+# change count must be OVER this level to trigger.
+ncCutoff = 10
 
 
 #################

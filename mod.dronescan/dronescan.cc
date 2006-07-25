@@ -598,6 +598,7 @@ for(xNetwork::const_clientIterator ptr = Network->clients_begin() ;
 
 /* Unregister the join counting timer */
 if(!MyUplink->UnRegisterTimer(tidClearJoinCounter, 0) ||
+   !MyUplink->UnRegisterTimer(tidClearNickCounter, 0) ||
    !MyUplink->UnRegisterTimer(tidClearActiveList, 0)) {
 	elog	<< "dronescan::~dronescan> "
 		<< "Could not unregister timer. Expect problems shortly."
@@ -699,7 +700,7 @@ void dronescan::OnTimer( const xServer::timerID& theTimer , void *)
 		ncChanMap.clear();
 
 		theTime = time(0) + ncInterval;
-		tidClearJoinCounter = MyUplink->RegisterTimer(theTime, this, 0);
+		tidClearNickCounter = MyUplink->RegisterTimer(theTime, this, 0);
 		}
 
 	if(theTimer == tidRefreshCaches) {
