@@ -1,8 +1,11 @@
 ------------------------------------------------------------------------------------
--- "$Id: cservice.sql,v 1.84 2006/07/17 00:29:03 nighty Exp $"
+-- "$Id: cservice.sql,v 1.85 2006/08/10 11:49:05 nighty Exp $"
 -- Channel service DB SQL file for PostgreSQL.
 
 -- ChangeLog:
+-- 2006-08-10: nighty
+--             Modified flags definitions for table channels, according to actual
+--             truth, thus adding a previously undocumented flag : 0x200 for FLOATLIM Active.
 -- 2006-07-17: nighty
 --             Added description for MIA Review Tag
 -- 2005-11-17: nighty
@@ -110,7 +113,8 @@ CREATE TABLE channels (
 -- 0x0000 0040 - Cautioned
 -- 0x0000 0080 - Manager on Vacation
 -- 0x0000 0100 - Channel Locked.
--- 0x0000 0200 - MIA Review Tag
+-- 0x0000 0200 - FLOATLIM Active
+-- 0x0000 0400 - MIA Review Tag
 
 -- 0x0001 0000 - AlwaysOp
 -- 0x0002 0000 - StrictOp
