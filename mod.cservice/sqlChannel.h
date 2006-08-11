@@ -17,11 +17,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: sqlChannel.h,v 1.43 2003/12/04 11:22:10 mrbean_ Exp $
+ * $Id: sqlChannel.h,v 1.44 2006/08/11 03:29:18 kewlio Exp $
  */
 
 #ifndef __SQLCHANNEL_H
-#define __SQLCHANNEL_H "$Id: sqlChannel.h,v 1.43 2003/12/04 11:22:10 mrbean_ Exp $"
+#define __SQLCHANNEL_H "$Id: sqlChannel.h,v 1.44 2006/08/11 03:29:18 kewlio Exp $"
 
 #include	<string>
 #include	<map>
@@ -66,6 +66,7 @@ public:
 	static const flagType	F_OPONLY; 	// Deprecated.
 	static const flagType	F_AUTOJOIN;
 	static const flagType	F_FLOATLIM;
+	static const flagType	F_MIA;		// MIA review tag
 	static const flagType	F_NOFORCE; // Reserved for use by Planetarion.
 
 	/*

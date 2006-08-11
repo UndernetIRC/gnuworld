@@ -24,7 +24,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: sqlChannel.cc,v 1.39 2005/09/29 15:21:56 kewlio Exp $
+ * $Id: sqlChannel.cc,v 1.40 2006/08/11 03:29:18 kewlio Exp $
  */
 
 #include	<sstream>
@@ -41,7 +41,7 @@
 #include	"cservice_config.h"
 
 const char sqlChannel_h_rcsId[] = __SQLCHANNEL_H ;
-const char sqlChannel_cc_rcsId[] = "$Id: sqlChannel.cc,v 1.39 2005/09/29 15:21:56 kewlio Exp $" ;
+const char sqlChannel_cc_rcsId[] = "$Id: sqlChannel.cc,v 1.40 2006/08/11 03:29:18 kewlio Exp $" ;
 
 namespace gnuworld
 {
@@ -61,6 +61,7 @@ const sqlChannel::flagType sqlChannel::F_CAUTION  = 0x00000040 ;
 const sqlChannel::flagType sqlChannel::F_VACATION = 0x00000080 ;
 const sqlChannel::flagType sqlChannel::F_LOCKED   = 0x00000100 ;
 const sqlChannel::flagType sqlChannel::F_FLOATLIM = 0x00000200 ;
+const sqlChannel::flagType sqlChannel::F_MIA      = 0x00000400 ;
 
 const sqlChannel::flagType sqlChannel::F_ALWAYSOP  = 0x00010000 ;
 const sqlChannel::flagType sqlChannel::F_STRICTOP  = 0x00020000 ;

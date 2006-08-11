@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: STATUSCommand.cc,v 1.43 2003/06/28 01:21:20 dan_karrels Exp $
+ * $Id: STATUSCommand.cc,v 1.44 2006/08/11 03:29:18 kewlio Exp $
  */
 
 #include	<string>
@@ -31,7 +31,7 @@
 #include	"Network.h"
 #include	"cservice_config.h"
 
-const char STATUSCommand_cc_rcsId[] = "$Id: STATUSCommand.cc,v 1.43 2003/06/28 01:21:20 dan_karrels Exp $" ;
+const char STATUSCommand_cc_rcsId[] = "$Id: STATUSCommand.cc,v 1.44 2006/08/11 03:29:18 kewlio Exp $" ;
 
 namespace gnuworld
 {
@@ -172,6 +172,7 @@ if (theChan->getFlag(sqlChannel::F_NOOP)) flagsSet += "NOOP ";
 if (theChan->getFlag(sqlChannel::F_AUTOTOPIC)) flagsSet += "AUTOTOPIC ";
 if (theChan->getFlag(sqlChannel::F_AUTOJOIN)) flagsSet += "AUTOJOIN ";
 if (theChan->getFlag(sqlChannel::F_LOCKED)) flagsSet += "LOCKED ";
+if (theChan->getFlag(sqlChannel::F_MIA)) flagsSet += "MIA ";
 if (theChan->getFlag(sqlChannel::F_FLOATLIM))
 	{
 	stringstream floatLim;
