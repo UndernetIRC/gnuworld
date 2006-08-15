@@ -1,4 +1,8 @@
-// $Id: ChangeLog,v 1.96 2006/08/11 03:29:18 kewlio Exp $ //
+// $Id: ChangeLog,v 1.97 2006/08/15 00:50:06 kewlio Exp $ //
+
+2006-08-15	Dan-m00 <daniel@undernet.org>
+		* mod.cservice/CHANINFOCommand.cc: Added extra line of info
+			to show NOADDUSER setting (on or off) in 'info'
 
 2006-08-10	Dan-m00 <daniel@undernet.org>
 		* mod.cservice/sqlChannel.h:

@@ -28,7 +28,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: CHANINFOCommand.cc,v 1.55 2006/02/10 14:06:14 kewlio Exp $
+ * $Id: CHANINFOCommand.cc,v 1.56 2006/08/15 00:50:06 kewlio Exp $
  */
 
 #include	<string>
@@ -43,7 +43,7 @@
 #include	"libpq++.h"
 #include	"cservice_config.h"
 
-const char CHANINFOCommand_cc_rcsId[] = "$Id: CHANINFOCommand.cc,v 1.55 2006/02/10 14:06:14 kewlio Exp $" ;
+const char CHANINFOCommand_cc_rcsId[] = "$Id: CHANINFOCommand.cc,v 1.56 2006/08/15 00:50:06 kewlio Exp $" ;
 
 namespace gnuworld
 {
@@ -202,6 +202,14 @@ if( string::npos == st[ 1 ].find_first_of( '#' ) )
 		} else
 		{
 		bot->Notice(theClient, "INVISIBLE is Off");
+		}
+
+	if (theUser->getFlag(sqlUser::F_NOADDUSER))
+		{
+		bot->Notice(theClient, "NOADDUSER is On");
+		} else
+		{
+		bot->Notice(theClient, "NOADDUSER is Off");
 		}
 
 	bot->Notice(theClient,
