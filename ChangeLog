@@ -1,4 +1,12 @@
-// $Id: ChangeLog,v 1.98 2006/09/26 17:35:54 kewlio Exp $ //
+// $Id: ChangeLog,v 1.99 2006/09/26 20:15:43 kewlio Exp $ //
+
+2006-09-26	Dan-m00 <daniel@undernet.org>
+		* mod.ccontrol/CHANGLINECommand.cc: fix a bug in this code
+			which could lead to more glines than required being
+			added during a channel gline.
+
+		* src/Network.cc: modify matching code to speed up automated
+			glines (skip running match() for '*' idents)
 
 2006-09-24	Dan-m00 <daniel@undernet.org>
 		* mod.ccontrol/CHECKNETCommand.cc:

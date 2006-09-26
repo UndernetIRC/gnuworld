@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: Network.cc,v 1.73 2005/10/04 17:45:01 kewlio Exp $
+ * $Id: Network.cc,v 1.74 2006/09/26 20:15:43 kewlio Exp $
  */
 
 #include	<new>
@@ -45,7 +45,7 @@
 #include	"ip.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: Network.cc,v 1.73 2005/10/04 17:45:01 kewlio Exp $" ) ;
+RCSTAG( "$Id: Network.cc,v 1.74 2006/09/26 20:15:43 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -962,8 +962,8 @@ for (numericMapType::const_iterator ptr = numericMap.begin();
 {
 	const iClient* clientPtr = ptr->second;
 
-	/* match ident first */
-	if (!match(st[0], clientPtr->getUserName()))
+	/* match ident first - dont call match() if ident = '*' */
+	if ((!strcmp(st[0].c_str(),"*")) || (!match(st[0], clientPtr->getUserName())))
 	{
 		/* ident matches, check if host/ip matches */
 		/* to attempt to minimise cpu, if ip==host only check once */

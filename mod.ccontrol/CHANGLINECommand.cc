@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: CHANGLINECommand.cc,v 1.2 2006/09/26 17:35:58 kewlio Exp $
+ * $Id: CHANGLINECommand.cc,v 1.3 2006/09/26 20:15:43 kewlio Exp $
  */
 
 #include	<string>
@@ -41,7 +41,7 @@
 #include	"Constants.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: CHANGLINECommand.cc,v 1.2 2006/09/26 17:35:58 kewlio Exp $" ) ;
+RCSTAG( "$Id: CHANGLINECommand.cc,v 1.3 2006/09/26 20:15:43 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -157,6 +157,8 @@ bool CHANGLINECommand::Exec( iClient* theClient, const string& Message )
 		{
 			/* duplicate gline - continue to next channel user */
 			continue;
+		} else {
+			glineList["*@" + curIP] = 1;
 		}
 		if ((!TmpClient->getMode(iClient::MODE_SERVICES)) &&
 			!(bot->IsAuth(TmpClient)) && !(TmpClient->isOper())) 
