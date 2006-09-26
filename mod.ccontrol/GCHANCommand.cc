@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: GCHANCommand.cc,v 1.16 2005/01/12 03:50:29 dan_karrels Exp $
+ * $Id: GCHANCommand.cc,v 1.17 2006/09/26 17:35:58 kewlio Exp $
  */
 
 #include	<string>
@@ -39,7 +39,7 @@
 #include	"Constants.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: GCHANCommand.cc,v 1.16 2005/01/12 03:50:29 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: GCHANCommand.cc,v 1.17 2006/09/26 17:35:58 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -52,12 +52,6 @@ namespace uworld
 bool GCHANCommand::Exec( iClient* theClient, const string& Message )
 {
 StringTokenizer st( Message ) ;
-
-if(!dbConnected)
-        {
-        bot->Notice(theClient,"Sorry, but the db connection is down now, please try again alittle later");
-        return false;
-        }
 
 if( st.size() < 4 )
 	{
@@ -76,7 +70,8 @@ if( (st[pos].substr(0,1) != "#" ) || (st[pos].size() > channel::MaxName))
 	{
 	// Channel name must start with #
 	bot->Notice( theClient, "GCHAN: Please specify a legal channel name "
-		"must start with # and no longer than %d chars",channel::MaxName ) ;
+		"(must start with # and no longer than %d characters)",
+		channel::MaxName ) ;
 	return true ;
 	}
 
@@ -126,7 +121,8 @@ if(gLength == 0)
 	else
 		{
 	gLength = bot->getDefaultGlineLength() ;
-	bot->Notice(theClient,"No duration was set, setting to %d seconds by default",gLength) ;
+	bot->Notice(theClient,"No duration was set, using %d seconds by default",
+		gLength);
 	ResStart = 1;
 		}
 	}
@@ -141,7 +137,7 @@ string nickUserHost = theClient->getRealNickUserHost() ;
 string Reason = st.assemble( pos + ResStart );
 if(Reason.size() > 255)
 	{
-	bot->Notice(theClient,"Gline reason can't be more than 255 chars");
+	bot->Notice(theClient,"Gline reason can't be more than 255 characters");
 	return false;
 	}
 

@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: REMGCHANCommand.cc,v 1.13 2005/01/12 03:50:29 dan_karrels Exp $
+ * $Id: REMGCHANCommand.cc,v 1.14 2006/09/26 17:36:00 kewlio Exp $
  */
 
 #include	<string>
@@ -31,7 +31,7 @@
 #include	"Constants.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: REMGCHANCommand.cc,v 1.13 2005/01/12 03:50:29 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: REMGCHANCommand.cc,v 1.14 2006/09/26 17:36:00 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -46,12 +46,6 @@ bool REMGCHANCommand::Exec( iClient* theClient, const string& Message )
 {
 StringTokenizer st( Message ) ;
 
-if(!dbConnected)
-        {
-        bot->Notice(theClient,"Sorry, but the db connection is down now, please try again alittle later");
-        return false;
-        }
-
 if( st.size() < 2 )
 	{
 	Usage( theClient ) ;
@@ -60,8 +54,9 @@ if( st.size() < 2 )
 
 if((st[1].substr(0,1) != "#") || (st[1].size() > channel::MaxName))
 	{
-	bot->Notice(theClient,"Invalid channel name, must begin with # and cant be more than %d chars"
-			,channel::MaxName);
+	bot->Notice(theClient,"Invalid channel name. It must begin with # and can't be "
+			"more than %d characters in length.",
+			channel::MaxName);
 	return false;
 	}
 bot->MsgChanLog("REMGCHAN %s\n",st.assemble(1).c_str());

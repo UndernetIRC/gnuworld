@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccServer.cc,v 1.14 2005/01/12 03:50:29 dan_karrels Exp $
+ * $Id: ccServer.cc,v 1.15 2006/09/26 17:36:02 kewlio Exp $
  */
  
 #include	<sstream>
@@ -35,7 +35,7 @@
 #include	"Constants.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: ccServer.cc,v 1.14 2005/01/12 03:50:29 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: ccServer.cc,v 1.15 2006/09/26 17:36:02 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -74,7 +74,7 @@ ccServer::~ccServer()
 
 bool ccServer::Insert()
 {
-static const char *Main = "INSERT into servers (Name,LastUplink,LastNumeric,LastConnected,SplitedOn,SplitReason,Version,AddedOn,LastUpdated,ReportMissing) VALUES ('";
+static const char *Main = "INSERT INTO servers (Name,LastUplink,LastNumeric,LastConnected,SplitedOn,SplitReason,Version,AddedOn,LastUpdated,ReportMissing) VALUES ('";
 
 if(!dbConnected)
 	{

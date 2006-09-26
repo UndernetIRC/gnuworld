@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: CHANGLINECommand.cc,v 1.1 2005/10/04 01:45:30 kewlio Exp $
+ * $Id: CHANGLINECommand.cc,v 1.2 2006/09/26 17:35:58 kewlio Exp $
  */
 
 #include	<string>
@@ -41,7 +41,7 @@
 #include	"Constants.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: CHANGLINECommand.cc,v 1.1 2005/10/04 01:45:30 kewlio Exp $" ) ;
+RCSTAG( "$Id: CHANGLINECommand.cc,v 1.2 2006/09/26 17:35:58 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -60,12 +60,6 @@ bool CHANGLINECommand::Exec( iClient* theClient, const string& Message )
 {
 	StringTokenizer st(Message);
 
-	if (!dbConnected)
-	{
-		bot->Notice(theClient,"Sorry, but the db connection is down now, please try again alittle later");
-		return false;
-	}
-
 	if (st.size() < 4)
 	{
 		Usage(theClient);
@@ -82,7 +76,8 @@ bool CHANGLINECommand::Exec( iClient* theClient, const string& Message )
 	/* make sure they're trying a channel gline! */
 	if (st[pos].substr(0,1) != "#")
 	{
-		bot->Notice(theClient,"Umm... this is CHANGLINE, not GLINE - Try glining a channel maybe?");
+		bot->Notice(theClient,"Umm... this is CHANGLINE, not GLINE - Try "
+			"glining a channel maybe?");
 		return true;
 	}
 
@@ -135,7 +130,8 @@ bool CHANGLINECommand::Exec( iClient* theClient, const string& Message )
 
 	if (st[1].size() > channel::MaxName)
 	{
-		bot->Notice(theClient,"Channel name can't be more than %d chars",channel::MaxName);
+		bot->Notice(theClient,"Channel name can't be more than %d "
+			"characters", channel::MaxName);
 		return false;
 	}
 

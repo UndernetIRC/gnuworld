@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: Constants.h,v 1.12 2005/06/18 22:05:35 kewlio Exp $
+ * $Id: Constants.h,v 1.13 2006/09/26 17:35:58 kewlio Exp $
  */
 
 #ifndef __CONSTANTS_H_
@@ -95,7 +95,7 @@ const unsigned int PASS_OK = 3;
 
 namespace badChannels
 {
-static const char Query[] = "SELECT Name,Reason,AddedBy from BadChannels";
+static const char Query[] = "SELECT Name,Reason,AddedBy FROM BadChannels";
 }
 
 namespace scan
@@ -105,7 +105,7 @@ static const unsigned int MAX_SHOW = 15;
 
 namespace exceptions
 {
-static const char Query[] = "Select Host,Connections,AddedBy,AddedOn,Reason from Exceptions where lower(Host)='";
+static const char Query[] = "SELECT Host,Connections,AddedBy,AddedOn,Reason FROM Exceptions WHERE lower(Host)='";
 const unsigned int MAX_REASON = 449;
 }
 

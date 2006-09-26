@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: USERINFOCommand.cc,v 1.11 2005/10/04 15:08:40 kewlio Exp $
+ * $Id: USERINFOCommand.cc,v 1.12 2006/09/26 17:36:01 kewlio Exp $
  */
 
 #include	<string>
@@ -34,7 +34,7 @@
 #include	"Network.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: USERINFOCommand.cc,v 1.11 2005/10/04 15:08:40 kewlio Exp $" ) ;
+RCSTAG( "$Id: USERINFOCommand.cc,v 1.12 2006/09/26 17:36:01 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -146,26 +146,28 @@ for(ptr = bot->usersMap_begin();ptr != bot->usersMap_end();++ptr)
 		Id=tempUser->getID();
 		if(tempUser->getClient())
 			{
-			bot->Notice(theClient,"User Name : %s , Currently logged in from : %s"
-				    ,Name.c_str(),tempUser->getClient()->getRealNickUserHost().c_str());
+			bot->Notice(theClient,"User Name: %s   Currently logged in from: %s",
+				Name.c_str(),
+				tempUser->getClient()->getRealNickUserHost().c_str());
 			}
 		else
-			bot->Notice(theClient,"User Name : %s",Name.c_str());
+			bot->Notice(theClient,"User Name: %s   Not logged in",Name.c_str());
 		if(Email == "")
 			Email.assign("Not assigned");
-		bot->Notice(theClient,"Level : %s , Email : %s",Level.c_str(),Email.c_str());
+		bot->Notice(theClient,"Level: %s   E-mail: %s",Level.c_str(),Email.c_str());
 		if(Server == "")
 			Server.assign("Not assigned");
-		bot->Notice(theClient,"Server : %s",Server.c_str());
+		bot->Notice(theClient,"Server: %s",Server.c_str());
 		if(Suspended)
 			{
-			bot->Notice(theClient,"User was suspended By : %s , Until %s"
-			,SuspendedBy.c_str(),bot->convertToAscTime(SuspendExpires));
-			bot->Notice(theClient,"Reason : %s",SuspendReason.c_str());
-			bot->Notice(theClient,"Level : %s",SLevel.c_str());
+			bot->Notice(theClient,"User was suspended by: %s until %s",
+				SuspendedBy.c_str(),
+				bot->convertToAscTime(SuspendExpires));
+			bot->Notice(theClient,"Reason: %s",SuspendReason.c_str());
+			bot->Notice(theClient,"Level: %s",SLevel.c_str());
 			}
-		bot->Notice(theClient,"User Flags : GetLogs \002%s\002 NeedOp \002%s\002"
-			    ,GetLogs,NeedOp);
+		bot->Notice(theClient,"User Flags: GetLogs \002%s\002 NeedOp \002%s\002",
+			GetLogs,NeedOp);
 		if ((st.size() > 2) && (!strcasecmp(st[2],"-cl")))
 		{
 			/* commands list requested */

@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: SGLINECommand.cc,v 1.13 2005/08/16 15:38:11 kewlio Exp $
+ * $Id: SGLINECommand.cc,v 1.14 2006/09/26 17:36:01 kewlio Exp $
  */
 
 #include	<string>
@@ -36,7 +36,7 @@
 #include	"Constants.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: SGLINECommand.cc,v 1.13 2005/08/16 15:38:11 kewlio Exp $" ) ;
+RCSTAG( "$Id: SGLINECommand.cc,v 1.14 2006/09/26 17:36:01 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -56,11 +56,6 @@ bool SGLINECommand::Exec( iClient* theClient, const string& Message )
 
 StringTokenizer st( Message ) ;
 
-if(!dbConnected)
-        {
-        bot->Notice(theClient,"Sorry, but the db connection is down now, please try again alittle later");
-        return false;
-        }
 if(st.size() < 3)
         {
         Usage( theClient ) ;
@@ -82,7 +77,7 @@ bot->MsgChanLog("SGLINE %s\n",st.assemble(1).c_str());
 
 if(!RealName &&(string::npos != st[pos].find_first_of('#')))
 	{
-	bot->Notice(theClient,"I dont think glining that host is such a good idea");
+	bot->Notice(theClient,"I don't think glining that host is such a good idea");
 	return true;
 	}
 time_t gLength = bot->getDefaultGlineLength() ;
@@ -96,7 +91,7 @@ if(!RealName)
 		{
 		// User has only specified hostname, not a user name
 		bot->Notice( theClient, "GLINE: Please specify gline mask in the "
-			"format: user@host" ) ;
+			"format of user@host" ) ;
 		return true ;
 		}
 
@@ -126,7 +121,8 @@ else //RealName Gline
 		}
 	if(!hostOk)
 		{
-		bot->Notice(theClient,"You must specify atleast one char other than *?$ as the realname!");
+		bot->Notice(theClient,"You must specify at least one character other "
+			"than *?$ as the realname!");
 		return true;
 		}
 	if(hasSlash)
@@ -183,13 +179,13 @@ if(!RealName)
 
 	if(gCheck & gline::NEG_TIME)
 		{
-		bot->Notice(theClient,"Hmmz, dont you think that giving a negative time is kinda stupid?");
+		bot->Notice(theClient,"A negative gline duration is not valid.");
 		Ok = false;
 		}	
 
 	if(gCheck & gline::HUH_NO_HOST)
 		{
-		bot->Notice(theClient,"I dont think glining that host is such a good idea, do you?");
+		bot->Notice(theClient,"I don't think glining that host is such a good idea, do you?");
 		Ok = false;
 		}
         if(gCheck & gline::BAD_CIDRMASK)
@@ -234,7 +230,7 @@ else
 	}
 if(Reason.size() > gline::MAX_REASON_LENGTH)
 	{
-	bot->Notice(theClient,"Gline reason can't be more than %d chars",
+	bot->Notice(theClient,"Gline reason can't be more than %d characters",
 		    gline::MAX_REASON_LENGTH);
 	return false;
 	}

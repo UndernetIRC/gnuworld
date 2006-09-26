@@ -16,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: CControlCommands.h,v 1.32 2005/12/27 20:53:31 kewlio Exp $
+ * $Id: CControlCommands.h,v 1.33 2006/09/26 17:35:58 kewlio Exp $
  */
 
 #ifndef __CCONTROLCOMMANDS_H
-#define __CCONTROLCOMMANDS_H "$Id: CControlCommands.h,v 1.32 2005/12/27 20:53:31 kewlio Exp $"
+#define __CCONTROLCOMMANDS_H "$Id: CControlCommands.h,v 1.33 2006/09/26 17:35:58 kewlio Exp $"
 
 #include	<string>
 
@@ -43,6 +43,7 @@ class Command
 
 public:
 	Command( ccontrol* _bot, const string& _commName,
+		const bool _needsDB,
 		const string& _help, const unsigned long _flags,
 		const bool _disabled, const bool _needOp,
 		const bool _noLog,const int unsigned _minLevel,
@@ -50,14 +51,15 @@ public:
 	 : bot( _bot ),
 	   server( 0 ),
 	   commName( _commName ),
-	   commRealName( _commName ),    	  
+	   commRealName( _commName ),
+	   needDB ( _needsDB ),
 	   help( _help ),
 	   flags ( _flags ),
 	   isDisabled ( _disabled ),
 	   needOp ( _needOp),
 	   noLog ( _noLog ),
 	   minLevel ( _minLevel ),
-	   secondAccess ( _secondAccess )    	   	
+	   secondAccess ( _secondAccess )
 	{}
 	virtual ~Command() {}
 
@@ -95,6 +97,9 @@ public:
 	inline const string& getRealName() const
 		{ return commRealName ; }
 	
+	inline const bool needsDB() const
+		{ return needDB ; }
+
 	inline const string& getHelp() const
 		{ return help ; }
 
@@ -120,6 +125,7 @@ protected:
 	xServer*	server ;
 	string		commName ;
 	string		commRealName ;
+	bool		needDB;
 	string		help ;
 	unsigned long   flags;
 	bool		isDisabled;

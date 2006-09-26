@@ -16,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccontrol.h,v 1.99 2006/05/03 08:33:15 kewlio Exp $
+ * $Id: ccontrol.h,v 1.100 2006/09/26 17:36:02 kewlio Exp $
  */
 
 #ifndef __CCONTROL_H
-#define __CCONTROL_H "$Id: ccontrol.h,v 1.99 2006/05/03 08:33:15 kewlio Exp $"
+#define __CCONTROL_H "$Id: ccontrol.h,v 1.100 2006/09/26 17:36:02 kewlio Exp $"
 
 //Undef this if you want to log to the database
 #define LOGTOHD 
@@ -252,6 +252,12 @@ public:
 	 * for efficiency.
 	 */
 	virtual void OnAttach() ;
+
+	/**
+	 * This method is called duringg shutdown.  It unloads the
+	 * client correctly during a shutdown.
+	 */
+	virtual void OnShutdown(const std::string& reason);
 
 	/**
 	 * Return true if the given channel name corresponds to a

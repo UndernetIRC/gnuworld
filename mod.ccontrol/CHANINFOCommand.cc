@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: CHANINFOCommand.cc,v 1.18 2005/06/20 11:27:02 kewlio Exp $
+ * $Id: CHANINFOCommand.cc,v 1.19 2006/09/26 17:35:58 kewlio Exp $
  */
 
 #include	<string>
@@ -30,7 +30,7 @@
 #include	"ccontrol_generic.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: CHANINFOCommand.cc,v 1.18 2005/06/20 11:27:02 kewlio Exp $" ) ;
+RCSTAG( "$Id: CHANINFOCommand.cc,v 1.19 2006/09/26 17:35:58 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -51,7 +51,7 @@ if( st.size() < 2 )
 
 if(st[1].size() > channel::MaxName)
 	{
-	bot->Notice(theClient,"Channel name can't be more than %d chars",
+	bot->Notice(theClient,"Channel name can't be more than %d characters",
 		channel::MaxName);
 	return false;
 	}

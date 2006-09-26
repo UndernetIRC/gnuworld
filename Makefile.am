@@ -1,4 +1,4 @@
-## $Id: Makefile.am,v 1.23 2005/01/17 23:07:23 dan_karrels Exp $
+## $Id: Makefile.am,v 1.24 2006/09/26 17:35:55 kewlio Exp $
 ## test
 
 @SET_MAKE@
@@ -185,4 +185,6 @@ EXTRA_DIST = bin/ccontrol.example.conf.in \
 	include/server.h \
 	libltdl/acconfig.h \
 	libltdl/ltdl.h \
-	libltdl/config.h
+	libltdl/config.h \
+	tools/checkgnuworld.sh
+

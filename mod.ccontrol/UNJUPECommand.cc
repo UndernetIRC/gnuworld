@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: UNJUPECommand.cc,v 1.2 2005/01/12 03:50:29 dan_karrels Exp $
+ * $Id: UNJUPECommand.cc,v 1.3 2006/09/26 17:36:01 kewlio Exp $
  */
 
 #include	<new>
@@ -34,7 +34,7 @@
 #include	"Constants.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: UNJUPECommand.cc,v 1.2 2005/01/12 03:50:29 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: UNJUPECommand.cc,v 1.3 2006/09/26 17:36:01 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -78,7 +78,7 @@ else if(string::npos == st[ 1 ].find_first_of( '.' ))
 Server = Network->findServerName(st[1]);
 if(!Server)
 	{
-	bot->Notice(theClient,"Sorry, but i cant find that server!");
+	bot->Notice(theClient,"Sorry, but i can't find that server!");
 	return false;
 	}
 if(!Server->isJupe())

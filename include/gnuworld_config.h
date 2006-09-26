@@ -17,11 +17,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: gnuworld_config.h,v 1.3 2005/11/16 21:06:37 kewlio Exp $
+ * $Id: gnuworld_config.h,v 1.4 2006/09/26 17:35:57 kewlio Exp $
  */
 
 #ifndef __GNUWORLD_CONFIG_H
-#define __GNUWORLD_CONFIG_H "$Id: gnuworld_config.h,v 1.3 2005/11/16 21:06:37 kewlio Exp $"
+#define __GNUWORLD_CONFIG_H "$Id: gnuworld_config.h,v 1.4 2006/09/26 17:35:57 kewlio Exp $"
 
 /* GNUWorld main configuration file */
 /* All core settings are set/defined here.
@@ -62,6 +62,13 @@
  * Set if you want gnuworld to track topics in the network channels
  */
 #undef TOPIC_TRACK
+
+/**
+ * DAEMON
+ * Set this to make GNUWorld fork into the background when run.
+ * default is OFF to maintain original operation
+ */
+#undef DAEMON
 
 #ifndef RCSTAG
 #define RCSTAG(tag) static const char rcsId[] = tag

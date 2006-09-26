@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: CLEARCHANCommand.cc,v 1.25 2005/03/17 18:35:21 mrbean_ Exp $
+ * $Id: CLEARCHANCommand.cc,v 1.26 2006/09/26 17:35:58 kewlio Exp $
  */
 
 #include	<string>
@@ -31,7 +31,7 @@
 #include	"ccBadChannel.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: CLEARCHANCommand.cc,v 1.25 2005/03/17 18:35:21 mrbean_ Exp $" ) ;
+RCSTAG( "$Id: CLEARCHANCommand.cc,v 1.26 2006/09/26 17:35:58 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -56,7 +56,8 @@ if( st.size() < 2 )
 
 if(st[1].size() > channel::MaxName)
 	{
-	bot->Notice(theClient,"Channel name can't be more than %d chars",channel::MaxName);
+	bot->Notice(theClient,"Channel name can't be more than %d characters.",
+		channel::MaxName);
 	return false;
 	}
 
@@ -69,7 +70,7 @@ if( NULL == theChan )
 	}
 if(bot->isOperChan(theChan))
 	{
-	bot->Notice(theClient,"C'mon , you know you cant clear an oper channel");
+	bot->Notice(theClient,"C'mon, you know you can't clear an oper channel.");
 	return false;
 	}
 
@@ -81,9 +82,9 @@ bot->MsgChanLog("CLEARCHAN %s\n",st.assemble(1).c_str());
 ccBadChannel* Chan = bot->isBadChannel(st[1]);
 if(Chan)
         {
-        bot->Notice(theClient,"Sorry, but you can not change modes in "
-                             "this channel because : %s"
-                             ,Chan->getReason().c_str());
+        bot->Notice(theClient,"Sorry, you can't change modes in "
+                             "this channel because: %s",
+                             Chan->getReason().c_str());
         return false;
         }
 

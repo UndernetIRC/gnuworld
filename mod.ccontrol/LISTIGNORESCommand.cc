@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: LISTIGNORESCommand.cc,v 1.9 2005/01/12 03:50:29 dan_karrels Exp $
+ * $Id: LISTIGNORESCommand.cc,v 1.10 2006/09/26 17:35:59 kewlio Exp $
  */
 
 #include	<string>
@@ -28,7 +28,7 @@
 #include	"CControlCommands.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: LISTIGNORESCommand.cc,v 1.9 2005/01/12 03:50:29 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: LISTIGNORESCommand.cc,v 1.10 2006/09/26 17:35:59 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -41,7 +41,7 @@ namespace uworld
 
 bool LISTIGNORESCommand::Exec( iClient* theClient, const string& )
 {
-bot->MsgChanLog("LISTIGNORES\n");
+bot->MsgChanLog("LISTIGNORES \n");
 bot->listIgnores(theClient);
 return true;
 }

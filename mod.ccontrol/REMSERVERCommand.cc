@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: REMSERVERCommand.cc,v 1.12 2005/01/12 03:50:29 dan_karrels Exp $
+ * $Id: REMSERVERCommand.cc,v 1.13 2006/09/26 17:36:01 kewlio Exp $
  */
 
 #include	<string>
@@ -34,7 +34,7 @@
 #include	"Constants.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: REMSERVERCommand.cc,v 1.12 2005/01/12 03:50:29 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: REMSERVERCommand.cc,v 1.13 2006/09/26 17:36:01 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -52,12 +52,6 @@ bool REMSERVERCommand::Exec( iClient* theClient, const string& Message )
 
 StringTokenizer st( Message ) ;
 
-if(!dbConnected)
-        {
-        bot->Notice(theClient,"Sorry, but the db connection is down now, please try again alittle later");
-        return false;
-        }
-
 if( st.size() < 2 )
 	{
 	Usage( theClient ) ;
@@ -65,15 +59,15 @@ if( st.size() < 2 )
 	}
 if(st[1].size() > server::MaxName)
 	{
-	bot->Notice(theClient,"Server name can't be longer than %d chars"
-		    ,server::MaxName);	
+	bot->Notice(theClient,"Server name can't be longer than %d characters",
+		    server::MaxName);
 	return false;
 	}
 
 ccServer* tmpServer = bot->getServer(bot->removeSqlChars(st[1]));
 if(!tmpServer)
 	{
-	bot->Notice(theClient, "Server %s is not  in my database!\n",st [ 1 ].c_str());
+	bot->Notice(theClient, "Server %s is not in my database!\n",st [ 1 ].c_str());
 	return false;
 	}	
 
@@ -91,18 +85,18 @@ ExecStatusType status = bot->SQLDb->Exec( theQuery.str().c_str() ) ;
         
 if(PGRES_TUPLES_OK != status)
         {
-	bot->Notice(theClient,"Database error, i cant go on with removing the server");	
+	bot->Notice(theClient,"Database error, unable to remove the server.");	
         return false;
         }
 
 if(bot->SQLDb->Tuples() > 0)
 	{
-	bot->Notice(theClient,"There are %d users adding to that server, please remove them first"
-			,bot->SQLDb->Tuples());
+	bot->Notice(theClient,"There are %d users added to that server, please remove them first",
+			bot->SQLDb->Tuples());
 	return false;
 	}
 
-bot->MsgChanLog("Removing server : %s from the database, at the request of %s\n",
+bot->MsgChanLog("Removing server '%s' from the database at the request of %s\n",
 		tmpServer->getName().c_str(),theClient->getNickName().c_str());
 
 //NewServer->setName(SName);

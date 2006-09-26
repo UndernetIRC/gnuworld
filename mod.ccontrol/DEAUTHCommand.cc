@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: DEAUTHCommand.cc,v 1.13 2005/06/19 12:17:50 kewlio Exp $
+ * $Id: DEAUTHCommand.cc,v 1.14 2006/09/26 17:35:58 kewlio Exp $
  */
 
 #include	<string>
@@ -29,7 +29,7 @@
 #include	"StringTokenizer.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: DEAUTHCommand.cc,v 1.13 2005/06/19 12:17:50 kewlio Exp $" ) ;
+RCSTAG( "$Id: DEAUTHCommand.cc,v 1.14 2006/09/26 17:35:58 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -45,7 +45,7 @@ bool DEAUTHCommand::Exec( iClient* theClient, const string& )
 ccUser* tmpUser = bot->IsAuth(theClient->getCharYYXXX());
 if (!tmpUser) 
 	{
-	bot->Notice(theClient,"Your are not authenticated");
+	bot->Notice(theClient,"You are not currently authenticated");
 	return false;
 	}
 if(bot->deAuthUser(tmpUser))

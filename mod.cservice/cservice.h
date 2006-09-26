@@ -17,11 +17,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: cservice.h,v 1.111 2005/12/27 13:27:59 kewlio Exp $
+ * $Id: cservice.h,v 1.112 2006/09/26 17:36:04 kewlio Exp $
  */
 
 #ifndef __CSERVICE_H
-#define __CSERVICE_H "$Id: cservice.h,v 1.111 2005/12/27 13:27:59 kewlio Exp $"
+#define __CSERVICE_H "$Id: cservice.h,v 1.112 2006/09/26 17:36:04 kewlio Exp $"
 
 #include	<iostream>
 #include	<string>
@@ -127,6 +127,7 @@ public:
 	virtual void OnPrivateMessage( iClient*, const string&,
 		bool = false  );
 	virtual void OnAttach() ;
+	virtual void OnShutdown(const string&);
 	virtual bool isOnChannel( const string& ) const;
 	virtual bool RegisterCommand( Command* ) ;
 	virtual bool UnRegisterCommand( const string& ) ;

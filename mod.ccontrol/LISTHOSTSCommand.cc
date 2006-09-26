@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: LISTHOSTSCommand.cc,v 1.13 2005/01/12 03:50:29 dan_karrels Exp $
+ * $Id: LISTHOSTSCommand.cc,v 1.14 2006/09/26 17:35:59 kewlio Exp $
  */
 
 #include	<string>
@@ -29,7 +29,7 @@
 #include	"StringTokenizer.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: LISTHOSTSCommand.cc,v 1.13 2005/01/12 03:50:29 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: LISTHOSTSCommand.cc,v 1.14 2006/09/26 17:35:59 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -44,12 +44,6 @@ bool LISTHOSTSCommand::Exec( iClient* theClient, const string& Message)
 StringTokenizer st( Message ) ;
 
 
-if(!dbConnected)
-        {
-        bot->Notice(theClient,"Sorry, but the db connection is down now, please try again alittle later");
-        return false;
-        }
-	
 if( st.size() < 2 )
 	{
 	Usage(theClient);
@@ -62,7 +56,7 @@ tmpUser = bot->GetOper(st[1]);
 
 if(!tmpUser)
 	{
-        bot->Notice(theClient,"%s isnt on my access list",st[1].c_str());
+        bot->Notice(theClient,"%s isn't on my access list",st[1].c_str());
         return false;
 	}
 
@@ -72,7 +66,7 @@ if(bot->listHosts(tmpUser,theClient))
 	}
 else
 	{
-	bot->Notice(theClient,"Error while accessing %s hostlist",st[1].c_str());
+	bot->Notice(theClient,"Error while accessing host list for %s",st[1].c_str());
 	}
 
 return true;

@@ -51,9 +51,9 @@ DIST_COMMON = README $(am__configure_deps) $(srcdir)/Makefile.am \
 	$(top_srcdir)/bin/snoop.example.conf.in \
 	$(top_srcdir)/bin/stats.example.conf.in \
 	$(top_srcdir)/configure $(top_srcdir)/include/defs.h.in \
-	AUTHORS COPYING ChangeLog INSTALL NEWS TODO config.guess \
-	config.sub depcomp install-sh ltconfig ltmain.sh missing \
-	mkinstalldirs
+	$(top_srcdir)/tools/checkgnuworld.sh.in AUTHORS COPYING \
+	ChangeLog INSTALL NEWS TODO config.guess config.sub depcomp \
+	install-sh ltconfig ltmain.sh missing mkinstalldirs
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.ac
@@ -69,7 +69,7 @@ CONFIG_CLEAN_FILES = bin/server_command_map bin/ccontrol.example.conf \
 	bin/gnutest.example.conf bin/GNUWorld.example.conf \
 	bin/nickserv.example.conf bin/scanner.example.conf \
 	bin/stats.example.conf bin/snoop.example.conf \
-	bin/dronescan.example.conf
+	bin/dronescan.example.conf tools/checkgnuworld.sh
 SOURCES =
 DIST_SOURCES =
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
@@ -373,7 +373,8 @@ EXTRA_DIST = bin/ccontrol.example.conf.in \
 	include/server.h \
 	libltdl/acconfig.h \
 	libltdl/ltdl.h \
-	libltdl/config.h
+	libltdl/config.h \
+	tools/checkgnuworld.sh
 
 all: all-recursive
 
@@ -453,6 +454,8 @@ bin/stats.example.conf: $(top_builddir)/config.status $(top_srcdir)/bin/stats.ex
 bin/snoop.example.conf: $(top_builddir)/config.status $(top_srcdir)/bin/snoop.example.conf.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 bin/dronescan.example.conf: $(top_builddir)/config.status $(top_srcdir)/bin/dronescan.example.conf.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+tools/checkgnuworld.sh: $(top_builddir)/config.status $(top_srcdir)/tools/checkgnuworld.sh.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 
 mostlyclean-libtool:
@@ -600,7 +603,7 @@ distclean-tags:
 distdir: $(DISTFILES)
 	$(am__remove_distdir)
 	mkdir $(distdir)
-	$(mkdir_p) $(distdir)/bin $(distdir)/contrib $(distdir)/doc $(distdir)/doc/cmaster/maint $(distdir)/doc/cmaster/regproc $(distdir)/doc/cmaster/website $(distdir)/doc/idoc $(distdir)/doc/nickserv $(distdir)/include $(distdir)/libltdl
+	$(mkdir_p) $(distdir)/bin $(distdir)/contrib $(distdir)/doc $(distdir)/doc/cmaster/maint $(distdir)/doc/cmaster/regproc $(distdir)/doc/cmaster/website $(distdir)/doc/idoc $(distdir)/doc/nickserv $(distdir)/include $(distdir)/libltdl $(distdir)/tools
 	@srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`; \
 	topsrcdirstrip=`echo "$(top_srcdir)" | sed 's|.|.|g'`; \
 	list='$(DISTFILES)'; for file in $$list; do \

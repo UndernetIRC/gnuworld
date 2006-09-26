@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: REMGLINECommand.cc,v 1.25 2005/01/12 03:50:29 dan_karrels Exp $
+ * $Id: REMGLINECommand.cc,v 1.26 2006/09/26 17:36:00 kewlio Exp $
  */
 
 #include	<string>
@@ -31,7 +31,7 @@
 #include	"Constants.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: REMGLINECommand.cc,v 1.25 2005/01/12 03:50:29 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: REMGLINECommand.cc,v 1.26 2006/09/26 17:36:00 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -45,12 +45,6 @@ namespace uworld
 bool REMGLINECommand::Exec( iClient* theClient, const string& Message )
 {
 StringTokenizer st( Message ) ;
-
-if(!dbConnected)
-        {
-        bot->Notice(theClient,"Sorry, but the db connection is down now, please try again alittle later");
-        return false;
-        }
 
 if( st.size() < 2 )
 	{
@@ -74,7 +68,7 @@ unsigned int dummy;
 
 if(bot->checkGline(st[1],0,dummy) & gline::HUH_NO_HOST)
 	{
-	bot->Notice(theClient,"Please user REMSGLINE to remove a this gline");
+	bot->Notice(theClient,"Please use REMSGLINE to remove a this gline");
 	return false;
 	}
 	

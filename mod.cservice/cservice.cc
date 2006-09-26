@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: cservice.cc,v 1.272 2006/02/10 14:06:14 kewlio Exp $
+ * $Id: cservice.cc,v 1.273 2006/09/26 17:36:04 kewlio Exp $
  */
 
 #include	<new>
@@ -187,6 +187,12 @@ MyUplink->RegisterEvent( EVT_ACCOUNT, this );
 MyUplink->RegisterEvent( EVT_BURST_ACK, this );
 
 xClient::OnAttach() ;
+}
+
+void cservice::OnShutdown(const std::string& reason)
+{
+	/* handle client shutdown */
+	MyUplink->UnloadClient(this, reason);
 }
 
 cservice::cservice(const string& args)

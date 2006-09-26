@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: INVITECommand.cc,v 1.20 2005/06/19 15:08:46 kewlio Exp $
+ * $Id: INVITECommand.cc,v 1.21 2006/09/26 17:35:58 kewlio Exp $
  */
 
 #include	<string>
@@ -32,7 +32,7 @@
 #include	"Network.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: INVITECommand.cc,v 1.20 2005/06/19 15:08:46 kewlio Exp $" ) ;
+RCSTAG( "$Id: INVITECommand.cc,v 1.21 2006/09/26 17:35:58 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -55,7 +55,8 @@ if( st.size() == 1 )
 	}
 if(st[1].size() > channel::MaxName)
 	{
-	bot->Notice(theClient,"Channel name can't be more than %d chars",channel::MaxName);
+	bot->Notice(theClient,"Channel name can't be more than %d characters",
+		channel::MaxName);
 	return false;
 	}
 ccUser* tmpUser = bot->IsAuth(theClient);
@@ -75,7 +76,8 @@ if(st.size() > 2)
 	inviteClient = Network->findNick(st[2]);
 	if( inviteClient == NULL)
 		{
-		bot->Notice(theClient,"I cant find %s anywere",st[2].c_str());
+		bot->Notice(theClient,"I cant find '%s' anywhere",
+			st[2].c_str());
 		return true;
 		}
 
@@ -94,7 +96,7 @@ else
 Channel* theChan = Network->findChannel(st[1]);
 if (theChan == NULL)
 {
-	bot->Notice(theClient, "Channel %s does not exist!", st[1].c_str());
+	bot->Notice(theClient, "Channel '%s' does not exist!", st[1].c_str());
 	return true;
 }
 

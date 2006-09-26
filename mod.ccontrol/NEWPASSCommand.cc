@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: NEWPASSCommand.cc,v 1.22 2005/01/12 03:50:29 dan_karrels Exp $
+ * $Id: NEWPASSCommand.cc,v 1.23 2006/09/26 17:36:00 kewlio Exp $
  */
 
 #include	<string>
@@ -32,7 +32,7 @@
 #include	"Constants.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: NEWPASSCommand.cc,v 1.22 2005/01/12 03:50:29 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: NEWPASSCommand.cc,v 1.23 2006/09/26 17:36:00 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -46,12 +46,6 @@ bool NEWPASSCommand::Exec( iClient* theClient, const string& Message)
 {
 StringTokenizer st( Message ) ;
 	
-if(!dbConnected)
-        {
-        bot->Notice(theClient,"Sorry, but the db connection is down now, please try again alittle later");
-        return false;
-        }
-
 if( st.size() < 2 )
 	{
 	Usage(theClient);
@@ -70,10 +64,11 @@ unsigned int passRet = bot->checkPassword(st[1],theUser);
 switch(passRet)
 	{
 	case password::TOO_SHORT:
-		bot->Notice(theClient,"Password must be atleast %d chars",password::MIN_SIZE);
+		bot->Notice(theClient,"Password must be at least %d characters",
+			password::MIN_SIZE);
 		break;
 	case password::LIKE_UNAME:
-		bot->Notice(theClient,"Password can't be like your username");
+		bot->Notice(theClient,"Password can't be similar to your username");
 		break;
 	case password::PASS_OK:
 		{		
@@ -81,15 +76,17 @@ switch(passRet)
 		if(theUser->Update())
 			{
 			bot->Notice(theClient,"Password changed!");
-        		bot->MsgChanLog("(%s) - %s : Changed Password \n",theUser->getUserName().c_str()
-                        		,theClient->getRealNickUserHost().c_str());
+        		bot->MsgChanLog("(%s) - %s: Changed Password\n",
+				theUser->getUserName().c_str(),
+                        	theClient->getRealNickUserHost().c_str());
 			return true;
 			}
 		else
 			{
 			bot->Notice(theClient,"Error while changing password");
-        		bot->MsgChanLog("Error while changing password for (%s) - %s\n",theUser->getUserName().c_str()
-                        		,theClient->getRealNickUserHost().c_str(),st.assemble(1).c_str());
+        		bot->MsgChanLog("Error while changing password for (%s) - %s\n",
+				theUser->getUserName().c_str(),
+                        	theClient->getRealNickUserHost().c_str(),st.assemble(1).c_str());
 			return true;
 			}
 		}

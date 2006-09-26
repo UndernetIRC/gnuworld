@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: REMOVEIGNORECommand.cc,v 1.10 2005/01/12 03:50:29 dan_karrels Exp $
+ * $Id: REMOVEIGNORECommand.cc,v 1.11 2006/09/26 17:36:01 kewlio Exp $
  */
 
 #include	<string>
@@ -31,7 +31,7 @@
 #include	"Network.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: REMOVEIGNORECommand.cc,v 1.10 2005/01/12 03:50:29 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: REMOVEIGNORECommand.cc,v 1.11 2006/09/26 17:36:01 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -65,20 +65,20 @@ if( string::npos == atPos )
 	if(bot->removeIgnore(igClient) == IGNORE_REMOVED)
 		{
 		bot->Notice(theClient,"Successfully removed ignore for user %s",st[1].c_str());
-		bot->MsgChanLog("Removed ignore for %s by %s request\n",st[1].c_str(),theClient->getNickName().c_str());
+		bot->MsgChanLog("Removed ignore for %s by request of %s\n",st[1].c_str(),theClient->getNickName().c_str());
 		}
 
 	else
-		bot->Notice(theClient,"Cant find ignore for user %s",st[1].c_str());
+		bot->Notice(theClient,"Can't find ignore for user %s",st[1].c_str());
 	}
 else
 	if(bot->removeIgnore(st[1]) == IGNORE_REMOVED)
 		{	
 		bot->Notice(theClient,"Successfully removed ignore for host %s",st[1].c_str());
-		bot->MsgChanLog("Removed ignore for %s by %s request\n",st[1].c_str(),theClient->getNickName().c_str());
+		bot->MsgChanLog("Removed ignore for %s by request of %s\n",st[1].c_str(),theClient->getNickName().c_str());
 		}
 	else
-		bot->Notice(theClient,"Cant find ignore for host %s",st[1].c_str());
+		bot->Notice(theClient,"Can't find ignore for host %s",st[1].c_str());
 
 return true;
 }

@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: CHECKNETCommand.cc,v 1.17 2005/06/19 01:09:14 kewlio Exp $
+ * $Id: CHECKNETCommand.cc,v 1.18 2006/09/26 17:35:58 kewlio Exp $
  */
 
 #include	<string>
@@ -29,7 +29,7 @@
 #include	"ccontrol_generic.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: CHECKNETCommand.cc,v 1.17 2005/06/19 01:09:14 kewlio Exp $" ) ;
+RCSTAG( "$Id: CHECKNETCommand.cc,v 1.18 2006/09/26 17:35:58 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -43,7 +43,7 @@ bool CHECKNETCommand::Exec( iClient* theClient, const string& )
 {
 unsigned int TServers = 0;
 
-bot->Notice(theClient,"Checking network status as for %d\n",::time(NULL));
+bot->Notice(theClient,"Checking network status as at %ld\n",::time(NULL));
 bot->MsgChanLog("CHECKNET\n");
 
 ccServer* CurServer = 0;
@@ -65,7 +65,7 @@ for (ccontrol::serversConstIterator ptr = bot->serversMap_begin() ;
 		Msg += "Last split: ";
 		if(CurServer->getLastSplitted() != 0)
 			{
-			sprintf(tNum, "%li", CurServer->getLastSplitted());
+			sprintf(tNum, "%ld", (long)CurServer->getLastSplitted());
 			Msg += "[";
 			Msg += tNum;
 			Msg += "] ";
@@ -80,7 +80,7 @@ for (ccontrol::serversConstIterator ptr = bot->serversMap_begin() ;
 		
 		if(CurServer->getLastConnected() != 0)
 			{
-			sprintf(tNum, "%li", CurServer->getLastConnected());
+			sprintf(tNum, "%ld", (long)CurServer->getLastConnected());
 			Msg += "[";
 			Msg += tNum;
 			Msg += "] ";
@@ -94,7 +94,7 @@ for (ccontrol::serversConstIterator ptr = bot->serversMap_begin() ;
 		}
 	}
 
-bot->Notice(theClient,"Finished checking the network status\n");
+bot->Notice(theClient,"Finished checking the status of the network.\n");
 bot->Notice(theClient,"Found a total of %d missing servers\n",TServers);
 return true;
 

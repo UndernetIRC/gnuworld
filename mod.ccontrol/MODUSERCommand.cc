@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: MODUSERCommand.cc,v 1.25 2005/01/12 03:50:29 dan_karrels Exp $
+ * $Id: MODUSERCommand.cc,v 1.26 2006/09/26 17:35:59 kewlio Exp $
  */
 
 #include	<string>
@@ -33,7 +33,7 @@
 #include	"Constants.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: MODUSERCommand.cc,v 1.25 2005/01/12 03:50:29 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: MODUSERCommand.cc,v 1.26 2006/09/26 17:35:59 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -47,12 +47,6 @@ bool MODUSERCommand::Exec( iClient* theClient, const string& Message)
 {	 
 StringTokenizer st( Message ) ;
 
-if(!dbConnected)
-        {
-        bot->Notice(theClient,"Sorry, but the db connection is down now, please try again alittle later");
-        return false;
-        }
-
 if(st.size() < 2)
 	{
 	Usage(theClient);
@@ -61,7 +55,7 @@ if(st.size() < 2)
 //Fetch the oper data base entry
 if(st[1].size() > 64)
 	{
-	bot->Notice(theClient,"Oper name can't be more than 64 chars");
+	bot->Notice(theClient,"Oper name can't be more than 64 characters");
 	return false;
 	}
 
@@ -69,7 +63,7 @@ ccUser* tmpUser = bot->GetOper(st[1]);
 
 if(!tmpUser)
 	{
-        bot->Notice(theClient,"%s isnt on my access list",st[1].c_str());
+        bot->Notice(theClient,"%s isn't on my access list",st[1].c_str());
         return false;
 	}
 //Check if the user got a higher or equal flags than the one he's trying to edit	
@@ -87,17 +81,20 @@ bool Same = (tmpUser->getID() == tmpAuth->getID());
 
 if((Admin) && (AdFlag <= OpFlag) && (!Same))
 	{
-	bot->Notice(theClient,"You cant modify a user who got higher/equal level than yours");
+	bot->Notice(theClient,"You can't modify a user who has a higher or "
+		"equal level to your own.");
 	return false;
 	}
 else if(AdFlag < OpFlag)
 	{
-	bot->Notice(theClient,"You cant modify a user who got higher level than yours");
+	bot->Notice(theClient,"You can't modify a user who has a higher level "
+		"than your own.");
 	return false;
 	}
 if((Admin) && (strcasecmp(tmpAuth->getServer().c_str(),tmpUser->getServer().c_str())))
 	{
-	bot->Notice(theClient,"You can only modify a user who's associated to the same server as you");
+	bot->Notice(theClient,"You can only modify a user who is associated to "
+		"the same server as you.");
 	return false;
 	}
 unsigned int pos = 2;
@@ -114,8 +111,9 @@ while(pos < st.size())
 		switch(passStat)
 			{
 			case password::TOO_SHORT:
-				bot->Notice(theClient,"Password must be atleast %d"
-					    ,password::MIN_SIZE);
+				bot->Notice(theClient,"Password must be atleast %d "
+					"characters",
+					password::MIN_SIZE);
 				pos+=2;
 				break;
 			case password::LIKE_UNAME:
@@ -128,7 +126,8 @@ while(pos < st.size())
 				tmpUser->setLast_Updated_By(theClient->getRealNickUserHost());
 				if(tmpUser->Update())
 					{
-					bot->Notice(theClient,"Password for %s Changed to %s",st[1].c_str(),st[pos+1].c_str());
+					bot->Notice(theClient,"Password for %s has been changed to %s",
+						st[1].c_str(),st[pos+1].c_str());
 					}
 				else
 					{
@@ -142,7 +141,7 @@ while(pos < st.size())
 		{
 		if((Same) && (AdFlag < operLevel::CODERLEVEL))
 			{
-			bot->Notice(theClient,"You cant add yourself another host");
+			bot->Notice(theClient,"You can't add yourself another host");
 			pos+=2;
 			continue;
 			}			
@@ -154,16 +153,18 @@ while(pos < st.size())
 			}
 		if(st[pos + 1].size() > 128)
 			{
-			bot->Notice(theClient,"Hostname can't be more than 128 chars");
+			bot->Notice(theClient,"Hostname can't be more than 128 characters");
 			return false;
 			}
 		if(!bot->validUserMask(st[pos+1]))
 			{
-			bot->Notice(theClient,"Mask %s is not a valid mask in the form of *!*@*",st[pos+1].c_str());
+			bot->Notice(theClient,"Mask '%s' is not a valid mask in the form of *!*@*",
+				st[pos+1].c_str());
 			}
 		else if(bot->UserGotHost(tmpUser,st[pos+1]))
 			{
-			bot->Notice(theClient,"%s already got the host %s",st[1].c_str(),st[pos+1].c_str());
+			bot->Notice(theClient,"'%s' already has the host (%s) listed.",
+				st[1].c_str(),st[pos+1].c_str());
 			}
 		else if(bot->AddHost(tmpUser,st[pos+1]))
 			{
@@ -171,7 +172,8 @@ while(pos < st.size())
 			}
 		else
 			{
-			bot->Notice(theClient,"Error while adding mask %s  for %s",st[pos+1].c_str(),st[1].c_str());
+			bot->Notice(theClient,"Error while adding the mask (%s) for %s",
+				st[pos+1].c_str(),st[1].c_str());
 			}
 		pos += 2;
 		}
@@ -184,20 +186,23 @@ while(pos < st.size())
 			}
 		if(st[pos + 1].size() > 128)
 			{
-			bot->Notice(theClient,"Hostname can't be more than 128 chars");
+			bot->Notice(theClient,"Hostname can't be more than 128 characters");
 			return false;
 			}
 		if(!bot->UserGotHost(tmpUser,bot->removeSqlChars(st[pos+1])))
 			{
-			bot->Notice(theClient,"%s doesnt have the host %s in my access list",st[1].c_str(),st[pos+1].c_str());
+			bot->Notice(theClient,"%s doesn't have the host '%s' in my access list",
+				st[1].c_str(),st[pos+1].c_str());
 			}
 		else if(bot->DelHost(tmpUser,bot->removeSqlChars(st[pos+1])))
 			{
-			bot->Notice(theClient,"Mask %s was deleted from %s access list",st[pos+1].c_str(),st[1].c_str());
+			bot->Notice(theClient,"Mask '%s' was deleted from %s's access list",
+				st[pos+1].c_str(),st[1].c_str());
 			}
 		else
 			{
-			bot->Notice(theClient,"Error while deleting mask %s from %s access list",st[pos+1].c_str(),st[1].c_str());
+			bot->Notice(theClient,"Error while deleting mask '%s' from %s's access list",
+				st[pos+1].c_str(),st[1].c_str());
 			}
 		pos += 2;
 		}	    
@@ -268,19 +273,19 @@ while(pos < st.size())
 			}
 		if(Admin)
 			{
-			bot->Notice(theClient,"Sorry, only SMT memebers can change the user server");
+			bot->Notice(theClient,"Sorry, only SMT+ users can change an admins' server");
 			return false;
 			}
 		if(st[pos + 1].size() > server::MaxName)
 			{
-			bot->Notice(theClient,"Server name can't be more than 128 chars");
+			bot->Notice(theClient,"Server name can't be more than 128 characters");
 			return false;
 			}
 		string SName = bot->expandDbServer(st[pos+1]);
 		if(!strcasecmp(SName,""))
 			{
-			bot->Notice(theClient,"I cant see a server in the db that matches %s"
-				    ,st[pos+1].c_str());
+			bot->Notice(theClient,"I can't see a server in the database that matches %s",
+				    st[pos+1].c_str());
 			return false;
 			}
 		if(!strcasecmp(tmpUser->getServer(),SName))
@@ -304,11 +309,11 @@ while(pos < st.size())
 			pos += 2;
 			}	
 		}		
-	else if(!strcasecmp(st[pos],"-op")) //Trying to toggle the get of logs
+	else if(!strcasecmp(st[pos],"-op")) //Trying to toggle needop
 		{
 		if(Admin)
 			{
-			bot->Notice(theClient,"Sorry, the needop is a must");
+			bot->Notice(theClient,"Sorry, the needop flag is required.");
 			pos+=2;
 			continue;
 			}
@@ -320,12 +325,12 @@ while(pos < st.size())
 		if(!strcasecmp(st[pos+1],"on"))
 			{
 			tmpUser->setNeedOp(true);
-			bot->Notice(theClient,"NeedOp have been turned on for %s",st[1].c_str());
+			bot->Notice(theClient,"NeedOp has been turned on for %s",st[1].c_str());
 			}
 		else if(!strcasecmp(st[pos+1],"off"))
 			{
 			tmpUser->setNeedOp(false);
-			bot->Notice(theClient,"NeedOp have been turned off for %s",st[1].c_str());
+			bot->Notice(theClient,"NeedOp has been turned off for %s",st[1].c_str());
 			}
 		else
 			{
@@ -339,7 +344,8 @@ while(pos < st.size())
 		{
 		if((AdFlag < operLevel::CODERLEVEL) && (AdFlag <= OpFlag))
 			{
-			bot->Notice(theClient,"You cant update an access of a user who has higher or equal level as yours");
+			bot->Notice(theClient,"You can't update an access for a user who has a higher "
+				"or equal level to your own.");
 			}
 		else
 			{
@@ -347,11 +353,11 @@ while(pos < st.size())
 			tmpUser->setLast_Updated_By(bot->removeSqlChars(theClient->getRealNickUserHost()));
 			if(tmpUser->Update())
 				{
-				bot->Notice(theClient,"Successfully updated %s access",st[1].c_str());
+				bot->Notice(theClient,"Successfully updated access level for %s.",st[1].c_str());
 				}
 			else
 				{
-				bot->Notice(theClient,"Error while updating %s access",st[1].c_str());
+				bot->Notice(theClient,"Error while updating access level for %s.",st[1].c_str());
 				}
 	    		}
 		pos++;
@@ -360,7 +366,7 @@ while(pos < st.size())
 		{
 		if((pos + 1) >= st.size())
 			{
-			bot->Notice(theClient,"-uf option must get anew flags");
+			bot->Notice(theClient,"-uf option must get an argument.");
 			return false;
 			}
 		unsigned int NewF;
@@ -382,14 +388,15 @@ while(pos < st.size())
 			}
 		else
 			{
-			bot->Notice(theClient,"Bad option for -uf , must be CODER/SMT/ADMIN/OPER");
+			bot->Notice(theClient,"Bad option for -uf, must be CODER, SMT, ADMIN or OPER");
 			NewF = 0;
 			}
 		if(NewF > 0)
 			{
 			if((AdFlag < operLevel::CODERLEVEL) && (AdFlag <= NewF))
 				{
-				bot->Notice(theClient,"You cant update the flags to a higher or equal to your own flags");
+				bot->Notice(theClient,"You can't update the flags to a higher or equal "
+					"level than your own.");
 				}
 			else
 				{
@@ -397,11 +404,11 @@ while(pos < st.size())
 				tmpUser->setLast_Updated_By(theClient->getRealNickUserHost());
 				if(tmpUser->Update())
 					{
-					bot->Notice(theClient,"Successfully updated %s flags",st[1].c_str());
+					bot->Notice(theClient,"Successfully updated flags for %s.",st[1].c_str());
 					}
 				else
 					{
-					bot->Notice(theClient,"Error while updating %s flags",st[1].c_str());
+					bot->Notice(theClient,"Error while updating flags for %s.",st[1].c_str());
 					}
 				}
 			}
@@ -412,18 +419,18 @@ while(pos < st.size())
 		{
 		if((pos + 1) >= st.size())
 			{
-			bot->Notice(theClient,"-e option must get an email addy");
+			bot->Notice(theClient,"-e option requires an e-mail address.");
 			return false;
 			}
 		tmpUser->setEmail(bot->removeSqlChars(st[pos+1]));
 		tmpUser->setLast_Updated_By(bot->removeSqlChars(theClient->getRealNickUserHost()));
 		if(tmpUser->Update())
 			{
-			bot->Notice(theClient,"Successfully updated %s email address",st[1].c_str());
+			bot->Notice(theClient,"Successfully updated e-mail address for %s.",st[1].c_str());
 			}
 		else
 			{
-			bot->Notice(theClient,"Error while updating %s email address",st[1].c_str());
+			bot->Notice(theClient,"Error while updating e-mail address for %s.",st[1].c_str());
 			}
 		pos+=2;
 		}

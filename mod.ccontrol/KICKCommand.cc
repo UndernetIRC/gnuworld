@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: KICKCommand.cc,v 1.14 2005/01/12 03:50:29 dan_karrels Exp $
+ * $Id: KICKCommand.cc,v 1.15 2006/09/26 17:35:58 kewlio Exp $
  */
 
 #include	<string>
@@ -33,7 +33,7 @@
 #include	"ccBadChannel.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: KICKCommand.cc,v 1.14 2005/01/12 03:50:29 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: KICKCommand.cc,v 1.15 2006/09/26 17:35:58 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -63,7 +63,8 @@ if( chanName[ 0 ] != '#' )
 
 if(chanName.size() > channel::MaxName)
 	{
-	bot->Notice(theClient,"Channel name can't be more than %d chars",channel::MaxName);
+	bot->Notice(theClient,"Channel name can't be more than %d characters",
+		channel::MaxName);
 	}
 
 bot->MsgChanLog("KICK %s\n",st.assemble(1).c_str());
@@ -71,9 +72,9 @@ bot->MsgChanLog("KICK %s\n",st.assemble(1).c_str());
 ccBadChannel* Chan = bot->isBadChannel(st[1]);
 if(Chan)
         {
-        bot->Notice(theClient,"Sorry, but you can not kick from  "
-                             "this channel because : %s"
-                             ,Chan->getReason().c_str());
+        bot->Notice(theClient,"Sorry, you can't kick from  "
+                             "this channel because: %s",
+                             Chan->getReason().c_str());
         return false;
         }
 
@@ -96,15 +97,15 @@ if( NULL == Target )
 if( NULL == theChan->findUser( Target ) )
 	{
 	bot->Notice( theClient, "User %s was not found "
-	"on channel %s",
-	st[ 1 ].c_str(),
-	theChan->getName().c_str() ) ;
+		"on channel %s",
+		st[ 1 ].c_str(),
+		theChan->getName().c_str());
 	return true ;
 	}
 
 if( Target->getMode(iClient::MODE_SERVICES))
 	{
-	bot->Notice(theClient,"Are you trying to get me introuble with %s?",st[ 2 ].c_str());
+	bot->Notice(theClient,"Are you trying to get me in trouble with %s?",st[ 2 ].c_str());
 	return false;
 	}
 bot->Notice( theClient, "Kicking %s from channel %s because %s",

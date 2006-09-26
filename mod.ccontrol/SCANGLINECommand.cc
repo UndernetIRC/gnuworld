@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: SCANGLINECommand.cc,v 1.12 2005/01/12 03:50:29 dan_karrels Exp $
+ * $Id: SCANGLINECommand.cc,v 1.13 2006/09/26 17:36:01 kewlio Exp $
  */
 
 #include	<string>
@@ -29,7 +29,7 @@
 #include	"StringTokenizer.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: SCANGLINECommand.cc,v 1.12 2005/01/12 03:50:29 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: SCANGLINECommand.cc,v 1.13 2006/09/26 17:36:01 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -60,7 +60,7 @@ if( glines.empty() )
 	return true ;
 	}
 
-bot->Notice( theClient, "Current time: %d", ::time( 0 ) ) ;
+bot->Notice( theClient, "Current time: %ld", (long)::time( 0 ) ) ;
 
 for( vector< const Gline* >::const_iterator ptr = glines.begin() ;
 	ptr != glines.end() ; ++ptr )

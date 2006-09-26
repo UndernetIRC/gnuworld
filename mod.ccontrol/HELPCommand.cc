@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: HELPCommand.cc,v 1.22 2005/10/04 20:16:52 kewlio Exp $
+ * $Id: HELPCommand.cc,v 1.23 2006/09/26 17:35:58 kewlio Exp $
  */
 
 #include	<string>
@@ -31,7 +31,7 @@
 #include	"commLevels.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: HELPCommand.cc,v 1.22 2005/10/04 20:16:52 kewlio Exp $" ) ;
+RCSTAG( "$Id: HELPCommand.cc,v 1.23 2006/09/26 17:35:58 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -46,12 +46,6 @@ namespace uworld
 bool HELPCommand::Exec( iClient* theClient, const string& Message )
 {
 StringTokenizer st( Message ) ;
-
-if(!dbConnected)
-        {
-        bot->Notice(theClient,"Sorry, but the db connection is down now, please try again alittle later");
-        return false;
-        }
 
 ccUser *tmpAuth = bot->IsAuth(theClient);
 //if(!tmpAuth)

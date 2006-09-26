@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccGline.cc,v 1.20 2005/01/12 03:50:29 dan_karrels Exp $
+ * $Id: ccGline.cc,v 1.21 2006/09/26 17:36:02 kewlio Exp $
  */
  
 #include	<sstream>
@@ -34,7 +34,7 @@
 #include	"ccontrol.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: ccGline.cc,v 1.20 2005/01/12 03:50:29 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: ccGline.cc,v 1.21 2006/09/26 17:36:02 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -92,7 +92,7 @@ if( PGRES_COMMAND_OK != status )
 	return false ;
 	}
 //Now insert the new one
-static const char *Main = "INSERT into Glines (Host,AddedBy,AddedOn,ExpiresAt,LastUpdated,Reason) VALUES ('";
+static const char *Main = "INSERT INTO Glines (Host,AddedBy,AddedOn,ExpiresAt,LastUpdated,Reason) VALUES ('";
 
 stringstream theQuery;
 theQuery	<< Main

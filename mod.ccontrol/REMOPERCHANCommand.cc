@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: REMOPERCHANCommand.cc,v 1.11 2005/01/12 03:50:29 dan_karrels Exp $
+ * $Id: REMOPERCHANCommand.cc,v 1.12 2006/09/26 17:36:00 kewlio Exp $
  */
 
 #include	<string>
@@ -31,7 +31,7 @@
 #include	"Constants.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: REMOPERCHANCommand.cc,v 1.11 2005/01/12 03:50:29 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: REMOPERCHANCommand.cc,v 1.12 2006/09/26 17:36:00 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -54,7 +54,8 @@ if( st.size() < 2 )
 
 if(st[1].size() > channel::MaxName)
 	{
-	bot->Notice(theClient,"Channel name can't be more than %d chars",channel::MaxName);
+	bot->Notice(theClient,"Channel name can't be more than %d characters",
+		channel::MaxName);
 	return false;
 	}
 string chanName = st[ 1 ] ;

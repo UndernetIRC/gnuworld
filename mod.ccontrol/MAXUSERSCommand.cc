@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: MAXUSERSCommand.cc,v 1.6 2005/06/19 01:09:14 kewlio Exp $
+ * $Id: MAXUSERSCommand.cc,v 1.7 2006/09/26 17:35:59 kewlio Exp $
  */
 
 #include	<string>
@@ -28,7 +28,7 @@
 #include	"ccontrol_generic.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: MAXUSERSCommand.cc,v 1.6 2005/06/19 01:09:14 kewlio Exp $" ) ;
+RCSTAG( "$Id: MAXUSERSCommand.cc,v 1.7 2006/09/26 17:35:59 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -38,8 +38,8 @@ namespace uworld
 
 bool MAXUSERSCommand::Exec( iClient* theClient, const string& )
 {
-bot->Notice(theClient,"Current number of users is : %d",bot->getCurUsers());
-bot->Notice(theClient,"Maximum number of users ever recorded is : %d",bot->getMaxUsers());
+bot->Notice(theClient,"Current number of users is: %d",bot->getCurUsers());
+bot->Notice(theClient,"Maximum number of users ever recorded is: %d",bot->getMaxUsers());
 bot->Notice(theClient,"Recorded on %s (%s ago)",bot->convertToAscTime(bot->getDateMax()),
 	Ago(bot->getDateMax()));
 

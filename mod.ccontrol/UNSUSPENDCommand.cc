@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: UNSUSPENDCommand.cc,v 1.13 2005/01/12 03:50:29 dan_karrels Exp $
+ * $Id: UNSUSPENDCommand.cc,v 1.14 2006/09/26 17:36:01 kewlio Exp $
  */
 
 #include	<string>
@@ -30,7 +30,7 @@
 #include	"StringTokenizer.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: UNSUSPENDCommand.cc,v 1.13 2005/01/12 03:50:29 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: UNSUSPENDCommand.cc,v 1.14 2006/09/26 17:36:01 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -44,12 +44,6 @@ bool UNSUSPENDCommand::Exec( iClient* theClient, const string& Message)
 {
 StringTokenizer st( Message ) ;
 	
-if(!dbConnected)
-        {
-        bot->Notice(theClient,"Sorry, but the db connection is down now, please try again alittle later");
-        return false;
-        }
-
 if( st.size() < 2 )
 	{
 	Usage(theClient);
@@ -62,7 +56,7 @@ ccUser* tmpUser = bot->GetOper(bot->removeSqlChars(st[1]));
 
 if(!tmpUser)
 	{
-	bot->Notice(theClient,"%s isnt on my access list",st[1].c_str());
+	bot->Notice(theClient,"%s isn't on my access list",st[1].c_str());
 	return false;
 	}
 	
@@ -79,17 +73,20 @@ bool Admin = AdFlag < operLevel::SMTLEVEL;
 
 if((Admin) && (AdFlag <= OpFlag))
 	{
-	bot->Notice(theClient,"You cant unsuspend a user who got higher/equal level than yours");
+	bot->Notice(theClient,"You can't unsuspend a user who has a higher or equal "
+		"access level than you.");
 	return false;
 	}
 else if(AdFlag < OpFlag)
 	{
-	bot->Notice(theClient,"You cant unsuspend a user who got higher level than yours");
+	bot->Notice(theClient,"You can't unsuspend a user who has a higher level "
+		"than you.");
 	return false;
 	}
 if((Admin) && (strcasecmp(tmpAuth->getServer().c_str(),tmpUser->getServer().c_str())))
 	{
-	bot->Notice(theClient,"You can only unsuspend a user who's associated to the same server as you");
+	bot->Notice(theClient,"You can only unsuspend a user that is associated with "
+		"the same server as you");
 	return false;
 	}
 if(tmpUser->getSuspendLevel() > AdFlag)
@@ -117,7 +114,7 @@ if(tmpUser->Update())
 	}
 else
 	{
-	bot->Notice(theClient,"Error while unsuspendeding %s",st[1].c_str());
+	bot->Notice(theClient,"Error while unsuspending %s",st[1].c_str());
 	return false;
 	}
 

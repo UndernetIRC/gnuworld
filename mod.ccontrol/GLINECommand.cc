@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: GLINECommand.cc,v 1.56 2005/10/04 01:45:30 kewlio Exp $
+ * $Id: GLINECommand.cc,v 1.57 2006/09/26 17:35:58 kewlio Exp $
  */
 
 #include	<string>
@@ -40,7 +40,7 @@
 #include	"Constants.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: GLINECommand.cc,v 1.56 2005/10/04 01:45:30 kewlio Exp $" ) ;
+RCSTAG( "$Id: GLINECommand.cc,v 1.57 2006/09/26 17:35:58 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -60,12 +60,6 @@ bool GLINECommand::Exec( iClient* theClient, const string& Message )
 {
 bool Ok = true;
 StringTokenizer st( Message ) ;
-
-if(!dbConnected)
-        {
-        bot->Notice(theClient,"Sorry, but the db connection is down now, please try again alittle later");
-        return false;
-        }
 
 if( st.size() < 4 )
 	{
@@ -97,7 +91,7 @@ string userName;
 string hostName;
 	if(st[pos].substr(0,1) == "$")
 		{
-		bot->Notice(theClient,"Please use sgline to set this gline");
+		bot->Notice(theClient,"Please use SGLINE to set this gline");
 		return true;
 		}
 	string::size_type atPos = st[ pos ].find_first_of( '@' ) ;
@@ -110,8 +104,9 @@ string hostName;
 			iClient* tClient = Network->findNick(st[pos]);
 			if(!tClient)
 				{
-				bot->Notice( theClient, "i can't find %s online, "
-					    "please specify a host instead",st[pos].c_str() ) ;
+				bot->Notice( theClient, "i can't find '%s' online, "
+					    "please specify a host instead",
+						st[pos].c_str());
 				return true ;
 				}
 			else   //Ohhh neat we found our target, lets grab his ip
@@ -187,12 +182,12 @@ string nickUserHost = theClient->getRealNickUserHost() ;
 		int gCheck = bot->checkGline(string(userName + "@" + hostName),gLength,Users);
 		if(gCheck & gline::NEG_TIME)
 			{
-			bot->Notice(theClient,"Hmmz, dont you think that giving a negative time is kinda stupid?");
+			bot->Notice(theClient,"You can't gline for a negative amount of time.");
 			Ok = false;
 			}	
 		if(gCheck & gline::HUH_NO_HOST)
 			{
-			bot->Notice(theClient,"I dont think glining that host is such a good idea, do you?");
+			bot->Notice(theClient,"I don't think glining that host is such a good idea, do you?");
 			Ok = false;
 			}
 		if(gCheck & gline::BAD_HOST)
@@ -217,34 +212,37 @@ string nickUserHost = theClient->getRealNickUserHost() ;
 			}
 		if(gCheck & gline::BAD_TIME)
 			{
-			bot->Notice(theClient,"Glining for more than %d seconds is a NoNo",gline::MFGLINE_TIME);
+			bot->Notice(theClient,"Glining for more than %d seconds is not allowed.",
+				gline::MFGLINE_TIME);
 			Ok = false;
 			}
 		if((gCheck & gline::FORCE_NEEDED_HOST) && (Ok))
 			{	
-			bot->Notice(theClient,"Please use forcegline to gline that host");
+			bot->Notice(theClient,"Please use FORCEGLINE to gline that host");
 			Ok = false;
 			}
 		if((gCheck & gline::FORCE_NEEDED_TIME) && (Ok))
 		    	{
-			bot->Notice(theClient,"Please use forcegline to gline for that amount of time");
+			bot->Notice(theClient,"Please use FORCEGLINE to gline for that amount of time");
 			Ok = false;
 			}
 		if((gCheck & gline::FU_NEEDED_USERS) && (Ok))
 			{
-			bot->Notice(theClient,"This host affects more than %d users, please use forcegline",gline::MFGLINE_USERS);
+			bot->Notice(theClient,"This gline would affect more than %d users, please "
+				"use FORCEGLINE",gline::MFGLINE_USERS);
 			Ok = false;
 			}
 		if((gCheck & gline::FU_NEEDED_TIME) && (Ok))
 			{
-			bot->Notice(theClient,"Please use forcegline to gline for more than %d second",gline::MFGLINE_TIME);
+			bot->Notice(theClient,"Please use FORCEGLINE to gline for more than "
+				"%d seconds",gline::MFGLINE_TIME);
 			Ok = false;
 			}
 		if((gCheck & gline::FORCE_NEEDED_WILDTIME) && (Ok))
 			{
 			bot->Notice(theClient,"Wildcard gline for more than %d"
-			    " seconds (or more than %d without ident)," 
-			    "must be set with forcegline"
+			    " seconds (or more than %d without ident), "
+			    "please use FORCEGLINE instead"
 			    ,gline::MGLINE_WILD_TIME ,
 			    gline::MGLINE_WILD_NOID_TIME);
 			Ok = false;
@@ -261,7 +259,7 @@ string nickUserHost = theClient->getRealNickUserHost() ;
 	string Reason = st.assemble( pos + ResStart );
 	if(Reason.size() > gline::MAX_REASON_LENGTH)
 		{
-		bot->Notice(theClient,"Gline reason can't be more than %d chars",
+		bot->Notice(theClient,"Gline reason can't be more than %d characters",
 			    gline::MAX_REASON_LENGTH);
 		return false;
 		}

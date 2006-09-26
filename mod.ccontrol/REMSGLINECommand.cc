@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: REMSGLINECommand.cc,v 1.7 2005/01/12 03:50:29 dan_karrels Exp $
+ * $Id: REMSGLINECommand.cc,v 1.8 2006/09/26 17:36:01 kewlio Exp $
  */
 
 #include	<string>
@@ -30,7 +30,7 @@
 #include	"StringTokenizer.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: REMSGLINECommand.cc,v 1.7 2005/01/12 03:50:29 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: REMSGLINECommand.cc,v 1.8 2006/09/26 17:36:01 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -44,12 +44,6 @@ namespace uworld
 bool REMSGLINECommand::Exec( iClient* theClient, const string& Message )
 {
 StringTokenizer st( Message ) ;
-
-if(!dbConnected)
-        {
-        bot->Notice(theClient,"Sorry, but the db connection is down now, please try again alittle later");
-        return false;
-        }
 
 if( st.size() < 2 )
 	{
@@ -75,12 +69,13 @@ else
 if(tmpGline != NULL)
 	{
 	if(!tmpGline->Delete())
-		bot->MsgChanLog("Error while removing gline for host %s from the db\n",st[1].c_str());
+		bot->MsgChanLog("Error while removing gline for host %s from the database\n",
+			st[1].c_str());
 	bot->remGline(tmpGline);
 	delete tmpGline;
 	}	
 server->removeGline(st[1],bot);
-bot->Notice( theClient, "Removal of gline(%s) succeeded\n",st[1].c_str() ) ;
+bot->Notice( theClient, "Removal of gline (%s) succeeded\n",st[1].c_str() ) ;
 return true ;
 }
 

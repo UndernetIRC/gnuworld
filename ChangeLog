@@ -1,4 +1,30 @@
-// $Id: ChangeLog,v 1.97 2006/08/15 00:50:06 kewlio Exp $ //
+// $Id: ChangeLog,v 1.98 2006/09/26 17:35:54 kewlio Exp $ //
+
+2006-09-24	Dan-m00 <daniel@undernet.org>
+		* mod.ccontrol/CHECKNETCommand.cc:
+		* mod.ccontrol/ccLog.cc: Resolved compiler warnings due to
+			mismatched types.
+
+		* mod.ccontrol/*: Phase 1 of code audit
+			- fixed typos and textual errors.
+			- moved db check to command handler instead
+			  of inside each command file (pointless
+			  (duplication of code)
+			- updated Ago/Duration functions to be less
+			  cpu intensive (and less code duplication)
+
+		* include/gnuworld_config.h:
+		* src/main.cc: make gnuworld fork into background.
+
+			define 'DAEMON' to use this functionality
+
+		* tools/checkgnuworld.sh.in:
+		* configure*:
+		* */Makefile.in:
+		* Makefile*:	Added crontab script to use with the
+			new daemon functionality.  Rebuilt configure
+			and makefiles to build a copy in tools/ with
+			the correct exec prefix
 
 2006-08-15	Dan-m00 <daniel@undernet.org>
 		* mod.cservice/CHANINFOCommand.cc: Added extra line of info

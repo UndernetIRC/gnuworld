@@ -16,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: cservice_config.h,v 1.12 2005/11/30 21:33:34 kewlio Exp $
+ * $Id: cservice_config.h,v 1.13 2006/09/26 17:36:04 kewlio Exp $
  */
 
 #ifndef __CSERVICE_CONFIG_H
-#define __CSERVICE_CONFIG_H "$Id: cservice_config.h,v 1.12 2005/11/30 21:33:34 kewlio Exp $"
+#define __CSERVICE_CONFIG_H "$Id: cservice_config.h,v 1.13 2006/09/26 17:36:04 kewlio Exp $"
 
 /**
  * Define this if you wish for all SQL queries to be sent
@@ -83,7 +83,7 @@
 /**
  * Define this if you want to enable the HELLO command.
  */
-#undef ALLOW_HELLO
+#define ALLOW_HELLO
 
 /**
  * Define this if you want the IP restriction to default to REJECT when no

@@ -20,12 +20,12 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccontrol.cc,v 1.209 2006/05/04 15:22:23 kewlio Exp $
+ * $Id: ccontrol.cc,v 1.210 2006/09/26 17:36:02 kewlio Exp $
 */
 
 #define MAJORVER "1"
-#define MINORVER "2pl4"
-#define RELDATE "4th October, 2005"
+#define MINORVER "2pl5"
+#define RELDATE "26th September, 2006"
 
 #include        <sys/types.h> 
 #include        <sys/socket.h>
@@ -66,7 +66,7 @@
 #include	"ccontrol_generic.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: ccontrol.cc,v 1.209 2006/05/04 15:22:23 kewlio Exp $" ) ;
+RCSTAG( "$Id: ccontrol.cc,v 1.210 2006/09/26 17:36:02 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -214,6 +214,7 @@ if( operChans.end() == find( operChans.begin(), operChans.end(), msgChan ) )
 
 RegisterCommand( new HELPCommand( this, "HELP", "[topic]"
 	"\t\tObtain general help or help for a specific command",
+	true,
 	commandLevel::flg_HELP,
 	false,
 	false,
@@ -222,6 +223,7 @@ RegisterCommand( new HELPCommand( this, "HELP", "[topic]"
 	false ) ) ;
 RegisterCommand( new INVITECommand( this, "INVITE", "<#channel> "
 	"\t\tRequest an invitation to a channel",
+	false,
 	commandLevel::flg_INVITE,
 	false,
 	false,
@@ -230,6 +232,7 @@ RegisterCommand( new INVITECommand( this, "INVITE", "<#channel> "
 	false ) ) ;
 RegisterCommand( new JUPECommand( this, "JUPE", "<servername> <reason> "
 	"Jupe a server for the given reason.",
+	false,
 	commandLevel::flg_JUPE,
 	false,
 	false,
@@ -238,6 +241,7 @@ RegisterCommand( new JUPECommand( this, "JUPE", "<servername> <reason> "
 	false ) ) ;
 RegisterCommand( new MODECommand( this, "MODE", "<channel> <modes> "
 	"Change modes on the given channel",
+	false,
 	commandLevel::flg_MODE,
 	false,
 	false,
@@ -247,6 +251,7 @@ RegisterCommand( new MODECommand( this, "MODE", "<channel> <modes> "
 RegisterCommand( new CHANGLINECommand( this, "CHANGLINE",
 	"<#channel> <duration>[time units (s,d,h)] <reason> "
 	"Gline a given channel for the given reason",
+	true,
 	commandLevel::flg_CHANGLINE,
 	false,
 	false,
@@ -256,6 +261,7 @@ RegisterCommand( new CHANGLINECommand( this, "CHANGLINE",
 RegisterCommand( new GLINECommand( this, "GLINE",
 	"<user@host> <duration>[time units (s,d,h)] <reason> "
 	"Gline a given user@host for the given reason",
+	true,
 	commandLevel::flg_GLINE,
 	false,
 	false,
@@ -264,6 +270,7 @@ RegisterCommand( new GLINECommand( this, "GLINE",
 	false ) ) ;
 RegisterCommand( new SCANGLINECommand( this, "SCANGLINE", "<mask> "
 	"Search current network glines for glines matching <mask>",
+	false,
 	commandLevel::flg_SCGLINE,
 	false,
 	false,
@@ -272,6 +279,7 @@ RegisterCommand( new SCANGLINECommand( this, "SCANGLINE", "<mask> "
 	false ) ) ;
 RegisterCommand( new REMGLINECommand( this, "REMGLINE", "<user@host> "
 	"Remove the gline matching <mask>",
+	true,
 	commandLevel::flg_REMGLINE,
 	false,
 	false,
@@ -280,6 +288,7 @@ RegisterCommand( new REMGLINECommand( this, "REMGLINE", "<user@host> "
 	false ) ) ;
 RegisterCommand( new TRANSLATECommand( this, "TRANSLATE", "<numeric>"
 	"Translate a numeric into user information",
+	false,
 	commandLevel::flg_TRANS,
 	false,
 	false,
@@ -288,6 +297,7 @@ RegisterCommand( new TRANSLATECommand( this, "TRANSLATE", "<numeric>"
 	false ) ) ;
 RegisterCommand( new WHOISCommand( this, "WHOIS", "<nickname>"
 	"Obtain information on a given nickname",
+	false,
 	commandLevel::flg_WHOIS,
 	false,
 	false,
@@ -296,6 +306,7 @@ RegisterCommand( new WHOISCommand( this, "WHOIS", "<nickname>"
 	false ) ) ;
 RegisterCommand( new KICKCommand( this, "KICK", "<channel> <nick> <reason>"
 	"Kick a user from a channel",
+	false,
 	commandLevel::flg_KICK,
 	false,
 	false,
@@ -309,6 +320,7 @@ RegisterCommand( new KICKCommand( this, "KICK", "<channel> <nick> <reason>"
 
 RegisterCommand( new ADDOPERCHANCommand( this, "ADDOPERCHAN", "<channel>"
 	"Add an oper channel",
+	false,
 	commandLevel::flg_ADDOPCHN,
 	false,
 	false,
@@ -317,6 +329,7 @@ RegisterCommand( new ADDOPERCHANCommand( this, "ADDOPERCHAN", "<channel>"
 	false ) ) ;
 RegisterCommand( new REMOPERCHANCommand( this, "REMOPERCHAN", "<channel>"
 	"Remove an oper channel",
+	false,
 	commandLevel::flg_REMOPCHN,
 	false,
 	false,
@@ -325,6 +338,7 @@ RegisterCommand( new REMOPERCHANCommand( this, "REMOPERCHAN", "<channel>"
 	false ) ) ;
 RegisterCommand( new LISTOPERCHANSCommand( this, "LISTOPERCHANS",
 	"List current IRCoperator only channels",
+	false,
 	commandLevel::flg_LOPCHN,
 	false,
 	false,
@@ -334,6 +348,7 @@ RegisterCommand( new LISTOPERCHANSCommand( this, "LISTOPERCHANS",
 
 RegisterCommand( new CHANINFOCommand( this, "CHANINFO", "<channel>"
 	"Obtain information about a given channel",
+	false,
 	commandLevel::flg_CHINFO,
 	false,
 	false,
@@ -342,6 +357,7 @@ RegisterCommand( new CHANINFOCommand( this, "CHANINFO", "<channel>"
 	false ) ) ;
 RegisterCommand( new LOGINCommand( this, "LOGIN", "<USER> <PASS> "
 	"Authenticate with the bot",
+	true,
 	commandLevel::flg_LOGIN,
 	false,
 	true,
@@ -350,6 +366,7 @@ RegisterCommand( new LOGINCommand( this, "LOGIN", "<USER> <PASS> "
 	false ) ) ;
 RegisterCommand( new DEAUTHCommand( this, "DEAUTH", ""
 	"Deauthenticate with the bot",
+	false,
 	commandLevel::flg_DEAUTH,
 	false,
 	false,
@@ -358,6 +375,7 @@ RegisterCommand( new DEAUTHCommand( this, "DEAUTH", ""
 	false ) ) ;
 RegisterCommand( new DEAUTHCommand( this, "LOGOUT", ""
         "Deauthenticate with the bot",
+	false,
         commandLevel::flg_DEAUTH,
         false,
         false,
@@ -367,6 +385,7 @@ RegisterCommand( new DEAUTHCommand( this, "LOGOUT", ""
 RegisterCommand( new ADDUSERCommand( this, "ADDUSER",
 	"<USER> <OPERTYPE> [SERVER*] <PASS> "
 	"Add a new oper",
+	true,
 	commandLevel::flg_ADDNOP,
 	false,
 	false,
@@ -375,6 +394,7 @@ RegisterCommand( new ADDUSERCommand( this, "ADDUSER",
 	false ) ) ;
 RegisterCommand( new REMUSERCommand( this, "REMUSER", "<USER> "
 	"Remove an oper",
+	true,
 	commandLevel::flg_REMOP,
 	false,
 	false,
@@ -384,6 +404,7 @@ RegisterCommand( new REMUSERCommand( this, "REMUSER", "<USER> "
 RegisterCommand( new ADDCOMMANDCommand( this, "ADDCOMMAND",
 	"<USER> <COMMAND> "
 	"Add a new command to an oper",
+	true,
 	commandLevel::flg_ADDCMD,
 	false,
 	false,
@@ -393,6 +414,7 @@ RegisterCommand( new ADDCOMMANDCommand( this, "ADDCOMMAND",
 RegisterCommand( new REMCOMMANDCommand( this, "REMCOMMAND",
 	"<USER> <COMMAND> "
 	"Remove a command from oper",
+	true,
 	commandLevel::flg_DELCMD,
 	false,
 	false,
@@ -401,6 +423,7 @@ RegisterCommand( new REMCOMMANDCommand( this, "REMCOMMAND",
 	false ) ) ;
 RegisterCommand( new NEWPASSCommand( this, "NEWPASS", "<PASSWORD> "
 	"Change password",
+	true,
 	commandLevel::flg_NEWPASS,
 	false,
 	false,
@@ -410,6 +433,7 @@ RegisterCommand( new NEWPASSCommand( this, "NEWPASS", "<PASSWORD> "
 RegisterCommand( new SUSPENDCommand( this, "SUSPEND",
 	"<OPER> <DURATION> [-l level] <REASON>"
 	"Suspend an oper",
+	true,
 	commandLevel::flg_SUSPEND,
 	false,
 	false,
@@ -418,6 +442,7 @@ RegisterCommand( new SUSPENDCommand( this, "SUSPEND",
 	false ) ) ;
 RegisterCommand( new UNSUSPENDCommand( this, "UNSUSPEND", "<OPER> "
 	"UnSuspend an oper",
+	true,
 	commandLevel::flg_UNSUSPEND,
 	false,
 	false,
@@ -427,6 +452,7 @@ RegisterCommand( new UNSUSPENDCommand( this, "UNSUSPEND", "<OPER> "
 RegisterCommand( new MODUSERCommand( this, "MODUSER",
 	"<OPER> <OPTION> <NEWVALUE> [OPTION] [NEWVALUE] ... "
 	"Modify an oper",
+	true,
 	commandLevel::flg_MODOP,
 	false,
 	false,
@@ -435,6 +461,7 @@ RegisterCommand( new MODUSERCommand( this, "MODUSER",
 	false ) ) ;
 RegisterCommand( new MODERATECommand( this, "MODERATE", "<#Channel> "
 	"Moderate A Channel",
+	false,
 	commandLevel::flg_MODERATE,
 	false,
 	false,
@@ -443,6 +470,7 @@ RegisterCommand( new MODERATECommand( this, "MODERATE", "<#Channel> "
 	false ) ) ;
 RegisterCommand( new UNMODERATECommand( this, "UNMODERATE", "<#Channel> "
 	"UNModerate A Channel",
+	false,
 	commandLevel::flg_UNMODERATE,
 	false,
 	false,
@@ -451,6 +479,7 @@ RegisterCommand( new UNMODERATECommand( this, "UNMODERATE", "<#Channel> "
 	false ) ) ;
 RegisterCommand( new OPCommand( this, "OP", "<#Channel> <nick> [nick] .. "
 	"Op user(s) on a Channel",
+	false,
 	commandLevel::flg_OP,
 	false,
 	false,
@@ -459,6 +488,7 @@ RegisterCommand( new OPCommand( this, "OP", "<#Channel> <nick> [nick] .. "
 	false ) ) ;
 RegisterCommand( new DEOPCommand( this, "DEOP", "<#Channel> <nick> [nick] .. "
 	"Deop user(s) on a Channel",
+	false,
 	commandLevel::flg_DEOP,
 	false,
 	false,
@@ -467,6 +497,7 @@ RegisterCommand( new DEOPCommand( this, "DEOP", "<#Channel> <nick> [nick] .. "
 	false ) ) ;
 RegisterCommand( new LISTHOSTSCommand( this, "LISTHOSTS", "<oper> "
 	"Shows an oper hosts list",
+	true,
 	commandLevel::flg_LISTHOSTS,
 	false,
 	false,
@@ -475,6 +506,7 @@ RegisterCommand( new LISTHOSTSCommand( this, "LISTHOSTS", "<oper> "
 	false ) ) ;
 RegisterCommand( new CLEARCHANCommand( this, "CLEARCHAN", "<#chan> "
 	"Removes all channel modes",
+	false,
 	commandLevel::flg_CLEARCHAN,
 	false,
 	false,
@@ -483,6 +515,7 @@ RegisterCommand( new CLEARCHANCommand( this, "CLEARCHAN", "<#chan> "
 	false ) ) ;
 RegisterCommand( new ADDSERVERCommand( this, "ADDSERVER", "<Server> "
 	"Add a new server to the bot database",
+	true,
 	commandLevel::flg_ADDSERVER,
 	false,
 	false,
@@ -491,6 +524,7 @@ RegisterCommand( new ADDSERVERCommand( this, "ADDSERVER", "<Server> "
 	false ) ) ;
 RegisterCommand( new LEARNNETCommand( this, "LEARNNET", ""
 	"Update the servers database according to the current situation",
+	true,
 	commandLevel::flg_LEARNNET,
 	false,
 	false,
@@ -499,6 +533,7 @@ RegisterCommand( new LEARNNETCommand( this, "LEARNNET", ""
 	true ) ) ;
 RegisterCommand( new REMSERVERCommand( this, "REMSERVER", "<Server name>"
 	"Removes a server from the bot database",
+	true,
 	commandLevel::flg_REMSERVER,
 	false,
 	false,
@@ -507,6 +542,7 @@ RegisterCommand( new REMSERVERCommand( this, "REMSERVER", "<Server name>"
 	true ) ) ;
 RegisterCommand( new CHECKNETCommand( this, "CHECKNET", ""
 	"Checks if all known servers are in place",
+	true,
 	commandLevel::flg_CHECKNET,
 	false,
 	false,
@@ -516,6 +552,7 @@ RegisterCommand( new CHECKNETCommand( this, "CHECKNET", ""
 RegisterCommand( new LASTCOMCommand( this, "LASTCOM",
 	"[number of lines to show]"
 	"Post you the bot logs",
+	true,
 	commandLevel::flg_LASTCOM,
 	false,
 	false,
@@ -525,6 +562,7 @@ RegisterCommand( new LASTCOMCommand( this, "LASTCOM",
 RegisterCommand( new LASTCOMCommand( this, "LASTCOMM",
 	"[number of lines to show]"
 	"Post you the bot logs",
+	true,
 	commandLevel::flg_LASTCOM,
 	false,
 	false,
@@ -535,6 +573,7 @@ RegisterCommand( new LASTCOMCommand( this, "LASTCOMM",
 RegisterCommand( new FORCEGLINECommand( this, "FORCEGLINE",
 	"<user@host> <duration>[time units] <reason> "
 	"Gline a given user@host for the given reason",
+	true,
 	commandLevel::flg_FGLINE,
 	false,
 	false,
@@ -544,6 +583,7 @@ RegisterCommand( new FORCEGLINECommand( this, "FORCEGLINE",
 RegisterCommand( new SGLINECommand( this, "SGLINE",
 	"<user@host> <duration>[time units] <reason> "
 	"Gline a given user@host for the given reason",
+	true,
 	commandLevel::flg_SGLINE,
 	false,
 	false,
@@ -553,6 +593,7 @@ RegisterCommand( new SGLINECommand( this, "SGLINE",
 
 RegisterCommand( new REMSGLINECommand( this, "REMSGLINE",
 	"<user@host> Removes a gline on a given host",
+	true,
 	commandLevel::flg_REMSGLINE,
 	false,
 	false,
@@ -563,6 +604,7 @@ RegisterCommand( new REMSGLINECommand( this, "REMSGLINE",
 RegisterCommand( new EXCEPTIONCommand( this, "EXCEPTIONS",
 	"(list / add / del) [host mask]"
 	"Add connection exceptions on hosts",
+	true,
 	commandLevel::flg_EXCEPTIONS,
 	false,
 	false,
@@ -571,6 +613,7 @@ RegisterCommand( new EXCEPTIONCommand( this, "EXCEPTIONS",
 	true ) ) ;
 RegisterCommand( new LISTIGNORESCommand( this, "LISTIGNORES",
 	"List the ignore list",
+	false,
 	commandLevel::flg_LISTIGNORES,
 	false,
 	false,
@@ -579,6 +622,7 @@ RegisterCommand( new LISTIGNORESCommand( this, "LISTIGNORES",
 	true ) ) ;
 RegisterCommand( new REMOVEIGNORECommand( this, "REMIGNORE", "(nick/host)"
 	" Removes a host/nick from the  ignore list",
+	false,
 	commandLevel::flg_REMIGNORE,
 	false,
 	false,
@@ -587,6 +631,7 @@ RegisterCommand( new REMOVEIGNORECommand( this, "REMIGNORE", "(nick/host)"
 	true ) ) ;
 RegisterCommand( new LISTCommand( this, "LIST", "(glines/servers/badchannels/exceptions/channels)"
 	" Get all kinds of lists from the bot",
+	false,
 	commandLevel::flg_LIST,
 	false,
 	false,
@@ -596,6 +641,7 @@ RegisterCommand( new LISTCommand( this, "LIST", "(glines/servers/badchannels/exc
 RegisterCommand( new COMMANDSCommand( this, "COMMANDS",
 	"<command> <option> <new value>"
 	" Change commands options",
+	true,
 	commandLevel::flg_COMMANDS,
 	false,
 	false,
@@ -605,6 +651,7 @@ RegisterCommand( new COMMANDSCommand( this, "COMMANDS",
 RegisterCommand( new GCHANCommand( this, "GCHAN",
 	"#channel <length/-per> <reason>"
 	" Set a BADCHAN gline",
+	true,
 	commandLevel::flg_GCHAN,
 	false,
 	false,
@@ -613,6 +660,7 @@ RegisterCommand( new GCHANCommand( this, "GCHAN",
 	true ) ) ;
 RegisterCommand( new REMGCHANCommand( this, "REMGCHAN", "#channel "
 	" Removes a BADCHAN gline",
+	true,
 	commandLevel::flg_GCHAN,
 	false,
 	false,
@@ -621,6 +669,7 @@ RegisterCommand( new REMGCHANCommand( this, "REMGCHAN", "#channel "
 	true ) ) ;
 RegisterCommand( new USERINFOCommand( this, "USERINFO",
 	"<usermask/servermask> [-cl] Get information about opers (with optional command listing)",
+	false,
 	commandLevel::flg_USERINFO,
 	false,
 	false,
@@ -628,6 +677,7 @@ RegisterCommand( new USERINFOCommand( this, "USERINFO",
 	operLevel::OPERLEVEL,
 	true ) ) ;
 RegisterCommand( new STATUSCommand( this, "STATUS", "Shows debug status ",
+	false,
 	commandLevel::flg_STATUS,
 	false,
 	false,
@@ -636,6 +686,7 @@ RegisterCommand( new STATUSCommand( this, "STATUS", "Shows debug status ",
 	true ) ) ;
 RegisterCommand( new SHUTDOWNCommand( this, "SHUTDOWN",
 	" <REASON> Shutdown the bot ",
+	false,
 	commandLevel::flg_SHUTDOWN,
 	false,
 	false,
@@ -645,6 +696,7 @@ RegisterCommand( new SHUTDOWNCommand( this, "SHUTDOWN",
 RegisterCommand( new SCANCommand( this, "SCAN",
 	" -h <host> / -n <real name> [-v] [-i]"
 	" Scans for all users which much a certain host / real name ",
+	false,
 	commandLevel::flg_SCAN,
 	false,
 	false,
@@ -653,6 +705,7 @@ RegisterCommand( new SCANCommand( this, "SCAN",
 	true ) ) ;
 RegisterCommand( new MAXUSERSCommand( this, "MAXUSERS", 
 	"Shows the maximum number of online users ever recorded ",
+	false,
 	commandLevel::flg_MAXUSERS,
 	false,
 	false,
@@ -667,6 +720,7 @@ RegisterCommand( new CONFIGCommand( this, "CONFIG",
 	" -CClonesTime <seconds> / -GBCount <count> / -GBInterval <interval in secs> "
 	" -SGline <Yes/No> "
 	"Manages all kinds of configuration related values ",
+	false,
 	commandLevel::flg_CONFIG,
 	false,
 	false,
@@ -676,6 +730,7 @@ RegisterCommand( new CONFIGCommand( this, "CONFIG",
 
 RegisterCommand( new NOMODECommand( this, "NOMODE", 
 	"<ADD/REM> <#channel> [reason]  Manage the nomode list  ",
+	false,
 	commandLevel::flg_NOMODE,
 	false,
 	false,
@@ -685,6 +740,7 @@ RegisterCommand( new NOMODECommand( this, "NOMODE",
 
 RegisterCommand( new SAYCommand( this, "SAY", 
 	"<-s/-b> <#chan/nick> Forced the bot to \"talk\" as the uplink or the bot",
+	false,
 	commandLevel::flg_SAY,
 	false,
 	false,
@@ -693,6 +749,7 @@ RegisterCommand( new SAYCommand( this, "SAY",
 	true ) ) ;
 RegisterCommand( new SAYCommand( this, "DO",
         "<-s/-b> <#chan/nick> Forces the bot to \"/me\" as the uplink or the bot",
+	false,
         commandLevel::flg_SAY,
         false,
         false,
@@ -701,6 +758,7 @@ RegisterCommand( new SAYCommand( this, "DO",
         true ) ) ;  
 RegisterCommand( new REOPCommand( this, "REOP", "<#chan> <nick> "
 	"Removes all channel ops, and reops the specified nick",
+	false,
 	commandLevel::flg_REOP,
 	false,
 	false,
@@ -710,6 +768,7 @@ RegisterCommand( new REOPCommand( this, "REOP", "<#chan> <nick> "
 
 RegisterCommand( new UNJUPECommand( this, "UNJUPE",
 	"<server> removes a jupiter on a server",
+	false,
 	commandLevel::flg_UNJUPE,
 	false,
 	false,
@@ -927,6 +986,12 @@ MyUplink->RegisterEvent( EVT_NETBREAK, this );
 xClient::OnAttach() ;
 }
 
+void ccontrol::OnShutdown(const std::string& reason)
+{
+	/* handle client shutdown */
+	MyUplink->UnloadClient(this, reason);
+}
+
 void ccontrol::OnPrivateMessage( iClient* theClient,
 	const string& Message, bool )
 {
@@ -1006,7 +1071,7 @@ if((!theUser) && !(ComAccess & commandLevel::flg_NOLOGIN) && (ComAccess))
 	{//The user isnt authenticated, 
 	 //and he must be to run this command
 	if((theClient->isOper()) && !(theClient->getMode(iClient::MODE_SERVICES)))
-		Notice(theClient,"Sorry, but you must be authenticated to run this command");
+		Notice(theClient,"Sorry, you must be authenticated to run this command");
 
 	xClient::OnPrivateMessage( theClient, Message ) ;
 	return ;
@@ -1016,27 +1081,41 @@ if((theUser) && (!theClient->isOper()) && (theUser->getNeedOp()))
 	{
 	if(!theClient->getMode(iClient::MODE_SERVICES))
 		Notice(theClient,
-			"You must be operd up to use this command");
+			"You must be oper'd to use this command");
 	}
 else if( (ComAccess) && (theUser) && !(theUser->gotAccess(commHandler->second)))
 	{
 	if(!theClient->getMode(iClient::MODE_SERVICES))
-		Notice( theClient, "You dont have access to that command" ) ;
+		Notice( theClient, "You don't have access to that command" ) ;
 	}
 else if(( (theUser) && isSuspended(theUser) ) && ( ComAccess ) )
 		{
 		if(theClient->getMode(iClient::MODE_SERVICES))
 			Notice( theClient,
-				"Sorry but you are suspended");
+				"Sorry, you are suspended");
 		}
 else if(commHandler->second->getIsDisabled())
 	{
 	if(!theClient->getMode(iClient::MODE_SERVICES))
 		Notice(theClient,
-			"Sorry, but this command is disabled");
+			"Sorry, this command is currently disabled");
 	}
-else 
+else
 	{
+		/* do we need a DB connection? */
+		if (commHandler->second->needsDB())
+		{
+			/* check database connection */
+			if (!dbConnected)
+			{
+				/* failed */
+				Notice(theClient, "Sorry, the database connection "
+					"is currently down, please try again later.");
+				xClient::OnPrivateMessage(theClient, Message);
+				return;
+			}
+			/* database connection is fine */
+		}
 	// Log the command
 	if(!commHandler->second->getNoLog()) //Dont log command which arent suppose to be logged
 		{	
@@ -1057,10 +1136,10 @@ else
 		newLog->CommandName = Command;
 		DailyLog(newLog);
 #endif
-		}			
+		}
 	// Execute the command handler
 	commHandler->second->Exec( theClient, Message) ;
-	}		
+	}
 xClient::OnPrivateMessage( theClient, Message ) ;
 }
 
@@ -1159,7 +1238,7 @@ else
 	StringTokenizer st(CTCP);
 	if(st.empty())
 		{
-		xClient::DoCTCP(theClient,CTCP,"Error Aren\'t we missing something?");
+		xClient::DoCTCP(theClient,CTCP,"Error Aren't we missing something?");
 		return ;
 		}
 	else if(st[0] == "PING")
@@ -1336,8 +1415,9 @@ switch( theEvent )
 		inBurst = true;
 		if(!CheckServer)
 			{    	
-			MsgChanLog("Unknown server connected : %s Uplink : %s\n"
-				    ,NewServer->getName().c_str(),UplinkServer->getName().c_str());
+			MsgChanLog("Unknown server just connected: %s via %s\n",
+				NewServer->getName().c_str(),
+				UplinkServer->getName().c_str());
 			}
 		else 
 			{
@@ -1925,7 +2005,7 @@ if(dbConnected)
                                         Notice(NewUser, "Automatic authentication after netsplit successful, however you are suspended", tUser->getUserName().c_str());
                         else
                                 Notice(NewUser, "Error in authentication", tUser->getUserName().c_str());
-                        MsgChanLog("(%s) - %s : AUTO-AUTHENTICATED\n", tUser->getUserName().c_str(),
+                        MsgChanLog("(%s) - %s: AUTO-AUTHENTICATED (after netsplit)\n", tUser->getUserName().c_str(),
                                 NewUser->getRealNickUserHost().c_str());
                         /* had enough checking, break out of the loop */
                         break;
@@ -1977,7 +2057,7 @@ return IsAuth(Network->findClient(Numeric));
 
 bool ccontrol::AddOper (ccUser* Oper)
 {
-static const char *Main = "INSERT into opers (user_name,password,access,saccess,last_updated_by,last_updated,flags,server,isSuspended,suspend_expires,suspended_by,suspend_level,suspend_reason,isUhs,isOper,isAdmin,isSmt,isCoder,GetLogs,NeedOp,Notice) VALUES ('";
+static const char *Main = "INSERT INTO opers (user_name,password,access,saccess,last_updated_by,last_updated,flags,server,isSuspended,suspend_expires,suspended_by,suspend_level,suspend_reason,isUhs,isOper,isAdmin,isSmt,isCoder,GetLogs,NeedOp,Notice) VALUES ('";
 
 if(!dbConnected)
 	{
@@ -2299,7 +2379,7 @@ if(!dbConnected)
 	return false;
 	}
 
-static const char *Main = "INSERT into hosts (user_id,host) VALUES (";
+static const char *Main = "INSERT INTO hosts (user_id,host) VALUES (";
 
 stringstream theQuery;
 theQuery	<< Main
@@ -2433,7 +2513,7 @@ if( PGRES_TUPLES_OK == status )
 	else
 		{
 		Notice( user,
-			"Couldnt find help for %s",
+			"Couldn't find help for %s",
 			command.c_str());
 		}
 	return true;
@@ -2481,7 +2561,7 @@ if( PGRES_TUPLES_OK == status )
 	else
 		{
 		Notice( user,
-			"Couldnt find help for %s",
+			"Couldn't find help for %s",
 			command.c_str());
 		}
 	return true;
@@ -2748,7 +2828,7 @@ if(Oper)
 	}
 
 buffer[ 512 ] = 0 ;
-static const char *Main = "INSERT into comlog (ts,oper,command) VALUES (now()::abstime::int4,'";
+static const char *Main = "INSERT INTO comlog (ts,oper,command) VALUES (now()::abstime::int4,'";
 StringTokenizer st(buffer);
 commandIterator tCommand = findCommand((string_upper(st[0])));
 string log;
@@ -2853,7 +2933,7 @@ va_start( list, Log ) ;
 vsprintf( buffer, Log, list ) ;
 va_end( list ) ;
 buffer[512]= '\0';
-static const char *Main = "INSERT into comlog (ts,oper,command) VALUES (now()::abstime::int4,'";
+static const char *Main = "INSERT INTO comlog (ts,oper,command) VALUES (now()::abstime::int4,'";
 StringTokenizer st(buffer);
 commandIterator tCommand = findCommand((string_upper(st[0])));
 string log;
@@ -2998,7 +3078,7 @@ if(!LogFile.is_open())
 	}
 if(LogFile.bad())
 	{//There was a problem in opening the log file
-	MsgChanLog("Error while logging to the logs file %s!\n",LogFileName.c_str());
+	MsgChanLog("Error while logging to the log file %s!\n",LogFileName.c_str());
 	return true;
 	}
 
@@ -3025,7 +3105,7 @@ if(!dbConnected)
 	return false;
 	}
 
-static const char* queryHeader = "SELECT * FROM comlog where ts >";
+static const char* queryHeader = "SELECT * FROM comlog WHERE ts >";
 stringstream theQuery;
 theQuery 	<< queryHeader 
 		<< From
@@ -3418,7 +3498,7 @@ for(;curUser != usersMap.end();++curUser)
 		}
 	}
 
-static const char *DelMain = "update opers set isSuspended = 'n',Suspend_Expires = 0, Suspended_by = '',suspend_level = 0,suspend_reason='' where IsSuspended = 'y' And suspend_expires < now()::abstime::int4";
+static const char *DelMain = "UPDATE opers SET isSuspended = 'n',Suspend_Expires = 0, Suspended_by = '',suspend_level = 0,suspend_reason='' WHERE IsSuspended = 'y' AND suspend_expires < now()::abstime::int4";
 
 stringstream DelQuery;
 DelQuery	<< DelMain
@@ -3563,7 +3643,7 @@ for(unsigned int i = 0; i< (glineQueue.size() > glineBurstCount ? glineBurstCoun
 		{
 		if(!curGline->Insert())
 			{
-			MsgChanLog("Error while adding gline on host %s to the db!\n",
+			MsgChanLog("Error while adding gline on host %s to the database!\n",
 				    curGline->getHost().c_str());
 			}
 		else
@@ -3582,7 +3662,7 @@ return true;
 
 bool ccontrol::loadGlines()
 {
-//static const char *Main = "SELECT * FROM glines where ExpiresAt > now()::abstime::int4";
+//static const char *Main = "SELECT * FROM glines WHERE ExpiresAt > now()::abstime::int4";
 
 if(!dbConnected)
 	{
@@ -3751,7 +3831,7 @@ if(!dbConnected)
         }
    
 stringstream theQuery;
-theQuery        << "Select * from misc where VarName = 'MaxUsers';"
+theQuery        << "SELECT * FROM misc WHERE VarName = 'MaxUsers';"
                 << ends;
 
 #ifdef LOG_SQL
@@ -3764,7 +3844,7 @@ ExecStatusType status = SQLDb->Exec( theQuery.str().c_str() ) ;
 
 if (PGRES_TUPLES_OK != status)
         {
-        elog << "Error on loading maxusers : " << SQLDb->ErrorMessage() << endl;
+        elog << "Error on loading maxusers: " << SQLDb->ErrorMessage() << endl;
 	return false;
         }
 if(SQLDb->Tuples() == 0)
@@ -3772,7 +3852,7 @@ if(SQLDb->Tuples() == 0)
 	maxUsers = 0;
 	dateMax = 0;
 	stringstream insertQ;
-	insertQ << "Insert into misc (VarName,Value1,Value2) Values ('MaxUsers',0,0);"
+	insertQ << "INSERT INTO misc (VarName,Value1,Value2) VALUES ('MaxUsers',0,0);"
 		<< ends;
 
 	status = SQLDb->Exec( insertQ.str().c_str() ) ;
@@ -3798,7 +3878,7 @@ if(!dbConnected)
         return false;
         }
    
-ExecStatusType status = SQLDb->Exec( "Select * from misc where VarName = 'Version'") ;
+ExecStatusType status = SQLDb->Exec( "SELECT * FROM misc WHERE VarName = 'Version'") ;
 
 if (PGRES_TUPLES_OK != status)
         {
@@ -3810,7 +3890,7 @@ for(int i =0;i<SQLDb->Tuples();++i)
 	VersionsList.push_back(SQLDb->GetValue(i,1));
 	}
 
-status = SQLDb->Exec( "Select * from misc where VarName = 'CheckVer'") ;
+status = SQLDb->Exec( "SELECT * FROM misc WHERE VarName = 'CheckVer'") ;
 
 if (PGRES_TUPLES_OK != status)
         {
@@ -3819,7 +3899,7 @@ if (PGRES_TUPLES_OK != status)
 
 if(SQLDb->Tuples() == 0)
 	{
-	status = SQLDb->Exec( "insert into misc (VarName,Value1) VALUES ('CheckVer',0)") ;
+	status = SQLDb->Exec( "INSERT INTO misc (VarName,Value1) VALUES ('CheckVer',0)") ;
 	checkVer = false;
 	if(PGRES_COMMAND_OK != status)
 		{
@@ -3889,7 +3969,7 @@ if(!dbConnected)
         }
    
 stringstream theQuery;
-theQuery        << "Select * from misc"
+theQuery        << "SELECT * FROM misc"
                 << ends;
 
 #ifdef LOG_SQL
@@ -4083,15 +4163,15 @@ return Exception;
 bool ccontrol::listExceptions( iClient *theClient )
 {
 
-Notice(theClient,"-= Exceptions list - listing a total of %d exceptions =-"
-	,exceptionList.size());
-	
+Notice(theClient,"-= Exceptions list - listing a total of %d exceptions =-",
+	exceptionList.size());
+
 for(exceptionIterator ptr = exception_begin();ptr != exception_end();ptr++)
-	Notice(theClient,"Host : %s  Connections : %d AddedBy : %s Reason %s"
-	       ,(*ptr)->getHost().c_str()
-	       ,(*ptr)->getConnections()
-	       ,(*ptr)->getAddedBy().c_str()
-	       ,(*ptr)->getReason().c_str());
+	Notice(theClient,"Host: %s   Connections: %d   AddedBy: %s   Reason: %s",
+		(*ptr)->getHost().c_str(),
+		(*ptr)->getConnections(),
+		(*ptr)->getAddedBy().c_str(),
+		(*ptr)->getReason().c_str());
 
 Notice(theClient,"-= End of exception list =-");
 
@@ -4158,7 +4238,7 @@ if(!dbConnected)
 
 if(!isException(removeSqlChars(Host)))
 	{
-	Notice(theClient,"Cant find exception for host %s",Host.c_str());
+	Notice(theClient,"Can't find exception for host %s",Host.c_str());
 	return true;
 	}
 ccException *tempException = NULL;
@@ -4210,7 +4290,7 @@ void ccontrol::addLogin( iClient* tClient)
 {
 if(!tClient->getCustomData(this))
 	{
-	elog << "Couldnt find custom data for " 
+	elog << "Couldn't find custom data for " 
 	     << tClient->getNickName() << endl;
 	return;
 	}
@@ -4273,7 +4353,7 @@ void ccontrol::ignoreUser( ccFloodData* Flood )
 {
 
 const iClient* theClient = Network->findClient(Flood->getNumeric());
-Notice(theClient,"I dont think I like you anymore , consider yourself ignored");
+Notice(theClient,"I don't think I like you anymore, consider yourself ignored!");
 MsgChanLog("Added %s to my ignore list\n",theClient->getRealNickUserHost().c_str());
 
 string silenceMask = string( "*!*" )
@@ -4305,10 +4385,10 @@ for(ignoreIterator ptr = ignore_begin();ptr!=ignore_end();ptr++)
 	tempLogin = *ptr;
 	if(tempLogin->getIgnoreExpires() > ::time(0))
 		{
-		Notice(theClient,"Host : %s Expires At %s[%d]",
+		Notice(theClient,"Host: %s Expires: %s [%ld]",
 		tempLogin->getIgnoredHost().c_str(),
 		convertToAscTime(tempLogin->getIgnoreExpires()),
-			tempLogin->getIgnoreExpires());
+		(long)tempLogin->getIgnoreExpires());
 		}
 	}
 Notice(theClient,"-= End Of Ignore List =-");			
@@ -4354,7 +4434,7 @@ return true;
 }
 bool ccontrol::loadExceptions()
 {
-static const char Query[] = "Select Host,Connections,AddedBy,AddedOn,Reason from Exceptions";
+static const char Query[] = "SELECT Host,Connections,AddedBy,AddedOn,Reason FROM Exceptions";
 
 if(!dbConnected)
 	{
@@ -4412,13 +4492,13 @@ for(glineIterator ptr = gline_begin();ptr != gline_end();++ptr)
 	    && (!match(Mask,tempGline->getHost())))
 		{
 		sprintf(gline_set, "%s", Duration(time(NULL) - tempGline->getAddedOn()));
-		Notice(theClient,"Host: %s, Expires: [%ld] %s, Added By %s at [%ld] %s ago"
-			,tempGline->getHost().c_str()
-			,tempGline->getExpires()
-			,Duration(tempGline->getExpires() - time(NULL))
-			,tempGline->getAddedBy().c_str()
-			,tempGline->getAddedOn()
-			,gline_set);
+		Notice(theClient,"Host: %s, Expires: [%ld] %s, Added by %s at [%ld] %s ago",
+			tempGline->getHost().c_str(),
+			tempGline->getExpires(),
+			Duration(tempGline->getExpires() - time(NULL)),
+			tempGline->getAddedBy().c_str(),
+			tempGline->getAddedOn(),
+			gline_set);
 		}
 	}
 
@@ -4430,13 +4510,13 @@ for(glineIterator ptr = rnGlineList.begin();ptr != rnGlineList.end();++ptr)
 	    && (!match(Mask,tempGline->getHost())))
 		{
 		sprintf(gline_set, "%s", Duration(time(NULL) - tempGline->getAddedOn()));
-		Notice(theClient,"Host: %s, Expires: [%ld] %s, Added By %s at [%ld] %s ago."
-			,tempGline->getHost().c_str()
-			,tempGline->getExpires()
-			,Duration(tempGline->getExpires() - time(NULL))
-			,tempGline->getAddedBy().c_str()
-			,tempGline->getAddedOn()
-			,gline_set);
+		Notice(theClient,"Host: %s, Expires: [%ld] %s, Added by %s at [%ld] %s ago.",
+			tempGline->getHost().c_str(),
+			tempGline->getExpires(),
+			Duration(tempGline->getExpires() - time(NULL)),
+			tempGline->getAddedBy().c_str(),
+			tempGline->getAddedOn(),
+			gline_set);
 		}
 	}
 Notice(theClient,"-= End Of Gline List =-");
@@ -4573,7 +4653,7 @@ theQuery	<< Main
 		<< (Comm->getNoLog() ? "'t'" : "'n'")
 		<< ", MinLevel = "
 		<< Comm->getMinLevel() 
-		<< " Where lower(RealName) = '"
+		<< " WHERE lower(RealName) = '"
 		<< string_lower(removeSqlChars(Comm->getRealName()))
 		<< "'"
 		<< ends;
@@ -4620,7 +4700,7 @@ return NULL;
 		
 bool ccontrol::UpdateCommandFromDb ( Command* Comm )
 {
-static const char *Main = "SELECT * From Commands where lower(RealName) = '";
+static const char *Main = "SELECT * FROM Commands WHERE lower(RealName) = '";
 
 if(!dbConnected)
 	{
@@ -4706,9 +4786,9 @@ if(SQLDb->Status() == CONNECTION_BAD) //Check if the connection had died
 	delete(SQLDb);
 	dbConnected = false;
 	updateSqldb(NULL);
-	MsgChanLog("PANIC! - The Connection With The Db Was Lost\n");
-	MsgChanLog("Attempting to reconnect, Attempt %d out of %d\n"
-		    ,connectCount+1,connectRetry+1);
+	MsgChanLog("PANIC! - The connection with the database was lost!\n");
+	MsgChanLog("Attempting to reconnect, attempt %d out of %d\n",
+		    connectCount+1,connectRetry+1);
 	string Query = "host=" + sqlHost + " dbname=" + sqlDb + " port=" + sqlPort;
 	if (strcasecmp(sqlUser,"''"))
 		{
@@ -4727,7 +4807,7 @@ if(SQLDb->Status() == CONNECTION_BAD) //Check if the connection had died
 		++connectCount;
 		if(connectCount > connectRetry)
 			{
-			MsgChanLog("Cant connect to the database, quiting\n");
+			MsgChanLog("Can't connect to the database, quitting (no more retries)\n");
 			::exit(1);
 			}
 		else
@@ -4738,7 +4818,7 @@ if(SQLDb->Status() == CONNECTION_BAD) //Check if the connection had died
 	else
 		{
 		dbConnected = true;
-		MsgChanLog("The PANIC is over, db connection restored\n");
+		MsgChanLog("The PANIC is over, database connectivity restored\n");
 		updateSqldb(SQLDb);
 		connectCount = 0;
 		}
@@ -4793,7 +4873,7 @@ mins = uptime / 60;
 uptime %= 60;
 secs = uptime;
 Notice(tmpClient,"CControl version %s.%s [%s]",MAJORVER,MINORVER,RELDATE);
-Notice(tmpClient,"Uptime : %dD %dH %dM %dS",days,hours,mins,secs);
+Notice(tmpClient, "Update: %s", Ago(uptime));
 if(checkClones)
 	{
 	Notice(tmpClient,"Monitoring %d different clones hosts\n",clientsIpMap.size());
@@ -4811,13 +4891,13 @@ Notice(tmpClient,"ccGline: %d",ccGline::numAllocated);
 Notice(tmpClient,"ccException: %d",ccException::numAllocated);
 Notice(tmpClient,"ccUser: %d",ccUser::numAllocated);
 Notice(tmpClient,"Total of %d users in the map",usersMap.size()); 
-Notice(tmpClient,"GBCount : %d , GBInterval : %d",glineBurstCount,glineBurstInterval);
-Notice(tmpClient,"Max Clones : %d , Max Virtual Clones : %d",maxClones,maxVClones);
-Notice(tmpClient,"Max Ident Clones : %d per /%d - Auto-Gline: %s",maxIClones,CClonesCIDR,IClonesGline ? "True" : "False");
+Notice(tmpClient,"GBCount: %d , GBInterval: %d",glineBurstCount,glineBurstInterval);
+Notice(tmpClient,"Max Clones: %d , Max Virtual Clones: %d",maxClones,maxVClones);
+Notice(tmpClient,"Max Ident Clones: %d per /%d - Auto-Gline: %s",maxIClones,CClonesCIDR,IClonesGline ? "True" : "False");
 Notice(tmpClient,"Max CIDR Clones: %d per /%d - Auto-Gline: %s",maxCClones,CClonesCIDR,CClonesGline ? "True" : "False");
 Notice(tmpClient,"  (%d seconds between announcements per block)", CClonesTime);
-Notice(tmpClient,"Save gline is : %s",saveGlines ? "True" : "False"); 
-Notice(tmpClient,"Bursting : %s",inBurst ? "True" : "False");
+Notice(tmpClient,"Save gline is: %s",saveGlines ? "True" : "False"); 
+Notice(tmpClient,"Bursting: %s",inBurst ? "True" : "False");
 }
 
 bool ccontrol::updateMisc(const string& varName, const unsigned int Value)
@@ -4878,7 +4958,7 @@ if(!dbConnected)
         return false;
         }
 stringstream theQuery;   
-theQuery        << "Select * from misc where VarName = '"
+theQuery        << "SELECT * FROM misc WHERE VarName = '"
 		<< varName << "'"
                 << ends;
 
@@ -4898,7 +4978,7 @@ if (PGRES_TUPLES_OK != status)
 if(SQLDb->Tuples() == 0)
 	{
 	stringstream insertQ;
-	insertQ << "Insert into misc (VarName,Value1) Values ('"
+	insertQ << "INSERT INTO misc (VarName,Value1) VALUES ('"
 		<< varName << "',"
 		<< Value <<")"
 		<< ends;
@@ -4913,9 +4993,9 @@ if(SQLDb->Tuples() == 0)
 else
 	{
 	stringstream updateQ;
-	updateQ << "Update misc set Value1 = "
+	updateQ << "UPDATE misc SET Value1 = "
 		<< Value 
-		<< " Where VarName = '"	
+		<< " WHERE VarName = '"	
 		<< varName << "'"
 		<< ends;
 
@@ -5017,8 +5097,8 @@ void ccontrol::showLogs(iClient* theClient, unsigned int Amount)
 {
 if(Amount > LogsToSave)
 	{
-	Notice(theClient,"Sorry, but you can't view more than the last %d commands"
-		,LogsToSave);
+	Notice(theClient,"Sorry, but you can't view more than the last %d commands",
+		LogsToSave);
 	Amount = LogsToSave;
 	}
 
@@ -5095,11 +5175,11 @@ if(curLog == LogList.end())
 	}
 while(Left > 0)
 	{
-	Notice(theClient,"[%s] - [(%s) - %s] - %s"
-		,convertToAscTime((*curLog)->Time)
-		,(*curLog)->User.c_str()
-		,(*curLog)->Host.c_str()
-		,(*curLog)->Desc.c_str());
+	Notice(theClient,"[%s] - [(%s) - %s] - %s",
+		convertToAscTime((*curLog)->Time),
+		(*curLog)->User.c_str(),
+		(*curLog)->Host.c_str(),
+		(*curLog)->Desc.c_str());
 	--curLog;
 	Left--;
 	}
@@ -5178,14 +5258,14 @@ if(maxUsers < curUsers)
 	maxUsers = curUsers;
 	dateMax = ::time(0);
 	
-	static const char *UPMain = "update Misc set Value1 = ";
+	static const char *UPMain = "UPDATE Misc SET Value1 = ";
 
 	stringstream DelQuery;
 	DelQuery	<< UPMain
 			<< maxUsers
 			<< ", Value2 = " 
 			<< dateMax
-			<< " Where VarName = 'MaxUsers'"
+			<< " WHERE VarName = 'MaxUsers'"
 			<< ends;
 #ifdef LOG_SQL
 	elog	<< "ccontrol::checkMaxUsers> "
@@ -5206,7 +5286,7 @@ if(maxUsers < curUsers)
 
 bool ccontrol::addVersion(const string& newVer)
 {
-static const char* verChar = "Insert into misc (VarName,Value5) Values ('Version','";
+static const char* verChar = "INSERT INTO misc (VarName,Value5) VALUES ('Version','";
 stringstream VerQuery;
 VerQuery	<< verChar
 		<< newVer
@@ -5244,7 +5324,7 @@ for(;ptr != VersionsList.end();)
 		}
 	}
 
-string delS = "delete from misc where VarName = 'Version' and lower(Value5) = '" 
+string delS = "DELETE FROM misc WHERE VarName = 'Version' AND lower(Value5) = '" 
 		+ string_lower(removeSqlChars(oldVer)) + "'";
 return (PGRES_COMMAND_OK == SQLDb->Exec(delS.c_str()));
 return true;
@@ -5271,9 +5351,9 @@ bool ccontrol::updateCheckVer(const bool newVal)
 {
 checkVer = newVal;
 stringstream ups;
-ups 	<< "Update misc set Value1 = "
+ups 	<< "UPDATE misc SET Value1 = "
 	<< (newVal ? 1 : 0)
-        << " where VarName = 'CheckVer'"
+        << " WHERE VarName = 'CheckVer'"
 	<< ends;
 
 ExecStatusType status = SQLDb->Exec( ups.str().c_str() ) ;

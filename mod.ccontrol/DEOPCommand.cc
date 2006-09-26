@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: DEOPCommand.cc,v 1.15 2005/06/19 15:16:53 kewlio Exp $
+ * $Id: DEOPCommand.cc,v 1.16 2006/09/26 17:35:58 kewlio Exp $
  */
 
 #include	<set>
@@ -34,7 +34,7 @@
 #include	"ccBadChannel.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: DEOPCommand.cc,v 1.15 2005/06/19 15:16:53 kewlio Exp $" ) ;
+RCSTAG( "$Id: DEOPCommand.cc,v 1.16 2006/09/26 17:35:58 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -57,7 +57,8 @@ if( st.size() < 3 )
 
 if(st[1].size() > channel::MaxName)
 	{
-	bot->Notice(theClient,"Channel name can't be more than %d chars",channel::MaxName);
+	bot->Notice(theClient,"Channel name can't be more than %d characters",
+		channel::MaxName);
 	return false;
 	}
 Channel* theChan = Network->findChannel( st[ 1 ] ) ;
@@ -72,8 +73,8 @@ ccBadChannel* Chan = bot->isBadChannel(st[1]);
 if(Chan)
         {
         bot->Notice(theClient,"Sorry, but you can not change modes in "
-                             "this channel because : %s"
-                             ,Chan->getReason().c_str());
+                             "this channel because: %s",
+                             Chan->getReason().c_str());
         return false;
         }
 
@@ -88,7 +89,7 @@ for( StringTokenizer::size_type i = 2 ; i < st.size() ; ++i )
 	{
 	if(st[i].size() > 64)
 		{
-		bot->Notice(theClient,"Nick name can't be more than 64 chars");
+		bot->Notice(theClient,"Nick can't be more than 64 characters");
 		return false;
 		}
 

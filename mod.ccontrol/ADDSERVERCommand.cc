@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ADDSERVERCommand.cc,v 1.16 2005/01/08 23:33:42 dan_karrels Exp $
+ * $Id: ADDSERVERCommand.cc,v 1.17 2006/09/26 17:35:58 kewlio Exp $
  */
 
 #include	<string>
@@ -28,7 +28,7 @@
 #include	"Network.h"
 #include	"Constants.h"
 
-RCSTAG( "$Id: ADDSERVERCommand.cc,v 1.16 2005/01/08 23:33:42 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: ADDSERVERCommand.cc,v 1.17 2006/09/26 17:35:58 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -47,17 +47,10 @@ if( st.size() < 2 )
 	return true ;
 	}
 
-if(!dbConnected)
-        {
-        bot->Notice(theClient,"Sorry, but the db connection is down "
-		"now, please try again a little later");
-        return false;
-        }
-
 if(st[1].size() > server::MaxName)
 	{
 	bot->Notice(theClient,"Server name can't be more than %d "
-		"chars",
+		"characters in length.",
 		server::MaxName);
 	return false;
 	}
@@ -69,7 +62,7 @@ if(string::npos != st[1].find_first_of('*'))
 
 	if(!tServer)
 		{
-		bot->Notice(theClient,"I cant find a linked server "
+		bot->Notice(theClient,"I can't find a linked server "
 			"that matches %s",
 			st[1].c_str());
 		return false;
@@ -86,7 +79,7 @@ bot->MsgChanLog("ADDSERVER %s\n",SName.c_str());
 ccServer* NewServer = new ccServer(bot->SQLDb);
 if(NewServer->loadData(SName))
 	{
-	bot->Notice(theClient, "Server %s is already in my database!",
+	bot->Notice(theClient, "Server '%s' is already in my database!",
 		SName.c_str());
 	delete NewServer;
 	return false;
@@ -122,9 +115,9 @@ if(!Report)
 NewServer->setAddedOn(::time(0));
 NewServer->setLastUpdated(::time(0));
 if(NewServer->Insert())
-	bot->Notice(theClient,"Server %s added successfully\n",SName.c_str());
+	bot->Notice(theClient,"Server '%s' has been added successfully\n",SName.c_str());
 else
-	bot->Notice(theClient,"Database error while adding server %s\n",
+	bot->Notice(theClient,"Database error while adding server '%s'\n",
 		SName.c_str());
 
 bot->addServer(NewServer);

@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccException.cc,v 1.13 2005/01/12 03:50:29 dan_karrels Exp $
+ * $Id: ccException.cc,v 1.14 2006/09/26 17:36:02 kewlio Exp $
  */
  
 #include	<sstream>
@@ -34,7 +34,7 @@
 #include	"ccontrol.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: ccException.cc,v 1.13 2005/01/12 03:50:29 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: ccException.cc,v 1.14 2006/09/26 17:36:02 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -147,7 +147,7 @@ else
 
 bool ccException::Insert()
 {
-static const char *quer = "INSERT into exceptions(host,connections,addedby,addedon,reason) VALUES ('";
+static const char *quer = "INSERT INTO exceptions(host,connections,addedby,addedon,reason) VALUES ('";
 
 if(!dbConnected)
 	{

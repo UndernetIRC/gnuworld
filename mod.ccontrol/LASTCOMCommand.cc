@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: LASTCOMCommand.cc,v 1.16 2005/01/12 03:50:29 dan_karrels Exp $
+ * $Id: LASTCOMCommand.cc,v 1.17 2006/09/26 17:35:58 kewlio Exp $
  */
 
 #include	<sstream>
@@ -35,7 +35,7 @@
 #include	"ELog.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: LASTCOMCommand.cc,v 1.16 2005/01/12 03:50:29 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: LASTCOMCommand.cc,v 1.17 2006/09/26 17:35:58 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -56,12 +56,6 @@ bot->MsgChanLog("LASTCOM\n");
 unsigned int NumOfCom;
 unsigned int Days = 0;
 stringstream theQuery;
-
-if(!dbConnected)
-        {
-        bot->Notice(theClient,"Sorry, but the db connection is down now, please try again alittle later");
-        return false;
-        }
 
 if( st.size() == 1 )
 	{

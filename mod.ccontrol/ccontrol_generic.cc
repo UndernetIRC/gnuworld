@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccontrol_generic.cc,v 1.2 2005/06/19 12:09:56 kewlio Exp $
+ * $Id: ccontrol_generic.cc,v 1.3 2006/09/26 17:36:02 kewlio Exp $
  */
 
 #include <time.h>
@@ -26,9 +26,9 @@
 
 char ago[250];
 
-char *Ago(long ts)
+char *Duration(long ts)
 {
-	/* express (now - ts) in human readable format */
+	/* express duration in human readable format */
 	long duration;
 	int days, hours, mins = 0;
 	char tmp[16];
@@ -36,29 +36,28 @@ char *Ago(long ts)
 	ago[0] = '\0';
 
 	duration = (time(NULL) - ts);
-	if (duration >= 86400)
+
+	days = (duration / 86400);
+	duration %= 86400;
+	hours = (duration / 3600);
+	duration %= 3600;
+	mins = (duration / 60);
+	duration %= 60;
+
+	if (days > 0)
 	{
-		/* magnitude of days */
-		days = (duration / 86400);
-		duration = (duration % 86400);
 		sprintf(tmp, "%dd", days);
-		strcat(ago,tmp);
+		strcat(ago, tmp);
 	}
-	if (duration >= 3600)
+	if (hours > 0)
 	{
-		/* magnitude of hours */
-		hours = (duration / 3600);
-		duration = (duration % 3600);
-		sprintf(tmp,"%dh", hours);
-		strcat(ago,tmp);
+		sprintf(tmp, "%dh", hours);
+		strcat(ago, tmp);
 	}
-	if (duration >= 60)
+	if (mins > 0)
 	{
-		/* magnitude of minutes */
-		mins = (duration / 60);
-		duration = (duration % 60);
-		sprintf(tmp,"%dm", mins);
-		strcat(ago,tmp);
+		sprintf(tmp, "%dm", mins);
+		strcat(ago, tmp);
 	}
 	sprintf(tmp,"%ds", (int) duration);
 	strcat(ago,tmp);
@@ -66,43 +65,13 @@ char *Ago(long ts)
 	return ago;
 }
 
-char *Duration(long ts)
+char *Ago(long ts)
 {
-        /* express a duration in human readable format */
+        /* express a a timestamp in human readable format */
         long duration;
-        int days, hours, mins = 0;
-        char tmp[16];
 
-        ago[0] = '\0';
+	duration = (time(NULL) - ts);
 
-        duration = ts;
-        if (duration >= 86400)
-        {
-                /* magnitude of days */
-                days = (duration / 86400);
-                duration = (duration % 86400);
-                sprintf(tmp, "%dd", days);
-                strcat(ago,tmp);
-        }
-        if (duration >= 3600)
-        {
-                /* magnitude of hours */
-                hours = (duration / 3600);
-                duration = (duration % 3600);
-                sprintf(tmp,"%dh", hours);
-                strcat(ago,tmp);
-        }
-        if (duration >= 60)
-        {
-                /* magnitude of minutes */
-                mins = (duration / 60);
-                duration = (duration % 60);
-                sprintf(tmp,"%dm", mins);
-                strcat(ago,tmp);
-        }
-        sprintf(tmp,"%ds", (int) duration);
-        strcat(ago,tmp);
-
-        return ago;
+        return (Duration(duration));
 }
 

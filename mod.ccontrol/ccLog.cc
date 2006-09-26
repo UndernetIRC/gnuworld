@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccLog.cc,v 1.8 2005/01/12 03:50:29 dan_karrels Exp $
+ * $Id: ccLog.cc,v 1.9 2006/09/26 17:36:02 kewlio Exp $
  */
  
 #include "ccLog.h"
@@ -28,7 +28,7 @@
 
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: ccLog.cc,v 1.8 2005/01/12 03:50:29 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: ccLog.cc,v 1.9 2006/09/26 17:36:02 kewlio Exp $" ) ;
 
 using namespace std;
 
@@ -48,7 +48,7 @@ if(out.bad())
 
 char time[20];
 time[0] = '\0';
-sprintf(time,"%li",::time(0));
+sprintf(time,"%ld",(long)::time(0));
 string Line = time;
 Line  += " ";
 string::size_type pos;

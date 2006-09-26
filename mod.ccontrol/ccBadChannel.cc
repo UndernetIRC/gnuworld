@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccBadChannel.cc,v 1.5 2005/01/12 03:50:29 dan_karrels Exp $
+ * $Id: ccBadChannel.cc,v 1.6 2006/09/26 17:36:02 kewlio Exp $
  */
 
 #include	<string>
@@ -26,7 +26,7 @@
 #include 	"ccBadChannel.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: ccBadChannel.cc,v 1.5 2005/01/12 03:50:29 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: ccBadChannel.cc,v 1.6 2006/09/26 17:36:02 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -52,11 +52,11 @@ if(!dbConnected)
         }
 
 stringstream theQuery;
-theQuery        << "update BadChannels set Reason = '"
+theQuery        << "UPDATE BadChannels SET Reason = '"
 		<< ccontrol::removeSqlChars(Reason)
 		<< "', AddedBy = '"
 		<< ccontrol::removeSqlChars(AddedBy)
-		<< "' where lower(Name) = '"
+		<< "' WHERE lower(Name) = '"
 		<< ccontrol::removeSqlChars(string_lower(Name)) << "'"
                 << ends;
          
@@ -85,7 +85,7 @@ if(!dbConnected)
         }
 
 stringstream theQuery;
-theQuery        << "delete from  BadChannels where lower(Name) = '"
+theQuery        << "DELETE FROM BadChannels WHERE lower(Name) = '"
 		<< ccontrol::removeSqlChars(string_lower(Name)) << "'"
                 << ends;
          
@@ -115,7 +115,7 @@ if(!dbConnected)
         }
 
 stringstream theQuery;
-theQuery        << "Insert into BadChannels (Name,Reason,AddedBy) VALUES ('"
+theQuery        << "INSERT INTO BadChannels (Name,Reason,AddedBy) VALUES ('"
 		<< ccontrol::removeSqlChars(Name) << "','"
 		<< ccontrol::removeSqlChars(Reason)
 		<< "','"

@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: SCANCommand.cc,v 1.13 2005/06/19 20:48:10 kewlio Exp $
+ * $Id: SCANCommand.cc,v 1.14 2006/09/26 17:36:01 kewlio Exp $
  */
 
 #include	<string>
@@ -36,7 +36,7 @@
 #include	"Constants.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: SCANCommand.cc,v 1.13 2005/06/19 20:48:10 kewlio Exp $" ) ;
+RCSTAG( "$Id: SCANCommand.cc,v 1.14 2006/09/26 17:36:01 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -140,7 +140,7 @@ for(pos = 1; pos < st.size() ; )
 		}
 	else
 		{
-		bot->Notice(theClient,"SCAN command can only get -h <host> -fh <host> or -n <real name>");
+		bot->Notice(theClient,"SCAN command can only get -h <host>, -fh <host> or -n <real name>");
 		return true;
 		}
 	}
@@ -166,13 +166,13 @@ else if(nameLook)
 	}
 else 
 	{
-	bot->Notice(theClient,"You didnt specify a search type (-h/-fh/-n) please try again");
+	bot->Notice(theClient,"You didn't specify a search type (-h/-fh/-n) - please try again");
 	return true;
 	}
 if( (cList.size() > scan::MAX_SHOW) && (showUsers))	
 	{
-	bot->Notice(theClient,"There were %d users matching this search, only 15 will be shown"
-		    ,cList.size());
+	bot->Notice(theClient,"There were %d users matching this search, only 15 will be shown",
+		cList.size());
 	}
 else
 	{

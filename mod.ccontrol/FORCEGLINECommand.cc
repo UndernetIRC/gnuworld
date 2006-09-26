@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: FORCEGLINECommand.cc,v 1.32 2005/06/18 22:51:47 kewlio Exp $
+ * $Id: FORCEGLINECommand.cc,v 1.33 2006/09/26 17:35:58 kewlio Exp $
  */
 
 #include	<string>
@@ -35,7 +35,7 @@
 #include	"Constants.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: FORCEGLINECommand.cc,v 1.32 2005/06/18 22:51:47 kewlio Exp $" ) ;
+RCSTAG( "$Id: FORCEGLINECommand.cc,v 1.33 2006/09/26 17:35:58 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -54,12 +54,6 @@ bool FORCEGLINECommand::Exec( iClient* theClient, const string& Message )
 {
 
 StringTokenizer st( Message ) ;
-
-if(!dbConnected)
-        {
-        bot->Notice(theClient,"Sorry, but the db connection is down now, please try again alittle later");
-        return false;
-        }
 
 if( st.size() < 3 )
 	{
@@ -89,12 +83,12 @@ time_t gLength = bot->getDefaultGlineLength() ;
 
 if(string::npos != st[pos].find_first_of('#'))
 	{
-	bot->Notice(theClient,"I dont think glining that host is such a good idea, lose the #");
+	bot->Notice(theClient,"I don't think glining that host is such a good idea, lose the #");
 	return true;
 	}
 if(st[pos].substr(0,1) == "$")
 	{
-	bot->Notice(theClient,"Please use sgline to set that gline");
+	bot->Notice(theClient,"Please use SGLINE to set that gline");
 	return true;
 	}
 string::size_type atPos = st[ pos ].find_first_of( '@' ) ;
@@ -147,7 +141,7 @@ if(!tmpUser)
 	}
 if((Forced) && (tmpUser->getType() < operLevel::SMTLEVEL))
 	{
-	bot->Notice(theClient,"Only smt+ can use the -fu option");
+	bot->Notice(theClient,"Only SMT+ can use the -fu option");
 	return false;
 	}
 	
@@ -156,13 +150,13 @@ int gCheck = bot->checkGline(st[pos],gLength,Users);
 
 if(gCheck & gline::NEG_TIME)
 	{
-	bot->Notice(theClient,"Hmmz, dont you think that giving a negative time is kinda stupid?");
+	bot->Notice(theClient,"You can't gline for a negative amount of time!");
 	Ok = false;
 	}	
 
 if(gCheck & gline::HUH_NO_HOST)
 	{
-	bot->Notice(theClient,"I dont think glining that host is such a good idea, do you?");
+	bot->Notice(theClient,"I don't think glining that host is such a good idea, do you?");
 	Ok = false;
 	}
 if(gCheck & gline::BAD_HOST)
@@ -187,7 +181,7 @@ if(gCheck & gline::BAD_CIDROVERRIDE)
         }
 if(gCheck & gline::BAD_TIME)
 	{
-	bot->Notice(theClient,"Glining for more than %d seconds is a NoNo",gline::MFGLINE_TIME);
+	bot->Notice(theClient,"Glining for more than %d seconds is not allowed",gline::MFGLINE_TIME);
 	Ok = false;
 	}
 if((gCheck & gline::FU_NEEDED_USERS) && (Ok))
@@ -197,13 +191,13 @@ if((gCheck & gline::FU_NEEDED_USERS) && (Ok))
 		Ok = false;
 		if(tmpUser->getFlags() < operLevel::SMTLEVEL)
 			{
-			bot->Notice(theClient,"Sorry but you cant set a gline which affects more than %d users"
-			,gline::MFGLINE_USERS);
+			bot->Notice(theClient,"Sorry, you can't set a gline which affects more than %d users",
+				gline::MFGLINE_USERS);
 			}
 		else
 			{
-			bot->Notice(theClient,"This gline affects more than %d users, please use the -fu flag"
-			,gline::MFGLINE_USERS);
+			bot->Notice(theClient,"This gline affects more than %d users, please use the -fu flag",
+				gline::MFGLINE_USERS);
 			}
 		
 		}
@@ -215,13 +209,13 @@ if((gCheck & gline::FU_NEEDED_TIME) && (Ok))
 		Ok = false;
 		if(tmpUser->getFlags() < operLevel::SMTLEVEL)
 			{
-			bot->Notice(theClient,"Sorry but you cant set a gline for more than %d seconds"
-			,gline::MFGLINE_TIME);
+			bot->Notice(theClient,"Sorry, you can't set a gline for more than %d seconds",
+				gline::MFGLINE_TIME);
 			}
 		else
 			{
-			bot->Notice(theClient,"This gline is for more than %d seconds, please use the -fu flag"
-			,gline::MFGLINE_TIME);
+			bot->Notice(theClient,"This gline is for more than %d seconds, please use the -fu flag",
+				gline::MFGLINE_TIME);
 			}
 		}
 	}
@@ -265,7 +259,7 @@ sprintf(Us,"%d",Users);
 string Reason = string("[") + Us + "] " + st.assemble( pos + ResStart );
 if(Reason.size() > gline::MAX_REASON_LENGTH)
 	{
-	bot->Notice(theClient,"Gline reason can't be more than %d chars",
+	bot->Notice(theClient,"Gline reason can't be more than %d characters",
 		    gline::MAX_REASON_LENGTH);
 	return false;
 	}

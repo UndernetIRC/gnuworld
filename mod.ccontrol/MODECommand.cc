@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: MODECommand.cc,v 1.21 2005/01/17 23:09:00 dan_karrels Exp $
+ * $Id: MODECommand.cc,v 1.22 2006/09/26 17:35:59 kewlio Exp $
  */
 
 #include	<string>
@@ -33,7 +33,7 @@
 #include	"ccBadChannel.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: MODECommand.cc,v 1.21 2005/01/17 23:09:00 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: MODECommand.cc,v 1.22 2006/09/26 17:35:59 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -56,14 +56,14 @@ if( st.size() < 3 )
 
 if(st[1].size() > channel::MaxName)
 	{
-	bot->Notice(theClient,"Channel can't be more than %d chars",
+	bot->Notice(theClient,"Channel can't be more than %d characters",
 		channel::MaxName);
 	}
 
 Channel* theChan = Network->findChannel( st[ 1 ] ) ;
 if( NULL == theChan )
 	{
-	bot->Notice( theClient, "Unable to find channel %s\n",
+	bot->Notice( theClient, "Unable to find channel '%s'\n",
 		st[ 1 ].c_str() ) ;
 	return true ;
 	}
@@ -72,9 +72,9 @@ bot->MsgChanLog("MODE  %s\n",st.assemble(1).c_str());
 ccBadChannel* Chan = bot->isBadChannel(st[1]);
 if(Chan)
         {
-        bot->Notice(theClient,"Sorry, but you can not change modes in "
-                             "this channel because : %s"
-                             ,Chan->getReason().c_str());
+        bot->Notice(theClient,"Sorry, but you can't change modes in "
+                             "this channel because: %s",
+                             Chan->getReason().c_str());
         return false;
         }
 
@@ -148,7 +148,7 @@ while( modePos < st.size() )
 				// Is the argument a valid nickname?
 				if( NULL == Target )
 					{
-					bot->Notice( theClient, "Unable to find %s\n",
+					bot->Notice( theClient, "Unable to find '%s'\n",
 						st[ argPos ].c_str() ) ;
 					return true ;
 					}

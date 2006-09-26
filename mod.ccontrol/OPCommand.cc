@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: OPCommand.cc,v 1.15 2005/06/19 14:54:51 kewlio Exp $
+ * $Id: OPCommand.cc,v 1.16 2006/09/26 17:36:00 kewlio Exp $
  */
 
 #include	<set>
@@ -32,7 +32,7 @@
 #include	"ccBadChannel.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: OPCommand.cc,v 1.15 2005/06/19 14:54:51 kewlio Exp $" ) ;
+RCSTAG( "$Id: OPCommand.cc,v 1.16 2006/09/26 17:36:00 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -55,7 +55,7 @@ if( st.size() < 3 )
 
 if(st[1].size() > channel::MaxName)
 	{
-	bot->Notice(theClient,"Channel name can't be more than %d chars",
+	bot->Notice(theClient,"Channel name can't be more than %d characters",
 		channel::MaxName);
 	return false;
 	}
@@ -71,8 +71,8 @@ if( NULL == theChan )
 ccBadChannel* Chan = bot->isBadChannel(st[1]);
 if(Chan)
 	{
-	bot->Notice(theClient,"Sorry, but you can not change modes in "
-			     "this channel because : %s",
+	bot->Notice(theClient,"Sorry, but you can't change modes in "
+			     "this channel because: %s",
 			     Chan->getReason().c_str());
 	return false;
 	}

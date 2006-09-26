@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: SAYCommand.cc,v 1.7 2005/12/01 04:11:39 kewlio Exp $
+ * $Id: SAYCommand.cc,v 1.8 2006/09/26 17:36:01 kewlio Exp $
  */
 
 #include	<string>
@@ -28,7 +28,7 @@
 #include	"Network.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: SAYCommand.cc,v 1.7 2005/12/01 04:11:39 kewlio Exp $" ) ;
+RCSTAG( "$Id: SAYCommand.cc,v 1.8 2006/09/26 17:36:01 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -61,7 +61,7 @@ else if(!strcasecmp(st[1].c_str(),"-b"))
 	}
 else
 	{
-	bot->Notice(theClient,"First argument must be -s for server , or -b for bot");
+	bot->Notice(theClient,"First argument must be -s for server, or -b for bot");
 	return true;
 	}
 
@@ -69,8 +69,8 @@ if(!strcasecmp(st[2].substr(0,1),"#"))
 	{
 	if(!Network->findChannel(st[2]))
 		{
-		bot->Notice(theClient,"Sorry, but i cant find channel %s"
-			    ,st[2].c_str());
+		bot->Notice(theClient,"Sorry, but i can't find channel %s",
+			    st[2].c_str());
 		return true;
 		}
 	else
@@ -83,8 +83,8 @@ else
 	iClient* tClient = Network->findNick(st[2]);
 	if(!tClient)
 		{
-		bot->Notice(theClient,"Sorry, but i cant find Nick %s"
-			    ,st[2].c_str());
+		bot->Notice(theClient,"Sorry, but i can't find nick: %s",
+			    st[2].c_str());
 		return true;
 		}
 	else

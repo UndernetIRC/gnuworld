@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ADDCOMMANDCommand.cc,v 1.28 2005/01/08 23:33:42 dan_karrels Exp $
+ * $Id: ADDCOMMANDCommand.cc,v 1.29 2006/09/26 17:35:57 kewlio Exp $
  */
  
 #include	<string>
@@ -28,7 +28,7 @@
 #include        "ccUser.h"
 #include	"misc.h"
 
-RCSTAG( "$Id: ADDCOMMANDCommand.cc,v 1.28 2005/01/08 23:33:42 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: ADDCOMMANDCommand.cc,v 1.29 2006/09/26 17:35:57 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -48,12 +48,6 @@ if( st.size() < 3 )
 	return true;
 	}
 
-if(!dbConnected)
-        {
-        bot->Notice(theClient,"Sorry, but the db connection is down now, please try again alittle later");
-        return false;
-        }
-
 StringTokenizer::size_type pos = 1;
 bool Forced = false;
 if(!strcasecmp(st[pos],"-fr"))
@@ -69,7 +63,7 @@ if(!strcasecmp(st[pos],"-fr"))
 // Fetch the oper record from the db
 if(st[pos].size() > 64)
 	{
-	bot->Notice(theClient,"Oper name can't be more than 64 chars");
+	bot->Notice(theClient,"Oper name can't be more than 64 characters in length.");
 	return false;
 	}
 
@@ -77,7 +71,7 @@ ccUser* theUser = bot->GetOper(st[pos]);
 if( !theUser )
 	{	
 	bot->Notice( theClient,
-		"I cant find oper %s",
+		"I can't find oper %s",
 		st[1].c_str());
 	return false;
 	}
@@ -86,14 +80,14 @@ pos++;
 //int CommandLevel = bot->getCommandLevel(st[pos]);
 if(st[pos].size() > 128)
 	{
-	bot->Notice(theClient,"Command name can't be more than 128 chars");
+	bot->Notice(theClient,"Command name can't be more than 128 characters in length.");
 	return false;
 	}
 Command* Comm = bot->findCommandInMem(st[pos]);
 if( !Comm )
 	{
 	bot->Notice( theClient,
-		"Command %s does not exist!",
+		"Command '%s' does not exist!",
 		st[pos].c_str());
 	return false;	        
 	}
@@ -101,7 +95,7 @@ if( !Comm )
 ccUser *AClient = bot->IsAuth( theClient );
 if( NULL == AClient )
 	{
-	bot->Notice( theClient, "You must first authenticate" ) ;
+	bot->Notice( theClient, "You must be authenticated to use this command." ) ;
 	return true ;
 	}
 bot->MsgChanLog("ADDCOMMAND %s\n",st.assemble(1).c_str());
@@ -110,7 +104,7 @@ bot->MsgChanLog("ADDCOMMAND %s\n",st.assemble(1).c_str());
 if(!AClient->gotAccess(Comm) )
 	{
 	bot->Notice( theClient,
-		"You must have access to a command inorder to add it");
+		"You must have access to a command in order to add it.");
 	return false;
 	}
 
@@ -122,14 +116,14 @@ else
 
 if((Admin) && (AClient->getType() <= theUser->getType()))
 	{
-	bot->Notice(theClient,"You cant modify user who have a "
-		"equal/higher access than you");
+	bot->Notice(theClient,"You can't modify a user who has an "
+		"equal or higher access level than you");
 	return false;
 	}
 else if(!(Admin) && (AClient->getType() < theUser->getType()))
 	{
-	bot->Notice(theClient,"You cant modify user who have a higher "
-		"access than you");
+	bot->Notice(theClient,"You can't modify a user who has a higher "
+		"access level than you");
 	return false;
 	}
 if((Admin) && (strcasecmp(AClient->getServer(),theUser->getServer())))
@@ -142,7 +136,7 @@ if(Forced)
 	{
 	if((AClient->getType() < operLevel::SMTLEVEL) && ((bot->findCommandInMem(st[pos]))->getMinLevel() > theUser->getType()))
 		{
-		bot->Notice(theClient,"Only SMT+ can force the add of command");
+		bot->Notice(theClient,"Only SMT+ can force the addition of a command");
 		return false;
 		}
 	}
@@ -150,12 +144,12 @@ else if(Comm->getMinLevel() > theUser->getType())
 	{
 	if(AClient->getType() >= operLevel::SMTLEVEL)
 		bot->Notice(theClient,
-			"The min level required to use this command "
+			"The minimum level required to use this command "
 			"is higher than the one the oper has, use "
-			"\002-fr\002 if you stil want to add it");
+			"\002-fr\002 if you still want to add it");
 	else
 		bot->Notice(theClient,
-			"The min level required to use this command "
+			"The minimum level required to use this command "
 			"is higher than the one the oper has");
 	return false;
 	}
@@ -163,7 +157,7 @@ else if(Comm->getMinLevel() > theUser->getType())
 else if(theUser->gotAccess(Comm))	
 	{
 	bot->Notice( theClient,
-		"%s already got access for %s",
+		"%s already has access to '%s'",
 		st[1].c_str(),
 		st[2].c_str());
 	return false;	        
@@ -178,7 +172,7 @@ if(theUser->Update())
 		"Successfully added the command for %s",
 		st[pos-1].c_str());
 	if(Forced)
-		bot->MsgChanLog("%s is using -fr to add %s to %s"
+		bot->MsgChanLog("%s is using -fr to add '%s' to %s"
 				,theClient->getNickName().c_str(),st[pos].c_str()
 				,st[pos-1].c_str());
 	// If the user is authenticated update his authenticate entry

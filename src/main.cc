@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: main.cc,v 1.65 2005/01/12 03:50:38 dan_karrels Exp $
+ * $Id: main.cc,v 1.66 2006/09/26 17:36:06 kewlio Exp $
  */
 
 #include	<sys/time.h>
@@ -47,7 +47,7 @@
 #include	"md5hash.h"
 #include	"Signal.h"
 
-RCSTAG( "$Id: main.cc,v 1.65 2005/01/12 03:50:38 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: main.cc,v 1.66 2006/09/26 17:36:06 kewlio Exp $" ) ;
 
 // main() must be in the global namespace
 using namespace gnuworld ;
@@ -152,6 +152,22 @@ if( 0 == Signal::getInstance() )
 
 // Seed the random number generator
 ::srand( ::time( 0 ) ) ;
+
+#ifdef DAEMON
+	/* fork into background here */
+	if (fork())
+	{
+		fprintf(stdout, "%s: forked into background\n", argv[0]);
+		exit(0);
+	}
+	setsid();
+	if (fork())
+		exit(0);
+	/* redirect stdin, stdout, stderr to null */
+	freopen("/dev/null", "r", stdin);
+	freopen("/dev/null", "w", stdout);
+	freopen("/dev/null", "w", stderr);
+#endif
 
 bool autoConnect = true ;
 while( autoConnect )

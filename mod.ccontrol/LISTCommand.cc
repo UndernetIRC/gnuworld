@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: LISTCommand.cc,v 1.21 2005/09/30 21:03:07 kewlio Exp $
+ * $Id: LISTCommand.cc,v 1.22 2006/09/26 17:35:58 kewlio Exp $
  */
 
 #include	<string>
@@ -32,7 +32,7 @@
 #include	"StringTokenizer.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: LISTCommand.cc,v 1.21 2005/09/30 21:03:07 kewlio Exp $" ) ;
+RCSTAG( "$Id: LISTCommand.cc,v 1.22 2006/09/26 17:35:58 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -130,7 +130,7 @@ else if(!strcasecmp(st[1].c_str(),"channels"))
 			if (st.size() < 4)
 			{
 				bot->Notice(theClient, "for 'list channels modes', you must supply the modes to match against!");
-				bot->Notice(theClient, "e.g. 'list channels modes +tns-m' to require +tns and require not to have +s");
+				bot->Notice(theClient, "e.g. 'list channels modes +tns-m' to require +tns and require not to have +m");
 				bot->Notice(theClient, "(other modes may be set unless explicitly not required as above)");
 				return false;
 			}
@@ -300,7 +300,7 @@ else if(!strcasecmp(st[1].c_str(),"channels"))
 	}
 else
 	{
-	bot->Notice(theClient,"Unknown list");
+	bot->Notice(theClient,"Unknown list type - see HELP");
 	}
 
 return true ;

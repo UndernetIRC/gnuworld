@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: SUSPENDCommand.cc,v 1.14 2005/01/12 03:50:29 dan_karrels Exp $
+ * $Id: SUSPENDCommand.cc,v 1.15 2006/09/26 17:36:01 kewlio Exp $
  */
 
 #include	<string>
@@ -30,7 +30,7 @@
 #include	"ccUser.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: SUSPENDCommand.cc,v 1.14 2005/01/12 03:50:29 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: SUSPENDCommand.cc,v 1.15 2006/09/26 17:36:01 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -44,12 +44,6 @@ bool SUSPENDCommand::Exec( iClient* theClient, const string& Message)
 {
 StringTokenizer st( Message ) ;
 	
-if(!dbConnected)
-        {
-        bot->Notice(theClient,"Sorry, but the db connection is down now, please try again alittle later");
-        return false;
-        }
-
 if( st.size() < 4 )
 	{
 	Usage(theClient);
@@ -60,7 +54,7 @@ ccUser* tmpUser = bot->GetOper(bot->removeSqlChars(st[1]));
 
 if(!tmpUser)
 	{
-	bot->Notice(theClient,"%s isnt on my access list",st[1].c_str());
+	bot->Notice(theClient,"%s isn't on my access list",st[1].c_str());
 	return false;
 	}
 ccUser* tmpAuth = bot->IsAuth(theClient);
@@ -76,17 +70,19 @@ bool Admin = AdFlag < operLevel::SMTLEVEL;
 
 if((Admin) && (AdFlag <= OpFlag))
 	{
-	bot->Notice(theClient,"You cant suspend a user who got higher/equal level than yours");
+	bot->Notice(theClient,"You can't suspend a user who has a higher or equal "
+		"level to your own");
 	return false;
 	}
 else if(AdFlag < OpFlag)
 	{
-	bot->Notice(theClient,"You cant suspend a user who got higher level than yours");
+	bot->Notice(theClient,"You can't suspend a user who has a higher level than "
+		"your own");
 	return false;
 	}
 if((Admin) && (strcasecmp(tmpAuth->getServer().c_str(),tmpUser->getServer().c_str())))
 	{
-	bot->Notice(theClient,"You can only suspend a user who's associated to the same server as you");
+	bot->Notice(theClient,"You can only suspend a user associated with the same server as you");
 	return false;
 	}
 
@@ -152,12 +148,12 @@ if(!strcasecmp(st[3],"-l"))
 		}
 	else
 		{
-		bot->Notice(theClient,"Invalid suspend level must be OPER/ADMIN/SMT/CODER");
+		bot->Notice(theClient,"Invalid suspend level must be OPER, ADMIN, SMT or CODER");
 		return false;
 		}
 	if(Level > AdFlag)
 		{
-		bot->Notice(theClient,"You cant suspend with a level higher than yours!");
+		bot->Notice(theClient,"You can't suspend at a level higher than your own!");
 		return false;
 		}
 	ResPos = 5;
@@ -175,7 +171,7 @@ if(tmpUser->Update())
 	}
 else
 	{
-	bot->Notice(theClient,"Error while suspendeding %s",st[1].c_str());
+	bot->Notice(theClient,"Error while suspending %s",st[1].c_str());
 	return false;
 	}
 

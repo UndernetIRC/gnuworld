@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: COMMANDSCommand.cc,v 1.14 2005/01/12 03:50:29 dan_karrels Exp $
+ * $Id: COMMANDSCommand.cc,v 1.15 2006/09/26 17:35:58 kewlio Exp $
  */
  
 #include	<string>
@@ -29,7 +29,7 @@
 #include	"misc.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: COMMANDSCommand.cc,v 1.14 2005/01/12 03:50:29 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: COMMANDSCommand.cc,v 1.15 2006/09/26 17:35:58 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -49,15 +49,9 @@ if( st.size() < 3 )
 	return true;
 	}
 
-if(!dbConnected)
-        {
-        bot->Notice(theClient,"Sorry, but the db connection is down now, please try again alittle later");
-        return false;
-        }
-
 if(st[1].size() > 128)
 	{
-	bot->Notice(theClient,"Command name can't be more than 128 chars");
+	bot->Notice(theClient,"Command name can't be more than 128 characters.");
 	return false;
 	}
 
@@ -66,7 +60,7 @@ bot->MsgChanLog("COMMANDS %s\n",st.assemble(1).c_str());
 Command* Comm = bot->findCommandInMem(st[2]);
 if(!Comm)
 	{
-	bot->Notice(theClient,"Can't find command name %s",st[2].c_str());
+	bot->Notice(theClient,"Can't find command name '%s'",st[2].c_str());
 	return false;
 	}
 if(!strcasecmp(st[1],"-ds"))
@@ -194,7 +188,7 @@ else if(!strcasecmp(st[1],"-na"))
 		}
 	if(st[3].size() > 128)
 	{
-		bot->Notice(theClient,"Command name can't be more than 128 chars");
+		bot->Notice(theClient,"Command name can't be more than 128 characters");
 		return false;
 	}
 	if(!strcasecmp(Comm->getName(),st[3]))
@@ -210,7 +204,7 @@ else if(!strcasecmp(st[1],"-na"))
 		}
 	else
 		{
-		bot->Notice(theClient,"name has been changed");
+		bot->Notice(theClient,"command name has been changed");
 		return true;
 		}
 	}
@@ -244,7 +238,7 @@ else if(!strcasecmp(st[1],"-ml"))
 		}
 	else
 		{
-		bot->Notice(theClient,"Unknown level, must be CODER,SMT,ADMIN,OPER,UHS");
+		bot->Notice(theClient,"Unknown level, must be CODER,SMT,ADMIN,OPER or UHS");
 		return false;
 		}
 	Comm->setMinLevel(MINLEVEL);

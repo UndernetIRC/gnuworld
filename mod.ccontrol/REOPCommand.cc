@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: REOPCommand.cc,v 1.6 2005/06/18 20:32:14 kewlio Exp $
+ * $Id: REOPCommand.cc,v 1.7 2006/09/26 17:36:01 kewlio Exp $
  */
 
 #include	<string>
@@ -32,7 +32,7 @@
 #include	"ccBadChannel.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: REOPCommand.cc,v 1.6 2005/06/18 20:32:14 kewlio Exp $" ) ;
+RCSTAG( "$Id: REOPCommand.cc,v 1.7 2006/09/26 17:36:01 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -56,7 +56,8 @@ if( st.size() < 3 )
 
 if(st[1].size() > channel::MaxName)
 	{
-	bot->Notice(theClient,"Channel name can't be more than %d chars",channel::MaxName);
+	bot->Notice(theClient,"Channel name can't be more than %d characters",
+		channel::MaxName);
 	return false;
 	}
 
@@ -70,14 +71,14 @@ if( NULL == theChan )
 
 if(bot->isOperChan(theChan))
 	{
-	bot->Notice(theClient,"C'mon , you know you cant reop an oper channel");
+	bot->Notice(theClient,"You can't reop an oper channel.");
 	return false;
 	}
 
 iClient* reopClient = Network->findNick(st[2]);
 if(!reopClient)
 	{
-	bot->Notice(theClient,"I cant find %s anywere",st[2].c_str());
+	bot->Notice(theClient,"I can't find %s online",st[2].c_str());
 	return true;
 	}
 
@@ -85,9 +86,9 @@ bot->MsgChanLog("REOP %s\n",st.assemble(1).c_str());
 ccBadChannel* Chan = bot->isBadChannel(st[1]);
 if(Chan)
         {
-        bot->Notice(theClient,"Sorry, but you can not change modes in "
-                             "this channel because : %s"
-                             ,Chan->getReason().c_str());
+        bot->Notice(theClient,"Sorry, but you can't change modes in "
+                             "this channel because: %s",
+                             Chan->getReason().c_str());
         return false;
         }
 

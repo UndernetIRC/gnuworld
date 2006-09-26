@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ADDOPERCHANCommand.cc,v 1.11 2005/01/08 23:33:42 dan_karrels Exp $
+ * $Id: ADDOPERCHANCommand.cc,v 1.12 2006/09/26 17:35:57 kewlio Exp $
  */
  
 #include	<string>
@@ -27,7 +27,7 @@
 #include	"StringTokenizer.h"
 #include	"Constants.h"
 
-RCSTAG( "$Id: ADDOPERCHANCommand.cc,v 1.11 2005/01/08 23:33:42 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: ADDOPERCHANCommand.cc,v 1.12 2006/09/26 17:35:57 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -61,12 +61,12 @@ if(chanName.length() >  channel::MaxName)
 
 if( bot->addOperChan( chanName ) )
 	{
-	bot->Notice( theClient, "Addition of %s as oper chan SUCCEEDED",
+	bot->Notice( theClient, "Addition of %s as oper chan has SUCCEEDED",
 		chanName.c_str() ) ;
 	}
 else
 	{
-	bot->Notice( theClient, "Addition of %s as oper chan FAILED",
+	bot->Notice( theClient, "Addition of %s as oper chan has FAILED",
 		chanName.c_str() ) ;
 	}
 return true ;

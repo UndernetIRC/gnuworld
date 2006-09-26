@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: REMUSERCommand.cc,v 1.13 2005/01/12 03:50:29 dan_karrels Exp $
+ * $Id: REMUSERCommand.cc,v 1.14 2006/09/26 17:36:01 kewlio Exp $
  */
 
 #include	<string>
@@ -31,7 +31,7 @@
 #include	"StringTokenizer.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: REMUSERCommand.cc,v 1.13 2005/01/12 03:50:29 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: REMUSERCommand.cc,v 1.14 2006/09/26 17:36:01 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -45,12 +45,6 @@ bool REMUSERCommand::Exec( iClient* theClient, const string& Message)
 {
 StringTokenizer st( Message ) ;
 
-if(!dbConnected)
-        {
-        bot->Notice(theClient,"Sorry, but the db connection is down now, please try again alittle later");
-        return false;
-        }
-
 if( st.size() < 2 )
 	{
 	Usage(theClient);
@@ -60,10 +54,10 @@ if( st.size() < 2 )
 ccUser* theUser = bot->GetOper(bot->removeSqlChars(st[1]));
 if (!theUser) 
 	{ 
-	bot->Notice(theClient,"Oper %s does not exists db," 
-	"check your handle and try again",st[1].c_str());
+	bot->Notice(theClient,"Oper %s does not exist in database, " 
+		"check your handle and try again",st[1].c_str());
 	return false;
-	}	    
+	}
 ccUser* tempAuth = bot->IsAuth(theClient);
 
 if(!tempAuth)
@@ -73,20 +67,21 @@ if(!tempAuth)
 if((tempAuth->getType() <= theUser->getType()) 
     && (tempAuth->getType() < operLevel::CODERLEVEL))
 	{
-	bot->Notice(theClient,"You cant remove an oper who got higher or equal access");
+	bot->Notice(theClient,"You can't remove an oper who has a higher or equal "
+		" access level to you.");
 	return false;
 	}
 if(((tempAuth->getType() < operLevel::SMTLEVEL)) &&
     (strcasecmp(tempAuth->getServer(),theUser->getServer())))
 	{
-	bot->Notice(theClient,"You cant remove opers from other servers");
+	bot->Notice(theClient,"You can't remove opers from other servers");
 	return false;
 	}
 bot->MsgChanLog("REMUSER %s\n",st.assemble(1).c_str());
 
 if(bot->DeleteOper(string_lower(st[1])))     
 	{    
-	bot->Notice(theClient,"Successfully Deleted Oper %s ",st[1].c_str());
+	bot->Notice(theClient,"Successfully deleted oper: %s",st[1].c_str());
 	
 	//Check if the user is authenticate 
 	if(theUser->getClient())
@@ -94,7 +89,8 @@ if(bot->DeleteOper(string_lower(st[1])))
 		//Get hte user iClient entry from the network , and notify him that he was deleted
 		const iClient *TClient = theUser->getClient(); 
 		if(TClient)
-			bot->Notice(TClient,"You have been removed from my access list");
+			bot->Notice(TClient,"You have been removed from my access list, "
+				"and have been deauthenticated.");
 		//Remove the user authenticate entry
 		bot->deAuthUser(theUser);
 		}	
@@ -103,7 +99,7 @@ if(bot->DeleteOper(string_lower(st[1])))
 	}
 else
 	{    
-	bot->Notice(theClient,"Error While Deleting Oper %s ",st[1].c_str());
+	bot->Notice(theClient,"Error while deleting oper: %s",st[1].c_str());
 	return false;	
 	}
 }

@@ -20,7 +20,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ADDUSERCommand.cc,v 1.20 2005/01/12 03:50:28 dan_karrels Exp $
+ * $Id: ADDUSERCommand.cc,v 1.21 2006/09/26 17:35:58 kewlio Exp $
  */
 
 #include	<string>
@@ -34,7 +34,7 @@
 #include	"Constants.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: ADDUSERCommand.cc,v 1.20 2005/01/12 03:50:28 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: ADDUSERCommand.cc,v 1.21 2006/09/26 17:35:58 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -53,17 +53,10 @@ if( st.size() < 4 )
 	return true;
 	}
 
-if(!dbConnected)
-        {
-        bot->Notice(theClient,"Sorry, but the db connection is down "
-		"now, please try again alittle later");
-        return false;
-        }
-
 if(st[1].size() > User::MaxName)
 	{
 	bot->Notice(theClient,"Oper name can't be more than %d "
-		"chars",
+		"characters in length.",
 		User::MaxName);
 	return false;
 	}
@@ -73,8 +66,8 @@ if(st[1].size() > User::MaxName)
 ccUser* theUser = bot->GetOper(st[1]);
 if (theUser)  
 	{ 
-	bot->Notice(theClient,"Oper %s already exsits in my db," 
-		"please change the oper handle and try again",
+	bot->Notice(theClient,"Oper '%s' already exsits in my database, " 
+		"please change the oper handle and try again.",
 		theUser->getUserName().c_str());
 	return false;
 	}
@@ -101,8 +94,8 @@ else if(!strcasecmp(st[2],"admin"))
 	{
 	if(st.size() < 5)
 		{
-		bot->Notice(theClient,"When adding new admin, you "
-			"must specify a server");
+		bot->Notice(theClient,"When adding a new admin, you "
+			"must specify a server.");
 		return false;
 		}
 	NewAccess = commandLevel::ADMIN;
@@ -118,7 +111,7 @@ else if(!strcasecmp(st[2],"oper"))
 else
 	{
 	bot->Notice(theClient,
-		"Illegal oper type; types are: oper, admin, smt ,coder");
+		"Illegal oper type; types are: oper, admin, smt and coder");
 	return false;
 	}	     	
 
@@ -126,7 +119,7 @@ ccUser *tOper = bot->IsAuth( theClient );
 if( NULL == tOper )
 	{
 	bot->Notice( theClient,
-		"You must first authenticate" ) ;
+		"You must be authenticated to use this command." ) ;
 	return true ;
 	}
 
@@ -148,15 +141,15 @@ if(OperFlags < operLevel::ADMINLEVEL)
 if((OperFlags < operLevel::SMTLEVEL) && (OperFlags <= NewFlags))
 	{
 	bot->Notice(theClient,
-		"Sorry, but you can't add an oper with higher or "
-		"equal access to yours");
+		"Sorry, but you can't add an oper with a higher or "
+		"equal access to your own");
 	return false;
 	}
 else if(OperFlags < NewFlags)
 	{
 	bot->Notice(theClient,
-		"Sorry, but you can't add an oper with higher "
-		"access than yours");
+		"Sorry, but you can't add an oper with a higher "
+		"access than your own");
 	return false;
 	}
 
@@ -180,8 +173,8 @@ else
 	string Server( bot->expandDbServer(st[3]) ) ;
 	if( Server.empty() )
 		{
-		bot->Notice(theClient,"I cant find a server that "
-			"matches %s in the database",
+		bot->Notice(theClient,"I can't find a server that "
+			"matches '%s' in the database",
 			st[3].c_str());
 		return false;
 		}
@@ -198,12 +191,12 @@ theUser->setNotice(true); //default to notice
 
 if(bot->AddOper(theUser) == true)
 	{
-	bot->Notice(theClient, "Oper successfully Added.");
+	bot->Notice(theClient, "Oper successfully added.");
 	theUser->loadData(theUser->getUserName());
 	bot->AddHost(theUser,"*!*@*");
 	}
 else
-	bot->Notice(theClient, "Error while adding new oper.");
+	bot->Notice(theClient, "Error while adding the new oper.");
 return true; 
 }
 }

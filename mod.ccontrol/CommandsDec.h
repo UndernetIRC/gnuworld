@@ -16,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: CommandsDec.h,v 1.16 2005/12/27 20:53:31 kewlio Exp $
+ * $Id: CommandsDec.h,v 1.17 2006/09/26 17:35:58 kewlio Exp $
  */
 
 #ifndef __COMMANDSDEC_H
-#define __COMMANDSDEC_H "$Id: CommandsDec.h,v 1.16 2005/12/27 20:53:31 kewlio Exp $"
+#define __COMMANDSDEC_H "$Id: CommandsDec.h,v 1.17 2006/09/26 17:35:58 kewlio Exp $"
 
 namespace gnuworld
 {
@@ -36,11 +36,12 @@ public: \
 	commName##Command( ccontrol* _bot, \
 		const string& _commName, \
 		const string& _help,  \
+		const bool _needDB, \
 	        int _flags , bool isDisabled, \
 		bool needOp, bool noLog, \
 		int minLevel , bool secondAccess ) \
-	: Command( _bot, _commName, _help,_flags,isDisabled \
-	,needOp,noLog,minLevel,secondAccess) \
+	: Command( _bot, _commName, _needDB, _help,_flags, \
+		isDisabled,needOp,noLog,minLevel,secondAccess) \
 	{} \
 	virtual bool Exec( iClient*, const string&) ; \
 	virtual ~commName##Command() {} \

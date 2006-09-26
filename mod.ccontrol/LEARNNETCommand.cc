@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: LEARNNETCommand.cc,v 1.15 2005/01/12 03:50:29 dan_karrels Exp $
+ * $Id: LEARNNETCommand.cc,v 1.16 2006/09/26 17:35:58 kewlio Exp $
  */
 
 #include	<new>
@@ -36,7 +36,7 @@
 #include	"misc.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: LEARNNETCommand.cc,v 1.15 2005/01/12 03:50:29 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: LEARNNETCommand.cc,v 1.16 2006/09/26 17:35:58 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -49,19 +49,12 @@ namespace uworld
 bool LEARNNETCommand::Exec( iClient* theClient, const string& Message )
 {
 
-if(!dbConnected)
-        {
-        bot->Notice(theClient,"Sorry, but the db connection is down "
-		"now, please try again alittle later");
-        return false;
-        }
-
 bot->MsgChanLog("LEARNNET \n");
 
 unsigned int AddedServers = 0;
 StringTokenizer st(Message);
 
-bot->MsgChanLog("Learning network status at the request of : %s\n",
+bot->MsgChanLog("Learning network status at the request of: %s\n",
 	theClient->getNickName().c_str());
 
 xNetwork::serverIterator ptr = Network->servers_begin();
@@ -110,16 +103,16 @@ for( ; ptr != end ; ptr++ )
 			else
 				{
 				bot->MsgChanLog("Error while learning "
-					"server : %s\n",
+					"server: %s\n",
 					NewServer->getName().c_str());
 				}	
 			}
 		}
 	}
 
-bot->MsgChanLog( "Finished learning the network, Learned a total of %d "
+bot->MsgChanLog( "Finished learning the network. Learned a total of %d "
 	"servers\n", AddedServers ) ;
-bot->Notice( theClient, "Finished learning the network, Learned a "
+bot->Notice( theClient, "Finished learning the network. Learned a "
 	"total of %d servers\n", AddedServers ) ;
 
 return true;

@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: LOGINCommand.cc,v 1.30 2005/06/19 02:39:14 kewlio Exp $
+ * $Id: LOGINCommand.cc,v 1.31 2006/09/26 17:35:59 kewlio Exp $
  */
 
 #include	<string>
@@ -35,7 +35,7 @@
 #include	"ip.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: LOGINCommand.cc,v 1.30 2005/06/19 02:39:14 kewlio Exp $" ) ;
+RCSTAG( "$Id: LOGINCommand.cc,v 1.31 2006/09/26 17:35:59 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -52,12 +52,6 @@ bool LOGINCommand::Exec( iClient* theClient, const string& Message)
 {
 StringTokenizer st( Message ) ;
 
-if(!dbConnected)
-        {
-        bot->Notice(theClient,"Sorry, but the db connection is down now, please try again alittle later");
-        return false;
-        }
-
 if( st.size() < 3 )
 	{
 	Usage(theClient);
@@ -68,7 +62,7 @@ ccUser* theUser = bot->IsAuth(theClient);
 if (theUser) 
 	{
 	//Dont let him authenticate under a new name (for now)
-	bot->Notice(theClient, "You are already authenticated! ");
+	bot->Notice(theClient, "You are already authenticated! See DEAUTH command.");
 	return false;
 	}
 
@@ -93,7 +87,7 @@ else
 	if((!theClient->isOper()) && (theUser->getNeedOp()))
 
 		{
-		bot->MsgChanLog("[FAILED LOGIN] %s - Not Operd\n",theClient->getRealNickUserHost().c_str());
+		bot->MsgChanLog("[FAILED LOGIN] %s - Not Oper'd\n",theClient->getRealNickUserHost().c_str());
 		bot->addLogin(theClient);
 		return false;
 		}
@@ -147,9 +141,9 @@ else
 		{
 		const iClient *tClient = theUser->getClient();
 		bot->Notice(tClient,"You have just been deauthenticated");
-		bot->MsgChanLog("Login conflict for user %s from %s and %s\n"
-				,st[1].c_str(),theClient->getNickName().c_str()
-				,tClient->getNickName().c_str());
+		bot->MsgChanLog("Login conflict for user %s from %s and %s\n",
+				st[1].c_str(),theClient->getNickName().c_str(),
+				tClient->getNickName().c_str());
 		bot->deAuthUser(theUser);
 		}
 	theUser->setUserName(st[1]);
@@ -157,13 +151,15 @@ else
 	//Try creating an authentication entry for the user
 	if(bot->AuthUser(theUser,theClient))
 		if(!(bot->isSuspended(theUser)))
-			bot->Notice(theClient, "Authentication successful! ",theUser->getUserName().c_str()); 
+			bot->Notice(theClient, "Authentication successful as %s! ",theUser->getUserName().c_str()); 
 		else 
-			bot->Notice(theClient, "Authentication successful,However you are suspended ",theUser->getUserName().c_str()); 
+			bot->Notice(theClient, "Authentication successful as %s, "
+				"however you are currently suspended ",
+				theUser->getUserName().c_str()); 
 	else
-	        bot->Notice(theClient, "Error in authentication ",theUser->getUserName().c_str()); 
-        bot->MsgChanLog("(%s) - %s : AUTHENTICATED\n",theUser->getUserName().c_str()
-                        ,theClient->getRealNickUserHost().c_str());
+	        bot->Notice(theClient, "Error in authentication as %s",theUser->getUserName().c_str()); 
+        bot->MsgChanLog("(%s) - %s: AUTHENTICATED\n",theUser->getUserName().c_str(),
+                        theClient->getRealNickUserHost().c_str());
 	/* record their connection timestamp + numeric */
 	theUser->setLastAuthTS(theClient->getConnectTime());
 	theUser->setLastAuthNumeric(theClient->getCharYYXXX());

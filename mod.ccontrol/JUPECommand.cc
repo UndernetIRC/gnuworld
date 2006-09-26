@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: JUPECommand.cc,v 1.22 2005/08/24 23:01:09 kewlio Exp $
+ * $Id: JUPECommand.cc,v 1.23 2006/09/26 17:35:58 kewlio Exp $
  */
 
 #include	<new>
@@ -34,7 +34,7 @@
 #include	"Constants.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: JUPECommand.cc,v 1.22 2005/08/24 23:01:09 kewlio Exp $" ) ;
+RCSTAG( "$Id: JUPECommand.cc,v 1.23 2006/09/26 17:35:58 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -80,19 +80,22 @@ Server = Network->findServerName(st[1]);
 if(Server)
 	{
 	bot->Notice(theClient,"%s is currently linked to the network"
-		    ", it will be automatically squit."
-		    ,st[1].c_str());
+		    ", it will be automatically squit.",
+		    st[1].c_str());
 	}
 SName = st[1];
 contime = ::time(0);
 
 if(!strcasecmp(SName,Network->findServer(bot->getUplink()->getUplinkCharYY())->getName()))
 	{
-	bot->Notice(theClient,"What are you trying to do? get me splited?");
+	bot->Notice(theClient,"What are you trying to do? kill me?");
 	bot->MsgChanLog("%s just tried to jupe my uplink!\n",theClient->getNickName().c_str());
 	return false;
 	}
-bot->MsgChanLog("%s is asking me to jupe %s because : %s\n",theClient->getNickName().c_str(),SName.c_str(),st.assemble(2).c_str());
+bot->MsgChanLog("%s is asking me to jupe %s because: %s\n",
+	theClient->getNickName().c_str(),
+	SName.c_str(),
+	st.assemble(2).c_str());
 
 string yyxxx( "00]]]" ) ;
 iServer* jupeServer = new (std::nothrow) iServer(

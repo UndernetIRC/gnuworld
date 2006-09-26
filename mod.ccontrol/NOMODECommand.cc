@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: NOMODECommand.cc,v 1.7 2006/02/10 20:18:28 kewlio Exp $
+ * $Id: NOMODECommand.cc,v 1.8 2006/09/26 17:36:00 kewlio Exp $
  */
 
 #include	<string>
@@ -29,7 +29,7 @@
 #include	"ccBadChannel.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: NOMODECommand.cc,v 1.7 2006/02/10 20:18:28 kewlio Exp $" ) ;
+RCSTAG( "$Id: NOMODECommand.cc,v 1.8 2006/09/26 17:36:00 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -50,7 +50,8 @@ if( st.size() < 3 )
 
 if(st[2].size() > channel::MaxName)
 	{
-	bot->Notice(theClient,"Channel name can't be more than %d chars",channel::MaxName);
+	bot->Notice(theClient,"Channel name can't be more than %d characters",
+		channel::MaxName);
 	return false;
 	}
 
@@ -71,13 +72,13 @@ if(!strcasecmp(st[1],"ADD"))
 		return true;
 		}
 	
-	NewChannel = new (std::nothrow) ccBadChannel(bot->removeSqlChars(st[2])
-					,bot->removeSqlChars(st.assemble(3))
-					,theClient->getRealNickUserHost());
+	NewChannel = new (std::nothrow) ccBadChannel(bot->removeSqlChars(st[2]),
+					bot->removeSqlChars(st.assemble(3)),
+					theClient->getRealNickUserHost());
 	assert(NewChannel != NULL);
 	if(!NewChannel->Insert(bot->SQLDb))
 		{
-		bot->Notice(theClient,"Error while inserting the NOMODE entry to the database");
+		bot->Notice(theClient,"Error while inserting the NOMODE entry into the database");
 		return false;
 		}
 	bot->addBadChannel(NewChannel);
