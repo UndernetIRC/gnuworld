@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccontrol_generic.cc,v 1.3 2006/09/26 17:36:02 kewlio Exp $
+ * $Id: ccontrol_generic.cc,v 1.4 2006/09/26 22:09:38 kewlio Exp $
  */
 
 #include <time.h>
@@ -35,7 +35,7 @@ char *Duration(long ts)
 
 	ago[0] = '\0';
 
-	duration = (time(NULL) - ts);
+	duration = ts;
 
 	days = (duration / 86400);
 	duration %= 86400;

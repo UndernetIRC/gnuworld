@@ -1,4 +1,7 @@
-// $Id: ChangeLog,v 1.100 2006/09/26 20:35:08 kewlio Exp $ //
+// $Id: ChangeLog,v 1.101 2006/09/26 22:09:38 kewlio Exp $ //
+
+2006-09-26	Dan-m00 <daniel@undernet.org>
+		* mod.ccontrol/ccontrol_generic.cc: fix typo - d'oh
 
 2006-09-26	Dan-m00 <daniel@undernet.org>
 		* src/Network.cc: fix compiler warning when compiling with
