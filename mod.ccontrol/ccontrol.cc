@@ -20,7 +20,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccontrol.cc,v 1.210 2006/09/26 17:36:02 kewlio Exp $
+ * $Id: ccontrol.cc,v 1.211 2006/10/08 22:06:33 kewlio Exp $
 */
 
 #define MAJORVER "1"
@@ -66,7 +66,7 @@
 #include	"ccontrol_generic.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: ccontrol.cc,v 1.210 2006/09/26 17:36:02 kewlio Exp $" ) ;
+RCSTAG( "$Id: ccontrol.cc,v 1.211 2006/10/08 22:06:33 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -1958,6 +1958,7 @@ if(dbConnected)
 				}
 			}
 		}
+/* TODO: actually remove this once we're certain.
 	if((!glSet)) 
 		{	
 		ccGline * tempGline = findMatchingRNGline(NewUser);
@@ -1974,7 +1975,7 @@ if(dbConnected)
 			theGline->setReason(tempGline->getReason());
 			queueGline(theGline,false);
 			}
-		}			
+		} */
 	}
         /* check if they are already logged into us */
         usersIterator tIterator = usersMap.begin();

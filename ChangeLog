@@ -1,4 +1,9 @@
-// $Id: ChangeLog,v 1.101 2006/09/26 22:09:38 kewlio Exp $ //
+// $Id: ChangeLog,v 1.102 2006/10/08 22:06:33 kewlio Exp $ //
+
+2006-10-08	Dan-m00 <daniel@undernet.org>
+		* mod.ccontrol/ccontrol.cc: comment out legacy realname gline
+			check as all servers should now support rnglines
+			natively.
 
 2006-09-26	Dan-m00 <daniel@undernet.org>
 		* mod.ccontrol/ccontrol_generic.cc: fix typo - d'oh
