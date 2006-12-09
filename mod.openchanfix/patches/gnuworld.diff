@@ -1,0 +1,381 @@
+ include/events.h         |    2 +
+ include/iServer.h        |   54 ++++++++++++++++++++++++++++++++++++++++++++++-
+ libircu/msg_CM.cc        |   18 +++++++++++++++
+ libircu/msg_M.cc         |   13 +++++++++++
+ libircu/msg_S.cc         |    9 +++++--
+ libircu/msg_Server.cc    |    3 ++
+ src/Network.cc           |   10 +++-----
+ src/iServer.cc           |   37 ++++++++++++++++++++++++++++++++
+ src/main.cc              |    4 +--
+ src/server.cc            |    2 -
+ src/server_connection.cc |    3 ++
+ 11 files changed, 142 insertions(+), 13 deletions(-)
+
+Index: include/events.h
+===================================================================
+RCS file: /cvsroot/gnuworld/gnuworld/include/events.h,v
+retrieving revision 1.19
+diff -u -r1.19 events.h
+--- include/events.h	29 Sep 2005 17:40:06 -0000	1.19
++++ include/events.h	27 Sep 2006 02:56:56 -0000
+@@ -74,6 +74,7 @@
+ {
+ 	EVT_JOIN = EVT_NOOP,
+ 	EVT_PART,
++	EVT_SERVERMODE, // when servers perform modes.
+ 	EVT_TOPIC, // passed even if TRACK_TOPIC is disabled
+ 	EVT_KICK, // moved to xClient::OnNetworkKick()
+ 	EVT_CREATE
+@@ -150,6 +151,7 @@
+ 	"Channel Topic Change", /* EVT_TOPIC */
+ 	"Channel Kick", /* EVT_KICK */
+ 	"Channel Create" /* EVT_CREATE */
++	"Channel Mode By Server" /* EVT_SERVERMODE */
+ } ;
+ 
+ } // namespace gnuworld
+Index: include/iServer.h
+===================================================================
+RCS file: /cvsroot/gnuworld/gnuworld/include/iServer.h,v
+retrieving revision 1.14
+diff -u -r1.14 iServer.h
+--- include/iServer.h	29 Dec 2003 23:59:36 -0000	1.14
++++ include/iServer.h	27 Sep 2006 02:56:57 -0000
+@@ -60,8 +60,17 @@
+ 	/// Type used to hold flags
+ 	typedef unsigned int	flagType ;
+ 
+-	/// Set if this iServer is juped, false otherwise
++	/**
++	 * Flags that iServers may have.
++	 */
++	/* Set if this iServer is juped, false otherwise */
+ 	static const flagType	FLAG_JUPE ;
++	/* Set if this iServer is a hub (+h) */
++	static const flagType	FLAG_HUB ;
++	/* Set if this iServer is a service (+s) */
++	static const flagType	FLAG_SERVICE ;
++	/* Set if this iServer is IPv6-compatible (+6) */
++	static const flagType	FLAG_IPV6 ;
+ 
+ 	/**
+ 	 * Construct an iServer given its vital state variables
+@@ -117,6 +126,42 @@
+ 		{ setFlag( FLAG_JUPE ) ; }
+ 
+ 	/**
++	 * Return true if this server is a hub.
++	 */
++	inline bool isHub() const
++		{ return getFlag( FLAG_HUB ) ; }
++
++	/**
++	 * Set this iServer as a hub.
++	 */
++	inline void setHub()
++		{ setFlag( FLAG_HUB ) ; }
++
++	/**
++	 * Return true if this server is a service.
++	 */
++	inline bool isService() const
++		{ return getFlag( FLAG_SERVICE ) ; }
++
++	/**
++	 * Set this iServer as a service.
++	 */
++	inline void setService()
++		{ setFlag( FLAG_SERVICE ) ; }
++
++	/**
++	 * Return true if this server is IPv6-compatible.
++	 */
++	inline bool isIPv6() const
++		{ return getFlag( FLAG_IPV6 ) ; }
++
++	/**
++	 * Set this iServer as IPv6-compatible.
++	 */
++	inline void setIPv6()
++		{ setFlag( FLAG_IPV6 ) ; }
++
++	/**
+ 	 * Return the server numeric of this server's uplink.
+ 	 */
+ 	inline const unsigned int& getUplinkIntYY() const
+@@ -212,6 +257,13 @@
+ 		return out ;
+ 		}
+ 
++	/* Mutator methods */
++
++	/**
++	 * Interpret a server's flags.
++	 */
++	void setFlags( const std::string& ) ;
++
+ protected:
+ 
+ 	/**
+Index: libircu/msg_CM.cc
+===================================================================
+RCS file: /cvsroot/gnuworld/gnuworld/libircu/msg_CM.cc,v
+retrieving revision 1.9
+diff -u -r1.9 msg_CM.cc
+--- libircu/msg_CM.cc	24 Jun 2005 22:48:59 -0000	1.9
++++ libircu/msg_CM.cc	27 Sep 2006 02:56:57 -0000
+@@ -81,6 +81,24 @@
+ bool clearVoice = false ;
+ bool clearBans = false ;
+ 
++// Go ahead and post the server mode event
++iServer* serverSource = 0 ;
++
++if( NULL != strchr( Param[ 0 ], '.' ) )
++	{
++	// Server, by name
++	serverSource = Network->findServerName( Param[ 0 ] ) ;
++	}
++else if( strlen( Param[ 0 ] ) < 3 )
++	{
++	// 1 or 2 char numeric, server
++	serverSource = Network->findServer( Param[ 0 ] ) ;
++	}
++
++if (serverSource != 0)
++	theServer->PostChannelEvent( EVT_SERVERMODE, tmpChan,
++				     static_cast< void* >( serverSource ));
++
+ xServer::modeVectorType modeVector ;
+ 
+ for( std::string::size_type i = 0 ; i < Modes.size() ; i++ )
+Index: libircu/msg_M.cc
+===================================================================
+RCS file: /cvsroot/gnuworld/gnuworld/libircu/msg_M.cc,v
+retrieving revision 1.12
+diff -u -r1.12 msg_M.cc
+--- libircu/msg_M.cc	29 Sep 2005 17:40:06 -0000	1.12
++++ libircu/msg_M.cc	27 Sep 2006 02:56:58 -0000
+@@ -129,6 +129,19 @@
+ 	return false ;
+ 	}
+ 
++if( serverSource != 0 )
++       {
++//       elog  << "msg_M ("
++//             << theChan->getName()
++//             << ") server "
++//             << serverSource->getName()
++//             << " performed a mode"
++//             << endl;
++       theServer->PostChannelEvent( EVT_SERVERMODE, theChan,
++               static_cast< void* >( serverSource ));
++       }
++
++/* XXX OPMODE FAILS HERE */
+ // Find the ChannelUser of the source client
+ // It is possible that the ChannelUser will be NULL, in the
+ // case that a server is setting the mode(s)
+Index: libircu/msg_S.cc
+===================================================================
+RCS file: /cvsroot/gnuworld/gnuworld/libircu/msg_S.cc,v
+retrieving revision 1.5
+diff -u -r1.5 msg_S.cc
+--- libircu/msg_S.cc	25 Mar 2005 03:07:29 -0000	1.5
++++ libircu/msg_S.cc	27 Sep 2006 02:56:58 -0000
+@@ -47,10 +47,10 @@
+ 
+ /**
+  * New server joined the network.
+- * Q S irc.dynmc.net 2 0 948159347 P10 BD] 0 :[209.0.37.10]
++ * Q S irc.dynmc.net 2 0 948159347 P10 BD] +h :[209.0.37.10]
+  * [209.0.37.10] Dynamic Networking Solutions
+  *
+- * B S EUWorld1.test.net 3 0 947284938 P10 OD] 0 :[128.227.184.152]
++ * B S EUWorld1.test.net 3 0 947284938 P10 OD] +s :[128.227.184.152]
+  * EUWorld Undernet Service
+  * B: Uplink Server numeric
+  * S: SERVER message
+@@ -61,7 +61,7 @@
+  * P10: Protocol
+  * B: Server numeric
+  * D]: Last used nick number for clients
+- * 0: Unused
++ * +h/+s: server flags
+  * EUWorld Undernet Server: description
+  * As always, the second token, the command, is not
+  * included in the xParameters passed here.
+@@ -128,6 +128,9 @@
+ 	newServer->setBursting( true ) ;
+ 	}
+ 
++// Set any appropriate server flags
++newServer->setFlags( params[ 7 ] ) ;
++
+ Network->addServer( newServer ) ;
+ //elog	<< "msg_S> Added server: "
+ //	<< *newServer
+Index: libircu/msg_Server.cc
+===================================================================
+RCS file: /cvsroot/gnuworld/gnuworld/libircu/msg_Server.cc,v
+retrieving revision 1.6
+diff -u -r1.6 msg_Server.cc
+--- libircu/msg_Server.cc	25 Mar 2005 03:07:29 -0000	1.6
++++ libircu/msg_Server.cc	27 Sep 2006 02:56:58 -0000
+@@ -107,6 +107,9 @@
+ 		tmpUplink->setBursting( true ) ;
+ 		}
+ 
++	// Set any appropriate server flags
++	tmpUplink->setFlags( Param[ 6 ] ) ;
++
+ 	theServer->setUplink( tmpUplink ) ;
+ 
+ 	// Find this server (me)
+Index: src/Network.cc
+===================================================================
+RCS file: /cvsroot/gnuworld/gnuworld/src/Network.cc,v
+retrieving revision 1.73
+diff -u -r1.73 Network.cc
+--- src/Network.cc	4 Oct 2005 17:45:01 -0000	1.73
++++ src/Network.cc	27 Sep 2006 02:57:03 -0000
+@@ -1040,8 +1040,6 @@
+ bool xNetwork::allocateClientNumeric( unsigned int intYY,
+ 	unsigned int& newIntXXX )
+ {
+-newIntXXX = 0 ;
+-
+ // First verify that the given intYY corresponds to a
+ // fake server (including the xServer).
+ reservedNumeric_iterator rsItr = reservedNumericMap.find( intYY ) ;
+@@ -1060,7 +1058,8 @@
+ // If the for loop traverses all possible values of
+ // unsigned int, it will eventually hit 0 again, and
+ // the loop will terminate.
+-for( newIntXXX = 1 ; newIntXXX != 0 ; ++newIntXXX )
++unsigned int maxIntXXX = base64toint("]]]", 3);
++for( newIntXXX = 0 ; newIntXXX <= maxIntXXX ; ++newIntXXX )
+ 	{
+ //	elog	<< "xNetwork::allocateClientNumeric> Checking: "
+ //		<< newIntXXX
+@@ -1079,10 +1078,9 @@
+ 	}
+ 
+ // Check if all values were examined
+-if( 0 == newIntXXX )
++if( newIntXXX > maxIntXXX )
+ 	{
+-	elog	<< "xNetwork::allocateClientNumeric> Looped unsigned "
+-		<< "int"
++	elog	<< "xNetwork::allocateClientNumeric> Exceeded maxIntXXX"
+ 		<< endl ;
+ 	return false ;
+ 	}
+Index: src/iServer.cc
+===================================================================
+RCS file: /cvsroot/gnuworld/gnuworld/src/iServer.cc,v
+retrieving revision 1.10
+diff -u -r1.10 iServer.cc
+--- src/iServer.cc	12 Jan 2005 03:50:38 -0000	1.10
++++ src/iServer.cc	27 Sep 2006 02:57:05 -0000
+@@ -38,6 +38,9 @@
+ using std::string ;
+ 
+ const iServer::flagType iServer::FLAG_JUPE	= 0x01 ;
++const iServer::flagType iServer::FLAG_HUB	= 0x02 ;
++const iServer::flagType iServer::FLAG_SERVICE	= 0x04 ;
++const iServer::flagType iServer::FLAG_IPV6	= 0x08 ;
+ 
+ iServer::iServer( const unsigned int& _uplink,
+ 	const string& _yyxxx,
+@@ -57,4 +60,38 @@
+ iServer::~iServer()
+ {}
+ 
++/** 
++ * Interpret a server's flags.
++ *
++ * @param[in] newFlags String listing server's P10 flags.
++ */
++void iServer::setFlags( const string& newFlags )
++{
++for( string::size_type i = 0 ; i < newFlags.size() ; i++ )
++	{
++	switch( newFlags[ i ] )
++		{
++		case 'h':
++			setHub() ;
++			break ;
++		case 's':
++			setService() ;
++			break ;
++		case '6':
++			setIPv6() ;
++			break ;
++		case '+':
++			break ;
++		default:
++			// Unknown flag
++			elog	<< "iServer> Unknown server flag: "
++				<< newFlags[ i ]
++				<< ", in flags string: "
++				<< newFlags
++				<< std::endl ;
++			break ;
++		} // switch
++	} // for
++} // setFlags()
++
+ } // namespace gnuworld
+Index: src/main.cc
+===================================================================
+RCS file: /cvsroot/gnuworld/gnuworld/src/main.cc,v
+retrieving revision 1.65
+diff -u -r1.65 main.cc
+--- src/main.cc	12 Jan 2005 03:50:38 -0000	1.65
++++ src/main.cc	27 Sep 2006 02:57:06 -0000
+@@ -369,9 +369,9 @@
+ 		// All output for the xClients should be in the
+ 		// output buffer by now, go ahead and put the
+ 		// server's SQ message there as well
+-		Write( "%s SQ %s :%s",
+-			getCharYY().c_str(),
++		Write( "%s SQ %s 0 :%s",
+ 			getCharYY().c_str(),
++			getName().c_str(),
+ 			getShutDownReason().c_str() ) ;
+ 
+ 		// Make sure the SQ and all previous data are flushed
+Index: src/server.cc
+===================================================================
+RCS file: /cvsroot/gnuworld/gnuworld/src/server.cc,v
+retrieving revision 1.219
+diff -u -r1.219 server.cc
+--- src/server.cc	2 Jan 2006 22:29:33 -0000	1.219
++++ src/server.cc	27 Sep 2006 02:57:08 -0000
+@@ -2899,7 +2899,7 @@
+ 	{
+ 	Write( "%s SQ %s %d :Unloading server",
+ 		getCharYY().c_str(),
+-		fakeServer->getCharYY().c_str(),
++		fakeServer->getName().c_str(),
+ 		fakeServer->getConnectTime() ) ;
+ 	}
+ 
+Index: src/server_connection.cc
+===================================================================
+RCS file: /cvsroot/gnuworld/gnuworld/src/server_connection.cc,v
+retrieving revision 1.3
+diff -u -r1.3 server_connection.cc
+--- src/server_connection.cc	25 Mar 2005 03:07:30 -0000	1.3
++++ src/server_connection.cc	27 Sep 2006 02:57:08 -0000
+@@ -91,6 +91,9 @@
+ // P10 version information, bogus.
+ Version = 10 ;
+ 
++// Set ourselves as a service.
++me->setService() ;
++
+ // Initialize the connection time variable to current time.
+ ConnectionTime = ::time( NULL ) ;
+ 
