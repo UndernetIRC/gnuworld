@@ -1,5 +1,5 @@
-/**
- * sqlUser.h
+	/**
+ * sqlcfUser.h
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -16,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
  * USA.
  *
- * $Id: sqlUser.h,v 1.4 2006/12/09 00:29:20 buzlip01 Exp $
+ * $Id: sqlcfUser.h,v 1.1 2006/12/09 00:29:20 buzlip01 Exp $
  */
 
-#ifndef __SQLUSER_H
-#define __SQLUSER_H "$Id: sqlUser.h,v 1.4 2006/12/09 00:29:20 buzlip01 Exp $"
+#ifndef __sqlcfUser_H
+#define __sqlcfUser_H "$Id: sqlcfUser.h,v 1.1 2006/12/09 00:29:20 buzlip01 Exp $"
 
 #include	<string>
 #include	<vector>
@@ -37,13 +37,13 @@ namespace cf
 
 class sqlManager;
 
-class sqlUser
+class sqlcfUser
 {
 
 public:
 
-	sqlUser(sqlManager*);
-	virtual ~sqlUser();
+	sqlcfUser(sqlManager*);
+	virtual ~sqlcfUser();
 
 	typedef unsigned short int	flagType ;
 	static const flagType F_SERVERADMIN; /* +a */
@@ -170,10 +170,10 @@ private:
 	hostListType	hostList;
 
 	sqlManager*	myManager;
-}; // class sqlUser
+}; // class sqlcfUser
 
 } // namespace cf
 
 } // namespace gnuworld
 
-#endif // __SQLUSER_H
+#endif // __sqlcfUser_H

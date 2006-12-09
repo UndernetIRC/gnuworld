@@ -16,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: responses.h,v 1.3 2006/04/05 02:37:35 buzlip01 Exp $
+ * $Id: responses.h,v 1.4 2006/12/09 00:29:19 buzlip01 Exp $
  */
 
 #ifndef __RESPONSES_H
-#define __RESPONSES_H "$Id: responses.h,v 1.3 2006/04/05 02:37:35 buzlip01 Exp $"
+#define __RESPONSES_H "$Id: responses.h,v 1.4 2006/12/09 00:29:19 buzlip01 Exp $"
 
 namespace gnuworld
 	{
@@ -70,6 +70,12 @@ namespace cf
 		const int aborting_manual_fix		= 178;
 		const int aborting_auto_fix		= 179;
 
+		/* CANFIX */
+		const int canfix_op_accounts		= 197;
+		const int canfix_rank_score_acc_header	= 198;
+		const int can_fix_not_enough_points	= 199;
+		const int canfix_manual_fix_disabled	= 204;
+
 		/* CHANFIX */
 		const int manual_fix_disabled		= 25;
 		const int not_enough_servers		= 26;
@@ -83,6 +89,11 @@ namespace cf
 		const int channel_has_notes		= 35;
 		const int manual_chanfix_ack		= 36;
 		const int temporarily_blocked_override	= 189;
+		const int score_not_high_enough		= 196;
+		const int not_enough_servers_non_oper	= 200;
+		const int channel_being_auto_fixed_noper	= 201;
+		const int channel_blocked_non_oper	= 202;
+		const int channel_temp_blocked		= 211;
 
 		/* CHECK */
 		const int check_results			= 37;
@@ -142,11 +153,17 @@ namespace cf
 		const int temporarily_blocked		= 188;
 		const int info_fix_started		= 192;
 		const int info_fix_waiting		= 193;
+		const int info_chan_temp_blocked	= 214;
 
 		/* INVITE */
 		const int cant_find_channel		= 77;
 		const int chanfix_not_in_chan		= 78;
 		const int already_in_channel		= 79;
+
+		/* LASTCOM */
+		const int lastcom_too_far_back		= 208;
+		const int lastcom_listing_messages	= 209;
+		const int end_of_log			= 210;
 		
 		/* LISTBLOCKED */
 		const int listblocks_blocked_chans	= 190;
@@ -157,10 +174,15 @@ namespace cf
 		const int host_list_header		= 164;
 		const int host_list_footer		= 165;
 
+		/* LISTTEMPBLOCKED */
+		const int list_temp_blocked_chans	= 212;
+		const int list_total_temp_blocked	= 213;
+
 		/* OPLIST */
 		const int top_unique_op_accounts	= 80;
 		const int found_unique_op_accounts	= 81;
 		const int rank_score_acc_header		= 82;
+		const int end_of_oplist			= 207;
 
 		/* OPNICKS */
 		const int opped_clients_on		= 83;
@@ -173,6 +195,10 @@ namespace cf
 
 		/* RELOAD */
 		const int reloading_client		= 88;
+
+		/* REQUESTOP */
+		const int requestop_ack			= 205;
+		const int requestop_must_wait		= 206;
 
 		/* SCORE */
 		const int score_for_channel_nick	= 89;
@@ -210,6 +236,11 @@ namespace cf
 		const int shutting_down			= 110;
 		const int update_in_progress		= 173;
 
+		/* SIMULATE */
+		const int manual_simulate_complete	= 221;
+		const int manual_simulate_starting	= 224;
+		const int manual_simulate_estimate	= 225;
+
 		/* STATUS */
 		const int status_uptime			= 111;
 		const int status_auto_fixing		= 112;
@@ -231,6 +262,12 @@ namespace cf
 		const int user_suspended		= 120;
 		const int user_cant_suspend_self	= 159;
 
+		/* TEMPBLOCK */
+		const int channel_already_temp_blocked	= 215;
+		const int channel_has_been_temp_blocked	= 216;
+		const int block_aborting_manual_fix	= 217;
+		const int block_aborting_auto_fix	= 218;
+
 		/* UNALERT */
 		const int no_alert_set			= 121;
 		const int alert_removed			= 122;
@@ -245,6 +282,10 @@ namespace cf
 		const int cant_unsuspend_diff_group	= 125;
 		const int user_not_suspended		= 126;
 		const int user_unsuspended		= 127;
+
+		/* UNTEMPBLOCK */
+		const int channel_not_temp_blocked	= 219;
+		const int channel_untempblocked		= 220;
 
 		/* USERSCORES */
 		const int userscores_header 		= 194;
@@ -288,6 +329,10 @@ namespace cf
 		const int requires_auth_and_flag	= 152;
 		const int requires_auth_and_flags	= 153;
 		const int syntax			= 154;
+		const int no_commands_during_burst_noper	= 203;
+		const int sim_opping			= 222;
+		const int sim_modes_removed		= 223;
+
 	} // namespace language
 } // namespace cf
 } // namespace gnuworld

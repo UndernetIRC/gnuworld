@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
  * USA.
  *
- * $Id: REHASHCommand.cc,v 1.3 2006/04/05 02:37:35 buzlip01 Exp $
+ * $Id: REHASHCommand.cc,v 1.4 2006/12/09 00:29:19 buzlip01 Exp $
  */
 
 #include	"gnuworld_config.h"
@@ -30,14 +30,14 @@
 #include	"chanfix.h"
 #include	"responses.h"
 
-RCSTAG("$Id: REHASHCommand.cc,v 1.3 2006/04/05 02:37:35 buzlip01 Exp $");
+RCSTAG("$Id: REHASHCommand.cc,v 1.4 2006/12/09 00:29:19 buzlip01 Exp $");
 
 namespace gnuworld
 {
 namespace cf
 {
 
-void REHASHCommand::Exec(iClient* theClient, sqlUser* theUser, const std::string& Message)
+void REHASHCommand::Exec(iClient* theClient, sqlcfUser* theUser, const std::string& Message)
 {
 StringTokenizer st(Message);
 
@@ -90,6 +90,7 @@ bot->logAdminMessage("%s (%s) REHASH %s",
 		     theClient->getRealNickUserHost().c_str(),
 		     !option.empty() ? option.c_str() : "");
 
+bot->logLastComMessage(theClient, Message);
 
 return;
 }

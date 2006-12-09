@@ -16,18 +16,18 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: chanfixCommands.h,v 1.3 2006/04/05 02:37:35 buzlip01 Exp $
+ * $Id: chanfixCommands.h,v 1.4 2006/12/09 00:29:19 buzlip01 Exp $
  */
 
 #ifndef __CHANFIXCOMMANDS_H
-#define __CHANFIXCOMMANDS_H "$Id: chanfixCommands.h,v 1.3 2006/04/05 02:37:35 buzlip01 Exp $"
+#define __CHANFIXCOMMANDS_H "$Id: chanfixCommands.h,v 1.4 2006/12/09 00:29:19 buzlip01 Exp $"
 
 namespace gnuworld {
 
 namespace cf {
 
 class chanfix;
-class sqlUser;
+class sqlcfUser;
 
 class Command {
 public:
@@ -38,7 +38,7 @@ public:
 
 	virtual ~Command() { }
 	
-	virtual void Exec(iClient*, sqlUser*, const std::string&) = 0;
+	virtual void Exec(iClient*, sqlcfUser*, const std::string&) = 0;
 	
 	void setServer(xServer *_server)
 		{ server = _server; }
@@ -81,8 +81,12 @@ class commandName##Command : public Command \
       unsigned short int _requiredFlags) : \
 	Command(_bot, _commandName, _help, _numParams, _requiredFlags) {} \
     virtual ~commandName##Command() {} \
-    virtual void Exec(iClient*, sqlUser*, const std::string&); \
+    virtual void Exec(iClient*, sqlcfUser*, const std::string&); \
 };
+
+/* Normal user commands */
+DECLARE_COMMAND( CANFIX )
+DECLARE_COMMAND( REQUESTOP )
 
 /* Oper commands */
 DECLARE_COMMAND( HELP )
@@ -114,6 +118,9 @@ DECLARE_COMMAND( WHOGROUP )
 DECLARE_COMMAND( BLOCK )
 DECLARE_COMMAND( UNBLOCK )
 DECLARE_COMMAND( LISTBLOCKED )
+DECLARE_COMMAND( TEMPBLOCK )
+DECLARE_COMMAND( UNTEMPBLOCK )
+DECLARE_COMMAND( LISTTEMPBLOCKED )
 
 /* Comment commands */
 DECLARE_COMMAND( ADDNOTE )
@@ -125,13 +132,16 @@ DECLARE_COMMAND( UNALERT )
 DECLARE_COMMAND( CHANFIX )
 DECLARE_COMMAND( OPLIST )
 DECLARE_COMMAND( OPNICKS )
+DECLARE_COMMAND( SIMULATE )
 
 /* Owner commands */
 DECLARE_COMMAND( DEBUG )
 DECLARE_COMMAND( INVITE )
+DECLARE_COMMAND( LASTCOM )
 DECLARE_COMMAND( QUOTE )
 DECLARE_COMMAND( REHASH )
 DECLARE_COMMAND( RELOAD )
+DECLARE_COMMAND( SAY )
 DECLARE_COMMAND( SET )
 DECLARE_COMMAND( SHUTDOWN )
 

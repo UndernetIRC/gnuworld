@@ -3,7 +3,7 @@
 -- Language: English (1)
 -- Author: evilnet development <http://evilnet.sourceforge.net>
 --
--- $Id: chanfix.language.english.sql,v 1.3 2006/04/05 02:37:35 buzlip01 Exp $
+-- $Id: chanfix.language.english.sql,v 1.4 2006/12/09 00:29:20 buzlip01 Exp $
 
 			
 DELETE FROM translations;
@@ -199,4 +199,34 @@ COPY "translations" FROM stdin;
 1	193	Current fix is on hold (waiting for ops to join)	31337	0
 1	194	Channel Score -- Time first opped / Time last opped	31337	0
 1	195	Account %s doesn't have any scores in the database.	31337	0
+1	196	You score for %s is not high enough to issue a fix.	31337	0
+1	197	Accounts who can issue fixes in channel %s:	31337	0
+1	198	Account -- Time first opped / Time last opped	31337	0
+1	199	You do not have a high enough score for %s to check canfix list.	31337	0
+1	200	Sorry, chanfix cannot fix channels at the moment, please try again soon.	31337	0
+1	201	The channel %s is being automatically fixed. You cannot issue another fix at the moment.	31337	0
+1	202	The channel %s cannot be fixed, please contact a help channel for further information.	31337	0
+1	203	Sorry, I'm too busy at the moment. Please try again soon.	31337	0
+1	204	Sorry, I cant fix channels at the moment.	31337	0
+1	205	Fixing %s, please wait.	31337	0
+1	206	You must wait %d seconds before %s can be fixed again with this command, or contact a help channel.	31337	0
+1	207	End of OPLIST for %s	31337	0
+1	208	You cannot see logs more than one year ago.	31337	0
+1	209	Listing last %d messages from day %d.	31337	0
+1	210	End of LASTCOM report.	31337	0
+1	211	The channel %s is TEMPBLOCKED.	31337	0
+1	212	List of all temp blocked channels:	31337	0
+1	213	%d channels temp blocked.	31337	0
+1	214	%s is TEMPBLOCKED.	31337	0
+1	215	The channel %s is already temp blocked.	31337	0
+1	216	The channel %s has been temp blocked.	31337	0
+1	217	WARNING: Channel %s is being manually fixed; aborting fix as per TEMPBLOCK.	31337	0
+1	218	WARNING: Channel %s is being automatically fixed; aborting fix as per TEMPBLOCK.	31337	0
+1	219	The channel %s is not temp blocked.	31337	0
+1	220	Channel %s has been untempblocked.	31337	0
+1	221	Simulate complete for %s	31337	0
+1	222	(%s) Opping: %s (%d Clients)	31337	0
+1	223	(%s) Channel modes have been removed.	31337	0
+1	224	Simulate for %s (%s) starting at next fixing round (Current C time %s).	31337	0
+1	225	NOTE: This is only an estimate, if ops with points join or part it could affect who gets opped.	31337	0
 \.

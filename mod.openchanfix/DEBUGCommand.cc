@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
  * USA.
  *
- * $Id: DEBUGCommand.cc,v 1.3 2006/04/05 02:37:34 buzlip01 Exp $
+ * $Id: DEBUGCommand.cc,v 1.4 2006/12/09 00:29:18 buzlip01 Exp $
  */
 
 #include	<string>
@@ -32,14 +32,14 @@
 #include	"chanfix.h"
 #include	"responses.h"
 
-RCSTAG("$Id: DEBUGCommand.cc,v 1.3 2006/04/05 02:37:34 buzlip01 Exp $");
+RCSTAG("$Id: DEBUGCommand.cc,v 1.4 2006/12/09 00:29:18 buzlip01 Exp $");
 
 namespace gnuworld
 {
 namespace cf
 {
 
-void DEBUGCommand::Exec(iClient* theClient, sqlUser* theUser, const std::string& Message)
+void DEBUGCommand::Exec(iClient* theClient, sqlcfUser* theUser, const std::string& Message)
 {
 #ifndef CHANFIX_DEBUG
 return;
@@ -80,6 +80,8 @@ if (option == "UPDATE") {
     return;
   }
 }
+
+bot->logLastComMessage(theClient, Message);
 
 }
 

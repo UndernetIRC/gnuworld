@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: sqlManager.cc,v 1.3 2006/04/05 02:37:35 buzlip01 Exp $
+ * $Id: sqlManager.cc,v 1.4 2006/12/09 00:29:20 buzlip01 Exp $
  */
 
 #include <new>

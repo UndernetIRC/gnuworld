@@ -6,7 +6,7 @@
 # (C) 2001 Alex Badea <vampire@go.ro>
 # (C) 2005 Neil Spierling <sirvulcan@gmail.com> (mod.chanfix modifications)
 #
-# $Id: cparse.py,v 1.3 2006/04/05 02:37:35 buzlip01 Exp $
+# $Id: cparse.py,v 1.4 2006/12/09 00:29:20 buzlip01 Exp $
 
 # Change this to suit your system
 gnuworld_home = "../../"
@@ -138,4 +138,5 @@ for file in files:
 	if file[-3:] != ".cc": continue
 	Parser(file).run()
 
+print "* Note: The chanfix.cc error is safe to ignore."
 print "* Done"

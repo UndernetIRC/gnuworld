@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: INFOCommand.cc,v 1.3 2006/04/05 02:37:34 buzlip01 Exp $
+ * $Id: INFOCommand.cc,v 1.4 2006/12/09 00:29:18 buzlip01 Exp $
  */
 
 #include "gnuworld_config.h"
@@ -31,16 +31,16 @@
 #include "responses.h"
 #include "StringTokenizer.h"
 #include "sqlChannel.h"
-#include "sqlUser.h"
+#include "sqlcfUser.h"
 
-RCSTAG("$Id: INFOCommand.cc,v 1.3 2006/04/05 02:37:34 buzlip01 Exp $");
+RCSTAG("$Id: INFOCommand.cc,v 1.4 2006/12/09 00:29:18 buzlip01 Exp $");
 
 namespace gnuworld
 {
 namespace cf
 {
 
-void INFOCommand::Exec(iClient* theClient, sqlUser* theUser, const std::string& Message)
+void INFOCommand::Exec(iClient* theClient, sqlcfUser* theUser, const std::string& Message)
 {
 StringTokenizer st(Message);
 
@@ -139,10 +139,9 @@ PgDatabase* cacheCon = bot->theManager->getConnection();
  * Perform a query to list all notes belonging to this channel.
  */
 std::stringstream allNotesQuery;
-allNotesQuery	<< "SELECT notes.id, notes.ts, users.user_name, notes.event, notes.message "
- 		<< "FROM notes,users "
-		<< "WHERE notes.userID = users.id "
-		<< "AND notes.channelID = "
+allNotesQuery	<< "SELECT notes.id, notes.ts, notes.user_name, notes.event, notes.message "
+ 		<< "FROM notes "
+		<< "WHERE notes.channelID = "
 		<< theChan->getID()
 		<< " ORDER BY notes.ts DESC"
 		;
@@ -201,6 +200,8 @@ bot->logAdminMessage("%s (%s) INFO %s",
 		     theUser ? theUser->getUserName().c_str() : "!NOT-LOGGED-IN!",
 		     theClient->getRealNickUserHost().c_str(),
 		     theChan->getChannel().c_str());
+
+bot->logLastComMessage(theClient, Message);
 
 return;
 }

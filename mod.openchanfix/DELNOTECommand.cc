@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: DELNOTECommand.cc,v 1.3 2006/04/05 02:37:34 buzlip01 Exp $
+ * $Id: DELNOTECommand.cc,v 1.4 2006/12/09 00:29:18 buzlip01 Exp $
  */
 
 #include "gnuworld_config.h"
@@ -30,16 +30,16 @@
 #include "responses.h"
 #include "StringTokenizer.h"
 #include "sqlChannel.h"
-#include "sqlUser.h"
+#include "sqlcfUser.h"
 
-RCSTAG("$Id: DELNOTECommand.cc,v 1.3 2006/04/05 02:37:34 buzlip01 Exp $");
+RCSTAG("$Id: DELNOTECommand.cc,v 1.4 2006/12/09 00:29:18 buzlip01 Exp $");
 
 namespace gnuworld
 {
 namespace cf
 {
 
-void DELNOTECommand::Exec(iClient* theClient, sqlUser* theUser, const std::string& Message)
+void DELNOTECommand::Exec(iClient* theClient, sqlcfUser* theUser, const std::string& Message)
 {
 StringTokenizer st(Message);
 
@@ -69,7 +69,7 @@ PgDatabase* cacheCon = bot->theManager->getConnection();
 
 /* Retrieve the note */
 std::stringstream noteCheckQuery;
-noteCheckQuery	<< "SELECT channelID, userID, event "
+noteCheckQuery	<< "SELECT channelID, user_name, event "
 		<< "FROM notes "
 		<< "WHERE id = "
 		<< messageId
@@ -100,7 +100,7 @@ if (cacheCon->Tuples() != 1) {
 }
 
 unsigned int channelID = atoi(cacheCon->GetValue(0,0));
-unsigned int userID = atoi(cacheCon->GetValue(0,1));
+std::string user_name = cacheCon->GetValue(0,1);
 unsigned short eventType = atoi(cacheCon->GetValue(0,2));
 
 /* Dispose of our connection instance */
@@ -115,7 +115,7 @@ if (channelID != theChan->getID()) {
   return;
 }
 
-if (userID != theUser->getID() && !theUser->getFlag(sqlUser::F_USERMANAGER)) {
+if (string_lower(user_name) != string_lower(theUser->getUserName()) && !theUser->getFlag(sqlcfUser::F_USERMANAGER)) {
   bot->SendTo(theClient,
               bot->getResponse(theUser,
                               language::note_not_added_by_you,
@@ -124,7 +124,7 @@ if (userID != theUser->getID() && !theUser->getFlag(sqlUser::F_USERMANAGER)) {
   return;
 }
 
-if (eventType != sqlChannel::EV_NOTE && !theUser->getFlag(sqlUser::F_OWNER)) {
+if (eventType != sqlChannel::EV_NOTE && !theUser->getFlag(sqlcfUser::F_OWNER)) {
   bot->SendTo(theClient,
               bot->getResponse(theUser,
                               language::note_not_manually_added,
@@ -145,6 +145,8 @@ bot->logAdminMessage("%s (%s) DELNOTE %s %d",
 		     theUser->getUserName().c_str(),
 		     theClient->getRealNickUserHost().c_str(),
 		     theChan->getChannel().c_str(), messageId);
+
+bot->logLastComMessage(theClient, Message);
 
 return;
 }

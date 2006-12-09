@@ -16,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: chanfix.h,v 1.4 2006/04/05 02:37:35 buzlip01 Exp $
+ * $Id: chanfix.h,v 1.5 2006/12/09 00:29:19 buzlip01 Exp $
  */
 
 #ifndef __CHANFIX_H
-#define __CHANFIX_H "$Id: chanfix.h,v 1.4 2006/04/05 02:37:35 buzlip01 Exp $"
+#define __CHANFIX_H "$Id: chanfix.h,v 1.5 2006/12/09 00:29:19 buzlip01 Exp $"
 
 #include	<string>
 #include	<vector>
@@ -47,7 +47,7 @@ extern short currentDay;
 
 #include	"sqlChanOp.h"
 #include	"sqlManager.h"
-#include	"sqlUser.h"
+#include	"sqlcfUser.h"
 
 namespace gnuworld
 {
@@ -200,17 +200,22 @@ public:
 	size_t countMyOps(const std::string&);
 	size_t countMyOps(Channel*);
 
-	sqlUser* isAuthed(const std::string);
+	sqlcfUser* isAuthed(const std::string);
 
 	void precacheChanOps();
 	void precacheChannels();
 	void precacheUsers();
+
+	void printResourceStats();
 
 	void changeState(STATE);
 
 	time_t currentTime() { return ::time(0); }
 	
 	time_t getSecsTilMidnight() { return 86400 - (currentTime() % 86400); }
+
+	size_t countAutoFixes() { return autoFixQ.size(); }
+	size_t countManFixes() { return manFixQ.size(); }
 
 	void updatePoints();
 	void giveAllOpsPoints();
@@ -220,12 +225,28 @@ public:
 
 	bool hasIdent(iClient*);
 
+	void JoinChan(Channel* theChan);
+	void PartChan(Channel* theChan);
+
 	void checkNetwork();
 	void checkChannelServiceLink(iServer*, const eventType&);
 	void findChannelService();
+	const int chanfix::getLastFix(sqlChannel*);
+
+	void chanfix::insertop(sqlChanOp*, sqlChannel*);
+	bool chanfix::findop(sqlChanOp*, sqlChannel*);
+	void chanfix::removechan(sqlChannel*);
+
+	bool simFix(sqlChannel*, bool, time_t, iClient*, sqlcfUser*);
+	bool simulateFix(sqlChannel*, bool, iClient*, sqlcfUser*);
+
+	bool shouldCJoin(sqlChannel*, bool);
 
 	void autoFix();
 	void manualFix(Channel*);
+
+	bool logLastComMessage(iClient*, const std::string&);
+	bool msgTopOps(Channel*);
 
 	bool fixChan(sqlChannel*, bool);
 	void stopFixingChan(Channel*, bool);
@@ -253,7 +274,7 @@ public:
 	void rotateDB();
 	
 	void expireTempBlocks();
-	
+
 	void prepareUpdate(bool);
 	void updateDB();
 
@@ -266,9 +287,9 @@ public:
 	bool removeFromAutoQ(Channel*);
 	bool removeFromManQ(Channel*);
 
-	char getFlagChar(const sqlUser::flagType&);
-	const std::string getFlagsString(const sqlUser::flagType&);
-	sqlUser::flagType getFlagType(const char);
+	char getFlagChar(const sqlcfUser::flagType&);
+	const std::string getFlagsString(const sqlcfUser::flagType&);
+	sqlcfUser::flagType getFlagType(const char);
 
 	const std::string getEventName(const int);
 
@@ -276,11 +297,13 @@ public:
 
 	const std::string tsToDateTime(time_t, bool);
 
-	const std::string getHostList( sqlUser* );
+	const std::string getHostList( sqlcfUser* );
 	
 	const std::string getChanNickName(const std::string&, const std::string&);
-	
+
 	const int getCurrentGMTHour(); /* returns the current hour in GMT (00-23) */
+
+	char *convertToAscTime(time_t);
 
 	/* Server notices */
 	bool serverNotice( Channel*, const char*, ... );
@@ -333,6 +356,14 @@ public:
 	typedef std::map <std::string, time_t, noCaseCompare> tempBlockType;
 	tempBlockType		tempBlockList;
 	
+	typedef struct {
+	    std::string account;
+	    std::string channel;
+	} simOppedStruct;
+
+	typedef std::multimap<std::string, simOppedStruct> SimMapType;
+	SimMapType		simMap;
+
 	/**
 	 * The snapshot map for updating the SQL database
 	 */
@@ -350,7 +381,7 @@ public:
 	/**
 	 * The db clients map
 	 */
-	typedef std::map <std::string, sqlUser*, noCaseCompare> usersMapType;
+	typedef std::map <std::string, sqlcfUser*, noCaseCompare> usersMapType;
 
 	/**
 	 * Holds the authenticated user list
@@ -385,7 +416,7 @@ public:
 	helpTableType	helpTable;
 
 	void loadHelpTable();
-	const std::string getHelpMessage(sqlUser*, std::string);
+	const std::string getHelpMessage(sqlcfUser*, std::string);
 
 	typedef std::map < std::string, std::pair <int, std::string> > languageTableType;
 	languageTableType	languageTable;
@@ -393,9 +424,12 @@ public:
 	typedef std::map < std::pair <int, int>, std::string > translationTableType ;
 	translationTableType	translationTable;
 	
+	typedef std::map < std::string, std::list< iClient* >, noCaseCompare > authMapType;
+	authMapType	authMap;
+
 	void loadTranslationTable();
 
-	const std::string getResponse(sqlUser*, int, std::string = std::string());
+	const std::string getResponse(sqlcfUser*, int, std::string = std::string());
 
 	/**
 	 * Configuration variables
@@ -407,10 +441,20 @@ public:
 	bool		enableAutoFix;
 	bool		enableChanFix;
 	bool		enableChannelBlocking;
+	bool		joinChannels;
+	bool		autoFixNotice;
+	bool		manualFixNotice;
 	bool		stopAutoFixOnOp;
 	bool		stopChanFixOnOp;
+	bool		allowTopOpFix;
+	bool		allowTopOpAlert;
+	int		topOpPercent;
+	int		minFixScore;
+	int		minCanFixScore;
+	int		minRequestOpTime;
 	unsigned int	version;
 	bool		useBurstToFix;
+	unsigned int	nextFix;
 	unsigned int	numServers;
 	unsigned int	minServersPresent;
 	std::string	chanServName;
@@ -422,7 +466,7 @@ public:
 	std::string	debugLogFile;
 	std::string	sqlHost;
 	std::string	sqlPort;
-	std::string	sqlUsername;
+	std::string	sqlcfUsername;
 	std::string	sqlPass;
 	std::string	sqlDB;
 
@@ -477,18 +521,30 @@ public:
 	bool doAutoFix() { return enableAutoFix; }
 	bool doChanFix() { return enableChanFix; }
 	bool doChanBlocking() { return enableChannelBlocking; }
+	bool doJoinChannels() { return joinChannels; }
+	bool doAutoFixNotice() { return autoFixNotice; }
+	bool doManualFixNotice() { return manualFixNotice; }
 	STATE getState() { return currentState; }
 	bool isChanServLinked() { return chanServLinked; }
 	bool isUpdateRunning() { return updateInProgress; }
+	bool isAllowingTopFix() { return allowTopOpFix; }
+	bool isAllowingTopOpAlert() { return allowTopOpAlert; }
+	unsigned int getTopOpPercent() { return topOpPercent; }
+	unsigned int getMinFixScore() { return minFixScore; }
+	unsigned int getMinCanFixScore() { return minCanFixScore; }
+	unsigned int getMinRequestOpTime() { return minRequestOpTime; }
 	unsigned int getNumServers() { return numServers; }
 	unsigned int getMinServersPresent() { return minServersPresent; }
 	unsigned int getNumTopScores() { return numTopScores; }
 	unsigned int getMinClients() { return minClients; }
+	unsigned int getNextFix() { return nextFix; }
 	short getCurrentDay() { return currentDay; }
 
 	/*
 	 *  Methods to set data attributes.
 	 */
+	inline void	setNextFix(int _nextFix)
+		{ nextFix = _nextFix; }
 	inline void	setNumServers(int _numServers)
 		{ numServers = _numServers; }
 	inline void	setDoAutoFix(bool _enableAutoFix)

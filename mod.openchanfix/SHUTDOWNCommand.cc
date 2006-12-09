@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
  * USA.
  *
- * $Id: SHUTDOWNCommand.cc,v 1.3 2006/04/05 02:37:35 buzlip01 Exp $
+ * $Id: SHUTDOWNCommand.cc,v 1.4 2006/12/09 00:29:19 buzlip01 Exp $
  */
 
 #include	<string>
@@ -32,14 +32,14 @@
 #include	"chanfix.h"
 #include	"responses.h"
 
-RCSTAG("$Id: SHUTDOWNCommand.cc,v 1.3 2006/04/05 02:37:35 buzlip01 Exp $");
+RCSTAG("$Id: SHUTDOWNCommand.cc,v 1.4 2006/12/09 00:29:19 buzlip01 Exp $");
 
 namespace gnuworld
 {
 namespace cf
 {
 
-void SHUTDOWNCommand::Exec(iClient* theClient, sqlUser* theUser, const std::string& Message)
+void SHUTDOWNCommand::Exec(iClient* theClient, sqlcfUser* theUser, const std::string& Message)
 {
 StringTokenizer st(Message);
 	
@@ -69,6 +69,8 @@ if (st.size() < 2)
   server->Shutdown();
 else
   server->Shutdown( st.assemble(1) );
+
+bot->logLastComMessage(theClient, Message);
 
 return;
 }

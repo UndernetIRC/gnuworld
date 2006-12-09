@@ -1,4 +1,4 @@
--- "$Id: chanfix.addme.sql,v 1.3 2006/04/05 02:37:35 buzlip01 Exp $"
+-- "$Id: chanfix.addme.sql,v 1.4 2006/12/09 00:29:20 buzlip01 Exp $"
 -- 2005-08-13 : reed
 --
 -- This script will add an account for user "Admin" with owner (+o) access.

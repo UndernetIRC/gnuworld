@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: DELFLAGCommand.cc,v 1.3 2006/04/05 02:37:34 buzlip01 Exp $
+ * $Id: DELFLAGCommand.cc,v 1.4 2006/12/09 00:29:18 buzlip01 Exp $
  */
 
 #include "gnuworld_config.h"
@@ -29,16 +29,16 @@
 #include "chanfix.h"
 #include "responses.h"
 #include "StringTokenizer.h"
-#include "sqlUser.h"
+#include "sqlcfUser.h"
 
-RCSTAG("$Id: DELFLAGCommand.cc,v 1.3 2006/04/05 02:37:34 buzlip01 Exp $");
+RCSTAG("$Id: DELFLAGCommand.cc,v 1.4 2006/12/09 00:29:18 buzlip01 Exp $");
 
 namespace gnuworld
 {
 namespace cf
 {
 
-void DELFLAGCommand::Exec(iClient* theClient, sqlUser* theUser, const std::string& Message)
+void DELFLAGCommand::Exec(iClient* theClient, sqlcfUser* theUser, const std::string& Message)
 {
 StringTokenizer st(Message);
 
@@ -60,7 +60,7 @@ if (!bot->getFlagType(flag)) {
   return;
 }
 
-sqlUser* targetUser = bot->isAuthed(st[1]);
+sqlcfUser* targetUser = bot->isAuthed(st[1]);
 if (!targetUser) {
   bot->SendTo(theClient,
               bot->getResponse(theUser,
@@ -69,8 +69,8 @@ if (!targetUser) {
   return;
 }
 
-if (flag == bot->getFlagChar(sqlUser::F_OWNER) &&
-    !theUser->getFlag(sqlUser::F_OWNER)) {
+if (flag == bot->getFlagChar(sqlcfUser::F_OWNER) &&
+    !theUser->getFlag(sqlcfUser::F_OWNER)) {
   bot->SendTo(theClient,
               bot->getResponse(theUser,
                               language::only_owner_del_owner_flag,
@@ -78,8 +78,8 @@ if (flag == bot->getFlagChar(sqlUser::F_OWNER) &&
   return;
 }
 
-if (flag == bot->getFlagChar(sqlUser::F_USERMANAGER) &&
-    !theUser->getFlag(sqlUser::F_OWNER)) {
+if (flag == bot->getFlagChar(sqlcfUser::F_USERMANAGER) &&
+    !theUser->getFlag(sqlcfUser::F_OWNER)) {
   bot->SendTo(theClient,
               bot->getResponse(theUser,
                               language::only_owner_del_user_flag,
@@ -88,8 +88,8 @@ if (flag == bot->getFlagChar(sqlUser::F_USERMANAGER) &&
 }
 
 /* A serveradmin can only delete flags from users on his/her own group. */
-if (theUser->getFlag(sqlUser::F_SERVERADMIN) &&
-    !theUser->getFlag(sqlUser::F_USERMANAGER)) {
+if (theUser->getFlag(sqlcfUser::F_SERVERADMIN) &&
+    !theUser->getFlag(sqlcfUser::F_USERMANAGER)) {
   if (targetUser->getGroup() != theUser->getGroup()) {
     bot->SendTo(theClient,
                 bot->getResponse(theUser,
@@ -97,14 +97,14 @@ if (theUser->getFlag(sqlUser::F_SERVERADMIN) &&
                                 std::string("You cannot delete a flag from a user in a different group.")).c_str());
     return;
   }
-  if (flag == bot->getFlagChar(sqlUser::F_BLOCK)) {
+  if (flag == bot->getFlagChar(sqlcfUser::F_BLOCK)) {
     bot->SendTo(theClient,
                 bot->getResponse(theUser,
                                 language::cant_remove_block_flag,
                                 std::string("You cannot remove a block flag.")).c_str());
     return;
   }
-  if (flag == bot->getFlagChar(sqlUser::F_SERVERADMIN)) {
+  if (flag == bot->getFlagChar(sqlcfUser::F_SERVERADMIN)) {
     bot->SendTo(theClient,
                 bot->getResponse(theUser,
                                 language::cant_remove_server_flag,
@@ -139,6 +139,8 @@ bot->logAdminMessage("%s (%s) DELFLAG %s %c",
 		     theUser->getUserName().c_str(),
 		     theClient->getRealNickUserHost().c_str(),
 		     targetUser->getUserName().c_str(), flag);
+
+bot->logLastComMessage(theClient, Message);
 
 } //DELFLAGCommand::Exec
 

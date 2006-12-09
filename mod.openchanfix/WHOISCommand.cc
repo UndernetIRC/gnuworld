@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: WHOISCommand.cc,v 1.3 2006/04/05 02:37:35 buzlip01 Exp $
+ * $Id: WHOISCommand.cc,v 1.4 2006/12/09 00:29:19 buzlip01 Exp $
  */
 
 #include "gnuworld_config.h"
@@ -30,16 +30,16 @@
 #include "chanfix.h"
 #include "responses.h"
 #include "StringTokenizer.h"
-#include "sqlUser.h"
+#include "sqlcfUser.h"
 
-RCSTAG("$Id: WHOISCommand.cc,v 1.3 2006/04/05 02:37:35 buzlip01 Exp $");
+RCSTAG("$Id: WHOISCommand.cc,v 1.4 2006/12/09 00:29:19 buzlip01 Exp $");
 
 namespace gnuworld
 {
 namespace cf
 {
 
-void WHOISCommand::Exec(iClient* theClient, sqlUser* theUser, const std::string& Message)
+void WHOISCommand::Exec(iClient* theClient, sqlcfUser* theUser, const std::string& Message)
 {
 StringTokenizer st(Message);
 
@@ -56,7 +56,7 @@ if (st[1] == "*") {
                               std::string("List of all users:")).c_str());
   chanfix::usersIterator ptr = bot->usersMap_begin();
   while (ptr != bot->usersMap_end()) {
-    sqlUser* tmpUser = ptr->second;
+    sqlcfUser* tmpUser = ptr->second;
     bot->SendTo(theClient,
 		bot->getResponse(theUser,
 			language::user_flags_group,
@@ -75,7 +75,7 @@ if (st[1] == "*") {
   return;
 }
 
-sqlUser* theUser2 = bot->isAuthed(st[1]);
+sqlcfUser* theUser2 = bot->isAuthed(st[1]);
 
 const char* username = st[1].c_str();
 if (username[0] == '=') {
@@ -173,6 +173,8 @@ if (st.size() > 2 && string_upper(st[2]) == "-MODIF")
 			std::string("Last modified: %s (%s ago)")).c_str(),
 			theUser2->getLastUpdatedBy().c_str(),
 			bot->prettyDuration(theUser2->getLastUpdated()).c_str());
+
+bot->logLastComMessage(theClient, Message);
 
 return;
 } //WHOISCommand::Exec

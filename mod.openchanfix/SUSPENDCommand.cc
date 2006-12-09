@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: SUSPENDCommand.cc,v 1.3 2006/04/05 02:37:35 buzlip01 Exp $
+ * $Id: SUSPENDCommand.cc,v 1.4 2006/12/09 00:29:19 buzlip01 Exp $
  */
 
 #include "gnuworld_config.h"
@@ -29,20 +29,20 @@
 #include "chanfix.h"
 #include "responses.h"
 #include "StringTokenizer.h"
-#include "sqlUser.h"
+#include "sqlcfUser.h"
 
-RCSTAG("$Id: SUSPENDCommand.cc,v 1.3 2006/04/05 02:37:35 buzlip01 Exp $");
+RCSTAG("$Id: SUSPENDCommand.cc,v 1.4 2006/12/09 00:29:19 buzlip01 Exp $");
 
 namespace gnuworld
 {
 namespace cf
 {
 
-void SUSPENDCommand::Exec(iClient* theClient, sqlUser* theUser, const std::string& Message)
+void SUSPENDCommand::Exec(iClient* theClient, sqlcfUser* theUser, const std::string& Message)
 {
 StringTokenizer st(Message);
 
-sqlUser* targetUser = bot->isAuthed(st[1]);
+sqlcfUser* targetUser = bot->isAuthed(st[1]);
 if (!targetUser) {
   bot->SendTo(theClient,
               bot->getResponse(theUser,
@@ -60,7 +60,7 @@ if (theUser == targetUser) {
 }
 
 /* Can't suspend an owner unless you're an owner. */
-if (targetUser->getFlag(sqlUser::F_OWNER) && !theUser->getFlag(sqlUser::F_OWNER)) {
+if (targetUser->getFlag(sqlcfUser::F_OWNER) && !theUser->getFlag(sqlcfUser::F_OWNER)) {
   bot->SendTo(theClient,
 	      bot->getResponse(theUser,
 			language::cant_suspend_an_owner,
@@ -69,7 +69,7 @@ if (targetUser->getFlag(sqlUser::F_OWNER) && !theUser->getFlag(sqlUser::F_OWNER)
 }
 
 /* Can only suspend a user manager if you're an owner. */
-if (targetUser->getFlag(sqlUser::F_USERMANAGER) && !theUser->getFlag(sqlUser::F_OWNER)) {
+if (targetUser->getFlag(sqlcfUser::F_USERMANAGER) && !theUser->getFlag(sqlcfUser::F_OWNER)) {
   bot->SendTo(theClient,
 	      bot->getResponse(theUser,
 			language::cant_suspend_manager,
@@ -79,8 +79,8 @@ if (targetUser->getFlag(sqlUser::F_USERMANAGER) && !theUser->getFlag(sqlUser::F_
 
 
 /* A serveradmin can only suspend users in his/her own group. */
-if (theUser->getFlag(sqlUser::F_SERVERADMIN) &&
-    !theUser->getFlag(sqlUser::F_USERMANAGER)) {
+if (theUser->getFlag(sqlcfUser::F_SERVERADMIN) &&
+    !theUser->getFlag(sqlcfUser::F_USERMANAGER)) {
   if (targetUser->getGroup() != theUser->getGroup()) {
     bot->SendTo(theClient,
 		bot->getResponse(theUser,
@@ -117,6 +117,8 @@ bot->logAdminMessage("%s (%s) SUSPEND %s",
 		     theUser->getUserName().c_str(),
 		     theClient->getRealNickUserHost().c_str(),
 		     targetUser->getUserName().c_str());
+
+bot->logLastComMessage(theClient, Message);
 
 return;
 } //SUSPENDCommand::Exec

@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: chanfix.cc,v 1.4 2006/04/05 02:37:35 buzlip01 Exp $
+ * $Id: chanfix.cc,v 1.5 2006/12/09 00:29:19 buzlip01 Exp $
  */
 
 #include	<csignal>
@@ -37,6 +37,8 @@
 #include	<string>
 #include	<utility>
 #include	<vector>
+
+#include	<sys/resource.h>
 
 #include	"libpq++.h"
 
@@ -54,13 +56,13 @@
 #include	"responses.h"
 #include	"sqlChanOp.h"
 #include	"sqlChannel.h"
-#include	"sqlUser.h"
+#include	"sqlcfUser.h"
 
 #ifdef CHANFIX_HAVE_BOOST_THREAD
 #include	<boost/thread/thread.hpp>
 #endif /* CHANFIX_HAVE_BOOST_THREAD */
 
-RCSTAG("$Id: chanfix.cc,v 1.4 2006/04/05 02:37:35 buzlip01 Exp $");
+RCSTAG("$Id: chanfix.cc,v 1.5 2006/12/09 00:29:19 buzlip01 Exp $");
 
 namespace gnuworld
 {
@@ -106,7 +108,7 @@ chanServLinked = false;
 updateInProgress = false;
 
 std::string dbString = "host=" + sqlHost + " dbname=" + sqlDB
-  + " port=" + sqlPort + " user=" + sqlUsername + " password=" + sqlPass;
+  + " port=" + sqlPort + " user=" + sqlcfUsername + " password=" + sqlPass;
 
 theManager = sqlManager::getInstance(dbString);
 
@@ -118,37 +120,42 @@ debugLog.open(debugLogFile.c_str(), std::ios::out | std::ios::app);
 RegisterCommand(new ADDFLAGCommand(this, "ADDFLAG",
 	"<username> <flag>",
 	3,
-	sqlUser::F_USERMANAGER | sqlUser::F_SERVERADMIN
+	sqlcfUser::F_USERMANAGER | sqlcfUser::F_SERVERADMIN
 	));
 RegisterCommand(new ADDHOSTCommand(this, "ADDHOST",
 	"<username> <nick!user@host>",
 	3,
-	sqlUser::F_USERMANAGER | sqlUser::F_SERVERADMIN
+	sqlcfUser::F_USERMANAGER | sqlcfUser::F_SERVERADMIN
 	));
 RegisterCommand(new ADDNOTECommand(this, "ADDNOTE",
 	"<#channel> <reason>",
 	3,
-	sqlUser::F_COMMENT
+	sqlcfUser::F_COMMENT
 	));
 RegisterCommand(new ADDUSERCommand(this, "ADDUSER",
 	"<username> [host]",
 	2,
-	sqlUser::F_USERMANAGER | sqlUser::F_SERVERADMIN
+	sqlcfUser::F_USERMANAGER | sqlcfUser::F_SERVERADMIN
 	));
 RegisterCommand(new ALERTCommand(this, "ALERT",
 	"<#channel> [reason]",
 	2,
-	sqlUser::F_COMMENT
+	sqlcfUser::F_COMMENT
 	));
 RegisterCommand(new BLOCKCommand(this, "BLOCK",
 	"<#channel> <reason>",
 	3,
-	sqlUser::F_BLOCK
+	sqlcfUser::F_BLOCK
+	));
+RegisterCommand(new CANFIXCommand(this, "CANFIX",
+	"<#channel>",
+	2,
+	0
 	));
 RegisterCommand(new CHANFIXCommand(this, "CHANFIX",
-	"<#channel> [override]",
+	"<#channel> [override] [contact]",
 	2,
-	sqlUser::F_CHANFIX
+	sqlcfUser::F_CHANFIX
 	));
 RegisterCommand(new CHECKCommand(this, "CHECK",
 	"<#channel>",
@@ -159,28 +166,28 @@ RegisterCommand(new CHECKCommand(this, "CHECK",
 RegisterCommand(new DEBUGCommand(this, "DEBUG",
 	"<ROTATE|UPDATE>",
 	2,
-	sqlUser::F_OWNER
+	sqlcfUser::F_OWNER
 	));
 #endif /* CHANFIX_DEBUG */
 RegisterCommand(new DELFLAGCommand(this, "DELFLAG",
 	"<username> <flag>",
 	3,
-	sqlUser::F_USERMANAGER | sqlUser::F_SERVERADMIN
+	sqlcfUser::F_USERMANAGER | sqlcfUser::F_SERVERADMIN
 	));
 RegisterCommand(new DELHOSTCommand(this, "DELHOST",
 	"<username> <nick!user@host>",
 	3,
-	sqlUser::F_USERMANAGER | sqlUser::F_SERVERADMIN
+	sqlcfUser::F_USERMANAGER | sqlcfUser::F_SERVERADMIN
 	));
 RegisterCommand(new DELNOTECommand(this, "DELNOTE",
 	"<#channel> <note_id>",
 	3,
-	sqlUser::F_COMMENT
+	sqlcfUser::F_COMMENT
 	));
 RegisterCommand(new DELUSERCommand(this, "DELUSER",
 	"<username>",
 	2,
-	sqlUser::F_USERMANAGER | sqlUser::F_SERVERADMIN
+	sqlcfUser::F_USERMANAGER | sqlcfUser::F_SERVERADMIN
 	));
 RegisterCommand(new HELPCommand(this, "HELP",
 	"[command]",
@@ -200,17 +207,27 @@ RegisterCommand(new INFOCommand(this, "INFO",
 RegisterCommand(new INVITECommand(this, "INVITE",
 	"",
 	1,
-	sqlUser::F_OWNER
+	sqlcfUser::F_OWNER
+	));
+RegisterCommand(new LASTCOMCommand(this, "LASTCOM",
+	"[amount of commands] [days from]",
+	1,
+	sqlcfUser::F_OWNER
 	));
 RegisterCommand(new LISTBLOCKEDCommand(this, "LISTBLOCKED",
 	"",
 	1,
-	sqlUser::F_BLOCK
+	sqlcfUser::F_BLOCK
 	));
 RegisterCommand(new LISTHOSTSCommand(this, "LISTHOSTS",
 	"[username]",
 	1,
-	sqlUser::F_LOGGEDIN
+	sqlcfUser::F_LOGGEDIN
+	));
+RegisterCommand(new LISTTEMPBLOCKEDCommand(this, "LISTTEMPBLOCKED",
+	"",
+	1,
+	sqlcfUser::F_BLOCK
 	));
 RegisterCommand(new OPLISTCommand(this, "OPLIST",
 	"<#channel> [-all] [-days]",
@@ -226,18 +243,23 @@ RegisterCommand(new OPNICKSCommand(this, "OPNICKS",
 RegisterCommand(new QUOTECommand(this, "QUOTE",
 	"<text>",
 	2,
-	sqlUser::F_OWNER
+	sqlcfUser::F_OWNER
 	));
 #endif /* ENABLE_QUOTE */
 RegisterCommand(new REHASHCommand(this, "REHASH",
 	"",
 	1,
-	sqlUser::F_OWNER
+	sqlcfUser::F_OWNER
 	));
 RegisterCommand(new RELOADCommand(this, "RELOAD",
 	"[reason]",
 	1,
-	sqlUser::F_OWNER
+	sqlcfUser::F_OWNER
+	));
+RegisterCommand(new REQUESTOPCommand(this, "REQUESTOP",
+	isAllowingTopOpAlert() ? "<#channel> [contact]" : "<#channel>",
+	2,
+	0
 	));
 RegisterCommand(new SCORECommand(this, "SCORE",
 	"<#channel> [account|=nick]",
@@ -249,20 +271,30 @@ RegisterCommand(new SCORECommand(this, "CSCORE",
 	2,
 	0
 	));
+RegisterCommand(new SAYCommand(this, "SAY",
+	"<#channel> <text>",
+	3,
+	sqlcfUser::F_OWNER
+	));
 RegisterCommand(new SETCommand(this, "SET",
 	"<option> <value>",
 	3,
-	sqlUser::F_OWNER
+	sqlcfUser::F_OWNER
 	));
 RegisterCommand(new SETGROUPCommand(this, "SETGROUP",
 	"<username> <group>",
 	3,
-	sqlUser::F_USERMANAGER
+	sqlcfUser::F_USERMANAGER
+	));
+RegisterCommand(new SIMULATECommand(this, "SIMULATE",
+	"<#channel> <auto/manual>",
+	3,
+	sqlcfUser::F_CHANFIX
 	));
 RegisterCommand(new SHUTDOWNCommand(this, "SHUTDOWN",
 	"[reason]",
 	1,
-	sqlUser::F_OWNER
+	sqlcfUser::F_OWNER
 	));
 RegisterCommand(new STATUSCommand(this, "STATUS",
 	"",
@@ -272,42 +304,52 @@ RegisterCommand(new STATUSCommand(this, "STATUS",
 RegisterCommand(new SUSPENDCommand(this, "SUSPEND",
 	"<username>",
 	2,
-	sqlUser::F_USERMANAGER | sqlUser::F_SERVERADMIN
+	sqlcfUser::F_USERMANAGER | sqlcfUser::F_SERVERADMIN
+	));
+RegisterCommand(new TEMPBLOCKCommand(this, "TEMPBLOCK",
+	"<#channel>",
+	2,
+	sqlcfUser::F_BLOCK
 	));
 RegisterCommand(new UNALERTCommand(this, "UNALERT",
 	"<#channel>",
 	2,
-	sqlUser::F_COMMENT
+	sqlcfUser::F_COMMENT
 	));
 RegisterCommand(new UNBLOCKCommand(this, "UNBLOCK",
 	"<#channel>",
 	2,
-	sqlUser::F_BLOCK
+	sqlcfUser::F_BLOCK
 	));
 RegisterCommand(new UNSUSPENDCommand(this, "UNSUSPEND",
 	"<username>",
 	2,
-	sqlUser::F_USERMANAGER | sqlUser::F_SERVERADMIN
+	sqlcfUser::F_USERMANAGER | sqlcfUser::F_SERVERADMIN
+	));
+RegisterCommand(new UNTEMPBLOCKCommand(this, "UNTEMPBLOCK",
+	"<#channel>",
+	2,
+	sqlcfUser::F_BLOCK
 	));
 RegisterCommand(new USERSCORESCommand(this, "USERSCORES",
 	"<account>",
 	2,
-	sqlUser::F_LOGGEDIN
+	sqlcfUser::F_LOGGEDIN
 	));
 RegisterCommand(new USETCommand(this, "USET",
 	"[username] <option> <value>",
 	3,
-	sqlUser::F_LOGGEDIN
+	sqlcfUser::F_LOGGEDIN
 	));
 RegisterCommand(new WHOGROUPCommand(this, "WHOGROUP",
 	"[group]",
 	1,
-	sqlUser::F_USERMANAGER | sqlUser::F_SERVERADMIN
+	sqlcfUser::F_USERMANAGER | sqlcfUser::F_SERVERADMIN
 	));
 RegisterCommand(new WHOISCommand(this, "WHOIS",
 	"<username|=nick|*> [-modif]",
 	2,
-	sqlUser::F_LOGGEDIN
+	sqlcfUser::F_LOGGEDIN
 	));
 
 /* Set our current day. */
@@ -351,8 +393,17 @@ joinChanModes = chanfixConfig->Require("joinChanModes")->second ;
 enableAutoFix = atob(chanfixConfig->Require("enableAutoFix")->second) ;
 enableChanFix = atob(chanfixConfig->Require("enableChanFix")->second) ;
 enableChannelBlocking = atob(chanfixConfig->Require("enableChannelBlocking")->second) ;
+autoFixNotice = atob(chanfixConfig->Require("autoFixNotice")->second) ;
+manualFixNotice = atob(chanfixConfig->Require("manualFixNotice")->second) ; 
+joinChannels = atob(chanfixConfig->Require("joinChannels")->second) ;
 stopAutoFixOnOp = atob(chanfixConfig->Require("stopAutoFixOnOp")->second) ;
-stopChanFixOnOp =  atob(chanfixConfig->Require("stopChanFixOnOp")->second) ;
+stopChanFixOnOp = atob(chanfixConfig->Require("stopChanFixOnOp")->second) ;
+allowTopOpFix = atob(chanfixConfig->Require("allowTopOpFix")->second) ;
+allowTopOpAlert = atob(chanfixConfig->Require("allowTopOpAlert")->second) ;
+topOpPercent = atoi((chanfixConfig->Require("topOpPercent")->second).c_str()) ;
+minFixScore = atoi((chanfixConfig->Require("minFixScore")->second).c_str()) ;
+minCanFixScore = atoi((chanfixConfig->Require("minCanFixScore")->second).c_str()) ;
+minRequestOpTime = atoi((chanfixConfig->Require("minRequestOpTime")->second).c_str()) ;
 version = atoi((chanfixConfig->Require("version")->second).c_str()) ;
 useBurstToFix = atob(chanfixConfig->Require("useBurstToFix")->second) ;
 numServers = atoi((chanfixConfig->Require("numServers")->second).c_str()) ;
@@ -386,7 +437,7 @@ for (joinChansType::iterator ptr = chansToJoin.begin();
 sqlHost = chanfixConfig->Require("sqlHost")->second;
 sqlPort = chanfixConfig->Require("sqlPort")->second;
 sqlDB = chanfixConfig->Require("sqlDB")->second;
-sqlUsername = chanfixConfig->Require("sqlUser")->second;
+sqlcfUsername = chanfixConfig->Require("sqlcfUser")->second;
 sqlPass = chanfixConfig->Require("sqlPass")->second;
 
 elog	<< "chanfix::readConfigFile> Configuration loaded!"
@@ -454,11 +505,14 @@ for (commandMapType::iterator ptr = commandMap.begin(); ptr != commandMap.end();
 /**
  * Register for global network events
  */
+MyUplink->RegisterEvent( EVT_ACCOUNT, this );
 MyUplink->RegisterEvent( EVT_KILL, this );
 MyUplink->RegisterEvent( EVT_QUIT, this );
 MyUplink->RegisterEvent( EVT_BURST_CMPLT, this );
 MyUplink->RegisterEvent( EVT_NETJOIN, this );
 MyUplink->RegisterEvent( EVT_NETBREAK, this );
+MyUplink->RegisterEvent( EVT_NICK, this );
+MyUplink->RegisterEvent( EVT_SERVERMODE, this );
 
 /**
  * Register for all channel events
@@ -517,6 +571,7 @@ else if (theTimer == tidFixQ) {
   /* Refresh Timer */
   theTime = time(NULL) + PROCESS_QUEUE_TIME;
   tidFixQ = MyUplink->RegisterTimer(theTime, this, NULL);
+  setNextFix(currentTime() + PROCESS_QUEUE_TIME);
 }
 else if (theTimer == tidRotateDB) {
   /* Clean-up the database if its 00 GMT */
@@ -596,18 +651,19 @@ xClient::OnDisconnect() ;
 void chanfix::OnPrivateMessage( iClient* theClient,
 	const std::string& Message, bool)
 {
-sqlUser* theUser = isAuthed(theClient->getAccount());
-
-if (!theClient->isOper()) {
-  if (!theUser || theUser->getNeedOper())
-    return;
-}
+sqlcfUser* theUser = isAuthed(theClient->getAccount());
 
 if (currentState == BURST) {
-  SendTo(theClient,
-         getResponse(theUser,
-                     language::no_commands_during_burst,
-                     std::string("Sorry, I do not accept commands during a burst.")).c_str());
+  if (theUser)
+    SendTo(theClient,
+           getResponse(theUser,
+                       language::no_commands_during_burst,
+                       std::string("Sorry, I do not accept commands during a burst.")).c_str());
+  else
+    SendTo(theClient,
+           getResponse(theUser,
+                       language::no_commands_during_burst_noper,
+                       std::string("Sorry, I'm too busy at the moment. Please try again soon.")).c_str());
   return;
 }
 
@@ -616,6 +672,13 @@ if (st.empty())
   return;
 
 const std::string Command = string_upper(st[0]);
+
+if (!theClient->isOper()) {
+  if (Command != "CANFIX" && Command != "HELP" && Command != "REQUESTOP") {
+    if (!theUser || theUser->getNeedOper())
+      return;
+  }
+}
 
 commandMapType::iterator commHandler = commandMap.find(Command);
 if (commHandler == commandMap.end()) {
@@ -632,7 +695,7 @@ if (st.size() < commHandler->second->getNumParams()) {
 }
 
 /* If you change this code, remember to change it in HELPCommand.cc */
-sqlUser::flagType requiredFlags = commHandler->second->getRequiredFlags();
+sqlcfUser::flagType requiredFlags = commHandler->second->getRequiredFlags();
 if (requiredFlags) {
   if (!theUser) {
     SendTo(theClient,
@@ -658,7 +721,7 @@ if (requiredFlags) {
     return;
   }
 
-  if (requiredFlags != sqlUser::F_LOGGEDIN &&
+  if (requiredFlags != sqlcfUser::F_LOGGEDIN &&
       !theUser->getFlag(requiredFlags)) {
     if (getFlagChar(requiredFlags) != ' ')
       SendTo(theClient,
@@ -734,6 +797,7 @@ void chanfix::OnChannelEvent( const channelEventType& whichEvent,
 	void* data1, void* data2, void* data3, void* data4 )
 {
 iClient* theClient = 0;
+iServer* theServer = 0;
 
 /* If we are not running, we don't want to be giving points. */
 if (currentState != RUN) return;
@@ -766,6 +830,16 @@ switch( whichEvent )
 		lostOp(theChan->getName(), theClient, NULL);
 		break ;
 		}
+	case EVT_SERVERMODE:
+		{
+		theServer = static_cast< iServer* >( data1 );
+                if (theServer && theServer != MyUplink->getUplink() && theServer->isService()) {
+		  if (!isTempBlocked(theChan->getName()))
+		    tempBlockList.insert(tempBlockType::value_type(theChan->getName(), currentTime()));
+		}
+//		elog << "chanfix: GOT SERVER MODE EVENT!" << std::endl;
+		break ;
+		}
 	default:
 		break ;
 	}
@@ -779,18 +853,14 @@ void chanfix::OnChannelModeO( Channel* theChan, ChannelUser* theUser,
 {
 /* if (currentState != RUN) return; */
 
-/* COMMENTED OUT DUE TO isService() NOT IN CORE YET
- * if (theUser) {
- *	// Let's see what server did the mode
- *	iServer* theServer = Network->findServer(theUser->getClient()->getIntYY());
- *	// If it was a service, then add the channel to the block list.
- *	if (theServer && theServer != MyUplink->getUplink() && theServer->isService()) {
- *	  // Check if it isn't already in the block list. If not, add it.
- *	  if (!isTempBlocked(theChan->getName()))
- *	    tempBlockList.insert(tempBlockType::value_type(theChan->getName(), currentTime()));
- *	}
- * }
- */
+if (theUser) {
+  iServer* theServer = Network->findServer(theUser->getClient()->getIntYY());
+  if (theServer && theServer != MyUplink->getUplink() && theServer->isService()) {
+    if (!isTempBlocked(theChan->getName()))
+      tempBlockList.insert(tempBlockType::value_type(theChan->getName(), currentTime()));
+  }
+}
+
 	
 if (theChan->size() < minClients)
   return;
@@ -821,12 +891,120 @@ for (xServer::opVectorType::const_iterator ptr = theTargets.begin();
 } // for
 }
 
+bool chanfix::logLastComMessage(iClient* theClient, const std::string& Message)
+{
+  StringTokenizer st(Message);
+  if (st.empty())
+    return false;
+
+  const std::string Command = string_upper(st[0]);
+
+  std::string log;
+  PgDatabase* cacheCon = theManager->getConnection();
+
+  static const char *Main = "INSERT into comlog (ts,user_name,command) VALUES (now()::abstime::int4,'";
+
+  std::stringstream insertString;
+  insertString	<< Main
+		<< theClient->getAccount()
+		<< "','"
+		<< Command
+		<< " ";
+
+  unsigned int pos = 1;
+  while (pos < st.size()) {
+    insertString << st[pos]
+		 << " ";
+    pos++;
+  }
+
+  insertString	<< "')"
+		<< std::ends;
+
+  if (!cacheCon->ExecCommandOk(insertString.str().c_str())) {
+    elog << "sqlChannel::Insert> Something went wrong: "
+	 << cacheCon->ErrorMessage()
+	 << std::endl;
+  }
+
+  theManager->removeConnection(cacheCon);
+
+  return true;
+}
+
+/* msgTopOps */
+bool chanfix::msgTopOps(Channel* netChan) {
+
+  int opCount = 0;
+  sqlChanOp* curOp = 0;
+  bool inChan = true;
+
+  chanOpsType myOps = getMyOps(netChan);
+
+  for (chanOpsType::iterator opPtr = myOps.begin();
+     opPtr != myOps.end() && (opCount < OPCOUNT); opPtr++) {
+ 
+    curOp = *opPtr;
+    opCount++;
+
+    inChan = accountIsOnChan(netChan->getName(), curOp->getAccount());
+    if (!inChan) {
+      typedef std::list < iClient* > accountListType;
+      const iClient* curAccount;
+      accountListType accountList;
+      authMapType::iterator cAuth = authMap.find(curOp->getAccount());
+      if (cAuth == authMap.end())
+	break;
+      
+      accountList = cAuth->second;
+
+      if (accountList.empty())
+        break;
+
+      for (accountListType::iterator cptr = accountList.begin(); (cptr != accountList.end()); cptr++)
+      {
+        curAccount = *cptr;
+
+        MyUplink->Write("%s P %s :%s channel modes have been removed to allow you to return. Please return so that I can op you during the channel fixing process\r\n",
+                  getCharYYXXX().c_str(), curAccount->getCharYYXXX().c_str(), netChan->getName().c_str());
+
+        MyUplink->Write("%s P %s :\002DO NOT REPLY TO THIS MESSAGE\002\r\n",
+                  getCharYYXXX().c_str(), curAccount->getCharYYXXX().c_str());
+
+      }
+    }
+  }
+
+  return true;
+}
+
 /* OnEvent */
 void chanfix::OnEvent( const eventType& whichEvent,
 	void* data1, void* data2, void* data3, void* data4 )
 {
 switch(whichEvent)
 	{
+	case EVT_ACCOUNT:
+		{
+		iClient* tmpUser = static_cast< iClient* >( data1 ) ;
+		authMapType::iterator ptr = authMap.find(tmpUser->getAccount());
+		if (ptr != authMap.end()) {
+			/* This user is already logged in, just add the iClient
+			 * (if they aren't in the list already)
+			 */
+			authMapType::mapped_type::iterator listPtr = std::find(ptr->second.begin(),
+					ptr->second.end(),
+					tmpUser);
+			if (listPtr == ptr->second.end())
+			  ptr->second.push_back(tmpUser);
+		} else {
+			/* Add the map entry AND the initial list entry */
+			authMapType::mapped_type theList;
+			theList.push_back(tmpUser);
+			authMap.insert(authMapType::value_type(tmpUser->getAccount(), theList));
+		}
+		break;
+		}
 	case EVT_BURST_CMPLT:
 		{
 		if (currentState != SPLIT)
@@ -853,6 +1031,41 @@ switch(whichEvent)
 		for (clientOpsType::iterator ptr = myOps->begin();
 		     ptr != myOps->end(); ptr++)
 		  lostOp(*ptr, theClient, myOps);
+		
+		/* Now we need to remove this iClient from the auth map */
+		authMapType::iterator ptr = authMap.find(theClient->getAccount());
+		
+		if (ptr != authMap.end()) {
+		  ptr->second.erase(std::find(ptr->second.begin(), ptr->second.end(), theClient));
+			
+		  /* If the list is empty, remove the map entry */
+		  if (ptr->second.empty())
+		    authMap.erase(theClient->getAccount());
+		}
+		break;
+		}
+	case EVT_NICK:
+		{
+		iClient* tmpUser = static_cast< iClient* >( data1 );
+		if (tmpUser->isModeR()) {
+		  /* Check to see if this current account is already mapped,
+		   * Then check to see if this nick is already there
+		   */
+		  authMapType::iterator ptr = authMap.find(tmpUser->getAccount());
+		  if (ptr != authMap.end()) {
+		    /* Already have an entry, just add the iClient if not there already */
+		    authMapType::mapped_type::iterator listPtr = std::find(ptr->second.begin(),
+					ptr->second.end(),
+					tmpUser);
+		    if (listPtr == ptr->second.end())
+		      ptr->second.push_back(tmpUser);
+		    
+		  } else {
+		    authMapType::mapped_type theList;
+		    theList.push_back(tmpUser);
+		    authMap.insert(authMapType::value_type(tmpUser->getAccount(), theList));
+		  }
+		}
 		break;
 		}
 	}
@@ -953,12 +1166,21 @@ return true;
 
 void chanfix::SendTo(iClient* theClient, const std::string& theMessage)
 {
-sqlUser* theUser = isAuthed(theClient->getAccount());
+sqlcfUser* theUser = isAuthed(theClient->getAccount());
 
 if (theUser && !theUser->getUseNotice())
   Message(theClient, theMessage);
 else
   Notice(theClient, theMessage);
+}
+
+char *chanfix::convertToAscTime(time_t NOW)
+{
+  time_t *tNow = &NOW;
+  struct tm* Now = gmtime(tNow);
+  char *ATime = asctime(Now);
+  ATime[strlen(ATime)-1] = '\0';
+  return ATime;
 }
 
 void chanfix::SendFmtTo(iClient* theClient, const std::string& theMessage)
@@ -967,7 +1189,7 @@ char buffer[512] = { 0 };
 char *b = buffer ;
 const char *m = 0 ;
 
-sqlUser* theUser = isAuthed(theClient->getAccount());
+sqlcfUser* theUser = isAuthed(theClient->getAccount());
 
 for (m = theMessage.c_str(); *m != 0; m++) {
   if (*m == '\n' || *m == '\r') {
@@ -1017,7 +1239,7 @@ va_start( list, Msg ) ;
 vsprintf( buffer, Msg, list ) ;
 va_end( list ) ;
 
-sqlUser* theUser = isAuthed(theClient->getAccount());
+sqlcfUser* theUser = isAuthed(theClient->getAccount());
 
 if (theUser && !theUser->getUseNotice())
   Message(theClient, "%s", buffer);
@@ -1166,7 +1388,7 @@ if (cacheCon->ExecTuplesOk(theQuery.str().c_str())) {
   usersMap.clear();
 
   for (int i = 0; i < cacheCon->Tuples(); ++i) {
-    sqlUser *newUser = new sqlUser(theManager);
+    sqlcfUser *newUser = new sqlcfUser(theManager);
     assert(newUser != 0);
 
     newUser->setAllMembers(cacheCon, i);
@@ -1356,7 +1578,7 @@ size_t chanfix::countMyOps(Channel* theChan)
 return countMyOps(theChan->getName());
 }
 
-const std::string chanfix::getHostList( sqlUser* User)
+const std::string chanfix::getHostList( sqlcfUser* User)
 {
 /* Get a connection instance to our backend */
 PgDatabase* cacheCon = theManager->getConnection();
@@ -1535,6 +1757,16 @@ if (string_lower(theServer->getName()) == string_lower(chanServName)) {
 return;
 }
 
+void chanfix::JoinChan(Channel* theChan)
+{
+MyUplink->JoinChannel(this, theChan->getName());
+}
+
+void chanfix::PartChan(Channel* theChan)
+{
+MyUplink->PartChannel(this, theChan->getName(), "");
+}
+
 /* Check for the channel service server to see if it is linked. */
 void chanfix::findChannelService()
 {
@@ -1550,6 +1782,50 @@ for (xNetwork::serverIterator ptr = Network->servers_begin();
    }
 }
 return;
+}
+
+const int chanfix::getLastFix(sqlChannel* theChan)
+{
+/* Get a connection instance to our backend */
+PgDatabase* cacheCon = theManager->getConnection();
+
+/* Grab the user's host list */
+static const char* queryHeader
+	= "SELECT ts,event FROM notes WHERE channelID = ";
+
+std::stringstream theQuery;
+theQuery	<< queryHeader 
+		<< theChan->getID()
+		;
+
+if (!cacheCon->ExecTuplesOk(theQuery.str().c_str())) {
+  elog	<< "chanfix::getHostList> SQL Error: "
+	<< cacheCon->ErrorMessage()
+	<< std::endl;
+  return 0;
+}
+
+int max_ts = 0;
+int ts = 0;
+int event;
+
+// SQL Query succeeded
+std::stringstream notes;
+for (int i = 0 ; i < cacheCon->Tuples(); i++)
+{
+	ts = atoi(cacheCon->GetValue(i, 0));
+	event = atoi(cacheCon->GetValue(i, 1));
+
+	if ((event == sqlChannel::EV_CHANFIX) || (event == sqlChannel::EV_REQUESTOP)) {
+		if (ts > max_ts)
+			max_ts = ts;
+	}
+}
+
+/* Dispose of our connection instance */
+theManager->removeConnection(cacheCon);
+
+return max_ts;
 }
 
 void chanfix::autoFix()
@@ -1607,10 +1883,16 @@ for (xNetwork::channelIterator ptr = Network->channels_begin(); ptr != Network->
 
        if ((sqlChan->getMaxScore() > 
 	   static_cast<int>(static_cast<float>(FIX_MIN_ABS_SCORE_END)
-	   * MAX_SCORE)) && !sqlChan->getFlag(sqlChannel::F_BLOCKED)) {
+	   * MAX_SCORE)) && !sqlChan->getFlag(sqlChannel::F_BLOCKED) &&
+	   !isTempBlocked(thisChan->getName())) {
 	 elog << "chanfix::autoFix> DEBUG: " << thisChan->getName() << " is opless, fixing." << std::endl;
 	 autoFixQ.insert(fixQueueType::value_type(thisChan->getName(), currentTime()));
 	 numOpLess++;
+
+	 if (doJoinChannels() && shouldCJoin(sqlChan, true))
+	   JoinChan(thisChan);
+	 if (doAutoFixNotice() && shouldCJoin(sqlChan, true))
+	   Message(thisChan, "Automatic channel fix in progress, please stand by.");
        }
      }
    }
@@ -1662,9 +1944,331 @@ if (useBurstToFix && thisChan->getCreationTime() > 1) {
   ClearMode(thisChan, "obiklrD", true);
 }
 
-Message(thisChan, "Channel fix in progress, please stand by.");
+sqlChannel* sqlChan = getChannelRecord(thisChan);
+if (!sqlChan) sqlChan = newChannelRecord(thisChan);
+
+if (doJoinChannels() && shouldCJoin(sqlChan, false))
+  JoinChan(thisChan);
+if (doManualFixNotice()  && shouldCJoin(sqlChan, false))
+  Message(thisChan, "Channel fix in progress, please stand by.");
 
 manFixQ.insert(fixQueueType::value_type(thisChan->getName(), currentTime() + CHANFIX_DELAY));
+}
+
+
+void chanfix::insertop(sqlChanOp* curOp, sqlChannel* sqlChan)
+{
+  simOppedStruct curStruct;
+
+  curStruct.account = curOp->getAccount();
+  curStruct.channel = sqlChan->getChannel();
+      
+  simMap.insert(SimMapType::value_type(sqlChan->getChannel(), curStruct));
+
+  return;
+}
+
+bool chanfix::findop(sqlChanOp* curOp, sqlChannel* sqlChan)
+{
+  for (SimMapType::iterator ptr = simMap.begin();
+       ptr != simMap.end(); ptr++) {
+
+    if ((ptr->first == sqlChan->getChannel()) && (ptr->second.account == curOp->getAccount()))
+      return true;
+  }
+
+  return false;
+}
+
+void chanfix::removechan(sqlChannel* sqlChan)
+{
+  simMap.erase(sqlChan->getChannel());
+  return;
+}
+
+bool chanfix::simFix(sqlChannel* sqlChan, bool autofix, time_t c_Time, iClient* theClient, sqlcfUser* theUser)
+{
+if (sqlChan->getSimStart() == 0) sqlChan->setSimStart(c_Time);
+sqlChan->setLastSimAttempt(c_Time);
+
+Channel* netChan = Network->findChannel(sqlChan->getChannel());
+if (!netChan) return true;
+
+chanOpsType myOps = getMyOps(netChan);
+
+if (myOps.begin() != myOps.end())
+  sqlChan->setTMaxScore((*myOps.begin())->getPoints());
+
+int maxScore = sqlChan->getTMaxScore();
+if (maxScore <= FIX_MIN_ABS_SCORE_END * MAX_SCORE)
+  return false;
+
+unsigned int maxOpped = (autofix ? AUTOFIX_NUM_OPPED : CHANFIX_NUM_OPPED);
+
+unsigned int currentOps = sqlChan->getAmountSimOpped();
+if (currentOps >= maxOpped)
+  return true;
+
+int time_since_start;
+if (autofix)
+  time_since_start = c_Time - sqlChan->getSimStart();
+else
+  time_since_start = c_Time - (sqlChan->getSimStart() + CHANFIX_DELAY);
+
+int max_time = (autofix ? AUTOFIX_MAXIMUM : CHANFIX_MAXIMUM);
+int min_score_abs = static_cast<int>((MAX_SCORE *
+		static_cast<float>(FIX_MIN_ABS_SCORE_BEGIN)) -
+		static_cast<float>(time_since_start) /
+		static_cast<float>(max_time) *
+		(MAX_SCORE * static_cast<float>(FIX_MIN_ABS_SCORE_BEGIN)
+		 - static_cast<float>(FIX_MIN_ABS_SCORE_END) * MAX_SCORE));
+
+int min_score_rel = static_cast<int>((maxScore *
+		static_cast<float>(FIX_MIN_REL_SCORE_BEGIN)) -
+		static_cast<float>(time_since_start) /
+		static_cast<float>(max_time) *
+		(maxScore * static_cast<float>(FIX_MIN_REL_SCORE_BEGIN)
+		 - static_cast<float>(FIX_MIN_REL_SCORE_END) * maxScore));
+
+int min_score = min_score_abs;
+if (min_score_rel > min_score)
+  min_score = min_score_rel;
+
+if (myOps.begin() != myOps.end())
+  sqlChan->setTMaxScore((*myOps.begin())->getPoints());
+
+if (sqlChan->getTMaxScore() < min_score)
+  min_score = sqlChan->getTMaxScore();
+
+unsigned int amtopped;
+iClient* curClient = 0;
+sqlChanOp* curOp = 0;
+acctListType acctToOp;
+std::string modes = "+";
+std::string args;
+unsigned int numClientsToOp = 0;
+bool cntMaxedOut = false;
+for (chanOpsType::iterator opPtr = myOps.begin(); opPtr != myOps.end();
+     opPtr++) {
+  curOp = *opPtr;
+  if (curOp->getPoints() >= min_score) {
+    acctToOp = findAccount(netChan, curOp->getAccount());
+    std::vector< iClient* >::const_iterator acctPtr = acctToOp.begin(),
+	end = acctToOp.end();
+    while (acctPtr != end) {
+      curClient = *acctPtr;
+      if (curClient && !findop(curOp, sqlChan)) {
+        amtopped = sqlChan->getAmountSimOpped();
+        amtopped++;
+        sqlChan->setAmountSimOpped(amtopped);
+
+	insertop(curOp, sqlChan);
+	if (!args.empty())
+	  args += " ";
+	args += curClient->getNickName();
+
+	if ((++numClientsToOp + currentOps) >= maxOpped) {
+	  cntMaxedOut = true;
+	  break;
+	}
+      }
+      ++acctPtr;
+    }
+    acctToOp.clear();
+    if (cntMaxedOut)
+      break;
+  }
+}
+
+if ((!numClientsToOp || maxScore < min_score) &&
+    (!autofix || !(numClientsToOp + currentOps))) {
+  if (autofix && !sqlChan->getSimModesRemoved()) {
+
+    if (netChan->banList_size() ||
+        netChan->getMode(Channel::MODE_I) ||
+        netChan->getMode(Channel::MODE_K) ||
+        netChan->getMode(Channel::MODE_L) ||
+        netChan->getMode(Channel::MODE_R) ||
+        netChan->getMode(Channel::MODE_D)) {
+
+      sqlChan->setSimModesRemoved(true);
+      SendTo(theClient,
+                getResponse(theUser,
+                                 language::sim_modes_removed,
+                                 std::string("(%s) Channel modes have been removed.")).c_str(),
+                                 tsToDateTime(c_Time, true).c_str());
+    }
+  }
+return false;
+}
+
+
+if (numClientsToOp) {
+  SendTo(theClient,
+            getResponse(theUser,
+                             language::sim_opping,
+                             std::string("(%s) Opping: %s (%d Clients)")).c_str(),
+                             tsToDateTime(c_Time, true).c_str(), args.c_str(), numClientsToOp);
+}
+
+if (numClientsToOp + currentOps >= netChan->size() ||
+    numClientsToOp + currentOps >= maxOpped)
+  return true;
+
+return false;
+}
+
+bool chanfix::simulateFix(sqlChannel* sqlChan, bool autofix, iClient* theClient, sqlcfUser* theUser)
+{
+  bool isFixed = false;
+  time_t t = getNextFix();
+  time_t end_fix = t + 86400; /* 1 Day */
+  time_t next_fix = t + PROCESS_QUEUE_TIME;
+
+  sqlChan->setSimStart(0);
+  sqlChan->setLastSimAttempt(0);
+  sqlChan->setAmountSimOpped(0);
+  sqlChan->setSimModesRemoved(false);
+
+  /* Modes are always removed straight when a CHANFIX command is issued
+     for a channel (manual fix). */
+  if (autofix == false)
+    SendTo(theClient,
+              getResponse(theUser,
+                               language::sim_modes_removed,
+                               std::string("(%s) Channel modes have been removed.")).c_str(),
+                               tsToDateTime(currentTime(), true).c_str());
+
+  while (t) {
+    if (next_fix == t) {
+      if (autofix) {
+        if (t - sqlChan->getSimStart() > AUTOFIX_MAXIMUM) {
+          isFixed = simFix(sqlChan, autofix, t, theClient, theUser);
+        }
+      } else {
+        if (t - sqlChan->getSimStart() > CHANFIX_MAXIMUM) {
+          isFixed = simFix(sqlChan, autofix, t, theClient, theUser);
+        }
+      }
+
+      next_fix = t + PROCESS_QUEUE_TIME;
+    }
+
+    if (isFixed || (t == end_fix))
+      break;
+    else
+      t++;
+  }
+
+  /* Cleanup */
+  removechan(sqlChan);
+
+  sqlChan->setSimStart(0);
+  sqlChan->setLastSimAttempt(0);
+  sqlChan->setAmountSimOpped(0);
+  sqlChan->setSimModesRemoved(false);
+
+  return isFixed;
+}
+
+
+
+bool chanfix::shouldCJoin(sqlChannel* sqlChan, bool autofix)
+{
+bool joinchan = false;
+int maxScore;
+time_t lastattempt;
+time_t fixstart;
+
+/* coder notes (mostly so i dont forget -sirv)
+ * if we use this function for simulation then fix start is the both
+ * these times will need to be set as temp vars in sqlChan
+ */
+fixstart = currentTime();
+lastattempt = currentTime();
+
+Channel* netChan = Network->findChannel(sqlChan->getChannel());
+if (!netChan) return joinchan;
+
+chanOpsType myOps = getMyOps(netChan);
+
+if (myOps.begin() != myOps.end())
+  sqlChan->setTMaxScore((*myOps.begin())->getPoints());
+
+maxScore = sqlChan->getTMaxScore();
+
+if (maxScore <= FIX_MIN_ABS_SCORE_END * MAX_SCORE)
+  return joinchan;
+
+unsigned int maxOpped = (autofix ? AUTOFIX_NUM_OPPED : CHANFIX_NUM_OPPED);
+unsigned int currentOps = countChanOps(netChan);
+
+if (currentOps >= maxOpped) {
+  return joinchan;
+} 
+
+int time_since_start;
+if (autofix)
+  time_since_start = currentTime() - fixstart;
+else
+  time_since_start = currentTime() - (fixstart + CHANFIX_DELAY);
+
+int max_time = (autofix ? AUTOFIX_MAXIMUM : CHANFIX_MAXIMUM);
+
+int min_score_abs = static_cast<int>((MAX_SCORE *
+		static_cast<float>(FIX_MIN_ABS_SCORE_BEGIN)) -
+		static_cast<float>(time_since_start) /
+		static_cast<float>(max_time) *
+		(MAX_SCORE * static_cast<float>(FIX_MIN_ABS_SCORE_BEGIN)
+		 - static_cast<float>(FIX_MIN_ABS_SCORE_END) * MAX_SCORE));
+
+int min_score_rel = static_cast<int>((maxScore *
+		static_cast<float>(FIX_MIN_REL_SCORE_BEGIN)) -
+		static_cast<float>(time_since_start) /
+		static_cast<float>(max_time) *
+		(maxScore * static_cast<float>(FIX_MIN_REL_SCORE_BEGIN)
+		 - static_cast<float>(FIX_MIN_REL_SCORE_END) * maxScore));
+
+int min_score = min_score_abs;
+if (min_score_rel > min_score)
+  min_score = min_score_rel;
+
+if (myOps.begin() != myOps.end())
+  sqlChan->setTMaxScore((*myOps.begin())->getPoints());
+
+if (sqlChan->getTMaxScore() < min_score)
+  min_score = sqlChan->getTMaxScore();
+
+iClient* curClient = 0;
+sqlChanOp* curOp = 0;
+acctListType acctToOp;
+unsigned int numClientsToOp = 0;
+bool cntMaxedOut = false;
+for (chanOpsType::iterator opPtr = myOps.begin(); opPtr != myOps.end();
+     opPtr++) {
+  curOp = *opPtr;
+  if (curOp->getPoints() >= min_score) {
+    acctToOp = findAccount(netChan, curOp->getAccount());
+    std::vector< iClient* >::const_iterator acctPtr = acctToOp.begin(),
+	end = acctToOp.end();
+    while (acctPtr != end) {
+      curClient = *acctPtr;
+      if (curClient && !netChan->findUser(curClient)->isModeO()) {
+	if ((++numClientsToOp + currentOps) >= maxOpped) {
+          joinchan = true;
+	  cntMaxedOut = true;
+	  break;
+	}
+      }
+      ++acctPtr;
+    }
+    acctToOp.clear();
+    if (cntMaxedOut)
+      break;
+  }
+}
+
+return joinchan;
 }
 
 bool chanfix::fixChan(sqlChannel* sqlChan, bool autofix)
@@ -1740,6 +2344,16 @@ int min_score_rel = static_cast<int>((maxScore *
 int min_score = min_score_abs;
 if (min_score_rel > min_score)
   min_score = min_score_rel;
+
+/* We need to check to see if the highest scoring ops score for the chan
+ * is less than min_score, if so, adjust min_score so we wont have
+ * to wait forever for the first op! */
+
+if (myOps.begin() != myOps.end())
+  sqlChan->setMaxScore((*myOps.begin())->getPoints());
+
+if (sqlChan->getMaxScore() < min_score)
+  min_score = sqlChan->getMaxScore();
 
 elog << "chanfix::fixChan> [" << netChan->getName() << "] start "
 	<< sqlChan->getFixStart() << ", delta " << time_since_start
@@ -1832,8 +2446,10 @@ void chanfix::stopFixingChan(Channel* theChan, bool force)
 if (!theChan) return;
 
 bool inFix = false;
+bool isAutoFix = false; /* false = manual - true = auto */
 
 if ((stopAutoFixOnOp || force) && isBeingAutoFixed(theChan)) {
+  isAutoFix = true;
   inFix = true;
   removeFromAutoQ(theChan);
 }
@@ -1849,6 +2465,15 @@ if (inFix) {
     sqlChan->setLastAttempt(0);
   }
 }
+
+if ((isAutoFix) && (doAutoFixNotice()))
+  Message(theChan, "Channel has been automatically fixed.");
+else if ((!isAutoFix) && (doManualFixNotice()) && 
+	((isBeingChanFixed(theChan)) || (isBeingAutoFixed(theChan))))
+  Message(theChan, "Channel has been fixed.");
+
+if (doJoinChannels())
+  PartChan(theChan);
 
 return;
 }
@@ -2019,6 +2644,11 @@ for (fixQueueType::iterator ptr = autoFixQ.begin(); ptr != autoFixQ.end(); ) {
       * has passed, remove it from the list
       */
      if (isFixed || currentTime() - sqlChan->getFixStart() > AUTOFIX_MAXIMUM) {
+       Channel* theChan = Network->findChannel(sqlChan->getChannel());
+       if (doAutoFixNotice())
+         Message(theChan, "Channel has been automatically fixed.");
+       if (doJoinChannels())
+         PartChan(theChan);
        autoFixQ.erase(ptr++);
        sqlChan->setFixStart(0);
        sqlChan->setLastAttempt(0);
@@ -2046,6 +2676,11 @@ for (fixQueueType::iterator ptr = manFixQ.begin(); ptr != manFixQ.end(); ) {
       * has passed, remove it from the list
       */
      if (isFixed || currentTime() - sqlChan->getFixStart() > CHANFIX_MAXIMUM + CHANFIX_DELAY) {
+       Channel* theChan = Network->findChannel(sqlChan->getChannel());
+       if (doManualFixNotice())
+         Message(theChan, "Channel has been fixed.");
+       if (doJoinChannels())
+         PartChan(theChan);
        manFixQ.erase(ptr++);
        sqlChan->setFixStart(0);
        sqlChan->setLastAttempt(0);
@@ -2157,10 +2792,10 @@ ptm = gmtime ( &rawtime );
 return ptm->tm_hour;
 }
 
-sqlUser* chanfix::isAuthed(const std::string Name)
+sqlcfUser* chanfix::isAuthed(const std::string Name)
 {
 //Name = escapeSQLChars(Name);
-sqlUser* tempUser = usersMap[Name];
+sqlcfUser* tempUser = usersMap[Name];
 if (!tempUser)
   usersMap.erase(usersMap.find(Name));
 return tempUser;
@@ -2274,7 +2909,7 @@ void chanfix::prepareUpdate(bool)
   } else
 #endif /* CHANFIX_HAVE_BOOST_THREAD */
     updateDB();
-
+    printResourceStats();
   return;
 }
 
@@ -2421,6 +3056,15 @@ void chanfix::updateDB()
   return;
 }
 
+void chanfix::printResourceStats()
+{
+  int who = RUSAGE_SELF;
+  struct rusage usage;
+  int ret;
+  ret = getrusage(who, &usage);
+  logDebugMessage("Max. resident size used by chanfix (kB): %ld", usage.ru_maxrss);
+}
+
 bool chanfix::isTempBlocked(const std::string& theChan)
 {
   tempBlockType::iterator ptr = tempBlockList.find(theChan);
@@ -2564,51 +3208,51 @@ for (xNetwork::channelIterator ptr = Network->channels_begin();
 return;
 } //giveAllOpsPoints
 
-char chanfix::getFlagChar(const sqlUser::flagType& whichFlag)
+char chanfix::getFlagChar(const sqlcfUser::flagType& whichFlag)
 {
- if (whichFlag == sqlUser::F_SERVERADMIN)
+ if (whichFlag == sqlcfUser::F_SERVERADMIN)
    return 'a';
- else if (whichFlag == sqlUser::F_BLOCK)
+ else if (whichFlag == sqlcfUser::F_BLOCK)
    return 'b';
- else if (whichFlag == sqlUser::F_COMMENT)
+ else if (whichFlag == sqlcfUser::F_COMMENT)
    return 'c';
- else if (whichFlag == sqlUser::F_CHANFIX)
+ else if (whichFlag == sqlcfUser::F_CHANFIX)
    return 'f';
- else if (whichFlag == sqlUser::F_OWNER)
+ else if (whichFlag == sqlcfUser::F_OWNER)
    return 'o';
- else if (whichFlag == sqlUser::F_USERMANAGER)
+ else if (whichFlag == sqlcfUser::F_USERMANAGER)
    return 'u';
  else
    return ' ';
 }
 
-const std::string chanfix::getFlagsString(const sqlUser::flagType& whichFlags)
+const std::string chanfix::getFlagsString(const sqlcfUser::flagType& whichFlags)
 {
  std::string flagstr;
- if (whichFlags & sqlUser::F_SERVERADMIN)
+ if (whichFlags & sqlcfUser::F_SERVERADMIN)
    flagstr += "a";
- if (whichFlags & sqlUser::F_BLOCK)
+ if (whichFlags & sqlcfUser::F_BLOCK)
    flagstr += "b";
- if (whichFlags & sqlUser::F_COMMENT)
+ if (whichFlags & sqlcfUser::F_COMMENT)
    flagstr += "c";
- if (whichFlags & sqlUser::F_CHANFIX)
+ if (whichFlags & sqlcfUser::F_CHANFIX)
    flagstr += "f";
- if (whichFlags & sqlUser::F_OWNER)
+ if (whichFlags & sqlcfUser::F_OWNER)
    flagstr += "o";
- if (whichFlags & sqlUser::F_USERMANAGER)
+ if (whichFlags & sqlcfUser::F_USERMANAGER)
    flagstr += "u";
 return flagstr;
 }
 
-sqlUser::flagType chanfix::getFlagType(const char whichChar)
+sqlcfUser::flagType chanfix::getFlagType(const char whichChar)
 {
 switch (whichChar) {
-  case 'a': return sqlUser::F_SERVERADMIN;
-  case 'b': return sqlUser::F_BLOCK;
-  case 'c': return sqlUser::F_COMMENT;
-  case 'f': return sqlUser::F_CHANFIX;
-  case 'o': return sqlUser::F_OWNER;
-  case 'u': return sqlUser::F_USERMANAGER;
+  case 'a': return sqlcfUser::F_SERVERADMIN;
+  case 'b': return sqlcfUser::F_BLOCK;
+  case 'c': return sqlcfUser::F_COMMENT;
+  case 'f': return sqlcfUser::F_CHANFIX;
+  case 'o': return sqlcfUser::F_OWNER;
+  case 'u': return sqlcfUser::F_USERMANAGER;
 }
 return 0;
 }
@@ -2621,8 +3265,16 @@ else if (whichEvent == sqlChannel::EV_NOTE)
   return "NOTE";
 else if (whichEvent == sqlChannel::EV_CHANFIX)
   return "CHANFIX";
+else if (whichEvent == sqlChannel::EV_SIMULATE)
+  return "SIMULATE";
+else if (whichEvent == sqlChannel::EV_REQUESTOP)
+  return "REQUESTOP";
 else if (whichEvent == sqlChannel::EV_BLOCK)
   return "BLOCK";
+else if (whichEvent == sqlChannel::EV_TEMPBLOCK)
+  return "TEMPBLOCK";
+else if (whichEvent == sqlChannel::EV_UNTEMPBLOCK)
+  return "UNTEMPBLOCK";
 else if (whichEvent == sqlChannel::EV_UNBLOCK)
   return "UNBLOCK";
 else if (whichEvent == sqlChannel::EV_ALERT)
@@ -2633,7 +3285,7 @@ else
   return "";
 }
 
-const std::string chanfix::getHelpMessage(sqlUser* theUser, std::string topic)
+const std::string chanfix::getHelpMessage(sqlcfUser* theUser, std::string topic)
 {
 int lang_id = 1;
 
@@ -2679,7 +3331,7 @@ theManager->removeConnection(cacheCon);
 return;
 }
 
-const std::string chanfix::getResponse( sqlUser* theUser,
+const std::string chanfix::getResponse( sqlcfUser* theUser,
 	int response_id, std::string msg )
 {
 
@@ -2794,8 +3446,8 @@ if (cacheCon->Status() == CONNECTION_BAD) { //Check if the connection has died
   MsgChanLog("Attempting to reconnect, Attempt %d out of %d\n",
 	     connectCount+1,connectRetry+1);
   std::string Query = "host=" + sqlHost + " dbname=" + sqlDB + " port=" + sqlPort;
-  if (strcasecmp(sqlUser,"''"))
-    Query += (" user=" + sqlUser);
+  if (strcasecmp(sqlcfUser,"''"))
+    Query += (" user=" + sqlcfUser);
   if (strcasecmp(sqlPass,"''"))
     Query += (" password=" + sqlPass);
   theManager = new (std::nothrow) cmDatabase(Query.c_str());
@@ -2850,7 +3502,7 @@ for(serversIterator ptr = serversMap.begin();ptr != serversMap.end();++ptr)
 
 void Command::Usage( iClient* theClient )
 {
-sqlUser* theUser = bot->isAuthed(theClient->getAccount());
+sqlcfUser* theUser = bot->isAuthed(theClient->getAccount());
 bot->SendTo(theClient,
             bot->getResponse(theUser,
                              language::syntax,

@@ -1,4 +1,4 @@
-# $Id: chanfix.example.conf.in,v 1.4 2006/04/05 02:37:35 buzlip01 Exp $
+# $Id: chanfix.example.conf.in,v 1.5 2006/12/09 00:29:19 buzlip01 Exp $
 # chanfix configuration file
 
 # ---------------------------------------------------------------------
@@ -27,7 +27,7 @@ sqlPort = 5432
 # Name of database
 sqlDB   = chanfix
 # If you don't need user/pass just put "" for option(s) below
-sqlUser = evilnet
+sqlcfUser = evilnet
 sqlPass = ""
 
 # ---------------------------------------------------------------------
@@ -61,11 +61,47 @@ enableChanFix = true
 # Can channels be blocked by admins?
 enableChannelBlocking = true
 
+# Should chanfix join the channel its fixing? this avoids the hopping issue
+joinChannels = true
+
+# Should chanfix send notices saying the channel is being fixed for auto
+# fixes. Also a notice after its finished saying its done?
+autoFixNotice = true
+
+# Should chanfix send notices saying the channel is being fixed for manual
+# fixes Also a notice after its finished saying its done?
+manualFixNotice = true
+
 # Should auto fixes stop if an already reopped user ops another user?
 stopAutoFixOnOp = true
 
 # Should manual fixes stop if an already reopped user ops another user?
 stopChanFixOnOp = true
+
+# Should the top ops be allowed to perform fixes on their own channels?
+allowTopOpFix = false
+
+# Should the top op fixes be able to alert the top 10 ops who are not in
+# the channel at the time of the fix automatically? If no/false then the
+# database help entry for REQUESTOP will need to be updated.
+allowTopOpAlert = true
+
+# How much percentage within the top score should the top ops score be
+# before they are allowed to perform fixes. Dont include a %.
+topOpPercent = 10
+
+# Minimum score an op has be before they can issue fixes in their own
+# channel without requiring an oper to do them.
+minFixScore = 1000
+
+# Minimum score an op has to be before they can use the CANFIX command for
+# a channel they are ops in.
+minCanFixScore = 500
+
+# Minimum time required between REQUESTOP fixes. (In seconds). The last
+# fix time is updated at the start of a fix so allow time for the first
+# fix aswell as time for a gap.
+minRequestOpTime = 720
 
 # ---------------------------------------------------------------------
 # Network settings

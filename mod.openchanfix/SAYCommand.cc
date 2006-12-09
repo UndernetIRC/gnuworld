@@ -1,10 +1,10 @@
 /**
- * QUOTECommand.cc
+ * SAYCommand.cc
  *
- * 18/12/2003 - Reed Loden <reed@reedloden.com>
+ * 08/16/2006 - Jimmy Lipham <music0m@alltel.net>
  * Initial Version
  *
- * Sends raw P10 code to the server
+ * Displays <text> in <#channel>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
  * USA.
  *
- * $Id: QUOTECommand.cc,v 1.4 2006/12/09 00:29:19 buzlip01 Exp $
+ * $Id: SAYCommand.cc,v 1.1 2006/12/09 00:29:19 buzlip01 Exp $
  */
 
 #include	<string>
@@ -31,38 +31,36 @@
 
 #include	"chanfix.h"
 #include	"responses.h"
+#include	"Network.h"
 
-RCSTAG("$Id: QUOTECommand.cc,v 1.4 2006/12/09 00:29:19 buzlip01 Exp $");
 
 namespace gnuworld
 {
 namespace cf
 {
 
-void QUOTECommand::Exec(iClient* theClient, sqlcfUser* theUser, const std::string& Message)
+void SAYCommand::Exec(iClient* theClient, sqlcfUser* theUser, const std::string& Message)
 {
-#ifndef ENABLE_QUOTE
-return;
-#endif
-
-if (!theUser->getNeedOper()) {
-  bot->SendTo(theClient,
-	bot->getResponse(theUser,
-			 language::unknown_command,
-			 std::string("Unknown command.")).c_str());
-  return;
-}
-
 StringTokenizer st(Message);
 
-bot->Write( st.assemble(1) );
+std::string option = st[1];
+std::string value = st.assemble(2);
 
-bot->logAdminMessage("%s (%s) QUOTE %s",
+bot->logAdminMessage("%s (%s) SAY %s %s",
 		     theUser->getUserName().c_str(),
 		     theClient->getRealNickUserHost().c_str(),
-		     st.assemble(1).c_str());
+		     option.c_str(), value.c_str());
 
 bot->logLastComMessage(theClient, Message);
+
+Channel* thisChan = Network->findChannel(option);
+
+if (!thisChan)
+	bot->SendTo(theClient,
+		"The channel %s does not exist on the network.",
+		option.c_str());
+else
+	bot->Message(thisChan,value);
 
 return;
 }

@@ -1,10 +1,10 @@
 /**
- * LISTBLOCKEDCommand.cc
+ * LISTTEMPBLOCKEDCommand.cc
  *
- * 03/25/2006 - Jimmy Lipham <music0m@alltel.net>
+ * 26/09/2006 - Neil Spierling <sirvulcan@gmail.com>
  * Initial Version
  *
- * Lists all blocked chans that chanfix has stored
+ * Lists all temp blocked chans that chanfix has stored
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: LISTBLOCKEDCommand.cc,v 1.2 2006/12/09 00:29:18 buzlip01 Exp $
+ * $Id: LISTTEMPBLOCKEDCommand.cc,v 1.1 2006/12/09 00:29:18 buzlip01 Exp $
  */
 
 #include "gnuworld_config.h"
@@ -33,14 +33,15 @@
 #include "sqlChannel.h"
 #include "sqlcfUser.h"
 
-RCSTAG("$Id: LISTBLOCKEDCommand.cc,v 1.2 2006/12/09 00:29:18 buzlip01 Exp $");
+RCSTAG("$Id: LISTTEMPBLOCKEDCommand.cc,v 1.1 2006/12/09 00:29:18 buzlip01 Exp $");
 
 namespace gnuworld
 {
 namespace cf
 {
-void LISTBLOCKEDCommand::Exec(iClient* theClient, sqlcfUser* theUser, const std::string& Message)
+void LISTTEMPBLOCKEDCommand::Exec(iClient* theClient, sqlcfUser* theUser, const std::string& Message)
 {
+int numBlocks = 0;
 
 /* Check if channel blocking has been disabled in the config. */
 if (!bot->doChanBlocking()) {
@@ -51,54 +52,29 @@ if (!bot->doChanBlocking()) {
   return;
 }
 
-/* List blocks */
-PgDatabase* cacheCon = bot->theManager->getConnection();
-
-std::stringstream theQuery;
-theQuery << "SELECT channel FROM channels WHERE (flags & "
-	 << sqlChannel::F_BLOCKED
-	 << ") = "
-	 << sqlChannel::F_BLOCKED
-	 << " ORDER BY channel ASC";
-
-if (!cacheCon->ExecTuplesOk(theQuery.str().c_str())) {
-  elog	<< "chanfix::LISTBLOCKEDCommand> SQL Error: "
-		<< cacheCon->ErrorMessage()
-		<< std::endl;
-  return;
-}
-
-// SQL query returned no errors
-unsigned int numBlocks = 0;
-std::string strBlocks;
 bot->SendTo(theClient,
 	bot->getResponse(theUser,
-		language::listblocks_blocked_chans,
-		std::string("List of all blocked channels:")).c_str());
+		language::list_temp_blocked_chans,
+		std::string("List of all temp blocked channels:")).c_str());
 
-for (int i = 0 ; i < cacheCon->Tuples(); i++) {
-  strBlocks += cacheCon->GetValue(i, 0);
-  strBlocks += " ";
-  if (strBlocks.size() >= 410) {
-    bot->SendTo(theClient, strBlocks.c_str());
-    strBlocks = "";
+
+for (xNetwork::channelIterator cptr = Network->channels_begin(); cptr != Network->channels_end() ; ++cptr ) {
+  Channel* thisChan = cptr->second ;
+  bool isBlocked = bot->isTempBlocked(thisChan->getName());
+
+  if (isBlocked) {
+      bot->SendTo(theClient, thisChan->getName());
+      numBlocks++;
   }
-  numBlocks++;
 }
 
-/* Dispose of our connection instance */
-bot->theManager->removeConnection(cacheCon);
-
-if (strBlocks.size())
-  bot->SendTo(theClient, strBlocks.c_str());
-
 bot->SendTo(theClient,
-	bot->getResponse(theUser,
-		language::listblocked_total_blocked,
-		std::string("%d channels blocked.")).c_str(),
+  	bot->getResponse(theUser,
+		language::list_total_temp_blocked,
+		std::string("%d channels temp blocked.")).c_str(),
 		numBlocks);
 
-bot->logAdminMessage("%s (%s) LISTBLOCKED",
+bot->logAdminMessage("%s (%s) LISTTEMPBLOCKED",
 		     theUser->getUserName().c_str(),
 		     theClient->getRealNickUserHost().c_str());
 

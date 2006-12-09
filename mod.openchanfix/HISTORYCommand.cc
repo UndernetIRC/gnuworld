@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: HISTORYCommand.cc,v 1.3 2006/04/05 02:37:34 buzlip01 Exp $
+ * $Id: HISTORYCommand.cc,v 1.4 2006/12/09 00:29:18 buzlip01 Exp $
  */
 
 #include "gnuworld_config.h"
@@ -30,16 +30,16 @@
 #include "responses.h"
 #include "StringTokenizer.h"
 #include "sqlChannel.h"
-#include "sqlUser.h"
+#include "sqlcfUser.h"
 
-RCSTAG("$Id: HISTORYCommand.cc,v 1.3 2006/04/05 02:37:34 buzlip01 Exp $");
+RCSTAG("$Id: HISTORYCommand.cc,v 1.4 2006/12/09 00:29:18 buzlip01 Exp $");
 
 namespace gnuworld
 {
 namespace cf
 {
 
-void HISTORYCommand::Exec(iClient* theClient, sqlUser* theUser, const std::string& Message)
+void HISTORYCommand::Exec(iClient* theClient, sqlcfUser* theUser, const std::string& Message)
 {
 StringTokenizer st(Message);
 
@@ -64,9 +64,11 @@ chanfixQuery	<< "SELECT ts "
 		<< "FROM notes "
 		<< "WHERE channelID = "
 		<< theChan->getID()
-		<< " AND event = "
+		<< " AND (event = "
 		<< sqlChannel::EV_CHANFIX
-		<< " ORDER BY ts DESC"
+		<< " OR event = "
+		<< sqlChannel::EV_REQUESTOP
+		<< ") ORDER BY ts DESC"
 		;
 
 if (!cacheCon->ExecTuplesOk(chanfixQuery.str().c_str())) {
@@ -117,6 +119,8 @@ bot->logAdminMessage("%s (%s) HISTORY %s",
 		     theUser ? theUser->getUserName().c_str() : "!NOT-LOGGED-IN!",
 		     theClient->getRealNickUserHost().c_str(),
 		     theChan->getChannel().c_str());
+
+bot->logLastComMessage(theClient, Message);
 
 return;
 }

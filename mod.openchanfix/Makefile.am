@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-# "$Id: Makefile.am,v 1.4 2006/04/05 02:37:35 buzlip01 Exp $"
+# "$Id: Makefile.am,v 1.5 2006/12/09 00:29:18 buzlip01 Exp $"
 
 lib_LTLIBRARIES = libchanfix.la
 
@@ -10,6 +10,7 @@ libchanfix_la_SOURCES = chanfix.cc \
 	ADDUSERCommand.cc \
 	ALERTCommand.cc \
 	BLOCKCommand.cc \
+	CANFIXCommand.cc \
 	CHANFIXCommand.cc \
 	CHECKCommand.cc \
 	DEBUGCommand.cc \
@@ -21,22 +22,29 @@ libchanfix_la_SOURCES = chanfix.cc \
 	HISTORYCommand.cc \
 	INFOCommand.cc \
 	INVITECommand.cc \
+	LASTCOMCommand.cc \
 	LISTBLOCKEDCommand.cc \
 	LISTHOSTSCommand.cc \
+	LISTTEMPBLOCKEDCommand.cc \
 	OPLISTCommand.cc \
 	OPNICKSCommand.cc \
 	QUOTECommand.cc \
 	REHASHCommand.cc \
 	RELOADCommand.cc \
+	REQUESTOPCommand.cc \
 	SCORECommand.cc \
+	SAYCommand.cc \
 	SETCommand.cc \
 	SETGROUPCommand.cc \
 	SHUTDOWNCommand.cc \
+	SIMULATECommand.cc \
 	STATUSCommand.cc \
 	SUSPENDCommand.cc \
+	TEMPBLOCKCommand.cc \
 	UNALERTCommand.cc \
 	UNBLOCKCommand.cc \
 	UNSUSPENDCommand.cc \
+	UNTEMPBLOCKCommand.cc \
 	USERSCORESCommand.cc \
 	USETCommand.cc \
 	WHOGROUPCommand.cc \
@@ -44,7 +52,7 @@ libchanfix_la_SOURCES = chanfix.cc \
 	sqlChanOp.cc \
 	sqlChannel.cc \
 	sqlManager.cc \
-	sqlUser.cc
+	sqlcfUser.cc
 
 libchanfix_la_CXXFLAGS = -I$(PGSQL_INCLUDE) -I${top_srcdir}/include \
 	-I${top_srcdir}/libgnuworld \
@@ -63,7 +71,7 @@ EXTRA_DIST = chanfix.h \
 	sqlChanOp.h \
 	sqlChannel.h \
 	sqlManager.h \
-	sqlUser.h \
+	sqlcfUser.h \
         $(COMMAND_CONF)
 
 confdir=${prefix}/bin

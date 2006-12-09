@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: UNBLOCKCommand.cc,v 1.3 2006/04/05 02:37:35 buzlip01 Exp $
+ * $Id: UNBLOCKCommand.cc,v 1.4 2006/12/09 00:29:19 buzlip01 Exp $
  */
 
 #include "gnuworld_config.h"
@@ -30,16 +30,16 @@
 #include "responses.h"
 #include "StringTokenizer.h"
 #include "sqlChannel.h"
-#include "sqlUser.h"
+#include "sqlcfUser.h"
 
-RCSTAG("$Id: UNBLOCKCommand.cc,v 1.3 2006/04/05 02:37:35 buzlip01 Exp $");
+RCSTAG("$Id: UNBLOCKCommand.cc,v 1.4 2006/12/09 00:29:19 buzlip01 Exp $");
 
 namespace gnuworld
 {
 namespace cf
 {
 
-void UNBLOCKCommand::Exec(iClient* theClient, sqlUser* theUser, const std::string& Message)
+void UNBLOCKCommand::Exec(iClient* theClient, sqlcfUser* theUser, const std::string& Message)
 {
 StringTokenizer st(Message);
 
@@ -79,7 +79,7 @@ else
   theChan->commit();
 
 /* Add note to the channel about this command */
-theChan->addNote(sqlChannel::EV_UNBLOCK, theUser, "");
+theChan->addNote(sqlChannel::EV_UNBLOCK, theClient, "");
 
 bot->SendTo(theClient,
             bot->getResponse(theUser,
@@ -92,6 +92,8 @@ bot->logAdminMessage("%s (%s) UNBLOCK %s",
 		     theUser->getUserName().c_str(),
 		     theClient->getRealNickUserHost().c_str(),
 		     theChan->getChannel().c_str());
+
+bot->logLastComMessage(theClient, Message);
 
 return;
 }

@@ -16,14 +16,15 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
  * USA.
  *
- * $Id: sqlChannel.h,v 1.3 2006/04/05 02:37:35 buzlip01 Exp $
+ * $Id: sqlChannel.h,v 1.4 2006/12/09 00:29:20 buzlip01 Exp $
  */
 
 #ifndef __SQLCHANNEL_H
-#define __SQLCHANNEL_H "$Id: sqlChannel.h,v 1.3 2006/04/05 02:37:35 buzlip01 Exp $"
+#define __SQLCHANNEL_H "$Id: sqlChannel.h,v 1.4 2006/12/09 00:29:20 buzlip01 Exp $"
 
 #include	<string>
 #include	<ctime>
+#include	"client.h"
 #include	"libpq++.h"
 
 namespace gnuworld
@@ -32,7 +33,7 @@ namespace gnuworld
 namespace cf
 {
 
-class sqlUser;
+class sqlcfUser;
 class sqlManager;
 
 class sqlChannel
@@ -56,10 +57,14 @@ public:
 	static const int	EV_MISC; /* Uncategorised event */
 	static const int	EV_NOTE; /* Miscellaneous notes */
 	static const int	EV_CHANFIX; /* Manual chanfixes */
+	static const int	EV_SIMULATE; /* Fix simulation */
 	static const int	EV_BLOCK; /* Channel block */
+	static const int	EV_TEMPBLOCK; /* Temp channel block */
+	static const int	EV_UNTEMPBLOCK; /* Temp channel block */
 	static const int	EV_UNBLOCK; /* Channel unblock */
 	static const int	EV_ALERT; /* Channel alert */
 	static const int	EV_UNALERT; /* Channel unalert */
+	static const int	EV_REQUESTOP; /* Requestops */
 
 	/*
 	 *  Methods to get data atrributes.
@@ -81,14 +86,29 @@ public:
 	inline time_t		getLastAttempt() const
 		{ return last ; }
 
+	inline time_t		getLastSimAttempt() const
+		{ return simlast ; }
+
 	inline time_t		getFixStart() const
 		{ return start ; }
+
+	inline time_t		getSimStart() const
+		{ return simstart ; }
 
 	inline unsigned int	getMaxScore() const
 		{ return maxScore ; }
 
+	inline unsigned int	getAmountSimOpped() const
+		{ return amtopped ; }
+
+	inline unsigned int	getTMaxScore() const
+		{ return tmaxScore ; }
+
 	inline bool		getModesRemoved() const
 		{ return modesRemoved ; }
+
+	inline bool		getSimModesRemoved() const
+		{ return simModesRemoved ; }
 
 	inline bool		useSQL() const
 		{ return inSQL ; }
@@ -117,14 +137,29 @@ public:
 	inline void     setLastAttempt (time_t _last)
 		{ last = _last; }
 
+	inline void     setLastSimAttempt (time_t _simlast)
+		{ simlast = _simlast; }
+
 	inline void	setFixStart(time_t _start)
 		{ start = _start; }
+
+	inline void	setSimStart(time_t _simstart)
+		{ simstart = _simstart; }
+
+	inline void	setAmountSimOpped(unsigned int _amtopped)
+		{ amtopped = _amtopped; }
 
 	inline void	setMaxScore(unsigned int _maxScore)
 		{ maxScore = _maxScore; }
 
+	inline void	setTMaxScore(unsigned int _tmaxScore)
+		{ tmaxScore = _tmaxScore; }
+
 	inline void	setModesRemoved(bool _modesRemoved)
 		{ modesRemoved = _modesRemoved; }
+
+	inline void	setSimModesRemoved(bool _simModesRemoved)
+		{ simModesRemoved = _simModesRemoved; }
 
 	inline void	setUseSQL(bool _inSQL)
 		{ inSQL = _inSQL; }
@@ -137,7 +172,7 @@ public:
 	/** Static member for keeping track of max user id */
 	static unsigned long int maxUserId;
 
-	void addNote(unsigned short, sqlUser*, const std::string&);
+	void addNote(unsigned short, iClient*, const std::string&);
 	bool deleteNote(unsigned int);
 	bool deleteOldestNote();
 	bool deleteAllNotes();
@@ -148,10 +183,16 @@ protected:
 
 	unsigned int	id;
 	std::string	channel;
+	std::string	user_name;
 	time_t		last;
+	time_t		simlast;
 	time_t		start;
+	time_t		simstart;
+	unsigned int	amtopped;
 	unsigned int	maxScore;
+	unsigned int	tmaxScore;
 	bool		modesRemoved;
+	bool		simModesRemoved;
 	flagType	flags;
 	bool		inSQL;
 

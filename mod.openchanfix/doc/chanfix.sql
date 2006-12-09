@@ -1,7 +1,7 @@
 -- mod.chanfix SQL Database Script
 -- (c) 2003 Matthias Crauwels <ultimate_@wol.be>
 -- (c) 2005 Reed Loden <reed@reedloden.com>
--- $Id: chanfix.sql,v 1.3 2006/04/05 02:37:35 buzlip01 Exp $
+-- $Id: chanfix.sql,v 1.4 2006/12/09 00:29:20 buzlip01 Exp $
 
 CREATE TABLE languages (
         id SERIAL,
@@ -102,7 +102,7 @@ CREATE TABLE notes (
 	id SERIAL,
 	ts INT4,
 	channelID INT4 CONSTRAINT notes_channelID_ref REFERENCES channels ( id ),
-	userID INT4 CONSTRAINT notes_userID_ref REFERENCES users ( id ),
+	user_name VARCHAR(128),
 	event INT2 DEFAULT 0,
 	-- Defines the note event type, so we can filter nice reports.
 -- 1  -- EV_MISC - Uncategorised event.
@@ -112,11 +112,17 @@ CREATE TABLE notes (
 -- 5  -- EV_UNBLOCK - When somebody unblocks a channel.
 -- 6  -- EV_ALERT - When someone sets alert flag on a channel.
 -- 7  -- EV_UNALERT - When somebody removes alert flag from a channel.
-	message TEXT,
+-- 8  -- EV_REQUESTOPS - When a normal client requestops a channel.
 
-	PRIMARY KEY(id, channelID, userID)
+	message TEXT,
+	PRIMARY KEY(id, channelID)
+);
+
+CREATE TABLE comlog (
+	ts INT4 NOT NULL,
+	user_name text,
+	command VARCHAR(512)
 );
 
 CREATE INDEX notes_channelID_idx ON notes(channelID);
-CREATE INDEX notes_userID_idx ON notes(userID);
 CREATE INDEX notes_event_idx ON notes(event);

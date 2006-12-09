@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: WHOGROUPCommand.cc,v 1.3 2006/04/05 02:37:35 buzlip01 Exp $
+ * $Id: WHOGROUPCommand.cc,v 1.4 2006/12/09 00:29:19 buzlip01 Exp $
  */
 
 #include "gnuworld_config.h"
@@ -29,16 +29,16 @@
 #include "chanfix.h"
 #include "responses.h"
 #include "StringTokenizer.h"
-#include "sqlUser.h"
+#include "sqlcfUser.h"
 
-RCSTAG("$Id: WHOGROUPCommand.cc,v 1.3 2006/04/05 02:37:35 buzlip01 Exp $");
+RCSTAG("$Id: WHOGROUPCommand.cc,v 1.4 2006/12/09 00:29:19 buzlip01 Exp $");
 
 namespace gnuworld
 {
 namespace cf
 {
 
-void WHOGROUPCommand::Exec(iClient* theClient, sqlUser* theUser, const std::string& Message)
+void WHOGROUPCommand::Exec(iClient* theClient, sqlcfUser* theUser, const std::string& Message)
 {
 StringTokenizer st(Message);
 
@@ -86,8 +86,8 @@ if (st.size() == 1) {
 }
 	
 /* A serveradmin can only WHOGROUP on his/her own group. */
-if (theUser->getFlag(sqlUser::F_SERVERADMIN) &&
-    !theUser->getFlag(sqlUser::F_USERMANAGER)) {
+if (theUser->getFlag(sqlcfUser::F_SERVERADMIN) &&
+    !theUser->getFlag(sqlcfUser::F_USERMANAGER)) {
   if (string_lower(st[1]) != theUser->getGroup()) {
     bot->SendTo(theClient,
                 bot->getResponse(theUser,
@@ -107,7 +107,7 @@ std::string groupUsers;
 unsigned int numUsersInGroup = 0;
 chanfix::usersIterator ptr = bot->usersMap_begin();
 while (ptr != bot->usersMap_end()) {
-  sqlUser* tmpUser = ptr->second;
+  sqlcfUser* tmpUser = ptr->second;
   if (tmpUser->getGroup() == string_lower(st[1])) {
     if (numUsersInGroup++ && !groupUsers.empty())
       groupUsers += " ";
@@ -131,6 +131,8 @@ bot->SendTo(theClient,
 			language::number_of_users,
 			std::string("Number of users: %d.")).c_str(),
 			numUsersInGroup);
+
+bot->logLastComMessage(theClient, Message);
 
 return;
 } //WHOGROUPCommand::Exec

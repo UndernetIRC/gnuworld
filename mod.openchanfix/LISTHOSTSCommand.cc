@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: LISTHOSTSCommand.cc,v 1.3 2006/04/05 02:37:35 buzlip01 Exp $
+ * $Id: LISTHOSTSCommand.cc,v 1.4 2006/12/09 00:29:18 buzlip01 Exp $
  */
 
 #include "gnuworld_config.h"
@@ -29,20 +29,20 @@
 #include "chanfix.h"
 #include "responses.h"
 #include "StringTokenizer.h"
-#include "sqlUser.h"
+#include "sqlcfUser.h"
 
-RCSTAG("$Id: LISTHOSTSCommand.cc,v 1.3 2006/04/05 02:37:35 buzlip01 Exp $");
+RCSTAG("$Id: LISTHOSTSCommand.cc,v 1.4 2006/12/09 00:29:18 buzlip01 Exp $");
 
 namespace gnuworld
 {
 namespace cf
 {
 
-void LISTHOSTSCommand::Exec(iClient* theClient, sqlUser* theUser, const std::string& Message)
+void LISTHOSTSCommand::Exec(iClient* theClient, sqlcfUser* theUser, const std::string& Message)
 {	 
 StringTokenizer st(Message);
 
-sqlUser* targetUser;
+sqlcfUser* targetUser;
 if (st.size() == 2)
   targetUser = bot->isAuthed(st[1]);
 else
@@ -57,7 +57,7 @@ if (!targetUser) {
   return;
 }
 
-sqlUser::flagType requiredFlags = sqlUser::F_USERMANAGER | sqlUser::F_SERVERADMIN;
+sqlcfUser::flagType requiredFlags = sqlcfUser::F_USERMANAGER | sqlcfUser::F_SERVERADMIN;
 if ((targetUser != theUser) && !theUser->getFlag(requiredFlags)) {
   bot->SendTo(theClient,
 	      bot->getResponse(theUser,
@@ -68,8 +68,8 @@ if ((targetUser != theUser) && !theUser->getFlag(requiredFlags)) {
 }
 
 /* A serveradmin can only view hosts of users in his/her own group. */
-if (theUser->getFlag(sqlUser::F_SERVERADMIN) &&
-    !theUser->getFlag(sqlUser::F_USERMANAGER)) {
+if (theUser->getFlag(sqlcfUser::F_SERVERADMIN) &&
+    !theUser->getFlag(sqlcfUser::F_USERMANAGER)) {
   if (targetUser->getGroup() != theUser->getGroup()) {
     bot->SendTo(theClient,
 		bot->getResponse(theUser,
@@ -85,9 +85,9 @@ bot->SendTo(theClient,
 			std::string("Host list for %s:")).c_str(),
 			targetUser->getUserName().c_str());
 
-sqlUser::hostListType sqlHostList = targetUser->getHostList();
+sqlcfUser::hostListType sqlHostList = targetUser->getHostList();
 if (!sqlHostList.empty()) {
-  for (sqlUser::hostListType::iterator itr = sqlHostList.begin();
+  for (sqlcfUser::hostListType::iterator itr = sqlHostList.begin();
        itr != sqlHostList.end(); ++itr)
     bot->SendTo(theClient, *itr);
 } else {
@@ -103,6 +103,8 @@ bot->logAdminMessage("%s (%s) LISTHOSTS %s",
 		     theUser->getUserName().c_str(),
 		     theClient->getRealNickUserHost().c_str(),
 		     targetUser->getUserName().c_str());
+
+bot->logLastComMessage(theClient, Message);
 
 return;
 } //LISTHOSTSCommand::Exec

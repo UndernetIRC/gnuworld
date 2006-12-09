@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ADDUSERCommand.cc,v 1.3 2006/04/05 02:37:34 buzlip01 Exp $
+ * $Id: ADDUSERCommand.cc,v 1.4 2006/12/09 00:29:18 buzlip01 Exp $
  */
 
 #include "gnuworld_config.h"
@@ -30,19 +30,19 @@
 #include "chanfix.h"
 #include "responses.h"
 #include "StringTokenizer.h"
-#include "sqlUser.h"
+#include "sqlcfUser.h"
 
-RCSTAG("$Id: ADDUSERCommand.cc,v 1.3 2006/04/05 02:37:34 buzlip01 Exp $");
+RCSTAG("$Id: ADDUSERCommand.cc,v 1.4 2006/12/09 00:29:18 buzlip01 Exp $");
 
 namespace gnuworld
 {
 namespace cf
 {
-void ADDUSERCommand::Exec(iClient* theClient, sqlUser* theUser, const std::string& Message)
+void ADDUSERCommand::Exec(iClient* theClient, sqlcfUser* theUser, const std::string& Message)
 {
 StringTokenizer st(Message);
 
-sqlUser* targetUser = bot->isAuthed(st[1]);
+sqlcfUser* targetUser = bot->isAuthed(st[1]);
 if (targetUser) {
   bot->SendTo(theClient,
               bot->getResponse(theUser,
@@ -51,7 +51,7 @@ if (targetUser) {
   return;
 }
 
-sqlUser *newUser = new sqlUser(bot->theManager);
+sqlcfUser *newUser = new sqlcfUser(bot->theManager);
 assert(newUser != 0);
 newUser->setUserName(st[1]);
 newUser->setCreated(bot->currentTime());
@@ -64,8 +64,8 @@ newUser->setLastUpdatedBy( std::string( "("
 	+ theClient->getRealNickUserHost() ) );
 
 /* A user added by a serveradmin automatically has the same group. */
-if (theUser->getFlag(sqlUser::F_SERVERADMIN) &&
-    !theUser->getFlag(sqlUser::F_USERMANAGER))
+if (theUser->getFlag(sqlcfUser::F_SERVERADMIN) &&
+    !theUser->getFlag(sqlcfUser::F_USERMANAGER))
   newUser->setGroup(theUser->getGroup());
 else
   newUser->setGroup("undernet.org");
@@ -110,6 +110,8 @@ if (st.size() > 2) {
 		       theClient->getRealNickUserHost().c_str(),
 		       st[1].c_str());
 }
+
+bot->logLastComMessage(theClient, Message);
 
 return;
 } //ADDUSERCommand::Exec

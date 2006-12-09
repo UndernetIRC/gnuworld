@@ -1,10 +1,10 @@
 /**
- * CHANFIXCommand.cc
+ * SIMULATECommand.cc
  *
- * 01/01/2004 - Reed Loden <reed@reedloden.com>
+ * 28/09/2006 - Neil Spierling
  * Initial Version
  *
- * Manually fix a channel
+ * Simulate a fix on a channel
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: CHANFIXCommand.cc,v 1.4 2006/12/09 00:29:18 buzlip01 Exp $
+ * $Id: SIMULATECommand.cc,v 1.1 2006/12/09 00:29:19 buzlip01 Exp $
  */
 
 #include "gnuworld_config.h"
@@ -30,50 +30,33 @@
 #include "chanfix.h"
 #include "responses.h"
 #include "StringTokenizer.h"
+#include "sqlChannel.h"
+#include "sqlcfUser.h"
 
-RCSTAG("$Id: CHANFIXCommand.cc,v 1.4 2006/12/09 00:29:18 buzlip01 Exp $");
+RCSTAG("$Id: SIMULATECommand.cc,v 1.1 2006/12/09 00:29:19 buzlip01 Exp $");
 
 namespace gnuworld
 {
 namespace cf
 {
 
-void CHANFIXCommand::Exec(iClient* theClient, sqlcfUser* theUser, const std::string& Message)
+void SIMULATECommand::Exec(iClient* theClient, sqlcfUser* theUser, const std::string& Message)
 {
 StringTokenizer st(Message);
 
-bool override = false;
-bool alert = false;
+bool autof = false;
 
 if (st.size() > 2) {
   unsigned int pos = 2;
   while(pos < st.size()) {
-    if (!strcasecmp(st[pos],"OVERRIDE"))
-      override = true;
+    if (!strcasecmp(st[pos],"AUTO"))
+      autof = true;
 
-    if (!strcasecmp(st[pos],"NOW"))
-      override = true;
-
-    if (!strcasecmp(st[pos],"YES"))
-      override = true;
-
-    if (!strcasecmp(st[pos],"!"))
-      override = true;
-
-    if (!strcasecmp(st[pos],"CONTACT"))
-      alert = true;
+    if (!strcasecmp(st[pos],"MANUAL"))
+      autof = false;
 
     pos++;
   }
-}
-
-/* Check if manual chanfix has been disabled in the config. */
-if (!bot->doChanFix()) {
-  bot->SendTo(theClient,
-              bot->getResponse(theUser,
-                              language::manual_fix_disabled,
-                              std::string("Sorry, manual chanfixes are currently disabled.")).c_str());
-  return;
 }
 
 /* If not enough servers are currently linked, bail out. */
@@ -103,7 +86,6 @@ if (!bot->canScoreChan(netChan)) {
   return;
 }
 
-/* Only allow chanfixes for channels that are in the database. */
 chanfix::chanOpsType myOps = bot->getMyOps(netChan);
 if (myOps.empty()) {
   bot->SendTo(theClient,
@@ -114,7 +96,6 @@ if (myOps.empty()) {
   return;
 }
 
-/* Don't fix a channel being chanfixed. */
 if (bot->isBeingChanFixed(netChan)) {
   bot->SendTo(theClient,
               bot->getResponse(theUser,
@@ -127,7 +108,6 @@ if (bot->isBeingChanFixed(netChan)) {
 sqlChannel* theChan = bot->getChannelRecord(st[1]);
 if (!theChan) theChan = bot->newChannelRecord(st[1]);
 
-/* Check if the highest score is high enough for a fix. */
 if (myOps.begin() != myOps.end())
   theChan->setMaxScore((*myOps.begin())->getPoints());
 
@@ -145,23 +125,6 @@ if (theChan->getMaxScore() <=
   return;
 }
 
-/* Don't fix a channel being autofixed without OVERRIDE flag. */
-if (bot->isBeingAutoFixed(netChan)) {
-  if (!override) {
-    bot->SendTo(theClient,
-                bot->getResponse(theUser,
-                                language::channel_being_auto_fixed,
-                                std::string("The channel %s is being automatically fixed. Append the OVERRIDE flag to force a manual fix.")).c_str(),
-                                            netChan->getName().c_str());
-    return;
-  } else {
-    /* We're going to manually fix this instead of autofixing it,
-     * so remove this channel from the autofix queue. */
-    bot->removeFromAutoQ(netChan);
-  }
-}
-
-/* Don't fix a blocked channel. */
 if (theChan->getFlag(sqlChannel::F_BLOCKED)) {
   bot->SendTo(theClient,
               bot->getResponse(theUser,
@@ -171,7 +134,6 @@ if (theChan->getFlag(sqlChannel::F_BLOCKED)) {
   return;
 }
 
-/* Don't fix a blocked channel. */
 if (bot->isTempBlocked(theChan->getChannel())) {
   bot->SendTo(theClient,
               bot->getResponse(theUser,
@@ -181,41 +143,36 @@ if (bot->isTempBlocked(theChan->getChannel())) {
   return;
 }
 
-/* Don't fix an alerted channel without the OVERRIDE flag. */
-if (theChan->getFlag(sqlChannel::F_ALERT) && !override) {
-  bot->SendTo(theClient,
-              bot->getResponse(theUser,
-                              language::channel_has_notes,
-                              std::string("Alert: The channel %s has notes. Use \002INFO %s\002 to read them. Append the OVERRIDE flag to force a manual fix.")).c_str(),
-                                          theChan->getChannel().c_str(), theChan->getChannel().c_str());
-  return;
-}
-
-/* Add the channel to the SQL database if it hasn't already been added */
 if (!theChan->useSQL())
   theChan->Insert();
 
-/* Alert top ops out of the channel if wanted */
-if (alert)
-  bot->msgTopOps(netChan);
-
-/* Fix the channel */
-bot->manualFix(netChan);
-
-/* Add note to the channel about this manual fix */
-theChan->addNote(sqlChannel::EV_CHANFIX, theClient, (override) ? "[override]" : "");
-
-/* Log the chanfix */
 bot->SendTo(theClient,
             bot->getResponse(theUser,
-                            language::manual_chanfix_ack,
-                            std::string("Manual chanfix acknowledged for %s")).c_str(),
+                            language::manual_simulate_starting,
+                            std::string("Simulate for %s (%s) starting at next fixing round (Current C time %s).")).c_str(),
+                                        netChan->getName().c_str(), ((autof == true) ? "AUTO" : "MANUAL"), 
+                                        bot->tsToDateTime(bot->currentTime(), true).c_str());
+
+bot->SendTo(theClient,
+            bot->getResponse(theUser,
+                            language::manual_simulate_estimate,
+                            std::string("NOTE: This is only an estimate, if ops with points join or part it could affect who gets opped.")).c_str());
+
+sqlChannel* sqlChan = bot->getChannelRecord(st[1]);
+bot->simulateFix(sqlChan, autof, theClient, theUser);
+
+theChan->addNote(sqlChannel::EV_SIMULATE, theClient, (autof) ? "[auto]" : "[manual]");
+
+bot->SendTo(theClient,
+            bot->getResponse(theUser,
+                            language::manual_simulate_complete,
+                            std::string("Simulate complete for %s")).c_str(),
                                         netChan->getName().c_str());
-bot->logAdminMessage("%s (%s) CHANFIX %s%s",
+
+bot->logAdminMessage("%s (%s) SIMULATE %s",
 		     theUser->getUserName().c_str(),
 		     theClient->getRealNickUserHost().c_str(),
-		     netChan->getName().c_str(),
-		     (override) ? " [override]" : "");
+		     netChan->getName().c_str());
 
 bot->logLastComMessage(theClient, Message);
 

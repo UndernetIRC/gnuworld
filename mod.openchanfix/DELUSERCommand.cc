@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: DELUSERCommand.cc,v 1.3 2006/04/05 02:37:34 buzlip01 Exp $
+ * $Id: DELUSERCommand.cc,v 1.4 2006/12/09 00:29:18 buzlip01 Exp $
  */
 
 #include "gnuworld_config.h"
@@ -29,20 +29,20 @@
 #include "chanfix.h"
 #include "responses.h"
 #include "StringTokenizer.h"
-#include "sqlUser.h"
+#include "sqlcfUser.h"
 
-RCSTAG("$Id: DELUSERCommand.cc,v 1.3 2006/04/05 02:37:34 buzlip01 Exp $");
+RCSTAG("$Id: DELUSERCommand.cc,v 1.4 2006/12/09 00:29:18 buzlip01 Exp $");
 
 namespace gnuworld
 {
 namespace cf
 {
 
-void DELUSERCommand::Exec(iClient* theClient, sqlUser* theUser, const std::string& Message)
+void DELUSERCommand::Exec(iClient* theClient, sqlcfUser* theUser, const std::string& Message)
 {
 StringTokenizer st(Message);
 
-sqlUser* targetUser = bot->isAuthed(st[1]);
+sqlcfUser* targetUser = bot->isAuthed(st[1]);
 if (!targetUser) {
   bot->SendTo(theClient,
 	      bot->getResponse(theUser,
@@ -52,7 +52,7 @@ if (!targetUser) {
 }
 
 /* Can't delete an owner unless you're an owner. */
-if (targetUser->getFlag(sqlUser::F_OWNER) && !theUser->getFlag(sqlUser::F_OWNER)) {
+if (targetUser->getFlag(sqlcfUser::F_OWNER) && !theUser->getFlag(sqlcfUser::F_OWNER)) {
   bot->SendTo(theClient,
 	      bot->getResponse(theUser,
 			language::cant_delete_an_owner,
@@ -61,7 +61,7 @@ if (targetUser->getFlag(sqlUser::F_OWNER) && !theUser->getFlag(sqlUser::F_OWNER)
 }
 
 /* Can only delete a user manager if you're an owner. */
-if (targetUser->getFlag(sqlUser::F_USERMANAGER) && !theUser->getFlag(sqlUser::F_OWNER)) {
+if (targetUser->getFlag(sqlcfUser::F_USERMANAGER) && !theUser->getFlag(sqlcfUser::F_OWNER)) {
   bot->SendTo(theClient,
 	      bot->getResponse(theUser,
 			language::cant_delete_manager,
@@ -70,8 +70,8 @@ if (targetUser->getFlag(sqlUser::F_USERMANAGER) && !theUser->getFlag(sqlUser::F_
 }
 
 /* A serveradmin can only delete users in his/her own group. */
-if (theUser->getFlag(sqlUser::F_SERVERADMIN) &&
-    !theUser->getFlag(sqlUser::F_USERMANAGER)) {
+if (theUser->getFlag(sqlcfUser::F_SERVERADMIN) &&
+    !theUser->getFlag(sqlcfUser::F_USERMANAGER)) {
   if (targetUser->getGroup() != theUser->getGroup()) {
     bot->SendTo(theClient,
 		bot->getResponse(theUser,
@@ -98,6 +98,8 @@ if (targetUser->Delete()) {
 			language::error_deleting_user,
 			std::string("Error deleting user %s.")).c_str(), st[1].c_str());
 }
+
+bot->logLastComMessage(theClient, Message);
 
 return;
 } //DELUSERCommand::Exec

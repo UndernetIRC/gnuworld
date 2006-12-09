@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
  * USA.
  *
- * $Id: sqlChannel.cc,v 1.3 2006/04/05 02:37:35 buzlip01 Exp $
+ * $Id: sqlChannel.cc,v 1.4 2006/12/09 00:29:19 buzlip01 Exp $
  */
 
 #include	<sstream>
@@ -41,19 +41,24 @@ namespace cf
 const sqlChannel::flagType sqlChannel::F_BLOCKED	= 0x00000001 ;
 const sqlChannel::flagType sqlChannel::F_ALERT		= 0x00000002 ;
 
-const int sqlChannel::EV_MISC		= 1 ; /* Uncategorized event */
-const int sqlChannel::EV_NOTE		= 2 ; /* Miscellaneous notes */
-const int sqlChannel::EV_CHANFIX	= 3 ; /* Manual chanfixes */
-const int sqlChannel::EV_BLOCK		= 4 ; /* Channel block */
-const int sqlChannel::EV_UNBLOCK	= 5 ; /* Channel unblock */
-const int sqlChannel::EV_ALERT		= 6 ; /* Channel alert */
-const int sqlChannel::EV_UNALERT	= 7 ; /* Channel unalert */
+const int sqlChannel::EV_MISC		= 1  ; /* Uncategorized event */
+const int sqlChannel::EV_NOTE		= 2  ; /* Miscellaneous notes */
+const int sqlChannel::EV_CHANFIX	= 3  ; /* Manual chanfixes */
+const int sqlChannel::EV_BLOCK		= 4  ; /* Channel block */
+const int sqlChannel::EV_UNBLOCK	= 5  ; /* Channel unblock */
+const int sqlChannel::EV_ALERT		= 6  ; /* Channel alert */
+const int sqlChannel::EV_UNALERT	= 7  ; /* Channel unalert */
+const int sqlChannel::EV_REQUESTOP	= 8  ; /* Requestops */
+const int sqlChannel::EV_TEMPBLOCK	= 9  ; /* Temp channel block */
+const int sqlChannel::EV_UNTEMPBLOCK	= 10 ; /* Temp channel unblock */
+const int sqlChannel::EV_SIMULATE	= 11 ; /* Fix simulation */
 
 unsigned long int sqlChannel::maxUserId = 0;
 
 sqlChannel::sqlChannel(sqlManager* _myManager) :
   id(0),
   channel(),
+  user_name(),
   last(0),
   start(0),
   maxScore(0),
@@ -174,7 +179,7 @@ return retval;
  * occured in this channel.
  */
 
-void sqlChannel::addNote(unsigned short eventType, sqlUser* theUser,
+void sqlChannel::addNote(unsigned short eventType, iClient* theUser,
 	const std::string& theMessage)
 {
 unsigned int num_notes = countNotes(0);
@@ -189,14 +194,14 @@ PgDatabase* cacheCon = myManager->getConnection();
 
 /* Create the INSERT statement */
 std::stringstream theLog;
-theLog	<< "INSERT INTO notes (ts, channelID, userID, event, message) "
+theLog	<< "INSERT INTO notes (ts, channelID, user_name, event, message) "
 	<< "VALUES ("
 	<< "now()::abstime::int4"
 	<< ", "
 	<< id
-	<< ", "
-	<< theUser->getID()
-	<< ", "
+	<< ", '"
+	<< theUser->getAccount()
+	<< "', "
 	<< eventType
 	<< ", "
 	<< "'"

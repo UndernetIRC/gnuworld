@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
  * USA.
  *
- * $Id: STATUSCommand.cc,v 1.3 2006/04/05 02:37:35 buzlip01 Exp $
+ * $Id: STATUSCommand.cc,v 1.4 2006/12/09 00:29:19 buzlip01 Exp $
  */
 
 #include	<string>
@@ -34,14 +34,14 @@
 #include	"responses.h"
 #include	"Network.h"
 
-RCSTAG("$Id: STATUSCommand.cc,v 1.3 2006/04/05 02:37:35 buzlip01 Exp $");
+RCSTAG("$Id: STATUSCommand.cc,v 1.4 2006/12/09 00:29:19 buzlip01 Exp $");
 
 namespace gnuworld
 {
 namespace cf
 {
 
-void STATUSCommand::Exec(iClient* theClient, sqlUser* theUser, const std::string&)
+void STATUSCommand::Exec(iClient* theClient, sqlcfUser* theUser, const std::string& Message)
 {
 
 bot->SendTo(theClient, "[evilnet development's GNUWorld %s]",
@@ -95,10 +95,18 @@ else
 			language::status_channel_service_not_linked,
 			std::string("Channel service not linked. New channels will not be scored.")).c_str());
 
+bot->SendTo(theClient,
+	std::string("Number of channels being autofixed: %i").c_str(),bot->countAutoFixes());
+
+bot->SendTo(theClient,
+	std::string("Number of channels being manually fixed: %i").c_str(),bot->countManFixes());
+
+
 bot->logAdminMessage("%s (%s) STATUS",
 		     theUser ? theUser->getUserName().c_str() : "!NOT-LOGGED-IN!",
 		     theClient->getRealNickUserHost().c_str());
 
+bot->logLastComMessage(theClient, Message);
 
 return;
 }

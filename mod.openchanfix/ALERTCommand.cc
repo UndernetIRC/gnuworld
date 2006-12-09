@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ALERTCommand.cc,v 1.3 2006/04/05 02:37:34 buzlip01 Exp $
+ * $Id: ALERTCommand.cc,v 1.4 2006/12/09 00:29:18 buzlip01 Exp $
  */
 
 #include "gnuworld_config.h"
@@ -30,16 +30,16 @@
 #include "responses.h"
 #include "StringTokenizer.h"
 #include "sqlChannel.h"
-#include "sqlUser.h"
+#include "sqlcfUser.h"
 
-RCSTAG("$Id: ALERTCommand.cc,v 1.3 2006/04/05 02:37:34 buzlip01 Exp $");
+RCSTAG("$Id: ALERTCommand.cc,v 1.4 2006/12/09 00:29:18 buzlip01 Exp $");
 
 namespace gnuworld
 {
 namespace cf
 {
 
-void ALERTCommand::Exec(iClient* theClient, sqlUser* theUser, const std::string& Message)
+void ALERTCommand::Exec(iClient* theClient, sqlcfUser* theUser, const std::string& Message)
 {
 StringTokenizer st(Message);
 
@@ -72,7 +72,7 @@ else
   theChan->commit();
 
 /* Add note to the channel about this command */
-theChan->addNote(sqlChannel::EV_ALERT, theUser, (st.size() > 2) ? st.assemble(2) : "");
+theChan->addNote(sqlChannel::EV_ALERT, theClient, (st.size() > 2) ? st.assemble(2) : "");
 
 bot->SendTo(theClient,
             bot->getResponse(theUser,
@@ -85,6 +85,8 @@ bot->logAdminMessage("%s (%s) ALERT %s",
 		     theUser->getUserName().c_str(),
 		     theClient->getRealNickUserHost().c_str(),
 		     theChan->getChannel().c_str());
+
+bot->logLastComMessage(theClient, Message);
 
 return;
 }

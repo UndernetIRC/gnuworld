@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: SCORECommand.cc,v 1.3 2006/04/05 02:37:35 buzlip01 Exp $
+ * $Id: SCORECommand.cc,v 1.4 2006/12/09 00:29:19 buzlip01 Exp $
  */
 
 #include <sstream>
@@ -35,16 +35,16 @@
 #include "StringTokenizer.h"
 #include "sqlChannel.h"
 #include "sqlChanOp.h"
-#include "sqlUser.h"
+#include "sqlcfUser.h"
 
-RCSTAG("$Id: SCORECommand.cc,v 1.3 2006/04/05 02:37:35 buzlip01 Exp $");
+RCSTAG("$Id: SCORECommand.cc,v 1.4 2006/12/09 00:29:19 buzlip01 Exp $");
 
 namespace gnuworld
 {
 namespace cf
 {
 
-void SCORECommand::Exec(iClient* theClient, sqlUser* theUser, const std::string& Message)
+void SCORECommand::Exec(iClient* theClient, sqlcfUser* theUser, const std::string& Message)
 {
 StringTokenizer st(Message);
 
@@ -321,6 +321,31 @@ if (compact) {
     bot->SendTo(theClient, strScoresNOP.str());
 }
 
+sqlChannel* theChan = bot->getChannelRecord(st[1]);
+if (theChan) {
+  bot->SendTo(theClient, "Notes: %d", theChan->countNotes(0));
+	
+  if (theChan->getFlag(sqlChannel::F_BLOCKED))
+    bot->SendTo(theClient,
+              bot->getResponse(theUser,
+                              language::info_chan_blocked,
+                              std::string("%s is BLOCKED.")).c_str(),
+                                          theChan->getChannel().c_str());
+  else if (bot->isTempBlocked(theChan->getChannel()))
+    bot->SendTo(theClient,
+              bot->getResponse(theUser,
+                              language::info_chan_temp_blocked,
+                              std::string("%s is TEMPBLOCKED.")).c_str(),
+                                          theChan->getChannel().c_str());
+  else if (theChan->getFlag(sqlChannel::F_ALERT))
+    bot->SendTo(theClient,
+              bot->getResponse(theUser,
+                              language::info_chan_alerted,
+                              std::string("%s is ALERTED.")).c_str(),
+                                          theChan->getChannel().c_str());
+}
+
+bot->logLastComMessage(theClient, Message);
 
 return;
 }

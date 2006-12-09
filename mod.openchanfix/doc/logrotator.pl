@@ -18,7 +18,7 @@ use strict;
 ##########################
 
 # Chanfix admin log
-our $adminlog = "/home/gnuworld/gnuworld/bin/chanfix-admin.log";
+our $adminlog = "/home/chanfix/gnuworld/bin/chanfix-admin.log";
 
 ###########################
 ##### EMAIL ADDRESSES #####
@@ -36,7 +36,7 @@ our $MX = "mx.mynet.org";
 #################################
 
 our $pid = $$;
-our $logdir = "/home/gnuworld/gnuworld/bin";
+our $logdir = "/home/chanfix/gnuworld/bin";
 
 system("mv $adminlog $adminlog.roll");
 system("kill -HUP `pidof gnuworld`");

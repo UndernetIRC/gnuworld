@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
  * USA.
  *
- * $Id: USETCommand.cc,v 1.4 2006/04/05 02:37:35 buzlip01 Exp $
+ * $Id: USETCommand.cc,v 1.5 2006/12/09 00:29:19 buzlip01 Exp $
  */
 
 #include	<string>
@@ -31,16 +31,16 @@
 
 #include	"chanfix.h"
 #include	"responses.h"
-#include	"sqlUser.h"
+#include	"sqlcfUser.h"
 
-RCSTAG("$Id: USETCommand.cc,v 1.4 2006/04/05 02:37:35 buzlip01 Exp $");
+RCSTAG("$Id: USETCommand.cc,v 1.5 2006/12/09 00:29:19 buzlip01 Exp $");
 
 namespace gnuworld
 {
 namespace cf
 {
 
-void USETCommand::Exec(iClient* theClient, sqlUser* theUser, const std::string& Message)
+void USETCommand::Exec(iClient* theClient, sqlcfUser* theUser, const std::string& Message)
 {
 StringTokenizer st(Message);
 
@@ -48,13 +48,13 @@ std::string option;
 std::string value;
 
 if (st.size() == 4) {
-  sqlUser* targetUser = bot->isAuthed(st[1]);
+  sqlcfUser* targetUser = bot->isAuthed(st[1]);
   option = string_upper(st[2]);
   value = string_upper(st[3]);
-  sqlUser::flagType requiredFlags;
+  sqlcfUser::flagType requiredFlags;
 
   if (option == "NEEDOPER") {
-    requiredFlags = sqlUser::F_USERMANAGER;
+    requiredFlags = sqlcfUser::F_USERMANAGER;
     if (!theUser->getFlag(requiredFlags)) {
       bot->SendTo(theClient,
 		  bot->getResponse(theUser,
@@ -138,6 +138,8 @@ bot->SendTo(theClient,
 	    bot->getResponse(theUser,
 			     language::setting_doesnt_exist,
 			     std::string("This setting does not exist.")).c_str());
+
+bot->logLastComMessage(theClient, Message);
 
 return;
 }

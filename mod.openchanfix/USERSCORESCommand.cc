@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: USERSCORESCommand.cc,v 1.1 2006/04/05 02:37:35 buzlip01 Exp $
+ * $Id: USERSCORESCommand.cc,v 1.2 2006/12/09 00:29:19 buzlip01 Exp $
  */
 
 #include <sstream>
@@ -33,16 +33,16 @@
 #include "responses.h"
 #include "StringTokenizer.h"
 #include "sqlChanOp.h"
-#include "sqlUser.h"
+#include "sqlcfUser.h"
 
-RCSTAG("$Id: USERSCORESCommand.cc,v 1.1 2006/04/05 02:37:35 buzlip01 Exp $");
+RCSTAG("$Id: USERSCORESCommand.cc,v 1.2 2006/12/09 00:29:19 buzlip01 Exp $");
 
 namespace gnuworld
 {
 namespace cf
 {
 
-void USERSCORESCommand::Exec(iClient* theClient, sqlUser* theUser, const std::string& Message)
+void USERSCORESCommand::Exec(iClient* theClient, sqlcfUser* theUser, const std::string& Message)
 {
 StringTokenizer st(Message);
 
@@ -85,6 +85,8 @@ bot->logAdminMessage("%s (%s) USERSCORES %s",
 		     theUser->getUserName().c_str(),
 		     theClient->getRealNickUserHost().c_str(),
 		     st[1].c_str());
+
+bot->logLastComMessage(theClient, Message);
 
 return;
 }
