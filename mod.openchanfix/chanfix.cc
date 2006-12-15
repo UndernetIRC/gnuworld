@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: chanfix.cc,v 1.5 2006/12/09 00:29:19 buzlip01 Exp $
+ * $Id: chanfix.cc,v 1.6 2006/12/15 19:48:56 buzlip01 Exp $
  */
 
 #include	<csignal>
@@ -62,7 +62,7 @@
 #include	<boost/thread/thread.hpp>
 #endif /* CHANFIX_HAVE_BOOST_THREAD */
 
-RCSTAG("$Id: chanfix.cc,v 1.5 2006/12/09 00:29:19 buzlip01 Exp $");
+RCSTAG("$Id: chanfix.cc,v 1.6 2006/12/15 19:48:56 buzlip01 Exp $");
 
 namespace gnuworld
 {
@@ -2645,6 +2645,13 @@ for (fixQueueType::iterator ptr = autoFixQ.begin(); ptr != autoFixQ.end(); ) {
       */
      if (isFixed || currentTime() - sqlChan->getFixStart() > AUTOFIX_MAXIMUM) {
        Channel* theChan = Network->findChannel(sqlChan->getChannel());
+	
+       if (!theChan) {
+	 //Object no longer exists
+	 autoFixQ.erase(ptr++);
+	 continue;
+       }
+
        if (doAutoFixNotice())
          Message(theChan, "Channel has been automatically fixed.");
        if (doJoinChannels())
@@ -2677,6 +2684,13 @@ for (fixQueueType::iterator ptr = manFixQ.begin(); ptr != manFixQ.end(); ) {
       */
      if (isFixed || currentTime() - sqlChan->getFixStart() > CHANFIX_MAXIMUM + CHANFIX_DELAY) {
        Channel* theChan = Network->findChannel(sqlChan->getChannel());
+	     
+       if (!theChan) {
+	 //Object no longer exists
+	 manFixQ.erase(ptr++);
+	 continue;
+       }
+	     
        if (doManualFixNotice())
          Message(theChan, "Channel has been fixed.");
        if (doJoinChannels())
@@ -2906,6 +2920,7 @@ void chanfix::prepareUpdate(bool)
   if (threaded) {
     ClassUpdateDB updateDB(*this);
     boost::thread pthrd(updateDB);
+    pthrd.join();
   } else
 #endif /* CHANFIX_HAVE_BOOST_THREAD */
     updateDB();
