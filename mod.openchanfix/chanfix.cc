@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: chanfix.cc,v 1.6 2006/12/15 19:48:56 buzlip01 Exp $
+ * $Id: chanfix.cc,v 1.7 2006/12/18 01:58:34 buzlip01 Exp $
  */
 
 #include	<csignal>
@@ -62,7 +62,7 @@
 #include	<boost/thread/thread.hpp>
 #endif /* CHANFIX_HAVE_BOOST_THREAD */
 
-RCSTAG("$Id: chanfix.cc,v 1.6 2006/12/15 19:48:56 buzlip01 Exp $");
+RCSTAG("$Id: chanfix.cc,v 1.7 2006/12/18 01:58:34 buzlip01 Exp $");
 
 namespace gnuworld
 {
@@ -1042,6 +1042,9 @@ switch(whichEvent)
 		  if (ptr->second.empty())
 		    authMap.erase(theClient->getAccount());
 		}
+		//Cleanup
+		theClient->removeCustomData(this);
+		delete myOps;
 		break;
 		}
 	case EVT_NICK:
@@ -1702,7 +1705,6 @@ if (myOps && !myOps->empty()) {
 
 myOps->insert(clientOpsType::value_type(thisChan->getName()));
 thisClient->setCustomData(this, static_cast< void*>(myOps));
-
 return;
 }
 
