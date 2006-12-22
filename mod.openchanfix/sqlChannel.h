@@ -16,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
  * USA.
  *
- * $Id: sqlChannel.h,v 1.4 2006/12/09 00:29:20 buzlip01 Exp $
+ * $Id: sqlChannel.h,v 1.5 2006/12/22 04:16:03 buzlip01 Exp $
  */
 
 #ifndef __SQLCHANNEL_H
-#define __SQLCHANNEL_H "$Id: sqlChannel.h,v 1.4 2006/12/09 00:29:20 buzlip01 Exp $"
+#define __SQLCHANNEL_H "$Id: sqlChannel.h,v 1.5 2006/12/22 04:16:03 buzlip01 Exp $"
 
 #include	<string>
 #include	<ctime>
@@ -95,13 +95,13 @@ public:
 	inline time_t		getSimStart() const
 		{ return simstart ; }
 
-	inline unsigned int	getMaxScore() const
+	inline int	getMaxScore() const
 		{ return maxScore ; }
 
-	inline unsigned int	getAmountSimOpped() const
+	inline int	getAmountSimOpped() const
 		{ return amtopped ; }
 
-	inline unsigned int	getTMaxScore() const
+	inline int	getTMaxScore() const
 		{ return tmaxScore ; }
 
 	inline bool		getModesRemoved() const
