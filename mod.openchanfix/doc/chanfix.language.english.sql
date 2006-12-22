@@ -3,7 +3,7 @@
 -- Language: English (1)
 -- Author: evilnet development <http://evilnet.sourceforge.net>
 --
--- $Id: chanfix.language.english.sql,v 1.4 2006/12/09 00:29:20 buzlip01 Exp $
+-- $Id: chanfix.language.english.sql,v 1.5 2006/12/22 03:00:03 buzlip01 Exp $
 
 			
 DELETE FROM translations;
@@ -229,4 +229,5 @@ COPY "translations" FROM stdin;
 1	223	(%s) Channel modes have been removed.	31337	0
 1	224	Simulate for %s (%s) starting at next fixing round (Current C time %s).	31337	0
 1	225	NOTE: This is only an estimate, if ops with points join or part it could affect who gets opped.	31337	0
+1	226	You may only WHOFLAG one flag.	31337	0
 \.

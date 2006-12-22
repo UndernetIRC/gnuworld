@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
  * USA.
  *
- * $Id: sqlcfUser.cc,v 1.1 2006/12/09 02:21:20 buzlip01 Exp $
+ * $Id: sqlcfUser.cc,v 1.2 2006/12/22 03:00:02 buzlip01 Exp $
  */
 
 #include	<sstream>
@@ -38,11 +38,12 @@ namespace cf
 
 const sqlcfUser::flagType sqlcfUser::F_SERVERADMIN =	0x01; /* +a */
 const sqlcfUser::flagType sqlcfUser::F_BLOCK =		0x02; /* +b */
-const sqlcfUser::flagType sqlcfUser::F_COMMENT =		0x04; /* +c */
-const sqlcfUser::flagType sqlcfUser::F_CHANFIX =		0x08; /* +f */
+const sqlcfUser::flagType sqlcfUser::F_COMMENT =	0x04; /* +c */
+const sqlcfUser::flagType sqlcfUser::F_CHANFIX =	0x08; /* +f */
 const sqlcfUser::flagType sqlcfUser::F_OWNER =		0x10; /* +o */
 const sqlcfUser::flagType sqlcfUser::F_USERMANAGER =	0x20; /* +u */
-const sqlcfUser::flagType sqlcfUser::F_LOGGEDIN =		0x40;
+const sqlcfUser::flagType sqlcfUser::F_PERMBLOCKER =	0x80; /* +p */
+const sqlcfUser::flagType sqlcfUser::F_LOGGEDIN =	0x40;
 
 unsigned long int sqlcfUser::maxUserId = 0;
 

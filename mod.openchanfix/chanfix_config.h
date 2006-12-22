@@ -16,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
  * USA.
  *
- * $Id: chanfix_config.h,v 1.5 2006/12/09 00:29:19 buzlip01 Exp $
+ * $Id: chanfix_config.h,v 1.6 2006/12/22 03:00:02 buzlip01 Exp $
  */
 
 #ifndef __CHANFIX_CONFIG_H
-#define __CHANFIX_CONFIG_H "$Id: chanfix_config.h,v 1.5 2006/12/09 00:29:19 buzlip01 Exp $"
+#define __CHANFIX_CONFIG_H "$Id: chanfix_config.h,v 1.6 2006/12/22 03:00:02 buzlip01 Exp $"
 
 #define CHANFIX_DEBUG 1
 /**
@@ -120,7 +120,7 @@
  * Interval between two consecutive SQL updates.
  * Default: every 12 hours
  */
-#define SQL_UPDATE_TIME		43200
+#define SQL_UPDATE_TIME		86400
 
 /**
  * Interval between two consecutive checks for opless channels.

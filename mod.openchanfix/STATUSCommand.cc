@@ -21,10 +21,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
  * USA.
  *
- * $Id: STATUSCommand.cc,v 1.4 2006/12/09 00:29:19 buzlip01 Exp $
+ * $Id: STATUSCommand.cc,v 1.5 2006/12/22 03:00:02 buzlip01 Exp $
  */
 
 #include	<string>
+#include	<sys/resource.h>
 
 #include	"gnuworld_config.h"
 #include	"StringTokenizer.h"
@@ -34,7 +35,7 @@
 #include	"responses.h"
 #include	"Network.h"
 
-RCSTAG("$Id: STATUSCommand.cc,v 1.4 2006/12/09 00:29:19 buzlip01 Exp $");
+RCSTAG("$Id: STATUSCommand.cc,v 1.5 2006/12/22 03:00:02 buzlip01 Exp $");
 
 namespace gnuworld
 {
@@ -100,6 +101,13 @@ bot->SendTo(theClient,
 
 bot->SendTo(theClient,
 	std::string("Number of channels being manually fixed: %i").c_str(),bot->countManFixes());
+
+int who = RUSAGE_SELF;
+struct rusage usage;
+int ret;
+ret = getrusage(who, &usage);
+bot->SendTo(theClient,
+	std::string("Memory Usage (kB): %ld").c_str(), usage.ru_maxrss);
 
 
 bot->logAdminMessage("%s (%s) STATUS",

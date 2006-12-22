@@ -16,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
  * USA.
  *
- * $Id: sqlcfUser.h,v 1.1 2006/12/09 00:29:20 buzlip01 Exp $
+ * $Id: sqlcfUser.h,v 1.2 2006/12/22 03:00:03 buzlip01 Exp $
  */
 
 #ifndef __sqlcfUser_H
-#define __sqlcfUser_H "$Id: sqlcfUser.h,v 1.1 2006/12/09 00:29:20 buzlip01 Exp $"
+#define __sqlcfUser_H "$Id: sqlcfUser.h,v 1.2 2006/12/22 03:00:03 buzlip01 Exp $"
 
 #include	<string>
 #include	<vector>
@@ -52,6 +52,7 @@ public:
 	static const flagType F_CHANFIX; /* +f */
 	static const flagType F_OWNER; /* +o */
 	static const flagType F_USERMANAGER; /* +u */
+	static const flagType F_PERMBLOCKER; /* +p */
 	static const flagType F_LOGGEDIN;
 
 	typedef std::list< std::string >	hostListType;

@@ -16,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: chanfixCommands.h,v 1.4 2006/12/09 00:29:19 buzlip01 Exp $
+ * $Id: chanfixCommands.h,v 1.5 2006/12/22 03:00:02 buzlip01 Exp $
  */
 
 #ifndef __CHANFIXCOMMANDS_H
-#define __CHANFIXCOMMANDS_H "$Id: chanfixCommands.h,v 1.4 2006/12/09 00:29:19 buzlip01 Exp $"
+#define __CHANFIXCOMMANDS_H "$Id: chanfixCommands.h,v 1.5 2006/12/22 03:00:02 buzlip01 Exp $"
 
 namespace gnuworld {
 
@@ -101,6 +101,7 @@ DECLARE_COMMAND( LISTHOSTS )
 DECLARE_COMMAND( USERSCORES )
 DECLARE_COMMAND( USET )
 DECLARE_COMMAND( WHOIS )
+DECLARE_COMMAND( WHOFLAG )
 
 /* User management commands */
 DECLARE_COMMAND( ADDFLAG )

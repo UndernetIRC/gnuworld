@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: chanfix.cc,v 1.7 2006/12/18 01:58:34 buzlip01 Exp $
+ * $Id: chanfix.cc,v 1.8 2006/12/22 03:00:02 buzlip01 Exp $
  */
 
 #include	<csignal>
@@ -62,7 +62,7 @@
 #include	<boost/thread/thread.hpp>
 #endif /* CHANFIX_HAVE_BOOST_THREAD */
 
-RCSTAG("$Id: chanfix.cc,v 1.7 2006/12/18 01:58:34 buzlip01 Exp $");
+RCSTAG("$Id: chanfix.cc,v 1.8 2006/12/22 03:00:02 buzlip01 Exp $");
 
 namespace gnuworld
 {
@@ -138,8 +138,8 @@ RegisterCommand(new ADDUSERCommand(this, "ADDUSER",
 	sqlcfUser::F_USERMANAGER | sqlcfUser::F_SERVERADMIN
 	));
 RegisterCommand(new ALERTCommand(this, "ALERT",
-	"<#channel> [reason]",
-	2,
+	"<#channel> <reason>",
+	3,
 	sqlcfUser::F_COMMENT
 	));
 RegisterCommand(new BLOCKCommand(this, "BLOCK",
@@ -339,6 +339,11 @@ RegisterCommand(new USERSCORESCommand(this, "USERSCORES",
 RegisterCommand(new USETCommand(this, "USET",
 	"[username] <option> <value>",
 	3,
+	sqlcfUser::F_LOGGEDIN
+	));
+RegisterCommand(new WHOFLAGCommand(this, "WHOFLAG",
+	"<flag>",
+	2,
 	sqlcfUser::F_LOGGEDIN
 	));
 RegisterCommand(new WHOGROUPCommand(this, "WHOGROUP",
@@ -1028,9 +1033,12 @@ switch(whichEvent)
 				 data2 );
 
 		clientOpsType* myOps = findMyOps(theClient);
-		for (clientOpsType::iterator ptr = myOps->begin();
-		     ptr != myOps->end(); ptr++)
-		  lostOp(*ptr, theClient, myOps);
+		if (!myOps->empty()) {
+		  for (clientOpsType::iterator ptr = myOps->begin(); ptr != myOps->end();)
+		    lostOp(*ptr++, theClient, myOps);
+		} else {
+		  delete myOps;
+		}
 		
 		/* Now we need to remove this iClient from the auth map */
 		authMapType::iterator ptr = authMap.find(theClient->getAccount());
@@ -1044,7 +1052,6 @@ switch(whichEvent)
 		}
 		//Cleanup
 		theClient->removeCustomData(this);
-		delete myOps;
 		break;
 		}
 	case EVT_NICK:
@@ -1697,13 +1704,16 @@ if (!thisOp) {
 thisOp->setLastSeenAs(thisClient->getRealNickUserHost());
 
 clientOpsType* myOps = findMyOps(thisClient);
-if (myOps && !myOps->empty()) {
+if (myOps != NULL && !myOps->empty()) {
   clientOpsType::iterator ptr = myOps->find(thisChan->getName());
-  if (ptr != myOps->end())
+  if (ptr != myOps->end()) {
+    delete myOps;
     return;
+  }
 }
 
 myOps->insert(clientOpsType::value_type(thisChan->getName()));
+thisClient->removeCustomData(this);
 thisClient->setCustomData(this, static_cast< void*>(myOps));
 return;
 }
@@ -1713,13 +1723,15 @@ void chanfix::lostOp(const std::string& channel, iClient* theClient, clientOpsTy
 if (myOps == NULL)
   myOps = findMyOps(theClient);
 
-if (!myOps || myOps->empty())
+if (myOps->empty())
   return;
 
 clientOpsType::iterator ptr = myOps->find(channel);
 if (ptr != myOps->end()) {
   myOps->erase(ptr);
-  theClient->setCustomData(this, static_cast< void*>(myOps));
+  theClient->removeCustomData(this);
+  if (!myOps->empty())
+    theClient->setCustomData(this, static_cast< void*>(myOps));
 }
 }
 
@@ -2884,8 +2896,12 @@ void chanfix::prepareUpdate(bool)
   Timer snapShotTimer;
   snapShotTimer.Start();
   
+  /* Has the snapshot map been allocated? if not, lets do! */
+  if (snapShot == NULL)
+    snapShot = new (std::nothrow) DBMapType;
+  
   /* Clear the snapShot map */
-  snapShot.clear();
+  snapShot->clear();
 
   //snapShotStruct* curStruct = new (std::nothrow) snapShotStruct;
   snapShotStruct curStruct;
@@ -2911,7 +2927,7 @@ void chanfix::prepareUpdate(bool)
         curStruct.day[i] = curOp->getDay(i);
       }
       
-      snapShot.insert(DBMapType::value_type(curChan, curStruct));
+      snapShot->insert(DBMapType::value_type(curChan, curStruct));
     }
   }
 
@@ -2992,8 +3008,8 @@ void chanfix::updateDB()
   int chanOpsProcessed = 0;
   int i = 0;
   
-  for (DBMapType::iterator ptr = snapShot.begin();
-       ptr != snapShot.end(); ptr++) {
+  for (DBMapType::iterator ptr = snapShot->begin();
+       ptr != snapShot->end(); ptr++) {
     theLine.str("");
     theLine	<< escapeSQLChars(ptr->first) << "\t"
 		<< escapeSQLChars(ptr->second.account) << "\t"
@@ -3067,7 +3083,8 @@ void chanfix::updateDB()
   theManager->removeConnection(cacheCon);
 
   /* Clean-up after ourselves and allow new updates to be started */
-  snapShot.clear();
+  snapShot->clear();
+  delete snapShot; snapShot = 0;
   updateInProgress = false;
 
   return;
@@ -3239,6 +3256,8 @@ char chanfix::getFlagChar(const sqlcfUser::flagType& whichFlag)
    return 'o';
  else if (whichFlag == sqlcfUser::F_USERMANAGER)
    return 'u';
+ else if (whichFlag == sqlcfUser::F_PERMBLOCKER)
+   return 'p';
  else
    return ' ';
 }
@@ -3258,6 +3277,9 @@ const std::string chanfix::getFlagsString(const sqlcfUser::flagType& whichFlags)
    flagstr += "o";
  if (whichFlags & sqlcfUser::F_USERMANAGER)
    flagstr += "u";
+ if (whichFlags & sqlcfUser::F_PERMBLOCKER)
+   flagstr += "p";
+ 
 return flagstr;
 }
 
@@ -3270,6 +3292,7 @@ switch (whichChar) {
   case 'f': return sqlcfUser::F_CHANFIX;
   case 'o': return sqlcfUser::F_OWNER;
   case 'u': return sqlcfUser::F_USERMANAGER;
+  case 'p': return sqlcfUser::F_PERMBLOCKER;
 }
 return 0;
 }

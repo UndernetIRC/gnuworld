@@ -16,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: responses.h,v 1.4 2006/12/09 00:29:19 buzlip01 Exp $
+ * $Id: responses.h,v 1.5 2006/12/22 03:00:02 buzlip01 Exp $
  */
 
 #ifndef __RESPONSES_H
-#define __RESPONSES_H "$Id: responses.h,v 1.4 2006/12/09 00:29:19 buzlip01 Exp $"
+#define __RESPONSES_H "$Id: responses.h,v 1.5 2006/12/22 03:00:02 buzlip01 Exp $"
 
 namespace gnuworld
 	{
@@ -296,6 +296,9 @@ namespace cf
 		const int send_notices			= 129;
 		const int send_privmsgs			= 130;
 		const int uset_notice_on_off		= 131;
+		
+		/* WHOFLAG */
+		const int one_flag_per_whoflag		= 226;
 
 		/* WHOGROUP */
 		const int whogroup_your_group		= 134;

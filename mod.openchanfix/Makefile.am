@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-# "$Id: Makefile.am,v 1.5 2006/12/09 00:29:18 buzlip01 Exp $"
+# "$Id: Makefile.am,v 1.6 2006/12/22 03:00:02 buzlip01 Exp $"
 
 lib_LTLIBRARIES = libchanfix.la
 
@@ -47,6 +47,7 @@ libchanfix_la_SOURCES = chanfix.cc \
 	UNTEMPBLOCKCommand.cc \
 	USERSCORESCommand.cc \
 	USETCommand.cc \
+	WHOFLAGCommand.cc \
 	WHOGROUPCommand.cc \
 	WHOISCommand.cc \
 	sqlChanOp.cc \
