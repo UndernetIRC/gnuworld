@@ -1,4 +1,4 @@
-## $Id: Makefile.am,v 1.24 2006/09/26 17:35:55 kewlio Exp $
+## $Id: Makefile.am,v 1.25 2006/12/22 06:41:39 kewlio Exp $
 ## test
 
 @SET_MAKE@
@@ -35,6 +35,10 @@ if COND_MODNICKSERV
   MODNICKSERV = mod.nickserv
 endif
 
+if COND_MODOPENCHANFIX
+  MODOPENCHANFIX = mod.openchanfix
+endif
+
 if COND_MODSCANNER
   MODSCANNER = mod.scanner
 endif
@@ -64,6 +68,7 @@ SUBDIRS = libgnuworld libltdl src $(NEW_MODS) \
 	$(MODDRONESCAN) \
 	$(MODGNUTEST) \
 	$(MODNICKSERV) \
+	$(MODOPENCHANFIX) \
 	$(MODSCANNER) \
 	$(MODSTATS) \
 	$(MODSNOOP) \
@@ -80,6 +85,7 @@ EXTRA_DIST = bin/ccontrol.example.conf.in \
 	bin/gnutest.example.conf.in \
 	bin/GNUWorld.example.conf.in \
 	bin/nickserv.example.conf.in \
+	bin/openchanfix.example.conf.in \
 	bin/scanner.example.conf.in \
 	bin/stats.example.conf.in \
 	bin/server_command_map.in \

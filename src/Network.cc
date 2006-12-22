@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: Network.cc,v 1.75 2006/09/26 20:35:08 kewlio Exp $
+ * $Id: Network.cc,v 1.76 2006/12/22 06:41:45 kewlio Exp $
  */
 
 #include	<new>
@@ -45,7 +45,7 @@
 #include	"ip.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: Network.cc,v 1.75 2006/09/26 20:35:08 kewlio Exp $" ) ;
+RCSTAG( "$Id: Network.cc,v 1.76 2006/12/22 06:41:45 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -1040,8 +1040,6 @@ return retMe;
 bool xNetwork::allocateClientNumeric( unsigned int intYY,
 	unsigned int& newIntXXX )
 {
-newIntXXX = 0 ;
-
 // First verify that the given intYY corresponds to a
 // fake server (including the xServer).
 reservedNumeric_iterator rsItr = reservedNumericMap.find( intYY ) ;
@@ -1060,7 +1058,8 @@ if( rsItr == reservedNumericMap.end() )
 // If the for loop traverses all possible values of
 // unsigned int, it will eventually hit 0 again, and
 // the loop will terminate.
-for( newIntXXX = 1 ; newIntXXX != 0 ; ++newIntXXX )
+unsigned int maxIntXXX = base64toint("]]]", 3);
+for( newIntXXX = 0 ; newIntXXX <= maxIntXXX ; ++newIntXXX )
 	{
 //	elog	<< "xNetwork::allocateClientNumeric> Checking: "
 //		<< newIntXXX
@@ -1079,10 +1078,9 @@ for( newIntXXX = 1 ; newIntXXX != 0 ; ++newIntXXX )
 	}
 
 // Check if all values were examined
-if( 0 == newIntXXX )
+if( newIntXXX > maxIntXXX )
 	{
-	elog	<< "xNetwork::allocateClientNumeric> Looped unsigned "
-		<< "int"
+	elog	<< "xNetwork::allocateClientNumeric> Exceeded maxIntXXX "
 		<< endl ;
 	return false ;
 	}

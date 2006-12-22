@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_CM.cc,v 1.9 2005/06/24 22:48:59 kewlio Exp $
+ * $Id: msg_CM.cc,v 1.10 2006/12/22 06:41:41 kewlio Exp $
  */
 
 #include	<map>
@@ -34,7 +34,7 @@
 #include	"ELog.h"
 #include	"ServerCommandHandler.h"
 
-RCSTAG( "$Id: msg_CM.cc,v 1.9 2005/06/24 22:48:59 kewlio Exp $" ) ;
+RCSTAG( "$Id: msg_CM.cc,v 1.10 2006/12/22 06:41:41 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -80,6 +80,23 @@ std::string Modes = Param[ 2 ] ;
 bool clearOps = false ;
 bool clearVoice = false ;
 bool clearBans = false ;
+
+// Go ahead and post the server mode event
+iServer* serverSource = 0 ;
+
+if( NULL != strchr( Param[ 0 ], '.' ) )
+{
+	// Server, by name
+	serverSource = Network->findServerName( Param[ 0 ] ) ;
+} else if( strlen( Param[ 0 ] ) < 3 )
+{
+	// 1 or 2 char numeric, server
+	serverSource = Network->findServer( Param[ 0 ] ) ;
+}
+
+if (serverSource != 0)
+	theServer->PostChannelEvent( EVT_SERVERMODE, tmpChan,
+		static_cast< void* >( serverSource ) );
 
 xServer::modeVectorType modeVector ;
 

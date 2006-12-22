@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server.cc,v 1.219 2006/01/02 22:29:33 kewlio Exp $
+ * $Id: server.cc,v 1.220 2006/12/22 06:41:45 kewlio Exp $
  */
 
 #include	<sys/time.h>
@@ -70,7 +70,7 @@
 #include	"ConnectionHandler.h"
 #include	"Connection.h"
 
-RCSTAG( "$Id: server.cc,v 1.219 2006/01/02 22:29:33 kewlio Exp $" ) ;
+RCSTAG( "$Id: server.cc,v 1.220 2006/12/22 06:41:45 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -1728,8 +1728,10 @@ if( !chanModes.empty() &&
 				if( argPos >= st.size() )
 					{
 					elog	<< "xServer::JoinChannel> Invalid"
-						<< " number of arguments to "
-						<< "chanModes"
+						<< " number of arguments to chanModes "
+						<< " in 'k' ("
+						<< chanModes.c_str()
+						<< ")"
 						<< endl ;
 					break ;
 					}
@@ -1758,8 +1760,10 @@ if( !chanModes.empty() &&
 				if( argPos >= st.size() )
 					{
 					elog	<< "xServer::JoinChannel> Invalid"
-						<< " number of arguments to "
-						<< "chanModes"
+						<< " number of arguments to chanModes "
+						<< " in 'A' ("
+						<< chanModes
+						<< ")"
 						<< endl ;
 					break ;
 					}
@@ -1771,8 +1775,10 @@ if( !chanModes.empty() &&
 				if( argPos >= st.size() )
 					{
 					elog	<< "xServer::JoinChannel> Invalid"
-						<< " number of arguments to "
-						<< "chanModes"
+						<< " number of arguments to chanModes "
+						<< " in 'U' ("
+						<< chanModes
+						<< ")"
 						<< endl ;
 					break ;
 					}
@@ -1784,8 +1790,10 @@ if( !chanModes.empty() &&
 				if( argPos >= st.size() )
 					{
 					elog	<< "xServer::JoinChannel> Invalid"
-						<< " number of arguments to "
-						<< "chanModes"
+						<< " number of arguments to chanModes "
+						<< " in 'l' ("
+						<< chanModes
+						<< ")"
 						<< endl ;
 					break ;
 					}

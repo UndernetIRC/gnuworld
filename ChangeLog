@@ -1,4 +1,48 @@
-// $Id: ChangeLog,v 1.102 2006/10/08 22:06:33 kewlio Exp $ //
+// $Id: ChangeLog,v 1.103 2006/12/22 06:41:39 kewlio Exp $ //
+
+2006-12-21	Dan-m00 <daniel@undernet.org>
+		* src/server.cc:
+		* libircu/msg_I.cc:	Modified debug output to get more info
+			upon certain runtime conditions.
+
+		* mod.cservice/cservice.cc:	Fixed output of some debug
+			entries.
+
+2006-12-21	mod.openchanfix development team
+		* libircu/msg_CM.cc:
+		* libircu/msg_M.cc:
+		* libircu/msg_S.cc:
+		* libircu/msg_Server.cc:
+		* include/events.h:
+		* include/iServer.h:
+		* src/Network.cc:
+		* src/iServer.cc:
+		* src/server_connection.cc:	Merge patches from the open
+			chanfix dev team.  It adds a new handler for server
+			modes.  It also adds parsing of server flags.
+
+2006-12-21	Dan-m00 <daniel@undernet.org>
+		* bin/openchanfix.example.conf.in (new file):
+		* bin/GNUWorld.example.conf.in:
+		* bin/server_command_map.in:
+		* bin/.cvsignore:
+		* mod.openchanfix/LASTCOMCommand.cc:
+		* mod.openchanfix/STATUSCommand.cc:
+		* mod.openchanfix/chanfix.cc:	re-merge openchanfix with
+			main gnuworld distribution.
+
+2006-12-21	Dan-m00 <daniel@undernet.org>
+		* ac_cxx_namespaces.m4 (new file):
+		* ax_boost_thread.m4 (new file):
+		* aclocal.m4, INSTALL:
+		* Makefile.am, Makefile.in:
+		* config.guess, config.sub, configure.ac, configure:
+		* depcomp, install-sh, ltmain.sh, missing, mkinstalldirs:
+		* include/defs.h.in:
+		* <alldirs>/Makefile.in, <alldirs>/Makefile.am:
+		* libltdl/*:	Rebuilt entire configure system, including
+			adding additional options and importing macros from
+			mod.openchanfix
 
 2006-10-08	Dan-m00 <daniel@undernet.org>
 		* mod.ccontrol/ccontrol.cc: comment out legacy realname gline

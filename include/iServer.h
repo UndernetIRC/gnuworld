@@ -19,11 +19,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: iServer.h,v 1.14 2003/12/29 23:59:36 dan_karrels Exp $
+ * $Id: iServer.h,v 1.15 2006/12/22 06:41:41 kewlio Exp $
  */
 
 #ifndef __ISERVER_H
-#define __ISERVER_H "$Id: iServer.h,v 1.14 2003/12/29 23:59:36 dan_karrels Exp $"
+#define __ISERVER_H "$Id: iServer.h,v 1.15 2006/12/22 06:41:41 kewlio Exp $"
 
 #include	<iostream>
 #include	<string>
@@ -60,8 +60,17 @@ public:
 	/// Type used to hold flags
 	typedef unsigned int	flagType ;
 
-	/// Set if this iServer is juped, false otherwise
+	/**
+	 * Flags that iServers may have.
+	 */
+	/* Set if this iServer is juped, false otherwise */
 	static const flagType	FLAG_JUPE ;
+	/* Set if this iServer is a hub (+h) */
+	static const flagType	FLAG_HUB ;
+	/* Set if this iServer is a service (+s) */
+	static const flagType	FLAG_SERVICE ;
+	/* Set if this iServer is IPv6-compatible (+6) */
+	static const flagType	FLAG_IPV6 ;
 
 	/**
 	 * Construct an iServer given its vital state variables
@@ -115,6 +124,42 @@ public:
 	 */
 	inline void setJupe()
 		{ setFlag( FLAG_JUPE ) ; }
+
+	/**
+	 * Return true if this server is a hub.
+	 */
+	inline bool isHub() const
+		{ return getFlag( FLAG_HUB ) ; }
+
+	/**
+	 * Set this iServer as a hub.
+	 */
+	inline void setHub()
+		{ setFlag( FLAG_HUB ) ; }
+
+	/**
+	 * Return true if this server is a service
+	 */
+	inline bool isService() const
+		{ return getFlag( FLAG_SERVICE ) ; }
+
+	/**
+	 * Set this iServer as a service.
+	 */
+	inline void setService()
+		{ setFlag( FLAG_SERVICE ) ; }
+
+	/**
+	 * Return true if this server is IPv6-compatible
+	 */
+	inline bool isIPv6() const
+		{ return getFlag( FLAG_IPV6 ) ; }
+
+	/**
+	 * Set this iServer as IPv6-compatible
+	 */
+	inline void setIPv6()
+		{ setFlag( FLAG_IPV6 ) ; }
 
 	/**
 	 * Return the server numeric of this server's uplink.
@@ -211,6 +256,13 @@ public:
 			<< "charYY: " << serv.getCharYY() ;
 		return out ;
 		}
+
+	/* Mutator methods */
+
+	/**
+	 * Interpret a server's flags.
+	 */
+	void setFlags( const std::string& ) ;
 
 protected:
 

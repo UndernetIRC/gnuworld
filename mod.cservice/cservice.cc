@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: cservice.cc,v 1.273 2006/09/26 17:36:04 kewlio Exp $
+ * $Id: cservice.cc,v 1.274 2006/12/22 06:41:43 kewlio Exp $
  */
 
 #include	<new>
@@ -1735,7 +1735,7 @@ expireQuery	<< "SELECT user_id,channel_id FROM levels "
 
 #ifdef LOG_SQL
 	elog	<< "expireSuspends::sqlQuery> "
-		<< expireQuery
+		<< expireQuery.str().c_str()
 		<< endl;
 #endif
 
@@ -1817,7 +1817,7 @@ updateQuery << "UPDATE levels SET suspend_expires = "
 
 #ifdef LOG_SQL
 	elog	<< "expireSuspends::sqlQuery> "
-		<< updateQuery
+		<< updateQuery.str().c_str()
 		<< endl;
 #endif
 

@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_Server.cc,v 1.6 2005/03/25 03:07:29 dan_karrels Exp $
+ * $Id: msg_Server.cc,v 1.7 2006/12/22 06:41:41 kewlio Exp $
  */
 
 #include	<new>
@@ -35,7 +35,7 @@
 #include	"xparameters.h"
 #include	"ServerCommandHandler.h"
 
-RCSTAG( "$Id: msg_Server.cc,v 1.6 2005/03/25 03:07:29 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: msg_Server.cc,v 1.7 2006/12/22 06:41:41 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -106,6 +106,9 @@ if( Param[ 1 ][ 0 ] == '1' )
 		{
 		tmpUplink->setBursting( true ) ;
 		}
+
+	// Set any appropriate server flags
+	tmpUplink->setFlags( Param[ 6 ] ) ;
 
 	theServer->setUplink( tmpUplink ) ;
 

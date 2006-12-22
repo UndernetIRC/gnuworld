@@ -10,6 +10,7 @@ cservice.conf
 GNUWorld.conf
 cloner.conf
 nickserv.conf
+openchanfix.conf
 stats.conf
 scanner.conf
 clientExample.conf

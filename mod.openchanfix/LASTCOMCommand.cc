@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: LASTCOMCommand.cc,v 1.1 2006/12/09 00:29:18 buzlip01 Exp $
+ * $Id: LASTCOMCommand.cc,v 1.2 2006/12/22 06:41:44 kewlio Exp $
  */
 
 #include	<sstream>
@@ -33,7 +33,7 @@
 
 #include	"chanfix.h"
 #include	"chanfixCommands.h"
-#include        "chanfix_defs.h"
+#include        "defs.h"
 #include        "responses.h"
 #include        "sqlChanOp.h"
 #include        "sqlChannel.h"
@@ -45,7 +45,7 @@
 #include	"ELog.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: LASTCOMCommand.cc,v 1.1 2006/12/09 00:29:18 buzlip01 Exp $" ) ;
+RCSTAG( "$Id: LASTCOMCommand.cc,v 1.2 2006/12/22 06:41:44 kewlio Exp $" ) ;
 
 namespace gnuworld
 {

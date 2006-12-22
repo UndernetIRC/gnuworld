@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: iServer.cc,v 1.10 2005/01/12 03:50:38 dan_karrels Exp $
+ * $Id: iServer.cc,v 1.11 2006/12/22 06:41:45 kewlio Exp $
  */
 
 #include	<string>
@@ -30,7 +30,7 @@
 #include	"gnuworld_config.h"
 #include	"NetworkTarget.h"
 
-RCSTAG( "$Id: iServer.cc,v 1.10 2005/01/12 03:50:38 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: iServer.cc,v 1.11 2006/12/22 06:41:45 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -38,6 +38,9 @@ namespace gnuworld
 using std::string ;
 
 const iServer::flagType iServer::FLAG_JUPE	= 0x01 ;
+const iServer::flagType iServer::FLAG_HUB	= 0x02 ;
+const iServer::flagType iServer::FLAG_SERVICE	= 0x04 ;
+const iServer::flagType iServer::FLAG_IPV6	= 0x08 ;
 
 iServer::iServer( const unsigned int& _uplink,
 	const string& _yyxxx,
@@ -56,5 +59,38 @@ iServer::iServer( const unsigned int& _uplink,
 
 iServer::~iServer()
 {}
+
+/**
+ * Interpret a server's flags.
+ *
+ * @Param[in] newFlags String listing server's P10 flags.
+ */
+void iServer::setFlags( const string& newFlags )
+{
+	for( string::size_type i = 0 ; i < newFlags.size() ; i++ )
+	{
+		switch( newFlags[ i ] )
+		{
+			case 'h':
+					setHub() ;
+					break ;
+			case 's':
+					setService() ;
+					break ;
+			case '6':
+					setIPv6() ;
+					break ;
+			case '+':	break ;
+			default:
+					// Unknown flag
+					elog	<< "iServer> Unknown server flag: "
+						<< newFlags[ i ]
+						<< ", in flags string: "
+						<< newFlags
+						<< std::endl ;
+					break ;
+		}
+	}
+}
 
 } // namespace gnuworld

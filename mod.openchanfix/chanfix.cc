@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: chanfix.cc,v 1.8 2006/12/22 03:00:02 buzlip01 Exp $
+ * $Id: chanfix.cc,v 1.9 2006/12/22 06:41:44 kewlio Exp $
  */
 
 #include	<csignal>
@@ -50,7 +50,7 @@
 #include	"StringTokenizer.h"
 
 #include	"chanfix.h"
-#include	"chanfix_defs.h"
+#include	"defs.h"
 #include	"chanfix_misc.h"
 #include	"chanfixCommands.h"
 #include	"responses.h"
@@ -62,7 +62,7 @@
 #include	<boost/thread/thread.hpp>
 #endif /* CHANFIX_HAVE_BOOST_THREAD */
 
-RCSTAG("$Id: chanfix.cc,v 1.8 2006/12/22 03:00:02 buzlip01 Exp $");
+RCSTAG("$Id: chanfix.cc,v 1.9 2006/12/22 06:41:44 kewlio Exp $");
 
 namespace gnuworld
 {
@@ -768,7 +768,7 @@ if (Command == "DCC") {
 } else if (Command == "PING" || Command == "ECHO") {
   DoCTCP(theClient, CTCP, Message);
 } else if (Command == "VERSION") {
-  DoCTCP(theClient, CTCP, "evilnet development - GNUWorld " CHANFIX_PACKAGE_STRING " [compiled "__DATE__" "__TIME__"]");
+  DoCTCP(theClient, CTCP, "evilnet development - GNUWorld " VERSION " [compiled "__DATE__" "__TIME__"]");
 } else if (Command == "WHODUNIT?") {
   DoCTCP(theClient, CTCP, "reed, ULtimaTe_, Compy, SiRVulcaN");
 } else if (Command == "SUBVERSION") {

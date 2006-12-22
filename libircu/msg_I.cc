@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_I.cc,v 1.5 2005/03/25 03:07:29 dan_karrels Exp $
+ * $Id: msg_I.cc,v 1.6 2006/12/22 06:41:41 kewlio Exp $
  */
 
 #include	<iostream>
@@ -32,7 +32,7 @@
 #include	"Network.h"
 #include	"ServerCommandHandler.h"
 
-RCSTAG( "$Id: msg_I.cc,v 1.5 2005/03/25 03:07:29 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: msg_I.cc,v 1.6 2006/12/22 06:41:41 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -46,8 +46,18 @@ bool msg_I::Execute( const xParameters& Param )
 {
 if( Param.size() != 3 )
 	{
-	elog	<< "msg_I> Invalid number of arguments"
+	elog	<< "msg_I> Invalid number of arguments ("
+		<< Param.size()
+		<< ")"
 		<< endl ;
+	int i;
+	for (i = 0; i < (int)Param.size(); i++)
+		elog	<< "msg_I>   arg"
+			<< i
+			<< " = '"
+			<< Param[i]
+			<< "'"
+			<< endl ;
 	return false ;
 	}
 

@@ -22,11 +22,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: events.h,v 1.19 2005/09/29 17:40:06 kewlio Exp $
+ * $Id: events.h,v 1.20 2006/12/22 06:41:41 kewlio Exp $
  */
 
 #ifndef __EVENTS_H
-#define __EVENTS_H "$Id: events.h,v 1.19 2005/09/29 17:40:06 kewlio Exp $"
+#define __EVENTS_H "$Id: events.h,v 1.20 2006/12/22 06:41:41 kewlio Exp $"
 
 #include	<string>
 
@@ -74,6 +74,7 @@ enum
 {
 	EVT_JOIN = EVT_NOOP,
 	EVT_PART,
+	EVT_SERVERMODE, // when server performs modes.
 	EVT_TOPIC, // passed even if TRACK_TOPIC is disabled
 	EVT_KICK, // moved to xClient::OnNetworkKick()
 	EVT_CREATE
@@ -149,7 +150,8 @@ const std::string eventNames[] = {
 	"Channel Part", /* EVT_PART */
 	"Channel Topic Change", /* EVT_TOPIC */
 	"Channel Kick", /* EVT_KICK */
-	"Channel Create" /* EVT_CREATE */
+	"Channel Create", /* EVT_CREATE */
+	"Channel Mode By Server" /* EVT_SERVERMODE */
 } ;
 
 } // namespace gnuworld

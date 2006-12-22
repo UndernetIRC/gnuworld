@@ -1,10 +1,10 @@
-dnl $Id: configure.ac,v 1.35 2006/09/26 17:35:57 kewlio Exp $
+dnl $Id: configure.ac,v 1.36 2006/12/22 06:41:40 kewlio Exp $
 dnl ----------------------------------------------------------
 
 echo Configuring GNUWorld...
 echo
 
-AC_REVISION($Revision: 1.35 $)
+AC_REVISION($Revision: 1.36 $)
 AC_INIT
 AC_CONFIG_SRCDIR([src/main.cc])
 AM_INIT_AUTOMAKE(gnuworld,2.8)
@@ -244,6 +244,26 @@ if [test $check_pgsql = "yes" ]; then
 fi
 AM_CONDITIONAL(COND_DBDIR,[test $build_dbdir = true])
 
+dnl Allow selection of additional includes and libraries paths
+dnl just in case!
+
+AC_ARG_WITH(extra-includes,
+	AC_HELP_STRING([--with-extra-includes=INCLUDESDIR],
+		[Specify location to find additional include files]),
+	[CXXFLAGS="$CXXFLAGS -I$withval"]
+)
+AC_ARG_WITH(extra-libraries,
+	AC_HELP_STRING([--with-extra-libraries=LIBRARYDIR],
+		[Specify location to find additional libraries]),
+	[LDFLAGS="$LDFLAGS -L$withval"]
+)
+
+dnl This calls a macro in ax_boost_thread.m4
+m4_include([ac_cxx_namespaces.m4])
+m4_include([ax_boost_thread.m4])
+CXXFLAGS="$CXXFLAGS $threadLib"
+AX_BOOST_THREAD
+
 dnl echo "PGSQL_INCLUDE: $PGSQL_INCLUDE"
 dnl echo "PGSQL_LIB: $PGSQL_LIB"
 dnl exit
@@ -262,6 +282,7 @@ build_modcservice=false
 build_moddronescan=false
 build_modgnutest=false
 build_modnickserv=false
+build_modopenchanfix=false
 build_modscanner=false
 build_modstats=false
 build_modsnoop=false
@@ -300,6 +321,7 @@ dnl	Prepare for conditionals
 	    mod.dronescan)	build_moddronescan=true;;
 	    mod.gnutest)	build_modgnutest=true;;
 	    mod.nickserv)	build_modnickserv=true;;
+	    mod.openchanfix)	build_modopenchanfix=true;;
 	    mod.scanner)	build_modscanner=true;;
 	    mod.stats)		build_modstats=true;;
 	    mod.snoop)		build_modsnoop=true;;
@@ -335,6 +357,7 @@ dnl	echo "mod_list: $mod_list"
 		    mod.dronescan)	build_moddronescan=true;;
 		    mod.gnutest)	build_modgnutest=true;;
 		    mod.nickserv)	build_modnickserv=true;;
+		    mod.openchanfix)	build_modopenchanfix=true;;
 		    mod.scanner)	build_modscanner=true;;
 		    mod.stats)		build_modstats=true;;
 		    mod.snoop)		build_modsnoop=true;;
@@ -342,6 +365,17 @@ dnl	echo "mod_list: $mod_list"
 		  esac
 		fi
 	 done
+fi
+
+dnl Check if openchanfix is selected.  mod.openchanfix requires threading
+dnl support - if we don't have it, tell the user so they can fix it.
+if [test $build_modopenchanfix = true]; then
+	if [test "x$threadLib" = "x"]; then
+		AC_MSG_ERROR(mod.openchanfix requires THREAD support - which you lack.)
+	fi
+	if [test "x$BOOST_THREAD_LIB" = "x"]; then
+		AC_MSG_ERROR(mod.openchanfix requires Boost::Thread support - which you lack.)
+	fi
 fi
 
 AM_CONDITIONAL(COND_MODCCONTROL,[test $build_modccontrol = true])
@@ -352,6 +386,7 @@ AM_CONDITIONAL(COND_MODCSERVICE,[test $build_modcservice = true])
 AM_CONDITIONAL(COND_MODDRONESCAN,[test $build_moddronescan = true])
 AM_CONDITIONAL(COND_MODGNUTEST,[test $build_modgnutest = true])
 AM_CONDITIONAL(COND_MODNICKSERV,[test $build_modnickserv = true])
+AM_CONDITIONAL(COND_MODOPENCHANFIX,[test $build_modopenchanfix = true])
 AM_CONDITIONAL(COND_MODSCANNER,[test $build_modscanner = true])
 AM_CONDITIONAL(COND_MODSTATS,[test $build_modstats = true])
 AM_CONDITIONAL(COND_MODSNOOP,[test $build_modsnoop = true])
@@ -386,6 +421,7 @@ mod.cservice/Makefile \
 mod.dronescan/Makefile \
 mod.gnutest/Makefile \
 mod.nickserv/Makefile \
+mod.openchanfix/Makefile \
 mod.scanner/Makefile \
 mod.stats/Makefile \
 mod.snoop/Makefile \
@@ -398,6 +434,7 @@ bin/cservice.example.conf \
 bin/gnutest.example.conf \
 bin/GNUWorld.example.conf \
 bin/nickserv.example.conf \
+bin/openchanfix.example.conf \
 bin/scanner.example.conf \
 bin/stats.example.conf \
 bin/snoop.example.conf \

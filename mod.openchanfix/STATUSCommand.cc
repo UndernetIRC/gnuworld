@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
  * USA.
  *
- * $Id: STATUSCommand.cc,v 1.5 2006/12/22 03:00:02 buzlip01 Exp $
+ * $Id: STATUSCommand.cc,v 1.6 2006/12/22 06:41:44 kewlio Exp $
  */
 
 #include	<string>
@@ -31,11 +31,11 @@
 #include	"StringTokenizer.h"
 
 #include	"chanfix.h"
-#include	"chanfix_defs.h"
+#include	"defs.h"
 #include	"responses.h"
 #include	"Network.h"
 
-RCSTAG("$Id: STATUSCommand.cc,v 1.5 2006/12/22 03:00:02 buzlip01 Exp $");
+RCSTAG("$Id: STATUSCommand.cc,v 1.6 2006/12/22 06:41:44 kewlio Exp $");
 
 namespace gnuworld
 {
@@ -46,7 +46,7 @@ void STATUSCommand::Exec(iClient* theClient, sqlcfUser* theUser, const std::stri
 {
 
 bot->SendTo(theClient, "[evilnet development's GNUWorld %s]",
-	    CHANFIX_PACKAGE_STRING);
+	    VERSION);
 bot->SendTo(theClient,
             bot->getResponse(theUser,
                             language::status_uptime,

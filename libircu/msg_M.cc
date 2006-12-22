@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_M.cc,v 1.12 2005/09/29 17:40:06 kewlio Exp $
+ * $Id: msg_M.cc,v 1.13 2006/12/22 06:41:41 kewlio Exp $
  */
 
 #include	<new>
@@ -39,7 +39,7 @@
 #include	"StringTokenizer.h"
 #include	"ServerCommandHandler.h"
 
-RCSTAG( "$Id: msg_M.cc,v 1.12 2005/09/29 17:40:06 kewlio Exp $" ) ;
+RCSTAG( "$Id: msg_M.cc,v 1.13 2006/12/22 06:41:41 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -129,6 +129,19 @@ if( NULL == theChan )
 	return false ;
 	}
 
+if( serverSource != 0 )
+{
+//	elog	<< "msg_M ("
+//		<< theChan->getName()
+//		<< ") server "
+//		<< serverSource->getName()
+//		<< " performed a mode"
+//		<< end1;
+	theServer->PostChannelEvent( EVT_SERVERMODE, theChan,
+		static_cast< void* >( serverSource ) ) ;
+}
+
+/* XXX OPMODE FAILS HERE */
 // Find the ChannelUser of the source client
 // It is possible that the ChannelUser will be NULL, in the
 // case that a server is setting the mode(s)

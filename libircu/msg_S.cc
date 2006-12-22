@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_S.cc,v 1.5 2005/03/25 03:07:29 dan_karrels Exp $
+ * $Id: msg_S.cc,v 1.6 2006/12/22 06:41:41 kewlio Exp $
  */
 
 #include	<new>
@@ -35,7 +35,7 @@
 #include	"xparameters.h"
 #include	"ServerCommandHandler.h"
 
-RCSTAG( "$Id: msg_S.cc,v 1.5 2005/03/25 03:07:29 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: msg_S.cc,v 1.6 2006/12/22 06:41:41 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -47,10 +47,10 @@ CREATE_HANDLER(msg_S)
 
 /**
  * New server joined the network.
- * Q S irc.dynmc.net 2 0 948159347 P10 BD] 0 :[209.0.37.10]
+ * Q S irc.dynmc.net 2 0 948159347 P10 BD] +6hs :[209.0.37.10]
  * [209.0.37.10] Dynamic Networking Solutions
  *
- * B S EUWorld1.test.net 3 0 947284938 P10 OD] 0 :[128.227.184.152]
+ * B S EUWorld1.test.net 3 0 947284938 P10 OD] +6hs :[128.227.184.152]
  * EUWorld Undernet Service
  * B: Uplink Server numeric
  * S: SERVER message
@@ -61,7 +61,7 @@ CREATE_HANDLER(msg_S)
  * P10: Protocol
  * B: Server numeric
  * D]: Last used nick number for clients
- * 0: Unused
+ * +6/+h/+s: server/services flags
  * EUWorld Undernet Server: description
  * As always, the second token, the command, is not
  * included in the xParameters passed here.
@@ -127,6 +127,9 @@ if( 'J' == params[ 5 ][ 0 ] )
 	{
 	newServer->setBursting( true ) ;
 	}
+
+// Set any appropriate server flags
+newServer->setFlags( params[ 7 ] ) ;
 
 Network->addServer( newServer ) ;
 //elog	<< "msg_S> Added server: "
