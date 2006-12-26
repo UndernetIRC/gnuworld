@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: INFOCommand.cc,v 1.4 2006/12/09 00:29:18 buzlip01 Exp $
+ * $Id: INFOCommand.cc,v 1.5 2006/12/26 14:36:08 buzlip01 Exp $
  */
 
 #include "gnuworld_config.h"
@@ -33,7 +33,7 @@
 #include "sqlChannel.h"
 #include "sqlcfUser.h"
 
-RCSTAG("$Id: INFOCommand.cc,v 1.4 2006/12/09 00:29:18 buzlip01 Exp $");
+RCSTAG("$Id: INFOCommand.cc,v 1.5 2006/12/26 14:36:08 buzlip01 Exp $");
 
 namespace gnuworld
 {
@@ -53,7 +53,7 @@ if (!theChan) {
     bot->SendTo(theClient,
 		bot->getResponse(theUser,
 			    language::temporarily_blocked,
-			    std::string("%s is temporarily blocked.")).c_str(),
+			    std::string("%s is temporarily blocked. (Use OVERRIDE to bypass)")).c_str(),
 			    st[1].c_str());
     return;
   }
@@ -76,7 +76,7 @@ if (isBlocked)
   bot->SendTo(theClient,
 	    bot->getResponse(theUser,
 			    language::temporarily_blocked,
-			    std::string("%s is temporarily blocked.")).c_str(),
+			    std::string("%s is temporarily blocked. (Use OVERRIDE to bypass)")).c_str(),
 			    st[1].c_str());
 
 if (theChan->getFlag(sqlChannel::F_BLOCKED))

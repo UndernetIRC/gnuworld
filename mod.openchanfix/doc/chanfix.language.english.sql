@@ -3,7 +3,7 @@
 -- Language: English (1)
 -- Author: evilnet development <http://evilnet.sourceforge.net>
 --
--- $Id: chanfix.language.english.sql,v 1.5 2006/12/22 03:00:03 buzlip01 Exp $
+-- $Id: chanfix.language.english.sql,v 1.6 2006/12/26 14:36:08 buzlip01 Exp $
 
 			
 DELETE FROM translations;
@@ -191,7 +191,7 @@ COPY "translations" FROM stdin;
 1	185	You cannot delete a host from a user manager unless you're an owner.	31337	0
 1	186	You cannot add a host to an owner unless you're an owner.	31337	0
 1	187	You cannot add a host to a user manager unless you're an owner.	31337	0
-1	188	%s is temporarily blocked.	31337	0
+1	188	%s is temporarily blocked. (Use OVERRIDE to bypass)	31337	0
 1	189	%s is temporarily blocked due to oper intervention via EUWorld within the last hour. Please append the OVERRIDE flag to force a manual fix.	31337	0
 1	190	List of all blocked channels:	31337	0
 1	191	%d channels blocked.	31337	0
@@ -214,16 +214,8 @@ COPY "translations" FROM stdin;
 1	208	You cannot see logs more than one year ago.	31337	0
 1	209	Listing last %d messages from day %d.	31337	0
 1	210	End of LASTCOM report.	31337	0
-1	211	The channel %s is TEMPBLOCKED.	31337	0
-1	212	List of all temp blocked channels:	31337	0
-1	213	%d channels temp blocked.	31337	0
-1	214	%s is TEMPBLOCKED.	31337	0
-1	215	The channel %s is already temp blocked.	31337	0
-1	216	The channel %s has been temp blocked.	31337	0
-1	217	WARNING: Channel %s is being manually fixed; aborting fix as per TEMPBLOCK.	31337	0
-1	218	WARNING: Channel %s is being automatically fixed; aborting fix as per TEMPBLOCK.	31337	0
-1	219	The channel %s is not temp blocked.	31337	0
-1	220	Channel %s has been untempblocked.	31337	0
+1	211	The channel %s is TEMPBLOCKED. To fix it, please append the OVERRIDE flag.	31337	0
+1	214	%s is TEMPBLOCKED. (Use OVERRIDE to bypass)	31337	0
 1	221	Simulate complete for %s	31337	0
 1	222	(%s) Opping: %s (%d Clients)	31337	0
 1	223	(%s) Channel modes have been removed.	31337	0

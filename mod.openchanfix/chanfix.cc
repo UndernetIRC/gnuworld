@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: chanfix.cc,v 1.9 2006/12/22 06:41:44 kewlio Exp $
+ * $Id: chanfix.cc,v 1.10 2006/12/26 14:36:08 buzlip01 Exp $
  */
 
 #include	<csignal>
@@ -62,7 +62,7 @@
 #include	<boost/thread/thread.hpp>
 #endif /* CHANFIX_HAVE_BOOST_THREAD */
 
-RCSTAG("$Id: chanfix.cc,v 1.9 2006/12/22 06:41:44 kewlio Exp $");
+RCSTAG("$Id: chanfix.cc,v 1.10 2006/12/26 14:36:08 buzlip01 Exp $");
 
 namespace gnuworld
 {
@@ -224,11 +224,6 @@ RegisterCommand(new LISTHOSTSCommand(this, "LISTHOSTS",
 	1,
 	sqlcfUser::F_LOGGEDIN
 	));
-RegisterCommand(new LISTTEMPBLOCKEDCommand(this, "LISTTEMPBLOCKED",
-	"",
-	1,
-	sqlcfUser::F_BLOCK
-	));
 RegisterCommand(new OPLISTCommand(this, "OPLIST",
 	"<#channel> [-all] [-days]",
 	2,
@@ -306,11 +301,6 @@ RegisterCommand(new SUSPENDCommand(this, "SUSPEND",
 	2,
 	sqlcfUser::F_USERMANAGER | sqlcfUser::F_SERVERADMIN
 	));
-RegisterCommand(new TEMPBLOCKCommand(this, "TEMPBLOCK",
-	"<#channel>",
-	2,
-	sqlcfUser::F_BLOCK
-	));
 RegisterCommand(new UNALERTCommand(this, "UNALERT",
 	"<#channel>",
 	2,
@@ -325,11 +315,6 @@ RegisterCommand(new UNSUSPENDCommand(this, "UNSUSPEND",
 	"<username>",
 	2,
 	sqlcfUser::F_USERMANAGER | sqlcfUser::F_SERVERADMIN
-	));
-RegisterCommand(new UNTEMPBLOCKCommand(this, "UNTEMPBLOCK",
-	"<#channel>",
-	2,
-	sqlcfUser::F_BLOCK
 	));
 RegisterCommand(new USERSCORESCommand(this, "USERSCORES",
 	"<account>",
@@ -3164,15 +3149,17 @@ std::string curChan;
 for (sqlChanOpsType::iterator ptr = sqlChanOps.begin();
      ptr != sqlChanOps.end(); ptr++) {
   for (sqlChanOpsType::mapped_type::iterator chanOp = ptr->second.begin();
-       chanOp != ptr->second.end(); chanOp++) {
+       chanOp != ptr->second.end();) {
     curOp = chanOp->second;
     curOp->setDay(nextDay, 0);
     curOp->calcTotalPoints();
     if (((curOp->getPoints() <= 0) &&
 	 (maxFirstOppedTS > curOp->getTimeFirstOpped()))
 	|| (maxLastOppedTS > curOp->getTimeLastOpped())) {
-      ptr->second.erase(chanOp);
+      ptr->second.erase(chanOp++);
       delete curOp; curOp = 0;
+    } else {
+      chanOp++;
     }
   }
   if (!ptr->second.size()) {

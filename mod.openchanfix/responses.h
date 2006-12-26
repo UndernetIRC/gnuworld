@@ -16,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: responses.h,v 1.5 2006/12/22 03:00:02 buzlip01 Exp $
+ * $Id: responses.h,v 1.6 2006/12/26 14:36:08 buzlip01 Exp $
  */
 
 #ifndef __RESPONSES_H
-#define __RESPONSES_H "$Id: responses.h,v 1.5 2006/12/22 03:00:02 buzlip01 Exp $"
+#define __RESPONSES_H "$Id: responses.h,v 1.6 2006/12/26 14:36:08 buzlip01 Exp $"
 
 namespace gnuworld
 	{
@@ -174,10 +174,6 @@ namespace cf
 		const int host_list_header		= 164;
 		const int host_list_footer		= 165;
 
-		/* LISTTEMPBLOCKED */
-		const int list_temp_blocked_chans	= 212;
-		const int list_total_temp_blocked	= 213;
-
 		/* OPLIST */
 		const int top_unique_op_accounts	= 80;
 		const int found_unique_op_accounts	= 81;
@@ -262,12 +258,6 @@ namespace cf
 		const int user_suspended		= 120;
 		const int user_cant_suspend_self	= 159;
 
-		/* TEMPBLOCK */
-		const int channel_already_temp_blocked	= 215;
-		const int channel_has_been_temp_blocked	= 216;
-		const int block_aborting_manual_fix	= 217;
-		const int block_aborting_auto_fix	= 218;
-
 		/* UNALERT */
 		const int no_alert_set			= 121;
 		const int alert_removed			= 122;
@@ -282,10 +272,6 @@ namespace cf
 		const int cant_unsuspend_diff_group	= 125;
 		const int user_not_suspended		= 126;
 		const int user_unsuspended		= 127;
-
-		/* UNTEMPBLOCK */
-		const int channel_not_temp_blocked	= 219;
-		const int channel_untempblocked		= 220;
 
 		/* USERSCORES */
 		const int userscores_header 		= 194;
