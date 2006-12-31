@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: chanfix.cc,v 1.10 2006/12/26 14:36:08 buzlip01 Exp $
+ * $Id: chanfix.cc,v 1.11 2006/12/31 17:29:20 buzlip01 Exp $
  */
 
 #include	<csignal>
@@ -62,7 +62,7 @@
 #include	<boost/thread/thread.hpp>
 #endif /* CHANFIX_HAVE_BOOST_THREAD */
 
-RCSTAG("$Id: chanfix.cc,v 1.10 2006/12/26 14:36:08 buzlip01 Exp $");
+RCSTAG("$Id: chanfix.cc,v 1.11 2006/12/31 17:29:20 buzlip01 Exp $");
 
 namespace gnuworld
 {
@@ -1692,7 +1692,6 @@ clientOpsType* myOps = findMyOps(thisClient);
 if (myOps != NULL && !myOps->empty()) {
   clientOpsType::iterator ptr = myOps->find(thisChan->getName());
   if (ptr != myOps->end()) {
-    delete myOps;
     return;
   }
 }
@@ -2818,7 +2817,7 @@ chanfix::clientOpsType* chanfix::findMyOps(iClient* theClient)
 {
 clientOpsType* myOps = static_cast< clientOpsType* >(theClient->getCustomData(this) );
 
-if (!myOps) myOps = new clientOpsType;
+if (myOps == NULL) myOps = new clientOpsType;
 
 return myOps;
 }
@@ -2881,12 +2880,8 @@ void chanfix::prepareUpdate(bool)
   Timer snapShotTimer;
   snapShotTimer.Start();
   
-  /* Has the snapshot map been allocated? if not, lets do! */
-  if (snapShot == NULL)
-    snapShot = new (std::nothrow) DBMapType;
-  
   /* Clear the snapShot map */
-  snapShot->clear();
+  snapShot.clear();
 
   //snapShotStruct* curStruct = new (std::nothrow) snapShotStruct;
   snapShotStruct curStruct;
@@ -2912,7 +2907,7 @@ void chanfix::prepareUpdate(bool)
         curStruct.day[i] = curOp->getDay(i);
       }
       
-      snapShot->insert(DBMapType::value_type(curChan, curStruct));
+      snapShot.insert(DBMapType::value_type(curChan, curStruct));
     }
   }
 
@@ -2993,8 +2988,8 @@ void chanfix::updateDB()
   int chanOpsProcessed = 0;
   int i = 0;
   
-  for (DBMapType::iterator ptr = snapShot->begin();
-       ptr != snapShot->end(); ptr++) {
+  for (DBMapType::iterator ptr = snapShot.begin();
+       ptr != snapShot.end(); ptr++) {
     theLine.str("");
     theLine	<< escapeSQLChars(ptr->first) << "\t"
 		<< escapeSQLChars(ptr->second.account) << "\t"
@@ -3068,8 +3063,7 @@ void chanfix::updateDB()
   theManager->removeConnection(cacheCon);
 
   /* Clean-up after ourselves and allow new updates to be started */
-  snapShot->clear();
-  delete snapShot; snapShot = 0;
+  snapShot.clear();
   updateInProgress = false;
 
   return;
@@ -3128,6 +3122,9 @@ logDebugMessage("Beginning database rotation.");
 Timer rotateDBTimer;
 rotateDBTimer.Start();
 
+int deleteCount = 0;
+int errorCount = 0;
+	
 short nextDay = currentDay;
 setCurrentDay();
 if (nextDay >= (DAYSAMPLES - 1))
@@ -3183,6 +3180,9 @@ for (sqlChanOpsType::iterator ptr = sqlChanOps.begin();
 	elog	<< "chanfix::rotateDB> Error: could not delete channel "
 		<< curChan.c_str()
 		<< std::endl;
+	errorCount++;
+      } else {
+	deleteCount++;
       }
 #ifdef REMEMBER_CHANNELS_WITH_NOTES_OR_FLAGS
     }
@@ -3192,6 +3192,10 @@ for (sqlChanOpsType::iterator ptr = sqlChanOps.begin();
 
 logDebugMessage("Completed database rotation in %u ms.",
 		rotateDBTimer.stopTimeMS());
+
+logDebugMessage("%i channels were deleted. %i channels errored out while deleting.",
+		deleteCount,
+		errorCount);
 
 return;
 }

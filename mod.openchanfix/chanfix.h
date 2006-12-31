@@ -16,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: chanfix.h,v 1.6 2006/12/22 03:00:02 buzlip01 Exp $
+ * $Id: chanfix.h,v 1.7 2006/12/31 17:29:20 buzlip01 Exp $
  */
 
 #ifndef __CHANFIX_H
-#define __CHANFIX_H "$Id: chanfix.h,v 1.6 2006/12/22 03:00:02 buzlip01 Exp $"
+#define __CHANFIX_H "$Id: chanfix.h,v 1.7 2006/12/31 17:29:20 buzlip01 Exp $"
 
 #include	<string>
 #include	<vector>
@@ -376,7 +376,7 @@ public:
 	} snapShotStruct;
 
 	typedef std::multimap<std::string, snapShotStruct> DBMapType;
-	DBMapType		*snapShot;
+	DBMapType		snapShot;
 
 	/**
 	 * The db clients map
