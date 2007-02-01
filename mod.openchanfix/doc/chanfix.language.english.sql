@@ -3,7 +3,7 @@
 -- Language: English (1)
 -- Author: evilnet development <http://evilnet.sourceforge.net>
 --
--- $Id: chanfix.language.english.sql,v 1.6 2006/12/26 14:36:08 buzlip01 Exp $
+-- $Id: chanfix.language.english.sql,v 1.7 2007/02/01 14:11:17 buzlip01 Exp $
 
 			
 DELETE FROM translations;
@@ -96,7 +96,7 @@ COPY "translations" FROM stdin;
 1	86	Successfully reloaded help tables. %i entries in table.	31337	0
 1	87	Successfully rehashed configuration file.	31337	0
 1	88	Reloading client...see you on the flip side	31337	0
-1	89	Score for %s (%s) in channel %s: %u.	31337	0
+1	89	Score for %s (%s) in channel %s: %u. (Ranked #%u of %d)	31337	0
 1	90	~U %s no@such.nick 0	31337	0
 1	91	No such nick %s.	31337	0
 1	92	None.	31337	0
@@ -161,7 +161,7 @@ COPY "translations" FROM stdin;
 1	155	Language: %s (%s)	31337	0
 1	156	~U %s no@score.for.account 0	31337	0
 1	157	No score for account %s on channel %s.	31337	0
-1	158	Score for account %s in channel %s: %u.	31337	0
+1	158	Score for account %s in channel %s: %u. (Ranked #%u of %d)	31337	0
 1	159	Suspending yourself is not a very wise thing to do.	31337	0
 1	160	Last modified: %s (%s ago)	31337	0
 1	161	NeedOper: Yes	31337	0

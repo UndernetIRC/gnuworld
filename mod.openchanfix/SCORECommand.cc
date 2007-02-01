@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: SCORECommand.cc,v 1.4 2006/12/09 00:29:19 buzlip01 Exp $
+ * $Id: SCORECommand.cc,v 1.5 2007/02/01 14:11:16 buzlip01 Exp $
  */
 
 #include <sstream>
@@ -37,7 +37,7 @@
 #include "sqlChanOp.h"
 #include "sqlcfUser.h"
 
-RCSTAG("$Id: SCORECommand.cc,v 1.4 2006/12/09 00:29:19 buzlip01 Exp $");
+RCSTAG("$Id: SCORECommand.cc,v 1.5 2007/02/01 14:11:16 buzlip01 Exp $");
 
 namespace gnuworld
 {
@@ -106,9 +106,12 @@ if (st.size() > 2) {
 					scUser);
       return;
     } else {
+      unsigned int ranking = 0;
+      size_t numMyOps = bot->countMyOps(netChan);
       for (chanfix::chanOpsType::iterator opPtr = myOps.begin();
 	   opPtr != myOps.end(); opPtr++) {
 	curOp = *opPtr;
+	ranking++;
 	if (string_lower(curOp->getAccount()) == string_lower(curClient->getAccount())) {
 	  //Score for "reed@local.host" in channel "#coder-com": 4.
 	  //Do it like they do on OCF, baby.
@@ -122,11 +125,13 @@ if (st.size() > 2) {
 	    bot->SendTo(theClient,
 			bot->getResponse(theUser,
 				language::score_for_channel_nick,
-				std::string("Score for %s (%s) in channel %s: %u.")).c_str(),
+				std::string("Score for %s (%s) in channel %s: %u. (Ranked #%u of %d)")).c_str(),
 					curClient->getNickName().c_str(),
 					curOp->getAccount().c_str(),
 					st[1].c_str(),
-					curOp->getPoints());
+					curOp->getPoints(),
+					ranking,
+					numMyOps);
 	  }
 	  return;
         }
@@ -150,9 +155,12 @@ if (st.size() > 2) {
     /* Account */
     if (st[2][0] == '*')
       ++scUser;
+    unsigned int ranking = 0;
+    size_t numMyOps = bot->countMyOps(netChan);
     for (chanfix::chanOpsType::iterator opPtr = myOps.begin();
 	 opPtr != myOps.end(); opPtr++) {
       curOp = *opPtr;
+      ranking++;
       if (string_lower(curOp->getAccount()) == string_lower(scUser)) {
 	if (compact)
 	  bot->SendTo(theClient, "~U %s %s %u", st[1].c_str(), curOp->getAccount().c_str(), curOp->getPoints());
@@ -160,10 +168,12 @@ if (st.size() > 2) {
 	  bot->SendTo(theClient,
 		bot->getResponse(theUser,
 			language::score_for_channel_account,
-			std::string("Score for account %s in channel %s: %u.")).c_str(),
+			std::string("Score for account %s in channel %s: %u. (Ranked #%u of %d)")).c_str(),
 				curOp->getAccount().c_str(),
 				st[1].c_str(),
-				curOp->getPoints());
+				curOp->getPoints(),
+				ranking,
+				numMyOps);
 	
 	return;
       }

@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: OPLISTCommand.cc,v 1.5 2006/12/09 00:29:19 buzlip01 Exp $
+ * $Id: OPLISTCommand.cc,v 1.6 2007/02/01 14:11:17 buzlip01 Exp $
  */
 
 #include "gnuworld_config.h"
@@ -33,7 +33,7 @@
 #include "sqlChannel.h"
 #include "sqlChanOp.h"
 
-RCSTAG("$Id: OPLISTCommand.cc,v 1.5 2006/12/09 00:29:19 buzlip01 Exp $");
+RCSTAG("$Id: OPLISTCommand.cc,v 1.6 2007/02/01 14:11:17 buzlip01 Exp $");
 
 namespace gnuworld
 {
@@ -71,6 +71,30 @@ if (myOps.empty()) {
                               language::no_scores_for_chan,
                               std::string("There are no scores in the database for %s.")).c_str(),
                                           st[1].c_str());
+	
+	sqlChannel* theChan = bot->getChannelRecord(st[1]);
+	if (theChan) {
+	  bot->SendTo(theClient, "Notes: %d", theChan->countNotes(0));
+
+	  if (bot->isTempBlocked(theChan->getChannel()))
+	    bot->SendTo(theClient,
+			bot->getResponse(theUser,
+					language::info_chan_temp_blocked,
+					std::string("%s is TEMPBLOCKED.")).c_str(),
+						    theChan->getChannel().c_str());
+	  else if (theChan->getFlag(sqlChannel::F_BLOCKED))
+	    bot->SendTo(theClient,
+		      bot->getResponse(theUser,
+				      language::info_chan_blocked,
+				      std::string("%s is BLOCKED.")).c_str(),
+						  theChan->getChannel().c_str());
+	  else if (theChan->getFlag(sqlChannel::F_ALERT))
+	    bot->SendTo(theClient,
+		      bot->getResponse(theUser,
+				      language::info_chan_alerted,
+				      std::string("%s is ALERTED.")).c_str(),
+						  theChan->getChannel().c_str());
+	}
   return;
 }
 
@@ -86,6 +110,30 @@ if (oCnt == 0) {
                               language::no_scores_for_chan,
                               std::string("There are no scores in the database for %s.")).c_str(),
 	      st[1].c_str());
+	
+	sqlChannel* theChan = bot->getChannelRecord(st[1]);
+	if (theChan) {
+	  bot->SendTo(theClient, "Notes: %d", theChan->countNotes(0));
+
+	  if (bot->isTempBlocked(theChan->getChannel()))
+	    bot->SendTo(theClient,
+			bot->getResponse(theUser,
+					language::info_chan_temp_blocked,
+					std::string("%s is TEMPBLOCKED.")).c_str(),
+						    theChan->getChannel().c_str());
+	  else if (theChan->getFlag(sqlChannel::F_BLOCKED))
+	    bot->SendTo(theClient,
+		      bot->getResponse(theUser,
+				      language::info_chan_blocked,
+				      std::string("%s is BLOCKED.")).c_str(),
+						  theChan->getChannel().c_str());
+	  else if (theChan->getFlag(sqlChannel::F_ALERT))
+	    bot->SendTo(theClient,
+		      bot->getResponse(theUser,
+				      language::info_chan_alerted,
+				      std::string("%s is ALERTED.")).c_str(),
+						  theChan->getChannel().c_str());
+	}
   return;
 }
 
