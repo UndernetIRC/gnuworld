@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: CHANFIXCommand.cc,v 1.4 2006/12/09 00:29:18 buzlip01 Exp $
+ * $Id: CHANFIXCommand.cc,v 1.5 2007/03/11 14:52:28 buzlip01 Exp $
  */
 
 #include "gnuworld_config.h"
@@ -31,7 +31,7 @@
 #include "responses.h"
 #include "StringTokenizer.h"
 
-RCSTAG("$Id: CHANFIXCommand.cc,v 1.4 2006/12/09 00:29:18 buzlip01 Exp $");
+RCSTAG("$Id: CHANFIXCommand.cc,v 1.5 2007/03/11 14:52:28 buzlip01 Exp $");
 
 namespace gnuworld
 {
@@ -171,12 +171,12 @@ if (theChan->getFlag(sqlChannel::F_BLOCKED)) {
   return;
 }
 
-/* Don't fix a blocked channel. */
-if (bot->isTempBlocked(theChan->getChannel())) {
+/* Don't fix a blocked channel without the OVERRIDE flag. */
+if (bot->isTempBlocked(theChan->getChannel()) && !override) {
   bot->SendTo(theClient,
               bot->getResponse(theUser,
                               language::channel_temp_blocked,
-                              std::string("The channel %s is TEMPBLOCKED.")).c_str(),
+                              std::string("The channel %s is TEMPBLOCKED. To fix it, please append the OVERRIDE flag.")).c_str(),
                                           theChan->getChannel().c_str());
   return;
 }

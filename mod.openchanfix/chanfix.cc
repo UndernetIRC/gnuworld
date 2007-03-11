@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: chanfix.cc,v 1.11 2006/12/31 17:29:20 buzlip01 Exp $
+ * $Id: chanfix.cc,v 1.12 2007/03/11 14:52:28 buzlip01 Exp $
  */
 
 #include	<csignal>
@@ -62,7 +62,7 @@
 #include	<boost/thread/thread.hpp>
 #endif /* CHANFIX_HAVE_BOOST_THREAD */
 
-RCSTAG("$Id: chanfix.cc,v 1.11 2006/12/31 17:29:20 buzlip01 Exp $");
+RCSTAG("$Id: chanfix.cc,v 1.12 2007/03/11 14:52:28 buzlip01 Exp $");
 
 namespace gnuworld
 {
@@ -2464,12 +2464,6 @@ if (inFix) {
   }
 }
 
-if ((isAutoFix) && (doAutoFixNotice()))
-  Message(theChan, "Channel has been automatically fixed.");
-else if ((!isAutoFix) && (doManualFixNotice()) && 
-	((isBeingChanFixed(theChan)) || (isBeingAutoFixed(theChan))))
-  Message(theChan, "Channel has been fixed.");
-
 if (doJoinChannels())
   PartChan(theChan);
 
@@ -2650,8 +2644,6 @@ for (fixQueueType::iterator ptr = autoFixQ.begin(); ptr != autoFixQ.end(); ) {
 	 continue;
        }
 
-       if (doAutoFixNotice())
-         Message(theChan, "Channel has been automatically fixed.");
        if (doJoinChannels())
          PartChan(theChan);
        autoFixQ.erase(ptr++);
@@ -2689,8 +2681,6 @@ for (fixQueueType::iterator ptr = manFixQ.begin(); ptr != manFixQ.end(); ) {
 	 continue;
        }
 	     
-       if (doManualFixNotice())
-         Message(theChan, "Channel has been fixed.");
        if (doJoinChannels())
          PartChan(theChan);
        manFixQ.erase(ptr++);
