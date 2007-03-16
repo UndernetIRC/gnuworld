@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: misc.cc,v 1.3 2003/07/22 21:36:48 dan_karrels Exp $
+ * $Id: misc.cc,v 1.4 2007/03/16 12:07:51 mrbean_ Exp $
  */
 
 #include	<string>
@@ -31,7 +31,7 @@
 
 #include	"misc.h"
 
-const char rcsId[] = "$Id: misc.cc,v 1.3 2003/07/22 21:36:48 dan_karrels Exp $" ;
+const char rcsId[] = "$Id: misc.cc,v 1.4 2007/03/16 12:07:51 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -135,4 +135,34 @@ int strcasecmp( const string& s1, const string& s2 )
 return ::strcasecmp( s1.c_str(), s2.c_str() ) ;
 }
 
+/**
+ * Returns the time which is given as #<d/h/m/s> as seconds */
+
+time_t extractTime( string Length )
+{
+unsigned int Units = 1;         // Default for seconds
+
+if (!strcasecmp(Length.substr(Length.length()-1).c_str(),"d"))
+	{
+	Units = (24*3600);
+	Length.resize(Length.length()-1);
+	}
+else if(!strcasecmp(Length.substr(Length.length()-1).c_str(),"h"))
+        {
+        Units = 3600;
+        Length.resize(Length.length()-1);
+        }
+else if(!strcasecmp(Length.substr(Length.length()-1).c_str(),"m"))
+        {
+        Units = 60;
+        Length.resize(Length.length()-1);
+        }
+else if(!strcasecmp(Length.substr(Length.length()-1).c_str(),"s"))
+        {
+        Units = 1;
+        Length.resize(Length.length()-1);
+        }
+
+return atoi(Length.c_str()) * Units;
+}
 } // namespace gnuworld

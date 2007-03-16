@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: client.cc,v 1.83 2005/11/17 19:08:08 kewlio Exp $
+ * $Id: client.cc,v 1.84 2007/03/16 12:07:52 mrbean_ Exp $
  */
 
 #include	<new>
@@ -47,7 +47,7 @@
 #include	"ELog.h"
 #include	"events.h"
 
-RCSTAG("$Id: client.cc,v 1.83 2005/11/17 19:08:08 kewlio Exp $" ) ;
+RCSTAG("$Id: client.cc,v 1.84 2007/03/16 12:07:52 mrbean_ Exp $" ) ;
 
 namespace gnuworld
 {
@@ -2024,24 +2024,28 @@ bool xClient::Join( const string& chanName,
 	const time_t& joinTime,
 	bool getOps )
 {
-if( !isConnected() )
-	{
-	return false ;
-	}
-
-// Ask the server to join this bot into the given channel.
-MyUplink->JoinChannel( this, chanName, chanModes, joinTime, getOps ) ;
-return true ;
+return Join(Network->findChannel(chanName),chanModes,joinTime,getOps);
 }
 
 bool xClient::Join( Channel* theChan,
-	const string&, // chanModes
+	const string& chanModes,
 	const time_t& joinTime,
 	bool getOps )
 {
+if ( !isConnected() )
+	{
+	return false;
+	}
 assert( theChan != NULL ) ;
+if( joinTime < theChan->getCreationTime() )
+	{
+	//The join is older than the creation time of the channel, need to remove all the modes of the channel
+	theChan->removeAllModes();
+	//Now set the channel creation ts to the join ts
+	theChan->setCreationTime(joinTime);
+	}
 
-return Join( theChan->getName(), string(), joinTime, getOps ) ;
+return MyUplink->JoinChannel( this, theChan->getName(), chanModes, joinTime, getOps ) ;
 }
 
 bool xClient::Part( const string& chanName, const string& reason )

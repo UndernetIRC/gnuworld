@@ -16,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccontrol.h,v 1.100 2006/09/26 17:36:02 kewlio Exp $
+ * $Id: ccontrol.h,v 1.101 2007/03/16 12:07:52 mrbean_ Exp $
  */
 
 #ifndef __CCONTROL_H
-#define __CCONTROL_H "$Id: ccontrol.h,v 1.100 2006/09/26 17:36:02 kewlio Exp $"
+#define __CCONTROL_H "$Id: ccontrol.h,v 1.101 2007/03/16 12:07:52 mrbean_ Exp $"
 
 //Undef this if you want to log to the database
 #define LOGTOHD 
@@ -681,6 +681,8 @@ public:
 	
 	bool updateMisc(const string&, const unsigned int);
 	
+	bool glineChannelUsers(Channel* , const string& , unsigned int , const string& , bool);
+
 	/**
 	 * This is a constant iterator type used to perform a read-only
 	 * iteration of the operchan structure.

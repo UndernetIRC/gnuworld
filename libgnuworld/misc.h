@@ -19,11 +19,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: misc.h,v 1.6 2003/12/29 23:59:36 dan_karrels Exp $
+ * $Id: misc.h,v 1.7 2007/03/16 12:07:51 mrbean_ Exp $
  */
 
 #ifndef __MISC_H
-#define __MISC_H "$Id: misc.h,v 1.6 2003/12/29 23:59:36 dan_karrels Exp $"
+#define __MISC_H "$Id: misc.h,v 1.7 2007/03/16 12:07:51 mrbean_ Exp $"
 
 #include	<string>
 #include	<iostream>
@@ -131,6 +131,12 @@ void string_toupper( std::string& ) ;
  * all numeric characters, return false otherwise.
  */
 bool IsNumeric( const std::string& ) ;
+
+/**
+ * Returns the time which is given as #<d/h/m/s> as seconds */
+
+time_t extractTime( std::string Length ) ;
+
 
 } // namespace gnuworld
 

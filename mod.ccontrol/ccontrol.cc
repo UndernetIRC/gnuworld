@@ -20,12 +20,12 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccontrol.cc,v 1.211 2006/10/08 22:06:33 kewlio Exp $
+ * $Id: ccontrol.cc,v 1.212 2007/03/16 12:07:52 mrbean_ Exp $
 */
 
 #define MAJORVER "1"
-#define MINORVER "2pl5"
-#define RELDATE "26th September, 2006"
+#define MINORVER "2pl6"
+#define RELDATE "16th March, 2007"
 
 #include        <sys/types.h> 
 #include        <sys/socket.h>
@@ -66,7 +66,7 @@
 #include	"ccontrol_generic.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: ccontrol.cc,v 1.211 2006/10/08 22:06:33 kewlio Exp $" ) ;
+RCSTAG( "$Id: ccontrol.cc,v 1.212 2007/03/16 12:07:52 mrbean_ Exp $" ) ;
 
 namespace gnuworld
 {
@@ -258,6 +258,16 @@ RegisterCommand( new CHANGLINECommand( this, "CHANGLINE",
 	false,
 	operLevel::CODERLEVEL,
 	true ) ) ;
+RegisterCommand( new FORCECHANGLINECommand( this, "FORCECHANGLINE",
+		"<#channel> <duration>[time units (s,d,h)] <reason> "
+		"Gline a given channel for the given reason",
+		true,
+		commandLevel::flg_FORCECHANGLINE,
+		false,
+		false,
+		false,
+		operLevel::OPERLEVEL,
+		true ) ) ;
 RegisterCommand( new GLINECommand( this, "GLINE",
 	"<user@host> <duration>[time units (s,d,h)] <reason> "
 	"Gline a given user@host for the given reason",
@@ -629,7 +639,7 @@ RegisterCommand( new REMOVEIGNORECommand( this, "REMIGNORE", "(nick/host)"
 	false,
 	operLevel::OPERLEVEL,
 	true ) ) ;
-RegisterCommand( new LISTCommand( this, "LIST", "(glines/servers/badchannels/exceptions/channels)"
+RegisterCommand( new LISTCommand( this, "LIST", "(glines/servers/nomodechannels/exceptions/channels)"
 	" Get all kinds of lists from the bot",
 	false,
 	commandLevel::flg_LIST,
@@ -4575,7 +4585,6 @@ for(badChannelsIterator ptr = badChannels_begin();ptr != badChannels_end();++ptr
 Notice(theClient, "-= End of Bad Channels (NOMODE) List =-");
 }
 
-
 void ccontrol::loadCommands()
 {
 
@@ -5391,6 +5400,63 @@ void ccontrol::remBadChannel(ccBadChannel* Channel)
 badChannelsMap.erase(badChannelsMap.find(Channel->getName()));
 }
 
+bool ccontrol::glineChannelUsers(Channel* theChan, const string& reason, unsigned int gLength, const string& addedBy,bool excludeChanWithOper)
+{
+ccGline *TmpGline;
+iClient *TmpClient;
+string curIP;
+typedef map<string , int> GlineMapType;
+GlineMapType glineList;
+GlineMapType::iterator gptr;
+list<ccGline*> neededGlines;
+bool foundOper = false;
+bool success = true;
+for (Channel::const_userIterator ptr = theChan->userList_begin();
+	ptr != theChan->userList_end(); ++ptr)
+	{
+	TmpClient = ptr->second->getClient();
+	if((excludeChanWithOper) && (TmpClient->isOper() 
+	    || TmpClient->getMode(iClient::MODE_SERVICES))) //Need to stop glining this channel
+		{
+		foundOper = true;
+		success = false;
+		break; 
+		}
+	curIP = xIP(TmpClient->getIP()).GetNumericIP();
+	gptr = glineList.find("*@" + curIP);
+	if (gptr != glineList.end())
+		{
+		/* duplicate gline - continue to next channel user */
+		continue;
+		} else {
+		glineList["*@" + curIP] = 1;
+		}
+	if ((!TmpClient->getMode(iClient::MODE_SERVICES)) &&
+		!(IsAuth(TmpClient)) && !(TmpClient->isOper()))
+		{
+		/* create a new gline and queue it */
+		TmpGline = new ccGline(SQLDb);
+		assert(TmpGline != NULL);
+		TmpGline->setHost("*@"  + curIP);
+		TmpGline->setExpires(unsigned(gLength));
+		TmpGline->setAddedBy(addedBy);
+		TmpGline->setReason(reason);
+		TmpGline->setAddedOn(::time(0));
+		TmpGline->setLastUpdated(::time(0));
+		excludeChanWithOper ? neededGlines.push_back(TmpGline) : queueGline(TmpGline);
+		}																        
+	}
+if(excludeChanWithOper)
+	{
+	list<ccGline*>::iterator glinesIt = neededGlines.begin();
+	for(; glinesIt != neededGlines.end(); ++glinesIt)
+		{
+		TmpGline = *glinesIt;
+		foundOper ? delete TmpGline : queueGline(TmpGline);
+		}
+	}
+return success;
+}
 
 }
 

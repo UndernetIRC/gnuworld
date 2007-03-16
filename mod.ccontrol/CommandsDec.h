@@ -16,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: CommandsDec.h,v 1.17 2006/09/26 17:35:58 kewlio Exp $
+ * $Id: CommandsDec.h,v 1.18 2007/03/16 12:07:51 mrbean_ Exp $
  */
 
 #ifndef __COMMANDSDEC_H
-#define __COMMANDSDEC_H "$Id: CommandsDec.h,v 1.17 2006/09/26 17:35:58 kewlio Exp $"
+#define __COMMANDSDEC_H "$Id: CommandsDec.h,v 1.18 2007/03/16 12:07:51 mrbean_ Exp $"
 
 namespace gnuworld
 {
@@ -103,6 +103,7 @@ DECLARE_COMMAND( REOP )
 DECLARE_COMMAND( SGLINE )
 DECLARE_COMMAND( REMSGLINE )
 DECLARE_COMMAND( UNJUPE )
+DECLARE_COMMAND ( FORCECHANGLINE )
 
 } // namespace uworld
 

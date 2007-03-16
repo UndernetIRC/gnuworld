@@ -1,5 +1,5 @@
 /**
- * CHANGLINECommand.cc
+ * FORCECHANGLINECommand.cc
  * Glines a specific channel
  *
  * This program is free software; you can redistribute it and/or
@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: CHANGLINECommand.cc,v 1.4 2007/03/16 12:07:51 mrbean_ Exp $
+ * $Id: FORCECHANGLINECommand.cc,v 1.1 2007/03/16 12:07:51 mrbean_ Exp $
  */
 
 #include	<string>
@@ -41,7 +41,7 @@
 #include	"Constants.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: CHANGLINECommand.cc,v 1.4 2007/03/16 12:07:51 mrbean_ Exp $" ) ;
+RCSTAG( "$Id: FORCECHANGLINECommand.cc,v 1.1 2007/03/16 12:07:51 mrbean_ Exp $" ) ;
 
 namespace gnuworld
 {
@@ -56,10 +56,11 @@ using std::string;
 namespace uworld
 {
 
-bool CHANGLINECommand::Exec( iClient* theClient, const string& Message )
+bool FORCECHANGLINECommand::Exec( iClient* theClient, const string& Message )
 {
+	const int MAX_CHANGLINE_LENGTH = 24*3600;
 	StringTokenizer st(Message);
-	unsigned ResStart = 2;
+	unsigned int ResStart = 2;
 
 	if (st.size() < 4)
 	{
@@ -72,7 +73,7 @@ bool CHANGLINECommand::Exec( iClient* theClient, const string& Message )
 	ccUser* tmpUser = bot->IsAuth(theClient);
 
 	/* log use of the command */
-	bot->MsgChanLog("CHANGLINE %s\n",st.assemble(1).c_str());
+	bot->MsgChanLog("FORCECHANGLINE %s\n",st.assemble(1).c_str());
 
 	/* make sure they're trying a channel gline! */
 	if (st[pos].substr(0,1) != "#")
@@ -82,14 +83,19 @@ bool CHANGLINECommand::Exec( iClient* theClient, const string& Message )
 		return true;
 	}
 	gLength = extractTime( st[2] );
-	if (gLength == 0) 
+	if (gLength == 0)
 	{
 		gLength = bot->getDefaultGlineLength();
 		ResStart = 1;
 	}
-
+	if (gLength > MAX_CHANGLINE_LENGTH)
+	{
+		bot->Notice(theClient,"FORCECHANGLINE is limited for maximum %d seconds, "
+			"please use the CHANGLINE command instead",MAX_CHANGLINE_LENGTH);
+		return false;
+	}
 	string nickUserHost = theClient->getRealNickUserHost();
-	
+
 	if (!tmpUser)
 	{
 		bot->Notice(theClient,"You must login to issue this channel gline!");
@@ -102,7 +108,11 @@ bool CHANGLINECommand::Exec( iClient* theClient, const string& Message )
 			"characters", channel::MaxName);
 		return false;
 	}
-
+	if(bot->isBadChannel(st[1]) != NULL)
+		{
+		bot->Notice(theClient,"You cant gline a nomode channel");
+		return false;
+		}
 	Channel* theChan = Network->findChannel(st[1]);
 	if (NULL == theChan)
 	{
@@ -111,7 +121,10 @@ bool CHANGLINECommand::Exec( iClient* theClient, const string& Message )
 		return true;
 	}
 
-	bot->glineChannelUsers(theChan,st.assemble( pos + ResStart ), gLength, nickUserHost, false);
+	if(!bot->glineChannelUsers(theChan,st.assemble( pos + ResStart ), gLength, nickUserHost,true))
+		{
+		bot->Notice(theClient, "You cant gline a channel which has an oper in it");
+		}
 	return true;
 }
 

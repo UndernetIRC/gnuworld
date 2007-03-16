@@ -14,7 +14,7 @@
 
 @SET_MAKE@
 
-# "$Id: Makefile.in,v 1.227 2006/12/22 06:41:42 kewlio Exp $"
+# "$Id: Makefile.in,v 1.228 2007/03/16 12:07:51 mrbean_ Exp $"
 
 VPATH = @srcdir@
 pkgdatadir = $(datadir)/@PACKAGE@
@@ -72,6 +72,7 @@ am_libccontrol_la_OBJECTS = libccontrol_la-ccontrol.lo \
 	libccontrol_la-CONFIGCommand.lo \
 	libccontrol_la-DEAUTHCommand.lo libccontrol_la-DEOPCommand.lo \
 	libccontrol_la-EXCEPTIONCommand.lo \
+	libccontrol_la-FORCECHANGLINECommand.lo \
 	libccontrol_la-FORCEGLINECommand.lo \
 	libccontrol_la-GCHANCommand.lo libccontrol_la-GLINECommand.lo \
 	libccontrol_la-HELPCommand.lo libccontrol_la-INVITECommand.lo \
@@ -272,6 +273,7 @@ libccontrol_la_SOURCES = ccontrol.cc \
 	DEAUTHCommand.cc \
 	DEOPCommand.cc \
 	EXCEPTIONCommand.cc \
+	FORCECHANGLINECommand.cc \
 	FORCEGLINECommand.cc \
 	GCHANCommand.cc \
 	GLINECommand.cc \
@@ -419,6 +421,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libccontrol_la-DEAUTHCommand.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libccontrol_la-DEOPCommand.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libccontrol_la-EXCEPTIONCommand.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libccontrol_la-FORCECHANGLINECommand.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libccontrol_la-FORCEGLINECommand.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libccontrol_la-GCHANCommand.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libccontrol_la-GLINECommand.Plo@am__quote@
@@ -653,6 +656,13 @@ libccontrol_la-EXCEPTIONCommand.lo: EXCEPTIONCommand.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='EXCEPTIONCommand.cc' object='libccontrol_la-EXCEPTIONCommand.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libccontrol_la_CXXFLAGS) $(CXXFLAGS) -c -o libccontrol_la-EXCEPTIONCommand.lo `test -f 'EXCEPTIONCommand.cc' || echo '$(srcdir)/'`EXCEPTIONCommand.cc
+
+libccontrol_la-FORCECHANGLINECommand.lo: FORCECHANGLINECommand.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libccontrol_la_CXXFLAGS) $(CXXFLAGS) -MT libccontrol_la-FORCECHANGLINECommand.lo -MD -MP -MF $(DEPDIR)/libccontrol_la-FORCECHANGLINECommand.Tpo -c -o libccontrol_la-FORCECHANGLINECommand.lo `test -f 'FORCECHANGLINECommand.cc' || echo '$(srcdir)/'`FORCECHANGLINECommand.cc
+@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libccontrol_la-FORCECHANGLINECommand.Tpo $(DEPDIR)/libccontrol_la-FORCECHANGLINECommand.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='FORCECHANGLINECommand.cc' object='libccontrol_la-FORCECHANGLINECommand.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libccontrol_la_CXXFLAGS) $(CXXFLAGS) -c -o libccontrol_la-FORCECHANGLINECommand.lo `test -f 'FORCECHANGLINECommand.cc' || echo '$(srcdir)/'`FORCECHANGLINECommand.cc
 
 libccontrol_la-FORCEGLINECommand.lo: FORCEGLINECommand.cc
 @am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libccontrol_la_CXXFLAGS) $(CXXFLAGS) -MT libccontrol_la-FORCEGLINECommand.lo -MD -MP -MF $(DEPDIR)/libccontrol_la-FORCEGLINECommand.Tpo -c -o libccontrol_la-FORCEGLINECommand.lo `test -f 'FORCEGLINECommand.cc' || echo '$(srcdir)/'`FORCEGLINECommand.cc

@@ -1,4 +1,25 @@
-// $Id: ChangeLog,v 1.103 2006/12/22 06:41:39 kewlio Exp $ //
+// $Id: ChangeLog,v 1.104 2007/03/16 12:07:51 mrbean_ Exp $ //
+
+2007-03-16	MrBean <mrbean@undernet.org>
+		libircu/msg_C.cc:
+		libircu/msg_J.cc:
+		src/client.cc:		Fixed a bug which caused modes
+			desynch when the join/creation time is older than the
+			creation time of the channel.
+		mod.ccontrol/CHANGLINECommand.cc: 	
+		mod.ccontrol/CommandsDec.h:
+		mod.ccontrol/Makefile.am:
+		mod.ccontrol/Makefile.in:
+		mod.ccontrol/ccontrol.cc:
+		mod.ccontrol/ccontrol.h:
+		mod.ccontrol/commLevels.h:
+		mod.ccontrol/FORCECHANGLINECommand.cc:	Added the
+			FORCECHANGLINE command which is semiliar to the
+			CHANGLINE command but limited to no more than 24 hours and
+			doesnt work on no mode channels or channels with opers.
+		mod.ccontrol/LISTCommand.cc: 	Changed the command to list
+			nomode channels from LIST badchannels to LIST nomodechannels
+		
 
 2006-12-21	Dan-m00 <daniel@undernet.org>
 		* src/server.cc:

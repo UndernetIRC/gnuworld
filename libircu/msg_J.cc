@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_J.cc,v 1.6 2005/03/25 03:07:29 dan_karrels Exp $
+ * $Id: msg_J.cc,v 1.7 2007/03/16 12:07:51 mrbean_ Exp $
  */
 
 #include	<new>
@@ -37,7 +37,7 @@
 #include	"StringTokenizer.h"
 #include	"ServerCommandHandler.h"
 
-RCSTAG( "$Id: msg_J.cc,v 1.6 2005/03/25 03:07:29 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: msg_J.cc,v 1.7 2007/03/16 12:07:51 mrbean_ Exp $" ) ;
 
 namespace gnuworld
 {
@@ -72,7 +72,7 @@ bool msg_J::Execute( const xParameters& Param )
 {
 // Verify that sufficient arguments have been provided
 // client_numeric #channel[,#channel2,...]
-if( Param.size() < 2 )
+if( Param.size() < 3 )
 	{
 	// Insufficient arguments provided, log the error
 	elog	<< "msg_J> Invalid number of arguments"
@@ -102,7 +102,7 @@ if( NULL == Target )
 // Tokenize by ',', as the client may join more than one
 // channel at once.
 StringTokenizer st( Param[ 1 ], ',' ) ;
-
+time_t joinTs = atoi( Param [ 2 ] );
 for( StringTokenizer::size_type i = 0 ; i < st.size() ; i++ )
 	{
 	// Is it a modeless channel?
@@ -214,7 +214,14 @@ for( StringTokenizer::size_type i = 0 ; i < st.size() ; i++ )
 		continue ;
 		}
 */
-
+	else if( joinTs < theChan->getCreationTime() )
+		{
+		//The time of join is earlier than the creation time of the channel
+		//Need to clear all the modes of the channel
+		theChan->removeAllModes();
+		//Now reset the channel creation time to the join ts
+		theChan->setCreationTime(joinTs);
+		}
 	// Add a new ChannelUser representing this client to this
 	// channel's user structure.
 	if( !theChan->addUser( theUser ) )
