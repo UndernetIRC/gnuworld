@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_C.cc,v 1.8 2007/03/16 12:07:51 mrbean_ Exp $
+ * $Id: msg_C.cc,v 1.9 2007/03/16 12:37:35 mrbean_ Exp $
  */
 
 #include	<new>
@@ -40,7 +40,7 @@
 #include	"ChannelUser.h"
 #include	"ServerCommandHandler.h"
 
-RCSTAG( "$Id: msg_C.cc,v 1.8 2007/03/16 12:07:51 mrbean_ Exp $" ) ;
+RCSTAG( "$Id: msg_C.cc,v 1.9 2007/03/16 12:37:35 mrbean_ Exp $" ) ;
 
 namespace gnuworld
 {
@@ -211,7 +211,7 @@ for( StringTokenizer::const_iterator ptr = st.begin() ; ptr != st.end() ;
 
 	int creationTime = atoi ( Param [ 2 ] );
 	// The user who created the channel is automatically +o
-	if(creationTime = theChan->getCreationTime() )
+	if(creationTime == theChan->getCreationTime() )
 		{
 		theUser->setModeO();
 		}
