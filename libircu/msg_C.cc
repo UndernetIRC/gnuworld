@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_C.cc,v 1.9 2007/03/16 12:37:35 mrbean_ Exp $
+ * $Id: msg_C.cc,v 1.10 2007/03/16 15:31:28 mrbean_ Exp $
  */
 
 #include	<new>
@@ -40,7 +40,7 @@
 #include	"ChannelUser.h"
 #include	"ServerCommandHandler.h"
 
-RCSTAG( "$Id: msg_C.cc,v 1.9 2007/03/16 12:37:35 mrbean_ Exp $" ) ;
+RCSTAG( "$Id: msg_C.cc,v 1.10 2007/03/16 15:31:28 mrbean_ Exp $" ) ;
 
 namespace gnuworld
 {
@@ -220,6 +220,7 @@ for( StringTokenizer::const_iterator ptr = st.begin() ; ptr != st.end() ;
 		//Need to clean all the channel modes and op the user who created the channel
 		theChan->removeAllModes();
 		theUser->setModeO() ;
+		theChan->setCreationTime(creationTime);
 		}
 
 	// Notify all listening xClients of this event
