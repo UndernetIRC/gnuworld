@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: client.cc,v 1.84 2007/03/16 12:07:52 mrbean_ Exp $
+ * $Id: client.cc,v 1.85 2007/03/18 19:13:18 mrbean_ Exp $
  */
 
 #include	<new>
@@ -47,7 +47,7 @@
 #include	"ELog.h"
 #include	"events.h"
 
-RCSTAG("$Id: client.cc,v 1.84 2007/03/16 12:07:52 mrbean_ Exp $" ) ;
+RCSTAG("$Id: client.cc,v 1.85 2007/03/18 19:13:18 mrbean_ Exp $" ) ;
 
 namespace gnuworld
 {
@@ -2024,7 +2024,9 @@ bool xClient::Join( const string& chanName,
 	const time_t& joinTime,
 	bool getOps )
 {
-return Join(Network->findChannel(chanName),chanModes,joinTime,getOps);
+Channel* theChan = Network->findChannel(chanName);
+return theChan ? Join(theChan,chanModes,joinTime,getOps) : 
+    MyUplink->JoinChannel(this,chanName,chanModes,joinTime,getOps); 
 }
 
 bool xClient::Join( Channel* theChan,
