@@ -17,11 +17,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: sqlChannel.h,v 1.44 2006/08/11 03:29:18 kewlio Exp $
+ * $Id: sqlChannel.h,v 1.45 2007/03/25 16:42:25 kewlio Exp $
  */
 
 #ifndef __SQLCHANNEL_H
-#define __SQLCHANNEL_H "$Id: sqlChannel.h,v 1.44 2006/08/11 03:29:18 kewlio Exp $"
+#define __SQLCHANNEL_H "$Id: sqlChannel.h,v 1.45 2007/03/25 16:42:25 kewlio Exp $"
 
 #include	<string>
 #include	<map>
@@ -161,6 +161,9 @@ public:
 
 	inline const unsigned int& getLimitMax() const
 		{ return limit_max ; }
+
+	inline const unsigned int& getMaxBans() const
+		{ return max_bans ; }
 	/**
 	 * Load channel data from the backend using the channel name as
 	 * a key.
@@ -248,6 +251,9 @@ public:
 	inline void setLimitMax( const unsigned int& _limit_max )
 		{ limit_max = _limit_max; }
 
+	inline void setMaxBans( const unsigned int& _max_bans )
+		{ max_bans = _max_bans; }
+
 	/**
 	 * Method to perform a SQL 'UPDATE' and commit changes to this
 	 * object back to the database.
@@ -294,6 +300,7 @@ protected:
 	time_t last_limit_check;
 	unsigned int limit_grace;
 	unsigned int limit_max;
+	unsigned int max_bans;
 
 	PgDatabase*	SQLDb;
 

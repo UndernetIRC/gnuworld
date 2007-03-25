@@ -1,4 +1,23 @@
-// $Id: ChangeLog,v 1.105 2007/03/25 12:24:36 kewlio Exp $ //
+// $Id: ChangeLog,v 1.106 2007/03/25 16:42:24 kewlio Exp $ //
+
+2007-03-25	Dan-m00 <daniel@undernet.org>
+		* doc/update_channels_20070325.sql: SQL update for new max_bans
+			feature.  This MUST be run if upgrading from an earlier
+			release of GNUworld!
+
+			psql cservice < doc/update_channels_20070325.sql
+
+		* doc/cservice.sql: alter the table structure for new max_bans.
+
+		* mod.cservice/constants.h:
+		* mod.cservice/sqlChannel.h:
+		* mod.cservice/sqlChannel.cc: Add new max_bans field to struct.
+
+		* mod.cservice/BANCommand.cc: use the greater of global and
+			local max_bans setting as the definitive figure.
+
+		*** note: currently, this feature will be configurable ONLY via
+			the website (currently pending coding) ***
 
 2007-03-24	Dan-m00 <daniel@undernet.org>
 		* mod.cservice/LOGINCommand.cc:	Added support for multiple logins

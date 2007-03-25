@@ -33,7 +33,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: BANCommand.cc,v 1.44 2006/09/26 17:36:03 kewlio Exp $
+ * $Id: BANCommand.cc,v 1.45 2007/03/25 16:42:24 kewlio Exp $
  */
 
 #include	<new>
@@ -52,7 +52,7 @@
 #include	"match.h"
 #include	"ip.h"
 
-const char BANCommand_cc_rcsId[] = "$Id: BANCommand.cc,v 1.44 2006/09/26 17:36:03 kewlio Exp $" ;
+const char BANCommand_cc_rcsId[] = "$Id: BANCommand.cc,v 1.45 2007/03/25 16:42:24 kewlio Exp $" ;
 
 namespace gnuworld
 {
@@ -253,7 +253,13 @@ if(banReason.size() > 128)
 	}
 
 /* check if the banlist is full */
-int max_bans = bot->getConfigVar("MAX_BANS")->asInt();
+int max_bans = 0;
+int global_max_bans = bot->getConfigVar("MAX_BANS")->asInt();
+int local_max_bans = theChan->getMaxBans();
+if (local_max_bans > global_max_bans)
+	max_bans = local_max_bans;
+else
+	max_bans = global_max_bans;
 int ban_count = 0;
 
 if (max_bans > 0)

@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------------
--- "$Id: cservice.sql,v 1.85 2006/08/10 11:49:05 nighty Exp $"
+-- "$Id: cservice.sql,v 1.86 2007/03/25 16:42:24 kewlio Exp $"
 -- Channel service DB SQL file for PostgreSQL.
 
 -- ChangeLog:
@@ -151,6 +151,9 @@ CREATE TABLE channels (
 
 	last_updated INT4 NOT NULL,
 	deleted INT2 DEFAULT '0',
+-- max_bans: override global max_bans setting
+--   if set to 0, use global setting - there is NO unlimited option.
+	max_bans INT4 DEFAULT '0',
 
 	PRIMARY KEY (id)
 );

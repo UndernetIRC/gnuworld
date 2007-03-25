@@ -24,7 +24,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: sqlChannel.cc,v 1.40 2006/08/11 03:29:18 kewlio Exp $
+ * $Id: sqlChannel.cc,v 1.41 2007/03/25 16:42:25 kewlio Exp $
  */
 
 #include	<sstream>
@@ -41,7 +41,7 @@
 #include	"cservice_config.h"
 
 const char sqlChannel_h_rcsId[] = __SQLCHANNEL_H ;
-const char sqlChannel_cc_rcsId[] = "$Id: sqlChannel.cc,v 1.40 2006/08/11 03:29:18 kewlio Exp $" ;
+const char sqlChannel_cc_rcsId[] = "$Id: sqlChannel.cc,v 1.41 2007/03/25 16:42:25 kewlio Exp $" ;
 
 namespace gnuworld
 {
@@ -107,6 +107,7 @@ sqlChannel::sqlChannel(PgDatabase* _SQLDb)
    last_limit_check(0),
    limit_grace(2),
    limit_max(0),
+   max_bans(0),
    SQLDb( _SQLDb )
 {
 }
@@ -233,6 +234,7 @@ limit_offset = atoi(SQLDb->GetValue(row,14));
 limit_period = atoi(SQLDb->GetValue(row,15));
 limit_grace = atoi(SQLDb->GetValue(row,16));
 limit_max = atoi(SQLDb->GetValue(row,17));
+max_bans = atoi(SQLDb->GetValue(row,18));
 }
 
 bool sqlChannel::commit()
@@ -261,6 +263,7 @@ queryString	<< queryHeader
 		<< "limit_period = " << limit_period << ", "
 		<< "limit_grace = " << limit_grace << ", "
 		<< "limit_max = " << limit_max << ", "
+		<< "max_bans = " << max_bans << ", "
 		<< "description = '" << escapeSQLChars(description) << "', "
 		<< "comment = '" << escapeSQLChars(comment) << "' "
 		<< queryCondition << id
