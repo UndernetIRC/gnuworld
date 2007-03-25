@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: LOGINCommand.cc,v 1.61 2006/02/10 14:06:14 kewlio Exp $
+ * $Id: LOGINCommand.cc,v 1.62 2007/03/25 12:24:36 kewlio Exp $
  */
 
 #include	<string>
@@ -34,7 +34,7 @@
 #include	"cservice_config.h"
 #include	"Network.h"
 
-const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.61 2006/02/10 14:06:14 kewlio Exp $" ;
+const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.62 2007/03/25 12:24:36 kewlio Exp $" ;
 
 namespace gnuworld
 {
@@ -234,28 +234,49 @@ if ((bot->getAdminAccessLevel(theUser, true) > 0) && (!theUser->getFlag(sqlUser:
  * Don't exceed MAXLOGINS.
  */
 
+bool iploginallow = false;
 if(theUser->networkClientList.size() + 1 > theUser->getMaxLogins())
 	{
-	bot->setFailedLogins(theClient, failedLogins+1);
-	bot->Notice(theClient, "AUTHENTICATION FAILED as %s. (Maximum "
-		"concurrent logins exceeded).",
-		theUser->getUserName().c_str());
-
-	string clientList;
-	for( sqlUser::networkClientListType::iterator ptr = theUser->networkClientList.begin() ;
-		ptr != theUser->networkClientList.end() ; )
+	/* They have exceeded their maxlogins setting, but check if they
+	   are allowed to login from the same IP - only applies if their
+	   maxlogins is set to ONE */
+	uint32_t iplogins = bot->getConfigVar("LOGINS_FROM_SAME_IP")->asInt();
+	if ((theUser->getMaxLogins() == 1) && (iplogins > 1))
+	{
+		/* ok, we're using the multi-logins feature (0=disabled) */
+		if (theUser->networkClientList.size() + 1 <= iplogins)
 		{
-		clientList += (*ptr)->getNickUserHost();
-		++ptr;
-		if (ptr != theUser->networkClientList.end())
-			{
-			clientList += ", ";
-			}
-		} // for()
+			/* Check their IP from previous session against
+			   current IP.  If it matches, allow the login.
+			   As this only applies if their maxlogin is 1, we
+			   know there is only 1 entry in their clientlist */
+			if (theClient->getIP() == theUser->networkClientList.front()->getIP())
+				iploginallow = true;
+		}
+	}
+	if (!iploginallow)
+	{
+		bot->setFailedLogins(theClient, failedLogins+1);
+		bot->Notice(theClient, "AUTHENTICATION FAILED as %s. (Maximum "
+			"concurrent logins exceeded).",
+			theUser->getUserName().c_str());
 
-	bot->Notice(theClient, "Current Sessions: %s", clientList.c_str());
-	return false;
-	} // for()
+		string clientList;
+		for( sqlUser::networkClientListType::iterator ptr = theUser->networkClientList.begin() ;
+			ptr != theUser->networkClientList.end() ; )
+			{
+			clientList += (*ptr)->getNickUserHost();
+			++ptr;
+			if (ptr != theUser->networkClientList.end())
+				{
+				clientList += ", ";
+				}
+			} // for()
+
+		bot->Notice(theClient, "Current Sessions: %s", clientList.c_str());
+		return false;
+		} // for()
+	}
 
 /*
  * If this user account is already authed against, send a notice to the other

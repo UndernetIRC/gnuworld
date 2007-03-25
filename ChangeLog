@@ -1,4 +1,11 @@
-// $Id: ChangeLog,v 1.104 2007/03/16 12:07:51 mrbean_ Exp $ //
+// $Id: ChangeLog,v 1.105 2007/03/25 12:24:36 kewlio Exp $ //
+
+2007-03-24	Dan-m00 <daniel@undernet.org>
+		* mod.cservice/LOGINCommand.cc:	Added support for multiple logins
+			from the same IP when a user has maxlogins=1.
+
+		* doc/cservice.config.sql: Added variable for the above.  This
+			defaults to zero (previous behavior, feature disabled)
 
 2007-03-16	MrBean <mrbean@undernet.org>
 		libircu/msg_C.cc:
