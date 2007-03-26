@@ -1,4 +1,11 @@
-// $Id: ChangeLog,v 1.106 2007/03/25 16:42:24 kewlio Exp $ //
+// $Id: ChangeLog,v 1.107 2007/03/26 16:10:46 kewlio Exp $ //
+
+2007-03-26	Dan-m00 <daniel@undernet.org>
+		* configure:
+		* */Makefile.in:
+		* mod.openchanfix/*: Update auto-build system, and remove all
+			old remnants of the openchanfix seperate module.  This
+			will fix the bugs in building gnuworld with openchanfix
 
 2007-03-25	Dan-m00 <daniel@undernet.org>
 		* doc/update_channels_20070325.sql: SQL update for new max_bans
