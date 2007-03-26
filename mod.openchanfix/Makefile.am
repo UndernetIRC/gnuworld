@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-# "$Id: Makefile.am,v 1.9 2006/12/31 17:29:20 buzlip01 Exp $"
+# "$Id: Makefile.am,v 1.10 2007/03/26 16:09:36 kewlio Exp $"
 
 lib_LTLIBRARIES = libchanfix.la
 
@@ -70,7 +70,4 @@ EXTRA_DIST = chanfix.h \
 	sqlManager.h \
 	sqlcfUser.h \
         $(COMMAND_CONF)
-
-confdir=${prefix}/bin
-conf_DATA = $(COMMAND_CONF)
 
