@@ -20,7 +20,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccontrol.cc,v 1.212 2007/03/16 12:07:52 mrbean_ Exp $
+ * $Id: ccontrol.cc,v 1.213 2007/03/30 09:33:03 mrbean_ Exp $
 */
 
 #define MAJORVER "1"
@@ -66,7 +66,7 @@
 #include	"ccontrol_generic.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: ccontrol.cc,v 1.212 2007/03/16 12:07:52 mrbean_ Exp $" ) ;
+RCSTAG( "$Id: ccontrol.cc,v 1.213 2007/03/30 09:33:03 mrbean_ Exp $" ) ;
 
 namespace gnuworld
 {
@@ -248,11 +248,11 @@ RegisterCommand( new MODECommand( this, "MODE", "<channel> <modes> "
 	false,
 	operLevel::OPERLEVEL,
 	false ) ) ;
-RegisterCommand( new CHANGLINECommand( this, "CHANGLINE",
+RegisterCommand( new SCHANGLINECommand( this, "SCHANGLINE",
 	"<#channel> <duration>[time units (s,d,h)] <reason> "
 	"Gline a given channel for the given reason",
 	true,
-	commandLevel::flg_CHANGLINE,
+	commandLevel::flg_SCHANGLINE,
 	false,
 	false,
 	false,

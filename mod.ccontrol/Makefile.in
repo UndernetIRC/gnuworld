@@ -14,7 +14,7 @@
 
 @SET_MAKE@
 
-# "$Id: Makefile.in,v 1.229 2007/03/26 16:09:34 kewlio Exp $"
+# "$Id: Makefile.in,v 1.230 2007/03/30 09:33:03 mrbean_ Exp $"
 
 VPATH = @srcdir@
 pkgdatadir = $(datadir)/@PACKAGE@
@@ -64,7 +64,6 @@ am_libccontrol_la_OBJECTS = libccontrol_la-ccontrol.lo \
 	libccontrol_la-ccFloodData.lo libccontrol_la-ccGline.lo \
 	libccontrol_la-ccLog.lo libccontrol_la-ccServer.lo \
 	libccontrol_la-ccUser.lo libccontrol_la-ccontrol_generic.lo \
-	libccontrol_la-CHANGLINECommand.lo \
 	libccontrol_la-CHANINFOCommand.lo \
 	libccontrol_la-CHECKNETCommand.lo \
 	libccontrol_la-CLEARCHANCommand.lo \
@@ -100,6 +99,7 @@ am_libccontrol_la_OBJECTS = libccontrol_la-ccontrol.lo \
 	libccontrol_la-REMUSERCommand.lo libccontrol_la-REOPCommand.lo \
 	libccontrol_la-SAYCommand.lo libccontrol_la-SCANCommand.lo \
 	libccontrol_la-SCANGLINECommand.lo \
+	libccontrol_la-SCHANGLINECommand.lo \
 	libccontrol_la-SGLINECommand.lo \
 	libccontrol_la-SHUTDOWNCommand.lo \
 	libccontrol_la-STATUSCommand.lo \
@@ -264,7 +264,6 @@ libccontrol_la_SOURCES = ccontrol.cc \
 	ccServer.cc \
 	ccUser.cc \
 	ccontrol_generic.cc \
-	CHANGLINECommand.cc \
 	CHANINFOCommand.cc \
 	CHECKNETCommand.cc \
 	CLEARCHANCommand.cc \
@@ -307,6 +306,7 @@ libccontrol_la_SOURCES = ccontrol.cc \
 	SAYCommand.cc \
 	SCANCommand.cc \
 	SCANGLINECommand.cc \
+	SCHANGLINECommand.cc \
 	SGLINECommand.cc \
 	SHUTDOWNCommand.cc \
 	STATUSCommand.cc \
@@ -412,7 +412,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libccontrol_la-ADDSERVERCommand.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libccontrol_la-ADDUSERCommand.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libccontrol_la-CControlCommands.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libccontrol_la-CHANGLINECommand.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libccontrol_la-CHANINFOCommand.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libccontrol_la-CHECKNETCommand.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libccontrol_la-CLEARCHANCommand.Plo@am__quote@
@@ -455,6 +454,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libccontrol_la-SAYCommand.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libccontrol_la-SCANCommand.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libccontrol_la-SCANGLINECommand.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libccontrol_la-SCHANGLINECommand.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libccontrol_la-SGLINECommand.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libccontrol_la-SHUTDOWNCommand.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libccontrol_la-STATUSCommand.Plo@am__quote@
@@ -593,13 +593,6 @@ libccontrol_la-ccontrol_generic.lo: ccontrol_generic.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='ccontrol_generic.cc' object='libccontrol_la-ccontrol_generic.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libccontrol_la_CXXFLAGS) $(CXXFLAGS) -c -o libccontrol_la-ccontrol_generic.lo `test -f 'ccontrol_generic.cc' || echo '$(srcdir)/'`ccontrol_generic.cc
-
-libccontrol_la-CHANGLINECommand.lo: CHANGLINECommand.cc
-@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libccontrol_la_CXXFLAGS) $(CXXFLAGS) -MT libccontrol_la-CHANGLINECommand.lo -MD -MP -MF $(DEPDIR)/libccontrol_la-CHANGLINECommand.Tpo -c -o libccontrol_la-CHANGLINECommand.lo `test -f 'CHANGLINECommand.cc' || echo '$(srcdir)/'`CHANGLINECommand.cc
-@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libccontrol_la-CHANGLINECommand.Tpo $(DEPDIR)/libccontrol_la-CHANGLINECommand.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='CHANGLINECommand.cc' object='libccontrol_la-CHANGLINECommand.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libccontrol_la_CXXFLAGS) $(CXXFLAGS) -c -o libccontrol_la-CHANGLINECommand.lo `test -f 'CHANGLINECommand.cc' || echo '$(srcdir)/'`CHANGLINECommand.cc
 
 libccontrol_la-CHANINFOCommand.lo: CHANINFOCommand.cc
 @am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libccontrol_la_CXXFLAGS) $(CXXFLAGS) -MT libccontrol_la-CHANINFOCommand.lo -MD -MP -MF $(DEPDIR)/libccontrol_la-CHANINFOCommand.Tpo -c -o libccontrol_la-CHANINFOCommand.lo `test -f 'CHANINFOCommand.cc' || echo '$(srcdir)/'`CHANINFOCommand.cc
@@ -894,6 +887,13 @@ libccontrol_la-SCANGLINECommand.lo: SCANGLINECommand.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='SCANGLINECommand.cc' object='libccontrol_la-SCANGLINECommand.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libccontrol_la_CXXFLAGS) $(CXXFLAGS) -c -o libccontrol_la-SCANGLINECommand.lo `test -f 'SCANGLINECommand.cc' || echo '$(srcdir)/'`SCANGLINECommand.cc
+
+libccontrol_la-SCHANGLINECommand.lo: SCHANGLINECommand.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libccontrol_la_CXXFLAGS) $(CXXFLAGS) -MT libccontrol_la-SCHANGLINECommand.lo -MD -MP -MF $(DEPDIR)/libccontrol_la-SCHANGLINECommand.Tpo -c -o libccontrol_la-SCHANGLINECommand.lo `test -f 'SCHANGLINECommand.cc' || echo '$(srcdir)/'`SCHANGLINECommand.cc
+@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libccontrol_la-SCHANGLINECommand.Tpo $(DEPDIR)/libccontrol_la-SCHANGLINECommand.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='SCHANGLINECommand.cc' object='libccontrol_la-SCHANGLINECommand.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libccontrol_la_CXXFLAGS) $(CXXFLAGS) -c -o libccontrol_la-SCHANGLINECommand.lo `test -f 'SCHANGLINECommand.cc' || echo '$(srcdir)/'`SCHANGLINECommand.cc
 
 libccontrol_la-SGLINECommand.lo: SGLINECommand.cc
 @am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libccontrol_la_CXXFLAGS) $(CXXFLAGS) -MT libccontrol_la-SGLINECommand.lo -MD -MP -MF $(DEPDIR)/libccontrol_la-SGLINECommand.Tpo -c -o libccontrol_la-SGLINECommand.lo `test -f 'SGLINECommand.cc' || echo '$(srcdir)/'`SGLINECommand.cc

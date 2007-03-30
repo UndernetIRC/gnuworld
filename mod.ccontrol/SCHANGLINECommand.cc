@@ -1,5 +1,5 @@
 /**
- * CHANGLINECommand.cc
+ * SCHANGLINECommand.cc
  * Glines a specific channel
  *
  * This program is free software; you can redistribute it and/or
@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: CHANGLINECommand.cc,v 1.4 2007/03/16 12:07:51 mrbean_ Exp $
+ * $Id: SCHANGLINECommand.cc,v 1.1 2007/03/30 09:33:04 mrbean_ Exp $
  */
 
 #include	<string>
@@ -41,7 +41,7 @@
 #include	"Constants.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: CHANGLINECommand.cc,v 1.4 2007/03/16 12:07:51 mrbean_ Exp $" ) ;
+RCSTAG( "$Id: SCHANGLINECommand.cc,v 1.1 2007/03/30 09:33:04 mrbean_ Exp $" ) ;
 
 namespace gnuworld
 {
@@ -56,7 +56,7 @@ using std::string;
 namespace uworld
 {
 
-bool CHANGLINECommand::Exec( iClient* theClient, const string& Message )
+bool SCHANGLINECommand::Exec( iClient* theClient, const string& Message )
 {
 	StringTokenizer st(Message);
 	unsigned ResStart = 2;
@@ -72,12 +72,12 @@ bool CHANGLINECommand::Exec( iClient* theClient, const string& Message )
 	ccUser* tmpUser = bot->IsAuth(theClient);
 
 	/* log use of the command */
-	bot->MsgChanLog("CHANGLINE %s\n",st.assemble(1).c_str());
+	bot->MsgChanLog("SCHANGLINE %s\n",st.assemble(1).c_str());
 
 	/* make sure they're trying a channel gline! */
 	if (st[pos].substr(0,1) != "#")
 	{
-		bot->Notice(theClient,"Umm... this is CHANGLINE, not GLINE - Try "
+		bot->Notice(theClient,"Umm... this is SCHANGLINE, not GLINE - Try "
 			"glining a channel maybe?");
 		return true;
 	}

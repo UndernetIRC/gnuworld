@@ -1,4 +1,9 @@
-// $Id: ChangeLog,v 1.107 2007/03/26 16:10:46 kewlio Exp $ //
+// $Id: ChangeLog,v 1.108 2007/03/30 09:33:04 mrbean_ Exp $ //
+
+2007-03-30	MrBean <mrbean@undernet.org>
+		* mod.ccontrol/*: Changed the name of the CHANGLINE command
+			to SCHANGLINE to conform with the SCOMMAND > FCOMMAND
+			> COMMAND standard.
 
 2007-03-26	Dan-m00 <daniel@undernet.org>
 		* configure:
