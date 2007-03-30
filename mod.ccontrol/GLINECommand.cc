@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: GLINECommand.cc,v 1.57 2006/09/26 17:35:58 kewlio Exp $
+ * $Id: GLINECommand.cc,v 1.58 2007/03/30 09:42:02 mrbean_ Exp $
  */
 
 #include	<string>
@@ -40,7 +40,7 @@
 #include	"Constants.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: GLINECommand.cc,v 1.57 2006/09/26 17:35:58 kewlio Exp $" ) ;
+RCSTAG( "$Id: GLINECommand.cc,v 1.58 2007/03/30 09:42:02 mrbean_ Exp $" ) ;
 
 namespace gnuworld
 {
@@ -131,38 +131,14 @@ string hostName;
 		userName = st[ pos ].substr( 0, atPos ) ;
 		hostName = st[ pos ].substr( atPos + 1 ) ;
 		}
-string Length;
-
-Length.assign(st[2]);
-unsigned int Units = 1; //Defualt for seconds
 unsigned int ResStart = 2;
-
-if(!strcasecmp(Length.substr(Length.length()-1).c_str(),"d"))
+gLength = extractTime( st[2] );
+if(gLength == 0)
 	{
-	Units = 24*3600;
-	Length.resize(Length.length()-1);
-	}
-else if(!strcasecmp(Length.substr(Length.length()-1).c_str(),"h"))
-	{
-	Units = 3600;
-	Length.resize(Length.length()-1);
-	}
-else if(!strcasecmp(Length.substr(Length.length()-1).c_str(),"m"))
-	{
-	Units = 60;
-	Length.resize(Length.length()-1);
-	}
-else if(!strcasecmp(Length.substr(Length.length()-1).c_str(),"s"))
-	{
-	Units = 1;
-	Length.resize(Length.length()-1);
-	}
-gLength = atoi(Length.c_str()) * Units;
-if(gLength == 0) 
-	{
-	gLength = bot->getDefaultGlineLength() ;
+	gLength == bot->getDefaultGlineLength();
 	ResStart = 1;
 	}
+	
 string nickUserHost = theClient->getRealNickUserHost() ;
 	
 	unsigned int Users;

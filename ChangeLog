@@ -1,4 +1,11 @@
-// $Id: ChangeLog,v 1.108 2007/03/30 09:33:04 mrbean_ Exp $ //
+// $Id: ChangeLog,v 1.109 2007/03/30 09:42:02 mrbean_ Exp $ //
+
+2007-30-03      MrBean <mrbean@undernet.org>
+                * mod.ccontrol/GLINECommand.cc
+		* mod.ccontrol/FORCECHANGLINECommand.cc: Use the extractTime
+			method in CHANGLINE and FORCECHANGLINE instead of
+			duplicating the code.
+
 
 2007-03-30	MrBean <mrbean@undernet.org>
 		* mod.ccontrol/*: Changed the name of the CHANGLINE command
