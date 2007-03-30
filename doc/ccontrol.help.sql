@@ -1,4 +1,4 @@
--- 2001-03-02 |MrBean| "$Id: ccontrol.help.sql,v 1.13 2006/05/03 08:33:15 kewlio Exp $"
+-- 2001-03-02 |MrBean| "$Id: ccontrol.help.sql,v 1.14 2007/03/30 09:51:15 mrbean_ Exp $"
 -- Created the file and added all help topics to the database
 
 -- 2201-03-11 |MrBean|
@@ -34,12 +34,6 @@ ADDOPERCHAN		1	****** ADDOPERCHAN COMMAND ******
 ADDOPERCHAN		2	Marks a channel as ircoperators only
 ADDOPERCHAN		3	Syntax: /msg $BOT$ addoperchan <channel>
 ADDOPERCHAN		4	thous making the bot kick and ban everyone who is not an ircop
-CHANGLINE		1	****** CHANGLINE COMMAND ******
-CHANGLINE		2	Glines all users on the given channel
-CHANGLINE		3	Syntax: /msg $BOT$ changline <#channel> [duration] <reason>
-CHANGLINE		4	<#channel> - the channel name to gline
-CHANGLINE		5	[duration] - Duration of the gline, may have s,m,h,d for secs,mins,hours,days
-CHANGLINE		6	<reason> - reason for the gline
 CHANINFO		1	****** CHANINFO COMMAND ******
 CHANINFO		2	Gives you all sort of information about a channel
 CHANINFO		3	Syntax: /msg $BOT$ chaninfo <#channel>
@@ -93,6 +87,13 @@ EXCEPTIONS		2	Excepts users from the various glines/warnings within CONFIG
 EXCEPTIONS		3	Syntax: /msg $BOT$ exceptions <add|del|list> <host mask> <connections>
 EXCEPTIONS		4	<host mask> - user@host mask to except
 EXCEPTIONS		5	<connections> - number of connections allowed before gline/warning
+FORCECHANGLINE		1	****** FORCECHANGLINE COMMAND ******
+FORCECHANGLINE		2	Glines all users on the given channel
+FORCECHANGLINE		3	Syntax: /msg $BOT$ forcechangline <#channel> [duration] <reason>
+FORCECHANGLINE		4	<#channel> - the channel name to gline
+FORCECHANGLINE		5	[duration] - Duration of the gline, may have s,m,h,d for secs,mins,hours,days
+FORCECHANGLINE		6	<reason> - reason for the gline
+FORCECHANGLINE		7	This type of chan gline is limited for 24 hours and cannot be issued on channels with opers or channels which are marked as nomode channels
 FORCEGLINE		1	****** FORCEGLINE COMMAND ******
 FORCEGLINE		2	Glines a host for a certain amount of time
 FORCEGLINE		3	Syntax: /msg $BOT$ forcegline [-fu] <nick|user@host> <duration[s/m/h/d]> <reason>
@@ -268,6 +269,12 @@ SCANGLINE		1	****** SCANGLINE COMMAND ******
 SCANGLINE		2	Scans the gline list for a gline matching a certain host
 SCANGLINE		3	Syntax: /msg $BOT$ scangline <host mask>
 SCANGLINE		4	<host mask> - the host mask to lookup
+SCHANGLINE		1	****** SCHANGLINE COMMAND ******
+SCHANGLINE		2	Glines all users on the given channel
+SCHANGLINE		3	Syntax: /msg $BOT$ schangline <#channel> [duration] <reason>
+SCHANGLINE		4	<#channel> - the channel name to gline
+SCHANGLINE		5	[duration] - Duration of the gline, may have s,m,h,d for secs,mins,hours,days
+SCHANGLINE		6	<reason> - reason for the gline
 SGLINE		1	****** SGLINE COMMAND ******
 SGLINE		2	gline a user@host with relaxed restrictions
 SGLINE		3	Syntax: /msg $BOT$ sgline <user@host> [duration] <reason>
