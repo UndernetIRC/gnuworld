@@ -1,4 +1,11 @@
-// $Id: ChangeLog,v 1.109 2007/03/30 09:42:02 mrbean_ Exp $ //
+// $Id: ChangeLog,v 1.110 2007/04/18 08:19:06 kewlio Exp $ //
+
+2007-04-16	Dan-m00 <daniel@undernet.org>
+		* mod.ccontrol/FORCEGLINECommand.cc: Remove compiler warning
+			about unused variable.
+
+		* mod.ccontrol/ccontrol.cc: fix uptime output in 'status' cmd.
+			Also remove redundant variables/calculations.
 
 2007-30-03      MrBean <mrbean@undernet.org>
                 * mod.ccontrol/GLINECommand.cc

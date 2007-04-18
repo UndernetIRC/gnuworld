@@ -20,7 +20,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccontrol.cc,v 1.213 2007/03/30 09:33:03 mrbean_ Exp $
+ * $Id: ccontrol.cc,v 1.214 2007/04/18 08:19:07 kewlio Exp $
 */
 
 #define MAJORVER "1"
@@ -66,7 +66,7 @@
 #include	"ccontrol_generic.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: ccontrol.cc,v 1.213 2007/03/30 09:33:03 mrbean_ Exp $" ) ;
+RCSTAG( "$Id: ccontrol.cc,v 1.214 2007/04/18 08:19:07 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -4869,21 +4869,8 @@ for(serversIterator ptr = serversMap.begin();ptr != serversMap.end();++ptr)
 
 void ccontrol::showStatus(iClient* tmpClient)
 {
-int uptime = ::time(0) - getUplink()->getStartTime();
-int days;
-int hours;
-int mins;
-int secs;
-
-days = uptime/(24*3600);
-uptime %= 24*3600;
-hours = uptime / 3600;
-uptime %= 3600;
-mins = uptime / 60;
-uptime %= 60;
-secs = uptime;
 Notice(tmpClient,"CControl version %s.%s [%s]",MAJORVER,MINORVER,RELDATE);
-Notice(tmpClient, "Update: %s", Ago(uptime));
+Notice(tmpClient, "Update: %s", Ago(getUplink()->getStartTime()));
 if(checkClones)
 	{
 	Notice(tmpClient,"Monitoring %d different clones hosts\n",clientsIpMap.size());

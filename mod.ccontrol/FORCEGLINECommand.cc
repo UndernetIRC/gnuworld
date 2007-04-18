@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: FORCEGLINECommand.cc,v 1.34 2007/03/30 09:42:02 mrbean_ Exp $
+ * $Id: FORCEGLINECommand.cc,v 1.35 2007/04/18 08:19:07 kewlio Exp $
  */
 
 #include	<string>
@@ -35,7 +35,7 @@
 #include	"Constants.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: FORCEGLINECommand.cc,v 1.34 2007/03/30 09:42:02 mrbean_ Exp $" ) ;
+RCSTAG( "$Id: FORCEGLINECommand.cc,v 1.35 2007/04/18 08:19:07 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -104,7 +104,6 @@ string userName = st[ pos ].substr( 0, pos ) ;
 string hostName = st[ pos ].substr( pos + 1 ) ;
 string Length;
 Length.assign(st[pos+1]);
-unsigned int Units = 1; //Defualt for seconds
 unsigned int ResStart = 2;
 bool Ok = true;
 gLength = extractTime( st[2] );
