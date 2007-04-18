@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_J.cc,v 1.8 2007/04/18 10:23:39 kewlio Exp $
+ * $Id: msg_J.cc,v 1.9 2007/04/18 10:50:25 kewlio Exp $
  */
 
 #include	<new>
@@ -37,7 +37,7 @@
 #include	"StringTokenizer.h"
 #include	"ServerCommandHandler.h"
 
-RCSTAG( "$Id: msg_J.cc,v 1.8 2007/04/18 10:23:39 kewlio Exp $" ) ;
+RCSTAG( "$Id: msg_J.cc,v 1.9 2007/04/18 10:50:25 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -65,14 +65,15 @@ CREATE_LOADER(msg_J)
 /**
  * Someone has just joined a non-empty channel.
  *
- * 0AT J #coder-com
- * OAT J #coder-com,#blah
+ * 0AT J #coder-com 1234567890
+ * OAT J #coder-com,#blah 1234567890
+ * OAT J 0 <optional-ts?>
  */
 bool msg_J::Execute( const xParameters& Param )
 {
 // Verify that sufficient arguments have been provided
 // client_numeric #channel[,#channel2,...]
-if( Param.size() < 3 )
+if( Param.size() < 2 )
 	{
 	// Insufficient arguments provided, log the error
 	elog	<< "msg_J> Invalid number of arguments"
@@ -90,6 +91,15 @@ if( Param.size() < 3 )
 	// Return error
 	return false ;
 	}
+
+/* a join to '0' may not have a timestamp, but all others should */
+if ((Param[1][0]!='0') && Param.size() < 3)
+{
+	elog	<< "msg_J> Invalid number of arguments"
+		<< endl ;
+	// Return error
+	return false;
+}
 
 // Find the client in question.
 iClient* Target = Network->findClient( Param[ 0 ] ) ;
@@ -111,7 +121,11 @@ if( NULL == Target )
 // Tokenize by ',', as the client may join more than one
 // channel at once.
 StringTokenizer st( Param[ 1 ], ',' ) ;
-time_t joinTs = atoi( Param [ 2 ] );
+time_t joinTs = 0;
+if (Param.size() < 2)
+	joinTs = ::time(NULL);
+else
+	joinTs = atoi( Param [ 2 ] );
 for( StringTokenizer::size_type i = 0 ; i < st.size() ; i++ )
 	{
 	// Is it a modeless channel?
