@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: LOGINCommand.cc,v 1.62 2007/03/25 12:24:36 kewlio Exp $
+ * $Id: LOGINCommand.cc,v 1.63 2007/04/18 08:49:45 kewlio Exp $
  */
 
 #include	<string>
@@ -34,7 +34,7 @@
 #include	"cservice_config.h"
 #include	"Network.h"
 
-const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.62 2007/03/25 12:24:36 kewlio Exp $" ;
+const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.63 2007/04/18 08:49:45 kewlio Exp $" ;
 
 namespace gnuworld
 {
@@ -241,6 +241,7 @@ if(theUser->networkClientList.size() + 1 > theUser->getMaxLogins())
 	   are allowed to login from the same IP - only applies if their
 	   maxlogins is set to ONE */
 	uint32_t iplogins = bot->getConfigVar("LOGINS_FROM_SAME_IP")->asInt();
+	uint32_t iploginident = bot->getConfigVar("LOGINS_FROM_SAME_IP_AND_IDENT")->asInt();
 	if ((theUser->getMaxLogins() == 1) && (iplogins > 1))
 	{
 		/* ok, we're using the multi-logins feature (0=disabled) */
@@ -251,7 +252,22 @@ if(theUser->networkClientList.size() + 1 > theUser->getMaxLogins())
 			   As this only applies if their maxlogin is 1, we
 			   know there is only 1 entry in their clientlist */
 			if (theClient->getIP() == theUser->networkClientList.front()->getIP())
-				iploginallow = true;
+			{
+				if (iploginident==1)
+				{
+					/* need to check ident here */
+					string oldident = theUser->networkClientList.front()->getUserName();
+					string newident = theClient->getUserName();
+					if ((oldident[0]=='~') || (oldident==newident))
+					{
+						/* idents match (or they are unidented) - allow this login */
+						iploginallow = true;
+					}
+				} else {
+					/* don't need to check ident, this login is allowed */
+					iploginallow = true;
+				}
+			}
 		}
 	}
 	if (!iploginallow)

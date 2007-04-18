@@ -1,4 +1,13 @@
-// $Id: ChangeLog,v 1.110 2007/04/18 08:19:06 kewlio Exp $ //
+// $Id: ChangeLog,v 1.111 2007/04/18 08:49:44 kewlio Exp $ //
+
+2007-04-18	Dan-m00 <daniel@undernet.org>
+		* doc/cservice.config.sql:
+		* mod.cservice/LOGINCommand.cc: add new functionality to the
+			max logins from same ip code.  You can now force the
+			check of ident as well as IP in order to login.
+
+			requires 'LOGINS_FROM_SAME_IP_AND_IDENT' = 1 in the
+			variables table.
 
 2007-04-16	Dan-m00 <daniel@undernet.org>
 		* mod.ccontrol/FORCEGLINECommand.cc: Remove compiler warning
