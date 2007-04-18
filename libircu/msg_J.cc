@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_J.cc,v 1.7 2007/03/16 12:07:51 mrbean_ Exp $
+ * $Id: msg_J.cc,v 1.8 2007/04/18 10:23:39 kewlio Exp $
  */
 
 #include	<new>
@@ -37,7 +37,7 @@
 #include	"StringTokenizer.h"
 #include	"ServerCommandHandler.h"
 
-RCSTAG( "$Id: msg_J.cc,v 1.7 2007/03/16 12:07:51 mrbean_ Exp $" ) ;
+RCSTAG( "$Id: msg_J.cc,v 1.8 2007/04/18 10:23:39 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -77,6 +77,15 @@ if( Param.size() < 3 )
 	// Insufficient arguments provided, log the error
 	elog	<< "msg_J> Invalid number of arguments"
 		<< endl ;
+
+	int i;
+	for (i = 0; i < (int)Param.size(); i++)
+		elog	<< "msg_J>   arg"
+			<< i
+			<< " = '"
+			<< Param[i]
+			<< "'"
+			<< endl ;
 
 	// Return error
 	return false ;

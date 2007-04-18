@@ -1,4 +1,13 @@
-// $Id: ChangeLog,v 1.111 2007/04/18 08:49:44 kewlio Exp $ //
+// $Id: ChangeLog,v 1.112 2007/04/18 10:23:38 kewlio Exp $ //
+
+2007-04-18	Dan-m00 <daniel@undernet.org>
+		* src/server.cc: fix parsing of channel modes on join (when +D
+			is encountered.
+
+		* libircu/msg_I.cc: add support (although unused) for invite
+			timestamps from .12 hubs
+
+		* libircu/msg_J.cc: add debug information to joins.
 
 2007-04-18	Dan-m00 <daniel@undernet.org>
 		* doc/cservice.config.sql:

@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server.cc,v 1.220 2006/12/22 06:41:45 kewlio Exp $
+ * $Id: server.cc,v 1.221 2007/04/18 10:23:39 kewlio Exp $
  */
 
 #include	<sys/time.h>
@@ -70,7 +70,7 @@
 #include	"ConnectionHandler.h"
 #include	"Connection.h"
 
-RCSTAG( "$Id: server.cc,v 1.220 2006/12/22 06:41:45 kewlio Exp $" ) ;
+RCSTAG( "$Id: server.cc,v 1.221 2007/04/18 10:23:39 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -1720,6 +1720,7 @@ if( !chanModes.empty() &&
 					theChan->setMode( Channel::MODE_D ) ;
 				else
 					theChan->removeMode( Channel::MODE_D ) ;
+				break ;
 
 			// TODO: Finish with polarity
 			// TODO: Add in support for modes b,v,o

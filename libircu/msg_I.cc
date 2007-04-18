@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_I.cc,v 1.6 2006/12/22 06:41:41 kewlio Exp $
+ * $Id: msg_I.cc,v 1.7 2007/04/18 10:23:39 kewlio Exp $
  */
 
 #include	<iostream>
@@ -32,7 +32,7 @@
 #include	"Network.h"
 #include	"ServerCommandHandler.h"
 
-RCSTAG( "$Id: msg_I.cc,v 1.6 2006/12/22 06:41:41 kewlio Exp $" ) ;
+RCSTAG( "$Id: msg_I.cc,v 1.7 2007/04/18 10:23:39 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -41,10 +41,11 @@ using std::endl ;
 
 CREATE_HANDLER(msg_I)
 
-// ABAHo I X :#lksdlkj
+// ABAHo I X :#lksdlkj                           (non-ts)
+// ABAHo I X :#lksdlkj 1234567890                (ts)
 bool msg_I::Execute( const xParameters& Param )
 {
-if( Param.size() != 3 )
+if (( Param.size() < 3 ) || ( Param.size() > 4))
 	{
 	elog	<< "msg_I> Invalid number of arguments ("
 		<< Param.size()
