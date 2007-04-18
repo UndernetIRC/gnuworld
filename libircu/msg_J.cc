@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_J.cc,v 1.9 2007/04/18 10:50:25 kewlio Exp $
+ * $Id: msg_J.cc,v 1.10 2007/04/18 11:00:20 kewlio Exp $
  */
 
 #include	<new>
@@ -37,7 +37,7 @@
 #include	"StringTokenizer.h"
 #include	"ServerCommandHandler.h"
 
-RCSTAG( "$Id: msg_J.cc,v 1.9 2007/04/18 10:50:25 kewlio Exp $" ) ;
+RCSTAG( "$Id: msg_J.cc,v 1.10 2007/04/18 11:00:20 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -122,7 +122,7 @@ if( NULL == Target )
 // channel at once.
 StringTokenizer st( Param[ 1 ], ',' ) ;
 time_t joinTs = 0;
-if (Param.size() < 2)
+if (Param.size() < 3)
 	joinTs = ::time(NULL);
 else
 	joinTs = atoi( Param [ 2 ] );
