@@ -24,7 +24,6 @@
 
 #include <cstdarg>	/* va_list */
 #include <cstdio>	/* *printf() */
-
 #include "libpq++.h"
 
 #include "gnuworld_config.h"
@@ -42,6 +41,7 @@
 #include "sqlFakeClient.h"
 #include "sqlUser.h"
 #include "Timer.h"
+#include "ip.h"
 
 namespace gnuworld {
 
@@ -112,10 +112,11 @@ dcInterval = atoi(dronescanConfig->Require("dcInterval")->second.c_str());
 consoleLevel = atoi(dronescanConfig->Require("consoleLevel")->second.c_str());
 jcInterval = atoi(dronescanConfig->Require("jcInterval")->second.c_str());
 jcCutoff = atoi(dronescanConfig->Require("jcCutoff")->second.c_str());
+//pcCutoff = atoi(dronescanConfig->Require("pcCutoff")->second.c_str());
 ncInterval = atoi(dronescanConfig->Require("ncInterval")->second.c_str());
 ncCutoff = atoi(dronescanConfig->Require("ncCutoff")->second.c_str());
 rcInterval = atoi(dronescanConfig->Require("rcInterval")->second.c_str());
-
+jcMinJoinToGline = atoi(dronescanConfig->Require("jcMinJoinToGline")->second.c_str());
 /* Set up variables that our tests will need */
 typedef std::vector<string> testVarsType;
 testVarsType testVars;
@@ -357,49 +358,21 @@ void dronescan::OnEvent( const eventType& theEvent,
 void dronescan::OnChannelEvent( const channelEventType& theEvent,
 	Channel *theChannel, void *Data1, void *Data2, void *Data3, void *Data4 )
 {
-	/* If this is not a join, we don't care. */
-	if(theEvent != EVT_JOIN) return ;
-
 	/* If we are bursting, we don't want to be checking joins. */
 	if(currentState == BURST) return ;
 
-	/* If this channel is too small, don't test it. */
-	if(theChannel->size() < channelCutoff) return ;
+	/* If this is not a join and not part, we don't care. */
+	if(theEvent != EVT_JOIN && theEvent != EVT_PART) return ;
 
-	/* Iterate over our available tests, checking this channel */
-	if(droneChannels.find(theChannel->getName()) == droneChannels.end()) {
-		/* This channel is not currently listed as active */
-		// Check the channel for abnormalities, if enough
-		// are found then it will be added to the
-		// droneChannels structure by checkChannel()
-		checkChannel( theChannel );
-	}
-
-	/* Reset lastjoin on the active channel */
-	droneChannelsType::iterator droneChanItr =
-		droneChannels.find( theChannel->getName() ) ;
-
-	// If the channel is still not in the droneChannels
-	// structure then it is a "normal" channel
-	if( droneChanItr != droneChannels.end() )
+	iClient* theClient = static_cast< iClient* > (Data1);
+	if(theEvent == EVT_JOIN)
 		{
-		droneChanItr->second->setLastJoin( ::time( 0 ) ) ;
+		handleChannelJoin(theChannel,theClient);
 		}
-
-	/* Do join count processing if applicable */
-	const string& channelName = theChannel->getName();
-
-	jcChanMap[channelName]++;
-
-	unsigned int joinCount = jcChanMap[channelName];
-
-	if(joinCount == jcCutoff)
+	else if (theEvent == EVT_PART)
 		{
-		log(WARN, "%s is being join flooded.",
-			channelName.c_str()
-			);
+		handleChannelPart(theChannel,theClient);
 		}
-
 xClient::OnChannelEvent( theEvent, theChannel,
 	Data1, Data2, Data3, Data4 ) ;
 }
@@ -641,34 +614,7 @@ void dronescan::OnTimer( const xServer::timerID& theTimer , void *)
 
 	if(theTimer == tidClearJoinCounter)
 		{
-		for(jcChanMapType::const_iterator itr = jcChanMap.begin() ;
-		    itr != jcChanMap.end() ; ++itr) {
-			Channel* theChan = Network->findChannel(
-				itr->first ) ;
-			if( 0 == theChan )
-				{
-				elog	<< "dronescan::OnTimer> Unable "
-					<< "to find channel: "
-					<< itr->first
-					<< std::endl ;
-				continue ;
-				}
-
-			if(itr->second >= jcCutoff)
-				log(WARN, "Join flood over in %s. Total joins: %u. Total size: %d",
-					itr->first.c_str(),
-					itr->second,
-					theChan->size()
-					);
-		}
-
-		log(DBG, "Clearing %u records from the join counter.",
-			jcChanMap.size()
-			);
-		jcChanMap.clear();
-
-		theTime = time(0) + jcInterval;
-		tidClearJoinCounter = MyUplink->RegisterTimer(theTime, this, 0);
+		processJoinPartChannels();
 		}
 
 	if(theTimer == tidClearNickCounter)
@@ -717,6 +663,111 @@ void dronescan::OnTimer( const xServer::timerID& theTimer , void *)
  ** D R O N E S C A N   F U N C T I O N S **
  *******************************************/
 
+
+void dronescan::processJoinPartChannels()
+{
+for(jcChanMapType::const_iterator itr = jcChanMap.begin() ;
+    itr != jcChanMap.end() ; ++itr) 
+	{
+	Channel* theChan = Network->findChannel(
+		itr->first ) ;
+	if( 0 == theChan )
+		{
+		elog	<< "dronescan::OnTimer> Unable "
+			<< "to find channel: "
+			<< itr->first
+			<< std::endl ;
+		delete itr->second;
+		continue ;
+		}
+	jfChannel* jChannel = itr->second;
+			
+	if(jChannel->getNumOfJoins() >= jcCutoff)
+		log(WARN, "Join flood over in %s. Total joins: %u. Total parts: %u. Total size: %d",
+			itr->first.c_str(),
+			jChannel->getNumOfJoins(),
+			jChannel->getNumOfParts(),
+			theChan->size()
+			);
+	jfChannel::joinPartMapIterator joinPartIt = jChannel->joinPartBegin();
+	jfChannel::joinPartMapIterator joinPartEnd = jChannel->joinPartEnd();
+	std::stringstream names;
+	std::stringstream excluded; 
+	for(;joinPartIt != joinPartEnd; ++joinPartIt )
+		{
+		if(joinPartIt->second.numOfJoins >= jcMinJoinToGline &&
+		    joinPartIt->second.numOfParts >= jcMinJoinToGline)
+			{
+			if(!joinPartIt->second.seenOper && !joinPartIt->second.seenLoggedInUser)
+				{
+				std::list<string>::const_iterator numericsIt = joinPartIt->second.numerics.begin();
+				for(;numericsIt != joinPartIt->second.numerics.end();++numericsIt)
+					{
+					iClient* theClient = Network->findClient(*numericsIt);
+					if(theClient && !strcmp(xIP(theClient->getIP()).GetNumericIP().c_str()
+						,joinPartIt->first.c_str()))
+						{
+						names 	<< theClient->getNickName() 
+							<< "[" << joinPartIt->second.numOfJoins
+							<< "],";
+						if(names.str().size() > 400)
+							{
+							names << "\r\n";
+							log(WARN,"Suppose to gline the following clients from %s:%s",
+							itr->first.c_str(),names.str().c_str());
+							names.str("");
+							}
+						
+						}
+					}
+				} else {
+				excluded << joinPartIt->first.c_str()
+					 << "[";
+				if(joinPartIt->second.seenOper)
+					{
+					excluded << "O";
+					} 
+				if(joinPartIt->second.seenLoggedInUser)
+					{
+					excluded << "L";
+					}
+				 excluded << "],";
+				if(excluded.str().size() > 400)
+					{
+					excluded << "\r\n";
+					log(WARN,"Excluding the following ips from %s:%s",
+					    itr->first.c_str(),excluded.str().c_str());
+					excluded.str("");
+					}	  
+				}	 
+			}
+		}
+	if(names.str().size() > 0)
+		{
+		names << "\r\n";
+		log(WARN,"Glining the following clients from %s:%s",
+		    itr->first.c_str(),
+		    names.str().c_str());
+		}
+	if(excluded.str().size() > 0)
+		{
+		excluded << "\r\n";
+		log(WARN,"Excluding the following ips from %s:%s",
+		    itr->first.c_str(),excluded.str().c_str());
+		}	  
+	delete itr->second;
+				
+	}
+
+log(DBG, "Clearing %u records from the join counter.",
+	jcChanMap.size()
+	);
+jcChanMap.clear();
+
+time_t theTime = time(0) + jcInterval;
+tidClearJoinCounter = MyUplink->RegisterTimer(theTime, this, 0);
+
+}
 /** Report a SQL error as necessary. */
 void dronescan::doSqlError(const string& theQuery, const string& theError)
 {
@@ -779,6 +830,82 @@ void dronescan::changeState(DS_STATE newState)
 	log(INFO, "Changed state in: %u ms", stateTimer.stopTimeMS());
 }
 
+
+void dronescan::handleChannelJoin( Channel* theChannel, iClient* theClient)
+{
+/* If this channel is too small, don't test it. */
+if(theChannel->size() < channelCutoff) return ;
+
+/* Iterate over our available tests, checking this channel */
+if(droneChannels.find(theChannel->getName()) == droneChannels.end()) {
+	/* This channel is not currently listed as active */
+	// Check the channel for abnormalities, if enough
+	// are found then it will be added to the
+	// droneChannels structure by checkChannel()
+	checkChannel( theChannel );
+}
+
+/* Reset lastjoin on the active channel */
+droneChannelsType::iterator droneChanItr =
+	droneChannels.find( theChannel->getName() ) ;
+
+// If the channel is still not in the droneChannels
+// structure then it is a "normal" channel
+if( droneChanItr != droneChannels.end() )
+	{
+	droneChanItr->second->setLastJoin( ::time( 0 ) ) ;
+	}
+
+/* Do join count processing if applicable */
+const string& channelName = theChannel->getName();
+
+jcChanMapIterator jcChanIt = jcChanMap.find(channelName);
+jfChannel* channel;
+if( jcChanIt != jcChanMap.end() )
+	{
+	channel = jcChanIt->second;
+	}
+else
+	{
+	channel = new (std::nothrow) jfChannel(channelName);
+	assert(channel != NULL);
+	jcChanMap[channelName] = channel;
+	}
+unsigned int joinCount = channel->advanceChannelJoin();
+
+if(joinCount == jcCutoff)
+	{
+	log(WARN, "%s is being join flooded.",
+		channelName.c_str()
+		);
+	//if the channel was not in flooded state, clear its join record
+	channel->setJoinFlooded(true);
+	}
+if(channel->getJoinFlooded())
+	{
+	channel->addJoin(theClient);
+	}
+}
+
+
+void dronescan::handleChannelPart(Channel* theChan,iClient* theClient)
+{
+jcChanMapIterator jcChanIt = jcChanMap.find(theChan->getName());
+if(jcChanIt != jcChanMap.end() && jcChanIt->second->getJoinFlooded())
+	{
+	unsigned int partCount = jcChanIt->second->advanceChannelParts();
+//	if(partCount == pcCutOff)
+//		{
+//		log(DEBUG,"%s is being part flooded.",
+//		    channelName.c_str());
+//		jcChanIt->second->setPartFlooded(true);
+//		}    
+//	if(jcChanIt->second->getPartFlooded())
+//		{
+		jcChanIt->second->addPart(theClient);
+//		}
+	}
+}
 
 /** Here we handle new clients as they connect to the network. */
 void dronescan::handleNewClient( iClient* theClient )

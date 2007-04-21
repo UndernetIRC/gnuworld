@@ -109,7 +109,7 @@ void LISTCommand::Exec( const iClient *theClient, const string& Message , const 
 		for(dronescan::jcChanMapType::const_iterator itr =
 		    bot->jcChanMap.begin() ; itr != bot->jcChanMap.end()
 		    ; ++itr) {
-		    	if(itr->second >= bot->jcCutoff)
+		    	if(itr->second->getNumOfJoins() >= bot->jcCutoff)
 				bot->Reply(theClient, "  %s (%u)",
 					itr->first.c_str(),
 					itr->second

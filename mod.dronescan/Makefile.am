@@ -23,7 +23,8 @@ libdronescan_la_SOURCES = 	\
 	HASALLOPTest.cc		\
 	HASOPTest.cc		\
 	MAXCHANSTest.cc		\
-	RANGETest.cc
+	RANGETest.cc		\
+	jfChannel.cc
 
 EXTRA_DIST = activeChannel.h \
 	clientData.h \

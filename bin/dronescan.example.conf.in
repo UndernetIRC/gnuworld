@@ -1,4 +1,4 @@
-# $Id: dronescan.example.conf.in,v 1.16 2006/07/25 01:51:18 isomer Exp $
+# $Id: dronescan.example.conf.in,v 1.17 2007/04/21 15:32:19 mrbean_ Exp $
 # What nickname should the bot use?
 nickname = E
 
@@ -79,6 +79,8 @@ jcInterval = 10
 # count must be OVER this level to trigger.
 jcCutoff = 10
 
+# The minimum time a client needs to join and part within a flood to be reported/glined
+jcMinJoinToGline = 1
 
 ################
 # NICK COUNTER #

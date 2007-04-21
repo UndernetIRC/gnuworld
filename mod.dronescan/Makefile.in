@@ -67,7 +67,8 @@ am_libdronescan_la_OBJECTS = libdronescan_la-dronescan.lo \
 	libdronescan_la-ABNORMALSTest.lo \
 	libdronescan_la-COMMONREALTest.lo \
 	libdronescan_la-HASALLOPTest.lo libdronescan_la-HASOPTest.lo \
-	libdronescan_la-MAXCHANSTest.lo libdronescan_la-RANGETest.lo
+	libdronescan_la-MAXCHANSTest.lo libdronescan_la-RANGETest.lo \
+	libdronescan_la-jfChannel.lo
 libdronescan_la_OBJECTS = $(am_libdronescan_la_OBJECTS)
 libdronescan_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) \
@@ -232,7 +233,8 @@ libdronescan_la_SOURCES = \
 	HASALLOPTest.cc		\
 	HASOPTest.cc		\
 	MAXCHANSTest.cc		\
-	RANGETest.cc
+	RANGETest.cc		\
+	jfChannel.cc
 
 EXTRA_DIST = activeChannel.h \
 	clientData.h \
@@ -334,6 +336,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdronescan_la-REMUSERCommand.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdronescan_la-STATUSCommand.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdronescan_la-dronescan.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdronescan_la-jfChannel.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdronescan_la-sqlFakeClient.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdronescan_la-sqlUser.Plo@am__quote@
 
@@ -497,6 +500,13 @@ libdronescan_la-RANGETest.lo: RANGETest.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='RANGETest.cc' object='libdronescan_la-RANGETest.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdronescan_la_CXXFLAGS) $(CXXFLAGS) -c -o libdronescan_la-RANGETest.lo `test -f 'RANGETest.cc' || echo '$(srcdir)/'`RANGETest.cc
+
+libdronescan_la-jfChannel.lo: jfChannel.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdronescan_la_CXXFLAGS) $(CXXFLAGS) -MT libdronescan_la-jfChannel.lo -MD -MP -MF $(DEPDIR)/libdronescan_la-jfChannel.Tpo -c -o libdronescan_la-jfChannel.lo `test -f 'jfChannel.cc' || echo '$(srcdir)/'`jfChannel.cc
+@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libdronescan_la-jfChannel.Tpo $(DEPDIR)/libdronescan_la-jfChannel.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='jfChannel.cc' object='libdronescan_la-jfChannel.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdronescan_la_CXXFLAGS) $(CXXFLAGS) -c -o libdronescan_la-jfChannel.lo `test -f 'jfChannel.cc' || echo '$(srcdir)/'`jfChannel.cc
 
 mostlyclean-libtool:
 	-rm -f *.lo

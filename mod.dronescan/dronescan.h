@@ -26,6 +26,8 @@
 #include "client.h"
 
 #include "clientData.h"
+#include "jfChannel.h"
+
 
 class PgDatabase;
 
@@ -108,12 +110,21 @@ public:
 	 ** D R O N E S C A N   F U N C T I O N S **
 	 *******************************************/
 
+	/** Process the join / part floods */
+	void processJoinPartChannels();
+	
 	/** Report a SQL error to the appropriate places. */
 	void doSqlError(const std::string&, const std::string&);
 
 	/** Change the current state. */
 	void changeState(DS_STATE) ;
+	
+	/** handles a channel join */
+	void handleChannelJoin( Channel*, iClient* );
 
+	/** handles a channel part */
+	void handleChannelPart( Channel*, iClient* );
+	
 	/** This function handles new clients as they connect. */
 	void handleNewClient( iClient* ) ;
 
@@ -182,10 +193,14 @@ public:
 	/** Join counter config options */
 	unsigned int jcInterval;
 	unsigned int jcCutoff;
+	unsigned int jcMinJoinToGline;
+	bool jcGlineEnable;
+	unsigned int pcCutoff;			
 	unsigned int ncInterval;
 	unsigned int ncCutoff;
-	typedef std::map< std::string , unsigned int , noCaseCompare >
+	typedef std::map< std::string , jfChannel* , noCaseCompare >
 		jcChanMapType;
+	typedef jcChanMapType::const_iterator jcChanMapIterator;
 	jcChanMapType jcChanMap;
 	typedef std::map< std::string , unsigned int , noCaseCompare >
 		ncChanMapType;

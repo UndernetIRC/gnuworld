@@ -1,5 +1,10 @@
-// $Id: ChangeLog,v 1.114 2007/04/18 11:06:06 kewlio Exp $ //
+// $Id: ChangeLog,v 1.115 2007/04/21 15:32:19 mrbean_ Exp $ //
 
+2007-04-21	MrBean <MrBean@undernet.org>
+		* mod.dronescan/*: started working on the ability to auto
+			gline join/part flooders, currently it only reports
+			them.
+			
 2007-04-18	Dan-m00 <daniel@undernet.org>
 		* libircu/msg_J.cc: alter logic slightly as a join to '0' (the
 			'part all channels' special exception) may not have a
