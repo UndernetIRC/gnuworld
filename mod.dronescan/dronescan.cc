@@ -682,78 +682,80 @@ for(jcChanMapType::const_iterator itr = jcChanMap.begin() ;
 		}
 	jfChannel* jChannel = itr->second;
 			
-	if(jChannel->getNumOfJoins() >= jcCutoff)
+	if(jChannel->getNumOfJoins() >= jcCutoff) 
+		{
 		log(WARN, "Join flood over in %s. Total joins: %u. Total parts: %u. Total size: %d",
 			itr->first.c_str(),
 			jChannel->getNumOfJoins(),
 			jChannel->getNumOfParts(),
 			theChan->size()
 			);
-	jfChannel::joinPartMapIterator joinPartIt = jChannel->joinPartBegin();
-	jfChannel::joinPartMapIterator joinPartEnd = jChannel->joinPartEnd();
-	std::stringstream names;
-	std::stringstream excluded; 
-	for(;joinPartIt != joinPartEnd; ++joinPartIt )
-		{
-		if(joinPartIt->second.numOfJoins >= jcMinJoinToGline &&
-		    joinPartIt->second.numOfParts >= jcMinJoinToGline)
+		jfChannel::joinPartMapIterator joinPartIt = jChannel->joinPartBegin();
+		jfChannel::joinPartMapIterator joinPartEnd = jChannel->joinPartEnd();
+		std::stringstream names;
+		std::stringstream excluded; 
+		for(;joinPartIt != joinPartEnd; ++joinPartIt )
 			{
-			if(!joinPartIt->second.seenOper && !joinPartIt->second.seenLoggedInUser)
+				if(joinPartIt->second.numOfJoins >= jcMinJoinToGline &&
+			    joinPartIt->second.numOfParts >= jcMinJoinToGline)
 				{
-				std::list<string>::const_iterator numericsIt = joinPartIt->second.numerics.begin();
-				for(;numericsIt != joinPartIt->second.numerics.end();++numericsIt)
+				if(!joinPartIt->second.seenOper && !joinPartIt->second.seenLoggedInUser)
 					{
-					iClient* theClient = Network->findClient(*numericsIt);
-					if(theClient && !strcmp(xIP(theClient->getIP()).GetNumericIP().c_str()
-						,joinPartIt->first.c_str()))
+					std::list<string>::const_iterator numericsIt = joinPartIt->second.numerics.begin();
+					for(;numericsIt != joinPartIt->second.numerics.end();++numericsIt)
 						{
-						names 	<< theClient->getNickName() 
-							<< "[" << joinPartIt->second.numOfJoins
-							<< "],";
-						if(names.str().size() > 400)
+						iClient* theClient = Network->findClient(*numericsIt);
+						if(theClient && !strcmp(xIP(theClient->getIP()).GetNumericIP().c_str()
+							,joinPartIt->first.c_str()))
 							{
-							names << "\r\n";
-							log(WARN,"Suppose to gline the following clients from %s:%s",
-							itr->first.c_str(),names.str().c_str());
-							names.str("");
-							}
+							names 	<< theClient->getNickName() 
+								<< "[" << joinPartIt->second.numOfJoins
+								<< "],";
+							if(names.str().size() > 400)
+								{
+								names << "\r\n";
+								log(WARN,"Suppose to gline the following clients from %s:%s",
+								itr->first.c_str(),names.str().c_str());
+								names.str("");
+								}
 						
+							}
 						}
-					}
-				} else {
-				excluded << joinPartIt->first.c_str()
-					 << "[";
-				if(joinPartIt->second.seenOper)
-					{
-					excluded << "O";
-					} 
-				if(joinPartIt->second.seenLoggedInUser)
-					{
-					excluded << "L";
-					}
-				 excluded << "],";
-				if(excluded.str().size() > 400)
-					{
-					excluded << "\r\n";
-					log(WARN,"Excluding the following ips from %s:%s",
-					    itr->first.c_str(),excluded.str().c_str());
-					excluded.str("");
-					}	  
-				}	 
+					} else  {
+					excluded << joinPartIt->first.c_str()
+						 << "[";
+					if(joinPartIt->second.seenOper)
+						{
+						excluded << "O";
+						} 
+					if(joinPartIt->second.seenLoggedInUser)
+						{
+						excluded << "L";
+						}
+					excluded << "],";
+					if(excluded.str().size() > 400)
+						{
+						excluded << "\r\n";
+						log(WARN,"Excluding the following ips from %s:%s",
+						    itr->first.c_str(),excluded.str().c_str());
+						excluded.str("");
+						}	  
+					}	 
+				}
 			}
-		}
-	if(names.str().size() > 0)
-		{
-		names << "\r\n";
-		log(WARN,"Glining the following clients from %s:%s",
-		    itr->first.c_str(),
-		    names.str().c_str());
-		}
-	if(excluded.str().size() > 0)
-		{
-		excluded << "\r\n";
-		log(WARN,"Excluding the following ips from %s:%s",
-		    itr->first.c_str(),excluded.str().c_str());
+		if(names.str().size() > 0)
+			{
+			names << "\r\n";
+			log(WARN,"Glining the following clients from %s:%s",
+			    itr->first.c_str(),
+			    names.str().c_str());
+			}
+		if(excluded.str().size() > 0)
+			{
+			excluded << "\r\n";
+			log(WARN,"Excluding the following ips from %s:%s",
+			    itr->first.c_str(),excluded.str().c_str());
+			}
 		}	  
 	delete itr->second;
 				
@@ -893,7 +895,7 @@ void dronescan::handleChannelPart(Channel* theChan,iClient* theClient)
 jcChanMapIterator jcChanIt = jcChanMap.find(theChan->getName());
 if(jcChanIt != jcChanMap.end() && jcChanIt->second->getJoinFlooded())
 	{
-	unsigned int partCount = jcChanIt->second->advanceChannelParts();
+//	unsigned int partCount = jcChanIt->second->advanceChannelParts();
 //	if(partCount == pcCutOff)
 //		{
 //		log(DEBUG,"%s is being part flooded.",
