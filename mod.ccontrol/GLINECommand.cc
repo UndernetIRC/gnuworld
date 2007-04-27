@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: GLINECommand.cc,v 1.58 2007/03/30 09:42:02 mrbean_ Exp $
+ * $Id: GLINECommand.cc,v 1.59 2007/04/27 21:18:54 mrbean_ Exp $
  */
 
 #include	<string>
@@ -40,7 +40,7 @@
 #include	"Constants.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: GLINECommand.cc,v 1.58 2007/03/30 09:42:02 mrbean_ Exp $" ) ;
+RCSTAG( "$Id: GLINECommand.cc,v 1.59 2007/04/27 21:18:54 mrbean_ Exp $" ) ;
 
 namespace gnuworld
 {
@@ -135,7 +135,7 @@ unsigned int ResStart = 2;
 gLength = extractTime( st[2] );
 if(gLength == 0)
 	{
-	gLength == bot->getDefaultGlineLength();
+	gLength = bot->getDefaultGlineLength();
 	ResStart = 1;
 	}
 	
