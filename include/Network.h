@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: Network.h,v 1.47 2005/06/24 22:49:39 kewlio Exp $
+ * $Id: Network.h,v 1.48 2007/04/27 19:30:43 mrbean_ Exp $
  */
 
 #ifndef __NETWORK_H
-#define __NETWORK_H "$Id: Network.h,v 1.47 2005/06/24 22:49:39 kewlio Exp $"
+#define __NETWORK_H "$Id: Network.h,v 1.48 2007/04/27 19:30:43 mrbean_ Exp $"
 
 #include	<vector>
 #include	<string>
@@ -337,6 +337,10 @@ public:
 	 */
 	virtual iServer*	findExpandedServerName(
 					const std::string& name ) const ;
+	/**
+	 * Returns all the servers which are currently in bursting state
+	 */
+	virtual std::list< iServer* > getAllBurstingServers();
 
 	/**
 	 * Find a global channel by case insensitive name.

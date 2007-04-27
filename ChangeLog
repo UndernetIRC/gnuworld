@@ -1,4 +1,14 @@
-// $Id: ChangeLog,v 1.115 2007/04/21 15:32:19 mrbean_ Exp $ //
+// $Id: ChangeLog,v 1.116 2007/04/27 19:30:43 mrbean_ Exp $ //
+
+2007-04-27	MrBean <MrBean@undernet.org>
+		* include/Network.h:
+		* src/Network.cc: Added the getAllBurstingServers method to
+			allow clients to get a list of the currently bursting
+			servers.
+		* mod.dronescan/*: Fixed a bug in which the bot was stuck in
+			in bursting state if the burst was not completed.
+			Fixed a bug in which number of clients that parted
+			wasn't updated
 
 2007-04-21	MrBean <MrBean@undernet.org>
 		* mod.dronescan/*: started working on the ability to auto

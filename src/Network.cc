@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: Network.cc,v 1.76 2006/12/22 06:41:45 kewlio Exp $
+ * $Id: Network.cc,v 1.77 2007/04/27 19:30:43 mrbean_ Exp $
  */
 
 #include	<new>
@@ -45,7 +45,7 @@
 #include	"ip.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: Network.cc,v 1.76 2006/12/22 06:41:45 kewlio Exp $" ) ;
+RCSTAG( "$Id: Network.cc,v 1.77 2007/04/27 19:30:43 mrbean_ Exp $" ) ;
 
 namespace gnuworld
 {
@@ -332,6 +332,22 @@ for( const_serverIterator ptr = servers_begin() ;
 	}
 return 0 ;
 }
+
+std::list< iServer* > xNetwork::getAllBurstingServers()
+{
+std::list< iServer* > burstingList;
+for( const_serverIterator ptr = servers_begin() ;
+	ptr != servers_end() ; ++ptr )
+	{
+	if(ptr->second->isBursting())
+		{
+		burstingList.push_back(ptr->second);
+		}
+	}
+return burstingList;
+
+}
+
 
 Channel* xNetwork::findChannel( const string& name ) const
 {

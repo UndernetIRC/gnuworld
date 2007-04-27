@@ -62,6 +62,9 @@ void STATUSCommand::Exec( const iClient *theClient, const string& Message, const
 			);
 	}
 
+	bot->Reply(theClient, "Current State: %s",
+	    bot->getCurrentState()== BURST ? "BURSTING" : "RUNNING");
+	    
 	return ;
 
 

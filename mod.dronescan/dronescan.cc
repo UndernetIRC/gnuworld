@@ -230,6 +230,7 @@ void dronescan::OnAttach()
 	/* Register for global network events */
 	MyUplink->RegisterEvent( EVT_BURST_CMPLT, this );
 	MyUplink->RegisterEvent( EVT_NETJOIN, this );
+	MyUplink->RegisterEvent( EVT_NETBREAK, this );
 	MyUplink->RegisterEvent( EVT_NICK, this );
 	MyUplink->RegisterEvent( EVT_KILL, this );
 	MyUplink->RegisterEvent( EVT_QUIT, this );
@@ -299,7 +300,7 @@ void dronescan::OnCTCP( iClient* theClient, const string& CTCP,
 	} else if("PING" == Command) {
 		DoCTCP(theClient, CTCP, Message);
 	} else if("VERSION" == Command) {
-		DoCTCP(theClient, CTCP, "GNUWorld DroneScan v0.0.9.1");
+		DoCTCP(theClient, CTCP, "GNUWorld DroneScan v0.0.9.2");
 	}
 
 	xClient::OnCTCP(theClient, CTCP, Message, Secure);
@@ -316,12 +317,17 @@ void dronescan::OnEvent( const eventType& theEvent,
 		case EVT_BURST_CMPLT :
 			{
 			log(DBG, "Caught EOB. Resetting frequencies.");
-			changeState(RUN);
+			updateState();
 			break;
 			} // EVT_BURST_CMPLT
 		case EVT_NETJOIN :
 			{
 			changeState(BURST);
+			break;
+			}
+		case EVT_NETBREAK :
+			{
+			updateState();
 			break;
 			}
 		case EVT_NICK :
@@ -714,7 +720,7 @@ for(jcChanMapType::const_iterator itr = jcChanMap.begin() ;
 							if(names.str().size() > 400)
 								{
 								names << "\r\n";
-								log(WARN,"Suppose to gline the following clients from %s:%s",
+								log(WARN,"Suppose to gline the following clients from %s: %s",
 								itr->first.c_str(),names.str().c_str());
 								names.str("");
 								}
@@ -736,7 +742,7 @@ for(jcChanMapType::const_iterator itr = jcChanMap.begin() ;
 					if(excluded.str().size() > 400)
 						{
 						excluded << "\r\n";
-						log(WARN,"Excluding the following ips from %s:%s",
+						log(WARN,"Excluding the following ips from %s: %s",
 						    itr->first.c_str(),excluded.str().c_str());
 						excluded.str("");
 						}	  
@@ -746,14 +752,14 @@ for(jcChanMapType::const_iterator itr = jcChanMap.begin() ;
 		if(names.str().size() > 0)
 			{
 			names << "\r\n";
-			log(WARN,"Glining the following clients from %s:%s",
+			log(WARN,"Suppose to gline the following clients from %s: %s",
 			    itr->first.c_str(),
 			    names.str().c_str());
 			}
 		if(excluded.str().size() > 0)
 			{
 			excluded << "\r\n";
-			log(WARN,"Excluding the following ips from %s:%s",
+			log(WARN,"Excluding the following ips from %s: %s",
 			    itr->first.c_str(),excluded.str().c_str());
 			}
 		}	  
@@ -832,6 +838,11 @@ void dronescan::changeState(DS_STATE newState)
 	log(INFO, "Changed state in: %u ms", stateTimer.stopTimeMS());
 }
 
+void dronescan::updateState() 
+{
+    std::list< iServer* > burstingServers = Network->getAllBurstingServers();
+    changeState(burstingServers.size() == 0 ? RUN : BURST);
+}
 
 void dronescan::handleChannelJoin( Channel* theChannel, iClient* theClient)
 {
@@ -895,7 +906,7 @@ void dronescan::handleChannelPart(Channel* theChan,iClient* theClient)
 jcChanMapIterator jcChanIt = jcChanMap.find(theChan->getName());
 if(jcChanIt != jcChanMap.end() && jcChanIt->second->getJoinFlooded())
 	{
-//	unsigned int partCount = jcChanIt->second->advanceChannelParts();
+	jcChanIt->second->advanceChannelParts();
 //	if(partCount == pcCutOff)
 //		{
 //		log(DEBUG,"%s is being part flooded.",

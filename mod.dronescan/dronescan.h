@@ -118,7 +118,10 @@ public:
 
 	/** Change the current state. */
 	void changeState(DS_STATE) ;
-	
+
+	/** Update the state according to the current network state */
+	void updateState();
+
 	/** handles a channel join */
 	void handleChannelJoin( Channel*, iClient* );
 
@@ -182,6 +185,9 @@ public:
 	inline PgDatabase *getSqlDb()
 		{ return SQLDb; }
 
+	inline const DS_STATE getCurrentState()
+		{ return currentState; }
+		
 	/** Internal variables */
 	userMapType userMap;
 	fcMapType fakeClients;
