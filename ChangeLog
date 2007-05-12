@@ -1,5 +1,9 @@
-// $Id: ChangeLog,v 1.116 2007/04/27 19:30:43 mrbean_ Exp $ //
+// $Id: ChangeLog,v 1.117 2007/05/12 13:20:00 mrbean_ Exp $ //
 
+2007-12-05	MrBean <MrBean@undernet.org>
+		* libircu/msg_S.cc: Fixed a bug which caused gnuworld to falsly
+			consider servers as bursting after EOB.
+			
 2007-04-27	MrBean <MrBean@undernet.org>
 		* include/Network.h:
 		* src/Network.cc: Added the getAllBurstingServers method to

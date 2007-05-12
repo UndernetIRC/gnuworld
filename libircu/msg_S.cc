@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_S.cc,v 1.6 2006/12/22 06:41:41 kewlio Exp $
+ * $Id: msg_S.cc,v 1.7 2007/05/12 13:20:00 mrbean_ Exp $
  */
 
 #include	<new>
@@ -35,7 +35,7 @@
 #include	"xparameters.h"
 #include	"ServerCommandHandler.h"
 
-RCSTAG( "$Id: msg_S.cc,v 1.6 2006/12/22 06:41:41 kewlio Exp $" ) ;
+RCSTAG( "$Id: msg_S.cc,v 1.7 2007/05/12 13:20:00 mrbean_ Exp $" ) ;
 
 namespace gnuworld
 {
@@ -113,13 +113,6 @@ iServer* newServer = new (std::nothrow) iServer( uplinkIntYY,
 		serverName,
 		connectTime ) ;
 assert( newServer != 0 ) ;
-
-// If we've finished our sync to the network, then this S
-// must be another server merging later on.
-if( !theServer->isBursting() )
-	{
-	newServer->setBursting( true ) ;
-	}
 
 // params[ 5 ] is either "P10", or "J10".  The J10 means
 // that the server is bursting
