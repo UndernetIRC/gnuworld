@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: iClient.cc,v 1.37 2005/11/14 04:13:21 kewlio Exp $
+ * $Id: iClient.cc,v 1.38 2007/05/26 09:41:24 mrbean_ Exp $
  */
 
 #include	<new>
@@ -33,8 +33,9 @@
 #include	"client.h"
 #include	"ip.h"
 #include	"gnuworld_config.h"
+#include	"Network.h"
 
-RCSTAG( "$Id: iClient.cc,v 1.37 2005/11/14 04:13:21 kewlio Exp $" ) ;
+RCSTAG( "$Id: iClient.cc,v 1.38 2007/05/26 09:41:24 mrbean_ Exp $" ) ;
 
 namespace gnuworld
 {
@@ -131,6 +132,10 @@ delete customDataMap ;
 customDataMap = 0 ;
 }
 
+const iServer* iClient::getServer()
+{
+    return Network->findServer(getIntYY());
+}
 void iClient::setModes( const string& newModes )
 {
 for( string::size_type i = 0 ; i < newModes.size() ; i++ )

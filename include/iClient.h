@@ -17,11 +17,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: iClient.h,v 1.47 2005/11/30 19:37:34 kewlio Exp $
+ * $Id: iClient.h,v 1.48 2007/05/26 09:41:24 mrbean_ Exp $
  */
 
 #ifndef __ICLIENT_H
-#define __ICLIENT_H "$Id: iClient.h,v 1.47 2005/11/30 19:37:34 kewlio Exp $"
+#define __ICLIENT_H "$Id: iClient.h,v 1.48 2007/05/26 09:41:24 mrbean_ Exp $"
 
 #include	<string>
 #include	<list>
@@ -31,6 +31,7 @@
 
 #include	"gnuworld_config.h"
 #include	"Channel.h"
+#include	"iServer.h"
 #include	"NetworkTarget.h"
 #include	"ELog.h"
 
@@ -38,6 +39,7 @@ namespace gnuworld
 {
 
 class xClient ;
+class Network ;
 
 /**
  * iClient objects represent network users.  This class provides
@@ -266,6 +268,11 @@ public:
 	inline const std::string& getFakeHost() const
 		{ return fakeHost ; }
 #endif
+	
+	/**
+	 * Retrieve the iClient's server
+	 */
+	const iServer* getServer();
 
 	/**
 	 * Retrieve the iClient's connection time.
