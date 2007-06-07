@@ -2,7 +2,7 @@
 /*
  *
  * Undernet GNUworld Interactive Installation Guide (aka UGIIG)
- * $Id: index.php,v 1.21 2006/07/17 01:24:02 nighty Exp $
+ * $Id: index.php,v 1.22 2007/06/07 01:52:37 nighty Exp $
  *
  * Released under the GNU Public License : http://www.gnu.org/licenses/gpl.txt
  * by nighty <nighty@undernet.org>
@@ -50,7 +50,7 @@ function footer($prev,$next) {
 	//echo "<address>maintained by <b>&lt;</b><a href=\"mailto:" . $coder_email . "\">" . $coder_email . "</a><b>&gt;</b> - Last modified : <b>" . date("M-d-Y H:i:s",   (  filemtime("index.php")+( date("Z",filemtime("index.php"))/3600 )   )   ) . " UTC/GMT</b> - <b>[</b><a href=\"./\">Home</a><b>]</b></address>";
 	echo "<address>maintained by <b>&lt;</b><a href=\"mailto:" . $coder_email . "\">" . $coder_email . "</a><b>&gt;</b> - <b>[</b><a href=\"./\">Home</a><b>]</b>";
 	echo "&nbsp;<br><font size=-2><b>";
-?>$Id: index.php,v 1.21 2006/07/17 01:24:02 nighty Exp $<?
+?>$Id: index.php,v 1.22 2007/06/07 01:52:37 nighty Exp $<?
 	echo "</b></font></address>\n";
 	echo "</body>\n";
 	echo "</html>\n";
@@ -117,7 +117,7 @@ define(ZLIB_FILE_NAME,"zlib-1.2.3.tar.gz");
 
 
 ?>
-<!-- $Id: index.php,v 1.21 2006/07/17 01:24:02 nighty Exp $ //-->
+<!-- $Id: index.php,v 1.22 2007/06/07 01:52:37 nighty Exp $ //-->
 <html>
 <head>
 <title>Undernet GNUworld Interactive Installation Guide</title>
@@ -990,6 +990,7 @@ this will <b>NOT</b> work and you will not be able to login properly to the bot 
 Load the CService schema :
 
 	<?=$os?>:/home/gnuworld/gnuworld/doc$ <b>/usr/local/pgsql/bin/psql cservice < cservice.sql</b>
+	<?=$os?>:/home/gnuworld/gnuworld/doc$ <b>/usr/local/pgsql/bin/psql cservice < cservice.config.sql</b>
 	<?=$os?>:/home/gnuworld/gnuworld/doc$ <b>/usr/local/pgsql/bin/psql cservice < languages.sql</b>
 	<?=$os?>:/home/gnuworld/gnuworld/doc$ <b>/usr/local/pgsql/bin/psql cservice < language_table.sql</b>
 	<?=$os?>:/home/gnuworld/gnuworld/doc$ <b>/usr/local/pgsql/bin/psql cservice < greeting.sql</b>
