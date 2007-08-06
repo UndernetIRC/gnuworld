@@ -24,7 +24,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: sqlChannel.cc,v 1.41 2007/03/25 16:42:25 kewlio Exp $
+ * $Id: sqlChannel.cc,v 1.42 2007/08/06 13:51:47 kewlio Exp $
  */
 
 #include	<sstream>
@@ -41,7 +41,7 @@
 #include	"cservice_config.h"
 
 const char sqlChannel_h_rcsId[] = __SQLCHANNEL_H ;
-const char sqlChannel_cc_rcsId[] = "$Id: sqlChannel.cc,v 1.41 2007/03/25 16:42:25 kewlio Exp $" ;
+const char sqlChannel_cc_rcsId[] = "$Id: sqlChannel.cc,v 1.42 2007/08/06 13:51:47 kewlio Exp $" ;
 
 namespace gnuworld
 {
@@ -84,6 +84,17 @@ const int sqlChannel::EV_PURGE    = 8 ;
 const int sqlChannel::EV_COMMENT 	= 9  ;
 const int sqlChannel::EV_REMOVEALL	= 10 ;
 const int sqlChannel::EV_IDLE		= 11 ;
+
+/* other events */
+const int sqlChannel::EV_MGRCHANGE	= 12 ;
+const int sqlChannel::EV_ADMREJECT	= 13 ;
+const int sqlChannel::EV_WITHDRAW	= 14 ;
+const int sqlChannel::EV_NEWAPP		= 15 ;
+const int sqlChannel::EV_NONSUPPORT	= 16 ;
+const int sqlChannel::EV_ADMREVIEW	= 17 ;
+const int sqlChannel::EV_CLRREVIEW	= 18 ;
+const int sqlChannel::EV_SUSPEND	= 19 ;
+const int sqlChannel::EV_UNSUSPEND	= 20 ;
 
 sqlChannel::sqlChannel(PgDatabase* _SQLDb)
  : id(0),

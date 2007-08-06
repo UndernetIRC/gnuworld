@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: STATUSCommand.cc,v 1.44 2006/08/11 03:29:18 kewlio Exp $
+ * $Id: STATUSCommand.cc,v 1.45 2007/08/06 13:51:47 kewlio Exp $
  */
 
 #include	<string>
@@ -31,7 +31,7 @@
 #include	"Network.h"
 #include	"cservice_config.h"
 
-const char STATUSCommand_cc_rcsId[] = "$Id: STATUSCommand.cc,v 1.44 2006/08/11 03:29:18 kewlio Exp $" ;
+const char STATUSCommand_cc_rcsId[] = "$Id: STATUSCommand.cc,v 1.45 2007/08/06 13:51:47 kewlio Exp $" ;
 
 namespace gnuworld
 {
@@ -158,21 +158,26 @@ if (tmpChan)
 bot->Notice(theClient, "MassDeopPro: %i", theChan->getMassDeopPro());
 
 string flagsSet;
-if (theChan->getFlag(sqlChannel::F_NOPURGE)) flagsSet += "NOPURGE ";
-if (theChan->getFlag(sqlChannel::F_SPECIAL)) flagsSet += "SPECIAL ";
-if (theChan->getFlag(sqlChannel::F_NOREG)) flagsSet += "NOREG ";
-if (theChan->getFlag(sqlChannel::F_NEVREG)) flagsSet += "NEVERREG ";
+if (admLevel > 0)
+{
+	/* only "*" access can view certain flags */
+	if (theChan->getFlag(sqlChannel::F_NOPURGE)) flagsSet += "NOPURGE ";
+	if (theChan->getFlag(sqlChannel::F_SPECIAL)) flagsSet += "SPECIAL ";
+	if (theChan->getFlag(sqlChannel::F_NOREG)) flagsSet += "NOREG ";
+	if (theChan->getFlag(sqlChannel::F_NEVREG)) flagsSet += "NEVERREG ";
+	if (theChan->getFlag(sqlChannel::F_CAUTION)) flagsSet += "CAUTION ";
+	if (theChan->getFlag(sqlChannel::F_LOCKED)) flagsSet += "LOCKED ";
+	if (theChan->getFlag(sqlChannel::F_MIA)) flagsSet += "MIA ";
+}
+/* anyone with access can view the rest of the flags (below) */
 if (theChan->getFlag(sqlChannel::F_SUSPEND)) flagsSet += "SUSPEND ";
 if (theChan->getFlag(sqlChannel::F_TEMP)) flagsSet += "TEMP ";
-if (theChan->getFlag(sqlChannel::F_CAUTION)) flagsSet += "CAUTION ";
 if (theChan->getFlag(sqlChannel::F_VACATION)) flagsSet += "VACATION ";
 if (theChan->getFlag(sqlChannel::F_ALWAYSOP)) flagsSet += "ALWAYSOP ";
 if (theChan->getFlag(sqlChannel::F_STRICTOP)) flagsSet += "STRICTOP ";
 if (theChan->getFlag(sqlChannel::F_NOOP)) flagsSet += "NOOP ";
 if (theChan->getFlag(sqlChannel::F_AUTOTOPIC)) flagsSet += "AUTOTOPIC ";
 if (theChan->getFlag(sqlChannel::F_AUTOJOIN)) flagsSet += "AUTOJOIN ";
-if (theChan->getFlag(sqlChannel::F_LOCKED)) flagsSet += "LOCKED ";
-if (theChan->getFlag(sqlChannel::F_MIA)) flagsSet += "MIA ";
 if (theChan->getFlag(sqlChannel::F_FLOATLIM))
 	{
 	stringstream floatLim;

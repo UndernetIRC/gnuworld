@@ -17,11 +17,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: sqlChannel.h,v 1.45 2007/03/25 16:42:25 kewlio Exp $
+ * $Id: sqlChannel.h,v 1.46 2007/08/06 13:51:47 kewlio Exp $
  */
 
 #ifndef __SQLCHANNEL_H
-#define __SQLCHANNEL_H "$Id: sqlChannel.h,v 1.45 2007/03/25 16:42:25 kewlio Exp $"
+#define __SQLCHANNEL_H "$Id: sqlChannel.h,v 1.46 2007/08/06 13:51:47 kewlio Exp $"
 
 #include	<string>
 #include	<map>
@@ -88,6 +88,17 @@ public:
 	static const int	EV_COMMENT;
 	static const int	EV_REMOVEALL;
 	static const int	EV_IDLE;
+
+	/* other events */
+	static const int	EV_MGRCHANGE;
+	static const int	EV_ADMREJECT;
+	static const int	EV_WITHDRAW;
+	static const int	EV_NEWAPP;
+	static const int	EV_NONSUPPORT;
+	static const int	EV_ADMREVIEW;
+	static const int	EV_CLRREVIEW;
+	static const int	EV_SUSPEND;
+	static const int	EV_UNSUSPEND;
 
 	/*
 	 *  Methods to get data atrributes.

@@ -33,7 +33,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: SETCommand.cc,v 1.59 2005/12/05 17:32:15 kewlio Exp $
+ * $Id: SETCommand.cc,v 1.60 2007/08/06 13:51:47 kewlio Exp $
  */
 
 #include	<string>
@@ -45,7 +45,7 @@
 #include	"responses.h"
 #include	"cservice_config.h"
 
-const char SETCommand_cc_rcsId[] = "$Id: SETCommand.cc,v 1.59 2005/12/05 17:32:15 kewlio Exp $" ;
+const char SETCommand_cc_rcsId[] = "$Id: SETCommand.cc,v 1.60 2007/08/06 13:51:47 kewlio Exp $" ;
 
 namespace gnuworld
 {
@@ -289,6 +289,7 @@ if(!theChan)
 int level = bot->getEffectiveAccessLevel(theUser, theChan, false);
 string option = string_upper(st[2]);
 string value;
+string reason;
 
 if (st.size() < 4)
 	{
@@ -297,6 +298,10 @@ if (st.size() < 4)
 else
 	{
  	value = string_upper(st[3]);
+	if (st.size() < 5)
+		reason = "";
+	else
+		reason = st.assemble(4);
 	}
 
 	/*
@@ -526,6 +531,11 @@ else
 			Usage(theClient);
 			return true;
 	    }
+            if (reason == "")
+            {
+                bot->Notice(theClient, "No reason given!  You must specify a reason after ON/OFF");
+                return true;
+            }
 	    if(value == "ON") theChan->setFlag(sqlChannel::F_SUSPEND);
 	    else if(value == "OFF") theChan->removeFlag(sqlChannel::F_SUSPEND);
 	    else
@@ -538,6 +548,16 @@ else
 		return true;
 	    }
 	    theChan->commit();
+            /* write a channel log entry */
+            string logmsg;
+            if (!theChan->getFlag(sqlChannel::F_SUSPEND))
+                logmsg += "un";
+            logmsg += "suspend reason: ";
+            logmsg += reason;
+            if (theChan->getFlag(sqlChannel::F_SUSPEND))
+                bot->writeChannelLog(theChan, theClient, sqlChannel::EV_SUSPEND, logmsg);
+            else
+                bot->writeChannelLog(theChan, theClient, sqlChannel::EV_UNSUSPEND, logmsg);
 	    bot->Notice(theClient,
 			bot->getResponse(theUser,
 				language::set_cmd_status,

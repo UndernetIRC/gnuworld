@@ -1,4 +1,16 @@
-// $Id: ChangeLog,v 1.118 2007/05/26 09:41:24 mrbean_ Exp $ //
+// $Id: ChangeLog,v 1.119 2007/08/06 13:51:47 kewlio Exp $ //
+
+2007-08-06	Dan-m00 <daniel@undernet.org>
+		* mod.cservice/sqlChannel.h:
+		* mod.cservice/sqlChannel.cc: Updated event types to reflect
+			all known events from the database.
+		* mod.cservice/SETCommand.cc: Updated 'SUSPEND' to require a
+			suspension reason, which gets logged to the channel
+			log with event type 'suspend' or 'unsuspend' with
+			the reason
+		* mod.cservice/STATUSCommand.cc: remove certain flags from
+			public view so that only '*' users can see them.
+			(e.g. SPECIAL, MIA ...)
 
 2007-26-05	MrBean <MrBean@undernet.org>
 		* include/iClient.h
