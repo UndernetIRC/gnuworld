@@ -1,4 +1,4 @@
--- $Id: language_german.sql,v 1.2 2006/01/31 00:25:13 kewlio Exp $
+-- $Id: language_german.sql,v 1.3 2007/08/07 21:22:28 kewlio Exp $
 -- Language Definition Table for German
 -- 16/8/2002 volta <volta2@gmx.de>
 -- beta readers: Tha_Funk
@@ -37,7 +37,7 @@ COPY translations FROM stdin;
 5	28	ZULETZT VERÄNDERT: %s (vor %s)	31337	0
 5	29	** SUSPENDIERT ** - Verfällt in %s (Level %i)	31337	0
 5	30	ZULETZT GESEHEN: vor %s.	31337	0
-5	31	Es gibt mehr als 15 passende Einträge.	31337	0
+5	31	Es gibt mehr als %d passende Einträge.	31337	0
 5	32	Bitte begrenze deine Anfrage.	31337	0
 5	33	Ende der Benutzerliste	31337	0
 5	34	Kein passender Eintrag!	31337	0

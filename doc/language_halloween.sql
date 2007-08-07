@@ -1,4 +1,4 @@
--- $Id: language_halloween.sql,v 1.5 2006/01/31 00:25:13 kewlio Exp $
+-- $Id: language_halloween.sql,v 1.6 2007/08/07 21:22:29 kewlio Exp $
 -- Muhauahuuahha.
 -- Halloween language definition.
 -- 30/10/01 - Gte (Greg Sikorski) <gte@atomicrevs.demon.co.uk>.
@@ -40,7 +40,7 @@ COPY "translations" FROM stdin;
 15	28	LAST MODIFIED: %s (%s ago)	31337	0
 15	29	** BANISHED ** - Expires in %s (Level %i)	31337	0
 15	30	LAST SEEN: %s ago.	31337	0
-15	31	There are more than 15 matching entries.	31337	0
+15	31	There are more than %d matching entries.	31337	0
 15	32	Please restrict your query.	31337	0
 15	33	End of generation list	31337	0
 15	34	No Match!	31337	0

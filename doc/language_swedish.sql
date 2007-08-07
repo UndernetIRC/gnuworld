@@ -1,4 +1,4 @@
--- $Id: language_swedish.sql,v 1.5 2006/01/31 00:25:13 kewlio Exp $
+-- $Id: language_swedish.sql,v 1.6 2007/08/07 21:22:29 kewlio Exp $
 -- Swedish language definition.
 -- 06/24/2002 - Ponte <tpin@telia.com>.
 -- 11/06/2002 - Comet <Comet@irc-solution.net>
@@ -40,7 +40,7 @@ COPY "translations" FROM stdin;
 20	28	SENAST MODIFIERAD: %s (%s sen)	31337	0
 20	29	** SUSPENDERAD ** - Utgår %s (Nivå %i)	31337	0
 20	30	SÅGS SENAST: %s sen.	31337	0
-20	31	Det är mer än 15 träffar.	31337	0
+20	31	Det är mer än %d träffar.	31337	0
 20	32	Var vänlig specificera din fråga.	31337	0
 20	33	Slut på behörighetslistan	31337	0
 20	34	Ingen Träff!	31337	0

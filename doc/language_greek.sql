@@ -1,4 +1,4 @@
--- $Id: language_greek.sql,v 1.6 2006/01/31 00:25:13 kewlio Exp $
+-- $Id: language_greek.sql,v 1.7 2007/08/07 21:22:28 kewlio Exp $
 -- Greek	 language definition.
 -- 04/05/02 - Marios Solomou <hawk@undernet.org>.
 -- 04/05/02 - deop <d30pma@cytanet.com.cy>.
@@ -37,7 +37,7 @@ COPY "translations" FROM stdin;
 19	28	TELEUTAIO MODIFIED: %s (%s prin)	31337	0
 19	29	** SUSPENDED ** - Ligei se %s (Orio %i)	31337	0
 19	30	TELEUTAIA SINANTISH: %s prin.	31337	0
-19	31	Iparxoun pio polles apo 15 teriastes Eisodous i Simetoxes.	31337	0
+19	31	Iparxoun pio polles apo %d teriastes Eisodous i Simetoxes.	31337	0
 19	32	Parakalw perioriste to erotima sas.	31337	0
 19	33	Telos tis listas twn access	31337	0
 19	34	Den eiparxei Teriasma!	31337	0

@@ -41,7 +41,7 @@ COPY "translations" FROM stdin;
 1	28	LAST MODIFIED: %s (%s ago)	31337	0
 1	29	** SUSPENDED ** - Expires in %s (Level %i)	31337	0
 1	30	LAST SEEN: %s ago.	31337	0
-1	31	There are more than 15 matching entries.	31337	0
+1	31	There are more than %d matching entries.	31337	0
 1	32	Please restrict your query.	31337	0
 1	33	End of access list	31337	0
 1	34	No Match!	31337	0
@@ -225,7 +225,7 @@ COPY "translations" FROM stdin;
 2	28	DERNIÈRE MODIFICATION: %s (depuis %s)	31337	0
 2	29	** SUSPENDU ** - Expire dans %s  (Level %i)	31337	0
 2	30	DERNIÈRE FOIS VU: il y a %s.	31337	0
-2	31	Il y a plus de 15 requêtes trouvées.	31337	0
+2	31	Il y a plus de %d requêtes trouvées.	31337	0
 2	32	SVP restreindre votre requête	31337	0
 2	33	Fin de la liste des accès	31337	0
 2	34	Aucune correspondance trouvée!	31337	0
@@ -400,7 +400,7 @@ COPY "translations" FROM stdin;
 3	28	SIDST ÆNDRET: %s (%s siden)	31337	0
 3	29	** SUSPENDERET ** - Udløber om %s (Level %i)	31337	0
 3	30	SIDST SET: %s siden.	31337	0
-3	31	Der er mere end 15 matchende indtastninger.	31337	0
+3	31	Der er mere end %d matchende indtastninger.	31337	0
 3	32	Forkort venligst din forspørgelse.	31337	0
 3	33	Slut på adgangsliste.	31337	0
 3	34	Ingen match!	31337	0
@@ -575,7 +575,7 @@ COPY "translations" FROM stdin;
 6	28	ÚLTIMA MODIFICAÇÃO: %s (%s atrás)	31337	0
 6	29	** SUSPENSÃO ** - Expira em %s  (nível %i)	31337	0
 6	30	ÚLTIMA VEZ: %s atrás.	31337	0
-6	31	Há mais de 15 entradas.	31337	0
+6	31	Há mais de %d entradas.	31337	0
 6	32	Por favor, Restrinja sua pergunta.	31337	0
 6	33	Final da lista de acesso	31337	0
 6	34	Não Consta!	31337	0
@@ -751,7 +751,7 @@ COPY "translations" FROM stdin;
 7	28	ULTIMA MODIFICA: %s (%s fà)	31337	0
 7	29	** SOSPESO ** - Scade il %s (Level %i)	31337	0
 7	30	VISTO L'ULTIMA VOLTA: %s.	31337	0
-7	31	Sono presenti più di 15 corrispondenze.	31337	0
+7	31	Sono presenti più di %d corrispondenze.	31337	0
 7	32	Per favore, restringi il campo di ricerca dell'interrogazione.	31337	0
 7	33	Fine della lista degli accessi	31337	0
 7	34	Nessuna Corrispondenza!	31337	0
@@ -924,7 +924,7 @@ COPY "translations" FROM stdin;
 8	28	MODIFICAT: %s (in urma cu %s)	31337	0
 8	29	** SUSPENDAT ** - Expira in %s (Level %i)	31337	0
 8	30	VAZUT: in urma cu %s	31337	0
-8	31	Sunt mai mult de 15 rezultate.	31337	0
+8	31	Sunt mai mult de %d rezultate.	31337	0
 8	32	Restrictioneaza-ti cererea.	31337	0
 8	33	Sfarsit lista de accese	31337	0
 8	34	N-am gasit nimic!	31337	0
@@ -1099,7 +1099,7 @@ COPY "translations" FROM stdin;
 9	28	DARRERA MODIFICACIÓ: %s (fa %s)	31337	0
 9	29	** SUSPÈS/A ** - Expira d'aquí a %s (Level %i)	31337	0
 9	30	VIST/A PER DARRERA VEGADA: fa %s.	31337	0
-9	31	Hi ha més de 15 entrades coincidents.	31337	0
+9	31	Hi ha més de %d entrades coincidents.	31337	0
 9	32	Si et plau, restringeix la teva cerca.	31337	0
 9	33	Fi de la llista d'accessos.	31337	0
 9	34	Cap Coincidència!	31337	0
@@ -1274,7 +1274,7 @@ COPY "translations" FROM stdin;
 10	28	ÚLTIMA MODIFICACIÓN: %s (hace %s)	31337	0
 10	29	** SUSPENDIDO/A ** - Expira dentro de %s (Level %i)	31337	0
 10	30	VISTO/A POR ÚLTIMA VEZ: hace %s.	31337	0
-10	31	Hay más de 15 entradas coincidentes.	31337	0
+10	31	Hay más de %d entradas coincidentes.	31337	0
 10	32	Restringe tu búsqueda, por favor.	31337	0
 10	33	Fin de la lista de accesos.	31337	0
 10	34	No hay coincidencias!	31337	0
@@ -1804,7 +1804,7 @@ COPY "translations" FROM stdin;
 13	28	SIST MODIFISERT: %s (%s siden)	31337	0
 13	29	** SUSPENDERT ** - Utløper om %s (Level %i)	31337	0
 13	30	Sist sett for: %s timer siden	31337	0
-13	31	Det er mere enn 15 treff som passer dine kriterier.	31337	0
+13	31	Det er mere enn %d treff som passer dine kriterier.	31337	0
 13	32	Vennligst begrens ditt søk.	31337	0
 13	33	Slutt på aksesslisten	31337	0
 13	34	Ingen treff!	31337	0
@@ -1980,7 +1980,7 @@ COPY "translations" FROM stdin;
 14	28	AKHIRE TAGHYIRE: %s (%s kabla)	31337	0
 14	29	** MOUTAWA9IFE ** - Yantahi fi %s (moustawa %i)	31337	0
 14	30	AKHIRE MARA CHOUHIDA : %s 9able.	31337	0
-14	31	Youjado aktare min 15 talabe .	31337	0
+14	31	Youjado aktare min %d talabe .	31337	0
 14	32	Min Fadlik 7addid talabake	31337	0
 14	33	Nihayato lai7ati al mousstawayate	31337	0
 14	34	lam youjade ayou chayeine youwafi9o talabakome 	31337	0
@@ -2148,7 +2148,7 @@ COPY "translations" FROM stdin;
 15	28	%s :ìôğé %s :ùåğä ìàçøåğä 	31337	0
 15	29	%s òã  %i äâéùä îåùòú áøîä ùì	31337	0
 15	30	%sğøàä ìàçøåğä ìôğé:	31337	0
-15	31	éù éåúø î 15 òøëéí îúàéîéí.	31337	0
+15	31	éù éåúø î %d òøëéí îúàéîéí.	31337	0
 15	32	äâáì àú á÷ùúê.	31337	0
 15	33	.ñåó øùéîú äâéùåú	31337	0
 15	34	àéï äúàîåú !	31337	0
@@ -2323,7 +2323,7 @@ COPY "translations" FROM stdin;
 16	28	POSLEDNO MODIFICIRAN: %s (%s pred)	31337	0
 16	29	** SUSPENDIRAN ** - Istekuva za %s (Nivo %i)	31337	0
 16	30	POSLEDNO VIDEN: %s pred.	31337	0
-16	31	Ima poveke od 15 isti.	31337	0
+16	31	Ima poveke od %d isti.	31337	0
 16	32	Ve molam namalete go izborot.	31337	0
 16	33	Kraj na pristap listata	31337	0
 16	34	Nema Takov!	31337	0

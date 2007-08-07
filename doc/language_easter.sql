@@ -32,7 +32,7 @@ COPY "translations" FROM stdin;
 1	28	LAST MODIFIED: %s (%s ago)	31337
 1	29	** SUSPENDED ** - Expires in %s	31337
 1	30	LAST SEEN: %s ago.	31337
-1	31	There are more than 15 matching entries.	31337
+1	31	There are more than %d matching entries.	31337
 1	32	Please restrict your query.	31337
 1	33	End of access list	31337
 1	34	No Match!	31337

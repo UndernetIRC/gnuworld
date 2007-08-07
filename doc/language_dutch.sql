@@ -1,4 +1,4 @@
--- $Id: language_dutch.sql,v 1.4 2006/01/31 00:25:13 kewlio Exp $ --
+-- $Id: language_dutch.sql,v 1.5 2007/08/07 21:22:28 kewlio Exp $ --
 -- Dutch language definition.
 -- 9/2/02 - Eagle-One (Ken Geboers) <Eagle-One@pandora.be>.
 
@@ -38,7 +38,7 @@ INSERT INTO translations VALUES (4,27,'KANAAL: %s -- AUTOMODE: %s',31337,0);
 INSERT INTO translations VALUES (4,28,'LAATST AANGEPAST: %s (%s geleden)',31337,0);
 INSERT INTO translations VALUES (4,29,'** GESCHORST ** - vervalt in %s (Niveau %i)',31337,0);
 INSERT INTO translations VALUES (4,30,'LAATST GEZIEN: %s geleden.',31337,0);
-INSERT INTO translations VALUES (4,31,'Er zijn meer dan 15 bijhorende records.',31337,0);
+INSERT INTO translations VALUES (4,31,'Er zijn meer dan %d bijhorende records.',31337,0);
 INSERT INTO translations VALUES (4,32,'Gelieve uw zoekopdracht te beperken.',31337,0);
 INSERT INTO translations VALUES (4,33,'Einde toegangslijst',31337,0);
 INSERT INTO translations VALUES (4,34,'Geen bijhorende records!',31337,0);

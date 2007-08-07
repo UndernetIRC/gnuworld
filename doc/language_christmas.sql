@@ -42,7 +42,7 @@ INSERT INTO translations VALUES (16,27,'TREE: %s -- AUTOMODE: %s',31337,0);
 INSERT INTO translations VALUES (16,28,'LAST MODIFIED: %s (%s ago)',31337,0);
 INSERT INTO translations VALUES (16,29,'** CHARMED ** - Expires in %s (Level %i)',31337,0);
 INSERT INTO translations VALUES (16,30,'LAST SEEN: %s ago.',31337,0);
-INSERT INTO translations VALUES (16,31,'There are more than 15 matching entries.',31337,0);
+INSERT INTO translations VALUES (16,31,'There are more than %d matching entries.',31337,0);
 INSERT INTO translations VALUES (16,32,'Please restrict your query.',31337,0);
 INSERT INTO translations VALUES (16,33,'End of stars list',31337,0);
 INSERT INTO translations VALUES (16,34,'No Match!',31337,0);

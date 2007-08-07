@@ -1,4 +1,16 @@
-// $Id: ChangeLog,v 1.119 2007/08/06 13:51:47 kewlio Exp $ //
+// $Id: ChangeLog,v 1.120 2007/08/07 21:22:28 kewlio Exp $ //
+
+2007-08-07	Dan-m00 <daniel@undernet.org>
+		* mod.cservice/LBANLISTCommand.cc: Set response to 'too many
+			bans' to be dynamic (from cservice_config.h)
+
+		* doc/language_*.sql: Modify response for the above.
+		* doc/update_languages_20070807_31.sql: modification sql file
+
+		NOTE: cservice module will CORE if you do not run the update
+		sql file, an example follows:
+
+			psql cservice < doc/update_languages_20070807_31.sql
 
 2007-08-06	Dan-m00 <daniel@undernet.org>
 		* mod.cservice/sqlChannel.h:

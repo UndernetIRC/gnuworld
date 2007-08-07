@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: LBANLISTCommand.cc,v 1.14 2005/09/29 15:21:56 kewlio Exp $
+ * $Id: LBANLISTCommand.cc,v 1.15 2007/08/07 21:22:29 kewlio Exp $
  */
 
 #include	<string>
@@ -38,7 +38,7 @@
 #include	"cservice_config.h"
 #include	"time.h"
 
-const char LBANLISTCommand_cc_rcsId[] = "$Id: LBANLISTCommand.cc,v 1.14 2005/09/29 15:21:56 kewlio Exp $" ;
+const char LBANLISTCommand_cc_rcsId[] = "$Id: LBANLISTCommand.cc,v 1.15 2007/08/07 21:22:29 kewlio Exp $" ;
 
 namespace gnuworld
 {
@@ -111,6 +111,11 @@ for( std::map< int,sqlBan* >::const_iterator ptr = theChan->banList.begin() ; pt
 		if (match(st[2], theBan->getBanMask()) == 0)
 			{
 			results++;
+			/* escape the loop if we exceed our ban limit */
+			if ((results > MAX_LBAN_RESULTS) && !showAll)
+			{
+				break;
+			}
 			ban_expires = theBan->getExpires();
 			ban_expires_d = ban_expires - bot->currentTime();
 			ban_expires_f = bot->currentTime() - ban_expires_d;
@@ -140,18 +145,17 @@ for( std::map< int,sqlBan* >::const_iterator ptr = theChan->banList.begin() ; pt
 				bot->prettyDuration(ban_expires_f).c_str());
 			}
 		}
-	if( (results >= MAX_LBAN_RESULTS) && !showAll)
-		{
-		break;
-		}
 	} // for()
 
-if( (results >= MAX_LBAN_RESULTS) && !showAll)
+/* if there are more results than we are configured to show,
+   tell the user (in their preferred language */
+if( (results > MAX_LBAN_RESULTS) && !showAll)
 	{
 	bot->Notice(theClient,
 		bot->getResponse(theUser,
 			language::more_than_max,
-			string("There are more than 15 matching entries.")));
+			string("There are more than %d matching entries.")).c_str(),
+		MAX_LBAN_RESULTS);
 	bot->Notice(theClient,
 		bot->getResponse(theUser,
 			language::restrict_query,
