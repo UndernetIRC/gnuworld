@@ -24,3 +24,8 @@ CREATE TABLE fakeclients (
 	FOREIGN KEY (created_by) REFERENCES users (id) ON UPDATE RESTRICT ON DELETE CASCADE,
 	UNIQUE (nickname)
 );
+-------------------------
+CREATE TABLE exceptionalChannels (
+	id serial,
+	name text unique not null
+);

@@ -27,6 +27,7 @@
 
 #include "clientData.h"
 #include "jfChannel.h"
+#include "glineData.h"
 
 
 class PgDatabase;
@@ -105,13 +106,17 @@ public:
 			userMapType;
 	typedef std::map< unsigned int , sqlFakeClient* > fcMapType;
 
-
+	typedef std::list< glineData* > glineQueueType;
+	
 	/*******************************************
 	 ** D R O N E S C A N   F U N C T I O N S **
 	 *******************************************/
 
 	/** Process the join / part floods */
 	void processJoinPartChannels();
+	
+	/** Process the gline queue */
+	void processGlineQueue();
 	
 	/** Report a SQL error to the appropriate places. */
 	void doSqlError(const std::string&, const std::string&);
@@ -180,7 +185,8 @@ public:
 	bool updateDue(std::string);
 	void preloadFakeClientCache();
 	void preloadUserCache();
-
+	bool preloadExceptionalChannels();
+	
 	/* Allow commands access to the database pointer */
 	inline PgDatabase *getSqlDb()
 		{ return SQLDb; }
@@ -196,11 +202,26 @@ public:
 	typedef std::map< std::string , activeChannel* > droneChannelsType;
 	droneChannelsType droneChannels;
 
+	/** Typedef of channels which are not checked for join/part floods */
+	typedef std::list< std::string > exceptionalChannelsType;
+	exceptionalChannelsType exceptionalChannels;
+	
+	/** The gline queue */
+	glineQueueType glineQueue;
+	
+	bool isExceptionalChannel(const std::string&);
+	
+	bool addExceptionalChannel(const std::string&);
+	
+	bool remExceptionalChannel(const std::string&);
+	 
 	/** Join counter config options */
 	unsigned int jcInterval;
 	unsigned int jcCutoff;
 	unsigned int jcMinJoinToGline;
 	bool jcGlineEnable;
+	std::string jcGlineReason;
+	unsigned int jcGlineLength; 
 	unsigned int pcCutoff;			
 	unsigned int ncInterval;
 	unsigned int ncCutoff;
@@ -211,6 +232,10 @@ public:
 	typedef std::map< std::string , unsigned int , noCaseCompare >
 		ncChanMapType;
 	ncChanMapType ncChanMap;
+	
+	/** Gline queue config options */
+	unsigned int gbCount;
+	unsigned int gbInterval;
 
 	/* Test control */
 	/** Test map type. */
@@ -234,6 +259,8 @@ public:
 	double channelMargin;
 
 protected:
+
+	void outputNames(const std::string&,std::stringstream&,bool);
 	/** Configuration file. */
 	EConfig *dronescanConfig;
 
@@ -276,6 +303,7 @@ protected:
 	xServer::timerID tidClearJoinCounter;
 	xServer::timerID tidClearNickCounter;
 	xServer::timerID tidRefreshCaches;
+	xServer::timerID tidGlineQueue;
 
 	/** Command map type. */
 	typedef std::map< std::string , Command* , noCaseCompare >

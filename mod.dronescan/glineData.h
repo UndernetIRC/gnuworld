@@ -1,5 +1,5 @@
 /**
- * levels.h
+ * glineData.h
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -17,39 +17,44 @@
  * USA.
  */
 
-#ifndef LEVELS_H
-#define LEVELS_H
+#ifndef GLINEDATA_H
+#define GLINEDATA_H
 
 namespace gnuworld {
 
 namespace ds {
 
-namespace level {
 
-	/* Try to keep anything non-authed opers need below 200 */
+/**
+ * This class is a data container for glines which are in the gline queue
+ */
+class glineData {
+public:
+	/** Constructor sets initial state to UNKNOWN. */
+	inline glineData(std::string _host, std::string _reason, time_t _expires)
+		{ host = _host; reason = _reason; expires = _expires;}
 
-	/* Standard level is 300 */
+	inline const std::string getHost() const
+		{ return host; }
 
-	const unsigned short access	= 300;
-	const unsigned short check	= 300;
-	const unsigned short fake	= 300;
-	const unsigned short list	= 300;
-	const unsigned short status	= 300;
+	inline const std::string getReason() const
+		{ return reason; }
 
-	/* Higher admin commands */
+	inline const time_t getExpires() const
+		{ return expires; }
 
-	const unsigned short adduser	= 750;
-	const unsigned short moduser	= 750;
-	const unsigned short remuser	= 750;
-	const unsigned short addExceptionalChannel = 750;
-	const unsigned short remExceptionalChannel = 750;
+
+protected:
+	/** The gline host */
+	std::string	host;
 	
-	/* Commands at 1000 should really be debug commands only */
+	/** The gline reason */
+	std::string 	reason;
+	
+	/** The gline expiry */
+	time_t 		expires;
 
-	const unsigned short analyse	= 1000;
-	const unsigned short quote	= 1000;
-
-} // namespace level
+}; // class glineData
 
 } // namespace ds
 

@@ -1,4 +1,4 @@
-# $Id: dronescan.example.conf.in,v 1.17 2007/04/21 15:32:19 mrbean_ Exp $
+# $Id: dronescan.example.conf.in,v 1.18 2007/08/24 13:07:05 mrbean_ Exp $
 # What nickname should the bot use?
 nickname = E
 
@@ -82,6 +82,16 @@ jcCutoff = 10
 # The minimum time a client needs to join and part within a flood to be reported/glined
 jcMinJoinToGline = 1
 
+# Whether or not to gline join flood clients 
+jcGlineEnable = 0
+
+# The gline reason to set when glining join flood offenders
+jcGlineReason = Flooding is not tollerated on this network!
+
+# The length in seconds for glines which are issued on join flood offenders
+jcGlineLength = 3600
+
+
 ################
 # NICK COUNTER #
 ################
@@ -119,3 +129,14 @@ maxChans = 2
 # The amount of users who must have the same realname before being considered
 # abnormal.
 realCutoff = 4
+
+###############
+# GLINE QUEUE #
+###############
+
+# The number of clients to gline when processing the gline queue
+gbCount = 2
+
+# The interval (in seconds) processing the gline queue
+gbInterval = 1
+

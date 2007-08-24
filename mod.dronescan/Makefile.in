@@ -56,6 +56,8 @@ libdronescan_la_LIBADD =
 am_libdronescan_la_OBJECTS = libdronescan_la-dronescan.lo \
 	libdronescan_la-Convert.lo libdronescan_la-sqlFakeClient.lo \
 	libdronescan_la-sqlUser.lo libdronescan_la-ACCESSCommand.lo \
+	libdronescan_la-ADDEXCEPTIONALCHANNELCommand.lo \
+	libdronescan_la-REMEXCEPTIONALCHANNELCommand.lo \
 	libdronescan_la-ADDUSERCommand.lo \
 	libdronescan_la-ANALYSECommand.lo \
 	libdronescan_la-CHECKCommand.lo libdronescan_la-FAKECommand.lo \
@@ -219,6 +221,8 @@ libdronescan_la_SOURCES = \
 	sqlFakeClient.cc	\
 	sqlUser.cc		\
 	ACCESSCommand.cc	\
+	ADDEXCEPTIONALCHANNELCommand.cc\
+	REMEXCEPTIONALCHANNELCommand.cc\
 	ADDUSERCommand.cc	\
 	ANALYSECommand.cc	\
 	CHECKCommand.cc		\
@@ -320,6 +324,7 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdronescan_la-ABNORMALSTest.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdronescan_la-ACCESSCommand.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdronescan_la-ADDEXCEPTIONALCHANNELCommand.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdronescan_la-ADDUSERCommand.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdronescan_la-ANALYSECommand.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdronescan_la-CHECKCommand.Plo@am__quote@
@@ -333,6 +338,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdronescan_la-MODUSERCommand.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdronescan_la-QUOTECommand.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdronescan_la-RANGETest.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdronescan_la-REMEXCEPTIONALCHANNELCommand.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdronescan_la-REMUSERCommand.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdronescan_la-STATUSCommand.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdronescan_la-dronescan.Plo@am__quote@
@@ -395,6 +401,20 @@ libdronescan_la-ACCESSCommand.lo: ACCESSCommand.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='ACCESSCommand.cc' object='libdronescan_la-ACCESSCommand.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdronescan_la_CXXFLAGS) $(CXXFLAGS) -c -o libdronescan_la-ACCESSCommand.lo `test -f 'ACCESSCommand.cc' || echo '$(srcdir)/'`ACCESSCommand.cc
+
+libdronescan_la-ADDEXCEPTIONALCHANNELCommand.lo: ADDEXCEPTIONALCHANNELCommand.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdronescan_la_CXXFLAGS) $(CXXFLAGS) -MT libdronescan_la-ADDEXCEPTIONALCHANNELCommand.lo -MD -MP -MF $(DEPDIR)/libdronescan_la-ADDEXCEPTIONALCHANNELCommand.Tpo -c -o libdronescan_la-ADDEXCEPTIONALCHANNELCommand.lo `test -f 'ADDEXCEPTIONALCHANNELCommand.cc' || echo '$(srcdir)/'`ADDEXCEPTIONALCHANNELCommand.cc
+@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libdronescan_la-ADDEXCEPTIONALCHANNELCommand.Tpo $(DEPDIR)/libdronescan_la-ADDEXCEPTIONALCHANNELCommand.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='ADDEXCEPTIONALCHANNELCommand.cc' object='libdronescan_la-ADDEXCEPTIONALCHANNELCommand.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdronescan_la_CXXFLAGS) $(CXXFLAGS) -c -o libdronescan_la-ADDEXCEPTIONALCHANNELCommand.lo `test -f 'ADDEXCEPTIONALCHANNELCommand.cc' || echo '$(srcdir)/'`ADDEXCEPTIONALCHANNELCommand.cc
+
+libdronescan_la-REMEXCEPTIONALCHANNELCommand.lo: REMEXCEPTIONALCHANNELCommand.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdronescan_la_CXXFLAGS) $(CXXFLAGS) -MT libdronescan_la-REMEXCEPTIONALCHANNELCommand.lo -MD -MP -MF $(DEPDIR)/libdronescan_la-REMEXCEPTIONALCHANNELCommand.Tpo -c -o libdronescan_la-REMEXCEPTIONALCHANNELCommand.lo `test -f 'REMEXCEPTIONALCHANNELCommand.cc' || echo '$(srcdir)/'`REMEXCEPTIONALCHANNELCommand.cc
+@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libdronescan_la-REMEXCEPTIONALCHANNELCommand.Tpo $(DEPDIR)/libdronescan_la-REMEXCEPTIONALCHANNELCommand.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='REMEXCEPTIONALCHANNELCommand.cc' object='libdronescan_la-REMEXCEPTIONALCHANNELCommand.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdronescan_la_CXXFLAGS) $(CXXFLAGS) -c -o libdronescan_la-REMEXCEPTIONALCHANNELCommand.lo `test -f 'REMEXCEPTIONALCHANNELCommand.cc' || echo '$(srcdir)/'`REMEXCEPTIONALCHANNELCommand.cc
 
 libdronescan_la-ADDUSERCommand.lo: ADDUSERCommand.cc
 @am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdronescan_la_CXXFLAGS) $(CXXFLAGS) -MT libdronescan_la-ADDUSERCommand.lo -MD -MP -MF $(DEPDIR)/libdronescan_la-ADDUSERCommand.Tpo -c -o libdronescan_la-ADDUSERCommand.lo `test -f 'ADDUSERCommand.cc' || echo '$(srcdir)/'`ADDUSERCommand.cc

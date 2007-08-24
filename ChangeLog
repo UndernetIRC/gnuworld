@@ -1,4 +1,10 @@
-// $Id: ChangeLog,v 1.120 2007/08/07 21:22:28 kewlio Exp $ //
+// $Id: ChangeLog,v 1.121 2007/08/24 13:07:05 mrbean_ Exp $ //
+
+2007-08-24	MrBean <mrbean@undernet.org>
+		* mod.dronescan/* Added exceptional channels (channels which are not checked)
+				  The dronescan can now gline join flood offenders
+		
+		NOTE: you must run the update sql file : psql dronescan < doc/update_exceptionalChannels_20070824.sql
 
 2007-08-07	Dan-m00 <daniel@undernet.org>
 		* mod.cservice/LBANLISTCommand.cc: Set response to 'too many

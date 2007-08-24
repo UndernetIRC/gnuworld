@@ -9,6 +9,8 @@ libdronescan_la_SOURCES = 	\
 	sqlFakeClient.cc	\
 	sqlUser.cc		\
 	ACCESSCommand.cc	\
+	ADDEXCEPTIONALCHANNELCommand.cc\
+	REMEXCEPTIONALCHANNELCommand.cc\
 	ADDUSERCommand.cc	\
 	ANALYSECommand.cc	\
 	CHECKCommand.cc		\

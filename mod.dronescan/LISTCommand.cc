@@ -127,6 +127,18 @@ void LISTCommand::Exec( const iClient *theClient, const string& Message , const 
 				);
 		}
 	}
+	
+	if("EXCEPTIONALCHANNELS" == Name) {
+		if(bot->exceptionalChannels.empty()) {
+			bot->Reply(theClient,"There are currently no exceptional channels");
+			return;
+		}
+		bot->Reply(theClient,"Exceptional channels:");
+		for(dronescan::exceptionalChannelsType::const_iterator itr = 
+		    bot->exceptionalChannels.begin(); itr != bot->exceptionalChannels.end();++itr) {
+			bot->Reply(theClient,"Channel: %s",(*itr).c_str());
+		}
+	}    
 
 	return ;
 } // LISTCommand::Exec(iClient*, const string&)

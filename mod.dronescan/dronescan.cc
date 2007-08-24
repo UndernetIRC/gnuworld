@@ -117,6 +117,11 @@ ncInterval = atoi(dronescanConfig->Require("ncInterval")->second.c_str());
 ncCutoff = atoi(dronescanConfig->Require("ncCutoff")->second.c_str());
 rcInterval = atoi(dronescanConfig->Require("rcInterval")->second.c_str());
 jcMinJoinToGline = atoi(dronescanConfig->Require("jcMinJoinToGline")->second.c_str());
+jcGlineEnable = atoi(dronescanConfig->Require("jcGlineEnable")->second.c_str()) == 1 ? true : false;
+jcGlineReason = dronescanConfig->Require("jcGlineReason")->second.c_str();
+jcGlineLength = atoi(dronescanConfig->Require("jcGlineLength")->second.c_str());
+gbCount = atoi(dronescanConfig->Require("gbCount")->second.c_str());
+gbInterval = atoi(dronescanConfig->Require("gbInterval")->second.c_str());
 /* Set up variables that our tests will need */
 typedef std::vector<string> testVarsType;
 testVarsType testVars;
@@ -175,6 +180,7 @@ elog << "dronescan> Established connection to SQL server." << std::endl;
 /* Preload caches */
 preloadFakeClientCache();
 preloadUserCache();
+preloadExceptionalChannels();
 
 /* Initialise statistics */
 customDataCounter = 0;
@@ -198,12 +204,14 @@ theTimer = new Timer();
 /* Register commands available to users */
 RegisterCommand(new ACCESSCommand(this, "ACCESS", "() (<user>)"));
 RegisterCommand(new ADDUSERCommand(this, "ADDUSER", "<user> <access>"));
+RegisterCommand(new ADDEXCEPTIONALCHANNELCommand(this, "ADDEXCEPTIONALCHANNEL","<channel name>"));
 RegisterCommand(new ANALYSECommand(this, "ANALYSE", "<#channel>"));
 RegisterCommand(new CHECKCommand(this, "CHECK", "(<#channel>) (<user>)"));
 RegisterCommand(new FAKECommand(this, "FAKE", "(activate)"));
 RegisterCommand(new LISTCommand(this, "LIST", "(active|fakeclients|joinflood|users)"));
 RegisterCommand(new MODUSERCommand(this, "MODUSER", "(ACCESS <user> <level>"));
 RegisterCommand(new QUOTECommand(this, "QUOTE", "<string>"));
+RegisterCommand(new REMEXCEPTIONALCHANNELCommand(this, "REMEXCEPTIONALCHANNEL","<channel name>"));
 RegisterCommand(new REMUSERCommand(this, "REMUSER", "<user>"));
 RegisterCommand(new STATUSCommand(this, "STATUS", ""));
 } // dronescan::dronescan(const string&)
@@ -252,6 +260,9 @@ void dronescan::OnAttach()
 
 	theTime = time(0) + ncInterval;
 	tidClearNickCounter = MyUplink->RegisterTimer(theTime, this, 0);
+	
+	theTime = time(0) + gbInterval;
+	tidGlineQueue = MyUplink->RegisterTimer(theTime,this,0);
 
 	xClient::OnAttach() ;
 } // dronescan::OnAttach()
@@ -659,11 +670,19 @@ void dronescan::OnTimer( const xServer::timerID& theTimer , void *)
 		log(DBG, "Refreshing caches");
 
 		preloadUserCache();
-
+		preloadExceptionalChannels();
+		
 		theTime = time(0) + rcInterval;
 		tidRefreshCaches = MyUplink->RegisterTimer(theTime, this, 0);
 	}
-}
+	
+	if(theTimer == tidGlineQueue) {
+		processGlineQueue();
+		
+		theTime = time(0) + gbInterval;
+		tidGlineQueue = MyUplink->RegisterTimer(theTime, this , 0);
+	}
+}		
 
 /*******************************************
  ** D R O N E S C A N   F U N C T I O N S **
@@ -700,6 +719,7 @@ for(jcChanMapType::const_iterator itr = jcChanMap.begin() ;
 		jfChannel::joinPartMapIterator joinPartEnd = jChannel->joinPartEnd();
 		std::stringstream names;
 		std::stringstream excluded; 
+		std::stringstream tempNames;
 		for(;joinPartIt != joinPartEnd; ++joinPartIt )
 			{
 				if(joinPartIt->second.numOfJoins >= jcMinJoinToGline &&
@@ -708,25 +728,31 @@ for(jcChanMapType::const_iterator itr = jcChanMap.begin() ;
 				if(!joinPartIt->second.seenOper && !joinPartIt->second.seenLoggedInUser)
 					{
 					std::list<string>::const_iterator numericsIt = joinPartIt->second.numerics.begin();
+					tempNames << joinPartIt->first.c_str() << std::string("[") 
+					<< joinPartIt->second.numOfJoins 
+					<< std::string("]{");
 					for(;numericsIt != joinPartIt->second.numerics.end();++numericsIt)
 						{
 						iClient* theClient = Network->findClient(*numericsIt);
 						if(theClient && !strcmp(xIP(theClient->getIP()).GetNumericIP().c_str()
 							,joinPartIt->first.c_str()))
 							{
-							names 	<< theClient->getNickName() 
-								<< "[" << joinPartIt->second.numOfJoins
-								<< "],";
-							if(names.str().size() > 400)
-								{
-								names << "\r\n";
-								log(WARN,"Suppose to gline the following clients from %s: %s",
-								itr->first.c_str(),names.str().c_str());
-								names.str("");
-								}
-						
+							tempNames 	<< theClient->getNickName() 
+								<< ",";
 							}
 						}
+						tempNames << "}";
+						if(names.str().size() + tempNames.str().size() > 400)
+								{
+								outputNames(itr->first,names,false);
+								}
+						names << " " << tempNames.str();
+						tempNames.str("");
+						if(jcGlineEnable)
+								{
+								glineData* theGline = new (std::nothrow) glineData("*!*@" +xIP(joinPartIt->first).GetNumericIP(),jcGlineReason,jcGlineLength);
+								glineQueue.push_back(theGline);
+								}
 					} else  {
 					excluded << joinPartIt->first.c_str()
 						 << "[";
@@ -741,26 +767,18 @@ for(jcChanMapType::const_iterator itr = jcChanMap.begin() ;
 					excluded << "],";
 					if(excluded.str().size() > 400)
 						{
-						excluded << "\r\n";
-						log(WARN,"Excluding the following ips from %s: %s",
-						    itr->first.c_str(),excluded.str().c_str());
-						excluded.str("");
+						outputNames(itr->first,excluded,true);
 						}	  
 					}	 
 				}
 			}
 		if(names.str().size() > 0)
 			{
-			names << "\r\n";
-			log(WARN,"Suppose to gline the following clients from %s: %s",
-			    itr->first.c_str(),
-			    names.str().c_str());
+			outputNames(itr->first,names,false);
 			}
 		if(excluded.str().size() > 0)
 			{
-			excluded << "\r\n";
-			log(WARN,"Excluding the following ips from %s: %s",
-			    itr->first.c_str(),excluded.str().c_str());
+			outputNames(itr->first,names,true);
 			}
 		}	  
 	delete itr->second;
@@ -775,6 +793,41 @@ jcChanMap.clear();
 time_t theTime = time(0) + jcInterval;
 tidClearJoinCounter = MyUplink->RegisterTimer(theTime, this, 0);
 
+}
+
+void dronescan::outputNames(const std::string& chanName,std::stringstream& names,bool exclude)
+{
+names << "\r\n";
+std::string gString = exclude ? "Excluding" : jcGlineEnable ? "Glining" : "Suppose to gline";
+log(WARN,"%s the following clients from %s: %s",gString.c_str(),
+	chanName.c_str(),names.str().c_str());
+	names.str("");
+}
+
+void dronescan::processGlineQueue() {
+if(glineQueue.size() > 0) 
+		{
+		unsigned int count = 0;
+		int userCount;
+		glineData* curGline;
+		char us[100];
+		log(DBG,"Processing gline queue\r\n");
+		for(; count < gbCount && glineQueue.size() > 0;)
+				{
+				curGline = glineQueue.front();
+				glineQueue.pop_front();
+				userCount = Network->countMatchingRealUserHost(curGline->getHost());
+				us[0] = '\0';
+				sprintf(us,"%d",count);
+				std::string glineReason = string("AUTO [") + us + string("] ") + curGline->getReason(); 
+				MyUplink->setGline(nickName,curGline->getHost(),
+				glineReason,curGline->getExpires(),::time(0),this);
+				delete curGline;
+				count++;
+				}
+
+		log(DBG,"Processed %d glines from the gline queue, %d glines are left in the queue",count,glineQueue.size());
+		}
 }
 /** Report a SQL error as necessary. */
 void dronescan::doSqlError(const string& theQuery, const string& theError)
@@ -841,6 +894,11 @@ void dronescan::changeState(DS_STATE newState)
 void dronescan::updateState() 
 {
     std::list< iServer* > burstingServers = Network->getAllBurstingServers();
+    std::list<iServer*>::iterator ptr = burstingServers.begin();
+    for(;ptr != burstingServers.end();++ptr)
+    {
+	log(DBG,"Server %s is bursting",(*ptr)->getName().c_str());
+    }
     changeState(burstingServers.size() == 0 ? RUN : BURST);
 }
 
@@ -848,6 +906,9 @@ void dronescan::handleChannelJoin( Channel* theChannel, iClient* theClient)
 {
 /* If this channel is too small, don't test it. */
 if(theChannel->size() < channelCutoff) return ;
+
+/* If this is an exceptional channel, dont test it. */
+if(isExceptionalChannel(theChannel->getName())) return;
 
 /* Iterate over our available tests, checking this channel */
 if(droneChannels.find(theChannel->getName()) == droneChannels.end()) {
@@ -903,6 +964,10 @@ if(channel->getJoinFlooded())
 
 void dronescan::handleChannelPart(Channel* theChan,iClient* theClient)
 {
+
+/* If this is an exceptional channel, dont test it. */
+if(isExceptionalChannel(theChan->getName())) return;
+
 jcChanMapIterator jcChanIt = jcChanMap.find(theChan->getName());
 if(jcChanIt != jcChanMap.end() && jcChanIt->second->getJoinFlooded())
 	{
@@ -1270,7 +1335,7 @@ void dronescan::log(LOG_TYPE logType, const char *format, ...)
 
 	newMessage << buffer;
 
-	Message(consoleChannel, newMessage.str().c_str());
+	Message(consoleChannel, "%s",newMessage.str().c_str());
 }
 
 
@@ -1447,6 +1512,34 @@ void dronescan::preloadUserCache()
 		<< std::endl ;
 }
 
+bool dronescan::preloadExceptionalChannels()
+{
+	std::stringstream theQuery;
+	theQuery	<< "SELECT name FROM exceptionalChannels";
+
+	ExecStatusType status = SQLDb->Exec(theQuery.str().c_str());
+
+	if(PGRES_TUPLES_OK == status) {
+		/* First we need to clear the current cache. */
+		exceptionalChannels.clear();
+
+		for(int i = 0; i < SQLDb->Tuples(); ++i) 
+		{
+			exceptionalChannels.push_back(SQLDb->GetValue(i,0));
+		}
+	} else {
+		elog	<< "dronescan::preloadExceptionalChannels> "
+			<< SQLDb->ErrorMessage();
+			return false;
+	}
+
+	elog	<< "dronescan::preloadExceptionalChannels> Loaded "
+		<< exceptionalChannels.size()
+		<< " exceptional channels."
+		<< std::endl ;
+	return true;
+	
+}
 
 /** Register a new command. */
 bool dronescan::RegisterCommand( Command *theCommand )
@@ -1485,6 +1578,63 @@ Test *dronescan::setTestVariable( const string& var, const string& value )
 	return 0;
 }
 
+bool dronescan::isExceptionalChannel(const string& chanName)
+{
+    exceptionalChannelsType::iterator it = exceptionalChannels.begin();
+    for(;it != exceptionalChannels.end();++it)
+    {
+	    if( !strcasecmp((*it).c_str(),chanName.c_str()))
+	    {
+		    return true;
+	    }
+    }
+    return false;
+}
+
+
+
+bool dronescan::addExceptionalChannel(const string& chanName)
+{
+	std::stringstream insertQ;
+	insertQ << "INSERT into exceptionalChannels(name) VALUES('"
+	        << chanName << "');" << std::ends;
+	
+	ExecStatusType status = SQLDb->Exec(insertQ.str().c_str());
+	
+	if (PGRES_COMMAND_OK != status)
+	{
+		elog << "ERROR while adding exceptionalChannel: " << SQLDb->ErrorMessage() << std::endl;
+		return false;    
+	}
+	exceptionalChannels.push_back(chanName);
+	return true;
+}
+
+bool dronescan::remExceptionalChannel(const string& chanName)
+{
+	std::stringstream insertQ;
+	insertQ << "DELETE from exceptionalChannels where name='"
+	        << chanName << "';" << std::ends;
+	
+	ExecStatusType status = SQLDb->Exec(insertQ.str().c_str());
+	
+	if (PGRES_COMMAND_OK != status)
+	{
+		elog << "ERROR while removing exceptionalChannel: " << SQLDb->ErrorMessage() << std::endl;
+		return false;    
+	}
+	exceptionalChannelsType::iterator it = exceptionalChannels.begin();
+	for(;it != exceptionalChannels.end();++it)
+	{
+	        if( !strcasecmp((*it).c_str(),chanName.c_str()))
+		{
+			exceptionalChannels.erase(it);
+	    	        return true;
+		}
+	}
+	return true;
+
+}
 
 /** Return usage information for a client */
 void Command::Usage( const iClient *theClient )
