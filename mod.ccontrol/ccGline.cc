@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccGline.cc,v 1.21 2006/09/26 17:36:02 kewlio Exp $
+ * $Id: ccGline.cc,v 1.22 2007/08/28 16:10:06 dan_karrels Exp $
  */
  
 #include	<sstream>
@@ -27,14 +27,14 @@
 #include	<cstring> 
 #include	<cstdlib>
 
-#include	"libpq++.h"
+#include	"dbHandle.h"
 #include	"ELog.h"
 #include	"misc.h"
 #include	"ccGline.h" 
 #include	"ccontrol.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: ccGline.cc,v 1.21 2006/09/26 17:36:02 kewlio Exp $" ) ;
+RCSTAG( "$Id: ccGline.cc,v 1.22 2007/08/28 16:10:06 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -49,7 +49,7 @@ namespace uworld
 
 unsigned int ccGline::numAllocated = 0;
 
-ccGline::ccGline(PgDatabase* _SQLDb)
+ccGline::ccGline(dbHandle* _SQLDb)
  : Id(),
    AddedBy(),
    AddedOn( 0 ),
@@ -81,9 +81,8 @@ delQuery	<< Del
 		<< ends;
 
 
-ExecStatusType status = SQLDb->Exec( delQuery.str().c_str() ) ;
-
-if( PGRES_COMMAND_OK != status ) 
+if( !SQLDb->Exec( delQuery ) )
+//if( PGRES_COMMAND_OK != status ) 
 	{
 	elog	<< "ccGline::DeleteOnInsert> SQL Failure: "
 		<< SQLDb->ErrorMessage()
@@ -108,9 +107,8 @@ elog	<< "Gline::Insert::sqlQuery> "
 	<< theQuery.str().c_str()
 	<< endl; 
 
-status = SQLDb->Exec( theQuery.str().c_str() ) ;
-
-if( PGRES_COMMAND_OK == status ) 
+if( SQLDb->Exec( theQuery ) )
+//if( PGRES_COMMAND_OK == status ) 
 	{
 	return true;
 	}
@@ -159,9 +157,8 @@ elog	<< "ccontrol::Gline::Update> "
 	<< theQuery.str().c_str()
 	<< endl; 
 
-ExecStatusType status = SQLDb->Exec( theQuery.str().c_str() ) ;
-
-if( PGRES_COMMAND_OK == status ) 
+if( SQLDb->Exec( theQuery ) )
+//if( PGRES_COMMAND_OK == status ) 
 	{
 	return true;
 	}
@@ -192,9 +189,8 @@ elog	<< "ccontrol::glineload> "
 	<< theQuery.str().c_str()
 	<< endl; 
 
-ExecStatusType status = SQLDb->Exec( theQuery.str().c_str() ) ;
-
-if( PGRES_TUPLES_OK != status )
+if( !SQLDb->Exec( theQuery, true ) )
+//if( PGRES_TUPLES_OK != status )
 	{
 	elog	<< "ccGline::load> SQL Failure: "
 		<< SQLDb->ErrorMessage()
@@ -208,9 +204,12 @@ if(SQLDb->Tuples() < 6)
 Id = SQLDb->GetValue(0,0);
 Host = SQLDb->GetValue(0,1);
 AddedBy = SQLDb->GetValue(0,2) ;
-AddedOn = static_cast< time_t >( unsigned(atoi( SQLDb->GetValue(0,3) ) )) ;
-Expires = static_cast< time_t >( unsigned(atoi( SQLDb->GetValue(0,4) ) )) ;
-LastUpdated = static_cast< time_t >( unsigned(atoi( SQLDb->GetValue(0,5) ) )) ;
+AddedOn = static_cast< time_t >( unsigned(
+	atoi( SQLDb->GetValue(0,3).c_str() ) )) ;
+Expires = static_cast< time_t >( unsigned(
+	atoi( SQLDb->GetValue(0,4).c_str() ) )) ;
+LastUpdated = static_cast< time_t >( unsigned(
+	atoi( SQLDb->GetValue(0,5).c_str() ) )) ;
 Reason = SQLDb->GetValue(0,6);
 
 return true;
@@ -234,9 +233,8 @@ elog	<< "ccontrol::loadData> "
 	<< theQuery.str().c_str()
 	<< endl; 
 
-ExecStatusType status = SQLDb->Exec( theQuery.str().c_str() ) ;
-
-if( PGRES_TUPLES_OK != status )
+if( !SQLDb->Exec( theQuery, true ) )
+//if( PGRES_TUPLES_OK != status )
 	{
 	elog	<< "ccGline::loadData> SQL Failure: "
 		<< SQLDb->ErrorMessage()
@@ -250,9 +248,9 @@ if(SQLDb->Tuples() == 0) //If no gline was found
 Id = SQLDb->GetValue(0,0);
 Host = SQLDb->GetValue(0,1);
 AddedBy = SQLDb->GetValue(0,2) ;
-AddedOn = static_cast< time_t >( atoi( SQLDb->GetValue(0,3) ) ) ;
-Expires = static_cast< time_t >( atoi( SQLDb->GetValue(0,4) ) ) ;
-LastUpdated = static_cast< time_t >( atoi( SQLDb->GetValue(0,5) ) ) ;
+AddedOn = static_cast< time_t >( atoi( SQLDb->GetValue(0,3).c_str() ) ) ;
+Expires = static_cast< time_t >( atoi( SQLDb->GetValue(0,4).c_str() ) ) ;
+LastUpdated = static_cast< time_t >( atoi( SQLDb->GetValue(0,5).c_str() ) ) ;
 Reason = SQLDb->GetValue(0,6);
 
 return true;
@@ -281,9 +279,8 @@ elog	<< "ccontrol::glineDelete> "
 	<< theQuery.str().c_str()
 	<< endl; 
 
-ExecStatusType status = SQLDb->Exec( theQuery.str().c_str() ) ;
-
-if( PGRES_COMMAND_OK == status ) 
+if( SQLDb->Exec( theQuery ) )
+//if( PGRES_COMMAND_OK == status ) 
 	{
 	return true;
 	}

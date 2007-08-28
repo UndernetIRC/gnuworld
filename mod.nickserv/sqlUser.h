@@ -22,7 +22,7 @@
 
 #include <string>
 
-#include "libpq++.h"
+#include "dbHandle.h"
 
 #include "logTarget.h"
 
@@ -136,7 +136,7 @@ class sqlUser
     void insertUser();
 
     /** Load data for this user from a given DB handle */
-    void setAllMembers(PgDatabase*, int);
+    void setAllMembers(dbHandle*, int);
 
     /** Static member for keeping track of max user id */
     static unsigned long int maxUserId;

@@ -17,54 +17,55 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: pgsqlDB.h,v 1.2 2002/05/31 15:07:19 dan_karrels Exp $
+ * $Id: pgsqlDB.h,v 1.3 2007/08/28 16:09:59 dan_karrels Exp $
  */
 
 #ifndef __PGSQLDB_H
-#define __PGSQLDB_H "$Id: pgsqlDB.h,v 1.2 2002/05/31 15:07:19 dan_karrels Exp $"
+#define __PGSQLDB_H "$Id: pgsqlDB.h,v 1.3 2007/08/28 16:09:59 dan_karrels Exp $"
 
 #include	<sys/types.h>
 
 #include	<string>
-#include	<sstream>
 #include	<exception>
 
-#include	"libpq++.h"
+#include	"libpq-fe.h"
 #include	"gnuworldDB.h"
 
 namespace gnuworld
 {
 
-using std::stringstream ;
-using std::string ;
-
 class pgsqlDB : public gnuworldDB
 {
 protected:
-	PgDatabase*		theDB ;
+	PGconn			*theDB ;
+	PGresult		*lastResult ;
 
 public:
-
-	pgsqlDB( const string& dbHost,
+	pgsqlDB( const std::string& dbHost,
 		const unsigned short int dbPort,
-		const string& dbName,
-		const string& userName,
-		const string& password ) throw( std::exception ) ;
+		const std::string& dbName,
+		const std::string& userName,
+		const std::string& password ) throw( std::exception ) ;
+	pgsqlDB( const std::string& connectInfo ) throw( std::exception ) ;
 	virtual ~pgsqlDB() ;
 
-	virtual bool		Exec( const string& ) ;
-	virtual bool		Exec( const stringstream& ) ;
+	virtual bool		Exec( const std::string&, bool = false ) ;
+	virtual bool		Exec( const std::stringstream&, bool = false ) ;
 	virtual bool		isConnected() const ;
 
+	virtual bool		PutLine( const std::string& ) ;
+	virtual bool		StartCopyIn( const std::string& ) ;
+	virtual bool		StopCopyIn() ;
+
 	virtual unsigned int	countTuples() const ;
-	virtual const string	ErrorMessage() const ;
+	virtual const std::string	ErrorMessage() const ;
 
-	// tuple number, field number
-	virtual const string	GetValue( const unsigned int&,
-					const unsigned int& ) const ;
-
-protected:
-
+	// tuple number, field number (row,col)
+	virtual const std::string	GetValue( unsigned int,
+						unsigned int ) const ;
+	virtual const std::string	GetValue( unsigned int row,
+						const std::string& colName )
+						const ;
 
 } ;
 

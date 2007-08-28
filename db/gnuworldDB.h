@@ -17,11 +17,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: gnuworldDB.h,v 1.3 2002/05/31 15:07:19 dan_karrels Exp $
+ * $Id: gnuworldDB.h,v 1.4 2007/08/28 16:09:59 dan_karrels Exp $
  */
 
 #ifndef __GNUWORLDDB_H
-#define __GNUWORLDDB_H "$Id: gnuworldDB.h,v 1.3 2002/05/31 15:07:19 dan_karrels Exp $"
+#define __GNUWORLDDB_H "$Id: gnuworldDB.h,v 1.4 2007/08/28 16:09:59 dan_karrels Exp $"
 
 #include	<string>
 #include	<sstream>
@@ -31,51 +31,81 @@
 namespace gnuworld
 {
 
-using std::stringstream ;
-using std::string ;
-
 class gnuworldDB
 {
-
 protected:
-	string			dbHost ;
+	std::string		dbHost ;
 	unsigned short int	dbPort ;
-	string			dbName ;
-	string			userName ;
-	string			password ;
+	std::string		dbName ;
+	std::string		userName ;
+	std::string		password ;
 
 public:
-
-	gnuworldDB( const string& dbHost,
+	gnuworldDB() ;
+	gnuworldDB( const std::string& dbHost,
 		const unsigned short int dbPort,
-		const string& dbName,
-		const string& userName,
-		const string& password ) ;
+		const std::string& dbName,
+		const std::string& userName,
+		const std::string& password ) ;
+	gnuworldDB( const std::string& connectInfo ) ;
 	virtual ~gnuworldDB() ;
 
-	virtual bool		Exec( const stringstream& ) = 0 ;
-	virtual bool		Exec( const string& ) = 0 ;
-	virtual bool		isConnected() const = 0 ;
+	/**
+	 * The Exec method will execute an SQL command with the database.
+	 * The "returnData" argument is false by default, and indicated
+	 * whether or not data is expected back.
+	 * If data is expected back, pass true to this method,
+	 * and the return value will indicate if data was successfully
+	 * returned.
+	 * Otherwise, no data is expected back, and the method will
+	 * return true if the command was successfully executed
+	 * (with no data returned).
+	 */
+	virtual bool	Exec( const std::stringstream&,
+					bool returnData = false ) = 0 ;
+
+	/**
+	 * The Exec method will execute an SQL command with the database.
+	 * The "returnData" argument is false by default, and indicated
+	 * whether or not data is expected back.
+	 * If data is expected back, pass true to this method,
+	 * and the return value will indicate if data was successfully
+	 * returned.
+	 * Otherwise, no data is expected back, and the method will
+	 * return true if the command was successfully executed
+	 * (with no data returned).
+	 */
+	virtual bool	Exec( const std::string&,
+				bool returnData = false ) = 0 ;
+	virtual bool	isConnected() const = 0 ;
+	virtual bool	ConnectionBad() const
+	{ return !isConnected() ; }
 
 	virtual unsigned int	countTuples() const = 0 ;
+	virtual unsigned int	Tuples() const
+	{ return countTuples() ; }
 
-	virtual const string	ErrorMessage() const = 0 ;
-	virtual const string	GetValue( const unsigned int&,
-					const unsigned int& ) const = 0 ;
+	virtual const std::string	ErrorMessage() const = 0 ;
+	virtual const std::string	GetValue( unsigned int row,
+						unsigned int column ) const = 0 ;
+	virtual const std::string	GetValue( unsigned int row,
+						const std::string& colName )
+							const = 0 ;
 
-	inline const string&	getDBHost() const
+	virtual bool		PutLine( const std::string& ) = 0 ;
+	virtual bool		StartCopyIn( const std::string& ) = 0 ;
+	virtual bool		StopCopyIn() = 0 ;
+
+	inline const std::string&	getDBHost() const
 		{ return dbHost ; }
 	inline const unsigned short int	getDBPort() const
 		{ return dbPort ; }
-	inline const string&	getDBName() const
+	inline const std::string&	getDBName() const
 		{ return dbName ; }
-	inline const string&	getUserName() const
+	inline const std::string&	getUserName() const
 		{ return userName ; }
-	inline const string&	getPassword() const
+	inline const std::string&	getPassword() const
 		{ return password ; }
-
-protected:
-
 
 } ;
 

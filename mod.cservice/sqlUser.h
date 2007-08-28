@@ -16,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: sqlUser.h,v 1.40 2005/12/02 23:20:28 kewlio Exp $
+ * $Id: sqlUser.h,v 1.41 2007/08/28 16:10:12 dan_karrels Exp $
  */
 
 #ifndef __SQLUSER_H
-#define __SQLUSER_H "$Id: sqlUser.h,v 1.40 2005/12/02 23:20:28 kewlio Exp $"
+#define __SQLUSER_H "$Id: sqlUser.h,v 1.41 2007/08/28 16:10:12 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
@@ -28,7 +28,7 @@
 #include	<ctime>
 
 #include	"cservice_config.h"
-#include	"libpq++.h"
+#include	"dbHandle.h"
 
 namespace gnuworld
 {
@@ -37,10 +37,8 @@ class iClient;
 
 class sqlUser
 {
-
 public:
-
-	sqlUser(PgDatabase*) ;
+	sqlUser(dbHandle*) ;
 	virtual ~sqlUser() ;
 
 	typedef unsigned short int	flagType ;
@@ -245,7 +243,7 @@ protected:
 	unsigned int	failed_logins;
 	unsigned int	failed_login_ts;
 
-	PgDatabase*	SQLDb;
+	dbHandle*	SQLDb;
 } ;
 
 } // namespace gnuworld

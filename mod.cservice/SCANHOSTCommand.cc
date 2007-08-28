@@ -22,7 +22,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: SCANHOSTCommand.cc,v 1.5 2005/11/30 21:33:34 kewlio Exp $
+ * $Id: SCANHOSTCommand.cc,v 1.6 2007/08/28 16:10:11 dan_karrels Exp $
  */
 
 
@@ -33,7 +33,7 @@
 #include        "cservice.h"
 #include        "levels.h"
 #include        "responses.h"
-#include        "libpq++.h"
+#include        "dbHandle.h"
 
 
 namespace gnuworld
@@ -100,9 +100,8 @@ scanhostQuery << "SELECT users.user_name, users_lastseen.last_hostmask FROM user
 		<< endl;
 #endif
 
-ExecStatusType status = bot->SQLDb->Exec( scanhostQuery.str().c_str() ) ;
-
-if( PGRES_TUPLES_OK != status )
+if( !bot->SQLDb->Exec( scanhostQuery, true ) )
+//if( PGRES_TUPLES_OK != status )
         {
         elog    << "SCANHOST> SQL Error: "
                 << bot->SQLDb->ErrorMessage()
@@ -131,7 +130,7 @@ scanResultsType scanResults;
 int matchCount = 0;
 
 /* store the results in the map defined above */
-for (int i = 0; i < bot->SQLDb->Tuples(); i++)
+for (unsigned int i = 0; i < bot->SQLDb->Tuples(); i++)
 {
 	string username = bot->SQLDb->GetValue(i, 0);
 	string lasthost = bot->SQLDb->GetValue(i, 1);

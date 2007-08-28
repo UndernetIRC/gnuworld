@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: REMOVEALLCommand.cc,v 1.6 2003/12/29 23:59:37 dan_karrels Exp $
+ * $Id: REMOVEALLCommand.cc,v 1.7 2007/08/28 16:10:11 dan_karrels Exp $
  */
 
 #include	<map>
@@ -33,7 +33,7 @@
 #include	"levels.h"
 #include	"cservice_config.h"
 
-const char REMOVEALLCommand_cc_rcsId[] = "$Id: REMOVEALLCommand.cc,v 1.6 2003/12/29 23:59:37 dan_karrels Exp $" ;
+const char REMOVEALLCommand_cc_rcsId[] = "$Id: REMOVEALLCommand.cc,v 1.7 2007/08/28 16:10:11 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -111,9 +111,8 @@ clearAllQuery	<< "SELECT user_id FROM levels WHERE"
 		<< endl;
 #endif
 
-ExecStatusType status = bot->SQLDb->Exec(clearAllQuery.str().c_str()) ;
-
-if( status != PGRES_TUPLES_OK )
+if( !bot->SQLDb->Exec(clearAllQuery, true ) )
+//if( status != PGRES_TUPLES_OK )
 	{
 	elog	<< "REMOVEALL> SQL Error: "
 		<< bot->SQLDb->ErrorMessage()
@@ -129,7 +128,7 @@ if( status != PGRES_TUPLES_OK )
 
 int delCounter = bot->SQLDb->Tuples();
 
-for (int i = 0 ; i < bot->SQLDb->Tuples(); i++)
+for (unsigned int i = 0 ; i < bot->SQLDb->Tuples(); i++)
 {
 	pair<int, int> thePair( atoi(bot->SQLDb->GetValue(i, 0)), theChan->getID() );
 
@@ -163,7 +162,7 @@ deleteAllQuery	<< "DELETE FROM levels WHERE"
 		<< endl;
 #endif
 
-if (bot->SQLDb->ExecCommandOk(deleteAllQuery.str().c_str()))
+if (bot->SQLDb->Exec(deleteAllQuery))
 	{
 		bot->Notice(theClient, "Done. Zapped %i access records from %s",
 			delCounter, theChan->getName().c_str());

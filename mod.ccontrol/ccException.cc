@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccException.cc,v 1.14 2006/09/26 17:36:02 kewlio Exp $
+ * $Id: ccException.cc,v 1.15 2007/08/28 16:10:06 dan_karrels Exp $
  */
  
 #include	<sstream>
@@ -34,7 +34,7 @@
 #include	"ccontrol.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: ccException.cc,v 1.14 2006/09/26 17:36:02 kewlio Exp $" ) ;
+RCSTAG( "$Id: ccException.cc,v 1.15 2007/08/28 16:10:06 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -48,10 +48,9 @@ namespace uworld
 {
 
 //extern unsigned int dbConnected;
-
 unsigned int ccException::numAllocated = 0;
 
-ccException::ccException(PgDatabase* _SQLDb)
+ccException::ccException(dbHandle* _SQLDb)
  : Host(string()),
    Connections(0),
    AddedBy(string()),
@@ -87,17 +86,17 @@ elog	<< "ccException::loadData> "
 	<< theQuery.str().c_str()
 	<< endl; 
 
-ExecStatusType status = SQLDb->Exec( theQuery.str().c_str() ) ;
-
-if( (PGRES_TUPLES_OK != status) && (SQLDb->Tuples() > 0) )
+// TODO: Isn't this impossible?
+if( !SQLDb->Exec( theQuery, true ) && (SQLDb->Tuples() > 0) )
+//if( (PGRES_TUPLES_OK != status) && (SQLDb->Tuples() > 0) )
 	{
 	return false;
 	}
 
 Host = SQLDb->GetValue(0,0);
-Connections = atoi(SQLDb->GetValue(0,1));
+Connections = atoi(SQLDb->GetValue(0,1).c_str());
 AddedBy = SQLDb->GetValue(0,2);
-AddedOn = atoi(SQLDb->GetValue(0,3));
+AddedOn = atoi(SQLDb->GetValue(0,3).c_str());
 Reason = SQLDb->GetValue(0,4);
 return true;
 
@@ -129,9 +128,8 @@ elog	<< "ccException::Update> "
 	<< theQuery.str().c_str()
 	<< endl; 
 
-ExecStatusType status = SQLDb->Exec( theQuery.str().c_str() ) ;
-
-if( PGRES_COMMAND_OK == status ) 
+if( SQLDb->Exec( theQuery ) )
+//if( PGRES_COMMAND_OK == status ) 
 	{
 	return true;
 	}
@@ -167,20 +165,20 @@ elog	<< "ccException::Insert> "
 	<< query.str().c_str()
 	<< endl; 
 
-ExecStatusType status = SQLDb->Exec( query.str().c_str() ) ;
-if(PGRES_COMMAND_OK != status)
+if( !SQLDb->Exec( query ) )
+//if(PGRES_COMMAND_OK != status)
 	{
 	elog	<< "ccException::Insert> SQL Failure: "
 		<< SQLDb->ErrorMessage()
 		<< endl ;
+	return false ;
 	}
-
-return (PGRES_COMMAND_OK == status) ;
+return true ;
+//return (PGRES_COMMAND_OK == status) ;
 }
 
 bool ccException::Delete()
 {
-
 static const char *quer = "DELETE FROM exceptions WHERE host = '";
 
 if(!dbConnected)
@@ -197,9 +195,8 @@ elog 		<< "ccException::delException> "
 		<< query.str().c_str()
 		<< endl ;
 
-ExecStatusType status = SQLDb->Exec( query.str().c_str() ) ;
-
-if( PGRES_COMMAND_OK != status )
+if( !SQLDb->Exec( query ) )
+//if( PGRES_COMMAND_OK != status )
 	{
 	elog	<< "ccException::findException> SQL Failure: "
 		<< SQLDb->ErrorMessage()

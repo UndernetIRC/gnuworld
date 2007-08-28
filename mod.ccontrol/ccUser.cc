@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccUser.cc,v 1.19 2005/01/12 03:50:29 dan_karrels Exp $
+ * $Id: ccUser.cc,v 1.20 2007/08/28 16:10:07 dan_karrels Exp $
  */
  
 #include	<sstream>
@@ -25,7 +25,7 @@
 
 #include	<cstring> 
 
-#include	"libpq++.h"
+#include	"dbHandle.h"
 #include	"ELog.h"
 #include	"misc.h"
 #include	"ccUser.h" 
@@ -33,7 +33,7 @@
 #include	"ccontrol.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: ccUser.cc,v 1.19 2005/01/12 03:50:29 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: ccUser.cc,v 1.20 2007/08/28 16:10:07 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -48,7 +48,7 @@ namespace uworld
 
 unsigned int ccUser::numAllocated = 0;
 
-ccUser::ccUser(PgDatabase* _SQLDb)
+ccUser::ccUser(dbHandle* _SQLDb)
  : Id( 0 ),
    Server( "" ),
    IsSuspended(0),
@@ -101,9 +101,8 @@ elog	<< "ccUser::loadData> "
 	<< theQuery.str().c_str()
 	<< endl; 
 
-ExecStatusType status = SQLDb->Exec( theQuery.str().c_str() ) ;
-
-if( (PGRES_TUPLES_OK == status) && (SQLDb->Tuples() > 0) )
+if( SQLDb->Exec( theQuery, true ) && (SQLDb->Tuples() > 0) )
+//if( (PGRES_TUPLES_OK == status) && (SQLDb->Tuples() > 0) )
 	{
         GetParm();
 	return true;
@@ -137,9 +136,8 @@ elog	<< "ccontrol::loadData> "
 	<< theQuery.str().c_str()
 	<< endl; 
 
-ExecStatusType status = SQLDb->Exec( theQuery.str().c_str() ) ;
-
-if( (PGRES_TUPLES_OK == status) && (SQLDb->Tuples() > 0) )
+if( SQLDb->Exec( theQuery, true ) && (SQLDb->Tuples() > 0) )
+//if( (PGRES_TUPLES_OK == status) && (SQLDb->Tuples() > 0) )
 	{
 	GetParm();
 	return true;
@@ -150,13 +148,13 @@ return false;
 
 void ccUser::GetParm()
 {
-Id = atoi(SQLDb->GetValue(0, 0));
+Id = atoi(SQLDb->GetValue(0, 0).c_str());
 UserName = SQLDb->GetValue(0, 1);
 Password = SQLDb->GetValue(0, 2);
-Access = atol(SQLDb->GetValue(0, 3));
-SAccess = atol(SQLDb->GetValue(0, 4));
-Flags = atoi(SQLDb->GetValue(0, 5));
-SuspendExpires = atoi(SQLDb->GetValue(0,6));
+Access = atol(SQLDb->GetValue(0, 3).c_str());
+SAccess = atol(SQLDb->GetValue(0, 4).c_str());
+Flags = atoi(SQLDb->GetValue(0, 5).c_str());
+SuspendExpires = atoi(SQLDb->GetValue(0,6).c_str());
 SuspendedBy = SQLDb->GetValue(0,7);
 Server = SQLDb->GetValue(0,8);
 IsSuspended = (!strcasecmp(SQLDb->GetValue(0,9),"t") ? 1 : 0 );
@@ -168,7 +166,7 @@ IsCoder = (!strcasecmp(SQLDb->GetValue(0,14),"t") ? 1 : 0 );
 GetLogs = (!strcasecmp(SQLDb->GetValue(0,15),"t") ? 1 : 0 );
 NeedOp = (!strcasecmp(SQLDb->GetValue(0,16),"t") ? 1 : 0 );
 Email = SQLDb->GetValue(0,17);
-SuspendLevel = atoi(SQLDb->GetValue(0,18));
+SuspendLevel = atoi(SQLDb->GetValue(0,18).c_str());
 SuspendReason = SQLDb->GetValue(0,19);
 Notice = (!strcasecmp(SQLDb->GetValue(0,20),"t") ? 1 : 0 );
 }    
@@ -231,9 +229,8 @@ elog	<< "ccontrol::UpdateOper> "
 	<< theQuery.str().c_str()
 	<< endl; 
 
-ExecStatusType status = SQLDb->Exec( theQuery.str().c_str() ) ;
-
-if( PGRES_COMMAND_OK == status ) 
+if( SQLDb->Exec( theQuery ) )
+//if( PGRES_COMMAND_OK == status ) 
 	{
 	return true;
 	}

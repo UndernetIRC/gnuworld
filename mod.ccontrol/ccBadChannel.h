@@ -16,14 +16,15 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccBadChannel.h,v 1.2 2003/06/28 01:21:19 dan_karrels Exp $
+ * $Id: ccBadChannel.h,v 1.3 2007/08/28 16:10:03 dan_karrels Exp $
  */
  
 #ifndef __CCBADCHANNEL_H_
 #define __CCBADCHANNEL_H_
 
-#include <libpq++.h>
-#include <string>
+#include	<string>
+
+#include	"dbHandle.h"
 
 using namespace std;
 
@@ -35,11 +36,10 @@ namespace uworld
 
 class ccBadChannel
 {
-
 public:
 	ccBadChannel() {}
 	
-	ccBadChannel(PgDatabase* , unsigned int);
+	ccBadChannel(dbHandle* , unsigned int);
 	
 	ccBadChannel(const string& _Name, const string& _Reason , 
 		     const string& _AddedBy) : Name(_Name),
@@ -47,11 +47,11 @@ public:
 	
 	~ccBadChannel(){}
 	
-	bool Update(PgDatabase*);
+	bool Update(dbHandle*);
 	
-	bool Insert(PgDatabase*);
+	bool Insert(dbHandle*);
 	
-	bool Delete(PgDatabase*);
+	bool Delete(dbHandle*);
 	
 	const string& getName() const
 	{ return Name; }

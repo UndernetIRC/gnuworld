@@ -22,7 +22,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: SCANUNAMECommand.cc,v 1.8 2005/11/30 21:33:34 kewlio Exp $
+ * $Id: SCANUNAMECommand.cc,v 1.9 2007/08/28 16:10:11 dan_karrels Exp $
  */
 
 
@@ -33,8 +33,7 @@
 #include        "cservice.h"
 #include        "levels.h"
 #include        "responses.h"
-#include        "libpq++.h"
-
+#include        "dbHandle.h"
 
 namespace gnuworld
 {
@@ -99,9 +98,8 @@ scanunameQuery << "SELECT user_name, signup_ip FROM users WHERE "
 		<< endl;
 #endif
 
-ExecStatusType status = bot->SQLDb->Exec( scanunameQuery.str().c_str() ) ;
-
-if( PGRES_TUPLES_OK != status )
+if( !bot->SQLDb->Exec( scanunameQuery, true ) )
+//if( PGRES_TUPLES_OK != status )
         {
         elog    << "SCANUNAME> SQL Error: "
                 << bot->SQLDb->ErrorMessage()
@@ -128,7 +126,7 @@ typedef std::map< std::string, std::string > scanResultsType;
 scanResultsType scanResults;
 
 /* store the results in the map defined above */
-for (int i = 0; i < bot->SQLDb->Tuples(); i++)
+for (unsigned int i = 0; i < bot->SQLDb->Tuples(); i++)
 {
         string username = bot->SQLDb->GetValue(i, 0);
         string signupip = bot->SQLDb->GetValue(i, 1);

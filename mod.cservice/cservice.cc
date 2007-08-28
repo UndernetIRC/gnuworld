@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: cservice.cc,v 1.274 2006/12/22 06:41:43 kewlio Exp $
+ * $Id: cservice.cc,v 1.275 2007/08/28 16:10:11 dan_karrels Exp $
  */
 
 #include	<new>
@@ -44,7 +44,7 @@
 #include	"StringTokenizer.h"
 #include	"misc.h"
 #include	"ELog.h"
-#include	"libpq++.h"
+#include	"dbHandle.h"
 #include	"constants.h"
 #include	"networkData.h"
 #include	"levels.h"
@@ -75,7 +75,6 @@ extern "C"
   {
     return new cservice( args );
   }
-
 }
 
 bool cservice::RegisterCommand( Command* newComm )
@@ -137,7 +136,7 @@ limit_timerID = MyUplink->RegisterTimer(theTime, this, NULL);
 		<< "now()::abstime::int4 - 600)"
 		<< endl;
 #endif
-if (SQLDb->Exec("DELETE FROM webnotices WHERE created_ts < (now()::abstime::int4 - 600)") == PGRES_COMMAND_OK)
+if (SQLDb->Exec("DELETE FROM webnotices WHERE created_ts < (now()::abstime::int4 - 600)"))
 {
 	/* only register the timer if the query is ok.
 	 * if the query fails, we most likely don't have
@@ -152,10 +151,10 @@ if (SQLDb->Exec("DELETE FROM webnotices WHERE created_ts < (now()::abstime::int4
 		<< endl;
 }
 
-if (SQLDb->Exec("SELECT now()::abstime::int4;") == PGRES_TUPLES_OK)
+if (SQLDb->Exec("SELECT now()::abstime::int4;"))
 	{
 	// Set our "Last Refresh" timers to the current database system time.
-	time_t serverTime = atoi(SQLDb->GetValue(0,0));
+	time_t serverTime = atoi(SQLDb->GetValue(0,0).c_str());
 	lastChannelRefresh = serverTime;
 	lastUserRefresh = serverTime;
 	lastLevelRefresh = serverTime;
@@ -289,7 +288,12 @@ elog	<< "*** [CMaster]: Attempting to make PostgreSQL connection to: "
 		<< confSqlDb
 		<< endl;
 
-SQLDb = new (std::nothrow) cmDatabase( Query.c_str() ) ;
+//SQLDb = new (std::nothrow) cmDatabase( Query.c_str() ) ;
+SQLDb = new (std::nothrow) dbHandle( confSqlHost,
+	atoi( confSqlPort.c_str() ),
+	confSqlDb,
+	confSqlUser,
+	confSqlPass ) ;
 assert( SQLDb != 0 ) ;
 
 if (SQLDb->ConnectionBad ())
@@ -928,8 +932,8 @@ else
 			<< ")"
 			<< ends;
 
-		ExecStatusType status = SQLDb->Exec(theLog.str().c_str()) ;
-		if( PGRES_COMMAND_OK != status )
+		if( !SQLDb->Exec(theLog ) )
+//		if( PGRES_COMMAND_OK != status )
 		{
 			elog    << "cservice::adminlog> Something went wrong: "
 				<< theLog.str().c_str()
@@ -1282,9 +1286,8 @@ bool cservice::checkIPR( iClient* theClient, sqlUser* theUser )
 		<< endl;
 #endif
 
-	ExecStatusType status = SQLDb->Exec(theQuery.str().c_str());
-
-	if (PGRES_TUPLES_OK != status)
+	if( !SQLDb->Exec(theQuery, true ) )
+//	if (PGRES_TUPLES_OK != status)
 	{
 		/* SQL error, fail them */
 		elog    << "cservice::checkIPR> SQL Error: "
@@ -1306,13 +1309,13 @@ bool cservice::checkIPR( iClient* theClient, sqlUser* theUser )
 	bool ipr_match = false;
 	unsigned int ipr_ts = 0;
 	unsigned int tmpIP = xIP(theClient->getIP()).GetLongIP();
-	for (int i=0; i < SQLDb->Tuples(); i++)
+	for (unsigned int i=0; i < SQLDb->Tuples(); i++)
 	{
 		/* get some variables out of the db row */
 		std::string ipr_allowmask = SQLDb->GetValue(i, 0);
-		unsigned int ipr_allowrange1 = atoi(SQLDb->GetValue(i, 1));
-		unsigned int ipr_allowrange2 = atoi(SQLDb->GetValue(i, 2));
-		ipr_ts = atoi(SQLDb->GetValue(i, 3));
+		unsigned int ipr_allowrange1 = atoi(SQLDb->GetValue(i, 1).c_str());
+		unsigned int ipr_allowrange2 = atoi(SQLDb->GetValue(i, 2).c_str());
+		ipr_ts = atoi(SQLDb->GetValue(i, 3).c_str());
 
 		/* is this an IP range? */
 		if (ipr_allowrange2 > 0)
@@ -1588,14 +1591,11 @@ const string cservice::getHelpMessage(sqlUser* theUser, string topic)
  */
 void cservice::loadHelpTable()
 {
-ExecStatusType status;
-
-status = SQLDb->Exec("SELECT language_id,topic,contents FROM help");
-
-if (PGRES_TUPLES_OK == status)
-	for (int i = 0; i < SQLDb->Tuples(); i++)
+if( SQLDb->Exec("SELECT language_id,topic,contents FROM help", true ) )
+//if (PGRES_TUPLES_OK == status)
+	for (unsigned int i = 0; i < SQLDb->Tuples(); i++)
 		helpTable.insert(helpTableType::value_type(std::make_pair(
-			atoi(SQLDb->GetValue(i, 0)),
+			atoi(SQLDb->GetValue(i, 0).c_str()),
 			SQLDb->GetValue(i, 1)),
 			SQLDb->GetValue(i, 2)));
 
@@ -1661,14 +1661,11 @@ return string( "Unable to retrieve response. Please contact a cservice "
  */
 void cservice::loadTranslationTable()
 {
-ExecStatusType status;
-
-status = SQLDb->Exec("SELECT id,code,name FROM languages");
-
-if (PGRES_TUPLES_OK == status)
-	for (int i = 0; i < SQLDb->Tuples(); i++)
+if( SQLDb->Exec("SELECT id,code,name FROM languages", true ) )
+//if (PGRES_TUPLES_OK == status)
+	for (unsigned int i = 0; i < SQLDb->Tuples(); i++)
 		languageTable.insert(languageTableType::value_type(SQLDb->GetValue(i, 1),
-			std::make_pair(atoi(SQLDb->GetValue(i, 0)),
+			std::make_pair(atoi(SQLDb->GetValue(i, 0).c_str()),
 				SQLDb->GetValue(i, 2))));
 
 #ifdef LOG_SQL
@@ -1678,19 +1675,18 @@ if (PGRES_TUPLES_OK == status)
 			<< endl;
 #endif
 
-status = SQLDb->Exec(
-	"SELECT language_id,response_id,text FROM translations" ) ;
-
-if( PGRES_TUPLES_OK == status )
+if( SQLDb->Exec(
+	"SELECT language_id,response_id,text FROM translations", true ) )
+//if( PGRES_TUPLES_OK == status )
 	{
-	for (int i = 0 ; i < SQLDb->Tuples(); i++)
+	for (unsigned int i = 0 ; i < SQLDb->Tuples(); i++)
 		{
 		/*
 		 *  Add to our translations table.
 		 */
 
-		int lang_id = atoi(SQLDb->GetValue( i, 0 ));
-		int resp_id = atoi(SQLDb->GetValue( i, 1 ));
+		int lang_id = atoi(SQLDb->GetValue( i, 0 ).c_str());
+		int resp_id = atoi(SQLDb->GetValue( i, 1 ).c_str());
 
 		pair<int, int> thePair( lang_id, resp_id ) ;
 
@@ -1739,9 +1735,8 @@ expireQuery	<< "SELECT user_id,channel_id FROM levels "
 		<< endl;
 #endif
 
-ExecStatusType status = SQLDb->Exec(expireQuery.str().c_str()) ;
-
-if( PGRES_TUPLES_OK != status )
+if( !SQLDb->Exec(expireQuery, true ) )
+//if( PGRES_TUPLES_OK != status )
 	{
 	elog	<< "cservice::expireSuspends> SQL Error: "
 		<< SQLDb->ErrorMessage()
@@ -1770,7 +1765,7 @@ if( PGRES_TUPLES_OK != status )
 typedef vector < pair < string, string > > expireVectorType;
 expireVectorType expireVector;
 
-for (int i = 0 ; i < SQLDb->Tuples(); i++)
+for (unsigned int i = 0 ; i < SQLDb->Tuples(); i++)
 	{
 	expireVector.push_back(expireVectorType::value_type(
 		SQLDb->GetValue(i, 0),
@@ -1821,8 +1816,8 @@ updateQuery << "UPDATE levels SET suspend_expires = "
 		<< endl;
 #endif
 
-status = SQLDb->Exec(updateQuery.str().c_str() ) ;
-if( status != PGRES_COMMAND_OK)
+if( !SQLDb->Exec(updateQuery ) )
+//if( status != PGRES_COMMAND_OK)
 	{
 	elog	<< "cservice::expireSuspends> Unable to "
 		<< "update record while unsuspending."
@@ -1900,9 +1895,8 @@ expireQuery	<< "SELECT channel_id,id FROM bans "
 		<< endl;
 #endif
 
-ExecStatusType status = SQLDb->Exec(expireQuery.str().c_str()) ;
-
-if( PGRES_TUPLES_OK != status )
+if( !SQLDb->Exec(expireQuery, true ) )
+//if( PGRES_TUPLES_OK != status )
 	{
 	elog	<< "cservice::expireBans> SQL Error: "
 		<< SQLDb->ErrorMessage()
@@ -1930,11 +1924,11 @@ if( PGRES_TUPLES_OK != status )
 typedef vector < pair < unsigned int, unsigned int > > expireVectorType;
 expireVectorType expireVector;
 
-for (int i = 0 ; i < SQLDb->Tuples(); i++)
+for (unsigned int i = 0 ; i < SQLDb->Tuples(); i++)
 	{
 	expireVector.push_back(expireVectorType::value_type(
-		atoi(SQLDb->GetValue(i, 0)),
-		atoi(SQLDb->GetValue(i, 1)) )
+		atoi(SQLDb->GetValue(i, 0).c_str()),
+		atoi(SQLDb->GetValue(i, 1).c_str()) )
 		);
 	}
 
@@ -2005,9 +1999,8 @@ deleteQuery	<< "DELETE FROM bans "
 		<< endl;
 #endif
 
-status = SQLDb->Exec(deleteQuery.str().c_str()) ;
-
-if( PGRES_COMMAND_OK != status )
+if( !SQLDb->Exec(deleteQuery ) )
+//if( PGRES_COMMAND_OK != status )
 	{
 	elog	<< "cservice::expireBans> SQL Error: "
 		<< SQLDb->ErrorMessage()
@@ -2055,8 +2048,8 @@ void cservice::cacheExpireUsers()
 				<< endl; 
 #endif
 
-			ExecStatusType status = SQLDb->Exec(queryString.str().c_str());
-			if (PGRES_TUPLES_OK == status)
+			if( SQLDb->Exec(queryString, true ) )
+//			if (PGRES_TUPLES_OK == status)
 			{
 				if (SQLDb->Tuples() < 1)
 				{
@@ -2072,10 +2065,10 @@ void cservice::cacheExpireUsers()
 
 #ifdef LOG_SQL
 					elog	<< "cservice::cacheExpireUsers::sqlQuery> "
-						<< updateQuery.str().c_str()
+						<< updateQuery
 						<< endl;
 #endif
-					status = SQLDb->Exec(updateQuery.str().c_str());
+					SQLDb->Exec(updateQuery.str());
 				}
 			}
 			/* update their details */
@@ -2289,9 +2282,8 @@ elog	<< "*** [CMaster::processDBUpdates]:sqlQuery: "
 		<< endl;
 #endif
 
-ExecStatusType status = SQLDb->Exec(theQuery.str().c_str());
-
-if (status != PGRES_TUPLES_OK)
+if( !SQLDb->Exec(theQuery, true ) )
+//if (status != PGRES_TUPLES_OK)
 	{
 	elog	<< "*** [CMaster::updateChannels]: SQL error: "
 			<< SQLDb->ErrorMessage()
@@ -2306,11 +2298,11 @@ if (SQLDb->Tuples() <= 0)
 	}
 
 /* Update our time offset incase things drift.. */
-dbTimeOffset = atoi(SQLDb->GetValue(0,"db_unixtime")) - ::time(NULL);
+dbTimeOffset = atoi(SQLDb->GetValue(0,"db_unixtime").c_str()) - ::time(NULL);
 unsigned int updates = 0;
 unsigned int newchans = 0;
 
-for (int i = 0 ; i < SQLDb->Tuples(); i++)
+for (unsigned int i = 0 ; i < SQLDb->Tuples(); i++)
 	{
 	sqlChannelHashType::iterator ptr =
 		sqlChannelCache.find(SQLDb->GetValue(i, 1));
@@ -2344,13 +2336,12 @@ logDebugMessage("[DB-UPDATE]: Refreshed %i channel records, loaded %i new channe
 	updates, newchans);
 
 /* Set the "Last refreshed from channels table" timestamp. */
-lastChannelRefresh = atoi(SQLDb->GetValue(0,"db_unixtime"));
+lastChannelRefresh = atoi(SQLDb->GetValue(0,"db_unixtime").c_str());
 }
 
 /*
  * Check the levels table for recent updates.
  */
-
 void cservice::updateLevels()
 {
 stringstream theQuery ;
@@ -2368,9 +2359,8 @@ elog	<< "*** [CMaster::updateLevels]: sqlQuery: "
 		<< endl;
 #endif
 
-ExecStatusType status = SQLDb->Exec(theQuery.str().c_str());
-
-if (status != PGRES_TUPLES_OK)
+if( !SQLDb->Exec(theQuery, true ) )
+//if (status != PGRES_TUPLES_OK)
 	{
 	elog	<< "*** [CMaster::updateLevels]: SQL error: "
 			<< SQLDb->ErrorMessage()
@@ -2385,14 +2375,14 @@ if (SQLDb->Tuples() <= 0)
 	}
 
 /* Update our time offset incase things drift.. */
-dbTimeOffset = atoi(SQLDb->GetValue(0,"db_unixtime")) - ::time(NULL);
+dbTimeOffset = atoi(SQLDb->GetValue(0,"db_unixtime").c_str()) - ::time(NULL);
 unsigned int updates = 0;
 unsigned int newlevs = 0;
 
-for (int i = 0 ; i < SQLDb->Tuples(); i++)
+for (unsigned int i = 0 ; i < SQLDb->Tuples(); i++)
 	{
-	unsigned int channel_id = atoi(SQLDb->GetValue(i, 0));
-	unsigned int user_id = atoi(SQLDb->GetValue(i, 1));
+	unsigned int channel_id = atoi(SQLDb->GetValue(i, 0).c_str());
+	unsigned int user_id = atoi(SQLDb->GetValue(i, 1).c_str());
 	sqlChannel* theChan = getChannelRecord(channel_id);
 
 	/*
@@ -2428,7 +2418,7 @@ logDebugMessage("[DB-UPDATE]: Refreshed %i level record(s), loaded %i new level 
 	updates, newlevs);
 
 /* Set the "Last refreshed from levels table" timestamp. */
-lastLevelRefresh = atoi(SQLDb->GetValue(0,"db_unixtime"));
+lastLevelRefresh = atoi(SQLDb->GetValue(0,"db_unixtime").c_str());
 }
 
 /*
@@ -2451,9 +2441,8 @@ void cservice::updateUsers()
 			<< endl;
 	#endif
 
-	ExecStatusType status = SQLDb->Exec(theQuery.str().c_str());
-
-	if (status != PGRES_TUPLES_OK)
+	if( !SQLDb->Exec(theQuery, true ) )
+//	if (status != PGRES_TUPLES_OK)
 		{
 		elog	<< "*** [CMaster::updateUsers]: SQL error: "
 				<< SQLDb->ErrorMessage()
@@ -2468,12 +2457,13 @@ void cservice::updateUsers()
 		}
 
 	/* Update our time offset incase things drift.. */
-	dbTimeOffset = atoi(SQLDb->GetValue(0,"db_unixtime")) - ::time(NULL);
+	dbTimeOffset = atoi(SQLDb->GetValue(0,"db_unixtime").c_str()) - ::time(NULL);
 	unsigned int updates = 0;
 
-	for (int i = 0 ; i < SQLDb->Tuples(); i++)
+	for (unsigned int i = 0 ; i < SQLDb->Tuples(); i++)
 		{
-		sqlUserHashType::iterator ptr = sqlUserCache.find(SQLDb->GetValue(i, 1));
+		sqlUserHashType::iterator ptr =
+			sqlUserCache.find(SQLDb->GetValue(i, 1));
 
 		if(ptr != sqlUserCache.end())
 			{
@@ -2487,7 +2477,7 @@ void cservice::updateUsers()
 		updates);
 
 	/* Set the "Last refreshed from Users table" timestamp. */
-	lastUserRefresh = atoi(SQLDb->GetValue(0,"db_unixtime"));
+	lastUserRefresh = atoi(SQLDb->GetValue(0,"db_unixtime").c_str());
 }
 
 void cservice::updateBans()
@@ -2565,11 +2555,10 @@ if (timer_id == webrelay_timerID)
 		<< webrelayQuery.c_str()
 		<< endl;
 #endif
-	ExecStatusType status = SQLDb->Exec(webrelayQuery.c_str());
-
 	int webrelay_messagecount = 0;
 
-	if (PGRES_TUPLES_OK == status)
+	if( SQLDb->Exec(webrelayQuery, true ) )
+//	if (PGRES_TUPLES_OK == status)
 	{
 		/* process messages */
 		webrelay_messagecount = SQLDb->Tuples();
@@ -2577,7 +2566,7 @@ if (timer_id == webrelay_timerID)
 		unsigned long webrelay_ts = 0;
 		for (int i=0; i < webrelay_messagecount; i++)
 		{
-			webrelay_ts = atoi(SQLDb->GetValue(i,0));
+			webrelay_ts = atoi(SQLDb->GetValue(i,0).c_str());
 			webrelay_msg = SQLDb->GetValue(i,1);
 
 			logAdminMessage("%s", webrelay_msg.c_str());
@@ -2594,7 +2583,8 @@ if (timer_id == webrelay_timerID)
 				<< webrelayQuery.c_str()
 				<< endl;
 #endif
-			if (SQLDb->Exec(webrelayQuery.c_str()) != PGRES_COMMAND_OK)
+			if (!SQLDb->Exec(webrelayQuery) )
+// PGRES_COMMAND_OK)
 			{
 				/* log error */
 				elog	<< "cservice::webrelay> SQL Query Error: "
@@ -2635,17 +2625,18 @@ if (timer_id == pending_timerID)
 			<< endl;
 #endif
 
-	ExecStatusType status = SQLDb->Exec(theQuery.str().c_str()) ;
 	unsigned int noticeCount = 0;
-
-	if( PGRES_TUPLES_OK == status )
+	if( SQLDb->Exec(theQuery, true ) )
+//	if( PGRES_TUPLES_OK == status )
 		{
-		for (int i = 0 ; i < SQLDb->Tuples(); i++)
+		for (unsigned int i = 0 ; i < SQLDb->Tuples(); i++)
 			{
 			noticeCount++;
 			string channelName = SQLDb->GetValue(i,0);
-			unsigned int channel_id = atoi(SQLDb->GetValue(i, 1));
-			unsigned int created_ts = atoi(SQLDb->GetValue(i, 2));
+			unsigned int channel_id =
+				atoi(SQLDb->GetValue(i, 1).c_str());
+			unsigned int created_ts =
+				atoi(SQLDb->GetValue(i, 2).c_str());
 			Channel* tmpChan = Network->findChannel(channelName);
 
 			if (tmpChan)
@@ -3957,7 +3948,9 @@ theLog	<< "INSERT INTO channellog (ts, channelID, event, message, "
 		<< endl;
 #endif
 
-SQLDb->ExecCommandOk(theLog.str().c_str());
+// TODO: Is this right?
+SQLDb->Exec(theLog);
+//SQLDb->ExecCommandOk(theLog.str().c_str());
 }
 
 /**
@@ -4096,8 +4089,8 @@ if (pendingChannelList.size() > 0)
 {
 	pendingChannelListType::iterator ptr = pendingChannelList.begin();
 
-	ExecStatusType beginStatus = SQLDb->Exec("BEGIN;") ;
-	if( PGRES_COMMAND_OK != beginStatus )
+	if( !SQLDb->Exec("BEGIN;" ) )
+//	if( PGRES_COMMAND_OK != beginStatus )
 	{
 		elog << "Error starting transaction." << endl;
 	}
@@ -4119,8 +4112,8 @@ if (pendingChannelList.size() > 0)
 		++ptr;
 		} /* while() */
 
-	ExecStatusType endStatus = SQLDb->Exec("END;") ;
-	if( PGRES_COMMAND_OK != endStatus )
+	if( !SQLDb->Exec("END;") )
+//	if( PGRES_COMMAND_OK != endStatus )
 	{
 		elog << "Error Ending transaction." << endl;
 	}
@@ -4149,11 +4142,10 @@ elog	<< "*** [CMaster::loadPendingChannelList]: Loading pending channel details.
 	<< endl;
 #endif
 
-ExecStatusType status = SQLDb->Exec(theQuery.str().c_str()) ;
-
-if( PGRES_TUPLES_OK == status )
+if( SQLDb->Exec(theQuery, true ) )
+//if( PGRES_TUPLES_OK == status )
 	{
-	for (int i = 0 ; i < SQLDb->Tuples(); i++)
+	for (unsigned int i = 0 ; i < SQLDb->Tuples(); i++)
 		{
 		string chanName = SQLDb->GetValue(i,0);
 		sqlPendingChannel* newPending;
@@ -4174,9 +4166,12 @@ if( PGRES_TUPLES_OK == status )
 				else
 			{
 			newPending = new sqlPendingChannel(SQLDb);
-			newPending->channel_id = atoi(SQLDb->GetValue(i,1));
-			newPending->join_count = atoi(SQLDb->GetValue(i,3));
-			newPending->unique_join_count = atoi(SQLDb->GetValue(i,5));
+			newPending->channel_id =
+				atoi(SQLDb->GetValue(i,1).c_str());
+			newPending->join_count =
+				atoi(SQLDb->GetValue(i,3).c_str());
+			newPending->unique_join_count =
+				atoi(SQLDb->GetValue(i,5).c_str());
 			pendingChannelList.insert( pendingChannelListType::value_type(chanName, newPending) );
 
 			/*
@@ -4189,7 +4184,8 @@ if( PGRES_TUPLES_OK == status )
 		 *  Next, update the internal supporters list.
 		 */
 		newPending->supporterList.insert(  sqlPendingChannel::supporterListType::value_type(
-			atoi(SQLDb->GetValue(i, 2)), atoi(SQLDb->GetValue(i, 4)) )  );
+			atoi(SQLDb->GetValue(i, 2).c_str()), 
+			atoi(SQLDb->GetValue(i, 4).c_str()) )  );
 		}
 	}
 
@@ -4220,7 +4216,8 @@ if( PGRES_TUPLES_OK == status )
 
 void cservice::checkDbConnectionStatus()
 {
-	if(SQLDb->Status() == CONNECTION_BAD)
+	if( SQLDb->ConnectionBad() )
+//	if(SQLDb->Status() == CONNECTION_BAD)
 	{
 		logAdminMessage("\002WARNING:\002 Backend database connection has been lost, attempting to reconnect.");
 		elog	<< "cmaster::cmaster> Attempting to reconnect to database." << endl;
@@ -4231,7 +4228,12 @@ void cservice::checkDbConnectionStatus()
 		string Query = "host=" + confSqlHost + " dbname=" + confSqlDb + " port=" + confSqlPort + " user=" + confSqlUser
 					 + " password=" + confSqlPass;
 
-		SQLDb = new (std::nothrow) cmDatabase( Query.c_str() ) ;
+		SQLDb = new (std::nothrow) dbHandle( confSqlHost,
+			atoi( confSqlPort.c_str() ),
+			confSqlDb,
+			confSqlUser,
+			confSqlPass ) ;
+//		SQLDb = new (std::nothrow) cmDatabase( Query.c_str() ) ;
 		assert( SQLDb != 0 ) ;
 
 		if (SQLDb->ConnectionBad())
@@ -4256,7 +4258,9 @@ void cservice::checkDbConnectionStatus()
 
 		} else
 		{
-				SQLDb->ExecCommandOk("LISTEN channels_u; LISTEN users_u; LISTEN levels_u;");
+// TODO: Is this ok?
+				SQLDb->Exec("LISTEN channels_u; LISTEN users_u; LISTEN levels_u;");
+//				SQLDb->ExecCommandOk("LISTEN channels_u; LISTEN users_u; LISTEN levels_u;");
 				logAdminMessage("Successfully reconnected to database server. Panic over ;)");
 		}
 	}
@@ -4274,11 +4278,10 @@ theQuery	<< "SELECT " << sql::channel_fields
 elog	<< "*** [CMaster::preloadChannelCache]: Loading all registered channel records: "
 		<< endl;
 
-ExecStatusType status = SQLDb->Exec(theQuery.str().c_str()) ;
-
-if( PGRES_TUPLES_OK == status )
+if( SQLDb->Exec(theQuery, true ) )
+//if( PGRES_TUPLES_OK == status )
 	{
-	for (int i = 0 ; i < SQLDb->Tuples(); i++)
+	for (unsigned int i = 0 ; i < SQLDb->Tuples(); i++)
 		{
  		/* Add this information to the channel cache. */
 
@@ -4314,17 +4317,16 @@ theQuery	<< "SELECT " << sql::ban_fields
 elog	<< "*** [CMaster::preloadBanCache]: Precaching Bans table: "
 	<< endl;
 
-ExecStatusType status = SQLDb->Exec(theQuery.str().c_str()) ;
-
-if( PGRES_TUPLES_OK == status )
+if( SQLDb->Exec(theQuery, true ) )
+//if( PGRES_TUPLES_OK == status )
 	{
-	for (int i = 0 ; i < SQLDb->Tuples(); i++)
+	for (unsigned int i = 0 ; i < SQLDb->Tuples(); i++)
 		{
 		/*
 		 * First, lookup this channel in the channel cache.
 		 */
 
-		unsigned int channel_id = atoi(SQLDb->GetValue(i, 1));
+		unsigned int channel_id = atoi(SQLDb->GetValue(i, 1).c_str());
 		sqlChannel* theChan = getChannelRecord(channel_id);
 
 		/*
@@ -4363,19 +4365,18 @@ theQuery	<< "SELECT " << sql::level_fields
 elog		<< "*** [CMaster::preloadLevelCache]: Precaching Level table: "
 			<< endl;
 
-ExecStatusType status = SQLDb->Exec(theQuery.str().c_str()) ;
 unsigned int goodCount = 0;
-
-if( PGRES_TUPLES_OK == status )
+if( SQLDb->Exec(theQuery, true ) )
+//if( PGRES_TUPLES_OK == status )
 	{
-		for (int i = 0 ; i < SQLDb->Tuples(); i++)
+		for (unsigned int i = 0 ; i < SQLDb->Tuples(); i++)
 		{
 		/*
 		 * First, lookup this channel in the channel cache.
 		 */
 
-		unsigned int channel_id = atoi(SQLDb->GetValue(i, 0));
-		unsigned int user_id = atoi(SQLDb->GetValue(i, 1));
+		unsigned int channel_id = atoi(SQLDb->GetValue(i, 0).c_str());
+		unsigned int user_id = atoi(SQLDb->GetValue(i, 1).c_str());
 		sqlChannel* theChan = getChannelRecord(channel_id);
 
 		/*
@@ -4422,11 +4423,10 @@ void cservice::preloadUserCache()
 				<< " days : "
 				<< endl;
 
-	ExecStatusType status = SQLDb->Exec(theQuery.str().c_str()) ;
-
-	if( PGRES_TUPLES_OK == status )
+	if( SQLDb->Exec(theQuery, true ) )
+//	if( PGRES_TUPLES_OK == status )
 	{
-		for (int i = 0 ; i < SQLDb->Tuples(); i++)
+		for (unsigned int i = 0 ; i < SQLDb->Tuples(); i++)
 			{
 				sqlUser* newUser = new (std::nothrow) sqlUser(SQLDb);
 				assert( newUser != 0 ) ;
@@ -4689,11 +4689,10 @@ void cservice::loadConfigData()
 	theQuery	<< "SELECT var_name,contents FROM variables;"
 				<< ends;
 
-	ExecStatusType status = SQLDb->Exec(theQuery.str().c_str()) ;
-
-	if( PGRES_TUPLES_OK == status )
+	if( SQLDb->Exec(theQuery, true ) )
+//	if( PGRES_TUPLES_OK == status )
 		{
-		for (int i = 0 ; i < SQLDb->Tuples(); i++)
+		for (unsigned int i = 0 ; i < SQLDb->Tuples(); i++)
 			{
 			ConfigData* newConfig = new (std::nothrow) ConfigData();
 			assert( newConfig != 0 ) ;
@@ -4733,10 +4732,8 @@ void cservice::outputChannelAccesses(iClient* theClient, sqlUser* theUser, sqlUs
 	string chanName ;
 	string chanAccess ;
 
-	ExecStatusType status =
-		SQLDb->Exec(channelsQuery.str().c_str()) ;
-
-	if( PGRES_TUPLES_OK != status )
+	if( !SQLDb->Exec(channelsQuery, true ) )
+//	if( PGRES_TUPLES_OK != status )
 		{
 		Notice( theClient,
 			"Internal error: SQL failed" ) ;
@@ -4747,7 +4744,7 @@ void cservice::outputChannelAccesses(iClient* theClient, sqlUser* theUser, sqlUs
 		return  ;
 		}
 
-	for(int i = 0; i < SQLDb->Tuples(); i++)
+	for(unsigned int i = 0; i < SQLDb->Tuples(); i++)
 		{
 		chanName = SQLDb->GetValue(i,0);
 		chanAccess = SQLDb->GetValue(i,1);

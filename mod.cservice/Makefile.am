@@ -1,11 +1,11 @@
 ## Process this file with automake to produce Makefile.in
-# "$Id: Makefile.am,v 1.52 2005/04/03 22:11:42 dan_karrels Exp $"
+# "$Id: Makefile.am,v 1.53 2007/08/28 16:10:10 dan_karrels Exp $"
 
 lib_LTLIBRARIES = libcservice.la
-libcservice_la_LDFLAGS = -module -export-dynamic -L$(PGSQL_LIB) \
-	-lpq++
-libcservice_la_CXXFLAGS = -I$(PGSQL_INCLUDE) -I${top_srcdir}/include \
-	-I${top_srcdir}/libgnuworld  -DHAVE_NAMESPACE_STD -DHAVE_CXX_STRING_HEADER -DDLLIMPORT=""
+libcservice_la_LDFLAGS = -module -export-dynamic -L$(top_builddir)/db \
+	-lgnuworldDB
+libcservice_la_CXXFLAGS = -I$(top_srcdir)/db -I${top_srcdir}/include \
+	-I${top_srcdir}/libgnuworld
 
 libcservice_la_SOURCES = cservice.cc \
 	networkData.cc \

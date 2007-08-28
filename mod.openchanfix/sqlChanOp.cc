@@ -18,13 +18,13 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
  * USA.
  *
- * $Id: sqlChanOp.cc,v 1.4 2006/12/09 00:29:19 buzlip01 Exp $
+ * $Id: sqlChanOp.cc,v 1.5 2007/08/28 16:10:22 dan_karrels Exp $
  */
 
 #include	<sstream>
 #include	<string>
 
-#include	"libpq++.h"
+#include	"dbHandle.h"
 
 #include	"ELog.h"
 #include	"misc.h"
@@ -50,7 +50,7 @@ sqlChanOp::sqlChanOp(sqlManager* _myManager) :
   myManager = _myManager;
 }
 	
-void sqlChanOp::setAllMembers(PgDatabase* theDB, int row)
+void sqlChanOp::setAllMembers(dbHandle* theDB, int row)
 {
   channel = theDB->GetValue(row, 0);
   account = theDB->GetValue(row, 1);

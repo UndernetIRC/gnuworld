@@ -19,7 +19,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: sqlBan.cc,v 1.9 2005/03/25 03:07:30 dan_karrels Exp $
+ * $Id: sqlBan.cc,v 1.10 2007/08/28 16:10:11 dan_karrels Exp $
  */
 
 #include	<sstream>
@@ -36,7 +36,7 @@
 #include	"cservice_config.h"
 
 const char sqlBan_h_rcsId[] = __SQLBAN_H ;
-const char sqlBan_cc_rcsId[] = "$Id: sqlBan.cc,v 1.9 2005/03/25 03:07:30 dan_karrels Exp $" ;
+const char sqlBan_cc_rcsId[] = "$Id: sqlBan.cc,v 1.10 2007/08/28 16:10:11 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -46,7 +46,7 @@ using std::endl ;
 using std::ends ;
 using std::stringstream ;
 
-sqlBan::sqlBan(PgDatabase* _SQLDb)
+sqlBan::sqlBan(dbHandle* _SQLDb)
   : id(0),
     channel_id(0),
     banmask(),
@@ -106,9 +106,8 @@ queryString	<< queryHeader
 		<< endl;
 #endif
 
-ExecStatusType status = SQLDb->Exec(queryString.str().c_str()) ;
-
-if( PGRES_COMMAND_OK != status )
+if( !SQLDb->Exec(queryString ) )
+//if( PGRES_COMMAND_OK != status )
 	{
 	// TODO: Log to msgchan here.
 	elog	<< "sqlBan::commit> Something went wrong: "
@@ -147,9 +146,8 @@ queryString	<< queryHeader
 		<< endl;
 #endif
 
-ExecStatusType status = SQLDb->Exec(queryString.str().c_str()) ;
-
-if( PGRES_TUPLES_OK != status )
+if( !SQLDb->Exec(queryString, true ) )
+//if( PGRES_TUPLES_OK != status )
 	{
 	// TODO: Log to msgchan here.
 	elog	<< "sqlBan::commit> Something went wrong: "
@@ -182,9 +180,8 @@ queryString	<< queryHeader
 		<< endl;
 #endif
 
-ExecStatusType status = SQLDb->Exec(queryString.str().c_str()) ;
-
-if( PGRES_COMMAND_OK != status )
+if( !SQLDb->Exec(queryString ) )
+//if( PGRES_COMMAND_OK != status )
 	{
 	// TODO: Log to msgchan here.
 	elog	<< "sqlBan::commit> Something went wrong: "

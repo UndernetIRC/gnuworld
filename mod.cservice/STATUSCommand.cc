@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: STATUSCommand.cc,v 1.45 2007/08/06 13:51:47 kewlio Exp $
+ * $Id: STATUSCommand.cc,v 1.46 2007/08/28 16:10:11 dan_karrels Exp $
  */
 
 #include	<string>
@@ -31,7 +31,7 @@
 #include	"Network.h"
 #include	"cservice_config.h"
 
-const char STATUSCommand_cc_rcsId[] = "$Id: STATUSCommand.cc,v 1.45 2007/08/06 13:51:47 kewlio Exp $" ;
+const char STATUSCommand_cc_rcsId[] = "$Id: STATUSCommand.cc,v 1.46 2007/08/28 16:10:11 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -217,9 +217,8 @@ authQuery	<< "SELECT users.user_name,levels.access FROM "
 		<< endl;
 #endif
 
-ExecStatusType status = bot->SQLDb->Exec( authQuery.str().c_str() ) ;
-
-if( PGRES_TUPLES_OK != status )
+if( !bot->SQLDb->Exec( authQuery, true ) )
+//if( PGRES_TUPLES_OK != status )
 	{
 	elog	<< "STATUS> SQL Error: "
 		<< bot->SQLDb->ErrorMessage()
@@ -232,7 +231,7 @@ string nextPerson;
 
 bool showNick = false;
 
-for (int i = 0 ; i < bot->SQLDb->Tuples(); i++)
+for (unsigned int i = 0 ; i < bot->SQLDb->Tuples(); i++)
 	{
 	/*
 	 *  Look up this username in the cache.

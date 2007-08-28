@@ -18,14 +18,14 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
  * USA.
  *
- * $Id: sqlChanOp.h,v 1.4 2006/12/09 00:29:19 buzlip01 Exp $
+ * $Id: sqlChanOp.h,v 1.5 2007/08/28 16:10:25 dan_karrels Exp $
  */
 
 #ifndef __SQLCHANOP_H
-#define __SQLCHANOP_H "$Id: sqlChanOp.h,v 1.4 2006/12/09 00:29:19 buzlip01 Exp $"
+#define __SQLCHANOP_H "$Id: sqlChanOp.h,v 1.5 2007/08/28 16:10:25 dan_karrels Exp $"
 
 #include	<string>
-#include	"libpq++.h"
+#include	"dbHandle.h"
 #include	"chanfix_config.h"
 
 namespace gnuworld
@@ -41,7 +41,6 @@ class sqlChanOp {
 public:
 	sqlChanOp(sqlManager*);
 	virtual ~sqlChanOp();
-
 
 	/*
 	 *  Methods to get data attributes.
@@ -96,7 +95,7 @@ public:
 	inline void	setDay(int _dayval, short _pointsval)
 		{ day[_dayval] = _pointsval ; }
 
-	void setAllMembers(PgDatabase*, int);
+	void setAllMembers(dbHandle*, int);
 	void calcTotalPoints();
 
 private:

@@ -1,10 +1,11 @@
 #include <sstream>
 
-#include "libpq++.h"
+#include "dbHandle.h"
 
 #include "ELog.h"
 
 #include "sqlUser.h"
+#include	"misc.h"
 
 namespace gnuworld {
 
@@ -15,7 +16,7 @@ using std::stringstream ;
 
 const sqlUser::flagType sqlUser::F_SUSPENDED	= 0x0001 ;
 
-sqlUser::sqlUser(PgDatabase *_SQLDb) :
+sqlUser::sqlUser(dbHandle *_SQLDb) :
 	user_name(),
 	last_seen(0),
 	last_updated_by(),
@@ -65,15 +66,14 @@ elog	<< "sqlUser::commit> "
 	<< endl;
 #endif
 
-ExecStatusType status = SQLDb->Exec(queryString.str().c_str());
-
-if(PGRES_COMMAND_OK != status) {
+if( !SQLDb->Exec(queryString ) )
+//if(PGRES_COMMAND_OK != status)
+	{
 	elog << "sqlUser::commit> " << SQLDb->ErrorMessage();
 	return false;
-}
+	}
 
 return true;
-
 }
 
 
@@ -100,12 +100,12 @@ elog	<< "sqlUser::insert> "
 	<< endl;
 #endif
 
-ExecStatusType status = SQLDb->Exec(insertString.str().c_str());
-
-if(PGRES_COMMAND_OK != status) {
+if( !SQLDb->Exec(insertString ) )
+//if(PGRES_COMMAND_OK != status)
+	{
 	elog << "sqlUser::insert> " << SQLDb->ErrorMessage();
 	return false;
-}
+	}
 
 return true;
 } // sqlUser::insert()
@@ -118,17 +118,15 @@ deleteString	<< "DELETE FROM users "
 		<< "WHERE user_name = '" << user_name << "'"
 		;
 
-ExecStatusType status = SQLDb->Exec(deleteString.str().c_str());
-
-if(PGRES_COMMAND_OK != status) {
+if( !SQLDb->Exec(deleteString ) )
+//if(PGRES_COMMAND_OK != status)
+	{
 	elog << "sqlUser::delete> " << SQLDb->ErrorMessage();
 	return false;
-}
+	}
 
 return true;
-
 }
-
 
 } // namespace ds
 

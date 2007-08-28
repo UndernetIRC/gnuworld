@@ -18,7 +18,7 @@
  */
 
 #ifndef NICKSERV_H
-#define NICKSERV_H
+#define NICKSERV_H "$Id: nickserv.h,v 1.18 2007/08/28 16:10:19 dan_karrels Exp $"
 
 #include "client.h"
 #include "EConfig.h"

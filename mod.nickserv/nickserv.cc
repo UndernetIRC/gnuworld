@@ -398,15 +398,15 @@ void nickserv::precacheUsers()
 elog << "*** [NickServ:precacheUsers] Precaching users." << std::endl;
 
 /* Get a connection instance to our backend */
-PgDatabase* cacheCon = theManager->getConnection();
+dbHandle* cacheCon = theManager->getConnection();
 
 /* Retrieve the list of registered users */
 std::stringstream cacheQuery;
 cacheQuery << "SELECT id,name,flags,level,lastseen_ts,registered_ts,logmask"
   << " FROM users";
 
-if(cacheCon->ExecTuplesOk(cacheQuery.str().c_str())) {
-  for(int i = 0; i < cacheCon->Tuples(); i++) {
+if(cacheCon->Exec(cacheQuery,true)) {
+  for(unsigned int i = 0; i < cacheCon->Tuples(); i++) {
     sqlUser* tmpUser = new sqlUser(theManager);
     assert(tmpUser != 0);
 

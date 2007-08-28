@@ -24,7 +24,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: sqlChannel.cc,v 1.42 2007/08/06 13:51:47 kewlio Exp $
+ * $Id: sqlChannel.cc,v 1.43 2007/08/28 16:10:12 dan_karrels Exp $
  */
 
 #include	<sstream>
@@ -39,9 +39,10 @@
 #include	"constants.h"
 #include	"cservice.h"
 #include	"cservice_config.h"
+#include	"dbHandle.h"
 
 const char sqlChannel_h_rcsId[] = __SQLCHANNEL_H ;
-const char sqlChannel_cc_rcsId[] = "$Id: sqlChannel.cc,v 1.42 2007/08/06 13:51:47 kewlio Exp $" ;
+const char sqlChannel_cc_rcsId[] = "$Id: sqlChannel.cc,v 1.43 2007/08/28 16:10:12 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -96,7 +97,7 @@ const int sqlChannel::EV_CLRREVIEW	= 18 ;
 const int sqlChannel::EV_SUSPEND	= 19 ;
 const int sqlChannel::EV_UNSUSPEND	= 20 ;
 
-sqlChannel::sqlChannel(PgDatabase* _SQLDb)
+sqlChannel::sqlChannel(dbHandle* _SQLDb)
  : id(0),
    name(),
    flags(0),
@@ -153,9 +154,8 @@ queryString	<< "SELECT "
 		<< endl;
 #endif
 
-ExecStatusType status = SQLDb->Exec(queryString.str().c_str()) ;
-
-if( PGRES_TUPLES_OK == status )
+if( SQLDb->Exec(queryString, true ) )
+//if( PGRES_TUPLES_OK == status )
 	{
 	/*
 	 *  If the channel doesn't exist, we won't get any rows back.
@@ -199,9 +199,8 @@ queryString	<< "SELECT "
 		<< endl;
 #endif
 
-ExecStatusType status = SQLDb->Exec(queryString.str().c_str()) ;
-
-if( PGRES_TUPLES_OK == status )
+if( SQLDb->Exec(queryString, true ) )
+//if( PGRES_TUPLES_OK == status )
 	{
 	/*
 	 *  If the channel doesn't exist, we won't get any rows back.
@@ -227,17 +226,17 @@ void sqlChannel::setAllMembers(int row)
  *  Assumes SQLDb contains a valid results set for all channel information.
  */
 
-id = atoi(SQLDb->GetValue(row, 0));
+id = atoi(SQLDb->GetValue(row, 0).c_str());
 name = SQLDb->GetValue(row, 1);
-flags = atoi(SQLDb->GetValue(row, 2));
-mass_deop_pro = atoi(SQLDb->GetValue(row,3));
-flood_pro = atoi(SQLDb->GetValue(row,4));
+flags = atoi(SQLDb->GetValue(row, 2).c_str());
+mass_deop_pro = atoi(SQLDb->GetValue(row,3).c_str());
+flood_pro = atoi(SQLDb->GetValue(row,4).c_str());
 url = SQLDb->GetValue(row,5);
 description = SQLDb->GetValue(row,6);
 comment = SQLDb->GetValue(row,7);
 keywords = SQLDb->GetValue(row,8);
-registered_ts = atoi(SQLDb->GetValue(row,9));
-channel_ts = atoi(SQLDb->GetValue(row,10));
+registered_ts = atoi(SQLDb->GetValue(row,9).c_str());
+channel_ts = atoi(SQLDb->GetValue(row,10).c_str());
 channel_mode = SQLDb->GetValue(row,11);
 userflags = atoi(SQLDb->GetValue(row,12));
 last_updated = atoi(SQLDb->GetValue(row,13));
@@ -286,9 +285,8 @@ queryString	<< queryHeader
 		<< endl;
 #endif
 
-ExecStatusType status = SQLDb->Exec(queryString.str().c_str()) ;
-
-if( PGRES_COMMAND_OK != status )
+if( !SQLDb->Exec(queryString ) )
+//if( PGRES_COMMAND_OK != status )
 	{
 	elog	<< "sqlChannel::commit> Something went wrong: "
 		<< SQLDb->ErrorMessage()
@@ -319,9 +317,8 @@ queryString	<< queryHeader
 			<< endl;
 #endif
 
-ExecStatusType status = SQLDb->Exec(queryString.str().c_str()) ;
-
-if( PGRES_COMMAND_OK != status )
+if( !SQLDb->Exec(queryString ) )
+//if( PGRES_COMMAND_OK != status )
 	{
 	// TODO: Log to msgchan here.
 	elog	<< "sqlChannel::commit> Something went wrong: "

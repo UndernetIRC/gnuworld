@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: chanfix.cc,v 1.12 2007/03/11 14:52:28 buzlip01 Exp $
+ * $Id: chanfix.cc,v 1.13 2007/08/28 16:10:22 dan_karrels Exp $
  */
 
 #include	<csignal>
@@ -40,7 +40,7 @@
 
 #include	<sys/resource.h>
 
-#include	"libpq++.h"
+#include	"dbHandle.h"
 
 #include	"gnuworld_config.h"
 #include	"client.h"
@@ -62,7 +62,7 @@
 #include	<boost/thread/thread.hpp>
 #endif /* CHANFIX_HAVE_BOOST_THREAD */
 
-RCSTAG("$Id: chanfix.cc,v 1.12 2007/03/11 14:52:28 buzlip01 Exp $");
+RCSTAG("$Id: chanfix.cc,v 1.13 2007/08/28 16:10:22 dan_karrels Exp $");
 
 namespace gnuworld
 {
@@ -890,7 +890,7 @@ bool chanfix::logLastComMessage(iClient* theClient, const std::string& Message)
   const std::string Command = string_upper(st[0]);
 
   std::string log;
-  PgDatabase* cacheCon = theManager->getConnection();
+  dbHandle* cacheCon = theManager->getConnection();
 
   static const char *Main = "INSERT into comlog (ts,user_name,command) VALUES (now()::abstime::int4,'";
 
@@ -911,7 +911,7 @@ bool chanfix::logLastComMessage(iClient* theClient, const std::string& Message)
   insertString	<< "')"
 		<< std::ends;
 
-  if (!cacheCon->ExecCommandOk(insertString.str().c_str())) {
+  if (!cacheCon->Exec(insertString)) {
     elog << "sqlChannel::Insert> Something went wrong: "
 	 << cacheCon->ErrorMessage()
 	 << std::endl;
@@ -1259,12 +1259,12 @@ void chanfix::precacheChanOps()
 elog << "*** [chanfix::precacheChanOps] Precaching chanops." << std::endl;
 
 /* Get a connection instance to our backend */
-PgDatabase* cacheCon = theManager->getConnection();
+dbHandle* cacheCon = theManager->getConnection();
 
 /* Check for the backup table. If it exists, something went wrong. */
 /* SELECT count(*) FROM pg_tables WHERE tablename = 'chanOpsBackup' */
 /* SELECT chanOpsBackup FROM information_schema.tables */
-if (!cacheCon->ExecTuplesOk("SELECT count(*) FROM pg_tables WHERE tablename = 'chanOpsBackup'")) {
+if (!cacheCon->Exec("SELECT count(*) FROM pg_tables WHERE tablename = 'chanOpsBackup'",true)) {
   elog	<< "*** [chanfix::precacheChanOps]: Error checking for backup table presence: " 
 		<< cacheCon->ErrorMessage()
 		<< std::endl;
@@ -1286,8 +1286,8 @@ theQuery	<< "SELECT channel,account,last_seen_as,ts_firstopped,ts_lastopped,day0
 elog		<< "*** [chanfix::precacheChanOps]: Loading chanOps and their points ..." 
 		<< std::endl;
 
-if (cacheCon->ExecTuplesOk(theQuery.str().c_str())) {
-  for (int i = 0 ; i < cacheCon->Tuples(); i++) {
+if (cacheCon->Exec(theQuery,true)) {
+  for (unsigned int i = 0 ; i < cacheCon->Tuples(); i++) {
      sqlChanOp* newOp = new (std::nothrow) sqlChanOp(theManager);
      assert( newOp != 0 ) ;
 
@@ -1325,7 +1325,7 @@ void chanfix::precacheChannels()
 elog << "*** [chanfix::precacheChannels] Precaching channels." << std::endl;
 
 /* Get a connection instance to our backend */
-PgDatabase* cacheCon = theManager->getConnection();
+dbHandle* cacheCon = theManager->getConnection();
 
 /* Retrieve the list of channels */
 std::stringstream theQuery;
@@ -1335,8 +1335,8 @@ theQuery	<< "SELECT id, channel, flags FROM channels"
 elog		<< "*** [chanfix::precacheChannels]: Loading channels ..."
 		<< std::endl;
 
-if (cacheCon->ExecTuplesOk(theQuery.str().c_str())) {
-  for (int i = 0; i < cacheCon->Tuples(); i++) {
+if (cacheCon->Exec(theQuery,true)) {
+  for (unsigned int i = 0; i < cacheCon->Tuples(); i++) {
      sqlChannel* newChan = new (std::nothrow) sqlChannel(theManager);
      assert( newChan != 0 ) ;
 
@@ -1366,7 +1366,7 @@ void chanfix::precacheUsers()
 elog << "*** [chanfix::precacheUsers] Precaching users." << std::endl;
 
 /* Get a connection instance to our backend */
-PgDatabase* cacheCon = theManager->getConnection();
+dbHandle* cacheCon = theManager->getConnection();
 
 /* Retrieve the list of chanops */
 std::stringstream theQuery;
@@ -1374,7 +1374,7 @@ theQuery	<< "SELECT id, user_name, created, last_seen, last_updated, last_update
 		<< "FROM users"
 		;
 
-if (cacheCon->ExecTuplesOk(theQuery.str().c_str())) {
+if (cacheCon->Exec(theQuery,true)) {
   /* First we need to clear the current cache. */
   for (usersMapType::iterator itr = usersMap.begin();
        itr != usersMap.end(); ++itr) {
@@ -1382,7 +1382,7 @@ if (cacheCon->ExecTuplesOk(theQuery.str().c_str())) {
   }
   usersMap.clear();
 
-  for (int i = 0; i < cacheCon->Tuples(); ++i) {
+  for (unsigned int i = 0; i < cacheCon->Tuples(); ++i) {
     sqlcfUser *newUser = new sqlcfUser(theManager);
     assert(newUser != 0);
 
@@ -1576,7 +1576,7 @@ return countMyOps(theChan->getName());
 const std::string chanfix::getHostList( sqlcfUser* User)
 {
 /* Get a connection instance to our backend */
-PgDatabase* cacheCon = theManager->getConnection();
+dbHandle* cacheCon = theManager->getConnection();
 
 /* Grab the user's host list */
 static const char* queryHeader
@@ -1587,7 +1587,7 @@ theQuery	<< queryHeader
 		<< User->getID()
 		;
 
-if (!cacheCon->ExecTuplesOk(theQuery.str().c_str())) {
+if (!cacheCon->Exec(theQuery,true)) {
   elog	<< "chanfix::getHostList> SQL Error: "
 	<< cacheCon->ErrorMessage()
 	<< std::endl;
@@ -1596,7 +1596,7 @@ if (!cacheCon->ExecTuplesOk(theQuery.str().c_str())) {
 
 // SQL Query succeeded
 std::stringstream hostlist;
-for (int i = 0 ; i < cacheCon->Tuples(); i++)
+for (unsigned int i = 0 ; i < cacheCon->Tuples(); i++)
 	{
 	if (!i)
 	  hostlist << cacheCon->GetValue(i, 0);
@@ -1785,7 +1785,7 @@ return;
 const int chanfix::getLastFix(sqlChannel* theChan)
 {
 /* Get a connection instance to our backend */
-PgDatabase* cacheCon = theManager->getConnection();
+dbHandle* cacheCon = theManager->getConnection();
 
 /* Grab the user's host list */
 static const char* queryHeader
@@ -1796,7 +1796,7 @@ theQuery	<< queryHeader
 		<< theChan->getID()
 		;
 
-if (!cacheCon->ExecTuplesOk(theQuery.str().c_str())) {
+if (!cacheCon->Exec(theQuery,true)) {
   elog	<< "chanfix::getHostList> SQL Error: "
 	<< cacheCon->ErrorMessage()
 	<< std::endl;
@@ -1809,7 +1809,7 @@ int event;
 
 // SQL Query succeeded
 std::stringstream notes;
-for (int i = 0 ; i < cacheCon->Tuples(); i++)
+for (unsigned int i = 0 ; i < cacheCon->Tuples(); i++)
 {
 	ts = atoi(cacheCon->GetValue(i, 0));
 	event = atoi(cacheCon->GetValue(i, 1));
@@ -2928,12 +2928,12 @@ void chanfix::updateDB()
   updateDBTimer.Start();
 
   /* Get a connection instance to our backend */
-  PgDatabase* cacheCon = theManager->getConnection();
+  dbHandle* cacheCon = theManager->getConnection();
 
   /* Check for the backup table. If it exists, something went wrong. */
   /* SELECT count(*) FROM pg_tables WHERE tablename = 'chanOpsBackup' */
   /* SELECT chanOpsBackup FROM information_schema.tables */
-  if (!cacheCon->ExecTuplesOk("SELECT count(*) FROM pg_tables WHERE tablename = 'chanOpsBackup'")) {
+  if (!cacheCon->Exec("SELECT count(*) FROM pg_tables WHERE tablename = 'chanOpsBackup'",true)) {
     elog	<< "*** [chanfix::updateDB]: Error checking for backup table presence: " 
 		<< cacheCon->ErrorMessage()
 		<< std::endl;
@@ -2942,7 +2942,7 @@ void chanfix::updateDB()
 
   if (cacheCon->Tuples() && atoi(cacheCon->GetValue(0, 0))) {
     /* Drop the backup table. */
-    if (!cacheCon->ExecCommandOk("DROP TABLE chanOpsBackup")) {
+    if (!cacheCon->Exec("DROP TABLE chanOpsBackup")) {
       elog	<< "*** [chanfix::updateDB]: Error dropping backup table: " 
 		<< cacheCon->ErrorMessage()
 		<< std::endl;
@@ -2951,7 +2951,7 @@ void chanfix::updateDB()
   }
 
   /* Copy all data from the main table to the backup table. */
-  if (!cacheCon->ExecCommandOk("CREATE TABLE chanOpsBackup AS SELECT * FROM chanOps")) {
+  if (!cacheCon->Exec("CREATE TABLE chanOpsBackup AS SELECT * FROM chanOps")) {
     elog	<< "*** [chanfix::updateDB]: Error creating backup table: " 
 		<< cacheCon->ErrorMessage()
 		<< std::endl;
@@ -2959,7 +2959,7 @@ void chanfix::updateDB()
   }
 
   /* Truncate the current chanOps table. */
-  if (!cacheCon->ExecCommandOk("TRUNCATE TABLE chanOps")) {
+  if (!cacheCon->Exec("TRUNCATE TABLE chanOps")) {
     elog	<< "*** [chanfix::updateDB]: Error truncating current chanOps table: " 
 		<< cacheCon->ErrorMessage()
 		<< std::endl;
@@ -2967,8 +2967,8 @@ void chanfix::updateDB()
   }
 
   /* Copy the current chanOps to SQL. */
-  ExecStatusType status = cacheCon->Exec("COPY chanOps FROM stdin");
-  if (PGRES_COPY_IN != status) {
+  if( !cacheCon->StartCopyIn("COPY chanOps FROM stdin") )
+   { 
     elog	<< "*** [chanfix::updateDB]: Error starting copy of chanOps table."
 		<< std::endl;
     return;
@@ -2996,7 +2996,7 @@ void chanfix::updateDB()
     theLine	<< "\n"
 		;
 
-    cacheCon->PutLine(theLine.str().c_str());
+    cacheCon->PutLine(theLine.str());
     chanOpsProcessed++;
   }
   
@@ -3007,16 +3007,17 @@ void chanfix::updateDB()
    * Synchronize with the backend.
    * Returns 0 on success, 1 on failure
    */
-  int copyStatus = cacheCon->EndCopy();
-  if (copyStatus != 0) {
-    elog	<< "*** [chanfix::updateDB] Error ending copy! Returned "
-		<< copyStatus << " instead (should be 0 for success)."
+  if( !cacheCon->StopCopyIn() )
+//  if (copyStatus != 0) {
+	{
+    elog	<< "*** [chanfix::updateDB] Error ending copy!"
+//		<< copyStatus << " instead (should be 0 for success)."
 		<< std::endl;
     return;
   }
 
   /* Count the rows to see if the cache == number of rows in table. */
-  if (!cacheCon->ExecTuplesOk("SELECT count(*) FROM chanOps")) {
+  if (!cacheCon->Exec("SELECT count(*) FROM chanOps",true)) {
     elog	<< "*** [chanfix::updateDB]: Error counting rows in chanOps table: " 
 		<< cacheCon->ErrorMessage()
 		<< std::endl;
@@ -3042,7 +3043,7 @@ void chanfix::updateDB()
   }
 
   /* Drop the backup table. */
-  if (!cacheCon->ExecCommandOk("DROP TABLE chanOpsBackup")) {
+  if (!cacheCon->Exec("DROP TABLE chanOpsBackup")) {
     elog	<< "*** [chanfix::updateDB]: Error dropping backup table (after completion): " 
 		<< cacheCon->ErrorMessage()
 		<< std::endl;
@@ -3327,15 +3328,15 @@ return std::string("");
 void chanfix::loadHelpTable()
 {
 /* Get a connection instance to our backend */
-PgDatabase* cacheCon = theManager->getConnection();
+dbHandle* cacheCon = theManager->getConnection();
 
 /* Grab the help table */
 std::stringstream theQuery;
 theQuery	<< "SELECT language_id,topic,contents FROM help"
 		;
 
-if (cacheCon->ExecTuplesOk(theQuery.str().c_str()))
-  for (int i = 0; i < cacheCon->Tuples(); i++)
+if (cacheCon->Exec(theQuery,true))
+  for (unsigned int i = 0; i < cacheCon->Tuples(); i++)
     helpTable.insert(helpTableType::value_type(
 		     std::make_pair(atoi(cacheCon->GetValue(i, 0)),
 				    cacheCon->GetValue(i, 1)),
@@ -3394,15 +3395,15 @@ return std::string( "Unable to retrieve response. Please contact a chanfix "
 void chanfix::loadTranslationTable()
 {
 /* Get a connection instance to our backend */
-PgDatabase* cacheCon = theManager->getConnection();
+dbHandle* cacheCon = theManager->getConnection();
 
 /* Grab the languages table */
 std::stringstream langQuery;
 langQuery	<< "SELECT id,code,name FROM languages"
 		;
 
-if (cacheCon->ExecTuplesOk(langQuery.str().c_str()))
-  for (int i = 0; i < cacheCon->Tuples(); i++)
+if (cacheCon->Exec(langQuery,true))
+  for (unsigned int i = 0; i < cacheCon->Tuples(); i++)
     languageTable.insert(languageTableType::value_type(cacheCon->GetValue(i, 1),
 			 std::make_pair(atoi(cacheCon->GetValue(i, 0)),
 					cacheCon->GetValue(i, 2))));
@@ -3417,8 +3418,8 @@ std::stringstream transQuery;
 transQuery	<< "SELECT language_id,response_id,text FROM translations"
 		;
 
-if (cacheCon->ExecTuplesOk(transQuery.str().c_str())) {
-  for (int i = 0 ; i < cacheCon->Tuples(); i++) {
+if (cacheCon->Exec(transQuery,true)) {
+  for (unsigned int i = 0 ; i < cacheCon->Tuples(); i++) {
     /*
      *  Add to our translations table.
      */
@@ -3492,9 +3493,8 @@ if (cacheCon->Status() == CONNECTION_BAD) { //Check if the connection has died
 
 }
 
-void chanfix::updateSQLDb(PgDatabase* _SQLDb)
+void chanfix::updateSQLDb(dbHandle* _SQLDb)
 {
-
 for(glineIterator ptr = glineList.begin();ptr != glineList.end();++ptr)
 	{
 	(ptr->second)->setSqldb(_SQLDb);

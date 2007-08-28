@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: WHOGROUPCommand.cc,v 1.4 2006/12/09 00:29:19 buzlip01 Exp $
+ * $Id: WHOGROUPCommand.cc,v 1.5 2007/08/28 16:10:22 dan_karrels Exp $
  */
 
 #include "gnuworld_config.h"
@@ -31,7 +31,7 @@
 #include "StringTokenizer.h"
 #include "sqlcfUser.h"
 
-RCSTAG("$Id: WHOGROUPCommand.cc,v 1.4 2006/12/09 00:29:19 buzlip01 Exp $");
+RCSTAG("$Id: WHOGROUPCommand.cc,v 1.5 2007/08/28 16:10:22 dan_karrels Exp $");
 
 namespace gnuworld
 {
@@ -49,12 +49,12 @@ bot->logAdminMessage("%s (%s) WHOGROUP %s",
 
 if (st.size() == 1) {
   /* No parameter supplied, so list all groups */
-  PgDatabase* cacheCon = bot->theManager->getConnection();
+  dbHandle* cacheCon = bot->theManager->getConnection();
 
   std::stringstream theQuery;
   theQuery << "SELECT DISTINCT faction FROM users ORDER BY faction ASC";
 
-  if (!cacheCon->ExecTuplesOk(theQuery.str().c_str())) {
+  if (!cacheCon->Exec(theQuery,true)) {
     elog	<< "chanfix::WHOGROUPCommand> SQL Error: "
 		<< cacheCon->ErrorMessage()
 		<< std::endl;
@@ -68,7 +68,7 @@ if (st.size() == 1) {
 		language::whogroup_list_groups,
 		std::string("List of all groups:")).c_str());
 
-  for (int i = 0 ; i < cacheCon->Tuples(); i++) {
+  for (unsigned int i = 0 ; i < cacheCon->Tuples(); i++) {
     bot->SendTo(theClient, cacheCon->GetValue(i, 0));
     numGroups++;
   }

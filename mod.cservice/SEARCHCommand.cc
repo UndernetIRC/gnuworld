@@ -24,7 +24,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: SEARCHCommand.cc,v 1.10 2005/09/29 15:21:56 kewlio Exp $
+ * $Id: SEARCHCommand.cc,v 1.11 2007/08/28 16:10:11 dan_karrels Exp $
  */
 
 #include	<string>
@@ -34,13 +34,12 @@
 #include	"StringTokenizer.h"
 #include	"ELog.h"
 #include	"cservice.h"
-#include	"libpq++.h"
+#include	"dbHandle.h"
 #include	"responses.h"
 #include	"cservice_config.h"
 #include	"Network.h"
-#include	<iostream>
 
-const char SEARCHCommand_cc_rcsId[] = "$Id: SEARCHCommand.cc,v 1.10 2005/09/29 15:21:56 kewlio Exp $" ;
+const char SEARCHCommand_cc_rcsId[] = "$Id: SEARCHCommand.cc,v 1.11 2007/08/28 16:10:11 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -123,9 +122,8 @@ theQuery	<< queryHeader
 		<< endl;
 #endif
 
-ExecStatusType status = bot->SQLDb->Exec(theQuery.str().c_str());
-
-if( PGRES_TUPLES_OK != status )
+if( !bot->SQLDb->Exec(theQuery, true ) )
+//if( PGRES_TUPLES_OK != status )
 	{
 	elog	<< "SEARCH> SQL Error: "
 		<< bot->SQLDb->ErrorMessage()
@@ -133,7 +131,7 @@ if( PGRES_TUPLES_OK != status )
 	return false ;
 	}
 
-for( int i = 0 ; i < bot->SQLDb->Tuples(); i++ )
+for( unsigned int i = 0 ; i < bot->SQLDb->Tuples(); i++ )
 	{
 	/*
 	 * Look to see if the channel exists in memory.
@@ -152,8 +150,8 @@ for( int i = 0 ; i < bot->SQLDb->Tuples(); i++ )
 	{
 	results++;
 	bot->Notice(theClient, "\026%-14s \026 - %s (%i users)",
-		    bot->SQLDb->GetValue(i, 0),
-		    bot->SQLDb->GetValue(i, 1),
+		    bot->SQLDb->GetValue(i, 0).c_str(),
+		    bot->SQLDb->GetValue(i, 1).c_str(),
 		    chanMembers);
 	}
 

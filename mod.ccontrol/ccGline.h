@@ -16,18 +16,18 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccGline.h,v 1.14 2003/06/28 01:21:19 dan_karrels Exp $
+ * $Id: ccGline.h,v 1.15 2007/08/28 16:10:07 dan_karrels Exp $
  */
 
 #ifndef __CCGLINE_H
-#define __CCGLINE_H "$Id: ccGline.h,v 1.14 2003/06/28 01:21:19 dan_karrels Exp $"
+#define __CCGLINE_H "$Id: ccGline.h,v 1.15 2007/08/28 16:10:07 dan_karrels Exp $"
 
 #include	<string>
 #include	<list>
 
 #include	<ctime>
 
-#include	"libpq++.h"
+#include	"dbHandle.h"
 
 namespace gnuworld
 { 
@@ -41,7 +41,7 @@ class ccGline
 {
 public:
 
-	ccGline(PgDatabase*);
+	ccGline(dbHandle*);
 	
 	virtual ~ccGline();
 	//Mehods for getting info
@@ -91,7 +91,7 @@ public:
 	inline void 		setReason( const string& _Reason ) 
 		{ Reason = _Reason; }
 	    
-	inline void 		setSqldb(PgDatabase* _SQLDb)
+	inline void 		setSqldb(dbHandle* _SQLDb)
 		{ SQLDb = _SQLDb; } 
 		
 	//Methods for updating 
@@ -116,7 +116,7 @@ protected:
 	time_t Expires;
 	time_t LastUpdated;
 	string Reason;
-	PgDatabase* SQLDb;
+	dbHandle* SQLDb;
 	
 }; // class ccGline
 }

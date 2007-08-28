@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: REMSERVERCommand.cc,v 1.13 2006/09/26 17:36:01 kewlio Exp $
+ * $Id: REMSERVERCommand.cc,v 1.14 2007/08/28 16:10:03 dan_karrels Exp $
  */
 
 #include	<string>
@@ -33,8 +33,9 @@
 #include	"Network.h"
 #include	"Constants.h"
 #include	"gnuworld_config.h"
+#include	"dbHandle.h"
 
-RCSTAG( "$Id: REMSERVERCommand.cc,v 1.13 2006/09/26 17:36:01 kewlio Exp $" ) ;
+RCSTAG( "$Id: REMSERVERCommand.cc,v 1.14 2007/08/28 16:10:03 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -81,9 +82,9 @@ theQuery        << User::Query
 
 
 elog << theQuery.str().c_str() << endl;
-ExecStatusType status = bot->SQLDb->Exec( theQuery.str().c_str() ) ;
-        
-if(PGRES_TUPLES_OK != status)
+
+if( !bot->SQLDb->Exec( theQuery.str(), true ) )
+//if(PGRES_TUPLES_OK != status)
         {
 	bot->Notice(theClient,"Database error, unable to remove the server.");	
         return false;

@@ -20,7 +20,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccontrol.cc,v 1.215 2007/05/26 09:41:24 mrbean_ Exp $
+ * $Id: ccontrol.cc,v 1.216 2007/08/28 16:10:07 dan_karrels Exp $
 */
 
 #define MAJORVER "1"
@@ -55,7 +55,7 @@
 #include	"Network.h"
 #include	"ELog.h"
 #include        "ccUser.h"
-#include	"libpq++.h"
+#include	"dbHandle.h"
 #include	"ccontrol.h"
 #include        "server.h"
 #include 	"Constants.h"
@@ -66,7 +66,7 @@
 #include	"ccontrol_generic.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: ccontrol.cc,v 1.215 2007/05/26 09:41:24 mrbean_ Exp $" ) ;
+RCSTAG( "$Id: ccontrol.cc,v 1.216 2007/08/28 16:10:07 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -138,7 +138,12 @@ elog	<< "ccontrol::ccontrol> Attempting to connect to "
 	<< sqlDb
 	<< endl;
  
-SQLDb = new (std::nothrow) cmDatabase( Query.c_str() ) ;
+SQLDb = new dbHandle( sqlHost,
+	::atoi( sqlPort.c_str() ),
+	sqlDb,
+	sqlUser,
+	sqlPass ) ;
+//(std::nothrow) cmDatabase( Query.c_str() ) ;
 assert( SQLDb != 0 ) ;
 
 //-- Make sure we connected to the SQL database; if
@@ -2102,9 +2107,7 @@ theQuery	<< Main
 		<< ")"
 		<< ends;
 
-ExecStatusType status = SQLDb->Exec( theQuery.str().c_str() ) ;
-
-if( PGRES_COMMAND_OK == status ) 
+if( SQLDb->Exec( theQuery.str().c_str() ) )
 	{
 	if(!Oper->loadData(Oper->getUserName()))
 		return false;
@@ -2125,7 +2128,6 @@ if(!dbConnected)
 	return false;
 	}
 
-ExecStatusType status;
 ccUser* tUser = usersMap[Name];
 //Delete the user hosts
 if(tUser)
@@ -2135,14 +2137,14 @@ if(tUser)
     HostQ << tMain;
     HostQ << tUser->getID();
     HostQ << ends;
-    status = SQLDb->Exec( HostQ.str().c_str() ) ;
 
 #ifdef LOG_SQL
 elog	<< "ccontrol::DeleteOper> "
 	<< HostQ.str().c_str()
 	<< endl; 
 #endif
-if( PGRES_COMMAND_OK != status ) 
+if( !SQLDb->Exec( HostQ ) )
+//if( PGRES_COMMAND_OK != status ) 
 	{
 	elog	<< "ccontrol::DeleteOper> SQL Failure: "
 		<< SQLDb->ErrorMessage()
@@ -2166,9 +2168,8 @@ elog	<< "ccontrol::DeleteOper> "
 	<< endl; 
 #endif
 
-status = SQLDb->Exec( theQuery.str().c_str() ) ;
-
-if( PGRES_COMMAND_OK == status ) 
+if(  SQLDb->Exec( theQuery ) )
+//if( PGRES_COMMAND_OK == status ) 
 	{
 	return true;
 	}
@@ -2251,9 +2252,8 @@ elog	<< "ccontrol::UserGotMask> "
 	<< endl; 
 #endif
 
-ExecStatusType status = SQLDb->Exec( theQuery.str().c_str() ) ;
-
-if( PGRES_TUPLES_OK != status )
+if( !SQLDb->Exec( theQuery, true ) )
+//if( PGRES_TUPLES_OK != status )
 	{
 	elog	<< "ccontrol::UserGotMask> SQL Failure: "
 		<< SQLDb->ErrorMessage()
@@ -2262,7 +2262,7 @@ if( PGRES_TUPLES_OK != status )
 	return false ;
 	}
 
-for( int i = 0 ; i < SQLDb->Tuples() ; i++ )
+for( unsigned int i = 0 ; i < SQLDb->Tuples() ; i++ )
 	{
 	if(match(SQLDb->GetValue(i,0),Host) == 0)
 		{
@@ -2294,11 +2294,10 @@ elog	<< "ccontrol::UserGotHost> "
 	<< endl; 
 #endif
 
-ExecStatusType status = SQLDb->Exec( theQuery.str().c_str() ) ;
-
-if( PGRES_TUPLES_OK == status )
+if( SQLDb->Exec( theQuery, true ) )
+//if( PGRES_TUPLES_OK == status )
 	{
-	for( int i = 0 ; i < SQLDb->Tuples() ; i++ )
+	for( unsigned int i = 0 ; i < SQLDb->Tuples() ; i++ )
 		{
 		if(!strcasecmp(SQLDb->GetValue(i,0),Host.c_str()))
 			{
@@ -2405,9 +2404,8 @@ elog	<< "ccontrol::AddHost> "
 	<< endl; 
 #endif
 
-ExecStatusType status = SQLDb->Exec( theQuery.str().c_str() ) ;
-
-if( PGRES_COMMAND_OK == status ) 
+if( SQLDb->Exec( theQuery ) )
+//if( PGRES_COMMAND_OK == status ) 
 	{
 	return true;
 	}
@@ -2443,9 +2441,8 @@ elog	<< "ccontrol::DelHost> "
 	<< endl; 
 #endif
 
-ExecStatusType status = SQLDb->Exec( theQuery.str().c_str() ) ;
-
-if( PGRES_COMMAND_OK == status ) 
+if( SQLDb->Exec( theQuery ) )
+//if( PGRES_COMMAND_OK == status ) 
 	{
 	return true;
 	}
@@ -2473,9 +2470,8 @@ theQuery	<< queryHeader
 		<< User->getID()
 		<< ends;
 
-ExecStatusType status = SQLDb->Exec( theQuery.str().c_str() ) ;
-
-if( PGRES_TUPLES_OK != status )
+if( !SQLDb->Exec( theQuery, true ) )
+//if( PGRES_TUPLES_OK != status )
 	{
 	elog	<< "LISTHOSTS> SQL Error: "
 		<< SQLDb->ErrorMessage()
@@ -2485,9 +2481,9 @@ if( PGRES_TUPLES_OK != status )
 
 // SQL Query succeeded
 Notice(theClient,"Host list for %s",User->getUserName().c_str());
-for (int i = 0 ; i < SQLDb->Tuples(); i++)
+for (unsigned int i = 0 ; i < SQLDb->Tuples(); i++)
 	{
-	Notice(theClient,"%s",SQLDb->GetValue(i, 0));
+	Notice(theClient,"%s",SQLDb->GetValue(i, 0).c_str());
 	}
 return true;
 }	
@@ -2514,9 +2510,8 @@ elog	<< "ccontrol::GetHelp> "
 	<< endl; 
 #endif
 
-ExecStatusType status = SQLDb->Exec( theQuery.str().c_str() ) ;
-
-if( PGRES_TUPLES_OK == status )
+if( SQLDb->Exec( theQuery, true ) )
+//if( PGRES_TUPLES_OK == status )
 	{
 	if(SQLDb->Tuples() > 0 )
 		{
@@ -2562,9 +2557,8 @@ elog	<< "ccontrol::GetHelp> "
 	<< endl; 
 #endif
 
-ExecStatusType status = SQLDb->Exec( theQuery.str().c_str() ) ;
-
-if( PGRES_TUPLES_OK == status )
+if( SQLDb->Exec( theQuery, true ) )
+//if( PGRES_TUPLES_OK == status )
 	{
 	if(SQLDb->Tuples() > 0 )
 		{
@@ -2590,7 +2584,7 @@ else
 
 void ccontrol::DoHelp(iClient* theClient)
 {
-for( int i = 0 ; i < SQLDb->Tuples() ; i++ )
+for( unsigned int i = 0 ; i < SQLDb->Tuples() ; i++ )
 	{
 	string commInfo = replace(
 		SQLDb->GetValue( i, 1 ),
@@ -2913,9 +2907,8 @@ elog	<< "ccontrol::DailyLog> "
 	<< endl; 
 #endif
 
-ExecStatusType status = SQLDb->Exec( theQuery.str().c_str() ) ;
-
-if( PGRES_COMMAND_OK == status ) 
+if( SQLDb->Exec( theQuery ) )
+//if( PGRES_COMMAND_OK == status ) 
 	{
 	return true;
 	}
@@ -3011,9 +3004,8 @@ elog	<< "ccontrol::DailyLog> "
 	<< endl; 
 #endif
 
-ExecStatusType status = SQLDb->Exec( theQuery.str().c_str() ) ;
-
-if( PGRES_COMMAND_OK == status ) 
+if( SQLDb->Exec( theQuery ) )
+//if( PGRES_COMMAND_OK == status ) 
 	{
 	return true;
 	}
@@ -3132,9 +3124,8 @@ elog	<< "ccontrol::CreateReport> "
 	<< endl;
 #endif
 	
-ExecStatusType status = SQLDb->Exec( theQuery.str().c_str() ) ;
-
-if( PGRES_TUPLES_OK != status )
+if( !SQLDb->Exec( theQuery, true ) )
+//if( PGRES_TUPLES_OK != status )
 	{
 	elog	<< "ccontrol::CreateReport> SQL Error: "
 		<< SQLDb->ErrorMessage()
@@ -3156,10 +3147,10 @@ tLogFile << "ccontrol log for command issued between "
 	<< convertToAscTime(Til)
 	<< endl;
 
-for (int i = 0 ; i < SQLDb->Tuples(); i++)
+for (unsigned int i = 0 ; i < SQLDb->Tuples(); i++)
 	{
 	tLogFile	<< "[ "
-		<< convertToAscTime(atoi(SQLDb->GetValue(i, 0)))
+		<< convertToAscTime(atoi(SQLDb->GetValue(i, 0).c_str()))
 		<< " - "
 		<< SQLDb->GetValue(i,1)
 		<< " ] "
@@ -3520,9 +3511,9 @@ elog	<< "ccontrol::RefreshSuspention> "
 	<< DelQuery.str().c_str()
 	<< endl; 
 #endif
-ExecStatusType status = SQLDb->Exec( DelQuery.str().c_str() ) ;
 
-if( PGRES_COMMAND_OK != status )
+if( !SQLDb->Exec( DelQuery ) )
+//if( PGRES_COMMAND_OK != status )
 	{
 	elog	<< "ccontrol::refreshSuspention> SQL Failure: "
 		<< SQLDb->ErrorMessage()
@@ -3692,9 +3683,9 @@ elog	<< "ccontrol::loadGlines> "
 	<< theQuery.str().c_str()
 	<< endl; 
 #endif
-ExecStatusType status = SQLDb->Exec( theQuery.str().c_str() ) ;
 
-if( PGRES_TUPLES_OK != status )
+if( !SQLDb->Exec( theQuery, true ) )
+//if( PGRES_TUPLES_OK != status )
 	{
 	elog	<< "ccontrol::loadGlines> SQL Failure: "
 		<< SQLDb->ErrorMessage()
@@ -3707,7 +3698,7 @@ ccGline *tempGline = NULL;
 
 inRefresh = true;
 
-for( int i = 0 ; i < SQLDb->Tuples() ; i++ )
+for( unsigned int i = 0 ; i < SQLDb->Tuples() ; i++ )
 	{
 	tempGline =  new (std::nothrow) ccGline(SQLDb);
 	assert( tempGline != NULL ) ;
@@ -3715,9 +3706,12 @@ for( int i = 0 ; i < SQLDb->Tuples() ; i++ )
 	tempGline->setId(SQLDb->GetValue(i,0));
 	tempGline->setHost(SQLDb->GetValue(i,1));
 	tempGline->setAddedBy(SQLDb->GetValue(i,2)) ;
-	tempGline->setAddedOn(static_cast< time_t >( atoi( SQLDb->GetValue(i,3) ) )) ;
-	tempGline->setExpires(static_cast< time_t >( atoi( SQLDb->GetValue(i,4) ) )) ;
-	tempGline->setLastUpdated(static_cast< time_t >( atoi( SQLDb->GetValue(i,5) ) )) ;
+	tempGline->setAddedOn(static_cast< time_t >(
+		atoi( SQLDb->GetValue(i,3).c_str() ) )) ;
+	tempGline->setExpires(static_cast< time_t >(
+		atoi( SQLDb->GetValue(i,4).c_str() ) )) ;
+	tempGline->setLastUpdated(static_cast< time_t >(
+		atoi( SQLDb->GetValue(i,5).c_str() ) )) ;
 	tempGline->setReason(SQLDb->GetValue(i,6));
 	addGline(tempGline);
 	}
@@ -3741,23 +3735,23 @@ elog    << "ccotrol::loadUsers> "
         << theQuery.str().c_str()
         << endl; 
 #endif
-ExecStatusType status = SQLDb->Exec( theQuery.str().c_str() ) ;
 
-if (PGRES_TUPLES_OK != status)
+if( !SQLDb->Exec( theQuery, true ) )
+//if (PGRES_TUPLES_OK != status)
         {
         return false;
         }
-ccUser* tempUser;
-for(int i =0;i<SQLDb->Tuples();++i)
+ccUser* tempUser = 0;
+for(unsigned int i =0;i<SQLDb->Tuples();++i)
 	{
 	tempUser = new (std::nothrow) ccUser(SQLDb);
-	tempUser->setID(atoi(SQLDb->GetValue(i, 0)));
+	tempUser->setID(atoi(SQLDb->GetValue(i, 0).c_str()));
         tempUser->setUserName(SQLDb->GetValue(i, 1));
         tempUser->setPassword(SQLDb->GetValue(i, 2));
-	tempUser->setAccess(atol(SQLDb->GetValue(i, 3)));
-	tempUser->setSAccess(atol(SQLDb->GetValue(i, 4)));
-	tempUser->setFlags(atoi(SQLDb->GetValue(i, 5)));
-	tempUser->setSuspendExpires(atoi(SQLDb->GetValue(i,6)));
+	tempUser->setAccess(atol(SQLDb->GetValue(i, 3).c_str()));
+	tempUser->setSAccess(atol(SQLDb->GetValue(i, 4).c_str()));
+	tempUser->setFlags(atoi(SQLDb->GetValue(i, 5).c_str()));
+	tempUser->setSuspendExpires(atoi(SQLDb->GetValue(i,6).c_str()));
 	tempUser->setSuspendedBy(SQLDb->GetValue(i,7));
 	tempUser->setServer(SQLDb->GetValue(i,8));
 	tempUser->setIsSuspended(!strcasecmp(SQLDb->GetValue(i,9),"t"));
@@ -3784,7 +3778,7 @@ for(int i =0;i<SQLDb->Tuples();++i)
 	tempUser->setLogs(!strcasecmp(SQLDb->GetValue(i,15),"t"));
 	tempUser->setNeedOp(!strcasecmp(SQLDb->GetValue(i,16),"t"));
 	tempUser->setEmail(SQLDb->GetValue(i,17));
-	tempUser->setSuspendLevel(atoi(SQLDb->GetValue(i,18)));
+	tempUser->setSuspendLevel(atoi(SQLDb->GetValue(i,18).c_str()));
 	tempUser->setSuspendReason(SQLDb->GetValue(i,19));
 	if(!strcasecmp(SQLDb->GetValue(i,20),"t"))
 		{
@@ -3817,14 +3811,14 @@ elog    << "ccotrol::loadServers> "
         << theQuery.str().c_str()
         << endl; 
 #endif
-ExecStatusType status = SQLDb->Exec( theQuery.str().c_str() ) ;
 
-if (PGRES_TUPLES_OK != status)
+if( !SQLDb->Exec( theQuery, true ) )
+//if (PGRES_TUPLES_OK != status)
         {
         return false;
         }
-ccServer* tempServer;
-for(int i =0;i<SQLDb->Tuples();++i)
+ccServer* tempServer = 0;
+for(unsigned int i =0;i<SQLDb->Tuples();++i)
 	{
 	tempServer = new (std::nothrow) ccServer(SQLDb);
 	assert(tempServer != NULL);
@@ -3852,9 +3846,8 @@ elog    << "ccotrol::loadMaxUsers> "
         << endl; 
 #endif
 
-ExecStatusType status = SQLDb->Exec( theQuery.str().c_str() ) ;
-
-if (PGRES_TUPLES_OK != status)
+if( !SQLDb->Exec( theQuery, true ) )
+//if (PGRES_TUPLES_OK != status)
         {
         elog << "Error on loading maxusers: " << SQLDb->ErrorMessage() << endl;
 	return false;
@@ -3867,17 +3860,16 @@ if(SQLDb->Tuples() == 0)
 	insertQ << "INSERT INTO misc (VarName,Value1,Value2) VALUES ('MaxUsers',0,0);"
 		<< ends;
 
-	status = SQLDb->Exec( insertQ.str().c_str() ) ;
-
-	if (PGRES_COMMAND_OK != status)
+	if( ! SQLDb->Exec( insertQ ) )
+//	if (PGRES_COMMAND_OK != status)
     		{
 		return false;
 	        }
 	}
 else
 	{
-	maxUsers = atoi(SQLDb->GetValue(0,1));
-	dateMax = atoi(SQLDb->GetValue(0,2));
+	maxUsers = atoi(SQLDb->GetValue(0,1).c_str());
+	dateMax = atoi(SQLDb->GetValue(0,2).c_str());
 	}
 return true;
 }
@@ -3890,37 +3882,35 @@ if(!dbConnected)
         return false;
         }
    
-ExecStatusType status = SQLDb->Exec( "SELECT * FROM misc WHERE VarName = 'Version'") ;
-
-if (PGRES_TUPLES_OK != status)
+if( !SQLDb->Exec( "SELECT * FROM misc WHERE VarName = 'Version'", true ) )
+//if (PGRES_TUPLES_OK != status)
         {
         return false;
         }
 
-for(int i =0;i<SQLDb->Tuples();++i)
+for(unsigned int i =0;i<SQLDb->Tuples();++i)
 	{
 	VersionsList.push_back(SQLDb->GetValue(i,1));
 	}
 
-status = SQLDb->Exec( "SELECT * FROM misc WHERE VarName = 'CheckVer'") ;
-
-if (PGRES_TUPLES_OK != status)
+if( !SQLDb->Exec( "SELECT * FROM misc WHERE VarName = 'CheckVer'", true ) )
+//if (PGRES_TUPLES_OK != status)
         {
         return false;
         }
 
 if(SQLDb->Tuples() == 0)
 	{
-	status = SQLDb->Exec( "INSERT INTO misc (VarName,Value1) VALUES ('CheckVer',0)") ;
 	checkVer = false;
-	if(PGRES_COMMAND_OK != status)
+	if( !SQLDb->Exec( "INSERT INTO misc (VarName,Value1) VALUES ('CheckVer',0)") )
+//	if(PGRES_COMMAND_OK != status)
 		{
 		return false;
 		}
 	}
 else
 	{
-	checkVer = atoi(SQLDb->GetValue(0,1));
+	checkVer = atoi(SQLDb->GetValue(0,1).c_str());
 	}
 return true;
 }
@@ -3943,15 +3933,14 @@ elog    << "ccotrol::loadBadChannels> "
         << endl;
 #endif
 
-ExecStatusType status = SQLDb->Exec( theQuery.str().c_str() ) ;
+if( !SQLDb->Exec( theQuery.str(), true ) )
+	{
 //delete[] theQuery.str() ;
-
-if (PGRES_TUPLES_OK != status)
-        {
+//if (PGRES_TUPLES_OK != status)
         return false;
         }
 ccBadChannel* tempBad;
-for(int i =0;i<SQLDb->Tuples();++i)
+for(unsigned int i =0;i<SQLDb->Tuples();++i)
         {
         tempBad = new (std::nothrow) ccBadChannel(SQLDb,i);
         assert(tempBad != NULL);
@@ -3990,76 +3979,75 @@ elog    << "ccotrol::loadMisc()> "
         << endl; 
 #endif
 
-ExecStatusType status = SQLDb->Exec( theQuery.str().c_str() ) ;
-
-if (PGRES_TUPLES_OK != status)
+if( !SQLDb->Exec( theQuery, true ) )
+//if (PGRES_TUPLES_OK != status)
         {
         elog << "Error on loading misc : " << SQLDb->ErrorMessage() << endl;
 	return false;
         }
 
-for(int i=0; i< SQLDb->Tuples();++i)
+for(unsigned int i=0; i< SQLDb->Tuples();++i)
 	{
 	if(!strcasecmp(SQLDb->GetValue(i,0),"GlineBurstCount"))
 		{
 		gotCount = true;
-		glineBurstCount = atoi(SQLDb->GetValue(i,1));
+		glineBurstCount = atoi(SQLDb->GetValue(i,1).c_str());
 		}
 	else if(!strcasecmp(SQLDb->GetValue(i,0),"GlineBurstInterval"))
 		{
 		gotInterval = true;
-		glineBurstInterval = atoi(SQLDb->GetValue(i,1));
+		glineBurstInterval = atoi(SQLDb->GetValue(i,1).c_str());
 		}
 	else if(!strcasecmp(SQLDb->GetValue(i,0),"VClones"))
 		{
 		gotVClones = true;
-		maxVClones = atoi(SQLDb->GetValue(i,1));
+		maxVClones = atoi(SQLDb->GetValue(i,1).c_str());
 		}
 	else if(!strcasecmp(SQLDb->GetValue(i,0),"Clones"))
 		{
 		gotClones = true;
-		maxClones = atoi(SQLDb->GetValue(i,1));
+		maxClones = atoi(SQLDb->GetValue(i,1).c_str());
 		}
         else if(!strcasecmp(SQLDb->GetValue(i,0),"CClones"))
                 {
                 gotCClones = true;
-                maxCClones = atoi(SQLDb->GetValue(i,1));
+                maxCClones = atoi(SQLDb->GetValue(i,1).c_str());
                 }
         else if(!strcasecmp(SQLDb->GetValue(i,0),"CClonesCIDR"))
                 {
                 gotCClonesCIDR = true;
-                CClonesCIDR = atoi(SQLDb->GetValue(i,1));
+                CClonesCIDR = atoi(SQLDb->GetValue(i,1).c_str());
                 }
 	else if(!strcasecmp(SQLDb->GetValue(i,0),"CClonesTime"))
 		{
 		gotCClonesTime = true;
-		CClonesTime = atoi(SQLDb->GetValue(i,1));
+		CClonesTime = atoi(SQLDb->GetValue(i,1).c_str());
 		}
         else if(!strcasecmp(SQLDb->GetValue(i,0),"CClonesGline"))
                 {
                 gotCClonesGline = true;
-                CClonesGline = (atoi(SQLDb->GetValue(i,1)) == 1);
+                CClonesGline = (atoi(SQLDb->GetValue(i,1).c_str()) == 1);
                 }
 	else if(!strcasecmp(SQLDb->GetValue(i,0),"IClones"))
 		{
 		gotIClones = true;
-		maxIClones = atoi(SQLDb->GetValue(i,1));
+		maxIClones = atoi(SQLDb->GetValue(i,1).c_str());
 		}
 	else if(!strcasecmp(SQLDb->GetValue(i,0),"IClonesGline"))
 		{
 		gotIClonesGline = true;
-		IClonesGline = (atoi(SQLDb->GetValue(i,1)) == 1);
+		IClonesGline = (atoi(SQLDb->GetValue(i,1).c_str()) == 1);
 		}
 	else if(!strcasecmp(SQLDb->GetValue(i,0),"GTime"))
 		{
 		gotGLen = true;
-		maxGlineLen = atoi(SQLDb->GetValue(i,1));
+		maxGlineLen = atoi(SQLDb->GetValue(i,1).c_str());
 		}
 
 	else if(!strcasecmp(SQLDb->GetValue(i,0),"SGline"))
 		{
 		gotSave = true;
-		saveGlines = (atoi(SQLDb->GetValue(i,1)) == 1);
+		saveGlines = (atoi(SQLDb->GetValue(i,1).c_str()) == 1);
 		}
 
 	}
@@ -4462,9 +4450,9 @@ elog	<< "ccontrol::loadExceptions> "
 	<< theQuery.str().c_str()
 	<< endl; 
 #endif
-ExecStatusType status = SQLDb->Exec( theQuery.str().c_str() ) ;
 
-if( PGRES_TUPLES_OK != status )
+if( !SQLDb->Exec( theQuery, true ) )
+//if( PGRES_TUPLES_OK != status )
 	{
 	elog	<< "ccontrol::loadExceptions> SQL Failure: "
 		<< SQLDb->ErrorMessage()
@@ -4475,15 +4463,16 @@ if( PGRES_TUPLES_OK != status )
 
 ccException *tempException = NULL;
 
-for( int i = 0 ; i < SQLDb->Tuples() ; i++ )
+for( unsigned int i = 0 ; i < SQLDb->Tuples() ; i++ )
 	{
 	tempException =  new (std::nothrow) ccException(SQLDb);
 	assert( tempException != 0 ) ;
 
 	tempException->setHost(SQLDb->GetValue(i,0));
-	tempException->setConnections(atoi(SQLDb->GetValue(i,1)));
+	tempException->setConnections(atoi(SQLDb->GetValue(i,1).c_str()));
 	tempException->setAddedBy(SQLDb->GetValue(i,2)) ;
-	tempException->setAddedOn(static_cast< time_t >( atoi( SQLDb->GetValue(i,3) ) )) ;
+	tempException->setAddedOn(static_cast< time_t >(
+		atoi( SQLDb->GetValue(i,3).c_str() ) )) ;
 	tempException->setReason(SQLDb->GetValue(i,4));
 	exceptionList.push_back(tempException);
 	}
@@ -4606,9 +4595,8 @@ elog	<< "ccontrol::loadCommands> "
 	<< endl; 
 #endif
 
-ExecStatusType status = SQLDb->Exec( theQuery.str().c_str() ) ;
-
-if( PGRES_TUPLES_OK != status )
+if( !SQLDb->Exec( theQuery, true ) )
+//if( PGRES_TUPLES_OK != status )
 	{
 	elog	<< "ccontrol::loadCommands> SQL Failure: "
 		<< SQLDb->ErrorMessage()
@@ -4619,7 +4607,7 @@ if( PGRES_TUPLES_OK != status )
 
 Command* NewCom;
 
-for( int i = 0 ; i < SQLDb->Tuples() ; i++ )
+for( unsigned int i = 0 ; i < SQLDb->Tuples() ; i++ )
 	{
 	NewCom = findRealCommand(SQLDb->GetValue(i,0));
 	if(!NewCom)
@@ -4674,9 +4662,9 @@ elog	<< "ccontrol::updateCommands> "
 	<< theQuery.str().c_str()
 	<< endl; 
 #endif
-ExecStatusType status = SQLDb->Exec( theQuery.str().c_str() ) ;
 
-if( PGRES_COMMAND_OK != status )
+if( !SQLDb->Exec( theQuery ) )
+//if( PGRES_COMMAND_OK != status )
 	{
 	elog	<< "ccontrol::updateCommands> SQL Failure: "
 		<< SQLDb->ErrorMessage()
@@ -4723,10 +4711,8 @@ theQuery	<< Main
 		<< string_lower(removeSqlChars(Comm->getRealName()))
 		<< "'" << ends;
 
-
-ExecStatusType status = SQLDb->Exec( theQuery.str().c_str() ) ;
-
-if( PGRES_TUPLES_OK != status )
+if( !SQLDb->Exec( theQuery, true ) )
+//if( PGRES_TUPLES_OK != status )
 	{
 	elog	<< "ccontrol::LoadCommand> SQL Failure: "
 		<< SQLDb->ErrorMessage()
@@ -4743,7 +4729,7 @@ else
 	Comm->Enable();
 Comm->setNeedOp((!strcasecmp(SQLDb->GetValue(0,4),"t")) ? true : false);
 Comm->setNoLog((!strcasecmp(SQLDb->GetValue(0,5),"t")) ? true : false);
-Comm->setMinLevel(atoi(SQLDb->GetValue(0,6)));
+Comm->setMinLevel(atoi(SQLDb->GetValue(0,6).c_str()));
 
 return true;
 
@@ -4791,8 +4777,8 @@ return NewString;
 
 void ccontrol::checkDbConnection()
 {
-
-if(SQLDb->Status() == CONNECTION_BAD) //Check if the connection had died
+if( SQLDb->ConnectionBad() )
+//if(SQLDb->Status() == CONNECTION_BAD) //Check if the connection had died
 	{
 	delete(SQLDb);
 	dbConnected = false;
@@ -4810,7 +4796,12 @@ if(SQLDb->Status() == CONNECTION_BAD) //Check if the connection had died
 		{
 		Query += (" password=" + sqlPass);
 		}
-	SQLDb = new (std::nothrow) cmDatabase(Query.c_str());
+	SQLDb = new dbHandle( sqlHost,
+		atoi( sqlPort.c_str() ),
+		sqlDb,
+		sqlUser,
+		sqlPass ) ;
+//	SQLDb = new (std::nothrow) cmDatabase(Query.c_str());
 	assert(SQLDb != NULL);
 	
 	if(SQLDb->ConnectionBad())
@@ -4838,9 +4829,8 @@ if(SQLDb->Status() == CONNECTION_BAD) //Check if the connection had died
 	
 }
 
-void ccontrol::updateSqldb(PgDatabase* _SQLDb)
+void ccontrol::updateSqldb(dbHandle* _SQLDb)
 {
-
 for(glineIterator ptr = glineList.begin();ptr != glineList.end();++ptr) 
 	{
 	(ptr->second)->setSqldb(_SQLDb);
@@ -4966,9 +4956,8 @@ elog    << "ccotrol::updateMisc> "
         << endl; 
 #endif
 
-ExecStatusType status = SQLDb->Exec( theQuery.str().c_str() ) ;
-
-if (PGRES_TUPLES_OK != status)
+if( !SQLDb->Exec( theQuery, true ) )
+//if (PGRES_TUPLES_OK != status)
         {
         elog << "Error update misc table : " << SQLDb->ErrorMessage() << endl;
 	return false;
@@ -4981,9 +4970,8 @@ if(SQLDb->Tuples() == 0)
 		<< Value <<")"
 		<< ends;
 
-	status = SQLDb->Exec( insertQ.str().c_str() ) ;
-
-	if (PGRES_COMMAND_OK != status)
+	if( !SQLDb->Exec( insertQ ) )
+//	if (PGRES_COMMAND_OK != status)
     		{
 		return false;
 	        }
@@ -4997,9 +4985,8 @@ else
 		<< varName << "'"
 		<< ends;
 
-	status = SQLDb->Exec( updateQ.str().c_str() ) ;
-
-	if (PGRES_COMMAND_OK != status)
+	if( !SQLDb->Exec( updateQ ) )
+//	if (PGRES_COMMAND_OK != status)
     		{
 		elog << "Error update misc table : " << SQLDb->ErrorMessage() << endl;
 		return false;
@@ -5270,9 +5257,8 @@ if(maxUsers < curUsers)
 		<< DelQuery.str().c_str()
 		<< endl; 
 #endif
-	ExecStatusType status = SQLDb->Exec( DelQuery.str().c_str() ) ;
-
-	if( PGRES_COMMAND_OK != status )
+	if( !SQLDb->Exec( DelQuery ) )
+//	if( PGRES_COMMAND_OK != status )
 		{
 		elog	<< "ccontrol::checkMaxUsers> SQL Failure: "
 			<< SQLDb->ErrorMessage()
@@ -5296,8 +5282,8 @@ elog		<< "ccontrol::addVersion> "
 		<< endl; 
 #endif
 
-ExecStatusType status = SQLDb->Exec( VerQuery.str().c_str() ) ;
-if( PGRES_COMMAND_OK != status )
+if( !SQLDb->Exec( VerQuery ) )
+//if( PGRES_COMMAND_OK != status )
 	{
 	elog	<< "ccontrol::addVersion> SQL Failure: "
 		<< SQLDb->ErrorMessage()
@@ -5324,7 +5310,7 @@ for(;ptr != VersionsList.end();)
 
 string delS = "DELETE FROM misc WHERE VarName = 'Version' AND lower(Value5) = '" 
 		+ string_lower(removeSqlChars(oldVer)) + "'";
-return (PGRES_COMMAND_OK == SQLDb->Exec(delS.c_str()));
+return SQLDb->Exec(delS);
 return true;
 }
 
@@ -5354,8 +5340,8 @@ ups 	<< "UPDATE misc SET Value1 = "
         << " WHERE VarName = 'CheckVer'"
 	<< ends;
 
-ExecStatusType status = SQLDb->Exec( ups.str().c_str() ) ;
-if( PGRES_COMMAND_OK != status )
+if( !SQLDb->Exec( ups ) )
+//if( PGRES_COMMAND_OK != status )
 	{
 	elog	<< "ccontrol::updateCheckVer> SQL Failure: "
 		<< SQLDb->ErrorMessage()

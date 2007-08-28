@@ -2,12 +2,13 @@
 #include <sstream>
 #include <iostream>
 
-#include "libpq++.h"
+#include "dbHandle.h"
 
 #include "ELog.h"
 
 #include "constants.h"
 #include "sqlFakeClient.h"
+#include	"misc.h"
 
 namespace gnuworld {
 
@@ -19,7 +20,7 @@ using std::stringstream;
 
 const sqlFakeClient::flagType sqlFakeClient::F_ACTIVE	= 0x0001 ;
 
-sqlFakeClient::sqlFakeClient(PgDatabase *_SQLDb) :
+sqlFakeClient::sqlFakeClient(dbHandle *_SQLDb) :
 	id(0),
 	nickname(),
 	username(),
@@ -78,7 +79,7 @@ fakeInsert	<< "INSERT INTO fakeclients VALUES ("
 		<< ")"
 		;
 
-if(!SQLDb->ExecCommandOk(fakeInsert.str().c_str())) {
+if(!SQLDb->Exec(fakeInsert)) {
 	return false;
 }
 
@@ -88,9 +89,9 @@ if(!SQLDb->ExecCommandOk(fakeInsert.str().c_str())) {
 stringstream selectFake;
 selectFake	<< sql::fakeclients;
 
-ExecStatusType status = SQLDb->Exec(selectFake.str().c_str());
-
-if( status != PGRES_TUPLES_OK ) return false;
+if( !SQLDb->Exec(selectFake, true ) )
+//if( status != PGRES_TUPLES_OK )
+	return false;
 
 setAllMembers(0);
 

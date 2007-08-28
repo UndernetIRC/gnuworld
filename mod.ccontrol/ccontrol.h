@@ -16,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccontrol.h,v 1.101 2007/03/16 12:07:52 mrbean_ Exp $
+ * $Id: ccontrol.h,v 1.102 2007/08/28 16:10:08 dan_karrels Exp $
  */
 
 #ifndef __CCONTROL_H
-#define __CCONTROL_H "$Id: ccontrol.h,v 1.101 2007/03/16 12:07:52 mrbean_ Exp $"
+#define __CCONTROL_H "$Id: ccontrol.h,v 1.102 2007/08/28 16:10:08 dan_karrels Exp $"
 
 //Undef this if you want to log to the database
 #define LOGTOHD 
@@ -41,7 +41,7 @@
 #include	"server.h"
 #include	"CControlCommands.h"
 #include	"Channel.h"
-#include	"libpq++.h"
+#include	"dbHandle.h"
 #include        "match.h"
 #include	"md5hash.h" 
 #include        "ccUser.h"
@@ -73,15 +73,16 @@ using namespace std;
  *  Sublcass the postgres API to create our own accessor
  *  to get at the PID information.
  */
-
-class cmDatabase : public PgDatabase
+/*
+class cmDatabase : public dbHandle
 {
 public:
 	cmDatabase(const string& conninfo)
-	 : PgDatabase(conninfo.c_str()) {}
+	 : dbHandle(conninfo.c_str()) {}
 	virtual ~cmDatabase() {}
 
 };
+*/
 
 /// Forward declaration of command handler class
 class Command ;
@@ -599,7 +600,7 @@ public:
 	
 	void checkDbConnection();
 	
-	void updateSqldb(PgDatabase*);
+	void updateSqldb(dbHandle*);
 	
 	void showStatus(iClient*);
 	
@@ -881,7 +882,7 @@ public:
 	/**
 	 * PostgreSQL Database
 	 */
-	cmDatabase* SQLDb;
+	dbHandle* SQLDb;
 
 	/* TimerID - Posts the daily log to the abuse team  */
 	gnuworld::xServer::timerID postDailyLog;

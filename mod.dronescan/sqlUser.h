@@ -18,11 +18,11 @@
  */
 
 #ifndef SQLUSER_H
-#define SQLUSER_H
+#define SQLUSER_H "$Id: sqlUser.h,v 1.4 2007/08/28 16:10:14 dan_karrels Exp $"
 
 #include <string>
 
-class PgDatabase;
+#include	"dbHandle.h"
 
 namespace gnuworld {
 
@@ -32,7 +32,7 @@ using std::string;
 
 class sqlUser {
 public:
-	sqlUser(PgDatabase*);
+	sqlUser(dbHandle*);
 	virtual ~sqlUser();
 
 	typedef unsigned int flagType;
@@ -101,7 +101,7 @@ protected:
 	unsigned int	flags;
 	unsigned int	access;
 
-	PgDatabase*	SQLDb;
+	dbHandle*	SQLDb;
 }; // class sqlUser
 
 } // namespace ds

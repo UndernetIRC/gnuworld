@@ -18,7 +18,7 @@
  */
 
 #ifndef DRONESCAN_H
-#define DRONESCAN_H
+#define DRONESCAN_H "$Id: dronescan.h,v 1.32 2007/08/28 16:10:14 dan_karrels Exp $"
 
 #include <map>
 #include <string>
@@ -27,10 +27,8 @@
 
 #include "clientData.h"
 #include "jfChannel.h"
+#include	"dbHandle.h"
 #include "glineData.h"
-
-
-class PgDatabase;
 
 namespace gnuworld {
 
@@ -188,7 +186,7 @@ public:
 	bool preloadExceptionalChannels();
 	
 	/* Allow commands access to the database pointer */
-	inline PgDatabase *getSqlDb()
+	inline dbHandle *getSqlDb()
 		{ return SQLDb; }
 
 	inline const DS_STATE getCurrentState()
@@ -265,7 +263,7 @@ protected:
 	EConfig *dronescanConfig;
 
 	/** Our database instance */
-	PgDatabase *SQLDb;
+	dbHandle *SQLDb;
 
 	/** Configuration variables. */
 	std::string consoleChannel;

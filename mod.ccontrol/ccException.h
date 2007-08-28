@@ -16,17 +16,17 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccException.h,v 1.9 2003/06/28 01:21:19 dan_karrels Exp $
+ * $Id: ccException.h,v 1.10 2007/08/28 16:10:06 dan_karrels Exp $
  */
 
 #ifndef __CCEXCEPTION_H
-#define __CCEXCEPTION_H "$Id: ccException.h,v 1.9 2003/06/28 01:21:19 dan_karrels Exp $"
+#define __CCEXCEPTION_H "$Id: ccException.h,v 1.10 2007/08/28 16:10:06 dan_karrels Exp $"
 
 #include	<string>
 
 #include	<ctime>
 
-#include	"libpq++.h"
+#include	"dbHandle.h"
 
 #include	"match.h"
 
@@ -40,9 +40,8 @@ namespace uworld
 
 class ccException
 {
-public:
-	
-	ccException(PgDatabase* _SQLDb);
+public:	
+	ccException(dbHandle* _SQLDb);
 	virtual ~ccException();
 	
 	inline bool operator==( const string& ExceptionHost ) const
@@ -79,7 +78,7 @@ public:
 	inline void 		setReason( const string& _Reason ) 
 		{ Reason = _Reason; }
 
-	inline void		setSqldb(PgDatabase* _SQLDb)
+	inline void		setSqldb(dbHandle* _SQLDb)
 		{ SQLDb = _SQLDb; }
 		
 	int		loadData(const string& Host);
@@ -99,7 +98,7 @@ protected:
 	string 		AddedBy;
 	time_t		AddedOn;
 	string 		Reason;
-	PgDatabase* SQLDb;
+	dbHandle* SQLDb;
 
 }; 
 }

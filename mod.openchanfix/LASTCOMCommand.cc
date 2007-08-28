@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: LASTCOMCommand.cc,v 1.2 2006/12/22 06:41:44 kewlio Exp $
+ * $Id: LASTCOMCommand.cc,v 1.3 2007/08/28 16:10:21 dan_karrels Exp $
  */
 
 #include	<sstream>
@@ -45,7 +45,7 @@
 #include	"ELog.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: LASTCOMCommand.cc,v 1.2 2006/12/22 06:41:44 kewlio Exp $" ) ;
+RCSTAG( "$Id: LASTCOMCommand.cc,v 1.3 2007/08/28 16:10:21 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {
@@ -60,7 +60,7 @@ unsigned int NumOfCom;
 unsigned int Days = 0;
 std::stringstream theQuery;
 
-PgDatabase* cacheCon = bot->theManager->getConnection();
+dbHandle* cacheCon = bot->theManager->getConnection();
 
 if (st.size() == 1 ) {
   NumOfCom = 20;
@@ -99,7 +99,7 @@ elog	<< "chanfix::LASTCOM> "
 	<< theQuery.str().c_str() 
 	<< std::endl;
 	
-if (!cacheCon->ExecTuplesOk(theQuery.str().c_str())) {
+if (!cacheCon->Exec(theQuery,true)) {
   elog	<< "chanfix::LASTCOM> SQL Error: "
 	<< cacheCon->ErrorMessage()
 	<< std::endl ;
@@ -113,8 +113,12 @@ bot->SendTo(theClient,
                              std::string("Listing last %d messages from day %d.")).c_str(),
 			     NumOfCom,Days);
 
+// TODO: Fix this warning
 for (int i = (cacheCon->Tuples() - 1) ; i >= 0; i--) {
-  bot->SendTo(theClient,"[ %s - %s ] %s",bot->convertToAscTime(atoi(cacheCon->GetValue(i, 0))),cacheCon->GetValue(i,1),cacheCon->GetValue(i,2));
+  bot->SendTo(theClient,"[ %s - %s ] %s",
+	bot->convertToAscTime(atoi(cacheCon->GetValue(i, 0))),
+	cacheCon->GetValue(i,1).c_str(),
+	cacheCon->GetValue(i,2).c_str());
 }
 
 bot->SendTo(theClient,

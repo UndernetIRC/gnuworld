@@ -16,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: chanfix.h,v 1.7 2006/12/31 17:29:20 buzlip01 Exp $
+ * $Id: chanfix.h,v 1.8 2007/08/28 16:10:22 dan_karrels Exp $
  */
 
 #ifndef __CHANFIX_H
-#define __CHANFIX_H "$Id: chanfix.h,v 1.7 2006/12/31 17:29:20 buzlip01 Exp $"
+#define __CHANFIX_H "$Id: chanfix.h,v 1.8 2007/08/28 16:10:22 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
@@ -231,11 +231,11 @@ public:
 	void checkNetwork();
 	void checkChannelServiceLink(iServer*, const eventType&);
 	void findChannelService();
-	const int chanfix::getLastFix(sqlChannel*);
+	const int getLastFix(sqlChannel*);
 
-	void chanfix::insertop(sqlChanOp*, sqlChannel*);
-	bool chanfix::findop(sqlChanOp*, sqlChannel*);
-	void chanfix::removechan(sqlChannel*);
+	void insertop(sqlChanOp*, sqlChannel*);
+	bool findop(sqlChanOp*, sqlChannel*);
+	void removechan(sqlChannel*);
 
 	bool simFix(sqlChannel*, bool, time_t, iClient*, sqlcfUser*);
 	bool simulateFix(sqlChannel*, bool, iClient*, sqlcfUser*);

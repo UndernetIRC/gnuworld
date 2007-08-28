@@ -17,11 +17,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: sqlChannel.h,v 1.46 2007/08/06 13:51:47 kewlio Exp $
+ * $Id: sqlChannel.h,v 1.47 2007/08/28 16:10:12 dan_karrels Exp $
  */
 
 #ifndef __SQLCHANNEL_H
-#define __SQLCHANNEL_H "$Id: sqlChannel.h,v 1.46 2007/08/06 13:51:47 kewlio Exp $"
+#define __SQLCHANNEL_H "$Id: sqlChannel.h,v 1.47 2007/08/28 16:10:12 dan_karrels Exp $"
 
 #include	<string>
 #include	<map>
@@ -30,7 +30,7 @@
 
 #include	<ctime>
 
-#include	"libpq++.h"
+#include	"dbHandle.h"
 #include	"sqlBan.h"
 
 namespace gnuworld
@@ -44,7 +44,7 @@ class sqlChannel
 {
 
 public:
-	sqlChannel(PgDatabase*) ;
+	sqlChannel(dbHandle*) ;
 	virtual ~sqlChannel() ;
 
 	typedef unsigned int	flagType ;
@@ -313,7 +313,7 @@ protected:
 	unsigned int limit_max;
 	unsigned int max_bans;
 
-	PgDatabase*	SQLDb;
+	dbHandle*	SQLDb;
 
  } ;
 

@@ -18,12 +18,12 @@
  */
 
 #ifndef CF_CHANFIX_H
-#define CF_CHANFIX_H
+#define CF_CHANFIX_H "$Id: chanfix.h,v 1.9 2007/08/28 16:10:08 dan_karrels Exp $"
 
-#include <string>
+#include	<string>
+#include	<map>
 
 #include "client.h"
-#include "gw_hashmap.h"
 
 #include "logging.h"
 
@@ -42,7 +42,6 @@ public:
 	/** Destructor. */
 	virtual ~chanfix();
 
-
 	/*************************************
 	 * X C L I E N T   F U N C T I O N S *
 	 *************************************/
@@ -54,14 +53,12 @@ public:
 		const std::string& , bool );
 	virtual void OnTimer( const TimerHandler::timerID& , void* );
 
-
 	/***************************
 	 * C H A N F I X   M I S C *
 	 ***************************/
 	virtual void log(const logging::loglevel&, const char*, ... );
 	virtual void log(const logging::loglevel&, const std::string&);
 	virtual void setConsoleTopic();
-
 
 	/***************************
 	 * C H A N F I X   C O R E *
@@ -70,20 +67,16 @@ public:
 	virtual cfChannel* getChannel(const std::string&,
 			bool create = false);
 
-
 protected:
 	/***********************
 	 * C O N T A I N E R S *
 	 ***********************/
-
-	 typedef HASHMAP< std::string , cfChannel* > mapChannels;
+	 typedef std::map< std::string , cfChannel* > mapChannels;
 	 mapChannels channels;
-
 
 	/*************************
 	 * C O N F I G   V A R S *
 	 *************************/
-
 	/** Name of our console channel. */
 	std::string confConsoleChannel;
 	/** Modes of our console channel. */
@@ -101,21 +94,18 @@ protected:
 	/** Duration to wait between linking and counting. */
 	unsigned short confStartDelay;
 
-
 	/***************
 	 * T I M E R S *
 	 ***************/
-
 	/** Counting timer. */
 	xServer::timerID timerCount;
-
 
 	/*******************
 	 * C O M M A N D S *
 	 *******************/
 
 	/** Type of the commandMap. */
-	typedef HASHMAP< std::string , Command* > commandMapType;
+	typedef std::map< std::string , Command* > commandMapType;
 	/** Convenience type when creating a new command pair. */
 	typedef commandMapType::value_type commandPairType;
 	/** Map holding all available bot commands. */

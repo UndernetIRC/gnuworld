@@ -16,16 +16,16 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
  * USA.
  *
- * $Id: sqlChannel.h,v 1.5 2006/12/22 04:16:03 buzlip01 Exp $
+ * $Id: sqlChannel.h,v 1.6 2007/08/28 16:10:25 dan_karrels Exp $
  */
 
 #ifndef __SQLCHANNEL_H
-#define __SQLCHANNEL_H "$Id: sqlChannel.h,v 1.5 2006/12/22 04:16:03 buzlip01 Exp $"
+#define __SQLCHANNEL_H "$Id: sqlChannel.h,v 1.6 2007/08/28 16:10:25 dan_karrels Exp $"
 
 #include	<string>
 #include	<ctime>
 #include	"client.h"
-#include	"libpq++.h"
+#include	"dbHandle.h"
 
 namespace gnuworld
 {
@@ -39,7 +39,6 @@ class sqlManager;
 class sqlChannel
 {
 public:
-
 	sqlChannel(sqlManager*);
 	virtual ~sqlChannel();
 
@@ -167,7 +166,7 @@ public:
 	bool Insert();
 	bool Delete();
 	bool commit();
-	void setAllMembers(PgDatabase*, int);
+	void setAllMembers(dbHandle*, int);
 
 	/** Static member for keeping track of max user id */
 	static unsigned long int maxUserId;

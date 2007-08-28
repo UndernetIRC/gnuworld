@@ -27,7 +27,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ACCESSCommand.cc,v 1.47 2005/09/29 15:21:56 kewlio Exp $
+ * $Id: ACCESSCommand.cc,v 1.48 2007/08/28 16:10:09 dan_karrels Exp $
  */
 
 #include	<string>
@@ -37,13 +37,13 @@
 #include	"StringTokenizer.h"
 #include	"ELog.h"
 #include	"cservice.h"
-#include	"libpq++.h"
+#include	"dbHandle.h"
 #include	"match.h"
 #include	"responses.h"
 #include	"cservice_config.h"
 #include	"Network.h"
 
-const char ACCESSCommand_cc_rcsId[] = "$Id: ACCESSCommand.cc,v 1.47 2005/09/29 15:21:56 kewlio Exp $" ;
+const char ACCESSCommand_cc_rcsId[] = "$Id: ACCESSCommand.cc,v 1.48 2007/08/28 16:10:09 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -269,8 +269,8 @@ theQuery	<< queryHeader
  *  All done, display the output. (Only fetch 15 results).
  */
 
-ExecStatusType status = bot->SQLDb->Exec( theQuery.str().c_str() ) ;
-if( PGRES_TUPLES_OK != status )
+if( !bot->SQLDb->Exec( theQuery, true ) )
+//if( PGRES_TUPLES_OK != status )
 	{
 	elog	<< "ACCESS> SQL Error: "
 		<< bot->SQLDb->ErrorMessage()
@@ -315,7 +315,7 @@ if (matchString[0] == '=')
 	}
 
 
-for (int i = 0 ; i < bot->SQLDb->Tuples(); i++)
+for (unsigned int i = 0 ; i < bot->SQLDb->Tuples(); i++)
 	{
 	autoMode = "None";
 
@@ -351,14 +351,14 @@ for (int i = 0 ; i < bot->SQLDb->Tuples(); i++)
 
 		bot->Notice(theClient,
 			bot->getResponse(theUser, language::user_access_is).c_str(),
-			bot->SQLDb->GetValue(i, 1),
-			bot->SQLDb->GetValue(i, 2),
+			bot->SQLDb->GetValue(i, 1).c_str(),
+			bot->SQLDb->GetValue(i, 2).c_str(),
 			bot->userStatusFlags(bot->SQLDb->GetValue(i, 1)).c_str()
 		);
 
 		bot->Notice(theClient,
 			bot->getResponse(theUser, language::channel_automode_is).c_str(),
-			bot->SQLDb->GetValue(i, 0),
+			bot->SQLDb->GetValue(i, 0).c_str(),
 			autoMode.c_str()
 		);
 
@@ -384,7 +384,7 @@ for (int i = 0 ; i < bot->SQLDb->Tuples(); i++)
 			bot->Notice(theClient,
 				bot->getResponse(theUser,
 					language::last_mod).c_str(),
-				bot->SQLDb->GetValue(i, 7),
+				bot->SQLDb->GetValue(i, 7).c_str(),
 				bot->prettyDuration(atoi(bot->SQLDb->GetValue(i,6))).c_str()
 			);
 			}

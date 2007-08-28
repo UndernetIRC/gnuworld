@@ -16,15 +16,15 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: sqlBan.h,v 1.6 2003/06/28 01:21:20 dan_karrels Exp $
+ * $Id: sqlBan.h,v 1.7 2007/08/28 16:10:12 dan_karrels Exp $
  */
 
 #ifndef __SQLBAN_H
-#define __SQLBAN_H "$Id: sqlBan.h,v 1.6 2003/06/28 01:21:20 dan_karrels Exp $"
+#define __SQLBAN_H "$Id: sqlBan.h,v 1.7 2007/08/28 16:10:12 dan_karrels Exp $"
 
 #include	<string>
 #include	<ctime>
-#include	"libpq++.h"
+#include	"dbHandle.h"
  
 using std::string ;
 
@@ -35,7 +35,7 @@ class sqlBan
 {
 
 public:
-	sqlBan(PgDatabase*) ;
+	sqlBan(dbHandle*) ;
 	virtual ~sqlBan() ;
  
 	/*
@@ -112,7 +112,7 @@ protected:
 	string		reason ; 
 	time_t		last_updated ;
  
-	PgDatabase*	SQLDb;
+	dbHandle*	SQLDb;
 } ;
 
 } 

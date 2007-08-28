@@ -16,17 +16,17 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccServer.h,v 1.8 2004/03/25 20:55:40 mrbean_ Exp $
+ * $Id: ccServer.h,v 1.9 2007/08/28 16:10:07 dan_karrels Exp $
  */
 
 #ifndef __CCSERVER_H
-#define __CCSERVER_H "$Id: ccServer.h,v 1.8 2004/03/25 20:55:40 mrbean_ Exp $"
+#define __CCSERVER_H "$Id: ccServer.h,v 1.9 2007/08/28 16:10:07 dan_karrels Exp $"
 
 #include	<string>
 
 #include	<ctime>
 
-#include	"libpq++.h"
+#include	"dbHandle.h"
 #include	"iServer.h"
 
 namespace gnuworld
@@ -40,7 +40,7 @@ namespace uworld
 class ccServer
 {
 public:
-	ccServer(PgDatabase*);
+	ccServer(dbHandle*);
 	virtual ~ccServer();
 	//Mehods for getting info
 	
@@ -113,7 +113,7 @@ public:
 	inline void		setReportMissing( const bool _ReportMissing )
 		{ ReportMissing = _ReportMissing; }
 		
-	inline void 		setSqldb(PgDatabase* _SQLDb)
+	inline void 		setSqldb(dbHandle* _SQLDb)
 		{ SQLDb = _SQLDb; }
 		
 	//Methods for updating 
@@ -144,7 +144,7 @@ protected:
 	time_t LastUpdated;
 	iServer* NetServer;
 	bool ReportMissing;
-	PgDatabase* SQLDb;
+	dbHandle* SQLDb;
 
 }; // class ccServer
 }

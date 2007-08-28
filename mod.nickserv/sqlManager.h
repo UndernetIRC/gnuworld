@@ -23,7 +23,7 @@
 #include <string>
 #include <vector>
 
-#include "libpq++.h"
+#include "dbHandle.h"
 
 #include "Logger.h"
 #include "Stats.h"
@@ -44,10 +44,10 @@ class sqlManager {
     static sqlManager* getInstance(const string&, int);
 
     /** Allow checking out of database connections */
-    PgDatabase* getConnection();
+    dbHandle* getConnection();
 
     /** Allow checking in of database connections */
-    void removeConnection(PgDatabase*);
+    void removeConnection(dbHandle*);
 
     /** Flush the current commit queue to the database */
     void flush();
@@ -73,7 +73,7 @@ class sqlManager {
     string dbString;
 
     /** Our PgDatabase instance */
-    PgDatabase* SQLDb;
+    dbHandle* SQLDb;
 
     /** The type used for the commit queue */
     typedef vector< string > commitQueueType;

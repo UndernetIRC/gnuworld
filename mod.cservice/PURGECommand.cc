@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: PURGECommand.cc,v 1.16 2003/06/28 01:21:20 dan_karrels Exp $
+ * $Id: PURGECommand.cc,v 1.17 2007/08/28 16:10:11 dan_karrels Exp $
  */
 
 #include	<string>
@@ -34,12 +34,12 @@
 #include	"ELog.h"
 #include	"cservice.h"
 #include	"levels.h"
-#include	"libpq++.h"
+#include	"dbHandle.h"
 #include	"Network.h"
 #include	"responses.h"
 #include	"cservice_config.h"
 
-const char PURGECommand_cc_rcsId[] = "$Id: PURGECommand.cc,v 1.16 2003/06/28 01:21:20 dan_karrels Exp $" ;
+const char PURGECommand_cc_rcsId[] = "$Id: PURGECommand.cc,v 1.17 2007/08/28 16:10:11 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -131,19 +131,18 @@ managerQuery	<< "SELECT users.user_name,users.email "
 		<< endl;
 #endif
 
-ExecStatusType status = bot->SQLDb->Exec(managerQuery.str().c_str()) ;
-
 string manager = "No Manager";
 string managerEmail = "No Email Address";
 
-if( status != PGRES_TUPLES_OK )
+if( !bot->SQLDb->Exec(managerQuery, true ) )
+//if( status != PGRES_TUPLES_OK )
 	{
 	elog	<< "PURGE> SQL Error: "
 		<< bot->SQLDb->ErrorMessage()
 		<< endl ;
 	return false ;
 	}
-		else
+else
 	{
 		if (bot->SQLDb->Tuples() != 0)
 		{
@@ -183,9 +182,8 @@ elog	<< "sqlQuery> "
 		<< endl;
 #endif
 
-status = bot->SQLDb->Exec(theQuery.str().c_str()) ;
-
-if( status != PGRES_COMMAND_OK )
+if( !bot->SQLDb->Exec(theQuery ) )
+//if( status != PGRES_COMMAND_OK )
 	{
 	elog	<< "PURGE> SQL Error: "
 		<< bot->SQLDb->ErrorMessage()

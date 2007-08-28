@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-# "$Id: Makefile.am,v 1.10 2007/03/26 16:09:36 kewlio Exp $"
+# "$Id: Makefile.am,v 1.11 2007/08/28 16:10:21 dan_karrels Exp $"
 
 lib_LTLIBRARIES = libchanfix.la
 
@@ -52,13 +52,12 @@ libchanfix_la_SOURCES = chanfix.cc \
 	sqlManager.cc \
 	sqlcfUser.cc
 
-libchanfix_la_CXXFLAGS = -I$(PGSQL_INCLUDE) -I${top_srcdir}/include \
+libchanfix_la_CXXFLAGS = -I$(top_srcdir)db -I${top_srcdir}/include \
 	-I${top_srcdir}/libgnuworld \
-	-DHAVE_NAMESPACE_STD -DHAVE_CXX_STRING_HEADER -DDLLIMPORT="" \
 	$(threadLib)
 
-libchanfix_la_LDFLAGS = -module -export-dynamic -L@PGSQL_LIB@ -lpq++ \
-	@BOOST_THREAD_LIB@
+libchanfix_la_LDFLAGS = -module -export-dynamic -L$(top_builddir)/db \
+	-lgnuworldDB @BOOST_THREAD_LIB@
 
 EXTRA_DIST = chanfix.h \
 	chanfixCommands.h \

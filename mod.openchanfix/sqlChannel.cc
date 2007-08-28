@@ -18,13 +18,13 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
  * USA.
  *
- * $Id: sqlChannel.cc,v 1.4 2006/12/09 00:29:19 buzlip01 Exp $
+ * $Id: sqlChannel.cc,v 1.5 2007/08/28 16:10:25 dan_karrels Exp $
  */
 
 #include	<sstream>
 #include	<string>
 
-#include	"libpq++.h"
+#include	"dbHandle.h"
 
 #include	"ELog.h"
 #include	"misc.h"
@@ -69,7 +69,7 @@ sqlChannel::sqlChannel(sqlManager* _myManager) :
   myManager = _myManager;
 }
 
-void sqlChannel::setAllMembers(PgDatabase* theDB, int row)
+void sqlChannel::setAllMembers(dbHandle* theDB, int row)
 {
   id = atoi(theDB->GetValue(row, 0));
   channel = theDB->GetValue(row, 1);
@@ -85,7 +85,7 @@ void sqlChannel::setAllMembers(PgDatabase* theDB, int row)
 bool sqlChannel::Insert()
 {
 /* Get a connection instance to our backend */
-PgDatabase* cacheCon = myManager->getConnection();
+dbHandle* cacheCon = myManager->getConnection();
 
 /* Grab the next available user id */
 id = ++maxUserId;
@@ -102,7 +102,7 @@ insertString    << "INSERT INTO channels "
 		<< ")"
 		;
 
-if (!cacheCon->ExecCommandOk(insertString.str().c_str())) {
+if (!cacheCon->Exec(insertString)) {
   elog	<< "sqlChannel::Insert> Something went wrong: "
 	<< cacheCon->ErrorMessage()
 	<< std::endl;
@@ -123,7 +123,7 @@ bool sqlChannel::Delete()
 bool retval = false;
 
 /* Get a connection instance to our backend */
-PgDatabase* cacheCon = myManager->getConnection();
+dbHandle* cacheCon = myManager->getConnection();
 
 /* Create the DELETE statement */
 std::stringstream deleteString;
@@ -131,7 +131,7 @@ deleteString    << "DELETE FROM channels "
 		<< "WHERE id = '" << id << "'"
 		;
 
-if (!cacheCon->ExecCommandOk(deleteString.str().c_str())) {
+if (!cacheCon->Exec(deleteString)) {
   elog	<< "sqlChannel::Delete> Something went wrong: "
 	<< cacheCon->ErrorMessage()
 	<< std::endl;
@@ -150,7 +150,7 @@ bool sqlChannel::commit()
 bool retval = false;
 
 /* Get a connection instance to our backend */
-PgDatabase* cacheCon = myManager->getConnection();
+dbHandle* cacheCon = myManager->getConnection();
 
 /* Create the UPDATE statement */
 std::stringstream chanCommit;
@@ -160,7 +160,7 @@ chanCommit	<< "UPDATE channels SET "
 		<< "id = " << id
 		;
 
-if (!cacheCon->ExecCommandOk(chanCommit.str().c_str())) {
+if (!cacheCon->Exec(chanCommit)) {
   elog	<< "sqlChannel::commit> Something went wrong: "
 	<< cacheCon->ErrorMessage()
 	<< std::endl;
@@ -190,7 +190,7 @@ while (num_notes >= MAXNOTECOUNT) {
 }
 
 /* Get a connection instance to our backend */
-PgDatabase* cacheCon = myManager->getConnection();
+dbHandle* cacheCon = myManager->getConnection();
 
 /* Create the INSERT statement */
 std::stringstream theLog;
@@ -209,7 +209,7 @@ theLog	<< "INSERT INTO notes (ts, channelID, user_name, event, message) "
 	<< "')"
 	;
 
-if (!cacheCon->ExecCommandOk(theLog.str().c_str())) {
+if (!cacheCon->Exec(theLog)) {
   elog	<< "sqlChannel::addNote> Something went wrong: "
 	<< cacheCon->ErrorMessage()
 	<< std::endl;
@@ -226,7 +226,7 @@ const std::string sqlChannel::getLastNote(unsigned short eventType, time_t& even
 std::string retval;
 
 /* Get a connection instance to our backend */
-PgDatabase* cacheCon = myManager->getConnection();
+dbHandle* cacheCon = myManager->getConnection();
 
 /* Retrieve the last note */
 std::stringstream queryString;
@@ -238,7 +238,7 @@ queryString	<< "SELECT message,ts"
 		<< " ORDER BY ts DESC LIMIT 1"
 		;
 
-if (cacheCon->ExecTuplesOk(queryString.str().c_str())) {
+if (cacheCon->Exec(queryString,true)) {
   if (cacheCon->Tuples() > 0) {
     std::string note = cacheCon->GetValue(0, 0);
     eventTime = atoi(cacheCon->GetValue(0, 1));
@@ -257,7 +257,7 @@ bool sqlChannel::deleteNote(unsigned int messageId)
 bool retval = false;
 
 /* Get a connection instance to our backend */
-PgDatabase* cacheCon = myManager->getConnection();
+dbHandle* cacheCon = myManager->getConnection();
 
 /* Create the DELETE statement */
 std::stringstream deleteString;
@@ -267,7 +267,7 @@ deleteString	<< "DELETE FROM notes WHERE channelID = "
 		<< messageId
 		;
 
-if (!cacheCon->ExecCommandOk(deleteString.str().c_str())) {
+if (!cacheCon->Exec(deleteString)) {
   elog	<< "sqlChannel::deleteNote> Something went wrong: "
 	<< cacheCon->ErrorMessage()
 	<< std::endl;
@@ -286,7 +286,7 @@ bool sqlChannel::deleteOldestNote()
 bool retval = false;
 
 /* Get a connection instance to our backend */
-PgDatabase* cacheCon = myManager->getConnection();
+dbHandle* cacheCon = myManager->getConnection();
 
 /* Retrieve the id of the oldest note */
 std::stringstream selectString;
@@ -295,7 +295,7 @@ selectString	<< "SELECT id FROM notes WHERE channelID = "
 		<< " ORDER BY ts ASC LIMIT 1"
 		;
 
-if (cacheCon->ExecTuplesOk(selectString.str().c_str())) {
+if (cacheCon->Exec(selectString,true)) {
   if (cacheCon->Tuples() > 0) {
     unsigned int note_id = atoi(cacheCon->GetValue(0, 0));
 
@@ -304,7 +304,7 @@ if (cacheCon->ExecTuplesOk(selectString.str().c_str())) {
 			<< note_id
 			;
 
-    if (cacheCon->ExecTuplesOk(deleteString.str().c_str()))
+    if (cacheCon->Exec(deleteString,true))
       retval = true;
   }
 }
@@ -320,7 +320,7 @@ bool sqlChannel::deleteAllNotes()
 bool retval = false;
 
 /* Get a connection instance to our backend */
-PgDatabase* cacheCon = myManager->getConnection();
+dbHandle* cacheCon = myManager->getConnection();
 
 /* Create the DELETE statement */
 std::stringstream deleteString;
@@ -328,7 +328,7 @@ deleteString	<< "DELETE FROM notes WHERE channelID = "
 		<< id
 		;
 
-if (!cacheCon->ExecCommandOk(deleteString.str().c_str())) {
+if (!cacheCon->Exec(deleteString)) {
   elog	<< "sqlChannel::deleteAllNotes> Something went wrong: "
 	<< cacheCon->ErrorMessage()
 	<< std::endl;
@@ -345,7 +345,7 @@ return retval;
 size_t sqlChannel::countNotes(unsigned short eventType)
 {
 /* Get a connection instance to our backend */
-PgDatabase* cacheCon = myManager->getConnection();
+dbHandle* cacheCon = myManager->getConnection();
 
 /* Count the notes */
 std::stringstream queryString;
@@ -360,7 +360,7 @@ queryString	<< " AND event = "
 
 size_t num_notes = 0;
 
-if (cacheCon->ExecTuplesOk(queryString.str().c_str()))
+if (cacheCon->Exec(queryString,true))
   num_notes = atoi(cacheCon->GetValue(0, 0));
 
 /* Dispose of our connection instance */

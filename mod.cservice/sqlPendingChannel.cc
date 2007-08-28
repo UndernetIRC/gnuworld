@@ -19,7 +19,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: sqlPendingChannel.cc,v 1.9 2003/06/28 01:21:20 dan_karrels Exp $
+ * $Id: sqlPendingChannel.cc,v 1.10 2007/08/28 16:10:12 dan_karrels Exp $
  */
  
 #include	<sstream>
@@ -40,7 +40,7 @@
 #include	"sqlPendingTraffic.h"
  
 const char sqlPendingChannel_h_rcsId[] = __SQLPENDINGCHANNEL_H ;
-const char sqlPendingChannel_cc_rcsId[] = "$Id: sqlPendingChannel.cc,v 1.9 2003/06/28 01:21:20 dan_karrels Exp $" ;
+const char sqlPendingChannel_cc_rcsId[] = "$Id: sqlPendingChannel.cc,v 1.10 2007/08/28 16:10:12 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -49,7 +49,7 @@ using std::endl ;
 using std::ends ;
 using std::stringstream ;
 
-sqlPendingChannel::sqlPendingChannel(PgDatabase* _SQLDb)
+sqlPendingChannel::sqlPendingChannel(dbHandle* _SQLDb)
 :channel_id(0), 
 join_count(0),
 unique_join_count(0),
@@ -89,11 +89,10 @@ theQuery 	<< "SELECT ip_number, join_count FROM pending_traffic"
 		<< endl; 
 #endif
 
-ExecStatusType status = SQLDb->Exec(theQuery.str().c_str()) ;
-
-if( PGRES_TUPLES_OK == status )
+if( SQLDb->Exec(theQuery, true ) )
+//if( PGRES_TUPLES_OK == status )
 	{
-	for (int i = 0 ; i < SQLDb->Tuples(); i++)
+	for (unsigned int i = 0 ; i < SQLDb->Tuples(); i++)
 		{ 
 			unsigned int theIp = atoi(SQLDb->GetValue(i, 0));
 //			elog << "IP: " << theIp << endl;
@@ -146,9 +145,8 @@ queryString << "UPDATE pending SET "
 			<< endl;
 #endif
 
-ExecStatusType status = SQLDb->Exec(queryString.str().c_str()) ;
-
-if( PGRES_COMMAND_OK != status )
+if( !SQLDb->Exec(queryString ) )
+//if( PGRES_COMMAND_OK != status )
 	{
 
 	elog	<< "sqlPendingChannel::commit> Something went wrong: "
@@ -189,9 +187,8 @@ bool sqlPendingChannel::commitSupporter(unsigned int sup_id, unsigned int count)
 				<< endl;
 	#endif
 	
-	ExecStatusType status = SQLDb->Exec(queryString.str().c_str()) ;
-	
-	if( PGRES_COMMAND_OK != status )
+	if( !SQLDb->Exec(queryString ) )
+//	if( PGRES_COMMAND_OK != status )
 		{
 			elog << "sqlPendingChannel::commit> Error updating supporter "
 				 << "record for " << sup_id << endl;

@@ -18,16 +18,16 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: sqlManager.h,v 1.4 2006/12/09 00:29:20 buzlip01 Exp $
+ * $Id: sqlManager.h,v 1.5 2007/08/28 16:10:25 dan_karrels Exp $
  */
 
 #ifndef __SQLMANAGER_H
-#define __SQLMANAGER_H "$Id: sqlManager.h,v 1.4 2006/12/09 00:29:20 buzlip01 Exp $"
+#define __SQLMANAGER_H "$Id: sqlManager.h,v 1.5 2007/08/28 16:10:25 dan_karrels Exp $"
 
 #include <string>
 #include <vector>
 
-#include "libpq++.h"
+#include "dbHandle.h"
 
 namespace gnuworld
 {
@@ -44,10 +44,10 @@ class sqlManager {
     static sqlManager* getInstance(const std::string&);
 
     /** Allow checking out of database connections */
-    PgDatabase* getConnection();
+    dbHandle* getConnection();
 
     /** Allow checking in of database connections */
-    void removeConnection(PgDatabase*);
+    void removeConnection(dbHandle*);
 
     /** Allow removal of theManager */
     void removeManager();
@@ -70,7 +70,7 @@ class sqlManager {
     std::string dbString;
 
     /** Our PgDatabase instance */
-    PgDatabase* SQLDb;
+    dbHandle* SQLDb;
 
     /** The current instance of sqlManager */
     static sqlManager* theManager;

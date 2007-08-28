@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: NOTECommand.cc,v 1.7 2003/06/28 01:21:20 dan_karrels Exp $
+ * $Id: NOTECommand.cc,v 1.8 2007/08/28 16:10:11 dan_karrels Exp $
  */
 
 #include	<string>
@@ -30,7 +30,7 @@
 #include	"cservice.h"
 #include	"cservice_config.h"
 
-const char NOTECommand_cc_rcsId[] = "$Id: NOTECommand.cc,v 1.7 2003/06/28 01:21:20 dan_karrels Exp $" ;
+const char NOTECommand_cc_rcsId[] = "$Id: NOTECommand.cc,v 1.8 2007/08/28 16:10:11 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -137,9 +137,8 @@ if (string_lower(st[1]) == "send")
 				<< endl;
 	#endif
 
-	ExecStatusType status = bot->SQLDb->Exec(queryString.str().c_str()) ;
-
-	if( PGRES_COMMAND_OK != status )
+	if( !bot->SQLDb->Exec(queryString ) )
+//	if( PGRES_COMMAND_OK != status )
 		{
 		elog	<< "sqlBan::commit> Something went wrong: "
 				<< bot->SQLDb->ErrorMessage()
@@ -178,9 +177,8 @@ if (string_lower(st[1]) == "read")
 					<< " ORDER BY notes.last_updated ASC"
 					<< ends;
 
-	ExecStatusType status = bot->SQLDb->Exec( allNotesQuery.str().c_str() ) ;
-
-	if( PGRES_TUPLES_OK != status )
+	if( !bot->SQLDb->Exec( allNotesQuery, true ) )
+//	if( PGRES_TUPLES_OK != status )
 		{
 		elog	<< "SUPPORTCommand> SQL Error: "
 				<< bot->SQLDb->ErrorMessage()
@@ -235,9 +233,8 @@ if (string_lower(st[1]) == "erase")
 					<< endl;
 		#endif
 
-		ExecStatusType status = bot->SQLDb->Exec(queryString.str().c_str()) ;
-
-		if( PGRES_COMMAND_OK != status )
+		if( !bot->SQLDb->Exec(queryString ) )
+//		if( PGRES_COMMAND_OK != status )
 			{
 			bot->Notice(theClient, "An unknown error occured while deleting your notes.");
 			return false;
@@ -271,9 +268,8 @@ if (string_lower(st[1]) == "erase")
 					<< endl;
 		#endif
 
-		ExecStatusType status = bot->SQLDb->Exec(queryString.str().c_str()) ;
-
-		if( PGRES_COMMAND_OK != status )
+		if( !bot->SQLDb->Exec(queryString, true ) )
+//		if( PGRES_COMMAND_OK != status )
 			{
 			bot->Notice(theClient, "An error occured while deleting note-id %i.", messageId);
 			return false;

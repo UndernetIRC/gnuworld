@@ -19,25 +19,24 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: sqlPendingChannel.h,v 1.7 2003/06/28 01:21:20 dan_karrels Exp $
+ * $Id: sqlPendingChannel.h,v 1.8 2007/08/28 16:10:12 dan_karrels Exp $
  */
 
 #ifndef __SQLPENDINGCHANNEL_H
-#define __SQLPENDINGCHANNEL_H "$Id: sqlPendingChannel.h,v 1.7 2003/06/28 01:21:20 dan_karrels Exp $"
+#define __SQLPENDINGCHANNEL_H "$Id: sqlPendingChannel.h,v 1.8 2007/08/28 16:10:12 dan_karrels Exp $"
 
-#include	<string> 
+#include	<map>
+
 #include	"sqlPendingTraffic.h"
- 
-using std::string ;
+#include	"dbHandle.h"
 
 namespace gnuworld
 { 
  
 class sqlPendingChannel
 {
-
 public:
-	sqlPendingChannel(PgDatabase*);
+	sqlPendingChannel(dbHandle*);
 	~sqlPendingChannel();
 
 	bool commit();
@@ -48,13 +47,13 @@ public:
 	unsigned int join_count;
 	unsigned int unique_join_count;
 
-	typedef map < int, int > supporterListType;
+	typedef std::map < int, int > supporterListType;
 	supporterListType supporterList;
 
-	typedef map < unsigned int, sqlPendingTraffic* > trafficListType;
+	typedef std::map < unsigned int, sqlPendingTraffic* > trafficListType;
 	trafficListType trafficList;
 
-	PgDatabase*	SQLDb;
+	dbHandle*	SQLDb;
 };
 
 }

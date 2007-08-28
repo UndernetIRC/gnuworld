@@ -1,4 +1,4 @@
-## $Id: Makefile.am,v 1.25 2006/12/22 06:41:39 kewlio Exp $
+## $Id: Makefile.am,v 1.26 2007/08/28 16:09:56 dan_karrels Exp $
 ## test
 
 @SET_MAKE@
@@ -55,11 +55,8 @@ if COND_TESTDIR
   TESTDIR = test
 endif
 
-if COND_DBDIR
-  DBDIR = db
-endif
-
-SUBDIRS = libgnuworld libltdl src $(NEW_MODS) \
+SUBDIRS = libgnuworld libltdl src db \
+	$(NEW_MODS) \
 	$(MODCCONTROL) \
 	$(MODCHANFIX) \
 	$(MODCLIENTEXAMPLE) \
@@ -73,7 +70,6 @@ SUBDIRS = libgnuworld libltdl src $(NEW_MODS) \
 	$(MODSTATS) \
 	$(MODSNOOP) \
 	$(TESTDIR) \
-	$(DBDIR) \
 	libircu
 
 EXTRA_DIST = bin/ccontrol.example.conf.in \

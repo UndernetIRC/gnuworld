@@ -16,15 +16,15 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: sqlLevel.h,v 1.17 2003/06/28 01:21:20 dan_karrels Exp $
+ * $Id: sqlLevel.h,v 1.18 2007/08/28 16:10:12 dan_karrels Exp $
  */
 
 #ifndef __SQLLEVEL_H
-#define __SQLLEVEL_H "$Id: sqlLevel.h,v 1.17 2003/06/28 01:21:20 dan_karrels Exp $"
+#define __SQLLEVEL_H "$Id: sqlLevel.h,v 1.18 2007/08/28 16:10:12 dan_karrels Exp $"
 
 #include	<string>
 #include	<ctime>
-#include	"libpq++.h"
+#include	"dbHandle.h"
 
 using std::string ;
 
@@ -33,9 +33,8 @@ namespace gnuworld
 
 class sqlLevel
 {
-
 public:
-	sqlLevel(PgDatabase*) ;
+	sqlLevel(dbHandle*) ;
 	virtual ~sqlLevel() ;
 
 	typedef unsigned int	flagType ;
@@ -162,7 +161,7 @@ protected:
 	time_t			last_updated ;
 	time_t			last_used;
 
-	PgDatabase*		SQLDb;
+	dbHandle*		SQLDb;
 } ;
 
 }

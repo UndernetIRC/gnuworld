@@ -16,16 +16,16 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
  * USA.
  *
- * $Id: sqlcfUser.h,v 1.2 2006/12/22 03:00:03 buzlip01 Exp $
+ * $Id: sqlcfUser.h,v 1.3 2007/08/28 16:10:25 dan_karrels Exp $
  */
 
 #ifndef __sqlcfUser_H
-#define __sqlcfUser_H "$Id: sqlcfUser.h,v 1.2 2006/12/22 03:00:03 buzlip01 Exp $"
+#define __sqlcfUser_H "$Id: sqlcfUser.h,v 1.3 2007/08/28 16:10:25 dan_karrels Exp $"
 
 #include	<string>
 #include	<vector>
 #include	<ctime>
-#include	"libpq++.h"
+#include	"dbHandle.h"
 
 namespace gnuworld
 {
@@ -140,7 +140,7 @@ public:
 		{ needOper = _needOper; }
 
 	/* Methods to alter our SQL status */
-	void setAllMembers(PgDatabase*, int);
+	void setAllMembers(dbHandle*, int);
 	bool commit();
 	bool Insert();
 	bool Delete();

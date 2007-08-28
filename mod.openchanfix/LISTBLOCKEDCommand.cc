@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: LISTBLOCKEDCommand.cc,v 1.2 2006/12/09 00:29:18 buzlip01 Exp $
+ * $Id: LISTBLOCKEDCommand.cc,v 1.3 2007/08/28 16:10:21 dan_karrels Exp $
  */
 
 #include "gnuworld_config.h"
@@ -33,7 +33,7 @@
 #include "sqlChannel.h"
 #include "sqlcfUser.h"
 
-RCSTAG("$Id: LISTBLOCKEDCommand.cc,v 1.2 2006/12/09 00:29:18 buzlip01 Exp $");
+RCSTAG("$Id: LISTBLOCKEDCommand.cc,v 1.3 2007/08/28 16:10:21 dan_karrels Exp $");
 
 namespace gnuworld
 {
@@ -52,7 +52,7 @@ if (!bot->doChanBlocking()) {
 }
 
 /* List blocks */
-PgDatabase* cacheCon = bot->theManager->getConnection();
+dbHandle* cacheCon = bot->theManager->getConnection();
 
 std::stringstream theQuery;
 theQuery << "SELECT channel FROM channels WHERE (flags & "
@@ -61,7 +61,7 @@ theQuery << "SELECT channel FROM channels WHERE (flags & "
 	 << sqlChannel::F_BLOCKED
 	 << " ORDER BY channel ASC";
 
-if (!cacheCon->ExecTuplesOk(theQuery.str().c_str())) {
+if (!cacheCon->Exec(theQuery,true)) {
   elog	<< "chanfix::LISTBLOCKEDCommand> SQL Error: "
 		<< cacheCon->ErrorMessage()
 		<< std::endl;
@@ -76,7 +76,7 @@ bot->SendTo(theClient,
 		language::listblocks_blocked_chans,
 		std::string("List of all blocked channels:")).c_str());
 
-for (int i = 0 ; i < cacheCon->Tuples(); i++) {
+for (unsigned int i = 0 ; i < cacheCon->Tuples(); i++) {
   strBlocks += cacheCon->GetValue(i, 0);
   strBlocks += " ";
   if (strBlocks.size() >= 410) {

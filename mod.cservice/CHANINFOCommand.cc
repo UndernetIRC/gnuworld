@@ -28,7 +28,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: CHANINFOCommand.cc,v 1.56 2006/08/15 00:50:06 kewlio Exp $
+ * $Id: CHANINFOCommand.cc,v 1.57 2007/08/28 16:10:09 dan_karrels Exp $
  */
 
 #include	<string>
@@ -40,10 +40,10 @@
 #include	"cservice.h"
 #include	"levels.h"
 #include	"responses.h"
-#include	"libpq++.h"
+#include	"dbHandle.h"
 #include	"cservice_config.h"
 
-const char CHANINFOCommand_cc_rcsId[] = "$Id: CHANINFOCommand.cc,v 1.56 2006/08/15 00:50:06 kewlio Exp $" ;
+const char CHANINFOCommand_cc_rcsId[] = "$Id: CHANINFOCommand.cc,v 1.57 2007/08/28 16:10:09 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -379,17 +379,16 @@ bot->Notice(theClient,
 		string("%s is registered by:")).c_str(),
 	st[1].c_str());
 
-ExecStatusType status = bot->SQLDb->Exec(theQuery.str().c_str()) ;
-
-if( PGRES_TUPLES_OK == status )
+if( bot->SQLDb->Exec(theQuery, true ) )
+//if( PGRES_TUPLES_OK == status )
 	{
-	for(int i = 0; i < bot->SQLDb->Tuples(); i++)
+	for(unsigned int i = 0; i < bot->SQLDb->Tuples(); i++)
 		{
 		bot->Notice(theClient,
 			bot->getResponse(theUser,
 				language::last_seen_info,
 				string("%s - last seen: %s ago")).c_str(),
-			bot->SQLDb->GetValue(i, 1),
+			bot->SQLDb->GetValue(i, 1).c_str(),
 			bot->prettyDuration(atoi(bot->SQLDb->GetValue(i, 3))).c_str());
 		} // for()
 	}

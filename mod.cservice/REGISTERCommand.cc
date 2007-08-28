@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: REGISTERCommand.cc,v 1.19 2003/12/29 23:59:37 dan_karrels Exp $
+ * $Id: REGISTERCommand.cc,v 1.20 2007/08/28 16:10:11 dan_karrels Exp $
  */
 
 #include	<map>
@@ -35,11 +35,11 @@
 #include	"ELog.h"
 #include	"cservice.h"
 #include	"levels.h"
-#include	"libpq++.h"
+#include	"dbHandle.h"
 #include	"Network.h"
 #include	"responses.h"
 
-const char REGISTERCommand_cc_rcsId[] = "$Id: REGISTERCommand.cc,v 1.19 2003/12/29 23:59:37 dan_karrels Exp $" ;
+const char REGISTERCommand_cc_rcsId[] = "$Id: REGISTERCommand.cc,v 1.20 2007/08/28 16:10:11 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -149,7 +149,6 @@ bool REGISTERCommand::Exec( iClient* theClient, const string& Message )
 	 */
 
 	stringstream checkQuery;
-	ExecStatusType status;
 
 	checkQuery 	<< "SELECT id FROM channels WHERE "
 				<< "registered_ts = 0 AND lower(name) = '"
@@ -160,7 +159,8 @@ bool REGISTERCommand::Exec( iClient* theClient, const string& Message )
 	elog << "sqlQuery> " << checkQuery.str().c_str() << endl;
 
 	bool isUnclaimed = false;
-	if ((status = bot->SQLDb->Exec(checkQuery.str().c_str())) == PGRES_TUPLES_OK)
+	if (bot->SQLDb->Exec(checkQuery, true))
+//	if ((status = bot->SQLDb->Exec(checkQuery.str().c_str())) == PGRES_TUPLES_OK)
 	{
 		if (bot->SQLDb->Tuples() > 0) isUnclaimed = true;
 	}
@@ -172,7 +172,6 @@ bool REGISTERCommand::Exec( iClient* theClient, const string& Message )
 		 */
 
 		stringstream reclaimQuery;
-		ExecStatusType status;
 
 		reclaimQuery<< "UPDATE channels SET registered_ts = now()::abstime::int4,"
 					<< " last_updated = now()::abstime::int4, "
@@ -184,7 +183,9 @@ bool REGISTERCommand::Exec( iClient* theClient, const string& Message )
 
 		elog << "sqlQuery> " << reclaimQuery.str().c_str() << endl;
 
-		if ((status = bot->SQLDb->Exec(reclaimQuery.str().c_str())) == PGRES_COMMAND_OK)
+		if (bot->SQLDb->Exec(reclaimQuery))
+//		if ((status = 
+//bot->SQLDb->Exec(reclaimQuery.str().c_str())) == PGRES_COMMAND_OK)
 		{
 			bot->logAdminMessage("%s (%s) has registered %s to %s", theClient->getNickName().c_str(),
 				theUser->getUserName().c_str(), st[1].c_str(), tmpUser->getUserName().c_str());
@@ -229,7 +230,9 @@ bool REGISTERCommand::Exec( iClient* theClient, const string& Message )
 
 	unsigned int theId = 0;
 
-	if ((status = bot->SQLDb->Exec(idQuery.str().c_str())) == PGRES_TUPLES_OK)
+	if (bot->SQLDb->Exec(idQuery))
+//	if ((status = bot->SQLDb->Exec(idQuery.str().c_str())) == 
+//PGRES_TUPLES_OK)
 	{
 		if (bot->SQLDb->Tuples() > 0)
 		{

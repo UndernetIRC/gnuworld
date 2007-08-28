@@ -19,7 +19,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: sqlUser.cc,v 1.45 2005/12/02 23:20:28 kewlio Exp $
+ * $Id: sqlUser.cc,v 1.46 2007/08/28 16:10:12 dan_karrels Exp $
  */
 
 #include	<sstream>
@@ -60,7 +60,7 @@ const unsigned int sqlUser::EV_ADMINMOD		= 3;
 const unsigned int sqlUser::EV_MISC		= 4;
 const unsigned int sqlUser::EV_COMMENT		= 5;
 
-sqlUser::sqlUser(PgDatabase* _SQLDb)
+sqlUser::sqlUser(dbHandle* _SQLDb)
  : id( 0 ),
    user_name(),
    password(),
@@ -111,9 +111,8 @@ queryString	<< "SELECT "
 		<< endl;
 #endif
 
-ExecStatusType status = SQLDb->Exec(queryString.str().c_str()) ;
-
-if( PGRES_TUPLES_OK == status )
+if( SQLDb->Exec(queryString, true ) )
+//if( PGRES_TUPLES_OK == status )
 	{
 	/*
 	 *  If the user doesn't exist, we won't get any rows back.
@@ -159,9 +158,8 @@ queryString	<< "SELECT "
 		<< endl;
 #endif
 
-ExecStatusType status = SQLDb->Exec(queryString.str().c_str()) ;
-
-if( PGRES_TUPLES_OK == status )
+if( SQLDb->Exec(queryString, true ) )
+//if( PGRES_TUPLES_OK == status )
 	{
 	/*
 	 *  If the user doesn't exist, we won't get any rows back.
@@ -238,9 +236,8 @@ queryString	<< queryHeader
 		<< endl;
 #endif
 
-ExecStatusType status = SQLDb->Exec(queryString.str().c_str()) ;
-
-if( PGRES_COMMAND_OK != status )
+if( !SQLDb->Exec(queryString ) )
+//if( PGRES_COMMAND_OK != status )
 	{
 	// TODO: Log to msgchan here.
 	elog	<< "sqlUser::commit> Something went wrong: "
@@ -281,9 +278,8 @@ queryString	<< queryHeader
 		<< endl;
 #endif
 
-ExecStatusType status = SQLDb->Exec(queryString.str().c_str()) ;
-
-if( PGRES_COMMAND_OK != status )
+if( !SQLDb->Exec(queryString ) )
+//if( PGRES_COMMAND_OK != status )
 	{
 	// TODO: Log to msgchan here.
 	elog	<< "sqlUser::commit> Something went wrong: "
@@ -320,9 +316,8 @@ queryString	<< queryHeader
 		<< endl;
 #endif
 
-ExecStatusType status = SQLDb->Exec(queryString.str().c_str()) ;
-
-if( PGRES_COMMAND_OK != status )
+if( !SQLDb->Exec(queryString ) )
+//if( PGRES_COMMAND_OK != status )
 	{
 	elog	<< "sqlUser::commit> Something went wrong: "
 		<< SQLDb->ErrorMessage()
@@ -348,9 +343,8 @@ queryString	<< "SELECT last_seen"
 		<< endl;
 #endif
 
-ExecStatusType status = SQLDb->Exec(queryString.str().c_str()) ;
-
-if( PGRES_TUPLES_OK == status )
+if( SQLDb->Exec(queryString, true ) )
+//if( PGRES_TUPLES_OK == status )
 	{
 	/*
 	 *  If the user doesn't exist, we won't get any rows back.
@@ -384,9 +378,8 @@ queryString	<< "SELECT last_hostmask"
 		<< endl;
 #endif
 
-ExecStatusType status = SQLDb->Exec(queryString.str().c_str()) ;
-
-if( PGRES_TUPLES_OK == status )
+if( SQLDb->Exec(queryString, true ) )
+//if( PGRES_TUPLES_OK == status )
 	{
 	/*
 	 *  If the user doesn't exist, we won't get any rows back.
@@ -433,8 +426,9 @@ theLog	<< "INSERT INTO userlog (ts, user_id, event, message, "
 		<< endl;
 #endif
 
-SQLDb->ExecCommandOk(theLog.str().c_str());
-
+// TODO: Is this ok?
+SQLDb->Exec(theLog);
+//SQLDb->ExecCommandOk(theLog.str().c_str());
 }
 
 const string sqlUser::getLastEvent(unsigned short eventType, unsigned int& eventTime)
@@ -455,9 +449,8 @@ queryString	<< "SELECT message,ts"
 			<< endl;
 #endif
 
-ExecStatusType status = SQLDb->Exec(queryString.str().c_str()) ;
-
-if( PGRES_TUPLES_OK == status )
+if( SQLDb->Exec(queryString, true ) )
+//if( PGRES_TUPLES_OK == status )
 	{
 
 	if(SQLDb->Tuples() < 1)
@@ -510,9 +503,8 @@ queryString	<< queryHeader
                 << endl;
 #endif
 
-ExecStatusType status = SQLDb->Exec(queryString.str().c_str()) ;
-
-if( PGRES_COMMAND_OK != status )
+if( !SQLDb->Exec(queryString ) )
+//if( PGRES_COMMAND_OK != status )
         {
         // TODO: Log to msgchan here.
         elog    << "sqlUser::insert> Something went wrong: "

@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: HISTORYCommand.cc,v 1.4 2006/12/09 00:29:18 buzlip01 Exp $
+ * $Id: HISTORYCommand.cc,v 1.5 2007/08/28 16:10:21 dan_karrels Exp $
  */
 
 #include "gnuworld_config.h"
@@ -32,7 +32,7 @@
 #include "sqlChannel.h"
 #include "sqlcfUser.h"
 
-RCSTAG("$Id: HISTORYCommand.cc,v 1.4 2006/12/09 00:29:18 buzlip01 Exp $");
+RCSTAG("$Id: HISTORYCommand.cc,v 1.5 2007/08/28 16:10:21 dan_karrels Exp $");
 
 namespace gnuworld
 {
@@ -54,7 +54,7 @@ if (!theChan || !theChan->useSQL()) {
 }
 
 /* Get a connection instance to our backend */
-PgDatabase* cacheCon = bot->theManager->getConnection();
+dbHandle* cacheCon = bot->theManager->getConnection();
 
 /*
  * Perform a query to list the dates/times this channel was last chanfixed.
@@ -71,7 +71,7 @@ chanfixQuery	<< "SELECT ts "
 		<< ") ORDER BY ts DESC"
 		;
 
-if (!cacheCon->ExecTuplesOk(chanfixQuery.str().c_str())) {
+if (!cacheCon->Exec(chanfixQuery,true)) {
 	elog	<< "HISTORYCommand> SQL Error: "
 		<< cacheCon->ErrorMessage()
 		<< std::endl;

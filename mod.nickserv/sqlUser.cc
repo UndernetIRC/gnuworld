@@ -25,6 +25,7 @@
 #include "gnuworld_config.h"
 #include "sqlManager.h"
 #include "sqlUser.h"
+#include	"misc.h"
 
 namespace gnuworld {
 
@@ -130,7 +131,7 @@ void sqlUser::insertUser()
  * This function loads in data from a DB handle,
  * to initialise the object properly
  */
-void sqlUser::setAllMembers(PgDatabase* theDB, int row)
+void sqlUser::setAllMembers(dbHandle* theDB, int row)
 {
   /* Grab the data, set the members */
 id = atoi(theDB->GetValue(row, 0));

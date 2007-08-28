@@ -26,7 +26,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ADDUSERCommand.cc,v 1.27 2005/11/28 07:57:49 kewlio Exp $
+ * $Id: ADDUSERCommand.cc,v 1.28 2007/08/28 16:10:09 dan_karrels Exp $
  */
 
 #include	<map>
@@ -38,11 +38,11 @@
 #include	"ELog.h"
 #include	"cservice.h"
 #include	"levels.h"
-#include	"libpq++.h"
+#include	"dbHandle.h"
 #include	"responses.h"
 #include	"cservice_config.h"
 
-const char ADDUSERCommand_cc_rcsId[] = "$Id: ADDUSERCommand.cc,v 1.27 2005/11/28 07:57:49 kewlio Exp $" ;
+const char ADDUSERCommand_cc_rcsId[] = "$Id: ADDUSERCommand.cc,v 1.28 2007/08/28 16:10:09 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -212,9 +212,8 @@ theQuery	<< queryHeader
 		<< endl;
 #endif
 
-ExecStatusType status = bot->SQLDb->Exec(theQuery.str().c_str()) ;
-
-if( PGRES_COMMAND_OK == status )
+if( bot->SQLDb->Exec(theQuery ) )
+//if( PGRES_COMMAND_OK == status )
 	{
 	bot->Notice(theClient,
 		bot->getResponse(theUser,

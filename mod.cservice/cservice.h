@@ -17,11 +17,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: cservice.h,v 1.112 2006/09/26 17:36:04 kewlio Exp $
+ * $Id: cservice.h,v 1.113 2007/08/28 16:10:11 dan_karrels Exp $
  */
 
 #ifndef __CSERVICE_H
-#define __CSERVICE_H "$Id: cservice.h,v 1.112 2006/09/26 17:36:04 kewlio Exp $"
+#define __CSERVICE_H "$Id: cservice.h,v 1.113 2007/08/28 16:10:11 dan_karrels Exp $"
 
 #include	<iostream>
 #include	<string>
@@ -41,8 +41,7 @@
 #include	"sqlLevel.h"
 #include	"sqlBan.h"
 #include	"sqlPendingChannel.h"
-
-class PgDatabase;
+#include	"dbHandle.h"
 
 namespace gnuworld
 {
@@ -77,16 +76,6 @@ public:
  */
 class Command;
 
-class cmDatabase : public PgDatabase
-{
-public:
-	cmDatabase(const char* conninfo)
-	  : PgDatabase(conninfo) {}
-	virtual ~cmDatabase() {}
-};
-
-class Command;
-
 class cservice : public xClient
 {
 protected:
@@ -103,8 +92,7 @@ protected:
 #endif
 
 public:
-
-	cmDatabase* SQLDb; /* PostgreSQL Database */
+	dbHandle* SQLDb; /* PostgreSQL Database */
 	string confSqlHost;
 	string confSqlPass;
 	string confSqlDb;

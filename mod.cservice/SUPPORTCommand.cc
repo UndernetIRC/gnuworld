@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: SUPPORTCommand.cc,v 1.8 2005/11/29 20:29:51 kewlio Exp $
+ * $Id: SUPPORTCommand.cc,v 1.9 2007/08/28 16:10:11 dan_karrels Exp $
  */
 
 #include	<string>
@@ -27,7 +27,7 @@
 #include	"ELog.h"
 #include	"cservice.h"
 
-const char SUPPORTCommand_cc_rcsId[] = "$Id: SUPPORTCommand.cc,v 1.8 2005/11/29 20:29:51 kewlio Exp $" ;
+const char SUPPORTCommand_cc_rcsId[] = "$Id: SUPPORTCommand.cc,v 1.9 2007/08/28 16:10:11 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -95,9 +95,8 @@ elog	<< "SUPPORTCommand::sqlQuery> "
 		<< endl;
 #endif
 
-ExecStatusType status = bot->SQLDb->Exec( theQuery.str().c_str() ) ;
-
-if( PGRES_TUPLES_OK != status )
+if( !bot->SQLDb->Exec( theQuery, true ) )
+//if( PGRES_TUPLES_OK != status )
 	{
 	elog	<< "SUPPORTCommand> SQL Error: "
 			<< bot->SQLDb->ErrorMessage()
@@ -133,9 +132,8 @@ elog	<< "SUPPORTCommand::sqlQuery> "
 		<< endl;
 #endif
 
-status = bot->SQLDb->Exec( supQuery.str().c_str() ) ;
-
-if( PGRES_TUPLES_OK != status )
+if( !bot->SQLDb->Exec( supQuery, true ) )
+//if( PGRES_TUPLES_OK != status )
 	{
 	elog	<< "SUPPORTCommand> SQL Error: "
 			<< bot->SQLDb->ErrorMessage()
@@ -182,9 +180,8 @@ elog	<< "SUPPORTCommand::sqlQuery> "
 		<< endl;
 #endif
 
-status = bot->SQLDb->Exec( updateQuery.str().c_str() ) ;
-
-if( PGRES_COMMAND_OK != status )
+if( !bot->SQLDb->Exec( updateQuery ) )
+//if( PGRES_COMMAND_OK != status )
 	{
 	elog	<< "SUPPORTCommand> SQL Error: "
 			<< bot->SQLDb->ErrorMessage()
@@ -223,9 +220,8 @@ if (supportChar == 'Y')
 			<< endl;
 #endif
 
-	status = bot->SQLDb->Exec( tenQuery.str().c_str() ) ;
-
-	if( PGRES_TUPLES_OK != status )
+	if( !bot->SQLDb->Exec( tenQuery, true ) )
+//	if( PGRES_TUPLES_OK != status )
 		{
 		elog	<< "SUPPORTCommand> SQL Error: "
 				<< bot->SQLDb->ErrorMessage()
@@ -325,9 +321,8 @@ if (supportChar == 'N')
 			<< endl;
 #endif
 
-	status = bot->SQLDb->Exec( mgrQuery.str().c_str() ) ;
-
-	if( PGRES_TUPLES_OK != status )
+	if( !bot->SQLDb->Exec( mgrQuery, true ) )
+//	if( PGRES_TUPLES_OK != status )
 	{
 		elog	<< "SUPPORTCommand> SQL Error: "
 				<< bot->SQLDb->ErrorMessage()
@@ -335,7 +330,8 @@ if (supportChar == 'N')
 		return false ;
 	}
 
-	if(bot->SQLDb->Tuples() >= 0)
+	// TODO: Comparing unsigned against 0
+	if(bot->SQLDb->Tuples() > 0)
 	{
 		string managerName = bot->SQLDb->GetValue(0,0);
 		string managerEmail = bot->SQLDb->GetValue(0,1);

@@ -18,11 +18,10 @@
  */
 
 #ifndef CF_CFCHANNEL_H
-#define CF_CFCHANNEL_H
+#define CF_CFCHANNEL_H "$Id: cfChannel.h,v 1.6 2007/08/28 16:10:08 dan_karrels Exp $"
 
-#include <string>
-
-#include "gw_hashmap.h"
+#include	<string>
+#include	<map>
 
 namespace gnuworld {
 
@@ -39,13 +38,12 @@ public:
 	cfChannelUser* getUser(const std::string&);
 
 	/** Return the beginning of the users map. */
-	typedef HASHMAP< std::string , cfChannelUser* > mapUsers;
+	typedef std::map< std::string , cfChannelUser* > mapUsers;
 	typedef mapUsers::const_iterator mapUsersConstIterator;
 	inline mapUsersConstIterator getUsersBegin()
 		{ return users.begin(); }
 	inline mapUsersConstIterator getUsersEnd()
 		{ return users.end(); }
-
 
 protected:
 	std::string name;

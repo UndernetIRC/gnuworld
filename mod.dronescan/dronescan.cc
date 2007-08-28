@@ -24,7 +24,7 @@
 
 #include <cstdarg>	/* va_list */
 #include <cstdio>	/* *printf() */
-#include "libpq++.h"
+#include "dbHandle.h"
 
 #include "gnuworld_config.h"
 #include "EConfig.h"
@@ -167,7 +167,12 @@ connectString	<< "host=" << sqlHost << " "
 		;
 elog << "dronescan::dronescan> Connecting to SQL Server." << std::endl;
 
-SQLDb = new PgDatabase(connectString.str().c_str());
+//SQLDb = new PgDatabase(connectString.str().c_str());
+SQLDb = new dbHandle( sqlHost,
+	atoi( sqlPort ),
+	sqlDB,
+	sqlUsername,
+	sqlPass ) ;
 if(SQLDb->ConnectionBad()) {
 	elog	<< "dronescan> Failed to connect to SQL server: "
 		<< SQLDb->ErrorMessage()
@@ -1396,12 +1401,12 @@ bool dronescan::updateDue(string _table)
 	std::stringstream check;
 	check	<< "SELECT max(last_updated) FROM " << _table;
 
-	ExecStatusType status = SQLDb->Exec(check.str().c_str());
-
-	if( PGRES_TUPLES_OK != status ) {
+	if( !SQLDb->Exec(check, true ) )
+//	if( PGRES_TUPLES_OK != status )
+		{
 		doSqlError(check.str(), SQLDb->ErrorMessage());
 		return false;
-	}
+		}
 
 	time_t maxUpdated = atoi(SQLDb->GetValue(0, 0));
 
@@ -1420,7 +1425,7 @@ void dronescan::preloadFakeClientCache()
 	std::stringstream theQuery;
 	theQuery	<< sql::fakeclients ;
 
-	if(!SQLDb->ExecTuplesOk(theQuery.str().c_str())) {
+	if(!SQLDb->Exec(theQuery, true)) {
 		doSqlError(theQuery.str(), SQLDb->ErrorMessage());
 		return;
 	}
@@ -1436,7 +1441,7 @@ void dronescan::preloadFakeClientCache()
 	string yyxxx( MyUplink->getCharYY() + "]]]" );
 */
 
-	for(int i = 0; i < SQLDb->Tuples(); ++i) {
+	for(unsigned int i = 0; i < SQLDb->Tuples(); ++i) {
 		sqlFakeClient *newFake = new sqlFakeClient(SQLDb);
 		assert(newFake != 0);
 
@@ -1484,9 +1489,9 @@ void dronescan::preloadUserCache()
 			<< "FROM users"
 			;
 
-	ExecStatusType status = SQLDb->Exec(theQuery.str().c_str());
-
-	if(PGRES_TUPLES_OK == status) {
+	if( SQLDb->Exec(theQuery ) )
+//	if(PGRES_TUPLES_OK == status)
+		{
 		/* First we need to clear the current cache. */
 		for(userMapType::iterator itr = userMap.begin() ;
 		    itr != userMap.end() ; ++itr) {
@@ -1494,7 +1499,7 @@ void dronescan::preloadUserCache()
 		}
 		userMap.clear();
 
-		for(int i = 0; i < SQLDb->Tuples(); ++i) {
+		for(unsigned int i = 0; i < SQLDb->Tuples(); ++i) {
 			sqlUser *newUser = new sqlUser(SQLDb);
 			assert(newUser != 0);
 
@@ -1514,31 +1519,31 @@ void dronescan::preloadUserCache()
 
 bool dronescan::preloadExceptionalChannels()
 {
-	std::stringstream theQuery;
-	theQuery	<< "SELECT name FROM exceptionalChannels";
+std::stringstream theQuery;
+theQuery	<< "SELECT name FROM exceptionalChannels";
 
-	ExecStatusType status = SQLDb->Exec(theQuery.str().c_str());
-
-	if(PGRES_TUPLES_OK == status) {
-		/* First we need to clear the current cache. */
-		exceptionalChannels.clear();
-
-		for(int i = 0; i < SQLDb->Tuples(); ++i) 
+//if(PGRES_TUPLES_OK == status) {
+if( SQLDb->Exec(theQuery, true ) )
+	{
+	/* First we need to clear the current cache. */
+	exceptionalChannels.clear();
+	for(unsigned int i = 0; i < SQLDb->Tuples(); ++i) 
 		{
-			exceptionalChannels.push_back(SQLDb->GetValue(i,0));
+		exceptionalChannels.push_back(SQLDb->GetValue(i,0));
 		}
-	} else {
-		elog	<< "dronescan::preloadExceptionalChannels> "
-			<< SQLDb->ErrorMessage();
-			return false;
+	}
+else
+	{
+	elog	<< "dronescan::preloadExceptionalChannels> "
+		<< SQLDb->ErrorMessage();
+		return false;
 	}
 
-	elog	<< "dronescan::preloadExceptionalChannels> Loaded "
-		<< exceptionalChannels.size()
-		<< " exceptional channels."
-		<< std::endl ;
-	return true;
-	
+elog	<< "dronescan::preloadExceptionalChannels> Loaded "
+	<< exceptionalChannels.size()
+	<< " exceptional channels."
+	<< std::endl ;
+return true;
 }
 
 /** Register a new command. */
@@ -1595,54 +1600,51 @@ bool dronescan::isExceptionalChannel(const string& chanName)
 
 bool dronescan::addExceptionalChannel(const string& chanName)
 {
-	std::stringstream insertQ;
-	insertQ << "INSERT into exceptionalChannels(name) VALUES('"
-	        << chanName << "');" << std::ends;
-	
-	ExecStatusType status = SQLDb->Exec(insertQ.str().c_str());
-	
-	if (PGRES_COMMAND_OK != status)
+std::stringstream insertQ;
+insertQ << "INSERT into exceptionalChannels(name) VALUES('"
+        << chanName << "');" << std::ends;
+
+//ExecStatusType status = SQLDb->Exec(insertQ.str().c_str());
+if( !SQLDb->Exec(insertQ) )
+//if (PGRES_COMMAND_OK != status)
 	{
-		elog << "ERROR while adding exceptionalChannel: " << SQLDb->ErrorMessage() << std::endl;
-		return false;    
+	elog << "ERROR while adding exceptionalChannel: " << SQLDb->ErrorMessage() << std::endl;
+	return false;    
 	}
-	exceptionalChannels.push_back(chanName);
-	return true;
+exceptionalChannels.push_back(chanName);
+return true;
 }
 
 bool dronescan::remExceptionalChannel(const string& chanName)
 {
-	std::stringstream insertQ;
-	insertQ << "DELETE from exceptionalChannels where name='"
-	        << chanName << "';" << std::ends;
-	
-	ExecStatusType status = SQLDb->Exec(insertQ.str().c_str());
-	
-	if (PGRES_COMMAND_OK != status)
+std::stringstream insertQ;
+insertQ << "DELETE from exceptionalChannels where name='"
+        << chanName << "';" << std::ends;
+
+//ExecStatusType status = SQLDb->Exec(insertQ.str().c_str());
+if( !SQLDb->Exec(insertQ) )
+//if (PGRES_COMMAND_OK != status)
 	{
-		elog << "ERROR while removing exceptionalChannel: " << SQLDb->ErrorMessage() << std::endl;
-		return false;    
+	elog << "ERROR while removing exceptionalChannel: " << SQLDb->ErrorMessage() << std::endl;
+	return false;    
 	}
-	exceptionalChannelsType::iterator it = exceptionalChannels.begin();
-	for(;it != exceptionalChannels.end();++it)
+exceptionalChannelsType::iterator it = exceptionalChannels.begin();
+for(;it != exceptionalChannels.end();++it)
 	{
-	        if( !strcasecmp((*it).c_str(),chanName.c_str()))
+        if( !strcasecmp((*it).c_str(),chanName.c_str()))
 		{
-			exceptionalChannels.erase(it);
-	    	        return true;
+		exceptionalChannels.erase(it);
+    	        return true;
 		}
 	}
-	return true;
-
+return true;
 }
 
 /** Return usage information for a client */
 void Command::Usage( const iClient *theClient )
 {
-	bot->Reply(theClient, "SYNTAX: %s", getInfo().c_str());
+bot->Reply(theClient, "SYNTAX: %s", getInfo().c_str());
 }
-
-
 
 } // namespace ds
 

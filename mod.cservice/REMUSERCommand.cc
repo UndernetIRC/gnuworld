@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: REMUSERCommand.cc,v 1.17 2005/11/29 20:29:51 kewlio Exp $
+ * $Id: REMUSERCommand.cc,v 1.18 2007/08/28 16:10:11 dan_karrels Exp $
  */
 
 #include	<map>
@@ -36,10 +36,10 @@
 #include	"ELog.h"
 #include	"cservice.h"
 #include	"levels.h"
-#include	"libpq++.h"
+#include	"dbHandle.h"
 #include	"responses.h"
 
-const char REMUSERCommand_cc_rcsId[] = "$Id: REMUSERCommand.cc,v 1.17 2005/11/29 20:29:51 kewlio Exp $" ;
+const char REMUSERCommand_cc_rcsId[] = "$Id: REMUSERCommand.cc,v 1.18 2007/08/28 16:10:11 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -63,7 +63,6 @@ bool REMUSERCommand::Exec( iClient* theClient, const string& Message )
 	static const char* queryHeader = "DELETE FROM levels WHERE ";
 
 	stringstream theQuery;
-	ExecStatusType status;
 
 	/*
 	 *  Fetch the sqlUser record attached to this client. If there isn't one,
@@ -185,7 +184,9 @@ bool REMUSERCommand::Exec( iClient* theClient, const string& Message )
 		<< endl;
 #endif
 
-	if ((status = bot->SQLDb->Exec(theQuery.str().c_str())) == PGRES_COMMAND_OK)
+	if (bot->SQLDb->Exec(theQuery))
+//	if ((status = bot->SQLDb->Exec(theQuery.str().c_str())) == 
+//PGRES_COMMAND_OK)
 	{
 		bot->Notice(theClient,
 			bot->getResponse(theUser,

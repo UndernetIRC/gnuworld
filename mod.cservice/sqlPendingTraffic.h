@@ -19,16 +19,14 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: sqlPendingTraffic.h,v 1.3 2003/06/28 01:21:20 dan_karrels Exp $
+ * $Id: sqlPendingTraffic.h,v 1.4 2007/08/28 16:10:12 dan_karrels Exp $
  */
 
 #ifndef __SQLPENDINGTRAFFIC_H
-#define __SQLPENDINGTRAFFIC_H "$Id: sqlPendingTraffic.h,v 1.3 2003/06/28 01:21:20 dan_karrels Exp $"
+#define __SQLPENDINGTRAFFIC_H "$Id: sqlPendingTraffic.h,v 1.4 2007/08/28 16:10:12 dan_karrels Exp $"
 
-#include	<string> 
+#include	"dbHandle.h"
  
-using std::string ;
-
 namespace gnuworld
 { 
  
@@ -36,7 +34,7 @@ class sqlPendingTraffic
 {
 
 public:
-	sqlPendingTraffic(PgDatabase*);
+	sqlPendingTraffic(dbHandle*);
 	bool insertRecord();
 	bool commit();
 
@@ -44,7 +42,7 @@ public:
 	unsigned int ip_number;
 	unsigned int join_count; 
 
-	PgDatabase*	SQLDb;
+	dbHandle*	SQLDb;
 };
 
 }

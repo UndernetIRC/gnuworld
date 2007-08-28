@@ -19,7 +19,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: sqlLevel.cc,v 1.16 2003/06/28 01:21:20 dan_karrels Exp $
+ * $Id: sqlLevel.cc,v 1.17 2007/08/28 16:10:12 dan_karrels Exp $
  */
 
 #include	<sstream>
@@ -39,7 +39,7 @@
 #include	"cservice_config.h"
 
 const char sqlLevel_h_rcsId[] = __SQLLEVEL_H ;
-const char sqlLevel_cc_rcsId[] = "$Id: sqlLevel.cc,v 1.16 2003/06/28 01:21:20 dan_karrels Exp $" ;
+const char sqlLevel_cc_rcsId[] = "$Id: sqlLevel.cc,v 1.17 2007/08/28 16:10:12 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -55,7 +55,7 @@ const sqlLevel::flagType sqlLevel::F_FORCED =	0x04 ;
 const sqlLevel::flagType sqlLevel::F_AUTOVOICE =0x08 ;
 const sqlLevel::flagType sqlLevel::F_ONDB =		0x10 ;
 
-sqlLevel::sqlLevel(PgDatabase* _SQLDb)
+sqlLevel::sqlLevel(dbHandle* _SQLDb)
  :channel_id(0),
  user_id(0),
  access(0),
@@ -103,9 +103,8 @@ queryString	<< "SELECT "
 		<< endl;
 #endif
 
-ExecStatusType status = SQLDb->Exec(queryString.str().c_str()) ;
-
-if( PGRES_TUPLES_OK == status )
+if( SQLDb->Exec(queryString, true ) )
+//if( PGRES_TUPLES_OK == status )
 	{
 	/*
 	 *  If this combo doesn't exist, we won't get any rows back.
@@ -178,9 +177,8 @@ queryString	<< queryHeader
 		<< endl;
 #endif
 
-ExecStatusType status = SQLDb->Exec(queryString.str().c_str()) ;
-
-if( PGRES_COMMAND_OK != status )
+if( !SQLDb->Exec(queryString ) )
+//if( PGRES_COMMAND_OK != status )
 	{
 	// TODO: Log to msgchan here.
 	elog	<< "sqlLevel::commit> Something went wrong: "
@@ -216,9 +214,8 @@ queryString	<< queryHeader
 			<< endl;
 #endif
 
-ExecStatusType status = SQLDb->Exec(queryString.str().c_str()) ;
-
-if( PGRES_COMMAND_OK != status )
+if( !SQLDb->Exec(queryString ) )
+//if( PGRES_COMMAND_OK != status )
 	{
 	// TODO: Log to msgchan here.
 	elog	<< "sqlLevel::commit> Something went wrong: "

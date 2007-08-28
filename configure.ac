@@ -1,10 +1,10 @@
-dnl $Id: configure.ac,v 1.36 2006/12/22 06:41:40 kewlio Exp $
+dnl $Id: configure.ac,v 1.37 2007/08/28 16:09:57 dan_karrels Exp $
 dnl ----------------------------------------------------------
 
 echo Configuring GNUWorld...
 echo
 
-AC_REVISION($Revision: 1.36 $)
+AC_REVISION($Revision: 1.37 $)
 AC_INIT
 AC_CONFIG_SRCDIR([src/main.cc])
 AM_INIT_AUTOMAKE(gnuworld,2.8)
@@ -38,6 +38,7 @@ dnl Configure libtool
 AC_PROG_LIBTOOL
 
 CXXFLAGS="-W -Wall -pipe -I\$(top_srcdir)/libltdl"
+CXXFLAGS="$CXXFLAGS -I\$(top_srcdir)/db"
 CFLAGS="$CFLAGS"
 
 AC_PREFIX_DEFAULT(`pwd`)
@@ -114,9 +115,6 @@ AC_CHECK_HEADERS(sys/file.h unistd.h sys/stat.h sys/ioctl.h sys/resource.h )
 AC_CHECK_HEADERS(sys/time.h asm/ioctls.h xti_inet.h sys/filio.h getopt.h)
 AC_CHECK_HEADERS(sys/types.h sys/socket.h netinet/in.h sys/un.h pthread.h)
 
-dnl See if we have hashmaps available to us
-AC_CHECK_HEADERS(ext/hash_map map)
-
 AC_HEADER_STDC
 AC_HEADER_TIME
 AC_TYPE_SIGNAL
@@ -175,74 +173,45 @@ AC_ARG_WITH(prof,
 	[CXXFLAGS="$CXXFLAGS -pg"]
 )
 
-check_pgsql=yes
-AC_ARG_WITH(pgsql,
-	AC_HELP_STRING([--without-pgsql],
-			[Do not check for pgsql.  This will cause \
-several modules to be uncompilable]),
-	[check_pgsql=$withval]
+pgsql_home="/usr/local/pgsql"
+AC_ARG_WITH(pgsql-home,
+	AC_HELP_STRING([--with-pgsql-home=PGSQLHOMEDIR],
+			[Specify home directory for PGSQL, default is \
+/usr/local/lib/pgsql]),
+	[pgsql_home=$withval]
 )
 
-PGSQL_LIB=/usr/local/pgsql/lib
+pgsql_lib="$pgsql_home/lib"
 AC_ARG_WITH(pgsql-lib,
 	AC_HELP_STRING([--with-pgsql-lib=PGSQLLIBDIR],
-			[Specify location to find libpq++.so, default is \
-/usr/local/pgsql/lib]),
-	[PGSQL_LIB=$withval]
+			[Specify location to find libpq.so, default is \
+/usr/local/lib/pgsql/lib]),
+	[pgsql_lib=$withval]
 )
-dnl echo PGSQL_LIB: $PGSQL_LIB
 
-PGSQL_INCLUDE=/usr/local/pgsql/include
+pgsql_include="$pgsql_home/include"
 AC_ARG_WITH(pgsql-include,
 	AC_HELP_STRING([--with-pgsql-include=PGSQLINCLUDEDIR],
-			[Specify location to find libpq++.h, default is \
-/usr/local/pgsql/include]),
-	[PGSQL_INCLUDE=$withval]
+			[Specify location to find libpq-fe.h, default is \
+/usr/local/lib/pgsql/include]),
+	[pgsql_include=$withval]
 )
-dnl echo PGSQL_INCLUDE: $PGSQL_INCLUDE
 
-build_dbdir=false
-if [test $check_pgsql = "yes" ]; then
-	build_dbdir=true
-	AC_MSG_CHECKING(for libpq++.h)
-	if [test -f "$PGSQL_INCLUDE/libpq++.h"]; then
-		/bin/true
-	elif [test -f "/usr/local/include/libpq++.h"]; then
-		PGSQL_INCLUDE=/usr/local/include
-	elif [test -f "/usr/include/postgresql/libpq++.h"]; then
-		PGSQL_INCLUDE=/usr/include/postgresql
-	elif [test -f "/usr/include/pgsql/libpq++.h"]; then
-		PGSQL_INCLUDE=/usr/include/pgsql
-	elif [test -f "/usr/include/libpq++.h"]; then
-		PGSQL_INCLUDE=/usr/include
-	else
-	        AC_MSG_ERROR( Unable to find libpq++.h )
-	fi
-	AC_MSG_RESULT(yes)
+AC_MSG_CHECKING([for libpq.so])
+if [ test -f $pgsql_lib/libpq.so ]; then
+	AC_MSG_RESULT([$pgsql_lib])
+	AC_DEFINE([HAVE_PGSQL],[],[Using PostGreSQL])
+else
+	AC_MSG_FAILURE([unable to find libpq.so])
 fi
 
-if [test $check_pgsql = "yes" ]; then
-	AC_MSG_CHECKING(for libpq++.so)
-	if [test -f "$PGSQL_LIB/libpq++.so"]; then
-		/bin/true
-	elif [test -f "/usr/local/lib/libpq++.so"]; then
-		PGSQL_LIB=/usr/local/lib
-	elif [test -f "/usr/lib/libpq++.so"]; then
-		PGSQL_LIB=/usr/lib
-	elif [test -f "/usr/lib/postgresql/libpq++.so"]; then
-		PGSQL_LIB=/usr/lib/postgresql
-	elif [test -f "/usr/lib/pgsql/libpq++.so"]; then
-		PGSQL_LIB=/usr/lib/pgsql
-	elif [test -f "/usr/local/pgsql/lib/libpq++.so"]; then
-		PGSQL_LIB=/usr/local/pgsql/lib
-	elif [test -f "/usr/local/postgresql/lib/libpq++.so"]; then
-		PGSQL_LIB=/usr/local/postgresql/lib
-	else
-	        AC_MSG_ERROR( Unable to find libpq++.so)
-	fi
-	AC_MSG_RESULT(yes)
+AC_MSG_CHECKING([for libpq-fe.h])
+if [ test -f $pgsql_include/libpq-fe.h ]; then
+	AC_MSG_RESULT([$pgsql_include])
+	AC_DEFINE([HAVE_PGSQL],[],[Using PostGreSQL])
+else
+	AC_MSG_FAILURE([unable to find libpq-fe.h])
 fi
-AM_CONDITIONAL(COND_DBDIR,[test $build_dbdir = true])
 
 dnl Allow selection of additional includes and libraries paths
 dnl just in case!
@@ -263,12 +232,6 @@ m4_include([ac_cxx_namespaces.m4])
 m4_include([ax_boost_thread.m4])
 CXXFLAGS="$CXXFLAGS $threadLib"
 AX_BOOST_THREAD
-
-dnl echo "PGSQL_INCLUDE: $PGSQL_INCLUDE"
-dnl echo "PGSQL_LIB: $PGSQL_LIB"
-dnl exit
-
-dnl CXXFLAGS="$CXXFLAGS -I${ac_top_srcdir}/include -I${ac_top_srcdir}/libgnuworld"
 
 echo
 echo "Detecting modules..."
@@ -399,47 +362,46 @@ LIBGNUWORLD="\$(top_builddir)/libgnuworld/libgnuworld.la"
 AC_SUBST(LIBGNUWORLD)
 
 AC_SUBST(NEW_MODS)
-AC_SUBST(DB)
 AC_SUBST(CXXFLAGS)
 AC_SUBST(INCLTDL)
 AC_SUBST(LIBLTDL)
 AC_SUBST(LIBTOOL_DEPS)
-AC_SUBST(PGSQL_INCLUDE)
-AC_SUBST(PGSQL_LIB)
+AC_SUBST(pgsql_include)
+AC_SUBST(pgsql_lib)
 
 AC_CONFIG_FILES([Makefile \
-db/Makefile \
-libgnuworld/Makefile \
-libircu/Makefile \
-src/Makefile \
-test/Makefile \
-mod.ccontrol/Makefile \
-mod.chanfix/Makefile \
-mod.clientExample/Makefile \
-mod.cloner/Makefile \
-mod.cservice/Makefile \
-mod.dronescan/Makefile \
-mod.gnutest/Makefile \
-mod.nickserv/Makefile \
-mod.openchanfix/Makefile \
-mod.scanner/Makefile \
-mod.stats/Makefile \
-mod.snoop/Makefile \
-bin/server_command_map \
-bin/ccontrol.example.conf \
-bin/chanfix.example.conf \
-bin/clientExample.example.conf \
-bin/cloner.example.conf \
-bin/cservice.example.conf \
-bin/gnutest.example.conf \
-bin/GNUWorld.example.conf \
-bin/nickserv.example.conf \
-bin/openchanfix.example.conf \
-bin/scanner.example.conf \
-bin/stats.example.conf \
-bin/snoop.example.conf \
-bin/dronescan.example.conf \
-tools/checkgnuworld.sh])
+	db/Makefile \
+	libgnuworld/Makefile \
+	libircu/Makefile \
+	src/Makefile \
+	test/Makefile \
+	mod.ccontrol/Makefile \
+	mod.chanfix/Makefile \
+	mod.clientExample/Makefile \
+	mod.cloner/Makefile \
+	mod.cservice/Makefile \
+	mod.dronescan/Makefile \
+	mod.gnutest/Makefile \
+	mod.nickserv/Makefile \
+	mod.openchanfix/Makefile \
+	mod.scanner/Makefile \
+	mod.stats/Makefile \
+	mod.snoop/Makefile \
+	bin/server_command_map \
+	bin/ccontrol.example.conf \
+	bin/chanfix.example.conf \
+	bin/clientExample.example.conf \
+	bin/cloner.example.conf \
+	bin/cservice.example.conf \
+	bin/gnutest.example.conf \
+	bin/GNUWorld.example.conf \
+	bin/nickserv.example.conf \
+	bin/openchanfix.example.conf \
+	bin/scanner.example.conf \
+	bin/stats.example.conf \
+	bin/snoop.example.conf \
+	bin/dronescan.example.conf \
+	tools/checkgnuworld.sh])
 
 AC_OUTPUT
 

@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: DELNOTECommand.cc,v 1.4 2006/12/09 00:29:18 buzlip01 Exp $
+ * $Id: DELNOTECommand.cc,v 1.5 2007/08/28 16:10:20 dan_karrels Exp $
  */
 
 #include "gnuworld_config.h"
@@ -32,7 +32,7 @@
 #include "sqlChannel.h"
 #include "sqlcfUser.h"
 
-RCSTAG("$Id: DELNOTECommand.cc,v 1.4 2006/12/09 00:29:18 buzlip01 Exp $");
+RCSTAG("$Id: DELNOTECommand.cc,v 1.5 2007/08/28 16:10:20 dan_karrels Exp $");
 
 namespace gnuworld
 {
@@ -65,7 +65,7 @@ if (!theChan->useSQL() || (theChan->countNotes(0) <= 0)) {
 unsigned int messageId = atoi(st[2].c_str());
 
 /* Get a connection instance to our backend */
-PgDatabase* cacheCon = bot->theManager->getConnection();
+dbHandle* cacheCon = bot->theManager->getConnection();
 
 /* Retrieve the note */
 std::stringstream noteCheckQuery;
@@ -75,7 +75,7 @@ noteCheckQuery	<< "SELECT channelID, user_name, event "
 		<< messageId
 		;
 
-if (!cacheCon->ExecTuplesOk(noteCheckQuery.str().c_str())) {
+if (!cacheCon->Exec(noteCheckQuery,true)) {
   elog	<< "DELNOTECommand> SQL Error: "
 	<< cacheCon->ErrorMessage()
 	<< std::endl ;

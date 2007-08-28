@@ -18,26 +18,29 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: pgsqlDB.cc,v 1.2 2002/05/31 15:07:19 dan_karrels Exp $
+ * $Id: pgsqlDB.cc,v 1.3 2007/08/28 16:09:59 dan_karrels Exp $
  */
 
 #include	<sys/types.h>
 
 #include	<new>
+#include	<iostream>
 #include	<exception>
 #include	<sstream>
 #include	<string>
 
-#include	"libpq++.h"
+#include	"libpq-fe.h"
 #include	"gnuworldDB.h"
 #include	"pgsqlDB.h"
 
-const char pgsqlDB_cc_rcsId[] = "$Id: pgsqlDB.cc,v 1.2 2002/05/31 15:07:19 dan_karrels Exp $" ;
+const char pgsqlDB_cc_rcsId[] = "$Id: pgsqlDB.cc,v 1.3 2007/08/28 16:09:59 dan_karrels Exp $" ;
 const char pgsqlDB_h_rcsId[] = __PGSQLDB_H ;
 
 namespace gnuworld
 {
 
+using std::cout ;
+using std::endl ;
 using std::ends ;
 using std::string ;
 using std::stringstream ;
@@ -47,7 +50,9 @@ pgsqlDB::pgsqlDB( const string& dbHost,
 	const string& dbName,
 	const string& userName,
 	const string& password ) throw( std::exception )
-: gnuworldDB( dbHost, dbPort, dbName, userName, password )
+: gnuworldDB( dbHost, dbPort, dbName, userName, password ),
+  theDB( 0 ),
+  lastResult( 0 )
 {
 stringstream s ;
 s	<< "host=" << dbHost
@@ -65,43 +70,154 @@ if( !password.empty() )
 s << ends ;
 
 // Allow exception to be thrown
-theDB = new PgDatabase( s.str().c_str() ) ;
-
-if( theDB->ConnectionBad() )
+theDB = PQconnectdb( s.str().c_str() ) ;
+if( 0 == theDB )
 	{
+	cout	<< "pgsqlDB> Failed to allocate memory for db handle"
+		<< endl ;
+	throw std::exception() ;
+	}
+if( !isConnected() )
+	{
+	cout	<< "pgsqlDB> Failed to connect to db: "
+		<< ErrorMessage()
+		<< endl ;
+	throw std::exception() ;
+	}
+}
+
+pgsqlDB::pgsqlDB( const string& connectInfo ) throw( std::exception )
+{
+// TODO
+// Allow exception to be thrown
+theDB = PQconnectdb( connectInfo.c_str() ) ;
+if( 0 == theDB )
+	{
+	cout	<< "pgsqlDB> Failed to allocate memory for db handle"
+		<< endl ;
+	throw std::exception() ;
+	}
+if( !isConnected() )
+	{
+	cout	<< "pgsqlDB> Failed to connect to db: "
+		<< ErrorMessage()
+		<< endl ;
 	throw std::exception() ;
 	}
 }
 
 pgsqlDB::~pgsqlDB()
 {
-delete theDB ; theDB = 0 ;
+if( theDB != 0 )
+	{
+	PQfinish( theDB ) ;
+	theDB = 0 ;
+	}
+if( lastResult != 0 )
+	{
+	PQclear( lastResult ) ;
+	lastResult = 0 ;
+	}
 }
 
-bool pgsqlDB::Exec( const string& theQuery )
+bool pgsqlDB::Exec( const string& theQuery, bool dataRet )
 {
-return (PGRES_COMMAND_OK == theDB->Exec( theQuery.c_str() )) ;
+// It is necessary to manually deallocate the last result
+// to prevent memory leaks.
+if( lastResult != 0 )
+	{
+	PQclear( lastResult ) ;
+	lastResult = 0 ;
+	}
+lastResult = PQexec( theDB, theQuery.c_str() ) ;
+
+ExecStatusType status = PQresultStatus( lastResult ) ;
+if( dataRet )
+	{
+	// User is expecting data back, so return status according
+	// to tuples being returned
+	return (PGRES_TUPLES_OK == status) ;
+	}
+else
+	{
+	// Command execution with no data returned.
+	return (PGRES_COMMAND_OK == status) ;
+	}
 }
 
-bool pgsqlDB::Exec( const stringstream& theQuery )
+bool pgsqlDB::Exec( const stringstream& theQuery, bool retData )
 {
-return (PGRES_COMMAND_OK == theDB->Exec( theQuery.str().c_str() )) ;
+return Exec( theQuery.str(), retData ) ;
+}
+
+bool pgsqlDB::StartCopyIn( const string& writeMe )
+{
+return Exec( writeMe ) ;
+}
+
+bool pgsqlDB::StopCopyIn()
+{
+if( 0 == lastResult )
+	{
+	return false ;
+	}
+return (PQputCopyEnd( theDB, 0 ) != -1) ;
+}
+
+bool pgsqlDB::PutLine( const string& writeMe )
+{
+if( 0 == lastResult )
+	{
+	return false ;
+	}
+return (PQputline( theDB, writeMe.c_str() ) != -1) ;
 }
 
 unsigned int pgsqlDB::countTuples() const
 {
-return theDB->Tuples() ;
+if( 0 == lastResult )
+	{
+	return 0 ;
+	}
+return PQntuples( lastResult ) ;
 }
 
 const string pgsqlDB::ErrorMessage() const
 {
-return theDB->ErrorMessage() ;
+return string( PQerrorMessage( theDB ) ) ;
 }
 
-const string pgsqlDB::GetValue( const unsigned int& tupleNumber,
-	const unsigned int& fieldNumber ) const
+const string pgsqlDB::GetValue( unsigned int rowNumber,
+	unsigned int columnNumber ) const
 {
-return theDB->GetValue( tupleNumber, fieldNumber ) ;
+if( 0 == lastResult )
+	{
+	return string() ;
+	}
+return PQgetvalue( lastResult, rowNumber, columnNumber ) ;
+}
+
+const string pgsqlDB::GetValue( unsigned int rowNumber,
+	const string& columnName ) const
+{
+if( 0 == lastResult )
+	{
+	return string( "No result stored" ) ;
+	}
+
+// Retrieve the column number for this name.
+const int columnNumber = PQfnumber( lastResult, columnName.c_str() ) ;
+if( -1 == columnNumber )
+	{
+	return (string( "No such column: " ) + columnName) ;
+	}
+
+return PQgetvalue( lastResult, rowNumber, columnNumber ) ;
+}
+
+bool pgsqlDB::isConnected() const
+{
+return (CONNECTION_OK == PQstatus( theDB )) ;
 }
 
 } // namespace gnuworld

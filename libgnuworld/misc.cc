@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: misc.cc,v 1.4 2007/03/16 12:07:51 mrbean_ Exp $
+ * $Id: misc.cc,v 1.5 2007/08/28 16:10:00 dan_karrels Exp $
  */
 
 #include	<string>
@@ -31,7 +31,7 @@
 
 #include	"misc.h"
 
-const char rcsId[] = "$Id: misc.cc,v 1.4 2007/03/16 12:07:51 mrbean_ Exp $" ;
+const char rcsId[] = "$Id: misc.cc,v 1.5 2007/08/28 16:10:00 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -165,4 +165,10 @@ else if(!strcasecmp(Length.substr(Length.length()-1).c_str(),"s"))
 
 return atoi(Length.c_str()) * Units;
 }
+
+int atoi( const std::string& val )
+{
+return ::atoi( val.c_str() ) ;
+}
+
 } // namespace gnuworld

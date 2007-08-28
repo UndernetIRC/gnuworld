@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: sqlManager.cc,v 1.4 2006/12/09 00:29:20 buzlip01 Exp $
+ * $Id: sqlManager.cc,v 1.5 2007/08/28 16:10:25 dan_karrels Exp $
  */
 
 #include <new>
@@ -67,12 +67,12 @@ return new sqlManager(_dbString);
  * This method creates and returns a connection to the database.
  * It will use the stored dbString to create the connection.
  */
-PgDatabase* sqlManager::getConnection()
+dbHandle* sqlManager::getConnection()
 {
 elog << "*** [sqlManager:getConnection] Attempting DB connection to: "
   << dbString << std::endl;
 
-PgDatabase* tempCon = new (std::nothrow) PgDatabase(dbString.c_str());
+dbHandle* tempCon = new (std::nothrow) dbHandle(dbString);
 assert(tempCon != 0);
 
 if(tempCon->ConnectionBad()) {
@@ -92,7 +92,7 @@ return tempCon;
  * This method will disconnect and destroy a database connection.
  * This method should never be passed a null pointer.
  */
-void sqlManager::removeConnection(PgDatabase* tempCon)
+void sqlManager::removeConnection(dbHandle* tempCon)
 {
 assert(tempCon != 0);
 

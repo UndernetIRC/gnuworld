@@ -25,6 +25,7 @@
 #include "gnuworld_config.h"
 #include "ELog.h"
 #include "sqlManager.h"
+#include	"dbHandle.h"
 
 using std::endl ;
 
@@ -53,8 +54,6 @@ if(theManager) return theManager;
 return new sqlManager(_dbString, _commitQueueMax);
 } // static sqlManager* sqlManager::getInstance(const string&)
 
-
-
 /*********************************
  ** P U B L I C   M E T H O D S **
  *********************************/
@@ -63,12 +62,12 @@ return new sqlManager(_dbString, _commitQueueMax);
  * This method creates and returns a connection to the database.
  * It will use the stored dbString to create the connection.
  */
-PgDatabase* sqlManager::getConnection()
+dbHandle* sqlManager::getConnection()
 {
 elog << "*** [sqlManager:getConnection] Attempting DB connection to: "
   << dbString << endl;
 
-PgDatabase* tempCon = new (std::nothrow) PgDatabase(dbString.c_str());
+dbHandle* tempCon = new (std::nothrow) dbHandle(dbString.c_str());
 assert(tempCon != 0);
 
 if(tempCon->ConnectionBad()) {
@@ -83,19 +82,17 @@ if(tempCon->ConnectionBad()) {
 return tempCon;
 }
 
-
 /**
  * This method will disconnect and destroy a database connection.
  * This method should never be passed a null pointer.
  */
-void sqlManager::removeConnection(PgDatabase* tempCon)
+void sqlManager::removeConnection(dbHandle* tempCon)
 {
 assert(tempCon != 0);
 
 elog << "*** [sqlManager:removeConnection] Removing DB connection." << endl;
 delete tempCon;
 }
-
 
 /**
  * This method simply processes all statements in the queue, executing
@@ -113,7 +110,7 @@ void sqlManager::flush()
     elog << "*** [sqlManager:flush] Executing: " << statement << endl;
 #endif
     theLogger->log(logging::events::E_SQL, "Executing: " + statement);
-    if(!SQLDb->ExecCommandOk(statement.c_str())) {
+    if(!SQLDb->Exec(statement)) {
       theStats->incStat("SM.ERROR");
       string error = string(SQLDb->ErrorMessage());
 #ifndef LOG_SQL

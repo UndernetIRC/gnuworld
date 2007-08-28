@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: INFOCommand.cc,v 1.5 2006/12/26 14:36:08 buzlip01 Exp $
+ * $Id: INFOCommand.cc,v 1.6 2007/08/28 16:10:21 dan_karrels Exp $
  */
 
 #include "gnuworld_config.h"
@@ -33,7 +33,7 @@
 #include "sqlChannel.h"
 #include "sqlcfUser.h"
 
-RCSTAG("$Id: INFOCommand.cc,v 1.5 2006/12/26 14:36:08 buzlip01 Exp $");
+RCSTAG("$Id: INFOCommand.cc,v 1.6 2007/08/28 16:10:21 dan_karrels Exp $");
 
 namespace gnuworld
 {
@@ -133,7 +133,7 @@ if (!theChan->useSQL()) {
 }
 
 /* Get a connection instance to our backend */
-PgDatabase* cacheCon = bot->theManager->getConnection();
+dbHandle* cacheCon = bot->theManager->getConnection();
 
 /*
  * Perform a query to list all notes belonging to this channel.
@@ -146,7 +146,7 @@ allNotesQuery	<< "SELECT notes.id, notes.ts, notes.user_name, notes.event, notes
 		<< " ORDER BY notes.ts DESC"
 		;
 
-if (!cacheCon->ExecTuplesOk(allNotesQuery.str().c_str())) {
+if (!cacheCon->Exec(allNotesQuery,true)) {
   elog	<< "INFOCommand> SQL Error: "
 	<< cacheCon->ErrorMessage()
 	<< std::endl;

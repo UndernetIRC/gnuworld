@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: LOGINCommand.cc,v 1.63 2007/04/18 08:49:45 kewlio Exp $
+ * $Id: LOGINCommand.cc,v 1.64 2007/08/28 16:10:10 dan_karrels Exp $
  */
 
 #include	<string>
@@ -34,7 +34,7 @@
 #include	"cservice_config.h"
 #include	"Network.h"
 
-const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.63 2007/04/18 08:49:45 kewlio Exp $" ;
+const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.64 2007/08/28 16:10:10 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -326,8 +326,8 @@ queryString	<< "SELECT last_seen FROM users_lastseen WHERE user_id="
 		<< endl;
 #endif
 
-ExecStatusType status = bot->SQLDb->Exec(queryString.str().c_str());
-if (PGRES_TUPLES_OK == status)
+if( bot->SQLDb->Exec(queryString, true ) )
+//if (PGRES_TUPLES_OK == status)
 {
 	if (bot->SQLDb->Tuples() < 1)
 	{
@@ -346,7 +346,7 @@ if (PGRES_TUPLES_OK == status)
 			<< updateQuery.str().c_str()
 			<< endl;
 #endif
-		status = bot->SQLDb->Exec(updateQuery.str().c_str());
+		bot->SQLDb->Exec(updateQuery);
 	}
 }
 /* update their details */
@@ -454,9 +454,8 @@ theQuery	<< "SELECT channel_id,flags,suspend_expires FROM "
 		<< endl;
 #endif
 
-status = bot->SQLDb->Exec(theQuery.str().c_str()) ;
-
-if( PGRES_TUPLES_OK != status )
+if( !bot->SQLDb->Exec(theQuery, true ) )
+//if( PGRES_TUPLES_OK != status )
 	{
 	elog	<< "LOGIN> SQL Error: "
 		<< bot->SQLDb->ErrorMessage()
@@ -467,7 +466,7 @@ if( PGRES_TUPLES_OK != status )
 typedef vector < autoOpData > autoOpVectorType;
 autoOpVectorType autoOpVector;
 
-for(int i = 0; i < bot->SQLDb->Tuples(); i++)
+for(unsigned int i = 0; i < bot->SQLDb->Tuples(); i++)
 	{
 	autoOpData current;
 
@@ -611,9 +610,8 @@ supporterQuery	<< "SELECT channels.name FROM"
 		<< endl;
 #endif
 
-status = bot->SQLDb->Exec(supporterQuery.str().c_str()) ;
-
-if( PGRES_TUPLES_OK != status )
+if( !bot->SQLDb->Exec(supporterQuery, true ) )
+//if( PGRES_TUPLES_OK != status )
 	{
 	elog	<< "LOGIN> SQL Error: "
 		<< bot->SQLDb->ErrorMessage()
@@ -622,7 +620,7 @@ if( PGRES_TUPLES_OK != status )
 	}
 
 
-for(int i = 0; i < bot->SQLDb->Tuples(); i++)
+for(unsigned int i = 0; i < bot->SQLDb->Tuples(); i++)
 	{
 	string channelName = bot->SQLDb->GetValue(i, 0);
 	bot->Notice(theClient, "You have been named as a supporter in a "
@@ -658,7 +656,7 @@ if(!theUser->getFlag(sqlUser::F_NONOTES))
 		<< endl;
 #endif
 
-	status = bot->SQLDb->Exec(noteQuery.str().c_str()) ;
+	bot->SQLDb->Exec(noteQuery, true) ;
 
 	unsigned int count = bot->SQLDb->Tuples();
 	if(count)

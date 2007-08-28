@@ -16,17 +16,17 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccUser.h,v 1.18 2005/06/19 02:38:51 kewlio Exp $
+ * $Id: ccUser.h,v 1.19 2007/08/28 16:10:07 dan_karrels Exp $
  */
 
 #ifndef __CCUSER_H
-#define __CCUSER_H "$Id: ccUser.h,v 1.18 2005/06/19 02:38:51 kewlio Exp $"
+#define __CCUSER_H "$Id: ccUser.h,v 1.19 2007/08/28 16:10:07 dan_karrels Exp $"
 
 #include	<string>
 
 #include	<ctime>
 
-#include	"libpq++.h"
+#include	"dbHandle.h"
 
 #include	"CControlCommands.h" 
 
@@ -56,17 +56,10 @@ CLASS
     Holds all the vital information about a user
 
 */
-
-
-
-
-
 class ccUser
 {
-
 public:
-
-	ccUser(PgDatabase*) ;
+	ccUser(dbHandle*) ;
 	virtual ~ccUser() ;
 
 	/*
@@ -228,7 +221,7 @@ public:
 	inline void			setClient(iClient* _Client)
 		    { Client = _Client; }
 		    
-	inline void			setSqldb(PgDatabase* _SQLDb)
+	inline void			setSqldb(dbHandle* _SQLDb)
 		    { SQLDb = _SQLDb; }
 	/*
 	 * Methods to load a user and update the 
@@ -294,7 +287,7 @@ protected:
 	bool NeedOp;
 	bool Notice;
 	iClient* Client;
-	PgDatabase* SQLDb;
+	dbHandle* SQLDb;
 	time_t LastAuthTS;
 	string LastAuthNumeric;
 
