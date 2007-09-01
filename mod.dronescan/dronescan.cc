@@ -782,6 +782,13 @@ for(jcChanMapType::const_iterator itr = jcChanMap.begin() ;
 						{
 						excluded << "L";
 						}
+					excluded << "],";
+					if(excluded.str().size() > 400)
+						{
+						outputNames(itr->first,excluded,true);
+						}	  
+
+#ifdef ENABLE_LOG4CPLUS
 					std::list<std::pair<std::string,std::string > >::const_iterator userNamesIt = joinPartIt->second.userNames.begin();
 					for(;userNamesIt != joinPartIt->second.userNames.end(); ++ userNamesIt)
 						{
@@ -806,11 +813,7 @@ for(jcChanMapType::const_iterator itr = jcChanMap.begin() ;
 						
 							}
 						}
-					excluded << "],";
-					if(excluded.str().size() > 400)
-						{
-						outputNames(itr->first,excluded,true);
-						}	  
+#endif
 					}	 
 				}
 			}
@@ -828,7 +831,9 @@ for(jcChanMapType::const_iterator itr = jcChanMap.begin() ;
 				{
 				log(WARN,"Aboring glines for channel %s because only %d flooding addresses found",
 						itr->first.c_str(),glined.size());
-				}  else {
+				}  
+#ifdef ENABLE_LOG4CPLUS
+				else {
 				log(JF_GLINED,"Join flood over in %s. Total joins: %u. Total parts: %u. Total size: %d. Total addresses glined %d.",
 				itr->first.c_str(),
 				jChannel->getNumOfJoins(),
@@ -836,6 +841,7 @@ for(jcChanMapType::const_iterator itr = jcChanMap.begin() ;
 				theChan->size(),
 				glined.size());
 				}
+#endif
 			}
 		std::list<std::pair<glineData*,std::list<string> > >::iterator glinesIt = glined.begin();
 		for(; glinesIt != glined.end();++glinesIt)
@@ -844,10 +850,12 @@ for(jcChanMapType::const_iterator itr = jcChanMap.begin() ;
 			if(glined.size() > 5)
 				{
 				std::list<string>::iterator clientsIt = glinesIt->second.begin();
+#ifdef ENABLE_LOG4CPLUS
 				for(; clientsIt != glinesIt->second.end(); ++ clientsIt)
 					{
 					log(JF_GLINED,(*clientsIt).c_str());
 					}
+#endif
 				glineQueue.push_back(curGline);
 				} 
 			else {
