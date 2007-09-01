@@ -21,7 +21,7 @@
 #include	<vector>
 #include	<sstream>
 #include	<iostream>
-
+#include 	<list>
 #include <cstdarg>	/* va_list */
 #include <cstdio>	/* *printf() */
 #include "dbHandle.h"
@@ -42,6 +42,10 @@
 #include "sqlUser.h"
 #include "Timer.h"
 #include "ip.h"
+
+#ifdef ENABLE_LOG4CPLUS
+#include <log4cplus/logger.h>
+#endif
 
 namespace gnuworld {
 
@@ -720,6 +724,7 @@ for(jcChanMapType::const_iterator itr = jcChanMap.begin() ;
 			jChannel->getNumOfParts(),
 			theChan->size()
 			);
+		std::list<std::pair<glineData*,std::list<string> > > glined;
 		jfChannel::joinPartMapIterator joinPartIt = jChannel->joinPartBegin();
 		jfChannel::joinPartMapIterator joinPartEnd = jChannel->joinPartEnd();
 		std::stringstream names;
@@ -727,6 +732,7 @@ for(jcChanMapType::const_iterator itr = jcChanMap.begin() ;
 		std::stringstream tempNames;
 		for(;joinPartIt != joinPartEnd; ++joinPartIt )
 			{
+				int numOfUsernames = 0;
 				if(joinPartIt->second.numOfJoins >= jcMinJoinToGline &&
 			    joinPartIt->second.numOfParts >= jcMinJoinToGline)
 				{
@@ -736,6 +742,7 @@ for(jcChanMapType::const_iterator itr = jcChanMap.begin() ;
 					tempNames << joinPartIt->first.c_str() << std::string("[") 
 					<< joinPartIt->second.numOfJoins 
 					<< std::string("]{");
+					std::list<std::string> clients;
 					for(;numericsIt != joinPartIt->second.numerics.end();++numericsIt)
 						{
 						iClient* theClient = Network->findClient(*numericsIt);
@@ -744,6 +751,12 @@ for(jcChanMapType::const_iterator itr = jcChanMap.begin() ;
 							{
 							tempNames 	<< theClient->getNickName() 
 								<< ",";
+							if(jcGlineEnable)
+								{
+								clients.push_back(theClient->getNickName() + "!" + theClient->getUserName() +"@"
+									+ xIP(theClient->getIP()).GetNumericIP() + " " + theClient->getDescription());
+									
+								}
 							}
 						}
 						tempNames << "}";
@@ -756,7 +769,7 @@ for(jcChanMapType::const_iterator itr = jcChanMap.begin() ;
 						if(jcGlineEnable)
 								{
 								glineData* theGline = new (std::nothrow) glineData("*!*@" +xIP(joinPartIt->first).GetNumericIP(),jcGlineReason,jcGlineLength);
-								glineQueue.push_back(theGline);
+								glined.push_back(std::pair<glineData*,std::list<std::string> >(theGline,clients));
 								}
 					} else  {
 					excluded << joinPartIt->first.c_str()
@@ -768,6 +781,30 @@ for(jcChanMapType::const_iterator itr = jcChanMap.begin() ;
 					if(joinPartIt->second.seenLoggedInUser)
 						{
 						excluded << "L";
+						}
+					std::list<std::pair<std::string,std::string > >::const_iterator userNamesIt = joinPartIt->second.userNames.begin();
+					for(;userNamesIt != joinPartIt->second.userNames.end(); ++ userNamesIt)
+						{
+						iClient* theClient = Network->findClient(userNamesIt->first);
+						if(theClient && !strcmp(xIP(theClient->getIP()).GetNumericIP().c_str()
+						,joinPartIt->first.c_str()))
+							{
+							if(numOfUsernames++ == 0)
+								{
+								log(JF_CSERVICE, "Join flood over in %s. Total joins: %u. Total parts: %u. Total size: %d",
+								itr->first.c_str(),
+								jChannel->getNumOfJoins(),
+								jChannel->getNumOfParts(),
+								theChan->size()
+								);
+								}
+								log(JF_CSERVICE,"%s %s!%s@%s %s",userNamesIt->second.c_str(),
+									theClient->getNickName().c_str(),
+									theClient->getUserName().c_str(),
+									xIP(theClient->getIP()).GetNumericIP().c_str(),
+									theClient->getDescription().c_str());
+						
+							}
 						}
 					excluded << "],";
 					if(excluded.str().size() > 400)
@@ -783,9 +820,43 @@ for(jcChanMapType::const_iterator itr = jcChanMap.begin() ;
 			}
 		if(excluded.str().size() > 0)
 			{
-			outputNames(itr->first,names,true);
+			outputNames(itr->first,excluded,true);
 			}
-		}	  
+		if(jcGlineEnable)
+			{ 
+			if(glined.size() <= 5)
+				{
+				log(WARN,"Aboring glines for channel %s because only %d flooding addresses found",
+						itr->first.c_str(),glined.size());
+				}  else {
+				log(JF_GLINED,"Join flood over in %s. Total joins: %u. Total parts: %u. Total size: %d. Total addresses glined %d.",
+				itr->first.c_str(),
+				jChannel->getNumOfJoins(),
+				jChannel->getNumOfParts(),
+				theChan->size(),
+				glined.size());
+				}
+			}
+		std::list<std::pair<glineData*,std::list<string> > >::iterator glinesIt = glined.begin();
+		for(; glinesIt != glined.end();++glinesIt)
+			{
+			glineData* curGline = glinesIt->first;
+			if(glined.size() > 5)
+				{
+				std::list<string>::iterator clientsIt = glinesIt->second.begin();
+				for(; clientsIt != glinesIt->second.end(); ++ clientsIt)
+					{
+					log(JF_GLINED,(*clientsIt).c_str());
+					}
+				glineQueue.push_back(curGline);
+				} 
+			else {
+				delete curGline;
+				}
+			}
+
+		}
+	
 	delete itr->second;
 				
 	}
@@ -1146,7 +1217,6 @@ void dronescan::setNickStates()
 		);
 }
 
-
 /** Check global channels for drones. */
 void dronescan::checkChannels()
 {
@@ -1343,6 +1413,20 @@ void dronescan::log(LOG_TYPE logType, const char *format, ...)
 	Message(consoleChannel, "%s",newMessage.str().c_str());
 }
 
+#ifdef ENABLE_LOG4CPLUS
+void dronescan::log(char* cat,const char* format, ...)
+{
+	char buffer[512] = {0};
+	va_list _list;
+
+	va_start(_list, format);
+	vsnprintf(buffer, 512, format, _list);
+	va_end(_list);
+
+	log4cplus::Logger::getInstance(cat).log(log4cplus::INFO_LOG_LEVEL,buffer);
+
+}
+#endif
 
 /** Set the topic of the console channel. */
 void dronescan::setConsoleTopic()
@@ -1489,7 +1573,7 @@ void dronescan::preloadUserCache()
 			<< "FROM users"
 			;
 
-	if( SQLDb->Exec(theQuery ) )
+	if( SQLDb->Exec(theQuery,true ) )
 //	if(PGRES_TUPLES_OK == status)
 		{
 		/* First we need to clear the current cache. */

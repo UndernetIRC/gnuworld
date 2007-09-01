@@ -131,3 +131,6 @@
 
 /* Define to `int' if <sys/types.h> doesn't define. */
 #undef uid_t
+
+/* Define to enable log4c integration */
+#undef ENABLE_LOG4CPLUS

@@ -38,6 +38,7 @@ public:
 	bool seenOper;
 	bool seenLoggedInUser;
 	std::list<std::string> numerics;
+	std::list<std::pair<std::string,std::string> > userNames;
 
 }; // class jfClientData
 

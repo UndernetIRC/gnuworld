@@ -18,7 +18,7 @@
  */
 
 #ifndef DRONESCAN_H
-#define DRONESCAN_H "$Id: dronescan.h,v 1.32 2007/08/28 16:10:14 dan_karrels Exp $"
+#define DRONESCAN_H "$Id: dronescan.h,v 1.33 2007/09/01 20:16:57 mrbean_ Exp $"
 
 #include <map>
 #include <string>
@@ -27,8 +27,19 @@
 
 #include "clientData.h"
 #include "jfChannel.h"
-#include	"dbHandle.h"
+#include "dbHandle.h"
 #include "glineData.h"
+
+#ifdef ENABLE_LOG4CPLUS
+#include <log4cplus/loglevel.h>
+#include <log4cplus/configurator.h>
+#include <iomanip>
+
+#define JF_GLINED "gnuworld.ds.jf.glined"
+#define JF_CSERVICE "gnuworld.ds.jf.cservice"
+
+#endif
+
 
 namespace gnuworld {
 
@@ -54,6 +65,8 @@ enum LOG_TYPE {
 	WARN,
 	ERR
 };
+
+
 
 class dronescan : public xClient {
 public:
@@ -169,6 +182,10 @@ public:
 
 	/** Log a message. */
 	void log(LOG_TYPE, const char*, ...) ;
+
+	#ifdef ENABLE_LOG4CPLUS
+	void log(char*,const char*, ...);
+	#endif
 
 	/** Set the topic of the console channel. */
 	void setConsoleTopic() ;
@@ -318,6 +335,7 @@ protected:
 
 	/** Fake sqlUser record for opered clients without accounts. */
 	sqlUser *fakeOperUser;
+	
 }; // class dronescan
 
 } // namespace ds

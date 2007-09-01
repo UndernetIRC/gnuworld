@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: cservice.cc,v 1.275 2007/08/28 16:10:11 dan_karrels Exp $
+ * $Id: cservice.cc,v 1.276 2007/09/01 20:16:55 mrbean_ Exp $
  */
 
 #include	<new>
@@ -151,7 +151,7 @@ if (SQLDb->Exec("DELETE FROM webnotices WHERE created_ts < (now()::abstime::int4
 		<< endl;
 }
 
-if (SQLDb->Exec("SELECT now()::abstime::int4;"))
+if (SQLDb->Exec("SELECT now()::abstime::int4;",true))
 	{
 	// Set our "Last Refresh" timers to the current database system time.
 	time_t serverTime = atoi(SQLDb->GetValue(0,0).c_str());

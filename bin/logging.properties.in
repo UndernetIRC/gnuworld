@@ -1,0 +1,15 @@
+log4cplus.logger.gnuworld.ds.jf.glined=INFO, DS-JFGLINED
+
+log4cplus.appender.DS-JFGLINED=log4cplus::DailyRollingFileAppender
+log4cplus.appender.DS-JFGLINED.File=jf-glined.log
+log4cplus.appender.DS-JFGLINED.Schedule=Daily
+log4cplus.appender.DS-JFGLINED.layout=log4cplus::PatternLayout
+log4cplus.appender.DS-JFGLINED.layout.ConversionPattern=%d - %m%n
+
+log4cplus.logger.gnuworld.ds.jf.cservice=INFO, DS-CSERVICE
+
+log4cplus.appender.DS-CSERVICE=log4cplus::DailyRollingFileAppender
+log4cplus.appender.DS-CSERVICE.File=jf-cservice.log
+log4cplus.appender.DS-CSERVICE.Schedule=Daily
+log4cplus.appender.DS-CSERVICE.layout=log4cplus::PatternLayout
+log4cplus.appender.DS-CSERVICE.layout.ConversionPattern=%d - %m%n

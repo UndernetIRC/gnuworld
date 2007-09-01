@@ -40,6 +40,8 @@ if(theClient->isOper())
 if(theClient->getMode(iClient::MODE_REGISTERED))
 	{
 	jfClient.seenLoggedInUser = true;
+	jfClient.userNames.push_back(std::pair<std::string,std::string>(theClient->getCharYYXXX(),
+		theClient->getAccount()));
 	}
 if(find(begin,end,theClient->getCharYYXXX()) == end)
 	{

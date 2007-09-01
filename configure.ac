@@ -1,10 +1,10 @@
-dnl $Id: configure.ac,v 1.37 2007/08/28 16:09:57 dan_karrels Exp $
+dnl $Id: configure.ac,v 1.38 2007/09/01 20:16:54 mrbean_ Exp $
 dnl ----------------------------------------------------------
 
 echo Configuring GNUWorld...
 echo
 
-AC_REVISION($Revision: 1.37 $)
+AC_REVISION($Revision: 1.38 $)
 AC_INIT
 AC_CONFIG_SRCDIR([src/main.cc])
 AM_INIT_AUTOMAKE(gnuworld,2.8)
@@ -197,10 +197,11 @@ AC_ARG_WITH(pgsql-include,
 	[pgsql_include=$withval]
 )
 
-AC_MSG_CHECKING([for libpq.so])
+AC_MSG_CHECKING([for libpq.so in $pgsql_lib])
 if [ test -f $pgsql_lib/libpq.so ]; then
 	AC_MSG_RESULT([$pgsql_lib])
 	AC_DEFINE([HAVE_PGSQL],[],[Using PostGreSQL])
+	[LDFLAGS="$LDFLAGS -L${pgsql_lib}"]
 else
 	AC_MSG_FAILURE([unable to find libpq.so])
 fi
@@ -209,8 +210,53 @@ AC_MSG_CHECKING([for libpq-fe.h])
 if [ test -f $pgsql_include/libpq-fe.h ]; then
 	AC_MSG_RESULT([$pgsql_include])
 	AC_DEFINE([HAVE_PGSQL],[],[Using PostGreSQL])
+	CXXFLAGS="${CXXFLAGS} -I${pgsql_include}"
 else
 	AC_MSG_FAILURE([unable to find libpq-fe.h])
+fi
+
+dnl Enable log4cplus if required
+AC_ARG_WITH(log4cplus,
+	AC_HELP_STRING([--with-log4cplus],
+			[Check log4cplus, if not enabled some modules may not have logging support]),
+	[check_log4cplus=$withval]
+)
+
+LOG4CPLUS_LIB="${check_log4cplus}/lib"
+AC_ARG_WITH(log4cplus-lib,
+	AC_HELP_STRING([--with-log4cplus-lib=LOG4CPLUSLIBDIR],
+			[Specify location to find liblog4cplus.so]),
+	[LOG4CPLUS_LIB=$withval]
+)
+
+LOG4CPLUS_INCLUDE="${check_log4cplus}/include"
+AC_ARG_WITH(log4cplus-include,
+	AC_HELP_STRING([--with-log4cplus-include=LOG4CPLUSINCLUDEDIR],
+			[Specify location to find logger.h]),
+	[LOG4CPLUS_INCLUDE=$withval]
+)
+
+if [test "x$check_log4cplus" != "x" ]; then
+	AC_MSG_CHECKING(for liblog4cplus.so)
+	if [test -f "$LOG4CPLUS_LIB/liblog4cplus.so"]; then
+		/bin/true
+	else
+	        AC_MSG_ERROR( Unable to find liblog4cplus.so, \
+			 please use the --with-log4cplus-lib argument to point to the right path)
+	fi
+	AC_MSG_RESULT(yes)
+	
+	AC_MSG_CHECKING(for log4cplus/logger.h)
+	if [test -f "$LOG4CPLUS_INCLUDE/log4cplus/logger.h"]; then
+		/bin/true
+	else
+	        AC_MSG_ERROR( Unable to find log4cplus/logger.h, \
+			 please use the --with-log4cplu-include argument to point to the right path)
+	fi
+	AC_MSG_RESULT(yes)
+	AC_DEFINE(ENABLE_LOG4CPLUS)
+	LDFLAGS="${LDFLAGS} -L${LOG4CPLUS_LIB} -llog4cplus"
+	CXXFLAGS="${CXXFLAGS} -I${LOG4CPLUS_INCLUDE}"
 fi
 
 dnl Allow selection of additional includes and libraries paths
@@ -370,38 +416,39 @@ AC_SUBST(pgsql_include)
 AC_SUBST(pgsql_lib)
 
 AC_CONFIG_FILES([Makefile \
-	db/Makefile \
-	libgnuworld/Makefile \
-	libircu/Makefile \
-	src/Makefile \
-	test/Makefile \
-	mod.ccontrol/Makefile \
-	mod.chanfix/Makefile \
-	mod.clientExample/Makefile \
-	mod.cloner/Makefile \
-	mod.cservice/Makefile \
-	mod.dronescan/Makefile \
-	mod.gnutest/Makefile \
-	mod.nickserv/Makefile \
-	mod.openchanfix/Makefile \
-	mod.scanner/Makefile \
-	mod.stats/Makefile \
-	mod.snoop/Makefile \
-	bin/server_command_map \
-	bin/ccontrol.example.conf \
-	bin/chanfix.example.conf \
-	bin/clientExample.example.conf \
-	bin/cloner.example.conf \
-	bin/cservice.example.conf \
-	bin/gnutest.example.conf \
-	bin/GNUWorld.example.conf \
-	bin/nickserv.example.conf \
-	bin/openchanfix.example.conf \
-	bin/scanner.example.conf \
-	bin/stats.example.conf \
-	bin/snoop.example.conf \
-	bin/dronescan.example.conf \
-	tools/checkgnuworld.sh])
+db/Makefile \
+libgnuworld/Makefile \
+libircu/Makefile \
+src/Makefile \
+test/Makefile \
+mod.ccontrol/Makefile \
+mod.chanfix/Makefile \
+mod.clientExample/Makefile \
+mod.cloner/Makefile \
+mod.cservice/Makefile \
+mod.dronescan/Makefile \
+mod.gnutest/Makefile \
+mod.nickserv/Makefile \
+mod.openchanfix/Makefile \
+mod.scanner/Makefile \
+mod.stats/Makefile \
+mod.snoop/Makefile \
+bin/server_command_map \
+bin/ccontrol.example.conf \
+bin/chanfix.example.conf \
+bin/clientExample.example.conf \
+bin/cloner.example.conf \
+bin/cservice.example.conf \
+bin/gnutest.example.conf \
+bin/GNUWorld.example.conf \
+bin/nickserv.example.conf \
+bin/openchanfix.example.conf \
+bin/scanner.example.conf \
+bin/stats.example.conf \
+bin/snoop.example.conf \
+bin/dronescan.example.conf \
+bin/logging.properties \
+tools/checkgnuworld.sh])
 
 AC_OUTPUT
 

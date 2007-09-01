@@ -1,4 +1,10 @@
-// $Id: ChangeLog,v 1.121 2007/08/24 13:07:05 mrbean_ Exp $ //
+// $Id: ChangeLog,v 1.122 2007/09/01 20:16:53 mrbean_ Exp $ //
+
+2007-09-01	MrBean <mrbean@undernet.org>
+		* Fixed the build system to include PGSQL lib in case postgresql is selected
+		* Modules can now link against log4cpp, use --with-log4cpp=<dir> to use it
+		* mod.cservice/cservice.cc - Fixed a bug which prevented X from starting
+		* mod.dronescan/* - Dronescan now logs all the glines it issues (need to enable log4cpp for it to work)
 
 2007-08-24	MrBean <mrbean@undernet.org>
 		* mod.dronescan/* Added exceptional channels (channels which are not checked)

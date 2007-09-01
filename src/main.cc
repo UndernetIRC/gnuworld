@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: main.cc,v 1.66 2006/09/26 17:36:06 kewlio Exp $
+ * $Id: main.cc,v 1.67 2007/09/01 20:16:56 mrbean_ Exp $
  */
 
 #include	<sys/time.h>
@@ -47,7 +47,12 @@
 #include	"md5hash.h"
 #include	"Signal.h"
 
-RCSTAG( "$Id: main.cc,v 1.66 2006/09/26 17:36:06 kewlio Exp $" ) ;
+#ifdef ENABLE_LOG4CPLUS
+#include <log4cplus/configurator.h>
+#include <log4cplus/logger.h>
+#endif
+
+RCSTAG( "$Id: main.cc,v 1.67 2007/09/01 20:16:56 mrbean_ Exp $" ) ;
 
 // main() must be in the global namespace
 using namespace gnuworld ;
@@ -228,6 +233,11 @@ logSocket = true ;
 verbose = false ;
 bool doDebug = true ;
 string socketFileName( "socket.log" ) ;
+
+std::cout << "Before configuration" << endl; 
+#ifdef ENABLE_LOG4CPLUS
+log4cplus::PropertyConfigurator::doConfigure("logging.properties");
+#endif
 
 optind = 0 ;
 int c = EOF ;
