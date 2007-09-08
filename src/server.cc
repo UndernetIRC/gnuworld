@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server.cc,v 1.222 2007/04/18 11:06:06 kewlio Exp $
+ * $Id: server.cc,v 1.223 2007/09/08 08:39:56 mrbean_ Exp $
  */
 
 #include	<sys/time.h>
@@ -70,7 +70,7 @@
 #include	"ConnectionHandler.h"
 #include	"Connection.h"
 
-RCSTAG( "$Id: server.cc,v 1.222 2007/04/18 11:06:06 kewlio Exp $" ) ;
+RCSTAG( "$Id: server.cc,v 1.223 2007/09/08 08:39:56 mrbean_ Exp $" ) ;
 
 namespace gnuworld
 {
@@ -988,9 +988,11 @@ bool xServer::AttachClient( const string& moduleName,
 moduleLoader< xClient* >* ml =
 	new (std::nothrow) moduleLoader< xClient* >( moduleName ) ;
 assert( ml != 0 ) ;
-
+xClient* clientPtr = NULL;
+try {
 // Attempt to instantiate an xClient instance from the module
-xClient* clientPtr = ml->loadObject( configFileName );
+clientPtr = ml->loadObject( configFileName );
+} catch (...) {}
 
 // Check if the object was loaded successfully
 if( NULL == clientPtr )
