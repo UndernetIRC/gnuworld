@@ -768,7 +768,7 @@ for(jcChanMapType::const_iterator itr = jcChanMap.begin() ;
 						tempNames.str("");
 						if(jcGlineEnable)
 								{
-								glineData* theGline = new (std::nothrow) glineData("*!*@" +xIP(joinPartIt->first).GetNumericIP(),jcGlineReason,jcGlineLength);
+								glineData* theGline = new (std::nothrow) glineData("*@" +joinPartIt->first,jcGlineReason,jcGlineLength);
 								glined.push_back(std::pair<glineData*,std::list<std::string> >(theGline,clients));
 								}
 					} else  {
@@ -902,7 +902,7 @@ if(glineQueue.size() > 0)
 				glineQueue.pop_front();
 				userCount = Network->countMatchingRealUserHost(curGline->getHost());
 				us[0] = '\0';
-				sprintf(us,"%d",count);
+				sprintf(us,"%d",userCount);
 				std::string glineReason = string("AUTO [") + us + string("] ") + curGline->getReason(); 
 				MyUplink->setGline(nickName,curGline->getHost(),
 				glineReason,curGline->getExpires(),::time(0),this);
