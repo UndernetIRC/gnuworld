@@ -20,7 +20,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccontrol.cc,v 1.216 2007/08/28 16:10:07 dan_karrels Exp $
+ * $Id: ccontrol.cc,v 1.217 2007/09/12 13:45:30 kewlio Exp $
 */
 
 #define MAJORVER "1"
@@ -66,7 +66,7 @@
 #include	"ccontrol_generic.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: ccontrol.cc,v 1.216 2007/08/28 16:10:07 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: ccontrol.cc,v 1.217 2007/09/12 13:45:30 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -3309,7 +3309,7 @@ for(string::size_type pos = 0; pos < Hostname.size();++pos)
 Affected = Network->countMatchingRealUserHost(Host); //Calculate the number of affected
 if((Dots > 3) && (GlineType & isIP)) //IP addy cant have more than 3 dots
 	retMe |=  gline::BAD_HOST;
-if((GlineType & (isIP || isWildCard) == isIP) && !(ParseEnded))
+if(((GlineType & (isIP || isWildCard)) == isIP) && !(ParseEnded))
 	Mask +=8; //Add the last mask count if needed
 if((GlineType & isIP) && (Mask < 24))
 	retMe |=  gline::HUH_NO_HOST;  //Its too wide
@@ -3455,7 +3455,7 @@ if((Dots > 3) && (GlineType & isIP)) //IP addy cant have more than 3 dots
 	retMe |=  gline::BAD_HOST;
 if((GlineType & isIP) && (isCIDR) && (Dots != 3))
 	retMe |= gline::BAD_CIDROVERRIDE;
-if((GlineType & (isIP || isWildCard) == isIP) && !(ParseEnded))
+if(((GlineType & (isIP || isWildCard)) == isIP) && !(ParseEnded))
 	Mask +=8; //Add the last mask count if needed
 if((GlineType & isIP) && (Mask < 8))
 	retMe |=  gline::HUH_NO_HOST;  //Its too wide

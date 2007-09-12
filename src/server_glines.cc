@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server_glines.cc,v 1.1 2005/01/07 00:10:46 dan_karrels Exp $
+ * $Id: server_glines.cc,v 1.2 2007/09/12 13:45:30 kewlio Exp $
  */
 
 #include	<new>
@@ -37,7 +37,7 @@
 #include	"Gline.h"
 #include	"ELog.h"
 
-RCSTAG( "$Id: server_glines.cc,v 1.1 2005/01/07 00:10:46 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: server_glines.cc,v 1.2 2007/09/12 13:45:30 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -74,9 +74,6 @@ Write( s ) ;
 // Did we find the gline in the interal gline structure?
 if( foundGline )
 	{
-	// Remove the gline from the internal gline structure
-	eraseGline( gItr ) ;
-
 	// Let all clients know that the gline has been removed
 	if( remClient )
 		{
@@ -91,6 +88,9 @@ if( foundGline )
 		}
 	// Deallocate the gline
 	delete gItr->second ;
+
+	// Remove the gline from the internal gline structure
+	eraseGline( gItr ) ;
 	}
 
 // Return success
@@ -241,10 +241,10 @@ void xServer::updateGlines()
 {
 time_t now = ::time( 0 ) ;
 
-glineIterator	ptr = glines_begin(),
-		end = glines_end() ;
-for( ; ptr != end ; ++ptr )
-	{
+glineIterator	ptr = glines_begin();
+
+while (ptr != glines_end())
+{
 	if( ptr->second->getExpiration() <= now )
 		{
 		// Expire the gline
@@ -252,9 +252,11 @@ for( ; ptr != end ; ++ptr )
 			static_cast< void* >( ptr->second ) ) ;
 
 		delete ptr->second ;
-		glineList.erase( ptr ) ;
+		glineList.erase( ptr++ ) ;
+		} else {
+		ptr++;
 		}
-	} // for()
+}
 } // updateGlines()
 
 } // namespace gnuworld

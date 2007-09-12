@@ -1,4 +1,10 @@
-// $Id: ChangeLog,v 1.123 2007/09/12 13:36:01 kewlio Exp $ //
+// $Id: ChangeLog,v 1.124 2007/09/12 13:45:30 kewlio Exp $ //
+
+2007-09-12	Dan-m00 <daniel@undernet.org>
+		* src/server_glines.cc: Modify the way we erase items from the
+			gline map.  This stops coredumps in newer gcc versions.
+		* mod.ccontrol/ccontrol.cc: add parenthesis around tests to
+			remove compile time warnings and potential mis-testing.
 
 2007-09-12	Dan-m00 <daniel@undernet.org>
 		* libgnuworld/Signal.cc:
