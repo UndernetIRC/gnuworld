@@ -1,4 +1,7 @@
-// $Id: ChangeLog,v 1.124 2007/09/12 13:45:30 kewlio Exp $ //
+// $Id: ChangeLog,v 1.125 2007/09/12 15:15:24 kewlio Exp $ //
+
+2007-09-12	Dan-m00 <daniel@undernet.org>
+		* Re-built configure system
 
 2007-09-12	Dan-m00 <daniel@undernet.org>
 		* src/server_glines.cc: Modify the way we erase items from the

@@ -1,4 +1,4 @@
-# generated automatically by aclocal 1.9.6 -*- Autoconf -*-
+# generated automatically by aclocal 1.9a -*- Autoconf -*-
 
 # Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
 # 2005  Free Software Foundation, Inc.
@@ -21,14 +21,21 @@
 # ----------------------------
 # Automake X.Y traces this macro to ensure aclocal.m4 has been
 # generated from the m4 files accompanying Automake X.Y.
-AC_DEFUN([AM_AUTOMAKE_VERSION], [am__api_version="1.9"])
+# (This private macro should not be called outside this file.)
+AC_DEFUN([AM_AUTOMAKE_VERSION],
+[am__api_version='1.9a'
+dnl Some users find AM_AUTOMAKE_VERSION and mistake it for a way to
+dnl require some minimum version.  Point them to the right macro.
+m4_if([$1], [1.9a], [],
+      [AC_FATAL([Do not call $0, use AM_INIT_AUTOMAKE([$1]).])])dnl
+])
 
 # AM_SET_CURRENT_AUTOMAKE_VERSION
 # -------------------------------
 # Call AM_AUTOMAKE_VERSION so it can be traced.
 # This function is AC_REQUIREd by AC_INIT_AUTOMAKE.
 AC_DEFUN([AM_SET_CURRENT_AUTOMAKE_VERSION],
-	 [AM_AUTOMAKE_VERSION([1.9.6])])
+	 [AM_AUTOMAKE_VERSION([1.9a])])
 
 # AM_AUX_DIR_EXPAND                                         -*- Autoconf -*-
 
@@ -378,7 +385,7 @@ AU_DEFUN([AM_CONFIG_HEADER], [AC_CONFIG_HEADERS($@)])
 # arguments mandatory, and then we can depend on a new Autoconf
 # release and drop the old call support.
 AC_DEFUN([AM_INIT_AUTOMAKE],
-[AC_PREREQ([2.58])dnl
+[AC_PREREQ([2.59c])dnl
 dnl Autoconf wants to disallow AM_ names.  We explicitly allow
 dnl the ones we care about.
 m4_pattern_allow([^AM_[A-Z]+FLAGS$])dnl
@@ -477,7 +484,7 @@ echo "timestamp for $1" >`AS_DIRNAME([$1])`/stamp-h[]$_am_stamp_count])
 # Define $install_sh.
 AC_DEFUN([AM_PROG_INSTALL_SH],
 [AC_REQUIRE([AM_AUX_DIR_EXPAND])dnl
-install_sh=${install_sh-"$am_aux_dir/install-sh"}
+install_sh=${install_sh-"\$(SHELL) $am_aux_dir/install-sh"}
 AC_SUBST(install_sh)])
 
 # Copyright (C) 2003, 2005  Free Software Foundation, Inc.
@@ -555,14 +562,14 @@ rm -f confinc confmf
 
 # Fake the existence of programs that GNU maintainers use.  -*- Autoconf -*-
 
-# Copyright (C) 1997, 1999, 2000, 2001, 2003, 2005
+# Copyright (C) 1997, 1999, 2000, 2001, 2003, 2004, 2005
 # Free Software Foundation, Inc.
 #
 # This file is free software; the Free Software Foundation
 # gives unlimited permission to copy and/or distribute it,
 # with or without modifications, as long as this notice is preserved.
 
-# serial 4
+# serial 5
 
 # AM_MISSING_PROG(NAME, PROGRAM)
 # ------------------------------
@@ -578,6 +585,7 @@ AC_SUBST($1)])
 # If it does, set am_missing_run to use it, otherwise, to nothing.
 AC_DEFUN([AM_MISSING_HAS_RUN],
 [AC_REQUIRE([AM_AUX_DIR_EXPAND])dnl
+AC_REQUIRE_AUX_FILE([missing])dnl
 test x"${MISSING+set}" = xset || MISSING="\${SHELL} $am_aux_dir/missing"
 # Use eval to expand $SHELL
 if eval "$MISSING --run true"; then
@@ -614,30 +622,34 @@ fi
 # parallel make tries to run `mkdir -p a/b' and `mkdir -p a/c'
 # concurrently, both version can detect that a/ is missing, but only
 # one can create it and the other will error out.  Consequently we
-# restrict ourselves to GNU make (using the --version option ensures
+# restrict ourselves to GNU mkdir (using the --version option ensures
 # this.)
 AC_DEFUN([AM_PROG_MKDIR_P],
 [if mkdir -p --version . >/dev/null 2>&1 && test ! -d ./--version; then
-  # We used to keeping the `.' as first argument, in order to
+  # We used to define $(mkdir_p) as `mkdir -p -- .', in order to
   # allow $(mkdir_p) to be used without argument.  As in
   #   $(mkdir_p) $(somedir)
-  # where $(somedir) is conditionally defined.  However this is wrong
-  # for two reasons:
-  #  1. if the package is installed by a user who cannot write `.'
-  #     make install will fail,
-  #  2. the above comment should most certainly read
-  #     $(mkdir_p) $(DESTDIR)$(somedir)
-  #     so it does not work when $(somedir) is undefined and
-  #     $(DESTDIR) is not.
-  #  To support the latter case, we have to write
-  #     test -z "$(somedir)" || $(mkdir_p) $(DESTDIR)$(somedir),
-  #  so the `.' trick is pointless.
+  # where $(somedir) is conditionally defined.  However we don't do
+  # that anymore.
+  #  1. before we restricted the check to GNU mkdir, `mkdir -p .' was
+  #     reported to fail in read-only directories.  The system where this
+  #     happened has been forgotten.
+  #  2. in practice we call $(mkdir_p) on directories such as
+  #       $(mkdir_p) "$(DESTDIR)$(somedir)"
+  #     and we don't want to create $(DESTDIR) if $(somedir) is empty.
+  #     To support the latter case, we have to write
+  #       test -z "$(somedir)" || $(mkdir_p) "$(DESTDIR)$(somedir)"
+  #     so $(mkdir_p) always has an argument.
+  #     We will have better chances of detecting a missing test if
+  #     $(mkdir_p) complains about missing arguments.
+  #  3. $(mkdir_p) is named after `mkdir -p' and we don't expect this
+  #     to accept no argument.
+  #  4. having something like `mkdir .' in the output is unsightly.
   mkdir_p='mkdir -p --'
 else
   # On NextStep and OpenStep, the `mkdir' command does not
   # recognize any option.  It will interpret all options as
-  # directories to create, and then abort because `.' already
-  # exists.
+  # directories to create.
   for d in ./-p ./--version;
   do
     test -d $d && rmdir $d
@@ -761,7 +773,7 @@ dnl Don't test for $cross_compiling = yes, because it might be `maybe'.
 if test "$cross_compiling" != no; then
   AC_CHECK_TOOL([STRIP], [strip], :)
 fi
-INSTALL_STRIP_PROGRAM="\${SHELL} \$(install_sh) -c -s"
+INSTALL_STRIP_PROGRAM="\$(install_sh) -c -s"
 AC_SUBST([INSTALL_STRIP_PROGRAM])])
 
 # Check how to create a tarball.                            -*- Autoconf -*-
