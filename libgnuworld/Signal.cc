@@ -18,9 +18,10 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: Signal.cc,v 1.9 2003/07/17 13:09:03 dan_karrels Exp $
+ * $Id: Signal.cc,v 1.10 2007/09/12 13:36:02 kewlio Exp $
  */
 
+#include	<stdlib.h>
 #include	<sys/types.h>
 #include	<sys/socket.h>
 #include	<pthread.h>
@@ -37,7 +38,7 @@
 #include	"Signal.h"
 #include	"ELog.h"
 
-const char rcsId[] = "$Id: Signal.cc,v 1.9 2003/07/17 13:09:03 dan_karrels Exp $" ;
+const char rcsId[] = "$Id: Signal.cc,v 1.10 2007/09/12 13:36:02 kewlio Exp $" ;
 
 namespace gnuworld
 {

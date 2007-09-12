@@ -1,4 +1,10 @@
-// $Id: ChangeLog,v 1.122 2007/09/01 20:16:53 mrbean_ Exp $ //
+// $Id: ChangeLog,v 1.123 2007/09/12 13:36:01 kewlio Exp $ //
+
+2007-09-12	Dan-m00 <daniel@undernet.org>
+		* libgnuworld/Signal.cc:
+		* libgnuworld/match.cc:
+		* mod.ccontrol/ccLog.cc: Added missing stdlib.h includes that
+			cause gcc4.3 to complain.
 
 2007-09-01	MrBean <mrbean@undernet.org>
 		* Fixed the build system to include PGSQL lib in case postgresql is selected
