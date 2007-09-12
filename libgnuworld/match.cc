@@ -16,7 +16,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- * $Id: match.cc,v 1.8 2007/09/12 13:36:02 kewlio Exp $
+ * $Id: match.cc,v 1.9 2007/09/12 16:40:33 kewlio Exp $
  */
 #include	"match.h"
 #include	"ConnectionManager.h"
@@ -24,7 +24,7 @@
 #include	<string>
 #include	<stdio.h>
 
-const char rcsId[] = "$Id: match.cc,v 1.8 2007/09/12 13:36:02 kewlio Exp $" ;
+const char rcsId[] = "$Id: match.cc,v 1.9 2007/09/12 16:40:33 kewlio Exp $" ;
 
 namespace gnuworld
 {
@@ -457,7 +457,7 @@ int matchexec(const char *string, const char *cmask, int minlen)
   char ch;
 
 tryhead:
-  while ((ToLower(*++s) == *++b) && *s);
+  while ((ToLower(*++s) == *++b) && *s) { /* noop */ };
   if (!*s)
     return ((*b != '\0') && ((*b++ != 'Z') || (*b != '\0')));
   if (*b != 'Z')
@@ -468,14 +468,14 @@ tryhead:
   };
 
   bs = s;
-  while (*++s);
+  while (*++s) { /* noop */ };
 
   if ((trash = (s - string - minlen)) < 0)
     return 2;
 
 trytail:
   while ((ToLower(*--s) == *++b) && *b && (ToLower(*--s) == *++b) && *b
-      && (ToLower(*--s) == *++b) && *b && (ToLower(*--s) == *++b) && *b);
+      && (ToLower(*--s) == *++b) && *b && (ToLower(*--s) == *++b) && *b) { /* noop */ };
   if (*b != 'Z')
   {
     if (*b == 'A')
@@ -494,7 +494,7 @@ trytail:
     bs = s;
 
 trychunk:
-    while ((ToLower(*++s) == *++b) && *b);
+    while ((ToLower(*++s) == *++b) && *b) { /* noop */ };
     if (!*b)
       return 0;
     if (*b == 'Z')
@@ -616,7 +616,7 @@ int mmexec(const char *wcm, int wminlen, const char *rcm, int rminlen)
      headAAAAZliatAAAZchunk for compiled masks */
 
   /* Match the head of wm with the head of rm */
-  for (; (*r) && (*r != 'Z') && ((*w == *r) || (*w == 'A')); r++, w++);
+  for (; (*r) && (*r != 'Z') && ((*w == *r) || (*w == 'A')); r++, w++) { /* noop */ };
   if (*r == 'Z')
     while (*w == 'A')           /* Eat extra '?' before '*' in wm if got '*' in rm */
       w++, eat++;
@@ -626,7 +626,7 @@ int mmexec(const char *wcm, int wminlen, const char *rcm, int rminlen)
     return 0;                   /* headZ<nul> matches head<anything>    */
 
   /* Does rm have any stars in it ? let's check */
-  for (rx = r; *r && (*r != 'Z'); r++);
+  for (rx = r; *r && (*r != 'Z'); r++) { /* noop */ };
   if (!*r)
   {
     /* rm has no stars and thus isn't a mask but it's just a flat
@@ -635,7 +635,7 @@ int mmexec(const char *wcm, int wminlen, const char *rcm, int rminlen)
     /* match the tail */
     if (*w != 'Z')
     {
-      for (; r--, (*w) && ((*w == *r) || (*w == 'A')); w++);
+      for (; r--, (*w) && ((*w == *r) || (*w == 'A')); w++) { /* noop */ };
       if (*w != 'Z')            /* headZliat1<any> fails on head<any>2tail  */
         return (*w) ? 1 : 0;    /* but headZliat<nul> matches head<any>tail */
     }
@@ -647,7 +647,7 @@ int mmexec(const char *wcm, int wminlen, const char *rcm, int rminlen)
       for (bw = w++; (*w != *rx); rx++) /* Seek the 1st char of the chunk */
         if (--trash < 0)        /* See if we can trash one more char of rm */
           return 1;             /* If not we can only fail of course       */
-      for (r = ++rx, w++; (*w) && ((*w == *r) || (*w == 'A')); r++, w++);
+      for (r = ++rx, w++; (*w) && ((*w == *r) || (*w == 'A')); r++, w++) { /* noop */ };
       if (!*w)                  /* Did last loop match the rest of chunk ? */
         return 0;               /* ... Yes, end of wm, matched !           */
       if (*w != 'Z')
@@ -669,7 +669,7 @@ int mmexec(const char *wcm, int wminlen, const char *rcm, int rminlen)
   /* Match the tail of wm (if any) against the tail of rm */
   if (*w != 'Z')
   {
-    for (; (*w) && (*r != 'Z') && ((*w == *r) || (*w == 'A')); w++, r++);
+    for (; (*w) && (*r != 'Z') && ((*w == *r) || (*w == 'A')); w++, r++) { /* noop */ };
     if (*r == 'Z')              /* extra '?' before tail are fluff, just flush 'em */
       while (*w == 'A')
         w++;
@@ -687,7 +687,7 @@ int mmexec(const char *wcm, int wminlen, const char *rcm, int rminlen)
     if (!(rx < rz))             /* head finished            */
       break;
     for (bw++, (br = ++rx);
-        (br < rz) && (*bw) && ((*bw == *br) || (*bw == 'A')); br++, bw++);
+        (br < rz) && (*bw) && ((*bw == *br) || (*bw == 'A')); br++, bw++) { /* noop */ };
     if (!(br < rz))             /* Note that we didn't use any 'eat' char yet, if  */
       while (*bw == 'A')        /* there were eat-en chars the head would be over  */
         bw++, eat++;            /* Happens only at end of head, and eat is still 0 */
@@ -715,7 +715,7 @@ int mmexec(const char *wcm, int wminlen, const char *rcm, int rminlen)
 
   /* Match the unused chunks of wm against the chunks of rm */
   rx = r;
-  for (; *r && (*r != 'Z'); r++);
+  for (; *r && (*r != 'Z'); r++) { /* noop */ };
   rz = r;
   if (*r++)
   {
@@ -731,7 +731,7 @@ int mmexec(const char *wcm, int wminlen, const char *rcm, int rminlen)
       if (!*r)
         break;
       for ((br = ++r), bw++;
-          (*br) && (*br != 'Z') && ((*bw == *br) || (*bw == 'A')); br++, bw++);
+          (*br) && (*br != 'Z') && ((*bw == *br) || (*bw == 'A')); br++, bw++) { /* noop */ };
       if (*br == 'Z')
         while (*bw == 'A')
           bw++, eat++;
@@ -771,7 +771,7 @@ int mmexec(const char *wcm, int wminlen, const char *rcm, int rminlen)
     if (!(r >= rx))
       return 1;
     for ((br = --r), bw++;
-        (*bw) && (br >= rx) && ((*bw == *br) || (*bw == 'A')); br--, bw++);
+        (*bw) && (br >= rx) && ((*bw == *br) || (*bw == 'A')); br--, bw++) { /* noop */ };
     if (!*bw)
       return 0;
     if (!(br >= rx))

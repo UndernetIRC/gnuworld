@@ -1,4 +1,12 @@
-// $Id: ChangeLog,v 1.125 2007/09/12 15:15:24 kewlio Exp $ //
+// $Id: ChangeLog,v 1.126 2007/09/12 16:40:31 kewlio Exp $ //
+
+2007-09-12	Dan-m00 <daniel@undernet.org>
+		* libgnuworld/match.cc: Remove compiler warnings relating to
+			empty body in while() and for() loops
+
+		* mod.ccontrol/ccontrol.h:
+		* mod.ccontrol/ccontrol.cc: Remove compiler warnings relating
+			to invalid type conversions.
 
 2007-09-12	Dan-m00 <daniel@undernet.org>
 		* Re-built configure system

@@ -20,7 +20,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccontrol.cc,v 1.217 2007/09/12 13:45:30 kewlio Exp $
+ * $Id: ccontrol.cc,v 1.218 2007/09/12 16:40:32 kewlio Exp $
 */
 
 #define MAJORVER "1"
@@ -66,7 +66,7 @@
 #include	"ccontrol_generic.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: ccontrol.cc,v 1.217 2007/09/12 13:45:30 kewlio Exp $" ) ;
+RCSTAG( "$Id: ccontrol.cc,v 1.218 2007/09/12 16:40:32 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -1295,8 +1295,9 @@ void ccontrol::OnEvent( const eventType& theEvent,
 {
 int i=0;
 int client_addr[4] = { 0 };
+struct in_addr tmp_ip;
 unsigned long mask_ip;
-const char *client_ip;
+char *client_ip;
 char Log[200];
 switch( theEvent )
 	{
@@ -1333,7 +1334,8 @@ switch( theEvent )
 	                        }
 	                        /* convert longip back to ip */
 	                        mask_ip = htonl(mask_ip);
-	                        client_ip = inet_ntoa((const in_addr&) mask_ip);
+				tmp_ip.s_addr = mask_ip;
+	                        client_ip = inet_ntoa(tmp_ip);
 				if ((clientsIp24Map.find(client_ip) != clientsIp24Map.end()) && 
 					(--clientsIp24Map[client_ip] < 1))
 	                        {
@@ -1805,7 +1807,8 @@ bool DoGline = false;
 int i=0, AffectedUsers = 0;
 int client_addr[4] = { 0 };
 unsigned long mask_ip;
-const char *client_ip;
+struct in_addr tmp_ip;
+char *client_ip;
 char Log[200], GlineMask[250], GlineReason[250];
 
 GlineReason[0] = '\0';
@@ -1844,7 +1847,8 @@ if(dbConnected)
                                 }
                                 /* convert longip back to ip */
                                 mask_ip = htonl(mask_ip);
-                                client_ip = inet_ntoa((const in_addr&) mask_ip);
+				tmp_ip.s_addr = mask_ip;
+                                client_ip = inet_ntoa(tmp_ip);
 				sprintf(Log, "%s/%d-%s", client_ip, CClonesCIDR, NewUser->getUserName().c_str());
 				int CurIdentConnections = ++clientsIp24IdentMap[Log];
                                 int CurCIDRConnections = ++clientsIp24Map[client_ip];
@@ -3165,7 +3169,7 @@ tLogFile.close();
 return true;
 }
 
-bool ccontrol::MailReport(const char *MailTo, char *ReportFile)
+bool ccontrol::MailReport(const char *MailTo, const char *ReportFile)
 {
 
 ifstream Report;
