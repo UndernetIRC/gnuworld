@@ -16,15 +16,18 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- * $Id: match.cc,v 1.9 2007/09/12 16:40:33 kewlio Exp $
+ * $Id: match.cc,v 1.10 2007/09/13 02:00:45 dan_karrels Exp $
  */
+
+#include	<string>
+
+#include	<cstdio>
+#include	<cstdlib>
+
 #include	"match.h"
 #include	"ConnectionManager.h"
-#include	<stdlib.h>
-#include	<string>
-#include	<stdio.h>
 
-const char rcsId[] = "$Id: match.cc,v 1.9 2007/09/12 16:40:33 kewlio Exp $" ;
+const char rcsId[] = "$Id: match.cc,v 1.10 2007/09/13 02:00:45 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
