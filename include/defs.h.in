@@ -1,5 +1,8 @@
 /* include/defs.h.in.  Generated from configure.ac by autoheader.  */
 
+/* Enable LOG4CPLUS */
+#undef ENABLE_LOG4CPLUS
+
 /* Define to 1 if you have the <asm/ioctls.h> header file. */
 #undef HAVE_ASM_IOCTLS_H
 
@@ -17,6 +20,9 @@
 
 /* Define to 1 if you have the `nsl' library (-lnsl). */
 #undef HAVE_LIBNSL
+
+/* Define to 1 if you have the `pq' library (-lpq). */
+#undef HAVE_LIBPQ
 
 /* Define to 1 if you have the `socket' library (-lsocket). */
 #undef HAVE_LIBSOCKET
@@ -131,6 +137,3 @@
 
 /* Define to `int' if <sys/types.h> doesn't define. */
 #undef uid_t
-
-/* Define to enable log4c integration */
-#undef ENABLE_LOG4CPLUS

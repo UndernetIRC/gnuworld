@@ -37,7 +37,8 @@ noinst_PROGRAMS = test_burst$(EXEEXT) test_mtrie_load$(EXEEXT) \
 	test_mtrie$(EXEEXT) test_stringtokenizer$(EXEEXT) \
 	test_econfig$(EXEEXT) test_gThread$(EXEEXT) \
 	test_signal$(EXEEXT) test_match$(EXEEXT) test_bot$(EXEEXT) \
-	test_kick_transaction$(EXEEXT) test_regex$(EXEEXT)
+	test_kick_transaction$(EXEEXT) $(am__EXEEXT_1)
+@COND_PCRE_TRUE@am__append_1 = test_regex
 subdir = test
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -48,6 +49,7 @@ am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = $(top_builddir)/include/defs.h
 CONFIG_CLEAN_FILES =
+@COND_PCRE_TRUE@am__EXEEXT_1 = test_regex$(EXEEXT)
 PROGRAMS = $(noinst_PROGRAMS)
 am_test_bot_OBJECTS = test_bot-testbot.$(OBJEXT)
 test_bot_OBJECTS = $(am_test_bot_OBJECTS)
@@ -236,6 +238,7 @@ PACKAGE_TARNAME = @PACKAGE_TARNAME@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
 RANLIB = @RANLIB@
+SED = @SED@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
@@ -281,8 +284,8 @@ mandir = @mandir@
 mkdir_p = @mkdir_p@
 oldincludedir = @oldincludedir@
 pdfdir = @pdfdir@
-pgsql_include = @pgsql_include@
-pgsql_lib = @pgsql_lib@
+pgsql_includedir = @pgsql_includedir@
+pgsql_libdir = @pgsql_libdir@
 prefix = @prefix@
 program_transform_name = @program_transform_name@
 psdir = @psdir@

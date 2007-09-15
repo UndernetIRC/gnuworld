@@ -1,13 +1,13 @@
-dnl $Id: configure.ac,v 1.38 2007/09/01 20:16:54 mrbean_ Exp $
+dnl $Id: configure.ac,v 1.39 2007/09/15 18:03:27 dan_karrels Exp $
 dnl ----------------------------------------------------------
 
 echo Configuring GNUWorld...
 echo
 
-AC_REVISION($Revision: 1.38 $)
+AC_REVISION($Revision: 1.39 $)
 AC_INIT
 AC_CONFIG_SRCDIR([src/main.cc])
-AM_INIT_AUTOMAKE(gnuworld,2.8)
+AM_INIT_AUTOMAKE(gnuworld,3.0)
 AM_CONFIG_HEADER(include/defs.h)
 
 AC_PROG_CXX
@@ -99,7 +99,12 @@ dnl ----------------------------------------------------------
 
 AC_CHECK_LIB(socket,socket)
 AC_CHECK_LIB(nsl,gethostbyname)
-dnl AC_CHECK_LIB(pcre,pcre_compile)
+
+dnl Check for pcre for building a test program.
+dnl If it is not present, just don't build the program.
+AC_CHECK_LIB(pcre,pcre_compile,
+	AM_CONDITIONAL(COND_PCRE,[/bin/true])
+	AM_CONDITIONAL(COND_PCRE,[/bin/false]))
 dnl AC_CHECK_LIB(z,inflate)
 dnl AC_CHECK_LIB(pthread,pthread_create)
 dnl AC_SEARCH_LIBS(pthread_create,lthread pthread c c_r)
@@ -173,7 +178,15 @@ AC_ARG_WITH(prof,
 	[CXXFLAGS="$CXXFLAGS -pg"]
 )
 
-pgsql_home="/usr/local/pgsql"
+dnl The idea with this pgsql code is to check for a system installed
+dnl postgresql and use it if found. However, if the user specifies
+dnl an alternate install location, use that instead.
+
+dnl Prepare to capture the user's input for the location of a pgsql
+dnl installation.
+pgsql_home=""
+pgsql_includedir="."
+pgsql_libdir="."
 AC_ARG_WITH(pgsql-home,
 	AC_HELP_STRING([--with-pgsql-home=PGSQLHOMEDIR],
 			[Specify home directory for PGSQL, default is \
@@ -181,39 +194,72 @@ AC_ARG_WITH(pgsql-home,
 	[pgsql_home=$withval]
 )
 
-pgsql_lib="$pgsql_home/lib"
-AC_ARG_WITH(pgsql-lib,
-	AC_HELP_STRING([--with-pgsql-lib=PGSQLLIBDIR],
-			[Specify location to find libpq.so, default is \
-/usr/local/lib/pgsql/lib]),
-	[pgsql_lib=$withval]
-)
-
-pgsql_include="$pgsql_home/include"
-AC_ARG_WITH(pgsql-include,
-	AC_HELP_STRING([--with-pgsql-include=PGSQLINCLUDEDIR],
-			[Specify location to find libpq-fe.h, default is \
-/usr/local/lib/pgsql/include]),
-	[pgsql_include=$withval]
-)
-
-AC_MSG_CHECKING([for libpq.so in $pgsql_lib])
-if [ test -f $pgsql_lib/libpq.so ]; then
-	AC_MSG_RESULT([$pgsql_lib])
-	AC_DEFINE([HAVE_PGSQL],[],[Using PostGreSQL])
-	[LDFLAGS="$LDFLAGS -L${pgsql_lib}"]
-else
-	AC_MSG_FAILURE([unable to find libpq.so])
+dnl If the user specified an install location, store the CXXFLAGS and
+dnl LIBS for restoring later. Add the user's install location to
+dnl the CXXFLAGS (for include directory) and LIBS (for library directory).
+dnl This is a pretty clear indication that I have no idea
+dnl what I am doing.
+tmpcxxflags="$CXXFLAGS"
+tmplibs="$LIBS"
+if [ test "$pgsql_home" != "" ]; then
+	dnl User provided a home directory
+	CXXFLAGS="$CXXFLAGS -I$pgsql_home/include"
+	LIBS="$LIBS -L$pgsql_home/lib"
+	pgsql_includedir="$pgsql_home/include"
+	pgsql_libdir="$pgsql_home/lib"
 fi
 
-AC_MSG_CHECKING([for libpq-fe.h])
-if [ test -f $pgsql_include/libpq-fe.h ]; then
-	AC_MSG_RESULT([$pgsql_include])
-	AC_DEFINE([HAVE_PGSQL],[],[Using PostGreSQL])
-	CXXFLAGS="${CXXFLAGS} -I${pgsql_include}"
-else
-	AC_MSG_FAILURE([unable to find libpq-fe.h])
-fi
+dnl Check for the pgsql library and header file.
+dnl Need to generalize when mysql support is added.
+AC_CHECK_LIB(pq, PQconnectdb)
+AC_CHECK_HEADER([libpq-fe.h])
+AC_DEFINE([HAVE_PGSQL],[],[Using PostGreSQL])
+
+dnl [pgsql_includedir="."],
+dnl AC_MSG_FAILURE([Unable to find libpq-fe.h, please install 
+dnl PostGreSQL]),[])
+
+dnl Everything seemed to work, pgsql located.
+dnl Restore the original CXXFLAGS and LIBS. The db library will
+dnl link against pgsql_lib (which is empty if using system default),
+dnl and will include pgsql_include (again, which is empty if using
+dnl system default installation).
+CXXFLAGS="$tmpcxxflags"
+LIBS="$tmplibs"
+
+dnl pgsql_lib="$pgsql_home/lib"
+dnl AC_ARG_WITH(pgsql-lib,
+dnl	AC_HELP_STRING([--with-pgsql-lib=PGSQLLIBDIR],
+dnl			[Specify location to find libpq.so, default is \
+dnl /usr/local/lib/pgsql/lib]),
+dnl	[pgsql_lib=$withval]
+dnl )
+
+dnl pgsql_include="$pgsql_home/include"
+dnl AC_ARG_WITH(pgsql-include,
+dnl	AC_HELP_STRING([--with-pgsql-include=PGSQLINCLUDEDIR],
+dnl			[Specify location to find libpq-fe.h, default is \
+dnl /usr/local/lib/pgsql/include]),
+dnl	[pgsql_include=$withval]
+dnl )
+
+dnl AC_MSG_CHECKING([for libpq.so in $pgsql_lib])
+dnl if [ test -f $pgsql_lib/libpq.so ]; then
+dnl	AC_MSG_RESULT([$pgsql_lib])
+dnl	AC_DEFINE([HAVE_PGSQL],[],[Using PostGreSQL])
+dnl	[LDFLAGS="$LDFLAGS -L${pgsql_lib}"]
+dnl else
+dnl	AC_MSG_FAILURE([unable to find libpq.so])
+dnl fi
+
+dnl AC_MSG_CHECKING([for libpq-fe.h])
+dnl if [ test -f $pgsql_include/libpq-fe.h ]; then
+dnl	AC_MSG_RESULT([$pgsql_include])
+dnl	AC_DEFINE([HAVE_PGSQL],[],[Using PostGreSQL])
+dnl	CXXFLAGS="${CXXFLAGS} -I${pgsql_include}"
+dnl else
+dnl	AC_MSG_FAILURE([unable to find libpq-fe.h])
+dnl fi
 
 dnl Enable log4cplus if required
 AC_ARG_WITH(log4cplus,
@@ -251,10 +297,10 @@ if [test "x$check_log4cplus" != "x" ]; then
 		/bin/true
 	else
 	        AC_MSG_ERROR( Unable to find log4cplus/logger.h, \
-			 please use the --with-log4cplu-include argument to point to the right path)
+			 please use the --with-log4cplus-include argument to point to the right path)
 	fi
 	AC_MSG_RESULT(yes)
-	AC_DEFINE(ENABLE_LOG4CPLUS)
+	AC_DEFINE([ENABLE_LOG4CPLUS], [], [Enable LOG4CPLUS])
 	LDFLAGS="${LDFLAGS} -L${LOG4CPLUS_LIB} -llog4cplus"
 	CXXFLAGS="${CXXFLAGS} -I${LOG4CPLUS_INCLUDE}"
 fi
@@ -412,8 +458,8 @@ AC_SUBST(CXXFLAGS)
 AC_SUBST(INCLTDL)
 AC_SUBST(LIBLTDL)
 AC_SUBST(LIBTOOL_DEPS)
-AC_SUBST(pgsql_include)
-AC_SUBST(pgsql_lib)
+AC_SUBST(pgsql_includedir)
+AC_SUBST(pgsql_libdir)
 
 AC_CONFIG_FILES([Makefile \
 db/Makefile \

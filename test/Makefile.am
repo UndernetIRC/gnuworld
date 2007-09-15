@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-## $Id: Makefile.am,v 1.18 2004/01/03 23:16:24 dan_karrels Exp $
+## $Id: Makefile.am,v 1.19 2007/09/15 18:03:34 dan_karrels Exp $
 
 noinst_PROGRAMS = test_burst \
 	test_mtrie_load \
@@ -12,9 +12,12 @@ noinst_PROGRAMS = test_burst \
 	test_signal \
 	test_match \
 	test_bot \
-	test_kick_transaction \
-	test_regex
+	test_kick_transaction
 LDADD = $(LIBGNUWORLD)
+
+if COND_PCRE
+  noinst_PROGRAMS += test_regex
+endif
 
 test_burst_SOURCES = burst.cc
 test_burst_CXXFLAGS = -I${top_srcdir}/include -I${top_srcdir}/libgnuworld

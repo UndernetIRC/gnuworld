@@ -67,6 +67,7 @@ class logTarget {
       return temp;
     }
 
+    virtual ~logTarget() {}
     virtual void log(const events::eventType&, const string&) = 0;
 }; // class logTarget
 

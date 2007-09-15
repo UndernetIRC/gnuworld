@@ -133,6 +133,7 @@ PACKAGE_TARNAME = @PACKAGE_TARNAME@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
 RANLIB = @RANLIB@
+SED = @SED@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
@@ -178,8 +179,8 @@ mandir = @mandir@
 mkdir_p = @mkdir_p@
 oldincludedir = @oldincludedir@
 pdfdir = @pdfdir@
-pgsql_include = @pgsql_include@
-pgsql_lib = @pgsql_lib@
+pgsql_includedir = @pgsql_includedir@
+pgsql_libdir = @pgsql_libdir@
 prefix = @prefix@
 program_transform_name = @program_transform_name@
 psdir = @psdir@
@@ -196,8 +197,8 @@ lib_LTLIBRARIES = libgnuworldDB.la
 libgnuworldDB_la_SOURCES = gnuworldDB.cc \
 	pgsqlDB.cc
 
-libgnuworldDB_la_CXXFLAGS = -I$(pgsql_include)
-libgnuworldDB_la_LDFLAGS = -L$(pgsql_lib) -lpq
+libgnuworldDB_la_CXXFLAGS = -I$(pgsql_includedir)
+libgnuworldDB_la_LDFLAGS = -L$(pgsql_libdir) -lpq
 EXTRA_DIST = gnuworldDB.h \
 	pgsqlDB.h \
 	dbHandle.h
