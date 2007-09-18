@@ -1,10 +1,10 @@
-dnl $Id: configure.ac,v 1.39 2007/09/15 18:03:27 dan_karrels Exp $
+dnl $Id: configure.ac,v 1.40 2007/09/18 15:34:46 dan_karrels Exp $
 dnl ----------------------------------------------------------
 
 echo Configuring GNUWorld...
 echo
 
-AC_REVISION($Revision: 1.39 $)
+AC_REVISION($Revision: 1.40 $)
 AC_INIT
 AC_CONFIG_SRCDIR([src/main.cc])
 AM_INIT_AUTOMAKE(gnuworld,3.0)
@@ -203,10 +203,17 @@ tmpcxxflags="$CXXFLAGS"
 tmplibs="$LIBS"
 if [ test "$pgsql_home" != "" ]; then
 	dnl User provided a home directory
+	dnl Set these next two variables for the AC_CHECK_LIB and
+	dnl AC_CHECK_HEADER used below.
 	CXXFLAGS="$CXXFLAGS -I$pgsql_home/include"
 	LIBS="$LIBS -L$pgsql_home/lib"
+
 	pgsql_includedir="$pgsql_home/include"
 	pgsql_libdir="$pgsql_home/lib"
+
+	dnl Since the user specified the directory, record the
+	dnl include directory for libpq-fe.h using a bit of a cheat.
+	tmpcxxflags="$tmpcxxflags -I$pgsql_includedir"
 fi
 
 dnl Check for the pgsql library and header file.
