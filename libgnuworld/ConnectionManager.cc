@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ConnectionManager.cc,v 1.19 2005/10/03 23:55:07 kewlio Exp $
+ * $Id: ConnectionManager.cc,v 1.20 2007/09/25 16:57:54 dan_karrels Exp $
  */
 
 #include	<unistd.h>
@@ -52,7 +52,7 @@
 #include	"Buffer.h"
 #include	"ELog.h"
 
-const char rcsId[] = "$Id: ConnectionManager.cc,v 1.19 2005/10/03 23:55:07 kewlio Exp $" ;
+const char rcsId[] = "$Id: ConnectionManager.cc,v 1.20 2007/09/25 16:57:54 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -1461,6 +1461,7 @@ if( optval < 0 )
 	return false ;
 	}
 
+optval = 1 ;
 // Detect closed connection
 optval = ::setsockopt( sockFD, SOL_SOCKET, SO_KEEPALIVE,
 	reinterpret_cast< const char* >( &optval ), sizeof( optval ) ) ;
@@ -1509,7 +1510,7 @@ if( listenFD < 0 )
 // setSocketOptions() does not set SO_REUSEADDR.
 // However, for server sockets, it's important to set SO_REUSEADDR,
 // to allow fast rebinds.
-int optVal = 0 ;
+int optVal = 1 ;
 if( ::setsockopt( listenFD, SOL_SOCKET, SO_REUSEADDR,
 	reinterpret_cast< const char* >( &optVal ),
 	sizeof( optVal ) ) < 0 )
