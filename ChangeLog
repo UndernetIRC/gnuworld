@@ -1,4 +1,9 @@
-// $Id: ChangeLog,v 1.127 2007/10/31 14:22:04 kewlio Exp $ //
+// $Id: ChangeLog,v 1.128 2007/10/31 14:56:33 kewlio Exp $ //
+
+2007-10-31	Dan-m00 <daniel@undernet.org>
+		* build-system: Rebuild entire configure/build system.  This
+			fixes problems running ./configure (COND_PCRE errors)
+			and pgsql warnings.
 
 2007-10-31	Dan-m00 <daniel@undernet.org>
 		* mod.cservice/cservice.cc: fix bug in reop code that causes

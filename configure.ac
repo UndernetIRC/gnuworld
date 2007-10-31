@@ -1,10 +1,10 @@
-dnl $Id: configure.ac,v 1.40 2007/09/18 15:34:46 dan_karrels Exp $
+dnl $Id: configure.ac,v 1.41 2007/10/31 14:56:36 kewlio Exp $
 dnl ----------------------------------------------------------
 
 echo Configuring GNUWorld...
 echo
 
-AC_REVISION($Revision: 1.40 $)
+AC_REVISION($Revision: 1.41 $)
 AC_INIT
 AC_CONFIG_SRCDIR([src/main.cc])
 AM_INIT_AUTOMAKE(gnuworld,3.0)
@@ -103,7 +103,7 @@ AC_CHECK_LIB(nsl,gethostbyname)
 dnl Check for pcre for building a test program.
 dnl If it is not present, just don't build the program.
 AC_CHECK_LIB(pcre,pcre_compile,
-	AM_CONDITIONAL(COND_PCRE,[/bin/true])
+	AM_CONDITIONAL(COND_PCRE,[/bin/true]),
 	AM_CONDITIONAL(COND_PCRE,[/bin/false]))
 dnl AC_CHECK_LIB(z,inflate)
 dnl AC_CHECK_LIB(pthread,pthread_create)
@@ -200,12 +200,14 @@ dnl the CXXFLAGS (for include directory) and LIBS (for library directory).
 dnl This is a pretty clear indication that I have no idea
 dnl what I am doing.
 tmpcxxflags="$CXXFLAGS"
+tmpcppflags="$CPPFLAGS"
 tmplibs="$LIBS"
 if [ test "$pgsql_home" != "" ]; then
 	dnl User provided a home directory
 	dnl Set these next two variables for the AC_CHECK_LIB and
 	dnl AC_CHECK_HEADER used below.
 	CXXFLAGS="$CXXFLAGS -I$pgsql_home/include"
+	CPPFLAGS="$CPPFLAGS -I$pgsql_home/include"
 	LIBS="$LIBS -L$pgsql_home/lib"
 
 	pgsql_includedir="$pgsql_home/include"
@@ -214,6 +216,7 @@ if [ test "$pgsql_home" != "" ]; then
 	dnl Since the user specified the directory, record the
 	dnl include directory for libpq-fe.h using a bit of a cheat.
 	tmpcxxflags="$tmpcxxflags -I$pgsql_includedir"
+	tmpcppflags="$tmpcppflags -I$pgsql_includedir"
 fi
 
 dnl Check for the pgsql library and header file.
@@ -232,6 +235,7 @@ dnl link against pgsql_lib (which is empty if using system default),
 dnl and will include pgsql_include (again, which is empty if using
 dnl system default installation).
 CXXFLAGS="$tmpcxxflags"
+CPPFLAGS="$tmpcppflags"
 LIBS="$tmplibs"
 
 dnl pgsql_lib="$pgsql_home/lib"
