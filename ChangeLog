@@ -1,4 +1,8 @@
-// $Id: ChangeLog,v 1.128 2007/10/31 14:56:33 kewlio Exp $ //
+// $Id: ChangeLog,v 1.129 2007/10/31 16:58:03 kewlio Exp $ //
+
+2007-10-31	Dan-m00 <daniel@undernet.org>
+		* mod.ccontrol/commLevels.h: move UNJUPE access to second access
+			flag instead of first (otherwise it doesn't work!)
 
 2007-10-31	Dan-m00 <daniel@undernet.org>
 		* build-system: Rebuild entire configure/build system.  This
