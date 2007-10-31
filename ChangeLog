@@ -1,4 +1,8 @@
-// $Id: ChangeLog,v 1.126 2007/09/12 16:40:31 kewlio Exp $ //
+// $Id: ChangeLog,v 1.127 2007/10/31 14:22:04 kewlio Exp $ //
+
+2007-10-31	Dan-m00 <daniel@undernet.org>
+		* mod.cservice/cservice.cc: fix bug in reop code that causes
+			newer GCC versions to coredump on reops.
 
 2007-09-12	Dan-m00 <daniel@undernet.org>
 		* libgnuworld/match.cc: Remove compiler warnings relating to

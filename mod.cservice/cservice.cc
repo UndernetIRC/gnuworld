@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: cservice.cc,v 1.276 2007/09/01 20:16:55 mrbean_ Exp $
+ * $Id: cservice.cc,v 1.277 2007/10/31 14:22:05 kewlio Exp $
  */
 
 #include	<new>
@@ -2242,10 +2242,11 @@ if (ptr->second <= currentTime())
 					}
 			}
 
-		}
-		reopQ.erase(ptr->first);
-	} /* If channel exists */
-	++ptr;
+		} /* If channel exists */
+		reopQ.erase(ptr++->first);	/* erase pointer, also increment it */
+	} else {
+		++ptr;
+	}
 } /* While */
 
 }
