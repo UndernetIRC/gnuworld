@@ -1,4 +1,9 @@
-// $Id: ChangeLog,v 1.129 2007/10/31 16:58:03 kewlio Exp $ //
+// $Id: ChangeLog,v 1.130 2007/11/05 10:04:23 kewlio Exp $ //
+
+2007-11-05	Dan-m00 <daniel@undernet.org>
+		* mod.ccontrol/CHANINFOCommand.cc: modify command to output a
+			summary of number of ops and voice in a channel.  Also
+			shows full user list to CODER level (with +o/+v flag)
 
 2007-10-31	Dan-m00 <daniel@undernet.org>
 		* mod.ccontrol/commLevels.h: move UNJUPE access to second access

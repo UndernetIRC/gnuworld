@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: CHANINFOCommand.cc,v 1.19 2006/09/26 17:35:58 kewlio Exp $
+ * $Id: CHANINFOCommand.cc,v 1.20 2007/11/05 10:04:23 kewlio Exp $
  */
 
 #include	<string>
@@ -30,7 +30,7 @@
 #include	"ccontrol_generic.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: CHANINFOCommand.cc,v 1.19 2006/09/26 17:35:58 kewlio Exp $" ) ;
+RCSTAG( "$Id: CHANINFOCommand.cc,v 1.20 2007/11/05 10:04:23 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -56,6 +56,11 @@ if(st[1].size() > channel::MaxName)
 	return false;
 	}
 
+ccUser* tmpAuth = bot->IsAuth(theClient);
+if (!tmpAuth)
+	return false;
+unsigned int OpFlag = tmpAuth->getType();
+
 bot->MsgChanLog("CHANINFO %s\n",st[1].c_str());
 	    
 Channel* theChan = Network->findChannel( st[ 1 ] ) ;
@@ -71,8 +76,43 @@ bot->Notice( theClient, "Channel %s is mode %s",
 	theChan->getModeString().c_str() ) ;
 bot->Notice( theClient, "Created at time: %d (%s ago)",
 	theChan->getCreationTime(), Ago(theChan->getCreationTime()));
-bot->Notice( theClient, "Number of channel users: %d",
-	theChan->size() ) ;
+
+/* iterate the channel user list to get statistics on each mode
+   and possibly a user list in future */
+int totalOps = 0; 
+int totalVoice = 0;
+string tmpMode;
+
+for (Channel::userIterator userItr = theChan->userList_begin();
+	userItr != theChan->userList_end(); ++userItr)
+{
+	ChannelUser* theUser = userItr->second;
+
+	if (theUser->isModeO())
+		totalOps++;
+	if (theUser->isModeV())
+		totalVoice++;
+	if (OpFlag == operLevel::CODERLEVEL)
+	{
+		/* show full info to coders - make it format for easy viewing */
+		if (theUser->isModeO() && theUser->isModeV())
+			tmpMode = "+o+v: ";
+		else if (theUser->isModeO())
+			tmpMode = "+o:   ";
+		else if (theUser->isModeV())
+			tmpMode = "+v:   ";
+		else
+			tmpMode = "none: ";
+		bot->Notice(theClient, "%s%s!%s@%s",
+			tmpMode.c_str(),
+			theUser->getNickName().c_str(),
+			theUser->getUserName().c_str(),
+			theUser->getHostName().c_str());
+	}
+}
+
+bot->Notice( theClient, "Number of channel users: %d (%d ops, %d voice)",
+	theChan->size(), totalOps, totalVoice);
 
 #ifdef TOPIC_TRACK
 bot->Notice(theClient,"Topic: %s",
