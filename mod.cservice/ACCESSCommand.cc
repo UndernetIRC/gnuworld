@@ -27,7 +27,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ACCESSCommand.cc,v 1.48 2007/08/28 16:10:09 dan_karrels Exp $
+ * $Id: ACCESSCommand.cc,v 1.49 2007/11/05 11:18:32 kewlio Exp $
  */
 
 #include	<string>
@@ -43,7 +43,7 @@
 #include	"cservice_config.h"
 #include	"Network.h"
 
-const char ACCESSCommand_cc_rcsId[] = "$Id: ACCESSCommand.cc,v 1.48 2007/08/28 16:10:09 dan_karrels Exp $" ;
+const char ACCESSCommand_cc_rcsId[] = "$Id: ACCESSCommand.cc,v 1.49 2007/11/05 11:18:32 kewlio Exp $" ;
 
 namespace gnuworld
 {
@@ -396,7 +396,8 @@ for (unsigned int i = 0 ; i < bot->SQLDb->Tuples(); i++)
 if ((results >= MAX_ACCESS_RESULTS) && !showAll)
 	{
 	bot->Notice(theClient,
-		bot->getResponse(theUser, language::more_than_max).c_str()
+		bot->getResponse(theUser, language::more_than_max).c_str(),
+		MAX_ACCESS_RESULTS
 	);
 	bot->Notice(theClient,
 		bot->getResponse(theUser, language::restrict_query).c_str()
