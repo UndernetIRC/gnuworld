@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: REGISTERCommand.cc,v 1.20 2007/08/28 16:10:11 dan_karrels Exp $
+ * $Id: REGISTERCommand.cc,v 1.21 2007/11/06 11:33:53 kewlio Exp $
  */
 
 #include	<map>
@@ -39,7 +39,7 @@
 #include	"Network.h"
 #include	"responses.h"
 
-const char REGISTERCommand_cc_rcsId[] = "$Id: REGISTERCommand.cc,v 1.20 2007/08/28 16:10:11 dan_karrels Exp $" ;
+const char REGISTERCommand_cc_rcsId[] = "$Id: REGISTERCommand.cc,v 1.21 2007/11/06 11:33:53 kewlio Exp $" ;
 
 namespace gnuworld
 {
@@ -230,7 +230,7 @@ bool REGISTERCommand::Exec( iClient* theClient, const string& Message )
 
 	unsigned int theId = 0;
 
-	if (bot->SQLDb->Exec(idQuery))
+	if (bot->SQLDb->Exec(idQuery, true))
 //	if ((status = bot->SQLDb->Exec(idQuery.str().c_str())) == 
 //PGRES_TUPLES_OK)
 	{

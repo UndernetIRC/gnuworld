@@ -1,4 +1,8 @@
-// $Id: ChangeLog,v 1.131 2007/11/05 11:18:31 kewlio Exp $ //
+// $Id: ChangeLog,v 1.132 2007/11/06 11:33:52 kewlio Exp $ //
+
+2007-11-06	Dan-m00 <daniel@undernet.org>
+		* mod.cservice/REGISTERCommand.cc: Fix problem when registering
+			channels (no manager added!) due to SQL Exec mods.
 
 2007-11-05	Dan-m00 <daniel@undernet.org>
 		* mod.cservice/ACCESSCommand.cc: fix output when too many
