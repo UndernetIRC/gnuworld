@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: PURGECommand.cc,v 1.17 2007/08/28 16:10:11 dan_karrels Exp $
+ * $Id: PURGECommand.cc,v 1.18 2007/11/06 13:32:09 kewlio Exp $
  */
 
 #include	<string>
@@ -39,7 +39,7 @@
 #include	"responses.h"
 #include	"cservice_config.h"
 
-const char PURGECommand_cc_rcsId[] = "$Id: PURGECommand.cc,v 1.17 2007/08/28 16:10:11 dan_karrels Exp $" ;
+const char PURGECommand_cc_rcsId[] = "$Id: PURGECommand.cc,v 1.18 2007/11/06 13:32:09 kewlio Exp $" ;
 
 namespace gnuworld
 {
@@ -206,7 +206,10 @@ while(ptr != bot->sqlLevelCache.end())
 	if (channel_id == theChan->getID())
 	{
 		thePair = ptr->first;
+
+#ifdef LOG_DEBUG
 		elog << "Purging Level Record for: " << thePair.second << " (UID: " << thePair.first << ")" << endl;
+#endif
 
 		++ptr;
 		bot->sqlLevelCache.erase(thePair);

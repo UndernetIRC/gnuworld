@@ -1,4 +1,12 @@
-// $Id: ChangeLog,v 1.132 2007/11/06 11:33:52 kewlio Exp $ //
+// $Id: ChangeLog,v 1.133 2007/11/06 13:32:07 kewlio Exp $ //
+
+2007-11-06	Dan-m00 <daniel@undernet.org>
+		* mod.cservice/REGISTERCommand.cc: don't log SQL queries unless
+			enabled in cservice_config.h
+		* mod.cservice/PURGECommand.cc: don't log purging information
+			unless debugging is enabled in cservice_config.h
+		* mod.cservice/cservice.cc: move a few more entries to only
+			log when debugging is enabled.
 
 2007-11-06	Dan-m00 <daniel@undernet.org>
 		* mod.cservice/REGISTERCommand.cc: Fix problem when registering

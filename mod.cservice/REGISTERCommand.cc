@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: REGISTERCommand.cc,v 1.21 2007/11/06 11:33:53 kewlio Exp $
+ * $Id: REGISTERCommand.cc,v 1.22 2007/11/06 13:32:08 kewlio Exp $
  */
 
 #include	<map>
@@ -39,7 +39,7 @@
 #include	"Network.h"
 #include	"responses.h"
 
-const char REGISTERCommand_cc_rcsId[] = "$Id: REGISTERCommand.cc,v 1.21 2007/11/06 11:33:53 kewlio Exp $" ;
+const char REGISTERCommand_cc_rcsId[] = "$Id: REGISTERCommand.cc,v 1.22 2007/11/06 13:32:08 kewlio Exp $" ;
 
 namespace gnuworld
 {
@@ -156,7 +156,9 @@ bool REGISTERCommand::Exec( iClient* theClient, const string& Message )
 				<< "'"
 				<< ends;
 
+#ifdef LOG_SQL
 	elog << "sqlQuery> " << checkQuery.str().c_str() << endl;
+#endif
 
 	bool isUnclaimed = false;
 	if (bot->SQLDb->Exec(checkQuery, true))
@@ -181,7 +183,9 @@ bool REGISTERCommand::Exec( iClient* theClient, const string& Message )
 					<< "'"
 					<< ends;
 
+#ifdef LOG_SQL
 		elog << "sqlQuery> " << reclaimQuery.str().c_str() << endl;
+#endif
 
 		if (bot->SQLDb->Exec(reclaimQuery))
 //		if ((status = 
@@ -226,7 +230,9 @@ bool REGISTERCommand::Exec( iClient* theClient, const string& Message )
 				<< "'"
 				<< ends;
 
+#ifdef LOG_SQL
 	elog << "sqlQuery> " << idQuery.str().c_str() << endl;
+#endif
 
 	unsigned int theId = 0;
 

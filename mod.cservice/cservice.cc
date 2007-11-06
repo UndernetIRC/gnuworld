@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: cservice.cc,v 1.277 2007/10/31 14:22:05 kewlio Exp $
+ * $Id: cservice.cc,v 1.278 2007/11/06 13:32:10 kewlio Exp $
  */
 
 #include	<new>
@@ -4096,7 +4096,9 @@ if (pendingChannelList.size() > 0)
 		elog << "Error starting transaction." << endl;
 	}
 
+#ifdef LOG_SQL
 	elog << "BEGIN" << endl;
+#endif
 
 	while (ptr != pendingChannelList.end())
 		{
@@ -4119,7 +4121,9 @@ if (pendingChannelList.size() > 0)
 		elog << "Error Ending transaction." << endl;
 	}
 
+#ifdef LOG_SQL
 	elog << "END" << endl;
+#endif
 
 	pendingChannelList.clear();
 }
