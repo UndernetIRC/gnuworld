@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server_glines.cc,v 1.2 2007/09/12 13:45:30 kewlio Exp $
+ * $Id: server_glines.cc,v 1.3 2007/12/14 03:06:10 isomer Exp $
  */
 
 #include	<new>
@@ -37,7 +37,7 @@
 #include	"Gline.h"
 #include	"ELog.h"
 
-RCSTAG( "$Id: server_glines.cc,v 1.2 2007/09/12 13:45:30 kewlio Exp $" ) ;
+RCSTAG( "$Id: server_glines.cc,v 1.3 2007/12/14 03:06:10 isomer Exp $" ) ;
 
 namespace gnuworld
 {
@@ -61,12 +61,35 @@ if( gItr != glines_end() )
 	}
 
 // Notify the network that we are removing it
-// Even if we didn't find the gline here, it may be present
-// to someone on the network *shrug*
 stringstream s ;
+if ( foundGline ) {
 s	<< getCharYY()
 	<< " GL * -"
-	<< userHost ;
+	<< userHost 
+	<< " "
+	<< gItr->second->getExpiration() // expiration
+	<< " "
+	<< ::time(0)	// lastmod
+	<< " "
+	<< gItr->second->getExpiration() // expiration
+	<< " :"
+	<< gItr->second->getReason();
+}
+else {
+// Even if we didn't find the gline here, it may be present
+// to someone on the network *shrug*
+s	<< getCharYY()
+	<< " GL * -"
+	<< userHost 
+	<< " "
+	<< ::time(0) + 60 // expire
+	<< " "
+	<< ::time(0)	// lastmod
+	<< " "
+	<< ::time(0) + 60 // lifetime
+	<< " "
+	<< ":Unknown G-Line";
+}
 
 // Write the data to the network output buffer(s)
 Write( s ) ;
@@ -130,7 +153,7 @@ assert( newGline != 0 ) ;
 // Notify the rest of the network
 stringstream s ;
 s	<< getCharYY() << " GL "
-	<< server << " +"
+	<< server << " !+"
 	<< userHost << ' '
 	<< duration << ' '
 	<< lastmod << " :"
