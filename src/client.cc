@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: client.cc,v 1.85 2007/03/18 19:13:18 mrbean_ Exp $
+ * $Id: client.cc,v 1.86 2007/12/24 04:50:12 kewlio Exp $
  */
 
 #include	<new>
@@ -47,7 +47,7 @@
 #include	"ELog.h"
 #include	"events.h"
 
-RCSTAG("$Id: client.cc,v 1.85 2007/03/18 19:13:18 mrbean_ Exp $" ) ;
+RCSTAG("$Id: client.cc,v 1.86 2007/12/24 04:50:12 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -1187,10 +1187,11 @@ else
 	// The bot has ops
 	}
 
-Write( "%s M %s -o %s",
+Write( "%s M %s -o %s %ld",
 	getCharYYXXX().c_str(),
 	theChan->getName().c_str(),
-	theClient->getCharYYXXX().c_str() ) ;
+	theClient->getCharYYXXX().c_str(),
+	theChan->getCreationTime() ) ;
 
 if( !OnChannel )
 	{
@@ -1301,7 +1302,8 @@ for( xServer::opVectorType::const_iterator ptr = opVector.begin(),
 		stringstream s ;
 		s	<< getCharYYXXX() << " M "
 			<< theChan->getName() << ' '
-			<< "-" << modeString << ' ' << args ;
+			<< "-" << modeString << ' ' << args
+			<< theChan->getCreationTime() ;
 
 		Write( s ) ;
 

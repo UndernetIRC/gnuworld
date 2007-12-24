@@ -1,4 +1,8 @@
-// $Id: ChangeLog,v 1.133 2007/11/06 13:32:07 kewlio Exp $ //
+// $Id: ChangeLog,v 1.134 2007/12/24 04:50:12 kewlio Exp $ //
+
+2007-12-24	Dan-m00 <daniel@undernet.org>
+		* src/client.cc: add channel creation timestamp after all DEOP
+			commands (to prevent desyncs caused when deopping users)
 
 2007-11-06	Dan-m00 <daniel@undernet.org>
 		* mod.cservice/REGISTERCommand.cc: don't log SQL queries unless
