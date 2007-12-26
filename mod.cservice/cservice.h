@@ -17,11 +17,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: cservice.h,v 1.113 2007/08/28 16:10:11 dan_karrels Exp $
+ * $Id: cservice.h,v 1.114 2007/12/26 20:23:17 kewlio Exp $
  */
 
 #ifndef __CSERVICE_H
-#define __CSERVICE_H "$Id: cservice.h,v 1.113 2007/08/28 16:10:11 dan_karrels Exp $"
+#define __CSERVICE_H "$Id: cservice.h,v 1.114 2007/12/26 20:23:17 kewlio Exp $"
 
 #include	<iostream>
 #include	<string>
@@ -162,6 +162,9 @@ public:
 
 	constCommandIterator findCommand( const string& theComm ) const
                 { return commandMap.find( theComm ) ; }
+
+	/* returns true is IPR checking is required for this user */
+	bool needIPRcheck( sqlUser* );
 
 	/* Returns the access sqlUser has in channel sqlChan. */
 	short getAccessLevel( sqlUser*, sqlChannel* );

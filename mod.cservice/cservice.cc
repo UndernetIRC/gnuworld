@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: cservice.cc,v 1.279 2007/12/26 16:14:19 kewlio Exp $
+ * $Id: cservice.cc,v 1.280 2007/12/26 20:23:17 kewlio Exp $
  */
 
 #include	<new>
@@ -899,8 +899,7 @@ else
 	sqlUser* theUser = isAuthed(theClient, false);
 
 	/* Check IP restriction (if admin level) - this is in case you get added as admin AFTER logging in */
-	if (theUser && (getAdminAccessLevel(theUser,true) > 0) && (!theUser->getFlag(sqlUser::F_ALUMNI)) &&
-		(Command != "LOGIN"))
+	if (theUser && needIPRcheck(theUser) && (Command != "LOGIN"))
 	{
 		/* ok, they have a valid user and are listed as admin (and this is not a login request) */
 		if (!passedIPR(theClient))
@@ -1394,6 +1393,33 @@ void cservice::setFailedLogins(iClient* theClient, unsigned int _failed_logins)
 	tmpData->failed_logins = _failed_logins;
 
 	return;
+}
+
+/**
+ *  Returns true or false to whether IPR checks are required.
+ */
+bool cservice::needIPRcheck(sqlUser* theUser)
+{
+	/* don't need to check in the case of alumni */
+	if (theUser->getFlag(sqlUser::F_ALUMNI))
+		return 0;
+	/* check if they have access to '*' */
+	sqlChannel* theChan = getChannelRecord("*");
+	if (!theChan)
+	{
+		elog	<< "cservice::needIPRcheck> Unable to "
+			<< "locate channel '*'!"
+			<< endl ;
+		::exit(0);
+	}
+	sqlLevel* theLevel = getLevelRecord(theUser, theChan);
+	if (theLevel)
+	{
+		if (theLevel->getAccess() > 0)
+			return true;
+	}
+	/* if we reach here, no IPR checks are needed */
+	return false;
 }
 
 /**
