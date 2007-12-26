@@ -1,5 +1,5 @@
 --
--- $Id: update_languages_20071226_100_101.sql,v 1.1 2007/12/26 19:13:01 kewlio Exp $
+-- $Id: update_languages_20071226_100_101.sql,v 1.2 2007/12/26 20:33:31 kewlio Exp $
 --
 -- Update items 100 and 101 (userflags info) to support textual representations.
 --
@@ -51,7 +51,7 @@ VALUES(8,100,'Valoarea pentru USERFLAGS e incorecta. Valorile admise sunt NONE, 
 INSERT INTO translations (language_id,response_id,text,last_updated,deleted)
 VALUES(8,101,'USERFLAGS pentru %s este %s',31337,0);
 INSERT INTO translations (language_id,response_id,text,last_updated,deleted)
-VALUES(9,100,'Valor d'USERFLAGS no vàlid. Els valors correctes són NONE, OP, VOICE.',31337,0);
+VALUES(9,100,'Valor d''USERFLAGS no vàlid. Els valors correctes són NONE, OP, VOICE.',31337,0);
 INSERT INTO translations (language_id,response_id,text,last_updated,deleted)
 VALUES(9,101,'USERFLAGS per %s és %s.',31337,0);
 INSERT INTO translations (language_id,response_id,text,last_updated,deleted)
