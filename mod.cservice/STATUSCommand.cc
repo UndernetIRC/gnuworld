@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: STATUSCommand.cc,v 1.47 2007/12/26 20:26:03 kewlio Exp $
+ * $Id: STATUSCommand.cc,v 1.48 2007/12/26 20:38:57 kewlio Exp $
  */
 
 #include	<string>
@@ -31,7 +31,7 @@
 #include	"Network.h"
 #include	"cservice_config.h"
 
-const char STATUSCommand_cc_rcsId[] = "$Id: STATUSCommand.cc,v 1.47 2007/12/26 20:26:03 kewlio Exp $" ;
+const char STATUSCommand_cc_rcsId[] = "$Id: STATUSCommand.cc,v 1.48 2007/12/26 20:38:57 kewlio Exp $" ;
 
 namespace gnuworld
 {
@@ -190,7 +190,7 @@ if (theChan->getFlag(sqlChannel::F_FLOATLIM))
 	<< theChan->getLimitGrace()
 	<< ", MAX:"
 	<< theChan->getLimitMax()
-	<< ")"
+	<< ") "
 	<< ends;
 	flagsSet += floatLim.str().c_str();
 	}
