@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server.cc,v 1.223 2007/09/08 08:39:56 mrbean_ Exp $
+ * $Id: server.cc,v 1.224 2007/12/26 20:44:24 kewlio Exp $
  */
 
 #include	<sys/time.h>
@@ -70,7 +70,7 @@
 #include	"ConnectionHandler.h"
 #include	"Connection.h"
 
-RCSTAG( "$Id: server.cc,v 1.223 2007/09/08 08:39:56 mrbean_ Exp $" ) ;
+RCSTAG( "$Id: server.cc,v 1.224 2007/12/26 20:44:24 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -2610,9 +2610,9 @@ for( rawModeVectorType::size_type modeIndex = 0 ;
 			<< " "
 			<< outputArgs
 			<< ends ;
-	elog	<< "xServer::Mode> output: "
+/*	elog	<< "xServer::Mode> output: "
 		<< outputSS.str()
-		<< endl ;
+		<< endl ; */
 	Write( outputSS ) ;
 
 	modeOutputCount = 0 ;
