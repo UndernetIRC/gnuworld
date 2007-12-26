@@ -1,4 +1,10 @@
-// $Id: ChangeLog,v 1.137 2007/12/26 20:23:17 kewlio Exp $ //
+// $Id: ChangeLog,v 1.138 2007/12/26 20:26:03 kewlio Exp $ //
+
+2007-12-26	Dan-m00 <daniel@undernet.org>
+		* mod.cservice/SETCommand.cc: alter set userflags to display
+			current setting if called with no arguments.
+		* mod.cservice/STATUSCommand.cc: show current channel userflags
+			setting in flags: line of 'STATUS' (if OP or VOICE)
 
 2007-12-26	Dan-m00 <daniel@undernet.org>
 		* mod.cservice/cservice.h:

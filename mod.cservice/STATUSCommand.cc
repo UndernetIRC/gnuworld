@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: STATUSCommand.cc,v 1.46 2007/08/28 16:10:11 dan_karrels Exp $
+ * $Id: STATUSCommand.cc,v 1.47 2007/12/26 20:26:03 kewlio Exp $
  */
 
 #include	<string>
@@ -31,7 +31,7 @@
 #include	"Network.h"
 #include	"cservice_config.h"
 
-const char STATUSCommand_cc_rcsId[] = "$Id: STATUSCommand.cc,v 1.46 2007/08/28 16:10:11 dan_karrels Exp $" ;
+const char STATUSCommand_cc_rcsId[] = "$Id: STATUSCommand.cc,v 1.47 2007/12/26 20:26:03 kewlio Exp $" ;
 
 namespace gnuworld
 {
@@ -194,6 +194,9 @@ if (theChan->getFlag(sqlChannel::F_FLOATLIM))
 	<< ends;
 	flagsSet += floatLim.str().c_str();
 	}
+/* show userflags (if not 'NONE') */
+if (theChan->getUserFlags() == 1) flagsSet += "USERFLAGS=OP ";
+else if (theChan->getUserFlags() == 2) flagsSet += "USERFLAGS=VOICE ";
 
 bot->Notice(theClient,
 	bot->getResponse(theUser, language::status_flags,
