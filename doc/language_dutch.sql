@@ -1,10 +1,13 @@
--- $Id: language_dutch.sql,v 1.5 2007/08/07 21:22:28 kewlio Exp $ --
+-- $Id: language_dutch.sql,v 1.6 2007/12/26 19:13:00 kewlio Exp $ --
 -- Dutch language definition.
 -- 9/2/02 - Eagle-One (Ken Geboers) <Eagle-One@pandora.be>.
 
 -- Run this once.
 
--- INSERT INTO languages VALUES(4,'NL','Dutch',31337);
+
+DELETE FROM languages WHERE id=4;
+
+INSERT INTO languages VALUES(4,'NL','Dutch',31337);
 
 DELETE FROM translations WHERE language_id = 4;
 
@@ -107,8 +110,8 @@ INSERT INTO translations VALUES (4,96,'Je INVISIBLE instelling staat nu AAN',313
 INSERT INTO translations VALUES (4,97,'Je INVISIBLE instelling staat nu AF',31337,0);
 INSERT INTO translations VALUES (4,98,'%s voor %s is %s',31337,0);
 INSERT INTO translations VALUES (4,99,'waarde van %s moet ON of OFF zijn',31337,0);
-INSERT INTO translations VALUES (4,100,'Ongeldige USERFLAGS instelling. Juiste waarden zijn: 0, 1, 2.',31337,0);
-INSERT INTO translations VALUES (4,101,'USERFLAGS voor %s is %i',31337,0);
+INSERT INTO translations VALUES (4,100,'Ongeldige USERFLAGS instelling. Juiste waarden zijn: NONE, OP, VOICE.',31337,0);
+INSERT INTO translations VALUES (4,101,'USERFLAGS voor %s is %s',31337,0);
 INSERT INTO translations VALUES (4,102,'Waarde van MASSDEOPPRO moet zijn: 0-7',31337,0);
 INSERT INTO translations VALUES (4,103,'MASSDEOPPRO voor %s is gezet op %d',31337,0);
 INSERT INTO translations VALUES (4,104,'Waarde van FLOODPRO moet zijn: 0-7',31337,0);

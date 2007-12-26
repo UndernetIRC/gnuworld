@@ -1,12 +1,14 @@
--- $Id: language_swedish.sql,v 1.6 2007/08/07 21:22:29 kewlio Exp $
+-- $Id: language_swedish.sql,v 1.7 2007/12/26 19:13:00 kewlio Exp $
 -- Swedish language definition.
 -- 06/24/2002 - Ponte <tpin@telia.com>.
 -- 11/06/2002 - Comet <Comet@irc-solution.net>
 -- 11/06/2002 - typo/grammar spellchecking by LexTbomb.
 
 -- Run this once.
-INSERT INTO languages VALUES(20,'SV','Svenska',31337);
 
+DELETE FROM languages WHERE id=20;
+
+INSERT INTO languages VALUES(20,'SV','Svenska',31337);
 
 DELETE FROM translations where language_id = 20;
 COPY "translations" FROM stdin;
@@ -109,8 +111,8 @@ COPY "translations" FROM stdin;
 20	97	Din OSYNLIGHETS inställning är nu "OFF".	31337	0
 20	98	%s för %s är %s	31337	0
 20	99	Värdet för %s måste vara "ON" eller "OFF"	31337	0
-20	100	Ogiltig användar inställning. Korrekta värden är 0, 1, 2.	31337	0
-20	101	ANVÄNDAR INSTÄLLNINGAR för %s är %i	31337	0
+20	100	Ogiltig användar inställning. Korrekta värden är NONE, OP, VOICE.	31337	0
+20	101	ANVÄNDAR INSTÄLLNINGAR för %s är %s	31337	0
 20	102	Värdet för MASSDEOPPRO måste vara 0-7	31337	0
 20	103	MASSDEOPPRO för %s är satt till %d	31337	0
 20	104	Värdet för FLOODPRO måste vara 0-7	31337	0

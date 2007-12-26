@@ -20,4 +20,8 @@ COPY "languages" FROM stdin;
 15	HA	Haloween	31337	0
 16	MK	Macedonian	31337	0
 17	EA	Easter	31337	0
+18	HA	Halloween	31337	0
+19	GR	Greek	31337	0
+20	SV	Svenska	31337	0
+21	CH	Christmas	31337	0
 \.

@@ -33,7 +33,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: SETCommand.cc,v 1.60 2007/08/06 13:51:47 kewlio Exp $
+ * $Id: SETCommand.cc,v 1.61 2007/12/26 19:13:00 kewlio Exp $
  */
 
 #include	<string>
@@ -45,7 +45,7 @@
 #include	"responses.h"
 #include	"cservice_config.h"
 
-const char SETCommand_cc_rcsId[] = "$Id: SETCommand.cc,v 1.60 2007/08/06 13:51:47 kewlio Exp $" ;
+const char SETCommand_cc_rcsId[] = "$Id: SETCommand.cc,v 1.61 2007/12/26 19:13:00 kewlio Exp $" ;
 
 namespace gnuworld
 {
@@ -808,13 +808,33 @@ else
 		return false;
 	    }
 
-		int setting = atoi(value.c_str());
+		int setting;
+		if (!IsNumeric(value))
+		{
+			if (value=="NONE")
+				setting = 0;
+			else if (value=="OP")
+				setting = 1;
+			else if (value=="VOICE")
+				setting = 2;
+			else
+				setting = 3;		/* dummy value to cause failure */
+		} else {
+			setting = atoi(value.c_str());
+			/* set value to textual description */
+			switch (setting) {
+				default:	break;
+				case 0:		value = "NONE";		break;
+				case 1:		value = "OP";		break;
+				case 2:		value = "VOICE";	break;
+			}
+		}
 		if ( (setting < 0) || (setting > 2))
 		{
 			bot->Notice(theClient,
 				bot->getResponse(theUser,
 					language::userflags_syntax,
-					string("Invalid USERFLAGS setting. Correct values are 0, 1, 2.")));
+					string("Invalid USERFLAGS setting. Correct values are NONE, OP or VOICE.")));
 			return false;
 		}
 
@@ -823,8 +843,8 @@ else
 	    bot->Notice(theClient,
 			bot->getResponse(theUser,
 				language::userflags_status,
-				string("USERFLAGS for %s is %i")).c_str(),
-			theChan->getName().c_str(), setting);
+				string("USERFLAGS for %s is %s")).c_str(),
+			theChan->getName().c_str(), value.c_str());
 	    return true;
 	}
 

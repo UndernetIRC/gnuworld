@@ -1,7 +1,9 @@
--- $Id: language_greek.sql,v 1.7 2007/08/07 21:22:28 kewlio Exp $
+-- $Id: language_greek.sql,v 1.8 2007/12/26 19:13:00 kewlio Exp $
 -- Greek	 language definition.
 -- 04/05/02 - Marios Solomou <hawk@undernet.org>.
 -- 04/05/02 - deop <d30pma@cytanet.com.cy>.
+
+DELETE FROM languages WHERE language_id=19;
 
 INSERT INTO languages VALUES(19,'GR','Greek',31337);
 
@@ -106,8 +108,8 @@ COPY "translations" FROM stdin;
 19	97	H rithmisi INVISIBLE einai twra OFF.	31337	0
 19	98	%s gia %s einai %s	31337	0
 19	99	H axia tou %s prepei na einai ON i OFF	31337	0
-19	100	Avasimi rithmisi gia USERFLAGS. Oi swstes axies einai 0, 1, 2.	31337	0
-19	101	USERFLAGS gia to %s einai %i	31337	0
+19	100	Avasimi rithmisi gia USERFLAGS. Oi swstes axies einai NONE, OP, VOICE.	31337	0
+19	101	USERFLAGS gia to %s einai %s	31337	0
 19	102	H axia tou MASSDEOPPRO prepei na einai apo 0-7	31337	0
 19	103	MASSDEOPPRO gia to %s exei tethei se %d	31337	0
 19	104	H axia tou FLOODPRO prepei na einai apo 0-7	31337	0

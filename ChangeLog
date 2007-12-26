@@ -1,4 +1,25 @@
-// $Id: ChangeLog,v 1.135 2007/12/26 16:14:19 kewlio Exp $ //
+// $Id: ChangeLog,v 1.136 2007/12/26 19:12:55 kewlio Exp $ //
+
+2007-12-26	Dan-m00 <daniel@undernet.org>
+		* doc/language*.sql: modify languages for new 101+101 responses
+			for userflags replies.
+		* doc/doc/update_languages_20071226_100_101.sql: update SQL for
+			previous installations.
+		* mod.cservice/SETCommand.cc: modify userflags functionality so
+			that you can use text or numeric settings.
+
+		NOTE: cservice module will CORE if you do not run the update
+		sql file, an example follows:
+
+			psql cservice < doc/update_languages_20071226_100_101.sql
+
+		however, it is PREFERRED that you re-import the entire language
+		database due to several other changes.  The correct order is:
+
+			psql cservice < doc/languages.sql
+			psql cservice < doc/language_table.sql
+
+		followed by any of the optional languages in language_*.sql
 
 2007-12-26	Dan-m00 <daniel@undernet.org>
 		* src/client.cc: dont clear out a channel if joining with a zero

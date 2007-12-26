@@ -1,4 +1,4 @@
--- $Id: language_german.sql,v 1.3 2007/08/07 21:22:28 kewlio Exp $
+-- $Id: language_german.sql,v 1.4 2007/12/26 19:13:00 kewlio Exp $
 -- Language Definition Table for German
 -- 16/8/2002 volta <volta2@gmx.de>
 -- beta readers: Tha_Funk
@@ -106,8 +106,8 @@ COPY translations FROM stdin;
 5	97	Deine INVISIBLE Einstellung ist jetzt AUS.	31337	0
 5	98	%s für %s ist %s	31337	0
 5	99	Wert für %s muß ON oder OFF sein.	31337	0
-5	100	Ungültige USERFLAG Einstellung. Korrekte Werte sind 0, 1, 2.	31337	0
-5	101	USERFLAGS für %s ist %i	31337	0
+5	100	Ungültige USERFLAG Einstellung. Korrekte Werte sind NONE, OP, VOICE.	31337	0
+5	101	USERFLAGS für %s ist %s	31337	0
 5	102	Wert für MASSDEOPPRO muß 0-7 sein	31337	0
 5	103	MASSDEOPPRO für %s ist auf %d gesetzt	31337	0
 5	104	Wert für FLOODPRO muß 0-7 sein	31337	0

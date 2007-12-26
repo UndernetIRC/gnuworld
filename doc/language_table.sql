@@ -110,8 +110,8 @@ COPY "translations" FROM stdin;
 1	97	Your INVISIBLE setting is now OFF.	31337	0
 1	98	%s for %s is %s	31337	0
 1	99	value of %s must be ON or OFF	31337	0
-1	100	Invalid USERFLAGS setting. Correct values are 0, 1, 2.	31337	0
-1	101	USERFLAGS for %s is %i	31337	0
+1	100	Invalid USERFLAGS setting. Correct values are NONE, OP or VOICE.	31337	0
+1	101	USERFLAGS for %s is %s	31337	0
 1	102	value of MASSDEOPPRO has to be 0-7	31337	0
 1	103	MASSDEOPPRO for %s is set to %d	31337	0
 1	104	value of FLOODPRO has to be 0-7	31337	0
@@ -294,8 +294,8 @@ COPY "translations" FROM stdin;
 2	97	Le mode INVISIBLE pour vos informations est maintenant à OFF.	31337	0
 2	98	%s pour %s est %s	31337	0
 2	99	La valeur de %s doit être ON ou OFF	31337	0
-2	100	Configuration USERFLAGS invalide! Les valeurs correctes sont 0, 1, 2.	31337	0
-2	101	Le USERFLAGS de %s est %i	31337	0
+2	100	Configuration USERFLAGS invalide! Les valeurs correctes sont NONE, OP, VOICE.	31337	0
+2	101	Le USERFLAGS de %s est %s	31337	0
 2	102	La valeur de MASSDEOPPRO doit être comprise entre 0 et 7	31337	0
 2	103	MASSDEOPPRO de %s a été configuré à %d	31337	0
 2	104	La valeur de FLOODPRO doit être comprise entre 0 et 7	31337	0
@@ -469,8 +469,8 @@ COPY "translations" FROM stdin;
 3	97	Din USYNLIG indstilling er nu sat til OFF.	31337	0
 3	98	%s for %s er %s	31337	0
 3	99	Værdig af %s skal være ON eller OFF	31337	0
-3	100	Ugyldig USERFLAGS indstilling. Korrekte værdiger er 0, 1, 2.	31337	0
-3	101	USERFLAGS for %s er %i	31337	0
+3	100	Ugyldig USERFLAGS indstilling. Korrekte værdiger er NONE, OP, VOICE.	31337	0
+3	101	USERFLAGS for %s er %s	31337	0
 3	102	Værdi af MASSDEOPPRO skal være 0-7	31337	0
 3	103	MASSDEOPPRO for %s er sat til %d	31337	0
 3	104	Værdi af FLOODPRO skal være 0-7	31337	0
@@ -644,8 +644,8 @@ COPY "translations" FROM stdin;
 6	97	Seu ajuste INVISÍVEL está agora DESLIGADO.	31337	0
 6	98	%s para %s é %s	31337	0
 6	99	valor de %s precisa ser ON ou OFF	31337	0
-6	100	Ajuste de USERFLAGS inválido. Os valores corretos são 0, 1, 2.	31337	0
-6	101	USERFLAGS para %s é %i	31337	0
+6	100	Ajuste de USERFLAGS inválido. Os valores corretos são NONE, OP, VOICE.	31337	0
+6	101	USERFLAGS para %s é %s	31337	0
 6	102	o valor de MASSDEOPPRO tem que ser 0-7	31337	0
 6	103	MASSDEOPPRO para %s é ajustado a %d	31337	0
 6	104	o valor de FLOODPRO tem que ser de 0-7	31337	0
@@ -820,8 +820,8 @@ COPY "translations" FROM stdin;
 7	97	L'impostazione INVISIBLE adesso non è attiva (OFF).	31337	0
 7	98	%s per %s è %s	31337	0
 7	99	il valore di %s dev'essere ON oppure OFF	31337	0
-7	100	Impostazione USERFLAGS non valida. I valori corretti sono 0, 1 o 2.	31337	0
-7	101	USERFLAGS per %s è %i	31337	0
+7	100	Impostazione USERFLAGS non valida. I valori corretti sono NONE, OP o VOICE.	31337	0
+7	101	USERFLAGS per %s è %s	31337	0
 7	102	il valore di MASSDEOPPRO dev'essere compreso tra 0 e 7 inclusi	31337	0
 7	103	MASSDEOPPRO per %s è impostato a %d	31337	0
 7	104	il valore di FLOODPRO dev'essere compreso tra 0 e 7 inclusi	31337	0
@@ -993,8 +993,8 @@ COPY "translations" FROM stdin;
 8	97	Acum INVISIBLE este OFF	31337	0
 8	98	%s pentru %s e %s	31337	0
 8	99	valoarea lui %s trebuie sa fie ON sau OFF	31337	0
-8	100	Valoarea pentru USERFLAGS e incorecta. Valorile admise sunt 0, 1, 2.	31337	0
-8	101	USERFLAGS pentru %s este %i	31337	0
+8	100	Valoarea pentru USERFLAGS e incorecta. Valorile admise sunt NONE, OP, VOICE.	31337	0
+8	101	USERFLAGS pentru %s este %s	31337	0
 8	102	valoarea pentru MASSDEOPPRO trebuie sa fie 0-7	31337	0
 8	103	MASSDEOPPRO pentru %s este %d	31337	0
 8	104	valoarea pentru FLOODPRO trebuie sa fie 0-7	31337	0
@@ -1168,8 +1168,8 @@ COPY "translations" FROM stdin;
 9	97	La teva opció INVISIBLE és ara inactiva (OFF).	31337	0
 9	98	%s a %s és %s	31337	0
 9	99	el valor de %s ha d'ésser 'ON' o 'OFF'.	31337	0
-9	100	Valor d'USERFLAGS no vàlid. Els valors correctes són 0, 1, 2.	31337	0
-9	101	USERFLAGS per %s és %i.	31337	0
+9	100	Valor d'USERFLAGS no vàlid. Els valors correctes són NONE, OP, VOICE.	31337	0
+9	101	USERFLAGS per %s és %s.	31337	0
 9	102	el valor de MASSDEOPPRO ha d'estar entre 0-7.	31337	0
 9	103	MASSDEOPPRO per %s s'ha fixat a %d.	31337	0
 9	104	el valor de FLOODPRO ha d'estar entre 0-7.	31337	0
@@ -1343,8 +1343,8 @@ COPY "translations" FROM stdin;
 10	97	Your INVISIBLE setting está ahora inactiva (OFF).	31337	0
 10	98	%s en %s está %s	31337	0
 10	99	el valor de %s sólo puede ser 'ON' u 'OFF'.	31337	0
-10	100	Valor de USERFLAGS no válido. Los valores válidos son 0, 1, 2.	31337	0
-10	101	USERFLAGS en %s es %i.	31337	0
+10	100	Valor de USERFLAGS no válido. Los valores válidos son NONE, OP, VOICE.	31337	0
+10	101	USERFLAGS en %s es %s.	31337	0
 10	102	el valor de MASSDEOPPRO tiene que estar entre 0-7.	31337	0
 10	103	MASSDEOPPRO en %s se ha establecido en %d.	31337	0
 10	104	el valor de FLOODPRO tiene que estar entre 0-7.	31337	0
@@ -1519,8 +1519,8 @@ COPY "translations" FROM stdin;
 11	97	Az informacioid most lathatoak (INVISIBLE OFF).	31337	0
 11	98	A(z) %s %s -nak most %s	31337	0
 11	99	A(z) %s erteke ON vagy OFF kell legyen	31337	0
-11	100	Ervenytelen USERFLAGS beallitas. Ervenyes ertekek: 0, 1, 2.	31337	0
-11	101	A(z) %s csatornanak az USERFLAGS erteke most %i	31337	0
+11	100	Ervenytelen USERFLAGS beallitas. Ervenyes ertekek: NONE, OP, VOICE.	31337	0
+11	101	A(z) %s csatornanak az USERFLAGS erteke most %s	31337	0
 11	102	A MASSDEOPPRO erteke 0-7 kozott kell legyen	31337	0
 11	103	A(z) %s csatorna MASSDEOPPRO opciojanak az erteke %d	31337	0
 11	104	A FLOODPRO erteke 0-7 kozott kell legyen	31337	0
@@ -1695,8 +1695,8 @@ COPY "translations" FROM stdin;
 12	97	GÖRÜNMEZLÝK ayarýnýz kapatýldý.	31337	0
 12	98	%s %s için %s	31337	0
 12	99	%s için deðer ON ya da OFF olmalý	31337	0
-12	100	Geçersiz USERFLAGS ayarý. Doðru deðerler 0, 1, 2.	31337	0
-12	101	%s için USERFLAGS ayarý %i	31337	0
+12	100	Geçersiz USERFLAGS ayarý. Doðru deðerler NONE, OP, VOICE.	31337	0
+12	101	%s için USERFLAGS ayarý %s	31337	0
 12	102	MASSDEOPPRO için deðer 0-7 olmalý	31337	0
 12	103	MASSDEOPPRO %s kanalý için %d yapýldý	31337	0
 12	104	FLOODPRO için deðer 0-7 olmalý	31337	0
@@ -1873,8 +1873,8 @@ COPY "translations" FROM stdin;
 13	97	INVISIBLE(usynlig) er nå OFF(av).	31337	0
 13	98	%s for %s er %s	31337	0
 13	99	%s MÅ være ON eller OFF	31337	0
-13	100	Ugyldig USERFLAGS instilling. Korrekte verdier er: 0, 1, 2.	31337	0
-13	101	USERFLAGS for %s er %i	31337	0
+13	100	Ugyldig USERFLAGS instilling. Korrekte verdier er: NONE, OP, VOICE.	31337	0
+13	101	USERFLAGS for %s er %s	31337	0
 13	102	Verdien for MASSDEOPPRO må være 0-7	31337	0
 13	103	MASSDEOPPRO for %s er satt til %d	31337	0
 13	104	Verdien til FLOODPRO må være 0-7	31337	0
@@ -2049,8 +2049,8 @@ COPY "translations" FROM stdin;
 14	97	Tari9atou INVISIBLE li khiyaratikoume al khassa al ane off.	31337	0
 14	98	%s li %s hia %s	31337	0
 14	99	Kimatou %s yajibou ane takouna ON aw OFF	31337	0
-14	100	Tahakoume USERFLAGS ghayrou sa7i7e! Al 9iyamou a sa7i7a hia 0,1,2.	31337	0
-14	101	Al USERFLAGS li %s houa %i	31337	0
+14	100	Tahakoume USERFLAGS ghayrou sa7i7e! Al 9iyamou a sa7i7a hia NONE,OP,VOICE.	31337	0
+14	101	Al USERFLAGS li %s houa %s	31337	0
 14	102	9imatou  MASSDEOPPRO yajibou ana takouna bayne 0-7	31337	0
 14	103	MASSDEOPPRO li %s ta7akama fihi ila %d	31337	0
 14	104	9imatou  FLOODPRO yajibou ane takouna bayne 0-7	31337	0
@@ -2217,8 +2217,8 @@ COPY "translations" FROM stdin;
 15	97	äîöá äáìúé ðøàä àéðå ôòéì.	31337	0
 15	98	%s äåà  %s ì %s 	31337	0
 15	99	.öøéê ìäéåú ôòéì àå àéðå ôòéì %sòøê ùì 	31337	0
-15	100	äâãøåú éåæøôìàâ ùâåéåú, äâãøåú ðëåðåú äï  0, 1, 2.	31337	0
-15	101	%s ì %i éåæøôìàâ äåà	31337	0
+15	100	äâãøåú éåæøôìàâ ùâåéåú, äâãøåú ðëåðåú äï  NONE, OP, VOICE.	31337	0
+15	101	%s ì %s éåæøôìàâ äåà	31337	0
 15	102	.òøëéé îàñ-ãéàåô-ôøå öøéëéí ìäéåú áéï 7-0	31337	0
 15	103	%s îåâãøéí ì %d îàñ-ãéàåô-ôøå	31337	0
 15	104	òøëéé ôìåãôøå öøéëéí ìäéåú áéï 7-0	31337	0
@@ -2392,8 +2392,8 @@ COPY "translations" FROM stdin;
 16	97	Vashiot NEVIDLIV flag e sega ISKLUCEN.	31337	0
 16	98	%s za %s e %s	31337	0
 16	99	podesuvanjeto na %s mora da bide VKLUCENO(ON) ili ISKLUCENO (OFF)	31337	0
-16	100	Pogreshni KORISNICKI PODESUVANJA. Tocnite podesuvanja se 0, 1, 2.	31337	0
-16	101	KORISNICKITE PODESUVANJA za %s se %i	31337	0
+16	100	Pogreshni KORISNICKI PODESUVANJA. Tocnite podesuvanja se NONE, OP, VOICE.	31337	0
+16	101	KORISNICKITE PODESUVANJA za %s se %s	31337	0
 16	102	podesuvanjeto za MASSDEOPPRO mora da bide 0-7	31337	0
 16	103	MASSDEOPPRO za %s e postaven na %d	31337	0
 16	104	podesuvanjeto za FLOODPRO mora da bide 0-7	31337	0
