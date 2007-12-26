@@ -1,4 +1,11 @@
-// $Id: ChangeLog,v 1.134 2007/12/24 04:50:12 kewlio Exp $ //
+// $Id: ChangeLog,v 1.135 2007/12/26 16:14:19 kewlio Exp $ //
+
+2007-12-26	Dan-m00 <daniel@undernet.org>
+		* src/client.cc: dont clear out a channel if joining with a zero
+			timestamp - removed a desync.
+		* mod.cservice/cservice.cc: modified ReOp code to use the
+			xServer::Mode() function to set automodes (removed a
+			desync)
 
 2007-12-24	Dan-m00 <daniel@undernet.org>
 		* src/client.cc: add channel creation timestamp after all DEOP

@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: cservice.cc,v 1.278 2007/11/06 13:32:10 kewlio Exp $
+ * $Id: cservice.cc,v 1.279 2007/12/26 16:14:19 kewlio Exp $
  */
 
 #include	<new>
@@ -2230,15 +2230,8 @@ if (ptr->second <= currentTime())
 				 */
 				if (theChan->getChannelMode() != "")
 					{
-					stringstream s2;
-					s2	<< getCharYYXXX()
-						<< " M "
-						<< tmpChan->getName()
-						<< " "
-						<< theChan->getChannelMode()
-						<< ends;
-
-					Write( s2 );
+						/* use the xServer::Mode code to set these modes */
+						MyUplink->Mode(this, tmpChan, theChan->getChannelMode().c_str(), std::string() );
 					}
 			}
 

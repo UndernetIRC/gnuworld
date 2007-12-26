@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: client.cc,v 1.86 2007/12/24 04:50:12 kewlio Exp $
+ * $Id: client.cc,v 1.87 2007/12/26 16:14:19 kewlio Exp $
  */
 
 #include	<new>
@@ -47,7 +47,7 @@
 #include	"ELog.h"
 #include	"events.h"
 
-RCSTAG("$Id: client.cc,v 1.86 2007/12/24 04:50:12 kewlio Exp $" ) ;
+RCSTAG("$Id: client.cc,v 1.87 2007/12/26 16:14:19 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -2041,7 +2041,7 @@ if ( !isConnected() )
 	return false;
 	}
 assert( theChan != NULL ) ;
-if( joinTime < theChan->getCreationTime() )
+if( ( joinTime > 0 ) && ( joinTime < theChan->getCreationTime() ) )
 	{
 	//The join is older than the creation time of the channel, need to remove all the modes of the channel
 	theChan->removeAllModes();
