@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: UNBANCommand.cc,v 1.19 2007/12/27 23:39:04 kewlio Exp $
+ * $Id: UNBANCommand.cc,v 1.20 2007/12/27 23:41:07 kewlio Exp $
  */
 
 #include	<string>
@@ -38,7 +38,7 @@
 #include	"responses.h"
 #include	"match.h"
 
-const char UNBANCommand_cc_rcsId[] = "$Id: UNBANCommand.cc,v 1.19 2007/12/27 23:39:04 kewlio Exp $" ;
+const char UNBANCommand_cc_rcsId[] = "$Id: UNBANCommand.cc,v 1.20 2007/12/27 23:41:07 kewlio Exp $" ;
 
 namespace gnuworld
 {
@@ -178,18 +178,8 @@ while (ptr != theChan->banList.end())
 	 */
 
 	/* do a (case insensitive) literal match */
-	elog	<< "UNBAN> strcasecmp("
-		<< theBan->getBanMask()
-		<< ","
-		<< banTarget
-		<< ")"
-		<< endl ;
 	if (!strcasecmp(theBan->getBanMask(), banTarget))
 		exactmatch = 1;
-
-	elog	<< "UNBAN> exactmatch = "
-		<< exactmatch
-		<< endl ;
 
 	if ( isNick )
 		{
@@ -199,10 +189,6 @@ while (ptr != theChan->banList.end())
 		{
 		comparison = match(banTarget, theBan->getBanMask());
 		}
-
-	elog	<< "UNBAN> comparison = "
-		<< comparison
-		<< endl ;
 
 	if ( comparison == 0 )
 		{
