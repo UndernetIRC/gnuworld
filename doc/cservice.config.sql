@@ -1,4 +1,4 @@
--- "$Id: cservice.config.sql,v 1.9 2007/04/18 08:49:44 kewlio Exp $"
+-- "$Id: cservice.config.sql,v 1.10 2007/12/27 22:54:50 kewlio Exp $"
 -- Default configuration entries for CMaster bot.
 
 INSERT INTO variables (var_name,contents,last_updated,hint)
@@ -18,7 +18,7 @@ VALUES ('FAILED_LOGINS_RATE', '900', now()::abstime::int4, 'Time between alerts 
 INSERT INTO variables (var_name,contents,last_updated,hint)
 VALUES ('MAX_FAILED_LOGINS', '20', now()::abstime::int4, 'Maximum failed logins per client');
 INSERT INTO variables (var_name,contents,last_updated,hint)
-VALUES ('MAX_BAN_DURATION', '2400', now()::abstime::int4, 'Maximum ban duration (in hours)');
+VALUES ('MAX_BAN_DURATION', '8640000', now()::abstime::int4, 'Maximum ban duration (in seconds)');
 INSERT INTO variables (var_name,contents,last_updated,hint)
 VALUES ('LOGINS_FROM_SAME_IP', '0', now()::abstime::int4, 'Maximum logins from same IP when maxlogins=1');
 INSERT INTO variables (var_name,contents,last_updated,hint)

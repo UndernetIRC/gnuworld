@@ -33,7 +33,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: BANCommand.cc,v 1.45 2007/03/25 16:42:24 kewlio Exp $
+ * $Id: BANCommand.cc,v 1.46 2007/12/27 22:54:50 kewlio Exp $
  */
 
 #include	<new>
@@ -52,7 +52,7 @@
 #include	"match.h"
 #include	"ip.h"
 
-const char BANCommand_cc_rcsId[] = "$Id: BANCommand.cc,v 1.45 2007/03/25 16:42:24 kewlio Exp $" ;
+const char BANCommand_cc_rcsId[] = "$Id: BANCommand.cc,v 1.46 2007/12/27 22:54:50 kewlio Exp $" ;
 
 namespace gnuworld
 {
@@ -145,7 +145,7 @@ if(!tmpBotUser->getMode(ChannelUser::MODE_O))
 		}
 
 int oCount = 0;
-unsigned int banTime = 3;
+unsigned int banTime = (3*3600);
 int banLevel = 75;
 string banReason = "No Reason";
 
@@ -162,50 +162,71 @@ switch(oCount)
 		 *  or we'll also accept a reason and set defaults.
 		 */
 
- 		if(!IsNumeric(st[3]))
+ 		if(!IsTimeSpec(st[3]))
  			{
 			banReason = st.assemble(3);
  			}
 			else
 			{
-			banTime = atoi(st[3].c_str());
+			banTime = extractTime(st[3], 3600);
 			}
 		break;
 		}
 	case 2:
 		{
-		if(!IsNumeric(st[3]))
+		/*
+		 *  Two parameters supplied, it's either reason,
+		 *  duration + reason or duration and level.
+		 */
+		if(!IsTimeSpec(st[3]))
 			{
+			/* first param is not duration, must be reason */
 			banReason = st.assemble(3);
 			break;
 			}
 
 		if(!IsNumeric(st[4]))
 			{
+			/* first param IS duration (see above), 2nd param is
+			 * NOT level - must be reason
+			 */
 			banReason = st.assemble(4);
-			banTime = atoi(st[3].c_str());
+			banTime = extractTime(st[3], 3600);
+			break;
 			}
 
-		banTime = atoi(st[3].c_str());
+		/* if we reach here, first param is duration, 2nd param is level
+		 * and no reason is specified.
+		 */
+		banTime = extractTime(st[3], 3600);
 		banLevel = atoi(st[4].c_str());
 		break;
 		}
 	case 3:
 		{
-		if(!IsNumeric(st[3]))
+		/*
+		 *  All parameters supplied, it's either reason, duration +
+		 *  reason or duration + level + reason.
+		 */
+		if(!IsTimeSpec(st[3]))
 			{
+			/* first param is NOT duration, must be reason */
 			banReason = st.assemble(3);
 			break;
 			}
 
 		if(!IsNumeric(st[4]))
 			{
+			/* first param IS duration (see above), 2nd param is
+			 * NOT level - must be reason.
+			 */
 			banReason = st.assemble(4);
-			banTime = atoi(st[3].c_str());
+			banTime = extractTime(st[3], 3600);
 			break;
 			}
 
-		banTime = atoi(st[3].c_str());
+		/* if we reach here, we have duration, level and reason */
+		banTime = extractTime(st[3], 3600);
 		banLevel = atoi(st[4].c_str());
 		banReason = st.assemble(5);
 		break;
@@ -283,7 +304,6 @@ if (max_bans > 0)
 	}
 }
 
-int banDuration = banTime * 3600;
 string banTarget = st[2];
 
 bool isNick = bot->validUserMask( banTarget ) ? false : true ;
@@ -490,7 +510,7 @@ newBan->setBanMask(banTarget);
 newBan->setSetBy(theUser->getUserName());
 newBan->setSetTS(bot->currentTime());
 newBan->setLevel(banLevel);
-newBan->setExpires(banDuration+bot->currentTime());
+newBan->setExpires(banTime+bot->currentTime());
 newBan->setReason(banReason);
 
 //theChan->banList[newBan->getID()] = newBan;

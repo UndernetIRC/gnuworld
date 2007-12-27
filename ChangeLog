@@ -1,4 +1,19 @@
-// $Id: ChangeLog,v 1.139 2007/12/27 20:45:14 kewlio Exp $ //
+// $Id: ChangeLog,v 1.140 2007/12/27 22:54:50 kewlio Exp $ //
+
+2007-12-27	Dan-m00 <daniel@undernet.org>
+		* doc/update_variables_20071227.sql:
+		* doc/cservice.config.sql:
+		* doc/cservice.help.sql: update SQL data for new format BAN
+			command for mod.cservice
+		* mod.cservice/BANCommand.cc: modified BAN command to allow a
+			more friendly and usable format for ban duration.  It
+			allows a unit specifier (s,m,h,d) after the time.
+
+		NOTE: the default variable for max ban duration is 2400.  This
+		will equate to 2400 SECONDS after this change.  To avoid this,
+		run the following command ONCE ONLY:
+
+			psql cservice < doc/update_variables_20071227.sql
 
 2007-12-27	Dan-m00 <daniel@undernet.org>
 		* libgnuworld/misc.cc:
