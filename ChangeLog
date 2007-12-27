@@ -1,4 +1,10 @@
-// $Id: ChangeLog,v 1.140 2007/12/27 22:54:50 kewlio Exp $ //
+// $Id: ChangeLog,v 1.141 2007/12/27 23:39:04 kewlio Exp $ //
+
+2007-12-27	Dan-m00 <daniel@undernet.org>
+		* mod.cservice/UNBANCommand.cc: modified UNBAN command so that
+			it will only remove an exact matching ban if one is
+			found.  Also, report the number of bans removed from
+			the channel banlist NOT banlist+channel banlist!
 
 2007-12-27	Dan-m00 <daniel@undernet.org>
 		* doc/update_variables_20071227.sql:

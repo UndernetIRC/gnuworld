@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: UNBANCommand.cc,v 1.18 2005/03/25 03:07:29 dan_karrels Exp $
+ * $Id: UNBANCommand.cc,v 1.19 2007/12/27 23:39:04 kewlio Exp $
  */
 
 #include	<string>
@@ -38,7 +38,7 @@
 #include	"responses.h"
 #include	"match.h"
 
-const char UNBANCommand_cc_rcsId[] = "$Id: UNBANCommand.cc,v 1.18 2005/03/25 03:07:29 dan_karrels Exp $" ;
+const char UNBANCommand_cc_rcsId[] = "$Id: UNBANCommand.cc,v 1.19 2007/12/27 23:39:04 kewlio Exp $" ;
 
 namespace gnuworld
 {
@@ -166,6 +166,7 @@ std::map< int,sqlBan* >::iterator ptr = theChan->banList.begin();
 
 size_t banCount = 0;
 unsigned short comparison = 0;
+unsigned short exactmatch = 0;
 vector <sqlBan*> oldBans;
 
 while (ptr != theChan->banList.end())
@@ -176,6 +177,20 @@ while (ptr != theChan->banList.end())
 	 * banmask.
 	 */
 
+	/* do a (case insensitive) literal match */
+	elog	<< "UNBAN> strcasecmp("
+		<< theBan->getBanMask()
+		<< ","
+		<< banTarget
+		<< ")"
+		<< endl ;
+	if (!strcasecmp(theBan->getBanMask(), banTarget))
+		exactmatch = 1;
+
+	elog	<< "UNBAN> exactmatch = "
+		<< exactmatch
+		<< endl ;
+
 	if ( isNick )
 		{
 		comparison = match(theBan->getBanMask(), banTarget);
@@ -184,6 +199,10 @@ while (ptr != theChan->banList.end())
 		{
 		comparison = match(banTarget, theBan->getBanMask());
 		}
+
+	elog	<< "UNBAN> comparison = "
+		<< comparison
+		<< endl ;
 
 	if ( comparison == 0 )
 		{
@@ -199,7 +218,15 @@ while (ptr != theChan->banList.end())
 			}
 		else
 			{
-			oldBans.push_back(theBan);
+			/* if it's an exact match, we want to only remove that ban */
+			if (exactmatch == 1)
+			{
+				oldBans.clear();
+				oldBans.push_back(theBan);
+				break;
+			} else {
+				oldBans.push_back(theBan);
+			}
 			}
 		} // if (banMatched)
 	++ptr;
@@ -251,6 +278,13 @@ while (cPtr != theChannel->banList_end())
 		comparison = match(banTarget, (*cPtr));
 		}
 
+	if (exactmatch == 1)
+	{
+		/* if we matched exactly above, we want to match exactly here too */
+		if (strcasecmp((*cPtr), banTarget))
+			comparison = 0;
+	}
+
 	if ( comparison == 0)
 		{
 		// Can't call xClient::UnBan inside the loop it will
@@ -264,8 +298,6 @@ while (cPtr != theChannel->banList_end())
 
 		theChannel->removeBan(*cPtr);
 		cPtr = theChannel->banList_begin();
-
-		banCount++;
 		}
 	else
 		{
