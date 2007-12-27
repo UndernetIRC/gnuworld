@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: SCHANGLINECommand.cc,v 1.1 2007/03/30 09:33:04 mrbean_ Exp $
+ * $Id: SCHANGLINECommand.cc,v 1.2 2007/12/27 20:45:16 kewlio Exp $
  */
 
 #include	<string>
@@ -41,7 +41,7 @@
 #include	"Constants.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: SCHANGLINECommand.cc,v 1.1 2007/03/30 09:33:04 mrbean_ Exp $" ) ;
+RCSTAG( "$Id: SCHANGLINECommand.cc,v 1.2 2007/12/27 20:45:16 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -81,9 +81,10 @@ bool SCHANGLINECommand::Exec( iClient* theClient, const string& Message )
 			"glining a channel maybe?");
 		return true;
 	}
-	gLength = extractTime( st[2] );
-	if (gLength == 0) 
+	if (IsTimeSpec(st[2]))
 	{
+		gLength = extractTime( st[2], 1 );
+	} else {
 		gLength = bot->getDefaultGlineLength();
 		ResStart = 1;
 	}

@@ -1,4 +1,17 @@
-// $Id: ChangeLog,v 1.138 2007/12/26 20:26:03 kewlio Exp $ //
+// $Id: ChangeLog,v 1.139 2007/12/27 20:45:14 kewlio Exp $ //
+
+2007-12-27	Dan-m00 <daniel@undernet.org>
+		* libgnuworld/misc.cc:
+		* libgnuworld/misc.h: add IsTimeSpec() function to check for
+			a valid time specification.  Also modify the extractTime
+			function to allow variable default units to be used.
+		* mod.ccontrol/FORCECHANGLINECommand.cc:
+		* mod.ccontrol/FORCEGLINECommand.cc:
+		* mod.ccontrol/GLINECommand.cc:
+		* mod.ccontrol/SCHANGLINECommand.cc: modify function calls to
+			extractTime() for the above changes.  Also implement
+			IsTimeSpec() checks rather than checking for a zero
+			reply from extractTime()
 
 2007-12-26	Dan-m00 <daniel@undernet.org>
 		* mod.cservice/SETCommand.cc: alter set userflags to display

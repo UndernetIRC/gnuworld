@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: misc.cc,v 1.5 2007/08/28 16:10:00 dan_karrels Exp $
+ * $Id: misc.cc,v 1.6 2007/12/27 20:45:15 kewlio Exp $
  */
 
 #include	<string>
@@ -31,7 +31,7 @@
 
 #include	"misc.h"
 
-const char rcsId[] = "$Id: misc.cc,v 1.5 2007/08/28 16:10:00 dan_karrels Exp $" ;
+const char rcsId[] = "$Id: misc.cc,v 1.6 2007/12/27 20:45:15 kewlio Exp $" ;
 
 namespace gnuworld
 {
@@ -130,6 +130,36 @@ for( string::const_iterator ptr = s.begin(), endPtr = s.end() ;
 return true ;
 }
 
+/**
+ * Return true if this string consists of a time specification
+ * [0123456789SsMmHhDd] - it also must begin with a digit.
+ */
+bool IsTimeSpec( const string& s )
+{
+	char c;
+	int count = 0;
+
+	for ( string::const_iterator ptr = s.begin(), endPtr = s.end() ;
+		ptr != endPtr ; ++ptr )
+	{
+		c = tolower(*ptr);
+		/* if this is the start, it must be a digit */
+		if ((ptr == s.begin()) && (!isdigit(c)))
+			return false;
+		/* check for valid characters (digits, smhd) */
+		if (!isdigit(c) && c != 's' && c != 'm' && c != 'h' && c != 'd')
+			return false;
+		/* keep a count of non-numeric characters */
+		if (!isdigit(c))
+			count++;
+		/* maximum of 1 is allowed */
+		if (count > 1)
+			return false;
+	}
+	/* if we reach here, this is a valid time specification */
+	return true;
+}
+
 int strcasecmp( const string& s1, const string& s2 )
 {
 return ::strcasecmp( s1.c_str(), s2.c_str() ) ;
@@ -138,9 +168,14 @@ return ::strcasecmp( s1.c_str(), s2.c_str() ) ;
 /**
  * Returns the time which is given as #<d/h/m/s> as seconds */
 
-time_t extractTime( string Length )
+time_t extractTime( string Length, unsigned int defaultUnits )
 {
-unsigned int Units = 1;         // Default for seconds
+unsigned int Units;
+
+if (defaultUnits == 0)
+	Units = 1;
+else
+	Units = defaultUnits;
 
 if (!strcasecmp(Length.substr(Length.length()-1).c_str(),"d"))
 	{

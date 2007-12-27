@@ -19,11 +19,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: misc.h,v 1.8 2007/08/28 16:10:00 dan_karrels Exp $
+ * $Id: misc.h,v 1.9 2007/12/27 20:45:15 kewlio Exp $
  */
 
 #ifndef __MISC_H
-#define __MISC_H "$Id: misc.h,v 1.8 2007/08/28 16:10:00 dan_karrels Exp $"
+#define __MISC_H "$Id: misc.h,v 1.9 2007/12/27 20:45:15 kewlio Exp $"
 
 #include	<string>
 #include	<iostream>
@@ -129,6 +129,12 @@ void string_toupper( std::string& ) ;
 
 /**
  * Examine a given C++ string and return true if it contains
+ * a time specification, return false otherwise.
+ */
+bool IsTimeSpec( const std::string& ) ;
+
+/**
+ * Examine a given C++ string and return true if it contains
  * all numeric characters, return false otherwise.
  */
 bool IsNumeric( const std::string& ) ;
@@ -136,7 +142,7 @@ bool IsNumeric( const std::string& ) ;
 /**
  * Returns the time which is given as #<d/h/m/s> as seconds
  */
-time_t extractTime( std::string Length ) ;
+time_t extractTime( std::string Length, unsigned int defaultUnits ) ;
 
 int atoi( const std::string& ) ;
 

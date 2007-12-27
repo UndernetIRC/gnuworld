@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: FORCEGLINECommand.cc,v 1.35 2007/04/18 08:19:07 kewlio Exp $
+ * $Id: FORCEGLINECommand.cc,v 1.36 2007/12/27 20:45:15 kewlio Exp $
  */
 
 #include	<string>
@@ -35,7 +35,7 @@
 #include	"Constants.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: FORCEGLINECommand.cc,v 1.35 2007/04/18 08:19:07 kewlio Exp $" ) ;
+RCSTAG( "$Id: FORCEGLINECommand.cc,v 1.36 2007/12/27 20:45:15 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -106,12 +106,13 @@ string Length;
 Length.assign(st[pos+1]);
 unsigned int ResStart = 2;
 bool Ok = true;
-gLength = extractTime( st[2] );
-if(gLength == 0) 
-	{
+if (IsTimeSpec(st[2]))
+{
+	gLength = extractTime( st[2], 1 );
+} else {
 	gLength = bot->getDefaultGlineLength() ;
 	ResStart = 1;
-	}
+}
 //ccUser *tmpAuth = bot->IsAuth(theClient);
 if(!tmpUser)
 	{ // We shouldnt have got here in the first place, but check it anyway
