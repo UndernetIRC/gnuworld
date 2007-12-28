@@ -1,4 +1,16 @@
-// $Id: ChangeLog,v 1.142 2007/12/28 01:43:14 kewlio Exp $ //
+// $Id: ChangeLog,v 1.143 2007/12/28 02:12:35 kewlio Exp $ //
+
+2007-12-28	Dan-m00 <daniel@undernet.org>
+		* doc/update_suspend_2071228.sql:
+		* doc/cservice.help.sql: modify help for SUSPEND command.
+		* mod.cservice/SUSPENDCommand.cc: modify suspend command to use
+			standard time specification (while maintaining original
+			syntax is used)
+
+		NOTE: either reimport your help files, or run the following
+		command to update the syntax of SUSPEND in help:
+
+			psql cservice < doc/update_suspend_20071228.sql
 
 2007-12-28	Dan-m00 <daniel@undernet.org>
 		* doc/update_purge_20071227.sql:

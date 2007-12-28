@@ -22,7 +22,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: SUSPENDCommand.cc,v 1.27 2003/12/29 23:59:37 dan_karrels Exp $
+ * $Id: SUSPENDCommand.cc,v 1.28 2007/12/28 02:12:35 kewlio Exp $
  */
 
 #include	<iostream>
@@ -37,7 +37,7 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char SUSPENDCommand_cc_rcsId[] = "$Id: SUSPENDCommand.cc,v 1.27 2003/12/29 23:59:37 dan_karrels Exp $" ;
+const char SUSPENDCommand_cc_rcsId[] = "$Id: SUSPENDCommand.cc,v 1.28 2007/12/28 02:12:35 kewlio Exp $" ;
 
 namespace gnuworld
 {
@@ -185,32 +185,39 @@ if (level <= usrLevel)
 	return false;
 	}
 
-string units;
-time_t duration = atoi(st[3].c_str());
-time_t finalDuration = (duration * 60); /* Default to minutes. */
+time_t finalDuration;
+
+if (!IsTimeSpec(st[3]))
+{
+	bot->Notice(theClient,
+		bot->getResponse(theUser,
+			language::inval_suspend_dur,
+			string("Invalid suspend duration.")));
+	return true;
+}
 
 if( st.size() >= 5 )
 	{
-	units = string_lower(st[4]);
+	string units = string_lower(st[4]);
 	if(units == "m")
 		{
-		finalDuration = duration * 60;
+		finalDuration = extractTime(st[3], 60);
 		}
 	else if(units == "h")
 		{
-		finalDuration = duration * 60 * 60;
+		finalDuration = extractTime(st[3], 3600);
 		}
 	else if(units == "d")
 		{
-		finalDuration = duration * 60 * 60 * 24;
+		finalDuration = extractTime(st[3], 86400);
 		}
 	else
 		{
-		bot->Notice(theClient,
-			bot->getResponse(theUser, language::bogus_time,
-				string("bogus time units")));
-		return true;
+		finalDuration = extractTime(st[3], 1);
 		}
+	} else {
+		/* default is minutes */
+		finalDuration = extractTime(st[3], 60);
 	} /* if( st.size() >= 5 ) */
 
 /* Greater than a year? */

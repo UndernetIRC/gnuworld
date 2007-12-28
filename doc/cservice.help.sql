@@ -3,7 +3,7 @@
 -- Its not particularly in any nice order, but you can use the web interface
 -- to change it all anyway.
 --
--- $Id: cservice.help.sql,v 1.7 2007/12/28 01:43:14 kewlio Exp $
+-- $Id: cservice.help.sql,v 1.8 2007/12/28 02:12:35 kewlio Exp $
 
 DELETE FROM help;
 
@@ -666,7 +666,7 @@ TOPIC	8	/msg X topic <#canal> <topic>\nX va schimba topicul (maxim 145 caractere
 CLEARMODE	8	/msg X clearmode <#canal>\nSterge toate modurile canalului. Poate fi folosita cand canalul a fost inchis (set +i sau +k fara cunostinta ta).\nNOTA: Aceasta nu este neaparat cea mai buna metoda de a intra pe canal, deoarece alti useri sau boti care sunt operatori pe canal pot reseta modurile dupa ce le-ai sters. \nVezi comanda STATUS (nivel 200) pentru alte informatii.
 SERVNOTICE	1	/msg X servnotice <#channel> <text>\nThis command is for CService Admins only.
 SET MODE	1	/msg X set <#channel> MODE\nThis will save the current channel modes as default.
-SUSPEND	1	/msg X suspend <#channel> <username> <duration> <M|H|D> [level]\nSuspends a user's access to X on your channel's userlist for the specified period of time, at the specified level if given.\nIf a level is not specified, the default suspension level used will be the access level of the issuer. \nYou can only SUSPEND someone with access lower than your own. The maximum duration is 372 days (8928 hours, 535680 minutes).
+SUSPEND	1	/msg X suspend <#channel> <username> <duration<M|H|D>> [level]\nSuspends a user's access to X on your channel's userlist for the specified period of time, at the specified level if given.\nIf a level is not specified, the default suspension level used will be the access level of the issuer. \nYou can only SUSPEND someone with access lower than your own. The maximum duration is 372 days (8928 hours, 535680 minutes).
 CHANINFO	8	/msg X chaninfo <#canal>\nArata daca canalul este sau nu inregistat, userul managerului, si actuala DESCRIPTION si URL, daca exista.
 NEWPASS	2	Désormais, les changements de mot de passe devront être effectués en utilisant la page web.\nAllez à http://cservice.undernet.org/live/ et logguez vous avec votre ancien mot de passe.\nQuand la page est chargée, cliquez sur le lien "newpass" dans le menu de gauche et suivez les instructions.
 DEOP	8	/msg X deop <#canal> [nick] [nick2] ... [nickN]\nDeopeaza una sau mai multe persoane din canal. Daca nu e specificat nici un nick si esti operator pe canal, X te va deopa. \nNOTA: Fi atent la limita care este setata la MASSDEOPPRO (vezi SET MASSDEOPPRO - nivel 500).
