@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: cservice.cc,v 1.280 2007/12/26 20:23:17 kewlio Exp $
+ * $Id: cservice.cc,v 1.281 2007/12/28 01:43:14 kewlio Exp $
  */
 
 #include	<new>
@@ -253,7 +253,7 @@ RegisterCommand(new SCANUNAMECommand(this, "SCANUNAME", "<mask> [-all]", 10));
 RegisterCommand(new REMIGNORECommand(this, "REMIGNORE", "<mask>", 5));
 RegisterCommand(new REGISTERCommand(this, "REGISTER", "<#channel> <username>", 8));
 RegisterCommand(new REMOVEALLCommand(this, "REMOVEALL", "<#channel>", 15));
-RegisterCommand(new PURGECommand(this, "PURGE", "<#channel> <reason>", 8));
+RegisterCommand(new PURGECommand(this, "PURGE", "<#channel> [-noop] <reason>", 8));
 RegisterCommand(new FORCECommand(this, "FORCE", "<#channel>", 8));
 RegisterCommand(new UNFORCECommand(this, "UNFORCE", "<#channel>", 8));
 RegisterCommand(new SERVNOTICECommand(this, "SERVNOTICE", "<#channel> <text>", 5));

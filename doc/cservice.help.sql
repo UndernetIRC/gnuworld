@@ -3,7 +3,7 @@
 -- Its not particularly in any nice order, but you can use the web interface
 -- to change it all anyway.
 --
--- $Id: cservice.help.sql,v 1.6 2007/12/27 22:54:50 kewlio Exp $
+-- $Id: cservice.help.sql,v 1.7 2007/12/28 01:43:14 kewlio Exp $
 
 DELETE FROM help;
 
@@ -377,7 +377,7 @@ SUPPORT	1	/msg X support <#channel> <yes/no>\nAn alternate method allowing you t
 HELP	12	/msg X help <komut>\r\nVerilen komut için yardým bilgilerini görüntüler.
 SET LANG	1	/msg X set lang <language code>\nWith this command you can specify in what language X should reply to you. \nAvailable languages: AR - Arabic, CA - Catalan, CH - Christmas, DK - Danish, NL - Dutch, EA - Easter, EN - English, FR - Français, DE - German, IL - Hebrew, HU - Hungarian, IT - Italian, NO - Norsk, PT - Portuguese, RO - Romanian, ES - Spanish, TR - Turkce,
 UNSUSPEND	2	/msg X unsuspend <#canal> <utilisateur>\r\nSupprime la suspension à X d'un utilisateur sur votre canal,\r\nlui permettant donc d'accèder de nouveau à X.\r\nVous ne pouvez UNSUSPEND que des gens ayant un accès inférieur au votre,\r\ndu moment que le niveau de suspension est également inférieur ou égal à votre propre niveau.
-PURGE	1	/msg X purge <#channel> <reason>\nPurges a channel. This command is for CService Admins only.
+PURGE	1	/msg X purge <#channel> [-noop] <reason>\nPurges a channel. This command is for CService Admins only.\n-noop flag causes no reops during purge
 VOICE	2	/msg X voice <#canal> [nick] [nick2] ... [nickN]\r\nVoice (+v) un ou plusieurs nickname dans votre canal.
 ADDCOMMENT	1	/msg X addcomment <username> <the comment>\nsets a usercomment for a given username. This command is for Cservice Admins only
 NEWPASS	1	From now on all passwords will be done via the webpage. Please visit http://cservice.undernet.org/ and click on "web interface"\nThen login with your OLD password. When the page is loaded click on the "newpass" link on the left hand column and follow the instructions.

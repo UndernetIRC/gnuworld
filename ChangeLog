@@ -1,4 +1,16 @@
-// $Id: ChangeLog,v 1.141 2007/12/27 23:39:04 kewlio Exp $ //
+// $Id: ChangeLog,v 1.142 2007/12/28 01:43:14 kewlio Exp $ //
+
+2007-12-28	Dan-m00 <daniel@undernet.org>
+		* doc/update_purge_20071227.sql:
+		* doc/cservice.help.sql:
+		* mod.cservice/cservice.cc: modify help for PURGE command syntax.
+		* mod.cservice/PURGECommand.cc: modify purge command to auto
+			op all level 100+ users upon purge UNLESS -noop given.
+
+		NOTE: either reimport your help files, or run the following
+		command to update the syntax of PURGE in help:
+
+			psql cservice < doc/update_purge_20071227.sql
 
 2007-12-27	Dan-m00 <daniel@undernet.org>
 		* mod.cservice/UNBANCommand.cc: modified UNBAN command so that

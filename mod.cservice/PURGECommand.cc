@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: PURGECommand.cc,v 1.18 2007/11/06 13:32:09 kewlio Exp $
+ * $Id: PURGECommand.cc,v 1.19 2007/12/28 01:43:14 kewlio Exp $
  */
 
 #include	<string>
@@ -39,7 +39,7 @@
 #include	"responses.h"
 #include	"cservice_config.h"
 
-const char PURGECommand_cc_rcsId[] = "$Id: PURGECommand.cc,v 1.18 2007/11/06 13:32:09 kewlio Exp $" ;
+const char PURGECommand_cc_rcsId[] = "$Id: PURGECommand.cc,v 1.19 2007/12/28 01:43:14 kewlio Exp $" ;
 
 namespace gnuworld
 {
@@ -110,6 +110,18 @@ if(theChan->getFlag(sqlChannel::F_NOPURGE))
 	return false;
 }
 
+bool reop;
+string reason;
+
+if (!strcasecmp(st[2],"-noop"))
+{
+	reason = st.assemble(3);
+	reop = false;
+} else {
+	reason = st.assemble(2);
+	reop = true;
+}
+
 /*
  * Fetch some information about the owner of this channel, so we can
  * 'freeze' it for future investigation in the log.
@@ -150,6 +162,60 @@ else
 			managerEmail = bot->SQLDb->GetValue(0,1);
 		}
 	}
+
+/* If we need to reop, do it here */
+if (reop)
+{
+	/* iterate over the channel userlist */
+	vector< iClient* > opList;
+	Channel* tmpChan = Network->findChannel(theChan->getName());
+	for (Channel::userIterator chanUsers = tmpChan->userList_begin();
+		chanUsers != tmpChan->userList_end(); ++chanUsers)
+	{
+		ChannelUser* tmpUser = chanUsers->second;
+		iClient* tmpClient = tmpUser->getClient();
+		sqlUser* tUser = bot->isAuthed(tmpClient, false);
+		if (!tUser)
+			continue;
+		sqlLevel* theLevel = bot->getLevelRecord(tUser, theChan);
+		/* check if they have access */
+		if (theLevel)
+		{
+			if (theLevel->getAccess() >= 100)
+			{
+				/* they're 100+, op them */                        
+				opList.push_back(tmpClient);
+			}
+		}
+	}
+	/* actually do the ops */
+	if (!opList.empty())
+	{
+		/* check we are in the channel, and opped */
+		ChannelUser* tmpBotUser = tmpChan->findUser(bot->getInstance());
+		if (tmpBotUser)
+		{
+			if (!tmpBotUser->getMode(ChannelUser::MODE_O))
+			{
+				/* op ourselves so that we can do the reops */
+				stringstream s;
+				s	<< bot->getCharYY()
+					<< " M "
+					<< theChan->getName()
+					<< " +o "
+					<< bot->getCharYYXXX()
+					<< ends;
+				bot->Write( s );
+				/* update the channel state */
+				tmpBotUser->setMode(ChannelUser::MODE_O);
+			}
+		}
+		/* do the ops - if we were not in the channel before, this will
+		 * auto-join and op the bot anyway.
+		 */
+		bot->Op(tmpChan, opList);
+	}
+}
 
 /*
  * Reset everything back to nice default values.
@@ -221,8 +287,6 @@ while(ptr != bot->sqlLevelCache.end())
 	}
 
 }
-
-string reason = st.assemble(2);
 
 bot->logAdminMessage("%s (%s) has purged %s (%s)",
 	theClient->getNickName().c_str(),
