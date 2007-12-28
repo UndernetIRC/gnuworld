@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: cservice.cc,v 1.281 2007/12/28 01:43:14 kewlio Exp $
+ * $Id: cservice.cc,v 1.282 2007/12/28 14:26:16 kewlio Exp $
  */
 
 #include	<new>
@@ -1459,6 +1459,9 @@ if (!theChan)
 sqlLevel* theLevel = getLevelRecord(theUser, theChan);
 if(theLevel)
 	{
+	/* check if they have been suspended! */
+	if (theLevel->getSuspendExpire() > currentTime())
+		return 0;
 	return theLevel->getAccess();
 	}
 

@@ -1,4 +1,8 @@
-// $Id: ChangeLog,v 1.143 2007/12/28 02:12:35 kewlio Exp $ //
+// $Id: ChangeLog,v 1.144 2007/12/28 14:26:16 kewlio Exp $ //
+
+2007-12-28	Dan-m00 <daniel@undernet.org>
+		* mod.cservice/cservice.cc: Check admin suspensions when using
+			admin level commands.
 
 2007-12-28	Dan-m00 <daniel@undernet.org>
 		* doc/update_suspend_2071228.sql:
