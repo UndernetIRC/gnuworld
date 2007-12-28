@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: UNBANCommand.cc,v 1.20 2007/12/27 23:41:07 kewlio Exp $
+ * $Id: UNBANCommand.cc,v 1.21 2007/12/28 00:21:48 kewlio Exp $
  */
 
 #include	<string>
@@ -38,7 +38,7 @@
 #include	"responses.h"
 #include	"match.h"
 
-const char UNBANCommand_cc_rcsId[] = "$Id: UNBANCommand.cc,v 1.20 2007/12/27 23:41:07 kewlio Exp $" ;
+const char UNBANCommand_cc_rcsId[] = "$Id: UNBANCommand.cc,v 1.21 2007/12/28 00:21:48 kewlio Exp $" ;
 
 namespace gnuworld
 {
@@ -268,7 +268,7 @@ while (cPtr != theChannel->banList_end())
 	{
 		/* if we matched exactly above, we want to match exactly here too */
 		if (strcasecmp((*cPtr), banTarget))
-			comparison = 0;
+			comparison = 1;
 	}
 
 	if ( comparison == 0)
