@@ -1,4 +1,9 @@
-// $Id: ChangeLog,v 1.144 2007/12/28 14:26:16 kewlio Exp $ //
+// $Id: ChangeLog,v 1.145 2007/12/29 16:17:36 kewlio Exp $ //
+
+2007-12-29	Dan-m00 <daniel@undernet.org>
+		* mod.cservice/PURGECommand.cc: check that the channel actually
+			exists on the network before attempting a reop.
+			(fixes core when purging empty channels)
 
 2007-12-28	Dan-m00 <daniel@undernet.org>
 		* mod.cservice/cservice.cc: Check admin suspensions when using

@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: PURGECommand.cc,v 1.19 2007/12/28 01:43:14 kewlio Exp $
+ * $Id: PURGECommand.cc,v 1.20 2007/12/29 16:17:36 kewlio Exp $
  */
 
 #include	<string>
@@ -39,7 +39,7 @@
 #include	"responses.h"
 #include	"cservice_config.h"
 
-const char PURGECommand_cc_rcsId[] = "$Id: PURGECommand.cc,v 1.19 2007/12/28 01:43:14 kewlio Exp $" ;
+const char PURGECommand_cc_rcsId[] = "$Id: PURGECommand.cc,v 1.20 2007/12/29 16:17:36 kewlio Exp $" ;
 
 namespace gnuworld
 {
@@ -169,51 +169,57 @@ if (reop)
 	/* iterate over the channel userlist */
 	vector< iClient* > opList;
 	Channel* tmpChan = Network->findChannel(theChan->getName());
-	for (Channel::userIterator chanUsers = tmpChan->userList_begin();
-		chanUsers != tmpChan->userList_end(); ++chanUsers)
+	/* only parse the following if the channel exists on the network
+	 * if there is nobody in the channel, there is nobody to op.
+	 */
+	if (tmpChan)
 	{
-		ChannelUser* tmpUser = chanUsers->second;
-		iClient* tmpClient = tmpUser->getClient();
-		sqlUser* tUser = bot->isAuthed(tmpClient, false);
-		if (!tUser)
-			continue;
-		sqlLevel* theLevel = bot->getLevelRecord(tUser, theChan);
-		/* check if they have access */
-		if (theLevel)
+		for (Channel::userIterator chanUsers = tmpChan->userList_begin();
+			chanUsers != tmpChan->userList_end(); ++chanUsers)
 		{
-			if (theLevel->getAccess() >= 100)
+			ChannelUser* tmpUser = chanUsers->second;
+			iClient* tmpClient = tmpUser->getClient();
+			sqlUser* tUser = bot->isAuthed(tmpClient, false);
+			if (!tUser)
+				continue;
+			sqlLevel* theLevel = bot->getLevelRecord(tUser, theChan);
+			/* check if they have access */
+			if (theLevel)
 			{
-				/* they're 100+, op them */                        
-				opList.push_back(tmpClient);
+				if (theLevel->getAccess() >= 100)
+				{
+					/* they're 100+, op them */                        
+					opList.push_back(tmpClient);
+				}
 			}
 		}
-	}
-	/* actually do the ops */
-	if (!opList.empty())
-	{
-		/* check we are in the channel, and opped */
-		ChannelUser* tmpBotUser = tmpChan->findUser(bot->getInstance());
-		if (tmpBotUser)
+		/* actually do the ops */
+		if (!opList.empty())
 		{
-			if (!tmpBotUser->getMode(ChannelUser::MODE_O))
+			/* check we are in the channel, and opped */
+			ChannelUser* tmpBotUser = tmpChan->findUser(bot->getInstance());
+			if (tmpBotUser)
 			{
-				/* op ourselves so that we can do the reops */
-				stringstream s;
-				s	<< bot->getCharYY()
-					<< " M "
-					<< theChan->getName()
-					<< " +o "
-					<< bot->getCharYYXXX()
-					<< ends;
-				bot->Write( s );
-				/* update the channel state */
-				tmpBotUser->setMode(ChannelUser::MODE_O);
+				if (!tmpBotUser->getMode(ChannelUser::MODE_O))
+				{
+					/* op ourselves so that we can do the reops */
+					stringstream s;
+					s	<< bot->getCharYY()
+						<< " M "
+						<< theChan->getName()
+						<< " +o "
+						<< bot->getCharYYXXX()
+						<< ends;
+					bot->Write( s );
+					/* update the channel state */
+					tmpBotUser->setMode(ChannelUser::MODE_O);
+				}
 			}
+			/* do the ops - if we were not in the channel before, this will
+			 * auto-join and op the bot anyway.
+			 */
+			bot->Op(tmpChan, opList);
 		}
-		/* do the ops - if we were not in the channel before, this will
-		 * auto-join and op the bot anyway.
-		 */
-		bot->Op(tmpChan, opList);
 	}
 }
 
