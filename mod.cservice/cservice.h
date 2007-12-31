@@ -17,11 +17,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: cservice.h,v 1.114 2007/12/26 20:23:17 kewlio Exp $
+ * $Id: cservice.h,v 1.115 2007/12/31 20:23:47 kewlio Exp $
  */
 
 #ifndef __CSERVICE_H
-#define __CSERVICE_H "$Id: cservice.h,v 1.114 2007/12/26 20:23:17 kewlio Exp $"
+#define __CSERVICE_H "$Id: cservice.h,v 1.115 2007/12/31 20:23:47 kewlio Exp $"
 
 #include	<iostream>
 #include	<string>
@@ -152,6 +152,10 @@ public:
 
 	/* Write a channel log */
 	void writeChannelLog(sqlChannel*, iClient*, unsigned short, const string&);
+
+	/* get last channel event for specific timestamp */
+	const string getLastChannelEvent(sqlChannel* theChannel,
+		unsigned short eventType, unsigned int& eventTime);
 
 	typedef commandMapType::const_iterator constCommandIterator ;
 	constCommandIterator command_begin() const

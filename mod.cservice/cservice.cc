@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: cservice.cc,v 1.282 2007/12/28 14:26:16 kewlio Exp $
+ * $Id: cservice.cc,v 1.283 2007/12/31 20:23:47 kewlio Exp $
  */
 
 #include	<new>
@@ -3974,6 +3974,48 @@ theLog	<< "INSERT INTO channellog (ts, channelID, event, message, "
 // TODO: Is this right?
 SQLDb->Exec(theLog);
 //SQLDb->ExecCommandOk(theLog.str().c_str());
+}
+
+/**
+ *  This function returns the last channel event of type 'eventType'
+ *  (up to 'eventTime') for the channel given.
+ *  It returns a blank string if none found.
+ */
+const string cservice::getLastChannelEvent(sqlChannel* theChannel,
+	unsigned short eventType, unsigned int& eventTime)
+{
+	unsigned int ts;
+	stringstream queryString;
+
+	if (eventTime == 0)
+		ts = currentTime();
+	else
+		ts = eventTime;
+
+	queryString	<< "SELECT message FROM channellog WHERE "
+			<< "channelid = "
+			<< theChannel->getID()
+			<< " AND event = "
+			<< eventType
+			<< " AND ts <= "
+			<< ts
+			<< " ORDER BY ts DESC LIMIT 1"
+			<< ends;
+
+#ifdef LOG_SQL
+	elog	<< "cservice::getLastChannelEvent> "
+		<< queryString.str().c_str()
+		<< endl;
+#endif
+
+	if (SQLDb->Exec(queryString, true))
+	{
+		if (SQLDb->Tuples() < 1)
+			return "";
+		string reason = SQLDb->GetValue(0, 0);
+		return reason;
+	}
+	return "";
 }
 
 /**

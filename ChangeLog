@@ -1,4 +1,10 @@
-// $Id: ChangeLog,v 1.147 2007/12/31 14:21:29 kewlio Exp $ //
+// $Id: ChangeLog,v 1.148 2007/12/31 20:23:47 kewlio Exp $ //
+
+2007-12-31	Dan-m00 <daniel@undernet.org>
+		* mod.cservice/cservice.h:
+		* mod.cservice/cservice.cc: add new function for fetching the
+			channel log entries (for events).  currently this is
+			not used but is for future use.
 
 2007-12-31	Dan-m00 <daniel@undernet.org>
 		* mod.service/CHANINFOCommand.cc: remove "URL" line of output
