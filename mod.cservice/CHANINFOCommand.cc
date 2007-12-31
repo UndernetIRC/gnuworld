@@ -28,7 +28,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: CHANINFOCommand.cc,v 1.58 2007/12/31 14:21:29 kewlio Exp $
+ * $Id: CHANINFOCommand.cc,v 1.59 2007/12/31 20:24:43 kewlio Exp $
  */
 
 #include	<string>
@@ -43,7 +43,7 @@
 #include	"dbHandle.h"
 #include	"cservice_config.h"
 
-const char CHANINFOCommand_cc_rcsId[] = "$Id: CHANINFOCommand.cc,v 1.58 2007/12/31 14:21:29 kewlio Exp $" ;
+const char CHANINFOCommand_cc_rcsId[] = "$Id: CHANINFOCommand.cc,v 1.59 2007/12/31 20:24:43 kewlio Exp $" ;
 
 namespace gnuworld
 {
@@ -394,6 +394,58 @@ if( !theChan->getDescription().empty() )
 			string("Desc: %s")).c_str(),
 		theChan->getDescription().c_str());
 	}
+
+if ((adminAccess > 0) && (theChan->getFlag(sqlChannel::F_SUSPEND)))
+{
+	string suspender = "";
+	string suspendreason = "";
+	unsigned int suspendts = 0;
+	stringstream queryString;
+
+	queryString	<< "SELECT message,ts FROM channellog WHERE "
+			<< "channelid = "
+			<< theChan->getID()
+			<< " AND event = "
+			<< sqlChannel::EV_SUSPEND
+			<< " AND ts <= "
+			<< bot->currentTime()
+			<< " ORDER BY ts DESC LIMIT 1"
+			<< ends;
+
+#ifdef LOG_SQL
+	elog	<< "cservice::CHANINFOCommand> "
+		<< queryString.str().c_str()
+		<< endl;
+#endif
+
+	if (bot->SQLDb->Exec(queryString, true))
+	{
+		if (bot->SQLDb->Tuples() > 0)
+		{
+			string tempreason = bot->SQLDb->GetValue(0, 0);
+			StringTokenizer suspendst(tempreason);
+			if (suspendst.size() > 5)
+			{
+				if ( (suspendst[2].substr(0,1)=="(") &&
+				(suspendst[2].substr(suspendst[2].size()-1,1)==")"))
+					suspender = suspendst[2].substr(1,
+						suspendst[2].size()-2);
+				else
+					suspender = suspendst[2];
+				suspendreason = suspendst.assemble(5);
+			}
+			suspendts = atoi(bot->SQLDb->GetValue(0, 1));
+		}
+	}
+
+	if (suspendreason != "")
+	{
+		bot->Notice(theClient, "Channel suspended %s ago by %s, Reason: %s",
+			bot->prettyDuration(suspendts).c_str(),
+			suspender.c_str(),
+			suspendreason.c_str());
+	}
+}
 
 if( !theChan->getComment().empty() && adminAccess )
 	{

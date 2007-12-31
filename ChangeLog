@@ -1,4 +1,8 @@
-// $Id: ChangeLog,v 1.148 2007/12/31 20:23:47 kewlio Exp $ //
+// $Id: ChangeLog,v 1.149 2007/12/31 20:24:43 kewlio Exp $ //
+
+2007-12-31	Dan-m00 <daniel@undernet.org>
+		* mod.cservice/CHANINFOCommand.cc: modify chaninfo output to
+			show suspend reasons to cservice administrators.
 
 2007-12-31	Dan-m00 <daniel@undernet.org>
 		* mod.cservice/cservice.h:
