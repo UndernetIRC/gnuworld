@@ -28,7 +28,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: CHANINFOCommand.cc,v 1.57 2007/08/28 16:10:09 dan_karrels Exp $
+ * $Id: CHANINFOCommand.cc,v 1.58 2007/12/31 14:21:29 kewlio Exp $
  */
 
 #include	<string>
@@ -43,7 +43,7 @@
 #include	"dbHandle.h"
 #include	"cservice_config.h"
 
-const char CHANINFOCommand_cc_rcsId[] = "$Id: CHANINFOCommand.cc,v 1.57 2007/08/28 16:10:09 dan_karrels Exp $" ;
+const char CHANINFOCommand_cc_rcsId[] = "$Id: CHANINFOCommand.cc,v 1.58 2007/12/31 14:21:29 kewlio Exp $" ;
 
 namespace gnuworld
 {
@@ -180,15 +180,6 @@ if( string::npos == st[ 1 ].find_first_of( '#' ) )
 		}
 
 	if (!aCount) bot->Notice(theClient, "  OFFLINE");
-
-	if( !theUser->getUrl().empty() )
-		{
-		bot->Notice(theClient,
-			bot->getResponse(tmpUser,
-				language::url,
-				string("URL: %s")).c_str(),
-			theUser->getUrl().c_str());
-		}
 
 	bot->Notice(theClient,
 		bot->getResponse(tmpUser,

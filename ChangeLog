@@ -1,4 +1,8 @@
-// $Id: ChangeLog,v 1.146 2007/12/31 14:16:43 kewlio Exp $ //
+// $Id: ChangeLog,v 1.147 2007/12/31 14:21:29 kewlio Exp $ //
+
+2007-12-31	Dan-m00 <daniel@undernet.org>
+		* mod.service/CHANINFOCommand.cc: remove "URL" line of output
+			from username information (NOT channel info!)
 
 2007-12-31	Dan-m00 <daniel@undernet.org>
 		* mod.cservice/SETCommand.cc: report channel (un-)suspends to
