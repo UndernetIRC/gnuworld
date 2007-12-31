@@ -33,7 +33,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: SETCommand.cc,v 1.62 2007/12/26 20:26:03 kewlio Exp $
+ * $Id: SETCommand.cc,v 1.63 2007/12/31 14:16:43 kewlio Exp $
  */
 
 #include	<string>
@@ -45,7 +45,7 @@
 #include	"responses.h"
 #include	"cservice_config.h"
 
-const char SETCommand_cc_rcsId[] = "$Id: SETCommand.cc,v 1.62 2007/12/26 20:26:03 kewlio Exp $" ;
+const char SETCommand_cc_rcsId[] = "$Id: SETCommand.cc,v 1.63 2007/12/31 14:16:43 kewlio Exp $" ;
 
 namespace gnuworld
 {
@@ -555,9 +555,19 @@ else
             logmsg += "suspend reason: ";
             logmsg += reason;
             if (theChan->getFlag(sqlChannel::F_SUSPEND))
+            {
                 bot->writeChannelLog(theChan, theClient, sqlChannel::EV_SUSPEND, logmsg);
-            else
+		/* inform admin channel */
+		bot->logAdminMessage("%s (%s) has suspended %s",
+			theClient->getNickName().c_str(), theUser->getUserName().c_str(),
+			theChan->getName().c_str());
+            } else {
                 bot->writeChannelLog(theChan, theClient, sqlChannel::EV_UNSUSPEND, logmsg);
+		/* inform admin channel */
+		bot->logAdminMessage("%s (%s) has unsuspended %s",
+			theClient->getNickName().c_str(), theUser->getUserName().c_str(),
+			theChan->getName().c_str());
+            }
 	    bot->Notice(theClient,
 			bot->getResponse(theUser,
 				language::set_cmd_status,
