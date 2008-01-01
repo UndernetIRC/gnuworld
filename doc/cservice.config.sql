@@ -1,4 +1,4 @@
--- "$Id: cservice.config.sql,v 1.10 2007/12/27 22:54:50 kewlio Exp $"
+-- "$Id: cservice.config.sql,v 1.11 2008/01/01 13:49:19 kewlio Exp $"
 -- Default configuration entries for CMaster bot.
 
 INSERT INTO variables (var_name,contents,last_updated,hint)
@@ -23,3 +23,6 @@ INSERT INTO variables (var_name,contents,last_updated,hint)
 VALUES ('LOGINS_FROM_SAME_IP', '0', now()::abstime::int4, 'Maximum logins from same IP when maxlogins=1');
 INSERT INTO variables (var_name,contents,last_updated,hint)
 VALUES ('LOGINS_FROM_SAME_IP_AND_IDENT', '0', now()::abstime::int4, 'Force check of ident as well as IP when maxlogins=1');
+INSERT INTO variables (var_name,contents,last_updated,hint)
+VALUES ('USE_LOGIN_DELAY', '1', now()::abstime::int4, 'Use login delay when cservice links if set to 1');
+

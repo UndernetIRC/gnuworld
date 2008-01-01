@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: LOGINCommand.cc,v 1.64 2007/08/28 16:10:10 dan_karrels Exp $
+ * $Id: LOGINCommand.cc,v 1.65 2008/01/01 13:49:19 kewlio Exp $
  */
 
 #include	<string>
@@ -34,7 +34,7 @@
 #include	"cservice_config.h"
 #include	"Network.h"
 
-const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.64 2007/08/28 16:10:10 dan_karrels Exp $" ;
+const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.65 2008/01/01 13:49:19 kewlio Exp $" ;
 
 namespace gnuworld
 {
@@ -64,8 +64,9 @@ if( st.size() < 3 )
 /*
  * Are we allowing logins yet?
  */
+unsigned int useLoginDelay = bot->getConfigVar("USE_LOGIN_DELAY")->asInt();
 unsigned int loginTime = bot->getUplink()->getStartTime() + bot->loginDelay;
-if(loginTime >= (unsigned int)bot->currentTime())
+if ( (useLoginDelay == 1) && (loginTime >= (unsigned int)bot->currentTime()) )
 	{
 	bot->Notice(theClient, "AUTHENTICATION FAILED as %s. (Unable "
 		"to login during reconnection, please try again in "

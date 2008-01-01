@@ -1,4 +1,15 @@
-// $Id: ChangeLog,v 1.149 2007/12/31 20:24:43 kewlio Exp $ //
+// $Id: ChangeLog,v 1.150 2008/01/01 13:49:18 kewlio Exp $ //
+
+2008-01-01	Dan-m00 <daniel@undernet.org>
+		* doc/update_config_20080101.sql:
+		* doc/cservice.config.sql: add USE_LOGIN_DELAY variable to set
+			if we use the login grace period or not.
+		* mod.cservice/LOGINCommand.cc: modify login command to check
+			the above configuration variable.
+
+		NOTE: please import the new config variable with the cmd:
+
+			psql cservice < doc/update_config_20080101.sql
 
 2007-12-31	Dan-m00 <daniel@undernet.org>
 		* mod.cservice/CHANINFOCommand.cc: modify chaninfo output to
