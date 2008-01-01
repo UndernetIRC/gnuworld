@@ -1,4 +1,8 @@
-// $Id: ChangeLog,v 1.150 2008/01/01 13:49:18 kewlio Exp $ //
+// $Id: ChangeLog,v 1.151 2008/01/01 19:03:41 kewlio Exp $ //
+
+2008-01-01	Dan-m00 <daniel@undernet.org>
+		* mod.cservice/CHANINFOCommand.cc: modify 'info <username>'
+			output to give a flags line for various settings.
 
 2008-01-01	Dan-m00 <daniel@undernet.org>
 		* doc/update_config_20080101.sql:

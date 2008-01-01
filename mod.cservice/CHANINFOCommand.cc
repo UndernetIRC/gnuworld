@@ -28,7 +28,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: CHANINFOCommand.cc,v 1.59 2007/12/31 20:24:43 kewlio Exp $
+ * $Id: CHANINFOCommand.cc,v 1.60 2008/01/01 19:03:41 kewlio Exp $
  */
 
 #include	<string>
@@ -43,7 +43,7 @@
 #include	"dbHandle.h"
 #include	"cservice_config.h"
 
-const char CHANINFOCommand_cc_rcsId[] = "$Id: CHANINFOCommand.cc,v 1.59 2007/12/31 20:24:43 kewlio Exp $" ;
+const char CHANINFOCommand_cc_rcsId[] = "$Id: CHANINFOCommand.cc,v 1.60 2008/01/01 19:03:41 kewlio Exp $" ;
 
 namespace gnuworld
 {
@@ -115,8 +115,63 @@ if( string::npos == st[ 1 ].find_first_of( '#' ) )
 		}
 	}
 
-	/* Keep details private. */
+	/* get the language STRING */
+	stringstream s;
+	int langId = theUser->getLanguageId();
+	s	<< langId
+		<< ends ;
+	string langString = s.str();
 
+	for (cservice::languageTableType::iterator ptr = bot->languageTable.begin();
+		ptr != bot->languageTable.end(); ptr++)
+	{
+		if (ptr->second.first == langId)
+		{
+			langString = ptr->first;
+			break;
+		}
+	}
+
+	/* build up a flag string */
+	string flagsSet;
+
+	if (theUser->getFlag(sqlUser::F_GLOBAL_SUSPEND)) 
+		flagsSet += "SUSPEND ";
+	if (theUser->getFlag(sqlUser::F_INVIS))
+		flagsSet += "INVISIBLE ";
+	if (theUser->getFlag(sqlUser::F_NOADDUSER))
+		flagsSet += "NOADDUSER ";
+	/* flags only visible to *1+ users */
+	if (adminAccess)
+	{
+		if (theUser->getFlag(sqlUser::F_FRAUD))
+			flagsSet += "FRAUD ";
+		if (theUser->getFlag(sqlUser::F_NOPURGE))
+			flagsSet += "NOPURGE ";
+		if (theUser->getFlag(sqlUser::F_ALUMNI))
+			flagsSet += "ALUMNI ";
+		if (theUser->getFlag(sqlUser::F_NOADMIN))
+			flagsSet += "DISABLEAUTH ";
+	}
+	/* flags with variables */
+	if (langString.size() > 0)
+		flagsSet += "LANG=" + langString + " ";
+	/* flags with variables for admins (or self-viewing) only */
+	if (adminAccess || (tmpUser == theUser))
+	{
+		int maxLogins = theUser->getMaxLogins();
+		stringstream ss;
+		ss	<< maxLogins
+			<< ends ;
+		if (maxLogins > 1)
+			flagsSet += "MAXLOGINS=" + ss.str() + " ";
+	}
+
+	/* set 'NONE' if no flags */
+	if (flagsSet.size() == 0)
+		flagsSet = "NONE ";
+
+	/* Keep details private. */
 	if (theUser->getFlag(sqlUser::F_INVIS))
 		{
 
@@ -127,6 +182,12 @@ if( string::npos == st[ 1 ].find_first_of( '#' ) )
 				bot->getResponse(tmpUser,
 					language::no_peeking,
 					string("Unable to view user details (Invisible)")));
+
+			/* Show flags even when invisible */
+			bot->Notice(theClient,
+				bot->getResponse(tmpUser, language::status_flags,
+				string("Flags set: %s")).c_str(),
+				flagsSet.c_str());
 
 			/*
 			 * Show the channels this guy owns to opers.
@@ -182,37 +243,15 @@ if( string::npos == st[ 1 ].find_first_of( '#' ) )
 	if (!aCount) bot->Notice(theClient, "  OFFLINE");
 
 	bot->Notice(theClient,
-		bot->getResponse(tmpUser,
-			language::lang,
-			string("Language: %i")).c_str(),
-		theUser->getLanguageId());
-
-	if (theUser->getFlag(sqlUser::F_INVIS))
-		{
-		bot->Notice(theClient, "INVISIBLE is On");
-		} else
-		{
-		bot->Notice(theClient, "INVISIBLE is Off");
-		}
-
-	if (theUser->getFlag(sqlUser::F_NOADDUSER))
-		{
-		bot->Notice(theClient, "NOADDUSER is On");
-		} else
-		{
-		bot->Notice(theClient, "NOADDUSER is Off");
-		}
+		bot->getResponse(tmpUser, language::status_flags,
+			string("Flags set: %s")).c_str(),
+			flagsSet.c_str());
 
 	bot->Notice(theClient,
 		bot->getResponse(tmpUser,
 			language::last_seen,
 			string("Last Seen: %s")).c_str(),
 		bot->prettyDuration(theUser->getLastSeen()).c_str());
-
-	if (theUser->getFlag(sqlUser::F_GLOBAL_SUSPEND))
-		{
-		bot->Notice(theClient, "\002** This account has been suspended **\002");
-		}
 
 	if(adminAccess)
 	{
@@ -304,9 +343,6 @@ if( string::npos == st[ 1 ].find_first_of( '#' ) )
 			bot->Notice(theClient, "Last Hostmask: %s",
 				theUser->getLastHostMask().c_str());
 		}
-
-		bot->Notice(theClient, "Max Logins: %i",
-			theUser->getMaxLogins());
 
 #ifdef USE_NOTES
 		if(theUser->getFlag(sqlUser::F_NONOTES))
