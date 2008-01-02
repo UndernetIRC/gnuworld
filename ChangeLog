@@ -1,4 +1,8 @@
-// $Id: ChangeLog,v 1.152 2008/01/02 17:32:48 kewlio Exp $ //
+// $Id: ChangeLog,v 1.153 2008/01/02 23:32:13 kewlio Exp $ //
+
+2008-01-01	Dan-m00 <daniel@undernet.org>
+		* db/gnuworldDB.cc: add dummy function to prevent pedantic
+			compilers from complaining.  Thanks to Isomer for this!
 
 2008-01-01	Dan-m00 <daniel@undernet.org>
 		* src/client.cc: make OP code send channel creation timestamp.

@@ -18,19 +18,24 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: gnuworldDB.cc,v 1.4 2007/08/28 16:09:59 dan_karrels Exp $
+ * $Id: gnuworldDB.cc,v 1.5 2008/01/02 23:32:17 kewlio Exp $
  */
 
 #include	<string>
 
 #include	"gnuworldDB.h"
 
-const char gnuworldDB_cc_rcsId[] = "$Id: gnuworldDB.cc,v 1.4 2007/08/28 16:09:59 dan_karrels Exp $" ;
+const char gnuworldDB_cc_rcsId[] = "$Id: gnuworldDB.cc,v 1.5 2008/01/02 23:32:17 kewlio Exp $" ;
 const char gnuworldDB_h_rcsId[] = __GNUWORLDDB_H ;
 
 namespace gnuworld
 {
 using std::string ;
+
+gnuworldDB::gnuworldDB( )
+{
+	/* dummy to prevent issues with pedantic compilers */
+}
 
 gnuworldDB::gnuworldDB( const string& _dbHost,
 	const unsigned short int _dbPort,
