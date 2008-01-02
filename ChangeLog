@@ -1,4 +1,9 @@
-// $Id: ChangeLog,v 1.151 2008/01/01 19:03:41 kewlio Exp $ //
+// $Id: ChangeLog,v 1.152 2008/01/02 17:32:48 kewlio Exp $ //
+
+2008-01-01	Dan-m00 <daniel@undernet.org>
+		* src/client.cc: make OP code send channel creation timestamp.
+		* mod.cservice/cservice.cc: make cservice reops send channel
+			creation timestamps.
 
 2008-01-01	Dan-m00 <daniel@undernet.org>
 		* mod.cservice/CHANINFOCommand.cc: modify 'info <username>'

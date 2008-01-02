@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: client.cc,v 1.87 2007/12/26 16:14:19 kewlio Exp $
+ * $Id: client.cc,v 1.88 2008/01/02 17:32:49 kewlio Exp $
  */
 
 #include	<new>
@@ -47,7 +47,7 @@
 #include	"ELog.h"
 #include	"events.h"
 
-RCSTAG("$Id: client.cc,v 1.87 2007/12/26 16:14:19 kewlio Exp $" ) ;
+RCSTAG("$Id: client.cc,v 1.88 2008/01/02 17:32:49 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -822,10 +822,11 @@ else
 	}
 
 // Op the user
-Write( "%s M %s +o %s",
+Write( "%s M %s +o %s %ld",
 	getCharYYXXX().c_str(),
 	theChan->getName().c_str(),
-	theClient->getCharYYXXX().c_str() ) ;
+	theClient->getCharYYXXX().c_str(),
+	theChan->getCreationTime() ) ;
 
 // Was the bot on the channel previously?
 if( !OnChannel )
@@ -927,7 +928,8 @@ for( xServer::opVectorType::const_iterator ptr = opVector.begin(),
 		stringstream s ;
 		s	<< getCharYYXXX() << " M "
 			<< theChan->getName() << ' '
-			<< "+" << modeString << ' ' << args ;
+			<< "+" << modeString << ' ' << args
+			<< " " << theChan->getCreationTime();
 
 		Write( s ) ;
 

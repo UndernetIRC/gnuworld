@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: cservice.cc,v 1.283 2007/12/31 20:23:47 kewlio Exp $
+ * $Id: cservice.cc,v 1.284 2008/01/02 17:32:49 kewlio Exp $
  */
 
 #include	<new>
@@ -2222,6 +2222,8 @@ if (ptr->second <= currentTime())
 				<< tmpChan->getName()
 				<< " +o "
 				<< getCharYYXXX()
+				<< " "
+				<< tmpChan->getCreationTime()
 				<< ends;
 
 			Write( s );
