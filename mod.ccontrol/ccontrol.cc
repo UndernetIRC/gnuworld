@@ -20,7 +20,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccontrol.cc,v 1.218 2007/09/12 16:40:32 kewlio Exp $
+ * $Id: ccontrol.cc,v 1.219 2008/01/03 04:26:22 kewlio Exp $
 */
 
 #define MAJORVER "1"
@@ -66,7 +66,7 @@
 #include	"ccontrol_generic.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: ccontrol.cc,v 1.218 2007/09/12 16:40:32 kewlio Exp $" ) ;
+RCSTAG( "$Id: ccontrol.cc,v 1.219 2008/01/03 04:26:22 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -731,6 +731,7 @@ RegisterCommand( new MAXUSERSCommand( this, "MAXUSERS",
 RegisterCommand( new CONFIGCommand( this, "CONFIG",
 	" -GTime <duration in secs> / -VClones <amount> -Clones <amount>"
 	" -CClones <amount> -CClonesCIDR <size> -CClonesGline <Yes/No>"
+	" -CClonesGTime <duration>"
 	" -IClones <amount> -IClonesGline <Yes/No>"
 	" -CClonesTime <seconds> / -GBCount <count> / -GBInterval <interval in secs> "
 	" -SGline <Yes/No> "
@@ -1804,6 +1805,7 @@ void ccontrol::handleNewClient( iClient* NewUser)
 {
 bool glSet = false;
 bool DoGline = false;
+int gDuration = maxGlineLen;
 int i=0, AffectedUsers = 0;
 int client_addr[4] = { 0 };
 unsigned long mask_ip;
@@ -1875,6 +1877,7 @@ if(dbConnected)
 						/* set the gline reason */
 						sprintf(GlineReason,"AUTO [%d] Automatically banned for excessive CIDR ident connections",AffectedUsers);
 						DoGline = true;
+						gDuration = maxGlineLen;
 					}
 				}
   
@@ -1897,6 +1900,7 @@ if(dbConnected)
 						/* set the gline reason */
 						sprintf(GlineReason,"AUTO [%d] Automatically banned for excessive CIDR connections",AffectedUsers);
                                                 DoGline = true;
+						gDuration = CClonesGTime;
 					}
                                 }
   
@@ -1916,6 +1920,7 @@ if(dbConnected)
 					/* set the gline reason */
 					sprintf(GlineReason,"AUTO [%d] Automatically banned for excessive connections",AffectedUsers);
                                         DoGline = true;
+					gDuration = maxGlineLen;
                                 }
   
                                 if (DoGline)
@@ -1936,7 +1941,7 @@ if(dbConnected)
 				ccGline *tmpGline;
 				tmpGline = new ccGline(SQLDb);
 				tmpGline->setHost(GlineMask);
-				tmpGline->setExpires(::time(0) + maxGlineLen);
+				tmpGline->setExpires(::time(0) + gDuration);
 				tmpGline->setReason(GlineReason);
 				tmpGline->setAddedOn(::time(0));
 				tmpGline->setAddedBy(nickName);
@@ -3963,6 +3968,7 @@ bool gotCClones = false;
 bool gotCClonesCIDR = false;
 bool gotCClonesTime = false;
 bool gotCClonesGline = false;
+bool gotCClonesGTime = false;
 bool gotIClones = false;
 bool gotIClonesGline = false;
 bool gotGLen = false;
@@ -4054,6 +4060,11 @@ for(unsigned int i=0; i< SQLDb->Tuples();++i)
 		saveGlines = (atoi(SQLDb->GetValue(i,1).c_str()) == 1);
 		}
 
+	else if(!strcasecmp(SQLDb->GetValue(i,0),"CClonesGTime"))
+		{
+		gotCClonesGTime = true;
+		CClonesGTime = atoi(SQLDb->GetValue(i,1).c_str());
+		}
 	}
 if(!gotCount)
 	{
@@ -4114,6 +4125,11 @@ if(!gotSave)
 	{
 	saveGlines = true;
 	updateMisc("SGline",saveGlines);
+	}
+if(!gotCClonesGTime)
+	{
+	CClonesGTime = maxGlineLen;
+	updateMisc("CClonesGTime",CClonesGTime);
 	}
 return true;
 }
@@ -4865,7 +4881,7 @@ for(serversIterator ptr = serversMap.begin();ptr != serversMap.end();++ptr)
 void ccontrol::showStatus(iClient* tmpClient)
 {
 Notice(tmpClient,"CControl version %s.%s [%s]",MAJORVER,MINORVER,RELDATE);
-Notice(tmpClient, "Update: %s", Ago(getUplink()->getStartTime()));
+Notice(tmpClient, "Service Uptime: %s", Ago(getUplink()->getStartTime()));
 if(checkClones)
 	{
 	Notice(tmpClient,"Monitoring %d different clones hosts\n",clientsIpMap.size());
@@ -4878,18 +4894,26 @@ if(checkClones)
 	}	
 Notice(tmpClient,"%d glines are waiting in the gline queue",glineQueue.size());
 Notice(tmpClient,"Allocated Structures:");
-Notice(tmpClient,"ccServer: %d",ccServer::numAllocated);
-Notice(tmpClient,"ccGline: %d",ccGline::numAllocated);
-Notice(tmpClient,"ccException: %d",ccException::numAllocated);
-Notice(tmpClient,"ccUser: %d",ccUser::numAllocated);
+Notice(tmpClient,"ccServer: %d, ccGline: %d, ccException: %d, ccUser: %d",
+	ccServer::numAllocated,
+	ccGline::numAllocated,
+	ccException::numAllocated,
+	ccUser::numAllocated);
 Notice(tmpClient,"Total of %d users in the map",usersMap.size()); 
-Notice(tmpClient,"GBCount: %d , GBInterval: %d",glineBurstCount,glineBurstInterval);
-Notice(tmpClient,"Max Clones: %d , Max Virtual Clones: %d",maxClones,maxVClones);
-Notice(tmpClient,"Max Ident Clones: %d per /%d - Auto-Gline: %s",maxIClones,CClonesCIDR,IClonesGline ? "True" : "False");
-Notice(tmpClient,"Max CIDR Clones: %d per /%d - Auto-Gline: %s",maxCClones,CClonesCIDR,CClonesGline ? "True" : "False");
-Notice(tmpClient,"  (%d seconds between announcements per block)", CClonesTime);
-Notice(tmpClient,"Save gline is: %s",saveGlines ? "True" : "False"); 
-Notice(tmpClient,"Bursting: %s",inBurst ? "True" : "False");
+Notice(tmpClient,"(Gline Burst) - GBCount: %d , GBInterval: %d",
+	glineBurstCount,
+	glineBurstInterval);
+Notice(tmpClient,"Max Clones: %d, Max Virtual Clones: %d",maxClones,maxVClones);
+Notice(tmpClient,"Max Ident Clones: %d per /%d - Auto-Gline: %s",
+	maxIClones,
+	CClonesCIDR,
+	IClonesGline ? "True" : "False");
+Notice(tmpClient,"Max CIDR Clones: %d per /%d - Auto-Gline: %s (for %s)",
+	maxCClones,CClonesCIDR,CClonesGline ? "YES" : "NO",
+	Duration(CClonesGTime));
+Notice(tmpClient,"  (%s between announcements per block)", Duration(CClonesTime));
+Notice(tmpClient,"Save gline is: %s",saveGlines ? "Enabled" : "Disabled"); 
+Notice(tmpClient,"Currently Bursting: %s",inBurst ? "YES" : "NO");
 }
 
 bool ccontrol::updateMisc(const string& varName, const unsigned int Value)
@@ -4939,10 +4963,13 @@ else if(!strcasecmp(varName,"GTime"))
 	{
 	maxGlineLen = Value;
 	}
-
 else if(!strcasecmp(varName,"SGline"))
 	{
 	saveGlines = (Value == 1);
+	}
+else if(!strcasecmp(varName,"CClonesGTime"))
+	{
+	CClonesGTime = Value;
 	}
 
 if(!dbConnected)

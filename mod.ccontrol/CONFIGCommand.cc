@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: CONFIGCommand.cc,v 1.13 2006/05/03 08:33:15 kewlio Exp $
+ * $Id: CONFIGCommand.cc,v 1.14 2008/01/03 04:26:22 kewlio Exp $
  */
 
 #include	<string>
@@ -25,8 +25,9 @@
 #include	"ccontrol.h"
 #include	"CControlCommands.h"
 #include	"gnuworld_config.h"
+#include	"ccontrol_generic.h"	/* for Duration() and Ago() */
 
-RCSTAG( "$Id: CONFIGCommand.cc,v 1.13 2006/05/03 08:33:15 kewlio Exp $" ) ;
+RCSTAG( "$Id: CONFIGCommand.cc,v 1.14 2008/01/03 04:26:22 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -117,25 +118,58 @@ for(unsigned int  pos =1; pos < st.size() ;)
   	        {
   	        if(st.size() < pos +2)
   	                 {
-  	                 bot->Notice(theClient,"-CClonesTime must get the duration in seconds between announcements per netblock.");
+  	                 bot->Notice(theClient,"-CClonesTime must get the duration between announcements per netblock.");
   	                 return true;
   	                 }
-  	        if((atoi(st[pos+1].c_str())<0) || (atoi(st[pos+1].c_str())>300))
+		if (!IsTimeSpec(st[pos+1]))
+			{
+			bot->Notice(theClient,"-CClonesTime must have a valid time specified, e.g. 60s or 1m");
+			return true;
+			}
+		int g = extractTime(st[pos+1], 1);
+		if (g < 0 || g > 300)
   	                 {
-  	                 bot->Notice(theClient,"-CClonesTime value must be between 0 and 300 seconds.");
+  	                 bot->Notice(theClient,"-CClonesTime value must be between 0s and 5m.");
   	                 return true;
   	                 }
-  	        if(!bot->updateMisc("CClonesTime",atoi(st[pos+1].c_str())))
+  	        if(!bot->updateMisc("CClonesTime",g))
   	                 {
   	                 bot->MsgChanLog("Error while updating the Duration time.\n");
   	                 }
   	        else
   	                 {
   	                 bot->Notice(theClient,"%s was successfully updated to %s",
-  	                 st[pos].c_str(),st[pos+1].c_str());
+  	                 st[pos].c_str(),Duration((long)g));
   	                 }
                  pos+=2;
                  }
+	else if(!strcasecmp(st[pos],"-CClonesGTime"))
+		{
+			if (st.size() < pos +2)
+			{
+				bot->Notice(theClient,"-CClonesGTime must get the duration of the gline in seconds.");
+				return true;
+			}
+			if (!IsTimeSpec(st[pos+1]))
+			{
+				bot->Notice(theClient,"Invalid CIDR Clones Gline Time specified.");
+				return true;
+			}
+			int g = extractTime(st[pos+1], 1);
+			if (g < 1800 || g > 172800)
+			{
+				bot->Notice(theClient,"-CClonesGTime value must be between 1800 and 172800 seconds (30 mins - 2 days).");
+				return true;
+			}
+			if (!bot->updateMisc("CClonesGTime",g))
+			{
+				bot->MsgChanLog("Error while updating the CIDR Clones Gline Time.\n");
+			} else {
+				bot->Notice(theClient,"%s was successfully updated to %s",
+					st[pos].c_str(),Duration((long)g));
+			}
+			pos += 2;
+		}
         else if(!strcasecmp(st[pos],"-CClones"))
                 {
                 if(st.size() < pos +2)
@@ -197,14 +231,25 @@ for(unsigned int  pos =1; pos < st.size() ;)
 			bot->Notice(theClient,"-GBInterval must get the number of seconds between each burst");
 			return true;
 			}
-		if(!bot->updateMisc("GlineBurstInterval",atoi(st[pos+1].c_str())))
+		if (!IsTimeSpec(st[pos+1]))
+			{
+			bot->Notice(theClient,"-GBInterval must get the number of seconds between each burst - e.g. 3 or 3s");
+			return true;
+			}
+		int g = extractTime(st[pos+1], 1);
+		if (g < 0 || g > 10)
+			{
+			bot->Notice(theClient,"-GBInterval must be between 0 and 10 seconds inclusive.");
+			return true;
+			}
+		if(!bot->updateMisc("GlineBurstInterval",g))
 			{
 			bot->MsgChanLog("Error while updating the gline burst interval in the db!\n");
 			}
 		else
 			{
 			bot->Notice(theClient,"%s was successfully updated to %s",
-				    st[pos].c_str(),st[pos+1].c_str());
+				    st[pos].c_str(),Duration((long)g));
 			}
 		pos+=2;			
 		}
@@ -212,17 +257,28 @@ for(unsigned int  pos =1; pos < st.size() ;)
 		{
 		if(st.size() < pos +2)
 			{
-			bot->Notice(theClient,"-GTime must get the duration in seconds for the excessive connections gline");
+			bot->Notice(theClient,"-GTime must get the duration for the excessive connections gline - e.g. 900s, 30m, 1h or 1d.");
 			return true;
 			}
-		if(!bot->updateMisc("GTime",atoi(st[pos+1].c_str())))
+		if (!IsTimeSpec(st[pos+1]))
+			{
+			bot->Notice(theClient,"-GTime must get a valid duration - e.g. 900s, 30m, 1h or 1d.");
+			return true;
+			}
+		int g = extractTime(st[pos+1], 1);
+		if (g < 300 || g > 172800)
+			{
+			bot->Notice(theClient,"-GTime must get a duration between 300s and 2d");
+			return true;
+			}
+		if(!bot->updateMisc("GTime",g))
 			{
 			bot->MsgChanLog("Error while updating the gline duration in the db!\n");
 			}
 		else
 			{
 			bot->Notice(theClient,"%s was successfully updated to %s",
-				    st[pos].c_str(),st[pos+1].c_str());
+				    st[pos].c_str(),Duration((long)g));
 			}
 
 		pos+=2;			

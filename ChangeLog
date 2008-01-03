@@ -1,4 +1,16 @@
-// $Id: ChangeLog,v 1.153 2008/01/02 23:32:13 kewlio Exp $ //
+// $Id: ChangeLog,v 1.154 2008/01/03 04:26:22 kewlio Exp $ //
+
+2008-01-03	Dan-m00 <daniel@undernet.org>
+		* doc/ccontrol.help.sql: Modify CONFIG help for new feature.
+		* mod.ccontrol/ccontrol.h:
+		* mod.ccontrol/ccontrol.cc: modify 'status' output to be more
+			user friendly, including new time specifications.
+			Also, incorporate new feature config options.
+		* mod.ccontrol/CONFIGCommand.cc: allow changes to the new CIDR
+			gline duration (including new time specs)
+		* mod.ccontrol/ccontrol_generic.cc: modify Ago() function to
+			only show seconds if greater than zero, or if no other
+			time units are present.
 
 2008-01-01	Dan-m00 <daniel@undernet.org>
 		* db/gnuworldDB.cc: add dummy function to prevent pedantic

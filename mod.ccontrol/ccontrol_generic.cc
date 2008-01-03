@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccontrol_generic.cc,v 1.4 2006/09/26 22:09:38 kewlio Exp $
+ * $Id: ccontrol_generic.cc,v 1.5 2008/01/03 04:26:22 kewlio Exp $
  */
 
 #include <time.h>
@@ -59,8 +59,12 @@ char *Duration(long ts)
 		sprintf(tmp, "%dm", mins);
 		strcat(ago, tmp);
 	}
-	sprintf(tmp,"%ds", (int) duration);
-	strcat(ago,tmp);
+	/* only show seconds if we have any (or no other units */
+	if ((duration > 0) || (strlen(ago) == 0))
+	{
+		sprintf(tmp,"%ds", (int) duration);
+		strcat(ago,tmp);
+	}
 
 	return ago;
 }

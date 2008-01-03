@@ -1,4 +1,4 @@
--- 2001-03-02 |MrBean| "$Id: ccontrol.help.sql,v 1.14 2007/03/30 09:51:15 mrbean_ Exp $"
+-- 2001-03-02 |MrBean| "$Id: ccontrol.help.sql,v 1.15 2008/01/03 04:26:22 kewlio Exp $"
 -- Created the file and added all help topics to the database
 
 -- 2201-03-11 |MrBean|
@@ -62,18 +62,19 @@ CONFIG		1	****** CONFIG COMMAND ******
 CONFIG		2	Sets internal configuration options within the bot
 CONFIG		3	Syntax: /msg $BOT$ config <option> <value>
 CONFIG		4	<option> may be:
-CONFIG		5	-GTime <duration> - default gline time (in seconds)
+CONFIG		5	-GTime <duration> - default gline time (accepts friendly times e.g. 900s, 30m, 3h, 1d)
 CONFIG		6	-VClones <amount> - threshold for warning about virtual (realname) clones
 CONFIG		7	-Clones <amount> - threshold for clones on a single IP
 CONFIG		8	-CClones <amount> - threshold for CIDR clones (see below)
 CONFIG		9	-CClonesCIDR <size> - CIDR bit length for clones (0-32)
 CONFIG		10	-CClonesGline <Yes|No> - auto-gline for CIDR clones flag
-CONFIG		11	-IClones <amount> - threshold for CIDR ident clones
-CONFIG		12	-IClonesGline <Yes|No> - auto-gline for CIDR ident clones flag
-CONFIG		13	-CClonesTime <duration> - time (in seconds) between clone warnings to msglog
-CONFIG		14	-GBCount <count> - number of glines to set at once
-CONFIG		15	-GBInterval <duration> - time between setting glines (in seconds)
-CONFIG		16	-SGline <Yes|No> - Save glines flag
+CONFIG		11	-CClonesGTime <duration> - gline duration for CIDR clones (accepts friendly times)
+CONFIG		12	-IClones <amount> - threshold for CIDR ident clones
+CONFIG		13	-IClonesGline <Yes|No> - auto-gline for CIDR ident clones flag
+CONFIG		14	-CClonesTime <duration> - time between clone warnings to msglog (accepts friendly times)
+CONFIG		15	-GBCount <count> - number of glines to set at once
+CONFIG		16	-GBInterval <duration> - time between setting gline bursts (accepts friendly times)
+CONFIG		17	-SGline <Yes|No> - Save glines flag
 DEAUTH		1	****** DEAUTH COMMAND ******
 DEAUTH		2	Deauthenticates you from the bot
 DEAUTH		3	Syntax: /msg $BOT$ deauth
