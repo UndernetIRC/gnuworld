@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: pgsqlDB.cc,v 1.3 2007/08/28 16:09:59 dan_karrels Exp $
+ * $Id: pgsqlDB.cc,v 1.4 2008/01/04 04:05:37 buzlip01 Exp $
  */
 
 #include	<sys/types.h>
@@ -33,7 +33,7 @@
 #include	"gnuworldDB.h"
 #include	"pgsqlDB.h"
 
-const char pgsqlDB_cc_rcsId[] = "$Id: pgsqlDB.cc,v 1.3 2007/08/28 16:09:59 dan_karrels Exp $" ;
+const char pgsqlDB_cc_rcsId[] = "$Id: pgsqlDB.cc,v 1.4 2008/01/04 04:05:37 buzlip01 Exp $" ;
 const char pgsqlDB_h_rcsId[] = __PGSQLDB_H ;
 
 namespace gnuworld
@@ -136,12 +136,18 @@ if( dataRet )
 	{
 	// User is expecting data back, so return status according
 	// to tuples being returned
-	return (PGRES_TUPLES_OK == status) ;
+	if (PGRES_COPY_IN == status) return true;
+	if (PGRES_TUPLES_OK == status) return true;
+	if (PGRES_COMMAND_OK == status) return true;
+	return false;
 	}
 else
 	{
 	// Command execution with no data returned.
-	return (PGRES_COMMAND_OK == status) ;
+	if (PGRES_COPY_IN == status) return true;
+        if (PGRES_TUPLES_OK == status) return true;
+	if (PGRES_COMMAND_OK == status) return true;
+        return false;
 	}
 }
 
