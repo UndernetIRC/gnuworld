@@ -1,4 +1,7 @@
-// $Id: ChangeLog,v 1.154 2008/01/03 04:26:22 kewlio Exp $ //
+// $Id: ChangeLog,v 1.155 2008/01/05 17:11:31 kewlio Exp $ //
+
+2008-01-05	Dan-m00 <daniel@undernet.org>
+		* doc/languages.sql: change language #15 to hebrew.
 
 2008-01-03	Dan-m00 <daniel@undernet.org>
 		* doc/ccontrol.help.sql: Modify CONFIG help for new feature.

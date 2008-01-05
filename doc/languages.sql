@@ -17,7 +17,7 @@ COPY "languages" FROM stdin;
 12	TR	Turkish	31337	0
 13	NO	Norsk	31337	0
 14	AR	Arabic	31337	0
-15	HA	Haloween	31337	0
+15	HE	Hebrew	31337	0
 16	MK	Macedonian	31337	0
 17	EA	Easter	31337	0
 18	HA	Halloween	31337	0
