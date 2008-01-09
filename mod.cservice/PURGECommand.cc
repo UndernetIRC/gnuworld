@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: PURGECommand.cc,v 1.20 2007/12/29 16:17:36 kewlio Exp $
+ * $Id: PURGECommand.cc,v 1.21 2008/01/09 23:05:53 kewlio Exp $
  */
 
 #include	<string>
@@ -39,7 +39,7 @@
 #include	"responses.h"
 #include	"cservice_config.h"
 
-const char PURGECommand_cc_rcsId[] = "$Id: PURGECommand.cc,v 1.20 2007/12/29 16:17:36 kewlio Exp $" ;
+const char PURGECommand_cc_rcsId[] = "$Id: PURGECommand.cc,v 1.21 2008/01/09 23:05:53 kewlio Exp $" ;
 
 namespace gnuworld
 {
@@ -182,10 +182,15 @@ if (reop)
 			sqlUser* tUser = bot->isAuthed(tmpClient, false);
 			if (!tUser)
 				continue;
+			/* are they globally suspended? */
+			if (tUser->getFlag(sqlUser::F_GLOBAL_SUSPEND))
+				continue;
 			sqlLevel* theLevel = bot->getLevelRecord(tUser, theChan);
-			/* check if they have access */
+			/* check if they have access (and not suspended) */
 			if (theLevel)
 			{
+				if (theLevel->getSuspendExpire() > bot->currentTime())
+					continue;
 				if (theLevel->getAccess() >= 100)
 				{
 					/* they're 100+, op them */                        

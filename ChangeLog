@@ -1,4 +1,8 @@
-// $Id: ChangeLog,v 1.155 2008/01/05 17:11:31 kewlio Exp $ //
+// $Id: ChangeLog,v 1.156 2008/01/09 23:05:53 kewlio Exp $ //
+
+2008-01-09	Dan-m00 <daniel@undernet.org>
+		* mod.cservice/PURGECommand: check global and channel lists for
+			suspended usernames (do not reop suspended users)
 
 2008-01-05	Dan-m00 <daniel@undernet.org>
 		* doc/languages.sql: change language #15 to hebrew.
