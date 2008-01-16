@@ -1,4 +1,4 @@
--- $Id: language_halloween.sql,v 1.7 2007/12/26 19:13:00 kewlio Exp $
+-- $Id: language_halloween.sql,v 1.8 2008/01/16 19:19:21 kewlio Exp $
 -- Muhauahuuahha.
 -- Halloween language definition.
 -- 30/10/01 - Gte (Greg Sikorski) <gte@atomicrevs.demon.co.uk>.
@@ -90,7 +90,7 @@ COPY "translations" FROM stdin;
 18	78	Modified %s's generation level on casket %s to %i	31337	0
 18	79	Set AUTOMODE to OP for %s on casket %s	31337	0
 18	80	Set AUTOMODE to VOICE for %s on casket %s	31337	0
-18	81	Set AUTOMODE to NONE for %s on casket %s	31337	0	
+18	81	Set AUTOMODE to NONE for %s on casket %s	31337	0
 18	82	Your secret chant cannot be your pumpkinname or current nick - syntax is: NEWPASS <new passphrase>	31337	0
 18	83	Password successfully changed.	31337	0
 18	84	The NOOP flag is set on %s	31337	0
