@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: SCORECommand.cc,v 1.5 2007/02/01 14:11:16 buzlip01 Exp $
+ * $Id: SCORECommand.cc,v 1.6 2008/01/16 02:03:39 buzlip01 Exp $
  */
 
 #include <sstream>
@@ -37,7 +37,7 @@
 #include "sqlChanOp.h"
 #include "sqlcfUser.h"
 
-RCSTAG("$Id: SCORECommand.cc,v 1.5 2007/02/01 14:11:16 buzlip01 Exp $");
+RCSTAG("$Id: SCORECommand.cc,v 1.6 2008/01/16 02:03:39 buzlip01 Exp $");
 
 namespace gnuworld
 {
@@ -333,7 +333,7 @@ if (compact) {
 
 sqlChannel* theChan = bot->getChannelRecord(st[1]);
 if (theChan) {
-  bot->SendTo(theClient, "Notes: %d", theChan->countNotes(0));
+  bot->SendTo(theClient, "Notes: %d", theChan->countNotes(bot->getLocalDBHandle(), 0));
 	
   if (theChan->getFlag(sqlChannel::F_BLOCKED))
     bot->SendTo(theClient,

@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: DELHOSTCommand.cc,v 1.4 2006/12/09 00:29:18 buzlip01 Exp $
+ * $Id: DELHOSTCommand.cc,v 1.5 2008/01/16 02:03:37 buzlip01 Exp $
  */
 
 #include "gnuworld_config.h"
@@ -31,7 +31,7 @@
 #include "StringTokenizer.h"
 #include "sqlcfUser.h"
 
-RCSTAG("$Id: DELHOSTCommand.cc,v 1.4 2006/12/09 00:29:18 buzlip01 Exp $");
+RCSTAG("$Id: DELHOSTCommand.cc,v 1.5 2008/01/16 02:03:37 buzlip01 Exp $");
 
 namespace gnuworld
 {
@@ -90,7 +90,7 @@ if (!targetUser->hasHost(st[2].c_str())) {
   return;
 }
 
-if (!targetUser->delHost(st[2].c_str())) {
+if (!targetUser->delHost(bot->getLocalDBHandle(),st[2].c_str())) {
   bot->SendTo(theClient,
 	      bot->getResponse(theUser,
 			language::failed_deleting_host,
@@ -104,7 +104,7 @@ targetUser->setLastUpdatedBy( std::string( "("
 	+ theUser->getUserName()
 	+ ") "
 	+ theClient->getRealNickUserHost() ) );
-targetUser->commit();
+targetUser->commit(bot->getLocalDBHandle());
 
 bot->SendTo(theClient,
             bot->getResponse(theUser,

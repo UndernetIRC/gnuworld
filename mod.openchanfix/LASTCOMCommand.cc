@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: LASTCOMCommand.cc,v 1.3 2007/08/28 16:10:21 dan_karrels Exp $
+ * $Id: LASTCOMCommand.cc,v 1.4 2008/01/16 02:03:37 buzlip01 Exp $
  */
 
 #include	<sstream>
@@ -45,7 +45,7 @@
 #include	"ELog.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: LASTCOMCommand.cc,v 1.3 2007/08/28 16:10:21 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: LASTCOMCommand.cc,v 1.4 2008/01/16 02:03:37 buzlip01 Exp $" ) ;
 
 namespace gnuworld
 {
@@ -60,7 +60,7 @@ unsigned int NumOfCom;
 unsigned int Days = 0;
 std::stringstream theQuery;
 
-dbHandle* cacheCon = bot->theManager->getConnection();
+dbHandle* cacheCon = bot->getLocalDBHandle();
 
 if (st.size() == 1 ) {
   NumOfCom = 20;
@@ -99,7 +99,7 @@ elog	<< "chanfix::LASTCOM> "
 	<< theQuery.str().c_str() 
 	<< std::endl;
 	
-if (!cacheCon->Exec(theQuery,true)) {
+if (!cacheCon->Exec(theQuery.str(),true)) {
   elog	<< "chanfix::LASTCOM> SQL Error: "
 	<< cacheCon->ErrorMessage()
 	<< std::endl ;
@@ -127,7 +127,7 @@ bot->SendTo(theClient,
                              std::string("End of LASTCOM report.")).c_str());
 
 /* Dispose of our connection instance */
-bot->theManager->removeConnection(cacheCon);
+//bot->theManager->removeConnection(cacheCon);
 
 bot->logLastComMessage(theClient, Message);
 

@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: SUSPENDCommand.cc,v 1.4 2006/12/09 00:29:19 buzlip01 Exp $
+ * $Id: SUSPENDCommand.cc,v 1.5 2008/01/16 02:03:39 buzlip01 Exp $
  */
 
 #include "gnuworld_config.h"
@@ -31,7 +31,7 @@
 #include "StringTokenizer.h"
 #include "sqlcfUser.h"
 
-RCSTAG("$Id: SUSPENDCommand.cc,v 1.4 2006/12/09 00:29:19 buzlip01 Exp $");
+RCSTAG("$Id: SUSPENDCommand.cc,v 1.5 2008/01/16 02:03:39 buzlip01 Exp $");
 
 namespace gnuworld
 {
@@ -105,7 +105,7 @@ targetUser->setLastUpdatedBy( std::string( "("
 	+ theUser->getUserName()
 	+ ") "
 	+ theClient->getRealNickUserHost() ) );
-targetUser->commit();
+targetUser->commit(bot->getLocalDBHandle());
 
 bot->SendTo(theClient,
             bot->getResponse(theUser,

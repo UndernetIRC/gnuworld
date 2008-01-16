@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: DELNOTECommand.cc,v 1.5 2007/08/28 16:10:20 dan_karrels Exp $
+ * $Id: DELNOTECommand.cc,v 1.6 2008/01/16 02:03:37 buzlip01 Exp $
  */
 
 #include "gnuworld_config.h"
@@ -32,7 +32,7 @@
 #include "sqlChannel.h"
 #include "sqlcfUser.h"
 
-RCSTAG("$Id: DELNOTECommand.cc,v 1.5 2007/08/28 16:10:20 dan_karrels Exp $");
+RCSTAG("$Id: DELNOTECommand.cc,v 1.6 2008/01/16 02:03:37 buzlip01 Exp $");
 
 namespace gnuworld
 {
@@ -53,7 +53,7 @@ if (!theChan) {
   return;
 }
 
-if (!theChan->useSQL() || (theChan->countNotes(0) <= 0)) {
+if (!theChan->useSQL() || (theChan->countNotes(bot->getLocalDBHandle(),0) <= 0)) {
   bot->SendTo(theClient,
               bot->getResponse(theUser,
                               language::chan_has_no_notes,
@@ -65,7 +65,7 @@ if (!theChan->useSQL() || (theChan->countNotes(0) <= 0)) {
 unsigned int messageId = atoi(st[2].c_str());
 
 /* Get a connection instance to our backend */
-dbHandle* cacheCon = bot->theManager->getConnection();
+dbHandle* cacheCon = bot->getLocalDBHandle();
 
 /* Retrieve the note */
 std::stringstream noteCheckQuery;
@@ -75,7 +75,7 @@ noteCheckQuery	<< "SELECT channelID, user_name, event "
 		<< messageId
 		;
 
-if (!cacheCon->Exec(noteCheckQuery,true)) {
+if (!cacheCon->Exec(noteCheckQuery.str(),true)) {
   elog	<< "DELNOTECommand> SQL Error: "
 	<< cacheCon->ErrorMessage()
 	<< std::endl ;
@@ -86,7 +86,7 @@ if (!cacheCon->Exec(noteCheckQuery,true)) {
 				std::string("An unknown error occured while checking the note id.")).c_str());
 
   /* Dispose of our connection instance */
-  bot->theManager->removeConnection(cacheCon);
+  //bot->theManager->removeConnection(cacheCon);
 
   return;
 }
@@ -104,7 +104,7 @@ std::string user_name = cacheCon->GetValue(0,1);
 unsigned short eventType = atoi(cacheCon->GetValue(0,2));
 
 /* Dispose of our connection instance */
-bot->theManager->removeConnection(cacheCon);
+//bot->theManager->removeConnection(cacheCon);
 
 if (channelID != theChan->getID()) {
   bot->SendTo(theClient,
@@ -133,7 +133,7 @@ if (eventType != sqlChannel::EV_NOTE && !theUser->getFlag(sqlcfUser::F_OWNER)) {
   return;
 }
 
-theChan->deleteNote(messageId);
+theChan->deleteNote(bot->getLocalDBHandle(),messageId);
 
 bot->SendTo(theClient,
             bot->getResponse(theUser,

@@ -16,16 +16,19 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
  * USA.
  *
- * $Id: sqlcfUser.h,v 1.3 2007/08/28 16:10:25 dan_karrels Exp $
+ * $Id: sqlcfUser.h,v 1.4 2008/01/16 02:03:40 buzlip01 Exp $
  */
 
 #ifndef __sqlcfUser_H
-#define __sqlcfUser_H "$Id: sqlcfUser.h,v 1.3 2007/08/28 16:10:25 dan_karrels Exp $"
+#define __sqlcfUser_H "$Id: sqlcfUser.h,v 1.4 2008/01/16 02:03:40 buzlip01 Exp $"
 
 #include	<string>
 #include	<vector>
 #include	<ctime>
+#include	<sstream>
 #include	"dbHandle.h"
+
+using namespace std;
 
 namespace gnuworld
 {
@@ -141,16 +144,16 @@ public:
 
 	/* Methods to alter our SQL status */
 	void setAllMembers(dbHandle*, int);
-	bool commit();
-	bool Insert();
-	bool Delete();
+	bool commit(dbHandle*);
+	bool Insert(dbHandle*);
+	bool Delete(dbHandle*);
 
 	/** Static member for keeping track of max user id */
 	static unsigned long int maxUserId;
 
-	void loadHostList();
-	bool addHost(const std::string&);		
-	bool delHost(const std::string&);		
+	void loadHostList(dbHandle*);
+	bool addHost(dbHandle*, const std::string&);		
+	bool delHost(dbHandle*, const std::string&);		
 	bool matchHost(const std::string&);
 	bool hasHost(const std::string&);
 

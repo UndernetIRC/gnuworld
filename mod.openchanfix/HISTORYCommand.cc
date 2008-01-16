@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: HISTORYCommand.cc,v 1.5 2007/08/28 16:10:21 dan_karrels Exp $
+ * $Id: HISTORYCommand.cc,v 1.6 2008/01/16 02:03:37 buzlip01 Exp $
  */
 
 #include "gnuworld_config.h"
@@ -32,7 +32,7 @@
 #include "sqlChannel.h"
 #include "sqlcfUser.h"
 
-RCSTAG("$Id: HISTORYCommand.cc,v 1.5 2007/08/28 16:10:21 dan_karrels Exp $");
+RCSTAG("$Id: HISTORYCommand.cc,v 1.6 2008/01/16 02:03:37 buzlip01 Exp $");
 
 namespace gnuworld
 {
@@ -54,7 +54,7 @@ if (!theChan || !theChan->useSQL()) {
 }
 
 /* Get a connection instance to our backend */
-dbHandle* cacheCon = bot->theManager->getConnection();
+dbHandle* cacheCon = bot->getLocalDBHandle();
 
 /*
  * Perform a query to list the dates/times this channel was last chanfixed.
@@ -71,7 +71,7 @@ chanfixQuery	<< "SELECT ts "
 		<< ") ORDER BY ts DESC"
 		;
 
-if (!cacheCon->Exec(chanfixQuery,true)) {
+if (!cacheCon->Exec(chanfixQuery.str(),true)) {
 	elog	<< "HISTORYCommand> SQL Error: "
 		<< cacheCon->ErrorMessage()
 		<< std::endl;
@@ -93,7 +93,7 @@ if (noteCount <= 0) {
                                           theChan->getChannel().c_str());
 
   /* Dispose of our connection instance */
-  bot->theManager->removeConnection(cacheCon);
+  //bot->theManager->removeConnection(cacheCon);
 
   return;
 }
@@ -113,7 +113,7 @@ bot->SendTo(theClient,
                             std::string("End of list.")).c_str());
 
 /* Dispose of our connection instance */
-bot->theManager->removeConnection(cacheCon);
+//bot->theManager->removeConnection(cacheCon);
 
 bot->logAdminMessage("%s (%s) HISTORY %s",
 		     theUser ? theUser->getUserName().c_str() : "!NOT-LOGGED-IN!",

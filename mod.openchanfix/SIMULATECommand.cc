@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: SIMULATECommand.cc,v 1.1 2006/12/09 00:29:19 buzlip01 Exp $
+ * $Id: SIMULATECommand.cc,v 1.2 2008/01/16 02:03:39 buzlip01 Exp $
  */
 
 #include "gnuworld_config.h"
@@ -33,7 +33,7 @@
 #include "sqlChannel.h"
 #include "sqlcfUser.h"
 
-RCSTAG("$Id: SIMULATECommand.cc,v 1.1 2006/12/09 00:29:19 buzlip01 Exp $");
+RCSTAG("$Id: SIMULATECommand.cc,v 1.2 2008/01/16 02:03:39 buzlip01 Exp $");
 
 namespace gnuworld
 {
@@ -144,7 +144,7 @@ if (bot->isTempBlocked(theChan->getChannel())) {
 }
 
 if (!theChan->useSQL())
-  theChan->Insert();
+  theChan->Insert(bot->getLocalDBHandle());
 
 bot->SendTo(theClient,
             bot->getResponse(theUser,
@@ -161,7 +161,7 @@ bot->SendTo(theClient,
 sqlChannel* sqlChan = bot->getChannelRecord(st[1]);
 bot->simulateFix(sqlChan, autof, theClient, theUser);
 
-theChan->addNote(sqlChannel::EV_SIMULATE, theClient, (autof) ? "[auto]" : "[manual]");
+theChan->addNote(bot->getLocalDBHandle(), sqlChannel::EV_SIMULATE, theClient, (autof) ? "[auto]" : "[manual]");
 
 bot->SendTo(theClient,
             bot->getResponse(theUser,

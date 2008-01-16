@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ADDHOSTCommand.cc,v 1.4 2006/12/09 00:29:18 buzlip01 Exp $
+ * $Id: ADDHOSTCommand.cc,v 1.5 2008/01/16 02:03:37 buzlip01 Exp $
  */
 
 #include "gnuworld_config.h"
@@ -31,7 +31,7 @@
 #include "StringTokenizer.h"
 #include "sqlcfUser.h"
 
-RCSTAG("$Id: ADDHOSTCommand.cc,v 1.4 2006/12/09 00:29:18 buzlip01 Exp $");
+RCSTAG("$Id: ADDHOSTCommand.cc,v 1.5 2008/01/16 02:03:37 buzlip01 Exp $");
 
 namespace gnuworld
 {
@@ -82,7 +82,7 @@ if (theUser->getFlag(sqlcfUser::F_SERVERADMIN) &&
   
 if (targetUser->matchHost(st[2].c_str())) {
   if ((st[2] != "*!*@*") && targetUser->hasHost("*!*@*")) {
-    targetUser->delHost("*!*@*");
+    targetUser->delHost(bot->getLocalDBHandle(),"*!*@*");
     bot->SendTo(theClient,
 		bot->getResponse(theUser,
 			language::removed_default_hostmask,
@@ -99,7 +99,7 @@ if (targetUser->matchHost(st[2].c_str())) {
   }
 }
 
-if (!targetUser->addHost(st[2].c_str())) {
+if (!targetUser->addHost(bot->getLocalDBHandle(),st[2].c_str())) {
   bot->SendTo(theClient,
 	      bot->getResponse(theUser,
 			language::failed_adding_hostmask,
@@ -113,7 +113,7 @@ targetUser->setLastUpdatedBy( std::string( "("
 	+ theUser->getUserName()
 	+ ") "
 	+ theClient->getRealNickUserHost() ) );
-targetUser->commit();
+targetUser->commit(bot->getLocalDBHandle());
 
 bot->SendTo(theClient,
             bot->getResponse(theUser,

@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
  * USA.
  *
- * $Id: USETCommand.cc,v 1.5 2006/12/09 00:29:19 buzlip01 Exp $
+ * $Id: USETCommand.cc,v 1.6 2008/01/16 02:03:39 buzlip01 Exp $
  */
 
 #include	<string>
@@ -33,7 +33,7 @@
 #include	"responses.h"
 #include	"sqlcfUser.h"
 
-RCSTAG("$Id: USETCommand.cc,v 1.5 2006/12/09 00:29:19 buzlip01 Exp $");
+RCSTAG("$Id: USETCommand.cc,v 1.6 2008/01/16 02:03:39 buzlip01 Exp $");
 
 namespace gnuworld
 {
@@ -67,13 +67,13 @@ if (st.size() == 4) {
       targetUser->setNeedOper(true);
       bot->SendTo(theClient, "%s is now required to be an IRC Operator", 
 		  targetUser->getUserName().c_str());
-      targetUser->commit();
+      targetUser->commit(bot->getLocalDBHandle());
       return;
     } else if (value == "OFF" || value == "NO" || value == "0") {
       targetUser->setNeedOper(false);
       bot->SendTo(theClient, "%s is now not required to be an IRC Operator", 
 		  targetUser->getUserName().c_str());
-      targetUser->commit();
+      targetUser->commit(bot->getLocalDBHandle());
       return;
     } else {
       bot->SendTo(theClient, "Please use USET <username> NEEDOPER <on/off>.");
@@ -97,7 +97,7 @@ if (option == "NOTICE") {
                 bot->getResponse(theUser,
                                 language::send_notices,
                                 std::string("I will now send you notices.")).c_str());
-    theUser->commit();
+    theUser->commit(bot->getLocalDBHandle());
     return;
   } else if (value == "OFF" || value == "NO" || value == "0") {
     theUser->setNotice(false);
@@ -105,7 +105,7 @@ if (option == "NOTICE") {
                 bot->getResponse(theUser,
                                 language::send_privmsgs,
                                 std::string("I will now send you privmsgs.")).c_str());
-    theUser->commit();
+    theUser->commit(bot->getLocalDBHandle());
     return;
   } else {
     bot->SendTo(theClient,
@@ -122,7 +122,7 @@ if (option == "LANG")
   if (ptr != bot->languageTable.end()) {
     std::string lang = ptr->second.second;
     theUser->setLanguageId(ptr->second.first);
-    theUser->commit();
+    theUser->commit(bot->getLocalDBHandle());
     bot->SendTo(theClient,
 		bot->getResponse(theUser,
 			language::lang_set_to,

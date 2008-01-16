@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: CHANFIXCommand.cc,v 1.5 2007/03/11 14:52:28 buzlip01 Exp $
+ * $Id: CHANFIXCommand.cc,v 1.6 2008/01/16 02:03:37 buzlip01 Exp $
  */
 
 #include "gnuworld_config.h"
@@ -31,7 +31,7 @@
 #include "responses.h"
 #include "StringTokenizer.h"
 
-RCSTAG("$Id: CHANFIXCommand.cc,v 1.5 2007/03/11 14:52:28 buzlip01 Exp $");
+RCSTAG("$Id: CHANFIXCommand.cc,v 1.6 2008/01/16 02:03:37 buzlip01 Exp $");
 
 namespace gnuworld
 {
@@ -193,7 +193,7 @@ if (theChan->getFlag(sqlChannel::F_ALERT) && !override) {
 
 /* Add the channel to the SQL database if it hasn't already been added */
 if (!theChan->useSQL())
-  theChan->Insert();
+  theChan->Insert(bot->getLocalDBHandle());
 
 /* Alert top ops out of the channel if wanted */
 if (alert)
@@ -203,7 +203,7 @@ if (alert)
 bot->manualFix(netChan);
 
 /* Add note to the channel about this manual fix */
-theChan->addNote(sqlChannel::EV_CHANFIX, theClient, (override) ? "[override]" : "");
+theChan->addNote(bot->getLocalDBHandle(), sqlChannel::EV_CHANFIX, theClient, (override) ? "[override]" : "");
 
 /* Log the chanfix */
 bot->SendTo(theClient,

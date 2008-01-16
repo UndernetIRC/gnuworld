@@ -16,16 +16,17 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: chanfix.h,v 1.8 2007/08/28 16:10:22 dan_karrels Exp $
+ * $Id: chanfix.h,v 1.9 2008/01/16 02:03:39 buzlip01 Exp $
  */
 
 #ifndef __CHANFIX_H
-#define __CHANFIX_H "$Id: chanfix.h,v 1.8 2007/08/28 16:10:22 dan_karrels Exp $"
+#define __CHANFIX_H "$Id: chanfix.h,v 1.9 2008/01/16 02:03:39 buzlip01 Exp $"
 
 #include	<string>
 #include	<vector>
 #include	<map>
 #include	<list>
+#include	<sstream>
 
 #include	"client.h"
 #include	"EConfig.h"
@@ -196,6 +197,8 @@ public:
 
 	sqlChanOp* findChanOp(const std::string&, const std::string&);
 	sqlChanOp* findChanOp(Channel*, iClient*);
+
+	dbHandle* getLocalDBHandle() { return localDBHandle; }
 
 	size_t countMyOps(const std::string&);
 	size_t countMyOps(Channel*);
@@ -512,6 +515,12 @@ protected:
 	 */
 	std::ofstream	adminLog;
 	std::ofstream	debugLog;
+
+	/**
+	 * DB Handle
+	 */
+	dbHandle*	localDBHandle;
+
 
 public:
 

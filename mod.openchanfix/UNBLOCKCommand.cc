@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: UNBLOCKCommand.cc,v 1.4 2006/12/09 00:29:19 buzlip01 Exp $
+ * $Id: UNBLOCKCommand.cc,v 1.5 2008/01/16 02:03:39 buzlip01 Exp $
  */
 
 #include "gnuworld_config.h"
@@ -32,7 +32,7 @@
 #include "sqlChannel.h"
 #include "sqlcfUser.h"
 
-RCSTAG("$Id: UNBLOCKCommand.cc,v 1.4 2006/12/09 00:29:19 buzlip01 Exp $");
+RCSTAG("$Id: UNBLOCKCommand.cc,v 1.5 2008/01/16 02:03:39 buzlip01 Exp $");
 
 namespace gnuworld
 {
@@ -74,12 +74,12 @@ if (!theChan->getFlag(sqlChannel::F_BLOCKED)) {
 theChan->removeFlag(sqlChannel::F_BLOCKED);
 
 if (!theChan->useSQL())
-  theChan->Insert();
+  theChan->Insert(bot->getLocalDBHandle());
 else
-  theChan->commit();
+  theChan->commit(bot->getLocalDBHandle());
 
 /* Add note to the channel about this command */
-theChan->addNote(sqlChannel::EV_UNBLOCK, theClient, "");
+theChan->addNote(bot->getLocalDBHandle(), sqlChannel::EV_UNBLOCK, theClient, "");
 
 bot->SendTo(theClient,
             bot->getResponse(theUser,

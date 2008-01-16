@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: OPLISTCommand.cc,v 1.6 2007/02/01 14:11:17 buzlip01 Exp $
+ * $Id: OPLISTCommand.cc,v 1.7 2008/01/16 02:03:39 buzlip01 Exp $
  */
 
 #include "gnuworld_config.h"
@@ -33,7 +33,7 @@
 #include "sqlChannel.h"
 #include "sqlChanOp.h"
 
-RCSTAG("$Id: OPLISTCommand.cc,v 1.6 2007/02/01 14:11:17 buzlip01 Exp $");
+RCSTAG("$Id: OPLISTCommand.cc,v 1.7 2008/01/16 02:03:39 buzlip01 Exp $");
 
 namespace gnuworld
 {
@@ -74,7 +74,7 @@ if (myOps.empty()) {
 	
 	sqlChannel* theChan = bot->getChannelRecord(st[1]);
 	if (theChan) {
-	  bot->SendTo(theClient, "Notes: %d", theChan->countNotes(0));
+	  bot->SendTo(theClient, "Notes: %d", theChan->countNotes(bot->getLocalDBHandle(),0));
 
 	  if (bot->isTempBlocked(theChan->getChannel()))
 	    bot->SendTo(theClient,
@@ -113,7 +113,7 @@ if (oCnt == 0) {
 	
 	sqlChannel* theChan = bot->getChannelRecord(st[1]);
 	if (theChan) {
-	  bot->SendTo(theClient, "Notes: %d", theChan->countNotes(0));
+	  bot->SendTo(theClient, "Notes: %d", theChan->countNotes(bot->getLocalDBHandle(),0));
 
 	  if (bot->isTempBlocked(theChan->getChannel()))
 	    bot->SendTo(theClient,
@@ -219,7 +219,7 @@ for (chanfix::chanOpsType::iterator opPtr = myOps.begin();
 
 sqlChannel* theChan = bot->getChannelRecord(st[1]);
 if (theChan) {
-  bot->SendTo(theClient, "Notes: %d", theChan->countNotes(0));
+  bot->SendTo(theClient, "Notes: %d", theChan->countNotes(bot->getLocalDBHandle(), 0));
 
   if (bot->isTempBlocked(theChan->getChannel()))
     bot->SendTo(theClient,

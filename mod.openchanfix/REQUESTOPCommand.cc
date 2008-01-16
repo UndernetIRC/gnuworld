@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: REQUESTOPCommand.cc,v 1.1 2006/12/09 00:29:19 buzlip01 Exp $
+ * $Id: REQUESTOPCommand.cc,v 1.2 2008/01/16 02:03:39 buzlip01 Exp $
  */
 
 #include "gnuworld_config.h"
@@ -31,7 +31,7 @@
 #include "responses.h"
 #include "StringTokenizer.h"
 
-RCSTAG("$Id: REQUESTOPCommand.cc,v 1.1 2006/12/09 00:29:19 buzlip01 Exp $");
+RCSTAG("$Id: REQUESTOPCommand.cc,v 1.2 2008/01/16 02:03:39 buzlip01 Exp $");
 
 namespace gnuworld
 {
@@ -230,7 +230,7 @@ if ((bot->isTempBlocked(theChan->getChannel())) || (theChan->getFlag(sqlChannel:
 
 /* Add the channel to the SQL database if it hasn't already been added */
 if (!theChan->useSQL())
-  theChan->Insert();
+  theChan->Insert(bot->getLocalDBHandle());
 
 /* Alert top ops out of the channel if wanted */
 if (alert)
@@ -240,7 +240,7 @@ if (alert)
 bot->manualFix(netChan);
 
 /* Add note to the channel about this manual fix */
-theChan->addNote(sqlChannel::EV_REQUESTOP, theClient, "");
+theChan->addNote(bot->getLocalDBHandle(), sqlChannel::EV_REQUESTOP, theClient, "");
 
 /* Log the chanfix */
 bot->SendTo(theClient,

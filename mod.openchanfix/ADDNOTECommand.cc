@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ADDNOTECommand.cc,v 1.4 2006/12/09 00:29:18 buzlip01 Exp $
+ * $Id: ADDNOTECommand.cc,v 1.5 2008/01/16 02:03:37 buzlip01 Exp $
  */
 
 #include "gnuworld_config.h"
@@ -32,7 +32,7 @@
 #include "sqlChannel.h"
 #include "sqlcfUser.h"
 
-RCSTAG("$Id: ADDNOTECommand.cc,v 1.4 2006/12/09 00:29:18 buzlip01 Exp $");
+RCSTAG("$Id: ADDNOTECommand.cc,v 1.5 2008/01/16 02:03:37 buzlip01 Exp $");
 
 namespace gnuworld
 {
@@ -55,9 +55,9 @@ sqlChannel* theChan = bot->getChannelRecord(st[1]);
 if (!theChan) theChan = bot->newChannelRecord(st[1]);
 
 if (!theChan->useSQL())
-  theChan->Insert();
+  theChan->Insert(bot->getLocalDBHandle());
 
-theChan->addNote(sqlChannel::EV_NOTE, theClient, st.assemble(2));
+theChan->addNote(bot->getLocalDBHandle(), sqlChannel::EV_NOTE, theClient, st.assemble(2));
 
 bot->SendTo(theClient,
             bot->getResponse(theUser,

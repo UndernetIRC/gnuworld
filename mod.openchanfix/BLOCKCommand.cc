@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: BLOCKCommand.cc,v 1.4 2006/12/09 00:29:18 buzlip01 Exp $
+ * $Id: BLOCKCommand.cc,v 1.5 2008/01/16 02:03:37 buzlip01 Exp $
  */
 
 #include "gnuworld_config.h"
@@ -33,7 +33,7 @@
 #include "sqlChannel.h"
 #include "sqlcfUser.h"
 
-RCSTAG("$Id: BLOCKCommand.cc,v 1.4 2006/12/09 00:29:18 buzlip01 Exp $");
+RCSTAG("$Id: BLOCKCommand.cc,v 1.5 2008/01/16 02:03:37 buzlip01 Exp $");
 
 namespace gnuworld
 {
@@ -77,12 +77,12 @@ if (theChan->getFlag(sqlChannel::F_BLOCKED)) {
 theChan->setFlag(sqlChannel::F_BLOCKED);
 
 if (!theChan->useSQL())
-  theChan->Insert();
+  theChan->Insert(bot->getLocalDBHandle());
 else
-  theChan->commit();
+  theChan->commit(bot->getLocalDBHandle());
 
 /* Add note to the channel about this command */
-theChan->addNote(sqlChannel::EV_BLOCK, theClient, st.assemble(2));
+theChan->addNote(bot->getLocalDBHandle(), sqlChannel::EV_BLOCK, theClient, st.assemble(2));
 
 bot->SendTo(theClient,
             bot->getResponse(theUser,

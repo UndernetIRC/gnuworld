@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: WHOGROUPCommand.cc,v 1.5 2007/08/28 16:10:22 dan_karrels Exp $
+ * $Id: WHOGROUPCommand.cc,v 1.6 2008/01/16 02:03:39 buzlip01 Exp $
  */
 
 #include "gnuworld_config.h"
@@ -31,7 +31,7 @@
 #include "StringTokenizer.h"
 #include "sqlcfUser.h"
 
-RCSTAG("$Id: WHOGROUPCommand.cc,v 1.5 2007/08/28 16:10:22 dan_karrels Exp $");
+RCSTAG("$Id: WHOGROUPCommand.cc,v 1.6 2008/01/16 02:03:39 buzlip01 Exp $");
 
 namespace gnuworld
 {
@@ -49,12 +49,12 @@ bot->logAdminMessage("%s (%s) WHOGROUP %s",
 
 if (st.size() == 1) {
   /* No parameter supplied, so list all groups */
-  dbHandle* cacheCon = bot->theManager->getConnection();
+  dbHandle* cacheCon = bot->getLocalDBHandle();
 
   std::stringstream theQuery;
   theQuery << "SELECT DISTINCT faction FROM users ORDER BY faction ASC";
 
-  if (!cacheCon->Exec(theQuery,true)) {
+  if (!cacheCon->Exec(theQuery.str(),true)) {
     elog	<< "chanfix::WHOGROUPCommand> SQL Error: "
 		<< cacheCon->ErrorMessage()
 		<< std::endl;
@@ -74,7 +74,7 @@ if (st.size() == 1) {
   }
 
   /* Dispose of our connection instance */
-  bot->theManager->removeConnection(cacheCon);
+  //bot->theManager->removeConnection(cacheCon);
 
   bot->SendTo(theClient,
 	      bot->getResponse(theUser,

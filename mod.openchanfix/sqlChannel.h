@@ -16,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
  * USA.
  *
- * $Id: sqlChannel.h,v 1.6 2007/08/28 16:10:25 dan_karrels Exp $
+ * $Id: sqlChannel.h,v 1.7 2008/01/16 02:03:39 buzlip01 Exp $
  */
 
 #ifndef __SQLCHANNEL_H
-#define __SQLCHANNEL_H "$Id: sqlChannel.h,v 1.6 2007/08/28 16:10:25 dan_karrels Exp $"
+#define __SQLCHANNEL_H "$Id: sqlChannel.h,v 1.7 2008/01/16 02:03:39 buzlip01 Exp $"
 
 #include	<string>
 #include	<ctime>
@@ -163,20 +163,20 @@ public:
 	inline void	setUseSQL(bool _inSQL)
 		{ inSQL = _inSQL; }
 
-	bool Insert();
-	bool Delete();
-	bool commit();
+	bool Insert(dbHandle*);
+	bool Delete(dbHandle*);
+	bool commit(dbHandle*);
 	void setAllMembers(dbHandle*, int);
 
 	/** Static member for keeping track of max user id */
 	static unsigned long int maxUserId;
 
-	void addNote(unsigned short, iClient*, const std::string&);
-	bool deleteNote(unsigned int);
-	bool deleteOldestNote();
-	bool deleteAllNotes();
-	size_t countNotes(unsigned short);
-	const std::string getLastNote(unsigned short, time_t&);
+	void addNote(dbHandle*, unsigned short, iClient*, const std::string&);
+	bool deleteNote(dbHandle*, unsigned int);
+	bool deleteOldestNote(dbHandle*);
+	bool deleteAllNotes(dbHandle*);
+	size_t countNotes(dbHandle*, unsigned short);
+	const std::string getLastNote(dbHandle*, unsigned short, time_t&);
 
 protected:
 

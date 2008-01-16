@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: LISTBLOCKEDCommand.cc,v 1.3 2007/08/28 16:10:21 dan_karrels Exp $
+ * $Id: LISTBLOCKEDCommand.cc,v 1.4 2008/01/16 02:03:37 buzlip01 Exp $
  */
 
 #include "gnuworld_config.h"
@@ -33,7 +33,7 @@
 #include "sqlChannel.h"
 #include "sqlcfUser.h"
 
-RCSTAG("$Id: LISTBLOCKEDCommand.cc,v 1.3 2007/08/28 16:10:21 dan_karrels Exp $");
+RCSTAG("$Id: LISTBLOCKEDCommand.cc,v 1.4 2008/01/16 02:03:37 buzlip01 Exp $");
 
 namespace gnuworld
 {
@@ -52,7 +52,7 @@ if (!bot->doChanBlocking()) {
 }
 
 /* List blocks */
-dbHandle* cacheCon = bot->theManager->getConnection();
+dbHandle* cacheCon = bot->getLocalDBHandle();
 
 std::stringstream theQuery;
 theQuery << "SELECT channel FROM channels WHERE (flags & "
@@ -61,7 +61,7 @@ theQuery << "SELECT channel FROM channels WHERE (flags & "
 	 << sqlChannel::F_BLOCKED
 	 << " ORDER BY channel ASC";
 
-if (!cacheCon->Exec(theQuery,true)) {
+if (!cacheCon->Exec(theQuery.str(),true)) {
   elog	<< "chanfix::LISTBLOCKEDCommand> SQL Error: "
 		<< cacheCon->ErrorMessage()
 		<< std::endl;
@@ -87,7 +87,7 @@ for (unsigned int i = 0 ; i < cacheCon->Tuples(); i++) {
 }
 
 /* Dispose of our connection instance */
-bot->theManager->removeConnection(cacheCon);
+//bot->theManager->removeConnection(cacheCon);
 
 if (strBlocks.size())
   bot->SendTo(theClient, strBlocks.c_str());

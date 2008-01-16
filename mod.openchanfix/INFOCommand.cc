@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: INFOCommand.cc,v 1.6 2007/08/28 16:10:21 dan_karrels Exp $
+ * $Id: INFOCommand.cc,v 1.7 2008/01/16 02:03:37 buzlip01 Exp $
  */
 
 #include "gnuworld_config.h"
@@ -33,7 +33,7 @@
 #include "sqlChannel.h"
 #include "sqlcfUser.h"
 
-RCSTAG("$Id: INFOCommand.cc,v 1.6 2007/08/28 16:10:21 dan_karrels Exp $");
+RCSTAG("$Id: INFOCommand.cc,v 1.7 2008/01/16 02:03:37 buzlip01 Exp $");
 
 namespace gnuworld
 {
@@ -133,7 +133,7 @@ if (!theChan->useSQL()) {
 }
 
 /* Get a connection instance to our backend */
-dbHandle* cacheCon = bot->theManager->getConnection();
+dbHandle* cacheCon = bot->getLocalDBHandle();
 
 /*
  * Perform a query to list all notes belonging to this channel.
@@ -146,7 +146,7 @@ allNotesQuery	<< "SELECT notes.id, notes.ts, notes.user_name, notes.event, notes
 		<< " ORDER BY notes.ts DESC"
 		;
 
-if (!cacheCon->Exec(allNotesQuery,true)) {
+if (!cacheCon->Exec(allNotesQuery.str(),true)) {
   elog	<< "INFOCommand> SQL Error: "
 	<< cacheCon->ErrorMessage()
 	<< std::endl;
@@ -157,7 +157,7 @@ if (!cacheCon->Exec(allNotesQuery,true)) {
 				std::string("An unknown error occurred while reading this channel's notes.")).c_str());
 
   /* Dispose of our connection instance */
-  bot->theManager->removeConnection(cacheCon);
+  //bot->theManager->removeConnection(cacheCon);
 
   return ;
 }
@@ -194,7 +194,7 @@ bot->SendTo(theClient,
                             std::string("End of information.")).c_str());
 
 /* Dispose of our connection instance */
-bot->theManager->removeConnection(cacheCon);
+//bot->theManager->removeConnection(cacheCon);
 
 bot->logAdminMessage("%s (%s) INFO %s",
 		     theUser ? theUser->getUserName().c_str() : "!NOT-LOGGED-IN!",
