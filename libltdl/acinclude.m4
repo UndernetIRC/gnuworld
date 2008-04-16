@@ -6524,6 +6524,9 @@ $as_executable_p $1[]dnl
 #  GNU Autoconf as AC_PROG_SED.  When it is available in   #
 #  a released version of Autoconf we should remove this    #
 #  macro and use it instead.                               #
+  freebsd*)
+    libltdl_cv_sys_dlopen_deplibs=yes
+    ;;
 ############################################################
 # LT_AC_PROG_SED
 # --------------
@@ -6710,9 +6713,6 @@ AC_CACHE_CHECK([whether deplibs are loaded by dlopen],
   darwin*)
     # Assuming the user has installed a libdl from somewhere, this is true
     # If you are looking for one http://www.opendarwin.org/projects/dlcompat
-    libltdl_cv_sys_dlopen_deplibs=yes
-    ;;
-  freebsd*)
     libltdl_cv_sys_dlopen_deplibs=yes
     ;;
   freebsd* | dragonfly*)

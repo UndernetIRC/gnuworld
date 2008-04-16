@@ -1,10 +1,10 @@
-dnl $Id: configure.ac,v 1.41 2007/10/31 14:56:36 kewlio Exp $
+dnl $Id: configure.ac,v 1.42 2008/04/16 15:25:49 danielaustin Exp $
 dnl ----------------------------------------------------------
 
 echo Configuring GNUWorld...
 echo
 
-AC_REVISION($Revision: 1.41 $)
+AC_REVISION($Revision: 1.42 $)
 AC_INIT
 AC_CONFIG_SRCDIR([src/main.cc])
 AM_INIT_AUTOMAKE(gnuworld,3.0)
@@ -225,10 +225,6 @@ AC_CHECK_LIB(pq, PQconnectdb)
 AC_CHECK_HEADER([libpq-fe.h])
 AC_DEFINE([HAVE_PGSQL],[],[Using PostGreSQL])
 
-dnl [pgsql_includedir="."],
-dnl AC_MSG_FAILURE([Unable to find libpq-fe.h, please install 
-dnl PostGreSQL]),[])
-
 dnl Everything seemed to work, pgsql located.
 dnl Restore the original CXXFLAGS and LIBS. The db library will
 dnl link against pgsql_lib (which is empty if using system default),
@@ -237,40 +233,6 @@ dnl system default installation).
 CXXFLAGS="$tmpcxxflags"
 CPPFLAGS="$tmpcppflags"
 LIBS="$tmplibs"
-
-dnl pgsql_lib="$pgsql_home/lib"
-dnl AC_ARG_WITH(pgsql-lib,
-dnl	AC_HELP_STRING([--with-pgsql-lib=PGSQLLIBDIR],
-dnl			[Specify location to find libpq.so, default is \
-dnl /usr/local/lib/pgsql/lib]),
-dnl	[pgsql_lib=$withval]
-dnl )
-
-dnl pgsql_include="$pgsql_home/include"
-dnl AC_ARG_WITH(pgsql-include,
-dnl	AC_HELP_STRING([--with-pgsql-include=PGSQLINCLUDEDIR],
-dnl			[Specify location to find libpq-fe.h, default is \
-dnl /usr/local/lib/pgsql/include]),
-dnl	[pgsql_include=$withval]
-dnl )
-
-dnl AC_MSG_CHECKING([for libpq.so in $pgsql_lib])
-dnl if [ test -f $pgsql_lib/libpq.so ]; then
-dnl	AC_MSG_RESULT([$pgsql_lib])
-dnl	AC_DEFINE([HAVE_PGSQL],[],[Using PostGreSQL])
-dnl	[LDFLAGS="$LDFLAGS -L${pgsql_lib}"]
-dnl else
-dnl	AC_MSG_FAILURE([unable to find libpq.so])
-dnl fi
-
-dnl AC_MSG_CHECKING([for libpq-fe.h])
-dnl if [ test -f $pgsql_include/libpq-fe.h ]; then
-dnl	AC_MSG_RESULT([$pgsql_include])
-dnl	AC_DEFINE([HAVE_PGSQL],[],[Using PostGreSQL])
-dnl	CXXFLAGS="${CXXFLAGS} -I${pgsql_include}"
-dnl else
-dnl	AC_MSG_FAILURE([unable to find libpq-fe.h])
-dnl fi
 
 dnl Enable log4cplus if required
 AC_ARG_WITH(log4cplus,
@@ -433,17 +395,6 @@ dnl	echo "mod_list: $mod_list"
 	 done
 fi
 
-dnl Check if openchanfix is selected.  mod.openchanfix requires threading
-dnl support - if we don't have it, tell the user so they can fix it.
-if [test $build_modopenchanfix = true]; then
-	if [test "x$threadLib" = "x"]; then
-		AC_MSG_ERROR(mod.openchanfix requires THREAD support - which you lack.)
-	fi
-	if [test "x$BOOST_THREAD_LIB" = "x"]; then
-		AC_MSG_ERROR(mod.openchanfix requires Boost::Thread support - which you lack.)
-	fi
-fi
-
 AM_CONDITIONAL(COND_MODCCONTROL,[test $build_modccontrol = true])
 AM_CONDITIONAL(COND_MODCHANFIX,[test $build_modchanfix = true])
 AM_CONDITIONAL(COND_MODCLIENTEXAMPLE,[test $build_modclientExample = true])
@@ -509,8 +460,23 @@ tools/checkgnuworld.sh])
 
 AC_OUTPUT
 
-echo
-echo Configuration has been finished, and everything seems to be all right.
-echo Now, you have the chance to modify include/gnuworld_config.h to set your
-echo preferred options...
-echo
+echo ""
+echo "##########################"
+echo "# GNUWorld Configuration #"
+echo "##########################"
+echo ""
+echo "Configuration of GNUWorld is complete - you're almost ready to run 'make'..."
+echo ""
+echo "Check the following files for modification before building:"
+echo "  include/gnuworld_config.h"
+
+if [test $build_modcservice = true]; then
+	echo "  mod.cservice/cservice_config.h"
+fi
+
+if [test $build_modopenchanfix = true]; then
+	echo "  mod.openchanfix/chanfix_config.h"
+fi
+
+echo ""
+

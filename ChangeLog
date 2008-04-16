@@ -1,4 +1,12 @@
-// $Id: ChangeLog,v 1.156 2008/01/09 23:05:53 kewlio Exp $ //
+// $Id: ChangeLog,v 1.157 2008/04/16 15:25:46 danielaustin Exp $ //
+
+2008-04-16	Dan-m00 <daniel@undernet.org>
+		* configure.ac: Removed boost requirement for chanfix, altered
+			output for for ./configure script and tidied up old
+			leftover configure code.
+		* configure:
+		* libltdl/acinclude.m4:
+		* */Makefile.in: Rebuilt configure/make system
 
 2008-01-09	Dan-m00 <daniel@undernet.org>
 		* mod.cservice/PURGECommand: check global and channel lists for
