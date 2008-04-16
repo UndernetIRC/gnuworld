@@ -1,4 +1,15 @@
-// $Id: ChangeLog,v 1.157 2008/04/16 15:25:46 danielaustin Exp $ //
+// $Id: ChangeLog,v 1.158 2008/04/16 20:29:35 danielaustin Exp $ //
+
+2008-04-16	Dan-m00 <daniel@undernet.org>
+		* include/Channel.h:
+		* libircu/msg_B.cc:
+		* libircu/msg_CM.cc:
+		* libircu/msg_M.cc:
+		* src/Channel.cc:
+		* src/Network.cc:
+		* src/client.cc:
+		* src/server.cc: Add support for ircu2.10.12.13's new '+R' mode
+			(registered channel)
 
 2008-04-16	Dan-m00 <daniel@undernet.org>
 		* configure.ac: Removed boost requirement for chanfix, altered

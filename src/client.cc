@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: client.cc,v 1.88 2008/01/02 17:32:49 kewlio Exp $
+ * $Id: client.cc,v 1.89 2008/04/16 20:29:39 danielaustin Exp $
  */
 
 #include	<new>
@@ -47,7 +47,7 @@
 #include	"ELog.h"
 #include	"events.h"
 
-RCSTAG("$Id: client.cc,v 1.88 2008/01/02 17:32:49 kewlio Exp $" ) ;
+RCSTAG("$Id: client.cc,v 1.89 2008/04/16 20:29:39 danielaustin Exp $" ) ;
 
 namespace gnuworld
 {
@@ -2335,6 +2335,11 @@ for( string::size_type modePos = 0 ; modePos < modes.size() ; ++modePos )
 			break;
 		case 'r':  //Registered Only?
 			theChan->removeMode(Channel::MODE_R);
+			modeVector.push_back( make_pair( false,
+				Channel::MODE_R ) ) ;
+			break;
+		case 'R':  // Registered Channel
+			theChan->removeMode(Channel::MODE_REG);
 			modeVector.push_back( make_pair( false,
 				Channel::MODE_R ) ) ;
 			break;

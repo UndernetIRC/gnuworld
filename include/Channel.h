@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: Channel.h,v 1.36 2005/09/29 17:40:06 kewlio Exp $
+ * $Id: Channel.h,v 1.37 2008/04/16 20:29:36 danielaustin Exp $
  */
 
 #ifndef __CHANNEL_H
-#define __CHANNEL_H "$Id: Channel.h,v 1.36 2005/09/29 17:40:06 kewlio Exp $"
+#define __CHANNEL_H "$Id: Channel.h,v 1.37 2008/04/16 20:29:36 danielaustin Exp $"
 
 #include	<string>
 #include	<map>
@@ -99,6 +99,9 @@ public:
 
 	/// Bit representing channel mode +r
 	static const modeType	MODE_R ;
+
+	/// Bit representing channel mode +R
+	static const modeType	MODE_REG ;
 
 	/// Bit representing channel mode +D
 	static const modeType	MODE_D ;

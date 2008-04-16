@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server.cc,v 1.224 2007/12/26 20:44:24 kewlio Exp $
+ * $Id: server.cc,v 1.225 2008/04/16 20:29:39 danielaustin Exp $
  */
 
 #include	<sys/time.h>
@@ -70,7 +70,7 @@
 #include	"ConnectionHandler.h"
 #include	"Connection.h"
 
-RCSTAG( "$Id: server.cc,v 1.224 2007/12/26 20:44:24 kewlio Exp $" ) ;
+RCSTAG( "$Id: server.cc,v 1.225 2008/04/16 20:29:39 danielaustin Exp $" ) ;
 
 namespace gnuworld
 {
@@ -1717,6 +1717,12 @@ if( !chanModes.empty() &&
 				else
 					theChan->removeMode( Channel::MODE_R ) ;
 				break ;
+			case 'R':
+				if( plus )
+					theChan->setMode( Channel::MODE_REG ) ;
+				else
+					theChan->removeMode( Channel::MODE_REG ) ;
+				break ;
 			case 'D':
 				if( plus )
 					theChan->setMode( Channel::MODE_D ) ;
@@ -1970,6 +1976,10 @@ if( theChan->getMode( Channel::MODE_R ) )
 	{
 	modeVector.push_back( make_pair( false, Channel::MODE_R ) ) ;
 	}
+if( theChan->getMode( Channel::MODE_REG ) )
+	{
+	modeVector.push_back( make_pair( false, Channel::MODE_REG ) ) ;
+	}
 if( theChan->getMode( Channel::MODE_D ) )
 	{
 	modeVector.push_back( make_pair( false, Channel::MODE_D ) ) ;
@@ -2061,6 +2071,7 @@ bool xServer::Mode( xClient* theClient,
 {
 assert( theChan != 0 ) ;
 
+
 /*
 elog	<< "xServer::Mode> theChan: "
 	<< *theChan
@@ -2130,6 +2141,7 @@ chanModes[ 'm' ] = Channel::MODE_M ;
 chanModes[ 'n' ] = Channel::MODE_N ;
 chanModes[ 'p' ] = Channel::MODE_P ;
 chanModes[ 'r' ] = Channel::MODE_R ;
+chanModes[ 'R' ] = Channel::MODE_REG ;
 chanModes[ 's' ] = Channel::MODE_S ;
 chanModes[ 't' ] = Channel::MODE_T ;
 chanModes[ 'D' ] = Channel::MODE_D ;
@@ -2202,6 +2214,7 @@ for( ; tokenIndex < st.size() ; )
 			case 'n':
 			case 'p':
 			case 'r':
+			case 'R':
 			case 's':
 			case 't':
 			case 'D':
@@ -3129,6 +3142,9 @@ for( string::const_iterator ptr = st[ 0 ].begin() ; ptr != st[ 0 ].end() ;
 			break ;
 		case 'r':
 			theChan->setMode( Channel::MODE_R ) ;
+			break ;
+		case 'R':
+			theChan->setMode( Channel::MODE_REG ) ;
 			break ;
 		case 'D':
 			theChan->setMode( Channel::MODE_D ) ;

@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: Channel.cc,v 1.54 2005/10/03 23:55:07 kewlio Exp $
+ * $Id: Channel.cc,v 1.55 2008/04/16 20:29:37 danielaustin Exp $
  */
 
 #include	<new>
@@ -38,7 +38,7 @@
 #include	"server.h"
 #include	"ConnectionManager.h"
 
-RCSTAG("$Id: Channel.cc,v 1.54 2005/10/03 23:55:07 kewlio Exp $") ;
+RCSTAG("$Id: Channel.cc,v 1.55 2008/04/16 20:29:37 danielaustin Exp $") ;
 
 namespace gnuworld
 {
@@ -60,6 +60,7 @@ const Channel::modeType Channel::MODE_R = 0x100 ;
 const Channel::modeType Channel::MODE_D = 0x200 ;
 const Channel::modeType Channel::MODE_A = 0x400 ;
 const Channel::modeType Channel::MODE_U = 0x800 ;
+const Channel::modeType Channel::MODE_REG = 0x1000 ;
 
 Channel::Channel( const string& _name,
 	const time_t& _creationTime )
@@ -484,6 +485,7 @@ if( modes & MODE_P )	modeString += 'p' ;
 if( modes & MODE_M )	modeString += 'm' ;
 if( modes & MODE_I )	modeString += 'i' ;
 if( modes & MODE_R )	modeString += 'r' ;
+if( modes & MODE_REG )	modeString += 'R' ;
 if( modes & MODE_D )	modeString += 'D' ;
 
 if( modes & MODE_K )
