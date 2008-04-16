@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: OPERPARTCommand.cc,v 1.14 2005/01/08 23:33:42 dan_karrels Exp $
+ * $Id: OPERPARTCommand.cc,v 1.15 2008/04/16 20:34:39 danielaustin Exp $
  */
 
 #include	<string>
@@ -38,7 +38,7 @@
 #include	"Network.h"
 #include	"cservice_config.h"
 
-const char OPERPARTCommand_cc_rcsId[] = "$Id: OPERPARTCommand.cc,v 1.14 2005/01/08 23:33:42 dan_karrels Exp $" ;
+const char OPERPARTCommand_cc_rcsId[] = "$Id: OPERPARTCommand.cc,v 1.15 2008/04/16 20:34:39 danielaustin Exp $" ;
 
 namespace gnuworld
 {
@@ -111,7 +111,6 @@ bot->logAdminMessage("%s is asking me to leave channel %s",
 		theChan->getName().c_str());
 
 theChan->setInChan(false);
-bot->getUplink()->UnRegisterChannelEvent(theChan->getName(), bot);
 bot->joinCount--;
 
 bot->Part(theChan->getName(), "At the request of an IRC Operator");

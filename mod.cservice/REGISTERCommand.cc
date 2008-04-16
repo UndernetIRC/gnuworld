@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: REGISTERCommand.cc,v 1.22 2007/11/06 13:32:08 kewlio Exp $
+ * $Id: REGISTERCommand.cc,v 1.23 2008/04/16 20:34:43 danielaustin Exp $
  */
 
 #include	<map>
@@ -39,7 +39,7 @@
 #include	"Network.h"
 #include	"responses.h"
 
-const char REGISTERCommand_cc_rcsId[] = "$Id: REGISTERCommand.cc,v 1.22 2007/11/06 13:32:08 kewlio Exp $" ;
+const char REGISTERCommand_cc_rcsId[] = "$Id: REGISTERCommand.cc,v 1.23 2008/04/16 20:34:43 danielaustin Exp $" ;
 
 namespace gnuworld
 {
@@ -290,6 +290,10 @@ bool REGISTERCommand::Exec( iClient* theClient, const string& Message )
 
 	pair<int, int> thePair( newManager->getUserId(), newManager->getChannelId());
 	bot->sqlLevelCache.insert(cservice::sqlLevelHashType::value_type(thePair, newManager));
+
+	/* set channel mode R - tmpChan is created further above */
+	if (tmpChan)
+		bot->getUplink()->Mode(NULL, tmpChan, string("+R"), string() );
 
 	return true;
 }

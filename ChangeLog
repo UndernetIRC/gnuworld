@@ -1,4 +1,16 @@
-// $Id: ChangeLog,v 1.158 2008/04/16 20:29:35 danielaustin Exp $ //
+// $Id: ChangeLog,v 1.159 2008/04/16 20:34:38 danielaustin Exp $ //
+
+2008-04-16	Dan-m00 <daniel@undernet.org>
+		* mod.cservice/cservice.cc:
+		* mod.cservice/JOINCommand.cc:
+		* mod.cservice/OPERJOINCommand.cc:
+		* mod.cservice/OPERPARTCommand.cc:
+		* mod.cservice/PARTCommand.cc:
+		* mod.cservice/PURGECommand.cc:
+		* mod.cservice/REGISTERCommand.cc:
+		* mod.cservice/SETCommand.cc: Add support to cservice module for
+			new '+R' mode.  Also adjust channel events to watch for
+			registered channels even when the bot is not present.
 
 2008-04-16	Dan-m00 <daniel@undernet.org>
 		* include/Channel.h:

@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: JOINCommand.cc,v 1.14 2003/06/28 01:21:20 dan_karrels Exp $
+ * $Id: JOINCommand.cc,v 1.15 2008/04/16 20:34:39 danielaustin Exp $
  */
 
 
@@ -36,7 +36,7 @@
 #include	"responses.h"
 #include	"Network.h"
 
-const char JOINCommand_cc_rcsId[] = "$Id: JOINCommand.cc,v 1.14 2003/06/28 01:21:20 dan_karrels Exp $" ;
+const char JOINCommand_cc_rcsId[] = "$Id: JOINCommand.cc,v 1.15 2008/04/16 20:34:39 danielaustin Exp $" ;
 
 namespace gnuworld
 {
@@ -100,9 +100,9 @@ if (theChan->getInChan())
 bot->writeChannelLog(theChan, theClient, sqlChannel::EV_JOIN, "");
 
 theChan->setInChan(true);
-bot->getUplink()->RegisterChannelEvent( theChan->getName(), bot);
+/* force setting mode +R - it is probably set already, but doesn't hurt to check */
 bot->Join(theChan->getName(),
-	"",
+	"+R",
 	theChan->getChannelTS(),
 	false);
 bot->joinCount++;

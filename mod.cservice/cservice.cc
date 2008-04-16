@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: cservice.cc,v 1.284 2008/01/02 17:32:49 kewlio Exp $
+ * $Id: cservice.cc,v 1.285 2008/04/16 20:34:44 danielaustin Exp $
  */
 
 #include	<new>
@@ -415,20 +415,24 @@ void cservice::BurstChannels()
  	 *   is on.
  	 */
 
+	Channel* tmpChan;
 	sqlChannelHashType::iterator ptr = sqlChannelCache.begin();
 	while (ptr != sqlChannelCache.end())
 	{
 	sqlChannel* theChan = (ptr)->second;
 
+	/* we're now interested in registered channels even if we're not in it... */
+	MyUplink->RegisterChannelEvent( theChan->getName(), this ) ;
+
 	if ( (theChan->getFlag(sqlChannel::F_AUTOJOIN)) && (theChan->getName() != "*") )
 		{
+		string tempModes = theChan->getChannelMode();
+		tempModes += 'R';
 		MyUplink->JoinChannel( this,
 			theChan->getName(),
-			theChan->getChannelMode(),
+			tempModes,
 			theChan->getChannelTS(),
 			true );
-
-		MyUplink->RegisterChannelEvent( theChan->getName(), this ) ;
 
 		theChan->setInChan(true);
 		joinCount++;
@@ -436,13 +440,26 @@ void cservice::BurstChannels()
 			if (getConfigVar("BAN_CHECK_ON_BURST")->asInt() == 1)
 			{
 				/* check current inhabitants of the channel against our banlist */
-				Channel* tmpChan = Network->findChannel(theChan->getName());
+				tmpChan = Network->findChannel(theChan->getName());
 				for (Channel::userIterator chanUsers = tmpChan->userList_begin();
 					chanUsers != tmpChan->userList_end(); ++chanUsers)
 				{
 					ChannelUser* tmpUser = chanUsers->second;
 					/* check if this user is banned */
 					(void)checkBansOnJoin(tmpChan, theChan, tmpUser->getClient());
+				}
+			}
+		} else {
+			if (theChan->getName() != "*")
+			{
+				/* although AUTOJOIN isn't set, set the channel to +R if
+				 * it exists on the Network.
+				 */
+				tmpChan = Network->findChannel(theChan->getName());
+				if (tmpChan)
+				{
+					string tempModes = "+R";
+					MyUplink->Mode(NULL, tmpChan, tempModes, string() );
 				}
 			}
 		}
@@ -2174,7 +2191,6 @@ void cservice::cacheExpireLevels()
 			 */
 
 			theChan->setInChan(false);
-			MyUplink->UnRegisterChannelEvent(theChan->getName(), this);
 			theChan->removeFlag(sqlChannel::F_AUTOJOIN);
 			theChan->commit();
 			joinCount--;
@@ -3434,6 +3450,12 @@ switch( whichEvent )
 				<< endl;
 			return ;
 			}
+
+		/* This is a registered channel, check it is set +R.
+		 * If not, set it to +R (channel creation)
+		 */
+		if (!theChan->getMode(Channel::MODE_REG))
+			MyUplink->Mode(NULL, theChan, string("+R"), string() );
 
 		/*
 		 * First thing we do - check if this person is banned.

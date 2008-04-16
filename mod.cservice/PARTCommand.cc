@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: PARTCommand.cc,v 1.16 2003/06/28 01:21:20 dan_karrels Exp $
+ * $Id: PARTCommand.cc,v 1.17 2008/04/16 20:34:40 danielaustin Exp $
  */
 
 
@@ -35,7 +35,7 @@
 #include	"responses.h"
 #include	"Network.h"
 
-const char PARTCommand_cc_rcsId[] = "$Id: PARTCommand.cc,v 1.16 2003/06/28 01:21:20 dan_karrels Exp $" ;
+const char PARTCommand_cc_rcsId[] = "$Id: PARTCommand.cc,v 1.17 2008/04/16 20:34:40 danielaustin Exp $" ;
 
 namespace gnuworld
 {
@@ -100,7 +100,6 @@ if (level < level::part)
 	}
 
 theChan->setInChan(false);
-bot->getUplink()->UnRegisterChannelEvent(theChan->getName(), bot);
 bot->joinCount--;
 
 /* Forced access. */

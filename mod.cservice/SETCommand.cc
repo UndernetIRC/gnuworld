@@ -33,7 +33,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: SETCommand.cc,v 1.63 2007/12/31 14:16:43 kewlio Exp $
+ * $Id: SETCommand.cc,v 1.64 2008/04/16 20:34:44 danielaustin Exp $
  */
 
 #include	<string>
@@ -45,7 +45,7 @@
 #include	"responses.h"
 #include	"cservice_config.h"
 
-const char SETCommand_cc_rcsId[] = "$Id: SETCommand.cc,v 1.63 2007/12/31 14:16:43 kewlio Exp $" ;
+const char SETCommand_cc_rcsId[] = "$Id: SETCommand.cc,v 1.64 2008/04/16 20:34:44 danielaustin Exp $" ;
 
 namespace gnuworld
 {
@@ -766,7 +766,6 @@ else
 	    {
 	    	theChan->setFlag(sqlChannel::F_AUTOJOIN);
 			theChan->setInChan(true);
-			bot->getUplink()->RegisterChannelEvent( theChan->getName(), bot ) ;
 			bot->Join(theChan->getName(), theChan->getChannelMode(),
 				theChan->getChannelTS(), false);
 			bot->joinCount++;
@@ -782,7 +781,6 @@ else
 	    	theChan->removeFlag(sqlChannel::F_AUTOJOIN);
 			theChan->setInChan(false);
 			bot->joinCount--;
-			bot->getUplink()->UnRegisterChannelEvent( theChan->getName(), bot ) ;
 			bot->Part(theChan->getName());
 		}
 	    else

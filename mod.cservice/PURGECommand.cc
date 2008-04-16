@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: PURGECommand.cc,v 1.21 2008/01/09 23:05:53 kewlio Exp $
+ * $Id: PURGECommand.cc,v 1.22 2008/04/16 20:34:40 danielaustin Exp $
  */
 
 #include	<string>
@@ -39,7 +39,7 @@
 #include	"responses.h"
 #include	"cservice_config.h"
 
-const char PURGECommand_cc_rcsId[] = "$Id: PURGECommand.cc,v 1.21 2008/01/09 23:05:53 kewlio Exp $" ;
+const char PURGECommand_cc_rcsId[] = "$Id: PURGECommand.cc,v 1.22 2008/04/16 20:34:40 danielaustin Exp $" ;
 
 namespace gnuworld
 {
@@ -319,7 +319,12 @@ bot->writeChannelLog(theChan,
 /* Remove from cache.. part channel. */
 bot->sqlChannelCache.erase(theChan->getName());
 bot->sqlChannelIDCache.erase(theChan->getID());
+/* no longer interested in this channel */
 bot->getUplink()->UnRegisterChannelEvent( theChan->getName(), bot ) ;
+/* remove mode 'R' (no longer registered) */
+Channel* tmpChan = Network->findChannel(theChan->getName());
+if (tmpChan)
+	bot->getUplink()->Mode(NULL, tmpChan, string("-R"), string() );
 bot->Part(theChan->getName());
 bot->joinCount--;
 
