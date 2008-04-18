@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: cservice.cc,v 1.286 2008/04/18 11:08:09 danielaustin Exp $
+ * $Id: cservice.cc,v 1.287 2008/04/18 11:09:24 danielaustin Exp $
  */
 
 #include	<new>
@@ -2837,7 +2837,6 @@ sqlUserHashType::iterator ptr = sqlUserCache.find(theUser);
 
 if(ptr != sqlUserCache.end())
 	{
-	sqlUser* tmpUser = ptr->second;
 	flagString = 'L';
 	/* (depreciated)
 	 * if(tmpUser->getFlag(sqlUser::F_LOGGEDIN)) flagString += 'U';
