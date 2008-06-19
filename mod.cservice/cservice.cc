@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: cservice.cc,v 1.289 2008/06/19 23:04:43 danielaustin Exp $
+ * $Id: cservice.cc,v 1.290 2008/06/19 23:17:24 danielaustin Exp $
  */
 
 #include	<new>
@@ -2914,11 +2914,11 @@ void cservice::OnChannelModeO( Channel* theChan, ChannelUser* theChanUser,
 sqlChannel* reggedChan = getChannelRecord(theChan->getName());
 if(!reggedChan)
 	{
-	elog	<< "cservice::OnChannelModeO> WARNING, unable to "
-		<< "locate channel record"
-		<< " for registered channel event: "
-		<< theChan->getName()
-		<< endl;
+//	elog	<< "cservice::OnChannelModeO> WARNING, unable to "
+//		<< "locate channel record"
+//		<< " for registered channel event: "
+//		<< theChan->getName()
+//		<< endl;
 	return;
 	}
 
