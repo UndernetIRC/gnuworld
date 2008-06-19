@@ -1,4 +1,9 @@
-// $Id: ChangeLog,v 1.161 2008/04/18 11:33:26 danielaustin Exp $ //
+// $Id: ChangeLog,v 1.162 2008/06/19 22:38:35 danielaustin Exp $ //
+
+2008-06-19	Dan-m00 <daniel@undernet.org>
+		* mod.ccontrol/ccontrol.cc:
+		* mod.cservice/cservice.cc: Send SILENCE removals to (*) all
+			targets rather than a specific target.  *bug fix*
 
 2008-04-18	Dan-m00 <daniel@undernet.org>
 		* doc/autokill.sql: Modify autokill script to work with pgsql

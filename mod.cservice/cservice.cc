@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: cservice.cc,v 1.287 2008/04/18 11:09:24 danielaustin Exp $
+ * $Id: cservice.cc,v 1.288 2008/06/19 22:38:43 danielaustin Exp $
  */
 
 #include	<new>
@@ -1888,7 +1888,7 @@ while (ptr != silenceList.end())
 		stringstream s;
 		s	<< getCharYYXXX()
 			<< " SILENCE "
-			<< ptr->second.second
+			<< "*"
 			<< " -"
 			<< theMask
 			<< ends;

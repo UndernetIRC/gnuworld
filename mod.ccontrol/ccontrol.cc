@@ -20,7 +20,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccontrol.cc,v 1.219 2008/01/03 04:26:22 kewlio Exp $
+ * $Id: ccontrol.cc,v 1.220 2008/06/19 22:38:57 danielaustin Exp $
 */
 
 #define MAJORVER "1"
@@ -66,7 +66,7 @@
 #include	"ccontrol_generic.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: ccontrol.cc,v 1.219 2008/01/03 04:26:22 kewlio Exp $" ) ;
+RCSTAG( "$Id: ccontrol.cc,v 1.220 2008/06/19 22:38:57 danielaustin Exp $" ) ;
 
 namespace gnuworld
 {
@@ -4338,7 +4338,7 @@ for(ignoreIterator ptr = ignore_begin();ptr!=ignore_end();)
 		stringstream s;
 		s	<< getCharYYXXX() 
 			<< " SILENCE " 
-			<< tempLogin->getNumeric() 
+			<< "*"
 			<< " -" 
 			<< tempLogin->getIgnoredHost()
 			<< ends; 
@@ -4428,7 +4428,7 @@ for(ignoreIterator ptr = ignore_begin();ptr!=ignore_end();)
 		stringstream s;
 		s	<< getCharYYXXX() 
 			<< " SILENCE " 
-			<< tempLogin->getNumeric() 
+			<< "*"
 			<< " -" 
 			<< tempLogin->getIgnoredHost()
 			<< ends; 
