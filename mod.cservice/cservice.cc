@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: cservice.cc,v 1.288 2008/06/19 22:38:43 danielaustin Exp $
+ * $Id: cservice.cc,v 1.289 2008/06/19 23:04:43 danielaustin Exp $
  */
 
 #include	<new>
@@ -3444,11 +3444,11 @@ switch( whichEvent )
 		sqlChannel* reggedChan = getChannelRecord(theChan->getName());
 		if(!reggedChan)
 			{
-			elog	<< "cservice::OnChannelEvent> WARNING, "
-				<< "unable to locate channel record"
-				<< " for registered channel event: "
-				<< theChan->getName()
-				<< endl;
+//			elog	<< "cservice::OnChannelEvent> WARNING, "
+//				<< "unable to locate channel record"
+//				<< " for registered channel event: "
+//				<< theChan->getName()
+//				<< endl;
 			return ;
 			}
 

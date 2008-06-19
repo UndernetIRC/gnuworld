@@ -1,4 +1,7 @@
-// $Id: ChangeLog,v 1.162 2008/06/19 22:38:35 danielaustin Exp $ //
+// $Id: ChangeLog,v 1.163 2008/06/19 23:04:36 danielaustin Exp $ //
+
+2008-06-19	Dan-m00 <daniel@undernet.org>
+		* mod.cservice/cservice.cc: stop unregistered channel msgs.
 
 2008-06-19	Dan-m00 <daniel@undernet.org>
 		* mod.ccontrol/ccontrol.cc:
