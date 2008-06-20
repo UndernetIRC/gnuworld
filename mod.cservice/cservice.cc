@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: cservice.cc,v 1.290 2008/06/19 23:17:24 danielaustin Exp $
+ * $Id: cservice.cc,v 1.291 2008/06/20 00:29:03 danielaustin Exp $
  */
 
 #include	<new>
@@ -3457,6 +3457,16 @@ switch( whichEvent )
 		 */
 		if (!theChan->getMode(Channel::MODE_REG))
 			MyUplink->Mode(NULL, theChan, string("+R"), string() );
+
+		/* If this is a registered channel, but we're not in it -
+		 * then we're not interested in the following commands!
+		 */
+		if (!reggedChan->getInChan())
+		{
+			xClient::OnChannelEvent( whichEvent, theChan,
+				data1, data2, data3, data4 );
+			break;
+		}
 
 		/*
 		 * First thing we do - check if this person is banned.

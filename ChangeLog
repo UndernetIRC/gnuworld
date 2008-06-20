@@ -1,4 +1,8 @@
-// $Id: ChangeLog,v 1.163 2008/06/19 23:04:36 danielaustin Exp $ //
+// $Id: ChangeLog,v 1.164 2008/06/20 00:28:49 danielaustin Exp $ //
+
+2008-06-20	Dan-m00 <daniel@undernet.org>
+		* mod.cservice/cservice.cc: fix a problem when X is not in a 
+			channel (due to +R modifications)
 
 2008-06-19	Dan-m00 <daniel@undernet.org>
 		* mod.cservice/cservice.cc: stop unregistered channel msgs.
