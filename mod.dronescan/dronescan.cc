@@ -121,7 +121,9 @@ ncInterval = atoi(dronescanConfig->Require("ncInterval")->second.c_str());
 ncCutoff = atoi(dronescanConfig->Require("ncCutoff")->second.c_str());
 rcInterval = atoi(dronescanConfig->Require("rcInterval")->second.c_str());
 jcMinJoinToGline = atoi(dronescanConfig->Require("jcMinJoinToGline")->second.c_str());
+jcMinJFSizeToGline = atoi(dronescanConfig->Require("jcMinJFSizeToGline")->second.c_str());
 jcGlineEnable = atoi(dronescanConfig->Require("jcGlineEnable")->second.c_str()) == 1 ? true : false;
+jcGlineEnableConf = jcGlineEnable;
 jcGlineReason = dronescanConfig->Require("jcGlineReason")->second.c_str();
 jcGlineLength = atoi(dronescanConfig->Require("jcGlineLength")->second.c_str());
 gbCount = atoi(dronescanConfig->Require("gbCount")->second.c_str());
@@ -506,7 +508,44 @@ void dronescan::OnPrivateMessage( iClient* theClient,
 		{
 		string Option = string_upper(st[1]);
 
-		/* Global entropy options */
+		//Glines on/off
+		if("GL" == Option) {
+			if ("ON" == string_upper(st[2])) {
+				if (jcGlineEnable) {
+					Reply(theClient, "I am already setting glines - no change");
+					return ;
+				}
+				else {
+					if (jcGlineEnableConf) {
+						jcGlineEnable = true;
+						Reply(theClient, "Auto-glines activated");
+						log(INFO, "%s is activating auto-glines", theClient->getNickName().c_str());
+					}
+					else {
+						Reply(theClient, "You have to enable auto-glines in the conf first");
+					}
+					return ;
+				}
+			}
+			else if ("OFF" == string_upper(st[2])) {
+				if (!jcGlineEnable) {
+					Reply(theClient, "I'm not setting glines - no change");
+					return ;
+				}
+				else {
+					jcGlineEnable = false;
+					Reply(theClient, "Glines deactivated");
+					log(INFO, "%s is deactivating auto-glines", theClient->getNickName().c_str());
+					return ;
+				}
+			}
+			else {
+				Reply(theClient, "Syntax: set GL <ON|OFF>");
+				return ;
+			}
+		}
+
+			/* Global entropy options */
 		if("CC" == Option)
 			{
 			unsigned int newCC = atoi(st[2].c_str());
@@ -730,6 +769,7 @@ for(jcChanMapType::const_iterator itr = jcChanMap.begin() ;
 		std::stringstream names;
 		std::stringstream excluded; 
 		std::stringstream tempNames;
+		bool isoktogline = (jcGlineEnable && jChannel->getNumOfJoins() > jcMinJFSizeToGline && jChannel->getNumOfParts() > jcMinJFSizeToGline) ? true : false;
 		for(;joinPartIt != joinPartEnd; ++joinPartIt )
 			{
 				int numOfUsernames = 0;
@@ -751,7 +791,7 @@ for(jcChanMapType::const_iterator itr = jcChanMap.begin() ;
 							{
 							tempNames 	<< theClient->getNickName() 
 								<< ",";
-							if(jcGlineEnable)
+							if (isoktogline == true)
 								{
 								clients.push_back(theClient->getNickName() + "!" + theClient->getUserName() +"@"
 									+ xIP(theClient->getIP()).GetNumericIP() + " " + theClient->getDescription());
@@ -762,11 +802,11 @@ for(jcChanMapType::const_iterator itr = jcChanMap.begin() ;
 						tempNames << "}";
 						if(names.str().size() + tempNames.str().size() > 400)
 								{
-								outputNames(itr->first,names,false);
+								outputNames(itr->first,names,false,isoktogline);
 								}
 						names << " " << tempNames.str();
 						tempNames.str("");
-						if(jcGlineEnable)
+						if (isoktogline == true)
 								{
 								glineData* theGline = new (std::nothrow) glineData("*@" +joinPartIt->first,jcGlineReason,jcGlineLength);
 								glined.push_back(std::pair<glineData*,std::list<std::string> >(theGline,clients));
@@ -785,7 +825,7 @@ for(jcChanMapType::const_iterator itr = jcChanMap.begin() ;
 					excluded << "],";
 					if(excluded.str().size() > 400)
 						{
-						outputNames(itr->first,excluded,true);
+						outputNames(itr->first,excluded,true,isoktogline);
 						}	  
 
 #ifdef ENABLE_LOG4CPLUS
@@ -819,13 +859,13 @@ for(jcChanMapType::const_iterator itr = jcChanMap.begin() ;
 			}
 		if(names.str().size() > 0)
 			{
-			outputNames(itr->first,names,false);
+			outputNames(itr->first,names,false,isoktogline);
 			}
 		if(excluded.str().size() > 0)
 			{
-			outputNames(itr->first,excluded,true);
+			outputNames(itr->first,excluded,true,isoktogline);
 			}
-		if(jcGlineEnable)
+		if (isoktogline == true)
 			{ 
 			if(glined.size() <= 5)
 				{
@@ -856,13 +896,25 @@ for(jcChanMapType::const_iterator itr = jcChanMap.begin() ;
 					log(JF_GLINED,(*clientsIt).c_str());
 					}
 #endif
-				glineQueue.push_back(curGline);
+				//Checking if the gline is already present in the queue (Needs to be tested: mod.cloner uses different ips for each client)
+				glineQueueType::iterator git = glineQueue.begin();
+				bool found_gline_in_queue = false;
+				for (; git != glineQueue.end(); ++git) {
+					if (strcasecmp((*git)->getHost().c_str(),curGline->getHost().c_str()) == 0)
+						found_gline_in_queue = true;
+				}
+				//skipping findGline() check, cpu expensive.
+				//if ((MyUplink->findGline(curGline->getHost()) == 0) && (found_gline_in_queue == false)) {
+				if (found_gline_in_queue == false) {
+					glineQueue.push_back(curGline);
+				}
 				} 
 			else {
 				delete curGline;
 				}
 			}
 
+		log(WARN, "Total addresses glined: %d", glined.size());
 		}
 	
 	delete itr->second;
@@ -879,10 +931,11 @@ tidClearJoinCounter = MyUplink->RegisterTimer(theTime, this, 0);
 
 }
 
-void dronescan::outputNames(const std::string& chanName,std::stringstream& names,bool exclude)
+void dronescan::outputNames(const std::string& chanName,std::stringstream& names,bool exclude,bool isoktogline)
 {
 names << "\r\n";
-std::string gString = exclude ? "Excluding" : jcGlineEnable ? "Glining" : "Suppose to gline";
+//std::string gString = exclude ? "Excluding" : jcGlineEnable ? "Glining" : "Suppose to gline";
+std::string gString = exclude ? "Excluding" : isoktogline ? "Glining" : "Suppose to gline";
 log(WARN,"%s the following clients from %s: %s",gString.c_str(),
 	chanName.c_str(),names.str().c_str());
 	names.str("");

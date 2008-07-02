@@ -18,7 +18,7 @@
  */
 
 #ifndef DRONESCAN_H
-#define DRONESCAN_H "$Id: dronescan.h,v 1.33 2007/09/01 20:16:57 mrbean_ Exp $"
+#define DRONESCAN_H "$Id: dronescan.h,v 1.34 2008/07/02 17:42:34 mrbean_ Exp $"
 
 #include <map>
 #include <string>
@@ -234,7 +234,9 @@ public:
 	unsigned int jcInterval;
 	unsigned int jcCutoff;
 	unsigned int jcMinJoinToGline;
+	unsigned int jcMinJFSizeToGline;
 	bool jcGlineEnable;
+	bool jcGlineEnableConf;
 	std::string jcGlineReason;
 	unsigned int jcGlineLength; 
 	unsigned int pcCutoff;			
@@ -275,7 +277,7 @@ public:
 
 protected:
 
-	void outputNames(const std::string&,std::stringstream&,bool);
+	void outputNames(const std::string&,std::stringstream&,bool,bool);
 	/** Configuration file. */
 	EConfig *dronescanConfig;
 
