@@ -18,7 +18,7 @@
  */
 
 #ifndef DRONESCAN_H
-#define DRONESCAN_H "$Id: dronescan.h,v 1.34 2008/07/02 17:42:34 mrbean_ Exp $"
+#define DRONESCAN_H "$Id: dronescan.h,v 1.35 2008/07/20 22:13:04 hidden1 Exp $"
 
 #include <map>
 #include <string>
@@ -209,9 +209,13 @@ public:
 	inline const DS_STATE getCurrentState()
 		{ return currentState; }
 		
+	inline int GetGlineQueueSize()
+		{ return glineQueue.size(); }
+
 	/** Internal variables */
 	userMapType userMap;
 	fcMapType fakeClients;
+	int lastBurstTime;
 
 	/** Typedef of currently seen drone channels */
 	typedef std::map< std::string , activeChannel* > droneChannelsType;

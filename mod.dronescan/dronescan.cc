@@ -191,7 +191,10 @@ elog << "dronescan> Established connection to SQL server." << std::endl;
 /* Preload caches */
 preloadFakeClientCache();
 preloadUserCache();
-preloadExceptionalChannels();
+if (preloadExceptionalChannels() == false) {
+	//If exceptional channels can't be loaded, we don't want glines to be turned on
+	jcGlineEnable = false;
+}
 
 /* Initialise statistics */
 customDataCounter = 0;
@@ -518,7 +521,7 @@ void dronescan::OnPrivateMessage( iClient* theClient,
 				else {
 					if (jcGlineEnableConf) {
 						jcGlineEnable = true;
-						Reply(theClient, "Auto-glines activated");
+						Reply(theClient, "Glines activated");
 						log(INFO, "%s is activating auto-glines", theClient->getNickName().c_str());
 					}
 					else {
@@ -648,6 +651,7 @@ if(!MyUplink->UnRegisterTimer(tidClearJoinCounter, 0) ||
 }
 
 
+
 /** Receive our own timed events. */
 void dronescan::OnTimer( const xServer::timerID& theTimer , void *)
 {
@@ -750,8 +754,9 @@ for(jcChanMapType::const_iterator itr = jcChanMap.begin() ;
 			<< "to find channel: "
 			<< itr->first
 			<< std::endl ;
-		delete itr->second;
-		continue ;
+			/* The join/flood is now reported/glined even if the channel is empty.
+			   We now have to make sure theChan != 0 below.
+			*/
 		}
 	jfChannel* jChannel = itr->second;
 			
@@ -761,7 +766,7 @@ for(jcChanMapType::const_iterator itr = jcChanMap.begin() ;
 			itr->first.c_str(),
 			jChannel->getNumOfJoins(),
 			jChannel->getNumOfParts(),
-			theChan->size()
+			(theChan == 0 ? 0 : theChan->size())
 			);
 		std::list<std::pair<glineData*,std::list<string> > > glined;
 		jfChannel::joinPartMapIterator joinPartIt = jChannel->joinPartBegin();
@@ -769,7 +774,8 @@ for(jcChanMapType::const_iterator itr = jcChanMap.begin() ;
 		std::stringstream names;
 		std::stringstream excluded; 
 		std::stringstream tempNames;
-		bool isoktogline = (jcGlineEnable && jChannel->getNumOfJoins() > jcMinJFSizeToGline && jChannel->getNumOfParts() > jcMinJFSizeToGline) ? true : false;
+		int clientcount = 0;
+		bool isoktogline = ((::time(0) - lastBurstTime) > 15 && jcGlineEnable && jChannel->getNumOfJoins() > jcMinJFSizeToGline && jChannel->getNumOfParts() > jcMinJFSizeToGline) ? true : false;
 		for(;joinPartIt != joinPartEnd; ++joinPartIt )
 			{
 				int numOfUsernames = 0;
@@ -781,7 +787,7 @@ for(jcChanMapType::const_iterator itr = jcChanMap.begin() ;
 					std::list<string>::const_iterator numericsIt = joinPartIt->second.numerics.begin();
 					tempNames << joinPartIt->first.c_str() << std::string("[") 
 					<< joinPartIt->second.numOfJoins 
-					<< std::string("]{");
+					<< std::string("]<");
 					std::list<std::string> clients;
 					for(;numericsIt != joinPartIt->second.numerics.end();++numericsIt)
 						{
@@ -799,7 +805,7 @@ for(jcChanMapType::const_iterator itr = jcChanMap.begin() ;
 								}
 							}
 						}
-						tempNames << "}";
+						tempNames << ">";
 						if(names.str().size() + tempNames.str().size() > 400)
 								{
 								outputNames(itr->first,names,false,isoktogline);
@@ -810,6 +816,7 @@ for(jcChanMapType::const_iterator itr = jcChanMap.begin() ;
 								{
 								glineData* theGline = new (std::nothrow) glineData("*@" +joinPartIt->first,jcGlineReason,jcGlineLength);
 								glined.push_back(std::pair<glineData*,std::list<std::string> >(theGline,clients));
+								clientcount += clients.size();
 								}
 					} else  {
 					excluded << joinPartIt->first.c_str()
@@ -842,7 +849,7 @@ for(jcChanMapType::const_iterator itr = jcChanMap.begin() ;
 								itr->first.c_str(),
 								jChannel->getNumOfJoins(),
 								jChannel->getNumOfParts(),
-								theChan->size()
+								(theChan == 0 ? 0 : theChan->size())
 								);
 								}
 								log(JF_CSERVICE,"%s %s!%s@%s %s",userNamesIt->second.c_str(),
@@ -867,10 +874,12 @@ for(jcChanMapType::const_iterator itr = jcChanMap.begin() ;
 			}
 		if (isoktogline == true)
 			{ 
-			if(glined.size() <= 5)
+			if ((glined.size() < 5) && (clientcount < 8))
 				{
-				log(WARN,"Aboring glines for channel %s because only %d flooding addresses found",
-						itr->first.c_str(),glined.size());
+					if (glined.size() != 0) {
+					log(WARN,"Aborting glines for channel %s because only %d flooding clients from %d addresses were found",
+						itr->first.c_str(),clientcount,glined.size());
+					}
 				}  
 #ifdef ENABLE_LOG4CPLUS
 				else {
@@ -878,7 +887,7 @@ for(jcChanMapType::const_iterator itr = jcChanMap.begin() ;
 				itr->first.c_str(),
 				jChannel->getNumOfJoins(),
 				jChannel->getNumOfParts(),
-				theChan->size(),
+				(theChan == 0 ? 0 : theChan->size()),
 				glined.size());
 				}
 #endif
@@ -887,7 +896,7 @@ for(jcChanMapType::const_iterator itr = jcChanMap.begin() ;
 		for(; glinesIt != glined.end();++glinesIt)
 			{
 			glineData* curGline = glinesIt->first;
-			if(glined.size() > 5)
+			if ((glined.size() >= 5) || (clientcount >= 8))
 				{
 				std::list<string>::iterator clientsIt = glinesIt->second.begin();
 #ifdef ENABLE_LOG4CPLUS
@@ -914,7 +923,8 @@ for(jcChanMapType::const_iterator itr = jcChanMap.begin() ;
 				}
 			}
 
-		log(WARN, "Total addresses glined: %d", glined.size());
+		if ((glined.size() > 0) && (glined.size() > 4))
+			log(WARN, "Glining %d floodbots from %d different ips", clientcount, glined.size());
 		}
 	
 	delete itr->second;
@@ -996,6 +1006,7 @@ void dronescan::changeState(DS_STATE newState)
 			setNickStates();
 			elog	<< "*** DroneScan: Exiting state BURST"
 				<< std::endl;
+			lastBurstTime = ::time(0);
 			break;
 			}
 		case RUN :
