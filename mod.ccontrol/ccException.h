@@ -16,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccException.h,v 1.10 2007/08/28 16:10:06 dan_karrels Exp $
+ * $Id: ccException.h,v 1.11 2008/08/06 19:35:58 hidden1 Exp $
  */
 
 #ifndef __CCEXCEPTION_H
-#define __CCEXCEPTION_H "$Id: ccException.h,v 1.10 2007/08/28 16:10:06 dan_karrels Exp $"
+#define __CCEXCEPTION_H "$Id: ccException.h,v 1.11 2008/08/06 19:35:58 hidden1 Exp $"
 
 #include	<string>
 
@@ -100,7 +100,177 @@ protected:
 	string 		Reason;
 	dbHandle* SQLDb;
 
+};
+
+class ccShellco
+{
+public:	
+	ccShellco(dbHandle* _SQLDb);
+	virtual ~ccShellco();
+	
+
+	inline const bool		isActive() const
+		{ return (active == 1 ? true : false); }
+	inline const string& 		getName() const
+		{ return Name; }
+		
+	inline const int		getID() const
+		{ return id; }
+
+	inline const int		getLimit() const
+		{ return maxlimit; }
+	
+	inline const string&		getAddedBy() const
+		{ return AddedBy; }
+		
+	inline time_t			getAddedOn() const
+		{ return AddedOn; }
+
+	inline const string&		getModBy() const
+		{ return ModBy; }
+		
+	inline time_t			getModOn() const
+		{ return ModOn; }
+
+	inline void 		setName( const string& _Name ) 
+		{ Name = _Name; }
+		
+	inline void		setLimit( const int _maxlimit ) 
+		{  maxlimit = _maxlimit; }
+	
+	inline void		setID( const int _id ) 
+		{  id = _id; }
+
+	inline void		setAddedBy( const string& _AddedBy) 
+		{ AddedBy = _AddedBy; }
+		
+	inline void		setAddedOn( const time_t _AddedOn )
+		{ AddedOn = _AddedOn; }
+	
+	inline void		setModBy( const string& _ModBy) 
+		{ ModBy = _ModBy; }
+		
+	inline void		setModOn( const time_t _ModOn )
+		{ ModOn = _ModOn; }
+		
+	inline void 	setActive( const int _active) 
+		{ active = _active; }
+
+	inline void		setSqldb(dbHandle* _SQLDb)
+		{ SQLDb = _SQLDb; }
+	
+	int		loadData(const string& Name);
+	
+	int		updateData();
+				
+	bool		Insert();
+	
+	bool		Delete();
+	
+	static unsigned int numAllocated;
+
+protected:
+	
+	int			id;
+	string 		Name;
+	int 		maxlimit;
+	int			active;
+	string 		AddedBy;
+	time_t		AddedOn;
+	string 		ModBy;
+	time_t		ModOn;
+	dbHandle* SQLDb;
+
 }; 
+
+class ccShellnb
+{
+public:	
+	ccShellnb(dbHandle* _SQLDb);
+	virtual ~ccShellnb();
+	
+	inline bool operator==( const string& ExceptionHost ) const
+		{ return (!strcasecmp( cidr, ExceptionHost )
+		    || !match(cidr.c_str(),ExceptionHost.c_str())) ; }
+
+	inline const string& 		getCidr() const
+			{ return cidr; }
+		
+	inline const string& 		getCidr1() const
+			{ return cidr1; }
+
+	inline const int 		getCompanyID() const
+			{ return companyid; }
+
+	inline const int 		getCidr2() const
+			{ return cidr2; }
+	
+	inline const string&		getAddedBy() const
+		{ return AddedBy; }
+		
+	inline time_t			getAddedOn() const
+		{ return AddedOn; }
+	
+	inline const string&	get24Mask() const
+		{ return str24; }
+	/*
+	inline const string&		getModBy() const
+		{ return ModBy; }
+		
+	inline time_t			getModOn() const
+		{ return ModOn; }
+	*/
+
+	inline void 		setShellco( ccShellco* _shellco ) 
+		{ shellco = _shellco; }
+
+	inline void 		setCompanyID( const int _companyid ) 
+		{ companyid = _companyid; }
+			
+	inline void		setAddedBy( const string& _AddedBy) 
+		{ AddedBy = _AddedBy; }
+		
+	inline void		setAddedOn( const time_t _AddedOn )
+		{ AddedOn = _AddedOn; }
+
+	/*
+	inline void		setModBy( const string& _ModBy) 
+		{ ModBy = _ModBy; }
+		
+	inline void		setModOn( const time_t _ModOn )
+		{ ModOn = _ModOn; }
+	*/
+
+	void 		setCidr( const string& _cidr );
+	bool		set24Mask();
+
+	inline void		setSqldb(dbHandle* _SQLDb)
+		{ SQLDb = _SQLDb; }
+
+
+	ccShellco*	shellco;
+
+	int		updateData();
+				
+	bool		Insert();
+	
+	bool		Delete();
+	
+	static unsigned int numAllocated;
+
+protected:
+	
+	int			companyid;
+	string 		cidr;
+	string 		cidr1;
+	int			cidr2;
+	string 		AddedBy;
+	time_t		AddedOn;
+	string		str24;
+	dbHandle* SQLDb;
+
+}; 
+
 }
 }
 #endif // __CCEXCEPTION_H

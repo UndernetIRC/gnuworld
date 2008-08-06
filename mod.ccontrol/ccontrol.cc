@@ -20,7 +20,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccontrol.cc,v 1.220 2008/06/19 22:38:57 danielaustin Exp $
+ * $Id: ccontrol.cc,v 1.221 2008/08/06 19:35:59 hidden1 Exp $
 */
 
 #define MAJORVER "1"
@@ -33,6 +33,7 @@
 #include        <netinet/in.h>
 #include        <netdb.h>
 #include	<fcntl.h>
+#include	<list>
 
 #include	<new>
 #include	<string>
@@ -66,7 +67,7 @@
 #include	"ccontrol_generic.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: ccontrol.cc,v 1.220 2008/06/19 22:38:57 danielaustin Exp $" ) ;
+RCSTAG( "$Id: ccontrol.cc,v 1.221 2008/08/06 19:35:59 hidden1 Exp $" ) ;
 
 namespace gnuworld
 {
@@ -626,6 +627,15 @@ RegisterCommand( new EXCEPTIONCommand( this, "EXCEPTIONS",
 	false,
 	operLevel::OPERLEVEL,
 	true ) ) ;
+RegisterCommand( new SHELLSCommand( this, "SHELLS",
+	"(addcompany / addnetblock / delcompany / delnetblock / list / chlimit / chname)",
+	true,
+	commandLevel::flg_SHELLS,
+	false,
+	false,
+	false,
+	operLevel::OPERLEVEL,
+	true ) ) ;
 RegisterCommand( new LISTIGNORESCommand( this, "LISTIGNORES",
 	"List the ignore list",
 	false,
@@ -644,7 +654,7 @@ RegisterCommand( new REMOVEIGNORECommand( this, "REMIGNORE", "(nick/host)"
 	false,
 	operLevel::OPERLEVEL,
 	true ) ) ;
-RegisterCommand( new LISTCommand( this, "LIST", "(glines/servers/nomodechannels/exceptions/channels)"
+RegisterCommand( new LISTCommand( this, "LIST", "(glines/servers/nomodechannels/exceptions/shells/channels)"
 	" Get all kinds of lists from the bot",
 	false,
 	commandLevel::flg_LIST,
@@ -1315,9 +1325,29 @@ switch( theEvent )
 			static_cast< iClient* >( Data1 ) :
 			static_cast< iClient* >( Data2 ) ;
 		--curUsers;
+		string tIP = xIP( tmpUser->getIP()).GetNumericIP();
+				/* Shell stuff here */
+				for (shellnbIterator ptr = shellnbList.begin(); ptr != shellnbList.end(); ptr++) {
+					if (isCidrMatch((*ptr)->getCidr(),tIP)) {
+						if (shellnbMap.find(*ptr) == shellnbMap.end()) {
+							shellnbMap.insert(std::make_pair<ccShellnb*,int>(*ptr, 0));
+						}
+						else {
+							shellnbMap[*ptr]--;
+						}
+	
+						if (shellcoMap.find((*ptr)->shellco) == shellcoMap.end()) {
+							shellcoMap.insert(std::make_pair<ccShellco*,int>((*ptr)->shellco, 0));
+						}
+						else {
+							shellcoMap[(*ptr)->shellco]--;
+						}
+					}
+				}
+				/* End of shell stuff */
 		if(checkClones)
 			{
-				string tIP = xIP( tmpUser->getIP()).GetNumericIP();
+
 	                        /* CIDR checks */
 	                        /* convert ip to longip */
 	                        i = sscanf(tIP.c_str(), "%d.%d.%d.%d", &client_addr[0], &client_addr[1], &client_addr[2], &client_addr[3]);
@@ -1810,8 +1840,13 @@ int i=0, AffectedUsers = 0;
 int client_addr[4] = { 0 };
 unsigned long mask_ip;
 struct in_addr tmp_ip;
-char *client_ip;
+char *clientip;
+char client_ip[19];
 char Log[200], GlineMask[250], GlineReason[250];
+bool isShellException = false;
+int shellglinecounter=0;
+std::stringstream s;
+stringListType *OthersList;
 
 GlineReason[0] = '\0';
 curUsers++;
@@ -1827,11 +1862,90 @@ NewUser->setCustomData(this,
 	static_cast< void* >( UserData ) );
 if(dbConnected)
 	{
+	string tIP = xIP( NewUser->getIP()).GetNumericIP();
+			/* Shell stuff here */
+			for (shellnbIterator ptr = shellnbList.begin(); ptr != shellnbList.end(); ptr++) {
+				if (isCidrMatch((*ptr)->getCidr(),tIP)) {
+					if (shellnbMap.find(*ptr) == shellnbMap.end()) {
+						shellnbMap.insert(std::make_pair<ccShellnb*,int>(*ptr, 1));
+					}
+					else {
+						shellnbMap[*ptr]++;
+					}
+
+					if (shellcoMap.find((*ptr)->shellco) == shellcoMap.end()) {
+						shellcoMap.insert(std::make_pair<ccShellco*,int>((*ptr)->shellco, 1));
+					}
+					else {
+						shellcoMap[(*ptr)->shellco]++;
+					}
+					if ((*ptr)->shellco->isActive()) {
+						isShellException = true;
+						if (shellcoMap[(*ptr)->shellco] > (*ptr)->shellco->getLimit()) {
+							for (shellnbIterator nptr = shellnbList.begin(); nptr != shellnbList.end(); nptr++) {
+								if ((*nptr)->shellco == (*ptr)->shellco) {
+
+									shellglinecounter++;
+									if ((shellglinecounter == 1) || (s.str().size() > 250)) {
+										if (s.str().size() > 250)
+											MsgChanLog("%s", s.str().c_str());
+										s.str("");
+										s << "Excessive connections (" << shellcoMap[(*ptr)->shellco] << ") from SHELL " << (*ptr)->shellco->getName().c_str() << " (will GLINE): *@";
+									}
+									else
+										s << ", *@";
+									s << (*nptr)->getCidr() << " (" << shellnbMap[*nptr] << ")";
+									sprintf(Log,"Glining SHELL *@%s (%s) for excessive connections (%d)",
+										(*nptr)->getCidr().c_str(), (*nptr)->shellco->getName().c_str(), shellnbMap[(*nptr)]);
+									sprintf(GlineMask,"*@%s", (*nptr)->getCidr().c_str());
+									//AffectedUsers = shellnbMap[(*nptr)];
+									AffectedUsers = shellcoMap[(*nptr)->shellco];
+									/* set the gline reason */
+									//sprintf(GlineReason,"AUTO [%d] Automatically banned for excessive connections",AffectedUsers);
+									sprintf(GlineReason,"AUTO [%d] (shell: %s) Automatically banned for excessive connections",AffectedUsers, (*nptr)->shellco->getName().c_str());
+									gDuration = maxGlineLen;
+
+				iClient* theClient = Network->findClient(this->getCharYYXXX());
+#ifndef LOGTOHD
+				DailyLog(theClient,"%s",Log);
+#else
+				ccLog* newLog = new (std::nothrow) ccLog();
+				newLog->Time = ::time(0);
+				newLog->Desc = Log;
+				newLog->Host = theClient->getRealNickUserHost().c_str();
+				newLog->User = "Me";			
+				newLog->CommandName = "AUTOGLINE";
+				DailyLog(newLog);
+#endif
+				glSet = true;
+				ccGline *tmpGline;
+				tmpGline = new ccGline(SQLDb);
+				tmpGline->setHost(GlineMask);
+				tmpGline->setExpires(::time(0) + gDuration);
+				tmpGline->setReason(GlineReason);
+				tmpGline->setAddedOn(::time(0));
+				tmpGline->setAddedBy(nickName);
+				tmpGline->setLastUpdated(::time(0));
+				tmpGline->Insert();
+				tmpGline->loadData(tmpGline->getHost());
+				addGline(tmpGline);
+				if(!getUplink()->isBursting())
+					addGlineToUplink(tmpGline);
+								}
+							}
+							MsgChanLog("%s", s.str().c_str());
+						}
+					}
+				}
+			}
+			/* End of shell stuff */
+
 	if(checkClones)
 		{
-		string tIP = xIP( NewUser->getIP()).GetNumericIP();
 		if(strcasecmp(tIP,"0.0.0.0"))			
 			{
+			
+
                                 /* CIDR checks */
                                 /* convert ip to longip */
                                 i = sscanf(tIP.c_str(), "%d.%d.%d.%d", &client_addr[0], &client_addr[1], &client_addr[2], &client_addr[3]);
@@ -1850,11 +1964,14 @@ if(dbConnected)
                                 /* convert longip back to ip */
                                 mask_ip = htonl(mask_ip);
 				tmp_ip.s_addr = mask_ip;
-                                client_ip = inet_ntoa(tmp_ip);
+                                clientip = inet_ntoa(tmp_ip);
+								strncpy(client_ip, clientip, 18);
+								client_ip[18] = '\0';
 				sprintf(Log, "%s/%d-%s", client_ip, CClonesCIDR, NewUser->getUserName().c_str());
 				int CurIdentConnections = ++clientsIp24IdentMap[Log];
                                 int CurCIDRConnections = ++clientsIp24Map[client_ip];
                                 sprintf(Log,"*@%s/%d", client_ip, CClonesCIDR);
+
 
 				/* check idents to see if we have too many */
 				if (CurIdentConnections > maxIClones)
@@ -1881,17 +1998,117 @@ if(dbConnected)
 					}
 				}
   
-                                if ((CurCIDRConnections > maxCClones) && (CurCIDRConnections > getExceptions(NewUser->getUserName()+"@" + tIP)) &&
+				if ((!isShellException) && (CurCIDRConnections > maxCClones) && (CurCIDRConnections > getExceptions(NewUser->getUserName()+"@" + tIP)) &&
                                         (CurCIDRConnections > getExceptions(NewUser->getUserName()+"@"+NewUser->getRealInsecureHost())))
 				{
+						// Shell stuff again here
+						if (CClonesCIDR == 24)
+						{
+							int NewLimit = maxCClones;
+							int m = 256;
+							OthersList = 0;
+							int theCount = CurCIDRConnections;
+							string strclient_ip = string(client_ip);
+							for (shellnbIterator ptr = shellnbList.begin(); ptr != shellnbList.end(); ptr++)
+							{
+								//elog << "ShellDebug: " << (*ptr)->getCidr() << ":  get24Mask(): " << (*ptr)->get24Mask() << " client_ip: " << string(client_ip) << endl;
+								if ((*ptr)->get24Mask() == strclient_ip) /* There is a shell exception somewhere on that /24, but not for that IP */
+								{
+									std::stringstream ss;
+									if (!isShellException) {
+										ss << strclient_ip << "/" << CClonesCIDR;
+									    OthersList = getOtherCidrs(ss.str());
+									}
+
+									isShellException = true;
+									int j=1;
+									int l=0;
+									l = (*ptr)->getCidr2();
+									if (l <= 24) {
+										elog << "ShellDebug: This shouldn't happen. l = " << l << endl;
+									}
+									for (int k=32; k>l; k--)
+									{
+										j = j * 2;
+									}
+									m -= j;
+									theCount -= shellnbMap[*ptr];
+								}
+							}
+							NewLimit = m / 256 * maxCClones;
+							if ((OthersList != 0) && (OthersList->size() > 0))
+							{
+								if (CurCIDRConnections > NewLimit)
+								{
+									shellglinecounter = 0;
+									for (stringListType::iterator nptr = OthersList->begin(); nptr != OthersList->end(); nptr++) {
+											shellglinecounter++;
+											if ((shellglinecounter == 1) || (s.str().size() > 250)) {
+												if (s.str().size() > 250)
+													MsgChanLog("%s", s.str().c_str());
+												s.str("");
+												s << "Excessive connections (" << theCount << ") from subnet *@" << strclient_ip << "/" << CClonesCIDR << " (will GLINE): *@";
+
+											}
+											else
+												s << ", *@";
+											s << (*nptr);
+
+											sprintf(Log,"Glining non-exempted SHELL *@%s for excessive connections (%d)",
+												(*nptr).c_str(), theCount);
+											sprintf(GlineMask,"*@%s", (*nptr).c_str());
+	                                        AffectedUsers = theCount;
+											/* set the gline reason */
+											sprintf(GlineReason,"AUTO [%d] Automatically banned for excessive connections",AffectedUsers);
+											gDuration = CClonesGTime;
+
+				iClient* theClient = Network->findClient(this->getCharYYXXX());
+#ifndef LOGTOHD
+				DailyLog(theClient,"%s",Log);
+#else
+				ccLog* newLog = new (std::nothrow) ccLog();
+				newLog->Time = ::time(0);
+				newLog->Desc = Log;
+				newLog->Host = theClient->getRealNickUserHost().c_str();
+				newLog->User = "Me";			
+				newLog->CommandName = "AUTOGLINE";
+				DailyLog(newLog);
+#endif
+				glSet = true;
+				ccGline *tmpGline;
+				tmpGline = new ccGline(SQLDb);
+				tmpGline->setHost(GlineMask);
+				tmpGline->setExpires(::time(0) + gDuration);
+				tmpGline->setReason(GlineReason);
+				tmpGline->setAddedOn(::time(0));
+				tmpGline->setAddedBy(nickName);
+				tmpGline->setLastUpdated(::time(0));
+				tmpGline->Insert();
+				tmpGline->loadData(tmpGline->getHost());
+				addGline(tmpGline);
+				if(!getUplink()->isBursting())
+					addGlineToUplink(tmpGline);
+									}
+									MsgChanLog("%s", s.str().c_str());
+
+								}
+							}
+						}
 					if ((clientsIp24MapLastWarn[client_ip] + CClonesTime) <= time(NULL))
 					{
-                                        MsgChanLog("Excessive connections (%d) from subnet *@%s/%d (will%s GLINE)\n",
-                                                CurCIDRConnections, client_ip, CClonesCIDR, CClonesGline ? "" : " _NOT_");
-					clientsIp24MapLastWarn[client_ip] = time(NULL);
+						
+						if (shellglinecounter == 0)
+						{
+							
+				                            MsgChanLog("Excessive connections (%d) from subnet *@%s/%d (will%s GLINE)\n",
+			                                        CurCIDRConnections, client_ip, CClonesCIDR, CClonesGline ? "" : " _NOT_");
+						clientsIp24MapLastWarn[client_ip] = time(NULL);
+						}
 					}
+						
+
 					/* check for auto-gline feature */
-					if (CClonesGline)
+					if ((CClonesGline) && (shellglinecounter == 0))
 					{
 	                                        sprintf(Log,"Glining *@%s/%d for excessive connections (%d)",
 	                                                client_ip, CClonesCIDR, CurCIDRConnections);
@@ -1923,8 +2140,8 @@ if(dbConnected)
 					gDuration = maxGlineLen;
                                 }
   
-                                if (DoGline)
-                                {
+                                if ((DoGline) && (shellglinecounter == 0))
+								{
                                         iClient* theClient = Network->findClient(this->getCharYYXXX());
 #ifndef LOGTOHD
 				DailyLog(theClient,"%s",Log);
@@ -2048,7 +2265,7 @@ if((theGline->getHost().substr(0,1) == "#")
    && (theGline->getExpires() == 0))
         {
         Expires = gline::PERM_TIME;
-        }
+		}
 else
 	{
 	Expires = theGline->getExpires() - time(0);
@@ -4180,6 +4397,280 @@ for(exceptionIterator ptr = exception_begin();ptr != exception_end();ptr++)
 return Exception;
 }
 
+bool ccontrol::isCidrMatch( const string& cidrmask1, const string& cidrmask2 )
+{
+	int client_addr[4] = { 0 };
+	struct in_addr tmp_ip;
+	unsigned long mask_ip;
+	char *client_ip;
+	int i = 0;
+	int CIDR;
+	int CIDR1;
+	int CIDR2;
+	string cidrmask;
+	string tIP;
+
+	StringTokenizer st;
+
+	
+	StringTokenizer st1(cidrmask1, '/');
+
+	if (st1.size() != 2)
+		CIDR1 = 32;
+	else
+		CIDR1 = atoi(st1[1].c_str());
+	StringTokenizer st2(cidrmask2, '/');
+
+	if (st2.size() != 2)
+		CIDR2 = 32;
+	else
+		CIDR2 = atoi(st2[1].c_str());
+
+	if (CIDR2 > CIDR1) {
+		CIDR = CIDR1;
+		cidrmask = cidrmask1;
+		st = st1;
+		tIP = st2[0];
+	}
+	else {
+		CIDR = CIDR2;
+		cidrmask = cidrmask2;
+		st = st2;
+		tIP = st1[0];
+	}
+
+
+
+	/* CIDR checks */
+	/* convert ip to longip */
+	i = sscanf(tIP.c_str(), "%d.%d.%d.%d", &client_addr[0], &client_addr[1], &client_addr[2], &client_addr[3]);
+	mask_ip = ntohl((client_addr[0]) | (client_addr[1] << 8) | (client_addr[2] << 16) | (client_addr[3] << 24));
+	/* bitshift ip to strip the last (32-cidrmask) bits (leaving a mask for the ip) */
+	for (i = 0; i < (32-CIDR); i++) {
+		/* right shift */
+		mask_ip >>= 1;
+	}
+	for (i = 0; i < (32-CIDR); i++) {
+		/* left shift */
+		mask_ip <<= 1;
+	}
+	/* convert longip back to ip */
+	mask_ip = htonl(mask_ip);
+	tmp_ip.s_addr = mask_ip;
+	client_ip = inet_ntoa(tmp_ip);
+	if (strcmp(client_ip,st[0].c_str()) == 0) {
+		return true;
+	}
+	return false;
+}
+
+
+bool ccontrol::isValidCidr( const string& cidrmask )
+{
+	int client_addr[4] = { 0 };
+	struct in_addr tmp_ip;
+	unsigned long mask_ip;
+	char *client_ip;
+	int i = 0;
+	int CIDR = 32;
+
+
+	if (cidrmask.size() > 18)
+		return false;
+
+	StringTokenizer st(cidrmask,'/');
+	if (st.size() != 2)
+		return false;
+	StringTokenizer st2(cidrmask,'.');
+	if (st2.size() != 4)
+		return false;
+
+	CIDR = atoi(st[1].c_str());
+	if ((CIDR < 0) || (CIDR > 32))
+		return false;
+
+
+	/* CIDR checks */
+	/* convert ip to longip */
+	i = sscanf(st[0].c_str(), "%d.%d.%d.%d", &client_addr[0], &client_addr[1], &client_addr[2], &client_addr[3]);
+	mask_ip = ntohl((client_addr[0]) | (client_addr[1] << 8) | (client_addr[2] << 16) | (client_addr[3] << 24));
+	/* bitshift ip to strip the last (32-cidrmask) bits (leaving a mask for the ip) */
+	for (i = 0; i < (32-CIDR); i++) {
+		/* right shift */
+		mask_ip >>= 1;
+	}
+	for (i = 0; i < (32-CIDR); i++) {
+		/* left shift */
+		mask_ip <<= 1;
+	}
+	/* convert longip back to ip */
+	mask_ip = htonl(mask_ip);
+	tmp_ip.s_addr = mask_ip;
+	client_ip = inet_ntoa(tmp_ip);
+	if (strcmp(client_ip,st[0].c_str()) == 0) {
+		return true;
+	}
+	return false;
+}
+
+std::list< string >* ccontrol::getOtherCidrs( const string& cidrmask )
+//stringListType* ccontrol::getOtherCidrs( const string& cidrmask )
+{
+	/* If we're here, it's because there's an exception on a netblock smaller than CClonesCIDR (a /24) and we want
+	 * to get a list of all netblocks that would cover the non-exempted shell netblocks.
+	 * You will probably dislike how this function was written, I do too. It's not efficient at all,
+	 * but atleast it does the work.
+	 */
+
+
+	int i=0;
+	int j=0;
+	int k=0;
+	int highest = CClonesCIDR + 1;
+	int lowest = 32;
+	std::list< ccShellnb* > tmpList;
+	static stringListType* theList = 0;
+	StringTokenizer st(cidrmask,'/');
+	string c;
+
+    i = cidrmask.find_last_of(".");
+	c = cidrmask.substr(0,i+1);
+
+	elog << "Debug: " << cidrmask << ": " 
+	     << c << endl;
+
+
+
+	if (theList == 0) {
+		theList = new (std::nothrow) stringListType;
+		assert(theList != 0);
+	}
+	theList->clear();
+
+	// This function will only work for /24s
+	if (atoi(st[1].c_str()) != 24) {
+        return theList;
+	}
+
+
+	for (shellnbIterator ptr = shellnbList.begin(); ptr != shellnbList.end(); ptr++) {
+		if (isCidrMatch(cidrmask, (*ptr)->getCidr())) {
+			tmpList.push_back((*ptr));
+			StringTokenizer st3((*ptr)->getCidr(),'/');
+			if (st3.size() != 2)
+				continue;
+			if (atoi(st3[1].c_str()) > highest)
+				highest = atoi(st3[1].c_str());
+			if (atoi(st3[1].c_str()) < lowest)
+				lowest = atoi(st3[1].c_str());
+		}
+	}
+
+	k = 1;
+	for (i = 32; i > lowest; i--)
+		k = k * 2;
+
+	for (i = lowest; i <= highest; i++) {
+
+		for (j = 0; j != 256; j += k) {
+			bool matched = false;
+			std::stringstream tmpCidr;
+			tmpCidr << c << j << "/" << i;
+			for (shellnbIterator ptr = tmpList.begin(); ptr != tmpList.end(); ptr++) {
+				if (isCidrMatch((*ptr)->getCidr(),tmpCidr.str())) {
+					matched = true;
+					break;
+				}
+			}
+			if (matched)
+				continue;
+			for (stringListType::iterator ptr = theList->begin(); ptr != theList->end(); ptr++) {
+				if (isCidrMatch((*ptr),tmpCidr.str())) {
+					matched = true;
+					break;
+				}
+			}
+			if (!matched) {
+				theList->push_back(tmpCidr.str());
+			}
+		}
+		k = k / 2;
+	}
+
+	return theList;
+}
+
+bool ccontrol::test( iClient *theClient, const string& Cidr )
+{
+		std::list< string >* astr;
+		astr = getOtherCidrs(Cidr);
+		std::list< string >::iterator ptr = astr->begin();
+		for (; ptr != astr->end(); ptr++)
+		{
+			Notice(theClient, "%s", (*ptr).c_str());
+		}
+		return true;
+}
+
+ccShellco* ccontrol::getShellco( const string& Name )
+{
+for (shellcoIterator ptr = shellcoList.begin(); ptr != shellcoList.end(); ptr++)
+	if (!strcasecmp(Name.c_str(),(*ptr)->getName().c_str()))
+		return *ptr;
+return 0;
+}
+
+ccShellco* ccontrol::getShellcobyID( const int& id)
+{
+for (shellcoIterator ptr = shellcoList.begin(); ptr != shellcoList.end(); ptr++)
+	if (id == (*ptr)->getID())
+		return *ptr;
+return 0;
+}
+
+ccShellnb* ccontrol::getShellnb( const string& Cidr )
+{
+for (shellnbIterator ptr = shellnbList.begin(); ptr != shellnbList.end(); ptr++)
+	if (Cidr == (*ptr)->getCidr())
+		return *ptr;
+return 0;
+}
+
+bool ccontrol::listShellExceptions( iClient *theClient )
+{
+
+Notice(theClient,"-= Shell Exceptions list - listing a total of %d shell companies =-",
+	shellcoList.size());
+
+for (shellcoIterator ptr = shellcoList.begin(); ptr != shellcoList.end(); ptr++) {
+	int i = 0;
+	bool multiple_lines = false;
+	stringstream s;
+	s << (*ptr)->getName() << ":   Limit: " << (*ptr)->getLimit() << " (" << shellcoMap[*ptr] << " online)    Netblocks: ";
+	for (shellnbIterator nptr = shellnbList.begin(); nptr != shellnbList.end(); nptr++) {
+		if ((*nptr)->shellco == *ptr) {
+			i++;
+			if (i > 1)
+				s << ", ";
+			s << (*nptr)->getCidr() << " (" << shellnbMap[*nptr] << ")";
+			if (s.str().size() > 200) {
+				multiple_lines = true;
+				i = 0;
+				Notice(theClient, "%s", s.str().c_str());
+				s.str("");
+			}
+		}
+	}
+	if ((i != 0) || (multiple_lines == false)) {
+		Notice(theClient, "%s", s.str().c_str());
+	}
+}
+
+Notice(theClient,"-= End of shell exception list =-");
+
+return true;
+}
+
 bool ccontrol::listExceptions( iClient *theClient )
 {
 
@@ -4209,9 +4700,9 @@ return false;
 }
 
 
+
 bool ccontrol::insertException( iClient *theClient , const string& Host , int Connections, const string& Reason )
 {
-//Check if there is already an exception on that host
 
 if(!dbConnected)
 	{
@@ -4247,12 +4738,209 @@ exceptionList.push_back(tempException);
 return true;
 }
 
+bool ccontrol::insertShellco( iClient *theClient , const string& Name , int Connections )
+{
+//Check if there is already an exception on that host
+
+if(!dbConnected)
+	{
+	Notice(theClient, "error: DB not connected.");
+	return false;
+	}
+
+if(getShellco(Name) != 0)
+	{
+	Notice(theClient,
+		"There is already a shell company called %s, "
+		"please use update",
+		Name.c_str());		
+	return false;
+	}
+
+//Create a new ccShellco structure 
+ccShellco* tempShellco = new (std::nothrow) ccShellco(SQLDb);
+assert(tempShellco != NULL);
+
+tempShellco->setName(removeSqlChars(Name));
+tempShellco->setLimit(Connections);
+tempShellco->setAddedBy(removeSqlChars(theClient->getRealNickUserHost()));
+tempShellco->setAddedOn(::time(0));
+tempShellco->setModBy(removeSqlChars(theClient->getRealNickUserHost()));
+tempShellco->setModOn(::time(0));
+//Update	the database, and the internal list
+if(!tempShellco->Insert())
+	{
+	delete tempShellco;
+	Notice(theClient, "SQL Insertion failed.");
+	return false;
+	}
+
+tempShellco->loadData(tempShellco->getName()); //The inserted id is needed in memory
+
+shellcoMap.insert(std::make_pair<ccShellco*,int>(tempShellco,0));
+shellcoList.push_back(tempShellco);
+return true;
+}
+
+bool ccontrol::insertShellnb( iClient *theClient , const string& Cidr, int Company )
+{
+int count=0;
+
+if (!isValidCidr(Cidr)) 
+	{
+		Notice(theClient, "Invalid cidr: %s", Cidr.c_str());
+		return false;
+	}
+
+if(!dbConnected)
+	{
+	Notice(theClient, "error: DB not connected.");
+	return false;
+	}
+
+
+if (CClonesCIDR != 24)
+	{
+	Notice(theClient, "SHELLS exception will only work properly if you type that command: /msg <mynick> CONFIG -CClonesCIDR 24");
+	return false;
+	}
+for (shellnbIterator ptr = shellnbList.begin(); ptr != shellnbList.end(); ptr++) 
+	{
+	if (isCidrMatch(Cidr,(*ptr)->getCidr()))
+		{
+			StringTokenizer st(Cidr,'/');
+			if ((*ptr)->getCompanyID() == Company)
+				{
+				Notice(theClient, "Can't add netblock %s because netblock %s is assigned to the %s company. Some IPs would match the two.", Cidr.c_str(), (*ptr)->getCidr().c_str(), (*ptr)->shellco->getName().c_str());
+				return false;
+				}
+			else if (((*ptr)->getCidr2() > 24) && (atoi(st[1].c_str()) > 24))
+				{
+				Notice(theClient, "Can't add netblock %s: Some IPs are already covered by %s and would match the two netblocks inside the /24.", Cidr.c_str(), (*ptr)->getCidr().c_str());
+				return false;
+				}
+		}
+	}
+
+//Create a new ccShellnb structure 
+ccShellnb* tempShellnb = new (std::nothrow) ccShellnb(SQLDb);
+assert(tempShellnb != NULL);
+
+tempShellnb->setCidr(removeSqlChars(Cidr));
+tempShellnb->setAddedBy(removeSqlChars(theClient->getRealNickUserHost()));
+tempShellnb->setAddedOn(::time(0));
+//tempShellnb->setModBy(removeSqlChars(theClient->getRealNickUserHost()));
+//tempShellnb->setModOn(::time(0));
+tempShellnb->setCompanyID(Company);
+tempShellnb->set24Mask();
+//Update the database, and the internal list
+if(!tempShellnb->Insert())
+	{
+	delete tempShellnb;
+	Notice(theClient, "SQL Insertion failed.");
+	return false;
+	}
+
+
+tempShellnb->shellco = getShellcobyID(Company);
+shellnbList.push_back(tempShellnb);
+
+for( xNetwork::const_clientIterator cItr = Network->clients_begin() ; cItr != Network->clients_end() ; ++cItr )	{
+	const iClient* tmpClient = cItr->second;
+    const string tIP = xIP(tmpClient->getIP()).GetNumericIP();
+		if (isCidrMatch(tempShellnb->getCidr(),tIP)) {
+			count++;
+			if (shellnbMap.find(tempShellnb) == shellnbMap.end()) {
+				shellnbMap.insert(std::make_pair<ccShellnb*,int>(tempShellnb, 1));
+			}
+			else {
+				shellnbMap[tempShellnb]++;
+			}
+			if (shellcoMap.find(tempShellnb->shellco) == shellcoMap.end()) {
+				shellcoMap.insert(std::make_pair<ccShellco*,int>(tempShellnb->shellco, 1));
+			}
+			else {
+				shellcoMap[tempShellnb->shellco]++;
+			}
+		}
+}
+Notice(theClient, "There are currently %c%d users%c online from %s", 2, count, 2, Cidr.c_str());
+return true;
+}
+
+bool ccontrol::delShellnb( iClient *theClient , const string &Host )
+{
+ccShellnb* Shellnb;
+if(!dbConnected) 
+	{
+	Notice(theClient, "error: DB not connected.");
+	return false;
+	}
+
+Shellnb = getShellnb(Host);
+if (Shellnb == 0) {
+	Notice(theClient, "Can't find shell exception for host %s", Host.c_str());
+	return true;
+}
+bool status = Shellnb->Delete();
+shellnbListType::iterator Itr = shellnbList.begin();
+for (; Itr != shellnbList.end(); Itr++) {
+	if (*Itr == Shellnb) {
+		shellnbList.erase(Itr);
+	}
+}
+shellcoMap[Shellnb->shellco] -= shellnbMap[Shellnb];
+shellnbMap.erase(Shellnb);
+
+delete Shellnb;
+return status;
+
+}
+
+bool ccontrol::delShellco( iClient *theClient , const string &Name )
+{
+ccShellco* Shellco;
+if(!dbConnected) 
+	{
+	Notice(theClient, "error: DB not connected.");
+	return false;
+	}
+
+Shellco = getShellco(Name);
+if (Shellco == 0) {
+	Notice(theClient, "Can't find shell company: %s", Name.c_str());
+	return false;
+}
+
+shellcoListType::iterator Itr = shellcoList.begin();
+for (; Itr != shellcoList.end(); Itr++) {
+	if (*Itr == Shellco) {
+		shellcoList.erase(Itr);
+	}
+}
+
+for (shellnbIterator ptr = shellnbList.begin(); ptr != shellnbList.end(); ptr++) {
+	if ((*ptr)->shellco == Shellco) {
+		if (!delShellnb(theClient, (*ptr)->getCidr())) {
+			Notice(theClient,"Error while deleting netblock '%s'",(*ptr)->getCidr().c_str());
+		}
+	}
+}
+bool status = Shellco->Delete();
+shellcoMap.erase(Shellco);
+
+delete Shellco;
+
+return status;
+
+}
 
 bool ccontrol::delException( iClient *theClient , const string &Host )
 {
 
 if(!dbConnected)
 	{
+	Notice(theClient, "error: DB not connected.");
 	return false;
 	}
 
@@ -4271,8 +4959,10 @@ for(exceptionIterator ptr = exception_begin();ptr != exception_end();)
 		bool status = tempException->Delete();
 		ptr = exceptionList.erase(ptr);
 		delete tempException;
-		if(!status)
+		if(!status) 
+			{
 			return false;
+			}
 		}
 	    
 	else
@@ -4455,6 +5145,8 @@ return true;
 bool ccontrol::loadExceptions()
 {
 static const char Query[] = "SELECT Host,Connections,AddedBy,AddedOn,Reason FROM Exceptions";
+static const char Query2[] = "SELECT name,id,AddedBy,AddedOn,lastmodby,lastmodon,maxlimit,active FROM ShellCompanies";
+static const char Query3[] = "SELECT cidr,companyid,AddedBy,AddedOn FROM ShellNetblocks";
 
 if(!dbConnected)
 	{
@@ -4496,6 +5188,98 @@ for( unsigned int i = 0 ; i < SQLDb->Tuples() ; i++ )
 	tempException->setReason(SQLDb->GetValue(i,4));
 	exceptionList.push_back(tempException);
 	}
+
+
+theQuery.str("");
+theQuery	<< Query2
+		<< ends;
+
+#ifdef LOG_SQL
+elog	<< "ccontrol::loadExceptions> "
+	<< theQuery.str().c_str()
+	<< endl; 
+#endif
+
+if( !SQLDb->Exec( theQuery, true ) )
+//if( PGRES_TUPLES_OK != status )
+	{
+	elog	<< "ccontrol::loadExceptions> SQL Failure: "
+		<< SQLDb->ErrorMessage()
+		<< endl ;
+	
+	return false;
+	}
+
+ccShellco *tempShellco = NULL;
+
+for( unsigned int i = 0 ; i < SQLDb->Tuples() ; i++ )
+	{
+
+	tempShellco =  new (std::nothrow) ccShellco(SQLDb);
+	assert( tempShellco != 0 ) ;
+
+	tempShellco->setName(SQLDb->GetValue(i,0));
+	tempShellco->setID(atoi(SQLDb->GetValue(i,1).c_str()));
+	tempShellco->setAddedBy(SQLDb->GetValue(i,2)) ;
+	tempShellco->setAddedOn(static_cast< time_t >(
+		atoi( SQLDb->GetValue(i,3).c_str() ) )) ;
+	tempShellco->setModBy(SQLDb->GetValue(i,4)) ;
+	tempShellco->setModOn(static_cast< time_t >(
+		atoi( SQLDb->GetValue(i,5).c_str() ) )) ;
+	tempShellco->setLimit(atoi(SQLDb->GetValue(i,6).c_str()));
+	tempShellco->setActive(atoi(SQLDb->GetValue(i,7).c_str()));
+	shellcoList.push_back(tempShellco);
+	}
+
+
+theQuery.str("");
+theQuery	<< Query3
+		<< ends;
+
+#ifdef LOG_SQL
+elog	<< "ccontrol::loadExceptions> "
+	<< theQuery.str().c_str()
+	<< endl; 
+#endif
+
+if( !SQLDb->Exec( theQuery, true ) )
+//if( PGRES_TUPLES_OK != status )
+	{
+	elog	<< "ccontrol::loadExceptions> SQL Failure: "
+		<< SQLDb->ErrorMessage()
+		<< endl ;
+	
+	return false;
+	}
+
+ccShellnb *tempShellnb = NULL;
+
+for( unsigned int i = 0 ; i < SQLDb->Tuples() ; i++ ) {
+
+	tempShellnb =  new (std::nothrow) ccShellnb(SQLDb);
+	assert( tempShellnb != 0 ) ;
+
+	tempShellnb->setCidr(SQLDb->GetValue(i,0));
+	int companyID = atoi(SQLDb->GetValue(i,1).c_str());
+	tempShellnb->setCompanyID(companyID);
+	tempShellnb->shellco = getShellcobyID(companyID);
+	tempShellnb->setAddedBy(SQLDb->GetValue(i,2)) ;
+	tempShellnb->setAddedOn(static_cast< time_t >(
+		atoi( SQLDb->GetValue(i,3).c_str() ) )) ;
+	//tempShellnb->setModBy(SQLDb->GetValue(i,4)) ;
+	//tempShellnb->setModOn(static_cast< time_t >(
+	//	atoi( SQLDb->GetValue(i,5).c_str() ) )) ;
+	//tempShellnb->setLimit(atoi(SQLDb->GetValue(i,6).c_str()));
+	tempShellnb->set24Mask();
+
+	if (getShellcobyID(companyID) == 0) { //This should not happen
+		MsgChanLog("Loading Shell netblock failed for %s. CompanyID %d not found.", tempShellnb->getCidr().c_str(), companyID);
+		delete tempShellnb;
+		continue;
+	}
+	shellnbList.push_back(tempShellnb);
+}
+
 return true;	
 } 
 
@@ -4866,6 +5650,16 @@ for(exceptionIterator ptr = exception_begin();ptr != exception_end();++ptr)
 	(*ptr)->setSqldb(_SQLDb);
 	}
 
+for(shellcoIterator ptr = shellcoList.begin();ptr != shellcoList.end();++ptr)
+	{
+	(*ptr)->setSqldb(_SQLDb);
+	}
+
+for(shellnbIterator ptr = shellnbList.begin();ptr != shellnbList.end();++ptr)
+	{
+	(*ptr)->setSqldb(_SQLDb);
+	}
+
 for(usersIterator ptr = usersMap.begin();ptr != usersMap.end();++ptr)
 	{
 	ptr->second->setSqldb(_SQLDb);
@@ -4894,11 +5688,13 @@ if(checkClones)
 	}	
 Notice(tmpClient,"%d glines are waiting in the gline queue",glineQueue.size());
 Notice(tmpClient,"Allocated Structures:");
-Notice(tmpClient,"ccServer: %d, ccGline: %d, ccException: %d, ccUser: %d",
+Notice(tmpClient,"ccServer: %d, ccGline: %d, ccException: %d, ccUser: %d, ccShellco: %d, ccShellnb: %d",
 	ccServer::numAllocated,
 	ccGline::numAllocated,
 	ccException::numAllocated,
-	ccUser::numAllocated);
+	ccUser::numAllocated,
+	ccShellco::numAllocated,
+	ccShellnb::numAllocated);
 Notice(tmpClient,"Total of %d users in the map",usersMap.size()); 
 Notice(tmpClient,"(Gline Burst) - GBCount: %d , GBInterval: %d",
 	glineBurstCount,

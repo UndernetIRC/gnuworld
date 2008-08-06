@@ -1,4 +1,4 @@
--- "$Id: README.ccontrol,v 1.9 2002/08/30 10:38:15 nighty Exp $"
+-- "$Id: README.ccontrol,v 1.10 2008/08/06 19:35:58 hidden1 Exp $"
 --
 -- For more detailed information about setting up GNUworld, visit :
 --      http://coder-com.undernet.org/gnuworld-setup/
@@ -27,6 +27,7 @@ Make sure you are in the gnuworld/doc directory.
 
 > psql ccontrol < ccontrol.sql
 > psql ccontrol < ccontrol.help.sql
+> psql ccontrol < ccontrol.shells.sql
 
 Add yourself
 ------------

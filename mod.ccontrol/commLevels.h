@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: commLevels.h,v 1.24 2007/10/31 16:58:03 kewlio Exp $
+ * $Id: commLevels.h,v 1.25 2008/08/06 19:36:03 hidden1 Exp $
  */
 
 #ifndef __COMMANDLEVELS_H
@@ -107,6 +107,7 @@ const unsigned long int flg_REMSGLINE = 0x1000000;
 const unsigned long int flg_UNJUPE     = 0x2000000;
 const unsigned long int flg_SCHANGLINE = 0x4000000;
 const unsigned long int flg_FORCECHANGLINE = 0x8000000;
+const unsigned long int flg_SHELLS = 0x10000000;
 
 /*
  Default commands that are added upon adding a new oper
@@ -131,7 +132,7 @@ const unsigned long int SSMT = SADMIN | flg_REMSERVER | flg_NOMODE;
 const unsigned long int CODER = SMT;
 const unsigned long int SCODER =  SSMT | flg_COMMANDS| flg_GCHAN | flg_RGCHAN
 			| flg_EXCEPTIONS | flg_STATUS | flg_SHUTDOWN 
-			| flg_CONFIG | flg_SAY | flg_SGLINE | flg_REMSGLINE | flg_SCHANGLINE;
+			| flg_CONFIG | flg_SAY | flg_SGLINE | flg_REMSGLINE | flg_SCHANGLINE | flg_SHELLS;
 }
 
 }

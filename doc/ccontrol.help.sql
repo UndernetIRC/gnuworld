@@ -1,4 +1,4 @@
--- 2001-03-02 |MrBean| "$Id: ccontrol.help.sql,v 1.15 2008/01/03 04:26:22 kewlio Exp $"
+-- 2001-03-02 |MrBean| "$Id: ccontrol.help.sql,v 1.16 2008/08/06 19:35:58 hidden1 Exp $"
 -- Created the file and added all help topics to the database
 
 -- 2201-03-11 |MrBean|
@@ -146,7 +146,7 @@ LEARNNET		3	Syntax: /msg $BOT$ learnnet
 LIST		1	****** LIST COMMAND ******
 LIST		2	This command lists various internal lists
 LIST		3	Syntax: /msg $BOT$ list <type>
-LIST		4	<type> - glines, servers, badchannels, exceptions, channels
+LIST		4	<type> - glines, servers, badchannels, exceptions, channels, shells
 LIST		5	 (see /msg $BOT$ help list channels for more info on channels)
 LIST	CHANNELS	1	****** LIST CHANNELS COMMAND ******
 LIST	CHANNELS	2	This command lists channels based on various criteria
@@ -321,3 +321,9 @@ WHOIS		1	****** WHOIS COMMAND ******
 WHOIS		2	Gives information about a user on the network
 WHOIS		3	Syntax: /msg $BOT$ whois <nick>
 WHOIS		4	<nick> - the person you want to get info about
+SHELLS		1	****** SHELLS COMMAND ******
+SHELLS		2	Add/remove/modify shells limits/exceptions
+SHELLS		3	Syntax: /msg $BOT$ SHELLS <addcompany|addnetblock|delcompany|delnetblock|list|chlimit|chname> <Shell company|Netblock> <max connections>
+SHELLS		4	<Shell company>: The name of the shell company
+SHELLS		5	<Netblock>: CIDR netblock
+SHELLS		6	<max connections>: The number of connections allowed before gline

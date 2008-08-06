@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: LISTCommand.cc,v 1.23 2007/03/16 12:07:51 mrbean_ Exp $
+ * $Id: LISTCommand.cc,v 1.24 2008/08/06 19:35:58 hidden1 Exp $
  */
 
 #include	<string>
@@ -32,7 +32,7 @@
 #include	"StringTokenizer.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: LISTCommand.cc,v 1.23 2007/03/16 12:07:51 mrbean_ Exp $" ) ;
+RCSTAG( "$Id: LISTCommand.cc,v 1.24 2008/08/06 19:35:58 hidden1 Exp $" ) ;
 
 namespace gnuworld
 {
@@ -84,6 +84,10 @@ else if(!strcasecmp(st[1].c_str(),"nomodechannels"))
 else if(!strcasecmp(st[1].c_str(),"exceptions"))
 	{
 	bot->listExceptions(theClient);
+	}
+else if(!strcasecmp(st[1].c_str(),"shells"))
+	{
+	bot->listShellExceptions(theClient);
 	}
 else if(!strcasecmp(st[1].c_str(),"channels"))
 	{
