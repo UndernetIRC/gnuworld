@@ -20,7 +20,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccontrol.cc,v 1.221 2008/08/06 19:35:59 hidden1 Exp $
+ * $Id: ccontrol.cc,v 1.222 2008/08/06 21:22:36 hidden1 Exp $
 */
 
 #define MAJORVER "1"
@@ -67,7 +67,7 @@
 #include	"ccontrol_generic.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: ccontrol.cc,v 1.221 2008/08/06 19:35:59 hidden1 Exp $" ) ;
+RCSTAG( "$Id: ccontrol.cc,v 1.222 2008/08/06 21:22:36 hidden1 Exp $" ) ;
 
 namespace gnuworld
 {
@@ -2059,7 +2059,7 @@ if(dbConnected)
 											sprintf(GlineMask,"*@%s", (*nptr).c_str());
 	                                        AffectedUsers = theCount;
 											/* set the gline reason */
-											sprintf(GlineReason,"AUTO [%d] Automatically banned for excessive connections",AffectedUsers);
+											sprintf(GlineReason,"AUTO [%d] Automatically banned for excessive CIDR connections",AffectedUsers);
 											gDuration = CClonesGTime;
 
 				iClient* theClient = Network->findClient(this->getCharYYXXX());
@@ -4785,6 +4785,7 @@ return true;
 bool ccontrol::insertShellnb( iClient *theClient , const string& Cidr, int Company )
 {
 int count=0;
+StringTokenizer st(Cidr,'/');
 
 if (!isValidCidr(Cidr)) 
 	{
@@ -4804,11 +4805,16 @@ if (CClonesCIDR != 24)
 	Notice(theClient, "SHELLS exception will only work properly if you type that command: /msg <mynick> CONFIG -CClonesCIDR 24");
 	return false;
 	}
+
+if (atoi(st[1].c_str()) < 8)
+	{
+	Notice(theClient, "You can't add an exception for something bigger than a /8");
+	return false;
+	}
 for (shellnbIterator ptr = shellnbList.begin(); ptr != shellnbList.end(); ptr++) 
 	{
 	if (isCidrMatch(Cidr,(*ptr)->getCidr()))
 		{
-			StringTokenizer st(Cidr,'/');
 			if ((*ptr)->getCompanyID() == Company)
 				{
 				Notice(theClient, "Can't add netblock %s because netblock %s is assigned to the %s company. Some IPs would match the two.", Cidr.c_str(), (*ptr)->getCidr().c_str(), (*ptr)->shellco->getName().c_str());

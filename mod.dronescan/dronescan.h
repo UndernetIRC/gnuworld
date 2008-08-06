@@ -18,7 +18,7 @@
  */
 
 #ifndef DRONESCAN_H
-#define DRONESCAN_H "$Id: dronescan.h,v 1.35 2008/07/20 22:13:04 hidden1 Exp $"
+#define DRONESCAN_H "$Id: dronescan.h,v 1.36 2008/08/06 21:22:36 hidden1 Exp $"
 
 #include <map>
 #include <string>
@@ -116,6 +116,7 @@ public:
 	typedef std::map< std::string , sqlUser* , noCaseCompare > 
 			userMapType;
 	typedef std::map< unsigned int , sqlFakeClient* > fcMapType;
+	typedef std::map< std::string , unsigned int > clientsIPMapType;
 
 	typedef std::list< glineData* > glineQueueType;
 	
@@ -215,6 +216,7 @@ public:
 	/** Internal variables */
 	userMapType userMap;
 	fcMapType fakeClients;
+	clientsIPMapType clientsIPMap;
 	int lastBurstTime;
 
 	/** Typedef of currently seen drone channels */

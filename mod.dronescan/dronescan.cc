@@ -373,6 +373,13 @@ void dronescan::OnEvent( const eventType& theEvent,
 					Data2 :
 					Data1 );
 
+			/* Store usercount per IPs to a map */
+			string IP = xIP(theClient->getIP()).GetNumericIP();
+			if (clientsIPMap[IP] <= 1)
+				clientsIPMap.erase(IP);
+			else
+				clientsIPMap[IP]--;
+
 			clientData *theData = static_cast< clientData* >
 				( theClient->removeCustomData(this) );
 
@@ -775,7 +782,7 @@ for(jcChanMapType::const_iterator itr = jcChanMap.begin() ;
 		std::stringstream excluded; 
 		std::stringstream tempNames;
 		int clientcount = 0;
-		bool isoktogline = ((::time(0) - lastBurstTime) > 15 && jcGlineEnable && jChannel->getNumOfJoins() > jcMinJFSizeToGline && jChannel->getNumOfParts() > jcMinJFSizeToGline) ? true : false;
+		bool isoktogline = ((::time(0) - lastBurstTime) > 25 && jcGlineEnable && jChannel->getNumOfJoins() > jcMinJFSizeToGline && jChannel->getNumOfParts() > jcMinJFSizeToGline) ? true : false;
 		for(;joinPartIt != joinPartEnd; ++joinPartIt )
 			{
 				int numOfUsernames = 0;
@@ -852,10 +859,15 @@ for(jcChanMapType::const_iterator itr = jcChanMap.begin() ;
 								(theChan == 0 ? 0 : theChan->size())
 								);
 								}
-								log(JF_CSERVICE,"%s %s!%s@%s %s",userNamesIt->second.c_str(),
+								/*log(JF_CSERVICE,"%s %s!%s@%s %s",userNamesIt->second.c_str(),
 									theClient->getNickName().c_str(),
 									theClient->getUserName().c_str(),
 									xIP(theClient->getIP()).GetNumericIP().c_str(),
+									theClient->getDescription().c_str());*/
+								log(JF_CSERVICE,"(%s) %s!%s@%s.users.undernet.org %s",xIP(theClient->getIP()).GetNumericIP().c_str(),
+									theClient->getNickName().c_str(),
+									theClient->getUserName().c_str(),
+									userNamesIt->second.c_str(),
 									theClient->getDescription().c_str());
 						
 							}
@@ -923,7 +935,7 @@ for(jcChanMapType::const_iterator itr = jcChanMap.begin() ;
 				}
 			}
 
-		if ((glined.size() > 0) && (glined.size() > 4))
+		if ((glined.size() >= 5) || (clientcount >= 8))
 			log(WARN, "Glining %d floodbots from %d different ips", clientcount, glined.size());
 		}
 	
@@ -963,7 +975,9 @@ if(glineQueue.size() > 0)
 				{
 				curGline = glineQueue.front();
 				glineQueue.pop_front();
-				userCount = Network->countMatchingRealUserHost(curGline->getHost());
+				//userCount = Network->countMatchingRealUserHost(curGline->getHost());
+				StringTokenizer st(curGline->getHost(),'@');
+				userCount = clientsIPMap[st[1]];
 				us[0] = '\0';
 				sprintf(us,"%d",userCount);
 				std::string glineReason = string("AUTO [") + us + string("] ") + curGline->getReason(); 
@@ -1140,6 +1154,14 @@ void dronescan::handleNewClient( iClient* theClient )
 	clientData* theData = new clientData();
 	assert(theClient->setCustomData(this, theData));
 	++customDataCounter;
+
+	string IP = xIP(theClient->getIP()).GetNumericIP();
+	/* Store usercount per IPs to a map */
+	if (clientsIPMap.find(IP) == clientsIPMap.end())
+		clientsIPMap.insert(std::make_pair(IP, 1));
+	else
+		clientsIPMap[IP]++;
+
 
 
 	/* If we are still bursting, calculate letter frequencies */
