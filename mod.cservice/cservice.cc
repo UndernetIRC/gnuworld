@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: cservice.cc,v 1.291 2008/06/20 00:29:03 danielaustin Exp $
+ * $Id: cservice.cc,v 1.292 2008/11/11 21:04:56 mrbean_ Exp $
  */
 
 #include	<new>
@@ -2922,6 +2922,11 @@ if(!reggedChan)
 	return;
 	}
 
+if(!reggedChan->getInChan()) 
+	{
+	//Do not monitor channels i am not in
+	return;
+	}
 // List of clients to deop.
 vector< iClient* > deopList;
 
