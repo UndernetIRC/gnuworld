@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: LOGINCommand.cc,v 1.65 2008/01/01 13:49:19 kewlio Exp $
+ * $Id: LOGINCommand.cc,v 1.66 2008/11/12 20:45:42 mrbean_ Exp $
  */
 
 #include	<string>
@@ -33,8 +33,9 @@
 #include	"networkData.h"
 #include	"cservice_config.h"
 #include	"Network.h"
+#include	"ip.h"
 
-const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.65 2008/01/01 13:49:19 kewlio Exp $" ;
+const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.66 2008/11/12 20:45:42 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -351,7 +352,8 @@ if( bot->SQLDb->Exec(queryString, true ) )
 	}
 }
 /* update their details */
-theUser->setLastSeen(bot->currentTime(), theClient->getNickUserHost());
+theUser->setLastSeen(bot->currentTime(), theClient->getNickUserHost(),
+	theClient->getNickName() + "!" + theClient->getUserName() + "@" + xIP( theClient->getIP()).GetNumericIP());
 theUser->setFlag(sqlUser::F_LOGGEDIN);
 theUser->addAuthedClient(theClient);
 

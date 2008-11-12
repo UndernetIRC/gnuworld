@@ -28,7 +28,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: CHANINFOCommand.cc,v 1.60 2008/01/01 19:03:41 kewlio Exp $
+ * $Id: CHANINFOCommand.cc,v 1.61 2008/11/12 20:45:42 mrbean_ Exp $
  */
 
 #include	<string>
@@ -43,7 +43,7 @@
 #include	"dbHandle.h"
 #include	"cservice_config.h"
 
-const char CHANINFOCommand_cc_rcsId[] = "$Id: CHANINFOCommand.cc,v 1.60 2008/01/01 19:03:41 kewlio Exp $" ;
+const char CHANINFOCommand_cc_rcsId[] = "$Id: CHANINFOCommand.cc,v 1.61 2008/11/12 20:45:42 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -342,6 +342,12 @@ if( string::npos == st[ 1 ].find_first_of( '#' ) )
 		} else {
 			bot->Notice(theClient, "Last Hostmask: %s",
 				theUser->getLastHostMask().c_str());
+			//Show ip only to admins
+			if(adminAccess > 0) 
+				{
+				bot->Notice(theClient, "Last IP: %s",
+					theUser->getLastIP().c_str());			
+				}
 		}
 
 #ifdef USE_NOTES

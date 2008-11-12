@@ -16,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: sqlUser.h,v 1.41 2007/08/28 16:10:12 dan_karrels Exp $
+ * $Id: sqlUser.h,v 1.42 2008/11/12 20:45:42 mrbean_ Exp $
  */
 
 #ifndef __SQLUSER_H
-#define __SQLUSER_H "$Id: sqlUser.h,v 1.41 2007/08/28 16:10:12 dan_karrels Exp $"
+#define __SQLUSER_H "$Id: sqlUser.h,v 1.42 2008/11/12 20:45:42 mrbean_ Exp $"
 
 #include	<string>
 #include	<vector>
@@ -154,9 +154,11 @@ public:
 		{ password = _password; }
 
 	inline void setLastSeen( const time_t& _last_seen,
-			const std::string& _last_hostmask )
+			const std::string& _last_hostmask,
+			const std::string& _last_ip)
 		{ last_seen = _last_seen;
 		  last_hostmask = _last_hostmask ;
+		  last_ip = _last_ip;
 		  commitLastSeen(); }
 
 	inline void setLastSeen( const time_t& _last_seen )
@@ -208,6 +210,7 @@ public:
 	bool commitLastSeenWithoutMask();
 	time_t	getLastSeen();
 	const std::string getLastHostMask();
+	const std::string getLastIP();
 	bool Insert() ;
 
 	bool loadData( int );
@@ -237,6 +240,7 @@ protected:
 	time_t		instantiated_ts;
 	std::string	email ;
 	std::string	last_hostmask ;
+	std::string last_ip;
 	unsigned int	maxlogins;
 	time_t		last_note;
 	unsigned int	notes_sent;

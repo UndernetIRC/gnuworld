@@ -19,7 +19,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: sqlUser.cc,v 1.46 2007/08/28 16:10:12 dan_karrels Exp $
+ * $Id: sqlUser.cc,v 1.47 2008/11/12 20:45:42 mrbean_ Exp $
  */
 
 #include	<sstream>
@@ -267,6 +267,9 @@ queryString	<< queryHeader
 		<< "last_hostmask = '"
 		<< escapeSQLChars(last_hostmask)
 		<< "', "
+		<< "last_ip = '"
+		<< escapeSQLChars(last_ip)
+		<< "', "
 		<< "last_updated = now()::abstime::int4 "
 		<< queryCondition
 		<< id
@@ -399,7 +402,40 @@ return ("");
 
 }
 
+const string sqlUser::getLastIP()
+{
+stringstream queryString;
+queryString	<< "SELECT last_ip"
+		<< " FROM users_lastseen WHERE user_id = "
+		<< id
+		<< ends;
 
+#ifdef LOG_SQL
+	elog	<< "sqlUser::getLastIP> "
+		<< queryString.str().c_str()
+		<< endl;
+#endif
+
+if( SQLDb->Exec(queryString, true ) )
+//if( PGRES_TUPLES_OK == status )
+	{
+	/*
+	 *  If the user doesn't exist, we won't get any rows back.
+	 */
+
+	if(SQLDb->Tuples() < 1)
+		{
+		return ("");
+		}
+
+	last_ip = SQLDb->GetValue(0, 0);
+
+	return (last_ip);
+	}
+
+return ("");
+
+}
 void sqlUser::writeEvent(unsigned short eventType, sqlUser* theUser, const string& theMessage)
 {
 string userExtra = theUser ? theUser->getUserName() : "Not Logged In";

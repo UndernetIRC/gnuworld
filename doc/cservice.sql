@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------------
--- "$Id: cservice.sql,v 1.86 2007/03/25 16:42:24 kewlio Exp $"
+-- "$Id: cservice.sql,v 1.87 2008/11/12 20:45:42 mrbean_ Exp $"
 -- Channel service DB SQL file for PostgreSQL.
 
 -- ChangeLog:
@@ -235,6 +235,7 @@ CREATE TABLE users_lastseen (
 	user_id INT4 CONSTRAINT lastseen_users_id_ref REFERENCES users ( id ),
 	last_seen INT4,
 	last_hostmask VARCHAR( 256 ),
+	last_ip VARCHAR( 256 ),
 	last_updated INT4 NOT NULL,
 	PRIMARY KEY (user_id)
 );
