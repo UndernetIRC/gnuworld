@@ -1,4 +1,4 @@
-# $Id: dronescan.example.conf.in,v 1.18 2007/08/24 13:07:05 mrbean_ Exp $
+# $Id: dronescan.example.conf.in,v 1.19 2008/11/17 02:54:42 hidden1 Exp $
 # What nickname should the bot use?
 nickname = E
 
@@ -84,6 +84,21 @@ jcMinJoinToGline = 1
 
 # Whether or not to gline join flood clients 
 jcGlineEnable = 0
+
+# The minimum joins during join-floods required for an IP to be glined without a part (Can be on multiple channels)
+jcMinJoinsPerIPToGline = 4
+
+# The time within the joins.
+jcJoinsPerIPTime = 14400
+
+# The number of clients per IP required during *ONE* joinflood to set a gline if there are no parts
+jcMinJoinToGlineJOnly = 2
+
+# The join-flood size required to set a gline with no parts
+jcMinJFJOnlySizeToGline = 25
+
+# The minimum number of flooding clients required to gline
+jcMinJFSizeToGline = 20
 
 # The gline reason to set when glining join flood offenders
 jcGlineReason = Flooding is not tollerated on this network!

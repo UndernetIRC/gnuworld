@@ -18,7 +18,7 @@
  */
 
 #ifndef DRONESCAN_H
-#define DRONESCAN_H "$Id: dronescan.h,v 1.36 2008/08/06 21:22:36 hidden1 Exp $"
+#define DRONESCAN_H "$Id: dronescan.h,v 1.37 2008/11/17 02:54:42 hidden1 Exp $"
 
 #include <map>
 #include <string>
@@ -66,6 +66,13 @@ enum LOG_TYPE {
 	ERR
 };
 
+struct JCFLOODCLIENTS {
+	std::list<std::string> log;
+	std::list<std::string> chans;
+	std::list<std::string> nicks;
+    int count;
+    int ctime;
+};
 
 
 class dronescan : public xClient {
@@ -117,7 +124,9 @@ public:
 			userMapType;
 	typedef std::map< unsigned int , sqlFakeClient* > fcMapType;
 	typedef std::map< std::string , unsigned int > clientsIPMapType;
-
+	typedef struct JCFLOODCLIENTS jcFloodClients;
+	typedef std::map< std::string , jcFloodClients* > clientsIPFloodMapType;
+	typedef std::list< std::string > IPJQueueType;
 	typedef std::list< glineData* > glineQueueType;
 	
 	/*******************************************
@@ -217,6 +226,7 @@ public:
 	userMapType userMap;
 	fcMapType fakeClients;
 	clientsIPMapType clientsIPMap;
+	clientsIPFloodMapType clientsIPFloodMap;
 	int lastBurstTime;
 
 	/** Typedef of currently seen drone channels */
@@ -229,6 +239,7 @@ public:
 	
 	/** The gline queue */
 	glineQueueType glineQueue;
+	IPJQueueType IPJQueue;
 	
 	bool isExceptionalChannel(const std::string&);
 	
@@ -240,7 +251,11 @@ public:
 	unsigned int jcInterval;
 	unsigned int jcCutoff;
 	unsigned int jcMinJoinToGline;
+	unsigned int jcMinJoinToGlineJOnly;
+	unsigned int jcMinJoinsPerIPToGline;
+	unsigned int jcJoinsPerIPTime;
 	unsigned int jcMinJFSizeToGline;
+	unsigned int jcMinJFJOnlySizeToGline;
 	bool jcGlineEnable;
 	bool jcGlineEnableConf;
 	std::string jcGlineReason;
@@ -345,6 +360,7 @@ protected:
 	sqlUser *fakeOperUser;
 	
 }; // class dronescan
+
 
 } // namespace ds
 

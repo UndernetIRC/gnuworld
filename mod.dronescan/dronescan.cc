@@ -121,7 +121,11 @@ ncInterval = atoi(dronescanConfig->Require("ncInterval")->second.c_str());
 ncCutoff = atoi(dronescanConfig->Require("ncCutoff")->second.c_str());
 rcInterval = atoi(dronescanConfig->Require("rcInterval")->second.c_str());
 jcMinJoinToGline = atoi(dronescanConfig->Require("jcMinJoinToGline")->second.c_str());
+jcMinJoinToGlineJOnly = atoi(dronescanConfig->Require("jcMinJoinToGlineJOnly")->second.c_str());
+jcMinJoinsPerIPToGline = atoi(dronescanConfig->Require("jcMinJoinsPerIPToGline")->second.c_str());
+jcJoinsPerIPTime = atoi(dronescanConfig->Require("jcJoinsPerIPTime")->second.c_str());
 jcMinJFSizeToGline = atoi(dronescanConfig->Require("jcMinJFSizeToGline")->second.c_str());
+jcMinJFJOnlySizeToGline = atoi(dronescanConfig->Require("jcMinJFJOnlySizeToGline")->second.c_str());
 jcGlineEnable = atoi(dronescanConfig->Require("jcGlineEnable")->second.c_str()) == 1 ? true : false;
 jcGlineEnableConf = jcGlineEnable;
 jcGlineReason = dronescanConfig->Require("jcGlineReason")->second.c_str();
@@ -750,6 +754,7 @@ void dronescan::OnTimer( const xServer::timerID& theTimer , void *)
 
 void dronescan::processJoinPartChannels()
 {
+	static time_t jcFCInterval = ::time(0);
 for(jcChanMapType::const_iterator itr = jcChanMap.begin() ;
     itr != jcChanMap.end() ; ++itr) 
 	{
@@ -782,12 +787,14 @@ for(jcChanMapType::const_iterator itr = jcChanMap.begin() ;
 		std::stringstream excluded; 
 		std::stringstream tempNames;
 		int clientcount = 0;
+
 		bool isoktogline = ((::time(0) - lastBurstTime) > 25 && jcGlineEnable && jChannel->getNumOfJoins() > jcMinJFSizeToGline && jChannel->getNumOfParts() > jcMinJFSizeToGline) ? true : false;
 		for(;joinPartIt != joinPartEnd; ++joinPartIt )
 			{
+				isoktogline = ((::time(0) - lastBurstTime) > 25 && jcGlineEnable && jChannel->getNumOfJoins() > jcMinJFSizeToGline && (jChannel->getNumOfParts() > jcMinJFSizeToGline) || (joinPartIt->second.numOfJoins >= jcMinJoinToGlineJOnly && jChannel->getNumOfJoins() >= jcMinJFJOnlySizeToGline)) ? true : false;
 				int numOfUsernames = 0;
-				if(joinPartIt->second.numOfJoins >= jcMinJoinToGline &&
-			    joinPartIt->second.numOfParts >= jcMinJoinToGline)
+				if((joinPartIt->second.numOfJoins >= jcMinJoinToGline &&
+			    joinPartIt->second.numOfParts >= jcMinJoinToGline) || (joinPartIt->second.numOfJoins >= jcMinJoinToGlineJOnly && jChannel->getNumOfJoins() >= jcMinJFJOnlySizeToGline))
 				{
 				if(!joinPartIt->second.seenOper && !joinPartIt->second.seenLoggedInUser)
 					{
@@ -822,6 +829,7 @@ for(jcChanMapType::const_iterator itr = jcChanMap.begin() ;
 						if (isoktogline == true)
 								{
 								glineData* theGline = new (std::nothrow) glineData("*@" +joinPartIt->first,jcGlineReason,jcGlineLength);
+								assert(theGline != 0);
 								glined.push_back(std::pair<glineData*,std::list<std::string> >(theGline,clients));
 								clientcount += clients.size();
 								}
@@ -886,7 +894,7 @@ for(jcChanMapType::const_iterator itr = jcChanMap.begin() ;
 			}
 		if (isoktogline == true)
 			{ 
-			if ((glined.size() < 5) && (clientcount < 8))
+			if ((glined.size() < 3) && (clientcount < 8))
 				{
 					if (glined.size() != 0) {
 					log(WARN,"Aborting glines for channel %s because only %d flooding clients from %d addresses were found",
@@ -908,8 +916,24 @@ for(jcChanMapType::const_iterator itr = jcChanMap.begin() ;
 		for(; glinesIt != glined.end();++glinesIt)
 			{
 			glineData* curGline = glinesIt->first;
-			if ((glined.size() >= 5) || (clientcount >= 8))
+			if ((glined.size() >= 3) || (clientcount >= 8))
 				{
+				/*
+				string IP = xIP(theClient->getIP()).GetNumericIP();
+				clientsIPFloodMapType::iterator tmpItr = clientsIPFloodMap.find(IP);
+				if (tmpItr != clientsIPFloodMap.end()) {
+					jcFloodClients* aptr = tmpItr->second;
+					clientsIPFloodMap.erase(tmpItr);
+					delete aptr;
+				}
+				IPJQueueType::iterator tmpItr2 = IPJQueue.begin();
+				for (; tmpItr2 != IPJQueue.end(); tmpItr2++) {
+					if (*tmpItr2 == IP) {
+						IPJQueue.erase(tmpItr2);
+						break;
+					}
+				}
+				*/
 				std::list<string>::iterator clientsIt = glinesIt->second.begin();
 #ifdef ENABLE_LOG4CPLUS
 				for(; clientsIt != glinesIt->second.end(); ++ clientsIt)
@@ -917,7 +941,7 @@ for(jcChanMapType::const_iterator itr = jcChanMap.begin() ;
 					log(JF_GLINED,(*clientsIt).c_str());
 					}
 #endif
-				//Checking if the gline is already present in the queue (Needs to be tested: mod.cloner uses different ips for each client)
+				//Checking if the gline is already present in the queue
 				glineQueueType::iterator git = glineQueue.begin();
 				bool found_gline_in_queue = false;
 				for (; git != glineQueue.end(); ++git) {
@@ -935,12 +959,88 @@ for(jcChanMapType::const_iterator itr = jcChanMap.begin() ;
 				}
 			}
 
-		if ((glined.size() >= 5) || (clientcount >= 8))
+		if ((glined.size() >= 3) || (clientcount >= 8))
 			log(WARN, "Glining %d floodbots from %d different ips", clientcount, glined.size());
 		}
 	
 	delete itr->second;
 				
+	}
+
+
+	IPJQueueType::iterator Itr2 = IPJQueue.begin();
+	std::stringstream tempNames;
+	int clientcount = 0;
+	for (; Itr2 != IPJQueue.end(); Itr2++) {
+		glineQueueType::iterator git = glineQueue.begin();
+		bool found_gline_in_queue = false;
+		for (; git != glineQueue.end(); ++git) {
+			std::string gmask = "*@" + *Itr2;
+			if (strcasecmp((*git)->getHost().c_str(),gmask.c_str()) == 0)
+				found_gline_in_queue = true;
+		}
+		if (found_gline_in_queue == true) {
+			continue;
+		}
+#ifdef ENABLE_LOG4CPLUS
+		if (clientcount == 0)
+			log(JF_GLINED,"--- Multiple join floods without parts ---");
+#endif
+		clientcount++;
+		if (tempNames.str().size() > 380) {
+			std::stringstream s;
+			s << "Glining the following clients:" << tempNames.str();
+			log(WARN, "%s", s.str().c_str());
+			tempNames.str("");
+		}
+		tempNames << " ";
+		jcFloodClients* jcFC = clientsIPFloodMap[*Itr2];
+		std::list<string>::const_iterator Itr3 = jcFC->nicks.begin();
+		tempNames << *Itr2 << std::string("[") 
+		<< jcFC->count 
+		<< std::string("]<");
+		for (; Itr3 != jcFC->nicks.end(); Itr3++) {
+			tempNames << *Itr3 << ",";
+		}
+		tempNames << ">(";
+		Itr3 = jcFC->chans.begin();
+		for (; Itr3 != jcFC->chans.end(); Itr3++) {
+			tempNames << *Itr3 << ",";
+		}
+		tempNames << ")";
+
+		glineData* theGline = new (std::nothrow) glineData("*@" +*Itr2,jcGlineReason,jcGlineLength);
+		assert(theGline != 0);
+		glineQueue.push_back(theGline);
+#ifdef ENABLE_LOG4CPLUS
+		Itr3 = jcFC->log.begin();
+		for (; Itr3 != jcFC->log.end(); Itr3++) {
+			log(JF_GLINED,"%s",(*Itr3).c_str());
+		}
+#endif
+
+	}
+	if (clientcount > 0) {
+#ifdef ENABLE_LOG4CPLUS
+		log(JF_GLINED,"--- End of multiple join floods without parts ---");
+#endif
+		std::string astr = "Glining the following clients:" + tempNames.str();
+		log(WARN, "%s", astr.c_str());
+		log(WARN, "Glining %d different ips for multiple joins during join floods", clientcount);
+	}
+	if (IPJQueue.size() > 0)
+		IPJQueue.clear();
+	if ((unsigned int) (jcFCInterval - ::time(0)) >= jcJoinsPerIPTime) {
+		jcFloodClients* jcFC;
+		jcFCInterval = ::time(0);
+		clientsIPFloodMapType::iterator anItr = clientsIPFloodMap.begin();
+		for (; anItr != clientsIPFloodMap.end(); anItr++) {
+			jcFC = anItr->second;
+			if ((unsigned int) (::time(0) - jcFC->ctime) > jcJoinsPerIPTime) {
+				clientsIPFloodMap.erase(anItr);
+				delete jcFC;
+			}
+		}
 	}
 
 log(DBG, "Clearing %u records from the join counter.",
@@ -1120,6 +1220,64 @@ if(joinCount == jcCutoff)
 if(channel->getJoinFlooded())
 	{
 	channel->addJoin(theClient);
+	if (joinCount >= jcCutoff) {
+		string IP = xIP(theClient->getIP()).GetNumericIP();
+		jcFloodClients* jcFC;
+		if ((::time(0) - lastBurstTime) > 25 && jcGlineEnable) {
+			clientsIPFloodMapType::const_iterator Itr = clientsIPFloodMap.find(IP);
+			if (Itr != clientsIPFloodMap.end()) {
+				jcFC = Itr->second;
+				if ((unsigned int) (::time(0) - jcFC->ctime) > jcJoinsPerIPTime) {
+					jcFC->ctime = ::time(0);
+					jcFC->count = 0;
+					jcFC->chans.clear();
+					jcFC->nicks.clear();
+					jcFC->log.clear();
+				}
+			}
+			else {
+				jcFC = new (std::nothrow) jcFloodClients;
+				assert(jcFC != NULL);
+				jcFC->count = 0;
+				jcFC->ctime = ::time(0);
+				clientsIPFloodMap[IP] = jcFC;
+			}
+			jcFC->count++;
+			std::list< string >::iterator sItr;
+			bool isMatchFound = false;
+			for (sItr = jcFC->chans.begin(); sItr != jcFC->chans.end(); sItr++) {
+				if (*sItr == channelName) {
+					isMatchFound = true;
+					break;
+				}
+			}
+			if (!isMatchFound)
+				jcFC->chans.push_back(channelName);
+			isMatchFound = false;
+			for (sItr = jcFC->nicks.begin(); sItr != jcFC->nicks.end(); sItr++) {
+				if (*sItr == theClient->getNickName()) {
+					isMatchFound = true;
+					break;
+				}
+			}
+			if (!isMatchFound)
+				jcFC->nicks.push_back(theClient->getNickName());
+
+			std::stringstream s;
+			s << theClient->getNickName()
+				<< "!" << theClient->getUserName()
+				<< "@" << xIP(theClient->getIP()).GetNumericIP()
+				<< " " << theClient->getDescription()
+				<< " " << channelName <<  " " << ::time(0);
+			jcFC->log.push_back(s.str());
+
+
+			if (jcFC->count >= jcMinJoinsPerIPToGline) {
+				IPJQueue.push_back(IP);
+			}
+		}
+	}
+
 	}
 }
 
