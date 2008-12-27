@@ -20,7 +20,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccontrol.cc,v 1.222 2008/08/06 21:22:36 hidden1 Exp $
+ * $Id: ccontrol.cc,v 1.223 2008/12/27 23:34:31 hidden1 Exp $
 */
 
 #define MAJORVER "1"
@@ -67,7 +67,7 @@
 #include	"ccontrol_generic.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: ccontrol.cc,v 1.222 2008/08/06 21:22:36 hidden1 Exp $" ) ;
+RCSTAG( "$Id: ccontrol.cc,v 1.223 2008/12/27 23:34:31 hidden1 Exp $" ) ;
 
 namespace gnuworld
 {
@@ -628,7 +628,7 @@ RegisterCommand( new EXCEPTIONCommand( this, "EXCEPTIONS",
 	operLevel::OPERLEVEL,
 	true ) ) ;
 RegisterCommand( new SHELLSCommand( this, "SHELLS",
-	"(addcompany / addnetblock / delcompany / delnetblock / list / chlimit / chname)",
+	"(addcompany / addnetblock / delcompany / delnetblock / list / chlimit / chname / clearall)",
 	true,
 	commandLevel::flg_SHELLS,
 	false,
@@ -3568,6 +3568,10 @@ if(GlineType & (isWildCard))
 		retMe |=  gline::FORCE_NEEDED_WILDTIME;
 		}
 	}
+if (getExceptions("*@" + Hostname) > 0) 
+	{
+	retMe |= gline::HUH_IS_EXCEPTION;
+	}
 	
 //if(GlineType & (isWildCard & (Len >  gline::MGLINE_WILD_TIME)))
 //	retMe |=  gline::FORCE_NEEDED_WILDTIME;
@@ -4368,6 +4372,25 @@ va_end( list ) ;
 MyUplink->Wallops( buffer ) ;
 }
 
+void ccontrol::addGlinedException( const string &Host )
+{
+	glinedExceptionList.push_back(pair<string,int>(Host, ::time(0)));
+}
+
+int ccontrol::isGlinedException( const string &Host )
+{
+	for (glinedExceptionListType::iterator ptr = glinedExceptionList.begin(); ptr != glinedExceptionList.end(); ptr++) {
+		if ((::time(0) - (ptr)->second) > 300) {
+			glinedExceptionList.erase(ptr);
+			continue;
+		}
+		if (Host == (ptr)->first) {
+			return (ptr)->second;
+		}
+	}
+	return 0;
+}
+
 int ccontrol::getExceptions( const string &Host )
 {
 int Exception = 0;
@@ -4561,12 +4584,13 @@ std::list< string >* ccontrol::getOtherCidrs( const string& cidrmask )
 				continue;
 			if (atoi(st3[1].c_str()) > highest)
 				highest = atoi(st3[1].c_str());
-			if (atoi(st3[1].c_str()) < lowest)
-				lowest = atoi(st3[1].c_str());
+			//if (atoi(st3[1].c_str()) < lowest)
+			//	lowest = atoi(st3[1].c_str());
 		}
 	}
 
 	k = 1;
+	lowest = 24;
 	for (i = 32; i > lowest; i--)
 		k = k * 2;
 
@@ -4886,7 +4910,7 @@ if(!dbConnected)
 Shellnb = getShellnb(Host);
 if (Shellnb == 0) {
 	Notice(theClient, "Can't find shell exception for host %s", Host.c_str());
-	return true;
+	return false;
 }
 bool status = Shellnb->Delete();
 shellnbListType::iterator Itr = shellnbList.begin();
@@ -4901,6 +4925,20 @@ shellnbMap.erase(Shellnb);
 delete Shellnb;
 return status;
 
+}
+
+void ccontrol::clearShells( iClient *theClient )
+{
+list<string> s;
+for (shellcoIterator ptr = shellcoList.begin(); ptr != shellcoList.end(); ptr++) {
+	string Name = (*ptr)->getName();
+	s.push_back(Name);
+}
+for (list<string>::iterator ptr = s.begin(); ptr != s.end(); ptr++) {
+	Notice(theClient, "Deleting Shellco '%s'", ptr->c_str());
+	delShellco(theClient, *ptr);
+}
+s.clear();
 }
 
 bool ccontrol::delShellco( iClient *theClient , const string &Name )
@@ -6207,7 +6245,7 @@ void ccontrol::remBadChannel(ccBadChannel* Channel)
 badChannelsMap.erase(badChannelsMap.find(Channel->getName()));
 }
 
-bool ccontrol::glineChannelUsers(Channel* theChan, const string& reason, unsigned int gLength, const string& addedBy,bool excludeChanWithOper)
+bool ccontrol::glineChannelUsers(iClient* theClient, Channel* theChan, const string& reason, unsigned int gLength, const string& addedBy,bool excludeChanWithOper)
 {
 ccGline *TmpGline;
 iClient *TmpClient;
@@ -6218,6 +6256,8 @@ GlineMapType::iterator gptr;
 list<ccGline*> neededGlines;
 bool foundOper = false;
 bool success = true;
+bool foundException = false;
+bool exceptionForce = false;
 for (Channel::const_userIterator ptr = theChan->userList_begin();
 	ptr != theChan->userList_end(); ++ptr)
 	{
@@ -6230,6 +6270,11 @@ for (Channel::const_userIterator ptr = theChan->userList_begin();
 		break; 
 		}
 	curIP = xIP(TmpClient->getIP()).GetNumericIP();
+	if (getExceptions("*@" + curIP) > 0) 
+		{
+		foundException = true;
+		Notice(theClient, "There is an exception for this user: %s!%s@%s", TmpClient->getNickName().c_str(), TmpClient->getUserName().c_str(), curIP.c_str());
+		}
 	gptr = glineList.find("*@" + curIP);
 	if (gptr != glineList.end())
 		{
@@ -6250,16 +6295,31 @@ for (Channel::const_userIterator ptr = theChan->userList_begin();
 		TmpGline->setReason(reason);
 		TmpGline->setAddedOn(::time(0));
 		TmpGline->setLastUpdated(::time(0));
-		excludeChanWithOper ? neededGlines.push_back(TmpGline) : queueGline(TmpGline);
+		(excludeChanWithOper || foundException) ? neededGlines.push_back(TmpGline) : queueGline(TmpGline);
 		}																        
 	}
-if(excludeChanWithOper)
+if (foundException)
+	{
+	if (isGlinedException(theChan->getName()) > 0) 
+		{
+		exceptionForce = true;
+		if (!(excludeChanWithOper && foundOper))
+			Notice(theClient,"There is an exception for at least one host on the channel. Channel G-line sent (forced)");
+		}
+	else if (!(excludeChanWithOper && foundOper))
+		{
+		Notice(theClient,"There is an exception for at least one host on the channel. Send the channel gline again to force.");
+		addGlinedException(theChan->getName());
+		}
+	}
+
+if(excludeChanWithOper || foundException)
 	{
 	list<ccGline*>::iterator glinesIt = neededGlines.begin();
 	for(; glinesIt != neededGlines.end(); ++glinesIt)
 		{
 		TmpGline = *glinesIt;
-		foundOper ? delete TmpGline : queueGline(TmpGline);
+		(foundOper || !exceptionForce) ? delete TmpGline : queueGline(TmpGline);
 		}
 	}
 return success;

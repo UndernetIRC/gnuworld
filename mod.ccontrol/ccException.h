@@ -16,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccException.h,v 1.11 2008/08/06 19:35:58 hidden1 Exp $
+ * $Id: ccException.h,v 1.12 2008/12/27 23:34:31 hidden1 Exp $
  */
 
 #ifndef __CCEXCEPTION_H
-#define __CCEXCEPTION_H "$Id: ccException.h,v 1.11 2008/08/06 19:35:58 hidden1 Exp $"
+#define __CCEXCEPTION_H "$Id: ccException.h,v 1.12 2008/12/27 23:34:31 hidden1 Exp $"
 
 #include	<string>
 
@@ -213,13 +213,6 @@ public:
 	
 	inline const string&	get24Mask() const
 		{ return str24; }
-	/*
-	inline const string&		getModBy() const
-		{ return ModBy; }
-		
-	inline time_t			getModOn() const
-		{ return ModOn; }
-	*/
 
 	inline void 		setShellco( ccShellco* _shellco ) 
 		{ shellco = _shellco; }
@@ -232,14 +225,6 @@ public:
 		
 	inline void		setAddedOn( const time_t _AddedOn )
 		{ AddedOn = _AddedOn; }
-
-	/*
-	inline void		setModBy( const string& _ModBy) 
-		{ ModBy = _ModBy; }
-		
-	inline void		setModOn( const time_t _ModOn )
-		{ ModOn = _ModOn; }
-	*/
 
 	void 		setCidr( const string& _cidr );
 	bool		set24Mask();

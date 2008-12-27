@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: FORCEGLINECommand.cc,v 1.36 2007/12/27 20:45:15 kewlio Exp $
+ * $Id: FORCEGLINECommand.cc,v 1.37 2008/12/27 23:34:31 hidden1 Exp $
  */
 
 #include	<string>
@@ -35,7 +35,7 @@
 #include	"Constants.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: FORCEGLINECommand.cc,v 1.36 2007/12/27 20:45:15 kewlio Exp $" ) ;
+RCSTAG( "$Id: FORCEGLINECommand.cc,v 1.37 2008/12/27 23:34:31 hidden1 Exp $" ) ;
 
 namespace gnuworld
 {
@@ -197,6 +197,18 @@ if((gCheck & gline::FU_NEEDED_TIME) && (Ok))
 				gline::MFGLINE_TIME);
 			}
 		}
+	}
+if((gCheck & gline::HUH_IS_EXCEPTION) && (Ok))
+	{
+	if (bot->isGlinedException(userName + "@" + hostName) > 0) {
+		bot->Notice(theClient,"There is an exception for that host. G-line sent (forced)");
+	}
+	else {
+		//bot->MsgChanLog("%c%s is attempting to gline a host with an exception (%s@%s)%c", 1, theClient->getNickName().c_str(), userName.c_str(), hostName.c_str(), 1);
+		bot->Notice(theClient,"There is an exception for that host. Send the gline again to force.");
+		bot->addGlinedException(userName + "@" + hostName);
+		Ok = false;
+	}
 	}
 
 /*if((gCheck & gline::FORCE_NEEDED_HOST) && (Ok))

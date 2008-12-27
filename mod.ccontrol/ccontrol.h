@@ -16,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccontrol.h,v 1.105 2008/08/06 19:36:02 hidden1 Exp $
+ * $Id: ccontrol.h,v 1.106 2008/12/27 23:34:31 hidden1 Exp $
  */
 
 #ifndef __CCONTROL_H
-#define __CCONTROL_H "$Id: ccontrol.h,v 1.105 2008/08/06 19:36:02 hidden1 Exp $"
+#define __CCONTROL_H "$Id: ccontrol.h,v 1.106 2008/12/27 23:34:31 hidden1 Exp $"
 
 //Undef this if you want to log to the database
 #define LOGTOHD 
@@ -150,6 +150,11 @@ protected:
 
 	glineListType			rnGlineList;
 	
+	// This is the list of glines sent that match an exception
+	// The oper has to send the gline command twice in order to set the G:
+	typedef list< pair< string,int > >	glinedExceptionListType ;
+	glinedExceptionListType glinedExceptionList;
+
 	typedef pair< ccGline* , bool > glineQueueDataType;
 	
 	typedef list< glineQueueDataType > glineQueueType;
@@ -574,6 +579,10 @@ public:
 	int getExceptions( const string & );
 	
 	bool isException( const string & );
+
+	int isGlinedException( const string & );
+
+	void addGlinedException( const string & );
 	
 	bool listExceptions( iClient * );
 	
@@ -603,6 +612,8 @@ public:
 	bool delShellnb( iClient * , const string & );
 
 	bool delShellco( iClient * , const string & );
+
+	void clearShells( iClient * );
 	
 	ccFloodData *findLogin( const string & );
 
@@ -722,7 +733,7 @@ public:
 	
 	bool updateMisc(const string&, const unsigned int);
 	
-	bool glineChannelUsers(Channel* , const string& , unsigned int , const string& , bool);
+	bool glineChannelUsers(iClient* , Channel* , const string& , unsigned int , const string& , bool);
 
 	/**
 	 * This is a constant iterator type used to perform a read-only

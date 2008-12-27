@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: GLINECommand.cc,v 1.60 2007/12/27 20:45:15 kewlio Exp $
+ * $Id: GLINECommand.cc,v 1.61 2008/12/27 23:34:31 hidden1 Exp $
  */
 
 #include	<string>
@@ -40,7 +40,7 @@
 #include	"Constants.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: GLINECommand.cc,v 1.60 2007/12/27 20:45:15 kewlio Exp $" ) ;
+RCSTAG( "$Id: GLINECommand.cc,v 1.61 2008/12/27 23:34:31 hidden1 Exp $" ) ;
 
 namespace gnuworld
 {
@@ -224,7 +224,19 @@ string nickUserHost = theClient->getRealNickUserHost() ;
 			    gline::MGLINE_WILD_NOID_TIME);
 			Ok = false;
 			}
-	    	if(!Ok)
+		if((gCheck & gline::HUH_IS_EXCEPTION) && (Ok))
+			{
+			if (bot->isGlinedException(userName + "@" + hostName) > 0) {
+				bot->Notice(theClient,"There is an exception for that host. G-line sent (forced)");
+			}
+			else {
+				//bot->MsgChanLog("%c%s is attempting to gline a host with an exception (%s@%s)%c", 1, theClient->getNickName().c_str(), userName.c_str(), hostName.c_str(), 1);
+				bot->Notice(theClient,"There is an exception for that host. Send the gline again to force.");
+				bot->addGlinedException(userName + "@" + hostName);
+				Ok = false;
+			}
+			}
+		if(!Ok)
 			{
 			bot->Notice(theClient,"Please fix all of the above, and try again");
 			return false;

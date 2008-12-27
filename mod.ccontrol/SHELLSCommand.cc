@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: SHELLSCommand.cc,v 1.1 2008/08/06 19:35:58 hidden1 Exp $
+ * $Id: SHELLSCommand.cc,v 1.2 2008/12/27 23:34:31 hidden1 Exp $
  */
 
 #include	<string>
@@ -32,7 +32,7 @@
 #include	"gnuworld_config.h"
 #include	"ccException.h"
 
-RCSTAG( "$Id: SHELLSCommand.cc,v 1.1 2008/08/06 19:35:58 hidden1 Exp $" ) ;
+RCSTAG( "$Id: SHELLSCommand.cc,v 1.2 2008/12/27 23:34:31 hidden1 Exp $" ) ;
 
 namespace gnuworld
 {
@@ -223,6 +223,11 @@ else if(!strcasecmp(st[1].c_str(),"delcompany"))
 			}
 		
 		}
+	}
+else if(!strcasecmp(st[1].c_str(),"clearall"))
+	{
+	bot->clearShells(theClient);
+	bot->Notice(theClient,"Successfully deleted all shell companies");
 	}
 
 else if(!strcasecmp(st[1].c_str(),"test"))

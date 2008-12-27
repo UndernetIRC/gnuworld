@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccException.cc,v 1.16 2008/08/06 19:35:58 hidden1 Exp $
+ * $Id: ccException.cc,v 1.17 2008/12/27 23:34:31 hidden1 Exp $
  */
  
 #include	<sstream>
@@ -35,7 +35,7 @@
 #include	"gnuworld_config.h"
 #include	"StringTokenizer.h"
 
-RCSTAG( "$Id: ccException.cc,v 1.16 2008/08/06 19:35:58 hidden1 Exp $" ) ;
+RCSTAG( "$Id: ccException.cc,v 1.17 2008/12/27 23:34:31 hidden1 Exp $" ) ;
 
 namespace gnuworld
 {

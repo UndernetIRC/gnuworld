@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: SCHANGLINECommand.cc,v 1.2 2007/12/27 20:45:16 kewlio Exp $
+ * $Id: SCHANGLINECommand.cc,v 1.3 2008/12/27 23:34:31 hidden1 Exp $
  */
 
 #include	<string>
@@ -41,7 +41,7 @@
 #include	"Constants.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: SCHANGLINECommand.cc,v 1.2 2007/12/27 20:45:16 kewlio Exp $" ) ;
+RCSTAG( "$Id: SCHANGLINECommand.cc,v 1.3 2008/12/27 23:34:31 hidden1 Exp $" ) ;
 
 namespace gnuworld
 {
@@ -112,7 +112,7 @@ bool SCHANGLINECommand::Exec( iClient* theClient, const string& Message )
 		return true;
 	}
 
-	bot->glineChannelUsers(theChan,st.assemble( pos + ResStart ), gLength, nickUserHost, false);
+	bot->glineChannelUsers(theClient, theChan,st.assemble( pos + ResStart ), gLength, nickUserHost, false);
 	return true;
 }
 

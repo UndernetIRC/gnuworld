@@ -1,4 +1,4 @@
--- 2001-03-02 |MrBean| "$Id: ccontrol.help.sql,v 1.16 2008/08/06 19:35:58 hidden1 Exp $"
+-- 2001-03-02 |MrBean| "$Id: ccontrol.help.sql,v 1.17 2008/12/27 23:34:30 hidden1 Exp $"
 -- Created the file and added all help topics to the database
 
 -- 2201-03-11 |MrBean|
@@ -323,7 +323,7 @@ WHOIS		3	Syntax: /msg $BOT$ whois <nick>
 WHOIS		4	<nick> - the person you want to get info about
 SHELLS		1	****** SHELLS COMMAND ******
 SHELLS		2	Add/remove/modify shells limits/exceptions
-SHELLS		3	Syntax: /msg $BOT$ SHELLS <addcompany|addnetblock|delcompany|delnetblock|list|chlimit|chname> <Shell company|Netblock> <max connections>
+SHELLS		3	Syntax: /msg $BOT$ SHELLS <addcompany|addnetblock|delcompany|delnetblock|list|chlimit|chname|clearall> <Shell company|Netblock> <max connections>
 SHELLS		4	<Shell company>: The name of the shell company
 SHELLS		5	<Netblock>: CIDR netblock
 SHELLS		6	<max connections>: The number of connections allowed before gline
