@@ -16,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccontrol.h,v 1.106 2008/12/27 23:34:31 hidden1 Exp $
+ * $Id: ccontrol.h,v 1.107 2008/12/28 12:21:15 hidden1 Exp $
  */
 
 #ifndef __CCONTROL_H
-#define __CCONTROL_H "$Id: ccontrol.h,v 1.106 2008/12/27 23:34:31 hidden1 Exp $"
+#define __CCONTROL_H "$Id: ccontrol.h,v 1.107 2008/12/28 12:21:15 hidden1 Exp $"
 
 //Undef this if you want to log to the database
 #define LOGTOHD 
@@ -613,7 +613,7 @@ public:
 
 	bool delShellco( iClient * , const string & );
 
-	void clearShells( iClient * );
+	bool clearShells( iClient * );
 	
 	ccFloodData *findLogin( const string & );
 

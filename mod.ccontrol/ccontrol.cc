@@ -20,7 +20,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccontrol.cc,v 1.223 2008/12/27 23:34:31 hidden1 Exp $
+ * $Id: ccontrol.cc,v 1.224 2008/12/28 12:21:15 hidden1 Exp $
 */
 
 #define MAJORVER "1"
@@ -67,7 +67,7 @@
 #include	"ccontrol_generic.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: ccontrol.cc,v 1.223 2008/12/27 23:34:31 hidden1 Exp $" ) ;
+RCSTAG( "$Id: ccontrol.cc,v 1.224 2008/12/28 12:21:15 hidden1 Exp $" ) ;
 
 namespace gnuworld
 {
@@ -4927,8 +4927,9 @@ return status;
 
 }
 
-void ccontrol::clearShells( iClient *theClient )
+bool ccontrol::clearShells( iClient *theClient )
 {
+bool ret = true;
 list<string> s;
 for (shellcoIterator ptr = shellcoList.begin(); ptr != shellcoList.end(); ptr++) {
 	string Name = (*ptr)->getName();
@@ -4936,9 +4937,11 @@ for (shellcoIterator ptr = shellcoList.begin(); ptr != shellcoList.end(); ptr++)
 }
 for (list<string>::iterator ptr = s.begin(); ptr != s.end(); ptr++) {
 	Notice(theClient, "Deleting Shellco '%s'", ptr->c_str());
-	delShellco(theClient, *ptr);
+	if (delShellco(theClient, *ptr) == false)
+		ret = false;
 }
 s.clear();
+return ret;
 }
 
 bool ccontrol::delShellco( iClient *theClient , const string &Name )
@@ -6296,7 +6299,7 @@ for (Channel::const_userIterator ptr = theChan->userList_begin();
 		TmpGline->setAddedOn(::time(0));
 		TmpGline->setLastUpdated(::time(0));
 		(excludeChanWithOper || foundException) ? neededGlines.push_back(TmpGline) : queueGline(TmpGline);
-		}																        
+		}
 	}
 if (foundException)
 	{
@@ -6319,7 +6322,7 @@ if(excludeChanWithOper || foundException)
 	for(; glinesIt != neededGlines.end(); ++glinesIt)
 		{
 		TmpGline = *glinesIt;
-		(foundOper || !exceptionForce) ? delete TmpGline : queueGline(TmpGline);
+		((excludeChanWithOper && foundOper) || (foundException && !exceptionForce)) ? delete TmpGline : queueGline(TmpGline);
 		}
 	}
 return success;
