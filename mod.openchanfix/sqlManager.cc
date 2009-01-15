@@ -18,13 +18,14 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: sqlManager.cc,v 1.5 2007/08/28 16:10:25 dan_karrels Exp $
+ * $Id: sqlManager.cc,v 1.6 2009/01/15 08:31:07 denspike Exp $
  */
 
 #include <new>
 #include <iostream>
 
 #include <cassert>
+#include <cstdlib>
 
 #include "gnuworld_config.h"
 #include "ELog.h"

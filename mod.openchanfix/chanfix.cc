@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: chanfix.cc,v 1.14 2008/01/16 02:03:39 buzlip01 Exp $
+ * $Id: chanfix.cc,v 1.15 2009/01/15 08:31:07 denspike Exp $
  */
 
 #include	<csignal>
@@ -62,7 +62,7 @@
 #include	<boost/thread/thread.hpp>
 #endif /* CHANFIX_HAVE_BOOST_THREAD */
 
-RCSTAG("$Id: chanfix.cc,v 1.14 2008/01/16 02:03:39 buzlip01 Exp $");
+RCSTAG("$Id: chanfix.cc,v 1.15 2009/01/15 08:31:07 denspike Exp $");
 
 namespace gnuworld
 {
@@ -3409,7 +3409,7 @@ return std::string( "Unable to retrieve response. Please contact a chanfix "
 void chanfix::loadTranslationTable()
 {
 /* Get a connection instance to our backend */
-dbHandle* cacheCon = theManager->getConnection();
+dbHandle* cacheCon = localDBHandle;
 
 /* Grab the languages table */
 std::stringstream langQuery;
