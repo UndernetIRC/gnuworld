@@ -1,4 +1,7 @@
--- "$Id: ccontrol.sql,v 1.32 2005/01/19 09:43:31 denspike Exp $"
+-- "$Id: ccontrol.sql,v 1.33 2009/01/16 14:28:19 denspike Exp $"
+
+-- 2009-01-16 : Spike
+-- Merged ShellCompanies and ShellNetblocks tables in.
 
 -- 2002-25-02 : |MrBean|
 -- Added the Misc table
@@ -139,4 +142,21 @@ CREATE TABLE BadChannels (
 	Reason VARCHAR(512) NOT NULL,
 	AddedBy VARCHAR(200) NOT NULL
 	);
-		
+
+CREATE TABLE ShellCompanies (
+        id SERIAL,
+        name VARCHAR(200) UNIQUE NOT NULL,
+        active int4 NOT NULL DEFAULT 1,
+        addedby VARCHAR(200) NOT NULL,
+        addedon int4 NOT NULL,
+        lastmodby VARCHAR(200) NOT NULL,
+        lastmodon int4 NOT NULL,
+        maxlimit int4 NOT NULL
+        );
+
+CREATE TABLE ShellNetblocks (
+        companyid int4 NOT NULL,
+        cidr VARCHAR(20) NOT NULL,
+        addedby VARCHAR(200) NOT NULL,
+        addedon int4 NOT NULL
+        );
