@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: cservice.cc,v 1.292 2008/11/11 21:04:56 mrbean_ Exp $
+ * $Id: cservice.cc,v 1.293 2009/02/04 17:09:39 denspike Exp $
  */
 
 #include	<new>
@@ -1449,7 +1449,6 @@ short int cservice::getAdminAccessLevel( sqlUser* theUser, bool verify )
  *  First thing, check if this ACCOUNT has been globally
  *  suspended.
  */
-
 if (theUser->getFlag(sqlUser::F_GLOBAL_SUSPEND))
 	{
 	return 0;
@@ -1588,6 +1587,17 @@ if (theLevel->getSuspendExpire() > currentTime())
 		}
 	return 0;
 	}
+
+/*  We need to use getAdminAccessLevel in case the check is made against *,
+ *  otherwise userflags (like ALUMNI) are not taken into account.
+ */
+
+sqlChannel* adminChan = getChannelRecord("*");
+if (theChan == adminChan)
+	{
+	return getAdminAccessLevel(theUser, false);
+	}
+
 
 return theLevel->getAccess();
 }
