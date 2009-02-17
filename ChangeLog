@@ -1,4 +1,8 @@
-// $Id: ChangeLog,v 1.164 2008/06/20 00:28:49 danielaustin Exp $ //
+// $Id: ChangeLog,v 1.165 2009/02/17 21:34:46 danielaustin Exp $ //
+
+2009-02-17	Dan-m00 <daniel@undernet.org>
+		* mod.ccontrol/ccontrol.cc: Check exceptions list when checking
+			CIDR ident clones.
 
 2008-06-20	Dan-m00 <daniel@undernet.org>
 		* mod.cservice/cservice.cc: fix a problem when X is not in a 

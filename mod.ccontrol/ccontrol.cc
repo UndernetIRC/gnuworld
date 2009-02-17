@@ -20,7 +20,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccontrol.cc,v 1.224 2008/12/28 12:21:15 hidden1 Exp $
+ * $Id: ccontrol.cc,v 1.225 2009/02/17 21:34:47 danielaustin Exp $
 */
 
 #define MAJORVER "1"
@@ -67,7 +67,7 @@
 #include	"ccontrol_generic.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: ccontrol.cc,v 1.224 2008/12/28 12:21:15 hidden1 Exp $" ) ;
+RCSTAG( "$Id: ccontrol.cc,v 1.225 2009/02/17 21:34:47 danielaustin Exp $" ) ;
 
 namespace gnuworld
 {
@@ -1974,7 +1974,8 @@ if(dbConnected)
 
 
 				/* check idents to see if we have too many */
-				if (CurIdentConnections > maxIClones)
+				if ((CurIdentConnections > maxIClones) && (CurIdentConnections > getExceptions(NewUser->getUserName() + "@" + tIP)) &&
+					(CurIdentConnections > getExceptions(NewUser->getUserName() + "@" + NewUser->getRealInsecureHost())))
 				{
 					/* too many - send a warning to the chanlog if within warning range */
 					if ((clientsIp24IdentMapLastWarn[Log] + CClonesTime) <= time(NULL))
