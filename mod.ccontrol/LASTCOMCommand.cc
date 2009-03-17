@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: LASTCOMCommand.cc,v 1.17 2006/09/26 17:35:58 kewlio Exp $
+ * $Id: LASTCOMCommand.cc,v 1.18 2009/03/17 09:50:58 denspike Exp $
  */
 
 #include	<sstream>
@@ -35,7 +35,7 @@
 #include	"ELog.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: LASTCOMCommand.cc,v 1.17 2006/09/26 17:35:58 kewlio Exp $" ) ;
+RCSTAG( "$Id: LASTCOMCommand.cc,v 1.18 2009/03/17 09:50:58 denspike Exp $" ) ;
 
 namespace gnuworld
 {
@@ -102,9 +102,9 @@ elog	<< "LASTCOM> "
 	<< theQuery.str().c_str() 
 	<< endl;
 	
-ExecStatusType status = bot->SQLDb->Exec( theQuery.str().c_str() ) ;
 
-if( PGRES_TUPLES_OK != status )
+if (!bot->SQLDb->Exec(theQuery, true))
+//if( PGRES_TUPLES_OK != status )
 	{
 	elog	<< "LASTCOM> SQL Error: "
 		<< bot->SQLDb->ErrorMessage()
@@ -116,7 +116,7 @@ if( PGRES_TUPLES_OK != status )
 bot->Notice(theClient,"Listing last %d messages from day %d",NumOfCom,Days);
 for (int i = (bot->SQLDb->Tuples() - 1) ; i >= 0; i--)
 	{
-	bot->Notice(theClient,"[ %s - %s ] %s",bot->convertToAscTime(atoi(bot->SQLDb->GetValue(i, 0))),bot->SQLDb->GetValue(i,1),bot->SQLDb->GetValue(i,2));
+	bot->Notice(theClient,"[ %s - %s ] %s",bot->convertToAscTime(atoi(bot->SQLDb->GetValue(i, 0))),bot->SQLDb->GetValue(i,1).c_str(),bot->SQLDb->GetValue(i,2).c_str());
 	}
 #else
 	if(st.size() > 1)
