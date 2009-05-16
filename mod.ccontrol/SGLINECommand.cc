@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: SGLINECommand.cc,v 1.14 2006/09/26 17:36:01 kewlio Exp $
+ * $Id: SGLINECommand.cc,v 1.15 2009/05/16 07:47:23 danielaustin Exp $
  */
 
 #include	<string>
@@ -36,7 +36,7 @@
 #include	"Constants.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: SGLINECommand.cc,v 1.14 2006/09/26 17:36:01 kewlio Exp $" ) ;
+RCSTAG( "$Id: SGLINECommand.cc,v 1.15 2009/05/16 07:47:23 danielaustin Exp $" ) ;
 
 namespace gnuworld
 {
@@ -171,7 +171,8 @@ if(!tmpUser)
 	
 unsigned int Users;
 string nickUserHost = bot->removeSqlChars(theClient->getRealNickUserHost()) ;
-string Reason = st.assemble( pos + ResStart );
+StringTokenizer ReasonTokenizer ( st.assemble( pos + ResStart ), '|');
+string Reason = ReasonTokenizer[0];
 
 if(!RealName)
 	{

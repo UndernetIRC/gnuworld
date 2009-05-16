@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: FORCECHANGLINECommand.cc,v 1.3 2008/12/27 23:34:31 hidden1 Exp $
+ * $Id: FORCECHANGLINECommand.cc,v 1.4 2009/05/16 07:47:23 danielaustin Exp $
  */
 
 #include	<string>
@@ -41,7 +41,7 @@
 #include	"Constants.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: FORCECHANGLINECommand.cc,v 1.3 2008/12/27 23:34:31 hidden1 Exp $" ) ;
+RCSTAG( "$Id: FORCECHANGLINECommand.cc,v 1.4 2009/05/16 07:47:23 danielaustin Exp $" ) ;
 
 namespace gnuworld
 {
@@ -122,7 +122,9 @@ bool FORCECHANGLINECommand::Exec( iClient* theClient, const string& Message )
 		return true;
 	}
 
-	if(!bot->glineChannelUsers(theClient, theChan,st.assemble( pos + ResStart ), gLength, nickUserHost,true))
+	StringTokenizer reason(st.assemble(pos + ResStart), '|');
+
+	if(!bot->glineChannelUsers(theClient, theChan, reason[0], gLength, nickUserHost,true))
 		{
 		bot->Notice(theClient, "You cant gline a channel which has an oper in it");
 		}

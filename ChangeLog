@@ -1,4 +1,14 @@
-// $Id: ChangeLog,v 1.165 2009/02/17 21:34:46 danielaustin Exp $ //
+// $Id: ChangeLog,v 1.166 2009/05/16 07:47:23 danielaustin Exp $ //
+
+2009-05-16	Isomer
+		* mod.ccontrol/FORCECHANGLINECommand.cc:
+		* mod.ccontrol/FORCEGLINECommand.cc:
+		* mod.ccontrol/GLINECommand.cc:
+		* mod.ccontrol/SCHANGLINECommand.cc:
+		* mod.ccontrol/SGLINECommand.cc: Allow an internal logging
+			reason to be given to glines by appending a pipe char
+			followed by the logging reason.  This reason is not
+			sent out to the network in the gline message.
 
 2009-02-17	Dan-m00 <daniel@undernet.org>
 		* mod.ccontrol/ccontrol.cc: Check exceptions list when checking

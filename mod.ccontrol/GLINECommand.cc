@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: GLINECommand.cc,v 1.61 2008/12/27 23:34:31 hidden1 Exp $
+ * $Id: GLINECommand.cc,v 1.62 2009/05/16 07:47:23 danielaustin Exp $
  */
 
 #include	<string>
@@ -40,7 +40,7 @@
 #include	"Constants.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: GLINECommand.cc,v 1.61 2008/12/27 23:34:31 hidden1 Exp $" ) ;
+RCSTAG( "$Id: GLINECommand.cc,v 1.62 2009/05/16 07:47:23 danielaustin Exp $" ) ;
 
 namespace gnuworld
 {
@@ -245,7 +245,8 @@ string nickUserHost = theClient->getRealNickUserHost() ;
 	char Us[100];
 	Us[0] = '\0';
 	sprintf(Us,"%d",Users);
-	string Reason = st.assemble( pos + ResStart );
+	StringTokenizer reasonTokenizer(st.assemble( pos + ResStart),'|');
+	string Reason = reasonTokenizer[0];
 	if(Reason.size() > gline::MAX_REASON_LENGTH)
 		{
 		bot->Notice(theClient,"Gline reason can't be more than %d characters",
