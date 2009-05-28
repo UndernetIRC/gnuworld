@@ -788,10 +788,13 @@ for(jcChanMapType::const_iterator itr = jcChanMap.begin() ;
 		std::stringstream tempNames;
 		int clientcount = 0;
 
-		bool isoktogline = ((::time(0) - lastBurstTime) > 25 && jcGlineEnable && jChannel->getNumOfJoins() > jcMinJFSizeToGline && jChannel->getNumOfParts() > jcMinJFSizeToGline) ? true : false;
+		bool isoktogline = false;
+		bool isoktogline2 = false;
 		for(;joinPartIt != joinPartEnd; ++joinPartIt )
 			{
-				isoktogline = ((::time(0) - lastBurstTime) > 25 && jcGlineEnable && jChannel->getNumOfJoins() > jcMinJFSizeToGline && (jChannel->getNumOfParts() > jcMinJFSizeToGline) || (joinPartIt->second.numOfJoins >= jcMinJoinToGlineJOnly && jChannel->getNumOfJoins() >= jcMinJFJOnlySizeToGline)) ? true : false;
+				isoktogline = ((::time(0) - lastBurstTime) > 25 && jcGlineEnable && jChannel->getNumOfJoins() > jcMinJFSizeToGline && (jChannel->getNumOfParts() > jcMinJFSizeToGline || (joinPartIt->second.numOfJoins >= jcMinJoinToGlineJOnly && jChannel->getNumOfJoins() >= jcMinJFJOnlySizeToGline))) ? true : false;
+				if (isoktogline)
+					isoktogline2 = true;
 				int numOfUsernames = 0;
 				if((joinPartIt->second.numOfJoins >= jcMinJoinToGline &&
 			    joinPartIt->second.numOfParts >= jcMinJoinToGline) || (joinPartIt->second.numOfJoins >= jcMinJoinToGlineJOnly && jChannel->getNumOfJoins() >= jcMinJFJOnlySizeToGline))
@@ -884,6 +887,9 @@ for(jcChanMapType::const_iterator itr = jcChanMap.begin() ;
 					}	 
 				}
 			}
+
+		isoktogline = isoktogline2;
+
 		if(names.str().size() > 0)
 			{
 			outputNames(itr->first,names,false,isoktogline);
@@ -1077,12 +1083,30 @@ if(glineQueue.size() > 0)
 				glineQueue.pop_front();
 				//userCount = Network->countMatchingRealUserHost(curGline->getHost());
 				StringTokenizer st(curGline->getHost(),'@');
+
+				recentlyGlinedIpsType::iterator rItr = recentlyGlinedIps.begin();
+				bool alreadyGlined = false;
+				for (; rItr != recentlyGlinedIps.end(); rItr++) {
+					if ((rItr->first == st[1]) && ((::time(0) - rItr->second) < 120)) {
+						alreadyGlined = true;
+					}
+				}
+				if (alreadyGlined) {
+					delete curGline;
+					continue;
+				}
+
 				userCount = clientsIPMap[st[1]];
 				us[0] = '\0';
 				sprintf(us,"%d",userCount);
 				std::string glineReason = string("AUTO [") + us + string("] ") + curGline->getReason(); 
 				MyUplink->setGline(nickName,curGline->getHost(),
 				glineReason,curGline->getExpires(),::time(0),this);
+
+				recentlyGlinedIps.push_front(std::pair<std::string,int>(st[1],::time(0)));
+				if (recentlyGlinedIps.size() > RecentlyGlinedIpsSize) {
+					recentlyGlinedIps.pop_back();
+				}
 				delete curGline;
 				count++;
 				}
@@ -1272,7 +1296,7 @@ if(channel->getJoinFlooded())
 			jcFC->log.push_back(s.str());
 
 
-			if (jcFC->count >= jcMinJoinsPerIPToGline) {
+			if ((unsigned int) jcFC->count >= jcMinJoinsPerIPToGline) {
 				IPJQueue.push_back(IP);
 			}
 		}

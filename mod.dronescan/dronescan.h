@@ -18,7 +18,7 @@
  */
 
 #ifndef DRONESCAN_H
-#define DRONESCAN_H "$Id: dronescan.h,v 1.37 2008/11/17 02:54:42 hidden1 Exp $"
+#define DRONESCAN_H "$Id: dronescan.h,v 1.38 2009/05/28 10:37:31 hidden1 Exp $"
 
 #include <map>
 #include <string>
@@ -39,6 +39,7 @@
 #define JF_CSERVICE "gnuworld.ds.jf.cservice"
 
 #endif
+#define RecentlyGlinedIpsSize 150
 
 
 namespace gnuworld {
@@ -128,6 +129,7 @@ public:
 	typedef std::map< std::string , jcFloodClients* > clientsIPFloodMapType;
 	typedef std::list< std::string > IPJQueueType;
 	typedef std::list< glineData* > glineQueueType;
+	typedef std::list< std::pair< std::string, int > > recentlyGlinedIpsType;
 	
 	/*******************************************
 	 ** D R O N E S C A N   F U N C T I O N S **
@@ -240,6 +242,7 @@ public:
 	/** The gline queue */
 	glineQueueType glineQueue;
 	IPJQueueType IPJQueue;
+	recentlyGlinedIpsType recentlyGlinedIps;
 	
 	bool isExceptionalChannel(const std::string&);
 	
