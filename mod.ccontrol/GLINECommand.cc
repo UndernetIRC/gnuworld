@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: GLINECommand.cc,v 1.62 2009/05/16 07:47:23 danielaustin Exp $
+ * $Id: GLINECommand.cc,v 1.63 2009/05/31 21:31:55 hidden1 Exp $
  */
 
 #include	<string>
@@ -40,7 +40,7 @@
 #include	"Constants.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: GLINECommand.cc,v 1.62 2009/05/16 07:47:23 danielaustin Exp $" ) ;
+RCSTAG( "$Id: GLINECommand.cc,v 1.63 2009/05/31 21:31:55 hidden1 Exp $" ) ;
 
 namespace gnuworld
 {
@@ -117,6 +117,25 @@ string hostName;
 					userName = "~*";
 					}
 				hostName = xIP(tClient->getIP()).GetNumericIP();
+				string newMsg = "GLINE mask for " + st[pos] + " is " + userName + "@" + hostName;
+				bot->MsgChanLog("%s\n",newMsg.c_str());
+#ifndef LOGTOHD
+				if(tmpUser)
+					bot->DailyLog(tmpUser,"%s",newMsg.c_str());
+				else
+		    			bot->DailyLog(theClient,"%s",newMsg.c_str());
+#else
+				ccLog* newLog = new (std::nothrow) ccLog();
+				newLog->Time = ::time(0);
+				newLog->Desc = newMsg.c_str();
+				newLog->Host = theClient->getRealNickUserHost().c_str();
+				if(tmpUser)
+					newLog->User = tmpUser->getUserName().c_str();
+				else
+					newLog->User = "Unknown";			
+				newLog->CommandName = "GLINE";
+				bot->DailyLog(newLog);
+#endif
 				}
 			}
 		else

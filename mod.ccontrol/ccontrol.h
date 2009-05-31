@@ -16,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccontrol.h,v 1.107 2008/12/28 12:21:15 hidden1 Exp $
+ * $Id: ccontrol.h,v 1.108 2009/05/31 21:31:55 hidden1 Exp $
  */
 
 #ifndef __CCONTROL_H
-#define __CCONTROL_H "$Id: ccontrol.h,v 1.107 2008/12/28 12:21:15 hidden1 Exp $"
+#define __CCONTROL_H "$Id: ccontrol.h,v 1.108 2009/05/31 21:31:55 hidden1 Exp $"
 
 //Undef this if you want to log to the database
 #define LOGTOHD 
@@ -1053,7 +1053,9 @@ protected:
 	int			maxThreads;
 
 	bool			checkClones;
-	
+
+	bool			showCGIpsInLogs;
+
 	time_t			dbConnectionTimer;
 	
 	string			sqlHost;

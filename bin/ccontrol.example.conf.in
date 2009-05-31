@@ -1,4 +1,4 @@
-# $Id: ccontrol.example.conf.in,v 1.2 2003/06/05 01:38:01 dan_karrels Exp $
+# $Id: ccontrol.example.conf.in,v 1.3 2009/05/31 21:31:55 hidden1 Exp $
 # conf file for testClient
 
 # database specifications
@@ -76,4 +76,7 @@ Expired_interval = 60
 
 # dbinterval
 dbinterval = 60
+
+# showCGIpsInLogs - If set to 1, it shows channel glines IPs in lastcom logs and in daily logs sent by email
+showCGIpsInLogs = 1
 

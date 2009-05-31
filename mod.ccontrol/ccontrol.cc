@@ -20,7 +20,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccontrol.cc,v 1.225 2009/02/17 21:34:47 danielaustin Exp $
+ * $Id: ccontrol.cc,v 1.226 2009/05/31 21:31:55 hidden1 Exp $
 */
 
 #define MAJORVER "1"
@@ -67,7 +67,7 @@
 #include	"ccontrol_generic.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: ccontrol.cc,v 1.225 2009/02/17 21:34:47 danielaustin Exp $" ) ;
+RCSTAG( "$Id: ccontrol.cc,v 1.226 2009/05/31 21:31:55 hidden1 Exp $" ) ;
 
 namespace gnuworld
 {
@@ -195,6 +195,8 @@ SendReport = atoi(conf.Require("mail_report")->second.c_str());
 maxThreads = atoi(conf.Require("max_threads")->second.c_str());
 
 checkClones = atoi(conf.Require("check_clones")->second.c_str());
+
+showCGIpsInLogs = atoi(conf.Require("showCGIpsInLogs")->second.c_str());
 
 dbConnectionTimer = atoi(conf.Require("dbinterval")->second.c_str());
 
@@ -6254,10 +6256,14 @@ bool ccontrol::glineChannelUsers(iClient* theClient, Channel* theChan, const str
 ccGline *TmpGline;
 iClient *TmpClient;
 string curIP;
+string newMsg = "IP addresses glined from " + theChan->getName() + ": ";
+ccUser* tmpUser = IsAuth(theClient);
 typedef map<string , int> GlineMapType;
 GlineMapType glineList;
 GlineMapType::iterator gptr;
 list<ccGline*> neededGlines;
+list<string> ipList;
+int count = 0;
 bool foundOper = false;
 bool success = true;
 bool foundException = false;
@@ -6300,8 +6306,24 @@ for (Channel::const_userIterator ptr = theChan->userList_begin();
 		TmpGline->setAddedOn(::time(0));
 		TmpGline->setLastUpdated(::time(0));
 		(excludeChanWithOper || foundException) ? neededGlines.push_back(TmpGline) : queueGline(TmpGline);
+		if (showCGIpsInLogs)
+			{
+			count++;
+			if (count > 1)
+				newMsg += ",";
+			newMsg += curIP;
+			if (newMsg.size() > 300)
+				{
+				ipList.push_back(newMsg);
+				newMsg = "IPs: ";
+				count = 0;
+				}
+			}
 		}
 	}
+if (showCGIpsInLogs)
+	ipList.push_back(newMsg);
+
 if (foundException)
 	{
 	if (isGlinedException(theChan->getName()) > 0) 
@@ -6323,9 +6345,43 @@ if(excludeChanWithOper || foundException)
 	for(; glinesIt != neededGlines.end(); ++glinesIt)
 		{
 		TmpGline = *glinesIt;
-		((excludeChanWithOper && foundOper) || (foundException && !exceptionForce)) ? delete TmpGline : queueGline(TmpGline);
+		//((excludeChanWithOper && foundOper) || (foundException && !exceptionForce)) ? delete TmpGline : queueGline(TmpGline);
+		if ((excludeChanWithOper && foundOper) || (foundException && !exceptionForce)) 
+			{
+			delete TmpGline;
+			}
+		else 
+			{
+			queueGline(TmpGline);
+			}
 		}
 	}
+
+if ((showCGIpsInLogs) && (((!excludeChanWithOper) && (!foundException)) || !((excludeChanWithOper && foundOper) || (foundException && !exceptionForce))))
+	{
+	for (list<string>::iterator sItr = ipList.begin(); sItr != ipList.end(); sItr++)
+		{
+		newMsg = *sItr;
+#ifndef LOGTOHD
+		if(tmpUser)
+			DailyLog(tmpUser,"%s",newMsg.c_str());
+		else
+    			DailyLog(theClient,"%s",newMsg.c_str());
+#else
+		ccLog* newLog = new (std::nothrow) ccLog();
+		newLog->Time = ::time(0);
+		newLog->Desc = newMsg.c_str();
+		newLog->Host = theClient->getRealNickUserHost().c_str();
+		if(tmpUser)
+			newLog->User = tmpUser->getUserName().c_str();
+		else
+			newLog->User = "Unknown";			
+		newLog->CommandName = (excludeChanWithOper) ? "FORCECHANGLINE" : "SCHANGLINE";
+		DailyLog(newLog);
+		}
+#endif
+	}
+
 return success;
 }
 
