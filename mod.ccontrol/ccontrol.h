@@ -16,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccontrol.h,v 1.108 2009/05/31 21:31:55 hidden1 Exp $
+ * $Id: ccontrol.h,v 1.109 2009/06/06 07:53:34 hidden1 Exp $
  */
 
 #ifndef __CCONTROL_H
-#define __CCONTROL_H "$Id: ccontrol.h,v 1.108 2009/05/31 21:31:55 hidden1 Exp $"
+#define __CCONTROL_H "$Id: ccontrol.h,v 1.109 2009/06/06 07:53:34 hidden1 Exp $"
 
 //Undef this if you want to log to the database
 #define LOGTOHD 
@@ -733,7 +733,7 @@ public:
 	
 	bool updateMisc(const string&, const unsigned int);
 	
-	bool glineChannelUsers(iClient* , Channel* , const string& , unsigned int , const string& , bool);
+	bool glineChannelUsers(iClient* , Channel* , const string& , unsigned int , const string& , bool, bool);
 
 	/**
 	 * This is a constant iterator type used to perform a read-only

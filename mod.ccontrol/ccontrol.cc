@@ -20,7 +20,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccontrol.cc,v 1.226 2009/05/31 21:31:55 hidden1 Exp $
+ * $Id: ccontrol.cc,v 1.227 2009/06/06 07:53:34 hidden1 Exp $
 */
 
 #define MAJORVER "1"
@@ -67,7 +67,7 @@
 #include	"ccontrol_generic.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: ccontrol.cc,v 1.226 2009/05/31 21:31:55 hidden1 Exp $" ) ;
+RCSTAG( "$Id: ccontrol.cc,v 1.227 2009/06/06 07:53:34 hidden1 Exp $" ) ;
 
 namespace gnuworld
 {
@@ -257,7 +257,7 @@ RegisterCommand( new MODECommand( this, "MODE", "<channel> <modes> "
 	operLevel::OPERLEVEL,
 	false ) ) ;
 RegisterCommand( new SCHANGLINECommand( this, "SCHANGLINE",
-	"<#channel> <duration>[time units (s,d,h)] <reason> "
+	"[-u] <#channel> <duration>[time units (s,d,h)] <reason> "
 	"Gline a given channel for the given reason",
 	true,
 	commandLevel::flg_SCHANGLINE,
@@ -267,7 +267,7 @@ RegisterCommand( new SCHANGLINECommand( this, "SCHANGLINE",
 	operLevel::CODERLEVEL,
 	true ) ) ;
 RegisterCommand( new FORCECHANGLINECommand( this, "FORCECHANGLINE",
-		"<#channel> <duration>[time units (s,d,h)] <reason> "
+		"[-u] <#channel> <duration>[time units (s,d,h)] <reason> "
 		"Gline a given channel for the given reason",
 		true,
 		commandLevel::flg_FORCECHANGLINE,
@@ -6251,7 +6251,7 @@ void ccontrol::remBadChannel(ccBadChannel* Channel)
 badChannelsMap.erase(badChannelsMap.find(Channel->getName()));
 }
 
-bool ccontrol::glineChannelUsers(iClient* theClient, Channel* theChan, const string& reason, unsigned int gLength, const string& addedBy,bool excludeChanWithOper)
+bool ccontrol::glineChannelUsers(iClient* theClient, Channel* theChan, const string& reason, unsigned int gLength, const string& addedBy,bool excludeChanWithOper,bool unidented)
 {
 ccGline *TmpGline;
 iClient *TmpClient;
@@ -6285,6 +6285,8 @@ for (Channel::const_userIterator ptr = theChan->userList_begin();
 		foundException = true;
 		Notice(theClient, "There is an exception for this user: %s!%s@%s", TmpClient->getNickName().c_str(), TmpClient->getUserName().c_str(), curIP.c_str());
 		}
+	if ((unidented) && (TmpClient->getUserName().substr(0,1)) != "~")
+		continue;
 	gptr = glineList.find("*@" + curIP);
 	if (gptr != glineList.end())
 		{
@@ -6299,7 +6301,10 @@ for (Channel::const_userIterator ptr = theChan->userList_begin();
 		/* create a new gline and queue it */
 		TmpGline = new ccGline(SQLDb);
 		assert(TmpGline != NULL);
-		TmpGline->setHost("*@"  + curIP);
+		if (unidented)
+			TmpGline->setHost("~*@"  + curIP);
+		else
+			TmpGline->setHost("*@"  + curIP);
 		TmpGline->setExpires(unsigned(gLength));
 		TmpGline->setAddedBy(addedBy);
 		TmpGline->setReason(reason);

@@ -1,4 +1,4 @@
--- 2001-03-02 |MrBean| "$Id: ccontrol.help.sql,v 1.17 2008/12/27 23:34:30 hidden1 Exp $"
+-- 2001-03-02 |MrBean| "$Id: ccontrol.help.sql,v 1.18 2009/06/06 07:53:34 hidden1 Exp $"
 -- Created the file and added all help topics to the database
 
 -- 2201-03-11 |MrBean|
@@ -90,11 +90,12 @@ EXCEPTIONS		4	<host mask> - user@host mask to except
 EXCEPTIONS		5	<connections> - number of connections allowed before gline/warning
 FORCECHANGLINE		1	****** FORCECHANGLINE COMMAND ******
 FORCECHANGLINE		2	Glines all users on the given channel
-FORCECHANGLINE		3	Syntax: /msg $BOT$ forcechangline <#channel> [duration] <reason>
+FORCECHANGLINE		3	Syntax: /msg $BOT$ forcechangline [-u] <#channel> [duration] <reason>
 FORCECHANGLINE		4	<#channel> - the channel name to gline
 FORCECHANGLINE		5	[duration] - Duration of the gline, may have s,m,h,d for secs,mins,hours,days
 FORCECHANGLINE		6	<reason> - reason for the gline
-FORCECHANGLINE		7	This type of chan gline is limited for 24 hours and cannot be issued on channels with opers or channels which are marked as nomode channels
+FORCECHANGLINE		7	[-u] - only glines the unidented clients found on the channel with ~*@IP glines
+FORCECHANGLINE		8	This type of chan gline is limited for 24 hours and cannot be issued on channels with opers or channels which are marked as nomode channels
 FORCEGLINE		1	****** FORCEGLINE COMMAND ******
 FORCEGLINE		2	Glines a host for a certain amount of time
 FORCEGLINE		3	Syntax: /msg $BOT$ forcegline [-fu] <nick|user@host> <duration[s/m/h/d]> <reason>
@@ -272,16 +273,23 @@ SCANGLINE		3	Syntax: /msg $BOT$ scangline <host mask>
 SCANGLINE		4	<host mask> - the host mask to lookup
 SCHANGLINE		1	****** SCHANGLINE COMMAND ******
 SCHANGLINE		2	Glines all users on the given channel
-SCHANGLINE		3	Syntax: /msg $BOT$ schangline <#channel> [duration] <reason>
+SCHANGLINE		3	Syntax: /msg $BOT$ schangline [-u] <#channel> [duration] <reason>
 SCHANGLINE		4	<#channel> - the channel name to gline
 SCHANGLINE		5	[duration] - Duration of the gline, may have s,m,h,d for secs,mins,hours,days
 SCHANGLINE		6	<reason> - reason for the gline
+SCHANGLINE		7	[-u] - only glines the unidented clients found on the channel with ~*@IP glines
 SGLINE		1	****** SGLINE COMMAND ******
 SGLINE		2	gline a user@host with relaxed restrictions
 SGLINE		3	Syntax: /msg $BOT$ sgline <user@host> [duration] <reason>
 SGLINE		4	<user@host> - the user@host to gline from the network
 SGLINE		5	[duration] - duration of the gline, supports s,m,h,d for secs,mins,hours,days
 SGLINE		6	<reason> - reason for the gline
+SHELLS		1	****** SHELLS COMMAND ******
+SHELLS		2	Add/remove/modify shells limits/exceptions
+SHELLS		3	Syntax: /msg $BOT$ SHELLS <addcompany|addnetblock|delcompany|delnetblock|list|chlimit|chname|clearall> <Shell company|Netblock> <max connections>
+SHELLS		4	<Shell company>: The name of the shell company
+SHELLS		5	<Netblock>: CIDR netblock
+SHELLS		6	<max connections>: The number of connections allowed before gline
 SHUTDOWN		1	****** SHUTDOWN COMMAND ******
 SHUTDOWN		2	Shutdown the service and exit
 SHUTDOWN		3	Syntax: /msg $BOT$ shutdown <reason>
@@ -321,9 +329,3 @@ WHOIS		1	****** WHOIS COMMAND ******
 WHOIS		2	Gives information about a user on the network
 WHOIS		3	Syntax: /msg $BOT$ whois <nick>
 WHOIS		4	<nick> - the person you want to get info about
-SHELLS		1	****** SHELLS COMMAND ******
-SHELLS		2	Add/remove/modify shells limits/exceptions
-SHELLS		3	Syntax: /msg $BOT$ SHELLS <addcompany|addnetblock|delcompany|delnetblock|list|chlimit|chname|clearall> <Shell company|Netblock> <max connections>
-SHELLS		4	<Shell company>: The name of the shell company
-SHELLS		5	<Netblock>: CIDR netblock
-SHELLS		6	<max connections>: The number of connections allowed before gline

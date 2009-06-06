@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: SCHANGLINECommand.cc,v 1.4 2009/05/16 07:47:23 danielaustin Exp $
+ * $Id: SCHANGLINECommand.cc,v 1.5 2009/06/06 07:53:34 hidden1 Exp $
  */
 
 #include	<string>
@@ -41,7 +41,7 @@
 #include	"Constants.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: SCHANGLINECommand.cc,v 1.4 2009/05/16 07:47:23 danielaustin Exp $" ) ;
+RCSTAG( "$Id: SCHANGLINECommand.cc,v 1.5 2009/06/06 07:53:34 hidden1 Exp $" ) ;
 
 namespace gnuworld
 {
@@ -60,11 +60,20 @@ bool SCHANGLINECommand::Exec( iClient* theClient, const string& Message )
 {
 	StringTokenizer st(Message);
 	unsigned ResStart = 2;
+	int uParam = 0; // if the -u paramter is used in the command, it will only gline unidented connections
 
 	if (st.size() < 4)
 	{
 		Usage(theClient);
 		return true;
+	}
+
+	if (st[1] == "-u") {
+		if (st.size() < 5) {
+			Usage(theClient);
+			return true;
+		}
+        uParam = 1;	
 	}
 
 	StringTokenizer::size_type pos = 1;
@@ -75,15 +84,15 @@ bool SCHANGLINECommand::Exec( iClient* theClient, const string& Message )
 	bot->MsgChanLog("SCHANGLINE %s\n",st.assemble(1).c_str());
 
 	/* make sure they're trying a channel gline! */
-	if (st[pos].substr(0,1) != "#")
+	if (st[pos+uParam].substr(0,1) != "#")
 	{
 		bot->Notice(theClient,"Umm... this is SCHANGLINE, not GLINE - Try "
 			"glining a channel maybe?");
 		return true;
 	}
-	if (IsTimeSpec(st[2]))
+	if (IsTimeSpec(st[2+uParam]))
 	{
-		gLength = extractTime( st[2], 1 );
+		gLength = extractTime( st[2+uParam], 1 );
 	} else {
 		gLength = bot->getDefaultGlineLength();
 		ResStart = 1;
@@ -97,24 +106,24 @@ bool SCHANGLINECommand::Exec( iClient* theClient, const string& Message )
 		return false;
 	}
 
-	if (st[1].size() > channel::MaxName)
+	if (st[1+uParam].size() > channel::MaxName)
 	{
 		bot->Notice(theClient,"Channel name can't be more than %d "
 			"characters", channel::MaxName);
 		return false;
 	}
 
-	Channel* theChan = Network->findChannel(st[1]);
+	Channel* theChan = Network->findChannel(st[1+uParam]);
 	if (NULL == theChan)
 	{
 		bot->Notice(theClient, "Unable to find channel %s",
-			st[1].c_str());
+			st[1+uParam].c_str());
 		return true;
 	}
 
-	StringTokenizer reason(st.assemble ( pos + ResStart), '|');
+	StringTokenizer reason(st.assemble ( pos + ResStart + uParam), '|');
 
-	bot->glineChannelUsers(theClient, theChan, reason[0], gLength, nickUserHost, false);
+	bot->glineChannelUsers(theClient, theChan, reason[0], gLength, nickUserHost, false, uParam);
 	return true;
 }
 
