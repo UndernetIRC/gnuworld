@@ -21,11 +21,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: levels.h,v 1.30 2005/09/29 15:21:56 kewlio Exp $
+ * $Id: levels.h,v 1.31 2009/06/09 15:40:29 mrbean_ Exp $
  */
 
 #ifndef __LEVELS_H
-#define __LEVELS_H "$Id: levels.h,v 1.30 2005/09/29 15:21:56 kewlio Exp $"
+#define __LEVELS_H "$Id: levels.h,v 1.31 2009/06/09 15:40:29 mrbean_ Exp $"
 
 namespace gnuworld {
 
@@ -41,7 +41,8 @@ namespace gnuworld {
 
   const int status = 1;
   const int force = 1; // And by definition, unforce.
-
+  const int modinfo_autoinvite = 1;
+  
   const int voice = 25;
   const int devoice = 25;
 

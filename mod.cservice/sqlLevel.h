@@ -16,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: sqlLevel.h,v 1.18 2007/08/28 16:10:12 dan_karrels Exp $
+ * $Id: sqlLevel.h,v 1.19 2009/06/09 15:40:29 mrbean_ Exp $
  */
 
 #ifndef __SQLLEVEL_H
-#define __SQLLEVEL_H "$Id: sqlLevel.h,v 1.18 2007/08/28 16:10:12 dan_karrels Exp $"
+#define __SQLLEVEL_H "$Id: sqlLevel.h,v 1.19 2009/06/09 15:40:29 mrbean_ Exp $"
 
 #include	<string>
 #include	<ctime>
@@ -43,6 +43,7 @@ public:
 	static const flagType	F_FORCED;		// Deprecated.
 	static const flagType	F_AUTOVOICE;
 	static const flagType	F_ONDB; 		// Deprecated.
+	static const flagType	F_AUTOINVITE;
 
 	/*
 	 *  Methods to get data atrributes.

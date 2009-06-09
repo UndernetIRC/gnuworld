@@ -19,7 +19,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: sqlLevel.cc,v 1.17 2007/08/28 16:10:12 dan_karrels Exp $
+ * $Id: sqlLevel.cc,v 1.18 2009/06/09 15:40:29 mrbean_ Exp $
  */
 
 #include	<sstream>
@@ -39,7 +39,7 @@
 #include	"cservice_config.h"
 
 const char sqlLevel_h_rcsId[] = __SQLLEVEL_H ;
-const char sqlLevel_cc_rcsId[] = "$Id: sqlLevel.cc,v 1.17 2007/08/28 16:10:12 dan_karrels Exp $" ;
+const char sqlLevel_cc_rcsId[] = "$Id: sqlLevel.cc,v 1.18 2009/06/09 15:40:29 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -54,6 +54,7 @@ const sqlLevel::flagType sqlLevel::F_PROTECT =	0x02 ;
 const sqlLevel::flagType sqlLevel::F_FORCED =	0x04 ;
 const sqlLevel::flagType sqlLevel::F_AUTOVOICE =0x08 ;
 const sqlLevel::flagType sqlLevel::F_ONDB =		0x10 ;
+const sqlLevel::flagType sqlLevel::F_AUTOINVITE = 0x20;
 
 sqlLevel::sqlLevel(dbHandle* _SQLDb)
  :channel_id(0),

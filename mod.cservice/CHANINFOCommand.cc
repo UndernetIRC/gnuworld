@@ -28,7 +28,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: CHANINFOCommand.cc,v 1.61 2008/11/12 20:45:42 mrbean_ Exp $
+ * $Id: CHANINFOCommand.cc,v 1.62 2009/06/09 15:40:29 mrbean_ Exp $
  */
 
 #include	<string>
@@ -43,7 +43,7 @@
 #include	"dbHandle.h"
 #include	"cservice_config.h"
 
-const char CHANINFOCommand_cc_rcsId[] = "$Id: CHANINFOCommand.cc,v 1.61 2008/11/12 20:45:42 mrbean_ Exp $" ;
+const char CHANINFOCommand_cc_rcsId[] = "$Id: CHANINFOCommand.cc,v 1.62 2009/06/09 15:40:29 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -161,12 +161,44 @@ if( string::npos == st[ 1 ].find_first_of( '#' ) )
 	{
 		int maxLogins = theUser->getMaxLogins();
 		stringstream ss;
-		ss	<< maxLogins
-			<< ends ;
+		ss	<< maxLogins;
+//			<< ends ;
 		if (maxLogins > 1)
 			flagsSet += "MAXLOGINS=" + ss.str() + " ";
-	}
+	
+		stringstream autoInviteQuery;
 
+		autoInviteQuery	<< "SELECT channel_id from levels"
+				<< " where user_id = " << theUser->getID()
+				<< " and flags & "
+				<< sqlLevel::F_AUTOINVITE
+				<< " > 0"
+				<< " and deleted = 0"
+				<< ends;
+
+		#ifdef LOG_SQL
+			elog	<< "CHANINFO::sqlQuery> "
+				<< autoInviteQuery.str().c_str()
+				<< endl;
+		#endif
+
+
+		if( !bot->SQLDb->Exec(autoInviteQuery, true ) )
+//	if( PGRES_TUPLES_OK != status )
+			{
+
+			elog	<< "CHANINFO> SQL Error: "
+				<< bot->SQLDb->ErrorMessage()
+				<< endl ;
+			return  false;
+			}
+		if(bot->SQLDb->Tuples() > 0)
+		{
+			flagsSet+= "INVITE ";
+		}
+
+
+	}
 	/* set 'NONE' if no flags */
 	if (flagsSet.size() == 0)
 		flagsSet = "NONE ";
@@ -373,6 +405,7 @@ if( string::npos == st[ 1 ].find_first_of( '#' ) )
 		bot->outputChannelAccesses(theClient, theUser, tmpUser, 500);
 	}
 
+	
 	return true;
 }
 

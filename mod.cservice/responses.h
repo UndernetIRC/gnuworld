@@ -22,11 +22,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: responses.h,v 1.20 2005/12/27 13:27:59 kewlio Exp $
+ * $Id: responses.h,v 1.21 2009/06/09 15:40:29 mrbean_ Exp $
  */
 
 #ifndef __RESPONSES_H
-#define __RESPONSES_H "$Id: responses.h,v 1.20 2005/12/27 13:27:59 kewlio Exp $"
+#define __RESPONSES_H "$Id: responses.h,v 1.21 2009/06/09 15:40:29 mrbean_ Exp $"
 
 namespace gnuworld
 	{
@@ -196,13 +196,13 @@ namespace gnuworld
 		const int invalid_option =			158;
 		const int is_service_bot =			159;
 		const int is_coder_rep =			160;
-		const int is_coder_contrib =			161;
+		const int is_coder_contrib =		161;
 		const int is_coder_devel =			162;
 		const int is_coder_senior =			163;
-		const int is_also_an_ircop = 			164;
+		const int is_also_an_ircop = 		164;
 		const int ban_added =				165;
 		const int ban_list_empty = 			166;
-		const int already_on_chan = 			167;
+		const int already_on_chan = 		167;
 		const int ircops_only_cmd =			168;
 		const int im_not_op =				169;
 		const int rpl_ignorelist = 			170;
@@ -211,8 +211,9 @@ namespace gnuworld
 		const int no_adduser =				173;
 		const int noadduser_on =			174;
 		const int noadduser_off =			175;
-		const int auth_failed_logins =			176;
-		const int max_failed_logins =			177;
+		const int auth_failed_logins =		176;
+		const int max_failed_logins =		177;
+		const int automode_invite =			178;
 		const int greeting = 				9998;
 		const int motd =					9999;
 	}

@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: cservice.cc,v 1.293 2009/02/04 17:09:39 denspike Exp $
+ * $Id: cservice.cc,v 1.294 2009/06/09 15:40:29 mrbean_ Exp $
  */
 
 #include	<new>
@@ -226,7 +226,7 @@ RegisterCommand(new VOICECommand(this, "VOICE", "<#channel> [nick] [nick] ..", 3
 RegisterCommand(new DEVOICECommand(this, "DEVOICE", "<#channel> [nick] [nick] ..", 3));
 RegisterCommand(new ADDUSERCommand(this, "ADDUSER", "<#channel> <username> <access>", 8));
 RegisterCommand(new REMUSERCommand(this, "REMUSER", "<#channel> <username>", 4));
-RegisterCommand(new MODINFOCommand(this, "MODINFO", "<#channel> [ACCESS <username> <level>] [AUTOMODE <username> <NONE|OP|VOICE>]", 6));
+RegisterCommand(new MODINFOCommand(this, "MODINFO", "<#channel> [ACCESS <username> <level>] [AUTOMODE <username> <NONE|OP|VOICE>] [INVITE <ON|OFF>]", 6));
 RegisterCommand(new SETCommand(this, "SET", "[#channel] <variable> <value> or, SET <invisible> <ON|OFF> or, SET LANG <language> or, SET MAXLOGINS <max-logins>.", 6));
 RegisterCommand(new INVITECommand(this, "INVITE", "<#channel>", 2));
 RegisterCommand(new TOPICCommand(this, "TOPIC", "<#channel> <topic>", 4));
@@ -1008,7 +1008,7 @@ else if(Command == "VERSION")
 	xClient::DoCTCP(theClient, CTCP,
 		"Undernet P10 Channel Services II ["
 		__DATE__ " " __TIME__
-		"] Release 1.3");
+		"] Release 1.4");
 	}
 else if(Command == "PROBLEM?")
 	{
@@ -4834,7 +4834,7 @@ void cservice::outputChannelAccesses(iClient* theClient, sqlUser* theUser, sqlUs
 	stringstream channelsQuery;
 	string channelList ;
 
-	channelsQuery	<< "SELECT channels.name,levels.access FROM levels,channels "
+	channelsQuery	<< "SELECT channels.name,levels.access,levels.flags FROM levels,channels "
 			<< "WHERE levels.channel_id = channels.id AND channels.registered_ts <> 0 AND levels.user_id = "
 			<< theUser->getID()
 			<< " AND levels.access >= "
@@ -4850,6 +4850,7 @@ void cservice::outputChannelAccesses(iClient* theClient, sqlUser* theUser, sqlUs
 
 	string chanName ;
 	string chanAccess ;
+	unsigned int flags;
 
 	if( !SQLDb->Exec(channelsQuery, true ) )
 //	if( PGRES_TUPLES_OK != status )
@@ -4865,8 +4866,15 @@ void cservice::outputChannelAccesses(iClient* theClient, sqlUser* theUser, sqlUs
 
 	for(unsigned int i = 0; i < SQLDb->Tuples(); i++)
 		{
-		chanName = SQLDb->GetValue(i,0);
+		flags = atoi(SQLDb->GetValue(i, 2));
+		if(flags & sqlLevel::F_AUTOINVITE)
+		{
+			chanName = "\002" + SQLDb->GetValue(i,0) + "\002";
+		} else {
+			chanName = SQLDb->GetValue(i,0);
+		}
 		chanAccess = SQLDb->GetValue(i,1);
+		
 		// 4 for 2 spaces, 2 brackets + comma.
 		if ((channelList.size() + chanName.size() + chanAccess.size() +5) >= 450)
 			{

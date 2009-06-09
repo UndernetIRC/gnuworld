@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: SHOWCOMMANDSCommand.cc,v 1.29 2005/12/05 17:32:15 kewlio Exp $
+ * $Id: SHOWCOMMANDSCommand.cc,v 1.30 2009/06/09 15:40:29 mrbean_ Exp $
  */
 
 #include	<string>
@@ -27,7 +27,7 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char SHOWCOMMANDSCommand_cc_rcsId[] = "$Id: SHOWCOMMANDSCommand.cc,v 1.29 2005/12/05 17:32:15 kewlio Exp $" ;
+const char SHOWCOMMANDSCommand_cc_rcsId[] = "$Id: SHOWCOMMANDSCommand.cc,v 1.30 2009/06/09 15:40:29 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -41,7 +41,7 @@ static const char* lvl_600_cmds = "\002Level  600\002: remignore addcomment scan
 
 static const char* lvl_500_cmds = "\002Level  500\002: part";
 static const char* lvl_450_cmds = "\002Level  450\002: join set%s*";
-static const char* lvl_400_cmds = "\002Level  400\002: adduser clearmode* modinfo remuser";
+static const char* lvl_400_cmds = "\002Level  400\002: adduser clearmode* modinfo+ remuser";
 static const char* lvl_100_cmds = "\002Level  100\002: op deop invite suspend unsuspend";
 static const char* lvl_75_cmds = "\002Level   75\002: ban* unban*";
 static const char* lvl_50_cmds = "\002Level   50\002: kick%s topic";

@@ -1,5 +1,18 @@
-// $Id: ChangeLog,v 1.166 2009/05/16 07:47:23 danielaustin Exp $ //
+// $Id: ChangeLog,v 1.167 2009/06/09 15:40:28 mrbean_ Exp $ //
 
+2009-06-09	MrBean
+		* mod.cservice/ACCESSCommand.cc:
+		* mod.cservice/cservice.cc:
+		* mod.cservice/CHANINFOCommand.cc:
+		* mod.cservice/levels.h:
+		* mod.cservice/responses.h:
+		* mod.cservice/LOGINCommand.cc:
+		* mod.cservice/MODINFOCommand.cc:
+		* mod.cservice/SHOWCOMMANDSCommand.cc:
+		* mod.cservice/sqlLevel.cc:
+		* mod.cservice/sqlLevel.h: Added invite on LOGIN, 
+			to toggle: /msg X modinfo #chan INVITE <ON|OFF>
+			
 2009-05-16	Isomer
 		* mod.ccontrol/FORCECHANGLINECommand.cc:
 		* mod.ccontrol/FORCEGLINECommand.cc:

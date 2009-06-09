@@ -28,7 +28,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: MODINFOCommand.cc,v 1.19 2003/06/28 01:21:20 dan_karrels Exp $
+ * $Id: MODINFOCommand.cc,v 1.20 2009/06/09 15:40:29 mrbean_ Exp $
  */
 
 #include	<string>
@@ -38,7 +38,7 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char MODINFOCommand_cc_rcsId[] = "$Id: MODINFOCommand.cc,v 1.19 2003/06/28 01:21:20 dan_karrels Exp $" ;
+const char MODINFOCommand_cc_rcsId[] = "$Id: MODINFOCommand.cc,v 1.20 2009/06/09 15:40:29 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -49,19 +49,23 @@ bool MODINFOCommand::Exec( iClient* theClient, const string& Message )
 bot->incStat("COMMANDS.MODINFO");
 
 StringTokenizer st( Message ) ;
-if( st.size() < 5 )
+if( st.size() < 4 )
 	{
 	Usage(theClient);
 	return true;
 	}
 
-const string command = string_upper(st[2]);
-if ((command != "ACCESS") && (command != "AUTOMODE"))
+string command = string_upper(st[2]);
+if ((command != "ACCESS") && (command != "AUTOMODE") && (command != "INVITE"))
 	{
 	Usage(theClient);
 	return true;
 	}
-
+if(command != "INVITE" && st.size() < 5 )
+	{
+	Usage(theClient);
+	return true;
+	}
 /*
  *  Fetch the sqlUser record attached to this client. If there isn't one,
  *  they aren't logged in - tell them they should be.
@@ -88,16 +92,60 @@ if (!theChan)
 	return false;
 	}
 
+int required_level = level::modinfo;
+if (command == "INVITE")
+	{
+	required_level = level::modinfo_autoinvite;
+	}
 /*
  *  Check the user has sufficient access on this channel.
  */
 int level = bot->getEffectiveAccessLevel(theUser, theChan, true);
-if (level < level::modinfo)
+if (level < required_level)
 	{
 	bot->Notice(theClient,
 		bot->getResponse(theUser,
 			language::insuf_access,
 			string("Sorry, you have insufficient access to perform that command.")));
+	return false;
+	}
+
+if(command == "INVITE")
+	{ //Handle modinfo INVITE
+	if(st[1] == "*")
+	{ //Admin channel?
+		bot->Notice(theClient,"It is a mistake to think you can solve any major problems just with potatoes.");
+		return false;
+	}
+	if(string_upper(st[3]) == "ON")
+		{ //Time to enable INVITE option
+		sqlLevel* aLevel = bot->getLevelRecord(theUser, theChan);
+		aLevel->setFlag(sqlLevel::F_AUTOINVITE);
+		aLevel->commit();
+
+		bot->Notice(theClient,
+			bot->getResponse(theUser,
+				language::automode_invite,
+				string("Set INVITE on login %s for channel %s")).c_str(),
+				theChan->getName().c_str(),"ON");
+
+		return false;
+		}
+	else if(string_upper(st[3]) == "OFF")
+		{
+		sqlLevel* aLevel = bot->getLevelRecord(theUser, theChan);
+		aLevel->removeFlag(sqlLevel::F_AUTOINVITE);
+		aLevel->commit();
+
+		bot->Notice(theClient,
+			bot->getResponse(theUser,
+				language::automode_invite,
+				string("Set INVITE on login %s for channel %s")).c_str(),
+				theChan->getName().c_str(),"OFF");
+
+		return false;
+		}
+	Usage(theClient);
 	return false;
 	}
 
@@ -205,6 +253,13 @@ if (command == "ACCESS")
 
 if (command == "AUTOMODE")
 	{
+	
+	if(st[1] == "*")
+	{ //Admin channel?
+		bot->Notice(theClient,"If there's anything more important than my ego around, I want it caught and shot now.");
+		return false;
+	}
+
 	/*
 	 * Check we aren't trying to change someone with access higher
 	 * than ours. Also, make sure we can't change someone else's MODINFO

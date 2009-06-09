@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: LOGINCommand.cc,v 1.66 2008/11/12 20:45:42 mrbean_ Exp $
+ * $Id: LOGINCommand.cc,v 1.67 2009/06/09 15:40:29 mrbean_ Exp $
  */
 
 #include	<string>
@@ -30,12 +30,13 @@
 #include	"cservice.h"
 #include	"md5hash.h"
 #include	"responses.h"
+#include	"levels.h"
 #include	"networkData.h"
 #include	"cservice_config.h"
 #include	"Network.h"
 #include	"ip.h"
 
-const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.66 2008/11/12 20:45:42 mrbean_ Exp $" ;
+const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.67 2009/06/09 15:40:29 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -486,7 +487,8 @@ for (autoOpVectorType::const_iterator resultPtr = autoOpVector.begin();
 
 	/* If the autoop flag isn't set in this record */
 	if (!(resultPtr->flags & sqlLevel::F_AUTOOP) &&
-		!(resultPtr->flags & sqlLevel::F_AUTOVOICE))
+		!(resultPtr->flags & sqlLevel::F_AUTOVOICE) &&
+		!(resultPtr->flags & sqlLevel::F_AUTOINVITE))
 		{
 		continue;
 		}
@@ -503,6 +505,58 @@ for (autoOpVectorType::const_iterator resultPtr = autoOpVector.begin();
 
 	if (theChan->getFlag(sqlChannel::F_SUSPEND))
 		{
+		continue;
+		}
+
+
+	/*
+	 * Check if they're already opped.
+	 */
+
+	Channel* netChan = Network->findChannel(theChan->getName());
+	if (!netChan)
+		{
+		continue;
+		}
+
+
+	/*
+	 * Don't attempt to op/invite if we're not in the channel, or not op'd.
+	 */
+
+	ChannelUser* tmpBotUser = netChan->findUser(bot->getInstance());
+	if (!tmpBotUser)
+		{
+		continue;
+		}
+
+	if (!theChan->getInChan() || !tmpBotUser->getMode(ChannelUser::MODE_O))
+		{
+		continue;
+		}
+
+	/*
+	 *  Would probably be wise to check they're not suspended too :)
+	 *  (*smack* Ace)
+	 */
+
+	if(resultPtr->suspend_expires > bot->currentTime() )
+		{
+		continue;
+		}
+
+	ChannelUser* tmpChanUser = netChan->findUser(theClient) ;
+	if(!tmpChanUser)
+		{
+		//The user is not in the channel, lets see if their autoinvite is on and act upon it
+		if (resultPtr->flags & sqlLevel::F_AUTOINVITE) 
+			{
+			int level = bot->getEffectiveAccessLevel(theUser, theChan, true);
+			if(level >= level::invite) 
+				{
+				bot->Invite(theClient,netChan);
+				}
+			}
 		continue;
 		}
 
@@ -528,47 +582,6 @@ for (autoOpVectorType::const_iterator resultPtr = autoOpVector.begin();
 		}
 
 	/*
-	 * Check if they're already opped.
-	 */
-
-	Channel* netChan = Network->findChannel(theChan->getName());
-	if (!netChan)
-		{
-		continue;
-		}
-
-	ChannelUser* tmpChanUser = netChan->findUser(theClient) ;
-	if(!tmpChanUser)
-		{
-		continue;
-		}
-
-	/*
-	 * Don't attempt to op if we're not in the channel, or not op'd.
-	 */
-
-	ChannelUser* tmpBotUser = netChan->findUser(bot->getInstance());
-	if (!tmpBotUser)
-		{
-		continue;
-		}
-
-	if (!theChan->getInChan() || !tmpBotUser->getMode(ChannelUser::MODE_O))
-		{
-		continue;
-		}
-
-	/*
-	 *  Would probably be wise to check they're not suspended too :)
-	 *  (*smack* Ace)
-	 */
-
-	if(resultPtr->suspend_expires > bot->currentTime() )
-		{
-		continue;
-		}
-
-	/*
  	 *  If its AUTOOP, check for op's and do the deed.
 	 *  Otherwise, its just AUTOVOICE :)
 	 */
@@ -580,7 +593,7 @@ for (autoOpVectorType::const_iterator resultPtr = autoOpVector.begin();
 			bot->Op(netChan, theClient);
 			}
 		}
-	else
+	else if (resultPtr->flags & sqlLevel::F_AUTOVOICE)
 		{
 		if(!tmpChanUser->getMode(ChannelUser::MODE_V))
 			{
